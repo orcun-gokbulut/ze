@@ -51,10 +51,9 @@ extern HINSTANCE ApplicationInstance;
 #include "Core/ConsoleWindow.h"
 #include "Core/Core.h"
 
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-	// Bismillahirahmanirahim
-
 	_set_SSE2_enable(1);
 	ApplicationInstance = hInstance;
 	zeCore->GetOptions()->Load("options.ini");
@@ -74,7 +73,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		ZERenderer* Renderer;
 		ZERenderer* ShadowRenderer;
 
-		ZEPlayer* Player = (ZEPlayer*)zeCore->GetGame()->CreateEntityInstance("ZEPlayer");
+		/*ZEPlayer* Player = (ZEPlayer*)zeCore->GetGame()->CreateEntityInstance("ZEPlayer");
 
 		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
 		Player->SetRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
@@ -85,65 +84,43 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Scene->SetCamera(Player->GetCamera());
 
 		ZELightBrush* Light = new ZELightBrush();
-		ZELightBrush* Light2 = new ZELightBrush();
 		Light->SetLightType(ZE_LT_POINT);
-		Light->SetPosition(ZEPoint3(45.0f, 120.0f, 0.0f));
+		Light->SetPosition(ZEPoint3(0.0f, 25.0f, 0.0f));
 		Light->SetScale(ZEPoint3(1.0f, 1.0f, 1.0f));
-		Light->GetLight()->SetRange(1500);
+		Light->GetLight()->SetRange(150);
 		Light->SetRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		Light->GetLight()->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-		Light->GetLight()->SetAttenuation(0.000f, 0.0f, 1.0f);
-		Light->GetLight()->SetIntensity(1.0f);
+		Light->GetLight()->SetAttenuation(0.001f, 0.0f, 2.0f);
+		Light->GetLight()->SetIntensity(5.0f);
 		Light->GetLight()->SetCastShadows(false);
-
-		Light2->SetLightType(ZE_LT_POINT);
-		Light2->SetPosition(ZEPoint3(-45.0f, -120.0f, 0.0f));
-		Light2->SetScale(ZEPoint3(1.0f, 1.0f, 1.0f));
-		Light2->GetLight()->SetRange(1500);
-		Light2->SetRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
-		Light2->GetLight()->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-		Light2->GetLight()->SetAttenuation(0.000f, 0.0f, 1.0f);
-		Light2->GetLight()->SetIntensity(1.0f);
-		Light2->GetLight()->SetCastShadows(false);
-
-		//Light->SetProjectionFOV(ZE_PI_2);
-		//Light->SetProjectionAspectRatio(1.0f);
-		//Light->SetProjectionTexture("test/pavyon.bmp");
-		//Scene->AddEntity(Light);
-		//Scene->AddEntity(Light2);
+		Scene->AddEntity(Light);
 
 		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
 		CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
 		CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
-		//CanvasBrush->Canvas.AddPlane(1000.0f, 1000);
-		CanvasBrush->Canvas.AddPyramid(10,20,10);
-		ZEMatrix4x4 Matrix;
-		ZEMatrix4x4::CreateTranslation(Matrix,0,90,0);
-		CanvasBrush->Canvas.SetTransfomation(Matrix);
-		CanvasBrush->Canvas.AddSphere(50,18,18);
+		CanvasBrush->Canvas.AddPlane(1000.0f, 1000);
 		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-		//CanvasBrush->Canvas.LoadCanvasFile("Test\\test.zeCanvas");
+		CanvasBrush->Canvas.LoadCanvasFile("Test\\test.zeCanvas");
 		CanvasBrush->UpdateCanvas();
-
 
 		CanvasBrush->Material.SetZero();
 		CanvasBrush->Material.LightningEnabled = true;
 		CanvasBrush->Material.SetShaderComponents(ZESHADER_DIFFUSEMAP);
-		CanvasBrush->Material.AmbientColor = ZEVector3(1.0f, 1.0f, 1.0f);
-		CanvasBrush->Material.DiffuseColor = ZEVector3(0.0f, 0.0f, 0.0f);
-		CanvasBrush->Material.SpecularColor = ZEVector3(0.0f, 0.0f, 0.0f);
+		CanvasBrush->Material.AmbientColor = ZEVector3(0.01f, 0.01f, 0.01f);
+		CanvasBrush->Material.DiffuseColor = ZEVector3(1.0f, 1.0f, 1.0f);
+		CanvasBrush->Material.SpecularColor = ZEVector3(1.0f, 1.0f, 1.0f);
 		CanvasBrush->Material.SpecularFactor = 64.0f;
-		CanvasBrush->Material.Opasity = 1.0f;
+		CanvasBrush->Material.Transparancy = 1.0f;
 		CanvasBrush->Material.TwoSided = false;
 		CanvasBrush->Material.RecivesShadow = true;
-		CanvasBrush->Material.DiffuseMap = ZETextureResource::LoadResource("Test\\diffuse.tga")->GetTexture();
+		CanvasBrush->Material.DiffuseMap = ZETextureResource::LoadResource("Test\\Diffuse.tga")->GetTexture();
 		Scene->AddEntity(CanvasBrush);
 
-		/*ZESkyBrush* Brush = (ZESkyBrush*)zeCore->GetGame()->CreateEntityInstance("ZESkyBrush");
+		ZESkyBrush* Brush = (ZESkyBrush*)zeCore->GetGame()->CreateEntityInstance("ZESkyBrush");
 		Brush->SetSkyTexture("cubetest.tga");
 		Brush->SetSkyColor(ZEVector3(1.0f, 1.0f, 1.0f));
 		Scene->AddEntity(Brush);*/
-		//Scene->Load("Map00.zeScene");	
+		Scene->Load("Map00.zeScene");
 		zeCore->Run();
 	}
 }

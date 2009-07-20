@@ -119,10 +119,6 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 	#ifdef ZESHADER_SKINTRANSFORM
 		Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		Normal = float3(0.0f, 0.0f, 0.0f);
-		#ifdef ZESHADER_NORMALMAP
-			Tangent = float3(0.0f, 0.0f, 0.0f);
-			Binormal = float3(0.0f, 0.0f, 0.0f);
-		#endif
 		for (int I = 0; I < 4; I++)
 			if (Input.BoneWeights[I] > 0.0f)
 			{

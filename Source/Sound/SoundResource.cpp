@@ -35,8 +35,8 @@
 
 #include "SoundResource.h"
 #include "Core/Core.h"
-#include <ogg/ogg.h>
-#include <vorbis/vorbisfile.h>
+#include <ogg.h>
+#include <vorbisfile.h>
 
 size_t OggFile_Read(void *ptr, size_t size, size_t nmemb, void *datasource)
 {

@@ -39,7 +39,6 @@
 
 #include "Vector.h"
 #include "Line.h"
-
 class ZEPlane;
 class ZERay : public ZELine
 {

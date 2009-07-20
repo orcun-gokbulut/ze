@@ -89,19 +89,9 @@ bool ZEScene::Initialize()
 	if (Renderer != NULL)
 		delete Renderer;
 
-	/*ZETexture* Texture = zeGraphics->CreateTexture();
-	Texture->Create(zeGraphics->GetScreenWidth(), zeGraphics->GetScreenHeight(), ZE_TPF_ARGB32, true);
-	*/
-	
 	Renderer = zeGraphics->CreateFrameRenderer();
 	if (Renderer == NULL)
 		return false;
-	
-/*
-	Renderer->SetOutput(Texture);
-	
-	PostProcessor = zeGraphics->CreatePostProcessor();
-	PostProcessor->SetInput(Texture);*/
 
 	/*Renderer->SetHDR(true, 1.0f, 0.2f);
 	Renderer->SetHDRBloom(true, 1.0f, 1.0f, 5.0f);
@@ -261,20 +251,6 @@ void ZEScene::Render(float ElapsedTime)
 	CullScene(Renderer, CurrentCamera->GetViewVolume(), true);
 	Renderer->Render(ElapsedTime);
 	Renderer->ClearList();
-
-	
-/*
-	PostProcessor->ApplyGrayscale(ZE_PPS_INPUT, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_FRAMEBUFFER);*/
 }
 /*
 ZEEntity* ZEScene::CastRay(const ZERay& Ray, float Range, ZESmartArray<ZEEntity*>& IntersectedEntities)

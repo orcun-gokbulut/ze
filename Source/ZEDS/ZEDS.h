@@ -37,15 +37,15 @@
 #ifndef	__ZEDS_H__
 #define __ZEDS_H__
 
-#include "definitions.h"
-#include "named.h"
-#include "variant.h"
-#include "typedvariant.h"
-#include "array.h"
-//#include "linklist.h"
-//#include "doublelinklist.h"
-//#include "collection.h"
-//#include "tree.h"
-//#include "typetree.h"
-
+#include "Named.h"
+#include "Definitions.h"
+#include "Variant.h"
+#include "TypedVariant.h"
+#include "Array.h"
+//#include "LinkList.h"
+//#include "DoublelinkList.h"
+//#include "Collection.h"
+//#include "Tree.h"
+//#include "Graph.h"
+//#include "TypeTree.h"
 #endif

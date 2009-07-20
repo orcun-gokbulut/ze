@@ -63,7 +63,7 @@ ZEArray<*>{
 #include <stdlib.h>
 #include "Definitions.h"
 #include "..\Types.h"
-#include "Allocator.h"
+#include "ArrayAllocator.h"
 #include <crtdbg.h>
 
 template<typename Type, typename Allocator_= ZEAllocatorBase<Type> >
@@ -438,5 +438,4 @@ class ZESmartArray : public ZEArray<Type, ZESmartAllocator<Type, Exponent> >
 template <typename Type, int ChunkSize>
 class ZEChunkArray : public ZEArray<Type, ZEChunkAllocator<Type, ChunkSize> >
 {};
-
 #endif

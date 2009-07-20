@@ -279,10 +279,6 @@ void ZED3D9RendererBase::DrawSM2(ZERenderList* RenderList, const ZEViewPoint& Vi
 
 	if (Material->LightningEnabled && RenderList->Lights.GetCount() != 0)
 	{
-		Device->SetRenderState(D3DRS_ALPHABLENDENABLE,TRUE);
-		Device->SetRenderState(D3DRS_ALPHAFUNC,D3DBLENDOP_ADD);
-		Device->SetRenderState(D3DRS_SRCBLEND,D3DBLEND_ONE);
-		Device->SetRenderState(D3DRS_DESTBLEND,D3DBLEND_ONE);
 		Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);
 		Device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 
@@ -327,8 +323,7 @@ void ZED3D9RendererBase::DrawSM2(ZERenderList* RenderList, const ZEViewPoint& Vi
 
 				case ZE_RLLT_PROJECTIVE:
 					Device->SetVertexShaderConstantF(24, (const float*)&CurrentLight->Position, 1);
-					Device->SetVertexShaderConstantF(25, (const float*)&CurrentLight->Direction, 1);
-					Device->SetVertexShaderConstantF(26, (const float*)&CurrentLight->Attenuation, 1);
+					Device->SetVertexShaderConstantF(25, (const float*)&CurrentLight->Attenuation, 1);
 					Device->SetVertexShaderConstantF(28, (float*)&CurrentLight->LightViewProjMatrix, 4);
 
 					Device->SetPixelShaderConstantF(12, (const float*)&CurrentLight->Color, 1);

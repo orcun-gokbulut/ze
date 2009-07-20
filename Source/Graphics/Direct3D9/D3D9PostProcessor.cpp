@@ -405,9 +405,9 @@ bool ZED3D9PostProcessor::ManageSourceDestination(ZEPostProcessorSource Source_,
 			break;
 
 		case ZE_PPD_FRAMEBUFFER:
-			Device->SetRenderTarget(0, Module->FrameColorBuffer); //  ZEDirect3D9Module::GetD3D9Module()->FrameColorBuffer
-			Device->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / Module->GetScreenWidth(), 1.0f / Module->GetScreenHeight(), 0.0f, 0.0f), 1);
-			Device->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / Module->GetScreenWidth(), 1.0f / Module->GetScreenHeight(), 0.0f, 0.0f), 1);
+			Device->SetRenderTarget(0, ZEDirect3D9Module::GetD3D9Module()->FrameColorBuffer);
+			Device->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / ZEDirect3D9Module::GetD3D9Module()->GetScreenWidth(), 1.0f / ZEDirect3D9Module::GetD3D9Module()->GetScreenHeight(), 0.0f, 0.0f), 1);
+			Device->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / ZEDirect3D9Module::GetD3D9Module()->GetScreenWidth(), 1.0f / ZEDirect3D9Module::GetD3D9Module()->GetScreenHeight(), 0.0f, 0.0f), 1);
 			break;
 
 		default:

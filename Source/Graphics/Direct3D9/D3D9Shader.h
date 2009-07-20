@@ -76,6 +76,7 @@ class ZED3D9Shader : public ZED3D9ComponentBase, public ZEShader
 {	
 	private:
 		int							ShaderComponents;
+
 	public:
 		ZED3D9ShaderPass			PreLightPass;
 		ZED3D9ShaderPass			PointLightPass;

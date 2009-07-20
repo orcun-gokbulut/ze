@@ -37,7 +37,9 @@
 #pragma warning(push)
 #pragma warning(disable:4482)
 #include "ZEMath/ZEMath.h"
-#include "GameInterface/Serialization.h"
+
+class ZESerializer;
+class ZEUnserializer;
 enum ZEVariantType
 {
 	ZEVARIANTTYPE_UNDEFINED = 0,
@@ -61,7 +63,7 @@ class ZEVector2;
 class ZEVector3;
 class ZEVector4;
 
-class ZEVariant : public ZESerializable
+class ZEVariant
 {
 	public:
 		union ZEVariantValue

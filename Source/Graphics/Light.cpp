@@ -335,8 +335,6 @@ const ZERLLight* ZEProjectiveLight::GetRenderListLight()
 		ZEMatrix4x4::Multiply(RenderListLight.LightViewProjMatrix, ViewProjMatrix, ScaleBiasMatrix);
 	}
 
-	ZEQuaternion::VectorProduct(RenderListLight.Direction, GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
-
 	if (CastsShadows)
 	{
 	}

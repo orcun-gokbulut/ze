@@ -198,12 +198,6 @@ struct PS_INPUT
 
 half4 ps_main(PS_INPUT Input) : COLOR0
 {	
-	if (Input.Position.x == 0.0)
-	{
-		discard;
-		return float4(0.0f, 0.0f, 0.0f, 0.0f);
-	}
-
 	#ifdef ZESHADER_OPASITYMAP
 		float4 OutputColor = half4(0.0f, 0.0f, 0.0f, MaterialOpasity * tex2D(OpacityMap, Input.Texcoord).r);
 	#else
@@ -214,7 +208,7 @@ half4 ps_main(PS_INPUT Input) : COLOR0
 		#endif
 	#endif
 
-/*	#ifdef ZESHADER_SHADOWMAP
+	#ifdef ZESHADER_SHADOWMAP
 		float ShadowFactor;
 		float Depth = Input.Position.z / Input.Position.w;
 		CalculateShadow(Input.ProjTexcoord, Depth, ShadowFactor);
@@ -223,7 +217,7 @@ half4 ps_main(PS_INPUT Input) : COLOR0
 			discard;
 			return float4(0.0f, 0.0f, 0.0f, 1.0f);
 		}
-	#endif*/
+	#endif
 
 	#ifdef ZESHADER_NORMALMAP
 		float3 Normal = (2.0f * tex2D(NormalMap, Input.Texcoord) - 1.0f);
@@ -235,9 +229,9 @@ half4 ps_main(PS_INPUT Input) : COLOR0
 
 	CalculatePointLight(Normal, Input.LightDirection.xyz, Input.LightDirection.w, ViewDirection, LightIntensity, LightColor * tex2Dproj(ProjectionMap, Input.ProjTexcoord).rgb, Input.Texcoord, OutputColor.rgb);
 
-	/*#ifdef ZESHADER_SHADOWMAP
+	#ifdef ZESHADER_SHADOWMAP
 		OutputColor.rgb *= ShadowFactor;
-	#endif*/
+	#endif
 
 	return OutputColor;
 

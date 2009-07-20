@@ -72,8 +72,7 @@ float4    ViewPosition					: register(c16);
 
 //First light 4 vector 1 matrix
 float4    LightPosition					: register(c24);
-float3	  LightDirection				: register(c25);
-float3    LightAttenuationFactors		: register(c26);
+float3    LightAttenuationFactors		: register(c25);
 float4x4  LightProjectionMatrix			: register(c28);
 
 // Bone matrices rest of the space
@@ -137,11 +136,6 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	#ifdef ZESHADER_SKINTRANSFORM
 		Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		Normal = float3(0.0f, 0.0f, 0.0f);
-		#ifdef ZESHADER_NORMALMAP
-			Tangent = float3(0.0f, 0.0f, 0.0f);
-			Binormal = float3(0.0f, 0.0f, 0.0f);
-		#endif
-
 		for (int I = 0; I < 4; I++)
 			if (Input.BoneWeights[I] > 0.0f)
 			{
@@ -163,7 +157,6 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.Position_ = Output.Position = mul(Position, WorldViewProjMatrix);
 	float4 WorldPosition = mul(Position, WorldMatrix);
-	Output.Position_.x = (dot(normalize(WorldPosition), LightDirection) > 1.0f ? 0.0f: 1.0f);
 	
 	float4 ViewDisplacement = ViewPosition - WorldPosition;
 	

@@ -41,7 +41,6 @@
 #include "Entity.h"
 #include "Map/Map.h"
 #include "Portal.h"
-#include "Graphics/PostProcessor.h"
 #include "Graphics/Camera.h"
 #include "Sound/Listener.h"
 #include "Graphics/ViewVolume.h"
@@ -84,7 +83,6 @@ class ZEScene
 		ZESmartArray<ZEEntity*>					Entities;
 	
 		ZERenderer*								Renderer;
-		ZEPostProcessor*						PostProcessor;
 		ZERenderer*								ShadowRenderer;
 		ZECamera*								CurrentCamera;
 		ZEListener*								CurrentListener;

@@ -71,7 +71,6 @@ void ZEDirect3D9Module::SetEnabled(bool Enabled)
 bool ZEDirect3D9Module::Initialize()
 {
 	zeLog("Initializing Direct3D 9.\r\n");
-
 	ScreenWidth = zeOptions->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger();
 	ScreenHeight = zeOptions->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger();
 	Fullscreen = zeOptions->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean();
@@ -217,7 +216,6 @@ bool ZEDirect3D9Module::Initialize()
 		return false;
 	}
 
-	//ZED3D9ComponentBase::D3
 	return true;
 }
 

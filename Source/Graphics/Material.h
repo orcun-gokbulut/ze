@@ -38,11 +38,37 @@
 #define __ZE_MATERIAL_H__
 
 #include "ZEMath/ZEMath.h"
-//#include "Core/Serialize.h"
 #include "Definitions.h"
 #include "Texture.h"
 #include "Vertex.h"
 #include "Shader.h"
+
+enum ZEShaderType
+{
+	ZE_ST_MATERIAL,
+	ZE_ST_POSTEFFECT,
+	ZE_ST_PARTICLE,
+	ZE_ST_OTHER
+};
+
+class ZEShader
+{
+	public:
+		virtual ZEShaderType			GetShaderType() = 0;
+		virtual size_t					GetLightPerPass(ZELightType LightType) = 0;
+
+		virtual bool					Setup() = 0;
+		virtual bool					PreLightningPass() = 0;
+		virtual bool					LightPass(ZELightType Light, ZESmartArray<ZERLLight*> Lights) = 0;
+};
+
+
+enum ZEMaterialType
+{
+	ZE_MT_FIXEDMATERIAL,
+	ZE_MT_CUSTOMMATERIAL,
+	ZE_MT_HLFXMATERIAL
+};
 
 enum ZETransparancyMode
 {
@@ -52,8 +78,7 @@ enum ZETransparancyMode
 	ZE_TM_ADDAPTIVE	= 3,
 	ZE_TM_SUBTRACTIVE = 4,
 };
-
-class ZEMaterial
+class ZEShader
 {
 	public:
 		bool							TwoSided;
@@ -63,25 +88,20 @@ class ZEMaterial
 		bool							RecivesShadow;
 		unsigned int					TransparancyCullLimit;
 
-/*		virtual void					CreateShader() = 0;
-		virtual void					ReleaseShader() = 0;*/
 
-		virtual const ZEShader*			GetShader() const = 0;
+		virtual bool					BeginPass(ZEMaterialPassType PassType, ZERenderListLi) = 0;
 
 		virtual	void					SetZero() = 0;
-
-		virtual const ZEVector4* 		GetVertexShaderConstants(int* Count) const = 0;
-		virtual const ZEVector4* 		GetPixelShaderConstants(int* Count) const = 0;
-		virtual const ZETextureBase**	GetTextures(int* Count) const = 0;
 };
 
 class ZEDefaultMaterial : public ZEMaterial
 {
 	private:
-		ZEShader*					Shader;
-		unsigned int				ShaderComponents;
+		ZEShader*						Shader;
+		unsigned int					ShaderComponents;
 
 	public:
+		virtual
 		union
 		{
 			struct

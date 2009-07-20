@@ -103,7 +103,9 @@
 		{AttributeName, ZEVARIANTTYPE_INTEGER, ZE_AS_ENTITY, AttributeFlag, AttributeDefaultValue, 0, NULL, NULL, NULL, AttributeDescription},
 	#define ZE_ENTITY_ATTRIBUTE_ENUMURATOR(AttributeName, AttributeFlag, EnumuratorName, AttributeDefaultValue, AttributeDescription)\
 		{AttributeName, ZEVARIANTTYPE_INTEGER, ZE_EAS_ENUMURATOR, AttributeFlag, AttributeDefaultValue, NULL, NULL, sizeof(EnumuratorName##Description) / sizeof(ZEEntityAttributeEnumurator), EnumuratorName##Description, AttributeDescription},
-
+	
+	#define ZE_
+	#define ZE_ENTITY_BIND_ATTRIBUTE(AttributeName, SetFunction, GetFunction);
 	#define ZE_ENTITY_ATTRIBUTES_END() }; *Count = sizeof(Attributes) / sizeof(ZEEntityAttribute); return Attributes; 
 #define ZE_ENTITY_DESCRIPTION_END(EntityName) }\
 	ZEEntityDescription* EntityName::EntityDescription()\

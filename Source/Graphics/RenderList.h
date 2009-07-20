@@ -43,31 +43,27 @@
 #include "Material.h"
 #include "VertexBuffer.h"
 
-#define	ZE_RLF_NONE								0
-#define	ZE_RLF_TRANSPARENT						1
-#define	ZE_RLF_IMPOSTER							2
-#define	ZE_RLF_ENABLE_ZCULLING					4
-#define	ZE_RLF_ENABLE_NOZWRITE					8
-#define	ZE_RLF_ENABLE_WORLD_TRANSFORM			16
-#define	ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM	32
-#define ZE_RLF_INSTANCED						64
-#define ZE_RLF_SKINNED							128
-#define ZE_RLF_INDEXED							256
+#define	ZE_RLF_ZCULLING						2
+#define	ZE_RLF_NOZWRITE						4
+#define	ZE_RLF_WORLD_TRANSFORM				8
+#define	ZE_RLF_VIEW_TRANSFORM				16
+#define ZE_RLF_PROJECTION_TRANSFROM			32
+#define ZE_RLF_INSTANCED					64
+#define ZE_RLF_SKINNED						128
+#define ZE_RLF_INDEXED						256
 
+#define ZE_DO_RIGID							0
+#define ZE_DO_TRANSPARENT					10
+#define ZE_DO_IMPOSTER						20
+#define ZE_DO_GUI							40
 
 enum ZERLPrimitiveType
 {
 	ZE_RLPT_POINT,
 	ZE_RLPT_LINE,
 	ZE_RLPT_TRIANGLE,
-	ZE_RLPT_TRIANGLESTRIPT
-};
-
-struct ZERLInstance
-{
-	ZEAABoundingBox					BoundingBox;
-	ZEMaterial*						Material;
-	ZEMatrix4x4						WorldTransform;
+	ZE_RLPT_TRIANGLESTRIPT,
+	ZE_RLPT_TRIANGLEFAN,
 };
 
 enum ZERLLightType
@@ -79,54 +75,50 @@ enum ZERLLightType
 };
 
 struct ZERLLight
-{
-		ZERLLightType				Type;
-		ZEVector3					Color;
-		ZEVector3					Position;
-		ZEVector3					Direction;
-		ZEVector3					Attenuation;
-		float						Intensity;
-		float						Range;
-		ZEMatrix4x4					LightViewProjMatrix;
-		ZEMatrix4x4					LightRotationMatrix;
+{	
+		ZERLLightType						Type;
+		ZEVector3							Color;
+		ZEVector3							Position;
+		ZEVector3							Direction;
+		ZEVector3							Attenuation;
+		float								Intensity;
+		float								Range;
+		ZEMatrix4x4							LightViewProjMatrix;
+		ZEMatrix4x4							LightRotationMatrix;
 		union
 		{
-			const ZETexture*		ProjectionMap;
-			const ZECubeTexture*	CubeProjectionMap;
+			const ZETexture*				ProjectionMap;
+			const ZECubeTexture*			CubeProjectionMap;
 		};
 		union
 		{
-			const ZETexture*		ShadowMap;
-			const ZECubeTexture*	CubeShadowMap;
+			const ZETexture*				ShadowMap;
+			const ZECubeTexture*			CubeShadowMap;
 		};
 
-		void						SetZero();
+		void								SetZero();
 };
 
 class ZERenderList
 {
 	public:
-		ZEDWORD							PickEntity;
-		ZEDWORD							PickInfo;
+		ZEDWORD								DrawOrder;
+		ZEDWORD								Flags;
 
-		ZEDWORD							Flags;
-		ZERLPrimitiveType				PrimitiveType;
-		ZEVertexType					VertexType;
-		unsigned int					VertexBufferOffset;
-		unsigned int					PrimitiveCount;
+		void*								IndexBuffer;
+		ZEVertexBuffer*						VertexBuffer;
+		ZEVertexType						VertexType;
+		unsigned int						VertexBufferOffset;
 
-		const ZEMaterial*				Material;
+		ZERLPrimitiveType					PrimitiveType;
+		unsigned int						PrimitiveCount;
 
-		void*							IndexBuffer;
-		ZEVertexBuffer*					VertexBuffer;
+		ZEMatrix4x4							WorldMatrix;
+		ZEArray<ZEMatrix4x4>				BoneTransforms;
 
-		ZEMatrix4x4						WorldMatrix;
+		const ZEShader*						Shader;
+		ZEChunkArray<const ZERLLight*, 10>	Lights;		
 
-		ZEArray<ZERLInstance>			Instances;
-		ZEArray<ZEMatrix4x4>			BoneTransforms;
-
-		ZEArray<const ZERLLight*>		Lights;		
-
-		void							SetZero();
+		void								SetZero();
 };
 #endif
