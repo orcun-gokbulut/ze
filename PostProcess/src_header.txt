@@ -1,0 +1,20 @@
+//////////////////////////////////////////////////////////////////////////////////////
+//                                                                                  //
+//  %ZEFILE% - Zinek Engine %ZEVERSION% Source Code                                 
+// -------------------------------------------------------------------------------- //
+//  Copyright (c) 2007-2008 Zinek Engine group.                                     //
+//  All rights reserved.                                                            //
+//                                                                                  //
+//                 READ TERMS BELLOW BEFORE TAKING ANY ACTION !                     //
+//                                                                                  //
+//  These coded instructions, statements, and computer programs contain             //
+//  unpublished proprietary information written by Zinek Engine group and they are  //
+//  protected by international copyright laws. This file is intellectual property   //
+//  of the Zinek Engine group and author(s). Storing this file, using this file,    //
+//  compiling this file, publishing this file to anykind media or network, editing  //
+//  this file, selling this file, reading this file is probited without notice and  //
+//  written permision of Y. Orcun Gokbulut. These terms at above can only be        //
+//  changed by Y. Orcun GOKBULUT.                                                   //
+//  author(s).                                                                      //
+%ZESTATIC_TEXT%
+//////////////////////////////////////////////////////////////////////////////////////

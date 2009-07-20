@@ -1,0 +1,148 @@
+/*ZEHEADER_START*/
+//////////////////////////////////////////////////////////////////////////////////////
+//                                                                                  //
+//  Core.h - Zinek Engine v0.04.02 Build 905 Source Code                                 
+// -------------------------------------------------------------------------------- //
+//  Copyright (c) 2007-2008 Zinek Engine group.                                     //
+//  All rights reserved.                                                            //
+//                                                                                  //
+//                 READ TERMS BELLOW BEFORE TAKING ANY ACTION !                     //
+//                                                                                  //
+//  These coded instructions, statements, and computer programs contain             //
+//  unpublished proprietary information written by Zinek Engine group and they are  //
+//  protected by international copyright laws. This file is intellectual property   //
+//  of the Zinek Engine group and author(s). Storing this file, using this file,    //
+//  compiling this file, publishing this file to anykind media or network, editing  //
+//  this file, selling this file, reading this file is probited without notice and  //
+//  written permision of Y. Orcun Gokbulut. These terms at above can only be        //
+//  changed by Y. Orcun GOKBULUT.                                                   //
+//  author(s).                                                                      //
+//*                                                                                *//
+//  DESCRIPTION         :                                                           //
+//  AUTHOR(S)           : Y. Orcun GOKBULUT                                         //
+//*                                                                                *//
+//////////////////////////////////////////////////////////////////////////////////////
+/*ZEHEADER_END*/
+
+#ifdef ZESHADER_COMPONENT0
+#define ZESHADER_SKINTRANFORMATION
+#endif
+#ifdef ZESHADER_COMPONENT1
+#define ZESHADER_DIFFUSEMAP
+#endif
+#ifdef ZESHADER_COMPONENT2
+#define ZESHADER_NORMALMAP
+#endif
+#ifdef ZESHADER_COMPONENT3
+#define ZESHADER_SPECULARMAP
+#endif
+#ifdef ZESHADER_COMPONENT4
+#define ZESHADER_EMMISIVEMAP
+#endif
+#ifdef ZESHADER_COMPONENT5
+#define ZESHADER_OPASITYMAP
+#endif
+#ifdef ZESHADER_COMPONENT6
+#define ZESHADER_DETAILDIFFUSEMAP
+#endif
+#ifdef ZESHADER_COMPONENT7
+#define ZESHADER_DETAILNORMALMAP
+#endif
+#ifdef ZESHADER_COMPONENT8
+#define ZESHADER_REFLECTION
+#endif
+#ifdef ZESHADER_COMPONENT9
+#define ZESHADER_REFRACTION
+#endif
+#ifdef ZESHADER_COMPONENT10
+#define ZESHADER_LIGHTMAP
+#endif
+#ifdef ZESHADER_COMPONENT11
+#define ZESHADER_DISTORTIONMAP
+
+#endif
+float4	  MaterialParams0			 : register(c0);
+float4	  MaterialParams1			 : register(c1);
+float4	  MaterialParams2			 : register(c2);
+float4	  MaterialParams3			 : register(c3);
+float4	  MaterialParams4			 : register(c4);
+
+#define	  MaterialAmbientColor         MaterialParams0.xyz
+#define	  MaterialOpasity			   MaterialParams0.w
+#define	  MaterialDiffuseColor         MaterialParams1.xyz
+#define	  MaterialSpecularColor        MaterialParams2.xyz
+#define	  MaterialSpecularFactor	   MaterialParams2.w
+#define	  MaterialEmmisiveColor        MaterialParams3.xyz
+#define	  MaterialEmmisiveFactor	   MaterialParams3.w
+#define	  MaterialReflectionFactor	   MaterialParams4.x
+#define	  MaterialRefractionFactor     MaterialParams4.y;
+#define	  MaterialDetailMapTiling      MaterialParams4.zw;
+
+float4    LightColor                 : register(c12);
+float     LightIntensity             : register(c13);
+
+sampler   DiffuseMap                 : register(s0);
+sampler   NormalMap                  : register(s1);
+sampler   SpecularMap                : register(s2);
+sampler   EmmisiveMap                : register(s3);
+sampler   OpacityMap				 : register(s4);
+sampler   DetailMap                  : register(s5);
+sampler   EnvironmentMap             : register(s6);
+sampler   LightMap                   : register(s7);
+sampler   ShadowMap                  : register(s8);
+
+struct PS_INPUT
+{
+	float2 Texcoord             : TEXCOORD0;
+	#ifdef ZESHADER_LIGHTMAP
+	float2 LightMapTexcoord     : TEXCOORD1;
+	#endif
+	#ifdef ZESHADER_REFLECTION
+	float3 ReflectionVector     : TEXCOORD3;
+	#endif
+	#ifdef ZESHADER_REFRACTION
+	float3 RefractionVector     : TEXCOORD4;
+	#endif
+};
+
+float4 ps_main(PS_INPUT Input) : COLOR0
+{
+	float4 OutputColor;
+	OutputColor.rgb = (MaterialAmbientColor + MaterialEmmisiveColor);
+	
+	// Transparancy
+	#ifdef ZESHADER_OPASITYMAP
+		//return (MaterialOpasity * tex2D(OpacityMap, Input.Texcoord).r).rrrr;
+		OutputColor.a = MaterialOpasity * tex2D(OpacityMap, Input.Texcoord).r;
+	#else
+		#ifdef ZESHADER_DIFFUSEMAP
+			//return (MaterialOpasity * tex2D(OpacityMap, Input.Texcoord).r).rrrr;
+			OutputColor.a = MaterialOpasity * tex2D(DiffuseMap, Input.Texcoord).a;
+		#else
+			OutputColor.a = MaterialOpasity;
+			//return OutputColor;
+		#endif
+	#endif
+	
+	#ifdef ZESHADER_DIFFUSEMAP
+		OutputColor.rgb *= tex2D(DiffuseMap, Input.Texcoord).rgb;
+	#endif
+
+	#ifdef ZESHADER_LIGHTMAP
+		OutputColor.rgb *= float4(tex2D(LightMap, Input.Texcoord).rgb, 1.0f);
+	#endif
+
+	#ifdef ZESHADER_EMMISIVEMAP
+		OutputColor.rgb += MaterialEmmisiveFactor * (tex2D(EmmisiveMap, Input.Texcoord).rgb + MaterialEmmisiveColor).rgb;
+	#endif
+
+	#ifdef ZESHADER_REFLECTION
+		OutputColor.rgb += MaterialReflectionFactor * texCUBE(EnvironmentMap, normalize(Input.ReflectionVector)).rgb;
+	#endif
+
+	#ifdef ZESHADER_REFRACTION
+		OutputColor.rgb += MaterialRefractionFactor * texCUBE(EnvironmentMap, normalize(Input.RefractionVector)).rgb;
+	#endif
+
+	return OutputColor;
+}

@@ -1,0 +1,38 @@
+/*ZEHEADER_START*/
+//////////////////////////////////////////////////////////////////////////////////////
+//                                                                                  //
+//  Core.h - Zinek Engine v0.04.02 Build 905 Source Code                                 
+// -------------------------------------------------------------------------------- //
+//  Copyright (c) 2007-2008 Zinek Engine group.                                     //
+//  All rights reserved.                                                            //
+//                                                                                  //
+//                 READ TERMS BELLOW BEFORE TAKING ANY ACTION !                     //
+//                                                                                  //
+//  These coded instructions, statements, and computer programs contain             //
+//  unpublished proprietary information written by Zinek Engine group and they are  //
+//  protected by international copyright laws. This file is intellectual property   //
+//  of the Zinek Engine group and author(s). Storing this file, using this file,    //
+//  compiling this file, publishing this file to anykind media or network, editing  //
+//  this file, selling this file, reading this file is probited without notice and  //
+//  written permision of Y. Orcun Gokbulut. These terms at above can only be        //
+//  changed by Y. Orcun GOKBULUT.                                                   //
+//  author(s).                                                                      //
+//*                                                                                *//
+//  DESCRIPTION         :                                                           //
+//  AUTHOR(S)           : Y. Orcun GOKBULUT                                         //
+//*                                                                                *//
+//////////////////////////////////////////////////////////////////////////////////////
+/*ZEHEADER_END*/
+
+float4	  SkyColor					 : register(c0);
+sampler   SkyTexture                 : register(s0);
+
+struct PS_INPUT
+{
+	float3 CubeTexcoord       : TEXCOORD0;
+};
+
+half4 ps_main(PS_INPUT Input) : COLOR0
+{
+	return SkyColor * texCUBE(SkyTexture, normalize(Input.CubeTexcoord));
+}

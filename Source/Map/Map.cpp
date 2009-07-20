@@ -1,0 +1,194 @@
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - Map.cpp
+ ------------------------------------------------------------------------------
+ Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
+
+ This file is part of the Zinek Engine  Software. Zinek Engine Software and the
+ accompanying  materials are  made available  under the  terms of Zinek  Engine
+ Commercial License or the GNU General Public License Version 3.
+
+                      ZINEK ENGINE COMMERCIAL LICENSE
+ Licensees  holding  valid  Zinek Engine Commercial  License(s) may  use  Zinek
+ Engine  Software in  accordance  with   the  commercial  license  agreement(s)
+ (which can only be  issued  by  copyright  owner "Yiğit  Orçun  GÖKBULUT") and
+ provided with the Software  or, alternatively,  in  accordance with the  terms
+ contained  in  a  written  agreement  between  you  and  copyright  owner. For
+ licensing  terms  and conditions  please  contact  with  copyright owner.
+
+                    GNU GENERAL PUBLIC LICENSE VERSION 3
+ This program is free software: you can  redistribute it and/or modify it under
+ the terms of the GNU General Public  License as published by the Free Software
+ Foundation, either  version 3 of  the License, or  (at your option)  any later
+ version. This program is  distributed in the hope that  it will be useful, but
+ WITHOUT ANY WARRANTY; without even the  implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE. See  the GNU General Public License for more
+ details. You  should have received  a copy of the  GNU General  Public License
+ along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+ Copyright Owner Information:
+  Name: Yiğit Orçun GÖKBULUT
+  Contact: orcun.gokbulut@gmail.com
+  Github: https://www.github.com/orcun-gokbulut/ZE
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
+
+#include "Map.h"
+#include "MapResource.h" 
+#include "Core/Core.h"
+#include "Core/Error.h"
+#include "Graphics/RenderList.h"
+#include "Graphics/Light.h"
+#include "Graphics/ViewVolume.h"
+
+bool ZEPortalMap::Initialize()
+{
+	PortalBBoxCanvas.Clean();
+	PortalBBoxCanvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
+
+	PortalBBoxMaterial.SetZero();
+	PortalBBoxMaterial.SetShaderComponents(0);
+	PortalBBoxMaterial.AmbientColor = ZEVector3(0.75f, 0.75f, 0.75f);
+	PortalBBoxMaterial.LightningEnabled = false;
+
+	PortalBBoxRenderList.SetZero();
+	PortalBBoxRenderList.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
+	PortalBBoxRenderList.VertexType = ZE_VT_SIMPLEVERTEX;
+	PortalBBoxRenderList.PrimitiveType = ZE_RLPT_LINE;
+	PortalBBoxRenderList.Material = &PortalBBoxMaterial;
+	PortalBBoxRenderList.VertexBuffer = &PortalBBoxCanvas;
+	PortalBBoxRenderList.PrimitiveCount = PortalBBoxCanvas.Vertices.GetCount() / 2;
+
+	ZEOctree::OctreeBBoxCanvas.Clean();
+	ZEOctree::OctreeBBoxCanvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
+
+	ZEOctree::OctreeBBoxMaterial.SetZero();
+	ZEOctree::OctreeBBoxMaterial.SetShaderComponents(0);
+	ZEOctree::OctreeBBoxMaterial.AmbientColor = ZEVector3(0.25f, 0.25f, 0.25f);
+	ZEOctree::OctreeBBoxMaterial.LightningEnabled = false;
+
+	ZEOctree::OctreeBBoxRenderList.SetZero();
+	ZEOctree::OctreeBBoxRenderList.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
+	ZEOctree::OctreeBBoxRenderList.PrimitiveType = ZE_RLPT_LINE;
+	ZEOctree::OctreeBBoxRenderList.VertexType = ZE_VT_SIMPLEVERTEX;
+	ZEOctree::OctreeBBoxRenderList.Material = &PortalBBoxMaterial;
+	ZEOctree::OctreeBBoxRenderList.VertexBuffer = &PortalBBoxCanvas;
+	ZEOctree::OctreeBBoxRenderList.PrimitiveCount = PortalBBoxCanvas.Vertices.GetCount() / 2;
+
+	return true;
+}
+
+bool ZEPortalMap::Destroy()
+{
+	if (MapResource != NULL)
+	{
+		MapResource->Release();
+		MapResource = NULL;
+	}
+	return true;
+}
+
+const char* ZEPortalMap::GetFileName()
+{
+	if (MapResource != NULL)
+		return MapResource->GetFileName();
+	else
+		return "";
+}
+
+bool ZEPortalMap::Load(const char* Filename)
+{
+	zeLog("Loading map file \"%s\".\r\n", Filename);
+	if (MapResource != NULL)
+	{
+		MapResource->Release();
+		MapResource = NULL;
+	}
+
+	if (strcmp(Filename, "") == 0)
+		return true;
+
+	MapResource = ZEMapResource::LoadResource(Filename);
+	if (MapResource == NULL)
+	{
+		zeError("Map", "Could not load map file. (Filename : \"%s\")", Filename);
+		return false;
+	}
+	return true;
+}
+
+void ZEPortalMap::RenderPortal(ZEMapPortal* Portal, ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESmartArray<ZELight*>& SceneLights)
+{
+	if (ViewVolume.CullTest(Portal->BoundingBox))
+	{
+		ZEMatrix4x4::CreateOrientation(PortalBBoxRenderList.WorldMatrix, Portal->BoundingBox.GetCenter(), 
+			ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 
+			ZEVector3(Portal->BoundingBox.Max.x - Portal->BoundingBox.Min.x, 
+				Portal->BoundingBox.Max.y - Portal->BoundingBox.Min.y, 
+				Portal->BoundingBox.Max.z - Portal->BoundingBox.Min.z)
+			);
+		//Renderer->AddToRenderList(&PortalBBoxRenderList); 
+
+		ZESmartArray<ZELight*> PortalLights;
+		for (size_t I = 0; I < SceneLights.GetCount(); I++)
+		{
+			const ZEViewVolume& LightViewVolume = SceneLights[I]->GetViewVolume();
+			if (SceneLights[I]->GetLightType() != ZE_LT_DIRECTIONAL || LightViewVolume.CullTest(Portal->BoundingBox))
+				PortalLights.Add(SceneLights[I]);
+		}
+
+		if (Portal->Octree != NULL)
+			Portal->Octree->Render(Renderer, ViewVolume, PortalLights);
+		else
+			for (size_t I = 0; I < Portal->RenderLists.GetCount(); I++)
+			{
+				if (Portal->RenderLists[I].Lights.GetCount() != SceneLights.GetCount())
+					Portal->RenderLists[I].Lights.SetCount(SceneLights.GetCount());
+
+				for (size_t N = 0; N < PortalLights.GetCount(); N++)
+					Portal->RenderLists[I].Lights[N] = PortalLights[N]->GetRenderListLight();
+
+				Renderer->AddToRenderList(&Portal->RenderLists[I]);
+			}
+	}
+}
+void ZEPortalMap::Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESmartArray<ZELight*>& SceneLights)
+{
+	if (MapResource != NULL)
+		for (size_t I = 0; I < MapResource->Portals.GetCount(); I++)
+			RenderPortal(&MapResource->Portals[I], Renderer, ViewVolume, SceneLights);
+}
+
+bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT)
+{
+	float T, CurMinT = 100000000000000.0f;
+	bool Found = false;
+	for (size_t I = 0; I < MapResource->Portals.GetCount(); I++)
+	{
+		ZEMapPortal* CurrentPortal = &MapResource->Portals[I];
+		//if (ZEAABoundingBox::IntersectionTest(CurrentPortal->BoundingBox,Ray))
+			for (size_t N = 0; N < CurrentPortal->Polygons.GetCount(); N++)
+			{
+				ZEMapPolygon& MapPolygon = MapResource->Portals[I].Polygons[N];
+				ZETriangle Triangle(MapPolygon.Vertices[0].Position, MapPolygon.Vertices[1].Position, MapPolygon.Vertices[2].Position);
+				if (ZETriangle::IntersectionTest(Triangle, Ray, T) && (!Found || MinT > T))
+				{
+					MinT = T;
+					Ray.GetPointOn(Position, T);
+					ZETriangle::GetNormal(Triangle, Normal);
+					Found = true;
+				}
+			}
+	}
+	return Found;
+}
+
+ZEPortalMap::ZEPortalMap()
+{
+	MapResource = NULL;
+}
+
+ZEPortalMap::~ZEPortalMap()
+{
+	Destroy();
+}
