@@ -58,6 +58,6 @@ class ZED3D9StaticVertexBuffer : public ZEStaticVertexBuffer, public ZED3D9Compo
 		virtual void				Destroy();
 
 									ZED3D9StaticVertexBuffer();
-									~ZED3D9StaticVertexBuffer();
+		virtual						~ZED3D9StaticVertexBuffer();
 };
 #endif

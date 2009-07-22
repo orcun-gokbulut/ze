@@ -46,6 +46,8 @@ class ZEVertexBuffer
 	public:
 		virtual size_t						GetBufferSize() = 0;
 		virtual bool						IsStatic() = 0;
+
+		virtual								~ZEVertexBuffer();
 };
 
 class ZEStaticVertexBuffer : public ZEVertexBuffer

@@ -278,7 +278,7 @@ ZEQuaternion ZEQuaternion::operator*(const ZEQuaternion& Other) const
 ZEQuaternion& ZEQuaternion::operator*=(const ZEQuaternion& Other)
 {
 	ZEQuaternion Temp;
-	Product(Temp, *this, Temp);
+	Product(Temp, *this, Other);
 	*this = Temp;
 	return *this;
 }
