@@ -161,6 +161,9 @@ void ZEPortalMap::Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, Z
 
 bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT)
 {
+	if (MapResource == NULL)
+		return false;
+
 	float T, CurMinT = 100000000000000.0f;
 	bool Found = false;
 	for (size_t I = 0; I < MapResource->Portals.GetCount(); I++)
