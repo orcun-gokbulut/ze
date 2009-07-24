@@ -254,14 +254,14 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 				tMaxT = TempT;
 			}
 
+			if (tMinT > MaxT || MinT > tMaxT)
+				return false;
+
 			if (MinT < tMinT)
 				MinT = tMinT;
 
 			if (MaxT > tMaxT)
 				MaxT = tMaxT;
-
-			if (MaxT > MinT)
-				return false;
 		}
 		else
 		{
@@ -281,7 +281,7 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 
 	if (Line.v.z == 0)
 	{
-		if (Line.p.y < BoundingBox.Min.y || Line.p.y > BoundingBox.Max.y)
+		if (Line.p.z < BoundingBox.Min.z || Line.p.z > BoundingBox.Max.z)
 			return false;
 
 		if (TValid == false)
@@ -314,7 +314,7 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 			if (MaxT > tMaxT)
 				MaxT = tMaxT;
 
-			if (MaxT > MinT)
+			if (tMinT > MaxT || MinT > tMaxT)
 				return false;
 			else
 				return true;
