@@ -287,6 +287,8 @@ class ZEEntity
 		virtual void						Reset(ZEEntityData* EntityData);
 		
 		void								UpdateBoundingVolumes();
+
+		bool								CastRay(const ZERay & Ray,const float Range,float &MinT);
 		
 		virtual bool						SetAttribute(const char* AttributeName, const ZEVariant& Value);
 		virtual bool						GetAttribute(const char* AttributeName, ZEVariant& Value);

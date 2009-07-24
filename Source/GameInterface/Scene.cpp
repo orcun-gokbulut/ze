@@ -306,12 +306,14 @@ ZEEntity* ZEScene::CastRay(const ZERay& Ray, float Range)
 		if (CurrentEntity == RayCaster)
 			continue;
 
-		if (ZEBoundingSphere::IntersectionTest(CurrentEntity->GetWorldBoundingSphere(), Ray, MinT, MaxT))
+		if (ZEAABoundingBox::IntersectionTest(CurrentEntity->GetWorldBoundingBox(),Ray,MinT,MaxT))
+		{
 			if (MinT < CurrMinT)
 			{
 				IntersectedEntity = CurrentEntity;
 				CurrMinT = MinT;
 			}
+		}
 	}
 
 	return IntersectedEntity;
@@ -331,13 +333,11 @@ bool ZEScene::CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntit
 		if (CurrentEntity == RayCaster)
 			continue;
 
-		if (ZEBoundingSphere::IntersectionTest(CurrentEntity->GetWorldBoundingSphere(), Ray, MinT, MaxT))
+		if (CurrentEntity->CastRay(Ray,Range,MinT))
 			if (MinT < CurrMinT)
 			{
 				CurrMinT = MinT;
 				*IntersectedEntity = CurrentEntity;
-				Ray.GetPointOn(Position, MinT);
-				ZEBoundingSphere::GetSurfaceNormal(Normal, CurrentEntity->GetWorldBoundingSphere(), Position);
 			}
 	}
 
@@ -348,6 +348,7 @@ bool ZEScene::CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntit
 			return true;
 		}
 
+	Ray.GetPointOn(Position,MinT);
 	return *IntersectedEntity != NULL;
 }
 
@@ -586,7 +587,7 @@ ZEScene::ZEScene()
 	Renderer = NULL;
 	CurrentCamera = NULL;
 	CurrentListener = NULL;
-	VisualDebugElements = 0;//ZE_VDE_ENTITY_ORIENTED_BOUNDINGBOX;
+	VisualDebugElements = ZE_VDE_ENTITY_AXISALIGNED_BOUNDINGBOX;
 }
 
 ZEScene::~ZEScene()

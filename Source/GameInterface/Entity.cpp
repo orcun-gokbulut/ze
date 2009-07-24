@@ -489,6 +489,33 @@ void ZEEntity::UpdateBoundingVolumes()
 	}
 }
 
+bool ZEEntity::CastRay(const ZERay & Ray,const float Range,float &MinT)
+{
+	float MaxT,CurrMinT = Range;
+
+	if (!ZEAABoundingBox::IntersectionTest(GetWorldBoundingBox(), Ray, MinT, MaxT))
+		return false;
+
+	if (BoundingVolumeMechanism != ZE_BVM_USECOMPONENTS)
+		return true;
+
+	int I = 0;
+	while (1)
+	{
+		if (I == Components.GetSize()) break;
+		if (ZEAABoundingBox::IntersectionTest(Components[I]->GetWorldBoundingBox(),Ray,MinT,MaxT))
+			if (CurrMinT > MinT)
+				CurrMinT = MinT;
+		
+		I++;
+	}
+
+	if (Range == CurrMinT) return false;
+
+	MinT = CurrMinT;
+	return true;
+}
+
 void ZEEntity::Tick(float Time)
 {
 	for (size_t I = 0; I < Components.GetCount(); I++)
