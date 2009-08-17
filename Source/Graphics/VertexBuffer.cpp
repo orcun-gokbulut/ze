@@ -45,7 +45,7 @@ bool ZEDynamicVertexBuffer::IsStatic()
 	return false;
 }
 
-virtual ZEDynamicVertexBuffer::~ZEVertexBuffer()
+ZEVertexBuffer::~ZEVertexBuffer()
 {
 	
 }

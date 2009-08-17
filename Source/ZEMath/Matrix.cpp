@@ -46,6 +46,13 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const ZEMatrix3x3 ZEMatrix3x3::Zero = ZEMatrix3x3(0.0f, 0.0f, 0.0f,
+												  0.0f, 0.0f, 0.0f,
+												  0.0f, 0.0f, 0.0f);
+
+const ZEMatrix3x3 ZEMatrix3x3::Identity = ZEMatrix3x3(1.0f, 0.0f, 0.0f,
+													  0.0f, 1.0f, 0.0f,
+													  0.0f, 0.0f, 1.0f);
 
 inline void ZEMatrix3x3::Create(ZEMatrix3x3 &Matrix, float M11, float M12, float M13,
 														float M21, float M22, float M23,
@@ -329,6 +336,16 @@ ZEMatrix3x3::ZEMatrix3x3()
 // ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+const ZEMatrix4x4 ZEMatrix4x4::Zero = ZEMatrix4x4(0.0f, 0.0f, 0.0f, 0.0f,
+												  0.0f, 0.0f, 0.0f, 0.0f,
+												  0.0f, 0.0f, 0.0f, 0.0f,
+												  0.0f, 0.0f, 0.0f, 0.0f);
+
+const ZEMatrix4x4 ZEMatrix4x4::Identity = ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f,
+													  0.0f, 1.0f, 0.0f, 0.0f,
+													  0.0f, 0.0f, 1.0f, 0.0f,
+													  0.0f, 0.0f, 0.0f, 1.0f);
+
 inline void ZEMatrix4x4::Create(ZEMatrix4x4& Matrix,
 				float M11, float M12, float M13, float M14,
 				float M21, float M22, float M23, float M24,
@@ -577,7 +594,7 @@ void ZEMatrix4x4::CreateIdentity(ZEMatrix4x4& Matrix)
 			1.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 1.0f );
+			0.0f, 0.0f, 0.0f, 1.0f);
 }
 void ZEMatrix4x4::CreateZero(ZEMatrix4x4& Matrix)
 {
@@ -585,7 +602,7 @@ void ZEMatrix4x4::CreateZero(ZEMatrix4x4& Matrix)
 			0.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 0.0f );
+			0.0f, 0.0f, 0.0f, 0.0f);
 }
 void ZEMatrix4x4::CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width, float Height, float NearZ, float FarZ)
 {

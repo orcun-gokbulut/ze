@@ -48,6 +48,7 @@ extern HINSTANCE ApplicationInstance;
 #include "GameInterface/CanvasBrush.h"
 #include "GameInterface/SkyBrush.h"
 #include "GameInterface/Scene.h"
+#include "GameInterface/ModelBrush.h"
 #include "Core/ConsoleWindow.h"
 #include "Core/Core.h"
 
@@ -81,6 +82,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
 
+		ZEModelBrush* Model = (ZEModelBrush*)zeCore->GetGame()->CreateEntityInstance("ZEModelBrush");
+		Scene->AddEntity(Model);
+		Model->SetModelFile("test model.zemodel");
+		Model->GetModel()->SetAnimationSpeed(1 /24.0f);
+		Model->GetModel()->PlayAnimationByIndex(0);
+
+		Model->SetPosition(ZEVector3(0.0f, -20.0f, 0.0f));
 		Scene->AddEntity(Player);
 		Scene->SetCamera(Player->GetCamera());
 

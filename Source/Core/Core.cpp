@@ -157,7 +157,7 @@ bool ZECore::SetPhysicsModule(ZEModule* Module)
 			zeError("Core", "Module type mismatch. This module is not a sound module. (Module Name : \"%s\")", Module->GetModuleDescription()->GetName());
 			return false;
 		}
-		Physics = (ZEPhysicsModule*)Module;
+		//Physics = (ZEPhysicsModule*)Module;
 	}
 	else
 		Physics = NULL;
@@ -165,7 +165,7 @@ bool ZECore::SetPhysicsModule(ZEModule* Module)
 	return true;
 }
 
-ZEPhysicsModule* ZECore::GetPhysicsModule()
+void* ZECore::GetPhysicsModule()
 {
 	return Physics;
 }

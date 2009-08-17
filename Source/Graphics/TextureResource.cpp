@@ -58,7 +58,7 @@ const char* ZETextureResource::GetResourceType() const
 {
 	return "Texture Resource";
 }
-
+ 
 const ZETexture* ZETextureResource::GetTexture()
 {
 	return Texture;

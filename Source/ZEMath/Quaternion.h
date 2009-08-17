@@ -48,36 +48,39 @@ class ZEQuaternionEx;
 class ZEQuaternion
 {
 	public:
-		float			w, x, y, z;
+		static const ZEQuaternion		Zero;
+		static const ZEQuaternion		Identity;
 
-		static void		Create(ZEQuaternion& Output, float w, float x, float y, float z);
-		static void		Create(ZEQuaternion& Output, float Angle, const ZEVector3& Axis);
-		static void		Create(ZEQuaternion& Output, float Pitch, float Yawn, float Roll);
-		static void		Create(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Right);
-		static void		CreateIdentity(ZEQuaternion& Output);
+		float							w, x, y, z;
 
-		static void		Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B);
-		static void		VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaternion, const ZEVector3& Vector);
+		static void						Create(ZEQuaternion& Output, float w, float x, float y, float z);
+		static void						Create(ZEQuaternion& Output, float Angle, const ZEVector3& Axis);
+		static void						Create(ZEQuaternion& Output, float Pitch, float Yawn, float Roll);
+		static void						Create(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Right);
+		static void						CreateIdentity(ZEQuaternion& Output);
 
-		void			Conjugate();
-		static void		Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
+		static void						Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B);
+		static void						VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaternion, const ZEVector3& Vector);
 
-		static void		Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor);
+		void							Conjugate();
+		static void						Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
 
-		void			Normalize();
-		static void		Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
+		static void						Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor);
 
-		static void		ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaternion& Quaternion);
-		static void		ConvertToEulerAngles(float &Yaw, float &Pitch, float &Roll, const ZEQuaternion& Quaternion);
-		static void		ConvertToLookAndUp(ZEVector3& Look, ZEVector3& Up, const ZEQuaternion& Quaternion);
+		void							Normalize();
+		static void						Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
 
-		ZEVector3		operator*(const ZEVector3& Vector) const;
-		ZEQuaternion	operator*(const ZEQuaternion& Other) const;
-		ZEQuaternion&	operator*=(const ZEQuaternion& Other);
+		static void						ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaternion& Quaternion);
+		static void						ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, const ZEQuaternion& Quaternion);
+		static void						ConvertToLookAndUp(ZEVector3& Look, ZEVector3& Up, const ZEQuaternion& Quaternion);
 
-						ZEQuaternion(float w, float x, float y, float z);
-						ZEQuaternion(float Angle, const ZEVector3& Axis);
-						ZEQuaternion();
+		ZEVector3						operator*(const ZEVector3& Vector) const;
+		ZEQuaternion					operator*(const ZEQuaternion& Other) const;
+		ZEQuaternion&					operator*=(const ZEQuaternion& Other);
+
+										ZEQuaternion(float w, float x, float y, float z);
+										ZEQuaternion(float Angle, const ZEVector3& Axis);
+										ZEQuaternion();
 };
 
 

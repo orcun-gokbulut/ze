@@ -41,6 +41,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/MP8"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;FREEIMAGE_LIB;ZEDEBUG_ENABLED;ZEDEBUG_PERFHUD"
@@ -1042,14 +1043,6 @@
 		<Filter
 			Name="Physics"
 			>
-			<File
-				RelativePath=".\Source\Physics\PhysicsModule.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Physics\PhysicsModule.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Particle"

@@ -50,7 +50,6 @@
 #include "Window.h"
 #include "Graphics/GraphicsModule.h"
 #include "Input/InputModule.h"
-#include "Physics/PhysicsModule.h"
 #include "Sound/SoundModule.h"
 #include "GameInterface/Game.h"
 
@@ -95,7 +94,7 @@ class ZECore
 		ZEGraphicsModule*				Graphics;
 		ZESoundModule*					Sound;
 		ZEInputModule*					Input;
-		ZEPhysicsModule*				Physics;
+		void*							Physics;
 		ZEGame*							Game;
 		ZEModule*						Network;
 
@@ -126,7 +125,7 @@ class ZECore
 		ZEInputModule*					GetInputModule();
 
 		bool							SetPhysicsModule(ZEModule* Module);
-		ZEPhysicsModule*				GetPhysicsModule();
+		void*							GetPhysicsModule();
 
 		bool							SetNetworkModule(ZEModule* Module);
 		ZEModule*						GetNetworkModule();

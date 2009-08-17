@@ -46,7 +46,8 @@ class ZECanvasBrush : public ZEEntity
 	
 	private:
 		ZERenderList						RenderList;
-
+		ZEStaticVertexBuffer*				VertexBuffer;
+		size_t								OldVertexCount;
 	public:
 		virtual bool						IsDrawable();
 

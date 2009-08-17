@@ -37,6 +37,10 @@
 #include <math.h>
 #include "matrix.h"
 
+const ZEVector2 ZEVector2::Zero = ZEVector2(0.0f, 0.0f);
+const ZEVector2 ZEVector2::UnitX = ZEVector2(1.0f, 0.0f);
+const ZEVector2 ZEVector2::UnitY = ZEVector2(0.0f, 1.0f);
+
 inline void ZEVector2::Create(float x, float y)
 {
 	this->x = x;
@@ -204,6 +208,10 @@ ZEVector2::ZEVector2()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const ZEVector3 ZEVector3::Zero	= ZEVector3(0.0f, 0.0f, 0.0f);
+const ZEVector3 ZEVector3::UnitX	= ZEVector3(1.0f, 0.0f, 0.0f);
+const ZEVector3 ZEVector3::UnitY	= ZEVector3(0.0f, 1.0f, 0.0f);
+const ZEVector3 ZEVector3::UnitZ	= ZEVector3(0.0f, 0.0f, 1.0f);
 
 inline void ZEVector3::Create(ZEVector3& Out, float x, float y, float z)
 {
@@ -394,6 +402,16 @@ ZEVector3::ZEVector3()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const ZEVector4 ZEVector4::Zero	= ZEVector4(0.0f, 0.0f, 0.0f, 0.0f);
+const ZEVector4 ZEVector4::UnitX	= ZEVector4(1.0f, 0.0f, 0.0f, 0.0f);
+const ZEVector4 ZEVector4::UnitY	= ZEVector4(0.0f, 1.0f, 0.0f, 0.0f);
+const ZEVector4 ZEVector4::UnitZ	= ZEVector4(0.0f, 0.0f, 1.0f, 0.0f);
+const ZEVector4 ZEVector4::UnitW	= ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
+
+const ZEVector4 ZEVector4::HomogenousUnitX = ZEVector4(1.0f, 0.0f, 0.0f, 1.0f);
+const ZEVector4 ZEVector4::HomogenousUnitY = ZEVector4(0.0f, 1.0f, 0.0f, 1.0f);
+const ZEVector4 ZEVector4::HomogenousUnitZ = ZEVector4(0.0f, 0.0f, 1.0f, 1.0f);
 
 inline void ZEVector4::Create(float x, float y, float z, float w)
 {

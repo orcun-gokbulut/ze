@@ -38,6 +38,9 @@ ZE_ENTITY_DESCRIPTION_START(ZECanvasBrush, ZEEntity, ZE_ERA_BOTH, "", "Canvas br
 	ZE_ENTITY_NOATTRIBUTE(ZECanvasBrush)
 ZE_ENTITY_DESCRIPTION_END(ZECanvasBrush)
 
+#include "Graphics/GraphicsModule.h"
+#include "Core/Error.h"
+
 bool ZECanvasBrush::IsDrawable()
 {
 	return true;
@@ -45,18 +48,27 @@ bool ZECanvasBrush::IsDrawable()
 
 void ZECanvasBrush::UpdateCanvas()
 {
-	if (RenderList.VertexBuffer != NULL)
-	{
-		((ZEStaticVertexBuffer*)RenderList.VertexBuffer)->Destroy();
-		delete RenderList.VertexBuffer;
-	}
-	
 	if (!Canvas.IsEmpty())
 	{
+		if (VertexBuffer == NULL)
+			VertexBuffer = zeGraphics->CreateStaticVertexBuffer();
+
+		if (OldVertexCount != Canvas.Vertices.GetCount())
+		{
+			OldVertexCount = Canvas.Vertices.GetCount();
+			VertexBuffer->Release();
+			if (!VertexBuffer->Create(Canvas.GetBufferSize()))
+				zeCriticalError("Canvas Brush", "Can not create Static Vertex Buffer.");
+		}
+		
+		void* Buffer = VertexBuffer->Lock();
+		memcpy(Buffer, Canvas.GetVertexBuffer(), Canvas.GetBufferSize());
+		VertexBuffer->Unlock();
+	
 		ZEAABoundingBox BoundingBox;
 		Canvas.CalculateBoundingBox(BoundingBox);
 		SetLocalBoundingBox(BoundingBox);
-		RenderList.VertexBuffer = Canvas.CreateStaticVertexBuffer();
+	
 		UpdateBoundingBox = true;
 		UpdateBoundingSphere = true;
 	}
@@ -64,12 +76,33 @@ void ZECanvasBrush::UpdateCanvas()
 
 void ZECanvasBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
 {
-	if (RenderList.VertexBuffer != NULL)
+	if (VertexBuffer != NULL)
 	{
 		RenderList.Lights.SetCount(Lights.GetCount());
 		for (size_t I = 0; I < Lights.GetCount(); I++)
 			RenderList.Lights[I] = Lights[I];
-		RenderList.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
+		if (PrimitiveType == ZE_RLPT_LINE)
+			RenderList.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_WORLD_TRANSFORM | ZE_RLF_ENABLE_ZCULLING | ZE_RLF_TRANSPARENT;
+		else
+			RenderList.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_WORLD_TRANSFORM | ZE_RLF_ENABLE_ZCULLING;
+
+		RenderList.VertexBuffer = VertexBuffer;
+		
+		switch(PrimitiveType)
+		{
+			case ZE_RLPT_TRIANGLESTRIPT:
+				RenderList.PrimitiveCount = Canvas.Vertices.GetCount() - 2;
+				break;
+			case ZE_RLPT_TRIANGLE:
+				RenderList.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
+				break;
+			case ZE_RLPT_LINE:
+				RenderList.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
+				break;
+			case ZE_RLPT_POINT:
+				RenderList.PrimitiveCount = Canvas.Vertices.GetCount();
+				break;	
+		}
 		RenderList.PrimitiveType = PrimitiveType;
 		RenderList.WorldMatrix = GetWorldTransform();
 		Renderer->AddToRenderList(&RenderList);
@@ -78,11 +111,16 @@ void ZECanvasBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLigh
 
 void ZECanvasBrush::Deinitialize()
 {
+	if (VertexBuffer != NULL)
+		VertexBuffer->Destroy();
+
 	Canvas.Clean();
 }
 
 ZECanvasBrush::ZECanvasBrush()
 {
+	VertexBuffer = NULL;
+	OldVertexCount = 0;
 	SetBoundingVolumeMechanism(ZE_BVM_USELOCALONLY);
 	RenderList.SetZero();
 	Material.SetZero();
@@ -94,6 +132,5 @@ ZECanvasBrush::ZECanvasBrush()
 
 ZECanvasBrush::~ZECanvasBrush()
 {
-	if (RenderList.VertexBuffer != NULL)
-		delete RenderList.VertexBuffer;
+	Deinitialize();
 }
