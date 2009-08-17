@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - RenderList.h
+ Zinek Engine - VertexDeclaration.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,91 +34,82 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_RENDERLIST_H__
-#define __ZE_RENDERLIST_H__
+#ifndef	__ZE_VERTEX_DECLARATION_H__
+#define __ZE_VERTEX_DECLARATION_H__
 
-#include "ZEDS/ZEDS.h"
-#include "ZEMath/ZEMath.h"
-#include "TextureResource.h"
-#include "Material.h"
-#include "VertexBuffer.h"
+#include "ZEDS/Array.h"
+#include "Types.h"
 
-#define	ZE_RLF_ZCULLING						2
-#define	ZE_RLF_NOZWRITE						4
-#define	ZE_RLF_WORLD_TRANSFORM				8
-#define	ZE_RLF_VIEW_TRANSFORM				16
-#define ZE_RLF_PROJECTION_TRANSFROM			32
-#define ZE_RLF_INSTANCED					64
-#define ZE_RLF_SKINNED						128
-#define ZE_RLF_INDEXED						256
+#define ZE_VE_POSITION				0x00000008
+#define ZE_VE_NORMAL				0x00000010
+#define ZE_VE_TANGENT				0x00000020
+#define ZE_VE_BINORMAL				0x00000040
+#define ZE_VE_SKIN					0x00000080
+#define ZE_VE_TEXCOORD(Count)		(0x00000004 && (Count))
 
-#define ZE_DO_RIGID							0
-#define ZE_DO_TRANSPARENT					10
-#define ZE_DO_IMPOSTER						20
-#define ZE_DO_GUI							40
-
-enum ZERLPrimitiveType
+enum ZEVertexElementSemantic
 {
-	ZE_RLPT_POINT,
-	ZE_RLPT_LINE,
-	ZE_RLPT_TRIANGLE,
-	ZE_RLPT_TRIANGLESTRIPT,
-	ZE_RLPT_TRIANGLEFAN,
+	ZE_VES_END			= 0,
+	ZE_VES_POSITION		= 1,
+	ZE_VES_NORMAL		= 2,
+	ZE_VES_BINORMAL		= 3,
+	ZE_VES_TANGENT		= 4,
+	ZE_VES_TEXTCOORD	= 5,
+	ZE_VES_COLOR		= 6,
+	ZE_VES_BLENDINDEX	= 7,
+	ZE_VES_BLENDWEIGHT	= 8
 };
 
-enum ZERLLightType
+enum ZEVertexElementType
 {
-	ZE_RLLT_POINT,
-	ZE_RLLT_DIRECTIONAL,
-	ZE_RLLT_PROJECTIVE,
-	ZE_RLLT_OMNIPROJECTIVE
+	ZE_VET_END			= 0,
+	ZE_VET_FLOAT		= 1,
+	ZE_VET_FLOAT2		= 2,
+	ZE_VET_FLOAT3		= 3,
+	ZE_VET_FLOAT4		= 4,
+	ZE_VET_SHORT2		= 5,
+	ZE_VET_SHORT4		= 6,
+	ZE_VET_BYTE4		= 7,
 };
 
-struct ZERLLight
-{	
-		ZERLLightType						Type;
-		ZEVector3							Color;
-		ZEVector3							Position;
-		ZEVector3							Direction;
-		ZEVector3							Attenuation;
-		float								Intensity;
-		float								Range;
-		ZEMatrix4x4							LightViewProjMatrix;
-		ZEMatrix4x4							LightRotationMatrix;
-		union
-		{
-			const ZETexture*				ProjectionMap;
-			const ZECubeTexture*			CubeProjectionMap;
-		};
-		union
-		{
-			const ZETexture*				ShadowMap;
-			const ZECubeTexture*			CubeShadowMap;
-		};
-
-		void								SetZero();
+struct ZEVertexElement
+{
+	/*public:	*/
+		ZEVertexElementSemantic						Semantic;
+		ZEVertexElementType							Type;
+		unsigned int								Index;
 };
 
-class ZERenderList
+class ZEResourceFile;
+class ZEVertexDeclaration
 {
+	protected:
+													ZEVertexDeclaration();
+		virtual										~ZEVertexDeclaration();
+
 	public:
-		ZEDWORD								DrawOrder;
-		ZEDWORD								Flags;
+		virtual const ZEArray<ZEVertexElement>&		GetVertexElements() = 0;
+		virtual size_t								GetVertexSize() = 0;
 
-		void*								IndexBuffer;
-		ZEVertexBuffer*						VertexBuffer;
-		ZEVertexType						VertexType;
-		unsigned int						VertexBufferOffset;
+		virtual bool								Create(const ZEArray<ZEVertexElement>& VertexElements) = 0;
+		virtual bool								Create(const ZEVertexElement* Elements) = 0;
+		virtual void								Release() = 0;
+		virtual void								Destroy();
 
-		ZERLPrimitiveType					PrimitiveType;
-		unsigned int						PrimitiveCount;
+		virtual void								SetupVertexDeclaration() = 0;
 
-		ZEMatrix4x4							WorldMatrix;
-		ZEArray<ZEMatrix4x4>				BoneTransforms;
+		static ZEVertexDeclaration*					LoadFromFile(const char* FileName);
+		static ZEVertexDeclaration*					LoadFromFile(ZEResourceFile* ResourceFile);
+		static ZEVertexDeclaration*					CreateInstance();
+};
 
-		const ZEShader*						Shader;
-		ZEChunkArray<const ZERLLight*, 10>	Lights;		
-
-		void								SetZero();
+enum ZEVertexType
+{
+	ZE_VT_NOTSET				= 0,
+	ZE_VT_SIMPLEVERTEX			= 1,
+	ZE_VT_MAPVERTEX				= 2,
+	ZE_VT_MODELVERTEX			= 3,
+	ZE_VT_SKINNEDMODELVERTEX	= 4,
+	ZE_VT_GUIVERTEX				= 5
 };
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle.cpp
+ Zinek Engine - D3D9CommonTools.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,91 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Rectangle.h"
-#include "Core/Error.h"
+#pragma once
+#ifndef __ZE_D3D9_COMMON_TOOLS_H__
+#define __ZE_D3D9_COMMON_TOOLS_H__
 
-bool ZERectangle::BoundingTest(const ZEPoint2& Point) const
-{
-	if ((Point.x >= LeftUp.x && Point.x <= RightDown.x) && (Point.y >= LeftUp.y &&  Point.y <= RightDown.y))
-		return true;
-	else
-		return false;
-}
-ZEPoint2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
-{
-	switch(Corner)
-	{
-		case ZERECTANGLECORNER_LEFTDOWN:
-			return ZEPoint2(LeftUp.x, RightDown.y);
-		case ZERECTANGLECORNER_RIGHTDOWN:
-			return ZEPoint2(RightDown.x, RightDown.y);
-		case ZERECTANGLECORNER_LEFTUP:
-			return ZEPoint2(LeftUp.x, LeftUp.y);
-		case ZERECTANGLECORNER_RIGHTUP:
-			return ZEPoint2(RightDown.x, LeftUp.y);
-		default:
-			ZEASSERT(true, "Wrong enum value ZERectangleCorner. Value : %d", Corner);
-	}
-}
+#include <d3d9.h>
+#include <d3dx9.h>
+#include "Graphics/Texture.h"
+#include "D3D9ComponentBase.h"
 
-float ZERectangle::GetWidth() const
-{
-	return LeftUp.x - RightDown.x;
-}
+#define ZED3D_RELEASE(x) if ((x) != NULL) {(x)->Release(); (x) = NULL;}
 
-float ZERectangle::GetHeight() const
+class ZED3D9CommonTools : public ZED3D9ComponentBase
 {
-	return LeftUp.y - RightDown.y;
-}
-
-ZERectangle::ZERectangle()
-{
-}
-
-ZERectangle::ZERectangle(const ZEPoint2& UpLeft, const ZEPoint2& DownRight)
-{
-	this->LeftUp = UpLeft;
-	this->RightDown = DownRight;
-}
-
-ZERectangle::ZERectangle(const ZEPoint2& UpLeft, float Width, float Height)
-{
-	this->LeftUp = UpLeft;
-	this->RightDown.x = UpLeft.x + Width;
-	this->RightDown.y = UpLeft.y + Height;
-}
-
-
-void ZE3DRectangle::GetPlane(ZEPlane & Plane) const
-{
-	ZEPlane::Create(Plane,P1,P2,P3);
-}
-
-const ZEPoint3& ZE3DRectangle::GetPoint(unsigned int Index) const
-{
-	switch(Index)
-	{
-		case 0:
-			return P1;
-		case 1:
-			return P2;
-		case 2:
-			return P3;
-		case 3:
-			return P4;
-		default:
-			return P1;
-	}
-}
-		
-ZE3DRectangle::ZE3DRectangle()
-{
-}
-
-ZE3DRectangle::ZE3DRectangle(const ZEPoint3& P1, const ZEPoint3& P2, const ZEPoint3& P3, const ZEPoint3& P4)
-{
-	this->P1 = P1;
-	this->P2 = P2;
-	this->P3 = P3;
-	this->P4 = P4;
-}
+	public:
+		static D3DFORMAT		ConvertPixelFormat(ZETexturePixelFormat Format);
+		static bool				CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* Source, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros = NULL);
+		static bool				CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, const char* Source, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros = NULL);
+		static bool				CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height);
+		static bool				CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height, ZETexturePixelFormat Format);
+		static bool				CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height, ZETexturePixelFormat Format);
+};
+#endif

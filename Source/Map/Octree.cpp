@@ -36,13 +36,13 @@
 #include "Octree.h"
 #include "Graphics/GraphicsModule.h"
 #include "Graphics/Renderer.h"
-#include "Graphics/RenderList.h"
+#include "Graphics/RenderOrder.h"
 #include "Graphics/ViewVolume.h"
 #include "Graphics/Light.h"
 #include "MapResource.h"
 
-ZEDefaultMaterial ZEOctree::OctreeBBoxMaterial;
-ZERenderList ZEOctree::OctreeBBoxRenderList;
+ZEFixedMaterial* ZEOctree::OctreeBBoxMaterial;
+ZERenderOrder ZEOctree::OctreeBBoxRenderOrder;
 ZECanvas ZEOctree::OctreeBBoxCanvas;
 
 bool ZEOctree::Initialize()
@@ -50,16 +50,24 @@ bool ZEOctree::Initialize()
 	OctreeBBoxCanvas.Clean();
 	OctreeBBoxCanvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
 
-	OctreeBBoxMaterial.SetZero();
-	OctreeBBoxMaterial.SetShaderComponents(0);
-	OctreeBBoxMaterial.AmbientColor = ZEVector3(1.0f, 1.0f, 0.0f);
-	OctreeBBoxMaterial.LightningEnabled = false;
+	if (OctreeBBoxMaterial != NULL)
+	{
+		OctreeBBoxMaterial->Destroy();
+		OctreeBBoxMaterial = NULL;
+	}
 
-	OctreeBBoxRenderList.SetZero();
-	OctreeBBoxRenderList.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
-	OctreeBBoxRenderList.PrimitiveType = ZE_RLPT_LINE;
-	OctreeBBoxRenderList.Material = &OctreeBBoxMaterial;
-	OctreeBBoxRenderList.VertexBuffer = &OctreeBBoxCanvas;
+	OctreeBBoxMaterial = ZEFixedMaterial::CreateInstance();
+
+	OctreeBBoxMaterial->SetZero();
+	OctreeBBoxMaterial->SetLightningEnabled(false);
+	OctreeBBoxMaterial->SetAmbientEnabled(true);
+	OctreeBBoxMaterial->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
+
+	OctreeBBoxRenderOrder.SetZero();
+	OctreeBBoxRenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
+	OctreeBBoxRenderOrder.PrimitiveType = ZE_RLPT_LINE;
+	OctreeBBoxRenderOrder.Material = OctreeBBoxMaterial;
+	OctreeBBoxRenderOrder.VertexBuffer = &OctreeBBoxCanvas;
 
 	return true;
 }
@@ -72,31 +80,31 @@ bool ZEOctree::Destroy()
 
 void ZEOctree::Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESmartArray<ZELight*>& Lights)
 {
-	ZEMatrix4x4::CreateOrientation(OctreeBBoxRenderList.WorldMatrix, BoundingBox.GetCenter(), 
+	ZEMatrix4x4::CreateOrientation(OctreeBBoxRenderOrder.WorldMatrix, BoundingBox.GetCenter(), 
 	ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 
 	ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, 
 		BoundingBox.Max.y - BoundingBox.Min.y, 
 		BoundingBox.Max.z - BoundingBox.Min.z)
 	);
-	Renderer->AddToRenderList(&OctreeBBoxRenderList);
+	Renderer->AddToRenderOrder(&OctreeBBoxRenderOrder);
 
 	for (size_t I = 0; I < 8; I++)
 			if (SubTrees[I] != NULL)
 				SubTrees[I]->Render(Renderer, ViewVolume, Lights);
-	/*if (RenderLists.GetCount() != 0)
+	/*if (RenderOrders.GetCount() != 0)
 	{
 		ZESmartArray<ZELight*> NodeLights;
 		for (size_t I = 0; I < Lights.GetCount(); I++)
 			if (Lights[I]->GetViewVolume().CullTest(BoundingBox))
 				NodeLights.Add(Lights[I]);
 
-		for (size_t I = 0; I < RenderLists.GetCount(); I++)
+		for (size_t I = 0; I < RenderOrders.GetCount(); I++)
 		{
-			RenderLists[I].Lights.Clear();
+			RenderOrders[I].Lights.Clear();
 			for (size_t N = 0; N < NodeLights.GetCount(); N++)
-				RenderLists[I].Lights.Add(NodeLights[N]->GetRenderListLight());
+				RenderOrders[I].Lights.Add(NodeLights[N]->GetRenderOrderLight());
 
-			Renderer->AddToRenderList(&RenderLists[I]);
+			Renderer->AddToRenderOrder(&RenderOrders[I]);
 		}
 
 		for (size_t I = 0; I < 8; I++)

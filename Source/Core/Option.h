@@ -37,7 +37,9 @@
 #ifndef	__ZE_OPTION_H__
 #define __ZE_OPTION_H__
 
-#include "ZEDS/ZEDS.h"
+#include "ZEDS/Named.h"
+#include "ZEDS/Array.h"
+#include "ZEDS/TypedVariant.h"
 #include "fastdelegate.h"
 #include "Command.h"
 #include <string.h>
@@ -153,8 +155,8 @@ class ZEOptionManager
 
 		ZEOption*					GetOption(const char* SectionName, const char* Name);
 
-		void						Save(const char *Filename);
-		void						Load(const char *Filename);
+		void						Save(const char *FileName);
+		void						Load(const char *FileName);
 		void						ParseParameters(const char *Parameters);
 		
 		void						CommitChanges();

@@ -24,44 +24,6 @@
 //////////////////////////////////////////////////////////////////////////////////////
 /*ZEHEADER_END*/
 
-#ifdef ZESHADER_COMPONENT0
-#define ZESHADER_SKINTRANFORMATION
-#endif
-#ifdef ZESHADER_COMPONENT1
-#define ZESHADER_DIFFUSEMAP
-#endif
-#ifdef ZESHADER_COMPONENT2
-#define ZESHADER_NORMALMAP
-#endif
-#ifndef ZESHADER_COMPONENT3
-#define ZESHADER_SPECULARMAP
-#endif
-#ifdef ZESHADER_COMPONENT4
-#define ZESHADER_EMMISIVEMAP
-#endif
-#ifdef ZESHADER_COMPONENT5
-#define ZESHADER_OPASITYMAP
-#endif
-#ifdef ZESHADER_COMPONENT6
-#define ZESHADER_DETAILDIFFUSEMAP
-#endif
-#ifdef ZESHADER_COMPONENT7
-#define ZESHADER_DETAILNORMALMAP
-#endif
-#ifdef ZESHADER_COMPONENT8
-#define ZESHADER_REFLECTION
-#endif
-#ifdef ZESHADER_COMPONENT9
-#define ZESHADER_REFRACTION
-#endif
-#ifdef ZESHADER_COMPONENT10
-#define ZESHADER_LIGHTMAP
-#endif
-#ifdef ZESHADER_COMPONENT11
-#define ZESHADER_DISTORTIONMAP
-#endif
-
-
 float4x4  WorldViewProjMatrix          : register(c0);
 float4x4  BoneMatrices[58]             : register(c32);
 

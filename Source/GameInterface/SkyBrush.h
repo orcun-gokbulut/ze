@@ -46,10 +46,10 @@ class ZESkyBrush : public ZEEntity
 {
 	ZE_ENTITY_CLASS(ZESkyBrush)
 	private:
-		ZECubeTextureResource*				SkyTexture;
-		ZEDefaultMaterial					SkyMaterial;
+		ZETextureCubeResource*				SkyTexture;
+		ZEFixedMaterial*					SkyMaterial;
 		ZECanvas							SkyBox;
-		ZERenderList						SkyRenderList;
+		ZERenderOrder						SkyRenderOrder;
 
 		ZEDirectionalLight					SkyLight;
 
@@ -62,7 +62,7 @@ class ZESkyBrush : public ZEEntity
 		virtual bool						IsLight();
 		virtual bool						AllwaysDraw();
 
-		virtual void						SetSkyTexture(const char* Filename);
+		virtual void						SetSkyTexture(const char* FileName);
 		const char*							GetSkyTexture();
 		
 		virtual void						SetSkyColor(const ZEVector3& Color);

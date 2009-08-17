@@ -36,7 +36,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <d3dx9.h>
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "ZEMath/Matrix.h"
 
 #define MATHLIB_FLOATTRESHOLD 0.00001f
 

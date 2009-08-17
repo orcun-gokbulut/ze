@@ -39,6 +39,7 @@
 #include "Input/InputDefinitions.h"
 #include "Graphics/GraphicsModule.h"
 #include "Core/Core.h"
+#include "ZEMath/Ray.h"
 
 #define ACTIONID_FORWARD		0
 #define ACTIONID_BACKWARD		1
@@ -208,7 +209,8 @@ void ZEPlayer::Initialize()
 	RegisterComponent(&Listener);
 	//RegisterComponent(&Light);
 
-	zeCore->GetGame()->GetScene()->CurrentCamera = &Camera;
+	zeScene->SetActiveCamera(&Camera);
+	zeScene->SetActiveListener(&Listener);
 }
 void ZEPlayer::Deinitialize()
 {

@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Canvas.h"
-#include "GraphicsModule.h"
 #include "Core/Error.h"
+#include "Core/ResourceFile.h"
 #include <stdio.h>
 
 #define ZECANVAS_ADDVERTEX(Vertex, Matrix, Pos, Nor, Texcrd)\
@@ -301,6 +301,9 @@ void ZECanvas::AddCircle(float Radious, unsigned int Segments)
 
 void ZECanvas::AddPlane(float Width, float Length)
 {
+	Width *= 0.5f;
+	Length *= 0.5f;
+
 	ZESimpleVertex* Verts = Vertices.MassAdd(6);
 	ZEVector3 Normal(0.0f, 1.0f, 0.0f);
 	ZECANVAS_ADDVERTEX(Verts[0], Transformation, ZEVector3(-Width, 0.0f, Length), Normal, ZEVector2(0.0f ,1.0f));
@@ -584,12 +587,12 @@ void ZECanvas::Clean()
 	Vertices.Clear();
 }
 
-bool ZECanvas::LoadCanvasFile(const char* Filename)
+bool ZECanvas::LoadCanvasFile(const char* FileName)
 {
 	ZEResourceFile File;
-	if (!File.Open(Filename))
+	if (!File.Open(FileName))
 	{
-		zeError("Canvas", "Can not load canvas file. (Filename : \"%s\")", Filename);
+		zeError("Canvas", "Can not load canvas file. (FileName : \"%s\")", FileName);
 		return false;
 	}
 	
@@ -609,20 +612,20 @@ bool ZECanvas::LoadCanvasFile(const char* Filename)
 
 	/*	if (Index == VertexCount)
 		{
-			zeError("Canvas", "Corrupted canvas file. Vertex count does not match. (Filename : \"%s\")", Filename);
+			zeError("Canvas", "Corrupted canvas file. Vertex count does not match. (FileName : \"%s\")", FileName);
 			return false;
 		}*/
 	}
 
-	if (Index + 1 != VertexCount)
-		zeWarning("Canvas", "Corrupted canvas file. Vertex count is less than verties in the file. (Filename : \"%s\")", Filename);
+	if (Index != VertexCount + 1 )
+		zeWarning("Canvas", "Corrupted canvas file. Vertex count is less than verties in the file. (FileName : \"%s\")", FileName);
 
 	return true;
 }
 
 ZEStaticVertexBuffer* ZECanvas::CreateStaticVertexBuffer()
 {
-	ZEStaticVertexBuffer* Buffer = zeGraphics->CreateStaticVertexBuffer();
+	ZEStaticVertexBuffer* Buffer = ZEStaticVertexBuffer::CreateInstance();
 	Buffer->Create(Vertices.GetCount() * sizeof(ZESimpleVertex));
 	void* BufferPtr = Buffer->Lock();
 	memcpy(BufferPtr, Vertices.GetCArray(), Vertices.GetCount() * sizeof(ZESimpleVertex));

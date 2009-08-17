@@ -37,122 +37,68 @@
 #ifndef __ZE_MATERIAL_H__ 
 #define __ZE_MATERIAL_H__
 
-#include "ZEMath/ZEMath.h"
-#include "Definitions.h"
-#include "Texture.h"
-#include "Vertex.h"
-#include "Shader.h"
-
-enum ZEShaderType
-{
-	ZE_ST_MATERIAL,
-	ZE_ST_POSTEFFECT,
-	ZE_ST_PARTICLE,
-	ZE_ST_OTHER
-};
-
-class ZEShader
-{
-	public:
-		virtual ZEShaderType			GetShaderType() = 0;
-		virtual size_t					GetLightPerPass(ZELightType LightType) = 0;
-
-		virtual bool					Setup() = 0;
-		virtual bool					PreLightningPass() = 0;
-		virtual bool					LightPass(ZELightType Light, ZESmartArray<ZERLLight*> Lights) = 0;
-};
-
-
 enum ZEMaterialType
 {
-	ZE_MT_FIXEDMATERIAL,
-	ZE_MT_CUSTOMMATERIAL,
-	ZE_MT_HLFXMATERIAL
+	ZE_MT_NONE,
+	ZE_MT_FIXED,
+	ZE_MT_CUSTOM,
+	ZE_MT_CGFX,
+	ZE_MT_OTHERs
 };
 
-enum ZETransparancyMode
+// ZEMaterialFlags
+#define ZE_MF_NOCACHING
+
+class ZERenderOrder;
+class ZERLLight;
+class ZECamera;
+class ZEMaterial
 {
-	ZE_TM_NOTRANSPARACY	= 0,
-	ZE_TM_ALPHACULL = 1,
-	ZE_TM_REGULAR = 2,
-	ZE_TM_ADDAPTIVE	= 3,
-	ZE_TM_SUBTRACTIVE = 4,
-};
-class ZEShader
-{
-	public:
-		bool							TwoSided;
-		bool							LightningEnabled;
-		bool							Wireframe;
-		ZETransparancyMode				TransparancyMode;
-		bool							RecivesShadow;
-		unsigned int					TransparancyCullLimit;
-
-
-		virtual bool					BeginPass(ZEMaterialPassType PassType, ZERenderListLi) = 0;
-
-		virtual	void					SetZero() = 0;
-};
-
-class ZEDefaultMaterial : public ZEMaterial
-{
-	private:
-		ZEShader*						Shader;
-		unsigned int					ShaderComponents;
+	protected:
+										ZEMaterial();
+		virtual							~ZEMaterial();
 
 	public:
-		virtual
-		union
-		{
-			struct
-			{
-				ZEVector3				AmbientColor;
-				float					Opasity;
-				ZEVector3				DiffuseColor;
-				float					Reserved0;
-				ZEVector3				SpecularColor;
-				float					SpecularFactor;
-				ZEVector3				EmmisiveColor;
-				float					EmmisiveFactor;
-				float					ReflectionFactor;
-				float					RefractionFactor;
-				ZEVector2				DetailMapTiling;
-			};
-			float						PixelShaderConstants[16];
-		};
+		virtual const char*				GetMaterialUID() const = 0;
+		virtual unsigned int			GetMaterialFlags() const = 0;
+		virtual ZEMaterialType			GetMaterialType() const = 0;
 
-		union
-		{
-			struct
-			{
-				const ZETexture*		DiffuseMap;
-				const ZETexture*		NormalMap;
-				const ZETexture*		SpecularMap;
-				const ZETexture*		EmmisiveMap;
-				const ZETexture*		OpacityMap;
-				const ZETexture*		DetailMap;
-				const ZETexture*		DetailNormalMap;
-				const ZECubeTexture*	EnvironmentMap;
-				const ZETexture*		LightMap;
-			};
-			ZETexture*					Textures[9];
-		};
+		// SetUp
+		virtual void					SetZero() = 0;
+		// Render calls
+		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const = 0;
 
-		void							SetShaderComponents(unsigned int ShaderComponents);
-		unsigned int					GetShaderComponents() const;
+		virtual bool					SetupPreLightning() const = 0;
+		virtual size_t					DoPreLightningPass() const = 0;
 
-		virtual void					Release() const;
+		virtual bool					SetupLightning() const = 0;
 
-		virtual void					SetZero();
+		virtual bool					SetupPointLightPass(bool Shadowed) const = 0;
+		virtual size_t					DoPointLightPass(const ZERLLight** Lights, size_t Count) const = 0;
 
-		virtual const ZEShader*			GetShader() const;
+		virtual bool					SetupDirectionalLightPass(bool Shadowed) const = 0;
+		virtual size_t					DoDirectionalLightPass(const ZERLLight** Lights, size_t Count) const = 0;
 
-		virtual const ZEVector4* 		GetVertexShaderConstants(int* Count) const;
-		virtual const ZEVector4* 		GetPixelShaderConstants(int* Count) const;
-		virtual const ZETextureBase**	GetTextures(int* Count) const;
+		virtual bool					SetupProjectiveLightPass(bool Shadowed) const = 0;
+		virtual size_t					DoProjectiveLightPass(const ZERLLight** Lights, size_t Count) const = 0;
 
-										ZEDefaultMaterial();
-										~ZEDefaultMaterial();
+		virtual bool					SetupOmniProjectiveLightPass(bool Shadowed) const = 0;
+		virtual size_t					DoOmniProjectivePass(const ZERLLight** Lights, size_t Count) const = 0;
+
+		virtual bool					SetupCustomPass(unsigned int CustomPassId) const = 0;
+		virtual bool					DoCustomPass(unsigned int CustomPassId, void* CustomData) const = 0;
+
+		virtual bool					SetupShadowPass() const = 0;	
+		virtual size_t					DoShadowPass() const = 0;
+
+		virtual void					EndOfPasses() const = 0;
+
+		virtual void					UpdateMaterial() = 0;
+
+		virtual void					Release() = 0;
+		virtual void					Destroy();
+
+
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - RenderOrder.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,4 +32,15 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#include "RenderOrder.h"
+#include <memory.h>
 
+void ZERLLight::SetZero()
+{
+	memset(this, 0, sizeof(ZERLLight));
+}
+
+void ZERenderOrder::SetZero()
+{
+	memset(this, 0, sizeof(ZERenderOrder));
+}

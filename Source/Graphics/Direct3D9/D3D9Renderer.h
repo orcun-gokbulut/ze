@@ -45,29 +45,23 @@
 
 class ZED3D9RendererBase : public ZERenderer, public ZED3D9ComponentBase
 {
+	friend class ZEDirect3D9Module;
 	protected:
-		ZESmartArray<ZERenderList>				NonTransparent;
-		ZESmartArray<ZERenderList>				Transparent;
-		ZESmartArray<ZERenderList>				Imposter;
-		ZEViewPoint								ViewPoint;
-
-		static LPDIRECT3DVERTEXDECLARATION9		VertexDeclarations[8];
-
+		ZESmartArray<ZERenderOrder>				NonTransparent;
+		ZESmartArray<ZERenderOrder>				Transparent;
+		ZESmartArray<ZERenderOrder>				Imposter;
+		ZECamera*								Camera;
 		LPDIRECT3DSURFACE9						RenderColorBufferRT;
 		LPDIRECT3DSURFACE9						RenderZBufferRT;
 
-		static bool								InitializeVertexDeclarations();		
-		static void								DeinitializeVertexDeclarations();
-	
+												ZED3D9RendererBase();
+		virtual									~ZED3D9RendererBase();
+
 	protected:						
-		void									SetShaderPass(ZED3D9ShaderPass* Pass, bool Skinned);
-		void									PumpStreams(ZERenderList* RenderList); // Setup Streams
-		void									DrawSM2(ZERenderList* RenderList, const ZEViewPoint& ViewPoint);
+		void									PumpStreams(ZERenderOrder* RenderOrder);
+		void									SetupRenderOrder(ZERenderOrder* RenderOrder);
 
 	public:
-		static bool								BaseInitialize();
-		static void								BaseDeinitialize();
-
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
 		virtual void							Destroy();
@@ -75,21 +69,20 @@ class ZED3D9RendererBase : public ZERenderer, public ZED3D9ComponentBase
 		virtual void							DeviceLost() = 0;
 		virtual bool							DeviceRestored() = 0;
 
-		virtual void							SetViewPoint(const ZEViewPoint& ViewPoint);
-		virtual void							AddToRenderList(ZERenderList* RenderList);
+		virtual void							SetCamera(ZECamera* Camera);
+		virtual void							AddToRenderOrder(ZERenderOrder* RenderOrder);
 		virtual void							ClearList();
 
 		virtual void							Render(float ElaspedTime);
 
-												ZED3D9RendererBase();
-		virtual									~ZED3D9RendererBase();
 };
 
 class ZED3D9FrameBufferRenderer : public ZED3D9RendererBase
 {
+	friend class ZEDirect3D9Module;
 	public:
-		virtual bool							SetOutput(ZECubeTexture* TextureResource, ZECubeTextureFace Face);
-		virtual bool							SetOutput(ZETexture* TextureResource);
+		virtual bool							SetOutput(ZETextureCube* TextureResource, ZETextureCubeFace Face);
+		virtual bool							SetOutput(ZETexture2D* TextureResource);
 
 		virtual bool							Initialize();
 
@@ -99,42 +92,45 @@ class ZED3D9FrameBufferRenderer : public ZED3D9RendererBase
 
 class ZED3D9TextureRenderer : public ZED3D9RendererBase
 {
+	friend class ZEDirect3D9Module;
 	private:
-		ZETexture*								OutputTexture;
-		ZECubeTexture*							OutputCubeTexture;
-		ZECubeTextureFace						OutputCubeTextureFace;
+		ZETexture2D*								OutputTexture;
+		ZETextureCube*							OutputCubeTexture;
+		ZETextureCubeFace						OutputCubeTextureFace;
+
+	protected:
+												ZED3D9TextureRenderer();
 
 	public:	
-		virtual bool							SetOutput(ZECubeTexture* Texture, ZECubeTextureFace Face);
-		virtual bool							SetOutput(ZETexture* Texture);
+		virtual bool							SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face);
+		virtual bool							SetOutput(ZETexture2D* Texture);
 
 		virtual void							DeviceLost();
 		virtual bool							DeviceRestored();
-
-												ZED3D9TextureRenderer();
 };
 
 class ZED3D9ShadowRenderer : public ZED3D9RendererBase
 {
+	friend class ZEDirect3D9Module;
 	protected:
-		void									DrawSM2(ZERenderList* RenderList, const ZEViewPoint& ViewPoint);
-		ZETexture*								OutputTexture;
-		ZECubeTexture*							OutputCubeTexture;
-		ZECubeTextureFace						OutputCubeTextureFace;
+		void									DrawSM2(ZERenderOrder* RenderOrder);
+		ZETexture2D*								OutputTexture;
+		ZETextureCube*							OutputCubeTexture;
+		ZETextureCubeFace						OutputCubeTextureFace;
+
+												ZED3D9ShadowRenderer();
 
 	public:	
 		static bool								BaseInitialize();
 		static void								BaseDeinitialize();
 
-		virtual bool							SetOutput(ZECubeTexture* Texture, ZECubeTextureFace Face);
-		virtual bool							SetOutput(ZETexture* Texture);
+		virtual bool							SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face);
+		virtual bool							SetOutput(ZETexture2D* Texture);
 
 		virtual void							DeviceLost();
 		virtual bool							DeviceRestored();
 
 		virtual void							Render(float ElaspedTime);
-
-												ZED3D9ShadowRenderer();
 };
 
 #endif

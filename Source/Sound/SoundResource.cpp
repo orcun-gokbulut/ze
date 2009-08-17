@@ -35,8 +35,8 @@
 
 #include "SoundResource.h"
 #include "Core/Core.h"
-#include <ogg.h>
-#include <vorbisfile.h>
+#include <ogg/ogg.h>
+#include <vorbis/vorbisfile.h>
 
 size_t OggFile_Read(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
@@ -64,15 +64,15 @@ const char* ZESoundResource::GetResourceType() const
 	return "Sound Resource";
 }
 
-ZESoundResource*  ZESoundResource::LoadOggFile(const char* Filename)
+ZESoundResource*  ZESoundResource::LoadOggFile(const char* FileName)
 {
-	ZESoundResource* Temp =(ZESoundResource*) zeResources->GetResource(Filename);
+	ZESoundResource* Temp =(ZESoundResource*) zeResources->GetResource(FileName);
 	if(Temp == NULL)
 	{
 		Temp = new ZESoundResource();
 		ZEResourceFile File;
 		
-		if(File.Open(Filename))
+		if(File.Open(FileName))
 		{
 			vorbis_info*      VorbisInfo;
 			OggVorbis_File    OggFile;
@@ -104,24 +104,24 @@ ZESoundResource*  ZESoundResource::LoadOggFile(const char* Filename)
 					Position =  Position + BytesRead;
 					if(BytesRead < 0)
 					{
-						zeError("Ogg Sound Resource", "Error decoding ogg. Filename : \"%s\"", Filename);
+						zeError("Ogg Sound Resource", "Error decoding ogg. FileName : \"%s\"", FileName);
 						delete Temp;					
 						return NULL;
 					}
 				}
-				Temp->SetFilename(Filename);
+				Temp->SetFileName(FileName);
 		
 			}
 			else
 			{
-				zeError("Ogg Sound Resource", "Can not read ogg. Filename : \"%s\"", Filename);
+				zeError("Ogg Sound Resource", "Can not read ogg. FileName : \"%s\"", FileName);
 				return NULL;
 			}
 			return Temp;
 		}
 		else
 		{
-			zeError("Ogg Sound Resource", "Can not open ogg file. Filename : \"%s\"", Filename);
+			zeError("Ogg Sound Resource", "Can not open ogg file. FileName : \"%s\"", FileName);
 			return NULL;
 		}
 	}
@@ -129,15 +129,15 @@ ZESoundResource*  ZESoundResource::LoadOggFile(const char* Filename)
 		return NULL;
 }
 
-ZESoundResource* ZESoundResource::LoadWaveFile(const char* Filename)
+ZESoundResource* ZESoundResource::LoadWaveFile(const char* FileName)
 {
-	ZESoundResource* Temp =(ZESoundResource*) zeResources->GetResource(Filename);
+	ZESoundResource* Temp =(ZESoundResource*) zeResources->GetResource(FileName);
 	if (Temp == NULL)
 	{	
 		ZEResourceFile File;
 		
 		
-		if (File.Open(Filename))
+		if (File.Open(FileName))
 		{
 			struct
 			{	
@@ -169,39 +169,39 @@ ZESoundResource* ZESoundResource::LoadWaveFile(const char* Filename)
 			File.Read(&Riff, sizeof(Riff), 1);
 			if (Riff.Header != 'FFIR')
 			{
-				zeError("Sound Resource", "Wrong wave file. Filename : \"%s\"", Filename);
+				zeError("Sound Resource", "Wrong wave file. FileName : \"%s\"", FileName);
 				return NULL;
 			}
 
 			if (Riff.Format != 'EVAW')
 			{
-				zeError("Sound Resource", "Wave file format it not supported. Filename : \"%s\"", Filename);
+				zeError("Sound Resource", "Wave file format it not supported. FileName : \"%s\"", FileName);
 				return NULL;
 			}
 
 			File.Read(&Fmt, sizeof(Fmt), 1);
 			if (Fmt.Header != ' tmf')
 			{
-				zeError("Sound Resource", "Wrong wave file. Filename : \"%s\"", Filename);
+				zeError("Sound Resource", "Wrong wave file. FileName : \"%s\"", FileName);
 				return NULL;
 			}
 			
 			if (Fmt.AudioFormat != 1)
 			{
-				zeError("Sound Resource", "Wave file audio format it not supported. Filename : \"%s\"", Filename);
+				zeError("Sound Resource", "Wave file audio format it not supported. FileName : \"%s\"", FileName);
 				return NULL;
 			}
 
 			File.Read(&Data, sizeof(Data), 1);
 			if (Data.Header != 'atad')
 			{
-				zeError("Sound Resource", "Wrong wave file. Filename : \"%s\"", Filename);
+				zeError("Sound Resource", "Wrong wave file. FileName : \"%s\"", FileName);
 				return NULL;
 			}
 
 			Temp = new ZESoundResource();
 
-			Temp->SetFilename(Filename);
+			Temp->SetFileName(FileName);
 			Temp->BitsPerSample = Fmt.BitsPerSample;
 			Temp->BlockAlign = Fmt.BlockAlign;
 			Temp->ChannelCount = Fmt.NumChannels;
@@ -265,12 +265,12 @@ void ZESoundResource::FillBuffer(size_t BufferPosition, unsigned char* Buffer, s
 	}
 }
 
-void  ZESoundResource::CacheResource(const char *Filename)
+void  ZESoundResource::CacheResource(const char *FileName)
 {
-	ZESoundResource* NewResource = (ZESoundResource*)zeResources->GetResource(Filename);
+	ZESoundResource* NewResource = (ZESoundResource*)zeResources->GetResource(FileName);
 	if (NewResource == NULL)
 	{
-		NewResource = LoadResource(Filename);
+		NewResource = LoadResource(FileName);
 		if (NewResource != NULL)
 		{
 			NewResource->Cached = true;
@@ -281,12 +281,12 @@ void  ZESoundResource::CacheResource(const char *Filename)
 
 }
 
-ZESoundResource* ZESoundResource::LoadSharedResource(const char *Filename)
+ZESoundResource* ZESoundResource::LoadSharedResource(const char *FileName)
 {
-	ZESoundResource* NewResource =(ZESoundResource*)zeResources->GetResource(Filename);
+	ZESoundResource* NewResource =(ZESoundResource*)zeResources->GetResource(FileName);
 	if (NewResource == NULL)
 	{
-		NewResource = LoadResource(Filename);
+		NewResource = LoadResource(FileName);
 		if (NewResource != NULL)
 		{
 			NewResource->Cached = false;
@@ -302,17 +302,17 @@ ZESoundResource* ZESoundResource::LoadSharedResource(const char *Filename)
 
 }
 
-ZESoundResource* ZESoundResource::LoadResource(const char* Filename)
+ZESoundResource* ZESoundResource::LoadResource(const char* FileName)
 {
-	ZESoundResource* Temp =(ZESoundResource*) zeResources->GetResource(Filename);
+	ZESoundResource* Temp =(ZESoundResource*) zeResources->GetResource(FileName);
 	if (Temp == NULL)
 	{
 		ZEResourceFile File;
-		switch(GetFileFormat(Filename))
+		switch(GetFileFormat(FileName))
 		{
 			case SOUNDFILEFORMAT_WAVE:
 					
-					Temp = ZESoundResource::LoadWaveFile(Filename);
+					Temp = ZESoundResource::LoadWaveFile(FileName);
 					if(Temp != NULL)
 					{
 						
@@ -320,14 +320,14 @@ ZESoundResource* ZESoundResource::LoadResource(const char* Filename)
 					}
 					else
 					{
-						zeError("Sound Resource", "Could not load sound file. Filename : \"%s\"." , Filename);
+						zeError("Sound Resource", "Could not load sound file. FileName : \"%s\"." , FileName);
 						return NULL;
 					}
 					break;
 				
 			case SOUNDFILEFORMAT_OGG:
 				
-					Temp=ZESoundResource::LoadOggFile(Filename);
+					Temp=ZESoundResource::LoadOggFile(FileName);
 					if (Temp != NULL)
 					{
 						
@@ -335,7 +335,7 @@ ZESoundResource* ZESoundResource::LoadResource(const char* Filename)
 					}
 					else
 					{
-					zeError("Sound Resource", "Could not load sound file. Filename : \"%s\"." , Filename);
+					zeError("Sound Resource", "Could not load sound file. FileName : \"%s\"." , FileName);
 					return NULL;
 					}
 					break;
@@ -343,7 +343,7 @@ ZESoundResource* ZESoundResource::LoadResource(const char* Filename)
 			default:	
 			case SOUNDFILEFORMAT_NONE:
 				
-					zeError("Sound Resource", "Unknown sound file format. Filename : \"%s\"." , Filename);
+					zeError("Sound Resource", "Unknown sound file format. FileName : \"%s\"." , FileName);
 					return NULL;
 					break;
 		}
@@ -355,13 +355,13 @@ ZESoundResource* ZESoundResource::LoadResource(const char* Filename)
 	}
 }
 
-ZESoundFileFormat ZESoundResource::GetFileFormat(const char* Filename)
+ZESoundFileFormat ZESoundResource::GetFileFormat(const char* FileName)
 {
-	if(!_strnicmp(&Filename[strlen(Filename) - 3],"mp3",3))
+	if(!_strnicmp(&FileName[strlen(FileName) - 3],"mp3",3))
 		return SOUNDFILEFORMAT_MP3;
-	else if(!_strnicmp(&Filename[strlen(Filename) - 3],"wav",3))
+	else if(!_strnicmp(&FileName[strlen(FileName) - 3],"wav",3))
 		return  SOUNDFILEFORMAT_WAVE;
-	else if(!_strnicmp(&Filename[strlen(Filename) - 3],"ogg",3))
+	else if(!_strnicmp(&FileName[strlen(FileName) - 3],"ogg",3))
 		return  SOUNDFILEFORMAT_OGG;
 	else
 		return  SOUNDFILEFORMAT_NONE;

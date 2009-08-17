@@ -43,12 +43,12 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;FREEIMAGE_LIB;ZEDEBUG_ENABLED;ZEDEBUG_PERFHUD"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;FREEIMAGE_LIB;ZEDEBUG_ENABLED;ZEDEBUG_PERFHUD;ZEDEBUG_BREAKONERROR"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="3"
+				RuntimeLibrary="1"
 				TreatWChar_tAsBuiltInType="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
@@ -69,8 +69,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimaged.lib"
-				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib&quot;;&quot;$(ProjectDir)\lib\OggVorbis\Win32\Debug&quot;"
-				IgnoreDefaultLibraryNames="LIBCMT"
+				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Multi-threaded\x86\Debug&quot;"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				RandomizedBaseAddress="1"
@@ -136,7 +136,7 @@
 				MinimalRebuild="false"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"
-				RuntimeLibrary="2"
+				RuntimeLibrary="0"
 				StructMemberAlignment="3"
 				BufferSecurityCheck="false"
 				EnableEnhancedInstructionSet="2"
@@ -160,8 +160,8 @@
 				AdditionalOptions="/fixed:no"
 				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimage.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib&quot;;&quot;$(ProjectDir)\lib\OggVorbis\Win32\Release&quot;"
-				IgnoreDefaultLibraryNames="LIBCMT"
+				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Multi-threaded\x86\Release&quot;"
+				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
@@ -375,11 +375,23 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Graphics\FixedMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\FixedMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Graphics\GraphicsModule.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Source\Graphics\GraphicsModule.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\IndexedPolygon.h"
 				>
 			</File>
 			<File
@@ -399,7 +411,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\Polygon.h"
+				RelativePath=".\Source\Graphics\MaterialComponents.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\MaterialFileFormat.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\MaterialResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\MaterialResource.h"
 				>
 			</File>
 			<File
@@ -415,19 +439,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\RenderList.cpp"
+				RelativePath=".\Source\Graphics\RenderOrder.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\RenderList.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Shader.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Shader.h"
+				RelativePath=".\Source\Graphics\RenderOrder.h"
 				>
 			</File>
 			<File
@@ -447,19 +463,27 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\Vertex.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Vertex.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\Graphics\VertexBuffer.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Source\Graphics\VertexBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\VertexDeclaration.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\VertexDeclaration.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\VertexTypes.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\VertexTypes.h"
 				>
 			</File>
 			<File
@@ -474,11 +498,11 @@
 				Name="Direct3D9"
 				>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Common.cpp"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9CommonTools.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Common.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9CommonTools.h"
 					>
 				</File>
 				<File
@@ -487,6 +511,14 @@
 				</File>
 				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9ComponentBase.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial.h"
 					>
 				</File>
 				<File
@@ -527,6 +559,14 @@
 				</File>
 				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9VertexBuffer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9VertexDeclaration.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9VertexDeclaration.h"
 					>
 				</File>
 				<File
@@ -830,10 +870,6 @@
 				RelativePath=".\Source\GameInterface\SkyBrush.h"
 				>
 			</File>
-			<Filter
-				Name="TestGame"
-				>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Input"
@@ -1042,14 +1078,6 @@
 		<Filter
 			Name="Physics"
 			>
-			<File
-				RelativePath=".\Source\Physics\PhysicsModule.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Physics\PhysicsModule.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Particle"
@@ -1118,18 +1146,6 @@
 		<Filter
 			Name="GUI"
 			>
-			<File
-				RelativePath=".\Source\GUI\GUIRenderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GUI\GUIRenderer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GUI\LinkedList.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="ZEDS"
@@ -1143,19 +1159,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Collection.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\ZEDS\Definitions.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEDS\DoubleLinklist.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEDS\Linklist.h"
 				>
 			</File>
 			<File
@@ -1187,7 +1191,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\ZEDS.h"
+				RelativePath=".\Source\ZEDS\ZEDS_.h"
 				>
 			</File>
 		</Filter>
@@ -1279,6 +1283,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEMath\Rectangle3D.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMath\Rectangle3D.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEMath\Triangle.cpp"
 				>
 			</File>
@@ -1303,7 +1315,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\ZEMath.h"
+				RelativePath=".\Source\ZEMath\ZEMath_.h"
 				>
 			</File>
 		</Filter>
@@ -1329,10 +1341,6 @@
 		</File>
 		<File
 			RelativePath=".\Source\ZESDK.h"
-			>
-		</File>
-		<File
-			RelativePath=".\VTune\Zinek Engine.vpj"
 			>
 		</File>
 	</Files>

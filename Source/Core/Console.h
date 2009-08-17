@@ -37,7 +37,8 @@
 #ifndef	__ZE_CONSOLE_H__
 #define __ZE_CONSOLE_H__
 
-#include "ZEDS/ZEDS.h"
+#include "ZEDS/Array.h"
+#include "ZEDS/Variant.h"
 #include <string.h>
 
 #define zeConsole ZEConsole::GetInstance()

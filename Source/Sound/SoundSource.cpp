@@ -157,7 +157,7 @@ void ZESoundSource::LoadSoundResource(ZESoundResource* Resource)
 	}
 }
 
-void ZESoundSource::LoadSoundFile(const char* Filename)
+void ZESoundSource::LoadSoundFile(const char* FileName)
 {
 	if (SoundResource != NULL)
 	{
@@ -165,7 +165,7 @@ void ZESoundSource::LoadSoundFile(const char* Filename)
 		zeSound->ReleaseBuffer(this);
 	}
 	
-	SoundResource = ZESoundResource::LoadResource(Filename);
+	SoundResource = ZESoundResource::LoadResource(FileName);
 	if (SoundResource == NULL)
 	{
 		SoundState = SOUNDSTATE_NOBUFFER;

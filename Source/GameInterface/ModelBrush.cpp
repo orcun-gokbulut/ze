@@ -50,7 +50,7 @@ ZE_ENTITY_DESCRIPTION_START(ZEModelBrush, ZEEntity, ZE_ERA_BOTH, "", "This entit
 		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("Physical", ZE_MAT_PHYSICAL)
 	ZE_ENTITY_ATTRIBUTE_ENUMURATOR_END()
 	ZE_ENTITY_ATTRIBUTES_START()
-		ZE_ENTITY_ATTRIBUTE_FILENAME("ModelFile", ZE_EAF_NONE, "zeModel", "", "Filename of the model that will be used")
+		ZE_ENTITY_ATTRIBUTE_FILENAME("ModelFile", ZE_EAF_NONE, "zeModel", "", "FileName of the model that will be used")
 		ZE_ENTITY_ATTRIBUTE("EnablePhysics", ZEVARIANTTYPE_BOOLEAN, ZE_EAF_NONE, true, "Will model brush will have physical interaction")
 		ZE_ENTITY_ATTRIBUTE_ENUMURATOR("AnimationState", ZE_EAF_NONE, ZEModelAnimationState, ZE_MAS_STOPPED, "Animation state of the model brush.")
 		ZE_ENTITY_ATTRIBUTE_ENUMURATOR("AnimationType", ZE_EAF_NONE, ZEModelAnimationType, ZE_MAT_NOANIMATION, "Animation type of the model brush.")

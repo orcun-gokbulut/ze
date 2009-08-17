@@ -37,25 +37,64 @@
 #include <math.h>
 #include "GraphicsModule.h"
 #include "Core/Error.h"
+#include "ZEMath/Ray.h"
+
+const ZEMatrix4x4& ZECamera::GetViewTransform()
+{
+	if (!UpdateViewTransform)
+		return ViewTransform;
+	
+	ZEMatrix4x4 ViewPositionTransform, ViewRotationTransform;
+
+	const ZEPoint3& ViewPosition = GetWorldPosition();
+	ZEQuaternion ViewRotation;
+	ZEQuaternion::Conjugate(ViewRotation, GetWorldRotation());
+	ZEMatrix4x4::CreateTranslation(ViewPositionTransform, -ViewPosition.x, -ViewPosition.y, -ViewPosition.z);
+	ZEMatrix4x4::CreateRotation(ViewRotationTransform, ViewRotation);
+	ZEMatrix4x4::Multiply(ViewTransform, ViewPositionTransform, ViewRotationTransform);
+	
+	UpdateViewTransform = false;
+	return ViewTransform;
+}
+
+const ZEMatrix4x4& ZECamera::GetProjectionTransform()
+{
+	if (!UpdateProjectionTransform)
+		return ProjectionTransform;
+
+	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, FOV, AspectRatio, zeGraphics->GetNearZ(), zeGraphics->GetFarZ());
+}
+
+const ZEMatrix4x4& ZECamera::GetViewProjectionTransform()
+{
+	if (!UpdateViewProjectionTransform)
+		return ViewProjectionTransform;
+
+	ZEMatrix4x4::Multiply(ViewProjectionTransform, GetViewTransform(), GetProjectionTransform());
+	return ViewProjectionTransform;
+}
 
 void ZECamera::SetLocalPosition(const ZEPoint3& NewPosition)
 {
 	UpdateViewFrustum = true;
-	UpdateViewPoint = true;
+	UpdateViewTransform = true;
+	UpdateViewProjectionTransform = true;
 	ZEComponent::SetLocalPosition(NewPosition);
 }	
 
 void ZECamera::SetLocalRotation(const ZEQuaternion& NewRotation)
 {
 	UpdateViewFrustum = true;
-	UpdateViewPoint = true;
+	UpdateViewTransform = true;
+	UpdateViewProjectionTransform = true;
 	ZEComponent::SetLocalRotation(NewRotation);
 }
 
 void ZECamera::OwnerWorldTransformChanged()
 {
 	UpdateViewFrustum = true;
-	UpdateViewPoint = true;
+	UpdateViewTransform = true;
+	UpdateViewProjectionTransform = true;
 	ZEComponent::OwnerWorldTransformChanged();
 }
 
@@ -64,7 +103,8 @@ void ZECamera::SetNearZ(float NearZ)
 	this->NearZ = NearZ;
 
 	UpdateViewFrustum = true;
-	UpdateViewPoint = true;
+	UpdateProjectionTransform = true;
+	UpdateViewProjectionTransform = true;
 }
 
 float ZECamera::GetNearZ()
@@ -77,7 +117,8 @@ void ZECamera::SetFarZ(float FarZ)
 	this->FarZ = FarZ;
 
 	UpdateViewFrustum = true;
-	UpdateViewPoint = true;
+	UpdateProjectionTransform = true;
+	UpdateViewProjectionTransform = true;
 }
 
 float ZECamera::GetFarZ()
@@ -91,7 +132,8 @@ void ZECamera::SetFOV(float FOV)
 	this->FOV = FOV;
 
 	UpdateViewFrustum = true;
-	UpdateViewPoint = true;
+	UpdateProjectionTransform = true;
+	UpdateViewProjectionTransform = true;
 }
 
 float ZECamera::GetFOV()
@@ -104,14 +146,15 @@ void ZECamera::SetAspectRatio(float AspectRatio)
 	this->AspectRatio = AspectRatio;
 
 	UpdateViewFrustum = true;
-	UpdateViewPoint = true;
+	UpdateProjectionTransform = true;
+	UpdateViewProjectionTransform = true;
 }
 
 float ZECamera::GetAspectRatio()
 {
 	return AspectRatio;
 }
-
+/*
 const ZEViewPoint& ZECamera::GetViewPoint()
 {
 	if (!UpdateViewPoint)
@@ -132,7 +175,7 @@ const ZEViewPoint& ZECamera::GetViewPoint()
 
 	UpdateViewPoint = false;
 	return ViewPoint;
-}
+}*/
 
 const ZEViewVolume& ZECamera::GetViewVolume()
 {
@@ -147,19 +190,19 @@ const ZEViewVolume& ZECamera::GetViewVolume()
 void ZECamera::GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY)
 {
 	ZEVector3 V;
-	const ZEViewPoint& ViewPoint = GetViewPoint();
-	V.x =  (((2.0f * ScreenX ) / zeGraphics->GetScreenWidth()) - 1) / ViewPoint.ProjMatrix.M11;
-	V.y = -(((2.0f * ScreenY ) / zeGraphics->GetScreenHeight()) - 1) / ViewPoint.ProjMatrix.M22;
+	const ZEMatrix4x4& ProjMatrix = GetProjectionTransform();
+	V.x =  (((2.0f * ScreenX ) / zeGraphics->GetScreenWidth()) - 1) / ProjMatrix.M11;
+	V.y = -(((2.0f * ScreenY ) / zeGraphics->GetScreenHeight()) - 1) / ProjMatrix.M22;
 	V.z =  1.0f;
 
 	ZEMatrix4x4 InvViewMatrix;
-	ZEMatrix4x4::Inverse(InvViewMatrix, ViewPoint.ViewMatrix);
+	ZEMatrix4x4::Inverse(InvViewMatrix, GetViewTransform());
 
 	ZEMatrix4x4::Transform3x3(Ray.v, InvViewMatrix, V);
 
 	Ray.p.x = InvViewMatrix.M41;
 	Ray.p.y = InvViewMatrix.M42;
-	Ray.p.z = InvViewMatrix.M43;
+	Ray.p.z = InvViewMatrix.M43; 
 	ZEVector3::Normalize(Ray.v, Ray.v);
 }
 
@@ -167,5 +210,8 @@ ZECamera::ZECamera()
 {
 	UpdateViewPoint = true;
 	UpdateViewFrustum = true;
+	UpdateViewTransform = true;
+	UpdateViewProjectionTransform = true;
+	UpdateProjectionTransform = true;
 }
 

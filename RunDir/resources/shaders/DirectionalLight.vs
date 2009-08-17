@@ -24,43 +24,6 @@
 //////////////////////////////////////////////////////////////////////////////////////
 /*ZEHEADER_END*/
 
-#if defined(ZESHADER_COMPONENT0)
-#define ZESHADER_SKINTRANFORMATION
-#endif
-#if defined(ZESHADER_COMPONENT1) 
-#define ZESHADER_DIFFUSEMAP
-#endif
-#if defined(ZESHADER_COMPONENT2)
-#define ZESHADER_NORMALMAP
-#endif
-#if defined(ZESHADER_COMPONENT3)
-#define ZESHADER_SPECULARMAP
-#endif
-#if defined(ZESHADER_COMPONENT4)
-#define ZESHADER_EMMISIVEMAP
-#endif
-#if defined(ZESHADER_COMPONENT5)
-#define ZESHADER_OCAPASITYMAP
-#endif
-#if defined(ZESHADER_COMPONENT6)
-#define ZESHADER_DETAILDIFFUSEMAP
-#endif
-#if defined(ZESHADER_COMPONENT7)
-#define ZESHADER_DETAILNORMALMAP
-#endif
-#if defined(ZESHADER_COMPONENT8)
-#define ZESHADER_REFLECTION
-#endif
-#if defined(ZESHADER_COMPONENT9)
-#define ZESHADER_REFRACTION
-#endif
-#if defined(ZESHADER_COMPONENT10)
-#define ZESHADER_LIGHTMAP
-#endif
-#if defined(ZESHADER_COMPONENT11)
-#define ZESHADER_DISTORTIONMAP
-#endif
-
 // Transformation matrices 5 matrices
 float4x4  WorldViewProjMatrix			: register(c0);
 float4x4  WorldMatrix					: register(c4);
@@ -119,6 +82,10 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 	#ifdef ZESHADER_SKINTRANSFORM
 		Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		Normal = float3(0.0f, 0.0f, 0.0f);
+		#ifdef ZESHADER_NORMALMAP
+			Tangent = float3(0.0f, 0.0f, 0.0f);
+			Binormal = float3(0.0f, 0.0f, 0.0f);
+		#endif
 		for (int I = 0; I < 4; I++)
 			if (Input.BoneWeights[I] > 0.0f)
 			{

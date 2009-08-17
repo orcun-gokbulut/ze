@@ -43,57 +43,70 @@
 
 class ZETextureResource : public ZEResource
 {
-	private:
-		ZETexture*							Texture;
 	public:
-		const char*							GetResourceType() const;
-		
-		const ZETexture*					GetTexture();
-
-		static void							CacheResource(const char* Filename);
-		static ZETextureResource*			LoadSharedResource(const char* Filename);
-		static ZETextureResource*			LoadResource(const char* Filename);
-		static ZETextureResource*			LoadResource(ZEResourceFile* ResourceFile);
-
-											ZETextureResource();
-											~ZETextureResource();
+		virtual ZETextureType				GetTextureType() const = 0;
 };
 
-class ZEVolumeTextureResource : public ZEResource
+class ZETexture2DResource : public ZETextureResource
 {
 	private:
-		ZEVolumeTexture*					Texture;
+		ZETexture2D*						Texture;
+
+	protected:
+											ZETexture2DResource();
+		virtual 							~ZETexture2DResource();
+
 	public:
-		const char*							GetResourceType() const;
+		virtual const char*					GetResourceType() const;
+		virtual ZETextureType				GetTextureType() const;
 
-		const ZEVolumeTexture*				GetTexture();
+		const ZETexture2D*					GetTexture() const;
 
-		static void							CacheResource(const char* Filename);
-		static ZETextureResource*			LoadSharedResource(const char* Filename);
-		static ZETextureResource*			LoadResource(const char* Filename);
-
-											ZEVolumeTextureResource();
-											~ZEVolumeTextureResource();
+		static void							CacheResource(const char* FileName);
+		static ZETexture2DResource*			LoadSharedResource(const char* FileName);
+		static ZETexture2DResource*			LoadResource(const char* FileName);
+		static ZETexture2DResource*			LoadResource(ZEResourceFile* ResourceFile);
 };
 
-class ZECubeTextureResource : public ZEResource
+class ZETexture3DResource : public ZETextureResource
 {
 	private:
-		ZECubeTexture*						Texture;
-		
+		ZETexture3D*						Texture;
+
+	protected:
+											ZETexture3DResource();
+		virtual 							~ZETexture3DResource();
+
 	public:
 		const char*							GetResourceType() const;
+		virtual ZETextureType				GetTextureType() const;
 
-		const ZECubeTexture*				GetTexture();
+		const ZETexture3D*					GetTexture() const;
 
-		static void							CacheResource(const char* Filename);
-		static ZECubeTextureResource*		LoadSharedResource(const char* Filename);
-		static ZECubeTextureResource*		LoadResource(const char* Filename);
-		static ZECubeTextureResource*		LoadResource(ZEResourceFile* ResourceFile);
+		static void							CacheResource(const char* FileName);
+		static ZETexture3DResource*			LoadSharedResource(const char* FileName);
+		static ZETexture3DResource*			LoadResource(const char* FileName);
+};
 
-									
-											ZECubeTextureResource();
-											~ZECubeTextureResource();
+class ZETextureCubeResource : public ZETextureResource
+{
+	private:
+		ZETextureCube*						Texture;
+
+	protected:
+		 									ZETextureCubeResource();
+		virtual								~ZETextureCubeResource();
+
+	public:
+		virtual const char*					GetResourceType() const;
+		virtual ZETextureType				GetTextureType() const;
+
+		const ZETextureCube*				GetTexture() const;
+
+		static void							CacheResource(const char* FileName);
+		static ZETextureCubeResource*		LoadSharedResource(const char* FileName);
+		static ZETextureCubeResource*		LoadResource(const char* FileName);
+		static ZETextureCubeResource*		LoadResource(ZEResourceFile* ResourceFile);
 };
 
 #endif

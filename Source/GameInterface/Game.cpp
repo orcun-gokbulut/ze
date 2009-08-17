@@ -142,8 +142,7 @@ bool ZEGame::Deinitialize()
 {
 	if (Scene != NULL)
 	{
-		Scene->Deinitialize();
-		delete Scene;
+		Scene->Destroy();
 		Scene = NULL;
 	}
 
@@ -153,6 +152,12 @@ bool ZEGame::Deinitialize()
 void ZEGame::Reset()
 {
 
+}
+
+void ZEGame::Destroy()
+{
+	Deinitialize();
+	delete this;
 }
 
 void ZEGame::Render(float ElapsedTime)
@@ -176,4 +181,14 @@ ZEGame::ZEGame()
 	RegisterEntityDescription(ZELightBrush::EntityDescription());
 	RegisterEntityDescription(ZEModelBrush::EntityDescription());
 	RegisterEntityDescription(ZESkyBrush::EntityDescription());
+}
+
+ZEGame::~ZEGame()
+{
+	Deinitialize();
+}
+
+ZEGame* ZEGame::GetInstance()
+{
+	return zeCore->GetGame();
 }

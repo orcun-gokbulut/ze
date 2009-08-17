@@ -34,16 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#include "module.h"
-#include "ZEMath/ZEMath.h"
-//#include "game_interface/physics.h"
-
+#include "Module.h"
 
 //class ZEPhysicalEnvironment;
 class ZEPhysicsModule : public ZEModule
 {
 	public:
-		virtual const char*		GetModuleName() = 0;
+		virtual const char*			GetModuleName() = 0;
 		virtual ZEModuleType		GetModuleType() = 0;
 		virtual ZEModuleAttribute	GetModuleAttribute() = 0;
 

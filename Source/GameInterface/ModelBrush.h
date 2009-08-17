@@ -39,7 +39,7 @@
 
 #include "GameInterface/Entity.h"
 #include "Graphics/Light.h"
-#include "Graphics/RenderList.h"
+#include "Graphics/RenderOrder.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/Material.h"
 #include "Model/Model.h"

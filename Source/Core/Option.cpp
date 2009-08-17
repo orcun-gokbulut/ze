@@ -482,9 +482,9 @@ size_t ZEOptionManager::GetNumberOfSections()
 	return Sections.GetCount();
 }
 
-void ZEOptionManager::Save(const char *Filename)
+void ZEOptionManager::Save(const char *FileName)
 {
-	FILE* File = fopen(Filename, "w");
+	FILE* File = fopen(FileName, "w");
 	ZEOptionSection*	CurrentSet;
 	ZEOption*		Current;
 	size_t I, N;
@@ -623,9 +623,9 @@ ZEOption* ZEOptionManager::GetOption(const char* SectionName, const char* Name)
 		return NULL;
 }
 
-void ZEOptionManager::Load(const char *Filename)
+void ZEOptionManager::Load(const char *FileName)
 {
-	FILE* File = fopen(Filename, "r");
+	FILE* File = fopen(FileName, "r");
 	
 	char		LineBuffer[OPTIONS_FILE_MAX_LINE_LENGTH], 
 				NameBuffer[OPTIONS_FILE_MAX_NAME_LENGTH], 

@@ -47,7 +47,7 @@ class ZEResource
 		char					FileName[ZE_MAX_FILE_NAME_SIZE];
 
 	protected:
-		void					SetFilename(const char* Value);
+		void					SetFileName(const char* Value);
 		bool					Cached;
 		bool					Shared;
 		bool					Internal;
@@ -55,6 +55,7 @@ class ZEResource
 
 	public:
 		virtual const char*		GetResourceType() const = 0;
+
 		const char*				GetFileName() const;
 
 		size_t					GetReferanceCount() const;

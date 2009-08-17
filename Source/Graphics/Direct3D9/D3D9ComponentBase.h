@@ -36,11 +36,11 @@
 #pragma once
 #ifndef	__ZE_D3DCOMPONENTBASE_H_
 #define __ZE_D3DCOMPONENTBASE_H_
-#include "ZEDS/ZEDS.h"
-#include "Graphics/Texture.h"
+
 #ifdef ZEDEBUG_ENABLED
 #define D3D_DEBUG_INFO
 #endif
+
 #include <D3D9.h>
 #include <D3DX9.h>
 
@@ -50,13 +50,6 @@ class ZED3D9ComponentBase
 	protected:
 		static ZEDirect3D9Module*		Module;
 		static LPDIRECT3DDEVICE9		Device;
-
-		static D3DFORMAT				ConvertPixelFormat(ZETexturePixelFormat Format);
-		static bool						CompileVertexShader(const char* Source, LPDIRECT3DVERTEXSHADER9* VertexShader, ZEArray<D3DXMACRO>* Macros = NULL);
-		static bool						CompilePixelShader(const char* Source, LPDIRECT3DPIXELSHADER9* PixelShader, ZEArray<D3DXMACRO>* Macros = NULL);
-		static bool						CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height);
-		static bool						CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height, ZETexturePixelFormat Format);
-		static bool						CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height, ZETexturePixelFormat Format);
 
 	public:
 		static bool						BaseInitialize(ZEDirect3D9Module* D3DModule);

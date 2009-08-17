@@ -37,7 +37,7 @@
 #ifndef	__ZE_RESOURCE_MANAGER_H__
 #define __ZE_RESOURCE_MANAGER_H__
 
-#include "ZEDS/ZEDS.h"
+#include "ZEDS/Array.h"
 #include "Resource.h"
 
 #define zeResources ZEResourceManager::GetInstance()

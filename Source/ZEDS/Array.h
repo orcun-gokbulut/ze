@@ -32,7 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-
+// Program Files\Microsoft Visual Studio 8\Common7\Packages\Debugger\autoexp.dat
 /*
 ;------------------------------------------------------------------------------
 ;  ZEArray<*> specialization
@@ -63,7 +63,7 @@ ZEArray<*>{
 #include <stdlib.h>
 #include "Definitions.h"
 #include "..\Types.h"
-#include "ArrayAllocator.h"
+#include "Allocator.h"
 #include <crtdbg.h>
 
 template<typename Type, typename Allocator_= ZEAllocatorBase<Type> >
@@ -438,4 +438,5 @@ class ZESmartArray : public ZEArray<Type, ZESmartAllocator<Type, Exponent> >
 template <typename Type, int ChunkSize>
 class ZEChunkArray : public ZEArray<Type, ZEChunkAllocator<Type, ChunkSize> >
 {};
+
 #endif

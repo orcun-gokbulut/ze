@@ -37,10 +37,10 @@
 #ifndef __ZE_OCTREE_H__
 #define __ZE_OCTREE_H__
 
-#include "ZEMath/ZEMath.h"
-#include "ZEDS/ZEDS.h"
-#include "Graphics/Material.h"
-#include "Graphics/RenderList.h"
+#include "ZEMath/AABoundingBox.h"
+#include "ZEDS/Array.h"
+#include "Graphics/FixedMaterial.h"
+#include "Graphics/RenderOrder.h"
 #include "Graphics/Canvas.h"
 
 struct ZEMapPolygon;
@@ -52,8 +52,8 @@ class ZELight;
 class ZEOctree
 {
 	public:
-		static ZEDefaultMaterial		OctreeBBoxMaterial;
-		static ZERenderList				OctreeBBoxRenderList;
+		static ZEFixedMaterial*			OctreeBBoxMaterial;
+		static ZERenderOrder			OctreeBBoxRenderOrder;
 		static ZECanvas					OctreeBBoxCanvas;
 
 		bool							IsLeaf;
@@ -64,7 +64,7 @@ class ZEOctree
 
 		ZEAABoundingBox					BoundingBox;
 		ZEVertexBuffer*					VertexBuffer;
-		ZEArray<ZERenderList>			RenderLists;
+		ZEArray<ZERenderOrder>			RenderOrders;
 
 		bool							Initialize();
 		bool							Destroy();

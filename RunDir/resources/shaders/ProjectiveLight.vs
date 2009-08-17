@@ -24,43 +24,6 @@
 //////////////////////////////////////////////////////////////////////////////////////
 /*ZEHEADER_END*/
 
-#ifdef ZESHADER_COMPONENT0
-#define ZESHADER_SKINTRANFORMATION
-#endif
-#ifdef ZESHADER_COMPONENT1
-#define ZESHADER_DIFFUSEMAP
-#endif
-#ifdef ZESHADER_COMPONENT2
-#define ZESHADER_NORMALMAP
-#endif
-#ifdef ZESHADER_COMPONENT3
-#define ZESHADER_SPECULARMAP
-#endif
-#ifdef ZESHADER_COMPONENT4
-#define ZESHADER_EMMISIVEMAP
-#endif
-#ifdef ZESHADER_COMPONENT5
-#define ZESHADER_OCAPASITYMAP
-#endif
-#ifdef ZESHADER_COMPONENT6
-#define ZESHADER_DETAILDIFFUSEMAP
-#endif
-#ifdef ZESHADER_COMPONENT7
-#define ZESHADER_DETAILNORMALMAP
-#endif
-#ifdef ZESHADER_COMPONENT8
-#define ZESHADER_REFLECTION
-#endif
-#ifdef ZESHADER_COMPONENT9
-#define ZESHADER_REFRACTION
-#endif
-#ifdef ZESHADER_COMPONENT10
-#define ZESHADER_LIGHTMAP
-#endif
-#ifdef ZESHADER_COMPONENT11
-#define ZESHADER_DISTORTIONMAP
-#endif
-
 // Transformation matrices 5 matrices
 float4x4  WorldViewProjMatrix			: register(c0);
 float4x4  WorldMatrix					: register(c4);
@@ -72,7 +35,8 @@ float4    ViewPosition					: register(c16);
 
 //First light 4 vector 1 matrix
 float4    LightPosition					: register(c24);
-float3    LightAttenuationFactors		: register(c25);
+float3	  LightDirection				: register(c25);
+float3    LightAttenuationFactors		: register(c26);
 float4x4  LightProjectionMatrix			: register(c28);
 
 // Bone matrices rest of the space
@@ -136,6 +100,11 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	#ifdef ZESHADER_SKINTRANSFORM
 		Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		Normal = float3(0.0f, 0.0f, 0.0f);
+		#ifdef ZESHADER_NORMALMAP
+			Tangent = float3(0.0f, 0.0f, 0.0f);
+			Binormal = float3(0.0f, 0.0f, 0.0f);
+		#endif
+
 		for (int I = 0; I < 4; I++)
 			if (Input.BoneWeights[I] > 0.0f)
 			{
@@ -157,6 +126,8 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.Position_ = Output.Position = mul(Position, WorldViewProjMatrix);
 	float4 WorldPosition = mul(Position, WorldMatrix);
+	float Test = dot(normalize(WorldPosition), normalize(LightDirection));
+	Output.Position_.x = (Test > 1.0f || Test < 0.0f ? 0.0f: 1.0f);
 	
 	float4 ViewDisplacement = ViewPosition - WorldPosition;
 	

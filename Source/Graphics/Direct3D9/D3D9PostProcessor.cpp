@@ -37,7 +37,7 @@
 #include "Direct3D9Module.h"
 #include "Core/Error.h"
 #include "D3D9Texture.h"
-#include "D3D9Common.h"
+#include "D3D9CommonTools.h"
 
 LPDIRECT3DVERTEXSHADER9 ZED3D9PostProcessor::GeneralVS;
 LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::ColorTransformPS = NULL;
@@ -77,7 +77,7 @@ bool ZED3D9PostProcessor::BaseInitialize()
 	Vertices[3].Create(1.0f, 1.0f);
 	ScreenQuadVB->Unlock();
 
-	CompileVertexShader(
+	ZED3D9CommonTools::CompileVertexShader(&GeneralVS,
 		"float2 InverseViewportDimentsions : register(c0);"
 		"struct VS_OUTPUT"
 		"{"
@@ -91,33 +91,29 @@ bool ZED3D9PostProcessor::BaseInitialize()
 			"Output.TexCoord.x = 0.5f * (1.0f + Output.Position.x + InverseViewportDimentsions.x);"
 			"Output.TexCoord.y = 0.5f * (1.0f - Output.Position.y + InverseViewportDimentsions.y);"
 			"return Output;"
-		"}",
-		&GeneralVS);
+		"}", "Post Process General", "vs_2_0");
 
-	CompilePixelShader(
+	ZED3D9CommonTools::CompilePixelShader(&GrayscalePS,
 		"sampler Screen : register(s0);"
 		"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
 		"{" 
 		"float4 Color = tex2D(Screen, TexCoord);"
 			"return float4(dot(float3(0.299f, 0.587f, 0.114f), Color.xyz).xxx, Color.w);"
-		"}",
-		&GrayscalePS);
+		"}", "Post Process Grayscale", "ps_2_0");
 
-	CompilePixelShader(
+	ZED3D9CommonTools::CompilePixelShader(&DirectPS,
 		"sampler Screen : register(s0);"
 		"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
 		"{"  
 			"return tex2D(Screen, TexCoord);"
-		"}",
-		&DirectPS);
+		"}", "Post Process Direct", "ps_2_0");
 	
-	CompilePixelShader(
+	ZED3D9CommonTools::CompilePixelShader(&InversePS,
 		"sampler Screen : register(s0);"
 		"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
 		"{"  
 			"return 1.0f - tex2D(Screen, TexCoord);"
-		"}",
-		&InversePS);
+		"}", "Post Process Inverse", "ps_2_0");
 
 	#pragma message("Task : Modify post processor downsample.")
 	/*CompilePixelShader(
@@ -129,7 +125,7 @@ bool ZED3D9PostProcessor::BaseInitialize()
 		"}",
 		&ColorTransformPS);*/
 
-	CompilePixelShader(
+	ZED3D9CommonTools::CompilePixelShader(&VBlurPS,
 		"sampler Screen : register(s0);"
 		"float2 InverseViewportDimensions : register(c0);"
 		"static const int KernelSize = 13;"
@@ -155,9 +151,9 @@ bool ZED3D9PostProcessor::BaseInitialize()
 			"for (int I = 0; I < KernelSize; I++)"
 				"Color += Kernel[I].y * tex2D(Screen, float2(TexCoord.x, TexCoord.y + Kernel[I].x * InverseViewportDimensions.y));"
 			"return Color;"
-		"}", &VBlurPS);
+		"}", "Post Process Vertical Blur", "ps_2_0");
 
-	CompilePixelShader(
+	ZED3D9CommonTools::CompilePixelShader(&HBlurPS,
 		"sampler Screen : register(s0);"
 		"float2 InverseViewportDimensions : register(c0);"
 		"static const int KernelSize = 13;"
@@ -183,9 +179,9 @@ bool ZED3D9PostProcessor::BaseInitialize()
 			"for (int I = 0; I < KernelSize; I++)"
 				"Color += Kernel[I].y * tex2D(Screen, float2(TexCoord.x + Kernel[I].x * InverseViewportDimensions.x, TexCoord.y));"
 			"return Color;"
-		"}", &HBlurPS);
+		"}", "Post Process Horizantal Blur", "ps_2_0");
 
-	CompilePixelShader(
+	ZED3D9CommonTools::CompilePixelShader(&HEdgePS,
 		"sampler Screen : register(s0);"
 		"float2 InverseViewportDimensions : register(c0);"
 		"static const int KernelSize = 6;"
@@ -204,9 +200,9 @@ bool ZED3D9PostProcessor::BaseInitialize()
 			"for (int I = 0; I < KernelSize; I++)"
 				"Color += Kernel[I].z * tex2D(Screen, float2(Texcoord.x + Kernel[I].x * InverseViewportDimensions.x, Texcoord.y + Kernel[I].y * InverseViewportDimensions.y));"
 			"return Color;"
-		"}", &HEdgePS);
+		"}", "Post Process Horizantal Edge Detection", "ps_2_0");
 
-	CompilePixelShader(
+	ZED3D9CommonTools::CompilePixelShader(&VEdgePS,
 		"sampler Screen : register(s0);"
 		"float2 InverseViewportDimensions : register(c0);"
 		"static const int KernelSize = 6;"
@@ -225,10 +221,10 @@ bool ZED3D9PostProcessor::BaseInitialize()
 			"for (int I = 0; I < KernelSize; I++)"
 				"Color += Kernel[I].z * tex2D(Screen, float2(Texcoord.x + Kernel[I].y * InverseViewportDimensions.x, Texcoord.y + Kernel[I].x * InverseViewportDimensions.y));"
 			"return Color;"
-		"}", &VEdgePS);
+		"}", "Post Process Vertical Edge Detection", "ps_2_0");
 
 	
-	CompilePixelShader(
+	ZED3D9CommonTools::CompilePixelShader(&SharpenPS,
 		"sampler Screen : register(s0);"
 		"float2 InverseViewportDimensions : register(c0);"
 		"static const int KernelSize = 5;"
@@ -246,11 +242,11 @@ bool ZED3D9PostProcessor::BaseInitialize()
 			"for (int I = 0; I < KernelSize; I++)"
 				"Color += Kernel[I].z * tex2D(Screen, float2(Texcoord.x + Kernel[I].x * InverseViewportDimensions.x, Texcoord.y + Kernel[I].y * InverseViewportDimensions.y));"
 			"return Color;"
-		"}", &SharpenPS);
+		"}", "Post Processor Sharpen", "ps_2_0");
 
 #pragma message("Task : Modify post processor downsample.")
 
-/*	CompilePixelShader(
+/*	CompilePixelShader(&DownSample4xPS,
 		"sampler Screen : register(s0);"
 		"float2 InverseViewportDimensions : register(c0);"
 		"static const int KernelSize = 16;"
@@ -279,25 +275,25 @@ bool ZED3D9PostProcessor::BaseInitialize()
 			"for (int i = 0; i < KernelSize; i++)"
 				"Color += tex2D( Screen, Tex + TexelCoordsDownFilter[i].xy );"
 			"return Color / KernelSize;"
-		"}", &DownSample4xPS);*/
+		"}", "Post Processor 4x Down Sampler", "ps_2_0" );*/
 
-	CompilePixelShader(
+	ZED3D9CommonTools::CompilePixelShader(&UpSample4xPS,
 		"sampler Screen : register(s0);"
 		"float2 InverseViewportDimensions : register(c0);"
 		"float4 ps_main(float2 Texcoord : TEXCOORD0) : COLOR0"
 		"{"
 			"return tex2D(Screen, Texcoord);"
-		"}", &UpSample4xPS);
+		"}", "Post Processor 4x Up Sampler", "ps_2_0");
 
 	return true;
 }
 
-void ZED3D9PostProcessor::SetInput(ZETexture* Texture)
+void ZED3D9PostProcessor::SetInput(ZETexture2D* Texture)
 {
 	Source = ((ZED3D9Texture*)Texture)->Texture;
 }
 
-void ZED3D9PostProcessor::SetOutput(ZETexture* Texture)
+void ZED3D9PostProcessor::SetOutput(ZETexture2D* Texture)
 {
 	Destination = ((ZED3D9Texture*)Texture)->Texture;
 }
@@ -405,9 +401,9 @@ bool ZED3D9PostProcessor::ManageSourceDestination(ZEPostProcessorSource Source_,
 			break;
 
 		case ZE_PPD_FRAMEBUFFER:
-			Device->SetRenderTarget(0, ZEDirect3D9Module::GetD3D9Module()->FrameColorBuffer);
-			Device->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / ZEDirect3D9Module::GetD3D9Module()->GetScreenWidth(), 1.0f / ZEDirect3D9Module::GetD3D9Module()->GetScreenHeight(), 0.0f, 0.0f), 1);
-			Device->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / ZEDirect3D9Module::GetD3D9Module()->GetScreenWidth(), 1.0f / ZEDirect3D9Module::GetD3D9Module()->GetScreenHeight(), 0.0f, 0.0f), 1);
+			Device->SetRenderTarget(0, Module->FrameColorBuffer); //  ZEDirect3D9Module::GetD3D9Module()->FrameColorBuffer
+			Device->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / Module->GetScreenWidth(), 1.0f / Module->GetScreenHeight(), 0.0f, 0.0f), 1);
+			Device->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / Module->GetScreenWidth(), 1.0f / Module->GetScreenHeight(), 0.0f, 0.0f), 1);
 			break;
 
 		default:

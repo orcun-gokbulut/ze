@@ -73,8 +73,8 @@ public:
 		static bool								BaseInitialize();
 		static void								BaseDeinitialize();
 
-		virtual void							SetInput(ZETexture* Texture);
-		virtual void							SetOutput(ZETexture* Texture);
+		virtual void							SetInput(ZETexture2D* Texture);
+		virtual void							SetOutput(ZETexture2D* Texture);
 
 		virtual void							DeviceLost();
 		virtual bool							DeviceRestored();

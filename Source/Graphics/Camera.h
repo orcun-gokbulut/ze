@@ -39,7 +39,7 @@
 
 #include "GameInterface/Entity.h"
 #include "Graphics/Renderer.h"
-#include "Graphics/RenderList.h"
+#include "Graphics/RenderOrder.h"
 #include "Graphics/Canvas.h"
 #include "Graphics/ViewVolume.h"
 #include "ZEMath/Plane.h"
@@ -59,13 +59,20 @@ class ZECamera : public ZEComponent
 	private:
 		bool							UpdateViewFrustum;
 		bool							UpdateViewPoint;
+		bool							UpdateViewTransform;
+		bool							UpdateProjectionTransform;
+		bool							UpdateViewProjectionTransform;
+
 
 		float							NearZ, FarZ;
 		float							FOV, AspectRatio;
 		float							Width, Height;
 
+		ZEMatrix4x4						ViewTransform;
+		ZEMatrix4x4						ProjectionTransform;
+		ZEMatrix4x4						ViewProjectionTransform;
+
 		ZEViewFrustum					ViewFrustum;
-		ZEViewPoint						ViewPoint;
 
 	public:
 		void							SetNearZ(float NearZ);
@@ -80,12 +87,16 @@ class ZECamera : public ZEComponent
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio();
 
+		virtual const ZEMatrix4x4&		GetViewTransform();
+		virtual const ZEMatrix4x4&		GetProjectionTransform();
+		virtual const ZEMatrix4x4&		GetViewProjectionTransform();
+
 		virtual void					SetLocalPosition(const ZEPoint3& NewPosition);	
 		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);
 
 		virtual void					OwnerWorldTransformChanged();	
 
-		const ZEViewPoint&				GetViewPoint();
+/*		const ZEViewPoint&				GetViewPoint();*/
 		const ZEViewVolume&				GetViewVolume();
 
 		void							GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY);

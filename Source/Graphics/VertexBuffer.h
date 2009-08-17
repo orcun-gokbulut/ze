@@ -37,15 +37,15 @@
 #ifndef	__ZE_VERTEXBUFFER_H__
 #define __ZE_VERTEXBUFFER_H__
 
-#include "ZEDS/ZEDS.h"
-#include "Vertex.h"
-#include "Polygon.h"
+#include "ZEDS/Array.h"
 
 class ZEVertexBuffer
 {
 	public:
-		virtual size_t						GetBufferSize() = 0;
 		virtual bool						IsStatic() = 0;
+		virtual size_t						GetBufferSize() = 0;
+
+		virtual								~ZEVertexBuffer();
 };
 
 class ZEStaticVertexBuffer : public ZEVertexBuffer
@@ -59,6 +59,8 @@ class ZEStaticVertexBuffer : public ZEVertexBuffer
 		virtual void						Release() = 0;
 
 		virtual void						Destroy() = 0;
+
+		static ZEStaticVertexBuffer*		CreateInstance();
 };
 
 class ZEDynamicVertexBuffer : public ZEVertexBuffer

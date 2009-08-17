@@ -37,7 +37,9 @@
 #ifndef	__ZE_COMMAND_H__
 #define __ZE_COMMAND_H__
 
-#include "ZEDS/ZEDS.h"
+#include "ZEDS/Named.h"
+#include "ZEDS/Array.h"
+#include "ZEDS/Variant.h"
 #include "fastdelegate.h"
 
 #define zeCommands ZECommandManager::GetInstance()

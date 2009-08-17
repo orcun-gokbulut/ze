@@ -34,7 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/Matrix.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "ZEMath/AABoundingBox.h"
+#include "ZEMath/OBoundingBox.h"
+#include "ZEMath/BoundingSphere.h"
 #include "Graphics/Renderer.h"
 
 enum ZEComponentClass

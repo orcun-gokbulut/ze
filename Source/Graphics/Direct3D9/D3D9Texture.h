@@ -41,8 +41,13 @@
 #include "D3D9ComponentBase.h"
 #include <d3d9.h>
 
-class ZED3D9Texture : public ZETexture, public ZED3D9ComponentBase
+class ZED3D9Texture : public ZETexture2D, public ZED3D9ComponentBase
 {
+	friend class ZEDirect3D9Module;
+	protected:
+										ZED3D9Texture();
+		virtual							~ZED3D9Texture();
+
 	public:
 		LPDIRECT3DTEXTURE9				Texture;
 
@@ -58,13 +63,15 @@ class ZED3D9Texture : public ZETexture, public ZED3D9ComponentBase
 		virtual void					Release();
 
 		virtual void					Destroy();
-
-										ZED3D9Texture();
-										~ZED3D9Texture();
 };
 
-class ZED3D9VolumeTexture : public ZEVolumeTexture, public ZED3D9ComponentBase
+class ZED3D9VolumeTexture : public ZETexture3D, public ZED3D9ComponentBase
 {
+	friend class ZEDirect3D9Module;
+	private:
+										ZED3D9VolumeTexture();
+		virtual							~ZED3D9VolumeTexture();
+
 	public:
 		LPDIRECT3DVOLUMETEXTURE9		VolumeTexture;
 
@@ -79,13 +86,15 @@ class ZED3D9VolumeTexture : public ZEVolumeTexture, public ZED3D9ComponentBase
 		virtual void					Release();
 
 		virtual void					Destroy();
-
-										ZED3D9VolumeTexture();
-										~ZED3D9VolumeTexture();
 };
 
-class ZED3D9CubeTexture : public ZECubeTexture, public ZED3D9ComponentBase
+class ZED3D9CubeTexture : public ZETextureCube, public ZED3D9ComponentBase
 {
+	friend class ZEDirect3D9Module;
+	protected:
+										ZED3D9CubeTexture();
+		virtual							~ZED3D9CubeTexture();
+
 	public:
 		LPDIRECT3DCUBETEXTURE9			CubeTexture;
 
@@ -95,13 +104,10 @@ class ZED3D9CubeTexture : public ZECubeTexture, public ZED3D9ComponentBase
 		virtual bool					DeviceRestored();
 
 		virtual bool					Create(int EdgeLenght, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
-		virtual void					Lock(ZECubeTextureFace Face, void** Buffer, int* Pitch);
-		virtual void					Unlock(ZECubeTextureFace Face);
+		virtual void					Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch);
+		virtual void					Unlock(ZETextureCubeFace Face);
 		virtual void					Release();
 
 		virtual void					Destroy();
-
-										ZED3D9CubeTexture();
-										~ZED3D9CubeTexture();
 };
 #endif

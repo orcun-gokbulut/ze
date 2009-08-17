@@ -41,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\Source&quot;;&quot;$(ProjectDir)..\Include&quot;"
-				PreprocessorDefinitions="FREEIMAGE_LIB;ZEDEBUG_ENABLED;ZEDEBUG_BREAKONERROR;ZEDEBUG_BREAKONCRITICALERROR;ZEDEBUG_PERFHUD"
+				PreprocessorDefinitions="FREEIMAGE_LIB;ZEDEBUG_ENABLED;ZEDEBUG_PERFHUD;ZEDEBUG_BREAKONERROR"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -61,9 +61,9 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="true"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib ogg_static.lib ogg.lib vorbis.lib vorbisenc.lib vorbisfile.lib freeimage.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimaged.lib"
 				OutputFile="$(ProjectDir)\Dist\Lib\$(ProjectName)d.lib"
-				AdditionalLibraryDirectories="&quot;$(ProjectDir)..\Lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(ProjectDir)..\Lib\Multi-threaded DLL\x86\Debug&quot;"
 				IgnoreAllDefaultLibraries="false"
 				IgnoreDefaultLibraryNames=""
 			/>
@@ -128,9 +128,9 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="true"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib ogg_static.lib ogg.lib vorbis.lib vorbisenc.lib vorbisfile.lib freeimage.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimage.lib"
 				OutputFile="$(ProjectDir)\Dist\Lib\$(ProjectName).lib"
-				AdditionalLibraryDirectories="&quot;$(ProjectDir)..\Lib&quot;"
+				AdditionalLibraryDirectories="&quot;$(ProjectDir)..\Lib\Multi-threaded DLL\x86\Release&quot;"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -194,22 +194,6 @@
 			</File>
 			<File
 				RelativePath="..\Source\Core\Core.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Core\DataTree.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Core\DataTree.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Core\DebugAssert.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Core\DebugAssert.h"
 				>
 			</File>
 			<File
@@ -353,11 +337,27 @@
 			Name="ZEMath"
 			>
 			<File
-				RelativePath="..\Source\ZEMath\BoundingVolume.cpp"
+				RelativePath="..\Source\ZEMath\3DRectangle.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\ZEMath\BoundingVolume.h"
+				RelativePath="..\Source\ZEMath\3DRectangle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\AABoundingBox.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\AABoundingBox.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\BoundingSphere.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\BoundingSphere.h"
 				>
 			</File>
 			<File
@@ -373,11 +373,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\ZEMath\LineSegment.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\LineSegment.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\ZEMath\Matrix.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Source\ZEMath\Matrix.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\OBoundingBox.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\OBoundingBox.h"
 				>
 			</File>
 			<File
@@ -397,11 +413,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\ZEMath\Ray.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\Ray.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\ZEMath\Rectangle.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Source\ZEMath\Rectangle.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\Triangle.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\Triangle.h"
 				>
 			</File>
 			<File
@@ -428,14 +460,6 @@
 		<Filter
 			Name="GameInterface"
 			>
-			<File
-				RelativePath="..\Source\GameInterface\Actor.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\GameInterface\Actor.h"
-				>
-			</File>
 			<File
 				RelativePath="..\Source\GameInterface\CanvasBrush.cpp"
 				>
@@ -478,14 +502,6 @@
 			</File>
 			<File
 				RelativePath="..\Source\GameInterface\GameProvider.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\GameInterface\Item.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\GameInterface\Item.h"
 				>
 			</File>
 			<File
@@ -552,18 +568,6 @@
 				RelativePath="..\Source\GameInterface\SkyBrush.h"
 				>
 			</File>
-			<Filter
-				Name="TestGame"
-				>
-				<File
-					RelativePath="..\Source\GameInterface\TestGame\TestGame.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Source\GameInterface\TestGame\TestGame.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Graphics"
@@ -585,11 +589,23 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Graphics\FixedMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\FixedMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Graphics\GraphicsModule.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Source\Graphics\GraphicsModule.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\IndexedPolygon.h"
 				>
 			</File>
 			<File
@@ -609,7 +625,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Graphics\Polygon.h"
+				RelativePath="..\Source\Graphics\MaterialComponents.h"
 				>
 			</File>
 			<File
@@ -637,14 +653,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Graphics\Shader.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Graphics\Shader.h"
-				>
-			</File>
-			<File
 				RelativePath="..\Source\Graphics\Texture.cpp"
 				>
 			</File>
@@ -661,19 +669,27 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Graphics\Vertex.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\Graphics\Vertex.h"
-				>
-			</File>
-			<File
 				RelativePath="..\Source\Graphics\VertexBuffer.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Source\Graphics\VertexBuffer.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\VertexDeclaration.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\VertexDeclaration.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\VertexTypes.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\VertexTypes.h"
 				>
 			</File>
 			<File
@@ -696,11 +712,27 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9CommonTools.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9CommonTools.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Source\Graphics\Direct3D9\D3D9ComponentBase.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\Source\Graphics\Direct3D9\D3D9ComponentBase.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9FixedMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9FixedMaterial.h"
 					>
 				</File>
 				<File
@@ -728,6 +760,10 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9ShadersSM2.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Source\Graphics\Direct3D9\D3D9Texture.cpp"
 					>
 				</File>
@@ -741,6 +777,14 @@
 				</File>
 				<File
 					RelativePath="..\Source\Graphics\Direct3D9\D3D9VertexBuffer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9VertexDeclaration.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9VertexDeclaration.h"
 					>
 				</File>
 				<File
@@ -768,6 +812,10 @@
 					</File>
 					<File
 						RelativePath="..\RunDir\resources\shaders\DirectionalLight.vs"
+						>
+					</File>
+					<File
+						RelativePath="..\RunDir\resources\shaders\DualParaboloidShadowPass.vs"
 						>
 					</File>
 					<File
@@ -808,6 +856,14 @@
 					</File>
 					<File
 						RelativePath="..\RunDir\resources\shaders\ShadowPass.vs"
+						>
+					</File>
+					<File
+						RelativePath="..\RunDir\resources\shaders\SkyBox.ps"
+						>
+					</File>
+					<File
+						RelativePath="..\RunDir\resources\shaders\SkyBox.vs"
 						>
 					</File>
 				</Filter>

@@ -46,7 +46,7 @@ const char* ZEResource::GetFileName() const
 	return this->FileName;
 }
 
-void ZEResource::SetFilename(const char* Value)
+void ZEResource::SetFileName(const char* Value)
 {
 	strcpy_s(FileName, ZE_MAX_FILE_NAME_SIZE, Value);
 }

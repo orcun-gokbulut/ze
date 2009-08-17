@@ -37,12 +37,15 @@
 #ifndef	__ZE_MODEL_RESOURCE_H__
 #define __ZE_MODEL_RESOURCE_H__
 
-#include "ZEDS/ZEDS.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "ZEMath/Matrix.h"
+#include "ZEMath/AABoundingBox.h"
+#include "ZEDS/Array.h"
 #include "Graphics/TextureResource.h"
 #include "Graphics/VertexBuffer.h"
-#include "Graphics/Vertex.h"
-#include "Graphics/Material.h"
+#include "Graphics/VertexTypes.h"
+#include "Graphics/FixedMaterial.h"
 
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256
@@ -193,14 +196,14 @@ class ZEModelResource : public ZEResource
 		ZEArray<ZEModelResourceMesh>			Meshes;
 		ZEArray<ZEModelResourceBone>			Bones;
 		ZEArray<ZEModelResourceAnimation>		Animations;
-		ZESmartArray<ZETextureResource*>		TextureResources;
-		ZEArray<ZEDefaultMaterial>				Materials;
+		ZESmartArray<ZETexture2DResource*>		TextureResources;
+		ZEArray<ZEMaterial*>					Materials;
 
 		const char*								GetResourceType() const;
 		
-		static ZEModelResource*					LoadResource(const char* Filename);
-		static const ZEModelResource*			LoadSharedResource(const char* Filename);
-		static void								CacheResource(const char* Filename);
+		static ZEModelResource*					LoadResource(const char* FileName);
+		static const ZEModelResource*			LoadSharedResource(const char* FileName);
+		static void								CacheResource(const char* FileName);
 										
 												~ZEModelResource();
 };

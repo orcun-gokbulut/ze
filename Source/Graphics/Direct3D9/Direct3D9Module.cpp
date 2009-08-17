@@ -41,6 +41,7 @@
 #include "Core/Window.h"
 #include "Core/Error.h"
 #include "Core/Console.h"
+#include "D3D9FixedMaterial.h"
 #include "D3D9Shader.h"
 #include "D3D9Texture.h"
 #include "D3D9VertexBuffer.h"
@@ -71,6 +72,7 @@ void ZEDirect3D9Module::SetEnabled(bool Enabled)
 bool ZEDirect3D9Module::Initialize()
 {
 	zeLog("Initializing Direct3D 9.\r\n");
+
 	ScreenWidth = zeOptions->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger();
 	ScreenHeight = zeOptions->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger();
 	Fullscreen = zeOptions->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean();
@@ -191,7 +193,7 @@ bool ZEDirect3D9Module::Initialize()
 		return false;
 	}
 
-	if (ZED3D9Shader::Initialize() == false)
+	if (ZED3D9Shader::BaseInitialize() == false)
 	{
 		zeCriticalError("Direct3D Module", "Can not initialize shader manager.");
 		Destroy();
@@ -204,18 +206,13 @@ bool ZEDirect3D9Module::Initialize()
 		return false;
 	}
 
-	if (!ZED3D9RendererBase::BaseInitialize())
-	{
-		zeCriticalError("Direct3D Module", "Can not initialize D3D9 component base.");
-		return false;
-	}
-
 	if (!ZED3D9ShadowRenderer::BaseInitialize())
 	{
 		zeCriticalError("Direct3D Module", "Can not initialize D3D9 shadow renderer base.");
 		return false;
 	}
 
+	//ZED3D9ComponentBase::D3
 	return true;
 }
 
@@ -224,7 +221,7 @@ void ZEDirect3D9Module::Deinitialize()
 	zeLog("Destroying Direct3D.\r\n");
 	ZED3D9ShadowRenderer::BaseDeinitialize();
 	ZED3D9PostProcessor::BaseDeinitialize();
-	ZED3D9Shader::Destroy();
+	ZED3D9Shader::BaseDeinitialize();
 	D3D9Device = NULL;
 	D3D9Module = NULL;
 
@@ -413,12 +410,23 @@ void ZEDirect3D9Module::SetAnisotropicFilter(int Level)
 	}
 }
 
+void ZEDirect3D9Module::SetMaterialComponentMask(unsigned int Mask)
+{
+	#pragma message("Task : Implament ZEDirect3D9Module::SetMaterialComponentMask()")
+}
+
+unsigned int ZEDirect3D9Module::GetMaterialComponentMask()
+{
+	#pragma message("Task : Implament ZEDirect3D9Module::GetMaterialComponentMask()")
+	return 0xFFFFFFFF;
+}
+
 ZERenderer* ZEDirect3D9Module::CreateFrameRenderer()
 {
 	ZED3D9RendererBase* Renderer = new ZED3D9FrameBufferRenderer();
 	if (!Renderer->Initialize())
 	{
-		delete Renderer;
+		Renderer->Destroy();
 		return NULL;
 	}
 
@@ -431,7 +439,7 @@ ZERenderer* ZEDirect3D9Module::CreateTextureRenderer()
 	ZED3D9RendererBase* Renderer = new ZED3D9TextureRenderer();
 	if (!Renderer->Initialize())
 	{
-		delete Renderer;
+		Renderer->Destroy();
 		return NULL;
 	}
 
@@ -444,7 +452,7 @@ ZERenderer* ZEDirect3D9Module::CreateShadowRenderer()
 	ZED3D9RendererBase* Renderer = new ZED3D9ShadowRenderer();
 	if (!Renderer->Initialize())
 	{
-		delete Renderer;
+		Renderer->Destroy();
 		return NULL;
 	}
 
@@ -455,6 +463,11 @@ ZERenderer* ZEDirect3D9Module::CreateShadowRenderer()
 ZEPostProcessor* ZEDirect3D9Module::CreatePostProcessor()
 {
 	return new ZED3D9PostProcessor;
+}
+
+ZEVertexDeclaration* ZEDirect3D9Module::CreateVertexDeclaration()
+{
+	return new ZED3D9VertexDeclaration();
 }
 
 void ZEDirect3D9Module::UpdateScreen()
@@ -487,32 +500,42 @@ ZEStaticVertexBuffer* ZEDirect3D9Module::CreateStaticVertexBuffer()
 	return VertexBuffer;
 }
 
-ZETexture* ZEDirect3D9Module::CreateTexture()
+ZETexture2D* ZEDirect3D9Module::CreateTexture()
 {
 	ZED3D9Texture* Texture = new ZED3D9Texture();
 	Textures.Add(Texture);
 	return Texture;
 }
 
-ZEVolumeTexture* ZEDirect3D9Module::CreateVolumeTexture()
+ZETexture3D* ZEDirect3D9Module::CreateVolumeTexture()
 {
 	ZED3D9VolumeTexture* Texture = new ZED3D9VolumeTexture();
 	VolumeTextures.Add(Texture);
 	return Texture;
 }
 
-ZECubeTexture* ZEDirect3D9Module::CreateCubeTexture()
+ZETextureCube* ZEDirect3D9Module::CreateCubeTexture()
 {
 	ZED3D9CubeTexture* Texture = new ZED3D9CubeTexture();
 	CubeTextures.Add(Texture);
 	return Texture;
 }
 
-ZEShader* ZEDirect3D9Module::CreateShader(unsigned int ShaderComponents)
+ZEFixedMaterial* ZEDirect3D9Module::CreateFixedMaterial()
 {
-	ZED3D9Shader* Shader = (ZED3D9Shader*)ZED3D9Shader::Create(ShaderComponents);
-	Shaders.Add(Shader);
-	return Shader;
+	return new ZED3D9FixedMaterial();
+}
+
+ZEFixedMaterial* ZEDirect3D9Module::CreateCustomMaterial()
+{
+	zeError("Direct3D9 Module", "Custom Materials are not implamented.");
+	return NULL;
+}
+
+ZEFixedMaterial* ZEDirect3D9Module::CreateCGFXMaterial()
+{
+	zeError("Direct3D9 Module", "CGFX Materials are not implamented.");
+	return NULL;
 }
 
 LPDIRECT3DDEVICE9 ZEDirect3D9Module::GetD3D9Device()

@@ -37,11 +37,12 @@
 #ifndef __ZE_MAP_H__
 #define __ZE_MAP_H__
 
-#include "ZEDS/ZEDS.h"
+#include "ZEDS/Array.h"
 #include "MapResource.h"
 #include "Octree.h"
 #include "Graphics/Canvas.h"
-//#include "Graphics/RenderList.h"
+#include "Graphics/RenderOrder.h"
+#include "Graphics/FixedMaterial.h"
 
 class ZERenderer;
 class ZEViewVolume;
@@ -54,7 +55,7 @@ class ZEEnvironment
 		virtual bool					Destroy() = 0;
 		virtual const char*				GetFileName() = 0;
 
-		virtual bool					Load(const char* Filename) = 0;
+		virtual bool					Load(const char* FileName) = 0;
 		virtual void					Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESmartArray<ZELight*>& Lights) = 0;
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT) = 0;
 
@@ -63,12 +64,12 @@ class ZEEnvironment
 class ZEPortalMap : public ZEEnvironment
 {
 	private:
-		ZEArray<ZERenderList*>			VertexBuffers;
+		ZEArray<ZERenderOrder*>			VertexBuffers;
 		ZEMapResource*					MapResource;
 
 		ZECanvas						PortalBBoxCanvas;
-		ZERenderList					PortalBBoxRenderList;
-		ZEDefaultMaterial				PortalBBoxMaterial;
+		ZERenderOrder					PortalBBoxRenderOrder;
+		ZEFixedMaterial*				PortalBBoxMaterial;
 
 	public:	
 		virtual bool					Initialize();
@@ -79,7 +80,7 @@ class ZEPortalMap : public ZEEnvironment
 		virtual void					RenderPortal(ZEMapPortal* Portal, ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESmartArray<ZELight*>& SceneLights);
 		virtual void					Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESmartArray<ZELight*>& Lights);
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT);
-		virtual bool					Load(const char* Filename);
+		virtual bool					Load(const char* FileName);
 										
 										ZEPortalMap();
 										~ZEPortalMap();

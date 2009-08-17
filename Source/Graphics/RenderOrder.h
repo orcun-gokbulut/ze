@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Vertex.h
+ Zinek Engine - RenderOrder.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,102 +34,94 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_VERTEX_H__
-#define __ZE_VERTEX_H__
+#ifndef	__ZE_RENDERLIST_H__
+#define __ZE_RENDERLIST_H__
 
-#include "ZEMath/ZEMath.h"
-#include "Types.h"
+#include "ZEDS/Array.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Matrix.h"
+#include "ZEMath/AABoundingBox.h"
 
-#define ZE_VE_POSITION				0x00000008
-#define ZE_VE_NORMAL				0x00000010
-#define ZE_VE_TANGENT				0x00000020
-#define ZE_VE_BINORMAL				0x00000040
-#define ZE_VE_SKIN					0x00000080
-#define ZE_VE_TEXCOORD(Count)		(0x00000004 && (Count))
+#define	ZE_RLF_NONE								0
+#define	ZE_RLF_TRANSPARENT						1
+#define	ZE_RLF_IMPOSTER							2
+#define	ZE_RLF_ENABLE_ZCULLING					4
+#define	ZE_RLF_ENABLE_NOZWRITE					8
+#define	ZE_RLF_ENABLE_WORLD_TRANSFORM			16
+#define	ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM	32
+#define ZE_RLF_INSTANCED						64
+#define ZE_RLF_SKINNED							128
+#define ZE_RLF_INDEXED							256
 
-enum ZEVertexType
+
+enum ZERLPrimitiveType
 {
-	ZE_VT_NOTSET				= 0,
-	ZE_VT_SIMPLEVERTEX			= 1,
-	ZE_VT_MAPVERTEX				= 2,
-	ZE_VT_MODELVERTEX			= 3,
-	ZE_VT_SKINNEDMODELVERTEX	= 4,
-	ZE_VT_GUIVERTEX				= 5
+	ZE_RLPT_POINT,
+	ZE_RLPT_LINE,
+	ZE_RLPT_TRIANGLE,
+	ZE_RLPT_TRIANGLESTRIPT
 };
 
-struct ZEVertexP
+enum ZERLLightType
 {
-	ZEVector3			Position;
+	ZE_RLLT_POINT,
+	ZE_RLLT_DIRECTIONAL,
+	ZE_RLLT_PROJECTIVE,
+	ZE_RLLT_OMNIPROJECTIVE
 };
 
-struct ZEVertexPN
+class ZETexture2D;
+class ZETextureCube;
+struct ZERLLight
 {
-	ZEVector3			Position;
-	ZEVector3			Normal;
-	ZEVector2			Texcoord;
+		ZERLLightType				Type;
+		ZEVector3					Color;
+		ZEVector3					Position;
+		ZEVector3					Direction;
+		ZEVector3					Attenuation;
+		float						Intensity;
+		float						Range;
+		ZEMatrix4x4					LightViewProjMatrix;
+		ZEMatrix4x4					LightRotationMatrix;
+		union
+		{
+			const ZETexture2D*		ProjectionMap;
+			const ZETextureCube*	CubeProjectionMap;
+		};
+		union
+		{
+			const ZETexture2D*		ShadowMap;
+			const ZETextureCube*	CubeShadowMap;
+		};
+
+		void						SetZero();
 };
 
-struct ZEVertexPNT
+class ZEMaterial;
+class ZEVertexDeclaration;
+class ZEVertexBuffer;
+
+class ZERenderOrder
 {
-	ZEVector3			Position;
-	ZEVector3			Normal;
-	ZEVector2			Texcoord;
+	public:
+		ZEDWORD							Flags;
+		ZERLPrimitiveType				PrimitiveType;
+		ZEVertexDeclaration*			VertexDeclaration;
+		unsigned int					VertexBufferOffset;
+		unsigned int					PrimitiveCount;
+
+		const ZEMaterial*				Material;
+
+		void*							IndexBuffer;
+		ZEVertexBuffer*					VertexBuffer;
+
+		ZEMatrix4x4						WorldMatrix;
+
+		ZEArray<ZERenderOrder*>			Instances;
+		ZEArray<ZEMatrix4x4>			BoneTransforms;
+
+		ZEArray<const ZERLLight*>		Lights;		
+
+		void							SetZero();
 };
-
-struct ZEVertexPNBTT
-{
-	ZEVector3			Position;
-	ZEVector3			Normal;
-	ZEVector3			Tangent;
-	ZEVector3			Binormal;
-	ZEVector2			Texcoord;
-};
-
-
-struct ZESimpleVertex
-{
-	ZEVector3			Position;
-	ZEVector3			Normal;
-	ZEVector2			Texcoord;
-};
-
-struct ZEMapVertex
-{
-	ZEVector3			Position;
-	ZEVector3			Normal;
-	ZEVector3			Tangent;
-	ZEVector3			Binormal;
-	ZEVector2			Texcoord;
-};
-
-struct ZEModelVertex
-{
-	ZEVector3			Position;
-	ZEVector3			Normal;
-	ZEVector3			Tangent;
-	ZEVector3			Binormal;
-	ZEVector2			Texcoord;
-};
-
-struct ZESkinnedModelVertex
-{
-	ZEVector3			Position;
-	ZEVector3			Normal;
-	ZEVector3			Tangent;
-	ZEVector3			Binormal;
-	ZEVector2			Texcoord;
-	unsigned char		BoneIndices[4];
-	float				BoneWeights[4];
-};
-
-struct ZEGUIVertex
-{
-	ZEVector2			Position;
-	ZEVector2			Texcoord;
-};
-
-size_t zeGetVertexSize(ZEDWORD VertexElements);
-size_t zeGetVertexSize(ZEVertexType VertexType);
-
-
 #endif

@@ -37,49 +37,66 @@
 #include "MapResource.h" 
 #include "Core/Core.h"
 #include "Core/Error.h"
-#include "Graphics/RenderList.h"
+#include "Graphics/RenderOrder.h"
 #include "Graphics/Light.h"
 #include "Graphics/ViewVolume.h"
+#include "ZEMath/Triangle.h"
+#include "ZEMath/Ray.h"
+#include "ZEMath/Ray.h"
 
 bool ZEPortalMap::Initialize()
 {
 	PortalBBoxCanvas.Clean();
 	PortalBBoxCanvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
 
-	PortalBBoxMaterial.SetZero();
-	PortalBBoxMaterial.SetShaderComponents(0);
-	PortalBBoxMaterial.AmbientColor = ZEVector3(0.75f, 0.75f, 0.75f);
-	PortalBBoxMaterial.LightningEnabled = false;
+	if (PortalBBoxMaterial != NULL)
+		PortalBBoxMaterial = ZEFixedMaterial::CreateInstance();
 
-	PortalBBoxRenderList.SetZero();
-	PortalBBoxRenderList.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
-	PortalBBoxRenderList.VertexType = ZE_VT_SIMPLEVERTEX;
-	PortalBBoxRenderList.PrimitiveType = ZE_RLPT_LINE;
-	PortalBBoxRenderList.Material = &PortalBBoxMaterial;
-	PortalBBoxRenderList.VertexBuffer = &PortalBBoxCanvas;
-	PortalBBoxRenderList.PrimitiveCount = PortalBBoxCanvas.Vertices.GetCount() / 2;
+	PortalBBoxMaterial->SetZero();
+	PortalBBoxMaterial->SetAmbientEnabled(true);
+	PortalBBoxMaterial->SetAmbientColor(ZEVector3(0.75f, 0.75f, 0.75f));
+	PortalBBoxMaterial->SetLightningEnabled(false);
+	PortalBBoxMaterial->UpdateMaterial();
+
+	PortalBBoxRenderOrder.SetZero();
+	PortalBBoxRenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
+	PortalBBoxRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
+	PortalBBoxRenderOrder.PrimitiveType = ZE_RLPT_LINE;
+	PortalBBoxRenderOrder.Material = PortalBBoxMaterial;
+	PortalBBoxRenderOrder.VertexBuffer = &PortalBBoxCanvas;
+	PortalBBoxRenderOrder.PrimitiveCount = PortalBBoxCanvas.Vertices.GetCount() / 2;
 
 	ZEOctree::OctreeBBoxCanvas.Clean();
 	ZEOctree::OctreeBBoxCanvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
 
-	ZEOctree::OctreeBBoxMaterial.SetZero();
-	ZEOctree::OctreeBBoxMaterial.SetShaderComponents(0);
-	ZEOctree::OctreeBBoxMaterial.AmbientColor = ZEVector3(0.25f, 0.25f, 0.25f);
-	ZEOctree::OctreeBBoxMaterial.LightningEnabled = false;
+	if (ZEOctree::OctreeBBoxMaterial == NULL)
+		ZEOctree::OctreeBBoxMaterial = ZEFixedMaterial::CreateInstance();
+	
+	ZEOctree::OctreeBBoxMaterial->SetZero();
+	ZEOctree::OctreeBBoxMaterial->SetAmbientEnabled(true);
+	ZEOctree::OctreeBBoxMaterial->SetAmbientColor(ZEVector3(0.25f, 0.25f, 0.25f));
+	ZEOctree::OctreeBBoxMaterial->SetLightningEnabled(false);
+	ZEOctree::OctreeBBoxMaterial->UpdateMaterial();
 
-	ZEOctree::OctreeBBoxRenderList.SetZero();
-	ZEOctree::OctreeBBoxRenderList.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
-	ZEOctree::OctreeBBoxRenderList.PrimitiveType = ZE_RLPT_LINE;
-	ZEOctree::OctreeBBoxRenderList.VertexType = ZE_VT_SIMPLEVERTEX;
-	ZEOctree::OctreeBBoxRenderList.Material = &PortalBBoxMaterial;
-	ZEOctree::OctreeBBoxRenderList.VertexBuffer = &PortalBBoxCanvas;
-	ZEOctree::OctreeBBoxRenderList.PrimitiveCount = PortalBBoxCanvas.Vertices.GetCount() / 2;
+	ZEOctree::OctreeBBoxRenderOrder.SetZero();
+	ZEOctree::OctreeBBoxRenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
+	ZEOctree::OctreeBBoxRenderOrder.PrimitiveType = ZE_RLPT_LINE;
+	ZEOctree::OctreeBBoxRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
+	ZEOctree::OctreeBBoxRenderOrder.Material = PortalBBoxMaterial;
+	ZEOctree::OctreeBBoxRenderOrder.VertexBuffer = &PortalBBoxCanvas;
+	ZEOctree::OctreeBBoxRenderOrder.PrimitiveCount = PortalBBoxCanvas.Vertices.GetCount() / 2;
 
 	return true;
 }
 
 bool ZEPortalMap::Destroy()
 {
+	if (PortalBBoxMaterial != NULL)
+	{
+		PortalBBoxMaterial->Destroy();
+		PortalBBoxMaterial = NULL;
+	}
+
 	if (MapResource != NULL)
 	{
 		MapResource->Release();
@@ -96,22 +113,22 @@ const char* ZEPortalMap::GetFileName()
 		return "";
 }
 
-bool ZEPortalMap::Load(const char* Filename)
+bool ZEPortalMap::Load(const char* FileName)
 {
-	zeLog("Loading map file \"%s\".\r\n", Filename);
+	zeLog("Loading map file \"%s\".\r\n", FileName);
 	if (MapResource != NULL)
 	{
 		MapResource->Release();
 		MapResource = NULL;
 	}
 
-	if (strcmp(Filename, "") == 0)
+	if (strcmp(FileName, "") == 0)
 		return true;
 
-	MapResource = ZEMapResource::LoadResource(Filename);
+	MapResource = ZEMapResource::LoadResource(FileName);
 	if (MapResource == NULL)
 	{
-		zeError("Map", "Could not load map file. (Filename : \"%s\")", Filename);
+		zeError("Map", "Could not load map file. (FileName : \"%s\")", FileName);
 		return false;
 	}
 	return true;
@@ -121,13 +138,13 @@ void ZEPortalMap::RenderPortal(ZEMapPortal* Portal, ZERenderer* Renderer, const 
 {
 	if (ViewVolume.CullTest(Portal->BoundingBox))
 	{
-		ZEMatrix4x4::CreateOrientation(PortalBBoxRenderList.WorldMatrix, Portal->BoundingBox.GetCenter(), 
+		ZEMatrix4x4::CreateOrientation(PortalBBoxRenderOrder.WorldMatrix, Portal->BoundingBox.GetCenter(), 
 			ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 
 			ZEVector3(Portal->BoundingBox.Max.x - Portal->BoundingBox.Min.x, 
 				Portal->BoundingBox.Max.y - Portal->BoundingBox.Min.y, 
 				Portal->BoundingBox.Max.z - Portal->BoundingBox.Min.z)
 			);
-		//Renderer->AddToRenderList(&PortalBBoxRenderList); 
+		//Renderer->AddToRenderOrder(&PortalBBoxRenderOrder); 
 
 		ZESmartArray<ZELight*> PortalLights;
 		for (size_t I = 0; I < SceneLights.GetCount(); I++)
@@ -140,15 +157,15 @@ void ZEPortalMap::RenderPortal(ZEMapPortal* Portal, ZERenderer* Renderer, const 
 		if (Portal->Octree != NULL)
 			Portal->Octree->Render(Renderer, ViewVolume, PortalLights);
 		else
-			for (size_t I = 0; I < Portal->RenderLists.GetCount(); I++)
+			for (size_t I = 0; I < Portal->RenderOrders.GetCount(); I++)
 			{
-				if (Portal->RenderLists[I].Lights.GetCount() != SceneLights.GetCount())
-					Portal->RenderLists[I].Lights.SetCount(SceneLights.GetCount());
+				if (Portal->RenderOrders[I].Lights.GetCount() != SceneLights.GetCount())
+					Portal->RenderOrders[I].Lights.SetCount(SceneLights.GetCount());
 
 				for (size_t N = 0; N < PortalLights.GetCount(); N++)
-					Portal->RenderLists[I].Lights[N] = PortalLights[N]->GetRenderListLight();
+					Portal->RenderOrders[I].Lights[N] = PortalLights[N]->GetRenderOrderLight();
 
-				Renderer->AddToRenderList(&Portal->RenderLists[I]);
+				Renderer->AddToRenderOrder(&Portal->RenderOrders[I]);
 			}
 	}
 }
@@ -186,6 +203,7 @@ bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norm
 ZEPortalMap::ZEPortalMap()
 {
 	MapResource = NULL;
+	PortalBBoxMaterial = NULL;
 }
 
 ZEPortalMap::~ZEPortalMap()

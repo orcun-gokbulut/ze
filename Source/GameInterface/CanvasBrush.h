@@ -38,6 +38,8 @@
 #include "Entity.h"
 #include "Graphics/Canvas.h"
 #include "Graphics/Renderer.h"
+#include "Graphics/FixedMaterial.h"
+
 ZE_ENTITY_DESCRIPTION(ZECanvasBrush, ZEEntity);
 
 class ZECanvasBrush : public ZEEntity
@@ -45,13 +47,13 @@ class ZECanvasBrush : public ZEEntity
 	ZE_ENTITY_CLASS(ZECanvasBrush)
 	
 	private:
-		ZERenderList						RenderList;
+		ZERenderOrder						RenderOrder;
 
 	public:
 		virtual bool						IsDrawable();
 
 		ZERLPrimitiveType					PrimitiveType;
-		ZEDefaultMaterial					Material;
+		ZEMaterial*							Material;
 		ZECanvas							Canvas;
 
 		void								UpdateCanvas();

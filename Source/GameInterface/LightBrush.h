@@ -39,11 +39,13 @@
 
 #include "GameInterface/Entity.h"
 #include "Graphics/Light.h"
-#include "Graphics/RenderList.h"
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/Material.h"
+#include "Graphics/RenderOrder.h"
 
 ZE_ENTITY_DESCRIPTION(ZELightBrush, ZEEntity);
+
+class ZETexture2DResource;
+class ZETextureCubeResource;
+class ZEFixedMaterial;
 
 class ZELightBrush : public ZEEntity
 {
@@ -53,16 +55,16 @@ class ZELightBrush : public ZEEntity
 		ZELight*							Light;
 		ZETextureType						Type;
 
-		ZERenderList						RenderList;
-		ZEDefaultMaterial					Material;
+		ZERenderOrder						RenderOrder;
+		ZEFixedMaterial*					Material;
 
 		float								Intensity;
 		ZEVector3							Color;
 		float								Range;
 		ZEVector3							Attenuation;
 		bool								CastsShadow;
-		ZETextureResource*					ProjectionTexture;
-		ZECubeTextureResource*				CubeProjectionTexture;
+		ZETexture2DResource*					ProjectionTexture;
+		ZETextureCubeResource*				CubeProjectionTexture;
 		float								ProjectionFOV;
 		float								ProjectionAspectRatio;
 

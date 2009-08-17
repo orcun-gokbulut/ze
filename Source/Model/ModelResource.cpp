@@ -102,19 +102,19 @@ ZEModelResourceMeshLOD::~ZEModelResourceMeshLOD()
 
 //////////////////////////////////////////////////////////////// READ ////////////////////////////////////////////////////////////////
 
-const ZETexture* ManageModelMaterialTextures(char* Filename, ZESmartArray<ZETextureResource*>& TextureResources)
+const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArray<ZETexture2DResource*>& TextureResources)
 {
-	if (strncmp(Filename, "", ZE_MDLF_MAX_FILENAME_SIZE) == 0)
+	if (strncmp(FileName, "", ZE_MDLF_MAX_FILENAME_SIZE) == 0)
 		return NULL;
 
 	for (size_t I = 0; I < TextureResources.GetCount(); I++)
-		if (strnicmp(TextureResources[I]->GetFileName(), Filename, ZE_MDLF_MAX_FILENAME_SIZE) == 0)
+		if (strnicmp(TextureResources[I]->GetFileName(), FileName, ZE_MDLF_MAX_FILENAME_SIZE) == 0)
 			return TextureResources[I]->GetTexture();
 
-	ZETextureResource* NewTextureResource = ZETextureResource::LoadSharedResource(Filename);
+	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(FileName);
 	if (NewTextureResource == NULL)
 	{
-		zeError("Map Resource", "Can not load texture file. (Filename : \"%s\")", Filename);
+		zeError("Map Resource", "Can not load texture file. (FileName : \"%s\")", FileName);
 		return NULL;
 	}
 	TextureResources.Add(NewTextureResource);
@@ -125,17 +125,17 @@ bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 {
 	for (size_t I = 0; I < Model->Materials.GetCount(); I++)
 	{
-		ZEDefaultMaterial* Material = &Model->Materials[I]; 
+		ZEMaterial* Material = Model->Materials[I]; 
 		ZEModelFileMaterialChunk MaterialChunk;
 
 		ResourceFile.Read(&MaterialChunk, sizeof(ZEModelFileMaterialChunk), 1);
 		if(MaterialChunk.ChunkId != ZE_MDLF_MATERIAL_CHUNKID)
 		{
-			zeError("Model Resource", "Corrupted ZEModel file. Materials chunk id does not matches.\r\n");
+			zeError("Model Resource", "Corrupted ZEModel file. Materials chunk id does not matches. (FileName : \"%s\"", ResourceFile.GetFileName());
 			return false;
 		}
 
-		Material->TwoSided = MaterialChunk.TwoSided;
+/*		Material->TwoSided = MaterialChunk.TwoSided;
 		Material->LightningEnabled = MaterialChunk.LightningEnabled;
 		Material->Wireframe = MaterialChunk.Wireframe;
 		Material->TransparancyMode = MaterialChunk.Transparant ? ZE_TM_ADDAPTIVE : ZE_TM_NOTRANSPARACY;
@@ -161,6 +161,7 @@ bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 		Material->DetailNormalMap = ManageModelMaterialTextures(MaterialChunk.DetailNormalMap, Model->TextureResources);
 		Material->EnvironmentMap = NULL;//ManageModelMaterialTextures(MaterialChunk.EnvironmentMap, Model->TextureResources);
 		Material->LightMap = ManageModelMaterialTextures(MaterialChunk.LightMap, Model->TextureResources);
+		*/
 	}
 	return true;
 }
@@ -176,7 +177,7 @@ bool ReadPhysicalShapesFromFile(ZEArray<ZEModelResourcePhysicalShape>* Shapes, Z
 
 		if(PhysicalShapeChunk.ChunkId != ZE_MDLF_PHYSICAL_SHAPE_CHUNKID)
 		{
-			zeError("Model Resource", "Corrupted ZEModel file. Physical shape chunk id does not matches.\r\n");
+			zeError("Model Resource", "Corrupted ZEModel file. Physical shape chunk id does not matches. (FileName : \"%s\"", ResourceFile.GetFileName());
 			return false;
 		}
 
@@ -215,7 +216,7 @@ bool ReadPhysicalShapesFromFile(ZEArray<ZEModelResourcePhysicalShape>* Shapes, Z
 				ResourceFile.Read(PhysicalShape->Mesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalShape->Mesh.Vertices.GetCount());
 				break;
 			default:
-				zeError("Model Resource", "Wrong physical shape type.\r\n");
+				zeError("Model Resource", "Wrong physical shape type. (FileName : \"%s\"", ResourceFile.GetFileName());
 				return false;
 		}
 	}
@@ -233,7 +234,7 @@ bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 		
 		if(MeshChunk.ChunkId != ZE_MDLF_MESH_CHUNKID)
 		{
-			zeError("Model Resource",  "Corrupted ZEModel file. Mesh's chunk id does not matches.\r\n");
+			zeError("Model Resource",  "Corrupted ZEModel file. Mesh's chunk id does not matches. (FileName : \"%s\"", ResourceFile.GetFileName());
 			return false;
 		}
 
@@ -256,7 +257,7 @@ bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 			ResourceFile.Read(&MeshLODChunk, sizeof(ZEModelFileMeshLODChunk), 1);
 			if (MeshLODChunk.ChunkId != ZE_MDLF_MESH_LOD_CHUNKID)
 			{
-				zeError("Model Resource",  "Corrupted ZEModel file. Mesh LOD's chunk id does not matches.\r\n");
+				zeError("Model Resource",  "Corrupted ZEModel file. Mesh LOD's chunk id does not matches. (FileName : \"%s\"", ResourceFile.GetFileName());
 				return false;			
 			}
 
@@ -288,7 +289,7 @@ bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 
 		if(BoneChunk.ChunkId != ZE_MDLF_BONE_CHUNKID)
 		{
-			zeError("Model Resource",  "Corrupted ZEModel file. Bone chunk id does not matches.\r\n");
+			zeError("Model Resource",  "Corrupted ZEModel file. Bone chunk id does not matches. (FileName : \"%s\"", ResourceFile.GetFileName());
 			return false;
 		}
 
@@ -360,41 +361,41 @@ bool ReadModelFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 
 	if(HeaderChunk.HEADER != ZE_MDLF_HEADER)
 	{
-		zeError("Model Resource", "Unknown ZEModel file format.\r\n");
+		zeError("Model Resource", "Unknown ZEModel file format. (FileName : \"%s\"", ResourceFile.GetFileName());
 		return false;
 	}
 
 	if(HeaderChunk.Version != ZE_MDLF_VERSION)
 	{
-		zeError("Model Resource", "ZEModel file version mismatched.\r\n");
+		zeError("Model Resource", "ZEModel file version mismatched. (FileName : \"%s\"", ResourceFile.GetFileName());
 		return false;	
 	}
 
 	Model->Materials.SetCount(HeaderChunk.MaterialCount);
 	if (!ReadMaterialsFromFile(Model, ResourceFile))
 	{
-		zeError("Model Resource", "Corrupted ZEModel file. Can not read model file.\r\n");
+		zeError("Model Resource", "Corrupted ZEModel file. Can not read model file. (FileName : \"%s\"", ResourceFile.GetFileName());
 		return false;
 	}
 
 	Model->Meshes.SetCount(HeaderChunk.MeshCount);
 	if(!ReadMeshesFromFile(Model, ResourceFile))
 	{
-		zeError("Model Resource", "Corrupted ZEModel file. Can not read model file.\r\n");
+		zeError("Model Resource", "Corrupted ZEModel file. Can not read model file. (FileName : \"%s\"", ResourceFile.GetFileName());
 		return false;
 	}
 
 	Model->Bones.SetCount(HeaderChunk.BoneCount);
 	if(!ReadBonesFromFile(Model, ResourceFile))
 	{
-		zeError("Model Resource", "Corrupted ZEModel file. Can not read model file.\r\n");
+		zeError("Model Resource", "Corrupted ZEModel file. Can not read model file. (FileName : \"%s\"", ResourceFile.GetFileName());
 		return false;
 	}
 
 	Model->Animations.SetCount(HeaderChunk.AnimationCount);
 	if(!ReadAnimationsFromFile(Model, ResourceFile))
 	{
-		zeError("Model Resource", "Corrupted ZEModel file. Can not read model file.\r\n");
+		zeError("Model Resource", "Corrupted ZEModel file. Can not read model file. (FileName : \"%s\"", ResourceFile.GetFileName());
 		return false;
 	}
 
@@ -407,15 +408,15 @@ const char* ZEModelResource::GetResourceType() const
 }
 
 
-const ZEModelResource* ZEModelResource::LoadSharedResource(const char* Filename)
+const ZEModelResource* ZEModelResource::LoadSharedResource(const char* FileName)
 {
-	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(Filename);
+	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(FileName);
 	
 	if (Resource != NULL)
 		return Resource;
 	else
 	{
-		Resource = LoadResource(Filename);
+		Resource = LoadResource(FileName);
 		if (Resource != NULL)
 		{
 			Resource->Shared = true;
@@ -429,32 +430,32 @@ const ZEModelResource* ZEModelResource::LoadSharedResource(const char* Filename)
 	}
 }
 
-void ZEModelResource::CacheResource(const char* Filename)
+void ZEModelResource::CacheResource(const char* FileName)
 {
-	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(Filename);
+	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(FileName);
 	if (Resource != NULL)
 		Resource->Cached = true;
 	else
 	{
-		Resource = LoadResource(Filename);
+		Resource = LoadResource(FileName);
 		Resource->Cached = true;
 		Resource->ReferenceCount = 0;
 		zeResources->AddResource(Resource);
 	}
 }
 
-ZEModelResource* ZEModelResource::LoadResource(const char* Filename)
+ZEModelResource* ZEModelResource::LoadResource(const char* FileName)
 {
 	ZEResourceFile ResourceFile;
-	if (ResourceFile.Open(Filename))
+	if (ResourceFile.Open(FileName))
 	{
 		ZEModelResource* NewResource = new ZEModelResource();
-		NewResource->SetFilename(Filename);
+		NewResource->SetFileName(FileName);
 		NewResource->Cached = false;
 		NewResource->ReferenceCount = 0;
 		if (!ReadModelFromFile(NewResource, ResourceFile))
 		{
-			zeError("Model Resource", "Can not load model file. (Filename : \"%s\")", Filename);
+			zeError("Model Resource", "Can not load model file. (FileName : \"%s\")", FileName);
 			delete NewResource;
 			return NULL;
 		}
@@ -463,7 +464,7 @@ ZEModelResource* ZEModelResource::LoadResource(const char* Filename)
 	}
 	else
 	{
-		zeError("Model Resource", "Model file does not exists. (Filename : \"%s\")", Filename);
+		zeError("Model Resource", "Model file does not exists. (FileName : \"%s\")", FileName);
 		return NULL;
 	}
 }

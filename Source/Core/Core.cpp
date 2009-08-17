@@ -358,9 +358,7 @@ void ZECore::ShutDown()
 	SetCoreState(ZECORESTATE_SHUTDOWN);
 	// Destroy game
 	if (Game != NULL)
-	{
 		Game->Deinitialize();
-	}
 
 	zeLog("Saving options.\r\n");
 	if (CoreState == ZECORESTATE_CRITICALERROR)

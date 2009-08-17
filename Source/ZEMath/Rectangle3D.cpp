@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ScreenPicker.h
+ Zinek Engine - Rectangle3D.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PICKER_H__
-#define __ZE_PICKER_H__
+#include "Rectangle3D.h"
+#include "Core/Error.h"
 
-class ZEScreenPicker
+void ZERectangle3D::GetPlane(ZEPlane & Plane) const
 {
-	public:
-		virtual void					SetPickingArea(ZERectangle& Rectangle);
-		virtual const ZERectangle&		GetPickingArea()
+	ZEPlane::Create(Plane,P1,P2,P3);
+}
 
-		virtual const ZEVector3&		PickPosition(unsigned int x, unsigned int y);
-		virtual const ZEVector3&		PickNormal(unsigned int x, unsigned int y);
-		virtual const ZEEntity*			PickObject(unsigned int x, unsigned int y);
-		virtual const ZEDWORD			PickObjectData(unsigned int x, unsigned int y);
-};
+const ZEPoint3& ZERectangle3D::GetPoint(unsigned int Index) const
+{
+	switch(Index)
+	{
+		case 0:
+			return P1;
+		case 1:
+			return P2;
+		case 2:
+			return P3;
+		case 3:
+			return P4;
+		default:
+			return P1;
+	}
+}
+		
+ZERectangle3D::ZERectangle3D()
+{
+}
 
-#endif
+ZERectangle3D::ZERectangle3D(const ZEPoint3& P1, const ZEPoint3& P2, const ZEPoint3& P3, const ZEPoint3& P4)
+{
+	this->P1 = P1;
+	this->P2 = P2;
+	this->P3 = P3;
+	this->P4 = P4;
+}

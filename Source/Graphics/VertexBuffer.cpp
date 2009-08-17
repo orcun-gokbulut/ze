@@ -32,12 +32,21 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "RenderList.h"
+#include "RenderOrder.h"
 #include "Core/Core.h"
+
+ZEVertexBuffer::~ZEVertexBuffer()
+{
+}
 
 bool ZEStaticVertexBuffer::IsStatic()
 {
 	return true;
+}
+
+ZEStaticVertexBuffer* ZEStaticVertexBuffer::CreateInstance()
+{
+	return zeGraphics->CreateStaticVertexBuffer();
 }
 
 bool ZEDynamicVertexBuffer::IsStatic()

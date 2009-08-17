@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ScreenPicker.cpp
+ Zinek Engine - IndexedPolygon.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ScreenPicker.h"
+#pragma once
+#ifndef __ZE_POLYGON_H__
+#define __ZE_POLYGON_H__
+
+#include "VertexTypes.h"
+
+struct ZEIndexedPolygon
+{
+	int			VertexIndexes[3];
+};
+
+#endif

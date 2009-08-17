@@ -37,8 +37,14 @@
 #ifndef	__ZE_ENTITY_H__
 #define __ZE_ENTITY_H__
 
-#include "ZEDS/ZEDS.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEDS/Array.h"
+#include "ZEDS/Variant.h"
+#include "ZEMath/Matrix.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "ZEMath/AABoundingBox.h"
+#include "ZEMath/OBoundingBox.h"
+#include "ZEMath/BoundingSphere.h"
 #include "Definitions.h"
 #include "Core/Component.h"
 #include "Graphics/Renderer.h"
@@ -103,9 +109,7 @@
 		{AttributeName, ZEVARIANTTYPE_INTEGER, ZE_AS_ENTITY, AttributeFlag, AttributeDefaultValue, 0, NULL, NULL, NULL, AttributeDescription},
 	#define ZE_ENTITY_ATTRIBUTE_ENUMURATOR(AttributeName, AttributeFlag, EnumuratorName, AttributeDefaultValue, AttributeDescription)\
 		{AttributeName, ZEVARIANTTYPE_INTEGER, ZE_EAS_ENUMURATOR, AttributeFlag, AttributeDefaultValue, NULL, NULL, sizeof(EnumuratorName##Description) / sizeof(ZEEntityAttributeEnumurator), EnumuratorName##Description, AttributeDescription},
-	
-	#define ZE_
-	#define ZE_ENTITY_BIND_ATTRIBUTE(AttributeName, SetFunction, GetFunction);
+
 	#define ZE_ENTITY_ATTRIBUTES_END() }; *Count = sizeof(Attributes) / sizeof(ZEEntityAttribute); return Attributes; 
 #define ZE_ENTITY_DESCRIPTION_END(EntityName) }\
 	ZEEntityDescription* EntityName::EntityDescription()\

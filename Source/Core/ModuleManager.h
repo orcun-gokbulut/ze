@@ -38,7 +38,7 @@
 #define __ZE_MODULE_MANAGER_H__
 
 #include "Option.h"
-#include "ZEDS/ZEDS.h"
+#include "ZEDS/Array.h"
 #include "Module.h"
 
 class ZEModuleManager
@@ -60,7 +60,7 @@ class ZEModuleManager
 		ZEModule*						CreateModule(ZEModuleType ModuleType);
 
 		bool							LoadInternalModule(ZEModuleDescription* ModuleDesc);		
-		bool							LoadExternalModule(const char* Filename);
+		bool							LoadExternalModule(const char* FileName);
 		void							SeekAndLoadExternalModules(const char* Directory);
 		void							UnloadModule(ZEModuleDescription* ModuleDesc);
 										

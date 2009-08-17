@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - 3DRectangle.h
+ Zinek Engine - ZEDS.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,22 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_3DRECTANGLE_H__
-#define __ZE_MATH_3DRECTANGLE_H__
+#ifndef	__ZEDS_H__
+#define __ZEDS_H__
 
-#include "Vector.h"
-#include "Plane.h"
-
-class ZE3DRectangle
-{
-	public:
-		ZEPoint3				P1, P2, P3, P4;
-
-		void					GetPlane(ZEPlane & Plane) const;
-		const ZEPoint3&			GetPoint(unsigned int Index) const;
-
-								ZE3DRectangle();
-								ZE3DRectangle(const ZEPoint3& P1, const ZEPoint3& P2, const ZEPoint3& P3, const ZEPoint3& P4);
-};
+#include "definitions.h"
+#include "named.h"
+#include "variant.h"
+#include "typedvariant.h"
+#include "array.h"
+//#include "linklist.h"
+//#include "doublelinklist.h"
+//#include "collection.h"
+//#include "tree.h"
+//#include "typetree.h"
 
 #endif

@@ -38,7 +38,7 @@
 #define __ZE_D3D9SHADER_H__
 
 #include "D3D9ComponentBase.h"
-#include "../Shader.h"
+#include "ZEDS/Array.h"
 
 enum ZED3D9ShaderPassType
 {
@@ -58,7 +58,7 @@ class ZED3D9ShaderPass : public ZED3D9ComponentBase
 		LPDIRECT3DPIXELSHADER9		PixelShader;
 		bool						Shared;
 
-		bool						Compile(const char* VertexShaderSource, const char* PixelShaderSource, ZEArray<D3DXMACRO>* Macros);
+		bool						Compile(const char* VertexShaderSource, const char* PixelShaderSource, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros);
 		void						Release();
 
 									ZED3D9ShaderPass();
@@ -72,10 +72,13 @@ class ZED3D9ShaderLightPass : public ZED3D9ShaderPass
 		unsigned int				MaxLight;
 };
 
-class ZED3D9Shader : public ZED3D9ComponentBase, public ZEShader
+class ZED3D9Shader : public ZED3D9ComponentBase
 {	
 	private:
 		int							ShaderComponents;
+		int							ShaderInstanceIndex;
+		
+		static const char*			GetMaterialComponentName(unsigned ShaderComponent);
 
 	public:
 		ZED3D9ShaderPass			PreLightPass;
@@ -87,15 +90,21 @@ class ZED3D9Shader : public ZED3D9ComponentBase, public ZEShader
 		ZED3D9ShaderPass			ShadowedProjectiveLightPass;
 		ZED3D9ShaderPass			OmniProjectiveLightPass;
 		ZED3D9ShaderPass			ShadowedOmniProjectiveLightPass;
-		ZED3D9ShaderPass			ShadowPass;
 
-		static bool					Initialize();
-		static void					Destroy();
+		ZED3D9ShaderPass			PointLightShadowPass;
+		ZED3D9ShaderPass			DirectionalLightShadowPass;
+		ZED3D9ShaderPass			ProjectiveLightShadowPass;
+		ZED3D9ShaderPass			OmniDirectionalLightShadowPass;
 
-		static ZEShader*			Create(unsigned int ShaderComponents);
+		static bool					BaseInitialize();
+		static void					BaseDeinitialize();
+
+		static ZED3D9Shader*		CreateFixedMaterialShader(unsigned int MaterialComponents);
 		void						Release();
+		void						Destroy();
 
 									ZED3D9Shader();
 									~ZED3D9Shader();
 };
+
 #endif

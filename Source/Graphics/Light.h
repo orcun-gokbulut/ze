@@ -38,7 +38,7 @@
 #define __ZE_LIGHT_H__
 
 #include "Core/Component.h"
-#include "RenderList.h"
+#include "RenderOrder.h"
 #include "ViewVolume.h"
 
 enum ZELightType
@@ -59,7 +59,7 @@ class ZELight : public ZEComponent
 	protected:
 		bool							UpdateViewVolume;
 		bool							CastsShadows;
-		ZERLLight						RenderListLight;
+		ZERLLight						RenderOrderLight;
 
 	public:
 		virtual ZELightType				GetLightType() = 0;
@@ -90,7 +90,7 @@ class ZELight : public ZEComponent
 		virtual void					SetCastShadows(bool NewValue);
 		
 		virtual void					RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer) = 0;
-		virtual const ZERLLight*		GetRenderListLight();
+		virtual const ZERLLight*		GetRenderOrderLight();
 
 		virtual const ZEViewVolume&		GetViewVolume() = 0;
 
@@ -101,7 +101,7 @@ class ZELight : public ZEComponent
 class ZEPointLight  : public ZELight
 {
 	private:
-		ZECubeTexture*					ShadowMap;
+		ZETextureCube*					ShadowMap;
 		ZEViewSphere					ViewVolume;
 
 	public:
@@ -109,7 +109,7 @@ class ZEPointLight  : public ZELight
 
 		virtual void					SetCastShadows(bool NewValue);
 
-		const ZECubeTexture*			GetShadowMap();
+		const ZETextureCube*			GetShadowMap();
 
 		virtual void					RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer);
 		virtual const ZEViewVolume&		GetViewVolume();
@@ -121,13 +121,13 @@ class ZEPointLight  : public ZELight
 class ZEDirectionalLight : public ZELight
 {
 	private:
-		ZETexture*						ShadowMap;
+		ZETexture2D*						ShadowMap;
 		ZEViewPlane						ViewVolume;
 
 	public:
 		ZELightType						GetLightType();
 
-		const ZETexture*				GetShadowMap();
+		const ZETexture2D*				GetShadowMap();
 
 		virtual void					RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer);
 		virtual const ZEViewVolume&		GetViewVolume();
@@ -151,14 +151,14 @@ class ZEProjectiveLight : public ZELight
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio();
  
-		const ZETexture*				GetShadowMap();
+		const ZETexture2D*				GetShadowMap();
 		void							SetShadowMap(int Width, int Height);
 
-		void							SetProjectionTexture(const ZETexture* Texture);
-		const ZETexture*				GetProjectionTexture();
+		void							SetProjectionTexture(const ZETexture2D* Texture);
+		const ZETexture2D*				GetProjectionTexture();
 
 		virtual void					RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer);
-		virtual const ZERLLight*		GetRenderListLight();
+		virtual const ZERLLight*		GetRenderOrderLight();
 		virtual const ZEViewVolume&		GetViewVolume();
 
 										ZEProjectiveLight();
@@ -169,17 +169,17 @@ class ZEProjectiveLight : public ZELight
 class ZEOmniProjectiveLight : public ZELight
 {
 	private:
-		ZECubeTexture*					ShadowMap;
-		ZECubeTexture*					ProjectionTexture;
+		ZETextureCube*					ShadowMap;
+		ZETextureCube*					ProjectionTexture;
 		ZEViewSphere					ViewVolume;
 
 	public:
 		ZELightType						GetLightType();
 
-		const ZECubeTexture*			GetShadowMap();
+		const ZETextureCube*			GetShadowMap();
 
-		void							SetProjectionTexture(const ZECubeTexture* Texture);
-		const ZECubeTexture*			GetProjectionTexture();
+		void							SetProjectionTexture(const ZETextureCube* Texture);
+		const ZETextureCube*			GetProjectionTexture();
 
 		virtual void					RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer);
 		virtual const ZEViewVolume&		GetViewVolume();

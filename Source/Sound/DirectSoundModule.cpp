@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "DirectSoundModule.h"
-#include "ZEDS/ZEDS.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEDS/Array.h"
+#include "ZEMath/Vector.h"
 #include "Core/Core.h"
 #include <dsound.h>
 
