@@ -45,7 +45,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
-				WarningLevel="3"
+				WarningLevel="2"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
@@ -113,7 +113,7 @@
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\Source&quot;;&quot;$(ProjectDir)..\Include&quot;"
 				PreprocessorDefinitions="FREEIMAGE_LIB"
 				RuntimeLibrary="0"
-				WarningLevel="3"
+				WarningLevel="2"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
@@ -181,7 +181,7 @@
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
-				WarningLevel="3"
+				WarningLevel="2"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
 			/>
@@ -249,7 +249,7 @@
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\Source&quot;;&quot;$(ProjectDir)..\Include&quot;"
 				PreprocessorDefinitions="FREEIMAGE_LIB"
 				RuntimeLibrary="2"
-				WarningLevel="3"
+				WarningLevel="2"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 			/>
