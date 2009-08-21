@@ -40,18 +40,18 @@
 
 #include "Core/Module.h"
 #include "Physics/PhysicsModule.h"
-#include "Physics/AegiaPhysicsModule.h"
-#include "Physics/AegiaPhysicsStream.h"
+#include "Physics/Aegia/AegiaPhysicsModule.h"
+#include "Physics/Aegia/AegiaPhysicsStream.h"
 
 #include "Physics/PhysicsWorld.h"
-#include "Physics/AegiaPhysicsWorld.h"
+#include "Physics/Aegia/AegiaPhysicsWorld.h"
 
 #include "Physics/PhysicsBody.h"
 #include "Physics/PhysicsBodyInfo.h"
-#include "Physics/AegiaPhysicsBody.h"
+#include "Physics/Aegia/AegiaPhysicsBody.h"
 
 #include "Physics/PhysicsMaterial.h"
-#include "Physics/AegiaPhysicsMaterial.h"
+#include "Physics/Aegia/AegiaPhysicsMaterial.h"
 
 #include "Physics/PhysicsShapeInfo.h"
 #include "Physics/PhysicsBoxShapeInfo.h"
@@ -62,7 +62,7 @@
 #include "Physics/PhysicsTrimeshShapeInfo.h"
 
 #include "Physics/PhysicsCharacterController.h"
-#include "Physics/AegiaPhysicsCharacterController.h"
+#include "Physics/Aegia/AegiaPhysicsCharacterController.h"
 
 ZEAegiaPhysicsBody::ZEAegiaPhysicsBody() : Actor(NULL)
 {

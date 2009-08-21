@@ -37,7 +37,7 @@
 #include "ZEMath/Vector.h"
 
 #include "Physics/PhysicsJoint.h"
-#include "Physics/AegiaPhysicsJoint.h"
+#include "Physics/Aegia/AegiaPhysicsJoint.h"
 
 #include "Physics/PhysicsJointInfo.h"
 #include "Physics/PhysicsFixedJointInfo.h"
@@ -52,11 +52,11 @@
 #include "Physics/PhysicsFreeJointInfo.h"
 
 #include "Physics/PhysicsBody.h"
-#include "Physics/AegiaPhysicsBody.h"
+#include "AegiaPhysicsBody.h"
 
 #include "Physics/PhysicsWorld.h"
-#include "Physics/AegiaPhysicsWorld.h"
-#include "Physics/AegiaPhysicsUtility.h"
+#include "AegiaPhysicsWorld.h"
+#include "AegiaPhysicsUtility.h"
 
 ZEAegiaPhysicsJoint::ZEAegiaPhysicsJoint() : Joint(NULL)
 {

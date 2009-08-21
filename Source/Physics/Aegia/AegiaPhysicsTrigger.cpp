@@ -36,7 +36,7 @@
 #include "ZEMath/Vector.h"
 #include "Physics/PhysicsBody.h"
 #include "Physics/PhysicsTrigger.h"
-#include "Physics/AegiaPhysicsTrigger.h"
+#include "AegiaPhysicsTrigger.h"
 
 ZEAegiaPhysicsTrigger::ZEAegiaPhysicsTrigger(ZEPhysicsBody* First,ZEPhysicsBody* Second, unsigned int Flag) : Trigger(First), Other(Second), Flags(Flag)
 {

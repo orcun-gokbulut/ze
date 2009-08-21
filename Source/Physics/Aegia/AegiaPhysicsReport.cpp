@@ -34,18 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "NxPhysics.h"
-#include "Physics/AegiaPhysicsReport.h"
+#include "Physics/Aegia/AegiaPhysicsReport.h"
 
 #include "ZEMath/Vector.h"
 #include "Physics/PhysicsCollision.h"
-#include "Physics/AegiaPhysicsCollision.h"
+#include "AegiaPhysicsCollision.h"
 #include "Physics/PhysicsTrigger.h"
-#include "Physics/AegiaPhysicsTrigger.h"
+#include "AegiaPhysicsTrigger.h"
 
 #include "Physics/PhysicsWorld.h"
 #include "Physics/PhysicsWorldInfo.h"
-#include "Physics/AegiaPhysicsWorld.h"
-#include "Physics/AegiaPhysicsUtility.h"
+#include "AegiaPhysicsWorld.h"
+#include "AegiaPhysicsUtility.h"
 
 void ZEAegiaPhysicsReport::onContactNotify(NxContactPair& pair, NxU32 events)
 {

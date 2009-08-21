@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Physics/AegiaPhysicsModuleDescription.h"
+#include "AegiaPhysicsModuleDescription.h"
 
 ZEModuleType ZEAegiaPhysicsModuleDescription::GetType()
 {

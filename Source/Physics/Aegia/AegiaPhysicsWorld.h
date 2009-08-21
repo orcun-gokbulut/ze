@@ -51,8 +51,8 @@ class ZECanvasBrush;
 
 class NxContactPair;
 #include "NxUserContactReport.h"
-#include "Physics/AegiaPhysicsReport.h"
-#include "Physics/AegiaPhysicsUtility.h"
+#include "AegiaPhysicsReport.h"
+#include "AegiaPhysicsUtility.h"
 
 class ControllerAllocator : public NxUserAllocator 
 {

@@ -39,26 +39,26 @@
 #include "ZEMath/Vector.h"
 
 #include "Physics/PhysicsModule.h"
-#include "Physics/AegiaPhysicsModule.h"
-#include "Physics/AegiaPhysicsModuleDescription.h"
+#include "AegiaPhysicsModule.h"
+#include "AegiaPhysicsModuleDescription.h"
 
 #include "Physics/PhysicsWorld.h"
-#include "Physics/AegiaPhysicsWorld.h"
+#include "AegiaPhysicsWorld.h"
 
 #include "Physics/PhysicsBody.h"
-#include "Physics/AegiaPhysicsBody.h"
+#include "AegiaPhysicsBody.h"
 
 #include "Physics/PhysicsJoint.h"
-#include "Physics/AegiaPhysicsJoint.h"
+#include "AegiaPhysicsJoint.h"
 
 #include "Physics/PhysicsVehicle.h"
-#include "Physics/AegiaPhysicsVehicle.h"
+#include "AegiaPhysicsVehicle.h"
 
 #include "Physics/PhysicsMaterial.h"
-#include "Physics/AegiaPhysicsMaterial.h"
+#include "AegiaPhysicsMaterial.h"
 
 #include "Physics/PhysicsCharacterController.h"
-#include "Physics/AegiaPhysicsCharacterController.h"
+#include "AegiaPhysicsCharacterController.h"
 
 ZEModuleDescription* ZEAegiaPhysicsModule::GetModuleDescription()
 {

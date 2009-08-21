@@ -41,7 +41,7 @@ class ZEPhysicsJoint;
 class ZEPhysicsJointInfo;
 class ZEVector3;
 class NxJoint;
-#include "Physics/AegiaPhysicsUtility.h"
+#include "AegiaPhysicsUtility.h"
 
 class ZEAegiaPhysicsJoint : public ZEPhysicsJoint
 {
