@@ -90,7 +90,7 @@
 	}\
 	const ZEEntityAttribute* EntityName##Description::GetAttributes(size_t* Count)\
 	{
-
+#define ZE_ENTITY_ATTRIBUTE(Name, SetFunction, GetFunction);
 	#define ZE_ENTITY_ATTRIBUTE_ENUMURATOR_START(EnumuratorName)\
 		static ZEEntityAttributeEnumurator EnumuratorName##Description[] = {
 	#define ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT(EnumuratorName, Value) {EnumuratorName, Value},

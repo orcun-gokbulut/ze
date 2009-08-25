@@ -260,7 +260,7 @@ ZETexture3DResource::ZETexture3DResource()
 ZETexture3DResource::~ZETexture3DResource()
 {
 	if (Texture != NULL)
-		delete Texture;
+		Texture->Destroy();
 };
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -476,5 +476,5 @@ ZETextureCubeResource::ZETextureCubeResource()
 ZETextureCubeResource::~ZETextureCubeResource()
 {
 	if (Texture != NULL)
-		delete Texture;
+		Texture->Destroy();
 };
