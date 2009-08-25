@@ -221,31 +221,42 @@ bool ReadPhysicalShapesFromFile(ZEArray<ZEModelResourcePhysicalShape>* Shapes, Z
 			}
 			case ZE_PST_CONVEX:
 			{
-				PhysicalShape->Convex.Scale = PhysicalShapeChunk.Convex.Scale;
-				PhysicalShape->Convex.Vertices.Clear();
-				for (int i=0;i<PhysicalShapeChunk.Convex.Vertices.GetCount();i++)
+				ZEDWORD ChunkId;
+				ResourceFile.Read(&ChunkId, sizeof(ZEDWORD), 1);
+				if (ChunkId != ZE_MDLF_PHYSICAL_VERTEX_CHUNKID)
 				{
-					PhysicalShape->Convex.Vertices.Add(PhysicalShapeChunk.Convex.Vertices[i]);
+					zeError("Model Resource", "Corrupted ZEModel file. Physical vertex chunk id does not matches.\r\n");
+					return false;
 				}
+				
+				PhysicalShape->Convex.Vertices.SetCount(PhysicalShapeChunk.Convex.VertexCount);
+				ResourceFile.Read(PhysicalShape->Convex.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalShape->Convex.Vertices.GetCount());
 				break;
 			}
 			case ZE_PST_TRIMESH:
 			{
-				PhysicalShape->Trimesh.Scale = PhysicalShapeChunk.Trimesh.Scale;
-				PhysicalShape->Trimesh.Vertices.Clear();
-				for (int i=0;i<PhysicalShapeChunk.Trimesh.Vertices.GetCount();i++)
+				//vertices
+				ZEDWORD ChunkId;
+				ResourceFile.Read(&ChunkId, sizeof(ZEDWORD), 1);
+				if (ChunkId != ZE_MDLF_PHYSICAL_VERTEX_CHUNKID)
 				{
-					PhysicalShape->Trimesh.Vertices.Add(PhysicalShapeChunk.Trimesh.Vertices[i]);
+					//zeError("Model Resource", "Corrupted ZEModel file. Physical vertex chunk id does not matches.\r\n");
+					return false;
 				}
-				PhysicalShape->Trimesh.Indices.Clear();
-				for (int i=0;i<PhysicalShapeChunk.Trimesh.Indices.GetCount();i++)
+				
+				PhysicalShape->Trimesh.Vertices.SetCount(PhysicalShapeChunk.Trimesh.VertexCount);
+				ResourceFile.Read(PhysicalShape->Trimesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalShape->Trimesh.Vertices.GetCount());
+				
+				//indices
+				ResourceFile.Read(&ChunkId, sizeof(ZEDWORD), 1);
+				if (ChunkId != ZE_MDLF_PHYSICAL_INDEX_CHUNKID)
 				{
-					ZEModelResourcePhysicalPolygon p;
-					p.VertexIndexes[0] = PhysicalShapeChunk.Trimesh.Indices[i].VertexIndexes[0];
-					p.VertexIndexes[1] = PhysicalShapeChunk.Trimesh.Indices[i].VertexIndexes[1];
-					p.VertexIndexes[2] = PhysicalShapeChunk.Trimesh.Indices[i].VertexIndexes[2];
-					PhysicalShape->Trimesh.Indices.Add(p);
+					//zeError("Model Resource", "Corrupted ZEModel file. Physical index chunk id does not matches.\r\n");
+					return false;
 				}
+				
+				PhysicalShape->Trimesh.Indices.SetCount(PhysicalShapeChunk.Trimesh.IndexCount);
+				ResourceFile.Read(PhysicalShape->Trimesh.Indices.GetCArray(), sizeof(ZEModelFilePhysicalPolygon), PhysicalShape->Trimesh.Indices.GetCount());
 				break;
 			}
 			default:

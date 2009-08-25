@@ -49,6 +49,8 @@
 #define	ZE_MDLF_BONE_CHUNKID					((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'BONE'))
 #define	ZE_MDLF_MESH_LOD_CHUNKID				((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'LOD '))
 #define	ZE_MDLF_PHYSICAL_SHAPE_CHUNKID			((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'PHSH'))
+#define ZE_MDLF_PHYSICAL_VERTEX_CHUNKID         ((ZEDWORD)(ZE_MDLF_PHYSICAL_SHAPE_CHUNKID + (ZEDWORD)'VRTX'))
+#define ZE_MDLF_PHYSICAL_INDEX_CHUNKID          ((ZEDWORD)(ZE_MDLF_PHYSICAL_SHAPE_CHUNKID + (ZEDWORD)'INDX'))
 #define	ZE_MDLF_ANIMATION_CHUNKID				((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'ANIM'))
 #define	ZE_MDLF_ANIMATION_KEYFRAME_CHUNKID		((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'ANKF'))
 
@@ -125,8 +127,8 @@ struct ZEModelFilePhysicalPolygon
 
 struct ZEModelFilePhysicalShapeChunk
 {
-	ZEDWORD								Type;
 	ZEDWORD								ChunkId;
+	ZEDWORD								Type;
 	ZEVector3							LocalPosition;
 	ZEQuaternion						LocalOrientation;
 	ZEModelFilePhysicalMaterialChunk	Material;
@@ -163,20 +165,18 @@ struct ZEModelFilePhysicalShapeChunk
 			float						Radius;
 			float						Height;
 		} Capsule;
+
+		struct
+		{
+			ZEDWORD						VertexCount;
+		} Convex;
+
+		struct
+		{
+			ZEDWORD						VertexCount;
+			ZEDWORD						IndexCount;
+		} Trimesh;
 	};
-
-	struct
-	{
-		ZEArray<ZEVector3>			Vertices;
-		ZEVector3                   Scale;
-	} Convex;
-
-	struct
-	{
-		ZEArray<ZEVector3>						Vertices;
-		ZEArray<ZEModelFilePhysicalPolygon>	    Indices;
-		ZEVector3                               Scale;
-	} Trimesh;
 };
 
 struct ZEModelFilePhysicalBodyChunk

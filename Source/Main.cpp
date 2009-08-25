@@ -150,7 +150,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Brush->SetSkyTexture("cubetest.tga");
 		Brush->SetSkyColor(ZEVector3(1.0f, 1.0f, 1.0f));
 		Scene->AddEntity(Brush);*/
-		Scene->Load("Map00.zeScene");	
+		//Scene->Load("Map00.zeScene");	
+
 		zeCore->Run();
 	}
 }

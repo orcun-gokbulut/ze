@@ -174,7 +174,7 @@ struct ZEModelResourcePhysicalBody
 	ZEVector3									Position;
 	ZEQuaternion								Orientation;
 	ZEVector3									MassCenter;
-	ZEArray<ZEModelResourcePhysicalShape>		Shapes;	
+	ZEArray<ZEModelResourcePhysicalShape>		Shapes;
 };
 
 struct ZEModelResourcePhysicalJoint

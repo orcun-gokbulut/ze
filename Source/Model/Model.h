@@ -42,6 +42,7 @@
 #include "Core/Component.h"
 #include "Graphics/RenderList.h"
 #include "ModelResource.h"
+#include "Physics/PhysicsBody.h"
 
 enum ZEModelAnimationState
 {
@@ -267,7 +268,9 @@ class ZEModel : public ZEComponent
 		bool								Visibility;
 		bool								AutoLOD;
 		size_t								ActiveLOD;
+
 		bool								PhysicsEnabled;
+		ZEPhysicsBody*                      PhysicsBody;
 
 		ZEModelAnimationType				AnimationType;
 		ZEModelAnimationState				AnimationState;
