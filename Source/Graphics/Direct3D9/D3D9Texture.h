@@ -94,7 +94,7 @@ class ZED3D9CubeTexture : public ZECubeTexture, public ZED3D9ComponentBase
 		virtual void					DeviceLost();
 		virtual bool					DeviceRestored();
 
-		virtual bool					Create(int EdgeLenght, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
+		virtual bool					Create(int EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
 		virtual void					Lock(ZECubeTextureFace Face, void** Buffer, int* Pitch);
 		virtual void					Unlock(ZECubeTextureFace Face);
 		virtual void					Release();

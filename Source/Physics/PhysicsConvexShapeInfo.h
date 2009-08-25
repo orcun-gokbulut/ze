@@ -49,7 +49,6 @@ class ZEPhysicsConvexShapeInfo : public ZEPhysicsShapeInfo
 		ZEPhysicsShapeType		GetType() { return ZEPhysicsShapeInfo::ZE_PST_CONVEX; }
 
 		ZEArray<ZEVector3>		Vertices;
-		ZEVector3				Scale;
 };
 
 #endif

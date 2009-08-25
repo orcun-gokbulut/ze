@@ -172,9 +172,9 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 					for (int i=0; i<(int)ConvexInfo->Vertices.GetCount(); i++)
 					{
 						Verts[i] = TONX(ConvexInfo->Vertices[i]);
-						Verts[i].x *= ConvexInfo->Scale.x;
+						/*Verts[i].x *= ConvexInfo->Scale.x;
 						Verts[i].y *= ConvexInfo->Scale.y;
-						Verts[i].z *= ConvexInfo->Scale.z;
+						Verts[i].z *= ConvexInfo->Scale.z;*/
 					}
 
 					//prepare mesh description
@@ -230,9 +230,9 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 					for (int i=0; i<(int)TrimeshInfo->Vertices.GetCount(); i++)
 					{
 						Verts[i] = TONX(TrimeshInfo->Vertices[i]);
-						Verts[i].x *= TrimeshInfo->Scale.x;
+						/*Verts[i].x *= TrimeshInfo->Scale.x;
 						Verts[i].y *= TrimeshInfo->Scale.y;
-						Verts[i].z *= TrimeshInfo->Scale.z;
+						Verts[i].z *= TrimeshInfo->Scale.z;*/
 					}
 
 					//prepare indexes

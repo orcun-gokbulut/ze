@@ -56,7 +56,7 @@ float ZELineSegment::Length(const ZELineSegment& LineSegment)
 	return ZEVector3::Length(LineSegment.v);
 }
 
-float ZELineSegment::GetLenght() const
+float ZELineSegment::GetLength() const
 {
 	return ZEVector3::Length(this->v);
 }

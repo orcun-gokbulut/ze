@@ -132,7 +132,7 @@ class ZECubeTexture : public ZETextureBase
 
 	public:
 		virtual ZETextureType			GetTextureType() const;
-		int								GetEdgeLenght() const;
+		int								GetEdgeLength() const;
 		ZETexturePixelFormat			GetPixelFormat() const;
 		bool							IsRenderTarget() const;
 

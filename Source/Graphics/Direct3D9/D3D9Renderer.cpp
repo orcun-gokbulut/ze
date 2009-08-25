@@ -613,7 +613,7 @@ bool ZED3D9TextureRenderer::SetOutput(ZECubeTexture* Texture, ZECubeTextureFace 
 	OutputTexture = NULL;
 
 	LPDIRECT3DCUBETEXTURE9 D3DTexture = ((ZED3D9CubeTexture*)Texture)->CubeTexture;
-	CreateDepthRenderTarget(&RenderZBufferRT, Texture->GetEdgeLenght(), Texture->GetEdgeLenght());
+	CreateDepthRenderTarget(&RenderZBufferRT, Texture->GetEdgeLength(), Texture->GetEdgeLength());
 
 	if (RenderColorBufferRT != NULL)
 		RenderColorBufferRT->Release();
@@ -797,7 +797,7 @@ bool ZED3D9ShadowRenderer::SetOutput(ZECubeTexture* Texture, ZECubeTextureFace F
 	}
 
 
-	if (!CreateRenderTarget(&RenderColorBufferRT, Texture->GetEdgeLenght(), Texture->GetEdgeLenght(), ZE_TPF_ARGB32))
+	if (!CreateRenderTarget(&RenderColorBufferRT, Texture->GetEdgeLength(), Texture->GetEdgeLength(), ZE_TPF_ARGB32))
 		return false;
 	
 	return true;

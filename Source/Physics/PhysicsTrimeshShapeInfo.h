@@ -50,7 +50,6 @@ class ZEPhysicsTrimeshShapeInfo : public ZEPhysicsShapeInfo
 
 		ZEArray<ZEVector3>		Vertices;
 		ZEArray<unsigned int>	Indexes;
-		ZEVector3				Scale;
 };
 
 #endif

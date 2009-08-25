@@ -70,10 +70,9 @@ enum ZEPhysicalShapeType
 	ZE_PST_PLANE            = 0,
 	ZE_PST_BOX				= 1,
 	ZE_PST_SPHERE			= 2,
-	ZE_PST_CYLINDER			= 3,
-	ZE_PST_CAPSULE			= 4,
-	ZE_PST_CONVEX			= 5,
-	ZE_PST_TRIMESH          = 6
+	ZE_PST_CAPSULE			= 3,
+	ZE_PST_CONVEX			= 4,
+	ZE_PST_TRIMESH          = 5
 };
 
 enum ZEPhysicalBodyType
@@ -128,9 +127,9 @@ struct ZEModelResourcePhysicalShape
 
 		struct
 		{
-			float						Widht;
+			float						Width;
 			float						Height;
-			float						Lenght;
+			float						Length;
 		} Box;
 
 		struct
@@ -148,14 +147,12 @@ struct ZEModelResourcePhysicalShape
 	struct
 	{
 		ZEArray<ZEVector3>			Vertices;
-		ZEVector3                   Scale;
 	} Convex;
 
 	struct
 	{
 		ZEArray<ZEVector3>						Vertices;
 		ZEArray<ZEModelResourcePhysicalPolygon>	Indices;
-		ZEVector3                               Scale;
 	} Trimesh;
 };
 

@@ -106,7 +106,7 @@ ZETextureType ZECubeTexture::GetTextureType() const
 	return ZE_TT_CUBE;
 }
 
-int ZECubeTexture::GetEdgeLenght() const
+int ZECubeTexture::GetEdgeLength() const
 {
 	return EdgeLength;
 }

@@ -37,6 +37,16 @@
 #include "ModelFileFormat.h"
 #include <stdio.h>
 #include "Core/Core.h"
+#include "Physics/PhysicsModule.h"
+#include "Physics/PhysicsBodyInfo.h"
+#include "Physics/PhysicsShapeInfo.h"
+#include "Physics/PhysicsBoxShapeInfo.h"
+#include "Physics/PhysicsCapsuleShapeInfo.h"
+#include "Physics/PhysicsConvexShapeInfo.h"
+#include "Physics/PhysicsPlaneShapeInfo.h"
+#include "Physics/PhysicsSphereShapeInfo.h"
+#include "Physics/PhysicsTrimeshShapeInfo.h"
+#include "Physics/PhysicsMaterial.h"
 
 void ZEModelMeshLOD::ResetMaterial()
 {
@@ -319,7 +329,128 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 
 	LODs.SetCount(MeshResource->LODs.GetCount());
 	for (size_t I = 0; I < MeshResource->LODs.GetCount(); I++)
-		LODs[I].Initialize(Owner, this, &MeshResource->LODs[I]);	
+		LODs[I].Initialize(Owner, this, &MeshResource->LODs[I]);
+
+	//init phy
+	ZEPhysicsBodyInfo BodyInfo;
+	BodyInfo.Mass = MeshResource->PhysicalBody.Mass;
+	BodyInfo.Position = MeshResource->PhysicalBody.Position;
+	BodyInfo.Orientation = MeshResource->PhysicalBody.Orientation;
+	BodyInfo.Kinematic = MeshResource->PhysicalBody.Kinematic;
+	BodyInfo.LinearDamp = MeshResource->PhysicalBody.LinearDamp;
+	BodyInfo.AngularDamp = MeshResource->PhysicalBody.AngularDamp;
+	for (size_t j = 0; j < MeshResource->PhysicalBody.Shapes.GetCount(); j++)
+	{
+		ZEModelResourcePhysicalShape Shape = MeshResource->PhysicalBody.Shapes[j];
+		switch (Shape.Type)
+		{
+			case ZE_PST_PLANE:
+			{
+				ZEPhysicsPlaneShapeInfo PlaneShapeInfo;
+				PlaneShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
+				PlaneShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
+				PlaneShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
+				PlaneShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				//PlaneShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
+				PlaneShapeInfo.LocalPosition = Shape.LocalPosition;
+				PlaneShapeInfo.Trigger = Shape.Trigger;
+
+				PlaneShapeInfo.Height = Shape.Plane.Height;
+				PlaneShapeInfo.Normal.x = Shape.Plane.NormalX;
+				PlaneShapeInfo.Normal.y = Shape.Plane.NormalY;
+				PlaneShapeInfo.Normal.z = Shape.Plane.NormalZ;
+
+				BodyInfo.ShapeInfos.Add(&PlaneShapeInfo);
+				break;
+			}
+			case ZE_PST_BOX:
+			{
+				ZEPhysicsBoxShapeInfo BoxShapeInfo;
+				BoxShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
+				BoxShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
+				BoxShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
+				BoxShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				//BoxShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
+				BoxShapeInfo.LocalPosition = Shape.LocalPosition;
+				BoxShapeInfo.Trigger = Shape.Trigger;
+
+				BoxShapeInfo.Dimensions.x = Shape.Box.Width;
+				BoxShapeInfo.Dimensions.y = Shape.Box.Height;
+				BoxShapeInfo.Dimensions.z = Shape.Box.Length;
+				BodyInfo.ShapeInfos.Add(&BoxShapeInfo);
+				break;
+			}
+			case ZE_PST_SPHERE:
+			{
+				ZEPhysicsSphereShapeInfo SphereShapeInfo;
+				SphereShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
+				SphereShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
+				SphereShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
+				SphereShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				//SphereShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
+				SphereShapeInfo.LocalPosition = Shape.LocalPosition;
+				SphereShapeInfo.Trigger = Shape.Trigger;
+
+				SphereShapeInfo.Radius = Shape.Sphere.Radius;
+				BodyInfo.ShapeInfos.Add(&SphereShapeInfo);
+				break;
+			}
+			case ZE_PST_CAPSULE:
+			{
+				ZEPhysicsCapsuleShapeInfo CapsuleShapeInfo;
+				CapsuleShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
+				CapsuleShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
+				CapsuleShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
+				CapsuleShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				//CapsuleShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
+				CapsuleShapeInfo.LocalPosition = Shape.LocalPosition;
+				CapsuleShapeInfo.Trigger = Shape.Trigger;
+
+				CapsuleShapeInfo.Height = Shape.Capsule.Height;
+				CapsuleShapeInfo.Radius = Shape.Capsule.Radius;
+				BodyInfo.ShapeInfos.Add(&CapsuleShapeInfo);
+				break;
+			}
+			case ZE_PST_CONVEX:
+			{
+				ZEPhysicsConvexShapeInfo ConvexShapeInfo;
+				ConvexShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
+				ConvexShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
+				ConvexShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
+				ConvexShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				//ConvexShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
+				ConvexShapeInfo.LocalPosition = Shape.LocalPosition;
+				ConvexShapeInfo.Trigger = Shape.Trigger;
+
+				ConvexShapeInfo.Vertices = Shape.Convex.Vertices;
+				BodyInfo.ShapeInfos.Add(&ConvexShapeInfo);
+				break;
+			}
+			case ZE_PST_TRIMESH:
+			{
+				ZEPhysicsTrimeshShapeInfo TrimeshShapeInfo;
+				TrimeshShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
+				TrimeshShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
+				TrimeshShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
+				TrimeshShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				//TrimeshShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
+				TrimeshShapeInfo.LocalPosition = Shape.LocalPosition;
+				TrimeshShapeInfo.Trigger = Shape.Trigger;
+
+				TrimeshShapeInfo.Vertices = Shape.Trimesh.Vertices;
+				for (int i=0;i<Shape.Trimesh.Indices.GetCount();i++)
+				{
+					TrimeshShapeInfo.Indexes.Add(Shape.Trimesh.Indices[i].VertexIndexes[0]);
+					TrimeshShapeInfo.Indexes.Add(Shape.Trimesh.Indices[i].VertexIndexes[1]);
+					TrimeshShapeInfo.Indexes.Add(Shape.Trimesh.Indices[i].VertexIndexes[2]);
+				}
+				BodyInfo.ShapeInfos.Add(&TrimeshShapeInfo);
+				break;
+			}
+		}
+	}
+	PhysicalBody = zePhysics->CreateBody();
+	PhysicalBody->Initialize(BodyInfo);
 }
 
 void ZEModelMesh::Deinitialize()
@@ -702,7 +833,9 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 
 	Meshes.SetCount(ModelResource->Meshes.GetCount());
 	for (size_t I = 0; I < ModelResource->Meshes.GetCount(); I++)
+	{
 		Meshes[I].Initialize(this, &ModelResource->Meshes[I]);
+	}
 
 	BoneTransforms.SetCount(ModelResource->Bones.GetCount());
 	Bones.SetCount(ModelResource->Bones.GetCount());

@@ -106,6 +106,8 @@ class ZEModelMesh
 		ZEMatrix4x4							WorldTransform;
 
 		bool								PhysicsEnabled;
+		ZEPhysicsBody*						PhysicalBody;
+
 		bool								AutoLOD;
 		size_t								ActiveLOD;
 
@@ -117,7 +119,6 @@ class ZEModelMesh
 
 		ZEModelAnimationType				AnimationType;
 		bool								Visible;		
-		void*								PhysicalBody;
 
 		ZEArray<ZEModelMeshLOD>				LODs;
 
@@ -268,9 +269,7 @@ class ZEModel : public ZEComponent
 		bool								Visibility;
 		bool								AutoLOD;
 		size_t								ActiveLOD;
-
 		bool								PhysicsEnabled;
-		ZEPhysicsBody*                      PhysicsBody;
 
 		ZEModelAnimationType				AnimationType;
 		ZEModelAnimationState				AnimationState;

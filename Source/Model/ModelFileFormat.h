@@ -154,9 +154,9 @@ struct ZEModelFilePhysicalShapeChunk
 
 		struct
 		{
-			float						Widht;
+			float						Width;
 			float						Height;
-			float						Lenght;
+			float						Length;
 		} Box;
 
 		struct

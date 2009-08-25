@@ -72,7 +72,7 @@ ZEPoint3 ZEAABoundingBox::GetVertex(unsigned char Index) const
 	return Vertex;
 }
 
-float ZEAABoundingBox::GetLenght() const
+float ZEAABoundingBox::GetLength() const
 {
 	ZEVector3 Temp;
 	ZEVector3::Sub(Temp, Max, Min);

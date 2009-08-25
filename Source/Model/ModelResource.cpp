@@ -203,9 +203,9 @@ bool ReadPhysicalShapesFromFile(ZEArray<ZEModelResourcePhysicalShape>* Shapes, Z
 			}
 			case ZE_PST_BOX:
 			{
-				PhysicalShape->Box.Widht = PhysicalShapeChunk.Box.Widht;
+				PhysicalShape->Box.Width = PhysicalShapeChunk.Box.Width;
 				PhysicalShape->Box.Height = PhysicalShapeChunk.Box.Height;
-				PhysicalShape->Box.Lenght = PhysicalShapeChunk.Box.Lenght;
+				PhysicalShape->Box.Length = PhysicalShapeChunk.Box.Length;
 				break;
 			}
 			case ZE_PST_SPHERE:
