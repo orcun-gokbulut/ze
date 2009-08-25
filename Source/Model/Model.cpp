@@ -1071,6 +1071,40 @@ void ZEModel::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& L
 {
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Draw(Renderer, Lights);
+
+	SkeletonPointsVertexBuffer.Clean();
+	SkeletonVertexBuffer.Clean();
+	if (DrawSkeleton)
+	{
+		ZEVector3 BonePosition1, BonePosition2;
+		for (size_t I = 0; I < Bones.GetCount(); I++)
+		{
+			ZEMatrix4x4::Transform(BonePosition1, Bones[I].GetModelTransform(), ZEVector3(0.0f, 0.0f, 0.0f));
+			SkeletonPointsVertexBuffer.AddPoint(BonePosition1);
+			if (Bones[I].GetChildBones().GetCount() != 0)	
+			{
+				ZEMatrix4x4::Transform(BonePosition2, Bones[I].GetModelTransform(), Bones[I].GetChildBones()[0]->GetRelativePosition());
+				SkeletonVertexBuffer.AddLine(BonePosition1, BonePosition2);
+			}
+		}
+		Renderer->AddToRenderList(&SkeletonPointsRenderList);
+		Renderer->AddToRenderList(&SkeletonRenderList);
+	}
+
+	if (DrawPhysicalBodies)
+	{
+		/*for (size_t I = 0; I < Meshes.GetCount(); I++)
+		{
+			if (Meshes[I].PhysicsEnabled)
+			{
+				switch(Meshes[I].PhysicalBody.
+			}
+		}*/
+	}
+
+	if (DrawPhysicalJoints)
+	{
+	}
 }
 
 void ZEModel::Tick(float ElapsedTime)

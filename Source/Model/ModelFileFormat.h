@@ -37,11 +37,21 @@
 #ifndef __ZE_MODEL_FILE_FORMAT_H__
 #define __ZE_MODEL_FILE_FORMAT_H__
 
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "ZEMath/AABoundingBox.h"
+#include "ZEDS/Array.h"
+
+#ifdef __ZINEK_ENGINE__
+#include "Definitions.h"
+#include "Types.h"
+#endif
+
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256
 
 #define ZE_FILE_MAKEVERSION(Major, Minor)		((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor))
-#define ZE_MDLF_VERSION							ZE_FILE_MAKEVERSION(0,31)
+#define ZE_MDLF_VERSION							ZE_FILE_MAKEVERSION(0,40)
 #define ZE_MDLF_HEADER							((ZEDWORD)((ZEDWORD)'ZEMF' + (ZEDWORD)'MDL '))
 
 #define	ZE_MDLF_MATERIAL_CHUNKID				((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'MTRL'))
@@ -49,10 +59,10 @@
 #define	ZE_MDLF_BONE_CHUNKID					((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'BONE'))
 #define	ZE_MDLF_MESH_LOD_CHUNKID				((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'LOD '))
 #define	ZE_MDLF_PHYSICAL_SHAPE_CHUNKID			((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'PHSH'))
-#define ZE_MDLF_PHYSICAL_VERTEX_CHUNKID         ((ZEDWORD)(ZE_MDLF_PHYSICAL_SHAPE_CHUNKID + (ZEDWORD)'VRTX'))
-#define ZE_MDLF_PHYSICAL_INDEX_CHUNKID          ((ZEDWORD)(ZE_MDLF_PHYSICAL_SHAPE_CHUNKID + (ZEDWORD)'INDX'))
+#define ZE_MDLF_PHYSICAL_SHAPE_VERTEX_CHUNKID	((ZEDWORD)(ZE_MDLF_PHYSICAL_SHAPE_CHUNKID + (ZEDWORD)'VRTX'))
+#define ZE_MDLF_PHYSICAL_SHAPE_INDEX_CHUNKID	((ZEDWORD)(ZE_MDLF_PHYSICAL_SHAPE_CHUNKID + (ZEDWORD)'INDX'))
 #define	ZE_MDLF_ANIMATION_CHUNKID				((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'ANIM'))
-#define	ZE_MDLF_ANIMATION_KEYFRAME_CHUNKID		((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'ANKF'))
+#define	ZE_MDLF_ANIMATION_KEYFRAME_CHUNKID		((ZEDWORD)(ZE_MDLF_ANIMATION_CHUNKID + (ZEDWORD)'ANKF'))
 
 struct ZEModelFileMaterialChunk
 {
@@ -113,16 +123,9 @@ struct ZEModelFileAnimationFrameChunk
 	ZEDWORD								MeshKeyCount;
 };
 
-
-struct ZEModelFilePhysicalMaterialChunk
-{
-	float				Restitution;
-	float				Friction;
-};
-
 struct ZEModelFilePhysicalPolygon
-{
-	int					VertexIndexes[3];
+{	
+	int									VertexIndexes[3];
 };
 
 struct ZEModelFilePhysicalShapeChunk
@@ -131,7 +134,8 @@ struct ZEModelFilePhysicalShapeChunk
 	ZEDWORD								Type;
 	ZEVector3							LocalPosition;
 	ZEQuaternion						LocalOrientation;
-	ZEModelFilePhysicalMaterialChunk	Material;
+	float								Restitution;
+	float								Friction;
 	ZEDWORD								Mask1;
 	ZEDWORD								Mask2;
 	ZEDWORD								Mask3;
@@ -181,7 +185,7 @@ struct ZEModelFilePhysicalShapeChunk
 
 struct ZEModelFilePhysicalBodyChunk
 {
-	ZEPhysicalBodyType                  Type;
+	ZEDWORD				                BodyType;
 	float								Mass;
 	bool								Kinematic;
 	float								LinearDamp;
@@ -194,122 +198,121 @@ struct ZEModelFilePhysicalBodyChunk
 
 struct ZEModelFilePhysicalJointChunk
 {
-	ZEPhysicalJointType Type;
-	ZEDWORD		Body1Id;
-	ZEDWORD		Body2Id;
-	bool		CollideBodies;
-	ZEVector3	GlobalAnchor;
-	bool		UseGlobalAnchor;
-	ZEVector3   GlobalAxis;
-	bool		UseGlobalAxis;
-	ZEVector3	LocalAnchor1;
-	ZEVector3	LocalAnchor2;
-	ZEVector3	LocalAxis1;
-	ZEVector3	LocalAxis2;
-	bool		Breakable;
-	float		BreakForce;
-	float		BreakTorque;
+	ZEDWORD								Type;
+	ZEDWORD								Body1Id;
+	ZEDWORD								Body2Id;
+	bool								CollideBodies;
+	ZEVector3							GlobalAnchor;
+	bool								UseGlobalAnchor;
+	ZEVector3							GlobalAxis;
+	bool								UseGlobalAxis;
+	ZEVector3							LocalAnchor1;
+	ZEVector3							LocalAnchor2;
+	ZEVector3							LocalAxis1;
+	ZEVector3							LocalAxis2;
+	bool								Breakable;
+	float								BreakForce;
+	float								BreakTorque;
 
 	union
 	{
 		struct
 		{
-			bool SwingLimit;
-			float SwingLimitValue;
-			float SwingLimitRestitution;
-			bool TwistLimit;
-			float TwistLimitLowValue;
-			float TwistLimitHighValue;
-			float TwistLimitRestitution;
+			bool						SwingLimit;
+			float						SwingLimitValue;
+			float						SwingLimitRestitution;
+			bool						TwistLimit;
+			float						TwistLimitLowValue;
+			float						TwistLimitHighValue;
+			float						TwistLimitRestitution;
 		} Spherical;
 
 		struct
 		{
-			bool HasLimit;
-			float LimitLowValue;
-			float LimitHighValue;
-			float LimitRestitution;
-			bool HasSpring;
-			float SpringValue;
-			float SpringDamper;
-			float SpringTarget;
-			bool HasMotor;
-			float MotorForce;
-			float MotorVelocity;
+			bool						HasLimit;
+			float						LimitLowValue;
+			float 						LimitHighValue;
+			float 						LimitRestitution;
+			bool 						HasSpring;
+			float 						SpringValue;
+			float 						SpringDamper;
+			float 						SpringTarget;
+			bool 						HasMotor;
+			float 						MotorForce;
+			float 						MotorVelocity;
 		} Revolute;
 
 		struct
 		{
-			bool HasMinLimit;
-			float MinDistance;
-			bool HasMaxLimit;
-			float MaxDistance;
-			bool HasSpring;
-			float SpringValue;
-			float SpringDamper;
+			bool 						HasMinLimit;
+			float 						MinDistance;
+			bool 						HasMaxLimit;
+			float 						MaxDistance;
+			bool 						HasSpring;
+			float 						SpringValue;
+			float 						SpringDamper;
 		} Distance;
 	};
 
 	struct
 	{
-		ZEVector3 Pulley1;
-		ZEVector3 Pulley2;
-		float Distance;
-		float Ratio;
-		float Stiffness;
-		bool IsRigid;
-		bool HasMotor;
-		float MotorForce;
-		float MotorVelocity;
+		ZEVector3 						Pulley1;
+		ZEVector3 						Pulley2;
+		float 							Distance;
+		float 							Ratio;
+		float 							Stiffness;
+		bool 							IsRigid;
+		bool 							HasMotor;
+		float 							MotorForce;
+		float 							MotorVelocity;
 	} Pulley;
 
 	struct
 	{
-		ZEDWORD XMotion;
-		ZEDWORD YMotion;
-		ZEDWORD ZMotion;
-		ZEDWORD TwistMotion;
-		ZEDWORD SwingMotion1;
-		ZEDWORD SwingMotion2;
-		float LinearLimitValue;
-		float LinearLimitRestitution;
-		float LinearLimitSpring;
-		float LinearLimitDamper;
-		float TwistLimitHighValue;
-		float TwistLimitLowValue;
-		float TwistLimitRestitution;
-		float TwistLimitSpring;
-		float TwistLimitDamper;
-		float Swing1LimitValue;
-		float Swing1LimitRestitution;
-		float Swing1LimitSpring;
-		float Swing1LimitDamper;
-		float Swing2LimitValue;
-		float Swing2LimitRestitution;
-		float Swing2LimitSpring;
-		float Swing2LimitDamper;
-		ZEVector3 LinearMotorPosition;
-		ZEVector3 LinearMotorVelocity;
-		ZEDWORD LinearXMotor;
-		float LinearXMotorForce;
-		float LinearXMotorSpring;
-		float LinearXMotorDamper;
-		ZEDWORD LinearYMotor;
-		float LinearYMotorForce;
-		float LinearYMotorSpring;
-		float LinearYMotorDamper;
-		ZEDWORD LinearZMotor;
-		float LinearZMotorForce;
-		float LinearZMotorSpring;
-		float LinearZMotorDamper;
-		ZEDWORD AngularMotor;
-		ZEQuaternion AngularMotorOrientation;
-		ZEVector3 AngularMotorVelocity;
-		float AngularMotorForce;
-		float AngularMotorSpring;
-		float AngularMotorDamper;
+		ZEDWORD 						XMotion;
+		ZEDWORD 						YMotion;
+		ZEDWORD 						ZMotion;
+		ZEDWORD 						TwistMotion;
+		ZEDWORD 						SwingMotion1;
+		ZEDWORD 						SwingMotion2;
+		float 							LinearLimitValue;
+		float 							LinearLimitRestitution;
+		float 							LinearLimitSpring;
+		float 							LinearLimitDamper;
+		float 							TwistLimitHighValue;
+		float 							TwistLimitLowValue;
+		float 							TwistLimitRestitution;
+		float 							TwistLimitSpring;
+		float 							TwistLimitDamper;
+		float 							Swing1LimitValue;
+		float 							Swing1LimitRestitution;
+		float 							Swing1LimitSpring;
+		float 							Swing1LimitDamper;
+		float 							Swing2LimitValue;
+		float 							Swing2LimitRestitution;
+		float 							Swing2LimitSpring;
+		float 							Swing2LimitDamper;
+		ZEVector3 						LinearMotorPosition;
+		ZEVector3 						LinearMotorVelocity;
+		ZEDWORD 						LinearXMotor;
+		float 							LinearXMotorForce;
+		float 							LinearXMotorSpring;
+		float 							LinearXMotorDamper;
+		ZEDWORD 						LinearYMotor;
+		float 							LinearYMotorForce;
+		float 							LinearYMotorSpring;
+		float 							LinearYMotorDamper;
+		ZEDWORD 						LinearZMotor;
+		float							LinearZMotorForce;
+		float 							LinearZMotorSpring;
+		float 							LinearZMotorDamper;
+		ZEDWORD 						AngularMotor;
+		ZEQuaternion 					AngularMotorOrientation;
+		ZEVector3 						AngularMotorVelocity;
+		float 							AngularMotorForce;
+		float 							AngularMotorSpring;
+		float 							AngularMotorDamper;
 	} Free;
-
 };
 
 struct ZEModelFileMeshLODChunk

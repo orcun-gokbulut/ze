@@ -98,15 +98,9 @@ enum ZEPhysicalJointType
 	ZE_PJT_FREE				= 9
 };
 
-struct ZEModelResourcePhysicalMaterial
-{
-	float				Restitution;
-	float				Friction;
-};
-
 struct ZEModelResourcePhysicalPolygon
 {
-	int					VertexIndexes[3];
+	int									VertexIndexes[3];
 };
 
 struct ZEModelResourcePhysicalShape
@@ -114,7 +108,8 @@ struct ZEModelResourcePhysicalShape
 	ZEPhysicalShapeType					Type;
 	ZEVector3							LocalPosition;
 	ZEQuaternion						LocalOrientation;
-	ZEModelResourcePhysicalMaterial  	Material;
+	float								Restitution;
+	float								Friction;
 	ZEDWORD								Mask1;
 	ZEDWORD								Mask2;
 	ZEDWORD								Mask3;

@@ -358,7 +358,7 @@ bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 		Bone->RelativeOrientation = BoneChunk.RelativeOrientation;
 		Bone->RelativePosition = BoneChunk.RelativePosition;
 		
-		Bone->PhysicalJoint.Type = BoneChunk.PhysicalJoint.Type;
+		Bone->PhysicalJoint.BodyType = BoneChunk.PhysicalJoint.Type;
 		Bone->PhysicalJoint.Body1Id = BoneChunk.PhysicalJoint.Body1Id;
 		Bone->PhysicalJoint.Body2Id = BoneChunk.PhysicalJoint.Body2Id;
 		Bone->PhysicalJoint.Breakable = BoneChunk.PhysicalJoint.Breakable;

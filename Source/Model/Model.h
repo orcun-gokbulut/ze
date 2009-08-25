@@ -290,6 +290,26 @@ class ZEModel : public ZEComponent
 		void								CalculateBoundingBox();		
 		void								LocalTransformChanged();
 
+		bool								DrawSkeleton;
+		bool								DrawPhysicalBodies;
+		bool								DrawPhysicalJoints;
+
+		ZERenderList						SkeletonRenderList;
+		ZEDefaultMaterial					SkeletonMaterial;
+		ZECanvas							SkeletonVertexBuffer;
+
+		ZERenderList						SkeletonPointsRenderList;
+		ZEDefaultMaterial					SkeletonPointsMaterial;
+		ZECanvas							SkeletonPointsVertexBuffer;
+		
+		static ZERenderList					PhysicalBodiesRenderList;
+		static ZEDefaultMaterial			PhysicalBodiesMaterial;
+		ZECanvas							PhysicalBodiesVertexBuffer;
+
+		static ZERenderList					PhysicalJointsRenderList;
+		static ZEDefaultMaterial			PhysicalJointsMaterial;
+		ZECanvas							PhysicalJointsVertexBuffer;
+
 	public:
 		virtual	bool						IsDrawable();
 
@@ -357,6 +377,14 @@ class ZEModel : public ZEComponent
 		void								UpdateBoundingBox();
 		void								UpdateBoneTransforms();
 
+		void								SetDrawSkeleton(bool Enabled);
+		bool								GetDrawSkeleton();
+
+		void								SetDrawPhysicalBodies(bool Enabled);
+		bool								GetDrawPhysicalBodies();
+
+		void								SetDrawPhysicalJoints(bool Enabled);
+		bool								GetDrawPhysicalJoints();
 
 											ZEModel();
 											~ZEModel();

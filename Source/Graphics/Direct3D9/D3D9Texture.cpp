@@ -72,6 +72,7 @@ bool ZED3D9Texture::DeviceRestored()
 {
 	if (RenderTarget)
 		return Create(Width, Height, PixelFormat, true);
+	return true;
 }
 
 bool ZED3D9Texture::Create(int Width, int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget)
