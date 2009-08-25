@@ -43,6 +43,7 @@
 #include "Graphics/RenderList.h"
 #include "ModelResource.h"
 #include "Physics/PhysicsBody.h"
+#include "Graphics/Canvas.h"
 
 enum ZEModelAnimationState
 {

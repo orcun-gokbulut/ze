@@ -47,7 +47,6 @@ class ZEPhysicsCollision
 								virtual ~ZEPhysicsCollision(){}
 
 	public:
-
 		virtual ZEPhysicsBody*	GetFirstCollider()  = 0;
 		virtual ZEPhysicsBody*	GetSecondCollider() = 0;
 		virtual ZEVector3		GetPoint()          = 0;

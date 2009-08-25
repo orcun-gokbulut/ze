@@ -47,24 +47,6 @@
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256
 
-class ZEModelResourceMeshLOD
-{
-	private:
-		ZEStaticVertexBuffer*				SharedVertexBuffer;
-
-	public:
-		ZEINT32								LODLevel;
-		ZEINT32								MaterialId;
-		ZEArray<ZEModelVertex>				Vertices;
-		ZEArray<ZESkinnedModelVertex>		SkinnedVertices;
-		
-		ZEStaticVertexBuffer*				GetSharedVertexBuffer() const;
-		ZEStaticVertexBuffer*				CreatePrivateVertexBuffer() const;
-
-											ZEModelResourceMeshLOD();
-											~ZEModelResourceMeshLOD();
-};
-
 enum ZEPhysicalShapeType
 {
 	ZE_PST_PLANE            = 0,
@@ -99,30 +81,30 @@ enum ZEPhysicalJointType
 
 struct ZEModelResourcePhysicalPolygon
 {
-	int									VertexIndexes[3];
+	int											VertexIndexes[3];
 };
 
 struct ZEModelResourcePhysicalShape
 {
-	ZEPhysicalShapeType					Type;
-	ZEVector3							LocalPosition;
-	ZEQuaternion						LocalOrientation;
-	float								Restitution;
-	float								Friction;
-	ZEDWORD								Mask1;
-	ZEDWORD								Mask2;
-	ZEDWORD								Mask3;
-	ZEDWORD								Mask4;
-	bool								Trigger;
+	ZEPhysicalShapeType							Type;
+	ZEVector3									LocalPosition;
+	ZEQuaternion								LocalOrientation;
+	float										Restitution;
+	float										Friction;
+	ZEDWORD										Mask1;
+	ZEDWORD										Mask2;
+	ZEDWORD										Mask3;
+	ZEDWORD										Mask4;
+	bool										Trigger;
 	
 	union
 	{
 		struct
 		{
-			float						Height;
-			float                       NormalX;
-			float                       NormalY;
-			float                       NormalZ;
+			float								Height;
+			float								NormalX;
+			float								NormalY;
+			float								NormalZ;
 		} Plane;
 
 		struct
@@ -134,13 +116,13 @@ struct ZEModelResourcePhysicalShape
 
 		struct
 		{
-			float						Radius;
+			float								Radius;
 		} Sphere;
 
 		struct
 		{
-			float						Radius;
-			float						Height;
+			float								Radius;
+			float								Height;
 		} Capsule;
 	};
 
@@ -158,7 +140,7 @@ struct ZEModelResourcePhysicalShape
 
 struct ZEModelResourcePhysicalBody
 {
-	ZEPhysicalBodyType							Type;
+	ZEPhysicalBodyType							BodyType;
 	float										Mass;
 	bool										Kinematic;
 	float										LinearDamp;
@@ -171,147 +153,123 @@ struct ZEModelResourcePhysicalBody
 
 struct ZEModelResourcePhysicalJoint
 {
-	ZEPhysicalJointType Type;
-	ZEDWORD		Body1Id;
-	ZEDWORD		Body2Id;
-	bool		CollideBodies;
-	ZEVector3	GlobalAnchor;
-	bool		UseGlobalAnchor;
-	ZEVector3   GlobalAxis;
-	bool		UseGlobalAxis;
-	ZEVector3	LocalAnchor1;
-	ZEVector3	LocalAnchor2;
-	ZEVector3	LocalAxis1;
-	ZEVector3	LocalAxis2;
-	bool		Breakable;
-	float		BreakForce;
-	float		BreakTorque;
+	ZEDWORD 									JointType;
+	ZEDWORD										Body1Id;
+	ZEDWORD										Body2Id;
+	bool										CollideBodies;
+	ZEVector3									GlobalAnchor;
+	bool										UseGlobalAnchor;
+	ZEVector3 									GlobalAxis;
+	bool										UseGlobalAxis;
+	ZEVector3									LocalAnchor1;
+	ZEVector3									LocalAnchor2;
+	ZEVector3									LocalAxis1;
+	ZEVector3									LocalAxis2;
+	bool										Breakable;
+	float										BreakForce;
+	float										BreakTorque;
 
 	union
 	{
 		struct
 		{
-			bool SwingLimit;
-			float SwingLimitValue;
-			float SwingLimitRestitution;
-			bool TwistLimit;
-			float TwistLimitLowValue;
-			float TwistLimitHighValue;
-			float TwistLimitRestitution;
+			bool 								SwingLimit;
+			float 								SwingLimitValue;
+			float 								SwingLimitRestitution;
+			bool 								TwistLimit;
+			float 								TwistLimitLowValue;
+			float 								TwistLimitHighValue;
+			float 								TwistLimitRestitution;
 		} Spherical;
 
 		struct
 		{
-			bool HasLimit;
-			float LimitLowValue;
-			float LimitHighValue;
-			float LimitRestitution;
-			bool HasSpring;
-			float SpringValue;
-			float SpringDamper;
-			float SpringTarget;
-			bool HasMotor;
-			float MotorForce;
-			float MotorVelocity;
+			bool 								HasLimit;
+			float 								LimitLowValue;
+			float 								LimitHighValue;
+			float 								LimitRestitution;
+			bool 								HasSpring;
+			float 								SpringValue;
+			float 								SpringDamper;
+			float 								SpringTarget;
+			bool 								HasMotor;
+			float 								MotorForce;
+			float 								MotorVelocity;
 		} Revolute;
 
 		struct
 		{
-			bool HasMinLimit;
-			float MinDistance;
-			bool HasMaxLimit;
-			float MaxDistance;
-			bool HasSpring;
-			float SpringValue;
-			float SpringDamper;
+			bool 								HasMinLimit;
+			float 								MinDistance;
+			bool 								HasMaxLimit;
+			float 								MaxDistance;
+			bool 								HasSpring;
+			float 								SpringValue;
+			float 								SpringDamper;
 		} Distance;
 	};
 
 	struct
 	{
-		ZEVector3 Pulley1;
-		ZEVector3 Pulley2;
-		float Distance;
-		float Ratio;
-		float Stiffness;
-		bool IsRigid;
-		bool HasMotor;
-		float MotorForce;
-		float MotorVelocity;
+		ZEVector3 								Pulley1;
+		ZEVector3 								Pulley2;
+		float 									Distance;
+		float 									Ratio;
+		float 									Stiffness;
+		bool 									IsRigid;
+		bool 									HasMotor;
+		float 									MotorForce;
+		float 									MotorVelocity;
 	} Pulley;
 
 	struct
 	{
-		ZEDWORD XMotion;
-		ZEDWORD YMotion;
-		ZEDWORD ZMotion;
-		ZEDWORD TwistMotion;
-		ZEDWORD SwingMotion1;
-		ZEDWORD SwingMotion2;
-		float LinearLimitValue;
-		float LinearLimitRestitution;
-		float LinearLimitSpring;
-		float LinearLimitDamper;
-		float TwistLimitHighValue;
-		float TwistLimitLowValue;
-		float TwistLimitRestitution;
-		float TwistLimitSpring;
-		float TwistLimitDamper;
-		float Swing1LimitValue;
-		float Swing1LimitRestitution;
-		float Swing1LimitSpring;
-		float Swing1LimitDamper;
-		float Swing2LimitValue;
-		float Swing2LimitRestitution;
-		float Swing2LimitSpring;
-		float Swing2LimitDamper;
-		ZEVector3 LinearMotorPosition;
-		ZEVector3 LinearMotorVelocity;
-		ZEDWORD LinearXMotor;
-		float LinearXMotorForce;
-		float LinearXMotorSpring;
-		float LinearXMotorDamper;
-		ZEDWORD LinearYMotor;
-		float LinearYMotorForce;
-		float LinearYMotorSpring;
-		float LinearYMotorDamper;
-		ZEDWORD LinearZMotor;
-		float LinearZMotorForce;
-		float LinearZMotorSpring;
-		float LinearZMotorDamper;
-		ZEDWORD AngularMotor;
-		ZEQuaternion AngularMotorOrientation;
-		ZEVector3 AngularMotorVelocity;
-		float AngularMotorForce;
-		float AngularMotorSpring;
-		float AngularMotorDamper;
+		ZEDWORD 								XMotion;
+		ZEDWORD 								YMotion;
+		ZEDWORD 								ZMotion;
+		ZEDWORD 								TwistMotion;
+		ZEDWORD 								SwingMotion1;
+		ZEDWORD 								SwingMotion2;
+		float 									LinearLimitValue;
+		float 									LinearLimitRestitution;
+		float 									LinearLimitSpring;
+		float 									LinearLimitDamper;
+		float 									TwistLimitHighValue;
+		float 									TwistLimitLowValue;
+		float 									TwistLimitRestitution;
+		float 									TwistLimitSpring;
+		float 									TwistLimitDamper;
+		float 									Swing1LimitValue;
+		float 									Swing1LimitRestitution;
+		float 									Swing1LimitSpring;
+		float 									Swing1LimitDamper;
+		float 									Swing2LimitValue;
+		float 									Swing2LimitRestitution;
+		float 									Swing2LimitSpring;
+		float 									Swing2LimitDamper;
+		ZEVector3 								LinearMotorPosition;
+		ZEVector3 								LinearMotorVelocity;
+		ZEDWORD 								LinearXMotor;
+		float 									LinearXMotorForce;
+		float 									LinearXMotorSpring;
+		float 									LinearXMotorDamper;
+		ZEDWORD 								LinearYMotor;
+		float 									LinearYMotorForce;
+		float 									LinearYMotorSpring;
+		float 									LinearYMotorDamper;
+		ZEDWORD 								LinearZMotor;
+		float 									LinearZMotorForce;
+		float 									LinearZMotorSpring;
+		float 									LinearZMotorDamper;
+		ZEDWORD 								AngularMotor;
+		ZEQuaternion 							AngularMotorOrientation;
+		ZEVector3 								AngularMotorVelocity;
+		float 									AngularMotorForce;
+		float 									AngularMotorSpring;
+		float									AngularMotorDamper;
 	} Free;
 };
 
-struct ZEModelResourceMesh
-{
-	char										Name[ZE_MDLF_MAX_NAME_SIZE]; 
-	ZEAABoundingBox								BoundingBox;
-	ZEVector3									Position;
-	ZEQuaternion								Orientation;
-	bool										IsSkinned;
-	ZEArray<ZEModelResourceMeshLOD>				LODs;
-	ZEModelResourcePhysicalBody					PhysicalBody;
-};
-
-struct ZEModelResourceBone
-{
-	char										Name[ZE_MDLF_MAX_NAME_SIZE];
-	ZEAABoundingBox								BoundingBox;
-	ZEINT32										ParentBone;
-	ZEVector3									RelativePosition;
-	ZEQuaternion								RelativeOrientation;
-	ZEMatrix4x4									ForwardTransform;
-	ZEVector3									AbsolutePosition;
-	ZEQuaternion								AbsoluteOrientation;
-	ZEMatrix4x4									InverseTransform;
-	ZEModelResourcePhysicalJoint				PhysicalJoint;
-};
 
 struct ZEModelResourceAnimationKey
 {
@@ -332,6 +290,50 @@ struct ZEModelResourceAnimation
 	ZEArray<ZEModelResourceAnimationFrame>		Frames;
 };
 
+
+class ZEModelResourceMeshLOD
+{
+	private:
+		ZEStaticVertexBuffer*					SharedVertexBuffer;
+
+	public:
+		ZEINT32									LODLevel;
+		ZEINT32									MaterialId;
+		ZEArray<ZEModelVertex>					Vertices;
+		ZEArray<ZESkinnedModelVertex>			SkinnedVertices;
+		
+		ZEStaticVertexBuffer*					GetSharedVertexBuffer() const;
+		ZEStaticVertexBuffer*					CreatePrivateVertexBuffer() const;
+
+												ZEModelResourceMeshLOD();
+												~ZEModelResourceMeshLOD();
+};
+
+struct ZEModelResourceMesh
+{
+	char										Name[ZE_MDLF_MAX_NAME_SIZE]; 
+	ZEAABoundingBox								BoundingBox;
+	ZEVector3									Position;
+	ZEQuaternion								Orientation;
+	bool										IsSkinned;
+	ZEArray<ZEModelResourceMeshLOD>				LODs;
+	ZEModelResourcePhysicalBody					PhysicalBody;
+	ZEModelResourcePhysicalJoint				PhysicalJoint;
+};
+
+struct ZEModelResourceBone
+{
+	char										Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEAABoundingBox								BoundingBox;
+	ZEINT32										ParentBone;
+	ZEVector3									RelativePosition;
+	ZEQuaternion								RelativeOrientation;
+	ZEMatrix4x4									ForwardTransform;
+	ZEVector3									AbsolutePosition;
+	ZEQuaternion								AbsoluteOrientation;
+	ZEMatrix4x4									InverseTransform;
+	ZEModelResourcePhysicalJoint				PhysicalJoint;
+};
 
 class ZEModelResource : public ZEResource
 {

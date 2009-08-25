@@ -183,8 +183,8 @@ bool ReadPhysicalShapesFromFile(ZEArray<ZEModelResourcePhysicalShape>* Shapes, Z
 		PhysicalShape->Type = (ZEPhysicalShapeType)PhysicalShapeChunk.Type;
 		PhysicalShape->LocalPosition = PhysicalShapeChunk.LocalPosition;
 		PhysicalShape->LocalOrientation = PhysicalShapeChunk.LocalOrientation;
-		PhysicalShape->Material.Friction = PhysicalShapeChunk.Material.Friction;
-		PhysicalShape->Material.Restitution = PhysicalShapeChunk.Material.Restitution;
+		PhysicalShape->Friction = PhysicalShapeChunk.Friction;
+		PhysicalShape->Restitution = PhysicalShapeChunk.Restitution;
 		PhysicalShape->Trigger = PhysicalShapeChunk.Trigger;
 		PhysicalShape->Mask1 = PhysicalShapeChunk.Mask1;
 		PhysicalShape->Mask2 = PhysicalShapeChunk.Mask2;
@@ -223,7 +223,7 @@ bool ReadPhysicalShapesFromFile(ZEArray<ZEModelResourcePhysicalShape>* Shapes, Z
 			{
 				ZEDWORD ChunkId;
 				ResourceFile.Read(&ChunkId, sizeof(ZEDWORD), 1);
-				if (ChunkId != ZE_MDLF_PHYSICAL_VERTEX_CHUNKID)
+				if (ChunkId != ZE_MDLF_PHYSICAL_SHAPE_VERTEX_CHUNKID)
 				{
 					zeError("Model Resource", "Corrupted ZEModel file. Physical vertex chunk id does not matches.\r\n");
 					return false;
@@ -238,9 +238,9 @@ bool ReadPhysicalShapesFromFile(ZEArray<ZEModelResourcePhysicalShape>* Shapes, Z
 				//vertices
 				ZEDWORD ChunkId;
 				ResourceFile.Read(&ChunkId, sizeof(ZEDWORD), 1);
-				if (ChunkId != ZE_MDLF_PHYSICAL_VERTEX_CHUNKID)
+				if (ChunkId != ZE_MDLF_PHYSICAL_SHAPE_VERTEX_CHUNKID)
 				{
-					//zeError("Model Resource", "Corrupted ZEModel file. Physical vertex chunk id does not matches.\r\n");
+					zeError("Model Resource", "Corrupted ZEModel file. Physical vertex chunk id does not matches.\r\n");
 					return false;
 				}
 				
@@ -249,9 +249,9 @@ bool ReadPhysicalShapesFromFile(ZEArray<ZEModelResourcePhysicalShape>* Shapes, Z
 				
 				//indices
 				ResourceFile.Read(&ChunkId, sizeof(ZEDWORD), 1);
-				if (ChunkId != ZE_MDLF_PHYSICAL_INDEX_CHUNKID)
+				if (ChunkId != ZE_MDLF_PHYSICAL_SHAPE_INDEX_CHUNKID)
 				{
-					//zeError("Model Resource", "Corrupted ZEModel file. Physical index chunk id does not matches.\r\n");
+					zeError("Model Resource", "Corrupted ZEModel file. Physical index chunk id does not matches.\r\n");
 					return false;
 				}
 				
@@ -289,7 +289,7 @@ bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 		Mesh->Position = MeshChunk.Position;
 		Mesh->Orientation = MeshChunk.Orientation;
 		//physical...
-		Mesh->PhysicalBody.Type = (ZEPhysicalBodyType)MeshChunk.PhysicalBody.Type;
+		Mesh->PhysicalBody.BodyType = (ZEPhysicalBodyType)MeshChunk.PhysicalBody.BodyType;
 		Mesh->PhysicalBody.Mass = MeshChunk.PhysicalBody.Mass;
 		Mesh->PhysicalBody.Kinematic = MeshChunk.PhysicalBody.Kinematic;
 		Mesh->PhysicalBody.AngularDamp = MeshChunk.PhysicalBody.AngularDamp;
@@ -358,7 +358,7 @@ bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 		Bone->RelativeOrientation = BoneChunk.RelativeOrientation;
 		Bone->RelativePosition = BoneChunk.RelativePosition;
 		
-		Bone->PhysicalJoint.BodyType = BoneChunk.PhysicalJoint.Type;
+		Bone->PhysicalJoint.JointType = BoneChunk.PhysicalJoint.Type;
 		Bone->PhysicalJoint.Body1Id = BoneChunk.PhysicalJoint.Body1Id;
 		Bone->PhysicalJoint.Body2Id = BoneChunk.PhysicalJoint.Body2Id;
 		Bone->PhysicalJoint.Breakable = BoneChunk.PhysicalJoint.Breakable;
@@ -374,7 +374,7 @@ bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 		Bone->PhysicalJoint.LocalAxis1 = BoneChunk.PhysicalJoint.LocalAxis1;
 		Bone->PhysicalJoint.LocalAxis2 = BoneChunk.PhysicalJoint.LocalAxis2;
 
-		switch (Bone->PhysicalJoint.Type)
+		switch (Bone->PhysicalJoint.JointType)
 		{
 			case ZE_PJT_SPHERICAL:
 			{
