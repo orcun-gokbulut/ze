@@ -77,8 +77,7 @@ class ZEArrayVertexBuffer : public ZEDynamicVertexBuffer
 {
 	public:
 		ZEArray<_VertexType, _Allocator> Vertices;
-
-		virtual 
+ 
 		virtual unsigned int GetBufferSize()
 		{
 			return Vertices.GetCount() * sizeof(_VertexType);
