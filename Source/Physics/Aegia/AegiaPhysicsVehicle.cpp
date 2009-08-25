@@ -40,11 +40,11 @@
 #include "Physics/PhysicsVehicle.h"
 #include "Physics/PhysicsVehicleInfo.h"
 #include "Physics/PhysicsBody.h"
-#include "Physics/AegiaPhysicsBody.h"
+#include "Physics/Aegia/AegiaPhysicsBody.h"
 #include "Physics/PhysicsWorld.h"
-#include "Physics/AegiaPhysicsWorld.h"
-#include "Physics/AegiaPhysicsUtility.h"
-#include "Physics/AegiaPhysicsVehicle.h"
+#include "Physics/Aegia/AegiaPhysicsWorld.h"
+#include "Physics/Aegia/AegiaPhysicsUtility.h"
+#include "Physics/Aegia/AegiaPhysicsVehicle.h"
 
 ZEAegiaPhysicsVehicle::ZEAegiaPhysicsVehicle() : Body(NULL)
 {

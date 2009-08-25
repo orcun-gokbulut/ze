@@ -41,10 +41,10 @@ class ZEPhysicsJointInfo;
 
 class ZEPhysicsFixedJointInfo : public ZEPhysicsJointInfo
 {
-public:
-	ZEPhysicsFixedJointInfo();
-	~ZEPhysicsFixedJointInfo(){}
-	ZEPhysicsJointType GetType() { return ZEPhysicsJointInfo::ZE_PJT_FIXED; }
+	public:
+								ZEPhysicsFixedJointInfo();
+								~ZEPhysicsFixedJointInfo(){}
+		ZEPhysicsJointType		GetType() { return ZEPhysicsJointInfo::ZE_PJT_FIXED; }
 };
 
 #endif

@@ -180,40 +180,74 @@ bool ReadPhysicalShapesFromFile(ZEArray<ZEModelResourcePhysicalShape>* Shapes, Z
 			return false;
 		}
 
-		PhysicalShape->Type = PhysicalShapeChunk.Type;
-		PhysicalShape->Position = PhysicalShapeChunk.Position;
-		PhysicalShape->Orientation = PhysicalShapeChunk.Orientation;
-		PhysicalShape->Mass = PhysicalShapeChunk.Mass;
-		PhysicalShape->Material.Enabled = PhysicalShapeChunk.Material.Enabled;
-		PhysicalShape->Material.StaticFriction = PhysicalShapeChunk.Material.StaticFriction;
-		PhysicalShape->Material.DynamicFriction = PhysicalShapeChunk.Material.DynamicFriction;
+		PhysicalShape->Type = (ZEPhysicalShapeType)PhysicalShapeChunk.Type;
+		PhysicalShape->LocalPosition = PhysicalShapeChunk.LocalPosition;
+		PhysicalShape->LocalOrientation = PhysicalShapeChunk.LocalOrientation;
+		PhysicalShape->Material.Friction = PhysicalShapeChunk.Material.Friction;
 		PhysicalShape->Material.Restitution = PhysicalShapeChunk.Material.Restitution;
+		PhysicalShape->Trigger = PhysicalShapeChunk.Trigger;
+		PhysicalShape->Mask1 = PhysicalShapeChunk.Mask1;
+		PhysicalShape->Mask2 = PhysicalShapeChunk.Mask2;
+		PhysicalShape->Mask3 = PhysicalShapeChunk.Mask3;
+		PhysicalShape->Mask4 = PhysicalShapeChunk.Mask4;
 
 		switch (PhysicalShape->Type)
 		{
+			case ZE_PST_PLANE:
+			{
+				PhysicalShape->Plane.Height = PhysicalShapeChunk.Plane.Height;
+				PhysicalShape->Plane.NormalX = PhysicalShapeChunk.Plane.NormalX;
+				PhysicalShape->Plane.NormalY = PhysicalShapeChunk.Plane.NormalY;
+				PhysicalShape->Plane.NormalZ = PhysicalShapeChunk.Plane.NormalZ;
+				break;
+			}
 			case ZE_PST_BOX:
+			{
 				PhysicalShape->Box.Widht = PhysicalShapeChunk.Box.Widht;
 				PhysicalShape->Box.Height = PhysicalShapeChunk.Box.Height;
 				PhysicalShape->Box.Lenght = PhysicalShapeChunk.Box.Lenght;
 				break;
+			}
 			case ZE_PST_SPHERE:
+			{
 				PhysicalShape->Sphere.Radius = PhysicalShapeChunk.Sphere.Radius;
 				break;
-			case ZE_PST_CYLINDER:
-				PhysicalShape->Cylinder.Height = PhysicalShapeChunk.Cylinder.Height;
-				PhysicalShape->Cylinder.Radius = PhysicalShapeChunk.Cylinder.Radius;
-				break;
-
+			}
 			case ZE_PST_CAPSULE:
+			{
 				PhysicalShape->Capsule.Height = PhysicalShapeChunk.Capsule.Height;
 				PhysicalShape->Capsule.Radius = PhysicalShapeChunk.Capsule.Radius;
 				break;
-			case ZE_PST_MESH:
-				PhysicalShape->Mesh.Indices.SetCount(PhysicalShapeChunk.Mesh.IndexCount);
-				ResourceFile.Read(PhysicalShape->Mesh.Indices.GetCArray(), sizeof(ZEModelFilePhysicalPolygon), PhysicalShape->Mesh.Indices.GetCount());
-				PhysicalShape->Mesh.Vertices.SetCount(PhysicalShapeChunk.Mesh.VertexCount);
-				ResourceFile.Read(PhysicalShape->Mesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalShape->Mesh.Vertices.GetCount());
+			}
+			case ZE_PST_CONVEX:
+			{
+				PhysicalShape->Convex.Scale = PhysicalShapeChunk.Convex.Scale;
+				PhysicalShape->Convex.Vertices.Clear();
+				for (int i=0;i<PhysicalShapeChunk.Convex.Vertices.GetCount();i++)
+				{
+					PhysicalShape->Convex.Vertices.Add(PhysicalShapeChunk.Convex.Vertices[i]);
+				}
 				break;
+			}
+			case ZE_PST_TRIMESH:
+			{
+				PhysicalShape->Trimesh.Scale = PhysicalShapeChunk.Trimesh.Scale;
+				PhysicalShape->Trimesh.Vertices.Clear();
+				for (int i=0;i<PhysicalShapeChunk.Trimesh.Vertices.GetCount();i++)
+				{
+					PhysicalShape->Trimesh.Vertices.Add(PhysicalShapeChunk.Trimesh.Vertices[i]);
+				}
+				PhysicalShape->Trimesh.Indices.Clear();
+				for (int i=0;i<PhysicalShapeChunk.Trimesh.Indices.GetCount();i++)
+				{
+					ZEModelResourcePhysicalPolygon p;
+					p.VertexIndexes[0] = PhysicalShapeChunk.Trimesh.Indices[i].VertexIndexes[0];
+					p.VertexIndexes[1] = PhysicalShapeChunk.Trimesh.Indices[i].VertexIndexes[1];
+					p.VertexIndexes[2] = PhysicalShapeChunk.Trimesh.Indices[i].VertexIndexes[2];
+					PhysicalShape->Trimesh.Indices.Add(p);
+				}
+				break;
+			}
 			default:
 				zeError("Model Resource", "Wrong physical shape type.\r\n");
 				return false;
@@ -243,11 +277,21 @@ bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 		Mesh->LODs.SetCount(MeshChunk.LODCount);
 		Mesh->Position = MeshChunk.Position;
 		Mesh->Orientation = MeshChunk.Orientation;
+		//physical...
 		Mesh->PhysicalBody.Type = (ZEPhysicalBodyType)MeshChunk.PhysicalBody.Type;
+		Mesh->PhysicalBody.Mass = MeshChunk.PhysicalBody.Mass;
+		Mesh->PhysicalBody.Kinematic = MeshChunk.PhysicalBody.Kinematic;
+		Mesh->PhysicalBody.AngularDamp = MeshChunk.PhysicalBody.AngularDamp;
+		Mesh->PhysicalBody.LinearDamp = MeshChunk.PhysicalBody.LinearDamp;
+		Mesh->PhysicalBody.Position = MeshChunk.PhysicalBody.Position;
+		Mesh->PhysicalBody.Orientation = MeshChunk.PhysicalBody.Orientation;
+		Mesh->PhysicalBody.MassCenter = MeshChunk.PhysicalBody.MassCenter;
 		Mesh->PhysicalBody.Shapes.SetCount(MeshChunk.PhysicalBody.ShapeCount);
 
 		if (!ReadPhysicalShapesFromFile(&Mesh->PhysicalBody.Shapes, ResourceFile))
+		{
 			return false;
+		}
 
 		for (size_t I = 0; I < Mesh->LODs.GetCount(); I++)
 		{
@@ -302,11 +346,123 @@ bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile& ResourceFile)
 		Bone->ParentBone = BoneChunk.ParentBone;
 		Bone->RelativeOrientation = BoneChunk.RelativeOrientation;
 		Bone->RelativePosition = BoneChunk.RelativePosition;
-		Bone->PhysicalBody.Shapes.SetCount(BoneChunk.PhysicalBody.ShapeCount);
-		Bone->PhysicalBody.Type = (ZEPhysicalBodyType)BoneChunk.PhysicalBody.Type;
+		
+		Bone->PhysicalJoint.Type = BoneChunk.PhysicalJoint.Type;
+		Bone->PhysicalJoint.Body1Id = BoneChunk.PhysicalJoint.Body1Id;
+		Bone->PhysicalJoint.Body2Id = BoneChunk.PhysicalJoint.Body2Id;
+		Bone->PhysicalJoint.Breakable = BoneChunk.PhysicalJoint.Breakable;
+		Bone->PhysicalJoint.BreakForce = BoneChunk.PhysicalJoint.BreakForce;
+		Bone->PhysicalJoint.BreakTorque = BoneChunk.PhysicalJoint.BreakTorque;
+		Bone->PhysicalJoint.CollideBodies = BoneChunk.PhysicalJoint.CollideBodies;
+		Bone->PhysicalJoint.UseGlobalAnchor = BoneChunk.PhysicalJoint.UseGlobalAnchor;
+		Bone->PhysicalJoint.GlobalAnchor = BoneChunk.PhysicalJoint.GlobalAnchor;
+		Bone->PhysicalJoint.UseGlobalAxis = BoneChunk.PhysicalJoint.UseGlobalAxis;
+		Bone->PhysicalJoint.GlobalAxis = BoneChunk.PhysicalJoint.GlobalAxis;
+		Bone->PhysicalJoint.LocalAnchor1 = BoneChunk.PhysicalJoint.LocalAnchor1;
+		Bone->PhysicalJoint.LocalAnchor2 = BoneChunk.PhysicalJoint.LocalAnchor2;
+		Bone->PhysicalJoint.LocalAxis1 = BoneChunk.PhysicalJoint.LocalAxis1;
+		Bone->PhysicalJoint.LocalAxis2 = BoneChunk.PhysicalJoint.LocalAxis2;
 
-		if (!ReadPhysicalShapesFromFile(&Bone->PhysicalBody.Shapes, ResourceFile))
-			return false;
+		switch (Bone->PhysicalJoint.Type)
+		{
+			case ZE_PJT_SPHERICAL:
+			{
+				Bone->PhysicalJoint.Spherical.SwingLimit = BoneChunk.PhysicalJoint.Spherical.SwingLimit;
+				Bone->PhysicalJoint.Spherical.SwingLimitRestitution = BoneChunk.PhysicalJoint.Spherical.SwingLimitRestitution;
+				Bone->PhysicalJoint.Spherical.SwingLimitValue = BoneChunk.PhysicalJoint.Spherical.SwingLimitValue;
+				Bone->PhysicalJoint.Spherical.TwistLimit = BoneChunk.PhysicalJoint.Spherical.TwistLimit;
+				Bone->PhysicalJoint.Spherical.TwistLimitHighValue = BoneChunk.PhysicalJoint.Spherical.TwistLimitHighValue;
+				Bone->PhysicalJoint.Spherical.TwistLimitLowValue = BoneChunk.PhysicalJoint.Spherical.TwistLimitLowValue;
+				Bone->PhysicalJoint.Spherical.TwistLimitRestitution = BoneChunk.PhysicalJoint.Spherical.TwistLimitRestitution;
+				break;
+			}
+			case ZE_PJT_REVOLUTE:
+			{
+				Bone->PhysicalJoint.Revolute.HasLimit = BoneChunk.PhysicalJoint.Revolute.HasLimit;
+				Bone->PhysicalJoint.Revolute.HasMotor = BoneChunk.PhysicalJoint.Revolute.HasMotor;
+				Bone->PhysicalJoint.Revolute.HasSpring = BoneChunk.PhysicalJoint.Revolute.HasSpring;
+				Bone->PhysicalJoint.Revolute.LimitHighValue = BoneChunk.PhysicalJoint.Revolute.LimitHighValue;
+				Bone->PhysicalJoint.Revolute.LimitLowValue = BoneChunk.PhysicalJoint.Revolute.LimitLowValue;
+				Bone->PhysicalJoint.Revolute.LimitRestitution = BoneChunk.PhysicalJoint.Revolute.LimitRestitution;
+				Bone->PhysicalJoint.Revolute.MotorForce = BoneChunk.PhysicalJoint.Revolute.MotorForce;
+				Bone->PhysicalJoint.Revolute.MotorVelocity = BoneChunk.PhysicalJoint.Revolute.MotorVelocity;
+				Bone->PhysicalJoint.Revolute.SpringDamper = BoneChunk.PhysicalJoint.Revolute.SpringDamper;
+				Bone->PhysicalJoint.Revolute.SpringTarget = BoneChunk.PhysicalJoint.Revolute.SpringTarget;
+				Bone->PhysicalJoint.Revolute.SpringValue = BoneChunk.PhysicalJoint.Revolute.SpringValue;
+				break;
+			}
+			case ZE_PJT_DISTANCE:
+			{
+				Bone->PhysicalJoint.Distance.HasMaxLimit = BoneChunk.PhysicalJoint.Distance.HasMaxLimit;
+				Bone->PhysicalJoint.Distance.HasMinLimit = BoneChunk.PhysicalJoint.Distance.HasMinLimit;
+				Bone->PhysicalJoint.Distance.HasSpring = BoneChunk.PhysicalJoint.Distance.HasSpring;
+				Bone->PhysicalJoint.Distance.MaxDistance = BoneChunk.PhysicalJoint.Distance.MaxDistance;
+				Bone->PhysicalJoint.Distance.MinDistance = BoneChunk.PhysicalJoint.Distance.MinDistance;
+				Bone->PhysicalJoint.Distance.SpringDamper = BoneChunk.PhysicalJoint.Distance.SpringDamper;
+				Bone->PhysicalJoint.Distance.SpringValue = BoneChunk.PhysicalJoint.Distance.SpringValue;
+				break;
+			}
+			case ZE_PJT_PULLEY:
+			{
+				Bone->PhysicalJoint.Pulley.Distance = BoneChunk.PhysicalJoint.Pulley.Distance;
+				Bone->PhysicalJoint.Pulley.HasMotor = BoneChunk.PhysicalJoint.Pulley.HasMotor;
+				Bone->PhysicalJoint.Pulley.IsRigid = BoneChunk.PhysicalJoint.Pulley.IsRigid;
+				Bone->PhysicalJoint.Pulley.MotorForce = BoneChunk.PhysicalJoint.Pulley.MotorForce;
+				Bone->PhysicalJoint.Pulley.MotorVelocity = BoneChunk.PhysicalJoint.Pulley.MotorVelocity;
+				Bone->PhysicalJoint.Pulley.Pulley1 = BoneChunk.PhysicalJoint.Pulley.Pulley1;
+				Bone->PhysicalJoint.Pulley.Pulley2 = BoneChunk.PhysicalJoint.Pulley.Pulley2;
+				Bone->PhysicalJoint.Pulley.Ratio = BoneChunk.PhysicalJoint.Pulley.Ratio;
+				Bone->PhysicalJoint.Pulley.Stiffness = BoneChunk.PhysicalJoint.Pulley.Stiffness;
+				break;
+			}
+			case ZE_PJT_FREE:
+			{
+				Bone->PhysicalJoint.Free.AngularMotor = BoneChunk.PhysicalJoint.Free.AngularMotor;
+				Bone->PhysicalJoint.Free.AngularMotorDamper = BoneChunk.PhysicalJoint.Free.AngularMotorDamper;
+				Bone->PhysicalJoint.Free.AngularMotorForce = BoneChunk.PhysicalJoint.Free.AngularMotorForce;
+				Bone->PhysicalJoint.Free.AngularMotorOrientation = BoneChunk.PhysicalJoint.Free.AngularMotorOrientation;
+				Bone->PhysicalJoint.Free.AngularMotorSpring = BoneChunk.PhysicalJoint.Free.AngularMotorSpring;
+				Bone->PhysicalJoint.Free.AngularMotorVelocity = BoneChunk.PhysicalJoint.Free.AngularMotorVelocity;
+				Bone->PhysicalJoint.Free.LinearLimitDamper = BoneChunk.PhysicalJoint.Free.LinearLimitDamper;
+				Bone->PhysicalJoint.Free.LinearLimitRestitution = BoneChunk.PhysicalJoint.Free.LinearLimitRestitution;
+				Bone->PhysicalJoint.Free.LinearLimitSpring = BoneChunk.PhysicalJoint.Free.LinearLimitSpring;
+				Bone->PhysicalJoint.Free.LinearLimitValue = BoneChunk.PhysicalJoint.Free.LinearLimitValue;
+				Bone->PhysicalJoint.Free.LinearMotorPosition = BoneChunk.PhysicalJoint.Free.LinearMotorPosition;
+				Bone->PhysicalJoint.Free.LinearMotorVelocity = BoneChunk.PhysicalJoint.Free.LinearMotorVelocity;
+				Bone->PhysicalJoint.Free.LinearXMotor = BoneChunk.PhysicalJoint.Free.LinearXMotor;
+				Bone->PhysicalJoint.Free.LinearXMotorDamper = BoneChunk.PhysicalJoint.Free.LinearXMotorDamper;
+				Bone->PhysicalJoint.Free.LinearXMotorForce = BoneChunk.PhysicalJoint.Free.LinearXMotorForce;
+				Bone->PhysicalJoint.Free.LinearXMotorSpring = BoneChunk.PhysicalJoint.Free.LinearXMotorSpring;
+				Bone->PhysicalJoint.Free.LinearYMotor = BoneChunk.PhysicalJoint.Free.LinearYMotor;
+				Bone->PhysicalJoint.Free.LinearYMotorDamper = BoneChunk.PhysicalJoint.Free.LinearYMotorDamper;
+				Bone->PhysicalJoint.Free.LinearYMotorForce = BoneChunk.PhysicalJoint.Free.LinearYMotorForce;
+				Bone->PhysicalJoint.Free.LinearYMotorSpring = BoneChunk.PhysicalJoint.Free.LinearYMotorSpring;
+				Bone->PhysicalJoint.Free.LinearZMotor = BoneChunk.PhysicalJoint.Free.LinearZMotor;
+				Bone->PhysicalJoint.Free.LinearZMotorDamper = BoneChunk.PhysicalJoint.Free.LinearZMotorDamper;
+				Bone->PhysicalJoint.Free.LinearZMotorForce = BoneChunk.PhysicalJoint.Free.LinearZMotorForce;
+				Bone->PhysicalJoint.Free.LinearZMotorSpring = BoneChunk.PhysicalJoint.Free.LinearZMotorSpring;
+				Bone->PhysicalJoint.Free.Swing1LimitDamper = BoneChunk.PhysicalJoint.Free.Swing1LimitDamper;
+				Bone->PhysicalJoint.Free.Swing1LimitRestitution = BoneChunk.PhysicalJoint.Free.Swing1LimitRestitution;
+				Bone->PhysicalJoint.Free.Swing1LimitSpring = BoneChunk.PhysicalJoint.Free.Swing1LimitSpring;
+				Bone->PhysicalJoint.Free.Swing1LimitValue = BoneChunk.PhysicalJoint.Free.Swing1LimitValue;
+				Bone->PhysicalJoint.Free.Swing2LimitDamper = BoneChunk.PhysicalJoint.Free.Swing2LimitDamper;
+				Bone->PhysicalJoint.Free.Swing2LimitRestitution = BoneChunk.PhysicalJoint.Free.Swing2LimitRestitution;
+				Bone->PhysicalJoint.Free.Swing2LimitSpring = BoneChunk.PhysicalJoint.Free.Swing2LimitSpring;
+				Bone->PhysicalJoint.Free.Swing2LimitValue = BoneChunk.PhysicalJoint.Free.Swing2LimitValue;
+				Bone->PhysicalJoint.Free.SwingMotion1 = BoneChunk.PhysicalJoint.Free.SwingMotion1;
+				Bone->PhysicalJoint.Free.SwingMotion2 = BoneChunk.PhysicalJoint.Free.SwingMotion2;
+				Bone->PhysicalJoint.Free.TwistLimitDamper = BoneChunk.PhysicalJoint.Free.TwistLimitDamper;
+				Bone->PhysicalJoint.Free.TwistLimitHighValue = BoneChunk.PhysicalJoint.Free.TwistLimitHighValue;
+				Bone->PhysicalJoint.Free.TwistLimitLowValue = BoneChunk.PhysicalJoint.Free.TwistLimitLowValue;
+				Bone->PhysicalJoint.Free.TwistLimitRestitution = BoneChunk.PhysicalJoint.Free.TwistLimitRestitution;
+				Bone->PhysicalJoint.Free.TwistLimitSpring = BoneChunk.PhysicalJoint.Free.TwistLimitSpring;
+				Bone->PhysicalJoint.Free.TwistMotion = BoneChunk.PhysicalJoint.Free.TwistMotion;
+				Bone->PhysicalJoint.Free.XMotion = BoneChunk.PhysicalJoint.Free.XMotion;
+				Bone->PhysicalJoint.Free.YMotion = BoneChunk.PhysicalJoint.Free.YMotion;
+				Bone->PhysicalJoint.Free.ZMotion = BoneChunk.PhysicalJoint.Free.ZMotion;
+				break;
+			}
+		}
 	}
 
 	return true;

@@ -41,10 +41,10 @@ class ZEPhysicsJointInfo;
 
 class ZEPhysicsPrismaticJointInfo : public ZEPhysicsJointInfo
 {
-public:
-	ZEPhysicsPrismaticJointInfo();
-	~ZEPhysicsPrismaticJointInfo(){}
-	ZEPhysicsJointType GetType() { return ZEPhysicsJointInfo::ZE_PJT_PRISMATIC; }
+	public:
+								ZEPhysicsPrismaticJointInfo();
+								~ZEPhysicsPrismaticJointInfo(){}
+		ZEPhysicsJointType		GetType() { return ZEPhysicsJointInfo::ZE_PJT_PRISMATIC; }
 };
 
 #endif

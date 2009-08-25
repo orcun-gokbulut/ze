@@ -41,7 +41,7 @@ class ZEPhysicsCharacterController;
 class ZEPhysicsCharacterControllerInfo;
 class ZEVector3;
 #include "NxController.h"
-#include "Physics/AegiaPhysicsUtility.h"
+#include "Physics/Aegia/AegiaPhysicsUtility.h"
 
 class ZEAegiaPhysicsCharacterController : public ZEPhysicsCharacterController
 {

@@ -43,14 +43,14 @@ class ZEVector3;
 
 class ZEPhysicsTrimeshShapeInfo : public ZEPhysicsShapeInfo
 {
-public:
-	ZEPhysicsTrimeshShapeInfo();
-	~ZEPhysicsTrimeshShapeInfo(){}
-	ZEPhysicsShapeType GetType() { return ZEPhysicsShapeInfo::ZE_PST_TRIMESH; }
+	public:
+								ZEPhysicsTrimeshShapeInfo();
+								~ZEPhysicsTrimeshShapeInfo(){}
+		ZEPhysicsShapeType		GetType() { return ZEPhysicsShapeInfo::ZE_PST_TRIMESH; }
 
-	ZEArray<ZEVector3>    Vertices;
-	ZEArray<unsigned int> Indexes;
-	ZEVector3 Scale;
+		ZEArray<ZEVector3>		Vertices;
+		ZEArray<unsigned int>	Indexes;
+		ZEVector3				Scale;
 };
 
 #endif

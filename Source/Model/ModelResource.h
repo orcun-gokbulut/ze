@@ -67,12 +67,15 @@ class ZEModelResourceMeshLOD
 
 enum ZEPhysicalShapeType
 {
-	ZE_PST_BOX				= 0,
-	ZE_PST_SPHERE			= 1,
-	ZE_PST_CYLINDER			= 2,
-	ZE_PST_CAPSULE			= 3,
-	ZE_PST_MESH				= 4
+	ZE_PST_PLANE            = 0,
+	ZE_PST_BOX				= 1,
+	ZE_PST_SPHERE			= 2,
+	ZE_PST_CYLINDER			= 3,
+	ZE_PST_CAPSULE			= 4,
+	ZE_PST_CONVEX			= 5,
+	ZE_PST_TRIMESH          = 6
 };
+
 enum ZEPhysicalBodyType
 {
 	ZE_PBT_NONE				= 0,
@@ -81,12 +84,24 @@ enum ZEPhysicalBodyType
 	ZE_PBT_CLOTH			= 3
 };
 
+enum ZEPhysicalJointType
+{
+	ZE_PJT_FIXED            = 0,
+	ZE_PJT_SPHERICAL		= 1,
+	ZE_PJT_REVOLUTE			= 2,
+	ZE_PJT_PRISMATIC		= 3,
+	ZE_PJT_CYLINDRICAL		= 4,
+	ZE_PJT_DISTANCE			= 5,
+	ZE_PJT_POINTONLINE		= 6,
+	ZE_PJT_POINTINPLANE		= 7,
+	ZE_PJT_PULLEY			= 8,
+	ZE_PJT_FREE				= 9
+};
+
 struct ZEModelResourcePhysicalMaterial
 {
-	bool										Enabled;
-	float										Restitution;
-	float										DynamicFriction;
-	float										StaticFriction;
+	float				Restitution;
+	float				Friction;
 };
 
 struct ZEModelResourcePhysicalPolygon
@@ -96,50 +111,189 @@ struct ZEModelResourcePhysicalPolygon
 
 struct ZEModelResourcePhysicalShape
 {
-	ZEVector3									Position;
-	ZEQuaternion								Orientation;
-	ZEDWORD										Type;
-	float										Mass;
-	ZEModelResourcePhysicalMaterial				Material;
-
+	ZEPhysicalShapeType					Type;
+	ZEVector3							LocalPosition;
+	ZEQuaternion						LocalOrientation;
+	ZEModelResourcePhysicalMaterial  	Material;
+	ZEDWORD								Mask1;
+	ZEDWORD								Mask2;
+	ZEDWORD								Mask3;
+	ZEDWORD								Mask4;
+	bool								Trigger;
+	
 	union
 	{
 		struct
 		{
-			float			Widht;
-			float			Height;
-			float			Lenght;
+			float						Height;
+			float                       NormalX;
+			float                       NormalY;
+			float                       NormalZ;
+		} Plane;
+
+		struct
+		{
+			float						Widht;
+			float						Height;
+			float						Lenght;
 		} Box;
 
 		struct
 		{
-			float			Radius;
+			float						Radius;
 		} Sphere;
-
-		struct 
-		{
-			float			Radius;
-			float			Height;
-		} Cylinder;
 
 		struct
 		{
-			float			Radius;
-			float			Height;
+			float						Radius;
+			float						Height;
 		} Capsule;
 	};
 
 	struct
 	{
-		ZEArray<ZEModelResourcePhysicalPolygon>	Indices;
+		ZEArray<ZEVector3>			Vertices;
+		ZEVector3                   Scale;
+	} Convex;
+
+	struct
+	{
 		ZEArray<ZEVector3>						Vertices;
-	} Mesh;
+		ZEArray<ZEModelResourcePhysicalPolygon>	Indices;
+		ZEVector3                               Scale;
+	} Trimesh;
 };
 
 struct ZEModelResourcePhysicalBody
 {
 	ZEPhysicalBodyType							Type;
+	float										Mass;
+	bool										Kinematic;
+	float										LinearDamp;
+	float										AngularDamp;
+	ZEVector3									Position;
+	ZEQuaternion								Orientation;
+	ZEVector3									MassCenter;
 	ZEArray<ZEModelResourcePhysicalShape>		Shapes;	
+};
+
+struct ZEModelResourcePhysicalJoint
+{
+	ZEPhysicalJointType Type;
+	ZEDWORD		Body1Id;
+	ZEDWORD		Body2Id;
+	bool		CollideBodies;
+	ZEVector3	GlobalAnchor;
+	bool		UseGlobalAnchor;
+	ZEVector3   GlobalAxis;
+	bool		UseGlobalAxis;
+	ZEVector3	LocalAnchor1;
+	ZEVector3	LocalAnchor2;
+	ZEVector3	LocalAxis1;
+	ZEVector3	LocalAxis2;
+	bool		Breakable;
+	float		BreakForce;
+	float		BreakTorque;
+
+	union
+	{
+		struct
+		{
+			bool SwingLimit;
+			float SwingLimitValue;
+			float SwingLimitRestitution;
+			bool TwistLimit;
+			float TwistLimitLowValue;
+			float TwistLimitHighValue;
+			float TwistLimitRestitution;
+		} Spherical;
+
+		struct
+		{
+			bool HasLimit;
+			float LimitLowValue;
+			float LimitHighValue;
+			float LimitRestitution;
+			bool HasSpring;
+			float SpringValue;
+			float SpringDamper;
+			float SpringTarget;
+			bool HasMotor;
+			float MotorForce;
+			float MotorVelocity;
+		} Revolute;
+
+		struct
+		{
+			bool HasMinLimit;
+			float MinDistance;
+			bool HasMaxLimit;
+			float MaxDistance;
+			bool HasSpring;
+			float SpringValue;
+			float SpringDamper;
+		} Distance;
+	};
+
+	struct
+	{
+		ZEVector3 Pulley1;
+		ZEVector3 Pulley2;
+		float Distance;
+		float Ratio;
+		float Stiffness;
+		bool IsRigid;
+		bool HasMotor;
+		float MotorForce;
+		float MotorVelocity;
+	} Pulley;
+
+	struct
+	{
+		ZEDWORD XMotion;
+		ZEDWORD YMotion;
+		ZEDWORD ZMotion;
+		ZEDWORD TwistMotion;
+		ZEDWORD SwingMotion1;
+		ZEDWORD SwingMotion2;
+		float LinearLimitValue;
+		float LinearLimitRestitution;
+		float LinearLimitSpring;
+		float LinearLimitDamper;
+		float TwistLimitHighValue;
+		float TwistLimitLowValue;
+		float TwistLimitRestitution;
+		float TwistLimitSpring;
+		float TwistLimitDamper;
+		float Swing1LimitValue;
+		float Swing1LimitRestitution;
+		float Swing1LimitSpring;
+		float Swing1LimitDamper;
+		float Swing2LimitValue;
+		float Swing2LimitRestitution;
+		float Swing2LimitSpring;
+		float Swing2LimitDamper;
+		ZEVector3 LinearMotorPosition;
+		ZEVector3 LinearMotorVelocity;
+		ZEDWORD LinearXMotor;
+		float LinearXMotorForce;
+		float LinearXMotorSpring;
+		float LinearXMotorDamper;
+		ZEDWORD LinearYMotor;
+		float LinearYMotorForce;
+		float LinearYMotorSpring;
+		float LinearYMotorDamper;
+		ZEDWORD LinearZMotor;
+		float LinearZMotorForce;
+		float LinearZMotorSpring;
+		float LinearZMotorDamper;
+		ZEDWORD AngularMotor;
+		ZEQuaternion AngularMotorOrientation;
+		ZEVector3 AngularMotorVelocity;
+		float AngularMotorForce;
+		float AngularMotorSpring;
+		float AngularMotorDamper;
+	} Free;
 };
 
 struct ZEModelResourceMesh
@@ -164,7 +318,7 @@ struct ZEModelResourceBone
 	ZEVector3									AbsolutePosition;
 	ZEQuaternion								AbsoluteOrientation;
 	ZEMatrix4x4									InverseTransform;
-	ZEModelResourcePhysicalBody					PhysicalBody;
+	ZEModelResourcePhysicalJoint				PhysicalJoint;
 };
 
 struct ZEModelResourceAnimationKey

@@ -35,6 +35,9 @@
 
 #include "Physics/PhysicsCollisionMask.h"
 
-ZEPhysicsCollisionMask::ZEPhysicsCollisionMask() : Mask1(0), Mask2(0), Mask3(0), Mask4(0)
+ZEPhysicsCollisionMask::ZEPhysicsCollisionMask() :
+
+Mask1(0xFFFFFFFF), Mask2(0xFFFFFFFF), Mask3(0xFFFFFFFF), Mask4(0xFFFFFFFF)
+
 {
 }

@@ -42,16 +42,17 @@ class ZEVector3;
 
 class ZEPhysicsCollision
 {
-protected:
-	ZEPhysicsCollision(){}
-	virtual ~ZEPhysicsCollision(){}
+	protected:
+								ZEPhysicsCollision(){}
+								virtual ~ZEPhysicsCollision(){}
 
-public:
-	virtual ZEPhysicsBody* GetFirstCollider()  = 0;
-	virtual ZEPhysicsBody* GetSecondCollider() = 0;
-	virtual ZEVector3      GetPoint()          = 0;
-	virtual ZEVector3      GetNormal()         = 0;
-	virtual float          GetPower()          = 0;
+	public:
+
+		virtual ZEPhysicsBody*	GetFirstCollider()  = 0;
+		virtual ZEPhysicsBody*	GetSecondCollider() = 0;
+		virtual ZEVector3		GetPoint()          = 0;
+		virtual ZEVector3		GetNormal()         = 0;
+		virtual float			GetPower()          = 0;
 };
 
 #endif

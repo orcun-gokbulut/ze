@@ -43,25 +43,25 @@ class ZEVector3;
 
 class ZEPhysicsShapeInfo
 {
-public:
-	enum ZEPhysicsShapeType
-	{
-		ZE_PST_PLANE,
-		ZE_PST_BOX,
-		ZE_PST_SPHERE,
-		ZE_PST_CAPSULE,
-		ZE_PST_CONVEX,
-		ZE_PST_TRIMESH
-	};
+	public:
+		enum ZEPhysicsShapeType
+		{
+			ZE_PST_PLANE,
+			ZE_PST_BOX,
+			ZE_PST_SPHERE,
+			ZE_PST_CAPSULE,
+			ZE_PST_CONVEX,
+			ZE_PST_TRIMESH
+		};
 
-	ZEPhysicsShapeInfo();
-	virtual ~ZEPhysicsShapeInfo(){ Material = 0; }//NULL
-	virtual ZEPhysicsShapeType GetType() = 0;
-	
-	ZEPhysicsMaterial* Material;
-	ZEVector3 LocalPosition;
-	ZEPhysicsCollisionMask CollisionMask;
-	bool Trigger;
+										ZEPhysicsShapeInfo();
+		virtual							~ZEPhysicsShapeInfo(){ Material = 0; }//NULL
+		virtual ZEPhysicsShapeType		GetType() = 0;
+		
+		ZEPhysicsMaterial*				Material;
+		ZEVector3						LocalPosition;
+		ZEPhysicsCollisionMask			CollisionMask;
+		bool							Trigger;
 };
 
 #endif

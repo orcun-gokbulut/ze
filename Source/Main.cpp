@@ -82,13 +82,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
 
-		ZEModelBrush* Model = (ZEModelBrush*)zeCore->GetGame()->CreateEntityInstance("ZEModelBrush");
+		/*ZEModelBrush* Model = (ZEModelBrush*)zeCore->GetGame()->CreateEntityInstance("ZEModelBrush");
 		Scene->AddEntity(Model);
-		Model->SetModelFile("test model.zemodel");
-		Model->GetModel()->SetAnimationSpeed(1 /24.0f);
+		Model->SetModelFile("test model.zemodel");*/
+		/*Model->GetModel()->SetAnimationSpeed(1 /24.0f);
 		Model->GetModel()->PlayAnimationByIndex(0);
+		Model->SetPosition(ZEVector3(0.0f, -20.0f, 0.0f));*/
 
-		Model->SetPosition(ZEVector3(0.0f, -20.0f, 0.0f));
 		Scene->AddEntity(Player);
 		Scene->SetCamera(Player->GetCamera());
 
@@ -120,38 +120,37 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		//Scene->AddEntity(Light);
 		//Scene->AddEntity(Light2);
 
-		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
-		CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
-		CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
-		//CanvasBrush->Canvas.AddPlane(1000.0f, 1000);
-		CanvasBrush->Canvas.AddPyramid(10,20,10);
-		ZEMatrix4x4 Matrix;
-		ZEMatrix4x4::CreateTranslation(Matrix,0,90,0);
-		CanvasBrush->Canvas.SetTransfomation(Matrix);
-		CanvasBrush->Canvas.AddSphere(50,18,18);
-		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-		//CanvasBrush->Canvas.LoadCanvasFile("Test\\test.zeCanvas");
-		CanvasBrush->UpdateCanvas();
+		//ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
+		//CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
+		//CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
+		////CanvasBrush->Canvas.AddPlane(1000.0f, 1000);
+		//CanvasBrush->Canvas.AddPyramid(10,20,10);
+		//ZEMatrix4x4 Matrix;
+		//ZEMatrix4x4::CreateTranslation(Matrix,0,90,0);
+		//CanvasBrush->Canvas.SetTransfomation(Matrix);
+		//CanvasBrush->Canvas.AddSphere(50,18,18);
+		//CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+		////CanvasBrush->Canvas.LoadCanvasFile("Test\\test.zeCanvas");
+		//CanvasBrush->UpdateCanvas();
 
-
-		CanvasBrush->Material.SetZero();
-		CanvasBrush->Material.LightningEnabled = true;
-		CanvasBrush->Material.SetShaderComponents(ZESHADER_DIFFUSEMAP);
-		CanvasBrush->Material.AmbientColor = ZEVector3(1.0f, 1.0f, 1.0f);
-		CanvasBrush->Material.DiffuseColor = ZEVector3(0.0f, 0.0f, 0.0f);
-		CanvasBrush->Material.SpecularColor = ZEVector3(0.0f, 0.0f, 0.0f);
-		CanvasBrush->Material.SpecularFactor = 64.0f;
-		CanvasBrush->Material.Opasity = 1.0f;
-		CanvasBrush->Material.TwoSided = false;
-		CanvasBrush->Material.RecivesShadow = true;
-		CanvasBrush->Material.DiffuseMap = ZETextureResource::LoadResource("Test\\diffuse.tga")->GetTexture();
-		Scene->AddEntity(CanvasBrush);
+		//CanvasBrush->Material.SetZero();
+		//CanvasBrush->Material.LightningEnabled = true;
+		//CanvasBrush->Material.SetShaderComponents(ZESHADER_DIFFUSEMAP);
+		//CanvasBrush->Material.AmbientColor = ZEVector3(1.0f, 1.0f, 1.0f);
+		//CanvasBrush->Material.DiffuseColor = ZEVector3(0.0f, 0.0f, 0.0f);
+		//CanvasBrush->Material.SpecularColor = ZEVector3(0.0f, 0.0f, 0.0f);
+		//CanvasBrush->Material.SpecularFactor = 64.0f;
+		//CanvasBrush->Material.Opasity = 1.0f;
+		//CanvasBrush->Material.TwoSided = false;
+		//CanvasBrush->Material.RecivesShadow = true;
+		//CanvasBrush->Material.DiffuseMap = ZETextureResource::LoadResource("Test\\diffuse.tga")->GetTexture();
+		//Scene->AddEntity(CanvasBrush);
 
 		/*ZESkyBrush* Brush = (ZESkyBrush*)zeCore->GetGame()->CreateEntityInstance("ZESkyBrush");
 		Brush->SetSkyTexture("cubetest.tga");
 		Brush->SetSkyColor(ZEVector3(1.0f, 1.0f, 1.0f));
 		Scene->AddEntity(Brush);*/
-		//Scene->Load("Map00.zeScene");	
+		Scene->Load("Map00.zeScene");	
 		zeCore->Run();
 	}
 }

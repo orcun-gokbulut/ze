@@ -42,10 +42,10 @@
 
 #include "Physics/PhysicsCharacterController.h"
 #include "Physics/PhysicsCharacterControllerInfo.h"
-#include "AegiaPhysicsCharacterController.h"
+#include "Physics/Aegia/AegiaPhysicsCharacterController.h"
 
 #include "Physics/PhysicsWorld.h"
-#include "Physics/AegiaPhysicsWorld.h"
+#include "Physics/Aegia/AegiaPhysicsWorld.h"
 #include "Physics/PhysicsCollisionMask.h"
 
 

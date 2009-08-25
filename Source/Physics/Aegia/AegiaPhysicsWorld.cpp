@@ -42,30 +42,27 @@
 #include "Physics/PhysicsTrigger.h"
 #include "Physics/PhysicsWorld.h"
 #include "Physics/PhysicsWorldInfo.h"
-#include "AegiaPhysicsWorld.h"
-#include "AegiaPhysicsUtility.h"
+#include "Physics/Aegia/AegiaPhysicsWorld.h"
+#include "Physics/Aegia/AegiaPhysicsUtility.h"
 #include "Core/Core.h"
 #include "Core/Error.h"
 #include "Core/Console.h"
 
-template<> ZEAegiaPhysicsWorld* ZESingleton<ZEAegiaPhysicsWorld>::ms_Singleton = 0;
+ZEAegiaPhysicsWorld* ZEAegiaPhysicsWorld::ms_Singleton = 0;
 
 ZEAegiaPhysicsWorld* ZEAegiaPhysicsWorld::getSingletonPtr(void)
 {
 	return ms_Singleton;
 }
 
-ZEAegiaPhysicsWorld& ZEAegiaPhysicsWorld::getSingleton(void)
-{  
-	assert( ms_Singleton );  return ( *ms_Singleton );
-}
-
 ZEAegiaPhysicsWorld::ZEAegiaPhysicsWorld() : PhysicsSdk(NULL), PhysicsScene(NULL), Cooker(NULL), ControllerManager(0), ControllerAlloc(0), Report(), DelegateC(0), DelegateT(0), Debugger(NULL), DebugView(false)
 {
+	ms_Singleton = this;
 }
 
 ZEAegiaPhysicsWorld::~ZEAegiaPhysicsWorld()
 {
+	ms_Singleton = 0;
 	Deinitialize();
 }
 

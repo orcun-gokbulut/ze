@@ -36,10 +36,10 @@
 #include "NxPhysics.h"
 #include "ZEMath/Vector.h"
 #include "Physics/PhysicsMaterial.h"
-#include "AegiaPhysicsMaterial.h"
+#include "Physics/Aegia/AegiaPhysicsMaterial.h"
 
 #include "Physics/PhysicsWorld.h"
-#include "AegiaPhysicsWorld.h"
+#include "Physics/Aegia/AegiaPhysicsWorld.h"
 
 ZEAegiaPhysicsMaterial::ZEAegiaPhysicsMaterial()
 {

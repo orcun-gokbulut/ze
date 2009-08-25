@@ -41,10 +41,10 @@ class ZEPhysicsJointInfo;
 
 class ZEPhysicsCylindricalJointInfo : public ZEPhysicsJointInfo
 {
-public:
-	ZEPhysicsCylindricalJointInfo();
-	~ZEPhysicsCylindricalJointInfo(){}
-	ZEPhysicsJointType GetType() { return ZEPhysicsJointInfo::ZE_PJT_CYLINDRICAL; }
+	public:
+								ZEPhysicsCylindricalJointInfo();
+								~ZEPhysicsCylindricalJointInfo(){}
+		ZEPhysicsJointType		GetType() { return ZEPhysicsJointInfo::ZE_PJT_CYLINDRICAL; }
 };
 
 #endif

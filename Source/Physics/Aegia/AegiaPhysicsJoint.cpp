@@ -52,11 +52,11 @@
 #include "Physics/PhysicsFreeJointInfo.h"
 
 #include "Physics/PhysicsBody.h"
-#include "AegiaPhysicsBody.h"
+#include "Physics/Aegia/AegiaPhysicsBody.h"
 
 #include "Physics/PhysicsWorld.h"
-#include "AegiaPhysicsWorld.h"
-#include "AegiaPhysicsUtility.h"
+#include "Physics/Aegia/AegiaPhysicsWorld.h"
+#include "Physics/Aegia/AegiaPhysicsUtility.h"
 
 ZEAegiaPhysicsJoint::ZEAegiaPhysicsJoint() : Joint(NULL)
 {

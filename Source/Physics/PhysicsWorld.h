@@ -49,18 +49,18 @@ typedef fastdelegate::FastDelegate1<ZEPhysicsTrigger*>   TriggerDelegate;
 
 class ZEPhysicsWorld
 {
-protected:
-	ZEPhysicsWorld(){}
-	virtual ~ZEPhysicsWorld(){}
-public:
-	virtual void Initialize(ZEPhysicsWorldInfo& Info)    = 0;
-	virtual void Deinitialize()                          = 0;
-	virtual void Update(const float ElapsedTime)         = 0;
-	virtual void ShowDebugView(bool Show)                = 0;
-	virtual void SetCollisionCallback(CollisionDelegate) = 0;
-	virtual void SetTriggerCallback(TriggerDelegate)     = 0;
-	virtual ZEVector3 GetGravity()                       = 0;
-	virtual void SetGravity(ZEVector3)                   = 0;
+	protected:
+								ZEPhysicsWorld(){}
+		virtual					~ZEPhysicsWorld(){}
+	public:
+		virtual void			Initialize(ZEPhysicsWorldInfo& Info)    = 0;
+		virtual void			Deinitialize()                          = 0;
+		virtual void			Update(const float ElapsedTime)         = 0;
+		virtual void			ShowDebugView(bool Show)                = 0;
+		virtual void			SetCollisionCallback(CollisionDelegate) = 0;
+		virtual void			SetTriggerCallback(TriggerDelegate)     = 0;
+		virtual ZEVector3		GetGravity()                            = 0;
+		virtual void			SetGravity(ZEVector3)                   = 0;
 };
 
 #endif

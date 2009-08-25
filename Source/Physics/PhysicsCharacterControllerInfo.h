@@ -41,15 +41,15 @@ class ZEVector3;
 
 class ZEPhysicsCharacterControllerInfo
 {
-public:
-	ZEPhysicsCharacterControllerInfo();
-	virtual ~ZEPhysicsCharacterControllerInfo(){}
+	public:
+						ZEPhysicsCharacterControllerInfo();
+		virtual			~ZEPhysicsCharacterControllerInfo(){}
 
-	float Height;
-	float Radius;
-	float StepLimit;
-	float SlopeLimit;
-	ZEVector3 Position;
+		float			Height;
+		float			Radius;
+		float			StepLimit;
+		float			SlopeLimit;
+		ZEVector3		Position;
 };
 
 #endif

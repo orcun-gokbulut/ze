@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "NxPhysics.h"
-#include "AegiaPhysicsStream.h"
+#include "Physics/Aegia/AegiaPhysicsStream.h"
 
 ZEAegiaPhysicsMemoryWriteBuffer::ZEAegiaPhysicsMemoryWriteBuffer() : currentSize(0), maxSize(0), data(NULL)
 {

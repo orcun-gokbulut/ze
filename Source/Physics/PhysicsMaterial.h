@@ -39,17 +39,17 @@
 
 class ZEPhysicsMaterial
 {
-protected:
-	ZEPhysicsMaterial();
-	virtual ~ZEPhysicsMaterial(){}
+	protected:
+							ZEPhysicsMaterial();
+		virtual				~ZEPhysicsMaterial(){}
 
-public:
-	virtual void Initialize(float Friction, float Restitution) = 0;
-	virtual void Deinitialize()                                = 0;
-	unsigned short GetIndex() { return Index; }
+	public:
+		virtual void		Initialize(float Friction, float Restitution) = 0;
+		virtual void		Deinitialize()                                = 0;
+		unsigned short		GetIndex() { return Index; }
 
-protected:
-	unsigned short Index;
+	protected:
+		unsigned short		Index;
 };
 
 #endif

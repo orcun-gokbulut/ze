@@ -41,22 +41,23 @@ class ZEPhysicsCharacterControllerInfo;
 
 class ZEPhysicsCharacterController
 {
-protected:
-	ZEPhysicsCharacterController(){}
-	virtual ~ZEPhysicsCharacterController(){}
+	protected:
+								ZEPhysicsCharacterController(){}
+		virtual					~ZEPhysicsCharacterController(){}
 
-public:
-	virtual void Initialize(ZEPhysicsCharacterControllerInfo& Info) = 0;
-	virtual void Deinitialize()                                     = 0;
-	virtual void Update(float ElapsedTime)                          = 0;
+	public:
 
-	virtual ZEVector3 GetVelocity()     = 0;
-	virtual void SetVelocity(ZEVector3) = 0;
+		virtual void			Initialize(ZEPhysicsCharacterControllerInfo& Info) = 0;
+		virtual void			Deinitialize() = 0;
+		virtual void			Update(float ElapsedTime) = 0;
 
-	virtual ZEVector3 GetPosition()           = 0;
-	virtual void SetPosition(const ZEVector3) = 0;
-	virtual bool IsOnGround()                 = 0;
-	virtual void SetCollision(bool)           = 0;
+		virtual ZEVector3		GetVelocity() = 0;
+		virtual void			SetVelocity(ZEVector3) = 0;
+
+		virtual ZEVector3		GetPosition() = 0;
+		virtual void			SetPosition(const ZEVector3) = 0;
+		virtual bool			IsOnGround() = 0;
+		virtual void			SetCollision(bool) = 0;
 };
 
 #endif

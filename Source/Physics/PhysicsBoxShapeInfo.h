@@ -42,12 +42,12 @@ class ZEVector3;
 
 class ZEPhysicsBoxShapeInfo : public ZEPhysicsShapeInfo
 {
-public:
-	ZEPhysicsBoxShapeInfo();
-	~ZEPhysicsBoxShapeInfo(){}
-	ZEPhysicsShapeType GetType() { return ZEPhysicsShapeInfo::ZE_PST_BOX; }
+	public:
+								ZEPhysicsBoxShapeInfo();
+								~ZEPhysicsBoxShapeInfo(){}
+		ZEPhysicsShapeType		GetType() { return ZEPhysicsShapeInfo::ZE_PST_BOX; }
 
-	ZEVector3 Dimensions;
+		ZEVector3				Dimensions;
 };
 
 #endif

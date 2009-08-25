@@ -38,14 +38,14 @@
 
 #include "ZEMath/Vector.h"
 #include "Physics/PhysicsCollision.h"
-#include "AegiaPhysicsCollision.h"
+#include "Physics/Aegia/AegiaPhysicsCollision.h"
 #include "Physics/PhysicsTrigger.h"
-#include "AegiaPhysicsTrigger.h"
+#include "Physics/Aegia/AegiaPhysicsTrigger.h"
 
 #include "Physics/PhysicsWorld.h"
 #include "Physics/PhysicsWorldInfo.h"
-#include "AegiaPhysicsWorld.h"
-#include "AegiaPhysicsUtility.h"
+#include "Physics/Aegia/AegiaPhysicsWorld.h"
+#include "Physics/Aegia/AegiaPhysicsUtility.h"
 
 void ZEAegiaPhysicsReport::onContactNotify(NxContactPair& pair, NxU32 events)
 {

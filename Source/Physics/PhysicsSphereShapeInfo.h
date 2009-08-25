@@ -42,12 +42,12 @@ class ZEVector3;
 
 class ZEPhysicsSphereShapeInfo : public ZEPhysicsShapeInfo
 {
-public:
-	ZEPhysicsSphereShapeInfo();
-	~ZEPhysicsSphereShapeInfo(){}
-	ZEPhysicsShapeType GetType() { return ZEPhysicsShapeInfo::ZE_PST_SPHERE; }
+	public:
+								ZEPhysicsSphereShapeInfo();
+								~ZEPhysicsSphereShapeInfo(){}
+		ZEPhysicsShapeType		GetType() { return ZEPhysicsShapeInfo::ZE_PST_SPHERE; }
 
-	float Radius;
+		float					Radius;
 };
 
 #endif

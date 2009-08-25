@@ -36,7 +36,7 @@
 #include "ZEMath/Vector.h"
 #include "Physics/PhysicsBody.h"
 #include "Physics/PhysicsCollision.h"
-#include "AegiaPhysicsCollision.h"
+#include "Physics/Aegia/AegiaPhysicsCollision.h"
 
 ZEAegiaPhysicsCollision::ZEAegiaPhysicsCollision(ZEPhysicsBody* pFirst,ZEPhysicsBody* pSecond,ZEVector3 pPoint,ZEVector3 pNormal, float pPower) : First(pFirst), Second(pSecond), Point(pPoint), Normal(pNormal), Power(pPower)
 {

@@ -43,25 +43,25 @@ class ZEVector3;
 
 struct ZEPhysicsWheelAttribute
 {
-	ZEVector3 Position;
-	bool Steerable;
-	bool Accelerated;
-	float Radius;
-	float Width;
-	float SuspensionLength;
-	float SuspensionSpring;
-	float SuspensionDamper;
+	ZEVector3	Position;
+	bool		Steerable;
+	bool		Accelerated;
+	float		Radius;
+	float		Width;
+	float		SuspensionLength;
+	float		SuspensionSpring;
+	float		SuspensionDamper;
 };
 
 class ZEPhysicsVehicleInfo
 {
-public:
-	ZEPhysicsVehicleInfo();
-	~ZEPhysicsVehicleInfo(){}
-	
-	ZEPhysicsBody* Body;
-	ZEArray<ZEPhysicsWheelAttribute> WheelInfo;
-	float BrakeForce;
+	public:
+											ZEPhysicsVehicleInfo();
+											~ZEPhysicsVehicleInfo(){}
+		
+		ZEPhysicsBody*						Body;
+		ZEArray<ZEPhysicsWheelAttribute>	WheelInfo;
+		float								BrakeForce;
 };
 
 #endif

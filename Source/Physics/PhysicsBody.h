@@ -45,61 +45,61 @@ class ZEPhysicsShape;
 class ZEPhysicsBody
 {
 	protected:
-							ZEPhysicsBody(){}
-		virtual				~ZEPhysicsBody(){}
+								ZEPhysicsBody(){}
+		virtual					~ZEPhysicsBody(){}
 
 	public:
-		virtual void		Initialize(ZEPhysicsBodyInfo& Info) = 0;
-		virtual void		Deinitialize() = 0;
+		virtual void			Initialize(ZEPhysicsBodyInfo& Info) = 0;
+		virtual void			Deinitialize() = 0;
 
-		virtual void		ApplyForce(const ZEVector3) = 0;
-		virtual void		ApplyImpulse(const ZEVector3) = 0;
-		virtual void		ApplyTorque(const ZEVector3) = 0;
+		virtual void			ApplyForce(const ZEVector3) = 0;
+		virtual void			ApplyImpulse(const ZEVector3) = 0;
+		virtual void			ApplyTorque(const ZEVector3) = 0;
 
-		virtual void		ApplyLocalForce(const ZEVector3) = 0;
-		virtual void		ApplyLocalImpulse(const ZEVector3) = 0;
-		virtual void		ApplyLocalTorque(const ZEVector3) = 0;
+		virtual void			ApplyLocalForce(const ZEVector3) = 0;
+		virtual void			ApplyLocalImpulse(const ZEVector3) = 0;
+		virtual void			ApplyLocalTorque(const ZEVector3) = 0;
 
-		virtual ZEVector3	GetMassCenter() = 0;
-		virtual void		SetMassCenter(const ZEVector3) = 0;
+		virtual ZEVector3		GetMassCenter() = 0;
+		virtual void			SetMassCenter(const ZEVector3) = 0;
 
-		virtual ZEVector3	GetLinearVelocity() = 0;
-		virtual void		SetLinearVelocity(const ZEVector3)  = 0;
+		virtual ZEVector3		GetLinearVelocity() = 0;
+		virtual void			SetLinearVelocity(const ZEVector3)  = 0;
 
-		virtual ZEVector3	GetAngularVelocity() = 0;
-		virtual void		SetAngularVelocity(const ZEVector3) = 0;
+		virtual ZEVector3		GetAngularVelocity() = 0;
+		virtual void			SetAngularVelocity(const ZEVector3) = 0;
 
-		virtual ZEVector3	GetPosition() = 0;
-		virtual void		SetPosition(const ZEVector3) = 0;
+		virtual ZEVector3		GetPosition() = 0;
+		virtual void			SetPosition(const ZEVector3) = 0;
 		
-		virtual ZEQuaternion GetOrientation() = 0;
-		virtual void SetOrientation(const ZEQuaternion) = 0;
+		virtual ZEQuaternion	GetOrientation() = 0;
+		virtual void			SetOrientation(const ZEQuaternion) = 0;
 
-		virtual float GetLinearDamping() = 0;
-		virtual void SetLinearDamping(float) = 0;
+		virtual float			GetLinearDamping() = 0;
+		virtual void			SetLinearDamping(float) = 0;
 
-		virtual float GetAngularDamping() = 0;
-		virtual void SetAngularDamping(float) = 0;
+		virtual float			GetAngularDamping() = 0;
+		virtual void			SetAngularDamping(float) = 0;
 
-		virtual ZEVector3 GetLinearMomentum() = 0;
-		virtual void SetLinearMomentum(ZEVector3) = 0;
+		virtual ZEVector3		GetLinearMomentum() = 0;
+		virtual void			SetLinearMomentum(ZEVector3) = 0;
 
-		virtual ZEVector3 GetAngularMomentum() = 0;
-		virtual void SetAngularMomentum(ZEVector3) = 0;
+		virtual ZEVector3		GetAngularMomentum() = 0;
+		virtual void			SetAngularMomentum(ZEVector3) = 0;
 
-		virtual void SetMass(float) = 0;
-		virtual float GetMass() = 0;
-		virtual bool IsDynamic() = 0;
+		virtual void			SetMass(float) = 0;
+		virtual float			GetMass() = 0;
+		virtual bool			IsDynamic() = 0;
 
-		virtual unsigned int GetShapeCount()                                  = 0;
-		virtual ZEVector3 GetGlobalShapePosition(int Index)                   = 0;
-		virtual void SetGlobalShapePosition(int Index, const ZEVector3)       = 0;
-		virtual ZEVector3 GetLocalShapePosition(int Index)                    = 0;
-		virtual void SetLocalShapePosition(int Index, const ZEVector3)        = 0;
-		virtual ZEQuaternion GetGlobalShapeOrientation(int Index)             = 0;
-		virtual void SetGlobalShapeOrientation(int Index, const ZEQuaternion) = 0;
-		virtual ZEQuaternion GetLocalShapeOrientation(int Index)              = 0;
-		virtual void SetLocalShapeOrientation(int Index,const ZEQuaternion)   = 0;
+		virtual unsigned int	GetShapeCount() = 0;
+		virtual ZEVector3		GetGlobalShapePosition(int Index) = 0;
+		virtual void			SetGlobalShapePosition(int Index, const ZEVector3) = 0;
+		virtual ZEVector3		GetLocalShapePosition(int Index) = 0;
+		virtual void			SetLocalShapePosition(int Index, const ZEVector3) = 0;
+		virtual ZEQuaternion	GetGlobalShapeOrientation(int Index) = 0;
+		virtual void			SetGlobalShapeOrientation(int Index, const ZEQuaternion) = 0;
+		virtual ZEQuaternion	GetLocalShapeOrientation(int Index) = 0;
+		virtual void			SetLocalShapeOrientation(int Index,const ZEQuaternion) = 0;
 };
 
 #endif

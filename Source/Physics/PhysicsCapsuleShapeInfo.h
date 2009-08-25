@@ -42,13 +42,13 @@ class ZEVector3;
 
 class ZEPhysicsCapsuleShapeInfo : public ZEPhysicsShapeInfo
 {
-public:
-	ZEPhysicsCapsuleShapeInfo();
-	~ZEPhysicsCapsuleShapeInfo(){}
-	ZEPhysicsShapeType GetType() { return ZEPhysicsShapeInfo::ZE_PST_CAPSULE; }
+	public:
+								ZEPhysicsCapsuleShapeInfo();
+								~ZEPhysicsCapsuleShapeInfo(){}
+		ZEPhysicsShapeType		GetType() { return ZEPhysicsShapeInfo::ZE_PST_CAPSULE; }
 
-	float Height;
-	float Radius;
+		float					Height;
+		float					Radius;
 };
 
 #endif

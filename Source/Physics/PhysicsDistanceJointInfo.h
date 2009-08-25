@@ -41,20 +41,20 @@ class ZEPhysicsJointInfo;
 
 class ZEPhysicsDistanceJointInfo : public ZEPhysicsJointInfo
 {
-public:
-	ZEPhysicsDistanceJointInfo();
-	~ZEPhysicsDistanceJointInfo(){}
-	ZEPhysicsJointType GetType() { return ZEPhysicsJointInfo::ZE_PJT_DISTANCE; }
+	public:
+								ZEPhysicsDistanceJointInfo();
+								~ZEPhysicsDistanceJointInfo(){}
+		ZEPhysicsJointType		GetType() { return ZEPhysicsJointInfo::ZE_PJT_DISTANCE; }
 
-	bool HasMinLimit;
-	float MinDistance;
+		bool					HasMinLimit;
+		float					MinDistance;
 
-	bool HasMaxLimit;
-	float MaxDistance;
+		bool					HasMaxLimit;
+		float					MaxDistance;
 
-	bool HasSpring;
-	float SpringValue;
-	float SpringDamper;
+		bool					HasSpring;
+		float					SpringValue;
+		float					SpringDamper;
 };
 
 #endif

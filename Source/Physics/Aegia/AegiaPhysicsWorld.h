@@ -47,12 +47,11 @@ class NxScene;
 class NxCookingInterface;
 class NxControllerManager;
 class ZECanvasBrush;
-#include "Singleton.h"
 
 class NxContactPair;
 #include "NxUserContactReport.h"
-#include "AegiaPhysicsReport.h"
-#include "AegiaPhysicsUtility.h"
+#include "Physics/Aegia/AegiaPhysicsReport.h"
+#include "Physics/Aegia/AegiaPhysicsUtility.h"
 
 class ControllerAllocator : public NxUserAllocator 
 {
@@ -63,7 +62,7 @@ public:
 	virtual void    free(void* memory)                                          { ::free(memory); }
 };
 
-class ZEAegiaPhysicsWorld : public ZEPhysicsWorld, public ZESingleton<ZEAegiaPhysicsWorld>
+class ZEAegiaPhysicsWorld : public ZEPhysicsWorld
 {
 	friend class ZEAegiaPhysicsReport;
 	friend class ZEAegiaPhysicsModule;
@@ -71,8 +70,8 @@ class ZEAegiaPhysicsWorld : public ZEPhysicsWorld, public ZESingleton<ZEAegiaPhy
 private:
 	ZEAegiaPhysicsWorld();
 	~ZEAegiaPhysicsWorld();
+	static ZEAegiaPhysicsWorld* ms_Singleton;
 public:
-	static ZEAegiaPhysicsWorld& getSingleton();
 	static ZEAegiaPhysicsWorld* getSingletonPtr();
 
 	void Initialize(ZEPhysicsWorldInfo& Info);

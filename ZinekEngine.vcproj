@@ -1411,10 +1411,6 @@
 		<Filter
 			Name="Particle"
 			>
-			<File
-				RelativePath=".\Source\Model\ModelResource.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Map"
@@ -1460,11 +1456,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Model\ModelFileFormat.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Model\ModelFileFormat.h"
 				>
 			</File>
 			<File
 				RelativePath=".\Source\Model\ModelResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Model\ModelResource.h"
 				>
 			</File>
 		</Filter>

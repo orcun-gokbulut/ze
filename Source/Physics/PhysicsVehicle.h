@@ -44,25 +44,25 @@ class ZEPhysicsBody;
 
 class ZEPhysicsVehicle
 {
-protected:
-	ZEPhysicsVehicle(){}
-	virtual ~ZEPhysicsVehicle(){}
+	protected:
+									ZEPhysicsVehicle(){}
+		virtual						~ZEPhysicsVehicle(){}
 
-public:
-	virtual void Initialize(ZEPhysicsVehicleInfo& Info) = 0;
-	virtual void Deinitialize()                         = 0;
-	virtual void Update(float ElapsedTime)              = 0;
+	public:
+		virtual void				Initialize(ZEPhysicsVehicleInfo& Info) = 0;
+		virtual void				Deinitialize()                         = 0;
+		virtual void				Update(float ElapsedTime)              = 0;
 
-	virtual ZEPhysicsBody* GetBody()			        = 0;
-	virtual int GetWheelCount()                         = 0;
-	virtual ZEVector3 GetWheelPosition(int Index)       = 0;
-	virtual ZEQuaternion GetWheelOrientation(int Index) = 0;
-	virtual void SetSteeringAngle(float Angle)			= 0;
-	virtual void SetMotorTorque(float Torque)			= 0;
-	virtual void SetBrakeTorque(float Torque)			= 0;
-	virtual ZEVector3 GetLinearVelocity()				= 0;
-	virtual float GetWheelSpeed(int Index)				= 0;
-	virtual float GetAverageWheelSpeed()				= 0;
+		virtual ZEPhysicsBody*		GetBody() = 0;
+		virtual int					GetWheelCount() = 0;
+		virtual ZEVector3			GetWheelPosition(int Index) = 0;
+		virtual ZEQuaternion		GetWheelOrientation(int Index) = 0;
+		virtual void				SetSteeringAngle(float Angle) = 0;
+		virtual void				SetMotorTorque(float Torque) = 0;
+		virtual void				SetBrakeTorque(float Torque) = 0;
+		virtual ZEVector3			GetLinearVelocity() = 0;
+		virtual float				GetWheelSpeed(int Index) = 0;
+		virtual float				GetAverageWheelSpeed() = 0;
 };
 
 #endif

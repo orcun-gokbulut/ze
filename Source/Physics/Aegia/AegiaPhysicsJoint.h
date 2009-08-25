@@ -41,7 +41,7 @@ class ZEPhysicsJoint;
 class ZEPhysicsJointInfo;
 class ZEVector3;
 class NxJoint;
-#include "AegiaPhysicsUtility.h"
+#include "Physics/Aegia/AegiaPhysicsUtility.h"
 
 class ZEAegiaPhysicsJoint : public ZEPhysicsJoint
 {
@@ -60,9 +60,9 @@ public:
 	ZEVector3 GetGlobalAxis() { return TOZE(Joint->getGlobalAxis()); }
 	void SetGlobalAxis(const ZEVector3 Axis) { Joint->setGlobalAxis(TONX(Axis)); }
 
-	void SetLimitPoint(const ZEVector3 Point, bool OnBody2 = false) 
+	void SetLimitPoint(const ZEVector3 Point, bool OnBody2 = false)
 	{ Joint->setLimitPoint(TONX(Point),OnBody2); }
-	void AddLimitPlane(const ZEVector3 Normal, const ZEVector3 Point, float Restitution = 0) 
+	void AddLimitPlane(const ZEVector3 Normal, const ZEVector3 Point, float Restitution = 0)
 	{ Joint->addLimitPlane(TONX(Normal),TONX(Point), Restitution); }
 	void SetJointMotor(float MotorForce, float MotorVelocity);
 

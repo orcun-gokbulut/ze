@@ -51,27 +51,27 @@ class ZEPhysicsCollisionMask;
 
 class ZEPhysicsModule : public ZEModule
 {
-public:
-	virtual ~ZEPhysicsModule(){}
-	static ZEPhysicsModule*	GetInstance() { return 0; }
-	
-	virtual ZEPhysicsWorld* CreateWorld()					 = 0;
-	virtual ZEPhysicsBody*  CreateBody()					 = 0;
-	virtual ZEPhysicsJoint* CreateJoint()					 = 0;
-	virtual ZEPhysicsVehicle* CreateVehicle()		         = 0;
-	virtual ZEPhysicsMaterial* CreateMaterial()				 = 0;
-	virtual ZEPhysicsCharacterController* CreateController() = 0;
+	public:
+		virtual									~ZEPhysicsModule(){}
+		static ZEPhysicsModule*					GetInstance() { return 0; }
+		
+		virtual ZEPhysicsWorld*					CreateWorld() = 0;
+		virtual ZEPhysicsBody*					CreateBody() = 0;
+		virtual ZEPhysicsJoint*					CreateJoint() = 0;
+		virtual ZEPhysicsVehicle*				CreateVehicle() = 0;
+		virtual ZEPhysicsMaterial*				CreateMaterial() = 0;
+		virtual ZEPhysicsCharacterController*	CreateController() = 0;
 
-	//                        ZEPhysicsWorld** to set a null to parameter ?
-	virtual bool DestroyWorld(ZEPhysicsWorld*)					   = 0;
-	virtual bool DestroyBody(ZEPhysicsBody*)					   = 0;
-	virtual bool DestroyJoint(ZEPhysicsJoint*)					   = 0;
-	virtual bool DestroyVehicle(ZEPhysicsVehicle*)	               = 0;
-	virtual bool DestroyMaterial(ZEPhysicsMaterial*)			   = 0;
-	virtual bool DestroyController(ZEPhysicsCharacterController*)  = 0;
+		//                                       ZEPhysicsWorld** to set a null to parameter ?
+		virtual bool				DestroyWorld(ZEPhysicsWorld*) = 0;
+		virtual bool				DestroyBody(ZEPhysicsBody*) = 0;
+		virtual bool				DestroyJoint(ZEPhysicsJoint*) = 0;
+		virtual bool				DestroyVehicle(ZEPhysicsVehicle*) = 0;
+		virtual bool				DestroyMaterial(ZEPhysicsMaterial*) = 0;
+		virtual bool				DestroyController(ZEPhysicsCharacterController*) = 0;
 
-	virtual bool CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEVector3& Point, ZEPhysicsCollisionMask Mask) = 0;
-	virtual bool CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEPhysicsBody** Contact, ZEPhysicsCollisionMask Mask) = 0;
+		virtual bool				CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEVector3& Point, ZEPhysicsCollisionMask Mask) = 0;
+		virtual bool				CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEPhysicsBody** Contact, ZEPhysicsCollisionMask Mask) = 0;
 };
 
 #endif

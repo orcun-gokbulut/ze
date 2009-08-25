@@ -42,7 +42,7 @@ class ZEPhysicsBodyInfo;
 class ZEVector3;
 class ZEQuaternion;
 class NxActor;
-#include "AegiaPhysicsUtility.h"
+#include "Physics/Aegia/AegiaPhysicsUtility.h"
 
 class ZEAegiaPhysicsBody : public ZEPhysicsBody
 {

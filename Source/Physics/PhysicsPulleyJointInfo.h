@@ -42,21 +42,21 @@ class ZEVector3;
 
 class ZEPhysicsPulleyJointInfo : public ZEPhysicsJointInfo
 {
-public:
-	ZEPhysicsPulleyJointInfo();
-	~ZEPhysicsPulleyJointInfo(){}
-	ZEPhysicsJointType GetType() { return ZEPhysicsJointInfo::ZE_PJT_PULLEY; }
+	public:
+								ZEPhysicsPulleyJointInfo();
+								~ZEPhysicsPulleyJointInfo(){}
+		ZEPhysicsJointType		GetType() { return ZEPhysicsJointInfo::ZE_PJT_PULLEY; }
 
-	ZEVector3 Pulley1;
-	ZEVector3 Pulley2;
-	float Distance;
-	float Ratio;
-	float Stiffness;
+		ZEVector3				Pulley1;
+		ZEVector3				Pulley2;
+		float					Distance;
+		float					Ratio;
+		float					Stiffness;
 
-	bool IsRigid;
-	bool HasMotor;
-	float MotorForce;
-	float MotorVelocity;
+		bool					IsRigid;
+		bool					HasMotor;
+		float					MotorForce;
+		float					MotorVelocity;
 };
 
 #endif
