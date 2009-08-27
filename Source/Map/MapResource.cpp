@@ -334,7 +334,7 @@ bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMapPortal>& Por
 		Portal->Brushes.SetCount(FilePortal.BrushCount);
 		Portal->Doors.SetCount(FilePortal.DoorCount);
 		Portal->Polygons.SetCount(FilePortal.PolygonCount);
-		Portal->HasPhysicalMesh = FilePortal.HasPhysicalMesh;
+		//Portal->HasPhysicalMesh = FilePortal.HasPhysicalMesh;
 		Portal->HasOctree = FilePortal.HasOctree;
 		Portal->Octree = NULL;
 
@@ -393,9 +393,9 @@ bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMapPortal>& Por
 		}
 
 		// Read Physical Mesh
-		if (FilePortal.HasPhysicalMesh)
+		/*if (FilePortal.HasPhysicalMesh)
 			if (!ReadPhysicalMeshFromFile(ResourceFile, Portal->PhysicalMesh))
-				return false;
+				return false;*/
 
 		// Read Brushes
 		if (!ReadEntitiesFromFile(ResourceFile, Portal->Brushes))
@@ -440,6 +440,12 @@ bool ReadMapFromFile(ZEResourceFile* ResourceFile, ZEMapResource* Map)
 	if (!ReadEntitiesFromFile(ResourceFile, Map->Entities))
 	{
 		zeError("Map Resource", "File is corrupted. Can not read entities from file. (Filename : \"%s\")", ResourceFile->GetFilename());
+		return false;
+	}
+
+	if (!ReadPhysicalMeshFromFile(ResourceFile, Map->PhysicalMesh))
+	{
+		zeError("Map Resource", "File is corrupted. Can not read physical mesh from file. (Filename : \"%s\")", ResourceFile->GetFilename());
 		return false;
 	}
 

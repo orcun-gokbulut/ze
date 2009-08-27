@@ -93,8 +93,8 @@ class ZEMapPortal
 		bool										HasOctree;
 		ZEOctree*									Octree;
 	
-		bool										HasPhysicalMesh;
-		ZEMapPhysicalMesh							PhysicalMesh;
+		//bool										HasPhysicalMesh;
+		//ZEMapPhysicalMesh							PhysicalMesh;
 
 													ZEMapPortal();
 													~ZEMapPortal();
@@ -108,6 +108,9 @@ class ZEMapResource : public ZEResource
 		ZEArray<ZEMapPortalDoor>					PortalDoors;
 		ZEArray<ZEMapPortal>						Portals;
 		ZEArray<ZEEntityData>						Entities;
+
+		bool										HasPhysicalMesh;
+		ZEMapPhysicalMesh							PhysicalMesh;
 
 		const char*									GetResourceType() const;
 

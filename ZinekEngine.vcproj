@@ -1332,6 +1332,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Map\MapFileFormat.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Map\MapFileFormat.h"
 				>
 			</File>
