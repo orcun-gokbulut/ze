@@ -41,6 +41,7 @@ class ZEPhysicsBodyInfo;
 class ZEVector3;
 class ZEQuaternion;
 class ZEPhysicsShape;
+class ZEPhysicsShapeInfo;
 
 class ZEPhysicsBody
 {
@@ -51,6 +52,7 @@ class ZEPhysicsBody
 	public:
 		virtual void			Initialize(ZEPhysicsBodyInfo& Info) = 0;
 		virtual void			Deinitialize() = 0;
+		virtual void			AddShape(ZEPhysicsShapeInfo* Info) = 0;
 
 		virtual void			ApplyForce(const ZEVector3) = 0;
 		virtual void			ApplyImpulse(const ZEVector3) = 0;

@@ -328,3 +328,202 @@ void ZEAegiaPhysicsBody::Deinitialize()
 		Actor = NULL;
 	}
 }
+
+void ZEAegiaPhysicsBody::AddShape(ZEPhysicsShapeInfo* Info)
+{
+	ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
+
+	if (Actor != NULL && World != NULL)
+	{
+		switch (Info->GetType())
+		{
+			case ZEPhysicsShapeInfo::ZE_PST_PLANE:
+			{
+				ZEPhysicsPlaneShapeInfo* PlaneInfo = (ZEPhysicsPlaneShapeInfo*)Info;
+				NxPlaneShapeDesc PlaneDesc;
+				PlaneDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
+				if (PlaneInfo->Trigger)PlaneDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				PlaneDesc.d = PlaneInfo->Height;
+				PlaneDesc.normal = TONX(PlaneInfo->Normal);
+				PlaneDesc.localPose.t = TONX(PlaneInfo->LocalPosition);
+				PlaneDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(PlaneInfo->CollisionMask);
+				if (PlaneInfo->Material)
+				{
+					PlaneDesc.materialIndex = PlaneInfo->Material->GetIndex();
+				}
+				Actor->createShape(PlaneDesc);
+				break;
+			}
+			case ZEPhysicsShapeInfo::ZE_PST_BOX:
+			{
+				ZEPhysicsBoxShapeInfo* BoxInfo = (ZEPhysicsBoxShapeInfo*)Info;
+				NxBoxShapeDesc BoxDesc;
+				BoxDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
+				if (BoxInfo->Trigger)BoxDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				BoxDesc.dimensions = TONX(BoxInfo->Dimensions);
+				BoxDesc.localPose.t = TONX(BoxInfo->LocalPosition);
+				BoxDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(BoxInfo->CollisionMask);
+				if (BoxInfo->Material)
+				{
+					BoxDesc.materialIndex = BoxInfo->Material->GetIndex();
+				}
+				Actor->createShape(BoxDesc);
+				break;
+			}
+			case ZEPhysicsShapeInfo::ZE_PST_CAPSULE:
+			{
+				ZEPhysicsCapsuleShapeInfo* CapsuleInfo = (ZEPhysicsCapsuleShapeInfo*)Info;
+				NxCapsuleShapeDesc CapsuleDesc;
+				CapsuleDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
+				if (CapsuleInfo->Trigger)CapsuleDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				CapsuleDesc.height = CapsuleInfo->Height;
+				CapsuleDesc.radius = CapsuleInfo->Radius;
+				CapsuleDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(CapsuleInfo->CollisionMask);;
+				CapsuleDesc.localPose.t = TONX(CapsuleInfo->LocalPosition);
+				if (CapsuleInfo->Material)
+				{
+					CapsuleDesc.materialIndex = CapsuleInfo->Material->GetIndex();
+				}
+				Actor->createShape(CapsuleDesc);
+				break;
+			}
+			case ZEPhysicsShapeInfo::ZE_PST_SPHERE:
+			{
+				ZEPhysicsSphereShapeInfo* SphereInfo = (ZEPhysicsSphereShapeInfo*)Info;
+				NxSphereShapeDesc SphereDesc;
+				SphereDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
+				if (SphereInfo->Trigger)SphereDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				SphereDesc.radius = SphereInfo->Radius;
+				SphereDesc.localPose.t = TONX(SphereInfo->LocalPosition);
+				SphereDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(SphereInfo->CollisionMask);;
+				if (SphereInfo->Material)
+				{
+					SphereDesc.materialIndex = SphereInfo->Material->GetIndex();
+				}
+				Actor->createShape(SphereDesc);
+				break;
+			}
+			case ZEPhysicsShapeInfo::ZE_PST_CONVEX:
+			{
+				ZEPhysicsConvexShapeInfo* ConvexInfo = (ZEPhysicsConvexShapeInfo*)Info;
+				NxConvexShapeDesc ConvexDesc;
+				ConvexDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
+				if (ConvexInfo->Trigger)ConvexDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				ConvexDesc.localPose.t = TONX(ConvexInfo->LocalPosition);
+				ConvexDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(ConvexInfo->CollisionMask);;
+
+				//first prepare vertices
+				NxVec3* Verts = new NxVec3[ConvexInfo->Vertices.GetCount()];
+				for (int i=0; i<(int)ConvexInfo->Vertices.GetCount(); i++)
+				{
+					Verts[i] = TONX(ConvexInfo->Vertices[i]);
+				}
+
+				//prepare mesh description
+				NxConvexMeshDesc ConvexMeshDesc;
+				ConvexMeshDesc.numVertices		= (NxU32)ConvexInfo->Vertices.GetCount();
+				ConvexMeshDesc.pointStrideBytes	= sizeof(NxVec3);
+				ConvexMeshDesc.points			= Verts;
+				ConvexMeshDesc.flags			= NX_CF_COMPUTE_CONVEX;
+
+				//cook the mesh
+				if (World->GetCooker()->NxInitCooking())
+				{
+					//Cooking from memory    
+					ZEAegiaPhysicsMemoryWriteBuffer Buffer;
+					if (World->GetCooker()->NxCookConvexMesh(ConvexMeshDesc, Buffer))
+					{
+						//set mesh data
+						ConvexDesc.meshData = World->GetSdk()->createConvexMesh(ZEAegiaPhysicsMemoryReadBuffer(Buffer.data));
+					}
+					else
+					{
+						//Creation Error
+					}
+				}
+				else
+				{
+					//Creation Error
+				}
+
+				//delete temp
+				delete [] Verts;
+
+				//set material
+				if (ConvexInfo->Material)
+				{
+					ConvexDesc.materialIndex = ConvexInfo->Material->GetIndex();
+				}
+
+				Actor->createShape(ConvexDesc);
+				break;
+			}
+			case ZEPhysicsShapeInfo::ZE_PST_TRIMESH:
+			{
+				ZEPhysicsTrimeshShapeInfo* TrimeshInfo = (ZEPhysicsTrimeshShapeInfo*)Info;
+				NxTriangleMeshShapeDesc TrimeshDesc;
+				TrimeshDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
+				if (TrimeshInfo->Trigger)TrimeshDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				TrimeshDesc.localPose.t = TONX(TrimeshInfo->LocalPosition);
+				TrimeshDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(TrimeshInfo->CollisionMask);;
+
+				//first prepare vertices
+				NxVec3* Verts = new NxVec3[TrimeshInfo->Vertices.GetCount()];
+				for (int i=0; i<(int)TrimeshInfo->Vertices.GetCount(); i++)
+				{
+					Verts[i] = TONX(TrimeshInfo->Vertices[i]);
+				}
+
+				//prepare indexes
+				unsigned int* Indxs = new unsigned int [TrimeshInfo->Indexes.GetCount()];
+				for (int i=0; i<(int)TrimeshInfo->Indexes.GetCount(); i++)
+				{
+					Indxs[i] = TrimeshInfo->Indexes[i];
+				}
+
+				//prepare mesh description
+				NxTriangleMeshDesc TriangleMeshDesc;
+				TriangleMeshDesc.numVertices = (NxU32)TrimeshInfo->Vertices.GetCount();
+				TriangleMeshDesc.numTriangles = (NxU32)TrimeshInfo->Indexes.GetCount()/3;
+				TriangleMeshDesc.pointStrideBytes = sizeof(NxVec3);
+				TriangleMeshDesc.triangleStrideBytes = sizeof(NxU32) * 3;
+				TriangleMeshDesc.points = Verts;
+				TriangleMeshDesc.triangles = Indxs;
+				TriangleMeshDesc.flags = 0;
+
+				//cook the mesh
+				if (World->GetCooker()->NxInitCooking())
+				{
+					//Cooking from memory    
+					ZEAegiaPhysicsMemoryWriteBuffer Buffer;
+					if (World->GetCooker()->NxCookTriangleMesh(TriangleMeshDesc, Buffer))
+					{
+						//init convex desc
+						TrimeshDesc.meshData = World->GetSdk()->createTriangleMesh(ZEAegiaPhysicsMemoryReadBuffer(Buffer.data));
+					}
+					else
+					{
+						//Creation Error
+					}
+				}
+				else
+				{
+					//Creation Error
+				}
+
+				//delete temp
+				delete [] Verts;
+				delete [] Indxs;
+
+				//set material
+				if (TrimeshInfo->Material)
+				{
+					TrimeshDesc.materialIndex = TrimeshInfo->Material->GetIndex();
+				}
+
+				Actor->createShape(TrimeshDesc);
+				break;
+			}
+		}
+	}
+}

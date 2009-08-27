@@ -55,6 +55,7 @@ private:
 public:
 	void Initialize(ZEPhysicsBodyInfo& Info);
 	void Deinitialize();
+	void AddShape(ZEPhysicsShapeInfo* Info);
 
 	void ApplyForce(const ZEVector3 Force) { Actor->addForce(TONX(Force),NX_FORCE); }
 	void ApplyImpulse(const ZEVector3 Force) { Actor->addForce(TONX(Force),NX_IMPULSE); }
