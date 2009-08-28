@@ -53,29 +53,40 @@
 #define ACTIONID_CONSOLE		10
 #define ACTIONID_RAYCAST		11
 
+#define ACTIONID_VFORWARD		12
+#define ACTIONID_VBACKWARD		13
+#define ACTIONID_VSTRAFELEFT	14
+#define ACTIONID_VSTRAFERIGHT	15
+#define ACTIONID_FIRE1          16
+#define ACTIONID_FIRE2          17
+
+#define ACTIONID_CAMERA         18
+#define ACTIONID_JUMP           19
+#define ACTIONID_TESTUP         20
+#define ACTIONID_TESTDN         21
+
 ZE_ENTITY_DESCRIPTION_START(ZEPlayer, ZEEntity, ZE_ERA_BOTH, "", "Player spawn point")
 	ZE_ENTITY_NOATTRIBUTE(ZEPlayer)
 ZE_ENTITY_DESCRIPTION_END(ZEPlayer)
 
-ZECamera* ZEPlayer::GetCamera()
-{
-	return &Camera;
-}
 
 ZEListener* ZEPlayer::GetListener()
 {
 	return &Listener;
 }
 
-void ZEPlayer::SetFOV(float FOV)
-{
-	this->FOV = FOV;
-}
+#include "Physics/PhysicsWorld.h"
+#include "Physics/Aegia/AegiaPhysicsWorld.h"
+#include "CameraManager.h"
+extern CameraManager CamMgr;
 
-float ZEPlayer::GetFOV()
-{
-	return FOV;
-}
+#include "GameInterface/CanvasBrush.h"
+#include "box.h"
+extern box* boxes[64];
+
+#include "Physics/PhysicsCharacterController.h"
+extern ZEPhysicsCharacterController* cont1;
+extern ZECanvasBrush* ccapsule;
 
 void ZEPlayer::Tick(float Time)
 {
@@ -85,6 +96,9 @@ void ZEPlayer::Tick(float Time)
 	ZEQuaternion RotationChange;
 	ZEInputAction* Current;
 	zeInput->ProcessInputMap(&InputMap);
+	float walk = 0,strafe = 0,pitch = 0,yaw = 0;
+	static float char_y = -10;
+	ZEVector3 cVelocity = ZEVector3(0,0,0);
 	
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 	ZEComponent* HitComponent;
@@ -94,51 +108,48 @@ void ZEPlayer::Tick(float Time)
 		Current = &InputMap.InputActions[I];
 		switch(Current->Id)
 		{
-			case ACTIONID_FORWARD:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, 1));
-				ZEVector3::Scale(PositionChange, PositionChange, 80.0f * Time);
-				ZEVector3::Add(Position, Position, PositionChange);
-				SetPosition(Position);
+			case ACTIONID_CAMERA:
+			{
+				static float ctime = 0;
+				ctime += Time;
+				if (ctime > 0.5)
+				{
+					ctime = 0;
+					CamMgr.ChangeCamera();
+					if (CamMgr.GetCurrentCamera() != 0)
+					{
+						cont1->SetPosition(CamMgr.GetCamera()->GetLocalPosition());
+					}
+				}
 				break;
-			case ACTIONID_BACKWARD:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, -1));
-				ZEVector3::Scale(PositionChange, PositionChange, 80.0f * Time);
-				ZEVector3::Add(Position, Position, PositionChange);
-				SetPosition(Position);
+			}
+			case ACTIONID_TESTUP:
+			{
 				break;
-			case ACTIONID_STRAFELEFT:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(-1, 0, 0));
-				ZEVector3::Scale(PositionChange, PositionChange, 80.0f * Time);
-				ZEVector3::Add(Position, Position, PositionChange);
-				SetPosition(Position);
+			}
+			case ACTIONID_TESTDN:
+			{
 				break;
-			case ACTIONID_STRAFERIGHT:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(1, 0, 0));
-				ZEVector3::Scale(PositionChange, PositionChange, 80.0f * Time);
-				ZEVector3::Add(Position, Position, PositionChange);
-				SetPosition(Position);
-				break;
+			}
 			case ACTIONID_ZOOMIN:
-				if (FOV > ZE_PI_8 * 0.5)
-					FOV -= Current->AxisValue * 0.0005f;
-				Camera.SetFOV(FOV);
 				break;
 			case ACTIONID_ZOOMOUT:
-				if (FOV < ZE_PI - ZE_PI_8)
-					FOV += Current->AxisValue * 0.0005f;
-				Camera.SetFOV(FOV);
 				break;
 			case ACTIONID_TURNLEFT:
-				Yawn = Yawn - 0.005f * Current->AxisValue;
+				//setCrossair(GetPosition(), GetRotation());
+				yaw = -1.0 * Current->AxisValue;
 				break;
 			case ACTIONID_TURNRIGHT:
-				Yawn = Yawn + 0.005f * Current->AxisValue;
+				//setCrossair(GetPosition(), GetRotation());
+				yaw = 1.0 * Current->AxisValue;
 				break;
 			case ACTIONID_TURNUP:
-				Pitch = Pitch + 0.005f * Current->AxisValue;
+				//setCrossair(GetPosition(), GetRotation());
+				pitch = 1.0 * Current->AxisValue;
 				break;
 			case ACTIONID_TURNDOWN:
-				Pitch = Pitch - 0.005f * Current->AxisValue;
+				//setCrossair(GetPosition(), GetRotation());
+				pitch = -1.0 * Current->AxisValue;
 				break;
 			case ACTIONID_CONSOLE:
 				if (zeConsole->IsVisible())
@@ -147,53 +158,149 @@ void ZEPlayer::Tick(float Time)
 					zeConsole->ShowConsole();
 				break;
 			case ACTIONID_RAYCAST:
-				ZEQuaternion::VectorProduct(RayDirection, Camera.GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
-				/*if (zeCore->GetGame()->GetScene()->CastRay(ZERay(RayDirection, Camera.GetWorldPosition()), 100000000000000.0f) != NULL)
-					continue;*/
-				if (zeCore->GetGame()->GetScene()->CastRay(ZERay(RayDirection, Camera.GetWorldPosition()), 100000000000000.0f, &HitEntity, HitPosition, HitNormal) != NULL)
-					continue;
+			{
+				static bool cas = false;
+				cas = !cas;
+				ZEAegiaPhysicsWorld::getSingletonPtr()->ShowDebugView(cas);
 				break;
+			}
+			case ACTIONID_FIRE2:
+			{
+					ZEVector3 dir(0,0,1);
+					dir = this->GetRotation() * dir;
+					static float ctime = 0;
+					ctime += Time;
+					if (ctime > 0.2)
+					{
+						ctime = 0;
+						static int ct = 0;
+						if (ct > 3)ct = 0;
+						boxes[ct]->actor->SetPosition(this->GetPosition());
+						boxes[ct]->actor->SetLinearVelocity(ZEVector3(0,0,0));
+						boxes[ct]->actor->SetAngularVelocity(ZEVector3(0,0,0));
+						boxes[ct]->actor->ApplyImpulse(dir * 250);
+						ct++;
+					}
+					break;
+			}
+			case ACTIONID_JUMP:
+			{
+				if (cont1->IsOnGround())
+				{
+					char_y = 5;
+				}
+				break;
+			}
+			case ACTIONID_FORWARD:
+			{
+				if (CamMgr.GetCurrentCamera() == 0)
+				{
+					walk = 40;
+				}
+				else
+				{
+					ZEQuaternion::VectorProduct(PositionChange, CamMgr.GetCamera()->GetLocalRotation(), ZEVector3(0, 0, 1));
+					PositionChange.y = 0;
+					cVelocity += PositionChange;
+				}
+				break;
+			}
+			case ACTIONID_BACKWARD:
+			{
+				if (CamMgr.GetCurrentCamera() == 0)
+				{
+					walk = -40;
+				}
+				else
+				{
+					ZEQuaternion::VectorProduct(PositionChange, CamMgr.GetCamera()->GetLocalRotation(), ZEVector3(0, 0, -1));
+					PositionChange.y = 0;
+					cVelocity += PositionChange;
+				}
+				break;
+			}
+			case ACTIONID_STRAFELEFT:
+			{
+				if (CamMgr.GetCurrentCamera() == 0)
+				{
+					strafe = -40;
+				}
+				else
+				{
+					ZEQuaternion::VectorProduct(PositionChange, CamMgr.GetCamera()->GetLocalRotation(), ZEVector3(-1, 0, 0));
+					PositionChange.y = 0;
+					cVelocity += PositionChange;
+				}
+				break;
+			}
+			case ACTIONID_STRAFERIGHT:
+			{
+				if (CamMgr.GetCurrentCamera() == 0)
+				{
+					strafe = 40;
+				}
+				else
+				{
+					ZEQuaternion::VectorProduct(PositionChange, CamMgr.GetCamera()->GetLocalRotation(), ZEVector3(1, 0, 0));
+					PositionChange.y = 0;
+					cVelocity += PositionChange;
+				}
+				break;
+			}
 		}
-
-		if (Yawn < -ZE_PI)
-			Yawn = ZE_PI;
-		else if (Yawn > ZE_PI)
-			Yawn = -ZE_PI;
-
-		if (Pitch < -ZE_PI_2)
-			Pitch = -ZE_PI_2;
-		else if (Pitch > ZE_PI_2)
-			Pitch = ZE_PI_2;
-
-		if (Roll < -ZE_PI)
-			Roll = ZE_PI_2;
-		else if (Roll > ZE_PI)
-			Roll = ZE_PI;
-
-		ZEQuaternion::Create(Rotation, Pitch, Yawn, Roll);
-		ZEQuaternion Temp;
-		ZEQuaternion::Normalize(Temp,Rotation);
-		Rotation = Temp;
-		SetRotation(Rotation);
 	}
+
+	if (CamMgr.GetCurrentCamera() == 0)
+	{
+		CamMgr.GetFreeCamera()->setParams(walk, strafe, pitch, yaw);
+	}
+	else if (CamMgr.GetCurrentCamera() == 1)
+	{
+		//apply velocity to char controller
+		ZEVector3::Scale(cVelocity, cVelocity, 8);
+		char_y -= 10 * Time;
+		if (cont1->IsOnGround() && char_y < -10)char_y = -10;
+		cVelocity.y = char_y;
+		cont1->SetVelocity(cVelocity);
+		//
+		ZEVector3 npos = cont1->GetPosition();
+		ZEVector3 offset(0,1,0);
+		CamMgr.GetFpsCamera()->setParams(npos, offset,pitch, yaw);
+	}
+	else if (CamMgr.GetCurrentCamera() == 2)
+	{
+		//apply velocity to char controller
+		ZEVector3::Scale(cVelocity, cVelocity, 8);
+		char_y -= 10 * Time;
+		if (cont1->IsOnGround() && char_y < -10)char_y = -10;
+		cVelocity.y = char_y;
+		cont1->SetVelocity(cVelocity);
+
+		ZEVector3 npos = cont1->GetPosition();
+		ZEVector3 offset(0,1,-5);
+		CamMgr.GetTpsCamera()->setParams(npos, offset, pitch, yaw);
+	}
+	CamMgr.Update(Time);
+
+	//else if (camtype == 2)
+	//{
+	//	//apply velocity to char controller
+	//	ZEVector3::Scale(cVelocity, cVelocity, 8);
+	//	char_y -= 10 * Time;
+	//	if (cont1->IsOnGround() && char_y < -10)char_y = -10;
+	//	cVelocity.y = char_y;
+	//	cont1->SetVelocity(cVelocity);
+
+	//	ZEVector3 Offset(0,1,-5);
+	//	//CameraManager::UpdateTps(this, cont1, Offset, pitch, yaw, Time);
+	//}
+
 	ZEEntity::Tick(Time);
 }
 
 void ZEPlayer::Initialize()
 {
-	FOV = ZE_PI_2;
-	Camera.SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Camera.SetLocalRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
-	Camera.SetNearZ(zeGraphics->GetNearZ());
-	Camera.SetFarZ(zeGraphics->GetFarZ());
-	Camera.SetFOV(FOV);
-	Camera.SetAspectRatio(zeGraphics->GetAspectRatio());
-
-	Camera.Initialize();
 	Listener.Initialize();
-
-	Yawn = Pitch = Roll = 0;
-	
 	Listener.SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Listener.SetLocalRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
 
@@ -204,18 +311,12 @@ void ZEPlayer::Initialize()
 	Light.SetAttenuation(0.0001f, 0.01f, 1.0f);
 	Light.SetColor(ZEVector3(1.0f, 0.0f, 1.0f));
 
-	RegisterComponent(&Camera);
 	RegisterComponent(&Listener);
-	//RegisterComponent(&Light);
-
-	zeCore->GetGame()->GetScene()->CurrentCamera = &Camera;
 }
 void ZEPlayer::Deinitialize()
 {
-	Camera.Deinitialize();
 	Listener.Deinitialize();
 	Light.Deinitialize();
-
 }
 
 void ZEPlayer::Draw(ZERenderer * Renderer)
@@ -225,10 +326,25 @@ void ZEPlayer::Draw(ZERenderer * Renderer)
 
 ZEPlayer::ZEPlayer()
 {
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,		"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,	"Move Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT, "Strafe Right",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_D, ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFELEFT,	"Strafe Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_A, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,		"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_UP, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,	"Move Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_DOWN, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT, "Strafe Right",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_RIGHT, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFELEFT,	"Strafe Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_LEFT, ZE_IBS_PRESSED)));
+
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FIRE1,		"Fire1",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMB_LEFTBUTTON, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FIRE2,		"Fire2",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMB_RIGHTBUTTON, ZE_IBS_PRESSED)));
+
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_VFORWARD,	"vMove Forward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_VBACKWARD,	"vMove Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_VSTRAFERIGHT,"vStrafe Right",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_D, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_VSTRAFELEFT,	"vStrafe Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_A, ZE_IBS_PRESSED)));
+
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_CAMERA,		"Cam",		        ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_C, ZE_IBS_PRESSED)));
+	
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_JUMP,		"Jump",		        ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMB_MIDDLEBUTTON, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TESTUP,		"Testup",		     ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_PGUP, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TESTDN,		"Testdn",		     ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_PGDN, ZE_IBS_PRESSED)));
+
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNUP,		"Turn Up",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNDOWN,	"Turn Down",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNRIGHT,	"Turn Right",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE)));

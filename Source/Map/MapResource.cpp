@@ -41,6 +41,12 @@
 #include "MapFileFormat.h"
 #include "Graphics/GraphicsModule.h"
 
+#include "Core/Core.h"
+#include "Physics/PhysicsModule.h"
+#include "Physics/PhysicsShapeInfo.h"
+#include "Physics/PhysicsTrimeshShapeInfo.h"
+#include "Physics/PhysicsBodyInfo.h"
+
 // Reading
 
 const ZETexture* ManageMapMaterialTextures(char* Filename, ZESmartArray<ZETextureResource*>& TextureResources)
@@ -308,7 +314,6 @@ bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPhysicalMesh& P
 
 	// Read physical mesh polygons
 	ResourceFile->Read(PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygonChunk), PhysicalMesh.Polygons.GetCount());
-
 	return true;
 }
 
@@ -448,6 +453,36 @@ bool ReadMapFromFile(ZEResourceFile* ResourceFile, ZEMapResource* Map)
 		zeError("Map Resource", "File is corrupted. Can not read physical mesh from file. (Filename : \"%s\")", ResourceFile->GetFilename());
 		return false;
 	}
+
+	//create body
+	ZEPhysicsTrimeshShapeInfo TrimeshShapeInfo;
+	ZEPhysicsCollisionMask all;all.Full();
+	TrimeshShapeInfo.CollisionMask = all;
+	
+	int ct = 0;
+	TrimeshShapeInfo.Vertices.SetCount(Map->PhysicalMesh.Vertices.GetCount());
+	for (int i=0;i<Map->PhysicalMesh.Vertices.GetCount();i++)
+	{
+		TrimeshShapeInfo.Vertices[ct++] = Map->PhysicalMesh.Vertices[i];
+	}
+
+	TrimeshShapeInfo.Indexes.SetCount(Map->PhysicalMesh.Polygons.GetCount() * 3);
+	ct = 0;
+	for (int i=0;i<Map->PhysicalMesh.Polygons.GetCount();i++)
+	{
+		TrimeshShapeInfo.Indexes[ct++] = Map->PhysicalMesh.Polygons[i].Indices[0];
+		TrimeshShapeInfo.Indexes[ct++] = Map->PhysicalMesh.Polygons[i].Indices[1];
+		TrimeshShapeInfo.Indexes[ct++] = Map->PhysicalMesh.Polygons[i].Indices[2];
+	}
+	
+	ZEPhysicsBodyInfo TrimeshBodyInfo;
+	TrimeshBodyInfo.ShapeInfos.Add(&TrimeshShapeInfo);
+	TrimeshBodyInfo.Mass = 0;
+	TrimeshBodyInfo.Position = ZEVector3(0,0,0);
+	TrimeshBodyInfo.Orientation = ZEQuaternion(1,0,0,0);
+
+	Map->PhysicalBody = zePhysics->CreateBody();
+	Map->PhysicalBody->Initialize(TrimeshBodyInfo);
 
 	return true;
 }

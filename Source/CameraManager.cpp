@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Player.h
+ Zinek Engine - CameraManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,38 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PLAYER_H__
-#define __ZE_PLAYER_H__
+#include "CameraManager.h"
 
-#include "Graphics/Canvas.h"
-#include "Sound/Listener.h"
-#include "Input/InputMap.h"
-#include "Graphics/Light.h"
-
-ZE_ENTITY_DESCRIPTION(ZEPlayer, ZEEntity);
-
-class ZEPlayer : public ZEEntity
+CameraManager::CameraManager() : FreeController(NULL), FpsController(NULL), TpsController(NULL)
 {
-	ZE_ENTITY_CLASS(ZEPlayer)
-	private:
-		ZEInputMap				InputMap;
-		ZEListener				Listener;
-		ZEPointLight			Light;
-	
-	public:
-		ZEListener*				GetListener();
+	CurrentCamera = 0;
+}
 
-		void					Tick(float Time);
+CameraManager::~CameraManager()
+{
+	delete FreeController;
+	delete FpsController;
+	delete TpsController;
+}
 
-		void					Draw(ZERenderer * Renderer);
-
-		void					SetActive(bool);
-		
-		void					Initialize();
-		void					Deinitialize();
-
-								ZEPlayer();
-								~ZEPlayer();
-};
-#endif
+void CameraManager::Update(float ElapsedTime)
+{
+	if (CurrentCamera == 0 && FreeController != NULL)
+	{
+		FreeController->Update(ElapsedTime);
+	}
+	else if (CurrentCamera == 1 && FpsController != NULL)
+	{
+		FpsController->Update(ElapsedTime);
+	}
+	else if (CurrentCamera == 2 && TpsController != NULL)
+	{
+		TpsController->Update(ElapsedTime);
+	}
+}

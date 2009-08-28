@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Player.h
+ Zinek Engine - TpsCameraController.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,38 +33,63 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PLAYER_H__
-#define __ZE_PLAYER_H__
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "TpsCameraController.h"
 
-#include "Graphics/Canvas.h"
-#include "Sound/Listener.h"
-#include "Input/InputMap.h"
-#include "Graphics/Light.h"
+#include "Core/Core.h"
+#include "Physics/PhysicsModule.h"
+#include "Physics/PhysicsCollisionMask.h"
 
-ZE_ENTITY_DESCRIPTION(ZEPlayer, ZEEntity);
-
-class ZEPlayer : public ZEEntity
+ZETpsCameraController::ZETpsCameraController(ZECamera* Camera) : ZECameraController(Camera)
 {
-	ZE_ENTITY_CLASS(ZEPlayer)
-	private:
-		ZEInputMap				InputMap;
-		ZEListener				Listener;
-		ZEPointLight			Light;
+	Position = ZEVector3(0,0,0);
+	Pitch = 0;
+	Yaw = 0;
+}
+
+ZETpsCameraController::~ZETpsCameraController()
+{
+	Camera = NULL;
+}
+
+void ZETpsCameraController::Update(float ElapsedTime)
+{
+	ZEVector3 rPosition = Position;
+	ZEQuaternion Orientation = Camera->GetLocalRotation();
+	//orientation
+	float cRoll,cYaw,cPitch;
+	ZEQuaternion::ConvertToEulerAngles(cPitch, cYaw, cRoll, Orientation);
+	cYaw   += Yaw * ElapsedTime;
+	cPitch += Pitch * ElapsedTime;
+	ZEQuaternion::Create(Orientation, cPitch, cYaw, cRoll);
+
+	ZEVector3 Result;
+	ZEVector3::Normalize(Result,(Orientation * Offset));
+	ZEPhysicsCollisionMask Mask;Mask.Full();
+	if (zePhysics->CastRay(Position, Result, Result, Mask))
+	{
+		float Length = (Position - Result).Length();
+		float OffLength = Offset.Length();
+		if (Length > OffLength)
+		{
+			Position = rPosition + Orientation * Offset;
+		}
+		else
+		{
+			Position = rPosition + Orientation * Offset * ((Length-0.5) / OffLength);
+		}
+	}
+	else Position = rPosition + Orientation * Offset;
 	
-	public:
-		ZEListener*				GetListener();
+	Camera->SetLocalPosition(Position);
+	Camera->SetLocalRotation(Orientation);
+}
 
-		void					Tick(float Time);
-
-		void					Draw(ZERenderer * Renderer);
-
-		void					SetActive(bool);
-		
-		void					Initialize();
-		void					Deinitialize();
-
-								ZEPlayer();
-								~ZEPlayer();
-};
-#endif
+void ZETpsCameraController::setParams(ZEVector3 cPosition, ZEVector3 cOffset, float cPitch, float cYaw)
+{
+	Position = cPosition;
+	Offset = cOffset;
+	Pitch  = cPitch;
+	Yaw    = cYaw;
+}

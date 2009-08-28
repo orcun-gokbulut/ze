@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Player.h
+ Zinek Engine - CameraController.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,38 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PLAYER_H__
-#define __ZE_PLAYER_H__
+#ifndef _ZE_CAMERA_CONTROLLER_H_
+#define _ZE_CAMERA_CONTROLLER_H_
 
-#include "Graphics/Canvas.h"
-#include "Sound/Listener.h"
-#include "Input/InputMap.h"
-#include "Graphics/Light.h"
+#include "Graphics/Camera.h"
 
-ZE_ENTITY_DESCRIPTION(ZEPlayer, ZEEntity);
-
-class ZEPlayer : public ZEEntity
+class ZECameraController
 {
-	ZE_ENTITY_CLASS(ZEPlayer)
-	private:
-		ZEInputMap				InputMap;
-		ZEListener				Listener;
-		ZEPointLight			Light;
-	
-	public:
-		ZEListener*				GetListener();
+public:
+							ZECameraController(ZECamera* Camera);
+	virtual					~ZECameraController();
+	virtual void			Update(float ElapsedTime) = 0;
+	ZECamera*               GetCamera() { return Camera; }
 
-		void					Tick(float Time);
-
-		void					Draw(ZERenderer * Renderer);
-
-		void					SetActive(bool);
-		
-		void					Initialize();
-		void					Deinitialize();
-
-								ZEPlayer();
-								~ZEPlayer();
+protected:
+	ZECamera*				Camera;
 };
+
 #endif

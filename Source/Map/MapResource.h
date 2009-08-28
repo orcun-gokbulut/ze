@@ -47,6 +47,7 @@
 #include "Graphics/TextureResource.h"
 #include "Octree.h"
 #include "GameInterface/Entity.h"
+#include "Physics/PhysicsBody.h"
 
 struct ZEMapPolygon
 {
@@ -111,6 +112,7 @@ class ZEMapResource : public ZEResource
 
 		bool										HasPhysicalMesh;
 		ZEMapPhysicalMesh							PhysicalMesh;
+		ZEPhysicsBody*								PhysicalBody;
 
 		const char*									GetResourceType() const;
 

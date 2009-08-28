@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Player.h
+ Zinek Engine - FpsCameraController.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,38 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PLAYER_H__
-#define __ZE_PLAYER_H__
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "FpsCameraController.h"
 
-#include "Graphics/Canvas.h"
-#include "Sound/Listener.h"
-#include "Input/InputMap.h"
-#include "Graphics/Light.h"
-
-ZE_ENTITY_DESCRIPTION(ZEPlayer, ZEEntity);
-
-class ZEPlayer : public ZEEntity
+ZEFpsCameraController::ZEFpsCameraController(ZECamera* Camera) : ZECameraController(Camera)
 {
-	ZE_ENTITY_CLASS(ZEPlayer)
-	private:
-		ZEInputMap				InputMap;
-		ZEListener				Listener;
-		ZEPointLight			Light;
-	
-	public:
-		ZEListener*				GetListener();
+	Position = ZEVector3(0,0,0);
+	Pitch = 0;
+	Yaw = 0;
+}
 
-		void					Tick(float Time);
+ZEFpsCameraController::~ZEFpsCameraController()
+{
+	Camera = NULL;
+}
 
-		void					Draw(ZERenderer * Renderer);
+void ZEFpsCameraController::Update(float ElapsedTime)
+{
+	ZEQuaternion Orientation = Camera->GetLocalRotation();
+	float cRoll,cYaw,cPitch;
+	ZEQuaternion::ConvertToEulerAngles(cPitch, cYaw, cRoll, Orientation);
+	cPitch += Pitch * ElapsedTime;
+	cYaw   += Yaw * ElapsedTime;
+	ZEQuaternion::Create(Orientation, cPitch, cYaw, cRoll);
+	Camera->SetLocalPosition(Position);
+	Camera->SetLocalRotation(Orientation);
+}
 
-		void					SetActive(bool);
-		
-		void					Initialize();
-		void					Deinitialize();
-
-								ZEPlayer();
-								~ZEPlayer();
-};
-#endif
+void ZEFpsCameraController::setParams(ZEVector3 cPosition, ZEVector3 cOffset, float cPitch, float cYaw)
+{
+	Position = cPosition + cOffset;
+	Pitch	 = cPitch;
+	Yaw		 = cYaw;
+}

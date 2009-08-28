@@ -52,10 +52,49 @@ extern HINSTANCE ApplicationInstance;
 #include "Core/ConsoleWindow.h"
 #include "Core/Core.h"
 
+#include "Physics/PhysicsModule.h"
+#include "Physics/Aegia/AegiaPhysicsModule.h"
+#include "Physics/PhysicsWorld.h"
+#include "Physics/PhysicsWorldInfo.h"
+#include "Physics/PhysicsBody.h"
+#include "Physics/PhysicsBodyInfo.h"
+#include "Physics/PhysicsCollisionMask.h"
+
+#include "Physics/PhysicsCharacterController.h"
+#include "Physics/PhysicsCharacterControllerInfo.h"
+
+#include "Physics/PhysicsShapeInfo.h"
+#include "Physics/PhysicsPlaneShapeInfo.h"
+#include "box.h"
+
+ZEPhysicsWorld* World;
+ZEPhysicsBody* StaticBody;
+ZEPhysicsCollisionMask all;
+ZEPhysicsCharacterController* cont1;
+
+ZECanvasBrush* ccapsule;
+box* boxes[64];
+
+#include "CameraManager.h"
+CameraManager CamMgr;
+
+void initPhy()
+{
+	//physics
+	zePhysics->Initialize();
+
+	//world
+	ZEPhysicsWorldInfo WorldInfo;
+	WorldInfo.Gravity = ZEVector3(0,-10,0);
+	WorldInfo.DebugView = false;
+	World = zePhysics->CreateWorld();
+	World->Initialize(WorldInfo);
+
+	all.Full();
+}
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-	// Bismillahirahmanirahim
-
 	_set_SSE2_enable(1);
 	ApplicationInstance = hInstance;
 	zeCore->GetOptions()->Load("options.ini");
@@ -63,95 +102,81 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_GRAPHICS));
 	zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_SOUND));
 	zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_INPUT));
+	zeCore->SetPhysicsModule((ZEModule*)new ZEAegiaPhysicsModule());
 	ZEConsoleWindow ConsoleWindow;
 	zeCore->GetConsole()->SetConsoleInterface(&ConsoleWindow);
 	zeCore->GetWindow()->SetWindowType(zeCore->GetOptions()->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean() ? ZE_WT_FULLSCREEN : ZE_WT_RESIZABLE);
 	zeCore->GetWindow()->SetWindowSize(zeCore->GetOptions()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger(), zeCore->GetOptions()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger());
-//	zeCore->GetWindow()->SetWindowPosition(0, 0);
+
 	if (zeCore->StartUp())
 	{
+		initPhy();
+
 		ZEScene* Scene = zeCore->GetGame()->GetScene();
+		Scene->LoadEnvironment("BoxMap.ZEMAP");
+		Scene->SetVisualDebugElements(ZE_VDE_NONE);
+
+		//boxes
+		for (int i=0;i<4;i++)
+		{
+			boxes[i] = new box(Scene,"textures/greek_roman0001.tga",10,ZEVector3(0,0+i*1,0),ZEQuaternion(), ZEVector3(0.5,0.5,0.5), false, false, all, 0.25, 0.25);
+		}
+
+		//character
+		ccapsule = new ZECanvasBrush();
+		ccapsule->Canvas.LoadCanvasFile("Test/Capsule.zeCanvas");
+		ccapsule->SetPosition(ZEPoint3(0,0,0));
+		ccapsule->SetScale(ZEPoint3(0.5,1,0.5));
+		ccapsule->UpdateCanvas();
+		ccapsule->Material.SetZero();
+		ccapsule->Material.LightningEnabled = true;
+		ccapsule->Material.SetShaderComponents(ZESHADER_DIFFUSEMAP);
+		ccapsule->Material.AmbientColor = ZEVector3(0.0f, 0.0f, 0.0f);
+		ccapsule->Material.DiffuseColor = ZEVector3(1.0f, 1.0f, 1.0f);
+		ccapsule->Material.SpecularColor = ZEVector3(1.0f, 1.0f, 1.0f);
+		ccapsule->Material.SpecularFactor = 64.0f;
+		ccapsule->Material.DiffuseMap = ZETextureResource::LoadResource("Test/blue.jpg")->GetTexture();
+		Scene->AddEntity(ccapsule);
+
+		ZEPhysicsCharacterControllerInfo ChrInfo;
+		ChrInfo.Height = 1.75;
+		ChrInfo.Radius = 0.30;
+		ChrInfo.SlopeLimit = 75;
+		ChrInfo.StepLimit = 0.5;
+		ChrInfo.Position = ZEVector3(0,2,0);
+		cont1 = zePhysics->CreateController();
+		cont1->Initialize(ChrInfo);
 
 		ZERenderer* Renderer;
 		ZERenderer* ShadowRenderer;
 
 		ZEPlayer* Player = (ZEPlayer*)zeCore->GetGame()->CreateEntityInstance("ZEPlayer");
-
 		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
 		Player->SetRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
-		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
-		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
-
-		/*ZEModelBrush* Model = (ZEModelBrush*)zeCore->GetGame()->CreateEntityInstance("ZEModelBrush");
-		Scene->AddEntity(Model);
-		Model->SetModelFile("test model.zemodel");*/
-		/*Model->GetModel()->SetAnimationSpeed(1 /24.0f);
-		Model->GetModel()->PlayAnimationByIndex(0);
-		Model->SetPosition(ZEVector3(0.0f, -20.0f, 0.0f));*/
-
 		Scene->AddEntity(Player);
-		Scene->SetCamera(Player->GetCamera());
 
 		ZELightBrush* Light = new ZELightBrush();
-		ZELightBrush* Light2 = new ZELightBrush();
 		Light->SetLightType(ZE_LT_POINT);
-		Light->SetPosition(ZEPoint3(45.0f, 120.0f, 0.0f));
+		Light->SetPosition(ZEPoint3(1.0f, 5.0f, 1.0f));
 		Light->SetScale(ZEPoint3(1.0f, 1.0f, 1.0f));
 		Light->GetLight()->SetRange(1500);
 		Light->SetRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		Light->GetLight()->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-		Light->GetLight()->SetAttenuation(0.000f, 0.0f, 1.0f);
+		Light->GetLight()->SetAttenuation(0.0f, 0.0f, 0.5f);
 		Light->GetLight()->SetIntensity(1.0f);
 		Light->GetLight()->SetCastShadows(false);
+		Light->SetScale(ZEVector3(0.01,0.01,0.01));
+		Scene->AddEntity(Light);
 
-		Light2->SetLightType(ZE_LT_POINT);
-		Light2->SetPosition(ZEPoint3(-45.0f, -120.0f, 0.0f));
-		Light2->SetScale(ZEPoint3(1.0f, 1.0f, 1.0f));
-		Light2->GetLight()->SetRange(1500);
-		Light2->SetRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
-		Light2->GetLight()->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-		Light2->GetLight()->SetAttenuation(0.000f, 0.0f, 1.0f);
-		Light2->GetLight()->SetIntensity(1.0f);
-		Light2->GetLight()->SetCastShadows(false);
+		ZEFreeCameraController* cont1 = new ZEFreeCameraController(Scene->CurrentCamera);
+		CamMgr.SetFreeController(cont1);
+		ZEFpsCameraController* cont2 = new ZEFpsCameraController(Scene->CurrentCamera);
+		CamMgr.SetFpsController(cont2);
+		ZETpsCameraController* cont3 = new ZETpsCameraController(Scene->CurrentCamera);
+		CamMgr.SetTpsController(cont3);
 
-		//Light->SetProjectionFOV(ZE_PI_2);
-		//Light->SetProjectionAspectRatio(1.0f);
-		//Light->SetProjectionTexture("test/pavyon.bmp");
-		//Scene->AddEntity(Light);
-		//Scene->AddEntity(Light2);
-
-		//ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
-		//CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
-		//CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
-		////CanvasBrush->Canvas.AddPlane(1000.0f, 1000);
-		//CanvasBrush->Canvas.AddPyramid(10,20,10);
-		//ZEMatrix4x4 Matrix;
-		//ZEMatrix4x4::CreateTranslation(Matrix,0,90,0);
-		//CanvasBrush->Canvas.SetTransfomation(Matrix);
-		//CanvasBrush->Canvas.AddSphere(50,18,18);
-		//CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-		////CanvasBrush->Canvas.LoadCanvasFile("Test\\test.zeCanvas");
-		//CanvasBrush->UpdateCanvas();
-
-		//CanvasBrush->Material.SetZero();
-		//CanvasBrush->Material.LightningEnabled = true;
-		//CanvasBrush->Material.SetShaderComponents(ZESHADER_DIFFUSEMAP);
-		//CanvasBrush->Material.AmbientColor = ZEVector3(1.0f, 1.0f, 1.0f);
-		//CanvasBrush->Material.DiffuseColor = ZEVector3(0.0f, 0.0f, 0.0f);
-		//CanvasBrush->Material.SpecularColor = ZEVector3(0.0f, 0.0f, 0.0f);
-		//CanvasBrush->Material.SpecularFactor = 64.0f;
-		//CanvasBrush->Material.Opasity = 1.0f;
-		//CanvasBrush->Material.TwoSided = false;
-		//CanvasBrush->Material.RecivesShadow = true;
-		//CanvasBrush->Material.DiffuseMap = ZETextureResource::LoadResource("Test\\diffuse.tga")->GetTexture();
-		//Scene->AddEntity(CanvasBrush);
-
-		/*ZESkyBrush* Brush = (ZESkyBrush*)zeCore->GetGame()->CreateEntityInstance("ZESkyBrush");
-		Brush->SetSkyTexture("cubetest.tga");
-		Brush->SetSkyColor(ZEVector3(1.0f, 1.0f, 1.0f));
-		Scene->AddEntity(Brush);*/
-		//Scene->Load("Map00.zeScene");	
-
+		zeGraphics->SetNearZ(0.1);
+		zeGraphics->SetFarZ(1000.0);
 		zeCore->Run();
 	}
 }

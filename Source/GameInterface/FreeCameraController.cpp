@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Player.h
+ Zinek Engine - FreeCameraController.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,38 +33,43 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PLAYER_H__
-#define __ZE_PLAYER_H__
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "FreeCameraController.h"
 
-#include "Graphics/Canvas.h"
-#include "Sound/Listener.h"
-#include "Input/InputMap.h"
-#include "Graphics/Light.h"
-
-ZE_ENTITY_DESCRIPTION(ZEPlayer, ZEEntity);
-
-class ZEPlayer : public ZEEntity
+ZEFreeCameraController::ZEFreeCameraController(ZECamera* Camera) : ZECameraController(Camera)
 {
-	ZE_ENTITY_CLASS(ZEPlayer)
-	private:
-		ZEInputMap				InputMap;
-		ZEListener				Listener;
-		ZEPointLight			Light;
+	Walk = 0;
+	Strafe = 0;
+	Pitch = 0;
+	Yaw = 0;
+}
+
+ZEFreeCameraController::~ZEFreeCameraController()
+{
+	Camera = NULL;
+}
+
+void ZEFreeCameraController::Update(float ElapsedTime)
+{
+	ZEVector3 Position = Camera->GetLocalPosition();
+	ZEQuaternion Orientation = Camera->GetLocalRotation();
 	
-	public:
-		ZEListener*				GetListener();
+	float cRoll,cYaw,cPitch;
+	ZEQuaternion::ConvertToEulerAngles(cPitch, cYaw, cRoll, Orientation);
+	cPitch += Pitch * ElapsedTime;
+	cYaw   += Yaw * ElapsedTime;
+	ZEQuaternion::Create(Orientation, cPitch, cYaw, cRoll);
+	Orientation.Normalize();
+	Position += Orientation * ZEVector3(Strafe,0,Walk) * ElapsedTime;
+	Camera->SetLocalPosition(Position);
+	Camera->SetLocalRotation(Orientation);
+}
 
-		void					Tick(float Time);
-
-		void					Draw(ZERenderer * Renderer);
-
-		void					SetActive(bool);
-		
-		void					Initialize();
-		void					Deinitialize();
-
-								ZEPlayer();
-								~ZEPlayer();
-};
-#endif
+void ZEFreeCameraController::setParams(float cWalk, float cStrafe, float cPitch, float cYaw)
+{
+	Walk   = cWalk;
+	Strafe = cStrafe;
+	Pitch  = cPitch;
+	Yaw    = cYaw;
+}

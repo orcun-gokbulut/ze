@@ -181,6 +181,18 @@ bool ZEScene::Initialize()
 	LightRangeMaterial.SetShaderComponents(0);
 	LightRangeMaterial.AmbientColor = ZEVector3(0.0f, 0.0f, 0.5f);
 	LightRangeMaterial.LightningEnabled = false;
+
+	CurrentCamera = new ZECamera();
+	CurrentCamera->SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	CurrentCamera->SetLocalRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
+	CurrentCamera->SetNearZ(zeGraphics->GetNearZ());
+	CurrentCamera->SetFarZ(zeGraphics->GetFarZ());
+	CurrentCamera->SetNearZ(0.1);
+	CurrentCamera->SetFarZ(1000);
+	CurrentCamera->SetFOV(ZE_PI_4);
+	CurrentCamera->SetAspectRatio(zeGraphics->GetAspectRatio());
+	CurrentCamera->Initialize();
+
 	return true;
 }
 
@@ -206,6 +218,13 @@ bool ZEScene::Deinitialize()
 	{
 		Renderer->Destroy();
 		Renderer = NULL;
+	}
+
+	if (CurrentCamera != NULL)
+	{
+		CurrentCamera->Deinitialize();
+		delete CurrentCamera;
+		CurrentCamera = NULL;
 	}
 
 	return true;
@@ -245,11 +264,35 @@ void ZEScene::SetListener(ZEListener* Listener)
 	zeSound->SetListener(Listener);
 }
 
+#include "Physics/PhysicsWorld.h"
+#include "GameInterface/CanvasBrush.h"
+#include "Physics/PhysicsCharacterController.h"
+#include "box.h"
+extern ZEPhysicsWorld* World;
+extern box* boxes[64];
+extern ZEPhysicsCharacterController* cont1;
+extern ZECanvasBrush* ccapsule;
+
 void ZEScene::Tick(float ElapsedTime)
 {
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 		if (Entities[I]->IsEnabled())
 			Entities[I]->Tick(ElapsedTime);
+
+	World->Update(ElapsedTime);
+
+	cont1->Update(ElapsedTime);
+	ZEVector3 ff = cont1->GetPosition();
+	ccapsule->SetPosition(ff);
+
+	for (int i=0;i<64;i++)
+	{
+		if (boxes[i])
+		{
+			boxes[i]->model->SetPosition(boxes[i]->actor->GetPosition());
+			boxes[i]->model->SetRotation(boxes[i]->actor->GetOrientation());
+		}
+	}
 }
 
 void ZEScene::Render(float ElapsedTime)

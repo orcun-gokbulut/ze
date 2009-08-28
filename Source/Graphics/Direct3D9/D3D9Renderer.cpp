@@ -469,11 +469,11 @@ void ZED3D9RendererBase::AddToRenderList(ZERenderList* RenderList)
 			return;
 		}
 
-		if (RenderList->PrimitiveCount == 0)
+		/*if (RenderList->PrimitiveCount == 0)
 		{
 			zeError("Direct3D9 Renderer", "RenderList's primitive count is zero.");
 			return;
-		}
+		}*/
 	#endif
 
 /*	if (RenderList->Lights.GetCount() != 0 && RenderList->Lights[0]->ShadowMap != NULL)

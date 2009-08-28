@@ -151,8 +151,8 @@ void ZEQuaternion::ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, c
 	float sqy = Quaternion.y * Quaternion.y;    
 	float sqz = Quaternion.z * Quaternion.z;
     Yaw = atan2(2 * Quaternion.y * Quaternion.w - 2 * Quaternion.x * Quaternion.z , 1 - 2 * sqy - 2 * sqz);
-	Pitch = asin(2 * test);
-	Roll = atan2(2 * Quaternion.x * Quaternion.w - 2 * Quaternion.y * Quaternion.z , 1 - 2 * sqx - 2 * sqz);
+	Roll = asin(2 * test);
+	Pitch = atan2(2 * Quaternion.x * Quaternion.w - 2 * Quaternion.y * Quaternion.z , 1 - 2 * sqx - 2 * sqz);
 }
 
 void ZEQuaternion::Conjugate()

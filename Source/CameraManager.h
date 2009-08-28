@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Player.h
+ Zinek Engine - CameraManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,38 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PLAYER_H__
-#define __ZE_PLAYER_H__
+#ifndef _CameraManager_H_
+#define _CameraManager_H_
 
-#include "Graphics/Canvas.h"
-#include "Sound/Listener.h"
-#include "Input/InputMap.h"
-#include "Graphics/Light.h"
+#include "GameInterface/FreeCameraController.h"
+#include "GameInterface/FpsCameraController.h"
+#include "GameInterface/TpsCameraController.h"
 
-ZE_ENTITY_DESCRIPTION(ZEPlayer, ZEEntity);
-
-class ZEPlayer : public ZEEntity
+class CameraManager
 {
-	ZE_ENTITY_CLASS(ZEPlayer)
-	private:
-		ZEInputMap				InputMap;
-		ZEListener				Listener;
-		ZEPointLight			Light;
-	
-	public:
-		ZEListener*				GetListener();
+public:
+	CameraManager();
+	~CameraManager();
+	void Update(float ElapsedTime);
+	void SetFreeController(ZEFreeCameraController* Controller) { FreeController = Controller; }
+	void SetFpsController(ZEFpsCameraController* Controller) { FpsController = Controller; }
+	void SetTpsController(ZETpsCameraController* Controller) { TpsController = Controller; }
+	void ChangeCamera() { CurrentCamera++;CurrentCamera = CurrentCamera % 3; }
+	int GetCurrentCamera() { return CurrentCamera; }
+	ZEFreeCameraController* GetFreeCamera() { return FreeController; }
+	ZEFpsCameraController* GetFpsCamera() { return FpsController; }
+	ZETpsCameraController* GetTpsCamera() { return TpsController; }
+	ZECamera* GetCamera() 
+	{
+		if (CurrentCamera == 0)return FreeController->GetCamera();
+		if (CurrentCamera == 1)return FpsController->GetCamera();
+		if (CurrentCamera == 2)return TpsController->GetCamera();
+	}
 
-		void					Tick(float Time);
-
-		void					Draw(ZERenderer * Renderer);
-
-		void					SetActive(bool);
-		
-		void					Initialize();
-		void					Deinitialize();
-
-								ZEPlayer();
-								~ZEPlayer();
+private:
+	ZEFreeCameraController* FreeController;
+	ZEFpsCameraController*  FpsController;
+	ZETpsCameraController*  TpsController;
+	int CurrentCamera;
 };
+
 #endif

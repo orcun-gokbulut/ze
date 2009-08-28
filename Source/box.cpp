@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Player.h
+ Zinek Engine - box.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,38 +33,63 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PLAYER_H__
-#define __ZE_PLAYER_H__
+#include "Core/Core.h"
+#include "Core/Module.h"
+#include "GameInterface/Scene.h"
+#include "Physics/PhysicsModule.h"
+#include "GameInterface/CanvasBrush.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
 
-#include "Graphics/Canvas.h"
-#include "Sound/Listener.h"
-#include "Input/InputMap.h"
-#include "Graphics/Light.h"
+#include "NxPhysics.h"
+#include "NxCooking.h"
+#include "Physics/Aegia/AegiaPhysicsModule.h"
+#include "Physics/PhysicsWorld.h"
+#include "Physics/PhysicsWorldInfo.h"
+#include "Physics/Aegia/AegiaPhysicsWorld.h"
+#include "Physics/PhysicsBody.h"
+#include "Physics/PhysicsBodyInfo.h"
+#include "Physics/Aegia/AegiaPhysicsBody.h"
+#include "Physics/PhysicsShapeInfo.h"
+#include "Physics/PhysicsBoxShapeInfo.h"
 
-ZE_ENTITY_DESCRIPTION(ZEPlayer, ZEEntity);
+#include "box.h"
 
-class ZEPlayer : public ZEEntity
+box::box(ZEScene* scene, const char* tex, float mass, ZEVector3 poss, ZEQuaternion ori, ZEVector3 scl, bool kinematic, bool trigger, ZEPhysicsCollisionMask mask, float ldamp, float adamp)
 {
-	ZE_ENTITY_CLASS(ZEPlayer)
-	private:
-		ZEInputMap				InputMap;
-		ZEListener				Listener;
-		ZEPointLight			Light;
-	
-	public:
-		ZEListener*				GetListener();
+	model = new ZECanvasBrush();
+	model->Canvas.AddBox(1,1,1);
+	model->SetPosition(poss);
+	model->SetScale(scl);
+	model->UpdateCanvas();
+	model->Material.SetZero();
+	model->Material.LightningEnabled = true;
+	model->Material.SetShaderComponents(ZESHADER_DIFFUSEMAP);
+	model->Material.AmbientColor = ZEVector3(0.0f, 0.0f, 0.0f);
+	model->Material.DiffuseColor = ZEVector3(1.0f, 1.0f, 1.0f);
+	model->Material.SpecularColor = ZEVector3(1.0f, 1.0f, 1.0f);
+	model->Material.SpecularFactor = 64.0f;
+	model->Material.DiffuseMap = ZETextureResource::LoadResource(tex)->GetTexture();
+	scene->AddEntity(model);
 
-		void					Tick(float Time);
+	ZEPhysicsBoxShapeInfo BoxShapeInfo;
+	BoxShapeInfo.Trigger = trigger;
+	BoxShapeInfo.CollisionMask = mask;
+	BoxShapeInfo.Dimensions = scl * 0.5;
+	ZEPhysicsBodyInfo BodyInfo;
+	BodyInfo.ShapeInfos.Add(&BoxShapeInfo);
+	BodyInfo.Mass = mass;
+	BodyInfo.Position = poss;
+	BodyInfo.Orientation = ori;
+	BodyInfo.Kinematic = kinematic;
+	BodyInfo.LinearDamp = ldamp;
+	BodyInfo.AngularDamp = adamp;
+	actor = zePhysics->CreateBody();
+	actor->Initialize(BodyInfo);
+	BoxShapeInfo.LocalPosition.y ++;
+	actor->AddShape(&BoxShapeInfo);
+}
 
-		void					Draw(ZERenderer * Renderer);
-
-		void					SetActive(bool);
-		
-		void					Initialize();
-		void					Deinitialize();
-
-								ZEPlayer();
-								~ZEPlayer();
-};
-#endif
+box::~box()
+{
+}

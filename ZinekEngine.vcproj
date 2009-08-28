@@ -749,8 +749,40 @@
 				>
 			</File>
 			<Filter
-				Name="TestGame"
+				Name="Camera"
 				>
+				<File
+					RelativePath=".\Source\GameInterface\CameraController.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\CameraController.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\FpsCameraController.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\FpsCameraController.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\FreeCameraController.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\FreeCameraController.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\TpsCameraController.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\TpsCameraController.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1580,6 +1612,22 @@
 				>
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\Source\box.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\box.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\CameraManager.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\CameraManager.h"
+			>
+		</File>
 		<File
 			RelativePath=".\Source\CompileOptions.h"
 			>
