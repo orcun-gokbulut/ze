@@ -88,8 +88,22 @@ extern box* boxes[64];
 extern ZEPhysicsCharacterController* cont1;
 extern ZECanvasBrush* ccapsule;
 
+#include "windows.h"
+#include "stdio.h"
+#include <iostream>
 void ZEPlayer::Tick(float Time)
 {
+	if (CamMgr.GetCurrentCamera() > 0)Sleep(10);
+	static float ttt = 0;
+	ttt += Time;
+	if (ttt > 1)
+	{
+		ttt = 0;
+		char str[64];
+		sprintf(str,"->%f\n",Time);
+		zeLog(str);
+	}
+
 	ZEVector3 Position = GetPosition();
 	ZEQuaternion Rotation = GetRotation();
 	ZEVector3 PositionChange;
@@ -99,6 +113,7 @@ void ZEPlayer::Tick(float Time)
 	float walk = 0,strafe = 0,pitch = 0,yaw = 0;
 	static float char_y = -10;
 	ZEVector3 cVelocity = ZEVector3(0,0,0);
+	static float tps_dist = 4.0;
 	
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 	ZEComponent* HitComponent;
@@ -125,6 +140,14 @@ void ZEPlayer::Tick(float Time)
 			}
 			case ACTIONID_TESTUP:
 			{
+				if (CamMgr.GetCurrentCamera() == 1)
+				{
+					CamMgr.GetFpsCamera()->Shake();
+				}
+				else if (CamMgr.GetCurrentCamera() == 2)
+				{
+					CamMgr.GetTpsCamera()->Shake();
+				}
 				break;
 			}
 			case ACTIONID_TESTDN:
@@ -132,24 +155,26 @@ void ZEPlayer::Tick(float Time)
 				break;
 			}
 			case ACTIONID_ZOOMIN:
+				tps_dist -= Time * 100;
 				break;
 			case ACTIONID_ZOOMOUT:
+				tps_dist += Time * 100;
 				break;
 			case ACTIONID_TURNLEFT:
 				//setCrossair(GetPosition(), GetRotation());
-				yaw = -1.0 * Current->AxisValue;
+				yaw = -0.0025 * Current->AxisValue / Time;
 				break;
 			case ACTIONID_TURNRIGHT:
 				//setCrossair(GetPosition(), GetRotation());
-				yaw = 1.0 * Current->AxisValue;
+				yaw = 0.0025 * Current->AxisValue / Time;
 				break;
 			case ACTIONID_TURNUP:
 				//setCrossair(GetPosition(), GetRotation());
-				pitch = 1.0 * Current->AxisValue;
+				pitch = 0.0025 * Current->AxisValue / Time;
 				break;
 			case ACTIONID_TURNDOWN:
 				//setCrossair(GetPosition(), GetRotation());
-				pitch = -1.0 * Current->AxisValue;
+				pitch = -0.0025 * Current->AxisValue / Time;
 				break;
 			case ACTIONID_CONSOLE:
 				if (zeConsole->IsVisible())
@@ -257,7 +282,7 @@ void ZEPlayer::Tick(float Time)
 	else if (CamMgr.GetCurrentCamera() == 1)
 	{
 		//apply velocity to char controller
-		ZEVector3::Scale(cVelocity, cVelocity, 8);
+		ZEVector3::Scale(cVelocity, cVelocity, 4);
 		char_y -= 10 * Time;
 		if (cont1->IsOnGround() && char_y < -10)char_y = -10;
 		cVelocity.y = char_y;
@@ -265,12 +290,12 @@ void ZEPlayer::Tick(float Time)
 		//
 		ZEVector3 npos = cont1->GetPosition();
 		ZEVector3 offset(0,1,0);
-		CamMgr.GetFpsCamera()->setParams(npos, offset,pitch, yaw);
+		CamMgr.GetFpsCamera()->SetParams(npos, offset,pitch, yaw);
 	}
 	else if (CamMgr.GetCurrentCamera() == 2)
 	{
 		//apply velocity to char controller
-		ZEVector3::Scale(cVelocity, cVelocity, 8);
+		ZEVector3::Scale(cVelocity, cVelocity, 4);
 		char_y -= 10 * Time;
 		if (cont1->IsOnGround() && char_y < -10)char_y = -10;
 		cVelocity.y = char_y;
@@ -278,22 +303,10 @@ void ZEPlayer::Tick(float Time)
 
 		ZEVector3 npos = cont1->GetPosition();
 		ZEVector3 offset(0,1,-5);
-		CamMgr.GetTpsCamera()->setParams(npos, offset, pitch, yaw);
+		ZEVector3::Normalize(offset,offset);
+		CamMgr.GetTpsCamera()->SetParams(npos, offset * tps_dist, pitch, yaw);
 	}
 	CamMgr.Update(Time);
-
-	//else if (camtype == 2)
-	//{
-	//	//apply velocity to char controller
-	//	ZEVector3::Scale(cVelocity, cVelocity, 8);
-	//	char_y -= 10 * Time;
-	//	if (cont1->IsOnGround() && char_y < -10)char_y = -10;
-	//	cVelocity.y = char_y;
-	//	cont1->SetVelocity(cVelocity);
-
-	//	ZEVector3 Offset(0,1,-5);
-	//	//CameraManager::UpdateTps(this, cont1, Offset, pitch, yaw, Time);
-	//}
 
 	ZEEntity::Tick(Time);
 }

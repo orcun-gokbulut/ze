@@ -76,7 +76,8 @@ public:
 
 	bool CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
 	bool CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEPhysicsBody** Contact, ZEPhysicsCollisionMask Mask);
-
+	bool BoxSweep(ZEVector3 Center, ZEVector3 Dimensions, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
+	bool CapsuleSweep(ZEVector3 Center, float Radius, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
 	//gets & sets
 	bool IsEnabled() { return Enabled; }
 	void SetEnabled(bool Enabled) { this->Enabled = Enabled; }

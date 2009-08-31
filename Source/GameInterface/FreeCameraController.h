@@ -41,7 +41,7 @@
 class ZEFreeCameraController : public ZECameraController
 {
 public:
-							ZEFreeCameraController(ZECamera* Camera);
+							ZEFreeCameraController(ZECamera* Camera, float PitchLimit);
 							~ZEFreeCameraController();
 	void					Update(float ElapsedTime);
 	void					setParams(float cWalk, float cStrafe, float cPitch, float cYaw);
@@ -51,6 +51,7 @@ private:
 	float					Strafe;
 	float					Pitch;
 	float					Yaw;
+	float					PitchLimit;
 };
 
 #endif

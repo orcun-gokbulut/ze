@@ -86,8 +86,6 @@ box::box(ZEScene* scene, const char* tex, float mass, ZEVector3 poss, ZEQuaterni
 	BodyInfo.AngularDamp = adamp;
 	actor = zePhysics->CreateBody();
 	actor->Initialize(BodyInfo);
-	BoxShapeInfo.LocalPosition.y ++;
-	actor->AddShape(&BoxShapeInfo);
 }
 
 box::~box()

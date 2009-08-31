@@ -170,7 +170,6 @@ bool ZEAegiaPhysicsModule::CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEVect
 			Point = TOZE(Hit.worldImpact);
 			return true;
 		}
-		return false;
 	}
 	return false;
 }
@@ -190,9 +189,46 @@ bool ZEAegiaPhysicsModule::CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEPhys
 			*Contact = (ZEPhysicsBody*)ClosestShape->getActor().userData;
 			return true;
 		}
-		return false;
 	}
 	*Contact = NULL;
 	return false;
 }
 
+bool ZEAegiaPhysicsModule::BoxSweep(ZEVector3 Center, ZEVector3 Dimensions, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask)
+{
+	ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
+	if (World != NULL)
+	{
+		NxBox Box;
+		Box.center	= TONX(Center);
+		Box.extents	= TONX(Dimensions);;
+
+		NxSweepQueryHit Result;
+		if (World->GetScene()->linearOBBSweep(Box, TONX(Motion), NX_SF_STATICS|NX_SF_DYNAMICS, NULL, 1, &Result, NULL, -1, &ZEAegiaPhysicsUtility::toNX(Mask)) > 0)
+		{
+			Point = TOZE(Result.point);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool ZEAegiaPhysicsModule::CapsuleSweep(ZEVector3 Center, float Radius, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask)
+{
+	ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
+	if (World != NULL)
+	{
+		NxCapsule Capsule;
+		Capsule.radius	= Radius;
+		Capsule.p0 = TONX(Center);
+		Capsule.p1 = TONX(Center);
+	    
+		NxSweepQueryHit Result;
+		if (World->GetScene()->linearCapsuleSweep(Capsule, TONX(Motion), NX_SF_STATICS|NX_SF_DYNAMICS, NULL, 1, &Result, NULL, -1, &ZEAegiaPhysicsUtility::toNX(Mask)) > 0)
+		{
+			Point = TOZE(Result.point);
+			return true;
+		}
+	}
+	return false;
+}

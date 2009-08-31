@@ -37,11 +37,16 @@
 #include "ZEMath/Quaternion.h"
 #include "FpsCameraController.h"
 
-ZEFpsCameraController::ZEFpsCameraController(ZECamera* Camera) : ZECameraController(Camera)
+ZEFpsCameraController::ZEFpsCameraController(ZECamera* Camera, float PitchLimit) : ZECameraController(Camera)
 {
 	Position = ZEVector3(0,0,0);
+	Shaker = ZEVector3(0,0,0);
+	ShakeQ = ZEQuaternion(1,0,0,0);
+	ShakeTime = 0;
+	ShakeInterval = 0;
 	Pitch = 0;
 	Yaw = 0;
+	this->PitchLimit = PitchLimit;
 }
 
 ZEFpsCameraController::~ZEFpsCameraController()
@@ -56,14 +61,42 @@ void ZEFpsCameraController::Update(float ElapsedTime)
 	ZEQuaternion::ConvertToEulerAngles(cPitch, cYaw, cRoll, Orientation);
 	cPitch += Pitch * ElapsedTime;
 	cYaw   += Yaw * ElapsedTime;
+	if (cPitch >= PitchLimit)cPitch = PitchLimit;
+	else if (cPitch <= -PitchLimit)cPitch = -PitchLimit;
 	ZEQuaternion::Create(Orientation, cPitch, cYaw, cRoll);
 	Camera->SetLocalPosition(Position);
+	
+	//shaking
+	if (ShakeTime > 0)
+	{
+		ShakeTime -= ElapsedTime;
+		static float CShake = 0;
+		CShake += ElapsedTime;
+		if (CShake > ShakeInterval)
+		{
+			CShake = 0;
+			float p = (-50 + (rand() % 100)) * 0.02 * Shaker.x * ElapsedTime;
+			float y = (-50 + (rand() % 100)) * 0.02 * Shaker.y * ElapsedTime;
+			float r = (-50 + (rand() % 100)) * 0.02 * Shaker.z * ElapsedTime;
+			ZEQuaternion::Create(ShakeQ, p,y,r);
+		}
+		ZEQuaternion::Product(Orientation, Orientation, ShakeQ);
+	}
+
+	//apply ori
 	Camera->SetLocalRotation(Orientation);
 }
 
-void ZEFpsCameraController::setParams(ZEVector3 cPosition, ZEVector3 cOffset, float cPitch, float cYaw)
+void ZEFpsCameraController::SetParams(ZEVector3 cPosition, ZEVector3 cOffset, float cPitch, float cYaw)
 {
 	Position = cPosition + cOffset;
 	Pitch	 = cPitch;
 	Yaw		 = cYaw;
+}
+
+void ZEFpsCameraController::Shake(ZEVector3 PowerAxis, float Time, float Interval)
+{
+	Shaker = PowerAxis;
+	ShakeTime = Time;
+	ShakeInterval = Interval;
 }

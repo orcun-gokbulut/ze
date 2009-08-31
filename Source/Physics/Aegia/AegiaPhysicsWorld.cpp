@@ -205,7 +205,29 @@ void ZEAegiaPhysicsWorld::Deinitialize()
 void ZEAegiaPhysicsWorld::ShowDebugView(bool Show) 
 { 
 	DebugView = Show;
-	if (Debugger)Debugger->SetVisible(Show);
+	if (Debugger)
+	{
+		Debugger->SetVisible(Show);
+
+		if (DebugView)
+		{
+			Debugger->Canvas.Clean();
+
+			const NxDebugRenderable* data = PhysicsScene->getDebugRenderable();
+			NxU32 NbLines = NULL;
+			if (data)NbLines = data->getNbLines();
+			const NxDebugLine* Lines;
+			if (data)Lines = data->getLines();
+			
+			while(NbLines--)
+			{
+				Debugger->Canvas.AddLine(ZEVector3(Lines->p0.x,Lines->p0.y,Lines->p0.z),ZEVector3(Lines->p1.x,Lines->p1.y,Lines->p1.z));
+				Lines++;
+			}
+
+			Debugger->UpdateCanvas();
+		}
+	}
 }
 
 void ZEAegiaPhysicsWorld::Update(const float ElapsedTime)
@@ -215,7 +237,7 @@ void ZEAegiaPhysicsWorld::Update(const float ElapsedTime)
 	PhysicsScene->flushStream();
 
 	//debug render
-	if (DebugView)
+	/*if (DebugView)
 	{
 		Debugger->Canvas.Clean();
 
@@ -232,7 +254,7 @@ void ZEAegiaPhysicsWorld::Update(const float ElapsedTime)
 		}
 
 		Debugger->UpdateCanvas();
-	}
+	}*/
 
 	while(!PhysicsScene->fetchResults(NX_RIGID_BODY_FINISHED, false)){}
 }

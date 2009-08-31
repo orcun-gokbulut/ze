@@ -117,7 +117,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Scene->SetVisualDebugElements(ZE_VDE_NONE);
 
 		//boxes
-		for (int i=0;i<4;i++)
+		for (int i=0;i<5;i++)
 		{
 			boxes[i] = new box(Scene,"textures/greek_roman0001.tga",10,ZEVector3(0,0+i*1,0),ZEQuaternion(), ZEVector3(0.5,0.5,0.5), false, false, all, 0.25, 0.25);
 		}
@@ -126,7 +126,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		ccapsule = new ZECanvasBrush();
 		ccapsule->Canvas.LoadCanvasFile("Test/Capsule.zeCanvas");
 		ccapsule->SetPosition(ZEPoint3(0,0,0));
-		ccapsule->SetScale(ZEPoint3(0.5,1,0.5));
+		ccapsule->SetScale(ZEPoint3(0.25,0.60,0.25));
 		ccapsule->UpdateCanvas();
 		ccapsule->Material.SetZero();
 		ccapsule->Material.LightningEnabled = true;
@@ -139,11 +139,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Scene->AddEntity(ccapsule);
 
 		ZEPhysicsCharacterControllerInfo ChrInfo;
-		ChrInfo.Height = 1.75;
-		ChrInfo.Radius = 0.30;
-		ChrInfo.SlopeLimit = 75;
-		ChrInfo.StepLimit = 0.5;
-		ChrInfo.Position = ZEVector3(0,2,0);
+		ChrInfo.Height = 1.25;
+		ChrInfo.Radius = 0.125;
+		ChrInfo.SlopeLimit = 60;
+		ChrInfo.StepLimit = 0.125;
+		ChrInfo.Position = ZEVector3(2,1,0);
 		cont1 = zePhysics->CreateController();
 		cont1->Initialize(ChrInfo);
 
@@ -168,11 +168,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Light->SetScale(ZEVector3(0.01,0.01,0.01));
 		Scene->AddEntity(Light);
 
-		ZEFreeCameraController* cont1 = new ZEFreeCameraController(Scene->CurrentCamera);
+		ZEFreeCameraController* cont1 = new ZEFreeCameraController(Scene->CurrentCamera,ZE_PI_2);
 		CamMgr.SetFreeController(cont1);
-		ZEFpsCameraController* cont2 = new ZEFpsCameraController(Scene->CurrentCamera);
+		ZEFpsCameraController* cont2 = new ZEFpsCameraController(Scene->CurrentCamera,ZE_PI_2);
 		CamMgr.SetFpsController(cont2);
-		ZETpsCameraController* cont3 = new ZETpsCameraController(Scene->CurrentCamera);
+		ZETpsCameraController* cont3 = new ZETpsCameraController(Scene->CurrentCamera,ZE_PI / 3, 1000, 100);
 		CamMgr.SetTpsController(cont3);
 
 		zeGraphics->SetNearZ(0.1);

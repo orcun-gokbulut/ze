@@ -41,11 +41,19 @@
 #include "Physics/PhysicsModule.h"
 #include "Physics/PhysicsCollisionMask.h"
 
-ZETpsCameraController::ZETpsCameraController(ZECamera* Camera) : ZECameraController(Camera)
+ZETpsCameraController::ZETpsCameraController(ZECamera* Camera, float PitchLimit, unsigned int SpringValue, unsigned int SpringDamp) : ZECameraController(Camera)
 {
 	Position = ZEVector3(0,0,0);
+	Velocity = ZEVector3(0,0,0);
 	Pitch = 0;
 	Yaw = 0;
+	Shaker = ZEVector3(0,0,0);
+	ShakeQ = ZEQuaternion(1,0,0,0);
+	ShakeTime = 0;
+	ShakeInterval = 0;
+	this->PitchLimit = PitchLimit;
+	this->SpringValue = SpringValue;
+	this->SpringDamp = SpringDamp;
 }
 
 ZETpsCameraController::~ZETpsCameraController()
@@ -62,12 +70,15 @@ void ZETpsCameraController::Update(float ElapsedTime)
 	ZEQuaternion::ConvertToEulerAngles(cPitch, cYaw, cRoll, Orientation);
 	cYaw   += Yaw * ElapsedTime;
 	cPitch += Pitch * ElapsedTime;
+	if (cPitch >= PitchLimit)cPitch = PitchLimit;
+	else if (cPitch <= -PitchLimit)cPitch = -PitchLimit;
 	ZEQuaternion::Create(Orientation, cPitch, cYaw, cRoll);
 
 	ZEVector3 Result;
 	ZEVector3::Normalize(Result,(Orientation * Offset));
+
 	ZEPhysicsCollisionMask Mask;Mask.Full();
-	if (zePhysics->CastRay(Position, Result, Result, Mask))
+	if (zePhysics->CapsuleSweep(Position, 0.1, Result*ZEVector3::LengthSquare(Offset), Result, Mask))
 	{
 		float Length = (Position - Result).Length();
 		float OffLength = Offset.Length();
@@ -81,15 +92,52 @@ void ZETpsCameraController::Update(float ElapsedTime)
 		}
 	}
 	else Position = rPosition + Orientation * Offset;
-	
+
+	//spring
+	if (SpringValue > 0)
+	{
+		ZEVector3 Delta = Camera->GetLocalPosition() - Position;
+		ZEVector3 Acc = (Delta * -(float)SpringValue) - (Velocity * (float)SpringDamp);
+		Velocity += Acc * ElapsedTime;
+		ZEVector3 NewPosition = Camera->GetLocalPosition() + Velocity * ElapsedTime;
+		if (ZEVector3::DistanceSquare(NewPosition,Position) < ZEVector3::LengthSquare(Delta))
+		{
+			Position = NewPosition;
+		}
+	}
+
+	//shaking
+	if (ShakeTime > 0)
+	{
+		ShakeTime -= ElapsedTime;
+		static float CShake = 0;
+		CShake += ElapsedTime;
+		if (CShake > ShakeInterval)
+		{
+			CShake = 0;
+			float p = (-50 + (rand() % 100)) * 0.02 * Shaker.x * ElapsedTime;
+			float y = (-50 + (rand() % 100)) * 0.02 * Shaker.y * ElapsedTime;
+			float r = (-50 + (rand() % 100)) * 0.02 * Shaker.z * ElapsedTime;
+			ZEQuaternion::Create(ShakeQ, p,y,r);
+		}
+		ZEQuaternion::Product(Orientation, Orientation, ShakeQ);
+	}
+
 	Camera->SetLocalPosition(Position);
 	Camera->SetLocalRotation(Orientation);
 }
 
-void ZETpsCameraController::setParams(ZEVector3 cPosition, ZEVector3 cOffset, float cPitch, float cYaw)
+void ZETpsCameraController::SetParams(ZEVector3 cPosition, ZEVector3 cOffset, float cPitch, float cYaw)
 {
 	Position = cPosition;
 	Offset = cOffset;
 	Pitch  = cPitch;
 	Yaw    = cYaw;
+}
+
+void ZETpsCameraController::Shake(ZEVector3 PowerAxis, float Time, float Interval)
+{
+	Shaker = PowerAxis;
+	ShakeTime = Time;
+	ShakeInterval = Interval;
 }

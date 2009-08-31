@@ -37,12 +37,13 @@
 #include "ZEMath/Quaternion.h"
 #include "FreeCameraController.h"
 
-ZEFreeCameraController::ZEFreeCameraController(ZECamera* Camera) : ZECameraController(Camera)
+ZEFreeCameraController::ZEFreeCameraController(ZECamera* Camera, float PitchLimit) : ZECameraController(Camera)
 {
 	Walk = 0;
 	Strafe = 0;
 	Pitch = 0;
 	Yaw = 0;
+	this->PitchLimit = PitchLimit;
 }
 
 ZEFreeCameraController::~ZEFreeCameraController()
@@ -59,6 +60,8 @@ void ZEFreeCameraController::Update(float ElapsedTime)
 	ZEQuaternion::ConvertToEulerAngles(cPitch, cYaw, cRoll, Orientation);
 	cPitch += Pitch * ElapsedTime;
 	cYaw   += Yaw * ElapsedTime;
+	if (cPitch >= PitchLimit)cPitch = PitchLimit;
+	else if (cPitch <= -PitchLimit)cPitch = -PitchLimit;
 	ZEQuaternion::Create(Orientation, cPitch, cYaw, cRoll);
 	Orientation.Normalize();
 	Position += Orientation * ZEVector3(Strafe,0,Walk) * ElapsedTime;

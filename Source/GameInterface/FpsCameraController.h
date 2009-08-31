@@ -41,15 +41,22 @@
 class ZEFpsCameraController : public ZECameraController
 {
 public:
-							ZEFpsCameraController(ZECamera* Camera);
+							ZEFpsCameraController(ZECamera* Camera, float PitchLimit);
 							~ZEFpsCameraController();
 	void					Update(float ElapsedTime);
-	void					setParams(ZEVector3 cPosition, ZEVector3 cOffset, float cPitch, float cYaw);
+	void					SetParams(ZEVector3 cPosition, ZEVector3 cOffset, float cPitch, float cYaw);
+	void					Shake(ZEVector3 PowerAxis = ZEVector3(0.5,0.5,0.5), float Time = 1.0, float Interval = 0.01);
 
 private:
 	ZEVector3				Position;
 	float					Pitch;
 	float					Yaw;
+	float					PitchLimit;
+	//shake
+	ZEVector3				Shaker;
+	ZEQuaternion			ShakeQ;
+	float                   ShakeTime;
+	float					ShakeInterval;
 };
 
 #endif

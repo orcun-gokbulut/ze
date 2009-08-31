@@ -72,6 +72,9 @@ class ZEPhysicsModule : public ZEModule
 
 		virtual bool				CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEVector3& Point, ZEPhysicsCollisionMask Mask) = 0;
 		virtual bool				CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEPhysicsBody** Contact, ZEPhysicsCollisionMask Mask) = 0;
+
+		virtual bool				BoxSweep(ZEVector3 Center, ZEVector3 Dimensions, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask) = 0;
+		virtual bool				CapsuleSweep(ZEVector3 Center, float Radius, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask) = 0;
 };
 
 #endif
