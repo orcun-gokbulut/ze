@@ -33,6 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDS/ZEDS.h"
-#include "ModelResource.h"
 #include "ModelFileFormat.h"

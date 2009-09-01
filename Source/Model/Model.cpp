@@ -337,8 +337,9 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	BodyInfo.Position = MeshResource->PhysicalBody.Position;
 	BodyInfo.Orientation = MeshResource->PhysicalBody.Orientation;
 	BodyInfo.Kinematic = MeshResource->PhysicalBody.Kinematic;
-	BodyInfo.LinearDamp = MeshResource->PhysicalBody.LinearDamp;
-	BodyInfo.AngularDamp = MeshResource->PhysicalBody.AngularDamp;
+	BodyInfo.LinearDamp = MeshResource->PhysicalBody.LinearDamping;
+	BodyInfo.AngularDamp = MeshResource->PhysicalBody.AngularDamping;
+	
 	for (size_t j = 0; j < MeshResource->PhysicalBody.Shapes.GetCount(); j++)
 	{
 		ZEModelResourcePhysicalShape Shape = MeshResource->PhysicalBody.Shapes[j];
@@ -347,10 +348,10 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			case ZE_PST_PLANE:
 			{
 				ZEPhysicsPlaneShapeInfo PlaneShapeInfo;
-				PlaneShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
-				PlaneShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
-				PlaneShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
-				PlaneShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				PlaneShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
+				PlaneShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
+				PlaneShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
+				PlaneShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//PlaneShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
 				PlaneShapeInfo.LocalPosition = Shape.LocalPosition;
 				PlaneShapeInfo.Trigger = Shape.Trigger;
@@ -366,10 +367,10 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			case ZE_PST_BOX:
 			{
 				ZEPhysicsBoxShapeInfo BoxShapeInfo;
-				BoxShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
-				BoxShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
-				BoxShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
-				BoxShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				BoxShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
+				BoxShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
+				BoxShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
+				BoxShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//BoxShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
 				BoxShapeInfo.LocalPosition = Shape.LocalPosition;
 				BoxShapeInfo.Trigger = Shape.Trigger;
@@ -383,10 +384,10 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			case ZE_PST_SPHERE:
 			{
 				ZEPhysicsSphereShapeInfo SphereShapeInfo;
-				SphereShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
-				SphereShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
-				SphereShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
-				SphereShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				SphereShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
+				SphereShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
+				SphereShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
+				SphereShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//SphereShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
 				SphereShapeInfo.LocalPosition = Shape.LocalPosition;
 				SphereShapeInfo.Trigger = Shape.Trigger;
@@ -398,10 +399,10 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			case ZE_PST_CAPSULE:
 			{
 				ZEPhysicsCapsuleShapeInfo CapsuleShapeInfo;
-				CapsuleShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
-				CapsuleShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
-				CapsuleShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
-				CapsuleShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				CapsuleShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
+				CapsuleShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
+				CapsuleShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
+				CapsuleShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//CapsuleShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
 				CapsuleShapeInfo.LocalPosition = Shape.LocalPosition;
 				CapsuleShapeInfo.Trigger = Shape.Trigger;
@@ -414,10 +415,10 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			case ZE_PST_CONVEX:
 			{
 				ZEPhysicsConvexShapeInfo ConvexShapeInfo;
-				ConvexShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
-				ConvexShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
-				ConvexShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
-				ConvexShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				ConvexShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
+				ConvexShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
+				ConvexShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
+				ConvexShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//ConvexShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
 				ConvexShapeInfo.LocalPosition = Shape.LocalPosition;
 				ConvexShapeInfo.Trigger = Shape.Trigger;
@@ -429,20 +430,20 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			case ZE_PST_TRIMESH:
 			{
 				ZEPhysicsTrimeshShapeInfo TrimeshShapeInfo;
-				TrimeshShapeInfo.CollisionMask.Mask1 = Shape.Mask1;
-				TrimeshShapeInfo.CollisionMask.Mask2 = Shape.Mask2;
-				TrimeshShapeInfo.CollisionMask.Mask3 = Shape.Mask3;
-				TrimeshShapeInfo.CollisionMask.Mask4 = Shape.Mask4;
+				TrimeshShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
+				TrimeshShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
+				TrimeshShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
+				TrimeshShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//TrimeshShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
 				TrimeshShapeInfo.LocalPosition = Shape.LocalPosition;
 				TrimeshShapeInfo.Trigger = Shape.Trigger;
 
-				TrimeshShapeInfo.Vertices = Shape.Trimesh.Vertices;
-				for (int i=0;i<Shape.Trimesh.Indices.GetCount();i++)
+				TrimeshShapeInfo.Vertices = Shape.TriMesh.Vertices;
+				for (int i=0;i<Shape.TriMesh.Indices.GetCount();i++)
 				{
-					TrimeshShapeInfo.Indexes.Add(Shape.Trimesh.Indices[i].VertexIndexes[0]);
-					TrimeshShapeInfo.Indexes.Add(Shape.Trimesh.Indices[i].VertexIndexes[1]);
-					TrimeshShapeInfo.Indexes.Add(Shape.Trimesh.Indices[i].VertexIndexes[2]);
+					TrimeshShapeInfo.Indexes.Add(Shape.TriMesh.Indices[i].VertexIndexes[0]);
+					TrimeshShapeInfo.Indexes.Add(Shape.TriMesh.Indices[i].VertexIndexes[1]);
+					TrimeshShapeInfo.Indexes.Add(Shape.TriMesh.Indices[i].VertexIndexes[2]);
 				}
 				BodyInfo.ShapeInfos.Add(&TrimeshShapeInfo);
 				break;

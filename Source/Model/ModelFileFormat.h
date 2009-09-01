@@ -40,12 +40,8 @@
 #include "ZEMath/Vector.h"
 #include "ZEMath/Quaternion.h"
 #include "ZEMath/AABoundingBox.h"
-#include "ZEDS/Array.h"
-
-#ifdef __ZINEK_ENGINE__
 #include "Definitions.h"
 #include "Types.h"
-#endif
 
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256
@@ -123,23 +119,24 @@ struct ZEModelFileAnimationFrameChunk
 	ZEDWORD								MeshKeyCount;
 };
 
-struct ZEModelFilePhysicalPolygon
+struct ZEModelFilePhysicalPolygonChunk
 {	
 	int									VertexIndexes[3];
 };
 
-struct ZEModelFilePhysicalShapeChunk
+struct ZEModelFilePhysicalBodyShapeChunk
 {
 	ZEDWORD								ChunkId;
 	ZEDWORD								Type;
 	ZEVector3							LocalPosition;
 	ZEQuaternion						LocalOrientation;
 	float								Restitution;
-	float								Friction;
-	ZEDWORD								Mask1;
-	ZEDWORD								Mask2;
-	ZEDWORD								Mask3;
-	ZEDWORD								Mask4;
+	float								StaticFriction;
+	float								DynamicFriction;
+	ZEDWORD								CollisionMask1;
+	ZEDWORD								CollisionMask2;
+	ZEDWORD								CollisionMask3;
+	ZEDWORD								CollisionMask4;
 	bool								Trigger;
 	
 	union
@@ -179,19 +176,17 @@ struct ZEModelFilePhysicalShapeChunk
 		{
 			ZEDWORD						VertexCount;
 			ZEDWORD						IndexCount;
-		} Trimesh;
+		} TriMesh;
 	};
 };
 
 struct ZEModelFilePhysicalBodyChunk
 {
-	ZEDWORD				                BodyType;
+	ZEDWORD				                Type;
 	float								Mass;
 	bool								Kinematic;
-	float								LinearDamp;
-	float								AngularDamp;
-	ZEVector3							Position;
-	ZEQuaternion						Orientation;
+	float								LinearDamping;
+	float								AngularDamping;
 	ZEVector3							MassCenter;
 	ZEDWORD								ShapeCount;
 };
@@ -199,17 +194,17 @@ struct ZEModelFilePhysicalBodyChunk
 struct ZEModelFilePhysicalJointChunk
 {
 	ZEDWORD								Type;
+	ZEDWORD								Body1Type;
 	ZEDWORD								Body1Id;
 	ZEDWORD								Body2Id;
-	bool								CollideBodies;
+	bool								UseGlobalAnchorAxis;
 	ZEVector3							GlobalAnchor;
-	bool								UseGlobalAnchor;
-	ZEVector3							GlobalAxis;
-	bool								UseGlobalAxis;
+	ZEQuaternion						GlobalAxis;
 	ZEVector3							LocalAnchor1;
 	ZEVector3							LocalAnchor2;
-	ZEVector3							LocalAxis1;
-	ZEVector3							LocalAxis2;
+	ZEQuaternion						LocalAxis1;
+	ZEQuaternion						LocalAxis2;
+	bool								CollideBodies;
 	bool								Breakable;
 	float								BreakForce;
 	float								BreakTorque;
@@ -272,43 +267,52 @@ struct ZEModelFilePhysicalJointChunk
 		ZEDWORD 						XMotion;
 		ZEDWORD 						YMotion;
 		ZEDWORD 						ZMotion;
-		ZEDWORD 						TwistMotion;
-		ZEDWORD 						SwingMotion1;
-		ZEDWORD 						SwingMotion2;
 		float 							LinearLimitValue;
 		float 							LinearLimitRestitution;
 		float 							LinearLimitSpring;
 		float 							LinearLimitDamper;
+
+		ZEDWORD 						TwistMotion;
 		float 							TwistLimitHighValue;
 		float 							TwistLimitLowValue;
 		float 							TwistLimitRestitution;
 		float 							TwistLimitSpring;
 		float 							TwistLimitDamper;
+ 							
+		ZEDWORD 						Swing1Motion;
 		float 							Swing1LimitValue;
 		float 							Swing1LimitRestitution;
 		float 							Swing1LimitSpring;
 		float 							Swing1LimitDamper;
+		
+		ZEDWORD 						Swing2Motion;
 		float 							Swing2LimitValue;
 		float 							Swing2LimitRestitution;
 		float 							Swing2LimitSpring;
 		float 							Swing2LimitDamper;
+
 		ZEVector3 						LinearMotorPosition;
 		ZEVector3 						LinearMotorVelocity;
+
 		ZEDWORD 						LinearXMotor;
 		float 							LinearXMotorForce;
 		float 							LinearXMotorSpring;
 		float 							LinearXMotorDamper;
+
 		ZEDWORD 						LinearYMotor;
 		float 							LinearYMotorForce;
 		float 							LinearYMotorSpring;
 		float 							LinearYMotorDamper;
+
 		ZEDWORD 						LinearZMotor;
-		float							LinearZMotorForce;
+		float 							LinearZMotorForce;
 		float 							LinearZMotorSpring;
 		float 							LinearZMotorDamper;
-		ZEDWORD 						AngularMotor;
+ 							
 		ZEQuaternion 					AngularMotorOrientation;
 		ZEVector3 						AngularMotorVelocity;
+
+		ZEDWORD 						AngularMotor;
 		float 							AngularMotorForce;
 		float 							AngularMotorSpring;
 		float 							AngularMotorDamper;
@@ -345,6 +349,7 @@ struct ZEModelFileBoneChunk
 	ZEVector3							AbsolutePosition;
 	ZEQuaternion						AbsoluteOrientation;
 	ZEAABoundingBox						BoundingBox;
+	ZEModelFilePhysicalBodyChunk		PhysicalBody;
 	ZEModelFilePhysicalJointChunk		PhysicalJoint;
 };
 

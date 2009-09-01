@@ -67,16 +67,17 @@ enum ZEPhysicalBodyType
 
 enum ZEPhysicalJointType
 {
-	ZE_PJT_FIXED            = 0,
-	ZE_PJT_SPHERICAL		= 1,
-	ZE_PJT_REVOLUTE			= 2,
-	ZE_PJT_PRISMATIC		= 3,
-	ZE_PJT_CYLINDRICAL		= 4,
-	ZE_PJT_DISTANCE			= 5,
-	ZE_PJT_POINTONLINE		= 6,
-	ZE_PJT_POINTINPLANE		= 7,
-	ZE_PJT_PULLEY			= 8,
-	ZE_PJT_FREE				= 9
+	ZE_PJT_NONE				= 0,
+	ZE_PJT_FIXED            = 1,
+	ZE_PJT_SPHERICAL		= 2,
+	ZE_PJT_REVOLUTE			= 3,
+	ZE_PJT_PRISMATIC		= 4,
+	ZE_PJT_CYLINDRICAL		= 5,
+	ZE_PJT_DISTANCE			= 6,
+	ZE_PJT_POINTONLINE		= 7,
+	ZE_PJT_POINTINPLANE		= 8,
+	ZE_PJT_PULLEY			= 9,
+	ZE_PJT_FREE				= 10
 };
 
 struct ZEModelResourcePhysicalPolygon
@@ -90,11 +91,12 @@ struct ZEModelResourcePhysicalShape
 	ZEVector3									LocalPosition;
 	ZEQuaternion								LocalOrientation;
 	float										Restitution;
-	float										Friction;
-	ZEDWORD										Mask1;
-	ZEDWORD										Mask2;
-	ZEDWORD										Mask3;
-	ZEDWORD										Mask4;
+	float										StaticFriction;
+	float										DynamicFriction;
+	ZEDWORD										CollisionMask1;
+	ZEDWORD										CollisionMask2;
+	ZEDWORD										CollisionMask3;
+	ZEDWORD										CollisionMask4;
 	bool										Trigger;
 	
 	union
@@ -109,10 +111,10 @@ struct ZEModelResourcePhysicalShape
 
 		struct
 		{
-			float						Width;
-			float						Height;
-			float						Length;
-		} Box;
+			float								Width;
+			float								Height;
+			float								Length;
+		} Box;	
 
 		struct
 		{
@@ -135,16 +137,16 @@ struct ZEModelResourcePhysicalShape
 	{
 		ZEArray<ZEVector3>						Vertices;
 		ZEArray<ZEModelResourcePhysicalPolygon>	Indices;
-	} Trimesh;
+	} TriMesh;
 };
 
 struct ZEModelResourcePhysicalBody
 {
-	ZEPhysicalBodyType							BodyType;
+	ZEPhysicalBodyType							Type;
 	float										Mass;
 	bool										Kinematic;
-	float										LinearDamp;
-	float										AngularDamp;
+	float										LinearDamping;
+	float										AngularDamping;
 	ZEVector3									Position;
 	ZEQuaternion								Orientation;
 	ZEVector3									MassCenter;
@@ -157,14 +159,13 @@ struct ZEModelResourcePhysicalJoint
 	ZEDWORD										Body1Id;
 	ZEDWORD										Body2Id;
 	bool										CollideBodies;
+	bool										UseGlobalAnchorAxis;
 	ZEVector3									GlobalAnchor;
-	bool										UseGlobalAnchor;
-	ZEVector3 									GlobalAxis;
-	bool										UseGlobalAxis;
+	ZEQuaternion								GlobalAxis;
 	ZEVector3									LocalAnchor1;
 	ZEVector3									LocalAnchor2;
-	ZEVector3									LocalAxis1;
-	ZEVector3									LocalAxis2;
+	ZEQuaternion								LocalAxis1;
+	ZEQuaternion								LocalAxis2;
 	bool										Breakable;
 	float										BreakForce;
 	float										BreakTorque;
@@ -211,15 +212,15 @@ struct ZEModelResourcePhysicalJoint
 
 	struct
 	{
-		ZEVector3 								Pulley1;
-		ZEVector3 								Pulley2;
-		float 									Distance;
-		float 									Ratio;
-		float 									Stiffness;
-		bool 									IsRigid;
-		bool 									HasMotor;
-		float 									MotorForce;
-		float 									MotorVelocity;
+		ZEVector3 						Pulley1;
+		ZEVector3 						Pulley2;
+		float 							Distance;
+		float 							Ratio;
+		float 							Stiffness;
+		bool 							IsRigid;
+		bool 							HasMotor;
+		float 							MotorForce;
+		float 							MotorVelocity;
 	} Pulley;
 
 	struct
@@ -227,46 +228,55 @@ struct ZEModelResourcePhysicalJoint
 		ZEDWORD 								XMotion;
 		ZEDWORD 								YMotion;
 		ZEDWORD 								ZMotion;
-		ZEDWORD 								TwistMotion;
-		ZEDWORD 								SwingMotion1;
-		ZEDWORD 								SwingMotion2;
 		float 									LinearLimitValue;
 		float 									LinearLimitRestitution;
 		float 									LinearLimitSpring;
 		float 									LinearLimitDamper;
+
+		ZEDWORD 								TwistMotion;
 		float 									TwistLimitHighValue;
 		float 									TwistLimitLowValue;
 		float 									TwistLimitRestitution;
 		float 									TwistLimitSpring;
 		float 									TwistLimitDamper;
+ 							
+		ZEDWORD 								Swing1Motion;
 		float 									Swing1LimitValue;
 		float 									Swing1LimitRestitution;
 		float 									Swing1LimitSpring;
 		float 									Swing1LimitDamper;
+		
+		ZEDWORD 								Swing2Motion;
 		float 									Swing2LimitValue;
 		float 									Swing2LimitRestitution;
 		float 									Swing2LimitSpring;
 		float 									Swing2LimitDamper;
+
 		ZEVector3 								LinearMotorPosition;
 		ZEVector3 								LinearMotorVelocity;
+
 		ZEDWORD 								LinearXMotor;
 		float 									LinearXMotorForce;
 		float 									LinearXMotorSpring;
 		float 									LinearXMotorDamper;
+
 		ZEDWORD 								LinearYMotor;
 		float 									LinearYMotorForce;
 		float 									LinearYMotorSpring;
 		float 									LinearYMotorDamper;
+
 		ZEDWORD 								LinearZMotor;
 		float 									LinearZMotorForce;
 		float 									LinearZMotorSpring;
 		float 									LinearZMotorDamper;
-		ZEDWORD 								AngularMotor;
+ 							
 		ZEQuaternion 							AngularMotorOrientation;
 		ZEVector3 								AngularMotorVelocity;
+
+		ZEDWORD 								AngularMotor;
 		float 									AngularMotorForce;
 		float 									AngularMotorSpring;
-		float									AngularMotorDamper;
+		float 									AngularMotorDamper;
 	} Free;
 };
 

@@ -111,6 +111,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	if (zeCore->StartUp())
 	{
 		initPhy();
+		ZEModelResource* ModelResource = ZEModelResource::LoadResource("test.zeModel");
 
 		ZEScene* Scene = zeCore->GetGame()->GetScene();
 		Scene->LoadEnvironment("BoxMap.ZEMAP");
