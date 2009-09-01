@@ -533,5 +533,3 @@ void ZED3D9FixedMaterial::Destroy()
 {
 	delete this;
 }
-
-
