@@ -215,7 +215,11 @@ size_t ZEPartialResourceFile::Read(void* Buffer, size_t Size, size_t Count)
 		IsEof = true;
 	}
 
-	return fread(Buffer, Size, Count, (FILE*)File);
+	size_t ReadBytes = fread(Buffer, Size, Count, (FILE*)File);
+	zeWarning("Resource File", "Read bytes is less than requested read size."
+		"(Read : %d, Requested : %d (ElementSize : %d, Count : %d), FileName : \"%s\", Cursor : %d)", 
+		ReadBytes, Size * Count, Size, Count, GetFilename(), Tell());
+	return ReadBytes;
 }
 
 size_t ZEPartialResourceFile::Tell()

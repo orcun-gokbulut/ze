@@ -653,6 +653,22 @@
 			Name="Game Interface"
 			>
 			<File
+				RelativePath=".\Source\GameInterface\CameraController.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\GameInterface\CameraController.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\GameInterface\CameraManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\GameInterface\CameraManager.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\GameInterface\CanvasBrush.cpp"
 				>
 			</File>
@@ -674,6 +690,22 @@
 			</File>
 			<File
 				RelativePath=".\Source\GameInterface\Entity.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\GameInterface\FpsCameraController.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\GameInterface\FpsCameraController.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\GameInterface\FreeCameraController.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\GameInterface\FreeCameraController.h"
 				>
 			</File>
 			<File
@@ -748,42 +780,14 @@
 				RelativePath=".\Source\GameInterface\SkyBrush.h"
 				>
 			</File>
-			<Filter
-				Name="Camera"
+			<File
+				RelativePath=".\Source\GameInterface\TpsCameraController.cpp"
 				>
-				<File
-					RelativePath=".\Source\GameInterface\CameraController.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\GameInterface\CameraController.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\GameInterface\FpsCameraController.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\GameInterface\FpsCameraController.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\GameInterface\FreeCameraController.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\GameInterface\FreeCameraController.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\GameInterface\TpsCameraController.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\GameInterface\TpsCameraController.h"
-					>
-				</File>
-			</Filter>
+			</File>
+			<File
+				RelativePath=".\Source\GameInterface\TpsCameraController.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Input"
@@ -1448,19 +1452,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Collection.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\ZEDS\Definitions.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEDS\DoubleLinklist.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEDS\Linklist.h"
 				>
 			</File>
 			<File
@@ -1618,14 +1610,6 @@
 		</File>
 		<File
 			RelativePath=".\Source\box.h"
-			>
-		</File>
-		<File
-			RelativePath=".\Source\CameraManager.cpp"
-			>
-		</File>
-		<File
-			RelativePath=".\Source\CameraManager.h"
 			>
 		</File>
 		<File

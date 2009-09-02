@@ -75,7 +75,7 @@ ZEPhysicsCharacterController* cont1;
 ZECanvasBrush* ccapsule;
 box* boxes[64];
 
-#include "CameraManager.h"
+#include "GameInterface/CameraManager.h"
 CameraManager CamMgr;
 
 void initPhy()
