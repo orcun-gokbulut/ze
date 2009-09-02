@@ -99,10 +99,9 @@ void ZETpsCameraController::Update(float ElapsedTime)
 		ZEVector3 Delta = Camera->GetLocalPosition() - Position;
 		ZEVector3 Acc = (Delta * -(float)SpringValue) - (Velocity * (float)SpringDamp);
 		Velocity += Acc * ElapsedTime;
-		ZEVector3 NewPosition = Camera->GetLocalPosition() + Velocity * ElapsedTime;
-		if (ZEVector3::DistanceSquare(NewPosition,Position) < ZEVector3::LengthSquare(Delta))
+		if (ZEVector3::LengthSquare(Velocity * ElapsedTime) < ZEVector3::LengthSquare(Offset))
 		{
-			Position = NewPosition;
+			Position = Camera->GetLocalPosition() + Velocity * ElapsedTime;
 		}
 	}
 
@@ -114,17 +113,18 @@ void ZETpsCameraController::Update(float ElapsedTime)
 		CShake += ElapsedTime;
 		if (CShake > ShakeInterval)
 		{
-			CShake = 0;
+			CShake -= ShakeInterval;
 			float p = (-50 + (rand() % 100)) * 0.02 * Shaker.x * ElapsedTime;
 			float y = (-50 + (rand() % 100)) * 0.02 * Shaker.y * ElapsedTime;
-			float r = (-50 + (rand() % 100)) * 0.02 * Shaker.z * ElapsedTime;
-			ZEQuaternion::Create(ShakeQ, p,y,r);
+			//float r = (-50 + (rand() % 100)) * 0.02 * Shaker.z * ElapsedTime;
+			ZEQuaternion::Create(ShakeQ, p,y,0);
 		}
 		ZEQuaternion::Product(Orientation, Orientation, ShakeQ);
+		Camera->SetLocalRotation(Orientation);
 	}
+	else if (Pitch != 0 || Yaw != 0)Camera->SetLocalRotation(Orientation);
 
 	Camera->SetLocalPosition(Position);
-	Camera->SetLocalRotation(Orientation);
 }
 
 void ZETpsCameraController::SetParams(ZEVector3 cPosition, ZEVector3 cOffset, float cPitch, float cYaw)

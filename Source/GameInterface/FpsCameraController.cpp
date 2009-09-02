@@ -39,9 +39,9 @@
 
 ZEFpsCameraController::ZEFpsCameraController(ZECamera* Camera, float PitchLimit) : ZECameraController(Camera)
 {
-	Position = ZEVector3(0,0,0);
-	Shaker = ZEVector3(0,0,0);
-	ShakeQ = ZEQuaternion(1,0,0,0);
+	Position = ZEVector3::Zero;
+	Shaker = ZEVector3::Zero;
+	ShakeQ = ZEQuaternion::Identity;
 	ShakeTime = 0;
 	ShakeInterval = 0;
 	Pitch = 0;
@@ -74,17 +74,16 @@ void ZEFpsCameraController::Update(float ElapsedTime)
 		CShake += ElapsedTime;
 		if (CShake > ShakeInterval)
 		{
-			CShake = 0;
+			CShake -= ShakeInterval;
 			float p = (-50 + (rand() % 100)) * 0.02 * Shaker.x * ElapsedTime;
 			float y = (-50 + (rand() % 100)) * 0.02 * Shaker.y * ElapsedTime;
-			float r = (-50 + (rand() % 100)) * 0.02 * Shaker.z * ElapsedTime;
-			ZEQuaternion::Create(ShakeQ, p,y,r);
+			//float r = (-50 + (rand() % 100)) * 0.02 * Shaker.z * ElapsedTime;
+			ZEQuaternion::Create(ShakeQ, p,y,0);
 		}
 		ZEQuaternion::Product(Orientation, Orientation, ShakeQ);
+		Camera->SetLocalRotation(Orientation);
 	}
-
-	//apply ori
-	Camera->SetLocalRotation(Orientation);
+	else if (Pitch != 0 || Yaw != 0)Camera->SetLocalRotation(Orientation);
 }
 
 void ZEFpsCameraController::SetParams(ZEVector3 cPosition, ZEVector3 cOffset, float cPitch, float cYaw)
