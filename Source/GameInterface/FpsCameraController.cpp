@@ -61,8 +61,12 @@ void ZEFpsCameraController::Update(float ElapsedTime)
 	ZEQuaternion::ConvertToEulerAngles(cPitch, cYaw, cRoll, Orientation);
 	cPitch += Pitch * ElapsedTime;
 	cYaw   += Yaw * ElapsedTime;
-	if (cPitch >= PitchLimit)cPitch = PitchLimit;
-	else if (cPitch <= -PitchLimit)cPitch = -PitchLimit;
+	if (cPitch >= PitchLimit)
+		cPitch = PitchLimit;
+	else 
+		if (cPitch <= -PitchLimit)
+			cPitch = -PitchLimit;
+
 	ZEQuaternion::Create(Orientation, cPitch, cYaw, cRoll);
 	Camera->SetLocalPosition(Position);
 	

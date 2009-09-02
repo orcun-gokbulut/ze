@@ -451,7 +451,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 		}
 	}
 	PhysicalBody = zePhysics->CreateBody();
-	PhysicalBody->Initialize(BodyInfo);
+	//PhysicalBody->Initialize(BodyInfo);
 }
 
 void ZEModelMesh::Deinitialize()
@@ -1209,7 +1209,7 @@ void ZEModel::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& L
 	SkeletonPointsVertexBuffer.Clean();
 	SkeletonVertexBuffer.Clean();
 	if (DrawSkeleton)
-	{
+	{/*
 		ZEVector3 BonePosition1, BonePosition2;
 		for (size_t I = 0; I < Bones.GetCount(); I++)
 		{
@@ -1222,7 +1222,7 @@ void ZEModel::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& L
 			}
 		}
 		Renderer->AddToRenderList(&SkeletonPointsRenderList);
-		Renderer->AddToRenderList(&SkeletonRenderList);
+		Renderer->AddToRenderList(&SkeletonRenderList);*/
 	}
 
 	if (DrawPhysicalBodies)

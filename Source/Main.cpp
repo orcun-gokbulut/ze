@@ -111,12 +111,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	if (zeCore->StartUp())
 	{
 		initPhy();
-		ZEModelResource* ModelResource = ZEModelResource::LoadResource("test.zeModel");
-
+	
 		ZEScene* Scene = zeCore->GetGame()->GetScene();
 		Scene->LoadEnvironment("BoxMap.ZEMAP");
 		Scene->SetVisualDebugElements(ZE_VDE_NONE);
 
+		ZEModelBrush* ModelBrush = (ZEModelBrush*)zeCore->GetGame()->CreateEntityInstance("ZEModelBrush");
+		Scene->AddEntity(ModelBrush);
+		ModelBrush->SetModelFile("test.zeModel");
 		//boxes
 		for (int i=0;i<5;i++)
 		{
