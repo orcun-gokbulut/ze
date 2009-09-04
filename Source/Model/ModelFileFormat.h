@@ -187,6 +187,7 @@ struct ZEModelFilePhysicalBodyChunk
 {
 	ZEDWORD								ChunkId;
 	ZEDWORD				                Type;
+	bool								Enabled;
 	float								Mass;
 	bool								Kinematic;
 	float								LinearDamping;
@@ -199,6 +200,7 @@ struct ZEModelFilePhysicalJointChunk
 {
 	ZEDWORD								ChunkId;
 	ZEDWORD								Type;
+	bool								Enabled;
 	ZEDWORD								Body1Type;
 	ZEDWORD								Body1Id;
 	ZEDWORD								Body2Id;

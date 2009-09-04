@@ -178,6 +178,7 @@ bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile*
 	}
 
 	Body->Type				= (ZEPhysicalBodyType)BodyChunk.Type;
+	Body->Enabled			= BodyChunk.Enabled;
 	Body->Mass				= BodyChunk.Mass;
 	Body->Kinematic			= BodyChunk.Kinematic;
 	Body->AngularDamping	= BodyChunk.AngularDamping;
@@ -359,6 +360,7 @@ bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEResourceFi
 	}
 
 	Joint->JointType			= JointChunk.Type;
+	Joint->Enabled				= JointChunk.Enabled;
 	Joint->Body1Id				= JointChunk.Body1Id;
 	Joint->Body2Id				= JointChunk.Body2Id;
 	Joint->Breakable			= JointChunk.Breakable;

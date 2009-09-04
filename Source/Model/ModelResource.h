@@ -143,6 +143,7 @@ struct ZEModelResourcePhysicalShape
 struct ZEModelResourcePhysicalBody
 {
 	ZEPhysicalBodyType							Type;
+	bool										Enabled;
 	float										Mass;
 	bool										Kinematic;
 	float										LinearDamping;
@@ -156,6 +157,7 @@ struct ZEModelResourcePhysicalBody
 struct ZEModelResourcePhysicalJoint
 {
 	ZEDWORD 									JointType;
+	bool										Enabled;
 	ZEDWORD										Body1Id;
 	ZEDWORD										Body2Id;
 	bool										CollideBodies;
