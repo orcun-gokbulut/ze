@@ -192,7 +192,7 @@ void ZEPlayer::Tick(float Time)
 			case ACTIONID_FIRE2:
 			{
 					ZEVector3 dir(0,0,1);
-					dir = this->GetRotation() * dir;
+					dir = dir * this->GetRotation();
 					static float ctime = 0;
 					ctime += Time;
 					if (ctime > 0.2)
@@ -224,7 +224,7 @@ void ZEPlayer::Tick(float Time)
 				}
 				else
 				{
-					ZEQuaternion::VectorProduct(PositionChange, CamMgr.GetCamera()->GetLocalRotation(), ZEVector3(0, 0, 1));
+					ZEQuaternion::Transform(PositionChange, ZEVector3(0, 0, 1), CamMgr.GetCamera()->GetLocalRotation());
 					PositionChange.y = 0;
 					cVelocity += PositionChange;
 				}
@@ -238,7 +238,7 @@ void ZEPlayer::Tick(float Time)
 				}
 				else
 				{
-					ZEQuaternion::VectorProduct(PositionChange, CamMgr.GetCamera()->GetLocalRotation(), ZEVector3(0, 0, -1));
+					ZEQuaternion::Transform(PositionChange, ZEVector3(0, 0, -1), CamMgr.GetCamera()->GetLocalRotation());
 					PositionChange.y = 0;
 					cVelocity += PositionChange;
 				}
@@ -252,7 +252,7 @@ void ZEPlayer::Tick(float Time)
 				}
 				else
 				{
-					ZEQuaternion::VectorProduct(PositionChange, CamMgr.GetCamera()->GetLocalRotation(), ZEVector3(-1, 0, 0));
+					ZEQuaternion::Transform(PositionChange, ZEVector3(-1, 0, 0), CamMgr.GetCamera()->GetLocalRotation());
 					PositionChange.y = 0;
 					cVelocity += PositionChange;
 				}
@@ -266,7 +266,7 @@ void ZEPlayer::Tick(float Time)
 				}
 				else
 				{
-					ZEQuaternion::VectorProduct(PositionChange, CamMgr.GetCamera()->GetLocalRotation(), ZEVector3(1, 0, 0));
+					ZEQuaternion::Transform(PositionChange, ZEVector3(1, 0, 0), CamMgr.GetCamera()->GetLocalRotation());
 					PositionChange.y = 0;
 					cVelocity += PositionChange;
 				}

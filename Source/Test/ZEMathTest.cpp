@@ -593,7 +593,7 @@ bool TestQuaternion()
 		A.Normalize();
 
 		ZEVector3 V(5, 6, 7), Out;
-		ZEQuaternion::VectorProduct(Out, A, V);
+		ZEQuaternion::Transform(Out, V, A);
 
 		D3DXQUATERNION DQ(2,3,4,1), DQP, DV(5,6,7,0), DO;
 		D3DXQuaternionNormalize(&DQ, &DQ);

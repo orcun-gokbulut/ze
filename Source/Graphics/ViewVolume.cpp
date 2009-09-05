@@ -189,7 +189,7 @@ bool ZEViewFrustum::CullTest(ZEComponent* Component) const
 	return ConeCullTest(Component->GetWorldBoundingSphere())&& CullTest(Component->GetWorldBoundingBox());
 }
 
-ZEDoorViewTest ZEViewFrustum::CullTest(const ZE3DRectangle& PortalDoor) const
+ZEDoorViewTest ZEViewFrustum::CullTest(const ZERectangle3D& PortalDoor) const
 {
 	return ZE_DVT_INSIDE;
 }
@@ -200,14 +200,14 @@ void ZEViewFrustum::Create(const ZEVector3& Position, const ZEQuaternion& Rotati
 	float SinFovAT = SinFov * AspectRatio;
 	float CosFov = cosf(FOV/2);
 
-	ZEQuaternion::VectorProduct(TopClippingPlane.n, Rotation, ZEVector3(0.0f, -CosFov, SinFov));
-	ZEQuaternion::VectorProduct(BottomClippingPlane.n, Rotation, ZEVector3(0.0f, CosFov, SinFov));
+	ZEQuaternion::Transform(TopClippingPlane.n, ZEVector3(0.0f, -CosFov, SinFov), Rotation);
+	ZEQuaternion::Transform(BottomClippingPlane.n, ZEVector3(0.0f, CosFov, SinFov), Rotation);
 
-	ZEQuaternion::VectorProduct(RightClippingPlane.n, Rotation, ZEVector3(-CosFov, 0.0f, SinFovAT));
-	ZEQuaternion::VectorProduct(LeftClippingPlane.n, Rotation, ZEVector3(CosFov, 0.0f, SinFovAT));
+	ZEQuaternion::Transform(RightClippingPlane.n, ZEVector3(-CosFov, 0.0f, SinFovAT), Rotation);
+	ZEQuaternion::Transform(LeftClippingPlane.n, ZEVector3(CosFov, 0.0f, SinFovAT), Rotation);
 
-	ZEQuaternion::VectorProduct(NearClippingPlane.n, Rotation, ZEVector3(0.0f, 0.0f, 1.0f));
-	ZEQuaternion::VectorProduct(FarClippingPlane.n, Rotation, ZEVector3(0.0f, 0.0f, -1.0f));
+	ZEQuaternion::Transform(NearClippingPlane.n, ZEVector3(0.0f, 0.0f, 1.0f), Rotation);
+	ZEQuaternion::Transform(FarClippingPlane.n, ZEVector3(0.0f, 0.0f, -1.0f), Rotation);
 
 
 	LeftClippingPlane.p = RightClippingPlane.p = TopClippingPlane.p = BottomClippingPlane.p = Position;
@@ -222,7 +222,7 @@ void ZEViewFrustum::Create(const ZEVector3& Position, const ZEQuaternion& Rotati
 	// View cone
 
 	this->Position = Position;
-	ZEQuaternion::VectorProduct(CenterVector, Rotation, ZEVector3(0.0f, 0.0f, 1.0f));
+	ZEQuaternion::Transform(CenterVector, ZEVector3(0.0f, 0.0f, 1.0f), Rotation);
 
 	float tanfov = tanf(FOV / 2.0f);
 	float tHeight = tanfov * NearZ * 2.0f;
@@ -270,7 +270,7 @@ bool ZEViewSphere::CullTest(ZEComponent* Component) const
 		&& ZEAABoundingBox::CollisionTest(Component->GetWorldBoundingBox(), BoundingSphere);
 }
 
-ZEDoorViewTest ZEViewSphere::CullTest(const ZE3DRectangle& PortalDoor) const
+ZEDoorViewTest ZEViewSphere::CullTest(const ZERectangle3D& PortalDoor) const
 {
 	ZEASSERT(true, "NOT IMPLAMENTED");
 	return ZE_DVT_INSIDE;
@@ -318,7 +318,7 @@ bool ZEViewHemiSphere::CullTest(ZEComponent* Component) const
 		&& ZEAABoundingBox::CollisionTest(Component->GetWorldBoundingBox(), BoundingSphere);
 }
 
-ZEDoorViewTest ZEViewHemiSphere::CullTest(const ZE3DRectangle& PortalDoor) const
+ZEDoorViewTest ZEViewHemiSphere::CullTest(const ZERectangle3D& PortalDoor) const
 {
 	ZEASSERT(true, "NOT IMPLAMENTED");
 	return ZE_DVT_INSIDE;
@@ -361,7 +361,7 @@ bool ZEViewCuboid::CullTest(ZEComponent* Component) const
 	return true;
 }
 
-ZEDoorViewTest ZEViewCuboid::CullTest(const ZE3DRectangle& PortalDoor) const
+ZEDoorViewTest ZEViewCuboid::CullTest(const ZERectangle3D& PortalDoor) const
 {
 	ZEASSERT(true, "Not implamented");
 	return ZE_DVT_INSIDE;
@@ -369,12 +369,12 @@ ZEDoorViewTest ZEViewCuboid::CullTest(const ZE3DRectangle& PortalDoor) const
 
 void ZEViewCuboid::Create(const ZEPosition3& Position, const ZEQuaternion& Rotation, float Width, float Height, float NearZ, float FarZ)
 {
-	ZEQuaternion::VectorProduct(BoundingBox.U, Rotation, ZEVector3(0.0f, Height, 0.0f));
-	ZEQuaternion::VectorProduct(BoundingBox.V, Rotation, ZEVector3(Width, 0.0f, 0.0f));
-	ZEQuaternion::VectorProduct(BoundingBox.N, Rotation, ZEVector3(0.0f, 0.0f, FarZ - NearZ));
+	ZEQuaternion::Transform(BoundingBox.U, ZEVector3(0.0f, Height, 0.0f), Rotation);
+	ZEQuaternion::Transform(BoundingBox.V, ZEVector3(Width, 0.0f, 0.0f), Rotation);
+	ZEQuaternion::Transform(BoundingBox.N, ZEVector3(0.0f, 0.0f, FarZ - NearZ), Rotation);
 	
 	ZEVector3 Near;
-	ZEQuaternion::VectorProduct(Near, Rotation, ZEVector3(0.0f, 0.0f, NearZ));
+	ZEQuaternion::Transform(Near, ZEVector3(0.0f, 0.0f, NearZ), Rotation);
 	
 	BoundingBox.Position.x = Position.x - (BoundingBox.U.x + BoundingBox.V.x) * 0.5f + Near.x;
 	BoundingBox.Position.y = Position.y - (BoundingBox.U.y + BoundingBox.V.y) * 0.5f + Near.y;
@@ -421,7 +421,7 @@ bool ZEViewPlane::CullTest(ZEComponent* Component) const
 	return true;
 }
 
-ZEDoorViewTest ZEViewPlane::CullTest(const ZE3DRectangle& PortalDoor) const
+ZEDoorViewTest ZEViewPlane::CullTest(const ZERectangle3D& PortalDoor) const
 {
 	bool Visible = false;
 	for (int I = 0; I < 4; I++)
@@ -460,10 +460,10 @@ enum ZECullTestResult
 	ZE_INTERSECTION
 };
 ZECullTestResult LineSegmentAgainstBordersTest(const ZEPoint3 &P1,const ZEPoint3 &P2,const ZEPlane & Border1,const ZEPlane & Border2);
-ZEHalfSpace DoorAgainstPlanePreTest(const ZE3DRectangle & Door,const ZEPlane & Plane);
-void CutPortalDoorWithLine(ZEPoint3 & Out1,ZEPoint3 & Out2,const ZE3DRectangle & Door,const ZELine & Line);
+ZEHalfSpace DoorAgainstPlanePreTest(const ZERectangle3D & Door,const ZEPlane & Plane);
+void CutPortalDoorWithLine(ZEPoint3 & Out1,ZEPoint3 & Out2,const ZERectangle3D & Door,const ZELine & Line);
 
-ZEDoorViewTest ZECamera::ViewFrustumCullTest(const ZE3DRectangle& PortalDoor) 
+ZEDoorViewTest ZECamera::ViewFrustumCullTest(const ZERectangle3D& PortalDoor) 
 {
 	ZEPlane DoorPlane;
 	PortalDoor.GetPlane(DoorPlane);
@@ -566,7 +566,7 @@ ZEDoorViewTest ZECamera::ViewFrustumCullTest(const ZE3DRectangle& PortalDoor)
 }
 
 
-void ZECamera::GenerateCameraFromDoor(ZEViewCone & Cone,ZECamera & Camera,const ZE3DRectangle & Door)
+void ZECamera::GenerateCameraFromDoor(ZEViewCone & Cone,ZECamera & Camera,const ZERectangle3D & Door)
 {
 	// Just Clipping Plane
 
@@ -628,7 +628,7 @@ ZECullTestResult LineSegmentAgainstBordersTest(const ZEPoint3 &P1,const ZEPoint3
 	return ZE_OUTSIDE_BY_SECOND_PLANE;
 }
 
-ZEHalfSpace DoorAgainstPlanePreTest(const ZE3DRectangle & Door,const ZEPlane & Plane)
+ZEHalfSpace DoorAgainstPlanePreTest(const ZERectangle3D & Door,const ZEPlane & Plane)
 {
 	ZEHalfSpace test = ZEPlane::TestHalfSpace(Plane,Door.P1);
 
@@ -669,7 +669,7 @@ bool CutLineWithLine(ZEVector3 & Out,const ZELine & Line1,const ZELine & Line2) 
 	return 1;
 }
 
-void CutPortalDoorWithLine(ZEPoint3 & Out1,ZEPoint3 & Out2,const ZE3DRectangle & Door,const ZELine & Line)
+void CutPortalDoorWithLine(ZEPoint3 & Out1,ZEPoint3 & Out2,const ZERectangle3D & Door,const ZELine & Line)
 {
 	bool cut = 0;
 	ZEPoint3 point;

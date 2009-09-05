@@ -48,7 +48,7 @@
 #include "Ray.h"
 #include "LineSegment.h"
 #include "Rectangle.h"
-#include "3DRectangle.h"
+#include "Rectangle3D.h"
 #include "AABoundingBox.h"
 #include "OBoundingBox.h"
 #include "BoundingSphere.h"

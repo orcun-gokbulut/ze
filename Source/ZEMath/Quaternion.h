@@ -60,7 +60,7 @@ class ZEQuaternion
 		static void						CreateIdentity(ZEQuaternion& Output);
 
 		static void						Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B);
-		static void						VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaternion, const ZEVector3& Vector);
+		static void						Transform(ZEVector3& Output, const ZEVector3& Vector, const ZEQuaternion& Quaternion);
 
 		void							Conjugate();
 		static void						Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
@@ -74,7 +74,6 @@ class ZEQuaternion
 		static void						ConvertToEulerAngles(float &Yaw, float &Pitch, float &Roll, const ZEQuaternion& Quaternion);
 		static void						ConvertToLookAndUp(ZEVector3& Look, ZEVector3& Up, const ZEQuaternion& Quaternion);
 
-		ZEVector3						operator*(const ZEVector3& Vector) const;
 		ZEQuaternion					operator*(const ZEQuaternion& Other) const;
 		ZEQuaternion&					operator*=(const ZEQuaternion& Other);
 

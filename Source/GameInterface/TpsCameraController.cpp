@@ -75,7 +75,7 @@ void ZETpsCameraController::Update(float ElapsedTime)
 	ZEQuaternion::Create(Orientation, cPitch, cYaw, cRoll);
 
 	ZEVector3 Result;
-	ZEVector3::Normalize(Result,(Orientation * Offset));
+	ZEVector3::Normalize(Result,(Offset * Orientation));
 
 	ZEPhysicsCollisionMask Mask;Mask.Full();
 	if (zePhysics->CapsuleSweep(Position, 0.1, Result*ZEVector3::LengthSquare(Offset), Result, Mask))
@@ -84,14 +84,14 @@ void ZETpsCameraController::Update(float ElapsedTime)
 		float OffLength = Offset.Length();
 		if (Length > OffLength)
 		{
-			Position = rPosition + Orientation * Offset;
+			Position = rPosition + Offset * Orientation;
 		}
 		else
 		{
-			Position = rPosition + Orientation * Offset * ((Length-0.5) / OffLength);
+			Position = rPosition + Offset * Orientation * ((Length-0.5) / OffLength);
 		}
 	}
-	else Position = rPosition + Orientation * Offset;
+	else Position = rPosition + Offset * Orientation;
 
 	//spring
 	if (SpringValue > 0)

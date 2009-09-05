@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle.cpp
+ Zinek Engine - Rectangle3D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,91 +33,23 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Rectangle.h"
-#include "Core/Error.h"
+#pragma once
+#ifndef __ZE_MATH_RECTANGLE_3D_H__
+#define __ZE_MATH_RECTANGLE_3D_H__
 
-bool ZERectangle::BoundingTest(const ZEPoint2& Point) const
-{
-	if ((Point.x >= LeftUp.x && Point.x <= RightDown.x) && (Point.y >= LeftUp.y &&  Point.y <= RightDown.y))
-		return true;
-	else
-		return false;
-}
-ZEPoint2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
-{
-	switch(Corner)
-	{
-		case ZERECTANGLECORNER_LEFTDOWN:
-			return ZEPoint2(LeftUp.x, RightDown.y);
-		case ZERECTANGLECORNER_RIGHTDOWN:
-			return ZEPoint2(RightDown.x, RightDown.y);
-		case ZERECTANGLECORNER_LEFTUP:
-			return ZEPoint2(LeftUp.x, LeftUp.y);
-		case ZERECTANGLECORNER_RIGHTUP:
-			return ZEPoint2(RightDown.x, LeftUp.y);
-		default:
-			ZEASSERT(true, "Wrong enum value ZERectangleCorner. Value : %d", Corner);
-	}
-}
+#include "Vector.h"
+#include "Plane.h"
 
-float ZERectangle::GetWidth() const
+class ZERectangle3D
 {
-	return LeftUp.x - RightDown.x;
-}
+	public:
+		ZEPoint3				P1, P2, P3, P4;
 
-float ZERectangle::GetHeight() const
-{
-	return LeftUp.y - RightDown.y;
-}
+		void					GetPlane(ZEPlane& Plane) const;
+		const ZEPoint3&			GetPoint(unsigned int Index) const;
 
-ZERectangle::ZERectangle()
-{
-}
+								ZERectangle3D();
+								ZERectangle3D(const ZEPoint3& P1, const ZEPoint3& P2, const ZEPoint3& P3, const ZEPoint3& P4);
+};
 
-ZERectangle::ZERectangle(const ZEPoint2& UpLeft, const ZEPoint2& DownRight)
-{
-	this->LeftUp = UpLeft;
-	this->RightDown = DownRight;
-}
-
-ZERectangle::ZERectangle(const ZEPoint2& UpLeft, float Width, float Height)
-{
-	this->LeftUp = UpLeft;
-	this->RightDown.x = UpLeft.x + Width;
-	this->RightDown.y = UpLeft.y + Height;
-}
-
-
-void ZE3DRectangle::GetPlane(ZEPlane & Plane) const
-{
-	ZEPlane::Create(Plane,P1,P2,P3);
-}
-
-const ZEPoint3& ZE3DRectangle::GetPoint(unsigned int Index) const
-{
-	switch(Index)
-	{
-		case 0:
-			return P1;
-		case 1:
-			return P2;
-		case 2:
-			return P3;
-		case 3:
-			return P4;
-		default:
-			return P1;
-	}
-}
-		
-ZE3DRectangle::ZE3DRectangle()
-{
-}
-
-ZE3DRectangle::ZE3DRectangle(const ZEPoint3& P1, const ZEPoint3& P2, const ZEPoint3& P3, const ZEPoint3& P4)
-{
-	this->P1 = P1;
-	this->P2 = P2;
-	this->P3 = P3;
-	this->P4 = P4;
-}
+#endif

@@ -135,7 +135,7 @@ struct ZEMapFilePortalDoorChunk
 {
 	ZEDWORD							ChunkIdentifier;
 	char							Name[ZE_MAP_MAX_NAME_SIZE];
-	ZE3DRectangle					Rectangle;
+	ZERectangle3D					Rectangle;
 	ZEDWORD							DestinationPortal;
 	bool							IsOpen;
 };

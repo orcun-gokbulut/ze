@@ -33,9 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "vector.h"
+#include "Vector.h"
 #include <math.h>
-#include "matrix.h"
+#include "Matrix.h"
+#include "Quaternion.h"
 
 const ZEVector2 ZEVector2::Zero = ZEVector2(0.0f, 0.0f);
 const ZEVector2 ZEVector2::UnitX = ZEVector2(1.0f, 0.0f);
@@ -358,6 +359,13 @@ ZEVector3 ZEVector3::operator * (const ZEMatrix4x4 &RightOperand) const
 	return Temp;
 }
 
+ZEVector3 ZEVector3::operator*(const ZEQuaternion &RightOperand) const
+{
+	ZEVector3 Temp;
+	ZEQuaternion::Transform(Temp, *this, RightOperand);
+	return Temp;
+}
+
 ZEVector3 ZEVector3::operator * (float s) const
 {
 	ZEVector3 Temp;
@@ -400,6 +408,13 @@ ZEVector3& ZEVector3::operator *= (const ZEMatrix4x4 &RightOperand)
 {
 	ZEVector3 Temp = *this;
 	ZEMatrix4x4::Transform(*this, Temp, RightOperand);
+	return *this;
+}
+
+ZEVector3& ZEVector3::operator *= (const ZEQuaternion &RightOperand) 
+{
+	ZEVector3 Temp = *this;
+	ZEQuaternion::Transform(*this, Temp, RightOperand);
 	return *this;
 }
 

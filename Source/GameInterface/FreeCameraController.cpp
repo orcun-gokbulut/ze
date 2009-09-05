@@ -64,7 +64,7 @@ void ZEFreeCameraController::Update(float ElapsedTime)
 	else if (cPitch <= -PitchLimit)cPitch = -PitchLimit;
 	ZEQuaternion::Create(Orientation, cPitch, cYaw, cRoll);
 	Orientation.Normalize();
-	Position += Orientation * ZEVector3(Strafe,0,Walk) * ElapsedTime;
+	Position += ZEVector3(Strafe,0,Walk) * Orientation * ElapsedTime;
 	Camera->SetLocalPosition(Position);
 	Camera->SetLocalRotation(Orientation);
 }

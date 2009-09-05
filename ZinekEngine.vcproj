@@ -1576,6 +1576,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEMath\Rectangle3D.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMath\Rectangle3D.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEMath\Triangle.cpp"
 				>
 			</File>

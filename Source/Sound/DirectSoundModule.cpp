@@ -322,7 +322,7 @@ void ZEDirectSoundModule::UpdateSource3D(ZESoundSource3D* Source3D)
 	Temp = Source3D->GetOwner()->GetVelocity();
 	MapVector3(DS3D.vVelocity, Temp);
 
-	ZEQuaternion::VectorProduct(Temp, Source3D->GetWorldRotation(), ZEVector3(0,0,1));
+	ZEQuaternion::Transform(Temp, ZEVector3(0,0,1), Source3D->GetWorldRotation());
 	MapVector3(DS3D.vConeOrientation, Temp);
 
 	DS3D.dwInsideConeAngle = Source3D->GetInsideConeAngle();
@@ -403,10 +403,10 @@ void ZEDirectSoundModule::UpdateListener(ZEListener* NewListener)
 	Temp = NewListener->GetOwner()->GetVelocity();
 	MapVector3(Listener.vVelocity, Temp);
 
-	ZEQuaternion::VectorProduct(Temp, Rotation, ZEVector3(0, 0, 1));
+	ZEQuaternion::Transform(Temp, ZEVector3(0, 0, 1), Rotation);
 	MapVector3(Listener.vOrientFront, Temp);
 
-	ZEQuaternion::VectorProduct(Temp, Rotation, ZEVector3(0, 1, 0));
+	ZEQuaternion::Transform(Temp, ZEVector3(0, 1, 0), Rotation);
 	MapVector3(Listener.vOrientTop, Temp);
 
 	Listener.flDistanceFactor = NewListener->GetDistanceFactor();

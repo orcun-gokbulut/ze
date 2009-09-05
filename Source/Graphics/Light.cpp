@@ -131,7 +131,7 @@ void ZELight::SetCastShadows(bool NewValue)
 const ZERLLight* ZELight::GetRenderListLight()
 {
 	RenderListLight.Position = ZEVector3(GetWorldPosition());
-	ZEQuaternion::VectorProduct(RenderListLight.Direction, GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
+	ZEQuaternion::Transform(RenderListLight.Direction, ZEVector3(0.0f, 0.0f, 1.0f), GetWorldRotation());
 	ZEQuaternion InvRotation;
 	ZEQuaternion::Conjugate(InvRotation, GetWorldRotation());
 	ZEMatrix4x4::CreateRotation(RenderListLight.LightRotationMatrix, InvRotation);
@@ -213,7 +213,7 @@ const ZEViewVolume& ZEDirectionalLight::GetViewVolume()
 	if (UpdateViewVolume)
 	{
 		ZEVector3 Direction;
-		ZEQuaternion::VectorProduct(Direction, GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
+		ZEQuaternion::Transform(Direction, ZEVector3(0.0f, 0.0f, 1.0f), GetWorldRotation());
 		ViewVolume.Create(GetWorldPosition(), Direction, GetRange());
 		UpdateViewVolume = false;
 	}
@@ -335,7 +335,7 @@ const ZERLLight* ZEProjectiveLight::GetRenderListLight()
 		ZEMatrix4x4::Multiply(RenderListLight.LightViewProjMatrix, ViewProjMatrix, ScaleBiasMatrix);
 	}
 
-	ZEQuaternion::VectorProduct(RenderListLight.Direction, GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
+	ZEQuaternion::Transform(RenderListLight.Direction, ZEVector3(0.0f, 0.0f, 1.0f), GetWorldRotation());
 
 	if (CastsShadows)
 	{

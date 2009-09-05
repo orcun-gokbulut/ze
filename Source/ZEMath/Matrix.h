@@ -68,49 +68,51 @@ class ZEMatrix3x3
 		};
 
 	public:
-		static void		Create(ZEMatrix3x3& Matrix, float M11, float M12, float M13,
-													 float M21, float M22, float M23,
-													 float M31, float M32, float M33);
-		static void		Create(ZEMatrix3x3& Matrix, float* M);
-		static void		CreateRotation(ZEMatrix3x3& Matrix, const ZEQuaternion& Rotation);
-		static void		CreateRotationX(ZEMatrix3x3& Matrix, float Pitch);
-		static void		CreateRotationY(ZEMatrix3x3& Matrix, float Yawn);
-		static void		CreateRotationZ(ZEMatrix3x3& Matrix, float Roll);
-		static void		CreateRotationXYZ(ZEMatrix3x3& Matrix, float Pitch, float Yawn, float Roll);
-		static void		CreateScale(ZEMatrix3x3& Matrix, float x, float y, float z);
-		static void		CreateIdentity(ZEMatrix3x3& Matrix);
-		static void		CreateZero(ZEMatrix3x3& Matrix);
+		static const ZEMatrix3x3		Zero;
+		static const ZEMatrix3x3		Identity;
+		static void						Create(ZEMatrix3x3& Matrix, float M11, float M12, float M13,
+																	float M21, float M22, float M23,
+																	float M31, float M32, float M33);
+		static void						Create(ZEMatrix3x3& Matrix, float* M);
+		static void						CreateRotation(ZEMatrix3x3& Matrix, const ZEQuaternion& Rotation);
+		static void						CreateRotationX(ZEMatrix3x3& Matrix, float Pitch);
+		static void						CreateRotationY(ZEMatrix3x3& Matrix, float Yawn);
+		static void						CreateRotationZ(ZEMatrix3x3& Matrix, float Roll);
+		static void						CreateRotationXYZ(ZEMatrix3x3& Matrix, float Pitch, float Yawn, float Roll);
+		static void						CreateScale(ZEMatrix3x3& Matrix, float x, float y, float z);
+		static void						CreateIdentity(ZEMatrix3x3& Matrix);
+		static void						CreateZero(ZEMatrix3x3& Matrix);
 
-		static void		Add(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
-		static void		Sub(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
-		static void		Multiply(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
-		static void		Scale(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, float s);
-		static void		Transpose(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix);
-		static bool		Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix);
+		static void						Add(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
+		static void						Sub(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
+		static void						Multiply(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
+		static void						Scale(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, float s);
+		static void						Transpose(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix);
+		static bool						Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix);
 
-		static void		Transform(ZEVector2& Out, const ZEVector2& Vector, const ZEMatrix3x3 &Matrix);
-		static void		Transform(ZEVector3& Out, const ZEVector3& Vector, const ZEMatrix3x3 &Matrix);
-		static void		Transform(ZEVector4& Out, const ZEVector4& Vector, const ZEMatrix3x3 &Matrix);
+		static void						Transform(ZEVector2& Out, const ZEVector2& Vector, const ZEMatrix3x3 &Matrix);
+		static void						Transform(ZEVector3& Out, const ZEVector3& Vector, const ZEMatrix3x3 &Matrix);
+		static void						Transform(ZEVector4& Out, const ZEVector4& Vector, const ZEMatrix3x3 &Matrix);
 
-		ZEMatrix3x3		operator+(const ZEMatrix3x3 &RightOperand) const;
-		ZEMatrix3x3		operator-(const ZEMatrix3x3 &RightOperand) const;
-		ZEMatrix3x3		operator*(const ZEMatrix3x3 &RightOperand) const;
-		ZEMatrix3x3		operator*(float S);
+		ZEMatrix3x3						operator+(const ZEMatrix3x3 &RightOperand) const;
+		ZEMatrix3x3						operator-(const ZEMatrix3x3 &RightOperand) const;
+		ZEMatrix3x3						operator*(const ZEMatrix3x3 &RightOperand) const;
+		ZEMatrix3x3						operator*(float S);
 
-		ZEMatrix3x3&	operator += (const ZEMatrix3x3 &RightOperand);
-		ZEMatrix3x3&	operator -= (const ZEMatrix3x3 &RightOperand);
-		ZEMatrix3x3&	operator *= (const ZEMatrix3x3 &RightOperand);
-		ZEMatrix3x3&	operator *= (float S);
+		ZEMatrix3x3&					operator += (const ZEMatrix3x3 &RightOperand);
+		ZEMatrix3x3&					operator -= (const ZEMatrix3x3 &RightOperand);
+		ZEMatrix3x3&					operator *= (const ZEMatrix3x3 &RightOperand);
+		ZEMatrix3x3&					operator *= (float S);
 
-		bool			operator == (const ZEMatrix3x3 &M) const;
-		bool			operator != (const ZEMatrix3x3 &M) const;
+		bool							operator == (const ZEMatrix3x3 &M) const;
+		bool							operator != (const ZEMatrix3x3 &M) const;
 		
 
-						ZEMatrix3x3(float M11, float M12, float M13,
-									 float M21, float M22, float M23,
-									 float M31, float M32, float M33);
-						ZEMatrix3x3(float* M);
-						ZEMatrix3x3();
+										ZEMatrix3x3(float M11, float M12, float M13,
+													float M21, float M22, float M23,
+													float M31, float M32, float M33);
+										ZEMatrix3x3(float* M);
+										ZEMatrix3x3();
 };
 
 
@@ -134,59 +136,62 @@ class ZEMatrix4x4
 			float MA[16];
 		};
 
-		static void		Create(ZEMatrix4x4& Matrix, float M11, float M12, float M13, float M14,
+		static const ZEMatrix4x4		Zero;
+		static const ZEMatrix4x4		Identity;
+
+		static void						Create(ZEMatrix4x4& Matrix, float M11, float M12, float M13, float M14,
 													float M21, float M22, float M23, float M24,
 													float M31, float M32, float M33, float M34,
 													float M41, float M42, float M43, float M44);
-		static void		Create(ZEMatrix4x4& Matrix, float* M);
-		static void		CreateRotationX(ZEMatrix4x4& Matrix, float Pitch);
-		static void		CreateRotationY(ZEMatrix4x4& Matrix, float Yawn);
-		static void		CreateRotationZ(ZEMatrix4x4& Matrix, float Roll);
-		static void		CreateRotationXYZ(ZEMatrix4x4& Matrix, float Pitch, float Yawn, float Roll);
-		static void		CreateRotation(ZEMatrix4x4& Matrix, const ZEQuaternion& Rotation);
-		static void		CreateScale(ZEMatrix4x4& Matrix, float x, float y, float z);
-		static void		CreateScale(ZEMatrix4x4& Matrix, const ZEVector3& Scale);
-		static void		CreateTranslation(ZEMatrix4x4& Matrix, float x, float y, float z);
-		static void		CreateTranslation(ZEMatrix4x4& Matrix, const ZEVector3& Position);
-		static void		CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale);
-		static void		CreateOffset(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);
-		static void		CreateIdentity(ZEMatrix4x4& Matrix);
-		static void		CreateZero(ZEMatrix4x4& Matrix);
-		static void		CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width, float Height, float NearZ, float FarZ);
-		static void		CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ);
-		static void		CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ);
+		static void						Create(ZEMatrix4x4& Matrix, float* M);
+		static void						CreateRotationX(ZEMatrix4x4& Matrix, float Pitch);
+		static void						CreateRotationY(ZEMatrix4x4& Matrix, float Yawn);
+		static void						CreateRotationZ(ZEMatrix4x4& Matrix, float Roll);
+		static void						CreateRotationXYZ(ZEMatrix4x4& Matrix, float Pitch, float Yawn, float Roll);
+		static void						CreateRotation(ZEMatrix4x4& Matrix, const ZEQuaternion& Rotation);
+		static void						CreateScale(ZEMatrix4x4& Matrix, float x, float y, float z);
+		static void						CreateScale(ZEMatrix4x4& Matrix, const ZEVector3& Scale);
+		static void						CreateTranslation(ZEMatrix4x4& Matrix, float x, float y, float z);
+		static void						CreateTranslation(ZEMatrix4x4& Matrix, const ZEVector3& Position);
+		static void						CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale);
+		static void						CreateOffset(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);
+		static void						CreateIdentity(ZEMatrix4x4& Matrix);
+		static void						CreateZero(ZEMatrix4x4& Matrix);
+		static void						CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width, float Height, float NearZ, float FarZ);
+		static void						CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ);
+		static void						CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ);
 
-		static void		Add(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
-		static void		Sub(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
-		static void		Multiply(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
-		static void		Scale(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, float s);
-		static void		Transpose(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix);
-		static bool		Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix);
+		static void						Add(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
+		static void						Sub(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
+		static void						Multiply(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
+		static void						Scale(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, float s);
+		static void						Transpose(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix);
+		static bool						Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix);
 
-		static void		Transform(ZEVector3 &Out, const ZEVector3& Vector, const ZEMatrix4x4 &Matrix);
-		static void		Transform3x3(ZEVector3 &Out, const ZEVector3& Vector, const ZEMatrix4x4 &Matrix);
-		static void		Transform(ZEVector4 &Out, const ZEVector4& Vector, const ZEMatrix4x4 &Matrix);
+		static void						Transform(ZEVector3 &Out, const ZEVector3& Vector, const ZEMatrix4x4 &Matrix);
+		static void						Transform3x3(ZEVector3 &Out, const ZEVector3& Vector, const ZEMatrix4x4 &Matrix);
+		static void						Transform(ZEVector4 &Out, const ZEVector4& Vector, const ZEMatrix4x4 &Matrix);
 
-		ZEMatrix4x4		operator+(const ZEMatrix4x4 &RightOperand) const;
-		ZEMatrix4x4		operator-(const ZEMatrix4x4 &RightOperand) const;
-		ZEMatrix4x4		operator*(const ZEMatrix4x4 &RightOperand) const;
-		ZEMatrix4x4		operator*(float S);
+		ZEMatrix4x4						operator+(const ZEMatrix4x4 &RightOperand) const;
+		ZEMatrix4x4						operator-(const ZEMatrix4x4 &RightOperand) const;
+		ZEMatrix4x4						operator*(const ZEMatrix4x4 &RightOperand) const;
+		ZEMatrix4x4						operator*(float S);
 
-		void			operator += (const ZEMatrix4x4 &RightOperand);
-		void			operator -= (const ZEMatrix4x4 &RightOperand);
-		void			operator *= (const ZEMatrix4x4 &RightOperand);
-		void			operator *= (float S);
+		void							operator += (const ZEMatrix4x4 &RightOperand);
+		void							operator -= (const ZEMatrix4x4 &RightOperand);
+		void							operator *= (const ZEMatrix4x4 &RightOperand);
+		void							operator *= (float S);
 
-		bool			operator == (const ZEMatrix4x4 &M) const;
-		bool			operator != (const ZEMatrix4x4 &M) const;
+		bool							operator == (const ZEMatrix4x4 &M) const;
+		bool							operator != (const ZEMatrix4x4 &M) const;
 		
 
-						ZEMatrix4x4(float M11, float M12, float M13, float M14,
-									float M21, float M22, float M23, float M24,
-									float M31, float M32, float M33, float M34,
-									float M41, float M42, float M43, float M44);
-						ZEMatrix4x4(float* M);
-						ZEMatrix4x4();
+									ZEMatrix4x4(float M11, float M12, float M13, float M14,
+												float M21, float M22, float M23, float M24,
+												float M31, float M32, float M33, float M34,
+												float M41, float M42, float M43, float M44);
+									ZEMatrix4x4(float* M);
+									ZEMatrix4x4();
 };
 
 #endif

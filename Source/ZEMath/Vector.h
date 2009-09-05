@@ -43,6 +43,7 @@
 	#define _VECTOR_STATIC_ static
 #endif
 
+class ZEQuaternion;
 class ZEMatrix3x3;
 class ZEMatrix4x4;
 
@@ -161,6 +162,7 @@ class ZEVector3
 		ZEVector3					operator*(const ZEVector3 &RightOperand) const;
 		ZEVector3					operator*(const ZEMatrix4x4 &RightOperand) const;
 		ZEVector3					operator*(const ZEMatrix3x3 &RightOperand) const;
+		ZEVector3					operator*(const ZEQuaternion &RightOperand) const;
 		ZEVector3					operator*(float S) const;
 
 		ZEVector3					operator - () const;
@@ -170,15 +172,16 @@ class ZEVector3
 		ZEVector3&					operator *= (const ZEVector3 &RightOperand);
 		ZEVector3&					operator *= (const ZEMatrix3x3 &RightOperand);
 		ZEVector3&					operator *= (const ZEMatrix4x4 &RightOperand);
+		ZEVector3&					operator *= (const ZEQuaternion &RightOperand);
 		ZEVector3&					operator *= (float S);
 
-		bool					operator == (const ZEVector3 &RightOperand) const;
-		bool					operator != (const ZEVector3 &RightOperand) const;
+		bool						operator == (const ZEVector3 &RightOperand) const;
+		bool						operator != (const ZEVector3 &RightOperand) const;
 
-								ZEVector3(float x, float y, float z);
-								ZEVector3(ZEVector2& Base, float z);
-								ZEVector3(const ZEVector3& Start, const ZEVector3& End);
-								ZEVector3();
+									ZEVector3(float x, float y, float z);
+									ZEVector3(ZEVector2& Base, float z);
+									ZEVector3(const ZEVector3& Start, const ZEVector3& End);
+									ZEVector3();
 };
 
 typedef ZEVector3 ZEPoint3, ZEPosition3;

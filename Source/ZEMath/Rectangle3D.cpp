@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - 3DRectangle.h
+ Zinek Engine - Rectangle3D.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATH_3DRECTANGLE_H__
-#define __ZE_MATH_3DRECTANGLE_H__
+#include "Rectangle3D.h"
 
-#include "Vector.h"
-#include "Plane.h"
-
-class ZE3DRectangle
+void ZERectangle3D::GetPlane(ZEPlane & Plane) const
 {
-	public:
-		ZEPoint3				P1, P2, P3, P4;
+	ZEPlane::Create(Plane,P1,P2,P3);
+}
 
-		void					GetPlane(ZEPlane & Plane) const;
-		const ZEPoint3&			GetPoint(unsigned int Index) const;
+const ZEPoint3& ZERectangle3D::GetPoint(unsigned int Index) const
+{
+	switch(Index)
+	{
+		case 0:
+			return P1;
+		case 1:
+			return P2;
+		case 2:
+			return P3;
+		case 3:
+			return P4;
+		default:
+			return P1;
+	}
+}
+		
+ZERectangle3D::ZERectangle3D()
+{
+}
 
-								ZE3DRectangle();
-								ZE3DRectangle(const ZEPoint3& P1, const ZEPoint3& P2, const ZEPoint3& P3, const ZEPoint3& P4);
-};
-
-#endif
+ZERectangle3D::ZERectangle3D(const ZEPoint3& P1, const ZEPoint3& P2, const ZEPoint3& P3, const ZEPoint3& P4)
+{
+	this->P1 = P1;
+	this->P2 = P2;
+	this->P3 = P3;
+	this->P4 = P4;
+}

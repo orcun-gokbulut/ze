@@ -63,7 +63,7 @@ class ZEMapPortalDoor
 {
 	public:
 		char							Name[ZE_MAX_NAME_SIZE];
-		ZE3DRectangle					Rectangle;
+		ZERectangle3D					Rectangle;
 		ZEMapPortal*					DestinationPortal;
 		bool							IsOpen;
 };
