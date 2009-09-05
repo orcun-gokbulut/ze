@@ -39,12 +39,12 @@
 #include <stdio.h>
 
 #define ZECANVAS_ADDVERTEX(Vertex, Matrix, Pos, Nor, Texcrd)\
-	ZEMatrix4x4::Transform((Vertex).Position, (Matrix), (Pos));\
-	ZEMatrix4x4::Transform3x3((Vertex).Normal, (Matrix), (Nor));\
+	ZEMatrix4x4::Transform((Vertex).Position, (Pos), (Matrix));\
+	ZEMatrix4x4::Transform3x3((Vertex).Normal, (Nor), (Matrix));\
 	(Vertex).Texcoord = (Texcrd)
 
 #define ZECANVAS_ADDWIREVERTEX(Vertex, Matrix, Pos)\
-	ZEMatrix4x4::Transform((Vertex).Position, (Matrix), (Pos));\
+	ZEMatrix4x4::Transform((Vertex).Position, (Pos), (Matrix));\
 	(Vertex).Normal = ZEVector3(0.0f, 0.0f, 0.0f);\
 	(Vertex).Texcoord = ZEVector2(0.0f, 0.0f)
 

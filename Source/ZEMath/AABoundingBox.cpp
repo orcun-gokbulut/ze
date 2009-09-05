@@ -72,7 +72,7 @@ ZEPoint3 ZEAABoundingBox::GetVertex(unsigned char Index) const
 	return Vertex;
 }
 
-float ZEAABoundingBox::GetLength() const
+float ZEAABoundingBox::GetLenght() const
 {
 	ZEVector3 Temp;
 	ZEVector3::Sub(Temp, Max, Min);
@@ -83,11 +83,11 @@ float ZEAABoundingBox::GetLength() const
 void ZEAABoundingBox::Transform(ZEAABoundingBox& Output, const ZEAABoundingBox& Input, const ZEMatrix4x4& TransformMatrix)
 {
 	ZEPoint3 Point;
-	ZEMatrix4x4::Transform(Point, TransformMatrix, Input.GetVertex(0));
+	ZEMatrix4x4::Transform(Point, Input.GetVertex(0), TransformMatrix);
 	Output.Min = Output.Max = Point;
 	for (int I = 1; I < 8; I++)
 	{
-		ZEMatrix4x4::Transform(Point, TransformMatrix, Input.GetVertex(I));
+		ZEMatrix4x4::Transform(Point, Input.GetVertex(I), TransformMatrix);
 		if (Point.x < Output.Min.x) Output.Min.x = Point.x;
 		if (Point.y < Output.Min.y) Output.Min.y = Point.y;
 		if (Point.z < Output.Min.z) Output.Min.z = Point.z;
@@ -181,9 +181,9 @@ void ZEAABoundingBox::GenerateOBoundingBox(ZEOBoundingBox& BoundingBox, const ZE
 {
 	ZEVector3::Add(BoundingBox.Position, Min, *((const ZEVector3*)Transform.M[4]));
 
-	ZEMatrix4x4::Transform3x3(BoundingBox.U, Transform, ZEVector3(Max.x - Min.x, 0.0f, 0.0f));
-	ZEMatrix4x4::Transform3x3(BoundingBox.V, Transform, ZEVector3(0.0f, Max.y - Min.y, 0.0f));
-	ZEMatrix4x4::Transform3x3(BoundingBox.N, Transform, ZEVector3(0.0f, 0.0f, Max.z - Min.z));
+	ZEMatrix4x4::Transform3x3(BoundingBox.U, ZEVector3(Max.x - Min.x, 0.0f, 0.0f), Transform);
+	ZEMatrix4x4::Transform3x3(BoundingBox.V, ZEVector3(0.0f, Max.y - Min.y, 0.0f), Transform);
+	ZEMatrix4x4::Transform3x3(BoundingBox.N, ZEVector3(0.0f, 0.0f, Max.z - Min.z), Transform);
 }
 
 bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZEPoint3 Point)
@@ -254,14 +254,14 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 				tMaxT = TempT;
 			}
 
-			if (tMinT > MaxT || MinT > tMaxT)
-				return false;
-
 			if (MinT < tMinT)
 				MinT = tMinT;
 
 			if (MaxT > tMaxT)
 				MaxT = tMaxT;
+
+			if (MaxT > MinT)
+				return false;
 		}
 		else
 		{
@@ -281,7 +281,7 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 
 	if (Line.v.z == 0)
 	{
-		if (Line.p.z < BoundingBox.Min.z || Line.p.z > BoundingBox.Max.z)
+		if (Line.p.y < BoundingBox.Min.y || Line.p.y > BoundingBox.Max.y)
 			return false;
 
 		if (TValid == false)
@@ -314,7 +314,7 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 			if (MaxT > tMaxT)
 				MaxT = tMaxT;
 
-			if (tMinT > MaxT || MinT > tMaxT)
+			if (MaxT > MinT)
 				return false;
 			else
 				return true;

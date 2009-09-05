@@ -244,11 +244,11 @@ const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 		{
 			ZEVector3 Point;
 			ZEMatrix4x4 WorldTransform = GetWorldTransform();
-			ZEMatrix4x4::Transform(Point, WorldTransform, LocalBoundingBox.GetVertex(0));
+			ZEMatrix4x4::Transform(Point, LocalBoundingBox.GetVertex(0), WorldTransform);
 			WorldBoundingBox.Min = WorldBoundingBox.Max = Point;
 			for (int I = 1; I < 8; I++)
 			{
-				ZEMatrix4x4::Transform(Point, WorldTransform, LocalBoundingBox.GetVertex(I));
+				ZEMatrix4x4::Transform(Point, LocalBoundingBox.GetVertex(I), WorldTransform);
 				if (Point.x < WorldBoundingBox.Min.x) WorldBoundingBox.Min.x = Point.x;
 				if (Point.y < WorldBoundingBox.Min.y) WorldBoundingBox.Min.y = Point.y;
 				if (Point.z < WorldBoundingBox.Min.z) WorldBoundingBox.Min.z = Point.z;

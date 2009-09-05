@@ -131,8 +131,8 @@ struct ZEModelFilePhysicalBodyShapeChunk
 {
 	ZEDWORD								ChunkId;
 	ZEDWORD								Type;
-	ZEVector3							LocalPosition;
-	ZEQuaternion						LocalOrientation;
+	ZEVector3							Position;
+	ZEQuaternion						Rotation;
 	float								Restitution;
 	float								StaticFriction;
 	float								DynamicFriction;
@@ -340,7 +340,8 @@ struct ZEModelFileMeshChunk
 	char								Name[ZE_MDLF_MAX_NAME_SIZE];
 	ZEAABoundingBox						BoundingBox;
 	ZEVector3							Position;
-	ZEQuaternion						Orientation;
+	ZEQuaternion						Rotation;
+	ZEVector3							Scale;
 	bool								IsSkinned;
 	ZEDWORD								LODCount;
 	bool								HasPhysicalBody;
@@ -352,9 +353,7 @@ struct ZEModelFileBoneChunk
 	char								Name[ZE_MDLF_MAX_NAME_SIZE];
 	ZEINT32								ParentBone;
 	ZEVector3							RelativePosition;
-	ZEQuaternion						RelativeOrientation;
-	ZEVector3							AbsolutePosition;
-	ZEQuaternion						AbsoluteOrientation;
+	ZEQuaternion						RelativeRotation;
 	ZEAABoundingBox						BoundingBox;
 	bool								HasPhysicalBody;
 	bool								HasPhysicalJoint;

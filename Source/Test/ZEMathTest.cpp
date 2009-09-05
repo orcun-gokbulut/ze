@@ -454,7 +454,7 @@ bool TestMatrix()
 		D3DXVec3Transform(&DO, &DA, &DT);
 
 		ZEVector3 A(1.0, 2.0, 3.0),C;
-		ZEMatrix4x4::Transform(C, TA, A);
+		ZEMatrix4x4::Transform(C, A, TA);
 
 		Succeed =CheckVector(C, DO.x, DO.y, DO.z)&Succeed;
 	}

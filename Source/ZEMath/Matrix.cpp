@@ -46,13 +46,6 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const ZEMatrix3x3 ZEMatrix3x3::Zero = ZEMatrix3x3(0.0f, 0.0f, 0.0f,
-												  0.0f, 0.0f, 0.0f,
-												  0.0f, 0.0f, 0.0f);
-
-const ZEMatrix3x3 ZEMatrix3x3::Identity = ZEMatrix3x3(1.0f, 0.0f, 0.0f,
-													  0.0f, 1.0f, 0.0f,
-													  0.0f, 0.0f, 1.0f);
 
 inline void ZEMatrix3x3::Create(ZEMatrix3x3 &Matrix, float M11, float M12, float M13,
 														float M21, float M22, float M23,
@@ -235,20 +228,32 @@ void ZEMatrix3x3::Transpose(ZEMatrix3x3& Out, const ZEMatrix3x3& Matrix)
 	Out.M33 = Matrix.M33;
 }
 
-void ZEMatrix3x3::Transform(ZEVector3& Out, const ZEMatrix3x3& Matrix, const ZEVector3& Vector)
-{
-	Out.x = Matrix.M11 * Vector.x + Matrix.M21 * Vector.y + Matrix.M31 * Vector.z;
-	Out.y = Matrix.M12 * Vector.x + Matrix.M22 * Vector.y + Matrix.M32 * Vector.z;
-	Out.z = Matrix.M13 * Vector.x + Matrix.M23 * Vector.y + Matrix.M33 * Vector.z;
-}
-
 bool ZEMatrix3x3::Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix)
 {
 	float Det;
 	return D3DXMatrixInverse((D3DXMATRIX*)&Out, &Det, (D3DXMATRIX*)&Matrix) != NULL;
 }
 
-// overloading // 
+void ZEMatrix3x3::Transform(ZEVector2& Out, const ZEVector2& Vector, const ZEMatrix3x3 &Matrix)
+{
+	Out.x = Matrix.M11 * Vector.x + Matrix.M21 * Vector.y + Matrix.M31;
+	Out.y = Matrix.M12 * Vector.x + Matrix.M22 * Vector.y + Matrix.M32;
+}
+
+void ZEMatrix3x3::Transform(ZEVector3& Out, const ZEVector3& Vector, const ZEMatrix3x3 &Matrix)
+{
+	Out.x = Matrix.M11 * Vector.x + Matrix.M21 * Vector.y + Matrix.M31 * Vector.z;
+	Out.y = Matrix.M12 * Vector.x + Matrix.M22 * Vector.y + Matrix.M32 * Vector.z;
+	Out.z = Matrix.M13 * Vector.x + Matrix.M23 * Vector.y + Matrix.M33 * Vector.z;
+}
+
+void ZEMatrix3x3::Transform(ZEVector4& Out, const ZEVector4& Vector, const ZEMatrix3x3 &Matrix)
+{
+	Out.x = Matrix.M11 * Vector.x + Matrix.M21 * Vector.y + Matrix.M31 * Vector.z;
+	Out.y = Matrix.M12 * Vector.x + Matrix.M22 * Vector.y + Matrix.M32 * Vector.z;
+	Out.z = Matrix.M13 * Vector.x + Matrix.M23 * Vector.y + Matrix.M33 * Vector.z;
+	Out.w = 1.0f;
+}
 
 ZEMatrix3x3 ZEMatrix3x3::operator+(const ZEMatrix3x3 &RightOperand) const 
 {
@@ -335,16 +340,6 @@ ZEMatrix3x3::ZEMatrix3x3()
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4 //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-const ZEMatrix4x4 ZEMatrix4x4::Zero = ZEMatrix4x4(0.0f, 0.0f, 0.0f, 0.0f,
-												  0.0f, 0.0f, 0.0f, 0.0f,
-												  0.0f, 0.0f, 0.0f, 0.0f,
-												  0.0f, 0.0f, 0.0f, 0.0f);
-
-const ZEMatrix4x4 ZEMatrix4x4::Identity = ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f,
-													  0.0f, 1.0f, 0.0f, 0.0f,
-													  0.0f, 0.0f, 1.0f, 0.0f,
-													  0.0f, 0.0f, 0.0f, 1.0f);
 
 inline void ZEMatrix4x4::Create(ZEMatrix4x4& Matrix,
 				float M11, float M12, float M13, float M14,
@@ -594,7 +589,7 @@ void ZEMatrix4x4::CreateIdentity(ZEMatrix4x4& Matrix)
 			1.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 1.0f);
+			0.0f, 0.0f, 0.0f, 1.0f );
 }
 void ZEMatrix4x4::CreateZero(ZEMatrix4x4& Matrix)
 {
@@ -602,7 +597,7 @@ void ZEMatrix4x4::CreateZero(ZEMatrix4x4& Matrix)
 			0.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 0.0f);
+			0.0f, 0.0f, 0.0f, 0.0f );
 }
 void ZEMatrix4x4::CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width, float Height, float NearZ, float FarZ)
 {
@@ -738,18 +733,26 @@ void ZEMatrix4x4::Transpose(ZEMatrix4x4& Out, const ZEMatrix4x4& Matrix)
 	Out.M44 = Matrix.M44;
 }
 
-void ZEMatrix4x4::Transform(ZEVector3& Out, const ZEMatrix4x4& Matrix, const ZEVector3& Vector)
+void ZEMatrix4x4::Transform(ZEVector3& Out, const ZEVector3& Vector, const ZEMatrix4x4& Matrix)
 {
 	Out.x = Matrix.M11 * Vector.x + Matrix.M21 * Vector.y + Matrix.M31 * Vector.z + Matrix.M41;
 	Out.y = Matrix.M12 * Vector.x + Matrix.M22 * Vector.y + Matrix.M32 * Vector.z + Matrix.M42;
 	Out.z = Matrix.M13 * Vector.x + Matrix.M23 * Vector.y + Matrix.M33 * Vector.z + Matrix.M43;
 }
 
-void ZEMatrix4x4::Transform3x3(ZEVector3 &Out, const ZEMatrix4x4& Matrix, const ZEVector3& Vector)
+void ZEMatrix4x4::Transform3x3(ZEVector3 &Out, const ZEVector3& Vector, const ZEMatrix4x4& Matrix)
 {
 	Out.x = Matrix.M11 * Vector.x + Matrix.M21 * Vector.y + Matrix.M31 * Vector.z;
 	Out.y = Matrix.M12 * Vector.x + Matrix.M22 * Vector.y + Matrix.M32 * Vector.z;
 	Out.z = Matrix.M13 * Vector.x + Matrix.M23 * Vector.y + Matrix.M33 * Vector.z;
+}
+
+void ZEMatrix4x4::Transform(ZEVector4 &Out, const ZEVector4& Vector, const ZEMatrix4x4& Matrix)
+{
+	Out.x = Matrix.M11 * Vector.x + Matrix.M21 * Vector.y + Matrix.M31 * Vector.z + Matrix.M41 * Vector.w;
+	Out.y = Matrix.M12 * Vector.x + Matrix.M22 * Vector.y + Matrix.M32 * Vector.z + Matrix.M42 * Vector.w;
+	Out.z = Matrix.M13 * Vector.x + Matrix.M23 * Vector.y + Matrix.M33 * Vector.z + Matrix.M43 * Vector.w;
+	Out.w = Matrix.M14 * Vector.x + Matrix.M24 * Vector.y + Matrix.M34 * Vector.z + Matrix.M44 * Vector.w;
 }
 
 bool ZEMatrix4x4::Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix)

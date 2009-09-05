@@ -71,7 +71,7 @@ class ZEQuaternion
 		static void						Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
 
 		static void						ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaternion& Quaternion);
-		static void						ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, const ZEQuaternion& Quaternion);
+		static void						ConvertToEulerAngles(float &Yaw, float &Pitch, float &Roll, const ZEQuaternion& Quaternion);
 		static void						ConvertToLookAndUp(ZEVector3& Look, ZEVector3& Up, const ZEQuaternion& Quaternion);
 
 		ZEVector3						operator*(const ZEVector3& Vector) const;

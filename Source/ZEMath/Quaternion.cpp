@@ -36,8 +36,8 @@
 #include "quaternion.h"
 #include <math.h>
 
-const ZEQuaternion ZEQuaternion::Zero = ZEQuaternion(0.0f, 0.0f, 0.0f, 0.0f);
-const ZEQuaternion ZEQuaternion::Identity = ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f);
+const ZEQuaternion ZEQuaternion::Zero;
+const ZEQuaternion ZEQuaternion::Identity;
 
 void ZEQuaternion::Create(ZEQuaternion& Output, float w, float x, float y, float z)
 {
@@ -128,7 +128,7 @@ void ZEQuaternion::VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaterni
 	Output.z = Vect.z;
 }
 
-void ZEQuaternion::ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, const ZEQuaternion& Quaternion)
+void ZEQuaternion::ConvertToEulerAngles(float &Yaw, float &Pitch, float &Roll, const ZEQuaternion& Quaternion)
 {
 	float test = Quaternion.x * Quaternion.y + Quaternion.z * Quaternion.w;
 	if (test > 0.499) 
@@ -151,8 +151,8 @@ void ZEQuaternion::ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, c
 	float sqy = Quaternion.y * Quaternion.y;    
 	float sqz = Quaternion.z * Quaternion.z;
     Yaw = atan2(2 * Quaternion.y * Quaternion.w - 2 * Quaternion.x * Quaternion.z , 1 - 2 * sqy - 2 * sqz);
-	Roll = asin(2 * test);
-	Pitch = atan2(2 * Quaternion.x * Quaternion.w - 2 * Quaternion.y * Quaternion.z , 1 - 2 * sqx - 2 * sqz);
+	Pitch = asin(2 * test);
+	Roll = atan2(2 * Quaternion.x * Quaternion.w - 2 * Quaternion.y * Quaternion.z , 1 - 2 * sqx - 2 * sqz);
 }
 
 void ZEQuaternion::Conjugate()
@@ -281,7 +281,7 @@ ZEQuaternion ZEQuaternion::operator*(const ZEQuaternion& Other) const
 ZEQuaternion& ZEQuaternion::operator*=(const ZEQuaternion& Other)
 {
 	ZEQuaternion Temp;
-	Product(Temp, *this, Other);
+	Product(Temp, *this, Temp);
 	*this = Temp;
 	return *this;
 }

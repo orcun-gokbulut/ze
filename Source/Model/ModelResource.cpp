@@ -200,8 +200,8 @@ bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile*
 		}
 
 		Shape->Type						= (ZEPhysicalShapeType)ShapeChunk.Type;
-		Shape->LocalPosition			= ShapeChunk.LocalPosition;
-		Shape->LocalOrientation			= ShapeChunk.LocalOrientation;
+		Shape->Position					= ShapeChunk.Position;
+		Shape->Rotation					= ShapeChunk.Rotation;
 		Shape->StaticFriction			= ShapeChunk.StaticFriction;
 		Shape->DynamicFriction			= ShapeChunk.DynamicFriction;
 		Shape->Restitution				= ShapeChunk.Restitution;
@@ -223,9 +223,9 @@ bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile*
 			}
 			case ZE_PST_BOX:
 			{
-				Shape->Box.Width		= ShapeChunk.Box.Width;
-				Shape->Box.Height		= ShapeChunk.Box.Height;
-				Shape->Box.Length		= ShapeChunk.Box.Length;
+				Shape->Box.Width		= 0.5 * ShapeChunk.Box.Width;
+				Shape->Box.Height		= 0.5 * ShapeChunk.Box.Height;
+				Shape->Box.Length		= 0.5 * ShapeChunk.Box.Length;
 				break;
 			}
 			case ZE_PST_SPHERE:
@@ -306,7 +306,11 @@ bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 		Mesh->IsSkinned		= MeshChunk.IsSkinned;
 		Mesh->BoundingBox	= MeshChunk.BoundingBox;
 		Mesh->Position		= MeshChunk.Position;
-		Mesh->Orientation	= MeshChunk.Orientation;
+		Mesh->Rotation		= MeshChunk.Rotation;
+		Mesh->Scale			= MeshChunk.Scale;
+
+		Mesh->PhysicalBody.Position = ZEVector3(0,1,0);
+		Mesh->PhysicalBody.Orientation = ZEQuaternion::Identity;
 
 		Mesh->LODs.SetCount(MeshChunk.LODCount);
 		for (size_t I = 0; I < Mesh->LODs.GetCount(); I++)
@@ -497,18 +501,19 @@ bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 
 		strncpy(Bone->Name, BoneChunk.Name, ZE_MDLF_MAX_NAME_SIZE);
 		Bone->BoundingBox = BoneChunk.BoundingBox;
-		Bone->AbsoluteOrientation = BoneChunk.AbsoluteOrientation;
-		Bone->AbsolutePosition = BoneChunk.AbsolutePosition;
-		ZEMatrix4x4::CreateOffset(Bone->ForwardTransform, BoneChunk.AbsolutePosition, BoneChunk.AbsoluteOrientation);
-		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
+
+		/*ZEMatrix4x4::CreateOffset(Bone->ForwardTransform, BoneChunk.AbsolutePosition, BoneChunk.AbsoluteOrientation);
+		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);*/
 		Bone->BoundingBox = BoneChunk.BoundingBox;
 		Bone->ParentBone = BoneChunk.ParentBone;
-		Bone->RelativeOrientation = BoneChunk.RelativeOrientation;
 		Bone->RelativePosition = BoneChunk.RelativePosition;
-		
-
+		Bone->RelativeOrientation = BoneChunk.RelativeRotation;
 	}
-
+#pragma tast
+	/*
+	Bone->AbsoluteOrientation = BoneChunk.AbsoluteOrientation;
+	Bone->AbsolutePosition = BoneChunk.AbsolutePosition;
+	*/
 	return true;
 }
 

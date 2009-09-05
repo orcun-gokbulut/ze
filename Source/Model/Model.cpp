@@ -317,8 +317,8 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	PhysicsEnabled = false;
 	AnimationType = ZE_MAT_PREDEFINED;
 	Position = MeshResource->Position;
-	Rotation = MeshResource->Orientation;
-	Scale = ZEVector3(1.0f, 1.0f, 1.0f);
+	Rotation = MeshResource->Rotation;
+	Scale = MeshResource->Scale;
 	LocalBoundingBox = MeshResource->BoundingBox;
 
 	UpdateWorldBoundingBox = true;
@@ -353,7 +353,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 				PlaneShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
 				PlaneShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//PlaneShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
-				PlaneShapeInfo.LocalPosition = Shape.LocalPosition;
+				PlaneShapeInfo.LocalPosition = Shape.Position;
 				PlaneShapeInfo.Trigger = Shape.Trigger;
 
 				PlaneShapeInfo.Height = Shape.Plane.Height;
@@ -372,7 +372,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 				BoxShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
 				BoxShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//BoxShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
-				BoxShapeInfo.LocalPosition = Shape.LocalPosition;
+				BoxShapeInfo.LocalPosition = Shape.Position;
 				BoxShapeInfo.Trigger = Shape.Trigger;
 
 				BoxShapeInfo.Dimensions.x = Shape.Box.Width;
@@ -389,7 +389,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 				SphereShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
 				SphereShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//SphereShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
-				SphereShapeInfo.LocalPosition = Shape.LocalPosition;
+				SphereShapeInfo.LocalPosition = Shape.Position;
 				SphereShapeInfo.Trigger = Shape.Trigger;
 
 				SphereShapeInfo.Radius = Shape.Sphere.Radius;
@@ -404,7 +404,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 				CapsuleShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
 				CapsuleShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//CapsuleShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
-				CapsuleShapeInfo.LocalPosition = Shape.LocalPosition;
+				CapsuleShapeInfo.LocalPosition = Shape.Position;
 				CapsuleShapeInfo.Trigger = Shape.Trigger;
 
 				CapsuleShapeInfo.Height = Shape.Capsule.Height;
@@ -420,7 +420,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 				ConvexShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
 				ConvexShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//ConvexShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
-				ConvexShapeInfo.LocalPosition = Shape.LocalPosition;
+				ConvexShapeInfo.LocalPosition = Shape.Position;
 				ConvexShapeInfo.Trigger = Shape.Trigger;
 
 				ConvexShapeInfo.Vertices = Shape.Convex.Vertices;
@@ -435,7 +435,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 				TrimeshShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
 				TrimeshShapeInfo.CollisionMask.Mask4 = Shape.CollisionMask4;
 				//TrimeshShapeInfo.Material->Initialize(Shape.Material.Friction,Shape.Material.Restitution);
-				TrimeshShapeInfo.LocalPosition = Shape.LocalPosition;
+				TrimeshShapeInfo.LocalPosition = Shape.Position;
 				TrimeshShapeInfo.Trigger = Shape.Trigger;
 
 				TrimeshShapeInfo.Vertices = Shape.TriMesh.Vertices;
@@ -1066,8 +1066,8 @@ void ZEModel::SetStaticPose(const ZEModelAnimation* Animation, unsigned int Fram
 		{
 			Key = &Frame->BoneKeys[I];
 
-			Bones[Key->ItemId].SetRelativeRotation(Key->Orientation);
-			//Bones[Key->ItemId].SetRelativeRotation(Key->Orientation);
+			Bones[Key->ItemId].SetRelativePosition(Key->Position);
+			Bones[Key->ItemId].SetRelativeRotation(Key->Rotation);
 		}
 		
 		for (size_t I = 0; I < Frame->MeshKeys.GetCount(); I++)
@@ -1075,7 +1075,8 @@ void ZEModel::SetStaticPose(const ZEModelAnimation* Animation, unsigned int Fram
 			Key = &Frame->MeshKeys[I];
 			
 			Meshes[Key->ItemId].SetLocalPosition(Key->Position);
-			Bones[Key->ItemId].SetRelativeRotation(Key->Orientation);
+			Meshes[Key->ItemId].SetLocalRotation(Key->Rotation);
+			Meshes[Key->ItemId].SetLocalScale(Key->Scale);
 		}
 	}
 }
@@ -1265,7 +1266,7 @@ void ZEModel::Tick(float ElapsedTime)
 			const ZEModelResourceAnimationKey* NextKey = &NextFrame->BoneKeys[I];
 			
 			ZEQuaternion Rotation;
-			ZEQuaternion::Slerp(Rotation, Key->Orientation, NextKey->Orientation, Interpolation);
+			ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
 
 			Bones[Key->ItemId].SetRelativeRotation(Rotation);
 			//Bones[Key->ItemId].SetRelativeRotation(Key->Orientation);
@@ -1281,7 +1282,7 @@ void ZEModel::Tick(float ElapsedTime)
 			Meshes[Key->ItemId].SetLocalPosition(Position);
 
 			ZEQuaternion Rotation;
-			ZEQuaternion::Slerp(Rotation, Key->Orientation, NextKey->Orientation, Interpolation);
+			ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
 			Bones[Key->ItemId].SetRelativeRotation(Rotation);
 
 		}

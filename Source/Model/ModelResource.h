@@ -88,8 +88,8 @@ struct ZEModelResourcePhysicalPolygon
 struct ZEModelResourcePhysicalShape
 {
 	ZEPhysicalShapeType							Type;
-	ZEVector3									LocalPosition;
-	ZEQuaternion								LocalOrientation;
+	ZEVector3									Position;
+	ZEQuaternion								Rotation;
 	float										Restitution;
 	float										StaticFriction;
 	float										DynamicFriction;
@@ -214,15 +214,15 @@ struct ZEModelResourcePhysicalJoint
 
 	struct
 	{
-		ZEVector3 						Pulley1;
-		ZEVector3 						Pulley2;
-		float 							Distance;
-		float 							Ratio;
-		float 							Stiffness;
-		bool 							IsRigid;
-		bool 							HasMotor;
-		float 							MotorForce;
-		float 							MotorVelocity;
+		ZEVector3 								Pulley1;
+		ZEVector3 								Pulley2;
+		float 									Distance;
+		float 									Ratio;
+		float 									Stiffness;
+		bool 									IsRigid;
+		bool									HasMotor;
+		float 									MotorForce;
+		float 									MotorVelocity;
 	} Pulley;
 
 	struct
@@ -287,7 +287,8 @@ struct ZEModelResourceAnimationKey
 {
 	ZEDWORD										ItemId;
 	ZEVector3									Position;
-	ZEQuaternion								Orientation;
+	ZEQuaternion								Rotation;
+	ZEVector3									Scale;
 };
 
 struct ZEModelResourceAnimationFrame
@@ -326,7 +327,8 @@ struct ZEModelResourceMesh
 	char										Name[ZE_MDLF_MAX_NAME_SIZE]; 
 	ZEAABoundingBox								BoundingBox;
 	ZEVector3									Position;
-	ZEQuaternion								Orientation;
+	ZEQuaternion								Rotation;
+	ZEVector3									Scale;
 	bool										IsSkinned;
 	ZEArray<ZEModelResourceMeshLOD>				LODs;
 	ZEModelResourcePhysicalBody					PhysicalBody;

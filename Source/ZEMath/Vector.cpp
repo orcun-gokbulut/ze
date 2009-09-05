@@ -120,62 +120,76 @@ inline float ZEVector2::Length() const
 	return sqrt(x * x + y * y);
 }
 
-ZEVector2 ZEVector2::operator +(const ZEVector2 &RightOperand) const
+ZEVector2 ZEVector2::operator + (const ZEVector2 &RightOperand) const
 {
 	ZEVector2 Temp;
 	ZEVector2::Add(Temp, RightOperand, *this);
 	return Temp;
 }
 
-ZEVector2 ZEVector2::operator -(const ZEVector2 &RightOperand) const
+ZEVector2 ZEVector2::operator - (const ZEVector2 &RightOperand) const
 {
 	ZEVector2 Temp;
 	ZEVector2::Substution(Temp, RightOperand, *this);
 	return Temp;
 }
 
-ZEVector2 ZEVector2::operator *(const ZEVector2 &RightOperand) const
+ZEVector2 ZEVector2::operator * (const ZEVector2 &RightOperand) const
 {
 	ZEVector2 Temp;
 	ZEVector2::Multiply(Temp, RightOperand, *this);
 	return Temp;
 }
 
-ZEVector2 ZEVector2::operator *(float s) const
+ZEVector2 ZEVector2::operator * (float s) const
 {
 	ZEVector2 Temp;
 	ZEVector2::Scale(Temp, *this, s);
 	return Temp;
 }
 
-ZEVector2 ZEVector2::operator-() const
+ZEVector2  ZEVector2::operator * (const ZEMatrix3x3& RightOperand) const
+{
+	ZEVector2 Temp;
+	ZEMatrix3x3::Transform(Temp, *this, RightOperand);
+	return Temp;
+}
+
+ZEVector2 ZEVector2::operator - () const
 {
 	ZEVector2 Temp(-x, -y);
 	return Temp;
 }
 
-ZEVector2& ZEVector2::operator +=(const ZEVector2 &RightOperand)
+ZEVector2& ZEVector2::operator += (const ZEVector2 &RightOperand)
 {
 
 	ZEVector2::Add(*this, RightOperand, *this);
 	return *this;
 }
 
-ZEVector2& ZEVector2::operator -=(const ZEVector2 &RightOperand)
+ZEVector2& ZEVector2::operator -= (const ZEVector2 &RightOperand)
 {
 	ZEVector2::Substution(*this, RightOperand, *this);
 	return *this;
 }
 
-ZEVector2& ZEVector2::operator *=(const ZEVector2 &RightOperand)
+ZEVector2& ZEVector2::operator *= (const ZEVector2 &RightOperand)
 {
 	ZEVector2::Multiply(*this, RightOperand, *this);
 	return *this;
 }
 
-ZEVector2& ZEVector2::operator *=(float s)
+ZEVector2& ZEVector2::operator *= (float s)
 {
 	ZEVector2::Scale(*this, *this, s);
+	return *this;
+}
+
+ZEVector2& ZEVector2::operator *= (const ZEMatrix3x3 &RightOperand)
+{
+	ZEVector2 Temp = *this;
+	ZEMatrix3x3::Transform(*this, Temp, RightOperand);
 	return *this;
 }
 
@@ -208,7 +222,8 @@ ZEVector2::ZEVector2()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const ZEVector3 ZEVector3::Zero	= ZEVector3(0.0f, 0.0f, 0.0f);
+
+const ZEVector3 ZEVector3::Zero		= ZEVector3(0.0f, 0.0f, 0.0f);
 const ZEVector3 ZEVector3::UnitX	= ZEVector3(1.0f, 0.0f, 0.0f);
 const ZEVector3 ZEVector3::UnitY	= ZEVector3(0.0f, 1.0f, 0.0f);
 const ZEVector3 ZEVector3::UnitZ	= ZEVector3(0.0f, 0.0f, 1.0f);
@@ -308,35 +323,49 @@ inline float ZEVector3::Length() const
 	return sqrt(x * x + y * y + z * z);
 }
 
-ZEVector3 ZEVector3::operator+(const ZEVector3 &RightOperand) const
+ZEVector3 ZEVector3::operator + (const ZEVector3 &RightOperand) const
 {
 	ZEVector3 Temp;
 	ZEVector3::Add(Temp, *this, RightOperand);
 	return Temp;
 }
 
-ZEVector3 ZEVector3::operator-(const ZEVector3 &RightOperand) const
+ZEVector3 ZEVector3::operator - (const ZEVector3 &RightOperand) const
 {
 	ZEVector3 Temp;
 	ZEVector3::Sub(Temp, *this, RightOperand);
 	return Temp;
 }
 
-ZEVector3 ZEVector3::operator*(const ZEVector3 &RightOperand) const
+ZEVector3 ZEVector3::operator * (const ZEVector3 &RightOperand) const
 {
 	ZEVector3 Temp;
 	ZEVector3::CrossProduct(Temp, *this, RightOperand);
 	return Temp;
 }
 
-ZEVector3 ZEVector3::operator*(float s) const
+ZEVector3 ZEVector3::operator * (const ZEMatrix3x3 &RightOperand) const
+{
+	ZEVector3 Temp;
+	ZEMatrix3x3::Transform(Temp, *this, RightOperand);
+	return Temp;
+}
+
+ZEVector3 ZEVector3::operator * (const ZEMatrix4x4 &RightOperand) const
+{
+	ZEVector3 Temp;
+	ZEMatrix4x4::Transform(Temp, *this, RightOperand);
+	return Temp;
+}
+
+ZEVector3 ZEVector3::operator * (float s) const
 {
 	ZEVector3 Temp;
 	ZEVector3::Scale(Temp, *this, s);
 	return Temp;
 }
 
-ZEVector3 ZEVector3::operator-() const
+ZEVector3 ZEVector3::operator - () const
 {
 	ZEVector3 Temp(-x, -y, -z);
 	return Temp;
@@ -358,6 +387,20 @@ ZEVector3& ZEVector3::operator *= (const ZEVector3 &RightOperand)
 {
 	ZEVector3::Multiply(*this, *this, RightOperand);
 	return  *this;
+}
+
+ZEVector3& ZEVector3::operator *= (const ZEMatrix3x3 &RightOperand)
+{
+	ZEVector3 Temp = *this;
+	ZEMatrix3x3::Transform(*this, Temp, RightOperand);
+	return *this;
+}
+
+ZEVector3& ZEVector3::operator *= (const ZEMatrix4x4 &RightOperand)
+{
+	ZEVector3 Temp = *this;
+	ZEMatrix4x4::Transform(*this, Temp, RightOperand);
+	return *this;
 }
 
 ZEVector3& ZEVector3::operator *= (float s)
@@ -403,7 +446,7 @@ ZEVector3::ZEVector3()
 // ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4 //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const ZEVector4 ZEVector4::Zero	= ZEVector4(0.0f, 0.0f, 0.0f, 0.0f);
+const ZEVector4 ZEVector4::Zero		= ZEVector4(0.0f, 0.0f, 0.0f, 0.0f);
 const ZEVector4 ZEVector4::UnitX	= ZEVector4(1.0f, 0.0f, 0.0f, 0.0f);
 const ZEVector4 ZEVector4::UnitY	= ZEVector4(0.0f, 1.0f, 0.0f, 0.0f);
 const ZEVector4 ZEVector4::UnitZ	= ZEVector4(0.0f, 0.0f, 1.0f, 0.0f);
@@ -509,34 +552,47 @@ inline float ZEVector4::Length() const
 	return sqrt(x * x + y * y + z * z + w * w);
 }
 
-ZEVector4 ZEVector4::operator+(const ZEVector4 &RightOperand) const
+ZEVector4 ZEVector4::operator + (const ZEVector4 &RightOperand) const
 {
 	ZEVector4 Temp;
 	ZEVector4::Add(Temp, *this, RightOperand);
 	return Temp;
 }
 
-ZEVector4 ZEVector4::operator-(const ZEVector4 &RightOperand) const
+ZEVector4 ZEVector4::operator - (const ZEVector4 &RightOperand) const
 {
 	ZEVector4 Temp;
 	ZEVector4::Sub(Temp, *this, RightOperand);
 	return Temp;
 }
 
-ZEVector4 ZEVector4::operator*(const ZEVector4 &RightOperand) const
+ZEVector4 ZEVector4::operator * (const ZEVector4 &RightOperand) const
 {
 	ZEVector4 Temp;
 	ZEVector4::Multiply(Temp, *this, RightOperand);
 	return Temp;
 }
 
-ZEVector4 ZEVector4::operator*(float s) const
+ZEVector4 ZEVector4::operator * (float s) const
 {
 	ZEVector4 Temp;
 	ZEVector4::Scale(Temp, *this, s);
 	return Temp;
 }
 
+ZEVector4 ZEVector4::operator * (const ZEMatrix3x3 &RightOperand) const
+{
+	ZEVector4 Temp;
+	ZEMatrix3x3::Transform(Temp, *this, RightOperand);
+	return Temp;
+}
+
+ZEVector4 ZEVector4::operator * (const ZEMatrix4x4 &RightOperand) const
+{
+	ZEVector4 Temp;
+	ZEMatrix4x4::Transform(Temp, *this, RightOperand);
+	return Temp;
+}
 
 ZEVector4& ZEVector4::operator += (const ZEVector4 &RightOperand)
 {
@@ -555,6 +611,7 @@ ZEVector4& ZEVector4::operator *= (const ZEVector4 &RightOperand)
 	ZEVector4::Multiply(*this, *this, RightOperand);
 	return *this;
 }
+
 
 ZEVector4& ZEVector4::operator *= (float s)
 {

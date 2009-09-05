@@ -155,7 +155,7 @@ void ZECamera::GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY)
 	ZEMatrix4x4 InvViewMatrix;
 	ZEMatrix4x4::Inverse(InvViewMatrix, ViewPoint.ViewMatrix);
 
-	ZEMatrix4x4::Transform3x3(Ray.v, InvViewMatrix, V);
+	ZEMatrix4x4::Transform3x3(Ray.v, V, InvViewMatrix);
 
 	Ray.p.x = InvViewMatrix.M41;
 	Ray.p.y = InvViewMatrix.M42;

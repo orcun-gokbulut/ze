@@ -54,7 +54,7 @@ class ZELineSegment : public ZELine
 	
 		void				GetPointOn(ZEPoint3& Point, float t) const;
 
-		float				GetLength() const;
+		float				GetLenght() const;
 		void				GetSegmentStartPoint(ZEPoint3& StartPoint) const;
 		void				GetSegmentEndPoint(ZEPoint3& EndPoint) const;
 

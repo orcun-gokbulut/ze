@@ -49,7 +49,7 @@ public:
 
 	ZEPoint3					GetCenter() const;
 	ZEPoint3					GetVertex(unsigned char Index) const;
-	float						GetLength() const;
+	float						GetLenght() const;
 
 
 	void						GenerateBoundingSphere(ZEBoundingSphere& BoundingSphere) const;
