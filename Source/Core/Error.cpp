@@ -137,11 +137,19 @@ void ZEError::LogToFile(const char* Module, ZEErrorType ErrorType, const char* E
 
 void ZEError::RaiseError(const char* From, ZEErrorType Level, const char* ErrorFormat, ...)
 {
+	va_list VList;
+	va_start(VList, ErrorFormat);
+	RaiseError(From, Level, ErrorFormat, VList);
+	va_end(VList);
+}
+
+void ZEError::RaiseError(const char* From, ZEErrorType Level, const char* ErrorFormat, va_list Parameters)
+{
 	char Buffer[4096];
 
 	va_list VList;
 	va_start(VList, ErrorFormat);
-	vsprintf_s(Buffer, 4095, ErrorFormat, VList);
+	vsprintf_s(Buffer, 4095, ErrorFormat, Parameters);
 	va_end(VList);
 
 	LogToFile(From, Level, Buffer);
@@ -155,13 +163,19 @@ void ZEError::RaiseError(const char* From, ZEErrorType Level, const char* ErrorF
 		zeCore->SetCoreState(ZECORESTATE_CRITICALERROR);
 }
 
+
 void ZEError::RaiseAssert(ZEAssertType AssertType, const char* Function, const char* File, int Line, const char* Message, ...)
 {
-	char Buffer[4096];
-
 	va_list VList;
-	va_start(VList, Line);
-	vsprintf_s(Buffer, 4095, Message, VList);
+	va_start(VList, Message);
+	RaiseAssert(AssertType, Function, File, Line, Message, VList);
+	va_end(VList);
+}
+
+void ZEError::RaiseAssert(ZEAssertType AssertType, const char* Function, const char* File, int Line, const char* Message, va_list Parameters)
+{
+	char Buffer[4096];
+	vsprintf_s(Buffer, 4095, Message, Parameters);
 
 	if (zeCore->GetConsole() != NULL)
 		zeLog("%s : %s (Function : %s, File : %s, Line : %d)\r\n", (AssertType == ZE_ASSERTTYPE_ASSERT ? "Assert" : "Warning"),  Buffer,  Function, File, Line);
@@ -169,13 +183,12 @@ void ZEError::RaiseAssert(ZEAssertType AssertType, const char* Function, const c
 	#if defined(ZEDEBUG_ENABLED) && defined(ZEPLATFORM_WINDOWS)
 		if (AssertType == ZE_ASSERTTYPE_ASSERT)
 		{
-			_CrtDbgReport(_CRT_ASSERT, File, Line, "Zinek Engine", Message, VList); 
+			_CrtDbgReport(_CRT_ASSERT, File, Line, "Zinek Engine", Message, Parameters); 
 		}
 	#else
 		if (AssertType == ZE_ASSERTTYPE_ASSERT)
 			abort();
 	#endif
-	va_end(VList);
 }
 
 ZEError* ZEError::GetInstance()

@@ -40,7 +40,8 @@
 //  All rights reserved.									 //
 ///////////////////////////////////////////////////////////////
 
-#include "typedvariant.h"
+#include "DSAssert.h"
+#include "TypedVariant.h"
 #include <string.h>
 #include "definitions.h"
 #include <string.h>
@@ -52,7 +53,7 @@ void ZETypedVariant::SetString(char *NewValue)
 	ZEDS_ASSERT(Type != ZEVARIANTTYPE_STRING && Type != ZEVARIANTTYPE_UNDEFINED, "ZETypedVariant::SetString operation failed. Types does not match.");
 	if(Type == ZEVARIANTTYPE_STRING || Type == ZEVARIANTTYPE_MATRIX3X3 || Type == ZEVARIANTTYPE_MATRIX4X4)
 	{
-		if (Value.String != null || Type == ZEVARIANTTYPE_UNDEFINED)
+		if (Value.String != NULL || Type == ZEVARIANTTYPE_UNDEFINED)
 			delete[] Value.String;
 		Value.String = new char[strlen(NewValue) + 1];
 		strcpy(Value.String, NewValue);

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Definitions.h
+ Zinek Engine - MathAssert.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,17 +34,28 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_DEFINITIONS_H__
-#define __ZE_MATH_DEFINITIONS_H__
+#ifndef	__ZEMATH_ASSERT_H__
+#define __ZEMATH_ASSERT_H__
 
-#define ZE_ZERO_TRESHOLD	0.00001 
+	#ifdef ZEDEBUG_ENABLED
+	#define ZEMATH_DEBUG_MODE
+	#endif
 
-#define ZE_PI				3.1415926535897932384626433832795f		// 180  Degree
-#define ZE_PI_2				1.5707963267948966192313216916398f		// 90   Degree
-#define ZE_PI_4				0.78539816339744830961566084581988f		// 45   Degree
-#define ZE_PI_8				0.39269908169872415480783042290994f		// 22.5 Degree 
-#define ZE_PIx2				6.283185307179586476925286766559 
-
-#define ZEDEG2RAD(Angle) ((Angle) * ZE_PI/180)
-#define ZERAD2DEG(Angle) ((Angle) * 180/ZE_PI)
+	#ifdef ZEMATH_DEBUG_MODE
+		#ifdef __ZINEK_ENGINE__
+			void __ZEMATH_ASSERT(const char* Function, const char* File, int Line, const char* Message, ...);
+			void __ZEMATH_WARNING(const char* Function, const char* File, int Line, const char* Message, ...);
+			#define ZEMATH_ASSERT(Condition, ...) if (Condition) {__ZEMATH_ASSERT(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);}
+			#define ZEMATH_WARNING(Condition, ...) if (Condition) {__ZEMATH_ASSERT(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);}
+		#elif defined(__ZETOOLSDK__)
+			#define ZEMATH_ASSERT(Condition, ...) 
+			#define ZEMATH_WARNING(Condition, ...)
+		#else
+			#define ZEMATH_ASSERT(Condition, ...) 
+			#define ZEMATH_WARNING(Condition, ...)
+		#endif
+	#else
+		#define ZEMATH_ASSERT(Condition, ...) 
+		#define ZEMATH_WARNING(Condition, ...)
+	#endif
 #endif

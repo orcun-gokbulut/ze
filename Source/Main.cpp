@@ -118,7 +118,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 		ZEModelBrush* ModelBrush = (ZEModelBrush*)zeCore->GetGame()->CreateEntityInstance("ZEModelBrush");
 		Scene->AddEntity(ModelBrush);
-		ModelBrush->SetModelFile("test.zeModel");
+		ModelBrush->SetModelFile("teapot.zeModel");
+		ModelBrush->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3(0.0f, 1.0f, 0.0f)));
 		//boxes
 		for (int i=0;i<5;i++)
 		{

@@ -319,10 +319,10 @@ class ZEModel : public ZEComponent
 		const ZEModelResource*				GetModelResource();
 
 		
-		const ZEArray<ZEModelBone>&			GetSkeleton();
+		ZEArray<ZEModelBone>&				GetSkeleton();
 		ZEArray<ZEModelBone>&				GetBones();
 		const ZEArray<ZEMatrix4x4>&			GetBoneTransforms();
-		const ZEArray<ZEModelMesh>&			GetMeshes();
+		ZEArray<ZEModelMesh>&				GetMeshes();
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
 
 		void								SetAnimation(const ZEModelAnimation* Animation);

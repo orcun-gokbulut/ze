@@ -42,6 +42,7 @@
 
 #include "Variant.h"
 #include "Definitions.h"
+#include "DSAssert.h"
 #include "../Types.h"
 #include <string.h>
 #pragma warning(push)
@@ -49,10 +50,10 @@
 
 void ZEVariant::SetType(ZEVariantType NewType)
 {
-	if (Type == ZEVARIANTTYPE_STRING && Value.String != null)
+	if (Type == ZEVARIANTTYPE_STRING && Value.String != NULL)
 	{
 		delete[] Value.String;
-		Value.String = null;
+		Value.String = NULL;
 	}
 	else if (Type == ZEVARIANTTYPE_MATRIX3X3 || Type == ZEVARIANTTYPE_MATRIX4X4)
 		delete Value.Pointer;
@@ -60,7 +61,7 @@ void ZEVariant::SetType(ZEVariantType NewType)
 	switch(NewType)
 	{
 		case ZEVARIANTTYPE_STRING:
-			Value.String = null;
+			Value.String = NULL;
 			break;
 		case ZEVARIANTTYPE_MATRIX3X3:
 			Value.Matrix3x3 = new ZEMatrix3x3();

@@ -909,26 +909,6 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Tests"
-			>
-			<File
-				RelativePath=".\Source\Test\Test.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Test\Test.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Test\ZEMathTest.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Test\ZEMathTest.h"
-				>
-			</File>
-		</Filter>
-		<Filter
 			Name="Sound"
 			>
 			<File
@@ -1456,6 +1436,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEDS\DSAssert.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEDS\DSAssert.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEDS\Named.cpp"
 				>
 			</File>
@@ -1525,6 +1513,14 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEMath\LineSegment.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMath\MathAssert.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMath\MathAssert.h"
 				>
 			</File>
 			<File

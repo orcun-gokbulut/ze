@@ -62,6 +62,7 @@ ZEArray<*>{
 
 #include <stdlib.h>
 #include "Definitions.h"
+#include "DSAssert.h"
 #include "..\Types.h"
 #include "Allocator.h"
 #include <crtdbg.h>

@@ -42,6 +42,7 @@
 #else
 	#define _MATRIX_STATIC_ static
 #endif
+
 class ZEVector2;
 class ZEVector3;
 class ZEVector4;

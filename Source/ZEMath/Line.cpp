@@ -62,7 +62,7 @@ float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& t
     float    e = ZEVector3::DotProduct(LineB.v, w);
     float    D = a*c - b*b;
 
-	if (D < ZE_ZEROTRESHOLD) 
+	if (D < ZE_ZERO_TRESHOLD) 
 	{
         tA = 0.0;
         tB = (b>c ? d/b : e/c);

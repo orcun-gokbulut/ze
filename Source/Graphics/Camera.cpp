@@ -120,7 +120,7 @@ const ZEViewPoint& ZECamera::GetViewPoint()
 	ZEMatrix4x4 ViewPositionTransform, ViewRotationTransform;
 
 	const ZEPoint3& ViewPosition = GetWorldPosition();
-	ZEQuaternion ViewRotation;
+	ZEQuaternion ViewRotation;// = GetWorldRotation();
 	ZEQuaternion::Conjugate(ViewRotation, GetWorldRotation());
 	ZEMatrix4x4::CreateTranslation(ViewPositionTransform, -ViewPosition.x, -ViewPosition.y, -ViewPosition.z);
 	ZEMatrix4x4::CreateRotation(ViewRotationTransform, ViewRotation);

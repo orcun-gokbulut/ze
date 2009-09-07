@@ -42,7 +42,7 @@
 
 void ZENamed::SetName(const char* NewName)
 {
-	if (Name != null)
+	if (Name != NULL)
 		delete[] Name;
 	Name = new char[strlen(NewName) + 1];
 	strcpy(Name, NewName);
@@ -55,12 +55,12 @@ const char* ZENamed::GetName()
 
 ZENamed::ZENamed()
 {
-	Name = null;
+	Name = NULL;
 }
 
 ZENamed::~ZENamed()
 {
-	if(Name != null)
+	if(Name != NULL)
 		delete[] Name;
 }
 #pragma warning(pop)

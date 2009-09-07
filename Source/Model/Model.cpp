@@ -858,7 +858,7 @@ const ZEModelResource* ZEModel::GetModelResource()
 }
 
 
-const ZEArray<ZEModelBone>& ZEModel::GetSkeleton()
+ZEArray<ZEModelBone>& ZEModel::GetSkeleton()
 {
 	return Skeleton;
 }
@@ -880,7 +880,7 @@ const ZEArray<ZEMatrix4x4>& ZEModel::GetBoneTransforms()
 	return BoneTransforms;
 }
 
-const ZEArray<ZEModelMesh>& ZEModel::GetMeshes()
+ZEArray<ZEModelMesh>& ZEModel::GetMeshes()
 {
 	return Meshes;
 }

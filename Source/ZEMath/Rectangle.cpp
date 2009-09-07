@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Rectangle.h"
-
+#include "MathAssert.h"
 bool ZERectangle::BoundingTest(const ZEPoint2& Point) const
 {
 	if ((Point.x >= LeftUp.x && Point.x <= RightDown.x) && (Point.y >= LeftUp.y &&  Point.y <= RightDown.y))
@@ -55,6 +55,7 @@ ZEPoint2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
 		case ZERECTANGLECORNER_RIGHTUP:
 			return ZEPoint2(RightDown.x, LeftUp.y);
 		default:
+			ZEMATH_ASSERT(true, "Wrong corner.");
 			break;
 	}
 }

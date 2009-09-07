@@ -102,7 +102,9 @@ class ZEError
 		char*						GetLogFileName();
 
 		void						RaiseError(const char* Module, ZEErrorType ErrorType, const char* ErrorFormat, ... );
+		void						RaiseError(const char* Module, ZEErrorType ErrorType, const char* ErrorFormat, va_list Parameters);
 		void						RaiseAssert(ZEAssertType AssertType, const char* Function, const char* File, int Line, const char* Message, ...);
+		void						RaiseAssert(ZEAssertType AssertType, const char* Function, const char* File, int Line, const char* Message, va_list Parameters);
 
 		static ZEError*				GetInstance();
 

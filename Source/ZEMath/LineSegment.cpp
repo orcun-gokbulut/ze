@@ -83,7 +83,7 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegmentA, const ZE
     float    sN, sD = D;
     float    tN, tD = D;
 
-	if (D < ZE_ZEROTRESHOLD) 
+	if (D < ZE_ZERO_TRESHOLD) 
 	{
         sN = 0.0; 
         sD = 1.0;      
@@ -133,8 +133,8 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegmentA, const ZE
         }
     }
 
-    tA = (fabs(sN) < ZE_ZEROTRESHOLD ? 0.0f : sN / sD);
-    tB = (fabs(tN) < ZE_ZEROTRESHOLD ? 0.0f : tN / tD);
+    tA = (fabs(sN) < ZE_ZERO_TRESHOLD ? 0.0f : sN / sD);
+    tB = (fabs(tN) < ZE_ZERO_TRESHOLD ? 0.0f : tN / tD);
 
 	ZEVector3 P1, P2;
 	ZEVector3::Scale(P1, LineSegmentA.v, tA);

@@ -33,13 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Core/Error.h"
-void zedsAssert(const char* Function, const char* File, int Line, const char* Message, ...)
-{
-	ZEError::GetInstance()->RaiseAssert(ZE_ASSERTTYPE_ASSERT, Function, File, Line, Message);
-}
-
-void zedsWarningAssert(const char* Function, const char* File, int Line, const char* Message, ...)
-{
-	ZEError::GetInstance()->RaiseAssert(ZE_ASSERTTYPE_WARNINGASSERT, "", File, Line, Message);
-}
+#include "ZEDS.h"

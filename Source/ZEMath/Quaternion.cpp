@@ -33,7 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "quaternion.h"
+
+#include "Quaternion.h"
+#include "Definitions.h"
+#include "MathAssert.h"
+#include "Vector.h"
+#include "Matrix.h"
 #include <math.h>
 
 const ZEQuaternion ZEQuaternion::Zero;
@@ -72,6 +77,8 @@ void ZEQuaternion::Create(ZEQuaternion& Output, float Pitch, float Yawn, float R
        Output.x = CosRoll * SinPitch * CosYaw + SinRoll * CosPitch * SinYaw;
        Output.y = CosRoll * CosPitch * SinYaw - SinRoll * SinPitch * CosYaw;
        Output.z = SinRoll * CosPitchCosYaw - CosRoll * SinPitchSinYaw;
+
+	   ZEMATH_ASSERT(fabs(Output.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Create() output is not normalized.");
 }
 
 void ZEQuaternion::Create(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Up)
@@ -96,6 +103,8 @@ void ZEQuaternion::Create(ZEQuaternion& Output, const ZEVector3& Direction, cons
 	 Output.x = (Direction.y - NewUp.z) / Scale;
 	 Output.y = (Right.z - Direction.x) / Scale;
 	 Output.z = (NewUp.x - Right.y) / Scale;
+	 
+	 ZEMATH_ASSERT(fabs(Output.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Create() function outputis not unit quaternion.");
 }
 
 
@@ -109,14 +118,21 @@ void ZEQuaternion::CreateIdentity(ZEQuaternion& Output)
 
 void ZEQuaternion::Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B)
 {
+	//ZEMATH_ASSERT(fabs(A.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Product function's parameter A is not unit quaternion.");
+	//ZEMATH_ASSERT(fabs(B.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Product function's parameter B is not unit quaternion.");
+
 	Output.w = A.w * B.w - A.x * B.x - A.y * B.y - A.z * B.z;
 	Output.x = A.w * B.x + A.x * B.w + A.y * B.z - A.z * B.y;
 	Output.y = A.w * B.y - A.x * B.z + A.y * B.w + A.z * B.x;
 	Output.z = A.w * B.z + A.x * B.y - A.y * B.x + A.z * B.w;
+
+	//ZEMATH_ASSERT(fabs(Output.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Product function's parameter A is not unit quaternion.");
 }
 
 void ZEQuaternion::Transform(ZEVector3& Output, const ZEVector3& Vector, const ZEQuaternion& Quaternion)
 {
+	ZEMATH_ASSERT(fabs(Quaternion.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Transform function's parameter Quaternion is not unit quaternion.");
+
 	ZEQuaternion Vect(0, Vector.x, Vector.y, Vector.z), Temp, InvQ;
 	
 	Product(Temp, Quaternion, Vect);
@@ -130,6 +146,8 @@ void ZEQuaternion::Transform(ZEVector3& Output, const ZEVector3& Vector, const Z
 
 void ZEQuaternion::ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, const ZEQuaternion& Quaternion)
 {
+	ZEMATH_ASSERT(fabs(Quaternion.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::ConvertToEulerAngles function's parameter Quaternion is not unit quaternion.");
+
 	float test = Quaternion.x * Quaternion.y + Quaternion.z * Quaternion.w;
 	if (test > 0.499) 
 	{ // singularity at north pole
@@ -164,15 +182,18 @@ void ZEQuaternion::Conjugate()
 
 void ZEQuaternion::Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternion)
 {
+	ZEMATH_ASSERT(fabs(Quaternion.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Conjugate function's parameter A is not unit quaternion.");
 	Output.x = -Quaternion.x;
 	Output.y = -Quaternion.y;
 	Output.z = -Quaternion.z;
 	Output.w = Quaternion.w;
 }
 
-
 void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor)
 {
+	ZEMATH_ASSERT(fabs(A.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Slerp function's parameter A is not unit quaternion.");
+	ZEMATH_ASSERT(fabs(B.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Slerp function's parameter B is not unit quaternion.");
+
 	float CosHalfTheta = A.w * B.w + A.x * B.x + A.y * B.y + A.z * B.z;
 
 	if (fabs(CosHalfTheta) >= 1.0)
@@ -187,7 +208,7 @@ void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQu
 		float HalfTheta = acos(CosHalfTheta);
 		float SinHalfTheta = sqrt(1.0f - CosHalfTheta * CosHalfTheta);
 
-		if (fabs(SinHalfTheta) < 0.001)
+		if (fabs(SinHalfTheta) < ZE_ZERO_TRESHOLD)
 		{ 
 			Output.w = (A.w * 0.5f + B.w * 0.5f);
 			Output.x = (A.x * 0.5f + B.x * 0.5f);
@@ -205,51 +226,28 @@ void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQu
 			Output.z = (A.z * RatioA + B.z * RatioB);
 		}
 	}
+	
+	ZEMATH_ASSERT(fabs(Output.Length() - 1.0f) < ZE_ZERO_TRESHOLD, "ZEQuaternion::Slerp function's output is not unit quaternion.");
+}
+
+void ZEQuaternion::ConvertToRotationMatrix(ZEMatrix3x3& Output, const ZEQuaternion& Quaternion)
+{
+	ZEMatrix3x3::CreateRotation(Output, Quaternion);
 }
 
 void ZEQuaternion::ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaternion& Quaternion)
 {
-	/*
-	Output.M11 = 1.0f	-	2.0f * Quaternion.y * Quaternion.y	-	2.0f * Quaternion.z * Quaternion.z;
-	Output.M12 =			2.0f * Quaternion.x * Quaternion.y	-	2.0f * Quaternion.w * Quaternion.z;
-	Output.M13 =			2.0f * Quaternion.x * Quaternion.z	+	2.0f * Quaternion.w * Quaternion.y;
-	Output.M14 = 0.0f;
+	ZEMatrix4x4::CreateRotation(Output, Quaternion);
+}
 
-	Output.M21 =			2.0f * Quaternion.x * Quaternion.y	+	2.0f * Quaternion.w * Quaternion.z;
-	Output.M22 = 1.0f	-	2.0f * Quaternion.x * Quaternion.x	-	2.0f * Quaternion.z * Quaternion.z;
-	Output.M23 =			2.0f * Quaternion.y * Quaternion.z	-	2.0f * Quaternion.w * Quaternion.x;
-	Output.M24 = 0.0f;
+float ZEQuaternion::Length() const
+{
+	return sqrtf(x * x + y * y + z * z + w * w);
+}
 
-	Output.M31 =			2.0f * Quaternion.x * Quaternion.z	-	2.0f * Quaternion.w * Quaternion.y;
-	Output.M32 =			2.0f * Quaternion.y * Quaternion.z	+	2.0f * Quaternion.w * Quaternion.x;
-	Output.M33 = 1.0f	-	2.0f * Quaternion.x * Quaternion.x	-	2.0f * Quaternion.y * Quaternion.y;
-	Output.M34 = 0.0f;
-
-	Output.M41 = 0.0f;
-	Output.M42 = 0.0f;
-	Output.M43 = 0.0f;
-	Output.M44 = 1.0f;
-*/
-	Output.M11 = 1.0f	-	2.0f * Quaternion.y * Quaternion.y	-	2.0f * Quaternion.z * Quaternion.z;
-	Output.M21 =			2.0f * Quaternion.x * Quaternion.y	-	2.0f * Quaternion.w * Quaternion.z;
-	Output.M31 =			2.0f * Quaternion.x * Quaternion.z	+	2.0f * Quaternion.w * Quaternion.y;
-	Output.M41 = 0.0f;
-
-	Output.M12 =			2.0f * Quaternion.x * Quaternion.y	+	2.0f * Quaternion.w * Quaternion.z;
-	Output.M22 = 1.0f	-	2.0f * Quaternion.x * Quaternion.x	-	2.0f * Quaternion.z * Quaternion.z;
-	Output.M32 =			2.0f * Quaternion.y * Quaternion.z	-	2.0f * Quaternion.w * Quaternion.x;
-	Output.M42 = 0.0f;
-
-	Output.M13 =			2.0f * Quaternion.x * Quaternion.z	-	2.0f * Quaternion.w * Quaternion.y;
-	Output.M23 =			2.0f * Quaternion.y * Quaternion.z	+	2.0f * Quaternion.w * Quaternion.x;
-	Output.M33 = 1.0f	-	2.0f * Quaternion.x * Quaternion.x	-	2.0f * Quaternion.y * Quaternion.y;
-	Output.M43 = 0.0f;
-
-	Output.M14 = 0.0f;
-	Output.M24 = 0.0f;
-	Output.M34 = 0.0f;
-	Output.M44 = 1.0f;
-
+float ZEQuaternion::Length(ZEQuaternion& Quaternion)
+{
+	return sqrtf(Quaternion.x * Quaternion.x + Quaternion.y * Quaternion.y + Quaternion.z * Quaternion.z + Quaternion.w * Quaternion.w);
 }
 
 void ZEQuaternion::Normalize()

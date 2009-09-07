@@ -37,31 +37,11 @@
 #ifndef	__ZEDS_DEFINITIONS_H__
 #define __ZEDS_DEFINITIONS_H__
 
-#include "CompileOptions.h"
-
-#ifdef ZEDEBUG_ENABLED
-#define ZEDS_DEBUG_MODE
-#endif
-
-#ifdef ZEDS_DEBUG_MODE
-	#ifdef ZE_ZINEKENGINE
-		void zedsAssert(const char* Function, const char* File, int Line, const char* Message, ...);
-		void zedsWarningAssert(const char* Function, const char* File, int Line, const char* Message, ...);
-		#define ZEDS_ASSERT(Condition, ...) if (Condition) zedsAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
-		#define ZEDS_WARNING(Condition, ...) if (Condition) zedsWarningAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
-	#endif
-#else
-	#define ZEDS_ASSERT(Condition, Message)
-	#define ZEDS_WARNING(Condition, Message)
+#ifndef NULL
+#define NULL 0
 #endif
 
 #include <memory.h>
-
-#ifndef null
-#define null 0
-#endif
-
-
 template <typename Type>
 inline void ObjectConcat(Type* Destiantion, Type* Source1, size_t Count1, Type* Source2, size_t Count2)
 {
