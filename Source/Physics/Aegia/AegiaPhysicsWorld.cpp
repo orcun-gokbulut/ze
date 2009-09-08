@@ -108,7 +108,7 @@ void ZEAegiaPhysicsWorld::Initialize(ZEPhysicsWorldInfo& Info)
 			zeLog("Physx Scene Creation Error.");
 		}
 
-		float timestep = 1.0f/60.0f;
+		float timestep = 1.0f/100.0f;
 		PhysicsScene->setTiming(timestep,8,NX_TIMESTEP_FIXED);
 
 		//collision filtering
@@ -215,9 +215,15 @@ void ZEAegiaPhysicsWorld::ShowDebugView(bool Show)
 
 			const NxDebugRenderable* data = PhysicsScene->getDebugRenderable();
 			NxU32 NbLines = NULL;
-			if (data)NbLines = data->getNbLines();
+			if (data)
+			{
+				NbLines = data->getNbLines();
+			}
 			const NxDebugLine* Lines;
-			if (data)Lines = data->getLines();
+			if (data)
+			{
+				Lines = data->getLines();
+			}
 			
 			while(NbLines--)
 			{
@@ -243,9 +249,15 @@ void ZEAegiaPhysicsWorld::Update(const float ElapsedTime)
 
 		const NxDebugRenderable* data = PhysicsScene->getDebugRenderable();
 		NxU32 NbLines = NULL;
-		if (data)NbLines = data->getNbLines();
+		if (data)
+		{
+			NbLines = data->getNbLines();
+		}
 		const NxDebugLine* Lines;
-		if (data)Lines = data->getLines();
+		if (data)
+		{
+			Lines = data->getLines();
+		}
 		
 		while(NbLines--)
 		{

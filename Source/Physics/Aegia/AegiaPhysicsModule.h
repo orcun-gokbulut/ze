@@ -56,34 +56,35 @@ class ZEAegiaPhysicsModule: public ZEPhysicsModule
 {	
 public:
 	//module
-	bool Initialize();
-	void Deinitialize();
+	bool							Initialize();
+	void							Deinitialize();
 	
 	//physics module
-	ZEPhysicsWorld*               CreateWorld();
-    ZEPhysicsBody*                CreateBody();
-	ZEPhysicsJoint*	              CreateJoint();
-	ZEPhysicsVehicle*             CreateVehicle();
-	ZEPhysicsMaterial*            CreateMaterial();
-	ZEPhysicsCharacterController* CreateController();
+	ZEPhysicsWorld*					CreateWorld();
+    ZEPhysicsBody*					CreateBody();
+	ZEPhysicsJoint*					CreateJoint();
+	ZEPhysicsVehicle*				CreateVehicle();
+	ZEPhysicsMaterial*				CreateMaterial();
+	ZEPhysicsCharacterController*	CreateController();
 
-	bool DestroyWorld(ZEPhysicsWorld* World);
-	bool DestroyBody(ZEPhysicsBody* Body);
-	bool DestroyJoint(ZEPhysicsJoint* Joint);
-	bool DestroyVehicle(ZEPhysicsVehicle*);
-	bool DestroyMaterial(ZEPhysicsMaterial* Material);
-	bool DestroyController(ZEPhysicsCharacterController* Controller);
+	bool							DestroyWorld(ZEPhysicsWorld* World);
+	bool							DestroyBody(ZEPhysicsBody* Body);
+	bool							DestroyJoint(ZEPhysicsJoint* Joint);
+	bool							DestroyVehicle(ZEPhysicsVehicle*);
+	bool							DestroyMaterial(ZEPhysicsMaterial* Material);
+	bool							DestroyController(ZEPhysicsCharacterController* Controller);
 
-	bool CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
-	bool CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEPhysicsBody** Contact, ZEPhysicsCollisionMask Mask);
-	bool BoxSweep(ZEVector3 Center, ZEVector3 Dimensions, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
-	bool CapsuleSweep(ZEVector3 Center, float Radius, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
+	bool							CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
+	bool							CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEPhysicsBody** Contact, ZEPhysicsCollisionMask Mask);
+	bool							BoxSweep(ZEVector3 Center, ZEVector3 Dimensions, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
+	bool							CapsuleSweep(ZEVector3 Center, float Radius, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
 	//gets & sets
-	bool IsEnabled() { return Enabled; }
-	void SetEnabled(bool Enabled) { this->Enabled = Enabled; }
-	ZEModuleDescription* GetModuleDescription();
+	bool							IsEnabled() { return Enabled; }
+	void							SetEnabled(bool Enabled) { this->Enabled = Enabled; }
+	ZEModuleDescription*			GetModuleDescription();
 
 private:
-	bool Enabled;
+	bool							Enabled;
+
 };
 #endif

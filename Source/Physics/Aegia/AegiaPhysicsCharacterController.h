@@ -45,28 +45,30 @@ class ZEVector3;
 
 class ZEAegiaPhysicsCharacterController : public ZEPhysicsCharacterController
 {
-	friend class ZEAegiaPhysicsModule;
+	friend class			ZEAegiaPhysicsModule;
+
 private:
-	ZEAegiaPhysicsCharacterController();
-	~ZEAegiaPhysicsCharacterController();
+							ZEAegiaPhysicsCharacterController();
+							~ZEAegiaPhysicsCharacterController();
 
 public:
-	void Initialize(ZEPhysicsCharacterControllerInfo& Info);
-	void Deinitialize();
-	void Update(float ElapsedTime);
+	void					Initialize(ZEPhysicsCharacterControllerInfo& Info);
+	void					Deinitialize();
+	void					Update(float ElapsedTime);
 	
-	ZEVector3 GetVelocity() { return Velocity; }
-	void SetVelocity(ZEVector3 Vector) { Velocity = Vector; }
+	ZEVector3				GetVelocity() { return Velocity; }
+	void					SetVelocity(ZEVector3 Vector) { Velocity = Vector; }
 
-	ZEVector3 GetPosition() { return TOZE(Controller->getDebugPosition()); }
-	void SetPosition(const ZEVector3 Position) { Controller->setPosition(TONXE(Position)); }
-	bool IsOnGround() { return (CollisionFlag & NXCC_COLLISION_DOWN); }
-	void SetCollision(bool Collide) { Controller->setCollision(Collide); }
+	ZEVector3				GetPosition() { return TOZE(Controller->getDebugPosition()); }
+	void					SetPosition(const ZEVector3 Position) { Controller->setPosition(TONXE(Position)); }
+	bool					IsOnGround() { return (CollisionFlag & NXCC_COLLISION_DOWN); }
+	void					SetCollision(bool Collide) { Controller->setCollision(Collide); }
 
 private:
-	NxController* Controller;
-	ZEVector3 Velocity;
-	NxU32 CollisionFlag;
+	NxController*			Controller;
+	ZEVector3				Velocity;
+	NxU32					CollisionFlag;
+
 };
 
 #endif

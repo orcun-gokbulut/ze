@@ -340,6 +340,14 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	BodyInfo.LinearDamp = MeshResource->PhysicalBody.LinearDamping;
 	BodyInfo.AngularDamp = MeshResource->PhysicalBody.AngularDamping;
 	
+	//have local copy
+	ZEPhysicsPlaneShapeInfo PlaneShapeInfo;
+	ZEPhysicsBoxShapeInfo BoxShapeInfo;
+	ZEPhysicsSphereShapeInfo SphereShapeInfo;
+	ZEPhysicsCapsuleShapeInfo CapsuleShapeInfo;
+	ZEPhysicsConvexShapeInfo ConvexShapeInfo;
+	ZEPhysicsTrimeshShapeInfo TrimeshShapeInfo;
+
 	for (size_t j = 0; j < MeshResource->PhysicalBody.Shapes.GetCount(); j++)
 	{
 		ZEModelResourcePhysicalShape Shape = MeshResource->PhysicalBody.Shapes[j];
@@ -347,7 +355,6 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 		{
 			case ZE_PST_PLANE:
 			{
-				ZEPhysicsPlaneShapeInfo PlaneShapeInfo;
 				PlaneShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
 				PlaneShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
 				PlaneShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
@@ -366,7 +373,6 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			}
 			case ZE_PST_BOX:
 			{
-				ZEPhysicsBoxShapeInfo BoxShapeInfo;
 				BoxShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
 				BoxShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
 				BoxShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
@@ -383,7 +389,6 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			}
 			case ZE_PST_SPHERE:
 			{
-				ZEPhysicsSphereShapeInfo SphereShapeInfo;
 				SphereShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
 				SphereShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
 				SphereShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
@@ -398,7 +403,6 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			}
 			case ZE_PST_CAPSULE:
 			{
-				ZEPhysicsCapsuleShapeInfo CapsuleShapeInfo;
 				CapsuleShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
 				CapsuleShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
 				CapsuleShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
@@ -414,7 +418,6 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			}
 			case ZE_PST_CONVEX:
 			{
-				ZEPhysicsConvexShapeInfo ConvexShapeInfo;
 				ConvexShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
 				ConvexShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
 				ConvexShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
@@ -429,7 +432,6 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			}
 			case ZE_PST_TRIMESH:
 			{
-				ZEPhysicsTrimeshShapeInfo TrimeshShapeInfo;
 				TrimeshShapeInfo.CollisionMask.Mask1 = Shape.CollisionMask1;
 				TrimeshShapeInfo.CollisionMask.Mask2 = Shape.CollisionMask2;
 				TrimeshShapeInfo.CollisionMask.Mask3 = Shape.CollisionMask3;
@@ -450,8 +452,9 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			}
 		}
 	}
+
 	PhysicalBody = zePhysics->CreateBody();
-	//PhysicalBody->Initialize(BodyInfo);
+	PhysicalBody->Initialize(BodyInfo);
 }
 
 void ZEModelMesh::Deinitialize()
@@ -1211,7 +1214,7 @@ void ZEModel::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& L
 	SkeletonVertexBuffer.Clean();
 	if (DrawSkeleton)
 	{/*
-		ZEVector3 BonePosition1, BonePosition2;
+		/*ZEVector3 BonePosition1, BonePosition2;
 		for (size_t I = 0; I < Bones.GetCount(); I++)
 		{
 			ZEMatrix4x4::Transform(BonePosition1, Bones[I].GetModelTransform(), ZEVector3(0.0f, 0.0f, 0.0f));
@@ -1287,6 +1290,46 @@ void ZEModel::Tick(float ElapsedTime)
 
 		}
 		AnimationFrame += AnimationSpeed * ElapsedTime;
+	}
+
+	if (Meshes.GetCount()>0)
+	{
+		//Meshes[0].SetLocalPosition(ZEVector3::Zero);
+		//Meshes[0].GetPhysicalBody()->SetPosition(ZEVector3::Zero);
+		//ZEVector3 ewrt = Meshes[0].GetPhysicalBody()->GetPosition();
+		
+		for (int i=0;i<Meshes.GetCount();i++)
+		{
+			//Meshes[i].SetLocalPosition(Meshes[i].GetPhysicalBody()->GetPosition());
+			//Meshes[i].SetLocalRotation(Meshes[i].GetPhysicalBody()->GetOrientation());
+
+			Meshes[i].SetLocalPosition(ZEVector3::Zero);
+			ZEQuaternion q;
+			static float rrr;
+			rrr += ZE_PI * ElapsedTime;
+			ZEQuaternion::Create(q, rrr, ZEVector3::UnitX);
+			Meshes[i].SetLocalRotation(q);
+		}
+
+		//this->SetWorldPosition(ZEVector3::Zero);
+		//this->SetLocalPosition(ZEVector3::Zero);
+		/*this->SetWorldRotation(ZEQuaternion::Identity);
+		this->SetLocalRotation(ZEQuaternion::Identity);*/
+
+		/*for (int i=0;i<Meshes.GetCount();i++)
+		{
+			Meshes[i].SetLocalPosition(ZEVector3(0,0,0));
+			Meshes[i].SetLocalRotation(Meshes[i].GetPhysicalBody()->GetOrientation());
+		}*/
+
+		//ZEVector3 ewrt = Meshes[0].GetPhysicalBody()->GetPosition();
+		//this->SetWorldPosition(Meshes[0].GetPhysicalBody()->GetPosition());
+		//this->SetWorldRotation(Meshes[0].GetPhysicalBody()->GetOrientation());
+		//this->SetLocalPosition(Meshes[0].GetPhysicalBody()->GetPosition());
+		//this->SetLocalRotation(Meshes[0].GetPhysicalBody()->GetOrientation());
+
+		//this->SetWorldPosition(ZEVector3::Zero);
+		//this->SetLocalPosition(ZEVector3::Zero);
 	}
 }
 

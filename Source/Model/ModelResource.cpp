@@ -308,6 +308,9 @@ bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 		Mesh->Position		= MeshChunk.Position;
 		Mesh->Rotation		= MeshChunk.Rotation;
 		Mesh->Scale			= MeshChunk.Scale;
+		//should be taken from scene or map file !!!!!!!
+		Mesh->PhysicalBody.Position = ZEVector3(0,1,0);
+		Mesh->PhysicalBody.Orientation = ZEQuaternion::Identity;
 
 		Mesh->PhysicalBody.Position = ZEVector3(0,1,0);
 		Mesh->PhysicalBody.Orientation = ZEQuaternion::Identity;

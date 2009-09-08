@@ -43,25 +43,25 @@ class ZEVector3;
 
 class ZEAegiaPhysicsCollision : public ZEPhysicsCollision
 {
-	friend class ZEAegiaPhysicsReport;
+	friend class		ZEAegiaPhysicsReport;
 
 private:
-	ZEAegiaPhysicsCollision(ZEPhysicsBody* pFirst,ZEPhysicsBody* pSecond,ZEVector3 pPoint,ZEVector3 pNormal, float pPower);
-	~ZEAegiaPhysicsCollision();
+						ZEAegiaPhysicsCollision(ZEPhysicsBody* pFirst,ZEPhysicsBody* pSecond,ZEVector3 pPoint,ZEVector3 pNormal, float pPower);
+						~ZEAegiaPhysicsCollision();
 
 public:
-	ZEPhysicsBody* GetFirstCollider()  { return First; }
-	ZEPhysicsBody* GetSecondCollider() { return Second; }
-	ZEVector3      GetPoint()          { return Point; }
-	ZEVector3      GetNormal()         { return Normal; }
-	float          GetPower()          { return Power; }
+	ZEPhysicsBody*		GetFirstCollider()  { return First; }
+	ZEPhysicsBody*		GetSecondCollider() { return Second; }
+	ZEVector3			GetPoint()          { return Point; }
+	ZEVector3			GetNormal()         { return Normal; }
+	float				GetPower()          { return Power; }
 
 private:
-	ZEPhysicsBody* First;
-	ZEPhysicsBody* Second;
-	ZEVector3 Point;
-	ZEVector3 Normal;
-	float Power;
+	ZEPhysicsBody*		First;
+	ZEPhysicsBody*		Second;
+	ZEVector3			Point;
+	ZEVector3			Normal;
+	float				Power;
 };
 
 #endif

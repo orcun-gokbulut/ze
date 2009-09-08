@@ -45,32 +45,30 @@ class NxJoint;
 
 class ZEAegiaPhysicsJoint : public ZEPhysicsJoint
 {
-	friend class ZEAegiaPhysicsModule;
+	friend class		ZEAegiaPhysicsModule;
 
 private:
-	ZEAegiaPhysicsJoint();
-	~ZEAegiaPhysicsJoint();
+						ZEAegiaPhysicsJoint();
+						~ZEAegiaPhysicsJoint();
 
 public:
-	void Initialize(ZEPhysicsJointInfo& Info);
-	void Deinitialize();
+	void				Initialize(ZEPhysicsJointInfo& Info);
+	void				Deinitialize();
 
-	ZEVector3 GetGlobalAnchor() { return TOZE(Joint->getGlobalAnchor()); }
-	void SetGlobalAnchor(const ZEVector3 Anchor) { Joint->setGlobalAnchor(TONX(Anchor)); }
-	ZEVector3 GetGlobalAxis() { return TOZE(Joint->getGlobalAxis()); }
-	void SetGlobalAxis(const ZEVector3 Axis) { Joint->setGlobalAxis(TONX(Axis)); }
+	ZEVector3			GetGlobalAnchor() { return TOZE(Joint->getGlobalAnchor()); }
+	void				SetGlobalAnchor(const ZEVector3 Anchor) { Joint->setGlobalAnchor(TONX(Anchor)); }
+	ZEVector3			GetGlobalAxis() { return TOZE(Joint->getGlobalAxis()); }
+	void				SetGlobalAxis(const ZEVector3 Axis) { Joint->setGlobalAxis(TONX(Axis)); }
 
-	void SetLimitPoint(const ZEVector3 Point, bool OnBody2 = false)
-	{ Joint->setLimitPoint(TONX(Point),OnBody2); }
-	void AddLimitPlane(const ZEVector3 Normal, const ZEVector3 Point, float Restitution = 0)
-	{ Joint->addLimitPlane(TONX(Normal),TONX(Point), Restitution); }
-	void SetJointMotor(float MotorForce, float MotorVelocity);
+	void				SetLimitPoint(const ZEVector3 Point, bool OnBody2 = false) { Joint->setLimitPoint(TONX(Point),OnBody2); }
+	void				AddLimitPlane(const ZEVector3 Normal, const ZEVector3 Point, float Restitution = 0) { Joint->addLimitPlane(TONX(Normal),TONX(Point), Restitution); }
+	void				SetJointMotor(float MotorForce, float MotorVelocity);
 
-	ZEPhysicsBody* GetBody1() { NxActor *a1,*a2;Joint->getActors(&a1,&a2);return (ZEPhysicsBody*)a1->userData; }
-	ZEPhysicsBody* GetBody2() { NxActor *a1,*a2;Joint->getActors(&a1,&a2);return (ZEPhysicsBody*)a2->userData; }
+	ZEPhysicsBody*		GetBody1() { NxActor *a1,*a2;Joint->getActors(&a1,&a2);return (ZEPhysicsBody*)a1->userData; }
+	ZEPhysicsBody*		GetBody2() { NxActor *a1,*a2;Joint->getActors(&a1,&a2);return (ZEPhysicsBody*)a2->userData; }
 
 private:
-	NxJoint* Joint;
+	NxJoint*			Joint;
 };
 
 #endif

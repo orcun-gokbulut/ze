@@ -49,40 +49,23 @@
 #include "Physics/PhysicsCollisionMask.h"
 
 
-class ControllerHitReport : public NxUserControllerHitReport
+class ZEControllerHitReport : public NxUserControllerHitReport
 {
-	public:
-	virtual NxControllerAction  onShapeHit(const NxControllerShapeHit& hit)
+public:
+	virtual NxControllerAction onShapeHit(const NxControllerShapeHit& hit)
 	{
 		if(1 && hit.shape)
 		{
-
 			NxActor& actor = hit.shape->getActor();
-			if(actor.isDynamic())
+
+			if (actor.isDynamic())
 			{
-				if(hit.dir.y==0.0f)
+				if(hit.dir.y == 0.0f)
 				{
 					NxF32 coeff = hit.length * 64.0f;
 					actor.addForceAtLocalPos(hit.dir*coeff, NxVec3(0,0,0), NX_IMPULSE);
 				}
 			}
-
-			/*NxCollisionGroup group = hit.shape->getGroup();
-			if(group==GROUP_COLLIDABLE_PUSHABLE)
-			{
-				NxActor& actor = hit.shape->getActor();
-				if(actor.isDynamic())
-				{
-					if(hit.dir.y==0.0f)
-					{
-						NxF32 coeff = hit.length * 64.0f;
-						actor.addForceAtLocalPos(hit.dir*coeff, NxVec3(0,0,0), NX_IMPULSE);
-					}
-				}
-			}
-			else if(group==GROUP_COLLIDABLE_NON_PUSHABLE)
-			{
-			}*/
 		}
 		return NX_ACTION_NONE;
 	}
@@ -92,7 +75,7 @@ class ControllerHitReport : public NxUserControllerHitReport
 		return NX_ACTION_NONE;
 	}
 
-}gControllerHitReport;
+}ControllerHitReport;
 
 ZEAegiaPhysicsCharacterController::ZEAegiaPhysicsCharacterController() : Controller(NULL), Velocity(0,0,0), CollisionFlag(0)
 {
@@ -119,7 +102,7 @@ void ZEAegiaPhysicsCharacterController::Initialize(ZEPhysicsCharacterControllerI
 		CapsuleDesc.position.y = Info.Position.y;
 		CapsuleDesc.position.z = Info.Position.z;
 		CapsuleDesc.upDirection = NX_Y;
-		CapsuleDesc.callback = &gControllerHitReport;
+		CapsuleDesc.callback = &ControllerHitReport;
 
 		if (CapsuleDesc.isValid())
 		{

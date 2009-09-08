@@ -276,8 +276,12 @@ extern ZECanvasBrush* ccapsule;
 void ZEScene::Tick(float ElapsedTime)
 {
 	for (size_t I = 0; I < Entities.GetCount(); I++)
+	{
 		if (Entities[I]->IsEnabled())
+		{
 			Entities[I]->Tick(ElapsedTime);
+		}
+	}
 
 	World->Update(ElapsedTime);
 

@@ -100,8 +100,14 @@ void ZEAegiaPhysicsVehicle::Initialize(ZEPhysicsVehicleInfo& Info)
 
 			//Wheel
 			wheelDesc.wheelFlags = NX_WF_USE_WHEELSHAPE | NX_WF_BUILD_LOWER_HALF;
-			if (Atr.Accelerated)wheelDesc.wheelFlags |= NX_WF_ACCELERATED;
-			if (Atr.Steerable)wheelDesc.wheelFlags |= NX_WF_STEERABLE_INPUT;
+			if (Atr.Accelerated)
+			{
+				wheelDesc.wheelFlags |= NX_WF_ACCELERATED;
+			}
+			if (Atr.Steerable)
+			{
+				wheelDesc.wheelFlags |= NX_WF_STEERABLE_INPUT;
+			}
 			wheelDesc.position = TONX(Atr.Position);
 			wheelShapeDesc.localPose.t = wheelDesc.position;
 			if (wheelShapeDesc.isValid())
@@ -159,7 +165,9 @@ void ZEAegiaPhysicsVehicle::SetSteeringAngle(float Angle)
 	for (int i=0;i<Wheels.GetCount();i++)
 	{
 		if (Wheels[i]->getWheelFlags() & NX_WF_STEERABLE_INPUT)
+		{
 			Wheels[i]->setSteerAngle(Angle);
+		}
 	}
 }
 
@@ -168,7 +176,9 @@ void ZEAegiaPhysicsVehicle::SetMotorTorque(float Torque)
 	for (int i=0;i<Wheels.GetCount();i++)
 	{
 		if (Wheels[i]->getWheelFlags() & NX_WF_ACCELERATED)
+		{
 			Wheels[i]->setMotorTorque(Torque);
+		}
 	}
 }
 

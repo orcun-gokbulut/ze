@@ -653,22 +653,6 @@
 			Name="Game Interface"
 			>
 			<File
-				RelativePath=".\Source\GameInterface\CameraController.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\CameraController.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\CameraManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\CameraManager.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\GameInterface\CanvasBrush.cpp"
 				>
 			</File>
@@ -690,22 +674,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\GameInterface\Entity.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\FpsCameraController.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\FpsCameraController.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\FreeCameraController.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\FreeCameraController.h"
 				>
 			</File>
 			<File
@@ -780,14 +748,50 @@
 				RelativePath=".\Source\GameInterface\SkyBrush.h"
 				>
 			</File>
-			<File
-				RelativePath=".\Source\GameInterface\TpsCameraController.cpp"
+			<Filter
+				Name="Camera"
 				>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\TpsCameraController.h"
-				>
-			</File>
+				<File
+					RelativePath=".\Source\GameInterface\CameraController.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\CameraController.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\CameraManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\CameraManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\FpsCameraController.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\FpsCameraController.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\FreeCameraController.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\FreeCameraController.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\TpsCameraController.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\GameInterface\TpsCameraController.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Input"

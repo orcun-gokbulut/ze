@@ -125,6 +125,7 @@ class ZEModelMesh
 
 	public:
 		const char*							GetName();
+		ZEPhysicsBody*						GetPhysicalBody() { return PhysicalBody; }
 
 		const ZEAABoundingBox&				GetLocalBoundingBox();
 		const ZEAABoundingBox&				GetModelBoundingBox();

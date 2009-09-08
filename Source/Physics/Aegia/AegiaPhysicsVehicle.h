@@ -45,35 +45,35 @@ class ZEQuaternion;
 
 class ZEAegiaPhysicsVehicle : public ZEPhysicsVehicle
 {
-	friend class ZEAegiaPhysicsModule;
+	friend class					ZEAegiaPhysicsModule;
 
 private:
-	ZEAegiaPhysicsVehicle();
-	~ZEAegiaPhysicsVehicle();
+									ZEAegiaPhysicsVehicle();
+									~ZEAegiaPhysicsVehicle();
 
 public:
-	void Initialize(ZEPhysicsVehicleInfo& Info);
-	void Deinitialize();
-	void Update(float ElapsedTime);
+	void							Initialize(ZEPhysicsVehicleInfo& Info);
+	void							Deinitialize();
+	void							Update(float ElapsedTime);
 
-	ZEPhysicsBody* GetBody()      { return Body; }
-	int GetWheelCount()           { return Wheels.GetCount(); }
-	ZEVector3 GetLinearVelocity() { return Body->GetLinearVelocity(); }
+	ZEPhysicsBody*					GetBody() { return Body; }
+	int								GetWheelCount() { return Wheels.GetCount(); }
+	ZEVector3						GetLinearVelocity() { return Body->GetLinearVelocity(); }
 
-	void SetSteeringAngle(float Angle);
-	void SetMotorTorque(float Torque);
-	void SetBrakeTorque(float Torque);
+	void							SetSteeringAngle(float Angle);
+	void							SetMotorTorque(float Torque);
+	void							SetBrakeTorque(float Torque);
 
-	ZEVector3 GetWheelPosition(int Index);
-	ZEQuaternion GetWheelOrientation(int Index);
-	float GetWheelSpeed(int Index);
-	float GetAverageWheelSpeed();
+	ZEVector3						GetWheelPosition(int Index);
+	ZEQuaternion					GetWheelOrientation(int Index);
+	float							GetWheelSpeed(int Index);
+	float							GetAverageWheelSpeed();
 
 private:
-	ZEPhysicsBody* Body;
-	ZEArray<NxWheelShape*> Wheels;
-	ZEArray<NxWheelContactData> Contacts;
-	ZEArray<float> RollValues;
+	ZEPhysicsBody*					Body;
+	ZEArray<NxWheelShape*>			Wheels;
+	ZEArray<NxWheelContactData>		Contacts;
+	ZEArray<float>					RollValues;
 };
 
 #endif

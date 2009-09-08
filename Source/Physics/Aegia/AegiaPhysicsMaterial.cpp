@@ -53,7 +53,10 @@ ZEAegiaPhysicsMaterial::~ZEAegiaPhysicsMaterial()
 void ZEAegiaPhysicsMaterial::Initialize(float Friction, float Restitution)
 {
 	//check bounds
-	if (Restitution > 1.0f)Restitution = 1.0;
+	if (Restitution > 1.0f)	
+	{
+		Restitution = 1.0;
+	}
 
 	ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
 

@@ -46,79 +46,86 @@ class NxActor;
 
 class ZEAegiaPhysicsBody : public ZEPhysicsBody
 {
-	friend class ZEAegiaPhysicsModule;
+	friend class		ZEAegiaPhysicsModule;
 
 private:
-	ZEAegiaPhysicsBody();
-	~ZEAegiaPhysicsBody();
+						ZEAegiaPhysicsBody();
+						~ZEAegiaPhysicsBody();
 
 public:
-	void Initialize(ZEPhysicsBodyInfo& Info);
-	void Deinitialize();
-	void AddShape(ZEPhysicsShapeInfo* Info);
+	void				Initialize(ZEPhysicsBodyInfo& Info);
+	void				Deinitialize();
+	void				AddShape(ZEPhysicsShapeInfo* Info);
 
-	void ApplyForce(const ZEVector3 Force) { Actor->addForce(TONX(Force),NX_FORCE); }
-	void ApplyImpulse(const ZEVector3 Force) { Actor->addForce(TONX(Force),NX_IMPULSE); }
-	void ApplyTorque(const ZEVector3 Force) { Actor->addTorque(TONX(Force)); }
+	void				ApplyForce(const ZEVector3 Force) { Actor->addForce(TONX(Force),NX_FORCE); }
+	void				ApplyImpulse(const ZEVector3 Force) { Actor->addForce(TONX(Force),NX_IMPULSE); }
+	void				ApplyTorque(const ZEVector3 Force) { Actor->addTorque(TONX(Force)); }
 
-	void ApplyLocalForce(const ZEVector3 Force) { Actor->addLocalForce(TONX(Force),NX_FORCE); }
-	void ApplyLocalImpulse(const ZEVector3 Force) { Actor->addLocalForce(TONX(Force),NX_IMPULSE); }
-	void ApplyLocalTorque(const ZEVector3 Force) { Actor->addLocalTorque(TONX(Force)); }
+	void				ApplyLocalForce(const ZEVector3 Force) { Actor->addLocalForce(TONX(Force),NX_FORCE); }
+	void				ApplyLocalImpulse(const ZEVector3 Force) { Actor->addLocalForce(TONX(Force),NX_IMPULSE); }
+	void				ApplyLocalTorque(const ZEVector3 Force) { Actor->addLocalTorque(TONX(Force)); }
 
-	ZEVector3 GetMassCenter() { return TOZE(Actor->getCMassLocalPosition()); }
-	void SetMassCenter(const ZEVector3 Pos) { Actor->setCMassOffsetLocalPosition(TONX(Pos)); }
+	ZEVector3			GetMassCenter() { return TOZE(Actor->getCMassLocalPosition()); }
+	void				SetMassCenter(const ZEVector3 Pos) { Actor->setCMassOffsetLocalPosition(TONX(Pos)); }
 
-	ZEVector3 GetLinearVelocity() { return TOZE(Actor->getLinearVelocity()); }
-	void SetLinearVelocity(const ZEVector3 Vel) { Actor->setLinearVelocity(TONX(Vel)); }
+	ZEVector3			GetLinearVelocity() { return TOZE(Actor->getLinearVelocity()); }
+	void				SetLinearVelocity(const ZEVector3 Vel) { Actor->setLinearVelocity(TONX(Vel)); }
 
-	ZEVector3 GetAngularVelocity() { return TOZE(Actor->getAngularVelocity()); }
-	void SetAngularVelocity(const ZEVector3 Vel) { Actor->setAngularVelocity(TONX(Vel)); }
+	ZEVector3			GetAngularVelocity() { return TOZE(Actor->getAngularVelocity()); }
+	void				SetAngularVelocity(const ZEVector3 Vel) { Actor->setAngularVelocity(TONX(Vel)); }
 
-	ZEVector3 GetPosition() { return TOZE(Actor->getGlobalPosition()); }
-	void SetPosition(const ZEVector3 Pos) { Actor->setGlobalPosition(TONX(Pos)); }
+	ZEVector3			GetPosition() { return TOZE(Actor->getGlobalPosition()); }
+	void				SetPosition(const ZEVector3 Pos) { Actor->setGlobalPosition(TONX(Pos)); }
 
-	ZEQuaternion GetOrientation() { return TOZE(Actor->getGlobalOrientationQuat()); }
-	void SetOrientation(const ZEQuaternion Ori) { Actor->setGlobalOrientationQuat(TONX(Ori)); }
+	ZEQuaternion		GetOrientation() { return TOZE(Actor->getGlobalOrientationQuat()); }
+	void				SetOrientation(const ZEQuaternion Ori) { Actor->setGlobalOrientationQuat(TONX(Ori)); }
 	
-	float GetLinearDamping() { return Actor->getLinearDamping(); }
-	void SetLinearDamping(float Damp) { Actor->setLinearDamping(Damp); }
+	float				GetLinearDamping() { return Actor->getLinearDamping(); }
+	void				SetLinearDamping(float Damp) { Actor->setLinearDamping(Damp); }
 
-	float GetAngularDamping() { return Actor->getAngularDamping(); }
-	void SetAngularDamping(float Damp) { Actor->setAngularDamping(Damp); }
+	float				GetAngularDamping() { return Actor->getAngularDamping(); }
+	void				SetAngularDamping(float Damp) { Actor->setAngularDamping(Damp); }
 
-	ZEVector3 GetLinearMomentum() { return TOZE(Actor->getLinearMomentum()); }
-	void SetLinearMomentum(ZEVector3 Moment) { Actor->setLinearMomentum(TONX(Moment)); }
+	ZEVector3			GetLinearMomentum() { return TOZE(Actor->getLinearMomentum()); }
+	void				SetLinearMomentum(ZEVector3 Moment) { Actor->setLinearMomentum(TONX(Moment)); }
 
-	ZEVector3 GetAngularMomentum() { return TOZE(Actor->getAngularMomentum()); }
-	void SetAngularMomentum(ZEVector3 Moment) { Actor->setAngularMomentum(TONX(Moment)); }
+	ZEVector3			GetAngularMomentum() { return TOZE(Actor->getAngularMomentum()); }
+	void				SetAngularMomentum(ZEVector3 Moment) { Actor->setAngularMomentum(TONX(Moment)); }
 
-	void SetMass(float Mass) { Actor->setMass(Mass); }
-	float GetMass() { return Actor->getMass(); }
-	bool IsDynamic() { return Actor->isDynamic(); }
+	void				SetMass(float Mass) { Actor->setMass(Mass); }
+	float				GetMass() { return Actor->getMass(); }
+	bool				IsDynamic() { return Actor->isDynamic(); }
 
-	unsigned int GetShapeCount() { return Actor->getNbShapes(); }
+	unsigned int		GetShapeCount() { return Actor->getNbShapes(); }
+	NxActor*			GetActor() { return Actor; }
+	
 	ZEVector3 GetGlobalShapePosition(int Index) 
 	{ 
 		return TOZE(Actor->getShapes()[Index]->getGlobalPosition());
 	}
+
 	void SetGlobalShapePosition(int Index, const ZEVector3 Pos) 
 	{ 
 		Actor->getShapes()[Index]->setGlobalPosition(TONX(Pos));
 	}
+
 	ZEVector3 GetLocalShapePosition(int Index)
 	{ 
 		return TOZE(Actor->getShapes()[Index]->getLocalPosition());
 	}
+
 	void SetLocalShapePosition(int Index, const ZEVector3 Pos) 
 	{ 
 		Actor->getShapes()[Index]->setLocalPosition(TONX(Pos));
 	}
+
 	ZEQuaternion GetGlobalShapeOrientation(int Index)
 	{ 
 		NxMat33 Mat = Actor->getShapes()[Index]->getGlobalOrientation();
 		NxQuat Quat;Mat.toQuat(Quat);
 		return TOZE(Quat);
 	}
+
 	void SetGlobalShapeOrientation(int Index, const ZEQuaternion Ori)
 	{ 
 		NxQuat Quat = TONX(Ori);
@@ -126,12 +133,14 @@ public:
 		Actor->getShapes()[Index]->setGlobalOrientation(Mat);
 		Actor->updateMassFromShapes(0,Actor->getMass());
 	}
+
 	ZEQuaternion GetLocalShapeOrientation(int Index)  
 	{ 
 		NxMat33 Mat = Actor->getShapes()[Index]->getLocalOrientation();
 		NxQuat Quat;Mat.toQuat(Quat);
 		return TOZE(Quat);
 	}
+
 	void SetLocalShapeOrientation(int Index,const ZEQuaternion Ori)
 	{ 
 		NxQuat Quat = TONX(Ori);
@@ -140,11 +149,9 @@ public:
 		Actor->updateMassFromShapes(0,Actor->getMass());
 	}
 
-	//gets & sets
-	NxActor* GetActor() { return Actor; }
-
 private:
-	NxActor* Actor;
+	NxActor*			Actor;
+
 };
 
 #endif

@@ -39,8 +39,8 @@
 
 class ZEAegiaPhysicsReport : public NxUserContactReport, public NxUserTriggerReport 
 {
-	void onContactNotify(NxContactPair& pair, NxU32 events);
-	void onTrigger(NxShape& triggerShape, NxShape& otherShape, NxTriggerFlag status);
+	void			onContactNotify(NxContactPair& pair, NxU32 events);
+	void			onTrigger(NxShape& triggerShape, NxShape& otherShape, NxTriggerFlag status);
 };
 
 #endif

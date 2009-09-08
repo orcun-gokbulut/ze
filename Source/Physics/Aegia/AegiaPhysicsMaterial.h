@@ -41,15 +41,15 @@ class ZEPhysicsMaterial;
 
 class ZEAegiaPhysicsMaterial : public ZEPhysicsMaterial
 {
-	friend class ZEAegiaPhysicsModule;
+	friend class		ZEAegiaPhysicsModule;
 
 private:
-	ZEAegiaPhysicsMaterial();
-	~ZEAegiaPhysicsMaterial();
+						ZEAegiaPhysicsMaterial();
+						~ZEAegiaPhysicsMaterial();
 
 public:
-	void Initialize(float Friction, float Restitution);
-	void Deinitialize();
+	void				Initialize(float Friction, float Restitution);
+	void				Deinitialize();
 };
 
 #endif

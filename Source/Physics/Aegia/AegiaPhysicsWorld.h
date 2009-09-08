@@ -64,44 +64,43 @@ public:
 
 class ZEAegiaPhysicsWorld : public ZEPhysicsWorld
 {
-	friend class ZEAegiaPhysicsReport;
-	friend class ZEAegiaPhysicsModule;
+	friend class					ZEAegiaPhysicsReport;
+	friend class					ZEAegiaPhysicsModule;
 
 private:
-	ZEAegiaPhysicsWorld();
-	~ZEAegiaPhysicsWorld();
-	static ZEAegiaPhysicsWorld* ms_Singleton;
+									ZEAegiaPhysicsWorld();
+									~ZEAegiaPhysicsWorld();
 public:
-	static ZEAegiaPhysicsWorld* getSingletonPtr();
-
-	void Initialize(ZEPhysicsWorldInfo& Info);
-	void Deinitialize();
-	void Update(const float ElapsedTime);
-	void ShowDebugView(bool Show);
+	static ZEAegiaPhysicsWorld*		getSingletonPtr();
+	void							Initialize(ZEPhysicsWorldInfo& Info);
+	void							Deinitialize();
+	void							Update(const float ElapsedTime);
+	void							ShowDebugView(bool Show);
 
 
 	//gets & sets
-	NxPhysicsSDK* GetSdk() { return PhysicsSdk; }
-	NxScene* GetScene() { return PhysicsScene; }
-	NxCookingInterface* GetCooker() { return Cooker; }
-	NxControllerManager* GetControllerManager() { return ControllerManager; }
-	void SetCollisionCallback(CollisionDelegate Function) { DelegateC = Function; }
-	void SetTriggerCallback(TriggerDelegate Function) { DelegateT = Function; }
+	NxPhysicsSDK*					GetSdk() { return PhysicsSdk; }
+	NxScene*						GetScene() { return PhysicsScene; }
+	NxCookingInterface*				GetCooker() { return Cooker; }
+	NxControllerManager*			GetControllerManager() { return ControllerManager; }
+	void							SetCollisionCallback(CollisionDelegate Function) { DelegateC = Function; }
+	void							SetTriggerCallback(TriggerDelegate Function) { DelegateT = Function; }
 	
-	ZEVector3 GetGravity() { NxVec3 v;PhysicsScene->getGravity(v);return TOZE(v); }
-	void SetGravity(ZEVector3 Vector) { PhysicsScene->setGravity(TONX(Vector)); }
+	ZEVector3						GetGravity() { NxVec3 v;PhysicsScene->getGravity(v);return TOZE(v); }
+	void							SetGravity(ZEVector3 Vector) { PhysicsScene->setGravity(TONX(Vector)); }
 
 private:
-	NxPhysicsSDK* PhysicsSdk;
-	NxScene*      PhysicsScene;
-	NxCookingInterface* Cooker;
-	NxControllerManager* ControllerManager;
-	ControllerAllocator* ControllerAlloc;
-	ZEAegiaPhysicsReport Report;
-	CollisionDelegate DelegateC;
-	TriggerDelegate DelegateT;
-	ZECanvasBrush* Debugger;
-	bool DebugView;
+	static ZEAegiaPhysicsWorld*		ms_Singleton;
+	NxPhysicsSDK*					PhysicsSdk;
+	NxScene*						PhysicsScene;
+	NxCookingInterface*				Cooker;
+	NxControllerManager*			ControllerManager;
+	ControllerAllocator*			ControllerAlloc;
+	ZEAegiaPhysicsReport			Report;
+	CollisionDelegate				DelegateC;
+	TriggerDelegate					DelegateT;
+	ZECanvasBrush*					Debugger;
+	bool							DebugView;
 };
 
 #endif

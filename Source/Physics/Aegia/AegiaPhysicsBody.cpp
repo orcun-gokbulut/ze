@@ -81,12 +81,14 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 	{
 		NxActorDesc ActorDesc;
 		NxBodyDesc BodyDesc;
+
 		//set body desc
 		if (Info.Mass>0)
 		{
 			ActorDesc.body = &BodyDesc;
 			ActorDesc.density = 1;
 		}
+
 		//set shape descs
 		for (int i=0; i< (int)Info.ShapeInfos.GetCount(); i++)
 		{
@@ -97,15 +99,22 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 					ZEPhysicsPlaneShapeInfo* PlaneInfo = (ZEPhysicsPlaneShapeInfo*)Info.ShapeInfos[i];
 					NxPlaneShapeDesc PlaneDesc;
 					PlaneDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-					if (PlaneInfo->Trigger)PlaneDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+					if (PlaneInfo->Trigger)
+					{
+						PlaneDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+					}
+
 					PlaneDesc.d = PlaneInfo->Height;
 					PlaneDesc.normal = TONX(PlaneInfo->Normal);
 					PlaneDesc.localPose.t = TONX(PlaneInfo->LocalPosition);
 					PlaneDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(PlaneInfo->CollisionMask);
+
 					if (PlaneInfo->Material)
 					{
 						PlaneDesc.materialIndex = PlaneInfo->Material->GetIndex();
 					}
+
 					ActorDesc.shapes.pushBack(&PlaneDesc);
 					break;
 				}
@@ -114,14 +123,21 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 					ZEPhysicsBoxShapeInfo* BoxInfo = (ZEPhysicsBoxShapeInfo*)Info.ShapeInfos[i];
 					NxBoxShapeDesc BoxDesc;
 					BoxDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-					if (BoxInfo->Trigger)BoxDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+					if (BoxInfo->Trigger)
+					{
+						BoxDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+					}
+
 					BoxDesc.dimensions = TONX(BoxInfo->Dimensions);
 					BoxDesc.localPose.t = TONX(BoxInfo->LocalPosition);
 					BoxDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(BoxInfo->CollisionMask);
+
 					if (BoxInfo->Material)
 					{
 						BoxDesc.materialIndex = BoxInfo->Material->GetIndex();
 					}
+
 					ActorDesc.shapes.pushBack(&BoxDesc);
 					break;
 				}
@@ -130,15 +146,22 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 					ZEPhysicsCapsuleShapeInfo* CapsuleInfo = (ZEPhysicsCapsuleShapeInfo*)Info.ShapeInfos[i];
 					NxCapsuleShapeDesc CapsuleDesc;
 					CapsuleDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-					if (CapsuleInfo->Trigger)CapsuleDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+					if (CapsuleInfo->Trigger)
+					{
+						CapsuleDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+					}
+
 					CapsuleDesc.height = CapsuleInfo->Height;
 					CapsuleDesc.radius = CapsuleInfo->Radius;
 					CapsuleDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(CapsuleInfo->CollisionMask);;
 					CapsuleDesc.localPose.t = TONX(CapsuleInfo->LocalPosition);
+
 					if (CapsuleInfo->Material)
 					{
 						CapsuleDesc.materialIndex = CapsuleInfo->Material->GetIndex();
 					}
+
 					ActorDesc.shapes.pushBack(&CapsuleDesc);
 					break;
 				}
@@ -147,14 +170,21 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 					ZEPhysicsSphereShapeInfo* SphereInfo = (ZEPhysicsSphereShapeInfo*)Info.ShapeInfos[i];
 					NxSphereShapeDesc SphereDesc;
 					SphereDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-					if (SphereInfo->Trigger)SphereDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+					if (SphereInfo->Trigger)
+					{
+						SphereDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+					}
+
 					SphereDesc.radius = SphereInfo->Radius;
 					SphereDesc.localPose.t = TONX(SphereInfo->LocalPosition);
-					SphereDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(SphereInfo->CollisionMask);;
+					SphereDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(SphereInfo->CollisionMask);
+
 					if (SphereInfo->Material)
 					{
 						SphereDesc.materialIndex = SphereInfo->Material->GetIndex();
 					}
+
 					ActorDesc.shapes.pushBack(&SphereDesc);
 					break;
 				}
@@ -163,7 +193,12 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 					ZEPhysicsConvexShapeInfo* ConvexInfo = (ZEPhysicsConvexShapeInfo*)Info.ShapeInfos[i];
 					NxConvexShapeDesc ConvexDesc;
 					ConvexDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-					if (ConvexInfo->Trigger)ConvexDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+					if (ConvexInfo->Trigger)
+					{
+						ConvexDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+					}
+
 					ConvexDesc.localPose.t = TONX(ConvexInfo->LocalPosition);
 					ConvexDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(ConvexInfo->CollisionMask);;
 
@@ -172,9 +207,6 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 					for (int i=0; i<(int)ConvexInfo->Vertices.GetCount(); i++)
 					{
 						Verts[i] = TONX(ConvexInfo->Vertices[i]);
-						/*Verts[i].x *= ConvexInfo->Scale.x;
-						Verts[i].y *= ConvexInfo->Scale.y;
-						Verts[i].z *= ConvexInfo->Scale.z;*/
 					}
 
 					//prepare mesh description
@@ -221,7 +253,12 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 					ZEPhysicsTrimeshShapeInfo* TrimeshInfo = (ZEPhysicsTrimeshShapeInfo*)Info.ShapeInfos[i];
 					NxTriangleMeshShapeDesc TrimeshDesc;
 					TrimeshDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-					if (TrimeshInfo->Trigger)TrimeshDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+					if (TrimeshInfo->Trigger)
+					{
+						TrimeshDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+					}
+
 					TrimeshDesc.localPose.t = TONX(TrimeshInfo->LocalPosition);
 					TrimeshDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(TrimeshInfo->CollisionMask);;
 
@@ -230,9 +267,6 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 					for (int i=0; i<(int)TrimeshInfo->Vertices.GetCount(); i++)
 					{
 						Verts[i] = TONX(TrimeshInfo->Vertices[i]);
-						/*Verts[i].x *= TrimeshInfo->Scale.x;
-						Verts[i].y *= TrimeshInfo->Scale.y;
-						Verts[i].z *= TrimeshInfo->Scale.z;*/
 					}
 
 					//prepare indexes
@@ -294,19 +328,29 @@ void ZEAegiaPhysicsBody::Initialize(ZEPhysicsBodyInfo& Info)
 			//set attributes
 			Actor->setGlobalPosition(TONX(Info.Position));
 			Actor->setGlobalOrientationQuat(TONX(Info.Orientation));
-			if (Info.Mass>0)Actor->updateMassFromShapes(0,Info.Mass);
+
+			if (Info.Mass>0)
+			{
+				Actor->updateMassFromShapes(0,Info.Mass);
+			}
+
 			Actor->setLinearDamping(Info.LinearDamp);
 			Actor->setAngularDamping(Info.AngularDamp);
-			if (Info.Kinematic)Actor->raiseBodyFlag(NX_BF_KINEMATIC);
+
+			if (Info.Kinematic)
+			{
+				Actor->raiseBodyFlag(NX_BF_KINEMATIC);
+			}
+
 			//set user data to this
 			Actor->userData = this;
 			NxShape*const* shapes = Actor->getShapes();
 			NxU32 nShapes = Actor->getNbShapes();
+
 			while (nShapes--)
 			{
 				shapes[nShapes]->userData = this;
 			}
-			//Actor->raiseBodyFlag(NX_BF_FROZEN_ROT);
 		}
 		else
 		{
@@ -319,10 +363,12 @@ void ZEAegiaPhysicsBody::Deinitialize()
 	if (Actor != NULL && ZEAegiaPhysicsWorld::getSingletonPtr() != NULL)
 	{
 		ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
+
 		if (Actor->userData != NULL)
 		{
 			delete Actor->userData;
 		}
+
         //ReleaseUserDataFromShapes(actor);
 		World->GetScene()->releaseActor(*Actor);
 		Actor = NULL;
@@ -342,15 +388,22 @@ void ZEAegiaPhysicsBody::AddShape(ZEPhysicsShapeInfo* Info)
 				ZEPhysicsPlaneShapeInfo* PlaneInfo = (ZEPhysicsPlaneShapeInfo*)Info;
 				NxPlaneShapeDesc PlaneDesc;
 				PlaneDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-				if (PlaneInfo->Trigger)PlaneDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+				if (PlaneInfo->Trigger)
+				{
+					PlaneDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				}
+
 				PlaneDesc.d = PlaneInfo->Height;
 				PlaneDesc.normal = TONX(PlaneInfo->Normal);
 				PlaneDesc.localPose.t = TONX(PlaneInfo->LocalPosition);
 				PlaneDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(PlaneInfo->CollisionMask);
+
 				if (PlaneInfo->Material)
 				{
 					PlaneDesc.materialIndex = PlaneInfo->Material->GetIndex();
 				}
+
 				Actor->createShape(PlaneDesc);
 				break;
 			}
@@ -359,14 +412,21 @@ void ZEAegiaPhysicsBody::AddShape(ZEPhysicsShapeInfo* Info)
 				ZEPhysicsBoxShapeInfo* BoxInfo = (ZEPhysicsBoxShapeInfo*)Info;
 				NxBoxShapeDesc BoxDesc;
 				BoxDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-				if (BoxInfo->Trigger)BoxDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+				if (BoxInfo->Trigger)
+				{
+					BoxDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				}
+
 				BoxDesc.dimensions = TONX(BoxInfo->Dimensions);
 				BoxDesc.localPose.t = TONX(BoxInfo->LocalPosition);
 				BoxDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(BoxInfo->CollisionMask);
+
 				if (BoxInfo->Material)
 				{
 					BoxDesc.materialIndex = BoxInfo->Material->GetIndex();
 				}
+
 				Actor->createShape(BoxDesc);
 				break;
 			}
@@ -375,15 +435,22 @@ void ZEAegiaPhysicsBody::AddShape(ZEPhysicsShapeInfo* Info)
 				ZEPhysicsCapsuleShapeInfo* CapsuleInfo = (ZEPhysicsCapsuleShapeInfo*)Info;
 				NxCapsuleShapeDesc CapsuleDesc;
 				CapsuleDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-				if (CapsuleInfo->Trigger)CapsuleDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+				if (CapsuleInfo->Trigger)
+				{
+					CapsuleDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				}
+
 				CapsuleDesc.height = CapsuleInfo->Height;
 				CapsuleDesc.radius = CapsuleInfo->Radius;
 				CapsuleDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(CapsuleInfo->CollisionMask);;
 				CapsuleDesc.localPose.t = TONX(CapsuleInfo->LocalPosition);
+
 				if (CapsuleInfo->Material)
 				{
 					CapsuleDesc.materialIndex = CapsuleInfo->Material->GetIndex();
 				}
+
 				Actor->createShape(CapsuleDesc);
 				break;
 			}
@@ -392,14 +459,21 @@ void ZEAegiaPhysicsBody::AddShape(ZEPhysicsShapeInfo* Info)
 				ZEPhysicsSphereShapeInfo* SphereInfo = (ZEPhysicsSphereShapeInfo*)Info;
 				NxSphereShapeDesc SphereDesc;
 				SphereDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-				if (SphereInfo->Trigger)SphereDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+				if (SphereInfo->Trigger)
+				{
+					SphereDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				}
+
 				SphereDesc.radius = SphereInfo->Radius;
 				SphereDesc.localPose.t = TONX(SphereInfo->LocalPosition);
-				SphereDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(SphereInfo->CollisionMask);;
+				SphereDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(SphereInfo->CollisionMask);
+
 				if (SphereInfo->Material)
 				{
 					SphereDesc.materialIndex = SphereInfo->Material->GetIndex();
 				}
+
 				Actor->createShape(SphereDesc);
 				break;
 			}
@@ -408,7 +482,12 @@ void ZEAegiaPhysicsBody::AddShape(ZEPhysicsShapeInfo* Info)
 				ZEPhysicsConvexShapeInfo* ConvexInfo = (ZEPhysicsConvexShapeInfo*)Info;
 				NxConvexShapeDesc ConvexDesc;
 				ConvexDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-				if (ConvexInfo->Trigger)ConvexDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+				if (ConvexInfo->Trigger)
+				{
+					ConvexDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				}
+
 				ConvexDesc.localPose.t = TONX(ConvexInfo->LocalPosition);
 				ConvexDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(ConvexInfo->CollisionMask);;
 
@@ -463,7 +542,12 @@ void ZEAegiaPhysicsBody::AddShape(ZEPhysicsShapeInfo* Info)
 				ZEPhysicsTrimeshShapeInfo* TrimeshInfo = (ZEPhysicsTrimeshShapeInfo*)Info;
 				NxTriangleMeshShapeDesc TrimeshDesc;
 				TrimeshDesc.shapeFlags |= NX_SF_POINT_CONTACT_FORCE;
-				if (TrimeshInfo->Trigger)TrimeshDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+
+				if (TrimeshInfo->Trigger)
+				{
+					TrimeshDesc.shapeFlags |= NX_TRIGGER_ENABLE;
+				}
+
 				TrimeshDesc.localPose.t = TONX(TrimeshInfo->LocalPosition);
 				TrimeshDesc.groupsMask = ZEAegiaPhysicsUtility::toNX(TrimeshInfo->CollisionMask);;
 

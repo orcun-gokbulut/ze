@@ -65,7 +65,7 @@ box::box(ZEScene* scene, const char* tex, float mass, ZEVector3 poss, ZEQuaterni
 	model->Material.SetZero();
 	model->Material.LightningEnabled = true;
 	model->Material.SetShaderComponents(ZESHADER_DIFFUSEMAP);
-	model->Material.AmbientColor = ZEVector3(0.0f, 0.0f, 0.0f);
+	model->Material.AmbientColor = ZEVector3(0.2f, 0.2f, 0.2f);
 	model->Material.DiffuseColor = ZEVector3(1.0f, 1.0f, 1.0f);
 	model->Material.SpecularColor = ZEVector3(1.0f, 1.0f, 1.0f);
 	model->Material.SpecularFactor = 64.0f;

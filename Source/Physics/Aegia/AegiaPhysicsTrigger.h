@@ -42,21 +42,21 @@ class ZEPhysicsBody;
 
 class ZEAegiaPhysicsTrigger : public ZEPhysicsTrigger
 {
-	friend class ZEAegiaPhysicsReport;
+	friend class		ZEAegiaPhysicsReport;
 
 private:
-	ZEAegiaPhysicsTrigger(ZEPhysicsBody* First,ZEPhysicsBody* Second, unsigned int Flag);
-	~ZEAegiaPhysicsTrigger();
+						ZEAegiaPhysicsTrigger(ZEPhysicsBody* First,ZEPhysicsBody* Second, unsigned int Flag);
+						~ZEAegiaPhysicsTrigger();
 
 public:
-	ZEPhysicsBody* GetTriggerBody() { return Trigger; }
-	ZEPhysicsBody* GetOtherBody()   { return Other; }
-	unsigned int   GetFlags()       { return Flags; }
+	ZEPhysicsBody*		GetTriggerBody() { return Trigger; }
+	ZEPhysicsBody*		GetOtherBody()   { return Other; }
+	unsigned int		GetFlags()       { return Flags; }
 
 private:
-	ZEPhysicsBody* Trigger;
-	ZEPhysicsBody* Other;
-	unsigned int Flags;
+	ZEPhysicsBody*		Trigger;
+	ZEPhysicsBody*		Other;
+	unsigned int		Flags;
 };
 
 #endif
