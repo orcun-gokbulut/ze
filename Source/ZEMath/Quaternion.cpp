@@ -226,8 +226,10 @@ void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQu
 			Output.z = (A.z * RatioA + B.z * RatioB);
 		}
 	}
+
+	Normalize(Output, Output);
 	
-	ZEMATH_ASSERT(fabs(Output.Length() - 1.0f) < ZE_ZERO_TRESHOLD, "ZEQuaternion::Slerp function's output is not unit quaternion.");
+	ZEMATH_ASSERT(fabs(Output.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Slerp function's output is not unit quaternion.");
 }
 
 void ZEQuaternion::ConvertToRotationMatrix(ZEMatrix3x3& Output, const ZEQuaternion& Quaternion)

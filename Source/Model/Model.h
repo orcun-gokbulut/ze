@@ -213,6 +213,8 @@ class ZEModelBone
 		const ZEArray<ZEModelBone*>			GetChildBones();
 		const char*							GetName();
 
+		bool								IsRootBone();
+
 		const ZEAABoundingBox&				GetLocalBoundingBox();
 		const ZEAABoundingBox&				GetModelBoundingBox();
 		const ZEAABoundingBox&				GetWorldBoundingBox();
@@ -225,9 +227,6 @@ class ZEModelBone
 		const ZEMatrix4x4&					GetRelativeTransform();
 		const ZEMatrix4x4&					GetInverseTransform();
 		const ZEMatrix4x4&					GetForwardTransform();
-
-		const ZEVector3&					GetAbsolutePostion();
-		const ZEQuaternion&					GetAbsoluteRotation();
 
 		const ZEVector3&					GetRelativePosition();
 		void								SetRelativePosition(const ZEVector3& Position);

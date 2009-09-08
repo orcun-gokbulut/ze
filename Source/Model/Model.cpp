@@ -513,6 +513,11 @@ const ZEArray<ZEModelBone*> ZEModelBone::GetChildBones()
 	return ChildBones;
 }
 
+bool ZEModelBone::IsRootBone()
+{
+	return ParentBone == NULL;
+}
+
 const ZEAABoundingBox& ZEModelBone::GetLocalBoundingBox()
 {
 	return BoneResource->BoundingBox;
@@ -609,16 +614,6 @@ const ZEMatrix4x4& ZEModelBone::GetRelativeTransform()
 	return RelativeTransform;
 }
 
-const ZEVector3& ZEModelBone::GetAbsolutePostion()
-{
-	return BoneResource->AbsolutePosition;
-}
-
-const ZEQuaternion& ZEModelBone::GetAbsoluteRotation()
-{
-	return BoneResource->AbsoluteOrientation;
-}
-
 const ZEVector3& ZEModelBone::GetRelativePosition()
 {
 	return RelativePosition;
@@ -692,7 +687,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 	Owner = Model;
 	this->BoneResource = BoneResource;
 	RelativePosition = BoneResource->RelativePosition;
-	RelativeRotation = BoneResource->RelativeOrientation;
+	RelativeRotation = BoneResource->RelativeRotation;
 
 	UpdateRelativeTransform = true;
 	UpdateVertexTransform = true;
@@ -1093,7 +1088,7 @@ void ZEModel::PlayAnimationByName(const char* AnimationName, unsigned int StartF
 		return;
 
 	for (size_t I = 0; I < ModelResource->Animations.GetCount(); I++)
-		if (strnicmp(Animation->Name, ModelResource->Animations[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
+		if (strnicmp(AnimationName, ModelResource->Animations[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
 		{
 			PlayAnimation(&ModelResource->Animations[I], StartFrame, EndFrame);
 			return;
@@ -1249,7 +1244,7 @@ void ZEModel::Tick(float ElapsedTime)
 {
 	if (AnimationState == ZE_MAS_PLAYING)
 	{
-		if (AnimationFrame > AnimationEndFrame)
+		if (AnimationFrame >= AnimationEndFrame)
 			if (AnimationLooping)
 				AnimationFrame = AnimationStartFrame + fmodf(AnimationFrame, AnimationEndFrame - AnimationStartFrame);
 			else
@@ -1260,8 +1255,13 @@ void ZEModel::Tick(float ElapsedTime)
 			
 		float Interpolation = AnimationFrame - floorf(AnimationFrame);
 
+		int NextFrameId = (int)ceilf(AnimationFrame);
+		if (NextFrameId >= Animation->Frames.GetCount())
+			NextFrameId = AnimationStartFrame + fmodf(AnimationFrame, AnimationEndFrame - AnimationStartFrame);
+
 		const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[(int)floorf(AnimationFrame)];
-		const ZEModelResourceAnimationFrame* NextFrame = &Animation->Frames[(int)ceilf(AnimationFrame)];
+		const ZEModelResourceAnimationFrame* NextFrame = &Animation->Frames[NextFrameId];
+
 
 		for (size_t I = 0; I < Frame->BoneKeys.GetCount(); I++)
 		{
@@ -1270,9 +1270,7 @@ void ZEModel::Tick(float ElapsedTime)
 			
 			ZEQuaternion Rotation;
 			ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
-
 			Bones[Key->ItemId].SetRelativeRotation(Rotation);
-			//Bones[Key->ItemId].SetRelativeRotation(Key->Orientation);
 		}
 		
 		for (size_t I = 0; I < Frame->MeshKeys.GetCount(); I++)
@@ -1286,8 +1284,11 @@ void ZEModel::Tick(float ElapsedTime)
 
 			ZEQuaternion Rotation;
 			ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
-			Bones[Key->ItemId].SetRelativeRotation(Rotation);
+			Meshes[Key->ItemId].SetLocalRotation(Rotation);
 
+			ZEVector3 Scale;
+			ZEVector3::Lerp(Scale, Key->Scale, NextKey->Scale, Interpolation);
+			Meshes[Key->ItemId].SetLocalScale(Scale);
 		}
 		AnimationFrame += AnimationSpeed * ElapsedTime;
 	}

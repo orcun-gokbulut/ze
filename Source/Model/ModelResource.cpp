@@ -487,6 +487,27 @@ bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEResourceFi
 	return true;
 }
 
+void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, int BoneId)
+{
+	ZEMatrix4x4::CreateOrientation(Bone->RelativeTransform, Bone->RelativePosition, Bone->RelativeRotation, Bone->RelativeScale);
+
+	if (Bone->ParentBone != -1)
+	{
+
+		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Bone->RelativeTransform, Model->Bones[Bone->ParentBone].ForwardTransform);
+		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
+	}
+	else
+	{
+		Bone->ForwardTransform = Bone->RelativeTransform;
+		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
+	}
+
+	for (size_t I = 0; I < Model->Bones.GetCount(); I++)
+		if (Model->Bones[I].ParentBone == BoneId)
+			ProcessBones(Model, &Model->Bones[I], I);
+}
+
 bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 {
 	for (size_t I = 0; I < Model->Bones.GetCount(); I++)
@@ -505,18 +526,16 @@ bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 		strncpy(Bone->Name, BoneChunk.Name, ZE_MDLF_MAX_NAME_SIZE);
 		Bone->BoundingBox = BoneChunk.BoundingBox;
 
-		/*ZEMatrix4x4::CreateOffset(Bone->ForwardTransform, BoneChunk.AbsolutePosition, BoneChunk.AbsoluteOrientation);
-		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);*/
 		Bone->BoundingBox = BoneChunk.BoundingBox;
 		Bone->ParentBone = BoneChunk.ParentBone;
 		Bone->RelativePosition = BoneChunk.RelativePosition;
-		Bone->RelativeOrientation = BoneChunk.RelativeRotation;
+		Bone->RelativeRotation = BoneChunk.RelativeRotation;
+		Bone->RelativeScale = BoneChunk.RelativeScale;
 	}
-#pragma tast
-	/*
-	Bone->AbsoluteOrientation = BoneChunk.AbsoluteOrientation;
-	Bone->AbsolutePosition = BoneChunk.AbsolutePosition;
-	*/
+
+	for (size_t I = 0; I < Model->Bones.GetCount(); I++)
+		if (Model->Bones[I].ParentBone == -1)
+			ProcessBones(Model, &Model->Bones[I], I);
 	return true;
 }
 

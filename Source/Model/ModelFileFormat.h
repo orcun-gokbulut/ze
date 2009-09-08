@@ -354,6 +354,7 @@ struct ZEModelFileBoneChunk
 	ZEINT32								ParentBone;
 	ZEVector3							RelativePosition;
 	ZEQuaternion						RelativeRotation;
+	ZEVector3							RelativeScale;
 	ZEAABoundingBox						BoundingBox;
 	bool								HasPhysicalBody;
 	bool								HasPhysicalJoint;

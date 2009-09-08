@@ -341,10 +341,10 @@ struct ZEModelResourceBone
 	ZEAABoundingBox								BoundingBox;
 	ZEINT32										ParentBone;
 	ZEVector3									RelativePosition;
-	ZEQuaternion								RelativeOrientation;
+	ZEQuaternion								RelativeRotation;
+	ZEVector3									RelativeScale;
+	ZEMatrix4x4									RelativeTransform;
 	ZEMatrix4x4									ForwardTransform;
-	ZEVector3									AbsolutePosition;
-	ZEQuaternion								AbsoluteOrientation;
 	ZEMatrix4x4									InverseTransform;
 	ZEModelResourcePhysicalJoint				PhysicalJoint;
 };
