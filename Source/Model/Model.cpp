@@ -1293,7 +1293,7 @@ void ZEModel::Tick(float ElapsedTime)
 		AnimationFrame += AnimationSpeed * ElapsedTime;
 	}
 
-	if (Meshes.GetCount()>0)
+	/*if (Meshes.GetCount()>0)
 	{
 		//Meshes[0].SetLocalPosition(ZEVector3::Zero);
 		//Meshes[0].GetPhysicalBody()->SetPosition(ZEVector3::Zero);
@@ -1315,14 +1315,14 @@ void ZEModel::Tick(float ElapsedTime)
 		//this->SetWorldPosition(ZEVector3::Zero);
 		//this->SetLocalPosition(ZEVector3::Zero);
 		/*this->SetWorldRotation(ZEQuaternion::Identity);
-		this->SetLocalRotation(ZEQuaternion::Identity);*/
+		this->SetLocalRotation(ZEQuaternion::Identity);
 
 		/*for (int i=0;i<Meshes.GetCount();i++)
 		{
 			Meshes[i].SetLocalPosition(ZEVector3(0,0,0));
 			Meshes[i].SetLocalRotation(Meshes[i].GetPhysicalBody()->GetOrientation());
 		}*/
-
+/*
 		//ZEVector3 ewrt = Meshes[0].GetPhysicalBody()->GetPosition();
 		//this->SetWorldPosition(Meshes[0].GetPhysicalBody()->GetPosition());
 		//this->SetWorldRotation(Meshes[0].GetPhysicalBody()->GetOrientation());
@@ -1331,7 +1331,7 @@ void ZEModel::Tick(float ElapsedTime)
 
 		//this->SetWorldPosition(ZEVector3::Zero);
 		//this->SetLocalPosition(ZEVector3::Zero);
-	}
+	}*/
 }
 
 
