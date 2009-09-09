@@ -147,11 +147,11 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 			if (Input.BoneWeights[I] > 0.0f)
 			{
 				Position = mul(Input.Position, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
-				Normal += mul(Input.Normal, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
+				Normal += mul(Input.Normal, (float3x3)BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
 
 				#ifdef ZESHADER_NORMALMAP
-					Tangent += mul(Input.Tangent, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
-					Binormal += mul(Input.Binormal, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
+					Tangent += mul(Input.Tangent, (float3x3)BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
+					Binormal += mul(Input.Binormal, (float3x3)BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
 				#endif
 			}	
 	#else

@@ -189,11 +189,18 @@ void ZEQuaternion::Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternio
 	Output.w = Quaternion.w;
 }
 
+#include <d3dx9.h>
 void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor)
 {
 	ZEMATH_ASSERT(fabs(A.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Slerp function's parameter A is not unit quaternion.");
 	ZEMATH_ASSERT(fabs(B.Length() - 1.0f) > ZE_ZERO_TRESHOLD, "ZEQuaternion::Slerp function's parameter B is not unit quaternion.");
 
+	D3DXQUATERNION Q1, Q2, QO;
+	MapQuaternion(Q1, A);
+	MapQuaternion(Q2, B);
+	D3DXQuaternionSlerp(&QO, &Q1, &Q2, Factor);
+	MapQuaternion(Output, QO);
+	return;
 	float CosHalfTheta = A.w * B.w + A.x * B.x + A.y * B.y + A.z * B.z;
 
 	if (fabs(CosHalfTheta) >= 1.0)
