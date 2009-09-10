@@ -39,14 +39,14 @@
 #include "Plane.h"
 #include <d3dx9.h>
 
-inline void ZELine::Create(ZELine& Line, const ZEPoint3& P0, const ZEPoint3& P1)
+void ZELine::Create(ZELine& Line, const ZEPoint3& P0, const ZEPoint3& P1)
 {
 	ZEVector3::Sub(Line.v, P1, P0);
 	Line.p = P0;
 
 }
 
-inline void ZELine::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEPoint3& p)
+void ZELine::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEPoint3& p)
 {
 	Line.v = v;
 	Line.p = p;
@@ -103,7 +103,8 @@ ZELine::ZELine()
 {
 }
 
-ZELine::ZELine(const ZEPoint3& P0, const ZEPoint3& P1)
+ZELine::ZELine(const ZEPoint3& v, const ZEPoint3& p)
 {
-	Create(*this, P0, P1);
+	this->v = v;
+	this->p = p;
 }

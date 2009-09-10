@@ -54,8 +54,8 @@ class ZEOBoundingBox
 		static ZEHalfSpace		PlaneHalfSpaceTest(const ZEOBoundingBox& BoundingBox, const ZEPlane& Plane);
 
 		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZEPoint3 Point);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment);
+		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax);
+		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray, float& TMin, float& TMax);
+		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax);
 };
 #endif

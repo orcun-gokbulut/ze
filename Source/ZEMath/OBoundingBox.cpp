@@ -36,8 +36,17 @@
 #include "BoundingSphere.h"
 #include "AABoundingBox.h"
 #include "OBoundingBox.h"
+#include "Definitions.h"s
+#include "LineSegment.h"
+#include "Ray.h"
 
 #include <math.h>
+
+ZEPoint3 ZEOBoundingBox::GetCenter() const
+{
+	return U * 0.5f + V * 0.5 + N * 0.5f + Position;
+}
+
 
 ZEPoint3 ZEOBoundingBox::GetVertex(unsigned char Index) const
 {
@@ -90,22 +99,139 @@ bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const Z
 	return true;
 }
 
-bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line)
+bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line, float& T0, float& T1)
 {
 //	ZEASSERT(true, "Not implamented");
-	return false;
+/*template <class T> bool Math3D<T>::IntersectLineOBB(
+    const Vector3<T>& O, // Line origin
+    const Vector3<T>& D, // Line direction
+    const Vector3<T>& C, // Box center
+    const Vector3<T> A[], // Box axes
+    const Vector3<T>& e, // Box extents
+    T t[], // On output, parametric points of intersection
+    T epsilon) // Tolerance for parallel test*/
+
+    int Parallel = 0;
+    bool Found = false;
+    float DA[3];
+    float dA[3];
+
+	//Vector3<T> d = C - O;
+	ZEVector3 d;
+	ZEVector3::Sub(d, BoundingBox.GetCenter(), Line.p);
+	
+	float e[3];
+	float t[2];
+	e[0] = ZEVector3::Length(BoundingBox.U);
+	e[1] = ZEVector3::Length(BoundingBox.V);
+	e[2] = ZEVector3::Length(BoundingBox.N);
+	
+	ZEVector3 A[3];
+	ZEVector3::Scale(A[0], BoundingBox.U, 1.0f / e[0]);
+	ZEVector3::Scale(A[1], BoundingBox.V, 1.0f / e[1]);
+	ZEVector3::Scale(A[2], BoundingBox.N, 1.0f / e[2]);
+
+    for (int I = 0; I < 3; I++)
+    {
+        //DA[i] = D.Dot(A[i]);
+		DA[I] = ZEVector3::DotProduct(Line.v, A[I]);
+
+        //dA[i] = d.Dot(A[i]);
+        dA[I] = ZEVector3::DotProduct(d, A[I]);
+
+		if (fabs(DA[I]) < ZE_ZEROTRESHOLD)
+            Parallel |= 1 << I;
+        else
+        {
+            float es = (DA[I] > 0.0f) ? e[I] : -e[I];
+            float invDA = 1.0f / DA[I];
+
+            if (!Found)
+            {
+                t[0] = (dA[I] - es) * invDA;
+                t[1] = (dA[I] + es) * invDA;
+                Found = true;
+            }
+            else
+            {
+                float s = (dA[I] - es) * invDA;
+                if (s > t[0])
+                    t[0] = s;
+                s = (dA[I] + es) * invDA;
+                if (s < t[1])
+                    t[1] = s;
+                if (t[0] > t[1])
+                    return false;
+            }
+        }
+    }
+    
+    if (Parallel)
+        for (int I = 0; I < 3; I++)
+            if (Parallel & (1 << I))
+                if (fabs(dA[I] - t[0] * DA[I]) > e[I] || fabs(dA[I] - t[1] * DA[I]) > e[I])
+                    return false;
+
+/*	if (t[0] > t[1])
+	{
+		TMin = t[1];
+		TMax = t[0];
+	}
+	else
+	{
+		TMin = t[0];
+		TMax = t[1];
+	}*/
+    return true;
 }
 
-bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray)
+bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray, float& TMin, float& TMax)
 {
-//	ZEASSERT(true, "Not implamented");
-	return false;
+	float T0, T1;
+	if (IntersectionTest(BoundingBox, Ray.p))
+	{
+		if (IntersectionTest(BoundingBox, ZELine(Ray.v, Ray.p), T0, T1))
+		{
+			TMin = 0.0f;
+			TMax = T0 > T1 ? T0 : T1;
+			return true;
+		}
+	}
+	else
+	{
+		if (IntersectionTest(BoundingBox, ZELine(Ray.v, Ray.p), T0, T1))
+		{
+			if (T0 > T1)
+			{
+				TMin = T1;
+				TMax = T0;
+			}
+			else
+			{
+				TMin = T0;
+				TMax = T1;
+			}
+
+			if (TMin > 0.0f)
+				return true;
+			else 
+				return false;
+		}
+		else
+			return false;
+	}
 }
 
-bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment)
+bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax)
 {
-//	ZEASSERT(true, "Not implamented");
-	return false;
+	float T0, T1;
+	if (IntersectionTest(BoundingBox, ZELine(LineSegment.v, LineSegment.p), TMin, TMax))
+		if (TMin > 0.0f && TMax < 1.0f)
+			return true;
+		else 
+			return false;
+	else
+		return false;
 }
 
 /*

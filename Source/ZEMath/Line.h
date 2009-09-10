@@ -54,7 +54,7 @@ class ZELine
 
 		void				GetPointOn(ZEPoint3& Point, float t) const;
 
-							ZELine(const ZEPoint3& n, const ZEPoint3& p);
+							ZELine(const ZEPoint3& v, const ZEPoint3& p);
 							ZELine();
 };
 #endif

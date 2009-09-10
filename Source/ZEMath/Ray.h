@@ -51,7 +51,7 @@ class ZERay : public ZELine
 
 		void				GetPointOn(ZEPoint3& Point, float t) const;
 
-							ZERay(const ZEPoint3 & n,const ZEPoint3 &p);
+							ZERay(const ZEPoint3 & v,const ZEPoint3 &p);
 							ZERay();
 };
 #endif

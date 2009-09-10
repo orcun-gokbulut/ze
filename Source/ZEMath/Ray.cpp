@@ -73,9 +73,9 @@ void ZERay::GetPointOn(ZEPoint3& Point, float t) const
 	ZELine::GetPointOn(Point,t);
 }
 
-ZERay::ZERay(const ZEPoint3 & n,const ZEPoint3 &p)
+ZERay::ZERay(const ZEPoint3 & v,const ZEPoint3 &p)
 {
-	this->v = n;
+	this->v = v;
 	this->p = p;
 }
 
