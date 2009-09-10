@@ -118,13 +118,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 		ZEModelBrush* ModelBrush = (ZEModelBrush*)zeCore->GetGame()->CreateEntityInstance("ZEModelBrush");
 		Scene->AddEntity(ModelBrush);
-		ModelBrush->SetScale(ZEVector3(0.01f, 0.01f, 0.01f));
+		ModelBrush->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
 		ModelBrush->SetPosition(ZEVector3(1.0f, 0.0f, 0.0f));
 		ModelBrush->SetModelFile("skin.zeModel");
 		ModelBrush->GetModel()->SetAnimationLooping(true);
-		ModelBrush->GetModel()->SetAnimationSpeed(25.0f);
-		ModelBrush->GetModel()->GetBones()[4].SetRelativeRotation(ZEQuaternion(ZE_PI_4, ZEVector3(0.0f, 1.0f, 0.0f)));
-		//ModelBrush->GetModel()->PlayAnimationByName("test",0, 100);
+		ModelBrush->GetModel()->SetAnimationSpeed(5.0f);
+		//ModelBrush->GetModel()->GetBones()[4].SetRelativeRotation(ZEQuaternion(ZE_PI_4, ZEVector3(0.0f, 1.0f, 0.0f)));
+		ModelBrush->GetModel()->PlayAnimationByName("test",0, 100);
 		//boxes
 		for (int i=0;i<5;i++)
 		{

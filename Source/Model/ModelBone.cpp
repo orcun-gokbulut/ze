@@ -101,7 +101,7 @@ const ZEMatrix4x4& ZEModelBone::GetInverseTransform()
 
 const ZEMatrix4x4& ZEModelBone::GetLocalTransform()
 {
-	if (UpdateLocalTransform)
+	//if (UpdateLocalTransform)
 	{
 		if (ParentBone == NULL)
 			LocalTransform = GetRelativeTransform();
@@ -117,7 +117,7 @@ const ZEMatrix4x4& ZEModelBone::GetLocalTransform()
 
 const ZEMatrix4x4& ZEModelBone::GetWorldTransform()
 {
-	if (UpdateWorldTransform)
+//	if (UpdateWorldTransform)
 	{
 		ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
 		UpdateWorldTransform = false;
@@ -128,7 +128,7 @@ const ZEMatrix4x4& ZEModelBone::GetWorldTransform()
 
 const ZEMatrix4x4& ZEModelBone::GetModelTransform()
 {
-	if (UpdateWorldTransform)
+	//if (UpdateWorldTransform)
 	{
 		ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetLocalTransform());
 		UpdateWorldTransform = false;
@@ -139,7 +139,7 @@ const ZEMatrix4x4& ZEModelBone::GetModelTransform()
 
 const ZEMatrix4x4& ZEModelBone::GetVertexTransform()
 {
-	if (UpdateVertexTransform)
+//	if (UpdateVertexTransform)
 	{
 		ZEMatrix4x4::Multiply(VertexTransform, BoneResource->InverseTransform, GetModelTransform());
 		//VertexTransform = GetModelTransform();
@@ -152,7 +152,7 @@ const ZEMatrix4x4& ZEModelBone::GetVertexTransform()
 
 const ZEMatrix4x4& ZEModelBone::GetRelativeTransform()
 {
-	if (UpdateRelativeTransform)
+//	if (UpdateRelativeTransform)
 	{
 		ZEMatrix4x4 Temp1, Temp2;
 		ZEMatrix4x4::CreateTranslation(Temp1, RelativePosition);

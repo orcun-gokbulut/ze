@@ -559,6 +559,10 @@ void ZEModel::Tick(float ElapsedTime)
 			const ZEModelResourceAnimationKey* Key = &Frame->BoneKeys[I];
 			const ZEModelResourceAnimationKey* NextKey = &NextFrame->BoneKeys[I];
 			
+			ZEVector3 Position;
+			ZEVector3::Lerp(Position, Key->Position, Key->Position, Interpolation);
+			Bones[Key->ItemId].SetRelativePosition(Position);
+
 			ZEQuaternion Rotation;
 			ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
 			Bones[Key->ItemId].SetRelativeRotation(Rotation);
