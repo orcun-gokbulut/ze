@@ -1388,11 +1388,35 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Model\ModelAnimation.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Model\ModelAnimation.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Model\ModelBone.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Model\ModelBone.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Model\ModelFileFormat.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Source\Model\ModelFileFormat.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Model\ModelMesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Model\ModelMesh.h"
 				>
 			</File>
 			<File
