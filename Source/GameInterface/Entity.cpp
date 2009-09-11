@@ -499,18 +499,21 @@ bool ZEEntity::CastRay(const ZERay & Ray,const float Range,float &MinT)
 	if (BoundingVolumeMechanism != ZE_BVM_USECOMPONENTS)
 		return true;
 
-	int I = 0;
-	while (1)
+	for (size_t I = 0; I < Components.GetSize(); I++)
 	{
-		if (I == Components.GetSize()) break;
-		if (ZEAABoundingBox::IntersectionTest(Components[I]->GetWorldBoundingBox(),Ray,MinT,MaxT))
-			if (CurrMinT > MinT)
-				CurrMinT = MinT;
+		ZERay LocalRay;
+		ZEMatrix4x4 InvWorldTransform;
+		ZEMatrix4x4::Inverse(InvWorldTransform, Components[I]->GetWorldTransform());
 		
-		I++;
+		ZEMatrix4x4::Transform(LocalRay.p, InvWorldTransform, Ray.p);
+		ZEMatrix4x4::Transform3x3(LocalRay.v, InvWorldTransform, Ray.p);
+		if (ZEAABoundingBox::IntersectionTest(Components[I]->GetLocalBoundingBox(), LocalRay, MinT,MaxT))
+			if (CurrMinT > MinT)
+				CurrMinT = MinT;		
 	}
 
-	if (Range == CurrMinT) return false;
+	if (Range < CurrMinT) 
+		return false;
 
 	MinT = CurrMinT;
 	return true;
