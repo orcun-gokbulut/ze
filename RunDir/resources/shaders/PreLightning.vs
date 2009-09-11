@@ -93,7 +93,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 		for (int I = 0; I < 4; I++)
 			if (Input.BoneWeights[I] > 0.0f)
 			{
-				Position = mul(Input.Position, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
+				Position += mul(Input.Position, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
 				#if defined(ZESHADER_REFLECTION) || defined(ZESHADER_REFRACTION)
 					Normal += mul(Input.Normal, (float3x3)BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
 				#endif

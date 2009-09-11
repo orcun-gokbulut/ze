@@ -462,26 +462,28 @@ void ZECanvas::AddBox(float Width, float Height, float Length)
 //	}
 //}
 
-void ZECanvas::AddSphere(float radius,unsigned int intersects,unsigned int slices,bool reverse)
+void ZECanvas::AddSphere(float Radius, unsigned int Intersects, unsigned int Slices, bool Reverse)
 {
-	float normalDir = reverse ? -1.0f : 1.0f;
+	#pragma message "ZECanvas::AddSphere Baştan yazılacak."
+
+	float normalDir = Reverse ? -1.0f : 1.0f;
 	ZEVector3 currentVertex;
 	ZEVector3 normalizedVert;
 	ZEVector2 currentTexCoord;
 
-	slices += 2;
-	float unitYangle = ZE_PI / (float) slices;
-	float unitXangle = 2 * ZE_PI / (float) intersects;
-	float unitXText = 1 / (float) intersects;
-	float unitYText = 1 / (float) slices;
+	Slices += 2;
+	float unitYangle = ZE_PI / (float) Slices;
+	float unitXangle = 2 * ZE_PI / (float) Intersects;
+	float unitXText = 1 / (float) Intersects;
+	float unitYText = 1 / (float) Slices;
 
 	int N = 0;
-	ZESimpleVertex* Verts =  Vertices.MassAdd(intersects * (slices) * 6);
+	ZESimpleVertex* Verts =  Vertices.MassAdd(Intersects * Slices * 6);
 
 	float currentYCos; // circle y pos
-	float prevYCos = cos(0.0);
+	float prevYCos = cosf(0.0);
 	float currentYSin; // circle radius
-	float prevYSin = sin(0.0);
+	float prevYSin = sinf(0.0);
 	float currentXCos; // circle x pos
 	float prevXCos;
 	float currentXSin; // circle z pos
@@ -499,15 +501,15 @@ void ZECanvas::AddSphere(float radius,unsigned int intersects,unsigned int slice
 	Y = 1;
 	while (1)
 	{
-		if (Y == slices + 1) break;
+		if (Y == Slices + 1) break;
 
 		currentYCos = cos(unitYangle * Y);
 		currentYSin = sin(unitYangle * Y);
 		prevXCos = cos(-unitXangle);
 		prevXSin = sin(-unitXangle);
 
-		currentCircleRadius = currentYSin * radius;
-		prevCircleRadius = prevYSin * radius;
+		currentCircleRadius = currentYSin * Radius;
+		prevCircleRadius = prevYSin * Radius;
 
 		currentTextCoordY = unitYText * Y;
 		prevTextCoordX = 1 - unitXText;
@@ -515,7 +517,7 @@ void ZECanvas::AddSphere(float radius,unsigned int intersects,unsigned int slice
 		X = 0;
 		while (1)
 		{
-			if (X == intersects) break;
+			if (X == Intersects) break;
 
 			currentXCos = cos(unitXangle * X);
 			currentXSin = sin(unitXangle * X);
@@ -530,7 +532,7 @@ void ZECanvas::AddSphere(float radius,unsigned int intersects,unsigned int slice
 			//						topleft[3] + bottomright[4] + topright[5] 
 
 			// top left
-			currentVertex = ZEVector3(prevXCos * prevCircleRadius,prevYCos * radius,prevXSin * prevCircleRadius);
+			currentVertex = ZEVector3(prevXCos * prevCircleRadius,prevYCos * Radius,prevXSin * prevCircleRadius);
 			ZEVector3::Normalize(normalizedVert,currentVertex);
 			ZEVector3::Scale(normalizedVert,normalizedVert,normalDir);
 			currentTexCoord = ZEVector2(prevTextCoordX,prevTextCoordY);
@@ -538,26 +540,26 @@ void ZECanvas::AddSphere(float radius,unsigned int intersects,unsigned int slice
 			Verts[N+3] = Verts[N];
 
 			// bottom left
-			currentVertex = ZEVector3(prevXCos * currentCircleRadius,currentYCos * radius,prevXSin * currentCircleRadius);
+			currentVertex = ZEVector3(prevXCos * currentCircleRadius,currentYCos * Radius,prevXSin * currentCircleRadius);
 			ZEVector3::Normalize(normalizedVert,currentVertex);
 			ZEVector3::Scale(normalizedVert,normalizedVert,normalDir);
 			currentTexCoord = ZEVector2(prevTextCoordX,currentTextCoordY);
-			ZECANVAS_ADDVERTEX(Verts[N + (reverse ? 1 : 2)], Transformation, currentVertex, normalizedVert, currentTexCoord);
+			ZECANVAS_ADDVERTEX(Verts[N + (Reverse ? 1 : 2)], Transformation, currentVertex, normalizedVert, currentTexCoord);
 
 			// bottom right
-			currentVertex = ZEVector3(currentXCos * currentCircleRadius,currentYCos * radius,currentXSin * currentCircleRadius);
+			currentVertex = ZEVector3(currentXCos * currentCircleRadius,currentYCos * Radius,currentXSin * currentCircleRadius);
 			ZEVector3::Normalize(normalizedVert,currentVertex);
 			ZEVector3::Scale(normalizedVert,normalizedVert,normalDir);
 			currentTexCoord = ZEVector2(currentTextCoordX,currentTextCoordY);
-			ZECANVAS_ADDVERTEX(Verts[N + (reverse ? 2 : 1)], Transformation, currentVertex, normalizedVert, currentTexCoord);
-			Verts[N+(reverse ? 4 : 5)] = Verts[N+(reverse ? 2 : 1)];
+			ZECANVAS_ADDVERTEX(Verts[N + (Reverse ? 2 : 1)], Transformation, currentVertex, normalizedVert, currentTexCoord);
+			Verts[N+(Reverse ? 4 : 5)] = Verts[N+(Reverse ? 2 : 1)];
 
 			// top right
-			currentVertex = ZEVector3(currentXCos * prevCircleRadius,prevYCos * radius,currentXSin * prevCircleRadius);
+			currentVertex = ZEVector3(currentXCos * prevCircleRadius,prevYCos * Radius,currentXSin * prevCircleRadius);
 			ZEVector3::Normalize(normalizedVert,currentVertex);
 			ZEVector3::Scale(normalizedVert,normalizedVert,normalDir);
 			currentTexCoord = ZEVector2(currentTextCoordX,prevTextCoordY);
-			ZECANVAS_ADDVERTEX(Verts[N + (reverse ? 5 : 4)], Transformation, currentVertex, normalizedVert, currentTexCoord);
+			ZECANVAS_ADDVERTEX(Verts[N + (Reverse ? 5 : 4)], Transformation, currentVertex, normalizedVert, currentTexCoord);
 
 			X++;
 			prevXCos = currentXCos;

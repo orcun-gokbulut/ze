@@ -67,9 +67,9 @@ class ZECanvas : public ZEArrayVertexBuffer<ZESimpleVertex>
 		void							AddCircle(float Radious, unsigned int Segments);
 
 		void							AddBox(float Width, float Height, float Length);
-		void							AddSphere(float radius,unsigned int intersects,unsigned int slices,bool reverse = false);
+		void							AddSphere(float Radius,unsigned int Intersects, unsigned int Slices, bool Reverse = false);
 		void							AddQuad(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3);
-		void							AddDisc(float Radious, unsigned int Segments);
+		void							AddDisc(float Radius, unsigned int Segments);
 		void							AddPyramid(float Width, float Height, float Length);
 		void							AddPlane(float Width, float Length);
 

@@ -126,7 +126,7 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 		for (int I = 0; I < 4; I++)
 			if (Input.BoneWeights[I] > 0.0f)
 			{
-				Position = mul(Input.Position, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
+				Position += mul(Input.Position, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
 				Normal += mul(Input.Normal, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
 
 				#ifdef ZESHADER_NORMALMAP

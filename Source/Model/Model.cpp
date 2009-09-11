@@ -159,7 +159,7 @@ ZEArray<ZEModelBone>& ZEModel::GetBones()
 
 const ZEArray<ZEMatrix4x4>& ZEModel::GetBoneTransforms()
 {
-	if (UpdateBoneTransforms_)
+	//if (UpdateBoneTransforms_)
 	{
 		for (size_t I = 0; I < Bones.GetCount(); I++)
 			BoneTransforms[I] = Bones[I].GetVertexTransform();

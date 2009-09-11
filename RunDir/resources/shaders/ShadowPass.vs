@@ -101,7 +101,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 		Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		for (int I = 0; I < 4; I++)
 			if (Input.BoneWeights[I] > 0.0f)
-				Position = mul(Input.Position, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
+				Position += mul(Input.Position, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
 	#else
 		Position = Input.Position;
 	#endif

@@ -141,9 +141,7 @@ const ZEMatrix4x4& ZEModelBone::GetVertexTransform()
 {
 //	if (UpdateVertexTransform)
 	{
-		ZEMatrix4x4::Multiply(VertexTransform, BoneResource->InverseTransform, GetModelTransform());
-		//VertexTransform = GetModelTransform();
-		//ZEMatrix4x4::CreateIdentity(VertexTransform);
+		ZEMatrix4x4::Multiply(VertexTransform, BoneResource->InverseTransform, GetWorldTransform());
 		UpdateVertexTransform = false;
 	}
 
@@ -159,7 +157,6 @@ const ZEMatrix4x4& ZEModelBone::GetRelativeTransform()
 		ZEMatrix4x4::CreateRotation(Temp2, RelativeRotation);
 		ZEMatrix4x4::Multiply(RelativeTransform, Temp2, Temp1);
 
-		//ZEMatrix4x4::CreateOffset(Temp1, RelativePosition, RelativeRotation);
 		UpdateRelativeTransform = false;
 	}
 	return RelativeTransform;
