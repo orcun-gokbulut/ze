@@ -723,6 +723,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Core\Property.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Core\Resource.cpp"
 				>
 			</File>
