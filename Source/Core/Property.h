@@ -37,6 +37,23 @@ ZEPropertContainer
 
 ZEProperty(Type, GetFunction, SetFunction) Plus;
 
+ZE_META()
+	ZE_PROPERTIES(ZEClass) 
+		ZE_PROPERTY()
+		ZE_ENUM_PROPERTY_START("Name", GetFunction, SetFunction, Description)
+			ZE_ENUM_ELEMENT("Name", Value);
+		ZE_ENUM_PROPERTY
+ZE_META_PROPERTIES()
+
+enum ZEPropertySemantic
+{
+	ZE_PS_POSITION,
+	ZE_PS_ROTATION,
+	ZE_PS_DIRECTION,
+	ZE_PS_SCALE,
+	ZE_PS_FILENAME,
+	ZE_PS_COLOR,
+};
 
 enum ZEPropertyAccess
 {
@@ -47,80 +64,82 @@ enum ZEPropertyAccess
 
 class ZEPropertyDescription
 {
-	const char*					Name;
-	ZEVariantType				Type;
-	ZEPropertyAccess			Access;
+	const char*									Name;
+	ZEVariantType								Type;
+	ZEPropertyAccess							Access;
+	const char*									Description;
+	ZEPropertySemantic							Semantic;
+	void*										SemanticProperties;
+	bool										Hidden;
+	size_t										EnumuratorCount;
+	ZEPropertyEnumurator*						Enumurators;
 };
 
 class ZEMethodDescription
 {
-	const char*					Name;
-	size_t						ParameterCount;
-	const ZEVariantType* const	Parameters;
-	ZEVariantType				ReturnType;
+	const char*									Name;
+	size_t										ParameterCount;
+	const ZEVariantType* const					Parameters;
+	ZEVariantType								ReturnType;
 };
 
-class ZEClassDescription
-{
-	const char*					Name;
-	ZEClassDescription**		ParentClasses;
-}0;
-
-class ZEClass
-{
-	public:
-		virtual ZEProperty*		GetClassName();
-		virtual ZEProperty*		GetParentClassName();
-
-};
+class ZEModel
 
 class ZEPropertyContainer
 {
 	public:
-		virtual ZEMethod*		GetMethods(size_t& Count);
-		virtual size_t			GetPropertyIndex(const char* PropertyName);
-		virtual bool			CallMethod(const char* Name, ZEArray<ZEVariant&> Parameters, ZEVariant& ReturnValue);
+		virtual ZEMethod*						GetMethods(size_t& Count);
+		virtual size_t							GetPropertyIndex(const char* PropertyName);
+		virtual bool							CallMethod(const char* Name, ZEArray<ZEVariant&> Parameters, ZEVariant& ReturnValue);
 
-		virtual ZEProperty*		GetProperties(size_t& Count);
-		virtual size_t			GetPropertyIndex(const char* PropertyName);
-		virtual bool			SetProperty(const char* Name, const ZEVariant& Value);
-		virtual bool			GetProperty(const char* Name, ZEVariant& Value);
+		virtual const ZEPropertyDescription*	GetProperties(size_t& Count);
+
+		virtual size_t							GetPropertyId(const char* PropertyName);
+		
+		virtual bool							GetProperty(size_t PropertyId);
+		virtual bool							SetProperty(const char* Name, const ZEVariant& Value);
+		virtual bool							SetPropertyController(void* Controller);
+		
+		virtual bool							GetProperty(size_t PropertyId);
+		virtual bool							GetProperty(const char* Name, ZEVariant& Value);
+		virtual bool							GetPropertyController(void* Controller);
 };
 
 class ZEPropertyKeyFrame
 {
 	public:
-		float							Time;
-		size_t							ElementIndex;
-		size_t							PropertyIndex;
-		ZEVariant						Value;
+		float									Time;
+		size_t									ElementIndex;
+		size_t									PropertyIndex;
+		ZEVariant								Value;
 };
 
 class ZEPropertyAnimations
 {
 	public:
-		size_t							FrameCount;
-		ZEArray<ZEPropertyKeyFrame>		KeyFrames;
+		size_t									FrameCount;
+		ZEArray<ZEPropertyKeyFrame>				KeyFrames;
 };
 
 class ZEPropertyContainerAnimation
 {
 	public:
-		ZEPropertyAnimation*			Animation;
-		float							BlendFactor;
-		int								Priority;
-		float							AnimationSpeed;
-		ZEArray<size_t>					AnimationMask;
-		bool 							Looping;
+		ZEPropertyAnimation*					Animation;
+		float									BlendFactor;
+		int										Priority;
+		float									AnimationSpeed;
+		ZEArray<size_t>							AnimationMask;
+		bool 									Looping;
 };
 
 class ZEAnimatedPropertyContainer : public ZEPropertyContainer
 {
 	public:
-		ZEArray<ZEPropertyAnimation>		Animations;
-		ZEArray<ZEPropertyAnimationTrack>	Tracks;
+		ZEArray<ZEPropertyAnimation>			Animations;
+		ZEArray<ZEPropertyAnimationTrack>		Tracks;
 
-		void								SetTracLoop(bool 
-		void								AdvanceAnimation(float ElapsedTime);
+		void									SetTrackLoop(bool Enabled);
+		bool									GetTrackLoop();
 
+		void									AdvanceAnimation(float ElapsedTime);
 };

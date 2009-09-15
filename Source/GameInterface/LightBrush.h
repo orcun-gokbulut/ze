@@ -63,7 +63,7 @@ class ZELightBrush : public ZEEntity
 		float								Range;
 		ZEVector3							Attenuation;
 		bool								CastsShadow;
-		ZETexture2DResource*					ProjectionTexture;
+		ZETexture2DResource*				ProjectionTexture;
 		ZETextureCubeResource*				CubeProjectionTexture;
 		float								ProjectionFOV;
 		float								ProjectionAspectRatio;
