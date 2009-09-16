@@ -115,25 +115,39 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		ZEScene* Scene = zeCore->GetGame()->GetScene();
 		Scene->LoadEnvironment("BoxMap.ZEMAP");
 		Scene->SetVisualDebugElements(ZE_VDE_NONE);
+		Scene->SetVisualDebugElements(ZE_VDE_ENTITY_ORIENTED_BOUNDINGBOX);
 
-		ZEModelBrush* ModelBrush = (ZEModelBrush*)zeCore->GetGame()->CreateEntityInstance("ZEModelBrush");
-		Scene->AddEntity(ModelBrush);
-		ModelBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
-		ModelBrush->SetPosition(ZEVector3(1.0f, 0.0f, 0.0f));
-		ModelBrush->SetModelFile("skin.zeModel");
-		ModelBrush->GetModel()->GetMeshes()[0].SetLocalPosition(ZEVector3(2, 1, 3));
-		ModelBrush->GetModel()->GetMeshes()[0].SetLocalRotation(ZEQuaternion(ZE_PI_4, ZEVector3(1.0f, 0.0, 0.0)));
-		ModelBrush->GetModel()->SetAnimationLooping(true);
-		ModelBrush->GetModel()->SetAnimationSpeed(25.0f);
-		//ModelBrush->GetModel()->GetBones()[4].SetRelativeRotation(ZEQuaternion(ZE_PI_4, ZEVector3(0.0f, 1.0f, 0.0f)));
-		ModelBrush->GetModel()->PlayAnimationByName("test",0, 100);
-		//ModelBrush->GetModel()->SetAnimationFrame(50);
-		//ModelBrush->GetModel()->PauseAnimation();
+		//show axis
+		ZECanvasBrush* axis = new ZECanvasBrush();
+		axis->PrimitiveType = ZE_RLPT_LINE;
+		axis->Canvas.Clean();
+		axis->Canvas.AddLine(ZEVector3::Zero, ZEVector3(2,0,0));
+		axis->Canvas.AddLine(ZEVector3::Zero, ZEVector3::UnitY);
+		axis->Canvas.AddLine(ZEVector3::Zero, ZEVector3::UnitZ);
+		axis->UpdateCanvas();
+		axis->Material.SetZero();
+		axis->Material.LightningEnabled = false;
+		axis->Material.AmbientColor = ZEVector3(0.0f, 1.0f, 0.0f);
+		axis->Material.SetShaderComponents(0);
+		Scene->AddEntity(axis);
+
 		//boxes
-		for (int i=0;i<5;i++)
+		for (int i=0;i<4;i++)
 		{
-			boxes[i] = new box(Scene,"textures/greek_roman0001.tga",10,ZEVector3(0,0+i*1,0),ZEQuaternion(), ZEVector3(0.5,0.5,0.5), false, false, all, 0.25, 0.25);
+			//boxes[i] = new box(Scene,"textures/greek_roman0001.tga",10,ZEVector3(0,0+i*1,0),ZEQuaternion(), ZEVector3(0.5,0.5,0.5), false, false, all, 0.25, 0.25);
 		}
+
+		ZEModelBrush* mdl = new ZEModelBrush();
+		mdl->Initialize();
+		//mdl->SetModelFile("test.ZEMODEL");
+		//mdl->SetModelFile("Primitive_Cube.ZEMODEL");
+		//mdl->SetModelFile("Primitive_Sphere.ZEMODEL");
+		//mdl->SetModelFile("Primitive_Capsule.ZEMODEL");
+		mdl->SetModelFile("Convex_Cylinder.ZEMODEL");
+		//mdl->SetModelFile("TriMesh_Teapot.ZEMODEL");
+		//mdl->SetModelFile("Combine_Convex_Primitive.ZEMODEL");
+		//mdl->SetModelFile("2_Sphere_BlueBig.ZEMODEL");
+		Scene->AddEntity(mdl);
 
 		//character
 		ccapsule = new ZECanvasBrush();

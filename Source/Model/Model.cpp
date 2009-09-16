@@ -536,6 +536,7 @@ void ZEModel::Tick(float ElapsedTime)
 	if (AnimationState == ZE_MAS_PLAYING)
 	{
 		if (AnimationFrame >= AnimationEndFrame)
+		{
 			if (AnimationLooping)
 				AnimationFrame = AnimationStartFrame + fmodf(AnimationFrame, AnimationEndFrame - AnimationStartFrame);
 			else
@@ -543,6 +544,7 @@ void ZEModel::Tick(float ElapsedTime)
 				AnimationFrame = AnimationEndFrame;
 				AnimationState = ZE_MAS_STOPPED;
 			}
+		}
 			
 		float Interpolation = AnimationFrame - floorf(AnimationFrame);
 
@@ -596,15 +598,15 @@ void ZEModel::Tick(float ElapsedTime)
 		
 		for (int i=0;i<Meshes.GetCount();i++)
 		{
-			//Meshes[i].SetLocalPosition(Meshes[i].GetPhysicalBody()->GetPosition());
-			//Meshes[i].SetLocalRotation(Meshes[i].GetPhysicalBody()->GetOrientation());
+			Meshes[i].SetLocalPosition(Meshes[i].GetPhysicalBody()->GetPosition());
+			Meshes[i].SetLocalRotation(Meshes[i].GetPhysicalBody()->GetOrientation());
 
-			Meshes[i].SetLocalPosition(ZEVector3::Zero);
-			ZEQuaternion q;
-			static float rrr;
-			rrr += ZE_PI * ElapsedTime;
-			ZEQuaternion::Create(q, rrr, ZEVector3::UnitX);
-			Meshes[i].SetLocalRotation(q);
+			//Meshes[i].SetLocalPosition(ZEVector3::Zero);
+			//ZEQuaternion q;
+			//static float rrr;
+			//rrr += ZE_PI * ElapsedTime;
+			//ZEQuaternion::Create(q, rrr, ZEVector3::UnitX);
+			//Meshes[i].SetLocalRotation(q);
 		}
 
 		//this->SetWorldPosition(ZEVector3::Zero);
@@ -612,12 +614,11 @@ void ZEModel::Tick(float ElapsedTime)
 		/*this->SetWorldRotation(ZEQuaternion::Identity);
 		this->SetLocalRotation(ZEQuaternion::Identity);
 
-		/*for (int i=0;i<Meshes.GetCount();i++)
-		{
-			Meshes[i].SetLocalPosition(ZEVector3(0,0,0));
-			Meshes[i].SetLocalRotation(Meshes[i].GetPhysicalBody()->GetOrientation());
-		}*/
-/*
+		//for (int i=0;i<Meshes.GetCount();i++)
+		//{
+		//	Meshes[i].SetLocalPosition(ZEVector3(0,0,0));
+		//	Meshes[i].SetLocalRotation(Meshes[i].GetPhysicalBody()->GetOrientation());
+		//}
 		//ZEVector3 ewrt = Meshes[0].GetPhysicalBody()->GetPosition();
 		//this->SetWorldPosition(Meshes[0].GetPhysicalBody()->GetPosition());
 		//this->SetWorldRotation(Meshes[0].GetPhysicalBody()->GetOrientation());
@@ -628,7 +629,6 @@ void ZEModel::Tick(float ElapsedTime)
 		//this->SetLocalPosition(ZEVector3::Zero);
 	}*/
 }
-
 
 ZEModel::ZEModel()
 {
