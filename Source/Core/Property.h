@@ -72,7 +72,10 @@ class ZEPropertyDescription
 	void*										SemanticProperties;
 	bool										Hidden;
 	size_t										EnumuratorCount;
+
 	ZEPropertyEnumurator*						Enumurators;
+
+	propert Enumutator (SetEnumrator, GetEnumurator, true, "Enumurations in properties")
 };
 
 class ZEMethodDescription
@@ -143,3 +146,14 @@ class ZEAnimatedPropertyContainer : public ZEPropertyContainer
 
 		void									AdvanceAnimation(float ElapsedTime);
 };
+
+ZE_META_PROCESSOR_START
+	ZE_CLASS_DESCRIPTION_START
+		ClassName = ""
+		ClassDescription = ""
+		ParentType
+	ZE_CLASS_DESCRIPTION_END
+	ZE_CLASS_PROPERTIES_START
+		"Position", GetPosition, SetPosition, "De
+	ZE_CLASS_PROPERTIES_END
+ZE_META_PROCESSOR_END
