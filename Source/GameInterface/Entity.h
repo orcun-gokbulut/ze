@@ -212,7 +212,7 @@ class ZEEntityDescription
 		virtual const char*					GetEditorDescription();
 };
 
-ZEPropertable class ZEEntity 
+class ZEEntity 
 {
 	private: 
 		char								Name[ZE_MAX_NAME_SIZE];
@@ -232,7 +232,7 @@ ZEPropertable class ZEEntity
 		ZEAABoundingBox						LocalBoundingBox;
 		ZEAABoundingBox						WorldBoundingBox;
 		ZEBoundingSphere					WorldBoundingSphere;
-		Property							Enumurator(Get, Set);
+
 	protected:
 		void								SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
 		
@@ -301,13 +301,8 @@ ZEPropertable class ZEEntity
 		
 		void								UpdateBoundingVolumes();
 		
-		virtual size_t						GetPropertyId(const char* PropertyName);
-		
-		virtual bool						SetProperty(size_t PropertyId, const ZEVariant& Value);
-		virtual bool						SetProperty(const char* PropertyName, const ZEVariant& Value);
-
-		virtual bool						GetProperty(size_t PropertyId, ZEVariant& Value);	
-		virtual bool						GetProperty(const char* PropertyName, ZEVariant& Value);
+		virtual bool						GetAttribute(const char* AttributeName, ZEVariant& Value);
+		virtual bool						SetAttribute(const char* AttributeName, const ZEVariant& Value);
 
 		virtual bool						Serialize(ZESerializer* Serializer);
 		virtual bool						Unserialize(ZEUnserializer* Unserializer);
