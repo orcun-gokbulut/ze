@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;FREEIMAGE_LIB;ZEDEBUG_ENABLED;ZEDEBUG_PERFHUD;ZEDEBUG_BREAKONERROR"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;FREEIMAGE_LIB;ZEDEBUG_ENABLED;ZEDEBUG_BREAKONERROR;ZEDEBUG_PERFHUD"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -381,6 +381,16 @@
 			<File
 				RelativePath=".\Source\Graphics\FixedMaterial.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Zinek Engine Post Processor"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\Graphics\GraphicsModule.cpp"
@@ -1320,6 +1330,42 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEMath\ZEMath_.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Meta"
+			>
+			<File
+				RelativePath=".\Source\Meta\Class.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Meta\Class.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Meta\PostProcessor.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Meta\PostProcessor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Meta\Property.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Meta\Property.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Meta\Provider.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Meta\Provider.h"
 				>
 			</File>
 		</Filter>

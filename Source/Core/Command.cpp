@@ -163,8 +163,8 @@ bool ZECommandManager::Callback_ListSections(ZECommand* Command, const ZECommand
 		Count = Sections.GetCount();
 	}
 	else if (Params->GetCount() == 2 && 
-			 Params->GetItem(0).GetType() == ZEVARIANTTYPE_INTEGER && 
-			 Params->GetItem(1).GetType() == ZEVARIANTTYPE_INTEGER)
+			 Params->GetItem(0).GetType() == ZE_VRT_INTEGER && 
+			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER)
 	{
 		Index = Params->GetItem(0).GetInteger();
 		Count = Params->GetItem(1).GetInteger();
@@ -194,16 +194,16 @@ bool ZECommandManager::Callback_ListCommands(ZECommand* Command, const ZECommand
 	ZECommandSection* Sec;
 
 	if (Params->GetCount() == 1 &&
-		Params->GetItem(0).GetType() == ZEVARIANTTYPE_STRING)
+		Params->GetItem(0).GetType() == ZE_VRT_STRING)
 	{
 		Sec = GetCommandSection(Params->GetItem(0).GetString());
 		Index = 0;
 		Count = -1;
 	}
 	else if (Params->GetCount() == 1 &&
-			 Params->GetItem(0).GetType() == ZEVARIANTTYPE_STRING &&
-			 Params->GetItem(1).GetType() == ZEVARIANTTYPE_INTEGER &&
-			 Params->GetItem(2).GetType() == ZEVARIANTTYPE_INTEGER)
+			 Params->GetItem(0).GetType() == ZE_VRT_STRING &&
+			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER &&
+			 Params->GetItem(2).GetType() == ZE_VRT_INTEGER)
 	{
 		Sec = GetCommandSection(Params->GetItem(0).GetString());
 		Index = Params->GetItem(1).GetInteger();

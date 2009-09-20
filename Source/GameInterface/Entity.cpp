@@ -104,13 +104,13 @@ const ZEEntityAttribute* ZEEntityDescription::GetAttributes(size_t* Count)
 
 	static ZEEntityAttribute Attributes[] = 
 	{
-		{"EntityId", ZEVARIANTTYPE_INTEGER, ZE_EAS_ENTITY, ZE_EAF_READONLY, 0, 0, NULL, NULL, NULL, "Unique number that indentifes entity"},
-		{"EntityName", ZEVARIANTTYPE_STRING, ZE_EAS_NONE, ZE_EAF_UNIQUE, "", 0, NULL, NULL, NULL, "Name of the entity"},
-		{"Position", ZEVARIANTTYPE_VECTOR3,  ZE_EAS_NONE, ZE_EAF_NONE, ZEVector3(0.0f, 0.0f, 0.0f), 0, NULL, NULL, NULL, "World position of the entity"},
-		{"Rotation", ZEVARIANTTYPE_QUATERNION,  ZE_EAS_NONE, ZE_EAF_NONE, ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 0, NULL, NULL, NULL, "World rotation of the entity"},
-		{"Scale", ZEVARIANTTYPE_VECTOR3,  ZE_EAS_NONE, ZE_EAF_NONE, ZEVector3(1.0f, 1.0f, 1.0f), 0, NULL, NULL, NULL, "World scale of the entity"},
-		{"Enabled", ZEVARIANTTYPE_BOOLEAN,  ZE_EAS_NONE, ZE_EAF_NONE, false, 0, NULL, NULL, NULL, "If entity is disabled it will not recive Ticks so it will not interact with player. However this property does not affect entity physical interactions. A entity can be disabled but physically active."},
-		{"Visible", ZEVARIANTTYPE_BOOLEAN,  ZE_EAS_NONE, ZE_EAF_NONE, false, 0, NULL, NULL, NULL, "Is entity visible"},
+		{"EntityId", ZE_VRT_INTEGER, ZE_EAS_ENTITY, ZE_EAF_READONLY, 0, 0, NULL, NULL, NULL, "Unique number that indentifes entity"},
+		{"EntityName", ZE_VRT_STRING, ZE_EAS_NONE, ZE_EAF_UNIQUE, "", 0, NULL, NULL, NULL, "Name of the entity"},
+		{"Position", ZE_VRT_VECTOR3,  ZE_EAS_NONE, ZE_EAF_NONE, ZEVector3(0.0f, 0.0f, 0.0f), 0, NULL, NULL, NULL, "World position of the entity"},
+		{"Rotation", ZE_VRT_QUATERNION,  ZE_EAS_NONE, ZE_EAF_NONE, ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 0, NULL, NULL, NULL, "World rotation of the entity"},
+		{"Scale", ZE_VRT_VECTOR3,  ZE_EAS_NONE, ZE_EAF_NONE, ZEVector3(1.0f, 1.0f, 1.0f), 0, NULL, NULL, NULL, "World scale of the entity"},
+		{"Enabled", ZE_VRT_BOOLEAN,  ZE_EAS_NONE, ZE_EAF_NONE, false, 0, NULL, NULL, NULL, "If entity is disabled it will not recive Ticks so it will not interact with player. However this property does not affect entity physical interactions. A entity can be disabled but physically active."},
+		{"Visible", ZE_VRT_BOOLEAN,  ZE_EAS_NONE, ZE_EAF_NONE, false, 0, NULL, NULL, NULL, "Is entity visible"},
 	};
 
 	*Count = 7;

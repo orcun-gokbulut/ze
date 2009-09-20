@@ -43,6 +43,7 @@
 #include "Texture.h"
 #include "ZEDS/Array.h"
 #include "ZEDS/Variant.h"
+#include "Meta/Class.h"
 
 enum ZETextureFilterMode
 {
@@ -77,27 +78,11 @@ enum ZEMaterialOpacityComponent
 	ZE_MOC_OPACITYMAP			= 2,
 };
 
-struct ZEMaterialAnimationKey
-{
-	unsigned int							PropertyIndex;
-	ZEVariant								Value;
-};
-
-struct ZEMaterialAnimationFrame
-{
-
-	ZEArray<ZEMaterialAnimationKey>			Keys;
-};
-
-struct ZEMaterialAnimation
-{
-
-	ZEArray<ZEMaterialAnimationFrame>		Frames;
-	char									Name[ZE_MAX_NAME_SIZE];
-};
+ZE_META_CLASS_DESCRIPTION(ZEFixedMaterial)
 
 class ZEFixedMaterial : public ZEMaterial
 {
+	ZE_META_CLASS()
 	protected:
 		unsigned int					OldMaterialComponents;
 		unsigned int					MaterialComponents;
@@ -217,186 +202,317 @@ class ZEFixedMaterial : public ZEMaterial
 	public:
 		// Material Options
 		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided();
+		bool							GetTwoSided() const;
 		void							SetLightningEnabled(bool Enable);
-		bool							GetLightningEnabled();
+		bool							GetLightningEnabled() const;
 		void							SetWireframe(bool Enable);
-		bool							GetWireframe();
+		bool							GetWireframe() const;
 		void							SetTransparancyMode(ZEMaterialTransparancyMode Mode);
-		ZEMaterialTransparancyMode		GetTransparancyMode();
+		ZEMaterialTransparancyMode		GetTransparancyMode() const;
 		void							SetTransparancyCullLimit(unsigned int Limit);
-		unsigned int					GetTransparancyCullLimit();
+		unsigned int					GetTransparancyCullLimit() const;
 		void							SetRecivesShadow(bool Enable);
-		bool							GetRecivesShadow();
+		bool							GetRecivesShadow() const;
 
 		// Ambient
 		void							SetAmbientEnabled(bool Enabled);
-		bool							GetAmbientEnabled();
+		bool							GetAmbientEnabled() const;
 		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor();
+		float							GetAmbientFactor() const;
 		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor();
+		const ZEVector3&				GetAmbientColor() const;
 
 		// Diffuse
 		void							SetDiffuseEnabled(bool Enabled);
-		bool							GetDiffuseEnabled();
+		bool							GetDiffuseEnabled() const;
 		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor();
+		const ZEVector3&				GetDiffuseColor() const;
 		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor();
+		float							GetDiffuseFactor() const;
 		void							SetDiffuseMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetDiffuseMap();
+		const ZETexture2D*				GetDiffuseMap() const;
 		void							SetDiffuseMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDiffuseMapAddressModeU();
+		ZETextureAddressMode			GetDiffuseMapAddressModeU() const;
 		void							SetDiffuseMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDiffuseMapAddressModeV();
+		ZETextureAddressMode			GetDiffuseMapAddressModeV() const;
 
 		// Specular
 		void							SetSpecularEnabled(bool Enabled);
-		bool							GetSpecularEnabled();
+		bool							GetSpecularEnabled() const;
 		void							SetSpecularFactor(float Factor);
-		float							GetSpecularFactor();
+		float							GetSpecularFactor() const;
 		void							SetSpecularShininess(float Shininess);
-		float							GetSpecularShininess();
+		float							GetSpecularShininess() const;
 		void							SetSpecularColor(const ZEVector3& Color);
-		const ZEVector3&				GetSpecularColor();
+		const ZEVector3&				GetSpecularColor() const;
 		void							SetSpecularMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetSpecularMap();
+		const ZETexture2D*				GetSpecularMap() const;
 		void							SetSpecularMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetSpecularMapAddressModeU();
+		ZETextureAddressMode			GetSpecularMapAddressModeU() const;
 		void							SetSpecularMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetSpecularMapAddressModeV();
+		ZETextureAddressMode			GetSpecularMapAddressModeV() const;
 
 		// Emmisive
 		void							SetEmmisiveEnabled(bool Enabled);
-		bool							GetEmmisiveEnabled();
+		bool							GetEmmisiveEnabled() const;
 		void							SetEmmisiveFactor(float Factor);
-		float							GetEmmisiveFactor();
+		float							GetEmmisiveFactor() const;
 		void							SetEmmisiveColor(const ZEVector3& Color);
-		const ZEVector3&				GetEmmisiveColor();
+		const ZEVector3&				GetEmmisiveColor() const;
 		void							SetEmmisiveMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetEmmisiveMap();
+		const ZETexture2D*				GetEmmisiveMap() const;
 		void							SetEmmisiveMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetEmmisiveMapAddressModeU();
+		ZETextureAddressMode			GetEmmisiveMapAddressModeU() const;
 		void							SetEmmisiveMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetEmmisiveMapAddressModeV();
+		ZETextureAddressMode			GetEmmisiveMapAddressModeV() const;
 
 		// Normal Map
 		void							SetNormalMapEnabled(bool Enabled);
-		bool							GetNormalMapEnabled();
+		bool							GetNormalMapEnabled() const;
 		void							SetNormalMap(const ZETexture2D*	Texture);
-		const ZETexture2D*				GetNormalMap();
+		const ZETexture2D*				GetNormalMap() const;
 		void							SetNormalMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetNormalMapAddressModeU();
+		ZETextureAddressMode			GetNormalMapAddressModeU() const;
 		void							SetNormalMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetNormalMapAddressModeV();
+		ZETextureAddressMode			GetNormalMapAddressModeV() const;
 
 		// ParallaxMap
 		void							SetParallaxMapEnabled(bool Enabled);
-		bool							GetParallaxMapEnabled();
+		bool							GetParallaxMapEnabled() const;
 		void							SetParallaxMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetParallaxMap();
+		const ZETexture2D*				GetParallaxMap() const;
 		void							SetParallaxMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetParallaxMapAddressModeU();
+		ZETextureAddressMode			GetParallaxMapAddressModeU() const;
 		void							SetParallaxMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetParallaxMapAddressModeV();
+		ZETextureAddressMode			GetParallaxMapAddressModeV() const;
 
 		// Opacity
 		void							SetOpacityEnabled(bool Enabled);
-		bool							GetOpacityEnabled();
+		bool							GetOpacityEnabled() const;
 		void							SetOpacity(float Value);
-		float							GetOpacity();
+		float							GetOpacity() const;
 		void							SetOpacityComponent(ZEMaterialOpacityComponent Component);
-		ZEMaterialOpacityComponent		GetOpacityComponent();
+		ZEMaterialOpacityComponent		GetOpacityComponent() const;
 		void							SetOpacityMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetOpacityMap();
+		const ZETexture2D*				GetOpacityMap() const;
 		void							SetOpacityMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetOpacityMapAddressModeU();
+		ZETextureAddressMode			GetOpacityMapAddressModeU() const;
 		void							SetOpacityMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetOpacityMapAddressModeV();
+		ZETextureAddressMode			GetOpacityMapAddressModeV() const;
 
 		// Reflection
 		void							SetReflectionEnabled(bool Enabled);
-		bool							GetReflectionEnabled();
+		bool							GetReflectionEnabled() const;
 		void							SetReflectionFactor(float Factor);
-		float							GetReflectionFactor();
+		float							GetReflectionFactor() const;
 		void							SetReflectionMap(const ZETextureCube* Texture);
-		const ZETextureCube*			GetReflectionMap();
+		const ZETextureCube*			GetReflectionMap() const;
 		void							SetReflectionMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetReflectionMapAddressModeU();
+		ZETextureAddressMode			GetReflectionMapAddressModeU() const;
 		void							SetReflectionMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetReflectionMapAddressModeV();
+		ZETextureAddressMode			GetReflectionMapAddressModeV() const;
 		void							SetReflectionMapAddressModeW(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetReflectionMapAddressModeW();
+		ZETextureAddressMode			GetReflectionMapAddressModeW() const;
 
 		// Refraction
 		void							SetRefractionEnabled(bool Enabled);
-		bool							GetRefractionEnabled();
+		bool							GetRefractionEnabled() const;
 		void							SetRefractionIndex(float Index);
-		float							GetRefractionIndex();
+		float							GetRefractionIndex() const;
 		void							SetRefractionFactor(float Factor);
-		float							GetRefractionFactor();
+		float							GetRefractionFactor() const;
 		void							SetRefractionMap(const ZETextureCube* Texture);
-		const ZETextureCube*			GetRefractionMap();
+		const ZETextureCube*			GetRefractionMap() const;
 		void							SetRefractionMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetRefractionMapAddressModeU();
+		ZETextureAddressMode			GetRefractionMapAddressModeU() const;
 		void							SetRefractionMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetRefractionMapAddressModeV();
+		ZETextureAddressMode			GetRefractionMapAddressModeV() const;
 		void							SetRefractionMapAddressModeW(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetRefractionMapAddressModeW();
+		ZETextureAddressMode			GetRefractionMapAddressModeW() const;
 		// Detail Map
 		void							SetDetailMapEnabled(bool Enabled);
-		bool							GetDetailMapEnabled();
+		bool							GetDetailMapEnabled() const;
 		void							SetDetailMapUScale(float u);
-		float							GetDetailMapUScale();
+		float							GetDetailMapUScale() const;
 		void							SetDetailMapVScale(float v);
-		float							GetDetailMapVScale();
+		float							GetDetailMapVScale() const;
 		void							SetDetailDiffuseMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetDetailDiffuseMap();
+		const ZETexture2D*				GetDetailDiffuseMap() const;
 		void							SetDetailDiffuseMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDetailDiffuseMapAddressModeU();
+		ZETextureAddressMode			GetDetailDiffuseMapAddressModeU() const;
 		void							SetDetailDiffuseMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDetailDiffuseMapAddressModeV();
+		ZETextureAddressMode			GetDetailDiffuseMapAddressModeV() const;
 		void							SetDetailNormalMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetDetailNormalMap();
+		const ZETexture2D*				GetDetailNormalMap() const;
 		void							SetDetailNormalMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDetailNormalMapAddressModeU();
+		ZETextureAddressMode			GetDetailNormalMapAddressModeU() const;
 		void							SetDetailNormalMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDetailNormalMapAddressModeV();
+		ZETextureAddressMode			GetDetailNormalMapAddressModeV() const;
 
 		// LightMap/Ambient Occlusion Map
 		void							SetLightMapEnabled(bool Enabled);
-		bool							GetLightMapEnabled();
+		bool							GetLightMapEnabled() const;
 		void							SetLightMapFactor(float Factor);
-		float							GetLightMapFactor();
+		float							GetLightMapFactor() const;
 		void							SetLightMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetLightMap();
+		const ZETexture2D*				GetLightMap() const;
 		void							SetLightMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetLightMapAddressModeU();
+		ZETextureAddressMode			GetLightMapAddressModeU() const;
 		void							SetLightMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetLightMapAddressModeV();
+		ZETextureAddressMode			GetLightMapAddressModeV() const;
 
 		// Distortion
 		void							SetDistortionEnabled(bool Enabled);
-		bool							GetDistortionEnabled();
+		bool							GetDistortionEnabled() const;
 		void							SetDistortionFactor(float Factor);
-		float							GetDistortionFactor();
+		float							GetDistortionFactor() const;
 		void							SetDistortionMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetDistortionMap();
+		const ZETexture2D*				GetDistortionMap() const;
 		void							SetDistortionMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDistortionMapAddressModeU();
+		ZETextureAddressMode			GetDistortionMapAddressModeU() const;
 		void							SetDistortionMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDistortionMapAddressModeV();
+		ZETextureAddressMode			GetDistortionMapAddressModeV() const;
 
 		virtual void					SetZero();
 
-		void							PlayAnimation(ZEMaterialAnimation* Animation);
+		/*void							PlayAnimation(ZEMaterialAnimation* Animation);
 		void							PauseAnimation();
-		void							StopAnimation();
+		void							StopAnimation();*/
 
 		void							Tick(float ElapsedTime);
 
 		static ZEFixedMaterial*			CreateInstance();
 };
 
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEFixedMaterial">
+			<description>Material System</description>
+			<property name="TwoSided"					type="boolean"			autogetset="yes"/>
+			<property name="LightningEnabled"			type="boolean"			autogetset="yes"/>
+			<property name="Wireframe"					type="boolean"			autogetset="yes"/>
+			<property name="TransparancyMode"			type="integer"			autogetset="yes"/>
+			<property name="TransparancyCullLimit"		type="integer"			autogetset="yes"/>
+			<property name="RecivesShadow"				type="boolean"			autogetset="yes"/>
+			  
+			<property name="AmbientEnabled"				type="boolean"			autogetset="yes"/>
+			<property name="AmbientFactor"				type="float"			autogetset="yes"/>
+			<property name="AmbientColor"				type="ZEVector3"		autogetset="yes"/>
+			
+			<property name="DiffuseEnabled"				type="boolean"			autogetset="yes"/>
+			<property name="DiffuseColor"				type="ZEVector3"		autogetset="yes"/>
+			<property name="DiffuseFactor"				type="float"			autogetset="yes"/>
+			<property name="DiffuseMap"					type="string"			autogetset="yes"/>
+
+			<property name="SpecularEnabled"			type="boolean"			autogetset="yes"/>
+			<property name="SpecularFactor"				type="float"			autogetset="yes"/>
+			<property name="SpecularShininess"			type="float"			autogetset="yes"/>
+			<property name="SpecularColor"				type="ZEVector3"		autogetset="yes"/>
+			<property name="SpecularMap"				type="string"			autogetset="yes"/>
+			<property name="SpecularMapAddressModeU"	type="integer"			autogetset="yes"/>
+			<property name="SpecularMapAddressModeV"	type="integer"			autogetset="yes"/>
+		
+			<property name="EmmisiveEnabled"			type="boolean"			autogetset="yes"/>
+			<property name="EmmisiveFactor"				type="float"			autogetset="yes"/>
+			<property name="EmmisiveColor"				type="ZEVector3"		autogetset="yes"/>
+			<property name="EmmisiveMap"				type="string"			autogetset="yes"/>
+			<property name="EmmisiveMapAddressModeU"	type="integer"			autogetset="yes"/>
+			<property name="EmmisiveMapAddressModeV"	type="integer"			autogetset="yes"/>
+
+			<property name="NormalMapEnabled"			type="boolean"			autogetset="yes"/>
+			<property name="NormalMapMap"				type="string"			autogetset="yes"/>
+			<property name="NormalMapAddressModeU"		type="integer"			autogetset="yes"/>
+			<property name="NormalMapAddressModeV"		type="integer"			autogetset="yes"/>
+
+			<property name="ParallaxMapEnabled"			type="boolean"			autogetset="yes"/>
+			<property name="ParallaxMap"				type="string"			autogetset="yes"/>
+			<property name="ParallaxMapAddressModeU"	type="integer"			autogetset="yes"/>
+			<property name="ParallaxMapAddressModeV"	type="integer"			autogetset="yes"/>
+
+			<property name="OpacityEnabled"				type="boolean"			autogetset="yes"/>
+			<property name="Opacity"					type="float"			autogetset="yes"/>
+			<property name="OpacityComponent"			type="integer"			autogetset="yes"/>
+			<property name="OpacityMap"					type="string"			autogetset="yes"/>
+			<property name="OpacityMapAddressModeU"		type="integer"			autogetset="yes"/>
+			<property name="OpacityMapAddressModeV"		type="integer"			autogetset="yes"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END()
+*/
+
+/*// Reflection
+void							SetReflectionEnabled(bool Enabled);
+bool							GetReflectionEnabled();
+void							SetReflectionFactor(float Factor);
+float							GetReflectionFactor();
+void							SetReflectionMap(const ZETextureCube* Texture);
+const ZETextureCube*			GetReflectionMap();
+void							SetReflectionMapAddressModeU(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetReflectionMapAddressModeU();
+void							SetReflectionMapAddressModeV(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetReflectionMapAddressModeV();
+void							SetReflectionMapAddressModeW(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetReflectionMapAddressModeW();
+
+// Refraction
+void							SetRefractionEnabled(bool Enabled);
+bool							GetRefractionEnabled();
+void							SetRefractionIndex(float Index);
+float							GetRefractionIndex();
+void							SetRefractionFactor(float Factor);
+float							GetRefractionFactor();
+void							SetRefractionMap(const ZETextureCube* Texture);
+const ZETextureCube*			GetRefractionMap();
+void							SetRefractionMapAddressModeU(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetRefractionMapAddressModeU();
+void							SetRefractionMapAddressModeV(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetRefractionMapAddressModeV();
+void							SetRefractionMapAddressModeW(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetRefractionMapAddressModeW();
+// Detail Map
+void							SetDetailMapEnabled(bool Enabled);
+bool							GetDetailMapEnabled();
+void							SetDetailMapUScale(float u);
+float							GetDetailMapUScale();
+void							SetDetailMapVScale(float v);
+float							GetDetailMapVScale();
+void							SetDetailDiffuseMap(const ZETexture2D* Texture);
+const ZETexture2D*				GetDetailDiffuseMap();
+void							SetDetailDiffuseMapAddressModeU(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetDetailDiffuseMapAddressModeU();
+void							SetDetailDiffuseMapAddressModeV(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetDetailDiffuseMapAddressModeV();
+void							SetDetailNormalMap(const ZETexture2D* Texture);
+const ZETexture2D*				GetDetailNormalMap();
+void							SetDetailNormalMapAddressModeU(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetDetailNormalMapAddressModeU();
+void							SetDetailNormalMapAddressModeV(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetDetailNormalMapAddressModeV();
+
+// LightMap/Ambient Occlusion Map
+void							SetLightMapEnabled(bool Enabled);
+bool							GetLightMapEnabled();
+void							SetLightMapFactor(float Factor);
+float							GetLightMapFactor();
+void							SetLightMap(const ZETexture2D* Texture);
+const ZETexture2D*				GetLightMap();
+void							SetLightMapAddressModeU(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetLightMapAddressModeU();
+void							SetLightMapAddressModeV(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetLightMapAddressModeV();
+
+// Distortion
+void							SetDistortionEnabled(bool Enabled);
+bool							GetDistortionEnabled();
+void							SetDistortionFactor(float Factor);
+float							GetDistortionFactor();
+void							SetDistortionMap(const ZETexture2D* Texture);
+const ZETexture2D*				GetDistortionMap();
+void							SetDistortionMapAddressModeU(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetDistortionMapAddressModeU();
+void							SetDistortionMapAddressModeV(ZETextureAddressMode Mode);
+ZETextureAddressMode			GetDistortionMapAddressModeV();*/
 #endif

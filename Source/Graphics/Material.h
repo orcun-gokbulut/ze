@@ -37,6 +37,8 @@
 #ifndef __ZE_MATERIAL_H__ 
 #define __ZE_MATERIAL_H__
 
+#include "Meta/Class.h"
+
 enum ZEMaterialType
 {
 	ZE_MT_NONE,
@@ -52,7 +54,7 @@ enum ZEMaterialType
 class ZERenderOrder;
 class ZERLLight;
 class ZECamera;
-class ZEMaterial
+class ZEMaterial : public ZEClass
 {
 	protected:
 										ZEMaterial();

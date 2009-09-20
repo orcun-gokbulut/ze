@@ -111,7 +111,7 @@ void ZEFixedMaterial::SetTwoSided(bool Enable)
 	TwoSided = Enable;
 }
 
-bool ZEFixedMaterial::GetTwoSided()
+bool ZEFixedMaterial::GetTwoSided() const
 {
 	return TwoSided;
 }
@@ -121,7 +121,7 @@ void ZEFixedMaterial::SetLightningEnabled(bool Enable)
 	LightningEnabled = Enable;
 }
 
-bool ZEFixedMaterial::GetLightningEnabled()
+bool ZEFixedMaterial::GetLightningEnabled() const
 {
 	return LightningEnabled;
 }
@@ -131,7 +131,7 @@ void ZEFixedMaterial::SetWireframe(bool Enable)
 	Wireframe = Enable;
 }
 
-bool ZEFixedMaterial::GetWireframe()
+bool ZEFixedMaterial::GetWireframe() const
 {
 	return Wireframe;
 }
@@ -142,7 +142,7 @@ void ZEFixedMaterial::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
 
 }
 
-ZEMaterialTransparancyMode ZEFixedMaterial::GetTransparancyMode()
+ZEMaterialTransparancyMode ZEFixedMaterial::GetTransparancyMode() const
 {
 	return TransparancyMode;
 }
@@ -152,7 +152,7 @@ void ZEFixedMaterial::SetTransparancyCullLimit(unsigned int Limit)
 	Limit = TransparancyCullLimit;
 }
 
-unsigned int ZEFixedMaterial::GetTransparancyCullLimit()
+unsigned int ZEFixedMaterial::GetTransparancyCullLimit() const
 {
 	return TransparancyCullLimit;
 }
@@ -162,7 +162,7 @@ void ZEFixedMaterial::SetRecivesShadow(bool Enable)
 	RecivesShadow = Enable;
 }
 
-bool ZEFixedMaterial::GetRecivesShadow()
+bool ZEFixedMaterial::GetRecivesShadow() const
 {
 	return RecivesShadow;
 }
@@ -176,7 +176,7 @@ void ZEFixedMaterial::SetAmbientEnabled(bool Enabled)
 
 }
 
-bool ZEFixedMaterial::GetAmbientEnabled()
+bool ZEFixedMaterial::GetAmbientEnabled() const
 {
 	return MaterialComponents & ZESHADER_AMBIENT;
 }
@@ -187,7 +187,7 @@ void ZEFixedMaterial::SetAmbientColor(const ZEVector3& Color)
 	AmbientColorSC = AmbientColor * AmbientFactor;
 }
 
-const ZEVector3& ZEFixedMaterial::GetAmbientColor()
+const ZEVector3& ZEFixedMaterial::GetAmbientColor() const
 {
 	return AmbientColor;
 }
@@ -198,7 +198,7 @@ void ZEFixedMaterial::SetAmbientFactor(float Factor)
 	AmbientColorSC = AmbientColor * AmbientFactor;
 }
 
-float ZEFixedMaterial::GetAmbientFactor()
+float ZEFixedMaterial::GetAmbientFactor() const
 {
 	return AmbientFactor;
 }
@@ -211,9 +211,9 @@ void ZEFixedMaterial::SetDiffuseEnabled(bool Enabled)
 		MaterialComponents &= !ZESHADER_DIFFUSE;
 }
 
-bool ZEFixedMaterial::GetDiffuseEnabled()
+bool ZEFixedMaterial::GetDiffuseEnabled() const
 {
-	return MaterialComponents &= ZESHADER_DIFFUSE;
+	return MaterialComponents & ZESHADER_DIFFUSE;
 }
 
 void ZEFixedMaterial::SetDiffuseColor(const ZEVector3& Color)
@@ -222,7 +222,7 @@ void ZEFixedMaterial::SetDiffuseColor(const ZEVector3& Color)
 	ZEVector3::Scale(DiffuseColorSC, DiffuseColor, DiffuseFactor);
 }
 
-const ZEVector3& ZEFixedMaterial::GetDiffuseColor()
+const ZEVector3& ZEFixedMaterial::GetDiffuseColor() const
 {
 	return DiffuseColor;
 }
@@ -233,7 +233,7 @@ void ZEFixedMaterial::SetDiffuseFactor(float Factor)
 	ZEVector3::Scale(DiffuseColorSC, DiffuseColor, DiffuseFactor);
 }
 
-float ZEFixedMaterial::GetDiffuseFactor()
+float ZEFixedMaterial::GetDiffuseFactor() const
 {
 	return DiffuseFactor;
 }
@@ -248,7 +248,7 @@ void ZEFixedMaterial::SetDiffuseMap(const ZETexture2D* Texture)
 	DiffuseMap = Texture;
 }
 
-const ZETexture2D* ZEFixedMaterial::GetDiffuseMap()
+const ZETexture2D* ZEFixedMaterial::GetDiffuseMap() const
 {
 	return DiffuseMap;
 }
@@ -258,7 +258,7 @@ void ZEFixedMaterial::SetDiffuseMapAddressModeU(ZETextureAddressMode Mode)
 	DiffuseMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetDiffuseMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetDiffuseMapAddressModeU() const
 {
 	return DiffuseMapAddressModeU;
 }
@@ -268,7 +268,7 @@ void ZEFixedMaterial::SetDiffuseMapAddressModeV(ZETextureAddressMode Mode)
 	DiffuseMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetDiffuseMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetDiffuseMapAddressModeV() const
 {
 	return DiffuseMapAddressModeV;
 }
@@ -281,7 +281,7 @@ void ZEFixedMaterial::SetSpecularEnabled(bool Enabled)
 		MaterialComponents &= !ZESHADER_SPECULAR;
 }
 
-bool ZEFixedMaterial::GetSpecularEnabled()
+bool ZEFixedMaterial::GetSpecularEnabled() const
 {
 	return MaterialComponents & ZESHADER_SPECULAR;
 }
@@ -291,7 +291,7 @@ void ZEFixedMaterial::SetSpecularColor(const ZEVector3& Color)
 	SpecularColor = Color;
 }
 
-const ZEVector3& ZEFixedMaterial::GetSpecularColor()
+const ZEVector3& ZEFixedMaterial::GetSpecularColor() const
 {
 	return SpecularColor;
 }
@@ -302,7 +302,7 @@ void ZEFixedMaterial::SetSpecularFactor(float Factor)
 	ZEVector3::Scale(SpecularColorSC, SpecularColor, SpecularFactor);
 }
 
-float ZEFixedMaterial::GetSpecularFactor()
+float ZEFixedMaterial::GetSpecularFactor() const
 {
 	return SpecularFactor;
 }
@@ -312,7 +312,7 @@ void ZEFixedMaterial::SetSpecularShininess(float Shininess)
 	SpecularShininess = Shininess;
 }
 
-float ZEFixedMaterial::GetSpecularShininess()
+float ZEFixedMaterial::GetSpecularShininess() const
 {
 	return SpecularShininess;
 }
@@ -328,7 +328,7 @@ void ZEFixedMaterial::SetSpecularMap(const ZETexture2D* Texture)
 
 }
 
-const ZETexture2D* ZEFixedMaterial::GetSpecularMap()
+const ZETexture2D* ZEFixedMaterial::GetSpecularMap() const
 {
 	return SpecularMap;
 }
@@ -338,7 +338,7 @@ void ZEFixedMaterial::SetSpecularMapAddressModeU(ZETextureAddressMode Mode)
 	SpecularMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetSpecularMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetSpecularMapAddressModeU() const
 {
 	return SpecularMapAddressModeU;
 }
@@ -348,7 +348,7 @@ void ZEFixedMaterial::SetSpecularMapAddressModeV(ZETextureAddressMode Mode)
 	SpecularMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetSpecularMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetSpecularMapAddressModeV() const
 {
 	return SpecularMapAddressModeV;
 }
@@ -363,7 +363,7 @@ void ZEFixedMaterial::SetEmmisiveEnabled(bool Enabled)
 
 }
 
-bool ZEFixedMaterial::GetEmmisiveEnabled()
+bool ZEFixedMaterial::GetEmmisiveEnabled() const
 {
 	return MaterialComponents & ZESHADER_EMMISIVE;
 }
@@ -374,7 +374,7 @@ void ZEFixedMaterial::SetEmmisiveFactor(float Factor)
 	ZEVector3::Scale(EmmisiveColorSC, EmmisiveColor, EmmisiveFactor);
 }
 
-float ZEFixedMaterial::GetEmmisiveFactor()
+float ZEFixedMaterial::GetEmmisiveFactor() const
 {
 	return EmmisiveFactor;
 }
@@ -385,7 +385,7 @@ void ZEFixedMaterial::SetEmmisiveColor(const ZEVector3& Color)
 	ZEVector3::Scale(EmmisiveColorSC, EmmisiveColor, EmmisiveFactor);
 }
 
-const ZEVector3& ZEFixedMaterial::GetEmmisiveColor()
+const ZEVector3& ZEFixedMaterial::GetEmmisiveColor() const
 {
 	return EmmisiveColor;
 }
@@ -395,7 +395,7 @@ void ZEFixedMaterial::SetEmmisiveMap(const ZETexture2D* Texture)
 	EmmisiveMap = Texture;
 }
 
-const ZETexture2D* ZEFixedMaterial::GetEmmisiveMap()
+const ZETexture2D* ZEFixedMaterial::GetEmmisiveMap() const
 {
 	return EmmisiveMap;
 }
@@ -405,7 +405,7 @@ void ZEFixedMaterial::SetEmmisiveMapAddressModeU(ZETextureAddressMode Mode)
 	EmmisiveMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetEmmisiveMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetEmmisiveMapAddressModeU() const
 {
 	return EmmisiveMapAddressModeU;
 }
@@ -415,7 +415,7 @@ void ZEFixedMaterial::SetEmmisiveMapAddressModeV(ZETextureAddressMode Mode)
 	EmmisiveMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetEmmisiveMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetEmmisiveMapAddressModeV() const
 {
 	return EmmisiveMapAddressModeV;
 }
@@ -430,7 +430,7 @@ void ZEFixedMaterial::SetNormalMap(const ZETexture2D* Texture)
 	NormalMap = Texture;
 }
 
-const ZETexture2D* ZEFixedMaterial::GetNormalMap()
+const ZETexture2D* ZEFixedMaterial::GetNormalMap() const
 {
 	return NormalMap;
 }
@@ -440,7 +440,7 @@ void ZEFixedMaterial::SetNormalMapAddressModeU(ZETextureAddressMode Mode)
 	NormalMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetNormalMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetNormalMapAddressModeU() const
 {
 	return NormalMapAddressModeU;
 }
@@ -450,7 +450,7 @@ void ZEFixedMaterial::SetNormalMapAddressModeV(ZETextureAddressMode Mode)
 	NormalMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetNormalMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetNormalMapAddressModeV() const
 {
 	return NormalMapAddressModeV;
 }
@@ -465,7 +465,7 @@ void ZEFixedMaterial::SetParallaxMap(const ZETexture2D* Texture)
 	ParallaxMap = Texture;
 }
 
-const ZETexture2D* ZEFixedMaterial::GetParallaxMap()
+const ZETexture2D* ZEFixedMaterial::GetParallaxMap() const
 {
 	return ParallaxMap;
 }
@@ -475,7 +475,7 @@ void ZEFixedMaterial::SetParallaxMapAddressModeU(ZETextureAddressMode Mode)
 	ParallaxMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetParallaxMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetParallaxMapAddressModeU() const
 {
 	return ParallaxMapAddressModeU;
 }
@@ -485,7 +485,7 @@ void ZEFixedMaterial::SetParallaxMapAddressModeV(ZETextureAddressMode Mode)
 	ParallaxMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetParallaxMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetParallaxMapAddressModeV() const
 {
 	return ParallaxMapAddressModeV;
 }
@@ -498,7 +498,7 @@ void ZEFixedMaterial::SetOpacityEnabled(bool Enabled)
 		MaterialComponents &= !ZESHADER_OPACITY;
 }
 
-bool ZEFixedMaterial::GetOpacityEnabled()
+bool ZEFixedMaterial::GetOpacityEnabled() const
 {
 	return MaterialComponents & ZESHADER_OPACITY;
 }
@@ -508,7 +508,7 @@ void ZEFixedMaterial::SetOpacity(float Value)
 	Opacity = Value;
 }
 
-float ZEFixedMaterial::GetOpacity()
+float ZEFixedMaterial::GetOpacity() const
 {
 	return Opacity;
 }
@@ -523,7 +523,7 @@ void ZEFixedMaterial::SetOpacityMap(const ZETexture2D* Texture)
 	OpacityMap = Texture;
 }
 
-const ZETexture2D* ZEFixedMaterial::GetOpacityMap()
+const ZETexture2D* ZEFixedMaterial::GetOpacityMap() const
 {
 	return OpacityMap;
 }
@@ -533,7 +533,7 @@ void ZEFixedMaterial::SetOpacityMapAddressModeU(ZETextureAddressMode Mode)
 	OpacityMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetOpacityMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetOpacityMapAddressModeU() const
 {
 	return OpacityMapAddressModeU;
 }
@@ -543,7 +543,7 @@ void ZEFixedMaterial::SetOpacityMapAddressModeV(ZETextureAddressMode Mode)
 	OpacityMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetOpacityMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetOpacityMapAddressModeV() const
 {
 	return OpacityMapAddressModeV;
 }
@@ -556,7 +556,7 @@ void ZEFixedMaterial::SetReflectionEnabled(bool Enabled)
 		MaterialComponents |= ZESHADER_REFLECTION;
 }
 
-bool ZEFixedMaterial::GetReflectionEnabled()
+bool ZEFixedMaterial::GetReflectionEnabled() const
 {
 	return MaterialComponents & ZESHADER_REFLECTION;
 }
@@ -566,7 +566,7 @@ void ZEFixedMaterial::SetReflectionFactor(float Factor)
 	ReflectionFactor = Factor;
 }
 
-float ZEFixedMaterial::GetReflectionFactor()
+float ZEFixedMaterial::GetReflectionFactor() const
 {
 	return ReflectionFactor;
 }
@@ -581,7 +581,7 @@ void ZEFixedMaterial::SetReflectionMap(const ZETextureCube* Texture)
 	ReflectionMap = Texture;
 }
 
-const ZETextureCube* ZEFixedMaterial::GetReflectionMap()
+const ZETextureCube* ZEFixedMaterial::GetReflectionMap() const
 {
 	return ReflectionMap;
 }
@@ -591,7 +591,7 @@ void ZEFixedMaterial::SetReflectionMapAddressModeU(ZETextureAddressMode Mode)
 	ReflectionMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetReflectionMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetReflectionMapAddressModeU() const
 {
 	return ReflectionMapAddressModeU;
 }
@@ -601,7 +601,7 @@ void ZEFixedMaterial::SetReflectionMapAddressModeV(ZETextureAddressMode Mode)
 	ReflectionMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetReflectionMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetReflectionMapAddressModeV() const
 {
 	return ReflectionMapAddressModeV;
 }
@@ -611,7 +611,7 @@ void ZEFixedMaterial::SetReflectionMapAddressModeW(ZETextureAddressMode Mode)
 	ReflectionMapAddressModeW = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetReflectionMapAddressModeW()
+ZETextureAddressMode ZEFixedMaterial::GetReflectionMapAddressModeW() const
 {
 	return ReflectionMapAddressModeW;
 }
@@ -624,7 +624,7 @@ void ZEFixedMaterial::SetRefractionEnabled(bool Enabled)
 		MaterialComponents |= ZESHADER_REFRACTION;
 }
 
-bool ZEFixedMaterial::GetRefractionEnabled()
+bool ZEFixedMaterial::GetRefractionEnabled() const
 {
 	return MaterialComponents & ZESHADER_REFRACTION;
 }
@@ -634,7 +634,7 @@ void ZEFixedMaterial::SetRefractionIndex(float Index)
 	RefractionIndex = Index;
 }
 
-float ZEFixedMaterial::GetRefractionIndex()
+float ZEFixedMaterial::GetRefractionIndex() const
 {
 	return RefractionIndex;
 }
@@ -644,7 +644,7 @@ void ZEFixedMaterial::SetRefractionFactor(float Factor)
 	RefractionFactor = Factor;
 }
 
-float ZEFixedMaterial::GetRefractionFactor()
+float ZEFixedMaterial::GetRefractionFactor() const
 {
 	return RefractionFactor;
 }
@@ -659,7 +659,7 @@ void ZEFixedMaterial::SetRefractionMap(const ZETextureCube* Texture)
 	RefractionMap = Texture;
 }
 
-const ZETextureCube* ZEFixedMaterial::GetRefractionMap()
+const ZETextureCube* ZEFixedMaterial::GetRefractionMap() const
 {
 	return RefractionMap;
 }
@@ -669,7 +669,7 @@ void ZEFixedMaterial::SetRefractionMapAddressModeU(ZETextureAddressMode Mode)
 	RefractionMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetRefractionMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetRefractionMapAddressModeU() const
 {
 	return RefractionMapAddressModeU;
 }
@@ -679,7 +679,7 @@ void ZEFixedMaterial::SetRefractionMapAddressModeV(ZETextureAddressMode Mode)
 	RefractionMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetRefractionMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetRefractionMapAddressModeV() const
 {
 	return RefractionMapAddressModeV;
 }
@@ -689,7 +689,7 @@ void ZEFixedMaterial::SetRefractionMapAddressModeW(ZETextureAddressMode Mode)
 	RefractionMapAddressModeW = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetRefractionMapAddressModeW()
+ZETextureAddressMode ZEFixedMaterial::GetRefractionMapAddressModeW() const
 {
 	return RefractionMapAddressModeW;
 }
@@ -702,7 +702,7 @@ void ZEFixedMaterial::SetDetailMapEnabled(bool Enabled)
 		MaterialComponents &= !ZESHADER_DETAILMAP;
 }
 
-bool ZEFixedMaterial::GetDetailMapEnabled()
+bool ZEFixedMaterial::GetDetailMapEnabled() const
 {
 	return MaterialComponents & ZESHADER_DETAILMAP;
 }
@@ -712,7 +712,7 @@ void ZEFixedMaterial::SetDetailMapUScale(float u)
 	DetailMapTiling.x = u;
 }
 
-float ZEFixedMaterial::GetDetailMapUScale()
+float ZEFixedMaterial::GetDetailMapUScale() const
 {
 	return DetailMapTiling.x;
 }
@@ -722,7 +722,7 @@ void ZEFixedMaterial::SetDetailMapVScale(float v)
 	DetailMapTiling.y = v;
 }
 
-float ZEFixedMaterial::GetDetailMapVScale()
+float ZEFixedMaterial::GetDetailMapVScale() const
 {
 	return DetailMapTiling.y;
 }
@@ -737,7 +737,7 @@ void ZEFixedMaterial::SetDetailDiffuseMap(const ZETexture2D* Texture)
 	DetailDiffuseMap = Texture;
 }
 
-const ZETexture2D* ZEFixedMaterial::GetDetailDiffuseMap()
+const ZETexture2D* ZEFixedMaterial::GetDetailDiffuseMap() const
 {
 	return DetailDiffuseMap;
 }
@@ -747,7 +747,7 @@ void ZEFixedMaterial::SetDetailDiffuseMapAddressModeU(ZETextureAddressMode Mode)
 	DetailDiffuseMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetDetailDiffuseMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetDetailDiffuseMapAddressModeU() const
 {
 	return DetailDiffuseMapAddressModeU;
 }
@@ -757,7 +757,7 @@ void ZEFixedMaterial::SetDetailDiffuseMapAddressModeV(ZETextureAddressMode Mode)
 	DetailDiffuseMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetDetailDiffuseMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetDetailDiffuseMapAddressModeV() const
 {
 	return DetailDiffuseMapAddressModeV;
 }
@@ -772,7 +772,7 @@ void ZEFixedMaterial::SetDetailNormalMap(const ZETexture2D* Texture)
 	DetailNormalMap = Texture;
 }
 
-const ZETexture2D* ZEFixedMaterial::GetDetailNormalMap()
+const ZETexture2D* ZEFixedMaterial::GetDetailNormalMap() const
 {
 	return DetailNormalMap;
 }
@@ -782,7 +782,7 @@ void ZEFixedMaterial::SetDetailNormalMapAddressModeU(ZETextureAddressMode Mode)
 	DetailNormalMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetDetailNormalMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetDetailNormalMapAddressModeU() const
 {
 	return DetailNormalMapAddressModeU;
 }
@@ -792,7 +792,7 @@ void ZEFixedMaterial::SetDetailNormalMapAddressModeV(ZETextureAddressMode Mode)
 	DetailNormalMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetDetailNormalMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetDetailNormalMapAddressModeV() const
 {
 	return DetailNormalMapAddressModeV;
 }
@@ -805,7 +805,7 @@ void ZEFixedMaterial::SetLightMapEnabled(bool Enabled)
 		MaterialComponents &= !ZESHADER_LIGHTMAP;
 }
 
-bool ZEFixedMaterial::GetLightMapEnabled()
+bool ZEFixedMaterial::GetLightMapEnabled() const
 {
 	return MaterialComponents & ZESHADER_LIGHTMAP;
 }
@@ -815,7 +815,7 @@ void ZEFixedMaterial::SetLightMapFactor(float Factor)
 	LightMapFactor = Factor;
 }
 
-float ZEFixedMaterial::GetLightMapFactor()
+float ZEFixedMaterial::GetLightMapFactor() const
 {
 	return LightMapFactor;
 }
@@ -825,7 +825,7 @@ void ZEFixedMaterial::SetLightMap(const ZETexture2D* Texture)
 	LightMap = Texture;
 }
 
-const ZETexture2D* ZEFixedMaterial::GetLightMap()
+const ZETexture2D* ZEFixedMaterial::GetLightMap() const
 {
 	return LightMap;
 }
@@ -835,7 +835,7 @@ void ZEFixedMaterial::SetLightMapAddressModeU(ZETextureAddressMode Mode)
 	LightMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetLightMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetLightMapAddressModeU() const
 {
 	return LightMapAddressModeU;
 }
@@ -845,7 +845,7 @@ void ZEFixedMaterial::SetLightMapAddressModeV(ZETextureAddressMode Mode)
 	LightMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetLightMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetLightMapAddressModeV() const
 {
 	return LightMapAddressModeV;
 }
@@ -858,7 +858,7 @@ void ZEFixedMaterial::SetDistortionEnabled(bool Enabled)
 		MaterialComponents &= !ZESHADER_DISTORTIONMAP;
 }
 
-bool ZEFixedMaterial::GetDistortionEnabled()
+bool ZEFixedMaterial::GetDistortionEnabled() const
 {
 	return MaterialComponents & ZESHADER_DISTORTIONMAP;
 }
@@ -868,7 +868,7 @@ void ZEFixedMaterial::SetDistortionFactor(float Factor)
 	DistortionFactor = Factor;
 }
 
-float ZEFixedMaterial::GetDistortionFactor()
+float ZEFixedMaterial::GetDistortionFactor() const
 {
 	return DistortionFactor;
 }
@@ -878,7 +878,7 @@ void ZEFixedMaterial::SetDistortionMap(const ZETexture2D* Texture)
 	DistortionMap = Texture;
 }
 
-const ZETexture2D* ZEFixedMaterial::GetDistortionMap()
+const ZETexture2D* ZEFixedMaterial::GetDistortionMap() const
 {
 	return DistortionMap; 
 }
@@ -888,7 +888,7 @@ void ZEFixedMaterial::SetDistortionMapAddressModeU(ZETextureAddressMode Mode)
 	DistortionMapAddressModeU = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetDistortionMapAddressModeU()
+ZETextureAddressMode ZEFixedMaterial::GetDistortionMapAddressModeU() const
 {
 	return DistortionMapAddressModeU;
 }
@@ -898,7 +898,7 @@ void ZEFixedMaterial::SetDistortionMapAddressModeV(ZETextureAddressMode Mode)
 	DistortionMapAddressModeV = Mode;
 }
 
-ZETextureAddressMode ZEFixedMaterial::GetDistortionMapAddressModeV()
+ZETextureAddressMode ZEFixedMaterial::GetDistortionMapAddressModeV() const
 {
 	return DistortionMapAddressModeV;
 }
@@ -907,3 +907,6 @@ ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 {
 	return zeGraphics->CreateFixedMaterial();
 }
+
+#include "FixedMaterial.h.zpp"
+

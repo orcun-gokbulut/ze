@@ -286,7 +286,7 @@ void ZEDirectInputModule::ProcessInputs()
 		{	
 			ZeroMemory(&KeyboardState, sizeof(ZEDIKeyboardState));
 			hr = DIKeyboard->Acquire();
-			if (hr != DIERR_OTHERAPPHASPRIO)
+			if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
 				zeError("DirectInput Module", "Could not accuire keyboard.");
 		}
 	}
@@ -297,7 +297,7 @@ void ZEDirectInputModule::ProcessInputs()
 		{
 			ZeroMemory(&MouseState, sizeof(ZEDIMouseState));
 			hr = DIKeyboard->Acquire();
-			if (hr != DIERR_OTHERAPPHASPRIO)
+			if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
 				zeError("DirectInput Module", "Could not accuire keyboard.");
 		}
 	}
@@ -308,7 +308,7 @@ void ZEDirectInputModule::ProcessInputs()
 		{
 			ZeroMemory(&JoystickState, sizeof(ZEDIJoystickState));
 			hr = DIKeyboard->Acquire();
-			if (hr != DIERR_OTHERAPPHASPRIO)
+			if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
 				zeError("DirectInput Module", "Could not accuire keyboard.");
 		}
 	}

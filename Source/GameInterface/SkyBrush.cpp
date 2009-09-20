@@ -39,12 +39,12 @@
 
 ZE_ENTITY_DESCRIPTION_START(ZESkyBrush, ZEEntity, ZE_ERA_BOTH, "", "Sky Brush")
 	ZE_ENTITY_ATTRIBUTES_START()
-		ZE_ENTITY_ATTRIBUTE_SEMANTIC("SkyColor", ZEVARIANTTYPE_VECTOR3, ZE_EAF_NONE, ZE_EAS_COLORVALUE, ZEVector3(0.75f, 0.65f, 0.90f), "Color of the sky")
+		ZE_ENTITY_ATTRIBUTE_SEMANTIC("SkyColor", ZE_VRT_VECTOR3, ZE_EAF_NONE, ZE_EAS_COLORVALUE, ZEVector3(0.75f, 0.65f, 0.90f), "Color of the sky")
 		ZE_ENTITY_ATTRIBUTE_FILENAME("SkyTexture", ZE_EAF_NONE, "Image", "", "Texture of the sky")
-		ZE_ENTITY_ATTRIBUTE("SkyLightEnabled", ZEVARIANTTYPE_BOOLEAN, ZE_EAF_NONE, false, "Sun light enabled")
-		ZE_ENTITY_ATTRIBUTE_SEMANTIC("SkyLightColor", ZEVARIANTTYPE_VECTOR3, ZE_EAF_NONE, ZE_EAS_COLORVALUE, ZEVector3(1.0f, 1.0f, 1.0f), "Color of the sun")
-		ZE_ENTITY_ATTRIBUTE("SkyLightDirection", ZEVARIANTTYPE_VECTOR3, ZE_EAF_NONE, ZEVector3(0.0f, -1.0f, 0.0f), "Direction of the light")
-		ZE_ENTITY_ATTRIBUTE("SkyLightIntensity", ZEVARIANTTYPE_FLOAT, ZE_EAF_NONE, 1.0f, "Intensity of the light")
+		ZE_ENTITY_ATTRIBUTE("SkyLightEnabled", ZE_VRT_BOOLEAN, ZE_EAF_NONE, false, "Sun light enabled")
+		ZE_ENTITY_ATTRIBUTE_SEMANTIC("SkyLightColor", ZE_VRT_VECTOR3, ZE_EAF_NONE, ZE_EAS_COLORVALUE, ZEVector3(1.0f, 1.0f, 1.0f), "Color of the sun")
+		ZE_ENTITY_ATTRIBUTE("SkyLightDirection", ZE_VRT_VECTOR3, ZE_EAF_NONE, ZEVector3(0.0f, -1.0f, 0.0f), "Direction of the light")
+		ZE_ENTITY_ATTRIBUTE("SkyLightIntensity", ZE_VRT_FLOAT, ZE_EAF_NONE, 1.0f, "Intensity of the light")
 	ZE_ENTITY_ATTRIBUTES_END()
 ZE_ENTITY_DESCRIPTION_END(ZESkyBrush)
 

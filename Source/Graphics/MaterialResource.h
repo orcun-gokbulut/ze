@@ -41,6 +41,7 @@
 #include "FixedMaterial.h"
 #include "ZEDS/Array.h"
 
+class ZEMaterialAnimation;
 class ZETextureResource;
 class ZEResourceFile;
 class ZEMaterialResource : public ZEResource

@@ -111,11 +111,11 @@
 	#define ZE_ENTITY_ATTRIBUTE_SEMANTIC(AttributeName, AttributeType,  AttributeFlag, AttributeSemantic, AttributeDefaultValue, AttributeDescription)\
 		{AttributeName, AttributeType, AttributeSemantic, AttributeFlag, AttributeDefaultValue, NULL, NULL, 0, NULL, AttributeDescription},
 	#define ZE_ENTITY_ATTRIBUTE_FILENAME(AttributeName, AttributeFlag, FileExtensionFilter, AttributeDefaultValue, AttributeDescription)\
-		{AttributeName, ZEVARIANTTYPE_STRING, ZE_EAS_FILENAME, AttributeFlag, AttributeDefaultValue, FileExtensionFilter, NULL, 0, NULL, AttributeDescription},
+		{AttributeName, ZE_VRT_STRING, ZE_EAS_FILENAME, AttributeFlag, AttributeDefaultValue, FileExtensionFilter, NULL, 0, NULL, AttributeDescription},
 	#define ZE_ENTITY_ATTRIBUTE_ENTITY(AttributeName, AttributeFlag, EntityTypeFilter, AttributeDefaultValue, AttributeDescription)\
-		{AttributeName, ZEVARIANTTYPE_INTEGER, ZE_AS_ENTITY, AttributeFlag, AttributeDefaultValue, 0, NULL, NULL, NULL, AttributeDescription},
+		{AttributeName, ZE_VRT_INTEGER, ZE_AS_ENTITY, AttributeFlag, AttributeDefaultValue, 0, NULL, NULL, NULL, AttributeDescription},
 	#define ZE_ENTITY_ATTRIBUTE_ENUMURATOR(AttributeName, AttributeFlag, EnumuratorName, AttributeDefaultValue, AttributeDescription)\
-		{AttributeName, ZEVARIANTTYPE_INTEGER, ZE_EAS_ENUMURATOR, AttributeFlag, AttributeDefaultValue, NULL, NULL, sizeof(EnumuratorName##Description) / sizeof(ZEEntityAttributeEnumurator), EnumuratorName##Description, AttributeDescription},
+		{AttributeName, ZE_VRT_INTEGER, ZE_EAS_ENUMURATOR, AttributeFlag, AttributeDefaultValue, NULL, NULL, sizeof(EnumuratorName##Description) / sizeof(ZEEntityAttributeEnumurator), EnumuratorName##Description, AttributeDescription},
 
 	#define ZE_ENTITY_ATTRIBUTES_END() }; *Count = sizeof(Attributes) / sizeof(ZEEntityAttribute); return Attributes; 
 #define ZE_ENTITY_DESCRIPTION_END(EntityName) }\

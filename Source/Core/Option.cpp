@@ -236,7 +236,7 @@ ZEOptionSection::~ZEOptionSection()
 		return true;
 	}
 	else if (Params->GetCount() == 1 &&
-			 Params->GetItem(0).GetType() == ZEVARIANTTYPE_STRING)
+			 Params->GetItem(0).GetType() == ZE_VRT_STRING)
 	{
 		Load(Params->GetItem(0).GetString());
 		zeLog("Options loaded.");
@@ -263,7 +263,7 @@ ZEOptionSection::~ZEOptionSection()
 			zeLog("Options saved.");
 			return true;
 		case 1:
-			if (Params->GetItem(0).GetType() == ZEVARIANTTYPE_STRING)
+			if (Params->GetItem(0).GetType() == ZE_VRT_STRING)
 			{
 				Save(Params->GetItem(0).GetString());
 				zeLog("Options saved to \"%s\" file.", Params->GetItem(0).GetString());
@@ -290,8 +290,8 @@ bool ZEOptionManager::ListSectionsCommand(ZECommand* Command, const ZECommandPar
 		Count = Sections.GetCount();
 	}
 	else if (Params->GetCount() == 2 && 
-			 Params->GetItem(0).GetType() == ZEVARIANTTYPE_INTEGER && 
-			 Params->GetItem(1).GetType() == ZEVARIANTTYPE_INTEGER)
+			 Params->GetItem(0).GetType() == ZE_VRT_INTEGER && 
+			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER)
 	{
 		Index = Params->GetItem(0).GetInteger();
 		Count = Params->GetItem(1).GetInteger();
@@ -326,16 +326,16 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 	ZEOptionSection* Sec;
 
 	if (Params->GetCount() == 1 &&
-		Params->GetItem(0).GetType() == ZEVARIANTTYPE_STRING)
+		Params->GetItem(0).GetType() == ZE_VRT_STRING)
 	{
 		Sec = GetSection(Params->GetItem(0).GetString());
 		Index = 0;
 		Count = -1;
 	}
 	else if (Params->GetCount() == 1 &&
-			 Params->GetItem(0).GetType() == ZEVARIANTTYPE_STRING &&
-			 Params->GetItem(1).GetType() == ZEVARIANTTYPE_INTEGER &&
-			 Params->GetItem(2).GetType() == ZEVARIANTTYPE_INTEGER)
+			 Params->GetItem(0).GetType() == ZE_VRT_STRING &&
+			 Params->GetItem(1).GetType() == ZE_VRT_INTEGER &&
+			 Params->GetItem(2).GetType() == ZE_VRT_INTEGER)
 	{
 		Sec = GetSection(Params->GetItem(0).GetString());
 		Index = Params->GetItem(1).GetInteger();
@@ -364,22 +364,22 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 			zeLog(" %-30s  ", Sec->GetOption(I)->GetName());
 			switch(Opt->GetValueType())
 			{
-				case ZEVARIANTTYPE_UNDEFINED:
+				case ZE_VRT_UNDEFINED:
 					zeLog(" Undefined  ");
 					break;
-				case ZEVARIANTTYPE_INTEGER:
+				case ZE_VRT_INTEGER:
 					zeLog(" Integer    ");
 					break;
-				case ZEVARIANTTYPE_FLOAT:
+				case ZE_VRT_FLOAT:
 					zeLog(" Float      ");
 					break;
-				case ZEVARIANTTYPE_BOOLEAN:
+				case ZE_VRT_BOOLEAN:
 					zeLog(" Boolean    ");
 					break;
-				case ZEVARIANTTYPE_NULL:
+				case ZE_VRT_NULL:
 					zeLog(" NULL       ");
 					break;
-				case ZEVARIANTTYPE_STRING:
+				case ZE_VRT_STRING:
 					zeLog(" String     ");
 					break;
 				default:
@@ -389,22 +389,22 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 
    			switch(Opt->GetValueType())
 			{
-				case ZEVARIANTTYPE_UNDEFINED:
+				case ZE_VRT_UNDEFINED:
 					zeLog("UNDEFINED (Probably Internal Error)\r\n");
 					break;
-				case ZEVARIANTTYPE_INTEGER:
+				case ZE_VRT_INTEGER:
 					zeLog("%d\r\n", Opt->GetValue().GetInteger());
 					break;
-				case ZEVARIANTTYPE_FLOAT:
+				case ZE_VRT_FLOAT:
 					zeLog("%lf\r\n", Opt->GetValue().GetFloat());
 					break;
-				case ZEVARIANTTYPE_BOOLEAN:
+				case ZE_VRT_BOOLEAN:
 					zeLog("%s\r\n", Opt->GetValue().GetBoolean() ? "true" : "false");
 					break;
-				case ZEVARIANTTYPE_NULL:
+				case ZE_VRT_NULL:
 					zeLog("NULL\r\n");
 					break;
-				case ZEVARIANTTYPE_STRING:
+				case ZE_VRT_STRING:
 					zeLog("\"%s\"\r\n", Opt->GetValue().GetString());
 					break;
 				default:
@@ -500,19 +500,19 @@ void ZEOptionManager::Save(const char *FileName)
 				if (Current->GetAttribute() != ZEOPTIONATTRIBUTE_HIDDEN && Current->GetAttribute() != ZEOPTIONATTRIBUTE_INTERNAL)
 					switch(Current->GetValueType())
 					{
-						case ZEVARIANTTYPE_NULL:
+						case ZE_VRT_NULL:
 							fprintf(File, "%s\n");
 							break;
-						case ZEVARIANTTYPE_STRING:
+						case ZE_VRT_STRING:
 							fprintf(File, "%s = %s\n", Current->GetName(), Current->GetValue().GetString());
 							break;
-						case ZEVARIANTTYPE_INTEGER:
+						case ZE_VRT_INTEGER:
 							fprintf(File, "%s = %d\n", Current->GetName(), Current->GetValue().GetInteger());
 							break;			
-						case ZEVARIANTTYPE_FLOAT:
+						case ZE_VRT_FLOAT:
 							fprintf(File, "%s = %f\n", Current->GetName(), Current->GetValue().GetFloat());
 							break;
-						case ZEVARIANTTYPE_BOOLEAN:
+						case ZE_VRT_BOOLEAN:
 							fprintf(File, "%s = %s\n", Current->GetName(), Current->GetValue().GetBoolean() == true ? "true" : "false");
 							break;
 					}
@@ -654,16 +654,16 @@ void ZEOptionManager::Load(const char *FileName)
 						if (Current->GetAttribute() != ZEOPTIONATTRIBUTE_INTERNAL)
 							switch(Current->GetValueType())
 							{
-							case ZEVARIANTTYPE_STRING:
+							case ZE_VRT_STRING:
 								Current->SetValue(ValueBuffer);
 								break;
-							case ZEVARIANTTYPE_INTEGER:
+							case ZE_VRT_INTEGER:
 								Current->SetValue(atoi(ValueBuffer));
 								break;			
-							case ZEVARIANTTYPE_FLOAT:
+							case ZE_VRT_FLOAT:
 								Current->SetValue((float)atof(ValueBuffer));
 								break;
-							case ZEVARIANTTYPE_BOOLEAN:
+							case ZE_VRT_BOOLEAN:
 								if(_stricmp(ValueBuffer, "true") == 0)
 									Current->SetValue(true);
 								else if (_stricmp(ValueBuffer, "false") == 0)
