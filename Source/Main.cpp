@@ -143,11 +143,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		//mdl->SetModelFile("Primitive_Cube.ZEMODEL");
 		//mdl->SetModelFile("Primitive_Sphere.ZEMODEL");
 		//mdl->SetModelFile("Primitive_Capsule.ZEMODEL");
-		mdl->SetModelFile("Convex_Cylinder.ZEMODEL");
+		//mdl->SetModelFile("Convex_Cylinder.ZEMODEL");
 		//mdl->SetModelFile("TriMesh_Teapot.ZEMODEL");
 		//mdl->SetModelFile("Combine_Convex_Primitive.ZEMODEL");
 		//mdl->SetModelFile("2_Sphere_BlueBig.ZEMODEL");
-		Scene->AddEntity(mdl);
+		//Scene->AddEntity(mdl);
 
 		//character
 		ccapsule = new ZECanvasBrush();

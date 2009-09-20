@@ -285,8 +285,8 @@ void ZEScene::Tick(float ElapsedTime)
 
 	World->Update(ElapsedTime);
 
-	cont1->Update(ElapsedTime);
-	ZEVector3 ff = cont1->GetPosition();
+	//cont1->Update(ElapsedTime);
+	//ZEVector3 ff = cont1->GetPosition();
 	ccapsule->SetPosition(ff);
 
 	for (int i=0;i<64;i++)

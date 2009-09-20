@@ -106,7 +106,7 @@ void ZEAegiaPhysicsCharacterController::Initialize(ZEPhysicsCharacterControllerI
 
 		if (CapsuleDesc.isValid())
 		{
-			Controller = (NxCapsuleController*)World->GetControllerManager()->createController(World->GetScene(), CapsuleDesc);
+			//Controller = (NxCapsuleController*)World->GetControllerManager()->createController(World->GetScene(), CapsuleDesc);
 		}
 	}
 }
