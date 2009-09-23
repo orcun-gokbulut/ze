@@ -900,7 +900,7 @@ void ZEFixedMaterial::SetDistortionMapAddressModeV(ZETextureAddressMode Mode)
 
 ZETextureAddressMode ZEFixedMaterial::GetDistortionMapAddressModeV() const
 {
-	return DistortionMapAddressModeV;
+	return DistortionMapAddressModeV; 
 }
 
 ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
