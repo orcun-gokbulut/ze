@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 ///////////////////////////////////////////////////////////////
-//  Orcun's Data Structres Version 2.0 (Zinek Engine)    //
+//  Orcun's Data Structres Version 2.0 (Zinek Engine)		 //
 // --------------------------------------------------------- //
-//  Copyrights (C) 2005-2007,  Y. Or�un G�kbulut			 //
+//  Copyrights (C) 2005-2007,  Y. Orçun GÖKBULUT			 //
 //  All rights reserved.									 //
 ///////////////////////////////////////////////////////////////
 

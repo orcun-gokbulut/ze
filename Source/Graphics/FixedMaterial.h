@@ -504,7 +504,7 @@ ZE_POSTPROCESSOR_START(Meta)
 					<item name="Mirror" value="ZE_TAM_MIRROR"/>
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
-			</property>
+			</property> 
 			<property name="ParallaxMapAddressModeV"	type="integer"			autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
@@ -531,12 +531,12 @@ ZE_POSTPROCESSOR_START(Meta)
 					<item name="Mirror" value="ZE_TAM_MIRROR"/>
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
-			</property>
+			</property>  
 			<property name="OpacityMapAddressModeV"		type="integer"			autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
-					<item name="Mirror" value="ZE_TAM_MIRROR"/>
+			 		<item name="Mirror" value="ZE_TAM_MIRROR"/>
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>

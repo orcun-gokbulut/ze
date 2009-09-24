@@ -14,12 +14,12 @@
 //  of the Zinek Engine group and author(s). Storing this file, using this file,    //
 //  compiling this file, publishing this file to anykind media or network, editing  //
 //  this file, selling this file, reading this file is probited without notice and  //
-//  written permision of Y. Orcun Gokbulut. These terms at above can only be        //
-//  changed by Y. Orcun GOKBULUT.                                                   //
+//  written permision of Y. Orçun GÖKBULUT. These terms at above can only be        //
+//  changed by Y. Orçun GÖKBULUT.                                                   //
 //  author(s).                                                                      //
 //*                                                                                *//
 //  DESCRIPTION         :                                                           //
-//  AUTHOR(S)           : Y. Orcun GOKBULUT                                         //
+//  AUTHOR(S)           : Y. Orçun GÖKBULUT                                         //
 //*                                                                                *//
 //////////////////////////////////////////////////////////////////////////////////////
 /*ZEHEADER_END*/

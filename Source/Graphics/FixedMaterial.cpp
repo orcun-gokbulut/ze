@@ -420,13 +420,21 @@ ZETextureAddressMode ZEFixedMaterial::GetEmmisiveMapAddressModeV() const
 	return EmmisiveMapAddressModeV;
 }
 
+void ZEFixedMaterial::SetNormalMapEnabled(bool Enabled)
+{
+	if (Enabled)
+		MaterialComponents |= ZESHADER_NORMALMAP;
+	else
+		MaterialComponents &= !ZESHADER_NORMALMAP;
+}
+
+bool ZEFixedMaterial::GetNormalMapEnabled() const
+{
+	return MaterialComponents & ZESHADER_NORMALMAP;
+}
+
 void ZEFixedMaterial::SetNormalMap(const ZETexture2D* Texture)
 {
-	if (Texture == NULL)
-		MaterialComponents &= !ZESHADER_NORMALMAP;
-	else
-		MaterialComponents |= ZESHADER_NORMALMAP;
-
 	NormalMap = Texture;
 }
 
@@ -455,14 +463,23 @@ ZETextureAddressMode ZEFixedMaterial::GetNormalMapAddressModeV() const
 	return NormalMapAddressModeV;
 }
 
+void ZEFixedMaterial::SetParallaxMapEnabled(bool Enabled)
+{
+	if (Enabled)
+		MaterialComponents |= ZESHADER_PARALLAXMAP;
+	else
+		MaterialComponents &= !ZESHADER_PARALLAXMAP;
+}
+
 void ZEFixedMaterial::SetParallaxMap(const ZETexture2D* Texture)
 {
-	if (Texture == NULL)
-		MaterialComponents &= !ZESHADER_PARALLAXMAP;
-	else
-		MaterialComponents |= ZESHADER_PARALLAXMAP;
 
 	ParallaxMap = Texture;
+}
+
+bool ZEFixedMaterial::GetParallaxMapEnabled() const
+{
+	return MaterialComponents & ZESHADER_PARALLAXMAP;
 }
 
 const ZETexture2D* ZEFixedMaterial::GetParallaxMap() const
@@ -516,6 +533,12 @@ float ZEFixedMaterial::GetOpacity() const
 void ZEFixedMaterial::SetOpacityComponent(ZEMaterialOpacityComponent Component)
 {
 	#pragma message("Task: Implament Fixed Material Ocapacity Component")
+}
+
+ZEMaterialOpacityComponent  ZEFixedMaterial::GetOpacityComponent() const
+{
+	#pragma message("Task: Implament Fixed Material Ocapacity Component")
+	return ZE_MOC_CONSTANT;
 }
 
 void ZEFixedMaterial::SetOpacityMap(const ZETexture2D* Texture)

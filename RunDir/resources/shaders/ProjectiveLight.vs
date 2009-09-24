@@ -1,29 +1,37 @@
 /*ZEHEADER_START*/
 //////////////////////////////////////////////////////////////////////////////////////
 //                                                                                  //
-//  Core.h - Zinek Engine v0.04.02 Build 905 Source Code                                 
+//  MapResource.h - Zinek Engine v0.05.00 Build 1024 Source Code                                 
 // -------------------------------------------------------------------------------- //
-//  Copyright (c) 2007-2008 Zinek Engine group.                                     //
-//  All rights reserved.                                                            //
+//  Copyright (c) 2007-2009 Y. Orçun GÖKBULUT. All rights reserved.                 //
 //                                                                                  //
 //                 READ TERMS BELLOW BEFORE TAKING ANY ACTION !                     //
 //                                                                                  //
 //  These coded instructions, statements, and computer programs contain             //
-//  unpublished proprietary information written by Zinek Engine group and they are  //
+//  unpublished proprietary information belongs to Y. Orçun GÖKBULUT and they are   //
 //  protected by international copyright laws. This file is intellectual property   //
-//  of the Zinek Engine group and author(s). Storing this file, using this file,    //
-//  compiling this file, publishing this file to anykind media or network, editing  //
-//  this file, selling this file, reading this file is probited without notice and  //
-//  written permision of Y. Orcun Gokbulut. These terms at above can only be        //
-//  changed by Y. Orcun GOKBULUT.                                                   //
-//  author(s).                                                                      //
+//  of the Y. Orçun GÖKBULUT. Storing this file, using this file, changing content  //
+//  of this file, copying or duplicating this file, compiling this file, publishing // 
+//  this file to anykind media or network, editing  this file, selling this file,   //
+//  booking this file, reading this file are probited without notice and written    //
+//  permision of Y. Orçun GÖKBULUT.                                                 //
+//  These terms at above can only be changed by Y. Orçun GÖKBULUT.                  //
+//                                                                                  //
+//  Contact Information:                                                            //
+//     Adress : Zinek Code House & Game Studio                                      //                                             
+//              Aydinlar Mahallesi.                                                 //
+//              Mimar Sokak. 33/5                                                   //
+//              06450  Ankara/TURKEY                                                //
+//     Phone  : +90 (533) 734 21 22                                                 //
+//     E-Mail : contact@zinekengine.com                                             //
+//     WWW    : http://www.zinekengine.com                                          //
+//                                                                                  //
 //*                                                                                *//
 //  DESCRIPTION         :                                                           //
-//  AUTHOR(S)           : Y. Orcun GOKBULUT                                         //
+//  AUTHOR(S)           : Y. Orçun GÖKBULUT                                         //
 //*                                                                                *//
 //////////////////////////////////////////////////////////////////////////////////////
 /*ZEHEADER_END*/
-
 // Transformation matrices 5 matrices
 float4x4  WorldViewProjMatrix			: register(c0);
 float4x4  WorldMatrix					: register(c4);

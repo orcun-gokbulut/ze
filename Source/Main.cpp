@@ -72,6 +72,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 //	zeCore->GetWindow()->SetWindowPosition(0, 0);
  	if (zeCore->StartUp())
 	{
+		ZEFixedMaterial* Material = ZEFixedMaterial::CreateInstance();
+		Material->SetProperty("AmbientFactor", 5.0f);
+		int PropId = Material->GetPropertyId("AmbientColor");
+
 		ZEScene* Scene = zeCore->GetGame()->GetScene();
 
 		ZERenderer* Renderer;
