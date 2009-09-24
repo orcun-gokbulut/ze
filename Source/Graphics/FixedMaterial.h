@@ -40,7 +40,7 @@
 #include "Material.h"
 #include "ZEMath/Vector.h"
 #include "Definitions.h"
-#include "Texture.h"
+#include "Texture.h" 
 #include "ZEDS/Array.h"
 #include "ZEDS/Variant.h"
 #include "Meta/Class.h"
