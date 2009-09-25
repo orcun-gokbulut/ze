@@ -348,8 +348,8 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETextureAddressMode			GetRefractionMapAddressModeV() const;
 		void							SetRefractionMapAddressModeW(ZETextureAddressMode Mode);
 		ZETextureAddressMode			GetRefractionMapAddressModeW() const;
-		// Detail Map
-		void							SetDetailMapEnabled(bool Enabled);
+		// Detail Map  
+		void							SetDetailMapEnabled(bool Enabled); 
 		bool							GetDetailMapEnabled() const;
 		void							SetDetailMapUScale(float u);
 		float							GetDetailMapUScale() const;
@@ -409,10 +409,10 @@ ZE_POSTPROCESSOR_START(Meta)
 	<meta> 
 		<class name="ZEFixedMaterial">
 			<description>Material System</description>
-			<property name="TwoSided"					type="boolean"			autogetset="yes"/>
-			<property name="LightningEnabled"			type="boolean"			autogetset="yes"/>
-			<property name="Wireframe"					type="boolean"			autogetset="yes"/>
-			<property name="TransparancyMode"			type="integer"			autogetset="yes">
+			<property name="TwoSided" type="boolean" autogetset="yes"/>
+			<property name="LightningEnabled" type="boolean" autogetset="yes"/>
+			<property name="Wireframe" type="boolean" autogetset="yes"/>
+			<property name="TransparancyMode" type="integer" autogetset="yes">
 				<enumurator name="ZEMaterialTransparancyMode">
 					<item name="No Transparancy" value="ZE_MTM_NOTRANSPARACY"/>
 					<item name="Alpha Test" value="ZE_MTM_ALPHACULL"/>
@@ -421,24 +421,24 @@ ZE_POSTPROCESSOR_START(Meta)
 					<item name="Subtractive" value="ZE_MTM_SUBTRACTIVE"/>
 				</enumurator>
 			</property>
-			<property name="TransparancyCullLimit"		type="integer"			autogetset="yes"/>
-			<property name="RecivesShadow"				type="boolean"			autogetset="yes"/>
+			<property name="TransparancyCullLimit" type="integer" autogetset="yes"/>
+			<property name="RecivesShadow" type="boolean" autogetset="yes"/>
 			  
-			<property name="AmbientEnabled"				type="boolean"			autogetset="yes"/>
-			<property name="AmbientFactor"				type="float"			autogetset="yes"/>
-			<property name="AmbientColor"				type="ZEVector3"		autogetset="yes"/>
+			<property name="AmbientEnabled" type="boolean" autogetset="yes"/>
+			<property name="AmbientFactor" type="float" autogetset="yes"/>
+			<property name="AmbientColor" type="ZEVector3" autogetset="yes"/>
 			  
-			<property name="DiffuseEnabled"				type="boolean"			autogetset="yes"/>
-			<property name="DiffuseColor"				type="ZEVector3"		autogetset="yes"/>
-			<property name="DiffuseFactor"				type="float"			autogetset="yes"/>
-			<!--<property name="DiffuseMap"					type="string"			autogetset="yes"/>-->
+			<property name="DiffuseEnabled" type="boolean" autogetset="yes"/>
+			<property name="DiffuseColor" type="ZEVector3" autogetset="yes"/>
+			<property name="DiffuseFactor" type="float" autogetset="yes"/>
+			<!--<property name="DiffuseMap" type="string" autogetset="yes"/>-->
 
-			<property name="SpecularEnabled"			type="boolean"			autogetset="yes"/>
-			<property name="SpecularFactor"				type="float"			autogetset="yes"/>
-			<property name="SpecularShininess"			type="float"			autogetset="yes"/>
-			<property name="SpecularColor"				type="ZEVector3"		autogetset="yes"/>
-			<!--<property name="SpecularMap"				type="string"			autogetset="yes"/>-->
-			<property name="SpecularMapAddressModeU"	type="integer"			autogetset="yes">
+			<property name="SpecularEnabled" type="boolean" autogetset="yes"/>
+			<property name="SpecularFactor" type="float" autogetset="yes"/>
+			<property name="SpecularShininess" type="float" autogetset="yes"/>
+			<property name="SpecularColor" type="ZEVector3" autogetset="yes"/>
+			<!--<property name="SpecularMap" type="string" autogetset="yes"/>-->
+			<property name="SpecularMapAddressModeU"	type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -446,28 +446,7 @@ ZE_POSTPROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name="SpecularMapAddressModeV"	type="integer"			autogetset="yes">
-				<enumurator name="ZETextureAddressMode">
-					<item name="Wrap" value="ZE_TAM_WRAP"/>
-					<item name="Clamp" value="ZE_TAM_CLAMP"/>
-					<item name="Mirror" value="ZE_TAM_MIRROR"/>
-					<item name="Border" value="ZE_TAM_BORDER"/>
-				</enumurator>
-			</property>
-
-			<property name="EmmisiveEnabled"			type="boolean"			autogetset="yes"/>
-			<property name="EmmisiveFactor"				type="float"			autogetset="yes"/>
-			<property name="EmmisiveColor"				type="ZEVector3"		autogetset="yes"/>
-			<!--<property name="EmmisiveMap"				type="string"			autogetset="yes"/>-->
-			<property name="EmmisiveMapAddressModeU"	type="integer"			autogetset="yes">
-				<enumurator name="ZETextureAddressMode">
-					<item name="Wrap" value="ZE_TAM_WRAP"/>
-					<item name="Clamp" value="ZE_TAM_CLAMP"/>
-					<item name="Mirror" value="ZE_TAM_MIRROR"/>
-					<item name="Border" value="ZE_TAM_BORDER"/>
-				</enumurator>
-			</property>
-			<property name="EmmisiveMapAddressModeV"	type="integer"			autogetset="yes">
+			<property name="SpecularMapAddressModeV" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -476,9 +455,11 @@ ZE_POSTPROCESSOR_START(Meta)
 				</enumurator>
 			</property>
 
-			<property name="NormalMapEnabled"			type="boolean"			autogetset="yes"/>
-			<!--<property name="NormalMap"				type="string"			autogetset="yes"/>-->
-			<property name="NormalMapAddressModeU"		type="integer"			autogetset="yes">
+			<property name="EmmisiveEnabled" type="boolean" autogetset="yes"/>
+			<property name="EmmisiveFactor" type="float" autogetset="yes"/>
+			<property name="EmmisiveColor" type="ZEVector3" autogetset="yes"/>
+			<!--<property name="EmmisiveMap" type="string" autogetset="yes"/>-->
+			<property name="EmmisiveMapAddressModeU" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -486,7 +467,7 @@ ZE_POSTPROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name="NormalMapAddressModeV"		type="integer"			autogetset="yes">
+			<property name="EmmisiveMapAddressModeV" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -495,9 +476,28 @@ ZE_POSTPROCESSOR_START(Meta)
 				</enumurator>
 			</property>
 
-			<property name="ParallaxMapEnabled"			type="boolean"			autogetset="yes"/>
-			<!--<property name="ParallaxMap"				type="string"			autogetset="yes"/>-->
-			<property name="ParallaxMapAddressModeU"	type="integer"			autogetset="yes">
+			<property name="NormalMapEnabled" type="boolean" autogetset="yes"/>
+			<!--<property name="NormalMap" type="string" autogetset="yes"/>-->
+			<property name="NormalMapAddressModeU" type="integer" autogetset="yes">
+				<enumurator name="ZETextureAddressMode">
+					<item name="Wrap" value="ZE_TAM_WRAP"/>
+					<item name="Clamp" value="ZE_TAM_CLAMP"/>
+					<item name="Mirror" value="ZE_TAM_MIRROR"/>
+					<item name="Border" value="ZE_TAM_BORDER"/>
+				</enumurator>
+			</property>
+			<property name="NormalMapAddressModeV" type="integer" autogetset="yes">
+				<enumurator name="ZETextureAddressMode">
+					<item name="Wrap" value="ZE_TAM_WRAP"/>
+					<item name="Clamp" value="ZE_TAM_CLAMP"/>
+					<item name="Mirror" value="ZE_TAM_MIRROR"/>
+					<item name="Border" value="ZE_TAM_BORDER"/>
+				</enumurator>
+			</property>
+
+			<property name="ParallaxMapEnabled" type="boolean" autogetset="yes"/>
+			<!--<property name="ParallaxMap" type="string" autogetset="yes"/>-->
+			<property name="ParallaxMapAddressModeU" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -505,7 +505,7 @@ ZE_POSTPROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property> 
-			<property name="ParallaxMapAddressModeV"	type="integer"			autogetset="yes">
+			<property name="ParallaxMapAddressModeV" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -514,17 +514,17 @@ ZE_POSTPROCESSOR_START(Meta)
 				</enumurator>
 			</property>
 
-			<property name="OpacityEnabled"				type="boolean"			autogetset="yes"/>
-			<property name="Opacity"					type="float"			autogetset="yes"/>
-			<property name="OpacityComponent"			type="integer"			autogetset="yes">
+			<property name="OpacityEnabled" type="boolean" autogetset="yes"/>
+			<property name="Opacity" type="float" autogetset="yes"/>
+			<property name="OpacityComponent" type="integer" autogetset="yes">
 				<enumurator name = "ZEMaterialOpacityComponent">
 					<item name="Constant" value="ZE_MOC_CONSTANT"/>
 					<item name="Diffuse Map Alpha" value="ZE_MOC_DIFFUSE_ALPHA"/>
 					<item name="Opacity Map" value="ZE_MOC_OPACITYMAP"/>
 				</enumurator>
 			</property>
-			<!--<property name="OpacityMap"					type="string"			autogetset="yes"/>-->
-			<property name="OpacityMapAddressModeU"		type="integer"			autogetset="yes">
+			<!--<property name="OpacityMap" type="string" autogetset="yes"/>-->
+			<property name="OpacityMapAddressModeU" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -532,7 +532,7 @@ ZE_POSTPROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>  
-			<property name="OpacityMapAddressModeV"		type="integer"			autogetset="yes">
+			<property name="OpacityMapAddressModeV" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>

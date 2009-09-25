@@ -73,6 +73,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
  	if (zeCore->StartUp())
 	{
 		ZEFixedMaterial* Material = ZEFixedMaterial::CreateInstance();
+		Material->SetProperty("OpacityMapAddressModeU", ZE_TAM_BORDER);
 		Material->SetProperty("AmbientFactor", 5.0f);
 		int PropId = Material->GetPropertyId("AmbientColor");
 
