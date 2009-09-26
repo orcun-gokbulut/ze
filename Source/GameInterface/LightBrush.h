@@ -37,19 +37,19 @@
 #ifndef __ZE_LIGHTBRUSH_H__
 #define __ZE_LIGHTBRUSH_H__
 
+#include "Meta/Class.h"
 #include "GameInterface/Entity.h"
 #include "Graphics/Light.h"
 #include "Graphics/RenderOrder.h"
 
-ZE_ENTITY_DESCRIPTION(ZELightBrush, ZEEntity);
+ZE_META_CLASS_DESCRIPTION(ZELightBrush);
 
 class ZETexture2DResource;
 class ZETextureCubeResource;
 class ZEFixedMaterial;
-
 class ZELightBrush : public ZEEntity
 {
-	ZE_ENTITY_CLASS(ZELightBrush)
+	ZE_META_CLASS()
 	private:
 		ZELightType							LightType;
 		ZELight*							Light;
@@ -71,34 +71,36 @@ class ZELightBrush : public ZEEntity
 	public:
 		virtual bool						IsDrawable();
 
-		void								SetLightType(ZELightType LightType);
 		ZELight*							GetLight();
 
+		void								SetLightType(ZELightType LightType);
+		ZELightType							GetLightType() const;
+
 		void								SetColor(const ZEVector3& NewColor);
-		const ZEVector3&					GetColor();
+		const ZEVector3&					GetColor() const;
 
 		void								SetIntensity(float NewValue);
-		float								GetIntensity();
+		float								GetIntensity() const;
 
 		void								SetRange(float NewValue);
-		float								GetRange();
+		float								GetRange() const;
 
 		void								SetEnabled(bool NewValue);
 		
-		void								SetAttenuation(float DistanceSquare, float Distance, float Constant);
-		const ZEVector3&					GetAttenuation();
+		void								SetAttenuation(const ZEVector3& NewValue);
+		const ZEVector3&					GetAttenuation() const;
 
-		bool								IsCastingShadows();
-		void								SetCastShadows(bool NewValue);
+		void								SetCastsShadow(bool NewValue);
+		bool								GetCastsShadow() const;
 
 		void								SetProjectionTexture(const char* TextureFile);
-		const char*							GetProjectionTexture();
+		const char*							GetProjectionTexture() const;
 
 		void								SetProjectionFOV(float NewValue);
-		float								GetProjectionFOV();
+		float								GetProjectionFOV() const;
 
 		void								SetProjectionAspectRatio(float NewValue);
-		float								GetProjectionAspectRatio();
+		float								GetProjectionAspectRatio() const;
 
 		virtual void						Initialize();
 		virtual void						Deinitialize();
@@ -108,10 +110,34 @@ class ZELightBrush : public ZEEntity
 		virtual void						Update();
 		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
 
-		virtual bool						SetAttribute(const char* AttributeName, const ZEVariant& Value);
-		virtual bool						GetAttribute(const char* AttributeName, ZEVariant& Value);
-
 											ZELightBrush();
 		virtual								~ZELightBrush();
 };
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZELightBrush" parent="ZEEntity" icon="" description="Light brush">
+			<property name="LightType" type="integer" autogetset="true" description="Type of the light">
+				<enumurator name="ZELightType">
+					<item name="None" value="ZE_LT_NONE"/>  
+					<item name="Point Light" value="ZE_LT_POINT"/>
+					<item name="Directional Light" value="ZE_LT_DIRECTIONAL"/>
+					<item name="Projective Light" value="ZE_LT_PROJECTIVE"/>
+					<item name="Omni Projective Light" value="ZE_LT_OMNIPROJECTIVE"/>
+				</enumurator>
+			</property>
+			<property name="Intensity" type="float" autogetset="true" description="Intesity of the light"/>
+			<property name="Color" type="ZEVector3" autogetset="true" description= "Color of the light"/>
+			<property name="Range" type="float" autogetset="true" description="Range of the light"/>
+			<property name="Attenuation" type="ZEVector3" autogetset="true" description="Attenuation of the light"/>
+			<property name="CastsShadow" type="boolean" autogetset="true" description="Does light casts shadows ?"/>
+			<property name="ProjectionTexture" type="string" autogetset="true" description="Projection texture"/>
+			<property name="ProjectionFOV" type="float" autogetset="true" description="Field of view of the projection"/>
+			<property name="ProjectionAspectRatio" type="float" autogetset="true" description="Aspect Ratio of the projection"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END() 
+*/
 #endif

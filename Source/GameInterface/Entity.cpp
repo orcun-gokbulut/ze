@@ -36,7 +36,7 @@
 #include "Entity.h"
 #include "Core/Error.h"
 #include <string.h>
-
+/*
 void ZEEntityData::Generate(ZEEntityDescription* Description)
 {
 	const ZEEntityAttribute* TempAttributes;
@@ -85,8 +85,8 @@ bool ZEEntityData::Unserialize(ZEUnserializer* Unserializer)
 		Attributes[I].Value.Unserialize(Unserializer);
 	}
 	return true;
-}
-
+}*/
+/*
 ZEEntityDescription* ZEEntityDescription::GetParentType()
 {
 	return NULL;
@@ -136,6 +136,7 @@ const char* ZEEntityDescription::GetEditorDescription()
 {
 	return "Base entity class";
 }
+*/
 
 void ZEEntity::SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism)
 {
@@ -206,7 +207,7 @@ void ZEEntity::UnregisterComponent(ZEComponent* Component)
 				break;
 			}
 }
-
+/*
 ZEEntityDescription* ZEEntity::EntityDescription()
 {
 	static  ZEEntityDescription EntityDescription;
@@ -216,7 +217,7 @@ ZEEntityDescription* ZEEntity::EntityDescription()
 ZEEntityDescription* ZEEntity::GetEntityDescription()
 {
 	return EntityDescription();
-}
+}*/
 
 void ZEEntity::SetEntityId(int EntityId)
 {
@@ -224,7 +225,7 @@ void ZEEntity::SetEntityId(int EntityId)
 }
 
 
-int ZEEntity::GetEntityId()
+int ZEEntity::GetEntityId() const
 {
 	return EntityId;
 }
@@ -326,7 +327,7 @@ void ZEEntity::SetName(const char* NewName)
 	strncpy(Name, NewName, ZE_MAX_NAME_SIZE);
 }
 
-const char* ZEEntity::GetName()
+const char* ZEEntity::GetName() const
 {
 	return Name;
 }
@@ -336,19 +337,19 @@ void ZEEntity::SetVisible(bool Visible)
 	this->Visible = Visible;
 }
 
-bool ZEEntity::IsVisible()
+bool ZEEntity::GetVisible() const
 {
 	return Visible;
-}
-
-bool ZEEntity::IsEnabled()
-{
-	return Enabled;
 }
 
 void ZEEntity::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
+}
+
+bool ZEEntity::GetEnabled() const
+{
+	return Enabled;
 }
 
 void ZEEntity::SetPosition(const ZEPoint3& NewPosition) 
@@ -360,7 +361,7 @@ void ZEEntity::SetPosition(const ZEPoint3& NewPosition)
 	UpdateComponents();
 }
 
-const ZEPoint3& ZEEntity::GetPosition()
+const ZEPoint3& ZEEntity::GetPosition() const
 {
 	return Position;
 }
@@ -374,7 +375,7 @@ void ZEEntity::SetRotation(const ZEQuaternion& NewRotation)
 	UpdateComponents();
 }
 
-const ZEQuaternion& ZEEntity::GetRotation()
+const ZEQuaternion& ZEEntity::GetRotation() const
 {
 	return Rotation;
 }
@@ -388,7 +389,7 @@ void ZEEntity::SetScale(const ZEVector3& NewScale)
 	UpdateComponents();
 }
 
-const ZEVector3& ZEEntity::GetScale()
+const ZEVector3& ZEEntity::GetScale() const
 {
 	return Scale;
 }
@@ -409,7 +410,7 @@ void ZEEntity::SetVelocity(const ZEVector3& NewVelocity)
 	Velocity = NewVelocity;
 }
 
-const ZEVector3& ZEEntity::GetVelocity()
+const ZEVector3& ZEEntity::GetVelocity() const
 {
 	return Velocity;
 }
@@ -427,12 +428,12 @@ void ZEEntity::Destroy()
 	delete this;
 }
 
-void ZEEntity::Reset(ZEEntityData* EntityData)
+void ZEEntity::Reset()
 {
 	Deinitialize();
 	Initialize();
 }
-
+/*
 bool ZEEntity::SetAttribute(const char* AttributeName, const ZEVariant& Value)
 {
 	if (strcmp(AttributeName, "EntityId") == 0)
@@ -479,7 +480,7 @@ bool ZEEntity::GetAttribute(const char* AttributeName, ZEVariant& Value)
 
 	return true;
 }
-
+*/
 void ZEEntity::UpdateBoundingVolumes()
 {
 	if (BoundingVolumeMechanism == ZE_BVM_USEBOTH || BoundingVolumeMechanism == ZE_BVM_USECOMPONENTS)
@@ -507,7 +508,7 @@ void ZEEntity::Update()
 void ZEEntity::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
 {
 }
-
+/*
 bool ZEEntity::Serialize(ZESerializer* Serializer)
 {
 	ZEVariant Value;
@@ -570,7 +571,7 @@ bool ZEEntity::Unserialize(ZEUnserializer* Unserializer)
 	return true;
 }
 
- 
+ */
 ZEEntity::ZEEntity()
 {
 	Name[0] = '\0';
@@ -589,5 +590,7 @@ ZEEntity::ZEEntity()
 
 ZEEntity::~ZEEntity()
 {
-	ZEWARNINGASSERT(Components.GetCount() != 0, "Entity : %s. There are uninitialized component available.", GetEntityDescription()->GetTypeName());
+	ZEWARNINGASSERT(Components.GetCount() != 0, "Entity : %s. There are uninitialized component available.", GetClassDescription()->GetName());
 }
+
+#include "Entity.h.zpp"

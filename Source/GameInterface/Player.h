@@ -36,18 +36,19 @@
 #pragma once
 #ifndef	__ZE_PLAYER_H__
 #define __ZE_PLAYER_H__
-
+ 
+#include "Meta/Class.h"
 #include "Graphics/Camera.h"
 #include "Graphics/Canvas.h"
 #include "Sound/Listener.h"
 #include "Input/InputMap.h"
 #include "Graphics/Light.h"
 
-ZE_ENTITY_DESCRIPTION(ZEPlayer, ZEEntity);
+ZE_META_CLASS_DESCRIPTION(ZEPlayer);
 
 class ZEPlayer : public ZEEntity
 {
-	ZE_ENTITY_CLASS(ZEPlayer)
+	ZE_META_CLASS(ZEPlayer)
 	private:
 		ZEInputMap				InputMap;
 		ZECamera				Camera;
@@ -74,4 +75,14 @@ class ZEPlayer : public ZEEntity
 								ZEPlayer();
 								~ZEPlayer();
 };
+
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZEPlayer" parent="ZEEntity" description="Player spawn point"/>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END()
+*/
 #endif

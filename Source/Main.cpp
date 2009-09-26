@@ -72,11 +72,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 //	zeCore->GetWindow()->SetWindowPosition(0, 0);
  	if (zeCore->StartUp())
 	{
-		ZEFixedMaterial* Material = ZEFixedMaterial::CreateInstance();
-		Material->SetProperty("OpacityMapAddressModeU", ZE_TAM_BORDER);
-		Material->SetProperty("AmbientFactor", 5.0f);
-		int PropId = Material->GetPropertyId("AmbientColor");
-
 		ZEScene* Scene = zeCore->GetGame()->GetScene();
 
 		ZERenderer* Renderer;
@@ -132,6 +127,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		CanvasMaterial->SetSpecularColor(ZEVector3(1.0f, 1.0f, 1.0f));
 		CanvasMaterial->SetSpecularShininess(64.0f);
 		CanvasMaterial->UpdateMaterial();
+		ZEFileSerializer Serializer;
+		Serializer.OpenFile("test.ze");
+		CanvasMaterial->Serialize((ZESerializer*)&Serializer);
+		Serializer.CloseFile();
+
+		CanvasBrush->Material->Destroy();
+		CanvasMaterial = ZEFixedMaterial::CreateInstance();
+		CanvasBrush->Material = (ZEMaterial*)CanvasMaterial;
+
+		ZEFileUnserializer Unserializer;
+		Unserializer.OpenFile("test.ze");
+		CanvasMaterial->Unserialize((ZEUnserializer*)&Unserializer);
+		Unserializer.CloseFile();
 		Scene->AddEntity(CanvasBrush);
 
 		/*

@@ -89,8 +89,7 @@ class ZEMapPortal
 		ZEVertexBuffer*							VertexBuffer;
 		ZEArray<ZERenderOrder>					RenderOrders;
 		ZEArray<ZEMapPolygon>					Polygons;
-		ZEArray<ZEEntityData>					Brushes;
-			
+				
 		bool									HasOctree;
 		ZEOctree*								Octree;
 	

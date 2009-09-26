@@ -37,47 +37,11 @@
 #include "Core/Error.h"
 #include "Graphics/Canvas.h"
 
-ZE_ENTITY_DESCRIPTION_START(ZEModelBrush, ZEEntity, ZE_ERA_BOTH, "", "This entity used for displaying animated visual models in the game environments like statues, mechineries, furnitures and etc.")
-	ZE_ENTITY_ATTRIBUTE_ENUMURATOR_START(ZEModelAnimationState)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("Static Frame", ZE_MAS_STATICFRAME)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("Playing", ZE_MAS_PLAYING)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("Paused", ZE_MAS_PAUSED)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("Stopped", ZE_MAS_STOPPED)
-	ZE_ENTITY_ATTRIBUTE_ENUMURATOR_END()
-	ZE_ENTITY_ATTRIBUTE_ENUMURATOR_START(ZEModelAnimationType)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("No Animation", ZE_MAT_NOANIMATION)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("Predifined", ZE_MAT_PREDEFINED)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("Physical", ZE_MAT_PHYSICAL)
-	ZE_ENTITY_ATTRIBUTE_ENUMURATOR_END()
-	ZE_ENTITY_ATTRIBUTES_START()
-		ZE_ENTITY_ATTRIBUTE_FILENAME("ModelFile", ZE_EAF_NONE, "zeModel", "", "FileName of the model that will be used")
-		ZE_ENTITY_ATTRIBUTE("EnablePhysics", ZE_VRT_BOOLEAN, ZE_EAF_NONE, true, "Will model brush will have physical interaction")
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR("AnimationState", ZE_EAF_NONE, ZEModelAnimationState, ZE_MAS_STOPPED, "Animation state of the model brush.")
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR("AnimationType", ZE_EAF_NONE, ZEModelAnimationType, ZE_MAT_NOANIMATION, "Animation type of the model brush.")
-		ZE_ENTITY_ATTRIBUTE("AnimationName", ZE_VRT_STRING, ZE_EAF_NONE, "", "Animation name of the model brush")
-		ZE_ENTITY_ATTRIBUTE("AnimationLooping", ZE_VRT_BOOLEAN, ZE_EAF_NONE, true, "Animation loooping")
-		ZE_ENTITY_ATTRIBUTE("AnimationFrame", ZE_VRT_INTEGER, ZE_EAF_NONE, 0, "Animation Frame")
-		ZE_ENTITY_ATTRIBUTE("AnimationSpeed", ZE_VRT_FLOAT, ZE_EAF_NONE, 0, "Speed of the animation being played.")
-	ZE_ENTITY_ATTRIBUTES_END()
-ZE_ENTITY_DESCRIPTION_END(ZEModelBrush)
-
 bool ZEModelBrush::IsDrawable()
 {
 	return true;
 }
-
-		
-void ZEModelBrush::SetModelFile(const char* ModelFile)
-{
-	Model->SetModelResource(ZEModelResource::LoadSharedResource(ModelFile));
-}
-
-const char* ZEModelBrush::GetModelFileName()
-{
-	if (Model != NULL)
-		return Model->GetModelResource()->GetFileName();
-}
-	
+			
 ZEModel* ZEModelBrush::GetModel()
 {
 	return Model;
@@ -93,7 +57,96 @@ const ZEAABoundingBox& ZEModelBrush::GetWorldBoundingBox()
 	return Model->GetWorldBoundingBox();
 }
 
- void ZEModelBrush::Initialize()
+void ZEModelBrush::SetModelFile(const char* ModelFile)
+{
+	if (strcmp(ModelFile, "") != 0)
+		Model->SetModelResource(ZEModelResource::LoadSharedResource(ModelFile));
+	else
+		Model->SetModelResource(NULL);
+}
+
+const char* ZEModelBrush::GetModelFile() const
+{
+	if (Model->GetModelResource() != NULL)
+		return Model->GetModelResource()->GetFileName();
+	else
+		return "";
+}
+
+void ZEModelBrush::SetEnablePhysics(bool Enable)
+{
+	Model->SetPhysicsEnabled(Enable);
+}
+
+bool ZEModelBrush::GetEnablePhysics() const
+{
+	return Model->GetPhysicsEnabled();
+}
+
+void ZEModelBrush::SetAnimationState(ZEModelAnimationState AnimationState)
+{
+	Model->SetAnimationState(AnimationState);
+}
+
+ZEModelAnimationState ZEModelBrush::GetAnimationState() const
+{
+	return Model->GetAnimationState();
+}
+
+void ZEModelBrush::SetAnimationType(ZEModelAnimationType AnimationType)
+{
+	Model->SetAnimationType(AnimationType);
+}
+
+ZEModelAnimationType ZEModelBrush::GetAnimationType() const
+{
+	return Model->GetAnimationType();
+}
+
+void ZEModelBrush::SetAnimationName(const char* AnimationName)
+{
+	Model->SetAnimationByName(strcmp(AnimationName, "") == 0 ? NULL : AnimationName);
+}
+
+const char* ZEModelBrush::GetAnimationName() const
+{
+	if (Model->GetAnimation() != NULL)
+		return Model->GetAnimation()->Name;
+	else
+		return "";
+}
+
+void ZEModelBrush::SetAnimationLooping(bool AnimationLooping)
+{
+	Model->SetAnimationLooping(AnimationLooping);
+}
+
+bool ZEModelBrush::GetAnimationLooping() const
+{
+	return Model->GetAnimationLooping();
+}
+
+void ZEModelBrush::SetAnimationFrame(int AnimationFrame)
+{
+		Model->SetAnimationFrame(AnimationFrame);
+}
+
+int ZEModelBrush::GetAnimationFrame() const
+{
+	return Model->GetAnimationFrame();
+}
+
+void ZEModelBrush::SetAnimationSpeed(float AnimationSpeed)
+{
+	Model->SetAnimationSpeed(AnimationSpeed);
+}
+
+float ZEModelBrush::GetAnimationSpeed() const
+{
+	return Model->GetAnimationSpeed();
+}
+
+void ZEModelBrush::Initialize()
 {
 	if (Model == NULL)
 	{
@@ -127,59 +180,6 @@ void ZEModelBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight
 		Model->Draw(Renderer, Lights);
 }
 
-bool ZEModelBrush::SetAttribute(const char* AttributeName, const ZEVariant& Value)
-{
-	if (strcmp(AttributeName, "ModelFile") == 0)
-		if (strcmp(Value.GetString(), "") != 0)
-			Model->SetModelResource(ZEModelResource::LoadSharedResource(Value.GetString()));
-		else
-			Model->SetModelResource(NULL);
-	else if (strcmp(AttributeName, "EnablePhysics") == 0)
-		Model->SetPhysicsEnabled(Value.GetBoolean());
-	else if (strcmp(AttributeName, "AnimationState") == 0)
-		Model->SetAnimationState((ZEModelAnimationState)Value.GetInteger());
-	else if (strcmp(AttributeName, "AnimationType") == 0)
-		Model->SetAnimationType((ZEModelAnimationType)Value.GetInteger());
-	else if (strcmp(AttributeName, "AnimationName") == 0)
-		Model->SetAnimationByName(strcmp(Value.GetString(), "") == 0 ? NULL : Value.GetString());
-	else if (strcmp(AttributeName, "AnimationLooping") == 0)
-		Model->SetAnimationLooping(Value.GetBoolean());
-	else if (strcmp(AttributeName, "AnimationFrame") == 0)
-		Model->SetAnimationFrame(Value.GetInteger());
-	else if (strcmp(AttributeName, "AnimationSpeed") == 0)
-		Model->SetAnimationSpeed(Value.GetFloat());
-	else
-		return ZEEntity::SetAttribute(AttributeName, Value);
-
-	return true;
-}
-
-bool ZEModelBrush::GetAttribute(const char* AttributeName, ZEVariant& Value)
-{
-	if (strcmp(AttributeName, "ModelFile") == 0)
-		if (Model == NULL || Model->GetModelResource() == NULL)
-			Value = "";
-		else
-			Value =  Model->GetModelResource()->GetFileName();
-	else if (strcmp(AttributeName, "EnablePhysics") == 0)
-		Value = Model->GetPhysicsEnabled();
-	else if (strcmp(AttributeName, "AnimationState") == 0)
-		Value = Model->GetAnimationState();
-	else if (strcmp(AttributeName, "AnimationType") == 0)
-		Value = Model->GetAnimationType();
-	else if (strcmp(AttributeName, "AnimationName") == 0)
-		Value = (Model->GetAnimation() != NULL ? Model->GetAnimation()->Name : "");
-	else if (strcmp(AttributeName, "AnimationLooping") == 0)
-		Value = Model->GetAnimationLooping();
-	else if (strcmp(AttributeName, "AnimationFrame") == 0)
-		Value = (int)Model->GetAnimationFrame();
-	else if (strcmp(AttributeName, "AnimationSpeed") == 0)
-		Value = (float)Model->GetAnimationSpeed();
-	else
-		return ZEEntity::GetAttribute(AttributeName, Value);
-
-	return true;
-}
 ZEModelBrush::ZEModelBrush()
 {
 	Model = NULL;
@@ -190,3 +190,5 @@ ZEModelBrush::~ZEModelBrush()
 {
 	Deinitialize();
 }
+
+#include "ModelBrush.h.zpp"

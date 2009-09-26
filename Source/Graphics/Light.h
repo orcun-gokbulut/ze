@@ -72,22 +72,22 @@ class ZELight : public ZEComponent
 		virtual void					OwnerWorldTransformChanged();
 
 		void							SetColor(const ZEVector3& NewColor);
-		const ZEVector3&				GetColor();
+		const ZEVector3&				GetColor() const;
 
 		void							SetIntensity(float NewValue);
-		float							GetIntensity();
+		float							GetIntensity() const;
 
 		void							SetRange(float NewValue);
-		float							GetRange();
+		float							GetRange() const;
 
-		bool							IsEnabled();
 		void							SetEnabled(bool NewValue);
+		bool							GetEnabled() const;
 		
 		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
-		const ZEVector3&				GetAttenuation();
+		const ZEVector3&				GetAttenuation() const;
 
-		bool							IsCastingShadows();
-		virtual void					SetCastShadows(bool NewValue);
+		virtual void					SetCastsShadows(bool NewValue);
+		bool							GetCastsShadows() const;
 		
 		virtual void					RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer) = 0;
 		virtual const ZERLLight*		GetRenderOrderLight();

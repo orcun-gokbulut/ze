@@ -54,10 +54,6 @@
 #define ACTIONID_CONSOLE		10
 #define ACTIONID_RAYCAST		11
 
-ZE_ENTITY_DESCRIPTION_START(ZEPlayer, ZEEntity, ZE_ERA_BOTH, "", "Player spawn point")
-	ZE_ENTITY_NOATTRIBUTE(ZEPlayer)
-ZE_ENTITY_DESCRIPTION_END(ZEPlayer)
-
 ZECamera* ZEPlayer::GetCamera()
 {
 	return &Camera;
@@ -245,3 +241,5 @@ ZEPlayer::~ZEPlayer()
 {
 	Deinitialize();
 }
+
+#include "Player.h.zpp"

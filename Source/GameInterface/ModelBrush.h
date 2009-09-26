@@ -40,27 +40,49 @@
 #include "GameInterface/Entity.h"
 #include "Graphics/Light.h"
 #include "Graphics/RenderOrder.h"
-#include "Graphics/VertexBuffer.h"
+#include "Graphics/VertexBuffer.h" 
 #include "Graphics/Material.h"
 #include "Model/Model.h"
 
-ZE_ENTITY_DESCRIPTION(ZEModelBrush, ZEEntity);
+ZE_META_CLASS_DESCRIPTION(ZEModelBrush);
 
 class ZEModelBrush : public ZEEntity
 {
-	ZE_ENTITY_CLASS(ZEModelBrush)
+	ZE_META_CLASS()
 	private:
 		ZEModel*							Model;
 
 	public:
 		virtual bool						IsDrawable();
 
-		void								SetModelFile(const char* ModelFile);
-		const char*							GetModelFileName();
 		ZEModel*							GetModel();
 
 		virtual const ZEAABoundingBox&		GetLocalBoundingBox();
 		virtual const ZEAABoundingBox&		GetWorldBoundingBox();
+
+		void								SetModelFile(const char* FileName);
+		const char*							GetModelFile() const;
+
+		void								SetEnablePhysics(bool Enable);
+		bool 								GetEnablePhysics() const;
+
+		void 								SetAnimationState(ZEModelAnimationState AnimationState);
+		ZEModelAnimationState 				GetAnimationState() const;
+
+		void								SetAnimationType(ZEModelAnimationType AnimationType);
+		ZEModelAnimationType				GetAnimationType() const;
+
+		void								SetAnimationName(const char* AnimationName);
+		const char*							GetAnimationName() const;
+
+		void								SetAnimationLooping(bool AnimationLooping);
+		bool								GetAnimationLooping() const;
+
+		void 								SetAnimationFrame(int AnimationFrame);
+		int									GetAnimationFrame() const;
+
+		void								SetAnimationSpeed(float AnimationSpeed);
+		float								GetAnimationSpeed() const;
 
 		virtual void						Initialize();
 		virtual void						Deinitialize();
@@ -69,10 +91,39 @@ class ZEModelBrush : public ZEEntity
 		virtual void						Update();
 		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
 
-		virtual bool						SetAttribute(const char* AttributeName, const ZEVariant& Value);
-		virtual bool						GetAttribute(const char* AttributeName, ZEVariant& Value);
-
 											ZEModelBrush();
 		virtual								~ZEModelBrush();
 };
-#endif
+
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta>
+	 	<class name="ZEModelBrush" parent="ZEEntity" icon="" description="This entity used for displaying animated visual models in the game environments like statues, mechineries, furnitures and etc.">
+			<property name="ModelFile" type="string" autogetset="true" description="FileName of the model that will be used"/>
+			<property name="EnablePhysics" type="boolean" autogetset="true" description="Will model brush will have physical interaction"/>
+			<property name="AnimationState" type="integer" autogetset="true" description="Animation state of the model brush.">
+				<enumurator name="ZEModelAnimationState">
+					<item name="Static Frame" value="ZE_MAS_STATICFRAME"/>
+					<item name="Playing" value="ZE_MAS_PLAYING"/>
+					<item name="Paused" value="ZE_MAS_PAUSED"/>
+					<item name="Stopped" value="ZE_MAS_STOPPED"/>
+				</enumurator>
+			</property>
+			<property name="AnimationType" type="integer" autogetset="true" description="Animation type of the model brush.">
+				<enumurator name="ZEModelAnimationType">
+					<item name="No Animation" value="ZE_MAT_NOANIMATION"/>
+					<item name="Predifined" value="ZE_MAT_PREDEFINED"/>
+					<item name="Physical" value="ZE_MAT_PHYSICAL"/>
+				</enumurator>
+			</property>
+			<property name="AnimationName" type="string" autogetset="true" description="Animation name of the model brush"/>
+			<property name="AnimationLooping" type="boolean" autogetset="true" description="Animation loooping"/>
+			<property name="AnimationFrame" type="integer" autogetset="true" description="Animation Frame"/>
+			<property name="AnimationSpeed" type="float" autogetset="true" description="Speed of the animation being played."/>
+		</class>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END()
+*/
+#endif 

@@ -387,7 +387,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Zinek Engine Post Processor"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -811,6 +811,15 @@
 			<File
 				RelativePath=".\Source\GameInterface\Entity.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\GameInterface\Game.cpp"
@@ -831,6 +840,15 @@
 			<File
 				RelativePath=".\Source\GameInterface\LightBrush.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\GameInterface\ModelBrush.cpp"
@@ -839,6 +857,16 @@
 			<File
 				RelativePath=".\Source\GameInterface\ModelBrush.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						AdditionalDependencies=""
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\GameInterface\Player.cpp"
@@ -855,6 +883,15 @@
 			<File
 				RelativePath=".\Source\GameInterface\Player.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\GameInterface\Portal.h"
@@ -883,6 +920,15 @@
 			<File
 				RelativePath=".\Source\GameInterface\SkyBrush.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter

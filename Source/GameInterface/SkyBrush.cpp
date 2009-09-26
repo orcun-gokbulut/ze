@@ -37,17 +37,6 @@
 #include "SkyBrush.h"
 #include <string.h>
 
-ZE_ENTITY_DESCRIPTION_START(ZESkyBrush, ZEEntity, ZE_ERA_BOTH, "", "Sky Brush")
-	ZE_ENTITY_ATTRIBUTES_START()
-		ZE_ENTITY_ATTRIBUTE_SEMANTIC("SkyColor", ZE_VRT_VECTOR3, ZE_EAF_NONE, ZE_EAS_COLORVALUE, ZEVector3(0.75f, 0.65f, 0.90f), "Color of the sky")
-		ZE_ENTITY_ATTRIBUTE_FILENAME("SkyTexture", ZE_EAF_NONE, "Image", "", "Texture of the sky")
-		ZE_ENTITY_ATTRIBUTE("SkyLightEnabled", ZE_VRT_BOOLEAN, ZE_EAF_NONE, false, "Sun light enabled")
-		ZE_ENTITY_ATTRIBUTE_SEMANTIC("SkyLightColor", ZE_VRT_VECTOR3, ZE_EAF_NONE, ZE_EAS_COLORVALUE, ZEVector3(1.0f, 1.0f, 1.0f), "Color of the sun")
-		ZE_ENTITY_ATTRIBUTE("SkyLightDirection", ZE_VRT_VECTOR3, ZE_EAF_NONE, ZEVector3(0.0f, -1.0f, 0.0f), "Direction of the light")
-		ZE_ENTITY_ATTRIBUTE("SkyLightIntensity", ZE_VRT_FLOAT, ZE_EAF_NONE, 1.0f, "Intensity of the light")
-	ZE_ENTITY_ATTRIBUTES_END()
-ZE_ENTITY_DESCRIPTION_END(ZESkyBrush)
-
 const ZEAABoundingBox& ZESkyBrush::GetWorldBoundingBox()
 {
 	return ZEAABoundingBox();
@@ -60,7 +49,7 @@ bool ZESkyBrush::IsDrawable()
 
 bool ZESkyBrush::IsLight()
 {
-	return IsEnabled() && SkyLight.IsEnabled();
+	return GetEnabled() && SkyLight.IsEnabled();
 }
 
 bool ZESkyBrush::AllwaysDraw()
@@ -73,7 +62,7 @@ void ZESkyBrush::SetSkyColor(const ZEVector3& Color)
 	SkyMaterial->SetAmbientColor(Color);
 }
 
-const ZEVector3& ZESkyBrush::GetSkyColor()
+const ZEVector3& ZESkyBrush::GetSkyColor() const
 {
 	return SkyMaterial->GetAmbientColor();
 }
@@ -89,7 +78,7 @@ void ZESkyBrush::SetSkyTexture(const char* FileName)
 	SkyTexture = ZETextureCubeResource::LoadResource(FileName);
 }
 
-const char* ZESkyBrush::GetSkyTexture()
+const char* ZESkyBrush::GetSkyTexture() const
 {
 	if (SkyTexture == NULL)
 		return "";
@@ -102,7 +91,7 @@ void ZESkyBrush::SetSkyLightEnabled(bool Enabled)
 	SkyLight.SetEnabled(Enabled);
 }
 
-bool ZESkyBrush::GetSkyLightEnabled()
+bool ZESkyBrush::GetSkyLightEnabled() const
 {
 	return SkyLight.IsEnabled();
 }
@@ -112,7 +101,7 @@ void ZESkyBrush::SetSkyLightColor(const ZEVector3& Color)
 	SkyLight.SetColor(Color);
 }
 
-const ZEVector3& ZESkyBrush::GetSkyLightColor()
+const ZEVector3& ZESkyBrush::GetSkyLightColor() const
 {
 	return SkyLight.GetColor();
 }
@@ -122,7 +111,7 @@ void ZESkyBrush::SetSkyLightDirection(const ZEVector3& Direction)
 	//SkyLight.SetDirection(Direction);
 }
 
-const ZEVector3& ZESkyBrush::GetSkyLightDirection()
+const ZEVector3& ZESkyBrush::GetSkyLightDirection() const
 {
 //	return SkyLight.GetDirection();
 	return ZEVector3();
@@ -133,50 +122,9 @@ void ZESkyBrush::SetSkyLightIntensity(float Intensity)
 	SkyLight.SetIntensity(Intensity);
 }
 
-float ZESkyBrush::GetSkyLightIntensity()
+float ZESkyBrush::GetSkyLightIntensity() const
 {
 	return SkyLight.GetIntensity();
-	
-}
-
-bool ZESkyBrush::SetAttribute(const char* AttributeName, const ZEVariant& Value)
-{
-	if (stricmp(AttributeName, "SkyTexture") == 0)
-		SetSkyTexture(Value.GetString());
-	else if (stricmp(AttributeName, "SkyColor") == 0)
-		SetSkyColor(Value.GetVector3());
-	else if (stricmp(AttributeName, "SkyLightEnabled") == 0)
-		SetSkyLightEnabled(Value.GetBoolean());
-	else if (stricmp(AttributeName, "SkyLightColor") == 0)
-		SetSkyLightColor(Value.GetVector3());
-	else if (stricmp(AttributeName, "SkyLightDirection") == 0)
-		SetSkyLightDirection(Value.GetVector3());
-	else if (stricmp(AttributeName, "SkyLightIntensity") == 0)
-		SetSkyLightIntensity(Value.GetFloat());
-	else
-		return ZEEntity::SetAttribute(AttributeName, Value);
-
-	return true;
-}
-
-bool ZESkyBrush::GetAttribute(const char* AttributeName, ZEVariant& Value)
-{
-	if (stricmp(AttributeName, "SkyTexture") == 0)
-		Value =  GetSkyTexture();
-	else if (stricmp(AttributeName, "SkyColor") == 0)
-		Value =  GetSkyColor();
-	else if (stricmp(AttributeName, "SkyLightEnabled") == 0)
-		Value = GetSkyLightEnabled();
-	else if (stricmp(AttributeName, "SkyLightColor") == 0)
-		Value =  GetSkyLightColor();
-	else if (stricmp(AttributeName, "SkyLightDirection") == 0)
-		Value =  GetSkyLightDirection();
-	else if (stricmp(AttributeName, "SkyLightIntensity") == 0)
-		Value =  GetSkyLightIntensity();
-	else
-		return ZEEntity::GetAttribute(AttributeName, Value);
-
-	return true;
 }
 
 void ZESkyBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
@@ -220,3 +168,6 @@ ZESkyBrush::ZESkyBrush()
 ZESkyBrush::~ZESkyBrush()
 {
 }
+
+
+#include "SkyBrush.h.zpp"

@@ -41,27 +41,6 @@
 #include "Graphics/FixedMaterial.h"
 #include "Graphics/TextureResource.h"
 
-ZE_ENTITY_DESCRIPTION_START(ZELightBrush, ZEEntity, ZE_ERA_BOTH, "", "Light brush")
-	ZE_ENTITY_ATTRIBUTE_ENUMURATOR_START(ZELightType)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("None", ZE_LT_NONE)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("Point Light", ZE_LT_POINT)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("Directional Light", ZE_LT_DIRECTIONAL)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("Projective Light", ZE_LT_PROJECTIVE)
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR_ELEMENT("Omni Projective Light", ZE_LT_OMNIPROJECTIVE)
-	ZE_ENTITY_ATTRIBUTE_ENUMURATOR_END()
-	ZE_ENTITY_ATTRIBUTES_START()
-		ZE_ENTITY_ATTRIBUTE_ENUMURATOR("LightType", ZE_EAF_NONE, ZELightType, ZE_LT_NONE,"Type of the light")
-		ZE_ENTITY_ATTRIBUTE("Intensity", ZE_VRT_FLOAT, ZE_EAF_NONE, 1.0f, "Intesity of the light")
-		ZE_ENTITY_ATTRIBUTE_SEMANTIC("Color", ZE_VRT_VECTOR3, ZE_EAF_NONE, ZE_EAS_COLORVALUE, ZEVector3(1.0f, 1.0f, 1.0f), "Color of the light")
-		ZE_ENTITY_ATTRIBUTE("Range", ZE_VRT_FLOAT, ZE_EAF_NONE, 10.0f, "Range of the light")
-		ZE_ENTITY_ATTRIBUTE("Attenuation", ZE_VRT_VECTOR3, ZE_EAF_NONE, ZEVector3(0.0f, 0.0f, 1.0f), "Attenuation of the light")
-		ZE_ENTITY_ATTRIBUTE("CastsShadow", ZE_VRT_BOOLEAN, ZE_EAF_NONE, false, "Does light casts shadows ?")
-		ZE_ENTITY_ATTRIBUTE_FILENAME("ProjectionTexture", ZE_EAF_NONE, "Image", "", "Projection texture")
-		ZE_ENTITY_ATTRIBUTE("ProjectionFOV", ZE_VRT_FLOAT, ZE_EAF_NONE, ZE_PI_2, "Field of view of the projection")
-		ZE_ENTITY_ATTRIBUTE("ProjectionAspectRatio", ZE_VRT_FLOAT, ZE_EAF_NONE, 1.0f, "Aspect Ratio of the projection")
-	ZE_ENTITY_ATTRIBUTES_END()
-ZE_ENTITY_DESCRIPTION_END(ZELightBrush)
-
 bool ZELightBrush::IsDrawable()
 {
 	return true;
@@ -129,7 +108,7 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 	Light->SetRange(Range);
 	Light->SetAttenuation(Attenuation.x, Attenuation.y, Attenuation.z);
 	Light->SetCastShadows(CastsShadow);
-	Light->SetEnabled(IsEnabled());
+	Light->SetEnabled(GetEnabled());
 
 	if (LightType == ZE_LT_PROJECTIVE)
 	{
@@ -154,6 +133,11 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 	RegisterComponent(Light);
 }
 
+ZELightType ZELightBrush::GetLightType() const
+{
+	return LightType;
+}
+
 void ZELightBrush::SetColor(const ZEVector3& NewColor)
 {
 	Color = NewColor;
@@ -161,7 +145,7 @@ void ZELightBrush::SetColor(const ZEVector3& NewColor)
 		Light->SetColor(NewColor);
 }
 
-const ZEVector3& ZELightBrush::GetColor()
+const ZEVector3& ZELightBrush::GetColor() const
 {
 	return Color;
 }
@@ -173,7 +157,7 @@ void ZELightBrush::SetIntensity(float NewValue)
 		Light->SetIntensity(NewValue);
 }
 
-float ZELightBrush::GetIntensity()
+float ZELightBrush::GetIntensity() const
 {
 	return Intensity;
 }
@@ -186,7 +170,7 @@ void ZELightBrush::SetRange(float NewValue)
 
 }
 
-float ZELightBrush::GetRange()
+float ZELightBrush::GetRange() const
 {
 	return Range;
 }
@@ -199,7 +183,7 @@ void ZELightBrush::SetProjectionFOV(float NewValue)
 
 }
 
-float ZELightBrush::GetProjectionFOV()
+float ZELightBrush::GetProjectionFOV() const
 {
 	return ProjectionFOV;
 }
@@ -212,7 +196,7 @@ void ZELightBrush::SetProjectionAspectRatio(float NewValue)
 
 }
 
-float ZELightBrush::GetProjectionAspectRatio()
+float ZELightBrush::GetProjectionAspectRatio() const
 {
 	return ProjectionAspectRatio;
 }
@@ -224,28 +208,29 @@ void ZELightBrush::SetEnabled(bool NewValue)
 		Light->SetEnabled(NewValue);
 }
 		
-void ZELightBrush::SetAttenuation(float DistanceSquare, float Distance, float Constant)
+void ZELightBrush::SetAttenuation(const ZEVector3& NewValue)
 {
-	Attenuation = ZEVector3(DistanceSquare, Distance, Constant);
+	Attenuation = NewValue;
 	if (Light != NULL)
-		Light->SetAttenuation(DistanceSquare, Distance, Constant);
+		Light->SetAttenuation(Attenuation.x, Attenuation.y, Attenuation.z);
 }
 
-const ZEVector3& ZELightBrush::GetAttenuation()
+const ZEVector3& ZELightBrush::GetAttenuation() const
 {
 	return Attenuation;
 }
 
-bool ZELightBrush::IsCastingShadows()
-{
-	return CastsShadow;
-}
-
-void ZELightBrush::SetCastShadows(bool NewValue)
+void ZELightBrush::SetCastsShadow(bool NewValue)
 {
 	CastsShadow = NewValue;
 	if (Light != NULL)
+	
 		Light->SetCastShadows(NewValue);
+}
+
+bool ZELightBrush::GetCastsShadow() const
+{
+	return CastsShadow;
 }
 
 void ZELightBrush::SetProjectionTexture(const char* TextureFile)
@@ -278,7 +263,7 @@ void ZELightBrush::SetProjectionTexture(const char* TextureFile)
 
 }
 
-const char* ZELightBrush::GetProjectionTexture()
+const char* ZELightBrush::GetProjectionTexture() const
 {
 	if (LightType == ZE_LT_PROJECTIVE && ProjectionTexture != NULL)
 		return ProjectionTexture->GetFileName();
@@ -366,58 +351,6 @@ void ZELightBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight
 	}
 }
 
-bool ZELightBrush::SetAttribute(const char* AttributeName, const ZEVariant& Value)
-{
-		if (strcmp(AttributeName, "LightType") == 0)
-			SetLightType((ZELightType)Value.GetInteger());
-		else if (strcmp(AttributeName, "Intensity") == 0)
-			SetIntensity(Value.GetFloat());
-		else if (strcmp(AttributeName, "Range") == 0)
-			SetRange(Value.GetFloat());
-		else if (strcmp(AttributeName, "Color") == 0)
-			SetColor(Value.GetVector3());
-		else if (strcmp(AttributeName, "Attenuation") == 0)
-			SetAttenuation(Value.GetVector3().x, Value.GetVector3().y ,Value.GetVector3().z);
-		else if (strcmp(AttributeName, "CastsShadow") == 0)
-			SetCastShadows(Value.GetBoolean());
-		else if (strcmp(AttributeName, "ProjectionTexture") == 0)
-			SetProjectionTexture(Value.GetString());
-		else if (strcmp(AttributeName, "ProjectionFOV") == 0)
-			SetProjectionFOV(Value.GetFloat());
-		else if (strcmp(AttributeName, "ProjectionAspectRatio") == 0)
-			SetProjectionAspectRatio(Value.GetFloat());
-		else
-			return ZEEntity::SetAttribute(AttributeName, Value);
-
-	return true;
-}
-
-bool ZELightBrush::GetAttribute(const char* AttributeName, ZEVariant& Value)
-{
-	if (strcmp(AttributeName, "LightType") == 0)
-		Value = (int)LightType;
-	else if (strcmp(AttributeName, "Intensity") == 0)
-		Value = GetIntensity();
-	else if (strcmp(AttributeName, "Range") == 0)
-		Value = GetRange();
-	else if (strcmp(AttributeName, "Attenuation") == 0)
-		Value = GetAttenuation();
-	else if (strcmp(AttributeName, "Color") == 0)
-		Value = GetColor();
-	else if (strcmp(AttributeName, "CastsShadow") == 0)
-		Value = IsCastingShadows();
-	else if (strcmp(AttributeName, "ProjectionTexture") == 0)
-		Value = GetProjectionTexture();
-	else if (strcmp(AttributeName, "ProjectionFOV") == 0)
-		Value = GetProjectionFOV();
-	else if (strcmp(AttributeName, "ProjectionAspectRatio") == 0)
-		Value = GetProjectionAspectRatio();
-	else
-		return ZEEntity::GetAttribute(AttributeName, Value);
-
-	return true;
-}
-
 ZELightBrush::ZELightBrush()
 {
 	Material = NULL;
@@ -441,3 +374,5 @@ ZELightBrush::~ZELightBrush()
 {
 	Deinitialize();
 }
+
+#include "LightBrush.h.zpp"
