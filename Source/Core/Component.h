@@ -80,12 +80,12 @@ class ZEComponent
 		virtual	bool					IsLight() const;
 		virtual	bool					IsDrawable() const;
 
+		const ZEMatrix4x4&				GetWorldTransform() const;
+		const ZEMatrix4x4&				GetLocalTransform() const;
+
 		virtual const ZEAABoundingBox&	GetLocalBoundingBox() const;
 		virtual const ZEAABoundingBox&	GetWorldBoundingBox() const;
 		const ZEBoundingSphere&			GetWorldBoundingSphere() const;
-
-		const ZEMatrix4x4&				GetWorldTransform() const;
-		const ZEMatrix4x4&				GetLocalTransform() const;
 
 		virtual void					SetOwner(ZEEntity* NewOwner);
 		virtual ZEEntity*				GetOwner() const;

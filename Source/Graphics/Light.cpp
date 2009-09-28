@@ -71,7 +71,7 @@ void ZELight::SetColor(const ZEVector3& NewColor)
 	RenderOrderLight.Color = NewColor;
 }
 
-const ZEVector3& ZELight::GetColor()
+const ZEVector3& ZELight::GetColor() const
 {
 	return RenderOrderLight.Color;
 }
@@ -81,7 +81,7 @@ void ZELight::SetIntensity(float NewValue)
 	RenderOrderLight.Intensity = NewValue;
 }
 
-float ZELight::GetIntensity()
+float ZELight::GetIntensity() const
 {
 	return RenderOrderLight.Intensity;
 }
@@ -91,7 +91,7 @@ void ZELight::SetRange(float NewValue)
 	RenderOrderLight.Range = NewValue;
 }
 
-float ZELight::GetRange()
+float ZELight::GetRange() const
 {
 	return RenderOrderLight.Range;
 }
@@ -103,14 +103,9 @@ void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constan
 	RenderOrderLight.Attenuation.z = DistanceSquare;
 }
 
-const ZEVector3& ZELight::GetAttenuation()
+const ZEVector3& ZELight::GetAttenuation() const
 {
 	return RenderOrderLight.Attenuation;
-}
-
-bool ZELight::IsEnabled()
-{
-	return Enabled;
 }
 
 void ZELight::SetEnabled(bool NewValue)
@@ -118,14 +113,19 @@ void ZELight::SetEnabled(bool NewValue)
 	Enabled = NewValue;
 }
 
-bool ZELight::IsCastingShadows()
+bool ZELight::GetEnabled() const
 {
-	return CastsShadows;
+	return Enabled;
 }
 
-void ZELight::SetCastShadows(bool NewValue)
+void ZELight::SetCastsShadows(bool NewValue)
 {
 	CastsShadows = NewValue;
+}
+
+bool ZELight::GetCastsShadows() const
+{
+	return CastsShadows;
 }
 
 const ZERLLight* ZELight::GetRenderOrderLight()
@@ -152,7 +152,7 @@ ZELightType ZEPointLight::GetLightType()
 	return ZE_LT_POINT;
 }
 
-void ZEPointLight::SetCastShadows(bool NewValue)
+void ZEPointLight::SetCastsShadows(bool NewValue)
 {
 	RenderOrderLight.CubeShadowMap = CastsShadows ? ShadowMap : NULL;
 	CastsShadows = NewValue;
@@ -282,7 +282,7 @@ void ZEProjectiveLight::SetShadowMap(int Width, int Height)
 
 void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer)
 {
-	if (!IsCastingShadows() || RenderOrderLight.ShadowMap == NULL || RenderOrderLight.ShadowMap->IsEmpty())
+	if (!GetCastsShadows() || RenderOrderLight.ShadowMap == NULL || RenderOrderLight.ShadowMap->IsEmpty())
 		return;
 
 	ZEViewPoint ViewPoint;

@@ -107,7 +107,7 @@ class ZEPointLight  : public ZELight
 	public:
 		ZELightType						GetLightType();
 
-		virtual void					SetCastShadows(bool NewValue);
+		virtual void					SetCastsShadows(bool NewValue);
 
 		const ZETextureCube*			GetShadowMap();
 
@@ -121,7 +121,7 @@ class ZEPointLight  : public ZELight
 class ZEDirectionalLight : public ZELight
 {
 	private:
-		ZETexture2D*						ShadowMap;
+		ZETexture2D*					ShadowMap;
 		ZEViewPlane						ViewVolume;
 
 	public:

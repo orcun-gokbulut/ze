@@ -168,7 +168,7 @@ void ZEEntity::RegisterComponent(ZEComponent* Component)
 {
 	if (Component->IsDrawable())
 	{
-		if (Component->IsVisible())
+		if (Component->GetVisible())
 			UpdateBoundingVolumes();
 
 		Drawable = true;
@@ -264,7 +264,7 @@ const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 		if (BoundingVolumeMechanism == ZE_BVM_USEBOTH || BoundingVolumeMechanism == ZE_BVM_USECOMPONENTS)
 			for (size_t I = 0; I < Components.GetCount(); I++)
 			{
-				if (Components[I]->IsDrawable() && Components[I]->IsVisible())
+				if (Components[I]->IsDrawable() && Components[I]->GetVisible())
 				{
 					const ZEAABoundingBox& CompBoundingBox = Components[I]->GetWorldBoundingBox();
 					if (NoBoundingBox == true)
@@ -433,54 +433,7 @@ void ZEEntity::Reset()
 	Deinitialize();
 	Initialize();
 }
-/*
-bool ZEEntity::SetAttribute(const char* AttributeName, const ZEVariant& Value)
-{
-	if (strcmp(AttributeName, "EntityId") == 0)
-		SetEntityId(Value.GetInteger());
-	else if (strcmp(AttributeName, "Position") == 0)
-		SetPosition(Value.GetVector3());
-	else if (strcmp(AttributeName, "EntityName") == 0)
-		SetName(Value.GetString());
-	else if (strcmp(AttributeName, "Rotation") == 0)
-		SetRotation(Value.GetQuaternion());
-	else if (strcmp(AttributeName, "Scale") == 0)
-		SetScale(Value.GetVector3());
-	else if (strcmp(AttributeName, "Enabled") == 0)
-		SetEnabled(Value.GetBoolean()) ;
-	else if (strcmp(AttributeName, "Visible") == 0)
-		SetVisible(Value.GetBoolean());
-	else
-		return false;
 
-	return true;
-}
-
-bool ZEEntity::GetAttribute(const char* AttributeName, ZEVariant& Value)
-{
-	if (strcmp(AttributeName, "EntityId") == 0)
-		Value = GetEntityId();
-	else if (strcmp(AttributeName, "EntityName") == 0)
-		Value = GetName();
-	else if (strcmp(AttributeName, "Position") == 0)
-		Value = GetPosition();
-	else if (strcmp(AttributeName, "Rotation") == 0)
-		Value = GetRotation();
-	else if (strcmp(AttributeName, "Scale") == 0)
-		Value = GetScale();
-	else if (strcmp(AttributeName, "Enabled") == 0)
-		Value = IsEnabled();
-	else if (strcmp(AttributeName, "Visible") == 0)
-		Value = IsVisible();
-	else
-	{
-		Value.SetNull();
-		return false;
-	}
-
-	return true;
-}
-*/
 void ZEEntity::UpdateBoundingVolumes()
 {
 	if (BoundingVolumeMechanism == ZE_BVM_USEBOTH || BoundingVolumeMechanism == ZE_BVM_USECOMPONENTS)
@@ -508,70 +461,7 @@ void ZEEntity::Update()
 void ZEEntity::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
 {
 }
-/*
-bool ZEEntity::Serialize(ZESerializer* Serializer)
-{
-	ZEVariant Value;
-	ZEEntityDescription* CurrDesc = GetEntityDescription();
-	ZEDWORD TotalAttributeCount = 0;
-	size_t AttributeCount;
 
-	while (CurrDesc != NULL)
-	{
-		CurrDesc->GetAttributes(&AttributeCount);
-		TotalAttributeCount += AttributeCount;
-		CurrDesc = CurrDesc->GetParentType();
-	}
-
-	Serializer->Write(&TotalAttributeCount, sizeof(ZEDWORD), 1);
-
-	CurrDesc = GetEntityDescription();
-	while (CurrDesc != NULL)
-	{
-
-		const ZEEntityAttribute* Attributes = CurrDesc->GetAttributes(&AttributeCount);
-		for (size_t I = 0; I < AttributeCount; I++)
-		{
-			Serializer->Write((void*)Attributes[I].Name, sizeof(char), ZE_MAX_NAME_SIZE);
-			if (!GetAttribute(Attributes[I].Name, Value))
-			{
-				zeError("Entity Serialize", "Entity does not have specified attribute. (Entity Id: %d, Entity Name : \"%s\", Attribute Name : \"%s\")", GetEntityId(), GetName(), Attributes[I].Name);
-				return false;
-			}
-
-			Value.Serialize(Serializer);
-		}
-
-		CurrDesc = CurrDesc->GetParentType();
-	}
-
-	return true;
-}
-
-bool ZEEntity::Unserialize(ZEUnserializer* Unserializer)
-{	
-	ZEDWORD AttributeCount;
-	Unserializer->Read(&AttributeCount, sizeof(ZEDWORD), 1);
-
-	for (size_t I = 0; I < AttributeCount; I++)
-	{
-		char AttributeName[ZE_MAX_NAME_SIZE];
-		Unserializer->Read(AttributeName, sizeof(char), ZE_MAX_NAME_SIZE);
-
-		ZEVariant AttributeValue;
-		AttributeValue.Unserialize(Unserializer);
-
-		if (!SetAttribute(AttributeName, AttributeValue))
-		{
-			zeError("Entity Unserialize", "Entity does not have specified attribute. (Entity Id: %d, Entity Name : \"%s\", Attribute Name : \"%s\")", GetEntityId(), GetName(), AttributeName);
-			return false;
-		}
-	}
-
-	return true;
-}
-
- */
 ZEEntity::ZEEntity()
 {
 	Name[0] = '\0';
@@ -594,3 +484,8 @@ ZEEntity::~ZEEntity()
 }
 
 #include "Entity.h.zpp"
+
+ZEEntityRunAt ZEEntityDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}

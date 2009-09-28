@@ -376,7 +376,7 @@ ZEListener* ZEScene::GetActiveListener()
 void ZEScene::Tick(float ElapsedTime)
 {
 	for (size_t I = 0; I < Entities.GetCount(); I++)
-		if (Entities[I]->IsEnabled())
+		if (Entities[I]->GetEnabled())
 			Entities[I]->Tick(ElapsedTime);
 }
 
@@ -533,7 +533,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 							DrawBoundingSphere(ZEBoundingSphere(Component->GetWorldPosition(), ((ZELight*)Component)->GetRange()), Renderer, LightRangeMaterial);
 
 						SceneLights.Add((ZELight*)Component);
-						if (((ZELight*)Component)->IsCastingShadows())
+						if (((ZELight*)Component)->GetCastsShadows())
 							((ZELight*)Component)->RenderShadowMap(this, ShadowRenderer);
 					}
 				}
@@ -544,7 +544,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 	{
 		ZEEntity* CurrentEntity = Entities[I];
-		if (CurrentEntity->IsDrawable() && CurrentEntity->IsVisible() && (CurrentEntity->AllwaysDraw() || ViewVolume.CullTest(CurrentEntity)))
+		if (CurrentEntity->IsDrawable() && CurrentEntity->GetVisible() && (CurrentEntity->AllwaysDraw() || ViewVolume.CullTest(CurrentEntity)))
 		{
 			EntityLights.Clear();
 			Lights.Clear();
@@ -573,7 +573,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 			for (size_t N = 0; N < Components.GetCount(); N++)
 			{
 				ZEComponent* Component = Components[N];
-				if (Component->IsDrawable() && Component->IsVisible() && ViewVolume.CullTest(Component))
+				if (Component->IsDrawable() && Component->GetVisible() && ViewVolume.CullTest(Component))
 				{
 					Lights.Clear();
 					for (size_t M = 0; M < EntityLights.GetCount(); M++)
@@ -633,7 +633,7 @@ bool ZEScene::Save(const char* FileName)
 
 		for (size_t I = 0; I < Entities.GetCount(); I++)
 		{
-			Serializer.Write((void*)Entities[I]->GetEntityDescription()->GetTypeName(), sizeof(char), ZE_MAX_NAME_SIZE);
+			Serializer.Write((void*)Entities[I]->GetClassDescription()->GetType(), sizeof(char), ZE_MAX_NAME_SIZE);
 			if (!Entities[I]->Serialize((ZESerializer*)&Serializer))
 			{
 				zeError("Scene", "Serialization of entity \"%s\" has failed.", Entities[I]->GetName());

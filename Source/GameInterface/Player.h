@@ -48,7 +48,7 @@ ZE_META_CLASS_DESCRIPTION(ZEPlayer);
 
 class ZEPlayer : public ZEEntity
 {
-	ZE_META_CLASS(ZEPlayer)
+	ZE_META_CLASS()
 	private:
 		ZEInputMap				InputMap;
 		ZECamera				Camera;

@@ -107,7 +107,7 @@ class ZEMapResource : public ZEResource
 		ZEArray<ZEMaterial*>					Materials;
 		ZEArray<ZEMapPortalDoor>				PortalDoors;
 		ZEArray<ZEMapPortal>					Portals;
-		ZEArray<ZEEntityData>					Entities;
+		/*ZEArray<ZEEntityData>					Entities;*/
 
 		const char*								GetResourceType() const;
 

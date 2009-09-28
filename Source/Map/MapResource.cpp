@@ -225,7 +225,7 @@ bool ReadOctreeFromFile(ZEResourceFile* ResourceFile, ZEOctree** Octree, ZEArray
 
 	return true;
 }
-
+/*
 bool ReadEntitiesFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEEntityData>& Entities)
 {
 	ZEDWORD ChunkIdentifier = ZE_MAP_ENTITY_CHUNK;
@@ -268,7 +268,7 @@ bool ReadEntitiesFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEEntityData>& E
 		}
 	}
 	return true;
-}
+}*/
 
 bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPhysicalMesh& PhysicalMesh)
 {
@@ -332,7 +332,6 @@ bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMapPortal>& Por
 
 		strncpy(Portal->Name, FilePortal.Name, ZE_MAP_MAX_NAME_SIZE);
 		Portal->BoundingBox = FilePortal.BoundingBox;
-		Portal->Brushes.SetCount(FilePortal.BrushCount);
 		Portal->Doors.SetCount(FilePortal.DoorCount);
 		Portal->Polygons.SetCount(FilePortal.PolygonCount);
 		Portal->HasPhysicalMesh = FilePortal.HasPhysicalMesh;
@@ -398,9 +397,9 @@ bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMapPortal>& Por
 			if (!ReadPhysicalMeshFromFile(ResourceFile, Portal->PhysicalMesh))
 				return false;
 
-		// Read Brushes
+	/*	// Read Brushes
 		if (!ReadEntitiesFromFile(ResourceFile, Portal->Brushes))
-			return false;
+			return false;*/
 	}
 	return true;
 }
@@ -424,7 +423,7 @@ bool ReadMapFromFile(ZEResourceFile* ResourceFile, ZEMapResource* Map)
 
 	Map->Portals.SetCount(TempHeader.PortalCount);
 	Map->Materials.SetCount(TempHeader.MaterialCount);
-	Map->Entities.SetCount(TempHeader.EntityCount);
+	/*Map->Entities.SetCount(TempHeader.EntityCount);*/
 
 	if (!ReadMaterialsFromFile(ResourceFile, Map->Materials, Map->TextureResources))
 	{
@@ -438,11 +437,11 @@ bool ReadMapFromFile(ZEResourceFile* ResourceFile, ZEMapResource* Map)
 		return false;
 	}
 
-	if (!ReadEntitiesFromFile(ResourceFile, Map->Entities))
+/*	if (!ReadEntitiesFromFile(ResourceFile, Map->Entities))
 	{
 		zeError("Map Resource", "File is corrupted. Can not read entities from file. (FileName : \"%s\")", ResourceFile->GetFileName());
 		return false;
-	}
+	}*/
 
 	return true;
 }

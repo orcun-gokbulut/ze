@@ -49,7 +49,7 @@ bool ZESkyBrush::IsDrawable()
 
 bool ZESkyBrush::IsLight()
 {
-	return GetEnabled() && SkyLight.IsEnabled();
+	return GetEnabled() && SkyLight.GetEnabled();
 }
 
 bool ZESkyBrush::AllwaysDraw()
@@ -93,7 +93,7 @@ void ZESkyBrush::SetSkyLightEnabled(bool Enabled)
 
 bool ZESkyBrush::GetSkyLightEnabled() const
 {
-	return SkyLight.IsEnabled();
+	return SkyLight.GetEnabled();
 }
 
 void ZESkyBrush::SetSkyLightColor(const ZEVector3& Color)

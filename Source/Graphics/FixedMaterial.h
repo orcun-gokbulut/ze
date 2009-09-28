@@ -407,7 +407,7 @@ class ZEFixedMaterial : public ZEMaterial
 ZE_POSTPROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZEFixedMaterial">
+		<class name="ZEFixedMaterial" noinstance="true">
 			<description>Material System</description>
 			<property name="TwoSided" type="boolean" autogetset="yes"/>
 			<property name="LightningEnabled" type="boolean" autogetset="yes"/>

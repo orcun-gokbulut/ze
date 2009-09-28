@@ -787,6 +787,15 @@
 			<File
 				RelativePath=".\Source\GameInterface\CanvasBrush.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\GameInterface\Entity.cpp"
@@ -816,7 +825,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -862,7 +871,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						AdditionalDependencies=""
 						Outputs="$(InputPath).zpp"
 					/>
@@ -888,7 +897,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -925,7 +934,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>

@@ -96,7 +96,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Light->GetLight()->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 		Light->GetLight()->SetAttenuation(0.001f, 0.0f, 2.0f);
 		Light->GetLight()->SetIntensity(5.0f);
-		Light->GetLight()->SetCastShadows(false);
+		Light->GetLight()->SetCastsShadows(false);
 		Light->SetProjectionFOV(ZE_PI_2);
 		Light->SetProjectionAspectRatio(1.0f);
 		Light->SetProjectionTexture("test/pavyon.bmp");
@@ -126,20 +126,21 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		CanvasMaterial->SetSpecularEnabled(true);
 		CanvasMaterial->SetSpecularColor(ZEVector3(1.0f, 1.0f, 1.0f));
 		CanvasMaterial->SetSpecularShininess(64.0f);
-		CanvasMaterial->UpdateMaterial();
+		CanvasMateriawl->UpdateMaterial();
 		ZEFileSerializer Serializer;
 		Serializer.OpenFile("test.ze");
 		CanvasMaterial->Serialize((ZESerializer*)&Serializer);
 		Serializer.CloseFile();
 
-		CanvasBrush->Material->Destroy();
+		/*CanvasBrush->Material->Destroy();
 		CanvasMaterial = ZEFixedMaterial::CreateInstance();
 		CanvasBrush->Material = (ZEMaterial*)CanvasMaterial;
 
 		ZEFileUnserializer Unserializer;
 		Unserializer.OpenFile("test.ze");
 		CanvasMaterial->Unserialize((ZEUnserializer*)&Unserializer);
-		Unserializer.CloseFile();
+		CanvasMaterial->UpdateMaterial();
+		Unserializer.CloseFile();*/
 		Scene->AddEntity(CanvasBrush);
 
 		/*

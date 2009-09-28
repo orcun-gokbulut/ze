@@ -52,35 +52,12 @@ void ZEComponent::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 		Owner->UpdateBoundingVolumes();
 }
 
-bool ZEComponent::IsEnabled()
-{
-	return Enabled;
-}
-
-void ZEComponent::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-bool ZEComponent::IsVisible()
-{
-	return Visible;
-}
-
-void ZEComponent::SetVisible(bool Visible)
-{
-	this->Visible = Visible;
-	UpdateWorldBoundingSphere = true;
-	UpdateWorldBoundingBox = true;
-	Owner->UpdateBoundingVolumes();
-}
-
-bool  ZEComponent::IsLight()
+bool  ZEComponent::IsLight() const
 {
 	return false;
 }
 
-bool ZEComponent::IsDrawable()
+bool ZEComponent::IsDrawable() const
 {
 	return false;
 }
@@ -96,47 +73,86 @@ void ZEComponent::SetOwner(ZEEntity* NewOwner)
 		Owner->UpdateBoundingVolumes();
 }
 
-ZEEntity* ZEComponent::GetOwner()
+ZEEntity* ZEComponent::GetOwner() const
 {
 	return Owner;
 }
 
-void ZEComponent::OwnerWorldTransformChanged()
+const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 {
-	UpdateWorldTransform = true;
-	UpdateWorldBoundingSphere = true;
-	UpdateWorldBoundingBox = true;	
+	if (Owner != NULL)
+	{
+		if (UpdateWorldTransform)
+		{
+			ZEMatrix4x4::Multiply(((ZEComponent*)this)->WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
+			((ZEComponent*)this)->UpdateWorldTransform = false;
+		}
+
+		return WorldTransform;
+	}
+	else
+		return LocalTransform;
 }
 
+const ZEMatrix4x4& ZEComponent::GetLocalTransform() const 
+{
+	if (UpdateLocalTransform)
+	{
+		ZEMatrix4x4::CreateOrientation(((ZEComponent*)this)->LocalTransform, Position, Rotation, Scale);
+		((ZEComponent*)this)->UpdateLocalTransform = false;
+	}
 
-const ZEAABoundingBox& ZEComponent::GetLocalBoundingBox()
+	return LocalTransform;
+}
+
+const ZEAABoundingBox& ZEComponent::GetLocalBoundingBox() const
 {
 	return LocalBoundingBox;
 }
 
-const ZEAABoundingBox& ZEComponent::GetWorldBoundingBox()
+const ZEAABoundingBox& ZEComponent::GetWorldBoundingBox() const
 {
 	if (!UpdateWorldBoundingBox)
 		return WorldBoundingBox;
 
-	ZEAABoundingBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
-	UpdateWorldBoundingBox = false;
+	ZEAABoundingBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+	((ZEComponent*)this)->UpdateWorldBoundingBox = false;
 	return WorldBoundingBox;
 }
 
-const ZEBoundingSphere& ZEComponent::GetWorldBoundingSphere()
+const ZEBoundingSphere& ZEComponent::GetWorldBoundingSphere() const
 {
 	if (!UpdateWorldBoundingSphere)
 		return WorldBoundingSphere;
 
-	GetWorldBoundingBox().GenerateBoundingSphere(WorldBoundingSphere);
+	GetWorldBoundingBox().GenerateBoundingSphere(((ZEComponent*)this)->WorldBoundingSphere);
 
-	UpdateWorldBoundingSphere = false;
+	((ZEComponent*)this)->UpdateWorldBoundingSphere = false;
 
 	return WorldBoundingSphere;
 }
 
-const ZEVector3& ZEComponent::GetLocalPosition()
+bool ZEComponent::GetEnabled() const
+{
+	return Enabled;
+}
+
+void ZEComponent::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+}
+
+bool ZEComponent::GetVisible() const
+{
+	return Visible;
+}
+
+void ZEComponent::SetVisible(bool Visible)
+{
+	this->Visible = Visible;
+}
+
+const ZEVector3& ZEComponent::GetLocalPosition() const
 {
 	return Position;
 }
@@ -152,7 +168,7 @@ void ZEComponent::SetLocalPosition(const ZEVector3& NewPosition)
 		Owner->UpdateBoundingVolumes();
 }
 
-const ZEQuaternion& ZEComponent::GetLocalRotation()
+const ZEQuaternion& ZEComponent::GetLocalRotation() const
 {
 	return Rotation;
 }
@@ -169,7 +185,7 @@ void ZEComponent::SetLocalRotation(const ZEQuaternion& NewRotation)
 		Owner->UpdateBoundingVolumes();
 }
 
-const ZEVector3& ZEComponent::GetLocalScale()
+const ZEVector3& ZEComponent::GetLocalScale() const
 {
 	return Scale;
 }
@@ -185,35 +201,8 @@ void ZEComponent::SetLocalScale(const ZEVector3& NewScale)
 		Owner->UpdateBoundingVolumes();
 }
 
-const ZEMatrix4x4& ZEComponent::GetWorldTransform()
-{
-	if (Owner != NULL)
-	{
-		if (UpdateWorldTransform)
-		{
-			ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
-			UpdateWorldTransform = false;
-		}
 
-		return WorldTransform;
-	}
-	else
-		return LocalTransform;
-}
-
-const ZEMatrix4x4& ZEComponent::GetLocalTransform()
-{
-	if (UpdateLocalTransform)
-	{
-		ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
-		UpdateLocalTransform = false;
-	}
-
-	return LocalTransform;
-}
-
-
-const ZEVector3 ZEComponent::GetWorldPosition()
+const ZEVector3 ZEComponent::GetWorldPosition() const
 {
 	if (Owner != NULL)
 	{
@@ -233,7 +222,7 @@ void ZEComponent::SetWorldPosition(const ZEVector3& NewPosition)
 		Position = NewPosition;
 }
 
-const ZEQuaternion ZEComponent::GetWorldRotation()
+const ZEQuaternion ZEComponent::GetWorldRotation() const
 {
 	if (Owner != NULL)
 	{
@@ -281,6 +270,14 @@ bool ZEComponent::Deinitialize()
 {
 	return true;
 }
+
+void ZEComponent::OwnerWorldTransformChanged()
+{
+	UpdateWorldTransform = true;
+	UpdateWorldBoundingSphere = true;
+	UpdateWorldBoundingBox = true;	
+}
+
 
 ZEComponent::ZEComponent()
 {

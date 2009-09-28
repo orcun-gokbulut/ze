@@ -34,10 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 #include "CanvasBrush.h"
 
-ZE_ENTITY_DESCRIPTION_START(ZECanvasBrush, ZEEntity, ZE_ERA_BOTH, "", "Canvas brush")
-	ZE_ENTITY_NOATTRIBUTE()
-ZE_ENTITY_DESCRIPTION_END(ZECanvasBrush)
-
 bool ZECanvasBrush::IsDrawable()
 {
 	return true;
@@ -115,3 +111,5 @@ ZECanvasBrush::~ZECanvasBrush()
 	if (RenderOrder.VertexBuffer != NULL)
 		delete RenderOrder.VertexBuffer;
 }
+
+#include "CanvasBrush.h.zpp"

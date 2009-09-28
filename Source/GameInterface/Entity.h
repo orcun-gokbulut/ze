@@ -50,12 +50,46 @@
 #include "Graphics/Renderer.h"
 #include "Meta/Class.h"
 
+#define ZE_META_ENTITY_CLASS_EXTENSION\
+		virtual ZEEntityRunAt GetRunAt() const;
+
+#define ZE_META_ENTITY_DESCRIPTION(ClassName) ZE_META_EXTENDED_CLASS_DESCRIPTION(ClassName, ZEEntityDescription, ZE_META_ENTITY_CLASS_EXTENSION)
+#define ZE_META_ENTITY() ZE_META_EXTENDED_CLASS(ZEEntityDescription, )
+
 enum ZEBoundingVolumeMechnism
 {
 	ZE_BVM_USELOCALONLY,
 	ZE_BVM_USECOMPONENTS,
 	ZE_BVM_USEBOTH
 };
+
+enum ZEEntityRunAt
+{
+	ZE_ERA_NONE			= 0,
+	ZE_ERA_CLIENT		= 1,
+	ZE_ERA_SERVER		= 2,
+	ZE_ERA_BOTH			= 3
+};
+
+class ZEEntityDescription : public ZEClassDescription
+{
+	public:
+		virtual const char*						GetName() const;
+		virtual ZEClassDescription*				GetParent() const;
+		virtual const char*						GetType() const;
+		virtual const char*						GetDescription() const;
+		virtual const char*						GetIcon() const;
+		virtual const ZEPropertyDescription*	GetProperties() const;
+		virtual size_t							GetPropertyCount() const;
+		virtual size_t							GetPropertyOffset() const;
+		virtual const ZEMethodDescription*		GetMethods() const;
+		virtual size_t							GetMethodCount() const;
+		virtual size_t							GetMethodOffset() const;
+		virtual ZEClassProvider*				GetProvider() const;
+		virtual ZEClass*						CreateInstance() const;
+		virtual ZEEntityRunAt					GetRunAt() const;
+};
+
 class ZEEntityDescription;
 class ZEEntity;
 class ZEEntityData : public ZESerializable
@@ -71,10 +105,9 @@ class ZEEntityData : public ZESerializable
 		virtual bool						Unserialize(ZEUnserializer* Unserializer);
 };
 
-ZE_META_CLASS_DESCRIPTION(ZEEntity)
 class ZEEntity : public ZEClass
 {
-	ZE_META_CLASS()
+	ZE_META_ENTITY()
 	private: 
 		char								Name[ZE_MAX_NAME_SIZE];
 		int									EntityId;

@@ -59,10 +59,10 @@ const ZEMatrix4x4& ZECamera::GetViewTransform()
 
 const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 {
-	if (!UpdateProjectionTransform)
-		return ProjectionTransform;
+	if (UpdateProjectionTransform)
+		ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, FOV, AspectRatio, zeGraphics->GetNearZ(), zeGraphics->GetFarZ());
 
-	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, FOV, AspectRatio, zeGraphics->GetNearZ(), zeGraphics->GetFarZ());
+	return ProjectionTransform;
 }
 
 const ZEMatrix4x4& ZECamera::GetViewProjectionTransform()
