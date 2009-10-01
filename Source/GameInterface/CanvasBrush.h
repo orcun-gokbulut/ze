@@ -62,7 +62,8 @@ class ZECanvasBrush : public ZEEntity
 		virtual void						Deinitialize();
 
 		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
-	
+		virtual void						Tick(float ElapsedTime);
+
 											ZECanvasBrush();
 											~ZECanvasBrush();
 };

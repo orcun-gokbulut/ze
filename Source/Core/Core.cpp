@@ -405,7 +405,14 @@ void ZECore::ShutDown()
 void ZECore::MainLoop()
 {
 	static LARGE_INTEGER OldTime, Freq;
+	static bool FirstTime = true;
 	LARGE_INTEGER NewTime;
+
+	if (FirstTime)
+	{
+		QueryPerformanceCounter(&OldTime);
+		FirstTime = false;
+	}
 
 	QueryPerformanceFrequency(&Freq);
 	QueryPerformanceCounter(&NewTime);

@@ -419,6 +419,16 @@
 			<File
 				RelativePath=".\Source\Graphics\Material.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Zinek Engine Post Processor"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\Graphics\MaterialComponents.h"
@@ -792,7 +802,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -854,7 +864,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -1391,6 +1401,14 @@
 		<Filter
 			Name="Meta"
 			>
+			<File
+				RelativePath=".\Source\Meta\Animation.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Meta\Animation.h"
+				>
+			</File>
 			<File
 				RelativePath=".\Source\Meta\Class.cpp"
 				>

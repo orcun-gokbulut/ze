@@ -52,7 +52,7 @@ extern HINSTANCE ApplicationInstance;
 #include "Core/ConsoleWindow.h"
 #include "Core/Core.h"
 #include "GameInterface/ModelBrush.h"
-
+#include "Meta/Animation.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
@@ -126,12 +126,36 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		CanvasMaterial->SetSpecularEnabled(true);
 		CanvasMaterial->SetSpecularColor(ZEVector3(1.0f, 1.0f, 1.0f));
 		CanvasMaterial->SetSpecularShininess(64.0f);
-		CanvasMateriawl->UpdateMaterial();
-		ZEFileSerializer Serializer;
-		Serializer.OpenFile("test.ze");
-		CanvasMaterial->Serialize((ZESerializer*)&Serializer);
-		Serializer.CloseFile();
+		CanvasMaterial->UpdateMaterial();
 
+		ZEAnimation Animation;
+		ZEPropertyAnimation* PropertyAnimation = Animation.PropertyAnimations.Add();
+		Animation.FrameCount = 10;
+		Animation.FramePerSecond = 1.0f;
+		PropertyAnimation->InitialValue = ZEVector3(1.0f, 1.0f, 1.0f);
+		PropertyAnimation->Interpolate = true; 
+		PropertyAnimation->PropertyId = CanvasMaterial->GetPropertyId("AmbientColor");
+		ZEPropertyAnimationKey Keys[] =	{
+											{1.0f, ZEVector3(1.0, 1.0, 1.0)},
+											{2.0f, ZEVector3(0.0, 1.0, 0.0)},
+											{3.0f, ZEVector3(0.0, 0.0, 1.0)},
+											{4.0f, ZEVector3(0.0, 1.0, 0.0)},
+											{5.0f, ZEVector3(1.0, 0.0, 0.0)},
+											{6.0f, ZEVector3(0.0, 1.0, 0.0)},
+											{7.0f, ZEVector3(0.0, 0.0, 1.0)},
+											{8.0f, ZEVector3(0.0, 1.0, 1.0)},
+											{9.0f, ZEVector3(1.0, 0.0, 0.0)},
+											{10.0f, ZEVector3(1.00, 1.00, 1.00)}
+										};
+
+		PropertyAnimation->Keys.MassAdd(Keys, 10);
+		
+		CanvasMaterial->SetAnimationController(new ZEAnimationController());
+		CanvasMaterial->GetAnimationController()->SetAnimation(&Animation);
+		CanvasMaterial->GetAnimationController()->SetAnimationSpeed(1.0f);
+		CanvasMaterial->GetAnimationController()->SetLooping(false);
+		CanvasMaterial->GetAnimationController()->PlayAnimation();
+		
 		/*CanvasBrush->Material->Destroy();
 		CanvasMaterial = ZEFixedMaterial::CreateInstance();
 		CanvasBrush->Material = (ZEMaterial*)CanvasMaterial;

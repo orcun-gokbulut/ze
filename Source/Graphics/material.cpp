@@ -37,6 +37,8 @@
 #include "Core/Core.h"
 #include "memory.h"
 #include "GraphicsModule.h"
+#include "Meta/Animation.h"
+
 ZEMaterial::ZEMaterial()
 {
 }
@@ -45,7 +47,15 @@ ZEMaterial::~ZEMaterial()
 {
 }
 
+void ZEMaterial::AdvanceAnimation(float TimeElapsed)
+{
+	if (GetAnimationController() != NULL)
+		GetAnimationController()->AdvanceAnimation(TimeElapsed);
+}
+
 void ZEMaterial::Destroy()
 {
 	delete this;
 }
+
+#include "Material.h.zpp"

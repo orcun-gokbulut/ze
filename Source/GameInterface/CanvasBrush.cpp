@@ -93,6 +93,12 @@ void ZECanvasBrush::Deinitialize()
 	Canvas.Clean();
 }
 
+void ZECanvasBrush::Tick(float ElapsedTime)
+{
+	if (Material != NULL)
+		Material->AdvanceAnimation(ElapsedTime);
+}
+
 ZECanvasBrush::ZECanvasBrush()
 {
 	SetBoundingVolumeMechanism(ZE_BVM_USELOCALONLY);

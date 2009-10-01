@@ -105,7 +105,7 @@ void ZEVector2::Normalize(ZEVector2 &Out, const ZEVector2 &A)
 	Out.y = A.y / L;
 }
 
-inline void ZEVector2::Lerp(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B, float Factor)
+void ZEVector2::Lerp(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B, float Factor)
 {
 	Out.x = A.x + (B.x - A.x) * Factor;
 	Out.y = A.y + (B.y - A.y) * Factor;
@@ -478,7 +478,7 @@ void ZEVector4::Normalize(ZEVector4& Out, const ZEVector4& Vector)
 	Out.w = Vector.w / L;
 }
 
-inline void ZEVector4::Lerp(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B, float Factor)
+void ZEVector4::Lerp(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B, float Factor)
 {
 	Out.x = A.x + (B.x - A.x) * Factor;
 	Out.y = A.y + (B.y - A.y) * Factor;

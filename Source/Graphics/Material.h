@@ -47,15 +47,19 @@ enum ZEMaterialType
 	ZE_MT_CGFX,
 	ZE_MT_OTHERs
 };
-
+ 
 // ZEMaterialFlags
 #define ZE_MF_NOCACHING
-
+ 
 class ZERenderOrder;
 class ZERLLight;
 class ZECamera;
+
+ZE_META_CLASS_DESCRIPTION(ZEMaterial)
+
 class ZEMaterial : public ZEClass
 {
+	ZE_META_CLASS() 
 	protected:
 										ZEMaterial();
 		virtual							~ZEMaterial();
@@ -97,10 +101,19 @@ class ZEMaterial : public ZEClass
 
 		virtual void					UpdateMaterial() = 0;
 
+		virtual void					AdvanceAnimation(float TimeElapsed);
+
 		virtual void					Release() = 0;
 		virtual void					Destroy();
-
-
 };
 
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZEMaterial" noinstance="true" description="Base class of materials."/>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END()
+*/
 #endif
