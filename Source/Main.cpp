@@ -53,6 +53,7 @@ extern HINSTANCE ApplicationInstance;
 #include "Core/Core.h"
 #include "GameInterface/ModelBrush.h"
 #include "Meta/Animation.h"
+#include "GameInterface/Serialization.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
@@ -132,28 +133,48 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		ZEPropertyAnimation* PropertyAnimation = Animation.PropertyAnimations.Add();
 		Animation.FrameCount = 10;
 		Animation.FramePerSecond = 1.0f;
-		PropertyAnimation->InitialValue = ZEVector3(1.0f, 1.0f, 1.0f);
-		PropertyAnimation->Interpolate = true; 
+		strcpy(Animation.Name, "Orcun");
+		PropertyAnimation->ValueType = ZE_VRT_VECTOR3;
+		PropertyAnimation->Interpolate = false; 
 		PropertyAnimation->PropertyId = CanvasMaterial->GetPropertyId("AmbientColor");
 		ZEPropertyAnimationKey Keys[] =	{
-											{1.0f, ZEVector3(1.0, 1.0, 1.0)},
-											{2.0f, ZEVector3(0.0, 1.0, 0.0)},
-											{3.0f, ZEVector3(0.0, 0.0, 1.0)},
-											{4.0f, ZEVector3(0.0, 1.0, 0.0)},
-											{5.0f, ZEVector3(1.0, 0.0, 0.0)},
-											{6.0f, ZEVector3(0.0, 1.0, 0.0)},
-											{7.0f, ZEVector3(0.0, 0.0, 1.0)},
-											{8.0f, ZEVector3(0.0, 1.0, 1.0)},
-											{9.0f, ZEVector3(1.0, 0.0, 0.0)},
-											{10.0f, ZEVector3(1.00, 1.00, 1.00)}
+											{1.0f,		ZEVector3(0.1, 0.1, 1.1)},
+											{2.1f,		ZEVector3(2.1, 1.1, 2.1)},
+											{3.2f,		ZEVector3(1.5, 1.5, 0.5)},
+											{4.21f,		ZEVector3(0.1, 0.1, 1.1)},
+											{5.1f,		ZEVector3(1.5, 0.5, 0.5)},
+											{6.15f,		ZEVector3(0.1, 0.1, 1.1)},
+											{7.1f,		ZEVector3(2.1, 2.1, 2.1)},
+											{8.15f,		ZEVector3(0.5, 1.5, 0.5)},
+											{9.2f,		ZEVector3(2.1, 2.1, 2.1)},
+											{10.21f,	ZEVector3(1.1, 0.1, 0.1)}
 										};
-
 		PropertyAnimation->Keys.MassAdd(Keys, 10);
+
+		PropertyAnimation = Animation.PropertyAnimations.Add();
+		PropertyAnimation->ValueType = ZE_VRT_FLOAT;
+		PropertyAnimation->Interpolate = true; 
+		PropertyAnimation->PropertyId = CanvasMaterial->GetPropertyId("SpecularFactor");
+		ZEPropertyAnimationKey Keys2[] = {
+											{5.0f,		0.0f},
+											{10.0f,		1.0f},
+										 };
+		PropertyAnimation->Keys.MassAdd(Keys2, 2);
+		ZEFileSerializer Serializer;
+		Serializer.OpenFile("Test.zeAnim");
+		ZEAnimation::WriteToFile((ZESerializer*)&Serializer, &Animation);
+		Serializer.CloseFile();
 		
+		ZEAnimation Test;
+		ZEFileUnserializer Unserializer;
+		Unserializer.OpenFile("Test.zeAnim");
+		ZEAnimation::ReadFromFile((ZEUnserializer*)&Unserializer, &Test);
+		Unserializer.CloseFile();
+
 		CanvasMaterial->SetAnimationController(new ZEAnimationController());
-		CanvasMaterial->GetAnimationController()->SetAnimation(&Animation);
+		CanvasMaterial->GetAnimationController()->SetAnimation(&Test);
 		CanvasMaterial->GetAnimationController()->SetAnimationSpeed(1.0f);
-		CanvasMaterial->GetAnimationController()->SetLooping(false);
+		CanvasMaterial->GetAnimationController()->SetLooping(true);
 		CanvasMaterial->GetAnimationController()->PlayAnimation();
 		
 		/*CanvasBrush->Material->Destroy();

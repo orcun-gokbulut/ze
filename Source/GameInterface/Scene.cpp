@@ -521,13 +521,13 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 	ZESmartArray<ZELight*> SceneLights;
 	if (LightsEnabled)
 		for (size_t I = 0; I < Entities.GetCount(); I++)
-			if (Entities[I]->IsLight())
+			if (Entities[I]->GetRendererFlags() & ZE_RF_LIGHT_SOURCE)
 			{
 				const ZEArray<ZEComponent*>& Components = Entities[I]->GetComponents();
 				for (size_t N = 0; N < Components.GetCount(); N++)
 				{
 					ZEComponent* Component = Components[N];
-					if (Component->IsLight() && ViewVolume.LightCullTest((ZELight*)Component))
+					if ((Component->GetRendererFlags() & ZE_RF_LIGHT_SOURCE) && ViewVolume.LightCullTest((ZELight*)Component))
 					{
 						if (VisualDebugElements & ZE_VDE_LIGHT_RANGE)
 							DrawBoundingSphere(ZEBoundingSphere(Component->GetWorldPosition(), ((ZELight*)Component)->GetRange()), Renderer, LightRangeMaterial);
@@ -544,7 +544,11 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 	{
 		ZEEntity* CurrentEntity = Entities[I];
-		if (CurrentEntity->IsDrawable() && CurrentEntity->GetVisible() && (CurrentEntity->AllwaysDraw() || ViewVolume.CullTest(CurrentEntity)))
+		ZEDWORD RenderFlags = CurrentEntity->GetRendererFlags();
+		ZEDWORD CullerFlags = CurrentEntity->GetCullerFlags();
+
+		if (!(CullerFlags & ZE_CF_ALLWAYS_CULLED) && (RenderFlags & ZE_RF_DRAWABLE) && 
+			CurrentEntity->GetVisible() && ((CullerFlags & ZE_CF_NO_CULLING) || ViewVolume.CullTest(CurrentEntity)))
 		{
 			EntityLights.Clear();
 			Lights.Clear();
@@ -573,7 +577,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 			for (size_t N = 0; N < Components.GetCount(); N++)
 			{
 				ZEComponent* Component = Components[N];
-				if (Component->IsDrawable() && Component->GetVisible() && ViewVolume.CullTest(Component))
+				if ((Component->GetRendererFlags() & ZE_RF_DRAWABLE) && Component->GetVisible() && ViewVolume.CullTest(Component))
 				{
 					Lights.Clear();
 					for (size_t M = 0; M < EntityLights.GetCount(); M++)

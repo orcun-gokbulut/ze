@@ -40,6 +40,17 @@
 #include "Core/Error.h"
 #include "Core/ResourceManager.h"
 
+ZEMaterialResource::ZEMaterialResource()
+{
+	Material = NULL;
+}
+
+ZEMaterialResource::~ZEMaterialResource()
+{
+	if (Material != NULL)
+		Material->Release();
+}
+
 const char* ZEMaterialResource::GetResourceType() const
 {
 	return "Material";
@@ -50,26 +61,21 @@ const ZEMaterial* ZEMaterialResource::GetMaterial() const
 	return Material;
 }
 
-ZEMaterialType ZEMaterialResource::GetMaterialType() const
-{
-	return MaterialType;
-}
-
-const ZEArray<ZETextureResource*> ZEMaterialResource::GetTextures() const
+const ZEArray<ZETextureResource*>& ZEMaterialResource::GetTextureResources() const
 {
 	return TextureResources;
 }
 
-const ZEArray<ZEMaterialAnimation> ZEMaterialResource::GetAnimations() const
+const ZEArray<ZEAnimation>& ZEMaterialResource::GetAnimations() const
 {
-	return MaterialAnimations;
+	return Animations;
 }
 
-const ZEMaterialAnimation* ZEMaterialResource::GetAnimationByName(const char* Name) const
+const ZEAnimation* ZEMaterialResource::GetAnimationByName(const char* Name) const
 {
-	for (size_t I = 0; I < MaterialAnimations.GetCount(); I++)
-		if (strnicmp(MaterialAnimations[I].Name, Name, ZE_MTLF_MAX_NAME_SIZE) == 0)
-			return &MaterialAnimations[I];
+	for (size_t I = 0; I < Animations.GetCount(); I++)
+		if (strnicmp(Animations[I].Name, Name, ZE_MTLF_MAX_NAME_SIZE) == 0)
+			return &Animations[I];
 
 	return NULL;
 }
@@ -148,156 +154,17 @@ bool ZEMaterialResource::LoadTextures(ZEMaterialResource* MaterialResource, ZERe
 
 bool ZEMaterialResource::LoadFixedMaterial(ZEMaterialResource* MaterialResource, ZEResourceFile* ResourceFile)
 {
-	ZEMaterialFileFixedMaterialChunk MaterialChunk;
-	ResourceFile->Read(&MaterialChunk, sizeof(ZEMaterialFileFixedMaterialChunk), 1);
-	if (MaterialChunk.ChunkId != ZE_MTLF_MATERIAL_CHUNKID)
-	{
-		zeError("Material Resource", "Material chunk id does not match. (Material FileName : \"%s\")", ResourceFile->GetFileName());
-		return false;
-	}
-
-	ZEFixedMaterial* Material = ZEFixedMaterial::CreateInstance();
-	MaterialResource->Material = Material;
-
-	Material->SetTwoSided(MaterialChunk.TwoSided);
-	Material->SetLightningEnabled(MaterialChunk.LightningEnabled);
-	Material->SetWireframe(MaterialChunk.Wireframe);
-	Material->SetTransparancyMode(MaterialChunk.TransparancyMode);
-	Material->SetRecivesShadow(MaterialChunk.RecivesShadow);
-	Material->SetTransparancyCullLimit(MaterialChunk.TransparancyCullLimit);
-
-	Material->SetAmbientEnabled(MaterialChunk.AmbientEnabled);
-	Material->SetAmbientColor(MaterialChunk.AmbientColor);
-	Material->SetAmbientFactor(MaterialChunk.AmbientFactor);
-	
-	Material->SetDiffuseEnabled(MaterialChunk.DiffuseEnabled);
-	Material->SetDiffuseColor(MaterialChunk.DiffuseColor);
-	Material->SetDiffuseFactor(MaterialChunk.DiffuseFactor);
-	if (MaterialChunk.DiffuseMap != -1)
-		Material->SetDiffuseMap(((ZETexture2DResource*)MaterialResource->TextureResources[MaterialChunk.DiffuseMap])->GetTexture());
-	Material->SetDiffuseMapAddressModeU((ZETextureAddressMode)MaterialChunk.DiffuseMapAddressModeU);
-	Material->SetDiffuseMapAddressModeV((ZETextureAddressMode)MaterialChunk.DiffuseMapAddressModeV);
-
-	if (MaterialChunk.NormalMap != -1)
-		Material->SetNormalMap(((ZETexture2DResource*)MaterialResource->TextureResources[MaterialChunk.NormalMap])->GetTexture());
-	Material->SetNormalMapAddressModeU((ZETextureAddressMode)MaterialChunk.NormalMapAddressModeU);
-	Material->SetNormalMapAddressModeV((ZETextureAddressMode)MaterialChunk.NormalMapAddressModeV);
-
-	if (MaterialChunk.ParallaxMap != -1)
-		Material->SetParallaxMap(((ZETexture2DResource*)MaterialResource->TextureResources[MaterialChunk.ParallaxMap])->GetTexture());
-	Material->SetParallaxMapAddressModeU((ZETextureAddressMode)MaterialChunk.ParallaxMapAddressModeU);
-	Material->SetParallaxMapAddressModeV((ZETextureAddressMode)MaterialChunk.ParallaxMapAddressModeV);
-
-	Material->SetSpecularEnabled(MaterialChunk.SpecularEnabled);
-	Material->SetSpecularColor(MaterialChunk.SpecularColor);
-	Material->SetSpecularFactor(MaterialChunk.SpecularFactor);
-	Material->SetSpecularShininess(MaterialChunk.SpecularShininess);		
-	if (MaterialChunk.SpecularMap != -1)
-		Material->SetSpecularMap(((ZETexture2DResource*)MaterialResource->TextureResources[MaterialChunk.SpecularMap])->GetTexture());
-	Material->SetSpecularMapAddressModeU((ZETextureAddressMode)MaterialChunk.SpecularMapAddressModeU);
-	Material->SetSpecularMapAddressModeV((ZETextureAddressMode)MaterialChunk.SpecularMapAddressModeV);
-
-
-	Material->SetEmmisiveEnabled(MaterialChunk.EmmisiveEnabled);
-	Material->SetEmmisiveColor(MaterialChunk.EmmisiveColor);
-	Material->SetEmmisiveFactor(MaterialChunk.EmmisiveFactor);
-	if (MaterialChunk.EmmisiveMap != -1)
-		Material->SetEmmisiveMap(((ZETexture2DResource*)MaterialResource->TextureResources[MaterialChunk.EmmisiveMap])->GetTexture());
-	Material->SetEmmisiveMapAddressModeU((ZETextureAddressMode)MaterialChunk.EmmisiveMapAddressModeU);
-	Material->SetEmmisiveMapAddressModeV((ZETextureAddressMode)MaterialChunk.EmmisiveMapAddressModeV);
-
-	Material->SetOpacityEnabled(MaterialChunk.OpacityEnabled);
-	Material->SetOpacity(MaterialChunk.Opacity);
-	if (MaterialChunk.OpacityMap != -1)
-		Material->SetOpacityMap(((ZETexture2DResource*)MaterialResource->TextureResources[MaterialChunk.OpacityMap])->GetTexture());
-	Material->SetOpacityMapAddressModeU((ZETextureAddressMode)MaterialChunk.OpacityMapAddressModeU);
-	Material->SetOpacityMapAddressModeV((ZETextureAddressMode)MaterialChunk.OpacityMapAddressModeV);
-
-	Material->SetDetailMapEnabled(MaterialChunk.DetailMapEnabled);
-	Material->SetDetailMapUScale(MaterialChunk.DetailMapTiling.x);
-	Material->SetDetailMapVScale(MaterialChunk.DetailMapTiling.y);
-	if (MaterialChunk.DetailDiffuseMap != -1)
-		Material->SetDetailDiffuseMap(((ZETexture2DResource*)MaterialResource->TextureResources[MaterialChunk.DetailDiffuseMap])->GetTexture());
-	Material->SetDetailDiffuseMapAddressModeU((ZETextureAddressMode)MaterialChunk.DetailDiffuseMapAddressModeU);
-	Material->SetDetailDiffuseMapAddressModeV((ZETextureAddressMode)MaterialChunk.DetailDiffuseMapAddressModeV);
-	if (MaterialChunk.DetailNormalMap != -1)
-		Material->SetDetailNormalMap(((ZETexture2DResource*)MaterialResource->TextureResources[MaterialChunk.DetailNormalMap])->GetTexture());
-	Material->SetDetailNormalMapAddressModeU((ZETextureAddressMode)MaterialChunk.DetailNormalMapAddressModeU);
-	Material->SetDetailNormalMapAddressModeV((ZETextureAddressMode)MaterialChunk.DetailNormalMapAddressModeV);
-
-	Material->SetReflectionEnabled(MaterialChunk.ReflectionEnabled);
-	Material->SetReflectionFactor(MaterialChunk.ReflectionFactor);
-	if (MaterialChunk.ReflectionMap != -1)
-		Material->SetReflectionMap(((ZETextureCubeResource*)MaterialResource->TextureResources[MaterialChunk.ReflectionMap])->GetTexture());
-	Material->SetReflectionMapAddressModeU((ZETextureAddressMode)MaterialChunk.ReflectionMapAddressModeU);
-	Material->SetReflectionMapAddressModeV((ZETextureAddressMode)MaterialChunk.ReflectionMapAddressModeV);
-	Material->SetReflectionMapAddressModeW((ZETextureAddressMode)MaterialChunk.ReflectionMapAddressModeW);
-
-	Material->SetRefractionEnabled(MaterialChunk.RefractionEnabled);
-	Material->SetRefractionIndex(MaterialChunk.RefractionIndex);
-	Material->SetRefractionFactor(MaterialChunk.RefractionFactor);
-	if (MaterialChunk.RefractionMap != -1)
-		Material->SetRefractionMap(((ZETextureCubeResource*)MaterialResource->TextureResources[MaterialChunk.RefractionMap])->GetTexture());
-	Material->SetRefractionMapAddressModeU((ZETextureAddressMode)MaterialChunk.RefractionMapAddressModeU);
-	Material->SetRefractionMapAddressModeV((ZETextureAddressMode)MaterialChunk.RefractionMapAddressModeV);
-	Material->SetRefractionMapAddressModeW((ZETextureAddressMode)MaterialChunk.RefractionMapAddressModeW);
-
-	Material->SetLightMapEnabled(MaterialChunk.LightMapEnabled);
-	Material->SetLightMapFactor(MaterialChunk.LightMapFactor);
-	if (MaterialChunk.LightMap != -1)
-		Material->SetLightMap(((ZETexture2DResource*)MaterialResource->TextureResources[MaterialChunk.LightMap])->GetTexture());
-	Material->SetLightMapAddressModeU((ZETextureAddressMode)MaterialChunk.LightMapAddressModeU);
-	Material->SetLightMapAddressModeV((ZETextureAddressMode)MaterialChunk.LightMapAddressModeV);
-
-	Material->SetDistortionEnabled(MaterialChunk.DistortionEnabled);
-	Material->SetDistortionFactor(MaterialChunk.DistortionFactor);
-	if (MaterialChunk.DistortionMap != -1)
-		Material->SetDistortionMap(((ZETexture2DResource*)MaterialResource->TextureResources[MaterialChunk.DistortionMap])->GetTexture());
-	Material->SetDistortionMapAddressModeU((ZETextureAddressMode)MaterialChunk.DistortionMapAddressModeU);
-	Material->SetDistortionMapAddressModeV((ZETextureAddressMode)MaterialChunk.DistortionMapAddressModeV);	
-
 	return true;
 }
 
 bool ZEMaterialResource::LoadAnimations(ZEMaterialResource* MaterialResource, ZEResourceFile* ResourceFile)
 {
-	ZEMaterialFileAnimationChunk AnimationChunk;
-
-	for (size_t I = 0; I < MaterialResource->MaterialAnimations.GetCount(); I++)
-	{
-		ZEMaterialAnimation* CurrentAnimation = &MaterialResource->MaterialAnimations[I];
-
-		ResourceFile->Read(&AnimationChunk, sizeof(ZEMaterialFileAnimationChunk), 1);
-		if (AnimationChunk.ChunkId != ZE_MTLF_MATERIAL_CHUNKID)
-		{
-			zeError("Material Resource", "Material animation chunk id does not match. (Material FileName : \"%s\", Animation Index : %d)", ResourceFile->GetFileName(), I);
+	for (size_t I = 0; I < MaterialResource->Animations.GetCount(); I++)
+		if (!ZEAnimation::ReadFromFile(ResourceFile, &MaterialResource->Animations[I]))
+		{	
+			zeError("Material Resource", "Can not read material animation. (FileName : \"%s\")", ResourceFile->GetFileName());
 			return false;
 		}
-
-		strncpy(CurrentAnimation->Name, AnimationChunk.Name, ZE_MTLF_MAX_NAME_SIZE);
-
-		CurrentAnimation->Frames.SetCount(AnimationChunk.FrameCount);
-		for (size_t N = 0; N < CurrentAnimation->Frames.GetCount(); N++)
-		{
-			ZEMaterialFileAnimationFrameChunk AnimationFrameChunk;
-			ResourceFile->Read(&AnimationFrameChunk, sizeof(ZEMaterialFileAnimationFrameChunk), 1);
-			
-			if (AnimationFrameChunk.ChunkId != ZE_MTLF_ANIMATION_FRAME_CHUNKID)
-			{
-				zeError("Material Resource", "Material animation frame chunk id does not match. (Material FileName : \"%s\", Animation Index : %d, Frame Index : %d)", ResourceFile->GetFileName(), I, N);
-				return false;
-			}
-
-			ZEMaterialAnimationFrame* CurrentFrame = &CurrentAnimation->Frames[N];
-			ZEMaterialFileAnimationKeyChunk AnimationKeyChunk;
-			for (size_t M = 0; M < CurrentFrame->Keys.GetCount(); M++)
-			{
-				ResourceFile->Read(&AnimationKeyChunk, sizeof(ZEMaterialFileAnimationKeyChunk), 1);
-				CurrentFrame->Keys[M].PropertyIndex = AnimationKeyChunk.PropertyIndex;
-				CurrentFrame->Keys[M].Value.Unserialize(ResourceFile);
-			}
-		}
-	}
 
 	return true;
 }
@@ -332,20 +199,11 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(ZEResourceFile* ResourceFil
 
 
 	// Load Material
-	switch(HeaderChunk.MaterialType)
-	{
-		case ZE_MT_FIXED:
-			if (!LoadFixedMaterial(MaterialResource, ResourceFile))
-			{
-				zeError("Material File", "Corrupted material file. (FileName : \"%s\")", ResourceFile->GetFileName());
-				delete MaterialResource;
-				return NULL;
-			}
-			break;
-	}
+	MaterialResource->Material = ZEFixedMaterial::CreateInstance();
+	MaterialResource->Material->Unserialize(ResourceFile);
 
 	// Load Animations
-	MaterialResource->MaterialAnimations.SetCount(HeaderChunk.AnimationCount);
+	MaterialResource->Animations.SetCount(HeaderChunk.AnimationCount);
 	if (!LoadAnimations(MaterialResource, ResourceFile))
 	{
 		zeError("Material File", "Corrupted material file. (FileName : \"%s\")", ResourceFile->GetFileName());

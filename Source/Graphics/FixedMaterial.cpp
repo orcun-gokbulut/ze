@@ -730,24 +730,14 @@ bool ZEFixedMaterial::GetDetailMapEnabled() const
 	return MaterialComponents & ZESHADER_DETAILMAP;
 }
 
-void ZEFixedMaterial::SetDetailMapUScale(float u)
+void ZEFixedMaterial::SetDetailMapTiling(const ZEVector2& Tiling)
 {
-	DetailMapTiling.x = u;
+	DetailMapTiling = Tiling;
 }
 
-float ZEFixedMaterial::GetDetailMapUScale() const
+const ZEVector2& ZEFixedMaterial::GetDetailMapTiling() const
 {
-	return DetailMapTiling.x;
-}
-
-void ZEFixedMaterial::SetDetailMapVScale(float v)
-{
-	DetailMapTiling.y = v;
-}
-
-float ZEFixedMaterial::GetDetailMapVScale() const
-{
-	return DetailMapTiling.y;
+	return DetailMapTiling;
 }
 
 void ZEFixedMaterial::SetDetailDiffuseMap(const ZETexture2D* Texture)

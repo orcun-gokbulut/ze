@@ -694,7 +694,7 @@ bool ZEModel::IsDrawable()
 void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 {
 	if (this->ModelResource != NULL)
-		this->ModelResource->Release();
+		((ZEModelResource*)this->ModelResource)->Release();
 	this->ModelResource = ModelResource;
 
 	if (ModelResource == NULL)
@@ -1139,5 +1139,5 @@ ZEModel::ZEModel()
 ZEModel::~ZEModel()
 {
 	if (ModelResource != NULL)
-		ModelResource->Release();
+		((ZEModelResource*)ModelResource)->Release();
 }

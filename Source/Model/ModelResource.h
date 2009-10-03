@@ -192,6 +192,9 @@ struct ZEModelResourceAnimation
 
 class ZEModelResource : public ZEResource
 {
+	protected:
+		virtual									~ZEModelResource();
+
 	public:
 		ZEArray<ZEModelResourceMesh>			Meshes;
 		ZEArray<ZEModelResourceBone>			Bones;
@@ -204,8 +207,7 @@ class ZEModelResource : public ZEResource
 		static ZEModelResource*					LoadResource(const char* FileName);
 		static const ZEModelResource*			LoadSharedResource(const char* FileName);
 		static void								CacheResource(const char* FileName);
-										
-												~ZEModelResource();
+
 };
 
 #endif

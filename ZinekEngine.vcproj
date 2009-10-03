@@ -425,7 +425,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Zinek Engine Post Processor"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -740,10 +740,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\Core\Option.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Property.h"
 				>
 			</File>
 			<File

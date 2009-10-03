@@ -71,10 +71,15 @@ bool ZEResource::IsInternal() const
 	return this->Internal;
 }
 
-void ZEResource::Release() const
+void ZEResource::Release()
 {
+	ReferenceCount--;
 	if (Shared)
-		zeResources->ReleaseResource((ZEResource*)this);
+		if (ReferenceCount <= 0 && !Cached)
+		{
+			zeResources->ReleaseResource(this);
+			delete this;
+		}
 	else
 		if (!Cached)
 			delete this;

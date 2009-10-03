@@ -49,15 +49,15 @@
 #include "Octree.h"
 #include "GameInterface/Entity.h"
 
+class ZEMapPortal;
+class ZEMapResource;
+
 struct ZEMapPolygon
 {
 	ZEMapVertex									Vertices[3];
 	ZEMaterial*									Material;
 	unsigned int								LastIteration;
 };
-
-class ZEMapPortal;
-class ZEMapResource;
 
 class ZEMapPortalDoor
 {
@@ -78,7 +78,6 @@ struct ZEMapPhysicalMesh
 	ZEArray<ZEVector3>							Vertices;
 	ZEArray<ZEMapPhysicalMeshPolygon>			Polygons;
 };
-
 
 class ZEMapPortal
 {
@@ -102,12 +101,14 @@ class ZEMapPortal
 
 class ZEMapResource : public ZEResource
 {
+	protected:
+		virtual									~ZEMapResource();
+
 	public:
 		ZESmartArray<ZETexture2DResource*>		TextureResources;
 		ZEArray<ZEMaterial*>					Materials;
 		ZEArray<ZEMapPortalDoor>				PortalDoors;
 		ZEArray<ZEMapPortal>					Portals;
-		/*ZEArray<ZEEntityData>					Entities;*/
 
 		const char*								GetResourceType() const;
 
@@ -115,6 +116,6 @@ class ZEMapResource : public ZEResource
 		static const ZEMapResource*				LoadSharedResource(const char* FileName);
 		static void								CacheResource(const char* FileName);
 
-												~ZEMapResource();
+												
 };
 #endif

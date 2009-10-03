@@ -40,30 +40,32 @@
 #include "Core/Resource.h"
 #include "FixedMaterial.h"
 #include "ZEDS/Array.h"
+#include "Meta/Animation.h"
 
-class ZEMaterialAnimation;
 class ZETextureResource;
 class ZEResourceFile;
 class ZEMaterialResource : public ZEResource
 {
 	private:
 		ZEMaterial*								Material;
-		ZEMaterialType							MaterialType;
-		ZEArray<ZEMaterialAnimation>			MaterialAnimations;
+		ZEArray<ZEAnimation>					Animations;
 		ZEArray<ZETextureResource*>				TextureResources;
 
 		static bool								LoadTextures(ZEMaterialResource* MaterialResource, ZEResourceFile* ResourceFile);
 		static bool								LoadFixedMaterial(ZEMaterialResource* MaterialResource, ZEResourceFile* ResourceFile);
 		static bool								LoadAnimations(ZEMaterialResource* MaterialResource, ZEResourceFile* ResourceFile);
 
+	protected:
+												ZEMaterialResource();
+												~ZEMaterialResource();
+
 	public:
 		virtual const char*						GetResourceType() const;
 
 		const ZEMaterial*						GetMaterial() const;
-		ZEMaterialType							GetMaterialType() const;
-		const ZEArray<ZETextureResource*>		GetTextures() const;
-		const ZEArray<ZEMaterialAnimation>		GetAnimations() const;
-		const ZEMaterialAnimation*				GetAnimationByName(const char* Name) const;
+		const ZEArray<ZETextureResource*>&		GetTextureResources() const;
+		const ZEArray<ZEAnimation>&				GetAnimations() const;
+		const ZEAnimation*						GetAnimationByName(const char* Name) const;
 
 		static ZEMaterialResource*				LoadResource(ZEResourceFile* ResourceFile);
 		static ZEMaterialResource*				LoadResource(const char* FileName);

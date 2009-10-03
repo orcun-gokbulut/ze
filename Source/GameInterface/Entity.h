@@ -50,12 +50,6 @@
 #include "Graphics/Renderer.h"
 #include "Meta/Class.h"
 
-#define ZE_META_ENTITY_CLASS_EXTENSION\
-		virtual ZEEntityRunAt GetRunAt() const;
-
-#define ZE_META_ENTITY_DESCRIPTION(ClassName) ZE_META_EXTENDED_CLASS_DESCRIPTION(ClassName, ZEEntityDescription, ZE_META_ENTITY_CLASS_EXTENSION)
-#define ZE_META_ENTITY() ZE_META_EXTENDED_CLASS(ZEEntityDescription, )
-
 enum ZEBoundingVolumeMechnism
 {
 	ZE_BVM_USELOCALONLY,
@@ -70,6 +64,22 @@ enum ZEEntityRunAt
 	ZE_ERA_SERVER		= 2,
 	ZE_ERA_BOTH			= 3
 };
+
+#define ZE_META_ENTITY_CLASS_EXTENSION\
+		virtual ZEEntityRunAt GetRunAt() const;
+
+#define ZE_META_ENTITY_DESCRIPTION(ClassName) ZE_META_EXTENDED_CLASS_DESCRIPTION(ClassName, ZEEntityDescription, ZE_META_ENTITY_CLASS_EXTENSION)
+#define ZE_META_ENTITY() ZE_META_EXTENDED_CLASS(ZEEntityDescription, )
+
+#define ZE_CF_NO_CULLING				0
+#define ZE_CF_CULL						1
+#define ZE_CF_CULL_COMPONENTS			2
+#define ZE_CF_ALLWAYS_CULLED			4
+
+#define ZE_RF_NONE						0
+#define ZE_RF_DRAWABLE					1
+#define ZE_RF_DRAWABLE_COMPONENTS		2
+#define ZE_RF_LIGHT_SOURCE				4
 
 class ZEEntityDescription : public ZEClassDescription
 {
@@ -90,21 +100,6 @@ class ZEEntityDescription : public ZEClassDescription
 		virtual ZEEntityRunAt					GetRunAt() const;
 };
 
-class ZEEntityDescription;
-class ZEEntity;
-class ZEEntityData : public ZESerializable
-{
-	public:
-		char								EntityType[ZE_MAX_NAME_SIZE];
-		ZEArray<ZEPropertyDescription>		Properties;
-
-		void								Generate(ZEEntityDescription* Description);
-		void								Fill(ZEEntity* Entity);
-
-		virtual	bool						Serialize(ZESerializer* Serializer);
-		virtual bool						Unserialize(ZEUnserializer* Unserializer);
-};
-
 class ZEEntity : public ZEClass
 {
 	ZE_META_ENTITY()
@@ -117,10 +112,12 @@ class ZEEntity : public ZEClass
 		ZEMatrix4x4							WorldTransform;
 		ZEVector3							Velocity;
 		ZEVector3							OldPosition;
+
+		ZEDWORD								RendererFlags;
+		ZEDWORD								CullerFlags;
+
 		bool								Enabled;
 		bool								Visible;
-		bool								Drawable;
-		bool								HasLight;
 
 		ZEBoundingVolumeMechnism			BoundingVolumeMechanism;
 		ZEAABoundingBox						LocalBoundingBox;
@@ -131,7 +128,6 @@ class ZEEntity : public ZEClass
 		void								SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
 		void								SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
 
-		// States
 		void								UpdateComponents();
 		bool								UpdateBoundingBox;
 		bool								UpdateBoundingSphere;
@@ -149,9 +145,8 @@ class ZEEntity : public ZEClass
 		virtual const ZEAABoundingBox&		GetWorldBoundingBox();
 		const ZEBoundingSphere&				GetWorldBoundingSphere();
 
-		virtual bool						IsDrawable();
-		virtual bool						IsLight();
-		virtual bool						AllwaysDraw();
+		virtual ZEDWORD						GetRendererFlags() const;
+		virtual ZEDWORD						GetCullerFlags() const;
 
 		void								SetEntityId(int EntityId);
 		int									GetEntityId() const;

@@ -36,107 +36,6 @@
 #include "Entity.h"
 #include "Core/Error.h"
 #include <string.h>
-/*
-void ZEEntityData::Generate(ZEEntityDescription* Description)
-{
-	const ZEEntityAttribute* TempAttributes;
-	size_t Count;
-
-	Attributes.Clear();
-
-	while (Description != NULL)
-	{
-		TempAttributes = Description->GetAttributes(&Count);
-		if (Count != 0 && TempAttributes != NULL)
-			Attributes.MassAdd(TempAttributes, Count);
-
-		Description = Description->GetParentType();
-	}
-}
-
-void ZEEntityData::Fill(ZEEntity* Entity)
-{
-	for (size_t I = 0; I < Attributes.GetCount(); I++)
-		Entity->GetAttribute(Attributes[I].Name, Attributes[I].Value);
-}
-
-bool ZEEntityData::Serialize(ZESerializer* Serializer)
-{
-	Serializer->Write(EntityType, sizeof(char), ZE_MAX_NAME_SIZE);
-	ZEDWORD AttributeCount = Attributes.GetCount();
-	Serializer->Write(&AttributeCount, sizeof(ZEDWORD), 1);
-	for (size_t I = 0; I < Attributes.GetCount(); I++)
-	{
-			Serializer->Write((void*)Attributes[I].Name, sizeof(char), ZE_MAX_NAME_SIZE);
-			Attributes[I].Value.Serialize(Serializer);
-	}
-	return true;
-}
-
-bool ZEEntityData::Unserialize(ZEUnserializer* Unserializer)
-{
-	Unserializer->Read(EntityType, sizeof(char), ZE_MAX_NAME_SIZE);
-	ZEDWORD AttributeCount;
-	Unserializer->Read(&AttributeCount, sizeof(ZEDWORD), 1);
-	Attributes.SetCount(AttributeCount);
-	for (size_t I = 0; I < Attributes.GetCount(); I++)
-	{
-		Unserializer->Read((void*)Attributes[I].Name, sizeof(char), ZE_MAX_NAME_SIZE);
-		Attributes[I].Value.Unserialize(Unserializer);
-	}
-	return true;
-}*/
-/*
-ZEEntityDescription* ZEEntityDescription::GetParentType()
-{
-	return NULL;
-}
-
-const char* ZEEntityDescription::GetTypeName()
-{
-	return "ZEEntity";
-}
-
-const ZEEntityAttribute* ZEEntityDescription::GetAttributes(size_t* Count)
-{
-
-//	ZEEntityAttributeEnumurator* Enu = 	ZEEntityAttributeEnumurator()[] = {{"", 1}, {"", 1}};;
-
-	static ZEEntityAttribute Attributes[] = 
-	{
-		{"EntityId", ZE_VRT_INTEGER, ZE_EAS_ENTITY, ZE_EAF_READONLY, 0, 0, NULL, NULL, NULL, "Unique number that indentifes entity"},
-		{"EntityName", ZE_VRT_STRING, ZE_EAS_NONE, ZE_EAF_UNIQUE, "", 0, NULL, NULL, NULL, "Name of the entity"},
-		{"Position", ZE_VRT_VECTOR3,  ZE_EAS_NONE, ZE_EAF_NONE, ZEVector3(0.0f, 0.0f, 0.0f), 0, NULL, NULL, NULL, "World position of the entity"},
-		{"Rotation", ZE_VRT_QUATERNION,  ZE_EAS_NONE, ZE_EAF_NONE, ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 0, NULL, NULL, NULL, "World rotation of the entity"},
-		{"Scale", ZE_VRT_VECTOR3,  ZE_EAS_NONE, ZE_EAF_NONE, ZEVector3(1.0f, 1.0f, 1.0f), 0, NULL, NULL, NULL, "World scale of the entity"},
-		{"Enabled", ZE_VRT_BOOLEAN,  ZE_EAS_NONE, ZE_EAF_NONE, false, 0, NULL, NULL, NULL, "If entity is disabled it will not recive Ticks so it will not interact with player. However this property does not affect entity physical interactions. A entity can be disabled but physically active."},
-		{"Visible", ZE_VRT_BOOLEAN,  ZE_EAS_NONE, ZE_EAF_NONE, false, 0, NULL, NULL, NULL, "Is entity visible"},
-	};
-
-	*Count = 7;
-	return Attributes;
-}
-
-ZEEntity* ZEEntityDescription::CreateInstance()
-{
-	return NULL;
-}
-
-ZEEntityRunAt ZEEntityDescription::GetEntityRunAt()
-{
-	return ZE_ERA_NONE;
-}
-
-const char* ZEEntityDescription::GetEditorIcon()
-{
-	return "";
-}
-
-const char* ZEEntityDescription::GetEditorDescription()
-{
-	return "Base entity class";
-}
-*/
 
 void ZEEntity::SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism)
 {
@@ -166,18 +65,17 @@ void ZEEntity::UpdateComponents()
 
 void ZEEntity::RegisterComponent(ZEComponent* Component)
 {
-	if (Component->IsDrawable())
+	ZEDWORD ComponentRenderFlag = Component->GetRendererFlags();
+
+	if (Component->GetRendererFlags() & ZE_RF_DRAWABLE)
 	{
 		if (Component->GetVisible())
 			UpdateBoundingVolumes();
-
-		Drawable = true;
+		RendererFlags |= ZE_RF_DRAWABLE_COMPONENTS;
 	}
 
-	if (Component->IsLight())
-		HasLight = true;
-
-
+	if (Component->GetRendererFlags() & ZE_RF_LIGHT_SOURCE)
+		RendererFlags |= ZE_RF_LIGHT_SOURCE;
 
 	Component->SetOwner(this);
 	Component->Initialize();
@@ -189,41 +87,42 @@ void ZEEntity::UnregisterComponent(ZEComponent* Component)
 	Component->Deinitialize();
 	Components.DeleteValue(Component);
 
-	Drawable = false;
-	if (Component->IsDrawable())
+	if (Component->GetRendererFlags() & ZE_RF_DRAWABLE)
+	{
+		bool Drawable = false;
 		for (size_t I = 0; I < Components.GetCount(); I++)
-			if (Components[I]->IsDrawable())
+			if (Components[I]->GetRendererFlags() & ZE_RF_DRAWABLE)
 			{
 				Drawable = true;
 				break;
 			}
+		if (Drawable)
+			RendererFlags |= ZE_RF_DRAWABLE_COMPONENTS;
+		else
+			RendererFlags &= !ZE_RF_DRAWABLE_COMPONENTS;
+	}
 
-	HasLight = false;
-	if (Component->IsLight())
+	if (Component->GetRendererFlags() & ZE_RF_LIGHT_SOURCE)
+	{
+		bool HasLight = false;
 		for (size_t I = 0; I < Components.GetCount(); I++)
-			if (Components[I]->IsLight())
+			if (Components[I]->GetRendererFlags() & ZE_RF_LIGHT_SOURCE)
 			{
 				HasLight = true;
 				break;
 			}
-}
-/*
-ZEEntityDescription* ZEEntity::EntityDescription()
-{
-	static  ZEEntityDescription EntityDescription;
-	return &EntityDescription;
-}
 
-ZEEntityDescription* ZEEntity::GetEntityDescription()
-{
-	return EntityDescription();
-}*/
+		if (HasLight)
+			RendererFlags |= ZE_RF_LIGHT_SOURCE;
+		else
+			RendererFlags &= !ZE_RF_LIGHT_SOURCE;
+	}
+}
 
 void ZEEntity::SetEntityId(int EntityId)
 {
 	this->EntityId = EntityId;
 }
-
 
 int ZEEntity::GetEntityId() const
 {
@@ -264,7 +163,7 @@ const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 		if (BoundingVolumeMechanism == ZE_BVM_USEBOTH || BoundingVolumeMechanism == ZE_BVM_USECOMPONENTS)
 			for (size_t I = 0; I < Components.GetCount(); I++)
 			{
-				if (Components[I]->IsDrawable() && Components[I]->GetVisible())
+				if ((Components[I]->GetRendererFlags() & ZE_RF_DRAWABLE) && Components[I]->GetVisible())
 				{
 					const ZEAABoundingBox& CompBoundingBox = Components[I]->GetWorldBoundingBox();
 					if (NoBoundingBox == true)
@@ -307,19 +206,14 @@ const ZEBoundingSphere&	ZEEntity::GetWorldBoundingSphere()
 	return WorldBoundingSphere;
 }
 
-bool ZEEntity::IsDrawable()
+ZEDWORD ZEEntity::GetRendererFlags() const
 {
-	return Drawable;
+	return ZE_CF_NO_CULLING;
 }
 
-bool ZEEntity::IsLight()
+ZEDWORD ZEEntity::GetCullerFlags() const
 {
-	return HasLight;	
-}
-
-bool ZEEntity::AllwaysDraw()
-{
-	return false;
+	return ZE_RF_NONE;
 }
 
 void ZEEntity::SetName(const char* NewName)
@@ -473,8 +367,6 @@ ZEEntity::ZEEntity()
 	UpdateBoundingBox = true;
 	UpdateBoundingSphere = true;
 	UpdateWorldTransform = true;
-	HasLight = false;
-	Drawable = false;
 	Visible = true;
 }
 

@@ -53,6 +53,9 @@ class ZEResource
 		bool					Internal;
 		size_t					ReferenceCount;
 
+								ZEResource();
+		virtual					~ZEResource();
+
 	public:
 		virtual const char*		GetResourceType() const = 0;
 
@@ -63,9 +66,6 @@ class ZEResource
 		bool					IsCached() const;
 		bool					IsInternal() const;
 
-		virtual void			Release() const;
-
-								ZEResource();
-		virtual					~ZEResource();
+		void					Release();
 };
 #endif
