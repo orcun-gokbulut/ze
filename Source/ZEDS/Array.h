@@ -401,6 +401,16 @@ class ZEArray
 			return Items[Index];
 		}
 		
+		inline Type& GetFirstItem()
+		{
+			return Items[0];
+		}
+
+		inline Type& GetLastItem()
+		{
+			return Items[Count - 1];
+		}
+
 		inline Type& operator[](size_t Index)
 		{
 			ZEDS_ASSERT(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");

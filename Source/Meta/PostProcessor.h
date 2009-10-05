@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - CanvasBrush.h
+ Zinek Engine - PostProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,47 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CANVASBRUSH_H__
-#define __ZE_CANVASBRUSH_H__
-#include "Entity.h"
-#include "Graphics/Canvas.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/FixedMaterial.h"
+#ifndef __ZE_POST_PROCESSOR__
+#define __ZE_POST_PROCESSOR_
 
-ZE_META_CLASS_DESCRIPTION(ZECanvasBrush);
-
-class ZECanvasBrush : public ZEEntity
-{
-	ZE_META_CLASS()
-	
-	private:
-		ZERenderOrder						RenderOrder;
-
-	public:
-		virtual ZEDWORD						GetDrawFlags() const;
-
-		ZERLPrimitiveType					PrimitiveType;
-		ZEMaterial*							Material;
-		ZECanvas							Canvas;
-
-		void								UpdateCanvas();
-
-		virtual void						Deinitialize();
-
-		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
-		virtual void						Tick(float ElapsedTime);
-
-											ZECanvasBrush();
-											~ZECanvasBrush();
-};
-
-/*
-ZE_POSTPROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZECanvasBrush" parent="ZEEntity" icon="" description="Canvas brush"/>
-	</meta>
-</zinek>
-ZE_POSTPROCESSOR_END()
-*/
+#define ZE_POST_PROCESSOR_START(x)
+#define ZE_POST_PROCESSOR_ENDT(x)
 #endif

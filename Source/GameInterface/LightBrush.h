@@ -69,7 +69,7 @@ class ZELightBrush : public ZEEntity
 		float								ProjectionAspectRatio;
 
 	public:
-		virtual bool						IsDrawable();
+		virtual ZEDWORD						GetDrawFlags() const;
 
 		ZELight*							GetLight();
 

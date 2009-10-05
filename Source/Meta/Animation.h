@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - CanvasBrush.h
+ Zinek Engine - Animation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,47 +34,95 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CANVASBRUSH_H__
-#define __ZE_CANVASBRUSH_H__
-#include "Entity.h"
-#include "Graphics/Canvas.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/FixedMaterial.h"
+#ifndef __ZE_ANIMATION_H__
+#define __ZE_ANIMATION_H__
 
-ZE_META_CLASS_DESCRIPTION(ZECanvasBrush);
+#include "Definitions.h"
+#include "ZEDS/Array.h"
+#include "ZEDS/Variant.h"
 
-class ZECanvasBrush : public ZEEntity
+enum ZEAnimationState
 {
-	ZE_META_CLASS()
-	
-	private:
-		ZERenderOrder						RenderOrder;
-
-	public:
-		virtual ZEDWORD						GetDrawFlags() const;
-
-		ZERLPrimitiveType					PrimitiveType;
-		ZEMaterial*							Material;
-		ZECanvas							Canvas;
-
-		void								UpdateCanvas();
-
-		virtual void						Deinitialize();
-
-		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
-		virtual void						Tick(float ElapsedTime);
-
-											ZECanvasBrush();
-											~ZECanvasBrush();
+	ZE_AS_NONE			= 0,
+	ZE_AS_PLAYING		= 1,
+	ZE_AS_STOPPED		= 2,
+	ZE_AS_PAUSED		= 3
 };
 
-/*
-ZE_POSTPROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZECanvasBrush" parent="ZEEntity" icon="" description="Canvas brush"/>
-	</meta>
-</zinek>
-ZE_POSTPROCESSOR_END()
-*/
+struct ZEPropertyAnimationKey
+{
+	float								Time;
+	ZEVariant							Value;
+};
+
+struct ZEPropertyAnimation
+{
+	int									PropertyId;
+	ZEVariantType						ValueType;
+	bool								Interpolate;
+	ZEArray<ZEPropertyAnimationKey>		Keys;
+};
+
+class ZEResourceFile;
+class ZEAnimation
+{
+	public:
+		char							Name[ZE_MAX_NAME_SIZE];
+		int								FrameCount;
+		float							FramePerSecond;
+		ZEArray<ZEPropertyAnimation>	PropertyAnimations;
+
+		static bool						ReadFromFile(ZEUnserializer* Unserializer, ZEAnimation* Animation);
+		static bool						WriteToFile(ZESerializer* Serializer, ZEAnimation* Animation);
+};
+
+
+
+class ZEClass;
+class ZEAnimationController
+{
+	private:
+		ZEClass*						Owner;
+		ZEAnimation*					Animation;
+		float							StartFrame;
+		float							EndFrame;
+		float							CurrentFrame;
+		bool							Looping;
+		ZEAnimationState				State;
+		float							Speed;
+
+	public:
+		void							SetOwner(ZEClass* Owner);
+		ZEClass*						GetOwner();
+
+		void							SetLooping(bool Loop);
+		bool							GetLooping();
+		
+		void							SetCurrentFrame(float Frame);
+		float							GetCurrentFrame();
+		
+		void							SetStartFrame(float Start);
+		float							GetStartFrame();
+
+		void							SetEndFrame(float End);
+		float							GetEndFrame();
+
+		void							SetAnimationSpeed(float Speed);
+		float							GetAnimationSpeed();
+
+		ZEAnimationState				GetAnimationState();
+
+		void							SetAnimation(ZEAnimation* Animation);
+		ZEAnimation*					GetAnimation();
+
+		void							PlayAnimation();
+		void							PauseAnimation();
+		void							StopAnimation();
+		void							ResumeAnimation();
+
+		void							AdvanceAnimation(float TimeElapsed);
+
+										ZEAnimationController();
+										~ZEAnimationController();
+};
 #endif

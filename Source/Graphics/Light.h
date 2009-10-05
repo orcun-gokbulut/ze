@@ -64,7 +64,7 @@ class ZELight : public ZEComponent
 	public:
 		virtual ZELightType				GetLightType() = 0;
 
-		virtual bool					IsLight();
+		virtual ZEDWORD					GetDrawFlags() const;
 
 		virtual	void					SetLocalPosition(const ZEVector3& NewPosition);
 		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);

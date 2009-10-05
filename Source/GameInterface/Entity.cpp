@@ -65,17 +65,17 @@ void ZEEntity::UpdateComponents()
 
 void ZEEntity::RegisterComponent(ZEComponent* Component)
 {
-	ZEDWORD ComponentRenderFlag = Component->GetRendererFlags();
+	ZEDWORD ComponentRenderFlag = Component->GetDrawFlags();
 
-	if (Component->GetRendererFlags() & ZE_RF_DRAWABLE)
+	if (Component->GetDrawFlags() & ZE_DF_DRAW)
 	{
 		if (Component->GetVisible())
 			UpdateBoundingVolumes();
-		RendererFlags |= ZE_RF_DRAWABLE_COMPONENTS;
+		DrawFlags |= ZE_DF_DRAW_COMPONENTS;
 	}
 
-	if (Component->GetRendererFlags() & ZE_RF_LIGHT_SOURCE)
-		RendererFlags |= ZE_RF_LIGHT_SOURCE;
+	if (Component->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
+		DrawFlags |= ZE_DF_LIGHT_SOURCE;
 
 	Component->SetOwner(this);
 	Component->Initialize();
@@ -87,35 +87,39 @@ void ZEEntity::UnregisterComponent(ZEComponent* Component)
 	Component->Deinitialize();
 	Components.DeleteValue(Component);
 
-	if (Component->GetRendererFlags() & ZE_RF_DRAWABLE)
+	if (DrawFlags & ZE_DF_AUTO)
 	{
-		bool Drawable = false;
-		for (size_t I = 0; I < Components.GetCount(); I++)
-			if (Components[I]->GetRendererFlags() & ZE_RF_DRAWABLE)
-			{
-				Drawable = true;
-				break;
-			}
-		if (Drawable)
-			RendererFlags |= ZE_RF_DRAWABLE_COMPONENTS;
-		else
-			RendererFlags &= !ZE_RF_DRAWABLE_COMPONENTS;
-	}
+		if (Component->GetDrawFlags() & ZE_DF_DRAW)
+		{
+			bool Drawable = false;
+			for (size_t I = 0; I < Components.GetCount(); I++)
+				if (Components[I]->GetDrawFlags() & ZE_DF_DRAW)
+				{
+					Drawable = true;
+					break;
+				}
+			if (Drawable)
+				DrawFlags |= ZE_DF_DRAW_COMPONENTS;
+			else
+				DrawFlags &= !ZE_DF_DRAW_COMPONENTS;
+		}
 
-	if (Component->GetRendererFlags() & ZE_RF_LIGHT_SOURCE)
-	{
-		bool HasLight = false;
-		for (size_t I = 0; I < Components.GetCount(); I++)
-			if (Components[I]->GetRendererFlags() & ZE_RF_LIGHT_SOURCE)
-			{
-				HasLight = true;
-				break;
-			}
 
-		if (HasLight)
-			RendererFlags |= ZE_RF_LIGHT_SOURCE;
-		else
-			RendererFlags &= !ZE_RF_LIGHT_SOURCE;
+		if (Component->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
+		{
+			bool HasLight = false;
+			for (size_t I = 0; I < Components.GetCount(); I++)
+				if (Components[I]->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
+				{
+					HasLight = true;
+					break;
+				}
+
+			if (HasLight)
+				DrawFlags |= ZE_DF_LIGHT_SOURCE;
+			else
+				DrawFlags &= !ZE_DF_LIGHT_SOURCE;
+		}
 	}
 }
 
@@ -163,7 +167,7 @@ const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 		if (BoundingVolumeMechanism == ZE_BVM_USEBOTH || BoundingVolumeMechanism == ZE_BVM_USECOMPONENTS)
 			for (size_t I = 0; I < Components.GetCount(); I++)
 			{
-				if ((Components[I]->GetRendererFlags() & ZE_RF_DRAWABLE) && Components[I]->GetVisible())
+				if ((Components[I]->GetDrawFlags() & ZE_DF_DRAW) && Components[I]->GetVisible())
 				{
 					const ZEAABoundingBox& CompBoundingBox = Components[I]->GetWorldBoundingBox();
 					if (NoBoundingBox == true)
@@ -206,14 +210,9 @@ const ZEBoundingSphere&	ZEEntity::GetWorldBoundingSphere()
 	return WorldBoundingSphere;
 }
 
-ZEDWORD ZEEntity::GetRendererFlags() const
+ZEDWORD ZEEntity::GetDrawFlags() const
 {
-	return ZE_CF_NO_CULLING;
-}
-
-ZEDWORD ZEEntity::GetCullerFlags() const
-{
-	return ZE_RF_NONE;
+	return DrawFlags;
 }
 
 void ZEEntity::SetName(const char* NewName)
@@ -359,6 +358,7 @@ void ZEEntity::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& 
 ZEEntity::ZEEntity()
 {
 	Name[0] = '\0';
+	DrawFlags = ZE_DF_AUTO;
 	BoundingVolumeMechanism = ZE_BVM_USELOCALONLY;
 	Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f);

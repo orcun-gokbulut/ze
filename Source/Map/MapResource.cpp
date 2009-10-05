@@ -509,8 +509,6 @@ void ZEMapResource::CacheResource(const char* FileName)
 
 ZEMapResource* ZEMapResource::LoadResource(const char* FileName)
 {
-	ZEDWORD ChunkId;
-
 	// Open ZEMap file
 	ZEResourceFile ResourceFile;
 	if (ResourceFile.Open(FileName))

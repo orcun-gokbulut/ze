@@ -41,9 +41,9 @@
 // CLight  CLight  CLight  CLight  CLight  CLight  CLight  CLight  CLight  CLight  CLight  CLight  CLight  CLight  //
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool ZELight::IsLight()
+ZEDWORD ZELight::GetDrawFlags() const
 {
-	return true;
+	return ZE_DF_LIGHT_SOURCE;
 }
 
 void ZELight::SetLocalPosition(const ZEVector3& NewPosition)

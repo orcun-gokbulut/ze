@@ -42,19 +42,9 @@ const ZEAABoundingBox& ZESkyBrush::GetWorldBoundingBox()
 	return ZEAABoundingBox();
 }
 
-bool ZESkyBrush::IsDrawable()
+ZEDWORD ZESkyBrush::GetDrawFlags() const
 {
-	return true;
-}
-
-bool ZESkyBrush::IsLight()
-{
-	return GetEnabled() && SkyLight.GetEnabled();
-}
-
-bool ZESkyBrush::AllwaysDraw()
-{
-	return true;
+	return ZE_DF_DRAW | ZE_DF_LIGHT_SOURCE;
 }
 
 void ZESkyBrush::SetSkyColor(const ZEVector3& Color)

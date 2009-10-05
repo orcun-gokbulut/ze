@@ -281,19 +281,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\ZEDS\Collection.h"
-				>
-			</File>
-			<File
 				RelativePath="..\Source\ZEDS\Definitions.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\ZEDS\DoubleLinklist.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\ZEDS\Linklist.h"
 				>
 			</File>
 			<File
@@ -302,10 +290,6 @@
 			</File>
 			<File
 				RelativePath="..\Source\ZEDS\Named.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\ZEDS\Serialize.h"
 				>
 			</File>
 			<File
@@ -328,22 +312,10 @@
 				RelativePath="..\Source\ZEDS\ZEDS.cpp"
 				>
 			</File>
-			<File
-				RelativePath="..\Source\ZEDS\ZEDS.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="ZEMath"
 			>
-			<File
-				RelativePath="..\Source\ZEMath\3DRectangle.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\ZEMath\3DRectangle.h"
-				>
-			</File>
 			<File
 				RelativePath="..\Source\ZEMath\AABoundingBox.cpp"
 				>
@@ -429,6 +401,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\ZEMath\Rectangle3D.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\Rectangle3D.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\ZEMath\Triangle.cpp"
 				>
 			</File>
@@ -453,7 +433,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\ZEMath\ZEMath.h"
+				RelativePath="..\Source\ZEMath\ZEMath_.h"
 				>
 			</File>
 		</Filter>
@@ -617,7 +597,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Graphics\Material.cpp"
+				RelativePath="..\Source\Graphics\material.cpp"
 				>
 			</File>
 			<File
@@ -626,6 +606,18 @@
 			</File>
 			<File
 				RelativePath="..\Source\Graphics\MaterialComponents.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\MaterialFileFormat.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\MaterialResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\MaterialResource.h"
 				>
 			</File>
 			<File
@@ -645,11 +637,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Graphics\RenderList.cpp"
+				RelativePath="..\Source\Graphics\RenderOrder.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Graphics\RenderList.h"
+				RelativePath="..\Source\Graphics\RenderOrder.h"
 				>
 			</File>
 			<File
@@ -870,10 +862,6 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="GUI"
-			>
-		</Filter>
-		<Filter
 			Name="Input"
 			>
 			<File
@@ -1083,6 +1071,54 @@
 		</Filter>
 		<Filter
 			Name="VM"
+			>
+		</Filter>
+		<Filter
+			Name="Meta"
+			>
+			<File
+				RelativePath="..\Source\Meta\Animation.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Meta\Animation.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Meta\Class.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Meta\Class.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Meta\PostProcessor.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Meta\PostProcessor.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Meta\Property.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Meta\Property.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Meta\Provider.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Meta\Provider.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="GUI"
 			>
 		</Filter>
 		<File

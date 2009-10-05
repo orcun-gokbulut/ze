@@ -71,15 +71,14 @@ enum ZEEntityRunAt
 #define ZE_META_ENTITY_DESCRIPTION(ClassName) ZE_META_EXTENDED_CLASS_DESCRIPTION(ClassName, ZEEntityDescription, ZE_META_ENTITY_CLASS_EXTENSION)
 #define ZE_META_ENTITY() ZE_META_EXTENDED_CLASS(ZEEntityDescription, )
 
-#define ZE_CF_NO_CULLING				0
-#define ZE_CF_CULL						1
-#define ZE_CF_CULL_COMPONENTS			2
-#define ZE_CF_ALLWAYS_CULLED			4
-
-#define ZE_RF_NONE						0
-#define ZE_RF_DRAWABLE					1
-#define ZE_RF_DRAWABLE_COMPONENTS		2
-#define ZE_RF_LIGHT_SOURCE				4
+#define ZE_DF_NONE								0
+#define ZE_DF_DRAW								1
+#define ZE_DF_DRAW_COMPONENTS					2
+#define ZE_DF_LIGHT_SOURCE						4
+#define ZE_DF_LIGHT_RECIVER						8
+#define ZE_DF_CULL								16
+#define ZE_DF_CULL_COMPONENTS					32
+#define ZE_DF_AUTO								64
 
 class ZEEntityDescription : public ZEClassDescription
 {
@@ -104,89 +103,88 @@ class ZEEntity : public ZEClass
 {
 	ZE_META_ENTITY()
 	private: 
-		char								Name[ZE_MAX_NAME_SIZE];
-		int									EntityId;
-		ZEPoint3							Position;
-		ZEQuaternion						Rotation;
-		ZEVector3							Scale;
-		ZEMatrix4x4							WorldTransform;
-		ZEVector3							Velocity;
-		ZEVector3							OldPosition;
+		char									Name[ZE_MAX_NAME_SIZE];
+		int										EntityId;
+		ZEPoint3								Position;
+		ZEQuaternion							Rotation;
+		ZEVector3								Scale;
+		ZEMatrix4x4								WorldTransform;
+		ZEVector3								Velocity;
+		ZEVector3								OldPosition;
 
-		ZEDWORD								RendererFlags;
-		ZEDWORD								CullerFlags;
+		ZEDWORD									DrawFlags;
+		ZEDWORD									CullerFlags;
 
-		bool								Enabled;
-		bool								Visible;
+		bool									Enabled;
+		bool									Visible;
 
-		ZEBoundingVolumeMechnism			BoundingVolumeMechanism;
-		ZEAABoundingBox						LocalBoundingBox;
-		ZEAABoundingBox						WorldBoundingBox;
-		ZEBoundingSphere					WorldBoundingSphere;
+		ZEBoundingVolumeMechnism				BoundingVolumeMechanism;
+		ZEAABoundingBox							LocalBoundingBox;
+		ZEAABoundingBox							WorldBoundingBox;
+		ZEBoundingSphere						WorldBoundingSphere;
 
 	protected:
-		void								SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
-		void								SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
+		void									SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
+		void									SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
 
-		void								UpdateComponents();
-		bool								UpdateBoundingBox;
-		bool								UpdateBoundingSphere;
-		bool								UpdateWorldTransform;
+		void									UpdateComponents();
+		bool									UpdateBoundingBox;
+		bool									UpdateBoundingSphere;
+		bool									UpdateWorldTransform;
 
-		ZEArray<ZEComponent*>				Components;
+		ZEArray<ZEComponent*>					Components;
 
-		void								RegisterComponent(ZEComponent* Component);
-		void								UnregisterComponent(ZEComponent* Component);
-
+		void									RegisterComponent(ZEComponent* Component);
+		void									UnregisterComponent(ZEComponent* Component);
+	
 	public:
-		const ZEArray<ZEComponent *>&		GetComponents();
+		const ZEArray<ZEComponent *>&			GetComponents();
 
-		virtual const ZEAABoundingBox&		GetLocalBoundingBox();
-		virtual const ZEAABoundingBox&		GetWorldBoundingBox();
-		const ZEBoundingSphere&				GetWorldBoundingSphere();
+		virtual const ZEAABoundingBox&			GetLocalBoundingBox();
+		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
+		const ZEBoundingSphere&					GetWorldBoundingSphere();
 
-		virtual ZEDWORD						GetRendererFlags() const;
-		virtual ZEDWORD						GetCullerFlags() const;
+		virtual ZEDWORD							GetDrawFlags() const;
 
-		void								SetEntityId(int EntityId);
-		int									GetEntityId() const;
+		void									SetEntityId(int EntityId);
+		int										GetEntityId() const;
 
-		void								SetName(const char* NewName);
-		const char*							GetName() const;
+		void									SetName(const char* NewName);
+		const char*								GetName() const;
 
-		virtual void						SetVisible(bool Enabled);
-		virtual bool						GetVisible() const;
+		virtual void							SetVisible(bool Enabled);
+		virtual bool							GetVisible() const;
 
-		virtual void						SetEnabled(bool Enabled);
-		virtual bool						GetEnabled() const;
+		virtual void							SetEnabled(bool Enabled);
+		virtual bool							GetEnabled() const;
 
-		virtual void						SetPosition(const ZEPoint3& NewPosition);
-		const ZEPoint3&						GetPosition() const;
+		virtual void							SetPosition(const ZEPoint3& NewPosition);
+		const ZEPoint3&							GetPosition() const;
 
-		virtual void						SetRotation(const ZEQuaternion& NewRotation);
-		const ZEQuaternion&					GetRotation() const;
+		virtual void							SetRotation(const ZEQuaternion& NewRotation);
+		const ZEQuaternion&						GetRotation() const;
 
-		virtual void						SetScale(const ZEPoint3& NewScale);
-		const ZEPoint3&						GetScale() const;
+		virtual void							SetScale(const ZEPoint3& NewScale);
+		const ZEPoint3&							GetScale() const;
 
-		virtual void						SetVelocity(const ZEVector3& NewVelocity);
-		const ZEVector3&					GetVelocity() const;
+		virtual void							SetVelocity(const ZEVector3& NewVelocity);
+		const ZEVector3&						GetVelocity() const;
 
-		const ZEMatrix4x4&					GetWorldTransform();
+		const ZEMatrix4x4&						GetWorldTransform();
 
-		virtual void						Initialize();
-		virtual void						Deinitialize();
-		virtual void						Destroy();
-		virtual void						Reset();
+		virtual void							Initialize();
+		virtual void							Deinitialize();
+		virtual void							Destroy();
+		virtual void							Reset();
 		
-		virtual void						Tick(float Time);
-		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
-		virtual void						Update();
+		virtual void							Tick(float Time);
+		virtual void							Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
+		virtual void							Update();
 
-		void								UpdateBoundingVolumes();
+		void									UpdateBoundingVolumes();
 
-											ZEEntity();
-		virtual								~ZEEntity();
+												ZEEntity();
+		virtual									~ZEEntity();
 };
 
 /*

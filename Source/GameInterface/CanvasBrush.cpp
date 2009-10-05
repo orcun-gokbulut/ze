@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 #include "CanvasBrush.h"
 
-bool ZECanvasBrush::IsDrawable()
+ZEDWORD ZECanvasBrush::GetDrawFlags() const
 {
-	return true;
+	return ZE_DF_DRAW | ZE_DF_CULL;
 }
 
 void ZECanvasBrush::UpdateCanvas()

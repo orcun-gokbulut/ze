@@ -51,14 +51,9 @@ void ZEComponent::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 	if (Owner != NULL)
 		Owner->UpdateBoundingVolumes();
 }
-ZEDWORD ZEComponent::GetRendererFlags() const
+ZEDWORD ZEComponent::GetDrawFlags() const
 {
-	return ZE_RF_NONE;
-}
-
-ZEDWORD ZEComponent::GetCullerFlags() const
-{
-	return ZE_CF_NO_CULLING;
+	return ZE_DF_NONE;
 }
 
 void ZEComponent::SetOwner(ZEEntity* NewOwner)

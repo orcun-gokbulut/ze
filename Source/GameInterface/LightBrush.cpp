@@ -41,9 +41,9 @@
 #include "Graphics/FixedMaterial.h"
 #include "Graphics/TextureResource.h"
 
-bool ZELightBrush::IsDrawable()
+ZEDWORD ZELightBrush::GetDrawFlags() const
 {
-	return true;
+	return ZE_DF_LIGHT_SOURCE | ZE_DF_DRAW | ZE_DF_CULL;
 }
 
 ZELight* ZELightBrush::GetLight()

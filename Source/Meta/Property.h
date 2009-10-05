@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - CanvasBrush.h
+ Zinek Engine - Property.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,47 +34,66 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CANVASBRUSH_H__
-#define __ZE_CANVASBRUSH_H__
-#include "Entity.h"
-#include "Graphics/Canvas.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/FixedMaterial.h"
+#ifndef __ZE_PROPERTY_H__
+#define __ZE_PROPERTY_H__
 
-ZE_META_CLASS_DESCRIPTION(ZECanvasBrush);
+#include "ZEDS\Array.h"
+#include "ZEDS\Variant.h"
+#include "Definitions.h"
 
-class ZECanvasBrush : public ZEEntity
+enum ZEPropertySemantic
 {
-	ZE_META_CLASS()
-	
-	private:
-		ZERenderOrder						RenderOrder;
-
-	public:
-		virtual ZEDWORD						GetDrawFlags() const;
-
-		ZERLPrimitiveType					PrimitiveType;
-		ZEMaterial*							Material;
-		ZECanvas							Canvas;
-
-		void								UpdateCanvas();
-
-		virtual void						Deinitialize();
-
-		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
-		virtual void						Tick(float ElapsedTime);
-
-											ZECanvasBrush();
-											~ZECanvasBrush();
+	ZE_PS_NONE,
+	ZE_PS_POSITION,
+	ZE_PS_ROTATION,
+	ZE_PS_DIRECTION,
+	ZE_PS_SCALE,
+	ZE_PS_FILENAME,
+	ZE_PS_COLOR,
 };
 
-/*
-ZE_POSTPROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZECanvasBrush" parent="ZEEntity" icon="" description="Canvas brush"/>
-	</meta>
-</zinek>
-ZE_POSTPROCESSOR_END()
-*/
+enum ZEPropertyAccess
+{
+	ZE_PA_NOACCESS		= 0,
+	ZE_PA_READONLY		= 1,
+	ZE_PA_WRITEONLY		= 2,
+	ZE_PA_READWRITE		= 3,
+};
+
+struct ZEPropertyEnumuratorItem
+{
+	const char*									Name;
+	int											Value;
+};
+
+struct ZEPropertyEnumurator
+{
+	const char*									Name;
+	ZEPropertyEnumuratorItem*					Items;
+	size_t										ItemCount;
+};
+
+
+
+struct ZEPropertyDescription
+{
+	const char*									Name;
+	ZEVariantType								Type;
+	ZEPropertyAccess							Access;
+	bool										Visibility;
+	bool										Animatable;
+	const char*									Description;
+	ZEPropertySemantic							Semantic;
+	void*										SemanticProperties;
+	ZEPropertyEnumurator*						Enumurators;
+};
+
+struct ZEMethodDescription
+{
+	const char*									Name;
+	size_t										ParameterCount;
+	const ZEVariantType* const					Parameters;
+	ZEVariantType								ReturnType;
+};
+
 #endif

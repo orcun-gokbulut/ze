@@ -58,9 +58,7 @@ class ZESkyBrush : public ZEEntity
 	public:
 		virtual const ZEAABoundingBox&		GetWorldBoundingBox();
 
-		virtual bool						IsDrawable();
-		virtual bool						IsLight();
-		virtual bool						AllwaysDraw();
+		virtual ZEDWORD						GetDrawFlags() const;
 
 		virtual void						SetSkyTexture(const char* FileName);
 		const char*							GetSkyTexture() const;

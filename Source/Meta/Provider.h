@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - CanvasBrush.h
+ Zinek Engine - Provider.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,48 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_CANVASBRUSH_H__
-#define __ZE_CANVASBRUSH_H__
-#include "Entity.h"
-#include "Graphics/Canvas.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/FixedMaterial.h"
-
-ZE_META_CLASS_DESCRIPTION(ZECanvasBrush);
-
-class ZECanvasBrush : public ZEEntity
+class ZEClassDescription;
+class ZEClass;
+class ZEClassProvider
 {
-	ZE_META_CLASS()
-	
-	private:
-		ZERenderOrder						RenderOrder;
-
 	public:
-		virtual ZEDWORD						GetDrawFlags() const;
+		virtual ZEClassDescription*			GetClassDescriptions() = 0;
+		virtual size_t						GetClassDescriptionCount() = 0;
 
-		ZERLPrimitiveType					PrimitiveType;
-		ZEMaterial*							Material;
-		ZECanvas							Canvas;
+		virtual bool						RegisterClass(ZEClassDescription* Description);
+		virtual void						UnregisterClass();
 
-		void								UpdateCanvas();
-
-		virtual void						Deinitialize();
-
-		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
-		virtual void						Tick(float ElapsedTime);
-
-											ZECanvasBrush();
-											~ZECanvasBrush();
+		virtual ZEClass*					CreateInstance(size_t Index);
+		virtual ZEClass*					CreateInstance(const char* Name);
 };
-
-/*
-ZE_POSTPROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZECanvasBrush" parent="ZEEntity" icon="" description="Canvas brush"/>
-	</meta>
-</zinek>
-ZE_POSTPROCESSOR_END()
-*/
-#endif

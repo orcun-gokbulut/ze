@@ -77,8 +77,7 @@ class ZEComponent
 		void							SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
 
 	public:
-		virtual	ZEDWORD					GetRendererFlags() const;
-		virtual	ZEDWORD					GetCullerFlags() const;
+		virtual	ZEDWORD					GetDrawFlags() const;
 
 		const ZEMatrix4x4&				GetWorldTransform() const;
 		const ZEMatrix4x4&				GetLocalTransform() const;
