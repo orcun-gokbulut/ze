@@ -512,6 +512,8 @@ bool ZED3D9TextureRenderer::DeviceRestored()
 		return SetOutput(OutputCubeTexture, OutputCubeTextureFace);
 	else if (OutputTexture != NULL)
 		return SetOutput(OutputTexture);
+	else
+		return true;
 }
 
 ZED3D9TextureRenderer::ZED3D9TextureRenderer()
