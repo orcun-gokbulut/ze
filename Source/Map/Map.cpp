@@ -35,14 +35,15 @@
 
 #include "Map.h"
 #include "MapResource.h" 
-#include "Core/Core.h"
 #include "Core/Error.h"
+#include "Core/Console.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Light.h"
 #include "Graphics/ViewVolume.h"
 #include "ZEMath/Triangle.h"
 #include "ZEMath/Ray.h"
 #include "ZEMath/Ray.h"
+
 
 bool ZEPortalMap::Initialize()
 {
@@ -115,7 +116,7 @@ const char* ZEPortalMap::GetFileName()
 
 bool ZEPortalMap::Load(const char* FileName)
 {
-	zeLog("Loading map file \"%s\".\r\n", FileName);
+	zeOutput("Loading map file \"%s\".\r\n", FileName);
 	if (MapResource != NULL)
 	{
 		MapResource->Release();

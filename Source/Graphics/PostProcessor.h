@@ -34,47 +34,52 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_POSTPROCESSOR_H__
-#define __ZE_POSTPROCESSOR_H__
+#ifndef __ZE_POST_PROCESSOR_H__
+#define __ZE_POST_PROCESSOR_H__
 
-#include "Graphics/TextureResource.h"
-#include "ZEMath/Matrix.h"
+#include "ZEDS/Array.h"
 
-enum ZEPostProcessorDestination
+class ZERenderer;
+class ZETexture2D;
+class ZEPostEffect;
+
+class ZEPostEffectProvider
 {
-	ZE_PPD_INTERNAL			= 0,
-	ZE_PPD_OUTPUT			= 1,
-	ZE_PPD_FRAMEBUFFER		= 2
-};
-
-enum ZEPostProcessorSource
-{
-	ZE_PPS_INTERNAL			= 0,
-	ZE_PPS_INPUT			= 1,
+	public:
+		ZEPostEffect*					CreatePostEffect();
 };
 
 class ZEPostProcessor
 {
+	private:
+		ZEArray<ZEPostProcessor*>		PostEffects;
+		ZEArray<bool>					PostEffectState;
+
+		void							ProcessPostEffect(ZEPostEffect* PostEffect);
+		
+										ZEPostProcessor();
+		virtual							~ZEPostProcessor();
+		
 	public:
-		virtual void					SetInput(ZETexture2D* Texture) = 0;
-		virtual void					SetOutput(ZETexture2D* Texture) = 0;
+		virtual void					SetInput(ZERenderer* Renderer);
+		virtual void					SetInput(ZETexture2D* Input);
 
-		virtual void					DirectOutput(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination) = 0;
+		virtual void					SetOutput(ZETexture2D* Output);
+		virtual void					SetOuputToFrameBuffer();
 
-		virtual void					ApplyUpSample4x(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination) = 0;
-		virtual void					ApplyDownSample4x(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination) = 0;
+		ZEArray<ZEPostProcessor*>&		GetPostEffects();
 
-		virtual void					ApplyColorTransform(ZEPostProcessorSource Source, ZEMatrix3x3 Matrix, ZEPostProcessorDestination Destination) = 0;
-		virtual void					ApplyInverse(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination) = 0;
-		virtual void					ApplyGrayscale(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination) = 0;
+		virtual ZEPostEffect*			CreatePostEffect(const char* Name);
+		virtual ZEPostEffect*			CreatePostEffect(size_t Index);
+		
+		void							AddPostEffect(ZEPostEffect* PostEffect);
+		void							RemovePostEffect(ZEPostEffect* PostEffect);
+		
+		void							Process();
 
-		virtual void					ApplyBlurH(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination) = 0;
-		virtual void					ApplyBlurV(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination) = 0;
+		virtual void					Destroy();
 
-		virtual void					ApplySharpen(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination) = 0;
-
-		virtual void					ApplyEdgeDetectionH(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination) = 0;
-		virtual void					ApplyEdgeDetectionV(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination) = 0;
+		static ZEPostProcessor*			CreateInstance();
 };
 
 #endif

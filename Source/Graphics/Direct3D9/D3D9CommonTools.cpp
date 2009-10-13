@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "D3D9CommonTools.h"
-#include "Core/Core.h"
+#include "Core/Error.h"
 #include <d3dx9.h>
 
 D3DFORMAT ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)

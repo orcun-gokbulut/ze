@@ -37,6 +37,7 @@
 #define __ZE_CANVASBRUSH_H__
 #include "Entity.h"
 #include "Graphics/Canvas.h"
+#include "Graphics/RenderOrder.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/FixedMaterial.h"
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Direct3D9ModuleDescription.cpp
+ Zinek Engine - D3D9ModuleDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,57 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Direct3D9ModuleDescription.h"
-#include "Direct3D9Module.h"
+#include "D3D9ModuleDescription.h"
+#include "D3D9Module.h"
 #include "d3dx9.h"
 
 #define NULL 0
-ZEModuleType ZEDirect3D9ModuleDescription::GetType()
+ZEModuleType ZED3D9ModuleDescription::GetType()
 {
 	return ZE_MT_GRAPHICS;
 }
 
-ZEModuleAttribute ZEDirect3D9ModuleDescription::GetAttributes()
+ZEModuleAttribute ZED3D9ModuleDescription::GetAttributes()
 {
 	return ZE_MA_DEBUG;
 }
 
-int ZEDirect3D9ModuleDescription::GetRequiredZinekEngineVersion()
+int ZED3D9ModuleDescription::GetRequiredZinekEngineVersion()
 {
 	return 0;
 }
 
-int ZEDirect3D9ModuleDescription::GetMajorVersion()
+int ZED3D9ModuleDescription::GetMajorVersion()
 {
 	return 0;
 }
 
-int ZEDirect3D9ModuleDescription::GetMinorVersion()
+int ZED3D9ModuleDescription::GetMinorVersion()
 {
 	return 9;
 }
 
-const char* ZEDirect3D9ModuleDescription::GetCopyright()
+const char* ZED3D9ModuleDescription::GetCopyright()
 {
 	return "Copyright (C) 2008, Zinek Engine Group.";
 }
 
-const char* ZEDirect3D9ModuleDescription::GetName()
+const char* ZED3D9ModuleDescription::GetName()
 {
 	return "Direct3D9";
 }
 
-ZEOptionSection* ZEDirect3D9ModuleDescription::GetOptions()
+ZEOptionSection* ZED3D9ModuleDescription::GetOptions()
 {
 	return NULL;
 }
 
-ZEModule* ZEDirect3D9ModuleDescription::CreateModuleInstance()
+ZEModule* ZED3D9ModuleDescription::CreateModuleInstance()
 {
-	return new ZEDirect3D9Module();
+	return new ZED3D9Module();
 }
 
-bool ZEDirect3D9ModuleDescription::CheckCompatible()
+bool ZED3D9ModuleDescription::CheckCompatible()
 {
 	return true;
 }

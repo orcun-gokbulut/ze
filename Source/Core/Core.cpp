@@ -35,7 +35,18 @@
 
 #include "CompileOptions.h"
 #include "Core.h"
+#include "Error.h"
+#include "Module.h"
+#include "ModuleManager.h"
+#include "Console.h"
 #include "ConsoleWindow.h"
+#include "ResourceManager.h"
+#include "Window.h"
+#include "Graphics/GraphicsModule.h"
+#include "Input/InputModule.h"
+#include "Physics/PhysicsModule.h"
+#include "Sound/SoundModule.h"
+#include "GameInterface/Game.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
@@ -273,7 +284,7 @@ void ZECore::DeInitializeModule(ZEModule** Module)
 bool ZECore::InitializeModules()
 {
 	// Graphics module !
-	zeLog("Initializing Graphic Module.\r\n");	
+	zeOutput("Initializing Graphic Module.\r\n");	
 	if (!InitializeModule(Graphics))
 	{
 		zeError("Core", "Can not initialize graphic module.");
@@ -281,7 +292,7 @@ bool ZECore::InitializeModules()
 	}
 
 	// Sound module !
-	zeLog("Initializing Sound Module.\r\n");	
+	zeOutput("Initializing Sound Module.\r\n");	
 	if (!InitializeModule(Sound))
 	{
 		zeError("Core", "Can not initialize sound module.");
@@ -289,7 +300,7 @@ bool ZECore::InitializeModules()
 	}
 
 	// Input module !
-	zeLog("Initializing Input Module.\r\n");	
+	zeOutput("Initializing Input Module.\r\n");	
 	if (!InitializeModule(Input))
 	{
 		zeError("Core", "Can not initialize input module.");
@@ -302,21 +313,21 @@ void ZECore::DeinitializeModules()
 {
 	if (Graphics != NULL)
 	{
-		zeLog("Deinitializing Graphic module.");
+		zeOutput("Deinitializing Graphic module.");
 		Graphics->Deinitialize();
 		Graphics = NULL;
 	}
 
 	if (Sound != NULL)
 	{
-		zeLog("Deinitializing Sound module.");
+		zeOutput("Deinitializing Sound module.");
 		Sound->Deinitialize();
 		Sound = NULL;
 	}
 
 	if (Input != NULL)
 	{
-		zeLog("Deinitializing Input module.");
+		zeOutput("Deinitializing Input module.");
 		Input->Deinitialize();
 		Input = NULL;
 	}
@@ -332,17 +343,17 @@ bool ZECore::StartUp(void* WindowHandle)
 	SetCoreState(ZECORESTATE_STARTUP);
 	SetUserLevel(ZEUSERLEVEL_DEVELOPPER);
 
-	zeLog("Zinek Engine V%s\r\n", ZEVERSION_STRING);
-	zeLog("Initialization...\r\n");
+	zeOutput("Zinek Engine V%s\r\n", ZEVERSION_STRING);
+	zeOutput("Initialization...\r\n");
 
-	zeLog("Initializing Main Window...\r\n");
+	zeOutput("Initializing Main Window...\r\n");
 	if (WindowHandle != NULL)
 		Window->SetComponentWindowHandle(WindowHandle);
 
 	if (Window->Initialize() == false)
 		zeCriticalError("Core", "Can not create main window.");
 
-	zeLog("Initializing Modules...\r\n");
+	zeOutput("Initializing Modules...\r\n");
 	if (!InitializeModules())
 		zeCriticalError("Core", "Can not initialize modules.");
 
@@ -360,33 +371,33 @@ void ZECore::ShutDown()
 	if (Game != NULL)
 		Game->Deinitialize();
 
-	zeLog("Saving options.\r\n");
+	zeOutput("Saving options.\r\n");
 	if (CoreState == ZECORESTATE_CRITICALERROR)
-		zeLog("[Core] Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
+		zeOutput("[Core] Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
 	Options->Save("options.ini");
-	zeLog("Releasing game content data.\r\n");
+	zeOutput("Releasing game content data.\r\n");
 
-	zeLog("Releasing shared resources.\r\n");
+	zeOutput("Releasing shared resources.\r\n");
 	Resources->ReleaseAllResources();
 
-	zeLog("Releasing cached resources.\r\n");
+	zeOutput("Releasing cached resources.\r\n");
 	Resources->UncacheAllResources();
 
 	if (Input != NULL)
 	{
-		zeLog("Destroying Input Module.\r\n");
+		zeOutput("Destroying Input Module.\r\n");
 		Input->Destroy();
 	}
 
 	if (Sound != NULL)
 	{
-		zeLog("Destroying Sound Module.\r\n");
+		zeOutput("Destroying Sound Module.\r\n");
 		Sound->Destroy();
 	}
 
 	if (Graphics != NULL)
 	{
-		zeLog("Destroying Graphics Module.\r\n");
+		zeOutput("Destroying Graphics Module.\r\n");
 		Graphics->Destroy();
 	}
 

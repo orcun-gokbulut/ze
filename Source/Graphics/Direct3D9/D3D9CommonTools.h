@@ -53,5 +53,6 @@ class ZED3D9CommonTools : public ZED3D9ComponentBase
 		static bool				CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height);
 		static bool				CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height, ZETexturePixelFormat Format);
 		static bool				CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height, ZETexturePixelFormat Format);
+
 };
 #endif

@@ -37,10 +37,9 @@
 #ifndef	__ZE_CORE_H__
 #define __ZE_CORE_H__
 
-#include "ZESDK.h"
+/*#include "ZESDK.h"
 #include "CompileOptions.h" 
 #include "Error.h"
-#include "Option.h"
 #include "Command.h"
 #include "Resource.h"
 #include "ResourceManager.h"
@@ -52,7 +51,8 @@
 #include "Input/InputModule.h"
 #include "Physics/PhysicsModule.h"
 #include "Sound/SoundModule.h"
-#include "GameInterface/Game.h"
+#include "GameInterface/Game.h"*/
+#include "Option.h"
 
 #define zeCore ZECore::GetInstance()
 
@@ -74,6 +74,19 @@ enum ZECoreState
 	ZECORESTATE_CRITICALERROR
 };
 
+class ZEModuleManager;
+class ZEError;
+class ZEOptionManager;
+class ZEResourceManager;
+class ZECommandManager;
+class ZEConsole;
+class ZEWindow;
+class ZEGraphicsModule;
+class ZESoundModule;
+class ZEInputModule;
+class ZEPhysicsModule;
+class ZEGame;
+class ZEModule;
 
 class ZECore
 {

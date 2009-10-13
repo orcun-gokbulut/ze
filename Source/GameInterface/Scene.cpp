@@ -36,7 +36,10 @@
 #include "Scene.h"
 #include "Sound/SoundModule.h"
 #include "Graphics/GraphicsModule.h"
-#include "Core/Core.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/ShadowRenderer.h"
+#include "Core/Error.h"
+#include "Game.h";
 #include "Serialization.h"
 #include "ZEMath/Ray.h"
 #include <memory.h>
@@ -89,31 +92,23 @@ bool ZEScene::Initialize()
 {
 	if (Renderer != NULL)
 		Renderer->Destroy();
-
-	/*ZETexture2D* Texture = zeGraphics->CreateTexture();
-	Texture->Create(zeGraphics->GetScreenWidth(), zeGraphics->GetScreenHeight(), ZE_TPF_ARGB32, true);
-	*/
 	
-	Renderer = zeGraphics->CreateFrameRenderer();
+	Renderer = ZERenderer::CreateInstance();
 	if (Renderer == NULL)
+	{
+		zeCriticalError("Scene Manager", "Can not create renderer.");
 		return false;
-	
-/*
-	Renderer->SetOutput(Texture);
-	
-	PostProcessor = zeGraphics->CreatePostProcessor();
-	PostProcessor->SetInput(Texture);*/
-
-	/*Renderer->SetHDR(true, 1.0f, 0.2f);
-	Renderer->SetHDRBloom(true, 1.0f, 1.0f, 5.0f);
-	Renderer->SetHDRLightAdaptation(true, 0.99999f);*/
+	}
 
 	if (ShadowRenderer != NULL)
 		ShadowRenderer->Destroy();
 
-	ShadowRenderer = zeGraphics->CreateShadowRenderer();
+	ShadowRenderer = ZEShadowRenderer::CreateInstance();
 	if (Renderer == NULL)
+	{
+		zeCriticalError("Scene Manager", "Can not create renderer.");
 		return false;
+	}
 
 	ZECanvas Canvas;
 	Canvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
@@ -389,19 +384,6 @@ void ZEScene::Render(float ElapsedTime)
 	CullScene(Renderer, ActiveCamera->GetViewVolume(), true);
 	Renderer->Render(ElapsedTime);
 	Renderer->ClearList();
-/*
-
-	PostProcessor->ApplyGrayscale(ZE_PPS_INPUT, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_FRAMEBUFFER);*/
 }
 /*
 ZEEntity* ZEScene::CastRay(const ZERay& Ray, float Range, ZESmartArray<ZEEntity*>& IntersectedEntities)
@@ -679,7 +661,7 @@ bool ZEScene::Load(const char* FileName)
 		for (size_t I = 0; I < Entities.GetCount(); I++)
 		{
 			Unserializer.Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
-			Entities[I] = zeCore->GetGame()->CreateEntityInstance(EntityTypeName);
+			Entities[I] = zeGame->CreateEntityInstance(EntityTypeName);
 			if (Entities[I] == NULL)
 			{
 				zeError("Scene", "Unserialization can not create entity type \"%s\".", EntityTypeName);

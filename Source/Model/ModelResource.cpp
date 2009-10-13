@@ -34,9 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ModelResource.h"
-#include "ModelFileFormat.h"
-#include "Core/Core.h"
+#include "Core/ResourceManager.h"
+#include "Core/Error.h"
 #include "Graphics/GraphicsModule.h"
+#include "Graphics/Texture2DResource.h"
+#include "Graphics/VertexBuffer.h"
+#include "ModelFileFormat.h"
 
 ZEStaticVertexBuffer* ZEModelResourceMeshLOD::GetSharedVertexBuffer() const
 {

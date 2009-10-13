@@ -42,7 +42,7 @@
 #include <string.h>
 
 #define zeConsole ZEConsole::GetInstance()
-#define zeLog(...) ZEConsole::GetInstance()->Print(__VA_ARGS__)
+#define zeOutput(...) ZEConsole::GetInstance()->Print(__VA_ARGS__)
 
 class ZEConsoleInterface
 {

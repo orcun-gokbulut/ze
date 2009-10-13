@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D9VERTEXBUFFER_H__
-#define __ZE_D3D9VERTEXBUFFER_H__
+#ifndef __ZE_D3D9_VERTEX_BUFFER_H__
+#define __ZE_D3D9_VERTEX_BUFFER_H__
 
 #include "Graphics/VertexBuffer.h"
 #include "D3D9ComponentBase.h"

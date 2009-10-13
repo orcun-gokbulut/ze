@@ -44,7 +44,7 @@
 
 class ZED3D9VertexDeclaration : public ZEVertexDeclaration, private ZED3D9ComponentBase
 {
-	friend class ZEDirect3D9Module;
+	friend class ZED3D9Module;
 	private:
 		LPDIRECT3DVERTEXDECLARATION9		VertexDeclaration;
 		ZEArray<ZEVertexElement>			VertexElements;

@@ -50,6 +50,7 @@ enum ZELightType
 	ZE_LT_OMNIPROJECTIVE = 4
 };
 
+class ZEShadowRenderer;
 class ZEScene;
 class ZELight : public ZEComponent
 {
@@ -89,103 +90,11 @@ class ZELight : public ZEComponent
 		bool							IsCastingShadows();
 		virtual void					SetCastShadows(bool NewValue);
 		
-		virtual void					RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer) = 0;
+		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer) = 0;
 		virtual const ZERLLight*		GetRenderOrderLight();
 
 		virtual const ZEViewVolume&		GetViewVolume() = 0;
 
 										ZELight();
-
-};
-		
-class ZEPointLight  : public ZELight
-{
-	private:
-		ZETextureCube*					ShadowMap;
-		ZEViewSphere					ViewVolume;
-
-	public:
-		ZELightType						GetLightType();
-
-		virtual void					SetCastShadows(bool NewValue);
-
-		const ZETextureCube*			GetShadowMap();
-
-		virtual void					RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer);
-		virtual const ZEViewVolume&		GetViewVolume();
-
-										ZEPointLight();
-
-};
-
-class ZEDirectionalLight : public ZELight
-{
-	private:
-		ZETexture2D*						ShadowMap;
-		ZEViewPlane						ViewVolume;
-
-	public:
-		ZELightType						GetLightType();
-
-		const ZETexture2D*				GetShadowMap();
-
-		virtual void					RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer);
-		virtual const ZEViewVolume&		GetViewVolume();
-
-										ZEDirectionalLight();
-};
-
-class ZEProjectiveLight : public ZELight
-{
-	private:
-		float							FOV;
-		float							AspectRatio;
-		ZEViewFrustum					ViewVolume;
-
-	public:
-		ZELightType						GetLightType();
-
-		void							SetFOV(float FOV);
-		float							GetFOV();
-
-		void							SetAspectRatio(float AspectRatio);
-		float							GetAspectRatio();
- 
-		const ZETexture2D*				GetShadowMap();
-		void							SetShadowMap(int Width, int Height);
-
-		void							SetProjectionTexture(const ZETexture2D* Texture);
-		const ZETexture2D*				GetProjectionTexture();
-
-		virtual void					RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer);
-		virtual const ZERLLight*		GetRenderOrderLight();
-		virtual const ZEViewVolume&		GetViewVolume();
-
-										ZEProjectiveLight();
-										~ZEProjectiveLight();
-
-};
-
-class ZEOmniProjectiveLight : public ZELight
-{
-	private:
-		ZETextureCube*					ShadowMap;
-		ZETextureCube*					ProjectionTexture;
-		ZEViewSphere					ViewVolume;
-
-	public:
-		ZELightType						GetLightType();
-
-		const ZETextureCube*			GetShadowMap();
-
-		void							SetProjectionTexture(const ZETextureCube* Texture);
-		const ZETextureCube*			GetProjectionTexture();
-
-		virtual void					RenderShadowMap(ZEScene* Scene, ZERenderer* ShadowRenderer);
-		virtual const ZEViewVolume&		GetViewVolume();
-
-										ZEOmniProjectiveLight();
-
-};
-
+};	
 #endif

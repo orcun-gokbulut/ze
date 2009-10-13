@@ -38,12 +38,14 @@
 #define __ZE_SOUND_MODULE_H__
 
 #include "Core/Module.h"
-#include "SoundResource.h"
-#include "SoundSource.h"
-#include "SoundSource3D.h"
-#include "Listener.h"
+
+class ZESoundSource;
+class ZESoundSource3D;
+class ZEListener;
+class ZESoundResource;
 
 #define zeSound ZESoundModule::GetInstance()
+
 class ZESoundModule : public ZEModule
 {
 	public:

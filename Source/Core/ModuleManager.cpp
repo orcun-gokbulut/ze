@@ -34,7 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ModuleManager.h"
-#include "Core/Core.h"
+#include "Core/Error.h"
+#include "Core/Console.h"
 
 ZEOptionSection ZEModuleManager::ModuleManagerOptions;
 
@@ -201,7 +202,7 @@ ZEModule* ZEModuleManager::CreateModule(ZEModuleType ModuleType)
 
 bool ZEModuleManager::LoadInternalModule(ZEModuleDescription* ModuleDesc)
 {
-	zeLog("Loading Internal Module \"%s\". Version : %d.%d, Type : UNKNOWN, Attributes : %c%c%c%c%c%c, Option Section : %s\r\n",
+	zeOutput("Loading Internal Module \"%s\". Version : %d.%d, Type : UNKNOWN, Attributes : %c%c%c%c%c%c, Option Section : %s\r\n",
 		ModuleDesc->GetName(),
 		ModuleDesc->GetMajorVersion(),
 		ModuleDesc->GetMinorVersion(),
@@ -249,7 +250,7 @@ void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
 	ModuleList.DeleteValue(ModuleDesc);
 }
 
-#include "Graphics/Direct3D9/Direct3D9ModuleDescription.h"
+#include "Graphics/Direct3D9/D3D9ModuleDescription.h"
 #include "Sound/DirectSoundModule.h"
 #include "Input/DirectInput/DirectInputModuleDescription.h"
 #include "Input/DummyInput/DummyInputModuleDescription.h"
@@ -257,7 +258,7 @@ void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
 
 ZEModuleManager::ZEModuleManager()
 {
-	LoadInternalModule(new ZEDirect3D9ModuleDescription());
+	LoadInternalModule(new ZED3D9ModuleDescription());
 	LoadInternalModule(new ZEDirectSoundModuleDescription());
 	LoadInternalModule(new ZEDummyInputModuleDescription());
 	LoadInternalModule(new ZEVirtualInputModuleDescription());

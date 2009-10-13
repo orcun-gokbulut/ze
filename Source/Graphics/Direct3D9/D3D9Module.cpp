@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Direct3D9Module.cpp
+ Zinek Engine - D3D9Module.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,42 +36,48 @@
 #define D3D_DEBUG_INFO
 #endif
 
-#include "Direct3D9Module.h"
-#include "Direct3D9ModuleDescription.h"
+#include "D3D9Module.h"
+#include "D3D9ModuleDescription.h"
 #include "Core/Window.h"
 #include "Core/Error.h"
 #include "Core/Console.h"
 #include "D3D9FixedMaterial.h"
 #include "D3D9Shader.h"
-#include "D3D9Texture.h"
+#include "D3D9Texture2D.h"
+#include "D3D9Texture3D.h"
+#include "D3D9TextureCube.h"
 #include "D3D9VertexBuffer.h"
 #include "D3D9PostProcessor.h"
+#include "D3D9Renderer.h"
+#include "D3D9TextureRenderer.h"
+#include "D3D9ShadowRenderer.h"
+
 #include <d3dx9.h>
 
 LPDIRECT3DDEVICE9 D3D9Device;
-ZEDirect3D9Module* D3D9Module;
+ZED3D9Module* D3D9Module;
 D3DPRESENT_PARAMETERS D3DPP;
 
 #pragma warning(disable:4267)
 
-ZEModuleDescription* ZEDirect3D9Module::GetModuleDescription()
+ZEModuleDescription* ZED3D9Module::GetModuleDescription()
 {
-	static ZEDirect3D9ModuleDescription Desc;
+	static ZED3D9ModuleDescription Desc;
 	return &Desc;
 }
-bool ZEDirect3D9Module::IsEnabled()
+bool ZED3D9Module::IsEnabled()
 {
 	return Enabled;
 }
 
-void ZEDirect3D9Module::SetEnabled(bool Enabled)
+void ZED3D9Module::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
 }
 
-bool ZEDirect3D9Module::Initialize()
+bool ZED3D9Module::Initialize()
 {
-	zeLog("Initializing Direct3D 9.\r\n");
+	zeOutput("Initializing Direct3D 9.\r\n");
 
 	ScreenWidth = zeOptions->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger();
 	ScreenHeight = zeOptions->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger();
@@ -200,11 +206,11 @@ bool ZEDirect3D9Module::Initialize()
 		return false;
 	}
 
-	if (!ZED3D9PostProcessor::BaseInitialize())
+	/*if (!ZED3D9PostProcessor::BaseInitialize())
 	{
 		zeCriticalError("Direct3D Module", "Can not initialize D3D9 component base.");
 		return false;
-	}
+	}*/
 
 	if (!ZED3D9ShadowRenderer::BaseInitialize())
 	{
@@ -216,11 +222,11 @@ bool ZEDirect3D9Module::Initialize()
 	return true;
 }
 
-void ZEDirect3D9Module::Deinitialize()
+void ZED3D9Module::Deinitialize()
 {
-	zeLog("Destroying Direct3D.\r\n");
+	zeOutput("Destroying Direct3D.\r\n");
 	ZED3D9ShadowRenderer::BaseDeinitialize();
-	ZED3D9PostProcessor::BaseDeinitialize();
+	//ZED3D9PostProcessor::BaseDeinitialize();
 	ZED3D9Shader::BaseDeinitialize();
 	D3D9Device = NULL;
 	D3D9Module = NULL;
@@ -250,29 +256,35 @@ void ZEDirect3D9Module::Deinitialize()
 	}
 }
 
-void ZEDirect3D9Module::DeviceLost()
+void ZED3D9Module::DeviceLost()
 {
 	IsDeviceLost = true;
-	for (size_t I = 0; I < Textures.GetCount(); I++)
-		Textures[I]->DeviceLost();
+	for (size_t I = 0; I < Texture2Ds.GetCount(); I++)
+		Texture2Ds[I]->DeviceLost();
 
-	for (size_t I = 0; I < VolumeTextures.GetCount(); I++)
-		VolumeTextures[I]->DeviceLost();
+	for (size_t I = 0; I < Texture3Ds.GetCount(); I++)
+		Texture3Ds[I]->DeviceLost();
 
-	for (size_t I = 0; I < CubeTextures.GetCount(); I++)
-		CubeTextures[I]->DeviceLost();
+	for (size_t I = 0; I < TextureCubes.GetCount(); I++)
+		TextureCubes[I]->DeviceLost();
 
-/*	for (size_t I = 0; I < VertexBuffers.GetCount(); I++)
-		VertexBuffers[I]->DeviceLost();
-
-	for (size_t I = 0; I < Shaders.GetCount(); I++)
-		Shaders[I]->DeviceLost();*/
+/*	for (size_t I = 0; I < Shaders.GetCount(); I++)
+		Shaders[I]->DeviceLost();
 
 	for (size_t I = 0; I < PostProcessors.GetCount(); I++)
 		PostProcessors[I]->DeviceLost();
+	
+	for (size_t I = 0; I < VertexBuffers.GetCount(); I++)
+		VertexBuffers[I]->DeviceRestored();*/
 
 	for (size_t I = 0; I < Renderers.GetCount(); I++)
 		Renderers[I]->DeviceLost();
+	
+	for (size_t I = 0; I < TextureRenderers.GetCount(); I++)
+		TextureRenderers[I]->DeviceLost();
+
+	for (size_t I = 0; I < ShadowRenderers.GetCount(); I++)
+		ShadowRenderers[I]->DeviceLost();
 
 	FrameColorBuffer->Release();
 	FrameColorBuffer = NULL;
@@ -280,37 +292,42 @@ void ZEDirect3D9Module::DeviceLost()
 	FrameZBuffer = NULL;
 }
 
-void ZEDirect3D9Module::DeviceRestored()
+void ZED3D9Module::DeviceRestored()
 {
 	IsDeviceLost = false;
 
 	Device->GetBackBuffer(0, 0,D3DBACKBUFFER_TYPE_MONO, &FrameColorBuffer);
 	Device->GetDepthStencilSurface(&FrameZBuffer);
 
-	for (size_t I = 0; I < Textures.GetCount(); I++)
-		Textures[I]->DeviceRestored();
+	for (size_t I = 0; I < Texture2Ds.GetCount(); I++)
+		Texture2Ds[I]->DeviceRestored();
 
-	for (size_t I = 0; I < VolumeTextures.GetCount(); I++)
-		VolumeTextures[I]->DeviceRestored();
+	for (size_t I = 0; I < Texture3Ds.GetCount(); I++)
+		Texture3Ds[I]->DeviceRestored();
 
-	for (size_t I = 0; I < CubeTextures.GetCount(); I++)
-		CubeTextures[I]->DeviceRestored();
+	for (size_t I = 0; I < TextureCubes.GetCount(); I++)
+		TextureCubes[I]->DeviceRestored();
 
-/*	for (size_t I = 0; I < VertexBuffers.GetCount(); I++)
-		VertexBuffers[I]->DeviceRestored();
+	/*for (size_t I = 0; I < VertexBuffers.GetCount(); I++)
+		VertexBuffers[I]->DeviceRestored();*/
 
-	for (size_t I = 0; I < Shaders.GetCount(); I++)
-		Shaders[I]->DeviceRestored();*/
+	/*for (size_t I = 0; I < Shaders.GetCount(); I++)
+		Shaders[I]->DeviceRestored();
 
 	for (size_t I = 0; I < PostProcessors.GetCount(); I++)
-		PostProcessors[I]->DeviceRestored();
+		PostProcessors[I]->DeviceRestored();*/
 
 	for (size_t I = 0; I < Renderers.GetCount(); I++)
 		Renderers[I]->DeviceRestored();
 
+	for (size_t I = 0; I < TextureRenderers.GetCount(); I++)
+		TextureRenderers[I]->DeviceRestored();
+
+	for (size_t I = 0; I < ShadowRenderers.GetCount(); I++)
+		ShadowRenderers[I]->DeviceRestored();
 }
 
-void ZEDirect3D9Module::RestoreDevice(bool ForceReset)
+void ZED3D9Module::RestoreDevice(bool ForceReset)
 {
 	DeviceLost();
 	HRESULT DeviceState, Hr;
@@ -327,7 +344,7 @@ void ZEDirect3D9Module::RestoreDevice(bool ForceReset)
 			HRESULT hr =Device->Reset(&D3DPP);
 			if (hr == D3D_OK)
 			{
-				zeLog("Direct3D Device Restored.\r\n");
+				zeOutput("Direct3D Device Restored.\r\n");
 				break;
 			}
 			else if (hr == D3DERR_DEVICELOST)
@@ -341,7 +358,7 @@ void ZEDirect3D9Module::RestoreDevice(bool ForceReset)
 	DeviceRestored();
 }
 
-void ZEDirect3D9Module::SetScreenSize(int Width, int Height)
+void ZED3D9Module::SetScreenSize(int Width, int Height)
 {
 	ScreenWidth = Width;
 	ScreenHeight = Height;
@@ -353,7 +370,7 @@ void ZEDirect3D9Module::SetScreenSize(int Width, int Height)
 	}
 }
 
-void ZEDirect3D9Module::SetVerticalSync(bool Enabled)
+void ZED3D9Module::SetVerticalSync(bool Enabled)
 {
 	VerticalSync = Enabled;
 	if (Device != NULL)
@@ -363,31 +380,31 @@ void ZEDirect3D9Module::SetVerticalSync(bool Enabled)
 	}
 }
 
-void ZEDirect3D9Module::SetShaderQuality(int Quality)
+void ZED3D9Module::SetShaderQuality(int Quality)
 {
 }
 
-void ZEDirect3D9Module::SetTextureQuality(int Quality)
+void ZED3D9Module::SetTextureQuality(int Quality)
 {
 }
 
-void ZEDirect3D9Module::SetModelQuality(int Quality)
+void ZED3D9Module::SetModelQuality(int Quality)
 {
 }
 
-void ZEDirect3D9Module::SetShadowQuality(int Quality)
+void ZED3D9Module::SetShadowQuality(int Quality)
 {
 }
 
-void ZEDirect3D9Module::SetPostEffectQuality(int Quality)
+void ZED3D9Module::SetPostEffectQuality(int Quality)
 {
 }
 
-void ZEDirect3D9Module::SetHDRQuality(int Quality)
+void ZED3D9Module::SetHDRQuality(int Quality)
 {
 }
 
-void ZEDirect3D9Module::SetAntiAliasing(int Level)
+void ZED3D9Module::SetAntiAliasing(int Level)
 {
 	AntiAliasing = Level;
 	if (Device != NULL)
@@ -397,7 +414,7 @@ void ZEDirect3D9Module::SetAntiAliasing(int Level)
 	}
 }
 
-void ZEDirect3D9Module::SetAnisotropicFilter(int Level)
+void ZED3D9Module::SetAnisotropicFilter(int Level)
 {
 	AnisotropicFilter = Level;
 	for (DWORD I = 0; I < D3DCaps.MaxSimultaneousTextures; I++)
@@ -410,20 +427,20 @@ void ZEDirect3D9Module::SetAnisotropicFilter(int Level)
 	}
 }
 
-void ZEDirect3D9Module::SetMaterialComponentMask(unsigned int Mask)
+void ZED3D9Module::SetMaterialComponentMask(unsigned int Mask)
 {
-	#pragma message("Task : Implament ZEDirect3D9Module::SetMaterialComponentMask()")
+	#pragma message("Task : Implament ZED3D9Module::SetMaterialComponentMask()")
 }
 
-unsigned int ZEDirect3D9Module::GetMaterialComponentMask()
+unsigned int ZED3D9Module::GetMaterialComponentMask()
 {
-	#pragma message("Task : Implament ZEDirect3D9Module::GetMaterialComponentMask()")
+	#pragma message("Task : Implament ZED3D9Module::GetMaterialComponentMask()")
 	return 0xFFFFFFFF;
 }
 
-ZERenderer* ZEDirect3D9Module::CreateFrameRenderer()
+ZERenderer* ZED3D9Module::CreateRenderer()
 {
-	ZED3D9RendererBase* Renderer = new ZED3D9FrameBufferRenderer();
+	ZED3D9Renderer* Renderer = new ZED3D9Renderer();
 	if (!Renderer->Initialize())
 	{
 		Renderer->Destroy();
@@ -434,43 +451,44 @@ ZERenderer* ZEDirect3D9Module::CreateFrameRenderer()
 	return Renderer;
 }
 
-ZERenderer* ZEDirect3D9Module::CreateTextureRenderer()
+ZETextureRenderer* ZED3D9Module::CreateTextureRenderer()
 {
-	ZED3D9RendererBase* Renderer = new ZED3D9TextureRenderer();
+	ZED3D9TextureRenderer* Renderer = new ZED3D9TextureRenderer();
 	if (!Renderer->Initialize())
 	{
 		Renderer->Destroy();
 		return NULL;
 	}
 
-	Renderers.Add(Renderer);
+	TextureRenderers.Add(Renderer);
 	return Renderer;
 }
 
-ZERenderer* ZEDirect3D9Module::CreateShadowRenderer()
+ZEShadowRenderer* ZED3D9Module::CreateShadowRenderer()
 {
-	ZED3D9RendererBase* Renderer = new ZED3D9ShadowRenderer();
+	ZED3D9ShadowRenderer* Renderer = new ZED3D9ShadowRenderer();
 	if (!Renderer->Initialize())
 	{
 		Renderer->Destroy();
 		return NULL;
 	}
 
-	Renderers.Add(Renderer);
+	ShadowRenderers.Add(Renderer);
 	return  Renderer;
 }
 
-ZEPostProcessor* ZEDirect3D9Module::CreatePostProcessor()
+ZEPostProcessor* ZED3D9Module::CreatePostProcessor()
 {
-	return new ZED3D9PostProcessor;
+//	return new ZED3D9PostProcessor;
+	return NULL;
 }
 
-ZEVertexDeclaration* ZEDirect3D9Module::CreateVertexDeclaration()
+ZEVertexDeclaration* ZED3D9Module::CreateVertexDeclaration()
 {
 	return new ZED3D9VertexDeclaration();
 }
 
-void ZEDirect3D9Module::UpdateScreen()
+void ZED3D9Module::UpdateScreen()
 {
 	if (IsDeviceLost)
 		return;
@@ -482,7 +500,7 @@ void ZEDirect3D9Module::UpdateScreen()
 		Device->Present(NULL, NULL, NULL, NULL);
 }
  
-void ZEDirect3D9Module::ClearFrameBuffer()
+void ZED3D9Module::ClearFrameBuffer()
 {
 	if (IsDeviceLost)
 		return;
@@ -493,63 +511,63 @@ void ZEDirect3D9Module::ClearFrameBuffer()
 	Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00, 1, 0);
 }
 
-ZEStaticVertexBuffer* ZEDirect3D9Module::CreateStaticVertexBuffer()
+ZEStaticVertexBuffer* ZED3D9Module::CreateStaticVertexBuffer()
 {
 	ZED3D9StaticVertexBuffer* VertexBuffer = new ZED3D9StaticVertexBuffer();
 	VertexBuffers.Add(VertexBuffer);
 	return VertexBuffer;
 }
 
-ZETexture2D* ZEDirect3D9Module::CreateTexture()
+ZETexture2D* ZED3D9Module::CreateTexture()
 {
-	ZED3D9Texture* Texture = new ZED3D9Texture();
-	Textures.Add(Texture);
+	ZED3D9Texture2D* Texture = new ZED3D9Texture2D();
+	Texture2Ds.Add(Texture);
 	return Texture;
 }
 
-ZETexture3D* ZEDirect3D9Module::CreateVolumeTexture()
+ZETexture3D* ZED3D9Module::CreateVolumeTexture()
 {
-	ZED3D9VolumeTexture* Texture = new ZED3D9VolumeTexture();
-	VolumeTextures.Add(Texture);
+	ZED3D9Texture3D* Texture = new ZED3D9Texture3D();
+	Texture3Ds.Add(Texture);
 	return Texture;
 }
 
-ZETextureCube* ZEDirect3D9Module::CreateCubeTexture()
+ZETextureCube* ZED3D9Module::CreateCubeTexture()
 {
-	ZED3D9CubeTexture* Texture = new ZED3D9CubeTexture();
-	CubeTextures.Add(Texture);
+	ZED3D9TextureCube* Texture = new ZED3D9TextureCube();
+	TextureCubes.Add(Texture);
 	return Texture;
 }
 
-ZEFixedMaterial* ZEDirect3D9Module::CreateFixedMaterial()
+ZEFixedMaterial* ZED3D9Module::CreateFixedMaterial()
 {
 	return new ZED3D9FixedMaterial();
 }
 
-ZEFixedMaterial* ZEDirect3D9Module::CreateCustomMaterial()
+ZEFixedMaterial* ZED3D9Module::CreateCustomMaterial()
 {
 	zeError("Direct3D9 Module", "Custom Materials are not implamented.");
 	return NULL;
 }
 
-ZEFixedMaterial* ZEDirect3D9Module::CreateCGFXMaterial()
+ZEFixedMaterial* ZED3D9Module::CreateCGFXMaterial()
 {
 	zeError("Direct3D9 Module", "CGFX Materials are not implamented.");
 	return NULL;
 }
 
-LPDIRECT3DDEVICE9 ZEDirect3D9Module::GetD3D9Device()
+LPDIRECT3DDEVICE9 ZED3D9Module::GetD3D9Device()
 {
 	return D3D9Device;
 }
 
 
-ZEDirect3D9Module* ZEDirect3D9Module::GetD3D9Module()
+ZED3D9Module* ZED3D9Module::GetD3D9Module()
 {
 	return D3D9Module;
 }
 
-ZEDirect3D9Module::ZEDirect3D9Module()
+ZED3D9Module::ZED3D9Module()
 {
 	IsDeviceLost = false;
 	D3D9Device = NULL;
@@ -559,7 +577,7 @@ ZEDirect3D9Module::ZEDirect3D9Module()
 	FrameZBuffer = NULL;
 }
 
-ZEDirect3D9Module::~ZEDirect3D9Module()
+ZED3D9Module::~ZED3D9Module()
 {
 	Destroy();
 }

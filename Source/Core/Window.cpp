@@ -34,7 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Window.h"
-#include "Core/Core.h"
+#include "Core.h"
+#include "Error.h"
+#include "Console.h"
+#include "Input/InputModule.h"
+#include "Graphics/GraphicsModule.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #define NOMINMAX
@@ -72,7 +76,7 @@ void ShowWindowError()
 
 void ZEWindow::WindowGainedFocus()
 {
-	zeLog("Main window gained focus.\r\n");
+	zeOutput("Main window gained focus.\r\n");
 	ZEInputModule* Input = zeInput;
 	if (Input != NULL)
 		Input->Acquire();
@@ -80,7 +84,7 @@ void ZEWindow::WindowGainedFocus()
 
 void ZEWindow::WindowLostFocus()
 {
-	zeLog("Window lost focus.\r\n");
+	zeOutput("Window lost focus.\r\n");
 	ZEInputModule* Input = zeInput;
 	if (Input != NULL)
 		Input->UnAcquire();

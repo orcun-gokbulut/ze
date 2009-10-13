@@ -42,12 +42,18 @@
 #include "ZEMath/Rectangle3D.h"
 #include "Definitions.h"
 #include "Core/Resource.h"
-#include "Graphics/Material.h"
 #include "Graphics/VertexTypes.h"
 #include "Graphics/IndexedPolygon.h"
-#include "Graphics/TextureResource.h"
-#include "Octree.h"
 #include "GameInterface/Entity.h"
+
+class ZEVertexBuffer;
+class ZEMaterial;
+class ZETextureResource;
+class ZETexture2DResource;
+class ZEMapPortal;
+class ZEMapResource;
+class ZEOctree;
+
 
 struct ZEMapPolygon
 {
@@ -56,8 +62,7 @@ struct ZEMapPolygon
 	unsigned int								LastIteration;
 };
 
-class ZEMapPortal;
-class ZEMapResource;
+
 
 class ZEMapPortalDoor
 {

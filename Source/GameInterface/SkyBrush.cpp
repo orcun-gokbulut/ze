@@ -33,8 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "GameInterface/Scene.h"
 #include "SkyBrush.h"
+#include "GameInterface/Scene.h"
+#include "Graphics/DirectionalLight.h"
+#include "Graphics/TextureCubeResource.h"
 #include <string.h>
 
 ZE_ENTITY_DESCRIPTION_START(ZESkyBrush, ZEEntity, ZE_ERA_BOTH, "", "Sky Brush")

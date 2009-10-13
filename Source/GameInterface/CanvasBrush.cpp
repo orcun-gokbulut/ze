@@ -46,7 +46,7 @@ bool ZECanvasBrush::IsDrawable()
 void ZECanvasBrush::UpdateCanvas()
 {
 	if (RenderOrder.VertexBuffer != NULL)
-		delete RenderOrder.VertexBuffer;
+		((ZEStaticVertexBuffer*)RenderOrder.VertexBuffer)->Destroy();
 	
 	if (!Canvas.IsEmpty())
 	{

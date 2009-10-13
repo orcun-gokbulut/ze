@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Direct3D9ModuleDescription.h
+ Zinek Engine - D3D9ModuleDescription.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,12 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DIRECT3D9MODULEDESCRIPTION_H__
-#define __ZE_DIRECT3D9MODULEDESCRIPTION_H__
+#ifndef	__ZE_D3D9_MODULE_DESCRIPTION_H__
+#define __ZE_D3D9_MODULE_DESCRIPTION_H__
 
 #include "Core/Module.h"
 
-class ZEDirect3D9ModuleDescription : public ZEModuleDescription
+class ZED3D9ModuleDescription : public ZEModuleDescription
 {
 	public:
 		ZEModuleType			GetType();

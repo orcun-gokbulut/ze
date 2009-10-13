@@ -37,15 +37,17 @@
 #ifndef	__ZE_MODEL_RESOURCE_H__
 #define __ZE_MODEL_RESOURCE_H__
 
+#include "Core/Resource.h"
 #include "ZEMath/Vector.h"
 #include "ZEMath/Quaternion.h"
 #include "ZEMath/Matrix.h"
 #include "ZEMath/AABoundingBox.h"
 #include "ZEDS/Array.h"
-#include "Graphics/TextureResource.h"
-#include "Graphics/VertexBuffer.h"
 #include "Graphics/VertexTypes.h"
-#include "Graphics/FixedMaterial.h"
+
+class ZEStaticVertexBuffer;
+class ZETexture2DResource;
+class ZEMaterial;
 
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256

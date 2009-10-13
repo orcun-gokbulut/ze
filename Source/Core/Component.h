@@ -34,21 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+#ifndef __ZE_COMPONENT_H__
+#define __ZE_COMPONENT_H__
+
+#include "ZEDS/Array.h"
 #include "ZEMath/Matrix.h"
 #include "ZEMath/Vector.h"
 #include "ZEMath/Quaternion.h"
 #include "ZEMath/AABoundingBox.h"
 #include "ZEMath/OBoundingBox.h"
 #include "ZEMath/BoundingSphere.h"
-#include "Graphics/Renderer.h"
 
-enum ZEComponentClass
-{
-	ZE_CC_RENDERABLE	= 0,
-	ZE_CC_LIGHT			= 1,
-};
-
+class ZERenderer;
 class ZEEntity;
+class ZERLLight;
 class ZEComponent
 {
 	friend class ZEEntity;
@@ -121,3 +120,5 @@ class ZEComponent
 								
 										ZEComponent();
 };
+
+#endif

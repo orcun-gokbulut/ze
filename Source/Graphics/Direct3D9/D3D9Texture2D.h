@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PostEffect.h
+ Zinek Engine - D3D9Texture2D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,35 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_POSTEFFECT_H__
-#define __ZE_POSTEFFECT_H__
+#ifndef __ZE_D3D9_TEXTURE_2D_H__
+#define __ZE_D3D9_TEXTURE_2D_H__
 
-#include "Graphics/TextureResource.h"
-#include "ZEMath/ZEMath.h"
+#include "Graphics/Texture2D.h"
+#include "D3D9ComponentBase.h"
+#include <d3d9.h>
 
-enum ZEPostEffectorDestination
+class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 {
-	ZE_PED_INTERNAL			= 0,
-	ZE_PED_OUTPUTTEXTURE	= 1,
-	ZE_PED_OUTPUTSCREEN		= 2
-};
+	friend class ZED3D9Module;
+	protected:
+										ZED3D9Texture2D();
+		virtual							~ZED3D9Texture2D();
 
-class ZEPostEffector
-{
 	public:
-		virtual void					SetInput(ZETextureResource* TextureResource) = 0;
-		virtual void					SetOutput(ZETextureResource* TextureResource) = 0;
+		LPDIRECT3DTEXTURE9				Texture;
 
-		virtual void					DownSample4x() = 0;
-		virtual void					UpSample4x() = 0;
-		virtual void					ApplyHorizantalGaussianBlur(ZEPostEffectorDestination Destination) = 0;
-		virtual void					ApplyVerticalGaussianBlur(ZEPostEffectorDestination Destination) = 0;
-		virtual void					ApplyHorizantelSharpen(ZEPostEffectorDestination Destination) = 0;
-		virtual void					ApplyVerticalSharpen(ZEPostEffectorDestination Destination) = 0;
-		virtual void					ApplyColorTransform(ZEPostEffectorDestination Destination, ZEMatrix3x3 Matrix) = 0;
-		virtual void					ApplyEdgeDetection(ZEPostEffectorDestination Destination) = 0;
-		virtual void					ApplyInverse(ZEPostEffectorDestination Destination) = 0;
-		virtual void					ApplyConvertGreyscale(ZEPostEffectorDestination Destination) = 0;
+
+		virtual bool					IsEmpty() const;
+
+		virtual void					DeviceLost();
+		virtual bool					DeviceRestored();
+
+		virtual bool					Create(int Width, int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
+		virtual void					Lock(void** Buffer, int* Pitch);
+		virtual void					Unlock();
+		virtual void					Release();
+
+		virtual void					Destroy();
 };
 
 #endif

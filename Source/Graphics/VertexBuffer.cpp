@@ -32,8 +32,13 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "RenderOrder.h"
+#include "VertexBuffer.h"
+#include "Graphics/GraphicsModule.h"
 #include "Core/Core.h"
+
+ZEVertexBuffer::ZEVertexBuffer()
+{
+}
 
 ZEVertexBuffer::~ZEVertexBuffer()
 {
@@ -43,6 +48,12 @@ bool ZEStaticVertexBuffer::IsStatic()
 {
 	return true;
 }
+
+void ZEStaticVertexBuffer::Destroy()
+{
+	delete this;
+}
+
 
 ZEStaticVertexBuffer* ZEStaticVertexBuffer::CreateInstance()
 {

@@ -41,7 +41,6 @@
 #include "Graphics/Canvas.h"
 #include "Sound/Listener.h"
 #include "Input/InputMap.h"
-#include "Graphics/Light.h"
 
 ZE_ENTITY_DESCRIPTION(ZEPlayer, ZEEntity);
 
@@ -52,7 +51,6 @@ class ZEPlayer : public ZEEntity
 		ZEInputMap				InputMap;
 		ZECamera				Camera;
 		ZEListener				Listener;
-		ZEPointLight			Light;
 		float					Pitch, Yawn, Roll, FOV;
 	
 	public:

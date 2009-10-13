@@ -39,7 +39,12 @@
 #include "Graphics/RenderOrder.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/FixedMaterial.h"
-#include "Graphics/TextureResource.h"
+#include "Graphics/Texture2DResource.h"
+#include "Graphics/TextureCubeResource.h"
+#include "Graphics/PointLight.h"
+#include "Graphics/DirectionalLight.h"
+#include "Graphics/ProjectiveLight.h"
+#include "Graphics/OmniProjectiveLight.h"
 
 ZE_ENTITY_DESCRIPTION_START(ZELightBrush, ZEEntity, ZE_ERA_BOTH, "", "Light brush")
 	ZE_ENTITY_ATTRIBUTE_ENUMURATOR_START(ZELightType)

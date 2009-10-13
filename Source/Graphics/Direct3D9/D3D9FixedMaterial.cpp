@@ -35,7 +35,8 @@
 
 #include "D3D9FixedMaterial.h"
 #include "Graphics/RenderOrder.h"
-#include "D3D9Texture.h"
+#include "D3D9Texture2D.h"
+#include "D3D9TextureCube.h"
 #include "Graphics/Camera.h"
 #include "Graphics/MaterialComponents.h"
 
@@ -250,43 +251,43 @@ bool ZED3D9FixedMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Ca
 	if (MaterialComponents & ZESHADER_DIFFUSEMAP)
 	{
 		SetTextureStage(0, DiffuseMapAddressModeU, DiffuseMapAddressModeV);
-		Device->SetTexture(0, ((ZED3D9Texture*)DiffuseMap)->Texture);
+		Device->SetTexture(0, ((ZED3D9Texture2D*)DiffuseMap)->Texture);
 	}
 
 	if (MaterialComponents & ZESHADER_NORMALMAP)
 	{
 		SetTextureStage(1, NormalMapAddressModeU, NormalMapAddressModeV);
-		Device->SetTexture(1, ((ZED3D9Texture*)NormalMap)->Texture);
+		Device->SetTexture(1, ((ZED3D9Texture2D*)NormalMap)->Texture);
 	}
 
 	if (MaterialComponents & ZESHADER_PARALLAXMAP)
 	{
 		SetTextureStage(2, ParallaxMapAddressModeU, ParallaxMapAddressModeV);
-		Device->SetTexture(2, ((ZED3D9Texture*)ParallaxMap)->Texture);
+		Device->SetTexture(2, ((ZED3D9Texture2D*)ParallaxMap)->Texture);
 	}
 
 	if (MaterialComponents & ZESHADER_SPECULARMAP)
 	{
 		SetTextureStage(3, SpecularMapAddressModeU, SpecularMapAddressModeV);
-		Device->SetTexture(3, ((ZED3D9Texture*)SpecularMap)->Texture);
+		Device->SetTexture(3, ((ZED3D9Texture2D*)SpecularMap)->Texture);
 	}
 
 	if (MaterialComponents & ZESHADER_OPACITY)
 	{
 		SetTextureStage(4, OpacityMapAddressModeU, OpacityMapAddressModeV);
-		Device->SetTexture(4, ((ZED3D9Texture*)OpacityMap)->Texture);
+		Device->SetTexture(4, ((ZED3D9Texture2D*)OpacityMap)->Texture);
 	}
 
 	if (MaterialComponents & ZESHADER_DETAILDIFFUSEMAP)
 	{
 		SetTextureStage(5, DetailDiffuseMapAddressModeU, DetailDiffuseMapAddressModeV);
-		Device->SetTexture(5, ((ZED3D9Texture*)DetailDiffuseMap)->Texture);
+		Device->SetTexture(5, ((ZED3D9Texture2D*)DetailDiffuseMap)->Texture);
 	}
 
 	if (MaterialComponents & ZESHADER_DETAILNORMALMAP)
 	{
 		SetTextureStage(6, DetailNormalMapAddressModeU, DetailNormalMapAddressModeV);
-		Device->SetTexture(6, ((ZED3D9Texture*)DetailNormalMap)->Texture);
+		Device->SetTexture(6, ((ZED3D9Texture2D*)DetailNormalMap)->Texture);
 	}
 
 	return true;
@@ -297,31 +298,31 @@ bool ZED3D9FixedMaterial::SetupPreLightning() const
 	if (MaterialComponents & ZESHADER_EMMISIVEMAP)
 	{
 		SetTextureStage(0, EmmisiveMapAddressModeU, EmmisiveMapAddressModeV);
-		Device->SetTexture(7, ((ZED3D9Texture*)EmmisiveMap)->Texture);
+		Device->SetTexture(7, ((ZED3D9Texture2D*)EmmisiveMap)->Texture);
 	}
 
 	if (MaterialComponents & ZESHADER_REFLECTION)
 	{
 		SetTextureStage(8, ReflectionMapAddressModeU, ReflectionMapAddressModeV, ReflectionMapAddressModeW);
-		Device->SetTexture(8, ((ZED3D9CubeTexture*)ReflectionMap)->CubeTexture);
+		Device->SetTexture(8, ((ZED3D9TextureCube*)ReflectionMap)->CubeTexture);
 	}
 
 	if (MaterialComponents & ZESHADER_REFRACTION)
 	{
 		SetTextureStage(9, RefractionMapAddressModeU, RefractionMapAddressModeV, RefractionMapAddressModeW);
-		Device->SetTexture(9, ((ZED3D9CubeTexture*)RefractionMap)->CubeTexture);
+		Device->SetTexture(9, ((ZED3D9TextureCube*)RefractionMap)->CubeTexture);
 	}
 
 	if (MaterialComponents & ZESHADER_LIGHTMAP)
 	{
 		SetTextureStage(10, LightMapAddressModeU, LightMapAddressModeV);
-		Device->SetTexture(10, ((ZED3D9Texture*)LightMap)->Texture);
+		Device->SetTexture(10, ((ZED3D9Texture2D*)LightMap)->Texture);
 	}
 
 	if (MaterialComponents & ZESHADER_DISTORTIONMAP)
 	{
 		SetTextureStage(11, DistortionMapAddressModeU, DistortionMapAddressModeV);
-		Device->SetTexture(11, ((ZED3D9Texture*)DistortionMap)->Texture);
+		Device->SetTexture(11, ((ZED3D9Texture2D*)DistortionMap)->Texture);
 	}
 
 	SetShaderPass(&Shader->PreLightPass, RenderOrder->Flags & ZE_RLF_SKINNED);
@@ -371,7 +372,7 @@ size_t ZED3D9FixedMaterial::DoPointLightPass(const ZERLLight** Lights, size_t Co
 	Device->SetPixelShaderConstantF(13, (const float*)&ZEVector4(Lights[0]->Intensity, Lights[0]->Range, 0.0f, 0.0f), 1);
 
 	if (Lights[0]->ShadowMap != NULL && RecivesShadow)
-		Device->SetTexture(8, ((ZED3D9CubeTexture*)Lights[0]->CubeShadowMap)->CubeTexture);
+		Device->SetTexture(8, ((ZED3D9TextureCube*)Lights[0]->CubeShadowMap)->CubeTexture);
 
 	return 1;
 }
@@ -398,7 +399,7 @@ size_t ZED3D9FixedMaterial::DoDirectionalLightPass(const ZERLLight** Lights, siz
 	Device->SetPixelShaderConstantF(13, (const float*)&ZEVector4(Lights[0]->Intensity, 0.0f, 0.0f, 0.0f), 1);
 	
 	if (Lights[0]->ShadowMap != NULL && RecivesShadow)
-		Device->SetTexture(8, ((ZED3D9Texture*)Lights[0]->ShadowMap)->Texture);
+		Device->SetTexture(8, ((ZED3D9Texture2D*)Lights[0]->ShadowMap)->Texture);
 
 	return 1;
 }
@@ -433,7 +434,7 @@ size_t ZED3D9FixedMaterial::DoProjectiveLightPass(const ZERLLight** Lights, size
 	Device->SetSamplerState(9, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
 	Device->SetSamplerState(9, D3DSAMP_BORDERCOLOR, 0x00);
 	if (Lights[0]->ProjectionMap != NULL)
-		Device->SetTexture(9, ((ZED3D9Texture*)CurrentLight->ProjectionMap)->Texture);
+		Device->SetTexture(9, ((ZED3D9Texture2D*)CurrentLight->ProjectionMap)->Texture);
 
 	if (CurrentLight->ShadowMap != NULL && RecivesShadow)
 	{ 
@@ -442,10 +443,10 @@ size_t ZED3D9FixedMaterial::DoProjectiveLightPass(const ZERLLight** Lights, size
 		Device->SetSamplerState(8, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
 		Device->SetSamplerState(8, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
 		Device->SetSamplerState(8, D3DSAMP_BORDERCOLOR, 0x00);	
-		Device->SetTexture(8, ((ZED3D9Texture*)Lights[0]->ShadowMap)->Texture);
+		Device->SetTexture(8, ((ZED3D9Texture2D*)Lights[0]->ShadowMap)->Texture);
 		Device->SetPixelShaderConstantF(14, 
-			(const float*)&ZEVector4(1.0f / ((ZED3D9Texture*)Lights[0]->ShadowMap)->GetWidth(), 
-			1.0f / ((ZED3D9Texture*)Lights[0]->ShadowMap)->GetHeight(), 0.0f, 0.0f),1);
+			(const float*)&ZEVector4(1.0f / ((ZED3D9Texture2D*)Lights[0]->ShadowMap)->GetWidth(), 
+			1.0f / ((ZED3D9Texture2D*)Lights[0]->ShadowMap)->GetHeight(), 0.0f, 0.0f),1);
 	}
 
 	return 1;
@@ -479,10 +480,10 @@ size_t ZED3D9FixedMaterial::DoOmniProjectivePass(const ZERLLight** Lights, size_
 	Device->SetPixelShaderConstantF(13, (const float*)&ZEVector4(Lights[0]->Intensity, 0.0f, 0.0f, 0.0f), 1);
 
 	if (Lights[0]->CubeProjectionMap != NULL)
-		Device->SetTexture(9, ((ZED3D9CubeTexture*)Lights[0]->CubeProjectionMap)->CubeTexture);
+		Device->SetTexture(9, ((ZED3D9TextureCube*)Lights[0]->CubeProjectionMap)->CubeTexture);
 		
 	if (Lights[0]->ShadowMap != NULL && RecivesShadow)
-		Device->SetTexture(8, ((ZED3D9Texture*)Lights[0]->ShadowMap)->Texture);
+		Device->SetTexture(8, ((ZED3D9Texture2D*)Lights[0]->ShadowMap)->Texture);
 	return 1;
 }
 

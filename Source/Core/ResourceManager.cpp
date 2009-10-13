@@ -35,7 +35,8 @@
 
 #include "ResourceManager.h"
 #include <string.h>
-#include "Core/Core.h"
+#include "Core.h"
+#include "Core/Error.h"
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)

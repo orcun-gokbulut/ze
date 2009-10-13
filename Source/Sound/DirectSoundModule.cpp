@@ -37,6 +37,12 @@
 #include "ZEDS/Array.h"
 #include "ZEMath/Vector.h"
 #include "Core/Core.h"
+#include "Core/Error.h"
+#include "Core/Console.h"
+#include "Core/Window.h"
+#include "SoundSource.h"
+#include "SoundSource3D.h"
+#include "Listener.h"
 #include <dsound.h>
 
 
@@ -125,7 +131,7 @@ void ZEDirectSoundModule::SetEnabled(bool Enabled)
 
 bool ZEDirectSoundModule::Initialize()
 {	
-	zeLog("Initializing DirectSound.\r\n");
+	zeOutput("Initializing DirectSound.\r\n");
 	HRESULT hr;
 	
 	hr = DirectSoundCreate8(NULL, &DS, NULL);
@@ -176,7 +182,7 @@ bool ZEDirectSoundModule::Initialize()
 
 void ZEDirectSoundModule::Deinitialize()
 {	
-	zeLog("Destroying DirectSound.\r\n");
+	zeOutput("Destroying DirectSound.\r\n");
 	if (DSListener != NULL)
 	{
 		DSListener->Release();

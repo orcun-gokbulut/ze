@@ -44,7 +44,7 @@
 
 class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 {
-	friend class ZEDirect3D9Module;
+	friend class ZED3D9Module;
 	private:
 		ZED3D9Shader*					Shader;
 		ZERenderOrder*					RenderOrder;

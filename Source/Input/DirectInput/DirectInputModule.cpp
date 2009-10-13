@@ -120,7 +120,7 @@ void ZEDirectInputModule::SetEnabled(bool Enabled)
 
 bool ZEDirectInputModule::Initialize()
 {	
-	zeLog("Initializing Direct Input.\r\n");
+	zeOutput("Initializing Direct Input.\r\n");
 
 	HRESULT hr;
 	hr = DirectInput8Create((HINSTANCE)zeCore->GetApplicationInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&DI, NULL);
@@ -243,7 +243,7 @@ bool ZEDirectInputModule::Initialize()
 
 void ZEDirectInputModule::Deinitialize()
 {
-	zeLog("Destroying Direct Input.\r\n");
+	zeOutput("Destroying Direct Input.\r\n");
 	if (DIMouse != NULL)
 	{
 		DIMouse->Unacquire();
@@ -416,7 +416,7 @@ void ZEDirectInputModule::ProcessInputMap(ZEInputMap* InputMap)
 
 void ZEDirectInputModule::Acquire()
 {
-	zeLog("Acquire Direct Input.\r\n");
+	zeOutput("Acquire Direct Input.\r\n");
 	if (DIKeyboard != NULL)
 		DIKeyboard->Acquire();
 
@@ -429,7 +429,7 @@ void ZEDirectInputModule::Acquire()
 
 void ZEDirectInputModule::UnAcquire()
 {
-	zeLog("Unacquire Direct Input.\r\n");
+	zeOutput("Unacquire Direct Input.\r\n");
 
 	if (DIKeyboard != NULL)
 		DIKeyboard->Unacquire();

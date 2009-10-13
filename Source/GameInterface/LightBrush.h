@@ -38,14 +38,15 @@
 #define __ZE_LIGHTBRUSH_H__
 
 #include "GameInterface/Entity.h"
-#include "Graphics/Light.h"
 #include "Graphics/RenderOrder.h"
+#include "Graphics/Light.h"
 
 ZE_ENTITY_DESCRIPTION(ZELightBrush, ZEEntity);
 
 class ZETexture2DResource;
 class ZETextureCubeResource;
 class ZEFixedMaterial;
+class ZELight;
 
 class ZELightBrush : public ZEEntity
 {
@@ -53,7 +54,6 @@ class ZELightBrush : public ZEEntity
 	private:
 		ZELightType							LightType;
 		ZELight*							Light;
-		ZETextureType						Type;
 
 		ZERenderOrder						RenderOrder;
 		ZEFixedMaterial*					Material;

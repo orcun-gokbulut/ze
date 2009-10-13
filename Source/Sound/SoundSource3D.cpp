@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "SoundModule.h"
 #include "SoundSource3D.h"
-#include "Core/Core.h"
 
 bool ZESoundSource3D::Is3D()
 {

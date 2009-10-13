@@ -33,8 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "option.h"
-#include "core.h"
+#include "Option.h"
+#include "Core.h"
+#include "Error.h"
+#include "Console.h"
 #include <stdio.h>
 #include <ctype.h>
 
@@ -239,12 +241,12 @@ ZEOptionSection::~ZEOptionSection()
 			 Params->GetItem(0).GetType() == ZEVARIANTTYPE_STRING)
 	{
 		Load(Params->GetItem(0).GetString());
-		zeLog("Options loaded.");
+		zeOutput("Options loaded.");
 		return true;
 	}
 	else
 	{
-			zeLog("Incorrect parameters. \r\n"
+			zeOutput("Incorrect parameters. \r\n"
 							 "Usage :\r\n"
 							 "  Options.Load() - Loads options from options.ini\r\n"
 							 "  Options.Load(String FileName) - Load options from a file named 'FileName'\r\n"
@@ -260,17 +262,17 @@ ZEOptionSection::~ZEOptionSection()
 	 {
 		case 0:
 			Save("options.ini");
-			zeLog("Options saved.");
+			zeOutput("Options saved.");
 			return true;
 		case 1:
 			if (Params->GetItem(0).GetType() == ZEVARIANTTYPE_STRING)
 			{
 				Save(Params->GetItem(0).GetString());
-				zeLog("Options saved to \"%s\" file.", Params->GetItem(0).GetString());
+				zeOutput("Options saved to \"%s\" file.", Params->GetItem(0).GetString());
 				return true;
 			}
 		default:
-			zeLog("Incorrect parameters\r\n"
+			zeOutput("Incorrect parameters\r\n"
 							 "Usage :\r\n"
 							 "  Options.SaveOptions() - Saves current options to options.ini\r\n"
 							 "  Options.SaveOptions(String FileName) - Saves current options to a file named 'FileName'\r\n"
@@ -298,7 +300,7 @@ bool ZEOptionManager::ListSectionsCommand(ZECommand* Command, const ZECommandPar
 	}
 	else
 	{
-		zeLog("Incorrect parameters\r\n"
+		zeOutput("Incorrect parameters\r\n"
 						 "Usage :\r\n"
 						 "  Options.ListSections() - Lists all of the option sections\r\n"
 						 "  Options.ListSection(Integer From, Integer Count) - Lists 'Count' number of option sections starting from index 'From'\r\n"
@@ -307,14 +309,14 @@ bool ZEOptionManager::ListSectionsCommand(ZECommand* Command, const ZECommandPar
 		return false;
 	}
 
-	zeLog(" Name                           Has Changes   Number Of Options \r\n"
+	zeOutput(" Name                           Has Changes   Number Of Options \r\n"
 					 "----------------------------------------------------------------\r\n");
 
 	ZEOptionSection* CurrSection;
 	for (size_t I = Index; I < Sections.GetCount() && I <= Count; I++)
 	{
 		CurrSection = Sections.GetItem(I);
-		zeLog(" %-30s   %11s   %d\r\n", CurrSection->GetName(), CurrSection->GetNumberOfOptions(), 
+		zeOutput(" %-30s   %11s   %d\r\n", CurrSection->GetName(), CurrSection->GetNumberOfOptions(), 
 			(CurrSection->HasChanges() ? "    Yes    " : "   No      "));
 	}
 	return true;
@@ -343,7 +345,7 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 	}
 	else
 	{
-		zeLog("Incorrect parameters. \r\n"
+		zeOutput("Incorrect parameters. \r\n"
 						 "Usage :\r\n"
 						 " Options.ListOptions(String Section) - Lists all of the options in the section named 'Section'\r\n"
 						 " Options.ListOptions(String Section, Integer Index, Integer Count) - Lists 'Count' number of options in the option section named 'Section' starting from index 'Index'\r\n"
@@ -354,83 +356,83 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 
 	if (Sec != NULL)
 	{
-		zeLog(" Name                            Type           Changed    Value           \r\n"
+		zeOutput(" Name                            Type           Changed    Value           \r\n"
 						 "---------------------------------------------------------------------------\r\n");
 		
 		ZEOption* Opt;
 		for (size_t I = 0; I < Sec->GetNumberOfOptions() && I <= Count; I++)
 		{
 			Opt = Sec->GetOption(I);	
-			zeLog(" %-30s  ", Sec->GetOption(I)->GetName());
+			zeOutput(" %-30s  ", Sec->GetOption(I)->GetName());
 			switch(Opt->GetValueType())
 			{
 				case ZEVARIANTTYPE_UNDEFINED:
-					zeLog(" Undefined  ");
+					zeOutput(" Undefined  ");
 					break;
 				case ZEVARIANTTYPE_INTEGER:
-					zeLog(" Integer    ");
+					zeOutput(" Integer    ");
 					break;
 				case ZEVARIANTTYPE_FLOAT:
-					zeLog(" Float      ");
+					zeOutput(" Float      ");
 					break;
 				case ZEVARIANTTYPE_BOOLEAN:
-					zeLog(" Boolean    ");
+					zeOutput(" Boolean    ");
 					break;
 				case ZEVARIANTTYPE_NULL:
-					zeLog(" NULL       ");
+					zeOutput(" NULL       ");
 					break;
 				case ZEVARIANTTYPE_STRING:
-					zeLog(" String     ");
+					zeOutput(" String     ");
 					break;
 				default:
-					zeLog(" Error      ");
+					zeOutput(" Error      ");
 			}
-			zeLog(" %s  ", (Opt->IsChanged() ? "  Yes   " : "   No   "));
+			zeOutput(" %s  ", (Opt->IsChanged() ? "  Yes   " : "   No   "));
 
    			switch(Opt->GetValueType())
 			{
 				case ZEVARIANTTYPE_UNDEFINED:
-					zeLog("UNDEFINED (Probably Internal Error)\r\n");
+					zeOutput("UNDEFINED (Probably Internal Error)\r\n");
 					break;
 				case ZEVARIANTTYPE_INTEGER:
-					zeLog("%d\r\n", Opt->GetValue().GetInteger());
+					zeOutput("%d\r\n", Opt->GetValue().GetInteger());
 					break;
 				case ZEVARIANTTYPE_FLOAT:
-					zeLog("%lf\r\n", Opt->GetValue().GetFloat());
+					zeOutput("%lf\r\n", Opt->GetValue().GetFloat());
 					break;
 				case ZEVARIANTTYPE_BOOLEAN:
-					zeLog("%s\r\n", Opt->GetValue().GetBoolean() ? "true" : "false");
+					zeOutput("%s\r\n", Opt->GetValue().GetBoolean() ? "true" : "false");
 					break;
 				case ZEVARIANTTYPE_NULL:
-					zeLog("NULL\r\n");
+					zeOutput("NULL\r\n");
 					break;
 				case ZEVARIANTTYPE_STRING:
-					zeLog("\"%s\"\r\n", Opt->GetValue().GetString());
+					zeOutput("\"%s\"\r\n", Opt->GetValue().GetString());
 					break;
 				default:
-					zeLog("Error\r\n");
+					zeOutput("Error\r\n");
 			}
 		}
 		return true;
 	}
 	else
 	{
-		zeLog("There is no such an option section. \r\n\r\n");
+		zeOutput("There is no such an option section. \r\n\r\n");
 		return false;
 	}
 }
 
 bool ZEOptionManager::CommitChangesCommand(ZECommand* Command, const ZECommandParameterList* Params)
 {
-	zeLog("Committing changes in options to the modules and components. This may take a while. Please wait.\r\n");
+	zeOutput("Committing changes in options to the modules and components. This may take a while. Please wait.\r\n");
 	CommitChanges();
-	zeLog("Changes committed.\r\n");
+	zeOutput("Changes committed.\r\n");
 	return true;
 }
 
 bool ZEOptionManager::ResetChangesCommand(ZECommand* Command, const ZECommandParameterList* Params)
 {
-	zeLog("Option changes resetted.\r\n");
+	zeOutput("Option changes resetted.\r\n");
 	ResetChanges();
 	return true;
 }

@@ -41,18 +41,23 @@
 
 extern HINSTANCE ApplicationInstance;
 
+#include "Graphics/GraphicsModule.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/FixedMaterial.h"
+#include "Graphics/Texture2DResource.h"
+#include "GameInterface/Game.h"
 #include "GameInterface/Player.h"
 #include "GameInterface/LightBrush.h"
 #include "GameInterface/CanvasBrush.h"
 #include "GameInterface/SkyBrush.h"
 #include "GameInterface/Scene.h"
-#include "Core/ConsoleWindow.h"
 #include "Core/Core.h"
+#include "Core/ConsoleWindow.h"
+#include "Core/ModuleManager.h"
+#include "Core/Window.h"
 #include "GameInterface/ModelBrush.h"
-
+#include "Graphics/Direct3D9/D3D9PostProcessor.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {

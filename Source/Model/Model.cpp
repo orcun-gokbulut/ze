@@ -35,8 +35,11 @@
 
 #include "Model.h"
 #include "ModelFileFormat.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/VertexBuffer.h"
+#include "GameInterface/Entity.h"
 #include <stdio.h>
-#include "Core/Core.h"
+#include <string.h>
 
 void ZEModelMeshLOD::ResetMaterial()
 {

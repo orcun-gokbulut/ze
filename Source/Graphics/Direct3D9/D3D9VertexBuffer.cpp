@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "D3D9VertexBuffer.h"
-#include "Direct3D9Module.h"
-#include "Core/Core.h"
+#include "D3D9Module.h"
+#include "Core/Error.h"
 
 unsigned int ZED3D9StaticVertexBuffer::GetBufferSize()
 {

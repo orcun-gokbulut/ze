@@ -35,6 +35,7 @@
 
 #include "Game.h"
 #include "Core/Core.h"
+#include "Core/Error.h"
 
 ZEGameDescription* ZEGame::GetGameDescription()
 {

@@ -38,10 +38,14 @@
 #define __ZE_SKYBRUSH_H__
 
 #include "Entity.h"
-#include "Graphics/Light.h"
+#include "Graphics/DirectionalLight.h"
 #include "Graphics/Canvas.h"
 
 ZE_ENTITY_DESCRIPTION(ZESkyBrush, ZEEntity);
+
+class ZEScene;
+class ZETextureCubeResource;
+class ZEFixedMaterial;
 class ZESkyBrush : public ZEEntity
 {
 	ZE_ENTITY_CLASS(ZESkyBrush)

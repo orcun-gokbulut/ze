@@ -34,482 +34,249 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "D3D9PostProcessor.h"
-#include "Direct3D9Module.h"
 #include "Core/Error.h"
-#include "D3D9Texture.h"
 #include "D3D9CommonTools.h"
+#include "D3D9Texture2D.h"
+#include "D3D9Module.h"
 
-LPDIRECT3DVERTEXSHADER9 ZED3D9PostProcessor::GeneralVS;
-LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::ColorTransformPS = NULL;
-LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::InversePS = NULL;
-LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::GrayscalePS = NULL;
-LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::DownSample4xPS = NULL;
-LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::UpSample4xPS = NULL;
-LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::HBlurPS = NULL; 
-LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::VBlurPS = NULL;
-LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::SharpenPS = NULL; 
-LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::HEdgePS = NULL;
-LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::VEdgePS = NULL;
-LPDIRECT3DPIXELSHADER9 ZED3D9PostProcessor::DirectPS = NULL;
-LPDIRECT3DVERTEXBUFFER9 ZED3D9PostProcessor::ScreenQuadVB = NULL;
-LPDIRECT3DVERTEXDECLARATION9 ZED3D9PostProcessor::ScreenQuadVD = NULL;
+LPDIRECT3DVERTEXSHADER9 ZED3D9BlurPostEffect::VertexShader = NULL;
+LPDIRECT3DPIXELSHADER9 ZED3D9BlurPostEffect::VerticalPassPixelShader = NULL;
+LPDIRECT3DPIXELSHADER9 ZED3D9BlurPostEffect::HorizontalPassPixelShader = NULL;
 
-bool ZED3D9PostProcessor::BaseInitialize()
-{	
-	D3DVERTEXELEMENT9 VertexDecl[] = 
+ZED3D9BlurPostEffect::ZED3D9BlurPostEffect()
+{
+	Temporary = NULL;
+}
+
+ZED3D9BlurPostEffect::~ZED3D9BlurPostEffect()
+{
+	Deinitialize();
+}
+
+bool ZED3D9BlurPostEffect::Initialize()
+{
+	// Create general vertex shader
+	if (VertexShader == NULL)
+		if (!ZED3D9CommonTools::CompileVertexShader(&VertexShader,
+				"struct VS_OUTPUT"
+				"{"
+					"float4 Position : POSITION0;"
+					"float2 TexCoord : TEXCOORD0;"
+				"};"
+				"VS_OUTPUT vs_main(float4 Position : POSITION0)"
+				"{"
+					"VS_OUTPUT Output;"
+					"Output.Position = float4(Position.xy, 0.0f, 1.0f);"
+					"Output.TexCoord.x = Output.TexCoord.y;"
+					"return Output;"
+				"}", "Blur Pass", "VS_2_0", NULL)
+			)
+			return false;
+
+	// Create horizontal blur pass pixel shader
+	if (HorizontalPassPixelShader == NULL)
+		if (!ZED3D9CommonTools::CompilePixelShader(&HorizontalPassPixelShader, 
+				"sampler Input : register(s0);"
+				"const int KernelSize : register(i0);"
+				"const float2 Kernel : register(c0);"
+				"const float PixelSize : register(1);"
+				"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
+				"{"
+					"float4 Color = 0.0f;"
+					"for (int I = 0; I < KernelSize; I++)"
+						"Color += Kernel[I].y * tex2D(Input, float2(TexCoord.x, TexCoord.y + Kernel[I].x * PixelSize));"
+					"return Color;"
+				"}", "Horizantal Blur Pass", "PS_3_0", NULL)
+			)
+			return false;
+
+	// Create vertical blur pass pixel shader
+	if (VerticalPassPixelShader == NULL)
+		if (!ZED3D9CommonTools::CompilePixelShader(&VerticalPassPixelShader, 
+				"sampler Input : register(s0);"
+				"const int KernelSize : register(i0);"
+				"const float2 Kernel : register(c0);"
+				"const float PixelSize : register(1);"
+				"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
+				"{"
+					"float4 Color = 0.0f;"
+					"for (int I = 0; I < KernelSize; I++)"
+						"Color += Kernel[I].y * tex2D(Input, float2(TexCoord.x + Kernel[I].x * PixelSize, TexCoord.y));"
+					"return Color;"
+				"}", "Vertical Blur Pass", "PS_3_0", NULL)
+			)
+			return false;
+
+	return true;
+}
+
+void ZED3D9BlurPostEffect::Deinitialize()
+{
+	// If temporary render target created, release it
+	if (Temporary != NULL)
+		Temporary->Release();
+}
+
+bool ZED3D9BlurPostEffect::Process()
+{
+	// Check input post processor is available
+	if (Input == NULL && this->InputTexture == NULL)
 	{
-		{0, 0,  D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-		D3DDECL_END()
-	};
-	Device->CreateVertexDeclaration(VertexDecl, &ScreenQuadVD);
-
-	if (Device->CreateVertexBuffer(32, NULL, NULL, D3DPOOL_MANAGED, &ScreenQuadVB, NULL) != D3D_OK)
-	{
-		zeError("D3D9 Post Processor", "Can not create post effect vertex buffer.");
+		zeError("Blur Post Effect", "Post effect does not have any input.");
 		return false;
 	}
 
-	ZEVector2* Vertices;
-	ScreenQuadVB->Lock(0, NULL, (void**)&Vertices, NULL);
-	Vertices[0].Create(-1.0f, -1.0f);
-	Vertices[1].Create(-1.0f, 1.0f);
-	Vertices[2].Create(1.0f, -1.0f);
-	Vertices[3].Create(1.0f, 1.0f);
-	ScreenQuadVB->Unlock();
-
-	ZED3D9CommonTools::CompileVertexShader(&GeneralVS,
-		"float2 InverseViewportDimentsions : register(c0);"
-		"struct VS_OUTPUT"
-		"{"
-			"float4 Position : POSITION0;"
-			"float2 TexCoord : TEXCOORD0;"
-		"};"
-		"VS_OUTPUT vs_main(float4 Position : POSITION0)"
-		"{"
-			"VS_OUTPUT Output;"
-			"Output.Position = float4(Position.xy, 0.0f, 1.0f);"
-			"Output.TexCoord.x = 0.5f * (1.0f + Output.Position.x + InverseViewportDimentsions.x);"
-			"Output.TexCoord.y = 0.5f * (1.0f - Output.Position.y + InverseViewportDimentsions.y);"
-			"return Output;"
-		"}", "Post Process General", "vs_2_0");
-
-	ZED3D9CommonTools::CompilePixelShader(&GrayscalePS,
-		"sampler Screen : register(s0);"
-		"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-		"{" 
-		"float4 Color = tex2D(Screen, TexCoord);"
-			"return float4(dot(float3(0.299f, 0.587f, 0.114f), Color.xyz).xxx, Color.w);"
-		"}", "Post Process Grayscale", "ps_2_0");
-
-	ZED3D9CommonTools::CompilePixelShader(&DirectPS,
-		"sampler Screen : register(s0);"
-		"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-		"{"  
-			"return tex2D(Screen, TexCoord);"
-		"}", "Post Process Direct", "ps_2_0");
-	
-	ZED3D9CommonTools::CompilePixelShader(&InversePS,
-		"sampler Screen : register(s0);"
-		"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-		"{"  
-			"return 1.0f - tex2D(Screen, TexCoord);"
-		"}", "Post Process Inverse", "ps_2_0");
-
-	#pragma message("Task : Modify post processor downsample.")
-	/*CompilePixelShader(
-		"sampler Screen : register(s0);"
-		"float3x3 Transformation : register(s1);"
-		"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-		"{"  
-			"return mul(Transformation, tex2D(Screen, TexCoord));"
-		"}",
-		&ColorTransformPS);*/
-
-	ZED3D9CommonTools::CompilePixelShader(&VBlurPS,
-		"sampler Screen : register(s0);"
-		"float2 InverseViewportDimensions : register(c0);"
-		"static const int KernelSize = 13;"
-		"static const float2 Kernel[KernelSize] ="
-		"{"
-			"{-6.0f, 0.002216f},"
-			"{-5.0f, 0.008764f},"
-			"{-4.0f, 0.026995f},"
-			"{-3.0f, 0.064759f},"
-			"{-2.0f, 0.120985f},"
-			"{-1.0f, 0.176033f},"
-			"{0.0f, 0.199471f},"
-			"{1.0f, 0.176033f},"
-			"{2.0f, 0.120985f},"
-			"{3.0f, 0.064759f},"
-			"{4.0f, 0.026995f},"
-			"{5.0f, 0.008764f},"
-			"{6.0f, 0.002216f},"
-		"};"
-		"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-		"{"
-			"float4 Color = 0.0f;"
-			"for (int I = 0; I < KernelSize; I++)"
-				"Color += Kernel[I].y * tex2D(Screen, float2(TexCoord.x, TexCoord.y + Kernel[I].x * InverseViewportDimensions.y));"
-			"return Color;"
-		"}", "Post Process Vertical Blur", "ps_2_0");
-
-	ZED3D9CommonTools::CompilePixelShader(&HBlurPS,
-		"sampler Screen : register(s0);"
-		"float2 InverseViewportDimensions : register(c0);"
-		"static const int KernelSize = 13;"
-		"static const float2 Kernel[KernelSize] ="
-		"{"
-			"{-6.0f, 0.002216f},"
-			"{-5.0f, 0.008764f},"
-			"{-4.0f, 0.026995f},"
-			"{-3.0f, 0.064759f},"
-			"{-2.0f, 0.120985f},"
-			"{-1.0f, 0.176033f},"
-			"{0.0f, 0.199471f},"
-			"{1.0f, 0.176033f},"
-			"{2.0f, 0.120985f},"
-			"{3.0f, 0.064759f},"
-			"{4.0f, 0.026995f},"
-			"{5.0f, 0.008764f},"
-			"{6.0f, 0.002216f},"
-		"};"
-		"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-		"{"
-			"float4 Color = 0.0f;"
-			"for (int I = 0; I < KernelSize; I++)"
-				"Color += Kernel[I].y * tex2D(Screen, float2(TexCoord.x + Kernel[I].x * InverseViewportDimensions.x, TexCoord.y));"
-			"return Color;"
-		"}", "Post Process Horizantal Blur", "ps_2_0");
-
-	ZED3D9CommonTools::CompilePixelShader(&HEdgePS,
-		"sampler Screen : register(s0);"
-		"float2 InverseViewportDimensions : register(c0);"
-		"static const int KernelSize = 6;"
-		"static const float3 Kernel[KernelSize] ="
-		"{"
-			"{-1.0f, 1.0f, 1.0f},"
-			"{ 0.0f, 1.0f, 2.0f},"
-			"{ 1.0f, 1.0f, 1.0f},"
-			"{-1.0f, -1.0f, -1.0f},"
-			"{ 0.0f, -1.0f, -2.0f},"
-			"{ 1.0f, -1.0f, -1.0f},"
-		"};"
-		"float4 ps_main(float2 Texcoord : TEXCOORD0) : COLOR0"
-		"{"
-			"float4 Color = 0.0f;"
-			"for (int I = 0; I < KernelSize; I++)"
-				"Color += Kernel[I].z * tex2D(Screen, float2(Texcoord.x + Kernel[I].x * InverseViewportDimensions.x, Texcoord.y + Kernel[I].y * InverseViewportDimensions.y));"
-			"return Color;"
-		"}", "Post Process Horizantal Edge Detection", "ps_2_0");
-
-	ZED3D9CommonTools::CompilePixelShader(&VEdgePS,
-		"sampler Screen : register(s0);"
-		"float2 InverseViewportDimensions : register(c0);"
-		"static const int KernelSize = 6;"
-		"static const float3 Kernel[KernelSize] ="
-		"{"
-			"{-1.0f, 1.0f, 1.0f},"
-			"{ 0.0f, 1.0f, 2.0f},"
-			"{ 1.0f, 1.0f, 1.0f},"
-			"{-1.0f, -1.0f, -1.0f},"
-			"{ 0.0f, -1.0f, -2.0f},"
-			"{ 1.0f, -1.0f, -1.0f},"
-		"};"
-		"float4 ps_main(float2 Texcoord : TEXCOORD0) : COLOR0"
-		"{"
-			"float4 Color = 0.0f;"
-			"for (int I = 0; I < KernelSize; I++)"
-				"Color += Kernel[I].z * tex2D(Screen, float2(Texcoord.x + Kernel[I].y * InverseViewportDimensions.x, Texcoord.y + Kernel[I].x * InverseViewportDimensions.y));"
-			"return Color;"
-		"}", "Post Process Vertical Edge Detection", "ps_2_0");
-
-	
-	ZED3D9CommonTools::CompilePixelShader(&SharpenPS,
-		"sampler Screen : register(s0);"
-		"float2 InverseViewportDimensions : register(c0);"
-		"static const int KernelSize = 5;"
-		"static const float3 Kernel[KernelSize] ="
-		"{"
-			"{ 0.0f, 0.0f, 11.0f / 3.0f},"
-			"{-1.0f, -1.0f, -2.0f  / 3.0f},"
-			"{-1.0f, 1.0f, -2.0f  / 3.0f},"
-			"{ 1.0f, -1.0f, -2.0f  / 3.0f},"
-			"{ 1.0f, 1.0f, -2.0f  / 3.0f},"
-		"};"
-		"float4 ps_main(float2 Texcoord : TEXCOORD0) : COLOR0"
-		"{"
-			"float4 Color = 0.0f;"
-			"for (int I = 0; I < KernelSize; I++)"
-				"Color += Kernel[I].z * tex2D(Screen, float2(Texcoord.x + Kernel[I].x * InverseViewportDimensions.x, Texcoord.y + Kernel[I].y * InverseViewportDimensions.y));"
-			"return Color;"
-		"}", "Post Processor Sharpen", "ps_2_0");
-
-#pragma message("Task : Modify post processor downsample.")
-
-/*	CompilePixelShader(&DownSample4xPS,
-		"sampler Screen : register(s0);"
-		"float2 InverseViewportDimensions : register(c0);"
-		"static const int KernelSize = 16;"
-		"static float2 Kernel[16] ="
-		"{"
-			"{1.5f, -1.5f},"
-			"{1.5f, -0.5f},"
-			"{1.5f, 0.5f},"
-			"{1.5f, 1.5f},"
-			"{0.5f, -1.5f},"
-			"{0.5f, -0.5f},"
-			"{0.5f, 0.5f},"
-			"{0.5f, 1.5f},"
-			"{-0.5f, -1.5f},"
-			"{-0.5f, -0.5f},"
-			"{-0.5f, 0.5f},"
-			"{-0.5f, 1.5f},"
-			"{-1.5f, -1.5f},"
-			"{-1.5f, -0.5f},"
-			"{-1.5f, 0.5f},"
-			"{-1.5f, 1.5f},"
-		"};"
-		"float4 ps_main(float2 Texcoord : TEXCOORD0 ) : COLOR0"
-		"{"
-			"float4 Color = 0;"
-			"for (int i = 0; i < KernelSize; i++)"
-				"Color += tex2D( Screen, Tex + TexelCoordsDownFilter[i].xy );"
-			"return Color / KernelSize;"
-		"}", "Post Processor 4x Down Sampler", "ps_2_0" );*/
-
-	ZED3D9CommonTools::CompilePixelShader(&UpSample4xPS,
-		"sampler Screen : register(s0);"
-		"float2 InverseViewportDimensions : register(c0);"
-		"float4 ps_main(float2 Texcoord : TEXCOORD0) : COLOR0"
-		"{"
-			"return tex2D(Screen, Texcoord);"
-		"}", "Post Processor 4x Up Sampler", "ps_2_0");
-
-	return true;
-}
-
-void ZED3D9PostProcessor::SetInput(ZETexture2D* Texture)
-{
-	Source = ((ZED3D9Texture*)Texture)->Texture;
-}
-
-void ZED3D9PostProcessor::SetOutput(ZETexture2D* Texture)
-{
-	Destination = ((ZED3D9Texture*)Texture)->Texture;
-}
-
-void ZED3D9PostProcessor::DeviceLost()
-{
-
-}
-
-bool ZED3D9PostProcessor::DeviceRestored()
-{
-	return false;
-}
-
-void ZED3D9PostProcessor::BaseDeinitialize()
-{
-	ZED3D_RELEASE(GeneralVS);
-	ZED3D_RELEASE(ColorTransformPS);
-	ZED3D_RELEASE(InversePS);
-	ZED3D_RELEASE(GrayscalePS);
-	ZED3D_RELEASE(DownSample4xPS);
-	ZED3D_RELEASE(UpSample4xPS);
-	ZED3D_RELEASE(HBlurPS);
-	ZED3D_RELEASE(VBlurPS);
-	ZED3D_RELEASE(SharpenPS);
-	ZED3D_RELEASE(HEdgePS);
-	ZED3D_RELEASE(VEdgePS);
-	ZED3D_RELEASE(GeneralVS);
-	ZED3D_RELEASE(ScreenQuadVD);
-	ZED3D_RELEASE(ScreenQuadVB);
-}
-
-bool ZED3D9PostProcessor::ManageSourceDestination(ZEPostProcessorSource Source_, ZEPostProcessorDestination Destination_, float Scale)
-{
-	D3DSURFACE_DESC SrcDesc, DestDesc;
-	LPDIRECT3DSURFACE9 Surface;
-	LPDIRECT3DTEXTURE9 InternalSwap;
-
-	switch(Source_)
+	// Check wheater we are getting input from a texture or output of a post processor
+	ZETexture2D* InputTexture;
+	if (Input != NULL)
 	{
-		case ZE_PPS_INPUT:
-			if (Source == NULL)
-			{
-				zeError("D3D9 Post Processor", "Source is not valid. There is no input texture.");
-				return false;
-			}
+		InputTexture = Input->GetOutput();
 
-			Source->GetLevelDesc(0, &SrcDesc);
-			Device->SetTexture(0, Source);
-			break;
-
-		case ZE_PPS_INTERNAL:
-			InternalSwap = InternalSource;
-			InternalSource = InternalDestination;
-			InternalDestination = InternalSwap;
-
-			if (InternalSource == NULL)
-			{
-				zeError("D3D9 Post Processor", "Destination is not valid. There is no internal texture.");
-				return false;
-			}
-
-			InternalSource->GetLevelDesc(0, &SrcDesc);
-			Device->SetTexture(0, InternalSource);
-			break;
-
-		default:
-			zeError("D3D9 Post Processor", "Wrong source.");
+		// Check input postprocessor has valid output
+		if (InputTexture == NULL)
+		{
+			zeError("Blur Post Effect", "Output of input post effect does not exist.");
 			return false;
-			break;
+		}
+	}
+	else
+		InputTexture = this->InputTexture;
+
+
+	if (!OutputToFrameBuffer)
+	{
+		// If post effect will not output directly frame buffer then create output render target. 
+		if (Output == NULL)
+			Output = ZETexture2D::CreateInstance();
+
+		if (Output->GetWidth() != InputTexture->GetWidth() || Output->GetHeight() != InputTexture->GetHeight() || Output->GetPixelFormat() != InputTexture->GetPixelFormat())
+			Output->Create(InputTexture->GetWidth(), InputTexture->GetHeight(), InputTexture->GetPixelFormat(), true);
+	}
+	else
+	{
+		// If it will then release output render targer in case of old configurations of this post effect did not output frame buffer
+		if (Output != NULL)
+			Output->Release();
 	}
 
-	switch(Destination_)
+	// Calculate pixel sizes for calculating texel to pixel conversion
+	float PixelWidth_2 = 0.5f / InputTexture->GetWidth();
+	float PixelHeight_2 = 0.5f / InputTexture->GetHeight();
+	
+	// Generate screen aligned quad in the memory
+	struct
 	{
-		case ZE_PPD_OUTPUT:
-			if (Destination == NULL)
-			{
-				zeError("D3D9 Post Processor", "Destination is not valid.");
-				return false;
-			}
-			
-			Destination->GetLevelDesc(0, &DestDesc);
-			Destination->GetSurfaceLevel(0, &Surface);
-			Device->SetRenderTarget(0, Surface);		
-			Device->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / DestDesc.Width, 1.0f / DestDesc.Height, 0.0f, 0.0f), 1);
-			break;
+		float Position[3];
+		float UV[2];
+	} 
+	ScreenAlignedQuad[] =	{
+		{{-1.0f + PixelWidth_2, 1.0f + PixelHeight_2, 0.0f},  {0.0f, 0.0f}},
+		{{ 1.0f + PixelWidth_2, 1.0f + PixelHeight_2, 0.0f},  {1.0f, 0.0f}},
+		{{ 1.0f + PixelWidth_2, -1.0f + PixelHeight_2, 0.0f}, {1.0f, 1.0f}},
+		{{-1.0f + PixelWidth_2, -1.0f + PixelHeight_2, 0.0f}, {0.0f, 1.0f}}};
 
-		case ZE_PPD_INTERNAL:
-			if (InternalDestination == NULL)
-				Device->CreateTexture((UINT)(SrcDesc.Width * Scale), (UINT)(SrcDesc.Height * Scale), 0, D3DUSAGE_RENDERTARGET, SrcDesc.Format, D3DPOOL_DEFAULT, &InternalDestination, NULL);
-			else 
-			{
-				InternalDestination->GetLevelDesc(0, &DestDesc);
-				if (DestDesc.Width != SrcDesc.Width * Scale || DestDesc.Height!= SrcDesc.Height * Scale ||DestDesc.Format != SrcDesc.Format)
-				{
-					InternalDestination->Release();
-					Device->CreateTexture(SrcDesc.Width * Scale, SrcDesc.Height * Scale, 0, D3DUSAGE_RENDERTARGET, SrcDesc.Format, D3DPOOL_DEFAULT, &InternalDestination, NULL);
-				}
-			}
+	// Set proper render states for drawing post effect
+	Device->SetFVF(D3DFVF_XYZ |D3DFVF_TEX0);							// Vertex Format
+	Device->SetRenderState(D3DRS_ZENABLE, FALSE);						// No Z-Culling
+	Device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);				// No Alpha Test
+	Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);				// No Alpha Blending
+	Device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);				// No Culling
+	Device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_NONE);		// No Filtering
+	Device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_NONE);		// No filtering
+	Device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);	// Texture Adressing in Clamp Mode
+	Device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);	// Texture Adressing in Clamp Mode
 
-			Device->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (SrcDesc.Width * Scale), 1.0f / (SrcDesc.Height * Scale), 0.0f, 0.0f), 1);
-			Device->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / (SrcDesc.Width * Scale), 1.0f / (SrcDesc.Height * Scale), 0.0f, 0.0f), 1);
-			InternalDestination->GetSurfaceLevel(0, &Surface);
-			Device->SetRenderTarget(0, Surface);
-			break;
+	// Set Vertex Shader
+	Device->SetVertexShader(VertexShader);
 
-		case ZE_PPD_FRAMEBUFFER:
-			Device->SetRenderTarget(0, Module->FrameColorBuffer); //  ZEDirect3D9Module::GetD3D9Module()->FrameColorBuffer
-			Device->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / Module->GetScreenWidth(), 1.0f / Module->GetScreenHeight(), 0.0f, 0.0f), 1);
-			Device->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / Module->GetScreenWidth(), 1.0f / Module->GetScreenHeight(), 0.0f, 0.0f), 1);
-			break;
+	// Update kernel values. UpdateKernel() function will detect changed properties of Blur Post Effect and 
+	// if necessery will regenerate kernel values.
+	UpdateKernel();
 
-		default:
-			zeError("D3D9 Post Processor", "Wrong source.");
-			return false;
-			break;
+	// Set Kernel values
+	Device->SetPixelShaderConstantF(0, Kernel.GetCArray(), Kernel.GetCount());
+	Device->SetPixelShaderConstantI(0, &KernelSize, 1);
+
+	if (HorizontalPass && VerticalPass)
+	{
+		// Do both vertical and horizontal passes. 
+		// First do vertical pass and put output in temporary render target
+		// then do second pass read values from temporary render target and put
+		// output in output texture.
+
+		// Create temporary render target. 
+		// ZED3D9CommonTools::CreateRenderTarget will check previous render target is available or has correct dimensions. If not it will create one or modify current one.
+		ZED3D9CommonTools::CreateRenderTarget(&Temporary, InputTexture->GetWidth(), InputTexture->GetHeight(), InputTexture->GetPixelFormat());
+
+
+		// HORIZONTAL PASS
+		// Set horizontal pixel shader
+		Device->SetPixelShader(HorizontalPassPixelShader);
+		// Set input as texture
+		Device->SetTexture(0, ((ZED3D9Texture2D*)InputTexture)->Texture);
+		// Set output as render target
+		LPDIRECT3DSURFACE9 RenderTarget;
+		((ZED3D9Texture2D*)InputTexture)->Texture->GetSurfaceLevel(0, &RenderTarget);
+		Device->SetRenderTarget(0, RenderTarget);
+		// Set Pixel Size
+		PixelWidth_2 *= 2;
+		Device->SetPixelShaderConstantF(1, &PixelWidth_2, 1);
+		// Draw the pass
+		Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 0);
+
+		
+		// VERTICAL PASS
+		// Set horizontal pixel shader
+		Device->SetPixelShader(VerticalPassPixelShader);
+		// Set input as texture
+		Device->SetTexture(0, ((ZED3D9Texture2D*)Temporary)->Texture);
+		// Set output as render target
+		if (OutputToFrameBuffer)
+			Device->SetRenderTarget(0, Module->FrameColorBuffer);
+		else
+		{
+			((ZED3D9Texture2D*)Output)->Texture->GetSurfaceLevel(0, &RenderTarget);
+			Device->SetRenderTarget(0, RenderTarget);
+		}
+		// Set Pixel Size
+		PixelWidth_2 *= 2;
+		Device->SetPixelShaderConstantF(1, &PixelHeight_2, 1);
+		// Draw the pass
+		Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 0);
 	}
-	return true;
-};
-
-void ZED3D9PostProcessor::DrawPostEffect(LPDIRECT3DPIXELSHADER9 PixelShader)
-{
-	Device->SetRenderState(D3DRS_ZENABLE, FALSE);
-	Device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-	Device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-	Device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-	Device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	Device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-	Device->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-
-	Device->SetVertexShader(GeneralVS);
-	Device->SetPixelShader(PixelShader);
-
-	Device->SetStreamSource(0, ScreenQuadVB, 0, 8);
-	Device->SetVertexDeclaration(ScreenQuadVD);
-
-	Device->BeginScene();
-	Device->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
-	Device->EndScene();
-}
-
-void ZED3D9PostProcessor::ApplyInverse(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination)
-{
-	if (ManageSourceDestination(Source, Destination, 1.0f))
-		DrawPostEffect(InversePS);
-}
-
-void ZED3D9PostProcessor::ApplyGrayscale(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination)
-{
-	if (ManageSourceDestination(Source, Destination, 1.0f))
-		DrawPostEffect(GrayscalePS);
-}
-
-void ZED3D9PostProcessor::ApplyColorTransform(ZEPostProcessorSource Source, ZEMatrix3x3 Matrix, ZEPostProcessorDestination Destination)
-{
-	if (ManageSourceDestination(Source, Destination, 1.0f));
-}
-
-void ZED3D9PostProcessor::DirectOutput(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination)
-{
-	if (ManageSourceDestination(Source, Destination, 1.0f))
-		DrawPostEffect(DirectPS);
-}
-
-void ZED3D9PostProcessor::ApplyDownSample4x(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination)
-{
-}
-
-void ZED3D9PostProcessor::ApplyUpSample4x(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination)
-{
-	if (ManageSourceDestination(Source, Destination, 1.0f))
-		DrawPostEffect(DirectPS);
-}
-
-void ZED3D9PostProcessor::ApplyBlurV(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination)
-{
-	if (ManageSourceDestination(Source, Destination, 1.0f))
-		DrawPostEffect(VBlurPS);
-}
-
-void ZED3D9PostProcessor::ApplyBlurH(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination)
-{
-	if (ManageSourceDestination(Source, Destination, 1.0f))
-		DrawPostEffect(HBlurPS);
-}
-
-void ZED3D9PostProcessor::ApplySharpen(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination)
-{
-	if (ManageSourceDestination(Source, Destination, 1.0f))
-		DrawPostEffect(SharpenPS);
-}
-
-void ZED3D9PostProcessor::ApplyEdgeDetectionH(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination)
-{
-	if (ManageSourceDestination(Source, Destination, 1.0f))
-		DrawPostEffect(HEdgePS);
-}
-
-void ZED3D9PostProcessor::ApplyEdgeDetectionV(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination)
-{
-	if (ManageSourceDestination(Source, Destination, 1.0f))
-		DrawPostEffect(VEdgePS);
-}
-
-ZED3D9PostProcessor::ZED3D9PostProcessor()
-{
-	Source = NULL;
-	InternalSource = NULL;
-	InternalDestination = NULL;
-	Destination = NULL;
-}
-
-ZED3D9PostProcessor::~ZED3D9PostProcessor()
-{
-	ZED3D_RELEASE(Source);
-	ZED3D_RELEASE(InternalSource);
-	ZED3D_RELEASE(InternalDestination);
-	ZED3D_RELEASE(Destination);
+	else
+		if (VerticalPass)
+		{
+			// VERTICAL PASS
+			// Set vertical pixel shader
+			Device->SetPixelShader(VerticalPassPixelShader);
+			// Set input as texture
+			Device->SetTexture(0, ((ZED3D9Texture2D*)InputTexture)->Texture);
+			// Set output as render target
+			LPDIRECT3DSURFACE9 RenderTarget;
+			((ZED3D9Texture2D*)Output)->Texture->GetSurfaceLevel(0, &RenderTarget);
+			Device->SetRenderTarget(0, RenderTarget);
+			// Set Pixel Size
+			PixelWidth_2 *= 2;
+			Device->SetPixelShaderConstantF(1, &PixelHeight_2, 1);
+			// Draw the pass
+			Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 0);
+		}
+		else
+		{
+			// HORIZONTAL PASS
+			// Set vertical pixel shader
+			Device->SetPixelShader(HorizontalPassPixelShader);
+			// Set input as texture
+			Device->SetTexture(0, ((ZED3D9Texture2D*)InputTexture)->Texture);
+			// Set output as render target
+			LPDIRECT3DSURFACE9 RenderTarget;
+			((ZED3D9Texture2D*)Output)->Texture->GetSurfaceLevel(0, &RenderTarget);
+			Device->SetRenderTarget(0, RenderTarget);
+			// Set Pixel Size
+			PixelWidth_2 *= 2;
+			Device->SetPixelShaderConstantF(1, &PixelWidth_2, 1);
+			// Draw the pass
+			Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 0);
+		}
 }

@@ -41,11 +41,6 @@
 #include "Entity.h"
 #include "Map/Map.h"
 #include "Portal.h"
-#include "Graphics/PostProcessor.h"
-#include "Graphics/Camera.h"
-#include "Sound/Listener.h"
-#include "Graphics/ViewVolume.h"
-#include "Graphics/FixedMaterial.h"
 
 #define ZE_RCF_ENTITY								1
 #define ZE_RCF_COMPONENT							2
@@ -65,13 +60,22 @@
 #define ZE_VDE_LIGHT_RANGE							512
 #define ZE_VDE_ALL									1023
 
+#define zeScene ZEScene::GetInstance()
+
 class ZESceneBridge
 {
 	virtual void*								GetScene() = 0;
 	virtual void*								OnEntityChanged(ZEEntity* Entity) = 0;
 };
 
-#define zeScene ZEScene::GetInstance()
+class ZEViewVolume;
+class ZEBoundingBox;
+class ZECamera;
+class ZEListener;
+class ZEShadowRenderer;
+class ZEPostProcessor;
+class ZEFixedMaterial;
+class ZEEntity;
 class ZEScene
 {
 	private:
@@ -86,7 +90,7 @@ class ZEScene
 	
 		ZERenderer*								Renderer;
 		ZEPostProcessor*						PostProcessor;
-		ZERenderer*								ShadowRenderer;
+		ZEShadowRenderer*						ShadowRenderer;
 		ZECamera*								ActiveCamera;
 		ZEListener*								ActiveListener;
 

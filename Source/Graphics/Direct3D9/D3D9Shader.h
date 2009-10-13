@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_D3D9SHADER_H__
-#define __ZE_D3D9SHADER_H__
+#ifndef	__ZE_D3D9_SHADER_H__
+#define __ZE_D3D9_SHADER_H__
 
 #include "D3D9ComponentBase.h"
 #include "ZEDS/Array.h"

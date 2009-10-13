@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_D3DCOMPONENTBASE_H_
-#define __ZE_D3DCOMPONENTBASE_H_
+#ifndef	__ZE_D3D9_COMPONENTBASE_H_
+#define __ZE_D3D9_COMPONENTBASE_H_
 
 #ifdef ZEDEBUG_ENABLED
 #define D3D_DEBUG_INFO
@@ -44,15 +44,15 @@
 #include <D3D9.h>
 #include <D3DX9.h>
 
-class ZEDirect3D9Module;
+class ZED3D9Module;
 class ZED3D9ComponentBase
 {
 	protected:
-		static ZEDirect3D9Module*		Module;
+		static ZED3D9Module*			Module;
 		static LPDIRECT3DDEVICE9		Device;
 
 	public:
-		static bool						BaseInitialize(ZEDirect3D9Module* D3DModule);
+		static bool						BaseInitialize(ZED3D9Module* D3DModule);
 
 };
 #endif

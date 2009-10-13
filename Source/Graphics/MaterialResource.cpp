@@ -35,7 +35,8 @@
 
 #include "MaterialResource.h"
 #include "MaterialFileFormat.h"
-#include "TextureResource.h"
+#include "Texture2DResource.h"
+#include "TextureCubeResource.h"
 #include "Core/ResourceFile.h"
 #include "Core/Error.h"
 #include "Core/ResourceManager.h"

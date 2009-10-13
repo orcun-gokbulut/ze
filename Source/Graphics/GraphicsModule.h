@@ -51,6 +51,8 @@ class ZEStaticVertexBuffer;
 class ZEVertexDeclaration;
 class ZERenderOrder;
 class ZERenderer;
+class ZEShadowRenderer;
+class ZETextureRenderer;
 class ZEPostProcessor;
 
 class ZEGraphicsModule : public ZEModule
@@ -111,20 +113,21 @@ class ZEGraphicsModule : public ZEModule
 		virtual void						SetMaterialComponentMask(unsigned int Mask) = 0;
 		virtual unsigned int				GetMaterialComponentMask() = 0;
 
-		virtual ZEPostProcessor*			CreatePostProcessor() = 0;
-		virtual ZERenderer*					CreateFrameRenderer() = 0;
-		virtual ZERenderer*					CreateShadowRenderer() = 0;
-		virtual ZERenderer*					CreateTextureRenderer() = 0;
-
 		virtual void						UpdateScreen() = 0;
 		virtual void						ClearFrameBuffer() = 0;
 
-		virtual ZEStaticVertexBuffer*		CreateStaticVertexBuffer() = 0;
+		virtual ZEPostProcessor*			CreatePostProcessor() = 0;
 
+		virtual ZERenderer*					CreateRenderer() = 0;
+		virtual ZEShadowRenderer*			CreateShadowRenderer() = 0;
+		virtual ZETextureRenderer*			CreateTextureRenderer() = 0;
+
+
+		virtual ZEStaticVertexBuffer*		CreateStaticVertexBuffer() = 0;
 		virtual ZEVertexDeclaration*		CreateVertexDeclaration() = 0;
 
-		virtual ZETexture2D*					CreateTexture() = 0;
-		virtual ZETexture3D*			CreateVolumeTexture() = 0;
+		virtual ZETexture2D*				CreateTexture() = 0;
+		virtual ZETexture3D*				CreateVolumeTexture() = 0;
 		virtual ZETextureCube*				CreateCubeTexture() = 0;
 
 		virtual ZEFixedMaterial*			CreateFixedMaterial() = 0;

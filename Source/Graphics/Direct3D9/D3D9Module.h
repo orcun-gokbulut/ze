@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Direct3D9Module.h
+ Zinek Engine - D3D9Module.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,16 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DIRECT3D9_MODULE_H__
-#define __ZE_DIRECT3D9_MODULE_H__
+#ifndef	__ZE_D3D9_MODULE_H__
+#define __ZE_D3D9_MODULE_H__
 
 #include "Graphics/GraphicsModule.h"
-#include "D3D9Renderer.h"
-#include "D3D9Texture.h"
-#include "D3D9Shader.h"
-#include "D3D9VertexBuffer.h"
-#include "D3D9PostProcessor.h"
-#include "D3D9VertexDeclaration.h"
+#include "ZEDS/Array.h"
 
 #ifdef ZEDEBUG_ENABLED
 #define D3D_DEBUG_INFO
@@ -58,7 +53,18 @@ enum ZEDirect3D9ShaderVersion
 	ZE_D3D9SV_SHADER_MODEL_3	= 2
 };
 
-class ZEDirect3D9Module : public ZEGraphicsModule
+class ZED3D9Texture2D;
+class ZED3D9Texture3D;
+class ZED3D9TextureCube;
+class ZED3D9VertexDeclaration;
+class ZED3D9StaticVertexBuffer;
+class ZED3D9Renderer;
+class ZED3D9ShadowRenderer;
+class ZED3D9TextureRenderer;
+class ZED3D9PostProcessor;
+class ZED3D9Shader;
+
+class ZED3D9Module : public ZEGraphicsModule
 {
 	public:
 		bool											IsDeviceLost;
@@ -72,10 +78,12 @@ class ZEDirect3D9Module : public ZEGraphicsModule
 		LPDIRECT3DSURFACE9								FrameColorBuffer;
 		LPDIRECT3DSURFACE9								FrameZBuffer;
 
-		ZEChunkArray<ZED3D9RendererBase*, 50>			Renderers;
-		ZEChunkArray<ZED3D9Texture*, 50>				Textures;
-		ZEChunkArray<ZED3D9VolumeTexture*, 50>			VolumeTextures;
-		ZEChunkArray<ZED3D9CubeTexture*, 50>			CubeTextures;
+		ZEChunkArray<ZED3D9Renderer*, 50>				Renderers;
+		ZEChunkArray<ZED3D9ShadowRenderer*, 50>			ShadowRenderers;
+		ZEChunkArray<ZED3D9TextureRenderer*, 50>		TextureRenderers;
+		ZEChunkArray<ZED3D9Texture2D*, 50>				Texture2Ds;
+		ZEChunkArray<ZED3D9Texture3D*, 50>				Texture3Ds;
+		ZEChunkArray<ZED3D9TextureCube*, 50>			TextureCubes;
 		ZEChunkArray<ZED3D9Shader*, 50>					Shaders;
 		ZEChunkArray<ZED3D9StaticVertexBuffer*, 50>		VertexBuffers;
 		ZEChunkArray<ZED3D9PostProcessor*, 50>			PostProcessors;
@@ -113,16 +121,16 @@ class ZEDirect3D9Module : public ZEGraphicsModule
 		virtual void							SetMaterialComponentMask(unsigned int Mask);
 		virtual unsigned int					GetMaterialComponentMask();
 
-		virtual ZERenderer*						CreateFrameRenderer();
-		virtual ZERenderer*						CreateShadowRenderer();
-		virtual ZERenderer*						CreateTextureRenderer();
+		virtual ZERenderer*						CreateRenderer();
+		virtual ZEShadowRenderer*				CreateShadowRenderer();
+		virtual ZETextureRenderer*				CreateTextureRenderer();
 		virtual ZEPostProcessor*				CreatePostProcessor();
 
 		virtual ZEVertexDeclaration*			CreateVertexDeclaration();
 
 		virtual ZEStaticVertexBuffer*			CreateStaticVertexBuffer();
-		virtual ZETexture2D*						CreateTexture();
-		virtual ZETexture3D*				CreateVolumeTexture();
+		virtual ZETexture2D*					CreateTexture();
+		virtual ZETexture3D*					CreateVolumeTexture();
 		virtual ZETextureCube*					CreateCubeTexture();
 
 		virtual ZEFixedMaterial*				CreateFixedMaterial();
@@ -130,10 +138,10 @@ class ZEDirect3D9Module : public ZEGraphicsModule
 		virtual ZEFixedMaterial*				CreateCGFXMaterial();
 
 		static LPDIRECT3DDEVICE9				GetD3D9Device();
-		static ZEDirect3D9Module*				GetD3D9Module();
+		static ZED3D9Module*				GetD3D9Module();
 
-												ZEDirect3D9Module();
-											 	~ZEDirect3D9Module();
+												ZED3D9Module();
+											 	~ZED3D9Module();
 };
 
 #endif

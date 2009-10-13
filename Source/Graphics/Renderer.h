@@ -37,8 +37,9 @@
 #ifndef __ZE_RENDERER_H__
 #define __ZE_RENDERER_H__
 
-#include "RenderOrder.h"
-#include "Texture.h"
+#include "ZEDS/Array.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Matrix.h"
 
 struct ZEViewPoint
 {
@@ -51,28 +52,31 @@ struct ZEViewPoint
 	ZEMatrix4x4						ViewProjMatrix;
 };
 
+class ZEPostProcessor;
 class ZECamera;
-class ZETexture2D;
-class ZETextureCube;
+class ZERenderOrder;
 class ZERenderer
 {
 	protected:
-										ZERenderer();
-		virtual							~ZERenderer();
+											ZERenderer();
+		virtual								~ZERenderer();
 
 	public:
-		virtual bool					Initialize() = 0;
-		virtual void					Deinitialize() = 0;
-		virtual void					Destroy();
+		virtual bool						Initialize() = 0;
+		virtual void						Deinitialize() = 0;
 
-		virtual void					SetCamera(ZECamera* Camera) = 0;
-		virtual void					AddToRenderOrder(ZERenderOrder* RenderOrder) = 0;
-		virtual void					ClearList() = 0;
+		virtual void						Destroy();
 
-		virtual bool					SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face) = 0;
-		virtual bool					SetOutput(ZETexture2D* Texture) = 0;
+		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors();
+		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor);
+		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor);
 
-		virtual void					Render(float ElaspedTime = 0) = 0;
+		virtual void						SetCamera(ZECamera* Camera) = 0;
+		virtual void						AddToRenderOrder(ZERenderOrder* RenderOrder) = 0;
+		virtual void						ClearList() = 0;
+
+		virtual void						Render(float ElaspedTime = 0) = 0;
+		
+		static ZERenderer*					CreateInstance();
 };
-
 #endif

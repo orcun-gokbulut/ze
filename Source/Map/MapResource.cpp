@@ -40,6 +40,10 @@
 #include "Core/ResourceManager.h"
 #include "MapFileFormat.h"
 #include "Graphics/GraphicsModule.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/Texture2DResource.h"
+#include "Graphics/RenderOrder.h"
+#include "Octree.h"
 
 // Reading
 

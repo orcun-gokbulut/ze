@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Listener.h"
-#include "Core/Core.h"
+#include "SoundModule.h"
 
 void ZEListener::SetLocalPosition(const ZEVector3& NewPosition)
 {	
