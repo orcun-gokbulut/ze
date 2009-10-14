@@ -367,7 +367,7 @@ void ZELightBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight
 	{
 		RenderOrder.WorldMatrix = Light->GetWorldTransform();
 		Material->SetEmmisiveColor(Light->GetColor());
-		Renderer->AddToRenderOrder(&RenderOrder);
+		Renderer->AddToRenderList(&RenderOrder);
 	}
 }
 

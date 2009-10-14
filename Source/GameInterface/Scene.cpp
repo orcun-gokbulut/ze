@@ -55,7 +55,7 @@ void ZEScene::DrawOrientedBoundingBox(const ZEAABoundingBox& BoundingBox, const 
 			);
 	ZEMatrix4x4::Multiply(BoundingBoxRenderOrder.WorldMatrix, LocalPivot, Transform);
 	BoundingBoxRenderOrder.Material = Material;
-	Renderer->AddToRenderOrder(&BoundingBoxRenderOrder);
+	Renderer->AddToRenderList(&BoundingBoxRenderOrder);
 }
 
 void ZEScene::DrawAxisAlignedBoundingBox(const ZEAABoundingBox& BoundingBox, ZERenderer* Renderer, ZEMaterial* Material)
@@ -65,7 +65,7 @@ void ZEScene::DrawAxisAlignedBoundingBox(const ZEAABoundingBox& BoundingBox, ZER
 		ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z)
 		);
 	BoundingBoxRenderOrder.Material = Material;
-	Renderer->AddToRenderOrder(&BoundingBoxRenderOrder);
+	Renderer->AddToRenderList(&BoundingBoxRenderOrder);
 }
 
 void ZEScene::DrawBoundingSphere(const ZEBoundingSphere& BoundingSphere, ZERenderer* Renderer, ZEMaterial* Material)
@@ -75,7 +75,7 @@ void ZEScene::DrawBoundingSphere(const ZEBoundingSphere& BoundingSphere, ZERende
 		ZEVector3(BoundingSphere.Radius * 2.0f, BoundingSphere.Radius * 2.0f, BoundingSphere.Radius * 2.0f)
 		);
 	BoundingSphereRenderOrder.Material = Material;
-	Renderer->AddToRenderOrder(&BoundingSphereRenderOrder);
+	Renderer->AddToRenderList(&BoundingSphereRenderOrder);
 }
 
 void ZEScene::SetVisualDebugElements(ZEDWORD VisualDebugElements)

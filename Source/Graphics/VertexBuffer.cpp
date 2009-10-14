@@ -44,6 +44,16 @@ ZEVertexBuffer::~ZEVertexBuffer()
 {
 }
 
+ZEStaticVertexBuffer::ZEStaticVertexBuffer()
+{
+}
+
+ZEStaticVertexBuffer::~ZEStaticVertexBuffer()
+{
+}
+
+
+
 bool ZEStaticVertexBuffer::IsStatic()
 {
 	return true;

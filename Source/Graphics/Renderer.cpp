@@ -42,7 +42,7 @@ ZERenderer::ZERenderer()
 
 ZERenderer::~ZERenderer()
 {
-	Deinitialize();
+
 }
 
 void ZERenderer::Destroy()

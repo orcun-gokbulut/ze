@@ -74,7 +74,7 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor);
 		virtual void							RemovePostProcessor(ZEPostProcessor* PostProcessor);
 
-		virtual void							AddToRenderOrder(ZERenderOrder* RenderOrder);
+		virtual void							AddToRenderList(ZERenderOrder* RenderOrder);
 		virtual void							ClearList();
 
 		virtual void							Render(float ElaspedTime);

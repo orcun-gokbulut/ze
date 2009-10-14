@@ -52,6 +52,11 @@
 
 #pragma warning(disable:4267)
 
+ZED3D9Renderer::ZED3D9Renderer()
+{
+
+}
+
 ZED3D9Renderer::~ZED3D9Renderer()
 {
 	// Deinitialize renderer
@@ -69,6 +74,16 @@ void ZED3D9Renderer::Deinitialize()
 
 }
 
+void ZED3D9Renderer::DeviceLost()
+{
+	
+}
+
+bool ZED3D9Renderer::DeviceRestored()
+{
+	return true;
+}
+
 void ZED3D9Renderer::Destroy()
 {
 	// Remove renderer from modules renderer list
@@ -81,15 +96,22 @@ void ZED3D9Renderer::SetCamera(ZECamera* Camera)
 	this->Camera = Camera;
 }
 
-void ZED3D9Renderer::ClearList()
+ZEArray<ZEPostProcessor*>& ZED3D9Renderer::GetPostProcessors()
 {
-	//Clear render lists
-	Imposter.Clear(true);
-	Transparent.Clear(true);
-	NonTransparent.Clear(true);
+	return PostProcessors;
 }
 
-void ZED3D9Renderer::AddToRenderOrder(ZERenderOrder* RenderOrder)
+void ZED3D9Renderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
+{
+	PostProcessors.Add(PostProcessor);
+}
+
+void ZED3D9Renderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
+{
+	PostProcessors.DeleteValue(PostProcessor);
+}
+
+void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZEDEBUG_ENABLED
 		// Check render order is valid
@@ -104,6 +126,14 @@ void ZED3D9Renderer::AddToRenderOrder(ZERenderOrder* RenderOrder)
 		Transparent.Add(*RenderOrder);
 	else
 		NonTransparent.Add(*RenderOrder);
+}
+
+void ZED3D9Renderer::ClearList()
+{
+	//Clear render lists
+	Imposter.Clear(true);
+	Transparent.Clear(true);
+	NonTransparent.Clear(true);
 }
 
 void ZED3D9Renderer::Render(float ElaspedTime)

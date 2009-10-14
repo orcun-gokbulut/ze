@@ -47,10 +47,12 @@
 #include "D3D9Texture3D.h"
 #include "D3D9TextureCube.h"
 #include "D3D9VertexBuffer.h"
+#include "D3D9VertexDeclaration.h"
 #include "D3D9PostProcessor.h"
 #include "D3D9Renderer.h"
 #include "D3D9TextureRenderer.h"
 #include "D3D9ShadowRenderer.h"
+
 
 #include <d3dx9.h>
 
@@ -518,21 +520,21 @@ ZEStaticVertexBuffer* ZED3D9Module::CreateStaticVertexBuffer()
 	return VertexBuffer;
 }
 
-ZETexture2D* ZED3D9Module::CreateTexture()
+ZETexture2D* ZED3D9Module::CreateTexture2D()
 {
 	ZED3D9Texture2D* Texture = new ZED3D9Texture2D();
 	Texture2Ds.Add(Texture);
 	return Texture;
 }
 
-ZETexture3D* ZED3D9Module::CreateVolumeTexture()
+ZETexture3D* ZED3D9Module::CreateTexture3D()
 {
 	ZED3D9Texture3D* Texture = new ZED3D9Texture3D();
 	Texture3Ds.Add(Texture);
 	return Texture;
 }
 
-ZETextureCube* ZED3D9Module::CreateCubeTexture()
+ZETextureCube* ZED3D9Module::CreateTextureCube()
 {
 	ZED3D9TextureCube* Texture = new ZED3D9TextureCube();
 	TextureCubes.Add(Texture);

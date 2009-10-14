@@ -67,12 +67,12 @@ class ZERenderer
 
 		virtual void						Destroy();
 
-		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors();
-		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor);
-		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor);
+		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors() = 0;
+		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;
+		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor) = 0;
 
 		virtual void						SetCamera(ZECamera* Camera) = 0;
-		virtual void						AddToRenderOrder(ZERenderOrder* RenderOrder) = 0;
+		virtual void						AddToRenderList(ZERenderOrder* RenderOrder) = 0;
 		virtual void						ClearList() = 0;
 
 		virtual void						Render(float ElaspedTime = 0) = 0;

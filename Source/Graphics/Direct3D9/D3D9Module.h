@@ -127,18 +127,18 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual ZEPostProcessor*				CreatePostProcessor();
 
 		virtual ZEVertexDeclaration*			CreateVertexDeclaration();
-
 		virtual ZEStaticVertexBuffer*			CreateStaticVertexBuffer();
-		virtual ZETexture2D*					CreateTexture();
-		virtual ZETexture3D*					CreateVolumeTexture();
-		virtual ZETextureCube*					CreateCubeTexture();
+
+		virtual ZETexture2D*					CreateTexture2D();
+		virtual ZETexture3D*					CreateTexture3D();
+		virtual ZETextureCube*					CreateTextureCube();
 
 		virtual ZEFixedMaterial*				CreateFixedMaterial();
 		virtual ZEFixedMaterial*				CreateCustomMaterial();
 		virtual ZEFixedMaterial*				CreateCGFXMaterial();
 
 		static LPDIRECT3DDEVICE9				GetD3D9Device();
-		static ZED3D9Module*				GetD3D9Module();
+		static ZED3D9Module*					GetD3D9Module();
 
 												ZED3D9Module();
 											 	~ZED3D9Module();

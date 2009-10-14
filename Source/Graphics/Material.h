@@ -88,8 +88,19 @@ class ZEMaterial
 		virtual bool					SetupCustomPass(unsigned int CustomPassId) const = 0;
 		virtual bool					DoCustomPass(unsigned int CustomPassId, void* CustomData) const = 0;
 
-		virtual bool					SetupShadowPass() const = 0;	
-		virtual size_t					DoShadowPass() const = 0;
+		/*virtual bool					SetupShadowPass() const = 0;	
+
+		virtual bool					SetupPointLightPass() const = 0;
+		virtual size_t					DoPointLightShadowPass() const = 0;
+
+		virtual bool					SetupDirectionalLightPass() const = 0;
+		virtual size_t					DoDirectionalLightShadowPass() const = 0;
+
+		virtual bool					SetupProjectiveLightPass() const = 0;
+		virtual size_t					DoProjectiveLightShadowPass() const = 0;
+
+		virtual bool					SetupOmniProjectiveLightPass() const = 0;
+		virtual size_t					DoOmniProjectiveLightShadowPass() const = 0;*/
 
 		virtual void					EndOfPasses() const = 0;
 

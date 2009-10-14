@@ -88,7 +88,7 @@ void ZECanvasBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLigh
 		RenderOrder.Material = Material;
 		RenderOrder.PrimitiveType = PrimitiveType;
 		RenderOrder.WorldMatrix = GetWorldTransform();
-		Renderer->AddToRenderOrder(&RenderOrder);
+		Renderer->AddToRenderList(&RenderOrder);
 	}
 }
 

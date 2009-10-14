@@ -126,9 +126,9 @@ class ZEGraphicsModule : public ZEModule
 		virtual ZEStaticVertexBuffer*		CreateStaticVertexBuffer() = 0;
 		virtual ZEVertexDeclaration*		CreateVertexDeclaration() = 0;
 
-		virtual ZETexture2D*				CreateTexture() = 0;
-		virtual ZETexture3D*				CreateVolumeTexture() = 0;
-		virtual ZETextureCube*				CreateCubeTexture() = 0;
+		virtual ZETexture2D*				CreateTexture2D() = 0;
+		virtual ZETexture3D*				CreateTexture3D() = 0;
+		virtual ZETextureCube*				CreateTextureCube() = 0;
 
 		virtual ZEFixedMaterial*			CreateFixedMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCustomMaterial() = 0;

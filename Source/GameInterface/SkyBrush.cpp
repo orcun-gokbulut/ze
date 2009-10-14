@@ -191,7 +191,7 @@ void ZESkyBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>
 		ZEMatrix4x4::CreateRotation(CameraRotation, Camera->GetWorldRotation());
 		ZEMatrix4x4::CreateRotation(SkyRotation, GetRotation());
 		ZEMatrix4x4::Multiply(SkyRenderOrder.WorldMatrix, CameraRotation, SkyRotation);
-		Renderer->AddToRenderOrder(&SkyRenderOrder);
+		Renderer->AddToRenderList(&SkyRenderOrder);
 	}*/
 }
 

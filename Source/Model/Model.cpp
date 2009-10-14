@@ -82,7 +82,7 @@ void ZEModelMeshLOD::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLig
 
 	RenderOrder.Lights.Clear();
 	RenderOrder.Lights.MassAdd(Lights.GetConstCArray(), Lights.GetCount());
-	Renderer->AddToRenderOrder(&RenderOrder);
+	Renderer->AddToRenderList(&RenderOrder);
 }
 
 void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)

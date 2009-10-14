@@ -38,8 +38,8 @@
 #ifndef	__ZE_D3D9_VERTEX_DECLARATION_H__
 #define __ZE_D3D9_VERTEX_DECLARATION_H__
 
-#include "D3D9ComponentBase.h"
 #include "Graphics/VertexDeclaration.h"
+#include "D3D9ComponentBase.h"
 #include "ZEDS/Array.h"
 
 class ZED3D9VertexDeclaration : public ZEVertexDeclaration, private ZED3D9ComponentBase
@@ -65,8 +65,6 @@ class ZED3D9VertexDeclaration : public ZEVertexDeclaration, private ZED3D9Compon
 		virtual bool						Create(const ZEArray<ZEVertexElement>& VertexElements);
 		virtual bool						Create(const ZEVertexElement* VertexElements);
 		virtual void						Release();
-
-
 };
 
 #endif

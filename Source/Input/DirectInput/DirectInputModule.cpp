@@ -35,6 +35,9 @@
 
 #include "DirectInputModule.h"
 #include "DirectInputModuleDescription.h"
+#include "Core/Error.h"
+#include "Core/Window.h"
+#include "Core/Console.h"
 #include "Core/Core.h"
 #include <dinput.h>
 

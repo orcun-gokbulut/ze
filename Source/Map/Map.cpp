@@ -145,7 +145,7 @@ void ZEPortalMap::RenderPortal(ZEMapPortal* Portal, ZERenderer* Renderer, const 
 				Portal->BoundingBox.Max.y - Portal->BoundingBox.Min.y, 
 				Portal->BoundingBox.Max.z - Portal->BoundingBox.Min.z)
 			);
-		//Renderer->AddToRenderOrder(&PortalBBoxRenderOrder); 
+		//Renderer->AddToRenderList(&PortalBBoxRenderOrder); 
 
 		ZESmartArray<ZELight*> PortalLights;
 		for (size_t I = 0; I < SceneLights.GetCount(); I++)
@@ -166,7 +166,7 @@ void ZEPortalMap::RenderPortal(ZEMapPortal* Portal, ZERenderer* Renderer, const 
 				for (size_t N = 0; N < PortalLights.GetCount(); N++)
 					Portal->RenderOrders[I].Lights[N] = PortalLights[N]->GetRenderOrderLight();
 
-				Renderer->AddToRenderOrder(&Portal->RenderOrders[I]);
+				Renderer->AddToRenderList(&Portal->RenderOrders[I]);
 			}
 	}
 }

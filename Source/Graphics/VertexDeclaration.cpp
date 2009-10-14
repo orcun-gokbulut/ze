@@ -59,6 +59,7 @@ struct ZEVertexDeclarationFileElementChunk
 	ZEDWORD		Type;
 	ZEDWORD		Index;
 };
+
 ZEVertexDeclaration::ZEVertexDeclaration()
 {
 	
