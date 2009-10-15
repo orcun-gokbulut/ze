@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9Renderer.cpp
+ Zinek Engine - D3D9TextureRenderer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifdef ZEDEBUG_ENABLED
-#define D3D_DEBUG_INFO
-#endif
-
-#include "D3D9Renderer.h"
+#include "D3D9TextureRenderer.h"
 #include "D3D9RendererBase.h"
 #include "D3D9VertexBuffer.h"
 #include "D3D9Texture2D.h"
@@ -52,66 +48,41 @@
 
 #pragma warning(disable:4267)
 
-ZED3D9Renderer::ZED3D9Renderer()
-{
 
-}
 
-ZED3D9Renderer::~ZED3D9Renderer()
-{
-	// Deinitialize renderer
-	Deinitialize();
-}
-
-bool ZED3D9Renderer::Initialize() 
-{ 
-	// No initialization core necessary
-	return true; 
-} 
-
-void ZED3D9Renderer::Deinitialize()
-{
-
-}
-
-void ZED3D9Renderer::DeviceLost()
-{
-	
-}
-
-bool ZED3D9Renderer::DeviceRestored()
+bool ZED3D9TextureRenderer::Initialize()
 {
 	return true;
 }
 
-void ZED3D9Renderer::Destroy()
+void ZED3D9TextureRenderer::Deinitialize()
 {
-	// Remove renderer from modules renderer list
-	Module->Renderers.DeleteValue((ZED3D9Renderer*)this);
-	delete this;
+	ZED3D_RELEASE(DepthRenderTarget);
+	ZED3D_RELEASE(ColorRenderTarget);
 }
 
-void ZED3D9Renderer::SetCamera(ZECamera* Camera)
+
+void ZED3D9TextureRenderer::Destroy()
+{
+	// Remove renderer from modules renderer list
+	Module->TextureRenderers.DeleteValue((ZED3D9TextureRenderer*)this);
+	ZERenderer::Destroy();
+}
+
+void ZED3D9TextureRenderer::SetCamera(ZECamera* Camera)
 {
 	this->Camera = Camera;
 }
 
-ZEArray<ZEPostProcessor*>& ZED3D9Renderer::GetPostProcessors()
+void ZED3D9TextureRenderer::ClearList()
 {
-	return PostProcessors;
+	//Clear render lists
+	Imposter.Clear(true);
+	Transparent.Clear(true);
+	NonTransparent.Clear(true);
 }
 
-void ZED3D9Renderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
-{
-	PostProcessors.Add(PostProcessor);
-}
-
-void ZED3D9Renderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
-{
-	PostProcessors.DeleteValue(PostProcessor);
-}
-
-void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
+void ZED3D9TextureRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZEDEBUG_ENABLED
 		// Check render order is valid
@@ -128,15 +99,23 @@ void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
 		NonTransparent.Add(*RenderOrder);
 }
 
-void ZED3D9Renderer::ClearList()
+
+ZEArray<ZEPostProcessor*>& ZED3D9TextureRenderer::GetPostProcessors()
 {
-	//Clear render lists
-	Imposter.Clear(true);
-	Transparent.Clear(true);
-	NonTransparent.Clear(true);
+	return PostProcessors;
 }
 
-void ZED3D9Renderer::Render(float ElaspedTime)
+void ZED3D9TextureRenderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
+{
+	PostProcessors.Add(PostProcessor);
+}
+
+void ZED3D9TextureRenderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
+{
+	PostProcessors.DeleteValue(PostProcessor);
+}
+
+void ZED3D9TextureRenderer::Render(float ElaspedTime)
 {
 	// Check render module is enabled and the device is not lost
 	if (!Module->IsEnabled() || Module->IsDeviceLost)
@@ -215,4 +194,95 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 
 	// Finish Drawing
 	Device->EndScene();
+}
+
+bool ZED3D9TextureRenderer::SetOutput(ZETexture2D* Texture)
+{
+	// Check wheather texture is render target or not
+	if (!Texture->IsRenderTarget())
+	{
+		// If not rendere can't use it
+		zeError("D3D9 Texture Renderer", "Can not set output texture becouse texture is not a render target.");
+		return false;
+	}
+
+	LPDIRECT3DTEXTURE9 D3DTexture = ((ZED3D9Texture2D*)Texture)->Texture;
+
+	// Create depth buffer according to texture dimensions
+	ZED3D9CommonTools::CreateDepthRenderTarget(&DepthRenderTarget, Texture->GetWidth(), Texture->GetHeight());
+
+	// Release previous color render target
+	if (ColorRenderTarget != NULL)
+		ColorRenderTarget->Release();
+
+	// Get texture's surface for using as a render target
+	D3DTexture->GetSurfaceLevel(0, &ColorRenderTarget);
+
+	// Store texture in case of device lost (Check out device lost function
+	OutputTexture = Texture;
+	OutputCubeTexture = NULL; 
+
+	return true;
+}
+
+bool ZED3D9TextureRenderer::SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face)
+{
+	// Check wheather texture is render target or not
+	if (!Texture->IsRenderTarget())
+	{
+		// If not rendere can't use it
+		zeError("D3D9 Texture Renderer", "Can not set output texture becouse texture is not a render target.");
+		return false;
+	}
+
+	LPDIRECT3DCUBETEXTURE9 D3DTexture = ((ZED3D9TextureCube*)Texture)->CubeTexture;
+
+	// Create depth buffer according to texture dimensions
+	ZED3D9CommonTools::CreateDepthRenderTarget(&DepthRenderTarget, Texture->GetEdgeLenght(), Texture->GetEdgeLenght());
+
+	// Release previous color render target
+	if (ColorRenderTarget != NULL)
+		ColorRenderTarget->Release();
+	
+	// Get texture's surface for using as a render target
+	D3DTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)Face, 0, &ColorRenderTarget);
+
+	// Store texture in case of device lost (Check out device lost function
+	OutputCubeTexture = Texture;
+	OutputTexture = NULL; 
+
+	return true;
+}
+
+void ZED3D9TextureRenderer::DeviceLost()
+{
+	// If device is lost deinitialize render target
+	Deinitialize();
+}
+
+bool ZED3D9TextureRenderer::DeviceRestored()
+{
+	// When device is restored recreate depth and color render targets
+
+	if (OutputCubeTexture != NULL)
+		return SetOutput(OutputCubeTexture, OutputCubeTextureFace);
+	else if (OutputTexture != NULL)
+		return SetOutput(OutputTexture);
+	else
+		return true;
+}
+
+ZED3D9TextureRenderer::ZED3D9TextureRenderer()
+{
+	OutputTexture = NULL;
+	OutputCubeTexture = NULL;
+	ColorRenderTarget = NULL;
+	DepthRenderTarget = NULL;
+}
+
+ZED3D9TextureRenderer::~ZED3D9TextureRenderer()
+{
+	// Release depth and color render targets
+	ZED3D_RELEASE(ColorRenderTarget);
+	ZED3D_RELEASE(DepthRenderTarget);
 }

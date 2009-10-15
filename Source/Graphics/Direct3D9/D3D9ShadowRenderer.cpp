@@ -1,0 +1,365 @@
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - D3D9ShadowRenderer.cpp
+ ------------------------------------------------------------------------------
+ Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
+
+ This file is part of the Zinek Engine  Software. Zinek Engine Software and the
+ accompanying  materials are  made available  under the  terms of Zinek  Engine
+ Commercial License or the GNU General Public License Version 3.
+
+                      ZINEK ENGINE COMMERCIAL LICENSE
+ Licensees  holding  valid  Zinek Engine Commercial  License(s) may  use  Zinek
+ Engine  Software in  accordance  with   the  commercial  license  agreement(s)
+ (which can only be  issued  by  copyright  owner "Yiğit  Orçun  GÖKBULUT") and
+ provided with the Software  or, alternatively,  in  accordance with the  terms
+ contained  in  a  written  agreement  between  you  and  copyright  owner. For
+ licensing  terms  and conditions  please  contact  with  copyright owner.
+
+                    GNU GENERAL PUBLIC LICENSE VERSION 3
+ This program is free software: you can  redistribute it and/or modify it under
+ the terms of the GNU General Public  License as published by the Free Software
+ Foundation, either  version 3 of  the License, or  (at your option)  any later
+ version. This program is  distributed in the hope that  it will be useful, but
+ WITHOUT ANY WARRANTY; without even the  implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE. See  the GNU General Public License for more
+ details. You  should have received  a copy of the  GNU General  Public License
+ along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+ Copyright Owner Information:
+  Name: Yiğit Orçun GÖKBULUT
+  Contact: orcun.gokbulut@gmail.com
+  Github: https://www.github.com/orcun-gokbulut/ZE
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
+
+#include "D3D9Module.h"
+#include "D3D9ShadowRenderer.h"
+#include "D3D9RendererBase.h"
+#include "D3D9CommonTools.h"
+#include "Core/ResourceFile.h"
+#include "D3D9TextureCube.h"
+#include "D3D9Texture2D.h"
+#include "Core/Error.h"
+#include "Graphics/RenderOrder.h"
+
+#define ZE_MAX_SHADER_SOURCE_SIZE 32768
+
+LPDIRECT3DVERTEXSHADER9 ShadowMapVS = NULL;
+LPDIRECT3DVERTEXSHADER9 ShadowMapTextVS = NULL;
+LPDIRECT3DPIXELSHADER9 ShadowMapPS = NULL;
+LPDIRECT3DPIXELSHADER9 ShadowMapOpasityPS = NULL;
+LPDIRECT3DPIXELSHADER9 ShadowMapDiffuseAlphaPS = NULL;
+	
+bool ZED3D9ShadowRenderer::BaseInitialize()
+{
+/*	char SourceVS[ZE_MAX_SHADER_SOURCE_SIZE], SourcePS[ZE_MAX_SHADER_SOURCE_SIZE];
+	ZEArray<D3DXMACRO> Macros;
+
+	ZEResourceFile::ReadTextFile("Shaders\\ShadowPass.vs", SourceVS, ZE_MAX_SHADER_SOURCE_SIZE);
+	ZEResourceFile::ReadTextFile("Shaders\\ShadowPass.ps", SourcePS, ZE_MAX_SHADER_SOURCE_SIZE);
+	
+	ZED3D9CommonTools::CompileVertexShader(&ShadowMapVS, SourceVS, "Shadow Renderer Shadow Pass", "vs_2_0", Macros.GetCArray());
+	ZED3D9CommonTools::CompilePixelShader(&ShadowMapPS, SourcePS, "Shadow Renderer Shadow Pass", "ps_2_0", Macros.GetCArray());
+
+	Macros.Add();
+	Macros[0].Name = "ZESHADER_TRANSPARANT";
+	Macros[0].Definition = "";
+	Macros.Add();
+	Macros[1].Name = NULL;
+	Macros[1].Definition = NULL;
+	ZED3D9CommonTools::CompileVertexShader(&ShadowMapTextVS, SourceVS, "Transparant Shadow Pass", "vs_2_0", Macros.GetCArray());
+
+	Macros[1].Name = "ZESHADER_OPASITYMAP";
+	Macros[1].Definition = "";
+	Macros.Add();
+	Macros[2].Name = NULL;
+	Macros[2].Definition = NULL;
+	ZED3D9CommonTools::CompilePixelShader(&ShadowMapOpasityPS, SourcePS, "Opasity Map Transparant Shadow Pass", "ps_2_0", Macros.GetCArray());
+
+	Macros.Add();
+	Macros[1].Name = "ZESHADER_DIFFUSEMAP";
+	Macros[1].Definition = "";
+	ZED3D9CommonTools::CompilePixelShader(&ShadowMapDiffuseAlphaPS, SourcePS, "Diffuse Map Alpha Transparant Shadow Pass", "ps_2_0", Macros.GetCArray());
+*/
+	return true;
+}
+
+void ZED3D9ShadowRenderer::BaseDeinitialize()
+{
+	ZED3D_RELEASE(ShadowMapVS);
+	ZED3D_RELEASE(ShadowMapTextVS);
+	ZED3D_RELEASE(ShadowMapPS);
+	ZED3D_RELEASE(ShadowMapOpasityPS);
+	ZED3D_RELEASE(ShadowMapDiffuseAlphaPS);
+}
+
+void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
+{
+	//const ZEMaterial* Material = RenderOrder->Material;
+
+	//if (RenderOrder->Flags & ZE_RLF_SKINNED)
+	//	Device->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+
+	//if (RenderOrder->IndexBuffer != NULL)
+	//	if (RenderOrder->IndexBuffer IsStaticIndexBuffer())
+	//		Device->SetIndices(StaticIndexBuffers[RenderOrder->GetStaticIndexBufferId()]);	*/
+
+	//if (RenderOrder->Flags & ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM)
+	//{
+	//	ZEMatrix4x4 WorldViewProjMatrix;
+	//	ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewPoint.ViewProjMatrix);
+	//	Device->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
+	//}
+	//else
+	//	Device->SetVertexShaderConstantF(0, (float*)&RenderOrder->WorldMatrix, 4);
+
+
+	//Device->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);
+	//Device->SetVertexShaderConstantF(8, (float*)&RenderOrder->WorldMatrix, 4);
+	//Device->SetVertexShaderConstantF(16, (float*)&ZEVector4(ViewPoint.ViewPosition, 1.0f), 1);
+
+	//if (RenderOrder->Flags & ZE_RLF_ENABLE_ZCULLING)
+	//{
+	//	Device->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+	//	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	//	Device->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+	//}
+	//else
+	//	Device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);*/
+	//
+	//if (Material->TwoSided)
+	//	Device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	//else
+	//	Device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+
+	//if (Material->Wireframe)
+	//	Device->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	//else
+	//	Device->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+
+	//Device->SetVertexDeclaration(VertexDeclarations[RenderOrder->VertexType]);
+	//PumpStreams(RenderOrder);
+}
+
+void ZED3D9ShadowRenderer::SetCamera(ZECamera* Camera)
+{
+	this->Camera = Camera;
+}
+
+ZEArray<ZEPostProcessor*>& ZED3D9ShadowRenderer::GetPostProcessors()
+{
+	return PostProcessors;
+}
+
+void ZED3D9ShadowRenderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
+{
+	PostProcessors.Add(PostProcessor);
+}
+
+void ZED3D9ShadowRenderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
+{
+	PostProcessors.DeleteValue(PostProcessor);
+}
+
+bool ZED3D9ShadowRenderer::SetOutput(ZETexture2D* Texture)
+{
+	if (!Texture->IsRenderTarget())
+	{
+		zeError("D3D9 Shadow Renderer", "Can not set output texture becouse texture is not render target.");
+		return false;
+	}
+
+	OutputCubeTexture = NULL;
+	OutputTexture = Texture;
+
+	if (Texture->GetPixelFormat() != ZE_TPF_DEPTH && Texture->GetPixelFormat() != ZE_TPF_SHADOWMAP)
+	{
+		zeError("D3D9 Shadow Renderer", "Can not set output texture becouse texture is not a depth texture.");
+		return false;
+	}
+
+	LPDIRECT3DTEXTURE9 D3DTexture = ((ZED3D9Texture2D*)Texture)->Texture;
+	if (DepthRenderTarget != NULL)
+	{
+		DepthRenderTarget->Release();
+		DepthRenderTarget = NULL;
+	}
+
+	if (D3DTexture->GetSurfaceLevel(0, &DepthRenderTarget) != D3D_OK || DepthRenderTarget == NULL)
+	{
+		zeError("D3D9 Shadow Renderer", "Can not get shadow map surface.");
+		return false;
+	}
+
+	if (!ZED3D9CommonTools::CreateRenderTarget(&ColorRenderTarget, Texture->GetWidth(), Texture->GetHeight(), ZE_TPF_ARGB32))
+		return false;
+	
+	return true;
+}
+
+bool ZED3D9ShadowRenderer::SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face)
+{
+	if (!Texture->IsRenderTarget())
+	{
+		zeError("D3D9 Shadow Renderer", "Can not set output texture becouse texture is not render target.");
+		return false;
+	}
+
+	OutputCubeTexture = Texture;
+	OutputCubeTextureFace = Face;
+	OutputTexture = NULL;
+
+	if (Texture->GetPixelFormat() != ZE_TPF_DEPTH && Texture->GetPixelFormat() != ZE_TPF_SHADOWMAP)
+	{
+		zeError("D3D9 Shadow Renderer", "Can not set output texture becouse texture is not a depth texture.");
+		return false;
+	}
+
+	if (DepthRenderTarget != NULL)
+	{
+		DepthRenderTarget->Release();
+		DepthRenderTarget = NULL;
+	}
+
+	LPDIRECT3DCUBETEXTURE9 D3DTexture = ((ZED3D9TextureCube*)Texture)->CubeTexture;
+	if (D3DTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)Face, 0, &DepthRenderTarget) != D3D_OK || DepthRenderTarget == NULL)
+	{
+		zeError("D3D9 Shadow Renderer", "Can not get shadow map surface.");
+		return false;
+	}
+
+
+	if (!ZED3D9CommonTools::CreateRenderTarget(&ColorRenderTarget, Texture->GetEdgeLenght(), Texture->GetEdgeLenght(), ZE_TPF_ARGB32))
+		return false;
+	
+	return true;
+}
+
+void ZED3D9ShadowRenderer::DeviceLost()
+{
+	Deinitialize();
+}
+
+bool ZED3D9ShadowRenderer::DeviceRestored()
+{
+	if (OutputCubeTexture != NULL)
+		return SetOutput(OutputCubeTexture, OutputCubeTextureFace);
+	else if (OutputTexture != NULL)
+		return SetOutput(OutputTexture);
+
+	return true;
+}
+
+bool ZED3D9ShadowRenderer::Initialize()
+{
+	return true;
+}
+
+void ZED3D9ShadowRenderer::Deinitialize()
+{
+	ZED3D_RELEASE(DepthRenderTarget);
+	ZED3D_RELEASE(ColorRenderTarget);
+}
+
+void ZED3D9ShadowRenderer::Destroy()
+{
+	// Remove renderer from modules renderer list
+	Module->ShadowRenderers.DeleteValue((ZED3D9ShadowRenderer*)this);
+	ZERenderer::Destroy();
+}
+
+
+void ZED3D9ShadowRenderer::ClearList()
+{
+	//Clear render lists
+	Imposter.Clear(true);
+	Transparent.Clear(true);
+	NonTransparent.Clear(true);
+}
+
+void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
+{
+	#ifdef ZEDEBUG_ENABLED
+		// Check render order is valid
+		if (!ZED3D9RendererBase::CheckRenderOrder(RenderOrder))
+			return;
+	#endif
+
+	// Add render orders to render order lists according to their properties
+	if (RenderOrder->Flags & ZE_RLF_IMPOSTER)
+		Imposter.Add(*RenderOrder);
+	if (RenderOrder->Flags & ZE_RLF_TRANSPARENT)
+		Transparent.Add(*RenderOrder);
+	else
+		NonTransparent.Add(*RenderOrder);
+}
+
+void ZED3D9ShadowRenderer::Render(float ElaspedTime)
+{
+/*	if (!Module->IsEnabled() || Module->IsDeviceLost)
+		return;
+
+	Device->SetRenderTarget(0, ColorRenderTarget);
+	Device->SetDepthStencilSurface(DepthRenderTarget);
+	
+	Device->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0x00000000);
+
+	float BiasValue;
+	BiasValue = 0.0001f;//2.0f / 16777215.0f;;
+	Device->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, *(DWORD*)&BiasValue);
+
+	BiasValue = 0.002f;//2.0f / 16777215.0f;;
+	Device->SetRenderState(D3DRS_DEPTHBIAS, *(DWORD*)&BiasValue);
+
+	Device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	Device->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00);
+	Device->SetRenderState(D3DRS_ZENABLE, TRUE);
+	Device->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	
+	Device->SetVertexShader(ShadowMapVS);
+	Device->SetPixelShader(ShadowMapPS);
+
+	Device->BeginScene();
+		for (size_t I = 0; I < NonTransparent.GetCount(); I++)
+			DrawSM2(&NonTransparent[I]);
+
+		if (Transparent.GetCount() != 0)
+		{
+			Device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+			Device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+			Device->SetRenderState(D3DRS_ALPHAREF, 0x01);
+
+			Device->SetVertexShader(ShadowMapTextVS);
+			Device->SetPixelShader(ShadowMapOpasityPS);
+			for (size_t I = 0; I < Transparent.GetCount(); I++)
+				if (((ZEFixedMaterial*)Transparent[I].Material)->OpacityMap != NULL)
+					DrawRenderOrder(&Transparent[I]);
+
+
+			Device->SetPixelShader(ShadowMapDiffuseAlphaPS);
+			for (size_t I = 0; I < Transparent.GetCount(); I++)
+				if (((ZEFixedMaterial*)Transparent[I].Material)->OpacityMap == NULL)
+					DrawRenderOrder(&Transparent[I]);
+		}
+	Device->EndScene();
+//	Module->CurrentFrameId++;*/
+}
+
+
+ZED3D9ShadowRenderer::ZED3D9ShadowRenderer()
+{
+	OutputTexture = NULL;
+	OutputCubeTexture = NULL;
+	ColorRenderTarget = NULL;
+	DepthRenderTarget = NULL;
+}
+
+ZED3D9ShadowRenderer::~ZED3D9ShadowRenderer()
+{
+	// Release depth and color render targets
+	ZED3D_RELEASE(ColorRenderTarget);
+	ZED3D_RELEASE(DepthRenderTarget);
+}
