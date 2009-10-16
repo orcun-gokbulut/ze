@@ -43,6 +43,7 @@
 #include "D3D9ComponentBase.h"
 #include <d3d9.h>
 
+
 class ZED3D9BlurPostEffect : public ZEBlurPostEffect, public ZED3D9ComponentBase
 {
 	private:
@@ -51,6 +52,7 @@ class ZED3D9BlurPostEffect : public ZEBlurPostEffect, public ZED3D9ComponentBase
 		static LPDIRECT3DVERTEXSHADER9		VertexShader;
 		LPDIRECT3DTEXTURE9					Temporary;
 
+	protected:
 											ZED3D9BlurPostEffect();
 											~ZED3D9BlurPostEffect();
 	public:

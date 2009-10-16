@@ -43,43 +43,39 @@ class ZERenderer;
 class ZETexture2D;
 class ZEPostEffect;
 
-class ZEPostEffectProvider
-{
-	public:
-		ZEPostEffect*					CreatePostEffect();
-};
-
 class ZEPostProcessor
 {
 	private:
-		ZEArray<ZEPostProcessor*>		PostEffects;
-		ZEArray<bool>					PostEffectState;
-
-		void							ProcessPostEffect(ZEPostEffect* PostEffect);
-		
-										ZEPostProcessor();
-		virtual							~ZEPostProcessor();
+		ZEArray<ZEPostProcessor*>					Nodes;
+		ZEArray<bool>								NodeStates;
+	
+	protected:
+													ZEPostProcessor();
+		virtual										~ZEPostProcessor();
 		
 	public:
-		virtual void					SetInput(ZERenderer* Renderer);
-		virtual void					SetInput(ZETexture2D* Input);
+		virtual void								SetInput(ZERenderer* Renderer);
+		virtual void								SetInput(ZETexture2D* Input);
 
-		virtual void					SetOutput(ZETexture2D* Output);
-		virtual void					SetOuputToFrameBuffer();
+		virtual void								SetOutput(ZETexture2D* Output);
+		virtual void								SetOuputToFrameBuffer();
 
-		ZEArray<ZEPostProcessor*>&		GetPostEffects();
 
-		virtual ZEPostEffect*			CreatePostEffect(const char* Name);
-		virtual ZEPostEffect*			CreatePostEffect(size_t Index);
+		virtual ZEPostEffect*						CreateNode(const char* TypeName);
+		virtual ZEPostEffect*						CreateNode(size_t TypeId);
 		
-		void							AddPostEffect(ZEPostEffect* PostEffect);
-		void							RemovePostEffect(ZEPostEffect* PostEffect);
-		
-		void							Process();
+		virtual ZEArray<ZEPostProcessorNode*>&		GetNodes();		
+		virtual void								AddNode(ZEPostEffect* PostEffect);
+		virtual void								AddNode(ZEPostEffect* PostEffect);
 
-		virtual void					Destroy();
+		virtual bool								Initialize();
+		virtual void								Deinitialize();
 
-		static ZEPostProcessor*			CreateInstance();
+		virtual void								Process();
+	
+		virtual void								Destroy();
+
+		static ZEPostProcessor*						CreateInstance();
 };
 
 #endif

@@ -467,6 +467,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Graphics\PostProcessorNode.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\PostProcessorNode.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Graphics\ProjectiveLight.cpp"
 				>
 			</File>

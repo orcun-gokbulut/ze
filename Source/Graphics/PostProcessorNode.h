@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PostProcessor.cpp
+ Zinek Engine - PostProcessorNode.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,124 +33,101 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PostProcessor.h"
-#include "Graphics/GraphicsModule.h"
+#pragma once
+#ifndef __ZE_POST_PROCESSOR_NODE_H__
+#define __ZE_POST_PROCESSOR_NODE_H__
 
-ZEPostProcessorNode::ZEPostProcessorNode()
+#include "ZEDS/Array.h"
+
+class ZERenderer;
+class ZETexture2D;
+
+class ZEPostProcessorNode
 {
+	protected:
+										ZEPostProcessorNode();
+		virtual							~ZEPostProcessorNode();	
 
+	public:
+		virtual size_t					GetDependencyCount();
+		virtual ZEPostProcessorNode**	GetDependencies();
+
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
+
+		virtual void					Destroy();
+
+		virtual bool					Process();
+
+		virtual ZETexture2D*			GetOutput() = 0;
+};
+
+class ZEPPColorInputNode : public ZEPostProcessorNode
+{
+	protected:
+		ZERenderer*						Renderer;
+
+										ZEPPColorInputNode();
+		virtual							~ZEPPColorInputNode();	
+
+	public:
+		void							SetRenderer(ZERenderer* Renderer);
+		ZERenderer*						GetRenderer();
+
+		virtual ZETextrure2D*			GetOutput();
+
+		static ZEPPColorInputNode*		CreateInstance();
+};
+
+class ZEPPDepthInputNode : public ZEPostProcessorNode
+{
+	protected:
+		ZERenderer*						Renderer;
+
+										ZEPPDepthInputNode();
+		virtual							~ZEPPDepthInputNode();	
+
+	public:
+		void							SetRenderer(ZERenderer* Renderer);
+		ZERenderer*						GetRenderer();
+
+		virtual ZETextrure2D*			GetOutput();
+
+		static ZEPPDepthInputNode*		CreateInstance();
+};
+
+class ZEPPTextureInputNode : public ZEPostProcessorNode
+{
+	protected:
+		ZETexture2D*					Texture;
+
+										ZEPPTextureInputNode();
+		virtual							~ZEPPTextureInputNode();	
+
+	public:
+		void							SetTexture(ZETexture2D* Texture);
+		ZETexture2D*					GetTexture();
+
+		virtual ZETextrure2D*			GetOutput();
+
+		static ZEPPTextureInputNode*	CreateInstance();
 }
 
-ZEPostProcessorNode::~ZEPostProcessorNode()
+class ZEPPOutputNode
 {
+	protected:
+		ZERenderer*						Renderer;
 
-}
+										ZEPostProcessorOutput();
+		virtual							~ZEPostProcessorOutput();	
 
-size_t ZEPostProcessorNode::GetDependencyCount()
-{
-	return 0;
-}
+	public:
+		void							SetRenderer(ZERenderer* Renderer);
+		ZERenderer*						GetRenderer();
 
-ZEPostProcessorNode** ZEPostProcessorNode::GetDependencies()
-{
-	return NULL;
-}
+		virtual ZETextrure2D*			GetOutput();
 
-bool ZEPostProcessorNode::Initialize()
-{
-	return true;
-}
+		static ZEPostProcessorOutput*	CreateInstance();
+};
 
-void ZEPostProcessorNode::Deinitialize()
-{
-}
-
-void ZEPostProcessorNode::Destroy()
-{
-	delete this;
-}
-
-ZEPostProcessor::ZEPostProcessor()
-{
-}
-
-ZEPostProcessor::~ZEPostProcessor()
-{
-}
-
-void ZEPostProcessor::SetInput(ZERenderer* Renderer)
-{
-}
-
-void ZEPostProcessor::SetInput(ZETexture2D* Input)
-{
-}
-
-void ZEPostProcessor::SetOutput(ZETexture2D* Output)
-{
-}
-
-void ZEPostProcessor::SetOuputToFrameBuffer()
-{
-}
-
-
-ZEArray<ZEPostProcessor*>& ZEPostProcessor::GetPostEffects()
-{
-}
-
-ZEPostEffect* ZEPostProcessor::CreatePostEffect(const char* Name)
-{
-}
-
-ZEPostEffect* ZEPostProcessor::CreatePostEffect(size_t Index)
-{
-}
-		
-void ZEPostProcessor::AddNode(ZEPostPRocessorNode* Node)
-{
-	Nodes.Add(Node);
-}
-
-void ZEPostProcessor::RemoveNode(ZEPostPRocessorNode* Node)
-{
-	Nodes.DeleteValue(Node);
-}
-
-bool ZEPostProcessor::Initialize()
-{
-	// Set node state count
-	NodeStates.SetCount(Nodes.GetCount());
-
-	// Fill node states with false which mean that node is not processed
-	NodeStates.FillWith(false);
-
-	// Initialize nodes
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		Nodes[I]->Initialize();
-	
-	return true;
-}
-
-void ZEPostProcessor::Deinitialize()
-{
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		Nodes[I]->Deinitialize();
-}
-
-void ZEPostProcessor::Process()
-{
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		if (NodeStates[I] == false)
-			Nodes[I]->Process();
-}
-
-void ZEPostProcessor::Destroy()
-{
-	delete this;
-}
-
-ZEPostProcessor* ZEPostProcessor::CreateInstance()
-{
-	return zeGraphics->CreatePostProcessor();
-}
+#endif

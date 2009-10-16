@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PostProcessor.cpp
+ Zinek Engine - PostProcessorNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PostProcessor.h"
-#include "Graphics/GraphicsModule.h"
+#include "PostProcessorNode.h"
 
 ZEPostProcessorNode::ZEPostProcessorNode()
 {
@@ -68,89 +67,4 @@ void ZEPostProcessorNode::Deinitialize()
 void ZEPostProcessorNode::Destroy()
 {
 	delete this;
-}
-
-ZEPostProcessor::ZEPostProcessor()
-{
-}
-
-ZEPostProcessor::~ZEPostProcessor()
-{
-}
-
-void ZEPostProcessor::SetInput(ZERenderer* Renderer)
-{
-}
-
-void ZEPostProcessor::SetInput(ZETexture2D* Input)
-{
-}
-
-void ZEPostProcessor::SetOutput(ZETexture2D* Output)
-{
-}
-
-void ZEPostProcessor::SetOuputToFrameBuffer()
-{
-}
-
-
-ZEArray<ZEPostProcessor*>& ZEPostProcessor::GetPostEffects()
-{
-}
-
-ZEPostEffect* ZEPostProcessor::CreatePostEffect(const char* Name)
-{
-}
-
-ZEPostEffect* ZEPostProcessor::CreatePostEffect(size_t Index)
-{
-}
-		
-void ZEPostProcessor::AddNode(ZEPostPRocessorNode* Node)
-{
-	Nodes.Add(Node);
-}
-
-void ZEPostProcessor::RemoveNode(ZEPostPRocessorNode* Node)
-{
-	Nodes.DeleteValue(Node);
-}
-
-bool ZEPostProcessor::Initialize()
-{
-	// Set node state count
-	NodeStates.SetCount(Nodes.GetCount());
-
-	// Fill node states with false which mean that node is not processed
-	NodeStates.FillWith(false);
-
-	// Initialize nodes
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		Nodes[I]->Initialize();
-	
-	return true;
-}
-
-void ZEPostProcessor::Deinitialize()
-{
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		Nodes[I]->Deinitialize();
-}
-
-void ZEPostProcessor::Process()
-{
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		if (NodeStates[I] == false)
-			Nodes[I]->Process();
-}
-
-void ZEPostProcessor::Destroy()
-{
-	delete this;
-}
-
-ZEPostProcessor* ZEPostProcessor::CreateInstance()
-{
-	return zeGraphics->CreatePostProcessor();
 }

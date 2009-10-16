@@ -38,10 +38,9 @@
 #define __ZE_POST_EFFECTS_H__
 
 #include "ZEDS/Array.h"
-
+#include "PostProcessorNode.h"
 class ZETexture2D;
-
-class ZEPostEffect
+class ZEPostEffect : public ZEPostProcessorNode
 {
 	protected:
 										ZEPostEffect();
@@ -52,12 +51,8 @@ class ZEPostEffect
 		virtual ZEPostEffect*			GetDependencies() = 0;
 
 
-		virtual bool					SetInput(ZETexture2D* Texture) = 0;
-		virtual bool					SetInput(ZEPostEffect* Input) = 0;
-		virtual ZEPostEffect*			GetInput() = 0;
-
-		virtual void					SetOutputToFrameBuffer(bool Enabled) = 0;
-		virtual bool					GetOutputToFrameBuffer() = 0;
+		virtual bool					SetInput(ZEPostProcessorNode* Node) = 0;
+		virtual ZEPostProcessorNode*	GetInput() = 0;
 
 		virtual ZETexture2D*			GetOutput() = 0;
 
