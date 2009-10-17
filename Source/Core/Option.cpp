@@ -316,8 +316,8 @@ bool ZEOptionManager::ListSectionsCommand(ZECommand* Command, const ZECommandPar
 	for (size_t I = Index; I < Sections.GetCount() && I <= Count; I++)
 	{
 		CurrSection = Sections.GetItem(I);
-		zeOutput(" %-30s   %11s   %d\r\n", CurrSection->GetName(), CurrSection->GetNumberOfOptions(), 
-			(CurrSection->HasChanges() ? "    Yes    " : "   No      "));
+		zeOutput(" %-30s   %11s   %d\r\n", CurrSection->GetName(), (CurrSection->HasChanges() ? "    Yes    " : "   No      "),
+			CurrSection->GetNumberOfOptions());
 	}
 	return true;
 }
@@ -715,8 +715,8 @@ ZEOptionManager::ZEOptionManager()
 	Commands.SetName("Options");
 	Commands.AddCommand(new ZECommand("Save", BindDelegate(this, &ZEOptionManager::SaveCommand)));
 	Commands.AddCommand(new ZECommand("Load", BindDelegate(this, &ZEOptionManager::LoadCommand)));
-	Commands.AddCommand(new ZECommand("ListOptions", BindDelegate(this, &ZEOptionManager::ListSectionsCommand)));
-	Commands.AddCommand(new ZECommand("ListSections",BindDelegate(this, &ZEOptionManager::ListOptionsCommand)));
+	Commands.AddCommand(new ZECommand("ListSections", BindDelegate(this, &ZEOptionManager::ListSectionsCommand)));
+	Commands.AddCommand(new ZECommand("ListOptions",BindDelegate(this, &ZEOptionManager::ListOptionsCommand)));
 	Commands.AddCommand(new ZECommand("CommitChanges", BindDelegate(this, &ZEOptionManager::CommitChangesCommand)));
 	Commands.AddCommand(new ZECommand("ResetChanges",BindDelegate(this, &ZEOptionManager::ResetChangesCommand)));
 	zeCommands->RegisterSection(&Commands);

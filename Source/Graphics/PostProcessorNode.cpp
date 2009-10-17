@@ -68,3 +68,8 @@ void ZEPostProcessorNode::Destroy()
 {
 	delete this;
 }
+
+bool ZEPostProcessorNode::Process()
+{
+	return true;
+}

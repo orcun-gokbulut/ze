@@ -34,41 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "PostProcessor.h"
+#include "PostProcessorNode.h"
 #include "Graphics/GraphicsModule.h"
-
-ZEPostProcessorNode::ZEPostProcessorNode()
-{
-
-}
-
-ZEPostProcessorNode::~ZEPostProcessorNode()
-{
-
-}
-
-size_t ZEPostProcessorNode::GetDependencyCount()
-{
-	return 0;
-}
-
-ZEPostProcessorNode** ZEPostProcessorNode::GetDependencies()
-{
-	return NULL;
-}
-
-bool ZEPostProcessorNode::Initialize()
-{
-	return true;
-}
-
-void ZEPostProcessorNode::Deinitialize()
-{
-}
-
-void ZEPostProcessorNode::Destroy()
-{
-	delete this;
-}
 
 ZEPostProcessor::ZEPostProcessor()
 {
@@ -95,24 +62,27 @@ void ZEPostProcessor::SetOuputToFrameBuffer()
 }
 
 
-ZEArray<ZEPostProcessor*>& ZEPostProcessor::GetPostEffects()
+ZEArray<ZEPostProcessorNode*>& ZEPostProcessor::GetNodes()
 {
+	return Nodes;
 }
 
-ZEPostEffect* ZEPostProcessor::CreatePostEffect(const char* Name)
+ZEPostProcessorNode* ZEPostProcessor::CreateNode(const char* Name)
 {
+	return NULL;
 }
 
-ZEPostEffect* ZEPostProcessor::CreatePostEffect(size_t Index)
+ZEPostProcessorNode* ZEPostProcessor::CreateNode(size_t Index)
 {
+	return NULL;
 }
 		
-void ZEPostProcessor::AddNode(ZEPostPRocessorNode* Node)
+void ZEPostProcessor::AddNode(ZEPostProcessorNode* Node)
 {
 	Nodes.Add(Node);
 }
 
-void ZEPostProcessor::RemoveNode(ZEPostPRocessorNode* Node)
+void ZEPostProcessor::RemoveNode(ZEPostProcessorNode* Node)
 {
 	Nodes.DeleteValue(Node);
 }

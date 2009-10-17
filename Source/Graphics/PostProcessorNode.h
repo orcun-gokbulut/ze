@@ -74,7 +74,7 @@ class ZEPPColorInputNode : public ZEPostProcessorNode
 		void							SetRenderer(ZERenderer* Renderer);
 		ZERenderer*						GetRenderer();
 
-		virtual ZETextrure2D*			GetOutput();
+		virtual ZETexture2D*			GetOutput();
 
 		static ZEPPColorInputNode*		CreateInstance();
 };
@@ -91,7 +91,7 @@ class ZEPPDepthInputNode : public ZEPostProcessorNode
 		void							SetRenderer(ZERenderer* Renderer);
 		ZERenderer*						GetRenderer();
 
-		virtual ZETextrure2D*			GetOutput();
+		virtual ZETexture2D*			GetOutput();
 
 		static ZEPPDepthInputNode*		CreateInstance();
 };
@@ -108,26 +108,26 @@ class ZEPPTextureInputNode : public ZEPostProcessorNode
 		void							SetTexture(ZETexture2D* Texture);
 		ZETexture2D*					GetTexture();
 
-		virtual ZETextrure2D*			GetOutput();
+		virtual ZETexture2D*			GetOutput();
 
 		static ZEPPTextureInputNode*	CreateInstance();
-}
+};
 
 class ZEPPOutputNode
 {
 	protected:
 		ZERenderer*						Renderer;
 
-										ZEPostProcessorOutput();
-		virtual							~ZEPostProcessorOutput();	
+										ZEPPOutputNode();
+		virtual							~ZEPPOutputNode();	
 
 	public:
 		void							SetRenderer(ZERenderer* Renderer);
 		ZERenderer*						GetRenderer();
 
-		virtual ZETextrure2D*			GetOutput();
+		virtual ZETexture2D*			GetOutput();
 
-		static ZEPostProcessorOutput*	CreateInstance();
+		static ZEPPOutputNode*			CreateInstance();
 };
 
 #endif

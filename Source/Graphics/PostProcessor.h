@@ -41,12 +41,12 @@
 
 class ZERenderer;
 class ZETexture2D;
-class ZEPostEffect;
+class ZEPostProcessorNode;
 
 class ZEPostProcessor
 {
 	private:
-		ZEArray<ZEPostProcessor*>					Nodes;
+		ZEArray<ZEPostProcessorNode*>				Nodes;
 		ZEArray<bool>								NodeStates;
 	
 	protected:
@@ -61,12 +61,12 @@ class ZEPostProcessor
 		virtual void								SetOuputToFrameBuffer();
 
 
-		virtual ZEPostEffect*						CreateNode(const char* TypeName);
-		virtual ZEPostEffect*						CreateNode(size_t TypeId);
+		virtual ZEPostProcessorNode*				CreateNode(const char* TypeName);
+		virtual ZEPostProcessorNode*				CreateNode(size_t TypeId);
 		
 		virtual ZEArray<ZEPostProcessorNode*>&		GetNodes();		
-		virtual void								AddNode(ZEPostEffect* PostEffect);
-		virtual void								AddNode(ZEPostEffect* PostEffect);
+		virtual void								AddNode(ZEPostProcessorNode* Node);
+		virtual void								RemoveNode(ZEPostProcessorNode* Node);
 
 		virtual bool								Initialize();
 		virtual void								Deinitialize();

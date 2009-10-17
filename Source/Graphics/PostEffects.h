@@ -48,10 +48,10 @@ class ZEPostEffect : public ZEPostProcessorNode
 
 	public:
 		virtual size_t					GetDependencyCount() = 0;
-		virtual ZEPostEffect*			GetDependencies() = 0;
+		virtual ZEPostProcessorNode**	GetDependencies() = 0;
 
 
-		virtual bool					SetInput(ZEPostProcessorNode* Node) = 0;
+		virtual void					SetInput(ZEPostProcessorNode* Node) = 0;
 		virtual ZEPostProcessorNode*	GetInput() = 0;
 
 		virtual ZETexture2D*			GetOutput() = 0;
@@ -64,10 +64,10 @@ class ZEPostEffect : public ZEPostProcessorNode
 		virtual bool					Process() = 0;
 };
 
-class ZEBlurPostEffect
+class ZEBlurPostEffect : public ZEPostEffect
 {
 	protected:		
-		ZEPostEffect*					Input;
+		ZEPostProcessorNode*			Input;
 		ZETexture2D*					InputTexture;
 
 		ZETexture2D*					Output;
@@ -88,17 +88,14 @@ class ZEBlurPostEffect
 
 	public:	
 		virtual size_t					GetDependencyCount();
-		virtual ZEPostEffect**			GetDependencies();
+		virtual ZEPostProcessorNode**	GetDependencies();
 
-		virtual void					SetInput(ZETexture2D* Texture);
-		virtual void					SetInput(ZEPostEffect* Input);
-		virtual ZEPostEffect*			GetInput();
+
+		virtual void					SetInput(ZEPostProcessorNode* Node);
+		virtual ZEPostProcessorNode*	GetInput();
 
 		virtual ZETexture2D*			GetOutput();
 		
-		void							SetOutputToFrameBuffer(bool Enabled);
-		bool							GetOutputToFrameBuffer();
-
 		void							SetHorizontalPass(bool Enable);
 		bool							GetHorizontalPass();
 

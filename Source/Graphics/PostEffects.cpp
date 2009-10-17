@@ -84,22 +84,17 @@ size_t ZEBlurPostEffect::GetDependencyCount()
 	return 1;
 }
 
-ZEPostEffect** ZEBlurPostEffect::GetDependencies()
+ZEPostProcessorNode** ZEBlurPostEffect::GetDependencies()
 {
 	return &Input;
 }
 
-void ZEBlurPostEffect::SetInput(ZETexture2D* Texture)
-{
-	InputTexture = Texture;
-}
-
-void ZEBlurPostEffect::SetInput(ZEPostEffect* Input)
+void ZEBlurPostEffect::SetInput(ZEPostProcessorNode* Input)
 {
 	this->Input = Input;
 }
 
-ZEPostEffect* ZEBlurPostEffect::GetInput()
+ZEPostProcessorNode* ZEBlurPostEffect::GetInput()
 {
 	return Input;
 }
@@ -109,15 +104,6 @@ ZETexture2D* ZEBlurPostEffect::GetOutput()
 	return Output;
 }
 
-void ZEBlurPostEffect::SetOutputToFrameBuffer(bool Enabled)
-{
-	OutputToFrameBuffer = Enabled;
-}
-
-bool ZEBlurPostEffect::GetOutputToFrameBuffer()
-{
-	return OutputToFrameBuffer;	
-}
 
 void ZEBlurPostEffect::SetHorizontalPass(bool Enable)
 {
