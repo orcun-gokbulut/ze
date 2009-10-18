@@ -58,7 +58,7 @@ class ZED3D9Texture3D;
 class ZED3D9TextureCube;
 class ZED3D9VertexDeclaration;
 class ZED3D9StaticVertexBuffer;
-class ZED3D9Renderer;
+class ZED3D9FrameBufferRenderer;
 class ZED3D9ShadowRenderer;
 class ZED3D9TextureRenderer;
 class ZED3D9PostProcessor;
@@ -78,7 +78,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		LPDIRECT3DSURFACE9								FrameColorBuffer;
 		LPDIRECT3DSURFACE9								FrameZBuffer;
 
-		ZEChunkArray<ZED3D9Renderer*, 50>				Renderers;
+		ZEChunkArray<ZED3D9FrameBufferRenderer*, 50>				Renderers;
 		ZEChunkArray<ZED3D9ShadowRenderer*, 50>			ShadowRenderers;
 		ZEChunkArray<ZED3D9TextureRenderer*, 50>		TextureRenderers;
 		ZEChunkArray<ZED3D9Texture2D*, 50>				Texture2Ds;
@@ -121,7 +121,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual void							SetMaterialComponentMask(unsigned int Mask);
 		virtual unsigned int					GetMaterialComponentMask();
 
-		virtual ZERenderer*						CreateRenderer();
+		virtual ZEFrameBufferRenderer*			CreateFrameBufferRenderer();
 		virtual ZEShadowRenderer*				CreateShadowRenderer();
 		virtual ZETextureRenderer*				CreateTextureRenderer();
 		virtual ZEPostProcessor*				CreatePostProcessor();

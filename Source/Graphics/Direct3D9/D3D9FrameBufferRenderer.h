@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9Renderer.h
+ Zinek Engine - D3D9FrameBufferRenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,51 +34,63 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D9_RENDERER_H__
-#define __ZE_D3D9_RENDERER_H__
+#ifndef __ZE_D3D9_FRAME_BUFFER_RENDERER_H__
+#define __ZE_D3D9_FRAME_BUFFER_RENDERER_H__
 
-#include "Graphics/Renderer.h"
-#include "Graphics/TextureRenderer.h"
-#include "Graphics/ShadowRenderer.h"
-#include "Graphics/Texture.h"
-#include "D3D9Shader.h"
+#include "Graphics/FrameBufferRenderer.h"
 #include "D3D9ComponentBase.h"
 
-class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
+class ZED3D9FrameBufferRenderer : public ZEFrameBufferRenderer, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	private:
-		ZESmartArray<ZERenderOrder>				NonTransparent;
-		ZESmartArray<ZERenderOrder>				Transparent;
-		ZESmartArray<ZERenderOrder>				Imposter;
+		bool								
+		ZESmartArray<ZERenderOrder>			NonTransparent;
+		ZESmartArray<ZERenderOrder>			Transparent;
+		ZESmartArray<ZERenderOrder>			Imposter;
 		
-		ZECamera*								Camera;
+		ZECamera*							Camera;
 		
-		ZEArray<ZEPostProcessor*>				PostProcessors;
+		ZEArray<ZEPostProcessor*>			PostProcessors;
 
 	protected:
-												ZED3D9Renderer();
-		virtual									~ZED3D9Renderer();					
+											ZED3D9FrameBufferRenderer();
+		virtual								~ZED3D9FrameBufferRenderer();					
 
 	public:
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
-		virtual void							Destroy();
+		virtual void						SetRenderColorTexture(bool Enable);
+		virtual bool						GetRenderColorTexture();
 
-		virtual void							DeviceLost();
-		virtual bool							DeviceRestored();
+		virtual void						SetRenderDepthTexture(bool Enable);
+		virtual bool						GetRenderDepthTexture();
 
-		virtual void							SetCamera(ZECamera* Camera);
+		virtual void						SetRenderVelocityTexture(bool Enable);
+		virtual bool						GetRenderVelocityTexture();
 
-		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors();
-		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor);
-		virtual void							RemovePostProcessor(ZEPostProcessor* PostProcessor);
+		virtual void						SetRenderObjectTexture();
+		virtual bool						GetRenderObjectTexture();
+	
+		virtual ZETexture2D*				GetColorTexture();
+		virtual ZETexture2D*				GetDepthTexture();
+		virtual ZETexture2D*				GetVelociyTexture();
+		virtual ZETexture2D*				GetObjectTexture();
 
-		virtual void							AddToRenderList(ZERenderOrder* RenderOrder);
-		virtual void							ClearList();
+		virtual bool						Initialize();
+		virtual void						Deinitialize();
+		virtual void						Destroy();
 
-		virtual void							Render(float ElaspedTime);
+		virtual void						DeviceLost();
+		virtual bool						DeviceRestored();
+		virtual void						SetCamera(ZECamera* Camera);
 
+		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors();
+		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor);
+		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor);
+
+		virtual void						AddToRenderList(ZERenderOrder* RenderOrder);
+		virtual void						ClearList();
+
+		virtual void						Render(float ElaspedTime);
 };
 
 #endif

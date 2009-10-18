@@ -50,7 +50,7 @@ class ZEFixedMaterial;
 class ZEStaticVertexBuffer;
 class ZEVertexDeclaration;
 class ZERenderOrder;
-class ZERenderer;
+class ZEFrameBufferRenderer;
 class ZEShadowRenderer;
 class ZETextureRenderer;
 class ZEPostProcessor;
@@ -118,7 +118,7 @@ class ZEGraphicsModule : public ZEModule
 
 		virtual ZEPostProcessor*			CreatePostProcessor() = 0;
 
-		virtual ZERenderer*					CreateRenderer() = 0;
+		virtual ZEFrameBufferRenderer*		CreateFrameBufferRenderer() = 0;
 		virtual ZEShadowRenderer*			CreateShadowRenderer() = 0;
 		virtual ZETextureRenderer*			CreateTextureRenderer() = 0;
 

@@ -76,7 +76,6 @@ class ZERenderer
 		virtual void						ClearList() = 0;
 
 		virtual void						Render(float ElaspedTime = 0) = 0;
-		
-		static ZERenderer*					CreateInstance();
 };
+
 #endif

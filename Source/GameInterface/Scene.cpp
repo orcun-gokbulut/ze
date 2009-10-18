@@ -36,7 +36,7 @@
 #include "Scene.h"
 #include "Sound/SoundModule.h"
 #include "Graphics/GraphicsModule.h"
-#include "Graphics/Renderer.h"
+#include "Graphics/FrameBufferRenderer.h"
 #include "Graphics/ShadowRenderer.h"
 #include "Core/Error.h"
 #include "Game.h";
@@ -93,7 +93,7 @@ bool ZEScene::Initialize()
 	if (Renderer != NULL)
 		Renderer->Destroy();
 	
-	Renderer = ZERenderer::CreateInstance();
+	Renderer = ZEFrameBufferRenderer::CreateInstance();
 	if (Renderer == NULL)
 	{
 		zeCriticalError("Scene Manager", "Can not create renderer.");

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Renderer.cpp
+ Zinek Engine - FrameBufferRenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,19 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef __ZE_FRAME_BUFFER_RENDERER_H__
+#define __ZE_FRAME_BUFFER_RENDERER_H__
+
 #include "Renderer.h"
-#include "GraphicsModule.h"
 
-ZERenderer::ZERenderer()
+class ZETexture2D;
+class ZEFrameBufferRenderer : public ZERenderer
 {
-}
+	public:
+		virtual void						SetRenderColorTexture(bool Enable) = 0;
+		virtual bool						GetRenderColorTexture() = 0;
 
-ZERenderer::~ZERenderer()
-{
+		virtual void						SetRenderDepthTexture(bool Enable) = 0;
+		virtual bool						GetRenderDepthTexture() = 0;
 
-}
+		virtual void						SetRenderVelocityTexture(bool Enable) = 0;
+		virtual bool						GetRenderVelocityTexture() = 0;
 
-void ZERenderer::Destroy()
-{
-	delete this;
-}
+		virtual void						SetRenderObjectTexture() = 0;
+		virtual bool						GetRenderObjectTexture() = 0;
+
+		virtual ZETexture2D*				GetColorTexture() = 0;
+		virtual ZETexture2D*				GetDepthTexture() = 0;
+		virtual ZETexture2D*				GetVelociyTexture() = 0;
+		virtual ZETexture2D*				GetObjectTexture() = 0;
+
+		static ZEFrameBufferRenderer*		CreateInstance();
+};
+
+#endif

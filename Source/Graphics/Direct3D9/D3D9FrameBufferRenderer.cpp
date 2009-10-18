@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9Renderer.cpp
+ Zinek Engine - D3D9FrameBufferRenderer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #define D3D_DEBUG_INFO
 #endif
 
-#include "D3D9Renderer.h"
+#include "D3D9FrameBufferRenderer.h"
 #include "D3D9RendererBase.h"
 #include "D3D9VertexBuffer.h"
 #include "D3D9Texture2D.h"
@@ -52,66 +52,66 @@
 
 #pragma warning(disable:4267)
 
-ZED3D9Renderer::ZED3D9Renderer()
+ZED3D9FrameBufferRenderer::ZED3D9FrameBufferRenderer()
 {
 
 }
 
-ZED3D9Renderer::~ZED3D9Renderer()
+ZED3D9FrameBufferRenderer::~ZED3D9FrameBufferRenderer()
 {
 	// Deinitialize renderer
 	Deinitialize();
 }
 
-bool ZED3D9Renderer::Initialize() 
+bool ZED3D9FrameBufferRenderer::Initialize() 
 { 
 	// No initialization core necessary
 	return true; 
 } 
 
-void ZED3D9Renderer::Deinitialize()
+void ZED3D9FrameBufferRenderer::Deinitialize()
 {
 
 }
 
-void ZED3D9Renderer::DeviceLost()
+void ZED3D9FrameBufferRenderer::DeviceLost()
 {
 	
 }
 
-bool ZED3D9Renderer::DeviceRestored()
+bool ZED3D9FrameBufferRenderer::DeviceRestored()
 {
 	return true;
 }
 
-void ZED3D9Renderer::Destroy()
+void ZED3D9FrameBufferRenderer::Destroy()
 {
 	// Remove renderer from modules renderer list
-	Module->Renderers.DeleteValue((ZED3D9Renderer*)this);
+	Module->Renderers.DeleteValue((ZED3D9FrameBufferRenderer*)this);
 	delete this;
 }
 
-void ZED3D9Renderer::SetCamera(ZECamera* Camera)
+void ZED3D9FrameBufferRenderer::SetCamera(ZECamera* Camera)
 {
 	this->Camera = Camera;
 }
 
-ZEArray<ZEPostProcessor*>& ZED3D9Renderer::GetPostProcessors()
+ZEArray<ZEPostProcessor*>& ZED3D9FrameBufferRenderer::GetPostProcessors()
 {
 	return PostProcessors;
 }
 
-void ZED3D9Renderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
+void ZED3D9FrameBufferRenderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
 {
 	PostProcessors.Add(PostProcessor);
 }
 
-void ZED3D9Renderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
+void ZED3D9FrameBufferRenderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
 {
 	PostProcessors.DeleteValue(PostProcessor);
 }
 
-void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
+void ZED3D9FrameBufferRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZEDEBUG_ENABLED
 		// Check render order is valid
@@ -128,7 +128,7 @@ void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
 		NonTransparent.Add(*RenderOrder);
 }
 
-void ZED3D9Renderer::ClearList()
+void ZED3D9FrameBufferRenderer::ClearList()
 {
 	//Clear render lists
 	Imposter.Clear(true);
@@ -136,7 +136,7 @@ void ZED3D9Renderer::ClearList()
 	NonTransparent.Clear(true);
 }
 
-void ZED3D9Renderer::Render(float ElaspedTime)
+void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 {
 	// Check render module is enabled and the device is not lost
 	if (!Module->IsEnabled() || Module->IsDeviceLost)

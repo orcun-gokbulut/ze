@@ -49,7 +49,7 @@
 #include "D3D9VertexBuffer.h"
 #include "D3D9VertexDeclaration.h"
 #include "D3D9PostProcessor.h"
-#include "D3D9Renderer.h"
+#include "D3D9FrameBufferRenderer.h"
 #include "D3D9TextureRenderer.h"
 #include "D3D9ShadowRenderer.h"
 
@@ -440,9 +440,9 @@ unsigned int ZED3D9Module::GetMaterialComponentMask()
 	return 0xFFFFFFFF;
 }
 
-ZERenderer* ZED3D9Module::CreateRenderer()
+ZEFrameBufferRenderer* ZED3D9Module::CreateFrameBufferRenderer()
 {
-	ZED3D9Renderer* Renderer = new ZED3D9Renderer();
+	ZED3D9FrameBufferRenderer* Renderer = new ZED3D9FrameBufferRenderer();
 	if (!Renderer->Initialize())
 	{
 		Renderer->Destroy();
