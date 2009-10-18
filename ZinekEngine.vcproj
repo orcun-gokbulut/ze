@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1254"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Zinek Engine"
 	ProjectGUID="{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}"
 	RootNamespace="ComponentDevelopment"
@@ -638,11 +638,19 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial.cpp"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial2.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial2.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial2Shader.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial2Shader.h"
 					>
 				</File>
 				<File
@@ -683,14 +691,6 @@
 				</File>
 				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9RendererBase.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Shader.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Shader.h"
 					>
 				</File>
 				<File

@@ -54,7 +54,15 @@
 
 ZED3D9FrameBufferRenderer::ZED3D9FrameBufferRenderer()
 {
+	RenderColorTexture = false;
+	RenderDepthTexture = false;
+	RenderVelocityTexture = false;
+	RenderObjectTexture = false;
 
+	ColorTexture = NULL;
+	DepthTexture = NULL;
+	VelocityTexture = NULL;
+	ObjectTexture = NULL;
 }
 
 ZED3D9FrameBufferRenderer::~ZED3D9FrameBufferRenderer()
@@ -71,12 +79,86 @@ bool ZED3D9FrameBufferRenderer::Initialize()
 
 void ZED3D9FrameBufferRenderer::Deinitialize()
 {
+	// If color texture is created destroy it
+	if (ColorTexture != NULL)
+		ColorTexture->Destroy();
 
+	// If depth texture is created destroy it
+	if (DepthTexture != NULL)
+		DepthTexture->Destroy();
+
+	// If velocity texture is created destroy it
+	if (VelocityTexture != NULL)
+		VelocityTexture->Destroy();
+
+	// If object texture is created destroy it
+	if (ObjectTexture != NULL)
+		ObjectTexture->Destroy();
+}
+
+void ZED3D9FrameBufferRenderer::SetRenderColorTexture(bool Enable)
+{
+	RenderColorTexture = Enable;
+}
+
+bool ZED3D9FrameBufferRenderer::GetRenderColorTexture()
+{
+	return RenderColorTexture;
+}
+
+void ZED3D9FrameBufferRenderer::SetRenderDepthTexture(bool Enable)
+{
+	RenderDepthTexture = Enable;
+}
+
+bool ZED3D9FrameBufferRenderer::GetRenderDepthTexture()
+{
+	return RenderDepthTexture;
+}
+
+void ZED3D9FrameBufferRenderer::SetRenderVelocityTexture(bool Enable)
+{
+	RenderVelocityTexture = Enable;
+}
+
+bool ZED3D9FrameBufferRenderer::GetRenderVelocityTexture()
+{
+	return RenderVelocityTexture;
+}
+
+void ZED3D9FrameBufferRenderer::SetRenderObjectTexture(bool Enable)
+{
+	RenderObjectTexture = Enable;
+}
+
+bool ZED3D9FrameBufferRenderer::GetRenderObjectTexture()
+{
+	return RenderObjectTexture;
+}
+
+ZETexture2D* ZED3D9FrameBufferRenderer::GetColorTexture()
+{
+	return ColorTexture;
+}
+
+ZETexture2D* ZED3D9FrameBufferRenderer::GetDepthTexture()
+{
+	return DepthTexture;
+}
+
+ZETexture2D* ZED3D9FrameBufferRenderer::GetVelociyTexture()
+{
+	return VelocityTexture;
+}
+
+ZETexture2D* ZED3D9FrameBufferRenderer::GetObjectTexture()
+{
+	return ObjectTexture;
 }
 
 void ZED3D9FrameBufferRenderer::DeviceLost()
 {
-	
+	// Device is lost so recreate hardware resources
 }
 
 bool ZED3D9FrameBufferRenderer::DeviceRestored()
@@ -138,6 +220,7 @@ void ZED3D9FrameBufferRenderer::ClearList()
 
 void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 {
+
 	// Check render module is enabled and the device is not lost
 	if (!Module->IsEnabled() || Module->IsDeviceLost)
 		return;
@@ -154,6 +237,15 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 		Device->SetRenderTarget(0, Module->FrameColorBuffer);
 		Device->SetDepthStencilSurface(Module->FrameZBuffer);
 	}
+
+	if (RenderColorTexture)
+		ZED3D9CommonTools::CreateRenderTarget(RenderColorTexture, zeGraphics->GetScreenWidth(), zeGraphics->GetScreenHeight(), ZE_TPF_ARGB32);
+
+	if (RenderDepthTexture)
+		ZED3D9CommonTools::CreateRenderTarget(RenderDepthTexture, zeGraphics->GetScreenWidth(), zeGraphics->GetScreenHeight(), ZE_TPF_DEPTH);
+
+	if (RenderVelocityTexture)
+		ZED3D9CommonTools::CreateRenderTarget(RenderDepthTexture, zeGraphics->GetScreenWidth(), zeGraphics->GetScreenHeight(), ZE_TPF_DEPTH);
 
 	// Set z-buffer options
 	Device->SetRenderState(D3DRS_DEPTHBIAS, 0);

@@ -52,7 +52,7 @@ class ZEFrameBufferRenderer : public ZERenderer
 		virtual void						SetRenderVelocityTexture(bool Enable) = 0;
 		virtual bool						GetRenderVelocityTexture() = 0;
 
-		virtual void						SetRenderObjectTexture() = 0;
+		virtual void						SetRenderObjectTexture(bool Enable) = 0;
 		virtual bool						GetRenderObjectTexture() = 0;
 
 		virtual ZETexture2D*				GetColorTexture() = 0;

@@ -38,5 +38,5 @@
 
 ZEFrameBufferRenderer* ZEFrameBufferRenderer::CreateInstance()
 {
-	zeGraphics->CreateFrameBufferRenderer();
+	return zeGraphics->CreateFrameBufferRenderer();
 }

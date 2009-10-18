@@ -38,13 +38,23 @@
 #define __ZE_D3D9_FRAME_BUFFER_RENDERER_H__
 
 #include "Graphics/FrameBufferRenderer.h"
+//#include "Graphics/RenderOrder.h"
 #include "D3D9ComponentBase.h"
 
 class ZED3D9FrameBufferRenderer : public ZEFrameBufferRenderer, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	private:
-		bool								
+		bool								RenderColorTexture;
+		bool								RenderDepthTexture;
+		bool								RenderVelocityTexture;
+		bool								RenderObjectTexture;
+
+		ZETexture2D*						ColorTexture;
+		ZETexture2D*						DepthTexture;
+		ZETexture2D*						VelocityTexture;
+		ZETexture2D*						ObjectTexture;
+
 		ZESmartArray<ZERenderOrder>			NonTransparent;
 		ZESmartArray<ZERenderOrder>			Transparent;
 		ZESmartArray<ZERenderOrder>			Imposter;
@@ -67,7 +77,7 @@ class ZED3D9FrameBufferRenderer : public ZEFrameBufferRenderer, public ZED3D9Com
 		virtual void						SetRenderVelocityTexture(bool Enable);
 		virtual bool						GetRenderVelocityTexture();
 
-		virtual void						SetRenderObjectTexture();
+		virtual void						SetRenderObjectTexture(bool Enable);
 		virtual bool						GetRenderObjectTexture();
 	
 		virtual ZETexture2D*				GetColorTexture();
