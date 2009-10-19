@@ -83,6 +83,10 @@ class ZEModuleDescription
 
 class ZEModule
 {
+	protected:
+										ZEModule();
+		virtual							~ZEModule();
+
 	public:
 		virtual ZEModuleDescription*	GetModuleDescription() = 0;
 

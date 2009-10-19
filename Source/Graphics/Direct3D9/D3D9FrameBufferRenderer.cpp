@@ -220,6 +220,8 @@ void ZED3D9FrameBufferRenderer::ClearList()
 
 void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 {
+	unsigned int ScreenWidth = zeGraphics->GetScreenWidth();
+	unsigned int ScreenHeight = zeGraphics->GetScreenHeight();
 
 	// Check render module is enabled and the device is not lost
 	if (!Module->IsEnabled() || Module->IsDeviceLost)
@@ -238,14 +240,90 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 		Device->SetDepthStencilSurface(Module->FrameZBuffer);
 	}
 
+	// If renderer will give output to other mechanisms like post processors. It will enable render color buffer.
+	// Creating color texture if Render Color Texture enabled.
 	if (RenderColorTexture)
-		ZED3D9CommonTools::CreateRenderTarget(RenderColorTexture, zeGraphics->GetScreenWidth(), zeGraphics->GetScreenHeight(), ZE_TPF_ARGB32);
+		// Checking older texture available
+		if (ColorTexture != NULL)
+		{
+			// Checking older texture match the size of the screen. If it matches dont do anything
+			if (ColorTexture->GetHeight() != ScreenWidth && ColorTexture->GetHeight() != ScreenHeight)
+			{
+				// If not release it and recreate it with the correct size
+				ColorTexture->Release();
+				if (ColorTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32))
+				{
+					zeCriticalError("D3D9 Frame Buffer Renderer", "Can not create color texture.");
+					return;
+				}
+			}
+		}
+		else
+		{
+			// If there is no older texture then create brand new one
+			ColorTexture = ZETexture2D::CreateInstance();
+			ColorTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32);
+		}
+	else
+		// If render color buffer is not enabled check color texture is available or not
+		if (ColorTexture != NULL)
+		{
+			// If available then destroy it in order to save memory
+			ColorTexture->Destroy();
+			ColorTexture = NULL;
+		}
 
+	// Create depth render texture if render depth texture enabled. Same process with color texture creation
 	if (RenderDepthTexture)
-		ZED3D9CommonTools::CreateRenderTarget(RenderDepthTexture, zeGraphics->GetScreenWidth(), zeGraphics->GetScreenHeight(), ZE_TPF_DEPTH);
+		if (DepthTexture != NULL)
+		{
+			if (DepthTexture->GetHeight() != ScreenWidth && DepthTexture->GetHeight() != ScreenHeight)
+			{
+				DepthTexture->Release();
+				if (!DepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32))
+				{
+					zeCriticalError("D3D9 Frame Buffer Renderer", "Can not create depth texture.");
+					return;
+				}
+			}
+		}
+		else
+		{
+			DepthTexture = ZETexture2D::CreateInstance();
+			DepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32);
+		}
+	else
+		if (DepthTexture != NULL)
+		{
+			DepthTexture->Destroy();
+			DepthTexture = NULL;
+		}
 
+	// Create velocity render texture if render depth texture enabled. Same process with color texture creation
 	if (RenderVelocityTexture)
-		ZED3D9CommonTools::CreateRenderTarget(RenderDepthTexture, zeGraphics->GetScreenWidth(), zeGraphics->GetScreenHeight(), ZE_TPF_DEPTH);
+		if (VelocityTexture != NULL)
+		{
+			if (VelocityTexture->GetHeight() != ScreenWidth && VelocityTexture->GetHeight() != ScreenHeight)
+			{
+				VelocityTexture->Release();
+				if (!VelocityTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32))
+				{
+					zeCriticalError("D3D9 Frame Buffer Renderer", "Can not create velocity texture.");
+					return;
+				}
+			}
+		}
+		else
+		{
+			VelocityTexture = ZETexture2D::CreateInstance();
+			VelocityTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32);
+		}
+	else
+		if (VelocityTexture != NULL)
+		{
+			VelocityTexture->Destroy();
+			VelocityTexture = NULL;
+		}
 
 	// Set z-buffer options
 	Device->SetRenderState(D3DRS_DEPTHBIAS, 0);

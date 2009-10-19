@@ -41,6 +41,8 @@
 
 class ZEDummyInputModule: public ZEInputModule 
 {	
+	friend class ZEDummyInputModuleDescription;
+
 	private:
 		bool							Enabled;
 

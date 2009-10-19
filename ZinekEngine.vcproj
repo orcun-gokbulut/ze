@@ -475,14 +475,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\PostProcessorNode.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\PostProcessorNode.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\Graphics\ProjectiveLight.cpp"
 				>
 			</File>
@@ -638,19 +630,19 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial2.cpp"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial2.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial2Shader.cpp"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterialShader.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial2Shader.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterialShader.h"
 					>
 				</File>
 				<File
@@ -809,6 +801,86 @@
 						>
 					</File>
 				</Filter>
+			</Filter>
+			<Filter
+				Name="PostProcessor"
+				>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PostProcessor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PostProcessor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PostProcessorNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PostProcessorNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPBlurNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPBlurNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPColorInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPColorInputNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPDepthInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPDepthInputNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPFrameBufferOutputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPFrameBufferOutputNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPTextureInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPTextureInputNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPTextureOutputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPTextureOutputNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPVelocityInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPVelocityInputNode.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="FixedMaterial"
+				>
 			</Filter>
 		</Filter>
 		<Filter

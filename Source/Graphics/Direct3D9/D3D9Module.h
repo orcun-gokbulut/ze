@@ -62,10 +62,14 @@ class ZED3D9FrameBufferRenderer;
 class ZED3D9ShadowRenderer;
 class ZED3D9TextureRenderer;
 class ZED3D9PostProcessor;
-class ZED3D9Shader;
+class ZED3D9FixedMaterialShader;
 
 class ZED3D9Module : public ZEGraphicsModule
 {
+	friend class										ZED3D9ModuleDescription;
+	protected:
+														ZED3D9Module();
+											 			~ZED3D9Module();
 	public:
 		bool											IsDeviceLost;
 		bool											Enabled;
@@ -78,70 +82,67 @@ class ZED3D9Module : public ZEGraphicsModule
 		LPDIRECT3DSURFACE9								FrameColorBuffer;
 		LPDIRECT3DSURFACE9								FrameZBuffer;
 
-		ZEChunkArray<ZED3D9FrameBufferRenderer*, 50>				Renderers;
+		ZEChunkArray<ZED3D9FrameBufferRenderer*, 50>	Renderers;
 		ZEChunkArray<ZED3D9ShadowRenderer*, 50>			ShadowRenderers;
 		ZEChunkArray<ZED3D9TextureRenderer*, 50>		TextureRenderers;
 		ZEChunkArray<ZED3D9Texture2D*, 50>				Texture2Ds;
 		ZEChunkArray<ZED3D9Texture3D*, 50>				Texture3Ds;
 		ZEChunkArray<ZED3D9TextureCube*, 50>			TextureCubes;
-		ZEChunkArray<ZED3D9Shader*, 50>					Shaders;
+		ZEChunkArray<ZED3D9FixedMaterialShader*, 50>	Shaders;
 		ZEChunkArray<ZED3D9StaticVertexBuffer*, 50>		VertexBuffers;
 		ZEChunkArray<ZED3D9PostProcessor*, 50>			PostProcessors;
 		ZEChunkArray<ZED3D9VertexDeclaration*, 50>		VertexDeclaration;
 
 
-		int										ShaderModel;
+		int												ShaderModel;
 
-		ZEModuleDescription*					GetModuleDescription();
+		ZEModuleDescription*							GetModuleDescription();
 
-		virtual bool							IsEnabled();
-		virtual void							SetEnabled(bool Enabled);
+		virtual bool									IsEnabled();
+		virtual void									SetEnabled(bool Enabled);
 
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
+		virtual bool									Initialize();
+		virtual void									Deinitialize();
 
-		void									DeviceLost();
-		void									DeviceRestored();
-		void									RestoreDevice(bool ForceReset = false);
+		void											DeviceLost();
+		void											DeviceRestored();
+		void											RestoreDevice(bool ForceReset = false);
 
-		virtual void							ClearFrameBuffer();
-		virtual void							UpdateScreen();
+		virtual void									ClearFrameBuffer();
+		virtual void									UpdateScreen();
+	
+		virtual void									SetScreenSize(int Width, int Height);
+		virtual void									SetVerticalSync(bool Enabled);
+		virtual void									SetShaderQuality(int Quality);
+		virtual void									SetTextureQuality(int Quality);
+		virtual void									SetModelQuality(int Quality);
+		virtual void									SetShadowQuality(int Quality);
+		virtual void									SetPostEffectQuality(int Quality);
+		virtual void									SetHDRQuality(int Quality);
+		virtual void									SetAntiAliasing(int Level);
+		virtual void									SetAnisotropicFilter(int Level);
 
-		virtual void							SetScreenSize(int Width, int Height);
-		virtual void							SetVerticalSync(bool Enabled);
-		virtual void							SetShaderQuality(int Quality);
-		virtual void							SetTextureQuality(int Quality);
-		virtual void							SetModelQuality(int Quality);
-		virtual void							SetShadowQuality(int Quality);
-		virtual void							SetPostEffectQuality(int Quality);
-		virtual void							SetHDRQuality(int Quality);
-		virtual void							SetAntiAliasing(int Level);
-		virtual void							SetAnisotropicFilter(int Level);
+		virtual void									SetMaterialComponentMask(unsigned int Mask);
+		virtual unsigned int							GetMaterialComponentMask();
 
-		virtual void							SetMaterialComponentMask(unsigned int Mask);
-		virtual unsigned int					GetMaterialComponentMask();
+		virtual ZEFrameBufferRenderer*					CreateFrameBufferRenderer();
+		virtual ZEShadowRenderer*						CreateShadowRenderer();
+		virtual ZETextureRenderer*						CreateTextureRenderer();
+		virtual ZEPostProcessor*						CreatePostProcessor();
 
-		virtual ZEFrameBufferRenderer*			CreateFrameBufferRenderer();
-		virtual ZEShadowRenderer*				CreateShadowRenderer();
-		virtual ZETextureRenderer*				CreateTextureRenderer();
-		virtual ZEPostProcessor*				CreatePostProcessor();
+		virtual ZEVertexDeclaration*					CreateVertexDeclaration();
+		virtual ZEStaticVertexBuffer*					CreateStaticVertexBuffer();
 
-		virtual ZEVertexDeclaration*			CreateVertexDeclaration();
-		virtual ZEStaticVertexBuffer*			CreateStaticVertexBuffer();
+		virtual ZETexture2D*							CreateTexture2D();
+		virtual ZETexture3D*							CreateTexture3D();
+		virtual ZETextureCube*							CreateTextureCube();
 
-		virtual ZETexture2D*					CreateTexture2D();
-		virtual ZETexture3D*					CreateTexture3D();
-		virtual ZETextureCube*					CreateTextureCube();
+		virtual ZEFixedMaterial*						CreateFixedMaterial();
+		virtual ZEFixedMaterial*						CreateCustomMaterial();
+		virtual ZEFixedMaterial*						CreateCGFXMaterial();
 
-		virtual ZEFixedMaterial*				CreateFixedMaterial();
-		virtual ZEFixedMaterial*				CreateCustomMaterial();
-		virtual ZEFixedMaterial*				CreateCGFXMaterial();
-
-		static LPDIRECT3DDEVICE9				GetD3D9Device();
-		static ZED3D9Module*					GetD3D9Module();
-
-												ZED3D9Module();
-											 	~ZED3D9Module();
+		static LPDIRECT3DDEVICE9						GetD3D9Device();
+		static ZED3D9Module*							GetD3D9Module();
 };
 
 #endif

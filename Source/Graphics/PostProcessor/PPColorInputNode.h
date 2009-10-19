@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PostProcessor.cpp
+ Zinek Engine - PPColorInputNode.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,85 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PostProcessor.h"
+#pragma once
+#ifndef __ZE_PP_COLOR_INPUT_NODE_H__
+#define __ZE_PP_COLOR_INPUT_NODE_H__
+
 #include "PostProcessorNode.h"
-#include "Graphics/GraphicsModule.h"
 
-ZEPostProcessor::ZEPostProcessor()
+class ZETexture2D;
+class ZERenderer;
+
+class ZEPPRendererColorInputNode : public ZEPostProcessorNode
 {
-}
+	protected:
+		ZERenderer*								Renderer;
 
-ZEPostProcessor::~ZEPostProcessor()
-{
-}
+												ZEPPRendererColorInputNode();
 
+	public:
+		void									SetRenderer(ZERenderer* Renderer);
+		ZERenderer*								GetRenderer();
 
-ZEArray<ZEPostProcessorNode*>& ZEPostProcessor::GetNodes()
-{
-	return Nodes;
-}
+		virtual ZETexture2D*					GetOutput();
 
-ZEPostProcessorNode* ZEPostProcessor::CreateNode(const char* Name)
-{
-	if (strcmp(Name, "RendererColorInput") == 0)
-	if (strcmp(Name, "RendererDepthInput") == 0)
-	if (strcmp(Name, "RendererVelocityInput") == 0)
-	if (strcmp(Name, "FrameBufferOutput") == 0)
-	if (strcmp(Name, "TextureOutput") == 0)
-	if (strcmp(Name, "Blur") == 0)
+		static ZEPPColorInputNode*				CreateInstance();
+};
 
-	return NULL;
-}
-
-ZEPostProcessorNode* ZEPostProcessor::CreateNode(size_t Index)
-{
-	return NULL;
-}
-		
-void ZEPostProcessor::AddNode(ZEPostProcessorNode* Node)
-{
-	Nodes.Add(Node);
-}
-
-void ZEPostProcessor::RemoveNode(ZEPostProcessorNode* Node)
-{
-	Nodes.DeleteValue(Node);
-}
-
-bool ZEPostProcessor::Initialize()
-{
-	// Set node state count
-	NodeStates.SetCount(Nodes.GetCount());
-
-	// Fill node states with false which mean that node is not processed
-	NodeStates.FillWith(false);
-
-	// Initialize nodes
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		Nodes[I]->Initialize();
-	
-	return true;
-}
-
-void ZEPostProcessor::Deinitialize()
-{
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		Nodes[I]->Deinitialize();
-}
-
-void ZEPostProcessor::Process()
-{
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		if (NodeStates[I] == false)
-			Nodes[I]->Process();
-}
-
-void ZEPostProcessor::Destroy()
-{
-	delete this;
-}
-
-ZEPostProcessor* ZEPostProcessor::CreateInstance()
-{
-	return zeGraphics->CreatePostProcessor();
-}
+#endif

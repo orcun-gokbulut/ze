@@ -42,7 +42,7 @@
 #include "Core/Error.h"
 #include "Core/Console.h"
 #include "D3D9FixedMaterial.h"
-#include "D3D9Shader.h"
+//#include "D3D9Shader.h"
 #include "D3D9Texture2D.h"
 #include "D3D9Texture3D.h"
 #include "D3D9TextureCube.h"
@@ -201,7 +201,7 @@ bool ZED3D9Module::Initialize()
 		return false;
 	}
 
-	if (ZED3D9Shader::BaseInitialize() == false)
+	if (ZED3D9FixedMaterialShader::BaseInitialize() == false)
 	{
 		zeCriticalError("Direct3D Module", "Can not initialize shader manager.");
 		Destroy();
@@ -229,7 +229,7 @@ void ZED3D9Module::Deinitialize()
 	zeOutput("Destroying Direct3D.\r\n");
 	ZED3D9ShadowRenderer::BaseDeinitialize();
 	//ZED3D9PostProcessor::BaseDeinitialize();
-	ZED3D9Shader::BaseDeinitialize();
+	ZED3D9FixedMaterialShader::BaseDeinitialize();
 	D3D9Device = NULL;
 	D3D9Module = NULL;
 

@@ -42,6 +42,8 @@
 
 class ZEVirtualInputModule: public ZEInputModule 
 {	
+	friend class ZEVirtualInputModuleDescription;
+
 	private:
 		bool							Enabled;
 
@@ -49,6 +51,7 @@ class ZEVirtualInputModule: public ZEInputModule
 		unsigned int					VirtualInputAxisValues[ZE_VIRTUAL_INPUT_MAX_INPUT_COUNT];
 		size_t							VirtualInputEventCount;
 
+										ZEVirtualInputModule();
 	public:
 		virtual ZEModuleDescription*	GetModuleDescription();
 
@@ -74,8 +77,6 @@ class ZEVirtualInputModule: public ZEInputModule
 		void							ClickMouse(bool LeftButton, bool RightButton, bool MiddleButton);
 		void							PressKey(unsigned char ButtonId);
 		void							ReleaseKey(unsigned char ButtonId);
-
-										ZEVirtualInputModule();
 };
 #endif
    
