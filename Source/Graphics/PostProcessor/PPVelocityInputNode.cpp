@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - PPVelocityInputNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,66 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "PPVelocityInputNode.h"
+#include "Graphics/Renderer.h"
+#include "Core/Error.h"
+#include "Definitions.h"
+
+ZEPPVelocityInputNode::ZEPPVelocityInputNode()
+{
+	Renderer = NULL;
+}
+
+ZEPostProcessorNodeType ZEPPVelocityInputNode::GetNodeType()
+{
+	return ZE_PPNT_INPUT_NODE;
+}
+
+void ZEPPVelocityInputNode::SetRenderer(ZERenderer* Renderer)
+{
+
+	this->Renderer = Renderer;
+}
+
+ZERenderer* ZEPPVelocityInputNode::GetRenderer()
+{
+	return Renderer;
+}
+
+ZETexture2D* ZEPPVelocityInputNode::GetOutput()
+{
+	if (Renderer == NULL)
+		return NULL;
+	else
+		return Renderer->GetVelocityTexture(); 
+}
+
+bool ZEPPVelocityInputNode::Process()
+{
+
+	if (Renderer == NULL)
+	{
+		zeError("Post Processor - Velocity Input Node", "There is no renderer available.");
+		return false;
+	}
+
+	if (Renderer->GetRenderVelocityTexture() == false)
+	{
+		zeError("Post Processor - Velocity Input Node", "Current renderer does not enabled to provide color texture.");
+		return false;
+	}
+
+	if (Renderer->GetVelocityTexture() == NULL)
+	{
+		zeError("Post Processor - Velocity Input Node", "Current renderer does provide color texture.");
+		return false;
+	}
+
+	return true;
+}
+
+
+ZEPPVelocityInputNode* ZEPPVelocityInputNode::CreateInstance()
+{
+	return new ZEPPVelocityInputNode();
+}

@@ -40,6 +40,13 @@
 class ZETexture2D;
 class ZEPostProcessor;
 
+enum ZEPostProcessorNodeType
+{
+	ZE_PPNT_INPUT_NODE,
+	ZE_PPNT_PROCESSOR_NONE,
+	ZE_PPNT_OUTPUT_NODE
+};
+
 class ZEPostProcessorNode
 {
 	private:
@@ -52,6 +59,8 @@ class ZEPostProcessorNode
 		virtual	ZETexture2D*					GetDirectOutput();
 
 	public:
+		virtual ZEPostProcessorNodeType			GetNodeType() = 0;
+
 		virtual void							SetOwner(ZEPostProcessor* Owner);
 		ZEPostProcessor*						GetOwner();
 

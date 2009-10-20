@@ -43,17 +43,23 @@ class ZETexture2D;
 
 class ZEPPTextureOutputNode
 {
-	protected:
+	private:
 		ZETexture2D*							Texture;
 
+	protected:
 												ZEPPTextureOutputNode();
-		virtual									~ZEPPTextureOutputNode();	
+
+		virtual ZETexture2D*					GetInternalOutput();
 
 	public:
+		virtual ZEPostProcessorNodeType			GetNodeType();
+
 		void									SetTexture(ZETexture2D* Texture);
 		ZETexture2D*							GetTexture();
 
 		virtual ZETexture2D*					GetOutput();
+
+		virtual bool							Process();
 
 		static ZEPPTextureOutputNode*			CreateInstance();
 };

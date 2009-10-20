@@ -34,32 +34,65 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "PPColorInputNode.h"
+#include "Graphics/Renderer.h"
+#include "Core/Error.h"
+#include "Definitions.h"
 
-
-ZEPPRendererColorInputNode::ZEPPRendererColorInputNode()
+ZEPPColorInputNode::ZEPPColorInputNode()
 {
 	Renderer = NULL;
 }
 
-void ZEPPRendererColorInputNode::SetRenderer(ZERenderer* Renderer)
+ZEPostProcessorNodeType ZEPPColorInputNode::GetNodeType()
 {
+	return ZE_PPNT_INPUT_NODE;
+}
+
+void ZEPPColorInputNode::SetRenderer(ZERenderer* Renderer)
+{
+
 	this->Renderer = Renderer;
 }
 
-ZERenderer* ZEPPRendererColorInputNode::GetRenderer()
+ZERenderer* ZEPPColorInputNode::GetRenderer()
 {
 	return Renderer;
 }
 
-ZETexture2D* ZEPPRendererColorInputNode::GetOutput()
+ZETexture2D* ZEPPColorInputNode::GetOutput()
 {
-	if (Rendeer == NULL)
+	if (Renderer == NULL)
 		return NULL;
 	else
-		return Renderer->GetColorTexture; 
+		return Renderer->GetColorTexture(); 
 }
 
-ZEPPColorInputNode* ZEPPRendererColorInputNode::CreateInstance()
+bool ZEPPColorInputNode::Process()
 {
-	return new ZEPPRendererColorInputNode();
+
+	if (Renderer == NULL)
+	{
+		zeError("Post Processor - Color Input Node", "There is no renderer available.");
+		return false;
+	}
+
+	if (Renderer->GetRenderColorTexture() == false)
+	{
+		zeError("Post Processor - Color Input Node", "Current renderer does not enabled to provide color texture.");
+		return false;
+	}
+
+	if (Renderer->GetColorTexture() == NULL)
+	{
+		zeError("Post Processor - Color Input Node", "Current renderer does provide color texture.");
+		return false;
+	}
+
+	return true;
+}
+
+
+ZEPPColorInputNode* ZEPPColorInputNode::CreateInstance()
+{
+	return new ZEPPColorInputNode();
 }

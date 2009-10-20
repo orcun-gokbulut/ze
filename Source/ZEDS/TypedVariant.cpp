@@ -36,7 +36,7 @@
 ///////////////////////////////////////////////////////////////
 //  Orcun's Data Structres Version 2.0 (Zinek Engine)        //
 // --------------------------------------------------------- //
-//  Copyrights (C) 2005-2007,  Y. Or�un G�kbulut			 //
+//  Copyrights (C) 2005-2007,  Y. Orçun Gökbulut				 //
 //  All rights reserved.									 //
 ///////////////////////////////////////////////////////////////
 
@@ -52,7 +52,7 @@ void ZETypedVariant::SetString(char *NewValue)
 	ZEDS_ASSERT(Type != ZEVARIANTTYPE_STRING && Type != ZEVARIANTTYPE_UNDEFINED, "ZETypedVariant::SetString operation failed. Types does not match.");
 	if(Type == ZEVARIANTTYPE_STRING || Type == ZEVARIANTTYPE_MATRIX3X3 || Type == ZEVARIANTTYPE_MATRIX4X4)
 	{
-		if (Value.String != null || Type == ZEVARIANTTYPE_UNDEFINED)
+		if (Value.String != NULL || Type == ZEVARIANTTYPE_UNDEFINED)
 			delete[] Value.String;
 		Value.String = new char[strlen(NewValue) + 1];
 		strcpy(Value.String, NewValue);

@@ -37,12 +37,11 @@
 #ifndef __ZE_D3D9_POST_PROCESSOR_H__
 #define __ZE_D3D9_POST_PROCESSOR_H__
 
-#include "Graphics/PostProcessor.h"
-#include "Graphics/PostEffects.h"
+#include "Graphics/PostProcessor/PostProcessor.h"
 #include "Graphics/Texture.h"
 #include "D3D9ComponentBase.h"
 #include <d3d9.h>
-
+/*
 
 class ZED3D9BlurPostEffect : public ZEBlurPostEffect, public ZED3D9ComponentBase
 {
@@ -61,5 +60,5 @@ class ZED3D9BlurPostEffect : public ZEBlurPostEffect, public ZED3D9ComponentBase
 
 		virtual bool						Process();
 };
-
+*/
 #endif

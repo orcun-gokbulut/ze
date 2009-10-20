@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - PPTextureOutputNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "PPTextureOutputNode.h"
+#include "Graphics/Texture2D.h"
+#include "Core/Error.h"
+#include "Definitions.h"
+
+ZEPPTextureOutputNode::ZEPPTextureOutputNode()
+{
+	Texture = NULL;
+}
+
+ZETexture2D* ZEPPTextureOutputNode::GetInternalOutput()
+{
+	return Texture;
+}
+
+ZEPostProcessorNodeType ZEPPTextureOutputNode::GetNodeType()
+{
+	return ZE_PPNT_OUTPUT_NODE;
+}
+
+void ZEPPTextureOutputNode::SetTexture(ZETexture2D* Texture)
+{
+	// Check that texture is a render target or not (If it is not a render target than you can not render directly to the texture)
+	if (Texture != NULL && !Texture->IsRenderTarget())
+	{
+		zeError("Post Processor - Texture Output Node", "Output texture is not a render target. Texture output node only accpets textures that are render targets.");
+		this->Texture = NULL;	
+		return;
+	}
+
+	this->Texture = Texture;
+}
+
+ZETexture2D* ZEPPTextureOutputNode::GetTexture()
+{
+	return Texture;
+}
+
+ZETexture2D* ZEPPTextureOutputNode::GetOutput()
+{
+	return Texture;
+}
+
+bool ZEPPTextureOutputNode::Process()
+{
+	// Check output texture available
+	if (Texture == NULL)
+	{
+		zeError("Post Processor - Texture Output Node", "Output texture is not available.");
+		return false;
+	}
+
+	return true;
+}
+
+ZEPPTextureOutputNode* ZEPPTextureOutputNode::CreateInstance()
+{
+	return new ZEPPTextureOutputNode();
+}

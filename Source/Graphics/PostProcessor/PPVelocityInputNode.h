@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - PPVelocityInputNode.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,33 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef __ZE_PP_VELOCITY_INPUT_NODE_H__
+#define __ZE_PP_VELOCITY_INPUT_NODE_H__
+
+#include "PostProcessorNode.h"
+
+class ZETexture2D;
+class ZERenderer;
+
+class ZEPPVelocityInputNode : public ZEPostProcessorNode
+{
+	protected:
+		ZERenderer*								Renderer;
+
+												ZEPPVelocityInputNode();
+
+	public:
+		virtual ZEPostProcessorNodeType			GetNodeType();
+		
+		void									SetRenderer(ZERenderer* Renderer);
+		ZERenderer*								GetRenderer();
+
+		virtual ZETexture2D*					GetOutput();
+
+		virtual	bool							Process();
+
+		static ZEPPVelocityInputNode*				CreateInstance();
+};
+
+#endif

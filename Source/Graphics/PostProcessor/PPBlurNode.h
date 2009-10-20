@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - PPBlurNode.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,43 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef __ZE_POST_EFFECTS_H__
+#define __ZE_POST_EFFECTS_H__
+
+#include "ZEDS/Array.h"
+#include "PostProcessorNode.h"
+class ZETexture2D;
+
+class ZEBlurPostEffect : public ZEPPLinearKernelFilterNode
+{
+	protected:		
+		ZEPostProcessorNode*			Input;
+		ZETexture2D*					InputTexture;
+
+		ZETexture2D*					Output;
+
+		float							StandartDeviation;	
+
+		void							UpdateKernel();
+
+										ZEBlurPostEffect();
+		virtual							~ZEBlurPostEffect();
+
+	public:	
+		virtual size_t					GetDependencyCount();
+		virtual ZEPostProcessorNode**	GetDependencies();
+
+
+		virtual void					SetInput(ZEPostProcessorNode* Node);
+		virtual ZEPostProcessorNode*	GetInput();
+
+		virtual ZETexture2D*			GetOutput();
+		
+		void							SetStandartDeviation(float Ro);
+		float							GetStandartDeviation();
+
+		void							SetKernelSize(unsigned int Size);
+};
+
+#endif

@@ -43,18 +43,19 @@
 
 struct ZEViewPoint
 {
-	float							FOV;
-	float							NearZ;
-	float							FarZ;
-	ZEVector3						ViewPosition;
-	ZEMatrix4x4						ViewMatrix;
-	ZEMatrix4x4						ProjMatrix;
-	ZEMatrix4x4						ViewProjMatrix;
+	float									FOV;
+	float									NearZ;
+	float									FarZ;
+	ZEVector3								ViewPosition;
+	ZEMatrix4x4								ViewMatrix;
+	ZEMatrix4x4								ProjMatrix;
+	ZEMatrix4x4								ViewProjMatrix;
 };
 
 class ZEPostProcessor;
 class ZECamera;
 class ZERenderOrder;
+class ZETexture2D;
 class ZERenderer
 {
 	protected:
@@ -62,6 +63,23 @@ class ZERenderer
 		virtual								~ZERenderer();
 
 	public:
+		virtual void						SetRenderColorTexture(bool Enable);
+		virtual bool						GetRenderColorTexture();
+
+		virtual void						SetRenderDepthTexture(bool Enable);
+		virtual bool						GetRenderDepthTexture();
+
+		virtual void						SetRenderVelocityTexture(bool Enable);
+		virtual bool						GetRenderVelocityTexture();
+
+		virtual void						SetRenderObjectTexture(bool Enable);
+		virtual bool						GetRenderObjectTexture();
+
+		virtual ZETexture2D*				GetColorTexture();
+		virtual ZETexture2D*				GetDepthTexture();
+		virtual ZETexture2D*				GetVelocityTexture();
+		virtual ZETexture2D*				GetObjectTexture();
+
 		virtual bool						Initialize() = 0;
 		virtual void						Deinitialize() = 0;
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - PPDepthInputNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,65 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "PPDepthInputNode.h"
+#include "Graphics/Renderer.h"
+#include "Core/Error.h"
+#include "Definitions.h"
+
+ZEPPDepthInputNode::ZEPPDepthInputNode()
+{
+	Renderer = NULL;
+}
+
+ZEPostProcessorNodeType ZEPPDepthInputNode::GetNodeType()
+{
+	return ZE_PPNT_INPUT_NODE;
+}
+
+void ZEPPDepthInputNode::SetRenderer(ZERenderer* Renderer)
+{
+
+	this->Renderer = Renderer;
+}
+
+ZERenderer* ZEPPDepthInputNode::GetRenderer()
+{
+	return Renderer;
+}
+
+ZETexture2D* ZEPPDepthInputNode::GetOutput()
+{
+	if (Renderer == NULL)
+		return NULL;
+	else
+		return Renderer->GetDepthTexture(); 
+}
+
+bool ZEPPDepthInputNode::Process()
+{
+	if (Renderer == NULL)
+	{
+		zeError("Post Processor - Depth Input Node", "There is no renderer available.");
+		return false;
+	}
+
+	if (Renderer->GetRenderDepthTexture() == false)
+	{
+		zeError("Post Processor - Depth Input Node", "Current renderer does not enabled to provide color texture.");
+		return false;
+	}
+
+	if (Renderer->GetDepthTexture() == NULL)
+	{
+		zeError("Post Processor - Depth Input Node", "Current renderer does provide color texture.");
+		return false;
+	}
+
+	return true;
+}
+
+
+ZEPPDepthInputNode* ZEPPDepthInputNode::CreateInstance()
+{
+	return new ZEPPDepthInputNode();
+}

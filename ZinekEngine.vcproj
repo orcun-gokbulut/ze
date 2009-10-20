@@ -459,22 +459,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\PostEffects.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\PostEffects.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\PostProcessor.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\PostProcessor.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\Graphics\ProjectiveLight.cpp"
 				>
 			</File>
@@ -830,6 +814,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPBoxKernelFilterNode.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\Graphics\PostProcessor\PPColorInputNode.cpp"
 					>
 				</File>
@@ -851,6 +839,14 @@
 				</File>
 				<File
 					RelativePath=".\Source\Graphics\PostProcessor\PPFrameBufferOutputNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPLinearKernelFilterNode.c"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPLinearKernelFilterNode.h"
 					>
 				</File>
 				<File

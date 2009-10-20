@@ -34,14 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "PostProcessorNode.h"
-
-#ifndef NULL
-#define NULL 0
-#endif
+#include "Definitions.h"
 
 ZEPostProcessorNode::ZEPostProcessorNode()
 {
-
+	Owner = NULL;
 }
 
 ZEPostProcessorNode::~ZEPostProcessorNode()
@@ -52,6 +49,16 @@ ZEPostProcessorNode::~ZEPostProcessorNode()
 ZETexture2D* ZEPostProcessorNode::GetDirectOutput()
 {
 	return NULL;
+}
+
+void  ZEPostProcessorNode::SetOwner(ZEPostProcessor* Owner)
+{
+	this->Owner = Owner;
+}
+
+ZEPostProcessor*  ZEPostProcessorNode::GetOwner()
+{
+	return Owner;
 }
 
 size_t ZEPostProcessorNode::GetDependencyCount()

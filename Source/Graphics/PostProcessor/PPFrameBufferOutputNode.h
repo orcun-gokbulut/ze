@@ -40,16 +40,13 @@
 #include "PostProcessorNode.h"
 
 class ZETexture2D;
-class ZERenderer;
 
-class ZEPPFrameBufferOutputNode
+class ZEPPFrameBufferOutputNode : public ZEPostProcessorNode
 {
-	protected:
-												ZEPPOutputNode();
-		virtual									~ZEPPOutputNode();	
-
 	public:
-		static ZEPPOutputNode*					CreateInstance();
+		virtual ZEPostProcessorNodeType		GetNodeType();
+
+		static ZEPPFrameBufferOutputNode*	CreateInstance();
 };
 
 #endif

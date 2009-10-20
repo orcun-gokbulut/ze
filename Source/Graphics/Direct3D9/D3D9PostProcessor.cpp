@@ -38,7 +38,7 @@
 #include "D3D9CommonTools.h"
 #include "D3D9Texture2D.h"
 #include "D3D9Module.h"
-
+/*
 LPDIRECT3DVERTEXSHADER9 ZED3D9BlurPostEffect::VertexShader = NULL;
 LPDIRECT3DPIXELSHADER9 ZED3D9BlurPostEffect::VerticalPassPixelShader = NULL;
 LPDIRECT3DPIXELSHADER9 ZED3D9BlurPostEffect::HorizontalPassPixelShader = NULL;
@@ -279,4 +279,4 @@ bool ZED3D9BlurPostEffect::Process()
 			// Draw the pass
 			Device->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 0);
 		}
-}
+}*/

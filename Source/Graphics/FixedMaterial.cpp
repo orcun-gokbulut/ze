@@ -33,13 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "FixedMaterial.h"
 #include <Memory.h>
-
-#ifndef NULL
-#define NULL 0
-#endif
-
+#include "FixedMaterial.h"
+#include "Definitions.h"
 #include "GraphicsModule.h"
 #include "MaterialComponents.h"
 

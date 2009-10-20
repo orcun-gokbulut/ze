@@ -42,18 +42,22 @@
 class ZETexture2D;
 class ZERenderer;
 
-class ZEPPRendererColorInputNode : public ZEPostProcessorNode
+class ZEPPColorInputNode : public ZEPostProcessorNode
 {
 	protected:
 		ZERenderer*								Renderer;
 
-												ZEPPRendererColorInputNode();
+												ZEPPColorInputNode();
 
 	public:
+		virtual ZEPostProcessorNodeType			GetNodeType();
+
 		void									SetRenderer(ZERenderer* Renderer);
 		ZERenderer*								GetRenderer();
 
 		virtual ZETexture2D*					GetOutput();
+
+		virtual bool							Process();
 
 		static ZEPPColorInputNode*				CreateInstance();
 };

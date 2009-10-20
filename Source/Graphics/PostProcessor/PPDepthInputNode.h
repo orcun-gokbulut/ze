@@ -42,21 +42,24 @@
 class ZETexture2D;
 class ZERenderer;
 
-class ZEPPRendererDepthInputNode : public ZEPostProcessorNode
+class ZEPPDepthInputNode : public ZEPostProcessorNode
 {
 	protected:
 		ZERenderer*								Renderer;
 
-												ZEPPRendererDepthInputNode();
-		virtual									~ZEPPRendererDepthInputNode();	
+												ZEPPDepthInputNode();
 
 	public:
+		virtual ZEPostProcessorNodeType			GetNodeType();
+		
 		void									SetRenderer(ZERenderer* Renderer);
 		ZERenderer*								GetRenderer();
 
 		virtual ZETexture2D*					GetOutput();
 
-		static ZEPPRendererDepthInputNode*		CreateInstance();
+		virtual	bool							Process();
+
+		static ZEPPDepthInputNode*				CreateInstance();
 };
 
 #endif

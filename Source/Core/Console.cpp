@@ -149,7 +149,7 @@ inline bool ZEConsole::ParseConstant(const char* Input, int &Cursor, ZEVariant *
 				Output->SetBoolean(false);
 				return true;
 			}
-			else if (_stricmp(Temp, "null") == 0)
+			else if (_stricmp(Temp, "NULL") == 0)
 			{
 				Output->SetNull();
 				return true;
