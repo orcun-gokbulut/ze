@@ -41,10 +41,10 @@
 ZED3D9Module* ZED3D9ComponentBase::Module;
 LPDIRECT3DDEVICE9 ZED3D9ComponentBase::Device;
 
-bool ZED3D9ComponentBase::BaseInitialize(ZED3D9Module* D3DModule)
+bool ZED3D9ComponentBase::BaseInitialize(ZED3D9Module* Mdl)
 {
-	Module = D3DModule;
-	Device = D3DModule->Device;
+	Module = Mdl;
+	Device = Mdl->GetDevice();
 
 	return true;
 }

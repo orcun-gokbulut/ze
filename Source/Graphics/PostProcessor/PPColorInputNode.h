@@ -44,6 +44,8 @@ class ZERenderer;
 
 class ZEPPColorInputNode : public ZEPostProcessorNode
 {
+	friend class ZEPostProcessor;
+
 	protected:
 		ZERenderer*								Renderer;
 

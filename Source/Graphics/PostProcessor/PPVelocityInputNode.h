@@ -44,6 +44,8 @@ class ZERenderer;
 
 class ZEPPVelocityInputNode : public ZEPostProcessorNode
 {
+	friend class ZEPostProcessor;
+
 	protected:
 		ZERenderer*								Renderer;
 
@@ -59,7 +61,7 @@ class ZEPPVelocityInputNode : public ZEPostProcessorNode
 
 		virtual	bool							Process();
 
-		static ZEPPVelocityInputNode*				CreateInstance();
+		static ZEPPVelocityInputNode*			CreateInstance();
 };
 
 #endif

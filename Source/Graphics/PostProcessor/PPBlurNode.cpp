@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - PPBlurNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,121 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "PPBlurNode.h"
+#include "Core/Error.h"
+
+void ZEPPBlurNode::UpdateKernel()
+{
+	if (KernelDirtyFlag)
+	{
+		unsigned int KernelSize_2 = (Kernel.GetCount() - 1) / 2;
+
+		size_t Index = 0;
+		for (size_t I = -KernelSize_2; I <= KernelSize_2; I++)
+		{
+			Kernel[Index].x = I;
+			Kernel[Index].y = (1.0f / (sqrtf(2.0f * ZE_PI * StandartDeviation))) * powf(ZE_E, -((I * I) / (2 * StandartDeviation * StandartDeviation)));
+			Index++;
+		}
+		KernelDirtyFlag = false;
+	}
+}
+
+ZEPPBlurNode::ZEPPBlurNode()
+{
+	KernelDirtyFlag = true;
+	Input = NULL;
+
+	HorizontalPass = true;
+	VerticalPass = true;
+	Kernel.SetCount(9);
+	StandartDeviation = 0.84089642f;		
+	KernelDirtyFlag = true;
+}
+
+ZEPPBlurNode::~ZEPPBlurNode()
+{
+}
+
+ZEPostProcessorNodeType ZEPPBlurNode::GetNodeType()
+{
+	return ZE_PPNT_PROCESSOR_NODE;
+}
+
+size_t ZEPPBlurNode::GetDependencyCount()
+{
+	return 1;
+}
+
+ZEPostProcessorNode** ZEPPBlurNode::GetDependencies()
+{
+	return &Input;
+}
+
+void ZEPPBlurNode::SetInput(ZEPostProcessorNode* Input)
+{
+	this->Input = Input;
+}
+
+ZEPostProcessorNode* ZEPPBlurNode::GetInput()
+{
+	return Input;
+}
+
+void ZEPPBlurNode::SetHorizontalPass(bool Enable)
+{
+	HorizontalPass = Enable;
+}
+
+bool ZEPPBlurNode::GetHorizontalPass()
+{
+	return HorizontalPass;
+}
+
+void ZEPPBlurNode::SetVerticalPass(bool Enable)
+{
+	VerticalPass = Enable;
+}
+
+bool ZEPPBlurNode::GetVerticalPass()
+{
+	return VerticalPass;
+}
+
+void ZEPPBlurNode::SetStandartDeviation(float Ro)
+{
+	StandartDeviation = Ro;
+	KernelDirtyFlag = true;
+}
+
+float ZEPPBlurNode::GetStandartDeviation()
+{
+	return StandartDeviation;
+}
+
+void ZEPPBlurNode::SetKernelSize(unsigned int Size)
+{
+	if (Size != Kernel.GetCount())
+	{
+		if (Kernel.GetCount() % 2 != 1)
+		{
+			zeError("Blur Post Effect", "Kernel size is must be an odd number. Setting it to a default value 9.");
+			return;
+		}
+
+		if (Kernel.GetCount() > 16)
+		{
+			zeError("Blur Post Effect", "Kernel size is too big. Max : 15");
+			return;
+		}
+	
+		Kernel.SetCount(Size);
+
+		KernelDirtyFlag = true;
+	}
+}
+
+unsigned int ZEPPBlurNode::GetKernelSize()
+{
+	return Kernel.GetCount();
+}

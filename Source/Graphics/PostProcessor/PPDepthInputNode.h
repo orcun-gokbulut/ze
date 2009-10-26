@@ -44,6 +44,8 @@ class ZERenderer;
 
 class ZEPPDepthInputNode : public ZEPostProcessorNode
 {
+	friend class ZEPostProcessor;
+
 	protected:
 		ZERenderer*								Renderer;
 

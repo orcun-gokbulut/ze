@@ -147,10 +147,10 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 	}
 
 	HRESULT Hr;
-	Hr = Device->CreateTexture(Width, Height, MipMap, Usage, Format, Pool, &Texture, NULL); 
+	Hr = GetDevice()->CreateTexture(Width, Height, MipMap, Usage, Format, Pool, &Texture, NULL); 
 	if (Hr != D3D_OK)
 	{
-		zeError("Direct3D Module", "Can not create texture resource.");
+		zeError("D3D9 GetModule()", "Can not create texture resource.");
 		return false;
 	}
 
@@ -196,6 +196,6 @@ void ZED3D9Texture2D::Release()
 
 void ZED3D9Texture2D::Destroy()
 {
-	Module->Texture2Ds.DeleteValue((ZED3D9Texture2D*)this);
+	GetModule()->Texture2Ds.DeleteValue((ZED3D9Texture2D*)this);
 	delete this;
 }

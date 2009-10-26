@@ -38,38 +38,49 @@
 #define __ZE_POST_EFFECTS_H__
 
 #include "ZEDS/Array.h"
+#include "ZEMath/Vector.h"
 #include "PostProcessorNode.h"
 class ZETexture2D;
 
-class ZEBlurPostEffect : public ZEPPLinearKernelFilterNode
+class ZEPPBlurNode : public ZEPostProcessorNode
 {
 	protected:		
-		ZEPostProcessorNode*			Input;
-		ZETexture2D*					InputTexture;
+		ZEPostProcessorNode*				Input;
+	
+		float								StandartDeviation;	
 
-		ZETexture2D*					Output;
+		bool								HorizontalPass;
+		bool								VerticalPass;
 
-		float							StandartDeviation;	
+		ZEArray<ZEVector4>					Kernel;
+		bool								KernelDirtyFlag;
 
-		void							UpdateKernel();
+		void								UpdateKernel();
 
-										ZEBlurPostEffect();
-		virtual							~ZEBlurPostEffect();
+											ZEPPBlurNode();
+		virtual								~ZEPPBlurNode();
 
 	public:	
-		virtual size_t					GetDependencyCount();
-		virtual ZEPostProcessorNode**	GetDependencies();
+		virtual ZEPostProcessorNodeType		GetNodeType();
+
+		virtual size_t						GetDependencyCount();
+		virtual ZEPostProcessorNode**		GetDependencies();
 
 
-		virtual void					SetInput(ZEPostProcessorNode* Node);
-		virtual ZEPostProcessorNode*	GetInput();
+		virtual void						SetInput(ZEPostProcessorNode* Node);
+		virtual ZEPostProcessorNode*		GetInput();
+	
+		void								SetKernelSize(unsigned int Size);
+		unsigned int						GetKernelSize();
 
-		virtual ZETexture2D*			GetOutput();
-		
-		void							SetStandartDeviation(float Ro);
-		float							GetStandartDeviation();
+		void								SetStandartDeviation(float Ro);
+		float								GetStandartDeviation();
 
-		void							SetKernelSize(unsigned int Size);
+		void								SetHorizontalPass(bool Enabled);
+		bool								GetHorizontalPass();
+
+		void								SetVerticalPass(bool Enabled);
+		bool								GetVerticalPass();
 };
 
 #endif

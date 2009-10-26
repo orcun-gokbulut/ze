@@ -49,8 +49,6 @@ class ZEPPTextureOutputNode
 	protected:
 												ZEPPTextureOutputNode();
 
-		virtual ZETexture2D*					GetInternalOutput();
-
 	public:
 		virtual ZEPostProcessorNodeType			GetNodeType();
 

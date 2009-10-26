@@ -193,164 +193,6 @@
 				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
-		<Configuration
-			Name="Test|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="1"
-			CharacterSet="0"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-				CommandLine="&quot;$(SolutionDir)postprocess\madplay.exe&quot; &quot;$(SolutionDir)postprocess\building.mp3&quot;"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\directx&quot;;&quot;$(ProjectDir)\include\aegia\Foundation\include&quot;;&quot;$(ProjectDir)\include\aegia\Physics\include&quot;;&quot;$(ProjectDir)\include\aegia\PhysXLoader\include&quot;;&quot;$(ProjectDir)\include\aegia\Cooking\Include&quot;;&quot;$(ProjectDir)\include\aegia\NxExtensions\include&quot;;&quot;$(ProjectDir)\include\aegia\NxCharacter\include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;FREEIMAGE_LIB"
-				MinimalRebuild="true"
-				ExceptionHandling="0"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="true"
-				UsePrecompiledHeader="0"
-				WarningLevel="3"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-				DisableSpecificWarnings="4482"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib PhysXLoader.lib ogg_static.lib ogg.lib vorbis.lib vorbisenc.lib vorbisfile.lib freeimaged.lib cg.lib cgd3d9.lib"
-				LinkIncremental="2"
-				AdditionalLibraryDirectories="&quot;$(ProjectDir)\libs&quot;;&quot;$(ProjectDir)\libs\ageia&quot;;&quot;$(ProjectDir)\libs\directx\x86&quot;"
-				IgnoreDefaultLibraryNames="LIBCMT"
-				GenerateDebugInformation="true"
-				SubSystem="1"
-				RandomizedBaseAddress="1"
-				DataExecutionPrevention="0"
-				TargetMachine="1"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName).debug$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
-			/>
-		</Configuration>
-		<Configuration
-			Name="SDK Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
-			ConfigurationType="4"
-			CharacterSet="0"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-				CommandLine="&quot;$(SolutionDir)postprocess\madplay.exe&quot; &quot;$(SolutionDir)postprocess\building.mp3&quot;"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\directx&quot;;&quot;$(ProjectDir)\include\aegia\Foundation\include&quot;;&quot;$(ProjectDir)\include\aegia\Physics\include&quot;;&quot;$(ProjectDir)\include\aegia\PhysXLoader\include&quot;;&quot;$(ProjectDir)\include\aegia\Cooking\Include&quot;;&quot;$(ProjectDir)\include\aegia\NxExtensions\include&quot;;&quot;$(ProjectDir)\include\aegia\NxCharacter\include&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;ZEDEBUG_ENABLED;ZEDEBUG_PERFHUD;ZEDEBUG_BREAKONERROR"
-				GeneratePreprocessedFile="0"
-				MinimalRebuild="true"
-				ExceptionHandling="1"
-				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="true"
-				RuntimeTypeInfo="false"
-				UsePrecompiledHeader="0"
-				WarningLevel="1"
-				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="3"
-				DisableSpecificWarnings="4482"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLibrarianTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib ogg_static.lib ogg.lib vorbis.lib vorbisenc.lib vorbisfile.lib freeimage.lib"
-				OutputFile="$(OutDir)\zesdkd.lib"
-				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib&quot;;&quot;$(ProjectDir)\lib\directx\x86&quot;"
-				IgnoreAllDefaultLibraries="true"
-				IgnoreDefaultLibraryNames=""
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName).debug$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
-			/>
-		</Configuration>
 	</Configurations>
 	<References>
 	</References>
@@ -654,14 +496,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9PostProcessor.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9PostProcessor.h"
-					>
-				</File>
-				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9RendererBase.cpp"
 					>
 				</File>
@@ -785,6 +619,34 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="PostProcessor"
+					>
+					<File
+						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PostProcessor.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PostProcessor.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PPBlurNode.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PPBlurNode.h"
+						>
+					</File>
+					<File
+						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PPScreenOutputNode.cpp"
+						>
+					</File>
+					<File
+						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PPScreenOutputNode.h"
+						>
+					</File>
+				</Filter>
 			</Filter>
 			<Filter
 				Name="PostProcessor"
@@ -814,10 +676,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPBoxKernelFilterNode.h"
-					>
-				</File>
-				<File
 					RelativePath=".\Source\Graphics\PostProcessor\PPColorInputNode.cpp"
 					>
 				</File>
@@ -834,19 +692,27 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPFrameBufferOutputNode.cpp"
+					RelativePath=".\Source\Graphics\PostProcessor\PPFilter1DNode.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPFrameBufferOutputNode.h"
+					RelativePath=".\Source\Graphics\PostProcessor\PPFilter1DNode.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPLinearKernelFilterNode.c"
+					RelativePath=".\Source\Graphics\PostProcessor\PPFilter2DNode.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPLinearKernelFilterNode.h"
+					RelativePath=".\Source\Graphics\PostProcessor\PPFilter2DNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPScreenOutputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PostProcessor\PPScreenOutputNode.h"
 					>
 				</File>
 				<File
@@ -1017,14 +883,6 @@
 						GeneratePreprocessedFile="0"
 					/>
 				</FileConfiguration>
-				<FileConfiguration
-					Name="SDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						GeneratePreprocessedFile="0"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\GameInterface\Entity.h"
@@ -1147,24 +1005,6 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Test|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="SDK Debug|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"

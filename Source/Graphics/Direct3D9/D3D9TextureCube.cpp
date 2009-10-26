@@ -76,12 +76,12 @@ bool ZED3D9TextureCube::Create(int EdgeLength, ZETexturePixelFormat PixelFormat,
 		CubeTexture->Release();
 
 	HRESULT Hr;
-	Hr = Device->CreateCubeTexture(EdgeLength, 0, 
+	Hr = GetDevice()->CreateCubeTexture(EdgeLength, 0, 
 		(RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP), ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), 
 		(RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED), &CubeTexture, NULL);  
 	if (Hr != D3D_OK)
 	{
-		zeError("Direct3D Module", "Can not create volume texture resource.");
+		zeError("D3D9 GetModule()", "Can not create volume texture resource.");
 		return false;
 	}
 
@@ -115,6 +115,6 @@ void ZED3D9TextureCube::Release()
 
 void ZED3D9TextureCube::Destroy()
 {
-	Module->TextureCubes.DeleteValue((ZED3D9TextureCube*)this);
+	GetModule()->TextureCubes.DeleteValue((ZED3D9TextureCube*)this);
 	delete this;
 }

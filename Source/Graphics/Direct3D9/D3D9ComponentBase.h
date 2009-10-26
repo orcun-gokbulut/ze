@@ -42,14 +42,24 @@
 #endif
 
 #include <D3D9.h>
-#include <D3DX9.h>
 
 class ZED3D9Module;
 class ZED3D9ComponentBase
 {
-	protected:
+	private:
 		static ZED3D9Module*			Module;
 		static LPDIRECT3DDEVICE9		Device;
+
+	protected:
+		static inline ZED3D9Module*		GetModule()
+		{
+			return Module;
+		}
+
+		static inline LPDIRECT3DDEVICE9	GetDevice()
+		{
+			return Device;
+		}
 
 	public:
 		static bool						BaseInitialize(ZED3D9Module* D3DModule);

@@ -39,8 +39,6 @@
 
 #include "ZEDS/Array.h"
 
-class ZERenderer;
-class ZETexture2D;
 class ZEPostProcessorNode;
 
 class ZEPostProcessor

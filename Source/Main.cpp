@@ -57,7 +57,7 @@ extern HINSTANCE ApplicationInstance;
 #include "Core/ModuleManager.h"
 #include "Core/Window.h"
 #include "GameInterface/ModelBrush.h"
-#include "Graphics/Direct3D9/D3D9PostProcessor.h"
+#include "Graphics/PostProcessor/PostProcessor.h"
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {

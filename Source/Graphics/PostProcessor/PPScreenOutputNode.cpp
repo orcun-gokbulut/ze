@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PPFrameBufferOutputNode.h
+ Zinek Engine - PPScreenOutputNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PP_FRAME_BUFFER_OUTPUT_NODE_H__
-#define __ZE_PP_FRAME_BUFFER_OUTPUT_NODE_H__
+#include "PPScreenOutputNode.h"
+#include "Definitions.h"
 
-#include "PostProcessorNode.h"
-
-class ZETexture2D;
-
-class ZEPPFrameBufferOutputNode : public ZEPostProcessorNode
+ZEPPScreenOutputNode::ZEPPScreenOutputNode()
 {
-	public:
-		virtual ZEPostProcessorNodeType		GetNodeType();
+	Input = NULL;
+}
 
-		static ZEPPFrameBufferOutputNode*	CreateInstance();
-};
+ZEPostProcessorNodeType ZEPPScreenOutputNode::GetNodeType()
+{
+	return ZE_PPNT_OUTPUT_NODE;
+}
 
-#endif
+size_t ZEPPScreenOutputNode::GetDependencyCount()
+{
+	return 1;
+}
+
+ZEPostProcessorNode** ZEPPScreenOutputNode::GetDependencies()
+{
+	return &Input;
+}
+
+void ZEPPScreenOutputNode::SetInput(ZEPostProcessorNode* Node)
+{
+	Input = Node;
+}
+
+ZEPostProcessorNode* ZEPPScreenOutputNode::GetInput()
+{
+	return Input;
+}

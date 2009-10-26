@@ -39,6 +39,7 @@
 
 #include "D3D9ComponentBase.h"
 #include "ZEDS/Array.h"
+#include <d3dx9.h>
 
 enum ZED3D9FixedMateriaShaderPassType
 {

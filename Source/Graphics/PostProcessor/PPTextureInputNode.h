@@ -43,19 +43,22 @@ class ZETexture2D;
 
 class ZEPPTextureInputNode : public ZEPostProcessorNode
 {
-	protected:
-		ZETexture2D*							Texture;
+	friend class ZEPostProcessor;
 
-												ZEPPTextureInputNode();
-		virtual									~ZEPPTextureInputNode();	
+	protected:
+		ZETexture2D*						Texture;
+
+											ZEPPTextureInputNode();	
 
 	public:
-		void									SetTexture(ZETexture2D* Texture);
-		ZETexture2D*							GetTexture();
+		virtual ZEPostProcessorNodeType		GetNodeType();
 
-		virtual ZETexture2D*					GetOutput();
+		void								SetTexture(ZETexture2D* Texture);
+		ZETexture2D*						GetTexture();
 
-		static ZEPPTextureInputNode*			CreateInstance();
+		virtual ZETexture2D*				GetOutput();
+
+		static ZEPPTextureInputNode*		CreateInstance();
 };
 
 #endif

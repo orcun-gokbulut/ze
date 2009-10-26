@@ -69,10 +69,10 @@ bool ZED3D9Texture3D::Create(int Width, int Height, int Depth, ZETexturePixelFor
 		VolumeTexture->Release();
 
 	HRESULT Hr;
-	Hr = Device->CreateVolumeTexture(Width, Height, Depth, 0, D3DUSAGE_AUTOGENMIPMAP, ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), D3DPOOL_MANAGED, &VolumeTexture, NULL);  
+	Hr = GetDevice()->CreateVolumeTexture(Width, Height, Depth, 0, D3DUSAGE_AUTOGENMIPMAP, ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), D3DPOOL_MANAGED, &VolumeTexture, NULL);  
 	if (Hr != D3D_OK)
 	{
-		zeError("Direct3D Module", "Can not create volume texture resource.");
+		zeError("D3D9 GetModule()", "Can not create volume texture resource.");
 		return false;
 	}
 
@@ -106,7 +106,7 @@ void ZED3D9Texture3D::Release()
 
 void ZED3D9Texture3D::Destroy()
 {
-	Module->Texture3Ds.DeleteValue((ZED3D9Texture3D*)this);
+	GetModule()->Texture3Ds.DeleteValue((ZED3D9Texture3D*)this);
 	delete this;
 }
 

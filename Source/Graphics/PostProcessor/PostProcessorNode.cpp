@@ -46,11 +46,6 @@ ZEPostProcessorNode::~ZEPostProcessorNode()
 
 }
 
-ZETexture2D* ZEPostProcessorNode::GetDirectOutput()
-{
-	return NULL;
-}
-
 void  ZEPostProcessorNode::SetOwner(ZEPostProcessor* Owner)
 {
 	this->Owner = Owner;

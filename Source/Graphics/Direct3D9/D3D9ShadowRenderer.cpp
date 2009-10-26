@@ -99,46 +99,46 @@ void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
 	//const ZEMaterial* Material = RenderOrder->Material;
 
 	//if (RenderOrder->Flags & ZE_RLF_SKINNED)
-	//	Device->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+	//	GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
 
 	//if (RenderOrder->IndexBuffer != NULL)
 	//	if (RenderOrder->IndexBuffer IsStaticIndexBuffer())
-	//		Device->SetIndices(StaticIndexBuffers[RenderOrder->GetStaticIndexBufferId()]);	*/
+	//		GetDevice()->SetIndices(StaticIndexBuffers[RenderOrder->GetStaticIndexBufferId()]);	*/
 
 	//if (RenderOrder->Flags & ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM)
 	//{
 	//	ZEMatrix4x4 WorldViewProjMatrix;
 	//	ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewPoint.ViewProjMatrix);
-	//	Device->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
+	//	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
 	//}
 	//else
-	//	Device->SetVertexShaderConstantF(0, (float*)&RenderOrder->WorldMatrix, 4);
+	//	GetDevice()->SetVertexShaderConstantF(0, (float*)&RenderOrder->WorldMatrix, 4);
 
 
-	//Device->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);
-	//Device->SetVertexShaderConstantF(8, (float*)&RenderOrder->WorldMatrix, 4);
-	//Device->SetVertexShaderConstantF(16, (float*)&ZEVector4(ViewPoint.ViewPosition, 1.0f), 1);
+	//GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);
+	//GetDevice()->SetVertexShaderConstantF(8, (float*)&RenderOrder->WorldMatrix, 4);
+	//GetDevice()->SetVertexShaderConstantF(16, (float*)&ZEVector4(ViewPoint.ViewPosition, 1.0f), 1);
 
 	//if (RenderOrder->Flags & ZE_RLF_ENABLE_ZCULLING)
 	//{
-	//	Device->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-	//	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-	//	Device->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+	//	GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+	//	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	//	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	//}
 	//else
-	//	Device->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);*/
+	//	GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);*/
 	//
 	//if (Material->TwoSided)
-	//	Device->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	//	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	//else
-	//	Device->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	//	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 
 	//if (Material->Wireframe)
-	//	Device->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	//	GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	//else
-	//	Device->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	//	GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
-	//Device->SetVertexDeclaration(VertexDeclarations[RenderOrder->VertexType]);
+	//GetDevice()->SetVertexDeclaration(VertexDeclarations[RenderOrder->VertexType]);
 	//PumpStreams(RenderOrder);
 }
 
@@ -265,7 +265,7 @@ void ZED3D9ShadowRenderer::Deinitialize()
 void ZED3D9ShadowRenderer::Destroy()
 {
 	// Remove renderer from modules renderer list
-	Module->ShadowRenderers.DeleteValue((ZED3D9ShadowRenderer*)this);
+	GetModule()->ShadowRenderers.DeleteValue((ZED3D9ShadowRenderer*)this);
 	ZERenderer::Destroy();
 }
 
@@ -297,55 +297,55 @@ void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 
 void ZED3D9ShadowRenderer::Render(float ElaspedTime)
 {
-/*	if (!Module->IsEnabled() || Module->IsDeviceLost)
+/*	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost)
 		return;
 
-	Device->SetRenderTarget(0, ColorRenderTarget);
-	Device->SetDepthStencilSurface(DepthRenderTarget);
+	GetDevice()->SetRenderTarget(0, ColorRenderTarget);
+	GetDevice()->SetDepthStencilSurface(DepthRenderTarget);
 	
-	Device->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0x00000000);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0x00000000);
 
 	float BiasValue;
 	BiasValue = 0.0001f;//2.0f / 16777215.0f;;
-	Device->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, *(DWORD*)&BiasValue);
+	GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, *(DWORD*)&BiasValue);
 
 	BiasValue = 0.002f;//2.0f / 16777215.0f;;
-	Device->SetRenderState(D3DRS_DEPTHBIAS, *(DWORD*)&BiasValue);
+	GetDevice()->SetRenderState(D3DRS_DEPTHBIAS, *(DWORD*)&BiasValue);
 
-	Device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-	Device->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-	Device->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00);
-	Device->SetRenderState(D3DRS_ZENABLE, TRUE);
-	Device->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-	Device->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00);
+	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	
-	Device->SetVertexShader(ShadowMapVS);
-	Device->SetPixelShader(ShadowMapPS);
+	GetDevice()->SetVertexShader(ShadowMapVS);
+	GetDevice()->SetPixelShader(ShadowMapPS);
 
-	Device->BeginScene();
+	GetDevice()->BeginScene();
 		for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 			DrawSM2(&NonTransparent[I]);
 
 		if (Transparent.GetCount() != 0)
 		{
-			Device->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-			Device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
-			Device->SetRenderState(D3DRS_ALPHAREF, 0x01);
+			GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+			GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+			GetDevice()->SetRenderState(D3DRS_ALPHAREF, 0x01);
 
-			Device->SetVertexShader(ShadowMapTextVS);
-			Device->SetPixelShader(ShadowMapOpasityPS);
+			GetDevice()->SetVertexShader(ShadowMapTextVS);
+			GetDevice()->SetPixelShader(ShadowMapOpasityPS);
 			for (size_t I = 0; I < Transparent.GetCount(); I++)
 				if (((ZEFixedMaterial*)Transparent[I].Material)->OpacityMap != NULL)
 					DrawRenderOrder(&Transparent[I]);
 
 
-			Device->SetPixelShader(ShadowMapDiffuseAlphaPS);
+			GetDevice()->SetPixelShader(ShadowMapDiffuseAlphaPS);
 			for (size_t I = 0; I < Transparent.GetCount(); I++)
 				if (((ZEFixedMaterial*)Transparent[I].Material)->OpacityMap == NULL)
 					DrawRenderOrder(&Transparent[I]);
 		}
-	Device->EndScene();
-//	Module->CurrentFrameId++;*/
+	GetDevice()->EndScene();
+//	GetModule()->CurrentFrameId++;*/
 }
 
 

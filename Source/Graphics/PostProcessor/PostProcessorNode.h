@@ -43,38 +43,37 @@ class ZEPostProcessor;
 enum ZEPostProcessorNodeType
 {
 	ZE_PPNT_INPUT_NODE,
-	ZE_PPNT_PROCESSOR_NONE,
+	ZE_PPNT_PROCESSOR_NODE,
 	ZE_PPNT_OUTPUT_NODE
 };
 
+class ZEPostProcessorData;
 class ZEPostProcessorNode
 {
 	private:
-		ZEPostProcessor*						Owner;
+		ZEPostProcessor*					Owner;
 
 	protected:
-												ZEPostProcessorNode();
-		virtual									~ZEPostProcessorNode();	
-
-		virtual	ZETexture2D*					GetDirectOutput();
+											ZEPostProcessorNode();
+		virtual								~ZEPostProcessorNode();	
 
 	public:
-		virtual ZEPostProcessorNodeType			GetNodeType() = 0;
+		virtual ZEPostProcessorNodeType		GetNodeType() = 0;
 
-		virtual void							SetOwner(ZEPostProcessor* Owner);
-		ZEPostProcessor*						GetOwner();
+		virtual void						SetOwner(ZEPostProcessor* Owner);
+		ZEPostProcessor*					GetOwner();
 
-		virtual size_t							GetDependencyCount();
-		virtual ZEPostProcessorNode**			GetDependencies();
+		virtual size_t						GetDependencyCount();
+		virtual ZEPostProcessorNode**		GetDependencies();
 
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
+		virtual bool						Initialize();
+		virtual void						Deinitialize();
 
-		virtual void							Destroy();
+		virtual void						Destroy();
 
-		virtual bool							Process();
+		virtual bool						Process();
 
-		virtual ZETexture2D*					GetOutput() = 0;
+		virtual ZETexture2D*				GetOutput() = 0;
 };
 
 #endif

@@ -78,18 +78,18 @@ void ZED3D9RendererBase::PumpStreams(ZERenderOrder* RenderOrder)
 		/*
 		// Check wheater render order has static vertex buffer or not
 		if (VertexBuffer->IsStatic())
-			Device->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, VertexBuffer->GetVertexCount(), 0, VertexBuffer->GetPolygonCount());
+			GetDevice()->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, VertexBuffer->GetVertexCount(), 0, VertexBuffer->GetPolygonCount());
 		else
-			Device->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, VertexBuffer->GetVertexCount(), RenderOrder->PrimitiveCount, RenderOrder->IndexBuffer, D3DFMT_INDEX32, VertexBuffer->GetVertexBuffer(), RenderOrder->VertexDeclaration->GetVertexSize());
+			GetDevice()->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, VertexBuffer->GetVertexCount(), RenderOrder->PrimitiveCount, RenderOrder->IndexBuffer, D3DFMT_INDEX32, VertexBuffer->GetVertexBuffer(), RenderOrder->VertexDeclaration->GetVertexSize());
 		*/
 	} 
 	else
 	{
 		// Check wheater render order has static vertex buffer or not
 		if (VertexBuffer->IsStatic())
-			Device->DrawPrimitive(PrimitiveType, 0, RenderOrder->PrimitiveCount);
+			GetDevice()->DrawPrimitive(PrimitiveType, 0, RenderOrder->PrimitiveCount);
 		else
-			Device->DrawPrimitiveUP(PrimitiveType, RenderOrder->PrimitiveCount, ((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer(),  RenderOrder->VertexDeclaration->GetVertexSize());
+			GetDevice()->DrawPrimitiveUP(PrimitiveType, RenderOrder->PrimitiveCount, ((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer(),  RenderOrder->VertexDeclaration->GetVertexSize());
 	}
 }
 
@@ -112,12 +112,12 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 	/*
 	// Setup index buffer if available
 	if (RenderOrder->IndexBuffer != NULL)
-		Device->SetIndices(RenderOrder->IndexBuffer);
+		GetDevice()->SetIndices(RenderOrder->IndexBuffer);
 	*/
 
 	// If vertex buffer is static, setup vertex buffer
 	if (VertexBuffer->IsStatic())
-		Device->SetStreamSource(0, VertexBuffer->StaticBuffer, RenderOrder->VertexBufferOffset, RenderOrder->VertexDeclaration->GetVertexSize());
+		GetDevice()->SetStreamSource(0, VertexBuffer->StaticBuffer, RenderOrder->VertexBufferOffset, RenderOrder->VertexDeclaration->GetVertexSize());
 
 	// Setup Material
 	Material->SetupMaterial(RenderOrder, Camera);

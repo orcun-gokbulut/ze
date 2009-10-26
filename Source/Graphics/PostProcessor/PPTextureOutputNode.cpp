@@ -43,11 +43,6 @@ ZEPPTextureOutputNode::ZEPPTextureOutputNode()
 	Texture = NULL;
 }
 
-ZETexture2D* ZEPPTextureOutputNode::GetInternalOutput()
-{
-	return Texture;
-}
-
 ZEPostProcessorNodeType ZEPPTextureOutputNode::GetNodeType()
 {
 	return ZE_PPNT_OUTPUT_NODE;

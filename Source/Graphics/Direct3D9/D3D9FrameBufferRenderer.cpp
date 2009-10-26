@@ -158,7 +158,7 @@ ZETexture2D* ZED3D9FrameBufferRenderer::GetObjectTexture()
 
 void ZED3D9FrameBufferRenderer::DeviceLost()
 {
-	// Device is lost so recreate hardware resources
+	// GetDevice() is lost so recreate hardware resources
 }
 
 bool ZED3D9FrameBufferRenderer::DeviceRestored()
@@ -169,7 +169,7 @@ bool ZED3D9FrameBufferRenderer::DeviceRestored()
 void ZED3D9FrameBufferRenderer::Destroy()
 {
 	// Remove renderer from modules renderer list
-	Module->Renderers.DeleteValue((ZED3D9FrameBufferRenderer*)this);
+	GetModule()->Renderers.DeleteValue((ZED3D9FrameBufferRenderer*)this);
 	delete this;
 }
 
@@ -224,7 +224,7 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 	unsigned int ScreenHeight = zeGraphics->GetScreenHeight();
 
 	// Check render module is enabled and the device is not lost
-	if (!Module->IsEnabled() || Module->IsDeviceLost)
+	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost())
 		return;
 
 	// Check if there is a post process attached to render order
@@ -236,8 +236,8 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 	else
 	{
 		// If there is no post process attached then use directly frame buffer
-		Device->SetRenderTarget(0, Module->FrameColorBuffer);
-		Device->SetDepthStencilSurface(Module->FrameZBuffer);
+		GetDevice()->SetRenderTarget(0, GetModule()->GetFrameColorBuffer());
+		GetDevice()->SetDepthStencilSurface(GetModule()->GetFrameZBuffer());
 	}
 
 	// If renderer will give output to other mechanisms like post processors. It will enable render color buffer.
@@ -326,50 +326,50 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 		}
 
 	// Set z-buffer options
-	Device->SetRenderState(D3DRS_DEPTHBIAS, 0);
-	Device->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, 0);
+	GetDevice()->SetRenderState(D3DRS_DEPTHBIAS, 0);
+	GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, 0);
 
 	// Clear render targets
-	Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00, 1.0f, 0x00000000);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00, 1.0f, 0x00000000);
 
 	// Setup Texture sampling properties (Will be changed)
 	for (int I = 0; I < 10; I++)
 	{
 		if (I < 8)
 		{
-			Device->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-			Device->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-			Device->SetSamplerState(I, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
 		} 
 		else
 		{
-			Device->SetSamplerState(I, D3DSAMP_BORDERCOLOR, 0x0f);
-			Device->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
-			Device->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
-			Device->SetSamplerState(I, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
+			GetDevice()->SetSamplerState(I, D3DSAMP_BORDERCOLOR, 0x0f);
+			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
+			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
+			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
 		}
 
 		if (I == 8)
 		{
-			Device->SetSamplerState(I, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-			Device->SetSamplerState(I, D3DSAMP_MAGFILTER, D3DTEXF_POINT);	
-			Device->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+			GetDevice()->SetSamplerState(I, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+			GetDevice()->SetSamplerState(I, D3DSAMP_MAGFILTER, D3DTEXF_POINT);	
+			GetDevice()->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 		}
 		else
 		{
-			Device->SetSamplerState(I, D3DSAMP_MINFILTER, (Module->GetAnisotropicFilter() ? D3DTEXF_ANISOTROPIC : D3DTEXF_LINEAR));
-			Device->SetSamplerState(I, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-			Device->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+			GetDevice()->SetSamplerState(I, D3DSAMP_MINFILTER, (GetModule()->GetAnisotropicFilter() ? D3DTEXF_ANISOTROPIC : D3DTEXF_LINEAR));
+			GetDevice()->SetSamplerState(I, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+			GetDevice()->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 		}
 
 
 	}
 
 	// Enable color output
-	Device->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
 
 	// Start Drawing
-	Device->BeginScene();
+	GetDevice()->BeginScene();
 
 		// Draw non-transparent object first
 		for (size_t I = 0; I < NonTransparent.GetCount(); I++)
@@ -384,5 +384,5 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 			ZED3D9RendererBase::DrawRenderOrder(&Imposter[I], Camera);
 
 	// Finish Drawing
-	Device->EndScene();
+	GetDevice()->EndScene();
 }

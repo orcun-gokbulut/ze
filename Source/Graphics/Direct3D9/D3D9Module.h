@@ -64,24 +64,52 @@ class ZED3D9TextureRenderer;
 class ZED3D9PostProcessor;
 class ZED3D9FixedMaterialShader;
 
+enum ZED3D9PixelShaderVersion
+{
+	ZE_D3D9_PSV_3_0_0	= 4,
+	ZE_D3D9_PSV_2_0_A	= 3,
+	ZE_D3D9_PSV_2_0_B	= 2,
+	ZE_D3D9_PSV_2_0_0	= 1,
+	ZE_D3D9_PSV_NONE	= 0
+};
+
+enum ZED3D9VertexShaderVersion
+{
+	ZE_D3D9_VSV_3_0_0	= 3,
+	ZE_D3D9_VSV_2_0_A	= 2,
+	ZE_D3D9_VSV_2_0_0	= 1,
+	ZE_D3D9_VSV_NONE	= 0
+};
+
+enum ZED3D9PipelineType
+{
+	ZE_D3D9_PT_FIXED_FUNCTION,
+	ZE_D3D9_PT_PROGRAMABLE
+};
+
 class ZED3D9Module : public ZEGraphicsModule
 {
 	friend class										ZED3D9ModuleDescription;
-	protected:
-														ZED3D9Module();
-											 			~ZED3D9Module();
-	public:
-		bool											IsDeviceLost;
+	
+	private:
+		bool											DeviceLostState;
 		bool											Enabled;
-		bool											UseOnlyShaderModel2;
 
-		D3DCAPS9										D3DCaps;
+		ZED3D9PixelShaderVersion						PixelShaderVersion;
+		ZED3D9VertexShaderVersion						VertexShaderVersion;
+		ZED3D9PipelineType								PipelineType;
+
+		D3DCAPS9										DeviceCaps;
 
 		LPDIRECT3D9										D3D;
 		LPDIRECT3DDEVICE9								Device;
 		LPDIRECT3DSURFACE9								FrameColorBuffer;
 		LPDIRECT3DSURFACE9								FrameZBuffer;
 
+	protected:
+														ZED3D9Module();
+											 			~ZED3D9Module();
+	public:
 		ZEChunkArray<ZED3D9FrameBufferRenderer*, 50>	Renderers;
 		ZEChunkArray<ZED3D9ShadowRenderer*, 50>			ShadowRenderers;
 		ZEChunkArray<ZED3D9TextureRenderer*, 50>		TextureRenderers;
@@ -92,11 +120,18 @@ class ZED3D9Module : public ZEGraphicsModule
 		ZEChunkArray<ZED3D9StaticVertexBuffer*, 50>		VertexBuffers;
 		ZEChunkArray<ZED3D9PostProcessor*, 50>			PostProcessors;
 		ZEChunkArray<ZED3D9VertexDeclaration*, 50>		VertexDeclaration;
-
-
-		int												ShaderModel;
-
+		
 		ZEModuleDescription*							GetModuleDescription();
+
+		LPDIRECT3D9										GetDirect3D();
+		LPDIRECT3DDEVICE9								GetDevice();
+		D3DCAPS9*										GetDeviceCaps();
+		LPDIRECT3DSURFACE9								GetFrameColorBuffer();
+		LPDIRECT3DSURFACE9								GetFrameZBuffer();
+
+		ZED3D9PixelShaderVersion						GetPixelShaderVersion();
+		ZED3D9VertexShaderVersion						GetVertexShaderVersion();
+		ZED3D9PipelineType								GetPipelineType();
 
 		virtual bool									IsEnabled();
 		virtual void									SetEnabled(bool Enabled);
@@ -104,6 +139,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual bool									Initialize();
 		virtual void									Deinitialize();
 
+		bool											IsDeviceLost();
 		void											DeviceLost();
 		void											DeviceRestored();
 		void											RestoreDevice(bool ForceReset = false);
@@ -128,6 +164,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual ZEFrameBufferRenderer*					CreateFrameBufferRenderer();
 		virtual ZEShadowRenderer*						CreateShadowRenderer();
 		virtual ZETextureRenderer*						CreateTextureRenderer();
+
 		virtual ZEPostProcessor*						CreatePostProcessor();
 
 		virtual ZEVertexDeclaration*					CreateVertexDeclaration();

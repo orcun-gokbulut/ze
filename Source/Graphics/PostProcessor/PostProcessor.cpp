@@ -51,16 +51,23 @@ ZEArray<ZEPostProcessorNode*>& ZEPostProcessor::GetNodes()
 	return Nodes;
 }
 
+#include "PPColorInputNode.h"
+#include "PPDepthInputNode.h"
+#include "PPVelocityInputNode.h"
+#include "PPTextureInputNode.h"
+
 ZEPostProcessorNode* ZEPostProcessor::CreateNode(const char* Name)
 {
-	if (strcmp(Name, "RendererColorInput") == 0)
-	if (strcmp(Name, "RendererDepthInput") == 0)
-	if (strcmp(Name, "RendererVelocityInput") == 0)
-	if (strcmp(Name, "FrameBufferOutput") == 0)
-	if (strcmp(Name, "TextureOutput") == 0)
-	if (strcmp(Name, "Blur") == 0)
-
-	return NULL;
+	if (strcmp(Name, "ColorInput") == 0)
+		return new ZEPPColorInputNode();
+	else if (strcmp(Name, "DepthInput") == 0)
+		return new ZEPPDepthInputNode();
+	else if (strcmp(Name, "VelocityInput") == 0)
+		return new ZEPPVelocityInputNode();
+	else if (strcmp(Name, "TextureInput") == 0)
+		return new ZEPPTextureInputNode();
+	else
+		return NULL;
 }
 
 ZEPostProcessorNode* ZEPostProcessor::CreateNode(size_t Index)
