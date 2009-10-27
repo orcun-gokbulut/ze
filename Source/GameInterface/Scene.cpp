@@ -88,6 +88,11 @@ ZEDWORD ZEScene::GetVisualDebugElements()
 	return this->VisualDebugElements;
 }
 
+#include "Graphics/PostProcessor/PostProcessor.h"
+#include "Graphics/PostProcessor/PPColorInputNode.h"
+#include "Graphics/PostProcessor/PPScreenOutputNode.h"
+#include "Graphics/PostProcessor/PPBlurNode.h"
+
 bool ZEScene::Initialize()
 {
 	if (Renderer != NULL)
@@ -240,6 +245,25 @@ bool ZEScene::Initialize()
 	LightRangeMaterial->SetAmbientEnabled(true);
 	LightRangeMaterial->SetAmbientColor(ZEVector3(0.0f, 0.0f, 0.5f));
 	LightRangeMaterial->UpdateMaterial();
+
+	Renderer->SetRenderColorTexture(true);
+
+	PostProcessor = zeGraphics->CreatePostProcessor();
+	
+	ZEPPColorInputNode* ColorInput = (ZEPPColorInputNode*)PostProcessor->CreateNode("ColorInput");
+	ColorInput->SetRenderer(Renderer);
+	ColorInput->Initialize();
+	PostProcessor->AddNode(ColorInput);
+
+	ZEPPBlurNode* BlurNode = (ZEPPBlurNode*)PostProcessor->CreateNode("Blur");
+	BlurNode->SetInput(ColorInput);
+	BlurNode->Initialize();
+	PostProcessor->AddNode(BlurNode);
+	
+	ZEPPScreenOutputNode* ScreenOutput = (ZEPPScreenOutputNode*)PostProcessor->CreateNode("ScreenOutput");
+	ScreenOutput->SetInput(BlurNode);
+	ScreenOutput->Initialize();
+	PostProcessor->AddNode(ScreenOutput);
 
 	return true;
 }

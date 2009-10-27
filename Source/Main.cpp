@@ -57,7 +57,7 @@ extern HINSTANCE ApplicationInstance;
 #include "Core/ModuleManager.h"
 #include "Core/Window.h"
 #include "GameInterface/ModelBrush.h"
-#include "Graphics/PostProcessor/PostProcessor.h"
+
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
@@ -133,6 +133,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		CanvasMaterial->SetSpecularShininess(64.0f);
 		CanvasMaterial->UpdateMaterial();
 		Scene->AddEntity(CanvasBrush);
+
 
 		/*
 		ZESkyBrush* Brush = (ZESkyBrush*)zeCore->GetGame()->CreateEntityInstance("ZESkyBrush");

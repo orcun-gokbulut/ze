@@ -587,8 +587,7 @@ ZEShadowRenderer* ZED3D9Module::CreateShadowRenderer()
 
 ZEPostProcessor* ZED3D9Module::CreatePostProcessor()
 {
-//	return new ZED3D9PostProcessor;
-	return NULL;
+	return new ZED3D9PostProcessor();
 }
 
 ZEVertexDeclaration* ZED3D9Module::CreateVertexDeclaration()
