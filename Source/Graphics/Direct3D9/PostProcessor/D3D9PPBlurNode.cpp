@@ -81,113 +81,43 @@ bool ZED3D9PPBlurNode::Initialize()
 		return false;
 	}
 
-	switch(GetModule()->GetPixelShaderVersion())
+	if (GetModule()->GetPixelShaderVersion() == ZE_D3D9_PSV_NONE)
 	{
-		case ZE_D3D9_PSV_2_0_B:
-		case ZE_D3D9_PSV_2_0_0:
-			// Create horizontal blur pass pixel shader
-			if (HorizontalPassPixelShader == NULL)
-				if (!ZED3D9CommonTools::CompilePixelShader(&HorizontalPassPixelShader, 
-						"sampler Input : register(s0);"
-						"const float2 Kernel[7] : register(c0);"
-						"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-						"{"
-							"float4 Color = 0.0f;"
-							"for (int I = 0; I < KernelSize; I++)"
-								"Color += Kernel[I].x * tex2D(Input, float2(TexCoord.x, TexCoord.y + Kernel[I].y));"
-							"return Color;"
-						"}", "Horizantal Blur Pass", "ps_2_0", NULL)
-					)
-					return false;
-
-			// Create vertical blur pass pixel shader
-			if (VerticalPassPixelShader == NULL)
-				if (!ZED3D9CommonTools::CompilePixelShader(&VerticalPassPixelShader, 
-						"sampler Input : register(s0);"
-						"const float2 Kernel[7] : register(c0);"
-						"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-						"{"
-							"float4 Color = 0.0f;"
-							"for (int I = 0; I < KernelSize; I++)"
-								"Color += Kernel[I].x * tex2D(Input, float2(TexCoord.x + Kernel[I].y * PixelSize, TexCoord.y));"
-							"return Color;"
-						"}", "Vertical Blur Pass", "ps_2_0", NULL)
-					)
-					return false;
-			break;
-		case ZE_D3D9_PSV_2_0_A:
-			// Create horizontal blur pass pixel shader
-			if (HorizontalPassPixelShader == NULL)
-				if (!ZED3D9CommonTools::CompilePixelShader(&HorizontalPassPixelShader, 
-						"sampler Input : register(s0);"
-						"const int KernelSize : register(i0);"
-						"const float2 Kernel[16] : register(c0);"
-						"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-						"{"
-							"float4 Color = 0.0f;"
-							"for (int I = 0; I < KernelSize; I++)"
-								"Color += Kernel[I].x * tex2D(Input, float2(TexCoord.x, TexCoord.y + Kernel[I].y * PixelSize));"
-							"return Color;"
-						"}", "Horizantal Blur Pass", "ps_2_a", NULL)
-					)
-					return false;
-
-			// Create vertical blur pass pixel shader
-			if (VerticalPassPixelShader == NULL)
-				if (!ZED3D9CommonTools::CompilePixelShader(&VerticalPassPixelShader, 
-						"sampler Input : register(s0);"
-						"const int KernelSize : register(i0);"
-						"const float PixelSize : register(c0);"
-						"const float2 Kernel[16] : register(c1);"
-						"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-						"{"
-							"float4 Color = 0.0f;"
-							"for (int I = 0; I < KernelSize; I++)"
-								"Color += Kernel[I].x * tex2D(Input, float2(TexCoord.x + Kernel[I].y, TexCoord.y));"
-							"return Color;"
-						"}", "Vertical Blur Pass", "ps_2_a", NULL)
-					)
-					return false;
-			break;
-		case ZE_D3D9_PSV_3_0_0:
-			// Create horizontal blur pass pixel shader
-			if (HorizontalPassPixelShader == NULL)
-				if (!ZED3D9CommonTools::CompilePixelShader(&HorizontalPassPixelShader, 
-						"sampler Input : register(s0);"
-						"int KernelSize : register(i0);"
-						"float PixelSize : register(c0);"
-						"float2 Kernel[16] : register(c1);"
-						"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-						"{"
-							"float4 Color = 0.0f;"
-							"for (int I = 0; I < KernelSize; I++)"
-								"Color += Kernel[I].x * tex2D(Input, float2(TexCoord.x, TexCoord.y + Kernel[I].y * PixelSize));"
-							"return Color;"
-						"}", "Horizantal Blur Pass", "ps_3_0", NULL)
-					)
-					return false;
-
-			// Create vertical blur pass pixel shader
-			if (VerticalPassPixelShader == NULL)
-				if (!ZED3D9CommonTools::CompilePixelShader(&VerticalPassPixelShader, 
-						"sampler Input : register(s0);"
-						"int KernelSize : register(i0);"
-						"float PixelSize : register(c0);"
-						"float2 Kernel[16] : register(c1);"
-						"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
-						"{"
-							"float4 Color = 0.0f;"
-							"for (int I = 0; I < KernelSize; I++)"
-								"Color += Kernel[I].x * tex2D(Input, float2(TexCoord.x + Kernel[I].y, TexCoord.y));"
-							"return Color;"
-						"}", "Vertical Blur Pass", "ps_3_0", NULL)
-					)
-					return false;
-			break;
-		default:
-			zeError("D3D9 Post Processor - Blur Node", "Pixel shader is not supported.");
-			return false;
+		zeError("D3D9 Post Processor - Blur Node", "Pixel shader is not supported.");
+		return false;
 	}
+
+ 	// Create horizontal blur pass pixel shader
+	if (HorizontalPassPixelShader == NULL)
+		if (!ZED3D9CommonTools::CompilePixelShader(&HorizontalPassPixelShader, 
+				"sampler Input : register(s0);"
+				"const float2 Kernel[7] : register(c0);"
+				"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
+				"{"
+					"float4 Color = 0.0f;"
+					"for (int I = 0; I < 7; I++)"
+						"Color += Kernel[I].x * tex2D(Input, float2(TexCoord.x, TexCoord.y + Kernel[I].y));"
+					"return Color;"
+				"}", "Horizantal Blur Pass", "ps_2_0", NULL)
+			)
+			return false;
+
+	// Create vertical blur pass pixel shader
+	if (VerticalPassPixelShader == NULL)
+		if (!ZED3D9CommonTools::CompilePixelShader(&VerticalPassPixelShader, 
+				"sampler Input : register(s0);"
+				"const float2 Kernel[7] : register(c0);"
+				"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
+				"{"
+					"float4 Color = 0.0f;"
+					"for (int I = 0; I < 7; I++)"
+						"Color += Kernel[I].x * tex2D(Input, float2(TexCoord.x + Kernel[I].y, TexCoord.y));"
+					"return Color;"
+				"}", "Vertical Blur Pass", "ps_2_0", NULL)
+			)
+			return false;
+	
+	return true;
 }
 
 void ZED3D9PPBlurNode::Deinitialize()
@@ -205,6 +135,13 @@ void ZED3D9PPBlurNode::Deinitialize()
 		Output = NULL;
 	}
 }
+
+void ZED3D9PPBlurNode::DoHorizantalPass(LPDIRECT3DTEXTURE9 Source, LPDIRECT3DSURFACE9 RenderTarget)
+{
+}
+
+void ZED3D9PPBlurNode::DoVerticalPass(LPDIRECT3DTEXTURE9 Source, LPDIRECT3DSURFACE9 RenderTarget)
+{
 
 bool ZED3D9PPBlurNode::Process()
 {
@@ -231,9 +168,18 @@ bool ZED3D9PPBlurNode::Process()
 		return false;
 	}
 
+	// Check pass count
+	if (PassCount == 0)
+		return true;
+
+	// Update kernel values. UpdateKernel() function will detect changed properties of Blur Post Effect and 
+	// if necessery will regenerate kernel values.
+	UpdateKernel();
+
+
 	// Calculate pixel sizes for calculating texel to pixel conversion
-	float PixelWidth_2 = 0.5f / InputTexture->GetWidth();
-	float PixelHeight_2 = 0.5f / InputTexture->GetHeight();
+	float PixelWidth_2 = 0.5f * InputTexture->GetWidth() * DownSample;
+	float PixelHeight_2 = 0.5f * InputTexture->GetHeight() * DownSample;
 	
 	// Generate screen aligned quad in the memory
 	struct
@@ -264,68 +210,76 @@ bool ZED3D9PPBlurNode::Process()
 	// Set Vertex Shader
 	GetDevice()->SetVertexShader(VertexShader);
 
-	// Update kernel values. UpdateKernel() function will detect changed properties of Blur Post Effect and 
-	// if necessery will regenerate kernel values.
-	UpdateKernel();
 
-	
-	// Set shader constants
-	// Check shader versions and mechanisms
-	if (GetModule()->GetPixelShaderVersion() > ZE_D3D9_PSV_2_0_A || GetModule()->GetPixelShaderVersion() == ZE_D3D9_PSV_3_0_0)
+				// Do both vertical and horizontal passes. 
+			// First do vertical pass and put output in temporary render target
+			// then do second pass read values from temporary render target and put
+			// output in output texture.
+
+	if ((HorizontalPass && VerticalPass)
 	{
-		int KernelSize = Kernel.GetCount();
-		GetDevice()->SetPixelShaderConstantF(0, (float*)Kernel.GetCArray(), Kernel.GetCount());
-		GetDevice()->SetPixelShaderConstantI(0, &KernelSize, 1);
-	}
-	else
-		GetDevice()->SetPixelShaderConstantF(0, (float*)Kernel.GetCArray(), 7);
-
-	if (HorizontalPass && VerticalPass)
-	{
-		// Do both vertical and horizontal passes. 
-		// First do vertical pass and put output in temporary render target
-		// then do second pass read values from temporary render target and put
-		// output in output texture.
-
-		// Create temporary render target. 
+		// Create temporary render target. 		
 		// ZED3D9CommonTools::CreateRenderTarget will check previous render target is available or has correct dimensions. If not it will create one or modify current one.
-		ZED3D9CommonTools::CreateRenderTarget(&InternalSurface, InputTexture->GetWidth(), InputTexture->GetHeight(), InputTexture->GetPixelFormat());
+		ZED3D9CommonTools::CreateRenderTarget(&InternalSurface, InputTexture->GetWidth() * DownSample, InputTexture->GetHeight() * DownSample, InputTexture->GetPixelFormat());
 
+		// Initial source and target asignment
+		LPDIRECT3DTEXTURE9 Source = InputTexture;
+		LPDIRECT3DSURFACE9 Destination = Internal;
 
 		// HORIZONTAL PASS
 		// Set horizontal pixel shader
 		GetDevice()->SetPixelShader(HorizontalPassPixelShader);
-		// Set input as texture
-		GetDevice()->SetTexture(0, ((ZED3D9Texture2D*)InputTexture)->Texture);
-		// Set output as render target
-		LPDIRECT3DSURFACE9 RenderTarget;
-		((ZED3D9Texture2D*)InputTexture)->Texture->GetSurfaceLevel(0, &RenderTarget);
-		GetDevice()->SetRenderTarget(0, RenderTarget);
-		// Set Pixel Size
-		PixelWidth_2 *= 2;
-		GetDevice()->SetPixelShaderConstantF(1, &PixelWidth_2, 1);
-		// Draw the pass
-		GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 5 * 4);
-
 		
+		// Set input as texture
+		GetDevice()->SetPixelShaderConstantF(0, (float*)Kernel, 7);
+
+		for (unsigned int I = 0; I < PassCount; I++)
+		{
+
+			GetDevice()->SetTexture(0, Source);
+			// Set output as render target
+			GetDevice()->SetRenderTarget(0, Destination);
+			// Draw the pass
+			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 5 * 4);
+
+			// Change source and destination according to the chain
+			Source = (I + 1) % 2 == 1 ? Internal : Output;
+			Destination = (I + 1) % 2 == 1 ? Output : Internal;
+		}
+
 		// VERTICAL PASS
 		// Set horizontal pixel shader
-		GetDevice()->SetPixelShader(VerticalPassPixelShader);
+		GetDevice()->SetPixelShader(HorizontalPassPixelShader);
 		// Set input as texture
-		GetDevice()->SetTexture(0, ((ZED3D9Texture2D*)InternalSurface)->Texture);
-		// Set output as render target
-		((ZED3D9Texture2D*)Output)->Texture->GetSurfaceLevel(0, &RenderTarget);
-		GetDevice()->SetRenderTarget(0, RenderTarget);
+		GetDevice()->SetPixelShaderConstantF(0, (float*)Kernel, 7);
 
-		// Set Pixel Size
-		PixelWidth_2 *= 2;
-		GetDevice()->SetPixelShaderConstantF(1, &PixelHeight_2, 1);
-		// Draw the pass
-		GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 5 * 4);
+		for (unsigned int I = 0; I < PassCount; I++)
+		{
+			// Set source as texture
+			GetDevice()->SetTexture(0, Source);
+			// Set destionation as render target
+			GetDevice()->SetRenderTarget(0, Destination);
+			// Draw the pass
+			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 5 * 4);
+
+			// Change source and destination according to the chain
+			Source = (I + 1) % 2 == 1 ? Internal : Output;
+			Destination = (I + 1) % 2 == 1 ? Output : Internal;
+		}
 	}
 	else
 		if (VerticalPass)
 		{
+						if (PassCount % 2 == 1)
+			{
+				Source = (I + 1) % 2 == 1 ? Output : Internal;
+				Destination = (I + 1) % 2 == 1 ? Internal : Output;
+			}
+			else
+			{
+				Source= (I + 1) % 2 == 1 ? Internal : Output;
+				Destination  = (I + 1) % 2 == 1 ? Output : Internal;
+			}
 			// VERTICAL PASS
 			// Set vertical pixel shader
 			GetDevice()->SetPixelShader(VerticalPassPixelShader);
@@ -358,6 +312,7 @@ bool ZED3D9PPBlurNode::Process()
 			// Draw the pass
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 5 * 4);
 		}
+	}
 }
 
 ZETexture2D* ZED3D9PPBlurNode::GetOutput()

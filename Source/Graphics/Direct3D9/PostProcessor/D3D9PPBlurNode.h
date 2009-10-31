@@ -53,7 +53,10 @@ class ZED3D9PPBlurNode : public ZEPPBlurNode, private ZED3D9ComponentBase
 		static LPDIRECT3DPIXELSHADER9		HorizontalPassPixelShader;
 
 		ZETexture2D*						Output;
-		LPDIRECT3DSURFACE9					InternalSurface;
+		LPDIRECT3DTEXTURE9					Internal;
+
+		void								DoHorizantalPass(LPDIRECT3DTEXTURE9 Source, LPDIRECT3DSURFACE9 RenderTarget);
+		void								DoVerticalPass(LPDIRECT3DTEXTURE9 Source, LPDIRECT3DSURFACE9 RenderTarget);
 
 											ZED3D9PPBlurNode();
 		virtual								~ZED3D9PPBlurNode();

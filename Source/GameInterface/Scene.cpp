@@ -260,10 +260,10 @@ bool ZEScene::Initialize()
 	BlurNode->Initialize();
 	PostProcessor->AddNode(BlurNode);
 	
-	ZEPPScreenOutputNode* ScreenOutput = (ZEPPScreenOutputNode*)PostProcessor->CreateNode("ScreenOutput");
+	/*ZEPPScreenOutputNode* ScreenOutput = (ZEPPScreenOutputNode*)PostProcessor->CreateNode("ScreenOutput");
 	ScreenOutput->SetInput(BlurNode);
 	ScreenOutput->Initialize();
-	PostProcessor->AddNode(ScreenOutput);
+	PostProcessor->AddNode(ScreenOutput);*/
 
 	return true;
 }

@@ -40,13 +40,13 @@ void ZEPPBlurNode::UpdateKernel()
 {
 	if (KernelDirtyFlag)
 	{
-		unsigned int KernelSize_2 = (Kernel.GetCount() - 1) / 2;
-
+		int Value;
 		size_t Index = 0;
-		for (size_t I = -KernelSize_2; I <= KernelSize_2; I++)
+		for (size_t I = 0; I <= 7; I++)
 		{
-			Kernel[Index].x = I;
-			Kernel[Index].y = (1.0f / (sqrtf(2.0f * ZE_PI * StandartDeviation))) * powf(ZE_E, -((I * I) / (2 * StandartDeviation * StandartDeviation)));
+			Value = I - 3;
+			Kernel[I].x = Value;
+			Kernel[I].y = (1.0f / (sqrtf(2.0f * ZE_PI * StandartDeviation))) * powf(ZE_E, -((Value * Value) / (2 * StandartDeviation * StandartDeviation)));
 			Index++;
 		}
 		KernelDirtyFlag = false;
@@ -60,7 +60,6 @@ ZEPPBlurNode::ZEPPBlurNode()
 
 	HorizontalPass = true;
 	VerticalPass = true;
-	Kernel.SetCount(9);
 	StandartDeviation = 0.84089642f;		
 	KernelDirtyFlag = true;
 }
@@ -94,6 +93,26 @@ ZEPostProcessorNode* ZEPPBlurNode::GetInput()
 	return Input;
 }
 
+void ZEPPBlurNode::SetDownSample(unsigned int Factor)
+{
+	DownSample = Factor;
+}
+
+unsigned int ZEPPBlurNode::GetDownSample()
+{
+	return DownSample;
+}
+
+void ZEPPBlurNode::SetPassCount(unsigned int PassCount)
+{
+	this->PassCount = PassCount;
+}
+
+unsigned int ZEPPBlurNode::GetPassCount()
+{
+	return PassCount;
+}
+
 void ZEPPBlurNode::SetHorizontalPass(bool Enable)
 {
 	HorizontalPass = Enable;
@@ -123,31 +142,4 @@ void ZEPPBlurNode::SetStandartDeviation(float Ro)
 float ZEPPBlurNode::GetStandartDeviation()
 {
 	return StandartDeviation;
-}
-
-void ZEPPBlurNode::SetKernelSize(unsigned int Size)
-{
-	if (Size != Kernel.GetCount())
-	{
-		if (Kernel.GetCount() % 2 != 1)
-		{
-			zeError("Blur Post Effect", "Kernel size is must be an odd number. Setting it to a default value 9.");
-			return;
-		}
-
-		if (Kernel.GetCount() > 16)
-		{
-			zeError("Blur Post Effect", "Kernel size is too big. Max : 15");
-			return;
-		}
-	
-		Kernel.SetCount(Size);
-
-		KernelDirtyFlag = true;
-	}
-}
-
-unsigned int ZEPPBlurNode::GetKernelSize()
-{
-	return Kernel.GetCount();
 }

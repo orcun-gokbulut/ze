@@ -88,7 +88,7 @@ class ZEComponent
 		virtual void					SetOwner(ZEEntity* NewOwner);
 		virtual ZEEntity*				GetOwner();
 		virtual void					OwnerWorldTransformChanged();
-
+ 
 		virtual const ZEAABoundingBox&	GetLocalBoundingBox();
 		virtual const ZEAABoundingBox&	GetWorldBoundingBox();
 		const ZEBoundingSphere&			GetWorldBoundingSphere();

@@ -163,6 +163,31 @@ bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int 
 	return true;
 }
 
+bool ZED3D9CommonTools::CreateRenderTargetTexture(LPDIRECT3DTEXTURE9* Target, int Width, int Height, ZETexturePixelFormat Format)
+{
+	D3DSURFACE_DESC SurDesc;
+	D3DFORMAT D3DFormat = ConvertPixelFormat(Format);
+	if (*Target != NULL)
+	{
+		(*Target)->GetDesc(&SurDesc);
+		if (SurDesc.Width != Width ||SurDesc.Height != Height || SurDesc.Format != D3DFormat)
+			(*Target)->Release();
+		else
+			return true;
+	}
+
+	HRESULT Hr = GetDevice()->CreateTexture(Width, Height, D3DFormat, D3DMULTISAMPLE_NONE, 0, FALSE, Target, NULL);
+	if (Hr != D3D_OK)
+	{
+		zeError("Direct3D 9", "Can not create render target.");
+		*Target = NULL;
+		return false;
+	}
+
+	return true;
+}
+
+
 bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height, ZETexturePixelFormat Format)
 {
 	D3DSURFACE_DESC SurDesc;

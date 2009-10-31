@@ -74,7 +74,11 @@ bool ZED3D9Texture2D::DeviceRestored()
 bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget)
 {
 	if (Texture != NULL)
-		Texture->Release();
+		if (this->Width == Width || this->Height == Height || this->PixelFormat == PixelFormat || this->RenderTarget == RenderTarget)
+			return true;
+		else
+			Texture->Release();
+
 	
 	DWORD Usage, MipMap;
 	D3DFORMAT Format;

@@ -48,11 +48,13 @@ class ZEPPBlurNode : public ZEPostProcessorNode
 		ZEPostProcessorNode*				Input;
 	
 		float								StandartDeviation;	
+		unsigned int						PassCount;
+		unsigned int						DownSample;
 
 		bool								HorizontalPass;
 		bool								VerticalPass;
 
-		ZEArray<ZEVector4>					Kernel;
+		ZEVector4							Kernel[7];
 		bool								KernelDirtyFlag;
 
 		void								UpdateKernel();
@@ -69,9 +71,12 @@ class ZEPPBlurNode : public ZEPostProcessorNode
 
 		virtual void						SetInput(ZEPostProcessorNode* Node);
 		virtual ZEPostProcessorNode*		GetInput();
-	
-		void								SetKernelSize(unsigned int Size);
-		unsigned int						GetKernelSize();
+
+		void								SetDownSample(unsigned int Factor);
+		unsigned int						GetDownSample();
+
+		void								SetPassCount(unsigned int PassCount);
+		unsigned int						GetPassCount();
 
 		void								SetStandartDeviation(float Ro);
 		float								GetStandartDeviation();
