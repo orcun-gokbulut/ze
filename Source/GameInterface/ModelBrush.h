@@ -60,7 +60,6 @@ class ZEModelBrush : public ZEEntity
 		ZEModel*							GetModel();
 
 		virtual const ZEAABoundingBox&		GetLocalBoundingBox();
-		virtual const ZEAABoundingBox&		GetWorldBoundingBox();
 
 		virtual void						Initialize();
 		virtual void						Deinitialize();

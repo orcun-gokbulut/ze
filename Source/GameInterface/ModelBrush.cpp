@@ -88,11 +88,6 @@ const ZEAABoundingBox& ZEModelBrush::GetLocalBoundingBox()
 	return Model->GetLocalBoundingBox();
 }
 
-const ZEAABoundingBox& ZEModelBrush::GetWorldBoundingBox()
-{
-	return Model->GetWorldBoundingBox();
-}
-
  void ZEModelBrush::Initialize()
 {
 	if (Model == NULL)
