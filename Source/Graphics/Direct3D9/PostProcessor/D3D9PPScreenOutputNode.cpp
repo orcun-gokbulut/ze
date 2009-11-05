@@ -58,11 +58,11 @@ bool ZED3D9PPScreenOutputNode::Initialize()
 				"float4 Position : POSITION0;"
 				"float2 TexCoord : TEXCOORD0;"
 			"};"
-			"VS_OUTPUT vs_main(float4 Position : POSITION0)"
+			"VS_OUTPUT vs_main(float4 Position : POSITION0, float2 TexCoord : TEXCOORD0)"
 			"{"
 				"VS_OUTPUT Output;"
 				"Output.Position = float4(Position.xy, 0.0f, 1.0f);"
-				"Output.TexCoord.x = Output.TexCoord.y;"
+				"Output.TexCoord = TexCoord;"
 				"return Output;"
 			"}", "Screen copy", "vs_2_0", NULL)
 			)
@@ -154,4 +154,9 @@ bool ZED3D9PPScreenOutputNode::Proces()
 	GetDevice()->SetPixelShader(PixelShader);
 	GetDevice()->SetVertexShader(VertexShader);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 5 * 4);
+}
+
+ZETexture2D* ZED3D9PPScreenOutputNode::GetOutput()
+{
+	return NULL;
 }

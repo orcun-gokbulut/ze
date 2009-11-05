@@ -40,15 +40,9 @@ void ZEPPBlurNode::UpdateKernel()
 {
 	if (KernelDirtyFlag)
 	{
-		int Value;
-		size_t Index = 0;
 		for (size_t I = 0; I <= 7; I++)
-		{
-			Value = I - 3;
-			Kernel[I].x = Value;
-			Kernel[I].y = (1.0f / (sqrtf(2.0f * ZE_PI * StandartDeviation))) * powf(ZE_E, -((Value * Value) / (2 * StandartDeviation * StandartDeviation)));
-			Index++;
-		}
+			Kernel[I] = (1.0f / (sqrtf(2.0f * ZE_PI * StandartDeviation))) * powf(ZE_E, -((((float)I - 3) * ((float)I - 3)) / (2 * StandartDeviation * StandartDeviation)));
+
 		KernelDirtyFlag = false;
 	}
 }
@@ -62,6 +56,8 @@ ZEPPBlurNode::ZEPPBlurNode()
 	VerticalPass = true;
 	StandartDeviation = 0.84089642f;		
 	KernelDirtyFlag = true;
+	PassCount = 1;
+	DownSample = 1.0f;
 }
 
 ZEPPBlurNode::~ZEPPBlurNode()

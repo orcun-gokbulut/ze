@@ -250,6 +250,8 @@ bool ZEScene::Initialize()
 
 	PostProcessor = zeGraphics->CreatePostProcessor();
 	
+	Renderer->SetRenderColorTexture(true);
+
 	ZEPPColorInputNode* ColorInput = (ZEPPColorInputNode*)PostProcessor->CreateNode("ColorInput");
 	ColorInput->SetRenderer(Renderer);
 	ColorInput->Initialize();
@@ -260,10 +262,10 @@ bool ZEScene::Initialize()
 	BlurNode->Initialize();
 	PostProcessor->AddNode(BlurNode);
 	
-	/*ZEPPScreenOutputNode* ScreenOutput = (ZEPPScreenOutputNode*)PostProcessor->CreateNode("ScreenOutput");
+	ZEPPScreenOutputNode* ScreenOutput = (ZEPPScreenOutputNode*)PostProcessor->CreateNode("ScreenOutput");
 	ScreenOutput->SetInput(BlurNode);
 	ScreenOutput->Initialize();
-	PostProcessor->AddNode(ScreenOutput);*/
+	PostProcessor->AddNode(ScreenOutput);
 
 	return true;
 }
@@ -408,6 +410,8 @@ void ZEScene::Render(float ElapsedTime)
 	CullScene(Renderer, ActiveCamera->GetViewVolume(), true);
 	Renderer->Render(ElapsedTime);
 	Renderer->ClearList();
+
+	PostProcessor->Process();
 }
 /*
 ZEEntity* ZEScene::CastRay(const ZERay& Ray, float Range, ZESmartArray<ZEEntity*>& IntersectedEntities)
@@ -728,7 +732,7 @@ ZEScene::ZEScene()
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
 
-	VisualDebugElements = 0;//ZE_VDE_ENTITY_ORIENTED_BOUNDINGBOX;
+	VisualDebugElements = 0;
 }
 
 ZEScene::~ZEScene()

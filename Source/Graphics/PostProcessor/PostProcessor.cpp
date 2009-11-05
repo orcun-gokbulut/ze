@@ -36,6 +36,7 @@
 #include "PostProcessor.h"
 #include "PostProcessorNode.h"
 #include "Graphics/GraphicsModule.h"
+#include "Core/Error.h"
 
 ZEPostProcessor::ZEPostProcessor()
 {
@@ -44,7 +45,6 @@ ZEPostProcessor::ZEPostProcessor()
 ZEPostProcessor::~ZEPostProcessor()
 {
 }
-
 
 ZEArray<ZEPostProcessorNode*>& ZEPostProcessor::GetNodes()
 {
@@ -77,40 +77,62 @@ ZEPostProcessorNode* ZEPostProcessor::CreateNode(size_t Index)
 		
 void ZEPostProcessor::AddNode(ZEPostProcessorNode* Node)
 {
+	// Check circular dependency
+	#pragma message("Check circular dependency in ZEPostProcessor::AddNode function")
+
 	Nodes.Add(Node);
+	Node->SetOwner(this);
+	Node->Initialize();
 }
 
 void ZEPostProcessor::RemoveNode(ZEPostProcessorNode* Node)
 {
+	Node->Deinitialize();
+	Node->SetOwner(NULL);
 	Nodes.DeleteValue(Node);
 }
 
 bool ZEPostProcessor::Initialize()
 {
-	// Set node state count
-	NodeStates.SetCount(Nodes.GetCount());
-
-	// Fill node states with false which mean that node is not processed
-	NodeStates.FillWith(false);
-
-	// Initialize nodes
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		Nodes[I]->Initialize();
-	
 	return true;
 }
 
 void ZEPostProcessor::Deinitialize()
 {
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		Nodes[I]->Deinitialize();
+/*	for (size_t I = 0; I < Nodes.GetCount(); I++)
+		Nodes[I]->Deinitialize();*/
 }
 
-void ZEPostProcessor::Process()
+bool ZEPostProcessor::ProcessNode(ZEPostProcessorNode* Node)
 {
+	ZEPostProcessorNode** Dependencies = Node->GetDependencies();
+
+	// Process dependent nodes
+	for (size_t I = 0; I < Node->GetDependencyCount(); I++)
+		if (Dependencies[I]->GetState() == ZE_PPNS_NOT_PROCESSED)
+			if (!ProcessNode(Dependencies[I]))
+				return false;
+
+	// Process this node
+	if (Node->Process())
+	{
+		Node->SetState(ZE_PPNS_PROCESSED);
+		return true;
+	}
+	else
+		return true;
+}
+
+bool ZEPostProcessor::Process()
+{	
 	for (size_t I = 0; I < Nodes.GetCount(); I++)
-		if (NodeStates[I] == false)
-			Nodes[I]->Process();
+		if (!ProcessNode(Nodes[I]))
+		{
+			zeError("Post Processor", "Post process failed.");
+			return false;
+		}
+
+	return true;
 }
 
 void ZEPostProcessor::Destroy()

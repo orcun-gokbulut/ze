@@ -54,7 +54,7 @@ class ZEPPBlurNode : public ZEPostProcessorNode
 		bool								HorizontalPass;
 		bool								VerticalPass;
 
-		ZEVector4							Kernel[7];
+		float								Kernel[7];
 		bool								KernelDirtyFlag;
 
 		void								UpdateKernel();

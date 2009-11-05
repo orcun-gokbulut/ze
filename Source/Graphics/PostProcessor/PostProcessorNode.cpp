@@ -39,12 +39,14 @@
 ZEPostProcessorNode::ZEPostProcessorNode()
 {
 	Owner = NULL;
+	State = ZE_PPNS_NOT_PROCESSED;
 }
 
 ZEPostProcessorNode::~ZEPostProcessorNode()
 {
 
 }
+
 
 void  ZEPostProcessorNode::SetOwner(ZEPostProcessor* Owner)
 {
@@ -64,6 +66,16 @@ size_t ZEPostProcessorNode::GetDependencyCount()
 ZEPostProcessorNode** ZEPostProcessorNode::GetDependencies()
 {
 	return NULL;
+}
+
+void ZEPostProcessorNode::SetState(ZEPostProcessorNodeState State)
+{
+	this->State = State;
+}
+
+ZEPostProcessorNodeState ZEPostProcessorNode::GetState()
+{
+	return State;
 }
 
 bool ZEPostProcessorNode::Initialize()

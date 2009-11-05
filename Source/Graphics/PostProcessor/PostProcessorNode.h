@@ -47,11 +47,19 @@ enum ZEPostProcessorNodeType
 	ZE_PPNT_OUTPUT_NODE
 };
 
+enum ZEPostProcessorNodeState
+{
+	ZE_PPNS_NOT_PROCESSED		= 0,
+	ZE_PPNS_PROCESSED			= 1
+};
+
 class ZEPostProcessorData;
 class ZEPostProcessorNode
 {
+	friend class ZEPostProcessor;
 	private:
 		ZEPostProcessor*					Owner;
+		ZEPostProcessorNodeState			State;
 
 	protected:
 											ZEPostProcessorNode();
@@ -60,11 +68,16 @@ class ZEPostProcessorNode
 	public:
 		virtual ZEPostProcessorNodeType		GetNodeType() = 0;
 
-		virtual void						SetOwner(ZEPostProcessor* Owner);
+		bool								GetProcessed();
+
+		void								SetOwner(ZEPostProcessor* Owner);
 		ZEPostProcessor*					GetOwner();
 
 		virtual size_t						GetDependencyCount();
 		virtual ZEPostProcessorNode**		GetDependencies();
+
+		void								SetState(ZEPostProcessorNodeState State);
+		ZEPostProcessorNodeState			GetState();
 
 		virtual bool						Initialize();
 		virtual void						Deinitialize();

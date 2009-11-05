@@ -55,6 +55,8 @@ class ZED3D9PPScreenOutputNode : public ZEPPScreenOutputNode, public ZED3D9Compo
 		virtual void						Deinitialize();
 
 		virtual bool						Proces();
+
+		virtual ZETexture2D*				GetOutput();
 };
 
 #endif

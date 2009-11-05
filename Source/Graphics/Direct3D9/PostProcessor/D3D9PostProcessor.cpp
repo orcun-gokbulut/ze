@@ -34,12 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "D3D9PostProcessor.h"
-#include "D3D9PPBlurNode.h"
 #include <string.h>
+
+#include "D3D9PPBlurNode.h"
+#include "D3D9PPScreenOutputNode.h"
 
 ZEPostProcessorNode* ZED3D9PostProcessor::CreateNode(const char* TypeName)
 {
-	if (strcmp("Blur", TypeName) == 0)
+	if (strcmp("ScreenOutput", TypeName) == 0)
+		return new ZED3D9PPScreenOutputNode();
+	else if (strcmp("Blur", TypeName) == 0)
 		return new ZED3D9PPBlurNode();
 	else
 		ZEPostProcessor::CreateNode(TypeName);

@@ -116,30 +116,6 @@ bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, 
 	return true;
 }
 
-bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height, ZETexturePixelFormat Format)
-{
-	D3DSURFACE_DESC SurDesc;
-	D3DFORMAT D3DFormat = ConvertPixelFormat(Format);
-	if (*Target != NULL)
-	{
-		(*Target)->GetLevelDesc(0, &SurDesc);
-		if (SurDesc.Width != Width ||SurDesc.Height != Height || SurDesc.Format != D3DFormat)
-			(*Target)->Release();
-		else
-			return true;
-	}
-
-	HRESULT Hr = GetDevice()->CreateTexture(Width, Height, 1, D3DUSAGE_RENDERTARGET, D3DFormat, D3DPOOL_DEFAULT, Target, NULL);
-	if (Hr != D3D_OK)
-	{
-		zeError("Direct3D 9", "Can not create render target.");
-		*Target = NULL;
-		return false;
-	}
-
-	return true;
-}
-
 bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height)
 {
 	D3DSURFACE_DESC SurDesc;
@@ -155,7 +131,7 @@ bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int 
 	HRESULT Hr = GetDevice()->CreateDepthStencilSurface(Width, Height, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, Target, NULL);
 	if (Hr != D3D_OK)
 	{
-		zeError("Direct3D 9", "Can not create depth render target.");
+		zeError("D3D9", "Can not create depth render target.");
 		*Target = NULL;
 		return false;
 	}
@@ -163,23 +139,23 @@ bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int 
 	return true;
 }
 
-bool ZED3D9CommonTools::CreateRenderTargetTexture(LPDIRECT3DTEXTURE9* Target, int Width, int Height, ZETexturePixelFormat Format)
+bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height, ZETexturePixelFormat Format)
 {
 	D3DSURFACE_DESC SurDesc;
 	D3DFORMAT D3DFormat = ConvertPixelFormat(Format);
 	if (*Target != NULL)
 	{
-		(*Target)->GetDesc(&SurDesc);
+		(*Target)->GetLevelDesc(0, &SurDesc);
 		if (SurDesc.Width != Width ||SurDesc.Height != Height || SurDesc.Format != D3DFormat)
 			(*Target)->Release();
 		else
 			return true;
 	}
 
-	HRESULT Hr = GetDevice()->CreateTexture(Width, Height, D3DFormat, D3DMULTISAMPLE_NONE, 0, FALSE, Target, NULL);
+	HRESULT Hr = GetDevice()->CreateTexture(Width, Height, 0, D3DUSAGE_RENDERTARGET, D3DFormat, D3DPOOL_DEFAULT, Target, NULL);
 	if (Hr != D3D_OK)
 	{
-		zeError("Direct3D 9", "Can not create render target.");
+		zeError("D3D9", "Can not create render target texture.");
 		*Target = NULL;
 		return false;
 	}
@@ -204,7 +180,7 @@ bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width
 	HRESULT Hr = GetDevice()->CreateRenderTarget(Width, Height, D3DFormat, D3DMULTISAMPLE_NONE, 0, FALSE, Target, NULL);
 	if (Hr != D3D_OK)
 	{
-		zeError("Direct3D 9", "Can not create render target.");
+		zeError("D3D9", "Can not create render target.");
 		*Target = NULL;
 		return false;
 	}

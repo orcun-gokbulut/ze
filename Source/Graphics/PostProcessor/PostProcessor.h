@@ -48,6 +48,8 @@ class ZEPostProcessor
 		ZEArray<bool>								NodeStates;
 	
 	protected:
+		bool										ProcessNode(ZEPostProcessorNode* Node);
+
 													ZEPostProcessor();
 		virtual										~ZEPostProcessor();
 		
@@ -62,7 +64,7 @@ class ZEPostProcessor
 		virtual bool								Initialize();
 		virtual void								Deinitialize();
 
-		virtual void								Process();
+		virtual bool								Process();
 	
 		virtual void								Destroy();
 
