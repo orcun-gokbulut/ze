@@ -1231,6 +1231,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEDS\Definitions.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEDS\Definitions.h"
 				>
 			</File>
@@ -1256,14 +1260,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEDS\Variant.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEDS\ZEDS.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEDS\ZEDS_.h"
 				>
 			</File>
 		</Filter>
@@ -1384,10 +1380,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEMath\Vector.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEMath\ZEMath_.h"
 				>
 			</File>
 		</Filter>
