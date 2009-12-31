@@ -44,7 +44,7 @@ ZEPostProcessorNode* ZED3D9PostProcessor::CreateNode(const char* TypeName)
 	if (strcmp("ScreenOutput", TypeName) == 0)
 		return new ZED3D9PPScreenOutputNode();
 	else if (strcmp("Blur", TypeName) == 0)
-		return new ZED3D9PPBlurNode();
+		return NULL;//new ZED3D9PPBlurNode();
 	else
 		ZEPostProcessor::CreateNode(TypeName);
 }

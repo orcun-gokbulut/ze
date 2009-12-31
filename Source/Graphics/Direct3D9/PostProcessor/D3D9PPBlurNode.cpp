@@ -42,7 +42,7 @@
 LPDIRECT3DVERTEXSHADER9 ZED3D9PPBlurNode::VertexShader = NULL;
 LPDIRECT3DPIXELSHADER9 ZED3D9PPBlurNode::VerticalPassPixelShader = NULL;
 LPDIRECT3DPIXELSHADER9 ZED3D9PPBlurNode::HorizontalPassPixelShader = NULL;
-
+/*
 ZED3D9PPBlurNode::ZED3D9PPBlurNode()
 {
 	Internal = NULL;
@@ -385,4 +385,4 @@ bool ZED3D9PPBlurNode::Process()
 ZETexture2D* ZED3D9PPBlurNode::GetOutput()
 {
 	return Output;
-}
+}*/

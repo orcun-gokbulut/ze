@@ -446,5 +446,5 @@ void ZEDirectInputModule::UnAcquire()
 
 ZEDirectInputModule::~ZEDirectInputModule()
 {
-
+	Deinitialize();
 }

@@ -170,11 +170,12 @@ void ZEGame::Tick(float ElapsedTime)
 {
 	Scene->Tick(ElapsedTime);
 }
-
+ 
 #include "Player.h"
 #include "LightBrush.h"
 #include "ModelBrush.h"
 #include "SkyBrush.h"
+
 ZEGame::ZEGame()
 {
 	Scene = NULL;

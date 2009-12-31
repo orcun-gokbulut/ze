@@ -686,5 +686,5 @@ ZED3D9Module::ZED3D9Module()
 
 ZED3D9Module::~ZED3D9Module()
 {
-	Destroy();
+	Deinitialize();
 }

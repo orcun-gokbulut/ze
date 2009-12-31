@@ -35,14 +35,14 @@
 #pragma once
 #ifndef __ZE_CANVASBRUSH_H__
 #define __ZE_CANVASBRUSH_H__
+
 #include "Entity.h"
 #include "Graphics/Canvas.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/FixedMaterial.h"
 
 ZE_ENTITY_DESCRIPTION(ZECanvasBrush, ZEEntity);
 
+class ZERenderer;
+class ZEMaterial;
 class ZECanvasBrush : public ZEEntity
 {
 	ZE_ENTITY_CLASS(ZECanvasBrush)

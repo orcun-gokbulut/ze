@@ -204,7 +204,7 @@ void ZEDirectSoundModule::Deinitialize()
 
 ZEDirectSoundModule::~ZEDirectSoundModule()
 {
-	Destroy();
+	Deinitialize();
 }
 
 int ZEDirectSoundModule::CreateBuffer(ZESoundSource* Source, ZESoundResource* SoundResource)

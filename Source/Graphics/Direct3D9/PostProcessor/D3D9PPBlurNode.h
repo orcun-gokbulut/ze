@@ -58,16 +58,16 @@ class ZED3D9PPBlurNode : public ZEPPBlurNode, private ZED3D9ComponentBase
 		void								DoHorizantalPass(LPDIRECT3DTEXTURE9 Source, LPDIRECT3DSURFACE9 RenderTarget);
 		void								DoVerticalPass(LPDIRECT3DTEXTURE9 Source, LPDIRECT3DSURFACE9 RenderTarget);
 
-											ZED3D9PPBlurNode();
-		virtual								~ZED3D9PPBlurNode();
+		/*									ZED3D9PPBlurNode();
+		virtual								~ZED3D9PPBlurNode();*/
 
 	public:	
-		virtual bool						Initialize();
+		/*virtual bool						Initialize();
 		virtual void						Deinitialize();
 
 		virtual	bool						Process();
 
-		virtual ZETexture2D*				GetOutput();
+		virtual ZETexture2D*				GetOutput();*/
 };
 
 #endif

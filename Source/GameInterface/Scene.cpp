@@ -38,6 +38,8 @@
 #include "Graphics/GraphicsModule.h"
 #include "Graphics/FrameBufferRenderer.h"
 #include "Graphics/ShadowRenderer.h"
+#include "Graphics/Camera.h"
+#include "Graphics/Light.h"
 #include "Core/Error.h"
 #include "Game.h";
 #include "Serialization.h"
@@ -246,7 +248,7 @@ bool ZEScene::Initialize()
 	LightRangeMaterial->SetAmbientColor(ZEVector3(0.0f, 0.0f, 0.5f));
 	LightRangeMaterial->UpdateMaterial();
 
-	Renderer->SetRenderColorTexture(true);
+	/*Renderer->SetRenderColorTexture(true);
 
 	PostProcessor = zeGraphics->CreatePostProcessor();
 	
@@ -260,7 +262,7 @@ bool ZEScene::Initialize()
 	ZEPPBlurNode* BlurNode = (ZEPPBlurNode*)PostProcessor->CreateNode("Blur");
 	BlurNode->SetInput(ColorInput);
 	BlurNode->Initialize();
-	PostProcessor->AddNode(BlurNode);
+	PostProcessor->AddNode(BlurNode);*/
 	
 	ZEPPScreenOutputNode* ScreenOutput = (ZEPPScreenOutputNode*)PostProcessor->CreateNode("ScreenOutput");
 	ScreenOutput->SetInput(BlurNode);

@@ -281,19 +281,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\ZEDS\Collection.h"
+				RelativePath="..\Source\ZEDS\Definitions.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Source\ZEDS\Definitions.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\ZEDS\DoubleLinklist.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\ZEDS\Linklist.h"
 				>
 			</File>
 			<File
@@ -302,10 +294,6 @@
 			</File>
 			<File
 				RelativePath="..\Source\ZEDS\Named.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\ZEDS\Serialize.h"
 				>
 			</File>
 			<File
@@ -324,26 +312,10 @@
 				RelativePath="..\Source\ZEDS\Variant.h"
 				>
 			</File>
-			<File
-				RelativePath="..\Source\ZEDS\ZEDS.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\ZEDS\ZEDS.h"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="ZEMath"
 			>
-			<File
-				RelativePath="..\Source\ZEMath\3DRectangle.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\ZEMath\3DRectangle.h"
-				>
-			</File>
 			<File
 				RelativePath="..\Source\ZEMath\AABoundingBox.cpp"
 				>
@@ -429,6 +401,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\ZEMath\Rectangle3D.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\ZEMath\Rectangle3D.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\ZEMath\Triangle.cpp"
 				>
 			</File>
@@ -450,10 +430,6 @@
 			</File>
 			<File
 				RelativePath="..\Source\ZEMath\Vector.h"
-				>
-			</File>
-			<File
-				RelativePath="..\Source\ZEMath\ZEMath.h"
 				>
 			</File>
 		</Filter>
@@ -589,11 +565,27 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Graphics\DirectionalLight.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\DirectionalLight.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Graphics\FixedMaterial.cpp"
 				>
 			</File>
 			<File
 				RelativePath="..\Source\Graphics\FixedMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\FrameBufferRenderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\FrameBufferRenderer.h"
 				>
 			</File>
 			<File
@@ -617,7 +609,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Graphics\Material.cpp"
+				RelativePath="..\Source\Graphics\material.cpp"
 				>
 			</File>
 			<File
@@ -629,11 +621,39 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Graphics\PostEffect.h"
+				RelativePath="..\Source\Graphics\MaterialFileFormat.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Graphics\PostProcessor.h"
+				RelativePath="..\Source\Graphics\MaterialResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\MaterialResource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\OmniProjectiveLight.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\OmniProjectiveLight.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\PointLight.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\PointLight.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\ProjectiveLight.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\ProjectiveLight.h"
 				>
 			</File>
 			<File
@@ -645,11 +665,19 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Graphics\RenderList.cpp"
+				RelativePath="..\Source\Graphics\RenderOrder.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Graphics\RenderList.h"
+				RelativePath="..\Source\Graphics\RenderOrder.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\ShadowRenderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\ShadowRenderer.h"
 				>
 			</File>
 			<File
@@ -658,6 +686,62 @@
 			</File>
 			<File
 				RelativePath="..\Source\Graphics\Texture.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\Texture2D.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\Texture2D.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\Texture2DResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\Texture2DResource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\Texture3D.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\Texture3D.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\Texture3DResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\Texture3DResource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\TextureCube.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\TextureCube.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\TextureCubeResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\TextureCubeResource.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\TextureRenderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Graphics\TextureRenderer.h"
 				>
 			</File>
 			<File
@@ -736,27 +820,43 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Graphics\Direct3D9\D3D9PostProcessor.cpp"
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9FixedMaterialShader.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Graphics\Direct3D9\D3D9PostProcessor.h"
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9FixedMaterialShader.h"
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Graphics\Direct3D9\D3D9Renderer.cpp"
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9FrameBufferRenderer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Graphics\Direct3D9\D3D9Renderer.h"
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9FrameBufferRenderer.h"
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Graphics\Direct3D9\D3D9Shader.cpp"
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9Module.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Graphics\Direct3D9\D3D9Shader.h"
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9Module.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9ModuleDescription.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9ModuleDescription.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9RendererBase.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9RendererBase.h"
 					>
 				</File>
 				<File
@@ -764,11 +864,43 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Graphics\Direct3D9\D3D9Texture.cpp"
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9ShadowRenderer.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\Source\Graphics\Direct3D9\D3D9Texture.h"
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9ShadowRenderer.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9Texture2D.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9Texture2D.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9Texture3D.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9Texture3D.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9TextureCube.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9TextureCube.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9TextureRenderer.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\Direct3D9\D3D9TextureRenderer.h"
 					>
 				</File>
 				<File
@@ -785,22 +917,6 @@
 				</File>
 				<File
 					RelativePath="..\Source\Graphics\Direct3D9\D3D9VertexDeclaration.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Source\Graphics\Direct3D9\Direct3D9Module.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Source\Graphics\Direct3D9\Direct3D9Module.h"
-					>
-				</File>
-				<File
-					RelativePath="..\Source\Graphics\Direct3D9\Direct3D9ModuleDescription.cpp"
-					>
-				</File>
-				<File
-					RelativePath="..\Source\Graphics\Direct3D9\Direct3D9ModuleDescription.h"
 					>
 				</File>
 				<Filter
@@ -867,6 +983,126 @@
 						>
 					</File>
 				</Filter>
+				<Filter
+					Name="PostProcessor"
+					>
+					<File
+						RelativePath="..\Source\Graphics\Direct3D9\PostProcessor\D3D9PostProcessor.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Source\Graphics\Direct3D9\PostProcessor\D3D9PostProcessor.h"
+						>
+					</File>
+					<File
+						RelativePath="..\Source\Graphics\Direct3D9\PostProcessor\D3D9PPBlurNode.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Source\Graphics\Direct3D9\PostProcessor\D3D9PPBlurNode.h"
+						>
+					</File>
+					<File
+						RelativePath="..\Source\Graphics\Direct3D9\PostProcessor\D3D9PPScreenOutputNode.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\Source\Graphics\Direct3D9\PostProcessor\D3D9PPScreenOutputNode.h"
+						>
+					</File>
+				</Filter>
+			</Filter>
+			<Filter
+				Name="PostProcessor"
+				>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PostProcessor.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PostProcessor.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PostProcessorNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PostProcessorNode.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPBlurNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPBlurNode.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPColorInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPColorInputNode.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPDepthInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPDepthInputNode.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPFilter1DNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPFilter1DNode.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPFilter2DNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPFilter2DNode.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPScreenOutputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPScreenOutputNode.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPTextureInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPTextureInputNode.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPTextureOutputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPTextureOutputNode.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPVelocityInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Graphics\PostProcessor\PPVelocityInputNode.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter

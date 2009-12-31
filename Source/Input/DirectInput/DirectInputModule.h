@@ -42,9 +42,11 @@
 class ZEDirectInputModule : public ZEInputModule
 {
 	friend class ZEDirectInputModuleDescription;
-
 	private:
 		bool						Enabled;
+
+	protected:
+        virtual						~ZEDirectInputModule();
 
 	public:
 		ZEModuleDescription*		GetModuleDescription();
@@ -63,7 +65,5 @@ class ZEDirectInputModule : public ZEInputModule
 
 		void						Acquire();
 		void						UnAcquire();
-
-									~ZEDirectInputModule();
 };
 #endif
