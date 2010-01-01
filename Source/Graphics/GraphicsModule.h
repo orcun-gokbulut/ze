@@ -39,25 +39,19 @@
 
 #include "Core/Module.h"
 #include "Core/Option.h"
-#include "RenderList.h"
-#include "Renderer.h"
-#include "TextureResource.h"
-#include "PostProcessor.h"
 
 #define zeGraphics ZEGraphicsModule::GetInstance()
 
-enum ZERenderTarget
-{
-	ZERENDERTARGET_FRAMEBUFFER,
-	ZERENDERTARGET_STENCILBUFFER
-};
-
-enum ZERenderBuffer
-{
-	ZERENDERBUFFER_FRAMEBUFFER		= 1,
-	ZERENDERBUFFER_STENCILBUFFER	= 2,
-	ZERENDERBUFFER_ZBUFFER			= 3
-};
+class ZETexture2D;
+class ZETextureCube;
+class ZETexture3D;
+class ZEMaterial;
+class ZEFixedMaterial;
+class ZEStaticVertexBuffer;
+class ZEVertexDeclaration;
+class ZERenderOrder;
+class ZERenderer;
+class ZEPostProcessor;
 
 class ZEGraphicsModule : public ZEModule
 {	
@@ -114,6 +108,9 @@ class ZEGraphicsModule : public ZEModule
 
 		size_t								GetCurrentFrameId();
 
+		virtual void						SetMaterialComponentMask(unsigned int Mask) = 0;
+		virtual unsigned int				GetMaterialComponentMask() = 0;
+
 		virtual ZEPostProcessor*			CreatePostProcessor() = 0;
 		virtual ZERenderer*					CreateFrameRenderer() = 0;
 		virtual ZERenderer*					CreateShadowRenderer() = 0;
@@ -123,10 +120,16 @@ class ZEGraphicsModule : public ZEModule
 		virtual void						ClearFrameBuffer() = 0;
 
 		virtual ZEStaticVertexBuffer*		CreateStaticVertexBuffer() = 0;
-		virtual ZETexture*					CreateTexture() = 0;
-		virtual ZEVolumeTexture*			CreateVolumeTexture() = 0;
-		virtual ZECubeTexture*				CreateCubeTexture() = 0;
-		virtual ZEShader*					CreateShader(unsigned int ShaderComponents) = 0;
+
+		virtual ZEVertexDeclaration*		CreateVertexDeclaration() = 0;
+
+		virtual ZETexture2D*					CreateTexture() = 0;
+		virtual ZETexture3D*			CreateVolumeTexture() = 0;
+		virtual ZETextureCube*				CreateCubeTexture() = 0;
+
+		virtual ZEFixedMaterial*			CreateFixedMaterial() = 0;
+		virtual ZEFixedMaterial*			CreateCustomMaterial() = 0;
+		virtual ZEFixedMaterial*			CreateCGFXMaterial() = 0;
 
 		static ZEGraphicsModule*			GetInstance();
 };

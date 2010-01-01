@@ -39,17 +39,18 @@
 
 #include "Definitions.h"
 #include "Types.h"
-#include "ZEDS/ZEDS.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/AABoundingBox.h"
+#include "ZEMath/Rectangle3D.h"
 
 #define ZE_MAP_MAX_NAME_SIZE ZE_MAX_NAME_SIZE
 #define ZE_MAP_MAX_FILENAME_SIZE ZE_MAX_FILE_NAME_SIZE
 
-#define ZEFILE_MAKEVERSION(Major, Minor) ((ZEDWORD)((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor)))
-#define ZEFILE_GETMINORVERSION(x) ((ZEDWORD)((x) & 0x0000FFFF))
-#define ZEFILE_GETMAJORVERSION(x) ((ZEDWORD)(((x) & 0xFFFF0000) >> 16))
+#define ZE_FILE_FORMAT_MAKEVERSION(Major, Minor) ((ZEDWORD)((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor)))
+#define ZE_FILE_FORMAT_GETMINORVERSION(x) ((ZEDWORD)((x) & 0x0000FFFF))
+#define ZE_FILE_FORMAT_GETMAJORVERSION(x) ((ZEDWORD)(((x) & 0xFFFF0000) >> 16))
 
-#define ZE_MAP_VERSION ZEFILE_MAKEVERSION(0, 4)
+#define ZE_MAP_VERSION ZE_FILE_FORMAT_MAKEVERSION(0, 4)
 
 #define ZE_MAP_HEADER ((ZEDWORD)((ZEDWORD)'ZEMF' + (ZEDWORD)'MAP '))
 #define ZE_MAP_MATERIAL_CHUNK ((ZEDWORD)(ZE_MAP_HEADER + (ZEDWORD)'MTRL'))
@@ -135,7 +136,7 @@ struct ZEMapFilePortalDoorChunk
 {
 	ZEDWORD							ChunkIdentifier;
 	char							Name[ZE_MAP_MAX_NAME_SIZE];
-	ZE3DRectangle					Rectangle;
+	ZERectangle3D					Rectangle;
 	ZEDWORD							DestinationPortal;
 	bool							IsOpen;
 };

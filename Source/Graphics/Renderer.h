@@ -37,30 +37,40 @@
 #ifndef __ZE_RENDERER_H__
 #define __ZE_RENDERER_H__
 
-#include "RenderList.h"
+#include "RenderOrder.h"
+#include "Texture.h"
 
 struct ZEViewPoint
 {
+	float							FOV;
+	float							NearZ;
+	float							FarZ;
 	ZEVector3						ViewPosition;
 	ZEMatrix4x4						ViewMatrix;
 	ZEMatrix4x4						ProjMatrix;
 	ZEMatrix4x4						ViewProjMatrix;
 };
 
+class ZECamera;
+class ZETexture2D;
+class ZETextureCube;
 class ZERenderer
 {
+	protected:
+										ZERenderer();
+		virtual							~ZERenderer();
+
 	public:
 		virtual bool					Initialize() = 0;
 		virtual void					Deinitialize() = 0;
-
 		virtual void					Destroy();
 
-		virtual void					SetViewPoint(const ZEViewPoint& ViewPoint) = 0;
-		virtual void					AddToRenderList(ZERenderList* RenderList) = 0;
+		virtual void					SetCamera(ZECamera* Camera) = 0;
+		virtual void					AddToRenderOrder(ZERenderOrder* RenderOrder) = 0;
 		virtual void					ClearList() = 0;
 
-		virtual bool					SetOutput(ZECubeTexture* TextureResource, ZECubeTextureFace Face) = 0;
-		virtual bool					SetOutput(ZETexture* TextureResource) = 0;
+		virtual bool					SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face) = 0;
+		virtual bool					SetOutput(ZETexture2D* Texture) = 0;
 
 		virtual void					Render(float ElaspedTime = 0) = 0;
 };

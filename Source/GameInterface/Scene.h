@@ -37,7 +37,7 @@
 #ifndef __ZE_SCENE_H__
 #define __ZE_SCENE_H__
 
-#include "ZEDS/ZEDS.h"
+#include "ZEDS/Array.h"
 #include "Entity.h"
 #include "Map/Map.h"
 #include "Portal.h"
@@ -45,6 +45,7 @@
 #include "Graphics/Camera.h"
 #include "Sound/Listener.h"
 #include "Graphics/ViewVolume.h"
+#include "Graphics/FixedMaterial.h"
 
 #define ZE_RCF_ENTITY								1
 #define ZE_RCF_COMPONENT							2
@@ -70,6 +71,7 @@ class ZESceneBridge
 	virtual void*								OnEntityChanged(ZEEntity* Entity) = 0;
 };
 
+#define zeScene ZEScene::GetInstance()
 class ZEScene
 {
 	private:
@@ -79,26 +81,25 @@ class ZEScene
 
 		unsigned int							LastEntityId;
 
-	public:
 		ZEPortalMap								Environment;
 		ZESmartArray<ZEEntity*>					Entities;
 	
 		ZERenderer*								Renderer;
 		ZEPostProcessor*						PostProcessor;
 		ZERenderer*								ShadowRenderer;
-		ZECamera*								CurrentCamera;
-		ZEListener*								CurrentListener;
+		ZECamera*								ActiveCamera;
+		ZEListener*								ActiveListener;
 
-		ZEDefaultMaterial						EntityOrientedBoundingBoxMaterial;
-		ZEDefaultMaterial						EntityAxisAlignedBoundingBoxMaterial;
-		ZEDefaultMaterial						EntityBoundingSphereMaterial;
-		ZEDefaultMaterial						ComponentOrientedBoundingBoxMaterial;
-		ZEDefaultMaterial						ComponentAxisAlignedBoundingBoxMaterial;
-		ZEDefaultMaterial						ComponentBoundingSphereMaterial;
-		ZEDefaultMaterial						LightRangeMaterial;
+		ZEFixedMaterial*						EntityOrientedBoundingBoxMaterial;
+		ZEFixedMaterial*						EntityAxisAlignedBoundingBoxMaterial;
+		ZEFixedMaterial*						EntityBoundingSphereMaterial;
+		ZEFixedMaterial*						ComponentOrientedBoundingBoxMaterial;
+		ZEFixedMaterial*						ComponentAxisAlignedBoundingBoxMaterial;
+		ZEFixedMaterial*						ComponentBoundingSphereMaterial;
+		ZEFixedMaterial*						LightRangeMaterial;
 
-		ZERenderList							BoundingBoxRenderList;
-		ZERenderList							BoundingSphereRenderList;
+		ZERenderOrder							BoundingBoxRenderOrder;
+		ZERenderOrder							BoundingSphereRenderOrder;
 		
 		void									DrawOrientedBoundingBox(const ZEAABoundingBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, ZEMaterial* Material);
 		void									DrawAxisAlignedBoundingBox(const ZEAABoundingBox& BoundingBox, ZERenderer* Renderer, ZEMaterial* Material);
@@ -111,13 +112,17 @@ class ZEScene
 		bool									Initialize();
 		bool									Deinitialize();
 		void									Reset();
+		void									Destroy();
 
 		void									AddEntity(ZEEntity* Entity);
 		void									RemoveEntity(ZEEntity* Entity);
 		const ZESmartArray<ZEEntity*>&			GetEntities();
 
-		void									SetCamera(ZECamera* Camera);
-		void									SetListener(ZEListener* Listener);
+		void									SetActiveCamera(ZECamera* Camera);
+		ZECamera*								GetActiveCamera();
+
+		void									SetActiveListener(ZEListener* Listener);
+		ZEListener*								GetActiveListener();
 
 		void									Tick(float ElapsedTime);
 		void									Render(float ElapsedTime);
@@ -126,13 +131,15 @@ class ZEScene
 		virtual bool							CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntity, ZEVector3& Position, ZEVector3& Normal);
 
 		virtual void							CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bool LightsEnabled = true);
-		bool									LoadEnvironment(const char* Filename);
+		bool									LoadEnvironment(const char* FileName);
 
-		bool									Save(const char* Filename);
-		bool									Load(const char* Filename);
+		bool									Save(const char* FileName);
+		bool									Load(const char* FileName);
 
 												ZEScene();
-												~ZEScene();
+		virtual									~ZEScene();
+
+		static ZEScene*							GetInstance();
 };
 
 class ZEPortalScene : public ZEScene

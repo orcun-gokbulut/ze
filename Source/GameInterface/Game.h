@@ -37,11 +37,13 @@
 #ifndef	__ZE_GAME_H__
 #define __ZE_GAME_H__
 
-#include "ZEDS/ZEDS.h"
+#include "ZEDS/Array.h"
 #include "Entity.h"
 #include "Scene.h"
 
-enum ZEGameType
+#define zeGame ZEGame::GetInstance()
+
+enum ZEGameType	
 {
 	ZEGAMETYPE_SINGLEPLAYER,
 	ZEGAMETYPE_MULTIPLAYER
@@ -75,6 +77,7 @@ class ZEGame
 		virtual void							Reset();
 		virtual bool							Initialize();
 		virtual bool							Deinitialize();
+		virtual void							Destroy();
 
 		const ZEArray<ZEEntityDescription*>		GetEntityDescriptions();
 		ZEEntityDescription*					GetEntityDescription(size_t Index);
@@ -87,5 +90,8 @@ class ZEGame
 		virtual void							Render(float ElapsedTime);
 										
 												ZEGame();
+		virtual									~ZEGame();
+
+		static ZEGame*							GetInstance();
 };
 #endif

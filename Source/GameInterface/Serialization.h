@@ -64,7 +64,7 @@ class ZEFileSerializer
 
 	public:
 		virtual size_t				Write(const void* Data, size_t Size, size_t Count);
-		bool						OpenFile(const char* Filename);
+		bool						OpenFile(const char* FileName);
 		void						CloseFile();
 									
 									ZEFileSerializer();
@@ -78,7 +78,7 @@ class ZEFileUnserializer
 
 	public:
 		virtual size_t				Read(void* data, size_t Size, size_t Count);	
-		bool						OpenFile(const char* Filename);
+		bool						OpenFile(const char* FileName);
 		void						CloseFile();
 
 									ZEFileUnserializer();

@@ -44,9 +44,9 @@
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
 
-const char* ZEResourceFile::GetFilename()
+const char* ZEResourceFile::GetFileName()
 {
-	return Filename;
+	return FileName;
 }
 
 void* ZEResourceFile::GetFileHandle()
@@ -56,26 +56,26 @@ void* ZEResourceFile::GetFileHandle()
 
 void ZEResourceFile::GetPartialResourceFile(ZEPartialResourceFile& PartialResourceFile, size_t StartPosition, size_t EndPosition)
 {
-	sprintf(PartialResourceFile.Filename, "%s:(%d, &d)", Filename, StartPosition, EndPosition);
+	sprintf(PartialResourceFile.FileName, "%s:(%d, &d)", FileName, StartPosition, EndPosition);
 	PartialResourceFile.File = this->File;
 	PartialResourceFile.StartPosition = StartPosition;
 	PartialResourceFile.EndPosition = EndPosition;
-	Seek(StartPosition, SEEKFROM_BEGINING);
+	Seek(StartPosition, ZE_SF_BEGINING);
 }
 
-bool ZEResourceFile::Open(const char* Filename)
+bool ZEResourceFile::Open(const char* FileName)
 {
-	char RelativeFilename[ZE_MAX_NAME_SIZE + 11];
-	strncpy(this->Filename, Filename, ZE_MAX_FILE_NAME_SIZE);
+	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
+	strncpy(this->FileName, FileName, ZE_MAX_FILE_NAME_SIZE);
 
-	sprintf_s(RelativeFilename, ZE_MAX_NAME_SIZE + 11, "resources\\%s", Filename);
+	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", FileName);
 
-	File = fopen(RelativeFilename, "rb");
+	File = fopen(RelativeFileName, "rb");
 	if(File != NULL)
 		return true;
 	else
 	{
-		zeError("Resource File", "Could not open resource file \"%s\".", Filename);
+		zeError("Resource File", "Could not open resource file \"%s\".", FileName);
 		return false;
 	}
 }
@@ -115,15 +115,15 @@ void ZEResourceFile::Close()
 		fclose((FILE*)File);
 }
 
-bool ZEResourceFile::ReadFile(const char* Filename, void* Buffer, size_t BufferSize)
+bool ZEResourceFile::ReadFile(const char* FileName, void* Buffer, size_t BufferSize)
 {
-	char RelativeFilename[ZE_MAX_NAME_SIZE + 11];
-	sprintf_s(RelativeFilename, ZE_MAX_NAME_SIZE + 11, "resources\\%s", Filename);
+	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
+	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", FileName);
 
-	FILE* File = fopen(RelativeFilename, "rb");
+	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
 	{
-		zeError("Resource File", "Could not open resource file \"%s\".", Filename);
+		zeError("Resource File", "Could not open resource file \"%s\".", FileName);
 		return false;
 	}
 
@@ -140,16 +140,16 @@ bool ZEResourceFile::ReadFile(const char* Filename, void* Buffer, size_t BufferS
 	return true;
 }
 
-bool ZEResourceFile::ReadTextFile(const char* Filename, char* Buffer, size_t BufferSize)
+bool ZEResourceFile::ReadTextFile(const char* FileName, char* Buffer, size_t BufferSize)
 {
-	char RelativeFilename[ZE_MAX_NAME_SIZE + 11];
+	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
 
-	sprintf_s(RelativeFilename, ZE_MAX_NAME_SIZE + 11, "resources\\%s", Filename);
+	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", FileName);
 
-	FILE* File = fopen(RelativeFilename, "rb");
+	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
 	{
-		zeError("Resource File", "Could not open resource file \"%s\".", Filename);
+		zeError("Resource File", "Could not open resource file \"%s\".", FileName);
 		return false;
 	}
 
@@ -183,15 +183,15 @@ bool ZEPartialResourceFile::Seek(size_t Offset, ZESeekFrom Origin)
 {
 	switch(Origin)
 	{
-		case SEEKFROM_BEGINING:
+		case ZE_SF_BEGINING:
 			if (fseek((FILE*)File, StartPosition + Offset, SEEK_SET) != 0)
 				return false;
 			break;
-		case SEEKFROM_CURRENT:
+		case ZE_SF_CURRENT:
 			if (fseek((FILE*)File, Offset, SEEK_CUR) != 0)
 				return false;
 			break;
-		case SEEKFROM_END:
+		case ZE_SF_END:
 			if (fseek((FILE*)File, EndPosition + Offset, SEEK_SET) != 0)
 				return false;
 			break;

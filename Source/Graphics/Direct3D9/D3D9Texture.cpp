@@ -36,6 +36,7 @@
 #include "D3D9Texture.h"
 #include "Direct3D9Module.h"
 #include "Core/Core.h"
+#include "D3D9CommonTools.h"
 /*
 D3DFORMAT ConvertPixelFormat(ZETexturePixelFormat Format)
 {
@@ -52,6 +53,16 @@ D3DFORMAT ConvertPixelFormat(ZETexturePixelFormat Format)
 			ZEASSERT(true, "Wrong enum value ZETexturePixelFormat. Value : %d.", Format);
 	}
 }*/
+
+ZED3D9Texture::ZED3D9Texture()
+{
+	Texture = NULL;
+}
+
+ZED3D9Texture::~ZED3D9Texture()
+{
+	Release();
+}
 
 bool ZED3D9Texture::IsEmpty() const
 {
@@ -72,6 +83,8 @@ bool ZED3D9Texture::DeviceRestored()
 {
 	if (RenderTarget)
 		return Create(Width, Height, PixelFormat, true);
+
+	return true;
 }
 
 bool ZED3D9Texture::Create(int Width, int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget)
@@ -197,19 +210,23 @@ void ZED3D9Texture::Release()
 	}
 }
 
-
 void ZED3D9Texture::Destroy()
 {
 	Module->Textures.DeleteValue((ZED3D9Texture*)this);
 	delete this;
 }
 
-ZED3D9Texture::ZED3D9Texture()
+
+
+
+
+
+ZED3D9VolumeTexture::ZED3D9VolumeTexture()
 {
-	Texture = NULL;
+	VolumeTexture = NULL;
 }
 
-ZED3D9Texture::~ZED3D9Texture()
+ZED3D9VolumeTexture::~ZED3D9VolumeTexture()
 {
 	Release();
 }
@@ -234,7 +251,7 @@ bool ZED3D9VolumeTexture::Create(int Width, int Height, int Depth, ZETexturePixe
 		VolumeTexture->Release();
 
 	HRESULT Hr;
-	Hr = Device->CreateVolumeTexture(Width, Height, Depth, 0, D3DUSAGE_AUTOGENMIPMAP, ConvertPixelFormat(PixelFormat), D3DPOOL_MANAGED, &VolumeTexture, NULL);  
+	Hr = Device->CreateVolumeTexture(Width, Height, Depth, 0, D3DUSAGE_AUTOGENMIPMAP, ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), D3DPOOL_MANAGED, &VolumeTexture, NULL);  
 	if (Hr != D3D_OK)
 	{
 		zeError("Direct3D Module", "Can not create volume texture resource.");
@@ -276,12 +293,15 @@ void ZED3D9VolumeTexture::Destroy()
 }
 
 
-ZED3D9VolumeTexture::ZED3D9VolumeTexture()
+
+
+
+ZED3D9CubeTexture::ZED3D9CubeTexture()
 {
-	VolumeTexture = NULL;
+	CubeTexture = NULL;
 }
 
-ZED3D9VolumeTexture::~ZED3D9VolumeTexture()
+ZED3D9CubeTexture::~ZED3D9CubeTexture()
 {
 	Release();
 }
@@ -315,7 +335,7 @@ bool ZED3D9CubeTexture::Create(int EdgeLength, ZETexturePixelFormat PixelFormat,
 
 	HRESULT Hr;
 	Hr = Device->CreateCubeTexture(EdgeLength, 0, 
-		(RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP), ConvertPixelFormat(PixelFormat), 
+		(RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP), ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), 
 		(RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED), &CubeTexture, NULL);  
 	if (Hr != D3D_OK)
 	{
@@ -330,7 +350,7 @@ bool ZED3D9CubeTexture::Create(int EdgeLength, ZETexturePixelFormat PixelFormat,
 	return true;
 }
 
-void ZED3D9CubeTexture::Lock(ZECubeTextureFace Face, void** Buffer, int* Pitch)
+void ZED3D9CubeTexture::Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch)
 {
 	D3DLOCKED_RECT Rect;
 	CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, 0, &Rect, NULL, D3DLOCK_DISCARD);
@@ -338,7 +358,7 @@ void ZED3D9CubeTexture::Lock(ZECubeTextureFace Face, void** Buffer, int* Pitch)
 	*Pitch = Rect.Pitch;
 }
 
-void ZED3D9CubeTexture::Unlock(ZECubeTextureFace Face)
+void ZED3D9CubeTexture::Unlock(ZETextureCubeFace Face)
 {
 	CubeTexture->UnlockRect((D3DCUBEMAP_FACES)Face, 0);
 }
@@ -355,14 +375,4 @@ void ZED3D9CubeTexture::Destroy()
 {
 	Module->CubeTextures.DeleteValue((ZED3D9CubeTexture*)this);
 	delete this;
-}
-
-ZED3D9CubeTexture::ZED3D9CubeTexture()
-{
-	CubeTexture = NULL;
-}
-
-ZED3D9CubeTexture::~ZED3D9CubeTexture()
-{
-	Release();
 }

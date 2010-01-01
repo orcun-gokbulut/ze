@@ -86,38 +86,3 @@ ZERectangle::ZERectangle(const ZEPoint2& UpLeft, float Width, float Height)
 	this->RightDown.x = UpLeft.x + Width;
 	this->RightDown.y = UpLeft.y + Height;
 }
-
-
-void ZE3DRectangle::GetPlane(ZEPlane & Plane) const
-{
-	ZEPlane::Create(Plane,P1,P2,P3);
-}
-
-const ZEPoint3& ZE3DRectangle::GetPoint(unsigned int Index) const
-{
-	switch(Index)
-	{
-		case 0:
-			return P1;
-		case 1:
-			return P2;
-		case 2:
-			return P3;
-		case 3:
-			return P4;
-		default:
-			return P1;
-	}
-}
-		
-ZE3DRectangle::ZE3DRectangle()
-{
-}
-
-ZE3DRectangle::ZE3DRectangle(const ZEPoint3& P1, const ZEPoint3& P2, const ZEPoint3& P3, const ZEPoint3& P4)
-{
-	this->P1 = P1;
-	this->P2 = P2;
-	this->P3 = P3;
-	this->P4 = P4;
-}

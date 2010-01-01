@@ -46,7 +46,7 @@ const char* ZEResource::GetFileName() const
 	return this->FileName;
 }
 
-void ZEResource::SetFilename(const char* Value)
+void ZEResource::SetFileName(const char* Value)
 {
 	strcpy_s(FileName, ZE_MAX_FILE_NAME_SIZE, Value);
 }
@@ -71,10 +71,15 @@ bool ZEResource::IsInternal() const
 	return this->Internal;
 }
 
-void ZEResource::Release() const
+void ZEResource::Release()
 {
+	ReferenceCount--;
 	if (Shared)
-		zeResources->ReleaseResource((ZEResource*)this);
+		if (ReferenceCount <= 0 && !Cached)
+		{
+			zeResources->ReleaseResource(this);
+			delete this;
+		}
 	else
 		if (!Cached)
 			delete this;

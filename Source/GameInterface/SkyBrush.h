@@ -41,15 +41,15 @@
 #include "Graphics/Light.h"
 #include "Graphics/Canvas.h"
 
-ZE_ENTITY_DESCRIPTION(ZESkyBrush, ZEEntity);
+ZE_META_CLASS_DESCRIPTION(ZESkyBrush);
 class ZESkyBrush : public ZEEntity
 {
-	ZE_ENTITY_CLASS(ZESkyBrush)
+	ZE_META_CLASS()
 	private:
-		ZECubeTextureResource*				SkyTexture;
-		ZEDefaultMaterial					SkyMaterial;
+		ZETextureCubeResource*				SkyTexture;
+		ZEFixedMaterial*					SkyMaterial;
 		ZECanvas							SkyBox;
-		ZERenderList						SkyRenderList;
+		ZERenderOrder						SkyRenderOrder;
 
 		ZEDirectionalLight					SkyLight;
 
@@ -58,30 +58,25 @@ class ZESkyBrush : public ZEEntity
 	public:
 		virtual const ZEAABoundingBox&		GetWorldBoundingBox();
 
-		virtual bool						IsDrawable();
-		virtual bool						IsLight();
-		virtual bool						AllwaysDraw();
+		virtual ZEDWORD						GetDrawFlags() const;
 
-		virtual void						SetSkyTexture(const char* Filename);
-		const char*							GetSkyTexture();
+		virtual void						SetSkyTexture(const char* FileName);
+		const char*							GetSkyTexture() const;
 		
 		virtual void						SetSkyColor(const ZEVector3& Color);
-		const ZEVector3&					GetSkyColor();
+		const ZEVector3&					GetSkyColor() const;
 
 		virtual void						SetSkyLightEnabled(bool Enabled);
-		bool								GetSkyLightEnabled();
+		bool								GetSkyLightEnabled() const;
 
 		virtual void						SetSkyLightColor(const ZEVector3& Color);
-		const ZEVector3&					GetSkyLightColor();
+		const ZEVector3&					GetSkyLightColor() const;
 		
 		virtual void						SetSkyLightDirection(const ZEVector3& Direction);
-		const ZEVector3&					GetSkyLightDirection();
+		const ZEVector3&					GetSkyLightDirection() const;
 
 		virtual void						SetSkyLightIntensity(float Intensity);
-		float								GetSkyLightIntensity();
-
-		virtual bool						SetAttribute(const char* AttributeName, const ZEVariant& Value);
-		virtual bool						GetAttribute(const char* AttributeName, ZEVariant& Value);
+		float								GetSkyLightIntensity() const;
 
 		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
 		virtual void						Tick(float Time);
@@ -89,5 +84,20 @@ class ZESkyBrush : public ZEEntity
 											ZESkyBrush();
 											~ZESkyBrush();
 };	
-
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZESkyBrush"	parent="ZEEntity"	description="Sky Brush">
+			<property name="SkyColor"			type="ZEVector3"	autogetset="true"	default="ZEVector3(1.0f, 1.0f, 1.0f)"	description="Color of the sky"			semantic="color"/>
+			<property name="SkyTexture"			type="string"		autogetset="true"	default=""								description="Texture of the sky"		semantic="filename"		fileextension="IMAGE"/>
+			<property name="SkyLightEnabled"	type="boolean"		autogetset="true"	default="false"							description="Sun light enabled"			semantic="color"/>
+			<property name="SkyLightColor"		type="ZEVector3"	autogetset="true"	default="ZEVector3(1.0f, 1.0f, 1.0f)"	description="Color of the sun"			semantic="color"/>
+			<property name="SkyLightDirection"	type="ZEVector3"	autogetset="true"	default="ZEVector3(0.0f, -1.0f, 0.0f)"	description="Direction of the light"	semantic="direction"/>
+			<property name="SkyLightIntensity"	type="float"		autogetset="true"	default="1.0f"							description="Intensity of the light"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END()
+*/
 #endif

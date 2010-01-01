@@ -370,22 +370,22 @@ bool ZEConsole::ParseInput(const char* Input)
 				{
 					switch(Opt->GetValueType())
 					{
-						case ZEVARIANTTYPE_UNDEFINED:
+						case ZE_VRT_UNDEFINED:
 							Print("%s.%s = UNDEFINED (Probably an error)\r\n");
 							break;
-						case ZEVARIANTTYPE_INTEGER:
+						case ZE_VRT_INTEGER:
 							Print("%s.%s = %d\r\n", Section, Name, Opt->GetValue().GetInteger());
 							break;
-						case ZEVARIANTTYPE_FLOAT:
+						case ZE_VRT_FLOAT:
 							Print("%s.%s = %lf\r\n", Section, Name, Opt->GetValue().GetFloat());
 							break;
-						case ZEVARIANTTYPE_BOOLEAN:
+						case ZE_VRT_BOOLEAN:
 							Print("%s.%s = %s\r\n", Section, Name, Opt->GetValue().GetBoolean() ? "true" : "false");
 							break;
-						case ZEVARIANTTYPE_STRING:
+						case ZE_VRT_STRING:
 							Print("%s.%s = \"%s\"\r\n", Section, Name, Opt->GetValue().GetString());
 							break;
-						case ZEVARIANTTYPE_NULL:
+						case ZE_VRT_NULL:
 							Print("%s.%s = NULL\r\n");
 							break;
 						default:

@@ -32,27 +32,30 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
 #pragma once
 #ifndef __ZE_CANVASBRUSH_H__
 #define __ZE_CANVASBRUSH_H__
 #include "Entity.h"
 #include "Graphics/Canvas.h"
 #include "Graphics/Renderer.h"
-ZE_ENTITY_DESCRIPTION(ZECanvasBrush, ZEEntity);
+#include "Graphics/FixedMaterial.h"
+
+ZE_META_CLASS_DESCRIPTION(ZECanvasBrush);
 
 class ZECanvasBrush : public ZEEntity
 {
-	ZE_ENTITY_CLASS(ZECanvasBrush)
+	ZE_META_CLASS()
 	
 	private:
-		ZERenderList						RenderList;
+		ZERenderOrder						RenderOrder;
 		ZEStaticVertexBuffer*				VertexBuffer;
 		size_t								OldVertexCount;
 	public:
-		virtual bool						IsDrawable();
+		virtual ZEDWORD						GetDrawFlags() const;
 
 		ZERLPrimitiveType					PrimitiveType;
-		ZEDefaultMaterial					Material;
+		ZEMaterial*							Material;
 		ZECanvas							Canvas;
 
 		void								UpdateCanvas();
@@ -60,9 +63,19 @@ class ZECanvasBrush : public ZEEntity
 		virtual void						Deinitialize();
 
 		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
-	
+		virtual void						Tick(float ElapsedTime);
+
 											ZECanvasBrush();
 											~ZECanvasBrush();
 };
 
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZECanvasBrush" parent="ZEEntity" icon="" description="Canvas brush"/>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END()
+*/
 #endif

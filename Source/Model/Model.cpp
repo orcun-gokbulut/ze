@@ -40,17 +40,17 @@
 
 void ZEModelMeshLOD::ResetMaterial()
 {
-	RenderList.Material = &Owner->GetModelResource()->Materials[LODResource->MaterialId];
+	RenderOrder.Material = Owner->GetModelResource()->Materials[LODResource->MaterialId];
 }
 
 void ZEModelMeshLOD::SetMaterial(const ZEMaterial* Material)
 {
-	RenderList.Material = Material;
+	RenderOrder.Material = Material;
 }
 
 const ZEMaterial* ZEModelMeshLOD::GetMaterial()
 {
-	return RenderList.Material;
+	return RenderOrder.Material;
 }
 
 bool ZEModelMeshLOD::IsSkinned()
@@ -68,18 +68,18 @@ void ZEModelMeshLOD::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLig
 		const ZEArray<ZEMatrix4x4>& BoneVertexTransforms = Owner->GetBoneTransforms();
 		ZEMatrix4x4 OwnerMeshModelTransform = OwnerMesh->GetModelTransform();
 
-		RenderList.BoneTransforms.SetCount(BoneVertexTransforms.GetCount());
-		for (size_t I = 0; I < RenderList.BoneTransforms.GetCount(); I++)
-			ZEMatrix4x4::Multiply(RenderList.BoneTransforms[I], OwnerMeshModelTransform, BoneVertexTransforms[I]);
+		RenderOrder.BoneTransforms.SetCount(BoneVertexTransforms.GetCount());
+		for (size_t I = 0; I < RenderOrder.BoneTransforms.GetCount(); I++)
+			ZEMatrix4x4::Multiply(RenderOrder.BoneTransforms[I], OwnerMeshModelTransform, BoneVertexTransforms[I]);
 
-		RenderList.WorldMatrix = Owner->GetWorldTransform();
+		RenderOrder.WorldMatrix = Owner->GetWorldTransform();
 	}
 	else
-		RenderList.WorldMatrix = OwnerMesh->GetWorldTransform();
+		RenderOrder.WorldMatrix = OwnerMesh->GetWorldTransform();
 
-	RenderList.Lights.Clear();
-	RenderList.Lights.MassAdd(Lights.GetConstCArray(), Lights.GetCount());
-	Renderer->AddToRenderList(&RenderList);
+	RenderOrder.Lights.Clear();
+	RenderOrder.Lights.MassAdd(Lights.GetConstCArray(), Lights.GetCount());
+	Renderer->AddToRenderOrder(&RenderOrder);
 }
 
 void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)
@@ -90,20 +90,20 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 
 	Skinned = LODResource->Vertices.GetCount() == 0 ? true : false;
 
-	RenderList.SetZero();
-	RenderList.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_WORLD_TRANSFORM | ZE_RLF_ENABLE_ZCULLING | (Skinned ? ZE_RLF_SKINNED : 0);
-	RenderList.PrimitiveType = ZE_RLPT_TRIANGLE;
-	RenderList.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
-	RenderList.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;
-	RenderList.VertexType = Skinned ? ZE_VT_SKINNEDMODELVERTEX : ZE_VT_MODELVERTEX;
-	RenderList.Material = &Owner->GetModelResource()->Materials[LODResource->MaterialId];
+	RenderOrder.SetZero();
+	RenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_WORLD_TRANSFORM | ZE_RLF_ENABLE_ZCULLING | (Skinned ? ZE_RLF_SKINNED : 0);
+	RenderOrder.PrimitiveType = ZE_RLPT_TRIANGLE;
+	RenderOrder.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
+	RenderOrder.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;
+	RenderOrder.VertexDeclaration = Skinned ? ZESkinnedModelVertex::GetVertexDeclaration() : ZEModelVertex::GetVertexDeclaration();
+	RenderOrder.Material = Owner->GetModelResource()->Materials[LODResource->MaterialId];
 }
 
 void ZEModelMeshLOD::Deinitialize()
 {
 	Owner = NULL;
 	OwnerMesh = NULL;
-	RenderList.SetZero();
+	RenderOrder.SetZero();
 	VertexBuffer = NULL;
 	LODResource = NULL;
 	Material = NULL;
@@ -115,7 +115,7 @@ ZEModelMeshLOD::ZEModelMeshLOD()
 	Skinned = false;
 	Owner = NULL;
 	OwnerMesh = NULL;
-	RenderList.SetZero();
+	RenderOrder.SetZero();
 	VertexBuffer = NULL;
 	LODResource = NULL;
 	Material = NULL;
@@ -694,7 +694,7 @@ bool ZEModel::IsDrawable()
 void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 {
 	if (this->ModelResource != NULL)
-		this->ModelResource->Release();
+		((ZEModelResource*)this->ModelResource)->Release();
 	this->ModelResource = ModelResource;
 
 	if (ModelResource == NULL)
@@ -1139,5 +1139,5 @@ ZEModel::ZEModel()
 ZEModel::~ZEModel()
 {
 	if (ModelResource != NULL)
-		ModelResource->Release();
+		((ZEModelResource*)ModelResource)->Release();
 }

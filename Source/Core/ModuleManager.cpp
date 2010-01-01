@@ -235,7 +235,7 @@ bool ZEModuleManager::LoadInternalModule(ZEModuleDescription* ModuleDesc)
 	return true;
 }
 
-bool ZEModuleManager::LoadExternalModule(const char* Filename)
+bool ZEModuleManager::LoadExternalModule(const char* FileName)
 {
 	return false;
 }

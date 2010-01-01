@@ -37,7 +37,7 @@
 #ifndef	__ZE_INPUT_MAP_H__
 #define __ZE_INPUT_MAP_H__
 
-#include "ZEDS/ZEDS.h"
+#include "ZEDS/Array.h"
 
 enum ZEInputButtonState
 {

@@ -86,7 +86,7 @@ class ZESoundSource
 		void				PlayLoop();
 	
 		void				LoadSoundResource(ZESoundResource* Resource);
-		void				LoadSoundFile(const char* Filename);
+		void				LoadSoundFile(const char* FileName);
 		
 		virtual void		Update();
 

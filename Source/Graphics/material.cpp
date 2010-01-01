@@ -37,77 +37,25 @@
 #include "Core/Core.h"
 #include "memory.h"
 #include "GraphicsModule.h"
+#include "Meta/Animation.h"
 
-const ZEShader* ZEDefaultMaterial::GetShader() const 
+ZEMaterial::ZEMaterial()
 {
-	return Shader;
 }
 
-void ZEDefaultMaterial::SetZero()
+ZEMaterial::~ZEMaterial()
 {
-	ShaderComponents = -1;
-	TwoSided = false;
-	LightningEnabled = true;
-	Wireframe = false;
-	TransparancyMode = ZE_TM_NOTRANSPARACY;
-	TransparancyCullLimit = 0;
-	Opasity = 1.0f;
-	memset(Textures, 0, sizeof(Textures));
-	memset(PixelShaderConstants, 0, sizeof(PixelShaderConstants));
 }
 
-const ZEVector4* ZEDefaultMaterial::GetVertexShaderConstants(int* Count) const 
+void ZEMaterial::AdvanceAnimation(float TimeElapsed)
 {
-	*Count = 0;
-	return NULL;
+	if (GetAnimationController() != NULL)
+		GetAnimationController()->AdvanceAnimation(TimeElapsed);
 }
 
-const ZEVector4* ZEDefaultMaterial::GetPixelShaderConstants(int* Count) const 
+void ZEMaterial::Destroy()
 {
-	*Count = 4;
-	return (const ZEVector4*)&PixelShaderConstants;
+	delete this;
 }
 
-const ZETextureBase** ZEDefaultMaterial::GetTextures(int* Count) const 
-{
-	*Count = 9;
-	return (const ZETextureBase**)Textures;
-}
-
-void ZEDefaultMaterial::SetShaderComponents(unsigned int ShaderComponents) 
-{
-	if (this->ShaderComponents != ShaderComponents)
-	{
-		if (Shader != NULL)
-			Shader->Release();
-
-		Shader = zeGraphics->CreateShader(ShaderComponents);
-
-		this->ShaderComponents = ShaderComponents;
-	}
-}
-
-unsigned int ZEDefaultMaterial::GetShaderComponents() const 
-{
-	return this->ShaderComponents;
-}
-
-
-void ZEDefaultMaterial::Release() const
-{
-	if (Shader != NULL)
-	{
-		Shader->Release();
-		((ZEDefaultMaterial*)this)->Shader = NULL;
-	}
-}
-
-ZEDefaultMaterial::ZEDefaultMaterial()
-{
-	Shader = NULL;
-}
-
-ZEDefaultMaterial::~ZEDefaultMaterial()
-{
-	Release();
-}
+#include "Material.h.zpp"

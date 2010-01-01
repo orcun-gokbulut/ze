@@ -38,7 +38,7 @@
 #define __ZE_POSTPROCESSOR_H__
 
 #include "Graphics/TextureResource.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/Matrix.h"
 
 enum ZEPostProcessorDestination
 {
@@ -56,8 +56,8 @@ enum ZEPostProcessorSource
 class ZEPostProcessor
 {
 	public:
-		virtual void					SetInput(ZETexture* Texture) = 0;
-		virtual void					SetOutput(ZETexture* Texture) = 0;
+		virtual void					SetInput(ZETexture2D* Texture) = 0;
+		virtual void					SetOutput(ZETexture2D* Texture) = 0;
 
 		virtual void					DirectOutput(ZEPostProcessorSource Source, ZEPostProcessorDestination Destination) = 0;
 

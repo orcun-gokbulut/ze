@@ -37,10 +37,12 @@
 #ifndef	__ZE_MODEL_H__
 #define __ZE_MODEL_H__
 
-#include "ZEDS/ZEDS.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEDS/Array.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "ZEMath/Matrix.h"
 #include "Core/Component.h"
-#include "Graphics/RenderList.h"
+#include "Graphics/RenderOrder.h"
 #include "ModelResource.h"
 
 enum ZEModelAnimationState
@@ -67,7 +69,7 @@ class ZEModelMeshLOD
 		ZEModelMesh*						OwnerMesh;
 		const ZEModelResourceMeshLOD*		LODResource;
 		ZEVertexBuffer*						VertexBuffer;
-		ZERenderList						RenderList;
+		ZERenderOrder						RenderOrder;
 		const ZEMaterial*					Material;
 		bool								Skinned;
 
@@ -259,7 +261,7 @@ class ZEModel : public ZEComponent
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEMatrix4x4>				BoneTransforms;
 		ZEArray<ZEModelBone>				Skeleton;
-		ZEArray<ZERenderList>				LODRenderLists;
+		ZEArray<ZERenderOrder>				LODRenderOrders;
 		
 		ZEArray<ZEModelMesh>				Meshes;
 		ZEArray<ZEModelBone>				Bones;

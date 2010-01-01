@@ -42,9 +42,9 @@
 
 enum ZESeekFrom
 {
-	SEEKFROM_BEGINING	= 0,
-	SEEKFROM_END		= 1,
-	SEEKFROM_CURRENT	= 2
+	ZE_SF_BEGINING	= 0,
+	ZE_SF_END		= 1,
+	ZE_SF_CURRENT	= 2
 };
 
 class ZEPartialResourceFile;
@@ -52,13 +52,13 @@ class ZEResourceFile : public ZEUnserializer
 {
 	protected:
 		void*				File;
-		char				Filename[ZE_MAX_FILE_NAME_SIZE];
+		char				FileName[ZE_MAX_FILE_NAME_SIZE];
 
 	public:
-		const char*			GetFilename();
+		const char*			GetFileName();
 		void*				GetFileHandle();
 
-		virtual bool		Open(const char* Filename);
+		virtual bool		Open(const char* FileName);
 		virtual bool		Seek(size_t Offset, ZESeekFrom Origin);
 		virtual size_t		Read(void* Buffer, size_t Size, size_t Count);
 		virtual size_t		FormatedRead(void* Buffer, size_t BufferSize, void* Format, ...);
@@ -67,8 +67,8 @@ class ZEResourceFile : public ZEUnserializer
 		virtual bool		Eof();
 		void				GetPartialResourceFile(ZEPartialResourceFile& PartialResourceFile, size_t StartPosition, size_t EndPosition);
 		
-		static bool			ReadFile(const char* Filename, void* Buffer, size_t BufferSize);
-		static bool			ReadTextFile(const char* Filename, char* Buffer, size_t BufferSize);
+		static bool			ReadFile(const char* FileName, void* Buffer, size_t BufferSize);
+		static bool			ReadTextFile(const char* FileName, char* Buffer, size_t BufferSize);
 
 							ZEResourceFile();
 							~ZEResourceFile();
@@ -78,16 +78,16 @@ class ZEPartialResourceFile : public ZEResourceFile
 {
 	friend class ZEResourceFile;
 	private:
-		size_t		StartPosition;
-		size_t		EndPosition;
-		bool		IsEof;
+		size_t				StartPosition;
+		size_t				EndPosition;
+		bool				IsEof;
 
 	public:
-		bool		Seek(size_t Offset, ZESeekFrom Origin);
-		size_t		Read(void* Buffer, size_t Size, size_t Count);
-		bool		Eof();
-		size_t		Tell();
+		bool				Seek(size_t Offset, ZESeekFrom Origin);
+		size_t				Read(void* Buffer, size_t Size, size_t Count);
+		bool				Eof();
+		size_t				Tell();
 
-					ZEPartialResourceFile();
+							ZEPartialResourceFile();
 };
 #endif

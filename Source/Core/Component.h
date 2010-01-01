@@ -34,7 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/Matrix.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "ZEMath/AABoundingBox.h"
+#include "ZEMath/OBoundingBox.h"
+#include "ZEMath/BoundingSphere.h"
 #include "Graphics/Renderer.h"
 
 enum ZEComponentClass
@@ -67,44 +72,43 @@ class ZEComponent
 		bool							Enabled;
 		bool							Visible;
 
-	protected:
+	protected: 
 		void							UpdateBoundingVolumes();
 		void							SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
 
 	public:
-		bool							IsEnabled();
-		virtual void					SetEnabled(bool Enabled);
+		virtual	ZEDWORD					GetDrawFlags() const;
 
-		bool							IsVisible();
-		virtual void					SetVisible(bool Visible);
+		const ZEMatrix4x4&				GetWorldTransform() const;
+		const ZEMatrix4x4&				GetLocalTransform() const;
 
-		virtual	bool					IsLight();
-		virtual	bool					IsDrawable();
+		virtual const ZEAABoundingBox&	GetLocalBoundingBox() const;
+		virtual const ZEAABoundingBox&	GetWorldBoundingBox() const;
+		const ZEBoundingSphere&			GetWorldBoundingSphere() const;
 
 		virtual void					SetOwner(ZEEntity* NewOwner);
-		virtual ZEEntity*				GetOwner();
-		virtual void					OwnerWorldTransformChanged();
+		virtual ZEEntity*				GetOwner() const;
+		
+		bool							GetEnabled() const;
+		virtual void					SetEnabled(bool Enabled);
 
-		virtual const ZEAABoundingBox&	GetLocalBoundingBox();
-		virtual const ZEAABoundingBox&	GetWorldBoundingBox();
-		const ZEBoundingSphere&			GetWorldBoundingSphere();
+		bool							GetVisible() const;
+		virtual void					SetVisible(bool Visible);
 
-		const ZEVector3&				GetLocalPosition();
+
+		const ZEVector3&				GetLocalPosition() const;
 		virtual void					SetLocalPosition(const ZEVector3& NewPosition);
 
-		const ZEQuaternion&				GetLocalRotation();
+		const ZEQuaternion&				GetLocalRotation() const;
 		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);
 
-		const ZEVector3&				GetLocalScale();
+		const ZEVector3&				GetLocalScale() const;
 		virtual void					SetLocalScale(const ZEVector3& NewScale);
 
-		const ZEMatrix4x4&				GetWorldTransform();
-		const ZEMatrix4x4&				GetLocalTransform();
-
-		virtual const ZEVector3			GetWorldPosition();
+		virtual const ZEVector3			GetWorldPosition() const;
 		virtual void					SetWorldPosition(const ZEVector3& NewWorldPosition);
 
-		virtual const ZEQuaternion		GetWorldRotation();
+		virtual const ZEQuaternion		GetWorldRotation() const;
 		virtual void					SetWorldRotation(const ZEQuaternion& NewWorldRotation);
 
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& TEnterance, float &TExit);
@@ -113,6 +117,8 @@ class ZEComponent
 
 		virtual bool					Initialize();
 		virtual bool					Deinitialize();
-								
+	
+		virtual void					OwnerWorldTransformChanged();
+
 										ZEComponent();
 };

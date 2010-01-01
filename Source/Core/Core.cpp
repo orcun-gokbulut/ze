@@ -358,9 +358,7 @@ void ZECore::ShutDown()
 	SetCoreState(ZECORESTATE_SHUTDOWN);
 	// Destroy game
 	if (Game != NULL)
-	{
 		Game->Deinitialize();
-	}
 
 	zeLog("Saving options.\r\n");
 	if (CoreState == ZECORESTATE_CRITICALERROR)
@@ -407,7 +405,14 @@ void ZECore::ShutDown()
 void ZECore::MainLoop()
 {
 	static LARGE_INTEGER OldTime, Freq;
+	static bool FirstTime = true;
 	LARGE_INTEGER NewTime;
+
+	if (FirstTime)
+	{
+		QueryPerformanceCounter(&OldTime);
+		FirstTime = false;
+	}
 
 	QueryPerformanceFrequency(&Freq);
 	QueryPerformanceCounter(&NewTime);

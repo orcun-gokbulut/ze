@@ -41,12 +41,12 @@ size_t ZEFileSerializer::Write(const void* Buffer, size_t Size, size_t Count)
 	return fwrite(Buffer, Size, Count, (FILE*)File);
 }
 
-bool ZEFileSerializer::OpenFile(const char* Filename)
+bool ZEFileSerializer::OpenFile(const char* FileName)
 {
-	File = fopen(Filename, "wb");
+	File = fopen(FileName, "wb");
 	if (File == NULL)
 	{
-		zeError("File Serializer", "Can not open \"%s\" file.", Filename);
+		zeError("File Serializer", "Can not open \"%s\" file.", FileName);
 		return false;
 	}
 	return true;
@@ -77,12 +77,12 @@ size_t ZEFileUnserializer::Read(void* Buffer, size_t Size, size_t Count)
 	return fread(Buffer, Size, Count, (FILE*)File);
 }
 
-bool ZEFileUnserializer::OpenFile(const char* Filename)
+bool ZEFileUnserializer::OpenFile(const char* FileName)
 {
-	File = fopen(Filename, "rb");
+	File = fopen(FileName, "rb");
 	if (File == NULL)
 	{
-		zeError("File Unserializer", "Can not open \"%s\" file.", Filename);
+		zeError("File Unserializer", "Can not open \"%s\" file.", FileName);
 		return false;
 	}
 	return true;

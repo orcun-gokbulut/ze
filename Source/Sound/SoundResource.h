@@ -64,10 +64,10 @@ class ZESoundResource : public ZEResource
 		ZESoundOutputFormat			OutputFormat;
 		size_t						DataSize;
 		unsigned char*				Data;
-		static ZESoundFileFormat	GetFileFormat(const char* Filename);
-		static ZESoundResource* 	LoadWaveFile(const char* Filename);
-		static ZESoundResource* 	LoadOggFile (const char* Filename);
-		static ZESoundResource* 	LoadMp3File(const char* Filename);
+		static ZESoundFileFormat	GetFileFormat(const char* FileName);
+		static ZESoundResource* 	LoadWaveFile(const char* FileName);
+		static ZESoundResource* 	LoadOggFile (const char* FileName);
+		static ZESoundResource* 	LoadMp3File(const char* FileName);
 	
 	public:
 		const char*					GetResourceType() const;
@@ -84,9 +84,9 @@ class ZESoundResource : public ZEResource
 		size_t						GetBufferSize();
 		void						FillBuffer(size_t BufferPosition, unsigned char* Buffer, size_t BufferSize);
 
-		static void					CacheResource(const char* Filename);
-		static ZESoundResource*		LoadSharedResource(const char* Filename); 
-		static ZESoundResource*		LoadResource(const char* Filename);
+		static void					CacheResource(const char* FileName);
+		static ZESoundResource*		LoadSharedResource(const char* FileName); 
+		static ZESoundResource*		LoadResource(const char* FileName);
 		
 
 									ZESoundResource();

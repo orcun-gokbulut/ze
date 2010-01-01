@@ -96,7 +96,7 @@ void ZEGUIRenderer::Render()
 	ZERenderList RenderList;
 	ZEMatrix4x4::CreateIdentity(RenderList.WorldMatrix);
 //	ZEMatrix4x4::CreateViewPortTransform(RenderList.ViewFrustum.ViewProjMatrix, 0.0f, zeGraphics->GetScreenWidth(), zeGraphics->GetScreenHeight(), 0.0f, 0.0f, 1.0f);
-	ZEDefaultMaterial* Material = new ZEDefaultMaterial();
+	ZEFixedMaterial* Material = new ZEFixedMaterial();
 	RenderList.Material = Material;
 	Material->SetZero();
 	Material->SetShaderComponents(ZESHADER_DIFFUSEMAP);

@@ -36,6 +36,10 @@
 #ifndef __ZE_DEFINITIONS_H__
 #define __ZE_DEFINITIONS_H__
 
+#ifndef NULL
+#define NULL 0
+#endif
+
 #define ZE_MAX_NAME_SIZE			128
 #define ZE_MAX_FILE_NAME_SIZE		256
 

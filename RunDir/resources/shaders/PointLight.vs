@@ -14,52 +14,15 @@
 //  of the Zinek Engine group and author(s). Storing this file, using this file,    //
 //  compiling this file, publishing this file to anykind media or network, editing  //
 //  this file, selling this file, reading this file is probited without notice and  //
-//  written permision of Y. Orcun Gokbulut. These terms at above can only be        //
-//  changed by Y. Orcun GOKBULUT.                                                   //
+//  written permision of Y. Orçun GÖKBULUT. These terms at above can only be        //
+//  changed by Y. Orçun GÖKBULUT.                                                   //
 //  author(s).                                                                      //
 //*                                                                                *//
 //  DESCRIPTION         :                                                           //
-//  AUTHOR(S)           : Y. Orcun GOKBULUT                                         //
+//  AUTHOR(S)           : Y. Orçun GÖKBULUT                                         //
 //*                                                                                *//
 //////////////////////////////////////////////////////////////////////////////////////
 /*ZEHEADER_END*/
-
-#ifdef ZESHADER_COMPONENT0
-#define ZESHADER_SKINTRANFORMATION
-#endif
-#ifdef ZESHADER_COMPONENT1
-#define ZESHADER_DIFFUSEMAP
-#endif
-#ifdef ZESHADER_COMPONENT2
-#define ZESHADER_NORMALMAP
-#endif
-#ifdef ZESHADER_COMPONENT3
-#define ZESHADER_SPECULARMAP
-#endif
-#ifdef ZESHADER_COMPONENT4
-#define ZESHADER_EMMISIVEMAP
-#endif
-#ifdef ZESHADER_COMPONENT5
-#define ZESHADER_OCAPASITYMAP
-#endif
-#ifdef ZESHADER_COMPONENT6
-#define ZESHADER_DETAILDIFFUSEMAP
-#endif
-#ifdef ZESHADER_COMPONENT7
-#define ZESHADER_DETAILNORMALMAP
-#endif
-#ifdef ZESHADER_COMPONENT8
-#define ZESHADER_REFLECTION
-#endif
-#ifdef ZESHADER_COMPONENT9
-#define ZESHADER_REFRACTION
-#endif
-#ifdef ZESHADER_COMPONENT10
-#define ZESHADER_LIGHTMAP
-#endif
-#ifdef ZESHADER_COMPONENT11
-#define ZESHADER_DISTORTIONMAP
-#endif
 
 // Transformation matrices 5 matrices
 float4x4  WorldViewProjMatrix			: register(c0);
@@ -113,7 +76,7 @@ inline void CalculatePointLight(
 								in float3 LightAttenuationFactors,
 								in float3x3 TangentTransform,
 								out float3 LightDirection,
-								out float3 LightAttenuation,
+								out float LightAttenuation,
 								out float LightDistance)
 {
 	float3 LightDisplacement = LightPosition - Position;

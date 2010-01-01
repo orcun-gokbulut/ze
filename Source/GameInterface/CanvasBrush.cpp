@@ -32,22 +32,21 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "CanvasBrush.h"
-
-ZE_ENTITY_DESCRIPTION_START(ZECanvasBrush, ZEEntity, ZE_ERA_BOTH, "", "Canvas brush")
-	ZE_ENTITY_NOATTRIBUTE(ZECanvasBrush)
-ZE_ENTITY_DESCRIPTION_END(ZECanvasBrush)
-
-#include "Graphics/GraphicsModule.h"
 #include "Core/Error.h"
+#include "ZEMath/Ray.h"
+#include "CanvasBrush.h"
+#include "Graphics/GraphicsModule.h"
 
-bool ZECanvasBrush::IsDrawable()
+ZEDWORD ZECanvasBrush::GetDrawFlags() const
 {
-	return true;
+	return ZE_DF_DRAW | ZE_DF_CULL;
 }
 
 void ZECanvasBrush::UpdateCanvas()
 {
+	if (RenderOrder.VertexBuffer != NULL)
+		delete RenderOrder.VertexBuffer;
+	
 	if (!Canvas.IsEmpty())
 	{
 		if (VertexBuffer == NULL)
@@ -68,7 +67,7 @@ void ZECanvasBrush::UpdateCanvas()
 		ZEAABoundingBox BoundingBox;
 		Canvas.CalculateBoundingBox(BoundingBox);
 		SetLocalBoundingBox(BoundingBox);
-	
+		RenderOrder.VertexBuffer = Canvas.CreateStaticVertexBuffer();
 		UpdateBoundingBox = true;
 		UpdateBoundingSphere = true;
 	}
@@ -76,36 +75,34 @@ void ZECanvasBrush::UpdateCanvas()
 
 void ZECanvasBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
 {
-	if (VertexBuffer != NULL)
+	if (RenderOrder.VertexBuffer != NULL)
 	{
-		RenderList.Lights.SetCount(Lights.GetCount());
+		RenderOrder.Lights.SetCount(Lights.GetCount());
 		for (size_t I = 0; I < Lights.GetCount(); I++)
-			RenderList.Lights[I] = Lights[I];
-		if (PrimitiveType == ZE_RLPT_LINE)
-			RenderList.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_WORLD_TRANSFORM | ZE_RLF_ENABLE_ZCULLING | ZE_RLF_TRANSPARENT;
-		else
-			RenderList.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_WORLD_TRANSFORM | ZE_RLF_ENABLE_ZCULLING;
-
-		RenderList.VertexBuffer = VertexBuffer;
-		
+			RenderOrder.Lights[I] = Lights[I];
 		switch(PrimitiveType)
 		{
-			case ZE_RLPT_TRIANGLESTRIPT:
-				RenderList.PrimitiveCount = Canvas.Vertices.GetCount() - 2;
-				break;
-			case ZE_RLPT_TRIANGLE:
-				RenderList.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
-				break;
-			case ZE_RLPT_LINE:
-				RenderList.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
-				break;
 			case ZE_RLPT_POINT:
-				RenderList.PrimitiveCount = Canvas.Vertices.GetCount();
-				break;	
+				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount();
+				break;			
+			case ZE_RLPT_LINE:
+				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
+				break;			
+			case ZE_RLPT_TRIANGLE:
+				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
+				break;			
+			case ZE_RLPT_TRIANGLESTRIPT:
+				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() - 2;
+				break;			
+			default:
+				RenderOrder.PrimitiveCount = 0;
+				break;
 		}
-		RenderList.PrimitiveType = PrimitiveType;
-		RenderList.WorldMatrix = GetWorldTransform();
-		Renderer->AddToRenderList(&RenderList);
+
+		RenderOrder.Material = Material;
+		RenderOrder.PrimitiveType = PrimitiveType;
+		RenderOrder.WorldMatrix = GetWorldTransform();
+		Renderer->AddToRenderOrder(&RenderOrder);
 	}
 }
 
@@ -117,20 +114,31 @@ void ZECanvasBrush::Deinitialize()
 	Canvas.Clean();
 }
 
+void ZECanvasBrush::Tick(float ElapsedTime)
+{
+	if (Material != NULL)
+		Material->AdvanceAnimation(ElapsedTime);
+}
+
 ZECanvasBrush::ZECanvasBrush()
 {
 	VertexBuffer = NULL;
 	OldVertexCount = 0;
 	SetBoundingVolumeMechanism(ZE_BVM_USELOCALONLY);
-	RenderList.SetZero();
-	Material.SetZero();
+	RenderOrder.SetZero();
+	Material = NULL;
 	PrimitiveType = ZE_RLPT_TRIANGLE;
-	RenderList.VertexType = ZE_VT_SIMPLEVERTEX;
-	RenderList.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_WORLD_TRANSFORM | ZE_RLF_ENABLE_ZCULLING;
-	RenderList.Material = &Material;
+	RenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
+	RenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_WORLD_TRANSFORM | ZE_RLF_ENABLE_ZCULLING;
+	RenderOrder.Material = Material;
 }
 
 ZECanvasBrush::~ZECanvasBrush()
 {
-	Deinitialize();
+	if (Material != NULL)
+		Material->Release();
+	if (RenderOrder.VertexBuffer != NULL)
+		delete RenderOrder.VertexBuffer;
 }
+
+#include "CanvasBrush.h.zpp"

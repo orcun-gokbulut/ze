@@ -39,7 +39,7 @@
 
 #define zeInput ZEInputModule::GetInstance()
 
-#include "ZEDS/ZEDS.h"
+#include "ZEDS/Array.h"
 #include "Core/Module.h"
 #include "InputMap.h"
 

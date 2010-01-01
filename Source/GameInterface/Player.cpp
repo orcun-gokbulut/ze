@@ -39,6 +39,7 @@
 #include "Input/InputDefinitions.h"
 #include "Graphics/GraphicsModule.h"
 #include "Core/Core.h"
+#include "ZEMath/Ray.h"
 
 #define ACTIONID_FORWARD		0
 #define ACTIONID_BACKWARD		1
@@ -52,10 +53,6 @@
 #define ACTIONID_ZOOMOUT		9
 #define ACTIONID_CONSOLE		10
 #define ACTIONID_RAYCAST		11
-
-ZE_ENTITY_DESCRIPTION_START(ZEPlayer, ZEEntity, ZE_ERA_BOTH, "", "Player spawn point")
-	ZE_ENTITY_NOATTRIBUTE(ZEPlayer)
-ZE_ENTITY_DESCRIPTION_END(ZEPlayer)
 
 ZECamera* ZEPlayer::GetCamera()
 {
@@ -208,7 +205,8 @@ void ZEPlayer::Initialize()
 	RegisterComponent(&Listener);
 	//RegisterComponent(&Light);
 
-	zeCore->GetGame()->GetScene()->CurrentCamera = &Camera;
+	zeScene->SetActiveCamera(&Camera);
+	zeScene->SetActiveListener(&Listener);
 }
 void ZEPlayer::Deinitialize()
 {
@@ -243,3 +241,5 @@ ZEPlayer::~ZEPlayer()
 {
 	Deinitialize();
 }
+
+#include "Player.h.zpp"

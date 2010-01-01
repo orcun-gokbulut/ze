@@ -50,9 +50,9 @@ bool ZEGame::RegisterEntityDescription(ZEEntityDescription* EntityDescription)
 {
 #ifdef ZEDEBUG_ENABLED
 	for (int I = 0; I < EntityDescriptions.GetCount(); I++)
-		if (stricmp(EntityDescriptions[I]->GetTypeName(), EntityDescription->GetTypeName()) == 0)
+		if (stricmp(EntityDescriptions[I]->GetName(), EntityDescription->GetName()) == 0)
 		{
-			zeError("Entity Provider", "There is an already registered entity declaration. (Entity Description Name : \"%s\")", EntityDescription->GetTypeName());
+			zeError("Entity Provider", "There is an already registered entity declaration. (Entity Description Name : \"%s\")", EntityDescription->GetName());
 			return false;
 		}
 #endif
@@ -78,7 +78,7 @@ ZEEntityDescription* ZEGame::GetEntityDescription(size_t Index)
 ZEEntityDescription* ZEGame::GetEntityDescription(const char* EntityTypeName)
 {
 	for (size_t I = 0; I < EntityDescriptions.GetCount(); I++)
-		if (stricmp(EntityTypeName, EntityDescriptions[I]->GetTypeName()) == 0)
+		if (stricmp(EntityTypeName, EntityDescriptions[I]->GetName()) == 0)
 			return EntityDescriptions[I];
 	return NULL;
 }
@@ -94,10 +94,10 @@ ZEEntity* ZEGame::CreateEntityInstance(size_t Index)
 	}
 	else
 	{
-		ZEEntity* Entity = Description->CreateInstance();
+		ZEEntity* Entity = (ZEEntity*)Description->CreateInstance();
 		if (Entity == NULL)
 		{
-			zeError("Game", "Game can not create instance of entity.  (Entity Index : %d).",  Description->GetTypeName());
+			zeError("Game", "Game can not create instance of entity.  (Entity Index : %d).",  Description->GetName());
 			return NULL;
 		}
 		else
@@ -110,15 +110,15 @@ ZEEntity* ZEGame::CreateEntityInstance(const char* EntityTypeName)
 	ZEEntityDescription* Description = GetEntityDescription(EntityTypeName);
 	if (Description == NULL)
 	{
-		zeError("Game", "Game can not create entity becouse it is not registered. (Entity Index : %d).",  Description->GetTypeName());
+		zeError("Game", "Game can not create entity becouse it is not registered. (Entity Index : %d).",  Description->GetName());
 		return NULL;
 	}
 	else
 	{
-		ZEEntity* Entity = Description->CreateInstance();
+		ZEEntity* Entity = (ZEEntity*)Description->CreateInstance();
 		if (Entity == NULL)
 		{
-			zeError("Game", "Game can not create instance of entity. (Entity Type Name : \"%s\").",  Description->GetTypeName());
+			zeError("Game", "Game can not create instance of entity. (Entity Type Name : \"%s\").",  Description->GetName());
 			return NULL;
 		}
 		else
@@ -142,8 +142,7 @@ bool ZEGame::Deinitialize()
 {
 	if (Scene != NULL)
 	{
-		Scene->Deinitialize();
-		delete Scene;
+		Scene->Destroy();
 		Scene = NULL;
 	}
 
@@ -153,6 +152,12 @@ bool ZEGame::Deinitialize()
 void ZEGame::Reset()
 {
 
+}
+
+void ZEGame::Destroy()
+{
+	Deinitialize();
+	delete this;
 }
 
 void ZEGame::Render(float ElapsedTime)
@@ -172,8 +177,18 @@ void ZEGame::Tick(float ElapsedTime)
 ZEGame::ZEGame()
 {
 	Scene = NULL;
-	RegisterEntityDescription(ZEPlayer::EntityDescription());
-	RegisterEntityDescription(ZELightBrush::EntityDescription());
-	RegisterEntityDescription(ZEModelBrush::EntityDescription());
-	RegisterEntityDescription(ZESkyBrush::EntityDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEPlayer::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZELightBrush::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEModelBrush::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZESkyBrush::ClassDescription());
+}
+
+ZEGame::~ZEGame()
+{
+	Deinitialize();
+}
+
+ZEGame* ZEGame::GetInstance()
+{
+	return zeCore->GetGame();
 }

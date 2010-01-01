@@ -35,6 +35,14 @@
 
 #include "Renderer.h"
 
+ZERenderer::ZERenderer()
+{
+}
+
+ZERenderer::~ZERenderer()
+{
+}
+
 void ZERenderer::Destroy()
 {
 	delete this;

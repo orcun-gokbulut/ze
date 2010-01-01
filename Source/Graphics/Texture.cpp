@@ -34,65 +34,86 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Texture.h"
+#include "GraphicsModule.h"
 
-ZETextureType ZETexture::GetTextureType() const
+ZETexture::ZETexture()
 {
-	return ZE_TT_SURFACE;
+
 }
 
-int ZETexture::GetWidth() const
+ZETexture::~ZETexture()
+{
+
+}
+
+ZETextureType ZETexture2D::GetTextureType() const
+{
+	return ZE_TT_2D;
+}
+
+int ZETexture2D::GetWidth() const
 {
 	return Width;
 }
 
-int ZETexture::GetHeight() const
+int ZETexture2D::GetHeight() const
 {
 	return Height;
 }
 
-ZETexturePixelFormat ZETexture::GetPixelFormat() const
+ZETexturePixelFormat ZETexture2D::GetPixelFormat() const
 {
 	return PixelFormat;
 }
 
-bool ZETexture::IsRenderTarget() const
+bool ZETexture2D::IsRenderTarget() const
 {
 	return RenderTarget;
 }
 
-ZETexture::ZETexture()
+ZETexture2D::ZETexture2D()
 {
 	Width = Height = 0;
 	PixelFormat = ZE_TPF_NOTSET;
 	RenderTarget = false;
 };
 
-ZETextureType ZEVolumeTexture::GetTextureType() const
+ZETexture2D::~ZETexture2D()
 {
-	return ZE_TT_VOLUME;
+
 }
 
-int ZEVolumeTexture::GetWidth() const
+ZETexture2D* ZETexture2D::CreateInstance()
+{
+	return zeGraphics->CreateTexture();
+}
+
+ZETextureType ZETexture3D::GetTextureType() const
+{
+	return ZE_TT_3D;
+}
+
+int ZETexture3D::GetWidth() const
 {
 	return Width;
 }
 
-int ZEVolumeTexture::GetHeight() const
+int ZETexture3D::GetHeight() const
 {
 	return Height;
 }
 
-int ZEVolumeTexture::GetDepth() const
+int ZETexture3D::GetDepth() const
 {
 	return Height;
 }
 
-ZETexturePixelFormat ZEVolumeTexture::GetPixelFormat() const
+ZETexturePixelFormat ZETexture3D::GetPixelFormat() const
 {
 	return PixelFormat;
 }
 
-ZEVolumeTexture::ZEVolumeTexture()
+ZETexture3D::ZETexture3D()
 {
 	Width = 0;
 	Height = 0;
@@ -100,30 +121,52 @@ ZEVolumeTexture::ZEVolumeTexture()
 	PixelFormat = ZE_TPF_NOTSET;
 };
 
+ZETexture3D::~ZETexture3D()
+{
 
-ZETextureType ZECubeTexture::GetTextureType() const
+};
+
+ZETexture3D* ZETexture3D::CreateInstance()
+{
+	return zeGraphics->CreateVolumeTexture();
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+ZETextureType ZETextureCube::GetTextureType() const
 {
 	return ZE_TT_CUBE;
 }
 
-int ZECubeTexture::GetEdgeLenght() const
+int ZETextureCube::GetEdgeLenght() const
 {
 	return EdgeLength;
 }
 
-ZETexturePixelFormat ZECubeTexture::GetPixelFormat() const
+ZETexturePixelFormat ZETextureCube::GetPixelFormat() const
 {
 	return PixelFormat;
 }
 
-bool ZECubeTexture::IsRenderTarget() const
+bool ZETextureCube::IsRenderTarget() const
 {
 	return RenderTarget;
 }
 
-ZECubeTexture::ZECubeTexture()
+ZETextureCube::ZETextureCube()
 {
 	EdgeLength = 0;
 	PixelFormat = ZE_TPF_NOTSET;
 	RenderTarget = false; 
 };
+
+ZETextureCube::~ZETextureCube()
+{
+
+}
+
+ZETextureCube* ZETextureCube::CreateInstance()
+{
+	return zeGraphics->CreateCubeTexture();
+}

@@ -37,84 +37,85 @@
 #ifndef __ZE_MAP_RESOURCE_H__
 #define __ZE_MAP_RESOURCE_H__
 
-#include "ZEDS/ZEDS.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEDS/Array.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Rectangle3D.h"
 #include "Definitions.h"
 #include "Core/Resource.h"
 #include "Graphics/Material.h"
-#include "Graphics/Vertex.h"
-#include "Graphics/Polygon.h"
+#include "Graphics/VertexTypes.h"
+#include "Graphics/IndexedPolygon.h"
 #include "Graphics/TextureResource.h"
 #include "Octree.h"
 #include "GameInterface/Entity.h"
 
-struct ZEMapPolygon
-{
-	ZEMapVertex							Vertices[3];
-	ZEMaterial*							Material;
-	unsigned int						LastIteration;
-};
-
 class ZEMapPortal;
 class ZEMapResource;
+
+struct ZEMapPolygon
+{
+	ZEMapVertex									Vertices[3];
+	ZEMaterial*									Material;
+	unsigned int								LastIteration;
+};
 
 class ZEMapPortalDoor
 {
 	public:
-		char							Name[ZE_MAX_NAME_SIZE];
-		ZE3DRectangle					Rectangle;
-		ZEMapPortal*					DestinationPortal;
-		bool							IsOpen;
+		char									Name[ZE_MAX_NAME_SIZE];
+		ZERectangle3D							Rectangle;
+		ZEMapPortal*							DestinationPortal;
+		bool									IsOpen;
 };
 
 struct ZEMapPhysicalMeshPolygon
 {
-	ZEDWORD								Indices[3];
+	ZEDWORD										Indices[3];
 };
 
 struct ZEMapPhysicalMesh
 {
-	ZEArray<ZEVector3>					Vertices;
-	ZEArray<ZEMapPhysicalMeshPolygon>	Polygons;
+	ZEArray<ZEVector3>							Vertices;
+	ZEArray<ZEMapPhysicalMeshPolygon>			Polygons;
 };
-
 
 class ZEMapPortal
 {
 	public:
-		char										Name[ZE_MAX_NAME_SIZE];
-		ZEAABoundingBox								BoundingBox;
-		ZEArray<ZEMapPortalDoor>					Doors;
-		ZEVertexBuffer*								VertexBuffer;
-		ZEArray<ZERenderList>						RenderLists;
-		ZEArray<ZEMapPolygon>						Polygons;
-		ZEArray<ZEEntityData>						Brushes;
-			
-		bool										HasOctree;
-		ZEOctree*									Octree;
+		char									Name[ZE_MAX_NAME_SIZE];
+		ZEAABoundingBox							BoundingBox;
+		ZEArray<ZEMapPortalDoor>				Doors;
+		ZEVertexBuffer*							VertexBuffer;
+		ZEArray<ZERenderOrder>					RenderOrders;
+		ZEArray<ZEMapPolygon>					Polygons;
+				
+		bool									HasOctree;
+		ZEOctree*								Octree;
 	
-		bool										HasPhysicalMesh;
-		ZEMapPhysicalMesh							PhysicalMesh;
+		bool									HasPhysicalMesh;
+		ZEMapPhysicalMesh						PhysicalMesh;
 
-													ZEMapPortal();
-													~ZEMapPortal();
+												ZEMapPortal();
+												~ZEMapPortal();
 };
 
 class ZEMapResource : public ZEResource
 {
+	protected:
+		virtual									~ZEMapResource();
+
 	public:
-		ZESmartArray<ZETextureResource*>			TextureResources;
-		ZEArray<ZEDefaultMaterial>					Materials;
-		ZEArray<ZEMapPortalDoor>					PortalDoors;
-		ZEArray<ZEMapPortal>						Portals;
-		ZEArray<ZEEntityData>						Entities;
+		ZESmartArray<ZETexture2DResource*>		TextureResources;
+		ZEArray<ZEMaterial*>					Materials;
+		ZEArray<ZEMapPortalDoor>				PortalDoors;
+		ZEArray<ZEMapPortal>					Portals;
 
-		const char*									GetResourceType() const;
+		const char*								GetResourceType() const;
 
-		static ZEMapResource*						LoadResource(const char* Filename);
-		static const ZEMapResource*					LoadSharedResource(const char* Filename);
-		static void									CacheResource(const char* Filename);
+		static ZEMapResource*					LoadResource(const char* FileName);
+		static const ZEMapResource*				LoadSharedResource(const char* FileName);
+		static void								CacheResource(const char* FileName);
 
-													~ZEMapResource();
+												
 };
 #endif

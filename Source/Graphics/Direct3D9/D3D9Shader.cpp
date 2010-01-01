@@ -34,24 +34,41 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "D3D9Shader.h"
-#include "D3D9Common.h"
+#include "D3D9CommonTools.h"
 #include "Core/Error.h"
 #include "Core/ResourceFile.h"
-
+#include "Graphics/Material.h"
+#include "Graphics/FixedMaterial.h"
+#include "Graphics/MaterialComponents.h"
 #include <stdio.h>
 
-bool ZED3D9ShaderPass::Compile(const char* VertexShaderSource, const char* PixelShaderSource, ZEArray<D3DXMACRO>* Macros)
+bool ZED3D9ShaderPass::Compile(const char* VertexShaderSource, const char* PixelShaderSource, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
 {
-	if (!ZED3D9ComponentBase::CompileVertexShader(VertexShaderSource, &VertexShader, Macros))
+	char PSProfile[10] = "ps_";
+	char VSProfile[10] = "vs_";
+	strcat_s(PSProfile, 10, ShaderProfile);
+	strcat_s(VSProfile, 10, ShaderProfile);
+
+	if (!ZED3D9CommonTools::CompileVertexShader(&VertexShader, VertexShaderSource, ShaderName, VSProfile, Macros))
 		return false;
 
-	if (!ZED3D9ComponentBase::CompilePixelShader(PixelShaderSource, &PixelShader, Macros))
+	if (!ZED3D9CommonTools::CompilePixelShader(&PixelShader, PixelShaderSource, ShaderName, PSProfile, Macros))
 		return false;
 
-	(*Macros)[0].Name = "ZESHADER_SKINTRANSFORM";
-	if (!ZED3D9ComponentBase::CompileVertexShader(VertexShaderSource, &SkinnedVertexShader, Macros))
+	int I;
+	for (I = 0; I < 32; I++)
+		if (Macros[I].Name == NULL)
+		{
+			Macros[I].Name = "ZESHADER_SKINTRANSFORM";
+			Macros[I + 1].Name = NULL;
+			Macros[I + 1].Definition = NULL;
+			break;
+		}
+
+	if (!ZED3D9CommonTools::CompileVertexShader(&SkinnedVertexShader, VertexShaderSource, ShaderName, VSProfile, Macros))
 		return false;
-	(*Macros)[0].Name = "";
+	Macros[I].Name = NULL;
+	Macros[I].Definition = NULL;
 
 	return true;
 }
@@ -77,13 +94,24 @@ ZED3D9ShaderPass::~ZED3D9ShaderPass()
 		Release();
 }
 
-struct
+struct ZEMaterialShaderInstance
 {
-	ZED3D9Shader* Shader;
-	int	ReferanceCount;
-} ShaderDB[2048];
+	ZEMaterialType		MaterialType;
+	unsigned int		ShaderUID;
+	ZED3D9Shader*		Shader;
+	int					ReferanceCount;
+};
 
-char ComponentNames[32][30];
+struct ZEMaterialShaderFileCache
+{
+	ZEMaterialType		MaterialType;
+	unsigned int		ShaderUID;
+	unsigned int		FilePosition;
+};
+
+ZESmartArray<ZEMaterialShaderInstance, 5> ShaderInstances;
+ZESmartArray<ZEMaterialShaderFileCache, 5> FileShaderCache;
+
 ZED3D9ShaderPass ShadowPass;
 ZED3D9Shader* SkyShader;
 
@@ -104,16 +132,58 @@ char ShadowPassPS[ZE_MAX_SHADER_SOURCE_SIZE];
 char SkyBoxVS[ZE_MAX_SHADER_SOURCE_SIZE];
 char SkyBoxPS[ZE_MAX_SHADER_SOURCE_SIZE];
 
-bool ZED3D9Shader::Initialize()
+const char* ZED3D9Shader::GetMaterialComponentName(unsigned ShaderComponent)
 {
-	for (int I = 0; I < 32; I++)
-		sprintf(ComponentNames[I], "ZESHADER_COMPONENT%d", I);
-
-	for (size_t I = 0; I < 2048; I++)
+	switch(ShaderComponent)
 	{
-		ShaderDB[I].Shader = NULL;
-		ShaderDB[I].ReferanceCount = 0;
+		case ZESHADER_AMBIENT:
+			return "ZESHADER_AMBIENT";
+		case ZESHADER_DIFFUSE:
+			return "ZESHADER_DIFFUSE";
+		case ZESHADER_DIFFUSEMAP:
+			return "ZESHADER_DIFFUSEMAP";
+		case ZESHADER_NORMALMAP:
+			return "ZESHADER_NORMALMAP";
+		case ZESHADER_PARALLAXMAP:
+			return "ZESHADER_PARALLAXMAP";
+		case ZESHADER_SPECULAR:
+			return "ZESHADER_SPECULAR";
+		case ZESHADER_SPECULARMAP:
+			return "ZESHADER_SPECULARMAP";
+		case ZESHADER_EMMISIVE:
+			return "ZESHADER_EMMISIVE";
+		case ZESHADER_EMMISIVEMAP:
+			return "ZESHADER_EMMISIVEMAP";
+		case ZESHADER_OPACITY:
+			return "ZESHADER_OPACITY";
+		case ZESHADER_OPACITY_DIFFUSEALPHA:
+			return "ZESHADER_OPACITY_DIFFUSEALPHA";
+		case ZESHADER_OPACITY_CONSTANT:
+			return "ZESHADER_OPACITY_CONSTANT";
+		case ZESHADER_OCAPASITYMAP:
+			return "ZESHADER_OCAPASITYMAP";
+		case ZESHADER_DETAILMAP:
+			return "ZESHADER_DETAILMAP";
+		case ZESHADER_DETAILDIFFUSEMAP:
+			return "ZESHADER_DETAILDIFFUSEMAP";
+		case ZESHADER_DETAILNORMALMAP:
+			return "ZESHADER_DETAILNORMALMAP";
+		case ZESHADER_REFLECTION:
+			return "ZESHADER_REFLECTION";
+		case ZESHADER_REFRACTION:
+			return "ZESHADER_REFRACTION";
+		case ZESHADER_LIGHTMAP:
+			return "ZESHADER_LIGHTMAP";
+		case ZESHADER_DISTORTIONMAP:
+			return "ZESHADER_DISTORTIONMAP";
+		default:
+			return "";
 	}
+}
+
+bool ZED3D9Shader::BaseInitialize()
+{
+	ShaderInstances.Clear();
 
 	ZEResourceFile::ReadTextFile("Shaders\\PreLightning.vs", PreLightPassVS, ZE_MAX_SHADER_SOURCE_SIZE);
 	ZEResourceFile::ReadTextFile("Shaders\\PreLightning.ps", PreLightPassPS, ZE_MAX_SHADER_SOURCE_SIZE);
@@ -132,110 +202,127 @@ bool ZED3D9Shader::Initialize()
 	
 	ZEArray<D3DXMACRO> Macros;
 	Macros.Add();
-	Macros[0].Name = "";
-	Macros[0].Definition = "";
+	Macros[0].Name = NULL;
+	Macros[0].Definition = NULL;
 	Macros.Add();
 	Macros[1].Name = NULL;
 	Macros[1].Definition = NULL;
-	::ShadowPass.Compile(ShadowPassVS, ShadowPassPS, &Macros);
+
+	::ShadowPass.Compile(ShadowPassVS, ShadowPassPS, "Shadow Pass Shader", "2_0", Macros.GetCArray());
 	::ShadowPass.Shared = true;	
 	
 	SkyShader = new ZED3D9Shader();
 
-	SkyShader->PreLightPass.Compile(SkyBoxVS, SkyBoxPS, &Macros);
+	SkyShader->PreLightPass.Compile(SkyBoxVS, SkyBoxPS, "Fixed Material Shadow Pass", "2_0", Macros.GetCArray());
 	return true;
 }
 
 
-void ZED3D9Shader::Destroy()
+void ZED3D9Shader::BaseDeinitialize()
 {
-	for (size_t I = 0; I < 2048; I++)
-		if (ShaderDB[I].Shader != NULL)
-		{
-			if (ShaderDB[I].ReferanceCount == 0)
-				zeWarning("Shader System", "Shader is still in use. Destroying it. (ShaderComponents : %d)", I);
-			ShaderDB[I].ReferanceCount = 0;
-			ShaderDB[I].Shader->Release();
-			ShaderDB[I].Shader = NULL;
-		}
+	for (size_t I = 0; I <ShaderInstances.GetCount(); I++) 
+		if (ShaderInstances[I].Shader != NULL) 
+		{ 
+			zeWarning("Material Shader System", "Material shader is still in use. Destroying it. (Shader Cache Index : %d, Material Type : %d, Shader UID : %d)", 
+				I, 
+				ShaderInstances[I].MaterialType,
+				ShaderInstances[I].ShaderUID); 
+
+			ShaderInstances[I].Shader->Release(); 
+		} 	
+	ShaderInstances.Clear();
 }
-
-ZEShader* ZED3D9Shader::Create(unsigned int ShaderComponents)
+ 
+ZED3D9Shader* ZED3D9Shader::CreateFixedMaterialShader(unsigned int MaterialComponents)
 {
-	if (ShaderComponents == ZESHADER_SKY)
-	{
-		return SkyShader;
-	}
+	ZEMaterialShaderInstance* FreeSpace = NULL;
 
-	//ShaderComponents = ShaderComponents & !ZESHADER_NORMALMAP;
-	if (ShaderDB[ShaderComponents].Shader != NULL)
-	{
-		ShaderDB[ShaderComponents].ReferanceCount++;
-		return ShaderDB[ShaderComponents].Shader;
-	}
+	for (size_t I = 0; I < ShaderInstances.GetCount(); I++)
+		if (ShaderInstances[I].Shader == NULL)
+			FreeSpace = &ShaderInstances[I];
+		else
+			if (ShaderInstances[I].MaterialType == ZE_MT_FIXED && ShaderInstances[I].ShaderUID == MaterialComponents)
+			{
+				ShaderInstances[I].ReferanceCount++;
+				return ShaderInstances[I].Shader;
+			}
+	
+	if (FreeSpace == NULL)
+		FreeSpace = ShaderInstances.Add();
 
-	ShaderDB[ShaderComponents].ReferanceCount = 1;
-	ShaderDB[ShaderComponents].Shader = new ZED3D9Shader();
+	FreeSpace->MaterialType = ZE_MT_FIXED;
+	FreeSpace->ShaderUID = MaterialComponents;
+	FreeSpace->ReferanceCount = 1;
+	FreeSpace->Shader = new ZED3D9Shader();
+	FreeSpace->Shader->ShaderInstanceIndex = ShaderInstances.GetCount() - 1;
 
 	LPD3DXBUFFER OutputLog;
-	ZEArray<D3DXMACRO> ComponentMacros;
-	
-	D3DXMACRO* CurrentMacro = ComponentMacros.Add();
-	CurrentMacro->Definition = "";
-	CurrentMacro->Name = "";
-
-	for (int I = 0; I < ZESHADER_COMPONENTCOUNT; I++)
-	{
-		if ((ShaderComponents & (0x00000001 << I)) != 0)
+	D3DXMACRO ComponentMacros[64];
+	D3DXMACRO* CurrentMacro;
+	unsigned int ComponentMacroCount = 0;
+	for (int I = 0; I < 32; I++)
+		if ((MaterialComponents & (0x00000001 << I)) != 0)
 		{
-			CurrentMacro = ComponentMacros.Add();
-			CurrentMacro->Name = ComponentNames[I];
+			CurrentMacro = &ComponentMacros[ComponentMacroCount];
+			CurrentMacro->Name = ZED3D9Shader::GetMaterialComponentName(MaterialComponents & (0x00000001 << I));
 			CurrentMacro->Definition = "";
+			ComponentMacroCount++;
 		}
-	}
 
-	CurrentMacro = ComponentMacros.Add();
+	CurrentMacro = &ComponentMacros[ComponentMacroCount];
 	CurrentMacro->Name = NULL;
 	CurrentMacro->Definition = NULL;
 
-	ShaderDB[ShaderComponents].Shader->PreLightPass.Compile(PreLightPassVS, PreLightPassPS, &ComponentMacros);
-	ShaderDB[ShaderComponents].Shader->PointLightPass.Compile(PointLightVS, PointLightPS, &ComponentMacros);
-	ShaderDB[ShaderComponents].Shader->DirectionalLightPass.Compile(DirectionalLightVS, DirectionalLightPS, &ComponentMacros);
-	ShaderDB[ShaderComponents].Shader->ProjectiveLightPass.Compile(ProjectiveLightVS, ProjectiveLightPS, &ComponentMacros);
-	ShaderDB[ShaderComponents].Shader->OmniProjectiveLightPass.Compile(OmniProjectiveLightVS, OmniProjectiveLightPS, &ComponentMacros);
+	FreeSpace->Shader->PreLightPass.Compile(PreLightPassVS, PreLightPassPS, "Fixed Material PreLightning Pass", "2_0", ComponentMacros);
+	FreeSpace->Shader->PointLightPass.Compile(PointLightVS, PointLightPS, "Fixed Material Point Light Pass", "2_0", ComponentMacros);
+	FreeSpace->Shader->DirectionalLightPass.Compile(DirectionalLightVS, DirectionalLightPS, "Fixed Material Directional Light Pass", "2_0", ComponentMacros);
+	FreeSpace->Shader->ProjectiveLightPass.Compile(ProjectiveLightVS, ProjectiveLightPS, "Fixed Material Projective Light Pass", "2_0", ComponentMacros);
+	FreeSpace->Shader->OmniProjectiveLightPass.Compile(OmniProjectiveLightVS, OmniProjectiveLightPS, "Fixed Material OmniProjective Pass", "2_0", ComponentMacros);
 
-	CurrentMacro = &ComponentMacros[ComponentMacros.GetCount() - 1];
+	CurrentMacro = &ComponentMacros[ComponentMacroCount];
 	CurrentMacro->Name = "ZESHADER_SHADOWMAP";
 	CurrentMacro->Definition = "";
 
-	CurrentMacro = ComponentMacros.Add();
+	CurrentMacro = &ComponentMacros[ComponentMacroCount + 1];
 	CurrentMacro->Name = NULL;
 	CurrentMacro->Definition = NULL;
 
-	ShaderDB[ShaderComponents].Shader->ShadowedPointLightPass.Compile(PointLightVS, PointLightPS, &ComponentMacros);
-	ShaderDB[ShaderComponents].Shader->ShadowedDirectionalLightPass.Compile(DirectionalLightVS, DirectionalLightPS, &ComponentMacros);
-	ShaderDB[ShaderComponents].Shader->ShadowedProjectiveLightPass.Compile(ProjectiveLightVS, ProjectiveLightPS, &ComponentMacros);
-	ShaderDB[ShaderComponents].Shader->ShadowedOmniProjectiveLightPass.Compile(OmniProjectiveLightVS, OmniProjectiveLightPS, &ComponentMacros);
+	FreeSpace->Shader->ShadowedPointLightPass.Compile(PointLightVS, PointLightPS, "Fixed Material Shadowed Point Pass", "2_0", ComponentMacros);
+	FreeSpace->Shader->ShadowedDirectionalLightPass.Compile(DirectionalLightVS, DirectionalLightPS,"Fixed Shadowed Material Directional Pass", "2_0", ComponentMacros);
+	FreeSpace->Shader->ShadowedProjectiveLightPass.Compile(ProjectiveLightVS, ProjectiveLightPS, "Fixed Material Shadowed Projective Pass", "2_0", ComponentMacros);
+	FreeSpace->Shader->ShadowedOmniProjectiveLightPass.Compile(OmniProjectiveLightVS, OmniProjectiveLightPS, "Fixed Material Shadowed OmniProjective Pass", "2_0", ComponentMacros);
 
-	ShaderDB[ShaderComponents].Shader->ShaderComponents = ShaderComponents;
-	ShaderDB[ShaderComponents].Shader->ShadowPass = ::ShadowPass;
-	return ShaderDB[ShaderComponents].Shader;
+	FreeSpace->Shader->ProjectiveLightShadowPass = ::ShadowPass;
+	return FreeSpace->Shader;
 }
 
 void ZED3D9Shader::Release()
 {
-	ShaderDB[ShaderComponents].ReferanceCount--;
+	if (ShaderInstanceIndex == -1)
+		return;
 
-	if (ShaderDB[ShaderComponents].ReferanceCount < 1)
+	ShaderInstances[ShaderInstanceIndex].ReferanceCount--;
+
+	if (ShaderInstances[ShaderInstanceIndex].ReferanceCount < 1)
 	{
-		ShaderDB[ShaderComponents].ReferanceCount = 0;
-		ShaderDB[ShaderComponents].Shader = NULL;
+		ShaderInstances[ShaderInstanceIndex].MaterialType = ZE_MT_NONE;
+		ShaderInstances[ShaderInstanceIndex].ShaderUID = 0;
+		ShaderInstances[ShaderInstanceIndex].ReferanceCount = 0;
+		ShaderInstances[ShaderInstanceIndex].Shader = NULL;
+		ShaderInstanceIndex = -1;
+		ShaderComponents = 0;
 		delete this;
 	}
 }
 
+void ZED3D9Shader::Destroy()
+{
+	Release();
+}
+
 ZED3D9Shader::ZED3D9Shader()
 {
+	ShaderInstanceIndex = -1;
 }
 
 ZED3D9Shader::~ZED3D9Shader()

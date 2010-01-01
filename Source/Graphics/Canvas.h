@@ -37,10 +37,12 @@
 #ifndef __ZE_CANVAS_H__
 #define __ZE_CANVAS_H__
 
-#include "Vertex.h"
+#include "VertexTypes.h"
 #include "VertexBuffer.h"
-#include "ZEDS/ZEDS.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEDS/Array.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Matrix.h"
+#include "ZEMath/AABoundingBox.h"
 
 class ZECanvas : public ZEArrayVertexBuffer<ZESimpleVertex>
 {
@@ -67,7 +69,7 @@ class ZECanvas : public ZEArrayVertexBuffer<ZESimpleVertex>
 		void							AddCircle(float Radious, unsigned int Segments);
 
 		void							AddBox(float Width, float Height, float Length);
-		void							AddSphere(float radius,unsigned int intersects,unsigned int slices,bool reverse = false);
+		void							AddSphere(float Radious, unsigned int HSegment, unsigned int VSegment);
 		void							AddQuad(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3);
 		void							AddDisc(float Radious, unsigned int Segments);
 		void							AddPyramid(float Width, float Height, float Length);
@@ -82,7 +84,7 @@ class ZECanvas : public ZEArrayVertexBuffer<ZESimpleVertex>
 		void							Clean();
 
 		ZEStaticVertexBuffer*			CreateStaticVertexBuffer();
-		bool							LoadCanvasFile(const char* Filename);
+		bool							LoadCanvasFile(const char* FileName);
 
 										ZECanvas();
 };

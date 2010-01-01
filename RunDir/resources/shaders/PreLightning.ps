@@ -1,65 +1,37 @@
 /*ZEHEADER_START*/
 //////////////////////////////////////////////////////////////////////////////////////
 //                                                                                  //
-//  Core.h - Zinek Engine v0.04.02 Build 905 Source Code                                 
+//  MapResource.h - Zinek Engine v0.05.00 Build 1024 Source Code                                 
 // -------------------------------------------------------------------------------- //
-//  Copyright (c) 2007-2008 Zinek Engine group.                                     //
-//  All rights reserved.                                                            //
+//  Copyright (c) 2007-2009 Y. Orçun GÖKBULUT. All rights reserved.                 //
 //                                                                                  //
 //                 READ TERMS BELLOW BEFORE TAKING ANY ACTION !                     //
 //                                                                                  //
 //  These coded instructions, statements, and computer programs contain             //
-//  unpublished proprietary information written by Zinek Engine group and they are  //
+//  unpublished proprietary information belongs to Y. Orçun GÖKBULUT and they are   //
 //  protected by international copyright laws. This file is intellectual property   //
-//  of the Zinek Engine group and author(s). Storing this file, using this file,    //
-//  compiling this file, publishing this file to anykind media or network, editing  //
-//  this file, selling this file, reading this file is probited without notice and  //
-//  written permision of Y. Orcun Gokbulut. These terms at above can only be        //
-//  changed by Y. Orcun GOKBULUT.                                                   //
-//  author(s).                                                                      //
+//  of the Y. Orçun GÖKBULUT. Storing this file, using this file, changing content  //
+//  of this file, copying or duplicating this file, compiling this file, publishing // 
+//  this file to anykind media or network, editing  this file, selling this file,   //
+//  booking this file, reading this file are probited without notice and written    //
+//  permision of Y. Orçun GÖKBULUT.                                                 //
+//  These terms at above can only be changed by Y. Orçun GÖKBULUT.                  //
+//                                                                                  //
+//  Contact Information:                                                            //
+//     Adress : Zinek Code House & Game Studio                                      //                                             
+//              Aydinlar Mahallesi.                                                 //
+//              Mimar Sokak. 33/5                                                   //
+//              06450  Ankara/TURKEY                                                //
+//     Phone  : +90 (533) 734 21 22                                                 //
+//     E-Mail : contact@zinekengine.com                                             //
+//     WWW    : http://www.zinekengine.com                                          //
+//                                                                                  //
 //*                                                                                *//
 //  DESCRIPTION         :                                                           //
-//  AUTHOR(S)           : Y. Orcun GOKBULUT                                         //
+//  AUTHOR(S)           : Y. Orçun GÖKBULUT                                         //
 //*                                                                                *//
 //////////////////////////////////////////////////////////////////////////////////////
 /*ZEHEADER_END*/
-
-#ifdef ZESHADER_COMPONENT0
-#define ZESHADER_SKINTRANFORMATION
-#endif
-#ifdef ZESHADER_COMPONENT1
-#define ZESHADER_DIFFUSEMAP
-#endif
-#ifdef ZESHADER_COMPONENT2
-#define ZESHADER_NORMALMAP
-#endif
-#ifdef ZESHADER_COMPONENT3
-#define ZESHADER_SPECULARMAP
-#endif
-#ifdef ZESHADER_COMPONENT4
-#define ZESHADER_EMMISIVEMAP
-#endif
-#ifdef ZESHADER_COMPONENT5
-#define ZESHADER_OCAPASITYMAP
-#endif
-#ifdef ZESHADER_COMPONENT6
-#define ZESHADER_DETAILDIFFUSEMAP
-#endif
-#ifdef ZESHADER_COMPONENT7
-#define ZESHADER_DETAILNORMALMAP
-#endif
-#ifdef ZESHADER_COMPONENT8
-#define ZESHADER_REFLECTION
-#endif
-#ifdef ZESHADER_COMPONENT9
-#define ZESHADER_REFRACTION
-#endif
-#ifdef ZESHADER_COMPONENT10
-#define ZESHADER_LIGHTMAP
-#endif
-#ifdef ZESHADER_COMPONENT11
-#define ZESHADER_DISTORTIONMAP
-#endif
 
 float4	  MaterialParams0			 : register(c0);
 float4	  MaterialParams1			 : register(c1);
@@ -68,7 +40,7 @@ float4	  MaterialParams3			 : register(c3);
 float4	  MaterialParams4			 : register(c4);
 
 #define	  MaterialAmbientColor         MaterialParams0.xyz
-#define	  MaterialOpasity			   MaterialParams0.w
+#define	  MaterialOpacity			   MaterialParams0.w
 #define	  MaterialDiffuseColor         MaterialParams1.xyz
 #define	  MaterialSpecularColor        MaterialParams2.xyz
 #define	  MaterialSpecularFactor	   MaterialParams2.w
@@ -81,15 +53,21 @@ float4	  MaterialParams4			 : register(c4);
 float4    LightColor                 : register(c12);
 float     LightIntensity             : register(c13);
 
+// General Material Properties 
 sampler   DiffuseMap                 : register(s0);
 sampler   NormalMap                  : register(s1);
-sampler   SpecularMap                : register(s2);
-sampler   EmmisiveMap                : register(s3);
+sampler	  ParallaxMap				 : register(s2);
+sampler   SpecularMap                : register(s3);
 sampler   OpacityMap				 : register(s4);
-sampler   DetailMap                  : register(s5);
-sampler   EnvironmentMap             : register(s6);
-sampler   LightMap                   : register(s7);
-sampler   ShadowMap                  : register(s8);
+sampler   DetailDiffuseMap           : register(s5);
+sampler   DetailNormalMap            : register(s6);
+
+// PreLightning Material Properties
+sampler   EmmisiveMap                : register(s7);
+sampler	  ReflectionMap				 : register(s8);
+sampler   RefractionMap              : register(s9);
+sampler   LightMap                   : register(s10);
+sampler	  DistortionMap				 : register(s11);
 
 struct PS_INPUT
 {
@@ -103,27 +81,27 @@ struct PS_INPUT
 	#ifdef ZESHADER_REFRACTION
 	float3 RefractionVector     : TEXCOORD4;
 	#endif
+	#ifdef ZESHADER_DISTORTION
+	float2 ScreenCoordinates    : TEXCOORD5;
+	#endif
 };
 
 float4 ps_main(PS_INPUT Input) : COLOR0
 {
-	float4 OutputColor;
-	OutputColor.rgb = (MaterialAmbientColor + MaterialEmmisiveColor);
-	
-	// Transparancy
-	#ifdef ZESHADER_OPASITYMAP
-		//return (MaterialOpasity * tex2D(OpacityMap, Input.Texcoord).r).rrrr;
-		OutputColor.a = MaterialOpasity * tex2D(OpacityMap, Input.Texcoord).r;
-	#else
-		#ifdef ZESHADER_DIFFUSEMAP
-			//return (MaterialOpasity * tex2D(OpacityMap, Input.Texcoord).r).rrrr;
-			OutputColor.a = MaterialOpasity * tex2D(DiffuseMap, Input.Texcoord).a;
-		#else
-			OutputColor.a = MaterialOpasity;
-			//return OutputColor;
-		#endif
+	float4 OutputColor = float4(0.0f, 0.0f ,0.0f ,1.0f);
+
+	#ifdef ZESHADER_AMBIENT
+		OutputColor.rgb += MaterialAmbientColor;
 	#endif
 	
+	#ifdef ZESHADER_EMMISIVE
+		#ifdef ZESHADER_EMMISIVEMAP
+			OutpuColor.rgb += MaterialEmmisiveColor * tex2D(EmmisiveMap, Input.Texcoord);
+		#else
+			OutputColor.rgb += MaterialEmmisiveColor;
+		#endif
+	#endif
+
 	#ifdef ZESHADER_DIFFUSEMAP
 		OutputColor.rgb *= tex2D(DiffuseMap, Input.Texcoord).rgb;
 	#endif
@@ -132,16 +110,35 @@ float4 ps_main(PS_INPUT Input) : COLOR0
 		OutputColor.rgb *= float4(tex2D(LightMap, Input.Texcoord).rgb, 1.0f);
 	#endif
 
-	#ifdef ZESHADER_EMMISIVEMAP
-		OutputColor.rgb += MaterialEmmisiveFactor * (tex2D(EmmisiveMap, Input.Texcoord).rgb + MaterialEmmisiveColor).rgb;
-	#endif
-
 	#ifdef ZESHADER_REFLECTION
 		OutputColor.rgb += MaterialReflectionFactor * texCUBE(EnvironmentMap, normalize(Input.ReflectionVector)).rgb;
 	#endif
 
 	#ifdef ZESHADER_REFRACTION
 		OutputColor.rgb += MaterialRefractionFactor * texCUBE(EnvironmentMap, normalize(Input.RefractionVector)).rgb;
+	#endif
+	
+	#ifdef ZESHADER_DISTORTION
+		float2 DistortionTexCoord = tex2D(DistortionMap, Input.Texcoord);
+		OutputColor.rgb += DistortionFactor * tex2D(ScreenMap, ScreenCoordinates + DistortionTexCoord);
+	#endif
+
+	#ifdef ZESHADER_OPASITY
+		#ifdef ZESHADER_OPACITY_MAP
+			#ifdef ZESHADER_OPACITY_CONSTANT
+				OutputColor.a = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
+			#else
+				OutputColor.a = tex2D(DiffuseMap, Input.Texcoord).r;
+			#endif
+		#elif defined(ZESHADER_OPACITY_DIFFUSEALPHA
+			#ifdef ZESHADER_OPACITY_CONSTANT
+				OutputColor.a = MaterialOpacity * tex2D(DiffuseMap, Input.Texcoord).a;
+			#else
+				OutputColor.a = tex2D(DiffuseMap, Input.Texcoord).a;
+			#endif
+		#elif 
+			OutputColor.a = MaterialOpacity;
+		#endif
 	#endif
 
 	return OutputColor;
