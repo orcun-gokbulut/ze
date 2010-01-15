@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_VERTEXBUFFER_H__
-#define __ZE_VERTEXBUFFER_H__
+#ifndef	__ZE_VERTEX_BUFFER_H__
+#define __ZE_VERTEX_BUFFER_H__
 
 #include "ZEDS/Array.h"
 
@@ -45,11 +45,16 @@ class ZEVertexBuffer
 		virtual bool						IsStatic() = 0;
 		virtual size_t						GetBufferSize() = 0;
 
+											ZEVertexBuffer();
 		virtual								~ZEVertexBuffer();
 };
 
 class ZEStaticVertexBuffer : public ZEVertexBuffer
 {
+	protected:
+											ZEStaticVertexBuffer();
+		virtual								~ZEStaticVertexBuffer();
+
 	public:
 		virtual bool						IsStatic();
 
@@ -58,7 +63,7 @@ class ZEStaticVertexBuffer : public ZEVertexBuffer
 		virtual void						Unlock() = 0;
 		virtual void						Release() = 0;
 
-		virtual void						Destroy() = 0;
+		virtual void						Destroy();
 
 		static ZEStaticVertexBuffer*		CreateInstance();
 };

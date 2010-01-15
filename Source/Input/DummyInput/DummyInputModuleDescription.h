@@ -42,17 +42,17 @@
 class ZEDummyInputModuleDescription : public ZEModuleDescription
 {
 	public:
-		ZEModuleType			GetType();
-		ZEModuleAttribute		GetAttributes();
-		int						GetRequiredZinekEngineVersion();
-		int						GetMajorVersion();
-		int						GetMinorVersion();
-		const char*				GetCopyright();
-		const char*				GetName();
-		ZEOptionSection*		GetOptions();
+		virtual ZEModuleType			GetType();
+		virtual ZEModuleAttribute		GetAttributes();
+		virtual int						GetRequiredZinekEngineVersion();
+		virtual int						GetMajorVersion();
+		virtual int						GetMinorVersion();
+		virtual const char*				GetCopyright();
+		virtual const char*				GetName();
+		virtual ZEOptionSection*		GetOptions();
 
-		ZEModule*				CreateModuleInstance();
-		bool					CheckCompatible();
+		virtual ZEModule*				CreateModuleInstance();
+		virtual bool					CheckCompatible();
 };
 
 #endif

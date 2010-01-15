@@ -37,42 +37,62 @@
 #ifndef __ZE_RENDERER_H__
 #define __ZE_RENDERER_H__
 
-#include "RenderOrder.h"
-#include "Texture.h"
+#include "ZEDS/Array.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Matrix.h"
 
 struct ZEViewPoint
 {
-	float							FOV;
-	float							NearZ;
-	float							FarZ;
-	ZEVector3						ViewPosition;
-	ZEMatrix4x4						ViewMatrix;
-	ZEMatrix4x4						ProjMatrix;
-	ZEMatrix4x4						ViewProjMatrix;
+	float									FOV;
+	float									NearZ;
+	float									FarZ;
+	ZEVector3								ViewPosition;
+	ZEMatrix4x4								ViewMatrix;
+	ZEMatrix4x4								ProjMatrix;
+	ZEMatrix4x4								ViewProjMatrix;
 };
 
+class ZEPostProcessor;
 class ZECamera;
+class ZERenderOrder;
 class ZETexture2D;
-class ZETextureCube;
 class ZERenderer
 {
 	protected:
-										ZERenderer();
-		virtual							~ZERenderer();
+											ZERenderer();
+		virtual								~ZERenderer();
 
 	public:
-		virtual bool					Initialize() = 0;
-		virtual void					Deinitialize() = 0;
-		virtual void					Destroy();
+		virtual void						SetRenderColorTexture(bool Enable);
+		virtual bool						GetRenderColorTexture();
+		virtual void						SetRenderDepthTexture(bool Enable);
+		virtual bool						GetRenderDepthTexture();
 
-		virtual void					SetCamera(ZECamera* Camera) = 0;
-		virtual void					AddToRenderOrder(ZERenderOrder* RenderOrder) = 0;
-		virtual void					ClearList() = 0;
+		virtual void						SetRenderVelocityTexture(bool Enable);
+		virtual bool						GetRenderVelocityTexture();
 
-		virtual bool					SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face) = 0;
-		virtual bool					SetOutput(ZETexture2D* Texture) = 0;
+		virtual void						SetRenderObjectTexture(bool Enable);
+		virtual bool						GetRenderObjectTexture();
 
-		virtual void					Render(float ElaspedTime = 0) = 0;
+		virtual ZETexture2D*				GetColorTexture();
+		virtual ZETexture2D*				GetDepthTexture();
+		virtual ZETexture2D*				GetVelocityTexture();
+		virtual ZETexture2D*				GetObjectTexture();
+
+		virtual bool						Initialize() = 0;
+		virtual void						Deinitialize() = 0;
+
+		virtual void						Destroy();
+
+		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors() = 0;
+		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;
+		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor) = 0;
+
+		virtual void						SetCamera(ZECamera* Camera) = 0;
+		virtual void						AddToRenderList(ZERenderOrder* RenderOrder) = 0;
+		virtual void						ClearList() = 0;
+
+		virtual void						Render(float ElaspedTime = 0) = 0;
 };
 
 #endif
