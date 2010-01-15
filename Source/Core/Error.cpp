@@ -33,8 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "error.h"
-#include "core.h"
+#include "Error.h"
+#include "Core.h"
+#include "Console.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <assert.h>
@@ -50,7 +51,7 @@ void _ZEAssert(char* Message, char* File, int Line, ...)
 	vsprintf_s(Buffer, 1024, Message, VList);
 
 	if (zeCore->GetConsole() != NULL)
-		zeLog("[Assert] : %s\r\n", Buffer);
+		zeOutput("[Assert] : %s\r\n", Buffer);
 
 #if defined(ZEDEBUG_ENABLED) && defined(ZEPLATFORM_WINDOWS)
 //	_CrtDbgReport(_CRT_ASSERT, File, Line, "Zinek Engine", Message, VList);
@@ -146,7 +147,7 @@ void ZEError::RaiseError(const char* From, ZEErrorType Level, const char* ErrorF
 
 	LogToFile(From, Level, Buffer);
 	if (zeCore->GetConsole() != NULL)
-		zeLog("[%s] %s : %s\r\n", From, ErrorLevelToString(Level), Buffer);
+		zeOutput("[%s] %s : %s\r\n", From, ErrorLevelToString(Level), Buffer);
 	
 	if (Level == ZE_ERRORLEVEL_NONCRITICAL)
 		zeConsole->ShowConsole();
@@ -164,7 +165,7 @@ void ZEError::RaiseAssert(ZEAssertType AssertType, const char* Function, const c
 	vsprintf_s(Buffer, 4095, Message, VList);
 
 	if (zeCore->GetConsole() != NULL)
-		zeLog("%s : %s (Function : %s, File : %s, Line : %d)\r\n", (AssertType == ZE_ASSERTTYPE_ASSERT ? "Assert" : "Warning"),  Buffer,  Function, File, Line);
+		zeOutput("%s : %s (Function : %s, File : %s, Line : %d)\r\n", (AssertType == ZE_ASSERTTYPE_ASSERT ? "Assert" : "Warning"),  Buffer,  Function, File, Line);
 
 	#if defined(ZEDEBUG_ENABLED) && defined(ZEPLATFORM_WINDOWS)
 		if (AssertType == ZE_ASSERTTYPE_ASSERT)

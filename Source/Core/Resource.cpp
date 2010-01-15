@@ -34,7 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Resource.h"
-#include "Core.h"
+#include "ResourceManager.h"
+#include "Error.h"
 #include "Definitions.h"
 #include <string.h>
 

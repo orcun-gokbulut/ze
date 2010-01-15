@@ -35,6 +35,11 @@
 
 #include "GameInterface/Scene.h"
 #include "SkyBrush.h"
+#include "GameInterface/Scene.h"
+#include "Graphics/Camera.h"
+#include "Graphics/FixedMaterial.h"
+#include "Graphics/DirectionalLight.h"
+#include "Graphics/TextureCubeResource.h"
 #include <string.h>
 
 const ZEAABoundingBox& ZESkyBrush::GetWorldBoundingBox()
@@ -66,6 +71,7 @@ void ZESkyBrush::SetSkyTexture(const char* FileName)
 	}
 
 	SkyTexture = ZETextureCubeResource::LoadResource(FileName);
+	//SkyMaterial->SetDiffuseMap(SkyTexture);
 }
 
 const char* ZESkyBrush::GetSkyTexture() const
@@ -118,17 +124,17 @@ float ZESkyBrush::GetSkyLightIntensity() const
 }
 
 void ZESkyBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
-{/*
+{
 	if (SkyTexture != NULL)
 	{
-		SkyMaterial.DiffuseMap = (ZETexture2D*)SkyTexture->GetTexture();
+		SkyMaterial->SetDetailDiffuseMap((ZETexture2D*)SkyTexture->GetTexture());
 		ZECamera* Camera = zeScene->GetActiveCamera();
 		ZEMatrix4x4 CameraRotation, SkyRotation;
 		ZEMatrix4x4::CreateRotation(CameraRotation, Camera->GetWorldRotation());
 		ZEMatrix4x4::CreateRotation(SkyRotation, GetRotation());
 		ZEMatrix4x4::Multiply(SkyRenderOrder.WorldMatrix, CameraRotation, SkyRotation);
-		Renderer->AddToRenderOrder(&SkyRenderOrder);
-	}*/
+		Renderer->AddToRenderList(&SkyRenderOrder);
+	}
 }
 
 void ZESkyBrush::Tick(float Time)
@@ -139,24 +145,27 @@ ZESkyBrush::ZESkyBrush()
 {
 	SkyTexture = NULL;
 	SkyBox.AddBox(2.0f, 2.0, 2.0f);
-	/*
-	SkyMaterial.SetZero();
-	SkyMaterial.RecivesShadow = false;
-	SkyMaterial.LightningEnabled = false;
-	SkyMaterial.SetShaderComponents(ZESHADER_SKY);
-	SkyMaterial.TwoSided = true;*/
+	SkyMaterial = ZEFixedMaterial::CreateInstance();
+	
+	SkyMaterial->SetZero();
+	SkyMaterial->SetRecivesShadow(false);
+	SkyMaterial->SetLightningEnabled(false);
+	//SkyMaterial->SetShaderComponents(ZESHADER_SKY);
+	SkyMaterial->SetTwoSided(true);
 
 	SkyRenderOrder.SetZero();
 	SkyRenderOrder.Material = SkyMaterial;
 	SkyRenderOrder.VertexBuffer = &SkyBox;
-	SkyRenderOrder.PrimitiveType = ZE_RLPT_TRIANGLE;
+	SkyRenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	SkyRenderOrder.PrimitiveCount = SkyBox.Vertices.GetCount() / 3;
-	SkyRenderOrder.Flags = ZE_RLF_ENABLE_WORLD_TRANSFORM | ZE_RLF_ENABLE_ZCULLING;
+	SkyRenderOrder.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_ZCULLING;
 	SkyRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
 }
 
 ZESkyBrush::~ZESkyBrush()
 {
+	if (SkyMaterial != NULL)
+		SkyMaterial->Destroy();
 }
 
 

@@ -40,6 +40,10 @@
 #include "Core/ResourceManager.h"
 #include "MapFileFormat.h"
 #include "Graphics/GraphicsModule.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/Texture2DResource.h"
+#include "Graphics/RenderOrder.h"
+#include "Octree.h"
 
 // Reading
 
@@ -130,9 +134,9 @@ bool SortVertices(ZEStaticVertexBuffer** VertexBuffer, ZEArray<ZERenderOrder>& R
 			size_t MaterialId = Polygons[I].Material;
 			ZERenderOrder* RenderOrder = RenderOrders.Add();
 			RenderOrder->SetZero();
-			RenderOrder->Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_ZCULLING;
+			RenderOrder->Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_ZCULLING;
 			RenderOrder->Material = Materials[Polygons[I].Material];
-			RenderOrder->PrimitiveType = ZE_RLPT_TRIANGLE;
+			RenderOrder->PrimitiveType = ZE_ROPT_TRIANGLE;
 			RenderOrder->VertexBufferOffset = sizeof(ZEMapVertex) * VertexIndex;
 			RenderOrder->VertexBuffer = *VertexBuffer;
 			RenderOrder->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();

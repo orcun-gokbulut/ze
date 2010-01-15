@@ -64,7 +64,11 @@ ZEArray<*>{
 #include "Definitions.h"
 #include "..\Types.h"
 #include "Allocator.h"
+
+#ifdef ZEDEBUG_CHECKMEMORY
 #include <crtdbg.h>
+#endif
+
 
 template<typename Type, typename Allocator_= ZEAllocatorBase<Type> >
 class ZEArray
@@ -164,7 +168,11 @@ class ZEArray
 		{
 			Count++;
 			Allocator.Reallocate(&Items, Count); 
-			ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
+
+			#ifdef ZEDEBUG_CHECKMEMORY
+				ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
+			#endif
+			
 			return &Items[Count - 1];		
 		}
 

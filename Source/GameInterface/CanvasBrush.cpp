@@ -32,10 +32,11 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "Core/Error.h"
-#include "ZEMath/Ray.h"
 #include "CanvasBrush.h"
+#include "Core/Error.h"
 #include "Graphics/GraphicsModule.h"
+#include "Graphics/RenderOrder.h"
+#include "Graphics/VertexBuffer.h"
 
 ZEDWORD ZECanvasBrush::GetDrawFlags() const
 {
@@ -82,16 +83,16 @@ void ZECanvasBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLigh
 			RenderOrder.Lights[I] = Lights[I];
 		switch(PrimitiveType)
 		{
-			case ZE_RLPT_POINT:
+			case ZE_ROPT_POINT:
 				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount();
 				break;			
-			case ZE_RLPT_LINE:
+			case ZE_ROPT_LINE:
 				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
 				break;			
-			case ZE_RLPT_TRIANGLE:
+			case ZE_ROPT_TRIANGLE:
 				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
 				break;			
-			case ZE_RLPT_TRIANGLESTRIPT:
+			case ZE_ROPT_TRIANGLESTRIPT:
 				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() - 2;
 				break;			
 			default:
@@ -102,7 +103,7 @@ void ZECanvasBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLigh
 		RenderOrder.Material = Material;
 		RenderOrder.PrimitiveType = PrimitiveType;
 		RenderOrder.WorldMatrix = GetWorldTransform();
-		Renderer->AddToRenderOrder(&RenderOrder);
+		Renderer->AddToRenderList(&RenderOrder);
 	}
 }
 
@@ -127,9 +128,9 @@ ZECanvasBrush::ZECanvasBrush()
 	SetBoundingVolumeMechanism(ZE_BVM_USELOCALONLY);
 	RenderOrder.SetZero();
 	Material = NULL;
-	PrimitiveType = ZE_RLPT_TRIANGLE;
+	PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
-	RenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_WORLD_TRANSFORM | ZE_RLF_ENABLE_ZCULLING;
+	RenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_ZCULLING;
 	RenderOrder.Material = Material;
 }
 

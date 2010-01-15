@@ -42,15 +42,18 @@
 #include "ZEMath/Rectangle3D.h"
 #include "Definitions.h"
 #include "Core/Resource.h"
-#include "Graphics/Material.h"
 #include "Graphics/VertexTypes.h"
 #include "Graphics/IndexedPolygon.h"
-#include "Graphics/TextureResource.h"
-#include "Octree.h"
 #include "GameInterface/Entity.h"
 
+class ZEVertexBuffer;
+class ZEMaterial;
+class ZETextureResource;
+class ZETexture2DResource;
 class ZEMapPortal;
 class ZEMapResource;
+class ZEOctree;
+
 
 struct ZEMapPolygon
 {
@@ -58,6 +61,8 @@ struct ZEMapPolygon
 	ZEMaterial*									Material;
 	unsigned int								LastIteration;
 };
+
+
 
 class ZEMapPortalDoor
 {
@@ -88,7 +93,7 @@ class ZEMapPortal
 		ZEVertexBuffer*							VertexBuffer;
 		ZEArray<ZERenderOrder>					RenderOrders;
 		ZEArray<ZEMapPolygon>					Polygons;
-				
+			
 		bool									HasOctree;
 		ZEOctree*								Octree;
 	
@@ -115,7 +120,5 @@ class ZEMapResource : public ZEResource
 		static ZEMapResource*					LoadResource(const char* FileName);
 		static const ZEMapResource*				LoadSharedResource(const char* FileName);
 		static void								CacheResource(const char* FileName);
-
-												
 };
 #endif

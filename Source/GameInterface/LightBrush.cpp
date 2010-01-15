@@ -39,7 +39,12 @@
 #include "Graphics/RenderOrder.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/FixedMaterial.h"
-#include "Graphics/TextureResource.h"
+#include "Graphics/Texture2DResource.h"
+#include "Graphics/TextureCubeResource.h"
+#include "Graphics/PointLight.h"
+#include "Graphics/DirectionalLight.h"
+#include "Graphics/ProjectiveLight.h"
+#include "Graphics/OmniProjectiveLight.h"
 
 ZEDWORD ZELightBrush::GetDrawFlags() const
 {
@@ -287,9 +292,9 @@ void ZELightBrush::Initialize()
 	
 	RenderOrder.Material = Material;
 	RenderOrder.WorldMatrix = GetWorldTransform();
-	RenderOrder.PrimitiveType = ZE_RLPT_TRIANGLE;
+	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
-	RenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_ZCULLING;
+	RenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_ZCULLING;
 }
 
 void ZELightBrush::Deinitialize()
@@ -347,7 +352,7 @@ void ZELightBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight
 	{
 		RenderOrder.WorldMatrix = Light->GetWorldTransform();
 		Material->SetEmmisiveColor(Light->GetColor());
-		Renderer->AddToRenderOrder(&RenderOrder);
+		Renderer->AddToRenderList(&RenderOrder);
 	}
 }
 

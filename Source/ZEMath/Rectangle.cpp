@@ -55,8 +55,8 @@ ZEPoint2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
 			return ZEPoint2(LeftUp.x, LeftUp.y);
 		case ZERECTANGLECORNER_RIGHTUP:
 			return ZEPoint2(RightDown.x, LeftUp.y);
-		default:
-			ZEASSERT(true, "Wrong enum value ZERectangleCorner. Value : %d", Corner);
+		/*default:
+			ZEASSERT(true, "Wrong enum value ZERectangleCorner. Value : %d", Corner);*/
 	}
 }
 

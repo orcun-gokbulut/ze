@@ -39,23 +39,6 @@
 #include "GameInterface/Entity.h"
 #include "Graphics/Light.h"
 
-bool ViewFrustumPlaneVSBox(const ZEAABoundingBox & Box, const ZEPlane &Plane)
-{
-	for (int I = 0; I < 8; I++)
-		if (ZEPlane::TestHalfSpace(Plane, Box.GetVertex(I)) != ZEHALFSPACE_NEGATIVESIDE) 
-			return true;
-	return false;
-}
-
-bool ViewFrustumPlaneVSBox(const ZEOBoundingBox & Box, const ZEPlane &Plane)
-{
-	for (int I = 0; I < 8; I++)
-		if (ZEPlane::TestHalfSpace(Plane,Box.GetVertex(I)) != ZEHALFSPACE_NEGATIVESIDE) 
-			return true;
-	return false;
-}
-
-
 bool ZEViewFrustum::ConeCullTest(const ZEBoundingSphere& BoundingSphere) const
 {
 	// it is assumed that CenterVector is normalized
@@ -74,33 +57,33 @@ bool ZEViewFrustum::ConeCullTest(const ZEBoundingSphere& BoundingSphere) const
 	
 	ExtensionLength = (ProjLength + ExtensionLength) * SinRatio; // ConeRadius
 
-	return TotalLength <= BoundingSphere.Radius + ExtensionLength;
+	return TotalLength > BoundingSphere.Radius + ExtensionLength;
 }
 
 bool ZEViewFrustum::CullTest(const ZEAABoundingBox& BoundingBox) const
 {
-	if (!ViewFrustumPlaneVSBox(BoundingBox, NearClippingPlane)
-		|| !ViewFrustumPlaneVSBox(BoundingBox, FarClippingPlane)
-		|| !ViewFrustumPlaneVSBox(BoundingBox, LeftClippingPlane)
-		|| !ViewFrustumPlaneVSBox(BoundingBox, RightClippingPlane)
-		|| !ViewFrustumPlaneVSBox(BoundingBox, TopClippingPlane)
-		|| !ViewFrustumPlaneVSBox(BoundingBox, BottomClippingPlane))
-		return false;
+	if ((ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)))
+		return true;
 
-	return true;
+	return false;
 }
 
 bool ZEViewFrustum::CullTest(const ZEOBoundingBox& BoundingBox) const 
 {
-	if (!ViewFrustumPlaneVSBox(BoundingBox, NearClippingPlane)
-		|| !ViewFrustumPlaneVSBox(BoundingBox, FarClippingPlane)
-		|| !ViewFrustumPlaneVSBox(BoundingBox, LeftClippingPlane)
-		|| !ViewFrustumPlaneVSBox(BoundingBox, RightClippingPlane)
-		|| !ViewFrustumPlaneVSBox(BoundingBox, TopClippingPlane)
-		|| !ViewFrustumPlaneVSBox(BoundingBox, BottomClippingPlane))
-		return false;
+	if ((ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)) ||
+		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)) ||
+		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)) ||
+		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)) ||
+		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)) ||
+		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)))
+		return true;
 
-	return true;
+	return false;
 }
 
 bool ZEViewFrustum::CullTest(const ZEBoundingSphere& BoundingSphere) const

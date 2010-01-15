@@ -56,7 +56,7 @@ ZEModuleDescription* ZEDummyInputModule::GetModuleDescription()
 
 bool ZEDummyInputModule::Initialize()
 {
-	zeLog("Initializing Dummy Input module.");
+	zeOutput("Initializing Dummy Input module.");
 	Enabled = true;
 
 	return true;
@@ -64,7 +64,7 @@ bool ZEDummyInputModule::Initialize()
 
 void ZEDummyInputModule::Deinitialize()
 {
-	zeLog("Destroying Dummy Input module.");
+	zeOutput("Destroying Dummy Input module.");
 }
 
 

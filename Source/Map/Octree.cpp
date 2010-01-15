@@ -64,8 +64,8 @@ bool ZEOctree::Initialize()
 	OctreeBBoxMaterial->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
 
 	OctreeBBoxRenderOrder.SetZero();
-	OctreeBBoxRenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
-	OctreeBBoxRenderOrder.PrimitiveType = ZE_RLPT_LINE;
+	OctreeBBoxRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_ZCULLING;
+	OctreeBBoxRenderOrder.PrimitiveType = ZE_ROPT_LINE;
 	OctreeBBoxRenderOrder.Material = OctreeBBoxMaterial;
 	OctreeBBoxRenderOrder.VertexBuffer = &OctreeBBoxCanvas;
 
@@ -86,7 +86,7 @@ void ZEOctree::Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESm
 		BoundingBox.Max.y - BoundingBox.Min.y, 
 		BoundingBox.Max.z - BoundingBox.Min.z)
 	);
-	Renderer->AddToRenderOrder(&OctreeBBoxRenderOrder);
+	Renderer->AddToRenderList(&OctreeBBoxRenderOrder);
 
 	for (size_t I = 0; I < 8; I++)
 			if (SubTrees[I] != NULL)
@@ -104,7 +104,7 @@ void ZEOctree::Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESm
 			for (size_t N = 0; N < NodeLights.GetCount(); N++)
 				RenderOrders[I].Lights.Add(NodeLights[N]->GetRenderOrderLight());
 
-			Renderer->AddToRenderOrder(&RenderOrders[I]);
+			Renderer->AddToRenderList(&RenderOrders[I]);
 		}
 
 		for (size_t I = 0; I < 8; I++)

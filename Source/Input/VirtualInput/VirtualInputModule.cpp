@@ -46,7 +46,7 @@ ZEModuleDescription* ZEVirtualInputModule::GetModuleDescription()
 
 bool ZEVirtualInputModule::Initialize()
 {
-	zeLog("Initializing Virtual Input module.\r\n");
+	zeOutput("Initializing Virtual Input module.\r\n");
 	Enabled = true;
 
 	return true;
@@ -54,7 +54,7 @@ bool ZEVirtualInputModule::Initialize()
 
 void ZEVirtualInputModule::Deinitialize()
 {
-	zeLog("Destroting Virtual Input module.\r\n");
+	zeOutput("Destroting Virtual Input module.\r\n");
 }
 
 bool ZEVirtualInputModule::IsEnabled()

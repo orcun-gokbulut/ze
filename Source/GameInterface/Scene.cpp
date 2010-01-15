@@ -36,7 +36,12 @@
 #include "Scene.h"
 #include "Sound/SoundModule.h"
 #include "Graphics/GraphicsModule.h"
-#include "Core/Core.h"
+#include "Graphics/FrameBufferRenderer.h"
+#include "Graphics/ShadowRenderer.h"
+#include "Graphics/Camera.h"
+#include "Graphics/Light.h"
+#include "Core/Error.h"
+#include "Game.h";
 #include "Serialization.h"
 #include "ZEMath/Ray.h"
 #include <memory.h>
@@ -52,7 +57,7 @@ void ZEScene::DrawOrientedBoundingBox(const ZEAABoundingBox& BoundingBox, const 
 			);
 	ZEMatrix4x4::Multiply(BoundingBoxRenderOrder.WorldMatrix, LocalPivot, Transform);
 	BoundingBoxRenderOrder.Material = Material;
-	Renderer->AddToRenderOrder(&BoundingBoxRenderOrder);
+	Renderer->AddToRenderList(&BoundingBoxRenderOrder);
 }
 
 void ZEScene::DrawAxisAlignedBoundingBox(const ZEAABoundingBox& BoundingBox, ZERenderer* Renderer, ZEMaterial* Material)
@@ -62,7 +67,7 @@ void ZEScene::DrawAxisAlignedBoundingBox(const ZEAABoundingBox& BoundingBox, ZER
 		ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z)
 		);
 	BoundingBoxRenderOrder.Material = Material;
-	Renderer->AddToRenderOrder(&BoundingBoxRenderOrder);
+	Renderer->AddToRenderList(&BoundingBoxRenderOrder);
 }
 
 void ZEScene::DrawBoundingSphere(const ZEBoundingSphere& BoundingSphere, ZERenderer* Renderer, ZEMaterial* Material)
@@ -72,7 +77,7 @@ void ZEScene::DrawBoundingSphere(const ZEBoundingSphere& BoundingSphere, ZERende
 		ZEVector3(BoundingSphere.Radius * 2.0f, BoundingSphere.Radius * 2.0f, BoundingSphere.Radius * 2.0f)
 		);
 	BoundingSphereRenderOrder.Material = Material;
-	Renderer->AddToRenderOrder(&BoundingSphereRenderOrder);
+	Renderer->AddToRenderList(&BoundingSphereRenderOrder);
 }
 
 void ZEScene::SetVisualDebugElements(ZEDWORD VisualDebugElements)
@@ -85,6 +90,11 @@ ZEDWORD ZEScene::GetVisualDebugElements()
 	return this->VisualDebugElements;
 }
 
+#include "Graphics/PostProcessor/PostProcessor.h"
+#include "Graphics/PostProcessor/PPColorInputNode.h"
+#include "Graphics/PostProcessor/PPScreenOutputNode.h"
+#include "Graphics/PostProcessor/PPBlurNode.h"
+
 bool ZEScene::Initialize()
 {
 	if (Renderer != NULL)
@@ -94,34 +104,30 @@ bool ZEScene::Initialize()
 	Texture->Create(zeGraphics->GetScreenWidth(), zeGraphics->GetScreenHeight(), ZE_TPF_ARGB32, true);
 	*/
 	
-	Renderer = zeGraphics->CreateFrameRenderer();
+	Renderer = ZEFrameBufferRenderer::CreateInstance();
 	if (Renderer == NULL)
+	{
+		zeCriticalError("Scene Manager", "Can not create renderer.");
 		return false;
-	
-/*
-	Renderer->SetOutput(Texture);
-	
-	PostProcessor = zeGraphics->CreatePostProcessor();
-	PostProcessor->SetInput(Texture);*/
-
-	/*Renderer->SetHDR(true, 1.0f, 0.2f);
-	Renderer->SetHDRBloom(true, 1.0f, 1.0f, 5.0f);
-	Renderer->SetHDRLightAdaptation(true, 0.99999f);*/
+	}
 
 	if (ShadowRenderer != NULL)
 		ShadowRenderer->Destroy();
 
-	ShadowRenderer = zeGraphics->CreateShadowRenderer();
+	ShadowRenderer = ZEShadowRenderer::CreateInstance();
 	if (Renderer == NULL)
+	{
+		zeCriticalError("Scene Manager", "Can not create renderer.");
 		return false;
+	}
 
 	ZECanvas Canvas;
 	Canvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
 
 	BoundingBoxRenderOrder.SetZero();
-	BoundingBoxRenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
+	BoundingBoxRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_ZCULLING;
 	BoundingBoxRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
-	BoundingBoxRenderOrder.PrimitiveType = ZE_RLPT_LINE;
+	BoundingBoxRenderOrder.PrimitiveType = ZE_ROPT_LINE;
 	BoundingBoxRenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
 
 	if (BoundingBoxRenderOrder.VertexBuffer != NULL)
@@ -135,9 +141,9 @@ bool ZEScene::Initialize()
 	Canvas.Clean();
 	Canvas.AddWireframeSphere(1.0f, 8, 8);
 	BoundingSphereRenderOrder.SetZero();
-	BoundingSphereRenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
+	BoundingSphereRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_ZCULLING;
 	BoundingSphereRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
-	BoundingSphereRenderOrder.PrimitiveType = ZE_RLPT_LINE;
+	BoundingSphereRenderOrder.PrimitiveType = ZE_ROPT_LINE;
 	BoundingSphereRenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
 
 	if (BoundingSphereRenderOrder.VertexBuffer != NULL)
@@ -401,7 +407,8 @@ void ZEScene::Render(float ElapsedTime)
 	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
 	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
 	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_FRAMEBUFFER);*/
+	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_FRAMEBUFFER);
+	PostProcessor->Process();*/
 }
 /*
 ZEEntity* ZEScene::CastRay(const ZERay& Ray, float Range, ZESmartArray<ZEEntity*>& IntersectedEntities)
@@ -728,7 +735,7 @@ bool ZEScene::Load(const char* FileName)
 		for (size_t I = 0; I < Entities.GetCount(); I++)
 		{
 			Unserializer.Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
-			Entities[I] = zeCore->GetGame()->CreateEntityInstance(EntityTypeName);
+			Entities[I] = zeGame->CreateEntityInstance(EntityTypeName);
 			if (Entities[I] == NULL)
 			{
 				zeError("Scene", "Unserialization can not create entity type \"%s\".", EntityTypeName);

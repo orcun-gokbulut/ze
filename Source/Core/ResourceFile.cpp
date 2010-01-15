@@ -35,7 +35,7 @@
 
 #include "Definitions.h"
 #include "ResourceFile.h"
-#include "Core/Core.h"
+#include "Core/Error.h"
 
 #include <stdarg.h>
 #include <stdio.h>

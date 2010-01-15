@@ -36,11 +36,7 @@
 #ifndef __ZE_PORTAL_H__
 #define __ZE_PORTAL_H__
 
-#include "Graphics/Camera.h"
-#include "Graphics/Light.h"
-#include "Map/MapResource.h"
-#include "Map/Octree.h"
-#include "Core/Component.h"
+#include "ZEDS/Array.h"
 
 class ZECamera;
 class ZEViewCone;

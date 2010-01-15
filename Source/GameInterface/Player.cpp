@@ -34,11 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Player.h"
+
 #include "Core/Console.h"
 #include "Input/InputModule.h"
 #include "Input/InputDefinitions.h"
 #include "Graphics/GraphicsModule.h"
-#include "Core/Core.h"
+#include "Game.h"
+#include "ZEMath/Ray.h"
 #include "ZEMath/Ray.h"
 
 #define ACTIONID_FORWARD		0
@@ -147,7 +149,7 @@ void ZEPlayer::Tick(float Time)
 				ZEQuaternion::VectorProduct(RayDirection, Camera.GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
 				/*if (zeCore->GetGame()->GetScene()->CastRay(ZERay(RayDirection, Camera.GetWorldPosition()), 100000000000000.0f) != NULL)
 					continue;*/
-				if (zeCore->GetGame()->GetScene()->CastRay(ZERay(RayDirection, Camera.GetWorldPosition()), 100000000000000.0f, &HitEntity, HitPosition, HitNormal) != NULL)
+				if (zeGame->GetScene()->CastRay(ZERay(RayDirection, Camera.GetWorldPosition()), 100000000000000.0f, &HitEntity, HitPosition, HitNormal) != NULL)
 					continue;
 				break;
 		}
@@ -194,16 +196,8 @@ void ZEPlayer::Initialize()
 	Listener.SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Listener.SetLocalRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
 
-	Light.SetRange(200);
-	Light.SetLocalPosition(ZEVector3(0.0f, 10.0f, 0.0f));
-	Light.SetLocalPosition(ZEVector3(0.0f, 10.0f, 0.0f));
-	Light.SetIntensity(3.0f);
-	Light.SetAttenuation(0.0001f, 0.01f, 1.0f);
-	Light.SetColor(ZEVector3(1.0f, 0.0f, 1.0f));
-
 	RegisterComponent(&Camera);
 	RegisterComponent(&Listener);
-	//RegisterComponent(&Light);
 
 	zeScene->SetActiveCamera(&Camera);
 	zeScene->SetActiveListener(&Listener);
@@ -212,8 +206,6 @@ void ZEPlayer::Deinitialize()
 {
 	Camera.Deinitialize();
 	Listener.Deinitialize();
-	Light.Deinitialize();
-
 }
 
 void ZEPlayer::Draw(ZERenderer * Renderer)

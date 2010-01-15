@@ -37,7 +37,8 @@
 #define NOMINMAX
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
-#include "Core/Core.h"
+#include "Core.h"
+#include "Error.h"
 #include "WindowResource.h"
 #include <stdarg.h>
 

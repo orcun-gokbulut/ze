@@ -85,7 +85,7 @@ inline void CalculatePointLight(
 								in float3 LightAttenuationFactors,
 								in float3x3 TangentTransform,
 								out float3 LightDirection,
-								out float3 LightAttenuation)
+								out float LightAttenuation)
 {
 }
 

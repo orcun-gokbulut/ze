@@ -42,7 +42,8 @@
 #include <string.h>
 
 #define zeConsole ZEConsole::GetInstance()
-#define zeLog(...) ZEConsole::GetInstance()->Print(__VA_ARGS__)
+#define zeLog(Module, ...) ZEConsole::GetInstance()->Log(Module, __VA_ARGS__)
+#define zeOutput(...) ZEConsole::GetInstance()->Output(__VA_ARGS__)
 
 class ZEConsoleInterface
 {
@@ -94,7 +95,8 @@ class ZEConsole
 
 		bool					ParseInput(const char* Input);
 
-		void					Print(const char* Format, ...);
+		void					Log(const char* Module, const char* Format, ...);
+		void					Output(const char* Format, ...);
 		void					Input(const char* Input);
 
 		static ZEConsole*		GetInstance();

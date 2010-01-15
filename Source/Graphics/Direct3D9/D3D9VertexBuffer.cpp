@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "D3D9VertexBuffer.h"
-#include "Direct3D9Module.h"
-#include "Core/Core.h"
+#include "D3D9Module.h"
+#include "Core/Error.h"
 
 unsigned int ZED3D9StaticVertexBuffer::GetBufferSize()
 {
@@ -46,7 +46,7 @@ bool ZED3D9StaticVertexBuffer::Create(unsigned int BufferSize)
 {
 	Release();
 	this->BufferSize = BufferSize;
-	if (Device->CreateVertexBuffer(BufferSize, D3DUSAGE_WRITEONLY, NULL, D3DPOOL_MANAGED, &StaticBuffer, NULL) != D3D_OK)
+	if (GetDevice()->CreateVertexBuffer(BufferSize, D3DUSAGE_WRITEONLY, NULL, D3DPOOL_MANAGED, &StaticBuffer, NULL) != D3D_OK)
 	{
 		zeCriticalError("Direct3D9", "Can not create static vertex buffer.");
 		return false;
@@ -91,7 +91,7 @@ void ZED3D9StaticVertexBuffer::Release()
 
 void ZED3D9StaticVertexBuffer::Destroy()
 {
-	Module->VertexBuffers.DeleteValue((ZED3D9StaticVertexBuffer*)this);
+	GetModule()->VertexBuffers.DeleteValue((ZED3D9StaticVertexBuffer*)this);
 	delete this;
 }
 

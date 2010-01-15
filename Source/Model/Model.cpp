@@ -35,8 +35,11 @@
 
 #include "Model.h"
 #include "ModelFileFormat.h"
+#include "Graphics/Renderer.h"
+#include "Graphics/VertexBuffer.h"
+#include "GameInterface/Entity.h"
 #include <stdio.h>
-#include "Core/Core.h"
+#include <string.h>
 
 void ZEModelMeshLOD::ResetMaterial()
 {
@@ -79,7 +82,7 @@ void ZEModelMeshLOD::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLig
 
 	RenderOrder.Lights.Clear();
 	RenderOrder.Lights.MassAdd(Lights.GetConstCArray(), Lights.GetCount());
-	Renderer->AddToRenderOrder(&RenderOrder);
+	Renderer->AddToRenderList(&RenderOrder);
 }
 
 void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)
@@ -91,8 +94,8 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	Skinned = LODResource->Vertices.GetCount() == 0 ? true : false;
 
 	RenderOrder.SetZero();
-	RenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_ENABLE_WORLD_TRANSFORM | ZE_RLF_ENABLE_ZCULLING | (Skinned ? ZE_RLF_SKINNED : 0);
-	RenderOrder.PrimitiveType = ZE_RLPT_TRIANGLE;
+	RenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_ZCULLING | (Skinned ? ZE_ROF_SKINNED : 0);
+	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderOrder.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
 	RenderOrder.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;
 	RenderOrder.VertexDeclaration = Skinned ? ZESkinnedModelVertex::GetVertexDeclaration() : ZEModelVertex::GetVertexDeclaration();

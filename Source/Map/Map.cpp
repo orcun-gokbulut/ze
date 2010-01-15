@@ -35,14 +35,15 @@
 
 #include "Map.h"
 #include "MapResource.h" 
-#include "Core/Core.h"
 #include "Core/Error.h"
+#include "Core/Console.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Light.h"
 #include "Graphics/ViewVolume.h"
 #include "ZEMath/Triangle.h"
 #include "ZEMath/Ray.h"
 #include "ZEMath/Ray.h"
+
 
 bool ZEPortalMap::Initialize()
 {
@@ -59,9 +60,9 @@ bool ZEPortalMap::Initialize()
 	PortalBBoxMaterial->UpdateMaterial();
 
 	PortalBBoxRenderOrder.SetZero();
-	PortalBBoxRenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
+	PortalBBoxRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_ZCULLING;
 	PortalBBoxRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
-	PortalBBoxRenderOrder.PrimitiveType = ZE_RLPT_LINE;
+	PortalBBoxRenderOrder.PrimitiveType = ZE_ROPT_LINE;
 	PortalBBoxRenderOrder.Material = PortalBBoxMaterial;
 	PortalBBoxRenderOrder.VertexBuffer = &PortalBBoxCanvas;
 	PortalBBoxRenderOrder.PrimitiveCount = PortalBBoxCanvas.Vertices.GetCount() / 2;
@@ -79,8 +80,8 @@ bool ZEPortalMap::Initialize()
 	ZEOctree::OctreeBBoxMaterial->UpdateMaterial();
 
 	ZEOctree::OctreeBBoxRenderOrder.SetZero();
-	ZEOctree::OctreeBBoxRenderOrder.Flags = ZE_RLF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_RLF_TRANSPARENT | ZE_RLF_ENABLE_ZCULLING;
-	ZEOctree::OctreeBBoxRenderOrder.PrimitiveType = ZE_RLPT_LINE;
+	ZEOctree::OctreeBBoxRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_ZCULLING;
+	ZEOctree::OctreeBBoxRenderOrder.PrimitiveType = ZE_ROPT_LINE;
 	ZEOctree::OctreeBBoxRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
 	ZEOctree::OctreeBBoxRenderOrder.Material = PortalBBoxMaterial;
 	ZEOctree::OctreeBBoxRenderOrder.VertexBuffer = &PortalBBoxCanvas;
@@ -144,7 +145,7 @@ void ZEPortalMap::RenderPortal(ZEMapPortal* Portal, ZERenderer* Renderer, const 
 				Portal->BoundingBox.Max.y - Portal->BoundingBox.Min.y, 
 				Portal->BoundingBox.Max.z - Portal->BoundingBox.Min.z)
 			);
-		//Renderer->AddToRenderOrder(&PortalBBoxRenderOrder); 
+		//Renderer->AddToRenderList(&PortalBBoxRenderOrder); 
 
 		ZESmartArray<ZELight*> PortalLights;
 		for (size_t I = 0; I < SceneLights.GetCount(); I++)
@@ -165,7 +166,7 @@ void ZEPortalMap::RenderPortal(ZEMapPortal* Portal, ZERenderer* Renderer, const 
 				for (size_t N = 0; N < PortalLights.GetCount(); N++)
 					Portal->RenderOrders[I].Lights[N] = PortalLights[N]->GetRenderOrderLight();
 
-				Renderer->AddToRenderOrder(&Portal->RenderOrders[I]);
+				Renderer->AddToRenderList(&Portal->RenderOrders[I]);
 			}
 	}
 }

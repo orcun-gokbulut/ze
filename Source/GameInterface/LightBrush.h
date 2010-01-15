@@ -39,21 +39,22 @@
 
 #include "Meta/Class.h"
 #include "GameInterface/Entity.h"
-#include "Graphics/Light.h"
 #include "Graphics/RenderOrder.h"
+#include "Graphics/Light.h"
 
 ZE_META_CLASS_DESCRIPTION(ZELightBrush);
 
 class ZETexture2DResource;
 class ZETextureCubeResource;
 class ZEFixedMaterial;
+class ZELight;
+
 class ZELightBrush : public ZEEntity
 {
 	ZE_META_CLASS()
 	private:
 		ZELightType							LightType;
 		ZELight*							Light;
-		ZETextureType						Type;
 
 		ZERenderOrder						RenderOrder;
 		ZEFixedMaterial*					Material;

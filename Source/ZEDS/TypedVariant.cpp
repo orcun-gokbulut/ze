@@ -52,7 +52,7 @@ void ZETypedVariant::SetString(char *NewValue)
 	ZEDS_ASSERT(Type != ZE_VRT_STRING && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetString operation failed. Types does not match.");
 	if(Type == ZE_VRT_STRING || Type == ZE_VRT_MATRIX3X3 || Type == ZE_VRT_MATRIX4X4)
 	{
-		if (Value.String != null || Type == ZE_VRT_UNDEFINED)
+		if (Value.String != NULL || Type == ZE_VRT_UNDEFINED)
 			delete[] Value.String;
 		Value.String = new char[strlen(NewValue) + 1];
 		strcpy(Value.String, NewValue);

@@ -34,12 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+#ifndef __ZE_VARIANT_H__
+#define __ZE_VARIANT_H__
+
 #pragma warning(push)
 #pragma warning(disable:4482)
 #include "ZEMath/Matrix.h"
 #include "ZEMath/Vector.h"
 #include "ZEMath/Quaternion.h"
 #include "GameInterface/Serialization.h"
+
 enum ZEVariantType
 {
 	ZE_VRT_UNDEFINED = 0,
@@ -170,3 +174,4 @@ class ZEVariant : public ZESerializable
 
 
 #pragma warning(pop)
+#endif

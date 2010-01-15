@@ -39,22 +39,26 @@
 #include <windows.h>
 #include <math.h>
 
-extern HINSTANCE ApplicationInstance;
-
+#include "Core/Core.h"
+#include "Core/ConsoleWindow.h"
+#include "Core/ModuleManager.h"
+#include "Core/Window.h"
+#include "Graphics/GraphicsModule.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/FixedMaterial.h"
+#include "Graphics/Texture2DResource.h"
+#include "GameInterface/Game.h"
 #include "GameInterface/Player.h"
 #include "GameInterface/LightBrush.h"
 #include "GameInterface/CanvasBrush.h"
 #include "GameInterface/SkyBrush.h"
 #include "GameInterface/Scene.h"
 #include "GameInterface/ModelBrush.h"
-#include "Core/ConsoleWindow.h"
-#include "Core/Core.h"
-#include "GameInterface/ModelBrush.h"
-#include "Meta/Animation.h"
 #include "GameInterface/Serialization.h"
+#include "Meta/Animation.h"
+
+extern HINSTANCE ApplicationInstance;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
@@ -168,6 +172,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 											{10.0f,		1.0f},
 										 };
 		PropertyAnimation->Keys.MassAdd(Keys2, 2);
+		
 		ZEFileSerializer Serializer;
 		Serializer.OpenFile("Test.zeAnim");
 		ZEAnimation::WriteToFile((ZESerializer*)&Serializer, &Animation);
@@ -185,23 +190,13 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		CanvasMaterial->GetAnimationController()->SetLooping(true);
 		CanvasMaterial->GetAnimationController()->PlayAnimation();
 		
-		/*CanvasBrush->Material->Destroy();
-		CanvasMaterial = ZEFixedMaterial::CreateInstance();
-		CanvasBrush->Material = (ZEMaterial*)CanvasMaterial;
 
-		ZEFileUnserializer Unserializer;
-		Unserializer.OpenFile("test.ze");
-		CanvasMaterial->Unserialize((ZEUnserializer*)&Unserializer);
-		CanvasMaterial->UpdateMaterial();
-		Unserializer.CloseFile();*/
 		Scene->AddEntity(CanvasBrush);
 
-		/*
-		ZESkyBrush* Brush = (ZESkyBrush*)zeCore->GetGame()->CreateEntityInstance("ZESkyBrush");
+		/*ZESkyBrush* Brush = (ZESkyBrush*)zeCore->GetGame()->CreateEntityInstance("ZESkyBrush");
 		Brush->SetSkyTexture("cubetest.tga");
 		Brush->SetSkyColor(ZEVector3(1.0f, 1.0f, 1.0f));
-		Scene->AddEntity(Brush);
-		*/
+		Scene->AddEntity(Brush);*/
 	
 		zeCore->Run();
 	}

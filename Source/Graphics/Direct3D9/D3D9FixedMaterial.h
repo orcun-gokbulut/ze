@@ -39,17 +39,17 @@
 
 #include <d3d9.h>
 #include "D3D9ComponentBase.h"
-#include "D3D9Shader.h"
+#include "D3D9FixedMaterialShader.h"
 #include "Graphics/FixedMaterial.h"
 
 class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 {
-	friend class ZEDirect3D9Module;
+	friend class ZED3D9Module;
 	private:
-		ZED3D9Shader*					Shader;
+		ZED3D9FixedMaterialShader*		Shader;
 		ZERenderOrder*					RenderOrder;
 		ZECamera*						Camera;
-		void							SetShaderPass(ZED3D9ShaderPass* Pass, bool Skinned) const;
+		void							SetShaderPass(ZED3D9FixedMateriaShaderPass* Pass, bool Skinned) const;
 		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
 		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
 

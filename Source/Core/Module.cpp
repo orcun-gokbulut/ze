@@ -35,6 +35,14 @@
 
 #include "Module.h"
 
+ZEModule::ZEModule()
+{
+}
+
+ZEModule::~ZEModule()
+{
+}
+
 void ZEModule::Destroy()
 {
 	this->Deinitialize();

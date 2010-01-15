@@ -41,12 +41,13 @@
 ///////////////////////////////////////////////////////////////
 
 #pragma once
-#ifndef __ZE_TYPEDVARIANT_H__
-#define __ZE_TYPEDVARIANT_H__
+#ifndef __ZE_TYPED_VARIANT_H__
+#define __ZE_TYPED_VARIANT_H__
 
 #pragma warning(push)
 #pragma warning(disable:4482)
-#include "variant.h"
+
+#include "Variant.h"
 class ZETypedVariant : public ZEVariant
 {
 	public:

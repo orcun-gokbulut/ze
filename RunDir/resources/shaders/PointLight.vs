@@ -34,7 +34,7 @@ float4x4  WorldInvMatrix				: register(c12);
 float4    ViewPosition					: register(c16);
 
 //First light 4 vector 1 matrix
-float4    LightPosition					: register(c24);
+float3    LightPosition					: register(c24);
 float3    LightAttenuationFactors		: register(c25);
 float4x4  LightMapMatrix				: register(c28);
 
@@ -129,7 +129,7 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 	Output.Position = mul(Position, WorldViewProjMatrix);
 	float4 WorldPosition = mul(Position, WorldMatrix);
 
-	float4 ViewDisplacement = ViewPosition - WorldPosition;
+	float3 ViewDisplacement = ViewPosition - WorldPosition;
 	
 	float3x3 TangentTransform;
 	#ifdef ZESHADER_NORMALMAP
@@ -143,7 +143,7 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 	#endif
 
 	Output.Texcoord = Input.Texcoord;
-
+	
 	CalculatePointLight(WorldPosition, LightPosition, LightAttenuationFactors, TangentTransform, Output.LightDirection.xyz, Output.LightDirection.w, Output.ViewDirection.w);
 
 	return(Output);

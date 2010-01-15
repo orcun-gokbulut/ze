@@ -40,7 +40,6 @@
 #include "Material.h"
 #include "ZEMath/Vector.h"
 #include "Definitions.h"
-#include "Texture.h" 
 #include "ZEDS/Array.h"
 #include "ZEDS/Variant.h"
 #include "Meta/Class.h"
@@ -79,6 +78,9 @@ enum ZEMaterialOpacityComponent
 };
 
 ZE_META_CLASS_DESCRIPTION(ZEFixedMaterial)
+
+class ZETextureCube;
+class ZETexture2D;
 class ZEFixedMaterial : public ZEMaterial
 {
 	ZE_META_CLASS()

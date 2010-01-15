@@ -44,16 +44,6 @@ enum ZETextureType
 	ZE_TT_CUBE
 };
 
-enum ZETextureCubeFace
-{
-	ZE_CTF_POSITIVEX	= 0,
-	ZE_CTF_NEGATIVEX	= 1,
-	ZE_CTF_POSITIVEY	= 2,
-	ZE_CTF_NEGATIVEY	= 3,
-	ZE_CTF_POSITIVEZ	= 4,
-	ZE_CTF_NEGATIVEZ	= 5
-};
-
 enum ZETexturePixelFormat
 {
 	ZE_TPF_NOTSET,
@@ -78,81 +68,4 @@ class ZETexture
 		virtual void					Destroy() = 0;
 };
 
-class ZETexture2D : public ZETexture
-{
-	protected:
-		int								Width;
-		int								Height;
-		ZETexturePixelFormat			PixelFormat;
-		bool							RenderTarget;
-
-										ZETexture2D();
-		virtual							~ZETexture2D();
-
-	public:
-		virtual ZETextureType			GetTextureType() const;
-
-		int								GetWidth() const;
-		int								GetHeight() const;
-		ZETexturePixelFormat			GetPixelFormat() const;
-		bool							IsRenderTarget() const;
-
-		virtual bool					IsEmpty() const = 0;
-
-		virtual bool					Create(int Width, int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual void					Lock(void** Buffer, int* Pitch) = 0;
-		virtual void					Unlock() = 0;
-
-		static ZETexture2D*				CreateInstance();
-};
-
-class ZETexture3D : public ZETexture
-{
-	protected:
-		int								Width;
-		int								Height;
-		int								Depth;
-		ZETexturePixelFormat			PixelFormat;
-
-										ZETexture3D();
-		virtual							~ZETexture3D();
-
-	public:
-		virtual ZETextureType			GetTextureType() const;
-
-		int								GetWidth() const;
-		int								GetHeight() const;
-		int								GetDepth() const;
-		ZETexturePixelFormat			GetPixelFormat() const;
-		bool							IsRenderTarget() const;
-
-		virtual bool					Create(int Width, int Height, int Depth, ZETexturePixelFormat PixelFormat) = 0;
-		virtual void					Lock(void** Buffer, int* RowPitch, int* SlicePitch) = 0;
-		virtual void					Unlock() = 0;
-
-		static ZETexture3D*				CreateInstance();
-};
-
-class ZETextureCube : public ZETexture
-{
-	protected:
-		int								EdgeLength;
-		ZETexturePixelFormat			PixelFormat;
-		bool							RenderTarget;
-
-										ZETextureCube();
-		virtual							~ZETextureCube();
-
-	public:
-		virtual ZETextureType			GetTextureType() const;
-		int								GetEdgeLenght() const;
-		ZETexturePixelFormat			GetPixelFormat() const;
-		bool							IsRenderTarget() const;
-
-		virtual	bool					Create(int EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual void					Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch) = 0;
-		virtual void					Unlock(ZETextureCubeFace Face) = 0;
-
-		static ZETextureCube*			CreateInstance();
-};
 #endif

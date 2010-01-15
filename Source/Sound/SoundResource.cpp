@@ -34,7 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "SoundResource.h"
-#include "Core/Core.h"
+#include "Core/Error.h"
+#include "Core/ResourceManager.h"
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>
 

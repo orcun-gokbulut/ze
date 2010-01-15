@@ -69,10 +69,12 @@ class ZEAllocatorBase
 
 		inline void Deallocate(Type** Pointer)
 		{
-			Size = 0;
 			if (*Pointer != NULL)
+			{
+				Size = 0;
 				delete[] *Pointer;
-			*Pointer = NULL;
+				*Pointer = NULL;
+			}
 		}
 	
 		inline bool Allocate(Type** Pointer, size_t NewSize)

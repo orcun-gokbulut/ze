@@ -34,8 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#include "command.h"
-#include "core/core.h"
+#include "Command.h"
+#include "Core.h"
+#include "Error.h"
+#include "Console.h"
 #include <stdarg.h>
 
 #pragma warning(push)
@@ -61,7 +63,7 @@ bool ZECommand::Execute(ZEArray<ZEVariant>* ParamList)
 		return Callback(this, ParamList);
 	else
 	{
-		zeLog("Invalid Command.\r\n");
+		zeOutput("Invalid Command.\r\n");
 		return false;
 	}
 }
@@ -171,7 +173,7 @@ bool ZECommandManager::Callback_ListSections(ZECommand* Command, const ZECommand
 	}
 	else
 	{
-		zeLog("Incorrect parameters\r\n"
+		zeOutput("Incorrect parameters\r\n"
 						 "Usage :\r\n"
 						 "  Command.ListSections() - Lists all of the command sections\r\n"
 						 "  Command.ListSection(Integer From, Integer Count) - Lists 'Count' number of command sections starting from index 'From'\r\n"
@@ -180,11 +182,11 @@ bool ZECommandManager::Callback_ListSections(ZECommand* Command, const ZECommand
 		return false;
 	}
 
-	zeLog(" Name                       Number Of Commands \r\n"
+	zeOutput(" Name                       Number Of Commands \r\n"
 					 "-----------------------------------------------\r\n");
 
 	for (size_t I = Index; I < Sections.GetCount() && I <= Count; I++)
-		zeLog(" %-30s      %d\r\n", Sections.GetItem(I)->GetName(), Sections.GetItem(I)->GetNumberOfCommands());
+		zeOutput(" %-30s      %d\r\n", Sections.GetItem(I)->GetName(), Sections.GetItem(I)->GetNumberOfCommands());
 	return true;
 }
 
@@ -211,7 +213,7 @@ bool ZECommandManager::Callback_ListCommands(ZECommand* Command, const ZECommand
 	}
 	else
 	{
-		zeLog("Incorrect parameters. \r\n"
+		zeOutput("Incorrect parameters. \r\n"
 						 "Usage :\r\n"
 						 " Command.ListCommands(String Section) - Lists all of the commans in the command section named 'Section'\r\n"
 						 " Command.ListCommands(String Section, Integer Index, Integer Count) - Lists 'Count' number of commands in the command section named 'Section' starting from index 'Index'\r\n"
@@ -222,24 +224,24 @@ bool ZECommandManager::Callback_ListCommands(ZECommand* Command, const ZECommand
 
 	if (Sec != NULL)
 	{
-		zeLog(" Name                        Access Level\r\n"
+		zeOutput(" Name                        Access Level\r\n"
 						 "------------------------------------------\r\n");
 		
 		ZECommand* Cmd;
 		for (size_t I = 0; I < Sec->GetNumberOfCommands() && I <= Count; I++)
 		{
 			Cmd = Sec->GetCommand(I);	
-			zeLog(" %-30s", Cmd->GetName());
+			zeOutput(" %-30s", Cmd->GetName());
 			switch(Cmd->GetAccessLevel())
 			{
 				case ZEUSERLEVEL_DEVELOPPER:
-					zeLog(" Developer\r\n");
+					zeOutput(" Developer\r\n");
 					break;
 				case ZEUSERLEVEL_PLAYER:
-					zeLog(" Player\r\n");
+					zeOutput(" Player\r\n");
 					break;
 				case ZEUSERLEVEL_CHEATER:
-					zeLog("Cheater\r\n");
+					zeOutput("Cheater\r\n");
 					break;
 			}
 		}
@@ -247,7 +249,7 @@ bool ZECommandManager::Callback_ListCommands(ZECommand* Command, const ZECommand
 	}
 	else
 	{
-		zeLog("There is no such an command section. \r\n");
+		zeOutput("There is no such an command section. \r\n");
 		return false;
 	}
 }
