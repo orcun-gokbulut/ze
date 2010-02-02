@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - GUIWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,71 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#ifndef __GUI_WINDOW__
+#define __GUI_WINDOW__
 
-#include "ResourceFile.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <cmath>
+#include <gl/glut.h>
+#include <iostream>
+#include "ZELinkedList.h"
+#include "ZEGUIComponent.h"
+#include "ZEGUIEngine.h"
+#include "ZEGUIConstantDefinitions.h"
+#include "ZEGUIDragButton.h"
+#include "ZEGUIButton.h"
 
-class ZEResourceManager;
-class ZEResource
+class ZEGUIComponent;
+class ZEGUIEngine;
+
+class ZEGUIWindow : public ZEGUIComponent
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
+private:
+	float Color[4];
 
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
+protected:
 
-								ZEResource();
-		virtual					~ZEResource();
+	ZEGUIComponent *HoveredChild;
 
-	public:
-		virtual const char*		GetResourceType() const = 0;
+	void (*InMouseMotion) (float x,float y);
+	void (*InMouseAction) (unsigned char button,bool state);
+	void (*InKeyboardAction) (unsigned char key,bool state);
+	void (*InHoverExited) (void);
+	void (*InFocusExited) (void);
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
+	ZELinkedList <ZEGUIComponent> ChildrenDepths;
 
-		const char*				GetFileName() const;
+public:
+	ZEGUIWindow();
+	ZEGUIWindow(float newX0,float newX1,float newY0,float newY1);
+	~ZEGUIWindow();
 
-		void					AddReferance();
+	virtual void SetPositions(float newX0,float newX1,float newY0,float newY1,unsigned char relative = 1);
 
-		size_t					GetReferanceCount() const;
+	virtual void DrawSelf();
+	virtual void Draw();
 
-		void					Release();
+	void AddChild(ZEGUIComponent *);
+	void DeleteChild(ZEGUIComponent *);
+	void FocusChild(ZEGUIComponent *);
+	ZEGUIComponent *GetHoveredChild();
+	ZEGUIComponent *GetFocusedChild();
+	void AddDragButton();
+
+	virtual bool MouseMotionEvent(float mx,float my);
+	virtual bool MouseActionEvent(unsigned char  actionType);
+	virtual bool KeyboardEvent(unsigned char key,bool actionType);
+	virtual void HoverExited();
+	virtual void FocusExited();
+
+	void setMouseMotionLink(void (*linkedFunction)(float,float));
+	void setMouseActionLink(void (*linkedFunction)(unsigned char,bool));
+	void setKeyboardActionLink(void (*linkedFunction)(unsigned char,bool));
+	void setHoverExitedLink(void (linkedFunction)(void));
+	void setFocusExitedLink(void (linkedFunction)(void));
+
+	void SetColor(float,float,float,float);
 };
+
 #endif

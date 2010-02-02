@@ -74,7 +74,7 @@ void ZEResourceManager::AddResource(ZEResource* Resource)
 	this->SharedResources.Add(Resource);
 }
 
-void ZEResourceManager::ReleaseResource(ZEResource* Resource)
+void ZEResourceManager::RemoveResource(ZEResource* Resource)
 {
 	if (Resource->ReferenceCount <= 0 && !Resource->Cached)
 		SharedResources.DeleteValue(Resource);
@@ -98,7 +98,10 @@ void ZEResourceManager::UncacheResource(const char* FileName)
 		{
 			Resource->Cached = false;
 			if (Resource->ReferenceCount <= 0)
-				ReleaseResource(Resource);
+			{
+				RemoveResource(Resource);
+				delete Resource;
+			}
 		}
 }
 

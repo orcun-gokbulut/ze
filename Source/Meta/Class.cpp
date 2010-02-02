@@ -52,7 +52,7 @@ bool ZEClass::Serialize(ZESerializer* Serializer)
 {
 	ZEVariant Value;
 	ZEClassDescription* CurrDesc = GetClassDescription();
-
+ 
 	ZEClassFileChunk ClassChunk;
 	ClassChunk.Header = ZE_CLSF_CLASS_CHUNKID;
 	strncpy(ClassChunk.ClassType, CurrDesc->GetName(), ZE_MAX_NAME_SIZE);

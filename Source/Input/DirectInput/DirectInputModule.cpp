@@ -324,11 +324,10 @@ bool ZEDirectInputModule::GetRawInputEvent(ZEInputEvent& InputEvent)
 
 void ZEDirectInputModule::ProcessInputMap(ZEInputMap* InputMap)
 {
+	InputMap->InputActionCount = 0;
+
 	if (!Enabled)
 		return;
-
-
-	InputMap->InputActionCount = 0;
 
 	for (size_t I = 0 ; I < InputMap->InputBindings.GetCount(); I++)
 	{
@@ -442,6 +441,11 @@ void ZEDirectInputModule::UnAcquire()
 
 	if (DIJoystick != NULL)
 		DIJoystick->Unacquire();
+}
+
+ZEDirectInputModule::ZEDirectInputModule()
+{
+	Enabled = true;
 }
 
 ZEDirectInputModule::~ZEDirectInputModule()

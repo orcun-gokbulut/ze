@@ -53,7 +53,7 @@ class ZEResourceManager
 		const ZEResource*			GetResource(const char* FileName);
 
 		void						AddResource(ZEResource* Resource);
-		void						ReleaseResource(ZEResource* Resource);
+		void						RemoveResource(ZEResource* Resource);
 
 		void						ReleaseAllResources();
 
@@ -61,6 +61,5 @@ class ZEResourceManager
 		void						UncacheAllResources();
 
 		static ZEResourceManager*	GetInstance();
-
 };
 #endif

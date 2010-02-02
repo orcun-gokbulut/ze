@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - GUIConstantDefinitions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,36 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#ifndef __GUI_CONSTANT_DEFINITIONS__
+#define __GUI_CONSTANT_DEFINITIONS__
 
-#include "ResourceFile.h"
+#define ZE_GUI_MOUSE_MOTION 0
+#define ZE_GUI_MOUSE_ACTION 1
+#define ZE_GUI_KEYBOARD_ACTION 2
 
-class ZEResourceManager;
-class ZEResource
-{
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
+#define ZE_GUI_MOUSE_LEFT_BUTTON 0
+#define ZE_GUI_MOUSE_RIGHT_BUTTON 1
+#define ZE_GUI_MOUSE_MIDDLE_BUTTON 2
 
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
+#define ZE_GUI_BUTTON_RELEASED 0
+#define ZE_GUI_BUTTON_PRESSED 1
+#define ZE_GUI_DOUBLE_CLICK 2
 
-								ZEResource();
-		virtual					~ZEResource();
+#define ZE_GUI_MOUSE_LEFT_DOWN		0
+#define ZE_GUI_MOUSE_LEFT_UP		1
+#define ZE_GUI_MOUSE_LEFT_DOUBLE	2
+#define ZE_GUI_MOUSE_RIGHT_DOWN	3
+#define ZE_GUI_MOUSE_RIGHT_UP		4
+#define ZE_GUI_MOUSE_RIGHT_DOUBLE	5
+#define ZE_GUI_MOUSE_MIDDLE_DOWN	6
+#define ZE_GUI_MOUSE_MIDDLE_UP		7
 
-	public:
-		virtual const char*		GetResourceType() const = 0;
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
-
-		const char*				GetFileName() const;
-
-		void					AddReferance();
-
-		size_t					GetReferanceCount() const;
-
-		void					Release();
-};
+//#define GUI_HOVERED_STATE 1
+//#define GUI_FOCUSED_STATE 2
+//#define GUI_VISIBLE_STATE 4
+//#define GUI_ACTIVE_STATE 8
+//#define GUI_CLICKED_STATE 16
+//
+// component link actionlarda parametre olarak this pointer i olmali mi olmamali mi
 #endif

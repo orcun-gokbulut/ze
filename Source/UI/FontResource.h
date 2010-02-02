@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - FontResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,41 +34,42 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#ifndef	__ZE_FONT_RESOURCE_H__
+#define __ZE_FONT_RESOURCE_H__
 
-#include "ResourceFile.h"
+#include "Core/Resource.h"
+#include "ZEDS/Array.h"
+#include "ZEMath/Rectangle.h"
 
-class ZEResourceManager;
-class ZEResource
+#define ZE_FONT_CHARACTER_COUNT				256
+
+class ZETexture2D;
+class ZETexture2DResource;
+
+struct ZEFontCharacter
 {
-	friend class ZEResourceManager;
+	const ZETexture2D*		Texture;
+	ZERectangle				CoordinateRectangle;
+};
+
+class ZEFontResource : public ZEResource
+{
 	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
-
+		ZEArray<ZETexture2DResource*>		TextureResources;
+		ZEFontCharacter						Characters[ZE_FONT_CHARACTER_COUNT];
 	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
-
-								ZEResource();
-		virtual					~ZEResource();
+											ZEFontResource();
+		virtual 							~ZEFontResource();
 
 	public:
-		virtual const char*		GetResourceType() const = 0;
+		virtual const char*					GetResourceType() const;
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
+		const ZEFontCharacter&				GetCharacter(char Character);
 
-		const char*				GetFileName() const;
+		static ZEFontResource*				LoadResource(ZEResourceFile* ResourceFile);
+		static ZEFontResource*				LoadResource(const char* FileName);
+		static ZEFontResource*				LoadSharedResource(const char* FileName);
+		static void							CacheResource(const char* FileName);
 
-		void					AddReferance();
-
-		size_t					GetReferanceCount() const;
-
-		void					Release();
 };
 #endif

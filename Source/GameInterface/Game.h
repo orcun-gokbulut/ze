@@ -49,6 +49,10 @@ enum ZEGameType
 	ZEGAMETYPE_MULTIPLAYER
 };
 
+
+class ZERenderer;
+class ZEControl;
+
 class ZEGame;
 class ZEGameDescription
 {
@@ -60,9 +64,13 @@ class ZEGameDescription
 		virtual ZEGame*							CreateGameInstance() = 0;
 };
 
+#include "UI/UIControl.h"
+
 class ZEGame
 {
 	protected:
+		ZEUIRenderer*							UIRenderer;
+		ZEUIControl								UITestControl;
 		ZEScene*								Scene;
 		ZEArray<ZEEntityDescription*>			EntityDescriptions;
 

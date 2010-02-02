@@ -36,6 +36,8 @@
 #include "Game.h"
 #include "Core/Core.h"
 #include "Core/Error.h"
+#include "UI/UIRenderer.h"
+#include "UI/UIControl.h"
 
 ZEGameDescription* ZEGame::GetGameDescription()
 {
@@ -49,14 +51,13 @@ ZEScene* ZEGame::GetScene()
 
 bool ZEGame::RegisterEntityDescription(ZEEntityDescription* EntityDescription)
 {
-#ifdef ZEDEBUG_ENABLED
-	for (int I = 0; I < EntityDescriptions.GetCount(); I++)
+	for (size_t I = 0; I < EntityDescriptions.GetCount(); I++)
 		if (stricmp(EntityDescriptions[I]->GetName(), EntityDescription->GetName()) == 0)
 		{
-			zeError("Entity Provider", "There is an already registered entity declaration. (Entity Description Name : \"%s\")", EntityDescription->GetName());
+			zeError("Entity Provider", "Entity declaration already registered. (Entity Description Name : \"%s\")", EntityDescription->GetName());
 			return false;
 		}
-#endif
+
 	EntityDescriptions.Add(EntityDescription);
 	return true;
 }
@@ -129,6 +130,14 @@ ZEEntity* ZEGame::CreateEntityInstance(const char* EntityTypeName)
 
 bool ZEGame::Initialize()
 {
+	if (UIRenderer != NULL)
+		UIRenderer = ZEUIRenderer::CreateInstance();
+	
+	UIRenderer->Initialize();
+
+	UITestControl.SetPosition(ZEVector2(100, 100));
+	UITestControl.SetSize(ZEVector2(50.0f, 100.0f));
+
 	if (Scene != NULL)
 	{
 		Scene->Deinitialize();
@@ -141,6 +150,12 @@ bool ZEGame::Initialize()
 
 bool ZEGame::Deinitialize()
 {
+	if (UIRenderer != NULL)
+	{
+		UIRenderer->Destroy();
+		UIRenderer = NULL;
+	}
+
 	if (Scene != NULL)
 	{
 		Scene->Destroy();
@@ -163,7 +178,12 @@ void ZEGame::Destroy()
 
 void ZEGame::Render(float ElapsedTime)
 {
+	UIRenderer->Clean();
 	Scene->Render(ElapsedTime);
+	UITestControl.Draw(UIRenderer);
+	UIRenderer->Render(Scene->Renderer);
+	Scene->Renderer->Render(ElapsedTime);
+	Scene->Renderer->ClearList();
 }
 
 void ZEGame::Tick(float ElapsedTime)

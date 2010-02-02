@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - FontFile.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#include "Types.h"
 
-#include "ResourceFile.h"
+#define ZE_FONT_FILE_HEADER						((ZEDWORD)((ZEDWORD)'ZEFF' + (ZEDWORD)'FONT'))
+#define ZE_FONT_FILE_CHARACTER_COUNT			256
 
-class ZEResourceManager;
-class ZEResource
+#include "ZEMath/Rectangle.h"
+
+struct ZEFontFileCharacter
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
-
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
-
-								ZEResource();
-		virtual					~ZEResource();
-
-	public:
-		virtual const char*		GetResourceType() const = 0;
-
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
-
-		const char*				GetFileName() const;
-
-		void					AddReferance();
-
-		size_t					GetReferanceCount() const;
-
-		void					Release();
+	ZEDWORD						TextureId;
+	ZERectangle					Coordinates;
 };
-#endif
+
+struct ZEFontFileHeader
+{
+	ZEDWORD						Header;
+	ZEDWORD						TextureCount;
+	ZEFontFileCharacter			Characters[ZE_FONT_FILE_CHARACTER_COUNT];
+};

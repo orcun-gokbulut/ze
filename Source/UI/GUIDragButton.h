@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - GUIDragButton.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,33 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#ifndef __GUI_DRAG_BUTTON__
+#define __GUI_DRAG_BUTTON__
 
-#include "ResourceFile.h"
+#include "ZELinkedList.h"
+#include "ZEGUIConstantDefinitions.h"
+#include "ZEGUIComponent.h"
+#include "ZEGUIEngine.h"
+#include "ZEGUIWindow.h"
 
-class ZEResourceManager;
-class ZEResource
+class ZEGUIDragButton : public ZEGUIComponent
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
+protected:
+	bool ClickState;
+	float OldX,OldY;
 
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
+	void (*InDragAction)(ZEGUIComponent *,float,float);
 
-								ZEResource();
-		virtual					~ZEResource();
+public:
+	ZEGUIDragButton();
+	~ZEGUIDragButton();
 
-	public:
-		virtual const char*		GetResourceType() const = 0;
+	void SetDragActionLink(void (*LinkedFunction)(ZEGUIComponent *,float,float));
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
+	virtual bool MouseActionEvent(unsigned char ActionType);
+	virtual bool MouseMotionEvent(float Mx,float My);
 
-		const char*				GetFileName() const;
+	virtual void Draw();
 
-		void					AddReferance();
-
-		size_t					GetReferanceCount() const;
-
-		void					Release();
 };
 #endif

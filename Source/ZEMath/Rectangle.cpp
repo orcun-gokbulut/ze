@@ -36,28 +36,43 @@
 #include "Rectangle.h"
 #include "Core/Error.h"
 
-bool ZERectangle::BoundingTest(const ZEPoint2& Point) const
+bool ZERectangle::IsEmpty()
 {
-	if ((Point.x >= LeftUp.x && Point.x <= RightDown.x) && (Point.y >= LeftUp.y &&  Point.y <= RightDown.y))
-		return true;
-	else
-		return false;
+	return (LeftUp == ZEVector2::Zero && RightDown == ZEVector2::Zero);
 }
+
 ZEPoint2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
 {
 	switch(Corner)
 	{
-		case ZERECTANGLECORNER_LEFTDOWN:
+		case ZE_RC_LEFTDOWN:
 			return ZEPoint2(LeftUp.x, RightDown.y);
-		case ZERECTANGLECORNER_RIGHTDOWN:
+		case ZE_RC_RIGHTDOWN:
 			return ZEPoint2(RightDown.x, RightDown.y);
-		case ZERECTANGLECORNER_LEFTUP:
+		case ZE_RC_LEFTUP:
 			return ZEPoint2(LeftUp.x, LeftUp.y);
-		case ZERECTANGLECORNER_RIGHTUP:
+		case ZE_RC_RIGHTUP:
 			return ZEPoint2(RightDown.x, LeftUp.y);
 		/*default:
 			ZEASSERT(true, "Wrong enum value ZERectangleCorner. Value : %d", Corner);*/
 	}
+}
+
+void ZERectangle::SetPosition(const ZEVector2& Position)
+{
+	ZEVector2 Temp;
+	ZEVector2::Substution(Temp, Position, LeftUp);	
+	ZEVector2::Substution(RightDown, RightDown, Temp);
+}
+
+const ZEVector2& ZERectangle::GetPosition() const
+{
+	return LeftUp;
+}
+
+void ZERectangle::SetWidth(float Width)
+{
+	RightDown.x = LeftUp.x + Width;
 }
 
 float ZERectangle::GetWidth() const
@@ -65,9 +80,47 @@ float ZERectangle::GetWidth() const
 	return LeftUp.x - RightDown.x;
 }
 
+void ZERectangle::SetHeight(float Height)
+{
+	RightDown.y = LeftUp.y + Height;
+}
+
 float ZERectangle::GetHeight() const
 {
 	return LeftUp.y - RightDown.y;
+}
+
+bool ZERectangle::IntersectionTest(const ZERectangle& RectangleA, const ZERectangle& RectangleB)
+{
+	if ((RectangleA.LeftUp.x > RectangleB.RightDown.x) || 
+		(RectangleA.RightDown.x < RectangleB.LeftUp.x) ||
+		(RectangleA.LeftUp.y > RectangleB.RightDown.y) ||
+		(RectangleA.RightDown.y <RectangleB.LeftUp.y))
+		return false;
+	
+	return true;
+}
+
+bool ZERectangle::Intersection(ZERectangle& Intersection, const ZERectangle& RectangleA, const ZERectangle& RectangleB)
+{
+	if (!ZERectangle::IntersectionTest(RectangleA, RectangleB))
+		return false;
+
+	Intersection.LeftUp.x = (RectangleA.LeftUp.x > RectangleB.LeftUp.x ? RectangleA.LeftUp.x : RectangleB.LeftUp.x);
+	Intersection.LeftUp.y = (RectangleA.LeftUp.y > RectangleB.LeftUp.y ? RectangleA.LeftUp.y : RectangleB.LeftUp.y);
+	Intersection.RightDown.x = (RectangleA.RightDown.x < RectangleB.RightDown.x ? RectangleA.RightDown.x : RectangleB.RightDown.x);
+	Intersection.RightDown.y = (RectangleA.RightDown.y < RectangleB.RightDown.y ? RectangleA.RightDown.y : RectangleB.RightDown.y);
+
+	return true;
+}
+
+bool ZERectangle::BoundingTest(const ZERectangle& Rectangle, const ZEPoint2& Point)
+{
+	if ((Point.x >= Rectangle.LeftUp.x && Point.x <= Rectangle.RightDown.x) && 
+		(Point.y >= Rectangle.LeftUp.y && Point.y <= Rectangle.RightDown.y))
+		return true;
+	else
+		return false;
 }
 
 ZERectangle::ZERectangle()

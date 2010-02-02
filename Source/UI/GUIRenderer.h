@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - GUIRenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,41 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#ifndef	__ZE_GUIRENDERER_H__
+#define __ZE_GUIRENDERER_H__
 
-#include "ResourceFile.h"
+#include "ZEMath/ZEMath.h"
+#include "ZEDS/ZEDS.h"
+#include "Graphics/TextureResource.h"
+#include "Graphics/Vertex.h"
 
-class ZEResourceManager;
-class ZEResource
+struct ZEGUIRenderList
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
-
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
-
-								ZEResource();
-		virtual					~ZEResource();
-
-	public:
-		virtual const char*		GetResourceType() const = 0;
-
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
-
-		const char*				GetFileName() const;
-
-		void					AddReferance();
-
-		size_t					GetReferanceCount() const;
-
-		void					Release();
+	ZETextureResource*				Texture;
+	ZEArray<ZEGUIVertex>			Vertices;
 };
+
+struct ZEGUIImage
+{
+	ZERectangle						PositionRectangle;
+	ZERectangle						TexcoordRectangle;
+	ZETextureResource*				Texture;
+};
+
+class ZEGUIRenderer
+{
+	private:
+		ZEArray<ZEGUIRenderList>	Images;
+	public:
+		void						DrawImage(const ZEGUIImage* Image);
+		void						Clear();
+		void						Render();
+};
+
 #endif

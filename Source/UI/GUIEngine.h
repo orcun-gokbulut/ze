@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - GUIEngine.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,43 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#ifndef _GUI_ENGINE
+#define _GUI_ENGINE
 
-#include "ResourceFile.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <cmath>
+#include <gl/glut.h>
+#include <iostream>
+#include "ZELinkedList.h"
+#include "ZEGUIComponent.h"
+#include "ZEGUIWindow.h"
+#include "ZEGUIConstantDefinitions.h"
 
-class ZEResourceManager;
-class ZEResource
+using namespace std;
+
+class ZEGUIWindow;
+class ZEGUIComponent;
+
+class ZEGUIEngine
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
+private:
+	//bool buttonStates[131];
+	float mousePositionX,mousePositionY;
+	int ScreenSizeX,ScreenSizeY;
+	ZEGUIWindow *MainWindow;
 
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
+public:
+	ZEGUIEngine();
+	~ZEGUIEngine();
+	void Draw();
 
-								ZEResource();
-		virtual					~ZEResource();
+	ZEGUIWindow *GetMainWindow();
+	void SetMainWindow(ZEGUIWindow *Main);
 
-	public:
-		virtual const char*		GetResourceType() const = 0;
+	void AdjustSreenSize(int,int);
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
-
-		const char*				GetFileName() const;
-
-		void					AddReferance();
-
-		size_t					GetReferanceCount() const;
-
-		void					Release();
+	void InputEventHandler(unsigned int EventType,float Data0,float Data1);
 };
+
 #endif

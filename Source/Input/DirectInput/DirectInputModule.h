@@ -46,6 +46,7 @@ class ZEDirectInputModule : public ZEInputModule
 		bool						Enabled;
 
 	protected:
+									ZEDirectInputModule();
         virtual						~ZEDirectInputModule();
 
 	public:

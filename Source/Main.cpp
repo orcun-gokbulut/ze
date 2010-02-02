@@ -60,10 +60,10 @@
 
 extern HINSTANCE ApplicationInstance;
 
+#include "ZEDS/String.h"
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-	// Bismillahirahmanirahim
-
 	_set_SSE2_enable(1);
 	ApplicationInstance = hInstance;
 	zeCore->GetOptions()->Load("options.ini");
@@ -90,13 +90,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
 
-		ZEModelBrush* Model = (ZEModelBrush*)zeCore->GetGame()->CreateEntityInstance("ZEModelBrush");
+		/*ZEModelBrush* Model = (ZEModelBrush*)zeCore->GetGame()->CreateEntityInstance("ZEModelBrush");
 		Scene->AddEntity(Model);
 		Model->SetModelFile("test model.zemodel");
 		Model->GetModel()->SetAnimationSpeed(1 /24.0f);
 		Model->GetModel()->PlayAnimationByIndex(0);
 
-		Model->SetPosition(ZEVector3(0.0f, -20.0f, 0.0f));
+		Model->SetPosition(ZEVector3(0.0f, -20.0f, 0.0f));*/
+
 		Scene->AddEntity(Player);
 		Scene->SetActiveCamera(Player->GetCamera());
 
@@ -122,7 +123,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 		CanvasBrush->Canvas.LoadCanvasFile("Test\\test.zeCanvas");
 		CanvasBrush->UpdateCanvas();
-
 		ZEFixedMaterial* CanvasMaterial = ZEFixedMaterial::CreateInstance();
 		
 		CanvasBrush->Material = CanvasMaterial;
@@ -150,19 +150,19 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		PropertyAnimation->Interpolate = false; 
 		PropertyAnimation->PropertyId = CanvasMaterial->GetPropertyId("AmbientColor");
 		ZEPropertyAnimationKey Keys[] =	{
-											{1.0f,		ZEVector3(0.1, 0.1, 1.1)},
-											{2.1f,		ZEVector3(2.1, 1.1, 2.1)},
-											{3.2f,		ZEVector3(1.5, 1.5, 0.5)},
-											{4.21f,		ZEVector3(0.1, 0.1, 1.1)},
-											{5.1f,		ZEVector3(1.5, 0.5, 0.5)},
-											{6.15f,		ZEVector3(0.1, 0.1, 1.1)},
-											{7.1f,		ZEVector3(2.1, 2.1, 2.1)},
-											{8.15f,		ZEVector3(0.5, 1.5, 0.5)},
-											{9.2f,		ZEVector3(2.1, 2.1, 2.1)},
-											{10.21f,	ZEVector3(1.1, 0.1, 0.1)}
+											{1.0f,		ZEVector3(0.1f, 0.1f, 1.1f)},
+											{2.1f,		ZEVector3(2.1f, 1.1f, 2.1f)},
+											{3.2f,		ZEVector3(1.5f, 1.5f, 0.5f)},
+											{4.21f,		ZEVector3(0.1f, 0.1f, 1.1f)},
+											{5.1f,		ZEVector3(1.5f, 0.5f, 0.5f)},
+											{6.15f,		ZEVector3(0.1f, 0.1f, 1.1f)},
+											{7.1f,		ZEVector3(2.1f, 2.1f, 2.1f)},
+											{8.15f,		ZEVector3(0.5f, 1.5f, 0.5f)},
+											{9.2f,		ZEVector3(2.1f, 2.1f, 2.1f)},
+											{10.21f,	ZEVector3(1.1f, 0.1f, 0.1f)}
 										};
 		PropertyAnimation->Keys.MassAdd(Keys, 10);
-
+		
 		PropertyAnimation = Animation.PropertyAnimations.Add();
 		PropertyAnimation->ValueType = ZE_VRT_FLOAT;
 		PropertyAnimation->Interpolate = true; 

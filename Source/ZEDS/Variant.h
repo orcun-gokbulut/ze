@@ -39,6 +39,7 @@
 
 #pragma warning(push)
 #pragma warning(disable:4482)
+
 #include "ZEMath/Matrix.h"
 #include "ZEMath/Vector.h"
 #include "ZEMath/Quaternion.h"

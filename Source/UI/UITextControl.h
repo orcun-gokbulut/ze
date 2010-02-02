@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - UITextControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,41 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#ifndef __ZE_UI_TEXT_CONTROL__
+#define __ZE_UI_TEXT_CONTROL__
 
-#include "ResourceFile.h"
+#include "UIControl.h"
+#include "ZEDS/String.h"
+#include "ZEMath/Vector.h"
 
-class ZEResourceManager;
-class ZEResource
+class ZEUIRenderer;
+class ZEFontResource;
+class ZEUITextControl : public ZEUIControl
 {
-	friend class ZEResourceManager;
 	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
-
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
-
-								ZEResource();
-		virtual					~ZEResource();
+		ZEString						Text;
+		ZEFontResource*					FontResource;
+		ZEVector2						FontSize;
+		bool							TextWrap;
 
 	public:
-		virtual const char*		GetResourceType() const = 0;
+		void							SetText(const ZEString& String);
+		const ZEString&					GetText();
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
+		void							SetFont(ZEFontResource* FontResource);
+		ZEFontResource*					GetFont();
 
-		const char*				GetFileName() const;
+		void							SetFontSize(const ZEVector2& FontSize);
+		const ZEVector2&				GetFontSize();
 
-		void					AddReferance();
+		void							SetTextWrap(bool Wrap);
+		bool							GetTextWrap();
 
-		size_t					GetReferanceCount() const;
+		virtual void					Draw(ZEUIRenderer* Renderer);
 
-		void					Release();
+										ZEUITextControl();
+										~ZEUITextControl();
 };
+
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - GUIButton.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,76 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#include "ZEGUIButton.h"
 
-#include "ResourceFile.h"
-
-class ZEResourceManager;
-class ZEResource
+ZEGUIButton::ZEGUIButton()
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
+	ClickState = 0;
+	InClickAction = NULL;
+}
 
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
+ZEGUIButton::~ZEGUIButton()
+{}
 
-								ZEResource();
-		virtual					~ZEResource();
+void ZEGUIButton::SetClickActionLink(void (*linkedFunction)(ZEGUIComponent *))
+{
+	InClickAction = linkedFunction;
+}
 
-	public:
-		virtual const char*		GetResourceType() const = 0;
+void ZEGUIButton::Draw()
+{
+	if (ClickState != 1) glColor4f(1,1,0,0);
+	else glColor4f(0.5,0.5,0,0);
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
+	glBegin(GL_POLYGON);
+	glVertex2d(Positions[0],Positions[2]);
+	glVertex2d(Positions[1],Positions[2]);
+	glVertex2d(Positions[1],Positions[3]);
+	glVertex2d(Positions[0],Positions[3]);
+	glEnd();
 
-		const char*				GetFileName() const;
+	if (HoverState == 1)glColor4f(0,1,1,0);
+	else glColor4f(0,0.5,0.5,0);
 
-		void					AddReferance();
+	glBegin(GL_LINE_LOOP);
+	glVertex2d(Positions[0],Positions[2]);
+	glVertex2d(Positions[1],Positions[2]);
+	glVertex2d(Positions[1],Positions[3]);
+	glVertex2d(Positions[0],Positions[3]);
+	glEnd();
+}
 
-		size_t					GetReferanceCount() const;
+bool ZEGUIButton::MouseActionEvent(unsigned char ActionType)
+{
+	//if (buttonName == GUI_MOUSE_LEFT_BUTTON)
+	//{
+	//	if (actionType == GUI_BUTTON_PRESSED)
+	//	{
+	//		clickState = 1;
+	//		return 1;
+	//	}
 
-		void					Release();
-};
-#endif
+	//	clickState = 0;
+	//	
+	//	//parent->repositionEvent(0.01,0);
+	//	return 1;
+	//}
+	switch (ActionType)
+	{
+	case ZE_GUI_MOUSE_LEFT_DOWN:
+		ClickState = 1;
+	case ZE_GUI_MOUSE_RIGHT_DOWN:
+	case ZE_GUI_MOUSE_MIDDLE_DOWN:
+		FocusState = 1;
+		return 1;
+	case ZE_GUI_MOUSE_LEFT_UP:
+		if (ClickState == 1 ) 
+		{
+			ClickState = 0;
+			if (InClickAction != NULL) InClickAction(this);
+		}
+	default:
+		return 0;
+
+	}
+}

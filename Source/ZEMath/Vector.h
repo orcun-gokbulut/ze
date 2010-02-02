@@ -100,8 +100,8 @@ class ZEVector2
 		ZEVector2&					operator *=(float s);
 
 
-		bool						operator ==(ZEVector2 &RightOperand)const;
-		bool						operator !=(ZEVector2 &RightOperand)const;
+		bool						operator ==(const ZEVector2 &RightOperand) const;
+		bool						operator !=(const ZEVector2 &RightOperand) const;
 
 									ZEVector2(float x, float y);
 									ZEVector2(const ZEVector2 &Start, const ZEVector2 &End);

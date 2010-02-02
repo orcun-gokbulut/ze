@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - UIRectangle.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,41 +34,24 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#ifndef __ZE_UI_RECTANGLE_H__
+#define __ZE_UI_RECTANGLE_H__
 
-#include "ResourceFile.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Rectangle.h"
 
-class ZEResourceManager;
-class ZEResource
+struct ZEUIVertex;
+class ZEMaterial;
+class ZEUIRectangle
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
-
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
-
-								ZEResource();
-		virtual					~ZEResource();
-
 	public:
-		virtual const char*		GetResourceType() const = 0;
+		ZERectangle			Positions;
+		ZERectangle			Texcoords;
+		ZEMaterial*			Material;
+		ZEVector4			Color;
+		float				ZOrder;
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
-
-		const char*				GetFileName() const;
-
-		void					AddReferance();
-
-		size_t					GetReferanceCount() const;
-
-		void					Release();
+		static bool			Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, const ZERectangle& ClipRectangle);
+		void				ConvertToVertices(ZEUIVertex* Buffer) const;
 };
 #endif

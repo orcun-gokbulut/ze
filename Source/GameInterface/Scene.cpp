@@ -41,7 +41,7 @@
 #include "Graphics/Camera.h"
 #include "Graphics/Light.h"
 #include "Core/Error.h"
-#include "Game.h";
+#include "Game.h"
 #include "Serialization.h"
 #include "ZEMath/Ray.h"
 #include <memory.h>
@@ -393,8 +393,6 @@ void ZEScene::Render(float ElapsedTime)
 
 	Renderer->SetCamera(ActiveCamera);
 	CullScene(Renderer, ActiveCamera->GetViewVolume(), true);
-	Renderer->Render(ElapsedTime);
-	Renderer->ClearList();
 /*
 
 	PostProcessor->ApplyGrayscale(ZE_PPS_INPUT, ZE_PPD_INTERNAL);

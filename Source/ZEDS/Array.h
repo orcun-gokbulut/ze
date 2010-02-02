@@ -390,6 +390,16 @@ class ZEArray
 			Count = 0;
 		}
 
+		inline void Sort(int (*CompareFunction)(Type*, Type*))
+		{
+			qsort(Buffer, Count, sizeof(Type), CompareFunction);
+		}
+
+		inline void BinarySearch(const Type& Element, int (*CompareFunction)(Type*, Type*))
+		{
+			bsearch(&Element, Buffer, Count, sizeof(Type), CompareFunction);
+		}
+
 		inline const Type& GetItem(size_t Index) const
 		{
 			ZEDS_ASSERT(Index < 0 || Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");

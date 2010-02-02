@@ -99,7 +99,7 @@ struct ZESkinnedModelVertex
 		static ZEVertexDeclaration*		GetVertexDeclaration();
 };
 
-struct ZEGUIVertex
+struct ZEUIVertex
 {
 	private:
 		static ZEVertexDeclaration*		VertexDeclaration;
@@ -107,6 +107,7 @@ struct ZEGUIVertex
 	public:
 		ZEVector2						Position;
 		ZEVector2						Texcoord;
+		ZEVector4						Color;
 
 		static ZEVertexDeclaration*		GetVertexDeclaration();
 };

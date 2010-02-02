@@ -625,7 +625,7 @@ void ZEMatrix4x4::CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, fl
 			0.0f, 0.0f, -NearZ * FarZ / (FarZ - NearZ), 0.0f);
 }
 
-void ZEMatrix4x4::CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ)
+void ZEMatrix4x4::CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Top, float Bottom, float NearZ, float FarZ)
 {
 	Create(Matrix,
 			2.0f/(Right - Left), 0.0f, 0.0f, 0.0f, 

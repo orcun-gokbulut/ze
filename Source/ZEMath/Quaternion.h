@@ -37,9 +37,9 @@
 #ifndef	__ZE_MATH_QUATERNION_H__
 #define __ZE_MATH_QUATERNION_H__
 
-#include "definitions.h"
-#include "vector.h"
-#include "matrix.h"
+#include "Definitions.h"
+#include "Vector.h"
+#include "Matrix.h"
 
 #define MapQuaternion(A, B)	(A).x = (B).x; (A).y = (B).y; (A).z = (B).z; (A).w = (B).w 
 #define MapQuarternionToWXYZ(Q, _w, _x, _y, _z) (Q).w = (_w); (Q).x = (_x); (Q).y = (_y); (Q).z = (_z)

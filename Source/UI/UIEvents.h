@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - UIEvents.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,41 +34,43 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#ifndef __ZE_UI_EVENTS_H__
+#define __ZE_UI_EVENTS_H__
 
-#include "ResourceFile.h"
+#include "ZEMath/Vector.h"
+#include <fastdelegate.h>
 
-class ZEResourceManager;
-class ZEResource
+enum ZEUIMouseKey
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
-
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
-
-								ZEResource();
-		virtual					~ZEResource();
-
-	public:
-		virtual const char*		GetResourceType() const = 0;
-
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
-
-		const char*				GetFileName() const;
-
-		void					AddReferance();
-
-		size_t					GetReferanceCount() const;
-
-		void					Release();
+	ZE_UI_MOUSE_BUTTON_NONE	= 0,
+	ZE_UI_MOUSE_BUTTON_LEFT	= 1,
+	ZE_UI_MOUSE_BUTTON_RIGHT	= 2,
+	ZE_UI_MOUSE_BUTTON_MIDDLE	= 3,
 };
+
+// Mouse Events
+typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseClicked;
+typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseDoubleClicked;
+typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseButtonPressed;
+typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseButtonReleased;
+typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseEntered;
+typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseLeft;
+typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseMoved;
+
+// Keyboard Events
+typedef fastdelegate::FastDelegate1<char, void>								ZEUIEventKeyPressed;
+typedef fastdelegate::FastDelegate1<char, void>								ZEUIEventKeyReleased;
+
+// Component Event
+typedef fastdelegate::FastDelegate0<void>									ZEUIEventDestroyed;
+typedef fastdelegate::FastDelegate0<void>									ZEUIEventCreated;
+typedef fastdelegate::FastDelegate0<void>									ZEUIEventFocusLost;
+typedef fastdelegate::FastDelegate0<void>									ZEUIEventFocusGained;
+
+// Windows
+typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventWindowMoved;
+typedef fastdelegate::FastDelegate2<const ZEVector2&, void>					ZEUIEventWindowResized;
+typedef fastdelegate::FastDelegate1<bool, void>								ZEUIEventWindowClosed;
+typedef fastdelegate::FastDelegate0<void>									ZEUIEventWindowMinimized;
+
 #endif

@@ -21,7 +21,6 @@ Global
 		{4C4A8154-F42B-4D85-908D-87AC163D7057}.Debug|Win32.ActiveCfg = Debug|Win32
 		{4C4A8154-F42B-4D85-908D-87AC163D7057}.Debug|Win32.Build.0 = Debug|Win32
 		{4C4A8154-F42B-4D85-908D-87AC163D7057}.Release|Win32.ActiveCfg = Release|Win32
-		{4C4A8154-F42B-4D85-908D-87AC163D7057}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

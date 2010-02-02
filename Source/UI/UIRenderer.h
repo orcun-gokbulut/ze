@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - UIRenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,41 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#ifndef __ZE_UI_RENDERER_H__
+#define __ZE_UI_RENDERER_H__
 
-#include "ResourceFile.h"
+#include "UIRectangle.h"
+#include "ZEDS/Array.h"
+#include "ZEMath/Matrix.h"
+#include "Graphics/Renderer.h"
 
-class ZEResourceManager;
-class ZEResource
+class ZEVertexDeclaration;
+class ZEUIRenderer
 {
-	friend class ZEResourceManager;
 	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
+		ZESmartArray<ZERenderOrder>		RenderOrders;
+		ZEMaterial*						DefaultMaterial;
+		ZEVertexDeclaration*			VertexDeclaration;
+		ZEMatrix4x4						ScreenTransform;
 
 	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
-
-								ZEResource();
-		virtual					~ZEResource();
+										ZEUIRenderer();
+										~ZEUIRenderer();
 
 	public:
-		virtual const char*		GetResourceType() const = 0;
+		void							Initialize();
+		void							Deinitialize();
+		
+		void							Destroy();
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
+		void							AddRectangle(const ZEUIRectangle& Rectangle);
+		void							Render(ZERenderer* Renderer);
+		void							Clean();
 
-		const char*				GetFileName() const;
-
-		void					AddReferance();
-
-		size_t					GetReferanceCount() const;
-
-		void					Release();
+		static ZEUIRenderer*			CreateInstance();
 };
+
 #endif

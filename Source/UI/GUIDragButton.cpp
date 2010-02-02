@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - GUIDragButton.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,72 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#include "ZEGUIDragButton.h"
 
-#include "ResourceFile.h"
+ZEGUIDragButton::ZEGUIDragButton()
+{}
 
-class ZEResourceManager;
-class ZEResource
+ZEGUIDragButton::~ZEGUIDragButton()
+{}
+
+void ZEGUIDragButton::SetDragActionLink(void (*LinkedFunction)(ZEGUIComponent *,float,float))
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
+	InDragAction = LinkedFunction;
+}
 
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
+bool ZEGUIDragButton::MouseActionEvent(unsigned char ActionType)
+{
+	//if (actionType == GUI_BUTTON_PRESSED)
+	//{
+	//	clickState = 1;
+	//}
+	//else 
+	//{
+	//	clickState = 0;
+	//}
 
-								ZEResource();
-		virtual					~ZEResource();
+	//return 1;
 
-	public:
-		virtual const char*		GetResourceType() const = 0;
+	if (ZEGUIComponent::MouseActionEvent(ActionType))
+	{
+		ClickState = 1;
+		return 1;
+	}
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
+	ClickState = 0;
+	return 1;
+}
 
-		const char*				GetFileName() const;
+bool ZEGUIDragButton::MouseMotionEvent(float Mx,float My)
+{
+	if (ClickState == 1)
+	{
+		//Parent->SetPositions(Mx - OldX,Mx - OldX, My - OldY,My - OldY);
+		if (InDragAction != NULL) InDragAction(this,Mx - OldX,My - OldY);
+		OldX = Mx;
+		OldY = My;
 
-		void					AddReferance();
+		return 1;
+	}
+	else
+	{
+		OldX = Mx;
+		OldY = My;
 
-		size_t					GetReferanceCount() const;
+		if (!ZEGUIComponent::MouseMotionEvent(Mx,My)) return 0;
+		return 1;
+	}
+}
 
-		void					Release();
-};
-#endif
+void ZEGUIDragButton::Draw()
+{
+	if (ClickState == 1)glColor4f(1,0,1,0);
+	else glColor4f(0.5,0,0.5,0);
+
+	glBegin(GL_LINE_LOOP);
+	glVertex2d(Positions[0],Positions[2]);
+	glVertex2d(Positions[1],Positions[2]);
+	glVertex2d(Positions[1],Positions[3]);
+	glVertex2d(Positions[0],Positions[3]);
+	glEnd();
+}

@@ -89,7 +89,6 @@ class ZEScene
 		ZEPortalMap								Environment;
 		ZESmartArray<ZEEntity*>					Entities;
 	
-		ZERenderer*								Renderer;
 		ZEPostProcessor*						PostProcessor;
 		ZEShadowRenderer*						ShadowRenderer;
 		ZECamera*								ActiveCamera;
@@ -111,6 +110,8 @@ class ZEScene
 		void									DrawBoundingSphere(const ZEBoundingSphere& BoundingSphere, ZERenderer* Renderer, ZEMaterial* Material);
 
 	public:
+		ZERenderer*								Renderer;
+
 		void									SetVisualDebugElements(ZEDWORD VisualDebugElements);
 		ZEDWORD									GetVisualDebugElements();
 

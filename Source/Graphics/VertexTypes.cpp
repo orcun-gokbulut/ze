@@ -35,6 +35,7 @@
 
 #include "VertexTypes.h"
 #include "VertexDeclaration.h"
+#include "Core/Error.h"
 
 ZEVertexDeclaration* ZESimpleVertex::VertexDeclaration;
 ZEVertexDeclaration* ZESimpleVertex::GetVertexDeclaration()
@@ -57,6 +58,8 @@ ZEVertexDeclaration* ZESimpleVertex::GetVertexDeclaration()
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
 	}
+
+	ZEASSERT(VertexDeclaration->GetVertexSize() != sizeof(ZESimpleVertex), "Vertex decleration size does not matches.");
 
 	return VertexDeclaration;
 }
@@ -84,6 +87,8 @@ ZEVertexDeclaration* ZEMapVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
+	ZEASSERT(VertexDeclaration->GetVertexSize() != sizeof(ZEMapVertex), "Vertex decleration size does not matches.");
+
 	return VertexDeclaration;
 }
 
@@ -109,6 +114,8 @@ ZEVertexDeclaration* ZEModelVertex::GetVertexDeclaration()
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
 	}
+
+	ZEASSERT(VertexDeclaration->GetVertexSize() != sizeof(ZEModelVertex), "Vertex decleration size does not matches.");
 
 	return VertexDeclaration;
 }
@@ -138,11 +145,13 @@ ZEVertexDeclaration* ZESkinnedModelVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
+	ZEASSERT(VertexDeclaration->GetVertexSize() != sizeof(ZESkinnedModelVertex), "Vertex decleration size does not matches.");
+
 	return VertexDeclaration;
 }
 
-ZEVertexDeclaration* ZEGUIVertex::VertexDeclaration = NULL;
-ZEVertexDeclaration* ZEGUIVertex::GetVertexDeclaration()
+ZEVertexDeclaration* ZEUIVertex::VertexDeclaration = NULL;
+ZEVertexDeclaration* ZEUIVertex::GetVertexDeclaration()
 {
 	if (VertexDeclaration != NULL)
 		return VertexDeclaration;
@@ -152,6 +161,7 @@ ZEVertexDeclaration* ZEGUIVertex::GetVertexDeclaration()
 	ZEVertexElement ElementArray[] = {
 										{ZE_VES_POSITION, ZE_VET_FLOAT2, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
+										{ZE_VES_COLOR, ZE_VET_FLOAT4, 0},
 										{ZE_VES_END, ZE_VET_END, 0}
 									};
 
@@ -161,5 +171,6 @@ ZEVertexDeclaration* ZEGUIVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
+	ZEASSERT(VertexDeclaration->GetVertexSize() != sizeof(ZEUIVertex), "Vertex decleration size does not matches.");
 	return VertexDeclaration;
 }

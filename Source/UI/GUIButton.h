@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - GUIButton.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#ifndef __GUI_BUTTON__
+#define __GUI_BUTTON__
 
-#include "ResourceFile.h"
+#include "ZELinkedList.h"
+#include "ZEGUIConstantDefinitions.h"
+#include "ZEGUIComponent.h"
+#include "ZEGUIEngine.h"
+#include "ZEGUIWindow.h"
 
-class ZEResourceManager;
-class ZEResource
+class ZEGUIButton : virtual public ZEGUIComponent
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
+protected:
+	//metadata
 
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
+	//states
+	bool ClickState;
 
-								ZEResource();
-		virtual					~ZEResource();
+	void (*InClickAction)(ZEGUIComponent *);
+public:
+	ZEGUIButton();
+	~ZEGUIButton();
+	void SetClickActionLink(void (*LinkedFunction)(ZEGUIComponent *));
 
-	public:
-		virtual const char*		GetResourceType() const = 0;
-
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
-
-		const char*				GetFileName() const;
-
-		void					AddReferance();
-
-		size_t					GetReferanceCount() const;
-
-		void					Release();
+	virtual bool MouseActionEvent(unsigned char ActionType);
+	virtual void Draw();
 };
+
 #endif

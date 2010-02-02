@@ -102,8 +102,8 @@
 		Extension\
 	private:
 
-class ZEPropertyDescription;
-class ZEMethodDescription;
+struct ZEPropertyDescription;
+struct ZEMethodDescription;
 class ZEClassProvider;
 class ZEClass;
 class ZEAnimationController;

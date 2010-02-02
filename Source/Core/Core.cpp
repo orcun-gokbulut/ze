@@ -439,6 +439,7 @@ void ZECore::MainLoop()
 		Game->Tick(TimeDifference);
 		Game->Render(TimeDifference);
 	}
+
 	Input->ProcessInputs();
 	Window->ProcessMessages();
 	Sleep(0);

@@ -52,9 +52,20 @@ void ZEResource::SetFileName(const char* Value)
 	strcpy_s(FileName, ZE_MAX_FILE_NAME_SIZE, Value);
 }
 
+void ZEResource::AddReferance()
+{
+	ZEASSERT("Resource", "You can't add referance count to a non shared resource.");
+	if (Shared)
+		ReferenceCount++;
+}
+
+
 size_t ZEResource::GetReferanceCount() const
 {
-	return this->ReferenceCount;
+	if (Shared)
+		return this->ReferenceCount;
+	else
+		return 0;
 }
 
 bool ZEResource::IsShared() const
@@ -75,15 +86,16 @@ bool ZEResource::IsInternal() const
 void ZEResource::Release()
 {
 	ReferenceCount--;
-	if (Shared)
-		if (ReferenceCount <= 0 && !Cached)
+
+	ZEASSERT("Resource", "Referance count is lower than 0. (Resource Name : \"%s\")", GetFileName());
+
+	if(ReferenceCount == 0)
+		if (!Cached)
 		{
-			zeResources->ReleaseResource(this);
+			if (Shared)
+				zeResources->RemoveResource(this);
 			delete this;
 		}
-	else
-		if (!Cached)
-			delete this;
 }
 
 ZEResource::ZEResource()

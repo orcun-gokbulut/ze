@@ -179,12 +179,12 @@ ZEVector2& ZEVector2::operator *=(float s)
 	return *this;
 }
 
-bool ZEVector2::operator ==(ZEVector2 &RightOperand) const
+bool ZEVector2::operator ==(const ZEVector2 &RightOperand) const
 {
 	return (this->x == RightOperand.x) && (this->y == RightOperand.y);
 }
 
-bool ZEVector2::operator !=(ZEVector2 &RightOperand) const
+bool ZEVector2::operator !=(const ZEVector2 &RightOperand) const
 {
 	return (this->x != RightOperand.x) || (this->y != RightOperand.y);
 

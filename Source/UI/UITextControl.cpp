@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - UITextControl.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#include "UITextControl.h"
+#include "FontResource.h"
 
-#include "ResourceFile.h"
-
-class ZEResourceManager;
-class ZEResource
+void ZEUITextControl::SetText(const ZEString& Test)
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
+	this->Text = Text;
+}
 
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
+const ZEString& ZEUITextControl::GetText()
+{
+	return Text;
+}
 
-								ZEResource();
-		virtual					~ZEResource();
+void ZEUITextControl::SetFont(ZEFontResource* FontResource)
+{
+	this->FontResource = FontResource;
+	FontResource->AddReferance();
+}
 
-	public:
-		virtual const char*		GetResourceType() const = 0;
+ZEFontResource* ZEUITextControl::GetFont()
+{
+	return FontResource;
+}
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
+void ZEUITextControl::SetFontSize(const ZEVector2& FontSize)
+{
+	this->FontSize = FontSize;
+}
 
-		const char*				GetFileName() const;
+const ZEVector2& ZEUITextControl::GetFontSize()
+{
+	return FontSize;
+}
 
-		void					AddReferance();
+void ZEUITextControl::SetTextWrap(bool Enabled)
+{
+	TextWrap = Enabled;
+}
 
-		size_t					GetReferanceCount() const;
+bool ZEUITextControl::GetTextWrap()
+{
+	return TextWrap;
+}
 
-		void					Release();
-};
-#endif
+void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
+{
+}
+
+ZEUITextControl::ZEUITextControl()
+{
+	FontResource = NULL;
+}
+
+ZEUITextControl::~ZEUITextControl()
+{
+	if (FontResource != NULL)
+		FontResource->Release();
+}
+

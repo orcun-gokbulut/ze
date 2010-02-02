@@ -42,25 +42,44 @@
 
 enum ZERectangleCorner
 {
-	ZERECTANGLECORNER_LEFTDOWN		= 0,
-	ZERECTANGLECORNER_LEFTUP		= 1,
-	ZERECTANGLECORNER_RIGHTDOWN		= 2,
-	ZERECTANGLECORNER_RIGHTUP		= 3
+	ZE_RC_LEFTDOWN		= 0,
+	ZE_RC_LEFTUP		= 1,
+	ZE_RC_RIGHTDOWN		= 2,
+	ZE_RC_RIGHTUP		= 3
+};
+
+enum ZERectangleIntersectionResult
+{
+	ZE_RIC_NO_INTERSECTION = 0,
+	ZE_RIC_A_COVERS_B      = 1,
+	ZE_RIC_B_COVERS_A      = 2,
+	ZE_RIC_INTERSECTS	   = 3,
 };
 
 class ZERectangle
 {
 	public:
-		ZEPoint2				LeftUp, RightDown;
+		ZEPoint2								LeftUp, RightDown;
 
-		bool					BoundingTest(const ZEPoint2& Point) const;
-		ZEPoint2				GetCorner(ZERectangleCorner Corner) const;
+		bool									IsEmpty();
 
-		float					GetWidth() const;
-		float					GetHeight() const;
+		void									SetPosition(const ZEVector2& Position);
+		const ZEVector2&						GetPosition() const;
 
-								ZERectangle();
-								ZERectangle(const ZEPoint2& LeftUp, const ZEPoint2& RightDown);
-								ZERectangle(const ZEPoint2& LeftUp, float Width, float Height);
+		void									SetWidth(float Width);
+		float									GetWidth() const;
+	
+		void									SetHeight(float Height);
+		float									GetHeight() const;
+
+		ZEPoint2								GetCorner(ZERectangleCorner Corner) const;
+
+		static bool								IntersectionTest(const ZERectangle& RectangleA, const ZERectangle& RectangleB);
+		static bool								Intersection(ZERectangle& Intersection, const ZERectangle& RectangleA, const ZERectangle& RectangleB);
+		static bool								BoundingTest(const ZERectangle& Rectangle, const ZEPoint2& Point);
+
+												ZERectangle();
+												ZERectangle(const ZEPoint2& LeftUp, const ZEPoint2& RightDown);
+												ZERectangle(const ZEPoint2& LeftUp, float Width, float Height);
 };
 #endif

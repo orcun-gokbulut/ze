@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - GUIEngine.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,81 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_RESOURCE_H__
-#define __ZE_RESOURCE_H__
+#include "ZEGUIEngine.h"
 
-#include "ResourceFile.h"
+//-------------------------------------------------------------------------
+//-------------------------ZEGUIEngine functions-----------------------------
+//-------------------------------------------------------------------------
 
-class ZEResourceManager;
-class ZEResource
+ZEGUIEngine::ZEGUIEngine()
 {
-	friend class ZEResourceManager;
-	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
 
-	protected:
-		void					SetFileName(const char* Value);
-		bool					Cached;
-		bool					Shared;
-		bool					Internal;
-		size_t					ReferenceCount;
+}
 
-								ZEResource();
-		virtual					~ZEResource();
+ZEGUIEngine::~ZEGUIEngine()
+{
+}
 
-	public:
-		virtual const char*		GetResourceType() const = 0;
+void ZEGUIEngine::AdjustSreenSize(int x,int y)
+{
+	ScreenSizeX = x;
+	ScreenSizeY = y;
+	glLineWidth(2);
+}
 
-		bool					IsShared() const;
-		bool					IsCached() const;
-		bool					IsInternal() const;
+void ZEGUIEngine::Draw()
+{
+	glDisable(GL_LIGHTING);
+	glDisable(GL_DEPTH_TEST);
 
-		const char*				GetFileName() const;
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
 
-		void					AddReferance();
+	glLoadIdentity();
+	glOrtho(0,1,0,1,-5,5);
 
-		size_t					GetReferanceCount() const;
+	glMatrixMode(GL_MODELVIEW);
 
-		void					Release();
-};
-#endif
+	glLoadIdentity();
+	MainWindow->Draw();
+	
+	glMatrixMode(GL_PROJECTION);
+
+	glPopMatrix();
+	glMatrixMode(GL_MODELVIEW);
+
+	glEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+}
+
+ZEGUIWindow *ZEGUIEngine::GetMainWindow()
+{
+	return MainWindow;
+}
+
+void ZEGUIEngine::SetMainWindow(ZEGUIWindow *main)
+{
+	MainWindow = main;
+	MainWindow->SetParent(NULL,this);
+}
+
+void ZEGUIEngine::InputEventHandler(unsigned int eventType,float data0,float data1)
+{
+	if (eventType == ZE_GUI_MOUSE_MOTION)
+	{
+		data0 = data0 / ScreenSizeX;
+		data1 = (ScreenSizeY - data1) / ScreenSizeY;
+
+		MainWindow->MouseMotionEvent(data0,data1);
+			
+	}
+	else if (eventType == ZE_GUI_MOUSE_ACTION)
+	{
+		data0 = data0 * 3 + !data1;
+		MainWindow->MouseActionEvent(data0);
+	}
+	else
+	{
+		MainWindow->KeyboardEvent(data0,data1);
+	}
+}

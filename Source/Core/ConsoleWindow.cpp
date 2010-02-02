@@ -147,7 +147,7 @@ bool ZEConsoleWindow::Initialize()
 
 	ShowWindow((HWND)Handle, SW_HIDE);
 
-	for (int I = 0; I < zeConsole->OutputHistory.GetCount(); I++)
+	for (size_t I = 0; I < zeConsole->OutputHistory.GetCount(); I++)
 		Output(zeConsole->OutputHistory[I]);
 
 	return true;
