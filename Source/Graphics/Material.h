@@ -71,6 +71,7 @@ class ZEMaterial : public ZEClass
 
 		// SetUp
 		virtual void					SetZero() = 0;
+
 		// Render calls
 		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const = 0;
 

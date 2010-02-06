@@ -34,11 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "UITextControl.h"
+#include "UIRenderer.h"
 #include "FontResource.h"
+#include "Graphics/Texture2D.h"
 
-void ZEUITextControl::SetText(const ZEString& Test)
+void ZEUITextControl::SetText(const ZEString& Value)
 {
-	this->Text = Text;
+	this->Text = Value;
 }
 
 const ZEString& ZEUITextControl::GetText()
@@ -67,6 +69,16 @@ const ZEVector2& ZEUITextControl::GetFontSize()
 	return FontSize;
 }
 
+void ZEUITextControl::SetTextColor(const ZEVector4& Color)
+{
+	TextColor = Color;
+}
+
+const ZEVector4& ZEUITextControl::GetTextColor()
+{
+	return TextColor;
+}
+
 void ZEUITextControl::SetTextWrap(bool Enabled)
 {
 	TextWrap = Enabled;
@@ -79,11 +91,68 @@ bool ZEUITextControl::GetTextWrap()
 
 void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 {
+	if (FontResource == NULL)
+		return;
+
+	const char* Narrow = (const char*)Text;
+	size_t Size = Text.GetLength();
+
+	const ZERectangle& ControlRectangle = GetVisibleRectangle();
+	float ZOrder = GetZOrder();
+
+	ZEUIRectangle Temporary, Output;
+	Temporary.Material = NULL;
+	Temporary.Color = TextColor;
+
+	ZEVector2 NextPosition = ZEVector2::Zero;
+	ZEVector2 CharacterSize;
+
+	Output.ZOrder = ZOrder;
+	for (size_t I = 0; I < Size; I++)
+	{
+		const ZEFontCharacter& CurrCharacter = FontResource->GetCharacter(Narrow[I]);
+
+
+		ZEVector2::Substution(CharacterSize, CurrCharacter.CoordinateRectangle.RightDown, CurrCharacter.CoordinateRectangle.LeftUp);
+		ZEVector2::Multiply(CharacterSize, CharacterSize, FontSize);
+		ZEVector2::Multiply(CharacterSize, CharacterSize, ZEVector2(CurrCharacter.Texture->GetWidth(), CurrCharacter.Texture->GetHeight()));
+
+		ZEVector2::Add(Temporary.Positions.LeftUp, ControlRectangle.LeftUp, NextPosition);
+		ZEVector2::Add(Temporary.Positions.RightDown, Temporary.Positions.LeftUp, CharacterSize);
+
+		Temporary.Texcoords = CurrCharacter.CoordinateRectangle;
+
+
+		NextPosition.x += CharacterSize.x;
+		if (NextPosition.x > ControlRectangle.RightDown.x)
+			if (TextWrap)
+			{
+				NextPosition.y += CharacterSize.y;
+
+				if (NextPosition.y > ControlRectangle.RightDown.y)
+					return;
+
+				NextPosition.x = ControlRectangle.LeftUp.x;
+			}
+			else
+				return;	
+
+		if (!ZEUIRectangle::Clip(Output, Temporary, ControlRectangle))
+		{
+			Output.Material = CurrCharacter.Material;
+			Output.ZOrder = ZOrder;
+			Renderer->AddRectangle(Output);
+		}
+
+	}
 }
 
 ZEUITextControl::ZEUITextControl()
 {
 	FontResource = NULL;
+	FontSize = ZEVector2(1.0f, 1.0f);
+	TextColor = ZEVector4(1.0f, 1.0f, 1.0f, 1.0f);
+	TextWrap = false;
 }
 
 ZEUITextControl::~ZEUITextControl()

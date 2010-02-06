@@ -52,7 +52,7 @@ enum ZEGameType
 
 class ZERenderer;
 class ZEControl;
-
+class ZEUIManager;
 class ZEGame;
 class ZEGameDescription
 {
@@ -64,13 +64,9 @@ class ZEGameDescription
 		virtual ZEGame*							CreateGameInstance() = 0;
 };
 
-#include "UI/UIControl.h"
-
 class ZEGame
 {
 	protected:
-		ZEUIRenderer*							UIRenderer;
-		ZEUIControl								UITestControl;
 		ZEScene*								Scene;
 		ZEArray<ZEEntityDescription*>			EntityDescriptions;
 
@@ -78,6 +74,8 @@ class ZEGame
 		void									UnregisterEntityDescription(ZEEntityDescription* EntityDescription);
 
 	public:
+		ZEUIManager*							UIManager;
+
 		virtual ZEGameDescription*				GetGameDescription();
 
 		virtual ZEScene*						GetScene();

@@ -45,9 +45,12 @@
 
 class ZETexture2D;
 class ZETexture2DResource;
+class ZEUIMaterial;
+class ZEMaterial;
 
 struct ZEFontCharacter
 {
+	const ZEMaterial*		Material;
 	const ZETexture2D*		Texture;
 	ZERectangle				CoordinateRectangle;
 };
@@ -56,7 +59,9 @@ class ZEFontResource : public ZEResource
 {
 	private:
 		ZEArray<ZETexture2DResource*>		TextureResources;
+		ZEArray<ZEUIMaterial*>				Materials;
 		ZEFontCharacter						Characters[ZE_FONT_CHARACTER_COUNT];
+
 	protected:
 											ZEFontResource();
 		virtual 							~ZEFontResource();

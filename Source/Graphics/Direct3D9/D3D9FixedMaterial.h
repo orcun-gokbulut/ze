@@ -91,7 +91,7 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 		virtual void					EndOfPasses() const;
 
 		virtual void					UpdateMaterial();
+
 		virtual void					Release();
-		virtual void					Destroy();
 };
 #endif

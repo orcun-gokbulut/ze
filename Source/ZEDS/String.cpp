@@ -124,6 +124,83 @@ void ZEString::SetValue(const char* String)
 	#endif
 }
 
+void ZEString::SetNumbericValue(char Value, unsigned int Base)
+{
+	wchar_t Buffer[10];
+	_itow(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetNumbericValue(unsigned char Value, unsigned int Base)
+{
+	wchar_t Buffer[10];
+	_ultow(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetNumbericValue(short Value, unsigned int Base)
+{
+	wchar_t Buffer[35];
+	_ultow(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetNumbericValue(unsigned short Value, unsigned int Base)
+{
+	wchar_t Buffer[35];
+	_ultow(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetNumbericValue(int Value, unsigned int Base)
+{
+	wchar_t Buffer[35];
+	_itow(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetNumbericValue(unsigned int Value, unsigned int Base)
+{
+	wchar_t Buffer[35];
+	_ultow(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetNumbericValue(long Value, unsigned int Base)
+{
+	wchar_t Buffer[35];
+	_ltow(Value, Buffer, Base);
+	SetValue(Buffer);
+}
+
+void ZEString::SetNumbericValue(unsigned long Value, unsigned int Base)
+{
+	wchar_t Buffer[35];
+	_ultow(Value, Buffer, Base);
+	SetValue(Buffer);
+
+}
+
+void ZEString::SetNumbericValue(float Value, unsigned int NumberOfDigits)
+{
+	char Buffer[_CVTBUFSIZE];
+	gcvt(Value, NumberOfDigits, Buffer);
+	SetValue(Buffer);
+}
+
+void ZEString::SetNumbericValue(double Value, unsigned int NumberOfDigits)
+{
+	char Buffer[_CVTBUFSIZE];
+	gcvt(Value, NumberOfDigits, Buffer);
+	SetValue(Buffer);
+}
+
+void ZEString::SetBooleanValue(bool Value)
+{
+	SetValue(Value ? L"true" : L"false");
+}
+
+
 const wchar_t* ZEString::GetValue() const
 {
 	if (Buffer == NULL)
@@ -570,6 +647,11 @@ ZEString ZEString::ToUpper() const
 
 }
 
+unsigned int ZEString::ToUnsignedInteger()
+{
+	return _wtoi(Buffer);
+}
+
 int ZEString::ToInteger()
 {
 	return _wtoi(Buffer);
@@ -580,6 +662,11 @@ float ZEString::ToFloat()
 	return _wtof(Buffer);
 }
 
+double ZEString::ToDouble()
+{
+	wchar_t* Temp;
+	return wcstod(Buffer, &Temp);
+}
 
 ZEString& ZEString::operator=(const ZEString& String)
 {

@@ -47,7 +47,7 @@ class ZEUIRectangle
 	public:
 		ZERectangle			Positions;
 		ZERectangle			Texcoords;
-		ZEMaterial*			Material;
+		const ZEMaterial*	Material;
 		ZEVector4			Color;
 		float				ZOrder;
 

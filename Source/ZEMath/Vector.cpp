@@ -62,13 +62,13 @@ inline void ZEVector2::Add(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &
 inline void ZEVector2::Substution(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
 {
 	Out.x = A.x - B.x;
-	Out.x = A.y - B.y;
+	Out.y = A.y - B.y;
 }
 
 void ZEVector2::Multiply(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
 {
 	Out.x = A.x * B.x;
-	Out.x = A.y * B.y;
+	Out.y = A.y * B.y;
 }
 
 inline float ZEVector2::DotProduction(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
@@ -79,7 +79,7 @@ inline float ZEVector2::DotProduction(ZEVector2 &Out, const ZEVector2 &A, const 
 void ZEVector2::Scale(ZEVector2 &Out, const ZEVector2 &A, float s)
 {
 	Out.x = A.x * s;
-	Out.y = A.x * s;
+	Out.y = A.y * s;
 }
 
 float ZEVector2::Length(const ZEVector2 &A)

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UITextControl.h
+ Zinek Engine - D3D9UIMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,44 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_UI_TEXT_CONTROL__
-#define __ZE_UI_TEXT_CONTROL__
+#include "Graphics/UIMaterial.h"
 
-#include "UIControl.h"
-#include "ZEDS/String.h"
-#include "ZEMath/Vector.h"
-
-class ZEUIRenderer;
-class ZEFontResource;
-class ZEUITextControl : public ZEUIControl
+class ZED3D9UIMaterial : public ZEUIMaterial
 {
-	private:
-		ZEString						Text;
-		ZEVector4						TextColor;
-		bool							TextWrap;
-		ZEFontResource*					FontResource;
-		ZEVector2						FontSize;
-
 	public:
-		void							SetText(const ZEString& Value);
-		const ZEString&					GetText();
+		virtual const char*				GetMaterialUID() const;
+		virtual unsigned int			GetMaterialFlags() const;
+		virtual ZEMaterialType			GetMaterialType() const;
 
-		void							SetTextColor(const ZEVector4& Color);
-		const ZEVector4&				GetTextColor();
+		const char*						ConvertToString(unsigned int MaterialComponent);
 
-		void							SetTextWrap(bool Wrap);
-		bool							GetTextWrap();
+		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const;
 
-		void							SetFont(ZEFontResource* FontResource);
-		ZEFontResource*					GetFont();
+		virtual bool					SetupPreLightning() const;
+		virtual size_t					DoPreLightningPass() const;
 
-		void							SetFontSize(const ZEVector2& FontSize);
-		const ZEVector2&				GetFontSize();
+		virtual bool					SetupLightning() const;
+		virtual bool					SetupPointLightPass(bool Shadowed) const;
+		virtual size_t					DoPointLightPass(const ZERLLight** Lights, size_t Count) const;
 
-		virtual void					Draw(ZEUIRenderer* Renderer);
+		virtual bool					SetupDirectionalLightPass(bool Shadowed) const;
+		virtual size_t					DoDirectionalLightPass(const ZERLLight** Lights, size_t Count) const;
 
-										ZEUITextControl();
-										~ZEUITextControl();
+		virtual bool					SetupProjectiveLightPass(bool Shadowed) const;
+		virtual size_t					DoProjectiveLightPass(const ZERLLight** Lights, size_t Count) const;
+
+		virtual bool					SetupOmniProjectiveLightPass(bool Shadowed) const;
+		virtual size_t					DoOmniProjectivePass(const ZERLLight** Lights, size_t Count) const;
+
+		virtual bool					SetupCustomPass(unsigned int CustomPassId) const;
+		virtual bool					DoCustomPass(unsigned int CustomPassId, void* CustomData) const;
+
+		virtual bool					SetupShadowPass() const;	
+		virtual size_t					DoShadowPass() const;
+
+		virtual void					EndOfPasses() const;
+
+		virtual void					UpdateMaterial();
+		virtual void					Release();
+		virtual void					Destroy();
 };
-
-#endif

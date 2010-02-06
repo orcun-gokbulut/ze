@@ -147,7 +147,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Animation.FramePerSecond = 1.0f;
 		strcpy(Animation.Name, "Orcun");
 		PropertyAnimation->ValueType = ZE_VRT_VECTOR3;
-		PropertyAnimation->Interpolate = false; 
+		PropertyAnimation->Interpolate = true; 
 		PropertyAnimation->PropertyId = CanvasMaterial->GetPropertyId("AmbientColor");
 		ZEPropertyAnimationKey Keys[] =	{
 											{1.0f,		ZEVector3(0.1f, 0.1f, 1.1f)},

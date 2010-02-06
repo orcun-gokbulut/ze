@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UITextControl.h
+ Zinek Engine - UIMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_UI_TEXT_CONTROL__
-#define __ZE_UI_TEXT_CONTROL__
+#include "Graphics/GraphicsModule.h"
+#include "UIMaterial.h"
+#include "Texture2D.h"
 
-#include "UIControl.h"
-#include "ZEDS/String.h"
-#include "ZEMath/Vector.h"
-
-class ZEUIRenderer;
-class ZEFontResource;
-class ZEUITextControl : public ZEUIControl
+ZEUIMaterial::ZEUIMaterial()
 {
-	private:
-		ZEString						Text;
-		ZEVector4						TextColor;
-		bool							TextWrap;
-		ZEFontResource*					FontResource;
-		ZEVector2						FontSize;
+	Texture = NULL;
+}
 
-	public:
-		void							SetText(const ZEString& Value);
-		const ZEString&					GetText();
+ZEUIMaterial::~ZEUIMaterial()
+{
+	
+}
 
-		void							SetTextColor(const ZEVector4& Color);
-		const ZEVector4&				GetTextColor();
+void ZEUIMaterial::SetZero()
+{
+	WireFrame = false;
+	WireSize = 0.0f;
+}
 
-		void							SetTextWrap(bool Wrap);
-		bool							GetTextWrap();
+void ZEUIMaterial::SetWireFrame(bool Enabled)
+{
+	WireFrame = Enabled;
+}
 
-		void							SetFont(ZEFontResource* FontResource);
-		ZEFontResource*					GetFont();
+bool ZEUIMaterial::GetWireFrame() const
+{
+	return WireFrame;
+}
 
-		void							SetFontSize(const ZEVector2& FontSize);
-		const ZEVector2&				GetFontSize();
+void ZEUIMaterial::SetWireSize(float Size)
+{
+	WireSize = Size;
+}
 
-		virtual void					Draw(ZEUIRenderer* Renderer);
+float ZEUIMaterial::GetWireSize() const
+{
+	return WireSize;
+}
 
-										ZEUITextControl();
-										~ZEUITextControl();
-};
+void ZEUIMaterial::SetTexture(const ZETexture2D* Texture)
+{
+	this->Texture = Texture;
+}
 
-#endif
+const ZETexture2D* ZEUIMaterial::GetTexture() const
+{
+	return Texture;
+}
+
+ZEUIMaterial* ZEUIMaterial::CreateInstance()
+{
+	return zeGraphics->CreateUIMaterial();
+}

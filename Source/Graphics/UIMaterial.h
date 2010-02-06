@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UITextControl.h
+ Zinek Engine - UIMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,44 +34,37 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_TEXT_CONTROL__
-#define __ZE_UI_TEXT_CONTROL__
+#ifndef __ZE_UI_MATERIAL_H__ 
+#define __ZE_UI_MATERIAL_H__
 
-#include "UIControl.h"
-#include "ZEDS/String.h"
-#include "ZEMath/Vector.h"
+#include "Material.h"
 
-class ZEUIRenderer;
-class ZEFontResource;
-class ZEUITextControl : public ZEUIControl
+class ZETexture2D;
+
+class ZEUIMaterial : public ZEMaterial
 {
-	private:
-		ZEString						Text;
-		ZEVector4						TextColor;
-		bool							TextWrap;
-		ZEFontResource*					FontResource;
-		ZEVector2						FontSize;
+	friend class ZED3D9Module;
+	protected:
+		const ZETexture2D*		Texture;
+		bool					WireFrame;
+		float					WireSize;
+
+								ZEUIMaterial();
+		virtual					~ZEUIMaterial();
 
 	public:
-		void							SetText(const ZEString& Value);
-		const ZEString&					GetText();
+		void					SetZero();
 
-		void							SetTextColor(const ZEVector4& Color);
-		const ZEVector4&				GetTextColor();
+		void					SetWireFrame(bool Enabled);
+		bool					GetWireFrame() const;
 
-		void							SetTextWrap(bool Wrap);
-		bool							GetTextWrap();
+		void					SetWireSize(float Size);
+		float					GetWireSize() const;
 
-		void							SetFont(ZEFontResource* FontResource);
-		ZEFontResource*					GetFont();
+		void					SetTexture(const ZETexture2D* Texture);
+		const ZETexture2D*		GetTexture() const;
 
-		void							SetFontSize(const ZEVector2& FontSize);
-		const ZEVector2&				GetFontSize();
-
-		virtual void					Draw(ZEUIRenderer* Renderer);
-
-										ZEUITextControl();
-										~ZEUITextControl();
+		static ZEUIMaterial*	CreateInstance();
 };
 
 #endif

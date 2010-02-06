@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_FIXEDMATERIAL_H__ 
-#define __ZE_FIXEDMATERIAL_H__
+#ifndef __ZE_FIXED_MATERIAL_H__ 
+#define __ZE_FIXED_MATERIAL_H__
 
 #include "Material.h"
 #include "ZEMath/Vector.h"

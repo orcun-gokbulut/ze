@@ -56,16 +56,11 @@ void ZEUIRectangle::ConvertToVertices(ZEUIVertex* Buffer) const
 
 bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, const ZERectangle& ClipRectangle)
 {
-	bool Test1 = Rectangle.Positions.LeftUp.x > ClipRectangle.RightDown.x;
-	bool Test2 = Rectangle.Positions.RightDown.x < ClipRectangle.LeftUp.x;
-    bool Test3 = Rectangle.Positions.LeftUp.y > ClipRectangle.RightDown.y;
-    bool Test4 = Rectangle.Positions.RightDown.y <ClipRectangle.LeftUp.y;
-
-	if (!Test1 && !Test2 && !Test3 && !Test4)
-		return false;
-	else if (Test1 && Test2 && Test3 && Test4)
+	if ((Rectangle.Positions.RightDown.x < ClipRectangle.LeftUp.x) ||
+		(Rectangle.Positions.LeftUp.x > ClipRectangle.RightDown.x) ||
+		(Rectangle.Positions.RightDown.y < ClipRectangle.LeftUp.y) ||
+		(Rectangle.Positions.LeftUp.y > ClipRectangle.RightDown.y))
 	{
-		Output = Rectangle;
 		return true;
 	}
 	else
@@ -77,14 +72,14 @@ bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, 
 		{
 			Output.Positions.LeftUp.x = ClipRectangle.LeftUp.x;
 			Output.Texcoords.LeftUp.x = Rectangle.Texcoords.LeftUp.x +
-									   ((ClipRectangle.LeftUp.x - Rectangle.Positions.LeftUp.x) / 
-									   (Rectangle.Positions.RightDown.x - Rectangle.Positions.LeftUp.x)) * 
-									   (Rectangle.Texcoords.RightDown.x - Rectangle.Texcoords.LeftUp.x);
+										((ClipRectangle.LeftUp.x - Rectangle.Positions.LeftUp.x) * 
+										(Rectangle.Texcoords.RightDown.x - Rectangle.Texcoords.LeftUp.x)) /
+										(Rectangle.Positions.RightDown.x - Rectangle.Positions.LeftUp.x);
 		}
 		else
 		{
 			Output.Positions.LeftUp.x = Rectangle.Positions.LeftUp.x;
-			Output.Texcoords.LeftUp.x = Rectangle.Positions.LeftUp.x;
+			Output.Texcoords.LeftUp.x = Rectangle.Texcoords.LeftUp.x;
 		}
 
 
@@ -92,46 +87,46 @@ bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, 
 		{
 			Output.Positions.LeftUp.y = ClipRectangle.LeftUp.y;
 			Output.Texcoords.LeftUp.y = Rectangle.Texcoords.LeftUp.y + 
-									   ((ClipRectangle.LeftUp.y - Rectangle.Positions.LeftUp.y) / 
-									   (Rectangle.Positions.RightDown.y - Rectangle.Positions.LeftUp.y)) * 
-									   (Rectangle.Texcoords.RightDown.y - Rectangle.Texcoords.LeftUp.y);
+										((ClipRectangle.LeftUp.y - Rectangle.Positions.LeftUp.y) * 
+										(Rectangle.Texcoords.RightDown.y - Rectangle.Texcoords.LeftUp.y)) /
+										(Rectangle.Positions.RightDown.y - Rectangle.Positions.LeftUp.y);
 		}
 		else
 		{
 			Output.Positions.LeftUp.y = Rectangle.Positions.LeftUp.y;
-			Output.Texcoords.LeftUp.y = Rectangle.Positions.LeftUp.y;
+			Output.Texcoords.LeftUp.y = Rectangle.Texcoords.LeftUp.y;
 		}
 
 
-		if (ClipRectangle.RightDown.x < Rectangle.Positions.LeftUp.x)
+		if (ClipRectangle.RightDown.x < Rectangle.Positions.RightDown.x)
 		{
 			Output.Positions.RightDown.x = ClipRectangle.RightDown.x;
-			Output.Texcoords.RightDown.x = Rectangle.Texcoords.RightDown.x - 
-										  ((ClipRectangle.RightDown.x - Rectangle.Positions.RightDown.x) / 
-										  (Rectangle.Positions.RightDown.x - Rectangle.Positions.LeftUp.x)) * 
-										  (Rectangle.Texcoords.RightDown.x - Rectangle.Texcoords.LeftUp.x);
+			Output.Texcoords.RightDown.x = Rectangle.Texcoords.LeftUp.x + 
+											((ClipRectangle.RightDown.x - Rectangle.Positions.LeftUp.x) * 
+											(Rectangle.Texcoords.RightDown.x - Rectangle.Texcoords.LeftUp.x)) /
+											(Rectangle.Positions.RightDown.x - Rectangle.Positions.LeftUp.x);
 		}
 		else
 		{
 			Output.Positions.RightDown.x = Rectangle.Positions.RightDown.x;
-			Output.Texcoords.RightDown.x = Rectangle.Positions.RightDown.x;
+			Output.Texcoords.RightDown.x = Rectangle.Texcoords.RightDown.x;
 		}
 
 
-		if (ClipRectangle.RightDown.y < Rectangle.Positions.LeftUp.y)
+		if (ClipRectangle.RightDown.y < Rectangle.Positions.RightDown.y)
 		{
 			Output.Positions.RightDown.y = ClipRectangle.RightDown.y;
-			Output.Texcoords.RightDown.y = Rectangle.Texcoords.RightDown.y - 
-										  ((ClipRectangle.RightDown.y - Rectangle.Positions.RightDown.y) / 
-										  (Rectangle.Positions.RightDown.y - Rectangle.Positions.LeftUp.y)) * 
-										  (Rectangle.Texcoords.RightDown.y - Rectangle.Texcoords.LeftUp.y);
+			Output.Texcoords.RightDown.y = Rectangle.Texcoords.LeftUp.y +
+											((ClipRectangle.RightDown.y - Rectangle.Positions.LeftUp.y) * 
+											(Rectangle.Texcoords.RightDown.y - Rectangle.Texcoords.LeftUp.y)) / 
+											(Rectangle.Positions.RightDown.y - Rectangle.Positions.LeftUp.y);
 		}
 		else
 		{
 			Output.Positions.RightDown.y = Rectangle.Positions.RightDown.y;
-			Output.Texcoords.RightDown.y = Rectangle.Positions.RightDown.y;
+			Output.Texcoords.RightDown.y = Rectangle.Texcoords.RightDown.y;
 		}
 		
-		return true;
+		return false;
 	}
 }

@@ -68,6 +68,7 @@ void ZEUIRenderer::Initialize()
 	}
 
 	ZEMatrix4x4::CreateViewPortTransform(ScreenTransform, 0.0f, zeGraphics->GetScreenWidth(), 0.0f, zeGraphics->GetScreenHeight(), 0.0f, 1.0f);
+	
 }
 
 void ZEUIRenderer::Deinitialize()

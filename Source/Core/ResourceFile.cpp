@@ -163,7 +163,7 @@ bool ZEResourceFile::ReadTextFile(const char* FileName, char* Buffer, size_t Buf
 		return false;
 
 	fread(Buffer, sizeof(char), FileSize, File);
-	Buffer[FileSize + 1] = '\0';
+	Buffer[FileSize] = '\0';
 
 	fclose(File);
 	return true;

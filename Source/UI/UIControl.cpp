@@ -223,6 +223,26 @@ void ZEUIControl::GainFocus()
 	// IMPLAMENT !!!!!
 }
 
+void ZEUIControl::SetBackgroundColor(const ZEVector4& Color)
+{
+	BackgroundColor = Color;
+}
+
+const ZEVector4& ZEUIControl::GetBackgroundColor()
+{
+	return BackgroundColor;
+}
+
+void ZEUIControl::SetBackgroundType(ZEUIBackgroundType Type)
+{
+	BackgroundType = Type;
+}
+
+ZEUIBackgroundType ZEUIControl::GetBackgroundType()
+{
+	return BackgroundType;
+}
+
 void ZEUIControl::SetMouseClickedEvent(const ZEUIEventMouseClicked& Event)
 {
 	MouseClickedEvent = Event;
@@ -283,29 +303,31 @@ void ZEUIControl::Draw(ZEUIRenderer* Renderer)
 	if (!IsVisible())
 		return;
 
-	if (ParentControl != NULL)
-	{
-		ZEUIRectangle UIRectangle, Output;
-		UIRectangle.Positions = Rectangle;
-		UIRectangle.Texcoords = ZERectangle(ZEVector2(0.0f, 0.0f), ZEVector2(1.0f, 1.0f));
-
-		if (ZEUIRectangle::Clip(Output, UIRectangle, ParentControl->GetVisibleRectangle()))
+	if (BackgroundType == ZE_UI_BT_SOLID)
+		if (ParentControl != NULL)
 		{
+			ZEUIRectangle UIRectangle, Output;
+			UIRectangle.Positions = Rectangle;
+			UIRectangle.Texcoords = ZERectangle(ZEVector2(0.0f, 0.0f), ZEVector2(1.0f, 1.0f));
+
+			if (ZEUIRectangle::Clip(Output, UIRectangle, ParentControl->GetVisibleRectangle()))
+			{
+				Output.Material = NULL;
+				Output.ZOrder = ZOrder;
+				Output.Color = BackgroundColor;
+				Renderer->AddRectangle(Output);
+			}
+		}
+		else
+		{
+			ZEUIRectangle Output;
 			Output.Material = NULL;
+			Output.Positions = Rectangle;
+			Output.Texcoords = ZERectangle(ZEVector2(0.0f, 0.0f), ZEVector2(1.0f, 1.0f));
 			Output.ZOrder = ZOrder;
-			Output.Color = ZEVector4(1.0f, 1.0f, 1.0f, 1.0f);
+			Output.Color = BackgroundColor;
 			Renderer->AddRectangle(Output);
 		}
-	}
-	else
-	{
-		ZEUIRectangle Output;
-		Output.Material = NULL;
-		Output.Positions = Rectangle;
-		Output.Texcoords = ZERectangle(ZEVector2(0.0f, 0.0f), ZEVector2(1.0f, 1.0f));
-		Output.ZOrder = ZOrder;
-		Renderer->AddRectangle(Output);
-	}
 
 	// Draw Self
 	for (size_t I = 0; I < ChildControls.GetCount(); I++)
@@ -316,6 +338,9 @@ void ZEUIControl::Draw(ZEUIRenderer* Renderer)
 ZEUIControl::ZEUIControl()
 {
 	ParentControl = NULL;
+	BackgroundType = ZE_UI_BT_SOLID;
+	BackgroundColor = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
+	BackgroundTexture = NULL;
 	HoverState = false;
 	FocusState = false;
 }

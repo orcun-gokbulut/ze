@@ -43,6 +43,31 @@
 #include "Core/Module.h"
 #include "InputMap.h"
 
+
+struct ZEInputMouseState
+{
+	int						MousePositionX;
+	int						MousePositionY;
+	
+	bool					Click;
+	bool					DoubleClick;
+
+	ZEInputButtonState		LeftButtonDown;
+	ZEInputButtonState		RightButtonDown;
+	ZEInputButtonState		MiddleButtonDown;
+	ZEInputButtonState		CtrlDown;
+	ZEInputButtonState		ShiftDown;
+};
+
+struct ZEInputKeyState
+{
+	char					Character;
+
+	int						VirtualKey;
+	int						RepeatCount;
+	int						ScanCode;
+};
+
 class ZEInputModule : public ZEModule 
 {	
 	public:
@@ -53,7 +78,7 @@ class ZEInputModule : public ZEModule
 		virtual void				ProcessInputMap(ZEInputMap* InputMap) = 0;
 
 		virtual bool				GetRawInputEvent(ZEInputEvent& InputEvent) = 0;
-
+		
 		virtual void				Acquire() = 0;
 		virtual void				UnAcquire() = 0;
 

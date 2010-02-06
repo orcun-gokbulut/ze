@@ -218,6 +218,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Graphics\DirectionalLight.cpp"
 				>
 			</File>
@@ -232,6 +236,15 @@
 			<File
 				RelativePath=".\Source\Graphics\FixedMaterial.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\Graphics\FrameBufferRenderer.cpp"
@@ -420,6 +433,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Graphics\UIMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\UIMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Graphics\VertexBuffer.cpp"
 				>
 			</File>
@@ -555,6 +576,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9VertexBuffer.cpp"
 					>
 				</File>
@@ -629,6 +658,18 @@
 						RelativePath=".\RunDir\resources\shaders\SkyBox.vs"
 						>
 					</File>
+					<File
+						RelativePath=".\RunDir\resources\shaders\UISolidPixelShader.ps"
+						>
+					</File>
+					<File
+						RelativePath=".\RunDir\resources\shaders\UITexturedPixelShader.ps"
+						>
+					</File>
+					<File
+						RelativePath=".\RunDir\resources\shaders\UIVertexShader.vs"
+						>
+					</File>
 				</Filter>
 				<Filter
 					Name="PostProcessor"
@@ -657,6 +698,10 @@
 						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PPScreenOutputNode.h"
 						>
 					</File>
+				</Filter>
+				<Filter
+					Name="FixedMaterial"
+					>
 				</Filter>
 			</Filter>
 			<Filter
@@ -750,10 +795,6 @@
 					RelativePath=".\Source\Graphics\PostProcessor\PPVelocityInputNode.h"
 					>
 				</File>
-			</Filter>
-			<Filter
-				Name="FixedMaterial"
-				>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1294,6 +1335,14 @@
 			</File>
 			<File
 				RelativePath=".\Source\UI\UIEvents.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\UI\UIManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\UI\UIManager.h"
 				>
 			</File>
 			<File

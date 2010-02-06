@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UITextControl.h
+ Zinek Engine - UIManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,92 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_UI_TEXT_CONTROL__
-#define __ZE_UI_TEXT_CONTROL__
-
+#include "UIManager.h"
+#include "UIRenderer.h"
 #include "UIControl.h"
-#include "ZEDS/String.h"
-#include "ZEMath/Vector.h"
+#include "Core/Error.h"
 
-class ZEUIRenderer;
-class ZEFontResource;
-class ZEUITextControl : public ZEUIControl
+ZEUIManager::ZEUIManager() 
 {
-	private:
-		ZEString						Text;
-		ZEVector4						TextColor;
-		bool							TextWrap;
-		ZEFontResource*					FontResource;
-		ZEVector2						FontSize;
+	UIRenderer = NULL;
+}
 
-	public:
-		void							SetText(const ZEString& Value);
-		const ZEString&					GetText();
+ZEUIManager::~ZEUIManager() 
+{
+	if (UIRenderer != NULL)
+		UIRenderer->Destroy();
+}
 
-		void							SetTextColor(const ZEVector4& Color);
-		const ZEVector4&				GetTextColor();
+void ZEUIManager::AddControl(ZEUIControl* Control)
+{
+	ZEASSERT(Controls.FindIndex(Control) != -1, "UI Control already added to ZEUIManager. (Control Name : %s)", Control->GetName());
 
-		void							SetTextWrap(bool Wrap);
-		bool							GetTextWrap();
+	Controls.Add(Control);
+}
 
-		void							SetFont(ZEFontResource* FontResource);
-		ZEFontResource*					GetFont();
+void ZEUIManager::RemoveControl(ZEUIControl* Control)
+{
+	Controls.DeleteValue(Control);
+}
 
-		void							SetFontSize(const ZEVector2& FontSize);
-		const ZEVector2&				GetFontSize();
+ZEArray<ZEUIControl*>& ZEUIManager::GetControls()
+{
+	return Controls;
+}
 
-		virtual void					Draw(ZEUIRenderer* Renderer);
+#include "UITextControl.h"
+#include "FontResource.h"
 
-										ZEUITextControl();
-										~ZEUITextControl();
-};
+bool ZEUIManager::Initialize()
+{
+	if (UIRenderer == NULL)
+		UIRenderer = ZEUIRenderer::CreateInstance();
 
-#endif
+	UIRenderer->Initialize();
+
+
+	// Test Routines
+
+	ZEUITextControl* TestControl = new ZEUITextControl();
+
+	TestControl->SetPosition(ZEVector2(20, 20));
+	TestControl->SetSize(ZEVector2(200.0f, 50.0f));
+	TestControl->SetBackgroundColor(ZEVector4(1.0f, 0.0f, 0.0f, 1.0f));
+	TestControl->SetTextColor(ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
+	TestControl->SetText("Kan kokuyorum ulan !");
+	TestControl->SetFontSize(ZEVector2(1.0f, 1.0f));
+	TestControl->SetFont(ZEFontResource::LoadResource("test.zeFont"));
+
+	AddControl(TestControl);
+
+	return true;
+}
+
+void ZEUIManager::Deinitialize()
+{
+	UIRenderer->Destroy();
+	UIRenderer = NULL;
+}
+
+void ZEUIManager::ProcessEvents()
+{
+}
+
+void ZEUIManager::Render(ZERenderer* Renderer)
+{
+	UIRenderer->Clean();
+	for (size_t I = 0; I < Controls.GetCount(); I++)
+		Controls[I]->Draw(UIRenderer);
+
+	UIRenderer->Render(Renderer);
+}
+
+void ZEUIManager::Destroy()
+{
+	delete this;
+}
+
+ZEUIManager* ZEUIManager::CreateInstance()
+{
+	return new ZEUIManager();
+}

@@ -51,7 +51,14 @@ enum ZEUIControlVisibility
 	ZE_IUCV_FULLY_VISIBLE	= 2,
 };
 
+enum ZEUIBackgroundType
+{
+	ZE_UI_BT_NONE			= 1,
+	ZE_UI_BT_SOLID			= 0,
+};
+
 class ZEUIRenderer;
+class ZETexture2D;
 class ZEUIControl
 {
 	private:
@@ -63,13 +70,16 @@ class ZEUIControl
 		ZERectangle						Rectangle;
 		ZERectangle						VisibleRectangle;
 	
+		ZEVector4						BackgroundColor;
+		ZETexture2D*					BackgroundTexture;
+		ZEUIBackgroundType				BackgroundType;
+
 		bool							HoverState;
 		bool							FocusState;
 
 		bool							Visibility;
 		bool							Enabled;
 		int								ZOrder;
-		
 		bool							DirtyVisibleRectangle;
 
 
@@ -140,6 +150,12 @@ class ZEUIControl
 
 		virtual void					SetVisiblity(bool Visible);
 		bool							GetVisibilty();
+
+		void							SetBackgroundColor(const ZEVector4& Color);
+		const ZEVector4&				GetBackgroundColor();
+
+		void							SetBackgroundType(ZEUIBackgroundType Type);
+		ZEUIBackgroundType				GetBackgroundType();
 
 		void 			 				SetMouseClickedEvent(const ZEUIEventMouseClicked& Event);
 		void 				 			SetMouseDoubleClickedEvent(const ZEUIEventMouseDoubleClicked& Event);

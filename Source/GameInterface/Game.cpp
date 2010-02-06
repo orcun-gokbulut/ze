@@ -36,8 +36,7 @@
 #include "Game.h"
 #include "Core/Core.h"
 #include "Core/Error.h"
-#include "UI/UIRenderer.h"
-#include "UI/UIControl.h"
+#include "UI/UIManager.h"
 
 ZEGameDescription* ZEGame::GetGameDescription()
 {
@@ -128,15 +127,15 @@ ZEEntity* ZEGame::CreateEntityInstance(const char* EntityTypeName)
 	}
 }
 
+#include "UI\FontResource.h"
+
 bool ZEGame::Initialize()
 {
-	if (UIRenderer != NULL)
-		UIRenderer = ZEUIRenderer::CreateInstance();
-	
-	UIRenderer->Initialize();
-
-	UITestControl.SetPosition(ZEVector2(100, 100));
-	UITestControl.SetSize(ZEVector2(50.0f, 100.0f));
+	if (UIManager == NULL)
+	{
+		UIManager = ZEUIManager::CreateInstance();
+		UIManager->Initialize();
+	}
 
 	if (Scene != NULL)
 	{
@@ -150,10 +149,10 @@ bool ZEGame::Initialize()
 
 bool ZEGame::Deinitialize()
 {
-	if (UIRenderer != NULL)
+	if (UIManager != NULL)
 	{
-		UIRenderer->Destroy();
-		UIRenderer = NULL;
+		UIManager->Destroy();
+		UIManager = NULL;
 	}
 
 	if (Scene != NULL)
@@ -178,16 +177,31 @@ void ZEGame::Destroy()
 
 void ZEGame::Render(float ElapsedTime)
 {
-	UIRenderer->Clean();
 	Scene->Render(ElapsedTime);
-	UITestControl.Draw(UIRenderer);
-	UIRenderer->Render(Scene->Renderer);
+	UIManager->Render(Scene->Renderer);
 	Scene->Renderer->Render(ElapsedTime);
 	Scene->Renderer->ClearList();
 }
 
+#include "ZEDS/String.h"
+#include "UI/UITextControl.h"
+
+#include <stdio.h>
 void ZEGame::Tick(float ElapsedTime)
 {
+	char Buffer[400];
+	ZEEntity* Player = Scene->GetEntities()[0];
+	const ZEVector3& Position = Player->GetPosition();
+	const ZEQuaternion& Rotation = Player->GetRotation();
+	float Yaw, Pitch, Roll;
+	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, Rotation);
+	
+	
+	sprintf(Buffer, "Position : [%f, %f, %f], Rotation : [%f, %f, %f]", 
+		Position.x, Position.y, Position.z,
+		Pitch, Yaw, Roll);
+	
+	((ZEUITextControl*)UIManager->GetControls()[0])->SetText(Buffer);
 	Scene->Tick(ElapsedTime);
 }
  
@@ -199,6 +213,7 @@ void ZEGame::Tick(float ElapsedTime)
 ZEGame::ZEGame()
 {
 	Scene = NULL;
+	UIManager = NULL;
 	RegisterEntityDescription((ZEEntityDescription*)ZEPlayer::ClassDescription());
 	RegisterEntityDescription((ZEEntityDescription*)ZELightBrush::ClassDescription());
 	RegisterEntityDescription((ZEEntityDescription*)ZEModelBrush::ClassDescription());

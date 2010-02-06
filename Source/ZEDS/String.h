@@ -102,12 +102,27 @@ class ZEString
 		wchar_t*					Buffer;
 		char*						CharBuffer;
 
+	protected:
+		void						SetSize();
+
 	public:			
 		void						SetValue(char Character);
 		void						SetValue(wchar_t Character);
 		void						SetValue(const wchar_t* String);
 		void						SetValue(const char* String);
 		const wchar_t*				GetValue() const;
+
+		void						SetNumbericValue(char Value, unsigned int Base = 10);
+		void						SetNumbericValue(unsigned char Value, unsigned int Base = 10);
+		void						SetNumbericValue(short Value, unsigned int Base = 10);
+		void						SetNumbericValue(unsigned short Value, unsigned int Base = 10);
+		void						SetNumbericValue(int Value, unsigned int Base = 10);
+		void						SetNumbericValue(unsigned int Value, unsigned int Base = 10);
+		void						SetNumbericValue(long Value, unsigned int Base = 10);
+		void						SetNumbericValue(unsigned long Value, unsigned int Base = 10);
+		void						SetNumbericValue(float Value, unsigned int NumberOfDigits = 6);
+		void						SetNumbericValue(double Value, unsigned int NumberOfDigits = 6);
+		void						SetBooleanValue(bool Value);
 
 		wchar_t						GetCharacter(size_t Position) const;
 		void						SetCharacter(size_t Position, wchar_t Value);
@@ -156,7 +171,9 @@ class ZEString
 		ZEString					ToUpper() const;
 
 		int							ToInteger();
+		unsigned int				ToUnsignedInteger();
 		float						ToFloat();
+		double						ToDouble();
 
 		ZEString&					operator=(const ZEString& String);
 		ZEString&					operator=(const wchar_t* String);
@@ -191,6 +208,14 @@ class ZEString
 									operator char();
 
 									ZEString();
+									
+	/*								ZEString(const short& Number);
+									ZEString(const int& Number);
+									ZEString(const long& Number);
+									ZEString(unsigned short& Number);
+									ZEString(unsigned int& Number);
+									ZEString(unsigned long& Number);
+									ZEString(unsigne*/
 									ZEString(const char* String);
 									ZEString(const wchar_t* String);
 									ZEString(const ZEString& String);
@@ -200,4 +225,5 @@ class ZEString
 
 
 };
+
 #endif

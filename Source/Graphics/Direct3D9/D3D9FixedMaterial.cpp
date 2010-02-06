@@ -529,8 +529,3 @@ void ZED3D9FixedMaterial::Release()
 	if (Shader != NULL)
 		Shader->Destroy();
 }
-
-void ZED3D9FixedMaterial::Destroy()
-{
-	delete this;
-}

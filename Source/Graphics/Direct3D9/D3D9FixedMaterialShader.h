@@ -69,39 +69,39 @@ class ZED3D9FixedMateriaShaderPass : public ZED3D9ComponentBase
 class ZED3D9FixedMaterialShader : public ZED3D9ComponentBase
 {	
 	private:
-		int											ShaderComponents;
-		int											ShaderInstanceIndex;
+		int										ShaderComponents;
+		int										ShaderInstanceIndex;
 		
-		static const char*							GetMaterialComponentName(unsigned ShaderComponent);
+		static const char*						GetMaterialComponentName(unsigned ShaderComponent);
 
-													ZED3D9FixedMaterialShader();
-													~ZED3D9FixedMaterialShader();
+												ZED3D9FixedMaterialShader();
+												~ZED3D9FixedMaterialShader();
 	public:
 
-		ZED3D9FixedMateriaShaderPass				PreLightPass;
-		ZED3D9FixedMateriaShaderPass				PointLightPass;
-		ZED3D9FixedMateriaShaderPass				ShadowedPointLightPass;
-		ZED3D9FixedMateriaShaderPass				DirectionalLightPass;
-		ZED3D9FixedMateriaShaderPass				ShadowedDirectionalLightPass;
-		ZED3D9FixedMateriaShaderPass				ProjectiveLightPass;
-		ZED3D9FixedMateriaShaderPass				ShadowedProjectiveLightPass;
-		ZED3D9FixedMateriaShaderPass				OmniProjectiveLightPass;
-		ZED3D9FixedMateriaShaderPass				ShadowedOmniProjectiveLightPass;
+		ZED3D9FixedMateriaShaderPass			PreLightPass;
+		ZED3D9FixedMateriaShaderPass			PointLightPass;
+		ZED3D9FixedMateriaShaderPass			ShadowedPointLightPass;
+		ZED3D9FixedMateriaShaderPass			DirectionalLightPass;
+		ZED3D9FixedMateriaShaderPass			ShadowedDirectionalLightPass;
+		ZED3D9FixedMateriaShaderPass			ProjectiveLightPass;
+		ZED3D9FixedMateriaShaderPass			ShadowedProjectiveLightPass;
+		ZED3D9FixedMateriaShaderPass			OmniProjectiveLightPass;
+		ZED3D9FixedMateriaShaderPass			ShadowedOmniProjectiveLightPass;
 
-		ZED3D9FixedMateriaShaderPass				DepthPass;
-		ZED3D9FixedMateriaShaderPass				VelocityPass;
-		ZED3D9FixedMateriaShaderPass				PointLightShadowPass;
-		ZED3D9FixedMateriaShaderPass				DirectionalLightShadowPass;
-		ZED3D9FixedMateriaShaderPass				ProjectiveLightShadowPass;
-		ZED3D9FixedMateriaShaderPass				OmniDirectionalLightShadowPass;
+		ZED3D9FixedMateriaShaderPass			DepthPass;
+		ZED3D9FixedMateriaShaderPass			VelocityPass;
+		ZED3D9FixedMateriaShaderPass			PointLightShadowPass;
+		ZED3D9FixedMateriaShaderPass			DirectionalLightShadowPass;
+		ZED3D9FixedMateriaShaderPass			ProjectiveLightShadowPass;
+		ZED3D9FixedMateriaShaderPass			OmniDirectionalLightShadowPass;
 
-		static bool									BaseInitialize();
-		static void									BaseDeinitialize();
+		static bool								BaseInitialize();
+		static void								BaseDeinitialize();
 
-		void										Release();
-		void										Destroy();
+		void									Release();
+		void									Destroy();
 
-		static ZED3D9FixedMaterialShader*			CreateInstance(unsigned int MaterialComponents);
+		static ZED3D9FixedMaterialShader*		CreateInstance(unsigned int MaterialComponents);
 };
 
 class ZEFixedMaterialShaderManager

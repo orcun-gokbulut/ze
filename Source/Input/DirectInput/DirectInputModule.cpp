@@ -41,6 +41,9 @@
 #include "Core/Core.h"
 #include <dinput.h>
 
+#define WINDOWS_MEAN_AND_LEAN
+#include <windows.h>
+
 #ifdef ZEDEBUG_ENABLED
 #define ZEKEYBOARD_COOPERATE_LEVEL		DISCL_FOREGROUND | DISCL_NONEXCLUSIVE
 #define ZEMOUSE_COOPERATE_LEVEL			DISCL_FOREGROUND | DISCL_NONEXCLUSIVE
@@ -289,8 +292,8 @@ void ZEDirectInputModule::ProcessInputs()
 		{	
 			ZeroMemory(&KeyboardState, sizeof(ZEDIKeyboardState));
 			hr = DIKeyboard->Acquire();
-			if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
-				zeError("DirectInput Module", "Could not accuire keyboard.");
+			/*if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
+				zeError("DirectInput Module", "Could not accuire keyboard.");*/
 		}
 	}
 	if (DIMouse != NULL)
@@ -300,8 +303,8 @@ void ZEDirectInputModule::ProcessInputs()
 		{
 			ZeroMemory(&MouseState, sizeof(ZEDIMouseState));
 			hr = DIKeyboard->Acquire();
-			if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
-				zeError("DirectInput Module", "Could not accuire keyboard.");
+			/*if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK && hr != S_FALSE))
+				zeError("DirectInput Module", "Could not accuire keyboard.");*/
 		}
 	}
 	if (DIJoystick != NULL)
@@ -311,9 +314,30 @@ void ZEDirectInputModule::ProcessInputs()
 		{
 			ZeroMemory(&JoystickState, sizeof(ZEDIJoystickState));
 			hr = DIKeyboard->Acquire();
-			if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
-				zeError("DirectInput Module", "Could not accuire keyboard.");
+			/*if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
+				zeError("DirectInput Module", "Could not accuire keyboard.");*/
 		}
+	}
+
+	MSG Message;
+	PeekMessage(&Message, (HWND)zeWindow->GetHandle(), 0, 0, PM_NOREMOVE);
+	switch(Message.message)
+	{
+		case WM_LBUTTONDBLCLK:
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+		case WM_RBUTTONDBLCLK:
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+		case WM_MBUTTONDBLCLK:
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+		case WM_KEYDOWN:
+		case WM_KEYUP:
+		case WM_INPUT:
+		case WM_CHAR:
+		case WM_MOUSEMOVE:
+			break;
 	}
 }
 

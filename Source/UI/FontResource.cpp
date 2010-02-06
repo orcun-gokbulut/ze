@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "FontResource.h"
+#include "Graphics/UIMaterial.h"
 #include "Graphics/Texture2DResource.h"
 #include "Core/ResourceManager.h"
 #include "Core/Error.h"
@@ -46,6 +47,9 @@ ZEFontResource::ZEFontResource()
 
 ZEFontResource::~ZEFontResource()
 {
+	for (int I = 0; I < Materials.GetCount(); I++)
+		Materials[I]->Destroy();
+
 	for (int I = 0; I < TextureResources.GetCount(); I++)
 		TextureResources[I]->Release();
 }
@@ -75,8 +79,15 @@ ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 	ZEFontResource* NewResource = new ZEFontResource();
 
 	NewResource->TextureResources.SetCount(FileHeader.TextureCount);
+	NewResource->Materials.SetCount(FileHeader.TextureCount);
 	for (size_t I = 0; I < FileHeader.TextureCount; I++)
 	{
+		ZEDWORD FileCursor, TextureFileSize;
+		
+		ResourceFile->Read(&TextureFileSize, sizeof(ZEDWORD), 1);
+		
+		FileCursor = ResourceFile->Tell();
+
 		ZETexture2DResource* CurrentTexture = ZETexture2DResource::LoadResource(ResourceFile);
 		if (CurrentTexture == NULL)
 		{
@@ -84,13 +95,21 @@ ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 			delete NewResource;
 			return NULL;
 		}
+
 		NewResource->TextureResources[I] = CurrentTexture;
+
+		NewResource->Materials[I] = ZEUIMaterial::CreateInstance();
+		NewResource->Materials[I]->SetWireFrame(false);
+		NewResource->Materials[I]->SetTexture(NewResource->TextureResources[I]->GetTexture());
+		NewResource->Materials[I]->UpdateMaterial();
+		ResourceFile->Seek(FileCursor + TextureFileSize, ZE_SF_BEGINING);
 	}
 
 	for (size_t I = 0; I < ZE_FONT_FILE_CHARACTER_COUNT; I++)
 	{
 		NewResource->Characters[I].CoordinateRectangle = FileHeader.Characters[I].Coordinates;
-		NewResource->Characters[I].Texture = NewResource->TextureResources[I]->GetTexture();
+		NewResource->Characters[I].Texture = NewResource->TextureResources[FileHeader.Characters[I].TextureId]->GetTexture();
+		NewResource->Characters[I].Material = NewResource->Materials[FileHeader.Characters[I].TextureId];
 	}
 
 	return NewResource;

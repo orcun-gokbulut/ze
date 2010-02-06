@@ -1,3 +1,4 @@
+== 20 Feburary 2010 - Revision 102 ==
 ADD: ZEUIControl added.
 ADD: ZEUIRenderer added.
 BUG: DirectInput InputMap->InputActionCount crash bug fixed.
@@ -5,3 +6,7 @@ ADD: ZEFontResource added.
 ADD: AddReferance has been added to ZEResource. It will be used on many Setter and Getters and will track shared and non shared resources.
 CHG: Now unshared resources have referance count.
 CHG: Resource release mechanism changed. Referance count added for non shared resources.
+ADD: New material type ZEUIMaterial has been added to the engine.
+ADD: ZEUIManager software component created. ZEUIManager manages UI Controls.
+ADD: ZEUIManager association added to ZEGame class.
+ADD: ZEUITextControl ,which is used for displaying bitmap characters, has been added to UI components.

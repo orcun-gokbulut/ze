@@ -65,6 +65,7 @@ class ZEResourceFile : public ZEUnserializer
 		virtual size_t		Tell();
 		virtual void		Close();
 		virtual bool		Eof();
+
 		void				GetPartialResourceFile(ZEPartialResourceFile& PartialResourceFile, size_t StartPosition, size_t EndPosition);
 		
 		static bool			ReadFile(const char* FileName, void* Buffer, size_t BufferSize);

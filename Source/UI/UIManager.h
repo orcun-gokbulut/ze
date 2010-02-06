@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UITextControl.h
+ Zinek Engine - UIManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,44 +34,36 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_TEXT_CONTROL__
-#define __ZE_UI_TEXT_CONTROL__
+#ifndef	__ZE_UI_MANAGER_H__
+#define __ZE_UI_MANAGER_H__
 
-#include "UIControl.h"
-#include "ZEDS/String.h"
-#include "ZEMath/Vector.h"
+#include "ZEDS/Array.h"
+#include "UIRenderer.h"
 
-class ZEUIRenderer;
-class ZEFontResource;
-class ZEUITextControl : public ZEUIControl
+class ZEUIControl;
+class ZEUIManager
 {
 	private:
-		ZEString						Text;
-		ZEVector4						TextColor;
-		bool							TextWrap;
-		ZEFontResource*					FontResource;
-		ZEVector2						FontSize;
+		ZEArray<ZEUIControl*>		Controls;
+		ZEUIRenderer*				UIRenderer;
+
+									ZEUIManager();
+									~ZEUIManager();
 
 	public:
-		void							SetText(const ZEString& Value);
-		const ZEString&					GetText();
+		void						AddControl(ZEUIControl* Control);
+		void						RemoveControl(ZEUIControl* Control);
+		ZEArray<ZEUIControl*>&		GetControls();
 
-		void							SetTextColor(const ZEVector4& Color);
-		const ZEVector4&				GetTextColor();
+		bool						Initialize();
+		void						Deinitialize();
+		
+		void						ProcessEvents();
+		void						Render(ZERenderer* Render);
 
-		void							SetTextWrap(bool Wrap);
-		bool							GetTextWrap();
+		void						Destroy();
 
-		void							SetFont(ZEFontResource* FontResource);
-		ZEFontResource*					GetFont();
-
-		void							SetFontSize(const ZEVector2& FontSize);
-		const ZEVector2&				GetFontSize();
-
-		virtual void					Draw(ZEUIRenderer* Renderer);
-
-										ZEUITextControl();
-										~ZEUITextControl();
+		static ZEUIManager*			CreateInstance();
 };
 
 #endif
