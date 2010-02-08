@@ -1241,6 +1241,64 @@
 		<Filter
 			Name="Particle"
 			>
+			<File
+				RelativePath=".\Source\Particle\Particle.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Particle\Particle.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Particle\ParticleController.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Particle\ParticleController.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Particle\ParticleEffect.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Particle\ParticleEffect.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Particle\ParticleEffectBrush.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Particle\ParticleEffectBrush.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						AdditionalDependencies=""
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Source\Particle\ParticleEmitter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Particle\ParticleEmitter.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Particle\ParticleSystem.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Particle\ParticleSystem.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Map"

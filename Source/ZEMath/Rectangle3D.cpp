@@ -41,7 +41,7 @@ void ZERectangle3D::GetPlane(ZEPlane & Plane) const
 	ZEPlane::Create(Plane,P1,P2,P3);
 }
 
-const ZEPoint3& ZERectangle3D::GetPoint(unsigned int Index) const
+const ZEVector3& ZERectangle3D::GetPoint(unsigned int Index) const
 {
 	switch(Index)
 	{
@@ -62,7 +62,7 @@ ZERectangle3D::ZERectangle3D()
 {
 }
 
-ZERectangle3D::ZERectangle3D(const ZEPoint3& P1, const ZEPoint3& P2, const ZEPoint3& P3, const ZEPoint3& P4)
+ZERectangle3D::ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4)
 {
 	this->P1 = P1;
 	this->P2 = P2;

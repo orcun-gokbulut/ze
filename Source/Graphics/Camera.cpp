@@ -46,7 +46,7 @@ const ZEMatrix4x4& ZECamera::GetViewTransform()
 	
 	ZEMatrix4x4 ViewPositionTransform, ViewRotationTransform;
 
-	const ZEPoint3& ViewPosition = GetWorldPosition();
+	const ZEVector3& ViewPosition = GetWorldPosition();
 	ZEQuaternion ViewRotation;
 	ZEQuaternion::Conjugate(ViewRotation, GetWorldRotation());
 	ZEMatrix4x4::CreateTranslation(ViewPositionTransform, -ViewPosition.x, -ViewPosition.y, -ViewPosition.z);
@@ -75,7 +75,7 @@ const ZEMatrix4x4& ZECamera::GetViewProjectionTransform()
 	return ViewProjectionTransform;
 }
 
-void ZECamera::SetLocalPosition(const ZEPoint3& NewPosition)
+void ZECamera::SetLocalPosition(const ZEVector3& NewPosition)
 {
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;
@@ -163,7 +163,7 @@ const ZEViewPoint& ZECamera::GetViewPoint()
 	
 	ZEMatrix4x4 ViewPositionTransform, ViewRotationTransform;
 
-	const ZEPoint3& ViewPosition = GetWorldPosition();
+	const ZEVector3& ViewPosition = GetWorldPosition();
 	ZEQuaternion ViewRotation;
 	ZEQuaternion::Conjugate(ViewRotation, GetWorldRotation());
 	ZEMatrix4x4::CreateTranslation(ViewPositionTransform, -ViewPosition.x, -ViewPosition.y, -ViewPosition.z);

@@ -193,7 +193,7 @@ const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 			}
 
 		if (NoBoundingBox == true)
-			WorldBoundingBox.Max = WorldBoundingBox.Max = ZEPoint3(0.0f, 0.0f, 0.0f);
+			WorldBoundingBox.Max = WorldBoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
 
 		UpdateBoundingBox = false;
 	}
@@ -247,7 +247,7 @@ bool ZEEntity::GetEnabled() const
 	return Enabled;
 }
 
-void ZEEntity::SetPosition(const ZEPoint3& NewPosition) 
+void ZEEntity::SetPosition(const ZEVector3& NewPosition) 
 {
 	UpdateWorldTransform = true;
 	UpdateBoundingBox = true;
@@ -256,7 +256,7 @@ void ZEEntity::SetPosition(const ZEPoint3& NewPosition)
 	UpdateComponents();
 }
 
-const ZEPoint3& ZEEntity::GetPosition() const
+const ZEVector3& ZEEntity::GetPosition() const
 {
 	return Position;
 }

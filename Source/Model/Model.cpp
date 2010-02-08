@@ -492,7 +492,7 @@ const ZEVector3& ZEModelBone::GetRelativePosition()
 	return RelativePosition;
 }
 
-void ZEModelBone::SetRelativePosition(const ZEPosition3& Position)
+void ZEModelBone::SetRelativePosition(const ZEVector3& Position)
 {
 	UpdateRelativeTransform = true;
 	UpdateVertexTransform = true;
@@ -676,7 +676,7 @@ void ZEModel::CalculateBoundingBox()
 	}*/
 
 	if (NotInitialized )
-		BoundingBox.Max = BoundingBox.Max = ZEPoint3(0.0f, 0.0f, 0.0f);
+		BoundingBox.Max = BoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
 }
 
 void ZEModel::LocalTransformChanged()

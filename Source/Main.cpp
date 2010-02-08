@@ -103,8 +103,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 		ZELightBrush* Light = new ZELightBrush();
 		Light->SetLightType(ZE_LT_PROJECTIVE);
-		Light->SetPosition(ZEPoint3(0.0f, 45.0f, 0.0f));
-		Light->SetScale(ZEPoint3(1.0f, 1.0f, 1.0f));
+		Light->SetPosition(ZEVector3(0.0f, 45.0f, 0.0f));
+		Light->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
 		Light->GetLight()->SetRange(150);
 		Light->SetRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
 		Light->GetLight()->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle3D.h
+ Zinek Engine - ParticleSystem.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,22 +34,68 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#ifndef __ZE_PARTICLE_SYSTEM_H__
+#define __ZE_PARTICLE_SYSTEM_H__
 
-#include "Vector.h"
-#include "Plane.h"
+#include "ZEDS/Array.h"
+#include "ZEDS/String.h"
+#include "ZEMath/Vector.h"
+#include "Graphics/RenderOrder.h"
 
-class ZERectangle3D
+class ZEParticleEffect;
+class ZEParticleEmitter;
+class ZEParticleController;
+class ZERenderer;
+
+enum ZEParticleBillboardType
 {
+	ZE_PBT_WORLD_ORIENTED			= 0,
+	ZE_PBT_VIEWPLANE_ORIENTED		= 1,
+	ZE_PBT_VIEWPOINT_ORIENTED		= 2,
+	ZE_PBT_CUSTOMAXIS_ORIENTED		= 3
+};
+
+class ZEStaricVertexBuffer;
+class ZEMaterial;
+class ZEStaticVertexBuffer;
+
+class ZEParticleSystem
+{
+	private:
+		ZEString							Name;						// Used in editor
+		ZEParticleEffect*					Owner;						// Owner effect of the system
+		bool								IsParticlePoolGenerated;
+		ZEArray<ZEParticleEmitter*>			EmitterArray;				// These elements emits the particles from the particle pool
+		ZEStaticVertexBuffer*				VertexBuffer;				// Holds the vertices
+		ZERenderOrder						RenderOrder;					// Used for rendering
+		ZEParticleBillboardType				BillboardType;				// Can be choosen from 3 types
+		ZEMaterial*							ParticleMaterial;			// Material of the entire system
+		bool								IsVertexBufferUpdated;		// A boolean for checking Vertex Buffer
+		
+		void								UpdateVertexBuffer();
+		unsigned int						GetTotalParticleCount();
+
 	public:
-		ZEVector3				P1, P2, P3, P4;
+		void								SetName(const ZEString& Name);
+		const ZEString&						GetName();
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&			GetPoint(unsigned int Index) const;
+		void								SetOwner(ZEParticleEffect* OwnerEffect);
+		ZEParticleEffect*					GetOwner();
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
+		void								SetBillboardType(ZEParticleBillboardType Type);
+		ZEParticleBillboardType				GetBillboardType();
+
+		void								SetMaterial(ZEMaterial *Material);
+		ZEMaterial*							GetMaterial();
+
+		void								Draw(ZERenderer *Renderer, const ZESmartArray<const ZERLLight*> &Lights);
+		void								Tick(float TimeElapsed);	
+
+		void								AddParticleEmitter(ZEParticleEmitter* ParticleEmitter);
+		void								DeleteParticleEmitter(ZEParticleEmitter* ParticleEmitter);
+	
+											ZEParticleSystem();
+											~ZEParticleSystem();
 };
 
 #endif

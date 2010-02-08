@@ -41,7 +41,7 @@ bool ZESoundSource3D::Is3D()
 	return true;
 }
 
-void ZESoundSource3D::SetPosition(const ZEPoint3& NewPosition)
+void ZESoundSource3D::SetPosition(const ZEVector3& NewPosition)
 {
  	Changed3D = true;
 	ZEComponent::SetLocalPosition(NewPosition);

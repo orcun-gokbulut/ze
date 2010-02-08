@@ -105,7 +105,7 @@ class ZEEntity : public ZEClass
 	private: 
 		char									Name[ZE_MAX_NAME_SIZE];
 		int										EntityId;
-		ZEPoint3								Position;
+		ZEVector3								Position;
 		ZEQuaternion							Rotation;
 		ZEVector3								Scale;
 		ZEMatrix4x4								WorldTransform;
@@ -158,14 +158,14 @@ class ZEEntity : public ZEClass
 		virtual void							SetEnabled(bool Enabled);
 		virtual bool							GetEnabled() const;
 
-		virtual void							SetPosition(const ZEPoint3& NewPosition);
-		const ZEPoint3&							GetPosition() const;
+		virtual void							SetPosition(const ZEVector3& NewPosition);
+		const ZEVector3&							GetPosition() const;
 
 		virtual void							SetRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion&						GetRotation() const;
 
-		virtual void							SetScale(const ZEPoint3& NewScale);
-		const ZEPoint3&							GetScale() const;
+		virtual void							SetScale(const ZEVector3& NewScale);
+		const ZEVector3&							GetScale() const;
 
 		virtual void							SetVelocity(const ZEVector3& NewVelocity);
 		const ZEVector3&						GetVelocity() const;

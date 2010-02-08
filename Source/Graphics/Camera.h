@@ -91,7 +91,7 @@ class ZECamera : public ZEComponent
 		virtual const ZEMatrix4x4&		GetProjectionTransform();
 		virtual const ZEMatrix4x4&		GetViewProjectionTransform();
 
-		virtual void					SetLocalPosition(const ZEPoint3& NewPosition);	
+		virtual void					SetLocalPosition(const ZEVector3& NewPosition);	
 		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);
 
 		virtual void					OwnerWorldTransformChanged();	

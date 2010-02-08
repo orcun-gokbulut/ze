@@ -41,18 +41,18 @@ bool ZERectangle::IsEmpty()
 	return (LeftUp == ZEVector2::Zero && RightDown == ZEVector2::Zero);
 }
 
-ZEPoint2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
+ZEVector2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
 {
 	switch(Corner)
 	{
 		case ZE_RC_LEFTDOWN:
-			return ZEPoint2(LeftUp.x, RightDown.y);
+			return ZEVector2(LeftUp.x, RightDown.y);
 		case ZE_RC_RIGHTDOWN:
-			return ZEPoint2(RightDown.x, RightDown.y);
+			return ZEVector2(RightDown.x, RightDown.y);
 		case ZE_RC_LEFTUP:
-			return ZEPoint2(LeftUp.x, LeftUp.y);
+			return ZEVector2(LeftUp.x, LeftUp.y);
 		case ZE_RC_RIGHTUP:
-			return ZEPoint2(RightDown.x, LeftUp.y);
+			return ZEVector2(RightDown.x, LeftUp.y);
 		/*default:
 			ZEASSERT(true, "Wrong enum value ZERectangleCorner. Value : %d", Corner);*/
 	}
@@ -114,7 +114,7 @@ bool ZERectangle::Intersection(ZERectangle& Intersection, const ZERectangle& Rec
 	return true;
 }
 
-bool ZERectangle::BoundingTest(const ZERectangle& Rectangle, const ZEPoint2& Point)
+bool ZERectangle::BoundingTest(const ZERectangle& Rectangle, const ZEVector2& Point)
 {
 	if ((Point.x >= Rectangle.LeftUp.x && Point.x <= Rectangle.RightDown.x) && 
 		(Point.y >= Rectangle.LeftUp.y && Point.y <= Rectangle.RightDown.y))
@@ -127,13 +127,13 @@ ZERectangle::ZERectangle()
 {
 }
 
-ZERectangle::ZERectangle(const ZEPoint2& UpLeft, const ZEPoint2& DownRight)
+ZERectangle::ZERectangle(const ZEVector2& UpLeft, const ZEVector2& DownRight)
 {
 	this->LeftUp = UpLeft;
 	this->RightDown = DownRight;
 }
 
-ZERectangle::ZERectangle(const ZEPoint2& UpLeft, float Width, float Height)
+ZERectangle::ZERectangle(const ZEVector2& UpLeft, float Width, float Height)
 {
 	this->LeftUp = UpLeft;
 	this->RightDown.x = UpLeft.x + Width;

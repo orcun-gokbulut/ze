@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle3D.h
+ Zinek Engine - ParticleController.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,22 +34,51 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#ifndef __ZE_PARTICLE_CONTROLLER_H__
+#define __ZE_PARTICLE_CONTROLLER_H__
 
-#include "Vector.h"
-#include "Plane.h"
+#include "Particle.h"
+#include "ParticleSystem.h"
 
-class ZERectangle3D
+class ZEParticleControllerNode
 {
+	private:
+		float 								Time;
+		float 								Value;
+
 	public:
-		ZEVector3				P1, P2, P3, P4;
+											ZEParticleControllerNode();
+											ZEParticleControllerNode(float Time, float Value);
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&			GetPoint(unsigned int Index) const;
+		void								SetTime(float Time);
+		float								GetTime();
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
+		void								SetValue(float Value);
+		float								GetValue();
+};
+
+class ZEParticleController
+{
+	private:
+		ZEString							Name;				// Name of the controller - used in editor
+		ZEParticleEmitter*					Owner;				// Owner emitter of the controller
+		ZEArray<ZEParticleControllerNode>	Nodes;
+
+	public:
+		void								SetName(const ZEString& ControllerName);
+		const ZEString&						GetName();
+
+		void								SetOwner(ZEParticleEmitter* ControllerOwner);
+		ZEParticleEmitter*					GetOwner();
+
+		void								AddKeyFrame(float Time, float Value);
+		void								RemoveKeyFrame(float Time);
+
+		void								SetKeyFrame(float Time, float Value);
+		float								GetKeyframe(float Time);
+
+											ZEParticleController();
+											~ZEParticleController();
 };
 
 #endif

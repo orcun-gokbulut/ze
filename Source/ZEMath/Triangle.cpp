@@ -57,7 +57,7 @@ void ZETriangle::GetNormal(const ZETriangle& Triangle, ZEVector3& Normal)
 	ZEVector3::Normalize(Normal, Normal);
 }
 
-void ZETriangle::GetBarrycentiricCoordinates(const ZETriangle& Triangle, const ZEPoint3& Point, ZEVector3& BarryCoords)
+void ZETriangle::GetBarrycentiricCoordinates(const ZETriangle& Triangle, const ZEVector3& Point, ZEVector3& BarryCoords)
 {
 }
 
@@ -67,7 +67,7 @@ void ZETriangle::GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane)
 	GetNormal(Triangle, Plane.n);
 }
 
-bool ZETriangle::InsideTest(const ZETriangle& Triangle, const ZEPoint3& Point)
+bool ZETriangle::InsideTest(const ZETriangle& Triangle, const ZEVector3& Point)
 {//
 	ZEVector3 U, V, N, W;
 	ZEVector3::Sub(U, Triangle.V1, Triangle.V0);

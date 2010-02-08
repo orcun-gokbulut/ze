@@ -44,17 +44,17 @@ class ZELine
 {
 	public:
 		ZEVector3			v;
-		ZEPoint3			p;
+		ZEVector3			p;
 
-		static void			Create(ZELine& Line, const ZEPoint3& P0, const ZEPoint3& P1);
-		static void			CreateParametric(ZELine& Line, const ZEVector3& v, const ZEPoint3& p);
+		static void			Create(ZELine& Line, const ZEVector3& P0, const ZEVector3& P1);
+		static void			CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p);
 		
 		static float		MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& tA, float &tB);
-		static float		DistanceToPoint(const ZELine& Line, const ZEPoint3& Point, float &t);
+		static float		DistanceToPoint(const ZELine& Line, const ZEVector3& Point, float &t);
 
-		void				GetPointOn(ZEPoint3& Point, float t) const;
+		void				GetPointOn(ZEVector3& Point, float t) const;
 
-							ZELine(const ZEPoint3& v, const ZEPoint3& p);
+							ZELine(const ZEVector3& v, const ZEVector3& p);
 							ZELine();
 };
 #endif

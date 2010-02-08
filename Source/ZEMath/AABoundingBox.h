@@ -45,10 +45,10 @@ class ZEOBoundingBox;
 class ZEAABoundingBox
 {
 public:
-	ZEPoint3					Min, Max;
+	ZEVector3					Min, Max;
 
-	ZEPoint3					GetCenter() const;
-	ZEPoint3					GetVertex(unsigned char Index) const;
+	ZEVector3					GetCenter() const;
+	ZEVector3					GetVertex(unsigned char Index) const;
 	float						GetLenght() const;
 
 
@@ -61,7 +61,7 @@ public:
 
 	static ZEHalfSpace			PlaneHalfSpaceTest(const ZEAABoundingBox& BoundingBox, const ZEPlane& Plane);
 
-	static bool					IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZEPoint3 Point);
+	static bool					IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZEVector3 Point);
 	static bool					IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZELine& Line);
 	static bool					IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZELine& Line, float& MinT, float& MaxT);
 	static bool					IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZERay& Ray);
@@ -74,6 +74,6 @@ public:
 	static bool					CollisionTest(const ZEAABoundingBox& BoundingBox, const ZEBoundingSphere& BoundingSphere);
 
 								ZEAABoundingBox();
-								ZEAABoundingBox(const ZEPoint3 Min, const ZEPoint3 Max);
+								ZEAABoundingBox(const ZEVector3 Min, const ZEVector3 Max);
 };
 #endif

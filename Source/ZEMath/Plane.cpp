@@ -130,11 +130,11 @@ bool ZEPlane::IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, Z
 	return true;
 }
 
-ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane Plane, const ZEPoint3 Point)
+ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane& Plane, const ZEVector3& Point)
 {
-	ZEPoint3 Temp;
-	ZEPoint3::Sub(Temp, Point, Plane.p);
-	ZEPoint3::Multiply(Temp, Plane.n, Temp);
+	ZEVector3 Temp;
+	ZEVector3::Sub(Temp, Point, Plane.p);
+	ZEVector3::Multiply(Temp, Plane.n, Temp);
 	
 	float D = Temp.x + Temp.y + Temp.z;
 
@@ -146,7 +146,7 @@ ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane Plane, const ZEPoint3 Point)
 		return ZEHALFSPACE_NEGATIVESIDE;
 }
 
-float ZEPlane::Distance(const ZEPlane& Plane, const ZEPoint3& Point)
+float ZEPlane::Distance(const ZEPlane& Plane, const ZEVector3& Point)
 {
 	ZEVector3 Temp;
 	ZEVector3::Sub(Temp, Point , Plane.p);
@@ -158,13 +158,13 @@ float ZEPlane::Distance(const ZEPlane& Plane, const ZEPoint3& Point)
 	return fabs(ZEVector3::Distance(Point, Temp));
 }
 
-inline void ZEPlane::Create(ZEPlane& Plane, const ZEVector3& n, const ZEPoint3& p)
+inline void ZEPlane::Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p)
 {
 	Plane.n = n;
 	Plane.p = p;
 }
 
-void ZEPlane::Create(ZEPlane& Plane,const ZEPosition3 &P1,const ZEPosition3 &P2,const ZEPosition3 &P3)
+void ZEPlane::Create(ZEPlane& Plane,const ZEVector3 &P1,const ZEVector3 &P2,const ZEVector3 &P3)
 {
 	ZEVector3 Sub1,Sub2;
 	ZEVector3::Sub(Sub1,P2,P1);
@@ -173,7 +173,7 @@ void ZEPlane::Create(ZEPlane& Plane,const ZEPosition3 &P1,const ZEPosition3 &P2,
 	Plane.p = P3;
 }
 
-ZEPlane::ZEPlane(const ZEVector3& n, const ZEPoint3& p)
+ZEPlane::ZEPlane(const ZEVector3& n, const ZEVector3& p)
 {
 	Create(*this, n, p);
 }

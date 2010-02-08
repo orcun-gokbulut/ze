@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle3D.h
+ Zinek Engine - ParticleEffect.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,49 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#include "ParticleEffect.h"
 
-#include "Vector.h"
-#include "Plane.h"
-
-class ZERectangle3D
+void ZEParticleEffect::LoadFromFile(const char* ZEPEFFile)
 {
-	public:
-		ZEVector3				P1, P2, P3, P4;
+}
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&			GetPoint(unsigned int Index) const;
+bool ZEParticleEffect::Initialize()
+{
+	return true;
+}
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
-};
+bool ZEParticleEffect::Deinitialize()
+{
+	return true;
+}
 
-#endif
+void ZEParticleEffect::Draw(ZERenderer *Renderer, const ZESmartArray<const ZERLLight*> &Lights)
+{
+	for(unsigned int I = 0; I < SystemArray.GetCount(); I++)
+		SystemArray[I]->Draw(Renderer, Lights);
+}
+
+void ZEParticleEffect::Tick(float TimeElapsed)
+{
+	for(unsigned int I = 0; I < SystemArray.GetCount(); I++)
+		SystemArray[I]->Tick(TimeElapsed);
+}
+
+void ZEParticleEffect::AddParticleSystem(ZEParticleSystem* &ParticleSystem)
+{
+	ParticleSystem->SetOwner(this);
+	SystemArray.Add(ParticleSystem);
+}
+
+bool ZEParticleEffect::IsDrawable()
+{
+	return true;
+}
+
+ZEParticleEffect::ZEParticleEffect()
+{
+}
+
+ZEParticleEffect::~ZEParticleEffect()
+{
+}

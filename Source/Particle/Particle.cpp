@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle3D.h
+ Zinek Engine - Particle.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
-
-#include "Vector.h"
-#include "Plane.h"
-
-class ZERectangle3D
-{
-	public:
-		ZEVector3				P1, P2, P3, P4;
-
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&			GetPoint(unsigned int Index) const;
-
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
-};
-
-#endif
+#include "Particle.h"

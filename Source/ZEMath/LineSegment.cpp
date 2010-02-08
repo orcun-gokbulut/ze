@@ -39,13 +39,13 @@
 #include "Plane.h"
 #include <d3dx9.h>
 
-inline void ZELineSegment::Create(ZELine& Line, const ZEPoint3& Start, const ZEPoint3& End)
+inline void ZELineSegment::Create(ZELine& Line, const ZEVector3& Start, const ZEVector3& End)
 {
 	ZEVector3::Sub(Line.v, End, Start);
 	Line.p = Start;
 }
 
-inline void ZELineSegment::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEPoint3& p)
+inline void ZELineSegment::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p)
 {
 	Line.v = v;
 	Line.p = p;
@@ -61,12 +61,12 @@ float ZELineSegment::GetLenght() const
 	return ZEVector3::Length(this->v);
 }
 
-void ZELineSegment::GetSegmentStartPoint(ZEPoint3& StartPoint) const
+void ZELineSegment::GetSegmentStartPoint(ZEVector3& StartPoint) const
 {
 	StartPoint = p;
 }
 
-void ZELineSegment::GetSegmentEndPoint(ZEPoint3& EndPoint) const
+void ZELineSegment::GetSegmentEndPoint(ZEVector3& EndPoint) const
 {
 	ZEVector3::Add(EndPoint, p, v);
 }
@@ -144,7 +144,7 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegmentA, const ZE
 	return ZEVector3::Length(w);
 }
 
-float ZELineSegment::DistanceToPoint(const ZELineSegment& LineSegment, const ZEPoint3& Point, float &t)
+float ZELineSegment::DistanceToPoint(const ZELineSegment& LineSegment, const ZEVector3& Point, float &t)
 {
 	ZEVector3 w;
 	ZEVector3::Sub(w, Point, LineSegment.p);
@@ -166,7 +166,7 @@ float ZELineSegment::DistanceToPoint(const ZELineSegment& LineSegment, const ZEP
     return ZEVector3::Distance(Point, w);
 }
 
-void ZELineSegment::GetPointOn(ZEPoint3& Point, float t) const
+void ZELineSegment::GetPointOn(ZEVector3& Point, float t) const
 {
 	if (t < 0)
 		Point = p;
@@ -179,7 +179,7 @@ void ZELineSegment::GetPointOn(ZEPoint3& Point, float t) const
 	}
 }
 
-ZELineSegment::ZELineSegment(const ZEPoint3& Start, const ZEPoint3& End)
+ZELineSegment::ZELineSegment(const ZEVector3& Start, const ZEVector3& End)
 {
 	Create(*this, Start, End);
 }

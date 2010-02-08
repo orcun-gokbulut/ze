@@ -1,12 +1,41 @@
-== 20 Feburary 2010 - Revision 102 ==
-ADD: ZEUIControl added.
-ADD: ZEUIRenderer added.
-BUG: DirectInput InputMap->InputActionCount crash bug fixed.
-ADD: ZEFontResource added.
-ADD: AddReferance has been added to ZEResource. It will be used on many Setter and Getters and will track shared and non shared resources.
-CHG: Now unshared resources have referance count.
-CHG: Resource release mechanism changed. Referance count added for non shared resources.
-ADD: New material type ZEUIMaterial has been added to the engine.
-ADD: ZEUIManager software component created. ZEUIManager manages UI Controls.
-ADD: ZEUIManager association added to ZEGame class.
-ADD: ZEUITextControl ,which is used for displaying bitmap characters, has been added to UI components.
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//                                                                                                              //
+//  ChangeLog.txt                                                                                               //
+// ------------------------------------------------------------------------------------------------------------ //
+//  This file contains log of modification/changes done through the project development and maintiance cycle.   //
+//  This file uses ZEChangeLog Notation which is defined in ZESPEC-0003 ZEChangeLog Spesification.              //
+//  You can obtain a copy of the notation from ZE Document Repository (From both Development Wiki and           //
+//  Development Shadered Folder)																				//
+//                                                                                                              //
+//  Important Note : ChangeLog.txt file must be consistent with the Code Repository.                            //
+//                                                                                                              //
+//  If you have any question about this file first refer ZESPEC-0003 and then your senior developer.            //
+//                                                                                                              //
+//  ZEChangeLog notation referance:                                                                             //
+//   [Version Date - Revision Number] Header of the version.                                                    //
+//   ADD: New file/software/code/feature/function/class added to the version.                                   //
+//   REM: A file/software/code/feature/function/class has been removed from the version.                        //
+//   BUG: A bug is found but not fixed in this version.                                                         //
+//   FIX: A bug is fixed.                                                                                       //
+//   CHG: A feature/function/software component/behevior has been changed.                                      //
+//                                                                                                              //
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+[20 Feburary 2010 - Revision 102]
+	ADD: ZEUIControl added.
+	ADD: ZEUIRenderer added.
+	BUG: DirectInput InputMap->InputActionCount crash bug fixed.
+	ADD: ZEFontResource added.
+	ADD: AddReferance has been added to ZEResource. It will be used on many Setter and Getters and will track shared and non shared resources.
+	CHG: Now unshared resources have referance count.
+	CHG: Resource release mechanism changed. Referance count added for non shared resources.
+	ADD: New material type ZEUIMaterial has been added to the engine.
+	ADD: ZEUIManager software component created. ZEUIManager manages UI Controls.
+	ADD: ZEUIManager association added to ZEGame class.
+	ADD: ZEUITextControl ,which is used for displaying bitmap characters, has been added to UI components.
+
+[8 Feburary 2010 - Revision 103
+    ADD: ZEParticle sub-system is added to trunk.
+    CHG: ZEParticle sub-system is integrated in to v0.05.00.
+    REM: ZEPoint and ZEPosition typedefs has been removed.
+    

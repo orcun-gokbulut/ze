@@ -41,18 +41,18 @@
 #include "Line.h"
 #include <math.h>
 
-ZEPoint3 ZEAABoundingBox::GetCenter() const
+ZEVector3 ZEAABoundingBox::GetCenter() const
 {
-	ZEPoint3 Center;
-	ZEPoint3::Sub(Center, Max, Min);
-	ZEPoint3::Scale(Center, Center, 0.5);
-	ZEPoint3::Add(Center, Center, Min);
+	ZEVector3 Center;
+	ZEVector3::Sub(Center, Max, Min);
+	ZEVector3::Scale(Center, Center, 0.5);
+	ZEVector3::Add(Center, Center, Min);
 	return Center;
 }
 
-ZEPoint3 ZEAABoundingBox::GetVertex(unsigned char Index) const
+ZEVector3 ZEAABoundingBox::GetVertex(unsigned char Index) const
 {
-	ZEPoint3 Vertex;
+	ZEVector3 Vertex;
 
 	if ((Index & 0x04) > 0)
 		Vertex.x = Max.x;
@@ -82,7 +82,7 @@ float ZEAABoundingBox::GetLenght() const
 
 void ZEAABoundingBox::Transform(ZEAABoundingBox& Output, const ZEAABoundingBox& Input, const ZEMatrix4x4& TransformMatrix)
 {
-	ZEPoint3 Point;
+	ZEVector3 Point;
 	ZEMatrix4x4::Transform(Point, TransformMatrix, Input.GetVertex(0));
 	Output.Min = Output.Max = Point;
 	for (int I = 1; I < 8; I++)
@@ -114,7 +114,7 @@ ZEAABoundingBox::ZEAABoundingBox()
 {
 }
 
-ZEAABoundingBox::ZEAABoundingBox(const ZEPoint3 Min, const ZEPoint3 Max)
+ZEAABoundingBox::ZEAABoundingBox(const ZEVector3 Min, const ZEVector3 Max)
 {
 	this->Min = Min;
 	this->Max = Max;
@@ -186,7 +186,7 @@ void ZEAABoundingBox::GenerateOBoundingBox(ZEOBoundingBox& BoundingBox, const ZE
 	ZEMatrix4x4::Transform3x3(BoundingBox.N, Transform, ZEVector3(0.0f, 0.0f, Max.z - Min.z));
 }
 
-bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZEPoint3 Point)
+bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZEVector3 Point)
 {
 	return (BoundingBox.Min.x >= Point.x) && (BoundingBox.Min.y >= Point.y) && (BoundingBox.Min.z >= Point.z) && (BoundingBox.Max.x >= Point.x) && (BoundingBox.Max.y >= Point.y) && (BoundingBox.Max.z >= Point.z);
 }

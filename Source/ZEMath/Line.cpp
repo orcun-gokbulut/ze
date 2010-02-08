@@ -39,14 +39,14 @@
 #include "Plane.h"
 #include <d3dx9.h>
 
-void ZELine::Create(ZELine& Line, const ZEPoint3& P0, const ZEPoint3& P1)
+void ZELine::Create(ZELine& Line, const ZEVector3& P0, const ZEVector3& P1)
 {
 	ZEVector3::Sub(Line.v, P1, P0);
 	Line.p = P0;
 
 }
 
-void ZELine::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEPoint3& p)
+void ZELine::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p)
 {
 	Line.v = v;
 	Line.p = p;
@@ -81,7 +81,7 @@ float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& t
 	return ZEVector3::Length(w);
 }
 
-float ZELine::DistanceToPoint(const ZELine& Line, const ZEPoint3& Point, float &t)
+float ZELine::DistanceToPoint(const ZELine& Line, const ZEVector3& Point, float &t)
 {
 	ZEVector3 Temp;
 	ZEVector3::Sub(Temp, Point, Line.p);
@@ -93,7 +93,7 @@ float ZELine::DistanceToPoint(const ZELine& Line, const ZEPoint3& Point, float &
 	return ZEVector3::Distance(Point, Temp);
 }
 
-void ZELine::GetPointOn(ZEPoint3& Point, float t) const
+void ZELine::GetPointOn(ZEVector3& Point, float t) const
 {
 	ZEVector3::Scale(Point, v, t);
 	ZEVector3::Add(Point, Point, p);
@@ -103,7 +103,7 @@ ZELine::ZELine()
 {
 }
 
-ZELine::ZELine(const ZEPoint3& v, const ZEPoint3& p)
+ZELine::ZELine(const ZEVector3& v, const ZEVector3& p)
 {
 	this->v = v;
 	this->p = p;

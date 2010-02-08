@@ -59,7 +59,7 @@ enum ZERectangleIntersectionResult
 class ZERectangle
 {
 	public:
-		ZEPoint2								LeftUp, RightDown;
+		ZEVector2								LeftUp, RightDown;
 
 		bool									IsEmpty();
 
@@ -72,14 +72,14 @@ class ZERectangle
 		void									SetHeight(float Height);
 		float									GetHeight() const;
 
-		ZEPoint2								GetCorner(ZERectangleCorner Corner) const;
+		ZEVector2								GetCorner(ZERectangleCorner Corner) const;
 
 		static bool								IntersectionTest(const ZERectangle& RectangleA, const ZERectangle& RectangleB);
 		static bool								Intersection(ZERectangle& Intersection, const ZERectangle& RectangleA, const ZERectangle& RectangleB);
-		static bool								BoundingTest(const ZERectangle& Rectangle, const ZEPoint2& Point);
+		static bool								BoundingTest(const ZERectangle& Rectangle, const ZEVector2& Point);
 
 												ZERectangle();
-												ZERectangle(const ZEPoint2& LeftUp, const ZEPoint2& RightDown);
-												ZERectangle(const ZEPoint2& LeftUp, float Width, float Height);
+												ZERectangle(const ZEVector2& LeftUp, const ZEVector2& RightDown);
+												ZERectangle(const ZEVector2& LeftUp, float Width, float Height);
 };
 #endif

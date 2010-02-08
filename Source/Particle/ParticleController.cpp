@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle3D.h
+ Zinek Engine - ParticleController.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,101 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#include "ParticleController.h"
 
-#include "Vector.h"
-#include "Plane.h"
 
-class ZERectangle3D
+ZEParticleControllerNode::ZEParticleControllerNode()
 {
-	public:
-		ZEVector3				P1, P2, P3, P4;
+}
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&			GetPoint(unsigned int Index) const;
+void ZEParticleControllerNode::SetTime(float Time)
+{
+	this->Time = Time;
+}
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
-};
+float ZEParticleControllerNode::GetTime()
+{
+	return this->Time;
+}
 
-#endif
+void ZEParticleControllerNode::SetValue(float Value)
+{
+	this->Value = Value;
+}
+
+float ZEParticleControllerNode::GetValue()
+{
+	return this->Value;
+}
+
+ZEParticleControllerNode::ZEParticleControllerNode(float Time, float Value)
+{
+	this->Time = Time;
+	this->Value = Value;
+}
+
+
+
+
+void ZEParticleController::SetName(const ZEString& ControllerName)
+{
+	Name = ControllerName;
+}
+
+const ZEString& ZEParticleController::GetName()
+{
+	return Name;
+}
+
+void ZEParticleController::SetOwner(ZEParticleEmitter* ControllerOwner)
+{
+	this->Owner = ControllerOwner;
+}
+
+ZEParticleEmitter* ZEParticleController::GetOwner()
+{
+	return Owner;
+}
+
+void ZEParticleController::AddKeyFrame(float Time, float Value)
+{
+	Nodes.Add(ZEParticleControllerNode(Time, Value));
+}
+
+void ZEParticleController::RemoveKeyFrame(float Time)
+{
+	for(unsigned int I = 0; I < Nodes.GetCount(); I++)
+	{
+		if(Nodes[I].GetTime() == Time)
+			Nodes.DeleteAt(I);
+	}
+}
+
+void ZEParticleController::SetKeyFrame(float Time, float Value)
+{
+	for(unsigned int I = 0; I < Nodes.GetCount(); I++)
+	{
+		if(Nodes[I].GetTime() == Time)
+			Nodes[I].SetValue(Value);
+	}
+}
+
+float ZEParticleController::GetKeyframe(float Time)
+{
+	for(unsigned int I = 0; I < Nodes.GetCount(); I++)
+	{
+		if(Nodes[I].GetTime() == Time)
+			return Nodes[I].GetValue();
+	}
+
+	return -1.0f;
+}
+
+ZEParticleController::ZEParticleController()
+{
+	Owner = NULL;
+}
+
+ZEParticleController::~ZEParticleController()
+{
+}

@@ -43,14 +43,14 @@ class ZEPlane;
 class ZERay : public ZELine
 {
 	public:
-		static void			Create(ZERay & Ray,const ZEPoint3 & Start,const ZEPoint3 & End);
+		static void			Create(ZERay & Ray,const ZEVector3 & Start,const ZEVector3 & End);
 		static void			CreateParametric(ZERay & Ray,const ZEVector3 & v,const ZEVector3 & p);
 
-		static float		DistanceToPoint(const ZERay& Ray, const ZEPoint3& Point, float &t);
+		static float		DistanceToPoint(const ZERay& Ray, const ZEVector3& Point, float &t);
 
-		void				GetPointOn(ZEPoint3& Point, float t) const;
+		void				GetPointOn(ZEVector3& Point, float t) const;
 
-							ZERay(const ZEPoint3 & v,const ZEPoint3 &p);
+							ZERay(const ZEVector3 & v,const ZEVector3 &p);
 							ZERay();
 };
 #endif

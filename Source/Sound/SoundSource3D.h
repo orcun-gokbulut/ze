@@ -51,7 +51,7 @@ class ZESoundSource3D: public ZESoundSource, public ZEComponent
 
 	public:
 		bool				Is3D();	
-		void				SetPosition(const ZEPoint3& NewPosition);
+		void				SetPosition(const ZEVector3& NewPosition);
 		void				SetRotation(const ZEQuaternion&);
 
 		float				GetMinDistance();

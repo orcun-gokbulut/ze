@@ -350,7 +350,7 @@ ZEDoorViewTest ZEViewCuboid::CullTest(const ZERectangle3D& PortalDoor) const
 	return ZE_DVT_INSIDE;
 }
 
-void ZEViewCuboid::Create(const ZEPosition3& Position, const ZEQuaternion& Rotation, float Width, float Height, float NearZ, float FarZ)
+void ZEViewCuboid::Create(const ZEVector3& Position, const ZEQuaternion& Rotation, float Width, float Height, float NearZ, float FarZ)
 {
 	ZEQuaternion::VectorProduct(BoundingBox.U, Rotation, ZEVector3(0.0f, Height, 0.0f));
 	ZEQuaternion::VectorProduct(BoundingBox.V, Rotation, ZEVector3(Width, 0.0f, 0.0f));
@@ -442,9 +442,9 @@ enum ZECullTestResult
 	ZE_OUTSIDE_BY_SECOND_PLANE,
 	ZE_INTERSECTION
 };
-ZECullTestResult LineSegmentAgainstBordersTest(const ZEPoint3 &P1,const ZEPoint3 &P2,const ZEPlane & Border1,const ZEPlane & Border2);
+ZECullTestResult LineSegmentAgainstBordersTest(const ZEVector3 &P1,const ZEVector3 &P2,const ZEPlane & Border1,const ZEPlane & Border2);
 ZEHalfSpace DoorAgainstPlanePreTest(const ZERectangle3D & Door,const ZEPlane & Plane);
-void CutPortalDoorWithLine(ZEPoint3 & Out1,ZEPoint3 & Out2,const ZERectangle3D & Door,const ZELine & Line);
+void CutPortalDoorWithLine(ZEVector3 & Out1,ZEVector3 & Out2,const ZERectangle3D & Door,const ZELine & Line);
 
 ZEDoorViewTest ZECamera::ViewFrustumCullTest(const ZERectangle3D& PortalDoor) 
 {
@@ -471,7 +471,7 @@ ZEDoorViewTest ZECamera::ViewFrustumCullTest(const ZERectangle3D& PortalDoor)
 
 	if (status == ZE_DVT_INSIDE) return status;
 
-	ZEPoint3 Point1,Point2;
+	ZEVector3 Point1,Point2;
 	ZECullTestResult Result1 = ZE_COVERABLE,Result2;
 	ZELine Intersection;
 
@@ -556,7 +556,7 @@ void ZECamera::GenerateCameraFromDoor(ZEViewCone & Cone,ZECamera & Camera,const 
 	Camera.NearClippingPlane = NearClippingPlane;
 	Camera.FarClippingPlane = FarClippingPlane;
 
-	ZEPosition3 WorldPosition = GetWorldPosition();
+	ZEVector3 WorldPosition = GetWorldPosition();
 
 	ZEPlane::Create(RightClippingPlane,WorldPosition,Door.P2,Door.P1);
 	ZEPlane::Create(TopClippingPlane,WorldPosition,Door.P3,Door.P2);
@@ -587,7 +587,7 @@ void ZECamera::GenerateCameraFromDoor(ZEViewCone & Cone,ZECamera & Camera,const 
 //-----------------PORTALDOOR CULLING HELPERS--------------------//
 //-----------------PORTALDOOR CULLING HELPERS--------------------//
 
-ZECullTestResult LineSegmentAgainstBordersTest(const ZEPoint3 &P1,const ZEPoint3 &P2,const ZEPlane & Border1,const ZEPlane & Border2)
+ZECullTestResult LineSegmentAgainstBordersTest(const ZEVector3 &P1,const ZEVector3 &P2,const ZEPlane & Border1,const ZEPlane & Border2)
 {
 	if (ZEPlane::TestHalfSpace(Border1,P1) == ZEHALFSPACE_NEGATIVESIDE)
 	{
@@ -629,8 +629,8 @@ bool CutLineWithLine(ZEVector3 & Out,const ZELine & Line1,const ZELine & Line2) 
 	if (V1dotV2 == 0) return 0;
 	float V1dotV1 = ZEVector3::DotProduct(Line1.v,Line1.v);
 
-	ZEPoint3 V2C,P1C;
-	ZEPoint3 temp;
+	ZEVector3 V2C,P1C;
+	ZEVector3 temp;
 	ZEVector3::Sub(temp,Line2.p,Line1.p);
 	ZEVector3::Scale(P1C,Line1.v,(ZEVector3::DotProduct(Line1.v,temp) / V1dotV1));
 	ZEVector3::Scale(V2C,Line1.v,V1dotV2 / V1dotV1);
@@ -652,10 +652,10 @@ bool CutLineWithLine(ZEVector3 & Out,const ZELine & Line1,const ZELine & Line2) 
 	return 1;
 }
 
-void CutPortalDoorWithLine(ZEPoint3 & Out1,ZEPoint3 & Out2,const ZERectangle3D & Door,const ZELine & Line)
+void CutPortalDoorWithLine(ZEVector3 & Out1,ZEVector3 & Out2,const ZERectangle3D & Door,const ZELine & Line)
 {
 	bool cut = 0;
-	ZEPoint3 point;
+	ZEVector3 point;
 	ZELine DoorLine;
 	
 	for (unsinged int I = 0; I < 4; I++)

@@ -539,7 +539,7 @@ void ZEMatrix4x4::CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Positi
 	ZEMatrix4x4::Multiply(Matrix, D, C);
 }
 
-void ZEMatrix4x4::CreateTranslation(ZEMatrix4x4& Matrix, const ZEPoint3& Position)
+void ZEMatrix4x4::CreateTranslation(ZEMatrix4x4& Matrix, const ZEVector3& Position)
 {
 	Create(Matrix,
 			1.0f, 0.0f, 0.0f, 0.0f,
@@ -548,7 +548,7 @@ void ZEMatrix4x4::CreateTranslation(ZEMatrix4x4& Matrix, const ZEPoint3& Positio
 			Position.x, Position.y, Position.z, 1.0f );
 }
 
-void ZEMatrix4x4::CreateOffset(ZEMatrix4x4& Matrix, const ZEPoint3& Position, const ZEQuaternion& Rotation)
+void ZEMatrix4x4::CreateOffset(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation)
 {
 	/*
 	Matrix.M11 = 1.0f	-	2.0f * Rotation.y * Rotation.y	-	2.0f * Rotation.z * Rotation.z;

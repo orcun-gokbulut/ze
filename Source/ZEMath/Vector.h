@@ -107,7 +107,6 @@ class ZEVector2
 									ZEVector2(const ZEVector2 &Start, const ZEVector2 &End);
 									ZEVector2();
 };
-typedef ZEVector2 ZEPoint2, ZEPosition2;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,8 +173,6 @@ class ZEVector3
 									ZEVector3(const ZEVector3& Start, const ZEVector3& End);
 									ZEVector3();
 };
-
-typedef ZEVector3 ZEPoint3, ZEPosition3;
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -246,5 +243,4 @@ class ZEVector4
 									ZEVector4();
 };
 
-typedef ZEVector4 ZEPoint4, ZEPosition4;	
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle3D.h
+ Zinek Engine - ParticleEffectBrush.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,22 +34,43 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#ifndef __ZE_PARTICLE_SYSTEM_BRUSH_H__
+#define __ZE_PARTICLE_SYSTEM_BRUSH_H__
 
-#include "Vector.h"
-#include "Plane.h"
+#include "GameInterface/Entity.h"
+#include "ParticleEffect.h"
 
-class ZERectangle3D
+ZE_META_CLASS_DESCRIPTION(ZEParticleEffectBrush);
+
+class ZEParticleEffectBrush : public ZEEntity
 {
+	ZE_META_CLASS()
+
+	private:
+		ZEParticleEffect			ParticleEffect;
+
 	public:
-		ZEVector3				P1, P2, P3, P4;
+		virtual bool				AllwaysDraw();
+		virtual bool				IsDrawable();
+		void						AddParticleSystem(ZEParticleSystem* System);
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&			GetPoint(unsigned int Index) const;
+		virtual void				Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
+		virtual void				Tick(float Time);
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
+		void						LoadFromFile(const char* ZEPEFFile);
+
+									ZEParticleEffectBrush();
+									~ZEParticleEffectBrush();
 };
+
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZEParticleEffectBrush" parent="ZEEntity" icon="" description="Particle effect brush"/>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END()
+*/
 
 #endif

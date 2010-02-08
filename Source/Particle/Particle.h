@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle3D.h
+ Zinek Engine - Particle.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,22 +34,28 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#ifndef __ZE_PARTICLE_H__
+#define __ZE_PARTICLE_H__
 
-#include "Vector.h"
-#include "Plane.h"
+#include "ZEMath/Vector.h"
 
-class ZERectangle3D
+class ZEParticle
 {
 	public:
-		ZEVector3				P1, P2, P3, P4;
+		ZEVector3							Acceleration;				// Changes the velocity
+		ZEVector3							AngularAcceleration;		// Changes the angular velocity
+		ZEVector3							Velocity;					// Changes the position
+		ZEVector3							AngularVelocity;			// Changes the up vector
+		ZEVector3							Position;					// Relative to system's position
+		ZEVector3							UpVector;					// Used for rotating particles along their axes
+		ZEVector4							Color;						// Vertex color
+		float								Life;						// When life of a particle drops below zero, it dies
+		float								Size;						// Size of an edge of the quad
+		float								BounceFactor;				// Used in repeller
+		bool								IsAlive;					// If a particle is dead, it won't drawn to the screen
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&			GetPoint(unsigned int Index) const;
-
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
+											ZEParticle() {};
+											~ZEParticle() {};
 };
 
 #endif

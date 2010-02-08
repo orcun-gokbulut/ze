@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle3D.h
+ Zinek Engine - ParticleEffectBrush.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#include "ParticleEffectBrush.h"
 
-#include "Vector.h"
-#include "Plane.h"
-
-class ZERectangle3D
+bool ZEParticleEffectBrush::AllwaysDraw()
 {
-	public:
-		ZEVector3				P1, P2, P3, P4;
+	return true;
+}
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&			GetPoint(unsigned int Index) const;
+bool ZEParticleEffectBrush::IsDrawable()
+{
+	return true;
+}
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
-};
+void ZEParticleEffectBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
+{
+	ParticleEffect.Draw(Renderer, Lights);
+}
 
-#endif
+void ZEParticleEffectBrush::Tick(float Time)
+{
+	ParticleEffect.Tick(Time);
+}
+
+
+void ZEParticleEffectBrush::AddParticleSystem(ZEParticleSystem* System)
+{
+	ParticleEffect.AddParticleSystem(System);
+}
+
+void ZEParticleEffectBrush::LoadFromFile(const char* ZEPEFFile)
+{
+	ParticleEffect.LoadFromFile(ZEPEFFile);
+}
+
+ZEParticleEffectBrush::ZEParticleEffectBrush()
+{
+	RegisterComponent(&ParticleEffect);
+}
+
+ZEParticleEffectBrush::~ZEParticleEffectBrush()
+{
+}
+
+#include "ParticleEffectBrush.h.zpp"

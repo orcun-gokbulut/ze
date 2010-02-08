@@ -42,13 +42,13 @@
 
 #include <math.h>
 
-ZEPoint3 ZEOBoundingBox::GetCenter() const
+ZEVector3 ZEOBoundingBox::GetCenter() const
 {
 	return U * 0.5f + V * 0.5 + N * 0.5f + Position;
 }
 
 
-ZEPoint3 ZEOBoundingBox::GetVertex(unsigned char Index) const
+ZEVector3 ZEOBoundingBox::GetVertex(unsigned char Index) const
 {
 	switch(Index)
 	{
@@ -83,7 +83,7 @@ ZEHalfSpace ZEOBoundingBox::PlaneHalfSpaceTest(const ZEOBoundingBox& BoundingBox
 	return HS1;
 }
 
-bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZEPoint3 Point)
+bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZEVector3& Point)
 {
 	float factor;
 
@@ -237,7 +237,7 @@ bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const Z
 /*
 bool ZEOBoundingBox::CollisionTest(const ZEOBoundingBox& BoundingBox1, const ZEOBoundingBox& BoundingBox2)
 {
-	//ZEPoint3 Temp;
+	//ZEVector3 Temp;
 	//float UDotU = ZEVector3::DotProduct(BoundingBox.U,BoundingBox.U);
 	//float VDotV = ZEVector3::DotProduct(BoundingBox.V,BoundingBox.V);
 	//float NDotN;

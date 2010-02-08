@@ -52,15 +52,15 @@ ZEHalfSpace ZEBoundingSphere::PlaneHalfSpaceTest(const ZEBoundingSphere& Boundin
 }
 
 
-void ZEBoundingSphere::GetSurfaceNormal(ZEVector3& Normal, const ZEBoundingSphere& BoundingSphere, const ZEPoint3& Point)
+void ZEBoundingSphere::GetSurfaceNormal(ZEVector3& Normal, const ZEBoundingSphere& BoundingSphere, const ZEVector3& Point)
 {
 	ZEVector3::Create(Normal, BoundingSphere.Position, Point);
 	ZEVector3::Normalize(Normal, Normal);
 }
 
-bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZEPoint3 Point)
+bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZEVector3 Point)
 {
-	return ZEPoint3::Distance(BoundingSphere.Position, Point) <= BoundingSphere.Radius;
+	return ZEVector3::Distance(BoundingSphere.Position, Point) <= BoundingSphere.Radius;
 }
 
 bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZELine& Line)
@@ -155,7 +155,7 @@ ZEBoundingSphere::ZEBoundingSphere()
 {
 }
 
-ZEBoundingSphere::ZEBoundingSphere(const ZEPoint3& Position, float Radius)
+ZEBoundingSphere::ZEBoundingSphere(const ZEVector3& Position, float Radius)
 {
 	ZEBoundingSphere::Position = Position;
 	ZEBoundingSphere::Radius = Radius;

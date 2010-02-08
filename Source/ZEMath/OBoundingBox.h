@@ -45,15 +45,15 @@ class ZEAABoundingBox;
 class ZEOBoundingBox
 {
 	public:
-		ZEPoint3				Position;
+		ZEVector3				Position;
 		ZEVector3				U, V, N;
 
-		ZEPoint3				GetCenter()	const;
-		ZEPoint3				GetVertex(unsigned char Index) const;
+		ZEVector3				GetCenter()	const;
+		ZEVector3				GetVertex(unsigned char Index) const;
 
 		static ZEHalfSpace		PlaneHalfSpaceTest(const ZEOBoundingBox& BoundingBox, const ZEPlane& Plane);
 
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZEPoint3 Point);
+		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZEVector3& Point);
 		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax);
 		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray, float& TMin, float& TMax);
 		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax);

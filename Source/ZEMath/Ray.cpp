@@ -39,7 +39,7 @@
 #include "Plane.h"
 #include <d3dx9.h>
 
-void ZERay::Create(ZERay & Ray, const ZEPoint3 & Start,const ZEPoint3 & End)
+void ZERay::Create(ZERay & Ray, const ZEVector3 & Start,const ZEVector3 & End)
 {
 	ZELine::Create(Ray,Start,End);
 }
@@ -50,7 +50,7 @@ void ZERay::CreateParametric(ZERay & Ray,const ZEVector3 & v,const ZEVector3 & p
 	Ray.p = p;
 }
 
-float ZERay::DistanceToPoint(const ZERay& Ray, const ZEPoint3& Point, float &t)
+float ZERay::DistanceToPoint(const ZERay& Ray, const ZEVector3& Point, float &t)
 {
 	ZEVector3 temp;
 	ZEVector3::Sub(temp,Point,Ray.p);
@@ -68,12 +68,12 @@ float ZERay::DistanceToPoint(const ZERay& Ray, const ZEPoint3& Point, float &t)
 
 }
 
-void ZERay::GetPointOn(ZEPoint3& Point, float t) const
+void ZERay::GetPointOn(ZEVector3& Point, float t) const
 {
 	ZELine::GetPointOn(Point,t);
 }
 
-ZERay::ZERay(const ZEPoint3 & v,const ZEPoint3 &p)
+ZERay::ZERay(const ZEVector3 & v,const ZEVector3 &p)
 {
 	this->v = v;
 	this->p = p;

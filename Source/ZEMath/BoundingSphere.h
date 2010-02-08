@@ -45,14 +45,14 @@ class ZEAABoundingBox;
 class ZEBoundingSphere
 {
 	public:
-		ZEPoint3				Position;
+		ZEVector3				Position;
 		float					Radius;
 
 		static ZEHalfSpace		PlaneHalfSpaceTest(const ZEBoundingSphere& BoundingSphere, const ZEPlane& Plane);
 
-		static void				GetSurfaceNormal(ZEVector3& Normal, const ZEBoundingSphere& BoundingSphere, const ZEPoint3& Point);
+		static void				GetSurfaceNormal(ZEVector3& Normal, const ZEBoundingSphere& BoundingSphere, const ZEVector3& Point);
 
-		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZEPoint3 Point);
+		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZEVector3 Point);
 
 		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZELine& Line);
 		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZELine& Line, float& MinT, float& MaxT);
@@ -66,6 +66,6 @@ class ZEBoundingSphere
 		static bool				CollisionTest(const ZEBoundingSphere& BoundingSphere1, const ZEBoundingSphere& BoundingSphere2);
 
 								ZEBoundingSphere();
-								ZEBoundingSphere(const ZEPoint3& Position, float Radious);
+								ZEBoundingSphere(const ZEVector3& Position, float Radious);
 };
 #endif

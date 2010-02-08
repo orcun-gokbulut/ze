@@ -81,7 +81,7 @@ class ZEViewVolume
 class ZEViewFrustum : public ZEViewVolume
 {
 	private:
-		ZEPoint3							Position;
+		ZEVector3							Position;
 		ZEVector3							CenterVector;
 		float								SinRatio;
 		float								TanRatio;
@@ -161,7 +161,7 @@ class ZEViewCuboid: public ZEViewVolume
 		virtual bool						CullTest(ZEComponent* Component) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
-		void								Create(const ZEPosition3& Position, const ZEQuaternion& Rotation,
+		void								Create(const ZEVector3& Position, const ZEQuaternion& Rotation,
 												   float Width, float Height, float NearZ, float FarZ);
 
 };

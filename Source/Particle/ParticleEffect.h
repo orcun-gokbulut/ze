@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle3D.h
+ Zinek Engine - ParticleEffect.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,22 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#ifndef __ZE_PARTICLE_EFFECT_H__
+#define __ZE_PARTICLE_EFFECT_H__
 
-#include "Vector.h"
-#include "Plane.h"
+#include "Core/Component.h"
+#include "ZEDS/Array.h"
+#include "ParticleSystem.h"
 
-class ZERectangle3D
+class ZERLLight;
+class ZERenderer;
+class ZEParticleEffect : public ZEComponent
 {
+	private:
+		ZEArray<ZEParticleSystem*>		SystemArray;				// An effect might be composed of many systems
+
 	public:
-		ZEVector3				P1, P2, P3, P4;
+		virtual	bool					IsDrawable();
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&			GetPoint(unsigned int Index) const;
+		bool							Initialize();
+		bool							Deinitialize();
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
+		void							Draw(ZERenderer *Renderer, const ZESmartArray<const ZERLLight*> &Lights);
+		void							Tick(float TimeElapsed);
+
+		void							AddParticleSystem(ZEParticleSystem* &ParticleSystem);
+
+		void							LoadFromFile(const char* ZEPEFFile);
+			
+										ZEParticleEffect();
+										~ZEParticleEffect();
 };
 
 #endif
