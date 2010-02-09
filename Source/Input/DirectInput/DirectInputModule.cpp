@@ -77,9 +77,17 @@ LPDIRECTINPUTDEVICE8	DIMouse		= NULL;
 LPDIRECTINPUTDEVICE8	DIKeyboard	= NULL;
 LPDIRECTINPUTDEVICE8	DIJoystick	= NULL;
 
-ZEDIKeyboardState		KeyboardState;
-ZEDIMouseState			MouseState;
-ZEDIJoystickState		JoystickState;
+ZEDIKeyboardState		KeyboardStateA, KeyboardStateB;
+ZEDIKeyboardState*      CurrentKeyboardState = &KeyboardStateA;
+ZEDIKeyboardState*		OldKeyboardState = &KeyboardStateB;
+
+ZEDIMouseState			MouseStateA, MouseStateB;
+ZEDIMouseState*			CurrentMouseState = &MouseStateA;
+ZEDIMouseState*			OldMouseState = &MouseStateB;
+
+ZEDIJoystickState		JoystickStateA, JoystickStateB;
+ZEDIJoystickState*		CurrentJoystickState = &JoystickStateA;
+ZEDIJoystickState*		OldJoystickState = &JoystickStateB;
 
 bool MouseAvailable		= true;
 bool JoystickAvailable	= false;
@@ -127,6 +135,15 @@ void ZEDirectInputModule::SetEnabled(bool Enabled)
 bool ZEDirectInputModule::Initialize()
 {	
 	zeOutput("Initializing Direct Input.\r\n");
+
+	ZeroMemory(&KeyboardStateA, sizeof(ZEDIKeyboardState));
+	ZeroMemory(&KeyboardStateB, sizeof(ZEDIKeyboardState));
+
+	ZeroMemory(&MouseStateA, sizeof(ZEDIMouseState));
+	ZeroMemory(&MouseStateB, sizeof(ZEDIMouseState));
+
+	ZeroMemory(&JoystickStateA, sizeof(ZEDIJoystickState));
+	ZeroMemory(&JoystickStateB, sizeof(ZEDIJoystickState));
 
 	HRESULT hr;
 	hr = DirectInput8Create((HINSTANCE)zeCore->GetApplicationInstance(), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&DI, NULL);
@@ -279,29 +296,49 @@ void ZEDirectInputModule::Deinitialize()
 	
 }
 
+
 void ZEDirectInputModule::ProcessInputs()
 {   
 	if (!Enabled)
 		return;
 
+	ZEDIKeyboardState* TempKeyboardState;
+	TempKeyboardState = CurrentKeyboardState;
+	CurrentKeyboardState = OldKeyboardState;
+	OldKeyboardState = TempKeyboardState;
+
+	ZEDIMouseState* TempMouseState;
+	TempMouseState = CurrentMouseState;
+	CurrentMouseState = OldMouseState;
+	OldMouseState = TempMouseState;
+
+	ZEDIJoystickState* TempJoystickState;
+	TempJoystickState = CurrentJoystickState;
+	CurrentJoystickState = OldJoystickState;
+	OldJoystickState = TempJoystickState;
+
 	HRESULT hr;
 	if (DIKeyboard != NULL)
 	{
-		hr = DIKeyboard->GetDeviceState(sizeof(ZEDIKeyboardState), &KeyboardState);
+		hr = DIKeyboard->GetDeviceState(sizeof(ZEDIKeyboardState), CurrentKeyboardState);
 		if(FAILED(hr))
 		{	
-			ZeroMemory(&KeyboardState, sizeof(ZEDIKeyboardState));
+			ZeroMemory(&KeyboardStateA, sizeof(ZEDIKeyboardState));
+			ZeroMemory(&KeyboardStateB, sizeof(ZEDIKeyboardState));
 			hr = DIKeyboard->Acquire();
 			/*if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
 				zeError("DirectInput Module", "Could not accuire keyboard.");*/
 		}
 	}
+
+	
 	if (DIMouse != NULL)
 	{
-		hr = DIMouse->GetDeviceState(sizeof(ZEDIMouseState), &MouseState);
+		hr = DIMouse->GetDeviceState(sizeof(ZEDIMouseState), CurrentMouseState);
 		if(FAILED(hr))
 		{
-			ZeroMemory(&MouseState, sizeof(ZEDIMouseState));
+			ZeroMemory(&MouseStateA, sizeof(ZEDIMouseState));
+			ZeroMemory(&MouseStateB, sizeof(ZEDIMouseState));
 			hr = DIKeyboard->Acquire();
 			/*if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK && hr != S_FALSE))
 				zeError("DirectInput Module", "Could not accuire keyboard.");*/
@@ -309,10 +346,11 @@ void ZEDirectInputModule::ProcessInputs()
 	}
 	if (DIJoystick != NULL)
 	{	
-		hr = DIJoystick->GetDeviceState(sizeof(ZEDIJoystickState), &JoystickState);
+		hr = DIJoystick->GetDeviceState(sizeof(ZEDIJoystickState), CurrentJoystickState);
 		if(FAILED(hr))
 		{
-			ZeroMemory(&JoystickState, sizeof(ZEDIJoystickState));
+			ZeroMemory(&JoystickStateA, sizeof(ZEDIJoystickState));
+			ZeroMemory(&JoystickStateB, sizeof(ZEDIJoystickState));
 			hr = DIKeyboard->Acquire();
 			/*if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
 				zeError("DirectInput Module", "Could not accuire keyboard.");*/
@@ -364,72 +402,76 @@ void ZEDirectInputModule::ProcessInputMap(ZEInputMap* InputMap)
 				{
 					if (CurrInputEvent->AxisSign == ZE_IAS_POSITIVE)
 					{
-						if (MouseState.Axis[CurrInputEvent->AxisId] > 0)
+						if (CurrentMouseState->Axis[CurrInputEvent->AxisId] > 0)
 						{
 							InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
 							InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
-							InputMap->InputActions[InputMap->InputActionCount].AxisValue = MouseState.Axis[CurrInputEvent->AxisId];
+							InputMap->InputActions[InputMap->InputActionCount].AxisValue = CurrentMouseState->Axis[CurrInputEvent->AxisId];
 							InputMap->InputActionCount++;
 						}
 					}
 					else
-						if (MouseState.Axis[CurrInputEvent->AxisId] < 0)
+						if (CurrentMouseState->Axis[CurrInputEvent->AxisId] < 0)
 						{
 							InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
 							InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
-							InputMap->InputActions[InputMap->InputActionCount].AxisValue = abs(MouseState.Axis[CurrInputEvent->AxisId]);
+							InputMap->InputActions[InputMap->InputActionCount].AxisValue = abs(CurrentMouseState->Axis[CurrInputEvent->AxisId]);
 							InputMap->InputActionCount++;
 						}
 				}						
 				else if (CurrInputEvent->InputType == ZE_IT_BUTTON)
 				{
-					if (MouseState.Buttons[CurrInputEvent->ButtonId] & 0x80)
-						{
-							InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
-							InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
-
-							InputMap->InputActionCount++;
-						}
+					if ((CurrInputEvent->ButtonState == ZE_IBS_ALL && (CurrentMouseState->Buttons[CurrInputEvent->ButtonId] & 0x80)) ||
+							(CurrInputEvent->ButtonState == ZE_IBS_PRESSED && (CurrentMouseState->Buttons[CurrInputEvent->ButtonId] & 0x80) && !(OldMouseState->Buttons[CurrInputEvent->ButtonId] & 0x80)) || 
+							(CurrInputEvent->ButtonState == ZE_IBS_RELEASED && !(CurrentMouseState->Buttons[CurrInputEvent->ButtonId] & 0x80) && (OldMouseState->Buttons[CurrInputEvent->ButtonId] & 0x80)))
+					{
+						InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
+						InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
+						InputMap->InputActionCount++;
+					}
 				}
 				break;
 
 			case ZE_IDT_KEYBOARD:
-			
-				if (KeyboardState.Buttons[CurrInputEvent->ButtonId] & 0x80)
+				if ((CurrInputEvent->ButtonState == ZE_IBS_ALL && (CurrentKeyboardState->Buttons[CurrInputEvent->ButtonId] & 0x80)) ||
+					(CurrInputEvent->ButtonState == ZE_IBS_PRESSED && (CurrentKeyboardState->Buttons[CurrInputEvent->ButtonId] & 0x80) && !(OldKeyboardState->Buttons[CurrInputEvent->ButtonId] & 0x80)) || 
+					(CurrInputEvent->ButtonState == ZE_IBS_RELEASED && !(CurrentKeyboardState->Buttons[CurrInputEvent->ButtonId] & 0x80) && (OldKeyboardState->Buttons[CurrInputEvent->ButtonId] & 0x80)))
 				{
 					InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
 					InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
 					InputMap->InputActionCount++;
 				}
 				break;
-			
+						
 			case ZE_IDT_JOYSTICK:
 
 				if (CurrInputEvent->InputType == ZE_IT_AXIS)
 				{	
 					if (CurrInputEvent->AxisSign == ZE_IAS_POSITIVE)
 					{
-						if (JoystickState.Axis[CurrInputEvent->AxisId] > 0)
+						if (CurrentJoystickState->Axis[CurrInputEvent->AxisId] > 0)
 						{
 							InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
 							InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
-							InputMap->InputActions[InputMap->InputActionCount].AxisValue = JoystickState.Axis[CurrInputEvent->AxisId];
+							InputMap->InputActions[InputMap->InputActionCount].AxisValue = CurrentJoystickState->Axis[CurrInputEvent->AxisId];
 							InputMap->InputActionCount++;
 						}
 					}
 					else
 					{	
-						if (JoystickState.Axis[CurrInputEvent->AxisId] < 0)
+						if (CurrentJoystickState->Axis[CurrInputEvent->AxisId] < 0)
 						{
 							InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
 							InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
-							InputMap->InputActions[InputMap->InputActionCount].AxisValue = abs(JoystickState.Axis[CurrInputEvent->AxisId]);
+							InputMap->InputActions[InputMap->InputActionCount].AxisValue = abs(CurrentJoystickState->Axis[CurrInputEvent->AxisId]);
 							InputMap->InputActionCount++;
 						}
 					}		
 				}
 				else
-					if (JoystickState.Buttons[CurrInputEvent->ButtonId] & 0x80)
+					if ((CurrInputEvent->ButtonState == ZE_IBS_ALL && (CurrentJoystickState->Buttons[CurrInputEvent->ButtonId] & 0x80)) ||
+						(CurrInputEvent->ButtonState == ZE_IBS_PRESSED && (CurrentJoystickState->Buttons[CurrInputEvent->ButtonId] & 0x80) && !(OldJoystickState->Buttons[CurrInputEvent->ButtonId] & 0x80)) || 
+						(CurrInputEvent->ButtonState == ZE_IBS_RELEASED && !(CurrentJoystickState->Buttons[CurrInputEvent->ButtonId] & 0x80) && (OldJoystickState->Buttons[CurrInputEvent->ButtonId] & 0x80)))
 					{
 						InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
 						InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;

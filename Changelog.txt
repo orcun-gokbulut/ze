@@ -21,7 +21,7 @@
 //                                                                                                              //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-[20 Feburary 2010 - Revision 102]
+[2 Feburary 2010 - Revision 102]
 	ADD: ZEUIControl added.
 	ADD: ZEUIRenderer added.
 	BUG: DirectInput InputMap->InputActionCount crash bug fixed.
@@ -39,3 +39,8 @@
     CHG: ZEParticle sub-system is integrated in to v0.05.00.
     REM: ZEPoint and ZEPosition typedefs has been removed.
     
+[9 Feburary 2010 - Revision 104]
+	CHG: ZETextControl render function is micro optimized.
+	FIX: ZETextControl text wrap behevior fixed.
+	ADD: ZEInputBinding's ZE_IBS_PRESSED, ZE_IBS_RELEASED and ZE_IBS_ALL button state beheviors implamented into DirectInput.
+	FIX: ZEPlayer's movement key bindings's button state changed from ZE_IBS_PRESS to ZE_IBS_ALL

@@ -104,46 +104,55 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 	Temporary.Material = NULL;
 	Temporary.Color = TextColor;
 
-	ZEVector2 NextPosition = ZEVector2::Zero;
 	ZEVector2 CharacterSize;
+
+	Temporary.Positions.LeftUp = ControlRectangle.LeftUp;
 
 	Output.ZOrder = ZOrder;
 	for (size_t I = 0; I < Size; I++)
 	{
 		const ZEFontCharacter& CurrCharacter = FontResource->GetCharacter(Narrow[I]);
 
-
 		ZEVector2::Substution(CharacterSize, CurrCharacter.CoordinateRectangle.RightDown, CurrCharacter.CoordinateRectangle.LeftUp);
 		ZEVector2::Multiply(CharacterSize, CharacterSize, FontSize);
 		ZEVector2::Multiply(CharacterSize, CharacterSize, ZEVector2(CurrCharacter.Texture->GetWidth(), CurrCharacter.Texture->GetHeight()));
 
-		ZEVector2::Add(Temporary.Positions.LeftUp, ControlRectangle.LeftUp, NextPosition);
-		ZEVector2::Add(Temporary.Positions.RightDown, Temporary.Positions.LeftUp, CharacterSize);
+		if (TextWrap)
+		{
+			if (Temporary.Positions.LeftUp.x + CharacterSize.x > ControlRectangle.RightDown.x)
+			{
+				Temporary.Positions.LeftUp.y += CharacterSize.y;
+				if (Temporary.Positions.LeftUp.y > ControlRectangle.RightDown.y)
+					return;
 
+				Temporary.Positions.LeftUp.x = ControlRectangle.LeftUp.x;
+			}
+		}
+		else
+			if (Temporary.Positions.LeftUp.x > ControlRectangle.RightDown.x)
+				return;
+
+		ZEVector2::Add(Temporary.Positions.RightDown, Temporary.Positions.LeftUp, CharacterSize);
 		Temporary.Texcoords = CurrCharacter.CoordinateRectangle;
 
 
-		NextPosition.x += CharacterSize.x;
-		if (NextPosition.x > ControlRectangle.RightDown.x)
-			if (TextWrap)
+	/*	if (Temporary.Positions.RightDown.y > ControlRectangle.RightDown.y)
+		{*/
+			if (!ZEUIRectangle::Clip(Output, Temporary, ControlRectangle)) // Muhtemel bug
 			{
-				NextPosition.y += CharacterSize.y;
-
-				if (NextPosition.y > ControlRectangle.RightDown.y)
-					return;
-
-				NextPosition.x = ControlRectangle.LeftUp.x;
+				Output.Material = CurrCharacter.Material;
+				Output.ZOrder = ZOrder;
+				Renderer->AddRectangle(Output);
 			}
-			else
-				return;	
-
-		if (!ZEUIRectangle::Clip(Output, Temporary, ControlRectangle))
+	/*	}
+		else
 		{
 			Output.Material = CurrCharacter.Material;
 			Output.ZOrder = ZOrder;
-			Renderer->AddRectangle(Output);
-		}
+			Renderer->AddRectangle(Temporary);
+		}*/
 
+		Temporary.Positions.LeftUp.x = Temporary.Positions.RightDown.x;
 	}
 }
 

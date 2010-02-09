@@ -119,7 +119,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
 		CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
 		CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
-		CanvasBrush->Canvas.AddPlane(1000.0f, 1000);
+		//CanvasBrush->Canvas.AddPlane(1000.0f, 1000.0f);
 		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 		CanvasBrush->Canvas.LoadCanvasFile("Test\\test.zeCanvas");
 		CanvasBrush->UpdateCanvas();

@@ -82,10 +82,11 @@ bool ZEUIManager::Initialize()
 	ZEUITextControl* TestControl = new ZEUITextControl();
 
 	TestControl->SetPosition(ZEVector2(20, 20));
-	TestControl->SetSize(ZEVector2(200.0f, 50.0f));
+	TestControl->SetSize(ZEVector2(780.0f, 100.0f));
 	TestControl->SetBackgroundColor(ZEVector4(1.0f, 0.0f, 0.0f, 1.0f));
 	TestControl->SetTextColor(ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
 	TestControl->SetText("Kan kokuyorum ulan !");
+	TestControl->SetTextWrap(true);
 	TestControl->SetFontSize(ZEVector2(1.0f, 1.0f));
 	TestControl->SetFont(ZEFontResource::LoadResource("test.zeFont"));
 
