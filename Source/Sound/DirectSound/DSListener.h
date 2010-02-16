@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundSource3D.h
+ Zinek Engine - DSListener.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,46 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SOUND_SOURCE_3D_H__
-#define __ZE_SOUND_SOURCE_3D_H__
+#ifndef	__ZE_DS_LISTENER_H__
+#define __ZE_DS_LISTENER_H__
 
-#include "Core/Component.h"
-#include "Meta/Class.h"
-#include "SoundSource.h"
-/*
-class ZESoundSource3D : public ZEComponent, public ZEClass
-{
-	protected:
-		float				MinDistance;
-		float				MaxDistance;
-		unsigned int		InsideAngle,OutsideAngle;
-		ZEVector3			ConeDirection;
-		unsigned int		ConeOutsideVolume;
-		bool				Changed3D;
-
-	public:
-		bool				Is3D();	
-		void				SetPosition(const ZEVector3& NewPosition);
-		void				SetRotation(const ZEQuaternion&);
-
-		float				GetMinDistance();
-		void				SetMinDistance(float  NewMinDistance);
-		
-		float				GetMaxDistance();
-		void				SetMaxDistance(float  NewMaxDistance);
-		
-		unsigned int		GetInsideConeAngle();
-		unsigned int		GetOutsideConeAngle();
-
-		void				SetConeAngles (unsigned int NewInsideAngle, unsigned int NewOutsideAngle);
-		
-					
-		unsigned int		GetConeOutsideVolume();
-		void				SetConeOutsideVolume(unsigned int NewOutsideVolume);
-		
-		void				Tick(float Time);
-
-							ZESoundSource3D();
-};
-*/
 #endif

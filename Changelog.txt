@@ -43,4 +43,15 @@
 	CHG: ZETextControl render function is micro optimized.
 	FIX: ZETextControl text wrap behevior fixed.
 	ADD: ZEInputBinding's ZE_IBS_PRESSED, ZE_IBS_RELEASED and ZE_IBS_ALL button state beheviors implamented into DirectInput.
-	FIX: ZEPlayer's movement key bindings's button state changed from ZE_IBS_PRESS to ZE_IBS_ALL
+	FIX: ZEPlayer's movement key bindings's buttosn state changed from ZE_IBS_PRESS to ZE_IBS_ALL.
+	
+[16 Feburary 2010 - Revision 105]
+	CHG: ZESoundResource design improved according to v0.05 general design.
+	ADD: GetLength function added to ZESoundResource which returns length of the sound sample in milliseconds.
+	FIX: ZEResourceFile::Seek function ZESeekFrom::ZE_SF_END does not worked correctly due a bug in the function. Fixed.
+	FIX: ZEPartialResourceFile::Seek function also suffers from ZESeekFrom::ZE_SF_END.
+	ADD: ZESoundSource dived in to sub classes ZESoundSourceWAV, ZESoundSourceOGG and ZESoundSourceMP3.
+	ADD: libmpg123 integrated and MP3 Support added to ZESoundSource.
+-ADD: Streaming enabled in sound source.
+-ADD: Effects enabled in sound source.
+	

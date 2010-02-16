@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundSource3D.h
+ Zinek Engine - DSModuleDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,48 +32,55 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#include "DSModuleDescription.h"
+#include "DSModule.h"
 
-#pragma once
-#ifndef	__ZE_SOUND_SOURCE_3D_H__
-#define __ZE_SOUND_SOURCE_3D_H__
-
-#include "Core/Component.h"
-#include "Meta/Class.h"
-#include "SoundSource.h"
-/*
-class ZESoundSource3D : public ZEComponent, public ZEClass
+ZEModuleType ZEDSModuleDescription::GetType()
 {
-	protected:
-		float				MinDistance;
-		float				MaxDistance;
-		unsigned int		InsideAngle,OutsideAngle;
-		ZEVector3			ConeDirection;
-		unsigned int		ConeOutsideVolume;
-		bool				Changed3D;
+	return ZE_MT_SOUND;
+}
 
-	public:
-		bool				Is3D();	
-		void				SetPosition(const ZEVector3& NewPosition);
-		void				SetRotation(const ZEQuaternion&);
+ZEModuleAttribute ZEDSModuleDescription::GetAttributes()
+{
+	return ZE_MA_DEBUG;
+}
 
-		float				GetMinDistance();
-		void				SetMinDistance(float  NewMinDistance);
-		
-		float				GetMaxDistance();
-		void				SetMaxDistance(float  NewMaxDistance);
-		
-		unsigned int		GetInsideConeAngle();
-		unsigned int		GetOutsideConeAngle();
+int ZEDSModuleDescription::GetRequiredZinekEngineVersion()
+{
+	return 0;
+}
 
-		void				SetConeAngles (unsigned int NewInsideAngle, unsigned int NewOutsideAngle);
-		
-					
-		unsigned int		GetConeOutsideVolume();
-		void				SetConeOutsideVolume(unsigned int NewOutsideVolume);
-		
-		void				Tick(float Time);
+int ZEDSModuleDescription::GetMajorVersion()
+{
+	return 0;
+}
 
-							ZESoundSource3D();
-};
-*/
-#endif
+int ZEDSModuleDescription::GetMinorVersion()
+{
+	return 4;
+}
+
+const char* ZEDSModuleDescription::GetCopyright()
+{
+	return "Copyright(c) 2007-2008, Zinek Engine Group. All rights reserved.";
+}
+
+const char* ZEDSModuleDescription::GetName()
+{
+	return "DirectSound";
+}
+
+ZEOptionSection* ZEDSModuleDescription::GetOptions()
+{
+	return NULL;
+}
+
+ZEModule* ZEDSModuleDescription::CreateModuleInstance()
+{
+	return new ZEDSModule();
+}
+
+bool ZEDSModuleDescription::CheckCompatible()
+{
+	return true;
+}

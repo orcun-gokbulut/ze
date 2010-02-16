@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundSource3D.h
+ Zinek Engine - DSSoundSource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,46 +34,45 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SOUND_SOURCE_3D_H__
-#define __ZE_SOUND_SOURCE_3D_H__
+#ifndef	__ZE_DS_SOUND_SOURCE_3D_H__
+#define __ZE_DS_SOUND_SOURCE_3D_H__
 
-#include "Core/Component.h"
-#include "Meta/Class.h"
-#include "SoundSource.h"
-/*
-class ZESoundSource3D : public ZEComponent, public ZEClass
+#include "DSComponentBase.h"
+#include "../SoundSource.h"
+#include <dsound.h>
+
+class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 {
-	protected:
-		float				MinDistance;
-		float				MaxDistance;
-		unsigned int		InsideAngle,OutsideAngle;
-		ZEVector3			ConeDirection;
-		unsigned int		ConeOutsideVolume;
-		bool				Changed3D;
+	friend class ZEDSModule;
+	private:
+		LPDIRECTSOUNDBUFFER			DSBuffer;
+
+		bool						CreateBuffer();
+		void						Stream();
+		void						ManageParameters();
+
+									ZEDSSoundSource();
+		virtual						~ZEDSSoundSource();
 
 	public:
-		bool				Is3D();	
-		void				SetPosition(const ZEVector3& NewPosition);
-		void				SetRotation(const ZEQuaternion&);
+		virtual void				SetCurrentCursor(unsigned int SampleIndex);
+		virtual unsigned int		GetCurrentCursor();
+		virtual void				SetStartCursor(unsigned int SampleIndex);
+		virtual void				SetEndCursor(unsigned int SampleIndex);
 
-		float				GetMinDistance();
-		void				SetMinDistance(float  NewMinDistance);
-		
-		float				GetMaxDistance();
-		void				SetMaxDistance(float  NewMaxDistance);
-		
-		unsigned int		GetInsideConeAngle();
-		unsigned int		GetOutsideConeAngle();
+		virtual void				SetPan(int NewPan);
+		virtual void				SetFrequency(unsigned int NewFrequency);
+		virtual void				SetVolume(unsigned int NewVolume);
+		virtual void				SetLoop(bool Enabled);				
+							
+		virtual void				Play();
+		virtual void				Resume();
+		virtual void				Pause();
+		virtual void				Stop();
 
-		void				SetConeAngles (unsigned int NewInsideAngle, unsigned int NewOutsideAngle);
-		
-					
-		unsigned int		GetConeOutsideVolume();
-		void				SetConeOutsideVolume(unsigned int NewOutsideVolume);
-		
-		void				Tick(float Time);
+		void						Update(float ElapsedTime);
 
-							ZESoundSource3D();
+		virtual void				SetSoundResource(ZESoundResource* Resource);
 };
-*/
+
 #endif

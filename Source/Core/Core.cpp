@@ -433,7 +433,7 @@ void ZECore::MainLoop()
 	srand(NewTime.LowPart);
 	Graphics->UpdateScreen();
 	Graphics->ClearFrameBuffer();
-	Sound->ProcessSound();
+	Sound->ProcessSound(TimeDifference);
 	if (Game != NULL)
 	{
 		Game->Tick(TimeDifference);
@@ -471,6 +471,7 @@ ZECore::ZECore()
 	ModuleManager	= new ZEModuleManager();
 	Window			= new ZEWindow();
 	Game			= new ZEGame();
+
 	ZEGraphicsModule::BaseInitialize();
 	ZESoundModule::BaseInitialize();
 	ZEInputModule::BaseInitialize();

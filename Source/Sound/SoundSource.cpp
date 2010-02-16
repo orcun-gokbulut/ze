@@ -36,172 +36,273 @@
 #include "SoundSource.h"
 #include "SoundModule.h"
 
-bool ZESoundSource::Is3D()
-{
-	return false;
-}
-
-ZESoundState	ZESoundSource::GetSoundState()				
-{
-	return SoundState;
-}
-
-int ZESoundSource::GetBufferId()
-{ 
-	return BufferId;
-}
-
-unsigned int ZESoundSource::GetCursor()
-{
-	return Cursor;
-}
-
-void ZESoundSource::SetCursor(unsigned int NewCursor)	
-{
-	Cursor = NewCursor;
-	Changed = true;
-}	
-
-unsigned int ZESoundSource ::GetPan()
-{
-	return Pan;
-}
-
-void ZESoundSource::SetPan(unsigned int NewPan)
-{
-	Pan = NewPan;
-	Changed = true;
-}	
-
-unsigned int ZESoundSource ::GetFrequency()			
-{
-	return Frequency;
-}
-
-void ZESoundSource ::SetFrequency(unsigned int NewFrequency)
-{
-	Frequency = NewFrequency;
-	Changed = true;
-}
-
-unsigned int ZESoundSource::GetVolume()
-{
-	return Volume;
-}
-
-void ZESoundSource::SetVolume(unsigned int NewVolume)
-{
-	Volume = NewVolume;
-	Changed = true;
-}
-
-void ZESoundSource ::Play()
-{
-	if (SoundState != SOUNDSTATE_NOBUFFER)
-	{
-		SoundState = SOUNDSTATE_PLAYING;
-		zeSound->UpdateSource(this);
-		zeSound->Play(this);
-	}
-}
-
-void ZESoundSource::Pause()
-{	
-	if (SoundState != SOUNDSTATE_NOBUFFER)
-	{
-		zeSound->Pause(this);
-		SoundState = SOUNDSTATE_PAUSED;
-	}
-}
-
-void ZESoundSource ::Stop() 
-{
-	if (SoundState != SOUNDSTATE_NOBUFFER)
-	{
-		zeSound->Stop(this);
-		SoundState = SOUNDSTATE_STOPPED;
-	}
-}
-
-void ZESoundSource ::PlayLoop()
-{
-	if (SoundState != SOUNDSTATE_NOBUFFER)
-	{
-		if (Changed)
-			zeSound->UpdateSource(this);
-		zeSound->PlayLoop(this);
-		SoundState = SOUNDSTATE_LOOPING;
-	}
-}
-
-void ZESoundSource::LoadSoundResource(ZESoundResource* Resource)
-{
-	if (SoundResource != NULL)
-	{
-		SoundResource->Release();
-		zeSound->ReleaseBuffer(this);
-	}
-	
-	if (Resource == NULL)
-	{
-		SoundState = SOUNDSTATE_NOBUFFER;
-		BufferId = -1;
-	}
-	else
-	{
-		SoundResource = Resource;
-		SoundState = SOUNDSTATE_STOPPED;	
-		BufferId = zeSound->CreateBuffer(this, SoundResource);
-		if (BufferId == -1)
-			SoundState = SOUNDSTATE_NOBUFFER;
-	}
-}
-
-void ZESoundSource::LoadSoundFile(const char* FileName)
-{
-	if (SoundResource != NULL)
-	{
-		SoundResource->Release();
-		zeSound->ReleaseBuffer(this);
-	}
-	
-	SoundResource = ZESoundResource::LoadResource(FileName);
-	if (SoundResource == NULL)
-	{
-		SoundState = SOUNDSTATE_NOBUFFER;
-		BufferId = -1;
-	}
-	else
-	{
-		SoundState = SOUNDSTATE_STOPPED;	
-		BufferId = zeSound->CreateBuffer(this, SoundResource);
-		if (BufferId == -1)
-			SoundState = SOUNDSTATE_NOBUFFER;
-	}
-}
-
-void ZESoundSource::Update()
-{	
-	if (SoundState != SOUNDSTATE_NOBUFFER && Changed)
-	{
-		zeSound->UpdateSource(this);
-		Changed = false;
-	}
-}	
-
 ZESoundSource::ZESoundSource()
 {
-	Changed = false;
+	SoundSourceState = ZE_SSS_NONE;
+	Pan = ZE_SS_PAN_MIDDLE;
+	Frequency = ZE_SS_FREQUENCY_DEFAULT;
+	Volume = ZE_SS_VOLUME_MAX;
+
+	Loop = false;
+	Streaming = false;
+	CurrentCursor = 0;
+	StartCursor = 0;
+	EndCursor = 0;
 	SoundResource = NULL;
-	SoundState = SOUNDSTATE_NOBUFFER;
-	BufferId = -1;
 }
 
 ZESoundSource::~ZESoundSource()
 {
 	if (SoundResource != NULL)
-	{
-		zeSound->ReleaseBuffer(this);
 		SoundResource->Release();
+}
+
+bool ZESoundSource::IsStreaming() const
+{
+	return Streaming;
+}
+
+void ZESoundSource::SetSoundSourceState(ZESoundSourceState State)		
+{
+	SoundSourceState = State;
+}
+
+ZESoundSourceState ZESoundSource::GetSoundSourceState() const		
+{
+	return SoundSourceState;
+}
+
+void ZESoundSource::SetCurrentCursor(unsigned int SampleIndex)
+{
+	StartCursor = SampleIndex;
+}
+
+void ZESoundSource::SetCurrentCursorTime(float Seconds)
+{
+	if (SoundResource != NULL)
+	{
+		unsigned int SampleIndex = (float)SoundResource->GetSamplesPerSecond() * Seconds;
+		if (SampleIndex > SoundResource->GetSampleCount())
+			SetStartCursor(SoundResource->GetSampleCount());
 	}
 }
+
+void ZESoundSource::SetCurrentCursorPersentage(float Percentage)
+{
+	if (SoundResource != NULL)
+	{
+		if (Percentage < 0.0f)
+			SetCurrentCursor(0);
+		else if (Percentage > 100.0f)
+			SetCurrentCursor(SoundResource->GetSampleCount());
+		else
+			SetCurrentCursor((SoundResource->GetSampleCount() / 100.0f) * Percentage);
+	}
+}
+
+unsigned int ZESoundSource::GetCurrentCursor() const
+{
+	return CurrentCursor;
+}
+
+unsigned int ZESoundSource::GetCurrentCursorTime() const
+{
+	if (SoundResource != NULL)
+		return (float)CurrentCursor / (float)SoundResource->GetSamplesPerSecond();
+	else
+		return 0;
+}
+
+float ZESoundSource::GetCurrentCursorPersentage() const
+{
+	if (SoundResource != NULL)
+		return ((float)CurrentCursor / (float)SoundResource->GetSampleCount()) * 100.0f;
+	else
+		return 0.0f;
+}
+
+void ZESoundSource::SetStartCursor(unsigned int SampleIndex)
+{
+	if (SoundResource == NULL)
+		if (StartCursor > SoundResource->GetSampleCount())
+			StartCursor = SoundResource->GetSampleCount();
+}
+
+void ZESoundSource::SetStartCursorTime(float Seconds)
+{
+	if (SoundResource != NULL)
+	{
+		unsigned int SampleIndex = (float)SoundResource->GetSamplesPerSecond() * Seconds;
+
+		if (SampleIndex > SoundResource->GetSampleCount())
+			SetStartCursor(SoundResource->GetSampleCount());
+		else
+			SetStartCursor(SampleIndex);
+	}
+}
+
+void ZESoundSource::SetStartCursorPersentage(float Percentage)
+{
+	if (SoundResource != NULL)
+	{
+		if (Percentage < 0.0f)
+			SetStartCursor(0);
+		else
+			SetStartCursor(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage);
+	}
+}
+
+unsigned int ZESoundSource::GetStartCursor() const
+{
+	return StartCursor;
+}
+
+float ZESoundSource::GetStartCursorTime() const
+{
+	if (SoundResource != NULL)
+		return (float)StartCursor / (float)SoundResource->GetSamplesPerSecond();
+	else
+		return 0;
+}
+
+float ZESoundSource::GetStartCursorPersentage() const
+{
+	if (SoundResource != NULL)
+		return (StartCursor / SoundResource->GetSampleCount()) * 100.0f;
+	else
+		return 0.0f;
+}
+
+void ZESoundSource::SetEndCursor(unsigned int SampleIndex)
+{
+	if (SoundResource != NULL)
+	{
+		if (SampleIndex > SoundResource->GetSampleCount())
+			EndCursor = SampleIndex;
+	}
+}
+
+void ZESoundSource::SetEndCursorTime(float Seconds)
+{
+	if (SoundResource != NULL)
+	{
+		unsigned int SampleIndex = (float)SoundResource->GetSamplesPerSecond() * Seconds;
+
+		if (SampleIndex > SoundResource->GetSampleCount())
+			SetEndCursor(SoundResource->GetSampleCount());
+		else
+			SetEndCursor(SampleIndex);
+	}
+}
+
+void ZESoundSource::SetEndCursorPercentage(float Percentage)
+{
+	if (SoundResource != NULL)
+	{
+		if (Percentage < 0.0f)
+			SetEndCursor(0);
+		else
+			SetEndCursor(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage);
+	}
+}
+
+unsigned int ZESoundSource::GetEndCursor() const
+{
+	return EndCursor;
+}
+
+float ZESoundSource::GetEndCursorTime() const
+{
+	if (SoundResource != NULL)
+		return (float)EndCursor / (float)SoundResource->GetSamplesPerSecond();
+	else
+		return 0;
+}
+
+float ZESoundSource::GetEndCursorPersentage() const
+{
+	if (SoundResource != NULL)
+		return (EndCursor / SoundResource->GetSampleCount()) * 100.0f;
+	else
+		return 0.0f;
+}
+
+void ZESoundSource::SetPan(int NewPan)
+{
+	Pan = NewPan;
+}	
+
+int ZESoundSource::GetPan() const
+{
+	return Pan;
+}
+
+void ZESoundSource::SetFrequency(unsigned int NewFrequency)
+{
+	Frequency = NewFrequency;
+}
+
+unsigned int ZESoundSource::GetFrequency() const		
+{
+	return Frequency;
+}
+
+void ZESoundSource::SetPlaybackSpeed(float Speed)
+{
+	SetFrequency(Speed * SoundResource->GetSamplesPerSecond());
+}
+
+float ZESoundSource::GetPlaybackSpeed() const
+{
+	if (SoundResource != NULL)
+		return Frequency / SoundResource->GetSamplesPerSecond();
+	else
+		return 1.0f;
+}
+
+void ZESoundSource::SetVolume(unsigned int NewVolume)
+{
+	Volume = NewVolume;
+}
+
+unsigned int ZESoundSource::GetVolume() const
+{
+	return Volume;
+}
+
+void ZESoundSource::SetLoop(bool Enabled)
+{
+	Loop = Enabled;
+}
+
+bool ZESoundSource::GetLoop() const
+{
+	return Loop;
+}
+
+void ZESoundSource::Destroy()
+{
+	delete this;
+}
+
+void ZESoundSource::SetSoundResource(ZESoundResource* Resource)
+{
+	if (SoundResource != NULL)
+		SoundResource->Release();
+
+	Resource->AddReferance();
+	SoundResource = Resource;
+}
+
+ZESoundResource* ZESoundSource::GetSoundResource() const
+{
+	return SoundResource;
+}
+
+ZESoundSource* ZESoundSource::CreateInstance()
+{
+	return zeSound->CreateSoundSource();
+}
+
+
+#include "SoundSource.h.zpp"

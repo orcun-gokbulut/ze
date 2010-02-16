@@ -82,7 +82,22 @@ bool ZEResourceFile::Open(const char* FileName)
 
 bool ZEResourceFile::Seek(size_t Offset, ZESeekFrom Origin)
 {
-	if (fseek((FILE*)File, Offset, Origin) == 0)
+
+	int OriginNorm;
+	switch(Origin)
+	{
+		case ZE_SF_BEGINING:
+			OriginNorm = SEEK_SET;
+			break;
+		case ZE_SF_CURRENT:
+			OriginNorm = SEEK_CUR;
+			break;
+		case ZE_SF_END:
+			OriginNorm = SEEK_END;
+			break;
+	}
+
+	if (fseek((FILE*)File, Offset, OriginNorm) == 0)
 		return true;
 	else
 		return false;
@@ -192,7 +207,7 @@ bool ZEPartialResourceFile::Seek(size_t Offset, ZESeekFrom Origin)
 				return false;
 			break;
 		case ZE_SF_END:
-			if (fseek((FILE*)File, EndPosition + Offset, SEEK_SET) != 0)
+			if (fseek((FILE*)File, EndPosition + Offset, SEEK_END) != 0)
 				return false;
 			break;
 	}

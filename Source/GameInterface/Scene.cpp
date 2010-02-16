@@ -371,7 +371,7 @@ ZECamera* ZEScene::GetActiveCamera()
 void ZEScene::SetActiveListener(ZEListener* Listener)
 {
 	ActiveListener = Listener;
-	zeSound->SetListener(Listener);
+	zeSound->SetActiveListener(Listener);
 }
 
 ZEListener* ZEScene::GetActiveListener()

@@ -165,7 +165,7 @@ class ZEEntity : public ZEClass
 		const ZEQuaternion&						GetRotation() const;
 
 		virtual void							SetScale(const ZEVector3& NewScale);
-		const ZEVector3&							GetScale() const;
+		const ZEVector3&						GetScale() const;
 
 		virtual void							SetVelocity(const ZEVector3& NewVelocity);
 		const ZEVector3&						GetVelocity() const;

@@ -34,14 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "SoundModule.h"
+#include "SoundResourceMP3.h"
 #include "Core/Core.h"
 
 void ZESoundModule::BaseInitialize()
 {
+	ZESoundResourceMP3::BaseInitialize();
 }
 
 void ZESoundModule::BaseDeinitialize()
 {
+	ZESoundResourceMP3::BaseDeinitialize();
 }
 
 ZESoundModule* ZESoundModule::GetInstance()

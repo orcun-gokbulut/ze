@@ -83,8 +83,8 @@ void ZEListener::SetRollOffFactor(float NewRollOffFactor)
 
 void ZEListener::Tick()
 {
-	if(ChangedListener == true)
+	/*if(ChangedListener == true)
 		zeSound->UpdateListener(this);
 		
-	ChangedListener = false;
+	ChangedListener = false;*/
 }

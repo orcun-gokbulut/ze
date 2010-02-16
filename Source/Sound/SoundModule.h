@@ -52,26 +52,22 @@ class ZESoundModule : public ZEModule
 		static void					BaseInitialize();
 		static void					BaseDeinitialize();
 
-		virtual void				Play(ZESoundSource* Source) = 0;
-		virtual void				Stop(ZESoundSource* Source) = 0;
-		virtual void				Pause(ZESoundSource* Source) = 0;
-		virtual void				PlayLoop(ZESoundSource* Source) = 0;
-		
-		virtual void				UpdateSource(ZESoundSource* Source) = 0 ;
-		virtual void                UpdateSource3D(ZESoundSource3D* Source3D)=0;
+		virtual void				SetMasterVolume(unsigned int Volume) = 0;
+		virtual unsigned int 		GetMasterVolume() = 0;
 
-		virtual void				ProcessSound() = 0;
-		virtual void				PauseAllSounds() = 0;
-		virtual void				StopAllSounds() = 0;
+		virtual void				ProcessSound(float ElapsedTime) = 0;
 
-		virtual void				ReloadBuffer(ZESoundSource* Source) = 0;
-		virtual void				ReloadAllBuffers() = 0;
+		virtual void				PlaySound(ZESoundResource* SoundResource) = 0;
 
-		virtual	void				SetListener(ZEListener* NewListener) = 0;
-		virtual void                UpdateListener(ZEListener* NewListener) = 0;
+		virtual void				SetMaxBufferSize(size_t BufferSize) = 0; 
+		virtual size_t				GetMaxBufferSize() = 0;
 
-		virtual int					CreateBuffer(ZESoundSource* Source, ZESoundResource* Resource) = 0;
-		virtual void				ReleaseBuffer(ZESoundSource* Source) = 0;
+		virtual	void				SetActiveListener(ZEListener* NewListener) = 0;
+		virtual ZEListener*			GetActiveListener() = 0;
+
+		virtual ZESoundSource*		CreateSoundSource() = 0;
+		virtual ZESoundSource3D*	CreateSoundSource3D() = 0;
+		virtual ZEListener*			CreateListener() = 0;
 
 		static ZESoundModule*		GetInstance();
 };

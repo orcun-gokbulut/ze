@@ -294,7 +294,7 @@ class ZEArray
 			#endif
 		}
 
-		inline void DeleteValue(Type& Value)
+		inline void DeleteValue(Type Value)
 		{
 			size_t N = 0, OldCount = Count;
 

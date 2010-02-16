@@ -48,7 +48,21 @@ unsigned DLL_CALLCONV FreeImageFile_Read_2D(void *buffer, unsigned size, unsigne
 
 int DLL_CALLCONV FreeImageFile_Seek_2D(fi_handle handle, long offset, int origin) 
 {
-	return ((ZEResourceFile*)handle)->Seek(offset, (ZESeekFrom)origin);
+	ZESeekFrom OriginNorm;
+	switch(origin)
+	{
+		case SEEK_SET:
+			OriginNorm = ZE_SF_BEGINING;
+			break;
+		case SEEK_CUR:
+			OriginNorm = ZE_SF_CURRENT;
+			break;
+		case SEEK_END:
+			OriginNorm = ZE_SF_END;
+			break;
+	}
+
+	return ((ZEResourceFile*)handle)->Seek(offset, OriginNorm);
 }
 
 long DLL_CALLCONV FreeImageFile_Tell_2D(fi_handle handle) 

@@ -35,7 +35,7 @@
 
 #include "SoundModule.h"
 #include "SoundSource3D.h"
-
+/*
 bool ZESoundSource3D::Is3D()
 {
 	return true;
@@ -120,3 +120,4 @@ ZESoundSource3D::ZESoundSource3D()
 	Changed3D = false;
 }
 
+*/

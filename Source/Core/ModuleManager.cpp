@@ -251,7 +251,7 @@ void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
 }
 
 #include "Graphics/Direct3D9/D3D9ModuleDescription.h"
-#include "Sound/DirectSoundModule.h"
+#include "Sound/DirectSound/DSModuleDescription.h"
 #include "Input/DirectInput/DirectInputModuleDescription.h"
 #include "Input/DummyInput/DummyInputModuleDescription.h"
 #include "Input/VirtualInput/VirtualInputModuleDescription.h"
@@ -259,7 +259,7 @@ void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
 ZEModuleManager::ZEModuleManager()
 {
 	LoadInternalModule(new ZED3D9ModuleDescription());
-	LoadInternalModule(new ZEDirectSoundModuleDescription());
+	LoadInternalModule(new ZEDSModuleDescription());
 	LoadInternalModule(new ZEDummyInputModuleDescription());
 	LoadInternalModule(new ZEVirtualInputModuleDescription());
 	LoadInternalModule(new ZEDirectInputModuleDescription());

@@ -58,6 +58,8 @@
 #include "GameInterface/Serialization.h"
 #include "Meta/Animation.h"
 
+#include "Sound/SoundSource.h"
+
 extern HINSTANCE ApplicationInstance;
 
 #include "ZEDS/String.h"
@@ -101,6 +103,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Scene->AddEntity(Player);
 		Scene->SetActiveCamera(Player->GetCamera());
 
+		/*
 		ZELightBrush* Light = new ZELightBrush();
 		Light->SetLightType(ZE_LT_PROJECTIVE);
 		Light->SetPosition(ZEVector3(0.0f, 45.0f, 0.0f));
@@ -191,13 +194,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		CanvasMaterial->GetAnimationController()->PlayAnimation();
 		
 
-		Scene->AddEntity(CanvasBrush);
+		Scene->AddEntity(CanvasBrush);*/
 
 		/*ZESkyBrush* Brush = (ZESkyBrush*)zeCore->GetGame()->CreateEntityInstance("ZESkyBrush");
 		Brush->SetSkyTexture("cubetest.tga");
 		Brush->SetSkyColor(ZEVector3(1.0f, 1.0f, 1.0f));
 		Scene->AddEntity(Brush);*/
-	
+
+		ZESoundSource* SoundSource = ZESoundSource::CreateInstance();
+
+		SoundSource->SetSoundResource(ZESoundResource::LoadResource("mozart.mp3"));
+		SoundSource->SetStartCursorTime(65.0f);
+		SoundSource->SetEndCursorTime(70.5f);
+		SoundSource->SetPlaybackSpeed(1.2f);
+		SoundSource->SetLoop(true);
+		SoundSource->Play();
+
 		zeCore->Run();
 	}
 }

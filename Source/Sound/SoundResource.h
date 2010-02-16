@@ -41,56 +41,47 @@
 
 enum ZESoundFileFormat
 {
-	SOUNDFILEFORMAT_NONE,
-	SOUNDFILEFORMAT_WAVE,
-	SOUNDFILEFORMAT_OGG,
-	SOUNDFILEFORMAT_MP3
-};
-
-class ZESoundOutputFormat
-{
-	public:
-	unsigned int					SamplesPerSecond;
-	short int						ChannelCount;
-	short int						BitsPerSample;
-	short int						BlockAlign;
-	unsigned int					BufferSize;
+	ZE_SFF_NONE,
+	ZE_SFF_WAVE,
+	ZE_SFF_OGG,
+	ZE_SFF_MP3
 };
 
 class ZESoundResource : public ZEResource
 {
-	private:
-		ZESoundFileFormat			FileFormat;
-		ZESoundOutputFormat			OutputFormat;
-		size_t						DataSize;
-		unsigned char*				Data;
-		static ZESoundFileFormat	GetFileFormat(const char* FileName);
-		static ZESoundResource* 	LoadWaveFile(const char* FileName);
-		static ZESoundResource* 	LoadOggFile (const char* FileName);
-		static ZESoundResource* 	LoadMp3File(const char* FileName);
-	
-	public:
-		const char*					GetResourceType() const;
+	protected:
+		ZESoundFileFormat				FileFormat;
 
-		ZESoundFileFormat			GetResourceFormat();
-		unsigned int				SamplesPerSecond;
-		short int					ChannelCount;
-		short int					BitsPerSample;
-		short int					BlockAlign;
-		unsigned int				BufferSize;
-		unsigned char*				Buffer;
-
-		const ZESoundOutputFormat&	GetOutputFormat();
-		size_t						GetBufferSize();
-		void						FillBuffer(size_t BufferPosition, unsigned char* Buffer, size_t BufferSize);
-
-		static void					CacheResource(const char* FileName);
-		static ZESoundResource*		LoadSharedResource(const char* FileName); 
-		static ZESoundResource*		LoadResource(const char* FileName);
+		unsigned int					SampleCount;
+		unsigned int					SamplesPerSecond;
+		short int						ChannelCount;
+		short int						BitsPerSample;
+		short int						BlockAlign;
 		
+		static ZESoundFileFormat		GetFileFormat(const char* FileName);
 
-									ZESoundResource();
-									~ZESoundResource();
+										ZESoundResource();
+		virtual							~ZESoundResource();
+
+	public:
+		const char*						GetResourceType() const;
+		ZESoundFileFormat				GetSoundFileFormat() const;
+
+		unsigned int					GetSamplesPerSecond() const;
+		short int						GetChannelCount() const;
+		short int						GetBitsPerSample() const;
+		short int						GetBlockAlign() const;
+		unsigned int					GetSampleCount() const;
+		size_t							GetPCMDataSize() const;
+
+		virtual size_t					GetDataSize() const = 0;		
+		virtual const unsigned char*	GetData() const = 0;
+
+		virtual void					Decode(void* Buffer, size_t SampleIndex, size_t SampleCount) = 0;
+
+		static void						CacheResource(const char* FileName);
+		static ZESoundResource*			LoadSharedResource(const char* FileName); 
+		static ZESoundResource*			LoadResource(const char* FileName);
 };
 
 #endif

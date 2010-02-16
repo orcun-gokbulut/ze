@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundSource3D.h
+ Zinek Engine - SoundResourceMP3.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,46 +34,37 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SOUND_SOURCE_3D_H__
-#define __ZE_SOUND_SOURCE_3D_H__
+#ifndef	__ZE_SOUND_RESOURCE_MP3_H__
+#define __ZE_SOUND_RESOURCE_MP3_H__
 
-#include "Core/Component.h"
-#include "Meta/Class.h"
-#include "SoundSource.h"
-/*
-class ZESoundSource3D : public ZEComponent, public ZEClass
+#include "SoundResource.h"
+#include <mpg123/mpg123.h>
+
+class ZESoundResourceMP3 : public ZESoundResource
 {
-	protected:
-		float				MinDistance;
-		float				MaxDistance;
-		unsigned int		InsideAngle,OutsideAngle;
-		ZEVector3			ConeDirection;
-		unsigned int		ConeOutsideVolume;
-		bool				Changed3D;
+	friend long Memory_Read(int fd, void *buffer, size_t nbytes);
+	friend long Memory_Seek(int fd, long offset, int whence);
+
+	private:
+		unsigned char*					Data;
+		size_t							DataSize;
+
+		mpg123_handle*					mpg123;
+		size_t							MemoryCursor;
+
+										ZESoundResourceMP3();
+		virtual							~ZESoundResourceMP3();
 
 	public:
-		bool				Is3D();	
-		void				SetPosition(const ZEVector3& NewPosition);
-		void				SetRotation(const ZEQuaternion&);
+		virtual unsigned int			GetDataSize() const;		
+		virtual const unsigned char*	GetData() const;
 
-		float				GetMinDistance();
-		void				SetMinDistance(float  NewMinDistance);
-		
-		float				GetMaxDistance();
-		void				SetMaxDistance(float  NewMaxDistance);
-		
-		unsigned int		GetInsideConeAngle();
-		unsigned int		GetOutsideConeAngle();
+		virtual void					Decode(void* DestinationBuffer, size_t SampleIndex, size_t SampleCount);
 
-		void				SetConeAngles (unsigned int NewInsideAngle, unsigned int NewOutsideAngle);
-		
-					
-		unsigned int		GetConeOutsideVolume();
-		void				SetConeOutsideVolume(unsigned int NewOutsideVolume);
-		
-		void				Tick(float Time);
+		static void						BaseInitialize();
+		static void						BaseDeinitialize();
 
-							ZESoundSource3D();
+		static ZESoundResource*			LoadResource(const char* FileName);
 };
-*/
+
 #endif
