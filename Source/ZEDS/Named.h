@@ -42,7 +42,7 @@ class ZENamed
 private:
 	char*			Name;
 public:
-	void				SetName(const char* NewName);
+	void			SetName(const char* NewName);
 	const char*		GetName();
 
 	ZENamed();

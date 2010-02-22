@@ -39,15 +39,15 @@
 ZESoundSource::ZESoundSource()
 {
 	SoundSourceState = ZE_SSS_NONE;
+	SoundSourceType = ZE_SST_NONE;
 	Pan = ZE_SS_PAN_MIDDLE;
 	Frequency = ZE_SS_FREQUENCY_DEFAULT;
 	Volume = ZE_SS_VOLUME_MAX;
-
 	Loop = false;
 	Streaming = false;
-	CurrentCursor = 0;
-	StartCursor = 0;
-	EndCursor = 0;
+	CurrentPosition = 0;
+	StartPosition = 0;
+	EndPosition = 0;
 	SoundResource = NULL;
 }
 
@@ -72,164 +72,183 @@ ZESoundSourceState ZESoundSource::GetSoundSourceState() const
 	return SoundSourceState;
 }
 
-void ZESoundSource::SetCurrentCursor(unsigned int SampleIndex)
+void ZESoundSource::SetSoundSourceType(ZESoundSourceType Type)
 {
-	StartCursor = SampleIndex;
+	SoundSourceType = Type;
+	
+	// Update Volume
+	SetVolume(GetVolume());
 }
 
-void ZESoundSource::SetCurrentCursorTime(float Seconds)
+ZESoundSourceType ZESoundSource::GetSoundSourceType()
+{
+	return SoundSourceType;
+}
+
+
+void ZESoundSource::SetCurrentPosition(unsigned int SampleIndex)
+{
+	StartPosition = SampleIndex;
+}
+
+void ZESoundSource::SetCurrentPositionTime(float Seconds)
 {
 	if (SoundResource != NULL)
 	{
 		unsigned int SampleIndex = (float)SoundResource->GetSamplesPerSecond() * Seconds;
 		if (SampleIndex > SoundResource->GetSampleCount())
-			SetStartCursor(SoundResource->GetSampleCount());
+			SetStartPosition(SoundResource->GetSampleCount());
 	}
 }
 
-void ZESoundSource::SetCurrentCursorPersentage(float Percentage)
+void ZESoundSource::SetCurrentPositionPersentage(float Percentage)
 {
 	if (SoundResource != NULL)
 	{
 		if (Percentage < 0.0f)
-			SetCurrentCursor(0);
+			SetCurrentPosition(0);
 		else if (Percentage > 100.0f)
-			SetCurrentCursor(SoundResource->GetSampleCount());
+			SetCurrentPosition(SoundResource->GetSampleCount());
 		else
-			SetCurrentCursor((SoundResource->GetSampleCount() / 100.0f) * Percentage);
+			SetCurrentPosition((SoundResource->GetSampleCount() / 100.0f) * Percentage);
 	}
 }
 
-unsigned int ZESoundSource::GetCurrentCursor() const
+unsigned int ZESoundSource::GetCurrentPosition() const
 {
-	return CurrentCursor;
+	return CurrentPosition;
 }
 
-unsigned int ZESoundSource::GetCurrentCursorTime() const
+unsigned int ZESoundSource::GetCurrentPositionTime() const
 {
 	if (SoundResource != NULL)
-		return (float)CurrentCursor / (float)SoundResource->GetSamplesPerSecond();
+		return (float)CurrentPosition / (float)SoundResource->GetSamplesPerSecond();
 	else
 		return 0;
 }
 
-float ZESoundSource::GetCurrentCursorPersentage() const
+float ZESoundSource::GetCurrentPositionPersentage() const
 {
 	if (SoundResource != NULL)
-		return ((float)CurrentCursor / (float)SoundResource->GetSampleCount()) * 100.0f;
+		return ((float)CurrentPosition / (float)SoundResource->GetSampleCount()) * 100.0f;
 	else
 		return 0.0f;
 }
 
-void ZESoundSource::SetStartCursor(unsigned int SampleIndex)
+void ZESoundSource::SetStartPosition(unsigned int SampleIndex)
 {
 	if (SoundResource == NULL)
-		if (StartCursor > SoundResource->GetSampleCount())
-			StartCursor = SoundResource->GetSampleCount();
+		if (StartPosition > SoundResource->GetSampleCount())
+			StartPosition = SoundResource->GetSampleCount();
 }
 
-void ZESoundSource::SetStartCursorTime(float Seconds)
+void ZESoundSource::SetStartPositionTime(float Seconds)
 {
 	if (SoundResource != NULL)
 	{
 		unsigned int SampleIndex = (float)SoundResource->GetSamplesPerSecond() * Seconds;
 
 		if (SampleIndex > SoundResource->GetSampleCount())
-			SetStartCursor(SoundResource->GetSampleCount());
+			SetStartPosition(SoundResource->GetSampleCount());
 		else
-			SetStartCursor(SampleIndex);
+			SetStartPosition(SampleIndex);
 	}
 }
 
-void ZESoundSource::SetStartCursorPersentage(float Percentage)
+void ZESoundSource::SetStartPositionPersentage(float Percentage)
 {
 	if (SoundResource != NULL)
 	{
 		if (Percentage < 0.0f)
-			SetStartCursor(0);
+			SetStartPosition(0);
 		else
-			SetStartCursor(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage);
+			SetStartPosition(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage);
 	}
 }
 
-unsigned int ZESoundSource::GetStartCursor() const
+unsigned int ZESoundSource::GetStartPosition() const
 {
-	return StartCursor;
+	return StartPosition;
 }
 
-float ZESoundSource::GetStartCursorTime() const
+float ZESoundSource::GetStartPositionTime() const
 {
 	if (SoundResource != NULL)
-		return (float)StartCursor / (float)SoundResource->GetSamplesPerSecond();
+		return (float)StartPosition / (float)SoundResource->GetSamplesPerSecond();
 	else
 		return 0;
 }
 
-float ZESoundSource::GetStartCursorPersentage() const
+float ZESoundSource::GetStartPositionPersentage() const
 {
 	if (SoundResource != NULL)
-		return (StartCursor / SoundResource->GetSampleCount()) * 100.0f;
+		return (StartPosition / SoundResource->GetSampleCount()) * 100.0f;
 	else
 		return 0.0f;
 }
 
-void ZESoundSource::SetEndCursor(unsigned int SampleIndex)
+void ZESoundSource::SetEndPosition(unsigned int SampleIndex)
 {
 	if (SoundResource != NULL)
 	{
 		if (SampleIndex > SoundResource->GetSampleCount())
-			EndCursor = SampleIndex;
+			EndPosition = SampleIndex;
 	}
 }
 
-void ZESoundSource::SetEndCursorTime(float Seconds)
+void ZESoundSource::SetEndPositionTime(float Seconds)
 {
 	if (SoundResource != NULL)
 	{
 		unsigned int SampleIndex = (float)SoundResource->GetSamplesPerSecond() * Seconds;
 
 		if (SampleIndex > SoundResource->GetSampleCount())
-			SetEndCursor(SoundResource->GetSampleCount());
+			SetEndPosition(SoundResource->GetSampleCount());
 		else
-			SetEndCursor(SampleIndex);
+			SetEndPosition(SampleIndex);
 	}
 }
 
-void ZESoundSource::SetEndCursorPercentage(float Percentage)
+void ZESoundSource::SetEndPositionPercentage(float Percentage)
 {
 	if (SoundResource != NULL)
 	{
 		if (Percentage < 0.0f)
-			SetEndCursor(0);
+			SetEndPosition(0);
 		else
-			SetEndCursor(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage);
+			SetEndPosition(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage);
 	}
 }
 
-unsigned int ZESoundSource::GetEndCursor() const
+unsigned int ZESoundSource::GetEndPosition() const
 {
-	return EndCursor;
+	return EndPosition;
 }
 
-float ZESoundSource::GetEndCursorTime() const
+float ZESoundSource::GetEndPositionTime() const
 {
 	if (SoundResource != NULL)
-		return (float)EndCursor / (float)SoundResource->GetSamplesPerSecond();
+		return (float)EndPosition / (float)SoundResource->GetSamplesPerSecond();
 	else
 		return 0;
 }
 
-float ZESoundSource::GetEndCursorPersentage() const
+float ZESoundSource::GetEndPositionPersentage() const
 {
 	if (SoundResource != NULL)
-		return (EndCursor / SoundResource->GetSampleCount()) * 100.0f;
+		return (EndPosition / SoundResource->GetSampleCount()) * 100.0f;
 	else
 		return 0.0f;
 }
 
 void ZESoundSource::SetPan(int NewPan)
 {
-	Pan = NewPan;
+	if (Pan > ZE_SS_PAN_RIGHT)
+		Pan = 100;
+	else if (Pan < ZE_SS_PAN_LEFT)
+		Pan = -100;
+	else
+		Pan = NewPan;
 }	
 
 int ZESoundSource::GetPan() const
@@ -262,7 +281,10 @@ float ZESoundSource::GetPlaybackSpeed() const
 
 void ZESoundSource::SetVolume(unsigned int NewVolume)
 {
-	Volume = NewVolume;
+	if (NewVolume > ZE_SS_VOLUME_MAX)
+		NewVolume = ZE_SS_VOLUME_MAX;
+
+	Volume = (float)NewVolume * ((float)zeSound->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
 }
 
 unsigned int ZESoundSource::GetVolume() const
@@ -278,6 +300,24 @@ void ZESoundSource::SetLoop(bool Enabled)
 bool ZESoundSource::GetLoop() const
 {
 	return Loop;
+}
+
+size_t ZESoundSource::GetLoopLength()
+{
+	if (StartPosition < EndPosition)
+		return EndPosition - StartPosition;
+	else
+		return StartPosition + (SoundResource->GetSampleCount() - EndPosition);
+}
+
+float ZESoundSource::GetLoopLenghtTime()
+{
+	return GetLoopLength() / SoundResource->GetSamplesPerSecond();
+}
+
+float ZESoundSource::GetLoopLenghtPercent()
+{
+	return (GetLoopLength() / SoundResource->GetSampleCount()) * 100.0f;
 }
 
 void ZESoundSource::Destroy()

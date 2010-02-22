@@ -56,6 +56,8 @@
 ZEOptionSection ZECore::CoreOptions; 
 
 HINSTANCE ApplicationInstance;
+LARGE_INTEGER PerformanceCounterFreq;
+LARGE_INTEGER PerformanceCount, OldPerformanceCount, StartPerformanceCount;
 
 ZEError* ZECore::GetError()
 {
@@ -219,13 +221,30 @@ size_t ZECore::GetFrameId()
 	return FrameId;
 }
 
-bool ZECore::DebugModeEnabled()
+float ZECore::GetFrameTime()
 {
-#ifdef ZEDEBUG_ENABLED
-	return true;
-#else
-	return false;
-#endif
+	return FrameTime;
+}
+
+float ZECore::GetRuningTime()
+{
+	QueryPerformanceCounter(&PerformanceCount);
+	return (PerformanceCount.QuadPart - StartPerformanceCount.QuadPart) / PerformanceCounterFreq.QuadPart;
+}
+
+
+void ZECore::SetDebugMode(bool Enabled)
+{
+	DebugMode = Enabled;
+}
+
+bool ZECore::GetDebugMode()
+{
+	#ifdef ZEDEBUG_ENABLED
+		return DebugMode;
+	#else
+		return false;
+	#endif
 }
 
 void* ZECore::GetApplicationInstance()
@@ -306,6 +325,8 @@ bool ZECore::InitializeModules()
 		zeError("Core", "Can not initialize input module.");
 		return false;
 	}
+
+	QueryPerformanceFrequency(&PerformanceCounterFreq);
 	return true;
 }
 
@@ -361,6 +382,8 @@ bool ZECore::StartUp(void* WindowHandle)
 	if (Game != NULL)
 		Game->Initialize();
 
+	QueryPerformanceFrequency(&PerformanceCounterFreq);
+
 	return true;
 }
 
@@ -415,34 +438,35 @@ void ZECore::ShutDown()
 
 void ZECore::MainLoop()
 {
-	static LARGE_INTEGER OldTime, Freq;
-	static bool FirstTime = true;
-	LARGE_INTEGER NewTime;
+	FrameId++;
 
-	if (FirstTime)
+	if (OldPerformanceCount.QuadPart == 0)
 	{
-		QueryPerformanceCounter(&OldTime);
-		FirstTime = false;
+		FrameTime = 0;
+		QueryPerformanceCounter(&OldPerformanceCount);
+	}
+	else
+	{
+		QueryPerformanceCounter(&PerformanceCount);
+
+		FrameTime = (PerformanceCount.QuadPart - OldPerformanceCount.QuadPart) / PerformanceCounterFreq.QuadPart;
+		OldPerformanceCount = PerformanceCount;
 	}
 
-	QueryPerformanceFrequency(&Freq);
-	QueryPerformanceCounter(&NewTime);
-	float TimeDifference = (float)(NewTime.QuadPart - OldTime.QuadPart) / (float)Freq.QuadPart;
-	OldTime = NewTime;
+	srand(PerformanceCount.LowPart);
 
-	srand(NewTime.LowPart);
 	Graphics->UpdateScreen();
 	Graphics->ClearFrameBuffer();
-	Sound->ProcessSound(TimeDifference);
-	if (Game != NULL)
-	{
-		Game->Tick(TimeDifference);
-		Game->Render(TimeDifference);
-	}
-
 	Input->ProcessInputs();
 	Window->ProcessMessages();
-	Sleep(0);
+	if (Game != NULL)
+	{
+		Game->Tick(FrameTime);
+		Game->Render(FrameTime);
+	}
+	Sound->ProcessSound(FrameTime);
+
+	//Sleep(0);
 }
 
 void ZECore::Run()
@@ -463,6 +487,10 @@ ZECore* ZECore::GetInstance()
 
 ZECore::ZECore() 
 {
+	PerformanceCounterFreq.QuadPart = 0;
+	PerformanceCount.QuadPart = 0;
+	OldPerformanceCount.QuadPart = 0;
+
 	Console			= new ZEConsole();
 	Commands		= new ZECommandManager();
 	Options			= new ZEOptionManager();

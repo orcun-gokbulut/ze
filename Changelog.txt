@@ -12,12 +12,16 @@
 //  If you have any question about this file first refer ZESPEC-0003 and then your senior developer.            //
 //                                                                                                              //
 //  ZEChangeLog notation referance:                                                                             //
-//   [Version Date - Revision Number] Header of the version.                                                    //
-//   ADD: New file/software/code/feature/function/class added to the version.                                   //
-//   REM: A file/software/code/feature/function/class has been removed from the version.                        //
-//   BUG: A bug is found but not fixed in this version.                                                         //
-//   FIX: A bug is fixed.                                                                                       //
-//   CHG: A feature/function/software component/behevior has been changed.                                      //
+//    Change Log Stamps                                                                                         //
+//      [Version Date - Revision Number] Header of the version.                                                 //
+//    Change Types:                                                                                             //
+//       ADD: New file/software/code/feature/function/class added to the version.                               //
+//       REM: A file/software/code/feature/function/class has been removed from the version.                    //
+//       BUG: A bug is found but not fixed in this version.                                                     //
+//       FIX: A bug or deflect is fixed.                                                                        //
+//       DEF: A known and not fixed deflect.															     	//
+//       CHG: A feature/function/software component/behevior has been changed.                                  //
+//       -  : A prefix that defines planned but not made change. It will be made in few revision.               //
 //                                                                                                              //
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -52,6 +56,24 @@
 	FIX: ZEPartialResourceFile::Seek function also suffers from ZESeekFrom::ZE_SF_END.
 	ADD: ZESoundSource dived in to sub classes ZESoundSourceWAV, ZESoundSourceOGG and ZESoundSourceMP3.
 	ADD: libmpg123 integrated and MP3 Support added to ZESoundSource.
--ADD: Streaming enabled in sound source.
--ADD: Effects enabled in sound source.
-	
+
+[22 Feburary 2010 - Revision 106]
+	ADD: ZEContainer added to ZEMeta system.
+	ADD: Sound Source Types added to sound system.
+	ADD: Common Source Types defined such as Effect, Music, Dialog, Video, Player Communication. User can also define his/her sound source type.
+	ADD: Each Source Type volume can be controlled through Sound Module.
+	ADD: Sound System integrated with options.
+	ADD: Master Volume, Effect Volume, Music Volume, Dialog Volume, Video Volume, Player Communication Volume hass ben added as options.
+	DEF: Volume options are non linear. Values below 50 are almost unhearable.
+	ADD: Streaming disabled property added. If disable streaming is enabled every sound source becomes unstreamed.
+	ADD: MaxBufferSize option added. MaxBufferSize defines maximum static sound source buffer can be. Sound Sources becomes streamed when sound resource's content execeed this value.
+	ADD: Streaming enabled in sound source.
+	DEF: Stream is not working properly.
+	ADD: GetFrameTime() function added to ZECore. It gives time difference between previous and current frame.
+	ADD: GetRunningTime() function added to ZECore. It gives total time elapsed since engine started running.
+	FIX: ZECore::GetFrameId() function gives correct incremental frame id.
+	BUG: GetFrameTime() does not work correctly.
+	CHG: ZENamed::GetName() function returns empty string ("") instead of NULL when it's empty.
+	CHG: ZENamed::SetName() function does not allocate empty string.
+	FIX: If NULL passed to ZENamed::SetName() function it crashes. Now it checks parameter for NULL or Empty string.
+	-ADD: Effects enabled in sound source.

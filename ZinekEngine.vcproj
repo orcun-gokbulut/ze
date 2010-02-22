@@ -815,6 +815,15 @@
 			<File
 				RelativePath=".\Source\Core\Component.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\Core\Console.cpp"
@@ -1190,6 +1199,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\SoundFX.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Sound\SoundModule.cpp"
 				>
 			</File>
@@ -1370,38 +1383,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\Particle\ParticleSystem.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Map"
-			>
-			<File
-				RelativePath=".\Source\Map\Map.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\Map.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\MapFileFormat.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\MapResource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\MapResource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\Octree.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\Octree.h"
 				>
 			</File>
 		</Filter>
@@ -1693,6 +1674,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Meta\Container.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Meta\Container.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Meta\PostProcessor.cpp"
 				>
 			</File>
@@ -1714,6 +1703,38 @@
 			</File>
 			<File
 				RelativePath=".\Source\Meta\Provider.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Map"
+			>
+			<File
+				RelativePath=".\Source\Map\Map.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Map\Map.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Map\MapFileFormat.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Map\MapResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Map\MapResource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Map\Octree.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Map\Octree.h"
 				>
 			</File>
 		</Filter>

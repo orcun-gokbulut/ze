@@ -68,6 +68,12 @@ void ZEGraphicsModule::BaseInitialize()
 	zeOptions->RegisterSection(&GraphicsOptions);
 }
 
+void ZEGraphicsModule::BaseDeinitialize()
+{
+	FreeImage_DeInitialise();
+	zeOptions->UnregisterSection(&GraphicsOptions);
+}
+
 void ZEGraphicsModule::SetScreenSize(int Width, int Height)
 {
 	ScreenWidth = Width;
@@ -205,11 +211,6 @@ bool ZEGraphicsModule::GetAnisotropicFilter()
 	return AnisotropicFilter;
 }
 
-void ZEGraphicsModule::BaseDeinitialize()
-{
-	FreeImage_DeInitialise();
-	zeOptions->UnregisterSection(&GraphicsOptions);
-}
 
 ZEGraphicsModule* ZEGraphicsModule::GetInstance()
 {

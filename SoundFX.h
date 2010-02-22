@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Provider.h
+ Zinek Engine - ZESoundFX.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,22 +33,115 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_META_CLASS_PROVIDER_H__
-#define __ZE_META_CLASS_PROVIDER_H__
-
-class ZEClassDescription;
-class ZEClass;
-class ZEClassProvider
+enum ZESoundFXType
 {
-	public:
-		virtual ZEClassDescription*			GetBaseClassDescription() = 0;
-		virtual ZEClassDescription*			GetClassDescriptions() = 0;
-		virtual size_t						GetClassDescriptionCount() = 0;
-
-		virtual bool						RegisterClass(ZEClassDescription* Description);
-		virtual void						UnregisterClass();
-
-		virtual ZEClass*					CreateInstance(size_t Index);
-		virtual ZEClass*					CreateInstance(const char* Name);
+	ZE_SFXT_CHORUS,
+	ZE_SFXT_ENVIRONMENTAL_REVERB,
+	ZE_SFXT_DISTORTION,
+	ZE_SFXT_ECHO,
+	ZE_SFXT_FLANGER,
+	ZE_SFXT_GARGLE,
+	ZE_SFXT_PARAMETRIC_EQ
+	ZE_SFXT_NOISY_SUPRESSOR
 };
-#endif
+
+class ZESoundFX
+{
+	private:
+		bool						Enabled;
+
+	public:
+		virtual ZESoundFXType		GetType();
+
+		void						SetEnabled(bool Enabled);
+		bool						GetEnabled();
+
+		void						Update();
+};
+
+class ZEChorusFX : public ZESoundFX
+{
+	private:
+		float		WetDryMix;
+		float		Depth;
+		float		Feedback;
+		float		Frequency;
+		int			Waveform;
+		float		Delay;
+		int			Phase;
+
+	public:
+		void		SetWetDryMix();
+		float		GetWetDryMix();
+};
+
+class ZEEnvironmentalReverbFX : public ZESoundFX 
+{
+	private:
+		int			Room;
+		int			RoomHF;
+		float		RoomRolloffFactor;
+		float		DecayTime;
+		float		DecayHFRatio;
+		int			Reflections;
+		float		ReflectionsDelay;
+		int			Reverb;
+		float		ReverbDelay;
+		float		Diffusion;
+		float		Density;
+		float		HFReference;
+};
+
+class DSFXDistortion : public ZESoundFX
+{
+    unsigned int	Gain;
+    unsigned int	Edge;
+    unsigned int	PostEQCenterFrequency;
+    unsigned int	PostEQBandwidth;
+    unsigned int	PreLowpassCutoff;
+} ;
+
+class DSFXEcho : public ZESoundFX
+{
+    float WetDryMix;
+    float Feedback;
+    float LeftDelay;
+    float RightDelay;
+    int PanDelay;
+} ;
+
+class DSFXFlanger : public ZESoundFX
+{
+    float WetDryMix;
+    float Depth;
+    float Feedback;
+    float Frequency;
+    int Weveform;
+    float Delay;
+    int Phase;
+};
+
+class DSFXGargle : public ZESoundFX
+{
+    unsigned int dwRateHz;
+    unsigned int dwWaveShape;
+};
+
+class DSFXReverb : public ZESoundFX 
+{
+    float fInGain;
+    float fReverbMix;
+    float fReverbTime;
+    float fHighFreqRTRatio;
+};
+
+class DSFXParamEq : public ZESoundFX
+{
+    float fCenter;
+    float fBandwidth;
+    float fGain;
+};
+
+class ZENoiseSupressorFX : public ZESoundFX
+{
+};

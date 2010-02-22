@@ -211,7 +211,7 @@ void ZEOptionSection::ResetChanges()
 
 ZEOptionSection::ZEOptionSection()
 {
-	SetName("");
+
 }
 
 ZEOptionSection::ZEOptionSection(const char* Name)

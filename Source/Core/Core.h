@@ -93,6 +93,8 @@ class ZECore
 		ZECoreState						CoreState;
 		ZEUserLevel						UserLevel;
 		size_t							FrameId;
+		float							FrameTime;
+		float							RunningTime;
 		bool							DebugMode;
 
 		char							ResourceDirectory;
@@ -146,9 +148,12 @@ class ZECore
 		bool							SetGame(ZEGame* Game);
 		ZEGame*							GetGame();
 
+		float							GetFrameTime();
+		float							GetRuningTime();
 		size_t							GetFrameId();
 		
-		bool							DebugModeEnabled();
+		void							SetDebugMode(bool Enabled);
+		bool							GetDebugMode();
 
 		void*							GetApplicationInstance();
 

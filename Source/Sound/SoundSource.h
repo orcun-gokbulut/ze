@@ -37,6 +37,7 @@
 #ifndef	__ZE_SOUND_SOURCE_H__
 #define __ZE_SOUND_SOURCE_H__
 
+#include "Core/Component.h"
 #include "Meta/Class.h"
 #include "SoundResource.h"
 
@@ -49,6 +50,17 @@
 
 #define ZE_SS_FREQUENCY_DEFAULT		0
 
+#define ZE_SS_MAX_TYPE 256
+
+enum ZESoundSourceType
+{
+	ZE_SST_NONE					= 0,
+	ZE_SST_EFFECT				= 1,
+	ZE_SST_DIALOG				= 2,
+	ZE_SST_MUSIC				= 3,
+	ZE_SST_VIDEO				= 4,
+	ZE_SST_PLAYER_COMM			= 5
+};
 
 enum  ZESoundSourceState
 {
@@ -58,14 +70,17 @@ enum  ZESoundSourceState
 	ZE_SSS_PAUSED,
 }; 
 
+class ZESoundSourceEffect;
+
 ZE_META_CLASS_DESCRIPTION(ZESoundSource);
 
-class ZESoundSource : public ZEClass
+class ZESoundSource : public ZEComponent
 {
 	ZE_META_CLASS()
 	protected:
 		ZESoundResource*			SoundResource;
 		ZESoundSourceState			SoundSourceState;
+		ZESoundSourceType			SoundSourceType;
 
 		int							Pan;
 		unsigned int				Frequency;
@@ -74,9 +89,10 @@ class ZESoundSource : public ZEClass
 		bool						Limited;
 		bool						Streaming;
 
-		unsigned int				CurrentCursor;
-		unsigned int				StartCursor;
-		unsigned int				EndCursor;
+		unsigned int				CurrentPosition;
+		unsigned int				OldPosition;
+		unsigned int				StartPosition;
+		unsigned int				EndPosition;
 
 									ZESoundSource();
 		virtual 					~ZESoundSource();
@@ -87,32 +103,39 @@ class ZESoundSource : public ZEClass
 		virtual void				SetSoundSourceState(ZESoundSourceState State);
 		ZESoundSourceState			GetSoundSourceState() const;
 	
-		virtual void				SetCurrentCursor(unsigned int SampleIndex);
-		void						SetCurrentCursorTime(float Seconds);
-		void						SetCurrentCursorPersentage(float Percent);
+		ZESoundSourceType			GetSoundSourceType();
+		void						SetSoundSourceType(ZESoundSourceType Type);
 
-		virtual unsigned int		GetCurrentCursor() const;
-		unsigned int				GetCurrentCursorTime() const;
-		float						GetCurrentCursorPersentage() const;
+		virtual void				SetCurrentPosition(unsigned int SampleIndex);
+		void						SetCurrentPositionTime(float Seconds);
+		void						SetCurrentPositionPersentage(float Percent);
 
-		virtual void				SetStartCursor(unsigned int SampleIndex);
-		void						SetStartCursorTime(float Seconds);
-		void						SetStartCursorPersentage(float Percent);
+		virtual unsigned int		GetCurrentPosition() const;
+		unsigned int				GetCurrentPositionTime() const;
+		float						GetCurrentPositionPersentage() const;
 
-		unsigned int				GetStartCursor() const;
-		float						GetStartCursorTime() const;
-		float						GetStartCursorPersentage() const;
+		virtual void				SetStartPosition(unsigned int SampleIndex);
+		void						SetStartPositionTime(float Seconds);
+		void						SetStartPositionPersentage(float Percent);
 
-		virtual void				SetEndCursor(unsigned int SampleIndex);
-		void						SetEndCursorTime(float Seconds);
-		void						SetEndCursorPercentage(float Percentage);
+		unsigned int				GetStartPosition() const;
+		float						GetStartPositionTime() const;
+		float						GetStartPositionPersentage() const;
 
-		unsigned int				GetEndCursor() const;
-		float						GetEndCursorTime() const;
-		float						GetEndCursorPersentage() const;
+		virtual void				SetEndPosition(unsigned int SampleIndex);
+		void						SetEndPositionTime(float Seconds);
+		void						SetEndPositionPercentage(float Percentage);
+
+		unsigned int				GetEndPosition() const;
+		float						GetEndPositionTime() const;
+		float						GetEndPositionPersentage() const;
 
 		virtual void				SetLoop(bool Enabled);
 		bool						GetLoop() const;
+
+		size_t						GetLoopLength();
+		float						GetLoopLenghtTime();
+		float						GetLoopLenghtPercent();
 
 		virtual void				SetPan(int NewPan);
 		int							GetPan() const;
@@ -143,9 +166,9 @@ class ZESoundSource : public ZEClass
 ZE_POSTPROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZESoundSource" noinstance="true">
+		<class name="ZESoundSource" parent="ZEComponent" noinstance="true">
 			<description>Sound Source</description>
-			<property name="CurrentCursor" type="integer" autogetset="yes">
+			<property name="CurrentPosition" type="integer" autogetset="yes">
 				<constraints>
 					<minvalue value="0"/>
 				</constraints>
@@ -168,8 +191,8 @@ ZE_POSTPROCESSOR_START(Meta)
 				</constraints>
 			</property>
 			<property name="Loop" type="boolean" autogetset="yes"/>
-			<property name="StartCursor" type="integer" autogetset="yes"/>
-			<property name="EndCursor" type="integer" autogetset="yes"/>
+			<property name="StartPosition" type="integer" autogetset="yes"/>
+			<property name="EndPosition" type="integer" autogetset="yes"/>
 			<property name="SoundSourceState" type="integer" autogetset="yes">
 				<enumurator name="ZESoundSourceState">
 					<item name="Playing" value="ZE_SSS_PLAYING"/>
@@ -177,6 +200,7 @@ ZE_POSTPROCESSOR_START(Meta)
 					<item name="Paused" value="ZE_SSS_PAUSED"/>
 				</enumurator>
 			</property>
+			<container name="Effects" type="ZESoundEffect"/>
 		</class>
 	</meta>
 </zinek>

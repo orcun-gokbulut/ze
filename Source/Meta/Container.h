@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Provider.h
+ Zinek Engine - Container.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,22 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_META_CLASS_PROVIDER_H__
-#define __ZE_META_CLASS_PROVIDER_H__
+#ifndef __ZE_META_CONTAINER_H__
+#define __ZE_META_CONTAINER_H__
 
-class ZEClassDescription;
+#include "ZEDS/Array.h"
+
 class ZEClass;
-class ZEClassProvider
+class ZEClassDescription;
+
+class ZEContainer
 {
+	private:
+		ZEClassDescription*					BaseClassDescription;
+		ZEArray<ZEClass*>					Items;
+
 	public:
-		virtual ZEClassDescription*			GetBaseClassDescription() = 0;
-		virtual ZEClassDescription*			GetClassDescriptions() = 0;
-		virtual size_t						GetClassDescriptionCount() = 0;
+		ZEClassDescription*					GetBaseClassDescription();
 
-		virtual bool						RegisterClass(ZEClassDescription* Description);
-		virtual void						UnregisterClass();
+		bool								Add(ZEClass* Item);
+		void								Remove(ZEClass* Item);
+		const ZEArray<ZEClass*>&			GetItems();
+		size_t								GetCount();
 
-		virtual ZEClass*					CreateInstance(size_t Index);
-		virtual ZEClass*					CreateInstance(const char* Name);
+											ZEContainer(ZEClassDescription* BaseClassDescription);
 };
+
 #endif

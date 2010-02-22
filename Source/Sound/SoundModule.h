@@ -38,6 +38,7 @@
 #define __ZE_SOUND_MODULE_H__
 
 #include "Core/Module.h"
+#include "Core/Option.h"
 
 class ZESoundSource;
 class ZESoundSource3D;
@@ -46,11 +47,35 @@ class ZESoundResource;
 
 #define zeSound ZESoundModule::GetInstance()
 
+enum ZESpeakerLayout
+{
+	ZE_SL_AUTOMATIC				= 0,
+	ZE_SL_DIRECT_OUT			= 1,
+	ZE_SL_MONO					= 2,
+	ZE_SL_HEAD_PHONE			= 3,
+	ZE_SL_STERIO_WIDE			= 4,
+	ZE_SL_STERIO_NARROW			= 5,
+	ZE_SL_STERIO_SURROUND		= 6,
+	ZE_SL_4						= 7,
+	ZE_SL_5_1					= 8,
+	ZE_SL_5_1_SURROUND			= 9,
+	ZE_SL_7_1					= 10,	
+	ZE_SL_7_1_SURROUND			= 11,
+};
+
+enum ZESoundSourceType;
+
 class ZESoundModule : public ZEModule
 {
+	protected:
+		static ZEOptionSection		SoundOptions;
+
 	public:
 		static void					BaseInitialize();
 		static void					BaseDeinitialize();
+
+		virtual void				SetSpeakerLayout(ZESpeakerLayout Layout) = 0;
+		virtual ZESpeakerLayout		GetSpeakerLayout() = 0;
 
 		virtual void				SetMasterVolume(unsigned int Volume) = 0;
 		virtual unsigned int 		GetMasterVolume() = 0;
@@ -59,11 +84,19 @@ class ZESoundModule : public ZEModule
 
 		virtual void				PlaySound(ZESoundResource* SoundResource) = 0;
 
+		virtual void				SetStreamingDisabled(bool Disabled) = 0;
+		virtual bool				GetStreamingDisabled() = 0;
+
 		virtual void				SetMaxBufferSize(size_t BufferSize) = 0; 
 		virtual size_t				GetMaxBufferSize() = 0;
 
+		virtual void				SetTypeVolume(ZESoundSourceType Type, unsigned int Volume) = 0;
+		virtual unsigned int		GetTypeVolume(ZESoundSourceType Type) = 0;
+
 		virtual	void				SetActiveListener(ZEListener* NewListener) = 0;
 		virtual ZEListener*			GetActiveListener() = 0;
+
+		virtual void				OptionsChanged();
 
 		virtual ZESoundSource*		CreateSoundSource() = 0;
 		virtual ZESoundSource3D*	CreateSoundSource3D() = 0;

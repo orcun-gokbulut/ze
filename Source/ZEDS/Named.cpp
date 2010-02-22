@@ -43,14 +43,26 @@
 void ZENamed::SetName(const char* NewName)
 {
 	if (Name != NULL)
+	{
 		delete[] Name;
-	Name = new char[strlen(NewName) + 1];
+		Name = NULL;
+	}
+
+	size_t Len = strlen(NewName);
+
+	if (Len == 0 || NewName == NULL || NewName[0] == '\0')
+		return;
+
+	Name = new char[Len + 1];
 	strcpy(Name, NewName);
 }
 
 const char* ZENamed::GetName()
 {
-	return Name;
+	if (Name == NULL)
+		return "";
+	else
+		return Name;
 }
 
 ZENamed::ZENamed()

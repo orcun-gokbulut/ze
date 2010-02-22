@@ -285,3 +285,5 @@ ZEComponent::ZEComponent()
 	UpdateWorldBoundingBox = true;
 	Visible = true;
 }
+
+#include "Component.h.zpp"

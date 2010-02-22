@@ -35,16 +35,106 @@
 
 #include "SoundModule.h"
 #include "SoundResourceMP3.h"
+#include "SoundSource.h"
 #include "Core/Core.h"
+
+ZEOptionSection  ZESoundModule::SoundOptions;
+
+static void OnOptionsChanged()
+{
+	if (zeSound != NULL)
+		zeSound->OptionsChanged();
+}
 
 void ZESoundModule::BaseInitialize()
 {
+	SoundOptions.SetName("Sound");
+	SoundOptions.SetEventHandler(&OnOptionsChanged);
+
+	SoundOptions.AddOption(new ZEOption("StreamingDisabled", false, ZEOPTIONATTRIBUTE_NORMAL));
+	SoundOptions.AddOption(new ZEOption("MaxBufferSize", 2000, ZEOPTIONATTRIBUTE_NORMAL));
+	SoundOptions.AddOption(new ZEOption("MasterVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
+	SoundOptions.AddOption(new ZEOption("SpeakerLayout", 1, ZEOPTIONATTRIBUTE_NORMAL));
+	SoundOptions.AddOption(new ZEOption("EffectVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
+	SoundOptions.AddOption(new ZEOption("DialogVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
+	SoundOptions.AddOption(new ZEOption("MusicVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
+	SoundOptions.AddOption(new ZEOption("VideoVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
+	SoundOptions.AddOption(new ZEOption("PlayerCommVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
+	zeOptions->RegisterSection(&SoundOptions);
+
 	ZESoundResourceMP3::BaseInitialize();
 }
 
 void ZESoundModule::BaseDeinitialize()
 {
 	ZESoundResourceMP3::BaseDeinitialize();
+	zeOptions->UnregisterSection(&SoundOptions);
+}
+
+void ZESoundModule::OptionsChanged()
+{
+	ZEOption* Current = SoundOptions.GetOption("StreamingDisabled");
+	if (Current->IsChanged())
+	{
+		SetStreamingDisabled(Current->GetValue().GetBoolean());
+		Current->SetValue(GetStreamingDisabled());
+	}
+
+	Current = SoundOptions.GetOption("MaxBufferSize");
+	if (Current->IsChanged())
+	{
+		SetMaxBufferSize(Current->GetValue().GetInteger());
+		Current->SetValue((int)GetMaxBufferSize());
+	}
+
+	Current = SoundOptions.GetOption("MasterVolume");
+	if (Current->IsChanged())
+	{
+		SetMasterVolume(Current->GetValue().GetInteger());
+		Current->SetValue((int)GetMasterVolume());
+	}
+
+	Current = SoundOptions.GetOption("SpeakerLayout");
+	if (Current->IsChanged())
+	{
+		SetSpeakerLayout((ZESpeakerLayout)Current->GetValue().GetInteger());
+		Current->SetValue((int)GetSpeakerLayout());
+	}
+
+	Current = SoundOptions.GetOption("EffectVolume");
+	if (Current->IsChanged())
+	{
+		SetTypeVolume(ZE_SST_EFFECT, Current->GetValue().GetInteger());
+		Current->SetValue((int)GetTypeVolume(ZE_SST_EFFECT));
+	}
+
+	Current = SoundOptions.GetOption("DialogVolume");
+	if (Current->IsChanged())
+	{
+		SetTypeVolume(ZE_SST_DIALOG, Current->GetValue().GetInteger());
+		Current->SetValue((int)GetTypeVolume(ZE_SST_DIALOG));
+	}
+
+	Current = SoundOptions.GetOption("MusicVolume");
+	if (Current->IsChanged())
+	{
+		SetTypeVolume(ZE_SST_MUSIC, Current->GetValue().GetInteger());
+		Current->SetValue((int)GetTypeVolume(ZE_SST_MUSIC));
+	}
+
+	Current = SoundOptions.GetOption("VideoVolume");
+	if (Current->IsChanged())
+	{
+		SetTypeVolume(ZE_SST_VIDEO, Current->GetValue().GetInteger());
+		Current->SetValue((int)GetTypeVolume(ZE_SST_VIDEO));
+	}
+
+	Current = SoundOptions.GetOption("PlayerCommVolume");
+	if (Current->IsChanged())
+	{
+		SetTypeVolume(ZE_SST_PLAYER_COMM, Current->GetValue().GetInteger());
+		Current->SetValue((int)GetTypeVolume(ZE_SST_PLAYER_COMM));
+	}
 }
 
 ZESoundModule* ZESoundModule::GetInstance()

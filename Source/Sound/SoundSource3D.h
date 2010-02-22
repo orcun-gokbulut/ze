@@ -40,9 +40,12 @@
 #include "Core/Component.h"
 #include "Meta/Class.h"
 #include "SoundSource.h"
-/*
-class ZESoundSource3D : public ZEComponent, public ZEClass
+
+ZE_META_CLASS_DESCRIPTION(ZESoundSource3D);
+
+class ZESoundSource3D : public ZESoundSource
 {
+	ZE_META_CLASS();
 	protected:
 		float				MinDistance;
 		float				MaxDistance;
@@ -51,29 +54,49 @@ class ZESoundSource3D : public ZEComponent, public ZEClass
 		unsigned int		ConeOutsideVolume;
 		bool				Changed3D;
 
-	public:
-		bool				Is3D();	
-		void				SetPosition(const ZEVector3& NewPosition);
-		void				SetRotation(const ZEQuaternion&);
+							ZESoundSource3D();
+		virtual				~ZESoundSource3D();
 
-		float				GetMinDistance();
+	public:	
 		void				SetMinDistance(float  NewMinDistance);
+		float				GetMinDistance();
 		
-		float				GetMaxDistance();
 		void				SetMaxDistance(float  NewMaxDistance);
+		float				GetMaxDistance();
 		
+		void				SetConeInsideAngle(unsigned int NewInsideAngle);
 		unsigned int		GetInsideConeAngle();
-		unsigned int		GetOutsideConeAngle();
 
-		void				SetConeAngles (unsigned int NewInsideAngle, unsigned int NewOutsideAngle);
-		
+		void				SetConeOutsideAngle( unsigned int NewOutsideAngle);
+		unsigned int		GetConeOutsideAngle();
 					
-		unsigned int		GetConeOutsideVolume();
 		void				SetConeOutsideVolume(unsigned int NewOutsideVolume);
+		unsigned int		GetConeOutsideVolume();
 		
 		void				Tick(float Time);
-
-							ZESoundSource3D();
 };
+
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZESoundSource3D" parent="ZESoundSource" noinstance="true">
+			<description>Sound Source</description>
+			<property name="MinDistance" type="integer" autogetset="yes">
+				<constraints>
+					<minvalue value="0"/>
+				</constraints>
+			</property>
+			<property name="MaxDistance" type="integer" autogetset="yes">
+				<constraints>
+					<minvalue value="0"/>
+				</constraints>
+			</property>
+			<property name="ConeInsideAngle" type="integer" autogetset="yes"/>
+			<property name="ConeOutSizeAngle" type="float" autogetset="yes"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END()
 */
 #endif

@@ -536,3 +536,4 @@ ZEConsole::~ZEConsole()
 {
 	Instance = NULL;
 }
+

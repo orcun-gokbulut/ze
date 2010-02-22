@@ -53,6 +53,27 @@ LPDIRECTSOUND3DLISTENER8		DSListener    = NULL;
 
 #define MapVector3(A, B)		(A).x = (B).x; (A).y = (B).y; (A).z = (B).z
 
+void ZEDSModule::UpdateVolumes(ZESoundSourceType SourceType)
+{
+	for (size_t I = 0; I < SoundSources.GetCount(); I++)
+		if (SoundSources[I]->GetSoundSourceType() == SourceType)
+			SoundSources[I]->SetVolume(SoundSources[I]->GetVolume());
+
+/*	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
+		if (SoundSources3D[I]->GetSoundSourceType() == SourceType)
+			SoundSources3D[I]->SetVolume(SoundSources[I]->GetVolume());
+*/
+}
+
+void ZEDSModule::UpdateStreams()
+{
+	for (size_t I = 0; I < SoundSources.GetCount(); I++)
+		SoundSources[I]->CreateBuffer();
+
+	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
+		SoundSources[I]->CreateBuffer();
+}
+
 ZEModuleDescription* ZEDSModule::GetModuleDescription()
 {
 	static ZEDSModuleDescription Desc;
@@ -76,7 +97,6 @@ void ZEDSModule::SetEnabled(bool Enabled)
 
 bool ZEDSModule::Initialize()
 {	
-	BufferSize = 262144; // 256kb
 	zeOutput("Initializing DirectSound.\r\n");
 	HRESULT hr;
 	
@@ -100,7 +120,7 @@ bool ZEDSModule::Initialize()
 	DSBUFFERDESC PrimaryBufferDesc;
 	ZeroMemory(&PrimaryBufferDesc, sizeof(DSBUFFERDESC));
 	PrimaryBufferDesc.dwSize = sizeof(DSBUFFERDESC);
-	PrimaryBufferDesc.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_PRIMARYBUFFER;
+	PrimaryBufferDesc.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_CTRLVOLUME | DSBCAPS_PRIMARYBUFFER;
 
 
 	hr = DS->CreateSoundBuffer(&PrimaryBufferDesc, &DSPrimary, NULL);
@@ -120,7 +140,18 @@ bool ZEDSModule::Initialize()
 	}
 
 	ZEDSComponentBase::BaseInitialize(this);
-	
+
+	memset(TypeVolumes, 100, sizeof(TypeVolumes));
+	SetStreamingDisabled(SoundOptions.GetOption("StreamingDisabled")->GetValue().GetBoolean());
+	SetMaxBufferSize(SoundOptions.GetOption("MaxBufferSize")->GetValue().GetInteger());
+	SetMasterVolume(SoundOptions.GetOption("MasterVolume")->GetValue().GetInteger());
+	SetSpeakerLayout((ZESpeakerLayout)SoundOptions.GetOption("SpeakerLayout")->GetValue().GetInteger());
+	SetTypeVolume(ZE_SST_EFFECT, SoundOptions.GetOption("EffectVolume")->GetValue().GetInteger());
+	SetTypeVolume(ZE_SST_DIALOG, SoundOptions.GetOption("DialogVolume")->GetValue().GetInteger());
+	SetTypeVolume(ZE_SST_MUSIC, SoundOptions.GetOption("MusicVolume")->GetValue().GetInteger());
+	SetTypeVolume(ZE_SST_VIDEO, SoundOptions.GetOption("VideoVolume")->GetValue().GetInteger());
+	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetInteger());
+
 	return true;
 }
 
@@ -146,10 +177,36 @@ void ZEDSModule::Deinitialize()
 	}
 }
 
+void ZEDSModule::SetSpeakerLayout(ZESpeakerLayout Layout)
+{
+	// Dangerous in DirectSound. 
+}
+
+ZESpeakerLayout ZEDSModule::GetSpeakerLayout()
+{
+	return ZE_SL_AUTOMATIC;
+}
+
+void ZEDSModule::SetStreamingDisabled(bool Disabled)
+{
+	StreamingDisabled = Disabled;
+	UpdateStreams();
+}
+
+bool ZEDSModule::GetStreamingDisabled()
+{
+	return StreamingDisabled;
+}
+
 void ZEDSModule::SetMasterVolume(unsigned int Volume)
 {
-	MasterVolume = Volume * (DSBVOLUME_MAX - DSBVOLUME_MAX) / 100 + DSBVOLUME_MIN;
-	DSPrimary->SetVolume(MasterVolume);
+	if (Volume > ZE_SS_VOLUME_MAX)
+		MasterVolume = ZE_SS_VOLUME_MAX;
+	else
+		MasterVolume = Volume;
+
+	int Vol = ((MasterVolume - ZE_SS_VOLUME_MIN) * (DSBVOLUME_MAX - DSBVOLUME_MIN)) / (ZE_SS_VOLUME_MAX - ZE_SS_VOLUME_MIN) + DSBVOLUME_MIN;
+	DSPrimary->SetVolume(((MasterVolume - ZE_SS_VOLUME_MIN) * (DSBVOLUME_MAX - DSBVOLUME_MIN)) / (ZE_SS_VOLUME_MAX - ZE_SS_VOLUME_MIN) + DSBVOLUME_MIN);
 }
 
 unsigned int ZEDSModule::GetMasterVolume()
@@ -157,20 +214,43 @@ unsigned int ZEDSModule::GetMasterVolume()
 	return MasterVolume;
 }
 
+void ZEDSModule::SetTypeVolume(ZESoundSourceType Type, unsigned int Volume)
+{
+	if (Volume > ZE_SS_VOLUME_MAX)
+		Volume = ZE_SS_VOLUME_MAX;
+	else
+		Volume = Volume;
+
+	TypeVolumes[Type] = Volume;
+
+	UpdateVolumes(Type);
+}
+
+unsigned int ZEDSModule::GetTypeVolume(ZESoundSourceType Type)
+{
+	ZEASSERT(Type >= 256, "Sound source types are limited to 256");
+	return TypeVolumes[Type];
+}
+
+
 void ZEDSModule::SetMaxBufferSize(unsigned int BufferSize)
 {
-	this->BufferSize = BufferSize;
+	MaxBufferSize = BufferSize;
 }
 
 unsigned int ZEDSModule::GetMaxBufferSize()
 {
-	return BufferSize;
+	return MaxBufferSize;
 }
 
 void ZEDSModule::ProcessSound(float ElapsedTime)
 {
 	for (size_t I = 0; I < SoundSources.GetCount(); I++)
 		SoundSources[I]->Update(ElapsedTime);
+
+	/*for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
+		SoundSources3D[I]->Update(ElapsedTime);*/
+
 }
 
 void ZEDSModule::PlaySound(ZESoundResource* SoundResource)

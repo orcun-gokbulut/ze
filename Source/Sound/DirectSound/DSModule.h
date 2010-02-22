@@ -39,11 +39,13 @@
 
 #include "ZEDS/Array.h"
 #include "Sound/SoundModule.h"
+#include "Sound/SoundSource.h"
 #include <dsound.h>
 
 class ZEDSSoundSource;
 class ZEDSSoundSource3D;
 class ZEDSListener;
+enum ZESoundSourceType;
 
 #undef PlaySound
 class ZEDSModule : public ZESoundModule
@@ -52,14 +54,23 @@ class ZEDSModule : public ZESoundModule
 	friend class ZEDSSoundSource;
 	friend class ZEDSSoundSource;
 	friend class ZEDSSoundSource3D;
+
 	private:
-		unsigned int						MasterVolume;
 		bool								Enabled;
+
+		unsigned int						MasterVolume;
+		unsigned int						TypeVolumes[ZE_SS_MAX_TYPE];
+
+		bool								StreamingDisabled;
+		unsigned int						MaxBufferSize;
+
 		ZEDSListener*						ActiveListener;
 		ZESmartArray<ZEDSListener*>			Listeners;
 		ZESmartArray<ZEDSSoundSource*>		SoundSources;
 		ZESmartArray<ZEDSSoundSource3D*>	SoundSources3D;
-		unsigned int						BufferSize;
+
+		void								UpdateVolumes(ZESoundSourceType SourceType);
+		void								UpdateStreams();
 
 	public:
 		ZEModuleDescription*				GetModuleDescription();		
@@ -71,9 +82,18 @@ class ZEDSModule : public ZESoundModule
 
 		virtual bool						Initialize();
 		virtual void						Deinitialize();
+		
+		virtual void						SetSpeakerLayout(ZESpeakerLayout Layout);
+		virtual ZESpeakerLayout				GetSpeakerLayout();
 
 		virtual void						SetMasterVolume(unsigned int Volume);
 		virtual unsigned int				GetMasterVolume();
+
+		virtual void						SetTypeVolume(ZESoundSourceType Type, unsigned int Volume);
+		virtual unsigned int				GetTypeVolume(ZESoundSourceType Type);
+
+		virtual void						SetStreamingDisabled(bool Disabled);
+		virtual bool						GetStreamingDisabled();
 
 		virtual void						SetMaxBufferSize(unsigned int BufferSize); 
 		virtual unsigned int				GetMaxBufferSize();
@@ -88,29 +108,5 @@ class ZEDSModule : public ZESoundModule
 		virtual ZESoundSource*				CreateSoundSource();
 		virtual ZESoundSource3D*			CreateSoundSource3D();
 		virtual ZEListener*					CreateListener();
-/*
-		virtual int						CreateBuffer(ZESoundSource* Source, ZESoundResource* Resource);
-		virtual void					ReleaseBuffer(ZESoundSource* Source);
-
-		virtual void					Play(ZESoundSource* Source);
-		virtual void					Stop(ZESoundSource* Source);
-		virtual void					Pause(ZESoundSource* Source);
-		virtual void					PlayLoop(ZESoundSource* Source);
-
-		virtual void					UpdateSource(ZESoundSource* Source);
-		virtual void				    UpdateSource3D(ZESoundSource3D* Source3D);
-
-		virtual void					ProcessSound();
-
-		virtual void					PauseAllSounds();
-		virtual void					StopAllSounds();
-
-		virtual void					ReloadBuffer(ZESoundSource* Source);
-		virtual void					ReloadAllBuffers();
-		
-		virtual void					SetListener(ZEListener* NewListener);
-		virtual void				    UpdateListener(ZEListener* NewListener);
-								
-										~ZEDirectSoundModule();*/
 };		
 #endif

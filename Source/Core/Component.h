@@ -37,6 +37,7 @@
 #ifndef __ZE_COMPONENT_H__
 #define __ZE_COMPONENT_H__
 
+#include "Meta/Class.h"
 #include "ZEDS/Array.h"
 #include "ZEMath/Matrix.h"
 #include "ZEMath/Vector.h"
@@ -48,8 +49,12 @@
 class ZERenderer;
 class ZEEntity;
 class ZERLLight;
-class ZEComponent
+
+ZE_META_CLASS_DESCRIPTION(ZEComponent);
+
+class ZEComponent : public ZEClass
 {
+	ZE_META_CLASS()
 	friend class ZEEntity;
 	private:
 		ZEEntity*						Owner;
@@ -121,5 +126,20 @@ class ZEComponent
 
 										ZEComponent();
 };
-
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEComponent">
+			<description>Base Entity Type</description>
+			<property name="LocalPosition" type="ZEVector3" autogetset="yes" description="World position of the entity"/>
+			<property name="LocalRotation" type="ZEQuaternion" autogetset="yes" description="World rotation of the entity"/>
+			<property name="LocalScale" type="ZEVector3" autogetset="yes" description="World scale of the entity"/>
+			<property name="Enabled" type="boolean" autogetset="yes" description="If entity is disabled it will not recive Ticks so it will not interact with player. However this property does not affect entity physical interactions. A entity can be disabled but physically active."/>
+			<property name="Visible" type="boolean" autogetset="yes" description="Is entity visible"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END()
+*/
 #endif

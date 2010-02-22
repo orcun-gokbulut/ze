@@ -203,10 +203,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 		ZESoundSource* SoundSource = ZESoundSource::CreateInstance();
 
-		SoundSource->SetSoundResource(ZESoundResource::LoadResource("mozart.mp3"));
-		SoundSource->SetStartCursorTime(65.0f);
-		SoundSource->SetEndCursorTime(70.5f);
-		SoundSource->SetPlaybackSpeed(1.2f);
+		SoundSource->SetSoundResource(ZESoundResource::LoadResource("test.wav"));
+		/*SoundSource->SetStartPositionTime(65.0f);
+		SoundSource->SetEndPositionTime(70.5f);*/
+		SoundSource->SetPlaybackSpeed(1.0f);
 		SoundSource->SetLoop(true);
 		SoundSource->Play();
 

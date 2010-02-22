@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Provider.h
+ Zinek Engine - Container.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,22 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_META_CLASS_PROVIDER_H__
-#define __ZE_META_CLASS_PROVIDER_H__
+#include "Container.h"
+#include "Class.h"
 
-class ZEClassDescription;
-class ZEClass;
-class ZEClassProvider
+ZEClassDescription* ZEContainer::GetBaseClassDescription()
 {
-	public:
-		virtual ZEClassDescription*			GetBaseClassDescription() = 0;
-		virtual ZEClassDescription*			GetClassDescriptions() = 0;
-		virtual size_t						GetClassDescriptionCount() = 0;
+	return BaseClassDescription;
+}
 
-		virtual bool						RegisterClass(ZEClassDescription* Description);
-		virtual void						UnregisterClass();
+bool ZEContainer::Add(ZEClass* Item)
+{
+	ZEClassDescription* Description;
+	while(Description = Item->GetClassDescription())
+	{
+		if (Description == BaseClassDescription)
+			Items.Add(Item);
+	}
 
-		virtual ZEClass*					CreateInstance(size_t Index);
-		virtual ZEClass*					CreateInstance(const char* Name);
-};
-#endif
+	return false;
+}
+
+void ZEContainer::Remove(ZEClass* Item)
+{
+	Items.DeleteValue(Item);
+}
+
+const ZEArray<ZEClass*>& ZEContainer::GetItems()
+{
+	return Items;
+}
+
+ZEContainer::ZEContainer(ZEClassDescription* BaseClassDescription)
+{
+	this->BaseClassDescription = BaseClassDescription;
+}
