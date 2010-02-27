@@ -37,4 +37,33 @@
 #ifndef	__ZE_DS_LISTENER_H__
 #define __ZE_DS_LISTENER_H__
 
+#include "../Listener.h"
+#include "DSComponentBase.h"
+
+class ZEDSListener : public ZEListener, public ZEDSComponentBase
+{	
+	friend class ZEDSModule;
+	private:
+		float						UpdateTreshold;
+		bool						ListenerDirtyFlag;
+
+									ZEDSListener();
+		virtual						~ZEDSListener();
+
+	public:
+		bool						IsActiveListener();
+		void						SetActiveListener();
+
+		virtual void				SetLocalPosition(const ZEVector3& NewPosition);
+		virtual void				SetLocalRotation(const ZEQuaternion& NewRotation);
+
+		virtual void				SetDistanceFactor(float NewDistanceFactor);	
+		virtual void				SetDopplerFactor(float NewDopplerFactor);
+		virtual void				SetRollOffFactor(float NewRollOffFactor);
+
+		virtual void				OwnerWorldTransformChanged();
+
+		void						Update();
+};
+
 #endif

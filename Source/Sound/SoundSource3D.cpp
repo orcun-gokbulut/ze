@@ -35,89 +35,48 @@
 
 #include "SoundModule.h"
 #include "SoundSource3D.h"
-/*
-bool ZESoundSource3D::Is3D()
+
+ZESoundSource3D::ZESoundSource3D()
 {
-	return true;
+	MinDistance = 0.0f;
+	MaxDistance = 100000000.0f;
+	ConeInsideAngle = 360;
+	ConeOutsideAngle = 360;
+	ConeOutsideVolume = 100;
 }
 
-void ZESoundSource3D::SetPosition(const ZEVector3& NewPosition)
+ZESoundSource3D::~ZESoundSource3D()
 {
- 	Changed3D = true;
-	ZEComponent::SetLocalPosition(NewPosition);
 }
 
-void ZESoundSource3D::SetRotation(const ZEQuaternion& NewRotation)
-{
-	ZEComponent::SetLocalRotation(NewRotation);
-	Changed3D = true;
-}
-
-float ZESoundSource3D::GetMinDistance() 
+float ZESoundSource3D::GetMinDistance() const
 {
 	return MinDistance;
 }
 
-void ZESoundSource3D::SetMinDistance(float  NewMinDistance) 
-{
-	MinDistance = NewMinDistance;
-	Changed3D = true;
-}		
-
-float ZESoundSource3D::GetMaxDistance() 
+float ZESoundSource3D::GetMaxDistance() const
 {
 	return MaxDistance;
 }
 
-void ZESoundSource3D::SetMaxDistance(float  NewMaxDistance)
+unsigned int ZESoundSource3D::GetConeInsideAngle() const
 {
-	MaxDistance = NewMaxDistance;
-	Changed3D = true;
-}		
-
-unsigned int ZESoundSource3D::GetInsideConeAngle() 	
-{
-	return InsideAngle;
-
+	return ConeInsideAngle;
 }
 
-unsigned int ZESoundSource3D::GetOutsideConeAngle() 	
+unsigned int ZESoundSource3D::GetConeOutsideAngle() const
 {
-	return OutsideAngle;
-
+	return ConeOutsideAngle;
 }
-
-void ZESoundSource3D::SetConeAngles (unsigned int NewInsideAngle, unsigned int NewOutsideAngle)
-{
-	InsideAngle = NewInsideAngle;
-	OutsideAngle = NewOutsideAngle;
-	Changed3D = true;
-}		
-
-unsigned int ZESoundSource3D::GetConeOutsideVolume()
+	
+unsigned int ZESoundSource3D::GetConeOutsideVolume() const
 {
 	return ConeOutsideVolume;
 }
 
-void ZESoundSource3D::SetConeOutsideVolume(unsigned int NewOutsideVolume)
+ZESoundSource3D* ZESoundSource3D::CreateInstance()
 {
-	ConeOutsideVolume = NewOutsideVolume;
-	Changed3D = true;
+	return zeSound->CreateSoundSource3D();
 }
 
-void ZESoundSource3D::Tick(float Time)
-{
-	ZESoundSource::Update();
-	if (SoundState != SOUNDSTATE_NOBUFFER && Changed3D)
-	{
-		zeSound->UpdateSource3D(this);
-		Changed3D = false;
-	}
-}
-
-ZESoundSource3D::ZESoundSource3D()
-{
-	Changed3D = false;
-}
-
-*/
+#include "SoundSource3D.h.zpp"

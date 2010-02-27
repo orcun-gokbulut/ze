@@ -38,11 +38,14 @@
 
 ZEDSModule* ZEDSComponentBase::Module;
 LPDIRECTSOUND8 ZEDSComponentBase::Device;
+LPDIRECTSOUNDBUFFER ZEDSComponentBase::PrimaryBuffer;
+LPDIRECTSOUND3DLISTENER8 ZEDSComponentBase::Listener;
 
 bool ZEDSComponentBase::BaseInitialize(ZEDSModule* Mdl)
 {
 	Module = Mdl;
 	Device = Mdl->GetDevice();
-
+	Listener = Mdl->GetListener();
+	PrimaryBuffer = Mdl->GetPrimaryBuffer();
 	return true;
 }

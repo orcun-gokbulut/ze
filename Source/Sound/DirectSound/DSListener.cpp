@@ -34,3 +34,128 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "DSListener.h"
+#define ZE_LISTENER_UPDATE_TRESHOLD 0.5f
+
+ZEDSListener::ZEDSListener()
+{
+	ListenerDirtyFlag = true;
+	UpdateTreshold = 0.0f;
+}
+
+ZEDSListener::~ZEDSListener()
+{
+
+}
+
+void ZEDSListener::SetActiveListener()
+{
+	GetModule()->SetActiveListener(this);
+}
+
+bool ZEDSListener::IsActiveListener()
+{
+	return (GetModule()->GetActiveListener() == this);
+}
+
+void ZEDSListener::SetLocalPosition(const ZEVector3& Position)
+{
+	ZEComponent::SetLocalPosition(Position);
+	ListenerDirtyFlag = true;
+
+	if (IsActiveListener())
+	{
+		const ZEVector3& WorldPosition = GetWorldPosition();
+		GetListener()->SetPosition(WorldPosition.x, WorldPosition.y, WorldPosition.z, DS3D_DEFERRED);
+	}
+}
+
+void ZEDSListener::SetLocalRotation(const ZEQuaternion& Rotation)
+{
+	ZEComponent::SetLocalRotation(Rotation);
+	ListenerDirtyFlag = true;
+
+	if (IsActiveListener())
+	{
+		const ZEQuaternion& WorldRotation = GetWorldRotation();
+		ZEVector3 Front, Top;
+		ZEQuaternion::VectorProduct(Front, WorldRotation, ZEVector3::UnitZ);
+		ZEQuaternion::VectorProduct(Top, WorldRotation, ZEVector3::UnitY);
+
+		GetListener()->SetOrientation(Front.x, Front.y, Front.z, Top.x, Top.y, Top.z, DS3D_DEFERRED);
+	}
+}
+
+void ZEDSListener::SetDistanceFactor(float Value)
+{
+	DistanceFactor = Value;
+	ListenerDirtyFlag = true;
+
+	if (IsActiveListener())
+		GetListener()->SetDistanceFactor(Value, DS3D_DEFERRED);
+}
+
+void ZEDSListener::SetDopplerFactor(float Value)
+{
+	DopplerFactor = Value;
+	ListenerDirtyFlag = true;
+
+	if (IsActiveListener())
+		GetListener()->SetDopplerFactor(Value, DS3D_DEFERRED);
+}
+
+void ZEDSListener::SetRollOffFactor(float Value)
+{
+	RollOffFactor = Value;
+	ListenerDirtyFlag = true;
+
+	if (IsActiveListener())
+		GetModule()->GetListener()->SetRolloffFactor(Value,  DS3D_DEFERRED);
+}
+
+void ZEDSListener::OwnerWorldTransformChanged()
+{
+	ListenerDirtyFlag = true;
+	if (IsActiveListener())
+		Update();
+}
+
+void ZEDSListener::Update()
+{
+	if (IsActiveListener())
+	{
+		DS3DLISTENER Params;
+		Params.dwSize = sizeof(DS3DLISTENER);
+		
+		const ZEVector3& WorldPosition = GetWorldPosition();
+		Params.vPosition.x = WorldPosition.x;
+		Params.vPosition.y = WorldPosition.y;
+		Params.vPosition.z = WorldPosition.z;
+
+		/*const ZEVector3& WorldVelocity = GetWorldVelocity();
+		Params.vVelocity.x = WorldVelocity.x;
+		Params.vVelocity.y = WorldVelocity.y;
+		Params.vVelocity.z = WorldVelocity.z;*/
+		
+		Params.vVelocity.x = 0.0f;
+		Params.vVelocity.y = 0.0f;
+		Params.vVelocity.z = 0.0f;
+		
+		const ZEQuaternion& WorldRotation = GetWorldRotation();
+		ZEVector3 Temp;
+		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitZ);
+		Params.vOrientFront.x = Temp.x;
+		Params.vOrientFront.y = Temp.y;
+		Params.vOrientFront.z = Temp.z;
+
+		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitY);
+		Params.vOrientTop.x = Temp.x;
+		Params.vOrientTop.y = Temp.y;
+		Params.vOrientTop.z = Temp.z;
+
+		Params.flDistanceFactor = DistanceFactor;
+		Params.flRolloffFactor = RollOffFactor;
+		Params.flDopplerFactor = DopplerFactor;
+
+		GetListener()->SetAllParameters(&Params, DS3D_DEFERRED);
+	}
+}

@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DS_SOUND_SOURCE_3D_H__
-#define __ZE_DS_SOUND_SOURCE_3D_H__
+#ifndef	__ZE_DS_SOUND_SOURCE_H__
+#define __ZE_DS_SOUND_SOURCE_H__
 
 #include "DSComponentBase.h"
 #include "../SoundSource.h"
@@ -46,20 +46,21 @@ class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 	friend class ZEDSModule;
 	private:
 		LPDIRECTSOUNDBUFFER			DSBuffer;
-		size_t						StreamBufferSize;
+		size_t						BufferSampleCount;
 		size_t						OldBufferPosition;
-		size_t						StreamChunk1Position;
-		size_t						StreamChunk2Position;
+		size_t						StreamPosition;
+		int							LastUpdatedBufferChunk;
 
-		bool						CreateBuffer();
+		bool						CreateBuffer(bool Is3D);
 		void						Stream();
 		void						ResetStream();
-		void						StreamDecodeAndFill(size_t Position, size_t BufferPosition, size_t BufferSize);
+		void						StreamDecodeAndFill(size_t BufferPosition, size_t Position, size_t SampleCount);
 
 									ZEDSSoundSource();
 		virtual						~ZEDSSoundSource();
 
 	public:
+		virtual void				SetSoundSourceState(ZESoundSourceState State);
 		virtual void				SetCurrentPosition(unsigned int SampleIndex);
 		virtual unsigned int		GetCurrentPosition();
 		virtual void				SetStartPosition(unsigned int SampleIndex);
@@ -68,7 +69,7 @@ class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 		virtual void				SetPan(int NewPan);
 		virtual void				SetFrequency(unsigned int NewFrequency);
 		virtual void				SetVolume(unsigned int NewVolume);
-		virtual void				SetLoop(bool Enabled);				
+		virtual void				SetLooping(bool Enabled);				
 							
 		virtual void				Play();
 		virtual void				Resume();

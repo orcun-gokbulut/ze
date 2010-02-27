@@ -40,17 +40,12 @@
 #include "Core/Error.h"
 #include "Core/Console.h"
 #include "Core/Window.h"
+#include "DSListener.h"
 #include "DSSoundSource.h"
 #include "DSSoundSource3D.h"
-#include "DSListener.h"
 #include <dsound.h>
 
 #define MAX_SOUNDBUFFER_COUNT	256
-
-LPDIRECTSOUND8					DS		      = NULL;
-LPDIRECTSOUNDBUFFER				DSPrimary     = NULL;
-LPDIRECTSOUND3DLISTENER8		DSListener    = NULL;
-
 #define MapVector3(A, B)		(A).x = (B).x; (A).y = (B).y; (A).z = (B).z
 
 void ZEDSModule::UpdateVolumes(ZESoundSourceType SourceType)
@@ -68,10 +63,22 @@ void ZEDSModule::UpdateVolumes(ZESoundSourceType SourceType)
 void ZEDSModule::UpdateStreams()
 {
 	for (size_t I = 0; I < SoundSources.GetCount(); I++)
-		SoundSources[I]->CreateBuffer();
+		SoundSources[I]->CreateBuffer(false);
 
 	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
-		SoundSources[I]->CreateBuffer();
+		SoundSources[I]->CreateBuffer(true);
+}
+
+ZEDSModule::ZEDSModule()
+{
+	UpdateTime = 0.2f;
+	DS = NULL;
+	DSPrimary = NULL;
+	DSListener = NULL;
+}
+
+ZEDSModule::~ZEDSModule()
+{
 }
 
 ZEModuleDescription* ZEDSModule::GetModuleDescription()
@@ -83,6 +90,16 @@ ZEModuleDescription* ZEDSModule::GetModuleDescription()
 LPDIRECTSOUND8 ZEDSModule::GetDevice()
 {
 	return DS;
+}
+
+LPDIRECTSOUND3DLISTENER8 ZEDSModule::GetListener()
+{
+	return DSListener;
+}
+
+LPDIRECTSOUNDBUFFER ZEDSModule::GetPrimaryBuffer()
+{
+	return DSPrimary;
 }
 
 bool ZEDSModule::IsEnabled()
@@ -121,7 +138,6 @@ bool ZEDSModule::Initialize()
 	ZeroMemory(&PrimaryBufferDesc, sizeof(DSBUFFERDESC));
 	PrimaryBufferDesc.dwSize = sizeof(DSBUFFERDESC);
 	PrimaryBufferDesc.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_CTRLVOLUME | DSBCAPS_PRIMARYBUFFER;
-
 
 	hr = DS->CreateSoundBuffer(&PrimaryBufferDesc, &DSPrimary, NULL);
 	if (FAILED(hr))
@@ -204,9 +220,9 @@ void ZEDSModule::SetMasterVolume(unsigned int Volume)
 		MasterVolume = ZE_SS_VOLUME_MAX;
 	else
 		MasterVolume = Volume;
-
-	int Vol = ((MasterVolume - ZE_SS_VOLUME_MIN) * (DSBVOLUME_MAX - DSBVOLUME_MIN)) / (ZE_SS_VOLUME_MAX - ZE_SS_VOLUME_MIN) + DSBVOLUME_MIN;
-	DSPrimary->SetVolume(((MasterVolume - ZE_SS_VOLUME_MIN) * (DSBVOLUME_MAX - DSBVOLUME_MIN)) / (ZE_SS_VOLUME_MAX - ZE_SS_VOLUME_MIN) + DSBVOLUME_MIN);
+	
+	//DSPrimary->SetVolume(((MasterVolume - ZE_SS_VOLUME_MIN) * (DSBVOLUME_MAX - DSBVOLUME_MIN)) / (ZE_SS_VOLUME_MAX - ZE_SS_VOLUME_MIN) + DSBVOLUME_MIN);
+	DSPrimary->SetVolume(log10f((float)MasterVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f);
 }
 
 unsigned int ZEDSModule::GetMasterVolume()
@@ -250,7 +266,13 @@ void ZEDSModule::ProcessSound(float ElapsedTime)
 
 	/*for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
 		SoundSources3D[I]->Update(ElapsedTime);*/
-
+	
+	if (UpdateTime  < 0.0f)
+	{
+		DSListener->CommitDeferredSettings();
+		UpdateTime = 0.2f;
+	}
+	UpdateTime -= ElapsedTime;
 }
 
 void ZEDSModule::PlaySound(ZESoundResource* SoundResource)
@@ -259,13 +281,13 @@ void ZEDSModule::PlaySound(ZESoundResource* SoundResource)
 
 void ZEDSModule::SetActiveListener(ZEListener* Listener)
 {
-	//ActiveListener = Listener;
+	ActiveListener = (ZEDSListener*)Listener;
+	ActiveListener->Update();
 }
 
 ZEListener* ZEDSModule::GetActiveListener()
 {
-	//return ActiveListener;
-	return NULL;
+	return ActiveListener;
 }
 
 ZESoundSource* ZEDSModule::CreateSoundSource()
@@ -277,14 +299,12 @@ ZESoundSource* ZEDSModule::CreateSoundSource()
 
 ZESoundSource3D* ZEDSModule::CreateSoundSource3D()
 {
-//	return new ZEDSSoundSource3D();
-	return NULL;
+	return new ZEDSSoundSource3D();
 }
 
 ZEListener* ZEDSModule::CreateListener()
 {
-//	return new ZEDSListener();
-	return NULL;
+	return new ZEDSListener();
 }
 
 /*

@@ -434,6 +434,8 @@ void ZECore::ShutDown()
 		ConsoleWindow.TermiantionState();
 		Console->SetConsoleInterface(NULL);
 	}
+
+	exit(0);
 }
 
 void ZECore::MainLoop()
@@ -449,7 +451,7 @@ void ZECore::MainLoop()
 	{
 		QueryPerformanceCounter(&PerformanceCount);
 
-		FrameTime = (PerformanceCount.QuadPart - OldPerformanceCount.QuadPart) / PerformanceCounterFreq.QuadPart;
+		FrameTime = (double)(PerformanceCount.QuadPart - OldPerformanceCount.QuadPart) / (double)PerformanceCounterFreq.QuadPart;
 		OldPerformanceCount = PerformanceCount;
 	}
 

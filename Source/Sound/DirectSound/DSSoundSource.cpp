@@ -35,8 +35,9 @@
 
 #include "DSSoundSource.h"
 #include "Core/Error.h"
+#include "Core/Console.h"
 
-bool ZEDSSoundSource::CreateBuffer()
+bool ZEDSSoundSource::CreateBuffer(bool Is3D)
 {
 	if (DSBuffer != NULL)
 	{
@@ -44,9 +45,12 @@ bool ZEDSSoundSource::CreateBuffer()
 		DSBuffer = NULL;
 	}
 
-	Streaming = (1000 * SoundResource->GetSampleCount()) / SoundResource->GetSamplesPerSecond() > zeSound->GetMaxBufferSize();
+	// Check streaming available and use it necessery
+	Streaming = !zeSound->GetStreamingDisabled()  && (1000 * SoundResource->GetSampleCount()) / SoundResource->GetSamplesPerSecond() > zeSound->GetMaxBufferSize();
+
+	// Calculate streaming buffer
 	if (Streaming)
-		StreamBufferSize = (zeSound->GetMaxBufferSize() * SoundResource->GetSamplesPerSecond()) / 1000;
+		BufferSampleCount = (zeSound->GetMaxBufferSize() * SoundResource->GetSamplesPerSecond()) / 1000;
 
 	HRESULT hr;
 	WAVEFORMATEX Format;
@@ -62,8 +66,8 @@ bool ZEDSSoundSource::CreateBuffer()
 	DSBUFFERDESC DSBufferDesc;
 	memset(&DSBufferDesc, 0, sizeof(DSBUFFERDESC)); 
 	DSBufferDesc.dwSize = sizeof(DSBUFFERDESC); 
-	DSBufferDesc.dwFlags = DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_CTRLPOSITIONNOTIFY;
-	DSBufferDesc.dwBufferBytes = (Streaming ? StreamBufferSize * SoundResource->GetBlockAlign() : SoundResource->GetPCMDataSize()); 
+	DSBufferDesc.dwFlags = (Is3D ? DSBCAPS_CTRL3D | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFX : DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_CTRLFX);
+	DSBufferDesc.dwBufferBytes = (Streaming ? BufferSampleCount * SoundResource->GetBlockAlign() : SoundResource->GetPCMDataSize()); 
 	DSBufferDesc.lpwfxFormat = &Format;
 	DSBufferDesc.guid3DAlgorithm = GUID_NULL;
 
@@ -75,6 +79,7 @@ bool ZEDSSoundSource::CreateBuffer()
 
 	if (!Streaming)
 	{
+		// Load everything into buffer
 		void *Buffer1, *Buffer2;
 		DWORD BufferSize1, BufferSize2;
 		DSBuffer->Lock(0, DSBufferDesc.dwBufferBytes, &Buffer1, &BufferSize1, &Buffer2, &BufferSize2, DSBLOCK_ENTIREBUFFER);	
@@ -91,32 +96,47 @@ bool ZEDSSoundSource::CreateBuffer()
 	else
 		ResetStream();
 
+	// If sound was playing continue to play.
+	if (SoundSourceState == ZE_SSS_PLAYING)
+		Resume();
+
+	// Reset properties to apply sound buffer
+	SetVolume(GetVolume());
+	SetPan(GetPan());
+	SetFrequency(GetFrequency());
 	return true;
 }
 
 void ZEDSSoundSource::ResetStream()
 {
-	StreamDecodeAndFill(StartPosition, 0, StreamBufferSize);
+	StreamDecodeAndFill(0, CurrentPosition, BufferSampleCount / 2);
+	
+	StreamPosition = CurrentPosition + BufferSampleCount / 2;
+	if (StreamPosition > EndPosition)
+		StreamPosition = (StreamPosition - EndPosition) + StartPosition;
+
+	LastUpdatedBufferChunk = 1;
 	OldBufferPosition = 0;
-}
+	DSBuffer->SetCurrentPosition(0);
+ }
 
-void ZEDSSoundSource::StreamDecodeAndFill(size_t Position, size_t BufferPosition, size_t BufferSize)
+void ZEDSSoundSource::StreamDecodeAndFill(size_t BufferPosition, size_t Position, size_t SampleCount)
 {
-	size_t SampleCount = BufferSize - BufferPosition;
-
 	void* Buffer;
 	DWORD LockedBufferSize;
-	DSBuffer->Lock(Position, SampleCount, &Buffer, &LockedBufferSize, NULL, NULL, NULL);
+	DSBuffer->Lock(BufferPosition * SoundResource->GetBlockAlign(), SampleCount * SoundResource->GetBlockAlign(), &Buffer, &LockedBufferSize, NULL, NULL, NULL);
 
 		if (Position + SampleCount < EndPosition)
 			SoundResource->Decode(Buffer, Position, SampleCount);
 		else
 		{
 			SampleCount = EndPosition - Position;
-			size_t RemainingSampleCount = (StreamBufferSize - BufferPosition) - SampleCount;
+			SoundResource->Decode(Buffer, Position, SampleCount);
+
+			size_t RemainingSampleCount = BufferSampleCount / 2 - SampleCount;
 			void* RemainingSampleBuffer = ((unsigned char*)Buffer) + SampleCount * SoundResource->GetBlockAlign();
 
-			if (Loop)
+			if (Looping)
 				SoundResource->Decode(RemainingSampleBuffer, StartPosition, RemainingSampleCount);
 			else
 				memset(RemainingSampleBuffer, (SoundResource->GetBitsPerSample() == 8 ? 0x80 : 0x00), RemainingSampleCount * SoundResource->GetBlockAlign());
@@ -125,29 +145,40 @@ void ZEDSSoundSource::StreamDecodeAndFill(size_t Position, size_t BufferPosition
 	DSBuffer->Unlock(Buffer, LockedBufferSize, NULL, NULL);
 }
 
-
 void ZEDSSoundSource::Stream()
 {
-	size_t StreamBufferSize_2 = StreamBufferSize / 2;
+	size_t BufferSampleCount_2 = BufferSampleCount / 2;
 
-	DWORD BufferPosition;
-	
+	DWORD BufferPosition;	
 	DSBuffer->GetCurrentPosition(&BufferPosition, NULL);
+	BufferPosition /= SoundResource->GetBlockAlign();
+
 
 	// Cursor is at second chunk
 	// Fill Firts Chunk
-	if (BufferPosition >= StreamBufferSize_2 && CurrentPosition > StreamChunk1Position && StreamChunk1Position + StreamBufferSize_2 < EndPosition)
+	if ((LastUpdatedBufferChunk != 1) && (BufferPosition >= BufferSampleCount_2))
 	{
-		StreamChunk1Position += StreamBufferSize;
-		StreamDecodeAndFill(StreamChunk1Position, 0, StreamBufferSize_2);
+		StreamDecodeAndFill(0, StreamPosition, BufferSampleCount_2);
+		zeLog("SS", "Streaming 1!, Current Position : %d, StreamPosition : %d, Buffer Position : %d", CurrentPosition, StreamPosition, BufferPosition);
+		LastUpdatedBufferChunk = 1;
+
+		
+		StreamPosition += BufferSampleCount_2;
+		if (StreamPosition > EndPosition)
+			StreamPosition = (StreamPosition - EndPosition) + StartPosition;
 	}
 	
 	// Cursor is at first chunk
 	// Fill Second Chunk
-	if (BufferPosition < StreamBufferSize_2 &&  CurrentPosition > StreamChunk2Position && StreamChunk2Position + StreamBufferSize_2 < EndPosition)
+	if ((LastUpdatedBufferChunk != 2) && (BufferPosition < BufferSampleCount_2))
 	{
-		StreamChunk2Position += StreamBufferSize;
-		StreamDecodeAndFill(StreamChunk2Position, StreamBufferSize_2, StreamBufferSize_2);
+		StreamDecodeAndFill(BufferSampleCount_2, StreamPosition, BufferSampleCount_2);
+		zeLog("SS", "Streaming 2!, Current Position : %d, StreamPosition : %d, Buffer Position : %d", CurrentPosition, StreamPosition, BufferPosition);
+		LastUpdatedBufferChunk = 2;
+
+		StreamPosition += BufferSampleCount_2;
+		if (StreamPosition > EndPosition)
+			StreamPosition = (StreamPosition - EndPosition) + StartPosition;
 	}
 }
 
@@ -161,6 +192,27 @@ ZEDSSoundSource::~ZEDSSoundSource()
 	GetModule()->SoundSources.DeleteValue(this);
 	if (DSBuffer != NULL)
 		DSBuffer->Release();
+}
+
+void ZEDSSoundSource::SetSoundSourceState(ZESoundSourceState State)
+{
+	if (State != SoundSourceState)
+		switch(State)
+		{
+			case ZE_SSS_STOPPED:
+				Stop();
+				break;
+			case ZE_SSS_PLAYING:
+				Play();
+				break;
+			case ZE_SSS_PAUSED:
+				Pause();
+				break;
+			default:
+			case ZE_SSS_NONE:
+				SoundSourceState = ZE_SSS_NONE;
+				break;
+		}
 }
 
 void ZEDSSoundSource::SetCurrentPosition(unsigned int SampleIndex)
@@ -180,9 +232,7 @@ void ZEDSSoundSource::SetCurrentPosition(unsigned int SampleIndex)
 unsigned int ZEDSSoundSource::GetCurrentPosition()
 {
 	if (Streaming)
-	{	
 		return CurrentPosition;
-	}
 	else
 		if (DSBuffer != NULL)
 		{
@@ -254,26 +304,34 @@ void ZEDSSoundSource::SetVolume(unsigned int NewVolume)
 	float EffectiveVolume = (float)Volume * ((float)zeSound->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
 	
 	if (DSBuffer != NULL)
-		DSBuffer->SetVolume(EffectiveVolume * (DSBVOLUME_MAX - DSBVOLUME_MAX) / ZE_SS_VOLUME_MAX + DSBVOLUME_MIN);
+		DSBuffer->SetVolume(log10f((float)EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f);
 }
 
-void ZEDSSoundSource::SetLoop(bool Enabled)
+void ZEDSSoundSource::SetLooping(bool Enabled)
 {
-	Loop = Enabled;
+	Looping = Enabled;
+	if (DSBuffer != NULL && !Streaming && SoundSourceState == ZE_SSS_PLAYING)
+		DSBuffer->Play(0, 0, (Looping ? DSBPLAY_LOOPING : NULL));
 }
 
 void ZEDSSoundSource::Play()
 {
+	CurrentPosition = StartPosition;
+
 	if (DSBuffer != NULL)
 	{
 		SoundSourceState = ZE_SSS_PLAYING;
 		
 		if (Streaming)
+		{
+			CurrentPosition = StartPosition;
 			ResetStream();
+		}
 		else
-			DSBuffer->SetCurrentPosition(StartPosition);
-		
-		CurrentPosition = StartPosition;
+		{
+			OldBufferPosition = StartPosition * SoundResource->GetBlockAlign();
+			DSBuffer->SetCurrentPosition(StartPosition * SoundResource->GetBlockAlign());
+		}
 
 		DSBuffer->Play(0, 0, DSBPLAY_LOOPING);
 	}
@@ -284,8 +342,13 @@ void ZEDSSoundSource::Resume()
 	if (DSBuffer != NULL)
 	{
 		SoundSourceState = ZE_SSS_PLAYING;
-		DSBuffer->Play(0, 0, 0);
+		
+		if (Streaming)
+			ResetStream();
+		else
+			DSBuffer->SetCurrentPosition(StartPosition);
 
+		DSBuffer->Play(0, 0, DSBPLAY_LOOPING);
 	}
 }
 
@@ -316,40 +379,49 @@ void ZEDSSoundSource::Update(float ElapsedTime)
 {
 	if (DSBuffer == NULL || SoundSourceState != ZE_SSS_PLAYING)
 		return;
+		
+	DWORD BufferPosition;
+	DSBuffer->GetCurrentPosition(&BufferPosition, NULL);
+	BufferPosition /= SoundResource->GetBlockAlign();
+
+	// Update CurrentPosition
+	bool BufferRewinded = false;
 
 	if (Streaming)
 	{
-		DWORD BufferPosition;
-		DSBuffer->GetCurrentPosition(&BufferPosition, NULL);
-
-		if (BufferPosition > OldBufferPosition)
+		if (BufferPosition >= OldBufferPosition)
 			CurrentPosition += BufferPosition - OldBufferPosition;
 		else
-			CurrentPosition += (StreamBufferSize - OldBufferPosition) + BufferPosition;
+		{
+			BufferRewinded = true;
+			CurrentPosition += (BufferSampleCount - OldBufferPosition) + BufferPosition;
+		}
 
 		OldBufferPosition = BufferPosition;
 	}
 	else
 	{
-		DWORD BufferPosition;
-		DSBuffer->GetCurrentPosition(&BufferPosition, NULL);
+		if (OldBufferPosition > BufferPosition)
+			BufferRewinded = true;
 
 		CurrentPosition = BufferPosition;
+		OldBufferPosition = BufferPosition;
 	}
 
-
-	unsigned int Position = GetCurrentPosition();
-	if (Position < StartPosition || Position > EndPosition)
+	// Check Limits
+	if (CurrentPosition < StartPosition || CurrentPosition > EndPosition || (!Streaming && BufferRewinded && (StartPosition < EndPosition)))
 	{
-		if (Loop)
+		if (Looping)
 			SetCurrentPosition(StartPosition);
 		else
 		{
 			SoundSourceState = ZE_SSS_STOPPED;
 			DSBuffer->Stop();
+			return;
 		}
 	}
 
+	// Stream
 	if (Streaming)
 		Stream();
 
@@ -365,7 +437,7 @@ void ZEDSSoundSource::SetSoundResource(ZESoundResource* Resource)
 		CurrentPosition = 0;
 		EndPosition = Resource->GetSampleCount();
 		SoundSourceState = ZE_SSS_STOPPED;
-		CreateBuffer();
+		CreateBuffer(false);
 	}
 	else
 	{

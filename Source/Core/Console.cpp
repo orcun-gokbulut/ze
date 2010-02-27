@@ -476,7 +476,7 @@ void ZEConsole::Log(const char* Module, const char* Format, ...)
 	va_end(vlist);
 	
 	char Buffer2[32768];
-	sprintf_s(Buffer2, 32768, "[%s] %s", Module, Buffer);
+	sprintf_s(Buffer2, 32768, "[%s] %s\r\n", Module, Buffer);
 
 	char* HistBuffer = new char[strlen(Buffer2) + 1];
 	strncpy(HistBuffer, Buffer2, strlen(Buffer2) + 1);  

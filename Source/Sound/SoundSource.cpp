@@ -43,7 +43,7 @@ ZESoundSource::ZESoundSource()
 	Pan = ZE_SS_PAN_MIDDLE;
 	Frequency = ZE_SS_FREQUENCY_DEFAULT;
 	Volume = ZE_SS_VOLUME_MAX;
-	Loop = false;
+	Looping = false;
 	Streaming = false;
 	CurrentPosition = 0;
 	StartPosition = 0;
@@ -292,17 +292,17 @@ unsigned int ZESoundSource::GetVolume() const
 	return Volume;
 }
 
-void ZESoundSource::SetLoop(bool Enabled)
+void ZESoundSource::SetLooping(bool Enabled)
 {
-	Loop = Enabled;
+	Looping = Enabled;
 }
 
-bool ZESoundSource::GetLoop() const
+bool ZESoundSource::GetLooping() const
 {
-	return Loop;
+	return Looping;
 }
 
-size_t ZESoundSource::GetLoopLength()
+size_t ZESoundSource::GetLoopingLength()
 {
 	if (StartPosition < EndPosition)
 		return EndPosition - StartPosition;
@@ -310,14 +310,14 @@ size_t ZESoundSource::GetLoopLength()
 		return StartPosition + (SoundResource->GetSampleCount() - EndPosition);
 }
 
-float ZESoundSource::GetLoopLenghtTime()
+float ZESoundSource::GetLoopingLenghtTime()
 {
-	return GetLoopLength() / SoundResource->GetSamplesPerSecond();
+	return GetLoopingLength() / SoundResource->GetSamplesPerSecond();
 }
 
-float ZESoundSource::GetLoopLenghtPercent()
+float ZESoundSource::GetLoopingLenghtPercent()
 {
-	return (GetLoopLength() / SoundResource->GetSampleCount()) * 100.0f;
+	return (GetLoopingLength() / SoundResource->GetSampleCount()) * 100.0f;
 }
 
 void ZESoundSource::Destroy()

@@ -47,33 +47,33 @@ class ZESoundSource3D : public ZESoundSource
 {
 	ZE_META_CLASS();
 	protected:
-		float				MinDistance;
-		float				MaxDistance;
-		unsigned int		InsideAngle,OutsideAngle;
-		ZEVector3			ConeDirection;
-		unsigned int		ConeOutsideVolume;
-		bool				Changed3D;
+		float						MinDistance;
+		float						MaxDistance;
+		unsigned int				ConeInsideAngle;
+		unsigned int				ConeOutsideAngle;
+		ZEVector3					ConeDirection;
+		unsigned int				ConeOutsideVolume;
 
-							ZESoundSource3D();
-		virtual				~ZESoundSource3D();
+									ZESoundSource3D();
+		virtual						~ZESoundSource3D();
 
 	public:	
-		void				SetMinDistance(float  NewMinDistance);
-		float				GetMinDistance();
+		virtual void				SetMinDistance(float  NewMinDistance) = 0;
+		float						GetMinDistance() const;
 		
-		void				SetMaxDistance(float  NewMaxDistance);
-		float				GetMaxDistance();
+		virtual void				SetMaxDistance(float  NewMaxDistance) = 0;
+		float						GetMaxDistance() const;
 		
-		void				SetConeInsideAngle(unsigned int NewInsideAngle);
-		unsigned int		GetInsideConeAngle();
+		virtual void				SetConeInsideAngle(unsigned int NewInsideAngle) = 0;
+		unsigned int				GetConeInsideAngle() const;
 
-		void				SetConeOutsideAngle( unsigned int NewOutsideAngle);
-		unsigned int		GetConeOutsideAngle();
+		virtual void				SetConeOutsideAngle(unsigned int NewOutsideAngle) = 0;
+		unsigned int				GetConeOutsideAngle() const;
 					
-		void				SetConeOutsideVolume(unsigned int NewOutsideVolume);
-		unsigned int		GetConeOutsideVolume();
-		
-		void				Tick(float Time);
+		virtual void				SetConeOutsideVolume(unsigned int NewOutsideVolume) = 0;
+		unsigned int				GetConeOutsideVolume() const;
+
+		static ZESoundSource3D*		CreateInstance();
 };
 
 /*
@@ -92,8 +92,24 @@ ZE_POSTPROCESSOR_START(Meta)
 					<minvalue value="0"/>
 				</constraints>
 			</property>
-			<property name="ConeInsideAngle" type="integer" autogetset="yes"/>
-			<property name="ConeOutSizeAngle" type="float" autogetset="yes"/>
+			<property name="ConeInsideAngle" type="integer" autogetset="yes">
+				<constraints>
+					<minvalue value="0"/>
+					<maxvalue value="360"/>
+				</constraints>
+			</property>
+			<property name="ConeOutsideAngle" type="integer" autogetset="yes">
+				<constraints>
+					<minvalue value="0"/>
+					<maxvalue value="360"/>
+				</constraints>
+			</property>
+			<property name="ConeOutsideVolume" type="integer" autogetset="yes">
+				<constraints>
+					<minvalue value="ZE_SS_VOLUME_MIN"/>
+					<maxvalue value="ZE_SS_VOLUME_MAX"/>
+				</constraints>
+			</property>
 		</class>
 	</meta>
 </zinek>

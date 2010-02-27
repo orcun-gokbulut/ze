@@ -58,6 +58,12 @@ class ZEDSModule : public ZESoundModule
 	private:
 		bool								Enabled;
 
+		float								UpdateTime;
+
+		LPDIRECTSOUND8						DS;
+		LPDIRECTSOUNDBUFFER					DSPrimary;
+		LPDIRECTSOUND3DLISTENER8			DSListener;
+
 		unsigned int						MasterVolume;
 		unsigned int						TypeVolumes[ZE_SS_MAX_TYPE];
 
@@ -72,10 +78,15 @@ class ZEDSModule : public ZESoundModule
 		void								UpdateVolumes(ZESoundSourceType SourceType);
 		void								UpdateStreams();
 
+											ZEDSModule();
+		virtual								~ZEDSModule();
+
 	public:
 		ZEModuleDescription*				GetModuleDescription();		
 
 		LPDIRECTSOUND8						GetDevice();
+		LPDIRECTSOUND3DLISTENER8			GetListener();
+		LPDIRECTSOUNDBUFFER					GetPrimaryBuffer();
 
 		virtual bool						IsEnabled();
 		virtual void						SetEnabled(bool Enabled);

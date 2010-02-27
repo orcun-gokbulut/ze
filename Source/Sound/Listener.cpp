@@ -36,16 +36,14 @@
 #include "Listener.h"
 #include "SoundModule.h"
 
-void ZEListener::SetLocalPosition(const ZEVector3& NewPosition)
-{	
-	ZEComponent::SetLocalPosition(NewPosition);
-	ChangedListener = true;
+void ZEListener::SetActiveListener()
+{
+	zeSound->SetActiveListener(this);
 }
 
-void ZEListener::SetLocalRotation(const ZEQuaternion& NewRotation)
+bool ZEListener::IsActiveListener()
 {
-	ZEComponent::SetLocalRotation(NewRotation);
-	ChangedListener = true;
+	return zeSound->GetActiveListener() == this;
 }
 
 float ZEListener::GetDistanceFactor()
@@ -56,7 +54,6 @@ float ZEListener::GetDistanceFactor()
 void ZEListener::SetDistanceFactor(float NewDistanceFactor)
 {
 	DistanceFactor = NewDistanceFactor;
-	ChangedListener=true;
 }
 
 float ZEListener::GetDopplerFactor()
@@ -67,7 +64,6 @@ float ZEListener::GetDopplerFactor()
 void ZEListener::SetDopplerFactor(float NewDopplerFactor)
 {
 	DopplerFactor = NewDopplerFactor;
-	ChangedListener=true;
 }
 
 float ZEListener::GetRollOffFactor()
@@ -78,13 +74,4 @@ float ZEListener::GetRollOffFactor()
 void ZEListener::SetRollOffFactor(float NewRollOffFactor)
 {
 	RollOffFactor = NewRollOffFactor;
-	ChangedListener=true;
-}
-
-void ZEListener::Tick()
-{
-	/*if(ChangedListener == true)
-		zeSound->UpdateListener(this);
-		
-	ChangedListener = false;*/
 }

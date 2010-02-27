@@ -37,4 +37,61 @@
 #ifndef	__ZE_DS_SOUND_SOURCE_3D_H__
 #define __ZE_DS_SOUND_SOURCE_3D_H__
 
+#include "../SoundSource3D.h"
+#include "DSSoundSource.h"
+#include <dsound.h>
+
+class ZEDSSoundSource3D : public ZESoundSource3D, public ZEDSComponentBase
+{
+	friend class ZEDSModule;
+	private:
+		LPDIRECTSOUNDBUFFER			DSBuffer;
+		LPDIRECTSOUND3DBUFFER		DS3DBuffer;
+		bool						BufferDirtyFlag;
+
+		size_t						BufferSampleCount;
+		size_t						OldBufferPosition;
+		size_t						StreamPosition;
+		int							LastUpdatedBufferChunk;
+
+		bool						CreateBuffer();
+		void						Stream();
+		void						ResetStream();
+		void						StreamDecodeAndFill(size_t BufferPosition, size_t Position, size_t SampleCount);
+
+									ZEDSSoundSource3D();
+		virtual						~ZEDSSoundSource3D();
+
+	public:
+		virtual void				SetSoundSourceState(ZESoundSourceState State);
+		virtual void				SetCurrentPosition(unsigned int SampleIndex);
+		virtual unsigned int		GetCurrentPosition();
+		virtual void				SetStartPosition(unsigned int SampleIndex);
+		virtual void				SetEndPosition(unsigned int SampleIndex);
+
+		virtual void				SetPan(int NewPan);
+		virtual void				SetFrequency(unsigned int NewFrequency);
+		virtual void				SetVolume(unsigned int NewVolume);
+		virtual void				SetLooping(bool Enabled);				
+							
+		virtual void				Play();
+		virtual void				Resume();
+		virtual void				Pause();
+		virtual void				Stop();
+
+		void						Update(float ElapsedTime);
+
+		virtual void				SetSoundResource(ZESoundResource* Resource);
+
+	public:
+		virtual void				SetLocalPosition(const ZEVector3& NewPosition);
+		virtual void				SetLocalRotation(const ZEQuaternion& NewRotation);
+
+		virtual void				SetMinDistance(float  NewMinDistance);
+		virtual void				SetMaxDistance(float  NewMaxDistance);
+		virtual void				SetConeInsideAngle(unsigned int NewInsideAngle);
+		virtual void				SetConeOutsideAngle(unsigned int NewOutsideAngle);			
+		virtual void				SetConeOutsideVolume(unsigned int NewOutsideVolume);
+};
+
 #endif

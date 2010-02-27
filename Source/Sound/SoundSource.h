@@ -85,7 +85,7 @@ class ZESoundSource : public ZEComponent
 		int							Pan;
 		unsigned int				Frequency;
 		unsigned int				Volume;
-		bool						Loop;
+		bool						Looping;
 		bool						Limited;
 		bool						Streaming;
 
@@ -98,23 +98,23 @@ class ZESoundSource : public ZEComponent
 		virtual 					~ZESoundSource();
 
 	public:
-		virtual bool				IsStreaming() const;
+		bool						IsStreaming() const;
 
-		virtual void				SetSoundSourceState(ZESoundSourceState State);
+		virtual void				SetSoundSourceState(ZESoundSourceState State) = 0;
 		ZESoundSourceState			GetSoundSourceState() const;
 	
 		ZESoundSourceType			GetSoundSourceType();
 		void						SetSoundSourceType(ZESoundSourceType Type);
 
-		virtual void				SetCurrentPosition(unsigned int SampleIndex);
+		virtual void				SetCurrentPosition(unsigned int SampleIndex) = 0;
 		void						SetCurrentPositionTime(float Seconds);
 		void						SetCurrentPositionPersentage(float Percent);
 
-		virtual unsigned int		GetCurrentPosition() const;
+		unsigned int				GetCurrentPosition() const;
 		unsigned int				GetCurrentPositionTime() const;
 		float						GetCurrentPositionPersentage() const;
 
-		virtual void				SetStartPosition(unsigned int SampleIndex);
+		virtual void				SetStartPosition(unsigned int SampleIndex) = 0;
 		void						SetStartPositionTime(float Seconds);
 		void						SetStartPositionPersentage(float Percent);
 
@@ -122,7 +122,7 @@ class ZESoundSource : public ZEComponent
 		float						GetStartPositionTime() const;
 		float						GetStartPositionPersentage() const;
 
-		virtual void				SetEndPosition(unsigned int SampleIndex);
+		virtual void				SetEndPosition(unsigned int SampleIndex) = 0;
 		void						SetEndPositionTime(float Seconds);
 		void						SetEndPositionPercentage(float Percentage);
 
@@ -130,23 +130,23 @@ class ZESoundSource : public ZEComponent
 		float						GetEndPositionTime() const;
 		float						GetEndPositionPersentage() const;
 
-		virtual void				SetLoop(bool Enabled);
-		bool						GetLoop() const;
+		virtual void				SetLooping(bool Enabled) = 0;
+		bool						GetLooping() const;
 
-		size_t						GetLoopLength();
-		float						GetLoopLenghtTime();
-		float						GetLoopLenghtPercent();
+		size_t						GetLoopingLength();
+		float						GetLoopingLenghtTime();
+		float						GetLoopingLenghtPercent();
 
-		virtual void				SetPan(int NewPan);
+		virtual void				SetPan(int NewPan) = 0;
 		int							GetPan() const;
 							
 		void						SetPlaybackSpeed(float Speed);
 		float						GetPlaybackSpeed() const;
 							
-		virtual void				SetFrequency(unsigned int NewFrequency);
+		virtual void				SetFrequency(unsigned int NewFrequency) = 0;
 		unsigned int				GetFrequency() const;
 							
-		virtual void				SetVolume(unsigned int NewVolume);
+		virtual void				SetVolume(unsigned int NewVolume) = 0;
 		unsigned int				GetVolume() const;
 						
 		virtual void				Play() = 0;
@@ -175,22 +175,23 @@ ZE_POSTPROCESSOR_START(Meta)
 			</property>
 			<property name="Volume" type="integer" autogetset="yes">
 				<constraints>
-					<minvalue value="0"/>
-					<maxvalue value="100"/>
+					<minvalue value="ZE_SS_VOLUME_MIN"/>
+					<maxvalue value="ZE_SS_VOLUME_MAX"/>
 				</constraints>
 			</property>
 			<property name="Pan" type="integer" autogetset="yes">
 				<constraints>
-					<minvalue value="-100"/>
-					<maxvalue value="100"/>
+					<minvalue value="-ZE_SS_PAN_LEFT"/>
+					<maxvalue value="ZE_SS_PAN_RIGHT"/>
 				</constraints>
 			</property>
 			<property name="PlaybackSpeed" type="float" autogetset="yes">
 				<constraints>
 					<minvalue value="0.1f"/>
+					<maxvalue valıe="2.0f"/>
 				</constraints>
 			</property>
-			<property name="Loop" type="boolean" autogetset="yes"/>
+			<property name="Looping" type="boolean" autogetset="yes"/>
 			<property name="StartPosition" type="integer" autogetset="yes"/>
 			<property name="EndPosition" type="integer" autogetset="yes"/>
 			<property name="SoundSourceState" type="integer" autogetset="yes">

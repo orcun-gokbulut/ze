@@ -42,25 +42,22 @@
 class ZEListener: public ZEComponent
 {	
 	protected:
-		bool			ChangedListener;
-	private:
-		float			DistanceFactor;
-		float			DopplerFactor;
-		float			RollOffFactor;
+		float				DistanceFactor;
+		float				DopplerFactor;
+		float				RollOffFactor;
 
 	public:
-		void			SetLocalPosition(const ZEVector3& NewPosition);
-		void			SetLocalRotation(const ZEQuaternion& NewRotation);
+		bool				IsActiveListener();
+		void				SetActiveListener();
 
-		float			GetDistanceFactor();
-		void			SetDistanceFactor(float NewDistanceFactor);
+		float				GetDistanceFactor();
+		virtual void		SetDistanceFactor(float NewDistanceFactor);
 		
-		float			GetDopplerFactor();
-		void			SetDopplerFactor(float NewDopplerFactor);
+		float				GetDopplerFactor();
+		virtual void		SetDopplerFactor(float NewDopplerFactor);
 		
-		float			GetRollOffFactor();
-		void			SetRollOffFactor(float NewRollOffFactor);
-		void			Tick();
+		float				GetRollOffFactor();
+		virtual void		SetRollOffFactor(float NewRollOffFactor);
 };
 
 #endif

@@ -43,22 +43,34 @@
 class ZEDSComponentBase
 {
 	private:
-		static ZEDSModule*				Module;
-		static LPDIRECTSOUND8			Device;
+		static ZEDSModule*						Module;
+		static LPDIRECTSOUND8					Device;
+		static LPDIRECTSOUNDBUFFER				PrimaryBuffer;
+		static LPDIRECTSOUND3DLISTENER8			Listener;
 
 	protected:
-		static inline ZEDSModule*		GetModule()
+		static inline ZEDSModule*				GetModule()
 		{
 			return Module;
 		}
 
-		static inline LPDIRECTSOUND8	GetDevice()
+		static inline LPDIRECTSOUND8			GetDevice()
 		{
 			return Device;
 		}
 
+		static inline LPDIRECTSOUNDBUFFER		GetPrimaryBuffer()
+		{
+			return PrimaryBuffer;
+		}
+
+		static inline LPDIRECTSOUND3DLISTENER8	GetListener()
+		{
+			return Listener;
+		}
+
 	public:
-		static bool						BaseInitialize(ZEDSModule* D3DModule);
+		static bool								BaseInitialize(ZEDSModule* D3DModule);
 };
 
 #endif

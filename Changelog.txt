@@ -77,3 +77,13 @@
 	CHG: ZENamed::SetName() function does not allocate empty string.
 	FIX: If NULL passed to ZENamed::SetName() function it crashes. Now it checks parameter for NULL or Empty string.
 	-ADD: Effects enabled in sound source.
+
+  [27 Þubat 2010 - Revision 107]
+    FIX: Volumes in sound sub-system are normalized and linearized to [0, 100]
+    ADD: DirectSound Listener added.
+    ADD: DirectSound 3D Buffer added.
+    BUG: DirectSound 3D Sound Source can not be created in vista.
+    CHG: ZEConsole::Log() function and zeLog macro now adds a new line character at the end of the message.
+    FIX: ZECore::FrameTime and ZECore::RunningTime fixed.
+    
+    
