@@ -46,7 +46,8 @@ ZEPostProcessorNode* ZED3D9PostProcessor::CreateNode(const char* TypeName)
 	else if (strcmp("Blur", TypeName) == 0)
 		return NULL;//new ZED3D9PPBlurNode();
 	else
-		ZEPostProcessor::CreateNode(TypeName);
+		return ZEPostProcessor::CreateNode(TypeName);
+
 }
 
 ZEPostProcessorNode* ZED3D9PostProcessor::CreateNode(size_t TypeId)

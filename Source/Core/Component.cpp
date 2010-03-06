@@ -72,6 +72,12 @@ ZEEntity* ZEComponent::GetOwner() const
 	return Owner;
 }
 
+const ZEVector3& ZEComponent::GetWorldVelocity()
+{
+	return Velocity;
+}
+
+
 const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 {
 	if (Owner != NULL)
@@ -249,6 +255,10 @@ bool ZEComponent::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norm
 
 void ZEComponent::Tick(float Time)
 {
+	const ZEVector3& WorldPosition = GetWorldPosition();
+
+	ZEVector3::Sub(Velocity, WorldPosition, OldPosition);
+	ZEVector3::Scale(Velocity, Velocity, Time);
 }
 
 void ZEComponent::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
@@ -275,10 +285,12 @@ void ZEComponent::OwnerWorldTransformChanged()
 
 ZEComponent::ZEComponent()
 {
-	Position = ZEVector3(0.0f, 0.0f, 0.0f);
-	Rotation = ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f);
-	Scale = ZEVector3(1.0f, 1.0f, 1.0f);
 	Owner = NULL;
+	Position = ZEVector3::Zero;
+	OldPosition = ZEVector3::Zero;
+	Velocity = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3(1.0f, 1.0f, 1.0f);
 	UpdateLocalTransform = true;
 	UpdateWorldTransform = true;
 	UpdateWorldBoundingSphere = true;

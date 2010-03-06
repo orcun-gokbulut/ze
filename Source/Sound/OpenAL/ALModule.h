@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSModule.h
+ Zinek Engine - ALModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,35 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DS_MODULE_H__
-#define __ZE_DS_MODULE_H__
+#ifndef	__ZE_AL_MODULE_H__
+#define __ZE_AL_MODULE_H__
 
 #include "ZEDS/Array.h"
 #include "Sound/SoundModule.h"
 #include "Sound/SoundSource.h"
-#include <dsound.h>
+#include <al.h>
+#include <alc.h>
 
-class ZEDSSoundSource;
-class ZEDSSoundSource3D;
-class ZEDSListener;
+class ZEALSoundSource;
+class ZEALSoundSource3D;
+class ZEALListener;
 enum ZESoundSourceType;
 
 #undef PlaySound
-class ZEDSModule : public ZESoundModule
+class ZEALModule : public ZESoundModule
 {
-	friend class ZEDSModuleDescription;
-	friend class ZEDSListener;
-	friend class ZEDSSoundSource;
-	friend class ZEDSSoundSource3D;
+	friend class ZEALModuleDescription;
+	friend class ZEALSoundListener;
+	friend class ZEALSoundSource;
+	friend class ZEALSoundSource3D;
 
 	private:
 		bool								Enabled;
 
 		float								UpdateTime;
 
-		LPDIRECTSOUND8						DS;
-		LPDIRECTSOUNDBUFFER					DSPrimary;
-		LPDIRECTSOUND3DLISTENER8			DSListener;
+		ALCdevice*							Device;
+		ALCcontext*							Context;
 
 		unsigned int						MasterVolume;
 		unsigned int						TypeVolumes[ZE_SS_MAX_TYPE];
@@ -70,23 +70,22 @@ class ZEDSModule : public ZESoundModule
 		bool								StreamingDisabled;
 		unsigned int						MaxBufferSize;
 
-		ZEDSListener*						ActiveListener;
-		ZESmartArray<ZEDSListener*>			Listeners;
-		ZESmartArray<ZEDSSoundSource*>		SoundSources;
-		ZESmartArray<ZEDSSoundSource3D*>	SoundSources3D;
+		ZEALListener*						ActiveListener;
+		ZESmartArray<ZEALListener*>			Listeners;
+		ZESmartArray<ZEALSoundSource*>		SoundSources;
+		ZESmartArray<ZEALSoundSource3D*>	SoundSources3D;
 
 		void								UpdateVolumes(ZESoundSourceType SourceType);
 		void								UpdateStreams();
 
-											ZEDSModule();
-		virtual								~ZEDSModule();
+											ZEALModule();
+		virtual								~ZEALModule();
 
 	public:
 		ZEModuleDescription*				GetModuleDescription();		
 
-		LPDIRECTSOUND8						GetDevice();
-		LPDIRECTSOUND3DLISTENER8			GetListener();
-		LPDIRECTSOUNDBUFFER					GetPrimaryBuffer();
+		ALCdevice*							GetDevice();
+		ALCcontext*							GetContext();
 
 		virtual bool						IsEnabled();
 		virtual void						SetEnabled(bool Enabled);

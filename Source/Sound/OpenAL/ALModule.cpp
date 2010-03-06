@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSModule.cpp
+ Zinek Engine - ALModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,129 +33,93 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DSModule.h"
-#include "DSModuleDescription.h"
+#include "ALModule.h"
+#include "ALModuleDescription.h"
 #include "ZEMath/Vector.h"
 #include "Core/Core.h"
 #include "Core/Error.h"
 #include "Core/Console.h"
 #include "Core/Window.h"
-#include "DSListener.h"
-#include "DSSoundSource.h"
-#include "DSSoundSource3D.h"
+#include "ALListener.h"
+#include "ALSoundSource.h"
+#include "ALSoundSource3D.h"
 #include <dsound.h>
 
 #define MAX_SOUNDBUFFER_COUNT	256
 #define MapVector3(A, B)		(A).x = (B).x; (A).y = (B).y; (A).z = (B).z
 
-void ZEDSModule::UpdateVolumes(ZESoundSourceType SourceType)
+void ZEALModule::UpdateVolumes(ZESoundSourceType SourceType)
 {
 	for (size_t I = 0; I < SoundSources.GetCount(); I++)
 		if (SoundSources[I]->GetSoundSourceType() == SourceType)
 			SoundSources[I]->SetVolume(SoundSources[I]->GetVolume());
 
-	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
+	/*for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
 		if (SoundSources3D[I]->GetSoundSourceType() == SourceType)
-			SoundSources3D[I]->SetVolume(SoundSources[I]->GetVolume());
+			SoundSources3D[I]->SetVolume(SoundSources[I]->GetVolume());*/
 
 }
 
-void ZEDSModule::UpdateStreams()
+void ZEALModule::UpdateStreams()
 {
 	for (size_t I = 0; I < SoundSources.GetCount(); I++)
-		SoundSources[I]->CreateBuffer(false);
+		SoundSources[I]->CreateBuffer();
 
 	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
-		SoundSources[I]->CreateBuffer(true);
+		SoundSources[I]->CreateBuffer();
 }
 
-ZEDSModule::ZEDSModule()
+ZEALModule::ZEALModule()
 {
 	UpdateTime = 0.2f;
-	DS = NULL;
-	DSPrimary = NULL;
-	DSListener = NULL;
 }
 
-ZEDSModule::~ZEDSModule()
+ZEALModule::~ZEALModule()
 {
 }
 
-ZEModuleDescription* ZEDSModule::GetModuleDescription()
+ZEModuleDescription* ZEALModule::GetModuleDescription()
 {
-	static ZEDSModuleDescription Desc;
+	static ZEALModuleDescription Desc;
 	return &Desc;
 }
 
-LPDIRECTSOUND8 ZEDSModule::GetDevice()
+ALCdevice* ZEALModule::GetDevice()
 {
-	return DS;
+	return Device;
 }
 
-LPDIRECTSOUND3DLISTENER8 ZEDSModule::GetListener()
+ALCcontext* ZEALModule::GetContext()
 {
-	return DSListener;
+	return Context;
 }
 
-LPDIRECTSOUNDBUFFER ZEDSModule::GetPrimaryBuffer()
-{
-	return DSPrimary;
-}
 
-bool ZEDSModule::IsEnabled()
+bool ZEALModule::IsEnabled()
 {
 	return Enabled;
 }
 
-void ZEDSModule::SetEnabled(bool Enabled)
+void ZEALModule::SetEnabled(bool Enabled)
 {
 	this->Enabled = true;
 }
 
-bool ZEDSModule::Initialize()
+bool ZEALModule::Initialize()
 {	
-	zeOutput("Initializing DirectSound.\r\n");
-	HRESULT hr;
+	zeLog("OpenAL Module", "Initializing OpeAL.");
 	
-	hr = DirectSoundCreate8(NULL, &DS, NULL);
-	if (FAILED(hr))
-	{	
-		Destroy();
-		zeError("DirectSound Module", "No DirectSound.");
-		return false;
-	}
-
-	hr=DS->SetCooperativeLevel((HWND)zeWindow->GetHandle(), DSSCL_PRIORITY);
-	
-	if (FAILED(hr))
-	{	
-		Destroy();
-		zeError("DirectSound Module", "Can not set DirectSound device cooperative level.");
-		return false;
-	}
-	
-	DSBUFFERDESC PrimaryBufferDesc;
-	ZeroMemory(&PrimaryBufferDesc, sizeof(DSBUFFERDESC));
-	PrimaryBufferDesc.dwSize = sizeof(DSBUFFERDESC);
-	PrimaryBufferDesc.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_CTRLVOLUME | DSBCAPS_PRIMARYBUFFER;
-
-	hr = DS->CreateSoundBuffer(&PrimaryBufferDesc, &DSPrimary, NULL);
-	if (FAILED(hr))
+	Device = alcOpenDevice(NULL); // select the "preferred device"
+	if (Device == NULL) 
 	{
-		Destroy();
-		zeError("DirectSound Module", "Can create direct sound primary buffer.");
+		zeError("OpenAL Module", "Can not open OpenAL device.");
 		return false;
 	}
 
-	hr = DSPrimary->QueryInterface(IID_IDirectSound3DListener8, (VOID**)&DSListener);
-	if (FAILED(hr))
-	{
-		Destroy();
-		zeError("DirectSound Module", "Can not create a Direct Sound listener.");
-		return false;
-	}
+	Context = alcCreateContext(Device, NULL);
+	alcMakeContextCurrent(Context);
 
-	ZEDSComponentBase::BaseInitialize(this);
+	ZEALComponentBase::BaseInitialize(this);
 
 	for(size_t I = 0; I < ZE_SS_MAX_TYPE; I++)
 		TypeVolumes[I] = 100;
@@ -173,66 +137,52 @@ bool ZEDSModule::Initialize()
 	return true;
 }
 
-void ZEDSModule::Deinitialize()
+void ZEALModule::Deinitialize()
 {	
-	zeOutput("Destroying DirectSound.\r\n");
-	if (DSListener != NULL)
-	{
-		DSListener->Release();
-		DSListener = NULL;
-	}
+	zeLog("OpenAL Module", "Destroying OpenAL.");
 
-	if (DSPrimary != NULL)
-	{
-		DSPrimary->Release();
-		DSPrimary = NULL;
-	}
-
-	if (DS != NULL)
-	{
-		DS->Release();
-		DS = NULL;
-	}
+	alcMakeContextCurrent(NULL);
+	alcDestroyContext(Context);
+	alcCloseDevice(Device);
 }
 
-void ZEDSModule::SetSpeakerLayout(ZESpeakerLayout Layout)
+void ZEALModule::SetSpeakerLayout(ZESpeakerLayout Layout)
 {
-	// Dangerous in DirectSound. 
+	// Not available in OpenAL
 }
 
-ZESpeakerLayout ZEDSModule::GetSpeakerLayout()
+ZESpeakerLayout ZEALModule::GetSpeakerLayout()
 {
 	return ZE_SL_AUTOMATIC;
 }
 
-void ZEDSModule::SetStreamingDisabled(bool Disabled)
+void ZEALModule::SetStreamingDisabled(bool Disabled)
 {
 	StreamingDisabled = Disabled;
 	UpdateStreams();
 }
 
-bool ZEDSModule::GetStreamingDisabled()
+bool ZEALModule::GetStreamingDisabled()
 {
 	return StreamingDisabled;
 }
 
-void ZEDSModule::SetMasterVolume(unsigned int Volume)
+void ZEALModule::SetMasterVolume(unsigned int Volume)
 {
 	if (Volume > ZE_SS_VOLUME_MAX)
 		MasterVolume = ZE_SS_VOLUME_MAX;
 	else
 		MasterVolume = Volume;
 	
-	//DSPrimary->SetVolume(((MasterVolume - ZE_SS_VOLUME_MIN) * (DSBVOLUME_MAX - DSBVOLUME_MIN)) / (ZE_SS_VOLUME_MAX - ZE_SS_VOLUME_MIN) + DSBVOLUME_MIN);
-	DSPrimary->SetVolume(log10f((float)MasterVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f);
+	alListenerf(AL_GAIN, MasterVolume / 100.0f);
 }
 
-unsigned int ZEDSModule::GetMasterVolume()
+unsigned int ZEALModule::GetMasterVolume()
 {
 	return MasterVolume;
 }
 
-void ZEDSModule::SetTypeVolume(ZESoundSourceType Type, unsigned int Volume)
+void ZEALModule::SetTypeVolume(ZESoundSourceType Type, unsigned int Volume)
 {
 	if (Volume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;
@@ -244,71 +194,64 @@ void ZEDSModule::SetTypeVolume(ZESoundSourceType Type, unsigned int Volume)
 	UpdateVolumes(Type);
 }
 
-unsigned int ZEDSModule::GetTypeVolume(ZESoundSourceType Type)
+unsigned int ZEALModule::GetTypeVolume(ZESoundSourceType Type)
 {
 	ZEASSERT(Type >= 256, "Sound source types are limited to 256");
 	return TypeVolumes[Type];
 }
 
 
-void ZEDSModule::SetMaxBufferSize(unsigned int BufferSize)
+void ZEALModule::SetMaxBufferSize(unsigned int BufferSize)
 {
 	MaxBufferSize = BufferSize;
 }
 
-unsigned int ZEDSModule::GetMaxBufferSize()
+unsigned int ZEALModule::GetMaxBufferSize()
 {
 	return MaxBufferSize;
 }
 
-void ZEDSModule::ProcessSound(float ElapsedTime)
+void ZEALModule::ProcessSound(float ElapsedTime)
 {
 	for (size_t I = 0; I < SoundSources.GetCount(); I++)
 		SoundSources[I]->Update(ElapsedTime);
 
-	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
-		SoundSources3D[I]->Update(ElapsedTime);
-	
-	if (UpdateTime  < 0.0f)
-	{
-		DSListener->CommitDeferredSettings();
-		UpdateTime = 0.2f;
-	}
-	UpdateTime -= ElapsedTime;
+	/*for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
+		SoundSources3D[I]->Update(ElapsedTime);*/
 }
 
-void ZEDSModule::PlaySound(ZESoundResource* SoundResource)
+#undef PlaySound
+void ZEALModule::PlaySound(ZESoundResource* SoundResource)
 {
 }
 
-void ZEDSModule::SetActiveListener(ZEListener* Listener)
+void ZEALModule::SetActiveListener(ZEListener* Listener)
 {
-	ActiveListener = (ZEDSListener*)Listener;
+	ActiveListener = (ZEALListener*)Listener;
 	ActiveListener->ResetParameters();
 }
 
-ZEListener* ZEDSModule::GetActiveListener()
+ZEListener* ZEALModule::GetActiveListener()
 {
 	return ActiveListener;
 }
 
-ZESoundSource* ZEDSModule::CreateSoundSource()
+ZESoundSource* ZEALModule::CreateSoundSource()
 {
-	ZEDSSoundSource* NewSoundSource = new ZEDSSoundSource();
+	ZEALSoundSource* NewSoundSource = new ZEALSoundSource();
 	SoundSources.Add(NewSoundSource);
 	return NewSoundSource;
 }
 
-ZESoundSource3D* ZEDSModule::CreateSoundSource3D()
+ZESoundSource3D* ZEALModule::CreateSoundSource3D()
 {
-	ZEDSSoundSource3D* NewSoundSource = new ZEDSSoundSource3D();
+/*	ZEALSoundSource3D* NewSoundSource = new ZEALSoundSource3D();
 	SoundSources3D.Add(NewSoundSource);
-	return NewSoundSource;
+	return NewSoundSource;*/
+	return NULL;
 }
 
-ZEListener* ZEDSModule::CreateListener()
+ZEListener* ZEALModule::CreateListener()
 {
-	ZEDSListener* Listener = new ZEDSListener();
-	Listeners.Add(Listener);
-	return Listener;
+	return new ZEALListener();
 }

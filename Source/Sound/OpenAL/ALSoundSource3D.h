@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSListener.h
+ Zinek Engine - ALSoundSource3D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,40 +32,66 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-
+/*
 #pragma once
-#ifndef	__ZE_DS_LISTENER_H__
-#define __ZE_DS_LISTENER_H__
+#ifndef	__ZE_AL_SOUND_SOURCE_3D_H__
+#define __ZE_AL_SOUND_SOURCE_3D_H__
 
-#include "../Listener.h"
-#include "DSComponentBase.h"
+#include "../SoundSource3D.h"
+#include "ALSoundSource.h"
+#include <dsound.h>
 
-class ZEDSListener : public ZEListener, public ZEDSComponentBase
-{	
-	friend class ZEDSModule;
+class ZEALSoundSource3D : public ZESoundSource3D, public ZEALComponentBase
+{
+	friend class ZEALModule;
 	private:
-		float						UpdateTreshold;
-		bool						ListenerDirtyFlag;
+		LPDIRECTSOUNDBUFFER			DSBuffer;
+		LPDIRECTSOUND3DBUFFER		DS3DBuffer;
+		bool						BufferDirtyFlag;
 
-		void						ResetParameters();
+		size_t						BufferSampleCount;
+		size_t						OldBufferPosition;
+		size_t						StreamPosition;
+		int							LastUpdatedBufferChunk;
 
-									ZEDSListener();
-		virtual						~ZEDSListener();
+		bool						CreateBuffer();
+		void						Stream();
+		void						ResetStream();
+		void						StreamDecodeAndFill(size_t BufferPosition, size_t Position, size_t SampleCount);
+
+		//							ZEALSoundSource3D();
+		//virtual						~ZEALSoundSource3D();
 
 	public:
-		bool						IsActiveListener();
-		void						SetActiveListener();
+		virtual void				SetSoundSourceState(ZESoundSourceState State);
+		virtual void				SetCurrentPosition(unsigned int SampleIndex);
+		virtual unsigned int		GetCurrentPosition();
+		virtual void				SetStartPosition(unsigned int SampleIndex);
+		virtual void				SetEndPosition(unsigned int SampleIndex);
 
+		virtual void				SetPan(int NewPan);
+		virtual void				SetFrequency(unsigned int NewFrequency);
+		virtual void				SetVolume(unsigned int NewVolume);
+		virtual void				SetLooping(bool Enabled);				
+							
+		virtual void				Play();
+		virtual void				Resume();
+		virtual void				Pause();
+		virtual void				Stop();
+
+		//void						Update(float ElapsedTime);
+
+		virtual void				SetSoundResource(ZESoundResource* Resource);
+
+	public:
 		virtual void				SetLocalPosition(const ZEVector3& NewPosition);
 		virtual void				SetLocalRotation(const ZEQuaternion& NewRotation);
 
-		virtual void				SetDistanceFactor(float NewDistanceFactor);	
-		virtual void				SetDopplerFactor(float NewDopplerFactor);
-		virtual void				SetRollOffFactor(float NewRollOffFactor);
-
-		virtual void				OwnerWorldTransformChanged();
-
-		virtual void				Tick(float ElapsedTime);
+		virtual void				SetMinDistance(float  NewMinDistance);
+		virtual void				SetMaxDistance(float  NewMaxDistance);
+		virtual void				SetConeInsideAngle(unsigned int NewInsideAngle);
+		virtual void				SetConeOutsideAngle(unsigned int NewOutsideAngle);			
+		virtual void				SetConeOutsideVolume(unsigned int NewOutsideVolume);
 };
 
-#endif
+#endif*/

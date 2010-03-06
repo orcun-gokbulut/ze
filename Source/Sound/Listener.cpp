@@ -36,6 +36,18 @@
 #include "Listener.h"
 #include "SoundModule.h"
 
+ZEListener::ZEListener()
+{
+	DistanceFactor = 1.0f;
+	DopplerFactor = 1.0f;
+	RollOffFactor = 1.0f;
+}
+
+ZEListener::~ZEListener()
+{
+
+}
+
 void ZEListener::SetActiveListener()
 {
 	zeSound->SetActiveListener(this);
@@ -74,4 +86,9 @@ float ZEListener::GetRollOffFactor()
 void ZEListener::SetRollOffFactor(float NewRollOffFactor)
 {
 	RollOffFactor = NewRollOffFactor;
+}
+
+ZEListener* ZEListener::CreateInstance()
+{
+	return zeSound->CreateListener();
 }

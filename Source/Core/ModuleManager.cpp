@@ -255,6 +255,7 @@ void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
 #include "Input/DirectInput/DirectInputModuleDescription.h"
 #include "Input/DummyInput/DummyInputModuleDescription.h"
 #include "Input/VirtualInput/VirtualInputModuleDescription.h"
+#include "Sound/OpenAL/ALModuleDescription.h"
 
 ZEModuleManager::ZEModuleManager()
 {
@@ -263,7 +264,8 @@ ZEModuleManager::ZEModuleManager()
 	LoadInternalModule(new ZEDummyInputModuleDescription());
 	LoadInternalModule(new ZEVirtualInputModuleDescription());
 	LoadInternalModule(new ZEDirectInputModuleDescription());
-		
+	LoadInternalModule(new ZEALModuleDescription());
+
 	ModuleManagerOptions.SetName("ModuleManager");
 	ModuleManagerOptions.AddOption(new ZEOption("GraphicsModule", "Direct3D9", ZEOPTIONATTRIBUTE_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("InputModule", "DirectInput", ZEOPTIONATTRIBUTE_NORMAL));

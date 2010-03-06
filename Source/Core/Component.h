@@ -58,7 +58,8 @@ class ZEComponent : public ZEClass
 	friend class ZEEntity;
 	private:
 		ZEEntity*						Owner;
-		ZEVector3						Position;
+		ZEVector3						Position, OldPosition;
+		ZEVector3						Velocity;
 		ZEQuaternion					Rotation;
 		ZEVector3						Scale;
 		ZEMatrix4x4						LocalTransform;
@@ -82,6 +83,8 @@ class ZEComponent : public ZEClass
 
 	public:
 		virtual	ZEDWORD					GetDrawFlags() const;
+
+		const ZEVector3&				GetWorldVelocity();
 
 		const ZEMatrix4x4&				GetWorldTransform() const;
 		const ZEMatrix4x4&				GetLocalTransform() const;

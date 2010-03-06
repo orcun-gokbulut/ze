@@ -63,7 +63,7 @@ ZECamera* ZEPlayer::GetCamera()
 
 ZEListener* ZEPlayer::GetListener()
 {
-	return &Listener;
+	return Listener;
 }
 
 void ZEPlayer::SetFOV(float FOV)
@@ -181,6 +181,8 @@ void ZEPlayer::Tick(float Time)
 void ZEPlayer::Initialize()
 {
 	FOV = ZE_PI_2;
+	Yawn = Pitch = Roll = 0;
+
 	Camera.SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Camera.SetLocalRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	Camera.SetNearZ(zeGraphics->GetNearZ());
@@ -189,23 +191,21 @@ void ZEPlayer::Initialize()
 	Camera.SetAspectRatio(zeGraphics->GetAspectRatio());
 
 	Camera.Initialize();
-	Listener.Initialize();
+	if (Listener == NULL)
+		Listener = ZEListener::CreateInstance();
 
-	Yawn = Pitch = Roll = 0;
-	
-	Listener.SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Listener.SetLocalRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
+	Listener->Initialize();
 
 	RegisterComponent(&Camera);
-	RegisterComponent(&Listener);
+	RegisterComponent(Listener);
 
 	zeScene->SetActiveCamera(&Camera);
-	zeScene->SetActiveListener(&Listener);
+	zeScene->SetActiveListener(Listener);
 }
 void ZEPlayer::Deinitialize()
 {
 	Camera.Deinitialize();
-	Listener.Deinitialize();
+	Listener->Deinitialize();
 }
 
 void ZEPlayer::Draw(ZERenderer * Renderer)
@@ -215,6 +215,7 @@ void ZEPlayer::Draw(ZERenderer * Renderer)
 
 ZEPlayer::ZEPlayer()
 {
+	Listener = NULL;
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,		"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_ALL)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,	"Move Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_ALL)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT, "Strafe Right",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_D, ZE_IBS_ALL)));

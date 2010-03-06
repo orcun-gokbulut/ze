@@ -41,6 +41,15 @@
 #include "Core/ResourceFile.h"
 #include "Texture.h"
 
+class ZEFileCacheManager
+{
+	private:
+		//ZEArray<
+	public:
+		virtual void*						AddToCache();
+		virtual void*						GetFromCache();
+};
+
 class ZETextureResource : public ZEResource
 {
 	public:

@@ -90,6 +90,8 @@ bool ZED3D9PPScreenOutputNode::Initialize()
 			)
 			return false;
 	}
+
+	return true;
 }
 
 void ZED3D9PPScreenOutputNode::Deinitialize()
@@ -154,6 +156,8 @@ bool ZED3D9PPScreenOutputNode::Proces()
 	GetDevice()->SetPixelShader(PixelShader);
 	GetDevice()->SetVertexShader(VertexShader);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 5 * 4);
+	
+	return true;
 }
 
 ZETexture2D* ZED3D9PPScreenOutputNode::GetOutput()

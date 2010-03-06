@@ -36,7 +36,7 @@
 #include "BoundingSphere.h"
 #include "AABoundingBox.h"
 #include "OBoundingBox.h"
-#include "Definitions.h"s
+#include "Definitions.h"
 #include "LineSegment.h"
 #include "Ray.h"
 

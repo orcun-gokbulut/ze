@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSListener.h
+ Zinek Engine - ALComponentBase.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,38 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DS_LISTENER_H__
-#define __ZE_DS_LISTENER_H__
+#ifndef	__ZE_AL_COMPONENT_BASE_H__
+#define __ZE_AL_COMPONENT_BASE_H__
 
-#include "../Listener.h"
-#include "DSComponentBase.h"
+#include "ALModule.h"
+#include <al.h>
+#include <alc.h>
 
-class ZEDSListener : public ZEListener, public ZEDSComponentBase
-{	
-	friend class ZEDSModule;
+class ZEALComponentBase
+{
 	private:
-		float						UpdateTreshold;
-		bool						ListenerDirtyFlag;
+		static ZEALModule*				Module;
+		static ALCdevice*				Device;
+		static ALCcontext*				Context;
 
-		void						ResetParameters();
+	protected:
+		static inline ZEALModule*		GetModule()
+		{
+			return Module;
+		}
 
-									ZEDSListener();
-		virtual						~ZEDSListener();
+		static inline ALCdevice*		GetDevice()
+		{
+			return Device;
+		}
+
+		static inline ALCcontext*		GetContext()
+		{
+			return Context;
+		}
 
 	public:
-		bool						IsActiveListener();
-		void						SetActiveListener();
-
-		virtual void				SetLocalPosition(const ZEVector3& NewPosition);
-		virtual void				SetLocalRotation(const ZEQuaternion& NewRotation);
-
-		virtual void				SetDistanceFactor(float NewDistanceFactor);	
-		virtual void				SetDopplerFactor(float NewDopplerFactor);
-		virtual void				SetRollOffFactor(float NewRollOffFactor);
-
-		virtual void				OwnerWorldTransformChanged();
-
-		virtual void				Tick(float ElapsedTime);
+		static bool						BaseInitialize(ZEALModule* D3DModule);
 };
 
 #endif

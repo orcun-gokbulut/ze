@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSListener.h
+ Zinek Engine - ALModuleDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,40 +32,55 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#include "ALModuleDescription.h"
+#include "ALModule.h"
 
-#pragma once
-#ifndef	__ZE_DS_LISTENER_H__
-#define __ZE_DS_LISTENER_H__
+ZEModuleType ZEALModuleDescription::GetType()
+{
+	return ZE_MT_SOUND;
+}
 
-#include "../Listener.h"
-#include "DSComponentBase.h"
+ZEModuleAttribute ZEALModuleDescription::GetAttributes()
+{
+	return ZE_MA_DEBUG;
+}
 
-class ZEDSListener : public ZEListener, public ZEDSComponentBase
-{	
-	friend class ZEDSModule;
-	private:
-		float						UpdateTreshold;
-		bool						ListenerDirtyFlag;
+int ZEALModuleDescription::GetRequiredZinekEngineVersion()
+{
+	return 0;
+}
 
-		void						ResetParameters();
+int ZEALModuleDescription::GetMajorVersion()
+{
+	return 0;
+}
 
-									ZEDSListener();
-		virtual						~ZEDSListener();
+int ZEALModuleDescription::GetMinorVersion()
+{
+	return 4;
+}
 
-	public:
-		bool						IsActiveListener();
-		void						SetActiveListener();
+const char* ZEALModuleDescription::GetCopyright()
+{
+	return "Copyright(c) 2007-2008, Zinek Engine Group. All rights reserved.";
+}
 
-		virtual void				SetLocalPosition(const ZEVector3& NewPosition);
-		virtual void				SetLocalRotation(const ZEQuaternion& NewRotation);
+const char* ZEALModuleDescription::GetName()
+{
+	return "OpenAL";
+}
 
-		virtual void				SetDistanceFactor(float NewDistanceFactor);	
-		virtual void				SetDopplerFactor(float NewDopplerFactor);
-		virtual void				SetRollOffFactor(float NewRollOffFactor);
+ZEOptionSection* ZEALModuleDescription::GetOptions()
+{
+	return NULL;
+}
 
-		virtual void				OwnerWorldTransformChanged();
+ZEModule* ZEALModuleDescription::CreateModuleInstance()
+{
+	return new ZEALModule();
+}
 
-		virtual void				Tick(float ElapsedTime);
-};
-
-#endif
+bool ZEALModuleDescription::CheckCompatible()
+{
+	return true;
+}

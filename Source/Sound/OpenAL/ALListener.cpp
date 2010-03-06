@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSListener.cpp
+ Zinek Engine - ALListener.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,134 +33,148 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DSListener.h"
+#include "ALListener.h"
 #define ZE_LISTENER_UPDATE_TRESHOLD 0.5f
 
-void ZEDSListener::ResetParameters()
+void ZEALListener::ResetParameters()
 {
 	if (IsActiveListener())
 	{
-		DS3DLISTENER Params;
-		Params.dwSize = sizeof(DS3DLISTENER);
-		
 		const ZEVector3& WorldPosition = GetWorldPosition();
-		Params.vPosition.x = WorldPosition.x;
-		Params.vPosition.y = WorldPosition.y;
-		Params.vPosition.z = WorldPosition.z;
+		alListener3f(AL_POSITION, WorldPosition.x, WorldPosition.y, WorldPosition.z);
 
-		/*const ZEVector3& WorldVelocity = GetWorldVelocity();
-		Params.vVelocity.x = WorldVelocity.x;
-		Params.vVelocity.y = WorldVelocity.y;
-		Params.vVelocity.z = WorldVelocity.z;*/
-		
-		Params.vVelocity.x = 0.0f;
-		Params.vVelocity.y = 0.0f;
-		Params.vVelocity.z = 0.0f;
-		
+		float Orientation[6];
 		const ZEQuaternion& WorldRotation = GetWorldRotation();
 		ZEVector3 Temp;
 		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitZ);
-		Params.vOrientFront.x = Temp.x;
-		Params.vOrientFront.y = Temp.y;
-		Params.vOrientFront.z = Temp.z;
-
+		Orientation[0] = Temp.x;
+		Orientation[1] = Temp.y;
+		Orientation[2] = Temp.z;
 		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitY);
-		Params.vOrientTop.x = Temp.x;
-		Params.vOrientTop.y = Temp.y;
-		Params.vOrientTop.z = Temp.z;
+		Orientation[3] = Temp.x;
+		Orientation[4] = Temp.y;
+		Orientation[5] = Temp.z;
+		alListenerfv(AL_ORIENTATION, Orientation);
 
-		Params.flDistanceFactor = DistanceFactor;
-		Params.flRolloffFactor = RollOffFactor;
-		Params.flDopplerFactor = DopplerFactor;
+		const ZEVector3& WorldVelocity = GetWorldVelocity();
+		alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
 
-		GetListener()->SetAllParameters(&Params, DS3D_DEFERRED);
+		alSpeedOfSound(DistanceFactor * 343.3f);
+		alDopplerFactor(DopplerFactor);
+		// Roll off factor
+		// Update all sound sources roll off factor
 	}
 }
 
-ZEDSListener::ZEDSListener()
+ZEALListener::ZEALListener()
 {
+
 }
 
-ZEDSListener::~ZEDSListener()
+ZEALListener::~ZEALListener()
 {
-	GetModule()->Listeners.DeleteValue(this);
+
 }
 
-void ZEDSListener::SetActiveListener()
+void ZEALListener::SetActiveListener()
 {
 	GetModule()->SetActiveListener(this);
 }
 
-bool ZEDSListener::IsActiveListener()
+bool ZEALListener::IsActiveListener()
 {
 	return (GetModule()->GetActiveListener() == this);
 }
 
-void ZEDSListener::SetLocalPosition(const ZEVector3& Position)
+void ZEALListener::SetLocalPosition(const ZEVector3& Position)
 {
 	ZEComponent::SetLocalPosition(Position);
 
 	if (IsActiveListener())
 	{
 		const ZEVector3& WorldPosition = GetWorldPosition();
-		GetListener()->SetPosition(WorldPosition.x, WorldPosition.y, WorldPosition.z, DS3D_DEFERRED);
+		alListener3f(AL_POSITION, WorldPosition.x, WorldPosition.y, WorldPosition.z);
 	}
 }
 
-void ZEDSListener::SetLocalRotation(const ZEQuaternion& Rotation)
+void ZEALListener::SetLocalRotation(const ZEQuaternion& Rotation)
 {
 	ZEComponent::SetLocalRotation(Rotation);
 
 	if (IsActiveListener())
 	{
+		float Orientation[6];
 		const ZEQuaternion& WorldRotation = GetWorldRotation();
-		ZEVector3 Front, Top;
-		ZEQuaternion::VectorProduct(Front, WorldRotation, ZEVector3::UnitZ);
-		ZEQuaternion::VectorProduct(Top, WorldRotation, ZEVector3::UnitY);
-
-		GetListener()->SetOrientation(Front.x, Front.y, Front.z, Top.x, Top.y, Top.z, DS3D_DEFERRED);
+		ZEVector3 Temp;
+		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitZ);
+		Orientation[0] = Temp.x;
+		Orientation[1] = Temp.y;
+		Orientation[2] = Temp.z;
+		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitY);
+		Orientation[3] = Temp.x;
+		Orientation[4] = Temp.y;
+		Orientation[5] = Temp.z;
+		
+		alListenerfv(AL_ORIENTATION, Orientation);
 	}
 }
 
-void ZEDSListener::SetDistanceFactor(float Value)
+void ZEALListener::SetDistanceFactor(float Value)
 {
 	DistanceFactor = Value;
-
-	if (IsActiveListener())
-		GetListener()->SetDistanceFactor(Value, DS3D_DEFERRED);
+	if(IsActiveListener())
+		alSpeedOfSound(Value * 343.3f);
 }
 
-void ZEDSListener::SetDopplerFactor(float Value)
+void ZEALListener::SetDopplerFactor(float Value)
 {
 	DopplerFactor = Value;
+	ListenerDirtyFlag = true;
 
 	if (IsActiveListener())
-		GetListener()->SetDopplerFactor(Value, DS3D_DEFERRED);
+		alDopplerFactor(Value);
 }
 
-void ZEDSListener::SetRollOffFactor(float Value)
+void ZEALListener::SetRollOffFactor(float Value)
 {
 	RollOffFactor = Value;
+	ListenerDirtyFlag = true;
 
-	if (IsActiveListener())
-		GetModule()->GetListener()->SetRolloffFactor(Value,  DS3D_DEFERRED);
-}
-
-void ZEDSListener::OwnerWorldTransformChanged()
-{
 	if (IsActiveListener())
 	{
-		SetLocalPosition(GetLocalPosition());
-		SetLocalRotation(GetLocalRotation());
+		// Not Supported
 	}
 }
 
-void ZEDSListener::Tick(float ElapsedTime)
+void ZEALListener::OwnerWorldTransformChanged()
+{
+	if (IsActiveListener())
+	{
+		const ZEVector3& WorldPosition = GetWorldPosition();
+		alListener3f(AL_POSITION, WorldPosition.x, WorldPosition.y, WorldPosition.z);
+
+		float Orientation[6];
+		const ZEQuaternion& WorldRotation = GetWorldRotation();
+		ZEVector3 Temp;
+		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitZ);
+		Orientation[0] = Temp.x;
+		Orientation[1] = Temp.y;
+		Orientation[2] = Temp.z;
+		ZEQuaternion::VectorProduct(Temp, WorldRotation, ZEVector3::UnitY);
+		Orientation[3] = Temp.x;
+		Orientation[4] = Temp.y;
+		Orientation[5] = Temp.z;
+		alListenerfv(AL_ORIENTATION, Orientation);
+
+		const ZEVector3& WorldVelocity = GetWorldVelocity();
+		alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
+	}
+}
+
+void ZEALListener::Tick(float ElapsedTime)
 {
 	ZEComponent::Tick(ElapsedTime);
-	if (IsActiveListener())
-	{
-		const ZEVector3& WorldVelocity = GetWorldVelocity();
-		GetModule()->GetListener()->SetVelocity(WorldVelocity.x, WorldVelocity.y, WorldVelocity.z, DS3D_DEFERRED);	
-	}
+
+	const ZEVector3& WorldVelocity = GetWorldVelocity();
+	alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
 }

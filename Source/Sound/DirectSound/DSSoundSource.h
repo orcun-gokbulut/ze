@@ -52,6 +52,8 @@ class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 		int							LastUpdatedBufferChunk;
 
 		bool						CreateBuffer(bool Is3D);
+		void						ResetParameters();
+
 		void						Stream();
 		void						ResetStream();
 		void						StreamDecodeAndFill(size_t BufferPosition, size_t Position, size_t SampleCount);
@@ -67,7 +69,7 @@ class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 		virtual void				SetEndPosition(unsigned int SampleIndex);
 
 		virtual void				SetPan(int NewPan);
-		virtual void				SetFrequency(unsigned int NewFrequency);
+		virtual void				SetPlaybackSpeed(float Speed);
 		virtual void				SetVolume(unsigned int NewVolume);
 		virtual void				SetLooping(bool Enabled);				
 							

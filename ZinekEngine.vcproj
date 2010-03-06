@@ -43,7 +43,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/MP8"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\PhysX&quot;;&quot;$(ProjectDir)\include\OpenAL&quot;;&quot;$(ProjectDir)\include\DirectX&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;FREEIMAGE_LIB;ZEDEBUG_ENABLED;ZEDEBUG_BREAKONERROR;ZEDEBUG_PERFHUD"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
@@ -69,8 +69,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimaged.lib libmpg123.lib"
-				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib&quot;;&quot;$(ProjectDir)\lib\Multi-threaded\x86\Debug&quot;"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimaged.lib libmpg123.lib OpenAL32.lib"
+				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Win x86\&quot;;&quot;$(ProjectDir)\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)\lib\Win x86\Debug&quot;;&quot;$(ProjectDir)\lib\Win x86\Debug\MT&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -132,7 +132,7 @@
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\directx&quot;;&quot;$(ProjectDir)\include\aegia\Foundation\include&quot;;&quot;$(ProjectDir)\include\aegia\Physics\include&quot;;&quot;$(ProjectDir)\include\aegia\PhysXLoader\include&quot;;&quot;$(ProjectDir)\include\aegia\Cooking\Include&quot;;&quot;$(ProjectDir)\include\aegia\NxExtensions\include&quot;;&quot;$(ProjectDir)\include\aegia\NxCharacter\include&quot;"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\PhysX&quot;;&quot;$(ProjectDir)\include\OpenAL&quot;;&quot;$(ProjectDir)\include\DirectX&quot;"
 				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;FREEIMAGE_LIB"
 				MinimalRebuild="false"
 				ExceptionHandling="0"
@@ -159,9 +159,9 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/fixed:no"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimage.lib libmpg123.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimage.lib libmpg123.lib OpenAL32.lib"
 				LinkIncremental="1"
-				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib&quot;;&quot;$(ProjectDir)\lib\Multi-threaded\x86\Release&quot;"
+				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Win x86\&quot;;&quot;$(ProjectDir)\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)\lib\Win x86\Release&quot;;&quot;$(ProjectDir)\lib\Win x86\Release\MT&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -1271,7 +1271,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -1325,6 +1325,58 @@
 				</File>
 				<File
 					RelativePath=".\Source\Sound\DirectSound\DSSoundSource3D.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="OpenAL"
+				>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALComponentBase.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALComponentBase.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALListener.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALListener.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALModule.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALModule.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALModuleDescription.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALModuleDescription.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALSoundSource.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALSoundSource.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALSoundSource3D.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Sound\OpenAL\ALSoundSource3D.h"
 					>
 				</File>
 			</Filter>
