@@ -57,6 +57,8 @@ class ZEALModule : public ZESoundModule
 	friend class ZEALSoundSource3D;
 
 	private:
+		ZEArray<ZESoundDevice>				DeviceList;
+
 		bool								Enabled;
 
 		float								UpdateTime;
@@ -82,7 +84,9 @@ class ZEALModule : public ZESoundModule
 		virtual								~ZEALModule();
 
 	public:
-		ZEModuleDescription*				GetModuleDescription();		
+		ZEModuleDescription*				GetModuleDescription();	
+
+		virtual const ZEArray<ZESoundDevice>&	GetDeviceList();
 
 		ALCdevice*							GetDevice();
 		ALCcontext*							GetContext();

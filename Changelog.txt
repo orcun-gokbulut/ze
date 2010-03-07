@@ -85,9 +85,10 @@
     BUG: DirectSound 3D Sound Source can not be created in vista.
     CHG: ZEConsole::Log() function and zeLog macro now adds a new line character at the end of the message.
     FIX: ZECore::FrameTime and ZECore::RunningTime fixed.
-  []
+  [6 Mart 2010 - Revision 108]
     ADD: OpenAL module added.
     CHG: Library (Lib) and Include (Include) directories and project setting changed.
     
-    
-    
+  [7 Mart 2010 - Revision 109]
+    ADD: OpenAL 3D Sound Source added.
+    ADD: Device enumuration support added to Sound Subsystem and Sound Modules.

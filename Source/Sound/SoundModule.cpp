@@ -51,6 +51,7 @@ void ZESoundModule::BaseInitialize()
 	SoundOptions.SetName("Sound");
 	SoundOptions.SetEventHandler(&OnOptionsChanged);
 
+	SoundOptions.AddOption(new ZEOption("DeviceId", 0, ZEOPTIONATTRIBUTE_NORMAL));
 	SoundOptions.AddOption(new ZEOption("StreamingDisabled", false, ZEOPTIONATTRIBUTE_NORMAL));
 	SoundOptions.AddOption(new ZEOption("MaxBufferSize", 2000, ZEOPTIONATTRIBUTE_NORMAL));
 	SoundOptions.AddOption(new ZEOption("MasterVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));

@@ -54,8 +54,12 @@ class ZEDSModule : public ZESoundModule
 	friend class ZEDSListener;
 	friend class ZEDSSoundSource;
 	friend class ZEDSSoundSource3D;
+	friend BOOL CALLBACK DSEnumProc(LPGUID GUID, LPCTSTR DeviceName, LPCTSTR DriverName, LPVOID ModulePointer);
 
 	private:
+		ZEArray<ZESoundDevice>				DeviceList;
+		ZEArray<GUID>						DeviceGUIDList;
+
 		bool								Enabled;
 
 		float								UpdateTime;
@@ -87,6 +91,7 @@ class ZEDSModule : public ZESoundModule
 		LPDIRECTSOUND8						GetDevice();
 		LPDIRECTSOUND3DLISTENER8			GetListener();
 		LPDIRECTSOUNDBUFFER					GetPrimaryBuffer();
+		virtual const ZEArray<ZESoundDevice>&	GetDeviceList();
 
 		virtual bool						IsEnabled();
 		virtual void						SetEnabled(bool Enabled);

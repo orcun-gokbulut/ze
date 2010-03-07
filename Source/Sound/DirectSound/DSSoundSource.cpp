@@ -256,7 +256,7 @@ void ZEDSSoundSource::SetStartPosition(unsigned int SampleIndex)
 	if (SoundResource != NULL)
 		if (SampleIndex > SoundResource->GetSampleCount())
 		{
-			EffectiveStartPosition = SoundResource->GetSampleCount();
+			EffectiveStartPosition = SampleIndex % SoundResource->GetSampleCount();
 			return;
 		}
 
@@ -268,7 +268,7 @@ void ZEDSSoundSource::SetEndPosition(unsigned int SampleIndex)
 	if (SoundResource != NULL)
 		if (SampleIndex > SoundResource->GetSampleCount())
 		{
-			EffectiveEndPosition = SoundResource->GetSampleCount();
+			EffectiveEndPosition = SampleIndex % SoundResource->GetSampleCount();
 			return;
 		}
 

@@ -33,184 +33,286 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ALSoundSource3D.h"
+// FIRST OF ALL:
+// OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
+// OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
+// OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
+// OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
+// OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
+// OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
+
+#include "ALSoundSource3d.h"
 #include "Core/Error.h"
 #include "Core/Console.h"
-/*
+#include "Sound/Listener.h"
+
+static const char* ConvertErrorToString(ALenum Error)
+{
+	switch(Error)
+	{
+		case AL_NO_ERROR:
+		return "There is not currently an error.";
+		case AL_INVALID_NAME:
+			return "A bad name (ID) was passed to an OpenAL function.";
+		case AL_INVALID_ENUM:
+			return "An invalid enum value was passed to an OpenAL function.";
+		case AL_INVALID_VALUE:
+			return "An invalid value was passed to an OpenAL function.";
+		case AL_INVALID_OPERATION:
+			return "The requested operation is not valid.";
+		case AL_OUT_OF_MEMORY:
+			return "The requested operation resulted in OpenAL running out of memory";
+		default:
+			return "Unknown error.";
+	}
+}
+
+static ALenum GetBufferFormat(ZESoundResource* SoundResource)
+{
+	switch(SoundResource->GetChannelCount())
+	{
+		case 1:
+			switch(SoundResource->GetBitsPerSample())
+			{
+				case 8:
+					return AL_FORMAT_MONO8;
+					break;
+				case 16:
+					return AL_FORMAT_MONO16;
+					break;
+				default:
+					return 0;
+			}
+			break;
+		case 2:
+			switch(SoundResource->GetBitsPerSample())
+			{
+				case 8:
+					return AL_FORMAT_STEREO8;
+					break;
+				case 16:
+					return AL_FORMAT_STEREO16;
+					break;
+				default:
+					return 0;
+			}
+			break;
+		default:
+			return 0;
+	}
+}
+
 bool ZEALSoundSource3D::CreateBuffer()
 {
-	if (DSBuffer != NULL)
-	{
-		DSBuffer->Release();
-		DSBuffer = NULL;
-	}
+	ALenum Error; // Notation sucks
+	
+	// Delete old buffer and source
+	DestroyBufferSource();
+
 
 	// Check streaming available and use it necessery
-	Streaming = !zeSound->GetStreamingDisabled()  && (1000 * SoundResource->GetSampleCount()) / SoundResource->GetSamplesPerSecond() > zeSound->GetMaxBufferSize();
+	Streaming = !GetModule()->GetStreamingDisabled()  && (1000 * SoundResource->GetSampleCount()) / SoundResource->GetSamplesPerSecond() > GetModule()->GetMaxBufferSize();
 
 	// Calculate streaming buffer
 	if (Streaming)
-		BufferSampleCount = (zeSound->GetMaxBufferSize() * SoundResource->GetSamplesPerSecond()) / 1000;
+		BufferSampleCount = (GetModule()->GetMaxBufferSize() * SoundResource->GetSamplesPerSecond()) / 1000;
 
-	HRESULT hr;
-	WAVEFORMATEX Format;
-	memset(&Format, 0, sizeof(WAVEFORMATEX)); 
-	Format.cbSize = sizeof(WAVEFORMATEX);
-	Format.wFormatTag = WAVE_FORMAT_PCM; 
-	Format.nChannels = SoundResource->GetChannelCount(); 
-	Format.nSamplesPerSec = SoundResource->GetSamplesPerSecond();
-	Format.nBlockAlign = SoundResource->GetBlockAlign();
-	Format.wBitsPerSample = SoundResource->GetBitsPerSample();
-	Format.nAvgBytesPerSec = Format.nSamplesPerSec * Format.nBlockAlign; 
+	BufferSampleCount /= 2;
 
-	DSBUFFERDESC DSBufferDesc;
-	memset(&DSBufferDesc, 0, sizeof(DSBUFFERDESC)); 
-	DSBufferDesc.dwSize = sizeof(DSBUFFERDESC); 
-	DSBufferDesc.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFX;
-	DSBufferDesc.dwBufferBytes = (Streaming ? BufferSampleCount * SoundResource->GetBlockAlign() : SoundResource->GetPCMDataSize()); 
-	DSBufferDesc.lpwfxFormat = &Format;
-	DSBufferDesc.guid3DAlgorithm = DS3DALG_NO_VIRTUALIZATION;
+	// Create Buffer
+	alGetError();
+	alGenBuffers(1, &ALBuffer1);
+	if (Streaming)
+		alGenBuffers(1, &ALBuffer2);
 
-	if (FAILED(hr = GetDevice()->CreateSoundBuffer(&DSBufferDesc, &DSBuffer, NULL)))
+	if ((Error = alGetError()) != AL_NO_ERROR)
 	{
-		zeError("DirectSound Sound Source 3D", "Can not create direct sound buffer.");
+		DestroyBufferSource();
+		zeError("OpenAL Sound Source", "Can not create OpenAL buffer. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
 		return false;
 	}
 
-	if (FAILED(hr = DSBuffer->QueryInterface(IID_IDirectSound3DBuffer8, (void**)&DS3DBuffer)))
+
+	alGetError();
+	alGenSources(1, &ALSource);
+	if ((Error = alGetError()) != AL_NO_ERROR)
 	{
-		zeError("DirectSound Sound Source 3D", "Can not create 3d direct sound buffer.");
+		DestroyBufferSource();
+		zeError("OpenAL Sound Source", "Can not create OpenAL buffer. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
 		return false;
 	}
 
 	if (!Streaming)
 	{
-		// Load everything into buffer
-		void *Buffer1, *Buffer2;
-		DWORD BufferSize1, BufferSize2;
-		DSBuffer->Lock(0, DSBufferDesc.dwBufferBytes, &Buffer1, &BufferSize1, &Buffer2, &BufferSize2, DSBLOCK_ENTIREBUFFER);	
-			SoundResource->Decode(Buffer1, 0, BufferSize1 / SoundResource->GetBlockAlign());
-			if (Buffer2 != NULL)
-				SoundResource->Decode(Buffer2, BufferSize1 / SoundResource->GetBlockAlign(), BufferSize2);
+		unsigned char* ALStupidBuffer = new unsigned char[SoundResource->GetPCMDataSize()];
+		SoundResource->Decode(ALStupidBuffer, 0, SoundResource->GetSampleCount());
+		
+		alGetError();
+		alBufferData(ALBuffer1, GetBufferFormat(SoundResource), ALStupidBuffer, SoundResource->GetPCMDataSize(), SoundResource->GetSamplesPerSecond());
+		if ((Error = alGetError()) != AL_NO_ERROR)
+		{
+			DestroyBufferSource();
+			zeError("OpenAL Sound Source", "Can not load data to OpenAL buffer. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
+			return false;
+		}
+		delete[] ALStupidBuffer;
 
-	
-		DSBuffer->Unlock(Buffer1, BufferSize1, Buffer2, BufferSize2);
+		alGetError();
+		alSourcei(ALSource, AL_BUFFER, ALBuffer1);
+		if ((Error = alGetError()) != AL_NO_ERROR)
+		{
+			DestroyBufferSource();
+			zeError("OpenAL Sound Source", "Can not assign OpenAL buffer to OpenAL source. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
+			return false;
+		}
+
 	}
 	else
-		ResetStream();
+	{
+		if (InnerStreamBuffer != NULL)
+			delete[] InnerStreamBuffer;
+
+		InnerStreamBuffer = new char[BufferSampleCount * SoundResource->GetBlockAlign()];
+	}
 
 	// If sound was playing continue to play.
 	if (SoundSourceState == ZE_SSS_PLAYING)
 		Resume();
 
 	// Reset properties to apply sound buffer
-	SetVolume(GetVolume());
-	SetPan(GetPan());
-	SetFrequency(GetFrequency());
-	Params.dwInsideConeAngle = ConeInsideAngle;
-	Params.dwOutsideConeAngle = ConeInsideAngle;
-	Params.flMaxDistance = ConeInsideAngle;
-    Params.vPosition;
-    Params.vVelocity;
-    Params.dwInsideConeAngle;
-    Params.dwOutsideConeAngle;
-    Params.vConeOrientation;
-    Params.lConeOutsideVolume;
-    Params.flMinDistance;
-    Params.flMaxDistance;
-    Params.dwMode;
+	ResetParameters();
+
+	Allocated = true;
 	return true;
 }
 
+
+void ZEALSoundSource3D::ResetParameters()
+{
+	float EffectiveVolume = (float)Volume * ((float)GetModule()->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
+	alSourcef(ALSource, AL_PITCH, PlaybackSpeed);
+	alSourcef(ALSource, AL_GAIN, EffectiveVolume / 100.0f);
+	//alSourcei(ALSource, AL_LOOPING, (Streaming ? AL_FALSE : AL_TRUE));
+	alSourcei(ALSource, AL_SOURCE_RELATIVE, AL_TRUE);
+    alSource3f(ALSource, AL_POSITION, 0.0, 0.0, 0.0);
+	alSource3f(ALSource, AL_VELOCITY, 0.0, 0.0, 0.0);
+	alSource3f(ALSource, AL_DIRECTION, 0.0, 0.0, 0.0);
+	alSourcef(ALSource, AL_ROLLOFF_FACTOR, GetModule()->GetActiveListener()->GetRollOffFactor());
+	alSourcei(ALSource, AL_SOURCE_RELATIVE, AL_FALSE);
+
+	const ZEVector3& Position = GetWorldPosition();
+	alSource3f(ALSource, AL_POSITION, Position.x, Position.y, Position.z);
+	ZEVector3 Direction;
+	ZEQuaternion::VectorProduct(Direction, GetWorldRotation(), ZEVector3::UnitZ);
+	alSource3f(ALSource, AL_DIRECTION, Direction.x, Direction.y, Direction.z);
+	alSourcei(ALSource, AL_REFERENCE_DISTANCE, MinDistance);
+	alSourcei(ALSource, AL_CONE_INNER_ANGLE, ConeInsideAngle);
+	alSourcei(ALSource, AL_CONE_OUTER_ANGLE, ConeOutsideAngle);
+	alSourcei(ALSource, AL_CONE_OUTER_GAIN, EffectiveVolume / 100.0f);
+
+}
+
+void ZEALSoundSource3D::DestroyBufferSource()
+{
+	if (ALBuffer1 != NULL)
+		alDeleteBuffers(1, &ALBuffer1);
+
+	if (ALBuffer2 != NULL)
+		alDeleteBuffers(1, &ALBuffer2);
+	
+	if (ALSource != NULL)
+		alDeleteSources(1, &ALSource);
+	
+	if (InnerStreamBuffer != NULL)
+		delete[] InnerStreamBuffer;
+
+	Allocated = false;
+}
+
 void ZEALSoundSource3D::ResetStream()
-{
-	StreamDecodeAndFill(0, CurrentPosition, BufferSampleCount / 2);
-	
-	StreamPosition = CurrentPosition + BufferSampleCount / 2;
-	if (StreamPosition > EndPosition)
-		StreamPosition = (StreamPosition - EndPosition) + StartPosition;
+{	
+	StreamPosition = CurrentPosition;
+	if (StreamPosition > EffectiveEndPosition)
+		StreamPosition = (StreamPosition - EffectiveEndPosition) + EffectiveStartPosition;
 
-	LastUpdatedBufferChunk = 1;
+	StreamDecodeAndFill(ALBuffer1, StreamPosition, BufferSampleCount);
+	StreamPosition += BufferSampleCount;
+	if (StreamPosition > EffectiveEndPosition)
+		StreamPosition = (StreamPosition - EffectiveEndPosition) + EffectiveStartPosition;
+
+	StreamDecodeAndFill(ALBuffer2, StreamPosition, BufferSampleCount);
+	StreamPosition += BufferSampleCount;
+	if (StreamPosition > EffectiveEndPosition)
+		StreamPosition = (StreamPosition - EffectiveEndPosition) + EffectiveStartPosition;
+
 	OldBufferPosition = 0;
-	DSBuffer->SetCurrentPosition(0);
- }
+	alSourcei(ALSource, AL_SAMPLE_OFFSET, 0);
+	alSourcei(ALSource, AL_BUFFER, NULL);
+	alSourceQueueBuffers(ALSource, 1, &ALBuffer1);
+	alSourceQueueBuffers(ALSource, 1, &ALBuffer2);
 
-void ZEALSoundSource3D::StreamDecodeAndFill(size_t BufferPosition, size_t Position, size_t SampleCount)
+}
+
+
+void ZEALSoundSource3D::StreamDecodeAndFill(ALuint Buffer, size_t Position, size_t SampleCount)
 {
-	void* Buffer;
-	DWORD LockedBufferSize;
-	DSBuffer->Lock(BufferPosition * SoundResource->GetBlockAlign(), SampleCount * SoundResource->GetBlockAlign(), &Buffer, &LockedBufferSize, NULL, NULL, NULL);
+	if (Position + SampleCount < EffectiveEndPosition)
+		SoundResource->Decode(InnerStreamBuffer, Position, SampleCount);
+	else
+	{
+		SampleCount = EffectiveEndPosition - Position;
+		SoundResource->Decode(InnerStreamBuffer, Position, SampleCount);
 
-		if (Position + SampleCount < EndPosition)
-			SoundResource->Decode(Buffer, Position, SampleCount);
+		size_t RemainingSampleCount = BufferSampleCount - SampleCount;
+		void* RemainingSampleBuffer = ((unsigned char*)InnerStreamBuffer) + SampleCount * SoundResource->GetBlockAlign();
+
+		if (Looping)
+			SoundResource->Decode(RemainingSampleBuffer, EffectiveStartPosition, RemainingSampleCount);
 		else
-		{
-			SampleCount = EndPosition - Position;
-			SoundResource->Decode(Buffer, Position, SampleCount);
+			memset(RemainingSampleBuffer, (SoundResource->GetBitsPerSample() == 8 ? 0x80 : 0x00), RemainingSampleCount * SoundResource->GetBlockAlign());
+	}
 
-			size_t RemainingSampleCount = BufferSampleCount / 2 - SampleCount;
-			void* RemainingSampleBuffer = ((unsigned char*)Buffer) + SampleCount * SoundResource->GetBlockAlign();
 
-			if (Looping)
-				SoundResource->Decode(RemainingSampleBuffer, StartPosition, RemainingSampleCount);
-			else
-				memset(RemainingSampleBuffer, (SoundResource->GetBitsPerSample() == 8 ? 0x80 : 0x00), RemainingSampleCount * SoundResource->GetBlockAlign());
-		}
-	
-	DSBuffer->Unlock(Buffer, LockedBufferSize, NULL, NULL);
+	alBufferData(Buffer, GetBufferFormat(SoundResource), InnerStreamBuffer, BufferSampleCount * SoundResource->GetBlockAlign(), SoundResource->GetSamplesPerSecond());
+
+	zeLog("ss", "Stream Position %d, Buffer Id : %d, Error: %d", StreamPosition, Buffer, alGetError());
+
 }
 
 void ZEALSoundSource3D::Stream()
 {
-	size_t BufferSampleCount_2 = BufferSampleCount / 2;
-
-	DWORD BufferPosition;	
-	DSBuffer->GetCurrentPosition(&BufferPosition, NULL);
-	BufferPosition /= SoundResource->GetBlockAlign();
-
-
-	// Cursor is at second chunk
-	// Fill Firts Chunk
-	if ((LastUpdatedBufferChunk != 1) && (BufferPosition >= BufferSampleCount_2))
+	ALint BufferCount;
+	ALuint Buffer;
+	alGetSourcei(ALSource, AL_BUFFERS_PROCESSED, &BufferCount);
+	for (size_t I = 0; I < BufferCount; I++)
 	{
-		StreamDecodeAndFill(0, StreamPosition, BufferSampleCount_2);
-		zeLog("SS", "Streaming 1!, Current Position : %d, StreamPosition : %d, Buffer Position : %d", CurrentPosition, StreamPosition, BufferPosition);
-		LastUpdatedBufferChunk = 1;
+		alSourceUnqueueBuffers(ALSource, 1, &Buffer);
+		alDeleteBuffers(1, &Buffer);
+		alGenBuffers(1, &Buffer);
 
-		
-		StreamPosition += BufferSampleCount_2;
-		if (StreamPosition > EndPosition)
-			StreamPosition = (StreamPosition - EndPosition) + StartPosition;
-	}
-	
-	// Cursor is at first chunk
-	// Fill Second Chunk
-	if ((LastUpdatedBufferChunk != 2) && (BufferPosition < BufferSampleCount_2))
-	{
-		StreamDecodeAndFill(BufferSampleCount_2, StreamPosition, BufferSampleCount_2);
-		zeLog("SS", "Streaming 2!, Current Position : %d, StreamPosition : %d, Buffer Position : %d", CurrentPosition, StreamPosition, BufferPosition);
-		LastUpdatedBufferChunk = 2;
+		StreamDecodeAndFill(Buffer, StreamPosition, BufferSampleCount);
+		StreamPosition += BufferSampleCount;
+		if (StreamPosition > EffectiveEndPosition)
+			StreamPosition = (StreamPosition - EffectiveEndPosition) + EffectiveStartPosition;
 
-		StreamPosition += BufferSampleCount_2;
-		if (StreamPosition > EndPosition)
-			StreamPosition = (StreamPosition - EndPosition) + StartPosition;
+		alSourceQueueBuffers(ALSource, 1, &Buffer);
 	}
 }
 
 ZEALSoundSource3D::ZEALSoundSource3D()
 {
-	BufferDirtyFlag = true;
-	DSBuffer = NULL;
-	DS3DBuffer = NULL; 
+	InnerStreamBuffer = NULL;
+	ALBuffer1 = NULL;
+	ALBuffer2 = NULL;
+	ALSource = NULL;
+
+	Allocated = false;
 }
 
 ZEALSoundSource3D::~ZEALSoundSource3D()
 {
 	GetModule()->SoundSources3D.DeleteValue(this);
-	if (DSBuffer != NULL)
-		DSBuffer->Release();
-	if (DS3DBuffer != NULL)
-		DS3DBuffer->Release();
+	DestroyBufferSource();
 }
 
 void ZEALSoundSource3D::SetSoundSourceState(ZESoundSourceState State)
@@ -244,7 +346,7 @@ void ZEALSoundSource3D::SetCurrentPosition(unsigned int SampleIndex)
 		if (Streaming)
 			CurrentPosition = SampleIndex;
 		else
-			DSBuffer->SetCurrentPosition(SampleIndex * SoundResource->GetBlockAlign());
+			alSourcei(ALSource, AL_SAMPLE_OFFSET, SampleIndex);
 	}
 }
 
@@ -253,39 +355,14 @@ unsigned int ZEALSoundSource3D::GetCurrentPosition()
 	if (Streaming)
 		return CurrentPosition;
 	else
-		if (DSBuffer != NULL)
+		if (SoundResource != NULL)
 		{
-			DWORD Position;
-			DSBuffer->GetCurrentPosition(&Position, NULL);
-			Position /= SoundResource->GetBlockAlign();
+			ALint Position;
+			alGetSourcei(ALSource, AL_SAMPLE_OFFSET, &Position);
 			return Position;
 		}
 		else
 			return 0;
-}
-
-void ZEALSoundSource3D::SetStartPosition(unsigned int SampleIndex)
-{
-	if (SoundResource != NULL)
-		if (SampleIndex > SoundResource->GetSampleCount())
-		{
-			StartPosition = SoundResource->GetSampleCount();
-			return;
-		}
-
-	StartPosition = SampleIndex;
-}
-
-void ZEALSoundSource3D::SetEndPosition(unsigned int SampleIndex)
-{
-	if (SoundResource != NULL)
-		if (SampleIndex > SoundResource->GetSampleCount())
-		{
-			EndPosition = SoundResource->GetSampleCount();
-			return;
-		}
-
-	EndPosition = SampleIndex;
 }
 
 void ZEALSoundSource3D::SetPan(int NewPan)
@@ -297,100 +374,88 @@ void ZEALSoundSource3D::SetPan(int NewPan)
 	else
 		Pan = NewPan;
 
-	if (DSBuffer != NULL)
-		DSBuffer->SetPan((((Pan + 100)*(DSBPAN_RIGHT - DSBPAN_LEFT))/200) + DSBPAN_LEFT);
+	// No panning support in OpenAL!
 }
 
-void ZEALSoundSource3D::SetFrequency(unsigned int NewFrequency)
+void ZEALSoundSource3D::SetPlaybackSpeed(float Speed)
 {
-	if (Frequency == ZE_SS_FREQUENCY_DEFAULT)
-	{
-		if (SoundResource != NULL)
-			Frequency = SoundResource->GetSamplesPerSecond();
-	}
-	else
-		Frequency = NewFrequency;
+	PlaybackSpeed = Speed;
 
-	if (DSBuffer != NULL)
-		DSBuffer->SetFrequency(NewFrequency);
+	if (Allocated)
+		alSourcef(ALSource, AL_PITCH, Speed);
 }
 
 void ZEALSoundSource3D::SetVolume(unsigned int NewVolume)
 {
 	if (Volume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;
-	else
-		Volume = NewVolume;
 
-	float EffectiveVolume = (float)Volume * ((float)zeSound->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
+	float EffectiveVolume = (float)Volume * ((float)GetModule()->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
 	
-	if (DSBuffer != NULL)
-		DSBuffer->SetVolume(log10f((float)EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f);
+	if (SoundResource != NULL)
+		alSourcef(ALSource, AL_GAIN, EffectiveVolume / 100);
 }
 
 void ZEALSoundSource3D::SetLooping(bool Enabled)
 {
 	Looping = Enabled;
-	if (DSBuffer != NULL && !Streaming && SoundSourceState == ZE_SSS_PLAYING)
-		DSBuffer->Play(0, 0, (Looping ? DSBPLAY_LOOPING : NULL));
+	if (SoundResource != NULL && !Streaming)
+		alSourcei(ALSource, AL_LOOPING, Looping || Streaming ? AL_TRUE : AL_FALSE);
 }
 
 void ZEALSoundSource3D::Play()
 {
-	CurrentPosition = StartPosition;
+	CurrentPosition = EffectiveStartPosition;
 
-	if (DSBuffer != NULL)
+	if (Allocated)
 	{
 		SoundSourceState = ZE_SSS_PLAYING;
 		
 		if (Streaming)
-		{
-			CurrentPosition = StartPosition;
 			ResetStream();
-		}
 		else
 		{
-			OldBufferPosition = StartPosition * SoundResource->GetBlockAlign();
-			DSBuffer->SetCurrentPosition(StartPosition * SoundResource->GetBlockAlign());
+			OldBufferPosition = CurrentPosition;
+			alBufferi(ALSource, AL_SAMPLE_OFFSET, CurrentPosition);
 		}
 
-		DSBuffer->Play(0, 0, DSBPLAY_LOOPING);
+		alSourcePlay(ALSource);
 	}
 }
 
 void ZEALSoundSource3D::Resume()
 {
-	if (DSBuffer != NULL)
+	if (SoundResource != NULL)
 	{
 		SoundSourceState = ZE_SSS_PLAYING;
 		
 		if (Streaming)
 			ResetStream();
 		else
-			DSBuffer->SetCurrentPosition(StartPosition);
+			alSourcei(ALSource, AL_SAMPLE_OFFSET, EffectiveStartPosition);
 
-		DSBuffer->Play(0, 0, DSBPLAY_LOOPING);
+		alSourcePlay(ALSource);
 	}
 }
 
 void ZEALSoundSource3D::Pause()
 {
-	if (DSBuffer != NULL)
+	if (Allocated)
 	{
 		SoundSourceState = ZE_SSS_PAUSED;
-		DSBuffer->Stop();
+		alSourceStop(ALSource);
 	}
 }
 
 void ZEALSoundSource3D::Stop()
 {
-	if (DSBuffer != NULL)
+	if (Allocated)
 	{
-		DSBuffer->Stop();
+		alSourceStop(ALSource);
 		if (Streaming)
-			CurrentPosition = StartPosition;
+			CurrentPosition = EffectiveStartPosition;
 		else
-			DSBuffer->SetCurrentPosition(StartPosition);
+			alSourcei(ALSource, AL_SAMPLE_OFFSET, CurrentPosition);
 
 		SoundSourceState = ZE_SSS_STOPPED;
 	}
@@ -398,12 +463,12 @@ void ZEALSoundSource3D::Stop()
 
 void ZEALSoundSource3D::Update(float ElapsedTime)
 {
-	if (DSBuffer == NULL || SoundSourceState != ZE_SSS_PLAYING)
+	if (!Allocated || SoundSourceState != ZE_SSS_PLAYING)
 		return;
 		
-	DWORD BufferPosition;
-	DSBuffer->GetCurrentPosition(&BufferPosition, NULL);
-	BufferPosition /= SoundResource->GetBlockAlign();
+	ALint ALBufferPosition;
+	alGetSourcei(ALSource, AL_SAMPLE_OFFSET, &ALBufferPosition);
+	BufferPosition = ALBufferPosition;
 
 	// Update CurrentPosition
 	bool BufferRewinded = false;
@@ -430,14 +495,14 @@ void ZEALSoundSource3D::Update(float ElapsedTime)
 	}
 
 	// Check Limits
-	if (CurrentPosition < StartPosition || CurrentPosition > EndPosition || (!Streaming && BufferRewinded && (StartPosition < EndPosition)))
+	if (CurrentPosition < EffectiveStartPosition || CurrentPosition > EffectiveEndPosition || (!Streaming && BufferRewinded && (EffectiveStartPosition < EffectiveEndPosition)))
 	{
 		if (Looping)
-			SetCurrentPosition(StartPosition);
+			SetCurrentPosition(EffectiveStartPosition);
 		else
 		{
 			SoundSourceState = ZE_SSS_STOPPED;
-			DSBuffer->Stop();
+			alSourceStop(ALSource);
 			return;
 		}
 	}
@@ -445,35 +510,32 @@ void ZEALSoundSource3D::Update(float ElapsedTime)
 	// Stream
 	if (Streaming)
 		Stream();
-
 }
 
 void ZEALSoundSource3D::SetSoundResource(ZESoundResource* Resource)
 {
+	if (SoundResource != NULL)
+	{
+		SoundResource->Release();
+		SoundResource = NULL;
+	}
+
 	if (Resource != NULL)
 	{
-		if (Resource->GetChannelCount() != 1)
+		SoundResource = Resource;
+		SetLimitsEnabled(LimitsEnabled);
+		if (!CreateBuffer())
 		{
-			zeError("DirectSound Sound Source 3D", "Other than one channel (mono) sound resources can not be assigned to 3d sound source.");
+			SoundResource = NULL;
 			return;
 		}
-
-		Resource->AddReferance();
-		SoundResource = Resource;
-		StartPosition = 0;
-		CurrentPosition = 0;
-		EndPosition = Resource->GetSampleCount();
-		SoundSourceState = ZE_SSS_STOPPED;
-		CreateBuffer();
+		SoundSourceState = ZE_SSS_STOPPED;		
+		SoundResource->AddReferance();
 	}
 	else
 	{
+		DestroyBufferSource();
 		SoundSourceState = ZE_SSS_NONE;
-		if (DSBuffer != NULL)
-		{
-			DSBuffer->Release();
-			DSBuffer = NULL;
-		}
 	}
 }
 
@@ -504,27 +566,33 @@ void ZEALSoundSource3D::SetLocalRotation(const ZEQuaternion& NewRotation)
 
 	if (Allocated)
 	{
-		ZEVector3 Front;
-		ZEQuaternion::VectorProduct(Front, ZEComponent::GetWorldRotation(), ZEVector3::UnitZ);
+		ZEVector3 Direction;
+		ZEQuaternion::VectorProduct(Direction, GetWorldRotation(), ZEVector3::UnitZ);
 
-		alSource3f(ALSource, AL_DIRECTION,  Front.x, Front.y, Front.z);
+		alSource3f(ALSource, AL_DIRECTION,  Direction.x, Direction.y, Direction.z);
 	}
 }
 
 void ZEALSoundSource3D::SetMinDistance(float  NewMinDistance)
 {
-	MinDistance = NewMinDistance;
+	if (NewMinDistance < 0)
+		MinDistance = 0;
+	else
+		MinDistance = NewMinDistance;
 
 	if (Allocated)
-		alSourcei(ALSource, AL_REFERANCE_DISTANCE, MinDistance);
+		alSourcei(ALSource, AL_REFERENCE_DISTANCE, MinDistance);
 }
 
 void ZEALSoundSource3D::SetMaxDistance(float  NewMaxDistance)
 {
-	MaxDistance = NewMaxDistance;
+	if (NewMaxDistance < 0)
+		MaxDistance = 0;
+	else
+		MaxDistance = NewMaxDistance;
 
 	if (Allocated)
-		alSourcei(ALSource, AL_REFERANCE_DISTANCE, MinDistance);
+		alSourcei(ALSource, AL_MAX_DISTANCE, MaxDistance);
 }
 
 void ZEALSoundSource3D::SetConeInsideAngle(unsigned int NewInsideAngle)
@@ -557,10 +625,8 @@ void ZEALSoundSource3D::SetConeOutsideVolume(unsigned int NewOutsideVolume)
 	else
 		ConeOutsideVolume = NewOutsideVolume;
 
-	BufferDirtyFlag = true;
-
 	float EffectiveVolume = (float)ConeOutsideVolume * ((float)zeSound->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
 	
 	if (Allocated)
 		alSourcei(ALSource, AL_CONE_OUTER_GAIN, EffectiveVolume / 100.0f);
-}*/
+}

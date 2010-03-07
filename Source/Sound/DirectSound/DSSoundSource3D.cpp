@@ -199,7 +199,6 @@ void ZEDSSoundSource3D::Stream()
 	if ((LastUpdatedBufferChunk != 1) && (BufferPosition >= BufferSampleCount_2))
 	{
 		StreamDecodeAndFill(0, StreamPosition, BufferSampleCount_2);
-		zeLog("SS", "Streaming 1!, Current Position : %d, StreamPosition : %d, Buffer Position : %d", CurrentPosition, StreamPosition, BufferPosition);
 		LastUpdatedBufferChunk = 1;
 
 		
@@ -213,7 +212,6 @@ void ZEDSSoundSource3D::Stream()
 	if ((LastUpdatedBufferChunk != 2) && (BufferPosition < BufferSampleCount_2))
 	{
 		StreamDecodeAndFill(BufferSampleCount_2, StreamPosition, BufferSampleCount_2);
-		zeLog("SS", "Streaming 2!, Current Position : %d, StreamPosition : %d, Buffer Position : %d", CurrentPosition, StreamPosition, BufferPosition);
 		LastUpdatedBufferChunk = 2;
 
 		StreamPosition += BufferSampleCount_2;
@@ -293,7 +291,7 @@ void ZEDSSoundSource3D::SetStartPosition(unsigned int SampleIndex)
 	if (SoundResource != NULL)
 		if (SampleIndex > SoundResource->GetSampleCount())
 		{
-			EffectiveStartPosition = SoundResource->GetSampleCount();
+			EffectiveStartPosition = SampleIndex % SoundResource->GetSampleCount();
 			return;
 		}
 
@@ -305,7 +303,7 @@ void ZEDSSoundSource3D::SetEndPosition(unsigned int SampleIndex)
 	if (SoundResource != NULL)
 		if (SampleIndex > SoundResource->GetSampleCount())
 		{
-			EffectiveEndPosition = SoundResource->GetSampleCount();
+			EffectiveEndPosition = SampleIndex % SoundResource->GetSampleCount();
 			return;
 		}
 
@@ -529,7 +527,7 @@ void ZEDSSoundSource3D::SetLocalRotation(const ZEQuaternion& NewRotation)
 	}
 }
 
-void ZEDSSoundSource3D::SetMinDistance(float  NewMinDistance)
+void ZEDSSoundSource3D::SetMinDistance(float NewMinDistance)
 {
 	MinDistance = NewMinDistance;
 
@@ -538,7 +536,7 @@ void ZEDSSoundSource3D::SetMinDistance(float  NewMinDistance)
 		
 }
 
-void ZEDSSoundSource3D::SetMaxDistance(float  NewMaxDistance)
+void ZEDSSoundSource3D::SetMaxDistance(float NewMaxDistance)
 {
 	MaxDistance = NewMaxDistance;
 

@@ -201,7 +201,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 		Brush->SetSkyColor(ZEVector3(1.0f, 1.0f, 1.0f));
 		Scene->AddEntity(Brush);*/
 
-		ZESoundSource* SoundSource = ZESoundSource::CreateInstance();
+		ZESoundSource3D* SoundSource = ZESoundSource3D::CreateInstance();
 
 		SoundSource->SetSoundResource(ZESoundResource::LoadResource("test.wav"));
 		SoundSource->SetCurrentPositionTime(50);

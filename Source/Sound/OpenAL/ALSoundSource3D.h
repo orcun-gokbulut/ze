@@ -32,45 +32,48 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-/*
+
 #pragma once
 #ifndef	__ZE_AL_SOUND_SOURCE_3D_H__
 #define __ZE_AL_SOUND_SOURCE_3D_H__
 
+#include "ALComponentBase.h"
 #include "../SoundSource3D.h"
-#include "ALSoundSource.h"
-#include <dsound.h>
+#include <al.h>
 
 class ZEALSoundSource3D : public ZESoundSource3D, public ZEALComponentBase
 {
 	friend class ZEALModule;
 	private:
-		LPDIRECTSOUNDBUFFER			DSBuffer;
-		LPDIRECTSOUND3DBUFFER		DS3DBuffer;
-		bool						BufferDirtyFlag;
+		bool						Allocated;
+		ALuint						ALSource;
+		ALuint						ALBuffer1;
+		ALuint						ALBuffer2;
+		char*						InnerStreamBuffer;
 
+		size_t						BufferPosition;
 		size_t						BufferSampleCount;
 		size_t						OldBufferPosition;
 		size_t						StreamPosition;
-		int							LastUpdatedBufferChunk;
 
 		bool						CreateBuffer();
+		void						ResetParameters();
+		void						DestroyBufferSource();
+
 		void						Stream();
 		void						ResetStream();
 		void						StreamDecodeAndFill(size_t BufferPosition, size_t Position, size_t SampleCount);
 
-		//							ZEALSoundSource3D();
-		//virtual						~ZEALSoundSource3D();
+									ZEALSoundSource3D();
+		virtual						~ZEALSoundSource3D();
 
 	public:
 		virtual void				SetSoundSourceState(ZESoundSourceState State);
 		virtual void				SetCurrentPosition(unsigned int SampleIndex);
 		virtual unsigned int		GetCurrentPosition();
-		virtual void				SetStartPosition(unsigned int SampleIndex);
-		virtual void				SetEndPosition(unsigned int SampleIndex);
 
 		virtual void				SetPan(int NewPan);
-		virtual void				SetFrequency(unsigned int NewFrequency);
+		virtual void				SetPlaybackSpeed(float Speed);
 		virtual void				SetVolume(unsigned int NewVolume);
 		virtual void				SetLooping(bool Enabled);				
 							
@@ -79,7 +82,7 @@ class ZEALSoundSource3D : public ZESoundSource3D, public ZEALComponentBase
 		virtual void				Pause();
 		virtual void				Stop();
 
-		//void						Update(float ElapsedTime);
+		void						Update(float ElapsedTime);
 
 		virtual void				SetSoundResource(ZESoundResource* Resource);
 
@@ -93,5 +96,4 @@ class ZEALSoundSource3D : public ZESoundSource3D, public ZEALComponentBase
 		virtual void				SetConeOutsideAngle(unsigned int NewOutsideAngle);			
 		virtual void				SetConeOutsideVolume(unsigned int NewOutsideVolume);
 };
-
-#endif*/
+#endif

@@ -39,7 +39,7 @@
 
 #include "Core/Module.h"
 #include "Core/Option.h"
-
+#include "ZEDS/String.h"
 class ZESoundSource;
 class ZESoundSource3D;
 class ZEListener;
@@ -65,6 +65,15 @@ enum ZESpeakerLayout
 
 enum ZESoundSourceType;
 
+#define ZE_MAX_DEVICE_NAME_SIZE 128
+struct ZESoundDevice
+{
+	size_t			DeviceId;
+	char			DeviceName[ZE_MAX_DEVICE_NAME_SIZE];
+	char			DriverName[ZE_MAX_DEVICE_NAME_SIZE];
+};
+
+
 class ZESoundModule : public ZEModule
 {
 	protected:
@@ -73,6 +82,8 @@ class ZESoundModule : public ZEModule
 	public:
 		static void					BaseInitialize();
 		static void					BaseDeinitialize();
+
+		virtual const ZEArray<ZESoundDevice>&	GetDeviceList() = 0;
 
 		virtual void				SetSpeakerLayout(ZESpeakerLayout Layout) = 0;
 		virtual ZESpeakerLayout		GetSpeakerLayout() = 0;
