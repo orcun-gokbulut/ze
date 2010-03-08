@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsShapeInfo.h
+ Zinek Engine - PhysicalObject.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,5 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PHYSICS_SHAPE_INFO_H__
-#define __ZE_PHYSICS_SHAPE_INFO_H__
+#include "PhysicalObject.h"
 
-class ZEPhysicsMaterial;
-class ZEVector3;
-#include "Physics/PhysicsCollisionMask.h"
-
-class ZEPhysicsShapeInfo
-{
-	public:
-		enum ZEPhysicsShapeType
-		{
-			ZE_PST_PLANE,
-			ZE_PST_BOX,
-			ZE_PST_SPHERE,
-			ZE_PST_CAPSULE,
-			ZE_PST_CONVEX,
-			ZE_PST_TRIMESH
-		};
-
-										ZEPhysicsShapeInfo();
-		virtual							~ZEPhysicsShapeInfo(){ Material = 0; }//NULL
-		virtual ZEPhysicsShapeType		GetType() = 0;
-		
-		ZEPhysicsMaterial*				Material;
-		ZEVector3						LocalPosition;
-		ZEPhysicsCollisionMask			CollisionMask;
-		bool							Trigger;
-};
-
-#endif

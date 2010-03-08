@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsModule.h
+ Zinek Engine - PhysicalBody.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PHYSICS_MODULE_H__
-#define __ZE_PHYSICS_MODULE_H__
+#include "PhysicalBody.h"
 
-#include "Core/Module.h"
-
-class ZEPhysicsWorld;
-class ZEPhysicsBody;
-class ZEPhysicsJoint;
-class ZEPhysicsVehicle;
-class ZEPhysicsMaterial;
-class ZEPhysicsCharacterController;
-class ZEVector3;
-class ZEPhysicsCollisionMask;
-
-#define zePhysics ZEPhysicsModule::GetInstance()
-
-class ZEPhysicsModule : public ZEModule
+void ZEPhysicalBody::GetPhysicalObjectType()
 {
-	public:
-		virtual	bool							Initialize();
-		virtual void							Deinitialize();
-
-		virtual ZEPhysicsWorld*					CreateWorld() = 0;
-		virtual ZEPhysicsBody*					CreateBody() = 0;
-		virtual ZEPhysicsJoint*					CreateJoint() = 0;
-		virtual ZEPhysicsVehicle*				CreateVehicle() = 0;
-		virtual ZEPhysicsMaterial*				CreateMaterial() = 0;
-		virtual ZEPhysicsCharacterController*	CreateController() = 0;
-
-		static ZEPhysicsModule*					GetInstance();
-};
-
-#endif
+	return ZE_POT_BODY;
+}

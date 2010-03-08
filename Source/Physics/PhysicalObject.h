@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsCollision.h
+ Zinek Engine - PhysicalObject.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,24 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PHYSICS_COLLISION_H__
-#define __ZE_PHYSICS_COLLISION_H__
+#ifndef __ZE_PHYSICAL_OBJECT_H__
+#define __ZE_PHYSICAL_OBJECT_H__
 
-class ZEPhysicsBody;
-class ZEVector3;
-
-class ZEPhysicsCollision
+class ZEPhysicalObject
 {
-	protected:
-								ZEPhysicsCollision(){}
-								virtual ~ZEPhysicsCollision(){}
+	private:
+									ZEPhysicalObject();
+		virtual						~ZEPhysicalObject();
 
 	public:
-		virtual ZEPhysicsBody*	GetFirstCollider()  = 0;
-		virtual ZEPhysicsBody*	GetSecondCollider() = 0;
-		virtual ZEVector3		GetPoint()          = 0;
-		virtual ZEVector3		GetNormal()         = 0;
-		virtual float			GetPower()          = 0;
-};
+		virtual void				GetPhysicalObjectType() = 0;
+		virtual void				SetPosition(const ZEVector3& NewPosition) = 0;
+		virtual ZEVector3			GetPosition() = 0;
+		
+		virtual void				SetRotation(const ZEQuaternion& NewRotation) = 0;
+		virtual ZEQuaternion		GetRotation() = 0;
 
+		virtual bool				Initialize();
+		virtual void				Deinitialize();
+
+		void						Destroy();
+};
 #endif

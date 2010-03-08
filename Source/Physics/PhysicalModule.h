@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsTrigger.h
+ Zinek Engine - PhysicalModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,21 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PHYSICS_TRIGGER_H__
-#define __ZE_PHYSICS_TRIGGER_H__
+#ifndef	__ZE_PHYSICS_MODULE_H__
+#define __ZE_PHYSICS_MODULE_H__
 
+#include "Core/Module.h"
+
+class ZEPhysicsWorld;
 class ZEPhysicsBody;
+class ZEPhysicsJoint;
+class ZEPhysicsVehicle;
+class ZEPhysicsMaterial;
+class ZEPhysicsCharacterController;
+class ZEVector3;
+class ZEPhysicsCollisionMask;
 
-class ZEPhysicsTrigger
+#define zePhysics ZEPhysicsModule::GetInstance()
+
+class ZEPhysicsModule : public ZEModule
 {
-	protected:
-									ZEPhysicsTrigger(){}
-		virtual						~ZEPhysicsTrigger(){}
-
 	public:
-		virtual ZEPhysicsBody*		GetTriggerBody() = 0;
-		virtual ZEPhysicsBody*		GetOtherBody()   = 0;
-		virtual unsigned int		GetFlags()       = 0;
+		virtual	bool							Initialize();
+		virtual void							Deinitialize();
+
+		virtual ZEPhysicalWorld*				CreateWorld() = 0;
+		virtual ZEPhysicalBody*					CreateBody() = 0;
+		virtual ZEPhysicalJoint*				CreateJoint() = 0;
+		virtual ZEPhysicalForceField			CreateForceField() = 0;
+		virtual ZEPhysicalTrigger				CreateTrigger() = 0;
+
+	/*	virtual ZEPhysicsVehicle*				CreateVehicle() = 0;
+		virtual ZEPhysicsCharacterController*	CreateController() = 0;*/
+
+		static ZEPhysicsModule*					GetInstance();
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsBody.cpp
+ Zinek Engine - PhysicalWorld.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,40 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "Physics/PhysicsBody.h"
-#include "Physics/PhysicsBodyInfo.h"
+#pragma once
+#ifndef	__ZE_PHYSICAL_WORLD_H__
+#define __ZE_PHYSICAL_WORLD_H__
+
+class ZEPhysicsWorldInfo;
+class ZEPhysicsCollision;
+class ZEPhysicsTrigger;
+class ZEVector3;
+
+#include "ZEDS/Array.h"
+
+class ZEPhysicalObject;
+class ZEPhysicalWorld
+{
+	protected:
+													ZEPhysicsWorld(){}
+		virtual										~ZEPhysicsWorld(){}
+
+	public:
+		virtual void								SetGravity(ZEVector3) = 0;
+		virtual ZEVector3							GetGravity() = 0;
+
+		virtual const ZEArray<ZEPhysicalObject*>&	GetPhysicalObjects();
+		virtual void								AddPhysicalObject(ZEPhysicalObject* Object);
+		virtual void								RemovePhysicalObject(ZEPhysicalObject* Object);
+
+		virtual void								Initialize() = 0;
+		virtual void								Deinitialize() = 0;
+
+		virtual void								Update(float ElapsedTime) = 0;
+
+		void										Destroy();
+
+		static ZEPhysicalWorld*						CreateInstance();
+};
+
+#endif

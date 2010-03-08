@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsShapeInfo.cpp
+ Zinek Engine - PhysicalCollision.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,24 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath/Vector.h"
-#include "Physics/PhysicsShapeInfo.h"
+#pragma once
+#ifndef	__ZE_PHYSICAL_COLLISION_H__
+#define __ZE_PHYSICAL_COLLISION_H__
 
-ZEPhysicsShapeInfo::ZEPhysicsShapeInfo() : Material(0), LocalPosition(0,0,0), CollisionMask(), Trigger(false)
+#include "ZEMath/Vector.h"
+#include "FastDelegate.h"
+
+typedef fastdelegate::FastDelegate1<ZEPhysicsCollision*> ZECollisionCallback;
+
+class ZEPhysicalBody;
+struct ZEPhysicalCollision
 {
-}
+	ZEPhysicalBody*				Collider1;
+	ZEPhysicalBody*				Collider2;
+
+	ZEVector3					Position;
+	ZEVector3					Normal;
+	float						Power;
+};
+
+#endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsMaterial.h
+ Zinek Engine - PhysicalTrigger.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,22 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PHYSICS_MATERIAL_H__
-#define __ZE_PHYSICS_MATERIAL_H__
+#ifndef	__ZE_PHYSICAL_TRIGGER_H__
+#define __ZE_PHYSICAL_TRIGGER_H__
 
-class ZEPhysicsMaterial
+#include "FastDelegate.h"
+typedef fastdelegate::FastDelegate1<ZEPhysicsTrigger*>   ZETriggerCallback;
+
+class ZEPhysicsBody;
+struct ZEPhysicsTrigger
 {
-	protected:
-							ZEPhysicsMaterial();
-		virtual				~ZEPhysicsMaterial(){}
-
-	public:
-		virtual void		Initialize(float Friction, float Restitution) = 0;
-		virtual void		Deinitialize()                                = 0;
-		unsigned short		GetIndex() { return Index; }
-
-	protected:
-		unsigned short		Index;
+	ZEPhysicsBody*		TriggerBody;
+	ZEPhysicsBody*		OtherObject;
 };
 
 #endif
