@@ -41,585 +41,6 @@
 #include <stdio.h>
 #include <string.h>
 
-void ZEModelMeshLOD::ResetMaterial()
-{
-	RenderOrder.Material = Owner->GetModelResource()->Materials[LODResource->MaterialId];
-}
-
-void ZEModelMeshLOD::SetMaterial(const ZEMaterial* Material)
-{
-	RenderOrder.Material = Material;
-}
-
-const ZEMaterial* ZEModelMeshLOD::GetMaterial()
-{
-	return RenderOrder.Material;
-}
-
-bool ZEModelMeshLOD::IsSkinned()
-{
-	return Skinned;
-}
-
-void ZEModelMeshLOD::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
-{
-	if (VertexBuffer == NULL)
-		return;
-
-	if (Skinned)
-	{
-		const ZEArray<ZEMatrix4x4>& BoneVertexTransforms = Owner->GetBoneTransforms();
-		ZEMatrix4x4 OwnerMeshModelTransform = OwnerMesh->GetModelTransform();
-
-		RenderOrder.BoneTransforms.SetCount(BoneVertexTransforms.GetCount());
-		for (size_t I = 0; I < RenderOrder.BoneTransforms.GetCount(); I++)
-			ZEMatrix4x4::Multiply(RenderOrder.BoneTransforms[I], OwnerMeshModelTransform, BoneVertexTransforms[I]);
-
-		RenderOrder.WorldMatrix = Owner->GetWorldTransform();
-	}
-	else
-		RenderOrder.WorldMatrix = OwnerMesh->GetWorldTransform();
-
-	RenderOrder.Lights.Clear();
-	RenderOrder.Lights.MassAdd(Lights.GetConstCArray(), Lights.GetCount());
-	Renderer->AddToRenderList(&RenderOrder);
-}
-
-void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)
-{
-	Owner = Model;
-	OwnerMesh = Mesh;
-	this->LODResource = LODResource;
-
-	Skinned = LODResource->Vertices.GetCount() == 0 ? true : false;
-
-	RenderOrder.SetZero();
-	RenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_ZCULLING | (Skinned ? ZE_ROF_SKINNED : 0);
-	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderOrder.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
-	RenderOrder.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;
-	RenderOrder.VertexDeclaration = Skinned ? ZESkinnedModelVertex::GetVertexDeclaration() : ZEModelVertex::GetVertexDeclaration();
-	RenderOrder.Material = Owner->GetModelResource()->Materials[LODResource->MaterialId];
-}
-
-void ZEModelMeshLOD::Deinitialize()
-{
-	Owner = NULL;
-	OwnerMesh = NULL;
-	RenderOrder.SetZero();
-	VertexBuffer = NULL;
-	LODResource = NULL;
-	Material = NULL;
-	Skinned = false;
-}
-
-ZEModelMeshLOD::ZEModelMeshLOD()
-{
-	Skinned = false;
-	Owner = NULL;
-	OwnerMesh = NULL;
-	RenderOrder.SetZero();
-	VertexBuffer = NULL;
-	LODResource = NULL;
-	Material = NULL;
-}
-
-ZEModelMeshLOD::~ZEModelMeshLOD()
-{
-	Deinitialize();
-}
-
-// MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH 
-// MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH 
-// MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH MESH 
-
-void ZEModelMesh::SetActiveLOD(size_t LOD)
-{
-	AutoLOD = false;
-	this->ActiveLOD = LOD;
-}
-
-size_t ZEModelMesh::GetActiveLOD()
-{
-	return ActiveLOD;
-}
-
-void ZEModelMesh::SetAutoLOD(bool Enabled)
-{
-	AutoLOD = Enabled;
-}
-
-bool ZEModelMesh::GetAutoLOD()
-{
-	return AutoLOD;
-}
-
-void ZEModelMesh::SetVisible(bool Visible)
-{
-	this->Visible = Visible;
-}
-
-bool ZEModelMesh::GetVisible()
-{
-	return Visible;
-}
-
-const char* ZEModelMesh::GetName()
-{
-	return MeshResource->Name;
-}
-
-const ZEAABoundingBox& ZEModelMesh::GetLocalBoundingBox()
-{
-	return LocalBoundingBox;
-}
-
-const ZEAABoundingBox& ZEModelMesh::GetModelBoundingBox()
-{
-	if (UpdateModelBoundingBox)
-	{
-		ZEAABoundingBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
-		UpdateModelBoundingBox = false;
-	}
-	
-	return ModelBoundingBox;
-}
-
-
-const ZEAABoundingBox& ZEModelMesh::GetWorldBoundingBox()
-{
-	if (UpdateWorldBoundingBox)
-	{
-		ZEAABoundingBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
-		UpdateWorldBoundingBox = false;
-	}
-	return WorldBoundingBox;
-}
-
-const ZEMatrix4x4& ZEModelMesh::GetLocalTransform()
-{
-	if (UpdateLocalTransform)
-	{
-		ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
-		UpdateLocalTransform = false;
-	}
-	
-	return LocalTransform;
-}
-
-const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
-{
-	if (UpdateModelTransform)
-	{
-		ZEMatrix4x4::Multiply(ModelTransform, GetLocalTransform(), Owner->GetLocalTransform());
-		UpdateModelTransform = false;
-	}
-	return ModelTransform;	
-	
-}
-
-const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
-{
-	if (UpdateWorldTransform)
-	{
-		ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
-		UpdateWorldTransform = false;
-	}
-	return WorldTransform;	
-}
-	
-void ZEModelMesh::SetLocalPosition(const ZEVector3& LocalPosition)
-{
-	UpdateWorldBoundingBox = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-	UpdateModelTransform = true;
-	UpdateLocalTransform = true;
-	Owner->UpdateBoundingBox();
-
-	Position = LocalPosition;
-}
-
-const ZEVector3& ZEModelMesh::GetLocalPostion()
-{
-	return Position;
-}
-
-void ZEModelMesh::SetLocalRotation(const ZEQuaternion& LocalRotation)
-{
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateLocalTransform = true;
-	Owner->UpdateBoundingBox();
-
-	Rotation = LocalRotation;
-}
-
-const ZEQuaternion& ZEModelMesh::GetLocalRotation()
-{
-	return Rotation;
-}
-
-void ZEModelMesh::SetLocalScale(const ZEVector3& LocalScale)
-{
-	UpdateWorldBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateModelTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateLocalTransform = true;
-	Owner->UpdateBoundingBox();
-
-	Scale = LocalScale;
-}
-
-const ZEVector3& ZEModelMesh::GetLocalScale()
-{
-	return Scale;
-}
-
-void ZEModelMesh::SetAnimationType(ZEModelAnimationType AnimationType)
-{
-	this-> AnimationType = AnimationType;
-}
-
-ZEModelAnimationType ZEModelMesh::GetAnimationType()
-{
-	return AnimationType;
-}
-
-
-void ZEModelMesh::SetPhysicsEnabled(bool Enabled)
-{
-	PhysicsEnabled = Enabled;
-}
-
-bool ZEModelMesh::GetPhysicsEnabled()
-{
-	return PhysicsEnabled;
-}
-
-void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshResource)
-{
-	Owner = Model;
-	this->MeshResource = MeshResource;
-	ActiveLOD = 0;
-	AutoLOD = true;
-	PhysicsEnabled = false;
-	AnimationType = ZE_MAT_PREDEFINED;
-	Position = MeshResource->Position;
-	Rotation = MeshResource->Orientation;
-	Scale = ZEVector3(1.0f, 1.0f, 1.0f);
-	LocalBoundingBox = MeshResource->BoundingBox;
-
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateLocalTransform = true;
-
-	LODs.SetCount(MeshResource->LODs.GetCount());
-	for (size_t I = 0; I < MeshResource->LODs.GetCount(); I++)
-		LODs[I].Initialize(Owner, this, &MeshResource->LODs[I]);	
-}
-
-void ZEModelMesh::Deinitialize()
-{
-	Owner = NULL;
-	LODs.Clear();
-}
-
-void ZEModelMesh::ModelTransformChanged()
-{
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
-}
-
-void ZEModelMesh::ModelWorldTransformChanged()
-{
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
-}
-
-void ZEModelMesh::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
-{
-	LODs[0].Draw(Renderer, Lights);	
-}
-
-
-ZEModelMesh::ZEModelMesh()
-{
-	Owner = NULL;
-	MeshResource = NULL;
-}
-
-ZEModelMesh::~ZEModelMesh()
-{
-	Deinitialize();
-}
-
-// BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE
-// BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE
-// BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE BONE
-
-const char* ZEModelBone::GetName()
-{
-	return BoneResource->Name;
-}
-
-const ZEModelBone* ZEModelBone::GetParentBone()
-{
-	return ParentBone;
-}
-
-const ZEArray<ZEModelBone*> ZEModelBone::GetChildBones()
-{
-	return ChildBones;
-}
-
-const ZEAABoundingBox& ZEModelBone::GetLocalBoundingBox()
-{
-	return BoneResource->BoundingBox;
-}
-
-const ZEAABoundingBox& ZEModelBone::GetModelBoundingBox()
-{
-	if (UpdateModelBoundingBox)
-	{
-		ZEAABoundingBox::Transform(ModelBoundingBox, BoneResource->BoundingBox, GetModelTransform());
-		UpdateModelBoundingBox = false;
-	}
-	return ModelBoundingBox;
-}
-
-const ZEAABoundingBox& ZEModelBone::GetWorldBoundingBox()
-{
-	if (UpdateWorldBoundingBox)
-	{
-		ZEAABoundingBox::Transform(WorldBoundingBox, BoneResource->BoundingBox, GetWorldTransform());
-		UpdateWorldBoundingBox = false;
-	}
-	return WorldBoundingBox;
-}
-
-const ZEMatrix4x4& ZEModelBone::GetInverseTransform()
-{
-	return BoneResource->InverseTransform;
-}
-
-const ZEMatrix4x4& ZEModelBone::GetLocalTransform()
-{
-	if (UpdateLocalTransform)
-	{
-		if (ParentBone == NULL)
-			LocalTransform = GetRelativeTransform();
-		else
-		{
-			ZEMatrix4x4::Multiply(LocalTransform, GetRelativeTransform(), ParentBone->GetLocalTransform());
-			return LocalTransform;
-		}
-		UpdateLocalTransform = false;
-	}
-	return LocalTransform;
-}
-
-const ZEMatrix4x4& ZEModelBone::GetWorldTransform()
-{
-	if (UpdateWorldTransform)
-	{
-		ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
-		UpdateWorldTransform = false;
-	}
-
-	return WorldTransform;
-}
-
-const ZEMatrix4x4& ZEModelBone::GetModelTransform()
-{
-	if (UpdateWorldTransform)
-	{
-		ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetLocalTransform());
-		UpdateWorldTransform = false;
-	}
-
-	return WorldTransform;
-}
-
-const ZEMatrix4x4& ZEModelBone::GetVertexTransform()
-{
-	if (UpdateVertexTransform)
-	{
-		ZEMatrix4x4::Multiply(VertexTransform, BoneResource->InverseTransform, GetModelTransform());
-		//VertexTransform = GetModelTransform();
-		//ZEMatrix4x4::CreateIdentity(VertexTransform);
-		UpdateVertexTransform = false;
-	}
-
-	return VertexTransform;
-}
-
-const ZEMatrix4x4& ZEModelBone::GetRelativeTransform()
-{
-	if (UpdateRelativeTransform)
-	{
-		ZEMatrix4x4 Temp1, Temp2;
-		ZEMatrix4x4::CreateTranslation(Temp1, RelativePosition);
-		ZEMatrix4x4::CreateRotation(Temp2, RelativeRotation);
-		ZEMatrix4x4::Multiply(RelativeTransform, Temp2, Temp1);
-
-		ZEMatrix4x4::CreateOffset(Temp1, RelativePosition, RelativeRotation);
-		UpdateRelativeTransform = false;
-	}
-	return RelativeTransform;
-}
-
-const ZEVector3& ZEModelBone::GetAbsolutePostion()
-{
-	return BoneResource->AbsolutePosition;
-}
-
-const ZEQuaternion& ZEModelBone::GetAbsoluteRotation()
-{
-	return BoneResource->AbsoluteOrientation;
-}
-
-const ZEVector3& ZEModelBone::GetRelativePosition()
-{
-	return RelativePosition;
-}
-
-void ZEModelBone::SetRelativePosition(const ZEVector3& Position)
-{
-	UpdateRelativeTransform = true;
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
-	Owner->UpdateBoundingBox();
-
-	RelativePosition = Position;
-}
-
-const ZEQuaternion& ZEModelBone::GetRelativeRotation()
-{
-	return RelativeRotation;
-}
-
-void ZEModelBone::SetRelativeRotation(const ZEQuaternion& Rotation)
-{
-	UpdateRelativeTransform = true;
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
-	Owner->UpdateBoundingBox();
-	Owner->UpdateBoneTransforms();
-	RelativeRotation = Rotation;
-}
-
-void ZEModelBone::SetAnimationType(ZEModelAnimationType AnimationType)
-{
-	this->AnimationType = AnimationType;
-}
-
-ZEModelAnimationType ZEModelBone::GetAnimationType()
-{
-	return AnimationType;
-}
-
-void ZEModelBone::AddChild(ZEModelBone* Bone)
-{
-	Bone->ParentBone = this;
-	ChildBones.Add(Bone);
-}
-
-void ZEModelBone::RemoveChild(ZEModelBone* Bone)
-{
-	Bone->ParentBone = NULL;
-	ChildBones.DeleteValue(Bone);
-}
-
-void ZEModelBone::SetPhysicsEnabled(bool Enabled)
-{
-	PhysicsEnabled = Enabled;
-}
-
-bool ZEModelBone::GetPhysicsEnabled()
-{
-	return PhysicsEnabled;
-}
-
-void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneResource)
-{
-	Owner = Model;
-	this->BoneResource = BoneResource;
-	RelativePosition = BoneResource->RelativePosition;
-	RelativeRotation = BoneResource->RelativeOrientation;
-
-	UpdateRelativeTransform = true;
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
-	Owner->UpdateBoneTransforms();
-}
-
-void ZEModelBone::Deinitialize()
-{
-	Owner = NULL;
-	ParentBone = NULL;
-	ChildBones.Clear();
-
-	UpdateRelativeTransform = true;
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
-}
-
-void ZEModelBone::ModelWorldTransformChanged()
-{
-	UpdateVertexTransform = true;
-	UpdateWorldTransform = true;
-	UpdateWorldBoundingBox = true;
-}
-
-void ZEModelBone::ModelTransformChanged()
-{
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
-}
-
-ZEModelBone::ZEModelBone()
-{
-	Owner = NULL;
-	ParentBone = NULL;
-	UpdateRelativeTransform = true;
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
-}
-
-ZEModelBone::~ZEModelBone()
-{
-	Deinitialize();
-}
-
 // MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL
 // MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL
 // MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL
@@ -705,7 +126,9 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 
 	Meshes.SetCount(ModelResource->Meshes.GetCount());
 	for (size_t I = 0; I < ModelResource->Meshes.GetCount(); I++)
+	{
 		Meshes[I].Initialize(this, &ModelResource->Meshes[I]);
+	}
 
 	BoneTransforms.SetCount(ModelResource->Bones.GetCount());
 	Bones.SetCount(ModelResource->Bones.GetCount());
@@ -727,7 +150,7 @@ const ZEModelResource* ZEModel::GetModelResource()
 }
 
 
-const ZEArray<ZEModelBone>& ZEModel::GetSkeleton()
+ZEArray<ZEModelBone>& ZEModel::GetSkeleton()
 {
 	return Skeleton;
 }
@@ -739,7 +162,7 @@ ZEArray<ZEModelBone>& ZEModel::GetBones()
 
 const ZEArray<ZEMatrix4x4>& ZEModel::GetBoneTransforms()
 {
-	if (UpdateBoneTransforms_)
+	//if (UpdateBoneTransforms_)
 	{
 		for (size_t I = 0; I < Bones.GetCount(); I++)
 			BoneTransforms[I] = Bones[I].GetVertexTransform();
@@ -749,7 +172,7 @@ const ZEArray<ZEMatrix4x4>& ZEModel::GetBoneTransforms()
 	return BoneTransforms;
 }
 
-const ZEArray<ZEModelMesh>& ZEModel::GetMeshes()
+ZEArray<ZEModelMesh>& ZEModel::GetMeshes()
 {
 	return Meshes;
 }
@@ -935,8 +358,8 @@ void ZEModel::SetStaticPose(const ZEModelAnimation* Animation, unsigned int Fram
 		{
 			Key = &Frame->BoneKeys[I];
 
-			Bones[Key->ItemId].SetRelativeRotation(Key->Orientation);
-			//Bones[Key->ItemId].SetRelativeRotation(Key->Orientation);
+			Bones[Key->ItemId].SetRelativePosition(Key->Position);
+			Bones[Key->ItemId].SetRelativeRotation(Key->Rotation);
 		}
 		
 		for (size_t I = 0; I < Frame->MeshKeys.GetCount(); I++)
@@ -944,7 +367,8 @@ void ZEModel::SetStaticPose(const ZEModelAnimation* Animation, unsigned int Fram
 			Key = &Frame->MeshKeys[I];
 			
 			Meshes[Key->ItemId].SetLocalPosition(Key->Position);
-			Bones[Key->ItemId].SetRelativeRotation(Key->Orientation);
+			Meshes[Key->ItemId].SetLocalRotation(Key->Rotation);
+			Meshes[Key->ItemId].SetLocalScale(Key->Scale);
 		}
 	}
 }
@@ -958,7 +382,7 @@ void ZEModel::PlayAnimationByName(const char* AnimationName, unsigned int StartF
 		return;
 
 	for (size_t I = 0; I < ModelResource->Animations.GetCount(); I++)
-		if (strnicmp(Animation->Name, ModelResource->Animations[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
+		if (strnicmp(AnimationName, ModelResource->Animations[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
 		{
 			PlayAnimation(&ModelResource->Animations[I], StartFrame, EndFrame);
 			return;
@@ -1074,13 +498,48 @@ void ZEModel::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& L
 {
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Draw(Renderer, Lights);
+
+	SkeletonPointsVertexBuffer.Clean();
+	SkeletonVertexBuffer.Clean();
+	if (DrawSkeleton)
+	{/*
+		/*ZEVector3 BonePosition1, BonePosition2;
+		for (size_t I = 0; I < Bones.GetCount(); I++)
+		{
+			ZEMatrix4x4::Transform(BonePosition1, Bones[I].GetModelTransform(), ZEVector3(0.0f, 0.0f, 0.0f));
+			SkeletonPointsVertexBuffer.AddPoint(BonePosition1);
+			if (Bones[I].GetChildBones().GetCount() != 0)	
+			{
+				ZEMatrix4x4::Transform(BonePosition2, Bones[I].GetModelTransform(), Bones[I].GetChildBones()[0]->GetRelativePosition());
+				SkeletonVertexBuffer.AddLine(BonePosition1, BonePosition2);
+			}
+		}
+		Renderer->AddToRenderOrder(&SkeletonPointsRenderOrder);
+		Renderer->AddToRenderOrder(&SkeletonRenderOrder);*/
+	}
+
+	if (DrawPhysicalBodies)
+	{
+		/*for (size_t I = 0; I < Meshes.GetCount(); I++)
+		{
+			if (Meshes[I].PhysicsEnabled)
+			{
+				switch(Meshes[I].PhysicalBody.
+			}
+		}*/
+	}
+
+	if (DrawPhysicalJoints)
+	{
+	}
 }
 
 void ZEModel::Tick(float ElapsedTime)
 {
 	if (AnimationState == ZE_MAS_PLAYING)
 	{
-		if (AnimationFrame > AnimationEndFrame)
+		if (AnimationFrame >= AnimationEndFrame)
+		{
 			if (AnimationLooping)
 				AnimationFrame = AnimationStartFrame + fmodf(AnimationFrame, AnimationEndFrame - AnimationStartFrame);
 			else
@@ -1088,22 +547,30 @@ void ZEModel::Tick(float ElapsedTime)
 				AnimationFrame = AnimationEndFrame;
 				AnimationState = ZE_MAS_STOPPED;
 			}
+		}
 			
 		float Interpolation = AnimationFrame - floorf(AnimationFrame);
 
+		int NextFrameId = (int)ceilf(AnimationFrame);
+		if (NextFrameId >= Animation->Frames.GetCount())
+			NextFrameId = AnimationStartFrame + fmodf(AnimationFrame, AnimationEndFrame - AnimationStartFrame);
+
 		const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[(int)floorf(AnimationFrame)];
-		const ZEModelResourceAnimationFrame* NextFrame = &Animation->Frames[(int)ceilf(AnimationFrame)];
+		const ZEModelResourceAnimationFrame* NextFrame = &Animation->Frames[NextFrameId];
+
 
 		for (size_t I = 0; I < Frame->BoneKeys.GetCount(); I++)
 		{
 			const ZEModelResourceAnimationKey* Key = &Frame->BoneKeys[I];
 			const ZEModelResourceAnimationKey* NextKey = &NextFrame->BoneKeys[I];
 			
-			ZEQuaternion Rotation;
-			ZEQuaternion::Slerp(Rotation, Key->Orientation, NextKey->Orientation, Interpolation);
+			ZEVector3 Position;
+			ZEVector3::Lerp(Position, Key->Position, Key->Position, Interpolation);
+			Bones[Key->ItemId].SetRelativePosition(Position);
 
+			ZEQuaternion Rotation;
+			ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
 			Bones[Key->ItemId].SetRelativeRotation(Rotation);
-			//Bones[Key->ItemId].SetRelativeRotation(Key->Orientation);
 		}
 		
 		for (size_t I = 0; I < Frame->MeshKeys.GetCount(); I++)
@@ -1116,14 +583,55 @@ void ZEModel::Tick(float ElapsedTime)
 			Meshes[Key->ItemId].SetLocalPosition(Position);
 
 			ZEQuaternion Rotation;
-			ZEQuaternion::Slerp(Rotation, Key->Orientation, NextKey->Orientation, Interpolation);
-			Bones[Key->ItemId].SetRelativeRotation(Rotation);
+			ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
+			Meshes[Key->ItemId].SetLocalRotation(Rotation);
 
+			ZEVector3 Scale;
+			ZEVector3::Lerp(Scale, Key->Scale, NextKey->Scale, Interpolation);
+			Meshes[Key->ItemId].SetLocalScale(Scale);
 		}
 		AnimationFrame += AnimationSpeed * ElapsedTime;
 	}
-}
 
+	/*if (Meshes.GetCount()>0)
+	{
+		//Meshes[0].SetLocalPosition(ZEVector3::Zero);
+		//Meshes[0].GetPhysicalBody()->SetPosition(ZEVector3::Zero);
+		//ZEVector3 ewrt = Meshes[0].GetPhysicalBody()->GetPosition();
+		
+		for (int i=0;i<Meshes.GetCount();i++)
+		{
+			Meshes[i].SetLocalPosition(Meshes[i].GetPhysicalBody()->GetPosition());
+			Meshes[i].SetLocalRotation(Meshes[i].GetPhysicalBody()->GetOrientation());
+
+			//Meshes[i].SetLocalPosition(ZEVector3::Zero);
+			//ZEQuaternion q;
+			//static float rrr;
+			//rrr += ZE_PI * ElapsedTime;
+			//ZEQuaternion::Create(q, rrr, ZEVector3::UnitX);
+			//Meshes[i].SetLocalRotation(q);
+		}
+
+		//this->SetWorldPosition(ZEVector3::Zero);
+		//this->SetLocalPosition(ZEVector3::Zero);
+		/*this->SetWorldRotation(ZEQuaternion::Identity);
+		this->SetLocalRotation(ZEQuaternion::Identity);
+
+		//for (int i=0;i<Meshes.GetCount();i++)
+		//{
+		//	Meshes[i].SetLocalPosition(ZEVector3(0,0,0));
+		//	Meshes[i].SetLocalRotation(Meshes[i].GetPhysicalBody()->GetOrientation());
+		//}
+		//ZEVector3 ewrt = Meshes[0].GetPhysicalBody()->GetPosition();
+		//this->SetWorldPosition(Meshes[0].GetPhysicalBody()->GetPosition());
+		//this->SetWorldRotation(Meshes[0].GetPhysicalBody()->GetOrientation());
+		//this->SetLocalPosition(Meshes[0].GetPhysicalBody()->GetPosition());
+		//this->SetLocalRotation(Meshes[0].GetPhysicalBody()->GetOrientation());
+
+		//this->SetWorldPosition(ZEVector3::Zero);
+		//this->SetLocalPosition(ZEVector3::Zero);
+	}*/
+}
 
 ZEModel::ZEModel()
 {

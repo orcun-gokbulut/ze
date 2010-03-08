@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsReport.h
+ Zinek Engine - PhysXPhysicsReport.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_AEGIA_PHYSICS_REPORT_H__
-#define __ZE_AEGIA_PHYSICS_REPORT_H__
+#include "NxPhysics.h"
+#include "PhysXPhysicsReport.h"
 
-class ZEAegiaPhysicsReport : public NxUserContactReport, public NxUserTriggerReport 
+#include "ZEMath/Vector.h"
+#include "Physics/PhysicsCollision.h"
+#include "PhysXPhysicsCollision.h"
+#include "Physics/PhysicsTrigger.h"
+#include "PhysXPhysicsTrigger.h"
+
+#include "Physics/PhysicsWorld.h"
+#include "Physics/PhysicsWorldInfo.h"
+#include "PhysXPhysicsWorld.h"
+#include "PhysXPhysicsUtility.h"
+
+void ZEPhysXPhysicsReport::onContactNotify(NxContactPair& pair, NxU32 events)
 {
-	void onContactNotify(NxContactPair& pair, NxU32 events);
-	void onTrigger(NxShape& triggerShape, NxShape& otherShape, NxTriggerFlag status);
-};
+	ZEPhysXPhysicsWorld* World = ZEPhysXPhysicsWorld::getSingletonPtr();
+	if (World != NULL)
+	{
+		if (!World->DelegateC.empty())
+		{
+			NxContactStreamIterator j(pair.stream);
+			
+			if (j.goNextPair() && j.goNextPatch() && j.goNextPoint())
+			{
+				ZEPhysXPhysicsCollision Coll((ZEPhysicsBody*)pair.actors[0]->userData,
+											 (ZEPhysicsBody*)pair.actors[1]->userData,
+													               TOZE(j.getPoint()),
+													         TOZE(j.getPatchNormal()),
+													         j.getPointNormalForce());
+				World->DelegateC(&Coll);
+			}
+		}
+	}
+}
 
-#endif
+void ZEPhysXPhysicsReport::onTrigger(NxShape& triggerShape, NxShape& otherShape, NxTriggerFlag status)
+{
+	ZEPhysXPhysicsWorld* World = ZEPhysXPhysicsWorld::getSingletonPtr();
+	if (World != NULL)
+	{
+		if (!World->DelegateT.empty())
+		{
+				ZEPhysXPhysicsTrigger Trig((ZEPhysicsBody*)triggerShape.userData,
+										   (ZEPhysicsBody*)  otherShape.userData,
+													                     status);
+				World->DelegateT(&Trig);
+		}
+	}
+}

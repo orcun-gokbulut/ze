@@ -178,7 +178,7 @@ bool ZECore::SetPhysicsModule(ZEModule* Module)
 	return true;
 }
 
-void* ZECore::GetPhysicsModule()
+ZEPhysicsModule* ZECore::GetPhysicsModule()
 {
 	return Physics;
 }

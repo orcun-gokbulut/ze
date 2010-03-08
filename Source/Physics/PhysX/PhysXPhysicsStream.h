@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsReport.cpp
+ Zinek Engine - PhysXPhysicsStream.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "NxPhysics.h"
-#include "Physics/Aegia/AegiaPhysicsReport.h"
+#pragma once
+#ifndef	__ZE_PHYSX_PHYSICS_STREAM_H__
+#define __ZE_PHYSX_PHYSICS_STREAM_H__
 
-#include "ZEMath/Vector.h"
-#include "Physics/PhysicsCollision.h"
-#include "AegiaPhysicsCollision.h"
-#include "Physics/PhysicsTrigger.h"
-#include "AegiaPhysicsTrigger.h"
+#include "NxStream.h"
 
-#include "Physics/PhysicsWorld.h"
-#include "Physics/PhysicsWorldInfo.h"
-#include "AegiaPhysicsWorld.h"
-#include "AegiaPhysicsUtility.h"
-
-void ZEAegiaPhysicsReport::onContactNotify(NxContactPair& pair, NxU32 events)
+class ZEPhysXPhysicsMemoryWriteBuffer : public NxStream
 {
-	ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
-	if (World != NULL)
-	{
-		if (!World->DelegateC.empty())
-		{
-			NxContactStreamIterator j(pair.stream);
-			
-			if (j.goNextPair() && j.goNextPatch() && j.goNextPoint())
-			{
-				ZEAegiaPhysicsCollision Coll((ZEPhysicsBody*)pair.actors[0]->userData,
-											 (ZEPhysicsBody*)pair.actors[1]->userData,
-													               TOZE(j.getPoint()),
-													         TOZE(j.getPatchNormal()),
-													         j.getPointNormalForce());
-				World->DelegateC(&Coll);
-			}
-		}
-	}
-}
+public:
+						ZEPhysXPhysicsMemoryWriteBuffer();
+	virtual				~ZEPhysXPhysicsMemoryWriteBuffer();
+	void				clear();
 
-void ZEAegiaPhysicsReport::onTrigger(NxShape& triggerShape, NxShape& otherShape, NxTriggerFlag status)
+	virtual NxU8		readByte()   const	{ NX_ASSERT(0);	return 0;	}
+	virtual NxU16		readWord()   const	{ NX_ASSERT(0);	return 0;	}
+	virtual NxU32		readDword()  const	{ NX_ASSERT(0);	return 0;	}
+	virtual float		readFloat()  const	{ NX_ASSERT(0);	return 0.0f;}
+	virtual double		readDouble() const	{ NX_ASSERT(0);	return 0.0;	}
+	virtual void		readBuffer(void* buffer, NxU32 size) const{ NX_ASSERT(0);}
+
+	virtual NxStream&	storeByte(NxU8 b);
+	virtual NxStream&	storeWord(NxU16 w);
+	virtual NxStream&	storeDword(NxU32 d);
+	virtual NxStream&	storeFloat(NxReal f);
+	virtual NxStream&	storeDouble(NxF64 f);
+	virtual NxStream&	storeBuffer(const void* buffer, NxU32 size);
+
+	NxU32				currentSize;
+	NxU32				maxSize;
+	NxU8*				data;
+};
+
+class ZEPhysXPhysicsMemoryReadBuffer : public NxStream
 {
-	ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
-	if (World != NULL)
-	{
-		if (!World->DelegateT.empty())
-		{
-				ZEAegiaPhysicsTrigger Trig((ZEPhysicsBody*)triggerShape.userData,
-										   (ZEPhysicsBody*)  otherShape.userData,
-													                     status);
-				World->DelegateT(&Trig);
-		}
-	}
-}
+public:
+								ZEPhysXPhysicsMemoryReadBuffer(const NxU8* data);
+	virtual						~ZEPhysXPhysicsMemoryReadBuffer();
+
+	virtual NxU8				readByte() const;
+	virtual NxU16				readWord() const;
+	virtual NxU32				readDword() const;
+	virtual float				readFloat() const;
+	virtual double				readDouble() const;
+	virtual void				readBuffer(void* buffer, NxU32 size) const;
+
+	virtual NxStream&			storeByte(NxU8 b) { NX_ASSERT(0);	 return *this; }
+	virtual NxStream&			storeWord(NxU16 w) { NX_ASSERT(0);	 return *this; }
+	virtual NxStream&			storeDword(NxU32 d) { NX_ASSERT(0);	 return *this; }
+	virtual NxStream&			storeFloat(NxReal f) { NX_ASSERT(0); return *this; }
+	virtual NxStream&			storeDouble(NxF64 f) { NX_ASSERT(0); return *this; }
+	virtual NxStream&			storeBuffer(const void* buffer, NxU32 size) { NX_ASSERT(0);	return *this; }
+
+	mutable const NxU8*			buffer;
+};
+
+#endif

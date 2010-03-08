@@ -43,25 +43,25 @@ class ZEPhysicsBody;
 
 class ZEPhysicsJoint
 {
-protected:
-	ZEPhysicsJoint(){}
-	virtual ~ZEPhysicsJoint(){}
+	protected:
+									ZEPhysicsJoint(){}
+		virtual						~ZEPhysicsJoint(){}
 
-public:
-	virtual void Initialize(ZEPhysicsJointInfo& Info) = 0;
-	virtual void Deinitialize()                       = 0;
+	public:
+		virtual void				Initialize(ZEPhysicsJointInfo& Info) = 0;
+		virtual void				Deinitialize() = 0;
 
-	virtual ZEVector3 GetGlobalAnchor()           = 0;
-	virtual void SetGlobalAnchor(const ZEVector3) = 0;
-	virtual ZEVector3 GetGlobalAxis()             = 0;
-	virtual void SetGlobalAxis(const ZEVector3)   = 0;
+		virtual ZEVector3			GetGlobalAnchor() = 0;
+		virtual void				SetGlobalAnchor(const ZEVector3) = 0;
+		virtual ZEVector3			GetGlobalAxis() = 0;
+		virtual void				SetGlobalAxis(const ZEVector3) = 0;
 
-	virtual void SetLimitPoint(const ZEVector3 Point, bool OnBody2 = false) = 0;
-	virtual void AddLimitPlane(const ZEVector3 Normal, const ZEVector3 Point, float Restitution = 0) = 0;
-	virtual void SetJointMotor(float MotorForce, float MotorVelocity) = 0;
+		virtual void				SetLimitPoint(const ZEVector3 Point, bool OnBody2 = false) = 0;
+		virtual void				AddLimitPlane(const ZEVector3 Normal, const ZEVector3 Point, float Restitution = 0) = 0;
+		virtual void				SetJointMotor(float MotorForce, float MotorVelocity) = 0;
 
-	virtual ZEPhysicsBody* GetBody1() = 0;
-	virtual ZEPhysicsBody* GetBody2() = 0;
+		virtual ZEPhysicsBody*		GetBody1() = 0;
+		virtual ZEPhysicsBody*		GetBody2() = 0;
 };
 
 #endif

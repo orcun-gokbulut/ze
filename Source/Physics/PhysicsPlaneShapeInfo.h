@@ -42,13 +42,13 @@ class ZEVector3;
 
 class ZEPhysicsPlaneShapeInfo : public ZEPhysicsShapeInfo
 {
-public:
-	ZEPhysicsPlaneShapeInfo();
-	~ZEPhysicsPlaneShapeInfo(){}
-	ZEPhysicsShapeType GetType() { return ZEPhysicsShapeInfo::ZE_PST_PLANE; }
+	public:
+								ZEPhysicsPlaneShapeInfo();
+								~ZEPhysicsPlaneShapeInfo(){}
+		ZEPhysicsShapeType		GetType() { return ZEPhysicsShapeInfo::ZE_PST_PLANE; }
 
-	float Height;
-	ZEVector3 Normal;
+		float					Height;
+		ZEVector3				Normal;
 };
 
 #endif

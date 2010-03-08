@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsTrigger.h
+ Zinek Engine - PhysXPhysicsUtility.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,30 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_AEGIA_PHYSICS_TRIGGER_H__
-#define __ZE_AEGIA_PHYSICS_TRIGGER_H__
-
-class ZEPhysicsTrigger;
-class ZEPhysicsBody;
-
-class ZEAegiaPhysicsTrigger : public ZEPhysicsTrigger
-{
-	friend class ZEAegiaPhysicsReport;
-
-private:
-	ZEAegiaPhysicsTrigger(ZEPhysicsBody* First,ZEPhysicsBody* Second, unsigned int Flag);
-	~ZEAegiaPhysicsTrigger();
-
-public:
-	ZEPhysicsBody* GetTriggerBody() { return Trigger; }
-	ZEPhysicsBody* GetOtherBody()   { return Other; }
-	unsigned int   GetFlags()       { return Flags; }
-
-private:
-	ZEPhysicsBody* Trigger;
-	ZEPhysicsBody* Other;
-	unsigned int Flags;
-};
-
-#endif
+#include "PhysXPhysicsUtility.h"

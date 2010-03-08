@@ -37,6 +37,6 @@
 #include "Physics/PhysicsShapeInfo.h"
 #include "Physics/PhysicsConvexShapeInfo.h"
 
-ZEPhysicsConvexShapeInfo::ZEPhysicsConvexShapeInfo() : Scale(1,1,1)
+ZEPhysicsConvexShapeInfo::ZEPhysicsConvexShapeInfo()// : Scale(1,1,1)
 {
 }

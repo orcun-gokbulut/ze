@@ -41,24 +41,24 @@ class ZEPhysicsJointInfo;
 
 class ZEPhysicsRevoluteJointInfo : public ZEPhysicsJointInfo
 {
-public:
-	ZEPhysicsRevoluteJointInfo();
-	~ZEPhysicsRevoluteJointInfo(){}
-	ZEPhysicsJointType GetType() { return ZEPhysicsJointInfo::ZE_PJT_REVOLUTE; }
+	public:
+								ZEPhysicsRevoluteJointInfo();
+								~ZEPhysicsRevoluteJointInfo(){}
+		ZEPhysicsJointType		GetType() { return ZEPhysicsJointInfo::ZE_PJT_REVOLUTE; }
 
-	bool HasLimit;
-	float LimitLowValue;
-	float LimitHighValue;
-	float LimitRestitution;
+		bool					HasLimit;
+		float					LimitLowValue;
+		float					LimitHighValue;
+		float					LimitRestitution;
 
-	bool HasSpring;
-	float SpringValue;
-	float SpringDamper;
-	float SpringTarget;
+		bool					HasSpring;
+		float					SpringValue;
+		float					SpringDamper;
+		float					SpringTarget;
 
-	bool HasMotor;
-	float MotorForce;
-	float MotorVelocity;
+		bool					HasMotor;
+		float					MotorForce;
+		float					MotorVelocity;
 
 };
 

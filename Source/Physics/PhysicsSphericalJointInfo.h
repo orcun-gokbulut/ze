@@ -41,19 +41,19 @@ class ZEPhysicsJointInfo;
 
 class ZEPhysicsSphericalJointInfo : public ZEPhysicsJointInfo
 {
-public:
-	ZEPhysicsSphericalJointInfo();
-	~ZEPhysicsSphericalJointInfo(){}
-	ZEPhysicsJointType GetType() { return ZEPhysicsJointInfo::ZE_PJT_SPHERICAL; }
+	public:
+									ZEPhysicsSphericalJointInfo();
+									~ZEPhysicsSphericalJointInfo(){}
+		ZEPhysicsJointType			GetType() { return ZEPhysicsJointInfo::ZE_PJT_SPHERICAL; }
 
-	bool SwingLimit;
-	float SwingLimitValue;
-	float SwingLimitRestitution;
+		bool						SwingLimit;
+		float						SwingLimitValue;
+		float						SwingLimitRestitution;
 
-	bool TwistLimit;
-	float TwistLimitLowValue;
-	float TwistLimitHighValue;
-	float TwistLimitRestitution;
+		bool						TwistLimit;
+		float						TwistLimitLowValue;
+		float						TwistLimitHighValue;
+		float						TwistLimitRestitution;
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsJoint.cpp
+ Zinek Engine - PhysXPhysicsJoint.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #include "ZEMath/Vector.h"
 
 #include "Physics/PhysicsJoint.h"
-#include "Physics/Aegia/AegiaPhysicsJoint.h"
+#include "PhysXPhysicsJoint.h"
 
 #include "Physics/PhysicsJointInfo.h"
 #include "Physics/PhysicsFixedJointInfo.h"
@@ -52,24 +52,24 @@
 #include "Physics/PhysicsFreeJointInfo.h"
 
 #include "Physics/PhysicsBody.h"
-#include "AegiaPhysicsBody.h"
+#include "PhysXPhysicsBody.h"
 
 #include "Physics/PhysicsWorld.h"
-#include "AegiaPhysicsWorld.h"
-#include "AegiaPhysicsUtility.h"
+#include "PhysXPhysicsWorld.h"
+#include "PhysXPhysicsUtility.h"
 
-ZEAegiaPhysicsJoint::ZEAegiaPhysicsJoint() : Joint(NULL)
+ZEPhysXPhysicsJoint::ZEPhysXPhysicsJoint() : Joint(NULL)
 {
 }
 
-ZEAegiaPhysicsJoint::~ZEAegiaPhysicsJoint()
+ZEPhysXPhysicsJoint::~ZEPhysXPhysicsJoint()
 {
 	Deinitialize();
 }
 
-void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
+void ZEPhysXPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 {
-	ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
+	ZEPhysXPhysicsWorld* World = ZEPhysXPhysicsWorld::getSingletonPtr();
 
 	if (Joint == NULL && World != NULL)
 	{
@@ -83,15 +83,25 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 				NxFixedJointDesc FixedDesc;
 				if (FixedInfo->Body1)
 				{
-					FixedDesc.actor[0] = ((ZEAegiaPhysicsBody*)FixedInfo->Body1)->GetActor();
+					FixedDesc.actor[0] = ((ZEPhysXPhysicsBody*)FixedInfo->Body1)->GetActor();
 				}
-				else FixedDesc.actor[0] = NULL;
+				else 
+				{
+					FixedDesc.actor[0] = NULL;
+				}
 				if (FixedInfo->Body2)
 				{
-					FixedDesc.actor[1] = ((ZEAegiaPhysicsBody*)FixedInfo->Body2)->GetActor();
+					FixedDesc.actor[1] = ((ZEPhysXPhysicsBody*)FixedInfo->Body2)->GetActor();
 				}
-				else FixedDesc.actor[1] = NULL;
-				if (Info.CollideBodies)FixedDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				else 
+				{
+					FixedDesc.actor[1] = NULL;
+				}
+
+				if (Info.CollideBodies)
+				{
+					FixedDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				}
 				
 				//set anchor
 				if (FixedInfo->UseGlobalAnchor)
@@ -103,6 +113,7 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 					FixedDesc.localAnchor[0] = TONX(FixedInfo->LocalAnchor1);
 					FixedDesc.localAnchor[1] = TONX(FixedInfo->LocalAnchor2);
 				}
+
 				//set axis
 				if (FixedInfo->UseGlobalAxis)
 				{
@@ -132,15 +143,26 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 				NxSphericalJointDesc SphericalDesc;
 				if (SphericalInfo->Body1)
 				{
-					SphericalDesc.actor[0] = ((ZEAegiaPhysicsBody*)SphericalInfo->Body1)->GetActor();
+					SphericalDesc.actor[0] = ((ZEPhysXPhysicsBody*)SphericalInfo->Body1)->GetActor();
 				}
-				else SphericalDesc.actor[0] = NULL;
+				else 
+				{
+					SphericalDesc.actor[0] = NULL;
+				}
+
 				if (SphericalInfo->Body2)
 				{
-					SphericalDesc.actor[1] = ((ZEAegiaPhysicsBody*)SphericalInfo->Body2)->GetActor();
+					SphericalDesc.actor[1] = ((ZEPhysXPhysicsBody*)SphericalInfo->Body2)->GetActor();
 				}
-				else SphericalDesc.actor[1] = NULL;
-				if (Info.CollideBodies)SphericalDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				else 
+				{
+					SphericalDesc.actor[1] = NULL;
+				}
+
+				if (Info.CollideBodies)
+				{
+					SphericalDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				}
 				
 				//set anchor
 				if (SphericalInfo->UseGlobalAnchor)
@@ -152,6 +174,7 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 					SphericalDesc.localAnchor[0] = TONX(SphericalInfo->LocalAnchor1);
 					SphericalDesc.localAnchor[1] = TONX(SphericalInfo->LocalAnchor2);
 				}
+
 				//set axis
 				if (SphericalInfo->UseGlobalAxis)
 				{
@@ -198,15 +221,26 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 				NxRevoluteJointDesc RevoluteDesc;
 				if (RevoluteInfo->Body1)
 				{
-					RevoluteDesc.actor[0] = ((ZEAegiaPhysicsBody*)RevoluteInfo->Body1)->GetActor();
+					RevoluteDesc.actor[0] = ((ZEPhysXPhysicsBody*)RevoluteInfo->Body1)->GetActor();
 				}
-				else RevoluteDesc.actor[0] = NULL;
+				else 
+				{
+					RevoluteDesc.actor[0] = NULL;
+				}
+
 				if (RevoluteInfo->Body2)
 				{
-					RevoluteDesc.actor[1] = ((ZEAegiaPhysicsBody*)RevoluteInfo->Body2)->GetActor();
+					RevoluteDesc.actor[1] = ((ZEPhysXPhysicsBody*)RevoluteInfo->Body2)->GetActor();
 				}
-				else RevoluteDesc.actor[1] = NULL;
-				if (Info.CollideBodies)RevoluteDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				else 
+				{
+					RevoluteDesc.actor[1] = NULL;
+				}
+
+				if (Info.CollideBodies)
+				{
+					RevoluteDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				}
 				
 				//set anchor
 				if (RevoluteInfo->UseGlobalAnchor)
@@ -218,6 +252,7 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 					RevoluteDesc.localAnchor[0] = TONX(RevoluteInfo->LocalAnchor1);
 					RevoluteDesc.localAnchor[1] = TONX(RevoluteInfo->LocalAnchor2);
 				}
+
 				//set axis
 				if (RevoluteInfo->UseGlobalAxis)
 				{
@@ -276,15 +311,26 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 				NxPrismaticJointDesc PrismaticDesc;
 				if (PrismaticInfo->Body1)
 				{
-					PrismaticDesc.actor[0] = ((ZEAegiaPhysicsBody*)PrismaticInfo->Body1)->GetActor();
+					PrismaticDesc.actor[0] = ((ZEPhysXPhysicsBody*)PrismaticInfo->Body1)->GetActor();
 				}
-				else PrismaticDesc.actor[0] = NULL;
+				else 
+				{
+					PrismaticDesc.actor[0] = NULL;
+				}
+
 				if (PrismaticInfo->Body2)
 				{
-					PrismaticDesc.actor[1] = ((ZEAegiaPhysicsBody*)PrismaticInfo->Body2)->GetActor();
+					PrismaticDesc.actor[1] = ((ZEPhysXPhysicsBody*)PrismaticInfo->Body2)->GetActor();
 				}
-				else PrismaticDesc.actor[1] = NULL;
-				if (Info.CollideBodies)PrismaticDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				else 
+				{
+					PrismaticDesc.actor[1] = NULL;
+				}
+
+				if (Info.CollideBodies)
+				{
+					PrismaticDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				}
 				
 				//set anchor
 				if (PrismaticInfo->UseGlobalAnchor)
@@ -296,6 +342,7 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 					PrismaticDesc.localAnchor[0] = TONX(PrismaticInfo->LocalAnchor1);
 					PrismaticDesc.localAnchor[1] = TONX(PrismaticInfo->LocalAnchor2);
 				}
+
 				//set axis
 				if (PrismaticInfo->UseGlobalAxis)
 				{
@@ -326,15 +373,26 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 				NxCylindricalJointDesc CylindricalDesc;
 				if (CylindricalInfo->Body1)
 				{
-					CylindricalDesc.actor[0] = ((ZEAegiaPhysicsBody*)CylindricalInfo->Body1)->GetActor();
+					CylindricalDesc.actor[0] = ((ZEPhysXPhysicsBody*)CylindricalInfo->Body1)->GetActor();
 				}
-				else CylindricalDesc.actor[0] = NULL;
+				else 
+				{
+					CylindricalDesc.actor[0] = NULL;
+				}
+
 				if (CylindricalInfo->Body2)
 				{
-					CylindricalDesc.actor[1] = ((ZEAegiaPhysicsBody*)CylindricalInfo->Body2)->GetActor();
+					CylindricalDesc.actor[1] = ((ZEPhysXPhysicsBody*)CylindricalInfo->Body2)->GetActor();
 				}
-				else CylindricalDesc.actor[1] = NULL;
-				if (Info.CollideBodies)CylindricalDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				else
+				{
+					CylindricalDesc.actor[1] = NULL;
+				}
+
+				if (Info.CollideBodies)
+				{
+					CylindricalDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				}
 				
 				//set anchor
 				if (CylindricalInfo->UseGlobalAnchor)
@@ -346,6 +404,7 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 					CylindricalDesc.localAnchor[0] = TONX(CylindricalInfo->LocalAnchor1);
 					CylindricalDesc.localAnchor[1] = TONX(CylindricalInfo->LocalAnchor2);
 				}
+
 				//set axis
 				if (CylindricalInfo->UseGlobalAxis)
 				{
@@ -376,15 +435,26 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 				NxDistanceJointDesc DistanceDesc;
 				if (DistanceInfo->Body1)
 				{
-					DistanceDesc.actor[0] = ((ZEAegiaPhysicsBody*)DistanceInfo->Body1)->GetActor();
+					DistanceDesc.actor[0] = ((ZEPhysXPhysicsBody*)DistanceInfo->Body1)->GetActor();
 				}
-				else DistanceDesc.actor[0] = NULL;
+				else 
+				{
+					DistanceDesc.actor[0] = NULL;
+				}
+
 				if (DistanceInfo->Body2)
 				{
-					DistanceDesc.actor[1] = ((ZEAegiaPhysicsBody*)DistanceInfo->Body2)->GetActor();
+					DistanceDesc.actor[1] = ((ZEPhysXPhysicsBody*)DistanceInfo->Body2)->GetActor();
 				}
-				else DistanceDesc.actor[1] = NULL;
-				if (Info.CollideBodies)DistanceDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				else 
+				{
+					DistanceDesc.actor[1] = NULL;
+				}
+
+				if (Info.CollideBodies)
+				{
+					DistanceDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				}
 				
 				//set anchor
 				if (DistanceInfo->UseGlobalAnchor)
@@ -448,15 +518,26 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 				NxPointOnLineJointDesc PointOnLineDesc;
 				if (PointOnLineInfo->Body1)
 				{
-					PointOnLineDesc.actor[0] = ((ZEAegiaPhysicsBody*)PointOnLineInfo->Body1)->GetActor();
+					PointOnLineDesc.actor[0] = ((ZEPhysXPhysicsBody*)PointOnLineInfo->Body1)->GetActor();
 				}
-				else PointOnLineDesc.actor[0] = NULL;
+				else 
+				{
+					PointOnLineDesc.actor[0] = NULL;
+				}
+
 				if (PointOnLineInfo->Body2)
 				{
-					PointOnLineDesc.actor[1] = ((ZEAegiaPhysicsBody*)PointOnLineInfo->Body2)->GetActor();
+					PointOnLineDesc.actor[1] = ((ZEPhysXPhysicsBody*)PointOnLineInfo->Body2)->GetActor();
 				}
-				else PointOnLineDesc.actor[1] = NULL;
-				if (Info.CollideBodies)PointOnLineDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				else 
+				{
+					PointOnLineDesc.actor[1] = NULL;
+				}
+
+				if (Info.CollideBodies)
+				{
+					PointOnLineDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				}
 				
 				//set anchor
 				if (PointOnLineInfo->UseGlobalAnchor)
@@ -468,6 +549,7 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 					PointOnLineDesc.localAnchor[0] = TONX(PointOnLineInfo->LocalAnchor1);
 					PointOnLineDesc.localAnchor[1] = TONX(PointOnLineInfo->LocalAnchor2);
 				}
+
 				//set axis
 				if (PointOnLineInfo->UseGlobalAxis)
 				{
@@ -497,15 +579,26 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 				NxPointInPlaneJointDesc PointInPlaneDesc;
 				if (PointInPlaneInfo->Body1)
 				{
-					PointInPlaneDesc.actor[0] = ((ZEAegiaPhysicsBody*)PointInPlaneInfo->Body1)->GetActor();
+					PointInPlaneDesc.actor[0] = ((ZEPhysXPhysicsBody*)PointInPlaneInfo->Body1)->GetActor();
 				}
-				else PointInPlaneDesc.actor[0] = NULL;
+				else 
+				{
+					PointInPlaneDesc.actor[0] = NULL;
+				}
+
 				if (PointInPlaneInfo->Body2)
 				{
-					PointInPlaneDesc.actor[1] = ((ZEAegiaPhysicsBody*)PointInPlaneInfo->Body2)->GetActor();
+					PointInPlaneDesc.actor[1] = ((ZEPhysXPhysicsBody*)PointInPlaneInfo->Body2)->GetActor();
 				}
-				else PointInPlaneDesc.actor[1] = NULL;
-				if (Info.CollideBodies)PointInPlaneDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				else 
+				{
+					PointInPlaneDesc.actor[1] = NULL;
+				}
+
+				if (Info.CollideBodies)
+				{
+					PointInPlaneDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				}
 				
 				//set anchor
 				if (PointInPlaneInfo->UseGlobalAnchor)
@@ -517,6 +610,7 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 					PointInPlaneDesc.localAnchor[0] = TONX(PointInPlaneInfo->LocalAnchor1);
 					PointInPlaneDesc.localAnchor[1] = TONX(PointInPlaneInfo->LocalAnchor2);
 				}
+
 				//set axis
 				if (PointInPlaneInfo->UseGlobalAxis)
 				{
@@ -546,15 +640,26 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 				NxPulleyJointDesc PulleyDesc;
 				if (PulleyInfo->Body1)
 				{
-					PulleyDesc.actor[0] = ((ZEAegiaPhysicsBody*)PulleyInfo->Body1)->GetActor();
+					PulleyDesc.actor[0] = ((ZEPhysXPhysicsBody*)PulleyInfo->Body1)->GetActor();
 				}
-				else PulleyDesc.actor[0] = NULL;
+				else 
+				{
+					PulleyDesc.actor[0] = NULL;
+				}
+
 				if (PulleyInfo->Body2)
 				{
-					PulleyDesc.actor[1] = ((ZEAegiaPhysicsBody*)PulleyInfo->Body2)->GetActor();
+					PulleyDesc.actor[1] = ((ZEPhysXPhysicsBody*)PulleyInfo->Body2)->GetActor();
 				}
-				else PulleyDesc.actor[1] = NULL;
-				if (Info.CollideBodies)PulleyDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				else 
+				{
+					PulleyDesc.actor[1] = NULL;
+				}
+
+				if (Info.CollideBodies)
+				{
+					PulleyDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				}
 				
 				//set anchor
 				if (PulleyInfo->UseGlobalAnchor)
@@ -584,7 +689,10 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 				PulleyDesc.ratio = PulleyInfo->Ratio;
 				PulleyDesc.stiffness = PulleyInfo->Stiffness;
 
-				if (PulleyInfo->IsRigid)PulleyDesc.flags |= NX_PJF_IS_RIGID;
+				if (PulleyInfo->IsRigid)
+				{
+					PulleyDesc.flags |= NX_PJF_IS_RIGID;
+				}
 
 				if (PulleyInfo->HasMotor)
 				{
@@ -615,15 +723,26 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 				NxD6JointDesc FreeDesc;
 				if (FreeInfo->Body1)
 				{
-					FreeDesc.actor[0] = ((ZEAegiaPhysicsBody*)FreeInfo->Body1)->GetActor();
+					FreeDesc.actor[0] = ((ZEPhysXPhysicsBody*)FreeInfo->Body1)->GetActor();
 				}
-				else FreeDesc.actor[0] = NULL;
+				else 
+				{
+					FreeDesc.actor[0] = NULL;
+				}
+
 				if (FreeInfo->Body2)
 				{
-					FreeDesc.actor[1] = ((ZEAegiaPhysicsBody*)FreeInfo->Body2)->GetActor();
+					FreeDesc.actor[1] = ((ZEPhysXPhysicsBody*)FreeInfo->Body2)->GetActor();
 				}
-				else FreeDesc.actor[1] = NULL;
-				if (Info.CollideBodies)FreeDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				else
+				{
+					FreeDesc.actor[1] = NULL;
+				}
+
+				if (Info.CollideBodies)
+				{
+					FreeDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+				}
 				
 				//set anchor
 				if (FreeInfo->UseGlobalAnchor)
@@ -635,6 +754,7 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 					FreeDesc.localAnchor[0] = TONX(FreeInfo->LocalAnchor1);
 					FreeDesc.localAnchor[1] = TONX(FreeInfo->LocalAnchor2);
 				}
+
 				//set axis
 				if (FreeInfo->UseGlobalAxis)
 				{
@@ -828,17 +948,17 @@ void ZEAegiaPhysicsJoint::Initialize(ZEPhysicsJointInfo& Info)
 	}
 }
 
-void ZEAegiaPhysicsJoint::Deinitialize()
+void ZEPhysXPhysicsJoint::Deinitialize()
 {
-	if (Joint != NULL && ZEAegiaPhysicsWorld::getSingletonPtr() != NULL)
+	if (Joint != NULL && ZEPhysXPhysicsWorld::getSingletonPtr() != NULL)
 	{
-		ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
+		ZEPhysXPhysicsWorld* World = ZEPhysXPhysicsWorld::getSingletonPtr();
 		World->GetScene()->releaseJoint(*Joint);
 		Joint = NULL;
 	}
 }
 
-void ZEAegiaPhysicsJoint::SetJointMotor(float MotorForce, float MotorVelocity)
+void ZEPhysXPhysicsJoint::SetJointMotor(float MotorForce, float MotorVelocity)
 {
 	if (Joint->isRevoluteJoint())
 	{

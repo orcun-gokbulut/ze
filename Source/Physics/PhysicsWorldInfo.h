@@ -41,13 +41,13 @@ class ZEVector3;
 
 class ZEPhysicsWorldInfo
 {
-public:
-	ZEPhysicsWorldInfo();
-	~ZEPhysicsWorldInfo(){}
+	public:
+						ZEPhysicsWorldInfo();
+						~ZEPhysicsWorldInfo(){}
 
-	ZEVector3 Gravity;
-	bool ContiniousDetection;
-	bool DebugView;
+		ZEVector3		Gravity;
+		bool			ContiniousDetection;
+		bool			DebugView;
 };
 
 #endif

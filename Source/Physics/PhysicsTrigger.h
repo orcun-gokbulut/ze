@@ -41,14 +41,14 @@ class ZEPhysicsBody;
 
 class ZEPhysicsTrigger
 {
-protected:
-	ZEPhysicsTrigger(){}
-	virtual ~ZEPhysicsTrigger(){}
+	protected:
+									ZEPhysicsTrigger(){}
+		virtual						~ZEPhysicsTrigger(){}
 
-public:
-	virtual ZEPhysicsBody* GetTriggerBody() = 0;
-	virtual ZEPhysicsBody* GetOtherBody()   = 0;
-	virtual unsigned int   GetFlags()       = 0;
+	public:
+		virtual ZEPhysicsBody*		GetTriggerBody() = 0;
+		virtual ZEPhysicsBody*		GetOtherBody()   = 0;
+		virtual unsigned int		GetFlags()       = 0;
 };
 
 #endif

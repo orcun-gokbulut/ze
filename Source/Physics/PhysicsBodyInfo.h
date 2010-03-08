@@ -44,25 +44,17 @@ class ZEQuaternion;
 
 class ZEPhysicsBodyInfo
 {
-public:
-	ZEPhysicsBodyInfo();
-	virtual ~ZEPhysicsBodyInfo() 
-	{ 
-		/*for (int i=0;i<ShapeInfos.GetCount();i++)
-		{
-			delete ShapeInfos[i];
-			ShapeInfos[i] = NULL;
-		}*/
-		ShapeInfos.Clear();
-	}
+	public:
+											ZEPhysicsBodyInfo();
+		virtual								~ZEPhysicsBodyInfo() { ShapeInfos.Clear(); }
 
-	int Mass;
-	bool Kinematic;
-	float LinearDamp;
-	float AngularDamp;
-	ZEVector3 Position;
-	ZEQuaternion Orientation;
-	ZEArray<ZEPhysicsShapeInfo*> ShapeInfos;
+		float 								Mass;
+		bool								Kinematic;
+		float								LinearDamp;
+		float								AngularDamp;
+		ZEVector3							Position;
+		ZEQuaternion						Orientation;
+		ZEArray<ZEPhysicsShapeInfo*>		ShapeInfos;
 };
 
 #endif

@@ -39,22 +39,22 @@
 
 class ZEPhysicsCollisionMask
 {
-public:
-	ZEPhysicsCollisionMask();
-	~ZEPhysicsCollisionMask(){}
+	public:
+						ZEPhysicsCollisionMask();
+						~ZEPhysicsCollisionMask(){}
 
-	void Zero() { Mask1=Mask2=Mask3=Mask4=0; }
-	void Full() { Mask1=Mask2=Mask3=Mask4=0xFFFFFFFF; }
+		void			Zero() { Mask1=Mask2=Mask3=Mask4=0; }
+		void			Full() { Mask1=Mask2=Mask3=Mask4=0xFFFFFFFF; }
 
-	void SetMask1(unsigned int i) { Mask1 = (1<<i); }
-	void SetMask2(unsigned int i) { Mask2 = (1<<i); }
-	void SetMask3(unsigned int i) { Mask3 = (1<<i); }
-	void SetMask4(unsigned int i) { Mask4 = (1<<i); }
+		void			SetMask1(unsigned int i) { Mask1 = (1<<i); }
+		void			SetMask2(unsigned int i) { Mask2 = (1<<i); }
+		void			SetMask3(unsigned int i) { Mask3 = (1<<i); }
+		void			SetMask4(unsigned int i) { Mask4 = (1<<i); }
 
-	unsigned int Mask1;
-	unsigned int Mask2;
-	unsigned int Mask3;
-	unsigned int Mask4;
+		unsigned int	Mask1;
+		unsigned int	Mask2;
+		unsigned int	Mask3;
+		unsigned int	Mask4;
 };
 
 #endif

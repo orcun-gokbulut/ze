@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsModuleDescription.h
+ Zinek Engine - PhysXPhysicsCharacterController.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,24 +34,41 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AEGIA_PHYSICS_MODULE_DESCRIPTION_H__
-#define __ZE_AEGIA_PHYSICS_MODULE_DESCRIPTION_H__
+#ifndef	__ZE_PHYSX_PHYSICS_CHARACTER_CONTROLLER_H__
+#define __ZE_PHYSX_PHYSICS_CHARACTER_CONTROLLER_H__
 
-#include "Core/Module.h"
+class ZEPhysicsCharacterController;
+class ZEPhysicsCharacterControllerInfo;
+class ZEVector3;
+#include "NxController.h"
+#include "PhysXPhysicsUtility.h"
 
-class ZEAegiaPhysicsModuleDescription : public ZEModuleDescription
+class ZEPhysXPhysicsCharacterController : public ZEPhysicsCharacterController
 {
-	public:
-		ZEModuleType			GetType();
-		ZEModuleAttribute		GetAttributes();
-		int						GetRequiredZinekEngineVersion();
-		int						GetMajorVersion();
-		int						GetMinorVersion();
-		const char*				GetCopyright();
-		const char*				GetName();
-		ZEOptionSection*		GetOptions();
-		ZEModule*				CreateModuleInstance();
-		bool					CheckCompatible();
+	friend class			ZEPhysXPhysicsModule;
+
+private:
+							ZEPhysXPhysicsCharacterController();
+							~ZEPhysXPhysicsCharacterController();
+
+public:
+	void					Initialize(ZEPhysicsCharacterControllerInfo& Info);
+	void					Deinitialize();
+	void					Update(float ElapsedTime);
+	
+	ZEVector3				GetVelocity() { return Velocity; }
+	void					SetVelocity(ZEVector3 Vector) { Velocity = Vector; }
+
+	ZEVector3				GetPosition() { return TOZE(Controller->getDebugPosition()); }
+	void					SetPosition(const ZEVector3 Position) { Controller->setPosition(TONXE(Position)); }
+	bool					IsOnGround() { return (CollisionFlag & NXCC_COLLISION_DOWN); }
+	void					SetCollision(bool Collide) { Controller->setCollision(Collide); }
+
+private:
+	NxController*			Controller;
+	ZEVector3				Velocity;
+	NxU32					CollisionFlag;
+
 };
 
 #endif

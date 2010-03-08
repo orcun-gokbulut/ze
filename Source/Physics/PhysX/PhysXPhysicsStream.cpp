@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsStream.cpp
+ Zinek Engine - PhysXPhysicsStream.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,53 +34,53 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "NxPhysics.h"
-#include "AegiaPhysicsStream.h"
+#include "PhysXPhysicsStream.h"
 
-ZEAegiaPhysicsMemoryWriteBuffer::ZEAegiaPhysicsMemoryWriteBuffer() : currentSize(0), maxSize(0), data(NULL)
+ZEPhysXPhysicsMemoryWriteBuffer::ZEPhysXPhysicsMemoryWriteBuffer() : currentSize(0), maxSize(0), data(NULL)
 {
 }
 
-ZEAegiaPhysicsMemoryWriteBuffer::~ZEAegiaPhysicsMemoryWriteBuffer()
+ZEPhysXPhysicsMemoryWriteBuffer::~ZEPhysXPhysicsMemoryWriteBuffer()
 {
 	NX_DELETE_ARRAY(data);
 }
 
-void ZEAegiaPhysicsMemoryWriteBuffer::clear()
+void ZEPhysXPhysicsMemoryWriteBuffer::clear()
 {
 	currentSize = 0;
 }
 
-NxStream& ZEAegiaPhysicsMemoryWriteBuffer::storeByte(NxU8 b)
+NxStream& ZEPhysXPhysicsMemoryWriteBuffer::storeByte(NxU8 b)
 {
 	storeBuffer(&b, sizeof(NxU8));
 	return *this;
 }
 
-NxStream& ZEAegiaPhysicsMemoryWriteBuffer::storeWord(NxU16 w)
+NxStream& ZEPhysXPhysicsMemoryWriteBuffer::storeWord(NxU16 w)
 {
 	storeBuffer(&w, sizeof(NxU16));
 	return *this;
 }
 
-NxStream& ZEAegiaPhysicsMemoryWriteBuffer::storeDword(NxU32 d)
+NxStream& ZEPhysXPhysicsMemoryWriteBuffer::storeDword(NxU32 d)
 {
 	storeBuffer(&d, sizeof(NxU32));
 	return *this;
 }
 
-NxStream& ZEAegiaPhysicsMemoryWriteBuffer::storeFloat(NxReal f)
+NxStream& ZEPhysXPhysicsMemoryWriteBuffer::storeFloat(NxReal f)
 {
 	storeBuffer(&f, sizeof(NxReal));
 	return *this;
 }
 
-NxStream& ZEAegiaPhysicsMemoryWriteBuffer::storeDouble(NxF64 f)
+NxStream& ZEPhysXPhysicsMemoryWriteBuffer::storeDouble(NxF64 f)
 {
 	storeBuffer(&f, sizeof(NxF64));
 	return *this;
 }
 
-NxStream& ZEAegiaPhysicsMemoryWriteBuffer::storeBuffer(const void* buffer, NxU32 size)
+NxStream& ZEPhysXPhysicsMemoryWriteBuffer::storeBuffer(const void* buffer, NxU32 size)
 {
 	NxU32 expectedSize = currentSize + size;
 	if(expectedSize > maxSize)
@@ -102,16 +102,16 @@ NxStream& ZEAegiaPhysicsMemoryWriteBuffer::storeBuffer(const void* buffer, NxU32
 	return *this;
 }
 
-ZEAegiaPhysicsMemoryReadBuffer::ZEAegiaPhysicsMemoryReadBuffer(const NxU8* data) : buffer(data)
+ZEPhysXPhysicsMemoryReadBuffer::ZEPhysXPhysicsMemoryReadBuffer(const NxU8* data) : buffer(data)
 {
 }
 
-ZEAegiaPhysicsMemoryReadBuffer::~ZEAegiaPhysicsMemoryReadBuffer()
+ZEPhysXPhysicsMemoryReadBuffer::~ZEPhysXPhysicsMemoryReadBuffer()
 {
 	// We don't own the data => no delete
 }
 
-NxU8 ZEAegiaPhysicsMemoryReadBuffer::readByte() const
+NxU8 ZEPhysXPhysicsMemoryReadBuffer::readByte() const
 {
 	NxU8 b;
 	memcpy(&b, buffer, sizeof(NxU8));
@@ -119,7 +119,7 @@ NxU8 ZEAegiaPhysicsMemoryReadBuffer::readByte() const
 	return b;
 }
 
-NxU16 ZEAegiaPhysicsMemoryReadBuffer::readWord() const
+NxU16 ZEPhysXPhysicsMemoryReadBuffer::readWord() const
 {
 	NxU16 w;
 	memcpy(&w, buffer, sizeof(NxU16));
@@ -127,7 +127,7 @@ NxU16 ZEAegiaPhysicsMemoryReadBuffer::readWord() const
 	return w;
 }
 
-NxU32 ZEAegiaPhysicsMemoryReadBuffer::readDword() const
+NxU32 ZEPhysXPhysicsMemoryReadBuffer::readDword() const
 {
 	NxU32 d;
 	memcpy(&d, buffer, sizeof(NxU32));
@@ -135,7 +135,7 @@ NxU32 ZEAegiaPhysicsMemoryReadBuffer::readDword() const
 	return d;
 }
 
-float ZEAegiaPhysicsMemoryReadBuffer::readFloat() const
+float ZEPhysXPhysicsMemoryReadBuffer::readFloat() const
 {
 	float f;
 	memcpy(&f, buffer, sizeof(float));
@@ -143,7 +143,7 @@ float ZEAegiaPhysicsMemoryReadBuffer::readFloat() const
 	return f;
 }
 
-double ZEAegiaPhysicsMemoryReadBuffer::readDouble() const
+double ZEPhysXPhysicsMemoryReadBuffer::readDouble() const
 {
 	double f;
 	memcpy(&f, buffer, sizeof(double));
@@ -151,7 +151,7 @@ double ZEAegiaPhysicsMemoryReadBuffer::readDouble() const
 	return f;
 }
 
-void ZEAegiaPhysicsMemoryReadBuffer::readBuffer(void* dest, NxU32 size) const
+void ZEPhysXPhysicsMemoryReadBuffer::readBuffer(void* dest, NxU32 size) const
 {
 	memcpy(dest, buffer, size);
 	buffer += size;

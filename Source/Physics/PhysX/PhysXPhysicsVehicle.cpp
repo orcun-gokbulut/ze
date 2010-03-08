@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsVehicle.cpp
+ Zinek Engine - PhysXPhysicsVehicle.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,38 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "NxPhysics.h"
-#include "NxWheel.h"
+//#include "NxWheel.h"
 #include "ZEMath/Vector.h"
 #include "ZEMath/Quaternion.h"
 #include "Physics/PhysicsVehicle.h"
 #include "Physics/PhysicsVehicleInfo.h"
 #include "Physics/PhysicsBody.h"
-#include "Physics/AegiaPhysicsBody.h"
+#include "PhysXPhysicsBody.h"
 #include "Physics/PhysicsWorld.h"
-#include "Physics/AegiaPhysicsWorld.h"
-#include "Physics/AegiaPhysicsUtility.h"
-#include "Physics/AegiaPhysicsVehicle.h"
-
-ZEAegiaPhysicsVehicle::ZEAegiaPhysicsVehicle() : Body(NULL)
+#include "PhysXPhysicsWorld.h"
+#include "PhysXPhysicsUtility.h"
+#include "PhysXPhysicsVehicle.h"
+/*
+ZEPhysXPhysicsVehicle::ZEPhysXPhysicsVehicle() : Body(NULL)
 {
 	Wheels.Clear();
 	Contacts.Clear();
 	RollValues.Clear();
 }
 
-ZEAegiaPhysicsVehicle::~ZEAegiaPhysicsVehicle()
+ZEPhysXPhysicsVehicle::~ZEPhysXPhysicsVehicle()
 {
 	Deinitialize();
 }
 
-void ZEAegiaPhysicsVehicle::Initialize(ZEPhysicsVehicleInfo& Info)
+void ZEPhysXPhysicsVehicle::Initialize(ZEPhysicsVehicleInfo& Info)
 {
-	ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
+	ZEPhysXPhysicsWorld* World = ZEPhysXPhysicsWorld::getSingletonPtr();
 
 	if (World != NULL && Info.Body != NULL)
 	{
 		Body = Info.Body;
-		ZEAegiaPhysicsBody* ABody = (ZEAegiaPhysicsBody*)Body;
+		ZEPhysXPhysicsBody* ABody = (ZEPhysXPhysicsBody*)Body;
 
 		for (int i=0;i<Info.WheelInfo.GetCount();i++)
 		{
@@ -100,15 +100,21 @@ void ZEAegiaPhysicsVehicle::Initialize(ZEPhysicsVehicleInfo& Info)
 
 			//Wheel
 			wheelDesc.wheelFlags = NX_WF_USE_WHEELSHAPE | NX_WF_BUILD_LOWER_HALF;
-			if (Atr.Accelerated)wheelDesc.wheelFlags |= NX_WF_ACCELERATED;
-			if (Atr.Steerable)wheelDesc.wheelFlags |= NX_WF_STEERABLE_INPUT;
+			if (Atr.Accelerated)
+			{
+				wheelDesc.wheelFlags |= NX_WF_ACCELERATED;
+			}
+			if (Atr.Steerable)
+			{
+				wheelDesc.wheelFlags |= NX_WF_STEERABLE_INPUT;
+			}
 			wheelDesc.position = TONX(Atr.Position);
 			wheelShapeDesc.localPose.t = wheelDesc.position;
 			if (wheelShapeDesc.isValid())
 			{
 				NxWheelShape* WShape = static_cast<NxWheelShape *>(ABody->GetActor()->createShape(wheelShapeDesc));
 				ZEPhysicsCollisionMask FullMask;FullMask.Full();
-				WShape->setGroupsMask(ZEAegiaPhysicsUtility::toNX(FullMask));
+				WShape->setGroupsMask(ZEPhysXPhysicsUtility::toNX(FullMask));
 				WShape->setWheelFlags(wheelDesc.wheelFlags);
 				Wheels.Add(WShape);
 				//add contact data
@@ -124,15 +130,15 @@ void ZEAegiaPhysicsVehicle::Initialize(ZEPhysicsVehicleInfo& Info)
 	}
 }
 
-void ZEAegiaPhysicsVehicle::Deinitialize()
+void ZEPhysXPhysicsVehicle::Deinitialize()
 {
-	ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
+	ZEPhysXPhysicsWorld* World = ZEPhysXPhysicsWorld::getSingletonPtr();
 
 	if (World != NULL)
 	{
 		if (Body != NULL)
 		{
-			ZEAegiaPhysicsBody* ABody = (ZEAegiaPhysicsBody*)Body;
+			ZEPhysXPhysicsBody* ABody = (ZEPhysXPhysicsBody*)Body;
 			for (int i=0;i<Wheels.GetCount();i++)
 			{
 				ABody->GetActor()->releaseShape(*Wheels[i]);
@@ -145,7 +151,7 @@ void ZEAegiaPhysicsVehicle::Deinitialize()
 	}
 }
 
-void ZEAegiaPhysicsVehicle::Update(float ElapsedTime)
+void ZEPhysXPhysicsVehicle::Update(float ElapsedTime)
 {
 	for (int i=0;i<Wheels.GetCount();i++)
 	{
@@ -154,25 +160,29 @@ void ZEAegiaPhysicsVehicle::Update(float ElapsedTime)
 	}
 }
 
-void ZEAegiaPhysicsVehicle::SetSteeringAngle(float Angle)
+void ZEPhysXPhysicsVehicle::SetSteeringAngle(float Angle)
 {
 	for (int i=0;i<Wheels.GetCount();i++)
 	{
 		if (Wheels[i]->getWheelFlags() & NX_WF_STEERABLE_INPUT)
+		{
 			Wheels[i]->setSteerAngle(Angle);
+		}
 	}
 }
 
-void ZEAegiaPhysicsVehicle::SetMotorTorque(float Torque)
+void ZEPhysXPhysicsVehicle::SetMotorTorque(float Torque)
 {
 	for (int i=0;i<Wheels.GetCount();i++)
 	{
 		if (Wheels[i]->getWheelFlags() & NX_WF_ACCELERATED)
+		{
 			Wheels[i]->setMotorTorque(Torque);
+		}
 	}
 }
 
-void ZEAegiaPhysicsVehicle::SetBrakeTorque(float Torque)
+void ZEPhysXPhysicsVehicle::SetBrakeTorque(float Torque)
 {
 	for (int i=0;i<Wheels.GetCount();i++)
 	{
@@ -180,14 +190,14 @@ void ZEAegiaPhysicsVehicle::SetBrakeTorque(float Torque)
 	}
 }
 
-ZEVector3 ZEAegiaPhysicsVehicle::GetWheelPosition(int Index)
+ZEVector3 ZEPhysXPhysicsVehicle::GetWheelPosition(int Index)
 {
 	NxVec3 Pos = Wheels[Index]->getGlobalPosition();
 	Pos.y -= Contacts[Index].contactPosition - Wheels[Index]->getRadius();
 	return TOZE(Pos);
 }
 
-ZEQuaternion ZEAegiaPhysicsVehicle::GetWheelOrientation(int Index)
+ZEQuaternion ZEPhysXPhysicsVehicle::GetWheelOrientation(int Index)
 {
 	ZEQuaternion QRet,QBody,QWheel;
 	QBody = Body->GetOrientation();
@@ -197,12 +207,12 @@ ZEQuaternion ZEAegiaPhysicsVehicle::GetWheelOrientation(int Index)
 	return QRet;
 }
 
-float ZEAegiaPhysicsVehicle::GetWheelSpeed(int Index)
+float ZEPhysXPhysicsVehicle::GetWheelSpeed(int Index)
 {
 	return Wheels[Index]->getAxleSpeed();
 }
 
-float ZEAegiaPhysicsVehicle::GetAverageWheelSpeed()
+float ZEPhysXPhysicsVehicle::GetAverageWheelSpeed()
 {
 	float Ret = 0;
 	for (int i=0;i<Wheels.GetCount();i++)
@@ -210,4 +220,4 @@ float ZEAegiaPhysicsVehicle::GetAverageWheelSpeed()
 		Ret += Wheels[i]->getAxleSpeed();
 	}
 	return Ret / Wheels.GetCount();
-}
+}*/

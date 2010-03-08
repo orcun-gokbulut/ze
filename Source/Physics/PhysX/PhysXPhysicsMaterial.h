@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsUtility.h
+ Zinek Engine - PhysXPhysicsMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,73 +34,22 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AEGIA_PHYSICS_UTILITY_H__
-#define __ZE_AEGIA_PHYSICS_UTILITY_H__
+#ifndef	__ZE_PHYSX_PHYSICS_MATERIAL_H__
+#define __ZE_PHYSX_PHYSICS_MATERIAL_H__
 
-#include "NxPhysics.h"
-#include "NxExtended.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "Physics/PhysicsCollisionMask.h"
+class ZEPhysicsMaterial;
 
-#define TOZE  ZEAegiaPhysicsUtility::toZE
-#define TONX  ZEAegiaPhysicsUtility::toNX
-#define TONXE ZEAegiaPhysicsUtility::toNXE
-
-class ZEAegiaPhysicsUtility
+class ZEPhysXPhysicsMaterial : public ZEPhysicsMaterial
 {
+	friend class		ZEPhysXPhysicsModule;
+
+private:
+						ZEPhysXPhysicsMaterial();
+						~ZEPhysXPhysicsMaterial();
+
 public:
-	static ZEVector3 toZE(const NxVec3 &vec)
-	{
-		return ZEVector3(vec.x, vec.y, vec.z);
-	}
-
-	static ZEVector3 toZE(const NxExtendedVec3 &vec)
-	{
-		return ZEVector3(vec.x, vec.y, vec.z);
-	}
-
-	static NxVec3 toNX(const ZEVector3 &vec)
-	{
-		return NxVec3(vec.x, vec.y, vec.z);
-	}
-
-	static NxExtendedVec3 toNXE(const ZEVector3 &vec)
-	{
-		return NxExtendedVec3(vec.x, vec.y, vec.z);
-	}
-
-	static ZEQuaternion toZE(const NxQuat &quat)
-	{
-		return ZEQuaternion(quat.w, quat.x, quat.y, quat.z);
-	}
-
-	static NxQuat toNX(const ZEQuaternion &quat)//private quat. cons.
-	{
-		NxQuat qt;
-		qt.setWXYZ(quat.w,quat.x,quat.y,quat.z);
-		return qt;
-	}
-
-	static ZEPhysicsCollisionMask toZE(NxGroupsMask mask)
-	{
-		ZEPhysicsCollisionMask ret;
-		ret.Mask1 = mask.bits0;
-		ret.Mask2 = mask.bits1;
-		ret.Mask3 = mask.bits2;
-		ret.Mask4 = mask.bits3;
-		return ret;
-	}
-
-	static NxGroupsMask toNX(ZEPhysicsCollisionMask mask)
-	{
-		NxGroupsMask ret;
-		ret.bits0 = mask.Mask1;
-		ret.bits1 = mask.Mask2;
-		ret.bits2 = mask.Mask3;
-		ret.bits3 = mask.Mask4;
-		return ret;
-	}
+	void				Initialize(float Friction, float Restitution);
+	void				Deinitialize();
 };
 
 #endif

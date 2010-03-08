@@ -41,77 +41,77 @@ class ZEPhysicsJointInfo;
 
 class ZEPhysicsFreeJointInfo : public ZEPhysicsJointInfo
 {
-public:
-	enum ZEPhysicsFreeJointMotion
-	{
-		ZE_PJM_FREE,
-		ZE_PJM_LIMITED,
-		ZE_PJM_LOCKED
-	};
+	public:
+		enum ZEPhysicsFreeJointMotion
+		{
+			ZE_PJM_FREE,
+			ZE_PJM_LIMITED,
+			ZE_PJM_LOCKED
+		};
 
-	enum ZEPhysicsFreeJointMotorTarget
-	{
-		ZE_PJMT_POSITION,
-		ZE_PJMT_VELOCITY
-	};
+		enum ZEPhysicsFreeJointMotorTarget
+		{
+			ZE_PJMT_POSITION,
+			ZE_PJMT_VELOCITY
+		};
 
-	ZEPhysicsFreeJointInfo();
-	~ZEPhysicsFreeJointInfo(){}
-	ZEPhysicsJointType GetType() { return ZEPhysicsJointInfo::ZE_PJT_FREE; }
+										ZEPhysicsFreeJointInfo();
+										~ZEPhysicsFreeJointInfo(){}
+		ZEPhysicsJointType				GetType() { return ZEPhysicsJointInfo::ZE_PJT_FREE; }
 
-	ZEPhysicsFreeJointMotion XMotion;
-	ZEPhysicsFreeJointMotion YMotion;
-	ZEPhysicsFreeJointMotion ZMotion;
+		ZEPhysicsFreeJointMotion		XMotion;
+		ZEPhysicsFreeJointMotion		YMotion;
+		ZEPhysicsFreeJointMotion		ZMotion;
 
-	ZEPhysicsFreeJointMotion TwistMotion;
-	ZEPhysicsFreeJointMotion Swing1Motion;
-	ZEPhysicsFreeJointMotion Swing2Motion;
+		ZEPhysicsFreeJointMotion		TwistMotion;
+		ZEPhysicsFreeJointMotion		Swing1Motion;
+		ZEPhysicsFreeJointMotion		Swing2Motion;
 
-	float LinearLimitValue;
-	float LinearLimitRestitution;
-	float LinearLimitSpring;
-	float LinearLimitDamper;
+		float							LinearLimitValue;
+		float							LinearLimitRestitution;
+		float							LinearLimitSpring;
+		float							LinearLimitDamper;
 
-	float TwistLimitLowValue;
-	float TwistLimitHighValue;
-	float TwistLimitRestitution;
-	float TwistLimitSpring;
-	float TwistLimitDamper;
+		float							TwistLimitLowValue;
+		float							TwistLimitHighValue;
+		float							TwistLimitRestitution;
+		float							TwistLimitSpring;
+		float							TwistLimitDamper;
 
-	float Swing1LimitValue;
-	float Swing1LimitRestitution;
-	float Swing1LimitSpring;
-	float Swing1LimitDamper;
+		float							Swing1LimitValue;
+		float							Swing1LimitRestitution;
+		float							Swing1LimitSpring;
+		float							Swing1LimitDamper;
 
-	float Swing2LimitValue;
-	float Swing2LimitRestitution;
-	float Swing2LimitSpring;
-	float Swing2LimitDamper;
+		float							Swing2LimitValue;
+		float							Swing2LimitRestitution;
+		float							Swing2LimitSpring;
+		float							Swing2LimitDamper;
 
-	ZEVector3 LinearMotorPosition;
-	ZEVector3 LinearMotorVelocity;
+		ZEVector3						LinearMotorPosition;
+		ZEVector3						LinearMotorVelocity;
 
-	ZEPhysicsFreeJointMotorTarget LinearXMotor;
-	float LinearXMotorForce;
-	float LinearXMotorSpring;
-	float LinearXMotorDamper;
+		ZEPhysicsFreeJointMotorTarget	LinearXMotor;
+		float							LinearXMotorForce;
+		float							LinearXMotorSpring;
+		float							LinearXMotorDamper;
 
-	ZEPhysicsFreeJointMotorTarget LinearYMotor;
-	float LinearYMotorForce;
-	float LinearYMotorSpring;
-	float LinearYMotorDamper;
+		ZEPhysicsFreeJointMotorTarget	LinearYMotor;
+		float							LinearYMotorForce;
+		float							LinearYMotorSpring;
+		float							LinearYMotorDamper;
 
-	ZEPhysicsFreeJointMotorTarget LinearZMotor;
-	float LinearZMotorForce;
-	float LinearZMotorSpring;
-	float LinearZMotorDamper;
+		ZEPhysicsFreeJointMotorTarget	LinearZMotor;
+		float							LinearZMotorForce;
+		float							LinearZMotorSpring;
+		float							LinearZMotorDamper;
 
-	ZEQuaternion AngularMotorOrientation;
-	ZEVector3 AngularMotorVelocity;
-	ZEPhysicsFreeJointMotorTarget AngularMotor;
-	float AngularMotorForce;
-	float AngularMotorSpring;
-	float AngularMotorDamper;
+		ZEQuaternion					AngularMotorOrientation;
+		ZEVector3						AngularMotorVelocity;
+		ZEPhysicsFreeJointMotorTarget	AngularMotor;
+		float							AngularMotorForce;
+		float							AngularMotorSpring;
+		float							AngularMotorDamper;
 };
 
 #endif

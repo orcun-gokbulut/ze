@@ -41,10 +41,10 @@ class ZEPhysicsJointInfo;
 
 class ZEPhysicsPointOnLineJointInfo : public ZEPhysicsJointInfo
 {
-public:
-	ZEPhysicsPointOnLineJointInfo();
-	~ZEPhysicsPointOnLineJointInfo(){}
-	ZEPhysicsJointType GetType() { return ZEPhysicsJointInfo::ZE_PJT_POINTONLINE; }
+	public:
+								ZEPhysicsPointOnLineJointInfo();
+								~ZEPhysicsPointOnLineJointInfo(){}
+		ZEPhysicsJointType		GetType() { return ZEPhysicsJointInfo::ZE_PJT_POINTONLINE; }
 };
 
 #endif

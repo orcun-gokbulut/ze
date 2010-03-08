@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsVehicle.h
+ Zinek Engine - PhysXPhysicsCollision.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,47 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_AEGIA_PHYSICS_VEHICLE_JOINT_H__
-#define __ZE_AEGIA_PHYSICS_VEHICLE_JOINT_H__
+#include "ZEMath/Vector.h"
+#include "Physics/PhysicsBody.h"
+#include "Physics/PhysicsCollision.h"
+#include "PhysXPhysicsCollision.h"
 
-class ZEPhysicsVehicle;
-class ZEPhysicsVehicleInfo;
-class ZEVector3;
-class ZEQuaternion;
-#include "ZEDS/Array.h"
-
-class ZEAegiaPhysicsVehicle : public ZEPhysicsVehicle
+ZEPhysXPhysicsCollision::ZEPhysXPhysicsCollision(ZEPhysicsBody* pFirst,ZEPhysicsBody* pSecond,ZEVector3 pPoint,ZEVector3 pNormal, float pPower) : First(pFirst), Second(pSecond), Point(pPoint), Normal(pNormal), Power(pPower)
 {
-	friend class ZEAegiaPhysicsModule;
+}
 
-private:
-	ZEAegiaPhysicsVehicle();
-	~ZEAegiaPhysicsVehicle();
-
-public:
-	void Initialize(ZEPhysicsVehicleInfo& Info);
-	void Deinitialize();
-	void Update(float ElapsedTime);
-
-	ZEPhysicsBody* GetBody()      { return Body; }
-	int GetWheelCount()           { return Wheels.GetCount(); }
-	ZEVector3 GetLinearVelocity() { return Body->GetLinearVelocity(); }
-
-	void SetSteeringAngle(float Angle);
-	void SetMotorTorque(float Torque);
-	void SetBrakeTorque(float Torque);
-
-	ZEVector3 GetWheelPosition(int Index);
-	ZEQuaternion GetWheelOrientation(int Index);
-	float GetWheelSpeed(int Index);
-	float GetAverageWheelSpeed();
-
-private:
-	ZEPhysicsBody* Body;
-	ZEArray<NxWheelShape*> Wheels;
-	ZEArray<NxWheelContactData> Contacts;
-	ZEArray<float> RollValues;
-};
-
-#endif
+ZEPhysXPhysicsCollision::~ZEPhysXPhysicsCollision()
+{
+	First = 0;
+	Second = 0;
+}

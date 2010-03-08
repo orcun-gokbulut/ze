@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsModuleDescription.cpp
+ Zinek Engine - PhysXPhysicsTrigger.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,54 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "AegiaPhysicsModuleDescription.h"
+#pragma once
+#ifndef	__ZE_PHYSX_PHYSICS_TRIGGER_H__
+#define __ZE_PHYSX_PHYSICS_TRIGGER_H__
 
-ZEModuleType ZEAegiaPhysicsModuleDescription::GetType()
-{
-	return ZE_MT_PHYSICS;
-}
+class ZEPhysicsTrigger;
+class ZEPhysicsBody;
 
-ZEModuleAttribute ZEAegiaPhysicsModuleDescription::GetAttributes()
+class ZEPhysXPhysicsTrigger : public ZEPhysicsTrigger
 {
-	return ZE_MA_INTERNAL;
-}
+	friend class		ZEPhysXPhysicsReport;
 
-int ZEAegiaPhysicsModuleDescription::GetRequiredZinekEngineVersion()
-{
-	return 0;
-}
+private:
+						ZEPhysXPhysicsTrigger(ZEPhysicsBody* First,ZEPhysicsBody* Second, unsigned int Flag);
+						~ZEPhysXPhysicsTrigger();
 
-int ZEAegiaPhysicsModuleDescription::GetMajorVersion()
-{
-	return 0;
-}
+public:
+	ZEPhysicsBody*		GetTriggerBody() { return Trigger; }
+	ZEPhysicsBody*		GetOtherBody()   { return Other; }
+	unsigned int		GetFlags()       { return Flags; }
 
-int ZEAegiaPhysicsModuleDescription::GetMinorVersion()
-{
-	return 1;
-}
+private:
+	ZEPhysicsBody*		Trigger;
+	ZEPhysicsBody*		Other;
+	unsigned int		Flags;
+};
 
-const char* ZEAegiaPhysicsModuleDescription::GetCopyright()
-{
-	return "Copyright (c) 2007-2009, Zinek Engine Group. All rights reserved.";
-}
-
-const char* ZEAegiaPhysicsModuleDescription::GetName()
-{
-	return "Aegia";
-}
-
-ZEOptionSection* ZEAegiaPhysicsModuleDescription::GetOptions()
-{
-	return 0;
-}
-
-ZEModule* ZEAegiaPhysicsModuleDescription::CreateModuleInstance()
-{
-	return 0;//new ZEAegiaPhysicsModule();
-}
-
-bool ZEAegiaPhysicsModuleDescription::CheckCompatible()
-{
-	return true;
-}
+#endif

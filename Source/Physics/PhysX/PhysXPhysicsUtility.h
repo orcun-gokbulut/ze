@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsModule.h
+ Zinek Engine - PhysXPhysicsUtility.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,55 +34,73 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AEGIA_PHYSICS_MODULE_H__
-#define __ZE_AEGIA_PHYSICS_MODULE_H__
+#ifndef	__ZE_PHYSX_PHYSICS_UTILITY_H__
+#define __ZE_PHYSX_PHYSICS_UTILITY_H__
 
-#pragma comment(lib, "PhysXLoader.lib")
-#pragma comment(lib, "NxCooking.lib")
-#pragma comment(lib, "NxCharacter.lib")
+#include "NxPhysics.h"
+#include "NxExtended.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "Physics/PhysicsCollisionMask.h"
 
-class ZEPhysicsModule;
-class ZEModuleDescription;
-class ZEPhysicsWorld;
-class ZEPhysicsBody;
-class ZEPhysicsJoint;
-class ZEPhysicsVehicle;
-class ZEPhysicsMaterial;
-class ZEPhysicsCharacterController;
-class ZEVector3;
-class ZEPhysicsCollisionMask;
+#define TOZE  ZEPhysXPhysicsUtility::toZE
+#define TONX  ZEPhysXPhysicsUtility::toNX
+#define TONXE ZEPhysXPhysicsUtility::toNXE
 
-class ZEAegiaPhysicsModule: public ZEPhysicsModule
-{	
+class ZEPhysXPhysicsUtility
+{
 public:
-	//module
-	bool Initialize();
-	void Deinitialize();
-	
-	//physics module
-	ZEPhysicsWorld*               CreateWorld();
-    ZEPhysicsBody*                CreateBody();
-	ZEPhysicsJoint*	              CreateJoint();
-	ZEPhysicsVehicle*             CreateVehicle();
-	ZEPhysicsMaterial*            CreateMaterial();
-	ZEPhysicsCharacterController* CreateController();
+	static ZEVector3 toZE(const NxVec3 &vec)
+	{
+		return ZEVector3(vec.x, vec.y, vec.z);
+	}
 
-	bool DestroyWorld(ZEPhysicsWorld* World);
-	bool DestroyBody(ZEPhysicsBody* Body);
-	bool DestroyJoint(ZEPhysicsJoint* Joint);
-	bool DestroyVehicle(ZEPhysicsVehicle*);
-	bool DestroyMaterial(ZEPhysicsMaterial* Material);
-	bool DestroyController(ZEPhysicsCharacterController* Controller);
+	static ZEVector3 toZE(const NxExtendedVec3 &vec)
+	{
+		return ZEVector3(vec.x, vec.y, vec.z);
+	}
 
-	bool CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
-	bool CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEPhysicsBody** Contact, ZEPhysicsCollisionMask Mask);
+	static NxVec3 toNX(const ZEVector3 &vec)
+	{
+		return NxVec3(vec.x, vec.y, vec.z);
+	}
 
-	//gets & sets
-	bool IsEnabled() { return Enabled; }
-	void SetEnabled(bool Enabled) { this->Enabled = Enabled; }
-	ZEModuleDescription* GetModuleDescription();
+	static NxExtendedVec3 toNXE(const ZEVector3 &vec)
+	{
+		return NxExtendedVec3(vec.x, vec.y, vec.z);
+	}
 
-private:
-	bool Enabled;
+	static ZEQuaternion toZE(const NxQuat &quat)
+	{
+		return ZEQuaternion(quat.w, quat.x, quat.y, quat.z);
+	}
+
+	static NxQuat toNX(const ZEQuaternion &quat)//private quat. cons.
+	{
+		NxQuat qt;
+		qt.setWXYZ(quat.w,quat.x,quat.y,quat.z);
+		return qt;
+	}
+
+	static ZEPhysicsCollisionMask toZE(NxGroupsMask mask)
+	{
+		ZEPhysicsCollisionMask ret;
+		ret.Mask1 = mask.bits0;
+		ret.Mask2 = mask.bits1;
+		ret.Mask3 = mask.bits2;
+		ret.Mask4 = mask.bits3;
+		return ret;
+	}
+
+	static NxGroupsMask toNX(ZEPhysicsCollisionMask mask)
+	{
+		NxGroupsMask ret;
+		ret.bits0 = mask.Mask1;
+		ret.bits1 = mask.Mask2;
+		ret.bits2 = mask.Mask3;
+		ret.bits3 = mask.Mask4;
+		return ret;
+	}
 };
+
 #endif

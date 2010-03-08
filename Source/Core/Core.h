@@ -109,7 +109,7 @@ class ZECore
 		ZEGraphicsModule*				Graphics;
 		ZESoundModule*					Sound;
 		ZEInputModule*					Input;
-		void*							Physics;
+		ZEPhysicsModule*				Physics;
 		ZEGame*							Game;
 		ZEModule*						Network;
 
@@ -140,7 +140,7 @@ class ZECore
 		ZEInputModule*					GetInputModule();
 
 		bool							SetPhysicsModule(ZEModule* Module);
-		void*							GetPhysicsModule();
+		ZEPhysicsModule*				GetPhysicsModule();
 
 		bool							SetNetworkModule(ZEModule* Module);
 		ZEModule*						GetNetworkModule();

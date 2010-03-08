@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsWorld.h
+ Zinek Engine - PhysXPhysicsWorld.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AEGIA_PHYSICS_WORLD_H__
-#define __ZE_AEGIA_PHYSICS_WORLD_H__
+#ifndef	__ZE_PHYSX_PHYSICS_WORLD_H__
+#define __ZE_PHYSX_PHYSICS_WORLD_H__
 
 class ZEPhysicsWorld;
 class ZEPhysicsWorldInfo;
@@ -47,12 +47,11 @@ class NxScene;
 class NxCookingInterface;
 class NxControllerManager;
 class ZECanvasBrush;
-#include "Singleton.h"
 
 class NxContactPair;
 #include "NxUserContactReport.h"
-#include "AegiaPhysicsReport.h"
-#include "AegiaPhysicsUtility.h"
+#include "PhysXPhysicsReport.h"
+#include "PhysXPhysicsUtility.h"
 
 class ControllerAllocator : public NxUserAllocator 
 {
@@ -63,46 +62,45 @@ public:
 	virtual void    free(void* memory)                                          { ::free(memory); }
 };
 
-class ZEAegiaPhysicsWorld : public ZEPhysicsWorld, public ZESingleton<ZEAegiaPhysicsWorld>
+class ZEPhysXPhysicsWorld : public ZEPhysicsWorld
 {
-	friend class ZEAegiaPhysicsReport;
-	friend class ZEAegiaPhysicsModule;
+	friend class					ZEPhysXPhysicsReport;
+	friend class					ZEPhysXPhysicsModule;
 
 private:
-	ZEAegiaPhysicsWorld();
-	~ZEAegiaPhysicsWorld();
+									ZEPhysXPhysicsWorld();
+									~ZEPhysXPhysicsWorld();
 public:
-	static ZEAegiaPhysicsWorld& getSingleton();
-	static ZEAegiaPhysicsWorld* getSingletonPtr();
-
-	void Initialize(ZEPhysicsWorldInfo& Info);
-	void Deinitialize();
-	void Update(const float ElapsedTime);
-	void ShowDebugView(bool Show);
+	static ZEPhysXPhysicsWorld*		getSingletonPtr();
+	void							Initialize(ZEPhysicsWorldInfo& Info);
+	void							Deinitialize();
+	void							Update(const float ElapsedTime);
+	void							ShowDebugView(bool Show);
 
 
 	//gets & sets
-	NxPhysicsSDK* GetSdk() { return PhysicsSdk; }
-	NxScene* GetScene() { return PhysicsScene; }
-	NxCookingInterface* GetCooker() { return Cooker; }
-	NxControllerManager* GetControllerManager() { return ControllerManager; }
-	void SetCollisionCallback(CollisionDelegate Function) { DelegateC = Function; }
-	void SetTriggerCallback(TriggerDelegate Function) { DelegateT = Function; }
+	NxPhysicsSDK*					GetSdk() { return PhysicsSdk; }
+	NxScene*						GetScene() { return PhysicsScene; }
+	NxCookingInterface*				GetCooker() { return Cooker; }
+	NxControllerManager*			GetControllerManager() { return ControllerManager; }
+	void							SetCollisionCallback(CollisionDelegate Function) { DelegateC = Function; }
+	void							SetTriggerCallback(TriggerDelegate Function) { DelegateT = Function; }
 	
-	ZEVector3 GetGravity() { NxVec3 v;PhysicsScene->getGravity(v);return TOZE(v); }
-	void SetGravity(ZEVector3 Vector) { PhysicsScene->setGravity(TONX(Vector)); }
+	ZEVector3						GetGravity() { NxVec3 v;PhysicsScene->getGravity(v);return TOZE(v); }
+	void							SetGravity(ZEVector3 Vector) { PhysicsScene->setGravity(TONX(Vector)); }
 
 private:
-	NxPhysicsSDK* PhysicsSdk;
-	NxScene*      PhysicsScene;
-	NxCookingInterface* Cooker;
-	NxControllerManager* ControllerManager;
-	ControllerAllocator* ControllerAlloc;
-	ZEAegiaPhysicsReport Report;
-	CollisionDelegate DelegateC;
-	TriggerDelegate DelegateT;
-	ZECanvasBrush* Debugger;
-	bool DebugView;
+	static ZEPhysXPhysicsWorld*		ms_Singleton;
+	NxPhysicsSDK*					PhysicsSdk;
+	NxScene*						PhysicsScene;
+	NxCookingInterface*				Cooker;
+	NxControllerManager*			ControllerManager;
+	ControllerAllocator*			ControllerAlloc;
+	ZEPhysXPhysicsReport			Report;
+	CollisionDelegate				DelegateC;
+	TriggerDelegate					DelegateT;
+	ZECanvasBrush*					Debugger;
+	bool							DebugView;
 };
 
 #endif

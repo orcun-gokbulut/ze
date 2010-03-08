@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsStream.h
+ Zinek Engine - PhysXPhysicsModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,58 +34,57 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AEGIA_PHYSICS_STREAM_H__
-#define __ZE_AEGIA_PHYSICS_STREAM_H__
+#ifndef	__ZE_PHYSX_PHYSICS_MODULE_H__
+#define __ZE_PHYSX_PHYSICS_MODULE_H__
 
-#include "NxStream.h"
+#pragma comment(lib, "PhysXLoader.lib")
+#pragma comment(lib, "NxCooking.lib")
+#pragma comment(lib, "NxCharacter.lib")
 
-class ZEAegiaPhysicsMemoryWriteBuffer : public NxStream
-{
+class ZEPhysicsModule;
+class ZEModuleDescription;
+class ZEPhysicsWorld;
+class ZEPhysicsBody;
+class ZEPhysicsJoint;
+class ZEPhysicsVehicle;
+class ZEPhysicsMaterial;
+class ZEPhysicsCharacterController;
+class ZEVector3;
+class ZEPhysicsCollisionMask;
+
+class ZEPhysXPhysicsModule: public ZEPhysicsModule
+{	
 public:
-	ZEAegiaPhysicsMemoryWriteBuffer();
-	virtual ~ZEAegiaPhysicsMemoryWriteBuffer();
-	void clear();
+	//module
+	bool							Initialize();
+	void							Deinitialize();
+	
+	//physics module
+	ZEPhysicsWorld*					CreateWorld();
+    ZEPhysicsBody*					CreateBody();
+	ZEPhysicsJoint*					CreateJoint();
+	ZEPhysicsVehicle*				CreateVehicle();
+	ZEPhysicsMaterial*				CreateMaterial();
+	ZEPhysicsCharacterController*	CreateController();
 
-	virtual NxU8   readByte()							const	{ NX_ASSERT(0);	return 0;	}
-	virtual NxU16  readWord()							const	{ NX_ASSERT(0);	return 0;	}
-	virtual NxU32  readDword()							const	{ NX_ASSERT(0);	return 0;	}
-	virtual float  readFloat()							const	{ NX_ASSERT(0);	return 0.0f;}
-	virtual double readDouble()							const	{ NX_ASSERT(0);	return 0.0;	}
-	virtual void   readBuffer(void* buffer, NxU32 size)	const	{ NX_ASSERT(0);				}
+	bool							DestroyWorld(ZEPhysicsWorld* World);
+	bool							DestroyBody(ZEPhysicsBody* Body);
+	bool							DestroyJoint(ZEPhysicsJoint* Joint);
+	bool							DestroyVehicle(ZEPhysicsVehicle*);
+	bool							DestroyMaterial(ZEPhysicsMaterial* Material);
+	bool							DestroyController(ZEPhysicsCharacterController* Controller);
 
-	virtual NxStream& storeByte(NxU8 b);
-	virtual NxStream& storeWord(NxU16 w);
-	virtual NxStream& storeDword(NxU32 d);
-	virtual NxStream& storeFloat(NxReal f);
-	virtual NxStream& storeDouble(NxF64 f);
-	virtual NxStream& storeBuffer(const void* buffer, NxU32 size);
+	bool							CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
+	bool							CastRay(ZEVector3 Origin, ZEVector3 Direction, ZEPhysicsBody** Contact, ZEPhysicsCollisionMask Mask);
+	bool							BoxSweep(ZEVector3 Center, ZEVector3 Dimensions, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
+	bool							CapsuleSweep(ZEVector3 Center, float Radius, ZEVector3 Motion, ZEVector3& Point, ZEPhysicsCollisionMask Mask);
+	//gets & sets
+	bool							IsEnabled() { return Enabled; }
+	void							SetEnabled(bool Enabled) { this->Enabled = Enabled; }
+	ZEModuleDescription*			GetModuleDescription();
 
-	NxU32 currentSize;
-	NxU32 maxSize;
-	NxU8* data;
+private:
+	bool							Enabled;
+
 };
-
-class ZEAegiaPhysicsMemoryReadBuffer : public NxStream
-{
-	public:
-	ZEAegiaPhysicsMemoryReadBuffer(const NxU8* data);
-	virtual ~ZEAegiaPhysicsMemoryReadBuffer();
-
-	virtual NxU8   readByte()							const;
-	virtual NxU16  readWord()							const;
-	virtual NxU32  readDword()							const;
-	virtual float  readFloat()							const;
-	virtual double readDouble()							const;
-	virtual void   readBuffer(void* buffer, NxU32 size)	const;
-
-	virtual NxStream& storeByte(NxU8 b)							  { NX_ASSERT(0);	return *this;	}
-	virtual NxStream& storeWord(NxU16 w)						  { NX_ASSERT(0);	return *this;	}
-	virtual NxStream& storeDword(NxU32 d)						  { NX_ASSERT(0);	return *this;	}
-	virtual NxStream& storeFloat(NxReal f)						  { NX_ASSERT(0);	return *this;	}
-	virtual NxStream& storeDouble(NxF64 f)						  { NX_ASSERT(0);	return *this;	}
-	virtual NxStream& storeBuffer(const void* buffer, NxU32 size) { NX_ASSERT(0);	return *this;	}
-
-	mutable const NxU8* buffer;
-};
-
 #endif

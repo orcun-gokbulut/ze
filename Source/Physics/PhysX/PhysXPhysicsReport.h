@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsTrigger.cpp
+ Zinek Engine - PhysXPhysicsReport.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,17 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath/Vector.h"
-#include "Physics/PhysicsBody.h"
-#include "Physics/PhysicsTrigger.h"
-#include "AegiaPhysicsTrigger.h"
+#pragma once
+#ifndef	__ZE_PHYSX_PHYSICS_REPORT_H__
+#define __ZE_PHYSX_PHYSICS_REPORT_H__
 
-ZEAegiaPhysicsTrigger::ZEAegiaPhysicsTrigger(ZEPhysicsBody* First,ZEPhysicsBody* Second, unsigned int Flag) : Trigger(First), Other(Second), Flags(Flag)
+class ZEPhysXPhysicsReport : public NxUserContactReport, public NxUserTriggerReport 
 {
-}
+	void			onContactNotify(NxContactPair& pair, NxU32 events);
+	void			onTrigger(NxShape& triggerShape, NxShape& otherShape, NxTriggerFlag status);
+};
 
-ZEAegiaPhysicsTrigger::~ZEAegiaPhysicsTrigger()
-{
-	Trigger = 0;
-	Other = 0;
-}
+#endif

@@ -43,13 +43,12 @@ class ZEVector3;
 
 class ZEPhysicsConvexShapeInfo : public ZEPhysicsShapeInfo
 {
-public:
-	ZEPhysicsConvexShapeInfo();
-	~ZEPhysicsConvexShapeInfo(){}
-	ZEPhysicsShapeType GetType() { return ZEPhysicsShapeInfo::ZE_PST_CONVEX; }
+	public:
+								ZEPhysicsConvexShapeInfo();
+								~ZEPhysicsConvexShapeInfo(){}
+		ZEPhysicsShapeType		GetType() { return ZEPhysicsShapeInfo::ZE_PST_CONVEX; }
 
-	ZEArray<ZEVector3> Vertices;
-	ZEVector3 Scale;
+		ZEArray<ZEVector3>		Vertices;
 };
 
 #endif

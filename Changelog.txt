@@ -92,3 +92,9 @@
   [7 Mart 2010 - Revision 109]
     ADD: OpenAL 3D Sound Source added.
     ADD: Device enumuration support added to Sound Subsystem and Sound Modules.
+    
+  [8 Mart 2010 - Revision 110]
+    ADD: ZEPhysics sub-system integrated.
+    ADD: ZEModel sub-system integreated.
+    CHG: Aegia module renamed to PhysX.
+    

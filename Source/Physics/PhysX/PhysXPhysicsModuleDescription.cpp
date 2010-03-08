@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsJoint.h
+ Zinek Engine - PhysXPhysicsModuleDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,44 +33,54 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_AEGIA_PHYSICS_JOINT_H__
-#define __ZE_AEGIA_PHYSICS_JOINT_H__
+#include "PhysXPhysicsModuleDescription.h"
 
-class ZEPhysicsJoint;
-class ZEPhysicsJointInfo;
-class ZEVector3;
-class NxJoint;
-#include "AegiaPhysicsUtility.h"
-
-class ZEAegiaPhysicsJoint : public ZEPhysicsJoint
+ZEModuleType ZEPhysXPhysicsModuleDescription::GetType()
 {
-	friend class ZEAegiaPhysicsModule;
+	return ZE_MT_PHYSICS;
+}
 
-private:
-	ZEAegiaPhysicsJoint();
-	~ZEAegiaPhysicsJoint();
+ZEModuleAttribute ZEPhysXPhysicsModuleDescription::GetAttributes()
+{
+	return ZE_MA_INTERNAL;
+}
 
-public:
-	void Initialize(ZEPhysicsJointInfo& Info);
-	void Deinitialize();
+int ZEPhysXPhysicsModuleDescription::GetRequiredZinekEngineVersion()
+{
+	return 0;
+}
 
-	ZEVector3 GetGlobalAnchor() { return TOZE(Joint->getGlobalAnchor()); }
-	void SetGlobalAnchor(const ZEVector3 Anchor) { Joint->setGlobalAnchor(TONX(Anchor)); }
-	ZEVector3 GetGlobalAxis() { return TOZE(Joint->getGlobalAxis()); }
-	void SetGlobalAxis(const ZEVector3 Axis) { Joint->setGlobalAxis(TONX(Axis)); }
+int ZEPhysXPhysicsModuleDescription::GetMajorVersion()
+{
+	return 0;
+}
 
-	void SetLimitPoint(const ZEVector3 Point, bool OnBody2 = false) 
-	{ Joint->setLimitPoint(TONX(Point),OnBody2); }
-	void AddLimitPlane(const ZEVector3 Normal, const ZEVector3 Point, float Restitution = 0) 
-	{ Joint->addLimitPlane(TONX(Normal),TONX(Point), Restitution); }
-	void SetJointMotor(float MotorForce, float MotorVelocity);
+int ZEPhysXPhysicsModuleDescription::GetMinorVersion()
+{
+	return 1;
+}
 
-	ZEPhysicsBody* GetBody1() { NxActor *a1,*a2;Joint->getActors(&a1,&a2);return (ZEPhysicsBody*)a1->userData; }
-	ZEPhysicsBody* GetBody2() { NxActor *a1,*a2;Joint->getActors(&a1,&a2);return (ZEPhysicsBody*)a2->userData; }
+const char* ZEPhysXPhysicsModuleDescription::GetCopyright()
+{
+	return "Copyright (c) 2007-2009, Zinek Engine Group. All rights reserved.";
+}
 
-private:
-	NxJoint* Joint;
-};
+const char* ZEPhysXPhysicsModuleDescription::GetName()
+{
+	return "PhysX";
+}
 
-#endif
+ZEOptionSection* ZEPhysXPhysicsModuleDescription::GetOptions()
+{
+	return 0;
+}
+
+ZEModule* ZEPhysXPhysicsModuleDescription::CreateModuleInstance()
+{
+	return 0;//new ZEPhysXPhysicsModule();
+}
+
+bool ZEPhysXPhysicsModuleDescription::CheckCompatible()
+{
+	return true;
+}

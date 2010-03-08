@@ -42,42 +42,42 @@ class ZEPhysicsBody;
 
 class ZEPhysicsJointInfo
 {
-public:
-	enum ZEPhysicsJointType
-	{
-		ZE_PJT_FIXED,
-		ZE_PJT_SPHERICAL,
-		ZE_PJT_REVOLUTE,
-		ZE_PJT_PRISMATIC,
-		ZE_PJT_CYLINDRICAL,
-		ZE_PJT_DISTANCE,
-		ZE_PJT_POINTONLINE,
-		ZE_PJT_POINTINPLANE,
-		ZE_PJT_PULLEY,
-		ZE_PJT_FREE
-	};
+	public:
+		enum ZEPhysicsJointType
+		{
+			ZE_PJT_FIXED,
+			ZE_PJT_SPHERICAL,
+			ZE_PJT_REVOLUTE,
+			ZE_PJT_PRISMATIC,
+			ZE_PJT_CYLINDRICAL,
+			ZE_PJT_DISTANCE,
+			ZE_PJT_POINTONLINE,
+			ZE_PJT_POINTINPLANE,
+			ZE_PJT_PULLEY,
+			ZE_PJT_FREE
+		};
 
-	ZEPhysicsJointInfo();
-	virtual ~ZEPhysicsJointInfo(){ Body1 = 0; Body2 = 0; }//NULL
-	virtual ZEPhysicsJointType GetType() = 0;
+										ZEPhysicsJointInfo();
+		virtual							~ZEPhysicsJointInfo(){ Body1 = 0; Body2 = 0; }//NULL
+		virtual ZEPhysicsJointType		GetType() = 0;
 
-	ZEPhysicsBody* Body1;
-	ZEPhysicsBody* Body2;
-	bool CollideBodies;
+		ZEPhysicsBody*					Body1;
+		ZEPhysicsBody*					Body2;
+		bool							CollideBodies;
 
-	bool UseGlobalAnchor;
-	ZEVector3 GlobalAnchor;
-	bool UseGlobalAxis;
-	ZEVector3 GlobalAxis;
+		bool							UseGlobalAnchor;
+		ZEVector3						GlobalAnchor;
+		bool							UseGlobalAxis;
+		ZEVector3						GlobalAxis;
 
-	ZEVector3 LocalAnchor1;
-	ZEVector3 LocalAxis1;
-	ZEVector3 LocalAnchor2;
-	ZEVector3 LocalAxis2;
+		ZEVector3						LocalAnchor1;
+		ZEVector3						LocalAxis1;
+		ZEVector3						LocalAnchor2;
+		ZEVector3						LocalAxis2;
 
-	bool Breakable;
-	float BreakForce;
-	float BreakTorque;
+		bool							Breakable;
+		float							BreakForce;
+		float							BreakTorque;
 };
 
 #endif

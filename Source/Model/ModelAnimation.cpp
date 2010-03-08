@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsCollision.cpp
+ Zinek Engine - ModelAnimation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,17 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath/Vector.h"
-#include "Physics/PhysicsBody.h"
-#include "Physics/PhysicsCollision.h"
-#include "AegiaPhysicsCollision.h"
-
-ZEAegiaPhysicsCollision::ZEAegiaPhysicsCollision(ZEPhysicsBody* pFirst,ZEPhysicsBody* pSecond,ZEVector3 pPoint,ZEVector3 pNormal, float pPower) : First(pFirst), Second(pSecond), Point(pPoint), Normal(pNormal), Power(pPower)
-{
-}
-
-ZEAegiaPhysicsCollision::~ZEAegiaPhysicsCollision()
-{
-	First = 0;
-	Second = 0;
-}
+#include "ModelAnimation.h"

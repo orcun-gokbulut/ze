@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsCharacterController.h
+ Zinek Engine - PhysXPhysicsCollision.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,39 +34,34 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AEGIA_PHYSICS_CHARACTER_CONTROLLER_H__
-#define __ZE_AEGIA_PHYSICS_CHARACTER_CONTROLLER_H__
+#ifndef	__ZE_PHYSX_PHYSICS_COLLISION_H__
+#define __ZE_PHYSX_PHYSICS_COLLISION_H__
 
-class ZEPhysicsCharacterController;
-class ZEPhysicsCharacterControllerInfo;
+class ZEPhysicsCollision;
+class ZEPhysicsBody;
 class ZEVector3;
-#include "NxController.h"
-#include "Physics/AegiaPhysicsUtility.h"
 
-class ZEAegiaPhysicsCharacterController : public ZEPhysicsCharacterController
+class ZEPhysXPhysicsCollision : public ZEPhysicsCollision
 {
-	friend class ZEAegiaPhysicsModule;
+	friend class		ZEPhysXPhysicsReport;
+
 private:
-	ZEAegiaPhysicsCharacterController();
-	~ZEAegiaPhysicsCharacterController();
+						ZEPhysXPhysicsCollision(ZEPhysicsBody* pFirst,ZEPhysicsBody* pSecond,ZEVector3 pPoint,ZEVector3 pNormal, float pPower);
+						~ZEPhysXPhysicsCollision();
 
 public:
-	void Initialize(ZEPhysicsCharacterControllerInfo& Info);
-	void Deinitialize();
-	void Update(float ElapsedTime);
-	
-	ZEVector3 GetVelocity() { return Velocity; }
-	void SetVelocity(ZEVector3 Vector) { Velocity = Vector; }
-
-	ZEVector3 GetPosition() { return TOZE(Controller->getDebugPosition()); }
-	void SetPosition(const ZEVector3 Position) { Controller->setPosition(TONXE(Position)); }
-	bool IsOnGround() { return (CollisionFlag & NXCC_COLLISION_DOWN); }
-	void SetCollision(bool Collide) { Controller->setCollision(Collide); }
+	ZEPhysicsBody*		GetFirstCollider()  { return First; }
+	ZEPhysicsBody*		GetSecondCollider() { return Second; }
+	ZEVector3			GetPoint()          { return Point; }
+	ZEVector3			GetNormal()         { return Normal; }
+	float				GetPower()          { return Power; }
 
 private:
-	NxController* Controller;
-	ZEVector3 Velocity;
-	NxU32 CollisionFlag;
+	ZEPhysicsBody*		First;
+	ZEPhysicsBody*		Second;
+	ZEVector3			Point;
+	ZEVector3			Normal;
+	float				Power;
 };
 
 #endif

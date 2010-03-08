@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsPulleyJointInfo.h
+ Zinek Engine - PhysXPhysicsVehicle.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,29 +34,45 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PHYSICS_PULLEY_JOINT_INFO_H__
-#define __ZE_PHYSICS_PULLEY_JOINT_INFO_H__
+#ifndef	__ZE_PHYSX_PHYSICS_VEHICLE_JOINT_H__
+#define __ZE_PHYSX_PHYSICS_VEHICLE_JOINT_H__
 
-class ZEPhysicsJointInfo;
+class ZEPhysicsVehicle;
+class ZEPhysicsVehicleInfo;
 class ZEVector3;
+class ZEQuaternion;
+#include "ZEDS/Array.h"
 
-class ZEPhysicsPulleyJointInfo : public ZEPhysicsJointInfo
+class ZEPhysXPhysicsVehicle : public ZEPhysicsVehicle
 {
+	friend class						ZEPhysXPhysicsModule;
+	private:
+										ZEPhysXPhysicsVehicle();
+										~ZEPhysXPhysicsVehicle();
+
 	public:
-								ZEPhysicsPulleyJointInfo();
-								~ZEPhysicsPulleyJointInfo(){}
-		ZEPhysicsJointType		GetType() { return ZEPhysicsJointInfo::ZE_PJT_PULLEY; }
+		void							Initialize(ZEPhysicsVehicleInfo& Info);
+		void							Deinitialize();
+		void							Update(float ElapsedTime);
 
-		ZEVector3				Pulley1;
-		ZEVector3				Pulley2;
-		float					Distance;
-		float					Ratio;
-		float					Stiffness;
+		ZEPhysicsBody*					GetBody() { return Body; }
+		int								GetWheelCount() { return Wheels.GetCount(); }
+		ZEVector3						GetLinearVelocity() { return Body->GetLinearVelocity(); }
 
-		bool					IsRigid;
-		bool					HasMotor;
-		float					MotorForce;
-		float					MotorVelocity;
+		void							SetSteeringAngle(float Angle);
+		void							SetMotorTorque(float Torque);
+		void							SetBrakeTorque(float Torque);
+
+		ZEVector3						GetWheelPosition(int Index);
+		ZEQuaternion					GetWheelOrientation(int Index);
+		float							GetWheelSpeed(int Index);
+		float							GetAverageWheelSpeed();
+
+	private:
+		ZEPhysicsBody*					Body;
+		ZEArray<NxWheelShape*>			Wheels;
+		ZEArray<NxWheelContactData>		Contacts;
+		ZEArray<float>					RollValues;
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsMaterial.cpp
+ Zinek Engine - PhysXPhysicsTrigger.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "NxPhysics.h"
 #include "ZEMath/Vector.h"
-#include "Physics/PhysicsMaterial.h"
-#include "AegiaPhysicsMaterial.h"
+#include "Physics/PhysicsBody.h"
+#include "Physics/PhysicsTrigger.h"
+#include "PhysXPhysicsTrigger.h"
 
-#include "Physics/PhysicsWorld.h"
-#include "AegiaPhysicsWorld.h"
-
-ZEAegiaPhysicsMaterial::ZEAegiaPhysicsMaterial()
+ZEPhysXPhysicsTrigger::ZEPhysXPhysicsTrigger(ZEPhysicsBody* First,ZEPhysicsBody* Second, unsigned int Flag) : Trigger(First), Other(Second), Flags(Flag)
 {
 }
 
-ZEAegiaPhysicsMaterial::~ZEAegiaPhysicsMaterial()
+ZEPhysXPhysicsTrigger::~ZEPhysXPhysicsTrigger()
 {
-	Deinitialize();
-}
-
-void ZEAegiaPhysicsMaterial::Initialize(float Friction, float Restitution)
-{
-	//check bounds
-	if (Restitution > 1.0f)Restitution = 1.0;
-
-	ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
-
-	if (Index == 0 && World != NULL)
-	{
-		NxMaterialDesc MaterialDesc;
-		MaterialDesc.restitution = Restitution;
-		MaterialDesc.staticFriction = Friction;
-		MaterialDesc.dynamicFriction = Friction;
-
-		if (MaterialDesc.isValid())
-		{
-			NxMaterial* NewMaterial = World->GetScene()->createMaterial(MaterialDesc); 
-			Index = NewMaterial->getMaterialIndex();
-		}
-	}
-}
-
-void ZEAegiaPhysicsMaterial::Deinitialize()
-{
-	ZEAegiaPhysicsWorld* World = ZEAegiaPhysicsWorld::getSingletonPtr();
-
-	if (Index != 0 && World != NULL)
-	{
-		NxMaterial* Material = World->GetScene()->getMaterialFromIndex(Index);
-		World->GetScene()->releaseMaterial(*Material);
-		Index = 0;
-	}
+	Trigger = 0;
+	Other = 0;
 }

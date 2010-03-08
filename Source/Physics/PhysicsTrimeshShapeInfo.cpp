@@ -37,6 +37,6 @@
 #include "Physics/PhysicsShapeInfo.h"
 #include "Physics/PhysicsTrimeshShapeInfo.h"
 
-ZEPhysicsTrimeshShapeInfo::ZEPhysicsTrimeshShapeInfo() : Scale(1,1,1)
+ZEPhysicsTrimeshShapeInfo::ZEPhysicsTrimeshShapeInfo()// : Scale(1,1,1)
 {
 }

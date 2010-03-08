@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsWorld.cpp
+ Zinek Engine - PhysXPhysicsWorld.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -42,41 +42,39 @@
 #include "Physics/PhysicsTrigger.h"
 #include "Physics/PhysicsWorld.h"
 #include "Physics/PhysicsWorldInfo.h"
-#include "AegiaPhysicsWorld.h"
-#include "AegiaPhysicsUtility.h"
+#include "PhysXPhysicsWorld.h"
+#include "PhysXPhysicsUtility.h"
 #include "Core/Core.h"
 #include "Core/Error.h"
 #include "Core/Console.h"
+#include "GameInterface/Scene.h"
 
-template<> ZEAegiaPhysicsWorld* ZESingleton<ZEAegiaPhysicsWorld>::ms_Singleton = 0;
+ZEPhysXPhysicsWorld* ZEPhysXPhysicsWorld::ms_Singleton = 0;
 
-ZEAegiaPhysicsWorld* ZEAegiaPhysicsWorld::getSingletonPtr(void)
+ZEPhysXPhysicsWorld* ZEPhysXPhysicsWorld::getSingletonPtr(void)
 {
 	return ms_Singleton;
 }
 
-ZEAegiaPhysicsWorld& ZEAegiaPhysicsWorld::getSingleton(void)
-{  
-	assert( ms_Singleton );  return ( *ms_Singleton );
+ZEPhysXPhysicsWorld::ZEPhysXPhysicsWorld() : PhysicsSdk(NULL), PhysicsScene(NULL), Cooker(NULL), ControllerManager(0), ControllerAlloc(0), Report(), DelegateC(0), DelegateT(0), Debugger(NULL), DebugView(false)
+{
+	ms_Singleton = this;
 }
 
-ZEAegiaPhysicsWorld::ZEAegiaPhysicsWorld() : PhysicsSdk(NULL), PhysicsScene(NULL), Cooker(NULL), ControllerManager(0), ControllerAlloc(0), Report(), DelegateC(0), DelegateT(0), Debugger(NULL), DebugView(false)
+ZEPhysXPhysicsWorld::~ZEPhysXPhysicsWorld()
 {
-}
-
-ZEAegiaPhysicsWorld::~ZEAegiaPhysicsWorld()
-{
+	ms_Singleton = 0;
 	Deinitialize();
 }
 
-void ZEAegiaPhysicsWorld::Initialize(ZEPhysicsWorldInfo& Info)
+void ZEPhysXPhysicsWorld::Initialize(ZEPhysicsWorldInfo& Info)
 {
 	if (PhysicsSdk == NULL)
 	{
 		PhysicsSdk = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION);
 		if(!PhysicsSdk)
 		{
-			zeLog("Physx Sdk Creation Error, Wrong Sdk Dll Version?");
+			zeLog("PhysX Physics World", "Physx Sdk Creation Error, Wrong Sdk Dll Version?");
 			return;
 		}
 		else
@@ -108,10 +106,10 @@ void ZEAegiaPhysicsWorld::Initialize(ZEPhysicsWorldInfo& Info)
 
 		if(!PhysicsScene)
 		{
-			zeLog("Physx Scene Creation Error.");
+			zeLog("PhysX Physics World", "Physx Scene Creation Error.");
 		}
 
-		float timestep = 1.0f/60.0f;
+		float timestep = 1.0f/100.0f;
 		PhysicsScene->setTiming(timestep,8,NX_TIMESTEP_FIXED);
 
 		//collision filtering
@@ -153,19 +151,20 @@ void ZEAegiaPhysicsWorld::Initialize(ZEPhysicsWorldInfo& Info)
 	if (Debugger == NULL)
 	{
 		Debugger = new ZECanvasBrush();
-		Debugger->PrimitiveType = ZE_RLPT_LINE;
+		Debugger->PrimitiveType = ZE_ROPT_LINE;
 		Debugger->Canvas.Clean();
 		Debugger->UpdateCanvas();
-		Debugger->Material.SetZero();
-		Debugger->Material.LightningEnabled = false;
-		Debugger->Material.AmbientColor = ZEVector3(0.75f, 0.0f, 0.0f);
-		Debugger->Material.SetShaderComponents(0);
+		Debugger->Material = ZEFixedMaterial::CreateInstance();
+		Debugger->Material->SetZero();
+		((ZEFixedMaterial*)Debugger->Material)->SetLightningEnabled(false);
+		((ZEFixedMaterial*)Debugger->Material)->SetAmbientColor(ZEVector3(0.75f, 0.0f, 0.0f));
+		Debugger->Material->UpdateMaterial();
 		Debugger->SetVisible(DebugView);
-		zeCore->GetGame()->GetScene()->AddEntity(Debugger);
+		zeScene->AddEntity(Debugger);
 	}
 }
 
-void ZEAegiaPhysicsWorld::Deinitialize()
+void ZEPhysXPhysicsWorld::Deinitialize()
 {
 	//cooker
 	if (Cooker)
@@ -205,28 +204,62 @@ void ZEAegiaPhysicsWorld::Deinitialize()
 	}
 }
 
-void ZEAegiaPhysicsWorld::ShowDebugView(bool Show) 
+void ZEPhysXPhysicsWorld::ShowDebugView(bool Show) 
 { 
 	DebugView = Show;
-	if (Debugger)Debugger->SetVisible(Show);
+	if (Debugger)
+	{
+		Debugger->SetVisible(Show);
+
+		if (DebugView)
+		{
+			Debugger->Canvas.Clean();
+
+			const NxDebugRenderable* data = PhysicsScene->getDebugRenderable();
+			NxU32 NbLines = NULL;
+			if (data)
+			{
+				NbLines = data->getNbLines();
+			}
+			const NxDebugLine* Lines;
+			if (data)
+			{
+				Lines = data->getLines();
+			}
+			
+			while(NbLines--)
+			{
+				Debugger->Canvas.AddLine(ZEVector3(Lines->p0.x,Lines->p0.y,Lines->p0.z),ZEVector3(Lines->p1.x,Lines->p1.y,Lines->p1.z));
+				Lines++;
+			}
+
+			Debugger->UpdateCanvas();
+		}
+	}
 }
 
-void ZEAegiaPhysicsWorld::Update(const float ElapsedTime)
+void ZEPhysXPhysicsWorld::Update(const float ElapsedTime)
 {
 	//simulate
 	PhysicsScene->simulate(ElapsedTime);
 	PhysicsScene->flushStream();
 
 	//debug render
-	if (DebugView)
+	/*if (DebugView)
 	{
 		Debugger->Canvas.Clean();
 
 		const NxDebugRenderable* data = PhysicsScene->getDebugRenderable();
 		NxU32 NbLines = NULL;
-		if (data)NbLines = data->getNbLines();
+		if (data)
+		{
+			NbLines = data->getNbLines();
+		}
 		const NxDebugLine* Lines;
-		if (data)Lines = data->getLines();
+		if (data)
+		{
+			Lines = data->getLines();
+		}
 		
 		while(NbLines--)
 		{
@@ -235,7 +268,7 @@ void ZEAegiaPhysicsWorld::Update(const float ElapsedTime)
 		}
 
 		Debugger->UpdateCanvas();
-	}
+	}*/
 
 	while(!PhysicsScene->fetchResults(NX_RIGID_BODY_FINISHED, false)){}
 }

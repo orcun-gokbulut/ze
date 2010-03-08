@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsPulleyJointInfo.h
+ Zinek Engine - PhysXPhysicsModuleDescription.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,29 +34,24 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PHYSICS_PULLEY_JOINT_INFO_H__
-#define __ZE_PHYSICS_PULLEY_JOINT_INFO_H__
+#ifndef	__ZE_PHYSX_PHYSICS_MODULE_DESCRIPTION_H__
+#define __ZE_PHYSX_PHYSICS_MODULE_DESCRIPTION_H__
 
-class ZEPhysicsJointInfo;
-class ZEVector3;
+#include "Core/Module.h"
 
-class ZEPhysicsPulleyJointInfo : public ZEPhysicsJointInfo
+class ZEPhysXPhysicsModuleDescription : public ZEModuleDescription
 {
 	public:
-								ZEPhysicsPulleyJointInfo();
-								~ZEPhysicsPulleyJointInfo(){}
-		ZEPhysicsJointType		GetType() { return ZEPhysicsJointInfo::ZE_PJT_PULLEY; }
-
-		ZEVector3				Pulley1;
-		ZEVector3				Pulley2;
-		float					Distance;
-		float					Ratio;
-		float					Stiffness;
-
-		bool					IsRigid;
-		bool					HasMotor;
-		float					MotorForce;
-		float					MotorVelocity;
+		ZEModuleType			GetType();
+		ZEModuleAttribute		GetAttributes();
+		int						GetRequiredZinekEngineVersion();
+		int						GetMajorVersion();
+		int						GetMinorVersion();
+		const char*				GetCopyright();
+		const char*				GetName();
+		ZEOptionSection*		GetOptions();
+		ZEModule*				CreateModuleInstance();
+		bool					CheckCompatible();
 };
 
 #endif

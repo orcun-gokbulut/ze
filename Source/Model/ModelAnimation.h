@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AegiaPhysicsCollision.h
+ Zinek Engine - ModelAnimation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,34 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_AEGIA_PHYSICS_COLLISION_H__
-#define __ZE_AEGIA_PHYSICS_COLLISION_H__
+#ifndef	__ZE_MODEL_ANIMATION_H__
+#define __ZE_MODEL_ANIMATION_H__
 
-class ZEPhysicsCollision;
-class ZEPhysicsBody;
-class ZEVector3;
+#include "ModelResource.h"
 
-class ZEAegiaPhysicsCollision : public ZEPhysicsCollision
+enum ZEModelAnimationState
 {
-	friend class ZEAegiaPhysicsReport;
-
-private:
-	ZEAegiaPhysicsCollision(ZEPhysicsBody* pFirst,ZEPhysicsBody* pSecond,ZEVector3 pPoint,ZEVector3 pNormal, float pPower);
-	~ZEAegiaPhysicsCollision();
-
-public:
-	ZEPhysicsBody* GetFirstCollider()  { return First; }
-	ZEPhysicsBody* GetSecondCollider() { return Second; }
-	ZEVector3      GetPoint()          { return Point; }
-	ZEVector3      GetNormal()         { return Normal; }
-	float          GetPower()          { return Power; }
-
-private:
-	ZEPhysicsBody* First;
-	ZEPhysicsBody* Second;
-	ZEVector3 Point;
-	ZEVector3 Normal;
-	float Power;
+	ZE_MAS_STATICFRAME,
+	ZE_MAS_PLAYING,
+	ZE_MAS_PAUSED,
+	ZE_MAS_STOPPED
 };
+
+enum ZEModelAnimationType
+{
+	ZE_MAT_NOANIMATION,
+	ZE_MAT_PREDEFINED,
+	ZE_MAT_PHYSICAL
+};
+
+typedef ZEModelResourceAnimation ZEModelAnimation;
 
 #endif
