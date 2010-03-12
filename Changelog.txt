@@ -78,7 +78,7 @@
 	FIX: If NULL passed to ZENamed::SetName() function it crashes. Now it checks parameter for NULL or Empty string.
 	-ADD: Effects enabled in sound source.
 
-  [27 Þubat 2010 - Revision 107]
+[27 Þubat 2010 - Revision 107]
     FIX: Volumes in sound sub-system are normalized and linearized to [0, 100]
     ADD: DirectSound Listener added.
     ADD: DirectSound 3D Buffer added.
@@ -86,14 +86,17 @@
     CHG: ZEConsole::Log() function and zeLog macro now adds a new line character at the end of the message.
     FIX: ZECore::FrameTime and ZECore::RunningTime fixed.
 
-  [6 Mart 2010 - Revision 108]
+[6 Mart 2010 - Revision 108]
     ADD: OpenAL module added.
 	CHG: Library (Lib) and Include (Include) directories and project setting changed according to new Library and Include directory structures.
     
-  [7 Mart 2010 - Revision 109]
+[7 Mart 2010 - Revision 109]
     ADD: OpenAL 3D Sound Source added.
     ADD: Device enumuration support added to Sound Subsystem and Sound Modules.
     
-  [11 Mart 2010 - Revision 114]
+[11 Mart 2010 - Revision 114]
 	FIX: ZESDK's Library (Lib) and Include (Include) directories and project setting changed according to new Library and Include directory structures.
 	ADD: New source files added to ZESDK project and solution.
+	
+[12 Mart 2010 - Revision 115]
+	FIX: ZESDK library depedencies has been fixed.
