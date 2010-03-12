@@ -46,15 +46,15 @@ ZEModuleDescription* ZEVirtualInputModule::GetModuleDescription()
 
 bool ZEVirtualInputModule::Initialize()
 {
-	zeOutput("Initializing Virtual Input module.\r\n");
+	zeLog("Virtual Input Module", "Initializing Virtual Input module.");
 	Enabled = true;
-
+	zeLog("Virtual Input Module", "Virtual Input module initialized.");
 	return true;
 }
 
 void ZEVirtualInputModule::Deinitialize()
 {
-	zeOutput("Destroting Virtual Input module.\r\n");
+	zeLog("Virtual Input Module", "Virtual Input module destroyed.");
 }
 
 bool ZEVirtualInputModule::IsEnabled()
@@ -112,12 +112,12 @@ void ZEVirtualInputModule::ProcessInputMap(ZEInputMap* InputMap)
 
 void ZEVirtualInputModule::Acquire()
 {
-	zeNotice("Virtual Input", "Virtual Input acquired.");
+	zeNotice("Virtual Input Module", "Virtual input acquired.");
 }
 
 void ZEVirtualInputModule::UnAcquire()
 {
-	zeNotice("Virtual Input", "Virtual Input unacquired.");
+	zeNotice("Virtual Input Module", "Virtual input unacquired.");
 }
 
 void ZEVirtualInputModule::GetInputEventName(char* Name, size_t MaxSize)

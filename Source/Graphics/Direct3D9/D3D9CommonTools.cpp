@@ -103,7 +103,7 @@ bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, 
 
 	if (GetDevice()->CreatePixelShader((DWORD*)ShaderBuffer->GetBufferPointer(), PixelShader) != NULL)
 	{
-		zeError("D3D9 Pixel Shader Compiler", "Can not create pixel shader.\r\n");
+		zeError("D3D9 Pixel Shader Compiler", "Can not create pixel shader.");
 		*PixelShader = NULL;
 		return false;
 	}
@@ -132,7 +132,7 @@ bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width
 	HRESULT Hr = GetDevice()->CreateTexture(Width, Height, 1, D3DUSAGE_RENDERTARGET, D3DFormat, D3DPOOL_DEFAULT, Target, NULL);
 	if (Hr != D3D_OK)
 	{
-		zeError("Direct3D 9", "Can not create render target.");
+		zeError("D3D9", "Can not create render target.");
 		*Target = NULL;
 		return false;
 	}
@@ -155,7 +155,7 @@ bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int 
 	HRESULT Hr = GetDevice()->CreateDepthStencilSurface(Width, Height, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, Target, NULL);
 	if (Hr != D3D_OK)
 	{
-		zeError("Direct3D 9", "Can not create depth render target.");
+		zeError("D3D9", "Can not create depth render target.");
 		*Target = NULL;
 		return false;
 	}
@@ -179,7 +179,7 @@ bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width
 	HRESULT Hr = GetDevice()->CreateRenderTarget(Width, Height, D3DFormat, D3DMULTISAMPLE_NONE, 0, FALSE, Target, NULL);
 	if (Hr != D3D_OK)
 	{
-		zeError("Direct3D 9", "Can not create render target.");
+		zeError("D3D9", "Can not create render target.");
 		*Target = NULL;
 		return false;
 	}

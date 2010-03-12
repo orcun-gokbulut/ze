@@ -65,9 +65,9 @@ class ZEPhysicalWorld
 
 		virtual void								Update(float ElapsedTime) = 0;
 
-		void										Destroy();
+		virtual void								Destroy();
 
-		void										Draw(ZERenderer* Renderer);
+		virtual void								Draw(ZERenderer* Renderer) = 0;
 
 		static ZEPhysicalWorld*						CreateInstance();
 };

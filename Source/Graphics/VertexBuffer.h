@@ -78,19 +78,17 @@ class ZEDynamicVertexBuffer : public ZEVertexBuffer
 };
 
 template<typename _VertexType, typename _Allocator = ZESmartAllocator<_VertexType> >
-class ZEArrayVertexBuffer : public ZEDynamicVertexBuffer
+class ZEArrayVertexBuffer : public ZEDynamicVertexBuffer, public ZEArray<_VertexType, _Allocator>
 {
 	public:
-		ZEArray<_VertexType, _Allocator> Vertices;
- 
 		virtual unsigned int GetBufferSize()
 		{
-			return Vertices.GetCount() * sizeof(_VertexType);
+			return GetCount() * sizeof(_VertexType);
 		}
 
 		virtual void* GetVertexBuffer()
 		{
-			return Vertices.GetCArray();
+			return GetCArray();
 		}
 };
 

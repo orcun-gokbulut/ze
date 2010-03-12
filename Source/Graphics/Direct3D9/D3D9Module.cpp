@@ -121,7 +121,7 @@ void ZED3D9Module::SetEnabled(bool Enabled)
 
 bool ZED3D9Module::Initialize()
 {
-	zeLog("D3D9 Module", "Initializing Direct3D 9.\r\n");
+	zeLog("D3D9 Module", "Initializing Direct3D 9.");
 
 	// Read options
 	ScreenWidth = zeOptions->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger();
@@ -202,7 +202,7 @@ bool ZED3D9Module::Initialize()
 
 	D3D9Device = Device;
 
-	zeLog("D3D9 Module", "Device Created.\r\n");
+	zeLog("D3D9 Module", "Device Created.");
 
 	// Check hardware capabilities
 	D3D->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &DeviceCaps);
@@ -210,7 +210,7 @@ bool ZED3D9Module::Initialize()
 	// Check vertex shader versions.
 	PipelineType = ZE_D3D9_PT_PROGRAMABLE;
 
-	zeLog("D3D9 Module", "Vertex Shader Version : %d.%d\r\n", D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.VertexShaderVersion));
+	zeLog("D3D9 Module", "Vertex Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.VertexShaderVersion));
 	switch(D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion))
 	{
 		case 1:
@@ -235,7 +235,7 @@ bool ZED3D9Module::Initialize()
 	};
 
 	// Check pixel shader version
-	zeLog("D3D9 Module", "Pixel Shader Version : %d.%d\r\n", D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.PixelShaderVersion));
+	zeLog("D3D9 Module", "Pixel Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.PixelShaderVersion));
 	switch(D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion))
 	{
 		case 1:

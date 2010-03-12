@@ -54,7 +54,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 	ZEScene* Scene = zeGame->GetScene();
 
 	// Create the player
-	if (Player != NULL)
+	if (Player == NULL)
 	{
 		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
 		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
@@ -65,12 +65,14 @@ bool ZEPhysicsDebugComponent::Initialize()
 		Scene->AddEntity(Player);
 	}
 
-	if (PhysicalRigidBody != NULL)
+	if (PhysicalRigidBody == NULL)
 	{
 		ZEPhysXPhysicalWorld* World = (ZEPhysXPhysicalWorld*)zeScene->GetPhysicalWorld();
 		NxScene* PhysicalScene = World->GetScene();
 
 		NxActorDesc ActorDesc;
+		ActorDesc.globalPose.t = NxVec3(0.0f, 0.0f, 0.0f);
+		ActorDesc.globalPose.M.id();
 		ActorDesc.body = NULL;
 
 		NxPlaneShapeDesc PlaneShapeDesc;
@@ -81,9 +83,10 @@ bool ZEPhysicsDebugComponent::Initialize()
 
 		NxActor* Actor = PhysicalScene->createActor(ActorDesc);
 
-		ZEPhysicalRigidBody* PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
-		PhysicalBody->SetPhysicalWorld(World);
-		PhysicalBody->AddPhysicalShape(new ZEPhysicalSphereShape());
+		PhysicalRigidBody = ZEPhysicalRigidBody::CreateInstance();
+		PhysicalRigidBody->SetPhysicalWorld(World);
+		PhysicalRigidBody->AddPhysicalShape(new ZEPhysicalSphereShape());
+		World->AddPhysicalObject(PhysicalRigidBody);
 	}
 
 	return true;

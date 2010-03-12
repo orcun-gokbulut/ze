@@ -314,7 +314,7 @@ void ZECore::DeInitializeModule(ZEModule** Module)
 bool ZECore::InitializeModules()
 {
 	// Graphics module !
-	zeLog("Core", "Initializing Graphic Module.\r\n");	
+	zeLog("Core", "Initializing Graphic Module.");	
 	if (!InitializeModule(Graphics))
 	{
 		zeError("Core", "Can not initialize graphic module.");
@@ -322,7 +322,7 @@ bool ZECore::InitializeModules()
 	}
 
 	// Physics module !
-	zeLog("Core", "Initializing physics module.\r\n");
+	zeLog("Core", "Initializing physics module.");
 	if (!InitializeModule(Physics))
 	{
 		zeError("Core", "Can not initialize physics module.");
@@ -330,7 +330,7 @@ bool ZECore::InitializeModules()
 	}
 
 	// Sound module !
-	zeLog("Core", "Initializing Sound Module.\r\n");	
+	zeLog("Core", "Initializing Sound Module.");	
 	if (!InitializeModule(Sound))
 	{
 		zeError("Core", "Can not initialize sound module.");
@@ -338,7 +338,7 @@ bool ZECore::InitializeModules()
 	}
 
 	// Input module !
-	zeLog("Core", "Initializing Input Module.\r\n");	
+	zeLog("Core", "Initializing Input Module.");	
 	if (!InitializeModule(Input))
 	{
 		zeError("Core", "Can not initialize input module.");
@@ -436,35 +436,35 @@ void ZECore::ShutDown()
 		zeLog("Core", "[Core] Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
 	Options->Save("options.ini");
 
-	zeLog("Core", "Releasing game content data.\r\n");
+	zeLog("Core", "Releasing game content data.");
 
-	zeLog("Core", "Releasing shared resources.\r\n");
+	zeLog("Core", "Releasing shared resources.");
 	Resources->ReleaseAllResources();
 
-	zeLog("Core", "Releasing cached resources.\r\n");
+	zeLog("Core", "Releasing cached resources.");
 	Resources->UncacheAllResources();
 
 	if (Input != NULL)
 	{
-		zeLog("Core", "Destroying Input Module.\r\n");
+		zeLog("Core", "Destroying Input Module.");
 		Input->Destroy();
 	}
 
 	if (Sound != NULL)
 	{
-		zeLog("Core", "Destroying Sound Module.\r\n");
+		zeLog("Core", "Destroying Sound Module.");
 		Sound->Destroy();
 	}
 
 	if (Graphics != NULL)
 	{
-		zeLog("Core", "Destroying Graphics Module.\r\n");
+		zeLog("Core", "Destroying Graphics Module.");
 		Graphics->Destroy();
 	}
 
 	if (Physics != NULL)
 	{
-		zeLog("Core", "Destroying Physics Module.\r\n");
+		zeLog("Core", "Destroying Physics Module.");
 		Physics->Destroy();
 	}
 

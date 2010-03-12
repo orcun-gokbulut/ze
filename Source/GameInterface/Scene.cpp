@@ -34,16 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Scene.h"
-#include "Sound/SoundModule.h"
-#include "Graphics/GraphicsModule.h"
+#include "Game.h"
+#include "Core/Console.h"
+#include "Core/Error.h"
 #include "Graphics/FrameBufferRenderer.h"
 #include "Graphics/ShadowRenderer.h"
 #include "Graphics/Camera.h"
 #include "Graphics/Light.h"
-#include "Core/Error.h"
-#include "Game.h"
 #include "Serialization.h"
 #include "ZEMath/Ray.h"
+#include "Physics/PhysicalWorld.h"
+#include "Sound/SoundModule.h"
 #include <memory.h>
 
 void ZEScene::SetVisualDebugElements(ZEDWORD VisualDebugElements)
@@ -59,33 +60,67 @@ ZEDWORD ZEScene::GetVisualDebugElements()
 bool ZEScene::Initialize()
 {
 	Deinitialize();
-	if (Renderer != NULL)
-		Renderer->Destroy();
 
-	Renderer = ZEFrameBufferRenderer::CreateInstance();
+	if (Renderer == NULL)
+		Renderer = ZEFrameBufferRenderer::CreateInstance();
+
 	if (Renderer == NULL)
 	{
-		zeCriticalError("Scene Manager", "Can not create renderer.");
+		zeCriticalError("Scene", "Can not create renderer.");
 		return false;
 	}
 
-	if (ShadowRenderer != NULL)
-		ShadowRenderer->Destroy();
-
-	ShadowRenderer = ZEShadowRenderer::CreateInstance();
-	if (Renderer == NULL)
+	if (!Renderer->Initialize())
 	{
-		zeCriticalError("Scene Manager", "Can not create renderer.");
+		zeCriticalError("Scene", "Can not initialize renderer.");
 		return false;
 	}
 
-	DebugDraw.Initialize();
+	if (ShadowRenderer == NULL)
+		ShadowRenderer = ZEShadowRenderer::CreateInstance();
 
+	if (Renderer == NULL)
+	{
+		zeCriticalError("Scene", "Can not create shadow renderer.");
+		return false;
+	}
+	
+	if (!ShadowRenderer->Initialize())
+	{
+		zeCriticalError("Scene", "Can not initialize shadow renderer.");
+		return false;
+	}
+
+	if (PhysicalWorld == NULL)
+		PhysicalWorld = ZEPhysicalWorld::CreateInstance();
+
+	if (PhysicalWorld == NULL)
+	{
+		zeCriticalError("Scene", "Can not create physical world.");
+		return false;
+	}
+
+	if (!PhysicalWorld->Initialize())
+	{
+		zeCriticalError("Scene", "Can not create physical world.");
+		return false;
+	}
+	
+	if (!DebugDraw.Initialize())
+		zeError("Scene", "Can not initialize scene debug draw.");
+
+	for (size_t I = 0; I < Entities.GetCount(); I++)
+		Entities[I]->Initialize();
+
+	Initialized = true;
 	return true;
 }
 
 void ZEScene::Deinitialize()
 {
+	if (PhysicalWorld != NULL)
+		PhysicalWorld->Deinitialize();
+
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Deinitialize();
 
@@ -95,6 +130,11 @@ void ZEScene::Deinitialize()
 
 	if (Renderer != NULL)
 		Renderer->Deinitialize();
+
+	if (ShadowRenderer != NULL)
+		ShadowRenderer->Deinitialize();
+
+	Initialized = false;
 	
 }
 
@@ -102,16 +142,19 @@ void ZEScene::Destroy()
 {
 	Deinitialize();
 
+	if (PhysicalWorld != NULL)
+		PhysicalWorld->Destroy();
+
+	if (Renderer != NULL)
+		Renderer->Destroy();
+
+	if (ShadowRenderer != NULL)
+		ShadowRenderer->Destroy();
+
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Destroy();
 
 	Environment.Destroy();
-
-	if (Renderer != NULL)
-	{
-		Renderer->Destroy();
-		Renderer = NULL;
-	}
 
 	delete this;
 }
@@ -170,6 +213,8 @@ void ZEScene::Tick(float ElapsedTime)
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 		if (Entities[I]->GetEnabled())
 			Entities[I]->Tick(ElapsedTime);
+
+	PhysicalWorld->Update(ElapsedTime);
 }
 
 void ZEScene::Render(float ElapsedTime)
@@ -179,36 +224,8 @@ void ZEScene::Render(float ElapsedTime)
 
 	Renderer->SetCamera(ActiveCamera);
 	CullScene(Renderer, ActiveCamera->GetViewVolume(), true);
-/*
-
-	PostProcessor->ApplyGrayscale(ZE_PPS_INPUT, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurH(ZE_PPS_INTERNAL, ZE_PPD_INTERNAL);
-	PostProcessor->ApplyBlurV(ZE_PPS_INTERNAL, ZE_PPD_FRAMEBUFFER);
-	PostProcessor->Process();*/
+	PhysicalWorld->Draw(Renderer);
 }
-/*
-ZEEntity* ZEScene::CastRay(const ZERay& Ray, float Range, ZESmartArray<ZEEntity*>& IntersectedEntities)
-{
-	float MinT, MaxT, CurrMinT = Range / Ray.v.Length();
-
-	IntersectedEntities.Clear();
-
-	for (size_t I = 0; I < Entities.GetCount(); I++)
-	{
-		ZEEntity* CurrentEntity = Entities[I];
-		if (ZEBoundingSphere::IntersectionTest(CurrentEntity->GetWorldBoundingSphere(), Ray, MinT, MaxT))
-			if (MinT < CurrMinT)
-				IntersectedEntities.Add(CurrentEntity);
-	}
-}*/
 
 ZEEntity* ZEScene::CastRay(const ZERay& Ray, float Range)
 {
@@ -269,44 +286,6 @@ bool ZEScene::CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntit
 	Ray.GetPointOn(Position,MinT);
 	return *IntersectedEntity != NULL;
 }
-
-/*
-bool ZEScene::CastRay(const ZERay& Ray, float Range)
-{
-	float MinT, MaxT, CurrMinT = Range / Ray.v.Length();
-	*Entity = NULL;
-	*Component = NULL;
-	
-	if (Filter & (ZE_RCF_ENTITY | ZE_RCF_COMPONENT))
-		for (size_t I = 0; I < Entities.GetCount(); I++)
-		{
-			ZEEntity* CurrentEntity = Entities[I];
-			if (ZEBoundingSphere::IntersectionTest(CurrentEntity->GetWorldBoundingSphere(), Ray)) // && ZEAABoundingBox::IntersectionTest(CurrentEntity->GetWorldBoundingBox(), Ray))
-				for (size_t N = 0; N < CurrentEntity->GetComponents().GetCount(); N++)
-				{
-					ZEComponent* CurrentComponent = CurrentEntity->GetComponents()[N];
-					if (ZEBoundingSphere::IntersectionTest(CurrentComponent->GetWorldBoundingSphere(), Ray, MinT, MaxT)) // && ZEAABoundingBox::IntersectionTest(CurrentComponent->GetWorldBoundingBox(), Ray))
-						if (Filter & ZE_RCF_ CurrentComponent->CastRay(Ray, Position, Normal, TEnterance, TExit))
-							if (CurrMinT > MinT)
-							{
-								CurrMinT = Mint;
-								*Component = CurrentComponent;
-								*Entity = CurrentEntity;
-							}
-				}
-		}
-
-	if (Filter & (ZE_RCF_MAP)
-		if (Environment.CastRay(Ray, Position, Normal, TEnterance, TExit))
-			if (MinT > TEnterance)
-			{
-				*Component = NULL;
-				*Entity = NULL;
-				return true;
-			}
-
-	return (*Component == NULL);
-}*/
 
 void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bool LightsEnabled)
 {
@@ -499,6 +478,7 @@ bool ZEScene::Save(const char* FileName)
 
 bool ZEScene::Load(const char* FileName)
 {
+	zeLog("Scene", "Loading scene \"%s\".", FileName);
 	ZEFileUnserializer Unserializer;
 	char EntityTypeName[ZE_MAX_NAME_SIZE];
 	if (Unserializer.OpenFile(FileName))
@@ -541,6 +521,7 @@ bool ZEScene::Load(const char* FileName)
 			}
 		}
 
+		zeLog("Scene", "Scene loaded.");
 		return true;
 	}
 	else
@@ -552,6 +533,7 @@ bool ZEScene::Load(const char* FileName)
 
 ZEScene::ZEScene()
 {
+	Initialized = false;
 	LastEntityId = 0;
 	ShadowRenderer = NULL;
 	Renderer = NULL;

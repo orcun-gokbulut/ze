@@ -53,6 +53,7 @@
 ZEPhysXPhysicalRigidBody::ZEPhysXPhysicalRigidBody()
 {
 	Actor = NULL;
+	PhysicalBodyType = ZE_PBT_DYNAMIC;
 	ActorDesc.setToDefault();
 	BodyDesc.setToDefault();
 }
@@ -400,7 +401,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 
 void ZEPhysXPhysicalRigidBody::Deinitialize()
 {
-	if (PhysicalWorld != NULL && PhysicalWorld->GetScene() != NULL)
+	if (Actor != NULL && PhysicalWorld != NULL && PhysicalWorld->GetScene() != NULL)
 	{
 		PhysicalWorld->GetScene()->releaseActor(*Actor);
 		Actor = NULL;

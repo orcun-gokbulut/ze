@@ -83,6 +83,8 @@ class ZEPhysicalWorld;
 class ZEScene
 {
 	private:
+		bool									Initialized;
+
 		unsigned int							LastEntityId;
 
 		ZEPortalMap								Environment;

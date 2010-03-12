@@ -46,7 +46,7 @@ bool ZESoundDebugComponent::Initialize()
 	ZEScene* Scene = zeGame->GetScene();
 
 	// Create the player
-	if (Player != NULL)
+	if (Player == NULL)
 	{
 		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
 		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
@@ -57,7 +57,7 @@ bool ZESoundDebugComponent::Initialize()
 		Scene->AddEntity(Player);
 	}
 
-	if (SoundSource != NULL)
+	if (SoundSource == NULL)
 	{
 		ZESoundSource3D* SoundSource = ZESoundSource3D::CreateInstance();
 
