@@ -52,14 +52,19 @@ class ZEMaterial;
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256
 
+#include "Physics/PhysicalRigidBody.h"
+#include "Physics/PhysicalShapes.h"
+
+/*
 enum ZEPhysicalShapeType
 {
 	ZE_PST_PLANE            = 0,
 	ZE_PST_BOX				= 1,
 	ZE_PST_SPHERE			= 2,
-	ZE_PST_CAPSULE			= 3,
-	ZE_PST_CONVEX			= 4,
-	ZE_PST_TRIMESH          = 5
+	ZE_PST_CYLINDER			= 3,
+	ZE_PST_CAPSULE			= 4,
+	ZE_PST_CONVEX			= 5,
+	ZE_PST_TRIMESH          = 6
 };
 
 enum ZEPhysicalBodyType
@@ -69,6 +74,7 @@ enum ZEPhysicalBodyType
 	ZE_PBT_DEFORMABLE		= 2,
 	ZE_PBT_CLOTH			= 3
 };
+*/
 
 enum ZEPhysicalJointType
 {

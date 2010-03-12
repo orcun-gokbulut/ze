@@ -37,16 +37,6 @@
 #include "Model.h"
 #include <stdio.h>
 #include "Core/Core.h"
-#include "Physics/PhysicsModule.h"
-#include "Physics/PhysicsBodyInfo.h"
-#include "Physics/PhysicsShapeInfo.h"
-#include "Physics/PhysicsBoxShapeInfo.h"
-#include "Physics/PhysicsCapsuleShapeInfo.h"
-#include "Physics/PhysicsConvexShapeInfo.h"
-#include "Physics/PhysicsPlaneShapeInfo.h"
-#include "Physics/PhysicsSphereShapeInfo.h"
-#include "Physics/PhysicsTrimeshShapeInfo.h"
-#include "Physics/PhysicsMaterial.h"
 
 const char* ZEModelBone::GetName()
 {

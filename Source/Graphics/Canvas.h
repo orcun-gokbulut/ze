@@ -44,11 +44,27 @@
 #include "ZEMath/Matrix.h"
 #include "ZEMath/AABoundingBox.h"
 
-class ZECanvas : public ZEArrayVertexBuffer<ZESimpleVertex>
+class ZECanvasVertex
+{
+	private:
+		static ZEVertexDeclaration*		VertexDeclaration;
+
+	public:
+		ZEVector3						Position;
+		ZEVector3						Normal;		
+		ZEVector2						Texcoord;
+		ZEVector4						Color;
+
+		static ZEVertexDeclaration*		GetVertexDeclaration();
+};
+
+class ZECanvas : public ZEDynamicVertexBuffer 
 {
 	public:
+		ZESmartArray<ZECanvasVertex>	Vertices;
 		ZESmartArray<ZEMatrix4x4>		TransformationStack;
 		ZEMatrix4x4						Transformation;
+		ZEVector4						Color;		
 
 	public:
 		void							PushTransformation();
@@ -56,28 +72,31 @@ class ZECanvas : public ZEArrayVertexBuffer<ZESimpleVertex>
 
 		void							SetTransfomation(const ZEMatrix4x4& Matrix);
 		const ZEMatrix4x4&				GetTransformation();
+		
+		void							SetColor(const ZEVector4& Color);
+		const ZEVector4&				GetColor();
 
 		void							AddWireframePlane(float Width, float Length, unsigned int VSegment, unsigned int HSegment);
 		void							AddWireframeBox(float Width, float Height, float Length);
-		void							AddWireframeSphere(float Radious, unsigned int HSegments, unsigned int VSegments);
+		void							AddWireframeSphere(float Radius, unsigned int HSegments, unsigned int VSegments);
 		void							AddWireframeQuad(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3);
-		void							AddWireframeCylinder(float Radious, float Height, unsigned int HSegments, unsigned int VSegments, bool Caps);
+		void							AddWireframeCylinder(float Radius, float Height, unsigned int HSegments, unsigned int VSegments, bool Caps);
 		void							AddWireframePyramid(float Width, float Height, float Length);
 
 		void							AddPoint(const ZEVector3& Point);
 		void							AddLine(const ZEVector3& Point0, const ZEVector3& Point1);
-		void							AddCircle(float Radious, unsigned int Segments);
+		void							AddCircle(float Radius, unsigned int Segments);
 
 		void							AddBox(float Width, float Height, float Length);
-		void							AddSphere(float Radious, unsigned int HSegment, unsigned int VSegment);
+		void							AddSphere(float Radius, unsigned int HSegment, unsigned int VSegment);
 		void							AddQuad(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3);
-		void							AddDisc(float Radious, unsigned int Segments);
+		void							AddDisc(float Radius, unsigned int Segments);
 		void							AddPyramid(float Width, float Height, float Length);
 		void							AddPlane(float Width, float Length);
 
-		void							AddVertex(const ZESimpleVertex& Vertex);
-		void							AddVertices(const ZESimpleVertex* Vertices, size_t Count);
-
+		void							AddVertex(const ZECanvasVertex& Vertex);
+		void							AddVertices(const ZECanvasVertex* Vertices, size_t Count);
+		
 		void							CalculateBoundingBox(ZEAABoundingBox& BoundingBox);
 
 		bool							IsEmpty();
@@ -86,6 +105,9 @@ class ZECanvas : public ZEArrayVertexBuffer<ZESimpleVertex>
 		ZEStaticVertexBuffer*			CreateStaticVertexBuffer();
 		bool							LoadCanvasFile(const char* FileName);
 
+		virtual unsigned int			GetBufferSize();
+		virtual void*					GetVertexBuffer();
+		
 										ZECanvas();
 };
 

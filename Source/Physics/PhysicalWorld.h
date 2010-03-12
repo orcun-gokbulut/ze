@@ -45,26 +45,29 @@ class ZEVector3;
 #include "ZEDS/Array.h"
 
 class ZEPhysicalObject;
+class ZERenderer;
 class ZEPhysicalWorld
 {
 	protected:
-													ZEPhysicsWorld(){}
-		virtual										~ZEPhysicsWorld(){}
+													ZEPhysicalWorld(){}
+		virtual										~ZEPhysicalWorld(){}
 
 	public:
-		virtual void								SetGravity(ZEVector3) = 0;
+		virtual void								SetGravity(const ZEVector3& Gravity) = 0;
 		virtual ZEVector3							GetGravity() = 0;
 
-		virtual const ZEArray<ZEPhysicalObject*>&	GetPhysicalObjects();
-		virtual void								AddPhysicalObject(ZEPhysicalObject* Object);
-		virtual void								RemovePhysicalObject(ZEPhysicalObject* Object);
+		virtual const ZEArray<ZEPhysicalObject*>&	GetPhysicalObjects() = 0;
+		virtual void								AddPhysicalObject(ZEPhysicalObject* Object) = 0;
+		virtual void								RemovePhysicalObject(ZEPhysicalObject* Object) = 0;
 
-		virtual void								Initialize() = 0;
+		virtual bool								Initialize() = 0;
 		virtual void								Deinitialize() = 0;
 
 		virtual void								Update(float ElapsedTime) = 0;
 
 		void										Destroy();
+
+		void										Draw(ZERenderer* Renderer);
 
 		static ZEPhysicalWorld*						CreateInstance();
 };

@@ -496,8 +496,8 @@ void ZEModel::UpdateBoneTransforms()
 
 void ZEModel::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
 {
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
-		Meshes[I].Draw(Renderer, Lights);
+/*	for (size_t I = 0; I < Meshes.GetCount(); I++)
+		Meshes[I].Draw(Renderer, Lights);*/
 
 	SkeletonPointsVertexBuffer.Clean();
 	SkeletonVertexBuffer.Clean();

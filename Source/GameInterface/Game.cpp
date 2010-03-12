@@ -178,9 +178,9 @@ void ZEGame::Destroy()
 void ZEGame::Render(float ElapsedTime)
 {
 	Scene->Render(ElapsedTime);
-	UIManager->Render(Scene->Renderer);
-	Scene->Renderer->Render(ElapsedTime);
-	Scene->Renderer->ClearList();
+	UIManager->Render(Scene->GetRenderer());
+	Scene->GetRenderer()->Render(ElapsedTime);
+	Scene->GetRenderer()->ClearList();
 }
 
 #include "ZEDS/String.h"

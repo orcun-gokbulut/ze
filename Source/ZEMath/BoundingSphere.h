@@ -66,6 +66,6 @@ class ZEBoundingSphere
 		static bool				CollisionTest(const ZEBoundingSphere& BoundingSphere1, const ZEBoundingSphere& BoundingSphere2);
 
 								ZEBoundingSphere();
-								ZEBoundingSphere(const ZEVector3& Position, float Radious);
+								ZEBoundingSphere(const ZEVector3& Position, float Radius);
 };
 #endif

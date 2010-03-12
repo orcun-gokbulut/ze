@@ -33,29 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "PhysicalShapes.h"
+
 // Physical Shape
 /////////////////////////////////////////////////////////////////////////////////////////
-void  ZEPhysicalShape::SetPosition(const ZEVector3& NewPosition)
+void ZEPhysicalShape::SetOwner(ZEPhysicalObject* Owner)
+{
+	this->Owner = Owner;
+}
+
+ZEPhysicalObject* ZEPhysicalShape::GetOwner()
+{
+	return Owner;
+}
+
+void ZEPhysicalShape::SetPosition(const ZEVector3& NewPosition)
 {
 	Position = NewPosition;
 }
 
-const ZEVector3&  ZEPhysicalShape::GetPosition()
+const ZEVector3& ZEPhysicalShape::GetPosition()
 {
 	return Position;
 }
 
-void  ZEPhysicalShape::SetOrientation(const ZEVector3& NewOrientation)
+void ZEPhysicalShape::SetRotation(const ZEQuaternion& NewRotation)
 {
 	Rotation = NewRotation;
 }
 
-const ZEQuaternion&  ZEPhysicalShape::GetOrientation()
+const ZEQuaternion& ZEPhysicalShape::GetRotation()
 {
 	return Rotation;
 }
 
-void  ZEPhysicalShape::SetMaterial(const ZEPhysicalMaterial& NewMaterial)
+void ZEPhysicalShape::SetMaterial(const ZEPhysicalMaterial& NewMaterial)
 {
 	Material = NewMaterial;
 }
@@ -65,76 +77,98 @@ const ZEPhysicalMaterial&  ZEPhysicalShape::GetMaterial()
 	return Material;
 }
 
-ZEPhysicalShape::ZEPhysicsShapeInfo()
+ZEPhysicalShape::ZEPhysicalShape()
 {
+	Position = ZEVector3::UnitX;
+	Rotation = ZEQuaternion::Identity;
 	Material.DynamicFriction = 1.0f;
 	Material.StaticFriction = 1.0f;
-	Material.Restitioun = 1.0f;
-}
-
-ZEPhysicalShape::~ZEPhysicsShapeInfo()
-{
+	Material.Restitution = 1.0f;
 }
 
 // Physical Box Shape
 /////////////////////////////////////////////////////////////////////////////////////////
-virtual ZEPhysicalBoxShape::GetType()
+ZEPhysicalShapeType ZEPhysicalBoxShape::GetPhysicalShapeType()
 {
 	return ZE_PST_BOX;
 }
 
-void  ZEPhysicalBoxShape::SetWidth(float NewWidth)
+void ZEPhysicalBoxShape::SetWidth(float NewWidth)
 {
 	Width = NewWidth;
 }
 
-float  ZEPhysicalBoxShape::GetWidth()
+float ZEPhysicalBoxShape::GetWidth()
 {
 	return Width;
 }
 
-void  ZEPhysicalBoxShape::SetHeight(float NewHeight)
+void ZEPhysicalBoxShape::SetHeight(float NewHeight)
 {
 	Height = NewHeight;
 }
 
-float  ZEPhysicalBoxShape::GetHeight()
+float ZEPhysicalBoxShape::GetHeight()
 {
 	return Height;
 }
 
-void  ZEPhysicalBoxShape::SetLength(float NewLength)
+void ZEPhysicalBoxShape::SetLength(float NewLength)
 {
-	Lenght = NewLength;
+	Length = NewLength;
 }
 
-float  ZEPhysicalBoxShape::GetLength()
+float ZEPhysicalBoxShape::GetLength()
 {
 	return Length;
 }
 
-// Physical Sphere Shape
-/////////////////////////////////////////////////////////////////////////////////////////
-void  ZEPhysicalSphereShape::SetRadious(float NewRadious)
+ZEPhysicalBoxShape::ZEPhysicalBoxShape()
 {
-	Radious = NewRadious;
+	Width = 1.0f;
+	Height = 1.0f;
+	Length = 1.0f;
 }
 
-float  ZEPhysicalSphereShape::GetRadious()
+
+// Physical Sphere Shape
+/////////////////////////////////////////////////////////////////////////////////////////
+ZEPhysicalShapeType ZEPhysicalSphereShape::GetPhysicalShapeType()
 {
-	return Radious;
+	return ZE_PST_SPHERE;
 }
+
+void ZEPhysicalSphereShape::SetRadius(float NewRadius)
+{
+	Radius = NewRadius;
+}
+
+float ZEPhysicalSphereShape::GetRadius()
+{
+	return Radius;
+}
+
+ZEPhysicalSphereShape::ZEPhysicalSphereShape()
+{
+	Radius = 1.0f;
+}
+
 
 // Physical Capsule Shape
 /////////////////////////////////////////////////////////////////////////////////////////
-void  ZEPhysicalCapsuleShape::SetRadious(float NewRadious)
+ZEPhysicalShapeType ZEPhysicalCapsuleShape::GetPhysicalShapeType()
 {
-	Radious = NewRadious;
+	return ZE_PST_CAPSULE;
 }
 
-float  ZEPhysicalCapsuleShape::GetRadious()
+void  ZEPhysicalCapsuleShape::SetRadius(float NewRadius)
 {
-	return Radious;
+	Radius = NewRadius;
+}
+
+float  ZEPhysicalCapsuleShape::GetRadius()
+{
+	return Radius;
 }
 
 void  ZEPhysicalCapsuleShape::SetHeight(float NewHeight)
@@ -147,18 +181,114 @@ float  ZEPhysicalCapsuleShape::GetHeight()
 	return Height;
 }
 
+ZEPhysicalCapsuleShape::ZEPhysicalCapsuleShape()
+{
+	Radius = 1.0f;
+	Height = 1.0f;
+}
+
+
 // Physical Trimesh Shape
 /////////////////////////////////////////////////////////////////////////////////////////
-void  ZEPhysicalTrimeshShape::SetVertices(ZEArray<ZEVector3>& Vertices, ZEArray<unsigned int[3]> Indices)
+ZEPhysicalShapeType ZEPhysicalCylinderShape::GetPhysicalShapeType()
 {
-	// UNDEFINED
+	return ZE_PST_CYLINDER;
 }
+
+void ZEPhysicalCylinderShape::SetRadius(float NewRadius)
+{
+	Radius = NewRadius;
+}
+
+float ZEPhysicalCylinderShape::GetRadius()
+{
+	return Radius;
+}
+
+
+void ZEPhysicalCylinderShape::SetHeight(float NewHeight)
+{
+	Height = NewHeight;
+}
+
+float ZEPhysicalCylinderShape::GetHeight()
+{
+	return Height;
+}
+
+ ZEPhysicalCylinderShape::ZEPhysicalCylinderShape()
+ {
+	Radius = 1.0f;
+	Height = 1.0f;
+ }
+
+
+// Physical Trimesh Shape
+/////////////////////////////////////////////////////////////////////////////////////////
+ZEPhysicalShapeType ZEPhysicalTrimeshShape::GetPhysicalShapeType()
+{
+	return ZE_PST_TRIMESH;
+}
+
+void ZEPhysicalTrimeshShape::SetMaterialsPerTriangle(bool Enabled)
+{
+	MaterialsPerTriangle = Enabled;
+}
+
+bool ZEPhysicalTrimeshShape::GetMaterialsPerTriangle()
+{
+	return MaterialsPerTriangle;
+}
+
+void  ZEPhysicalTrimeshShape::SetTriangleVertices(const ZEArray<ZEVector3>& Vertices)
+{
+	TriangleVertices = Vertices;
+}
+
+const ZEArray<ZEVector3>& ZEPhysicalTrimeshShape::GetTriangleVertices()
+{
+	return TriangleVertices;
+}
+
+void ZEPhysicalTrimeshShape::SetTriangles(const ZEArray<ZEPhysicalTriangle>& Triangles)
+{
+	this->Triangles = Triangles;
+}
+
+const ZEArray<ZEPhysicalTriangle>& ZEPhysicalTrimeshShape::GetTriangles()
+{
+	return Triangles;
+}
+
+void ZEPhysicalTrimeshShape::SetTriangleMaterials(const ZEArray<ZEPhysicalMaterial>& Materials)
+{
+	TriangleMaterials = Materials;
+}
+
+const ZEArray<ZEPhysicalMaterial>& ZEPhysicalTrimeshShape::GetTriangleMaterials()
+{
+	return TriangleMaterials;
+}
+
+ZEPhysicalTrimeshShape::ZEPhysicalTrimeshShape()
+{
+	MaterialsPerTriangle = false;
+}
+
 
 // Physical Convex Shape
 /////////////////////////////////////////////////////////////////////////////////////////
-void  ZEPhysicalConvexShape::SetVertices(ZEArray<ZEVector3>& Vertices)
+ZEPhysicalShapeType ZEPhysicalConvexShape::GetPhysicalShapeType()
 {
-	// UNDEFINED
+	return ZE_PST_CONVEX;
 }
 
-#endif
+void ZEPhysicalConvexShape::SetConvexVertices(const ZEArray<ZEVector3>& Vertices)
+{
+	ConvexVertices= Vertices;
+}
+
+const ZEArray<ZEVector3>& ZEPhysicalConvexShape::GetConvexVertices()
+{
+	return ConvexVertices;
+}

@@ -46,40 +46,6 @@
 #include "ZEMath/Ray.h"
 #include <memory.h>
 
-void ZEScene::DrawOrientedBoundingBox(const ZEAABoundingBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, ZEMaterial* Material)
-{
-	ZEMatrix4x4 LocalPivot;
-	ZEMatrix4x4::CreateOrientation(LocalPivot, BoundingBox.GetCenter(), 
-		ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 
-		ZEVector3((BoundingBox.Max.x - BoundingBox.Min.x), 
-			(BoundingBox.Max.y - BoundingBox.Min.y), 
-			(BoundingBox.Max.z - BoundingBox.Min.z))
-			);
-	ZEMatrix4x4::Multiply(BoundingBoxRenderOrder.WorldMatrix, LocalPivot, Transform);
-	BoundingBoxRenderOrder.Material = Material;
-	Renderer->AddToRenderList(&BoundingBoxRenderOrder);
-}
-
-void ZEScene::DrawAxisAlignedBoundingBox(const ZEAABoundingBox& BoundingBox, ZERenderer* Renderer, ZEMaterial* Material)
-{
-	ZEMatrix4x4::CreateOrientation(BoundingBoxRenderOrder.WorldMatrix, BoundingBox.GetCenter(), 
-		ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 
-		ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z)
-		);
-	BoundingBoxRenderOrder.Material = Material;
-	Renderer->AddToRenderList(&BoundingBoxRenderOrder);
-}
-
-void ZEScene::DrawBoundingSphere(const ZEBoundingSphere& BoundingSphere, ZERenderer* Renderer, ZEMaterial* Material)
-{
-	ZEMatrix4x4::CreateOrientation(BoundingSphereRenderOrder.WorldMatrix, BoundingSphere.Position, 
-		ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 
-		ZEVector3(BoundingSphere.Radius * 2.0f, BoundingSphere.Radius * 2.0f, BoundingSphere.Radius * 2.0f)
-		);
-	BoundingSphereRenderOrder.Material = Material;
-	Renderer->AddToRenderList(&BoundingSphereRenderOrder);
-}
-
 void ZEScene::SetVisualDebugElements(ZEDWORD VisualDebugElements)
 {
 	this->VisualDebugElements = VisualDebugElements;
@@ -90,20 +56,12 @@ ZEDWORD ZEScene::GetVisualDebugElements()
 	return this->VisualDebugElements;
 }
 
-#include "Graphics/PostProcessor/PostProcessor.h"
-#include "Graphics/PostProcessor/PPColorInputNode.h"
-#include "Graphics/PostProcessor/PPScreenOutputNode.h"
-#include "Graphics/PostProcessor/PPBlurNode.h"
-
 bool ZEScene::Initialize()
 {
+	Deinitialize();
 	if (Renderer != NULL)
 		Renderer->Destroy();
 
-	/*ZETexture2D* Texture = zeGraphics->CreateTexture();
-	Texture->Create(zeGraphics->GetScreenWidth(), zeGraphics->GetScreenHeight(), ZE_TPF_ARGB32, true);
-	*/
-	
 	Renderer = ZEFrameBufferRenderer::CreateInstance();
 	if (Renderer == NULL)
 	{
@@ -121,204 +79,33 @@ bool ZEScene::Initialize()
 		return false;
 	}
 
-	ZECanvas Canvas;
-	Canvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
-
-	BoundingBoxRenderOrder.SetZero();
-	BoundingBoxRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_ZCULLING;
-	BoundingBoxRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
-	BoundingBoxRenderOrder.PrimitiveType = ZE_ROPT_LINE;
-	BoundingBoxRenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
-
-	if (BoundingBoxRenderOrder.VertexBuffer != NULL)
-	{
-		((ZEStaticVertexBuffer*)BoundingBoxRenderOrder.VertexBuffer)->Release();
-		delete BoundingBoxRenderOrder.VertexBuffer;
-	}
-	
-	BoundingBoxRenderOrder.VertexBuffer = Canvas.CreateStaticVertexBuffer();
-
-	Canvas.Clean();
-	Canvas.AddWireframeSphere(1.0f, 8, 8);
-	BoundingSphereRenderOrder.SetZero();
-	BoundingSphereRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_ZCULLING;
-	BoundingSphereRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
-	BoundingSphereRenderOrder.PrimitiveType = ZE_ROPT_LINE;
-	BoundingSphereRenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
-
-	if (BoundingSphereRenderOrder.VertexBuffer != NULL)
-	{
-		((ZEStaticVertexBuffer*)BoundingBoxRenderOrder.VertexBuffer)->Release();
-		delete BoundingSphereRenderOrder.VertexBuffer;
-	}
-
-	BoundingSphereRenderOrder.VertexBuffer = Canvas.CreateStaticVertexBuffer();
-
-
-	if (EntityAxisAlignedBoundingBoxMaterial != NULL)
-	{
-		EntityAxisAlignedBoundingBoxMaterial->Destroy();
-		EntityAxisAlignedBoundingBoxMaterial = NULL;
-	}
-
-	EntityAxisAlignedBoundingBoxMaterial = ZEFixedMaterial::CreateInstance();
-	EntityAxisAlignedBoundingBoxMaterial->SetZero();
-	EntityAxisAlignedBoundingBoxMaterial->SetLightningEnabled(false);
-	EntityAxisAlignedBoundingBoxMaterial->SetAmbientEnabled(true);
-	EntityAxisAlignedBoundingBoxMaterial->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
-	EntityAxisAlignedBoundingBoxMaterial->UpdateMaterial();
-
-
-	if (EntityOrientedBoundingBoxMaterial != NULL)
-	{
-		EntityOrientedBoundingBoxMaterial->Destroy();
-		EntityOrientedBoundingBoxMaterial = NULL;
-	}
-
-	EntityOrientedBoundingBoxMaterial = ZEFixedMaterial::CreateInstance();
-	EntityOrientedBoundingBoxMaterial->SetZero();
-	EntityOrientedBoundingBoxMaterial->SetLightningEnabled(false);
-	EntityOrientedBoundingBoxMaterial->SetAmbientEnabled(true);
-	EntityOrientedBoundingBoxMaterial->SetAmbientColor(ZEVector3(1.0f, 1.0f, 1.0f));
-	EntityOrientedBoundingBoxMaterial->UpdateMaterial();
-
-
-	if (EntityBoundingSphereMaterial != NULL)
-	{
-		EntityBoundingSphereMaterial->Destroy();
-		EntityBoundingSphereMaterial = NULL;
-	}
-
-	EntityBoundingSphereMaterial = ZEFixedMaterial::CreateInstance();
-	EntityBoundingSphereMaterial->SetZero();
-	EntityBoundingSphereMaterial->SetLightningEnabled(false);
-	EntityBoundingSphereMaterial->SetAmbientEnabled(true);
-	EntityBoundingSphereMaterial->SetAmbientColor(ZEVector3(1.0f, 0.0f, 1.0f));
-	EntityBoundingSphereMaterial->UpdateMaterial();
-
-
-	if (ComponentAxisAlignedBoundingBoxMaterial != NULL)
-	{
-		ComponentAxisAlignedBoundingBoxMaterial->Destroy();
-		ComponentAxisAlignedBoundingBoxMaterial = NULL;
-	}
-
-	ComponentAxisAlignedBoundingBoxMaterial = ZEFixedMaterial::CreateInstance();
-	ComponentAxisAlignedBoundingBoxMaterial->SetZero();
-	ComponentAxisAlignedBoundingBoxMaterial->SetLightningEnabled(false);
-	ComponentAxisAlignedBoundingBoxMaterial->SetAmbientEnabled(true);
-	ComponentAxisAlignedBoundingBoxMaterial->SetAmbientColor(ZEVector3(0.5f, 0.5f, 0.0f));
-	ComponentAxisAlignedBoundingBoxMaterial->UpdateMaterial();
-
-
-	if (ComponentOrientedBoundingBoxMaterial != NULL)
-	{
-		ComponentOrientedBoundingBoxMaterial->Destroy();
-		ComponentOrientedBoundingBoxMaterial = NULL;
-	}
-
-	ComponentOrientedBoundingBoxMaterial = ZEFixedMaterial::CreateInstance();
-	ComponentOrientedBoundingBoxMaterial->SetZero();
-	ComponentOrientedBoundingBoxMaterial->SetLightningEnabled(false);
-	ComponentOrientedBoundingBoxMaterial->SetAmbientEnabled(true);
-	ComponentOrientedBoundingBoxMaterial->SetAmbientColor(ZEVector3(0.5f, 0.5f, 0.5f));
-	ComponentOrientedBoundingBoxMaterial->UpdateMaterial();
-
-
-	if (ComponentBoundingSphereMaterial != NULL)
-	{
-		ComponentBoundingSphereMaterial->Destroy();
-		ComponentBoundingSphereMaterial = NULL;
-	}
-
-	ComponentBoundingSphereMaterial = ZEFixedMaterial::CreateInstance();
-	ComponentBoundingSphereMaterial->SetZero();
-	ComponentBoundingSphereMaterial->SetLightningEnabled(false);
-	ComponentBoundingSphereMaterial->SetAmbientEnabled(true);
-	ComponentBoundingSphereMaterial->SetAmbientColor(ZEVector3(0.5f, 0.0f, 0.5f));
-	ComponentBoundingSphereMaterial->UpdateMaterial();
-
-
-	if (LightRangeMaterial != NULL)
-	{
-		LightRangeMaterial->Destroy();
-		LightRangeMaterial = NULL;
-	}
-
-	LightRangeMaterial = ZEFixedMaterial::CreateInstance();
-	LightRangeMaterial->SetZero();
-	LightRangeMaterial->SetLightningEnabled(false);
-	LightRangeMaterial->SetAmbientEnabled(true);
-	LightRangeMaterial->SetAmbientColor(ZEVector3(0.0f, 0.0f, 0.5f));
-	LightRangeMaterial->UpdateMaterial();
+	DebugDraw.Initialize();
 
 	return true;
 }
 
-bool ZEScene::Deinitialize()
+void ZEScene::Deinitialize()
 {
+	for (size_t I = 0; I < Entities.GetCount(); I++)
+		Entities[I]->Deinitialize();
+
+	//Environment.Deinitialize();
+	
+	DebugDraw.Deinitialize();
+
+	if (Renderer != NULL)
+		Renderer->Deinitialize();
+	
+}
+
+void ZEScene::Destroy()
+{
+	Deinitialize();
+
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Destroy();
 
-	Entities.Clear();
-
 	Environment.Destroy();
-	if (EntityAxisAlignedBoundingBoxMaterial != NULL)
-	{
-		EntityAxisAlignedBoundingBoxMaterial->Destroy();
-		EntityAxisAlignedBoundingBoxMaterial = NULL;
-	}
-
-
-	if (EntityOrientedBoundingBoxMaterial != NULL)
-	{
-		EntityOrientedBoundingBoxMaterial->Destroy();
-		EntityOrientedBoundingBoxMaterial = NULL;
-	}
-
-
-	if (EntityBoundingSphereMaterial != NULL)
-	{
-		EntityBoundingSphereMaterial->Destroy();
-		EntityBoundingSphereMaterial = NULL;
-	}
-
-
-	if (EntityBoundingSphereMaterial != NULL)
-	{
-		EntityBoundingSphereMaterial->Destroy();
-		EntityBoundingSphereMaterial = NULL;
-	}
-
-	if (ComponentAxisAlignedBoundingBoxMaterial != NULL)
-	{
-		ComponentAxisAlignedBoundingBoxMaterial->Destroy();
-		ComponentAxisAlignedBoundingBoxMaterial = NULL;
-	}
-
-	if (ComponentOrientedBoundingBoxMaterial != NULL)
-	{
-		ComponentOrientedBoundingBoxMaterial->Destroy();
-		ComponentOrientedBoundingBoxMaterial = NULL;
-	}
-
-	if (ComponentBoundingSphereMaterial != NULL)
-	{
-		ComponentBoundingSphereMaterial->Destroy();
-		ComponentBoundingSphereMaterial = NULL;
-	}
-
-	if (BoundingBoxRenderOrder.VertexBuffer != NULL)
-	{
-		((ZEStaticVertexBuffer*)BoundingBoxRenderOrder.VertexBuffer)->Destroy();
-		BoundingBoxRenderOrder.VertexBuffer = NULL;
-	}
-
-	if (BoundingSphereRenderOrder.VertexBuffer != NULL)
-	{
-		((ZEStaticVertexBuffer*)BoundingSphereRenderOrder.VertexBuffer)->Destroy();
-		BoundingSphereRenderOrder.VertexBuffer = NULL;
-	}
 
 	if (Renderer != NULL)
 	{
@@ -326,17 +113,6 @@ bool ZEScene::Deinitialize()
 		Renderer = NULL;
 	}
 
-	return true;
-}
-
-void ZEScene::Reset()
-{
-
-}
-
-void ZEScene::Destroy()
-{
-	Deinitialize();
 	delete this;
 }
 
@@ -356,6 +132,16 @@ void ZEScene::RemoveEntity(ZEEntity* Entity)
 const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()
 {
 	return Entities;
+}
+
+ZERenderer* ZEScene::GetRenderer()
+{
+	return Renderer;
+}
+
+ZEPhysicalWorld* ZEScene::GetPhysicalWorld()
+{
+	return PhysicalWorld;
 }
 
 void ZEScene::SetActiveCamera(ZECamera* Camera)
@@ -547,7 +333,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 
 						// If visual debug elements enabled then visualize lights range
 						if (VisualDebugElements & ZE_VDE_LIGHT_RANGE)
-							DrawBoundingSphere(ZEBoundingSphere(Component->GetWorldPosition(), ((ZELight*)Component)->GetRange()), Renderer, LightRangeMaterial);
+							DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Component->GetWorldPosition(), ((ZELight*)Component)->GetRange()), Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
 
 						// If light is casting shadows generate shadow maps of the light
 						if (((ZELight*)Component)->GetCastsShadows())
@@ -599,13 +385,13 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 
 			// Draw visual debug elements local and axis aligned entites bounding boxes and bounding sphere if enabled
 			if (VisualDebugElements & ZE_VDE_ENTITY_ORIENTED_BOUNDINGBOX)
-				DrawOrientedBoundingBox(CurrentEntity->GetLocalBoundingBox(), CurrentEntity->GetWorldTransform(), Renderer, EntityOrientedBoundingBoxMaterial);
+				DebugDraw.DrawOrientedBoundingBox(CurrentEntity->GetLocalBoundingBox(), CurrentEntity->GetWorldTransform(), Renderer, ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
 
 			if (VisualDebugElements & ZE_VDE_ENTITY_AXISALIGNED_BOUNDINGBOX)
-				DrawAxisAlignedBoundingBox(CurrentEntity->GetWorldBoundingBox(), Renderer, EntityAxisAlignedBoundingBoxMaterial);
+				DebugDraw.DrawAxisAlignedBoundingBox(CurrentEntity->GetWorldBoundingBox(), Renderer, ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));
 
 			if (VisualDebugElements & ZE_VDE_ENTITY_BOUNDINGSPHERE)
-				DrawBoundingSphere(CurrentEntity->GetWorldBoundingSphere(), Renderer, EntityBoundingSphereMaterial);
+				DebugDraw.DrawBoundingSphere(CurrentEntity->GetWorldBoundingSphere(), Renderer, ZEVector4(0.25f, 0.25f, 0.25f, 1.0f));
 
 			// Call entity's draw routine to make it draw it self
 			CurrentEntity->Draw(Renderer, Lights);
@@ -636,13 +422,13 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 
 						// Draw bounding volumes of the components if enabled
 						if (VisualDebugElements & ZE_VDE_COMPONENT_ORIENTED_BOUNDINGBOX)
-							DrawOrientedBoundingBox(Component->GetLocalBoundingBox(), Component->GetWorldTransform(), Renderer, ComponentOrientedBoundingBoxMaterial);
+							DebugDraw.DrawOrientedBoundingBox(Component->GetLocalBoundingBox(), Component->GetWorldTransform(), Renderer, ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
 
 						if (VisualDebugElements & ZE_VDE_COMPONENT_AXISALIGNED_BOUNDINGBOX)
-							DrawAxisAlignedBoundingBox(Component->GetWorldBoundingBox(), Renderer, ComponentAxisAlignedBoundingBoxMaterial);
+							DebugDraw.DrawAxisAlignedBoundingBox(Component->GetWorldBoundingBox(), Renderer, ZEVector4(0.5f, 0.5f, 0.0f, 1.0f));
 
 						if (VisualDebugElements & ZE_VDE_COMPONENT_BOUNDINGSPHERE)
-							DrawBoundingSphere(Component->GetWorldBoundingSphere(), Renderer, ComponentBoundingSphereMaterial);
+							DebugDraw.DrawBoundingSphere(Component->GetWorldBoundingSphere(), Renderer, ZEVector4(0.25f, 0.25f, 0.0f, 1.0f));
 						
 						// Call components's draw routine to make it draw it self
 						Component->Draw(Renderer, Lights);
@@ -651,7 +437,11 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 			}
 		}
 	}
+	
 	Environment.Render(Renderer, ViewVolume, VisibleLights);
+	
+	if (VisualDebugElements != NULL)
+		DebugDraw.Draw(Renderer);
 }
 
 
@@ -762,19 +552,12 @@ bool ZEScene::Load(const char* FileName)
 
 ZEScene::ZEScene()
 {
-	EntityAxisAlignedBoundingBoxMaterial = NULL;
-	EntityOrientedBoundingBoxMaterial = NULL;
-	EntityBoundingSphereMaterial = NULL;
-	EntityBoundingSphereMaterial = NULL;
-	ComponentAxisAlignedBoundingBoxMaterial = NULL;
-	ComponentOrientedBoundingBoxMaterial = NULL;
-	ComponentBoundingSphereMaterial = NULL;
-	LightRangeMaterial = NULL;
 	LastEntityId = 0;
 	ShadowRenderer = NULL;
 	Renderer = NULL;
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
+	PhysicalWorld = NULL;
 
 	VisualDebugElements = ZE_VDE_ENTITY_AXISALIGNED_BOUNDINGBOX;
 }

@@ -33,22 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PHYSICS_SHAPE_INFO_H__
-#define __ZE_PHYSICS_SHAPE_INFO_H__
 
-class ZEPhysicsMaterial;
-class ZEVector3;
-#include "Physics/PhysicsCollisionMask.h"
+#pragma once
+#ifndef	__ZE_PHYSICAL_SHAPES_H__
+#define __ZE_PHYSICAL_SHAPES_H__
+
+#include "ZEDS/Array.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
 
 enum  ZEPhysicalShapeType
 {
-	ZE_PBST_PLANE,
-	ZE_PBST_BOX,
-	ZE_PBST_SPHERE,
-	ZE_PBST_CAPSULE,
-	ZE_PBST_CONVEX,
-	ZE_PBST_TRIMESH
+	ZE_PST_PLANE,
+	ZE_PST_BOX,
+	ZE_PST_SPHERE,
+	ZE_PST_CYLINDER,
+	ZE_PST_CAPSULE,
+	ZE_PST_CONVEX,
+	ZE_PST_TRIMESH
+};
+
+struct ZEPhysicalTriangle
+{
+	unsigned int Indices[3];
+	unsigned int MaterialIndex;
 };
 
 struct ZEPhysicalMaterial
@@ -58,92 +66,142 @@ struct ZEPhysicalMaterial
 	float		Restitution;
 };
 
-class  ZEPhysicalShape
+class ZEPhysicalObject;
+
+class ZEPhysicalShape
 {
 	private:
-		ZEVector3					Positon;
-		ZEQuaternion				Orientation;
-		bool						Trigger;
-		 ZEPhysicalShapeMaterial	Material;
+		ZEPhysicalObject*				Owner;
+		ZEVector3						Position;
+		ZEQuaternion					Rotation;
+		bool							Trigger;
+		ZEPhysicalMaterial				Material;
 
 	public:
-		virtual ZEPhysicsShapeType	GetType() = 0;
+		virtual ZEPhysicalShapeType		GetPhysicalShapeType() = 0;
 
-		void						SetPosition(const ZEVector3& NewPosition);
-		const ZEVector3&			GetPosition();
+		void							SetOwner(ZEPhysicalObject* Owner);
+		ZEPhysicalObject*				GetOwner();
 
-		void						SetRotation(const ZEVector3& NewOrientation);
-		const ZEQuaternion&			GetRotation();
+		void							SetPosition(const ZEVector3& NewPosition);
+		const ZEVector3&				GetPosition();
 
-		void						SetMaterial(const ZEPhysicalMaterial& NewMaterial);
-		const ZEPhysicalMaterial&	GetMaterial();
+		void							SetRotation(const ZEQuaternion& NewRotation);
+		const ZEQuaternion&				GetRotation();
 
-									ZEPhysicsShapeInfo();
-		virtual						~ZEPhysicsShapeInfo();
+		void							SetMaterial(const ZEPhysicalMaterial& NewMaterial);
+		const ZEPhysicalMaterial&		GetMaterial();
+
+										ZEPhysicalShape();
 };
 
 class  ZEPhysicalBoxShape : public  ZEPhysicalShape
 {
 	private:
-		float						Width;
-		float						Height;
-		float						Length;
+		float							Width;
+		float							Height;
+		float							Length;
 
 	public:
-		virtual ZEPhysicsShapeType	GetType();
+		virtual ZEPhysicalShapeType		GetPhysicalShapeType();
 
-		void						SetWidth(float NewWidth);
-		float						GetLength();
+		void							SetWidth(float NewWidth);
+		float							GetWidth();
 
-		void						SetHeight(float NewHeight);
-		float						GetHeight();
+		void							SetHeight(float NewHeight);
+		float							GetHeight();
 
-		void						SetLength(float NewLength);
-		float						GetLength();
+		void							SetLength(float NewLength);
+		float							GetLength();
+
+										ZEPhysicalBoxShape();
 };
 
-class  ZEPhysicalSphereShape : public  ZEPhysicalSShape
+class  ZEPhysicalSphereShape : public  ZEPhysicalShape
 {
 	private:
-		float						Radious;
+		float							Radius;
 
 	public:
-		virtual ZEPhysicsShapeType	GetType();
+		virtual ZEPhysicalShapeType		GetPhysicalShapeType();
 
-		void						SetRadious(float NewRadious);
-		float						GetRadious();
+		void							SetRadius(float NewRadius);
+		float							GetRadius();
+
+										ZEPhysicalSphereShape();
 };
 
 class  ZEPhysicalCapsuleShape : public  ZEPhysicalShape
 {
 	private:
-		float						Radious1;
-		float						Height;
+		float							Radius;
+		float							Height;
 
 	public:
-		virtual ZEPhysicsShapeType	GetType();
+		virtual ZEPhysicalShapeType		GetPhysicalShapeType();
 
-		void						SetRadious(float NewRadious);
-		float						GetRadious();
+		void							SetRadius(float NewRadius);
+		float							GetRadius();
 
-		void						SetHeight(float NewHeight);
-		float						GetHeight();
+		void							SetHeight(float NewHeight);
+		float							GetHeight();
+
+										ZEPhysicalCapsuleShape();
+};
+
+class ZEPhysicalCylinderShape
+{
+	private:
+		float							Radius;
+		float							Height;
+
+	public:
+		virtual ZEPhysicalShapeType		GetPhysicalShapeType();
+
+		void							SetRadius(float NewRadius);
+		float							GetRadius();
+
+		void							SetHeight(float NewHeight);
+		float							GetHeight();
+
+										ZEPhysicalCylinderShape();
 };
 
 class  ZEPhysicalTrimeshShape : public  ZEPhysicalShape
 {
-	public:
-		virtual ZEPhysicsShapeType	GetType();
+	private:
+		ZEArray<ZEVector3>				TriangleVertices;
+		ZEArray<ZEPhysicalTriangle>		Triangles;
+		ZEArray<ZEPhysicalMaterial>		TriangleMaterials;
+		bool							MaterialsPerTriangle;
 
-		void						SetVertices(ZEArray<ZEVector3>& Vertices, ZEArray<unsigned int[3]> Indices);
-	
+	public:
+		virtual ZEPhysicalShapeType		GetPhysicalShapeType();
+
+		void							SetMaterialsPerTriangle(bool Enabled);
+		bool							GetMaterialsPerTriangle();
+
+		void							SetTriangleVertices(const ZEArray<ZEVector3>& Vertices);
+		const ZEArray<ZEVector3>&		GetTriangleVertices();
+
+		void							SetTriangles(const ZEArray<ZEPhysicalTriangle>& Triangles);
+		const ZEArray<ZEPhysicalTriangle>& GetTriangles();
+
+		void							SetTriangleMaterials(const ZEArray<ZEPhysicalMaterial>& Materials);
+		const ZEArray<ZEPhysicalMaterial>& GetTriangleMaterials();
+
+										ZEPhysicalTrimeshShape();
 };
 
 class  ZEPhysicalConvexShape : public  ZEPhysicalShape
 {
-	public:	
-		virtual ZEPhysicsShapeType	GetType();
+	private:
+		ZEArray<ZEVector3>				ConvexVertices;
 
-		void						SetVertices(ZEArray<ZEVector3>& Vertices);	
+	public:	
+		virtual ZEPhysicalShapeType		GetPhysicalShapeType();
+
+		void							SetConvexVertices(const ZEArray<ZEVector3>& Vertices);	
+		const ZEArray<ZEVector3>&		GetConvexVertices();
 };
 #endif

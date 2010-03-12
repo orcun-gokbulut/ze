@@ -55,6 +55,7 @@ class ZEShadowRenderer;
 class ZETextureRenderer;
 class ZEPostProcessor;
 class ZEUIMaterial;
+class ZESimpleMaterial;
 
 class ZEGraphicsModule : public ZEModule
 {	
@@ -133,6 +134,7 @@ class ZEGraphicsModule : public ZEModule
 
 		virtual ZEUIMaterial*				CreateUIMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateFixedMaterial() = 0;
+		virtual ZESimpleMaterial*			CreateSimpleMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCustomMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCGFXMaterial() = 0;
 

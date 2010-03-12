@@ -37,20 +37,6 @@
 #ifndef	__ZE_CORE_H__
 #define __ZE_CORE_H__
 
-/*#include "ZESDK.h"
-#include "CompileOptions.h" 
-#include "Error.h"
-#include "Command.h"
-#include "Resource.h"
-#include "ResourceManager.h"
-#include "Module.h"
-#include "ModuleManager.h"
-#include "Console.h"
-#include "Window.h"
-#include "Graphics/GraphicsModule.h"
-#include "Input/InputModule.h"
-#include "Sound/SoundModule.h"
-#include "GameInterface/Game.h"*/
 #include "Option.h"
 
 #define zeCore ZECore::GetInstance()
@@ -86,6 +72,8 @@ class ZEInputModule;
 class ZEPhysicsModule;
 class ZEGame;
 class ZEModule;
+class ZENetworkModule;
+class ZEDebugComponent;
 
 class ZECore
 {
@@ -111,7 +99,9 @@ class ZECore
 		ZEInputModule*					Input;
 		ZEPhysicsModule*				Physics;
 		ZEGame*							Game;
-		ZEModule*						Network;
+		ZENetworkModule*				Network;
+
+		ZEDebugComponent*				DebugComponent;
 
 		bool							InitializeModule(ZEModule* Module);
 		void							DeInitializeModule(ZEModule** Module);
@@ -142,11 +132,14 @@ class ZECore
 		bool							SetPhysicsModule(ZEModule* Module);
 		ZEPhysicsModule*				GetPhysicsModule();
 
-		bool							SetNetworkModule(ZEModule* Module);
-		ZEModule*						GetNetworkModule();
+		bool							SetNetworkModule(ZENetworkModule* Module);
+		ZENetworkModule*				GetNetworkModule();
 
 		bool							SetGame(ZEGame* Game);
 		ZEGame*							GetGame();
+
+		void							SetDebugComponent(ZEDebugComponent* Component);
+		ZEDebugComponent*				GetDebugComponent();
 
 		float							GetFrameTime();
 		float							GetRuningTime();

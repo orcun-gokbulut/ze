@@ -53,7 +53,7 @@ void _ZEAssert(char* Message, char* File, int Line, ...)
 	if (zeCore->GetConsole() != NULL)
 		zeOutput("[Assert] : %s\r\n", Buffer);
 
-#if defined(ZEDEBUG_ENABLED) && defined(ZEPLATFORM_WINDOWS)
+#if defined(ZEDEBUG_ENABLED) && defined(ZE_PLATFORM_WINDOWS)
 //	_CrtDbgReport(_CRT_ASSERT, File, Line, "Zinek Engine", Message, VList);
 #else
 	abort();
@@ -167,7 +167,7 @@ void ZEError::RaiseAssert(ZEAssertType AssertType, const char* Function, const c
 	if (zeCore->GetConsole() != NULL)
 		zeOutput("%s : %s (Function : %s, File : %s, Line : %d)\r\n", (AssertType == ZE_ASSERTTYPE_ASSERT ? "Assert" : "Warning"),  Buffer,  Function, File, Line);
 
-	#if defined(ZEDEBUG_ENABLED) && defined(ZEPLATFORM_WINDOWS)
+	#if defined(ZEDEBUG_ENABLED) && defined(ZE_PLATFORM_WINDOWS)
 		if (AssertType == ZE_ASSERTTYPE_ASSERT)
 		{
 	//		_CrtDbgReport(_CRT_ASSERT, File, Line, "Zinek Engine", Message, VList); 

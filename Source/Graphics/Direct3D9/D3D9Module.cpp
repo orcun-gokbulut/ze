@@ -53,6 +53,7 @@
 #include "D3D9TextureRenderer.h"
 #include "D3D9ShadowRenderer.h"
 #include "D3D9UIMaterial.h"
+#include "D3D9SimpleMaterial.h"
 
 #include <d3dx9.h>
 
@@ -654,6 +655,11 @@ ZEFixedMaterial* ZED3D9Module::CreateFixedMaterial()
 ZEUIMaterial* ZED3D9Module::CreateUIMaterial()
 {
 	return new ZED3D9UIMaterial();
+}
+
+ZESimpleMaterial* ZED3D9Module::CreateSimpleMaterial()
+{
+	return new ZED3D9SimpleMaterial();
 }
 
 ZEFixedMaterial* ZED3D9Module::CreateCustomMaterial()

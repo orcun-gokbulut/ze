@@ -38,7 +38,6 @@
 #define __ZE_PHYSICAL_TRIGGER_H__
 
 #include "FastDelegate.h"
-typedef fastdelegate::FastDelegate1<ZEPhysicsTrigger*>   ZETriggerCallback;
 
 class ZEPhysicsBody;
 struct ZEPhysicsTrigger
@@ -46,5 +45,7 @@ struct ZEPhysicsTrigger
 	ZEPhysicsBody*		TriggerBody;
 	ZEPhysicsBody*		OtherObject;
 };
+
+typedef fastdelegate::FastDelegate1<ZEPhysicsTrigger*>   ZETriggerCallback;
 
 #endif

@@ -69,7 +69,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimaged.lib libmpg123.lib OpenAL32.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimaged.lib libmpg123.lib OpenAL32.lib PhysXLoader.lib NxCooking.lib"
 				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Win x86\&quot;;&quot;$(ProjectDir)\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)\lib\Win x86\Debug&quot;;&quot;$(ProjectDir)\lib\Win x86\Debug\MT&quot;"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
@@ -159,7 +159,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/fixed:no"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimage.lib libmpg123.lib OpenAL32.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimage.lib libmpg123.lib OpenAL32.lib PhysXLoader.lib NxCooking.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Win x86\&quot;;&quot;$(ProjectDir)\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)\lib\Win x86\Release&quot;;&quot;$(ProjectDir)\lib\Win x86\Release\MT&quot;"
 				IgnoreDefaultLibraryNames=""
@@ -361,6 +361,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Graphics\SimpleMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\SimpleMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Graphics\Texture.cpp"
 				>
 			</File>
@@ -544,6 +552,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9SimpleMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9SimpleMaterial.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9Texture2D.cpp"
 					>
 				</File>
@@ -648,6 +664,14 @@
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\ShadowPass.vs"
+						>
+					</File>
+					<File
+						RelativePath=".\RunDir\resources\shaders\SimplePixelShader.vs"
+						>
+					</File>
+					<File
+						RelativePath=".\RunDir\resources\shaders\SimpleVertexShader.ps"
 						>
 					</File>
 					<File
@@ -850,6 +874,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Core\DebugComponent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\DebugComponent.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Core\Error.cpp"
 				>
 			</File>
@@ -1049,6 +1081,14 @@
 			</File>
 			<File
 				RelativePath=".\Source\GameInterface\Scene.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\GameInterface\SceneDebugDraw.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\GameInterface\SceneDebugDraw.h"
 				>
 			</File>
 			<File
@@ -1385,14 +1425,6 @@
 			Name="Physics"
 			>
 			<File
-				RelativePath=".\Source\Physics\PhysicalBody.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Physics\PhysicalBody.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\Physics\PhysicalCollision.cpp"
 				>
 			</File>
@@ -1401,19 +1433,19 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalModule.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Physics\PhysicalModule.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\Physics\PhysicalObject.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Source\Physics\PhysicalObject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Physics\PhysicalRigidBody.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Physics\PhysicalRigidBody.h"
 				>
 			</File>
 			<File
@@ -1440,9 +1472,73 @@
 				RelativePath=".\Source\Physics\PhysicalWorld.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Source\Physics\PhysicsModule.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Physics\PhysicsModule.h"
+				>
+			</File>
 			<Filter
 				Name="PhysX"
 				>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXComponentBase.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXComponentBase.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXConversion.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXConversion.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXModule.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXModule.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXModuleDescription.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXModuleDescription.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalRigidBody.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalRigidBody.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalWorld.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalWorld.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXUserOutputStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXUserOutputStream.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
@@ -1892,6 +1988,34 @@
 			</File>
 			<File
 				RelativePath=".\Source\Map\Octree.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="DebugComponents"
+			>
+			<File
+				RelativePath=".\Source\DebugComponents\MetaDebugComponent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\DebugComponents\MetaDebugComponent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\DebugComponents\PhysicsDebugComponent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\DebugComponents\PhysicsDebugComponent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\DebugComponents\SoundDebugComponent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\DebugComponents\SoundDebugComponent.h"
 				>
 			</File>
 		</Filter>

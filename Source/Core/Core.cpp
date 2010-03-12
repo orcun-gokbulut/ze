@@ -44,9 +44,10 @@
 #include "Window.h"
 #include "Graphics/GraphicsModule.h"
 #include "Input/InputModule.h"
-//#include "Physics/PhysicsModule.h"
+#include "Physics/PhysicsModule.h"
 #include "Sound/SoundModule.h"
 #include "GameInterface/Game.h"
+#include "DebugComponent.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
@@ -170,7 +171,7 @@ bool ZECore::SetPhysicsModule(ZEModule* Module)
 			zeError("Core", "Module type mismatch. This module is not a sound module. (Module Name : \"%s\")", Module->GetModuleDescription()->GetName());
 			return false;
 		}
-		//Physics = (ZEPhysicsModule*)Module;
+		Physics = (ZEPhysicsModule*)Module;
 	}
 	else
 		Physics = NULL;
@@ -183,24 +184,24 @@ ZEPhysicsModule* ZECore::GetPhysicsModule()
 	return Physics;
 }
 
-bool ZECore::SetNetworkModule(ZEModule* Module)
+bool ZECore::SetNetworkModule(ZENetworkModule* Module)
 {
-	if (Module != NULL)
+	/*if (Module != NULL)
 	{
 		if (Module->GetModuleDescription()->GetType() != ZE_MT_SOUND)
 		{
 			zeError("Core", "Module type mismatch. This module is not a sound module. (Module Name : \"%s\")", Module->GetModuleDescription()->GetName());
 			return false;
 		}
-		Network = (ZEModule*)Module;
+		Network = (ZENetworkModule*)Module;
 	}
 	else
-		Network = NULL;
+		Network = NULL;*/
 
 	return true;
 }
 
-ZEModule* ZECore::GetNetworkModule()
+ZENetworkModule* ZECore::GetNetworkModule()
 {
 	return Network;
 }
@@ -214,6 +215,16 @@ bool ZECore::SetGame(ZEGame* Game)
 ZEGame* ZECore::GetGame()
 {
 	return Game;
+}
+
+void ZECore::SetDebugComponent(ZEDebugComponent* Component)
+{
+	DebugComponent = Component;
+}
+
+ZEDebugComponent* ZECore::GetDebugComponent()
+{
+	return DebugComponent;
 }
 
 size_t ZECore::GetFrameId()
@@ -303,15 +314,23 @@ void ZECore::DeInitializeModule(ZEModule** Module)
 bool ZECore::InitializeModules()
 {
 	// Graphics module !
-	zeOutput("Initializing Graphic Module.\r\n");	
+	zeLog("Core", "Initializing Graphic Module.\r\n");	
 	if (!InitializeModule(Graphics))
 	{
 		zeError("Core", "Can not initialize graphic module.");
 		return false;
 	}
 
+	// Physics module !
+	zeLog("Core", "Initializing physics module.\r\n");
+	if (!InitializeModule(Physics))
+	{
+		zeError("Core", "Can not initialize physics module.");
+		return false;
+	}
+
 	// Sound module !
-	zeOutput("Initializing Sound Module.\r\n");	
+	zeLog("Core", "Initializing Sound Module.\r\n");	
 	if (!InitializeModule(Sound))
 	{
 		zeError("Core", "Can not initialize sound module.");
@@ -319,7 +338,7 @@ bool ZECore::InitializeModules()
 	}
 
 	// Input module !
-	zeOutput("Initializing Input Module.\r\n");	
+	zeLog("Core", "Initializing Input Module.\r\n");	
 	if (!InitializeModule(Input))
 	{
 		zeError("Core", "Can not initialize input module.");
@@ -334,21 +353,28 @@ void ZECore::DeinitializeModules()
 {
 	if (Graphics != NULL)
 	{
-		zeOutput("Deinitializing Graphic module.");
+		zeLog("Core", "Deinitializing Graphic module.");
 		Graphics->Deinitialize();
 		Graphics = NULL;
 	}
 
+	if (Physics != NULL)
+	{
+		zeLog("Core", "Deinitializing Physics module.");
+		Physics->Deinitialize();
+		Physics = NULL;
+	}
+
 	if (Sound != NULL)
 	{
-		zeOutput("Deinitializing Sound module.");
+		zeLog("Core", "Deinitializing Sound module.");
 		Sound->Deinitialize();
 		Sound = NULL;
 	}
 
 	if (Input != NULL)
 	{
-		zeOutput("Deinitializing Input module.");
+		zeLog("Core", "Deinitializing Input module.");
 		Input->Deinitialize();
 		Input = NULL;
 	}
@@ -364,68 +390,85 @@ bool ZECore::StartUp(void* WindowHandle)
 	SetCoreState(ZECORESTATE_STARTUP);
 	SetUserLevel(ZEUSERLEVEL_DEVELOPPER);
 
-	zeOutput("Zinek Engine V%s\r\n", ZEVERSION_STRING);
-	zeOutput("Initialization...\r\n");
+	zeLog("Core", "Zinek Engine V%s.", ZE_VERSION_STRING);
+	zeLog("Core", "Initializing Core...");
 
-	zeOutput("Initializing Main Window...\r\n");
+	zeLog("Core", "Initializing Main Window...");
 	if (WindowHandle != NULL)
 		Window->SetComponentWindowHandle(WindowHandle);
 
 	if (Window->Initialize() == false)
 		zeCriticalError("Core", "Can not create main window.");
 
-	zeOutput("Initializing Modules...\r\n");
+	zeLog("Core", "Initializing Modules...");
 	if (!InitializeModules())
 		zeCriticalError("Core", "Can not initialize modules.");
+	zeLog("Core", "Modules initialized.");
 
 	Console->EnableInput();
 	if (Game != NULL)
 		Game->Initialize();
 
 	QueryPerformanceFrequency(&PerformanceCounterFreq);
+	zeLog("Core", "Core initialized.");
+
+	if (DebugComponent != NULL)
+		DebugComponent->StartUp();
 
 	return true;
 }
 
 void ZECore::ShutDown()
 {
+	zeLog("Core", "Deinitializing Core.");
 	SetCoreState(ZECORESTATE_SHUTDOWN);
+
+	if (DebugComponent == NULL)
+		DebugComponent->ShutDown();
+
 	// Destroy game
+	zeLog("Core", "Deinitializing Running Games.");
 	if (Game != NULL)
 		Game->Deinitialize();
 
-	zeOutput("Saving options.\r\n");
+	zeLog("Core", "Saving options.");
 	if (CoreState == ZECORESTATE_CRITICALERROR)
-		zeOutput("[Core] Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
+		zeLog("Core", "[Core] Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
 	Options->Save("options.ini");
-	zeOutput("Releasing game content data.\r\n");
 
-	zeOutput("Releasing shared resources.\r\n");
+	zeLog("Core", "Releasing game content data.\r\n");
+
+	zeLog("Core", "Releasing shared resources.\r\n");
 	Resources->ReleaseAllResources();
 
-	zeOutput("Releasing cached resources.\r\n");
+	zeLog("Core", "Releasing cached resources.\r\n");
 	Resources->UncacheAllResources();
 
 	if (Input != NULL)
 	{
-		zeOutput("Destroying Input Module.\r\n");
+		zeLog("Core", "Destroying Input Module.\r\n");
 		Input->Destroy();
 	}
 
 	if (Sound != NULL)
 	{
-		zeOutput("Destroying Sound Module.\r\n");
+		zeLog("Core", "Destroying Sound Module.\r\n");
 		Sound->Destroy();
 	}
 
 	if (Graphics != NULL)
 	{
-		zeOutput("Destroying Graphics Module.\r\n");
+		zeLog("Core", "Destroying Graphics Module.\r\n");
 		Graphics->Destroy();
 	}
 
-	Window->Deinitialize();
+	if (Physics != NULL)
+	{
+		zeLog("Core", "Destroying Physics Module.\r\n");
+		Physics->Destroy();
+	}
 
+	Window->Deinitialize();
 
 	if (CoreState == ZECORESTATE_CRITICALERROR)
 	{
@@ -435,11 +478,16 @@ void ZECore::ShutDown()
 		Console->SetConsoleInterface(NULL);
 	}
 
+	zeLog("Core", "Core deinitialized.");
+	zeLog("Core", "Terminating engine.");
 	exit(0);
 }
 
 void ZECore::MainLoop()
 {
+	if (DebugComponent != NULL)
+		DebugComponent->PreProcess();
+
 	FrameId++;
 
 	if (OldPerformanceCount.QuadPart == 0)
@@ -466,16 +514,28 @@ void ZECore::MainLoop()
 		Game->Tick(FrameTime);
 		Game->Render(FrameTime);
 	}
-	Sound->ProcessSound(FrameTime);
+	
+	if (DebugComponent != NULL)
+		DebugComponent->Process(FrameTime);
 
-	//Sleep(0);
+	Sound->ProcessSound(FrameTime);
+	
+	if (DebugComponent != NULL)
+		DebugComponent->PostProcess();
 }
 
 void ZECore::Run()
 {
 	SetCoreState(ZECORESTATE_RUNNING);
+	
+	if (DebugComponent != NULL)
+		DebugComponent->Initialize();
+
 	while(CoreState != ZECORESTATE_TERMINATE && CoreState != ZECORESTATE_SHUTDOWN)
 		MainLoop();
+
+	if (DebugComponent != NULL)
+		DebugComponent->Deinitialize();
 
 	if (CoreState != ZECORESTATE_SHUTDOWN)
 		ShutDown();
@@ -493,6 +553,7 @@ ZECore::ZECore()
 	PerformanceCount.QuadPart = 0;
 	OldPerformanceCount.QuadPart = 0;
 
+	DebugComponent	= NULL;
 	Console			= new ZEConsole();
 	Commands		= new ZECommandManager();
 	Options			= new ZEOptionManager();

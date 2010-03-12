@@ -174,3 +174,27 @@ ZEVertexDeclaration* ZEUIVertex::GetVertexDeclaration()
 	ZEASSERT(VertexDeclaration->GetVertexSize() != sizeof(ZEUIVertex), "Vertex decleration size does not matches.");
 	return VertexDeclaration;
 }
+
+ZEVertexDeclaration* ZEColoredVertex::VertexDeclaration = NULL;
+ZEVertexDeclaration* ZEColoredVertex::GetVertexDeclaration()
+{
+	if (VertexDeclaration != NULL)
+		return VertexDeclaration;
+
+	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
+
+	ZEVertexElement ElementArray[] = {
+										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
+										{ZE_VES_COLOR, ZE_VET_FLOAT4, 0},
+										{ZE_VES_END, ZE_VET_END, 0}
+									};
+
+	if (!VertexDeclaration->Create(ElementArray))
+	{
+		VertexDeclaration->Destroy();
+		VertexDeclaration = NULL;
+	}
+
+	ZEASSERT(VertexDeclaration->GetVertexSize() != sizeof(ZEColoredVertex), "Vertex decleration size does not matches.");
+	return VertexDeclaration;
+}

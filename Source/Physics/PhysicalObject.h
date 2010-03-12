@@ -37,22 +37,40 @@
 #ifndef __ZE_PHYSICAL_OBJECT_H__
 #define __ZE_PHYSICAL_OBJECT_H__
 
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+
+enum ZEPhysicalObjectType
+{
+	ZE_POT_RIGID_BODY,
+	ZE_POT_JOINT,
+	ZE_POT_CLOTH,
+	ZE_POT_SOFT_BODY,
+	ZE_POT_TRIGGER,
+	ZE_POT_FORCE_FIELD,
+};
+
+class ZEPhysicalWorld;
 class ZEPhysicalObject
 {
-	private:
-									ZEPhysicalObject();
-		virtual						~ZEPhysicalObject();
+	protected:
+									ZEPhysicalObject(){}
+		virtual						~ZEPhysicalObject(){}
 
 	public:
-		virtual void				GetPhysicalObjectType() = 0;
+		virtual ZEPhysicalObjectType GetPhysicalObjectType() = 0;
+
+		virtual void				SetPhysicalWorld(ZEPhysicalWorld* World) = 0;
+		virtual ZEPhysicalWorld*	GetPhysicalWorld() = 0;
+
 		virtual void				SetPosition(const ZEVector3& NewPosition) = 0;
 		virtual ZEVector3			GetPosition() = 0;
 		
 		virtual void				SetRotation(const ZEQuaternion& NewRotation) = 0;
 		virtual ZEQuaternion		GetRotation() = 0;
 
-		virtual bool				Initialize();
-		virtual void				Deinitialize();
+		virtual bool				Initialize() = 0;
+		virtual void				Deinitialize() = 0;
 
 		void						Destroy();
 };

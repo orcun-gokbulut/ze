@@ -119,10 +119,10 @@ class ZEModelMesh
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();
 
-		void								Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshResource);
+		void								Initialize(ZEModel* Model, const ZEModelResourceMesh* MeshResource);
 		void								Deinitialize();
 
-		void								Draw(ZERenderer* Renderer,  const ZESmartArray<const ZERLLight*>& Lights);
+		void								Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
 
 											ZEModelMesh();
 											~ZEModelMesh();

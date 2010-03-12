@@ -40,13 +40,15 @@
 #include "ZEMath/Vector.h"
 #include "FastDelegate.h"
 
-typedef fastdelegate::FastDelegate1<ZEPhysicsCollision*> ZECollisionCallback;
+struct ZEPhysicalCollision;
 
-class ZEPhysicalBody;
+typedef fastdelegate::FastDelegate1<const ZEPhysicalCollision&> ZECollisionCallback;
+
+class ZEPhysicalRigidBody;
 struct ZEPhysicalCollision
 {
-	ZEPhysicalBody*				Collider1;
-	ZEPhysicalBody*				Collider2;
+	ZEPhysicalRigidBody*		Collider1;
+	ZEPhysicalRigidBody*		Collider2;
 
 	ZEVector3					Position;
 	ZEVector3					Normal;

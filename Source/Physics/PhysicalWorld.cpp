@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsWorld.cpp
+ Zinek Engine - PhysicalWorld.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Physics/PhysicsWorld.h"
+#include "PhysicsModule.h"
+#include "Physics/PhysicalWorld.h"
+
+void ZEPhysicalWorld::Destroy()
+{
+	Deinitialize();
+	delete this;
+}
+
+ZEPhysicalWorld* ZEPhysicalWorld::CreateInstance()
+{
+	return zePhysics->CreatePhysicalWorld();
+}
