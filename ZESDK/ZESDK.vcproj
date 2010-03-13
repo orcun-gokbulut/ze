@@ -694,6 +694,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\GameInterface\SceneDebugDraw.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\GameInterface\SceneDebugDraw.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\GameInterface\Serialization.cpp"
 				>
 			</File>
