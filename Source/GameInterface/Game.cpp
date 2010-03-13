@@ -202,12 +202,25 @@ void ZEGame::Tick(float ElapsedTime)
 
 	AvarageFPS /= 3000.0f;
 
-	char Buffer[400];
-	const ZEVector3& Position = Scene->GetActiveCamera()->GetWorldPosition();
-	const ZEQuaternion& Rotation = Scene->GetActiveCamera()->GetWorldRotation();
+
+	ZEVector3 Position;
+	ZEQuaternion Rotation;
+
+	if (Scene->GetActiveCamera() != NULL)
+	{
+		Position = Scene->GetActiveCamera()->GetWorldPosition();
+		Rotation = Scene->GetActiveCamera()->GetWorldRotation();
+	}
+	else
+	{
+		Position = ZEVector3::Zero;
+		Rotation = ZEQuaternion::Identity;
+	}
+
 	float Yaw, Pitch, Roll;
 	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, Rotation);
 	
+	char Buffer[400];
 	sprintf(Buffer, "Current FPS: %.0f, Avarage FPS: %.0f, Position : [%f, %f, %f], Rotation : [%f, %f, %f]", 
 		1.0f / ElapsedTime, AvarageFPS, Position.x, Position.y, Position.z,
 		Pitch, Yaw, Roll);

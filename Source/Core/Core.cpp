@@ -352,6 +352,12 @@ void ZECore::Terminate()
 
 bool ZECore::InitializeModule(ZEModule* Module)
 {
+	if (Module == NULL)
+	{
+		zeError("Core", "Module is not present for initialization.");
+		return false;
+	}
+
 	if (Module->Initialize() == false)
 	{
 		Module->Destroy();
