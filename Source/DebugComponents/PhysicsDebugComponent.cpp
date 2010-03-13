@@ -35,6 +35,7 @@
 
 #include "PhysicsDebugComponent.h"
 
+#include "Core/Console.h"
 #include "Graphics/GraphicsModule.h"
 #include "GameInterface/Game.h"
 #include "GameInterface/Player.h"
@@ -68,23 +69,9 @@ bool ZEPhysicsDebugComponent::Initialize()
 	if (PhysicalRigidBody == NULL)
 	{
 		ZEPhysXPhysicalWorld* World = (ZEPhysXPhysicalWorld*)zeScene->GetPhysicalWorld();
-		NxScene* PhysicalScene = World->GetScene();
-
-		NxActorDesc ActorDesc;
-		ActorDesc.globalPose.t = NxVec3(0.0f, 0.0f, 0.0f);
-		ActorDesc.globalPose.M.id();
-		ActorDesc.body = NULL;
-
-		NxPlaneShapeDesc PlaneShapeDesc;
-		PlaneShapeDesc.normal = NxVec3(0.0f, 1.0f, 0.0f);
-		PlaneShapeDesc.d = 0.0f;
-		PlaneShapeDesc.localPose.t = NxVec3(0.0f, 0.0f, 0.0f);
-		ActorDesc.shapes.push_back(&PlaneShapeDesc);
-
-		NxActor* Actor = PhysicalScene->createActor(ActorDesc);
 
 		PhysicalRigidBody = ZEPhysicalRigidBody::CreateInstance();
-		PhysicalRigidBody->SetPhysicalWorld(World);
+		PhysicalRigidBody->SetPosition(ZEVector3(0.0f, 10.0f, 1.0f));
 		PhysicalRigidBody->AddPhysicalShape(new ZEPhysicalSphereShape());
 		World->AddPhysicalObject(PhysicalRigidBody);
 	}
@@ -106,6 +93,19 @@ void ZEPhysicsDebugComponent::Deinitialize()
 		PhysicalRigidBody = NULL;
 	}
 }
+
+void ZEPhysicsDebugComponent::Process(float ElapsedTime)
+{
+	static float TotalTime = 0.0f;
+
+	TotalTime += ElapsedTime;
+	if (TotalTime > 1.0f)
+	{
+		zeLog("Test", "Physical Body Position : [%f, %f, %f]", PhysicalRigidBody->GetPosition().x, PhysicalRigidBody->GetPosition().y, PhysicalRigidBody->GetPosition().z);
+		TotalTime = 0.0f;
+	}
+}
+
 
 ZEPhysicsDebugComponent::ZEPhysicsDebugComponent()
 {

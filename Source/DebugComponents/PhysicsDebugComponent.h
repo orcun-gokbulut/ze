@@ -49,6 +49,8 @@ class ZEPhysicsDebugComponent : public ZEDebugComponent
 		ZEPhysicalRigidBody*	PhysicalRigidBody;
 		
 	public:
+		virtual void			Process(float ElapsedTime);
+
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
 

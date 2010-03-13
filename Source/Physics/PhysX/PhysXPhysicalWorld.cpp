@@ -53,6 +53,12 @@ static ZEVector4 NX_TO_ZE(NxU32 color)
 ZEPhysXPhysicalWorld::ZEPhysXPhysicalWorld()
 {
 	Scene = NULL;
+	SceneDesc.userData = this;
+	SceneDesc.gravity = NxVec3(0.0f, -9.8f, 0.0f);
+	SceneDesc.groundPlane = true;
+	SceneDesc.simType = NX_SIMULATION_SW;
+	SceneDesc.upAxis = 1;
+	SceneDesc.flags
 	DebugDraw.Material = NULL;
 }
 
@@ -165,7 +171,10 @@ void ZEPhysXPhysicalWorld::AddPhysicalObject(ZEPhysicalObject* Object)
 {
 	PhysicalObjects.Add(Object);
 	if (Scene != NULL)
+	{
+		Object->SetPhysicalWorld(this);
 		Object->Initialize();
+	}
 }
 
 void ZEPhysXPhysicalWorld::RemovePhysicalObject(ZEPhysicalObject* Object)
@@ -195,7 +204,11 @@ bool ZEPhysXPhysicalWorld::Initialize()
 		return false;
 	}
 
-	Scene->setTiming((1.0f / 60.0f) / 4.0f, 4, NX_TIMESTEP_FIXED);
+	Scene->setTiming(1.0f / 100.0f, 8, NX_TIMESTEP_FIXED);
+
+	for (size_t I = 0; I < PhysicalObjects.GetCount(); I++)
+		PhysicalObjects[I]->Initialize();
+
 
 	for (size_t I = 0; I < PhysicalObjects.GetCount(); I++)
 		PhysicalObjects[I]->Initialize();
@@ -263,7 +276,7 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 
 void ZEPhysXPhysicalWorld::Update(float ElapsedTime)
 {
-    Scene->simulate(1.0f / 60.0f);
+    Scene->simulate(1.0f);
     Scene->flushStream();
 
 	Scene->fetchResults(NX_RIGID_BODY_FINISHED, true);

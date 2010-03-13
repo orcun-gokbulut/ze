@@ -39,7 +39,7 @@
 
 //#include "CompileOptions.h"
 
-#ifdef ZEDEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLED
 #define ZEDS_DEBUG_MODE
 #endif
 

@@ -37,7 +37,7 @@
 #ifndef __ZE_COMPILE_OPTIONS_H__
 #define __ZE_COMPILE_OPTIONS_H__
 
-#define ZE_ZINEKENGINE
+#define ZE_ZINEK_ENGINE
 
 #define ZE_MAKE_VERSION(Major, Minor, Build) ((unsigned int)(Major) << 24 | (unsigned int)(Minor)<<16 | (Build))
 #define ZE_VERSION_MAJORNUMBER 0
@@ -45,7 +45,7 @@
 #define ZE_VERSION_NUMBER ZE_MAKE_VERSION(ZE_VERSION_MAJORNUMBER, ZE_VERSION_MINORNUMBER, 0)
 #define ZE_VERSION_STRING "0.5"
 
-//#define ZEDEBUG_ENABLED
+//#define ZE_DEBUG_ENABLED
 #define ZESTATISTICS_ENABLED
 
 #define ZE_PLATFORM_X86

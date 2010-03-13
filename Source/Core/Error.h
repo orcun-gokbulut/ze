@@ -40,48 +40,78 @@
 #include "CompileOptions.h"
 #include "Option.h"
 
+#if defined(ZE_DEBUG_ENABLED) && defined(ZE_PLATFORM_WINDOWS)
+	#include <crtdbg.h>
+#else
+	#include <stdlib.h> 
+#endif
+
 #define ZEERROR_MAX_FILENAME_SIZE	255
 
-#ifdef ZEDEBUG_ENABLED
-	#define ZEASSERT(Condition, ...) if (Condition) ZEError::GetInstance()->RaiseAssert(ZE_ASSERTTYPE_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__) 
-	#define ZEWARNINGASSERT(Condition, ...) if (Condition) ZEError::GetInstance()->RaiseAssert(ZE_ASSERTTYPE_WARNINGASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+#define zeBreak() __asm{ int 3 }
+
+#ifdef ZE_DEBUG_ENABLED
+	#ifdef ZE_PLATFORM_WINDOWS
+		#define ZEASSERT(Condition, ...) if (Condition){ZEError::GetInstance()->RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); if (_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();} 
+		#define ZEWARNINGASSERT(Condition, ...) if (Condition) ZEError::GetInstance()->RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+	#else
+		#define ZEASSERT(Condition, ...) if (Condition){ZEError::GetInstance()->RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); abort();} 
+		#define ZEWARNINGASSERT(Condition, ...) if (Condition) ZEError::GetInstance()->RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+	#endif
 #else
-	#define ZEASSERT(Condition, ...) 
-	#define ZEWARNINGASSERT(Condition, ...)
+	#ifdef ZE_DEBUG_FORCE_VERIFY
+		#define ZEASSERT(Condition, ...) if (Condition) {}
+		#define ZEWARNINGASSERT(Condition, ...) if (Condition) {}
+	#else
+		#define ZEASSERT(Condition, ...) 
+		#define ZEWARNINGASSERT(Condition, ...)
+	#endif
 #endif
 
-#if defined(ZEDEBUG_ENABLED) && defined(ZEDEBUG_BREAKONERROR)
-	#define zeCriticalError(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_ERRORLEVEL_CRITICAL, __VA_ARGS__); abort();}
+#if defined(ZE_DEBUG_ENABLED) && defined(ZE_DEBUG_BREAK_ON_ERROR)
+	#ifdef ZE_PLATFORM_WINDOWS
+		#define zeCriticalError(Module, ...) {if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();ZEError::GetInstance()->RaiseError(Module, ZE_EL_CRITICAL, __VA_ARGS__);}
+	#else
+		#define zeCriticalError(Module, ...) {abort(); ZEError::GetInstance()->RaiseError(Module, ZE_EL_CRITICAL, __VA_ARGS__);}
+	#endif
 #else
-	#define zeCriticalError(Module, ...) ZEError::GetInstance()->RaiseError(Module, ZE_ERRORLEVEL_CRITICAL, __VA_ARGS__)
+	#define zeCriticalError(Module, ...) ZEError::GetInstance()->RaiseError(Module, ZE_EL_CRITICAL, __VA_ARGS__)
 #endif
 
-#if defined(ZEDEBUG_ENABLED) && defined(ZEDEBUG_BREAKONERROR)
-	#define zeError(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_ERRORLEVEL_NONCRITICAL, __VA_ARGS__); abort();}
+#if defined(ZE_DEBUG_ENABLED) && defined(ZE_DEBUG_BREAK_ON_ERROR)
+	#ifdef ZE_PLATFORM_WINDOWS
+		#define zeError(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_EL_NONCRITICAL, __VA_ARGS__); if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();}
+	#else
+		#define zeError(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_EL_NONCRITICAL, __VA_ARGS__); abort();}
+	#endif
 #else
-	#define zeError(Module, ...) ZEError::GetInstance()->RaiseError(Module, ZE_ERRORLEVEL_NONCRITICAL, __VA_ARGS__)
+	#define zeError(Module, ...) ZEError::GetInstance()->RaiseError(Module, ZE_EL_NONCRITICAL, __VA_ARGS__)
 #endif
 
-#if defined(ZEDEBUG_ENABLED) && defined(ZEDEBUG_BREAKONWARNING)
-	#define zeWarning(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_ERRORLEVEL_WARNING, __VA_ARGS__); abort();}
+#if defined(ZE_DEBUG_ENABLED) && defined(ZE_DEBUG_BREAK_ON_WARNING)
+	#ifdef ZE_PLATFORM_WINDOWS
+		#define zeWarning(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_EL_WARNING, __VA_ARGS__); if(_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) ==  1) zeBreak();}
+	#else
+		#define zeWarning(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_EL_WARNING, __VA_ARGS__); abort();}
+	#endif
 #else
-	#define zeWarning(Module, ...) ZEError::GetInstance()->RaiseError(Module, ZE_ERRORLEVEL_WARNING, __VA_ARGS__)
+	#define zeWarning(Module, ...) ZEError::GetInstance()->RaiseError(Module, ZE_EL_WARNING, __VA_ARGS__)
 #endif
 
-#define zeNotice(Module, ...) ZEError::GetInstance()->RaiseError(Module, ZE_ERRORLEVEL_NOTICE, __VA_ARGS__)
+#define zeNotice(Module, ...) ZEError::GetInstance()->RaiseError(Module, ZE_EL_NOTICE, __VA_ARGS__)
 
 enum ZEErrorType
 {
-	ZE_ERRORLEVEL_CRITICAL,
-	ZE_ERRORLEVEL_NONCRITICAL,
-	ZE_ERRORLEVEL_WARNING,
-	ZE_ERRORLEVEL_NOTICE
+	ZE_EL_CRITICAL,
+	ZE_EL_NONCRITICAL,
+	ZE_EL_WARNING,
+	ZE_EL_NOTICE
 };
 
 enum ZEAssertType
 {
-	ZE_ASSERTTYPE_ASSERT,
-	ZE_ASSERTTYPE_WARNINGASSERT,
+	ZE_AT_ASSERT,
+	ZE_AT_WARNING_ASSERT,
 };
 
 class ZEError

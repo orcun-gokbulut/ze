@@ -112,3 +112,6 @@
    CHG: ZEArrayVertexBuffer now inherits from both ZEDynamicVertexBuffer and ZEArray. Now itself acts as array. Vertices member variable has been removed.
    CHG: ZEScene Visual Debug Elemens rendering mechanisim has been changed. This mechanisim moved to new class ZESceneDebugDraw. ZESceneDebugDraw uses simple material and vertex colored canvas and draws all visual debug elements in single draw call.
    
+[13 Mark 2010 - Revision 119]
+   CHG: Major error reporting and error handling improvements.
+   CHG: Minor notation and coding style improvements. (Mostly ZEDEBUG, ZECore and ZEError enumurators)

@@ -32,7 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#ifdef ZEDEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLED
 #define D3D_DEBUG_INFO
 #endif
 
@@ -175,8 +175,8 @@ bool ZED3D9Module::Initialize()
 	UINT AdapterToUse = D3DADAPTER_DEFAULT;
 	D3DDEVTYPE DeviceType = D3DDEVTYPE_HAL;
 	
-	// If perfhud debugging enabled (by defining ZEDEBUG_PERFHUD) replace default adapter with perfhud adapter
-	#ifdef ZEDEBUG_PERFHUD
+	// If perfhud debugging enabled (by defining ZE_DEBUG_D3D9_PERFHUD) replace default adapter with perfhud adapter
+	#ifdef ZE_DEBUG_D3D9_PERFHUD
 	for (UINT Adapter=0; Adapter < D3D->GetAdapterCount(); Adapter++)
 	{
 		D3DADAPTER_IDENTIFIER9 Identifier;

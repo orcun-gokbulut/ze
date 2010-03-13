@@ -74,7 +74,7 @@ ZEVertexDeclaration* ZECanvasVertex::GetVertexDeclaration()
 		VertexDeclaration = NULL;
 	}
 
-	ZEASSERT(VertexDeclaration->GetVertexSize() != sizeof(ZEUIVertex), "Vertex decleration size does not matches.");
+	ZEASSERT(VertexDeclaration->GetVertexSize() != sizeof(ZECanvasVertex), "Vertex decleration size does not matches.");
 	return VertexDeclaration;
 }
 

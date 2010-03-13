@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifdef ZEDEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLED
 #define D3D_DEBUG_INFO
 #endif
 
@@ -195,7 +195,7 @@ void ZED3D9FrameBufferRenderer::RemovePostProcessor(ZEPostProcessor* PostProcess
 
 void ZED3D9FrameBufferRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
-	#ifdef ZEDEBUG_ENABLED
+	#ifdef ZE_DEBUG_ENABLED
 		// Check render order is valid
 		if (!ZED3D9RendererBase::CheckRenderOrder(RenderOrder))
 			return;

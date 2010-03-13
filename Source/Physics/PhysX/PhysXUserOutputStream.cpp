@@ -39,7 +39,29 @@
 
 void ZEPhysXUserOutputStream::reportError(NxErrorCode Code, const char* Message, const char* File, int Line)
 {
-	zeError("PhysX", "Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
+	switch(Code)
+	{
+		case NXE_NO_ERROR:
+			break;
+		default:
+		case NXE_INVALID_PARAMETER:
+		case NXE_INVALID_OPERATION:
+		case NXE_OUT_OF_MEMORY:
+		case NXE_INTERNAL_ERROR:
+		case NXE_ASSERTION:
+			zeCriticalError("PhysX", "Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
+			break;
+
+		case NXE_DB_PRINT:
+			zeLog("PhysX", Message);
+			break;
+		case NXE_DB_INFO:
+			zeNotice("PhysX", "Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
+			break;
+		case NXE_DB_WARNING:
+			zeWarning("PhysX", "Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
+			break;
+	}
 }
 
 NxAssertResponse ZEPhysXUserOutputStream::reportAssertViolation(const char* Message, const char* File, int Line)

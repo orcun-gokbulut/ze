@@ -40,7 +40,7 @@
 #include "Graphics/GraphicsModule.h"
 #include "ZEDS/Array.h"
 
-#ifdef ZEDEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLED
 #define D3D_DEBUG_INFO
 #endif
 #define INIT_GUID

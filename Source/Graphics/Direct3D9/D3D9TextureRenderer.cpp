@@ -84,7 +84,7 @@ void ZED3D9TextureRenderer::ClearList()
 
 void ZED3D9TextureRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
-	#ifdef ZEDEBUG_ENABLED
+	#ifdef ZE_DEBUG_ENABLED
 		// Check render order is valid
 		if (!ZED3D9RendererBase::CheckRenderOrder(RenderOrder))
 			return;

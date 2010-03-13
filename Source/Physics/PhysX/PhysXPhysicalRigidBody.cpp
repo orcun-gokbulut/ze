@@ -54,8 +54,8 @@ ZEPhysXPhysicalRigidBody::ZEPhysXPhysicalRigidBody()
 {
 	Actor = NULL;
 	PhysicalBodyType = ZE_PBT_DYNAMIC;
-	ActorDesc.setToDefault();
-	BodyDesc.setToDefault();
+	ActorDesc.userData = this;
+	BodyDesc.mass = 1.0f;
 }
 
 ZEPhysXPhysicalRigidBody::~ZEPhysXPhysicalRigidBody()
@@ -335,7 +335,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 			{
 				NxBoxShapeDesc BoxShapeDesc;
 
-				//BoxShapeInfo.Trigger = CurrentShape->GetTrigger();
+				BoxShapeDesc.userData = CurrentShape;
 				BoxShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
 				BoxShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
 
@@ -351,10 +351,10 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 			{
 				NxSphereShapeDesc SphereShapeDesc;
 				
-				//BoxShapeInfo.Trigger = CurrentShape->GetTrigger();
+				SphereShapeDesc.userData = CurrentShape;
 				SphereShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
 				SphereShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
-
+				SphereShapeDesc.userData = CurrentShape;
 				SphereShapeDesc.radius = ((ZEPhysicalSphereShape*)CurrentShape)->GetRadius();
 
 				ActorDesc.shapes.push_back(&SphereShapeDesc);
@@ -365,7 +365,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 			{
 				NxCapsuleShapeDesc CapsuleShapeDesc;
 
-				//BoxShapeInfo.Trigger = CurrentShape->GetTrigger();
+				CapsuleShapeDesc.userData = CurrentShape;
 				CapsuleShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
 				CapsuleShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
 

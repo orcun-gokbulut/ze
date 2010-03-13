@@ -251,7 +251,7 @@ void ZECore::SetDebugMode(bool Enabled)
 
 bool ZECore::GetDebugMode()
 {
-	#ifdef ZEDEBUG_ENABLED
+	#ifdef ZE_DEBUG_ENABLED
 		return DebugMode;
 	#else
 		return false;
@@ -271,8 +271,42 @@ ZECoreState ZECore::GetCoreState()
 void ZECore::SetCoreState(ZECoreState CoreState)
 {
 	this->CoreState = CoreState;
-	if (CoreState == ZECORESTATE_CRITICALERROR)
-		ShutDown();
+	
+	const char* CoreStateText;
+
+	switch(CoreState)
+	{
+		default:
+		case ZE_CS_CRITICALERROR:
+			CoreStateText = "Critical Error";
+			break;
+
+		case ZE_CS_PAUSED:
+			CoreStateText = "Paused";
+			break;
+
+		case ZE_CS_RUNNING:
+			CoreStateText = "Running";
+			break;
+
+		case ZE_CS_SHUTDOWN:
+			CoreStateText = "Shutdown";
+			break;
+
+		case ZE_CS_STARTUP:
+			CoreStateText = "StartUp";
+			break;
+
+		case ZE_CS_TERMINATE:
+			CoreStateText = "Terminate";
+			break;
+
+		case ZE_CS_UNKNOWN:
+			CoreStateText = "Unknown";
+			break;
+	}
+
+	zeLog("Core", "Core state changed to \"%s\".", CoreStateText);
 }
 
 ZEUserLevel ZECore::GetUserLevel()
@@ -283,11 +317,37 @@ ZEUserLevel ZECore::GetUserLevel()
 void ZECore::SetUserLevel(ZEUserLevel UserLevel)
 {
 	this->UserLevel = UserLevel;
+
+	const char* UserLevelText;
+	switch(UserLevel)
+	{
+		case ZE_UL_DEVELOPPER:
+			UserLevelText = "Developer";
+			break;
+
+		case ZE_UL_ADMINISTRATOR:
+			UserLevelText = "Administrator";
+			break;
+
+		case ZE_UL_CHEATER:
+			UserLevelText = "Cheater";
+			break;
+
+		case ZE_UL_PLAYER:
+			UserLevelText = "Player";
+			break;
+
+		default:
+			UserLevelText = "Unknown";
+			break;
+	}
+
+	zeLog("Core", "User level changed to \"%s\".", UserLevelText);
 }
 
 void ZECore::Terminate()
 {
-	SetCoreState(ZECORESTATE_TERMINATE);
+	SetCoreState(ZE_CS_TERMINATE);
 }
 
 bool ZECore::InitializeModule(ZEModule* Module)
@@ -387,8 +447,8 @@ bool ZECore::StartUp(void* WindowHandle)
 	Console->DisableInput();
 	
 	DebugMode = true;
-	SetCoreState(ZECORESTATE_STARTUP);
-	SetUserLevel(ZEUSERLEVEL_DEVELOPPER);
+	SetCoreState(ZE_CS_STARTUP);
+	SetUserLevel(ZE_UL_DEVELOPPER);
 
 	zeLog("Core", "Zinek Engine V%s.", ZE_VERSION_STRING);
 	zeLog("Core", "Initializing Core...");
@@ -421,7 +481,7 @@ bool ZECore::StartUp(void* WindowHandle)
 void ZECore::ShutDown()
 {
 	zeLog("Core", "Deinitializing Core.");
-	SetCoreState(ZECORESTATE_SHUTDOWN);
+	SetCoreState(ZE_CS_SHUTDOWN);
 
 	if (DebugComponent == NULL)
 		DebugComponent->ShutDown();
@@ -432,7 +492,7 @@ void ZECore::ShutDown()
 		Game->Deinitialize();
 
 	zeLog("Core", "Saving options.");
-	if (CoreState == ZECORESTATE_CRITICALERROR)
+	if (CoreState == ZE_CS_CRITICALERROR)
 		zeLog("Core", "[Core] Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
 	Options->Save("options.ini");
 
@@ -469,16 +529,8 @@ void ZECore::ShutDown()
 	}
 
 	Window->Deinitialize();
-
-	if (CoreState == ZECORESTATE_CRITICALERROR)
-	{
-		ZEConsoleWindow ConsoleWindow;
-		Console->SetConsoleInterface(&ConsoleWindow);
-		ConsoleWindow.TermiantionState();
-		Console->SetConsoleInterface(NULL);
-	}
-
 	zeLog("Core", "Core deinitialized.");
+
 	zeLog("Core", "Terminating engine.");
 	exit(0);
 }
@@ -526,19 +578,18 @@ void ZECore::MainLoop()
 
 void ZECore::Run()
 {
-	SetCoreState(ZECORESTATE_RUNNING);
+	SetCoreState(ZE_CS_RUNNING);
 	
 	if (DebugComponent != NULL)
 		DebugComponent->Initialize();
 
-	while(CoreState != ZECORESTATE_TERMINATE && CoreState != ZECORESTATE_SHUTDOWN)
+	while(CoreState != ZE_CS_TERMINATE && CoreState != ZE_CS_SHUTDOWN)
 		MainLoop();
 
 	if (DebugComponent != NULL)
 		DebugComponent->Deinitialize();
 
-	if (CoreState != ZECORESTATE_SHUTDOWN)
-		ShutDown();
+	ShutDown();
 }
 
 ZECore* ZECore::GetInstance()

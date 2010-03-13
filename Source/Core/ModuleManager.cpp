@@ -56,7 +56,7 @@ bool ZEModuleManager::CheckModule(ZEModuleDescription* ModuleDesc)
 		return false;
 	}
 
-/*#ifndef ZEDEBUG_ENABLED
+/*#ifndef ZE_DEBUG_ENABLED
 	if ((ModuleDesc->GetAttributes() & ZE_MA_DEBUG))
 	{
 		zeError("Module Manager", 
