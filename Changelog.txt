@@ -128,3 +128,6 @@
 	FIX: Window Console appending test at the cursor location has been fixed. Now it appends at the end of the textbox.
 	FIX: ZESDK linkage error. Missing source files has been added to ZESDK project.
 	FIX: Minor project configuration bugs. No WIN32 and _DEBUG/NDEBUG definitions in ZESDK. CONSOLE definition on Zinek Engine project.
+
+[13 March 2010 - Revision 126]
+	FIX: Map.cpp material bug fixed.

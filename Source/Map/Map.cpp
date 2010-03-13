@@ -50,7 +50,7 @@ bool ZEPortalMap::Initialize()
 	PortalBBoxCanvas.Clean();
 	PortalBBoxCanvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
 
-	if (PortalBBoxMaterial != NULL)
+	if (PortalBBoxMaterial == NULL)
 		PortalBBoxMaterial = ZEFixedMaterial::CreateInstance();
 
 	PortalBBoxMaterial->SetZero();
