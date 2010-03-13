@@ -61,7 +61,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="true"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimaged.lib libmpg123.lib OpenAL32.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimaged.lib PhysXLoader.lib NxCooking.lib NxCharacter.lib libmpg123.lib OpenAL32.lib"
 				OutputFile="$(ProjectDir)\Dist\Lib\$(ProjectName)d.lib"
 				AdditionalLibraryDirectories="&quot;$(ProjectDir)..\lib\Win x86\&quot;;&quot;$(ProjectDir)..\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)..\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)..\lib\Win x86\Debug&quot;;&quot;$(ProjectDir)..\lib\Win x86\Debug\MT&quot;"
 				IgnoreAllDefaultLibraries="false"
@@ -131,7 +131,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="true"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimage.lib libmpg123.lib OpenAL32.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimage.lib PhysXLoader.lib NxCooking.lib NxCharacter.lib libmpg123.lib OpenAL32.lib"
 				OutputFile="$(ProjectDir)\Dist\Lib\$(ProjectName).lib"
 				AdditionalLibraryDirectories="&quot;$(ProjectDir)..\lib\Win x86\&quot;;&quot;$(ProjectDir)..\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)..\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)..\lib\Win x86\Release&quot;;&quot;$(ProjectDir)..\lib\Win x86\Release\MT&quot;"
 			/>
@@ -198,8 +198,7 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				LinkLibraryDependencies="true"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimaged.lib libmpg123.lib OpenAL32.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimaged.lib PhysXLoader.lib NxCooking.lib NxCharacter.lib libmpg123.lib OpenAL32.lib"
 				OutputFile="$(ProjectDir)\Dist\Lib\$(ProjectName)d_dll.lib"
 				AdditionalLibraryDirectories="&quot;$(ProjectDir)..\lib\Win x86\&quot;;&quot;$(ProjectDir)..\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)..\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)..\lib\Win x86\Debug&quot;;&quot;$(ProjectDir)..\lib\Win x86\Debug\MT DLL&quot;"
 				IgnoreAllDefaultLibraries="false"
@@ -270,7 +269,7 @@
 			<Tool
 				Name="VCLibrarianTool"
 				LinkLibraryDependencies="true"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimage.lib libmpg123.lib OpenAL32.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimage.lib PhysXLoader.lib NxCooking.lib NxCharacter.lib libmpg123.lib OpenAL32.lib"
 				OutputFile="$(ProjectDir)\Dist\Lib\$(ProjectName)_dll.lib"
 				AdditionalLibraryDirectories="&quot;$(ProjectDir)..\lib\Win x86\&quot;;&quot;$(ProjectDir)..\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)..\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)..\lib\Win x86\Release&quot;;&quot;$(ProjectDir)..\lib\Win x86\Release\MT DLL&quot;"
 			/>

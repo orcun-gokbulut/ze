@@ -53,7 +53,7 @@
 				TreatWChar_tAsBuiltInType="true"
 				RuntimeTypeInfo="true"
 				UsePrecompiledHeader="0"
-				WarningLevel="1"
+				WarningLevel="2"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4482"
@@ -557,18 +557,6 @@
 				</File>
 				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9RendererBase.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Shader.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Shader.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9ShadersSM2.h"
 					>
 				</File>
 				<File

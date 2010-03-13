@@ -162,7 +162,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 		return NULL;
 	}
 	
-	float EdgeLenght = Width / 3;
+	int EdgeLenght = Width / 3;
 
 	ZETexturePixelFormat Format;
 
@@ -221,7 +221,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 	unsigned char* Bits = FreeImage_GetBits((FIBITMAP*)Data);
 
 	if (!LoadCubeFace(Texture, ZE_CTF_NEGATIVEX, Bits, EdgeLenght, 0,				EdgeLenght, BPP) ||
-		!LoadCubeFace(Texture, ZE_CTF_POSITIVEZ, Bits, EdgeLenght,EdgeLenght,		EdgeLenght, BPP) ||
+		!LoadCubeFace(Texture, ZE_CTF_POSITIVEZ, Bits, EdgeLenght, EdgeLenght,		EdgeLenght, BPP) ||
 		!LoadCubeFace(Texture, ZE_CTF_POSITIVEX, Bits, EdgeLenght, EdgeLenght * 2,	EdgeLenght, BPP) ||
 		!LoadCubeFace(Texture, ZE_CTF_NEGATIVEZ, Bits, EdgeLenght, 0,				0, BPP) ||
 		!LoadCubeFace(Texture, ZE_CTF_NEGATIVEY, Bits, EdgeLenght, EdgeLenght,		0, BPP) ||
