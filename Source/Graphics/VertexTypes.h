@@ -111,4 +111,17 @@ struct ZEUIVertex
 
 		static ZEVertexDeclaration*		GetVertexDeclaration();
 };
+
+struct ZEColoredVertex
+{
+	private:
+		static ZEVertexDeclaration*		VertexDeclaration;
+
+	public:
+		ZEVector3						Position;
+		ZEVector4						Color;
+
+		static ZEVertexDeclaration*		GetVertexDeclaration();
+};
+
 #endif

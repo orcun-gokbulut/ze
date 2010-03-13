@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifdef ZE_ZINEKENGINE
+#ifdef ZE_ZINEK_ENGINE
 #include "Core/Error.h"
 #else
 #include <stdio.h>
@@ -41,8 +41,8 @@
 
 void zedsAssert(const char* Function, const char* File, int Line, const char* Message, ...)
 {
-#ifdef ZE_ZINEKENGINE
-	ZEError::GetInstance()->RaiseAssert(ZE_ASSERTTYPE_ASSERT, Function, File, Line, Message);
+#ifdef ZE_ZINEK_ENGINE
+	ZEError::GetInstance()->RaiseAssert(ZE_AT_ASSERT, Function, File, Line, Message);
 #else
 	printf("[ASSERT] Error : %s (Function : \"%s\", File : \"%s\", Line : %d)\n", Message, Function, File, Line);
 #endif
@@ -50,8 +50,8 @@ void zedsAssert(const char* Function, const char* File, int Line, const char* Me
 
 void zedsWarningAssert(const char* Function, const char* File, int Line, const char* Message, ...)
 {
-#ifdef ZE_ZINEKENGINE
-	ZEError::GetInstance()->RaiseAssert(ZE_ASSERTTYPE_WARNINGASSERT, "", File, Line, Message);
+#ifdef ZE_ZINEK_ENGINE
+	ZEError::GetInstance()->RaiseAssert(ZE_AT_WARNING_ASSERT, "", File, Line, Message);
 #else
 	printf("[ASSERT] Warning : %s (Function : \"%s\", File : \"%s\", Line : %d)\n", Message, Function, File, Line);
 #endif

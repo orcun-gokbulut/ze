@@ -76,7 +76,7 @@ void ShowWindowError()
 
 void ZEWindow::WindowGainedFocus()
 {
-	zeOutput("Main window gained focus.\r\n");
+	zeLog("Window", "Main window gained focus.");
 	ZEInputModule* Input = zeInput;
 	if (Input != NULL)
 		Input->Acquire();
@@ -84,7 +84,7 @@ void ZEWindow::WindowGainedFocus()
 
 void ZEWindow::WindowLostFocus()
 {
-	zeOutput("Window lost focus.\r\n");
+	zeLog("Window", "Window lost focus.");
 	ZEInputModule* Input = zeInput;
 	if (Input != NULL)
 		Input->UnAcquire();
@@ -92,7 +92,7 @@ void ZEWindow::WindowLostFocus()
 
 void ZEWindow::WindowDestroyed()
 {
-	if (zeCore->GetCoreState() != ZECORESTATE_SHUTDOWN && zeCore->GetCoreState() != ZECORESTATE_CRITICALERROR)
+	if (zeCore->GetCoreState() != ZE_CS_SHUTDOWN && zeCore->GetCoreState() != ZE_CS_CRITICALERROR)
 		zeCore->ShutDown();
 }
 

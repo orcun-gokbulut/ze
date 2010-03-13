@@ -32,7 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#ifdef ZEDEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLED
 #define D3D_DEBUG_INFO
 #endif
 
@@ -314,7 +314,7 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 
 bool ZED3D9RendererBase::CheckRenderOrder(ZERenderOrder* RenderOrder)
 {
-	#ifdef ZEDEBUG_ENABLED
+	#ifdef ZE_DEBUG_ENABLED
 		// Check render order material is available
 		if (RenderOrder->Material == NULL)
 		{

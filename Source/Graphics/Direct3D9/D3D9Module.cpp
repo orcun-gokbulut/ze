@@ -32,7 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#ifdef ZEDEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLED
 #define D3D_DEBUG_INFO
 #endif
 
@@ -53,6 +53,7 @@
 #include "D3D9TextureRenderer.h"
 #include "D3D9ShadowRenderer.h"
 #include "D3D9UIMaterial.h"
+#include "D3D9SimpleMaterial.h"
 
 #include <d3dx9.h>
 
@@ -120,7 +121,7 @@ void ZED3D9Module::SetEnabled(bool Enabled)
 
 bool ZED3D9Module::Initialize()
 {
-	zeLog("D3D9 Module", "Initializing Direct3D 9.\r\n");
+	zeLog("D3D9 Module", "Initializing Direct3D 9.");
 
 	// Read options
 	ScreenWidth = zeOptions->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger();
@@ -174,8 +175,8 @@ bool ZED3D9Module::Initialize()
 	UINT AdapterToUse = D3DADAPTER_DEFAULT;
 	D3DDEVTYPE DeviceType = D3DDEVTYPE_HAL;
 	
-	// If perfhud debugging enabled (by defining ZEDEBUG_PERFHUD) replace default adapter with perfhud adapter
-	#ifdef ZEDEBUG_PERFHUD
+	// If perfhud debugging enabled (by defining ZE_DEBUG_D3D9_PERFHUD) replace default adapter with perfhud adapter
+	#ifdef ZE_DEBUG_D3D9_PERFHUD
 	for (UINT Adapter=0; Adapter < D3D->GetAdapterCount(); Adapter++)
 	{
 		D3DADAPTER_IDENTIFIER9 Identifier;
@@ -201,7 +202,7 @@ bool ZED3D9Module::Initialize()
 
 	D3D9Device = Device;
 
-	zeLog("D3D9 Module", "Device Created.\r\n");
+	zeLog("D3D9 Module", "Device Created.");
 
 	// Check hardware capabilities
 	D3D->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &DeviceCaps);
@@ -209,7 +210,7 @@ bool ZED3D9Module::Initialize()
 	// Check vertex shader versions.
 	PipelineType = ZE_D3D9_PT_PROGRAMABLE;
 
-	zeLog("D3D9 Module", "Vertex Shader Version : %d.%d\r\n", D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.VertexShaderVersion));
+	zeLog("D3D9 Module", "Vertex Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.VertexShaderVersion));
 	switch(D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion))
 	{
 		case 1:
@@ -234,7 +235,7 @@ bool ZED3D9Module::Initialize()
 	};
 
 	// Check pixel shader version
-	zeLog("D3D9 Module", "Pixel Shader Version : %d.%d\r\n", D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.PixelShaderVersion));
+	zeLog("D3D9 Module", "Pixel Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.PixelShaderVersion));
 	switch(D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion))
 	{
 		case 1:
@@ -654,6 +655,11 @@ ZEFixedMaterial* ZED3D9Module::CreateFixedMaterial()
 ZEUIMaterial* ZED3D9Module::CreateUIMaterial()
 {
 	return new ZED3D9UIMaterial();
+}
+
+ZESimpleMaterial* ZED3D9Module::CreateSimpleMaterial()
+{
+	return new ZED3D9SimpleMaterial();
 }
 
 ZEFixedMaterial* ZED3D9Module::CreateCustomMaterial()

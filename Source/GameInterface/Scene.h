@@ -42,6 +42,7 @@
 #include "Map/Map.h"
 #include "Portal.h"
 #include "Graphics/FixedMaterial.h"
+#include "SceneDebugDraw.h"
 
 #define ZE_RCF_ENTITY								1
 #define ZE_RCF_COMPONENT							2
@@ -77,52 +78,36 @@ class ZEShadowRenderer;
 class ZEPostProcessor;
 class ZEFixedMaterial;
 class ZEEntity;
+class ZEPhysicalWorld;
+
 class ZEScene
 {
 	private:
-		ZEDWORD									VisualDebugElements;
-
-		void									OptionsChanged();
+		bool									Initialized;
 
 		unsigned int							LastEntityId;
 
 		ZEPortalMap								Environment;
 		ZESmartArray<ZEEntity*>					Entities;
+
+		ZEPhysicalWorld*						PhysicalWorld;
 	
+		ZERenderer*								Renderer;
 		ZEPostProcessor*						PostProcessor;
 		ZEShadowRenderer*						ShadowRenderer;
 		ZECamera*								ActiveCamera;
 		ZEListener*								ActiveListener;
 
-		ZEFixedMaterial*						EntityOrientedBoundingBoxMaterial;
-		ZEFixedMaterial*						EntityAxisAlignedBoundingBoxMaterial;
-		ZEFixedMaterial*						EntityBoundingSphereMaterial;
-		ZEFixedMaterial*						ComponentOrientedBoundingBoxMaterial;
-		ZEFixedMaterial*						ComponentAxisAlignedBoundingBoxMaterial;
-		ZEFixedMaterial*						ComponentBoundingSphereMaterial;
-		ZEFixedMaterial*						LightRangeMaterial;
-
-		ZERenderOrder							BoundingBoxRenderOrder;
-		ZERenderOrder							BoundingSphereRenderOrder;
-		
-		void									DrawOrientedBoundingBox(const ZEAABoundingBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, ZEMaterial* Material);
-		void									DrawAxisAlignedBoundingBox(const ZEAABoundingBox& BoundingBox, ZERenderer* Renderer, ZEMaterial* Material);
-		void									DrawBoundingSphere(const ZEBoundingSphere& BoundingSphere, ZERenderer* Renderer, ZEMaterial* Material);
+		ZEDWORD									VisualDebugElements;
+		ZESceneDebugDraw						DebugDraw;
 
 	public:
-		ZERenderer*								Renderer;
-
-		void									SetVisualDebugElements(ZEDWORD VisualDebugElements);
-		ZEDWORD									GetVisualDebugElements();
-
-		bool									Initialize();
-		bool									Deinitialize();
-		void									Reset();
-		void									Destroy();
-
 		void									AddEntity(ZEEntity* Entity);
 		void									RemoveEntity(ZEEntity* Entity);
 		const ZESmartArray<ZEEntity*>&			GetEntities();
+
+		ZERenderer*								GetRenderer();
+		ZEPhysicalWorld*						GetPhysicalWorld();
 
 		void									SetActiveCamera(ZECamera* Camera);
 		ZECamera*								GetActiveCamera();
@@ -130,8 +115,8 @@ class ZEScene
 		void									SetActiveListener(ZEListener* Listener);
 		ZEListener*								GetActiveListener();
 
-		void									Tick(float ElapsedTime);
-		void									Render(float ElapsedTime);
+		void									SetVisualDebugElements(ZEDWORD VisualDebugElements);
+		ZEDWORD									GetVisualDebugElements();
 
 		virtual ZEEntity*						CastRay(const ZERay& Ray, float Range);
 		virtual bool							CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntity, ZEVector3& Position, ZEVector3& Normal);
@@ -141,6 +126,14 @@ class ZEScene
 
 		bool									Save(const char* FileName);
 		bool									Load(const char* FileName);
+
+		bool									Initialize();
+		void									Deinitialize();
+		void									Destroy();
+
+
+		void									Tick(float ElapsedTime);
+		void									Render(float ElapsedTime);
 
 												ZEScene();
 		virtual									~ZEScene();

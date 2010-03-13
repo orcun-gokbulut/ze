@@ -37,6 +37,7 @@
 #include "Core/Core.h"
 #include "Core/Error.h"
 #include "UI/UIManager.h"
+#include "Graphics/Camera.h"
 
 ZEGameDescription* ZEGame::GetGameDescription()
 {
@@ -178,9 +179,9 @@ void ZEGame::Destroy()
 void ZEGame::Render(float ElapsedTime)
 {
 	Scene->Render(ElapsedTime);
-	UIManager->Render(Scene->Renderer);
-	Scene->Renderer->Render(ElapsedTime);
-	Scene->Renderer->ClearList();
+	UIManager->Render(Scene->GetRenderer());
+	Scene->GetRenderer()->Render(ElapsedTime);
+	Scene->GetRenderer()->ClearList();
 }
 
 #include "ZEDS/String.h"
@@ -202,9 +203,8 @@ void ZEGame::Tick(float ElapsedTime)
 	AvarageFPS /= 3000.0f;
 
 	char Buffer[400];
-	ZEEntity* Player = Scene->GetEntities()[0];
-	const ZEVector3& Position = Player->GetPosition();
-	const ZEQuaternion& Rotation = Player->GetRotation();
+	const ZEVector3& Position = Scene->GetActiveCamera()->GetWorldPosition();
+	const ZEQuaternion& Rotation = Scene->GetActiveCamera()->GetWorldRotation();
 	float Yaw, Pitch, Roll;
 	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, Rotation);
 	

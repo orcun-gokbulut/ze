@@ -44,7 +44,7 @@
 #define WINDOWS_MEAN_AND_LEAN
 #include <windows.h>
 
-#ifdef ZEDEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLED
 #define ZEKEYBOARD_COOPERATE_LEVEL		DISCL_FOREGROUND | DISCL_NONEXCLUSIVE
 #define ZEMOUSE_COOPERATE_LEVEL			DISCL_FOREGROUND | DISCL_NONEXCLUSIVE
 #define ZEJOYSTICK_COOPERATE_LEVEL		DISCL_FOREGROUND | DISCL_NONEXCLUSIVE
@@ -134,7 +134,7 @@ void ZEDirectInputModule::SetEnabled(bool Enabled)
 
 bool ZEDirectInputModule::Initialize()
 {	
-	zeOutput("Initializing Direct Input.\r\n");
+	zeLog("DirectInput Module", "Initializing Direct Input module.\r\n");
 
 	ZeroMemory(&KeyboardStateA, sizeof(ZEDIKeyboardState));
 	ZeroMemory(&KeyboardStateB, sizeof(ZEDIKeyboardState));
@@ -266,7 +266,7 @@ bool ZEDirectInputModule::Initialize()
 
 void ZEDirectInputModule::Deinitialize()
 {
-	zeOutput("Destroying Direct Input.\r\n");
+	zeLog("DirectInput Module", "Destroying Direct Input module.\r\n");
 	if (DIMouse != NULL)
 	{
 		DIMouse->Unacquire();
@@ -293,7 +293,7 @@ void ZEDirectInputModule::Deinitialize()
 		DI->Release();
 		DI = NULL;
 	}
-	
+	zeLog("DirectInput Module", "Direct Input module destroyed.");
 }
 
 
@@ -484,7 +484,7 @@ void ZEDirectInputModule::ProcessInputMap(ZEInputMap* InputMap)
 
 void ZEDirectInputModule::Acquire()
 {
-	zeOutput("Acquire Direct Input.\r\n");
+	zeLog("DirectInput Module", "Acquire Direct Input.");
 	if (DIKeyboard != NULL)
 		DIKeyboard->Acquire();
 
@@ -497,7 +497,7 @@ void ZEDirectInputModule::Acquire()
 
 void ZEDirectInputModule::UnAcquire()
 {
-	zeOutput("Unacquire Direct Input.\r\n");
+	zeOutput("DirectInput Module", "Unacquire Direct Input.");
 
 	if (DIKeyboard != NULL)
 		DIKeyboard->Unacquire();

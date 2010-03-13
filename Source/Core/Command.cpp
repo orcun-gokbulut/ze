@@ -234,13 +234,13 @@ bool ZECommandManager::Callback_ListCommands(ZECommand* Command, const ZECommand
 			zeOutput(" %-30s", Cmd->GetName());
 			switch(Cmd->GetAccessLevel())
 			{
-				case ZEUSERLEVEL_DEVELOPPER:
+				case ZE_UL_DEVELOPPER:
 					zeOutput(" Developer\r\n");
 					break;
-				case ZEUSERLEVEL_PLAYER:
+				case ZE_UL_PLAYER:
 					zeOutput(" Player\r\n");
 					break;
-				case ZEUSERLEVEL_CHEATER:
+				case ZE_UL_CHEATER:
 					zeOutput("Cheater\r\n");
 					break;
 			}

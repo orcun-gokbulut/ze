@@ -92,8 +92,10 @@ class ZEModule
 
 		virtual bool					IsEnabled() = 0;
 		virtual void					SetEnabled(bool Enabled) = 0;
+
 		virtual bool					Initialize() = 0;
 		virtual void					Deinitialize() = 0;
+
 		virtual void					Destroy();
 };
 #endif

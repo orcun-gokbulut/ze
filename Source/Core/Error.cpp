@@ -36,6 +36,7 @@
 #include "Error.h"
 #include "Core.h"
 #include "Console.h"
+#include "ConsoleWindow.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <assert.h>
@@ -53,7 +54,7 @@ void _ZEAssert(char* Message, char* File, int Line, ...)
 	if (zeCore->GetConsole() != NULL)
 		zeOutput("[Assert] : %s\r\n", Buffer);
 
-#if defined(ZEDEBUG_ENABLED) && defined(ZEPLATFORM_WINDOWS)
+#if defined(ZE_DEBUG_ENABLED) && defined(ZE_PLATFORM_WINDOWS)
 //	_CrtDbgReport(_CRT_ASSERT, File, Line, "Zinek Engine", Message, VList);
 #else
 	abort();
@@ -102,14 +103,14 @@ char* ZEError::ErrorLevelToString(ZEErrorType ErrorLevel)
 {
 	switch(ErrorLevel)
 	{
-		case ZE_ERRORLEVEL_CRITICAL:
+		case ZE_EL_CRITICAL:
 			return "CRITICAL ERROR";
 		default:
-		case ZE_ERRORLEVEL_NONCRITICAL:
+		case ZE_EL_NONCRITICAL:
 			return "Error";
-		case ZE_ERRORLEVEL_WARNING:
+		case ZE_EL_WARNING:
 			return "Warning";
-		case ZE_ERRORLEVEL_NOTICE:
+		case ZE_EL_NOTICE:
 			return "Notice";
 	}
 }
@@ -122,7 +123,7 @@ void ZEError::LogToFile(const char* Module, ZEErrorType ErrorType, const char* E
 		if (fopen_s(&LogFile, LogFileName, "a") != NULL)
 		{
 			DisableFileLogging();
-			RaiseError("Can not open log file. File logging is disabled.", ZE_ERRORLEVEL_NONCRITICAL, "Error");
+			RaiseError("Can not open log file. File logging is disabled.", ZE_EL_NONCRITICAL, "Error");
 			return;
 		}
 		else
@@ -149,11 +150,18 @@ void ZEError::RaiseError(const char* From, ZEErrorType Level, const char* ErrorF
 	if (zeCore->GetConsole() != NULL)
 		zeOutput("[%s] %s : %s\r\n", From, ErrorLevelToString(Level), Buffer);
 	
-	if (Level == ZE_ERRORLEVEL_NONCRITICAL)
+	if (Level == ZE_EL_NONCRITICAL)
 		zeConsole->ShowConsole();
 
-	if (Level == ZE_ERRORLEVEL_CRITICAL)
-		zeCore->SetCoreState(ZECORESTATE_CRITICALERROR);
+	if (Level == ZE_EL_CRITICAL)
+	{
+		zeCore->SetCoreState(ZE_CS_CRITICALERROR);
+		ZEConsoleWindow ConsoleWindow;
+		ZECore::GetInstance()->GetConsole()->SetConsoleInterface(&ConsoleWindow);
+		ConsoleWindow.TermiantionState();
+		ZECore::GetInstance()->GetConsole()->SetConsoleInterface(NULL);
+		exit(0);
+	}
 }
 
 void ZEError::RaiseAssert(ZEAssertType AssertType, const char* Function, const char* File, int Line, const char* Message, ...)
@@ -165,17 +173,8 @@ void ZEError::RaiseAssert(ZEAssertType AssertType, const char* Function, const c
 	vsprintf_s(Buffer, 4095, Message, VList);
 
 	if (zeCore->GetConsole() != NULL)
-		zeOutput("%s : %s (Function : %s, File : %s, Line : %d)\r\n", (AssertType == ZE_ASSERTTYPE_ASSERT ? "Assert" : "Warning"),  Buffer,  Function, File, Line);
+		zeOutput("%s : %s (Function : %s, File : %s, Line : %d)\r\n", (AssertType == ZE_AT_ASSERT ? "Assert" : "Warning"),  Buffer,  Function, File, Line);
 
-	#if defined(ZEDEBUG_ENABLED) && defined(ZEPLATFORM_WINDOWS)
-		if (AssertType == ZE_ASSERTTYPE_ASSERT)
-		{
-	//		_CrtDbgReport(_CRT_ASSERT, File, Line, "Zinek Engine", Message, VList); 
-		}
-	#else
-		if (AssertType == ZE_ASSERTTYPE_ASSERT)
-			abort();
-	#endif
 	va_end(VList);
 }
 

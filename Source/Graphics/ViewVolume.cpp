@@ -259,10 +259,10 @@ ZEDoorViewTest ZEViewSphere::CullTest(const ZERectangle3D& PortalDoor) const
 	return ZE_DVT_INSIDE;
 }
 
-void ZEViewSphere::Create(const ZEVector3& Position, float Radious, float NearZ)
+void ZEViewSphere::Create(const ZEVector3& Position, float Radius, float NearZ)
 {
 	BoundingSphere.Position = Position;
-	BoundingSphere.Radius = Radious;
+	BoundingSphere.Radius = Radius;
 	this->NearZ = NearZ;
 }
 
@@ -307,10 +307,10 @@ ZEDoorViewTest ZEViewHemiSphere::CullTest(const ZERectangle3D& PortalDoor) const
 	return ZE_DVT_INSIDE;
 }
 
-void ZEViewHemiSphere::Create(const ZEVector3& Position, const ZEVector3& Direction, float Radious, float NearZ)
+void ZEViewHemiSphere::Create(const ZEVector3& Position, const ZEVector3& Direction, float Radius, float NearZ)
 {
 	BoundingSphere.Position = Position;
-	BoundingSphere.Radius = Radious;
+	BoundingSphere.Radius = Radius;
 	HalfPlane.p = Position;
 	HalfPlane.n = Direction;
 }

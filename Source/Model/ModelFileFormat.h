@@ -37,20 +37,31 @@
 #ifndef __ZE_MODEL_FILE_FORMAT_H__
 #define __ZE_MODEL_FILE_FORMAT_H__
 
-#define ZE_MDLF_MAX_NAME_SIZE					128
-#define ZE_MDLF_MAX_FILENAME_SIZE				256
+#include "../ZEMath/Vector.h"
+#include "../ZEMath/Quaternion.h"
+#include "../ZEMath/AABoundingBox.h"
+#include "../ZEDS/Array.h"
+#include "../Definitions.h"
+#include "../Types.h"
 
-#define ZE_FILE_MAKEVERSION(Major, Minor)		((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor))
-#define ZE_MDLF_VERSION							ZE_FILE_MAKEVERSION(0,31)
-#define ZE_MDLF_HEADER							((ZEDWORD)((ZEDWORD)'ZEMF' + (ZEDWORD)'MDL '))
+#define ZE_MDLF_MAX_NAME_SIZE						128
+#define ZE_MDLF_MAX_FILENAME_SIZE					256
 
-#define	ZE_MDLF_MATERIAL_CHUNKID				((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'MTRL'))
-#define	ZE_MDLF_MESH_CHUNKID					((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'MESH'))
-#define	ZE_MDLF_BONE_CHUNKID					((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'BONE'))
-#define	ZE_MDLF_MESH_LOD_CHUNKID				((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'LOD '))
-#define	ZE_MDLF_PHYSICAL_SHAPE_CHUNKID			((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'PHSH'))
-#define	ZE_MDLF_ANIMATION_CHUNKID				((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'ANIM'))
-#define	ZE_MDLF_ANIMATION_KEYFRAME_CHUNKID		((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'ANKF'))
+#define ZE_FILE_MAKEVERSION(Major, Minor)			((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor))
+#define ZE_MDLF_VERSION								ZE_FILE_MAKEVERSION(0,40)
+#define ZE_MDLF_HEADER								((ZEDWORD)((ZEDWORD)'ZEMF' + (ZEDWORD)'MDL '))
+
+#define	ZE_MDLF_MATERIAL_CHUNKID					((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'MTRL'))
+#define	ZE_MDLF_MESH_CHUNKID						((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'MESH'))
+#define	ZE_MDLF_BONE_CHUNKID						((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'BONE'))
+#define	ZE_MDLF_MESH_LOD_CHUNKID					((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'LOD '))
+#define ZE_MDLF_PHYSICAL_BODY_CHUNKID				((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'PBDY'))
+#define	ZE_MDLF_PHYSICAL_BODY_SHAPE_CHUNKID			((ZEDWORD)(ZE_MDLF_PHYSICAL_BODY_CHUNKID + (ZEDWORD)'PHSH'))
+#define ZE_MDLF_PHYSICAL_BODY_SHAPE_VERTEX_CHUNKID	((ZEDWORD)(ZE_MDLF_PHYSICAL_BODY_SHAPE_CHUNKID + (ZEDWORD)'VRTX'))
+#define ZE_MDLF_PHYSICAL_BODY_SHAPE_INDEX_CHUNKID	((ZEDWORD)(ZE_MDLF_PHYSICAL_BODY_SHAPE_CHUNKID + (ZEDWORD)'INDX'))
+#define ZE_MDLF_PHYSICAL_JOINT_CHUNKID				((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'PJNT'))
+#define	ZE_MDLF_ANIMATION_CHUNKID					((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'ANIM'))
+#define	ZE_MDLF_ANIMATION_KEYFRAME_CHUNKID			((ZEDWORD)(ZE_MDLF_ANIMATION_CHUNKID + (ZEDWORD)'ANKF'))
 
 struct ZEModelFileMaterialChunk
 {
@@ -111,61 +122,208 @@ struct ZEModelFileAnimationFrameChunk
 	ZEDWORD								MeshKeyCount;
 };
 
-
-struct ZEModelFilePhysicalMaterialChunk
-{
-	bool								Enabled;
-	float								Restitution;
-	float								DynamicFriction;
-	float								StaticFriction;
+struct ZEModelFilePhysicalPolygonChunk
+{	
+	int									VertexIndexes[3];
 };
 
-struct ZEModelFilePhysicalPolygon
-{
-	int					VertexIndexes[3];
-};
-
-struct ZEModelFilePhysicalShapeChunk
+struct ZEModelFilePhysicalBodyShapeChunk
 {
 	ZEDWORD								ChunkId;
-	ZEVector3							Position;
-	ZEQuaternion						Orientation;
 	ZEDWORD								Type;
-	float								Mass;
-	ZEModelFilePhysicalMaterialChunk	Material;
+	ZEVector3							Position;
+	ZEQuaternion						Rotation;
+	float								Restitution;
+	float								StaticFriction;
+	float								DynamicFriction;
+	ZEDWORD								CollisionMask1;
+	ZEDWORD								CollisionMask2;
+	ZEDWORD								CollisionMask3;
+	ZEDWORD								CollisionMask4;
+	bool								Trigger;
 	
 	union
 	{
 		struct
 		{
-			float						Widht;
 			float						Height;
-			float						Lenght;
+			float                       NormalX;
+			float                       NormalY;
+			float                       NormalZ;
+		} Plane;
+
+		struct
+		{
+			float						Width;
+			float						Height;
+			float						Length;
 		} Box;
 
 		struct
 		{
 			float						Radius;
 		} Sphere;
-		
-		struct 
-		{
-			float						Radius;
-			float						Height;
-		} Cylinder;
 
 		struct
 		{
 			float						Radius;
 			float						Height;
 		} Capsule;
-		
+
 		struct
 		{
-			ZEDWORD						IndexCount;
 			ZEDWORD						VertexCount;
-		} Mesh;
+		} Convex;
+
+		struct
+		{
+			ZEDWORD						VertexCount;
+			ZEDWORD						IndexCount;
+		} TriMesh;
 	};
+};
+
+struct ZEModelFilePhysicalBodyChunk
+{
+	ZEDWORD								ChunkId;
+	ZEDWORD				                Type;
+	bool								Enabled;
+	float								Mass;
+	bool								Kinematic;
+	float								LinearDamping;
+	float								AngularDamping;
+	ZEVector3							MassCenter;
+	ZEDWORD								ShapeCount;
+};
+
+struct ZEModelFilePhysicalJointChunk
+{
+	ZEDWORD								ChunkId;
+	ZEDWORD								Type;
+	bool								Enabled;
+	ZEDWORD								Body1Type;
+	ZEDWORD								Body1Id;
+	ZEDWORD								Body2Id;
+	bool								UseGlobalAnchorAxis;
+	ZEVector3							GlobalAnchor;
+	ZEQuaternion						GlobalAxis;
+	ZEVector3							LocalAnchor1;
+	ZEVector3							LocalAnchor2;
+	ZEQuaternion						LocalAxis1;
+	ZEQuaternion						LocalAxis2;
+	bool								CollideBodies;
+	bool								Breakable;
+	float								BreakForce;
+	float								BreakTorque;
+
+	union
+	{
+		struct
+		{
+			bool						SwingLimit;
+			float						SwingLimitValue;
+			float						SwingLimitRestitution;
+			bool						TwistLimit;
+			float						TwistLimitLowValue;
+			float						TwistLimitHighValue;
+			float						TwistLimitRestitution;
+		} Spherical;
+
+		struct
+		{
+			bool						HasLimit;
+			float						LimitLowValue;
+			float 						LimitHighValue;
+			float 						LimitRestitution;
+			bool 						HasSpring;
+			float 						SpringValue;
+			float 						SpringDamper;
+			float 						SpringTarget;
+			bool 						HasMotor;
+			float 						MotorForce;
+			float 						MotorVelocity;
+		} Revolute;
+
+		struct
+		{
+			bool 						HasMinLimit;
+			float 						MinDistance;
+			bool 						HasMaxLimit;
+			float 						MaxDistance;
+			bool 						HasSpring;
+			float 						SpringValue;
+			float 						SpringDamper;
+		} Distance;
+	};
+
+	struct
+	{
+		ZEVector3 						Pulley1;
+		ZEVector3 						Pulley2;
+		float 							Distance;
+		float 							Ratio;
+		float 							Stiffness;
+		bool 							IsRigid;
+		bool 							HasMotor;
+		float 							MotorForce;
+		float 							MotorVelocity;
+	} Pulley;
+
+	struct
+	{
+		ZEDWORD 						XMotion;
+		ZEDWORD 						YMotion;
+		ZEDWORD 						ZMotion;
+		float 							LinearLimitValue;
+		float 							LinearLimitRestitution;
+		float 							LinearLimitSpring;
+		float 							LinearLimitDamper;
+
+		ZEDWORD 						TwistMotion;
+		float 							TwistLimitHighValue;
+		float 							TwistLimitLowValue;
+		float 							TwistLimitRestitution;
+		float 							TwistLimitSpring;
+		float 							TwistLimitDamper;
+ 							
+		ZEDWORD 						Swing1Motion;
+		float 							Swing1LimitValue;
+		float 							Swing1LimitRestitution;
+		float 							Swing1LimitSpring;
+		float 							Swing1LimitDamper;
+		
+		ZEDWORD 						Swing2Motion;
+		float 							Swing2LimitValue;
+		float 							Swing2LimitRestitution;
+		float 							Swing2LimitSpring;
+		float 							Swing2LimitDamper;
+
+		ZEVector3 						LinearMotorPosition;
+		ZEVector3 						LinearMotorVelocity;
+
+		ZEDWORD 						LinearXMotor;
+		float 							LinearXMotorForce;
+		float 							LinearXMotorSpring;
+		float 							LinearXMotorDamper;
+
+		ZEDWORD 						LinearYMotor;
+		float 							LinearYMotorForce;
+		float 							LinearYMotorSpring;
+		float 							LinearYMotorDamper;
+
+		ZEDWORD 						LinearZMotor;
+		float 							LinearZMotorForce;
+		float 							LinearZMotorSpring;
+		float 							LinearZMotorDamper;
+ 							
+		ZEQuaternion 					AngularMotorOrientation;
+		ZEVector3 						AngularMotorVelocity;
+
+		ZEDWORD 						AngularMotor;
+		float 							AngularMotorForce;
+		float 							AngularMotorSpring;
+		float 							AngularMotorDamper;
+	} Free;
 };
 
 struct ZEModelFileMeshLODChunk
@@ -176,23 +334,17 @@ struct ZEModelFileMeshLODChunk
 	ZEDWORD								VertexCount;
 };
 
-struct ZEModelFilePhysicalBodyChunk
-{
-	ZEDWORD								Type;
-	float								Mass;
-	ZEDWORD								ShapeCount;	
-};
-
 struct ZEModelFileMeshChunk
 {
 	ZEDWORD								ChunkId;
 	char								Name[ZE_MDLF_MAX_NAME_SIZE];
 	ZEAABoundingBox						BoundingBox;
 	ZEVector3							Position;
-	ZEQuaternion						Orientation;
+	ZEQuaternion						Rotation;
+	ZEVector3							Scale;
 	bool								IsSkinned;
 	ZEDWORD								LODCount;
-	ZEModelFilePhysicalBodyChunk		PhysicalBody;
+	bool								HasPhysicalBody;
 };
 
 struct ZEModelFileBoneChunk
@@ -201,11 +353,11 @@ struct ZEModelFileBoneChunk
 	char								Name[ZE_MDLF_MAX_NAME_SIZE];
 	ZEINT32								ParentBone;
 	ZEVector3							RelativePosition;
-	ZEQuaternion						RelativeOrientation;
-	ZEVector3							AbsolutePosition;
-	ZEQuaternion						AbsoluteOrientation;
+	ZEQuaternion						RelativeRotation;
+	ZEVector3							RelativeScale;
 	ZEAABoundingBox						BoundingBox;
-	ZEModelFilePhysicalBodyChunk		PhysicalBody;
+	bool								HasPhysicalBody;
+	bool								HasPhysicalJoint;
 };
 
 #endif

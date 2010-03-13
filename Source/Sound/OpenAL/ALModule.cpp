@@ -151,7 +151,9 @@ bool ZEALModule::Initialize()
 
 	ALchar* DeviceName = NULL;
 	if (DeviceId > DeviceList.GetCount())
+	{
 		zeWarning("OpenAL Module", "Wrong device id. Using sound default device.");
+	}
 	else
 		if (DeviceId == 0)
 			zeLog("OpenAL Module", "Using default sound device");

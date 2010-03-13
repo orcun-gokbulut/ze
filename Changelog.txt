@@ -39,9 +39,9 @@
 	ADD: ZEUITextControl ,which is used for displaying bitmap characters, has been added to UI components.
 
 [8 Feburary 2010 - Revision 103
-    ADD: ZEParticle sub-system is added to trunk.
-    CHG: ZEParticle sub-system is integrated in to v0.05.00.
-    REM: ZEPoint and ZEPosition typedefs has been removed.
+	ADD: ZEParticle sub-system is added to trunk.
+	CHG: ZEParticle sub-system is integrated in to v0.05.00.
+	REM: ZEPoint and ZEPosition typedefs has been removed.
     
 [9 Feburary 2010 - Revision 104]
 	CHG: ZETextControl render function is micro optimized.
@@ -78,25 +78,48 @@
 	FIX: If NULL passed to ZENamed::SetName() function it crashes. Now it checks parameter for NULL or Empty string.
 	-ADD: Effects enabled in sound source.
 
-[27 Þubat 2010 - Revision 107]
-    FIX: Volumes in sound sub-system are normalized and linearized to [0, 100]
-    ADD: DirectSound Listener added.
-    ADD: DirectSound 3D Buffer added.
-    BUG: DirectSound 3D Sound Source can not be created in vista.
-    CHG: ZEConsole::Log() function and zeLog macro now adds a new line character at the end of the message.
-    FIX: ZECore::FrameTime and ZECore::RunningTime fixed.
+[27 Feburary 2010 - Revision 107]
+	FIX: Volumes in sound sub-system are normalized and linearized to [0, 100]
+	ADD: DirectSound Listener added.
+	ADD: DirectSound 3D Buffer added.
+	BUG: DirectSound 3D Sound Source can not be created in vista.
+	CHG: ZEConsole::Log() function and zeLog macro now adds a new line character at the end of the message.
+	FIX: ZECore::FrameTime and ZECore::RunningTime fixed.
 
-[6 Mart 2010 - Revision 108]
+[6 March 2010 - Revision 108]
     ADD: OpenAL module added.
 	CHG: Library (Lib) and Include (Include) directories and project setting changed according to new Library and Include directory structures.
     
-[7 Mart 2010 - Revision 109]
-    ADD: OpenAL 3D Sound Source added.
-    ADD: Device enumuration support added to Sound Subsystem and Sound Modules.
+[7 March 2010 - Revision 109]
+	ADD: OpenAL 3D Sound Source added.
+	ADD: Device enumuration support added to Sound Subsystem and Sound Modules.
+
+[8 March 2010 - Revision 110]
+	ADD: ZEPhysics sub-system integrated.
+	ADD: ZEModel sub-system integreated.
+	CHG: Aegia module renamed to PhysX.
     
-[11 Mart 2010 - Revision 114]
+[11 March 2010 - Revision 114]
 	FIX: ZESDK's Library (Lib) and Include (Include) directories and project setting changed according to new Library and Include directory structures.
 	ADD: New source files added to ZESDK project and solution.
 	
-[12 Mart 2010 - Revision 115]
+[12 March 2010 - Revision 115]
 	FIX: ZESDK library depedencies has been fixed.
+    
+[12 March 2010 - Revision 116]
+   ADD: Colored Vertex added.
+   ADD: Simple Material added. Simple material is ultra-lightweight material that only support vertex coloring.
+   ADD: Canvas Vertex added.
+   ADD: Vertex color support added to canvas. ZECanvas::SetColor, ZECanvas::GetColor
+   ADD: Debug codes removed from WinMain function and added to newly created Debug Component mechanism.
+   ADD: Debug Component added. Debug components are used for putting engine in to spesific stage and testing and debugging engine.
+   ADD: Meta sub-system debug component added.
+   ADD: Sound sub-system debug component added.
+   ADD: Physics sub-system debug component added.
+   ADD: Debug visiualization mechanisim added ZEPhysXPhysicalWorld. User can see visualized physical world if he/she wants to.
+   CHG: ZEArrayVertexBuffer now inherits from both ZEDynamicVertexBuffer and ZEArray. Now itself acts as array. Vertices member variable has been removed.
+   CHG: ZEScene Visual Debug Elemens rendering mechanisim has been changed. This mechanisim moved to new class ZESceneDebugDraw. ZESceneDebugDraw uses simple material and vertex colored canvas and draws all visual debug elements in single draw call.
+   
+[13 Mark 2010 - Revision 119]
+   CHG: Major error reporting and error handling improvements.
+   CHG: Minor notation and coding style improvements. (Mostly ZEDEBUG, ZECore and ZEError enumurators)

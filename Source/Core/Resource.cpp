@@ -54,7 +54,6 @@ void ZEResource::SetFileName(const char* Value)
 
 void ZEResource::AddReferance()
 {
-	ZEASSERT("Resource", "You can't add referance count to a non shared resource.");
 	if (Shared)
 		ReferenceCount++;
 }

@@ -37,40 +37,27 @@
 #ifndef	__ZE_CORE_H__
 #define __ZE_CORE_H__
 
-/*#include "ZESDK.h"
-#include "CompileOptions.h" 
-#include "Error.h"
-#include "Command.h"
-#include "Resource.h"
-#include "ResourceManager.h"
-#include "Module.h"
-#include "ModuleManager.h"
-#include "Console.h"
-#include "Window.h"
-#include "Graphics/GraphicsModule.h"
-#include "Input/InputModule.h"
-#include "Sound/SoundModule.h"
-#include "GameInterface/Game.h"*/
 #include "Option.h"
 
 #define zeCore ZECore::GetInstance()
 
 enum ZEUserLevel
 {
-	ZEUSERLEVEL_PLAYER,
-	ZEUSERLEVEL_CHEATER,
-	ZEUSERLEVEL_DEVELOPPER
+	ZE_UL_PLAYER,
+	ZE_UL_CHEATER,
+	ZE_UL_ADMINISTRATOR,
+	ZE_UL_DEVELOPPER
 };
 
 enum ZECoreState
 {
-	ZECORESTATE_UNKNOWN,
-	ZECORESTATE_RUNNING,
-	ZECORESTATE_PAUSED,
-	ZECORESTATE_STARTUP,
-	ZECORESTATE_SHUTDOWN,
-	ZECORESTATE_TERMINATE,
-	ZECORESTATE_CRITICALERROR
+	ZE_CS_UNKNOWN,
+	ZE_CS_RUNNING,
+	ZE_CS_PAUSED,
+	ZE_CS_STARTUP,
+	ZE_CS_SHUTDOWN,
+	ZE_CS_TERMINATE,
+	ZE_CS_CRITICALERROR
 };
 
 class ZEModuleManager;
@@ -86,6 +73,8 @@ class ZEInputModule;
 class ZEPhysicsModule;
 class ZEGame;
 class ZEModule;
+class ZENetworkModule;
+class ZEDebugComponent;
 
 class ZECore
 {
@@ -109,9 +98,11 @@ class ZECore
 		ZEGraphicsModule*				Graphics;
 		ZESoundModule*					Sound;
 		ZEInputModule*					Input;
-		void*							Physics;
+		ZEPhysicsModule*				Physics;
 		ZEGame*							Game;
-		ZEModule*						Network;
+		ZENetworkModule*				Network;
+
+		ZEDebugComponent*				DebugComponent;
 
 		bool							InitializeModule(ZEModule* Module);
 		void							DeInitializeModule(ZEModule** Module);
@@ -140,13 +131,16 @@ class ZECore
 		ZEInputModule*					GetInputModule();
 
 		bool							SetPhysicsModule(ZEModule* Module);
-		void*							GetPhysicsModule();
+		ZEPhysicsModule*				GetPhysicsModule();
 
-		bool							SetNetworkModule(ZEModule* Module);
-		ZEModule*						GetNetworkModule();
+		bool							SetNetworkModule(ZENetworkModule* Module);
+		ZENetworkModule*				GetNetworkModule();
 
 		bool							SetGame(ZEGame* Game);
 		ZEGame*							GetGame();
+
+		void							SetDebugComponent(ZEDebugComponent* Component);
+		ZEDebugComponent*				GetDebugComponent();
 
 		float							GetFrameTime();
 		float							GetRuningTime();

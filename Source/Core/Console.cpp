@@ -486,7 +486,7 @@ void ZEConsole::Log(const char* Module, const char* Format, ...)
 	
 	if (!_CrtCheckMemory())
 		OutputDebugString("Jackpot");
-#ifdef ZEDEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLED
 	OutputDebugString(Buffer2);
 #endif
 }
@@ -504,7 +504,7 @@ void ZEConsole::Output(const char* Format, ...)
 	OutputHistory.Add(HistBuffer);
 	if (ConsoleInterface != NULL)
 		ConsoleInterface->Output(Buffer);
-#ifdef ZEDEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLED
 	OutputDebugString(Buffer);
 #endif
 }

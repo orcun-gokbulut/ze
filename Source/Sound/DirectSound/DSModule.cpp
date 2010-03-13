@@ -168,7 +168,9 @@ bool ZEDSModule::Initialize()
 
 	GUID* DeviceGUID = NULL;
 	if (DeviceId > DeviceList.GetCount())
+	{
 		zeWarning("DirectSound Module", "Wrong device id. Using default sound device.");
+	}
 	else
 		if (DeviceId == 0)
 			zeLog("DirectSound Module", "Using default sound device.");

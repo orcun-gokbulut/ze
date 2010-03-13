@@ -37,7 +37,7 @@
 #ifndef	__ZE_D3D9_COMPONENTBASE_H_
 #define __ZE_D3D9_COMPONENTBASE_H_
 
-#ifdef ZEDEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLED
 #define D3D_DEBUG_INFO
 #endif
 

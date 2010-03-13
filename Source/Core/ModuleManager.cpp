@@ -44,21 +44,19 @@ bool ZEModuleManager::CheckModule(ZEModuleDescription* ModuleDesc)
 	ZEModuleDescription* Desc = GetModuleDescription(ModuleDesc->GetName());
 	if (Desc != NULL)
 	{
-		zeError("Module Manager", 
-			"Can not load module. Module is allready loaded. (Module Name : \"%s\", Module Version = %d.%d)", 
+		zeError("Module Manager", "Can not load module. Module is allready loaded. (Module Name : \"%s\", Module Version = %d.%d)", 
 			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
 		return false;
 	}
 
 	if (!ModuleDesc->CheckCompatible())
 	{
-		zeError("Moudle Manager",
-			"Module compatible check failed. Module is not compatible with this system.  (Module Name : \"%s\", Module Version : %d.%d)",
+		zeError("Moudle Manager", "Module compatible check failed. Module is not compatible with this system.  (Module Name : \"%s\", Module Version : %d.%d)",
 			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
 		return false;
 	}
 
-/*#ifndef ZEDEBUG_ENABLED
+/*#ifndef ZE_DEBUG_ENABLED
 	if ((ModuleDesc->GetAttributes() & ZE_MA_DEBUG))
 	{
 		zeError("Module Manager", 
@@ -68,10 +66,9 @@ bool ZEModuleManager::CheckModule(ZEModuleDescription* ModuleDesc)
 	}
 #endif*/
 
-	if (ModuleDesc->GetRequiredZinekEngineVersion() != ZEVERSION_MAJORNUMBER)
+	if (ModuleDesc->GetRequiredZinekEngineVersion() != ZE_VERSION_MAJORNUMBER)
 	{
-		zeError("Module Manager", 
-			"Can not load module. Required Zinek Engine version does no match. This module requires Zinek Engine version %d.0. (Module Name : \"%s\", Module Version : %d.%d)",
+		zeError("Module Manager", "Can not load module. Required Zinek Engine version does no match. This module requires Zinek Engine version %d.0. (Module Name : \"%s\", Module Version : %d.%d)",
 			ModuleDesc->GetRequiredZinekEngineVersion(), ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
 		return false;
 	}
@@ -130,8 +127,7 @@ ZEModule* ZEModuleManager::CreateModule(size_t Index)
 
 	if (ModuleDesc == NULL)
 	{
-		zeError("Module Manager", 
-			"Can not find module. (Module Index : %d)",
+		zeError("Module Manager", "Can not find module. (Module Index : %d)",
 			Index);
 
 		return NULL;
@@ -140,8 +136,7 @@ ZEModule* ZEModuleManager::CreateModule(size_t Index)
 	ZEModule* Module = ModuleDesc->CreateModuleInstance();
 	if (Module == NULL)
 	{
-		zeError("Module Manager", 
-			"Can not create module. (Module Name : \"%s\", Module Version : %d.%d)",
+		zeError("Module Manager", "Can not create module. (Module Name : \"%s\", Module Version : %d.%d)",
 			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
 
 		return NULL;
@@ -155,8 +150,7 @@ ZEModule* ZEModuleManager::CreateModule(const char* Name)
 	ZEModuleDescription* ModuleDesc = GetModuleDescription(Name);
 	if (ModuleDesc == NULL)
 	{
-		zeError("Module Manager", 
-			"Can not find module. (Module Name : \"%s\")",
+		zeError("Module Manager", "Can not find module. (Module Name : \"%s\")",
 			Name);
 
 		return NULL;
@@ -165,8 +159,7 @@ ZEModule* ZEModuleManager::CreateModule(const char* Name)
 	ZEModule* Module = ModuleDesc->CreateModuleInstance();
 	if (Module == NULL)
 	{
-		zeError("Module Manager", 
-			"Can not create module. (Module Name : \"%s\", Module Version : %d.%d)",
+		zeError("Module Manager", "Can not create module. (Module Name : \"%s\", Module Version : %d.%d)",
 			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
 
 		return NULL;
@@ -181,8 +174,7 @@ ZEModule* ZEModuleManager::CreateModule(ZEModuleType ModuleType)
 	ZEModuleDescription* ModuleDesc = GetModuleDescription(ModuleType);
 	if (ModuleDesc == NULL)
 	{
-		zeError("Module Manager", 
-			"Can not find module. Please check your options.ini.");
+		zeError("Module Manager", "Can not find module. Please check your options.ini.");
 
 		return NULL;
 	}
@@ -190,8 +182,7 @@ ZEModule* ZEModuleManager::CreateModule(ZEModuleType ModuleType)
 	ZEModule* Module = ModuleDesc->CreateModuleInstance();
 	if (Module == NULL)
 	{
-		zeError("Module Manager", 
-			"Can not create module. (Module Name : \"%s\", Module Version : %d.%d)",
+		zeError("Module Manager", "Can not create module. (Module Name : \"%s\", Module Version : %d.%d)",
 			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
 
 		return NULL;
@@ -202,7 +193,7 @@ ZEModule* ZEModuleManager::CreateModule(ZEModuleType ModuleType)
 
 bool ZEModuleManager::LoadInternalModule(ZEModuleDescription* ModuleDesc)
 {
-	zeOutput("Loading Internal Module \"%s\". Version : %d.%d, Type : UNKNOWN, Attributes : %c%c%c%c%c%c, Option Section : %s\r\n",
+	zeLog("Module Manager", "Loading Internal Module \"%s\". Version : %d.%d, Type : UNKNOWN, Attributes : %c%c%c%c%c%c, Option Section : %s",
 		ModuleDesc->GetName(),
 		ModuleDesc->GetMajorVersion(),
 		ModuleDesc->GetMinorVersion(),
@@ -217,8 +208,7 @@ bool ZEModuleManager::LoadInternalModule(ZEModuleDescription* ModuleDesc)
 
 	if (!CheckModule(ModuleDesc))
 	{
-		zeError("Module Manager",
-			"Can not load module. Module check failed. (Module Name : \"%s\", Module Version : %d.%d)",
+		zeError("Module Manager", "Can not load module. Module check failed. (Module Name : \"%s\", Module Version : %d.%d)",
 			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
 		return false;
 	}
@@ -256,6 +246,7 @@ void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
 #include "Input/DummyInput/DummyInputModuleDescription.h"
 #include "Input/VirtualInput/VirtualInputModuleDescription.h"
 #include "Sound/OpenAL/ALModuleDescription.h"
+#include "Physics/PhysX/PhysXModuleDescription.h"
 
 ZEModuleManager::ZEModuleManager()
 {
@@ -265,16 +256,18 @@ ZEModuleManager::ZEModuleManager()
 	LoadInternalModule(new ZEVirtualInputModuleDescription());
 	LoadInternalModule(new ZEDirectInputModuleDescription());
 	LoadInternalModule(new ZEALModuleDescription());
+	LoadInternalModule(new ZEPhysXModuleDescription());
 
 	ModuleManagerOptions.SetName("ModuleManager");
 	ModuleManagerOptions.AddOption(new ZEOption("GraphicsModule", "Direct3D9", ZEOPTIONATTRIBUTE_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("InputModule", "DirectInput", ZEOPTIONATTRIBUTE_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("SoundModule", "DirectSound", ZEOPTIONATTRIBUTE_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("NetworkModule", "WinNetwork", ZEOPTIONATTRIBUTE_NORMAL));
-	ModuleManagerOptions.AddOption(new ZEOption("PhysicsModule", "Ageia", ZEOPTIONATTRIBUTE_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("PhysicsModule", "PhysX", ZEOPTIONATTRIBUTE_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("GameModule", "TestGame", ZEOPTIONATTRIBUTE_NORMAL));
 	zeOptions->RegisterSection(&ModuleManagerOptions);
 }
+
 ZEModuleManager::~ZEModuleManager()
 {
 	for (size_t I = 0; I < ModuleList.GetCount(); I++)
