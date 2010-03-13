@@ -107,19 +107,23 @@
 	FIX: ZESDK library depedencies has been fixed.
     
 [12 March 2010 - Revision 116]
-   ADD: Colored Vertex added.
-   ADD: Simple Material added. Simple material is ultra-lightweight material that only support vertex coloring.
-   ADD: Canvas Vertex added.
-   ADD: Vertex color support added to canvas. ZECanvas::SetColor, ZECanvas::GetColor
-   ADD: Debug codes removed from WinMain function and added to newly created Debug Component mechanism.
-   ADD: Debug Component added. Debug components are used for putting engine in to spesific stage and testing and debugging engine.
-   ADD: Meta sub-system debug component added.
-   ADD: Sound sub-system debug component added.
-   ADD: Physics sub-system debug component added.
-   ADD: Debug visiualization mechanisim added ZEPhysXPhysicalWorld. User can see visualized physical world if he/she wants to.
-   CHG: ZEArrayVertexBuffer now inherits from both ZEDynamicVertexBuffer and ZEArray. Now itself acts as array. Vertices member variable has been removed.
-   CHG: ZEScene Visual Debug Elemens rendering mechanisim has been changed. This mechanisim moved to new class ZESceneDebugDraw. ZESceneDebugDraw uses simple material and vertex colored canvas and draws all visual debug elements in single draw call.
+	ADD: Colored Vertex added.
+	ADD: Simple Material added. Simple material is ultra-lightweight material that only support vertex coloring.
+	ADD: Canvas Vertex added.
+	ADD: Vertex color support added to canvas. ZECanvas::SetColor, ZECanvas::GetColor
+	ADD: Debug codes removed from WinMain function and added to newly created Debug Component mechanism.
+	ADD: Debug Component added. Debug components are used for putting engine in to spesific stage and testing and debugging engine.
+	ADD: Meta sub-system debug component added.
+	ADD: Sound sub-system debug component added.
+	ADD: Physics sub-system debug component added.
+	ADD: Debug visiualization mechanisim added ZEPhysXPhysicalWorld. User can see visualized physical world if he/she wants to.
+	CHG: ZEArrayVertexBuffer now inherits from both ZEDynamicVertexBuffer and ZEArray. Now itself acts as array. Vertices member variable has been removed.
+	CHG: ZEScene Visual Debug Elemens rendering mechanisim has been changed. This mechanisim moved to new class ZESceneDebugDraw. ZESceneDebugDraw uses simple material and vertex colored canvas and draws all visual debug elements in single draw call.
    
-[13 Mark 2010 - Revision 119]
-   CHG: Major error reporting and error handling improvements.
-   CHG: Minor notation and coding style improvements. (Mostly ZEDEBUG, ZECore and ZEError enumurators)
+[13 March 2010 - Revision 119]
+	CHG: Major error reporting and error handling improvements.
+	CHG: Minor notation and coding style improvements. (Mostly ZEDEBUG, ZECore and ZEError enumurators)
+	
+[13 March 2010 - Revision 121]
+	FIX: Window Console appending test at the cursor location has been fixed. Now it appends at the end of the textbox.
+	FIX: ZESDK linkage error. Missing source files has been added to ZESDK project.

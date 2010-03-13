@@ -58,7 +58,6 @@ ZEPhysXPhysicalWorld::ZEPhysXPhysicalWorld()
 	SceneDesc.groundPlane = true;
 	SceneDesc.simType = NX_SIMULATION_SW;
 	SceneDesc.upAxis = 1;
-	SceneDesc.flags
 	DebugDraw.Material = NULL;
 }
 
@@ -221,8 +220,11 @@ void ZEPhysXPhysicalWorld::Deinitialize()
 	for (size_t I = 0; I < PhysicalObjects.GetCount(); I++)
 		PhysicalObjects[I]->Deinitialize();
 
-	GetPhysicsSDK()->releaseScene(*Scene);
-	Scene = NULL;
+	if (Scene != NULL)
+	{
+		GetPhysicsSDK()->releaseScene(*Scene);
+		Scene = NULL;
+	}
 }
 
 void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)

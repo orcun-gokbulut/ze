@@ -341,6 +341,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Graphics\Renderer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Graphics\RenderOrder.cpp"
 				>
 			</File>
@@ -453,6 +457,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Graphics\VertexBuffer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Graphics\VertexDeclaration.cpp"
 				>
 			</File>
@@ -479,6 +487,14 @@
 			<Filter
 				Name="Direct3D9"
 				>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9Common.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9Common.h"
+					>
+				</File>
 				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9CommonTools.cpp"
 					>
@@ -541,6 +557,18 @@
 				</File>
 				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9RendererBase.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9Shader.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9Shader.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9ShadersSM2.h"
 					>
 				</File>
 				<File
