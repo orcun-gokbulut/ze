@@ -489,7 +489,7 @@ void ZECore::ShutDown()
 	zeLog("Core", "Deinitializing Core.");
 	SetCoreState(ZE_CS_SHUTDOWN);
 
-	if (DebugComponent == NULL)
+	if (DebugComponent != NULL)
 		DebugComponent->ShutDown();
 
 	// Destroy game

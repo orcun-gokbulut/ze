@@ -143,16 +143,26 @@ void ZEScene::Destroy()
 	Deinitialize();
 
 	if (PhysicalWorld != NULL)
+	{
 		PhysicalWorld->Destroy();
+		PhysicalWorld = NULL;
+	}
 
 	if (Renderer != NULL)
+	{
 		Renderer->Destroy();
+		Renderer = NULL;
+	}
 
 	if (ShadowRenderer != NULL)
+	{
 		ShadowRenderer->Destroy();
+		ShadowRenderer = NULL;
+	}
 
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Destroy();
+	Entities.Clear();
 
 	Environment.Destroy();
 

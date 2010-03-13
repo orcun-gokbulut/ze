@@ -33,13 +33,27 @@
 //////////////////////////////////////////////////////////////////////////////////////
 /*ZEHEADER_END*/
 
-struct PS_INPUT
+float4x4	TransformMatrix				: register(c0);
+
+struct VS_INPUT 
 {
-	float2 Texcoord             : TEXCOORD0;
-	float4 Color			    : COLOR0;
+	float4 Position             : POSITION0;
+	float4 Color                : TEXCOORD0;
+
 };
 
-float4 ps_main(PS_INPUT Input) : COLOR0
+struct VS_OUTPUT 
 {
-	return Input.Color;
+	float4 Position             : POSITION0;
+	float4 Color				: TEXCOORD0;
+};
+
+VS_OUTPUT vs_main(VS_INPUT Input)
+{
+	VS_OUTPUT Output;
+
+	Output.Position = mul(Input.Position, TransformMatrix);
+	Output.Color = Input.Color;
+	
+	return Output;
 }

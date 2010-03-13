@@ -120,6 +120,10 @@ bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Ele
 				D3DElements[I].Type = D3DDECLTYPE_FLOAT4;
 				VertexSize += 16;
 				break;
+			case ZE_VET_COLOR:
+				D3DElements[I].Type = D3DDECLTYPE_D3DCOLOR;
+				VertexSize += 4;
+				break;
 			case ZE_VET_BYTE4:
 				D3DElements[I].Type = D3DDECLTYPE_UBYTE4;
 				VertexSize += 4;

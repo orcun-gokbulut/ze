@@ -70,6 +70,7 @@ enum ZEVertexElementType
 	ZE_VET_SHORT2		= 5,
 	ZE_VET_SHORT4		= 6,
 	ZE_VET_BYTE4		= 7,
+	ZE_VET_COLOR		= 8,
 };
 
 struct ZEVertexElement

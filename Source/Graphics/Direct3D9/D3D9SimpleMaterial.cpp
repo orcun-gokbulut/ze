@@ -36,6 +36,7 @@
 #include "D3D9SimpleMaterial.h"
 #include "D3D9CommonTools.h"
 #include "Graphics/RenderOrder.h"
+#include "Graphics/Camera.h"
 #include "Core/ResourceFile.h"
 #include <D3D9.h>
 
@@ -59,6 +60,8 @@ ZEMaterialType ZED3D9SimpleMaterial::GetMaterialType() const
 
 bool ZED3D9SimpleMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const 
 {
+	((ZED3D9SimpleMaterial*)this)->UpdateMaterial();
+
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_ZCULLING)
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
@@ -82,10 +85,21 @@ bool ZED3D9SimpleMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* C
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
-
+	
+	if (RenderOrder->Flags & (ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM & ZE_ROF_ENABLE_WORLD_TRANSFORM))
+	{
+		ZEMatrix4x4 WorldViewProjMatrix;
+		ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, Camera->GetViewProjectionTransform());
+		GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
+	}
+	else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM)
+		GetDevice()->SetVertexShaderConstantF(0, (float*)&Camera->GetViewProjectionTransform(), 4);
+	else if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+		GetDevice()->SetVertexShaderConstantF(0, (float*)&RenderOrder->WorldMatrix, 4);
+	else
+		GetDevice()->SetVertexShaderConstantF(0, (float*)&ZEMatrix4x4::Identity, 4);
 
 	GetDevice()->SetVertexShader(VertexShader);
-	GetDevice()->SetVertexShaderConstantF(0, (float*)&RenderOrder->WorldMatrix, 4);
 	GetDevice()->SetPixelShader(PixelShader);
 
 	return true;

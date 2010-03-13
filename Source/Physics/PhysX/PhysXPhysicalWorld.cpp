@@ -71,6 +71,7 @@ ZEPhysXPhysicalWorld::~ZEPhysXPhysicalWorld()
 
 void ZEPhysXPhysicalWorld::InitializeDebugDraw()
 {
+	GetPhysicsSDK()->setParameter(NX_VISUALIZATION_SCALE, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_AXES, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_MASS_AXES, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_LIN_VELOCITY, 1.0f);
@@ -249,7 +250,7 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 	DebugDraw.LinesRenderOrder.PrimitiveCount = DebugRenderable->getNbLines();
 	DebugDraw.LinesVertexBuffer.SetCount(DebugDraw.LinesRenderOrder.PrimitiveCount * 2);
 	const NxDebugLine* DebugLines = DebugRenderable->getLines();
-	for (size_t I = 0; I < DebugDraw.LinesRenderOrder.PrimitiveCount * 2; I++)
+	for (size_t I = 0; I < DebugDraw.LinesRenderOrder.PrimitiveCount; I++)
 	{
 		DebugDraw.LinesVertexBuffer[2 * I].Position = NX_TO_ZE(DebugLines[I].p0);
 		DebugDraw.LinesVertexBuffer[2 * I].Color = NX_TO_ZE(DebugLines[I].color);
@@ -262,7 +263,7 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 	DebugDraw.TrianglesRenderOrder.PrimitiveCount = DebugRenderable->getNbTriangles();
 	DebugDraw.TrianglesVertexBuffer.SetCount(DebugDraw.TrianglesRenderOrder.PrimitiveCount * 3);
 	const NxDebugTriangle* DebugTriangles = DebugRenderable->getTriangles();
-	for (size_t I = 0; I < DebugDraw.TrianglesRenderOrder.PrimitiveCount * 3; I++)
+	for (size_t I = 0; I < DebugDraw.TrianglesRenderOrder.PrimitiveCount; I++)
 	{
 		DebugDraw.TrianglesVertexBuffer[3 * I].Position = NX_TO_ZE(DebugTriangles[I].p0);
 		DebugDraw.TrianglesVertexBuffer[3 * I].Color = NX_TO_ZE(DebugTriangles[I].color);
@@ -278,7 +279,7 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 
 void ZEPhysXPhysicalWorld::Update(float ElapsedTime)
 {
-    Scene->simulate(1.0f);
+    Scene->simulate(ElapsedTime);
     Scene->flushStream();
 
 	Scene->fetchResults(NX_RIGID_BODY_FINISHED, true);

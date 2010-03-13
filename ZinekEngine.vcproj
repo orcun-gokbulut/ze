@@ -683,11 +683,11 @@
 						>
 					</File>
 					<File
-						RelativePath=".\RunDir\resources\shaders\SimplePixelShader.vs"
+						RelativePath=".\RunDir\resources\shaders\SimplePixelShader.ps"
 						>
 					</File>
 					<File
-						RelativePath=".\RunDir\resources\shaders\SimpleVertexShader.ps"
+						RelativePath=".\RunDir\resources\shaders\SimpleVertexShader.vs"
 						>
 					</File>
 					<File

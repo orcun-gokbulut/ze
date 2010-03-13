@@ -43,7 +43,7 @@
 #include <stdlib.h>
 #include <string>
 
-#ifdef ZE_DEBUG_CHECKMEMORY
+#ifdef ZE_DEBUG_CHECK_MEMORY
 #include <crtdbg.h>
 #endif
 
@@ -98,7 +98,7 @@ void ZEString::SetValue(const wchar_t* String)
 
 	memcpy(Buffer, String, Size);
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
@@ -119,7 +119,7 @@ void ZEString::SetValue(const char* String)
 
 	mbstowcs(Buffer, String, Size);
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
@@ -243,7 +243,7 @@ void ZEString::Append(const wchar_t* String)
 		memcpy(Buffer + Length, String, (StringLength + 1) * sizeof(wchar_t));
 	}
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
@@ -291,7 +291,7 @@ void ZEString::Insert(const wchar_t* String)
 			delete[] OldBuffer;
 	}
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
@@ -343,7 +343,7 @@ void ZEString::Insert(size_t Position, const wchar_t* String)
 		memcpy(Buffer + Position + StringLength, Buffer + Position, (Length - Position - StringLength + 1) * sizeof(wchar_t));
 	}
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
@@ -376,7 +376,7 @@ void ZEString::Insert(size_t Position, wchar_t Character)
 		memcpy(Buffer + Position + 1, Buffer + Position, (Length - Position) * sizeof(wchar_t));
 	}
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
@@ -409,7 +409,7 @@ void ZEString::Remove(size_t Position, size_t Count)
 		memcpy(Buffer + Position, Buffer + Position + Count, (Length - Position - Count + 1) * sizeof(wchar_t));	
 	}
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
@@ -450,7 +450,7 @@ ZEString ZEString::Left(size_t Count) const
 	memcpy(Temp.Buffer, Buffer, Count * sizeof(wchar_t)); 
 	Temp.Buffer[Count] = L'\0';
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
@@ -471,7 +471,7 @@ ZEString ZEString::Right(size_t Count) const
 	Temp.Allocator.Allocate(&Temp.Buffer, (Count + 1) * sizeof(wchar_t));
 	memcpy(Temp.Buffer, Buffer + Length - Count, (Count + 1) * sizeof(wchar_t)); 
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
@@ -491,7 +491,7 @@ ZEString ZEString::Middle(size_t Position, size_t Count) const
 	memcpy(Temp.Buffer, Buffer + Position, Count * sizeof(wchar_t));
 	Temp.Buffer[Count] = L'\0';
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
@@ -512,7 +512,7 @@ ZEString ZEString::SubString(size_t StartPosition, size_t EndPosition) const
 	memcpy(Temp.Buffer, Buffer + StartPosition, (EndPosition - StartPosition + 1) * sizeof(wchar_t));
 	Temp.Buffer[EndPosition - StartPosition + 1] = '\0';
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
@@ -538,7 +538,7 @@ ZEString ZEString::TrimLeft() const
 	Temp.Allocator.Allocate(&Temp.Buffer, (Length - Count + 1) * sizeof(wchar_t));
 	memcpy(Temp.Buffer, Buffer + Count, (Length - Count + 1) * sizeof(wchar_t)); 
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
@@ -565,7 +565,7 @@ ZEString ZEString::TrimRight() const
 	memcpy(Temp.Buffer, Buffer, (Length - Count) * sizeof(wchar_t)); 
 	Temp.Buffer[Length - Count] = L'\0';
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
@@ -603,7 +603,7 @@ ZEString ZEString::Trim() const
 	memcpy(Temp.Buffer, Buffer + LeftCount, (Length - LeftCount - RightCount) * sizeof(wchar_t)); 
 	Temp.Buffer[Length - LeftCount - RightCount] = L'\0';
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
@@ -775,7 +775,7 @@ ZEString::operator std::string() const
 	((ZEString*)this)->CharBuffer = new char[Length * sizeof(char) * 3 + sizeof(char)];
 	wcstombs(CharBuffer, Buffer, Length);
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
@@ -807,7 +807,7 @@ ZEString::operator const char*() const
 	((ZEString*)this)->CharBuffer = new char[(Length + 1) * sizeof(char) * 3];
 	wcstombs(CharBuffer, Buffer, Length + 1);
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
@@ -849,7 +849,7 @@ ZEString::~ZEString()
 	if (Buffer != NULL)
 		Allocator.Deallocate(&Buffer);
 
-	#ifdef ZE_DEBUG_CHECKMEMORY
+	#ifdef ZE_DEBUG_CHECK_MEMORY
 		ZEDS_ASSERT(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
