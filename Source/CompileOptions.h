@@ -37,7 +37,9 @@
 #ifndef __ZE_COMPILE_OPTIONS_H__
 #define __ZE_COMPILE_OPTIONS_H__
 
+#ifndef ZE_ZINEK_ENGINE
 #define ZE_ZINEK_ENGINE
+#endif
 
 #define ZE_MAKE_VERSION(Major, Minor, Build) ((unsigned int)(Major) << 24 | (unsigned int)(Minor)<<16 | (Build))
 #define ZE_VERSION_MAJORNUMBER 0

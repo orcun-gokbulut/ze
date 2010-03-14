@@ -51,7 +51,7 @@ ZEUIManager::~ZEUIManager()
 
 void ZEUIManager::AddControl(ZEUIControl* Control)
 {
-	ZEASSERT(Controls.FindIndex(Control) != -1, "UI Control already added to ZEUIManager. (Control Name : %s)", Control->GetName());
+	zeAssert(Controls.FindIndex(Control) != -1, "UI Control already added to ZEUIManager. (Control Name : %s)", Control->GetName());
 
 	Controls.Add(Control);
 }

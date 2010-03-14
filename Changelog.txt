@@ -132,3 +132,10 @@
 	FIX: ZEScene memory corruption on shutdown bug fixed.
 	FIX: ZEColoredVertex vertex declaration bug fixed.
 	FIX: ZEPhysicalWorld Debug Render no output bug fixed
+
+[15 March 2010 - Revision 127]
+	ADD: ZEPhysicalStaticObject and ZEPhysicalStaticMesh added.
+	CHG: ZEPhysicalMaterial is moved to its own .h and .cpp file.
+	CHG: ZEPhysicalMeshShape has been removed.
+	CHG: Minor notation improvements. ZEASSERT renamed to zeAssert and ZEWARNINGASSERT renamed to zeWarningAssert.
+	CHG: ZE_ZINEK_ENGINE set as global macro.

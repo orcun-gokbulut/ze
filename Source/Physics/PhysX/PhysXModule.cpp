@@ -37,6 +37,8 @@
 #include "PhysXModuleDescription.h"
 #include "PhysXPhysicalWorld.h"
 #include "PhysXPhysicalRigidBody.h"
+#include "PhysXPhysicalStaticObject.h"
+#include "PhysXPhysicalStaticMesh.h"
 #include "Core/Error.h"
 #include "Core/Console.h"
 
@@ -112,6 +114,16 @@ ZEPhysicalWorld* ZEPhysXModule::CreatePhysicalWorld()
 ZEPhysicalRigidBody* ZEPhysXModule::CreatePhysicalRigidBody()
 {
 	return new ZEPhysXPhysicalRigidBody();
+}
+
+ZEPhysicalStaticObject* ZEPhysXModule::CreatePhysicalStaticObject()
+{
+	return new ZEPhysXPhysicalStaticObject();
+}
+
+ZEPhysicalStaticMesh* ZEPhysXModule::CreatePhysicalStaticMesh()
+{
+	return new ZEPhysXPhysicalStaticMesh();
 }
 
 ZEPhysicalJoint* ZEPhysXModule::CreatePhysicalJoint()

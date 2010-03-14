@@ -223,59 +223,6 @@ float ZEPhysicalCylinderShape::GetHeight()
  }
 
 
-// Physical Trimesh Shape
-/////////////////////////////////////////////////////////////////////////////////////////
-ZEPhysicalShapeType ZEPhysicalTrimeshShape::GetPhysicalShapeType()
-{
-	return ZE_PST_TRIMESH;
-}
-
-void ZEPhysicalTrimeshShape::SetMaterialsPerTriangle(bool Enabled)
-{
-	MaterialsPerTriangle = Enabled;
-}
-
-bool ZEPhysicalTrimeshShape::GetMaterialsPerTriangle()
-{
-	return MaterialsPerTriangle;
-}
-
-void  ZEPhysicalTrimeshShape::SetTriangleVertices(const ZEArray<ZEVector3>& Vertices)
-{
-	TriangleVertices = Vertices;
-}
-
-const ZEArray<ZEVector3>& ZEPhysicalTrimeshShape::GetTriangleVertices()
-{
-	return TriangleVertices;
-}
-
-void ZEPhysicalTrimeshShape::SetTriangles(const ZEArray<ZEPhysicalTriangle>& Triangles)
-{
-	this->Triangles = Triangles;
-}
-
-const ZEArray<ZEPhysicalTriangle>& ZEPhysicalTrimeshShape::GetTriangles()
-{
-	return Triangles;
-}
-
-void ZEPhysicalTrimeshShape::SetTriangleMaterials(const ZEArray<ZEPhysicalMaterial>& Materials)
-{
-	TriangleMaterials = Materials;
-}
-
-const ZEArray<ZEPhysicalMaterial>& ZEPhysicalTrimeshShape::GetTriangleMaterials()
-{
-	return TriangleMaterials;
-}
-
-ZEPhysicalTrimeshShape::ZEPhysicalTrimeshShape()
-{
-	MaterialsPerTriangle = false;
-}
-
-
 // Physical Convex Shape
 /////////////////////////////////////////////////////////////////////////////////////////
 ZEPhysicalShapeType ZEPhysicalConvexShape::GetPhysicalShapeType()

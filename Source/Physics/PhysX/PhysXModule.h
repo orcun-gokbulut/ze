@@ -68,6 +68,8 @@ class ZEPhysXModule : public ZEPhysicsModule
 
 		virtual ZEPhysicalWorld*				CreatePhysicalWorld();
 		virtual ZEPhysicalRigidBody*			CreatePhysicalRigidBody();
+		virtual ZEPhysicalStaticObject*			CreatePhysicalStaticObject();
+		virtual ZEPhysicalStaticMesh*			CreatePhysicalStaticMesh();
 		virtual ZEPhysicalJoint*				CreatePhysicalJoint();
 		virtual ZEPhysicalCloth*				CreatePhysicalCloth();
 		virtual ZEPhysicalSoftBody*				CreatePhysicalSoftBody();

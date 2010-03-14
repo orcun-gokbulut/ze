@@ -54,7 +54,7 @@ ZEVector2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
 		case ZE_RC_RIGHTUP:
 			return ZEVector2(RightDown.x, LeftUp.y);
 		/*default:
-			ZEASSERT(true, "Wrong enum value ZERectangleCorner. Value : %d", Corner);*/
+			zeAssert(true, "Wrong enum value ZERectangleCorner. Value : %d", Corner);*/
 	}
 }
 

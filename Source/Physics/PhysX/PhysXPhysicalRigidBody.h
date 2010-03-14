@@ -87,8 +87,17 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 
 		virtual void					SetMassCenterRotation(const ZEQuaternion& NewRotation);
 		virtual ZEQuaternion			GetMassCenterRotation();
-								
-		virtual void					SetLinearVelocity(const ZEVector3& NewVelocity) ;
+
+		virtual	void					SetGravityEnabled(bool Enabled);
+		virtual bool					GetGravityEnabled();
+
+		virtual void					SetLockPositon(bool Enabled);
+		virtual bool					GetLockPosition();
+
+		virtual void					SetLockRotation(bool Enabled);
+		virtual bool					GetLockRotation();
+
+		virtual void					SetLinearVelocity(const ZEVector3& NewVelocity);
 		virtual ZEVector3				GetLinearVelocity();
 								
 		virtual void					SetAngularVelocity(const ZEVector3& NewVelocity);

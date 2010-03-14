@@ -377,7 +377,7 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 
 bool ZEAABoundingBox::CollisionTest(const ZEAABoundingBox& BoundingBox1, const ZEOBoundingBox& BoundingBox2)
 {
-//	ZEASSERT(true "Not implamented");
+//	zeAssert(true "Not implamented");
 	return false;	
 }
 

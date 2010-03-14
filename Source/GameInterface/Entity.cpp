@@ -404,7 +404,7 @@ ZEEntity::ZEEntity()
 
 ZEEntity::~ZEEntity()
 {
-	ZEWARNINGASSERT(Components.GetCount() != 0, "Entity : %s. There are uninitialized component available.", GetClassDescription()->GetName());
+	zeWarningAssert(Components.GetCount() != 0, "Entity : %s. There are uninitialized component available.", GetClassDescription()->GetName());
 }
 
 #include "Entity.h.zpp"

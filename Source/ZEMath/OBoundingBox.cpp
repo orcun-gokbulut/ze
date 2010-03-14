@@ -101,7 +101,7 @@ bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const Z
 
 bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line, float& T0, float& T1)
 {
-//	ZEASSERT(true, "Not implamented");
+//	zeAssert(true, "Not implamented");
 /*template <class T> bool Math3D<T>::IntersectLineOBB(
     const Vector3<T>& O, // Line origin
     const Vector3<T>& D, // Line direction
@@ -280,17 +280,17 @@ bool ZEOBoundingBox::CollisionTest(const ZEOBoundingBox& BoundingBox1, const ZEO
 	//proj2d = ZEVector3::DotProduct(BoundingBox.V,Temp) / VDotV;
 	//if (proj2d < 0 || proj2d > 1) return 0;
 
-	ZEASSERT(true "Not implamented");
+	zeAssert(true "Not implamented");
 	return false;
 }
 bool ZEOBoundingBox::CollisionTest(const ZEOBoundingBox& BoundingBox1, const ZEAABoundingBox& BoundingBox2)
 {
-	ZEASSERT(true "Not implamented");
+	zeAssert(true "Not implamented");
 	return false;
 }
 
 bool ZEOBoundingBox::CollisionTest(const ZEOBoundingBox& BoundingBox, const ZEBoundingSphere& BoundingSphere)
 {
-	ZEASSERT(true "Not implamented");
+	zeAssert(true "Not implamented");
 	return false;
 }*/

@@ -224,7 +224,7 @@ ZEViewVolumeType ZEViewSphere::GetViewVolumeType() const
 
 bool ZEViewSphere::LightCullTest(ZELight* Light) const
 {
-	ZEASSERT(true, "Not implamented");
+	zeAssert(true, "Not implamented");
 	return false;
 }
 
@@ -247,7 +247,7 @@ bool ZEViewSphere::CullTest(ZEComponent* Component) const
 	ZEBoundingSphere ComponentBoundingSphere;
 	ZEAABoundingBox ComponentBoundingBox;
 
-	ZEWARNINGASSERT(true, "NearZ cull test not implamented");
+	zeWarningAssert(true, "NearZ cull test not implamented");
 
 	return ZEBoundingSphere::CollisionTest(Component->GetWorldBoundingSphere(), BoundingSphere) 
 		&& ZEAABoundingBox::CollisionTest(Component->GetWorldBoundingBox(), BoundingSphere);
@@ -255,7 +255,7 @@ bool ZEViewSphere::CullTest(ZEComponent* Component) const
 
 ZEDoorViewTest ZEViewSphere::CullTest(const ZERectangle3D& PortalDoor) const
 {
-	ZEASSERT(true, "NOT IMPLAMENTED");
+	zeAssert(true, "NOT IMPLAMENTED");
 	return ZE_DVT_INSIDE;
 }
 
@@ -275,7 +275,7 @@ ZEViewVolumeType ZEViewHemiSphere::GetViewVolumeType() const
 
 bool ZEViewHemiSphere::LightCullTest(ZELight* Light) const
 {
-	ZEASSERT(true, "Not implamented");
+	zeAssert(true, "Not implamented");
 	return false;
 }
 
@@ -303,7 +303,7 @@ bool ZEViewHemiSphere::CullTest(ZEComponent* Component) const
 
 ZEDoorViewTest ZEViewHemiSphere::CullTest(const ZERectangle3D& PortalDoor) const
 {
-	ZEASSERT(true, "NOT IMPLAMENTED");
+	zeAssert(true, "NOT IMPLAMENTED");
 	return ZE_DVT_INSIDE;
 }
 
@@ -319,34 +319,34 @@ void ZEViewHemiSphere::Create(const ZEVector3& Position, const ZEVector3& Direct
 // ZEViewCuboid
 ZEViewVolumeType ZEViewCuboid::GetViewVolumeType() const
 {
-	ZEASSERT(true, "Not implamented");
+	zeAssert(true, "Not implamented");
 	return ZE_VVT_CUBOID;
 }
 
 bool ZEViewCuboid::CullTest(const ZEAABoundingBox& BoundingBox) const
 {
-	ZEWARNINGASSERT(true, "NOT IMPLAMENTED");
+	zeWarningAssert(true, "NOT IMPLAMENTED");
 	//return ZEBoundingSphere::CollisionTest(Entity->GetWorldBoundingSphere(), BoundingBox);
 	return true;
 }
 
 bool ZEViewCuboid::CullTest(ZEEntity* Entity) const
 {
-	ZEWARNINGASSERT(true, "NOT IMPLAMENTED");
+	zeWarningAssert(true, "NOT IMPLAMENTED");
 	//return ZEBoundingSphere::CollisionTest(Entity->GetWorldBoundingSphere(), BoundingBox);
 	return true;
 }
 
 bool ZEViewCuboid::CullTest(ZEComponent* Component) const
 {
-	ZEWARNINGASSERT(true, "NOT IMPLAMENTED");
+	zeWarningAssert(true, "NOT IMPLAMENTED");
 	//return ZEBoundingSphere::CollisionTest(Component->GetWorldBoundingSphere(), BoundingBox);
 	return true;
 }
 
 ZEDoorViewTest ZEViewCuboid::CullTest(const ZERectangle3D& PortalDoor) const
 {
-	ZEASSERT(true, "Not implamented");
+	zeAssert(true, "Not implamented");
 	return ZE_DVT_INSIDE;
 }
 
@@ -373,14 +373,14 @@ ZEViewVolumeType ZEViewPlane::GetViewVolumeType() const
 bool ZEViewPlane::LightCullTest(ZELight* Light) const
 {
 
-	ZEASSERT(true, "Not implamented");
+	zeAssert(true, "Not implamented");
 	return false;
 }
 
 
 bool ZEViewPlane::CullTest(const ZEAABoundingBox& BoundingBox) const
 {
-	ZEWARNINGASSERT(true, "NOT IMPLAMENTED");
+	zeWarningAssert(true, "NOT IMPLAMENTED");
 	return true;
 }
 
@@ -689,5 +689,5 @@ void CutPortalDoorWithLine(ZEVector3 & Out1,ZEVector3 & Out2,const ZERectangle3D
 			}
 	}
 
-	ZEASSERT(true, "PortalDoorVSFrustumPlaneIntersection test error, Ozan should control it");
+	zeAssert(true, "PortalDoorVSFrustumPlaneIntersection test error, Ozan should control it");
 }*/

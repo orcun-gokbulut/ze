@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsModule.h
+ Zinek Engine - PhysXPhysicalStaticObject.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,47 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PHYSICS_MODULE_H__
-#define __ZE_PHYSICS_MODULE_H__
+#ifndef __ZE_PHYSX_PHYSICAL_STATIC_OBJECT_H__
+#define __ZE_PHYSX_PHYSICAL_STATIC_OBJECT_H__
 
-#include "Core/Module.h"
+#include "Physics/PhysicalStaticObject.h"
 
-class ZEPhysicalWorld;
-class ZEPhysicalRigidBody;
-class ZEPhysicalStaticObject;
-class ZEPhysicalStaticMesh;
-class ZEPhysicalJoint;
-class ZEPhysicalCloth;
-class ZEPhysicalSoftBody;
-class ZEPhysicalForceField;
-class ZEPhysicalTrigger;
-class ZEPhysicalVehicle;
-class ZEPhysicalCharacterController;
+#include <NxActor.h>
+#include <NxActorDesc.h>
 
-#define zePhysics ZEPhysicsModule::GetInstance()
-
-class ZEPhysicsModule : public ZEModule
+class ZEPhysXPhysicalWorld;
+class ZEPhysXPhysicalStaticObject : public ZEPhysicalStaticObject
 {
+	friend class ZEPhysXModule;
+	private:
+		ZEPhysXPhysicalWorld*			PhysicalWorld;
+		ZEArray<ZEPhysicalShape*>		Shapes;
+
+		NxActor*						Actor;
+		NxActorDesc						ActorDesc;
+	
+		void							ReCreate();
+
+										ZEPhysXPhysicalStaticObject();
+		virtual							~ZEPhysXPhysicalStaticObject();
+
 	public:
-		virtual ZEPhysicalWorld*				CreatePhysicalWorld() = 0;
-		virtual ZEPhysicalRigidBody*			CreatePhysicalRigidBody() = 0;
-		virtual ZEPhysicalStaticObject*			CreatePhysicalStaticObject() = 0;
-		virtual ZEPhysicalStaticMesh*			CreatePhysicalStaticMesh() = 0;
-		virtual ZEPhysicalJoint*				CreatePhysicalJoint() = 0;
-		virtual ZEPhysicalCloth*				CreatePhysicalCloth() = 0;
-		virtual ZEPhysicalSoftBody*				CreatePhysicalSoftBody() = 0;
-		virtual ZEPhysicalForceField*			CreatePhysicalForceField() = 0;
-		virtual ZEPhysicalTrigger*				CreatePhysicalTrigger() = 0;
+		virtual void					SetPhysicalWorld(ZEPhysicalWorld* World);
+		virtual ZEPhysicalWorld*		GetPhysicalWorld();
 
-		virtual ZEPhysicalVehicle*				CreatePhysicalVehicle() = 0;
-		virtual ZEPhysicalCharacterController*	CreatePhysicalController() = 0;
+		virtual void					SetPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3				GetPosition();
+		
+		virtual void					SetRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion			GetRotation();
 
-		static ZEPhysicsModule*					GetInstance();
+		virtual const				
+		ZEArray<ZEPhysicalShape*>&		GetPhysicalShapes();
+		virtual void					AddPhysicalShape(ZEPhysicalShape* Shape);
+		virtual void					RemovePhysicalShape(ZEPhysicalShape* Shape);
+
+		virtual bool					Initialize();
+		virtual void					Deinitialize();	
+
 };
-
 #endif

@@ -185,6 +185,68 @@ ZEQuaternion ZEPhysXPhysicalRigidBody::GetMassCenterRotation()
 	return NX_TO_ZE(Temp);
 }
 
+void ZEPhysXPhysicalRigidBody::SetGravityEnabled(bool Enabled)
+{
+	if (Enabled)
+	{
+		BodyDesc.flags &= ~NX_BF_DISABLE_GRAVITY;
+		if (Actor != NULL)
+			Actor->clearBodyFlag(NX_BF_DISABLE_GRAVITY);
+	}
+	else
+	{
+		BodyDesc.flags |= NX_BF_DISABLE_GRAVITY;
+		if (Actor != NULL)
+			Actor->raiseBodyFlag(NX_BF_DISABLE_GRAVITY);
+	}
+}
+
+bool ZEPhysXPhysicalRigidBody::GetGravityEnabled()
+{
+	return !(BodyDesc.flags & NX_BF_DISABLE_GRAVITY);
+}
+
+void ZEPhysXPhysicalRigidBody::SetLockPositon(bool Enabled)
+{
+	if (Enabled)
+	{
+		BodyDesc.flags |= NX_BF_FROZEN_POS;
+		if (Actor != NULL)
+			Actor->raiseBodyFlag(NX_BF_FROZEN_POS);
+	}
+	else
+	{
+		BodyDesc.flags &= ~NX_BF_FROZEN_POS;
+		if (Actor != NULL)
+			Actor->clearBodyFlag(NX_BF_FROZEN_POS);
+	}
+}
+
+bool ZEPhysXPhysicalRigidBody::GetLockPosition()
+{
+	return BodyDesc.flags & NX_BF_FROZEN_POS;
+}
+
+void ZEPhysXPhysicalRigidBody::SetLockRotation(bool Enabled)
+{
+	if (Enabled)
+	{
+		BodyDesc.flags |= NX_BF_FROZEN_ROT;
+		if (Actor != NULL)
+			Actor->raiseBodyFlag(NX_BF_FROZEN_ROT);
+	}
+	else
+	{
+		BodyDesc.flags &= ~NX_BF_FROZEN_ROT;
+		if (Actor != NULL)
+			Actor->clearBodyFlag(NX_BF_FROZEN_ROT);
+	}
+}
+
+bool ZEPhysXPhysicalRigidBody::GetLockRotation()
+{
+	return BodyDesc.flags & NX_BF_FROZEN_ROT;
+}
 
 void ZEPhysXPhysicalRigidBody::SetLinearVelocity(const ZEVector3& NewVelocity) 
 {
@@ -317,13 +379,8 @@ void ZEPhysXPhysicalRigidBody::ReCreate()
 bool ZEPhysXPhysicalRigidBody::Initialize()
 {
 	Deinitialize();
-	if (PhysicalWorld == NULL)
+	if (PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
 		return false;
-	
-	if (PhysicalBodyType == ZE_PBT_KINEMATIC)
-		ActorDesc.body = NULL;
-	else
-		ActorDesc.body = &BodyDesc;
 
 	for (size_t I = 0; I < Shapes.GetCount(); I++)
 	{

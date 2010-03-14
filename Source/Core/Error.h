@@ -52,19 +52,19 @@
 
 #ifdef ZE_DEBUG_ENABLED
 	#ifdef ZE_PLATFORM_WINDOWS
-		#define ZEASSERT(Condition, ...) if (Condition){ZEError::GetInstance()->RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); if (_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();} 
-		#define ZEWARNINGASSERT(Condition, ...) if (Condition) ZEError::GetInstance()->RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+		#define zeAssert(Condition, ...) if (Condition){ZEError::GetInstance()->RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); if (_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();} 
+		#define zeWarningAssert(Condition, ...) if (Condition) ZEError::GetInstance()->RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
 	#else
-		#define ZEASSERT(Condition, ...) if (Condition){ZEError::GetInstance()->RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); abort();} 
-		#define ZEWARNINGASSERT(Condition, ...) if (Condition) ZEError::GetInstance()->RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+		#define zeAssert(Condition, ...) if (Condition){ZEError::GetInstance()->RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); abort();} 
+		#define zeWarningAssert(Condition, ...) if (Condition) ZEError::GetInstance()->RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
 	#endif
 #else
 	#ifdef ZE_DEBUG_FORCE_VERIFY
-		#define ZEASSERT(Condition, ...) if (Condition) {}
-		#define ZEWARNINGASSERT(Condition, ...) if (Condition) {}
+		#define zeAssert(Condition, ...) if (Condition) {}
+		#define zeWarningAssert(Condition, ...) if (Condition) {}
 	#else
-		#define ZEASSERT(Condition, ...) 
-		#define ZEWARNINGASSERT(Condition, ...)
+		#define zeAssert(Condition, ...) 
+		#define zeWarningAssert(Condition, ...)
 	#endif
 #endif
 

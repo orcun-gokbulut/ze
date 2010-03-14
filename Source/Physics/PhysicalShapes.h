@@ -41,6 +41,7 @@
 #include "ZEDS/Array.h"
 #include "ZEMath/Vector.h"
 #include "ZEMath/Quaternion.h"
+#include "PhysicalMaterial.h"
 
 enum  ZEPhysicalShapeType
 {
@@ -50,21 +51,9 @@ enum  ZEPhysicalShapeType
 	ZE_PST_CYLINDER,
 	ZE_PST_CAPSULE,
 	ZE_PST_CONVEX,
-	ZE_PST_TRIMESH
 };
 
-struct ZEPhysicalTriangle
-{
-	unsigned int Indices[3];
-	unsigned int MaterialIndex;
-};
-
-struct ZEPhysicalMaterial
-{
-	float		StaticFriction;
-	float		DynamicFriction;
-	float		Restitution;
-};
+#define ZE_PST_TRIMESH -1 // Will be removes
 
 class ZEPhysicalObject;
 
@@ -165,32 +154,6 @@ class ZEPhysicalCylinderShape
 		float							GetHeight();
 
 										ZEPhysicalCylinderShape();
-};
-
-class  ZEPhysicalTrimeshShape : public  ZEPhysicalShape
-{
-	private:
-		ZEArray<ZEVector3>				TriangleVertices;
-		ZEArray<ZEPhysicalTriangle>		Triangles;
-		ZEArray<ZEPhysicalMaterial>		TriangleMaterials;
-		bool							MaterialsPerTriangle;
-
-	public:
-		virtual ZEPhysicalShapeType		GetPhysicalShapeType();
-
-		void							SetMaterialsPerTriangle(bool Enabled);
-		bool							GetMaterialsPerTriangle();
-
-		void							SetTriangleVertices(const ZEArray<ZEVector3>& Vertices);
-		const ZEArray<ZEVector3>&		GetTriangleVertices();
-
-		void							SetTriangles(const ZEArray<ZEPhysicalTriangle>& Triangles);
-		const ZEArray<ZEPhysicalTriangle>& GetTriangles();
-
-		void							SetTriangleMaterials(const ZEArray<ZEPhysicalMaterial>& Materials);
-		const ZEArray<ZEPhysicalMaterial>& GetTriangleMaterials();
-
-										ZEPhysicalTrimeshShape();
 };
 
 class  ZEPhysicalConvexShape : public  ZEPhysicalShape

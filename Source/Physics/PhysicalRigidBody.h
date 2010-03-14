@@ -63,7 +63,7 @@ class ZEPhysicalRigidBody : public ZEPhysicalObject
 									
 		//virtual void					SetCollisionCallback(ZEPhysicalCollisionCallback);
 		//ZEPhysicalCollisionCallback	GetCollisionCallback();
-									
+		
 		virtual const				
 		ZEArray<ZEPhysicalShape*>&		GetPhysicalShapes() = 0;
 		virtual void					AddPhysicalShape(ZEPhysicalShape* Shape) = 0;
@@ -71,6 +71,15 @@ class ZEPhysicalRigidBody : public ZEPhysicalObject
 
 		virtual void					SetMass(float NewMass) = 0;
 		virtual float					GetMass() = 0;
+
+		virtual	void					SetGravityEnabled(bool Enabled) = 0;
+		virtual bool					GetGravityEnabled() = 0;
+
+		virtual void					SetLockPositon(bool Enabled) =0 ;
+		virtual bool					GetLockPosition() = 0;
+
+		virtual void					SetLockRotation(bool Enabled) = 0;
+		virtual bool					GetLockRotation() = 0;
 
 		virtual void					SetMassCenterPosition(const ZEVector3& NewPosition) = 0;
 		virtual ZEVector3				GetMassCenterPosition() = 0;

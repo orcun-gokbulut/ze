@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsModule.h
+ Zinek Engine - PhysicalStaticMesh.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,28 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PHYSICS_MODULE_H__
-#define __ZE_PHYSICS_MODULE_H__
+#ifndef __ZE_PHYSICAL_STATIC_MESH_H__
+#define __ZE_PHYSICAL_STATIC_MESH_H__
 
-#include "Core/Module.h"
+#include "PhysicalObject.h"
+#include "PhysicalMaterial.h"
 
-class ZEPhysicalWorld;
-class ZEPhysicalRigidBody;
-class ZEPhysicalStaticObject;
-class ZEPhysicalStaticMesh;
-class ZEPhysicalJoint;
-class ZEPhysicalCloth;
-class ZEPhysicalSoftBody;
-class ZEPhysicalForceField;
-class ZEPhysicalTrigger;
-class ZEPhysicalVehicle;
-class ZEPhysicalCharacterController;
+struct ZEPhysicalTriangle
+{
+	unsigned int Indices[3];
+	unsigned int MaterialIndex;
+};
 
-#define zePhysics ZEPhysicsModule::GetInstance()
-
-class ZEPhysicsModule : public ZEModule
+class ZEPhysicalStaticMesh : public ZEPhysicalObject
 {
 	public:
-		virtual ZEPhysicalWorld*				CreatePhysicalWorld() = 0;
-		virtual ZEPhysicalRigidBody*			CreatePhysicalRigidBody() = 0;
-		virtual ZEPhysicalStaticObject*			CreatePhysicalStaticObject() = 0;
-		virtual ZEPhysicalStaticMesh*			CreatePhysicalStaticMesh() = 0;
-		virtual ZEPhysicalJoint*				CreatePhysicalJoint() = 0;
-		virtual ZEPhysicalCloth*				CreatePhysicalCloth() = 0;
-		virtual ZEPhysicalSoftBody*				CreatePhysicalSoftBody() = 0;
-		virtual ZEPhysicalForceField*			CreatePhysicalForceField() = 0;
-		virtual ZEPhysicalTrigger*				CreatePhysicalTrigger() = 0;
+		virtual ZEPhysicalObjectType	GetPhysicalObjectType();
 
-		virtual ZEPhysicalVehicle*				CreatePhysicalVehicle() = 0;
-		virtual ZEPhysicalCharacterController*	CreatePhysicalController() = 0;
+		virtual void					SetMaterials(const ZEPhysicalMaterial* Materials, size_t MaterialCount) = 0;
+		virtual void					SetPolygons(const ZEPhysicalTriangle* Triangles, size_t PolygonCount) = 0;
+		virtual void					SetVertices(const ZEVector3* Vertices, size_t VertexCount) = 0;
 
-		static ZEPhysicsModule*					GetInstance();
+		static ZEPhysicalStaticMesh*	CreateInstance();
 };
 
 #endif

@@ -110,7 +110,7 @@ size_t ZEResourceFile::Read(void* Buffer, size_t Size, size_t Count)
 
 size_t ZEResourceFile::FormatedRead(void* Buffer, size_t BufferSize, void* Format, ...)
 {
-	ZEASSERT(true, "NOT IMPLAMENTED !!!");
+	zeAssert(true, "NOT IMPLAMENTED !!!");
 	return 0;
 }
 
@@ -146,7 +146,7 @@ bool ZEResourceFile::ReadFile(const char* FileName, void* Buffer, size_t BufferS
 	size_t FileSize = ftell(File);
 	fseek(File, 0, SEEK_SET);
 
-	ZEASSERT(BufferSize < FileSize, "File size exceed buffer size.");
+	zeAssert(BufferSize < FileSize, "File size exceed buffer size.");
 
 	fread(Buffer, sizeof(char), (BufferSize > FileSize ? FileSize : BufferSize), File);
 
@@ -172,7 +172,7 @@ bool ZEResourceFile::ReadTextFile(const char* FileName, char* Buffer, size_t Buf
 	size_t FileSize = ftell(File);
 	fseek(File, 0, SEEK_SET);
 
-	ZEASSERT(BufferSize < FileSize + 1, "File size exceed buffer size.");
+	zeAssert(BufferSize < FileSize + 1, "File size exceed buffer size.");
 
 	if (BufferSize < FileSize + 1)
 		return false;

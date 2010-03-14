@@ -44,7 +44,7 @@
 				AdditionalOptions="/MP8"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\PhysX\Cooking&quot;;&quot;$(ProjectDir)\include\PhysX\Foundation&quot;;&quot;$(ProjectDir)\include\PhysX\NxCharacter&quot;;&quot;$(ProjectDir)\include\PhysX\PhysXLoader&quot;;&quot;$(ProjectDir)\include\PhysX\Physics&quot;;&quot;$(ProjectDir)\include\OpenAL&quot;;&quot;$(ProjectDir)\include\DirectX&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_DEBUG_ENABLED;ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_D3D9_PERFHUD;NX_USER_DEBUG_MODE"
+				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_ZINEK_ENGINE;ZE_DEBUG_ENABLED;ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_D3D9_PERFHUD;NX_USER_DEBUG_MODE"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -133,7 +133,7 @@
 				FavorSizeOrSpeed="1"
 				WholeProgramOptimization="true"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\PhysX&quot;;&quot;$(ProjectDir)\include\OpenAL&quot;;&quot;$(ProjectDir)\include\DirectX&quot;"
-				PreprocessorDefinitions="WIN32;NDEBUG;FREEIMAGE_LIB"
+				PreprocessorDefinitions="ZE_ZINEK_ENGINE;WIN32;NDEBUG;FREEIMAGE_LIB"
 				MinimalRebuild="false"
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"
@@ -1255,10 +1255,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\SoundFX.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\Sound\SoundModule.cpp"
 				>
 			</File>
@@ -1449,6 +1445,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\Physics\PhysicalMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Physics\PhysicalMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\Physics\PhysicalObject.cpp"
 				>
 			</File>
@@ -1470,6 +1474,22 @@
 			</File>
 			<File
 				RelativePath=".\Source\Physics\PhysicalShapes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Physics\PhysicalStaticMesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Physics\PhysicalStaticMesh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Physics\PhysicalStaticObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Physics\PhysicalStaticObject.h"
 				>
 			</File>
 			<File
@@ -1537,6 +1557,22 @@
 				</File>
 				<File
 					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalRigidBody.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticMesh.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticMesh.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticObject.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticObject.h"
 					>
 				</File>
 				<File

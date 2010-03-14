@@ -75,6 +75,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 		PhysicalRigidBody->AddPhysicalShape(new ZEPhysicalSphereShape());
 		World->AddPhysicalObject(PhysicalRigidBody);
 		PhysicalRigidBody->ApplyForce(ZEVector3(100.0f, 0.0f, 0.0f));
+		PhysicalRigidBody->SetGravityEnabled(false);
 	}
 
 	return true;

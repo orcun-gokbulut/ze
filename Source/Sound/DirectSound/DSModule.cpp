@@ -310,7 +310,7 @@ void ZEDSModule::SetTypeVolume(ZESoundSourceType Type, unsigned int Volume)
 
 unsigned int ZEDSModule::GetTypeVolume(ZESoundSourceType Type)
 {
-	ZEASSERT(Type >= 256, "Sound source types are limited to 256");
+	zeAssert(Type >= 256, "Sound source types are limited to 256");
 	return TypeVolumes[Type];
 }
 
