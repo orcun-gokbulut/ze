@@ -87,7 +87,7 @@ bool ZEUIManager::Initialize()
 	TestControl->SetTextColor(ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
 	TestControl->SetText("Kan kokuyorum ulan !");
 	TestControl->SetTextWrap(true);
-	TestControl->SetFontSize(ZEVector2(1.0f, 1.0f));
+	TestControl->SetFontSize(ZEVector2::One);
 	TestControl->SetFont(ZEFontResource::LoadResource("test.zeFont"));
 
 	AddControl(TestControl);

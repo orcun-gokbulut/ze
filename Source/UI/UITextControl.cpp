@@ -159,7 +159,7 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 ZEUITextControl::ZEUITextControl()
 {
 	FontResource = NULL;
-	FontSize = ZEVector2(1.0f, 1.0f);
+	FontSize = ZEVector2::One;
 	TextColor = ZEVector4(1.0f, 1.0f, 1.0f, 1.0f);
 	TextWrap = false;
 }

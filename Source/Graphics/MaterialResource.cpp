@@ -40,6 +40,7 @@
 #include "Core/ResourceFile.h"
 #include "Core/Error.h"
 #include "Core/ResourceManager.h"
+#include <string.h>
 
 ZEMaterialResource::ZEMaterialResource()
 {

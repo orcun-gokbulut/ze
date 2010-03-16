@@ -107,7 +107,7 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 
 	Light->SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Light->SetLocalRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
-	Light->SetLocalScale(ZEVector3(1.0f, 1.0f, 1.0f));
+	Light->SetLocalScale(ZEVector3::One);
 	Light->SetColor(Color);
 	Light->SetIntensity(Intensity);
 	Light->SetRange(Range);
@@ -365,7 +365,7 @@ ZELightBrush::ZELightBrush()
 	ProjectionTexture = NULL;
 	RenderOrder.SetZero();
 	Intensity = 1.0f;
-	Color = ZEVector3(1.0f, 1.0f, 1.0f);
+	Color = ZEVector3::One;
 	Range = 100.0f;
 	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
 	CastsShadow = false;

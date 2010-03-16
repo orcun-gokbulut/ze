@@ -40,6 +40,7 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)

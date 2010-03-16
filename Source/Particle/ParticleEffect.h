@@ -41,7 +41,7 @@
 #include "ZEDS/Array.h"
 #include "ParticleSystem.h"
 
-class ZERLLight;
+struct ZERLLight;
 class ZERenderer;
 class ZEParticleEffect : public ZEComponent
 {

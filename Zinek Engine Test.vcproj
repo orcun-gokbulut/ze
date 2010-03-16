@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(ProjectDir)Include;$(ProjectDir)Test;$(ProjectDir)Source"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;ZEDEBUG_ENABLED;ZEDEBUG_BREAKONWARNING;ZEDEBUG_BREAKONERROR;ZEDEBUG_CHECKMEMORY"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;ZE_DEBUG_ENABLED;ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_CHECK_MEMORY"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"

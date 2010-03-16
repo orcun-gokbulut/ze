@@ -42,8 +42,12 @@
 #include "Core/Error.h"
 #include "Core/Console.h"
 
+#include <NxPhysics.h>
+#include <NxCooking.h>
+
 ZEPhysXModule::ZEPhysXModule()
 {
+	CookingInterface = NULL;
 	PhysicsSDK = NULL;
 }
 
@@ -57,6 +61,10 @@ NxPhysicsSDK* ZEPhysXModule::GetPhysicsSDK()
 	return PhysicsSDK;
 }
 
+NxCookingInterface* ZEPhysXModule::GetCookingInterface()
+{
+	return CookingInterface;
+}
 
 ZEModuleDescription* ZEPhysXModule::GetModuleDescription()
 {
@@ -66,12 +74,12 @@ ZEModuleDescription* ZEPhysXModule::GetModuleDescription()
 
 bool ZEPhysXModule::IsEnabled()
 {
-	return true;
+	return Enabled;
 }
 
 void ZEPhysXModule::SetEnabled(bool Enabled)
 {
-
+	this->Enabled = Enabled;
 }
 
 bool ZEPhysXModule::Initialize()
@@ -86,6 +94,19 @@ bool ZEPhysXModule::Initialize()
 		return false;
 	}
 
+	CookingInterface = NxGetCookingLib(NX_PHYSICS_SDK_VERSION);
+	if (CookingInterface == NULL)
+	{
+		zeError("PhysX Module", "Can not create cooking interface.");
+		return false;
+	}
+
+	if (!CookingInterface->NxInitCooking())
+	{
+		zeError("PhysX Module", "Can not initilize PhysX cooking library.");
+		return false;
+	}
+	
 	ZEPhysXComponentBase::InitializeBase(this);
 
 	zeLog("PhysX Module", "PhysX intialized.");
@@ -104,6 +125,32 @@ void ZEPhysXModule::Deinitialize()
 		PhysicsSDK->release();
 		PhysicsSDK = NULL;
 	}
+
+	if (CookingInterface != NULL)
+	{
+		CookingInterface->NxCloseCooking();
+		CookingInterface = NULL;
+	}
+}
+
+void ZEPhysXModule::Process(float ElapsedTime)
+{
+	if (!Enabled)
+		return;
+
+	for (size_t I = 0; I < PhysicalWorlds.GetCount(); I++)
+		if (PhysicalWorlds[I]->GetEnabled())
+			PhysicalWorlds[I]->Process(ElapsedTime);
+}
+
+void ZEPhysXModule::UpdateWorlds()
+{
+	if (!Enabled)
+		return;
+
+	for (size_t I = 0; I < PhysicalWorlds.GetCount(); I++)
+		if (PhysicalWorlds[I]->GetEnabled())
+			PhysicalWorlds[I]->Update();
 }
 
 ZEPhysicalWorld* ZEPhysXModule::CreatePhysicalWorld()

@@ -33,6 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEMath/Definitions.h"
 #include "Canvas.h"
 #include "Core/Error.h"
 #include "Core/ResourceFile.h"

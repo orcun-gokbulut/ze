@@ -48,7 +48,7 @@
 
 class ZERenderer;
 class ZEEntity;
-class ZERLLight;
+struct ZERLLight;
 
 ZE_META_CLASS_DESCRIPTION(ZEComponent);
 

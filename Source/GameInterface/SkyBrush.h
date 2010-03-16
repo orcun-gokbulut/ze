@@ -93,10 +93,10 @@ ZE_POSTPROCESSOR_START(Meta)
 <zinek>
 	<meta>
 		<class name="ZESkyBrush"	parent="ZEEntity"	description="Sky Brush">
-			<property name="SkyColor"			type="ZEVector3"	autogetset="true"	default="ZEVector3(1.0f, 1.0f, 1.0f)"	description="Color of the sky"			semantic="color"/>
+			<property name="SkyColor"			type="ZEVector3"	autogetset="true"	default="ZEVector3::One"	description="Color of the sky"			semantic="color"/>
 			<property name="SkyTexture"			type="string"		autogetset="true"	default=""								description="Texture of the sky"		semantic="filename"		fileextension="IMAGE"/>
 			<property name="SkyLightEnabled"	type="boolean"		autogetset="true"	default="false"							description="Sun light enabled"			semantic="color"/>
-			<property name="SkyLightColor"		type="ZEVector3"	autogetset="true"	default="ZEVector3(1.0f, 1.0f, 1.0f)"	description="Color of the sun"			semantic="color"/>
+			<property name="SkyLightColor"		type="ZEVector3"	autogetset="true"	default="ZEVector3::One"	description="Color of the sun"			semantic="color"/>
 			<property name="SkyLightDirection"	type="ZEVector3"	autogetset="true"	default="ZEVector3(0.0f, -1.0f, 0.0f)"	description="Direction of the light"	semantic="direction"/>
 			<property name="SkyLightIntensity"	type="float"		autogetset="true"	default="1.0f"							description="Intensity of the light"/>
 		</class>

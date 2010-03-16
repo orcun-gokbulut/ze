@@ -35,6 +35,7 @@
 
 #include "PPBlurNode.h"
 #include "Core/Error.h"
+#include "ZEMath/Definitions.h"
 
 void ZEPPBlurNode::UpdateKernel()
 {

@@ -37,13 +37,17 @@
 
 #include "Core/Console.h"
 #include "Graphics/GraphicsModule.h"
+#include "Graphics/FixedMaterial.h"
+#include "Graphics/Texture2DResource.h"
 #include "GameInterface/Game.h"
 #include "GameInterface/Player.h"
+#include "GameInterface/CanvasBrush.h"
 #include "GameInterface/Scene.h"
 #include "Physics/PhysicsModule.h"
 #include "Physics/PhysicalWorld.h"
 #include "Physics/PhysicalRigidBody.h"
 #include "Physics/PhysicalShapes.h"
+#include "Physics/PhysicalStaticMesh.h"
 #include "Physics/PhysX/PhysXPhysicalWorld.h"
 
 #include <NxScene.h>
@@ -71,11 +75,66 @@ bool ZEPhysicsDebugComponent::Initialize()
 		ZEPhysXPhysicalWorld* World = (ZEPhysXPhysicalWorld*)zeScene->GetPhysicalWorld();
 
 		PhysicalRigidBody = ZEPhysicalRigidBody::CreateInstance();
-		PhysicalRigidBody->SetPosition(ZEVector3(0.0f, 10.0f, 1.0f));
-		PhysicalRigidBody->AddPhysicalShape(new ZEPhysicalSphereShape());
+		PhysicalRigidBody->SetPosition(ZEVector3(0.0f, 100.0f, 1.0f));
+		ZEPhysicalSphereShape Shape;
+		Shape.SetRadius(30.0f);
+		PhysicalRigidBody->AddPhysicalShape(&Shape);
 		World->AddPhysicalObject(PhysicalRigidBody);
+		PhysicalRigidBody->SetMass(30.0f);
+		//PhysicalRigidBody->SetKinematic(false);
 		PhysicalRigidBody->ApplyForce(ZEVector3(100.0f, 0.0f, 0.0f));
-		PhysicalRigidBody->SetGravityEnabled(false);
+		PhysicalRigidBody->SetGravityEnabled(true);
+
+		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
+		CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
+		CanvasBrush->SetScale(ZEVector3::One);
+		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+		CanvasBrush->Canvas.LoadCanvasFile("Test\\test.zeCanvas");
+		CanvasBrush->UpdateCanvas();
+		ZEFixedMaterial* CanvasMaterial = ZEFixedMaterial::CreateInstance();
+		
+		CanvasBrush->Material = CanvasMaterial;
+		CanvasMaterial->SetZero();
+		CanvasMaterial->SetLightningEnabled(true);
+		CanvasMaterial->SetTransparancyMode(ZE_MTM_NOTRANSPARACY);
+		CanvasMaterial->SetTwoSided(false);
+		CanvasMaterial->SetRecivesShadow(false);
+		CanvasMaterial->SetAmbientEnabled(true);
+		CanvasMaterial->SetAmbientColor(ZEVector3(0.1f, 0.1f, 0.1f));
+		CanvasMaterial->SetDiffuseEnabled(true);
+		CanvasMaterial->SetDiffuseColor(ZEVector3::One);
+		CanvasMaterial->SetDiffuseMap(ZETexture2DResource::LoadResource("Test\\Diffuse.tga")->GetTexture());
+		CanvasMaterial->SetSpecularEnabled(true);
+		CanvasMaterial->SetSpecularColor(ZEVector3::One);
+		CanvasMaterial->SetSpecularShininess(64.0f);
+		CanvasMaterial->UpdateMaterial();
+		zeScene->AddEntity(CanvasBrush);
+
+		ZEArray<ZEVector3> PhysicalVertices;
+		ZEArray<ZEPhysicalTriangle> PhysicalTriangles;
+
+		PhysicalVertices.SetCount(CanvasBrush->Canvas.Vertices.GetCount());
+		PhysicalTriangles.SetCount(PhysicalVertices.GetCount() / 3);
+
+		for (size_t I = 0; I < PhysicalVertices.GetCount(); I++)
+			PhysicalVertices[I] = CanvasBrush->Canvas.Vertices[I].Position;
+
+		for (size_t I = 0; I < PhysicalTriangles.GetCount(); I++)
+		{
+			PhysicalTriangles[I].MaterialIndex = 0;
+			PhysicalTriangles[I].Indices[0] =  3 * I;
+			PhysicalTriangles[I].Indices[1] =  3 * I + 1;
+			PhysicalTriangles[I].Indices[2] =  3 * I + 2;
+		}
+
+		ZEPhysicalStaticMesh* PhysicalMesh = ZEPhysicalStaticMesh::CreateInstance();
+		PhysicalMesh->SetPosition(CanvasBrush->GetPosition());
+		PhysicalMesh->SetRotation(CanvasBrush->GetRotation());
+		PhysicalMesh->SetData(PhysicalVertices.GetConstCArray(), PhysicalVertices.GetCount(),
+			PhysicalTriangles.GetConstCArray(), PhysicalTriangles.GetCount(),
+			NULL, 0);
+
+		World->AddPhysicalObject(PhysicalMesh);
 	}
 
 	return true;

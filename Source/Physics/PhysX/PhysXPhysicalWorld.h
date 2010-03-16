@@ -67,6 +67,9 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 
 		} DebugDraw;
 
+		bool										Enabled;
+		bool										Visualize;
+
 		void										InitializeDebugDraw();
 
 	protected:
@@ -89,12 +92,19 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 		virtual void								SetGravity(const ZEVector3& Gravity);
 		virtual ZEVector3							GetGravity();
 
+		virtual void								SetVisualize(bool Enabled);
+		virtual bool								GetVisualize();
+
+		virtual void								SetEnabled();
+		virtual bool								GetEnabled();
+
 		virtual bool								Initialize();
 		virtual void								Deinitialize();
 
 		virtual void								Draw(ZERenderer* Renderer);
 
-		virtual void								Update(float ElapsedTime);
+		virtual void								Process(float ElapsedTime);
+		virtual void								Update();
 
 
 };

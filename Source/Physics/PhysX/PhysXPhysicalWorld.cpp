@@ -59,6 +59,7 @@ ZEPhysXPhysicalWorld::ZEPhysXPhysicalWorld()
 	SceneDesc.simType = NX_SIMULATION_SW;
 	SceneDesc.upAxis = 1;
 	DebugDraw.Material = NULL;
+	Visualize = false;
 }
 
 ZEPhysXPhysicalWorld::~ZEPhysXPhysicalWorld()
@@ -195,6 +196,26 @@ ZEVector3 ZEPhysXPhysicalWorld::GetGravity()
 	return NX_TO_ZE(SceneDesc.gravity);
 }
 
+void ZEPhysXPhysicalWorld::SetVisualize(bool Enabled)
+{
+	Visualize = Enabled;
+}
+
+bool ZEPhysXPhysicalWorld::GetVisualize()
+{
+	return Visualize;
+}
+
+void ZEPhysXPhysicalWorld::SetEnabled()
+{
+	this->Enabled = Enabled;
+}
+
+bool ZEPhysXPhysicalWorld::GetEnabled()
+{
+	return Enabled;
+}
+
 bool ZEPhysXPhysicalWorld::Initialize()
 {
 	Scene = GetPhysicsSDK()->createScene(SceneDesc);
@@ -204,7 +225,7 @@ bool ZEPhysXPhysicalWorld::Initialize()
 		return false;
 	}
 
-	Scene->setTiming(1.0f / 100.0f, 8, NX_TIMESTEP_FIXED);
+	Scene->setTiming(1.0f / 60.0f, 4, NX_TIMESTEP_FIXED);
 
 	for (size_t I = 0; I < PhysicalObjects.GetCount(); I++)
 		PhysicalObjects[I]->Initialize();
@@ -230,6 +251,9 @@ void ZEPhysXPhysicalWorld::Deinitialize()
 
 void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 {
+	if (!Visualize)
+		return;
+
 	if (DebugDraw.Material == NULL)
 		InitializeDebugDraw();
 
@@ -277,10 +301,14 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 }
 
 
-void ZEPhysXPhysicalWorld::Update(float ElapsedTime)
+void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 {
     Scene->simulate(ElapsedTime);
     Scene->flushStream();
+}
 
-	Scene->fetchResults(NX_RIGID_BODY_FINISHED, true);
+void ZEPhysXPhysicalWorld::Update()
+{
+	Scene->fetchResults(NX_ALL_FINISHED, true);
+
 }

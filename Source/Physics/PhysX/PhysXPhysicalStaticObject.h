@@ -43,38 +43,48 @@
 #include <NxActorDesc.h>
 
 class ZEPhysXPhysicalWorld;
+
 class ZEPhysXPhysicalStaticObject : public ZEPhysicalStaticObject
 {
 	friend class ZEPhysXModule;
 	private:
-		ZEPhysXPhysicalWorld*			PhysicalWorld;
-		ZEArray<ZEPhysicalShape*>		Shapes;
+		ZEPhysXPhysicalWorld*				PhysicalWorld;
+		ZEArray<ZEPhysicalShape*>			Shapes;
 
-		NxActor*						Actor;
-		NxActorDesc						ActorDesc;
-	
-		void							ReCreate();
+		ZEVector3							Scale;
+		bool								Enabled;
 
-										ZEPhysXPhysicalStaticObject();
-		virtual							~ZEPhysXPhysicalStaticObject();
+		NxActor*							Actor;
+		NxActorDesc							ActorDesc;
 
-	public:
-		virtual void					SetPhysicalWorld(ZEPhysicalWorld* World);
-		virtual ZEPhysicalWorld*		GetPhysicalWorld();
+		void								ReCreate();
+		void								CreateShapes();
 
-		virtual void					SetPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3				GetPosition();
-		
-		virtual void					SetRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion			GetRotation();
+											ZEPhysXPhysicalStaticObject();
+		virtual								~ZEPhysXPhysicalStaticObject();
+										
+	public:									
+		virtual void						SetPhysicalWorld(ZEPhysicalWorld* World);
+		virtual ZEPhysicalWorld*			GetPhysicalWorld();
 
-		virtual const				
-		ZEArray<ZEPhysicalShape*>&		GetPhysicalShapes();
-		virtual void					AddPhysicalShape(ZEPhysicalShape* Shape);
-		virtual void					RemovePhysicalShape(ZEPhysicalShape* Shape);
+		virtual void						SetEnabled(bool Enabled);
+		virtual bool						GetEnabled();
+											
+		virtual void						SetPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3					GetPosition();
+											
+		virtual void						SetRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion				GetRotation();
 
-		virtual bool					Initialize();
-		virtual void					Deinitialize();	
+		virtual void						SetScale(const ZEVector3& NewScale);
+		virtual ZEVector3					GetScale();
 
+		const ZEArray<ZEPhysicalShape*>&	GetPhysicalShapes();
+		virtual void						AddPhysicalShape(ZEPhysicalShape* Shape);
+		virtual void						RemovePhysicalShape(ZEPhysicalShape* Shape);
+
+		virtual bool						Initialize();
+		virtual void						Deinitialize();	
 };
+
 #endif

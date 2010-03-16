@@ -139,3 +139,20 @@
 	CHG: ZEPhysicalMeshShape has been removed.
 	CHG: Minor notation improvements. ZEASSERT renamed to zeAssert and ZEWARNINGASSERT renamed to zeWarningAssert.
 	CHG: ZE_ZINEK_ENGINE set as global macro.
+	
+[16 March 2010 - Revision 128]
+	FIX: ZEPhysicalStaticObject and ZEPhysicalStaticMesh fixed.
+	ADD: ZEPhysXMemoryWriteStream, ZEPhysXMemoryReadStream and ZEPhysXFileStream added.
+	FIX: ZERLLigght compile warning fixed.
+	
+[17 March 2010 - Revision 129]
+	CHG: ZEDS error reporting and handling improvements.
+	CHG: ZEDS_ASSERT renamed to zedsAssert. ZEDS_WARNING renamed to zedsWarning.
+	ADD: ZEVector2/3/4::One constant added.
+	CHG: Scale property added to ZEPhysicalObject.
+	FIX: ZEPhysicalStaticMesh has been fixed.
+	FIX: ZEPhysicalRigidBody non-dynamic problem fixed.
+	ADD: NxCookingInterface variable added ZEPhysXModule and ZEPhysXComponentBase.
+	ADD: Enable flag added to ZEPhysicalObject
+	CHG: Improved main loop performance.
+	

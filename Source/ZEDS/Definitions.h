@@ -40,23 +40,29 @@
 //#include "CompileOptions.h"
 
 #ifdef ZE_DEBUG_ENABLED
-#define ZEDS_DEBUG_MODE
+	#define ZEDS_DEBUG_MODE
 #endif
 
 #ifdef ZEDS_DEBUG_MODE
-	void zedsAssert(const char* Function, const char* File, int Line, const char* Message, ...);
-	void zedsWarningAssert(const char* Function, const char* File, int Line, const char* Message, ...);
-	#define ZEDS_ASSERT(Condition, ...) if (Condition) zedsAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
-	#define ZEDS_WARNING(Condition, ...) if (Condition) zedsWarningAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+	#ifdef ZE_ZINEK_ENGINE
+		#include "Core/Error.h"
+		#define zedsAssert(Condition, ...) zeAssert(Condition, __VA_ARGS__) 
+		#define zedsWarningAssert(Condition, ...) zeWarningAssert(Condition, __VA_ARGS__)
+	#else	
+		void stdAssert(const char* Function, const char* File, int Line, const char* Message, ...);
+		void stdWarningAssert(const char* Function, const char* File, int Line, const char* Message, ...);
+		#define zedsAssert(Condition, ...) if (Condition) stdAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+		#define zedsWarningAssert(Condition, ...) if (Condition) stdWarningAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+	#endif
 #else
-	#define ZEDS_ASSERT(Condition, Message)
-	#define ZEDS_WARNING(Condition, Message)
+	#define zedsAssert(Condition, Message)
+	#define zedsWarningAssert(Condition, Message)
 #endif
 
 #include <memory.h>
 
 #ifndef NULL
-#define NULL 0
+	#define NULL 0
 #endif
 
 

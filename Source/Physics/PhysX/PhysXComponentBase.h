@@ -44,10 +44,16 @@ class NxPhysicsSDK;
 class ZEPhysXComponentBase 
 {
 	private:
-		static ZEPhysXModule*	Module;
-		static NxPhysicsSDK*	PhysicsSDK;
+		static ZEPhysXModule* Module;
+		static NxPhysicsSDK* PhysicsSDK;
+		static NxCookingInterface* CookingInterface;
 
 	public:
+		static __forceinline NxCookingInterface* GetCookingInterface()
+		{
+			return CookingInterface;
+		}
+
 		static __forceinline NxPhysicsSDK* GetPhysicsSDK()
 		{
 			return PhysicsSDK;
@@ -65,11 +71,13 @@ class ZEPhysXComponentBase
 			{
 				Module = _Module;
 				PhysicsSDK = Module->GetPhysicsSDK();
+				CookingInterface = Module->GetCookingInterface();
 			}
 			else
 			{
 				Module = NULL;
 				PhysicsSDK = NULL;
+				CookingInterface = NULL;
 			}	
 		}
 };

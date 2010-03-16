@@ -35,6 +35,7 @@
 
 #include "SoundResourceWAV.h"
 #include "Core/Error.h"
+#include <memory.h>
 
 ZESoundResourceWAV::ZESoundResourceWAV()
 {

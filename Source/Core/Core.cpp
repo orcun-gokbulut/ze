@@ -563,21 +563,24 @@ void ZECore::MainLoop()
 
 	srand(PerformanceCount.LowPart);
 
-	Graphics->UpdateScreen();
-	Graphics->ClearFrameBuffer();
+	// Game Logic
 	Input->ProcessInputs();
 	Window->ProcessMessages();
 	if (Game != NULL)
-	{
 		Game->Tick(FrameTime);
-		Game->Render(FrameTime);
-	}
 	
 	if (DebugComponent != NULL)
 		DebugComponent->Process(FrameTime);
 
+	// Engine Logic
+	Physics->Process(FrameTime);
 	Sound->ProcessSound(FrameTime);
-	
+	Graphics->ClearFrameBuffer();
+	if (Game != NULL)
+		Game->Render(FrameTime);
+	Graphics->UpdateScreen();
+	Physics->UpdateWorlds();
+
 	if (DebugComponent != NULL)
 		DebugComponent->PostProcess();
 }

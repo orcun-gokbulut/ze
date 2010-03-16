@@ -69,6 +69,9 @@ class ZEPhysicsModule : public ZEModule
 		virtual ZEPhysicalVehicle*				CreatePhysicalVehicle() = 0;
 		virtual ZEPhysicalCharacterController*	CreatePhysicalController() = 0;
 
+		virtual	void							Process(float ElapsedTime) = 0;
+		virtual void							UpdateWorlds() = 0;
+
 		static ZEPhysicsModule*					GetInstance();
 };
 

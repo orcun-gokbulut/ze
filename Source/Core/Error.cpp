@@ -67,7 +67,7 @@ void _ZEWarning(char* Message, char* File, int Line, ...)
 
 }
 
-ZEOptionSection ZEError::ErrorOptions; 
+static ZEOptionSection ErrorOptions; 
 
 bool ZEError::OptionCallback_General(ZEOption* Option, ZETypedVariant* Value)
 {

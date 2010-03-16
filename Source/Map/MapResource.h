@@ -53,7 +53,7 @@ class ZETexture2DResource;
 class ZEMapPortal;
 class ZEMapResource;
 class ZEOctree;
-
+class ZEPhysicalStaticMesh;
 
 struct ZEMapPolygon
 {
@@ -93,12 +93,11 @@ class ZEMapPortal
 		ZEVertexBuffer*							VertexBuffer;
 		ZEArray<ZERenderOrder>					RenderOrders;
 		ZEArray<ZEMapPolygon>					Polygons;
-			
+		ZEPhysicalStaticMesh*					PhysicalMesh;
 		bool									HasOctree;
 		ZEOctree*								Octree;
 	
 		bool									HasPhysicalMesh;
-		ZEMapPhysicalMesh						PhysicalMesh;
 
 												ZEMapPortal();
 												~ZEMapPortal();

@@ -67,6 +67,7 @@ class ZEVector2
 
 	public:
 		static const ZEVector2		Zero;
+		static const ZEVector2		One;
 		static const ZEVector2		UnitX;
 		static const ZEVector2		UnitY;
 
@@ -130,6 +131,7 @@ class ZEVector3
 
 	public:
 		static const ZEVector3		Zero;
+		static const ZEVector3		One;
 		static const ZEVector3		UnitX;
 		static const ZEVector3		UnitY;
 		static const ZEVector3		UnitZ;
@@ -196,6 +198,7 @@ class ZEVector4
 
 	public:
 		static const ZEVector4		Zero;
+		static const ZEVector4		One;
 		static const ZEVector4		UnitX;
 		static const ZEVector4		UnitY;
 		static const ZEVector4		UnitZ;

@@ -223,8 +223,6 @@ void ZEScene::Tick(float ElapsedTime)
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 		if (Entities[I]->GetEnabled())
 			Entities[I]->Tick(ElapsedTime);
-
-	PhysicalWorld->Update(ElapsedTime);
 }
 
 void ZEScene::Render(float ElapsedTime)

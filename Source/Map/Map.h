@@ -40,6 +40,7 @@
 #include "ZEDS/Array.h"
 #include "MapResource.h"
 #include "Octree.h"
+#include "Physics/PhysicalStaticMesh.h"
 #include "Graphics/Canvas.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/FixedMaterial.h"
@@ -61,6 +62,8 @@ class ZEEnvironment
 
 };
 
+class ZEPhysicalStaticMesh;
+
 class ZEPortalMap : public ZEEnvironment
 {
 	private:
@@ -70,6 +73,8 @@ class ZEPortalMap : public ZEEnvironment
 		ZECanvas						PortalBBoxCanvas;
 		ZERenderOrder					PortalBBoxRenderOrder;
 		ZEFixedMaterial*				PortalBBoxMaterial;
+
+		ZEPhysicalStaticMesh*			PhysicalMesh;
 
 	public:	
 		virtual bool					Initialize();

@@ -38,7 +38,6 @@
 
 #include "Definitions.h"
 #include "CompileOptions.h"
-#include "Option.h"
 
 #if defined(ZE_DEBUG_ENABLED) && defined(ZE_PLATFORM_WINDOWS)
 	#include <crtdbg.h>
@@ -114,10 +113,13 @@ enum ZEAssertType
 	ZE_AT_WARNING_ASSERT,
 };
 
+class ZEOptionSection;
+class ZEOption;
+class ZETypedVariant;
+
 class ZEError
 {
 	private:
-		static ZEOptionSection		ErrorOptions;
 		bool						FileLogging;
 		char						LogFileName[ZEERROR_MAX_FILENAME_SIZE];
 

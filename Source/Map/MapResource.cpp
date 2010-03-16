@@ -43,7 +43,10 @@
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/Texture2DResource.h"
 #include "Graphics/RenderOrder.h"
+#include "Graphics/FixedMaterial.h"
+#include "Physics/PhysicalStaticMesh.h"
 #include "Octree.h"
+#include <string.h>
 
 // Reading
 
@@ -66,6 +69,19 @@ const ZETexture2D* ManageMapMaterialTextures(char* FileName, ZESmartArray<ZEText
 	return NewTextureResource->GetTexture();
 }
 
+#define ZESHADER_SKINTRANSFORM				1
+#define ZESHADER_DIFFUSEMAP					2
+#define ZESHADER_NORMALMAP					4
+#define ZESHADER_SPECULARMAP				8
+#define ZESHADER_EMMISIVEMAP				16
+#define ZESHADER_OCAPASITYMAP				32
+#define ZESHADER_DETAILDIFFUSEMAP			64
+#define ZESHADER_DETAILNORMALMAP			128
+#define ZESHADER_REFLECTION					256
+#define ZESHADER_REFRACTION					512
+#define ZESHADER_LIGHTMAP					1024
+#define ZESHADER_DISTORTIONMAP				2048
+
 bool ReadMaterialsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMaterial*>& Materials, ZESmartArray<ZETexture2DResource*>& TextureResources)
 {
 	ZEMapFileMaterialChunk MaterialChunk;
@@ -81,36 +97,52 @@ bool ReadMaterialsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMaterial*>& M
 			zeError("Map Resource", "Material chunk's id does not match.");
 			return false;
 		}	
-		ZEMaterial* CurrentMaterial = Materials[I];
-
-/*		CurrentMaterial->SetShaderComponents(MaterialChunk.ShaderComponents);
 		
-		CurrentMaterial->TwoSided = MaterialChunk.TwoSided;
-		CurrentMaterial->LightningEnabled = MaterialChunk.LightningEnabled;
-		CurrentMaterial->Wireframe = MaterialChunk.Wireframe;
-		CurrentMaterial->TransparancyMode = (MaterialChunk.Transparant ? ZE_TM_ADDAPTIVE: ZE_TM_NOTRANSPARACY);
+		// Fixed Material Hack
+		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
+		
+		Materials[I] = CurrentMaterial;
+		CurrentMaterial->SetDiffuseEnabled(true);
+		CurrentMaterial->SetAmbientEnabled(true);
+		CurrentMaterial->SetSpecularEnabled(true);
+		CurrentMaterial->SetEmmisiveEnabled(true);
+		
+		CurrentMaterial->SetTwoSided(MaterialChunk.TwoSided);
+		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
+		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
+		CurrentMaterial->SetTransparancyMode(MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE: ZE_MTM_NOTRANSPARACY);
 
-		CurrentMaterial->AmbientColor = MaterialChunk.AmbientColor;
-		CurrentMaterial->DiffuseColor = MaterialChunk.DiffuseColor;
-		CurrentMaterial->SpecularColor = MaterialChunk.SpecularColor;
-		CurrentMaterial->EmmisiveColor = MaterialChunk.EmmisiveColor;
-		CurrentMaterial->EmmisiveFactor = MaterialChunk.EmmisiveFactor;
-		CurrentMaterial->SpecularFactor = (1.25f - MaterialChunk.SpecularFactor) * 128.0f;
-		CurrentMaterial->Opasity = MaterialChunk.Transparancy;
-		CurrentMaterial->ReflectionFactor = MaterialChunk.ReflectionFactor;
-		CurrentMaterial->RefractionFactor = MaterialChunk.RefractionFactor;
-		CurrentMaterial->DetailMapTiling = MaterialChunk.DetailMapTiling;
+		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor);
+		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);
+		CurrentMaterial->SetSpecularColor(MaterialChunk.SpecularColor);
+		CurrentMaterial->SetEmmisiveColor(MaterialChunk.EmmisiveColor);
+		CurrentMaterial->SetEmmisiveFactor(MaterialChunk.EmmisiveFactor);
+		CurrentMaterial->SetSpecularFactor((1.25f - MaterialChunk.SpecularFactor) * 128.0f);
+		CurrentMaterial->SetOpacity(MaterialChunk.Transparancy);
+		CurrentMaterial->SetReflectionFactor(MaterialChunk.ReflectionFactor);
+		CurrentMaterial->SetRefractionFactor(MaterialChunk.RefractionFactor);
+		CurrentMaterial->SetDetailMapTiling(MaterialChunk.DetailMapTiling);
 
-		CurrentMaterial->DiffuseMap = ManageMapMaterialTextures(MaterialChunk.DiffuseMap, TextureResources);
-		CurrentMaterial->NormalMap = ManageMapMaterialTextures(MaterialChunk.NormalMap, TextureResources);
-		CurrentMaterial->SpecularMap = ManageMapMaterialTextures(MaterialChunk.SpecularMap, TextureResources);
-		CurrentMaterial->EmmisiveMap = ManageMapMaterialTextures(MaterialChunk.EmmisiveMap, TextureResources);
-		CurrentMaterial->OpacityMap = ManageMapMaterialTextures(MaterialChunk.OpacityMap, TextureResources);
-		CurrentMaterial->DetailMap = ManageMapMaterialTextures(MaterialChunk.DetailMap, TextureResources);
-		CurrentMaterial->DetailNormalMap = ManageMapMaterialTextures(MaterialChunk.DetailNormalMap, TextureResources);
-		CurrentMaterial->EnvironmentMap = NULL;//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap, TextureResources);
-		CurrentMaterial->LightMap = ManageMapMaterialTextures(MaterialChunk.LightMap, TextureResources);
-		*/
+		CurrentMaterial->SetDiffuseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap, TextureResources));
+		
+		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_NORMALMAP);
+		CurrentMaterial->SetNormalMap(ManageMapMaterialTextures(MaterialChunk.NormalMap, TextureResources));
+		CurrentMaterial->SetSpecularMap(ManageMapMaterialTextures(MaterialChunk.SpecularMap, TextureResources));
+		CurrentMaterial->SetEmmisiveMap(ManageMapMaterialTextures(MaterialChunk.EmmisiveMap, TextureResources));
+		CurrentMaterial->SetOpacityMap(ManageMapMaterialTextures(MaterialChunk.OpacityMap, TextureResources));
+		
+		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_DETAILNORMALMAP);
+		CurrentMaterial->SetDetailDiffuseMap(ManageMapMaterialTextures(MaterialChunk.DetailMap, TextureResources));
+		CurrentMaterial->SetDetailNormalMap(ManageMapMaterialTextures(MaterialChunk.DetailNormalMap, TextureResources));
+		CurrentMaterial->SetReflectionEnabled(false);
+		CurrentMaterial->SetRefractionMap(NULL);//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap, TextureResources);
+		CurrentMaterial->SetRefractionEnabled(false);
+		CurrentMaterial->SetRefractionMap(NULL);
+
+		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_LIGHTMAP);
+		CurrentMaterial->SetLightMap(ManageMapMaterialTextures(MaterialChunk.LightMap, TextureResources));
+
+		CurrentMaterial->UpdateMaterial();
 	}
 	return true;
 }
@@ -229,52 +261,8 @@ bool ReadOctreeFromFile(ZEResourceFile* ResourceFile, ZEOctree** Octree, ZEArray
 
 	return true;
 }
-/*
-bool ReadEntitiesFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEEntityData>& Entities)
-{
-	ZEDWORD ChunkIdentifier = ZE_MAP_ENTITY_CHUNK;
-	
-	for (size_t I = 0; I < Entities.GetCount(); I++)
-	{
-		// Read EntityData header
-		ZEEntityDataChunk FileEntityData;
-		ZEEntityData* EntityData = &Entities[I];
 
-		ResourceFile->Read(&FileEntityData, sizeof(ZEEntityDataChunk), 1);
-		if (FileEntityData.ChunkIndentifier != ZE_MAP_ENTITY_CHUNK)
-		{
-			zeError("Map Resource", "Entity Data chunk's id does not match.");
-			return false;
-
-		}
-		strncpy(EntityData->EntityType, FileEntityData.EntityType, ZE_MAP_MAX_NAME_SIZE);
-		EntityData->Attributes.SetCount(FileEntityData.AttributeCount);
-
-
-		// Read Attributes
-		for (size_t N = 0; N < FileEntityData.AttributeCount; N++)
-		{
-			ZEEntityAttributeChunk FileAttribute;
-			ZEEntityAttribute* Attribute = &EntityData->Attributes[N];
-
-			ResourceFile->Read(&FileAttribute, sizeof(ZEEntityAttributeChunk), 1);
-
-			// Check chunk identifier for corrupution
-			if (FileAttribute.ChunkIndentifier = ZE_MAP_ENTITY_ATTRIBUTE_CHUNK)
-			{
-				zeError("Map Resource", "Entity Data chunk's id does not match.");
-				return false;
-			}
-
-//			strncpy(Attribute->Name, FileAttribute.Name, ZE_MAP_MAX_NAME_SIZE);
-			Attribute->Type = FileAttribute.Type;
-			Attribute->Value.Unserialize(ResourceFile);
-		}
-	}
-	return true;
-}*/
-
-bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPhysicalMesh& PhysicalMesh)
+bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPortal* Portal)
 {
 	// Read physical mesh header
 	ZEMapFilePhysicalMeshChunk FilePhysicalMesh;
@@ -287,8 +275,11 @@ bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPhysicalMesh& P
 		return false;
 	}
 
-	PhysicalMesh.Polygons.SetCount(FilePhysicalMesh.PolygonCount);
-	PhysicalMesh.Vertices.SetCount(FilePhysicalMesh.VertexCount);
+
+	ZEArray<ZEVector3> Vertices;
+	ZEArray<ZEMapFilePhysicalMeshPolygonChunk> Polygons;
+	Polygons.SetCount(FilePhysicalMesh.PolygonCount);
+	Vertices.SetCount(FilePhysicalMesh.VertexCount);
 
 	ZEDWORD ChunkIdentifier = 0;
 
@@ -301,7 +292,7 @@ bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPhysicalMesh& P
 	}
 
 	// Read physical mesh vertices
-	ResourceFile->Read(PhysicalMesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalMesh.Vertices.GetCount());
+	ResourceFile->Read(Vertices.GetCArray(), sizeof(ZEVector3), Vertices.GetCount());
 
 	// Check physical mesh polygons chunk identifier
 	ResourceFile->Read(&ChunkIdentifier, sizeof(ZEDWORD), 1);
@@ -312,7 +303,33 @@ bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPhysicalMesh& P
 	}
 
 	// Read physical mesh polygons
-	ResourceFile->Read(PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygonChunk), PhysicalMesh.Polygons.GetCount());
+	ResourceFile->Read(Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygonChunk), Polygons.GetCount());
+
+	// Create Physical Mesh
+	Portal->PhysicalMesh = ZEPhysicalStaticMesh::CreateInstance();
+	if (Portal->PhysicalMesh == NULL)
+	{
+		zeError("Map Resource", "Can not create physical static mesh");
+		return false;
+	}
+
+	// Convert polygons to ZEPhysicalTriangle
+	ZEArray<ZEPhysicalTriangle> PhysicalTriangles;
+	PhysicalTriangles.SetCount(Polygons.GetCount());
+	for (size_t I = 0; I < PhysicalTriangles.GetCount(); I++)
+	{
+		PhysicalTriangles[I].MaterialIndex = 0;
+		PhysicalTriangles[I].Indices[0] = Polygons[I].Indices[0];
+		PhysicalTriangles[I].Indices[1] = Polygons[I].Indices[1];
+		PhysicalTriangles[I].Indices[2] = Polygons[I].Indices[2];
+	}
+
+	// Feed data to physical mesh
+	if (!Portal->PhysicalMesh->SetData(Vertices.GetCArray(), Vertices.GetCount(), PhysicalTriangles.GetCArray(), PhysicalTriangles.GetCount(), NULL, 0))
+	{
+		zeError("Map Resource", "Can not set physical static mesh polygons.");
+		return false;
+	}
 
 	return true;
 }
@@ -398,7 +415,7 @@ bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMapPortal>& Por
 
 		// Read Physical Mesh
 		if (FilePortal.HasPhysicalMesh)
-			if (!ReadPhysicalMeshFromFile(ResourceFile, Portal->PhysicalMesh))
+			if (!ReadPhysicalMeshFromFile(ResourceFile, Portal))
 				return false;
 
 	/*	// Read Brushes

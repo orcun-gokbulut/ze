@@ -176,7 +176,7 @@ bool ZED3D9FixedMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Ca
 	GetDevice()->SetVertexShaderConstantF(12, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants));
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants));
 	
-	if (RenderOrder->Flags & (ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM & ZE_ROF_ENABLE_WORLD_TRANSFORM))
+	if (RenderOrder->Flags & (ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM))
 	{
 		ZEMatrix4x4 WorldViewProjMatrix;
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, Camera->GetViewProjectionTransform());

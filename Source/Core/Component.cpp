@@ -290,7 +290,7 @@ ZEComponent::ZEComponent()
 	OldPosition = ZEVector3::Zero;
 	Velocity = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
-	Scale = ZEVector3(1.0f, 1.0f, 1.0f);
+	Scale = ZEVector3::One;
 	UpdateLocalTransform = true;
 	UpdateWorldTransform = true;
 	UpdateWorldBoundingSphere = true;

@@ -36,6 +36,11 @@
 #include "PhysicalStaticObject.h"
 #include "PhysicsModule.h"
 
+ZEPhysicalObjectType ZEPhysicalStaticObject::GetPhysicalObjectType()
+{
+	return ZE_POT_STATIC_OBJECT;
+}
+
 ZEPhysicalStaticObject* ZEPhysicalStaticObject::CreateInstance()
 {
 	return zePhysics->CreatePhysicalStaticObject();

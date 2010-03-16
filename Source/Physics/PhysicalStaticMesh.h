@@ -51,9 +51,9 @@ class ZEPhysicalStaticMesh : public ZEPhysicalObject
 	public:
 		virtual ZEPhysicalObjectType	GetPhysicalObjectType();
 
-		virtual void					SetMaterials(const ZEPhysicalMaterial* Materials, size_t MaterialCount) = 0;
-		virtual void					SetPolygons(const ZEPhysicalTriangle* Triangles, size_t PolygonCount) = 0;
-		virtual void					SetVertices(const ZEVector3* Vertices, size_t VertexCount) = 0;
+		virtual bool					SetData(const ZEVector3* Vertices, size_t VertexCount, 
+												const ZEPhysicalTriangle* Triangles, size_t PolygonCount, 
+												const ZEPhysicalMaterial* Materials, size_t MaterialCount) = 0;
 
 		static ZEPhysicalStaticMesh*	CreateInstance();
 };

@@ -58,8 +58,8 @@ class ZEPhysicalRigidBody : public ZEPhysicalObject
 	public:							
 		virtual ZEPhysicalObjectType	GetPhysicalObjectType();
 								
-		virtual	void					SetPhysicalBodyType(ZEPhysicalBodyType Type) = 0;
-		virtual ZEPhysicalBodyType		GetPhysicalBodyType() = 0;
+		virtual void					SetKinematic(bool Enabled) = 0;
+		virtual bool					GetKinematic() = 0;
 									
 		//virtual void					SetCollisionCallback(ZEPhysicalCollisionCallback);
 		//ZEPhysicalCollisionCallback	GetCollisionCallback();

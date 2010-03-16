@@ -36,6 +36,7 @@
 #include "ModelBrush.h"
 #include "Core/Error.h"
 #include "Graphics/Canvas.h"
+#include <string.h>
 
 bool ZEModelBrush::IsDrawable()
 {

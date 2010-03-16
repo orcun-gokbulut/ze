@@ -38,6 +38,7 @@
 #include "Core/ResourceFile.h"
 #include "Types.h"
 #include "Core/Error.h"
+#include <string.h>
 
 #define	ZE_ANIF_ANIMATION_CHUNKID					((ZEDWORD)'ANIM')
 #define	ZE_ANIF_PROPERTY_ANIMATION_CHUNKID			((ZEDWORD)(ZE_ANIF_ANIMATION_CHUNKID + (ZEDWORD)'PRPT'))

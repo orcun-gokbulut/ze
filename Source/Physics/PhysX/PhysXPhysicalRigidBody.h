@@ -49,30 +49,38 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 	friend class ZEPhysXModule;
 	private:
 		ZEPhysXPhysicalWorld*			PhysicalWorld;
-		ZEPhysicalBodyType				PhysicalBodyType;
 		ZEArray<ZEPhysicalShape*>		Shapes;
+		ZEVector3						Scale;
+		bool							Enabled;
 
 		NxActor*						Actor;
 		NxActorDesc						ActorDesc;
 		NxBodyDesc						BodyDesc;
 
 		void							ReCreate();
+		void							CreateShapes();
 
 										ZEPhysXPhysicalRigidBody();
 		virtual							~ZEPhysXPhysicalRigidBody();
 								
 	public:
-		virtual void					SetPhysicalBodyType(ZEPhysicalBodyType Type);
-		virtual ZEPhysicalBodyType		GetPhysicalBodyType();
+		virtual void					SetKinematic(bool Enabled);
+		virtual bool					GetKinematic();
 
 		virtual void					SetPhysicalWorld(ZEPhysicalWorld* World);
 		virtual ZEPhysicalWorld*		GetPhysicalWorld();
 
+		virtual void					SetEnabled(bool Enabled);
+		virtual bool					GetEnabled();
+											
 		virtual void					SetPosition(const ZEVector3& NewPosition);
 		virtual ZEVector3				GetPosition();
 		
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 		virtual ZEQuaternion			GetRotation();
+
+		virtual void					SetScale(const ZEVector3& Scale);
+		virtual ZEVector3				GetScale();
 
 		virtual const				
 		ZEArray<ZEPhysicalShape*>&		GetPhysicalShapes();

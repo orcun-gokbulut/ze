@@ -54,6 +54,7 @@ ZEPhysXPhysicalStaticObject::ZEPhysXPhysicalStaticObject()
 {
 	Actor = NULL;
 	ActorDesc.body = NULL;
+	Scale = ZEVector3::One;
 	ActorDesc.userData = this;
 }
 
@@ -94,6 +95,37 @@ void ZEPhysXPhysicalStaticObject::RemovePhysicalShape(ZEPhysicalShape* Shape)
 		if (OldCount != Shapes.GetCount())
 			ReCreate();
 	
+}
+		
+void ZEPhysXPhysicalStaticObject::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+
+	if (Enabled)
+	{
+		ActorDesc.flags &= ~(NX_AF_DISABLE_COLLISION | NX_AF_DISABLE_RESPONSE | NX_AF_FLUID_DISABLE_COLLISION);
+		if (Actor != NULL)
+		{
+			Actor->clearActorFlag(NX_AF_DISABLE_COLLISION);
+			Actor->clearActorFlag(NX_AF_DISABLE_RESPONSE);
+			Actor->clearActorFlag(NX_AF_FLUID_DISABLE_COLLISION);
+		}
+	}
+	else
+	{
+		ActorDesc.flags |= (NX_AF_DISABLE_COLLISION | NX_AF_DISABLE_RESPONSE | NX_AF_FLUID_DISABLE_COLLISION);
+		if (Actor != NULL)
+		{
+			Actor->raiseActorFlag(NX_AF_DISABLE_COLLISION);
+			Actor->raiseActorFlag(NX_AF_DISABLE_RESPONSE);
+			Actor->raiseActorFlag(NX_AF_FLUID_DISABLE_COLLISION);
+		}
+	}
+}
+
+bool ZEPhysXPhysicalStaticObject::GetEnabled()
+{
+	return Enabled;
 }
 
 void ZEPhysXPhysicalStaticObject::SetPosition(const ZEVector3& NewPosition)
@@ -136,19 +168,29 @@ ZEQuaternion ZEPhysXPhysicalStaticObject::GetRotation()
 	}
 }
 
+void ZEPhysXPhysicalStaticObject::SetScale(const ZEVector3& NewScale)
+{
+	Scale = NewScale;
+	if (Actor != NULL)
+		ReCreate();
+}
+
+ZEVector3 ZEPhysXPhysicalStaticObject::GetScale()
+{
+	return Scale;
+}
+
 void ZEPhysXPhysicalStaticObject::ReCreate()
 {
+	Deinitialize();
 	ActorDesc.globalPose.t = Actor->getGlobalPosition();
 	ActorDesc.globalPose.M.fromQuat(Actor->getGlobalOrientationQuat()); 
 	Initialize();
 }
 
-				
-bool ZEPhysXPhysicalStaticObject::Initialize()
+void ZEPhysXPhysicalStaticObject::CreateShapes()
 {
-	Deinitialize();
-	if (PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
-		return false;
+	ActorDesc.shapes.clear();
 
 	for (size_t I = 0; I < Shapes.GetCount(); I++)
 	{
@@ -167,27 +209,30 @@ bool ZEPhysXPhysicalStaticObject::Initialize()
 				BoxShapeDesc.dimensions.x = ((ZEPhysicalBoxShape*)CurrentShape)->GetWidth() * 0.5f;
 				BoxShapeDesc.dimensions.y = ((ZEPhysicalBoxShape*)CurrentShape)->GetHeight() * 0.5f;
 				BoxShapeDesc.dimensions.z = ((ZEPhysicalBoxShape*)CurrentShape)->GetLength() * 0.5f;
-
+				BoxShapeDesc.dimensions.arrayMultiply(BoxShapeDesc.dimensions, ZE_TO_NX(Scale)); 
 				ActorDesc.shapes.push_back(&BoxShapeDesc);
 				break;
 			}
 
 			case ZE_PST_SPHERE:
 			{
+				zeWarningAssert(Scale.x != Scale.y && Scale.y != Scale.z, "Sphere physical shape does not support non uniform scaling. Only scale.x parameter will be used.");
+
 				NxSphereShapeDesc SphereShapeDesc;
 				
 				SphereShapeDesc.userData = CurrentShape;
 				SphereShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
 				SphereShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
 				SphereShapeDesc.userData = CurrentShape;
-				SphereShapeDesc.radius = ((ZEPhysicalSphereShape*)CurrentShape)->GetRadius();
-
+				SphereShapeDesc.radius = Scale.x * ((ZEPhysicalSphereShape*)CurrentShape)->GetRadius();
 				ActorDesc.shapes.push_back(&SphereShapeDesc);
 				break;
 			}
 
 			case ZE_PST_CAPSULE:
 			{
+				zeWarningAssert(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Capsule physical shape does not support scaling. Shape did not scaled.");
+				
 				NxCapsuleShapeDesc CapsuleShapeDesc;
 
 				CapsuleShapeDesc.userData = CurrentShape;
@@ -203,6 +248,8 @@ bool ZEPhysXPhysicalStaticObject::Initialize()
 
 			case ZE_PST_CYLINDER:
 			{
+				zeWarningAssert(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Cylinder physical shape does not support scaling. Shape did not scaled.");
+
 				break;
 			}
 
@@ -212,6 +259,15 @@ bool ZEPhysXPhysicalStaticObject::Initialize()
 			}
 		}
 	}
+}
+				
+bool ZEPhysXPhysicalStaticObject::Initialize()
+{
+	Deinitialize();
+	if (PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
+		return false;
+
+	CreateShapes();
 
 	NxScene* Scene = PhysicalWorld->GetScene();
 	Actor = Scene->createActor(ActorDesc);

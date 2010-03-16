@@ -38,6 +38,7 @@
 #include "matrix.h"
 
 const ZEVector2 ZEVector2::Zero = ZEVector2(0.0f, 0.0f);
+const ZEVector2 ZEVector2::One = ZEVector2(1.0f, 1.0f);
 const ZEVector2 ZEVector2::UnitX = ZEVector2(1.0f, 0.0f);
 const ZEVector2 ZEVector2::UnitY = ZEVector2(0.0f, 1.0f);
 
@@ -205,13 +206,14 @@ ZEVector2::ZEVector2()
 
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3 //
+
+// ZEVector3
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const ZEVector3 ZEVector3::Zero	= ZEVector3(0.0f, 0.0f, 0.0f);
-const ZEVector3 ZEVector3::UnitX	= ZEVector3(1.0f, 0.0f, 0.0f);
-const ZEVector3 ZEVector3::UnitY	= ZEVector3(0.0f, 1.0f, 0.0f);
-const ZEVector3 ZEVector3::UnitZ	= ZEVector3(0.0f, 0.0f, 1.0f);
+const ZEVector3 ZEVector3::One	= ZEVector3(1.0f, 1.0f, 1.0f);
+const ZEVector3 ZEVector3::UnitX = ZEVector3(1.0f, 0.0f, 0.0f);
+const ZEVector3 ZEVector3::UnitY = ZEVector3(0.0f, 1.0f, 0.0f);
+const ZEVector3 ZEVector3::UnitZ = ZEVector3(0.0f, 0.0f, 1.0f);
 
 inline void ZEVector3::Create(ZEVector3& Out, float x, float y, float z)
 {
@@ -404,6 +406,7 @@ ZEVector3::ZEVector3()
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const ZEVector4 ZEVector4::Zero	= ZEVector4(0.0f, 0.0f, 0.0f, 0.0f);
+const ZEVector4 ZEVector4::One	= ZEVector4(1.0f, 1.0f, 1.0f, 1.0f);
 const ZEVector4 ZEVector4::UnitX	= ZEVector4(1.0f, 0.0f, 0.0f, 0.0f);
 const ZEVector4 ZEVector4::UnitY	= ZEVector4(0.0f, 1.0f, 0.0f, 0.0f);
 const ZEVector4 ZEVector4::UnitZ	= ZEVector4(0.0f, 0.0f, 1.0f, 0.0f);

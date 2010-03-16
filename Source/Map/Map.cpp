@@ -43,7 +43,7 @@
 #include "ZEMath/Triangle.h"
 #include "ZEMath/Ray.h"
 #include "ZEMath/Ray.h"
-
+#include "Physics/PhysicalStaticMesh.h"
 
 bool ZEPortalMap::Initialize()
 {
@@ -132,6 +132,7 @@ bool ZEPortalMap::Load(const char* FileName)
 		zeError("Map", "Could not load map file. (FileName : \"%s\")", FileName);
 		return false;
 	}
+
 	return true;
 }
 

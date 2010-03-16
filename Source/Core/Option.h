@@ -42,7 +42,6 @@
 #include "ZEDS/TypedVariant.h"
 #include "fastdelegate.h"
 #include "Command.h"
-#include <string.h>
 
 #define zeOptions ZEOptionManager::GetInstance()
 

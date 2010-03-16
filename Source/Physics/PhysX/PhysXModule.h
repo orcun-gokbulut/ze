@@ -41,22 +41,27 @@
 #include "Physics/PhysicsModule.h"
 #include "PhysXUserOutputStream.h"
 #include "ZEDS/Array.h"
-#include <NxPhysics.h>
 
+class NxPhysicsSDK;
+class NxCookingInterface;
 class ZEPhysXPhysicalWorld;
+
 class ZEPhysXModule : public ZEPhysicsModule
 {
 	friend class ZEPhysXModuleDescription;
 	private:
 		ZEPhysXUserOutputStream					OutputStream;
 		NxPhysicsSDK*							PhysicsSDK;
+		NxCookingInterface*						CookingInterface;
 		ZEArray<ZEPhysXPhysicalWorld*>			PhysicalWorlds;
+		bool									Enabled;
 
 												ZEPhysXModule();
 		virtual									~ZEPhysXModule();
 
 	public:
 		NxPhysicsSDK*							GetPhysicsSDK();
+		NxCookingInterface*						GetCookingInterface();
 
 		virtual ZEModuleDescription*			GetModuleDescription();
 
@@ -65,6 +70,9 @@ class ZEPhysXModule : public ZEPhysicsModule
 
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
+		
+		virtual	void							Process(float ElapsedTime);
+		virtual void							UpdateWorlds();
 
 		virtual ZEPhysicalWorld*				CreatePhysicalWorld();
 		virtual ZEPhysicalRigidBody*			CreatePhysicalRigidBody();

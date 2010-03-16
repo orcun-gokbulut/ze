@@ -45,6 +45,7 @@
 #include "GameInterface/Scene.h"
 #include "GameInterface/Serialization.h"
 #include "Meta/Animation.h"
+#include <string.h>
 
 bool ZEMetaDebugComponent::Initialize()
 {
@@ -68,10 +69,10 @@ bool ZEMetaDebugComponent::Initialize()
 		ZELightBrush* Light = new ZELightBrush();
 		Light->SetLightType(ZE_LT_PROJECTIVE);
 		Light->SetPosition(ZEVector3(0.0f, 45.0f, 0.0f));
-		Light->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
+		Light->SetScale(ZEVector3::One);
 		Light->GetLight()->SetRange(150);
 		Light->SetRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
-		Light->GetLight()->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
+		Light->GetLight()->SetColor(ZEVector3::One);
 		Light->GetLight()->SetAttenuation(0.001f, 0.0f, 2.0f);
 		Light->GetLight()->SetIntensity(5.0f);
 		Light->GetLight()->SetCastsShadows(false);
@@ -101,10 +102,10 @@ bool ZEMetaDebugComponent::Initialize()
 		CanvasMaterial->SetAmbientEnabled(true);
 		CanvasMaterial->SetAmbientColor(ZEVector3(0.1f, 0.1f, 0.1f));
 		CanvasMaterial->SetDiffuseEnabled(true);
-		CanvasMaterial->SetDiffuseColor(ZEVector3(1.0f, 1.0f, 1.0f));
+		CanvasMaterial->SetDiffuseColor(ZEVector3::One);
 		CanvasMaterial->SetDiffuseMap(ZETexture2DResource::LoadResource("Test\\Diffuse.tga")->GetTexture());
 		CanvasMaterial->SetSpecularEnabled(true);
-		CanvasMaterial->SetSpecularColor(ZEVector3(1.0f, 1.0f, 1.0f));
+		CanvasMaterial->SetSpecularColor(ZEVector3::One);
 		CanvasMaterial->SetSpecularShininess(64.0f);
 		CanvasMaterial->UpdateMaterial();
 

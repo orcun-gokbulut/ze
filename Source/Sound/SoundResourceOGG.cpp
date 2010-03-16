@@ -37,6 +37,7 @@
 #include "Core/Error.h"
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>
+#include <Memory.h>
 
 // MEMORY SEEK
 static size_t OggMemory_Read(void *ptr, size_t size, size_t nmemb, void *datasource)

@@ -52,7 +52,7 @@ enum ZEMaterialType
 #define ZE_MF_NOCACHING
  
 class ZERenderOrder;
-class ZERLLight;
+struct ZERLLight;
 class ZECamera;
 
 ZE_META_CLASS_DESCRIPTION(ZEMaterial)

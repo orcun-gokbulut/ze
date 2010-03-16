@@ -33,28 +33,26 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifdef ZE_ZINEK_ENGINE
-#include "Core/Error.h"
-#else
 #include <stdio.h>
-#endif
+#include <stdarg.h>
 
-void zedsAssert(const char* Function, const char* File, int Line, const char* Message, ...)
-{
-#ifdef ZE_ZINEK_ENGINE
-	ZEError::GetInstance()->RaiseAssert(ZE_AT_ASSERT, Function, File, Line, Message);
-#else
-	printf("[ASSERT] Error : %s (Function : \"%s\", File : \"%s\", Line : %d)\n", Message, Function, File, Line);
-#endif
+void stdAssert(const char* Function, const char* File, int Line, const char* Message, ...)
+{	
+	va_list Args;
+	va_start(Args, Message);
+	printf("[ASSERT] ");
+	vprintf(Message, Args);
+	printf(" (Function : \"%s\", File : \"%s\", Line : %d)\n", Message, Function, File, Line);
+	va_end(Args);
 }
 
-void zedsWarningAssert(const char* Function, const char* File, int Line, const char* Message, ...)
+void stdWarningAssert(const char* Function, const char* File, int Line, const char* Message, ...)
 {
-#ifdef ZE_ZINEK_ENGINE
-	ZEError::GetInstance()->RaiseAssert(ZE_AT_WARNING_ASSERT, "", File, Line, Message);
-#else
-	printf("[ASSERT] Warning : %s (Function : \"%s\", File : \"%s\", Line : %d)\n", Message, Function, File, Line);
-#endif
-
+	va_list Args;
+	va_start(Args, Message);
+	printf("[Warning Assert] ");
+	vprintf(Message, Args);
+	printf(" (Function : \"%s\", File : \"%s\", Line : %d)\n", Message, Function, File, Line);
+	va_end(Args);
 }
  

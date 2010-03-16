@@ -44,20 +44,25 @@ void ZEPhysXUserOutputStream::reportError(NxErrorCode Code, const char* Message,
 		case NXE_NO_ERROR:
 			break;
 		default:
-		case NXE_INVALID_PARAMETER:
-		case NXE_INVALID_OPERATION:
 		case NXE_OUT_OF_MEMORY:
 		case NXE_INTERNAL_ERROR:
-		case NXE_ASSERTION:
 			zeCriticalError("PhysX", "Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
+			break;
+
+		case NXE_INVALID_PARAMETER:
+		case NXE_INVALID_OPERATION:
+		case NXE_ASSERTION:
+			zeError("PhysX", "Assert ! Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
 			break;
 
 		case NXE_DB_PRINT:
 			zeLog("PhysX", Message);
 			break;
+
 		case NXE_DB_INFO:
 			zeNotice("PhysX", "Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
 			break;
+
 		case NXE_DB_WARNING:
 			zeWarning("PhysX", "Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
 			break;

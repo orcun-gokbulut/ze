@@ -41,6 +41,7 @@
 #include "Graphics/VertexBuffer.h"
 #include "ModelFileFormat.h"
 #include <memory.h>
+#include <string.h>
 
 ZEStaticVertexBuffer* ZEModelResourceMeshLOD::GetSharedVertexBuffer() const
 {

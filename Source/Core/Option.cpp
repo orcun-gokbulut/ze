@@ -39,6 +39,7 @@
 #include "Console.h"
 #include <stdio.h>
 #include <ctype.h>
+#include <string.h>
 
 #pragma warning(push)
 #pragma warning(disable:4996)

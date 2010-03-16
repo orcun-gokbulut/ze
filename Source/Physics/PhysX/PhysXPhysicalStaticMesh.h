@@ -38,14 +38,56 @@
 #define __ZE_PHYSX_PHYSICAL_STATIC_MESH_H__
 
 #include "Physics/PhysicalStaticMesh.h"
+#include "PhysXComponentBase.h"
 
-class ZEPhysXPhysicalStaticMesh : public ZEPhysicalStaticMesh
+#include <NxActor.h>
+#include <NxActorDesc.h>
+#include <NxTriangleMesh.h>
+#include <NxTriangleMeshDesc.h>
+#include <NxTriangleMeshShapeDesc.h>
+
+class ZEPhysXPhysicalWorld;
+class ZEPhysXPhysicalStaticMesh : public ZEPhysicalStaticMesh, private ZEPhysXComponentBase
 {
 	friend class ZEPhysXModule;
-	public:	
-		virtual void					SetMaterials(const ZEPhysicalMaterial* Materials, size_t MaterialCount);
-		virtual void					SetPolygons(const ZEPhysicalTriangle* Triangles, size_t PolygonCount);
-		virtual void					SetVertices(const ZEVector3* Vertices, size_t VertexCount);
+	private:
+		ZEPhysXPhysicalWorld*			PhysicalWorld;
+		
+		NxActor*						Actor;
+		NxActorDesc						ActorDesc;
+		NxTriangleMeshShapeDesc			TriangleMeshShapeDesc;	
+
+		ZEVector3						Scale;
+		bool							Enabled;
+
+		void							ReCreate();
+
+										ZEPhysXPhysicalStaticMesh();
+		virtual							~ZEPhysXPhysicalStaticMesh();
+
+	public:
+		virtual void					SetPhysicalWorld(ZEPhysicalWorld* World);
+		virtual ZEPhysicalWorld*		GetPhysicalWorld();
+
+		virtual void					SetEnabled(bool Enabled);
+		virtual bool					GetEnabled();
+
+		virtual void					SetPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3				GetPosition();
+		
+		virtual void					SetRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion			GetRotation();
+
+		virtual void					SetScale(const ZEVector3& NewScale);
+		virtual ZEVector3				GetScale();
+
+		virtual bool					SetData(const ZEVector3* Vertices, size_t VertexCount, 
+												const ZEPhysicalTriangle* Triangles, size_t PolygonCount, 
+												const ZEPhysicalMaterial* Materials, size_t MaterialCount);
+
+		virtual bool					Initialize();
+		virtual void					Deinitialize();	
+
 };
 
 #endif

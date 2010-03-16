@@ -38,6 +38,7 @@
 #include "Core/Error.h"
 #include "UI/UIManager.h"
 #include "Graphics/Camera.h"
+#include <string.h>
 
 ZEGameDescription* ZEGame::GetGameDescription()
 {
