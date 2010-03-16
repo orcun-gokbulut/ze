@@ -36,8 +36,8 @@
 
 struct PS_INPUT
 {
-	float2 Texcoord             : TEXCOORD0;
-	float4 Color			    : COLOR0;
+	float4 Color			    : TEXCOORD0;
+	float2 Texcoord             : TEXCOORD1;
 };
 
 float4 ps_main(PS_INPUT Input) : COLOR0

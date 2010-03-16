@@ -106,8 +106,8 @@ struct ZEUIVertex
 
 	public:
 		ZEVector2						Position;
-		ZEVector2						Texcoord;
 		ZEVector4						Color;
+		ZEVector2						Texcoord;
 
 		static ZEVertexDeclaration*		GetVertexDeclaration();
 };

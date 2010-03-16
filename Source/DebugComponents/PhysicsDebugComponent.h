@@ -42,12 +42,15 @@
 class ZEPlayer;
 class ZEPhysicalRigidBody;
 
+#include "Physics/PhysicalShapes.h"
+
 class ZEPhysicsDebugComponent : public ZEDebugComponent
 {
 	private:
 		ZEPlayer*				Player;
 		ZEPhysicalRigidBody*	PhysicalRigidBody;
-		
+		ZEPhysicalSphereShape	Shape;	
+
 	public:
 		virtual void			Process(float ElapsedTime);
 

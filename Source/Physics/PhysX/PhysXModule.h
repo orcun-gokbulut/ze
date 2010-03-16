@@ -49,6 +49,7 @@ class ZEPhysXPhysicalWorld;
 class ZEPhysXModule : public ZEPhysicsModule
 {
 	friend class ZEPhysXModuleDescription;
+	friend class ZEPhysXPhysicalWorld;
 	private:
 		ZEPhysXUserOutputStream					OutputStream;
 		NxPhysicsSDK*							PhysicsSDK;

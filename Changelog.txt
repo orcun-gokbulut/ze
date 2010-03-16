@@ -145,7 +145,7 @@
 	ADD: ZEPhysXMemoryWriteStream, ZEPhysXMemoryReadStream and ZEPhysXFileStream added.
 	FIX: ZERLLigght compile warning fixed.
 	
-[17 March 2010 - Revision 129]
+[17 March 2010 - Revision 129, 130]
 	CHG: ZEDS error reporting and handling improvements.
 	CHG: ZEDS_ASSERT renamed to zedsAssert. ZEDS_WARNING renamed to zedsWarning.
 	ADD: ZEVector2/3/4::One constant added.
@@ -155,4 +155,4 @@
 	ADD: NxCookingInterface variable added ZEPhysXModule and ZEPhysXComponentBase.
 	ADD: Enable flag added to ZEPhysicalObject
 	CHG: Improved main loop performance.
-	
+	FIX: Physics sub-system minor improvements and fixed.	

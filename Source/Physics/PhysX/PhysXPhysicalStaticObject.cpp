@@ -187,11 +187,14 @@ void ZEPhysXPhysicalStaticObject::ReCreate()
 	ActorDesc.globalPose.M.fromQuat(Actor->getGlobalOrientationQuat()); 
 	Initialize();
 }
-
-void ZEPhysXPhysicalStaticObject::CreateShapes()
+		
+bool ZEPhysXPhysicalStaticObject::Initialize()
 {
+	Deinitialize();
+	if (PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
+		return false;
+	
 	ActorDesc.shapes.clear();
-
 	for (size_t I = 0; I < Shapes.GetCount(); I++)
 	{
 		ZEPhysicalShape* CurrentShape = Shapes[I];
@@ -210,6 +213,7 @@ void ZEPhysXPhysicalStaticObject::CreateShapes()
 				BoxShapeDesc.dimensions.y = ((ZEPhysicalBoxShape*)CurrentShape)->GetHeight() * 0.5f;
 				BoxShapeDesc.dimensions.z = ((ZEPhysicalBoxShape*)CurrentShape)->GetLength() * 0.5f;
 				BoxShapeDesc.dimensions.arrayMultiply(BoxShapeDesc.dimensions, ZE_TO_NX(Scale)); 
+
 				ActorDesc.shapes.push_back(&BoxShapeDesc);
 				break;
 			}
@@ -223,8 +227,9 @@ void ZEPhysXPhysicalStaticObject::CreateShapes()
 				SphereShapeDesc.userData = CurrentShape;
 				SphereShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
 				SphereShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
-				SphereShapeDesc.userData = CurrentShape;
+
 				SphereShapeDesc.radius = Scale.x * ((ZEPhysicalSphereShape*)CurrentShape)->GetRadius();
+
 				ActorDesc.shapes.push_back(&SphereShapeDesc);
 				break;
 			}
@@ -259,15 +264,6 @@ void ZEPhysXPhysicalStaticObject::CreateShapes()
 			}
 		}
 	}
-}
-				
-bool ZEPhysXPhysicalStaticObject::Initialize()
-{
-	Deinitialize();
-	if (PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
-		return false;
-
-	CreateShapes();
 
 	NxScene* Scene = PhysicalWorld->GetScene();
 	Actor = Scene->createActor(ActorDesc);

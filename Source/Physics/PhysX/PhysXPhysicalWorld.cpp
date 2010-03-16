@@ -60,6 +60,7 @@ ZEPhysXPhysicalWorld::ZEPhysXPhysicalWorld()
 	SceneDesc.upAxis = 1;
 	DebugDraw.Material = NULL;
 	Visualize = false;
+	Enabled = true;
 }
 
 ZEPhysXPhysicalWorld::~ZEPhysXPhysicalWorld()
@@ -305,6 +306,12 @@ void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 {
     Scene->simulate(ElapsedTime);
     Scene->flushStream();
+}
+
+void ZEPhysXPhysicalWorld::Destroy()
+{
+	GetModule()->PhysicalWorlds.DeleteValue(this);
+	delete this; 
 }
 
 void ZEPhysXPhysicalWorld::Update()

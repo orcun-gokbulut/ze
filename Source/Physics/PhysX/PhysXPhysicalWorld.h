@@ -103,6 +103,8 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 
 		virtual void								Draw(ZERenderer* Renderer);
 
+		virtual void								Destroy();
+
 		virtual void								Process(float ElapsedTime);
 		virtual void								Update();
 

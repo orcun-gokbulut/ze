@@ -39,16 +39,15 @@ float2		TextureSize					: register(c5);
 struct VS_INPUT 
 {
 	float4 Position             : POSITION0;
-	float2 Texcoord             : TEXCOORD0;
-	float4 Color                : COLOR0;
-
+	float4 Color                : TEXCOORD0;
+	float2 Texcoord             : TEXCOORD1;
 };
 
 struct VS_OUTPUT 
 {
 	float4 Position             : POSITION0;
-	float2 Texcoord             : TEXCOORD0;
-	float4 Color				: COLOR0;
+	float4 Color				: TEXCOORD0;
+	float2 Texcoord             : TEXCOORD1;
 };
 
 VS_OUTPUT vs_main(VS_INPUT Input)

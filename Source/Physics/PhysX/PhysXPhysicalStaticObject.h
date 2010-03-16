@@ -58,7 +58,6 @@ class ZEPhysXPhysicalStaticObject : public ZEPhysicalStaticObject
 		NxActorDesc							ActorDesc;
 
 		void								ReCreate();
-		void								CreateShapes();
 
 											ZEPhysXPhysicalStaticObject();
 		virtual								~ZEPhysXPhysicalStaticObject();

@@ -139,7 +139,7 @@ ZECanvasBrush::~ZECanvasBrush()
 	if (Material != NULL)
 		Material->Release();
 	if (RenderOrder.VertexBuffer != NULL)
-		delete RenderOrder.VertexBuffer;
+		((ZEStaticVertexBuffer*)RenderOrder.VertexBuffer)->Release();
 }
 
 #include "CanvasBrush.h.zpp"

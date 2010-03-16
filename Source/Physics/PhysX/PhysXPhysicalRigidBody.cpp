@@ -189,6 +189,8 @@ const ZEArray<ZEPhysicalShape*>& ZEPhysXPhysicalRigidBody::GetPhysicalShapes()
 void ZEPhysXPhysicalRigidBody::AddPhysicalShape(ZEPhysicalShape* Shape)
 {
 	Shapes.Add(Shape);
+	Shape->SetOwner(this);
+
 	if (Actor != NULL)
 		ReCreate();
 }
@@ -432,11 +434,13 @@ void ZEPhysXPhysicalRigidBody::ReCreate()
 	BodyDesc.angularDamping = Actor->getAngularDamping();
 	Initialize();
 }
-
-void ZEPhysXPhysicalRigidBody::CreateShapes()
+			
+bool ZEPhysXPhysicalRigidBody::Initialize()
 {
-	//ActorDesc.shapes.clear();
+	if (Actor != NULL || PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
+		return false;
 
+	ActorDesc.shapes.clear();
 	for (size_t I = 0; I < Shapes.GetCount(); I++)
 	{
 		ZEPhysicalShape* CurrentShape = Shapes[I];
@@ -506,14 +510,6 @@ void ZEPhysXPhysicalRigidBody::CreateShapes()
 			}
 		}
 	}
-}
-				
-bool ZEPhysXPhysicalRigidBody::Initialize()
-{
-	if (Actor != NULL || PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
-		return false;
-
-	CreateShapes();
 
 	NxScene* Scene = PhysicalWorld->GetScene();
 	Actor = Scene->createActor(ActorDesc);

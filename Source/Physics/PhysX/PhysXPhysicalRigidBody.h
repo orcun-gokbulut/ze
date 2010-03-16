@@ -58,7 +58,6 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 		NxBodyDesc						BodyDesc;
 
 		void							ReCreate();
-		void							CreateShapes();
 
 										ZEPhysXPhysicalRigidBody();
 		virtual							~ZEPhysXPhysicalRigidBody();

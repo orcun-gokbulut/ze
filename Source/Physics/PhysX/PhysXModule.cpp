@@ -49,6 +49,7 @@ ZEPhysXModule::ZEPhysXModule()
 {
 	CookingInterface = NULL;
 	PhysicsSDK = NULL;
+	Enabled = true;
 }
 
 ZEPhysXModule::~ZEPhysXModule()
@@ -155,7 +156,9 @@ void ZEPhysXModule::UpdateWorlds()
 
 ZEPhysicalWorld* ZEPhysXModule::CreatePhysicalWorld()
 {
-	return new ZEPhysXPhysicalWorld();
+	ZEPhysXPhysicalWorld* NewWorld = new ZEPhysXPhysicalWorld();
+	PhysicalWorlds.Add(NewWorld);
+	return NewWorld;
 }
 
 ZEPhysicalRigidBody* ZEPhysXModule::CreatePhysicalRigidBody()

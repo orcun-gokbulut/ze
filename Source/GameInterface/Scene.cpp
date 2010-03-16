@@ -232,7 +232,6 @@ void ZEScene::Render(float ElapsedTime)
 
 	Renderer->SetCamera(ActiveCamera);
 	CullScene(Renderer, ActiveCamera->GetViewVolume(), true);
-	PhysicalWorld->Draw(Renderer);
 }
 
 ZEEntity* ZEScene::CastRay(const ZERay& Ray, float Range)

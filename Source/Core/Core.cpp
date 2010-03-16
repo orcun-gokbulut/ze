@@ -541,6 +541,7 @@ void ZECore::ShutDown()
 	exit(0);
 }
 
+#include "Physics/PhysicalWorld.h"
 void ZECore::MainLoop()
 {
 	if (DebugComponent != NULL)
@@ -571,6 +572,7 @@ void ZECore::MainLoop()
 	
 	if (DebugComponent != NULL)
 		DebugComponent->Process(FrameTime);
+	Game->GetScene()->GetPhysicalWorld()->Draw(Game->GetScene()->GetRenderer());
 
 	// Engine Logic
 	Physics->Process(FrameTime);

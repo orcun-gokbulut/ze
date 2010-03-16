@@ -76,14 +76,14 @@ bool ZEPhysicsDebugComponent::Initialize()
 
 		PhysicalRigidBody = ZEPhysicalRigidBody::CreateInstance();
 		PhysicalRigidBody->SetPosition(ZEVector3(0.0f, 100.0f, 1.0f));
-		ZEPhysicalSphereShape Shape;
-		Shape.SetRadius(30.0f);
+		Shape.SetRadius(10.0f);
 		PhysicalRigidBody->AddPhysicalShape(&Shape);
-		World->AddPhysicalObject(PhysicalRigidBody);
-		PhysicalRigidBody->SetMass(30.0f);
-		//PhysicalRigidBody->SetKinematic(false);
-		PhysicalRigidBody->ApplyForce(ZEVector3(100.0f, 0.0f, 0.0f));
+		PhysicalRigidBody->SetMass(10.0f);
+		PhysicalRigidBody->SetKinematic(false);
 		PhysicalRigidBody->SetGravityEnabled(true);
+		PhysicalRigidBody->SetLinearDamping(0.01f);
+		World->AddPhysicalObject(PhysicalRigidBody);
+		PhysicalRigidBody->ApplyForce(ZEVector3(1000000.0f, 0.0f, 0.0f));
 
 		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
 		CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
@@ -135,6 +135,8 @@ bool ZEPhysicsDebugComponent::Initialize()
 			NULL, 0);
 
 		World->AddPhysicalObject(PhysicalMesh);
+
+		World->SetVisualize(true);
 	}
 
 	return true;
