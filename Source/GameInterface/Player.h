@@ -40,6 +40,7 @@
 #include "Meta/Class.h"
 #include "Graphics/Camera.h"
 #include "Graphics/Canvas.h"
+#include "Graphics/PointLight.h"
 #include "Sound/Listener.h"
 #include "Input/InputMap.h"
 
@@ -51,6 +52,7 @@ class ZEPlayer : public ZEEntity
 	private:
 		ZEInputMap				InputMap;
 		ZECamera				Camera;
+		ZEPointLight			PointLight;
 		ZEListener*				Listener;
 		float					Pitch, Yawn, Roll, FOV;
 	

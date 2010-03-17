@@ -83,7 +83,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 		PhysicalRigidBody->SetGravityEnabled(true);
 		PhysicalRigidBody->SetLinearDamping(0.01f);
 		World->AddPhysicalObject(PhysicalRigidBody);
-		PhysicalRigidBody->ApplyForce(ZEVector3(1000000.0f, 0.0f, 0.0f));
+		PhysicalRigidBody->ApplyForce(ZEVector3(1000.0f, 0.0f, 0.0f));
 
 		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
 		CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
@@ -136,7 +136,9 @@ bool ZEPhysicsDebugComponent::Initialize()
 
 		World->AddPhysicalObject(PhysicalMesh);
 
-		World->SetVisualize(true);
+		zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
+		World->SetVisualize(false);
+		Scene->SetVisualDebugElements(ZE_VDE_ALL);
 	}
 
 	return true;

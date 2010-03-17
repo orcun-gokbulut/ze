@@ -38,14 +38,14 @@ float4x4	TransformMatrix				: register(c0);
 struct VS_INPUT 
 {
 	float4 Position             : POSITION0;
-	float4 Color                : TEXCOORD0;
+	float4 Color                : TEXCOORD1;
 
 };
 
 struct VS_OUTPUT 
 {
 	float4 Position             : POSITION0;
-	float4 Color				: TEXCOORD0;
+	float4 Color				: TEXCOORD1;
 };
 
 VS_OUTPUT vs_main(VS_INPUT Input)

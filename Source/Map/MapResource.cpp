@@ -275,7 +275,6 @@ bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPortal* Portal)
 		return false;
 	}
 
-
 	ZEArray<ZEVector3> Vertices;
 	ZEArray<ZEMapFilePhysicalMeshPolygonChunk> Polygons;
 	Polygons.SetCount(FilePhysicalMesh.PolygonCount);
@@ -301,9 +300,14 @@ bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPortal* Portal)
 		zeError("Map Resource", "Physical mesh polygons chunk's id does not match.");
 		return false;
 	}
-
 	// Read physical mesh polygons
 	ResourceFile->Read(Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygonChunk), Polygons.GetCount());
+
+	if (Polygons.GetCount() == 0 || Vertices.GetCount() == 0)
+	{
+		Portal->PhysicalMesh = NULL;
+		return true;
+	}
 
 	// Create Physical Mesh
 	Portal->PhysicalMesh = ZEPhysicalStaticMesh::CreateInstance();

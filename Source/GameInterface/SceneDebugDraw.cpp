@@ -78,7 +78,7 @@ void ZESceneDebugDraw::DrawBoundingSphere(const ZEBoundingSphere& BoundingSphere
 		ZEVector3(BoundingSphere.Radius * 2.0f, BoundingSphere.Radius * 2.0f, BoundingSphere.Radius * 2.0f));
 	VertexBuffer.SetTransfomation(WorldMatrix);
 	VertexBuffer.SetColor(Color);
-	VertexBuffer.AddSphere(1.0f, 8, 8);
+	VertexBuffer.AddWireframeSphere(1.0f, 8, 8);
 }
 
 void ZESceneDebugDraw::Clean()

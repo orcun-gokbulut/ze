@@ -301,7 +301,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 	ZESmartArray<ZELight*> VisibleLights; // List of lights that can have effect on visible area
 
 	// Check lightning enabled
-	if (LightsEnabled)
+ 	if (LightsEnabled)
 		for (size_t I = 0; I < Entities.GetCount(); I++)
 			// Check wheather entity is light source or not. (Does it contains light component(s))
 			if (Entities[I]->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
@@ -361,7 +361,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 				const ZEViewVolume& LightViewVolume = VisibleLights[M]->GetViewVolume();
 
 				// Test light view volume and entity's bounding volumes in order to detect entity lies in lights effect area
-				if (VisibleLights[M]->GetLightType() != ZE_LT_DIRECTIONAL || LightViewVolume.CullTest(CurrentEntity))
+				if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || LightViewVolume.CullTest(CurrentEntity))
 				{
 					// Add light to list which contains lights effect entity
 					Lights.Add(VisibleLights[M]->GetRenderOrderLight());
@@ -402,7 +402,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 							// Test light view volume and entity's bounding volumes in order to detect entity lies in lights effect area
 							const ZEViewVolume& LightViewVolume = VisibleLights[M]->GetViewVolume();
 
-							if (VisibleLights[M]->GetLightType() != ZE_LT_DIRECTIONAL || LightViewVolume.CullTest(Components[N]))
+							if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || LightViewVolume.CullTest(Components[N]))
 								Lights.Add(VisibleLights[M]->GetRenderOrderLight());
 						}
 

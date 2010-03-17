@@ -195,13 +195,21 @@ void ZEPlayer::Initialize()
 		Listener = ZEListener::CreateInstance();
 
 	Listener->Initialize();
+	PointLight.SetLocalPosition(ZEVector3(0.0f, 5.0f, -5.0f));
+	PointLight.SetAttenuation(0.00000, 0.0000, 1.0f);
+	PointLight.SetRange(10000.0f);
+	PointLight.SetIntensity(5.0f);
+	PointLight.SetColor(ZEVector3::One);
+	PointLight.SetEnabled(true);
 
+	RegisterComponent(&PointLight);
 	RegisterComponent(&Camera);
 	RegisterComponent(Listener);
 
 	zeScene->SetActiveCamera(&Camera);
 	zeScene->SetActiveListener(Listener);
 }
+
 void ZEPlayer::Deinitialize()
 {
 	Camera.Deinitialize();
