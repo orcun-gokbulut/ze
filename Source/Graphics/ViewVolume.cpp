@@ -62,12 +62,12 @@ bool ZEViewFrustum::ConeCullTest(const ZEBoundingSphere& BoundingSphere) const
 
 bool ZEViewFrustum::CullTest(const ZEAABoundingBox& BoundingBox) const
 {
-	if ((ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)) ||
-		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)) ||
-		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)) ||
-		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)) ||
-		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)) ||
-		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)))
+	if ((ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE))
 		return true;
 
 	return false;
@@ -75,12 +75,12 @@ bool ZEViewFrustum::CullTest(const ZEAABoundingBox& BoundingBox) const
 
 bool ZEViewFrustum::CullTest(const ZEOBoundingBox& BoundingBox) const 
 {
-	if ((ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)) ||
-		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)) ||
-		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)) ||
-		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)) ||
-		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)) ||
-		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)))
+	if ((ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
+		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
+		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
+		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE) ||
+		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
+		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE))
 		return true;
 
 	return false;
@@ -164,12 +164,12 @@ bool ZEViewFrustum::LightCullTest(ZELight* Light) const
 
 bool ZEViewFrustum::CullTest(ZEEntity* Entity) const
 {
-	return ConeCullTest(Entity->GetWorldBoundingSphere()) && CullTest(Entity->GetWorldBoundingBox());
+	return /*ConeCullTest(Entity->GetWorldBoundingSphere()) &&*/ CullTest(Entity->GetWorldBoundingBox());
 }
 
 bool ZEViewFrustum::CullTest(ZEComponent* Component) const
 {
-	return ConeCullTest(Component->GetWorldBoundingSphere()) && CullTest(Component->GetWorldBoundingBox());
+	return /*ConeCullTest(Component->GetWorldBoundingSphere()) &&*/ CullTest(Component->GetWorldBoundingBox());
 }
 
 ZEDoorViewTest ZEViewFrustum::CullTest(const ZERectangle3D& PortalDoor) const

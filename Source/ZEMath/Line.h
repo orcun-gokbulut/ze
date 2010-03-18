@@ -39,22 +39,27 @@
 
 #include "Vector.h"
 
+#define MapLine(A, B)	(A).v = (B).v; (A).p = (B).p 
+#define MapLineToXYZ(L, _v, _p) (L).v = (_v); (L).p = (_p)
+
 class ZEPlane;
 class ZELine
 {
 	public:
 		ZEVector3			v;
 		ZEVector3			p;
+		
 
 		static void			Create(ZELine& Line, const ZEVector3& P0, const ZEVector3& P1);
 		static void			CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p);
 		
-		static float		MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& tA, float &tB);
+		static float		MinimumDistance(const ZELine& LineA, const ZELine& LineB);
+		static float		MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& tA, float& tB);
 		static float		DistanceToPoint(const ZELine& Line, const ZEVector3& Point, float &t);
-
 		void				GetPointOn(ZEVector3& Point, float t) const;
 
-							ZELine(const ZEVector3& v, const ZEVector3& p);
+							//ZELine(const ZEVector3& v, const ZEVector3& p);
+							ZELine(const ZEVector3& P0, const ZEVector3& P1);
 							ZELine();
 };
 #endif

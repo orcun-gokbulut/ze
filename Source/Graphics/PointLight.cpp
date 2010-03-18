@@ -35,27 +35,27 @@
 
 #include "PointLight.h"
 
-ZELightType ZEPointLight::GetLightType()
+ZELightType ZEVectorLight::GetLightType()
 {
 	return ZE_LT_POINT;
 }
 
-void ZEPointLight::SetCastShadows(bool NewValue)
+void ZEVectorLight::SetCastShadows(bool NewValue)
 {
 	RenderOrderLight.CubeShadowMap = CastsShadows ? ShadowMap : NULL;
 	CastsShadows = NewValue;
 }
 
-const ZETextureCube* ZEPointLight::GetShadowMap()
+const ZETextureCube* ZEVectorLight::GetShadowMap()
 {
 	return ShadowMap;
 }
 
-void ZEPointLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
+void ZEVectorLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
 {
 }
 
-const ZEViewVolume& ZEPointLight::GetViewVolume()
+const ZEViewVolume& ZEVectorLight::GetViewVolume()
 {
 	if (UpdateViewVolume)
 	{
@@ -66,7 +66,7 @@ const ZEViewVolume& ZEPointLight::GetViewVolume()
 	return ViewVolume;
 }
 
-ZEPointLight::ZEPointLight()
+ZEVectorLight::ZEVectorLight()
 {
 	RenderOrderLight.Type = ZE_ROLT_POINT;
 	ShadowMap = NULL;

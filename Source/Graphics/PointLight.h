@@ -40,7 +40,7 @@
 #include "Light.h"
 #include "ViewVolume.h"
 
-class ZEPointLight  : public ZELight
+class ZEVectorLight  : public ZELight
 {
 	private:
 		ZETextureCube*					ShadowMap;
@@ -56,7 +56,7 @@ class ZEPointLight  : public ZELight
 		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
 		virtual const ZEViewVolume&		GetViewVolume();
 
-										ZEPointLight();
+										ZEVectorLight();
 
 };
 

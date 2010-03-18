@@ -41,7 +41,7 @@
 [8 Feburary 2010 - Revision 103
 	ADD: ZEParticle sub-system is added to trunk.
 	CHG: ZEParticle sub-system is integrated in to v0.05.00.
-	REM: ZEPoint and ZEPosition typedefs has been removed.
+	REM: ZEVector and ZEPosition typedefs has been removed.
     
 [9 Feburary 2010 - Revision 104]
 	CHG: ZETextControl render function is micro optimized.
@@ -157,7 +157,7 @@
 	CHG: Improved main loop performance.
 	FIX: Physics sub-system minor improvements and fixed.	
 	
-[18 March 2010 - Revision 131, 132]
+[18 March 2010 - Revision 131, 132, 133]
 	FIX: Minor bug fixes.
 	FIX: ZESceneDebugDraw performance problem fixed.
 	CHG: ElementCount parameter added to ZEVertexDeclaration::Create(ZEVertexElement*) function and ZE_VET_END and ZE_VED_END enumurations removed.
@@ -167,3 +167,6 @@
 	ADD: All of the scene's entities are deinitilized on ZEScene::Deinitialize function.
 	ADD: Log and error messages added to ZEScene::Initialize and ZEScene::LoadEnvironment functions.
 	FIX: ZEScene::Raycast and ZEScene:Render function crash on scenes with no environment has been fixed.
+	FIX: Entity component culling fixed.
+	CHF: New, Improved, bug fixed and tested ZEMath integrated to Zinek Engine project.
+	ADD: New ZEMath tests added to Zinek Engine Test project.

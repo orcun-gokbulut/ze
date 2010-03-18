@@ -38,7 +38,6 @@
 #include "Line.h"
 #include "LineSegment.h"
 #include "Ray.h"
-
 #include <math.h>
 
 bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &t)
@@ -81,7 +80,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELineSegment& LineSe
     }
 
     t = N / D;
-    if (t < 0 || t > 1)
+    if (t < 0 || t >= 1)
         return true;
 
 	return false;
@@ -106,7 +105,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t)
     }
 
     t = N / D;
-    if (t > 0)
+    if (t >=0)
         return true;
 
 	return false;
@@ -114,14 +113,14 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t)
 
 bool ZEPlane::IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, ZELine & Line)
 {
-	ZEVector3::CrossProduct(Line.v,Plane1.n,Plane2.n);
+	ZEVector3::CrossProduct(Line.v, Plane1.n, Plane2.n);
 	if (Line.v.x == 0 && Line.v.y == 0 && Line.v.z == 0) 
 		return false;
 
 	ZEVector3 temp;
-	ZEVector3::CrossProduct(temp,Line.v,Plane2.n);
+	ZEVector3::CrossProduct(temp,Line.v, Plane2.n);
 
-	float dots = ZEVector3::DotProduct(Plane1.p,Plane1.n) - ZEVector3::DotProduct(Plane2.p,Plane1.n);
+	float dots = ZEVector3::DotProduct(Plane1.p, Plane1.n) - ZEVector3::DotProduct(Plane2.p,Plane1.n);
 	dots = dots / ZEVector3::DotProduct(temp,Plane1.n);
 
 	ZEVector3::Scale(Line.p,temp,dots);
@@ -130,7 +129,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, Z
 	return true;
 }
 
-ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane& Plane, const ZEVector3& Point)
+ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane Plane, const ZEVector3 Point)
 {
 	ZEVector3 Temp;
 	ZEVector3::Sub(Temp, Point, Plane.p);
@@ -169,7 +168,7 @@ void ZEPlane::Create(ZEPlane& Plane,const ZEVector3 &P1,const ZEVector3 &P2,cons
 	ZEVector3 Sub1,Sub2;
 	ZEVector3::Sub(Sub1,P2,P1);
 	ZEVector3::Sub(Sub2,P3,P1);
-	ZEVector3::CrossProduct(Plane.n,Sub1,Sub2);
+	ZEVector3::CrossProduct(Plane.n, Sub1, Sub2);
 	Plane.p = P3;
 }
 
@@ -180,4 +179,5 @@ ZEPlane::ZEPlane(const ZEVector3& n, const ZEVector3& p)
 
 ZEPlane::ZEPlane()
 {
+
 }

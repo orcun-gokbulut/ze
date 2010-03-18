@@ -42,16 +42,15 @@
 #else
 	#define _MATRIX_STATIC_ static
 #endif
+
 class ZEVector2;
 class ZEVector3;
 class ZEVector4;
 class ZEQuaternion;
 
 
+// ZEMatrix3x3
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3 //
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 class ZEMatrix3x3
 {
 	public:
@@ -69,10 +68,10 @@ class ZEMatrix3x3
 
 		static const ZEMatrix3x3		Zero;
 		static const ZEMatrix3x3		Identity;
-
+		
 		static void						Create(ZEMatrix3x3& Matrix, float M11, float M12, float M13,
-																	 float M21, float M22, float M23,
-																	 float M31, float M32, float M33);
+											   float M21, float M22, float M23,
+											   float M31, float M32, float M33);
 		static void						Create(ZEMatrix3x3& Matrix, float* M);
 		static void						CreateRotation(ZEMatrix3x3& Matrix, const ZEQuaternion& Rotation);
 		static void						CreateRotationX(ZEMatrix3x3& Matrix, float Pitch);
@@ -88,12 +87,13 @@ class ZEMatrix3x3
 		static void						Multiply(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
 		static void						Scale(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, float s);
 		static void						Transpose(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix);
+		static void						Determinant(float &det, const ZEMatrix3x3 &Matrix);
 		static bool						Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix);
 
 		static void						Transform(ZEVector2& Out, const ZEMatrix3x3 &Matrix, const ZEVector2& Vector); // Doldur metin doldur acıma doldur
 		static void						Transform(ZEVector3& Out, const ZEMatrix3x3 &Matrix, const ZEVector3& Vector);
 		static void						Transform(ZEVector4& Out, const ZEMatrix3x3 &Matrix, const ZEVector4& Vector); // Doldur metin doldur
-
+				   						
 		ZEMatrix3x3						operator+(const ZEMatrix3x3 &RightOperand) const;
 		ZEMatrix3x3						operator-(const ZEMatrix3x3 &RightOperand) const;
 		ZEMatrix3x3						operator*(const ZEMatrix3x3 &RightOperand) const;
@@ -106,19 +106,21 @@ class ZEMatrix3x3
 
 		bool							operator == (const ZEMatrix3x3 &M) const;
 		bool							operator != (const ZEMatrix3x3 &M) const;
+		
+		float&							operator[](size_t Index); 		
+		float							operator[](size_t Index) const;
 
 										ZEMatrix3x3(float M11, float M12, float M13,
-													 float M21, float M22, float M23,
-													 float M31, float M32, float M33);
+													float M21, float M22, float M23,
+													float M31, float M32, float M33);
 										ZEMatrix3x3(float* M);
 										ZEMatrix3x3();
 };
 
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4 //
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// ZEMatrix4x4
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEMatrix4x4
 {
 	public:
@@ -139,9 +141,9 @@ class ZEMatrix4x4
 		static const ZEMatrix4x4		Identity;
 
 		static void						Create(ZEMatrix4x4& Matrix, float M11, float M12, float M13, float M14,
-																	float M21, float M22, float M23, float M24,
-																	float M31, float M32, float M33, float M34,
-																	float M41, float M42, float M43, float M44);
+											   float M21, float M22, float M23, float M24,
+											   float M31, float M32, float M33, float M34,
+											   float M41, float M42, float M43, float M44);
 		static void						Create(ZEMatrix4x4& Matrix, float* M);
 		static void						CreateRotationX(ZEMatrix4x4& Matrix, float Pitch);
 		static void						CreateRotationY(ZEMatrix4x4& Matrix, float Yawn);
@@ -158,7 +160,7 @@ class ZEMatrix4x4
 		static void						CreateZero(ZEMatrix4x4& Matrix);
 		static void						CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width, float Height, float NearZ, float FarZ);
 		static void						CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ);
-		static void						CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Top, float Bottom, float NearZ, float FarZ);
+		static void						CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ);
 
 		static void						Add(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
 		static void						Sub(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
@@ -166,6 +168,7 @@ class ZEMatrix4x4
 		static void						Scale(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, float s);
 		static void						Transpose(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix);
 		static bool						Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix);
+		static void						Determinant(float &det,const ZEMatrix4x4 &Matrix);
 
 		static void						Transform(ZEVector3 &Out, const ZEMatrix4x4 &Matrix, const ZEVector3& Vector);
 		static void						Transform3x3(ZEVector3 &Out, const ZEMatrix4x4 &Matrix, const ZEVector3& Vector);
@@ -184,6 +187,8 @@ class ZEMatrix4x4
 		bool							operator == (const ZEMatrix4x4 &M) const;
 		bool							operator != (const ZEMatrix4x4 &M) const;
 		
+		float&							operator[](size_t Index); 
+		float							operator[](size_t Index) const;
 
 										ZEMatrix4x4(float M11, float M12, float M13, float M14,
 													float M21, float M22, float M23, float M24,

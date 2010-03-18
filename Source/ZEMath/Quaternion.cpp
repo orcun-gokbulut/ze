@@ -33,7 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "quaternion.h"
+#include "Quaternion.h"
+#include "Definitions.h"
 #include <math.h>
 
 const ZEQuaternion ZEQuaternion::Zero = ZEQuaternion(0.0f, 0.0f, 0.0f, 0.0f);
@@ -51,10 +52,11 @@ void ZEQuaternion::Create(ZEQuaternion& Output, float w, float x, float y, float
 void ZEQuaternion::Create(ZEQuaternion& Output, float Angle, const ZEVector3& Axis)
 {
 	float SinAngle = sinf(Angle/2);
+	Output.w = cos(Angle/2);
 	Output.x = Axis.x * SinAngle;
 	Output.y = Axis.y * SinAngle;
 	Output.z = Axis.z * SinAngle;
-	Output.w = cos(Angle/2);
+	
 }
 
 void ZEQuaternion::Create(ZEQuaternion& Output, float Pitch, float Yawn, float Roll)
@@ -87,7 +89,7 @@ void ZEQuaternion::Create(ZEQuaternion& Output, const ZEVector3& Direction, cons
 		 0.0f, 0.0f, 0.0f, 1.0f); */
 
 	 Output.w = sqrtf(1.0f + Right.x + NewUp.y + Direction.z) / 2.0f;
-	 float Scale = Output.w * 4.0;
+	 float Scale = Output.w * 4.0f;
 
 /*	 qrot.X = (mBasis.M32 - mBasis.M23) / Scale;
 	 qrot.Y = (mBasis.M13 - mBasis.M31) / Scale;
@@ -128,11 +130,12 @@ void ZEQuaternion::VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaterni
 	Output.z = Vect.z;
 }
 
-void ZEQuaternion::ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, const ZEQuaternion& Quaternion)
+void ZEQuaternion::ConvertToEulerAngles(float &Yaw, float &Pitch, float &Roll, const ZEQuaternion& Quaternion)
 {
 	float test = Quaternion.x * Quaternion.y + Quaternion.z * Quaternion.w;
 	if (test > 0.499) 
-	{ // singularity at north pole
+	{ 
+		// singularity at north pole
 		Yaw = 2 * atan2(Quaternion.x, Quaternion.w);
 		Pitch = ZE_PI_2;
 		Roll = 0;
@@ -140,7 +143,8 @@ void ZEQuaternion::ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, c
 	}	
 
 	if (test < -0.499) 
-	{ // singularity at south pole
+	{ 
+		// singularity at south pole
 		Yaw = -2 * atan2(Quaternion.x, Quaternion.w);
 		Pitch = - ZE_PI_2;
 		Roll = 0;
@@ -173,63 +177,62 @@ void ZEQuaternion::Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternio
 
 void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor)
 {
-	float CosHalfTheta = A.w * B.w + A.x * B.x + A.y * B.y + A.z * B.z;
+	float CosOmega = A.w * B.w + A.x * B.x + A.y * B.y + A.z * B.z;
 
-	if (fabs(CosHalfTheta) >= 1.0)
+	//***30.12.2009 tarihli ekleme***//
+	ZEQuaternion BTemp;
+	if(CosOmega < 0.0f)             
+	{                                
+		BTemp.w = B.w * (-1.0f);                    
+		BTemp.x = B.x * (-1.0f);                    
+		BTemp.y = B.y * (-1.0f);                    
+		BTemp.z = B.z * (-1.0f);                    
+		CosOmega = CosOmega * (-1.0f);         
+	}
+	else
+		BTemp = B;
+	
+	float RatioA;
+	float RatioB;
+
+	if (fabs(CosOmega) > 0.9999f)  
 	{
-		Output.w = A.w;
-		Output.x = A.x;
-		Output.y = A.y;
-		Output.z = A.z;
+		RatioA = 1.0f - Factor;
+		RatioB = Factor;
 	}
 	else
 	{
-		float HalfTheta = acos(CosHalfTheta);
-		float SinHalfTheta = sqrt(1.0f - CosHalfTheta * CosHalfTheta);
+		// Compute the sin of the angle using the
+		// trig identity sin^2(omega) + cos^2(omega) = 1
+		float CosOmeag2 = CosOmega * CosOmega;
+		float b = 1.0f - CosOmeag2 ;
+		float SinOmega = sqrt(b);
 
-		if (fabs(SinHalfTheta) < 0.001)
-		{ 
-			Output.w = (A.w * 0.5f + B.w * 0.5f);
-			Output.x = (A.x * 0.5f + B.x * 0.5f);
-			Output.y = (A.y * 0.5f + B.y * 0.5f);
-			Output.z = (A.z * 0.5f + B.z * 0.5f);
-		}
-		else
-		{
-			float RatioA = sin((1.0f - Factor) * HalfTheta) / SinHalfTheta;
-			float RatioB = sin(Factor * HalfTheta) / SinHalfTheta; 
+		// Compute the angle from its sin and cosine
+		float Omega = atan2(SinOmega, CosOmega);
 
-			Output.w = (A.w * RatioA + B.w * RatioB);
-			Output.x = (A.x * RatioA + B.x * RatioB);
-			Output.y = (A.y * RatioA + B.y * RatioB);
-			Output.z = (A.z * RatioA + B.z * RatioB);
-		}
+		// Compute inverse of denominator, so we only have
+		// to divide once
+		float OneOverSinOmega = 1.0f / SinOmega;
+
+		// Compute interpolation parameters
+		float a = 1.0f - Factor;
+		float c = a * Omega;
+		float d = Factor * Omega;
+
+		RatioA = sin(c) * OneOverSinOmega;
+		RatioB = sin(d) * OneOverSinOmega;
 	}
+
+	// Interpolate
+	Output.w = (A.w * RatioA + BTemp.w * RatioB);
+	Output.x = (A.x * RatioA + BTemp.x * RatioB);
+	Output.y = (A.y * RatioA + BTemp.y * RatioB);
+	Output.z = (A.z * RatioA + BTemp.z * RatioB);
 }
 
 void ZEQuaternion::ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaternion& Quaternion)
 {
-	/*
-	Output.M11 = 1.0f	-	2.0f * Quaternion.y * Quaternion.y	-	2.0f * Quaternion.z * Quaternion.z;
-	Output.M12 =			2.0f * Quaternion.x * Quaternion.y	-	2.0f * Quaternion.w * Quaternion.z;
-	Output.M13 =			2.0f * Quaternion.x * Quaternion.z	+	2.0f * Quaternion.w * Quaternion.y;
-	Output.M14 = 0.0f;
-
-	Output.M21 =			2.0f * Quaternion.x * Quaternion.y	+	2.0f * Quaternion.w * Quaternion.z;
-	Output.M22 = 1.0f	-	2.0f * Quaternion.x * Quaternion.x	-	2.0f * Quaternion.z * Quaternion.z;
-	Output.M23 =			2.0f * Quaternion.y * Quaternion.z	-	2.0f * Quaternion.w * Quaternion.x;
-	Output.M24 = 0.0f;
-
-	Output.M31 =			2.0f * Quaternion.x * Quaternion.z	-	2.0f * Quaternion.w * Quaternion.y;
-	Output.M32 =			2.0f * Quaternion.y * Quaternion.z	+	2.0f * Quaternion.w * Quaternion.x;
-	Output.M33 = 1.0f	-	2.0f * Quaternion.x * Quaternion.x	-	2.0f * Quaternion.y * Quaternion.y;
-	Output.M34 = 0.0f;
-
-	Output.M41 = 0.0f;
-	Output.M42 = 0.0f;
-	Output.M43 = 0.0f;
-	Output.M44 = 1.0f;
-*/
 	Output.M11 = 1.0f	-	2.0f * Quaternion.y * Quaternion.y	-	2.0f * Quaternion.z * Quaternion.z;
 	Output.M21 =			2.0f * Quaternion.x * Quaternion.y	-	2.0f * Quaternion.w * Quaternion.z;
 	Output.M31 =			2.0f * Quaternion.x * Quaternion.z	+	2.0f * Quaternion.w * Quaternion.y;
@@ -281,7 +284,7 @@ ZEQuaternion ZEQuaternion::operator*(const ZEQuaternion& Other) const
 ZEQuaternion& ZEQuaternion::operator*=(const ZEQuaternion& Other)
 {
 	ZEQuaternion Temp;
-	Product(Temp, *this, Other);
+	Product(Temp, *this, Temp);
 	*this = Temp;
 	return *this;
 }
@@ -291,6 +294,32 @@ ZEVector3 ZEQuaternion::operator*(const ZEVector3& Vector) const
 	ZEVector3 Temp;
 	VectorProduct(Temp, *this, Vector);
 	return Temp;
+}
+
+bool ZEQuaternion::operator==(const ZEQuaternion& RightOperand) const
+{
+	return ((fabs(this->x - RightOperand.x) < ZE_ZEROTRESHOLD) && 
+		(fabs(this->y - RightOperand.y) < ZE_ZEROTRESHOLD) &&
+		(fabs(this->z - RightOperand.z) < ZE_ZEROTRESHOLD) &&
+		(fabs(this->w - RightOperand.w) < ZE_ZEROTRESHOLD));
+}
+
+bool ZEQuaternion::operator!=(const ZEQuaternion& RightOperand) const
+{
+	return ((fabs(this->x - RightOperand.x) > ZE_ZEROTRESHOLD) || 
+			(fabs(this->y - RightOperand.y) > ZE_ZEROTRESHOLD) ||
+			(fabs(this->z - RightOperand.z) > ZE_ZEROTRESHOLD) ||
+			(fabs(this->w - RightOperand.w) > ZE_ZEROTRESHOLD));
+}
+
+float ZEQuaternion::operator[](size_t Index) const
+{
+	return M[Index];
+}
+
+float& ZEQuaternion::operator[](size_t Index)
+{
+	return M[Index];
 }
 
 ZEQuaternion::ZEQuaternion(float w, float x, float y, float z)

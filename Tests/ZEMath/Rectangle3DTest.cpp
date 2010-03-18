@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - OBoundingBox.h
+ Zinek Engine - Rectangle3DTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATH_BOUNDINGVOLUME_H__
-#define __ZE_MATH_BOUNDINGVOLUME_H__
-#include "Vector.h"
-#include "Matrix.h"
-#include "Plane.h"
+#include "UnitTest/UnitTest++.h"
+#include "../IOStreamMapping.h"
+#include "ZEMath/Rectangle3D.h"
+#include "ZEMath/Vector.h"
+#include "ZEmath/Plane.h"
+#include <math.h>
 
-class ZEBoundingSphere;
-class ZEAABoundingBox;
-class ZEOBoundingBox
+
+SUITE(Rectangle3D)
 {
-	public:
-		ZEVector3				Position;
-		ZEVector3				U, V, N;
+	TEST(RECT3D_Constructor)
+	{
+		ZEPoint3 A(1.0f, 2.0f, 3.0f);
+		ZEPoint3 B(4.0f, 5.0f, 6.0f);
+		ZEPoint3 C(7.0f, 8.0f, 9.0f);
+		ZEPoint3 D(10.0f, 11.0f, 12.0f);
+		
+		ZERectangle3D R(A, B, C, D);
 
-		ZEVector3				GetCenter()	const;
-		ZEVector3				GetVertex(unsigned char Index) const;
+		CHECK_EQUAL(R.P1, A);
+		CHECK_EQUAL(R.P2, B);
+		CHECK_EQUAL(R.P3, C);
+		CHECK_EQUAL(R.P4, D);
+	}
 
-		static ZEHalfSpace		PlaneHalfSpaceTest(const ZEOBoundingBox& BoundingBox, const ZEPlane& Plane);
+	TEST(RECT3D_GetPlane)
+	{
+		ZEPoint3 A(1.0f, 4.0f, 6.0f);
+		ZEPoint3 B(3.0f, 4.0f, 6.0f);
+		ZEPoint3 C(1.0f, 2.0f, 6.0f);
+		ZEPoint3 D(3.0f, 2.0f, 6.0f);
+		
+		ZERectangle3D R(A, B, C, D);
 
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZEVector3 Point);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment);
+		ZEPlane P ;
+		R.GetPlane(P);
 
-								ZEOBoundingBox();
-								ZEOBoundingBox(const ZEVector3 Position, const ZEVector3 U, const ZEVector3 V,const ZEVector3 N);
-};
-#endif
+		CHECK_EQUAL(P.n , ZEVector3(0.0f, 0.0f, -4.0f));
+		CHECK_EQUAL(P.p , ZEPoint3(1.0f, 2.0f, 6.0f));
+	}
+
+	TEST(RECT3D_GetPoint)
+	{
+		ZEPoint3 A(1.0f, 4.0f, 6.0f);
+		ZEPoint3 B(3.0f, 4.0f, 6.0f);
+		ZEPoint3 C(1.0f, 2.0f, 6.0f);
+		ZEPoint3 D(3.0f, 2.0f, 6.0f);
+		
+		ZERectangle3D R(A, B, C, D);
+
+		ZEPoint3 P1 = R.GetPoint(0);
+		ZEPoint3 P2 = R.GetPoint(1);
+		ZEPoint3 P3 = R.GetPoint(2);
+		ZEPoint3 P4 = R.GetPoint(3);
+
+		CHECK_EQUAL(A, P1);
+		CHECK_EQUAL(B, P2);
+		CHECK_EQUAL(C, P3);
+		CHECK_EQUAL(D, P4);
+	}
+}

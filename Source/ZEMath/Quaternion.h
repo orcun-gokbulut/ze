@@ -37,21 +37,27 @@
 #ifndef	__ZE_MATH_QUATERNION_H__
 #define __ZE_MATH_QUATERNION_H__
 
-#include "Definitions.h"
-#include "Vector.h"
-#include "Matrix.h"
+#include "definitions.h"
+#include "vector.h"
+#include "matrix.h"
 
 #define MapQuaternion(A, B)	(A).x = (B).x; (A).y = (B).y; (A).z = (B).z; (A).w = (B).w 
 #define MapQuarternionToWXYZ(Q, _w, _x, _y, _z) (Q).w = (_w); (Q).x = (_x); (Q).y = (_y); (Q).z = (_z)
 
-class ZEQuaternionEx;
 class ZEQuaternion
 {
 	public:
 		static const ZEQuaternion		Zero;
 		static const ZEQuaternion		Identity;
 
-		float							w, x, y, z;
+		union
+		{
+			struct
+			{
+				float	w, x, y, z;
+			};
+			float		M[4];
+		};
 
 		static void						Create(ZEQuaternion& Output, float w, float x, float y, float z);
 		static void						Create(ZEQuaternion& Output, float Angle, const ZEVector3& Axis);
@@ -71,12 +77,18 @@ class ZEQuaternion
 		static void						Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
 
 		static void						ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaternion& Quaternion);
-		static void						ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, const ZEQuaternion& Quaternion);
+		static void						ConvertToEulerAngles(float &Yaw, float &Pitch, float &Roll, const ZEQuaternion& Quaternion);
 		static void						ConvertToLookAndUp(ZEVector3& Look, ZEVector3& Up, const ZEQuaternion& Quaternion);
 
 		ZEVector3						operator*(const ZEVector3& Vector) const;
 		ZEQuaternion					operator*(const ZEQuaternion& Other) const;
 		ZEQuaternion&					operator*=(const ZEQuaternion& Other);
+
+		bool							operator==(const ZEQuaternion& RightOperand) const;
+		bool							operator!=(const ZEQuaternion& RightOperand) const;
+
+		float							operator[](size_t Index) const;
+		float&							operator[](size_t Index);
 
 										ZEQuaternion(float w, float x, float y, float z);
 										ZEQuaternion(float Angle, const ZEVector3& Axis);

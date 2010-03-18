@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Rectangle3D.h"
-#include "Core/Error.h"
+//#include "Core/Error.h"
 
 void ZERectangle3D::GetPlane(ZEPlane & Plane) const
 {

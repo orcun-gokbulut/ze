@@ -185,7 +185,7 @@ void ZEPlayer::Initialize()
 	Yawn = Pitch = Roll = 0;
 
 	Camera.SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Camera.SetLocalRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
+	Camera.SetLocalRotation(ZEQuaternion::Identity);
 	Camera.SetNearZ(zeGraphics->GetNearZ());
 	Camera.SetFarZ(zeGraphics->GetFarZ());
 	Camera.SetFOV(FOV);

@@ -45,7 +45,7 @@ inline void ZELineSegment::Create(ZELine& Line, const ZEVector3& Start, const ZE
 	Line.p = Start;
 }
 
-inline void ZELineSegment::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p)
+void ZELineSegment::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p)
 {
 	Line.v = v;
 	Line.p = p;
@@ -72,6 +72,7 @@ void ZELineSegment::GetSegmentEndPoint(ZEVector3& EndPoint) const
 }
 		
 float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegmentA, const ZELineSegment& LineSegmentB, float& tA, float &tB)
+
 {
 	ZEVector3 w(LineSegmentA.p, LineSegmentB.p);
 	float    a = ZEVector3::DotProduct(LineSegmentA.v, LineSegmentA.v);
@@ -183,7 +184,7 @@ ZELineSegment::ZELineSegment(const ZEVector3& Start, const ZEVector3& End)
 {
 	Create(*this, Start, End);
 }
-
 ZELineSegment::ZELineSegment()
 {
+
 }

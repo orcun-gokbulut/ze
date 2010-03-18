@@ -393,7 +393,7 @@ ZEEntity::ZEEntity()
 	DrawFlags = ZE_DF_AUTO;
 	BoundingVolumeMechanism = ZE_BVM_USELOCALONLY;
 	Position = ZEVector3(0.0f, 0.0f, 0.0f);
-	Rotation = ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f);
+	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3(1.0f, 1.0f ,1.0f);
 	Enabled = true;
 	UpdateBoundingBox = true;

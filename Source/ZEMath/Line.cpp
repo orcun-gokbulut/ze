@@ -39,7 +39,7 @@
 #include "Plane.h"
 #include <d3dx9.h>
 
-void ZELine::Create(ZELine& Line, const ZEVector3& P0, const ZEVector3& P1)
+inline void ZELine::Create(ZELine& Line, const ZEVector3& P0, const ZEVector3& P1)
 {
 	ZEVector3::Sub(Line.v, P1, P0);
 	Line.p = P0;
@@ -52,27 +52,29 @@ void ZELine::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3&
 	Line.p = p;
 }
 
-float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& tA, float &tB)
+float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB)
 {
+	float tA; 
+	float tB;
 	ZEVector3 w(LineA.p, LineB.p);
 	float    a = ZEVector3::DotProduct(LineA.v, LineA.v);
     float    b = ZEVector3::DotProduct(LineA.v, LineB.v);
     float    c = ZEVector3::DotProduct(LineB.v, LineB.v);
     float    d = ZEVector3::DotProduct(LineA.v, w);
     float    e = ZEVector3::DotProduct(LineB.v, w);
-    float    D = a*c - b*b;
-
-	if (D < ZE_ZEROTRESHOLD) 
+    float    det = a*c - b*b;
+	if (det<ZE_ZEROTRESHOLD) //Parallel
 	{
         tA = 0.0;
         tB = (b>c ? d/b : e/c);
-    }
-    else 
-	{
-        tA = (b*e - c*d) / D;
-        tB = (a*e - b*d) / D;
-    }
 
+    }
+    else //Non-Parallel
+	{
+		
+		tA = (b*e - c*d) / det;
+        tB = (a*e - b*d) / det; 
+	}
 	ZEVector3 P1, P2;
 	ZEVector3::Scale(P1, LineA.v, tA);
 	ZEVector3::Add(P1, P1, w);
@@ -80,6 +82,36 @@ float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& t
 	ZEVector3::Sub(w, P1, P2);
 	return ZEVector3::Length(w);
 }
+float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB,float &tA,float &tB)
+{
+	ZEVector3 w(LineA.p, LineB.p);
+	float    a = ZEVector3::DotProduct(LineA.v, LineA.v);
+    float    b = ZEVector3::DotProduct(LineA.v, LineB.v);
+    float    c = ZEVector3::DotProduct(LineB.v, LineB.v);
+    float    d = ZEVector3::DotProduct(LineA.v, w);
+    float    e = ZEVector3::DotProduct(LineB.v, w);
+    float    det = a*c - b*b;
+	if (det<ZE_ZEROTRESHOLD) //Parallel
+	{
+        tA = 0.0;
+        tB = (b>c ? d/b : e/c);
+
+    }
+    else //Non-Parallel
+	{
+		
+		tA = (b*e - c*d) / det;
+        tB = (a*e - b*d) / det; 
+	}
+	ZEVector3 P1, P2;
+	ZEVector3::Scale(P1, LineA.v, tA);
+	ZEVector3::Add(P1, P1, w);
+	ZEVector3::Scale(P2, LineB.v, tB);
+	ZEVector3::Sub(w, P1, P2);
+	return ZEVector3::Length(w);
+}
+
+
 
 float ZELine::DistanceToPoint(const ZELine& Line, const ZEVector3& Point, float &t)
 {
@@ -101,10 +133,10 @@ void ZELine::GetPointOn(ZEVector3& Point, float t) const
 
 ZELine::ZELine()
 {
+
 }
 
-ZELine::ZELine(const ZEVector3& v, const ZEVector3& p)
+ZELine::ZELine(const ZEVector3& P0, const ZEVector3& P1)
 {
-	this->v = v;
-	this->p = p;
+	Create(*this, P0, P1);
 }

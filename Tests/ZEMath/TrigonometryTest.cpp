@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - OBoundingBox.h
+ Zinek Engine - TrigonometryTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATH_BOUNDINGVOLUME_H__
-#define __ZE_MATH_BOUNDINGVOLUME_H__
-#include "Vector.h"
-#include "Matrix.h"
-#include "Plane.h"
+#include <UnitTest/UnitTest++.h>
+#include <math.h>
+#include "../IOStreamMapping.h"
+#include "ZEMath/Trigonometry.h"
+#include "ZEMath/Definitions.h"
 
-class ZEBoundingSphere;
-class ZEAABoundingBox;
-class ZEOBoundingBox
+SUITE(ZETrigonometry)
 {
-	public:
-		ZEVector3				Position;
-		ZEVector3				U, V, N;
+	TEST(FastSin)
+	{
+		CHECK_EQUAL(FastSin(360), 0);
 
-		ZEVector3				GetCenter()	const;
-		ZEVector3				GetVertex(unsigned char Index) const;
-
-		static ZEHalfSpace		PlaneHalfSpaceTest(const ZEOBoundingBox& BoundingBox, const ZEPlane& Plane);
-
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZEVector3 Point);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment);
-
-								ZEOBoundingBox();
-								ZEOBoundingBox(const ZEVector3 Position, const ZEVector3 U, const ZEVector3 V,const ZEVector3 N);
-};
-#endif
+	}
+	TEST(FastCos)
+	{
+		CHECK_EQUAL(FastCos(360), 1);
+	}
+	TEST(FastTan)
+	{
+		CHECK_EQUAL(FastTan(360), 0);
+	}
+}

@@ -63,7 +63,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 	{
 		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
 		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
-		Player->SetRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
 		Scene->SetActiveCamera(Player->GetCamera());
@@ -81,13 +81,13 @@ bool ZEPhysicsDebugComponent::Initialize()
 		PhysicalRigidBody->SetMass(10.0f);
 		PhysicalRigidBody->SetKinematic(false);
 		PhysicalRigidBody->SetGravityEnabled(true);
-		PhysicalRigidBody->SetLinearDamping(0.01f);
+		//PhysicalRigidBody->SetLinearDamping(0.01f);
 		World->AddPhysicalObject(PhysicalRigidBody);
 		PhysicalRigidBody->ApplyForce(ZEVector3(1000.0f, 0.0f, 0.0f));
 
 		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
 		CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
-		CanvasBrush->SetScale(ZEVector3::One);
+		CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
 		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 		CanvasBrush->Canvas.LoadCanvasFile("Test\\test.zeCanvas");
 		CanvasBrush->UpdateCanvas();
@@ -130,6 +130,8 @@ bool ZEPhysicsDebugComponent::Initialize()
 		ZEPhysicalStaticMesh* PhysicalMesh = ZEPhysicalStaticMesh::CreateInstance();
 		PhysicalMesh->SetPosition(CanvasBrush->GetPosition());
 		PhysicalMesh->SetRotation(CanvasBrush->GetRotation());
+		PhysicalMesh->SetScale(CanvasBrush->GetScale());
+
 		PhysicalMesh->SetData(PhysicalVertices.GetConstCArray(), PhysicalVertices.GetCount(),
 			PhysicalTriangles.GetConstCArray(), PhysicalTriangles.GetCount(),
 			NULL, 0);
@@ -139,6 +141,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 		//zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
 		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);
+		World->SetEnabled(true);
 	}
 
 	return true;
@@ -166,7 +169,14 @@ void ZEPhysicsDebugComponent::Process(float ElapsedTime)
 	TotalTime += ElapsedTime;
 	if (TotalTime > 1.0f)
 	{
-		zeLog("Test", "Physical Body Position : [%f, %f, %f]", PhysicalRigidBody->GetPosition().x, PhysicalRigidBody->GetPosition().y, PhysicalRigidBody->GetPosition().z);
+		float Pitch, Yaw, Roll;
+		ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, PhysicalRigidBody->GetRotation());
+		zeLog("Physical Body", "Position: [%f, %f, %f], Orientation: [%f, %f, %f], Velocity: [%f, %f, %f]", PhysicalRigidBody->GetPosition().x, 
+			PhysicalRigidBody->GetPosition().y, PhysicalRigidBody->GetPosition().z, 
+			Pitch, Yaw, Roll, 
+			PhysicalRigidBody->GetLinearVelocity().x,
+			PhysicalRigidBody->GetLinearVelocity().y,
+			PhysicalRigidBody->GetLinearVelocity().z);
 		TotalTime = 0.0f;
 	}
 }

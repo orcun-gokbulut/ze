@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Rectangle.h"
-#include "Core/Error.h"
+//#include "Core/Error.h"
 
 bool ZERectangle::IsEmpty()
 {
@@ -53,8 +53,9 @@ ZEVector2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
 			return ZEVector2(LeftUp.x, LeftUp.y);
 		case ZE_RC_RIGHTUP:
 			return ZEVector2(RightDown.x, LeftUp.y);
-		/*default:
-			zeAssert(true, "Wrong enum value ZERectangleCorner. Value : %d", Corner);*/
+		default:
+			//ZEASSERT(true, "Wrong enum value ZERectangleCorner. Value : %d", Corner);
+			break;
 	}
 }
 
@@ -77,12 +78,7 @@ void ZERectangle::SetWidth(float Width)
 
 float ZERectangle::GetWidth() const
 {
-	return LeftUp.x - RightDown.x;
-}
-
-void ZERectangle::SetHeight(float Height)
-{
-	RightDown.y = LeftUp.y + Height;
+	return RightDown.x - LeftUp.x;
 }
 
 float ZERectangle::GetHeight() const
@@ -137,5 +133,5 @@ ZERectangle::ZERectangle(const ZEVector2& UpLeft, float Width, float Height)
 {
 	this->LeftUp = UpLeft;
 	this->RightDown.x = UpLeft.x + Width;
-	this->RightDown.y = UpLeft.y + Height;
+	this->RightDown.y = UpLeft.y - Height;
 }

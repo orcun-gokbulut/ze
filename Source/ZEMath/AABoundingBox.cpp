@@ -254,14 +254,14 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 				tMaxT = TempT;
 			}
 
-			if (tMinT > MaxT || MinT > tMaxT)
-				return false;
-
 			if (MinT < tMinT)
 				MinT = tMinT;
 
 			if (MaxT > tMaxT)
 				MaxT = tMaxT;
+
+			if (MaxT > MinT)
+				return false;
 		}
 		else
 		{
@@ -281,7 +281,7 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 
 	if (Line.v.z == 0)
 	{
-		if (Line.p.z < BoundingBox.Min.z || Line.p.z > BoundingBox.Max.z)
+		if (Line.p.y < BoundingBox.Min.y || Line.p.y > BoundingBox.Max.y)
 			return false;
 
 		if (TValid == false)
@@ -314,7 +314,7 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 			if (MaxT > tMaxT)
 				MaxT = tMaxT;
 
-			if (tMinT > MaxT || MinT > tMaxT)
+			if (MaxT > MinT)
 				return false;
 			else
 				return true;
@@ -377,7 +377,7 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 
 bool ZEAABoundingBox::CollisionTest(const ZEAABoundingBox& BoundingBox1, const ZEOBoundingBox& BoundingBox2)
 {
-//	zeAssert(true "Not implamented");
+//	ZEASSERT(true "Not implamented");
 	return false;	
 }
 

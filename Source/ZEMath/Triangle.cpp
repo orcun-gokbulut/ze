@@ -148,6 +148,7 @@ bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZEPlane & Pl
 
 ZETriangle::ZETriangle()
 {
+	
 }
 
 ZETriangle::ZETriangle(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2)

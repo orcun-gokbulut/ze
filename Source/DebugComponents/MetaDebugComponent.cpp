@@ -56,7 +56,7 @@ bool ZEMetaDebugComponent::Initialize()
 	{
 		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
 		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
-		Player->SetRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
 		Scene->SetActiveCamera(Player->GetCamera());
@@ -71,7 +71,7 @@ bool ZEMetaDebugComponent::Initialize()
 		Light->SetPosition(ZEVector3(0.0f, 45.0f, 0.0f));
 		Light->SetScale(ZEVector3::One);
 		Light->GetLight()->SetRange(150);
-		Light->SetRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		Light->SetRotation(ZEQuaternion::Identity);
 		Light->GetLight()->SetColor(ZEVector3::One);
 		Light->GetLight()->SetAttenuation(0.001f, 0.0f, 2.0f);
 		Light->GetLight()->SetIntensity(5.0f);

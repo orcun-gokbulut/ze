@@ -154,7 +154,7 @@ void ZEPortalMap::RenderPortal(ZEMapPortal* Portal, ZERenderer* Renderer, const 
 	if (ViewVolume.CullTest(Portal->BoundingBox))
 	{
 		ZEMatrix4x4::CreateOrientation(PortalBBoxRenderOrder.WorldMatrix, Portal->BoundingBox.GetCenter(), 
-			ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 
+			ZEQuaternion::Identity, 
 			ZEVector3(Portal->BoundingBox.Max.x - Portal->BoundingBox.Min.x, 
 				Portal->BoundingBox.Max.y - Portal->BoundingBox.Min.y, 
 				Portal->BoundingBox.Max.z - Portal->BoundingBox.Min.z)

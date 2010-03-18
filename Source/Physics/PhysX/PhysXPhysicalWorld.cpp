@@ -55,7 +55,7 @@ ZEPhysXPhysicalWorld::ZEPhysXPhysicalWorld()
 	Scene = NULL;
 	SceneDesc.userData = this;
 	SceneDesc.gravity = NxVec3(0.0f, -9.8f, 0.0f);
-	SceneDesc.groundPlane = true;
+	SceneDesc.groundPlane = false;
 	SceneDesc.simType = NX_SIMULATION_SW;
 	SceneDesc.upAxis = 1;
 	DebugDraw.Material = NULL;
@@ -207,7 +207,7 @@ bool ZEPhysXPhysicalWorld::GetVisualize()
 	return Visualize;
 }
 
-void ZEPhysXPhysicalWorld::SetEnabled()
+void ZEPhysXPhysicalWorld::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
 }

@@ -39,17 +39,22 @@
 #include "ZEMath/Vector.h"
 #include "ZEMath/Quaternion.h"
 #include "ZEMath/Matrix.h"
+#include "ZEMath/Line.h"
 
 #define MATHLIB_FLOATTRESHOLD 0.00001f
 
 void PrintVector(float x, float y, float z)
 {
-	printf("V[%lf %lf, %lf]", x, y, z);
+	printf("V[%lf %lf %lf]", x, y, z);
 }
 
 void PrintVector(const ZEVector3& Vect)
 {
-	printf("V[%lf %lf, %lf]", Vect.x, Vect.y, Vect.z);
+	printf("V[%lf %lf %lf]", Vect.x, Vect.y, Vect.z);
+}
+void PrintPoint(const ZEVector3& Vect)
+{
+	printf("P[%lf %lf %lf]", Vect.x, Vect.y, Vect.z);
 }
 
 void PrintMatrix(const ZEMatrix4x4& Matrix)
@@ -84,7 +89,15 @@ void PrintQuaternion(float w, float x, float y, float z)
 {
 	printf("Q[%lf %lf %lf, %lf]", w, x, y, z);
 }
+void PrintLine(const ZELine& Line)
+{
+	printf("L...L(t)= ");
+	PrintPoint(Line.p);
+	printf(" + ");
+	PrintVector(Line.v);
+	printf("*t");
 
+}//Not Implemented.
 bool CheckVector(const ZEVector3& Vect, float x, float y, float z)
 {
 	if (fabs(Vect.x - x) < MATHLIB_FLOATTRESHOLD)
@@ -117,6 +130,40 @@ bool CheckVector(const ZEVector3& Vect, const D3DXVECTOR3& RefVect)
 	
 	printf("FAILED !!!\n  Referance : V[%lf %lf %lf]\n  Output    : ", RefVect.x, RefVect.y, RefVect.z);
 	PrintVector(Vect);
+	printf("\n");
+	return false;
+}
+bool CheckVector(const ZEVector3& Vect, const ZEVector3& RefVect)
+{
+	if (fabs(Vect.x - RefVect.x) < MATHLIB_FLOATTRESHOLD)
+		if (fabs(Vect.y - RefVect.y) < MATHLIB_FLOATTRESHOLD)
+			if (fabs(Vect.z - RefVect.z) < MATHLIB_FLOATTRESHOLD)
+			{
+				printf("PASSED.\n  Referance : V[%lf %lf %lf]\n  Output    : ", RefVect.x, RefVect.y, RefVect.z);
+				PrintVector(Vect);
+				printf("\n");
+				return true;
+			}
+	
+	printf("FAILED !!!\n  Referance : V[%lf %lf %lf]\n  Output    : ", RefVect.x, RefVect.y, RefVect.z);
+	PrintVector(Vect);
+	printf("\n");
+	return false;
+}
+bool CheckPoint(const ZEPoint3& Point, const ZEPoint3& RefPoint)
+{
+	if (fabs(Point.x - RefPoint.x) < MATHLIB_FLOATTRESHOLD)
+		if (fabs(Point.y - RefPoint.y) < MATHLIB_FLOATTRESHOLD)
+			if (fabs(Point.z - RefPoint.z) < MATHLIB_FLOATTRESHOLD)
+			{
+				printf("PASSED.\n  Referance : P[%lf %lf %lf]\n  Output    : ", RefPoint.x, RefPoint.y, RefPoint.z);
+				PrintPoint(Point);
+				printf("\n");
+				return true;
+			}
+	
+	printf("FAILED !!!\n  Referance : P[%lf %lf %lf]\n  Output    : ", RefPoint.x, RefPoint.y, RefPoint.z);
+	PrintPoint(Point);
 	printf("\n");
 	return false;
 }
@@ -189,21 +236,43 @@ bool CheckQuaternion(const ZEQuaternion& Quat, const D3DXQUATERNION& RefQuat)
 
 	return false;
 }
+bool CheckLine(const ZELine& L, ZEVector3& v, const ZEPoint3& P0, const ZEPoint3& P1)
+{
+	ZEVector3::Sub(v,P1,P0);
 
+
+	if(L.v==v)
+	{
+		printf("PASSED.\n Reference: L...L(t)= P[%lf %lf %lf]",P0.x,P0.y,P0.z);
+		printf(" + ");
+		printf("V[%lf %lf %lf]",(L.v).x,(L.v).y,(L.v).z);
+		printf("*t \n Output   : ");
+		PrintLine(L);
+		printf("\n");
+		return true;
+	}
+	printf("FAILED!!!\n Reference: P[%lf %lf %lf]",P0.x,P0.y,P0.z);
+	printf(" + ");
+	printf("V[%lf %lf %lf]",(L.v).x,(L.v).y,(L.v).z);
+	printf("*t \n Output  :");
+	PrintLine(L);
+	printf("\n");
+	return false;
+}
 bool TestVector()
 {
 	ZEVector3 A(1.0f, 2.0f, 3.0f), B(4.0f, 5.0f, 6.0f), C;
 	D3DXVECTOR3 DA, DB, DC;
 
 	bool Succeed = true;
-	printf("\n Vector Test in progress\n----------------------------------------------------\n");
+	printf("\n----------------------------------------------------\n Vector Test in progress\n----------------------------------------------------\n");
 	// ZEVector3()
 	{
 		printf ("ZEVector3(float x, float y, float z) -> ");
 
-		ZEVector3 X;
+		ZEVector3 X(1.0f, 2.0f, 3.0f);
 		
-		Succeed = CheckVector(X, 0.0f, 0.0f, 0.0f)& Succeed;
+		Succeed = CheckVector(X, 1.0f, 2.0f, 3.0f)& Succeed;
 	}
 
 	// ZEVector3(float x, float y, float z);
@@ -324,28 +393,47 @@ bool TestVector()
 	// static float Distance(const ZEVector& A, const ZEVector& B);
 	{
 		printf("static float Distance(const ZEVector& A, const ZEVector& B) -> ");
-		//if (ZEVector::Length(ZEVector3(1,2,3)) == D3DXVec3Length(&D3DXVECTOR3(1.0, 2.0, 3.0)))
-			printf("NOT TESTED !!!\n");
-		//else
-		//	Succeed = false;
+		D3DXVECTOR3 C=D3DXVECTOR3(1.0, 2.0, 3.0)-D3DXVECTOR3(4.0, 5.0, 6.0);
+		if (ZEVector3::Distance(ZEVector3(1,2,3),ZEVector3(4,5,6)) == D3DXVec3Length(&C))
+			printf("PASSED\n");
+		else
+			Succeed = false;
 	}
 	// static float DistanceSquare(const ZEVector& A, const ZEVector& B);	
 	{
 		printf("static float DistanceSquare(const ZEVector& A, const ZEVector& B) -> ");
-
-		//if (ZEVector::Length(ZEVector3(1,2,3)) == D3DXVec3Length(&D3DXVECTOR3(1.0, 2.0, 3.0)))
-			printf("NOT TESTED !!!\n");
-		//else
-		//	Succeed = false;
+		D3DXVECTOR3 C=D3DXVECTOR3(1.0, 2.0, 3.0)-D3DXVECTOR3(4.0, 5.0, 6.0);
+		float c=ZEVector3::DistanceSquare(ZEVector3(1,2,3),ZEVector3(4,5,6));
+		float d3dC=D3DXVec3Length(&C)*D3DXVec3Length(&C);
+		if (fabs(c-d3dC)<MATHLIB_FLOATTRESHOLD)
+			printf("PASSED\n");
+		else
+			Succeed = false;
 	}
 	// static void LineerInterpolate(ZEVector& Out, const ZEVector& A, const ZEVector& B, float Factor);
 	{
 		printf("static void LineerInterpolate(ZEVector& Out, const ZEVector& A, const ZEVector& B, float Factor) -> ");
 
-		//if (ZEVector::Length(ZEVector3(1,2,3)) == D3DXVec3Length(&D3DXVECTOR3(1.0, 2.0, 3.0)))
-			printf("NOT TESTED !!!\n");
-		//else
-		//	Succeed = false;
+		////if (ZEVector3::Length(ZEVector3(1,2,3)) == D3DXVec3Length(&D3DXVECTOR3(1.0, 2.0, 3.0)))
+		//	printf("NOT TESTED !!!\n");
+		////else
+		//	//Succeed = false;
+
+		//Interpolate Formula:  
+		//C=(1-ß)A+ßB
+		ZEVector3 C;
+		ZEVector3 A(1.0,2.0,3.0);
+		ZEVector3 B(6.0,9.0,5.0);
+		float t= 0.65f;
+
+		ZEVector3::Lerp(C,A,B,t);
+
+		ZEVector3 Ref;
+		Ref= A*(1-t) + B*t;
+		Succeed = CheckVector(C,Ref)& Succeed;
+
+
+		
 	}
 	if (Succeed == true)
 		printf("\nVector test completed successfully.\n\n");
@@ -355,11 +443,10 @@ bool TestVector()
 	return Succeed;
 }
 
-
 bool TestMatrix()
 {
 	bool Succeed = true;
-	printf("\n Matrix Test in progress\n----------------------------------------------------\n");
+	printf("\n----------------------------------------------------\n Matrix Test in progress\n----------------------------------------------------\n");
 	
 	//void Create(float M00, ... float M33)
 	{
@@ -390,13 +477,13 @@ bool TestMatrix()
 	//static void Add(TMatrix &Out, const TMatrix &A, const TMatrix &B);
 	{
 		printf("static void Add(TMatrix &Out, const TMatrix &A, const TMatrix &B) -> ");
-			
-		ZEMatrix4x4 A(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), B(16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1), C;
+		D3DXMATRIX D;	
+		ZEMatrix4x4 A(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16), B(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32), C;
 		ZEMatrix4x4::Add(C, A, B);
+		D=D3DXMATRIX(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) + 
+				D3DXMATRIX(2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32);
 			
-		Succeed = (CheckMatrix(C, 
-				D3DXMATRIX(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) + 
-				D3DXMATRIX(16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1)))& Succeed;
+		Succeed = (CheckMatrix(C,D))& Succeed;
 	}
 
 
@@ -411,7 +498,6 @@ bool TestMatrix()
 				D3DXMATRIX(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16) - 
 				D3DXMATRIX(16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1)))& Succeed;
 	}
-
 	//static void Product(TMatrix &Out, const TMatrix &A, const TMatrix &B);
 	{	printf("static void Product(TMatrix &Out, const TMatrix &A, const TMatrix &B) -> ");
 			
@@ -442,6 +528,7 @@ bool TestMatrix()
 		D3DXMATRIX DO;
 		D3DXMatrixTranspose(&DO,&D3DXMATRIX(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16));
 		Succeed = CheckMatrix(C,DO)& Succeed;
+
 	}
 
 	//static void Transform(ZEVector& Out, TMatrix &Matrix, ZEVector& Vector)
@@ -458,7 +545,7 @@ bool TestMatrix()
 		ZEVector3 A(1.0, 2.0, 3.0),C;
 		ZEMatrix4x4::Transform(C, TA, A);
 
-		Succeed =CheckVector(C, DO.x, DO.y, DO.z)&Succeed;
+		Succeed = CheckVector(C, DO.x, DO.y, DO.z)&Succeed;
 	}
 
 	//void LoadIdentity();
@@ -480,6 +567,33 @@ bool TestMatrix()
 		
 		Succeed = CheckMatrix(A,D3DXMATRIX(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0))& Succeed;
 	}
+	//Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix)
+	{
+		ZEMatrix4x4 A,B;
+		ZEMatrix4x4::Create(A,1,5,2,5,-1,6,0,8,5,0,11,-2,0,4,0,16);
+		ZEMatrix4x4::Inverse(B,A);
+		D3DXMATRIX DA(1,5,2,5,-1,6,0,8,5,0,11,-2,0,4,0,16);
+		D3DXMATRIX DB;
+		float det;
+		det= D3DXMatrixDeterminant(&DA);
+		D3DXMatrixInverse(&DB,&det,&DA);
+		Succeed=CheckMatrix(B,DB)& Succeed;
+		printf("%lf",det);
+	}
+	{
+		ZEMatrix4x4 A,B;
+		ZEMatrix4x4::Create(A,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16);
+		ZEMatrix4x4::Inverse(B,A);
+		D3DXMATRIX DA(1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16);
+		D3DXMATRIX DB;
+		float det;
+		det= D3DXMatrixDeterminant(&DA);
+		D3DXMatrixInverse(&DB,&det,&DA);
+		Succeed=CheckMatrix(B,DB)& Succeed;
+		printf("%lf",det);
+	}
+
+
 
 	if (Succeed == true)
 		printf("\nMatrix test completed successfully.\n\n");
@@ -493,7 +607,7 @@ bool TestQuaternion()
 {
 	bool Succeed = true;
 	
-	printf("\n Quaternion Test in progress\n----------------------------------------------------\n");
+	printf("\n----------------------------------------------------\n Quaternion Test in progress\n----------------------------------------------------\n");
 
 	//void Create(float w, float x, float y, float z);
 	{
@@ -590,7 +704,7 @@ bool TestQuaternion()
 	//void VectorProduct(const ZEVector& Other, ZEVector& Output) const
 	{
 		printf("void VectorProduct(const ZEVector& Other, ZEVector& Output) const -> ");
-		Succeed = false;
+		/*Succeed = false;*/
 		ZEQuaternion A(1, 2, 3, 4);
 		A.Normalize();
 
@@ -602,7 +716,8 @@ bool TestQuaternion()
 		D3DXQuaternionInverse(&DQP, &DQ);
 		DO = DQP * DV * DQ;
 
-		CheckVector(Out, D3DXVECTOR3(DO.x, DO.y, DO.z));
+
+		Succeed=CheckVector(Out, D3DXVECTOR3(DO.x, DO.y, DO.z))& Succeed;
 	}
 
 	//void Inverse();
@@ -651,10 +766,39 @@ bool TestQuaternion()
 	//void Interpolate(TQuaternion& Other, float I);
 	{
 	}
+	//void Slerp(ZEQuaternion& Output, const ZEQuaternion& A,const ZEQuaternion& B, float Factor)
 	
+	{
+		printf("void Slerp(ZEQuaternion& Output, const ZEQuaternion& A,const ZEQuaternion& B, float Factor)-> ");
+        ZEQuaternion A(1,2,3,4);
+		ZEQuaternion B(2,5,7,0);
+		ZEQuaternion C;
+		D3DXQUATERNION D(2,3,4,1);
+		D3DXQUATERNION E(5,7,0,2);
+		D3DXQUATERNION F;
 
+		ZEQuaternion::Slerp(C,A,B,3.0f );
+		D3DXQuaternionSlerp(&F,&D,&E,3.0f );
 
-	//void ConvertToRotationMatrix(TMatrix& Output) const;
+		Succeed = CheckQuaternion(C,F) & Succeed;
+		
+	}
+	{
+		printf("void Slerp(ZEQuaternion& Output, const ZEQuaternion& A,const ZEQuaternion& B, float Factor)-> ");
+        ZEQuaternion A(-1,-2,-3,-4);
+		ZEQuaternion B(2,5,7,0);
+		ZEQuaternion C;
+		D3DXQUATERNION D(-2,-3,-4,-1);
+		D3DXQUATERNION E(5,7,0,2);
+		D3DXQUATERNION F;
+
+		ZEQuaternion::Slerp(C,A,B,3.0f );
+		D3DXQuaternionSlerp(&F,&D,&E,3.0f );
+
+		Succeed = CheckQuaternion(C,F) & Succeed;
+		
+	}
+		//void ConvertToRotationMatrix(TMatrix& Output) const;
 	{
 		printf("void ConvertToRotationMatrix(TMatrix& Output) const -> ");
 		
@@ -669,7 +813,10 @@ bool TestQuaternion()
 		D3DXMatrixRotationQuaternion(&DM, &DA);
 		
 		Succeed = CheckMatrix(M, DM) & Succeed;
+
 	}
+
+
 
 	if (Succeed == true)
 		printf("\nQuaternion test completed successfully.\n\n");
@@ -679,11 +826,154 @@ bool TestQuaternion()
 	return Succeed;
 }
 
+
+
+bool TestLine()
+
+{
+	
+
+	bool Succeed = true;
+	printf("\n----------------------------------------------------\n Line Test in progress...\n----------------------------------------------------\n");
+
+	// Create(ZELine& Line, const ZEPoint3& P0, const ZEPoint3& P1);
+	{
+		ZEPoint3 P0(1.0f, 2.0f, 3.0f);
+		ZEPoint3 P1(5.0f, 6.0f, 7.0f);
+		D3DXVECTOR3 DA, DB, DC;
+		ZELine L;
+		printf ("\nCreate(const ZEPoint3& P0, const ZEPoint3& P1)->");
+
+		ZELine::Create(L,P0,P1);
+		ZEVector3 A;
+
+		Succeed=CheckLine(L,A,P0,P1)&Succeed;
+	}
+	
+	// ZELine(const ZEPoint3& P0, const ZEPoint3& P1)
+	{	
+		ZEPoint3 P0(1.0f, 2.0f, 3.0f);
+		ZEPoint3 P1(5.0f, 6.0f, 7.0f);
+		D3DXVECTOR3 DA, DB, DC;
+		printf ("\nZELine(const ZEPoint3& P0, const ZEPoint3& P1)->");
+
+		ZELine L(P0,P1);
+		ZEVector3 A;
+
+		Succeed=CheckLine(L,A,P0,P1)&Succeed;
+	}
+	// MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& tA, float &tB)
+	{
+		printf ("\nMinimumDistance(const ZELine& LineA, const ZELine& LineB, float& tA, float &tB)->");
+		long double d;
+		ZEPoint3 P1(0,3,0);
+		ZEPoint3 P2(1,4,-1);
+		ZEPoint3 P3(5,8,2);
+		ZEPoint3 P4(8,15,1);
+
+		ZELine A(P1,P2);
+		ZELine B(P3,P4);
+		d=ZELine::MinimumDistance(A,B);
+
+		Succeed = (fabs(d-sqrt(14.0))<MATHLIB_FLOATTRESHOLD)&&Succeed;
+
+		if(Succeed)
+		{
+			printf(" PASSED.");
+			printf("\n  Referance : %lf", sqrt(14.0));
+			printf("\n  Output    : %lf", d);
+
+		}
+
+		else
+		{
+			printf(" FAILED!!!");
+			printf("\n  Referance : %lf",sqrt(14.0));
+			printf("\n  Output    : %lf",d);
+		}
+	
+	}
+	//DistanceToPoint(const ZELine& Line, const ZEPoint3& Point, float &t)
+	printf ("\n\nDistanceToPoint(const ZELine& LineA, const ZELine& LineB, float& tA, float &tB)->");
+	{
+		ZEPoint3 P(5,8,2);
+		ZEPoint3 P1(0,3,0);
+		ZEPoint3 P2(1,4,-1);
+		ZELine L(P1,P2);
+		float t;
+		float d;
+
+		d=ZELine::DistanceToPoint(L,P,t);
+
+		Succeed = (fabs(d-4.61880215)<=MATHLIB_FLOATTRESHOLD)&&Succeed;
+		if(Succeed)
+		{
+			printf(" PASSED.");
+			printf("\n  Referance : %lf",4.61880215);
+			printf("\n  Output    : %lf",d);
+
+		}
+		else
+		{
+			printf(" FAILED!!!");
+			printf("\n  Referance : %lf", 4.61880215);
+			printf("\n  Output    : %lf", d);
+		}
+	}
+	//GetPointOn(ZEPoint3& Point, float t) const
+	{
+		printf ("\n\nGetPointOn(const ZELine& Line, const ZEPoint3& Point, float &t)->");
+		ZEPoint3 P1(0,3,0);
+		ZEPoint3 P2(1,4,-1);
+		ZEVector3 A;
+		ZEVector3 B;
+		const ZELine L=ZELine::ZELine(P1,P2);
+		ZEPoint3 P;
+		ZEPoint3 P3;
+		L.GetPointOn(P,3);
+		A=P;
+		
+		ZEVector3::Scale(P,L.v,3);
+		ZEVector3::Add(P,P,L.p);
+		B = P;
+
+		Succeed = CheckVector(A,B) & Succeed;
+	}
+	// CreateParametric(ZELine& Line, const ZEVector3& v, const ZEPoint3& p);
+	{
+		printf ("\n\nCreateParametric(ZELine& Line, const ZEVector3& v, const ZEPoint3& p)->\n");
+		ZEVector3 Vct(4.0f,5.0f,2.0f);
+		ZEPoint3  Pnt(1.0f,2.0f,3.0f);
+		ZELine L;
+		ZELine::CreateParametric(L,Vct,Pnt);
+
+		Succeed = CheckPoint(L.p, Pnt)& CheckVector(L.v, Vct)& Succeed;
+
+	}
+		
+
+	if (Succeed == true)
+		printf("\nLine test completed successfully.\n\n");
+	else
+		printf("\nLine test failed. Check failed functions.\n\n");
+
+	return Succeed;
+
+	
+} 
+bool TestRay()
+{
+	bool Succeed = true;
+	printf("\n----------------------------------------------------\n Ray Test in progress...\n----------------------------------------------------\n");
+	return true;
+
+}
 bool TestMath()
 {
 	bool Succeed = true;
 	Succeed = TestVector() & Succeed;
 	Succeed = TestMatrix() & Succeed;
 	Succeed = TestQuaternion() & Succeed;
+	Succeed = TestLine() & Succeed;
 	return Succeed;
 }

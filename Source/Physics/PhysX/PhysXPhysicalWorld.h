@@ -95,7 +95,7 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 		virtual void								SetVisualize(bool Enabled);
 		virtual bool								GetVisualize();
 
-		virtual void								SetEnabled();
+		virtual void								SetEnabled(bool Enabled);
 		virtual bool								GetEnabled();
 
 		virtual bool								Initialize();

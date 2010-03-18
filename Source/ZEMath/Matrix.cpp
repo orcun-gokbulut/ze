@@ -33,18 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "matrix.h"
-#include "vector.h"
-#include "quaternion.h"
+#include "Matrix.h"
+#include "Vector.h"
+#include "Quaternion.h"
+#include "Definitions.h"
 #include <memory.h>
 #include <math.h>
-#include <d3dx9.h>
 
 #define SWAP(x, y) temp = (x); (x) = (y); (y) = temp
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3  ZEMatrix3x3 //
+// ZEMatrix3x3
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const ZEMatrix3x3 ZEMatrix3x3::Zero = ZEMatrix3x3(0.0f, 0.0f, 0.0f,
 												  0.0f, 0.0f, 0.0f,
@@ -74,11 +72,9 @@ void ZEMatrix3x3::CreateRotation(ZEMatrix3x3& Matrix, const ZEQuaternion& Rotati
 	Matrix.M12 =			2.0f * Rotation.x * Rotation.y	-	2.0f * Rotation.w * Rotation.z;
 	Matrix.M13 =			2.0f * Rotation.x * Rotation.z	+	2.0f * Rotation.w * Rotation.y;
 
-
 	Matrix.M21 =			2.0f * Rotation.x * Rotation.y	+	2.0f * Rotation.w * Rotation.z;
 	Matrix.M22 = 1.0f	-	2.0f * Rotation.x * Rotation.x	-	2.0f * Rotation.z * Rotation.z;
-	;
-
+	Matrix.M23 =			2.0f * Rotation.y * Rotation.z	-	2.0f * Rotation.w * Rotation.x;
 
 	Matrix.M31 =			2.0f * Rotation.x * Rotation.z	-	2.0f * Rotation.w * Rotation.y;
 	Matrix.M32 =			2.0f * Rotation.y * Rotation.z	+	2.0f * Rotation.w * Rotation.x;
@@ -101,7 +97,6 @@ void ZEMatrix3x3::CreateRotationX(ZEMatrix3x3& Matrix, float Pitch)
 	Matrix.M31 = 0.0f;
 	Matrix.M32 = -Sin;
 	Matrix.M33 = Cos;
-
 }
 
 void ZEMatrix3x3::CreateRotationY(ZEMatrix3x3& Matrix, float Yawn)
@@ -169,9 +164,9 @@ inline void ZEMatrix3x3::Add(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMat
 	Out.M12 = A.M12 + B.M12;
 	Out.M13 = A.M13 + B.M13;
 	
-	Out.M21 = A.M11 + B.M11;
-	Out.M22 = A.M12 + B.M12;
-	Out.M23 = A.M13 + B.M13;
+	Out.M21 = A.M21 + B.M21;
+	Out.M22 = A.M22 + B.M22;
+	Out.M23 = A.M23 + B.M23;
 	
 	Out.M31 = A.M31 + B.M31;
 	Out.M32 = A.M32 + B.M32;
@@ -242,13 +237,89 @@ void ZEMatrix3x3::Transform(ZEVector3& Out, const ZEMatrix3x3& Matrix, const ZEV
 	Out.z = Matrix.M13 * Vector.x + Matrix.M23 * Vector.y + Matrix.M33 * Vector.z;
 }
 
+void ZEMatrix3x3::Determinant(float &det,const ZEMatrix3x3 &Matrix)
+{
+	float a, b, c, d, e, f, det1, det2;
+	a= Matrix.M11 * Matrix.M22 * Matrix.M33;
+	b= Matrix.M12 * Matrix.M23 * Matrix.M31;
+	c= Matrix.M13 * Matrix.M21 * Matrix.M32;
+	d= Matrix.M13 * Matrix.M22 * Matrix.M31;
+	e= Matrix.M12 * Matrix.M21 * Matrix.M33;
+	f= Matrix.M11 * Matrix.M23 * Matrix.M32;
+	det1 =  a + b + c ;
+	det2 = - d - e - f;
+	det = det1 + det2;
+} 
+
 bool ZEMatrix3x3::Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix)
 {
-	float Det;
-	return D3DXMatrixInverse((D3DXMATRIX*)&Out, &Det, (D3DXMATRIX*)&Matrix) != NULL;
-}
+	float a;
+	float detx;
+	ZEMatrix3x3::Determinant(a, Matrix);
+	if (a == 0)
+		return false;
 
-// overloading // 
+	ZEMatrix3x3 X;
+	ZEMatrix3x3::Create(X,1,Matrix.M12,Matrix.M13,0,Matrix.M22,Matrix.M23,0,Matrix.M32,Matrix.M33);
+	ZEMatrix3x3::Determinant(detx,X);
+	float x=detx/a;
+
+	float dety;
+	ZEMatrix3x3 Y;
+	ZEMatrix3x3::Create(Y,Matrix.M11,1,Matrix.M13,Matrix.M21,0,Matrix.M23,Matrix.M31,0,Matrix.M33);
+	ZEMatrix3x3::Determinant(dety,Y);
+	float y=dety/a;
+	
+	float detz;
+	ZEMatrix3x3 Z;
+	ZEMatrix3x3::Create(Z,Matrix.M11,Matrix.M12,1,Matrix.M21,Matrix.M22,0,Matrix.M31,Matrix.M32,0);
+	ZEMatrix3x3::Determinant(detz,Z);
+	float z=detz/a;
+
+
+	float detk;
+	ZEMatrix3x3 K;
+	ZEMatrix3x3::Create(K,0,Matrix.M12,Matrix.M13,1,Matrix.M22,Matrix.M23,0,Matrix.M32,Matrix.M33);
+	ZEMatrix3x3::Determinant(detk,K);
+	float k=detk/a;
+
+	float detl;
+	ZEMatrix3x3 L;
+	ZEMatrix3x3::Create(L,Matrix.M11,0,Matrix.M13,Matrix.M21,1,Matrix.M23,Matrix.M31,0,Matrix.M33);
+	ZEMatrix3x3::Determinant(detl,L);
+	float l=detl/a;
+
+	float detm;
+	ZEMatrix3x3 M;
+	ZEMatrix3x3::Create(M,Matrix.M11,Matrix.M12,0,Matrix.M21,Matrix.M22,1,Matrix.M31,Matrix.M32,0);
+	ZEMatrix3x3::Determinant(detm,M);
+	float m=detm/a;
+
+
+    float deto;
+	ZEMatrix3x3 O;
+	ZEMatrix3x3::Create(O,0,Matrix.M12,Matrix.M13,0,Matrix.M22,Matrix.M23,1,Matrix.M32,Matrix.M33);
+	ZEMatrix3x3::Determinant(deto,O);
+	float o=deto/a;
+
+	float detp;
+	ZEMatrix3x3 P;
+	ZEMatrix3x3::Create(P,Matrix.M11,0,Matrix.M13,Matrix.M21,0,Matrix.M23,Matrix.M31,1,Matrix.M33);
+	ZEMatrix3x3::Determinant(detp,P);
+	float p=detp/a;
+
+	float detq;
+	ZEMatrix3x3 Q;
+	ZEMatrix3x3::Create(Q,Matrix.M11,Matrix.M12,0,Matrix.M21,Matrix.M22,0,Matrix.M31,Matrix.M32,1);
+	ZEMatrix3x3::Determinant(detq,Q);
+	float q=detq/a;
+
+	Out.M11=x; Out.M12=k; Out.M13=o;
+	Out.M21=y; Out.M22=l; Out.M23=p;
+	Out.M31=z; Out.M32=m; Out.M33=q;
+
+	return true;
+}
 
 ZEMatrix3x3 ZEMatrix3x3::operator+(const ZEMatrix3x3 &RightOperand) const 
 {
@@ -304,15 +375,22 @@ ZEMatrix3x3& ZEMatrix3x3::operator *= (float S)
 	return *this;
 }
 
-
 bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const 
 {
-	return false;
+	for (size_t I = 0; I < 9; I++)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZEROTRESHOLD)
+			return false;
+
+	return true;
 }
 
 bool ZEMatrix3x3::operator != (const ZEMatrix3x3 &M) const 
 {
-	return false;
+	for (size_t I = 0; I < 9; I++)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZEROTRESHOLD)
+			return true;
+
+	return true;
 }
 
 ZEMatrix3x3::ZEMatrix3x3(float M00, float M01, float M02,
@@ -332,10 +410,8 @@ ZEMatrix3x3::ZEMatrix3x3()
 }
 
 
+// ZEMatrix4x4
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4  ZEMatrix4x4 //
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 const ZEMatrix4x4 ZEMatrix4x4::Zero = ZEMatrix4x4(0.0f, 0.0f, 0.0f, 0.0f,
 												  0.0f, 0.0f, 0.0f, 0.0f,
 												  0.0f, 0.0f, 0.0f, 0.0f,
@@ -489,47 +565,11 @@ void ZEMatrix4x4::CreateTranslation(ZEMatrix4x4& Matrix, float x, float y, float
 			1.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
-			x, y, z, 1.0f );
+			x   ,    y,    z, 1.0f );
 }
 
 void ZEMatrix4x4::CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale)
-{/*
-	Matrix.M11 = (1.0f -	2.0f * Rotation.y * Rotation.y	-	2.0f * Rotation.z * Rotation.z) * Scale.x;
-	Matrix.M12 = (			2.0f * Rotation.x * Rotation.y	-	2.0f * Rotation.w * Rotation.z) * Scale.x;
-	Matrix.M13 = (	 		2.0f * Rotation.x * Rotation.z	+	2.0f * Rotation.w * Rotation.y) * Scale.x;
-	Matrix.M14 = 0.0f;
-
-	Matrix.M21 = (			2.0f * Rotation.x * Rotation.y	+	2.0f * Rotation.w * Rotation.z) * Scale.y;
-	Matrix.M22 = (1.0f -	2.0f * Rotation.x * Rotation.x	-	2.0f * Rotation.z * Rotation.z) * Scale.y;
-	Matrix.M23 = (			2.0f * Rotation.y * Rotation.z	-	2.0f * Rotation.w * Rotation.x) * Scale.y;
-	Matrix.M24 = 0.0f;
-
-	Matrix.M31 = (			2.0f * Rotation.x * Rotation.z	-	2.0f * Rotation.w * Rotation.y) * Scale.z;
-	Matrix.M32 = (			2.0f * Rotation.y * Rotation.z	+	2.0f * Rotation.w * Rotation.x) * Scale.z;
-	Matrix.M33 = (1.0f -	2.0f * Rotation.x * Rotation.x	-	2.0f * Rotation.y * Rotation.y) * Scale.z;
-	Matrix.M34 = 0.0f;
-*/
-/*	Matrix.M11 = (1.0f -	2.0f * Rotation.y * Rotation.y	-	2.0f * Rotation.z * Rotation.z) * Scale.x;
-	Matrix.M21 = (			2.0f * Rotation.x * Rotation.y	-	2.0f * Rotation.w * Rotation.z) * Scale.x;
-	Matrix.M31 = (	 		2.0f * Rotation.x * Rotation.z	+	2.0f * Rotation.w * Rotation.y) * Scale.x;
-	Matrix.M41 = Position.x;
-
-	Matrix.M12 = (			2.0f * Rotation.x * Rotation.y	+	2.0f * Rotation.w * Rotation.z) * Scale.y;
-	Matrix.M22 = (1.0f -	2.0f * Rotation.x * Rotation.x	-	2.0f * Rotation.z * Rotation.z) * Scale.y;
-	Matrix.M32 = (			2.0f * Rotation.y * Rotation.z	-	2.0f * Rotation.w * Rotation.x) * Scale.y;
-	Matrix.M42 = Position.y;
-
-	Matrix.M13 = (			2.0f * Rotation.x * Rotation.z	-	2.0f * Rotation.w * Rotation.y) * Scale.z;
-	Matrix.M23 = (			2.0f * Rotation.y * Rotation.z	+	2.0f * Rotation.w * Rotation.x) * Scale.z;
-	Matrix.M33 = (1.0f -	2.0f * Rotation.x * Rotation.x	-	2.0f * Rotation.y * Rotation.y) * Scale.z;
-	Matrix.M43 = Position.z;
-
-	Matrix.M14 = 0.0f;
-	Matrix.M24 = 0.0f;
-	Matrix.M34 = 0.0f;
-	Matrix.M44 = 1.0f;	*/
-
-	
+{	
 	ZEMatrix4x4 A, B, C, D;
 
 	ZEMatrix4x4::CreateScale(A, Scale);
@@ -550,23 +590,6 @@ void ZEMatrix4x4::CreateTranslation(ZEMatrix4x4& Matrix, const ZEVector3& Positi
 
 void ZEMatrix4x4::CreateOffset(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation)
 {
-	/*
-	Matrix.M11 = 1.0f	-	2.0f * Rotation.y * Rotation.y	-	2.0f * Rotation.z * Rotation.z;
-	Matrix.M12 =			2.0f * Rotation.x * Rotation.y	-	2.0f * Rotation.w * Rotation.z;
-	Matrix.M13 =			2.0f * Rotation.x * Rotation.z	+	2.0f * Rotation.w * Rotation.y;
-	Matrix.M14 = 0.0f;
-
-	Matrix.M21 =			2.0f * Rotation.x * Rotation.y	+	2.0f * Rotation.w * Rotation.z;
-	Matrix.M22 = 1.0f	-	2.0f * Rotation.x * Rotation.x	-	2.0f * Rotation.z * Rotation.z;
-	Matrix.M23 =			2.0f * Rotation.y * Rotation.z	-	2.0f * Rotation.w * Rotation.x;
-	Matrix.M24 = 0.0f;
-
-	Matrix.M31 =			2.0f * Rotation.x * Rotation.z	-	2.0f * Rotation.w * Rotation.y;
-	Matrix.M32 =			2.0f * Rotation.y * Rotation.z	+	2.0f * Rotation.w * Rotation.x;
-	Matrix.M33 = 1.0f	-	2.0f * Rotation.x * Rotation.x	-	2.0f * Rotation.y * Rotation.y;
-	Matrix.M34 = 0.0f;
-	*/
-
 	Matrix.M11 = 1.0f	-	2.0f * Rotation.y * Rotation.y	-	2.0f * Rotation.z * Rotation.z;
 	Matrix.M21 =			2.0f * Rotation.x * Rotation.y	-	2.0f * Rotation.w * Rotation.z;
 	Matrix.M31 =			2.0f * Rotation.x * Rotation.z	+	2.0f * Rotation.w * Rotation.y;
@@ -594,7 +617,7 @@ void ZEMatrix4x4::CreateIdentity(ZEMatrix4x4& Matrix)
 			1.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 1.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 1.0f);
+			0.0f, 0.0f, 0.0f, 1.0f );
 }
 void ZEMatrix4x4::CreateZero(ZEMatrix4x4& Matrix)
 {
@@ -602,7 +625,7 @@ void ZEMatrix4x4::CreateZero(ZEMatrix4x4& Matrix)
 			0.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 0.0f,
-			0.0f, 0.0f, 0.0f, 0.0f);
+			0.0f, 0.0f, 0.0f, 0.0f );
 }
 void ZEMatrix4x4::CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width, float Height, float NearZ, float FarZ)
 {
@@ -641,10 +664,10 @@ inline void ZEMatrix4x4::Add(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMat
 	Out.M13 = A.M13 + B.M13;
 	Out.M14 = A.M14 + B.M14;
 	
-	Out.M21 = A.M11 + B.M11;
-	Out.M22 = A.M12 + B.M12;
-	Out.M23 = A.M13 + B.M13;
-	Out.M24 = A.M14 + B.M14;
+	Out.M21 = A.M21 + B.M21;
+	Out.M22 = A.M22 + B.M22;
+	Out.M23 = A.M23 + B.M23;
+	Out.M24 = A.M24 + B.M24;
 	
 	Out.M31 = A.M31 + B.M31;
 	Out.M32 = A.M32 + B.M32;
@@ -752,11 +775,148 @@ void ZEMatrix4x4::Transform3x3(ZEVector3 &Out, const ZEMatrix4x4& Matrix, const 
 	Out.z = Matrix.M13 * Vector.x + Matrix.M23 * Vector.y + Matrix.M33 * Vector.z;
 }
 
+void ZEMatrix4x4::Determinant(float &det,const ZEMatrix4x4 &Matrix)
+{
+	float d1,d2,d3,d4;
+	ZEMatrix3x3 A,B,C,D;
+	ZEMatrix3x3::Create(A,Matrix.M22,Matrix.M23,Matrix.M24,Matrix.M32,Matrix.M33,Matrix.M34,Matrix.M42,Matrix.M43,Matrix.M44);
+	ZEMatrix3x3::Create(B,Matrix.M21,Matrix.M23,Matrix.M24,Matrix.M31,Matrix.M33,Matrix.M34,Matrix.M41,Matrix.M43,Matrix.M44);
+    ZEMatrix3x3::Create(C,Matrix.M21,Matrix.M22,Matrix.M24,Matrix.M31,Matrix.M32,Matrix.M34,Matrix.M41,Matrix.M42,Matrix.M44);
+	ZEMatrix3x3::Create(D,Matrix.M21,Matrix.M22,Matrix.M23,Matrix.M31,Matrix.M32,Matrix.M33,Matrix.M41,Matrix.M42,Matrix.M43);
+
+	ZEMatrix3x3::Determinant(d1,A);
+	ZEMatrix3x3::Determinant(d2,B);
+	ZEMatrix3x3::Determinant(d3,C);
+	ZEMatrix3x3::Determinant(d4,D);
+
+	det = Matrix.M11 * d1 + Matrix.M13 * d3 - Matrix.M12 * d2 - Matrix.M14 * d4;
+	
+	
+}
+
 bool ZEMatrix4x4::Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix)
 {
-	float Det;
-	return D3DXMatrixInverse((D3DXMATRIX*)&Out, &Det, (D3DXMATRIX*)&Matrix) != NULL;
+	float a;
+	ZEMatrix4x4::Determinant(a, Matrix);
+	if(a == 0)
+		return false;
+
+	float detx;
+	ZEMatrix4x4 X;
+	ZEMatrix4x4::Create(X, 1, Matrix.M12, Matrix.M13, Matrix.M14, 
+						   0, Matrix.M22, Matrix.M23, Matrix.M24,
+						   0, Matrix.M32, Matrix.M33, Matrix.M34, 
+						   0, Matrix.M42, Matrix.M43, Matrix.M44);
+
+	ZEMatrix4x4::Determinant(detx, X);
+	float x = detx/a;
+
+	float dety;
+	ZEMatrix4x4 Y;
+	ZEMatrix4x4::Create(Y,Matrix.M11,1,Matrix.M13,Matrix.M14,
+		                  Matrix.M21,0,Matrix.M23,Matrix.M24,
+						  Matrix.M31,0,Matrix.M33,Matrix.M34,
+						  Matrix.M41,0,Matrix.M43,Matrix.M44);
+	ZEMatrix4x4::Determinant(dety,Y);
+	float y= dety/a;
+
+	float detz;
+	ZEMatrix4x4 Z;
+	ZEMatrix4x4::Create(Z,Matrix.M11,Matrix.M12,1,Matrix.M14,
+		                  Matrix.M21,Matrix.M22,0,Matrix.M24,
+						  Matrix.M31,Matrix.M32,0,Matrix.M34,
+						  Matrix.M41,Matrix.M42,0,Matrix.M44);
+	ZEMatrix4x4::Determinant(detz,Z);
+	float z= detz/a;
+
+	float detw;
+	ZEMatrix4x4 W;
+	ZEMatrix4x4::Create(W,Matrix.M11,Matrix.M12,Matrix.M13,1,
+		                  Matrix.M21,Matrix.M22,Matrix.M23,0,
+						  Matrix.M31,Matrix.M32,Matrix.M33,0,
+						  Matrix.M41,Matrix.M42,Matrix.M43,0);
+	ZEMatrix4x4::Determinant(detw,W);
+	float w= detw/a;
+
+
+	float detk;
+	ZEMatrix4x4 K;
+	ZEMatrix4x4::Create(K,0,Matrix.M12,Matrix.M13,Matrix.M14,1,Matrix.M22,Matrix.M23,Matrix.M24,0,Matrix.M32,Matrix.M33,Matrix.M34,0,Matrix.M42,Matrix.M43,Matrix.M44);
+	ZEMatrix4x4::Determinant(detk,K);
+	float k=detk/a;
+
+	float detl;
+	ZEMatrix4x4 L;
+	ZEMatrix4x4::Create(L,Matrix.M11,0,Matrix.M13,Matrix.M14,Matrix.M21,1,Matrix.M23,Matrix.M24,Matrix.M31,0,Matrix.M33,Matrix.M34,Matrix.M41,0,Matrix.M43,Matrix.M44);
+	ZEMatrix4x4::Determinant(detl,L);
+	float l=detl/a;
+
+	float detm;
+	ZEMatrix4x4 M;
+	ZEMatrix4x4::Create(M,Matrix.M11,Matrix.M12,0,Matrix.M14,Matrix.M21,Matrix.M22,1,Matrix.M24,Matrix.M31,Matrix.M32,0,Matrix.M34,Matrix.M41,Matrix.M42,0,Matrix.M44);
+	ZEMatrix4x4::Determinant(detm,M);
+	float m=detm/a;
+
+	float detn;
+	ZEMatrix4x4 N;
+	ZEMatrix4x4::Create(N,Matrix.M11,Matrix.M12,Matrix.M13,0,Matrix.M21,Matrix.M22,Matrix.M23,1,Matrix.M31,Matrix.M32,Matrix.M33,0,Matrix.M41,Matrix.M42,Matrix.M43,0);
+	ZEMatrix4x4::Determinant(detn,N);
+	float n=detn/a;
+
+	
+	float deto;
+	ZEMatrix4x4 O;
+	ZEMatrix4x4::Create(O,0,Matrix.M12,Matrix.M13,Matrix.M14,0,Matrix.M22,Matrix.M23,Matrix.M24,1,Matrix.M32,Matrix.M33,Matrix.M34,0,Matrix.M42,Matrix.M43,Matrix.M44);
+	ZEMatrix4x4::Determinant(deto,O);
+	float o=deto/a;
+
+	float detp;
+	ZEMatrix4x4 P;
+	ZEMatrix4x4::Create(P,Matrix.M11,0,Matrix.M13,Matrix.M14,Matrix.M21,0,Matrix.M23,Matrix.M24,Matrix.M31,1,Matrix.M33,Matrix.M34,Matrix.M41,0,Matrix.M43,Matrix.M44);
+	ZEMatrix4x4::Determinant(detp,P);
+	float p=detp/a;
+
+	float detq;
+	ZEMatrix4x4 Q;
+	ZEMatrix4x4::Create(Q,Matrix.M11,Matrix.M12,0,Matrix.M14,Matrix.M21,Matrix.M22,0,Matrix.M24,Matrix.M31,Matrix.M32,1,Matrix.M34,Matrix.M41,Matrix.M42,0,Matrix.M44);
+	ZEMatrix4x4::Determinant(detq,Q);
+	float q=detq/a;
+
+	float detr;
+	ZEMatrix4x4 R;
+	ZEMatrix4x4::Create(R,Matrix.M11,Matrix.M12,Matrix.M13,0,Matrix.M21,Matrix.M22,Matrix.M23,0,Matrix.M31,Matrix.M32,Matrix.M33,1,Matrix.M41,Matrix.M42,Matrix.M43,0);
+	ZEMatrix4x4::Determinant(detr,R);
+	float r=detr/a;
+
+
+	float dets;
+	ZEMatrix4x4 S;
+	ZEMatrix4x4::Create(S,0,Matrix.M12,Matrix.M13,Matrix.M14,0,Matrix.M22,Matrix.M23,Matrix.M24,0,Matrix.M32,Matrix.M33,Matrix.M34,1,Matrix.M42,Matrix.M43,Matrix.M44);
+	ZEMatrix4x4::Determinant(dets,S);
+	float s=dets/a;
+
+	float dett;
+	ZEMatrix4x4 T;
+	ZEMatrix4x4::Create(T,Matrix.M11,0,Matrix.M13,Matrix.M14,Matrix.M21,0,Matrix.M23,Matrix.M24,Matrix.M31,0,Matrix.M33,Matrix.M34,Matrix.M41,1,Matrix.M43,Matrix.M44);
+	ZEMatrix4x4::Determinant(dett,T);
+	float t=dett/a;
+
+	float detu;
+	ZEMatrix4x4 U;
+	ZEMatrix4x4::Create(U,Matrix.M11,Matrix.M12,0,Matrix.M14,Matrix.M21,Matrix.M22,0,Matrix.M24,Matrix.M31,Matrix.M32,0,Matrix.M34,Matrix.M41,Matrix.M42,1,Matrix.M44);
+	ZEMatrix4x4::Determinant(detu,U);
+	float u=detu/a;
+
+	float detv;
+	ZEMatrix4x4 V;
+	ZEMatrix4x4::Create(V,Matrix.M11,Matrix.M12,Matrix.M13,0,Matrix.M21,Matrix.M22,Matrix.M23,0,Matrix.M31,Matrix.M32,Matrix.M33,0,Matrix.M41,Matrix.M42,Matrix.M43,1);
+	ZEMatrix4x4::Determinant(detv,V);
+	float v=detv/a;
+	ZEMatrix4x4::Create(Out,x,k,o,s,y,l,p,t,z,m,q,u,w,n,r,v);
+
+	return true;
 }
+
 ZEMatrix4x4 ZEMatrix4x4::operator+(const ZEMatrix4x4 &RightOperand) const 
 {
 	ZEMatrix4x4 Temp;
@@ -808,21 +968,38 @@ void ZEMatrix4x4::operator *= (float S)
 	Scale(*this, *this, S);
 }
 
-
 bool ZEMatrix4x4::operator == (const ZEMatrix4x4 &M) const 
 {
-	return false;
+	for (size_t I = 0; I < 16; I++)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZEROTRESHOLD)
+			return false;
+
+	return true;
 }
 
 bool ZEMatrix4x4::operator != (const ZEMatrix4x4 &M) const 
 {
+	for (size_t I = 0; I < 16; I++)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZEROTRESHOLD)
+			return true;
+
 	return false;
 }
 
+float ZEMatrix4x4::operator[](size_t Index) const
+{
+	return MA[Index];
+}
+
+float& ZEMatrix4x4::operator[](size_t Index)
+{
+	return MA[Index];
+}
+
 ZEMatrix4x4::ZEMatrix4x4(float M11, float M12, float M13, float M14,
-				float M21, float M22, float M23, float M24,
-				float M31, float M32, float M33, float M34,
-				float M41, float M42, float M43, float M44)
+						 float M21, float M22, float M23, float M24,
+						 float M31, float M32, float M33, float M34,
+						 float M41, float M42, float M43, float M44)
 {
 	Create(*this, M11, M12, M13, M14, M21, M22, M23, M24, M31, M32, M33, M34, M41, M42, M43, M44);  
 }

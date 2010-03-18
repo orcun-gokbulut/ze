@@ -75,5 +75,7 @@ public:
 
 								ZEAABoundingBox();
 								ZEAABoundingBox(const ZEVector3 Min, const ZEVector3 Max);
+
+								
 };
 #endif

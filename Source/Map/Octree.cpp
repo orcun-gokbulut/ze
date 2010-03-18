@@ -81,7 +81,7 @@ bool ZEOctree::Destroy()
 void ZEOctree::Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESmartArray<ZELight*>& Lights)
 {
 	ZEMatrix4x4::CreateOrientation(OctreeBBoxRenderOrder.WorldMatrix, BoundingBox.GetCenter(), 
-	ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 
+	ZEQuaternion::Identity, 
 	ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, 
 		BoundingBox.Max.y - BoundingBox.Min.y, 
 		BoundingBox.Max.z - BoundingBox.Min.z)

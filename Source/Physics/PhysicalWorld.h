@@ -60,7 +60,7 @@ class ZEPhysicalWorld
 		virtual void								AddPhysicalObject(ZEPhysicalObject* Object) = 0;
 		virtual void								RemovePhysicalObject(ZEPhysicalObject* Object) = 0;
 
-		virtual void								SetEnabled() = 0;
+		virtual void								SetEnabled(bool Enabled) = 0;
 		virtual bool								GetEnabled() = 0;
 
 		virtual void								SetVisualize(bool Enabled) = 0;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - OBoundingBox.h
+ Zinek Engine - RectangleTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,94 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATH_BOUNDINGVOLUME_H__
-#define __ZE_MATH_BOUNDINGVOLUME_H__
-#include "Vector.h"
-#include "Matrix.h"
-#include "Plane.h"
+#include "UnitTest/UnitTest++.h"
+#include "../IOStreamMapping.h"
+#include "ZEMath/Rectangle.h"
+#include "ZEMath/Vector.h"
+#include <math.h>
 
-class ZEBoundingSphere;
-class ZEAABoundingBox;
-class ZEOBoundingBox
+SUITE(Rectangle)
 {
-	public:
-		ZEVector3				Position;
-		ZEVector3				U, V, N;
 
-		ZEVector3				GetCenter()	const;
-		ZEVector3				GetVertex(unsigned char Index) const;
+	TEST(RECT_Constructor)
+	{
+		ZEPoint2 LU(1.0f, 4.0f);
+		ZEPoint2 RD(3.0f, 2.0f);
+		ZERectangle R(LU, RD);
+		CHECK_EQUAL(R.LeftUp, ZEPoint2(1.0f, 4.0f));
+		CHECK_EQUAL(R.RightDown, ZEPoint2(3.0f, 2.0f));
 
-		static ZEHalfSpace		PlaneHalfSpaceTest(const ZEOBoundingBox& BoundingBox, const ZEPlane& Plane);
+		ZERectangle R2(LU, 2.0f, 2.0f);
+		CHECK_EQUAL(R2.LeftUp, ZEPoint2(1.0f, 4.0f));
+		CHECK_EQUAL(R2.RightDown, ZEPoint2(3.0f, 2.0f));
 
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZEVector3 Point);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment);
 
-								ZEOBoundingBox();
-								ZEOBoundingBox(const ZEVector3 Position, const ZEVector3 U, const ZEVector3 V,const ZEVector3 N);
-};
-#endif
+
+	}
+
+	TEST(RECT_BoundingTest)
+	{
+		
+
+		ZEPoint2 LU(1.0f, 4.0f);
+		ZEPoint2 RD(3.0f, 2.0f);
+		ZERectangle R(LU, RD);
+
+		ZEPoint2 P(2.0f, 3.0f);
+		bool result = R.BoundingTest(P);
+		CHECK_EQUAL(result, true);
+
+		ZEPoint2 P2(0.0f, 0.0f);
+		bool result2 = R.BoundingTest(P2);
+		CHECK_EQUAL(result2, false);
+
+		ZEPoint2 P3(2.0f, 2.0f);
+		bool result3 = R.BoundingTest(P3);
+		CHECK_EQUAL(result3, true);
+	}
+
+	TEST(RECT_GetCorner)
+	{
+		ZEPoint2 LU(1.0f, 4.0f);
+		ZEPoint2 RD(3.0f, 2.0f);
+		ZERectangle R(LU, RD);
+
+		ZEPoint2 C1 = R.GetCorner(ZERECTANGLECORNER_LEFTDOWN);
+		ZEPoint2 C2 = R.GetCorner(ZERECTANGLECORNER_LEFTUP);
+		ZEPoint2 C3 = R.GetCorner(ZERECTANGLECORNER_RIGHTDOWN);
+		ZEPoint2 C4 = R.GetCorner(ZERECTANGLECORNER_RIGHTUP);
+
+		CHECK_EQUAL(C1, ZEPoint2(1.0f, 2.0f));
+		CHECK_EQUAL(C2, ZEPoint2(1.0f, 4.0f));
+		CHECK_EQUAL(C3, ZEPoint2(3.0f, 2.0f));
+		CHECK_EQUAL(C4, ZEPoint2(3.0f, 4.0f));
+
+	}
+
+	TEST(RECT_GetWidth)
+	{
+		ZEPoint2 LU(1.0f, 4.0f);
+		ZEPoint2 RD(3.0f, 2.0f);
+		ZERectangle R(LU, RD);
+
+		float w = R.GetWidth();
+
+		CHECK_EQUAL(w, 2.0f);
+
+	}
+
+	TEST(RECT_GetHeight)
+	{
+		ZEPoint2 LU(1.0f, 4.0f);
+		ZEPoint2 RD(3.0f, 2.0f);
+		ZERectangle R(LU, RD);
+
+		float h = R.GetHeight();
+
+		CHECK_EQUAL(h, 2.0f);
+
+	}
+
+
+
+}

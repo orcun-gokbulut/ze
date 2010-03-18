@@ -40,20 +40,21 @@ float SinTable[451];
 
 void InitTrigTables()
 {
-	/*float Value;
+	float Value;
 	for(int I = 0; I < 181; I++)
 	{
-		Value = sinf((float)I * PI/180);
+		Value = sinf((float)I * ZE_PI/180);//12.02.2010 tarihinde PI ==> ZE_PI düzeltmesi yapıldı.
 		SinTable[I] = Value;
 		SinTable[I + 180] = -Value;
 	}
 
 	for(int I = 360; I < 451; I++)
-		SinTable[I] = sinf((float)I * PI/180);*/
+		SinTable[I] = sinf((float)I * ZE_PI/180);//12.02.2010 tarihinde PI ==> ZE_PI düzeltmesi yapıldı.
 }
 
 float FastSin(float Angle)
 {
+	InitTrigTables();//Bu satır 12.02.2010 tarihinde eklendi.
 	Angle = fmodf(Angle, 360);
 	
 	if (Angle < 0) Angle = Angle + 360;
@@ -65,6 +66,7 @@ float FastSin(float Angle)
 
 float FastCos(float Angle)
 {
+	InitTrigTables();//Bu satır 12.02.2010 tarihinde eklendi.
 	Angle = fmodf(Angle, 360);
 
 	if (Angle < 0) 
@@ -80,5 +82,5 @@ float FastCos(float Angle)
 
 float FastTan(float Angle)
 {
-	return FastSin(Angle) / FastCos(Angle); 
+	return FastSin(Angle) / FastCos(Angle);
 }

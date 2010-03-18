@@ -74,7 +74,7 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 	switch(LightType)
 	{
 		case ZE_LT_POINT:
-			Light = new ZEPointLight();
+			Light = new ZEVectorLight();
 			Canvas.AddSphere(2.0f, 8, 8);
 			break;
 
@@ -106,7 +106,7 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 	}
 
 	Light->SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Light->SetLocalRotation(ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
+	Light->SetLocalRotation(ZEQuaternion::Identity);
 	Light->SetLocalScale(ZEVector3::One);
 	Light->SetColor(Color);
 	Light->SetIntensity(Intensity);

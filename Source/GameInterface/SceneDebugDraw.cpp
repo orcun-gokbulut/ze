@@ -46,7 +46,7 @@ void ZESceneDebugDraw::DrawOrientedBoundingBox(const ZEAABoundingBox& BoundingBo
 {
 	ZEMatrix4x4 LocalPivot, WorldMatrix;
 	ZEMatrix4x4::CreateOrientation(LocalPivot, BoundingBox.GetCenter(), 
-		ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 
+		ZEQuaternion::Identity, 
 		ZEVector3((BoundingBox.Max.x - BoundingBox.Min.x), 
 			(BoundingBox.Max.y - BoundingBox.Min.y), 
 			(BoundingBox.Max.z - BoundingBox.Min.z))
@@ -62,7 +62,7 @@ void ZESceneDebugDraw::DrawAxisAlignedBoundingBox(const ZEAABoundingBox& Boundin
 {
 	ZEMatrix4x4 WorldMatrix;
 	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingBox.GetCenter(), 
-		ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 
+		ZEQuaternion::Identity, 
 		ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z));
 
 	VertexBuffer.SetColor(Color);
@@ -74,7 +74,7 @@ void ZESceneDebugDraw::DrawBoundingSphere(const ZEBoundingSphere& BoundingSphere
 {
 	ZEMatrix4x4 WorldMatrix;
 	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingSphere.Position, 
-		ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f), 
+		ZEQuaternion::Identity, 
 		ZEVector3(BoundingSphere.Radius * 2.0f, BoundingSphere.Radius * 2.0f, BoundingSphere.Radius * 2.0f));
 	VertexBuffer.SetTransfomation(WorldMatrix);
 	VertexBuffer.SetColor(Color);
