@@ -226,6 +226,7 @@ void ZEConsoleWindow::Output(const char* OutputText)
 ZEConsoleWindow::ZEConsoleWindow(void)
 {
 	Wait = false;
+	Handle = NULL;
 }
 
 ZEConsoleWindow::~ZEConsoleWindow(void)

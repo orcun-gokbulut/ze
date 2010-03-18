@@ -156,3 +156,14 @@
 	ADD: Enable flag added to ZEPhysicalObject
 	CHG: Improved main loop performance.
 	FIX: Physics sub-system minor improvements and fixed.	
+	
+[18 March 2010 - Revision 131, 132]
+	FIX: Minor bug fixes.
+	FIX: ZESceneDebugDraw performance problem fixed.
+	CHG: ElementCount parameter added to ZEVertexDeclaration::Create(ZEVertexElement*) function and ZE_VET_END and ZE_VED_END enumurations removed.
+	CHG: ZEEnvironment in ZEScene became pointer.
+	ADD: ZEEnvironment::Deinitialize function added. 
+	CHG: ZEEnvironment::Destroy function has been updated.
+	ADD: All of the scene's entities are deinitilized on ZEScene::Deinitialize function.
+	ADD: Log and error messages added to ZEScene::Initialize and ZEScene::LoadEnvironment functions.
+	FIX: ZEScene::Raycast and ZEScene:Render function crash on scenes with no environment has been fixed.

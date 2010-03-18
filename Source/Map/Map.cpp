@@ -45,6 +45,20 @@
 #include "ZEMath/Ray.h"
 #include "Physics/PhysicalStaticMesh.h"
 
+ZEEnvironment::ZEEnvironment()
+{
+}
+
+ZEEnvironment::~ZEEnvironment()
+{
+}
+
+void ZEEnvironment::Destroy()
+{
+	Deinitialize();
+	delete this;
+}
+
 bool ZEPortalMap::Initialize()
 {
 	PortalBBoxCanvas.Clean();
@@ -90,7 +104,7 @@ bool ZEPortalMap::Initialize()
 	return true;
 }
 
-bool ZEPortalMap::Destroy()
+void ZEPortalMap::Deinitialize()
 {
 	if (PortalBBoxMaterial != NULL)
 	{
@@ -103,7 +117,6 @@ bool ZEPortalMap::Destroy()
 		MapResource->Release();
 		MapResource = NULL;
 	}
-	return true;
 }
 
 const char* ZEPortalMap::GetFileName()
@@ -214,4 +227,9 @@ ZEPortalMap::ZEPortalMap()
 ZEPortalMap::~ZEPortalMap()
 {
 	Destroy();
+}
+
+ZEPortalMap* ZEPortalMap::CreateInstance()
+{
+	return new ZEPortalMap();	
 }

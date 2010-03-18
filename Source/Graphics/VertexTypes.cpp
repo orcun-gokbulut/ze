@@ -49,11 +49,10 @@ ZEVertexDeclaration* ZESimpleVertex::GetVertexDeclaration()
 										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
 										{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
-										{ZE_VES_END, ZE_VET_END, 0}
 									};
 
 
-	if (!VertexDeclaration->Create(ElementArray))
+	if (!VertexDeclaration->Create(ElementArray, 3))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
@@ -78,10 +77,9 @@ ZEVertexDeclaration* ZEMapVertex::GetVertexDeclaration()
 										{ZE_VES_TANGENT, ZE_VET_FLOAT3, 0},
 										{ZE_VES_BINORMAL, ZE_VET_FLOAT3, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
-										{ZE_VES_END, ZE_VET_END, 0}
 									};
 	
-	if (!VertexDeclaration->Create(ElementArray))
+	if (!VertexDeclaration->Create(ElementArray, 5))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
@@ -106,10 +104,9 @@ ZEVertexDeclaration* ZEModelVertex::GetVertexDeclaration()
 										{ZE_VES_TANGENT, ZE_VET_FLOAT3, 0},
 										{ZE_VES_BINORMAL, ZE_VET_FLOAT3, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
-										{ZE_VES_END, ZE_VET_END, 0}
 									};
 
-	if (!VertexDeclaration->Create(ElementArray))
+	if (!VertexDeclaration->Create(ElementArray, 5))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
@@ -136,10 +133,9 @@ ZEVertexDeclaration* ZESkinnedModelVertex::GetVertexDeclaration()
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
 										{ZE_VES_BLENDINDEX, ZE_VET_BYTE4, 0},
 										{ZE_VES_BLENDWEIGHT, ZE_VET_FLOAT4, 0},
-										{ZE_VES_END, ZE_VET_END, 0}
 									};
 
-	if (!VertexDeclaration->Create(ElementArray))
+	if (!VertexDeclaration->Create(ElementArray, 7))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
@@ -162,10 +158,9 @@ ZEVertexDeclaration* ZEUIVertex::GetVertexDeclaration()
 										{ZE_VES_POSITION, ZE_VET_FLOAT2, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT4, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 1},
-										{ZE_VES_END, ZE_VET_END, 0}
 									};
 
-	if (!VertexDeclaration->Create(ElementArray))
+	if (!VertexDeclaration->Create(ElementArray, 3))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;
@@ -186,10 +181,9 @@ ZEVertexDeclaration* ZEColoredVertex::GetVertexDeclaration()
 	ZEVertexElement ElementArray[] = {
 										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT4, 1},
-										{ZE_VES_END, ZE_VET_END, 0}
 									};
 
-	if (!VertexDeclaration->Create(ElementArray))
+	if (!VertexDeclaration->Create(ElementArray, 2))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;

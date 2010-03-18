@@ -51,9 +51,15 @@ class ZELight;
 
 class ZEEnvironment
 {
+	protected:
+										ZEEnvironment();
+		virtual							~ZEEnvironment();
+
 	public:
 		virtual bool					Initialize() = 0;
-		virtual bool					Destroy() = 0;
+		virtual void					Deinitialize() = 0;
+		virtual void					Destroy();
+
 		virtual const char*				GetFileName() = 0;
 
 		virtual bool					Load(const char* FileName) = 0;
@@ -61,8 +67,6 @@ class ZEEnvironment
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT) = 0;
 
 };
-
-class ZEPhysicalStaticMesh;
 
 class ZEPortalMap : public ZEEnvironment
 {
@@ -74,11 +78,12 @@ class ZEPortalMap : public ZEEnvironment
 		ZERenderOrder					PortalBBoxRenderOrder;
 		ZEFixedMaterial*				PortalBBoxMaterial;
 
-		ZEPhysicalStaticMesh*			PhysicalMesh;
+										ZEPortalMap();
+										~ZEPortalMap();
 
 	public:	
 		virtual bool					Initialize();
-		virtual bool					Destroy();
+		virtual void					Deinitialize();
 
 		virtual const char*				GetFileName();
 
@@ -87,7 +92,7 @@ class ZEPortalMap : public ZEEnvironment
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT);
 		virtual bool					Load(const char* FileName);
 										
-										ZEPortalMap();
-										~ZEPortalMap();
+		static ZEPortalMap*				CreateInstance();
+
 };
 #endif

@@ -1558,6 +1558,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\Source\Physics\PhysicalMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Physics\PhysicalMaterial.h"
+				>
+			</File>
+			<File
 				RelativePath="..\Source\Physics\PhysicalObject.cpp"
 				>
 			</File>
@@ -1579,6 +1587,22 @@
 			</File>
 			<File
 				RelativePath="..\Source\Physics\PhysicalShapes.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Physics\PhysicalStaticMesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Physics\PhysicalStaticMesh.h"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Physics\PhysicalStaticObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\Source\Physics\PhysicalStaticObject.h"
 				>
 			</File>
 			<File
@@ -1649,11 +1673,35 @@
 					>
 				</File>
 				<File
+					RelativePath="..\Source\Physics\PhysX\PhysXPhysicalStaticMesh.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Physics\PhysX\PhysXPhysicalStaticMesh.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Physics\PhysX\PhysXPhysicalStaticObject.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Physics\PhysX\PhysXPhysicalStaticObject.h"
+					>
+				</File>
+				<File
 					RelativePath="..\Source\Physics\PhysX\PhysXPhysicalWorld.cpp"
 					>
 				</File>
 				<File
 					RelativePath="..\Source\Physics\PhysX\PhysXPhysicalWorld.h"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Physics\PhysX\PhysXStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Physics\PhysX\PhysXStream.h"
 					>
 				</File>
 				<File

@@ -66,10 +66,9 @@ ZEVertexDeclaration* ZECanvasVertex::GetVertexDeclaration()
 										{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
 										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT4, 1},
-										{ZE_VES_END, ZE_VET_END, 0}
 									};
 
-	if (!VertexDeclaration->Create(ElementArray))
+	if (!VertexDeclaration->Create(ElementArray, 4))
 	{
 		VertexDeclaration->Destroy();
 		VertexDeclaration = NULL;

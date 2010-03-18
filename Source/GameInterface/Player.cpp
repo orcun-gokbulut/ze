@@ -42,6 +42,7 @@
 #include "Game.h"
 #include "ZEMath/Ray.h"
 #include "ZEMath/Ray.h"
+#include "Sound/Listener.h"
 
 #define ACTIONID_FORWARD		0
 #define ACTIONID_BACKWARD		1

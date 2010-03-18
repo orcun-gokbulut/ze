@@ -158,24 +158,10 @@ bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Ele
 
 	return true;
 }
-bool ZED3D9VertexDeclaration::Create(const ZEArray<ZEVertexElement>& Elements)
+
+bool ZED3D9VertexDeclaration::Create(const ZEVertexElement* Elements, size_t ElementCount)
 {
 	Release();
-
-	if (!CreateVertexDeclaration(Elements.GetConstCArray(), Elements.GetCount()))
-		return false;
-
-	VertexElements.CopyFrom(VertexElements);
-	return true;
-}
-
-bool ZED3D9VertexDeclaration::Create(const ZEVertexElement* Elements)
-{
-	Release();
-
-	size_t ElementCount = 0;
-	while(Elements[ElementCount].Semantic != ZE_VES_END)
-		ElementCount++;
 
 	if (!CreateVertexDeclaration(Elements, ElementCount))
 		return false;

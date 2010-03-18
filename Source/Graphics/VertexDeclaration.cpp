@@ -67,6 +67,11 @@ ZEVertexDeclaration::ZEVertexDeclaration()
 ZEVertexDeclaration::~ZEVertexDeclaration()
 {
 
+}		
+
+bool ZEVertexDeclaration::Create(const ZEArray<ZEVertexElement>& VertexElements)
+{
+	return Create(VertexElements.GetConstCArray(), VertexElements.GetCount());
 }
 
 void ZEVertexDeclaration::Destroy()

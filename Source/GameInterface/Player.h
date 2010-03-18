@@ -39,13 +39,12 @@
  
 #include "Meta/Class.h"
 #include "Graphics/Camera.h"
-#include "Graphics/Canvas.h"
 #include "Graphics/PointLight.h"
-#include "Sound/Listener.h"
 #include "Input/InputMap.h"
 
 ZE_META_CLASS_DESCRIPTION(ZEPlayer);
 
+class ZEListener;
 class ZEPlayer : public ZEEntity
 {
 	ZE_META_CLASS()

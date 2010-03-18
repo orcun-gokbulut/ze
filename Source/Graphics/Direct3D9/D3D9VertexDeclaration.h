@@ -62,8 +62,7 @@ class ZED3D9VertexDeclaration : public ZEVertexDeclaration, private ZED3D9Compon
 
 		virtual void						SetupVertexDeclaration();
 
-		virtual bool						Create(const ZEArray<ZEVertexElement>& VertexElements);
-		virtual bool						Create(const ZEVertexElement* VertexElements);
+		virtual bool						Create(const ZEVertexElement* VertexElements, size_t ElementCount);
 		virtual void						Release();
 
 

@@ -79,6 +79,7 @@ class ZEPostProcessor;
 class ZEFixedMaterial;
 class ZEEntity;
 class ZEPhysicalWorld;
+class ZEPortalMap;
 
 class ZEScene
 {
@@ -87,7 +88,7 @@ class ZEScene
 
 		unsigned int							LastEntityId;
 
-		ZEPortalMap								Environment;
+		ZEPortalMap*							Environment;
 		ZESmartArray<ZEEntity*>					Entities;
 
 		ZEPhysicalWorld*						PhysicalWorld;

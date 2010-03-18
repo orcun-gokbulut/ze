@@ -49,7 +49,6 @@
 
 enum ZEVertexElementSemantic
 {
-	ZE_VES_END			= 0,
 	ZE_VES_POSITION		= 1,
 	ZE_VES_NORMAL		= 2,
 	ZE_VES_BINORMAL		= 3,
@@ -62,7 +61,6 @@ enum ZEVertexElementSemantic
 
 enum ZEVertexElementType
 {
-	ZE_VET_END			= 0,
 	ZE_VET_FLOAT		= 1,
 	ZE_VET_FLOAT2		= 2,
 	ZE_VET_FLOAT3		= 3,
@@ -92,8 +90,8 @@ class ZEVertexDeclaration
 		virtual const ZEArray<ZEVertexElement>&		GetVertexElements() = 0;
 		virtual size_t								GetVertexSize() = 0;
 
-		virtual bool								Create(const ZEArray<ZEVertexElement>& VertexElements) = 0;
-		virtual bool								Create(const ZEVertexElement* Elements) = 0;
+		virtual bool								Create(const ZEArray<ZEVertexElement>& VertexElements);
+		virtual bool								Create(const ZEVertexElement* Elements, size_t ElementCount) = 0;
 		virtual void								Release() = 0;
 		virtual void								Destroy();
 

@@ -136,8 +136,8 @@ bool ZEPhysicsDebugComponent::Initialize()
 
 		World->AddPhysicalObject(PhysicalMesh);
 
-		zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
-		World->SetVisualize(false);
+		//zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
+		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);
 	}
 

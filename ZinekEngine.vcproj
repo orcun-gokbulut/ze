@@ -218,10 +218,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\Graphics\DirectionalLight.cpp"
 				>
 			</File>
@@ -609,6 +605,10 @@
 				</File>
 				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File

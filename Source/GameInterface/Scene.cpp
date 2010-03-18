@@ -118,14 +118,15 @@ bool ZEScene::Initialize()
 
 void ZEScene::Deinitialize()
 {
-	if (PhysicalWorld != NULL)
-		PhysicalWorld->Deinitialize();
-
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Deinitialize();
 
-	//Environment.Deinitialize();
-	
+	if (PhysicalWorld != NULL)
+		PhysicalWorld->Deinitialize();
+
+	if (Environment != NULL)
+		Environment->Deinitialize();
+
 	DebugDraw.Deinitialize();
 
 	if (Renderer != NULL)
@@ -142,6 +143,12 @@ void ZEScene::Destroy()
 {
 	Deinitialize();
 
+	if (Environment != NULL)
+	{
+		Environment->Destroy();
+		Environment = NULL;
+	}
+	
 	if (PhysicalWorld != NULL)
 	{
 		PhysicalWorld->Destroy();
@@ -163,8 +170,6 @@ void ZEScene::Destroy()
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Destroy();
 	Entities.Clear();
-
-	Environment.Destroy();
 
 	delete this;
 }
@@ -283,20 +288,24 @@ bool ZEScene::CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntit
 			}
 	}
 
-	if (Environment.CastRay(Ray, Position, Normal, MinT))
-		if (MinT < CurrMinT)
-		{
-			*IntersectedEntity = NULL;
-			return true;
-		}
+	if (Environment != NULL)
+	{
+		if (Environment->CastRay(Ray, Position, Normal, MinT))
+			if (MinT < CurrMinT)
+			{
+				*IntersectedEntity = NULL;
+				return true;
+			}
 
-	Ray.GetPointOn(Position,MinT);
+		Ray.GetPointOn(Position, MinT);
+	}
+
 	return *IntersectedEntity != NULL;
 }
 
 void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bool LightsEnabled)
 {
-	
+	DebugDraw.Clean();
 	// Step 1 : Find all light sources that can have effect on visible area
 	ZESmartArray<ZELight*> VisibleLights; // List of lights that can have effect on visible area
 
@@ -424,7 +433,8 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 		}
 	}
 	
-	Environment.Render(Renderer, ViewVolume, VisibleLights);
+	if (Environment != NULL)
+		Environment->Render(Renderer, ViewVolume, VisibleLights);
 	
 	if (VisualDebugElements != NULL)
 		DebugDraw.Draw(Renderer);
@@ -433,13 +443,26 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 
 bool ZEScene::LoadEnvironment(const char* FileName)
 {
-	if (!Environment.Destroy())
-		return false;
+	zeLog("Scene", "Loading environment.");
 
-	if (!Environment.Load(FileName))
-		return false;
+	if (Environment != NULL)
+		Environment->Deinitialize();
+	else
+		Environment = ZEPortalMap::CreateInstance();
 
-	Environment.Initialize();
+	if (!Environment->Load(FileName))
+	{
+		zeError("Scene", "Can not load environment.");
+		return false;
+	}
+
+	if (!Environment->Initialize())
+	{
+		zeError("Scene", "Can not initialize environment.");
+		return false;
+	}
+	
+	zeLog("Scene", "Environment loaded.");
 	return true;
 }
 
@@ -452,8 +475,8 @@ bool ZEScene::Save(const char* FileName)
 		Serializer.Write(&EntityCount, sizeof(ZEDWORD), 1);
 		
 		Serializer.Write(&LastEntityId, sizeof(int), 1);
-		if (strcmp(Environment.GetFileName(), "") != 0)
-			Serializer.Write(Environment.GetFileName(), sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+		if (strcmp(Environment->GetFileName(), "") != 0)
+			Serializer.Write(Environment->GetFileName(), sizeof(char), ZE_MAX_FILE_NAME_SIZE);
 		else
 		{
 			char Temp[ZE_MAX_FILE_NAME_SIZE];
@@ -496,8 +519,8 @@ bool ZEScene::Load(const char* FileName)
 		Unserializer.Read(&LastEntityId, sizeof(int), 1);
 		char MapFile[ZE_MAX_FILE_NAME_SIZE];
 		Unserializer.Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
-		Environment.Initialize();
-		if (!Environment.Load(MapFile))
+		Environment->Initialize();
+		if (!Environment->Load(MapFile))
 		{ 
 			zeError("Scene", "Unserialization can not load map file. (Map File : \"%s\")", MapFile);
 			zeError("Scene", "Unserialization failed.");
@@ -547,6 +570,7 @@ ZEScene::ZEScene()
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
 	PhysicalWorld = NULL;
+	Environment = NULL;
 
 	VisualDebugElements = ZE_VDE_ENTITY_AXISALIGNED_BOUNDINGBOX;
 }
