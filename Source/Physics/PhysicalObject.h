@@ -39,6 +39,9 @@
 
 #include "ZEMath/Vector.h"
 #include "ZEMath/Quaternion.h"
+#include "Types.h"
+
+#include "PhysicalCallbacks.h"
 
 enum ZEPhysicalObjectType
 {
@@ -57,30 +60,39 @@ class ZEPhysicalWorld;
 class ZEPhysicalObject
 {
 	protected:
-									ZEPhysicalObject(){}
-		virtual						~ZEPhysicalObject(){}
+		ZEPhysicalCollisionCallback				CollisionCallback;
+
+												ZEPhysicalObject(){}
+		virtual									~ZEPhysicalObject(){}
 
 	public:
-		virtual ZEPhysicalObjectType GetPhysicalObjectType() = 0;
+		virtual ZEPhysicalObjectType			GetPhysicalObjectType() = 0;
 
-		virtual void				SetPhysicalWorld(ZEPhysicalWorld* World) = 0;
-		virtual ZEPhysicalWorld*	GetPhysicalWorld() = 0;
+		virtual void							SetPhysicalWorld(ZEPhysicalWorld* World) = 0;
+		virtual ZEPhysicalWorld*				GetPhysicalWorld() = 0;
 
-		virtual void				SetEnabled(bool Enabled) = 0;
-		virtual bool				GetEnabled() = 0;
+		virtual void							SetEnabled(bool Enabled) = 0;
+		virtual bool							GetEnabled() = 0;
 
-		virtual void				SetPosition(const ZEVector3& NewPosition) = 0;
-		virtual ZEVector3			GetPosition() = 0;
+		virtual void							SetPosition(const ZEVector3& NewPosition) = 0;
+		virtual ZEVector3						GetPosition() = 0;
 		
-		virtual void				SetRotation(const ZEQuaternion& NewRotation) = 0;
-		virtual ZEQuaternion		GetRotation() = 0;
+		virtual void							SetRotation(const ZEQuaternion& NewRotation) = 0;
+		virtual ZEQuaternion					GetRotation() = 0;
 
-		virtual void				SetScale(const ZEVector3& NewScale) = 0;
-		virtual ZEVector3			GetScale() = 0;
+		virtual void							SetScale(const ZEVector3& NewScale) = 0;
+		virtual ZEVector3						GetScale() = 0;
 
-		virtual bool				Initialize() = 0;
-		virtual void				Deinitialize() = 0;
+		virtual void							SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags) = 0;
+		virtual ZEDWORD							GetCollisionCallbackFlags() = 0;
 
-		void						Destroy();
+		virtual void							SetCollisionCallback(const ZEPhysicalCollisionCallback& CollisionCallback);
+		virtual const
+		ZEPhysicalCollisionCallback&			GetCollisionCallback();
+
+		virtual bool							Initialize() = 0;
+		virtual void							Deinitialize() = 0;
+
+		void									Destroy();
 };
 #endif

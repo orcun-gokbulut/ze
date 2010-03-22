@@ -78,6 +78,9 @@ class ZEPhysXPhysicalStaticObject : public ZEPhysicalStaticObject
 		virtual void						SetScale(const ZEVector3& NewScale);
 		virtual ZEVector3					GetScale();
 
+		virtual void						SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags);
+		virtual ZEDWORD						GetCollisionCallbackFlags();
+
 		const ZEArray<ZEPhysicalShape*>&	GetPhysicalShapes();
 		virtual void						AddPhysicalShape(ZEPhysicalShape* Shape);
 		virtual void						RemovePhysicalShape(ZEPhysicalShape* Shape);

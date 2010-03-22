@@ -38,6 +38,7 @@
 #define __ZE_PHYSICS_DEBUG_COMPONENT_H__
 
 #include "Core/DebugComponent.h"
+#include "Physics/PhysicalCallbacks.h"
 
 class ZEPlayer;
 class ZEPhysicalRigidBody;
@@ -50,12 +51,18 @@ class ZEPhysicsDebugComponent : public ZEDebugComponent
 		ZEPlayer*				Player;
 		ZEPhysicalRigidBody*	PhysicalRigidBody;
 		ZEPhysicalSphereShape	Shape;	
+		ZEPhysicalSphereShape	Shape2;	
+
+		void					TransformChanged(const ZEPhysicalTransformChange& TransformChange);
+		void					ColisionDetected(const ZEPhysicalCollision& Collision);
 
 	public:
 		virtual void			Process(float ElapsedTime);
 
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
+
+
 
 								ZEPhysicsDebugComponent();
 		virtual					~ZEPhysicsDebugComponent();

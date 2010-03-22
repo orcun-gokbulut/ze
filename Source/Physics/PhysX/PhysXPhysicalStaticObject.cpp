@@ -180,6 +180,26 @@ ZEVector3 ZEPhysXPhysicalStaticObject::GetScale()
 	return Scale;
 }
 
+void ZEPhysXPhysicalStaticObject::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags)
+{
+	
+	ActorDesc.contactReportFlags = (ActorDesc.contactReportFlags & ~(NX_NOTIFY_ON_TOUCH | NX_NOTIFY_ON_START_TOUCH | NX_NOTIFY_ON_END_TOUCH)) |
+		((CollisionCallbackFlags & ZE_PCCF_ON_TOUCH) ? NX_NOTIFY_ON_TOUCH : NULL) |
+		((CollisionCallbackFlags & ZE_PCCF_ON_START_TOUCH) ? NX_NOTIFY_ON_START_TOUCH : NULL) |
+		((CollisionCallbackFlags & ZE_PCCF_ON_END_TOUCH) ? NX_NOTIFY_ON_END_TOUCH : NULL);
+	
+	if (Actor != NULL)
+		Actor->setContactReportFlags(ActorDesc.contactReportFlags);
+	
+}
+
+ZEDWORD ZEPhysXPhysicalStaticObject::GetCollisionCallbackFlags()
+{
+	return (ActorDesc.contactReportFlags & NX_NOTIFY_ON_START_TOUCH ? ZE_PCCF_ON_START_TOUCH : NULL) |
+		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_END_TOUCH ? ZE_PCCF_ON_END_TOUCH : NULL) |
+		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_TOUCH ? ZE_PCCF_ON_TOUCH : NULL);
+}
+
 void ZEPhysXPhysicalStaticObject::ReCreate()
 {
 	Deinitialize();

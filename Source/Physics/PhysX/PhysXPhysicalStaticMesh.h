@@ -50,12 +50,16 @@ class ZEPhysXPhysicalWorld;
 class ZEPhysXPhysicalStaticMesh : public ZEPhysicalStaticMesh, private ZEPhysXComponentBase
 {
 	friend class ZEPhysXModule;
+
 	private:
 		ZEPhysXPhysicalWorld*			PhysicalWorld;
 		
 		NxActor*						Actor;
 		NxActorDesc						ActorDesc;
 		NxTriangleMeshShapeDesc			TriangleMeshShapeDesc;	
+
+		ZEDWORD							CollisionFlags;
+		ZEPhysicalCollisionCallback		CollisionCallback;
 
 		ZEVector3						Scale;
 		bool							Enabled;
@@ -84,6 +88,9 @@ class ZEPhysXPhysicalStaticMesh : public ZEPhysicalStaticMesh, private ZEPhysXCo
 		virtual bool					SetData(const ZEVector3* Vertices, size_t VertexCount, 
 												const ZEPhysicalTriangle* Triangles, size_t PolygonCount, 
 												const ZEPhysicalMaterial* Materials, size_t MaterialCount);
+
+		virtual void					SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags);
+		virtual ZEDWORD					GetCollisionCallbackFlags();
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();	

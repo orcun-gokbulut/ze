@@ -36,10 +36,10 @@
 #include "PhysXPhysicalWorld.h"
 #include "PhysXConversion.h"
 #include "Physics/PhysicalObject.h"
+#include "Physics/PhysicalRigidBody.h"
 #include "Core/Error.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/SimpleMaterial.h"
-
 #include <NxDebugRenderable.h>
 
 static ZEVector4 NX_TO_ZE(NxU32 color)
@@ -218,7 +218,8 @@ bool ZEPhysXPhysicalWorld::GetEnabled()
 }
 
 bool ZEPhysXPhysicalWorld::Initialize()
-{
+{	
+	SceneDesc.flags |= NX_SF_ENABLE_ACTIVETRANSFORMS;
 	Scene = GetPhysicsSDK()->createScene(SceneDesc);
 	if (Scene == NULL) 
 	{
@@ -234,6 +235,8 @@ bool ZEPhysXPhysicalWorld::Initialize()
 
 	for (size_t I = 0; I < PhysicalObjects.GetCount(); I++)
 		PhysicalObjects[I]->Initialize();
+
+	Scene->setUserContactReport(&CollisionManager);
 
 	return true;
 }
@@ -304,7 +307,33 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 
 void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 {
-    Scene->simulate(ElapsedTime);
+	NxU32 TransformCount = 0;
+	NxActiveTransform *ActiveTransforms = Scene->getActiveTransforms(TransformCount);
+
+	Scene->simulate(ElapsedTime);
+	
+	for (size_t I = 0; I < TransformCount; I++)
+	{
+		if (ActiveTransforms[I].userData != NULL)
+		{
+			const ZEPhysicalTransformChangeCallback& Callback = ((ZEPhysicalRigidBody*)ActiveTransforms[I].userData)->GetTransformChangeCallback();
+			if (!Callback.empty())
+			{
+				ZEPhysicalTransformChange Change;
+				
+				Change.NewPosition = NX_TO_ZE(ActiveTransforms[I].actor2World.t);
+				
+				NxQuat Quat;
+				ActiveTransforms[I].actor2World.M.toQuat(Quat);
+				Change.NewRotation = NX_TO_ZE(Quat);
+				
+				Change.PhysicalObject = ((ZEPhysicalRigidBody*)ActiveTransforms[I].userData);
+				
+				Callback(Change);
+			}
+		}
+	}
+
     Scene->flushStream();
 }
 

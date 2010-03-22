@@ -121,7 +121,10 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 								
 		virtual void					SetAngularMomentum(const ZEVector3& NewAngularMomentum);
 		virtual ZEVector3				GetAngularMomentum();
-								
+
+		virtual void					SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags);
+		virtual ZEDWORD					GetCollisionCallbackFlags();
+
 		virtual void					ApplyForce(const ZEVector3& Force);
 		virtual void					ApplyTorque(const ZEVector3& Torque);
 								

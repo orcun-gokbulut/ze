@@ -170,3 +170,10 @@
 	FIX: Entity component culling fixed.
 	CHF: New, Improved, bug fixed and tested ZEMath integrated to Zinek Engine project.
 	ADD: New ZEMath tests added to Zinek Engine Test project.
+
+[22 March 2010 -revision 134]
+	ADD: Physical collision callback added to ZEPhysicalObject
+	ADD: Physical transform change callback added to ZEPhysicalRigidBody.
+	ADD: Culling statistics added to ZEScene. ZEScene::GetCullStatistics().
+	ADD: ZEFixedMaterial conversion added to ZEModelResource. Now it can read legacy ZEModel files until new material file format created.
+	

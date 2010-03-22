@@ -55,6 +55,7 @@ ZEPhysXPhysicalRigidBody::ZEPhysXPhysicalRigidBody()
 	Actor = NULL;
 	ActorDesc.userData = this;
 	ActorDesc.body = &BodyDesc;
+	ActorDesc.contactReportFlags |= NX_NOTIFY_ON_START_TOUCH;
 
 	Scale = ZEVector3::One;
 	Enabled = true;
@@ -85,7 +86,7 @@ void ZEPhysXPhysicalRigidBody::SetEnabled(bool Enabled)
 	this->Enabled = Enabled;
 	if (this->Enabled)
 	{
-		ActorDesc.flags &= ~(NX_AF_DISABLE_COLLISION | NX_AF_DISABLE_RESPONSE | NX_AF_FLUID_DISABLE_COLLISION);
+		ActorDesc.flags &= ~(NX_AF_DISABLE_COLLISION | NX_AF_DISABLE_RESPONSE);
 		BodyDesc.flags &= ~NX_BF_FROZEN;
 		if (Actor != NULL)
 		{
@@ -97,7 +98,7 @@ void ZEPhysXPhysicalRigidBody::SetEnabled(bool Enabled)
 	}
 	else
 	{
-		ActorDesc.flags |= (NX_AF_DISABLE_COLLISION | NX_AF_DISABLE_RESPONSE | NX_AF_FLUID_DISABLE_COLLISION);
+		ActorDesc.flags |= (NX_AF_DISABLE_COLLISION | NX_AF_DISABLE_RESPONSE);
 		BodyDesc.flags |= NX_BF_FROZEN;
 		if (Actor != NULL)
 		{
@@ -398,6 +399,27 @@ ZEVector3 ZEPhysXPhysicalRigidBody::GetAngularMomentum()
 	else
 		return NX_TO_ZE(BodyDesc.angularVelocity * BodyDesc.mass);
 }
+
+void ZEPhysXPhysicalRigidBody::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags)
+{
+	
+	ActorDesc.contactReportFlags = (ActorDesc.contactReportFlags & ~(NX_NOTIFY_ON_TOUCH | NX_NOTIFY_ON_START_TOUCH | NX_NOTIFY_ON_END_TOUCH)) |
+		((CollisionCallbackFlags & ZE_PCCF_ON_TOUCH) ? NX_NOTIFY_ON_TOUCH : NULL) |
+		((CollisionCallbackFlags & ZE_PCCF_ON_START_TOUCH) ? NX_NOTIFY_ON_START_TOUCH : NULL) |
+		((CollisionCallbackFlags & ZE_PCCF_ON_END_TOUCH) ? NX_NOTIFY_ON_END_TOUCH : NULL);
+	
+	if (Actor != NULL)
+		Actor->setContactReportFlags(ActorDesc.contactReportFlags);
+	
+}
+
+ZEDWORD ZEPhysXPhysicalRigidBody::GetCollisionCallbackFlags()
+{
+	return (ActorDesc.contactReportFlags & NX_NOTIFY_ON_START_TOUCH ? ZE_PCCF_ON_START_TOUCH : NULL) |
+		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_END_TOUCH ? ZE_PCCF_ON_END_TOUCH : NULL) |
+		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_TOUCH ? ZE_PCCF_ON_TOUCH : NULL);
+}
+
 
 void ZEPhysXPhysicalRigidBody::ApplyForce(const ZEVector3& Force)
 {

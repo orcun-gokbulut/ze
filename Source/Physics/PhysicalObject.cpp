@@ -35,3 +35,18 @@
 
 #include "PhysicalObject.h"
 
+void ZEPhysicalObject::SetCollisionCallback(const ZEPhysicalCollisionCallback& Callback)
+{
+	CollisionCallback = Callback;
+}
+
+const ZEPhysicalCollisionCallback& ZEPhysicalObject::GetCollisionCallback()
+{
+	return CollisionCallback;
+}
+
+void ZEPhysicalObject::Destroy()
+{
+	Deinitialize();
+	delete this;
+}

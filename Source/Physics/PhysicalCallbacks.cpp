@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalCollision.h
+ Zinek Engine - PhysicalCallbacks.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PHYSICAL_COLLISION_H__
-#define __ZE_PHYSICAL_COLLISION_H__
-
-#include "ZEMath/Vector.h"
-#include "FastDelegate.h"
-
-struct ZEPhysicalCollision;
-
-typedef fastdelegate::FastDelegate1<const ZEPhysicalCollision&> ZECollisionCallback;
-
-class ZEPhysicalRigidBody;
-struct ZEPhysicalCollision
-{
-	ZEPhysicalRigidBody*		Collider1;
-	ZEPhysicalRigidBody*		Collider2;
-
-	ZEVector3					Position;
-	ZEVector3					Normal;
-	float						Power;
-};
-
-#endif
+#include "PhysicalCallbacks.h"

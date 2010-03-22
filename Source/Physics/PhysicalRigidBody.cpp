@@ -41,10 +41,14 @@ ZEPhysicalObjectType ZEPhysicalRigidBody::GetPhysicalObjectType()
 	return ZE_POT_RIGID_BODY;
 }
 
-void ZEPhysicalRigidBody::Destroy()
+void ZEPhysicalRigidBody::SetTransformChangeCallback(const ZEPhysicalTransformChangeCallback& Callback)
 {
-	Deinitialize();
-	delete this;
+	TransformChangeCallback = Callback;
+}
+
+const ZEPhysicalTransformChangeCallback& ZEPhysicalRigidBody::GetTransformChangeCallback()
+{
+	return TransformChangeCallback;	
 }
 
 ZEPhysicalRigidBody* ZEPhysicalRigidBody::CreateInstance()

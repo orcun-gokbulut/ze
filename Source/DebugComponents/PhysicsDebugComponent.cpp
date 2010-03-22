@@ -50,9 +50,26 @@
 #include "Physics/PhysicalStaticMesh.h"
 #include "Physics/PhysX/PhysXPhysicalWorld.h"
 
+
 #include <NxScene.h>
 #include <NxActor.h>
 #include <NxPlaneShapeDesc.h>
+
+void ZEPhysicsDebugComponent::TransformChanged(const ZEPhysicalTransformChange& TransformChange)
+{
+	float Pitch, Yaw, Roll;
+	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, TransformChange.NewRotation);
+
+	/*zeLog("Physical Object", "Transform Changed. Object: %x, New Position: [%f, %f, %f], New Orientation: [%f, %f, %f]", 
+		TransformChange.PhysicalObject,
+		TransformChange.NewPosition.x, TransformChange.NewPosition.y, TransformChange.NewPosition.z,
+		Pitch, Yaw, Roll);*/
+}
+
+void ZEPhysicsDebugComponent::ColisionDetected(const ZEPhysicalCollision& Collision)
+{
+	zeLog("Physical Object", "Collision Occured: Object1 : %x, Object2 : %x", Collision.Collider1, Collision.Collider2);
+}
 
 bool ZEPhysicsDebugComponent::Initialize()
 {
@@ -78,9 +95,15 @@ bool ZEPhysicsDebugComponent::Initialize()
 		PhysicalRigidBody->SetPosition(ZEVector3(0.0f, 100.0f, 1.0f));
 		Shape.SetRadius(10.0f);
 		PhysicalRigidBody->AddPhysicalShape(&Shape);
+		Shape2.SetPosition(ZEVector3(10.0f, 0.0f, 0.0f));
+		Shape2.SetRadius(4.0f);
+		PhysicalRigidBody->AddPhysicalShape(&Shape2);
 		PhysicalRigidBody->SetMass(10.0f);
 		PhysicalRigidBody->SetKinematic(false);
 		PhysicalRigidBody->SetGravityEnabled(true);
+		PhysicalRigidBody->SetCollisionCallback(ZEPhysicalCollisionCallback(this, &ZEPhysicsDebugComponent::ColisionDetected));
+		PhysicalRigidBody->SetTransformChangeCallback(ZEPhysicalTransformChangeCallback(this, &ZEPhysicsDebugComponent::TransformChanged));
+
 		//PhysicalRigidBody->SetLinearDamping(0.01f);
 		World->AddPhysicalObject(PhysicalRigidBody);
 		PhysicalRigidBody->ApplyForce(ZEVector3(1000.0f, 0.0f, 0.0f));
@@ -169,14 +192,35 @@ void ZEPhysicsDebugComponent::Process(float ElapsedTime)
 	TotalTime += ElapsedTime;
 	if (TotalTime > 1.0f)
 	{
-		float Pitch, Yaw, Roll;
-		ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, PhysicalRigidBody->GetRotation());
-		zeLog("Physical Body", "Position: [%f, %f, %f], Orientation: [%f, %f, %f], Velocity: [%f, %f, %f]", PhysicalRigidBody->GetPosition().x, 
-			PhysicalRigidBody->GetPosition().y, PhysicalRigidBody->GetPosition().z, 
-			Pitch, Yaw, Roll, 
-			PhysicalRigidBody->GetLinearVelocity().x,
-			PhysicalRigidBody->GetLinearVelocity().y,
-			PhysicalRigidBody->GetLinearVelocity().z);
+		const ZECullStatistics& Stats = zeScene->GetCullStatistics();
+
+		/*zeLog("Scene", 
+			"TotalEntityCount: %d, \r\n"
+			"TotalComponentCount: %d, \r\n"
+			"TotalLightCount: %d, \r\n"
+			"DrawableEntityCount: %d, \r\n"
+			"DrawableComponentCount: %d, \r\n"
+			"VisibleEntityCount: %d, \r\n"
+			"VisibleComponentCount: %d, \r\n"
+			"VisibleLightCount: %d, \r\n"
+			"CulledEntityCount: %d, \r\n"
+			"CulledComponentCount: %d, \r\n"
+			"CulledLightCount: %d, \r\n"
+			"MaxLightPerEntity: %d, \r\n"
+			"MaxLightPerComponent: %d",
+			Stats.TotalEntityCount,
+			Stats.TotalComponentCount,
+			Stats.TotalLightCount,
+			Stats.DrawableEntityCount,
+			Stats.DrawableComponentCount,
+			Stats.VisibleEntityCount,
+			Stats.VisibleComponentCount,
+			Stats.VisibleLightCount,
+			Stats.CulledEntityCount,
+			Stats.CulledComponentCount,
+			Stats.CulledLightCount,
+			Stats.MaxLightPerEntity,
+			Stats.MaxLightPerComponent);*/
 		TotalTime = 0.0f;
 	}
 }

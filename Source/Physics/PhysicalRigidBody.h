@@ -52,71 +52,72 @@ enum ZEPhysicalBodyType
 class ZEPhysicalRigidBody : public ZEPhysicalObject
 {
 	protected:
-										ZEPhysicalRigidBody(){}
-		virtual							~ZEPhysicalRigidBody(){}
+		ZEPhysicalTransformChangeCallback		TransformChangeCallback;
+
+												ZEPhysicalRigidBody(){}
+		virtual									~ZEPhysicalRigidBody(){}
 								
 	public:							
-		virtual ZEPhysicalObjectType	GetPhysicalObjectType();
-								
-		virtual void					SetKinematic(bool Enabled) = 0;
-		virtual bool					GetKinematic() = 0;
-									
-		//virtual void					SetCollisionCallback(ZEPhysicalCollisionCallback);
-		//ZEPhysicalCollisionCallback	GetCollisionCallback();
-		
+		virtual ZEPhysicalObjectType			GetPhysicalObjectType();
+
 		virtual const				
-		ZEArray<ZEPhysicalShape*>&		GetPhysicalShapes() = 0;
-		virtual void					AddPhysicalShape(ZEPhysicalShape* Shape) = 0;
-		virtual void					RemovePhysicalShape(ZEPhysicalShape* Shape) = 0;
-
-		virtual void					SetMass(float NewMass) = 0;
-		virtual float					GetMass() = 0;
-
-		virtual	void					SetGravityEnabled(bool Enabled) = 0;
-		virtual bool					GetGravityEnabled() = 0;
-
-		virtual void					SetLockPositon(bool Enabled) =0 ;
-		virtual bool					GetLockPosition() = 0;
-
-		virtual void					SetLockRotation(bool Enabled) = 0;
-		virtual bool					GetLockRotation() = 0;
-
-		virtual void					SetMassCenterPosition(const ZEVector3& NewPosition) = 0;
-		virtual ZEVector3				GetMassCenterPosition() = 0;
-
-		virtual void					SetMassCenterRotation(const ZEQuaternion& Rotation) = 0;
-		virtual ZEQuaternion			GetMassCenterRotation() = 0;
+		ZEArray<ZEPhysicalShape*>&				GetPhysicalShapes() = 0;
+		virtual void							AddPhysicalShape(ZEPhysicalShape* Shape) = 0;
+		virtual void							RemovePhysicalShape(ZEPhysicalShape* Shape) = 0;
 								
-		virtual void					SetLinearVelocity(const ZEVector3& NewVelocity)  = 0;
-		virtual ZEVector3				GetLinearVelocity() = 0;
-								
-		virtual void					SetAngularVelocity(const ZEVector3& NewVelocity) = 0;
-		virtual ZEVector3				GetAngularVelocity() = 0;
+		virtual void							SetKinematic(bool Enabled) = 0;
+		virtual bool							GetKinematic() = 0;
 									
-		virtual void					SetLinearDamping(float NewLinearDamping) = 0;
-		virtual float					GetLinearDamping() = 0;
-									
-		virtual void					SetAngularDamping(float NewAngularDamping) = 0;
-		virtual float					GetAngularDamping() = 0;
-									
-		virtual void					SetLinearMomentum(const ZEVector3& NewLinearMomentum) = 0;
-		virtual ZEVector3				GetLinearMomentum() = 0;
-								
-		virtual void					SetAngularMomentum(const ZEVector3& NewAngularMomentum) = 0;
-		virtual ZEVector3				GetAngularMomentum() = 0;
-								
-		virtual void					ApplyForce(const ZEVector3& Force) = 0;
-		virtual void					ApplyTorque(const ZEVector3& Torque) = 0;
-								
-		virtual void					ApplyLocalForce(const ZEVector3& Force) = 0;
-		virtual void					ApplyLocalTorque(const ZEVector3& Torque) = 0;
-								
-		virtual bool					Initialize() = 0;
-		virtual void					Deinitialize() = 0;
+		virtual void							SetMass(float NewMass) = 0;
+		virtual float							GetMass() = 0;
 
-		void							Destroy();
+		virtual	void							SetGravityEnabled(bool Enabled) = 0;
+		virtual bool							GetGravityEnabled() = 0;
 
-		static ZEPhysicalRigidBody*		CreateInstance();
+		virtual void							SetLockPositon(bool Enabled) =0 ;
+		virtual bool							GetLockPosition() = 0;
+
+		virtual void							SetLockRotation(bool Enabled) = 0;
+		virtual bool							GetLockRotation() = 0;
+
+		virtual void							SetMassCenterPosition(const ZEVector3& NewPosition) = 0;
+		virtual ZEVector3						GetMassCenterPosition() = 0;
+
+		virtual void							SetMassCenterRotation(const ZEQuaternion& Rotation) = 0;
+		virtual ZEQuaternion					GetMassCenterRotation() = 0;
+								
+		virtual void							SetLinearVelocity(const ZEVector3& NewVelocity)  = 0;
+		virtual ZEVector3						GetLinearVelocity() = 0;
+								
+		virtual void							SetAngularVelocity(const ZEVector3& NewVelocity) = 0;
+		virtual ZEVector3						GetAngularVelocity() = 0;
+									
+		virtual void							SetLinearDamping(float NewLinearDamping) = 0;
+		virtual float							GetLinearDamping() = 0;
+									
+		virtual void							SetAngularDamping(float NewAngularDamping) = 0;
+		virtual float							GetAngularDamping() = 0;
+									
+		virtual void							SetLinearMomentum(const ZEVector3& NewLinearMomentum) = 0;
+		virtual ZEVector3						GetLinearMomentum() = 0;
+								
+		virtual void							SetAngularMomentum(const ZEVector3& NewAngularMomentum) = 0;
+		virtual ZEVector3						GetAngularMomentum() = 0;
+								
+		virtual void							ApplyForce(const ZEVector3& Force) = 0;
+		virtual void							ApplyTorque(const ZEVector3& Torque) = 0;
+								
+		virtual void							ApplyLocalForce(const ZEVector3& Force) = 0;
+		virtual void							ApplyLocalTorque(const ZEVector3& Torque) = 0;
+
+		virtual void							SetTransformChangeCallback(const ZEPhysicalTransformChangeCallback& TransfromChangeCallback);
+		virtual const
+		ZEPhysicalTransformChangeCallback&		GetTransformChangeCallback();
+	
+		virtual bool							Initialize() = 0;
+		virtual void							Deinitialize() = 0;
+
+		static ZEPhysicalRigidBody*				CreateInstance();
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalCollision.cpp
+ Zinek Engine - PhysicalCallbacks.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysicalCollision.h"
+#pragma once
+#ifndef	__ZE_PHYSICAL_CALLBACKS_H__
+#define __ZE_PHYSICAL_CALLBACKS_H__
+
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "FastDelegate.h"
+
+#define ZE_PCCF_ON_TOUCH			1
+#define ZE_PCCF_ON_START_TOUCH		2
+#define ZE_PCCF_ON_END_TOUCH		4
+
+class ZEPhysicalObject;
+struct ZEPhysicalCollision
+{
+	ZEPhysicalObject*			Collider1;
+	ZEPhysicalObject*			Collider2;
+
+	ZEVector3					Position;
+	ZEVector3					Normal;
+	float						Power;
+};
+
+typedef fastdelegate::FastDelegate1<const ZEPhysicalCollision&> ZEPhysicalCollisionCallback;
+
+struct ZEPhysicalTransformChange
+{
+	ZEPhysicalObject*			PhysicalObject;
+	ZEVector3					NewPosition;
+	ZEQuaternion				NewRotation;
+};
+
+typedef fastdelegate::FastDelegate1<const ZEPhysicalTransformChange&> ZEPhysicalTransformChangeCallback;
+
+#endif

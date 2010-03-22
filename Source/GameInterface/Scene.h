@@ -81,6 +81,23 @@ class ZEEntity;
 class ZEPhysicalWorld;
 class ZEPortalMap;
 
+struct ZECullStatistics
+{
+	size_t								TotalEntityCount;
+	size_t								TotalComponentCount;
+	size_t								TotalLightCount;
+	size_t								DrawableEntityCount;
+	size_t								DrawableComponentCount;
+	size_t								VisibleEntityCount;
+	size_t								VisibleComponentCount;
+	size_t								VisibleLightCount;
+	size_t								CulledEntityCount;
+	size_t								CulledComponentCount;
+	size_t								CulledLightCount;
+	size_t								MaxLightPerEntity;
+	size_t								MaxLightPerComponent;
+};
+
 class ZEScene
 {
 	private:
@@ -102,6 +119,8 @@ class ZEScene
 		ZEDWORD									VisualDebugElements;
 		ZESceneDebugDraw						DebugDraw;
 
+		ZECullStatistics						CullStatistics;
+
 	public:
 		void									AddEntity(ZEEntity* Entity);
 		void									RemoveEntity(ZEEntity* Entity);
@@ -121,6 +140,8 @@ class ZEScene
 
 		virtual ZEEntity*						CastRay(const ZERay& Ray, float Range);
 		virtual bool							CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntity, ZEVector3& Position, ZEVector3& Normal);
+
+		const ZECullStatistics&					GetCullStatistics();
 
 		virtual void							CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bool LightsEnabled = true);
 		bool									LoadEnvironment(const char* FileName);

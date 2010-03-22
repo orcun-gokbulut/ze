@@ -205,7 +205,26 @@ bool ZEPhysXPhysicalStaticMesh::SetData(const ZEVector3* Vertices, size_t Vertex
 	}
 }
 
-				
+void ZEPhysXPhysicalStaticMesh::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags)
+{
+	
+	ActorDesc.contactReportFlags = (ActorDesc.contactReportFlags & ~(NX_NOTIFY_ON_TOUCH | NX_NOTIFY_ON_START_TOUCH | NX_NOTIFY_ON_END_TOUCH)) |
+		((CollisionCallbackFlags & ZE_PCCF_ON_TOUCH) ? NX_NOTIFY_ON_TOUCH : NULL) |
+		((CollisionCallbackFlags & ZE_PCCF_ON_START_TOUCH) ? NX_NOTIFY_ON_START_TOUCH : NULL) |
+		((CollisionCallbackFlags & ZE_PCCF_ON_END_TOUCH) ? NX_NOTIFY_ON_END_TOUCH : NULL);
+	
+	if (Actor != NULL)
+		Actor->setContactReportFlags(ActorDesc.contactReportFlags);
+	
+}
+
+ZEDWORD ZEPhysXPhysicalStaticMesh::GetCollisionCallbackFlags()
+{
+	return (ActorDesc.contactReportFlags & NX_NOTIFY_ON_START_TOUCH ? ZE_PCCF_ON_START_TOUCH : NULL) |
+		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_END_TOUCH ? ZE_PCCF_ON_END_TOUCH : NULL) |
+		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_TOUCH ? ZE_PCCF_ON_TOUCH : NULL);
+}
+
 bool ZEPhysXPhysicalStaticMesh::Initialize()
 {
 	Deinitialize();

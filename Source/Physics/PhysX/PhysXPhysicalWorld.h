@@ -42,6 +42,7 @@
 
 #include "Physics/PhysicalWorld.h"
 #include "PhysXComponentBase.h"
+#include "PhysXCollisionManager.h"
 #include "ZEDS/Array.h"
 #include "ZEMath/Vector.h"
 #include "Graphics/VertexBuffer.h"
@@ -54,6 +55,8 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 {
 	friend class ZEPhysXModule;
 	private:
+		ZEPhysXCollisionManager						CollisionManager;
+
 		struct 
 		{
 			ZEMaterial* Material;
