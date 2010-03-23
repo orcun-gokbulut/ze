@@ -325,7 +325,8 @@ class ZEModelResourceMeshLOD
 		ZEINT32									MaterialId;
 		ZEArray<ZEModelVertex>					Vertices;
 		ZEArray<ZESkinnedModelVertex>			SkinnedVertices;
-		
+		ZEArray<ZEDWORD>						AffectingBoneIds;
+
 		ZEStaticVertexBuffer*					GetSharedVertexBuffer() const;
 		ZEStaticVertexBuffer*					CreatePrivateVertexBuffer() const;
 

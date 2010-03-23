@@ -332,6 +332,7 @@ struct ZEModelFileMeshLODChunk
 	ZEINT32								LODLevel;
 	ZEINT32								MaterialId;
 	ZEDWORD								VertexCount;
+	ZEDWORD								AffectingBoneCount;
 };
 
 struct ZEModelFileMeshChunk

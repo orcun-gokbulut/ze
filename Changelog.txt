@@ -185,5 +185,6 @@
 	FIX: Model Brush migrated to new drawing and rendering system.
 	FIX: Uninitialized Model Brush property change crash fixed.
 	FIX: FixedMaterial PreLightning Vertex shader Reflection and Refreaction problem fixed.
-	
-	
+
+[24 March 2010 - Revision 136]
+  ADD: Affected bone mechanism added to ZEModelLODMesh. Each skinned mesh in a model has it own bone indices values other than ZEModel bone indices. Only bones that affect mesh has been used weighting the mesh.

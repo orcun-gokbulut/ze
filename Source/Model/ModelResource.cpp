@@ -378,6 +378,9 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceF
 			LOD->LODLevel = MeshLODChunk.LODLevel;
 			if(MeshChunk.IsSkinned)
 			{
+				LOD->AffectingBoneIds.SetCount(MeshLODChunk.AffectingBoneCount);
+				ResourceFile->Read(LOD->AffectingBoneIds.GetCArray(), sizeof(ZEDWORD), LOD->AffectingBoneIds.GetCount());
+
 				LOD->SkinnedVertices.SetCount(MeshLODChunk.VertexCount);				
 				ResourceFile->Read(LOD->SkinnedVertices.GetCArray(), sizeof(ZESkinnedModelVertex),  LOD->SkinnedVertices.GetCount());
 			}
