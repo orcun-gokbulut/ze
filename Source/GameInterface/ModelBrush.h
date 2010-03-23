@@ -38,22 +38,22 @@
 #define __ZE_MODELBRUSH_H__
 
 #include "GameInterface/Entity.h"
-#include "Graphics/Light.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/VertexBuffer.h" 
-#include "Graphics/Material.h"
 #include "Model/Model.h"
 
 ZE_META_CLASS_DESCRIPTION(ZEModelBrush);
+
+class ZEModel;
+class ZEModelResource;
 
 class ZEModelBrush : public ZEEntity
 {
 	ZE_META_CLASS()
 	private:
 		ZEModel*							Model;
+		ZEModelResource*					ModelResource;
 
 	public:
-		virtual bool						IsDrawable();
+		virtual ZEDWORD						GetDrawFlags() const;
 
 		ZEModel*							GetModel();
 

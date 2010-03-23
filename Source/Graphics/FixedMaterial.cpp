@@ -172,7 +172,7 @@ void ZEFixedMaterial::SetAmbientEnabled(bool Enabled)
 	if (Enabled)
 		MaterialComponents |= ZESHADER_AMBIENT;
 	else
-		MaterialComponents &= !ZESHADER_AMBIENT;
+		MaterialComponents &= ~ZESHADER_AMBIENT;
 
 }
 
@@ -208,7 +208,7 @@ void ZEFixedMaterial::SetDiffuseEnabled(bool Enabled)
 	if (Enabled)
 		MaterialComponents |= ZESHADER_DIFFUSE;
 	else
-		MaterialComponents &= !ZESHADER_DIFFUSE;
+		MaterialComponents &= ~ZESHADER_DIFFUSE;
 }
 
 bool ZEFixedMaterial::GetDiffuseEnabled() const
@@ -241,7 +241,7 @@ float ZEFixedMaterial::GetDiffuseFactor() const
 void ZEFixedMaterial::SetDiffuseMap(const ZETexture2D* Texture)
 {
 	if (Texture == NULL)
-		MaterialComponents &= !ZESHADER_DIFFUSEMAP;
+		MaterialComponents &= ~ZESHADER_DIFFUSEMAP;
 	else
 		MaterialComponents |= ZESHADER_DIFFUSEMAP;
 
@@ -278,7 +278,7 @@ void ZEFixedMaterial::SetSpecularEnabled(bool Enabled)
 	if (Enabled)
 		MaterialComponents |= ZESHADER_SPECULAR;
 	else
-		MaterialComponents &= !ZESHADER_SPECULAR;
+		MaterialComponents &= ~ZESHADER_SPECULAR;
 }
 
 bool ZEFixedMaterial::GetSpecularEnabled() const
@@ -320,7 +320,7 @@ float ZEFixedMaterial::GetSpecularShininess() const
 void ZEFixedMaterial::SetSpecularMap(const ZETexture2D* Texture)
 {
 	if (Texture == NULL)
-		MaterialComponents &= !ZESHADER_SPECULARMAP;
+		MaterialComponents &= ~ZESHADER_SPECULARMAP;
 	else
 		MaterialComponents |= ZESHADER_SPECULARMAP;
 
@@ -358,7 +358,7 @@ void ZEFixedMaterial::SetEmmisiveEnabled(bool Enabled)
 	if (Enabled)
 		MaterialComponents |= ZESHADER_EMMISIVE;
 	else
-		MaterialComponents &= !ZESHADER_EMMISIVE;
+		MaterialComponents &= ~ZESHADER_EMMISIVE;
 
 
 }
@@ -425,7 +425,7 @@ void ZEFixedMaterial::SetNormalMapEnabled(bool Enabled)
 	if (Enabled)
 		MaterialComponents |= ZESHADER_NORMALMAP;
 	else
-		MaterialComponents &= !ZESHADER_NORMALMAP;
+		MaterialComponents &= ~ZESHADER_NORMALMAP;
 }
 
 bool ZEFixedMaterial::GetNormalMapEnabled() const
@@ -468,7 +468,7 @@ void ZEFixedMaterial::SetParallaxMapEnabled(bool Enabled)
 	if (Enabled)
 		MaterialComponents |= ZESHADER_PARALLAXMAP;
 	else
-		MaterialComponents &= !ZESHADER_PARALLAXMAP;
+		MaterialComponents &= ~ZESHADER_PARALLAXMAP;
 }
 
 void ZEFixedMaterial::SetParallaxMap(const ZETexture2D* Texture)
@@ -512,7 +512,7 @@ void ZEFixedMaterial::SetOpacityEnabled(bool Enabled)
 	if (Enabled)
 		MaterialComponents |= ZESHADER_OPACITY;
 	else
-		MaterialComponents &= !ZESHADER_OPACITY;
+		MaterialComponents &= ~ZESHADER_OPACITY;
 }
 
 bool ZEFixedMaterial::GetOpacityEnabled() const
@@ -574,9 +574,9 @@ ZETextureAddressMode ZEFixedMaterial::GetOpacityMapAddressModeV() const
 void ZEFixedMaterial::SetReflectionEnabled(bool Enabled)
 {
 	if (Enabled)
-		MaterialComponents &= !ZESHADER_REFLECTION;
-	else
 		MaterialComponents |= ZESHADER_REFLECTION;
+	else
+		MaterialComponents &= ~ZESHADER_REFLECTION;
 }
 
 bool ZEFixedMaterial::GetReflectionEnabled() const
@@ -597,7 +597,7 @@ float ZEFixedMaterial::GetReflectionFactor() const
 void ZEFixedMaterial::SetReflectionMap(const ZETextureCube* Texture)
 {
 	if (Texture == NULL)
-		MaterialComponents &= !ZESHADER_REFLECTION;
+		MaterialComponents &= ~ZESHADER_REFLECTION;
 	else
 		MaterialComponents |= ZESHADER_REFLECTION;
 
@@ -642,9 +642,9 @@ ZETextureAddressMode ZEFixedMaterial::GetReflectionMapAddressModeW() const
 void ZEFixedMaterial::SetRefractionEnabled(bool Enabled)
 {
 	if (Enabled)
-		MaterialComponents &= !ZESHADER_REFRACTION;
-	else
 		MaterialComponents |= ZESHADER_REFRACTION;
+	else
+		MaterialComponents &= ~ZESHADER_REFRACTION;
 }
 
 bool ZEFixedMaterial::GetRefractionEnabled() const
@@ -675,7 +675,7 @@ float ZEFixedMaterial::GetRefractionFactor() const
 void ZEFixedMaterial::SetRefractionMap(const ZETextureCube* Texture)
 {
 	if (Texture == NULL)
-		MaterialComponents &= !ZESHADER_REFRACTION;
+		MaterialComponents &= ~ZESHADER_REFRACTION;
 	else
 		MaterialComponents |= ZESHADER_REFRACTION;
 
@@ -722,7 +722,7 @@ void ZEFixedMaterial::SetDetailMapEnabled(bool Enabled)
 	if (Enabled)
 		MaterialComponents |= ZESHADER_DETAILMAP;
 	else
-		MaterialComponents &= !ZESHADER_DETAILMAP;
+		MaterialComponents &= ~ZESHADER_DETAILMAP;
 }
 
 bool ZEFixedMaterial::GetDetailMapEnabled() const
@@ -743,7 +743,7 @@ const ZEVector2& ZEFixedMaterial::GetDetailMapTiling() const
 void ZEFixedMaterial::SetDetailDiffuseMap(const ZETexture2D* Texture)
 {
 	if (Texture == NULL)
-		MaterialComponents &= !ZESHADER_DETAILDIFFUSEMAP;
+		MaterialComponents &= ~ZESHADER_DETAILDIFFUSEMAP;
 	else
 		MaterialComponents |= ZESHADER_DETAILDIFFUSEMAP;
 
@@ -778,7 +778,7 @@ ZETextureAddressMode ZEFixedMaterial::GetDetailDiffuseMapAddressModeV() const
 void ZEFixedMaterial::SetDetailNormalMap(const ZETexture2D* Texture)
 {
 	if (Texture == NULL)
-		MaterialComponents &= !ZESHADER_DETAILNORMALMAP;
+		MaterialComponents &= ~ZESHADER_DETAILNORMALMAP;
 	else
 		MaterialComponents |= ZESHADER_DETAILNORMALMAP;
 
@@ -815,7 +815,7 @@ void ZEFixedMaterial::SetLightMapEnabled(bool Enabled)
 	if (Enabled)
 		MaterialComponents |= ZESHADER_LIGHTMAP;
 	else
-		MaterialComponents &= !ZESHADER_LIGHTMAP;
+		MaterialComponents &= ~ZESHADER_LIGHTMAP;
 }
 
 bool ZEFixedMaterial::GetLightMapEnabled() const
@@ -868,7 +868,7 @@ void ZEFixedMaterial::SetDistortionEnabled(bool Enabled)
 	if (Enabled)
 		MaterialComponents |= ZESHADER_DISTORTIONMAP;
 	else
-		MaterialComponents &= !ZESHADER_DISTORTIONMAP;
+		MaterialComponents &= ~ZESHADER_DISTORTIONMAP;
 }
 
 bool ZEFixedMaterial::GetDistortionEnabled() const

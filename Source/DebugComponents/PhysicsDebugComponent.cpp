@@ -161,6 +161,9 @@ bool ZEPhysicsDebugComponent::Initialize()
 
 		World->AddPhysicalObject(PhysicalMesh);
 
+		Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
+		Model->SetModelFile("Warren\\Warren.zeModel");
+		Scene->AddEntity(Model);
 		//zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
 		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);

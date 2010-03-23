@@ -171,9 +171,19 @@
 	CHF: New, Improved, bug fixed and tested ZEMath integrated to Zinek Engine project.
 	ADD: New ZEMath tests added to Zinek Engine Test project.
 
-[22 March 2010 -revision 134]
-	ADD: Physical collision callback added to ZEPhysicalObject
-	ADD: Physical transform change callback added to ZEPhysicalRigidBody.
+[22 March 2010 - Revision 134]
 	ADD: Culling statistics added to ZEScene. ZEScene::GetCullStatistics().
 	ADD: ZEFixedMaterial conversion added to ZEModelResource. Now it can read legacy ZEModel files until new material file format created.
+	
+[23 March 2010 - Revision 135]
+	ADD: Physical collision callback added to ZEPhysicalObject
+	ADD: Physical transform change callback added to ZEPhysicalRigidBody.
+	FIX: ZEModelResource loading bug fixes.
+	FIX: ZEFixedMaterial MaterialComponent fixed.
+	FIX: Added maximum bone limit to ZED3D9FixedMaterial.
+	FIX: ZED3D9FixedMaterial shader creation fixed.
+	FIX: Model Brush migrated to new drawing and rendering system.
+	FIX: Uninitialized Model Brush property change crash fixed.
+	FIX: FixedMaterial PreLightning Vertex shader Reflection and Refreaction problem fixed.
+	
 	

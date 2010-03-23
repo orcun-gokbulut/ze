@@ -39,6 +39,7 @@
 
 #include "Core/DebugComponent.h"
 #include "Physics/PhysicalCallbacks.h"
+#include "GameInterface/ModelBrush.h"
 
 class ZEPlayer;
 class ZEPhysicalRigidBody;
@@ -52,6 +53,7 @@ class ZEPhysicsDebugComponent : public ZEDebugComponent
 		ZEPhysicalRigidBody*	PhysicalRigidBody;
 		ZEPhysicalSphereShape	Shape;	
 		ZEPhysicalSphereShape	Shape2;	
+		ZEModelBrush*			Model;
 
 		void					TransformChanged(const ZEPhysicalTransformChange& TransformChange);
 		void					ColisionDetected(const ZEPhysicalCollision& Collision);

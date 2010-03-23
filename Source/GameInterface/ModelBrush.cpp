@@ -36,11 +36,14 @@
 #include "ModelBrush.h"
 #include "Core/Error.h"
 #include "Graphics/Canvas.h"
+#include "Model/Model.h"
+#include "Model/ModelResource.h"
+
 #include <string.h>
 
-bool ZEModelBrush::IsDrawable()
+ZEDWORD ZEModelBrush::GetDrawFlags() const
 {
-	return true;
+	return ZE_DF_DRAW;// | ZE_DF_CULL;
 }
 			
 ZEModel* ZEModelBrush::GetModel()
@@ -60,11 +63,17 @@ const ZEAABoundingBox& ZEModelBrush::GetWorldBoundingBox()
 
 void ZEModelBrush::SetModelFile(const char* ModelFile)
 {
+	if (ModelResource != NULL)
+		ModelResource->Release();
+
 	if (strcmp(ModelFile, "") != 0)
-		Model->SetModelResource(ZEModelResource::LoadSharedResource(ModelFile));
+		ModelResource = ZEModelResource::LoadSharedResource(ModelFile);
 	else
-		Model->SetModelResource(NULL);
-}
+		ModelResource = NULL;
+
+	if (Model != NULL)
+		Model->SetModelResource(ModelResource);
+}	
 
 const char* ZEModelBrush::GetModelFile() const
 {
@@ -153,6 +162,9 @@ void ZEModelBrush::Initialize()
 	{
 		Model = new ZEModel();
 		RegisterComponent(Model);
+		if (ModelResource != NULL)
+			Model->SetModelResource(ModelResource);
+		Model->Initialize();
 	}
 }
 
@@ -162,6 +174,13 @@ void ZEModelBrush::Deinitialize()
 	{
 		UnregisterComponent(Model);
 		delete Model;
+		Model = NULL;
+	}
+
+	if (ModelResource != NULL)
+	{
+		ModelResource->Release();
+		ModelResource = NULL;
 	}
 }
 
@@ -184,6 +203,7 @@ void ZEModelBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight
 ZEModelBrush::ZEModelBrush()
 {
 	Model = NULL;
+	ModelResource = NULL;
 	SetBoundingVolumeMechanism(ZE_BVM_USECOMPONENTS);
 }
 

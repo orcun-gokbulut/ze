@@ -357,6 +357,7 @@ struct ZEModelResourceBone
 	ZEMatrix4x4									RelativeTransform;
 	ZEMatrix4x4									ForwardTransform;
 	ZEMatrix4x4									InverseTransform;
+	ZEModelResourcePhysicalBody					PhysicalBody;
 	ZEModelResourcePhysicalJoint				PhysicalJoint;
 };
 
@@ -375,7 +376,7 @@ class ZEModelResource : public ZEResource
 		const char*								GetResourceType() const;
 		
 		static ZEModelResource*					LoadResource(const char* FileName);
-		static const ZEModelResource*			LoadSharedResource(const char* FileName);
+		static ZEModelResource*					LoadSharedResource(const char* FileName);
 		static void								CacheResource(const char* FileName);
 };
 

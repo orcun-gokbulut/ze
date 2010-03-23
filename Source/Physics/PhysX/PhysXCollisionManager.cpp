@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UIManager.cpp
+ Zinek Engine - PhysXCollisionManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,93 +33,36 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "UIManager.h"
-#include "UIRenderer.h"
-#include "UIControl.h"
-#include "Core/Error.h"
+#include "PhysXCollisionManager.h"
+#include "Physics/PhysicalCallbacks.h"
+#include "Physics/PhysicalObject.h"
+#include <NxActor.h>
 
-ZEUIManager::ZEUIManager() 
+void ZEPhysXCollisionManager::onContactNotify(NxContactPair& pair, NxU32 events)
 {
-	UIRenderer = NULL;
-}
+	ZEPhysicalCollision Collision;
+	if (!pair.isDeletedActor[0])
+		Collision.Collider1 = (ZEPhysicalObject*)pair.actors[0]->userData;
+	else
+		Collision.Collider1 = NULL;
 
-ZEUIManager::~ZEUIManager() 
-{
-	if (UIRenderer != NULL)
-		UIRenderer->Destroy();
-}
+	if (!pair.isDeletedActor[0])
+		Collision.Collider2 = (ZEPhysicalObject*)pair.actors[1]->userData;
+	else
+		Collision.Collider2 = NULL;
+	
+	if (Collision.Collider1 != NULL)
+	{
+		const ZEPhysicalCollisionCallback& Callback = ((ZEPhysicalObject*)Collision.Collider1)->GetCollisionCallback();
+		if (!Callback.empty())
+			Callback(Collision);
+	}
 
-void ZEUIManager::AddControl(ZEUIControl* Control)
-{
-	zeAssert(Controls.FindIndex(Control) != -1, "UI Control already added to ZEUIManager. (Control Name : %s)", Control->GetName());
+	if (Collision.Collider2 != NULL)
+	{
+		const ZEPhysicalCollisionCallback& Callback = ((ZEPhysicalObject*)Collision.Collider2)->GetCollisionCallback();
+		if (!Callback.empty())
+			Callback(Collision);
+	}
 
-	Controls.Add(Control);
-}
-
-void ZEUIManager::RemoveControl(ZEUIControl* Control)
-{
-	Controls.DeleteValue(Control);
-}
-
-ZEArray<ZEUIControl*>& ZEUIManager::GetControls()
-{
-	return Controls;
-}
-
-#include "UITextControl.h"
-#include "FontResource.h"
-
-bool ZEUIManager::Initialize()
-{
-	if (UIRenderer == NULL)
-		UIRenderer = ZEUIRenderer::CreateInstance();
-
-	UIRenderer->Initialize();
-
-
-	// Test Routines
-
-	ZEUITextControl* TestControl = new ZEUITextControl();
-
-	TestControl->SetPosition(ZEVector2(20, 20));
-	TestControl->SetSize(ZEVector2(780.0f, 100.0f));
-	TestControl->SetBackgroundColor(ZEVector4(1.0f, 0.0f, 0.0f, 1.0f));
-	TestControl->SetTextColor(ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
-	TestControl->SetText("Kan kokuyorum ulan !");
-	TestControl->SetTextWrap(true);
-	TestControl->SetFontSize(ZEVector2::One);
-	TestControl->SetFont(ZEFontResource::LoadResource("OldEnglish.zeFont"));
-
-	AddControl(TestControl);
-
-	return true;
-}
-
-void ZEUIManager::Deinitialize()
-{
-	UIRenderer->Destroy();
-	UIRenderer = NULL;
-}
-
-void ZEUIManager::ProcessEvents()
-{
-}
-
-void ZEUIManager::Render(ZERenderer* Renderer)
-{
-	UIRenderer->Clean();
-	for (size_t I = 0; I < Controls.GetCount(); I++)
-		Controls[I]->Draw(UIRenderer);
-
-	UIRenderer->Render(Renderer);
-}
-
-void ZEUIManager::Destroy()
-{
-	delete this;
-}
-
-ZEUIManager* ZEUIManager::CreateInstance()
-{
-	return new ZEUIManager();
 }

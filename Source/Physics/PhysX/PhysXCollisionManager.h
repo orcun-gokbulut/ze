@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UIManager.cpp
+ Zinek Engine - PhysXCollisionManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,93 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "UIManager.h"
-#include "UIRenderer.h"
-#include "UIControl.h"
-#include "Core/Error.h"
+#pragma once
+#ifndef __ZE_PHYSX_COLLISION_MANAGER_H__
+#define __ZE_PHYSX_COLLISION_MANAGER_H__
 
-ZEUIManager::ZEUIManager() 
+#include <NxUserContactReport.h>
+
+class ZEPhysXCollisionManager : public NxUserContactReport
 {
-	UIRenderer = NULL;
-}
+	virtual void		onContactNotify(NxContactPair& pair, NxU32 events);
+};
 
-ZEUIManager::~ZEUIManager() 
-{
-	if (UIRenderer != NULL)
-		UIRenderer->Destroy();
-}
-
-void ZEUIManager::AddControl(ZEUIControl* Control)
-{
-	zeAssert(Controls.FindIndex(Control) != -1, "UI Control already added to ZEUIManager. (Control Name : %s)", Control->GetName());
-
-	Controls.Add(Control);
-}
-
-void ZEUIManager::RemoveControl(ZEUIControl* Control)
-{
-	Controls.DeleteValue(Control);
-}
-
-ZEArray<ZEUIControl*>& ZEUIManager::GetControls()
-{
-	return Controls;
-}
-
-#include "UITextControl.h"
-#include "FontResource.h"
-
-bool ZEUIManager::Initialize()
-{
-	if (UIRenderer == NULL)
-		UIRenderer = ZEUIRenderer::CreateInstance();
-
-	UIRenderer->Initialize();
-
-
-	// Test Routines
-
-	ZEUITextControl* TestControl = new ZEUITextControl();
-
-	TestControl->SetPosition(ZEVector2(20, 20));
-	TestControl->SetSize(ZEVector2(780.0f, 100.0f));
-	TestControl->SetBackgroundColor(ZEVector4(1.0f, 0.0f, 0.0f, 1.0f));
-	TestControl->SetTextColor(ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
-	TestControl->SetText("Kan kokuyorum ulan !");
-	TestControl->SetTextWrap(true);
-	TestControl->SetFontSize(ZEVector2::One);
-	TestControl->SetFont(ZEFontResource::LoadResource("OldEnglish.zeFont"));
-
-	AddControl(TestControl);
-
-	return true;
-}
-
-void ZEUIManager::Deinitialize()
-{
-	UIRenderer->Destroy();
-	UIRenderer = NULL;
-}
-
-void ZEUIManager::ProcessEvents()
-{
-}
-
-void ZEUIManager::Render(ZERenderer* Renderer)
-{
-	UIRenderer->Clean();
-	for (size_t I = 0; I < Controls.GetCount(); I++)
-		Controls[I]->Draw(UIRenderer);
-
-	UIRenderer->Render(Renderer);
-}
-
-void ZEUIManager::Destroy()
-{
-	delete this;
-}
-
-ZEUIManager* ZEUIManager::CreateInstance()
-{
-	return new ZEUIManager();
-}
+#endif

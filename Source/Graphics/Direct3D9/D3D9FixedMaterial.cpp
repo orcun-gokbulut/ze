@@ -170,7 +170,7 @@ bool ZED3D9FixedMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Ca
 	((ZED3D9FixedMaterial*)this)->RenderOrder = RenderOrder;
 	((ZED3D9FixedMaterial*)this)->Camera = Camera;
 
-	if (RenderOrder->Flags & ZE_ROF_SKINNED)
+	if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
 		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
 	
 	GetDevice()->SetVertexShaderConstantF(12, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants));
@@ -519,7 +519,7 @@ void ZED3D9FixedMaterial::EndOfPasses() const
 
 void ZED3D9FixedMaterial::UpdateMaterial()
 {
-	if (MaterialComponents != OldMaterialComponents)
+	if (MaterialComponents != OldMaterialComponents || Shader == NULL)
 	{
 		if (Shader != NULL)
 			Shader->Release();

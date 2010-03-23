@@ -108,7 +108,7 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 	// Setup vertex declaration
 	RenderOrder->VertexDeclaration->SetupVertexDeclaration();
 
-	/* NOT INDEX BUFFERS SUPPORTED ANYMORE */
+	/* NO INDEX BUFFERS SUPPORTED ANYMORE */
 	/*
 	// Setup index buffer if available
 	if (RenderOrder->IndexBuffer != NULL)

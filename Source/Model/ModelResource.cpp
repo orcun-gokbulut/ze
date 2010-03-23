@@ -108,7 +108,7 @@ ZEModelResourceMeshLOD::~ZEModelResourceMeshLOD()
 
 //////////////////////////////////////////////////////////////// READ ////////////////////////////////////////////////////////////////
 
-const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArray<ZETexture2DResource*>& TextureResources)
+static const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArray<ZETexture2DResource*>& TextureResources)
 {
 	if (strncmp(FileName, "", ZE_MDLF_MAX_FILENAME_SIZE) == 0)
 		return NULL;
@@ -127,20 +127,20 @@ const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArray<ZETe
 	return NewTextureResource->GetTexture();
 }
 
-#define ZESHADER_SKINTRANSFORM				1
-#define ZESHADER_DIFFUSEMAP					2
-#define ZESHADER_NORMALMAP					4
-#define ZESHADER_SPECULARMAP				8
-#define ZESHADER_EMMISIVEMAP				16
-#define ZESHADER_OCAPASITYMAP				32
-#define ZESHADER_DETAILDIFFUSEMAP			64
-#define ZESHADER_DETAILNORMALMAP			128
-#define ZESHADER_REFLECTION					256
-#define ZESHADER_REFRACTION					512
-#define ZESHADER_LIGHTMAP					1024
-#define ZESHADER_DISTORTIONMAP				2048
+#define ZE_MFSC_SKINTRANSFORM				1
+#define ZE_MFSC_DIFFUSEMAP					2
+#define ZE_MFSC_NORMALMAP					4
+#define ZE_MFSC_SPECULARMAP					8
+#define ZE_MFSC_EMMISIVEMAP					16
+#define ZE_MFSC_OCAPASITYMAP				32
+#define ZE_MFSC_DETAILDIFFUSEMAP			64
+#define ZE_MFSC_DETAILNORMALMAP				128
+#define ZE_MFSC_REFLECTION					256
+#define ZE_MFSC_REFRACTION					512
+#define ZE_MFSC_LIGHTMAP					1024
+#define ZE_MFSC_DISTORTIONMAP				2048
 
-bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
+static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 {
 	for (size_t I = 0; I < Model->Materials.GetCount(); I++)
 	{
@@ -157,6 +157,7 @@ bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
 		Model->Materials[I] = CurrentMaterial;
 
+		CurrentMaterial->SetZero();
 		CurrentMaterial->SetDiffuseEnabled(true);
 		CurrentMaterial->SetAmbientEnabled(true);
 		CurrentMaterial->SetSpecularEnabled(true);
@@ -180,13 +181,13 @@ bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 
 		CurrentMaterial->SetDiffuseMap(ManageModelMaterialTextures(MaterialChunk.DiffuseMap, Model->TextureResources));
 		
-		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_NORMALMAP);
+		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_NORMALMAP);
 		CurrentMaterial->SetNormalMap(ManageModelMaterialTextures(MaterialChunk.NormalMap, Model->TextureResources));
 		CurrentMaterial->SetSpecularMap(ManageModelMaterialTextures(MaterialChunk.SpecularMap, Model->TextureResources));
 		CurrentMaterial->SetEmmisiveMap(ManageModelMaterialTextures(MaterialChunk.EmmisiveMap, Model->TextureResources));
 		CurrentMaterial->SetOpacityMap(ManageModelMaterialTextures(MaterialChunk.OpasityMap, Model->TextureResources));
 		
-		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_DETAILNORMALMAP);
+		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_DETAILNORMALMAP);
 		CurrentMaterial->SetDetailDiffuseMap(ManageModelMaterialTextures(MaterialChunk.DetailMap, Model->TextureResources));
 		CurrentMaterial->SetDetailNormalMap(ManageModelMaterialTextures(MaterialChunk.DetailNormalMap, Model->TextureResources));
 		CurrentMaterial->SetReflectionEnabled(false);
@@ -194,15 +195,25 @@ bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetRefractionEnabled(false);
 		CurrentMaterial->SetRefractionMap(NULL);
 
-		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_LIGHTMAP);
+		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_LIGHTMAP);
 		CurrentMaterial->SetLightMap(ManageModelMaterialTextures(MaterialChunk.LightMap, Model->TextureResources));
 
-		CurrentMaterial->UpdateMaterial();
+ 		CurrentMaterial->UpdateMaterial();
 	}
 	return true;
 }
 
-bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile* ResourceFile)
+enum ZEPhysicalShapeType_
+{
+	_ZE_PST_PLANE           = 0,
+	_ZE_PST_BOX				= 1,
+	_ZE_PST_SPHERE			= 2,
+	_ZE_PST_CAPSULE			= 3,
+	_ZE_PST_CONVEX			= 4,
+	_ZE_PST_TRIMESH         = 5
+};
+
+static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile* ResourceFile)
 {
 	ZEModelFilePhysicalBodyChunk BodyChunk;
 	ResourceFile->Read(&BodyChunk, sizeof(ZEModelFilePhysicalBodyChunk), 1);
@@ -249,7 +260,7 @@ bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile*
 
 		switch (Shape->Type)
 		{
-			case ZE_PST_PLANE:
+			case _ZE_PST_PLANE:
 			{
 				Shape->Plane.Height		= ShapeChunk.Plane.Height;
 				Shape->Plane.NormalX	= ShapeChunk.Plane.NormalX;
@@ -257,25 +268,25 @@ bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile*
 				Shape->Plane.NormalZ	= ShapeChunk.Plane.NormalZ;
 				break;
 			}
-			case ZE_PST_BOX:
+			case _ZE_PST_BOX:
 			{
 				Shape->Box.Width		= 0.5 * ShapeChunk.Box.Width;
 				Shape->Box.Height		= 0.5 * ShapeChunk.Box.Height;
 				Shape->Box.Length		= 0.5 * ShapeChunk.Box.Length;
 				break;
 			}
-			case ZE_PST_SPHERE:
+			case _ZE_PST_SPHERE:
 			{
 				Shape->Sphere.Radius	= ShapeChunk.Sphere.Radius;
 				break;
 			}
-			case ZE_PST_CAPSULE:
+			case _ZE_PST_CAPSULE:
 			{
 				Shape->Capsule.Height	= ShapeChunk.Capsule.Height;
 				Shape->Capsule.Radius	= ShapeChunk.Capsule.Radius;
 				break;
 			}
-			case ZE_PST_CONVEX:
+			case _ZE_PST_CONVEX:
 			{
 				ZEDWORD ChunkId;
 				ResourceFile->Read(&ChunkId, sizeof(ZEDWORD), 1);
@@ -289,7 +300,7 @@ bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile*
 				ResourceFile->Read(Shape->Convex.Vertices.GetCArray(), sizeof(ZEVector3), Shape->Convex.Vertices.GetCount());
 				break;
 			}
-			case ZE_PST_TRIMESH:
+			case _ZE_PST_TRIMESH:
 			{
 				//vertices
 				ZEDWORD ChunkId;
@@ -323,7 +334,7 @@ bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile*
 	return true;
 }
 
-bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
+static bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 {
 	for (size_t I = 0; I < Model->Meshes.GetCount(); I++)
 	{
@@ -391,7 +402,7 @@ bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 	return true;
 }
 
-bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEResourceFile* ResourceFile)
+static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEResourceFile* ResourceFile)
 {
 	ZEModelFilePhysicalJointChunk JointChunk;
 	ResourceFile->Read(&JointChunk, sizeof(ZEModelResourcePhysicalJoint), 1);
@@ -523,7 +534,7 @@ bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEResourceFi
 	return true;
 }
 
-void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, int BoneId)
+static void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, int BoneId)
 {
 	ZEMatrix4x4::CreateOrientation(Bone->RelativeTransform, Bone->RelativePosition, Bone->RelativeRotation, Bone->RelativeScale);
 
@@ -544,7 +555,7 @@ void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, int BoneId)
 			ProcessBones(Model, &Model->Bones[I], I);
 }
 
-bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
+static bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 {
 	for (size_t I = 0; I < Model->Bones.GetCount(); I++)
 	{
@@ -561,12 +572,15 @@ bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 
 		strncpy(Bone->Name, BoneChunk.Name, ZE_MDLF_MAX_NAME_SIZE);
 		Bone->BoundingBox = BoneChunk.BoundingBox;
-
-		Bone->BoundingBox = BoneChunk.BoundingBox;
 		Bone->ParentBone = BoneChunk.ParentBone;
 		Bone->RelativePosition = BoneChunk.RelativePosition;
 		Bone->RelativeRotation = BoneChunk.RelativeRotation;
 		Bone->RelativeScale = BoneChunk.RelativeScale;
+		if (BoneChunk.HasPhysicalBody)
+			ReadPhysicalBodyFromFile(&Bone->PhysicalBody, ResourceFile);
+
+		if (BoneChunk.HasPhysicalJoint)
+			ReadPhysicalJointFromFile(&Bone->PhysicalJoint, ResourceFile);
 	}
 
 	for (size_t I = 0; I < Model->Bones.GetCount(); I++)
@@ -575,7 +589,7 @@ bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 	return true;
 }
 
-bool ReadAnimationsFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
+static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 {
 	for (size_t I = 0; I < Model->Animations.GetCount(); I++)
 	{
@@ -616,7 +630,7 @@ bool ReadAnimationsFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile
 	return true;
 }
 
-bool ReadModelFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
+static bool ReadModelFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 {
 	ZEModelFileHeaderChunk HeaderChunk;
 	ResourceFile->Read(&HeaderChunk, sizeof(ZEModelFileHeaderChunk), 1);
@@ -670,7 +684,7 @@ const char* ZEModelResource::GetResourceType() const
 }
 
 
-const ZEModelResource* ZEModelResource::LoadSharedResource(const char* FileName)
+ZEModelResource* ZEModelResource::LoadSharedResource(const char* FileName)
 {
 	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(FileName);
 	

@@ -112,6 +112,10 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 	Output.Position = mul(Position, WorldViewProjMatrix);
 
+	#if defined(ZESHADER_REFLECTION) || defined(ZESHADER_REFRACTION)
+		float3 CameraDirection = normalize(Position - ViewPosition);
+	#endif
+	
 	#ifdef ZESHADER_REFLECTION
 		Output.ReflectionVector = reflect(-CameraDirection, Normal);
 	#endif
