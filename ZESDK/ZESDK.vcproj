@@ -1550,11 +1550,11 @@
 			Name="Physics"
 			>
 			<File
-				RelativePath="..\Source\Physics\PhysicalCollision.cpp"
+				RelativePath="..\Source\Physics\PhysicalCallbacks.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\Source\Physics\PhysicalCollision.h"
+				RelativePath="..\Source\Physics\PhysicalCallbacks.h"
 				>
 			</File>
 			<File
@@ -1632,6 +1632,14 @@
 			<Filter
 				Name="PhysX"
 				>
+				<File
+					RelativePath="..\Source\Physics\PhysX\PhysXCollisionManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath="..\Source\Physics\PhysX\PhysXCollisionManager.h"
+					>
+				</File>
 				<File
 					RelativePath="..\Source\Physics\PhysX\PhysXComponentBase.cpp"
 					>

@@ -145,7 +145,9 @@ bool ZEGame::Initialize()
 		delete Scene;
 	}
 
-	Scene = new ZEScene();
+	if (Scene == NULL)
+		Scene = new ZEScene();
+	
 	return Scene->Initialize();
 }
 
