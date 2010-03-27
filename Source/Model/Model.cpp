@@ -37,7 +37,9 @@
 #include "ModelFileFormat.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/VertexBuffer.h"
+#include "Graphics/SimpleMaterial.h"
 #include "GameInterface/Entity.h"
+
 #include <stdio.h>
 #include <string.h>
 
@@ -98,6 +100,54 @@ void ZEModel::CalculateBoundingBox()
 
 	if (NotInitialized )
 		BoundingBox.Max = BoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
+}
+
+void ZEModel::DebugDraw(ZERenderer* Renderer)
+{
+	if (DebugDrawComponents.Material == NULL)
+	{
+		DebugDrawComponents.Material = ZESimpleMaterial::CreateInstance();
+
+		DebugDrawComponents.BonePositionsRenderOrder.SetZero();
+		DebugDrawComponents.BonePositionsRenderOrder.Material = DebugDrawComponents.Material;
+		DebugDrawComponents.BonePositionsRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_IMPOSTER;
+		DebugDrawComponents.BonePositionsRenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+		DebugDrawComponents.BonePositionsRenderOrder.VertexBuffer = &DebugDrawComponents.BonePositionsCanvas;
+		DebugDrawComponents.BonePositionsRenderOrder.PrimitiveType = ZE_ROPT_POINT;
+
+		DebugDrawComponents.BonesRenderOrder.SetZero();
+		DebugDrawComponents.BonesRenderOrder.Material = DebugDrawComponents.Material;
+		DebugDrawComponents.BonesRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_IMPOSTER;
+		DebugDrawComponents.BonesRenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+		DebugDrawComponents.BonesRenderOrder.VertexBuffer = &DebugDrawComponents.BonesCanvas;
+		DebugDrawComponents.BonesRenderOrder.PrimitiveType = ZE_ROPT_LINE;
+	}
+
+	DebugDrawComponents.BonesCanvas.Clean();
+	DebugDrawComponents.BonePositionsCanvas.Clean();
+	DebugDrawComponents.BonePositionsCanvas.SetColor(ZEVector4(1.0f, 0.0f, 0.0f, 0.0f));
+	DebugDrawComponents.BonesCanvas.SetColor(ZEVector4(0.0f, 1.0f, 1.0f, 0.0f));
+
+	if (DrawSkeleton)
+	{
+		ZEVector3 BonePosition1, BonePosition2;
+		for (size_t I = 0; I < Bones.GetCount(); I++)
+		{
+			DebugDrawComponents.BonePositionsCanvas.AddPoint(Bones[I].GetWorldPosition());
+		
+			if (Bones[I].GetParentBone() != NULL)
+				DebugDrawComponents.BonesCanvas.AddLine(Bones[I].GetWorldPosition(), Bones[I].GetParentBone()->GetWorldPosition());
+		}
+		DebugDrawComponents.BonesRenderOrder.WorldMatrix = GetWorldTransform();
+		DebugDrawComponents.BonesRenderOrder.PrimitiveCount = DebugDrawComponents.BonesCanvas.Vertices.GetCount() / 2;
+
+		DebugDrawComponents.BonePositionsRenderOrder.WorldMatrix = GetWorldTransform();
+		DebugDrawComponents.BonePositionsRenderOrder.PrimitiveCount = DebugDrawComponents.BonePositionsCanvas.Vertices.GetCount();
+
+		Renderer->AddToRenderList(&DebugDrawComponents.BonesRenderOrder);
+		Renderer->AddToRenderList(&DebugDrawComponents.BonePositionsRenderOrder);
+	}
+
 }
 
 void ZEModel::LocalTransformChanged()
@@ -237,6 +287,8 @@ void ZEModel::SetAnimationById(size_t AnimationIndex)
 		return;
 
 	Animation = &ModelResource->Animations[AnimationIndex];
+	AnimationStartFrame = 0;
+	AnimationEndFrame = Animation->Frames.GetCount() - 1;
 }
 
 void ZEModel::SetAnimationByName(const char* AnimationName)
@@ -247,9 +299,11 @@ void ZEModel::SetAnimationByName(const char* AnimationName)
 		return;
 
 	for (size_t I = 0; I < ModelResource->Animations.GetCount(); I++)
-		if (strnicmp(Animation->Name, ModelResource->Animations[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
+		if (strnicmp(AnimationName, ModelResource->Animations[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
 		{
 			Animation = &ModelResource->Animations[I];
+			AnimationStartFrame = 0;
+			AnimationEndFrame = Animation->Frames.GetCount() - 1;
 			return;
 		}
 }
@@ -498,40 +552,8 @@ void ZEModel::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& L
 {
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Draw(Renderer, Lights);
-
-	SkeletonPointsVertexBuffer.Clean();
-	SkeletonVertexBuffer.Clean();
-	if (DrawSkeleton)
-	{/*
-		/*ZEVector3 BonePosition1, BonePosition2;
-		for (size_t I = 0; I < Bones.GetCount(); I++)
-		{
-			ZEMatrix4x4::Transform(BonePosition1, Bones[I].GetModelTransform(), ZEVector3(0.0f, 0.0f, 0.0f));
-			SkeletonPointsVertexBuffer.AddPoint(BonePosition1);
-			if (Bones[I].GetChildBones().GetCount() != 0)	
-			{
-				ZEMatrix4x4::Transform(BonePosition2, Bones[I].GetModelTransform(), Bones[I].GetChildBones()[0]->GetRelativePosition());
-				SkeletonVertexBuffer.AddLine(BonePosition1, BonePosition2);
-			}
-		}
-		Renderer->AddToRenderOrder(&SkeletonPointsRenderOrder);
-		Renderer->AddToRenderOrder(&SkeletonRenderOrder);*/
-	}
-
-	if (DrawPhysicalBodies)
-	{
-		/*for (size_t I = 0; I < Meshes.GetCount(); I++)
-		{
-			if (Meshes[I].PhysicsEnabled)
-			{
-				switch(Meshes[I].PhysicalBody.
-			}
-		}*/
-	}
-
-	if (DrawPhysicalJoints)
-	{
-	}
+	
+	DebugDraw(Renderer);
 }
 
 void ZEModel::Tick(float ElapsedTime)
@@ -635,6 +657,9 @@ void ZEModel::Tick(float ElapsedTime)
 
 ZEModel::ZEModel()
 {
+	AnimationFrame = 0.0f;
+	AnimationStartFrame = 0.0f;
+	AnimationEndFrame = 0.0f;
 	ModelResource = NULL;
 	AnimationSpeed = 1.0f;
 	Visibility = true;
@@ -645,10 +670,16 @@ ZEModel::ZEModel()
 	Animation = NULL;	
 	AnimationFrame = 0;
 	AnimationLooping = false;
+	DebugDrawComponents.Material = NULL;
 }
 
 ZEModel::~ZEModel()
 {
+	if (DebugDrawComponents.Material != NULL)
+	{
+		DebugDrawComponents.Material->Release();
+	}
+
 	if (ModelResource != NULL)
 		((ZEModelResource*)ModelResource)->Release();
 }

@@ -65,10 +65,10 @@ void ZEModelMeshLOD::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLig
 	if (Skinned)
 	{
 		RenderOrder.BoneTransforms.SetCount(LODResource->AffectingBoneIds.GetCount());
-		for (size_t I = 0; I < AffectingBones.GetCount(); I++)
-			RenderOrder.BoneTransforms[I] = Owner->GetBones()[LODResource->AffectingBoneIds[I]].GetWorldTransform();
-		ZEMatrix4x4 OwnerMeshModelTransform = OwnerMesh->GetModelTransform();
-		RenderOrder.WorldMatrix = Owner->GetWorldTransform();
+		for (size_t I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
+			RenderOrder.BoneTransforms[I] = Owner->GetBones()[LODResource->AffectingBoneIds[I]].GetVertexTransform();
+
+		ZEMatrix4x4::Multiply(RenderOrder.WorldMatrix, this->OwnerMesh->GetLocalTransform(), Owner->GetWorldTransform());
 	}
 	else
 		RenderOrder.WorldMatrix = OwnerMesh->GetWorldTransform();

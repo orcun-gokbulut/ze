@@ -49,7 +49,8 @@
 #include "Physics/PhysicalShapes.h"
 #include "Physics/PhysicalStaticMesh.h"
 #include "Physics/PhysX/PhysXPhysicalWorld.h"
-
+#include "Model/Model.h"
+#include "Model/ModelMesh.h"
 
 #include <NxScene.h>
 #include <NxActor.h>
@@ -105,7 +106,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 		PhysicalRigidBody->SetTransformChangeCallback(ZEPhysicalTransformChangeCallback(this, &ZEPhysicsDebugComponent::TransformChanged));
 
 		//PhysicalRigidBody->SetLinearDamping(0.01f);
-		World->AddPhysicalObject(PhysicalRigidBody);
+		//World->AddPhysicalObject(PhysicalRigidBody);
 		PhysicalRigidBody->ApplyForce(ZEVector3(1000.0f, 0.0f, 0.0f));
 
 		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
@@ -131,7 +132,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 		CanvasMaterial->SetSpecularColor(ZEVector3::One);
 		CanvasMaterial->SetSpecularShininess(64.0f);
 		CanvasMaterial->UpdateMaterial();
-		zeScene->AddEntity(CanvasBrush);
+		//zeScene->AddEntity(CanvasBrush);
 
 		ZEArray<ZEVector3> PhysicalVertices;
 		ZEArray<ZEPhysicalTriangle> PhysicalTriangles;
@@ -159,11 +160,16 @@ bool ZEPhysicsDebugComponent::Initialize()
 			PhysicalTriangles.GetConstCArray(), PhysicalTriangles.GetCount(),
 			NULL, 0);
 
-		World->AddPhysicalObject(PhysicalMesh);
+		//World->AddPhysicalObject(PhysicalMesh);
 
 		Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
-		Model->SetModelFile("Warren\\Warren.zeModel");
+		Model->SetModelFile("test.zeModel");
 		Scene->AddEntity(Model);
+		//Model->GetModel()->GetMeshes()[0].SetLocalScale(ZEVector3(0.1, 0.1, 0.1));
+		Model->SetAnimationName("Test");
+		Model->SetAnimationState(ZE_MAS_PLAYING);
+		Model->SetAnimationSpeed(33.0f);
+		Model->SetAnimationLooping(true);
 		//zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
 		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);

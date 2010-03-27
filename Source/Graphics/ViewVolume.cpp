@@ -159,7 +159,8 @@ bool ZEViewFrustum::LightCullTest(ZELight* Light) const
 	ZEBoundingSphere BoundingSphere;
 	BoundingSphere.Position = Light->GetWorldPosition();
 	BoundingSphere.Radius = Light->GetRange();
-	return ConeCullTest(BoundingSphere);
+	//return ConeCullTest(BoundingSphere);
+	return false;
 }
 
 bool ZEViewFrustum::CullTest(ZEEntity* Entity) const
@@ -230,14 +231,14 @@ bool ZEViewSphere::LightCullTest(ZELight* Light) const
 
 bool ZEViewSphere::CullTest(const ZEAABoundingBox& BoundingBox) const
 {
-	return ZEBoundingSphere::CollisionTest(BoundingSphere, BoundingBox);
+	return !ZEBoundingSphere::CollisionTest(BoundingSphere, BoundingBox);
 }
 
 
 bool ZEViewSphere::CullTest(ZEEntity* Entity) const
 {
-	if (ZEBoundingSphere::CollisionTest(Entity->GetWorldBoundingSphere(), BoundingSphere) 
-		&& ZEAABoundingBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere))
+	if (!ZEBoundingSphere::CollisionTest(Entity->GetWorldBoundingSphere(), BoundingSphere) 
+		&& !ZEAABoundingBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere))
 			return true;
 	return false;
 }
@@ -249,8 +250,8 @@ bool ZEViewSphere::CullTest(ZEComponent* Component) const
 
 	zeWarningAssert(true, "NearZ cull test not implamented");
 
-	return ZEBoundingSphere::CollisionTest(Component->GetWorldBoundingSphere(), BoundingSphere) 
-		&& ZEAABoundingBox::CollisionTest(Component->GetWorldBoundingBox(), BoundingSphere);
+	return !ZEBoundingSphere::CollisionTest(Component->GetWorldBoundingSphere(), BoundingSphere) 
+		&& !ZEAABoundingBox::CollisionTest(Component->GetWorldBoundingBox(), BoundingSphere);
 }
 
 ZEDoorViewTest ZEViewSphere::CullTest(const ZERectangle3D& PortalDoor) const
@@ -281,24 +282,24 @@ bool ZEViewHemiSphere::LightCullTest(ZELight* Light) const
 
 bool ZEViewHemiSphere::CullTest(const ZEAABoundingBox& BoundingBox) const
 {
-	return ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, HalfPlane) != ZEHALFSPACE_NEGATIVESIDE 
-		&& ZEBoundingSphere::CollisionTest(BoundingSphere, BoundingBox);
+	return ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, HalfPlane) == ZEHALFSPACE_NEGATIVESIDE 
+		|| !ZEBoundingSphere::CollisionTest(BoundingSphere, BoundingBox);
 }
 
 bool ZEViewHemiSphere::CullTest(ZEEntity* Entity) const
 {
-	return ZEBoundingSphere::PlaneHalfSpaceTest(Entity->GetWorldBoundingSphere(), HalfPlane) != ZEHALFSPACE_NEGATIVESIDE 
-		&& ZEBoundingSphere::CollisionTest(BoundingSphere, Entity->GetWorldBoundingSphere())
-		&& ZEAABoundingBox::PlaneHalfSpaceTest(Entity->GetWorldBoundingBox(), HalfPlane) != ZEHALFSPACE_NEGATIVESIDE 
-		&& ZEAABoundingBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere);
+	return ZEBoundingSphere::PlaneHalfSpaceTest(Entity->GetWorldBoundingSphere(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
+		!ZEBoundingSphere::CollisionTest(BoundingSphere, Entity->GetWorldBoundingSphere()) ||
+		ZEAABoundingBox::PlaneHalfSpaceTest(Entity->GetWorldBoundingBox(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
+		!ZEAABoundingBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere);
 }
 
 bool ZEViewHemiSphere::CullTest(ZEComponent* Component) const
 {
-	return ZEBoundingSphere::PlaneHalfSpaceTest(Component->GetWorldBoundingSphere(), HalfPlane) != ZEHALFSPACE_NEGATIVESIDE 
-		&& ZEBoundingSphere::CollisionTest(BoundingSphere, Component->GetWorldBoundingSphere())
-		&& ZEAABoundingBox::PlaneHalfSpaceTest(Component->GetWorldBoundingBox(), HalfPlane) != ZEHALFSPACE_NEGATIVESIDE 
-		&& ZEAABoundingBox::CollisionTest(Component->GetWorldBoundingBox(), BoundingSphere);
+	return ZEBoundingSphere::PlaneHalfSpaceTest(Component->GetWorldBoundingSphere(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
+		!ZEBoundingSphere::CollisionTest(BoundingSphere, Component->GetWorldBoundingSphere()) ||
+		ZEAABoundingBox::PlaneHalfSpaceTest(Component->GetWorldBoundingBox(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
+		!ZEAABoundingBox::CollisionTest(Component->GetWorldBoundingBox(), BoundingSphere);
 }
 
 ZEDoorViewTest ZEViewHemiSphere::CullTest(const ZERectangle3D& PortalDoor) const
@@ -387,21 +388,21 @@ bool ZEViewPlane::CullTest(const ZEAABoundingBox& BoundingBox) const
 bool ZEViewPlane::CullTest(ZEEntity* Entity) const
 {
 	const ZEBoundingSphere& BoundingSphere = Entity->GetWorldBoundingSphere();
-	if (ZEBoundingSphere::PlaneHalfSpaceTest(BoundingSphere, Plane) == ZEHALFSPACE_NEGATIVESIDE 
-		|| ZEPlane::Distance(Plane, BoundingSphere.Position) - BoundingSphere.Radius > MaxDistance)
-		return false;
+	if (ZEBoundingSphere::PlaneHalfSpaceTest(BoundingSphere, Plane) == ZEHALFSPACE_NEGATIVESIDE ||
+		ZEPlane::Distance(Plane, BoundingSphere.Position) - BoundingSphere.Radius > MaxDistance)
+		return true;
 
-	return true;
+	return false;
 }
 
 bool ZEViewPlane::CullTest(ZEComponent* Component) const
 {
 	const ZEBoundingSphere& BoundingSphere = Component->GetWorldBoundingSphere();
-	if (ZEBoundingSphere::PlaneHalfSpaceTest(BoundingSphere, Plane) == ZEHALFSPACE_NEGATIVESIDE 
-		|| ZEPlane::Distance(Plane, BoundingSphere.Position) - BoundingSphere.Radius > MaxDistance)
-		return false;
+	if (ZEBoundingSphere::PlaneHalfSpaceTest(BoundingSphere, Plane) == ZEHALFSPACE_NEGATIVESIDE ||
+		ZEPlane::Distance(Plane, BoundingSphere.Position) - BoundingSphere.Radius > MaxDistance)
+		return true;
 
-	return true;
+	return false;
 }
 
 ZEDoorViewTest ZEViewPlane::CullTest(const ZERectangle3D& PortalDoor) const

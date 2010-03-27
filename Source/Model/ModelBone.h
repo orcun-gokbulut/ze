@@ -81,7 +81,7 @@ class ZEModelBone
 		ZEModelAnimationType				AnimationType;
 
 	public:
-		const ZEModelBone*					GetParentBone();
+		ZEModelBone*						GetParentBone();
 		const ZEArray<ZEModelBone*>			GetChildBones();
 		const char*							GetName();
 
@@ -105,6 +105,12 @@ class ZEModelBone
 
 		const ZEQuaternion&					GetRelativeRotation();
 		void								SetRelativeRotation(const ZEQuaternion& Rotation);
+
+		const ZEVector3						GetModelPosition();
+		const ZEQuaternion					GetModelRotation();
+
+		const ZEVector3						GetWorldPosition();
+		const ZEQuaternion					GetWorldRotation();
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();

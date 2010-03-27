@@ -155,7 +155,7 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 			switch (CurrentLight->Type)
 			{
 				case ZE_ROLT_POINT:
-					if (CurrentLight->ShadowMap != NULL)
+					if (CurrentLight->ShadowMap == NULL)
 					{
 						PointLightList[PointLightCount] = CurrentLight;
 						PointLightCount++;
@@ -168,7 +168,7 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 					break;
 
 				case ZE_ROLT_DIRECTIONAL:
-					if (CurrentLight->ShadowMap != NULL)
+					if (CurrentLight->ShadowMap == NULL)
 					{
 						DirectionalLightList[DirectionalLightCount] = CurrentLight;
 						DirectionalLightCount++;
@@ -181,7 +181,7 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 					break;
 
 				case ZE_ROLT_PROJECTIVE:
-					if (CurrentLight->ShadowMap != NULL)
+					if (CurrentLight->ShadowMap == NULL)
 					{
 						ProjectiveLightList[PointLightCount] = CurrentLight;
 						ProjectiveLightCount++;
@@ -194,7 +194,7 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 					break;
 
 				case ZE_ROLT_OMNIPROJECTIVE:
-					if (CurrentLight->ShadowMap != NULL)
+					if (CurrentLight->ShadowMap == NULL)
 					{
 						OmniProjectiveLightList[OmniProjectiveLightCount] = CurrentLight;
 						OmniProjectiveLightCount++;

@@ -43,7 +43,7 @@ const char* ZEModelBone::GetName()
 	return BoneResource->Name;
 }
 
-const ZEModelBone* ZEModelBone::GetParentBone()
+ZEModelBone* ZEModelBone::GetParentBone()
 {
 	return ParentBone;
 }
@@ -130,7 +130,7 @@ const ZEMatrix4x4& ZEModelBone::GetVertexTransform()
 {
 //	if (UpdateVertexTransform)
 	{
-		ZEMatrix4x4::Multiply(VertexTransform, BoneResource->InverseTransform, GetWorldTransform());
+		ZEMatrix4x4::Multiply(VertexTransform, BoneResource->InverseTransform, GetLocalTransform());
 		UpdateVertexTransform = false;
 	}
 
@@ -185,6 +185,62 @@ void ZEModelBone::SetRelativeRotation(const ZEQuaternion& Rotation)
 	Owner->UpdateBoundingBox();
 	Owner->UpdateBoneTransforms();
 	RelativeRotation = Rotation;
+}
+
+const ZEVector3 ZEModelBone::GetModelPosition()
+{
+	if (ParentBone == NULL)
+		return RelativePosition;
+	else
+	{
+		ZEVector3 Temp;
+		ZEMatrix4x4::Transform(Temp, ParentBone->GetModelTransform(), RelativePosition);
+		return Temp;
+	}
+}
+
+const ZEQuaternion ZEModelBone::GetModelRotation()
+{
+	if (ParentBone == NULL)
+		return RelativeRotation;
+	else
+	{
+		ZEQuaternion Temp;
+		ZEQuaternion::Product(Temp, RelativeRotation, ParentBone->GetModelRotation());
+		return Temp;
+	}
+}
+
+const ZEVector3 ZEModelBone::GetWorldPosition()
+{
+	if (ParentBone == NULL)
+	{
+		ZEVector3 Temp;
+		ZEMatrix4x4::Transform(Temp, Owner->GetWorldTransform(), RelativePosition);
+		return Temp;
+	}
+	else
+	{
+		ZEVector3 Temp;
+		ZEMatrix4x4::Transform(Temp, ParentBone->GetWorldTransform(), RelativePosition);
+		return Temp;
+	}
+}
+
+const ZEQuaternion ZEModelBone::GetWorldRotation()
+{
+	if (ParentBone == NULL)
+	{
+		ZEQuaternion Temp;
+		ZEQuaternion::Product(Temp, RelativeRotation, Owner->GetWorldRotation());
+		return Temp;
+	}
+	else
+	{
+		ZEQuaternion Temp;
+		ZEQuaternion::Product(Temp, RelativeRotation, ParentBone->GetWorldRotation());
+		return Temp;
+	}
 }
 
 void ZEModelBone::SetAnimationType(ZEModelAnimationType AnimationType)

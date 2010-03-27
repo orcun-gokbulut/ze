@@ -337,7 +337,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 					{
 						CullStatistics.TotalLightCount++;
 
-						if (ViewVolume.LightCullTest((ZELight*)Component))
+						if (!ViewVolume.LightCullTest((ZELight*)Component))
 						{
 							CullStatistics.VisibleLightCount++;
 							// If visual debug elements enabled then visualize lights range
@@ -395,7 +395,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 				const ZEViewVolume& LightViewVolume = VisibleLights[M]->GetViewVolume();
 
 				// Test light view volume and entity's bounding volumes in order to detect entity lies in lights effect area
-				if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || LightViewVolume.CullTest(CurrentEntity))
+				if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || !LightViewVolume.CullTest(CurrentEntity))
 				{
 					// Add light to list which contains lights effect entity
 					Lights.Add(VisibleLights[M]->GetRenderOrderLight());
@@ -452,7 +452,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 								// Test light view volume and entity's bounding volumes in order to detect entity lies in lights effect area
 								const ZEViewVolume& LightViewVolume = VisibleLights[M]->GetViewVolume();
 
-								if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || LightViewVolume.CullTest(Components[N]))
+								if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || !LightViewVolume.CullTest(Components[N]))
 									Lights.Add(VisibleLights[M]->GetRenderOrderLight());
 							}
 

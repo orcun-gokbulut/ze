@@ -252,43 +252,43 @@ bool ZED3D9FixedMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Ca
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	}
 
-	if (MaterialComponents & ZESHADER_DIFFUSEMAP)
+	if (MaterialComponents & ZESHADER_DIFFUSEMAP && DiffuseMap != NULL)
 	{
 		SetTextureStage(0, DiffuseMapAddressModeU, DiffuseMapAddressModeV);
 		GetDevice()->SetTexture(0, ((ZED3D9Texture2D*)DiffuseMap)->Texture);
 	}
 
-	if (MaterialComponents & ZESHADER_NORMALMAP)
+	if (MaterialComponents & ZESHADER_NORMALMAP && NormalMap != NULL)
 	{
 		SetTextureStage(1, NormalMapAddressModeU, NormalMapAddressModeV);
 		GetDevice()->SetTexture(1, ((ZED3D9Texture2D*)NormalMap)->Texture);
 	}
 
-	if (MaterialComponents & ZESHADER_PARALLAXMAP)
+	if (MaterialComponents & ZESHADER_PARALLAXMAP && ParallaxMap != NULL)
 	{
 		SetTextureStage(2, ParallaxMapAddressModeU, ParallaxMapAddressModeV);
 		GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)ParallaxMap)->Texture);
 	}
 
-	if (MaterialComponents & ZESHADER_SPECULARMAP)
+	if (MaterialComponents & ZESHADER_SPECULARMAP && SpecularMap != NULL)
 	{
 		SetTextureStage(3, SpecularMapAddressModeU, SpecularMapAddressModeV);
 		GetDevice()->SetTexture(3, ((ZED3D9Texture2D*)SpecularMap)->Texture);
 	}
 
-	if (MaterialComponents & ZESHADER_OPACITY)
+	if (MaterialComponents & ZESHADER_OPACITY && Opacity != NULL)
 	{
 		SetTextureStage(4, OpacityMapAddressModeU, OpacityMapAddressModeV);
 		GetDevice()->SetTexture(4, ((ZED3D9Texture2D*)OpacityMap)->Texture);
 	}
 
-	if (MaterialComponents & ZESHADER_DETAILDIFFUSEMAP)
+	if (MaterialComponents & ZESHADER_DETAILDIFFUSEMAP && DetailDiffuseMap != NULL)
 	{
 		SetTextureStage(5, DetailDiffuseMapAddressModeU, DetailDiffuseMapAddressModeV);
 		GetDevice()->SetTexture(5, ((ZED3D9Texture2D*)DetailDiffuseMap)->Texture);
 	}
 
-	if (MaterialComponents & ZESHADER_DETAILNORMALMAP)
+	if (MaterialComponents & ZESHADER_DETAILNORMALMAP && DetailNormalMap != NULL)
 	{
 		SetTextureStage(6, DetailNormalMapAddressModeU, DetailNormalMapAddressModeV);
 		GetDevice()->SetTexture(6, ((ZED3D9Texture2D*)DetailNormalMap)->Texture);
@@ -299,31 +299,31 @@ bool ZED3D9FixedMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Ca
 
 bool ZED3D9FixedMaterial::SetupPreLightning() const 
 {
-	if (MaterialComponents & ZESHADER_EMMISIVEMAP)
+	if (MaterialComponents & ZESHADER_EMMISIVEMAP && EmmisiveMap != NULL)
 	{
 		SetTextureStage(0, EmmisiveMapAddressModeU, EmmisiveMapAddressModeV);
 		GetDevice()->SetTexture(7, ((ZED3D9Texture2D*)EmmisiveMap)->Texture);
 	}
 
-	if (MaterialComponents & ZESHADER_REFLECTION)
+	if (MaterialComponents & ZESHADER_REFLECTION && ReflectionMap != NULL)
 	{
 		SetTextureStage(8, ReflectionMapAddressModeU, ReflectionMapAddressModeV, ReflectionMapAddressModeW);
 		GetDevice()->SetTexture(8, ((ZED3D9TextureCube*)ReflectionMap)->CubeTexture);
 	}
 
-	if (MaterialComponents & ZESHADER_REFRACTION)
+	if (MaterialComponents & ZESHADER_REFRACTION && RefractionMap != NULL)
 	{
 		SetTextureStage(9, RefractionMapAddressModeU, RefractionMapAddressModeV, RefractionMapAddressModeW);
 		GetDevice()->SetTexture(9, ((ZED3D9TextureCube*)RefractionMap)->CubeTexture);
 	}
 
-	if (MaterialComponents & ZESHADER_LIGHTMAP)
+	if (MaterialComponents & ZESHADER_LIGHTMAP && LightMap != NULL)
 	{
 		SetTextureStage(10, LightMapAddressModeU, LightMapAddressModeV);
 		GetDevice()->SetTexture(10, ((ZED3D9Texture2D*)LightMap)->Texture);
 	}
 
-	if (MaterialComponents & ZESHADER_DISTORTIONMAP)
+	if (MaterialComponents & ZESHADER_DISTORTIONMAP && DistortionMap != NULL)
 	{
 		SetTextureStage(11, DistortionMapAddressModeU, DistortionMapAddressModeV);
 		GetDevice()->SetTexture(11, ((ZED3D9Texture2D*)DistortionMap)->Texture);

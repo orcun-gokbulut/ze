@@ -55,7 +55,6 @@ class ZEModelMeshLOD
 		ZERenderOrder						RenderOrder;
 		const ZEMaterial*					Material;
 		bool								Skinned;
-		ZEArray<size_t>						AffectingBones;
 
 	public:
 		void								ResetMaterial();

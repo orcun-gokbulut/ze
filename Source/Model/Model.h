@@ -49,6 +49,7 @@
 class ZEQuaternion;
 class ZEMatrix4x4;
 class ZEFixedMaterial;
+class ZESimpleMaterial;
 
 class ZEModel : public ZEComponent
 {	
@@ -89,21 +90,16 @@ class ZEModel : public ZEComponent
 		bool								DrawPhysicalBodies;
 		bool								DrawPhysicalJoints;
 
-		ZERenderOrder						SkeletonRenderOrder;
-		ZEFixedMaterial*					SkeletonMaterial;
-		ZECanvas							SkeletonVertexBuffer;
+		struct
+		{
+			ZESimpleMaterial*				Material;
+			ZECanvas						BonesCanvas;
+			ZECanvas						BonePositionsCanvas;
+			ZERenderOrder					BonesRenderOrder;
+			ZERenderOrder					BonePositionsRenderOrder;
+		} DebugDrawComponents;
 
-		ZERenderOrder						SkeletonPointsRenderOrder;
-		ZEFixedMaterial*					SkeletonPointsMaterial;
-		ZECanvas							SkeletonPointsVertexBuffer;
-
-		static ZERenderOrder				PhysicalBodiesRenderOrder;
-		static ZEFixedMaterial*				PhysicalBodiesMaterial;
-		ZECanvas							PhysicalBodiesVertexBuffer;
-
-		static ZERenderOrder				PhysicalJointsRenderOrder;
-		static ZEFixedMaterial*				PhysicalJointsMaterial;
-		ZECanvas							PhysicalJointsVertexBuffer;
+		void								DebugDraw(ZERenderer* Renderer);
 
 	public:
 		virtual	bool						IsDrawable();
