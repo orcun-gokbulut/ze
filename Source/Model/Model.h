@@ -56,8 +56,7 @@ class ZEModel : public ZEComponent
 	friend class ZEPhysicalEnvironment;
 	private:
 		const ZEModelResource*				ModelResource;
-		ZEArray<ZEMatrix4x4>				BoneTransforms;
-		ZEArray<ZEModelBone>				Skeleton;
+		ZEArray<ZEModelBone*>				Skeleton;
 		ZEArray<ZERenderOrder>				LODRenderOrders;
 		
 		ZEArray<ZEModelMesh>				Meshes;
@@ -109,10 +108,10 @@ class ZEModel : public ZEComponent
 		void								SetModelResource(const ZEModelResource* ModelResource);	
 		const ZEModelResource*				GetModelResource();
 		
-		ZEArray<ZEModelBone>&				GetSkeleton();
-		ZEArray<ZEModelBone>&				GetBones();
+		const ZEArray<ZEModelBone*>&		GetSkeleton();
+		const ZEArray<ZEModelBone>&			GetBones();
 		const ZEArray<ZEMatrix4x4>&			GetBoneTransforms();
-		ZEArray<ZEModelMesh>&				GetMeshes();
+		const ZEArray<ZEModelMesh>&			GetMeshes();
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
 
 		void								SetAnimation(const ZEModelAnimation* Animation);

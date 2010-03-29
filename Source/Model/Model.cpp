@@ -180,16 +180,20 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 		Meshes[I].Initialize(this, &ModelResource->Meshes[I]);
 	}
 
-	BoneTransforms.SetCount(ModelResource->Bones.GetCount());
 	Bones.SetCount(ModelResource->Bones.GetCount());
 	for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
+	{
 		Bones[I].Initialize(this, &ModelResource->Bones[I]);
+		if (Bones[I].GetParentBone() == NULL)
+			Skeleton.Add(&Bones[I]);
+	}
 
 	for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
 	{
 		if (ModelResource->Bones[I].ParentBone != -1)
 			Bones[ModelResource->Bones[I].ParentBone].AddChild(&Bones[I]);
 	}
+
 	UpdateBoundingBox();
 	UpdateBoneTransforms();
 }
@@ -200,29 +204,17 @@ const ZEModelResource* ZEModel::GetModelResource()
 }
 
 
-ZEArray<ZEModelBone>& ZEModel::GetSkeleton()
+const ZEArray<ZEModelBone*>& ZEModel::GetSkeleton()
 {
 	return Skeleton;
 }
 
-ZEArray<ZEModelBone>& ZEModel::GetBones()
+const ZEArray<ZEModelBone>& ZEModel::GetBones()
 {
 	return Bones;
 }
 
-const ZEArray<ZEMatrix4x4>& ZEModel::GetBoneTransforms()
-{
-	//if (UpdateBoneTransforms_)
-	{
-		for (size_t I = 0; I < Bones.GetCount(); I++)
-			BoneTransforms[I] = Bones[I].GetVertexTransform();
-		UpdateBoneTransforms_ = false;
-	}
-
-	return BoneTransforms;
-}
-
-ZEArray<ZEModelMesh>& ZEModel::GetMeshes()
+const ZEArray<ZEModelMesh>& ZEModel::GetMeshes()
 {
 	return Meshes;
 }

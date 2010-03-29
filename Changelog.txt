@@ -201,3 +201,8 @@
   BUG: View Cone sphere intersection test in ZEViewFrustrum.
   FIX: Major fixes and improvements on ZEModel skinned meshes.
   BUG: Skining does not work while animating.
+  
+[29 March 2010 - Revision 139]
+  FIX: ZEModel::GetSkeleton() function fixed.
+  REM: ZEModel::GetBoneTransforms() functions has been removed.
+  
