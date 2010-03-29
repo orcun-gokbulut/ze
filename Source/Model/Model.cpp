@@ -209,7 +209,7 @@ const ZEArray<ZEModelBone*>& ZEModel::GetSkeleton()
 	return Skeleton;
 }
 
-const ZEArray<ZEModelBone>& ZEModel::GetBones()
+ZEArray<ZEModelBone>& ZEModel::GetBones()
 {
 	return Bones;
 }

@@ -194,15 +194,18 @@
 	FIX: ZEPhysicalWorld crash when initializing game more than once.
 
 [25 March 2010 - Revision 138]
-  FIX: Light culling fixed in Scene.
-  FIX: View Volumes culling test fixed.
-  FIX: D3D9RendererBase::Renderer lightning problem fixed.
-  FIX: D3D9FixedMaterial crash when NULL textures given has been fixed.
-  BUG: View Cone sphere intersection test in ZEViewFrustrum.
-  FIX: Major fixes and improvements on ZEModel skinned meshes.
-  BUG: Skining does not work while animating.
+	FIX: Light culling fixed in Scene.
+	FIX: View Volumes culling test fixed.
+	FIX: D3D9RendererBase::Renderer lightning problem fixed.
+	FIX: D3D9FixedMaterial crash when NULL textures given has been fixed.
+	BUG: View Cone sphere intersection test in ZEViewFrustrum.
+	FIX: Major fixes and improvements on ZEModel skinned meshes.
+	BUG: Skining does not work while animating.
   
 [29 March 2010 - Revision 139]
-  FIX: ZEModel::GetSkeleton() function fixed.
-  REM: ZEModel::GetBoneTransforms() functions has been removed.
+	FIX: ZEModel::GetSkeleton() function fixed.
+	REM: ZEModel::GetBoneTransforms() functions has been removed.
   
+[29 March 2010 - Revision 140]
+	FIX: Minor bug fixes.
+	CHG: ZEMath Invert function temporary implemented used D3DX helper functions.
