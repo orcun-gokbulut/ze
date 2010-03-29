@@ -41,9 +41,6 @@
 #include "vector.h"
 #include "matrix.h"
 
-#define MapQuaternion(A, B)	(A).x = (B).x; (A).y = (B).y; (A).z = (B).z; (A).w = (B).w 
-#define MapQuarternionToWXYZ(Q, _w, _x, _y, _z) (Q).w = (_w); (Q).x = (_x); (Q).y = (_y); (Q).z = (_z)
-
 class ZEQuaternion
 {
 	public:

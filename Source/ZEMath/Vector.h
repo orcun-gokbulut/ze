@@ -47,12 +47,8 @@ class ZEMatrix3x3;
 class ZEMatrix4x4;
 
 
+// ZEVector2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ZEVector2  ZEVector2  ZEVector2  ZEVector2  ZEVector2  ZEVector2  ZEVector2  ZEVector2  ZEVector2  ZEVector2 //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#define MapVector2(A, B)	(A).x = (B).x; (A).y = (B).y
-#define MapVector2ToXY(V, _x, _y) (V).x = (_x); (V).y = (_y)
-
 class ZEVector2
 {
 	public:
@@ -113,13 +109,8 @@ class ZEVector2
 };
 
 
+// ZEVector3
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3  ZEVector3 //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#define MapVector3(A, B)	(A).x = (B).x; (A).y = (B).y; (A).z = (B).z
-#define MapVector3ToXYZ(V, _x, _y, _z) (V).x = (_x); (V).y = (_y); (V).z = (_z)
-
 class ZEVector3
 {
 	public:
@@ -183,13 +174,8 @@ class ZEVector3
 };
 
 
+// ZEVector4
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4  ZEVector4 //
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#define MapVector4(A, B)	(A).x = (B).x; (A).y = (B).y; (A).z = (B).z; (A).w = (B).w
-#define MapVector4ToXYZW(V, _x, _y, _z, _w) (V).x = (_x); (V).y = (_y); (V).z = (_z); (V).w = (_w)
-
 class ZEVector4
 {
 	public:

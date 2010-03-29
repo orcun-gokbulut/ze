@@ -209,3 +209,6 @@
 [29 March 2010 - Revision 140]
 	FIX: Minor bug fixes.
 	CHG: ZEMath Invert function temporary implemented used D3DX helper functions.
+	
+[30 March 2010 - Revision 141]
+  REM: MapVector and MapQuaternion macros removed.
