@@ -170,7 +170,7 @@ void ZEParticleEmitter::SetAcceleration(const ZEVector3& EmitterAcceleration)
 	Acceleration = EmitterAcceleration;
 }
 
-const ZEVector3& ZEParticleEmitter::GetAcceleration()
+const ZEVector3& ZEParticleEmitter::GetAcceleration() const
 {
 	return Acceleration;
 }
@@ -180,7 +180,7 @@ void ZEParticleEmitter::SetName(const char* EmitterName)
 	strcpy(Name, EmitterName);
 }
 
-const char* ZEParticleEmitter::GetName()
+const char* ZEParticleEmitter::GetName() const
 {
 	return Name;
 }
@@ -190,7 +190,7 @@ void ZEParticleEmitter::SetOwner(ZEParticleSystem *EmitterOwner)
 	Owner = EmitterOwner;
 }
 
-ZEParticleSystem* ZEParticleEmitter::GetOwner()
+ZEParticleSystem* ZEParticleEmitter::GetOwner() const
 {
 	return Owner;
 }
@@ -200,7 +200,7 @@ void ZEParticleEmitter::SetParticlesPerSecond(unsigned int Value)
 	ParticlesPerSecond = Value;
 }
 
-unsigned int ZEParticleEmitter::GetParticlesPerSecond()
+unsigned int ZEParticleEmitter::GetParticlesPerSecond() const
 {
 	return ParticlesPerSecond;
 }
@@ -210,7 +210,7 @@ void ZEParticleEmitter::SetPosition(const ZEVector3& EmitterPosition)
 	Position = EmitterPosition;
 }
 
-const ZEVector3& ZEParticleEmitter::GetPosition()
+const ZEVector3& ZEParticleEmitter::GetPosition() const
 {
 	return Position;
 }
@@ -226,7 +226,7 @@ void ZEParticleEmitter::SetSphereEmitterSize(float SphereRadius)
 	Size.Torus.y = 0.0f;
 }
 
-float ZEParticleEmitter::GetSphereEmitterSize()
+float ZEParticleEmitter::GetSphereEmitterSize() const
 {
 	return Size.SphereRadius;
 }
@@ -242,7 +242,7 @@ void ZEParticleEmitter::SetTorusEmitterSize(const ZEVector2& TorusRadii)
 	Size.Box.z = 0.0f;
 }
 
-const ZEVector2& ZEParticleEmitter::GetTorusEmitterSize()
+const ZEVector2& ZEParticleEmitter::GetTorusEmitterSize() const
 {
 	return Size.Torus;
 }
@@ -258,7 +258,7 @@ void ZEParticleEmitter::SetBoxEmitterSize(const ZEVector3& BoxSize)
 	Size.SphereRadius = 0.0f;
 }
 
-const ZEVector3& ZEParticleEmitter::GetBoxEmitterSize()
+const ZEVector3& ZEParticleEmitter::GetBoxEmitterSize() const
 {
 	return Size.Box;
 }
@@ -268,7 +268,7 @@ void ZEParticleEmitter::SetType(ZEParticleEmitterType EmitterType)
 	Type = EmitterType;
 }
 
-ZEParticleEmitterType ZEParticleEmitter::GetType()
+ZEParticleEmitterType ZEParticleEmitter::GetType() const
 {
 	return Type;
 }
@@ -278,7 +278,7 @@ void ZEParticleEmitter::SetUpVector(const ZEVector3& EmitterUpVector)
 	UpVector = EmitterUpVector;
 }
 
-const ZEVector3& ZEParticleEmitter::GetUpVector()
+const ZEVector3& ZEParticleEmitter::GetUpVector() const
 {
 	return UpVector;
 }
@@ -288,7 +288,7 @@ void ZEParticleEmitter::SetVelocity(const ZEVector3& EmitterVelocity)
 	Velocity = EmitterVelocity;
 }
 
-const ZEVector3& ZEParticleEmitter::GetVelocity()
+const ZEVector3& ZEParticleEmitter::GetVelocity() const
 {
 	return Velocity;
 }
@@ -298,7 +298,7 @@ void ZEParticleEmitter::SetMinAcceleration(const ZEVector3& Acceleration)
 	MinAcceleration = Acceleration;
 }
 
-const ZEVector3& ZEParticleEmitter::GetMinAcceleration()
+const ZEVector3& ZEParticleEmitter::GetMinAcceleration() const
 {
 	return MinAcceleration;
 }
@@ -308,7 +308,7 @@ void ZEParticleEmitter::SetMaxAcceleration(const ZEVector3& Acceleration)
 	MaxAcceleration = Acceleration;
 }
 
-const ZEVector3& ZEParticleEmitter::GetMaxAcceleration()
+const ZEVector3& ZEParticleEmitter::GetMaxAcceleration() const
 {
 	return MaxAcceleration;
 }
@@ -318,7 +318,7 @@ void ZEParticleEmitter::SetMinAngularAcceleration(const ZEVector3& AngularAccele
 	MinAngularAcceleration = AngularAcceleration;
 }
 
-const ZEVector3& ZEParticleEmitter::GetMinAngularAcceleration()
+const ZEVector3& ZEParticleEmitter::GetMinAngularAcceleration() const
 {
 	return MinAngularAcceleration;
 }
@@ -328,7 +328,7 @@ void ZEParticleEmitter::SetMaxAngularAcceleration(const ZEVector3& AngularAccele
 	MaxAngularAcceleration = AngularAcceleration;
 }
 
-const ZEVector3& ZEParticleEmitter::GetMaxAngularAcceleration()
+const ZEVector3& ZEParticleEmitter::GetMaxAngularAcceleration() const
 {
 	return MaxAngularAcceleration;
 }
@@ -338,7 +338,7 @@ void ZEParticleEmitter::SetMinVelocity(const ZEVector3& Velocity)
 	MinVelocity = Velocity;
 }
 
-const ZEVector3& ZEParticleEmitter::GetMinVelocity()
+const ZEVector3& ZEParticleEmitter::GetMinVelocity() const
 {
 	return MinVelocity;
 }
@@ -348,7 +348,7 @@ void ZEParticleEmitter::SetMaxVelocity(const ZEVector3& Velocity)
 	MaxVelocity = Velocity;
 }
 
-const ZEVector3& ZEParticleEmitter::GetMaxVelocity()
+const ZEVector3& ZEParticleEmitter::GetMaxVelocity() const
 {
 	return MaxVelocity;
 }
@@ -358,7 +358,7 @@ void ZEParticleEmitter::SetMinAngularVelocity(const ZEVector3& AngularVelocity)
 	MinAngularVelocity = AngularVelocity;
 }
 
-const ZEVector3& ZEParticleEmitter::GetMinAngularVelocity()
+const ZEVector3& ZEParticleEmitter::GetMinAngularVelocity() const
 {
 	return MinAngularVelocity;
 }
@@ -368,7 +368,7 @@ void ZEParticleEmitter::SetMaxAngularVelocity(const ZEVector3& AngularVelocity)
 	MaxAngularVelocity = AngularVelocity;
 }
 
-const ZEVector3& ZEParticleEmitter::GetMaxAngularVelocity()
+const ZEVector3& ZEParticleEmitter::GetMaxAngularVelocity() const
 {
 	return MaxAngularVelocity;
 }
@@ -378,7 +378,7 @@ void ZEParticleEmitter::SetMinColor(const ZEVector4& Color)
 	MinColor = Color;
 }
 
-const ZEVector4& ZEParticleEmitter::GetMinColor()
+const ZEVector4& ZEParticleEmitter::GetMinColor() const
 {
 	return MinColor;
 }
@@ -388,7 +388,7 @@ void ZEParticleEmitter::SetMaxColor(const ZEVector4& Color)
 	MaxColor = Color;
 }
 
-const ZEVector4& ZEParticleEmitter::GetMaxColor()
+const ZEVector4& ZEParticleEmitter::GetMaxColor() const
 {
 	return MaxColor;
 }
@@ -398,7 +398,7 @@ void ZEParticleEmitter::SetMinBounceFactor(float BounceFactor)
 	MinBounceFactor = BounceFactor;
 }
 
-float ZEParticleEmitter::GetMinBounceFactor()
+float ZEParticleEmitter::GetMinBounceFactor() const
 {
 	return MinBounceFactor;
 }
@@ -408,7 +408,7 @@ void ZEParticleEmitter::SetMaxBounceFactor(float BounceFactor)
 	MaxBounceFactor = BounceFactor;
 }
 
-float ZEParticleEmitter::GetMaxBounceFactor()
+float ZEParticleEmitter::GetMaxBounceFactor() const
 {
 	return MaxBounceFactor;
 }
@@ -418,7 +418,7 @@ void ZEParticleEmitter::SetContinuity(bool Value)
 	IsContinuous = Value;
 }
 
-bool ZEParticleEmitter::GetContinuity()
+bool ZEParticleEmitter::GetContinuity() const
 {
 	return IsContinuous;
 }
@@ -428,7 +428,7 @@ void ZEParticleEmitter::SetMinLife(float Life)
 	MinLife = Life;
 }
 
-float ZEParticleEmitter::GetMinLife()
+float ZEParticleEmitter::GetMinLife() const
 {
 	return MinLife;
 }
@@ -438,7 +438,7 @@ void ZEParticleEmitter::SetMaxLife(float Life)
 	MaxLife = Life;
 }
 
-float ZEParticleEmitter::GetMaxLife()
+float ZEParticleEmitter::GetMaxLife() const
 {
 	return MaxLife;
 }
@@ -448,7 +448,7 @@ void ZEParticleEmitter::SetMaxParticleCount(unsigned int Value)
 	MaxParticleCount = Value;
 }
 
-unsigned int ZEParticleEmitter::GetMaxParticleCount()
+unsigned int ZEParticleEmitter::GetMaxParticleCount() const
 {
 	return MaxParticleCount;
 }
@@ -458,7 +458,7 @@ void ZEParticleEmitter::SetMinSize(float Size)
 	MinSize = Size;
 }
 
-float ZEParticleEmitter::GetMinSize()
+float ZEParticleEmitter::GetMinSize() const
 {
 	return MinSize;
 }
@@ -468,7 +468,7 @@ void ZEParticleEmitter::SetMaxSize(float Size)
 	MaxSize = Size;
 }
 
-float ZEParticleEmitter::GetMaxSize()
+float ZEParticleEmitter::GetMaxSize() const
 {
 	return MaxSize;
 }
@@ -478,7 +478,7 @@ void ZEParticleEmitter::SetMinUpVector(const ZEVector3& UpVector)
 	MinUpVector = UpVector;
 }
 
-const ZEVector3& ZEParticleEmitter::GetMinUpVector()
+const ZEVector3& ZEParticleEmitter::GetMinUpVector() const
 {
 	return MinUpVector;
 }
@@ -488,7 +488,7 @@ void ZEParticleEmitter::SetMaxUpVector(const ZEVector3& UpVector)
 	MaxUpVector = UpVector;
 }
 
-const ZEVector3& ZEParticleEmitter::GetMaxUpVector()
+const ZEVector3& ZEParticleEmitter::GetMaxUpVector() const
 {
 	return MinUpVector;
 }
@@ -503,3 +503,5 @@ ZEParticleEmitter::ZEParticleEmitter()
 ZEParticleEmitter::~ZEParticleEmitter()
 {
 }
+
+#include "ParticleEmitter.h.zpp"

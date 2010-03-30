@@ -58,8 +58,9 @@ class ZEParticleEffect : public ZEComponent
 		void							Tick(float TimeElapsed);
 
 		void							AddParticleSystem(ZEParticleSystem* &ParticleSystem);
+		ZEArray<ZEParticleSystem*>		GetSystemArray() const;
 
-		void							LoadFromFile(const char* ZEPEFFile);
+		void							LoadFromFile(const char* FileName);
 			
 										ZEParticleEffect();
 										~ZEParticleEffect();

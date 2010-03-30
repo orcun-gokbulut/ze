@@ -41,6 +41,9 @@
 #include "ZEDS/String.h"
 #include "ZEMath/Vector.h"
 #include "Graphics/RenderOrder.h"
+#include "Meta/Class.h"
+
+ZE_META_CLASS_DESCRIPTION(ZEParticleSystem);
 
 class ZEParticleEffect;
 class ZEParticleEmitter;
@@ -59,8 +62,10 @@ class ZEStaricVertexBuffer;
 class ZEMaterial;
 class ZEStaticVertexBuffer;
 
-class ZEParticleSystem
+class ZEParticleSystem : public ZEClass
 {
+	ZE_META_CLASS()
+
 	private:
 		ZEString							Name;						// Used in editor
 		ZEParticleEffect*					Owner;						// Owner effect of the system
@@ -77,25 +82,48 @@ class ZEParticleSystem
 
 	public:
 		void								SetName(const ZEString& Name);
-		const ZEString&						GetName();
+		const ZEString&						GetName() const;
 
 		void								SetOwner(ZEParticleEffect* OwnerEffect);
-		ZEParticleEffect*					GetOwner();
+		ZEParticleEffect*					GetOwner() const;
 
 		void								SetBillboardType(ZEParticleBillboardType Type);
-		ZEParticleBillboardType				GetBillboardType();
+		ZEParticleBillboardType				GetBillboardType() const;
 
 		void								SetMaterial(ZEMaterial *Material);
-		ZEMaterial*							GetMaterial();
+		ZEMaterial*							GetMaterial() const;
 
 		void								Draw(ZERenderer *Renderer, const ZESmartArray<const ZERLLight*> &Lights);
 		void								Tick(float TimeElapsed);	
 
 		void								AddParticleEmitter(ZEParticleEmitter* ParticleEmitter);
 		void								DeleteParticleEmitter(ZEParticleEmitter* ParticleEmitter);
+
+		ZEArray<ZEParticleEmitter*>			GetEmitterArray() const;
 	
 											ZEParticleSystem();
 											~ZEParticleSystem();
 };
+
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEParticleSystem">
+			<description>Particle System Class</description>
+			<property name="Name" type="string" autogetset="yes" description="Name of the particle system."/>
+			<property name="BillboardType" type="integer" autogetset="true" description="Billboarding type of the particles used in this system.">
+				<enumurator name="ZEParticleBillboardType">
+					<item name="World Oriented" value="ZE_PBT_WORLD_ORIENTED"/>
+					<item name="ViewPlane Oriented" value="ZE_PBT_VIEWPLANE_ORIENTED"/>
+					<item name="ViewPoint Oriented" value="ZE_PBT_VIEWPOINT_ORIENTED"/>
+					<item name="Custom Axis Oriented" value="ZE_PBT_CUSTOMAXIS_ORIENTED"/>
+				</enumurator>
+			</property>
+		</class>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END()
+*/
 
 #endif

@@ -179,7 +179,7 @@
 				AdditionalOptions="/MP"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)..\source&quot;;&quot;$(ProjectDir)..\include&quot;;&quot;$(ProjectDir)..\include\PhysX\Cooking&quot;;&quot;$(ProjectDir)..\include\PhysX\Foundation&quot;;&quot;$(ProjectDir)..\include\PhysX\NxCharacter&quot;;&quot;$(ProjectDir)..\include\PhysX\PhysXLoader&quot;;&quot;$(ProjectDir)..\include\PhysX\Physics&quot;;&quot;$(ProjectDir)..\include\OpenAL&quot;;&quot;$(ProjectDir)..\include\DirectX&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_DEBUG_ENABLED;ZE_DEBUG_D3D9_PERFHUD;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_BREAK_ON_WARNING"
+				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_DEBUG_ENABLED;ZE_DEBUG_D3D9_PERFHUD;ZE_DEBUG_BREAK_ON_ERROR"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -660,6 +660,15 @@
 			<File
 				RelativePath="..\Source\GameInterface\LightBrush.h"
 				>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\Source\GameInterface\ModelBrush.cpp"
@@ -1536,6 +1545,15 @@
 			<File
 				RelativePath="..\Source\Particle\ParticleEmitter.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)..\postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath="..\Source\Particle\ParticleSystem.cpp"
@@ -1544,6 +1562,15 @@
 			<File
 				RelativePath="..\Source\Particle\ParticleSystem.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)..\postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter

@@ -134,7 +134,7 @@ ZE_POSTPROCESSOR_START(Meta)
 <zinek>
 	<meta> 
 		<class name="ZEComponent">
-			<description>Base Entity Type</description>
+			<description>Base Component Type</description>
 			<property name="LocalPosition" type="ZEVector3" autogetset="yes" description="World position of the entity"/>
 			<property name="LocalRotation" type="ZEQuaternion" autogetset="yes" description="World rotation of the entity"/>
 			<property name="LocalScale" type="ZEVector3" autogetset="yes" description="World scale of the entity"/>

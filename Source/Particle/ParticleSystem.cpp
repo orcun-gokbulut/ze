@@ -241,7 +241,7 @@ void ZEParticleSystem::SetOwner(ZEParticleEffect* OwnerEffect)
 	Owner = OwnerEffect;
 }
 
-ZEParticleEffect* ZEParticleSystem::GetOwner()
+ZEParticleEffect* ZEParticleSystem::GetOwner() const
 {
 	return Owner;
 }
@@ -263,7 +263,7 @@ void ZEParticleSystem::SetName(const ZEString& SystemName)
 	Name = SystemName;
 }
 
-const ZEString& ZEParticleSystem::GetName()
+const ZEString& ZEParticleSystem::GetName() const
 {
 	return Name;
 }
@@ -273,7 +273,7 @@ void ZEParticleSystem::SetBillboardType(ZEParticleBillboardType Type)
 	BillboardType = Type;
 }
 
-ZEParticleBillboardType ZEParticleSystem::GetBillboardType()
+ZEParticleBillboardType ZEParticleSystem::GetBillboardType() const
 {
 	return BillboardType;
 }
@@ -283,9 +283,14 @@ void ZEParticleSystem::SetMaterial(ZEMaterial *Material)
 	ParticleMaterial = Material;
 }
 
-ZEMaterial* ZEParticleSystem::GetMaterial()
+ZEMaterial* ZEParticleSystem::GetMaterial() const
 {
 	return ParticleMaterial;
+}
+
+ZEArray<ZEParticleEmitter*> ZEParticleSystem::GetEmitterArray() const
+{
+	return EmitterArray;
 }
 
 ZEParticleSystem::ZEParticleSystem()
@@ -305,3 +310,5 @@ ZEParticleSystem::~ZEParticleSystem()
 	if (VertexBuffer != NULL)
 		VertexBuffer->Destroy();
 }
+
+#include "ParticleSystem.h.zpp"

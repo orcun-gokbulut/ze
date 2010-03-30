@@ -43,6 +43,9 @@
 #include "ParticleSystem.h"
 #include "Particle.h"
 #include "ParticleController.h"
+#include "Meta/Class.h"
+
+ZE_META_CLASS_DESCRIPTION(ZEParticleEmitter);
 
 enum ZEParticleEmitterType
 {
@@ -59,8 +62,9 @@ enum ZEParticleEmitterCollisionType
 	ZE_PECT_DYNAMIC_COLLISION			// Particles can collide to both static and dynamic objects - uses SIMD
 };
 
-class ZEParticleEmitter
+class ZEParticleEmitter : public ZEClass
 {
+	ZE_META_CLASS()
 	friend class ZEParticleSystem;
 
 	private:
@@ -85,23 +89,23 @@ class ZEParticleEmitter
 		} Size;
 
 		// Following variables are used to create the Particle Pool
-		ZEVector3						MinUpVector;				// Orientation of-
+		ZEVector3						MinUpVector;				//Orientation of-
 		ZEVector3						MaxUpVector;				//particles
-		ZEVector3						MinAcceleration;			// Acceleration of-
+		ZEVector3						MinAcceleration;			//Acceleration of-
 		ZEVector3						MaxAcceleration;			//particles
-		ZEVector3						MinVelocity;				// Velocity of-
+		ZEVector3						MinVelocity;				//Velocity of-
 		ZEVector3						MaxVelocity;				//particles
-		ZEVector3						MinAngularAcceleration;		// Angular acceleration of-
+		ZEVector3						MinAngularAcceleration;		//Angular acceleration of-
 		ZEVector3						MaxAngularAcceleration;		//particles
-		ZEVector3						MinAngularVelocity;			// Angular velocity of-
+		ZEVector3						MinAngularVelocity;			//Angular velocity of-
 		ZEVector3						MaxAngularVelocity;			//particles
-		ZEVector4						MinColor;					// Color value of-
+		ZEVector4						MinColor;					//Color value of-
 		ZEVector4						MaxColor;					//particles in RGBA
-		float							MinSize;					// Size of an edge of-
+		float							MinSize;					//Size of an edge of-
 		float							MaxSize;					//particles
-		float							MinLife;					// Life of the-
+		float							MinLife;					//Life of the-
 		float							MaxLife;					//particles
-		float							MinBounceFactor;			// Bounce factor of the-
+		float							MinBounceFactor;			//Bounce factor of the-
 		float							MaxBounceFactor;			//particles	
 		unsigned int					MaxParticleCount;			// Maximum number of particles of this emitter
 		bool							IsContinuous;					// Repeats the animation if true
@@ -127,91 +131,134 @@ class ZEParticleEmitter
 		void							AddParticleController(ZEParticleController* &ParticleController);
 
 		void							SetName(const char* EmitterName);
-		const char*						GetName();	
+		const char*						GetName() const;	
 
 		void							SetOwner(ZEParticleSystem* EmitterOwner);
-		ZEParticleSystem*				GetOwner();
+		ZEParticleSystem*				GetOwner() const;
 
 		void							SetPosition(const ZEVector3& EmitterPosition);
-		const ZEVector3&				GetPosition();
+		const ZEVector3&				GetPosition() const;
 
 		void							SetParticlesPerSecond(unsigned int Value);
-		unsigned int					GetParticlesPerSecond();
+		unsigned int					GetParticlesPerSecond() const;
 
 		void							SetBoxEmitterSize(const ZEVector3& BoxSize);
-		const ZEVector3&				GetBoxEmitterSize();
+		const ZEVector3&				GetBoxEmitterSize() const;
 
 		void							SetSphereEmitterSize(float SphereRadius);
-		float							GetSphereEmitterSize();
+		float							GetSphereEmitterSize() const;
 
 		void							SetTorusEmitterSize(const ZEVector2& TorusRadii);
-		const ZEVector2&				GetTorusEmitterSize();
+		const ZEVector2&				GetTorusEmitterSize() const;
 
 		void							SetType(ZEParticleEmitterType EmitterType);
-		ZEParticleEmitterType			GetType();
+		ZEParticleEmitterType			GetType() const;
 
 		void							SetAcceleration(const ZEVector3& EmitterAcceleration);
-		const ZEVector3&				GetAcceleration();
+		const ZEVector3&				GetAcceleration() const;
 
 		void							SetUpVector(const ZEVector3& EmitterUpVector);
-		const ZEVector3&				GetUpVector();
+		const ZEVector3&				GetUpVector() const;
 
 		void							SetVelocity(const ZEVector3& EmitterVelocity);
-		const ZEVector3&				GetVelocity() ;
+		const ZEVector3&				GetVelocity() const;
 
 		void							SetMaxParticleCount(unsigned int Value);
-		unsigned int					GetMaxParticleCount();
+		unsigned int					GetMaxParticleCount() const;
 
 		void							SetContinuity(bool Value);
-		bool							GetContinuity();
+		bool							GetContinuity() const;
 
 		void							SetMinUpVector(const ZEVector3& UpVector);
-		const ZEVector3&				GetMinUpVector();
+		const ZEVector3&				GetMinUpVector() const;
 		void							SetMaxUpVector(const ZEVector3& UpVector);
-		const ZEVector3&				GetMaxUpVector();
+		const ZEVector3&				GetMaxUpVector() const;
 
 		void							SetMinAcceleration(const ZEVector3& Acceleration);
-		const ZEVector3&				GetMinAcceleration();
+		const ZEVector3&				GetMinAcceleration() const;
 		void							SetMaxAcceleration(const ZEVector3& Acceleration);
-		const ZEVector3&				GetMaxAcceleration();
+		const ZEVector3&				GetMaxAcceleration() const;
 
 		void							SetMinVelocity(const ZEVector3& Velocity);
-		const ZEVector3&				GetMinVelocity();
+		const ZEVector3&				GetMinVelocity() const;
 		void							SetMaxVelocity(const ZEVector3& Velocity);
-		const ZEVector3&				GetMaxVelocity();
+		const ZEVector3&				GetMaxVelocity() const;
 
 		void 							SetMinAngularAcceleration(const ZEVector3& AngularAcceleration);
-		const ZEVector3& 				GetMinAngularAcceleration();
+		const ZEVector3& 				GetMinAngularAcceleration() const;
 		void 							SetMaxAngularAcceleration(const ZEVector3& AngularAcceleration);
-		const ZEVector3& 				GetMaxAngularAcceleration();
+		const ZEVector3& 				GetMaxAngularAcceleration() const;
 
 		void 							SetMinAngularVelocity(const ZEVector3& AngularVelocity);
-		const ZEVector3&				GetMinAngularVelocity();
+		const ZEVector3&				GetMinAngularVelocity() const;
 		void 							SetMaxAngularVelocity(const ZEVector3& AngularVelocity);
-		const ZEVector3&				GetMaxAngularVelocity();
+		const ZEVector3&				GetMaxAngularVelocity() const;
 
 		void							SetMinSize(float Size);
-		float 							GetMinSize();
+		float 							GetMinSize() const;
 		void 							SetMaxSize(float Size);
-		float 							GetMaxSize();
+		float 							GetMaxSize() const;
 
 		void 							SetMinLife(float Life);
-		float 							GetMinLife();
+		float 							GetMinLife() const;
 		void 							SetMaxLife(float Life);
-		float 							GetMaxLife();
+		float 							GetMaxLife() const;
 
 		void 							SetMinColor(const ZEVector4& Color);
-		const ZEVector4&				GetMinColor();
+		const ZEVector4&				GetMinColor() const;
 		void 							SetMaxColor(const ZEVector4& Color);
-		const ZEVector4&				GetMaxColor();
+		const ZEVector4&				GetMaxColor() const;
 
 		void 							SetMinBounceFactor(float BounceFactor);
-		float 							GetMinBounceFactor();
+		float 							GetMinBounceFactor() const;
 		void 							SetMaxBounceFactor(float BounceFactor);
-		float 							GetMaxBounceFactor();
+		float 							GetMaxBounceFactor() const;
 
 										ZEParticleEmitter();
 										~ZEParticleEmitter();
 };
+
+/*
+ZE_POSTPROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEParticleEmitter">
+			<description>Particle Emitter Class</description>
+			<property name="Name" type="string" autogetset="yes" description="Name of the particle emitter."/>
+			<property name="Position" type="ZEVector3" autogetset="yes" description="Position of the particle emitter."/>
+			<property name="Type" type="integer" autogetset="true" description="Type of the emitter.">
+				<enumurator name="ZEParticleEmitterType">
+					<item name="Point" value="ZE_PET_POINT"/>
+					<item name="Box" value="ZE_PET_BOX"/> 
+					<item name="Torus" value="ZE_PET_TORUS"/>
+					<item name="Sphere" value="ZE_PET_SPHERE"/>
+				</enumurator>
+			</property>
+			<property name="Acceleration" type="ZEVector3" autogetset="true" description="Acceleration of particles emitted from this emitter."/>
+			<property name="Velocity" type="ZEVector3" autogetset="true" description="Velocity of particles emitted from this emitter."/>
+			<property name="MaxParticleCount" type="integer" autogetset="true" description="Maximum number of particles will be emitted from this emitter."/>
+			<property name="Continuity" type="boolean" autogetset="true" description="Continuity of particles emitted from this emitter."/>
+			<property name="MinAcceleration" type="ZEVector3" autogetset="true" description="Minimum acceleration of particles emitted from this emitter."/>
+			<property name="MaxAcceleration" type="ZEVector3" autogetset="true" description="Maximum acceleration of particles emitted from this emitter."/>
+			<property name="MaxVelocity" type="ZEVector3" autogetset="true" description="Maximum velocity of particles emitted from this emitter."/>
+			<property name="MinVelocity" type="ZEVector3" autogetset="true" description="Minimum velocity of particles emitted from this emitter."/>	
+			<property name="MinAngularAcceleration" type="ZEVector3" autogetset="true" description="Minimum angular acceleration of particals."/>
+			<property name="MaxAngularAcceleration" type="ZEVector3" autogetset="true" description="Maximum angular acceleration of particals."/>
+			<property name="MinAngularVelocity" type="ZEVector3" autogetset="true" description="Minimum angular velocity of particals."/>
+			<property name="MaxAngularVelocity" type="ZEVector3" autogetset="true" description="Maximum angular velocity of particals."/>		
+			<property name="MinSize" type="float" autogetset="true" description="Minimum edge lenght of particles."/>
+			<property name="MaxSize" type="float" autogetset="true" description="Maximum edge lenght of particles."/>			
+			<property name="MinLife" type="float" autogetset="true" description="Minimum life of particles."/>
+			<property name="MaxLife" type="float" autogetset="true" description="Maximum life of particles."/>			
+			<property name="MinColor" type="ZEVector4" autogetset="true" description="Minimum color of particles."/>
+			<property name="MaxColor" type="ZEVector4" autogetset="true" description="Maximum color of particles."/>			
+			<property name="MinBounceFactor" type="float" autogetset="true" description="Minimum bounce factor of particles."/>
+			<property name="MaxBounceFactor" type="float" autogetset="true" description="Maximum bounce factor of particles."/>
+		</class>
+	</meta>
+</zinek>
+ZE_POSTPROCESSOR_END()
+*/
+
 
 #endif

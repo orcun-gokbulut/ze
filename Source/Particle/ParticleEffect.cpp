@@ -67,6 +67,11 @@ void ZEParticleEffect::AddParticleSystem(ZEParticleSystem* &ParticleSystem)
 	SystemArray.Add(ParticleSystem);
 }
 
+ZEArray<ZEParticleSystem*> ZEParticleEffect::GetSystemArray() const
+{
+	return SystemArray;
+}
+
 bool ZEParticleEffect::IsDrawable()
 {
 	return true;

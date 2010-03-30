@@ -61,6 +61,11 @@ void ZEParticleEffectBrush::AddParticleSystem(ZEParticleSystem* System)
 	ParticleEffect.AddParticleSystem(System);
 }
 
+ZEParticleEffect ZEParticleEffectBrush::GetParticleEffect() const
+{
+	return ParticleEffect;
+}
+
 void ZEParticleEffectBrush::LoadFromFile(const char* ZEPEFFile)
 {
 	ParticleEffect.LoadFromFile(ZEPEFFile);

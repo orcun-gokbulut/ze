@@ -53,11 +53,12 @@ class ZEParticleEffectBrush : public ZEEntity
 		virtual bool				AllwaysDraw();
 		virtual bool				IsDrawable();
 		void						AddParticleSystem(ZEParticleSystem* System);
+		ZEParticleEffect			GetParticleEffect() const;
 
 		virtual void				Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
 		virtual void				Tick(float Time);
 
-		void						LoadFromFile(const char* ZEPEFFile);
+		void						LoadFromFile(const char* FileName);
 
 									ZEParticleEffectBrush();
 									~ZEParticleEffectBrush();
