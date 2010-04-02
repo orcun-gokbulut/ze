@@ -220,3 +220,9 @@
 	ADD: ZEParticleEffectBrush::GetParticleEffect() const function added.
 	ADD: ZEParticleEffect::GetSystemArray() const function added.
 	CHG: ZEParticleEmitter Getter functions are now const functions.
+
+[2 April 2010 - Revision 143]
+	ADD: ZEParticleEffectBrush description registered to game.
+	CHG: Player register light comented.
+	ADD: ZEParticleEffect::GetSystems() function added.
+	ADD: ZEParticleSystem::GetEmmiters() function added.
