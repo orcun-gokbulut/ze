@@ -49,7 +49,7 @@ class ZEParticleEffect : public ZEComponent
 		ZEArray<ZEParticleSystem*>		SystemArray;				// An effect might be composed of many systems
 
 	public:
-		virtual	bool					IsDrawable();
+		virtual	ZEDWORD					GetDrawFlags() const;
 
 		bool							Initialize();
 		bool							Deinitialize();
@@ -58,7 +58,7 @@ class ZEParticleEffect : public ZEComponent
 		void							Tick(float TimeElapsed);
 
 		void							AddParticleSystem(ZEParticleSystem* &ParticleSystem);
-		ZEArray<ZEParticleSystem*>		GetSystemArray() const;
+		const ZEArray<ZEParticleSystem*>&		GetParticleSystems();
 
 		void							LoadFromFile(const char* FileName);
 			

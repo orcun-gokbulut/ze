@@ -99,7 +99,7 @@ class ZEParticleSystem : public ZEClass
 		void								AddParticleEmitter(ZEParticleEmitter* ParticleEmitter);
 		void								DeleteParticleEmitter(ZEParticleEmitter* ParticleEmitter);
 
-		ZEArray<ZEParticleEmitter*>			GetEmitterArray() const;
+		const ZEArray<ZEParticleEmitter*>&	GetEmitterArray();
 	
 											ZEParticleSystem();
 											~ZEParticleSystem();

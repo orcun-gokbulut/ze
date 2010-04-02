@@ -205,7 +205,7 @@ void ZEPlayer::Initialize()
 	PointLight.SetColor(ZEVector3::One);
 	PointLight.SetEnabled(true);
 
-	RegisterComponent(&PointLight);
+	//RegisterComponent(&PointLight);
 	RegisterComponent(&Camera);
 	RegisterComponent(Listener);
 

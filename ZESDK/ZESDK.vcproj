@@ -665,8 +665,8 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
+						CommandLine=""
+						Outputs=""
 					/>
 				</FileConfiguration>
 			</File>
@@ -1550,7 +1550,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)..\postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)..\postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -1567,7 +1567,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)..\postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)..\postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>

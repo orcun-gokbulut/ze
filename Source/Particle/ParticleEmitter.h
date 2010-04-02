@@ -237,6 +237,7 @@ ZE_POSTPROCESSOR_START(Meta)
 			<property name="Acceleration" type="ZEVector3" autogetset="true" description="Acceleration of particles emitted from this emitter."/>
 			<property name="Velocity" type="ZEVector3" autogetset="true" description="Velocity of particles emitted from this emitter."/>
 			<property name="MaxParticleCount" type="integer" autogetset="true" description="Maximum number of particles will be emitted from this emitter."/>
+			<property name="ParticlesPerSecond" type="integer" autogetset="true" description="Paritcles per secon emitted from this source."/>
 			<property name="Continuity" type="boolean" autogetset="true" description="Continuity of particles emitted from this emitter."/>
 			<property name="MinAcceleration" type="ZEVector3" autogetset="true" description="Minimum acceleration of particles emitted from this emitter."/>
 			<property name="MaxAcceleration" type="ZEVector3" autogetset="true" description="Maximum acceleration of particles emitted from this emitter."/>

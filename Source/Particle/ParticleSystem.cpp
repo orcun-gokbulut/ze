@@ -288,7 +288,7 @@ ZEMaterial* ZEParticleSystem::GetMaterial() const
 	return ParticleMaterial;
 }
 
-ZEArray<ZEParticleEmitter*> ZEParticleSystem::GetEmitterArray() const
+const ZEArray<ZEParticleEmitter*>& ZEParticleSystem::GetEmitterArray()
 {
 	return EmitterArray;
 }

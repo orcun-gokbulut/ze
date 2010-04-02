@@ -35,14 +35,9 @@
 
 #include "ParticleEffectBrush.h"
 
-bool ZEParticleEffectBrush::AllwaysDraw()
+ZEDWORD ZEParticleEffectBrush::GetDrawFlags() const
 {
-	return true;
-}
-
-bool ZEParticleEffectBrush::IsDrawable()
-{
-	return true;
+	return ZE_DF_DRAW_COMPONENTS;
 }
 
 void ZEParticleEffectBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
@@ -61,9 +56,9 @@ void ZEParticleEffectBrush::AddParticleSystem(ZEParticleSystem* System)
 	ParticleEffect.AddParticleSystem(System);
 }
 
-ZEParticleEffect ZEParticleEffectBrush::GetParticleEffect() const
+ZEParticleEffect* ZEParticleEffectBrush::GetParticleEffect()
 {
-	return ParticleEffect;
+	return &ParticleEffect;
 }
 
 void ZEParticleEffectBrush::LoadFromFile(const char* ZEPEFFile)

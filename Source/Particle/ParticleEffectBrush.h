@@ -50,10 +50,10 @@ class ZEParticleEffectBrush : public ZEEntity
 		ZEParticleEffect			ParticleEffect;
 
 	public:
-		virtual bool				AllwaysDraw();
-		virtual bool				IsDrawable();
+		virtual ZEDWORD				GetDrawFlags() const;
+
 		void						AddParticleSystem(ZEParticleSystem* System);
-		ZEParticleEffect			GetParticleEffect() const;
+		ZEParticleEffect*			GetParticleEffect();
 
 		virtual void				Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
 		virtual void				Tick(float Time);

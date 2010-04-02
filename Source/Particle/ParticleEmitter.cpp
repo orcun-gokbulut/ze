@@ -446,6 +446,12 @@ float ZEParticleEmitter::GetMaxLife() const
 void ZEParticleEmitter::SetMaxParticleCount(unsigned int Value)
 {
 	MaxParticleCount = Value;
+
+	size_t OldSize = ParticlePool.GetCount();
+	ParticlePool.Resize(Value);
+	for (size_t I = OldSize; I < MaxParticleCount; I++)
+		GenerateParticle(ParticlePool[I]);
+
 }
 
 unsigned int ZEParticleEmitter::GetMaxParticleCount() const
@@ -496,8 +502,28 @@ const ZEVector3& ZEParticleEmitter::GetMaxUpVector() const
 ZEParticleEmitter::ZEParticleEmitter()
 {
 	EmittedParticleCount = 0;
+	MaxParticleCount = 0;
 	LastCreation = 0.0f;
 	Owner = NULL;
+
+			ZEVector3						MinAcceleration;			//Acceleration of-
+		ZEVector3						MaxAcceleration;			//particles
+		ZEVector3						MinVelocity;				//Velocity of-
+		ZEVector3						MaxVelocity;				//particles
+		ZEVector3						MinAngularAcceleration;		//Angular acceleration of-
+		ZEVector3						MaxAngularAcceleration;		//particles
+		ZEVector3						MinAngularVelocity;			//Angular velocity of-
+		ZEVector3						MaxAngularVelocity;			//particles
+		ZEVector4						MinColor;					//Color value of-
+		ZEVector4						MaxColor;					//particles in RGBA
+		float							MinSize;					//Size of an edge of-
+		float							MaxSize;					//particles
+		float							MinLife;					//Life of the-
+		float							MaxLife;					//particles
+		float							MinBounceFactor;			//Bounce factor of the-
+		float							MaxBounceFactor;			//particles	
+		unsigned int					MaxParticleCount;			// Maximum number of particles of this emitter
+		bool							IsContinuous;					// Repeats the animation if true
 }
 
 ZEParticleEmitter::~ZEParticleEmitter()

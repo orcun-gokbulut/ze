@@ -34,9 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ParticleEffect.h"
+#include "GameInterface/Entity.h"
 
 void ZEParticleEffect::LoadFromFile(const char* ZEPEFFile)
 {
+}
+		
+ZEDWORD ZEParticleEffect::GetDrawFlags() const
+{
+	return ZE_DF_DRAW;
 }
 
 bool ZEParticleEffect::Initialize()
@@ -67,14 +73,9 @@ void ZEParticleEffect::AddParticleSystem(ZEParticleSystem* &ParticleSystem)
 	SystemArray.Add(ParticleSystem);
 }
 
-ZEArray<ZEParticleSystem*> ZEParticleEffect::GetSystemArray() const
+const ZEArray<ZEParticleSystem*>& ZEParticleEffect::GetParticleSystems()
 {
 	return SystemArray;
-}
-
-bool ZEParticleEffect::IsDrawable()
-{
-	return true;
 }
 
 ZEParticleEffect::ZEParticleEffect()
