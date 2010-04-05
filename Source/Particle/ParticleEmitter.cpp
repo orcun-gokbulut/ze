@@ -506,24 +506,29 @@ ZEParticleEmitter::ZEParticleEmitter()
 	LastCreation = 0.0f;
 	Owner = NULL;
 
-			ZEVector3						MinAcceleration;			//Acceleration of-
-		ZEVector3						MaxAcceleration;			//particles
-		ZEVector3						MinVelocity;				//Velocity of-
-		ZEVector3						MaxVelocity;				//particles
-		ZEVector3						MinAngularAcceleration;		//Angular acceleration of-
-		ZEVector3						MaxAngularAcceleration;		//particles
-		ZEVector3						MinAngularVelocity;			//Angular velocity of-
-		ZEVector3						MaxAngularVelocity;			//particles
-		ZEVector4						MinColor;					//Color value of-
-		ZEVector4						MaxColor;					//particles in RGBA
-		float							MinSize;					//Size of an edge of-
-		float							MaxSize;					//particles
-		float							MinLife;					//Life of the-
-		float							MaxLife;					//particles
-		float							MinBounceFactor;			//Bounce factor of the-
-		float							MaxBounceFactor;			//particles	
-		unsigned int					MaxParticleCount;			// Maximum number of particles of this emitter
-		bool							IsContinuous;					// Repeats the animation if true
+	Velocity = ZEVector3(0.0f, 0.0f, 0.0f);		
+	Acceleration = ZEVector3(0.0f, 0.0f, 0.0f);					
+	ParticlesPerSecond = 0;				
+	Position = ZEVector3(0.0f, 0.0f, 0.0f);						
+	Type = ZEParticleEmitterType::ZE_PET_POINT;	
+	MinAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);			
+	MaxAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);			
+	MinVelocity = ZEVector3(0.0f, 0.0f, 0.0f);				
+	MaxVelocity = ZEVector3(0.0f, 0.0f, 0.0f);				
+	MinAngularAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);		
+	MaxAngularAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);		
+	MinAngularVelocity = ZEVector3(0.0f, 0.0f, 0.0f);			
+	MaxAngularVelocity = ZEVector3(0.0f, 0.0f, 0.0f);			
+	MinColor = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);					
+	MaxColor = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);					
+	MinSize = 0.0f;					
+	MaxSize = 0.0f;					
+	MinLife = 0.0f;					
+	MaxLife = 0.0f;					
+	MinBounceFactor = 0.0f;			
+	MaxBounceFactor = 0.0f;			
+	MaxParticleCount = 0;			
+	IsContinuous = true;			
 }
 
 ZEParticleEmitter::~ZEParticleEmitter()

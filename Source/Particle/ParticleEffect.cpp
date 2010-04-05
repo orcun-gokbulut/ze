@@ -67,10 +67,15 @@ void ZEParticleEffect::Tick(float TimeElapsed)
 		SystemArray[I]->Tick(TimeElapsed);
 }
 
-void ZEParticleEffect::AddParticleSystem(ZEParticleSystem* &ParticleSystem)
+void ZEParticleEffect::AddParticleSystem(ZEParticleSystem* ParticleSystem)
 {
 	ParticleSystem->SetOwner(this);
 	SystemArray.Add(ParticleSystem);
+}
+
+void ZEParticleEffect::RemoveParticleSystem(ZEParticleSystem* ParticleSystem)
+{
+	SystemArray.DeleteValue(ParticleSystem);
 }
 
 const ZEArray<ZEParticleSystem*>& ZEParticleEffect::GetParticleSystems()

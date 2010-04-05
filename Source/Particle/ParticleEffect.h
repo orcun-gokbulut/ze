@@ -57,7 +57,8 @@ class ZEParticleEffect : public ZEComponent
 		void							Draw(ZERenderer *Renderer, const ZESmartArray<const ZERLLight*> &Lights);
 		void							Tick(float TimeElapsed);
 
-		void							AddParticleSystem(ZEParticleSystem* &ParticleSystem);
+		void									AddParticleSystem(ZEParticleSystem* ParticleSystem);
+		void									RemoveParticleSystem(ZEParticleSystem* ParticleSystem);
 		const ZEArray<ZEParticleSystem*>&		GetParticleSystems();
 
 		void							LoadFromFile(const char* FileName);

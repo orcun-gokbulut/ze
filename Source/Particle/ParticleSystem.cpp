@@ -303,6 +303,7 @@ ZEParticleSystem::ZEParticleSystem()
 	RenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
 	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	IsVertexBufferUpdated = false;
+	BillboardType = ZEParticleBillboardType::ZE_PBT_WORLD_ORIENTED;
 }
 
 ZEParticleSystem::~ZEParticleSystem()

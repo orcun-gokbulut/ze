@@ -226,3 +226,9 @@
 	CHG: Player register light comented.
 	ADD: ZEParticleEffect::GetSystems() function added.
 	ADD: ZEParticleSystem::GetEmmiters() function added.
+
+[5 April 2010 - Revision 144]
+	ADD: ZEParticleEffect::RemoveSystem() function added.
+	ADD: ZEParticleEmitter Particles Per Second property added to meta system.
+	ADD: ZEParticleEmiiter Properties Default values are initialized in ZEParticleEmiiter::ZEParticleEmiiter()
+
