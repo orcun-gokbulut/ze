@@ -231,4 +231,9 @@
 	ADD: ZEParticleEffect::RemoveSystem() function added.
 	ADD: ZEParticleEmitter Particles Per Second property added to meta system.
 	ADD: ZEParticleEmiiter Properties Default values are initialized in ZEParticleEmiiter::ZEParticleEmiiter()
-
+	
+[5 April 2010 - Revision 145]
+	CHG: Project's post process utilities has been migrated to new zepp. (Zinek Engine Post Processor)
+	CHG: New custom build step added project settings. Every source file in Zinek Engine will be processed by zepp.exe utility.
+	REM: Custom build steps (zepp.exe) in spesific header files has been removed.
+	REM: genheader.exe (source file header generator), verman.exe (version manager) and their input files has been removed from postprocess directory. They are replaced by ZELicensePostProcessor in zepp utility.

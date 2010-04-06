@@ -73,12 +73,12 @@ class ZECanvasBrush : public ZEEntity
 };
 
 /*
-ZE_POSTPROCESSOR_START(Meta)
+ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
 		<class name="ZECanvasBrush" parent="ZEEntity" icon="" description="Canvas brush"/>
 	</meta>
 </zinek>
-ZE_POSTPROCESSOR_END()
+ZE_POST_PROCESSOR_END()
 */
 #endif

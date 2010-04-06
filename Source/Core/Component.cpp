@@ -36,21 +36,28 @@
 #include "Component.h"
 #include "GameInterface/Entity.h"
 
+// ZEComponentDirtyTransfromFlags
+#define ZE_CDF_ALL							0xFFFFFFFF
+#define ZE_CDF_LOCAL_TRANSFORM				1
+#define ZE_CDF_WORLD_TRANSFORM				2
+#define ZE_CDF_WORLD_BOUNDING_SPHERE		4
+#define ZE_CDF_WORLD_BOUNDING_BOX			8
+
 void ZEComponent::UpdateBoundingVolumes()
 {
-	UpdateWorldBoundingBox = true;
-	UpdateWorldBoundingSphere = true;
+	DirtyFlags = ZE_CDF_ALL;
 	Owner->UpdateBoundingVolumes();
 }
 
 void ZEComponent::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 {
 	LocalBoundingBox = BoundingBox;
-	UpdateWorldBoundingBox = true;
-	UpdateWorldBoundingSphere = true;
+	DirtyFlags = ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_SPHERE;
+
 	if (Owner != NULL)
 		Owner->UpdateBoundingVolumes();
 }
+
 ZEDWORD ZEComponent::GetDrawFlags() const
 {
 	return ZE_DF_NONE;
@@ -59,9 +66,8 @@ ZEDWORD ZEComponent::GetDrawFlags() const
 void ZEComponent::SetOwner(ZEEntity* NewOwner)
 {
 	Owner = NewOwner;
-	UpdateWorldBoundingBox = true;
-	UpdateWorldBoundingSphere = true;
-	UpdateWorldTransform = true;
+
+	DirtyFlags = ZE_CDF_WORLD_TRANSFORM | ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_SPHERE;
 
 	if (Visible && Owner != NULL)
 		Owner->UpdateBoundingVolumes();
@@ -82,10 +88,10 @@ const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 {
 	if (Owner != NULL)
 	{
-		if (UpdateWorldTransform)
+		if (DirtyFlags & ZE_CDF_WORLD_TRANSFORM)
 		{
 			ZEMatrix4x4::Multiply(((ZEComponent*)this)->WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
-			((ZEComponent*)this)->UpdateWorldTransform = false;
+			((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_TRANSFORM;
 		}
 
 		return WorldTransform;
@@ -96,10 +102,10 @@ const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 
 const ZEMatrix4x4& ZEComponent::GetLocalTransform() const 
 {
-	if (UpdateLocalTransform)
+	if (DirtyFlags & ZE_CDF_LOCAL_TRANSFORM)
 	{
 		ZEMatrix4x4::CreateOrientation(((ZEComponent*)this)->LocalTransform, Position, Rotation, Scale);
-		((ZEComponent*)this)->UpdateLocalTransform = false;
+		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_LOCAL_TRANSFORM;
 	}
 
 	return LocalTransform;
@@ -112,22 +118,22 @@ const ZEAABoundingBox& ZEComponent::GetLocalBoundingBox() const
 
 const ZEAABoundingBox& ZEComponent::GetWorldBoundingBox() const
 {
-	if (!UpdateWorldBoundingBox)
-		return WorldBoundingBox;
+	if (!(DirtyFlags & ZE_CDF_WORLD_BOUNDING_BOX))
+	{
+		ZEAABoundingBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_BOUNDING_BOX;
+	}
 
-	ZEAABoundingBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
-	((ZEComponent*)this)->UpdateWorldBoundingBox = false;
 	return WorldBoundingBox;
 }
 
 const ZEBoundingSphere& ZEComponent::GetWorldBoundingSphere() const
 {
-	if (!UpdateWorldBoundingSphere)
-		return WorldBoundingSphere;
-
-	GetWorldBoundingBox().GenerateBoundingSphere(((ZEComponent*)this)->WorldBoundingSphere);
-
-	((ZEComponent*)this)->UpdateWorldBoundingSphere = false;
+	if (DirtyFlags & ZE_CDF_WORLD_BOUNDING_SPHERE)
+	{
+		GetWorldBoundingBox().GenerateBoundingSphere(((ZEComponent*)this)->WorldBoundingSphere);
+		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_BOUNDING_SPHERE;
+	}
 
 	return WorldBoundingSphere;
 }
@@ -159,10 +165,8 @@ const ZEVector3& ZEComponent::GetLocalPosition() const
 
 void ZEComponent::SetLocalPosition(const ZEVector3& NewPosition)
 {
-	UpdateLocalTransform = true;
-	UpdateWorldTransform = true;
-	UpdateWorldBoundingBox = true;
-	UpdateWorldBoundingSphere = true;
+	DirtyFlags = ZE_CDF_ALL;
+
 	Position = NewPosition;
 	if (Owner != NULL)
 		Owner->UpdateBoundingVolumes();
@@ -175,10 +179,7 @@ const ZEQuaternion& ZEComponent::GetLocalRotation() const
 
 void ZEComponent::SetLocalRotation(const ZEQuaternion& NewRotation)
 {
-	UpdateLocalTransform = true;
-	UpdateWorldTransform = true;
-	UpdateWorldBoundingBox = true;
-	UpdateWorldBoundingSphere = true;
+	DirtyFlags = ZE_CDF_ALL;
 
 	Rotation = NewRotation;
 	if (Owner != NULL)
@@ -192,10 +193,8 @@ const ZEVector3& ZEComponent::GetLocalScale() const
 
 void ZEComponent::SetLocalScale(const ZEVector3& NewScale)
 {
-	UpdateLocalTransform = true;
-	UpdateWorldTransform = true;
-	UpdateWorldBoundingBox = true;
-	UpdateWorldBoundingSphere = true;
+	DirtyFlags = ZE_CDF_ALL;
+
 	Scale = NewScale;
 	if (Owner != NULL)
 		Owner->UpdateBoundingVolumes();
@@ -216,6 +215,8 @@ const ZEVector3 ZEComponent::GetWorldPosition() const
 
 void ZEComponent::SetWorldPosition(const ZEVector3& NewPosition)
 {
+	DirtyFlags = ZE_CDF_ALL;
+
 	if (Owner != NULL)
 		ZEVector3::Sub(Position,NewPosition,Owner->GetPosition());
 	else
@@ -237,6 +238,8 @@ const ZEQuaternion ZEComponent::GetWorldRotation() const
 
 void ZEComponent::SetWorldRotation(const ZEQuaternion& NewRotation)
 {
+	DirtyFlags = ZE_CDF_ALL;
+
 	if (Owner != NULL)
 	{
 		ZEQuaternion Temp, InvWorldRotation;
@@ -250,7 +253,7 @@ void ZEComponent::SetWorldRotation(const ZEQuaternion& NewRotation)
 
 bool ZEComponent::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& TEnterance, float &TExit)
 {
-	return true;
+	return false;
 }
 
 void ZEComponent::Tick(float Time)
@@ -270,32 +273,29 @@ bool ZEComponent::Initialize()
 	return true;
 }
 
-bool ZEComponent::Deinitialize()
+void ZEComponent::Deinitialize()
 {
-	return true;
+
 }
 
 void ZEComponent::OwnerWorldTransformChanged()
 {
-	UpdateWorldTransform = true;
-	UpdateWorldBoundingSphere = true;
-	UpdateWorldBoundingBox = true;	
+	DirtyFlags = ZE_CDF_WORLD_TRANSFORM | ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_BOX;
 }
 
 
 ZEComponent::ZEComponent()
 {
 	Owner = NULL;
+
+	DirtyFlags = ZE_CDF_ALL;
 	Position = ZEVector3::Zero;
 	OldPosition = ZEVector3::Zero;
 	Velocity = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
-	UpdateLocalTransform = true;
-	UpdateWorldTransform = true;
-	UpdateWorldBoundingSphere = true;
-	UpdateWorldBoundingBox = true;
 	Visible = true;
+	Enabled = true;
 }
 
 #include "Component.h.zpp"

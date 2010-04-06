@@ -359,7 +359,7 @@ void ZELightBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight
 ZELightBrush::ZELightBrush()
 {
 	Material = NULL;
-	SetBoundingVolumeMechanism(ZE_BVM_USELOCALONLY);
+	SetBoundingVolumeMechanism(ZE_BVM_USE_LOCAL_ONLY);
 	LightType = ZE_LT_NONE;
 	Light = NULL;
 	ProjectionTexture = NULL;

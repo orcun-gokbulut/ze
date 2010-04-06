@@ -50,13 +50,6 @@
 #include "Graphics/Renderer.h"
 #include "Meta/Class.h"
 
-enum ZEBoundingVolumeMechnism
-{
-	ZE_BVM_USELOCALONLY,
-	ZE_BVM_USECOMPONENTS,
-	ZE_BVM_USEBOTH
-};
-
 enum ZEEntityRunAt
 {
 	ZE_ERA_NONE			= 0,
@@ -70,15 +63,6 @@ enum ZEEntityRunAt
 
 #define ZE_META_ENTITY_DESCRIPTION(ClassName) ZE_META_EXTENDED_CLASS_DESCRIPTION(ClassName, ZEEntityDescription, ZE_META_ENTITY_CLASS_EXTENSION)
 #define ZE_META_ENTITY() ZE_META_EXTENDED_CLASS(ZEEntityDescription, )
-
-#define ZE_DF_NONE								0
-#define ZE_DF_DRAW								1
-#define ZE_DF_DRAW_COMPONENTS					2
-#define ZE_DF_LIGHT_SOURCE						4
-#define ZE_DF_LIGHT_RECIVER						8
-#define ZE_DF_CULL								16
-#define ZE_DF_CULL_COMPONENTS					32
-#define ZE_DF_AUTO								64
 
 class ZEEntityDescription : public ZEClassDescription
 {
@@ -99,6 +83,37 @@ class ZEEntityDescription : public ZEClassDescription
 		virtual ZEEntityRunAt					GetRunAt() const;
 };
 
+
+enum ZEBoundingVolumeMechnism
+{
+	ZE_BVM_NO_BOUNDING_VOLUME	= 0,
+	ZE_BVM_USE_LOCAL_ONLY		= 1,
+	ZE_BVM_USE_COMPONENTS		= 2,
+	ZE_BVM_USE_BOTH				= 3
+};
+
+// ZEDrawFlags
+#define ZE_DF_NONE								0
+#define ZE_DF_DRAW								1
+#define ZE_DF_DRAW_COMPONENTS					2
+#define ZE_DF_LIGHT_SOURCE						4
+#define ZE_DF_LIGHT_RECIVER						8
+#define ZE_DF_CULL								16
+#define ZE_DF_CULL_COMPONENTS					32
+#define ZE_DF_AUTO								64
+
+// ZERayCastFlags
+#define ZE_RC_NONE								0
+#define ZE_RC_CAST_TO_ENTITY					1
+#define ZE_RC_CAST_TO_COMPONENTS				2
+
+// Entity Dirty Flags
+#define ZE_EDF_ALL								0xFFFFFFFF
+#define ZE_EDF_LOCAL_TRANSFORM					1
+#define ZE_EDF_WORLD_TRANSFORM					2
+#define ZE_EDF_WORLD_BOUNDING_SPHERE			4
+#define ZE_EDF_WORLD_BOUNDING_BOX				8
+
 class ZEEntity : public ZEClass
 {
 	ZE_META_ENTITY()
@@ -113,7 +128,7 @@ class ZEEntity : public ZEClass
 		ZEVector3								OldPosition;
 
 		ZEDWORD									DrawFlags;
-		ZEDWORD									CullerFlags;
+		ZEDWORD									RayCastFlags;
 
 		bool									Enabled;
 		bool									Visible;
@@ -127,10 +142,9 @@ class ZEEntity : public ZEClass
 		void									SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
 		void									SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
 
+		ZEDWORD									DirtyFlags;
+
 		void									UpdateComponents();
-		bool									UpdateBoundingBox;
-		bool									UpdateBoundingSphere;
-		bool									UpdateWorldTransform;
 
 		ZEArray<ZEComponent*>					Components;
 
@@ -145,6 +159,7 @@ class ZEEntity : public ZEClass
 		const ZEBoundingSphere&					GetWorldBoundingSphere();
 
 		virtual ZEDWORD							GetDrawFlags() const;
+		virtual ZEDWORD							GetRayCastFlags() const;
 
 		void									SetEntityId(int EntityId);
 		int										GetEntityId() const;
@@ -159,7 +174,7 @@ class ZEEntity : public ZEClass
 		virtual bool							GetEnabled() const;
 
 		virtual void							SetPosition(const ZEVector3& NewPosition);
-		const ZEVector3&							GetPosition() const;
+		const ZEVector3&						GetPosition() const;
 
 		virtual void							SetRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion&						GetRotation() const;
@@ -190,7 +205,7 @@ class ZEEntity : public ZEClass
 };
 
 /*
-ZE_POSTPROCESSOR_START(Meta)
+ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
 		<class name="ZEEntity">
@@ -205,6 +220,6 @@ ZE_POSTPROCESSOR_START(Meta)
 		</class>
 	</meta>
 </zinek>
-ZE_POSTPROCESSOR_END()
+ZE_POST_PROCESSOR_END()
 */
 #endif

@@ -50,9 +50,8 @@ bool ZEParticleEffect::Initialize()
 	return true;
 }
 
-bool ZEParticleEffect::Deinitialize()
+void ZEParticleEffect::Deinitialize()
 {
-	return true;
 }
 
 void ZEParticleEffect::Draw(ZERenderer *Renderer, const ZESmartArray<const ZERLLight*> &Lights)

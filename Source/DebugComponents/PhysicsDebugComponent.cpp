@@ -166,7 +166,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 		Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
 		Model->SetModelFile("test.zeModel");
 		Scene->AddEntity(Model);
-//		Model->GetModel()->GetSkeleton()[0].SetRelativeRotation(ZEQuaternion::Identity);
+		Model->GetModel()->GetBones()[5].SetRelativeRotation(ZEQuaternion(ZE_PI_4, ZEVector3(0.0f, 1.0f, 0.0f)));
 		//Model->GetModel()->GetMeshes()[0].SetLocalScale(ZEVector3(0.1, 0.1, 0.1));
 		Model->SetAnimationName("Test");
 		Model->SetAnimationState(ZE_MAS_PLAYING);

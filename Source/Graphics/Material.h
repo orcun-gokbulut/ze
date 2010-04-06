@@ -109,12 +109,12 @@ class ZEMaterial : public ZEClass
 };
 
 /*
-ZE_POSTPROCESSOR_START(Meta)
+ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
 		<class name="ZEMaterial" noinstance="true" description="Base class of materials."/>
 	</meta>
 </zinek>
-ZE_POSTPROCESSOR_END()
+ZE_POST_PROCESSOR_END()
 */
 #endif

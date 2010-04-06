@@ -42,22 +42,19 @@
 void ZEEntity::SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism)
 {
 	BoundingVolumeMechanism = Mechanism;
-	UpdateBoundingBox = true;
-	UpdateBoundingSphere = true;
+	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE;
 }
 
 void ZEEntity::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 {
 	LocalBoundingBox = BoundingBox;
-	UpdateBoundingBox = true;
-	UpdateBoundingSphere = true;
+	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE;
 }
 
 const ZEAABoundingBox& ZEEntity::GetLocalBoundingBox()
 {
 	return LocalBoundingBox;
 }
-
 
 void ZEEntity::UpdateComponents()
 {
@@ -124,6 +121,11 @@ void ZEEntity::UnregisterComponent(ZEComponent* Component)
 		}
 	}
 }
+		
+ZEDWORD ZEEntity::GetRayCastFlags() const
+{
+	return 0;
+}
 
 void ZEEntity::SetEntityId(int EntityId)
 {
@@ -142,11 +144,11 @@ const ZEArray<ZEComponent *> &	ZEEntity::GetComponents()
 
 const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 {
-	if (UpdateBoundingBox)
+	if (DirtyFlags & ZE_EDF_WORLD_BOUNDING_BOX)
 	{
 		bool NoBoundingBox = true;
 
-		if (BoundingVolumeMechanism == ZE_BVM_USEBOTH || BoundingVolumeMechanism == ZE_BVM_USELOCALONLY)
+		if (BoundingVolumeMechanism == ZE_BVM_USE_BOTH || BoundingVolumeMechanism == ZE_BVM_USE_LOCAL_ONLY)
 		{
 			ZEVector3 Point;
 			ZEMatrix4x4 WorldTransform = GetWorldTransform();
@@ -166,7 +168,7 @@ const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 			NoBoundingBox = false;
 		}
 
-		if (BoundingVolumeMechanism == ZE_BVM_USEBOTH || BoundingVolumeMechanism == ZE_BVM_USECOMPONENTS)
+		if (BoundingVolumeMechanism == ZE_BVM_USE_BOTH || BoundingVolumeMechanism == ZE_BVM_USE_COMPONENTS)
 			for (size_t I = 0; I < Components.GetCount(); I++)
 			{
 				if ((Components[I]->GetDrawFlags() & ZE_DF_DRAW) && Components[I]->GetVisible())
@@ -195,7 +197,7 @@ const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 		if (NoBoundingBox == true)
 			WorldBoundingBox.Max = WorldBoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
 
-		UpdateBoundingBox = false;
+		DrawFlags &= ~ZE_EDF_WORLD_BOUNDING_BOX;
 	}
 
 	return WorldBoundingBox;
@@ -203,10 +205,10 @@ const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 
 const ZEBoundingSphere&	ZEEntity::GetWorldBoundingSphere()
 {
-	if (UpdateBoundingSphere)
+	if (DirtyFlags & ZE_EDF_WORLD_BOUNDING_SPHERE)
 	{
 		GetWorldBoundingBox().GenerateBoundingSphere(WorldBoundingSphere);
-		UpdateBoundingSphere = false;
+		DirtyFlags &= ~ZE_EDF_WORLD_BOUNDING_SPHERE;
 	}
 
 	return WorldBoundingSphere;
@@ -249,9 +251,7 @@ bool ZEEntity::GetEnabled() const
 
 void ZEEntity::SetPosition(const ZEVector3& NewPosition) 
 {
-	UpdateWorldTransform = true;
-	UpdateBoundingBox = true;
-	UpdateBoundingSphere = true;
+	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE | ZE_EDF_WORLD_TRANSFORM;
 	Position = NewPosition;
 	UpdateComponents();
 }
@@ -263,9 +263,7 @@ const ZEVector3& ZEEntity::GetPosition() const
 
 void ZEEntity::SetRotation(const ZEQuaternion& NewRotation) 
 {
-	UpdateWorldTransform = true;
-	UpdateBoundingBox = true;
-	UpdateBoundingSphere = true;
+	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE | ZE_EDF_WORLD_TRANSFORM;
 	Rotation = NewRotation;
 	UpdateComponents();
 }
@@ -277,9 +275,7 @@ const ZEQuaternion& ZEEntity::GetRotation() const
 
 void ZEEntity::SetScale(const ZEVector3& NewScale)
 {
-	UpdateWorldTransform = true;
-	UpdateBoundingBox = true;
-	UpdateBoundingSphere = true;
+	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE | ZE_EDF_WORLD_TRANSFORM;
 	Scale = NewScale;
 	UpdateComponents();
 }
@@ -291,10 +287,10 @@ const ZEVector3& ZEEntity::GetScale() const
 
 const ZEMatrix4x4& ZEEntity::GetWorldTransform()
 {
-	if (UpdateWorldTransform)
+	if (DirtyFlags & ZE_EDF_WORLD_TRANSFORM)
 	{
 		ZEMatrix4x4::CreateOrientation(WorldTransform, Position, Rotation, Scale);
-		UpdateWorldTransform = false;
+		DirtyFlags &= ~ZE_EDF_WORLD_TRANSFORM;
 	}
 
 	return WorldTransform;
@@ -331,11 +327,8 @@ void ZEEntity::Reset()
 
 void ZEEntity::UpdateBoundingVolumes()
 {
-	if (BoundingVolumeMechanism == ZE_BVM_USEBOTH || BoundingVolumeMechanism == ZE_BVM_USECOMPONENTS)
-	{
-		UpdateBoundingSphere = true;
-		UpdateBoundingBox = true;
-	}
+	if (BoundingVolumeMechanism == ZE_BVM_USE_BOTH || BoundingVolumeMechanism == ZE_BVM_USE_COMPONENTS)
+		DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE;
 }
 
 bool ZEEntity::CastRay(const ZERay & Ray,const float Range,float &MinT)
@@ -345,7 +338,7 @@ bool ZEEntity::CastRay(const ZERay & Ray,const float Range,float &MinT)
 	if (!ZEAABoundingBox::IntersectionTest(GetWorldBoundingBox(), Ray, MinT, MaxT))
 		return false;
 
-	if (BoundingVolumeMechanism != ZE_BVM_USECOMPONENTS)
+	if (BoundingVolumeMechanism != ZE_BVM_USE_COMPONENTS)
 		return true;
 
 	for (size_t I = 0; I < Components.GetSize(); I++)
@@ -390,15 +383,17 @@ void ZEEntity::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& 
 ZEEntity::ZEEntity()
 {
 	Name[0] = '\0';
-	DrawFlags = ZE_DF_AUTO;
-	BoundingVolumeMechanism = ZE_BVM_USELOCALONLY;
+	DrawFlags = ZE_DF_DRAW | ZE_DF_DRAW_COMPONENTS | ZE_DF_CULL | ZE_DF_CULL_COMPONENTS;
+
+	BoundingVolumeMechanism = ZE_BVM_USE_BOTH;
+
 	Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion::Identity;
-	Scale = ZEVector3(1.0f, 1.0f ,1.0f);
+	Scale = ZEVector3::One;
 	Enabled = true;
-	UpdateBoundingBox = true;
-	UpdateBoundingSphere = true;
-	UpdateWorldTransform = true;
+	Visible = true;
+
+	DirtyFlags = ZE_EDF_ALL;
 	Visible = true;
 }
 

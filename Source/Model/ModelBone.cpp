@@ -119,7 +119,7 @@ const ZEMatrix4x4& ZEModelBone::GetModelTransform()
 {
 	//if (UpdateWorldTransform)
 	{
-		ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetLocalTransform());
+		ZEMatrix4x4::Multiply(WorldTransform, Owner->GetLocalTransform(), GetLocalTransform());
 		UpdateWorldTransform = false;
 	}
 

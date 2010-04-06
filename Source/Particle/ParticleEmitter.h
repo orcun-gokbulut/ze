@@ -219,7 +219,7 @@ class ZEParticleEmitter : public ZEClass
 };
 
 /*
-ZE_POSTPROCESSOR_START(Meta)
+ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
 		<class name="ZEParticleEmitter">
@@ -258,7 +258,7 @@ ZE_POSTPROCESSOR_START(Meta)
 		</class>
 	</meta>
 </zinek>
-ZE_POSTPROCESSOR_END()
+ZE_POST_PROCESSOR_END()
 */
 
 

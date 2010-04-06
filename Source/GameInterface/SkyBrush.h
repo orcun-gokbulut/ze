@@ -89,7 +89,7 @@ class ZESkyBrush : public ZEEntity
 											~ZESkyBrush();
 };	
 /*
-ZE_POSTPROCESSOR_START(Meta)
+ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
 		<class name="ZESkyBrush"	parent="ZEEntity"	description="Sky Brush">
@@ -102,6 +102,6 @@ ZE_POSTPROCESSOR_START(Meta)
 		</class>
 	</meta>
 </zinek>
-ZE_POSTPROCESSOR_END()
+ZE_POST_PROCESSOR_END()
 */
 #endif

@@ -1,4 +1,4 @@
-/*ZEHEADER_START*/
+/*ZE_POST_PROCESSOR_START(License)*/
 //////////////////////////////////////////////////////////////////////////////////////
 //                                                                                  //
 //  MapResource.h - Zinek Engine v0.05.00 Build 1024 Source Code                                 
@@ -31,7 +31,7 @@
 //  AUTHOR(S)           : Y. Orçun GÖKBULUT                                         //
 //*                                                                                *//
 //////////////////////////////////////////////////////////////////////////////////////
-/*ZEHEADER_END*/
+/*ZE_POST_PROCESSOR_END()*/
 
 // Transformation matrices 5 matrices
 float4x4  WorldViewProjMatrix			: register(c0);

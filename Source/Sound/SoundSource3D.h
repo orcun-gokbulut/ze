@@ -77,7 +77,7 @@ class ZESoundSource3D : public ZESoundSource
 };
 
 /*
-ZE_POSTPROCESSOR_START(Meta)
+ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
 		<class name="ZESoundSource3D" parent="ZESoundSource" noinstance="true">
@@ -113,6 +113,6 @@ ZE_POSTPROCESSOR_START(Meta)
 		</class>
 	</meta>
 </zinek>
-ZE_POSTPROCESSOR_END()
+ZE_POST_PROCESSOR_END()
 */
 #endif

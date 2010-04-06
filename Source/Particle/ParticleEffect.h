@@ -46,25 +46,25 @@ class ZERenderer;
 class ZEParticleEffect : public ZEComponent
 {
 	private:
-		ZEArray<ZEParticleSystem*>		SystemArray;				// An effect might be composed of many systems
+		ZEArray<ZEParticleSystem*>			SystemArray;				// An effect might be composed of many systems
 
 	public:
-		virtual	ZEDWORD					GetDrawFlags() const;
+		virtual	ZEDWORD						GetDrawFlags() const;
 
-		bool							Initialize();
-		bool							Deinitialize();
+		bool								Initialize();
+		void								Deinitialize();
 
-		void							Draw(ZERenderer *Renderer, const ZESmartArray<const ZERLLight*> &Lights);
-		void							Tick(float TimeElapsed);
+		void								Draw(ZERenderer *Renderer, const ZESmartArray<const ZERLLight*> &Lights);
+		void								Tick(float TimeElapsed);
 
-		void									AddParticleSystem(ZEParticleSystem* ParticleSystem);
-		void									RemoveParticleSystem(ZEParticleSystem* ParticleSystem);
-		const ZEArray<ZEParticleSystem*>&		GetParticleSystems();
+		void								AddParticleSystem(ZEParticleSystem* ParticleSystem);
+		void								RemoveParticleSystem(ZEParticleSystem* ParticleSystem);
+		const ZEArray<ZEParticleSystem*>&	GetParticleSystems();
 
-		void							LoadFromFile(const char* FileName);
+		void								LoadFromFile(const char* FileName);
 			
-										ZEParticleEffect();
-										~ZEParticleEffect();
+											ZEParticleEffect();
+											~ZEParticleEffect();
 };
 
 #endif

@@ -76,12 +76,12 @@ class ZEPlayer : public ZEEntity
 };
 
 /*
-ZE_POSTPROCESSOR_START(Meta)
+ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
 		<class name="ZEPlayer" parent="ZEEntity" description="Player spawn point"/>
 	</meta>
 </zinek>
-ZE_POSTPROCESSOR_END()
+ZE_POST_PROCESSOR_END()
 */
 #endif

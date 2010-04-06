@@ -96,7 +96,7 @@ class ZEModelBrush : public ZEEntity
 };
 
 /*
-ZE_POSTPROCESSOR_START(Meta)
+ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
 	 	<class name="ZEModelBrush" parent="ZEEntity" icon="" description="This entity used for displaying animated visual models in the game environments like statues, mechineries, furnitures and etc.">
@@ -124,6 +124,6 @@ ZE_POSTPROCESSOR_START(Meta)
 		</class>
 	</meta>
 </zinek>
-ZE_POSTPROCESSOR_END()
+ZE_POST_PROCESSOR_END()
 */
 #endif 

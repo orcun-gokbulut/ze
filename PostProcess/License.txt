@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////////////////////////////////
 //                                                                                  //
-//  %ZEFILE% - Zinek Engine %ZEVERSION% Source Code                                 
+//  ZE_LICENSE_FILE_NAME - Zinek Engine 0.5 Source Code                                 
 // -------------------------------------------------------------------------------- //
-//  Copyright (c) 2007-2009 Y. Orçun GÖKBULUT. All rights reserved.                 //
+//  Copyright (c) 2007-2010 Y. Orçun GÖKBULUT. All rights reserved.                 //
 //                                                                                  //
 //                 READ TERMS BELLOW BEFORE TAKING ANY ACTION !                     //
 //                                                                                  //
@@ -25,5 +25,5 @@
 //     E-Mail : contact@zinekengine.com                                             //
 //     WWW    : http://www.zinekengine.com                                          //
 //                                                                                  //
-%ZESTATIC_TEXT%
+ZE_LICENSE_STATIC_TEXT
 //////////////////////////////////////////////////////////////////////////////////////

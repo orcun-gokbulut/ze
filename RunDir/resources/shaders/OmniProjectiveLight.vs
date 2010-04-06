@@ -1,4 +1,4 @@
-/*ZEHEADER_START*/
+/*ZE_POST_PROCESSOR_START(License)*/
 //////////////////////////////////////////////////////////////////////////////////////
 //                                                                                  //
 //  MapResource.h - Zinek Engine v0.05.00 Build 1024 Source Code                                 
@@ -31,7 +31,7 @@
 //  AUTHOR(S)           : Y. Orçun GÖKBULUT                                         //
 //*                                                                                *//
 //////////////////////////////////////////////////////////////////////////////////////
-/*ZEHEADER_END*/
+/*ZE_POST_PROCESSOR_END()*/
 
 // Transformation matrices 5 matrices
 float4x4  WorldViewProjMatrix			: register(c0);
@@ -107,7 +107,7 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 		for (int I = 0; I < 4; I++)
 			if (Input.BoneWeights[I] > 0.0f)
 			{
-				Position = mul(Input.Position, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
+				Position += mul(Input.Position, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
 				Normal += mul(Input.Normal, (float3x3)BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
 
 				#ifdef ZESHADER_NORMALMAP

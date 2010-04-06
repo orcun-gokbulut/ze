@@ -204,7 +204,7 @@ ZEModelBrush::ZEModelBrush()
 {
 	Model = NULL;
 	ModelResource = NULL;
-	SetBoundingVolumeMechanism(ZE_BVM_USECOMPONENTS);
+	SetBoundingVolumeMechanism(ZE_BVM_USE_COMPONENTS);
 }
 
 ZEModelBrush::~ZEModelBrush()

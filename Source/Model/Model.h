@@ -46,6 +46,7 @@
 #include "ModelMesh.h"
 #include "ModelAnimation.h"
 
+#define ZE_MDF
 class ZEQuaternion;
 class ZEMatrix4x4;
 class ZEFixedMaterial;

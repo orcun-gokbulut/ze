@@ -52,6 +52,8 @@ struct ZERLLight;
 
 ZE_META_CLASS_DESCRIPTION(ZEComponent);
 
+#define ZE_CDF_USER_FLAG_START		16
+
 class ZEComponent : public ZEClass
 {
 	ZE_META_CLASS()
@@ -62,13 +64,11 @@ class ZEComponent : public ZEClass
 		ZEVector3						Velocity;
 		ZEQuaternion					Rotation;
 		ZEVector3						Scale;
+
+		ZEDWORD							DirtyFlags;
+
 		ZEMatrix4x4						LocalTransform;
 		ZEMatrix4x4						WorldTransform;
-
-		bool							UpdateLocalTransform;
-		bool							UpdateWorldTransform;
-		bool							UpdateWorldBoundingSphere;
-		bool							UpdateWorldBoundingBox;
 
 		ZEAABoundingBox					LocalBoundingBox;
 		ZEAABoundingBox					WorldBoundingBox;
@@ -123,14 +123,14 @@ class ZEComponent : public ZEClass
 		virtual void					Tick(float TimeElapsed);
 
 		virtual bool					Initialize();
-		virtual bool					Deinitialize();
+		virtual void					Deinitialize();
 	
 		virtual void					OwnerWorldTransformChanged();
 
 										ZEComponent();
 };
 /*
-ZE_POSTPROCESSOR_START(Meta)
+ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
 		<class name="ZEComponent">
@@ -143,6 +143,6 @@ ZE_POSTPROCESSOR_START(Meta)
 		</class>
 	</meta>
 </zinek>
-ZE_POSTPROCESSOR_END()
+ZE_POST_PROCESSOR_END()
 */
 #endif

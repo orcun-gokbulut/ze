@@ -380,7 +380,7 @@ class ZEFixedMaterial : public ZEMaterial
 };
 
 /*
-ZE_POSTPROCESSOR_START(Meta)
+ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
 		<class name="ZEFixedMaterial" noinstance="true">
@@ -664,6 +664,6 @@ ZE_POSTPROCESSOR_START(Meta)
 		</class>
 	</meta>
 </zinek>
-ZE_POSTPROCESSOR_END()
+ZE_POST_PROCESSOR_END()
 */
 #endif
