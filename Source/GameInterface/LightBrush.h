@@ -103,7 +103,7 @@ class ZELightBrush : public ZEEntity
 		void								SetProjectionAspectRatio(float NewValue);
 		float								GetProjectionAspectRatio() const;
 
-		virtual void						Initialize();
+		virtual bool						Initialize();
 		virtual void						Deinitialize();
 		virtual void						Reset();
 

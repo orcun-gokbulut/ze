@@ -278,7 +278,7 @@ const char* ZELightBrush::GetProjectionTexture() const
 		return "";
 }
 
-void ZELightBrush::Initialize()
+bool ZELightBrush::Initialize()
 {
 	if (Material == NULL)
 		Material = ZEFixedMaterial::CreateInstance();
@@ -295,6 +295,8 @@ void ZELightBrush::Initialize()
 	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
 	RenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_ZCULLING;
+
+	return true;
 }
 
 void ZELightBrush::Deinitialize()

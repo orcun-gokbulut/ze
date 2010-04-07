@@ -306,8 +306,9 @@ const ZEVector3& ZEEntity::GetVelocity() const
 	return Velocity;
 }
 
-void ZEEntity::Initialize()
+bool ZEEntity::Initialize()
 {
+	return true;
 }
 
 void ZEEntity::Deinitialize()

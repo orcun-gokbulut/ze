@@ -62,14 +62,14 @@ class ZEPlayer : public ZEEntity
 		void					SetFOV(float Fov);
 		float					GetFOV();
 
-		void					Tick(float Time);
-
-		void					Draw(ZERenderer * Renderer);
-
 		void					SetActive(bool);
+
+		virtual void			Tick(float Time);
+		virtual void			Draw(ZERenderer * Renderer);
+
 		
-		void					Initialize();
-		void					Deinitialize();
+		virtual	bool			Initialize();
+		virtual void			Deinitialize();
 
 								ZEPlayer();
 								~ZEPlayer();

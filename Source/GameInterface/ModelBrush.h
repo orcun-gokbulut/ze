@@ -84,7 +84,7 @@ class ZEModelBrush : public ZEEntity
 		void								SetAnimationSpeed(float AnimationSpeed);
 		float								GetAnimationSpeed() const;
 
-		virtual void						Initialize();
+		virtual bool						Initialize();
 		virtual void						Deinitialize();
 		virtual void						Reset();
 

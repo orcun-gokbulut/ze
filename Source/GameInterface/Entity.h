@@ -187,7 +187,7 @@ class ZEEntity : public ZEClass
 
 		const ZEMatrix4x4&						GetWorldTransform();
 
-		virtual void							Initialize();
+		virtual bool							Initialize();
 		virtual void							Deinitialize();
 		virtual void							Destroy();
 		virtual void							Reset();

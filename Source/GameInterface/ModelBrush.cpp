@@ -156,7 +156,7 @@ float ZEModelBrush::GetAnimationSpeed() const
 	return Model->GetAnimationSpeed();
 }
 
-void ZEModelBrush::Initialize()
+bool ZEModelBrush::Initialize()
 {
 	if (Model == NULL)
 	{
@@ -166,6 +166,8 @@ void ZEModelBrush::Initialize()
 			Model->SetModelResource(ModelResource);
 		Model->Initialize();
 	}
+
+	return true;
 }
 
 void ZEModelBrush::Deinitialize()

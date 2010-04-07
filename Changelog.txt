@@ -237,3 +237,6 @@
 	CHG: New custom build step added project settings. Every source file in Zinek Engine will be processed by zepp.exe utility.
 	REM: Custom build steps (zepp.exe) in spesific header files has been removed.
 	REM: genheader.exe (source file header generator), verman.exe (version manager) and their input files has been removed from postprocess directory. They are replaced by ZELicensePostProcessor in zepp utility.
+
+[7 April 2010 - Revision 146]
+	CHG: ZEEntity::Initialize now returns bool.

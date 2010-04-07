@@ -181,7 +181,7 @@ void ZEPlayer::Tick(float Time)
 	ZEEntity::Tick(Time);
 }
 
-void ZEPlayer::Initialize()
+bool ZEPlayer::Initialize()
 {
 	FOV = ZE_PI_2;
 	Yawn = Pitch = Roll = 0;
@@ -211,6 +211,8 @@ void ZEPlayer::Initialize()
 
 	zeScene->SetActiveCamera(&Camera);
 	zeScene->SetActiveListener(Listener);
+
+	return true;
 }
 
 void ZEPlayer::Deinitialize()
