@@ -520,7 +520,10 @@ ZEParticleEmitter::ZEParticleEmitter()
 	MinAngularVelocity = ZEVector3(0.0f, 0.0f, 0.0f);			
 	MaxAngularVelocity = ZEVector3(0.0f, 0.0f, 0.0f);			
 	MinColor = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);					
-	MaxColor = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);					
+	MaxColor = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
+	MinUpVector = ZEVector3(0.0f, 1.0f, 0.0f);
+	MaxUpVector = ZEVector3(0.0f, 1.0f, 0.0f);
+	
 	MinSize = 0.0f;					
 	MaxSize = 0.0f;					
 	MinLife = 0.0f;					

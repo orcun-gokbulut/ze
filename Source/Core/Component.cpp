@@ -52,7 +52,7 @@ void ZEComponent::UpdateBoundingVolumes()
 void ZEComponent::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 {
 	LocalBoundingBox = BoundingBox;
-	DirtyFlags = ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_SPHERE;
+	DirtyFlags |= ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_SPHERE;
 
 	if (Owner != NULL)
 		Owner->UpdateBoundingVolumes();
@@ -67,7 +67,7 @@ void ZEComponent::SetOwner(ZEEntity* NewOwner)
 {
 	Owner = NewOwner;
 
-	DirtyFlags = ZE_CDF_WORLD_TRANSFORM | ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_SPHERE;
+	DirtyFlags |= ZE_CDF_WORLD_TRANSFORM | ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_SPHERE;
 
 	if (Visible && Owner != NULL)
 		Owner->UpdateBoundingVolumes();
@@ -280,7 +280,7 @@ void ZEComponent::Deinitialize()
 
 void ZEComponent::OwnerWorldTransformChanged()
 {
-	DirtyFlags = ZE_CDF_WORLD_TRANSFORM | ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_BOX;
+	DirtyFlags |= ZE_CDF_WORLD_TRANSFORM | ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_BOX;
 }
 
 

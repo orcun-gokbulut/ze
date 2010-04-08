@@ -40,6 +40,7 @@
 #include "ParticleEmitter.h"
 #include "ParticleEffect.h"
 #include "ParticleSystem.h"
+#include "Graphics/SimpleMaterial.h"
 
 void ZEParticleSystem::UpdateVertexBuffer() //Bitmedi
 {
@@ -303,7 +304,7 @@ ZEParticleSystem::ZEParticleSystem()
 	RenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
 	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	IsVertexBufferUpdated = false;
-	BillboardType = ZEParticleBillboardType::ZE_PBT_WORLD_ORIENTED;
+	BillboardType = ZEParticleBillboardType::ZE_PBT_VIEWPLANE_ORIENTED;
 }
 
 ZEParticleSystem::~ZEParticleSystem()

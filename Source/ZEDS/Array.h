@@ -348,6 +348,8 @@ class ZEArray
 
 			Allocator.Reallocate(&Items, Count);
 
+			this->Count = Count;
+
 			#ifdef ZE_DEBUG_CHECK_MEMORY
 				zedsAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
