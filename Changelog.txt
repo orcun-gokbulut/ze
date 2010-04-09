@@ -242,3 +242,6 @@
 	CHG: ZEEntity::Initialize now returns bool.
 	FIX: ZEComponent DirtyFlag overwrite bugs fixed.
 	FIX: Major drawing bug fixes in ZEParticle sub-system.
+
+[8 April 2010 - Revision 148]
+	ADD: ZEParticleEmitter::ZEParticleEmitter() now initializes UpVector member.

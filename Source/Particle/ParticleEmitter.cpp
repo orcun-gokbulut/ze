@@ -523,6 +523,7 @@ ZEParticleEmitter::ZEParticleEmitter()
 	MaxColor = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
 	MinUpVector = ZEVector3(0.0f, 1.0f, 0.0f);
 	MaxUpVector = ZEVector3(0.0f, 1.0f, 0.0f);
+	UpVector = ZEVector3(0.0f, 1.0f, 0.0f);
 	
 	MinSize = 0.0f;					
 	MaxSize = 0.0f;					
