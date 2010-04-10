@@ -94,7 +94,7 @@ bool ZED3D9SimpleMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* C
 	GetDevice()->SetRenderState(D3DRS_POINTSIZE, *((DWORD*)&PointSize));
 	GetDevice()->SetRenderState(D3DRS_POINTSCALE_B, *((DWORD*)&PointScaleB));
 
-	if (RenderOrder->Flags & (ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM & ZE_ROF_ENABLE_WORLD_TRANSFORM))
+	if (RenderOrder->Flags & (ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM))
 	{
 		ZEMatrix4x4 WorldViewProjMatrix;
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, Camera->GetViewProjectionTransform());

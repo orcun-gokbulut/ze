@@ -40,17 +40,26 @@
 #include "Vector.h"
 #include "Line.h"
 class ZEPlane;
+class ZELineSegment;
 class ZERay : public ZELine
 {
 	public:
 		static void			Create(ZERay & Ray,const ZEVector3 & Start,const ZEVector3 & End);
 		static void			CreateParametric(ZERay & Ray,const ZEVector3 & v,const ZEVector3 & p);
 
-		static float		DistanceToPoint(const ZERay& Ray, const ZEVector3& Point, float &t);
+		static float		MinimumDistance(const ZERay& Ray, const ZEVector3& Point);
+		static float		MinimumDistance(const ZERay& Ray, const ZEVector3& Point, float &TRay);
+		static float		MinimumDistance(const ZERay& Ray, const ZELine& Line);
+		static float		MinimumDistance(const ZERay& Ray, const ZELine& Line, float& TRay, float& TLine);
+		static float		MinimumDistance(const ZERay& Ray, const ZELineSegment& LineSegment);
+		static float		MinimumDistance(const ZERay& Ray, const ZELineSegment& LineSegment, float& TRay, float& TLine);
+		static float		MinimumDistance(const ZERay& RayA, const ZERay& RayB);
+		static float		MinimumDistance(const ZERay& RayA, const ZERay& RayB, float& TRayA, float& TRayB);
 
-		void				GetPointOn(ZEVector3& Point, float t) const;
+		void				GetPointOn(ZEVector3& Point, float TRay) const;
+		ZEVector3			GetPointOn(float TRay) const;
 
-							ZERay(const ZEVector3 &v,const ZEVector3 &p);
+							ZERay(const ZEVector3 &v, const ZEVector3 &p);
 							ZERay();
 };
 #endif

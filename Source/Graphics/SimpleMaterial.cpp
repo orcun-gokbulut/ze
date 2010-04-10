@@ -38,7 +38,7 @@
 
 ZESimpleMaterial::ZESimpleMaterial()
 {
-
+	WireFrame = false;
 }
 
 ZESimpleMaterial::~ZESimpleMaterial()

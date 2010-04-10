@@ -185,14 +185,14 @@ ZEVector2& ZEVector2::operator *=(float s)
 
 bool ZEVector2::operator ==(const ZEVector2 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) < ZE_ZEROTRESHOLD) && 
-			(fabs(this->y - RightOperand.y) < ZE_ZEROTRESHOLD));
+	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_TRESHOLD) && 
+			(fabs(this->y - RightOperand.y) < ZE_ZERO_TRESHOLD));
 }
 
 bool ZEVector2::operator !=(const ZEVector2 &RightOperand) const
 {
-		return ((fabs(this->x - RightOperand.x) > ZE_ZEROTRESHOLD) || 
-			(fabs(this->y - RightOperand.y) > ZE_ZEROTRESHOLD));
+		return ((fabs(this->x - RightOperand.x) > ZE_ZERO_TRESHOLD) || 
+			(fabs(this->y - RightOperand.y) > ZE_ZERO_TRESHOLD));
 
 }
 
@@ -385,17 +385,17 @@ ZEVector3& ZEVector3::operator *= (float s)
 
 bool ZEVector3::operator == (const ZEVector3 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) < ZE_ZEROTRESHOLD) && 
-			(fabs(this->y - RightOperand.y) < ZE_ZEROTRESHOLD) &&
-			(fabs(this->z - RightOperand.z) < ZE_ZEROTRESHOLD));
+	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_TRESHOLD) && 
+			(fabs(this->y - RightOperand.y) < ZE_ZERO_TRESHOLD) &&
+			(fabs(this->z - RightOperand.z) < ZE_ZERO_TRESHOLD));
 
 }
 
 bool ZEVector3::operator != (const ZEVector3 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) > ZE_ZEROTRESHOLD) || 
-			(fabs(this->y - RightOperand.y) > ZE_ZEROTRESHOLD) ||
-			(fabs(this->z - RightOperand.z) > ZE_ZEROTRESHOLD));
+	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_TRESHOLD) || 
+			(fabs(this->y - RightOperand.y) > ZE_ZERO_TRESHOLD) ||
+			(fabs(this->z - RightOperand.z) > ZE_ZERO_TRESHOLD));
 }
 
 float ZEVector3::operator[](size_t Index) const
@@ -412,6 +412,7 @@ ZEVector3::ZEVector3(float x, float y, float z)
 {
 	Create(*this, x, y, z);
 }
+
 ZEVector3::ZEVector3(ZEVector2& Base, float z)
 {
 	x = Base.x;
@@ -601,18 +602,18 @@ ZEVector4 ZEVector4::operator-() const
 
 bool ZEVector4::operator == (const ZEVector4 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) < ZE_ZEROTRESHOLD) && 
-			(fabs(this->y - RightOperand.y) < ZE_ZEROTRESHOLD) &&
-			(fabs(this->z - RightOperand.z) < ZE_ZEROTRESHOLD) &&
-			(fabs(this->w - RightOperand.w) < ZE_ZEROTRESHOLD));
+	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_TRESHOLD) && 
+			(fabs(this->y - RightOperand.y) < ZE_ZERO_TRESHOLD) &&
+			(fabs(this->z - RightOperand.z) < ZE_ZERO_TRESHOLD) &&
+			(fabs(this->w - RightOperand.w) < ZE_ZERO_TRESHOLD));
 }
 
 bool ZEVector4::operator != (const ZEVector4 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) > ZE_ZEROTRESHOLD) || 
-			(fabs(this->y - RightOperand.y) > ZE_ZEROTRESHOLD) ||
-			(fabs(this->z - RightOperand.z) > ZE_ZEROTRESHOLD) ||
-			(fabs(this->w - RightOperand.w) > ZE_ZEROTRESHOLD));
+	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_TRESHOLD) || 
+			(fabs(this->y - RightOperand.y) > ZE_ZERO_TRESHOLD) ||
+			(fabs(this->z - RightOperand.z) > ZE_ZERO_TRESHOLD) ||
+			(fabs(this->w - RightOperand.w) > ZE_ZERO_TRESHOLD));
 }
 
 float ZEVector4::operator[](size_t Index) const

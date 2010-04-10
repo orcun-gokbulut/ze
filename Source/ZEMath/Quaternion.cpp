@@ -298,18 +298,18 @@ ZEVector3 ZEQuaternion::operator*(const ZEVector3& Vector) const
 
 bool ZEQuaternion::operator==(const ZEQuaternion& RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) < ZE_ZEROTRESHOLD) && 
-		(fabs(this->y - RightOperand.y) < ZE_ZEROTRESHOLD) &&
-		(fabs(this->z - RightOperand.z) < ZE_ZEROTRESHOLD) &&
-		(fabs(this->w - RightOperand.w) < ZE_ZEROTRESHOLD));
+	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_TRESHOLD) && 
+		(fabs(this->y - RightOperand.y) < ZE_ZERO_TRESHOLD) &&
+		(fabs(this->z - RightOperand.z) < ZE_ZERO_TRESHOLD) &&
+		(fabs(this->w - RightOperand.w) < ZE_ZERO_TRESHOLD));
 }
 
 bool ZEQuaternion::operator!=(const ZEQuaternion& RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) > ZE_ZEROTRESHOLD) || 
-			(fabs(this->y - RightOperand.y) > ZE_ZEROTRESHOLD) ||
-			(fabs(this->z - RightOperand.z) > ZE_ZEROTRESHOLD) ||
-			(fabs(this->w - RightOperand.w) > ZE_ZEROTRESHOLD));
+	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_TRESHOLD) || 
+			(fabs(this->y - RightOperand.y) > ZE_ZERO_TRESHOLD) ||
+			(fabs(this->z - RightOperand.z) > ZE_ZERO_TRESHOLD) ||
+			(fabs(this->w - RightOperand.w) > ZE_ZERO_TRESHOLD));
 }
 
 float ZEQuaternion::operator[](size_t Index) const

@@ -50,27 +50,89 @@ void ZERay::CreateParametric(ZERay & Ray,const ZEVector3 & v,const ZEVector3 & p
 	Ray.p = p;
 }
 
-float ZERay::DistanceToPoint(const ZERay& Ray, const ZEVector3& Point, float &t)
+float ZERay::MinimumDistance(const ZERay& Ray, const ZEVector3& Point)
 {
-	ZEVector3 temp;
-	ZEVector3::Sub(temp,Point,Ray.p);
+	float TRay;
 
-	t = ZEVector3::DotProduct(temp,Ray.v);
-	if (t <= 0)
-	{
-		t = 0;
-		return ZEVector3::Distance(Point,Ray.p);
-	}
-
-	ZEVector3::Scale(temp,Ray.v,t);
-	ZEVector3::Add(temp,Ray.p,temp);
-	return ZEVector3::Distance(temp, Point);
-
+	return ZERay::MinimumDistance(Ray, Point, TRay);
 }
 
-void ZERay::GetPointOn(ZEVector3& Point, float t) const
+float ZERay::MinimumDistance(const ZERay& Ray, const ZEVector3& Point, float& TRay)
 {
-	ZELine::GetPointOn(Point,t);
+	ZEVector3 Temp;
+	ZEVector3::Sub(Temp, Point, Ray.p);
+
+	TRay = ZEVector3::DotProduct(Temp, Ray.v);
+	if (TRay < 0)
+	{
+		TRay = 0;
+		return ZEVector3::Distance(Point, Ray.p);
+	}
+
+	ZEVector3::Scale(Temp, Ray.v, TRay);
+	ZEVector3::Add(Temp, Ray.p, Temp);
+	return ZEVector3::Distance(Temp, Point);
+}
+
+float ZERay::MinimumDistance(const ZERay& Ray, const ZELine& Line)
+{
+	return ZELine::MinimumDistance(Line, Ray);
+}
+
+float ZERay::MinimumDistance(const ZERay& Ray, const ZELine& Line, float& TRay, float& TLine)
+{
+	return ZELine::MinimumDistance(Line, Ray, TLine, TRay);
+}
+
+float ZERay::MinimumDistance(const ZERay& Ray, const ZELineSegment& LineSegment)
+{
+	float TRay, TLineSegment;
+
+	return ZERay::MinimumDistance(Ray, LineSegment, TRay, TLineSegment);
+}
+
+float ZERay::MinimumDistance(const ZERay& Ray, const ZELineSegment& LineSegment, float& TRay, float& TRaySegment)
+{
+	// NOT IMPLAMENTED !!!!
+	return 0;
+}
+
+float ZERay::MinimumDistance(const ZERay& RayA, const ZERay& RayB)
+{
+	float TRayA, TRayB;
+	return ZERay::MinimumDistance(RayA, RayB, TRayA, TRayB);
+}
+
+float ZERay::MinimumDistance(const ZERay& RayA, const ZERay& RayB, float& TRayA, float& TRayB)
+{
+	// NOT IMPLAMENTED !!!!
+	return 0;
+}
+
+void ZERay::GetPointOn(ZEVector3& Point, float TRay) const
+{
+	if (TRay < 0.0f)
+		Point = p;
+	else
+	{
+		ZEVector3::Scale(Point, v, TRay);
+		ZEVector3::Add(Point, Point, p);
+	}
+}
+
+ZEVector3 ZERay::GetPointOn(float TRay) const
+{
+	ZEVector3 Temp;
+
+	if (TRay < 0.0f)
+		Temp = p;
+	else
+	{
+		ZEVector3::Scale(Temp, v, TRay);
+		ZEVector3::Add(Temp, Temp, p);
+	}
+
+	return Temp;
 }
 
 ZERay::ZERay(const ZEVector3 & v,const ZEVector3 &p)

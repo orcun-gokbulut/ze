@@ -66,13 +66,13 @@ bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, 
 bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZELine& Line)
 {
 	float temp;
-	return ZELine::DistanceToPoint(Line, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
+	return ZELine::MinimumDistance(Line, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
 }
 
 bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZERay& Ray)
 {
 	float temp;
-	return ZERay::DistanceToPoint(Ray, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
+	return ZERay::MinimumDistance(Ray, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
 }
 
 bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZERay& Ray, float& MinT, float& MaxT)
@@ -114,7 +114,7 @@ bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, 
 bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZELineSegment& LineSegment)
 {
 	float temp;
- 	return ZELineSegment::DistanceToPoint(LineSegment, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
+ 	return ZELineSegment::MinimumDistance(LineSegment, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
 }
 
 bool ZEBoundingSphere::CollisionTest(const ZEBoundingSphere& BoundingSphere, const ZEOBoundingBox& BoundingBox)

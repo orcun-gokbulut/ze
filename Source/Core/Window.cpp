@@ -288,15 +288,15 @@ void ZEWindow::ProcessMessages()
 {
 	if (WindowType != ZE_WT_COMPONENT)
 	{
-		MSG msg;
-		ZeroMemory(&msg, sizeof(msg));
-		if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+		MSG Msg;
+		ZeroMemory(&Msg, sizeof(Msg));
+		while(PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE))
 		{	
-			if (msg.message == WM_QUIT)
+			if (Msg.message == WM_QUIT)
 				WindowDestroyed();
 
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			TranslateMessage(&Msg);
+			DispatchMessage(&Msg);
 		}
 	}
 } 

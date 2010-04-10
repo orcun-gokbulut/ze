@@ -80,13 +80,16 @@ bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const Z
 	float factor;
 
 	factor = (ZEVector3::DotProduct(BoundingBox.U,Point) - ZEVector3::DotProduct(BoundingBox.Position,BoundingBox.U)) / ZEVector3::DotProduct(BoundingBox.U,BoundingBox.U);
-	if (factor < 0 || factor > 1) return 0;
+	if (factor < 0.0f || factor > 1.0f) 
+		return false;
 
 	factor = (ZEVector3::DotProduct(BoundingBox.V,Point) - ZEVector3::DotProduct(BoundingBox.Position,BoundingBox.V)) / ZEVector3::DotProduct(BoundingBox.V,BoundingBox.V);
-	if (factor < 0 || factor > 1) return 0;
+	if (factor < 0.0f || factor > 1.0f) 
+		return false;
 
 	factor = (ZEVector3::DotProduct(BoundingBox.N,Point) - ZEVector3::DotProduct(BoundingBox.Position,BoundingBox.N)) / ZEVector3::DotProduct(BoundingBox.N,BoundingBox.N);
-	if (factor < 0 || factor > 1) return 0;
+	if (factor < 0.0f || factor > 1.0f) 
+		return false;
 
 	return true;
 }

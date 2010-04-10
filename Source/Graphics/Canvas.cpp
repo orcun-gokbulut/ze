@@ -97,6 +97,38 @@ const ZEMatrix4x4& ZECanvas::GetTransformation()
 {
 	return Transformation;
 }
+void ZECanvas::SetTranslation(const ZEVector3& Translation)
+{
+	this->Translation = Translation;
+	ZEMatrix4x4::CreateOrientation(Transformation, Translation, Rotation, Scale);
+}
+
+const ZEVector3& ZECanvas::GetTranslation()
+{
+	return this->Translation;
+}
+
+void ZECanvas::SetRotation(const ZEQuaternion& Rotation)
+{
+	this->Rotation = Rotation;
+	ZEMatrix4x4::CreateOrientation(Transformation, Translation, Rotation, Scale);
+}
+
+const ZEQuaternion& ZECanvas::GetRotation()
+{
+	return Rotation;
+}
+
+void ZECanvas::SetScale(const ZEVector3& Scale)
+{
+	this->Scale = Scale;
+	ZEMatrix4x4::CreateOrientation(Transformation, Translation, Rotation, Scale);
+}
+
+const ZEVector3& ZECanvas::GetScale()
+{
+	return Scale;
+}
 
 void ZECanvas::SetColor(const ZEVector4& Color)
 {
@@ -620,7 +652,7 @@ void ZECanvas::Clean()
 	Vertices.Clear();
 }
 
-bool ZECanvas::LoadCanvasFile(const char* FileName)
+bool ZECanvas::LoadFromFile(const char* FileName)
 {
 	ZEResourceFile File;
 	if (!File.Open(FileName))
@@ -678,5 +710,8 @@ void* ZECanvas::GetVertexBuffer()
 		
 ZECanvas::ZECanvas()
 {
-	ZEMatrix4x4::CreateIdentity(Transformation);
+	Transformation = ZEMatrix4x4::Identity;
+	Translation = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3::One;
 }

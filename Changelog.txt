@@ -245,3 +245,12 @@
 
 [8 April 2010 - Revision 148]
 	ADD: ZEParticleEmitter::ZEParticleEmitter() now initializes UpVector member.
+	
+[9 April 2010 - Revision 149]
+	ADD: ZELine/ZELineSegment/ZERay MinimumDistance function has been extended.
+	CHG: ZELine/ZELineSegment/ZERay GetDistanceToPoint function has been renamed as MinimumDistance function overload.
+	DEF: Not all of the MinimumDistance function are implamented.
+	FIX: ZEWindow::ProcessMessage now process more than one Window Message at one call.
+	ADD: ZECanvas::SetTranslation, ZECanvas::SetRotation and ZECanvas::SetScale functions are added. These function control the transformation that will be applied to the new shapes.
+	FIX: ZESimpleMaterial ZE_ROF_ENABLE_WORLD_TRANSFORM and ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM has been fixed.
+	

@@ -378,7 +378,7 @@ ZEMatrix3x3& ZEMatrix3x3::operator *= (float S)
 bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const 
 {
 	for (size_t I = 0; I < 9; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZEROTRESHOLD)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_TRESHOLD)
 			return false;
 
 	return true;
@@ -387,7 +387,7 @@ bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const
 bool ZEMatrix3x3::operator != (const ZEMatrix3x3 &M) const 
 {
 	for (size_t I = 0; I < 9; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZEROTRESHOLD)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_TRESHOLD)
 			return true;
 
 	return true;
@@ -439,6 +439,7 @@ inline void ZEMatrix4x4::Create(ZEMatrix4x4& Matrix, float M[16])
 	memcpy(Matrix.M, M, sizeof(ZEMatrix4x4));
 }
 
+#include <d3dx9.h>
 void ZEMatrix4x4::CreateRotation(ZEMatrix4x4& Matrix, const ZEQuaternion& Rotation)
 {
 	Matrix.M11 = 1.0f	-	2.0f * Rotation.y * Rotation.y	-	2.0f * Rotation.z * Rotation.z;
@@ -459,7 +460,7 @@ void ZEMatrix4x4::CreateRotation(ZEMatrix4x4& Matrix, const ZEQuaternion& Rotati
 	Matrix.M14 = 0.0f;
 	Matrix.M24 = 0.0f;
 	Matrix.M34 = 0.0f;
-	Matrix.M44 = 1.0f;	
+	Matrix.M44 = 1.0f;
 }
 
 void ZEMatrix4x4::CreateRotationX(ZEMatrix4x4& Matrix, float Pitch)
@@ -987,7 +988,7 @@ void ZEMatrix4x4::operator *= (float S)
 bool ZEMatrix4x4::operator == (const ZEMatrix4x4 &M) const 
 {
 	for (size_t I = 0; I < 16; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZEROTRESHOLD)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_TRESHOLD)
 			return false;
 
 	return true;
@@ -996,7 +997,7 @@ bool ZEMatrix4x4::operator == (const ZEMatrix4x4 &M) const
 bool ZEMatrix4x4::operator != (const ZEMatrix4x4 &M) const 
 {
 	for (size_t I = 0; I < 16; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZEROTRESHOLD)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_TRESHOLD)
 			return true;
 
 	return false;

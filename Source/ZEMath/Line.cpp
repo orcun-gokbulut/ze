@@ -35,6 +35,8 @@
 
 #include "Definitions.h"
 #include "Line.h"
+#include "Ray.h"
+#include "LineSegment.h"
 #include "Vector.h"
 #include "Plane.h"
 #include <d3dx9.h>
@@ -52,37 +54,13 @@ void ZELine::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3&
 	Line.p = p;
 }
 
-float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB)
+float ZELine::MinimumDistance(const ZELine& Line, const ZEVector3& Point)
 {
-	float tA; 
-	float tB;
-	ZEVector3 w(LineA.p, LineB.p);
-	float    a = ZEVector3::DotProduct(LineA.v, LineA.v);
-    float    b = ZEVector3::DotProduct(LineA.v, LineB.v);
-    float    c = ZEVector3::DotProduct(LineB.v, LineB.v);
-    float    d = ZEVector3::DotProduct(LineA.v, w);
-    float    e = ZEVector3::DotProduct(LineB.v, w);
-    float    det = a*c - b*b;
-	if (det<ZE_ZEROTRESHOLD) //Parallel
-	{
-        tA = 0.0;
-        tB = (b>c ? d/b : e/c);
-
-    }
-    else //Non-Parallel
-	{
-		
-		tA = (b*e - c*d) / det;
-        tB = (a*e - b*d) / det; 
-	}
-	ZEVector3 P1, P2;
-	ZEVector3::Scale(P1, LineA.v, tA);
-	ZEVector3::Add(P1, P1, w);
-	ZEVector3::Scale(P2, LineB.v, tB);
-	ZEVector3::Sub(w, P1, P2);
-	return ZEVector3::Length(w);
+	float T;
+	return ZELine::MinimumDistance(Line, Point, T);
 }
-float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB,float &tA,float &tB)
+
+__forceinline void _MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& TLineA,float& TLineB)
 {
 	ZEVector3 w(LineA.p, LineB.p);
 	float    a = ZEVector3::DotProduct(LineA.v, LineA.v);
@@ -91,44 +69,84 @@ float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB,float &tA
     float    d = ZEVector3::DotProduct(LineA.v, w);
     float    e = ZEVector3::DotProduct(LineB.v, w);
     float    det = a*c - b*b;
-	if (det<ZE_ZEROTRESHOLD) //Parallel
+	
+	if (det<ZE_ZERO_TRESHOLD) //Parallel
 	{
-        tA = 0.0;
-        tB = (b>c ? d/b : e/c);
+        TLineA = 0.0;
+        TLineB = (b>c ? d/b : e/c);
 
     }
     else //Non-Parallel
 	{
 		
-		tA = (b*e - c*d) / det;
-        tB = (a*e - b*d) / det; 
+		TLineA = (b*e - c*d) / det;
+        TLineB = (a*e - b*d) / det; 
 	}
-	ZEVector3 P1, P2;
-	ZEVector3::Scale(P1, LineA.v, tA);
-	ZEVector3::Add(P1, P1, w);
-	ZEVector3::Scale(P2, LineB.v, tB);
-	ZEVector3::Sub(w, P1, P2);
-	return ZEVector3::Length(w);
 }
 
-
-
-float ZELine::DistanceToPoint(const ZELine& Line, const ZEVector3& Point, float &t)
+float ZELine::MinimumDistance(const ZELine& Line, const ZEVector3& Point, float& TLine)
 {
 	ZEVector3 Temp;
 	ZEVector3::Sub(Temp, Point, Line.p);
 
-	t = ZEVector3::DotProduct(Line.v, Temp) / ZEVector3::DotProduct(Line.v, Line.v);
+	TLine = ZEVector3::DotProduct(Line.v, Temp) / ZEVector3::DotProduct(Line.v, Line.v);
 	
-	ZEVector3::Scale(Temp, Line.v, t);
+	ZEVector3::Scale(Temp, Line.v, TLine);
 	ZEVector3::Add(Temp, Temp, Point);
 	return ZEVector3::Distance(Point, Temp);
 }
 
-void ZELine::GetPointOn(ZEVector3& Point, float t) const
+float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB)
 {
-	ZEVector3::Scale(Point, v, t);
+	float TLineA; 
+	float TLineB;
+	
+	return ZELine::MinimumDistance(LineA, LineB, TLineA, TLineB);
+}
+
+float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& TLineA,float& TLineB)
+{
+	_MinimumDistance(LineA, LineB, TLineA, TLineB);
+
+	return ZEVector3::Length(ZEVector3(LineA.GetPointOn(TLineA), LineB.GetPointOn(TLineB)));
+}
+
+float ZELine::MinimumDistance(const ZELine& Line, const ZELineSegment& LineSegment)
+{
+	float TLine, TLineSegment;
+	return ZELine::MinimumDistance(Line, LineSegment, TLine, TLineSegment);
+}
+
+float ZELine::MinimumDistance(const ZELine& Line, const ZELineSegment& LineSegment, float& TLine, float& TLineSegment)
+{
+	// Not Implamented
+	return 0;
+}
+
+float ZELine::MinimumDistance(const ZELine& Line, const ZERay& Ray)
+{
+	float TLine, TRay;
+	return ZELine::MinimumDistance(Line, Ray, TLine, TRay);
+}
+
+float ZELine::MinimumDistance(const ZELine& Line, const ZERay& Ray, float& TLine, float& TRay)
+{
+	// Not Implamented
+	return 0;
+}
+
+void ZELine::GetPointOn(ZEVector3& Point, float TLine) const
+{
+	ZEVector3::Scale(Point, v, TLine);
 	ZEVector3::Add(Point, Point, p);
+}
+
+ZEVector3 ZELine::GetPointOn(float TLine) const
+{
+	ZEVector3 Temp;
+	ZEVector3::Scale(Temp, v, TLine);
+	ZEVector3::Add(Temp, Temp, p);
+	return Temp;
 }
 
 ZELine::ZELine()

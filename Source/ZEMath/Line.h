@@ -43,6 +43,9 @@
 #define MapLineToXYZ(L, _v, _p) (L).v = (_v); (L).p = (_p)
 
 class ZEPlane;
+class ZELineSegment;
+class ZERay;
+
 class ZELine
 {
 	public:
@@ -53,10 +56,17 @@ class ZELine
 		static void			Create(ZELine& Line, const ZEVector3& P0, const ZEVector3& P1);
 		static void			CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p);
 		
+		static float		MinimumDistance(const ZELine& Line, const ZEVector3& Point);
+		static float		MinimumDistance(const ZELine& Line, const ZEVector3& Point, float &TLine);
 		static float		MinimumDistance(const ZELine& LineA, const ZELine& LineB);
-		static float		MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& tA, float& tB);
-		static float		DistanceToPoint(const ZELine& Line, const ZEVector3& Point, float &t);
-		void				GetPointOn(ZEVector3& Point, float t) const;
+		static float		MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& TLineA, float& TLineB);
+		static float		MinimumDistance(const ZELine& Line, const ZELineSegment& LineSegment);
+		static float		MinimumDistance(const ZELine& Line, const ZELineSegment& LineSegment, float& TLine, float& TLineSegment);
+		static float		MinimumDistance(const ZELine& Line, const ZERay& Ray);
+		static float		MinimumDistance(const ZELine& Line, const ZERay& Ray, float& TLine, float& TRay);
+
+		void				GetPointOn(ZEVector3& Point, float TLine) const;
+		ZEVector3			GetPointOn(float TLine) const;
 
 							//ZELine(const ZEVector3& v, const ZEVector3& p);
 							ZELine(const ZEVector3& P0, const ZEVector3& P1);
