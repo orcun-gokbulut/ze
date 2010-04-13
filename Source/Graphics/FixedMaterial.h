@@ -385,10 +385,12 @@ ZE_POST_PROCESSOR_START(Meta)
 	<meta> 
 		<class name="ZEFixedMaterial" noinstance="true">
 			<description>Material System</description>
-			<property name="TwoSided" type="boolean" autogetset="yes"/>
-			<property name="LightningEnabled" type="boolean" autogetset="yes"/>
-			<property name="Wireframe" type="boolean" autogetset="yes"/>
-			<property name="TransparancyMode" type="integer" autogetset="yes">
+			<property name="TwoSided" groupname="Shading" type="boolean" autogetset="yes"/>
+			<property name="LightningEnabled" groupname="Shading" type="boolean" autogetset="yes"/>
+			<property name="RecivesShadow" groupname="Shading" type="boolean" autogetset="yes"/>
+			<property name="Wireframe" groupname="Shading" type="boolean" autogetset="yes"/>
+			<property name="TransparancyCullLimit" groupname="Transparancy" type="integer" autogetset="yes"/>
+			<property name="TransparancyMode" groupname="Transparancy" type="integer" autogetset="yes">
 				<enumurator name="ZEMaterialTransparancyMode">
 					<item name="No Transparancy" value="ZE_MTM_NOTRANSPARACY"/>
 					<item name="Alpha Test" value="ZE_MTM_ALPHACULL"/>
@@ -396,10 +398,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Adaptive" value="ZE_MTM_ADDAPTIVE"/>
 					<item name="Subtractive" value="ZE_MTM_SUBTRACTIVE"/>
 				</enumurator>
-			</property>
-			<property name="TransparancyCullLimit" type="integer" autogetset="yes"/>
-			<property name="RecivesShadow" type="boolean" autogetset="yes"/>
-			  
+			</property>			  
 
 			<property name="AmbientEnabled" groupname="Ambient" type="boolean" autogetset="yes"/>
 			<property name="AmbientFactor" groupname="Ambient" type="float" autogetset="yes"/>

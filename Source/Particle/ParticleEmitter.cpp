@@ -532,7 +532,11 @@ ZEParticleEmitter::ZEParticleEmitter()
 	MinBounceFactor = 0.0f;			
 	MaxBounceFactor = 0.0f;			
 	MaxParticleCount = 0;			
-	IsContinuous = true;			
+	IsContinuous = true;		
+
+	Size.Box = ZEVector3(1.0f, 1.0f, 1.0f);
+	Size.SphereRadius = 1.0f;
+	Size.Torus = ZEVector2(0.9f, 1.0f);
 }
 
 ZEParticleEmitter::~ZEParticleEmitter()
