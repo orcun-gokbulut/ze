@@ -83,6 +83,7 @@ struct ZEPropertyDescription
 	bool										Visibility;
 	bool										Animatable;
 	const char*									Description;
+	const char*									GroupName;
 	ZEPropertySemantic							Semantic;
 	void*										SemanticProperties;
 	ZEPropertyEnumurator*						Enumurators;

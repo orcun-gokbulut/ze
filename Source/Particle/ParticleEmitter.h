@@ -251,9 +251,9 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="MaxSize" type="float" autogetset="true" description="Maximum edge lenght of particles."/>			
 			<property name="MinLife" type="float" autogetset="true" description="Minimum life of particles."/>
 			<property name="MaxLife" type="float" autogetset="true" description="Maximum life of particles."/>			
-			<property name="MinColor" type="ZEVector4" autogetset="true" description="Minimum color of particles."/>
-			<property name="MaxColor" type="ZEVector4" autogetset="true" description="Maximum color of particles."/>			
-			<property name="MinBounceFactor" type="float" autogetset="true" description="Minimum bounce factor of particles."/>
+			<property name="MinColor" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Minimum color of particles."/>
+			<property name="MaxColor" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Maximum color of particles."/>			
+			<property name="MinBounceFactor" type="float" autogetset="true" description="Minimum  bounce factor of particles."/>
 			<property name="MaxBounceFactor" type="float" autogetset="true" description="Maximum bounce factor of particles."/>
 		</class>
 	</meta>

@@ -89,7 +89,7 @@ bool ZEMetaDebugComponent::Initialize()
 		CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
 		CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
 		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-		CanvasBrush->Canvas.LoadCanvasFile("Test\\test.zeCanvas");
+		CanvasBrush->Canvas.LoadFromFile("Test\\test.zeCanvas");
 		CanvasBrush->UpdateCanvas();
 		ZEFixedMaterial* CanvasMaterial = ZEFixedMaterial::CreateInstance();
 		
