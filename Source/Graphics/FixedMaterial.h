@@ -402,11 +402,11 @@ ZE_POST_PROCESSOR_START(Meta)
 
 			<property name="AmbientEnabled" groupname="Ambient" type="boolean" autogetset="yes"/>
 			<property name="AmbientFactor" groupname="Ambient" type="float" autogetset="yes"/>
-			<property name="AmbientColor" groupname="Ambient" type="ZEVector3" autogetset="yes"/>
+			<property name="AmbientColor" groupname="Ambient" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
 			  
 
 			<property name="DiffuseEnabled" groupname="Diffuse" type="boolean" autogetset="yes"/>
-			<property name="DiffuseColor" groupname="Diffuse" type="ZEVector3" autogetset="yes"/>
+			<property name="DiffuseColor" groupname="Diffuse" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
 			<property name="DiffuseFactor" groupname="Diffuse" type="float" autogetset="yes"/>
 			<!--<property name="DiffuseMap" groupname="Diffuse" type="string" autogetset="yes"/>-->
 
@@ -414,7 +414,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="SpecularEnabled" groupname="Specular" type="boolean" autogetset="yes"/>
 			<property name="SpecularFactor" groupname="Specular" type="float" autogetset="yes"/>
 			<property name="SpecularShininess" groupname="Specular" type="float" autogetset="yes"/>
-			<property name="SpecularColor" groupname="Specular" type="ZEVector3" autogetset="yes"/>
+			<property name="SpecularColor" groupname="Specular" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
 			<!--<property name="SpecularMap" groupname="Specular "type="string" autogetset="yes"/>-->
 			<property name="SpecularMapAddressModeU" groupname="Specular" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
@@ -436,7 +436,7 @@ ZE_POST_PROCESSOR_START(Meta)
 
 			<property name="EmmisiveEnabled" groupname="Emmisive" type="boolean" autogetset="yes"/>
 			<property name="EmmisiveFactor" groupname="Emmisive" type="float" autogetset="yes"/>
-			<property name="EmmisiveColor" groupname="Emmisive" type="ZEVector3" autogetset="yes"/>
+			<property name="EmmisiveColor" groupname="Emmisive" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
 			<!--<property name="EmmisiveMap" groupname="Emmisive" type="string" autogetset="yes"/>-->
 			<property name="EmmisiveMapAddressModeU" groupname="Emmisive" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">

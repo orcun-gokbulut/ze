@@ -106,23 +106,23 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 		Particle.Position = Position;		// All particles come from a single point
 		break;
 	case ZE_PET_BOX:	// Particles come from inside of a box
-		Particle.Position.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-Size.Box.x / 2, Size.Box.x / 2);
-		Particle.Position.y = Position.y + RAND_BETWEEN_TWO_FLOAT(-Size.Box.y / 2, Size.Box.y / 2);
-		Particle.Position.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-Size.Box.z / 2, Size.Box.z / 2);
+		Particle.Position.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2, BoxSize.x / 2);
+		Particle.Position.y = Position.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2, BoxSize.y / 2);
+		Particle.Position.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2, BoxSize.z / 2);
 		break;
 	case ZE_PET_TORUS:		// Particles come from inside of a torus
 		{
 			float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 			float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
-			float TubeRadius = RAND_BETWEEN_TWO_FLOAT(0.0f, Size.Torus.y);
-			Particle.Position.x = Position.x + (Size.Torus.x + TubeRadius * cosf(Phi)) * cosf(Theta);
-			Particle.Position.y = Position.y + (Size.Torus.x + TubeRadius * cosf(Phi)) * sinf(Theta);
+			float TubeRadius = RAND_BETWEEN_TWO_FLOAT(0.0f, TorusSize.y);
+			Particle.Position.x = Position.x + (TorusSize.x + TubeRadius * cosf(Phi)) * cosf(Theta);
+			Particle.Position.y = Position.y + (TorusSize.x + TubeRadius * cosf(Phi)) * sinf(Theta);
 			Particle.Position.z = Position.z + TubeRadius * sinf(Phi);		
 			break;
 		}
 	case ZE_PET_SPHERE:		//Particles come from inside of a sphere.
 		{
-			float Radius = RAND_BETWEEN_TWO_FLOAT(0.0f, Size.SphereRadius);
+			float Radius = RAND_BETWEEN_TWO_FLOAT(0.0f, SphereRadius);
 			float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 			float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, ZE_PI);
 			Particle.Position.x = Position.x + Radius * cosf(Theta) * sinf(Phi);
@@ -215,52 +215,34 @@ const ZEVector3& ZEParticleEmitter::GetPosition() const
 	return Position;
 }
 
-void ZEParticleEmitter::SetSphereEmitterSize(float SphereRadius)
+void ZEParticleEmitter::SetSphereRadius(float SphereRadius)
 {
-	Size.SphereRadius = SphereRadius;
-
-	Size.Box.x = 0.0f;
-	Size.Box.y = 0.0f;
-	Size.Box.z = 0.0f;
-	Size.Torus.x = 0.0f;
-	Size.Torus.y = 0.0f;
+	this->SphereRadius = SphereRadius;
 }
 
-float ZEParticleEmitter::GetSphereEmitterSize() const
+float ZEParticleEmitter::GetSphereRadius() const
 {
-	return Size.SphereRadius;
+	return SphereRadius;
 }
 
-void ZEParticleEmitter::SetTorusEmitterSize(const ZEVector2& TorusRadii)
+void ZEParticleEmitter::SetTorusSize(const ZEVector2& TorusRadius)
 {
-	Size.Torus.x = TorusRadii.x;
-	Size.Torus.y = TorusRadii.y;
-
-	Size.SphereRadius = 0.0f;
-	Size.Box.x = 0.0f;
-	Size.Box.y = 0.0f;
-	Size.Box.z = 0.0f;
+	this->TorusSize = TorusRadius;
 }
 
-const ZEVector2& ZEParticleEmitter::GetTorusEmitterSize() const
+const ZEVector2& ZEParticleEmitter::GetTorusSize() const
 {
-	return Size.Torus;
+	return TorusSize;
 }
 
-void ZEParticleEmitter::SetBoxEmitterSize(const ZEVector3& BoxSize)
+void ZEParticleEmitter::SetBoxSize(const ZEVector3& BoxSize)
 {
-	Size.Box.x = BoxSize.x;
-	Size.Box.y = BoxSize.y;
-	Size.Box.z = BoxSize.z;
-
-	Size.Torus.x = 0.0f;
-	Size.Torus.y = 0.0f;
-	Size.SphereRadius = 0.0f;
+	this->BoxSize = BoxSize;
 }
 
-const ZEVector3& ZEParticleEmitter::GetBoxEmitterSize() const
+const ZEVector3& ZEParticleEmitter::GetBoxSize() const
 {
-	return Size.Box;
+	return BoxSize;
 }
 
 void ZEParticleEmitter::SetType(ZEParticleEmitterType EmitterType)
@@ -534,9 +516,9 @@ ZEParticleEmitter::ZEParticleEmitter()
 	MaxParticleCount = 0;			
 	IsContinuous = true;		
 
-	Size.Box = ZEVector3(1.0f, 1.0f, 1.0f);
-	Size.SphereRadius = 1.0f;
-	Size.Torus = ZEVector2(0.9f, 1.0f);
+	BoxSize = ZEVector3(1.0f, 1.0f, 1.0f);
+	SphereRadius = 1.0f;
+	TorusSize = ZEVector2(1.0f, 1.0f);
 }
 
 ZEParticleEmitter::~ZEParticleEmitter()

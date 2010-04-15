@@ -81,12 +81,10 @@ class ZEParticleEmitter : public ZEClass
 		ZEParticleEmitterType			Type;							// Type from 4 available types
 		ZEVector3						UpVector;						// This is up vector of emitter NOT up vector of particles - Relative to the system
 		ZEVector3						Velocity;						// This is velocity of emitter NOT velocity of particles
-		struct 			// Since there's 3 different types, a structure is needed for the size variable.
-		{
-			ZEVector3 Box;
-			float SphereRadius;
-			ZEVector2 Torus;		
-		} Size;
+
+		ZEVector3						BoxSize;
+		float							SphereRadius;
+		ZEVector2						TorusSize;
 
 		// Following variables are used to create the Particle Pool
 		ZEVector3						MinUpVector;				//Orientation of-
@@ -142,14 +140,14 @@ class ZEParticleEmitter : public ZEClass
 		void							SetParticlesPerSecond(unsigned int Value);
 		unsigned int					GetParticlesPerSecond() const;
 
-		void							SetBoxEmitterSize(const ZEVector3& BoxSize);
-		const ZEVector3&				GetBoxEmitterSize() const;
+		void							SetBoxSize(const ZEVector3& BoxSize);
+		const ZEVector3&				GetBoxSize() const;
 
-		void							SetSphereEmitterSize(float SphereRadius);
-		float							GetSphereEmitterSize() const;
+		void							SetSphereRadius(float SphereRadius);
+		float							GetSphereRadius() const;
 
-		void							SetTorusEmitterSize(const ZEVector2& TorusRadii);
-		const ZEVector2&				GetTorusEmitterSize() const;
+		void							SetTorusSize(const ZEVector2& TorusRadius);
+		const ZEVector2&				GetTorusSize() const;
 
 		void							SetType(ZEParticleEmitterType EmitterType);
 		ZEParticleEmitterType			GetType() const;
@@ -225,7 +223,6 @@ ZE_POST_PROCESSOR_START(Meta)
 		<class name="ZEParticleEmitter">
 			<description>Particle Emitter Class</description>
 			<property name="Name" type="string" autogetset="yes" description="Name of the particle emitter."/>
-			<property name="Position" type="ZEVector3" autogetset="yes" description="Position of the particle emitter."/>
 			<property name="Type" type="integer" autogetset="true" description="Type of the emitter.">
 				<enumurator name="ZEParticleEmitterType">
 					<item name="Point" value="ZE_PET_POINT"/>
@@ -234,27 +231,33 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Sphere" value="ZE_PET_SPHERE"/>
 				</enumurator>
 			</property>
+			<property name="Position" type="ZEVector3" autogetset="yes" description="Position of the particle emitter."/>
 			<property name="Acceleration" type="ZEVector3" autogetset="true" description="Acceleration of particles emitted from this emitter."/>
 			<property name="Velocity" type="ZEVector3" autogetset="true" description="Velocity of particles emitted from this emitter."/>
-			<property name="MaxParticleCount" type="integer" autogetset="true" description="Maximum number of particles will be emitted from this emitter."/>
-			<property name="ParticlesPerSecond" type="integer" autogetset="true" description="Paritcles per secon emitted from this source."/>
-			<property name="Continuity" type="boolean" autogetset="true" description="Continuity of particles emitted from this emitter."/>
-			<property name="MinAcceleration" type="ZEVector3" autogetset="true" description="Minimum acceleration of particles emitted from this emitter."/>
-			<property name="MaxAcceleration" type="ZEVector3" autogetset="true" description="Maximum acceleration of particles emitted from this emitter."/>
-			<property name="MaxVelocity" type="ZEVector3" autogetset="true" description="Maximum velocity of particles emitted from this emitter."/>
-			<property name="MinVelocity" type="ZEVector3" autogetset="true" description="Minimum velocity of particles emitted from this emitter."/>	
-			<property name="MinAngularAcceleration" type="ZEVector3" autogetset="true" description="Minimum angular acceleration of particals."/>
-			<property name="MaxAngularAcceleration" type="ZEVector3" autogetset="true" description="Maximum angular acceleration of particals."/>
-			<property name="MinAngularVelocity" type="ZEVector3" autogetset="true" description="Minimum angular velocity of particals."/>
-			<property name="MaxAngularVelocity" type="ZEVector3" autogetset="true" description="Maximum angular velocity of particals."/>		
-			<property name="MinSize" type="float" autogetset="true" description="Minimum edge lenght of particles."/>
-			<property name="MaxSize" type="float" autogetset="true" description="Maximum edge lenght of particles."/>			
-			<property name="MinLife" type="float" autogetset="true" description="Minimum life of particles."/>
-			<property name="MaxLife" type="float" autogetset="true" description="Maximum life of particles."/>			
-			<property name="MinColor" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Minimum color of particles."/>
-			<property name="MaxColor" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Maximum color of particles."/>			
-			<property name="MinBounceFactor" type="float" autogetset="true" description="Minimum  bounce factor of particles."/>
-			<property name="MaxBounceFactor" type="float" autogetset="true" description="Maximum bounce factor of particles."/>
+
+			<property name="BoxSize" groupname="Emitter Sizes" type="ZEVector3" autogetset="true" description="Size of box emitter."/>
+			<property name="TorusSize" groupname="Emitter Sizes" type="ZEVector2" autogetset="true" description="Size of torus emitter."/>
+			<property name="SphereRadius" groupname="Emitter Sizes" type="float" autogetset="true" description="Size of sphere emitter."/>
+
+			<property name="MaxParticleCount" groupname="Particle Generation" type="integer" autogetset="true" description="Maximum number of particles will be emitted from this emitter."/>
+			<property name="ParticlesPerSecond" groupname="Particle Generation" type="integer" autogetset="true" description="Paritcles per secon emitted from this source."/>
+			<property name="Continuity" groupname="Particle Generation" type="boolean" autogetset="true" description="Continuity of particles emitted from this emitter."/>
+			<property name="MinAcceleration" groupname="Acceleration" type="ZEVector3" autogetset="true" description="Minimum acceleration of particles emitted from this emitter."/>
+			<property name="MaxAcceleration" groupname="Acceleration" type="ZEVector3" autogetset="true" description="Maximum acceleration of particles emitted from this emitter."/>
+			<property name="MaxVelocity" groupname="Velocity" type="ZEVector3" autogetset="true" description="Maximum velocity of particles emitted from this emitter."/>
+			<property name="MinVelocity" groupname="Velocity" type="ZEVector3" autogetset="true" description="Minimum velocity of particles emitted from this emitter."/>	
+			<property name="MinAngularAcceleration" groupname="Acceleration" type="ZEVector3" autogetset="true" description="Minimum angular acceleration of particals."/>
+			<property name="MaxAngularAcceleration" groupname="Acceleration" type="ZEVector3" autogetset="true" description="Maximum angular acceleration of particals."/>
+			<property name="MinAngularVelocity" groupname="Velocity" type="ZEVector3" autogetset="true" description="Minimum angular velocity of particals."/>
+			<property name="MaxAngularVelocity" groupname="Velocity" type="ZEVector3" autogetset="true" description="Maximum angular velocity of particals."/>		
+			<property name="MinSize" groupname="Particle Generation" type="float" autogetset="true" description="Minimum edge lenght of particles."/>
+			<property name="MaxSize" groupname="Particle Generation" type="float" autogetset="true" description="Maximum edge lenght of particles."/>			
+			<property name="MinLife" groupname="Particle Generation" type="float" autogetset="true" description="Minimum life of particles."/>
+			<property name="MaxLife" groupname="Particle Generation" type="float" autogetset="true" description="Maximum life of particles."/>			
+			<property name="MinColor" groupname="Particle Generation" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Minimum color of particles."/>
+			<property name="MaxColor" groupname="Particle Generation" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Maximum color of particles."/>			
+			<property name="MinBounceFactor" groupname="Physics" type="float" autogetset="true" description="Minimum  bounce factor of particles."/>
+			<property name="MaxBounceFactor" groupname="Physics" type="float" autogetset="true" description="Maximum bounce factor of particles."/>
 		</class>
 	</meta>
 </zinek>

@@ -256,3 +256,7 @@
 	
 [13 April 2010 - Revision 151]
 	ADD: Group name added to Property.h
+
+[15 April 2010 - Revision 153]
+	CHG: ZE_PS_COLOR added to some properties at FixedMaterial.h
+	FIX: ZEPArticleSystem::ZEPArticleSystem() now sets its material to zero. 
