@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1254"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Zinek Engine"
 	ProjectGUID="{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}"
 	RootNamespace="ComponentDevelopment"
@@ -609,11 +609,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
@@ -837,139 +837,6 @@
 					>
 				</File>
 			</Filter>
-		</Filter>
-		<Filter
-			Name="Core"
-			>
-			<File
-				RelativePath=".\Source\Core\Command.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Command.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Component.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Component.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Console.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Console.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ConsoleWindow.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ConsoleWindow.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Core.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Core.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\DebugComponent.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\DebugComponent.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Error.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Error.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Module.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Module.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ModuleManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ModuleManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Option.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Option.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Resource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ResourceFile.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ResourceFile.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ResourceManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ResourceManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Window.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Window.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\WindowResource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\WindowResource.rc"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Game Interface"
@@ -2103,6 +1970,139 @@
 			</File>
 			<File
 				RelativePath=".\Source\DebugComponents\SoundDebugComponent.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="Core"
+			>
+			<File
+				RelativePath=".\Source\Core\Command.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Command.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Component.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Component.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Console.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Console.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\ConsoleWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\ConsoleWindow.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Core.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Core.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\DebugComponent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\DebugComponent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Error.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Error.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Module.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Module.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\ModuleManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\ModuleManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Option.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Option.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Resource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Resource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\ResourceFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\ResourceFile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\ResourceManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\ResourceManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Window.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\Window.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\WindowResource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Core\WindowResource.rc"
 				>
 			</File>
 		</Filter>

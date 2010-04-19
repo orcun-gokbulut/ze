@@ -55,14 +55,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	_set_SSE2_enable(1);
 	ApplicationInstance = hInstance;
 	
-	ZEPhysicsDebugComponent PhysicsDebugComponent;
-	zeCore->SetDebugComponent(&PhysicsDebugComponent);
+	/*ZEPhysicsDebugComponent PhysicsDebugComponent;
+	zeCore->SetDebugComponent(&PhysicsDebugComponent);/
 
 	/*ZESoundDebugComponent SoundDebugComponent;
-	zeCore->SetDebugComponent(&SoundDebugComponent);
+	zeCore->SetDebugComponent(&SoundDebugComponent);*/
 
 	ZEMetaDebugComponent MetaDebugComponent;
-	zeCore->SetDebugComponent(&MetaDebugComponent);*/
+	zeCore->SetDebugComponent(&MetaDebugComponent);
 
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();

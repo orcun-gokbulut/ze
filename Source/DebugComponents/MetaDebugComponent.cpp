@@ -83,7 +83,7 @@ bool ZEMetaDebugComponent::Initialize()
 	}
 
 	// Create a canvas
-	if (Canvas != NULL)
+	if (Canvas == NULL)
 	{
 		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
 		CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
@@ -93,6 +93,7 @@ bool ZEMetaDebugComponent::Initialize()
 		CanvasBrush->UpdateCanvas();
 		ZEFixedMaterial* CanvasMaterial = ZEFixedMaterial::CreateInstance();
 		
+		CanvasBrush->SetProperty("Position", ZEVector3(0.0f, 0.0f, 0.0f));
 		CanvasBrush->Material = CanvasMaterial;
 		CanvasMaterial->SetZero();
 		CanvasMaterial->SetLightningEnabled(true);
