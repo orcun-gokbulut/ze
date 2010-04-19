@@ -69,6 +69,9 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 
 	this->LightType = LightType;
 
+	if (LightType == ZE_LT_NONE)
+		return;
+
 	ZECanvas Canvas;
 	ZEMatrix4x4 Rotation, Offset;
 	switch(LightType)
