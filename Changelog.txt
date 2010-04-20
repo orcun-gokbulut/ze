@@ -264,3 +264,7 @@
 [19 April 2010 - Revision 154 - Orcun]
   FIX: ZEClass::GetPropertyId (and also GetProperty and SetProperty) gives errorneus output because of the generated binary search code of ZEPostProcessor utility.
   CHG: ZEPostProcessor utility updated.
+
+[20 April 2010 - Revision 155 - Orcun]
+  FIX: ZELightBrush crashes when LightType property set to ZE_LT_NONE has been fixed.
+  FIX: ZELightBrush visualization draw has been fixed. (ZESimpleVertexDeclaration changed to ZECanvasVertexDeclaration)

@@ -296,7 +296,7 @@ bool ZELightBrush::Initialize()
 	RenderOrder.Material = Material;
 	RenderOrder.WorldMatrix = GetWorldTransform();
 	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
+	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 	RenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_ZCULLING;
 
 	return true;
