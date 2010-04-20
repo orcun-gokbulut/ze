@@ -178,6 +178,11 @@ void ZED3D9FrameBufferRenderer::SetCamera(ZECamera* Camera)
 	this->Camera = Camera;
 }
 
+ZECamera* ZED3D9FrameBufferRenderer::GetCamera()
+{
+	return Camera;
+}
+
 ZEArray<ZEPostProcessor*>& ZED3D9FrameBufferRenderer::GetPostProcessors()
 {
 	return PostProcessors;

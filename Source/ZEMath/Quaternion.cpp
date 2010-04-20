@@ -159,11 +159,16 @@ void ZEQuaternion::ConvertToEulerAngles(float &Yaw, float &Pitch, float &Roll, c
 	Roll = atan2(2 * Quaternion.x * Quaternion.w - 2 * Quaternion.y * Quaternion.z , 1 - 2 * sqx - 2 * sqz);
 }
 
-void ZEQuaternion::Conjugate()
+ZEQuaternion ZEQuaternion::Conjugate() const
 {
-	x = -x;
-	y = -y;
-	z = -z;
+	ZEQuaternion Temp;
+	
+	Temp.x = -x;
+	Temp.y = -y;
+	Temp.z = -z;
+	Temp.w = w;
+
+	return Temp;
 }
 
 void ZEQuaternion::Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternion)
@@ -255,14 +260,18 @@ void ZEQuaternion::ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaterni
 
 }
 
-void ZEQuaternion::Normalize()
+ZEQuaternion ZEQuaternion::Normalize() const
 {
-	float L = sqrt(x*x + y*y + z*z + w*w);
-	x = x / L;
-	y = y / L;
-	z = z / L;
-	w = w / L;
+	ZEQuaternion Temp;
 	
+	float L = sqrt(x*x + y*y + z*z + w*w);
+	
+	Temp.x = x / L;
+	Temp.y = y / L;
+	Temp.z = z / L;
+	Temp.w = w / L;
+	
+	return Temp;
 }
 
 void ZEQuaternion::Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion)

@@ -91,7 +91,9 @@ class ZED3D9FrameBufferRenderer : public ZEFrameBufferRenderer, public ZED3D9Com
 
 		virtual void						DeviceLost();
 		virtual bool						DeviceRestored();
+
 		virtual void						SetCamera(ZECamera* Camera);
+		virtual ZECamera*					GetCamera();
 
 		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors();
 		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor);

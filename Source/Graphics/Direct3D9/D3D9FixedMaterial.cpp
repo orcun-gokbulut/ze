@@ -165,35 +165,47 @@ ZEMaterialType ZED3D9FixedMaterial::GetMaterialType() const
 
 bool ZED3D9FixedMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const 
 {
+	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9FixedMaterial*)this)->UpdateMaterial();
 	 
 	((ZED3D9FixedMaterial*)this)->RenderOrder = RenderOrder;
 	((ZED3D9FixedMaterial*)this)->Camera = Camera;
 
-	if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
-		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
-	
-	GetDevice()->SetVertexShaderConstantF(12, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants));
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants));
-	
-	if (RenderOrder->Flags & (ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM))
-	{
-		ZEMatrix4x4 WorldViewProjMatrix;
-		ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, Camera->GetViewProjectionTransform());
-		GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
-	}
-	else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM)
-		GetDevice()->SetVertexShaderConstantF(0, (float*)&Camera->GetViewProjectionTransform(), 4);
-	else if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
-		GetDevice()->SetVertexShaderConstantF(0, (float*)&RenderOrder->WorldMatrix, 4);
+	// Setup Transformations
+	ZEMatrix4x4 ViewProjMatrix;
+	if (RenderOrder->Flags & (ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM))
+		ViewProjMatrix = Camera->GetViewProjectionTransform();
+	else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+		ViewProjMatrix = Camera->GetViewProjectionTransform();
+	else if (RenderOrder->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+		ViewProjMatrix = Camera->GetViewProjectionTransform();
 	else
-		GetDevice()->SetVertexShaderConstantF(0, (float*)&ZEMatrix4x4::Identity, 4);
+		ViewProjMatrix = ZEMatrix4x4::Identity;
 
-	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);
-	GetDevice()->SetVertexShaderConstantF(8, (float*)&RenderOrder->WorldMatrix, 4);
+	ZEMatrix4x4 WorldViewProjMatrix;
+	if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+		ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewProjMatrix);
+	else
+		WorldViewProjMatrix = ViewProjMatrix;
+		
+	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
+
+	if (RenderOrder->Flags == ZE_ROF_ENABLE_WORLD_TRANSFORM)
+	{
+		GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);
+		GetDevice()->SetVertexShaderConstantF(8, (float*)&RenderOrder->WorldMatrix, 4);
+	}
+	else
+	{
+		GetDevice()->SetVertexShaderConstantF(4, (float*)&ZEMatrix4x4::Identity, 4);
+		GetDevice()->SetVertexShaderConstantF(8, (float*)&ZEMatrix4x4::Identity, 4);
+	}
+
+	// Set Camera Position
 	GetDevice()->SetVertexShaderConstantF(16, (float*)&ZEVector4(Camera->GetWorldPosition(), 1.0f), 1);
 
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_ZCULLING)
+	// Setup ZCulling
+	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
@@ -206,16 +218,19 @@ bool ZED3D9FixedMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Ca
 	else
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 	
+	// Setup Backface Culling
 	if (TwoSided)
 		GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	else
 		GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 
+	// Setup Wireframe
 	if (Wireframe)
 		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
 	else
 		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	
+	// Setup Transparancy
 	if (TransparancyMode != ZE_MTM_NOTRANSPARACY)
 	{
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
@@ -252,6 +267,15 @@ bool ZED3D9FixedMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Ca
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	}
 
+	// Setup Bone Transforms
+	if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
+		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+	
+	// Setup Material Properties
+	GetDevice()->SetVertexShaderConstantF(12, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants));
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants));
+	
+	// Setup Textures
 	if (MaterialComponents & ZESHADER_DIFFUSEMAP && DiffuseMap != NULL)
 	{
 		SetTextureStage(0, DiffuseMapAddressModeU, DiffuseMapAddressModeV);

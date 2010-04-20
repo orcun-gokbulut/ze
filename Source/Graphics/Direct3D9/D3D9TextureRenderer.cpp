@@ -74,6 +74,11 @@ void ZED3D9TextureRenderer::SetCamera(ZECamera* Camera)
 	this->Camera = Camera;
 }
 
+ZECamera* ZED3D9TextureRenderer::GetCamera()
+{
+	return Camera;
+}
+
 void ZED3D9TextureRenderer::ClearList()
 {
 	//Clear render lists

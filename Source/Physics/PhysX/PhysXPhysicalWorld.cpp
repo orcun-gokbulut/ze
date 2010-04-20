@@ -139,21 +139,21 @@ void ZEPhysXPhysicalWorld::InitializeDebugDraw()
 	DebugDraw.PointsRenderOrder.SetZero();
 	DebugDraw.PointsRenderOrder.Material = DebugDraw.Material;
 	DebugDraw.PointsRenderOrder.PrimitiveType = ZE_ROPT_POINT;
-	DebugDraw.PointsRenderOrder.Flags = ZE_ROF_ENABLE_ZCULLING | ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM;
+	DebugDraw.PointsRenderOrder.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
 	DebugDraw.PointsRenderOrder.VertexBuffer = &DebugDraw.PointsVertexBuffer;
 	DebugDraw.PointsRenderOrder.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
 
 	DebugDraw.LinesRenderOrder.SetZero();
 	DebugDraw.LinesRenderOrder.Material = DebugDraw.Material;
 	DebugDraw.LinesRenderOrder.PrimitiveType = ZE_ROPT_LINE;
-	DebugDraw.LinesRenderOrder.Flags = ZE_ROF_ENABLE_ZCULLING | ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM;
+	DebugDraw.LinesRenderOrder.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
 	DebugDraw.LinesRenderOrder.VertexBuffer = &DebugDraw.LinesVertexBuffer;
 	DebugDraw.LinesRenderOrder.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
 
 	DebugDraw.TrianglesRenderOrder.SetZero();
 	DebugDraw.TrianglesRenderOrder.Material = DebugDraw.Material;
 	DebugDraw.TrianglesRenderOrder.PrimitiveType = ZE_ROPT_LINE;
-	DebugDraw.TrianglesRenderOrder.Flags = ZE_ROF_ENABLE_ZCULLING | ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM;
+	DebugDraw.TrianglesRenderOrder.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
 	DebugDraw.TrianglesRenderOrder.VertexBuffer = &DebugDraw.TrianglesVertexBuffer;
 	DebugDraw.TrianglesRenderOrder.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
 }

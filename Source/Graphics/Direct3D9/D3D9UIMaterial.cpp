@@ -61,7 +61,7 @@ ZEMaterialType ZED3D9UIMaterial::GetMaterialType() const
 
 bool ZED3D9UIMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const 
 {
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_ZCULLING)
+	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);

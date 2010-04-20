@@ -262,8 +262,8 @@
 	FIX: ZEPArticleSystem::ZEPArticleSystem() now sets its material to zero. 
 	
 [19 April 2010 - Revision 154 - Orcun]
-  FIX: ZEClass::GetPropertyId (and also GetProperty and SetProperty) gives errorneus output because of the generated binary search code of ZEPostProcessor utility.
-  CHG: ZEPostProcessor utility updated.
+	FIX: ZEClass::GetPropertyId (and also GetProperty and SetProperty) gives errorneus output because of the generated binary search code of ZEPostProcessor utility.
+	CHG: ZEPostProcessor utility updated.
 
 [20 April 2010 - Revision 155 - Orcun]
   FIX: ZELightBrush crashes when LightType property set to ZE_LT_NONE has been fixed.
@@ -272,3 +272,7 @@
 [20 April 2010 - Revision 157 - Can]
 	ADD: Property semantics added to XML of ZELightBrush.
 	ADD: Property semantics added to XML of ZEModelBrush.
+
+[21 April 2010 - Revision 158 - Orcun]
+	ADD: ZELine, ZERay, ZELineSegment MinimumDistance methods completed but not tested.
+	

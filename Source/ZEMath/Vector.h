@@ -83,7 +83,9 @@ class ZEVector2
 		static void					Lerp(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B, float Factor);	
 		
 		float						Length() const;
-
+		float						LengthSquare() const;
+		ZEVector2					Normalize() const;
+		
 		ZEVector2					operator +(const ZEVector2 &RightOperand) const;
 		ZEVector2					operator -(const ZEVector2 &RightOperand) const;
 		ZEVector2					operator *(const ZEVector2 &RightOperand) const;
@@ -147,6 +149,8 @@ class ZEVector3
 		static void					Lerp(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B, float Factor);
 
 		float						Length() const;
+		float						LengthSquare() const;
+		ZEVector3					Normalize() const;
 
 		ZEVector3					operator+(const ZEVector3 &RightOperand) const;
 		ZEVector3					operator-(const ZEVector3 &RightOperand) const;
@@ -215,6 +219,8 @@ class ZEVector4
 		static void					Lerp(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B, float Factor);
 
 		float						Length() const;
+		float						LengthSquare() const;
+		ZEVector4					Normalize() const;
 
 		ZEVector4					operator+(const ZEVector4 &RightOperand) const;
 		ZEVector4					operator-(const ZEVector4 &RightOperand) const;

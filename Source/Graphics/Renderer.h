@@ -89,6 +89,8 @@ class ZERenderer
 		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor) = 0;
 
 		virtual void						SetCamera(ZECamera* Camera) = 0;
+		virtual ZECamera*					GetCamera() = 0;
+
 		virtual void						AddToRenderList(ZERenderOrder* RenderOrder) = 0;
 		virtual void						ClearList() = 0;
 

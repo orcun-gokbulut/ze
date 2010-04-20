@@ -74,7 +74,7 @@ bool ZEPortalMap::Initialize()
 	PortalBBoxMaterial->UpdateMaterial();
 
 	PortalBBoxRenderOrder.SetZero();
-	PortalBBoxRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_ZCULLING;
+	PortalBBoxRenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_Z_CULLING;
 	PortalBBoxRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
 	PortalBBoxRenderOrder.PrimitiveType = ZE_ROPT_LINE;
 	PortalBBoxRenderOrder.Material = PortalBBoxMaterial;
@@ -94,7 +94,7 @@ bool ZEPortalMap::Initialize()
 	ZEOctree::OctreeBBoxMaterial->UpdateMaterial();
 
 	ZEOctree::OctreeBBoxRenderOrder.SetZero();
-	ZEOctree::OctreeBBoxRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_ZCULLING;
+	ZEOctree::OctreeBBoxRenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_Z_CULLING;
 	ZEOctree::OctreeBBoxRenderOrder.PrimitiveType = ZE_ROPT_LINE;
 	ZEOctree::OctreeBBoxRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
 	ZEOctree::OctreeBBoxRenderOrder.Material = PortalBBoxMaterial;

@@ -64,7 +64,7 @@ bool ZEOctree::Initialize()
 	OctreeBBoxMaterial->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
 
 	OctreeBBoxRenderOrder.SetZero();
-	OctreeBBoxRenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_ZCULLING;
+	OctreeBBoxRenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_Z_CULLING;
 	OctreeBBoxRenderOrder.PrimitiveType = ZE_ROPT_LINE;
 	OctreeBBoxRenderOrder.Material = OctreeBBoxMaterial;
 	OctreeBBoxRenderOrder.VertexBuffer = &OctreeBBoxCanvas;

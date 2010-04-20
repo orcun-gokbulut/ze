@@ -140,6 +140,27 @@ const ZEVector4& ZECanvas::GetColor()
 	return Color;
 }
 
+void ZECanvas::ApplyTranslation(const ZEVector3& Translation)
+{
+	ZEMatrix4x4 TranslationMatrix;
+	ZEMatrix4x4::CreateTranslation(TranslationMatrix, Translation);
+	ZEMatrix4x4::Multiply(Transformation, ZEMatrix4x4(Transformation), TranslationMatrix);
+}
+
+void ZECanvas::ApplyRotation(const ZEQuaternion& Rotation)
+{
+	ZEMatrix4x4 RotationMatrix;
+	ZEMatrix4x4::CreateRotation(RotationMatrix, Rotation);
+	ZEMatrix4x4::Multiply(Transformation, ZEMatrix4x4(Transformation), RotationMatrix);
+}
+
+void ZECanvas::ApplyScale(const ZEVector3& Scale)
+{
+	ZEMatrix4x4 ScaleMatrix;
+	ZEMatrix4x4::CreateTranslation(ScaleMatrix, Scale);
+	ZEMatrix4x4::Multiply(Transformation, ZEMatrix4x4(Transformation), ScaleMatrix);
+}
+
 void ZECanvas::AddWireframePlane(float Width, float Length, unsigned int VSegment, unsigned int HSegment)
 {
 	float XPosDiff = Width / (HSegment + 1);

@@ -42,16 +42,18 @@
 #include "ZEMath/Matrix.h"
 #include "ZEMath/AABoundingBox.h"
 
-#define	ZE_ROF_NONE								0
-#define	ZE_ROF_TRANSPARENT						1
-#define	ZE_ROF_IMPOSTER							2
-#define	ZE_ROF_ENABLE_ZCULLING					4
-#define	ZE_ROF_ENABLE_NOZWRITE					8
-#define	ZE_ROF_ENABLE_WORLD_TRANSFORM			16
-#define	ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM	32
-#define ZE_ROF_INSTANCED						64
-#define ZE_ROF_SKINNED							128
-#define ZE_ROF_INDEXED							256
+#define	ZE_ROF_NONE									0
+#define	ZE_ROF_TRANSPARENT							1
+#define	ZE_ROF_IMPOSTER								2
+#define	ZE_ROF_ENABLE_Z_CULLING						4
+#define	ZE_ROF_ENABLE_NO_Z_WRITE					8
+#define	ZE_ROF_ENABLE_WORLD_TRANSFORM				16
+#define ZE_ROF_ENABLE_VIEW_TRANSFORM				32
+#define ZE_ROF_ENABLE_PROJECTION_TRANSFORM			64
+#define	ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM		(ZE_ROF_ENABLE_VIEW_TRANSFORM | ZE_ROF_ENABLE_PROJECTION_TRANSFORM) 
+#define ZE_ROF_INSTANCED							128
+#define ZE_ROF_SKINNED								256
+#define ZE_ROF_INDEXED								512
 
 
 enum ZERLPrimitiveType
@@ -104,6 +106,7 @@ class ZEVertexBuffer;
 class ZERenderOrder
 {
 	public:
+		int								Priority;
 		ZEDWORD							Flags;
 		ZERLPrimitiveType				PrimitiveType;
 		ZEVertexDeclaration*			VertexDeclaration;

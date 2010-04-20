@@ -119,11 +119,28 @@ void ZEVector2::Lerp(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B, flo
 	Out.y = A.y + (B.y - A.y) * Factor;
 }
 
+ZEVector2 ZEVector2::Normalize() const
+{
+	ZEVector2 Temp;
+
+	float L = Length();
+	Temp.x = x / L;
+	Temp.y = y / L;
+
+	return Temp;
+}
+
 inline float ZEVector2::Length() const
 {
 	return sqrt(x * x + y * y);
 }
 
+float ZEVector2::LengthSquare() const
+{
+	return (x * x + y * y);
+}
+
+		
 ZEVector2 ZEVector2::operator +(const ZEVector2 &RightOperand) const
 {
 	ZEVector2 Temp;
@@ -323,6 +340,24 @@ void ZEVector3::Lerp(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B, flo
 inline float ZEVector3::Length() const
 {
 	return sqrt(x * x + y * y + z * z);
+}
+
+float ZEVector3::LengthSquare() const
+{
+	return x * x + y * y + z * z;
+}
+
+ZEVector3 ZEVector3::Normalize() const
+{
+	ZEVector3 Temp;
+
+	float L = Length();
+
+	Temp.x = x / L;
+	Temp.y = y / L;
+	Temp.z = z / L;
+	
+	return Temp;
 }
 
 ZEVector3 ZEVector3::operator+(const ZEVector3 &RightOperand) const
@@ -538,6 +573,25 @@ void ZEVector4::Lerp(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B, flo
 inline float ZEVector4::Length() const
 {
 	return sqrt(x * x + y * y + z * z + w * w);
+}
+
+float ZEVector4::LengthSquare() const
+{
+	return x * x + y * y + z * z + w * w;
+}
+
+ZEVector4 ZEVector4::Normalize() const
+{
+	ZEVector4 Temp;
+	
+	float L = Length();
+	
+	Temp.x = x / L;
+	Temp.y = y / L;
+	Temp.z = z / L;
+	Temp.w = w / L;
+
+	return Temp;
 }
 
 ZEVector4 ZEVector4::operator+(const ZEVector4 &RightOperand) const

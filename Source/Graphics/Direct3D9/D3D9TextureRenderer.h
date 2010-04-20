@@ -81,6 +81,7 @@ class ZED3D9TextureRenderer : public ZETextureRenderer, public ZED3D9ComponentBa
 		virtual bool							DeviceRestored();
 
 		virtual void							SetCamera(ZECamera* Camera);
+		virtual ZECamera*						GetCamera();
 
 		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors();
 		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor);

@@ -90,6 +90,11 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		void							SetColor(const ZEVector4& Color);
 		const ZEVector4&				GetColor();
 
+		// Transformations
+		void							ApplyTranslation(const ZEVector3& Translation);
+		void							ApplyRotation(const ZEQuaternion& Rotation);
+		void							ApplyScale(const ZEVector3& Scale);
+
 		// 2D Primitives
 		void							AddPoint(const ZEVector3& Point);
 		void							AddLine(const ZEVector3& Point0, const ZEVector3& Point1);

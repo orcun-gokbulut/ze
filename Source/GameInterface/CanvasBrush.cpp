@@ -130,7 +130,7 @@ ZECanvasBrush::ZECanvasBrush()
 	Material = NULL;
 	PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_ZCULLING;
+	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 	RenderOrder.Material = Material;
 }
 

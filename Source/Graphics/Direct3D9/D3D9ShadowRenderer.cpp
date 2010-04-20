@@ -105,7 +105,7 @@ void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
 	//	if (RenderOrder->IndexBuffer IsStaticIndexBuffer())
 	//		GetDevice()->SetIndices(StaticIndexBuffers[RenderOrder->GetStaticIndexBufferId()]);	*/
 
-	//if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM)
+	//if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 	//{
 	//	ZEMatrix4x4 WorldViewProjMatrix;
 	//	ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewPoint.ViewProjMatrix);
@@ -119,7 +119,7 @@ void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
 	//GetDevice()->SetVertexShaderConstantF(8, (float*)&RenderOrder->WorldMatrix, 4);
 	//GetDevice()->SetVertexShaderConstantF(16, (float*)&ZEVector4(ViewPoint.ViewPosition, 1.0f), 1);
 
-	//if (RenderOrder->Flags & ZE_ROF_ENABLE_ZCULLING)
+	//if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	//{
 	//	GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	//	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
@@ -145,6 +145,11 @@ void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
 void ZED3D9ShadowRenderer::SetCamera(ZECamera* Camera)
 {
 	this->Camera = Camera;
+}
+
+ZECamera* ZED3D9ShadowRenderer::GetCamera()
+{
+	return Camera;
 }
 
 ZEArray<ZEPostProcessor*>& ZED3D9ShadowRenderer::GetPostProcessors()

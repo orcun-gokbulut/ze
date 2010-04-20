@@ -300,7 +300,7 @@ ZEParticleSystem::ZEParticleSystem()
 	VertexBuffer = NULL;
 	ParticleMaterial = NULL;
 	RenderOrder.SetZero();
-	RenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_ZCULLING;
+	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_Z_CULLING;
 	RenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
 	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	IsVertexBufferUpdated = false;

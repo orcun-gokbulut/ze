@@ -90,6 +90,7 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		virtual bool							DeviceRestored();
 
 		virtual void							SetCamera(ZECamera* Camera);
+		virtual ZECamera*						GetCamera();
 
 		virtual void							AddToRenderList(ZERenderOrder* RenderOrder);
 		virtual void							ClearList();

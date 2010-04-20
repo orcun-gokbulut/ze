@@ -87,7 +87,7 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	Skinned = LODResource->Vertices.GetCount() == 0 ? true : false;
 
 	RenderOrder.SetZero();
-	RenderOrder.Flags = ZE_ROF_ENABLE_VIEWPROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_ZCULLING | (Skinned ? ZE_ROF_SKINNED : 0);
+	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | (Skinned ? ZE_ROF_SKINNED : 0);
 	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderOrder.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
 	RenderOrder.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;

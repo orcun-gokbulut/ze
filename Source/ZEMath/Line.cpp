@@ -60,30 +60,6 @@ float ZELine::MinimumDistance(const ZELine& Line, const ZEVector3& Point)
 	return ZELine::MinimumDistance(Line, Point, T);
 }
 
-__forceinline void _MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& TLineA,float& TLineB)
-{
-	ZEVector3 w(LineA.p, LineB.p);
-	float    a = ZEVector3::DotProduct(LineA.v, LineA.v);
-    float    b = ZEVector3::DotProduct(LineA.v, LineB.v);
-    float    c = ZEVector3::DotProduct(LineB.v, LineB.v);
-    float    d = ZEVector3::DotProduct(LineA.v, w);
-    float    e = ZEVector3::DotProduct(LineB.v, w);
-    float    det = a*c - b*b;
-	
-	if (det<ZE_ZERO_TRESHOLD) //Parallel
-	{
-        TLineA = 0.0;
-        TLineB = (b>c ? d/b : e/c);
-
-    }
-    else //Non-Parallel
-	{
-		
-		TLineA = (b*e - c*d) / det;
-        TLineB = (a*e - b*d) / det; 
-	}
-}
-
 float ZELine::MinimumDistance(const ZELine& Line, const ZEVector3& Point, float& TLine)
 {
 	ZEVector3 Temp;
@@ -106,33 +82,48 @@ float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB)
 
 float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& TLineA,float& TLineB)
 {
-	_MinimumDistance(LineA, LineB, TLineA, TLineB);
+	ZEVector3 w(LineA.p, LineB.p);
+	float    a = ZEVector3::DotProduct(LineA.v, LineA.v);
+    float    b = ZEVector3::DotProduct(LineA.v, LineB.v);
+    float    c = ZEVector3::DotProduct(LineB.v, LineB.v);
+    float    d = ZEVector3::DotProduct(LineA.v, w);
+    float    e = ZEVector3::DotProduct(LineB.v, w);
+    float    det = a*c - b*b;
+	
+	if (det<ZE_ZERO_TRESHOLD) //Parallel
+	{
+        TLineA = 0.0;
+        TLineB = (b>c ? d/b : e/c);
+
+    }
+    else //Non-Parallel
+	{
+		
+		TLineA = (b*e - c*d) / det;
+        TLineB = (a*e - b*d) / det; 
+	}
 
 	return ZEVector3::Length(ZEVector3(LineA.GetPointOn(TLineA), LineB.GetPointOn(TLineB)));
 }
 
 float ZELine::MinimumDistance(const ZELine& Line, const ZELineSegment& LineSegment)
 {
-	float TLine, TLineSegment;
-	return ZELine::MinimumDistance(Line, LineSegment, TLine, TLineSegment);
+	return ZELineSegment::MinimumDistance(LineSegment, Line);
 }
 
 float ZELine::MinimumDistance(const ZELine& Line, const ZELineSegment& LineSegment, float& TLine, float& TLineSegment)
 {
-	// Not Implamented
-	return 0;
+	return ZELineSegment::MinimumDistance(LineSegment, Line, TLineSegment, TLine);
 }
 
 float ZELine::MinimumDistance(const ZELine& Line, const ZERay& Ray)
 {
-	float TLine, TRay;
-	return ZELine::MinimumDistance(Line, Ray, TLine, TRay);
+	return ZERay::MinimumDistance(Ray, Line);
 }
 
 float ZELine::MinimumDistance(const ZELine& Line, const ZERay& Ray, float& TLine, float& TRay)
 {
-	// Not Implamented
-	return 0;
+	return ZERay::MinimumDistance(Ray, Line, TRay, TLine);
 }
 
 void ZELine::GetPointOn(ZEVector3& Point, float TLine) const

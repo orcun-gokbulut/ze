@@ -158,7 +158,7 @@ ZESkyBrush::ZESkyBrush()
 	SkyRenderOrder.VertexBuffer = &SkyBox;
 	SkyRenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	SkyRenderOrder.PrimitiveCount = SkyBox.Vertices.GetCount() / 3;
-	SkyRenderOrder.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_ZCULLING;
+	SkyRenderOrder.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 	SkyRenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
 }
 
