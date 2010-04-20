@@ -129,11 +129,11 @@ ZE_POST_PROCESSOR_START(Meta)
 				</enumurator>
 			</property>
 			<property name="Intensity" type="float" autogetset="true" description="Intesity of the light"/>
-			<property name="Color" type="ZEVector3" autogetset="true" description= "Color of the light"/>
+			<property name="Color" type="ZEVector3" autogetset="true" semantic="ZE_PS_COLOR" description= "Color of the light"/>
 			<property name="Range" type="float" autogetset="true" description="Range of the light"/>
 			<property name="Attenuation" type="ZEVector3" autogetset="true" description="Attenuation of the light"/>
 			<property name="CastsShadow" type="boolean" autogetset="true" description="Does light casts shadows ?"/>
-			<property name="ProjectionTexture" type="string" autogetset="true" description="Projection texture"/>
+			<property name="ProjectionTexture" type="string" autogetset="true" semantic="ZE_PS_FILENAME" description="Projection texture"/>
 			<property name="ProjectionFOV" type="float" autogetset="true" description="Field of view of the projection"/>
 			<property name="ProjectionAspectRatio" type="float" autogetset="true" description="Aspect Ratio of the projection"/>
 		</class>

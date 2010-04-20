@@ -100,7 +100,7 @@ ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
 	 	<class name="ZEModelBrush" parent="ZEEntity" icon="" description="This entity used for displaying animated visual models in the game environments like statues, mechineries, furnitures and etc.">
-			<property name="ModelFile" type="string" autogetset="true" description="FileName of the model that will be used"/>
+			<property name="ModelFile" type="string" autogetset="true" semantic="ZE_PS_FILENAME" fileextension="ZEMODEL" description="FileName of the model that will be used"/>
 			<property name="EnablePhysics" type="boolean" autogetset="true" description="Will model brush will have physical interaction"/>
 			<property name="AnimationState" type="integer" autogetset="true" description="Animation state of the model brush.">
 				<enumurator name="ZEModelAnimationState">

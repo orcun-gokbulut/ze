@@ -268,3 +268,7 @@
 [20 April 2010 - Revision 155 - Orcun]
   FIX: ZELightBrush crashes when LightType property set to ZE_LT_NONE has been fixed.
   FIX: ZELightBrush visualization draw has been fixed. (ZESimpleVertexDeclaration changed to ZECanvasVertexDeclaration)
+
+[20 April 2010 - Revision 157 - Can]
+	ADD: Property semantics added to XML of ZELightBrush.
+	ADD: Property semantics added to XML of ZEModelBrush.
