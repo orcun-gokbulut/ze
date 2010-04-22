@@ -159,6 +159,13 @@ void ZEQuaternion::ConvertToEulerAngles(float &Yaw, float &Pitch, float &Roll, c
 	Roll = atan2(2 * Quaternion.x * Quaternion.w - 2 * Quaternion.y * Quaternion.z , 1 - 2 * sqx - 2 * sqz);
 }
 
+void ZEQuaternion::ConvertToLookAndUp(ZEVector3& Look, ZEVector3& Up, const ZEQuaternion& Quaternion)
+{
+	ZEQuaternion::VectorProduct(Look, Quaternion, ZEVector3::UnitZ);
+	ZEQuaternion::VectorProduct(Up, Quaternion, ZEVector3::UnitY);
+}
+
+
 ZEQuaternion ZEQuaternion::Conjugate() const
 {
 	ZEQuaternion Temp;
