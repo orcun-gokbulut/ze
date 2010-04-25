@@ -101,8 +101,8 @@ float ZERay::MinimumDistance(const ZERay& Ray, const ZELine& Line, float& TRay, 
     }
     else 
 	{
-        sN = (b*e - c*d);
-        tN = (a*e - b*d);
+        sN = -(b*e - c*d);
+        tN = -(a*e - b*d);
         if (sN < 0.0) 
 		{
             sN = 0.0;
@@ -114,12 +114,7 @@ float ZERay::MinimumDistance(const ZERay& Ray, const ZELine& Line, float& TRay, 
     TRay = (fabs(sN) < ZE_ZERO_TRESHOLD ? 0.0f : sN / sD);
     TLine = (fabs(tN) < ZE_ZERO_TRESHOLD ? 0.0f : tN / tD);
 
-	ZEVector3 P1, P2;
-	ZEVector3::Scale(P1, Ray.v, TRay);
-	ZEVector3::Add(P1, P1, w);
-	ZEVector3::Scale(P2, Line.v, TLine);
-	ZEVector3::Sub(w, P1, P2);
-	return ZEVector3::Length(w);
+	return ZEVector3::Length(ZEVector3(Ray.GetPointOn(TRay), Line.GetPointOn(TLine)));
 }
 
 float ZERay::MinimumDistance(const ZERay& Ray, const ZELineSegment& LineSegment)

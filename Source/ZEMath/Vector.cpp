@@ -402,7 +402,7 @@ ZEVector3& ZEVector3::operator += (const ZEVector3 &RightOperand)
 
 ZEVector3& ZEVector3::operator -= (const ZEVector3 &RightOperand)
 {
-	ZEVector3::Add(*this, *this, RightOperand);
+	ZEVector3::Sub(*this, *this, RightOperand);
 	return *this;
 }
 

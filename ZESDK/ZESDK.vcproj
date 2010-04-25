@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1254"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="ZESDK"
 	ProjectGUID="{AD476028-DE8B-47D6-B2ED-9AC827844F81}"
 	RootNamespace="ZESDK"

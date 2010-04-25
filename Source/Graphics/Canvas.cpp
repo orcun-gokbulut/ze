@@ -670,6 +670,11 @@ bool ZECanvas::IsEmpty()
 
 void ZECanvas::Clean()
 {
+	//Translation = ZEVector3::Zero;
+	//Scale = ZEVector3::One;
+	//TransformationStack.Clear();
+	//Transformation = ZEMatrix4x4::Identity;
+
 	Vertices.Clear();
 }
 

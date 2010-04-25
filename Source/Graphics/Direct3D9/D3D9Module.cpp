@@ -121,7 +121,7 @@ void ZED3D9Module::SetEnabled(bool Enabled)
 
 bool ZED3D9Module::Initialize()
 {
-	zeLog("D3D9 Module", "Initializing Direct3D 9.");
+	zeLog("Direct3D9", "Initializing Direct3D 9.");
 
 	// Read options
 	ScreenWidth = zeOptions->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger();
@@ -159,7 +159,7 @@ bool ZED3D9Module::Initialize()
 	D3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if (!D3D)
 	{
-		zeCriticalError("D3D9 Module", "Can not create Direct3D.");
+		zeCriticalError("Direct3D9", "Can not create Direct3D.");
 		Destroy();
 		return false;
 	}
@@ -167,7 +167,7 @@ bool ZED3D9Module::Initialize()
 	// Check device type;
 	if (FAILED(D3D->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DFMT_X8R8G8B8, Fullscreen)))
 	{
-		zeCriticalError("D3D9 Module", "Device does not support Device Type.");
+		zeCriticalError("Direct3D9", "Device does not support Device Type.");
 		Destroy();
 		return false;
 	}
@@ -195,14 +195,14 @@ bool ZED3D9Module::Initialize()
 	Result = D3D->CreateDevice(AdapterToUse, DeviceType, (HWND)zeWindow->GetHandle(), D3DCREATE_HARDWARE_VERTEXPROCESSING, &D3DPP, &Device);
 	if(FAILED(Result)) 
 	{
-		zeCriticalError("D3D9 Module", "Can not create Direct3D Device.");
+		zeCriticalError("Direct3D9", "Can not create Direct3D Device.");
 		Destroy();
 		return false;
 	}
 
 	D3D9Device = Device;
 
-	zeLog("D3D9 Module", "Device Created.");
+	zeLog("Direct3D9", "Device Created.");
 
 	// Check hardware capabilities
 	D3D->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &DeviceCaps);
@@ -210,16 +210,16 @@ bool ZED3D9Module::Initialize()
 	// Check vertex shader versions.
 	PipelineType = ZE_D3D9_PT_PROGRAMABLE;
 
-	zeLog("D3D9 Module", "Vertex Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.VertexShaderVersion));
+	zeLog("Direct3D9", "Vertex Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.VertexShaderVersion));
 	switch(D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion))
 	{
 		case 1:
-			zeWarning("D3D9 Module", "Vertex shader model 1.x is not supported.");
+			zeWarning("Direct3D9", "Vertex shader model 1.x is not supported.");
 			break;
 		case 2:
 			if (D3DXGetVertexShaderProfile(Device) == "vs_2_a")
 			{
-				zeLog("D3D9 Module", "Vertex shader profile 2.0a found.");
+				zeLog("Direct3D9", "Vertex shader profile 2.0a found.");
 				VertexShaderVersion = ZE_D3D9_VSV_2_0_A;
 			}
 			else
@@ -229,27 +229,27 @@ bool ZED3D9Module::Initialize()
 			VertexShaderVersion = ZE_D3D9_VSV_3_0_0;
 			break;
 		default:
-			zeWarning("D3D9 Module", "No pixel shader support present.");
+			zeWarning("Direct3D9", "No pixel shader support present.");
 			VertexShaderVersion = ZE_D3D9_VSV_NONE;
 			break;
 	};
 
 	// Check pixel shader version
-	zeLog("D3D9 Module", "Pixel Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.PixelShaderVersion));
+	zeLog("Direct3D9", "Pixel Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.PixelShaderVersion));
 	switch(D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion))
 	{
 		case 1:
-			zeWarning("D3D9 Module", "Pixel shader model 1.x is not supported.");
+			zeWarning("Direct3D9", "Pixel shader model 1.x is not supported.");
 			break;
 		case 2:
 			if (D3DXGetPixelShaderProfile(Device) == "ps_2_a")
 			{
-				zeLog("D3D9 Module", "Pixel shader profile 2.0a found.");
+				zeLog("Direct3D9", "Pixel shader profile 2.0a found.");
 				PixelShaderVersion = ZE_D3D9_PSV_2_0_A;
 			}
 			else if (D3DXGetPixelShaderProfile(Device) == "ps_2_b")
 			{
-				zeLog("D3D9 Module", "Pixel shader profile 2.0a found.");
+				zeLog("Direct3D9", "Pixel shader profile 2.0a found.");
 				PixelShaderVersion = ZE_D3D9_PSV_2_0_A;
 			}
 			else
@@ -259,7 +259,7 @@ bool ZED3D9Module::Initialize()
 			PixelShaderVersion = ZE_D3D9_PSV_3_0_0;
 			break;
 		default:
-			zeWarning("D3D9 Module", "No pixel shader support present.");
+			zeWarning("Direct3D9", "No pixel shader support present.");
 			PixelShaderVersion = ZE_D3D9_PSV_NONE;
 			break;
 	};
@@ -271,15 +271,15 @@ bool ZED3D9Module::Initialize()
 	// If falled back to fixed pipeline give warning to the user
 	if (PipelineType == ZE_D3D9_PT_FIXED_FUNCTION)
 	{
-		zeWarning("D3D9 Module", "Programable shaders are not supported. Falling back to fixed pipeline.");
-		zeWarning("D3D9 Module", "Fixed pipeline does not have necessery capabilities to render most of the visual so visual quality will be disimprove dramatically.");
+		zeWarning("Direct3D9", "Programable shaders are not supported. Falling back to fixed pipeline.");
+		zeWarning("Direct3D9", "Fixed pipeline does not have necessery capabilities to render most of the visual so visual quality will be disimprove dramatically.");
 	}
 
 	// Get screen's back buffer
 	Result = Device->GetBackBuffer(0, 0,D3DBACKBUFFER_TYPE_MONO, &FrameColorBuffer);
 	if(FAILED(Result)) 
 	{
-		zeCriticalError("D3D9 Module", "Can not create Direct3D Backbuffer.");
+		zeCriticalError("Direct3D9", "Can not create Direct3D Backbuffer.");
 		Destroy();
 		return false;
 	}
@@ -288,7 +288,7 @@ bool ZED3D9Module::Initialize()
 	Result = Device->GetDepthStencilSurface(&FrameZBuffer);
 	if(FAILED(Result)) 
 	{
-		zeCriticalError("D3D9 Module", "Can not create Direct3D Backbuffer.");
+		zeCriticalError("Direct3D9", "Can not create Direct3D Backbuffer.");
 		Destroy();
 		return false;
 	}
@@ -298,28 +298,28 @@ bool ZED3D9Module::Initialize()
 	// Initialize component base
 	if (!ZED3D9ComponentBase::BaseInitialize(this))
 	{
-		zeCriticalError("D3D9 Module", "Can not initialize D3D9 component base.");
+		zeCriticalError("Direct3D9", "Can not initialize D3D9 component base.");
 		return false;
 	}
 
 	// Initialize fixed material shader
 	if (ZED3D9FixedMaterialShader::BaseInitialize() == false)
 	{
-		zeCriticalError("D3D9 Module", "Can not initialize shader manager.");
+		zeCriticalError("Direct3D9", "Can not initialize shader manager.");
 		Destroy();
 		return false;
 	}
 
 	/*if (!ZED3D9PostProcessor::BaseInitialize())
 	{
-		zeCriticalError("D3D9 Module", "Can not initialize D3D9 component base.");
+		zeCriticalError("Direct3D9", "Can not initialize D3D9 component base.");
 		return false;
 	}*/
 
 	// Initialize shadow renderer
 	if (!ZED3D9ShadowRenderer::BaseInitialize())
 	{
-		zeCriticalError("D3D9 Module", "Can not initialize D3D9 shadow renderer base.");
+		zeCriticalError("Direct3D9", "Can not initialize D3D9 shadow renderer base.");
 		return false;
 	}
 
@@ -328,7 +328,7 @@ bool ZED3D9Module::Initialize()
 
 void ZED3D9Module::Deinitialize()
 {
-	zeOutput("Destroying Direct3D.\r\n");
+	zeLog("Direct3D9", "Destroying Direct3D.\r\n");
 	ZED3D9ShadowRenderer::BaseDeinitialize();
 	//ZED3D9PostProcessor::BaseDeinitialize();
 	ZED3D9FixedMaterialShader::BaseDeinitialize();
@@ -453,7 +453,7 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 			HRESULT hr =Device->Reset(&D3DPP);
 			if (hr == D3D_OK)
 			{
-				zeOutput("Direct3D Device Restored.\r\n");
+				zeLog("Direct3D9", "Direct3D Device Restored.");
 				break;
 			}
 			else if (hr == D3DERR_DEVICELOST)

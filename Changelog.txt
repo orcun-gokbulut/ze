@@ -275,4 +275,8 @@
 
 [21 April 2010 - Revision 158 - Orcun]
 	ADD: ZELine, ZERay, ZELineSegment MinimumDistance methods completed but not tested.
-	
+
+[25 April 2010 - Revision 159 - Orcu]
+  FIX: ZELineSegment ZERay MinimumDistance functions negative TRay and TLineSegment fixed.
+  CHG: ZECanvas::Clear now also clears transformation stack and sets current transformation to identity transformation.
+  
