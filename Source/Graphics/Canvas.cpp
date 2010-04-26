@@ -272,6 +272,19 @@ void ZECanvas::AddWireframeSphere(float Radius, unsigned int HSegments, unsigned
 	}
 }
 
+void ZECanvas::AddWireframeTriangle(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2)
+{
+	ZECanvasVertex* Verts = Vertices.MassAdd(6);
+	ZECANVAS_ADDWIREVERTEX(Verts[0], Transformation, P0);
+	ZECANVAS_ADDWIREVERTEX(Verts[1], Transformation, P1);
+	
+	ZECANVAS_ADDWIREVERTEX(Verts[2], Transformation, P1);
+	ZECANVAS_ADDWIREVERTEX(Verts[3], Transformation, P2);
+
+	ZECANVAS_ADDWIREVERTEX(Verts[4], Transformation, P2);
+	ZECANVAS_ADDWIREVERTEX(Verts[5], Transformation, P0);
+}
+
 void ZECanvas::AddWireframeQuad(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3)
 {
 	ZECanvasVertex* Verts = Vertices.MassAdd(8);
@@ -550,6 +563,19 @@ void ZECanvas::AddSphere(float Radius, unsigned int HSegments, unsigned int VSeg
 	}
 }
 
+void ZECanvas::AddTriangle(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2)
+{
+	ZECanvasVertex* Verts = Vertices.MassAdd(3);
+	ZEVector3 Normal;
+	ZEVector3::CrossProduct(Normal, P1 - P0, P2 - P0);
+	ZEVector3::Normalize(Normal, Normal);
+
+
+	ZECANVAS_ADDVERTEX(Verts[0], Transformation, P0, Normal, ZEVector2(0.0f ,0.0f));
+	ZECANVAS_ADDVERTEX(Verts[1], Transformation, P1, Normal, ZEVector2(1.0f ,0.0f));
+	ZECANVAS_ADDVERTEX(Verts[2], Transformation, P2, Normal, ZEVector2(1.0f, 1.0f));
+}
+
 void ZECanvas::AddQuad(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3)
 {
 	ZECanvasVertex* Verts = Vertices.MassAdd(6);
@@ -670,10 +696,10 @@ bool ZECanvas::IsEmpty()
 
 void ZECanvas::Clean()
 {
-	//Translation = ZEVector3::Zero;
-	//Scale = ZEVector3::One;
-	//TransformationStack.Clear();
-	//Transformation = ZEMatrix4x4::Identity;
+	Translation = ZEVector3::Zero;
+	Scale = ZEVector3::One;
+	TransformationStack.Clear();
+	Transformation = ZEMatrix4x4::Identity;
 
 	Vertices.Clear();
 }
