@@ -776,6 +776,14 @@ void ZEMatrix4x4::Transform3x3(ZEVector3 &Out, const ZEMatrix4x4& Matrix, const 
 	Out.z = Matrix.M13 * Vector.x + Matrix.M23 * Vector.y + Matrix.M33 * Vector.z;
 }
 
+void ZEMatrix4x4::Transform(ZEVector4& Out, const ZEMatrix4x4& Matrix, const ZEVector4& Vector)
+{
+	Out.x = Matrix.M11 * Vector.x + Matrix.M21 * Vector.y + Matrix.M31 * Vector.z + Matrix.M41;
+	Out.y = Matrix.M12 * Vector.x + Matrix.M22 * Vector.y + Matrix.M32 * Vector.z + Matrix.M42;
+	Out.z = Matrix.M13 * Vector.x + Matrix.M23 * Vector.y + Matrix.M33 * Vector.z + Matrix.M43;
+	Out.w = Matrix.M14 * Vector.x + Matrix.M24 * Vector.y + Matrix.M34 * Vector.z + Matrix.M44;
+}
+
 void ZEMatrix4x4::Determinant(float &det,const ZEMatrix4x4 &Matrix)
 {
 	float d1,d2,d3,d4;
@@ -799,7 +807,7 @@ void ZEMatrix4x4::Determinant(float &det,const ZEMatrix4x4 &Matrix)
 
 bool ZEMatrix4x4::Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix)
 {
-	D3DXMATRIX D3DMatrix(Matrix.M11, Matrix.M12, Matrix.M13, Matrix.M14,
+	/*D3DXMATRIX D3DMatrix(Matrix.M11, Matrix.M12, Matrix.M13, Matrix.M14,
 						Matrix.M21, Matrix.M22, Matrix.M23, Matrix.M24,
 						Matrix.M31, Matrix.M32, Matrix.M33, Matrix.M34,
 						Matrix.M41, Matrix.M42, Matrix.M43, Matrix.M44);
@@ -812,7 +820,7 @@ bool ZEMatrix4x4::Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix)
 			D3DOut._31, D3DOut._32, D3DOut._33, D3DOut._34,
 			D3DOut._41, D3DOut._42, D3DOut._43, D3DOut._44);
 
-	return true;
+	return true;*/
 	float a;
 	ZEMatrix4x4::Determinant(a, Matrix);
 	if(a == 0)
@@ -952,6 +960,20 @@ ZEMatrix4x4 ZEMatrix4x4::operator*(const ZEMatrix4x4 &RightOperand) const
 {
 	ZEMatrix4x4 Temp;
 	Multiply(Temp, *this, RightOperand);
+	return Temp;
+}
+
+ZEVector3 ZEMatrix4x4::operator*(const ZEVector3 &RightOperand) const
+{
+	ZEVector3 Temp;
+	ZEMatrix4x4::Transform(Temp, *this, RightOperand);
+	return Temp;
+}
+
+ZEVector4 ZEMatrix4x4::operator*(const ZEVector4 &RightOperand) const
+{
+	ZEVector4 Temp;
+	ZEMatrix4x4::Transform(Temp, *this, RightOperand);
 	return Temp;
 }
 

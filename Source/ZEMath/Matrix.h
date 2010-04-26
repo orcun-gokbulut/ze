@@ -172,16 +172,20 @@ class ZEMatrix4x4
 
 		static void						Transform(ZEVector3 &Out, const ZEMatrix4x4 &Matrix, const ZEVector3& Vector);
 		static void						Transform3x3(ZEVector3 &Out, const ZEMatrix4x4 &Matrix, const ZEVector3& Vector);
-		static void						Transform(ZEVector4 &Out, const ZEMatrix4x4, const ZEVector4& Vector);
+		static void						Transform(ZEVector4 &Out, const ZEMatrix4x4 &Matrix, const ZEVector4& Vector);
 
-		ZEMatrix4x4						operator+(const ZEMatrix4x4 &RightOperand) const;
-		ZEMatrix4x4						operator-(const ZEMatrix4x4 &RightOperand) const;
-		ZEMatrix4x4						operator*(const ZEMatrix4x4 &RightOperand) const;
+		ZEMatrix4x4						operator+(const ZEMatrix4x4& RightOperand) const;
+		ZEMatrix4x4						operator-(const ZEMatrix4x4& RightOperand) const;
+		ZEMatrix4x4						operator*(const ZEMatrix4x4& RightOperand) const;
+		ZEVector3						operator*(const ZEVector3& RightOperand) const;
+		ZEVector4						operator*(const ZEVector4& RightOperand) const;
 		ZEMatrix4x4						operator*(float S);
 
-		void							operator += (const ZEMatrix4x4 &RightOperand);
-		void							operator -= (const ZEMatrix4x4 &RightOperand);
-		void							operator *= (const ZEMatrix4x4 &RightOperand);
+		void							operator += (const ZEMatrix4x4& RightOperand);
+		void							operator -= (const ZEMatrix4x4& RightOperand);
+		void							operator *= (const ZEMatrix4x4& RightOperand);
+		void							operator *= (const ZEVector3& RightOperand);
+		void							operator *= (const ZEVector4& RightOperand);
 		void							operator *= (float S);
 
 		bool							operator == (const ZEMatrix4x4 &M) const;
