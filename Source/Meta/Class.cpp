@@ -38,6 +38,18 @@
 #include "Core/Error.h"
 #include "Animation.h"
 
+bool ZEClassDescription::CheckParent(ZEClassDescription* Parent, ZEClassDescription* Children)
+{
+	ZEClassDescription* Current = Children->GetParent();
+	while (Current != NULL)
+	{
+		if (Current == Parent)
+			return true;
+		Current = Current->GetParent();
+	}
+	return false;
+}
+
 #define ZE_CLSF_CLASS_CHUNKID ((ZEDWORD)'CLAS')
 
 struct ZEClassFileChunk

@@ -125,6 +125,8 @@ class ZEClassDescription
 		virtual size_t							GetMethodOffset() const = 0;
 		virtual ZEClassProvider*				GetProvider() const = 0;
 		virtual ZEClass*						CreateInstance() const = 0;
+
+		static bool								CheckParent(ZEClassDescription* Parent, ZEClassDescription* Children);
 };
 
 class ZEClass

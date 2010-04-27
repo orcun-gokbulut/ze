@@ -170,7 +170,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 		//Model->GetModel()->GetMeshes()[0].SetLocalScale(ZEVector3(0.1, 0.1, 0.1));
 		Model->SetAnimationName("Test");
 		Model->SetAnimationState(ZE_MAS_PLAYING);
-		Model->SetAnimationSpeed(33.0f);
+		Model->SetAnimationSpeed(66.0f);
 		Model->SetAnimationLooping(true);
 		//zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
 		World->SetVisualize(true);

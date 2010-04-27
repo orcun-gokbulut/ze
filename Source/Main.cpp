@@ -55,21 +55,22 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	_set_SSE2_enable(1);
 	ApplicationInstance = hInstance;
 	
-	/*ZEPhysicsDebugComponent PhysicsDebugComponent;
-	zeCore->SetDebugComponent(&PhysicsDebugComponent);/
+	ZEPhysicsDebugComponent PhysicsDebugComponent;
+	zeCore->SetDebugComponent(&PhysicsDebugComponent);
 
 	/*ZESoundDebugComponent SoundDebugComponent;
 	zeCore->SetDebugComponent(&SoundDebugComponent);*/
 
-	ZEMetaDebugComponent MetaDebugComponent;
+/*	ZEMetaDebugComponent MetaDebugComponent;
 	zeCore->SetDebugComponent(&MetaDebugComponent);
-
+*/
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();
 	zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_GRAPHICS));
 	zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_SOUND));
 	zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_INPUT));
 	zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_PHYSICS));
+	zeCore->SetDebugComponent(&PhysicsDebugComponent);
 	ZEConsoleWindow ConsoleWindow;
 	zeCore->GetConsole()->SetConsoleInterface(&ConsoleWindow);
 	zeCore->GetWindow()->SetWindowType(zeCore->GetOptions()->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean() ? ZE_WT_FULLSCREEN : ZE_WT_RESIZABLE);

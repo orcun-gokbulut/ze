@@ -284,3 +284,7 @@
 	ADD: AddTriangle and AddWireframeTriangle added to ZECanvas.
 	ADD: operator* overload added to ZEMatrix4x4 for ZEVector3 and ZEVector4 types.
 	ADD: ZEMatrix::Transform ZEVector4 overload has been implamented.
+
+[27 April 2010 - REvision 163 - Orcun]
+	FIX: ZEModel's bone animation interpolation has been fixed.
+	ADD: CheckParent method added to ZEClassDescription. CheckParent method is used for checking a class parent.
