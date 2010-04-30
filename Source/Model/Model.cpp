@@ -73,30 +73,25 @@ void ZEModel::CalculateBoundingBox()
 		}
 
 	}
-/*
+
 	for (size_t I = 0; I < Bones.GetCount(); I++)
 	{
-		const ZEAABoundingBox& CurrentBoundingBox = Bones[I].GetModelBoundingBox();
+		ZEVector3 BonePosition = Bones[I].GetModelPosition();
 
 		if (NotInitialized)
 		{
-			BoundingBox.Min = BoundingBox.Max = CurrentBoundingBox.GetVertex(0);
+			BoundingBox.Min = BoundingBox.Max = BonePosition;
 			NotInitialized = false;
 		}
 
-		for (int N = 0; N < 8; N++)
-		{
-			ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
-			if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
-			if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
-			if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
+		if (BonePosition.x < BoundingBox.Min.x) BoundingBox.Min.x = BonePosition.x;
+		if (BonePosition.y < BoundingBox.Min.y) BoundingBox.Min.y = BonePosition.y;
+		if (BonePosition.z < BoundingBox.Min.z) BoundingBox.Min.z = BonePosition.z;
 
-			if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
-			if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
-			if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
-		}
-
-	}*/
+		if (BonePosition.x > BoundingBox.Max.x) BoundingBox.Max.x = BonePosition.x;
+		if (BonePosition.y > BoundingBox.Max.y) BoundingBox.Max.y = BonePosition.y;
+		if (BonePosition.z > BoundingBox.Max.z) BoundingBox.Max.z = BonePosition.z;
+	}
 
 	if (NotInitialized )
 		BoundingBox.Max = BoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
@@ -492,10 +487,10 @@ void ZEModel::StopAnimation()
 
 const ZEAABoundingBox& ZEModel::GetLocalBoundingBox()
 {
-	if (UpdateBoundingBox_)
+	if (BoundingBoxDirtyFlag)
 	{
 		CalculateBoundingBox();
-		UpdateBoundingBox_ = false;
+		BoundingBoxDirtyFlag = false;
 	}
 	return BoundingBox;
 }
@@ -530,14 +525,14 @@ void ZEModel::OwnerWorldTransformChanged()
 
 void ZEModel::UpdateBoundingBox()
 {
-	UpdateBoundingBox_ = true;
+	BoundingBoxDirtyFlag = true;
 	UpdateBoundingVolumes();
 	GetOwner()->UpdateBoundingVolumes();
 }
 
 void ZEModel::UpdateBoneTransforms()
 {
-	UpdateBoneTransforms_ = true;
+	BoneTransformsDirtyFlag = true;
 }
 
 void ZEModel::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
@@ -657,7 +652,8 @@ ZEModel::ZEModel()
 	Visibility = true;
 	AutoLOD = true;
 	ActiveLOD = 0;
-	UpdateBoundingBox_ = true;
+	BoundingBoxDirtyFlag = true;
+	BoneTransformsDirtyFlag = true;
 	AnimationState = ZE_MAS_STOPPED;
 	Animation = NULL;	
 	AnimationFrame = 0;

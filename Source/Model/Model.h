@@ -80,8 +80,8 @@ class ZEModel : public ZEComponent
 
 		ZEAABoundingBox						BoundingBox;
 
-		bool								UpdateBoundingBox_;
-		bool								UpdateBoneTransforms_;
+		bool								BoundingBoxDirtyFlag;
+		bool								BoneTransformsDirtyFlag;
 
 		void								CalculateBoundingBox();		
 		void								LocalTransformChanged();

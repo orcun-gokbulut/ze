@@ -843,7 +843,7 @@ ZEString::ZEString(const ZEString& String)
 
 ZEString::~ZEString()
 {
-	if (CharBuffer == NULL)
+	if (CharBuffer != NULL)
 		delete[] CharBuffer;
 	
 	if (Buffer != NULL)

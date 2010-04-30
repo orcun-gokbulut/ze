@@ -388,7 +388,7 @@ ZEEntity::ZEEntity()
 
 	BoundingVolumeMechanism = ZE_BVM_USE_BOTH;
 
-	Position = ZEVector3(0.0f, 0.0f, 0.0f);
+	OldPosition = Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
 	Enabled = true;

@@ -125,6 +125,7 @@ ZEOption::ZEOption(const char *InitialName, ZETypedVariant InitialDefaultValue, 
 	DefaultValue = InitialDefaultValue;
 	Value=InitialDefaultValue;
 	Attribute = InitialAttribute;
+	Changed = false;
 }
 
 ZEOption::ZEOption()

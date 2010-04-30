@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1254"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Zinek Engine"
 	ProjectGUID="{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}"
 	RootNamespace="ComponentDevelopment"
@@ -29,7 +29,7 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
-				CommandLine="$(SolutionDir)PostProcess\zepp.exe $(InputPath)&#x0D;&#x0A;"
+				CommandLine=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -98,7 +98,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName).debug$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName).$(ConfigurationName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -129,6 +129,100 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/I ."
 				Optimization="3"
+				InlineFunctionExpansion="2"
+				EnableIntrinsicFunctions="true"
+				FavorSizeOrSpeed="1"
+				WholeProgramOptimization="true"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\PhysX\Cooking&quot;;&quot;$(ProjectDir)\include\PhysX\Foundation&quot;;&quot;$(ProjectDir)\include\PhysX\NxCharacter&quot;;&quot;$(ProjectDir)\include\PhysX\PhysXLoader&quot;;&quot;$(ProjectDir)\include\PhysX\Physics&quot;;&quot;$(ProjectDir)\include\OpenAL&quot;;&quot;$(ProjectDir)\include\DirectX&quot;"
+				PreprocessorDefinitions="ZE_ZINEK_ENGINE;WIN32;NDEBUG;FREEIMAGE_LIB"
+				MinimalRebuild="false"
+				ExceptionHandling="0"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="0"
+				StructMemberAlignment="3"
+				BufferSecurityCheck="false"
+				EnableEnhancedInstructionSet="2"
+				RuntimeTypeInfo="false"
+				UsePrecompiledHeader="0"
+				WarningLevel="3"
+				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/fixed:no"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg_static.lib libvorbis_static.lib libvorbisfile_static.lib freeimage.lib libmpg123.lib OpenAL32.lib PhysXLoader.lib NxCooking.lib"
+				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Win x86\&quot;;&quot;$(ProjectDir)\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)\lib\Win x86\Release&quot;;&quot;$(ProjectDir)\lib\Win x86\Release\MT&quot;"
+				IgnoreDefaultLibraryNames=""
+				GenerateDebugInformation="false"
+				SubSystem="2"
+				OptimizeReferences="2"
+				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
+				TargetMachine="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName).$(ConfigurationName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release With Symbols|Win32"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			CharacterSet="0"
+			WholeProgramOptimization="1"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+				CommandLine="&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\building.mp3&quot;"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				AdditionalOptions="/I ."
+				Optimization="0"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
@@ -192,7 +286,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName).$(ConfigurationName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -609,11 +703,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
@@ -1045,6 +1139,15 @@
 					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|Win32"
+						>
+						<Tool
+							Name="VCCLCompilerTool"
+							ObjectFile="$(IntDir)\$(InputName)1.obj"
+							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
+						/>
+					</FileConfiguration>
+					<FileConfiguration
+						Name="Release With Symbols|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
@@ -2103,6 +2206,34 @@
 			</File>
 			<File
 				RelativePath=".\Source\Core\WindowResource.rc"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="My Inspector Results"
+			>
+			<File
+				RelativePath=".\My Inspector Results\r002mi1\r002mi1.insp"
+				>
+			</File>
+			<File
+				RelativePath=".\My Inspector Results\r003mi4\r003mi4.insp"
+				>
+			</File>
+			<File
+				RelativePath=".\My Inspector Results\r004mi2\r004mi2.insp"
+				>
+			</File>
+			<File
+				RelativePath=".\My Inspector Results\r005mi1\r005mi1.insp"
+				>
+			</File>
+			<File
+				RelativePath=".\My Inspector Results\r006mi2\r006mi2.insp"
+				>
+			</File>
+			<File
+				RelativePath=".\My Inspector Results\r007mi3\r007mi3.insp"
 				>
 			</File>
 		</Filter>

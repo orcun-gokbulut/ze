@@ -527,6 +527,7 @@ ZEConsole* ZEConsole::GetInstance()
 
 ZEConsole::ZEConsole()
 {
+	InputEnabled = true;
 	Visible = false;
 	Instance = this;
 	ConsoleInterface = NULL;

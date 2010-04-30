@@ -190,7 +190,7 @@ bool ZED3D9FixedMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Ca
 		
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
 
-	if (RenderOrder->Flags == ZE_ROF_ENABLE_WORLD_TRANSFORM)
+	if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
 	{
 		GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);
 		GetDevice()->SetVertexShaderConstantF(8, (float*)&RenderOrder->WorldMatrix, 4);
@@ -367,7 +367,7 @@ bool ZED3D9FixedMaterial::SetupLightning() const
 {
 	if (LightningEnabled)
 	{
-		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);
+		//GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATER);
 		GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 		GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 		GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);

@@ -185,6 +185,8 @@ ZEError* ZEError::GetInstance()
 
 ZEError::ZEError()
 {
+	FileLogging = false;
+	LogFileName[0] = '/0';
 	ErrorOptions.SetName("Error");
 	ErrorOptions.AddOption(new ZEOption("FileLogging", false, ZEOPTIONATTRIBUTE_NORMAL));
 	ErrorOptions.AddOption(new ZEOption("LogFile", "error.log", ZEOPTIONATTRIBUTE_NORMAL));

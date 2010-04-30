@@ -85,9 +85,8 @@ void ZEWindow::WindowGainedFocus()
 void ZEWindow::WindowLostFocus()
 {
 	zeLog("Window", "Window lost focus.");
-	ZEInputModule* Input = zeInput;
-	if (Input != NULL)
-		Input->UnAcquire();
+	if (zeInput != NULL)
+		zeInput->UnAcquire();
 }
 
 void ZEWindow::WindowDestroyed()
