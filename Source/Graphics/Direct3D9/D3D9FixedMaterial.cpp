@@ -300,7 +300,7 @@ bool ZED3D9FixedMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Ca
 		GetDevice()->SetTexture(3, ((ZED3D9Texture2D*)SpecularMap)->Texture);
 	}
 
-	if (MaterialComponents & ZESHADER_OPACITY && Opacity != NULL)
+	if (MaterialComponents & ZESHADER_OPACITY && Opacity != NULL && OpacityMap != NULL)
 	{
 		SetTextureStage(4, OpacityMapAddressModeU, OpacityMapAddressModeV);
 		GetDevice()->SetTexture(4, ((ZED3D9Texture2D*)OpacityMap)->Texture);

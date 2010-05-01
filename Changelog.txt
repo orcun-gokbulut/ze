@@ -298,3 +298,6 @@
 	FIX: ZEModel bounding box calculation bug fixed.
 	FIX: ZED3D9FixedMaterial RenderOrder ZE_ROF_ENABLE_WORLD_TRANSFORM flag problem fixed.
 	FIX: PointLight and Directional Light skinned vertex shader vertex position miscalculation problem fixed.
+	
+[1 MAy 2010 - Revsiion 166 - Orcun]
+	FIX: ZED3D9FixedMaterial Opacity map crash fixed.
