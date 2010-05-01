@@ -118,7 +118,7 @@ const ZEAABoundingBox& ZEComponent::GetLocalBoundingBox() const
 
 const ZEAABoundingBox& ZEComponent::GetWorldBoundingBox() const
 {
-	if (!(DirtyFlags & ZE_CDF_WORLD_BOUNDING_BOX))
+	if (DirtyFlags & ZE_CDF_WORLD_BOUNDING_BOX)
 	{
 		ZEAABoundingBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
 		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_BOUNDING_BOX;

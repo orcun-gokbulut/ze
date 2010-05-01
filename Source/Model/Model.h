@@ -102,9 +102,9 @@ class ZEModel : public ZEComponent
 		void								DebugDraw(ZERenderer* Renderer);
 
 	public:
-		virtual	bool						IsDrawable();
+		virtual	ZEDWORD						GetDrawFlags() const;
 
-		virtual const ZEAABoundingBox&		GetLocalBoundingBox();
+		virtual const ZEAABoundingBox&		GetLocalBoundingBox() const;
 
 		void								SetModelResource(const ZEModelResource* ModelResource);	
 		const ZEModelResource*				GetModelResource();

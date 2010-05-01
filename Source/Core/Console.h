@@ -47,9 +47,6 @@
 
 class ZEConsoleInterface
 {
-	protected:
-		ZEArray<char*>*			OutputHistory;
-		ZEArray<char*>*			InputHistory;
 	public:
 		virtual bool			Initialize() = 0;
 		virtual void			Deinitialize() = 0;

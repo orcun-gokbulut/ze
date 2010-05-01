@@ -299,5 +299,10 @@
 	FIX: ZED3D9FixedMaterial RenderOrder ZE_ROF_ENABLE_WORLD_TRANSFORM flag problem fixed.
 	FIX: PointLight and Directional Light skinned vertex shader vertex position miscalculation problem fixed.
 	
-[1 MAy 2010 - Revsiion 166 - Orcun]
+[1 MAy 2010 - Revsiion 166, 167 - Orcun]
 	FIX: ZED3D9FixedMaterial Opacity map crash fixed.
+	FIX: ZEComponent GetWorldBoundingBox() function dirty flag problem fixed.
+	FIX: ZEConsole input/output history memory leak fixed.
+	REM: Input/Output history array removed from ZEConsoleInterface. (They were not used. Instead ZEConsole's histories used)
+	FIX: ZEModel and ZEModelBrush's draw flags corrected. Culling works now.
+	CHG: ZEPostProcessor utility updated.

@@ -155,9 +155,9 @@ void ZEModel::LocalTransformChanged()
 
 }
 
-bool ZEModel::IsDrawable()
+ZEDWORD ZEModel::GetDrawFlags() const
 {
-	return true;
+	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
 void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
@@ -485,12 +485,12 @@ void ZEModel::StopAnimation()
 	AnimationState = ZE_MAS_STOPPED;
 }
 
-const ZEAABoundingBox& ZEModel::GetLocalBoundingBox()
+const ZEAABoundingBox& ZEModel::GetLocalBoundingBox() const
 {
 	if (BoundingBoxDirtyFlag)
 	{
-		CalculateBoundingBox();
-		BoundingBoxDirtyFlag = false;
+		((ZEModel*)this)->CalculateBoundingBox();
+		((ZEModel*)this)->BoundingBoxDirtyFlag = false;
 	}
 	return BoundingBox;
 }
@@ -659,6 +659,7 @@ ZEModel::ZEModel()
 	AnimationFrame = 0;
 	AnimationLooping = false;
 	DebugDrawComponents.Material = NULL;
+	DrawSkeleton = false;
 }
 
 ZEModel::~ZEModel()

@@ -43,7 +43,7 @@
 
 ZEDWORD ZEModelBrush::GetDrawFlags() const
 {
-	return ZE_DF_DRAW;// | ZE_DF_CULL;
+	return ZE_DF_DRAW | ZE_DF_CULL | ZE_DF_LIGHT_RECIVER;
 }
 			
 ZEModel* ZEModelBrush::GetModel()
