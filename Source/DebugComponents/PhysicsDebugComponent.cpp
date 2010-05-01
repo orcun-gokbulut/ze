@@ -81,7 +81,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 	if (Player == NULL)
 	{
 		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
-		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
+		Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
@@ -170,7 +170,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 		//Model->GetModel()->GetMeshes()[0].SetLocalScale(ZEVector3(0.1, 0.1, 0.1));
 		Model->SetAnimationName("Test");
 		Model->SetAnimationState(ZE_MAS_PLAYING);
-		Model->SetAnimationSpeed(66.0f);
+		Model->SetAnimationSpeed(1.0f);
 		Model->SetAnimationLooping(true);
 		//zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
 		World->SetVisualize(true);
