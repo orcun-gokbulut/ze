@@ -687,6 +687,7 @@ ZED3D9Module* ZED3D9Module::GetD3D9Module()
 
 ZED3D9Module::ZED3D9Module()
 {
+	Enabled = true;
 	DeviceLostState = false;
 	D3D9Device = NULL;
 	D3D = NULL;

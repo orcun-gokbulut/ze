@@ -299,10 +299,15 @@
 	FIX: ZED3D9FixedMaterial RenderOrder ZE_ROF_ENABLE_WORLD_TRANSFORM flag problem fixed.
 	FIX: PointLight and Directional Light skinned vertex shader vertex position miscalculation problem fixed.
 	
-[1 MAy 2010 - Revsiion 166, 167 - Orcun]
+[1 May 2010 - Revision 166, 167 - Orcun]
 	FIX: ZED3D9FixedMaterial Opacity map crash fixed.
 	FIX: ZEComponent GetWorldBoundingBox() function dirty flag problem fixed.
 	FIX: ZEConsole input/output history memory leak fixed.
 	REM: Input/Output history array removed from ZEConsoleInterface. (They were not used. Instead ZEConsole's histories used)
 	FIX: ZEModel and ZEModelBrush's draw flags corrected. Culling works now.
 	CHG: ZEPostProcessor utility updated.
+
+[3 May 2010 - Revision 168 - Orcun]
+	FIX: No output in release mode and ZED3D9GraphicsModule Enabled flag fixed.
+	FIX: ZEUITextControl::SetFont(NULL) crash fixed. Extra runtime checks added to ZEUITextControl::SetFont function.
+	CHG: Project properties changed for maximum optimization in both ZESDK Project and Zinek Engine Project.

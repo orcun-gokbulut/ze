@@ -139,7 +139,7 @@
 				ExceptionHandling="0"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="0"
-				StructMemberAlignment="3"
+				StructMemberAlignment="0"
 				BufferSecurityCheck="false"
 				EnableEnhancedInstructionSet="2"
 				RuntimeTypeInfo="false"
@@ -703,11 +703,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File

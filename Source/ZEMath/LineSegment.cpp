@@ -75,7 +75,7 @@ void ZELineSegment::GetSegmentEndPoint(ZEVector3& EndPoint) const
 float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZEVector3& Point)
 {
 	float TLineSegment;
-	return ZELineSegment::MinimumDistance(LineSegment, Point);
+	return ZELineSegment::MinimumDistance(LineSegment, Point, TLineSegment);
 }	
 
 float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZEVector3& Point, float& TLineSegment)

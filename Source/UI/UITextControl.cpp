@@ -50,8 +50,13 @@ const ZEString& ZEUITextControl::GetText()
 
 void ZEUITextControl::SetFont(ZEFontResource* FontResource)
 {
+	if (this->FontResource != NULL)
+		this->FontResource->Release();
+		
 	this->FontResource = FontResource;
-	FontResource->AddReferance();
+	
+	if (FontResource != NULL)
+		FontResource->AddReferance();
 }
 
 ZEFontResource* ZEUITextControl::GetFont()
