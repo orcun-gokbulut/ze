@@ -278,6 +278,11 @@ void ZEComponent::Deinitialize()
 
 }
 
+void ZEComponent::Destroy()
+{
+	delete this;
+}
+
 void ZEComponent::OwnerWorldTransformChanged()
 {
 	DirtyFlags |= ZE_CDF_WORLD_TRANSFORM | ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_BOX;

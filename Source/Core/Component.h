@@ -125,6 +125,8 @@ class ZEComponent : public ZEClass
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
 	
+		virtual void					Destroy();
+
 		virtual void					OwnerWorldTransformChanged();
 
 										ZEComponent();

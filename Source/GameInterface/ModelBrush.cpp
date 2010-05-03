@@ -175,7 +175,7 @@ void ZEModelBrush::Deinitialize()
 	if (Model != NULL)
 	{
 		UnregisterComponent(Model);
-		delete Model;
+		Model->Destroy();
 		Model = NULL;
 	}
 

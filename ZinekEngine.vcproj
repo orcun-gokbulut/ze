@@ -196,7 +196,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release With Symbols|Win32"
+			Name="Release(Symb)|Win32"
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
@@ -703,11 +703,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
@@ -1147,7 +1147,7 @@
 						/>
 					</FileConfiguration>
 					<FileConfiguration
-						Name="Release With Symbols|Win32"
+						Name="Release(Symb)|Win32"
 						>
 						<Tool
 							Name="VCCLCompilerTool"
