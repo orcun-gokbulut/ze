@@ -37,6 +37,31 @@
 #include "Model.h"
 #include "ModelFileFormat.h"
 #include "Graphics/Renderer.h"
+#include "GameInterface/Scene.h"
+#include "Physics/PhysicalRigidBody.h"
+/*
+void ZEModelMesh::UpdatePhysicalBody()
+{
+	PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
+
+	PhysicalBody->SetEnabled(MeshResource->PhysicalBody.Enabled);
+	PhysicalBody.Mass;
+	PhysicalBody->SetLinearDamping(MeshResource->PhysicalBody.LinearDamping);
+	PhysicalBody->SetAngularDamping(MeshResource->PhysicalBody.AngularDamping);
+	PhysicalBody->SetPosition(GetWorldTransform() * MeshResource->PhysicalBody.Position);
+	PhysicalBody->SetRotation(Owner->GetWorldRotation() * Rotation * MeshResource->PhysicalBody.Orientation);
+	
+	PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenter);
+	
+	//PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenterPosition);
+	//PhysicalBody->SetMassCenterRotation(MeshResource->PhysicalBody.MassCenterRotation);
+
+	for (size_t I = 0; I < MeshResource->PhysicalBody.Shapes.GetCount(); I++)
+	{
+		ZE
+	}
+
+}*/
 
 void ZEModelMesh::SetActiveLOD(size_t LOD)
 {
@@ -195,6 +220,10 @@ ZEModelAnimationType ZEModelMesh::GetAnimationType()
 	return AnimationType;
 }
 
+ZEPhysicalRigidBody* ZEModelMesh::GetPhysicalBody()
+{
+	return PhysicalBody;
+}
 
 void ZEModelMesh::SetPhysicsEnabled(bool Enabled)
 {

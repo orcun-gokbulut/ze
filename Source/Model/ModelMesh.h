@@ -45,7 +45,7 @@
 
 class ZEModel;
 class ZEModelResourceMesh;
-class ZEPhysicsBody;
+class ZEPhysicalRigidBody;
 class ZEModelMesh
 {
 	private:
@@ -64,7 +64,7 @@ class ZEModelMesh
 		ZEMatrix4x4							WorldTransform;
 
 		bool								PhysicsEnabled;
-		ZEPhysicsBody*						PhysicalBody;
+		ZEPhysicalRigidBody*				PhysicalBody;
 
 		bool								AutoLOD;
 		size_t								ActiveLOD;
@@ -80,9 +80,10 @@ class ZEModelMesh
 
 		ZEArray<ZEModelMeshLOD>				LODs;
 
+		void								UpdatePhysicalBody();
+
 	public:
 		const char*							GetName();
-		ZEPhysicsBody*						GetPhysicalBody() { return PhysicalBody; }
 
 		const ZEAABoundingBox&				GetLocalBoundingBox();
 		const ZEAABoundingBox&				GetModelBoundingBox();
@@ -115,6 +116,8 @@ class ZEModelMesh
 
 		void								SetVisible(bool Visible);
 		bool								GetVisible();
+
+		ZEPhysicalRigidBody*				GetPhysicalBody();
 
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();

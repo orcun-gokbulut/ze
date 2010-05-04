@@ -43,6 +43,9 @@
 #include "ModelAnimation.h"
 
 class ZEModel;
+class ZEPhysicalRigidBody;
+class ZEPhysicalJoint;
+
 class ZEModelBone
 {
 	private:
@@ -75,7 +78,7 @@ class ZEModelBone
 		bool								UpdateModelTransform;
 		bool								UpdateWorldTransform;
 
-		void*								PhysicalBody;
+		ZEPhysicalRigidBody*				PhysicalBody;
 		bool								PhysicsEnabled;
 
 		ZEModelAnimationType				AnimationType;
