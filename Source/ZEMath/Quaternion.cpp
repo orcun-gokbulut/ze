@@ -293,14 +293,14 @@ void ZEQuaternion::Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternio
 ZEQuaternion ZEQuaternion::operator*(const ZEQuaternion& Other) const
 {
 	ZEQuaternion Temp;
-	Product(Temp, *this, Temp);
+	Product(Temp, *this, Other);
 	return Temp;
 }
 
 ZEQuaternion& ZEQuaternion::operator*=(const ZEQuaternion& Other)
 {
 	ZEQuaternion Temp;
-	Product(Temp, *this, Temp);
+	Product(Temp, *this, Other);
 	*this = Temp;
 	return *this;
 }
