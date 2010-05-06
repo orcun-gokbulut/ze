@@ -45,7 +45,6 @@
 
 enum  ZEPhysicalShapeType
 {
-	ZE_PST_PLANE,
 	ZE_PST_BOX,
 	ZE_PST_SPHERE,
 	ZE_PST_CYLINDER,
@@ -138,7 +137,7 @@ class  ZEPhysicalCapsuleShape : public  ZEPhysicalShape
 										ZEPhysicalCapsuleShape();
 };
 
-class ZEPhysicalCylinderShape
+class ZEPhysicalCylinderShape : public  ZEPhysicalShape
 {
 	private:
 		float							Radius;

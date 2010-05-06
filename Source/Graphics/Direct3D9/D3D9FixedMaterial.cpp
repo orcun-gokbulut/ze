@@ -173,12 +173,12 @@ bool ZED3D9FixedMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Ca
 
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if (RenderOrder->Flags & (ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM))
+	if ((RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
 	else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
-		ViewProjMatrix = Camera->GetViewProjectionTransform();
+		ViewProjMatrix = Camera->GetViewTransform();
 	else if (RenderOrder->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
-		ViewProjMatrix = Camera->GetViewProjectionTransform();
+		ViewProjMatrix = Camera->GetProjectionTransform();
 	else
 		ViewProjMatrix = ZEMatrix4x4::Identity;
 

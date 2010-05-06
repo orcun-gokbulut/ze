@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalStaticObject.cpp
+ Zinek Engine - PhysicalStaticRigidBody.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,15 +33,24 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysicalStaticObject.h"
-#include "PhysicsModule.h"
+#pragma once
+#ifndef __ZE_PHYSICAL_STATIC_RIGID_BODY_H__
+#define __ZE_PHYSICAL_STATIC_RIGID_BODY_H__
 
-ZEPhysicalObjectType ZEPhysicalStaticObject::GetPhysicalObjectType()
-{
-	return ZE_POT_STATIC_OBJECT;
-}
+#include "PhysicalObject.h"
+#include "PhysicalShapes.h"
+#include "ZEDS/Array.h"
 
-ZEPhysicalStaticObject* ZEPhysicalStaticObject::CreateInstance()
+class ZEPhysicalStaticRigidBody : public ZEPhysicalObject
 {
-	return zePhysics->CreatePhysicalStaticObject();
-}
+	public:
+		virtual ZEPhysicalObjectType	GetPhysicalObjectType();
+
+		virtual const				
+		ZEArray<ZEPhysicalShape*>&		GetPhysicalShapes() = 0;
+		virtual void					AddPhysicalShape(ZEPhysicalShape* Shape) = 0;
+		virtual void					RemovePhysicalShape(ZEPhysicalShape* Shape) = 0;
+
+		static ZEPhysicalStaticRigidBody*	CreateInstance();
+};
+#endif
