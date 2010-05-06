@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Map.h
+ Zinek Engine - PortalMapPortalDoor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,37 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MAP_H__
-#define __ZE_MAP_H__
+#ifndef __ZE_PORTAL_MAP_PORTAL_DOOR_H__
+#define __ZE_PORTAL_MAP_PORTAL_DOOR_H__
 
-#include "ZEDS/Array.h"
-#include "MapResource.h"
-#include "Octree.h"
-#include "Physics/PhysicalStaticMesh.h"
-#include "Graphics/Canvas.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/FixedMaterial.h"
+typedef ZEPortalMapDoor ZEMapPortalDoor;
 
-class ZERenderer;
-class ZEViewVolume;
-class ZELight;
-
-class ZEMap
+class ZEMapPortalDoor
 {
-	protected:
-										ZEMap();
-		virtual							~ZEMap();
+	private:
+		ZEPortalMapPortal*		PortalA
+		ZEPortalMapPortal*		PortalB;
+		bool					Open;
 
 	public:
-		virtual bool					Initialize() = 0;
-		virtual void					Deinitialize() = 0;
-		virtual void					Destroy();
+		ZEPortalMapPortal*		GetPortalA();
+		ZEPortalMapPortal*		GetPortalB();
 
-		virtual const char*				GetFileName() = 0;
+		void					SetOpen(bool Open);
+		bool					GetOpen();
 
-		virtual bool					Load(const char* FileName) = 0;
-		virtual void					Render(ZERenderer* Renderer, ZESmartArray<ZELight*>& Lights) = 0;
-		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT) = 0;
-
+								ZEPortalMapPortalDoor();
 };
+
 #endif

@@ -703,11 +703,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
@@ -1456,11 +1456,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalStaticObject.cpp"
+				RelativePath=".\Source\Physics\PhysicalStaticRigidBody.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalStaticObject.h"
+				RelativePath=".\Source\Physics\PhysicalStaticRigidBody.h"
 				>
 			</File>
 			<File
@@ -1547,11 +1547,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticObject.cpp"
+					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticRigidBody.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticObject.h"
+					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticRigidBody.h"
 					>
 				</File>
 				<File
