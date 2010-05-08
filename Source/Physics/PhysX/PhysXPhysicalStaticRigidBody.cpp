@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXPhysicalStaticObject.cpp
+ Zinek Engine - PhysXPhysicalStaticRigidBody.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Core/Error.h"
-#include "PhysXPhysicalStaticObject.h"
+#include "PhysXPhysicalStaticRigidBody.h"
 #include "PhysXPhysicalWorld.h"
 #include "Physics/PhysicalShapes.h"
 #include "PhysXConversion.h"
@@ -50,7 +50,7 @@
 #include <NxQuat.h>
 #include <NxVec3.h>
 
-ZEPhysXPhysicalStaticObject::ZEPhysXPhysicalStaticObject()
+ZEPhysXPhysicalStaticRigidBody::ZEPhysXPhysicalStaticRigidBody()
 {
 	Actor = NULL;
 	ActorDesc.body = NULL;
@@ -58,36 +58,36 @@ ZEPhysXPhysicalStaticObject::ZEPhysXPhysicalStaticObject()
 	ActorDesc.userData = this;
 }
 
-ZEPhysXPhysicalStaticObject::~ZEPhysXPhysicalStaticObject()
+ZEPhysXPhysicalStaticRigidBody::~ZEPhysXPhysicalStaticRigidBody()
 {
 	Deinitialize();
 }
 
-void ZEPhysXPhysicalStaticObject::SetPhysicalWorld(ZEPhysicalWorld* World)
+void ZEPhysXPhysicalStaticRigidBody::SetPhysicalWorld(ZEPhysicalWorld* World)
 {
 	PhysicalWorld = (ZEPhysXPhysicalWorld*)World;
 	if (Actor != NULL)
 		Initialize();
 }
 
-ZEPhysicalWorld* ZEPhysXPhysicalStaticObject::GetPhysicalWorld()
+ZEPhysicalWorld* ZEPhysXPhysicalStaticRigidBody::GetPhysicalWorld()
 {
 	return PhysicalWorld;
 }
 
-const ZEArray<ZEPhysicalShape*>& ZEPhysXPhysicalStaticObject::GetPhysicalShapes()
+const ZEArray<ZEPhysicalShape*>& ZEPhysXPhysicalStaticRigidBody::GetPhysicalShapes()
 {
 	return Shapes;
 }
 
-void ZEPhysXPhysicalStaticObject::AddPhysicalShape(ZEPhysicalShape* Shape)
+void ZEPhysXPhysicalStaticRigidBody::AddPhysicalShape(ZEPhysicalShape* Shape)
 {
 	Shapes.Add(Shape);
 	if (Actor != NULL)
 		ReCreate();
 }
 
-void ZEPhysXPhysicalStaticObject::RemovePhysicalShape(ZEPhysicalShape* Shape)
+void ZEPhysXPhysicalStaticRigidBody::RemovePhysicalShape(ZEPhysicalShape* Shape)
 {
 	size_t OldCount = Shapes.GetCount();
 	Shapes.DeleteValue(Shape);
@@ -97,7 +97,7 @@ void ZEPhysXPhysicalStaticObject::RemovePhysicalShape(ZEPhysicalShape* Shape)
 	
 }
 		
-void ZEPhysXPhysicalStaticObject::SetEnabled(bool Enabled)
+void ZEPhysXPhysicalStaticRigidBody::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
 
@@ -123,12 +123,12 @@ void ZEPhysXPhysicalStaticObject::SetEnabled(bool Enabled)
 	}
 }
 
-bool ZEPhysXPhysicalStaticObject::GetEnabled()
+bool ZEPhysXPhysicalStaticRigidBody::GetEnabled()
 {
 	return Enabled;
 }
 
-void ZEPhysXPhysicalStaticObject::SetPosition(const ZEVector3& NewPosition)
+void ZEPhysXPhysicalStaticRigidBody::SetPosition(const ZEVector3& NewPosition)
 {
 	ActorDesc.globalPose.t = ZE_TO_NX(NewPosition);
 	if (Actor != NULL)
@@ -138,7 +138,7 @@ void ZEPhysXPhysicalStaticObject::SetPosition(const ZEVector3& NewPosition)
 	}
 }
 
-ZEVector3 ZEPhysXPhysicalStaticObject::GetPosition()
+ZEVector3 ZEPhysXPhysicalStaticRigidBody::GetPosition()
 {
 	if (Actor != NULL)
 		return NX_TO_ZE(Actor->getGlobalPosition());
@@ -146,7 +146,7 @@ ZEVector3 ZEPhysXPhysicalStaticObject::GetPosition()
 		return NX_TO_ZE(ActorDesc.globalPose.t);
 }
 
-void ZEPhysXPhysicalStaticObject::SetRotation(const ZEQuaternion& NewRotation)
+void ZEPhysXPhysicalStaticRigidBody::SetRotation(const ZEQuaternion& NewRotation)
 {
 	ActorDesc.globalPose.M.fromQuat(ZE_TO_NX(NewRotation));
 	if (Actor != NULL)
@@ -156,7 +156,7 @@ void ZEPhysXPhysicalStaticObject::SetRotation(const ZEQuaternion& NewRotation)
 	}
 }
 
-ZEQuaternion ZEPhysXPhysicalStaticObject::GetRotation()
+ZEQuaternion ZEPhysXPhysicalStaticRigidBody::GetRotation()
 {
 	if (Actor != NULL)
 		return NX_TO_ZE(Actor->getGlobalOrientationQuat());
@@ -168,19 +168,19 @@ ZEQuaternion ZEPhysXPhysicalStaticObject::GetRotation()
 	}
 }
 
-void ZEPhysXPhysicalStaticObject::SetScale(const ZEVector3& NewScale)
+void ZEPhysXPhysicalStaticRigidBody::SetScale(const ZEVector3& NewScale)
 {
 	Scale = NewScale;
 	if (Actor != NULL)
 		ReCreate();
 }
 
-ZEVector3 ZEPhysXPhysicalStaticObject::GetScale()
+ZEVector3 ZEPhysXPhysicalStaticRigidBody::GetScale()
 {
 	return Scale;
 }
 
-void ZEPhysXPhysicalStaticObject::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags)
+void ZEPhysXPhysicalStaticRigidBody::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags)
 {
 	
 	ActorDesc.contactReportFlags = (ActorDesc.contactReportFlags & ~(NX_NOTIFY_ON_TOUCH | NX_NOTIFY_ON_START_TOUCH | NX_NOTIFY_ON_END_TOUCH)) |
@@ -193,14 +193,14 @@ void ZEPhysXPhysicalStaticObject::SetCollisionCallbackFlags(ZEDWORD CollisionCal
 	
 }
 
-ZEDWORD ZEPhysXPhysicalStaticObject::GetCollisionCallbackFlags()
+ZEDWORD ZEPhysXPhysicalStaticRigidBody::GetCollisionCallbackFlags()
 {
 	return (ActorDesc.contactReportFlags & NX_NOTIFY_ON_START_TOUCH ? ZE_PCCF_ON_START_TOUCH : NULL) |
 		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_END_TOUCH ? ZE_PCCF_ON_END_TOUCH : NULL) |
 		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_TOUCH ? ZE_PCCF_ON_TOUCH : NULL);
 }
 
-void ZEPhysXPhysicalStaticObject::ReCreate()
+void ZEPhysXPhysicalStaticRigidBody::ReCreate()
 {
 	Deinitialize();
 	ActorDesc.globalPose.t = Actor->getGlobalPosition();
@@ -208,7 +208,7 @@ void ZEPhysXPhysicalStaticObject::ReCreate()
 	Initialize();
 }
 		
-bool ZEPhysXPhysicalStaticObject::Initialize()
+bool ZEPhysXPhysicalStaticRigidBody::Initialize()
 {
 	Deinitialize();
 	if (PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
@@ -296,7 +296,7 @@ bool ZEPhysXPhysicalStaticObject::Initialize()
 	return true;
 }
 
-void ZEPhysXPhysicalStaticObject::Deinitialize()
+void ZEPhysXPhysicalStaticRigidBody::Deinitialize()
 {
 	if (Actor != NULL && PhysicalWorld != NULL && PhysicalWorld->GetScene() != NULL)
 	{

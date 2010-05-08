@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MapResource.cpp
+ Zinek Engine - PortalMapResource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,24 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "MapResource.h"
+#include "PortalMapResource.h"
+#include "PortalMapFileFormat.h"
+#include "PortalMapPortalOctree.h"
+
 #include "Core/Error.h"
 #include "Core/Resource.h"
 #include "Core/ResourceFile.h"
 #include "Core/ResourceManager.h"
-#include "MapFileFormat.h"
-#include "Graphics/GraphicsModule.h"
-#include "Graphics/VertexBuffer.h"
 #include "Graphics/Texture2DResource.h"
-#include "Graphics/RenderOrder.h"
 #include "Graphics/FixedMaterial.h"
 #include "Physics/PhysicalStaticMesh.h"
-#include "Octree.h"
 #include <string.h>
 
 // Reading
+#define ZESHADER_SKINTRANSFORM				1
+#define ZESHADER_DIFFUSEMAP					2
+#define ZESHADER_NORMALMAP					4
+#define ZESHADER_SPECULARMAP				8
+#define ZESHADER_EMMISIVEMAP				16
+#define ZESHADER_OCAPASITYMAP				32
+#define ZESHADER_DETAILDIFFUSEMAP			64
+#define ZESHADER_DETAILNORMALMAP			128
+#define ZESHADER_REFLECTION					256
+#define ZESHADER_REFRACTION					512
+#define ZESHADER_LIGHTMAP					1024
+#define ZESHADER_DISTORTIONMAP				2048
 
-const ZETexture2D* ManageMapMaterialTextures(char* FileName, ZESmartArray<ZETexture2DResource*>& TextureResources)
+static const ZETexture2D* ManageMapMaterialTextures(char* FileName, ZESmartArray<ZETexture2DResource*>& TextureResources)
 {
 	if (strncmp(FileName, "", ZE_MAP_MAX_FILENAME_SIZE) == 0)
 		return NULL;
@@ -69,20 +79,7 @@ const ZETexture2D* ManageMapMaterialTextures(char* FileName, ZESmartArray<ZEText
 	return NewTextureResource->GetTexture();
 }
 
-#define ZESHADER_SKINTRANSFORM				1
-#define ZESHADER_DIFFUSEMAP					2
-#define ZESHADER_NORMALMAP					4
-#define ZESHADER_SPECULARMAP				8
-#define ZESHADER_EMMISIVEMAP				16
-#define ZESHADER_OCAPASITYMAP				32
-#define ZESHADER_DETAILDIFFUSEMAP			64
-#define ZESHADER_DETAILNORMALMAP			128
-#define ZESHADER_REFLECTION					256
-#define ZESHADER_REFRACTION					512
-#define ZESHADER_LIGHTMAP					1024
-#define ZESHADER_DISTORTIONMAP				2048
-
-bool ReadMaterialsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMaterial*>& Materials, ZESmartArray<ZETexture2DResource*>& TextureResources)
+static bool ReadMaterialsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMaterial*>& Materials, ZESmartArray<ZETexture2DResource*>& TextureResources)
 {
 	ZEMapFileMaterialChunk MaterialChunk;
 	// Read materials
@@ -147,7 +144,7 @@ bool ReadMaterialsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMaterial*>& M
 	return true;
 }
 
-bool SortVertices(ZEStaticVertexBuffer** VertexBuffer, ZEArray<ZERenderOrder>& RenderOrders, ZEArray<ZEMapFilePolygonChunk>& Polygons, ZEArray<ZEMaterial*>& Materials)
+/*static bool SortVertices(ZEStaticVertexBuffer** VertexBuffer, ZEArray<ZERenderOrder>& RenderOrders, ZEArray<ZEMapFilePolygonChunk>& Polygons, ZEArray<ZEMaterial*>& Materials)
 {
 	if (*VertexBuffer == NULL)
 		*VertexBuffer = zeGraphics->CreateStaticVertexBuffer();
@@ -190,7 +187,7 @@ bool SortVertices(ZEStaticVertexBuffer** VertexBuffer, ZEArray<ZERenderOrder>& R
 	return true;
 }
 
-bool ReadOctreeNodeFromFile(ZEResourceFile* ResourceFile, ZEOctree* Octree, ZEArray<ZEMaterial*>& Materials)
+static bool ReadOctreeNodeFromFile(ZEResourceFile* ResourceFile, ZEOctree* Octree, ZEArray<ZEMaterial*>& Materials)
 {
 	ZEMapFileOctreeChunk	FileOctree;
 	
@@ -249,7 +246,7 @@ bool ReadOctreeNodeFromFile(ZEResourceFile* ResourceFile, ZEOctree* Octree, ZEAr
 	return true;
 }
 
-bool ReadOctreeFromFile(ZEResourceFile* ResourceFile, ZEOctree** Octree, ZEArray<ZEMaterial*>& Materials)
+static bool ReadOctreeFromFile(ZEResourceFile* ResourceFile, ZEOctree** Octree, ZEArray<ZEMaterial*>& Materials)
 {
 	// Create octree
 	*Octree = new ZEOctree();
@@ -260,9 +257,9 @@ bool ReadOctreeFromFile(ZEResourceFile* ResourceFile, ZEOctree** Octree, ZEArray
 		return false;
 
 	return true;
-}
+}*/
 
-bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPortal* Portal)
+static bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourcePortal* Portal)
 {
 	// Read physical mesh header
 	ZEMapFilePhysicalMeshChunk FilePhysicalMesh;
@@ -275,11 +272,6 @@ bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPortal* Portal)
 		return false;
 	}
 
-	ZEArray<ZEVector3> Vertices;
-	ZEArray<ZEMapFilePhysicalMeshPolygonChunk> Polygons;
-	Polygons.SetCount(FilePhysicalMesh.PolygonCount);
-	Vertices.SetCount(FilePhysicalMesh.VertexCount);
-
 	ZEDWORD ChunkIdentifier = 0;
 
 	// Check physical mesh vertices chunk identifier
@@ -291,7 +283,9 @@ bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPortal* Portal)
 	}
 
 	// Read physical mesh vertices
-	ResourceFile->Read(Vertices.GetCArray(), sizeof(ZEVector3), Vertices.GetCount());
+	Portal->PhysicalMesh.Vertices.SetCount(FilePhysicalMesh.VertexCount);
+	ResourceFile->Read(Portal->PhysicalMesh.Vertices.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygonChunk), Portal->PhysicalMesh.Vertices.GetCount());
+
 
 	// Check physical mesh polygons chunk identifier
 	ResourceFile->Read(&ChunkIdentifier, sizeof(ZEDWORD), 1);
@@ -300,52 +294,22 @@ bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEMapPortal* Portal)
 		zeError("Map Resource", "Physical mesh polygons chunk's id does not match.");
 		return false;
 	}
+
 	// Read physical mesh polygons
-	ResourceFile->Read(Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygonChunk), Polygons.GetCount());
-
-	if (Polygons.GetCount() == 0 || Vertices.GetCount() == 0)
-	{
-		Portal->PhysicalMesh = NULL;
-		return true;
-	}
-
-	// Create Physical Mesh
-	Portal->PhysicalMesh = ZEPhysicalStaticMesh::CreateInstance();
-	if (Portal->PhysicalMesh == NULL)
-	{
-		zeError("Map Resource", "Can not create physical static mesh");
-		return false;
-	}
-
-	// Convert polygons to ZEPhysicalTriangle
-	ZEArray<ZEPhysicalTriangle> PhysicalTriangles;
-	PhysicalTriangles.SetCount(Polygons.GetCount());
-	for (size_t I = 0; I < PhysicalTriangles.GetCount(); I++)
-	{
-		PhysicalTriangles[I].MaterialIndex = 0;
-		PhysicalTriangles[I].Indices[0] = Polygons[I].Indices[0];
-		PhysicalTriangles[I].Indices[1] = Polygons[I].Indices[1];
-		PhysicalTriangles[I].Indices[2] = Polygons[I].Indices[2];
-	}
-
-	// Feed data to physical mesh
-	if (!Portal->PhysicalMesh->SetData(Vertices.GetCArray(), Vertices.GetCount(), PhysicalTriangles.GetCArray(), PhysicalTriangles.GetCount(), NULL, 0))
-	{
-		zeError("Map Resource", "Can not set physical static mesh polygons.");
-		return false;
-	}
+	Portal->PhysicalMesh.Polygons.SetCount(FilePhysicalMesh.PolygonCount);
+	ResourceFile->Read(Portal->PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygonChunk), Portal->PhysicalMesh.Polygons.GetCount());
 
 	return true;
 }
 
-bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMapPortal>& Portals, ZEArray<ZEMaterial*>& Materials, ZEArray<ZEMapPortalDoor>& PortalDoors)
+static bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResource* MapResoruce)
 {
 	ZEDWORD ChunkIdentifier;
 	ZEMapFilePortalChunk FilePortal;
 
-	for (size_t I = 0; I < Portals.GetCount(); I++)
+	for (size_t I = 0; I < MapResoruce->Portals.GetCount(); I++)
 	{
-		ZEMapPortal* Portal = &Portals[I];
+		ZEPortalMapResourcePortal* Portal = &MapResoruce->Portals[I];
 
 		ResourceFile->Read(&FilePortal, sizeof(ZEMapFilePortalChunk), 1);
 
@@ -357,37 +321,29 @@ bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMapPortal>& Por
 
 		strncpy(Portal->Name, FilePortal.Name, ZE_MAP_MAX_NAME_SIZE);
 		Portal->BoundingBox = FilePortal.BoundingBox;
-		Portal->Doors.SetCount(FilePortal.DoorCount);
+		Portal->DoorIds.SetCount(FilePortal.DoorIdCount);
 		Portal->Polygons.SetCount(FilePortal.PolygonCount);
 		Portal->HasPhysicalMesh = FilePortal.HasPhysicalMesh;
 		Portal->HasOctree = FilePortal.HasOctree;
-		Portal->Octree = NULL;
+//		Portal->Octree = NULL;
 
-		// Read portal doors
-		for (size_t N = 0; N < FilePortal.DoorCount; N++)
+		// Read portal doors ids
+		ZEDWORD Header;
+		ResourceFile->Read(&Header, sizeof(ZEDWORD), 1);
+		if (Header != ZE_MAP_PORTAL_DOOR_IDS_CHUNK)
 		{
-			ZEMapPortalDoor* Door = &Portal->Doors[N];
-			ZEMapFilePortalDoorChunk FileDoor;
-
-			ResourceFile->Read(&FileDoor, sizeof(ZEMapFilePortalDoorChunk), 1);
-
-			if (FileDoor.ChunkIdentifier != ZE_MAP_PORTAL_DOOR_CHUNK)
-			{
-				zeError("Map Resource", "Portal chunk's id does not match.");
-				return false;
-			}
-
-			strncpy(Door->Name, FileDoor.Name, ZE_MAX_NAME_SIZE);
-			Door->Rectangle = FileDoor.Rectangle;
-			Door->DestinationPortal = &Portals[FileDoor.DestinationPortal];
-			Door->IsOpen = FileDoor.IsOpen;
+			zeError("Map Resource", "Portal door ids chunk's id does not match.");
+			return false;
 		}
+		ResourceFile->Read(Portal->DoorIds.GetCArray(), sizeof(ZEDWORD), Portal->DoorIds.GetCount());
 
 		// Read Octree
 		if (FilePortal.HasOctree)
 		{
-			if (!ReadOctreeFromFile(ResourceFile, &Portal->Octree, Materials))
-				return false;
+			zeError("Portal Map", "Octree is not supported.");
+			return false;
+			/*if (!ReadOctreeFromFile(ResourceFile, &Portal->Octree, Materials))
+				return false;*/
 		}
 		else
 		{
@@ -406,30 +362,45 @@ bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMapPortal>& Por
 			ResourceFile->Read(MapPolygons.GetCArray(), sizeof(ZEMapFilePolygonChunk), MapPolygons.GetCount());
 			for (size_t I = 0; I < Portal->Polygons.GetCount(); I++)
 			{
-				Portal->Polygons[I].Material = Materials[MapPolygons[I].Material];
+				Portal->Polygons[I].Material = MapResoruce->Materials[MapPolygons[I].Material];
 				Portal->Polygons[I].LastIteration = 0;
 				Portal->Polygons[I].Vertices[0] = *(ZEMapVertex*)&MapPolygons[I].Vertices[0];
 				Portal->Polygons[I].Vertices[1] = *(ZEMapVertex*)&MapPolygons[I].Vertices[1];
 				Portal->Polygons[I].Vertices[2] = *(ZEMapVertex*)&MapPolygons[I].Vertices[2];
 			}
-			
-			if (!SortVertices((ZEStaticVertexBuffer**)&Portal->VertexBuffer, Portal->RenderOrders, MapPolygons, Materials))
-				return false;
 		}
 
 		// Read Physical Mesh
 		if (FilePortal.HasPhysicalMesh)
 			if (!ReadPhysicalMeshFromFile(ResourceFile, Portal))
 				return false;
-
-	/*	// Read Brushes
-		if (!ReadEntitiesFromFile(ResourceFile, Portal->Brushes))
-			return false;*/
 	}
 	return true;
 }
 
-bool ReadMapFromFile(ZEResourceFile* ResourceFile, ZEMapResource* Map)
+static bool ReadPortalDoorsFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResource* MapResource)
+{ 
+	for (size_t I = 0; I < MapResource->PortalDoors.GetCount(); I++)
+	{
+		ZEPortalMapResourcePortalDoor* Door = &MapResource->PortalDoors[I];
+		
+		ZEMapFilePortalDoorChunk FileDoor;
+		ResourceFile->Read(&FileDoor, sizeof(ZEDWORD), 1);
+
+		if (FileDoor.ChunkIdentifier != ZE_MAP_PORTAL_DOOR_CHUNK)
+		{
+			zeError("Map Resource", "Portal chunk's id does not match.");
+			return false;
+		}
+
+		strncpy(Door->Name, FileDoor.Name, ZE_MAX_NAME_SIZE);
+		Door->Rectangle = FileDoor.Rectangle;
+		Door->DestinationPortal = &Portals[FileDoor.DestinationPortal];
+		Door->IsOpen = FileDoor.IsOpen;
+	}
+}
+
+static bool ReadMapFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResource* Map)
 {
 	ZEMapFileHeader TempHeader;
 	ResourceFile->Read(&TempHeader, sizeof(ZEMapFileHeader), 1);
@@ -448,7 +419,6 @@ bool ReadMapFromFile(ZEResourceFile* ResourceFile, ZEMapResource* Map)
 
 	Map->Portals.SetCount(TempHeader.PortalCount);
 	Map->Materials.SetCount(TempHeader.MaterialCount);
-	/*Map->Entities.SetCount(TempHeader.EntityCount);*/
 
 	if (!ReadMaterialsFromFile(ResourceFile, Map->Materials, Map->TextureResources))
 	{
@@ -462,33 +432,27 @@ bool ReadMapFromFile(ZEResourceFile* ResourceFile, ZEMapResource* Map)
 		return false;
 	}
 
-/*	if (!ReadEntitiesFromFile(ResourceFile, Map->Entities))
-	{
-		zeError("Map Resource", "File is corrupted. Can not read entities from file. (FileName : \"%s\")", ResourceFile->GetFileName());
-		return false;
-	}*/
-
 	return true;
 }
 
-ZEMapPortal::ZEMapPortal()
+ZEPortalMapPortalResource::ZEPortalMapPortalResource()
 {
 	VertexBuffer = NULL;
 	Octree = NULL;
 }
 
-ZEMapPortal::~ZEMapPortal()
+ZEPortalMapPortalResource::~ZEPortalMapPortalResource()
 {
 	if (Octree != NULL)
 		delete Octree;
 }
 
-const char* ZEMapResource::GetResourceType() const
+const char* ZEPortalMapResource::GetResourceType() const
 {
 	return "Map Resource";
 }
 
-const ZEMapResource* ZEMapResource::LoadSharedResource(const char* FileName)
+const ZEPortalMapResource* ZEPortalMapResource::LoadSharedResource(const char* FileName)
 {
 	// Try to get instance of shared ZEMap file from resource manager
 	ZEMapResource* Resource = (ZEMapResource*)zeResources->GetResource(FileName);
@@ -532,7 +496,7 @@ void ZEMapResource::CacheResource(const char* FileName)
 	}
 }
 
-ZEMapResource* ZEMapResource::LoadResource(const char* FileName)
+ZEPortalMapResource* ZEMapResource::LoadResource(const char* FileName)
 {
 	// Open ZEMap file
 	ZEResourceFile ResourceFile;
@@ -562,7 +526,7 @@ ZEMapResource* ZEMapResource::LoadResource(const char* FileName)
 	}
 }
 
-ZEMapResource::~ZEMapResource()
+ZEPortalMapResource::~ZEPortalMapResource()
 {
 	for (size_t I = 0; I < TextureResources.GetCount(); I++)
 		TextureResources[I]->Release();

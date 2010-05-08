@@ -41,12 +41,13 @@
 
 class ZEPhysicalWorld;
 class ZEPhysicalRigidBody;
-class ZEPhysicalStaticObject;
+class ZEPhysicalStaticRigidBody;
 class ZEPhysicalStaticMesh;
 class ZEPhysicalJoint;
 class ZEPhysicalCloth;
 class ZEPhysicalSoftBody;
 class ZEPhysicalForceField;
+class ZEPhysicalStaticHeightField;
 class ZEPhysicalTrigger;
 class ZEPhysicalVehicle;
 class ZEPhysicalCharacterController;
@@ -57,13 +58,18 @@ class ZEPhysicsModule : public ZEModule
 {
 	public:
 		virtual ZEPhysicalWorld*				CreatePhysicalWorld() = 0;
+
 		virtual ZEPhysicalRigidBody*			CreatePhysicalRigidBody() = 0;
-		virtual ZEPhysicalStaticObject*			CreatePhysicalStaticObject() = 0;
-		virtual ZEPhysicalStaticMesh*			CreatePhysicalStaticMesh() = 0;
-		virtual ZEPhysicalJoint*				CreatePhysicalJoint() = 0;
-		virtual ZEPhysicalCloth*				CreatePhysicalCloth() = 0;
+		virtual ZEPhysicalStaticRigidBody*		CreatePhysicalStaticRigidBody() = 0;
 		virtual ZEPhysicalSoftBody*				CreatePhysicalSoftBody() = 0;
+		virtual ZEPhysicalCloth*				CreatePhysicalCloth() = 0;
+		virtual ZEPhysicalStaticMesh*			CreatePhysicalStaticMesh() = 0;
+		virtual ZEPhysicalStaticHeightField*	CreatePhysicalStaticHeightField() = 0;
+
 		virtual ZEPhysicalForceField*			CreatePhysicalForceField() = 0;
+
+		virtual ZEPhysicalJoint*				CreatePhysicalJoint() = 0;
+
 		virtual ZEPhysicalTrigger*				CreatePhysicalTrigger() = 0;
 
 		virtual ZEPhysicalVehicle*				CreatePhysicalVehicle() = 0;

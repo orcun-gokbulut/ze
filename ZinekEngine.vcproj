@@ -2027,26 +2027,42 @@
 				RelativePath=".\Source\Map\Map.h"
 				>
 			</File>
-			<File
-				RelativePath=".\Source\Map\MapFileFormat.h"
+			<Filter
+				Name="PortalMap"
 				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\MapResource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\MapResource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\Octree.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\Octree.h"
-				>
-			</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMap.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapFileFormat.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapPortal.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapPortalDoor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapPortalOctree.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapPortalOctree.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapResource.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapResource.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="DebugComponents"

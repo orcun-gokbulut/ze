@@ -45,6 +45,7 @@
 #include "ZEMath/Ray.h"
 #include "Physics/PhysicalWorld.h"
 #include "Sound/SoundModule.h"
+#include "Map/PortalMap/PortalMap.h"
 #include <memory.h>
 
 void ZEScene::SetVisualDebugElements(ZEDWORD VisualDebugElements)
@@ -124,8 +125,8 @@ void ZEScene::Deinitialize()
 	if (PhysicalWorld != NULL)
 		PhysicalWorld->Deinitialize();
 
-	if (Environment != NULL)
-		Environment->Deinitialize();
+	if (Map != NULL)
+		Map->Deinitialize();
 
 	DebugDraw.Deinitialize();
 
@@ -143,10 +144,10 @@ void ZEScene::Destroy()
 {
 	Deinitialize();
 
-	if (Environment != NULL)
+	if (Map != NULL)
 	{
-		Environment->Destroy();
-		Environment = NULL;
+		Map->Destroy();
+		Map = NULL;
 	}
 	
 	if (PhysicalWorld != NULL)
@@ -288,9 +289,9 @@ bool ZEScene::CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntit
 			}
 	}
 
-	if (Environment != NULL)
+	if (Map != NULL)
 	{
-		if (Environment->CastRay(Ray, Position, Normal, MinT))
+		if (Map->CastRay(Ray, Position, Normal, MinT))
 			if (MinT < CurrMinT)
 			{
 				*IntersectedEntity = NULL;
@@ -478,8 +479,8 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 		}
 	}
 	
-	if (Environment != NULL)
-		Environment->Render(Renderer, ViewVolume, VisibleLights);
+	if (Map != NULL)
+		Map->Render(Renderer, VisibleLights);
 	
 	if (VisualDebugElements != NULL)
 		DebugDraw.Draw(Renderer);
@@ -490,24 +491,24 @@ bool ZEScene::LoadEnvironment(const char* FileName)
 {
 	zeLog("Scene", "Loading environment.");
 
-	if (Environment != NULL)
-		Environment->Deinitialize();
+	if (Map != NULL)
+		Map->Deinitialize();
 	else
-		Environment = ZEPortalMap::CreateInstance();
+		Map = ZEPortalMap::CreateInstance();
 
-	if (!Environment->Load(FileName))
+	if (!Map->Load(FileName))
 	{
 		zeError("Scene", "Can not load environment.");
 		return false;
 	}
 
-	if (!Environment->Initialize())
+	if (!Map->Initialize())
 	{
 		zeError("Scene", "Can not initialize environment.");
 		return false;
 	}
 	
-	zeLog("Scene", "Environment loaded.");
+	zeLog("Scene", "Map loaded.");
 	return true;
 }
 
@@ -520,8 +521,8 @@ bool ZEScene::Save(const char* FileName)
 		Serializer.Write(&EntityCount, sizeof(ZEDWORD), 1);
 		
 		Serializer.Write(&LastEntityId, sizeof(int), 1);
-		if (strcmp(Environment->GetFileName(), "") != 0)
-			Serializer.Write(Environment->GetFileName(), sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+		if (strcmp(Map->GetFileName(), "") != 0)
+			Serializer.Write(Map->GetFileName(), sizeof(char), ZE_MAX_FILE_NAME_SIZE);
 		else
 		{
 			char Temp[ZE_MAX_FILE_NAME_SIZE];
@@ -564,8 +565,8 @@ bool ZEScene::Load(const char* FileName)
 		Unserializer.Read(&LastEntityId, sizeof(int), 1);
 		char MapFile[ZE_MAX_FILE_NAME_SIZE];
 		Unserializer.Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
-		Environment->Initialize();
-		if (!Environment->Load(MapFile))
+		Map->Initialize();
+		if (!Map->Load(MapFile))
 		{ 
 			zeError("Scene", "Unserialization can not load map file. (Map File : \"%s\")", MapFile);
 			zeError("Scene", "Unserialization failed.");
@@ -615,7 +616,7 @@ ZEScene::ZEScene()
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
 	PhysicalWorld = NULL;
-	Environment = NULL;
+	Map = NULL;
 
 	memset(&CullStatistics, 0, sizeof(ZECullStatistics));
 

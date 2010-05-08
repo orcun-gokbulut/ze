@@ -76,13 +76,18 @@ class ZEPhysXModule : public ZEPhysicsModule
 		virtual void							UpdateWorlds();
 
 		virtual ZEPhysicalWorld*				CreatePhysicalWorld();
+
 		virtual ZEPhysicalRigidBody*			CreatePhysicalRigidBody();
-		virtual ZEPhysicalStaticObject*			CreatePhysicalStaticObject();
-		virtual ZEPhysicalStaticMesh*			CreatePhysicalStaticMesh();
-		virtual ZEPhysicalJoint*				CreatePhysicalJoint();
-		virtual ZEPhysicalCloth*				CreatePhysicalCloth();
+		virtual ZEPhysicalStaticRigidBody*		CreatePhysicalStaticRigidBody();
 		virtual ZEPhysicalSoftBody*				CreatePhysicalSoftBody();
+		virtual ZEPhysicalCloth*				CreatePhysicalCloth();
+		virtual ZEPhysicalStaticMesh*			CreatePhysicalStaticMesh();
+		virtual ZEPhysicalStaticHeightField*	CreatePhysicalStaticHeightField();
+
 		virtual ZEPhysicalForceField*			CreatePhysicalForceField();
+
+		virtual ZEPhysicalJoint*				CreatePhysicalJoint();
+
 		virtual ZEPhysicalTrigger*				CreatePhysicalTrigger();
 
 		virtual ZEPhysicalVehicle*				CreatePhysicalVehicle();

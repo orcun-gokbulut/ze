@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXPhysicalStaticObject.h
+ Zinek Engine - PhysXPhysicalStaticRigidBody.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,17 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PHYSX_PHYSICAL_STATIC_OBJECT_H__
-#define __ZE_PHYSX_PHYSICAL_STATIC_OBJECT_H__
+#ifndef __ZE_PHYSX_PHYSICAL_STATIC_RIGID_BODY_H__
+#define __ZE_PHYSX_PHYSICAL_STATIC_RIGID_BODY_H__
 
-#include "Physics/PhysicalStaticObject.h"
+#include "Physics/PhysicalStaticRigidBody.h"
 
 #include <NxActor.h>
 #include <NxActorDesc.h>
 
 class ZEPhysXPhysicalWorld;
 
-class ZEPhysXPhysicalStaticObject : public ZEPhysicalStaticObject
+class ZEPhysXPhysicalStaticRigidBody : public ZEPhysicalStaticRigidBody
 {
 	friend class ZEPhysXModule;
 	private:
@@ -59,8 +59,8 @@ class ZEPhysXPhysicalStaticObject : public ZEPhysicalStaticObject
 
 		void								ReCreate();
 
-											ZEPhysXPhysicalStaticObject();
-		virtual								~ZEPhysXPhysicalStaticObject();
+											ZEPhysXPhysicalStaticRigidBody();
+		virtual								~ZEPhysXPhysicalStaticRigidBody();
 										
 	public:									
 		virtual void						SetPhysicalWorld(ZEPhysicalWorld* World);

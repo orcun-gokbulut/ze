@@ -311,3 +311,7 @@
 	FIX: No output in release mode and ZED3D9GraphicsModule Enabled flag fixed.
 	FIX: ZEUITextControl::SetFont(NULL) crash fixed. Extra runtime checks added to ZEUITextControl::SetFont function.
 	CHG: Project properties changed for maximum optimization in both ZESDK Project and Zinek Engine Project.
+
+[6 May 2010 - Revision 176 - Orcun]
+	FIX: ZED3D9FixedMaterial, ZED3D9SimpleMaterial ZE_ROF_VIEW_TRANSFORM and ZE_ROF_PROJECTION_TRANSFORM bug fixed.
+	CHG: ZEPhysicalStaticObject renamed to ZEPhysicalStaticRigidBody.

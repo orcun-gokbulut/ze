@@ -42,6 +42,7 @@ typedef ZEPortalMapDoor ZEMapPortalDoor;
 class ZEMapPortalDoor
 {
 	private:
+		ZERectangle3D			Rectagle;
 		ZEPortalMapPortal*		PortalA
 		ZEPortalMapPortal*		PortalB;
 		bool					Open;
@@ -49,6 +50,7 @@ class ZEMapPortalDoor
 	public:
 		ZEPortalMapPortal*		GetPortalA();
 		ZEPortalMapPortal*		GetPortalB();
+		const ZERectangle3D&	GetRectangle();
 
 		void					SetOpen(bool Open);
 		bool					GetOpen();

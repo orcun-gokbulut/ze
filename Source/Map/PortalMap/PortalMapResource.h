@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MapResource.h
+ Zinek Engine - PortalMapResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,90 +34,79 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MAP_RESOURCE_H__
-#define __ZE_MAP_RESOURCE_H__
+#ifndef __ZE_PORTAL_MAP_RESOURCE_H__
+#define __ZE_PORTLA_MAP_RESOURCE_H__
 
 #include "ZEDS/Array.h"
 #include "ZEMath/Vector.h"
 #include "ZEMath/Rectangle3D.h"
+#include "ZEMath/AABoundingBox.h"
 #include "Definitions.h"
 #include "Core/Resource.h"
 #include "Graphics/VertexTypes.h"
-#include "Graphics/IndexedPolygon.h"
-#include "GameInterface/Entity.h"
+#include "PortalMapPortalOctree.h"
 
-class ZEVertexBuffer;
 class ZEMaterial;
-class ZETextureResource;
 class ZETexture2DResource;
-class ZEMapPortal;
-class ZEMapResource;
-class ZEOctree;
-class ZEPhysicalStaticMesh;
 
-struct ZEMapPolygon
+struct ZEPortalMapPolygon
 {
-	ZEMapVertex									Vertices[3];
-	ZEMaterial*									Material;
-	unsigned int								LastIteration;
+	ZEMapVertex							Vertices[3];
+	ZEMaterial*							Material;
+	unsigned int						LastIteration;
 };
 
-
-
-class ZEMapPortalDoor
+struct ZEPortalMapPhysicalMeshPolygon
 {
-	public:
-		char									Name[ZE_MAX_NAME_SIZE];
-		ZERectangle3D							Rectangle;
-		ZEMapPortal*							DestinationPortal;
-		bool									IsOpen;
+	ZEDWORD								Indices[3];
 };
 
-struct ZEMapPhysicalMeshPolygon
-{
-	ZEDWORD										Indices[3];
-};
-
-struct ZEMapPhysicalMesh
+struct ZEPortalMapResourcePhysicalMesh
 {
 	ZEArray<ZEVector3>							Vertices;
-	ZEArray<ZEMapPhysicalMeshPolygon>			Polygons;
+	ZEArray<ZEPortalMapPhysicalMeshPolygon>		Polygons;
 };
 
-class ZEMapPortal
+struct ZEPortalMapResourcePortal
 {
-	public:
-		char									Name[ZE_MAX_NAME_SIZE];
-		ZEAABoundingBox							BoundingBox;
-		ZEArray<ZEMapPortalDoor>				Doors;
-		ZEVertexBuffer*							VertexBuffer;
-		ZEArray<ZERenderOrder>					RenderOrders;
-		ZEArray<ZEMapPolygon>					Polygons;
-		ZEPhysicalStaticMesh*					PhysicalMesh;
-		bool									HasOctree;
-		ZEOctree*								Octree;
-	
-		bool									HasPhysicalMesh;
-
-												ZEMapPortal();
-												~ZEMapPortal();
+	char								Name[ZE_MAX_NAME_SIZE];
+	ZEAABoundingBox						BoundingBox;
+	ZEArray<size_t>						DoorIds;
+	ZEArray<ZEPortalMapPolygon>			Polygons;
+	ZEPortalMapResourcePhysicalMesh		PhysicalMesh;
+	bool								HasOctree;
+	//ZEPortalMapOctree					Octree;
+	bool								HasPhysicalMesh;
 };
 
-class ZEMapResource : public ZEResource
+struct ZEPortalMapResourcePortalDoor
 {
-	protected:
-		virtual									~ZEMapResource();
+	char								Name[ZE_MAX_NAME_SIZE];
+	ZERectangle3D						Rectangle;
+	ZEPortalMapResourcePortal*			DestinationPortal;
+	bool								IsOpen;
+};
+
+class ZEPortalMapResource : public ZEResource
+{
+	private:
+		ZESmartArray<ZETexture2DResource*>				TextureResources;
+		ZEArray<ZEMaterial*>							Materials;
+		ZEArray<ZEPortalMapResourcePortalDoor>			PortalDoors;
+		ZEArray<ZEPortalMapResourcePortal>				Portals;
+
+		virtual											~ZEPortalMapResource();
 
 	public:
-		ZESmartArray<ZETexture2DResource*>		TextureResources;
-		ZEArray<ZEMaterial*>					Materials;
-		ZEArray<ZEMapPortalDoor>				PortalDoors;
-		ZEArray<ZEMapPortal>					Portals;
+		const char*										GetResourceType() const;
+		
+		const ZEArray<ZETexture2DResource*>&			GetTextures();
+		const ZEArray<ZEMaterial*>&						GetMaterials();
+		const ZEArray<ZEPortalMapResourcePortal>&		GetPortals();
+		const ZEArray<ZEPortalMapResourcePortalDoor>&	GetPortalDoors();
 
-		const char*								GetResourceType() const;
-
-		static ZEMapResource*					LoadResource(const char* FileName);
-		static const ZEMapResource*				LoadSharedResource(const char* FileName);
-		static void								CacheResource(const char* FileName);
+		static ZEPortalMapResource*						LoadResource(const char* FileName);
+		static const ZEPortalMapResource*				LoadSharedResource(const char* FileName);
+		static void										CacheResource(const char* FileName);
 };
 #endif

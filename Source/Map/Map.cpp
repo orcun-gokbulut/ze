@@ -35,16 +35,16 @@
 
 #include "Map.h"
 
-ZEEnvironment::ZEEnvironment()
+ZEMap::ZEMap()
 {
 }
 
-ZEEnvironment::~ZEEnvironment()
-{
-}
-
-void ZEEnvironment::Destroy()
+ZEMap::~ZEMap()
 {
 	Deinitialize();
+}
+
+void ZEMap::Destroy()
+{
 	delete this;
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MapFileFormat.h
+ Zinek Engine - PortalMapFileFormat.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MAPFILEFORMAT_H__
-#define __ZE_MAPFILEFORMAT_H__
+#ifndef __ZE_PORTAL_MAP_FILE_FORMAT_H__
+#define __ZE_PORTAL_MAP_FILE_FORMAT_H__
 
 #include "Definitions.h"
 #include "Types.h"
@@ -55,6 +55,7 @@
 #define ZE_MAP_HEADER ((ZEDWORD)((ZEDWORD)'ZEMF' + (ZEDWORD)'MAP '))
 #define ZE_MAP_MATERIAL_CHUNK ((ZEDWORD)(ZE_MAP_HEADER + (ZEDWORD)'MTRL'))
 #define ZE_MAP_PORTAL_CHUNK ((ZEDWORD)(ZE_MAP_HEADER + (ZEDWORD)'PRTL'))
+#define ZE_MAP_PORTAL_DOOR_IDS_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'IDS '))
 #define ZE_MAP_PORTAL_DOOR_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'DOOR'))
 #define ZE_MAP_BRUSHE_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'BRSH'))
 #define ZE_MAP_POLYGONS_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'PLYG'))
@@ -65,7 +66,6 @@
 #define ZE_MAP_PHYSICAL_MESH_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'MESH'))
 #define ZE_MAP_PHYSICAL_MESH_VERTICES_CHUNK ((ZEDWORD)(ZE_MAP_PHYSICAL_MESH_CHUNK + (ZEDWORD)'VERT'))
 #define ZE_MAP_PHYSICAL_MESH_POLYGONS_CHUNK ((ZEDWORD)(ZE_MAP_PHYSICAL_MESH_CHUNK + (ZEDWORD)'INDX'))
-
 
 struct ZEMapFileMaterialChunk
 {
@@ -146,7 +146,7 @@ struct ZEMapFilePortalChunk
 	ZEDWORD							ChunkIdentifier;
 	char							Name[ZE_MAP_MAX_NAME_SIZE];
 	ZEAABoundingBox					BoundingBox;
-	ZEDWORD							DoorCount;
+	ZEDWORD							DoorIdCount;
 	ZEDWORD							PolygonCount;
 	ZEDWORD							BrushCount;
 	bool							HasOctree;
@@ -158,20 +158,6 @@ struct ZEMapFilePhysicalMeshChunk
 	ZEDWORD							ChunkIdentifier;
 	ZEDWORD							VertexCount;
 	ZEDWORD							PolygonCount;
-};
-
-struct ZEEntityDataChunk
-{
-	ZEDWORD							ChunkIndentifier;
-	char							EntityType[ZE_MAP_MAX_NAME_SIZE];
-	ZEDWORD							AttributeCount;
-};
-
-struct ZEEntityAttributeChunk
-{
-	ZEDWORD							ChunkIndentifier;
-	char							Name[ZE_MAP_MAX_NAME_SIZE];
-	ZEVariantType					Type;
 };
 
 struct ZEMapFileHeader

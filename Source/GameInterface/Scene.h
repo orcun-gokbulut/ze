@@ -105,7 +105,7 @@ class ZEScene
 
 		unsigned int							LastEntityId;
 
-		ZEPortalMap*							Environment;
+		ZEPortalMap*							Map;
 		ZESmartArray<ZEEntity*>					Entities;
 
 		ZEPhysicalWorld*						PhysicalWorld;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Octree.cpp
+ Zinek Engine - PortalMapPortalOctree.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Octree.h"
+/*#include "PortalMapPortalOctree.h"
 #include "Graphics/GraphicsModule.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/RenderOrder.h"
@@ -45,7 +45,7 @@ ZEFixedMaterial* ZEOctree::OctreeBBoxMaterial;
 ZERenderOrder ZEOctree::OctreeBBoxRenderOrder;
 ZECanvas ZEOctree::OctreeBBoxCanvas;
 
-bool ZEOctree::Initialize()
+bool ZEPortalMapOctree::Initialize()
 {
 	OctreeBBoxCanvas.Clean();
 	OctreeBBoxCanvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
@@ -72,13 +72,13 @@ bool ZEOctree::Initialize()
 	return true;
 }
 
-bool ZEOctree::Destroy()
+bool ZEPortalMapOctree::Destroy()
 {
 	return true;
 }
 
 
-void ZEOctree::Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESmartArray<ZELight*>& Lights)
+void ZEPortalMapOctree::Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESmartArray<ZELight*>& Lights)
 {
 	ZEMatrix4x4::CreateOrientation(OctreeBBoxRenderOrder.WorldMatrix, BoundingBox.GetCenter(), 
 	ZEQuaternion::Identity, 
@@ -116,22 +116,23 @@ void ZEOctree::Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESm
 		for (size_t I = 0; I < 8; I++)
 			if (SubTrees[I] != NULL && ViewVolume.CullTest(SubTrees[I]->BoundingBox))
 				SubTrees[I]->Render(Renderer, ViewVolume, Lights);*/
-}
+/*}
 
 
-ZEOctree::ZEOctree()
+ZEPortalMapOctree::ZEPortalMapOctree()
 {
 	VertexBuffer = NULL;
 	for (size_t I = 0; I < 8; I++)
 		SubTrees[I] = NULL;
 }
 
-ZEOctree::~ZEOctree()
+ZEPortalMapOctree::~ZEPortalMapOctree()
 {
 	if (VertexBuffer != NULL)
-		delete VertexBuffer;
+		VertexBuffer->Destroy();
 
 	for (size_t I = 0; I < 8; I++)
 		if (SubTrees[I] != NULL)
 			delete SubTrees[I];
 }
+*/

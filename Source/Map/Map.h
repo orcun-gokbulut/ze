@@ -38,8 +38,6 @@
 #define __ZE_MAP_H__
 
 #include "ZEDS/Array.h"
-#include "MapResource.h"
-#include "Octree.h"
 #include "Physics/PhysicalStaticMesh.h"
 #include "Graphics/Canvas.h"
 #include "Graphics/RenderOrder.h"
@@ -48,7 +46,7 @@
 class ZERenderer;
 class ZEViewVolume;
 class ZELight;
-
+class ZEMapResource;
 class ZEMap
 {
 	protected:
@@ -62,7 +60,9 @@ class ZEMap
 
 		virtual const char*				GetFileName() = 0;
 
-		virtual bool					Load(const char* FileName) = 0;
+		virtual bool					SetResource(ZEMapResource* MapResource) = 0;
+		virtual ZEMapResource*			GetResource() = 0;
+
 		virtual void					Render(ZERenderer* Renderer, ZESmartArray<ZELight*>& Lights) = 0;
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT) = 0;
 

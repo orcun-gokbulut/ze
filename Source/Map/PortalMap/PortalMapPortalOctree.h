@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Octree.h
+ Zinek Engine - PortalMapPortalOctree.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_OCTREE_H__
-#define __ZE_OCTREE_H__
-
+#ifndef __ZE_PORTAL_MAP_OCTREE_H__
+#define __ZE_PORTAL_MAP_OCTREE_H__
+/*
 #include "ZEMath/AABoundingBox.h"
 #include "ZEDS/Array.h"
 #include "Graphics/FixedMaterial.h"
@@ -49,30 +49,30 @@ class ZEMapPortal;
 class ZERenderer;
 class ZEViewVolume;
 class ZELight;
-class ZEOctree
-{
-	public:
-		static ZEFixedMaterial*			OctreeBBoxMaterial;
-		static ZERenderOrder			OctreeBBoxRenderOrder;
-		static ZECanvas					OctreeBBoxCanvas;
 
-		bool							IsLeaf;
+class ZEPortalMapPortalOctree
+{
+	private:
+		bool							Leaf;
 		bool							HasPolygon;
 
 		size_t							Depth;
-		ZEOctree*						SubTrees[8];
+		ZEPortalMapPortalOctree*		SubTrees[8];
 
 		ZEAABoundingBox					BoundingBox;
 		ZEVertexBuffer*					VertexBuffer;
 		ZEArray<ZERenderOrder>			RenderOrders;
+
+	public:
+		bool							IsLeaf();
 
 		bool							Initialize();
 		bool							Destroy();
 
 		void							Render(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESmartArray<ZELight*>& Lights);
 
-										ZEOctree();
-										~ZEOctree();
+										ZEPortalMapOctree();
+										~ZEPortalMapOctree();
 };
-
+*/
 #endif
