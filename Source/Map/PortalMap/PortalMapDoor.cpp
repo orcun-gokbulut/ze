@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMapPortal.h
+ Zinek Engine - PortalMapDoor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,47 +32,56 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#include "PortalMapDoor.h"
+#include "PortalMapResource.h"
 
-#pragma once
-#ifndef __ZE_PORTAL_MAP_PORTAL_H__
-#define __ZE_PORTAL_MAP_PORTAL_H__
-
-#include "ZEDS/Array.h"
-#include "Graphics/RenderOrder.h"
-
-class ZEPortalMap;
-class ZEPortalMapDoor;
-class ZEPortalMapResourcePortal;
-class ZEVertexBuffer;
-class ZERenderer;
-class ZELight;
-class ZEPhysicalStaticMesh;
-
-class ZEPortalMapPortal
+ZEPortalMap* ZEPortalMapDoor::GetOwner()
 {
-	friend class ZEPortalMap;
-	private:
-		ZEPortalMap*						Owner;
-		ZEPortalMapResourcePortal*			Resource;
-		ZEVertexBuffer*						VertexBuffer;
-		ZEArray<ZERenderOrder>				RenderOrders;
-		ZEArray<ZEPortalMapDoor*>			Doors;
-		ZEPhysicalStaticMesh*				PhysicalMesh;
+	return Owner;
+}
 
-	public:
-		ZEPortalMap*						GetOwner();
-		const char*							GetName();
+const char* ZEPortalMapDoor::GetName()
+{
+	if (Resource != NULL)
+		return Resource->Name;
+	else
+		return "";
+}
 
-		const ZEArray<ZEPortalMapDoor*>&	GetDoors();
-		const ZEAABoundingBox&				GetBoundingBox();
-		ZEPhysicalStaticMesh*				GetPhysicalMesh();
+ZEPortalMapPortal** ZEPortalMapDoor::GetPortals()
+{
+	return Portals;
+}
 
-		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);
-		void								Deinitialize();
+const ZERectangle3D& ZEPortalMapDoor::GetRectangle()
+{
+	return Rectangle;
+}
 
-		void								Draw(ZERenderer* Renderer,  const ZESmartArray<const ZERLLight*>& Lights);
+void ZEPortalMapDoor::Initialize(ZEPortalMap* Owner, ZEPortalMapResourceDoor* Resource)
+{
+	this->Owner = Owner;
+	this->Resource = Resource;
+}
 
-											ZEPortalMapPortal();
-};
+void ZEPortalMapDoor::Deinitialize()
+{
+	Owner = NULL;
+	Resource = NULL;
+}
 
-#endif
+void ZEPortalMapDoor::SetOpen(bool Open)
+{
+	this->Open = Open;
+}
+
+bool ZEPortalMapDoor::GetOpen()
+{
+	return Open;
+}
+
+ZEPortalMapDoor::ZEPortalMapDoor()
+{
+	Owner = NULL;
+	Resource = NULL;
+}

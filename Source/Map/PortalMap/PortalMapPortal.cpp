@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMapPortal.h
+ Zinek Engine - PortalMapPortal.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,47 +32,59 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#include "PortalMapPortal.h"
+#include "PortalMapResource.h"
+#include "Physics/PhysicalStaticMesh.h"
 
-#pragma once
-#ifndef __ZE_PORTAL_MAP_PORTAL_H__
-#define __ZE_PORTAL_MAP_PORTAL_H__
-
-#include "ZEDS/Array.h"
-#include "Graphics/RenderOrder.h"
-
-class ZEPortalMap;
-class ZEPortalMapDoor;
-class ZEPortalMapResourcePortal;
-class ZEVertexBuffer;
-class ZERenderer;
-class ZELight;
-class ZEPhysicalStaticMesh;
-
-class ZEPortalMapPortal
+ZEPortalMap* ZEPortalMapPortal::GetOwner()
 {
-	friend class ZEPortalMap;
-	private:
-		ZEPortalMap*						Owner;
-		ZEPortalMapResourcePortal*			Resource;
-		ZEVertexBuffer*						VertexBuffer;
-		ZEArray<ZERenderOrder>				RenderOrders;
-		ZEArray<ZEPortalMapDoor*>			Doors;
-		ZEPhysicalStaticMesh*				PhysicalMesh;
+	return Owner;
+}
 
-	public:
-		ZEPortalMap*						GetOwner();
-		const char*							GetName();
+const char* ZEPortalMapPortal::GetName()
+{
+	if (Resource != NULL)
+		return Resource->Name;
+	else
+		return "";
+}
 
-		const ZEArray<ZEPortalMapDoor*>&	GetDoors();
-		const ZEAABoundingBox&				GetBoundingBox();
-		ZEPhysicalStaticMesh*				GetPhysicalMesh();
+const ZEArray<ZEPortalMapDoor*>& ZEPortalMapPortal::GetDoors()
+{
+	return Doors;
+}
 
-		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);
-		void								Deinitialize();
+const ZEAABoundingBox& ZEPortalMapPortal::GetBoundingBox()
+{
+	return Resource->BoundingBox;
+}
 
-		void								Draw(ZERenderer* Renderer,  const ZESmartArray<const ZERLLight*>& Lights);
+ZEPhysicalStaticMesh* ZEPortalMapPortal::GetPhysicalMesh()
+{
+	return PhysicalMesh;
+}
 
-											ZEPortalMapPortal();
-};
+void ZEPortalMapPortal::Draw(ZERenderer* Renderer,  const ZESmartArray<const ZERLLight*>& Lights)
+{
+	
+}
 
-#endif
+bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource)
+{
+	return false;
+}
+
+void ZEPortalMapPortal::Deinitialize()
+{
+	Owner = NULL;
+	Resource = NULL;
+	if (PhysicalMesh != NULL)
+		PhysicalMesh->Destroy();
+}
+
+ZEPortalMapPortal::ZEPortalMapPortal()
+{
+	Owner = NULL;
+	Resource = NULL;
+	PhysicalMesh = NULL;
+}

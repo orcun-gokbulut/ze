@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMapPortal.h
+ Zinek Engine - MapResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PORTAL_MAP_PORTAL_H__
-#define __ZE_PORTAL_MAP_PORTAL_H__
+#ifndef __ZE_MAP_RESOURCE_H__
+#define __ZE_MAP_RESOURCE_H__
 
+#include "Core/Resource.h"
 #include "ZEDS/Array.h"
-#include "Graphics/RenderOrder.h"
 
-class ZEPortalMap;
-class ZEPortalMapDoor;
-class ZEPortalMapResourcePortal;
-class ZEVertexBuffer;
-class ZERenderer;
-class ZELight;
-class ZEPhysicalStaticMesh;
-
-class ZEPortalMapPortal
+class ZEMapResource : public ZEResource
 {
-	friend class ZEPortalMap;
-	private:
-		ZEPortalMap*						Owner;
-		ZEPortalMapResourcePortal*			Resource;
-		ZEVertexBuffer*						VertexBuffer;
-		ZEArray<ZERenderOrder>				RenderOrders;
-		ZEArray<ZEPortalMapDoor*>			Doors;
-		ZEPhysicalStaticMesh*				PhysicalMesh;
-
 	public:
-		ZEPortalMap*						GetOwner();
-		const char*							GetName();
+		const char*						GetResourceType() const;
 
-		const ZEArray<ZEPortalMapDoor*>&	GetDoors();
-		const ZEAABoundingBox&				GetBoundingBox();
-		ZEPhysicalStaticMesh*				GetPhysicalMesh();
-
-		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);
-		void								Deinitialize();
-
-		void								Draw(ZERenderer* Renderer,  const ZESmartArray<const ZERLLight*>& Lights);
-
-											ZEPortalMapPortal();
+		static ZEMapResource*			LoadResource(const char* FileName);
+		static const ZEMapResource*		LoadSharedResource(const char* FileName);
+		static void						CacheResource(const char* FileName);
 };
 
 #endif

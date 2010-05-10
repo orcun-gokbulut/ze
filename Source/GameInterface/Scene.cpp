@@ -46,6 +46,7 @@
 #include "Physics/PhysicalWorld.h"
 #include "Sound/SoundModule.h"
 #include "Map/PortalMap/PortalMap.h"
+#include "Map/PortalMap/PortalMapResource.h"
 #include <memory.h>
 
 void ZEScene::SetVisualDebugElements(ZEDWORD VisualDebugElements)
@@ -149,7 +150,13 @@ void ZEScene::Destroy()
 		Map->Destroy();
 		Map = NULL;
 	}
-	
+
+	if (MapResource != NULL)
+	{
+		MapResource->Release();
+		MapResource = NULL;
+	}
+
 	if (PhysicalWorld != NULL)
 	{
 		PhysicalWorld->Destroy();
@@ -487,24 +494,24 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 }
 
 
-bool ZEScene::LoadEnvironment(const char* FileName)
+bool ZEScene::LoadMap(const char* FileName)
 {
 	zeLog("Scene", "Loading environment.");
 
-	if (Map != NULL)
-		Map->Deinitialize();
-	else
+	if (Map == NULL)
 		Map = ZEPortalMap::CreateInstance();
 
-	if (!Map->Load(FileName))
+	ZEPortalMapResource* MapResource = ZEPortalMapResource::LoadResource(FileName);
+	if (MapResource == NULL)
 	{
-		zeError("Scene", "Can not load environment.");
+		zeError("Scene", "Can not load map file.");
 		return false;
 	}
 
+	Map->SetResource(MapResource);
 	if (!Map->Initialize())
 	{
-		zeError("Scene", "Can not initialize environment.");
+		zeError("Scene", "Can not initialize map.");
 		return false;
 	}
 	
@@ -566,7 +573,7 @@ bool ZEScene::Load(const char* FileName)
 		char MapFile[ZE_MAX_FILE_NAME_SIZE];
 		Unserializer.Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
 		Map->Initialize();
-		if (!Map->Load(MapFile))
+		if (!LoadMap(MapFile))
 		{ 
 			zeError("Scene", "Unserialization can not load map file. (Map File : \"%s\")", MapFile);
 			zeError("Scene", "Unserialization failed.");

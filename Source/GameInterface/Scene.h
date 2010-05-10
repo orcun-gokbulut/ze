@@ -38,11 +38,19 @@
 #define __ZE_SCENE_H__
 
 #include "ZEDS/Array.h"
-#include "Entity.h"
-#include "Map/Map.h"
-#include "Portal.h"
-#include "Graphics/FixedMaterial.h"
 #include "SceneDebugDraw.h"
+
+class ZEViewVolume;
+class ZEBoundingBox;
+class ZECamera;
+class ZEListener;
+class ZEShadowRenderer;
+class ZEPostProcessor;
+class ZEFixedMaterial;
+class ZEEntity;
+class ZEPhysicalWorld;
+class ZEPortalMap;
+class ZEPortalMapResource;
 
 #define ZE_RCF_ENTITY								1
 #define ZE_RCF_COMPONENT							2
@@ -70,16 +78,7 @@ class ZESceneBridge
 	virtual void*								OnEntityChanged(ZEEntity* Entity) = 0;
 };
 
-class ZEViewVolume;
-class ZEBoundingBox;
-class ZECamera;
-class ZEListener;
-class ZEShadowRenderer;
-class ZEPostProcessor;
-class ZEFixedMaterial;
-class ZEEntity;
-class ZEPhysicalWorld;
-class ZEPortalMap;
+
 
 struct ZECullStatistics
 {
@@ -106,10 +105,12 @@ class ZEScene
 		unsigned int							LastEntityId;
 
 		ZEPortalMap*							Map;
+		ZEPortalMapResource*					MapResource;
+
 		ZESmartArray<ZEEntity*>					Entities;
 
 		ZEPhysicalWorld*						PhysicalWorld;
-	
+
 		ZERenderer*								Renderer;
 		ZEPostProcessor*						PostProcessor;
 		ZEShadowRenderer*						ShadowRenderer;
@@ -144,7 +145,7 @@ class ZEScene
 		const ZECullStatistics&					GetCullStatistics();
 
 		virtual void							CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bool LightsEnabled = true);
-		bool									LoadEnvironment(const char* FileName);
+		bool									LoadMap(const char* FileName);
 
 		bool									Save(const char* FileName);
 		bool									Load(const char* FileName);

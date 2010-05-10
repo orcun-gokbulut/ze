@@ -41,6 +41,7 @@
 #include "ParticleEffect.h"
 #include "ParticleSystem.h"
 #include "Graphics/SimpleMaterial.h"
+#include "Graphics/FixedMaterial.h"
 
 void ZEParticleSystem::UpdateVertexBuffer() //Bitmedi
 {

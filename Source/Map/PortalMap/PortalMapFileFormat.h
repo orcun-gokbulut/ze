@@ -50,12 +50,11 @@
 #define ZE_FILE_FORMAT_GETMINORVERSION(x) ((ZEDWORD)((x) & 0x0000FFFF))
 #define ZE_FILE_FORMAT_GETMAJORVERSION(x) ((ZEDWORD)(((x) & 0xFFFF0000) >> 16))
 
-#define ZE_MAP_VERSION ZE_FILE_FORMAT_MAKEVERSION(0, 4)
+#define ZE_MAP_VERSION ZE_FILE_FORMAT_MAKEVERSION(0, 5)
 
 #define ZE_MAP_HEADER ((ZEDWORD)((ZEDWORD)'ZEMF' + (ZEDWORD)'MAP '))
 #define ZE_MAP_MATERIAL_CHUNK ((ZEDWORD)(ZE_MAP_HEADER + (ZEDWORD)'MTRL'))
 #define ZE_MAP_PORTAL_CHUNK ((ZEDWORD)(ZE_MAP_HEADER + (ZEDWORD)'PRTL'))
-#define ZE_MAP_PORTAL_DOOR_IDS_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'IDS '))
 #define ZE_MAP_PORTAL_DOOR_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'DOOR'))
 #define ZE_MAP_BRUSHE_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'BRSH'))
 #define ZE_MAP_POLYGONS_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'PLYG'))
@@ -132,12 +131,12 @@ struct ZEMapFileOctreeChunk
 	ZEDWORD							PolygonCount;
 };
 
-struct ZEMapFilePortalDoorChunk
+struct ZEMapFileDoorChunk
 {
 	ZEDWORD							ChunkIdentifier;
 	char							Name[ZE_MAP_MAX_NAME_SIZE];
 	ZERectangle3D					Rectangle;
-	ZEDWORD							DestinationPortal;
+	ZEDWORD							PortalIds[2];
 	bool							IsOpen;
 };
 
@@ -146,7 +145,6 @@ struct ZEMapFilePortalChunk
 	ZEDWORD							ChunkIdentifier;
 	char							Name[ZE_MAP_MAX_NAME_SIZE];
 	ZEAABoundingBox					BoundingBox;
-	ZEDWORD							DoorIdCount;
 	ZEDWORD							PolygonCount;
 	ZEDWORD							BrushCount;
 	bool							HasOctree;
@@ -167,7 +165,7 @@ struct ZEMapFileHeader
 
 	ZEDWORD							MaterialCount;
 	ZEDWORD							PortalCount;
-	ZEDWORD							EntityCount;
+	ZEDWORD							DoorCount;
 
 };
 

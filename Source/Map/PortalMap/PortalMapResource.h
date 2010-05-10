@@ -35,8 +35,9 @@
 
 #pragma once
 #ifndef __ZE_PORTAL_MAP_RESOURCE_H__
-#define __ZE_PORTLA_MAP_RESOURCE_H__
+#define __ZE_PORTAL_MAP_RESOURCE_H__
 
+#include "../MapResource.h"
 #include "ZEDS/Array.h"
 #include "ZEMath/Vector.h"
 #include "ZEMath/Rectangle3D.h"
@@ -47,18 +48,20 @@
 #include "PortalMapPortalOctree.h"
 
 class ZEMaterial;
+class ZETexture2D;
 class ZETexture2DResource;
+class ZEPortalMapResourceDoor;
 
 struct ZEPortalMapPolygon
 {
-	ZEMapVertex							Vertices[3];
-	ZEMaterial*							Material;
-	unsigned int						LastIteration;
+	ZEMapVertex		Vertices[3];
+	ZEMaterial*		Material;
+	unsigned int	LastIteration;
 };
 
 struct ZEPortalMapPhysicalMeshPolygon
 {
-	ZEDWORD								Indices[3];
+	ZEDWORD			Indices[3];
 };
 
 struct ZEPortalMapResourcePhysicalMesh
@@ -69,44 +72,53 @@ struct ZEPortalMapResourcePhysicalMesh
 
 struct ZEPortalMapResourcePortal
 {
-	char								Name[ZE_MAX_NAME_SIZE];
-	ZEAABoundingBox						BoundingBox;
-	ZEArray<size_t>						DoorIds;
-	ZEArray<ZEPortalMapPolygon>			Polygons;
-	ZEPortalMapResourcePhysicalMesh		PhysicalMesh;
-	bool								HasOctree;
-	//ZEPortalMapOctree					Octree;
-	bool								HasPhysicalMesh;
+	char										Name[ZE_MAX_NAME_SIZE];
+	ZEAABoundingBox								BoundingBox;
+	ZEArray<ZEPortalMapResourceDoor*>			Doors;
+	ZEArray<size_t>								DoorIds;
+	ZEArray<ZEPortalMapPolygon>					Polygons;
+	ZEPortalMapResourcePhysicalMesh				PhysicalMesh;
+	bool										HasOctree;
+	//ZEPortalMapOctree							Octree;
+	bool										HasPhysicalMesh;
 };
 
-struct ZEPortalMapResourcePortalDoor
+struct ZEPortalMapResourceDoor
 {
-	char								Name[ZE_MAX_NAME_SIZE];
-	ZERectangle3D						Rectangle;
-	ZEPortalMapResourcePortal*			DestinationPortal;
-	bool								IsOpen;
+	char										Name[ZE_MAX_NAME_SIZE];
+	ZERectangle3D								Rectangle;
+	ZEPortalMapResourcePortal*					Portals[2];
+	size_t										PortalIds[2];
+	bool										IsOpen;
 };
 
-class ZEPortalMapResource : public ZEResource
+class ZEPortalMapResource : public ZEMapResource
 {
-	private:
-		ZESmartArray<ZETexture2DResource*>				TextureResources;
-		ZEArray<ZEMaterial*>							Materials;
-		ZEArray<ZEPortalMapResourcePortalDoor>			PortalDoors;
-		ZEArray<ZEPortalMapResourcePortal>				Portals;
+private:
+	ZESmartArray<ZETexture2DResource*>				TextureResources;
+	ZEArray<ZEMaterial*>							Materials;
+	ZEArray<ZEPortalMapResourceDoor>				PortalDoors;
+	ZEArray<ZEPortalMapResourcePortal>				Portals;
 
-		virtual											~ZEPortalMapResource();
+	const ZETexture2D*								ManageMapMaterialTextures(char* FileName);
+	bool  											ReadMaterialsFromFile(ZEResourceFile* ResourceFile);
+	bool  											ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourcePortal* Portal);
+	bool  											ReadPortalsFromFile(ZEResourceFile* ResourceFile);
+	bool  											ReadDoorsFromFile(ZEResourceFile* ResourceFile);
+	bool  											ReadMapFromFile(ZEResourceFile* ResourceFile);
 
-	public:
-		const char*										GetResourceType() const;
-		
-		const ZEArray<ZETexture2DResource*>&			GetTextures();
-		const ZEArray<ZEMaterial*>&						GetMaterials();
-		const ZEArray<ZEPortalMapResourcePortal>&		GetPortals();
-		const ZEArray<ZEPortalMapResourcePortalDoor>&	GetPortalDoors();
+	virtual											~ZEPortalMapResource();
 
-		static ZEPortalMapResource*						LoadResource(const char* FileName);
-		static const ZEPortalMapResource*				LoadSharedResource(const char* FileName);
-		static void										CacheResource(const char* FileName);
+public:
+	const char*										GetResourceType() const;
+
+	const ZEArray<ZETexture2DResource*>&			GetTextures();
+	const ZEArray<ZEMaterial*>&						GetMaterials();
+	const ZEArray<ZEPortalMapResourcePortal>&		GetPortals();
+	const ZEArray<ZEPortalMapResourceDoor>&			GetDoors();
+
+	static ZEPortalMapResource*						LoadResource(const char* FileName);
+	static const ZEPortalMapResource*				LoadSharedResource(const char* FileName);
+	static void										CacheResource(const char* FileName);
 };
 #endif

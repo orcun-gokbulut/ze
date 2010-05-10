@@ -703,11 +703,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
@@ -2027,11 +2027,31 @@
 				RelativePath=".\Source\Map\Map.h"
 				>
 			</File>
+			<File
+				RelativePath=".\Source\Map\MapResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Map\MapResource.h"
+				>
+			</File>
 			<Filter
 				Name="PortalMap"
 				>
 				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMap.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\Map\PortalMap\PortalMap.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapDoor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapDoor.h"
 					>
 				</File>
 				<File
@@ -2039,11 +2059,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapPortal.h"
+					RelativePath=".\Source\Map\PortalMap\PortalMapPortal.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapPortalDoor.h"
+					RelativePath=".\Source\Map\PortalMap\PortalMapPortal.h"
 					>
 				</File>
 				<File

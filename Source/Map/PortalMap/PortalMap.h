@@ -40,34 +40,36 @@
 #include "../Map.h"
 #include "ZEDS/Array.h"
 
+class ZEPortalMapResource;
 class ZEPortalMapPortal;
-class ZEPortalMapPortalDoor;
+class ZEPortalMapDoor;
 class ZERenderer;
-class ZEViewVolume;
 class ZELight;
 
 class ZEPortalMap : public ZEMap
 {
 	private:
-		ZEArray<ZEPortalMapPortal>			Portals;
-		ZEArray<ZEPortalMapPortalDoor>		PortalDoors;
+		ZEPortalMapResource*					Resource;
+		ZEArray<ZEPortalMapPortal>				Portals;
+		ZEArray<ZEPortalMapDoor>				PortalDoors;
 
-											ZEPortalMap();
-											~ZEPortalMap();
+												ZEPortalMap();
+												~ZEPortalMap();
 
 	public:	
-		ZEArray<ZEPortalMapPortal>&			GetPortals();
-		ZEArray<ZEPortalMapPortalDoor>&		GetPortalDoors();
+		const ZEArray<ZEPortalMapPortal>&		GetPortals();
+		const ZEArray<ZEPortalMapDoor>&			GetDoors();
 
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
+		virtual bool							Initialize();
+		virtual void							Deinitialize();
 
-		virtual void						Render(ZERenderer* Renderer, ZESmartArray<ZELight*>& Lights);
-		virtual bool						CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT);
+		virtual void							Render(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
+		virtual bool							CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT);
 
-		virtual bool						Load(const char* FileName);
+		virtual bool							SetResource(ZEMapResource* Resource);
+		virtual ZEMapResource*					GetResource();
 										
-		static ZEPortalMap*					CreateInstance();
+		static ZEPortalMap*						CreateInstance();
 
 };
 #endif

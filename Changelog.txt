@@ -315,3 +315,11 @@
 [6 May 2010 - Revision 176 - Orcun]
 	FIX: ZED3D9FixedMaterial, ZED3D9SimpleMaterial ZE_ROF_VIEW_TRANSFORM and ZE_ROF_PROJECTION_TRANSFORM bug fixed.
 	CHG: ZEPhysicalStaticObject renamed to ZEPhysicalStaticRigidBody.
+	
+[10 May 2010 - Revision 182 - Orcun]
+	CHG: ZEMap sub-system has been revised.
+	ADD: ZEMap abstract class (interface) added to ZEMap system.
+	ADD: ZEPortalMap, ZEPortalMapPortal, ZEPortalMapDoor components added to ZEMap subsystem.
+	CHG: ZEMap file format has been changed. DoorCount attribute has added to head chunk and Entity count has removed from head chunk. Portal Door's are now dicreet entities in ZEMap file.
+	
+	

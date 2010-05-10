@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMapPortal.h
+ Zinek Engine - PortalMapDoor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,39 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PORTAL_MAP_PORTAL_H__
-#define __ZE_PORTAL_MAP_PORTAL_H__
+#ifndef __ZE_PORTAL_MAP_DOOR_H__
+#define __ZE_PORTAL_MAP_DOOR_H__
 
-#include "ZEDS/Array.h"
-#include "Graphics/RenderOrder.h"
+#include "ZEMath/Rectangle3D.h"
 
 class ZEPortalMap;
-class ZEPortalMapDoor;
-class ZEPortalMapResourcePortal;
-class ZEVertexBuffer;
-class ZERenderer;
-class ZELight;
-class ZEPhysicalStaticMesh;
+class ZEPortalMapPortal;
+class ZEPortalMapResourceDoor;
 
-class ZEPortalMapPortal
+class ZEPortalMapDoor
 {
-	friend class ZEPortalMap;
 	private:
-		ZEPortalMap*						Owner;
-		ZEPortalMapResourcePortal*			Resource;
-		ZEVertexBuffer*						VertexBuffer;
-		ZEArray<ZERenderOrder>				RenderOrders;
-		ZEArray<ZEPortalMapDoor*>			Doors;
-		ZEPhysicalStaticMesh*				PhysicalMesh;
+		ZEPortalMap*				Owner;
+		ZEPortalMapResourceDoor*	Resource;
+		ZERectangle3D				Rectangle;
+		ZEPortalMapPortal*			Portals[2];
+		bool						Open;
 
 	public:
-		ZEPortalMap*						GetOwner();
-		const char*							GetName();
+		ZEPortalMap*				GetOwner();
 
-		const ZEArray<ZEPortalMapDoor*>&	GetDoors();
-		const ZEAABoundingBox&				GetBoundingBox();
-		ZEPhysicalStaticMesh*				GetPhysicalMesh();
+		const char*					GetName();
 
-		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);
-		void								Deinitialize();
+		ZEPortalMapPortal**			GetPortals();
+		const ZERectangle3D&		GetRectangle();
 
-		void								Draw(ZERenderer* Renderer,  const ZESmartArray<const ZERLLight*>& Lights);
+		void						Initialize(ZEPortalMap* Owner, ZEPortalMapResourceDoor* Resource);
+		void						Deinitialize();
 
-											ZEPortalMapPortal();
+		void						SetOpen(bool Open);
+		bool						GetOpen();
+
+									ZEPortalMapDoor();
 };
 
 #endif

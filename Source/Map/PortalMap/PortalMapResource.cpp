@@ -60,7 +60,7 @@
 #define ZESHADER_LIGHTMAP					1024
 #define ZESHADER_DISTORTIONMAP				2048
 
-static const ZETexture2D* ManageMapMaterialTextures(char* FileName, ZESmartArray<ZETexture2DResource*>& TextureResources)
+const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(char* FileName)
 {
 	if (strncmp(FileName, "", ZE_MAP_MAX_FILENAME_SIZE) == 0)
 		return NULL;
@@ -79,7 +79,7 @@ static const ZETexture2D* ManageMapMaterialTextures(char* FileName, ZESmartArray
 	return NewTextureResource->GetTexture();
 }
 
-static bool ReadMaterialsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMaterial*>& Materials, ZESmartArray<ZETexture2DResource*>& TextureResources)
+bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 {
 	ZEMapFileMaterialChunk MaterialChunk;
 	// Read materials
@@ -107,7 +107,7 @@ static bool ReadMaterialsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMateri
 		CurrentMaterial->SetTwoSided(MaterialChunk.TwoSided);
 		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
-		CurrentMaterial->SetTransparancyMode(MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE: ZE_MTM_NOTRANSPARACY);
+		CurrentMaterial->SetTransparancyMode(MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE : ZE_MTM_NOTRANSPARACY);
 
 		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor);
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);
@@ -120,24 +120,24 @@ static bool ReadMaterialsFromFile(ZEResourceFile* ResourceFile, ZEArray<ZEMateri
 		CurrentMaterial->SetRefractionFactor(MaterialChunk.RefractionFactor);
 		CurrentMaterial->SetDetailMapTiling(MaterialChunk.DetailMapTiling);
 
-		CurrentMaterial->SetDiffuseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap, TextureResources));
+		CurrentMaterial->SetDiffuseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap));
 		
 		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_NORMALMAP);
-		CurrentMaterial->SetNormalMap(ManageMapMaterialTextures(MaterialChunk.NormalMap, TextureResources));
-		CurrentMaterial->SetSpecularMap(ManageMapMaterialTextures(MaterialChunk.SpecularMap, TextureResources));
-		CurrentMaterial->SetEmmisiveMap(ManageMapMaterialTextures(MaterialChunk.EmmisiveMap, TextureResources));
-		CurrentMaterial->SetOpacityMap(ManageMapMaterialTextures(MaterialChunk.OpacityMap, TextureResources));
+		CurrentMaterial->SetNormalMap(ManageMapMaterialTextures(MaterialChunk.NormalMap));
+		CurrentMaterial->SetSpecularMap(ManageMapMaterialTextures(MaterialChunk.SpecularMap));
+		CurrentMaterial->SetEmmisiveMap(ManageMapMaterialTextures(MaterialChunk.EmmisiveMap));
+		CurrentMaterial->SetOpacityMap(ManageMapMaterialTextures(MaterialChunk.OpacityMap));
 		
 		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_DETAILNORMALMAP);
-		CurrentMaterial->SetDetailDiffuseMap(ManageMapMaterialTextures(MaterialChunk.DetailMap, TextureResources));
-		CurrentMaterial->SetDetailNormalMap(ManageMapMaterialTextures(MaterialChunk.DetailNormalMap, TextureResources));
+		CurrentMaterial->SetDetailDiffuseMap(ManageMapMaterialTextures(MaterialChunk.DetailMap));
+		CurrentMaterial->SetDetailNormalMap(ManageMapMaterialTextures(MaterialChunk.DetailNormalMap));
 		CurrentMaterial->SetReflectionEnabled(false);
-		CurrentMaterial->SetRefractionMap(NULL);//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap, TextureResources);
+		CurrentMaterial->SetRefractionMap(NULL);//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap);
 		CurrentMaterial->SetRefractionEnabled(false);
 		CurrentMaterial->SetRefractionMap(NULL);
 
 		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_LIGHTMAP);
-		CurrentMaterial->SetLightMap(ManageMapMaterialTextures(MaterialChunk.LightMap, TextureResources));
+		CurrentMaterial->SetLightMap(ManageMapMaterialTextures(MaterialChunk.LightMap));
 
 		CurrentMaterial->UpdateMaterial();
 	}
@@ -259,7 +259,7 @@ static bool ReadOctreeFromFile(ZEResourceFile* ResourceFile, ZEOctree** Octree, 
 	return true;
 }*/
 
-static bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourcePortal* Portal)
+bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourcePortal* Portal)
 {
 	// Read physical mesh header
 	ZEMapFilePhysicalMeshChunk FilePhysicalMesh;
@@ -302,14 +302,14 @@ static bool ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapRe
 	return true;
 }
 
-static bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResource* MapResoruce)
+bool ZEPortalMapResource::ReadPortalsFromFile(ZEResourceFile* ResourceFile)
 {
 	ZEDWORD ChunkIdentifier;
 	ZEMapFilePortalChunk FilePortal;
 
-	for (size_t I = 0; I < MapResoruce->Portals.GetCount(); I++)
+	for (size_t I = 0; I < Portals.GetCount(); I++)
 	{
-		ZEPortalMapResourcePortal* Portal = &MapResoruce->Portals[I];
+		ZEPortalMapResourcePortal* Portal = &Portals[I];
 
 		ResourceFile->Read(&FilePortal, sizeof(ZEMapFilePortalChunk), 1);
 
@@ -321,21 +321,11 @@ static bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourc
 
 		strncpy(Portal->Name, FilePortal.Name, ZE_MAP_MAX_NAME_SIZE);
 		Portal->BoundingBox = FilePortal.BoundingBox;
-		Portal->DoorIds.SetCount(FilePortal.DoorIdCount);
 		Portal->Polygons.SetCount(FilePortal.PolygonCount);
 		Portal->HasPhysicalMesh = FilePortal.HasPhysicalMesh;
 		Portal->HasOctree = FilePortal.HasOctree;
 //		Portal->Octree = NULL;
 
-		// Read portal doors ids
-		ZEDWORD Header;
-		ResourceFile->Read(&Header, sizeof(ZEDWORD), 1);
-		if (Header != ZE_MAP_PORTAL_DOOR_IDS_CHUNK)
-		{
-			zeError("Map Resource", "Portal door ids chunk's id does not match.");
-			return false;
-		}
-		ResourceFile->Read(Portal->DoorIds.GetCArray(), sizeof(ZEDWORD), Portal->DoorIds.GetCount());
 
 		// Read Octree
 		if (FilePortal.HasOctree)
@@ -362,7 +352,7 @@ static bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourc
 			ResourceFile->Read(MapPolygons.GetCArray(), sizeof(ZEMapFilePolygonChunk), MapPolygons.GetCount());
 			for (size_t I = 0; I < Portal->Polygons.GetCount(); I++)
 			{
-				Portal->Polygons[I].Material = MapResoruce->Materials[MapPolygons[I].Material];
+				Portal->Polygons[I].Material = Materials[MapPolygons[I].Material];
 				Portal->Polygons[I].LastIteration = 0;
 				Portal->Polygons[I].Vertices[0] = *(ZEMapVertex*)&MapPolygons[I].Vertices[0];
 				Portal->Polygons[I].Vertices[1] = *(ZEMapVertex*)&MapPolygons[I].Vertices[1];
@@ -378,13 +368,13 @@ static bool ReadPortalsFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourc
 	return true;
 }
 
-static bool ReadPortalDoorsFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResource* MapResource)
+bool ZEPortalMapResource::ReadDoorsFromFile(ZEResourceFile* ResourceFile)
 { 
-	for (size_t I = 0; I < MapResource->PortalDoors.GetCount(); I++)
+	for (size_t I = 0; I < PortalDoors.GetCount(); I++)
 	{
-		ZEPortalMapResourcePortalDoor* Door = &MapResource->PortalDoors[I];
+		ZEPortalMapResourceDoor* Door = &PortalDoors[I];
 		
-		ZEMapFilePortalDoorChunk FileDoor;
+		ZEMapFileDoorChunk FileDoor;
 		ResourceFile->Read(&FileDoor, sizeof(ZEDWORD), 1);
 
 		if (FileDoor.ChunkIdentifier != ZE_MAP_PORTAL_DOOR_CHUNK)
@@ -395,12 +385,21 @@ static bool ReadPortalDoorsFromFile(ZEResourceFile* ResourceFile, ZEPortalMapRes
 
 		strncpy(Door->Name, FileDoor.Name, ZE_MAX_NAME_SIZE);
 		Door->Rectangle = FileDoor.Rectangle;
-		Door->DestinationPortal = &Portals[FileDoor.DestinationPortal];
 		Door->IsOpen = FileDoor.IsOpen;
+
+		Door->PortalIds[0] = FileDoor.PortalIds[0];
+		Door->Portals[0] = &Portals[Door->PortalIds[0]];
+		Door->Portals[0]->DoorIds.Add(I);
+		Door->Portals[0]->Doors.Add(Door);
+
+		Door->PortalIds[1] = FileDoor.PortalIds[1];
+		Door->Portals[1] = &Portals[Door->PortalIds[1]];
+		Door->Portals[1]->DoorIds.Add(I);
+		Door->Portals[1]->Doors.Add(Door);
 	}
 }
 
-static bool ReadMapFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResource* Map)
+bool ZEPortalMapResource::ReadMapFromFile(ZEResourceFile* ResourceFile)
 {
 	ZEMapFileHeader TempHeader;
 	ResourceFile->Read(&TempHeader, sizeof(ZEMapFileHeader), 1);
@@ -417,34 +416,22 @@ static bool ReadMapFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResource* M
 		return false;
 	}
 
-	Map->Portals.SetCount(TempHeader.PortalCount);
-	Map->Materials.SetCount(TempHeader.MaterialCount);
+	Portals.SetCount(TempHeader.PortalCount);
+	Materials.SetCount(TempHeader.MaterialCount);
 
-	if (!ReadMaterialsFromFile(ResourceFile, Map->Materials, Map->TextureResources))
+	if (!ReadMaterialsFromFile(ResourceFile))
 	{
 		zeError("Map Resource", "File is corrupted. Can not read materials from file. (FileName : \"%s\")", ResourceFile->GetFileName());
 		return false;
 	}
 
-	if (!ReadPortalsFromFile(ResourceFile, Map->Portals, Map->Materials, Map->PortalDoors))
+	if (!ReadPortalsFromFile(ResourceFile))
 	{
 		zeError("Map Resource", "File is corrupted. Can not read portals from file. (FileName : \"%s\")", ResourceFile->GetFileName());
 		return false;
 	}
 
 	return true;
-}
-
-ZEPortalMapPortalResource::ZEPortalMapPortalResource()
-{
-	VertexBuffer = NULL;
-	Octree = NULL;
-}
-
-ZEPortalMapPortalResource::~ZEPortalMapPortalResource()
-{
-	if (Octree != NULL)
-		delete Octree;
 }
 
 const char* ZEPortalMapResource::GetResourceType() const
@@ -455,7 +442,7 @@ const char* ZEPortalMapResource::GetResourceType() const
 const ZEPortalMapResource* ZEPortalMapResource::LoadSharedResource(const char* FileName)
 {
 	// Try to get instance of shared ZEMap file from resource manager
-	ZEMapResource* Resource = (ZEMapResource*)zeResources->GetResource(FileName);
+	ZEPortalMapResource* Resource = (ZEPortalMapResource*)zeResources->GetResource(FileName);
 	
 	if (Resource != NULL)
 		return Resource;
@@ -476,10 +463,10 @@ const ZEPortalMapResource* ZEPortalMapResource::LoadSharedResource(const char* F
 	}
 }
 
-void ZEMapResource::CacheResource(const char* FileName)
+void ZEPortalMapResource::CacheResource(const char* FileName)
 {
 	// Try to get instance of shared ZEMap file from resource manager
-	ZEMapResource* Resource = (ZEMapResource*)zeResources->GetResource(FileName);
+	ZEPortalMapResource* Resource = (ZEPortalMapResource*)zeResources->GetResource(FileName);
 	if (Resource != NULL)
 		Resource->Cached = true;
 	else
@@ -496,19 +483,19 @@ void ZEMapResource::CacheResource(const char* FileName)
 	}
 }
 
-ZEPortalMapResource* ZEMapResource::LoadResource(const char* FileName)
+ZEPortalMapResource* ZEPortalMapResource::LoadResource(const char* FileName)
 {
 	// Open ZEMap file
 	ZEResourceFile ResourceFile;
 	if (ResourceFile.Open(FileName))
 	{
 		// Create ZEMapResource
-		ZEMapResource* MapResource = new ZEMapResource();
+		ZEPortalMapResource* MapResource = new ZEPortalMapResource();
 		MapResource->SetFileName(FileName);
 		MapResource->Cached = false;
 		MapResource->ReferenceCount = 0;
 
-		if (!ReadMapFromFile(&ResourceFile, MapResource))
+		if (!MapResource->ReadMapFromFile(&ResourceFile))
 		{
 			zeError("Map Resource", "Can not load map resource. (FileName : \"%s\")", FileName);
 			ResourceFile.Close();
