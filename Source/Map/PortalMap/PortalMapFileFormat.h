@@ -146,7 +146,6 @@ struct ZEMapFilePortalChunk
 	char							Name[ZE_MAP_MAX_NAME_SIZE];
 	ZEAABoundingBox					BoundingBox;
 	ZEDWORD							PolygonCount;
-	ZEDWORD							BrushCount;
 	bool							HasOctree;
 	bool							HasPhysicalMesh;
 };

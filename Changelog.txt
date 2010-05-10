@@ -321,5 +321,7 @@
 	ADD: ZEMap abstract class (interface) added to ZEMap system.
 	ADD: ZEPortalMap, ZEPortalMapPortal, ZEPortalMapDoor components added to ZEMap subsystem.
 	CHG: ZEMap file format has been changed. DoorCount attribute has added to head chunk and Entity count has removed from head chunk. Portal Door's are now dicreet entities in ZEMap file.
-	
+	REM: Entity data removed from ZEMap file.
+	REM: Portal brushes removed from ZEMap file.
+	ADD: ZEPortalMapOctree component added.
 	
