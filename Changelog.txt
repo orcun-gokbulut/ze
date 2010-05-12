@@ -315,3 +315,9 @@
 [6 May 2010 - Revision 176 - Orcun]
 	FIX: ZED3D9FixedMaterial, ZED3D9SimpleMaterial ZE_ROF_VIEW_TRANSFORM and ZE_ROF_PROJECTION_TRANSFORM bug fixed.
 	CHG: ZEPhysicalStaticObject renamed to ZEPhysicalStaticRigidBody.
+	
+[12 May 2010 - Revision 183 - Hakan]
+	FIX: ZEEntity::GetWorldBoundingBox() DirtyFlag bug fixed.
+	FIX: ZEError::LogFileName initial termination escape character bug fixed.
+	FIX: ZEAABoundingBox::IntersectionTest point version has been fixed.
+	

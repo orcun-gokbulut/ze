@@ -43,6 +43,7 @@
 #include "GameInterface/Player.h"
 #include "GameInterface/CanvasBrush.h"
 #include "GameInterface/Scene.h"
+#include "GameInterface/Trigger.h"
 #include "Physics/PhysicsModule.h"
 #include "Physics/PhysicalWorld.h"
 #include "Physics/PhysicalRigidBody.h"
@@ -71,6 +72,11 @@ void ZEPhysicsDebugComponent::TransformChanged(const ZEPhysicalTransformChange& 
 void ZEPhysicsDebugComponent::ColisionDetected(const ZEPhysicalCollision& Collision)
 {
 	zeLog("Physical Object", "Collision Occured: Object1 : %x, Object2 : %x", Collision.Collider1, Collision.Collider2);
+}
+
+void TriggerCallback(ZETrigger* Trigger, ZEEntity* Entity)
+{
+	zeLog("Trigger Callback", "Entity \"%s\" has triggered Trigger \"%s\".", Entity->GetName(), Trigger->GetName());
 }
 
 bool ZEPhysicsDebugComponent::Initialize()
@@ -176,10 +182,19 @@ bool ZEPhysicsDebugComponent::Initialize()
 		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);
 		World->SetEnabled(true);
+
+		ZETrigger* Trigger = new ZETrigger();
+		Trigger->SetName("Test Trigger");
+		Trigger->SetCallback(&TriggerCallback);
+		//Trigger->SetPosition(ZEVector3(10.0f, 10.0f, 10.0f));
+		Trigger->SetScale(ZEVector3(2.0f, 2.0f, 2.0f));
+
+		Scene->AddEntity(Trigger);
 	}
 
 	return true;
 }
+
 
 void ZEPhysicsDebugComponent::Deinitialize()
 {

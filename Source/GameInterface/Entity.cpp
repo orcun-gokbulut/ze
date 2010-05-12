@@ -197,7 +197,7 @@ const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 		if (NoBoundingBox == true)
 			WorldBoundingBox.Max = WorldBoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
 
-		DrawFlags &= ~ZE_EDF_WORLD_BOUNDING_BOX;
+		DirtyFlags &= ~ZE_EDF_WORLD_BOUNDING_BOX;
 	}
 
 	return WorldBoundingBox;

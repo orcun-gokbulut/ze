@@ -188,7 +188,9 @@ void ZEAABoundingBox::GenerateOBoundingBox(ZEOBoundingBox& BoundingBox, const ZE
 
 bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZEVector3 Point)
 {
-	return (BoundingBox.Min.x >= Point.x) && (BoundingBox.Min.y >= Point.y) && (BoundingBox.Min.z >= Point.z) && (BoundingBox.Max.x >= Point.x) && (BoundingBox.Max.y >= Point.y) && (BoundingBox.Max.z >= Point.z);
+	return (BoundingBox.Min.x <= Point.x) && (BoundingBox.Max.x >= Point.x) &&
+		(BoundingBox.Min.y <= Point.y) && (BoundingBox.Max.y >= Point.y) && 
+		(BoundingBox.Min.z <= Point.z) && (BoundingBox.Max.z >= Point.z);
 }
 
 bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZELine& Line)
