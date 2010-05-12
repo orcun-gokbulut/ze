@@ -36,6 +36,7 @@
 #include "TextureCubeResource.h"
 #include "TextureCube.h"
 #include "Core/Error.h"
+#include "Core/Console.h"
 #include "Core/ResourceManager.h"
 #include <freeimage.h>
 
@@ -129,6 +130,8 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(const char* FileName)
 
 ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* ResourceFile)
 {
+	zeLog("TextureCube Resource", "Loading texture file \"%s\".", ResourceFile->GetFileName());
+
 	FreeImageIO Callbacks;
 	Callbacks.read_proc = &FreeImageFile_Read_Cube;
 	Callbacks.seek_proc = &FreeImageFile_Seek_Cube;
@@ -236,6 +239,9 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 	TextureResource->SetFileName(ResourceFile->GetFileName());
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
+
+	zeLog("TextureCube Resource", "Texture file \"%s\" has been loaded.", ResourceFile->GetFileName());
+
 	return TextureResource;	
 }
 

@@ -329,3 +329,6 @@
 	FIX: ZEPortalMap file structures fixed.
 	ADD: Major improvements on ZEPortalMap.
 	FIX: ZEPortalMap file has been loaded.
+	
+[13 May 2010 - Revision 184 - Orcun]
+	ADD: Resource file loading log messages added all resource files.

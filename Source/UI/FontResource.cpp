@@ -37,6 +37,7 @@
 #include "Graphics/UIMaterial.h"
 #include "Graphics/Texture2DResource.h"
 #include "Core/ResourceManager.h"
+#include "Core/Console.h"
 #include "Core/Error.h"
 #include "Core/ResourceFile.h"
 #include "FontFile.h"
@@ -67,6 +68,8 @@ const ZEFontCharacter& ZEFontResource::GetCharacter(char Character)
 
 ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 {
+	zeLog("Font Resource", "Loading font file \"%s\".", ResourceFile->GetFileName());
+
 	ZEFontFileHeader FileHeader;
 
 	ResourceFile->Read(&FileHeader, sizeof(ZEFontFileHeader), 1);
@@ -111,6 +114,8 @@ ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 		NewResource->Characters[I].Texture = NewResource->TextureResources[FileHeader.Characters[I].TextureId]->GetTexture();
 		NewResource->Characters[I].Material = NewResource->Materials[FileHeader.Characters[I].TextureId];
 	}
+
+	zeLog("Font Resource", "Font file \"%s\" has been loaded.", ResourceFile->GetFileName());
 
 	return NewResource;
 }

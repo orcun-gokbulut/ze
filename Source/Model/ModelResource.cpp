@@ -35,6 +35,7 @@
 
 #include "ModelResource.h"
 #include "Core/ResourceManager.h"
+#include "Core/Console.h"
 #include "Core/Error.h"
 #include "Graphics/GraphicsModule.h"
 #include "Graphics/Texture2DResource.h"
@@ -635,6 +636,7 @@ static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEResourceFile* Resou
 
 static bool ReadModelFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 {
+	zeLog("Model Resource", "Loading model file \"%s\".", ResourceFile->GetFileName());
 	ZEModelFileHeaderChunk HeaderChunk;
 	ResourceFile->Read(&HeaderChunk, sizeof(ZEModelFileHeaderChunk), 1);
 
@@ -677,6 +679,8 @@ static bool ReadModelFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFi
 		zeError("Model Resource", "Corrupted ZEModel file. Can not read model file.");
 		return false;
 	}
+
+	zeLog("Model Resource", "Model file \"%s\" loaded.", ResourceFile->GetFileName());
 
 	return true;
 }

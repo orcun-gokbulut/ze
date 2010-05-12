@@ -38,6 +38,7 @@
 #include "PortalMapPortalOctree.h"
 
 #include "Core/Error.h"
+#include "Core/Console.h"
 #include "Core/Resource.h"
 #include "Core/ResourceFile.h"
 #include "Core/ResourceManager.h"
@@ -404,6 +405,8 @@ bool ZEPortalMapResource::ReadDoorsFromFile(ZEResourceFile* ResourceFile)
 
 bool ZEPortalMapResource::ReadMapFromFile(ZEResourceFile* ResourceFile)
 {
+	zeLog("Portal Map Resource", "Loading map file \"%s\".", ResourceFile->GetFileName());
+
 	ZEMapFileHeader TempHeader;
 	ResourceFile->Read(&TempHeader, sizeof(ZEMapFileHeader), 1);
 
@@ -440,6 +443,8 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEResourceFile* ResourceFile)
 		zeError("Map Resource", "File is corrupted. Can not read doors from file. (FileName : \"%s\")", ResourceFile->GetFileName());
 		return false;
 	}
+
+	zeLog("Portal Map Resource", "Map file \"%s\" has been loaded.", ResourceFile->GetFileName());
 
 	return true;
 }
@@ -534,6 +539,7 @@ ZEPortalMapResource* ZEPortalMapResource::LoadResource(const char* FileName)
 		}
 		
 		ResourceFile.Close();
+
 		return MapResource;
 	}
 	else

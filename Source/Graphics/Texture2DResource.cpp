@@ -35,6 +35,7 @@
 
 #include "Texture2DResource.h"
 #include "Core/Error.h"
+#include "Core/Console.h"
 #include "Core/ResourceManager.h"
 #include "Core/ResourceFile.h"
 #include "Texture2D.h"
@@ -115,6 +116,8 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const char* FileName)
 
 ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceFile)
 {
+	zeLog("Texture2D Resource", "Loading texture file \"%s\".", ResourceFile->GetFileName());
+
 	FreeImageIO Callbacks;
 	Callbacks.read_proc = &FreeImageFile_Read_2D;
 	Callbacks.seek_proc = &FreeImageFile_Seek_2D;
@@ -214,6 +217,9 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceF
 	TextureResource->SetFileName(ResourceFile->GetFileName());
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
+
+	zeLog("Texture2D Resource", "Texture file \"%s\" has been loaded.", ResourceFile->GetFileName());
+
 	return TextureResource;	
 }
 

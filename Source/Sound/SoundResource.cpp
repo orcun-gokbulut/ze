@@ -35,6 +35,7 @@
 
 #include "SoundResource.h"
 #include "Core/Error.h"
+#include "Core/Console.h"
 #include "Core/ResourceManager.h"
 #include "SoundResourceMP3.h"
 #include "SoundResourceOGG.h"
@@ -94,6 +95,8 @@ size_t ZESoundResource::GetPCMDataSize() const
 
 ZESoundResource* ZESoundResource::LoadResource(const char* FileName)
 {
+	zeLog("Sound Resource", "Loading sound file \"%s\"", FileName);
+
 	ZESoundResource* Temp = NULL;
 	switch(GetFileFormat(FileName))
 	{
@@ -121,6 +124,8 @@ ZESoundResource* ZESoundResource::LoadResource(const char* FileName)
 		zeError("Sound Resource", "Could not load sound file. (FileName : \"%s\")" , FileName);
 		return NULL;
 	}
+
+	zeLog("Sound Resource", "Sound file \"%s\" has been loaded.", FileName);
 
 	return Temp;
 }

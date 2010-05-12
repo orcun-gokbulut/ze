@@ -496,7 +496,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 
 bool ZEScene::LoadMap(const char* FileName)
 {
-	zeLog("Scene", "Loading environment.");
+	zeLog("Scene", "Loading map.");
 
 	if (Map == NULL)
 		Map = ZEPortalMap::CreateInstance();
@@ -521,6 +521,8 @@ bool ZEScene::LoadMap(const char* FileName)
 
 bool ZEScene::Save(const char* FileName)
 {
+	zeLog("Scene", "Saving scene file \"%s\".", FileName);
+
 	ZEFileSerializer Serializer;
 	if (Serializer.OpenFile(FileName))
 	{
@@ -550,6 +552,9 @@ bool ZEScene::Save(const char* FileName)
 		}
 
 		Serializer.CloseFile();
+		
+		zeLog("Scene", "Scene file \"%s\" saved.", FileName);
+
 		return true;
 	}
 	else
@@ -561,7 +566,8 @@ bool ZEScene::Save(const char* FileName)
 
 bool ZEScene::Load(const char* FileName)
 {
-	zeLog("Scene", "Loading scene \"%s\".", FileName);
+	zeLog("Scene", "Loading scene file \"%s\".", FileName);
+
 	ZEFileUnserializer Unserializer;
 	char EntityTypeName[ZE_MAX_NAME_SIZE];
 	if (Unserializer.OpenFile(FileName))
@@ -604,7 +610,7 @@ bool ZEScene::Load(const char* FileName)
 			}
 		}
 
-		zeLog("Scene", "Scene loaded.");
+		zeLog("Scene", "Scene file \"%s\" has been loaded.", FileName);
 		return true;
 	}
 	else
