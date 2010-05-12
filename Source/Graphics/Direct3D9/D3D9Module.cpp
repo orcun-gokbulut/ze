@@ -121,7 +121,7 @@ void ZED3D9Module::SetEnabled(bool Enabled)
 
 bool ZED3D9Module::Initialize()
 {
-	zeLog("Direct3D9", "Initializing Direct3D 9.");
+	zeLog("Direct3D9", "Initializing Direct3D 9 module.");
 
 	// Read options
 	ScreenWidth = zeOptions->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger();

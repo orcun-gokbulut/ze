@@ -85,7 +85,7 @@ void ZEPhysXModule::SetEnabled(bool Enabled)
 
 bool ZEPhysXModule::Initialize()
 {
-	zeLog("PhysX Module", "Initializing PhysX.");
+	zeLog("PhysX Module", "Initializing PhysX module.");
 	Deinitialize();
 
 	PhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION, NULL, &OutputStream);

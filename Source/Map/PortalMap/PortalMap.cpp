@@ -98,42 +98,6 @@ bool ZEPortalMap::SetResource(ZEMapResource* Resource)
 	return false;
 }
 
-/*void ZEPortalMap::RenderPortal(ZEMapPortal* Portal, ZERenderer* Renderer, const ZEViewVolume& ViewVolume, ZESmartArray<ZELight*>& SceneLights)
-{
-	if (ViewVolume.CullTest(Portal->BoundingBox))
-	{
-		ZEMatrix4x4::CreateOrientation(PortalBBoxRenderOrder.WorldMatrix, Portal->BoundingBox.GetCenter(), 
-			ZEQuaternion::Identity, 
-			ZEVector3(Portal->BoundingBox.Max.x - Portal->BoundingBox.Min.x, 
-			Portal->BoundingBox.Max.y - Portal->BoundingBox.Min.y, 
-			Portal->BoundingBox.Max.z - Portal->BoundingBox.Min.z)
-			);
-		//Renderer->AddToRenderList(&PortalBBoxRenderOrder); 
-
-		ZESmartArray<ZELight*> PortalLights;
-		for (size_t I = 0; I < SceneLights.GetCount(); I++)
-		{
-			const ZEViewVolume& LightViewVolume = SceneLights[I]->GetViewVolume();
-			if (SceneLights[I]->GetLightType() != ZE_LT_DIRECTIONAL || LightViewVolume.CullTest(Portal->BoundingBox))
-				PortalLights.Add(SceneLights[I]);
-		}
-
-		if (Portal->Octree != NULL)
-			Portal->Octree->Render(Renderer, ViewVolume, PortalLights);
-		else
-			for (size_t I = 0; I < Portal->RenderOrders.GetCount(); I++)
-			{
-				if (Portal->RenderOrders[I].Lights.GetCount() != SceneLights.GetCount())
-					Portal->RenderOrders[I].Lights.SetCount(SceneLights.GetCount());
-
-				for (size_t N = 0; N < PortalLights.GetCount(); N++)
-					Portal->RenderOrders[I].Lights[N] = PortalLights[N]->GetRenderOrderLight();
-
-				Renderer->AddToRenderList(&Portal->RenderOrders[I]);
-			}
-	}
-}*/
-
 void ZEPortalMap::Render(ZERenderer* Renderer,  const ZESmartArray<const ZELight*>& SceneLights)
 {
 	for (size_t I = 0; I < Portals.GetCount(); I++)

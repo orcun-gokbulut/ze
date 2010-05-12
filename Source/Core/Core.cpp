@@ -380,10 +380,10 @@ void ZECore::DeInitializeModule(ZEModule** Module)
 bool ZECore::InitializeModules()
 {
 	// Graphics module !
-	zeLog("Core", "Initializing Graphic Module.");	
+	zeLog("Core", "Initializing graphics module.");	
 	if (!InitializeModule(Graphics))
 	{
-		zeError("Core", "Can not initialize graphic module.");
+		zeError("Core", "Can not initialize graphics module.");
 		return false;
 	}
 
@@ -396,7 +396,7 @@ bool ZECore::InitializeModules()
 	}
 
 	// Sound module !
-	zeLog("Core", "Initializing Sound Module.");	
+	zeLog("Core", "Initializing sound module.");	
 	if (!InitializeModule(Sound))
 	{
 		zeError("Core", "Can not initialize sound module.");
@@ -457,9 +457,9 @@ bool ZECore::StartUp(void* WindowHandle)
 	SetUserLevel(ZE_UL_DEVELOPPER);
 
 	zeLog("Core", "Zinek Engine V%s.", ZE_VERSION_STRING);
-	zeLog("Core", "Initializing Core...");
+	zeLog("Core", "Initializing core...");
 
-	zeLog("Core", "Initializing Main Window...");
+	zeLog("Core", "Initializing main window...");
 	if (WindowHandle != NULL)
 		Window->SetComponentWindowHandle(WindowHandle);
 

@@ -113,7 +113,7 @@ void ZEALModule::SetEnabled(bool Enabled)
 
 bool ZEALModule::Initialize()
 {	
-	zeLog("OpenAL Module", "Initializing OpenAL.");
+	zeLog("OpenAL Module", "Initializing OpenAL module.");
 	
 	zeLog("OpenAL Module", "Enumurating Sound Devices.");
 	const ALCchar* DeviceNames = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);

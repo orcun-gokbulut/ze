@@ -151,7 +151,7 @@ bool ZEDSModule::Initialize()
 {	
 	HRESULT hr;
 	
-	zeLog("DirectSound Module", "Initializing DirectSound Module.");
+	zeLog("DirectSound Module", "Initializing DirectSound module.");
 	zeLog("DirectSound Module", "Enumurating sound devices.");
 	
 	DeviceList.Clear();

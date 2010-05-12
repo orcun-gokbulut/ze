@@ -134,7 +134,7 @@ void ZEDirectInputModule::SetEnabled(bool Enabled)
 
 bool ZEDirectInputModule::Initialize()
 {	
-	zeLog("DirectInput Module", "Initializing Direct Input module.\r\n");
+	zeLog("DirectInput Module", "Initializing Direct Input module.");
 
 	ZeroMemory(&KeyboardStateA, sizeof(ZEDIKeyboardState));
 	ZeroMemory(&KeyboardStateB, sizeof(ZEDIKeyboardState));
