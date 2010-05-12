@@ -70,7 +70,7 @@ class ZEPortalMapPortal
 		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);
 		void								Deinitialize();
 
-		void								Draw(ZERenderer* Renderer,  const ZESmartArray<const ZERLLight*>& Lights);
+		void								Draw(ZERenderer* Renderer,  const ZESmartArray<const ZELight*>& Lights);
 
 											ZEPortalMapPortal();
 };

@@ -259,6 +259,7 @@ static bool ReadOctreeFromFile(ZEResourceFile* ResourceFile, ZEOctree** Octree, 
 	return true;
 }*/
 
+
 bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourcePortal* Portal)
 {
 	// Read physical mesh header
@@ -370,12 +371,12 @@ bool ZEPortalMapResource::ReadPortalsFromFile(ZEResourceFile* ResourceFile)
 
 bool ZEPortalMapResource::ReadDoorsFromFile(ZEResourceFile* ResourceFile)
 { 
-	for (size_t I = 0; I < PortalDoors.GetCount(); I++)
+	for (size_t I = 0; I < Doors.GetCount(); I++)
 	{
-		ZEPortalMapResourceDoor* Door = &PortalDoors[I];
+		ZEPortalMapResourceDoor* Door = &Doors[I];
 		
 		ZEMapFileDoorChunk FileDoor;
-		ResourceFile->Read(&FileDoor, sizeof(ZEDWORD), 1);
+		ResourceFile->Read(&FileDoor, sizeof(ZEMapFileDoorChunk), 1);
 
 		if (FileDoor.ChunkIdentifier != ZE_MAP_PORTAL_DOOR_CHUNK)
 		{
@@ -397,6 +398,8 @@ bool ZEPortalMapResource::ReadDoorsFromFile(ZEResourceFile* ResourceFile)
 		Door->Portals[1]->DoorIds.Add(I);
 		Door->Portals[1]->Doors.Add(Door);
 	}
+
+	return true;
 }
 
 bool ZEPortalMapResource::ReadMapFromFile(ZEResourceFile* ResourceFile)
@@ -417,6 +420,7 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEResourceFile* ResourceFile)
 	}
 
 	Portals.SetCount(TempHeader.PortalCount);
+	Doors.SetCount(TempHeader.DoorCount);
 	Materials.SetCount(TempHeader.MaterialCount);
 
 	if (!ReadMaterialsFromFile(ResourceFile))
@@ -431,12 +435,38 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEResourceFile* ResourceFile)
 		return false;
 	}
 
+	if (!ReadDoorsFromFile(ResourceFile))
+	{
+		zeError("Map Resource", "File is corrupted. Can not read doors from file. (FileName : \"%s\")", ResourceFile->GetFileName());
+		return false;
+	}
+
 	return true;
 }
 
 const char* ZEPortalMapResource::GetResourceType() const
 {
-	return "Map Resource";
+	return "Portal Map Resource";
+}
+
+const ZEArray<ZETexture2DResource*>& ZEPortalMapResource::GetTextures()
+{
+	return TextureResources;
+}
+
+const ZEArray<ZEMaterial*>& ZEPortalMapResource::GetMaterials()
+{
+	return Materials;
+}
+
+const ZEArray<ZEPortalMapResourcePortal>& ZEPortalMapResource::GetPortals()
+{
+	return Portals;
+}
+
+const ZEArray<ZEPortalMapResourceDoor>& ZEPortalMapResource::GetDoors()
+{
+	return Doors;
 }
 
 const ZEPortalMapResource* ZEPortalMapResource::LoadSharedResource(const char* FileName)

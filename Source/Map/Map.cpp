@@ -41,7 +41,7 @@ ZEMap::ZEMap()
 
 ZEMap::~ZEMap()
 {
-	Deinitialize();
+
 }
 
 void ZEMap::Destroy()

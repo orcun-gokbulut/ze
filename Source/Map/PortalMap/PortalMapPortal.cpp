@@ -64,7 +64,7 @@ ZEPhysicalStaticMesh* ZEPortalMapPortal::GetPhysicalMesh()
 	return PhysicalMesh;
 }
 
-void ZEPortalMapPortal::Draw(ZERenderer* Renderer,  const ZESmartArray<const ZERLLight*>& Lights)
+void ZEPortalMapPortal::Draw(ZERenderer* Renderer,  const ZESmartArray<const ZELight*>& Lights)
 {
 	
 }

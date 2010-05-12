@@ -486,9 +486,9 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 		}
 	}
 	
-	if (Map != NULL)
+/*	if (Map != NULL)
 		Map->Render(Renderer, VisibleLights);
-	
+*/	
 	if (VisualDebugElements != NULL)
 		DebugDraw.Draw(Renderer);
 }
@@ -528,8 +528,8 @@ bool ZEScene::Save(const char* FileName)
 		Serializer.Write(&EntityCount, sizeof(ZEDWORD), 1);
 		
 		Serializer.Write(&LastEntityId, sizeof(int), 1);
-		if (strcmp(Map->GetFileName(), "") != 0)
-			Serializer.Write(Map->GetFileName(), sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+		if (MapResource != NULL)
+			Serializer.Write(MapResource->GetFileName(), sizeof(char), ZE_MAX_FILE_NAME_SIZE);
 		else
 		{
 			char Temp[ZE_MAX_FILE_NAME_SIZE];

@@ -45,17 +45,29 @@ ZEPortalMap::ZEPortalMap()
 	Resource = NULL;
 }
 
+ZEPortalMap::~ZEPortalMap()
+{
+	Deinitialize();
+}
+
+const ZEArray<ZEPortalMapPortal>& ZEPortalMap::GetPortals()
+{
+	return Portals;
+}
+
+const ZEArray<ZEPortalMapDoor>& ZEPortalMap::GetDoors()
+{
+	return Doors;
+}
+
 bool ZEPortalMap::Initialize()
 {
-	if (Resource == NULL)
+	if (Resource != NULL)
 	{
-		zeError("Portal Map", "Portal map resource is not available.");
-		return false;
+		Portals.SetCount(Resource->GetPortals().GetCount());
+		for (size_t I = 0; I < Portals.GetCount(); I++)
+		Doors.SetCount(Resource->GetDoors().GetCount());
 	}
-
-	Portals.SetCount(Resource->GetPortals().GetCount());
-	for (size_t I = 0; I < Portals.GetCount(); I++)
-	PortalDoors.SetCount(Resource->GetDoors().GetCount());
 
 	return true;
 }
@@ -76,9 +88,10 @@ ZEMapResource* ZEPortalMap::GetResource()
 
 bool ZEPortalMap::SetResource(ZEMapResource* Resource)
 {
-	if (strcmp(Resource->GetResourceType(), "PortalMap") == 0)
+	if (strcmp(Resource->GetResourceType(), "Portal Map Resource") == 0)
 	{
 		this->Resource = (ZEPortalMapResource*)Resource;
+		Initialize();
 		return true;
 	}
 
@@ -121,8 +134,18 @@ bool ZEPortalMap::SetResource(ZEMapResource* Resource)
 	}
 }*/
 
-void ZEPortalMap::Render(ZERenderer* Renderer,  const ZESmartArray<const ZERLLight*>& SceneLights)
+void ZEPortalMap::Render(ZERenderer* Renderer,  const ZESmartArray<const ZELight*>& SceneLights)
 {
 	for (size_t I = 0; I < Portals.GetCount(); I++)
 		Portals[I].Draw(Renderer, SceneLights);
+}
+
+bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT)
+{
+	return false;
+}
+
+ZEPortalMap* ZEPortalMap::CreateInstance()
+{
+	return new ZEPortalMap();
 }

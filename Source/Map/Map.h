@@ -58,7 +58,7 @@ class ZEMap
 		virtual void					Deinitialize() = 0;
 		virtual void					Destroy();
 
-		virtual const char*				GetFileName() = 0;
+		//virtual const char*			GetFileName() = 0;
 
 		virtual bool					SetResource(ZEMapResource* MapResource) = 0;
 		virtual ZEMapResource*			GetResource() = 0;

@@ -176,6 +176,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);
 		World->SetEnabled(true);
+		Scene->LoadMap("test.zemap");
 	}
 
 	return true;

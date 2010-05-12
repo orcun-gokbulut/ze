@@ -94,31 +94,31 @@ struct ZEPortalMapResourceDoor
 
 class ZEPortalMapResource : public ZEMapResource
 {
-private:
-	ZESmartArray<ZETexture2DResource*>				TextureResources;
-	ZEArray<ZEMaterial*>							Materials;
-	ZEArray<ZEPortalMapResourceDoor>				PortalDoors;
-	ZEArray<ZEPortalMapResourcePortal>				Portals;
+	private:
+		ZEArray<ZETexture2DResource*>				TextureResources;
+		ZEArray<ZEMaterial*>						Materials;
+		ZEArray<ZEPortalMapResourceDoor>			Doors;
+		ZEArray<ZEPortalMapResourcePortal>			Portals;
 
-	const ZETexture2D*								ManageMapMaterialTextures(char* FileName);
-	bool  											ReadMaterialsFromFile(ZEResourceFile* ResourceFile);
-	bool  											ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourcePortal* Portal);
-	bool  											ReadPortalsFromFile(ZEResourceFile* ResourceFile);
-	bool  											ReadDoorsFromFile(ZEResourceFile* ResourceFile);
-	bool  											ReadMapFromFile(ZEResourceFile* ResourceFile);
+		const ZETexture2D*							ManageMapMaterialTextures(char* FileName);
+		bool  										ReadMaterialsFromFile(ZEResourceFile* ResourceFile);
+		bool  										ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourcePortal* Portal);
+		bool  										ReadPortalsFromFile(ZEResourceFile* ResourceFile);
+		bool  										ReadDoorsFromFile(ZEResourceFile* ResourceFile);
+		bool  										ReadMapFromFile(ZEResourceFile* ResourceFile);
 
-	virtual											~ZEPortalMapResource();
+		virtual										~ZEPortalMapResource();
 
-public:
-	const char*										GetResourceType() const;
+	public:
+		const char*									GetResourceType() const;
 
-	const ZEArray<ZETexture2DResource*>&			GetTextures();
-	const ZEArray<ZEMaterial*>&						GetMaterials();
-	const ZEArray<ZEPortalMapResourcePortal>&		GetPortals();
-	const ZEArray<ZEPortalMapResourceDoor>&			GetDoors();
+		const ZEArray<ZETexture2DResource*>&		GetTextures();
+		const ZEArray<ZEMaterial*>&					GetMaterials();
+		const ZEArray<ZEPortalMapResourcePortal>&	GetPortals();
+		const ZEArray<ZEPortalMapResourceDoor>&		GetDoors();
 
-	static ZEPortalMapResource*						LoadResource(const char* FileName);
-	static const ZEPortalMapResource*				LoadSharedResource(const char* FileName);
-	static void										CacheResource(const char* FileName);
+		static ZEPortalMapResource*					LoadResource(const char* FileName);
+		static const ZEPortalMapResource*			LoadSharedResource(const char* FileName);
+		static void									CacheResource(const char* FileName);
 };
 #endif
