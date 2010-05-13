@@ -3,11 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 10.00
 # Visual Studio 2008
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Zinek Engine", "ZinekEngine.vcproj", "{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Zinek Engine Test", "Zinek Engine Test.vcproj", "{4C4A8154-F42B-4D85-908D-87AC163D7057}"
-	ProjectSection(ProjectDependencies) = postProject
-		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D} = {9CC3BAC9-51BE-4174-B3EC-F669BED2380D}
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -21,10 +16,6 @@ Global
 		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}.Release(Symb)|Win32.Build.0 = Release(Symb)|Win32
 		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}.Release|Win32.ActiveCfg = Release|Win32
 		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}.Release|Win32.Build.0 = Release|Win32
-		{4C4A8154-F42B-4D85-908D-87AC163D7057}.Debug|Win32.ActiveCfg = Debug|Win32
-		{4C4A8154-F42B-4D85-908D-87AC163D7057}.Debug|Win32.Build.0 = Debug|Win32
-		{4C4A8154-F42B-4D85-908D-87AC163D7057}.Release(Symb)|Win32.ActiveCfg = Release|Win32
-		{4C4A8154-F42B-4D85-908D-87AC163D7057}.Release|Win32.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

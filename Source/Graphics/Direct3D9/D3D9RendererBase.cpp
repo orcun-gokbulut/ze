@@ -87,9 +87,11 @@ void ZED3D9RendererBase::PumpStreams(ZERenderOrder* RenderOrder)
 	{
 		// Check wheater render order has static vertex buffer or not
 		if (VertexBuffer->IsStatic())
-			GetDevice()->DrawPrimitive(PrimitiveType, 0, RenderOrder->PrimitiveCount);
+			GetDevice()->DrawPrimitive(PrimitiveType, RenderOrder->VertexBufferOffset, RenderOrder->PrimitiveCount);
 		else
-			GetDevice()->DrawPrimitiveUP(PrimitiveType, RenderOrder->PrimitiveCount, ((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer(),  RenderOrder->VertexDeclaration->GetVertexSize());
+			GetDevice()->DrawPrimitiveUP(PrimitiveType, RenderOrder->PrimitiveCount, 
+					(char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderOrder->VertexBufferOffset * RenderOrder->VertexDeclaration->GetVertexSize(),  
+					RenderOrder->VertexDeclaration->GetVertexSize());
 	}
 }
 

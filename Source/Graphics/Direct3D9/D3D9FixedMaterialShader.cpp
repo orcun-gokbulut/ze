@@ -276,8 +276,8 @@ ZED3D9FixedMaterialShader* ZED3D9FixedMaterialShader::CreateInstance(unsigned in
 	FreeSpace->Shader->PreLightPass.Compile(PreLightPassVS, PreLightPassPS, "Fixed Material PreLightning Pass", "2_0", ComponentMacros);
 	FreeSpace->Shader->PointLightPass.Compile(PointLightVS, PointLightPS, "Fixed Material Point Light Pass", "2_0", ComponentMacros);
 	FreeSpace->Shader->DirectionalLightPass.Compile(DirectionalLightVS, DirectionalLightPS, "Fixed Material Directional Light Pass", "2_0", ComponentMacros);
-	FreeSpace->Shader->ProjectiveLightPass.Compile(ProjectiveLightVS, ProjectiveLightPS, "Fixed Material Projective Light Pass", "2_0", ComponentMacros);
-	FreeSpace->Shader->OmniProjectiveLightPass.Compile(OmniProjectiveLightVS, OmniProjectiveLightPS, "Fixed Material OmniProjective Pass", "2_0", ComponentMacros);
+	//FreeSpace->Shader->ProjectiveLightPass.Compile(ProjectiveLightVS, ProjectiveLightPS, "Fixed Material Projective Light Pass", "2_0", ComponentMacros);
+	//FreeSpace->Shader->OmniProjectiveLightPass.Compile(OmniProjectiveLightVS, OmniProjectiveLightPS, "Fixed Material OmniProjective Pass", "2_0", ComponentMacros);
 
 	CurrentMacro = &ComponentMacros[ComponentMacroCount];
 	CurrentMacro->Name = "ZESHADER_SHADOWMAP";
@@ -289,8 +289,8 @@ ZED3D9FixedMaterialShader* ZED3D9FixedMaterialShader::CreateInstance(unsigned in
 
 	FreeSpace->Shader->ShadowedPointLightPass.Compile(PointLightVS, PointLightPS, "Fixed Material Shadowed Point Pass", "2_0", ComponentMacros);
 	FreeSpace->Shader->ShadowedDirectionalLightPass.Compile(DirectionalLightVS, DirectionalLightPS,"Fixed Shadowed Material Directional Pass", "2_0", ComponentMacros);
-	FreeSpace->Shader->ShadowedProjectiveLightPass.Compile(ProjectiveLightVS, ProjectiveLightPS, "Fixed Material Shadowed Projective Pass", "2_0", ComponentMacros);
-	FreeSpace->Shader->ShadowedOmniProjectiveLightPass.Compile(OmniProjectiveLightVS, OmniProjectiveLightPS, "Fixed Material Shadowed OmniProjective Pass", "2_0", ComponentMacros);
+	//FreeSpace->Shader->ShadowedProjectiveLightPass.Compile(ProjectiveLightVS, ProjectiveLightPS, "Fixed Material Shadowed Projective Pass", "2_0", ComponentMacros);
+	//FreeSpace->Shader->ShadowedOmniProjectiveLightPass.Compile(OmniProjectiveLightVS, OmniProjectiveLightPS, "Fixed Material Shadowed OmniProjective Pass", "2_0", ComponentMacros);
 
 	FreeSpace->Shader->ProjectiveLightShadowPass = ::ShadowPass;
 	return FreeSpace->Shader;

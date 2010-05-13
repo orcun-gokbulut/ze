@@ -63,7 +63,7 @@ class ZEMap
 		virtual bool					SetResource(ZEMapResource* MapResource) = 0;
 		virtual ZEMapResource*			GetResource() = 0;
 
-		virtual void					Render(ZERenderer* Renderer, const ZESmartArray<const ZELight*>& Lights) = 0;
+		virtual void					Render(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights) = 0;
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT) = 0;
 
 };

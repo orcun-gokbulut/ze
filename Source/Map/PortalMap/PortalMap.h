@@ -48,6 +48,7 @@ class ZELight;
 
 class ZEPortalMap : public ZEMap
 {
+	friend class ZEPortalMapDoor;
 	private:
 		ZEPortalMapResource*					Resource;
 		ZEArray<ZEPortalMapPortal>				Portals;
@@ -63,7 +64,7 @@ class ZEPortalMap : public ZEMap
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
 
-		virtual void							Render(ZERenderer* Renderer, const ZESmartArray<const ZELight*>& Lights);
+		virtual void							Render(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights);
 		virtual bool							CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT);
 
 		virtual bool							SetResource(ZEMapResource* Resource);

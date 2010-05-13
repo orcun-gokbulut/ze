@@ -43,18 +43,18 @@
 class ZEPortalMap;
 class ZEPortalMapDoor;
 class ZEPortalMapResourcePortal;
-class ZEVertexBuffer;
+class ZEStaticVertexBuffer;
 class ZERenderer;
 class ZELight;
 class ZEPhysicalStaticMesh;
 
 class ZEPortalMapPortal
 {
-	friend class ZEPortalMap;
+	friend class ZEPortalMapDoor;
 	private:
 		ZEPortalMap*						Owner;
-		ZEPortalMapResourcePortal*			Resource;
-		ZEVertexBuffer*						VertexBuffer;
+		const ZEPortalMapResourcePortal*	Resource;
+		ZEStaticVertexBuffer*				VertexBuffer;
 		ZEArray<ZERenderOrder>				RenderOrders;
 		ZEArray<ZEPortalMapDoor*>			Doors;
 		ZEPhysicalStaticMesh*				PhysicalMesh;
@@ -67,12 +67,13 @@ class ZEPortalMapPortal
 		const ZEAABoundingBox&				GetBoundingBox();
 		ZEPhysicalStaticMesh*				GetPhysicalMesh();
 
-		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);
+		bool								Initialize(ZEPortalMap* Owner, const ZEPortalMapResourcePortal* Resource);
 		void								Deinitialize();
 
-		void								Draw(ZERenderer* Renderer,  const ZESmartArray<const ZELight*>& Lights);
+		void								Draw(ZERenderer* Renderer,  const ZESmartArray<ZELight*>& Lights);
 
 											ZEPortalMapPortal();
+											~ZEPortalMapPortal();
 };
 
 #endif

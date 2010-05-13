@@ -486,9 +486,9 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 		}
 	}
 	
-/*	if (Map != NULL)
+	if (Map != NULL)
 		Map->Render(Renderer, VisibleLights);
-*/	
+
 	if (VisualDebugElements != NULL)
 		DebugDraw.Draw(Renderer);
 }

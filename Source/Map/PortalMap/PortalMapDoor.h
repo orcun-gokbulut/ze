@@ -46,27 +46,27 @@ class ZEPortalMapResourceDoor;
 class ZEPortalMapDoor
 {
 	private:
-		ZEPortalMap*				Owner;
-		ZEPortalMapResourceDoor*	Resource;
-		ZERectangle3D				Rectangle;
-		ZEPortalMapPortal*			Portals[2];
-		bool						Open;
+		ZEPortalMap*					Owner;
+		const ZEPortalMapResourceDoor*	Resource;
+		ZERectangle3D					Rectangle;
+		ZEPortalMapPortal*				Portals[2];
+		bool							Open;
 
 	public:
-		ZEPortalMap*				GetOwner();
+		ZEPortalMap*					GetOwner();
 
-		const char*					GetName();
+		const char*						GetName();
 
-		ZEPortalMapPortal**			GetPortals();
-		const ZERectangle3D&		GetRectangle();
+		ZEPortalMapPortal**				GetPortals();
+		const ZERectangle3D&			GetRectangle();
 
-		void						Initialize(ZEPortalMap* Owner, ZEPortalMapResourceDoor* Resource);
-		void						Deinitialize();
+		void							Initialize(ZEPortalMap* Owner, const ZEPortalMapResourceDoor* Resource);
+		void							Deinitialize();
 
-		void						SetOpen(bool Open);
-		bool						GetOpen();
+		void							SetOpen(bool Open);
+		bool							GetOpen();
 
-									ZEPortalMapDoor();
+										ZEPortalMapDoor();
 };
 
 #endif

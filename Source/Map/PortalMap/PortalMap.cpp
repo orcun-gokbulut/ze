@@ -65,8 +65,13 @@ bool ZEPortalMap::Initialize()
 	if (Resource != NULL)
 	{
 		Portals.SetCount(Resource->GetPortals().GetCount());
+		
 		for (size_t I = 0; I < Portals.GetCount(); I++)
+			Portals[I].Initialize(this, &Resource->GetPortals()[I]);
+		
 		Doors.SetCount(Resource->GetDoors().GetCount());
+		for (size_t I = 0; I < Doors.GetCount(); I++)
+			Doors[I].Initialize(this, &Resource->GetDoors()[I]);
 	}
 
 	return true;
@@ -98,7 +103,7 @@ bool ZEPortalMap::SetResource(ZEMapResource* Resource)
 	return false;
 }
 
-void ZEPortalMap::Render(ZERenderer* Renderer,  const ZESmartArray<const ZELight*>& SceneLights)
+void ZEPortalMap::Render(ZERenderer* Renderer,  const ZESmartArray<ZELight*>& SceneLights)
 {
 	for (size_t I = 0; I < Portals.GetCount(); I++)
 		Portals[I].Draw(Renderer, SceneLights);

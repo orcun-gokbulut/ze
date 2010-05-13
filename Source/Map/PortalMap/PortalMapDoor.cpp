@@ -34,6 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 #include "PortalMapDoor.h"
 #include "PortalMapResource.h"
+#include "PortalMap.h"
+#include "PortalMapPortal.h"
 
 ZEPortalMap* ZEPortalMapDoor::GetOwner()
 {
@@ -58,10 +60,18 @@ const ZERectangle3D& ZEPortalMapDoor::GetRectangle()
 	return Rectangle;
 }
 
-void ZEPortalMapDoor::Initialize(ZEPortalMap* Owner, ZEPortalMapResourceDoor* Resource)
+void ZEPortalMapDoor::Initialize(ZEPortalMap* Owner, const ZEPortalMapResourceDoor* Resource)
 {
 	this->Owner = Owner;
 	this->Resource = Resource;
+	Rectangle = Resource->Rectangle;
+	Open = Resource->IsOpen;
+	
+	Portals[0] = &Owner->Portals[Resource->PortalIds[0]];
+	Portals[0]->Doors.Add(this);
+
+	Portals[1] = &Owner->Portals[Resource->PortalIds[1]];
+	Portals[1]->Doors.Add(this);
 }
 
 void ZEPortalMapDoor::Deinitialize()

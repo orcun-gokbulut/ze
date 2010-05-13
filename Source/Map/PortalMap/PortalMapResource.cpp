@@ -100,6 +100,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
 		
 		Materials[I] = CurrentMaterial;
+		CurrentMaterial->SetZero();
 		CurrentMaterial->SetDiffuseEnabled(true);
 		CurrentMaterial->SetAmbientEnabled(true);
 		CurrentMaterial->SetSpecularEnabled(true);
@@ -145,50 +146,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 	return true;
 }
 
-/*static bool SortVertices(ZEStaticVertexBuffer** VertexBuffer, ZEArray<ZERenderOrder>& RenderOrders, ZEArray<ZEMapFilePolygonChunk>& Polygons, ZEArray<ZEMaterial*>& Materials)
-{
-	if (*VertexBuffer == NULL)
-		*VertexBuffer = zeGraphics->CreateStaticVertexBuffer();
-
-	if (!(*VertexBuffer)->Create(Polygons.GetCount() * 3 * sizeof(ZEMapVertex)))
-		return false;
-
-	ZEMapVertex* Buffer = (ZEMapVertex*)(*VertexBuffer)->Lock();
-	
-	size_t VertexIndex = 0;
-	int RenderOrderIndex = -1;
-	for (size_t I = 0; I < Polygons.GetCount(); I++)
-	{
-		if (Polygons[I].Material != 0xFFFFFFFF)
-		{
-			size_t MaterialId = Polygons[I].Material;
-			ZERenderOrder* RenderOrder = RenderOrders.Add();
-			RenderOrder->SetZero();
-			RenderOrder->Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-			RenderOrder->Material = Materials[Polygons[I].Material];
-			RenderOrder->PrimitiveType = ZE_ROPT_TRIANGLE;
-			RenderOrder->VertexBufferOffset = sizeof(ZEMapVertex) * VertexIndex;
-			RenderOrder->VertexBuffer = *VertexBuffer;
-			RenderOrder->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();
-			ZEMatrix4x4::CreateIdentity(RenderOrder->WorldMatrix);
-			size_t PrimitiveCount = 0;
-			for (size_t N = I; N < Polygons.GetCount(); N++)
-				if (Polygons[N].Material == MaterialId)
-				{
-					memcpy(Buffer + VertexIndex, Polygons[N].Vertices, sizeof(ZEMapVertex) * 3);
-					Polygons[N].Material = 0xFFFFFFFF;
-					VertexIndex += 3;
-					PrimitiveCount++;
-				}
-			RenderOrder->PrimitiveCount = PrimitiveCount;
-		}
-	}
-	(*VertexBuffer)->Unlock();
-
-	return true;
-}
-
-static bool ReadOctreeNodeFromFile(ZEResourceFile* ResourceFile, ZEOctree* Octree, ZEArray<ZEMaterial*>& Materials)
+/*static bool ReadOctreeNodeFromFile(ZEResourceFile* ResourceFile, ZEOctree* Octree, ZEArray<ZEMaterial*>& Materials)
 {
 	ZEMapFileOctreeChunk	FileOctree;
 	

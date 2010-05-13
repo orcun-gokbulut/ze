@@ -163,10 +163,10 @@ bool ZEPhysicsDebugComponent::Initialize()
 
 		//World->AddPhysicalObject(PhysicalMesh);
 
-		/*Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
+		Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
 		Model->SetModelFile("test.zeModel");
 		Scene->AddEntity(Model);
-		Model->GetModel()->GetBones()[5].SetRelativeRotation(ZEQuaternion(ZE_PI_4, ZEVector3(0.0f, 1.0f, 0.0f)));
+		//Model->GetModel()->GetBones()[5].SetRelativeRotation(ZEQuaternion(ZE_PI_4, ZEVector3(0.0f, 1.0f, 0.0f)));
 		//Model->GetModel()->GetMeshes()[0].SetLocalScale(ZEVector3(0.1, 0.1, 0.1));
 		Model->SetAnimationName("Test");
 		Model->SetAnimationState(ZE_MAS_PLAYING);
@@ -175,7 +175,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 		//zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
 		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);
-		World->SetEnabled(true);*/
+		World->SetEnabled(true);
 		Scene->LoadMap("test.zemap");
 	}
 
