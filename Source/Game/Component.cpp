@@ -80,7 +80,7 @@ ZEEntity* ZEComponent::GetOwner() const
 
 const ZEVector3& ZEComponent::GetWorldVelocity()
 {
-	return Velocity;
+	return LocalVelocity;
 }
 
 
@@ -104,7 +104,7 @@ const ZEMatrix4x4& ZEComponent::GetLocalTransform() const
 {
 	if (DirtyFlags & ZE_CDF_LOCAL_TRANSFORM)
 	{
-		ZEMatrix4x4::CreateOrientation(((ZEComponent*)this)->LocalTransform, Position, Rotation, Scale);
+		ZEMatrix4x4::CreateOrientation(((ZEComponent*)this)->LocalTransform, LocalPosition, LocalRotation, LocalScale);
 		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_LOCAL_TRANSFORM;
 	}
 
@@ -160,42 +160,42 @@ void ZEComponent::SetVisible(bool Visible)
 
 const ZEVector3& ZEComponent::GetLocalPosition() const
 {
-	return Position;
+	return LocalPosition;
 }
 
 void ZEComponent::SetLocalPosition(const ZEVector3& NewPosition)
 {
 	DirtyFlags = ZE_CDF_ALL;
 
-	Position = NewPosition;
+	LocalPosition = NewPosition;
 	if (Owner != NULL)
 		Owner->UpdateBoundingVolumes();
 }
 
 const ZEQuaternion& ZEComponent::GetLocalRotation() const
 {
-	return Rotation;
+	return LocalRotation;
 }
 
 void ZEComponent::SetLocalRotation(const ZEQuaternion& NewRotation)
 {
 	DirtyFlags = ZE_CDF_ALL;
 
-	Rotation = NewRotation;
+	LocalRotation = NewRotation;
 	if (Owner != NULL)
 		Owner->UpdateBoundingVolumes();
 }
 
 const ZEVector3& ZEComponent::GetLocalScale() const
 {
-	return Scale;
+	return LocalScale;
 }
 
 void ZEComponent::SetLocalScale(const ZEVector3& NewScale)
 {
 	DirtyFlags = ZE_CDF_ALL;
 
-	Scale = NewScale;
+	LocalScale = NewScale;
 	if (Owner != NULL)
 		Owner->UpdateBoundingVolumes();
 }
@@ -206,11 +206,11 @@ const ZEVector3 ZEComponent::GetWorldPosition() const
 	if (Owner != NULL)
 	{
 		ZEVector3 Temp;
-		ZEVector3::Add(Temp, Owner->GetPosition(), Position);
+		ZEVector3::Add(Temp, Owner->GetPosition(), LocalPosition);
 		return Temp;
 	}
 	else
-		return Position;
+		return LocalPosition;
 }
 
 void ZEComponent::SetWorldPosition(const ZEVector3& NewPosition)
@@ -218,9 +218,9 @@ void ZEComponent::SetWorldPosition(const ZEVector3& NewPosition)
 	DirtyFlags = ZE_CDF_ALL;
 
 	if (Owner != NULL)
-		ZEVector3::Sub(Position,NewPosition,Owner->GetPosition());
+		ZEVector3::Sub(LocalPosition,NewPosition,Owner->GetPosition());
 	else
-		Position = NewPosition;
+		LocalPosition = NewPosition;
 }
 
 const ZEQuaternion ZEComponent::GetWorldRotation() const
@@ -228,12 +228,12 @@ const ZEQuaternion ZEComponent::GetWorldRotation() const
 	if (Owner != NULL)
 	{
 		ZEQuaternion Temp, Temp1;
-		ZEQuaternion::Product(Temp, Owner->GetRotation(), Rotation);
+		ZEQuaternion::Product(Temp, Owner->GetRotation(), LocalRotation);
 		ZEQuaternion::Normalize(Temp1, Temp);
 		return Temp1;
 	}
 	else
-		return Rotation;
+		return LocalRotation;
 }
 
 void ZEComponent::SetWorldRotation(const ZEQuaternion& NewRotation)
@@ -245,10 +245,10 @@ void ZEComponent::SetWorldRotation(const ZEQuaternion& NewRotation)
 		ZEQuaternion Temp, InvWorldRotation;
 		ZEQuaternion::Conjugate(InvWorldRotation, Owner->GetRotation());
 		ZEQuaternion::Product(Temp, NewRotation, InvWorldRotation);
-		ZEQuaternion::Normalize(Rotation, Temp);
+		ZEQuaternion::Normalize(LocalRotation, Temp);
 	}
 	else
-		Rotation = NewRotation;
+		LocalRotation = NewRotation;
 }
 
 bool ZEComponent::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& TEnterance, float &TExit)
@@ -260,8 +260,8 @@ void ZEComponent::Tick(float Time)
 {
 	const ZEVector3& WorldPosition = GetWorldPosition();
 
-	ZEVector3::Sub(Velocity, WorldPosition, OldPosition);
-	ZEVector3::Scale(Velocity, Velocity, Time);
+	ZEVector3::Sub(LocalVelocity, WorldPosition, LocalOldPosition);
+	ZEVector3::Scale(LocalVelocity, LocalVelocity, Time);
 }
 
 void ZEComponent::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
@@ -294,11 +294,11 @@ ZEComponent::ZEComponent()
 	Owner = NULL;
 
 	DirtyFlags = ZE_CDF_ALL;
-	Position = ZEVector3::Zero;
-	OldPosition = ZEVector3::Zero;
-	Velocity = ZEVector3::Zero;
-	Rotation = ZEQuaternion::Identity;
-	Scale = ZEVector3::One;
+	LocalPosition = ZEVector3::Zero;
+	LocalOldPosition = ZEVector3::Zero;
+	LocalVelocity = ZEVector3::Zero;
+	LocalRotation = ZEQuaternion::Identity;
+	LocalScale = ZEVector3::One;
 	Visible = true;
 	Enabled = true;
 }

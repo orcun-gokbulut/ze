@@ -93,7 +93,7 @@ class ZESoundSource : public ZEComponent
 		bool						Streaming;
 
 		unsigned int				CurrentPosition;
-		unsigned int				OldPosition;
+		unsigned int				LocalOldPosition;
 
 		unsigned int				EffectiveStartPosition;
 		unsigned int				EffectiveEndPosition;
