@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsDebugComponent.h
+ Zinek Engine - DebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,40 +34,25 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PHYSICS_DEBUG_COMPONENT_H__
-#define __ZE_PHYSICS_DEBUG_COMPONENT_H__
+#ifndef __ZE_DEBUG_MODULE_H__
+#define __ZE_DEBUG_MODULE_H__
 
-#include "Core/DebugComponent.h"
-#include "Physics/PhysicalCallbacks.h"
-#include "GameInterface/ModelBrush.h"
-
-class ZEPlayer;
-class ZEPhysicalRigidBody;
-
-#include "Physics/PhysicalShapes.h"
-
-class ZEPhysicsDebugComponent : public ZEDebugComponent
+class ZEDebugModule : public ZEModule
 {
-	private:
-		ZEPlayer*				Player;
-		ZEPhysicalRigidBody*	PhysicalRigidBody;
-		ZEPhysicalSphereShape	Shape;	
-		ZEPhysicalSphereShape	Shape2;	
-		ZEModelBrush*			Model;
-
-		void					TransformChanged(const ZEPhysicalTransformChange& TransformChange);
-		void					ColisionDetected(const ZEPhysicalCollision& Collision);
-
 	public:
-		virtual void			Process(float ElapsedTime);
-
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
+		virtual void			Destroy();
+		
+		virtual void			PreProcess();
+		virtual void			Process(float ElapsedTime);
+		virtual void			PostProcess();
+		
+		virtual void			StartUp();
+		virtual void			ShutDown();
 
-
-
-								ZEPhysicsDebugComponent();
-		virtual					~ZEPhysicsDebugComponent();
+		virtual void			Tick(float ElapsedTime);
+		virtual void			Render(float ElapsedTime);
 };
 
 #endif

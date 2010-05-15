@@ -35,7 +35,7 @@
 
 #include "Light.h"
 #include "RenderOrder.h"
-#include "GameInterface/Entity.h"
+#include "Game/Entity.h"
 
 ZEDWORD ZELight::GetDrawFlags() const
 {

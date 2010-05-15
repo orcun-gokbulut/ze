@@ -37,7 +37,7 @@
 #ifndef __ZE_PARTICLE_EFFECT_H__
 #define __ZE_PARTICLE_EFFECT_H__
 
-#include "Core/Component.h"
+#include "Game/Component.h"
 #include "ZEDS/Array.h"
 #include "ParticleSystem.h"
 

@@ -38,7 +38,7 @@
 #include "Graphics/Renderer.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/SimpleMaterial.h"
-#include "GameInterface/Entity.h"
+#include "Game/Entity.h"
 
 #include <stdio.h>
 #include <string.h>

@@ -37,7 +37,7 @@
 #ifndef	__ZE_SOUND_SOURCE_H__
 #define __ZE_SOUND_SOURCE_H__
 
-#include "Core/Component.h"
+#include "Game/Component.h"
 #include "Meta/Class.h"
 #include "SoundResource.h"
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MetaDebugComponent.cpp
+ Zinek Engine - MetaDebugModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,16 +38,16 @@
 #include "Graphics/GraphicsModule.h"
 #include "Graphics/FixedMaterial.h"
 #include "Graphics/Texture2DResource.h"
-#include "GameInterface/Game.h"
-#include "GameInterface/Player.h"
-#include "GameInterface/LightBrush.h"
-#include "GameInterface/CanvasBrush.h"
-#include "GameInterface/Scene.h"
-#include "GameInterface/Serialization.h"
+#include "Game/Game.h"
+#include "Game/Player.h"
+#include "Game/LightBrush.h"
+#include "Game/CanvasBrush.h"
+#include "Game/Scene.h"
+#include "Game/Serialization.h"
 #include "Meta/Animation.h"
 #include <string.h>
 
-bool ZEMetaDebugComponent::Initialize()
+bool ZEMetaDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
 
@@ -164,7 +164,7 @@ bool ZEMetaDebugComponent::Initialize()
 	return true;
 }
 
-void ZEMetaDebugComponent::Deinitialize()
+void ZEMetaDebugModule::Deinitialize()
 {
 	if (Light != NULL)
 	{
@@ -185,14 +185,14 @@ void ZEMetaDebugComponent::Deinitialize()
 	}
 }
 
-ZEMetaDebugComponent::ZEMetaDebugComponent()
+ZEMetaDebugModule::ZEMetaDebugModule()
 {
 	Light = NULL;
 	Canvas = NULL;
 	Player = NULL;
 }
 
-ZEMetaDebugComponent::~ZEMetaDebugComponent()
+ZEMetaDebugModule::~ZEMetaDebugModule()
 {
 	Deinitialize();
 }

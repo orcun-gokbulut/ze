@@ -43,7 +43,7 @@
 #include "ZEMath/Matrix.h"
 #include "ZEMath/Vector.h"
 #include "ZEMath/Quaternion.h"
-#include "GameInterface/Serialization.h"
+#include "Game/Serialization.h"
 
 enum ZEVariantType
 {

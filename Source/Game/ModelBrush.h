@@ -37,7 +37,7 @@
 #ifndef __ZE_MODELBRUSH_H__
 #define __ZE_MODELBRUSH_H__
 
-#include "GameInterface/Entity.h"
+#include "Game/Entity.h"
 #include "Model/Model.h"
 
 ZE_META_CLASS_DESCRIPTION(ZEModelBrush);

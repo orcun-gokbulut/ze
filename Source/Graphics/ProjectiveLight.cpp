@@ -37,7 +37,7 @@
 #include "Texture2D.h"
 #include "TextureCube.h"
 #include "Core/Error.h"
-#include "GameInterface/Scene.h"
+#include "Game/Scene.h"
 #include "ShadowRenderer.h"
 #include "GraphicsModule.h"
 

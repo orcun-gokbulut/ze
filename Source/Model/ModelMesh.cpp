@@ -37,7 +37,7 @@
 #include "Model.h"
 #include "ModelFileFormat.h"
 #include "Graphics/Renderer.h"
-#include "GameInterface/Scene.h"
+#include "Game/Scene.h"
 #include "Physics/PhysicalRigidBody.h"
 /*
 void ZEModelMesh::UpdatePhysicalBody()

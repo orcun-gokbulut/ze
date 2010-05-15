@@ -38,7 +38,7 @@
 #define __ZE_LIGHTBRUSH_H__
 
 #include "Meta/Class.h"
-#include "GameInterface/Entity.h"
+#include "Game/Entity.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Light.h"
 

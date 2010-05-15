@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ParticleEffect.h"
-#include "GameInterface/Entity.h"
+#include "Game/Entity.h"
 
 void ZEParticleEffect::LoadFromFile(const char* ZEPEFFile)
 {

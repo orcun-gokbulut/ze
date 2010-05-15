@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DebugComponent.cpp
+ Zinek Engine - SoundDebugModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,69 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DebugComponent.h"
+#include "SoundDebugComponent.h"
 
-bool ZEDebugComponent::Initialize()
+#include "Graphics/GraphicsModule.h"
+#include "Game/Game.h"
+#include "Game/Player.h"
+#include "Game/Scene.h"
+#include "Sound/SoundSource3D.h"
+
+bool ZESoundDebugModule::Initialize()
 {
+	ZEScene* Scene = zeGame->GetScene();
+
+	// Create the player
+	if (Player == NULL)
+	{
+		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
+		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
+		Player->SetRotation(ZEQuaternion::Identity);
+		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
+		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
+		Scene->SetActiveCamera(Player->GetCamera());
+		Scene->AddEntity(Player);
+	}
+
+	if (SoundSource == NULL)
+	{
+		ZESoundSource3D* SoundSource = ZESoundSource3D::CreateInstance();
+
+		SoundSource->SetSoundResource(ZESoundResource::LoadResource("test.wav"));
+		SoundSource->SetCurrentPositionTime(50);
+		SoundSource->SetStartPositionTime(0);
+		/*SoundSource->SetEndPositionTime(70.5f);*/
+		SoundSource->SetPlaybackSpeed(1.0f);
+		SoundSource->SetLooping(true);
+		SoundSource->Play();
+		SoundSource->SetSoundSourceType(ZE_SST_MUSIC);
+	}
+
 	return true;
 }
 
-void ZEDebugComponent::Deinitialize()
+void ZESoundDebugModule::Deinitialize()
 {
+	if (Player != NULL)
+	{
+		Player->Destroy();
+		Player = NULL;
+	}
+
+	if (SoundSource != NULL)
+	{
+		SoundSource->Destroy();
+		SoundSource = NULL;
+	}
 }
 
-void ZEDebugComponent::Destroy()
+ZESoundDebugModule::ZESoundDebugModule()
 {
+	SoundSource = NULL;
+	Player = NULL;
 }
 
-void ZEDebugComponent::PreProcess()
+ZESoundDebugModule::~ZESoundDebugModule()
 {
-}
-
-void ZEDebugComponent::Process(float ElapsedTime)
-{
-}
-
-void ZEDebugComponent::PostProcess()
-{
-}
-
-void ZEDebugComponent::StartUp()
-{
-}
-
-void ZEDebugComponent::ShutDown()
-{
-}
-
-void ZEDebugComponent::Tick(float ElapsedTime)
-{
-}
-
-void ZEDebugComponent::Render(float ElapsedTime)
-{
+	Deinitialize();
 }

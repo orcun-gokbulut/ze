@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DebugComponent.h
+ Zinek Engine - DebugModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_DEBUG_COMPONENT_H__
-#define __ZE_DEBUG_COMPONENT_H__
+#include "DebugComponent.h"
 
-class ZEDebugComponent
+bool ZEDebugModule::Initialize()
 {
-	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Destroy();
-		
-		virtual void			PreProcess();
-		virtual void			Process(float ElapsedTime);
-		virtual void			PostProcess();
-		
-		virtual void			StartUp();
-		virtual void			ShutDown();
+	return true;
+}
 
-		virtual void			Tick(float ElapsedTime);
-		virtual void			Render(float ElapsedTime);
-};
+void ZEDebugModule::Deinitialize()
+{
+}
 
-#endif
+void ZEDebugModule::Destroy()
+{
+}
+
+void ZEDebugModule::PreProcess()
+{
+}
+
+void ZEDebugModule::Process(float ElapsedTime)
+{
+}
+
+void ZEDebugModule::PostProcess()
+{
+}
+
+void ZEDebugModule::StartUp()
+{
+}
+
+void ZEDebugModule::ShutDown()
+{
+}
+
+void ZEDebugModule::Tick(float ElapsedTime)
+{
+}
+
+void ZEDebugModule::Render(float ElapsedTime)
+{
+}

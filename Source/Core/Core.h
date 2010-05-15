@@ -74,7 +74,7 @@ class ZEPhysicsModule;
 class ZEGame;
 class ZEModule;
 class ZENetworkModule;
-class ZEDebugComponent;
+class ZEDebugModule;
 
 class ZECore
 {
@@ -102,7 +102,7 @@ class ZECore
 		ZEGame*							Game;
 		ZENetworkModule*				Network;
 
-		ZEDebugComponent*				DebugComponent;
+		ZEDebugModule*				DebugComponent;
 
 		bool							InitializeModule(ZEModule* Module);
 		void							DeInitializeModule(ZEModule** Module);
@@ -139,8 +139,8 @@ class ZECore
 		bool							SetGame(ZEGame* Game);
 		ZEGame*							GetGame();
 
-		void							SetDebugComponent(ZEDebugComponent* Component);
-		ZEDebugComponent*				GetDebugComponent();
+		void							SetDebugComponent(ZEDebugModule* Component);
+		ZEDebugModule*				GetDebugComponent();
 
 		float							GetFrameTime();
 		float							GetRuningTime();

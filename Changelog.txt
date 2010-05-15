@@ -336,7 +336,11 @@
 [15 May 2010 - Revision 186 - Orcun]
 	FIX: ZEPortalMap rendering fixed. 
 
-[15 May 2010 - Revision 192 - Orcun]
+[15 May 2010 - Revision 192, 193 - Orcun]
 	CHG: GameInterface sub module renamed to Game.
 	CHG: Bit Flags types has been changed from ZEDWORD to typedefs.
 	ADD: ZEDrawParameters has been added.
+	CHG: ZEComponent moved to ZEGame sub-system.
+	CHG: ZEDebugComponent renamed to ZEDebugModule and became ZEModule.
+	CHG: DebugComponnent folder renamed to Debug.
+	CHG: ZEDebugModule moved to Debug folder.

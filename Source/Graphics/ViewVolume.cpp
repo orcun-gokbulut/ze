@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ViewVolume.h"
-#include "Core/Component.h"
+#include "Game/Component.h"
 #include "Core/Error.h"
-#include "GameInterface/Entity.h"
+#include "Game/Entity.h"
 #include "Graphics/Light.h"
 
 bool ZEViewFrustum::ConeCullTest(const ZEBoundingSphere& BoundingSphere) const

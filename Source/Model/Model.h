@@ -38,7 +38,7 @@
 #define __ZE_MODEL_H__
 
 #include "ZEDS/Array.h"
-#include "Core/Component.h"
+#include "Game/Component.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Canvas.h"
 #include "ModelResource.h"

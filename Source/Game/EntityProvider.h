@@ -38,7 +38,7 @@
 #define __ZE_ENTITYPROVIDER_H__
 
 #include "ZEDS/ZEDS.h"
-#include "GameInterface/Entity.h"
+#include "Game/Entity.h"
 
 class ZEEntityProvider
 {

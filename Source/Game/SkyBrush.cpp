@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "GameInterface/Scene.h"
+#include "Game/Scene.h"
 #include "SkyBrush.h"
-#include "GameInterface/Scene.h"
+#include "Game/Scene.h"
 #include "Graphics/Camera.h"
 #include "Graphics/FixedMaterial.h"
 #include "Graphics/DirectionalLight.h"

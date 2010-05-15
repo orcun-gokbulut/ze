@@ -37,7 +37,7 @@
 #ifndef	__ZE_RESOURCE_FILE_H__
 #define __ZE_RESOURCE_FILE_H__
 
-#include "GameInterface/Serialization.h"
+#include "Game/Serialization.h"
 #include "Definitions.h"
 
 enum ZESeekFrom

@@ -37,7 +37,7 @@
 #ifndef __ZE_PARTICLE_SYSTEM_BRUSH_H__
 #define __ZE_PARTICLE_SYSTEM_BRUSH_H__
 
-#include "GameInterface/Entity.h"
+#include "Game/Entity.h"
 #include "ParticleEffect.h"
 
 ZE_META_CLASS_DESCRIPTION(ZEParticleEffectBrush);

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsDebugComponent.cpp
+ Zinek Engine - PhysicsDebugModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -39,10 +39,10 @@
 #include "Graphics/GraphicsModule.h"
 #include "Graphics/FixedMaterial.h"
 #include "Graphics/Texture2DResource.h"
-#include "GameInterface/Game.h"
-#include "GameInterface/Player.h"
-#include "GameInterface/CanvasBrush.h"
-#include "GameInterface/Scene.h"
+#include "Game/Game.h"
+#include "Game/Player.h"
+#include "Game/CanvasBrush.h"
+#include "Game/Scene.h"
 #include "Physics/PhysicsModule.h"
 #include "Physics/PhysicalWorld.h"
 #include "Physics/PhysicalRigidBody.h"
@@ -57,7 +57,7 @@
 #include <NxActor.h>
 #include <NxPlaneShapeDesc.h>
 
-void ZEPhysicsDebugComponent::TransformChanged(const ZEPhysicalTransformChange& TransformChange)
+void ZEPhysicsDebugModule::TransformChanged(const ZEPhysicalTransformChange& TransformChange)
 {
 	float Pitch, Yaw, Roll;
 	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, TransformChange.NewRotation);
@@ -68,12 +68,12 @@ void ZEPhysicsDebugComponent::TransformChanged(const ZEPhysicalTransformChange& 
 		Pitch, Yaw, Roll);*/
 }
 
-void ZEPhysicsDebugComponent::ColisionDetected(const ZEPhysicalCollision& Collision)
+void ZEPhysicsDebugModule::ColisionDetected(const ZEPhysicalCollision& Collision)
 {
 	zeLog("Physical Object", "Collision Occured: Object1 : %x, Object2 : %x", Collision.Collider1, Collision.Collider2);
 }
 
-bool ZEPhysicsDebugComponent::Initialize()
+bool ZEPhysicsDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
 
@@ -103,8 +103,8 @@ bool ZEPhysicsDebugComponent::Initialize()
 		PhysicalRigidBody->SetMass(10.0f);
 		PhysicalRigidBody->SetKinematic(false);
 		PhysicalRigidBody->SetGravityEnabled(true);
-		PhysicalRigidBody->SetCollisionCallback(ZEPhysicalCollisionCallback(this, &ZEPhysicsDebugComponent::ColisionDetected));
-		PhysicalRigidBody->SetTransformChangeCallback(ZEPhysicalTransformChangeCallback(this, &ZEPhysicsDebugComponent::TransformChanged));
+		PhysicalRigidBody->SetCollisionCallback(ZEPhysicalCollisionCallback(this, &ZEPhysicsDebugModule::ColisionDetected));
+		PhysicalRigidBody->SetTransformChangeCallback(ZEPhysicalTransformChangeCallback(this, &ZEPhysicsDebugModule::TransformChanged));
 
 		//PhysicalRigidBody->SetLinearDamping(0.01f);
 		//World->AddPhysicalObject(PhysicalRigidBody);
@@ -182,7 +182,7 @@ bool ZEPhysicsDebugComponent::Initialize()
 	return true;
 }
 
-void ZEPhysicsDebugComponent::Deinitialize()
+void ZEPhysicsDebugModule::Deinitialize()
 {
 	if (Player != NULL)
 	{
@@ -197,7 +197,7 @@ void ZEPhysicsDebugComponent::Deinitialize()
 	}
 }
 
-void ZEPhysicsDebugComponent::Process(float ElapsedTime)
+void ZEPhysicsDebugModule::Process(float ElapsedTime)
 {
 	static float TotalTime = 0.0f;
 
@@ -238,13 +238,13 @@ void ZEPhysicsDebugComponent::Process(float ElapsedTime)
 }
 
 
-ZEPhysicsDebugComponent::ZEPhysicsDebugComponent()
+ZEPhysicsDebugModule::ZEPhysicsDebugModule()
 {
 	PhysicalRigidBody = NULL;
 	Player = NULL;
 }
 
-ZEPhysicsDebugComponent::~ZEPhysicsDebugComponent()
+ZEPhysicsDebugModule::~ZEPhysicsDebugModule()
 {
 	Deinitialize();
 }

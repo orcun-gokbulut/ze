@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "Component.h"
-#include "GameInterface/Entity.h"
+#include "Game/Entity.h"
 
 // ZEComponentDirtyTransfromFlags
 #define ZE_CDF_ALL							0xFFFFFFFF

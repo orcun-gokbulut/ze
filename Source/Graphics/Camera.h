@@ -37,14 +37,14 @@
 #ifndef	__ZE_CAMERA_H__
 #define __ZE_CAMERA_H__
 
-#include "GameInterface/Entity.h"
+#include "Game/Entity.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Canvas.h"
 #include "Graphics/ViewVolume.h"
 #include "ZEMath/Plane.h"
 #include "ZEMath/Rectangle.h"
-#include "GameInterface/Portal.h"
+#include "Game/Portal.h"
 
 enum ZECameraProjectionType
 {

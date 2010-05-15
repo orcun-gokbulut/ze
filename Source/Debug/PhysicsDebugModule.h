@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundDebugComponent.cpp
+ Zinek Engine - PhysicsDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,69 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "SoundDebugComponent.h"
+#pragma once
+#ifndef __ZE_PHYSICS_DEBUG_MODULE_H__
+#define __ZE_PHYSICS_DEBUG_MODULE_H__
 
-#include "Graphics/GraphicsModule.h"
-#include "GameInterface/Game.h"
-#include "GameInterface/Player.h"
-#include "GameInterface/Scene.h"
-#include "Sound/SoundSource3D.h"
+#include "Core/DebugComponent.h"
+#include "Physics/PhysicalCallbacks.h"
+#include "Game/ModelBrush.h"
 
-bool ZESoundDebugComponent::Initialize()
+class ZEPlayer;
+class ZEPhysicalRigidBody;
+
+#include "Physics/PhysicalShapes.h"
+
+class ZEPhysicsDebugModule : public ZEDebugModule
 {
-	ZEScene* Scene = zeGame->GetScene();
+	private:
+		ZEPlayer*				Player;
+		ZEPhysicalRigidBody*	PhysicalRigidBody;
+		ZEPhysicalSphereShape	Shape;	
+		ZEPhysicalSphereShape	Shape2;	
+		ZEModelBrush*			Model;
 
-	// Create the player
-	if (Player == NULL)
-	{
-		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
-		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
-		Player->SetRotation(ZEQuaternion::Identity);
-		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
-		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
-		Scene->SetActiveCamera(Player->GetCamera());
-		Scene->AddEntity(Player);
-	}
+		void					TransformChanged(const ZEPhysicalTransformChange& TransformChange);
+		void					ColisionDetected(const ZEPhysicalCollision& Collision);
 
-	if (SoundSource == NULL)
-	{
-		ZESoundSource3D* SoundSource = ZESoundSource3D::CreateInstance();
+	public:
+		virtual void			Process(float ElapsedTime);
 
-		SoundSource->SetSoundResource(ZESoundResource::LoadResource("test.wav"));
-		SoundSource->SetCurrentPositionTime(50);
-		SoundSource->SetStartPositionTime(0);
-		/*SoundSource->SetEndPositionTime(70.5f);*/
-		SoundSource->SetPlaybackSpeed(1.0f);
-		SoundSource->SetLooping(true);
-		SoundSource->Play();
-		SoundSource->SetSoundSourceType(ZE_SST_MUSIC);
-	}
+		virtual bool			Initialize();
+		virtual void			Deinitialize();
 
-	return true;
-}
 
-void ZESoundDebugComponent::Deinitialize()
-{
-	if (Player != NULL)
-	{
-		Player->Destroy();
-		Player = NULL;
-	}
 
-	if (SoundSource != NULL)
-	{
-		SoundSource->Destroy();
-		SoundSource = NULL;
-	}
-}
+								ZEPhysicsDebugModule();
+		virtual					~ZEPhysicsDebugModule();
+};
 
-ZESoundDebugComponent::ZESoundDebugComponent()
-{
-	SoundSource = NULL;
-	Player = NULL;
-}
-
-ZESoundDebugComponent::~ZESoundDebugComponent()
-{
-	Deinitialize();
-}
+#endif

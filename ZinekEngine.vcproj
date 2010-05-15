@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1254"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="Zinek Engine"
 	ProjectGUID="{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}"
 	RootNamespace="ComponentDevelopment"
@@ -703,11 +703,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
@@ -933,166 +933,123 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Game Interface"
+			Name="Game"
 			>
 			<File
-				RelativePath=".\Source\GameInterface\CanvasBrush.cpp"
+				RelativePath=".\Source\Game\CanvasBrush.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\CanvasBrush.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\Entity.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						GeneratePreprocessedFile="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\Entity.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\Game.cpp"
+				RelativePath=".\Source\Game\CanvasBrush.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\Game.h"
+				RelativePath=".\Source\Game\Component.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\GameManager.h"
+				RelativePath=".\Source\Game\Component.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\LightBrush.cpp"
+				RelativePath=".\Source\Game\Entity.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\LightBrush.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\ModelBrush.cpp"
+				RelativePath=".\Source\Game\Entity.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\ModelBrush.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						AdditionalDependencies=""
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\Player.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						GeneratePreprocessedFile="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\Player.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\GameInterface\Portal.h"
+				RelativePath=".\Source\Game\EntityProvider.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\Scene.cpp"
+				RelativePath=".\Source\Game\EntityProvider.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\Scene.h"
+				RelativePath=".\Source\Game\Game.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\SceneDebugDraw.cpp"
+				RelativePath=".\Source\Game\Game.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\SceneDebugDraw.h"
+				RelativePath=".\Source\Game\GameManager.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\Serialization.cpp"
+				RelativePath=".\Source\Game\GameProvider.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\Serialization.h"
+				RelativePath=".\Source\Game\GameProvider.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\SkyBrush.cpp"
+				RelativePath=".\Source\Game\LightBrush.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\GameInterface\SkyBrush.h"
+				RelativePath=".\Source\Game\LightBrush.h"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Source\Game\ModelBrush.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\ModelBrush.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\Player.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\Player.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\Portal.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\Portal.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\Scene.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\Scene.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\SceneDebugDraw.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\SceneDebugDraw.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\Serialization.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\Serialization.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\SkyBrush.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\SkyBrush.h"
+				>
 			</File>
 		</Filter>
 		<Filter
@@ -1721,7 +1678,7 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="VM"
+			Name="Script"
 			>
 		</Filter>
 		<Filter
@@ -2088,6 +2045,14 @@
 			Name="DebugComponents"
 			>
 			<File
+				RelativePath=".\Source\DebugComponents\DebugComponent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\DebugComponents\DebugComponent.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\DebugComponents\MetaDebugComponent.cpp"
 				>
 			</File>
@@ -2162,14 +2127,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\Core\Core.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\DebugComponent.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\DebugComponent.h"
 				>
 			</File>
 			<File

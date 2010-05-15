@@ -37,7 +37,7 @@
 #ifndef	__ZE_LIGHT_H__
 #define __ZE_LIGHT_H__
 
-#include "Core/Component.h"
+#include "Game/Component.h"
 #include "RenderOrder.h"
 #include "ViewVolume.h"
 

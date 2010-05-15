@@ -46,7 +46,7 @@
 #include "Input/InputModule.h"
 #include "Physics/PhysicsModule.h"
 #include "Sound/SoundModule.h"
-#include "GameInterface/Game.h"
+#include "Game/Game.h"
 #include "DebugComponent.h"
 
 #define WINDOWS_LEAN_AND_MEAN
@@ -217,12 +217,12 @@ ZEGame* ZECore::GetGame()
 	return Game;
 }
 
-void ZECore::SetDebugComponent(ZEDebugComponent* Component)
+void ZECore::SetDebugComponent(ZEDebugModule* Component)
 {
 	DebugComponent = Component;
 }
 
-ZEDebugComponent* ZECore::GetDebugComponent()
+ZEDebugModule* ZECore::GetDebugComponent()
 {
 	return DebugComponent;
 }

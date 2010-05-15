@@ -36,7 +36,7 @@
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/VertexTypes.h"
 #include "Graphics/Camera.h"
-#include "GameInterface/Scene.h"
+#include "Game/Scene.h"
 #include "ParticleEmitter.h"
 #include "ParticleEffect.h"
 #include "ParticleSystem.h"

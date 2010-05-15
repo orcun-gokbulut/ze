@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "OmniProjectiveLight.h"
-#include "GameInterface/Scene.h"
+#include "Game/Scene.h"
 #include "ShadowRenderer.h"
 #include "Texture.h"
 

@@ -46,7 +46,7 @@
 #include "ZEMath/OBoundingBox.h"
 #include "ZEMath/BoundingSphere.h"
 #include "Definitions.h"
-#include "Core/Component.h"
+#include "Component.h"
 #include "Graphics/Renderer.h"
 #include "Meta/Class.h"
 

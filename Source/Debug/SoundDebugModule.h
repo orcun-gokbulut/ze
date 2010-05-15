@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MetaDebugComponent.h
+ Zinek Engine - SoundDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,28 +34,27 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_DEBUG_COMPONENT_H__
-#define __ZE_META_DEBUG_COMPONENT_H__
+#ifndef __ZE_SOUND_DEBUG_MODULE_H__
+#define __ZE_SOUND_DEBUG_MODULE_H__
 
 #include "Core/DebugComponent.h"
 
 class ZEPlayer;
-class ZECanvasBrush;
-class ZELightBrush;
+class ZESoundSource;
+class ZESoundSource3D;
 
-class ZEMetaDebugComponent : public ZEDebugComponent
+class ZESoundDebugModule : public ZEDebugModule
 {
 	private:
 		ZEPlayer*				Player;
-		ZELightBrush*			Light;
-		ZECanvasBrush*			Canvas;
-
+		ZESoundSource3D*		SoundSource;
+		
 	public:
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
 
-								ZEMetaDebugComponent();
-		virtual					~ZEMetaDebugComponent();
+								ZESoundDebugModule();
+		virtual					~ZESoundDebugModule();
 };
 
 #endif
