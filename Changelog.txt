@@ -334,4 +334,9 @@
 	ADD: Resource file loading log messages added all resource files.
 
 [15 May 2010 - Revision 186 - Orcun]
-  FIX: ZEPortalMap rendering fixed. 
+	FIX: ZEPortalMap rendering fixed. 
+
+[15 May 2010 - Revision 192 - Orcun]
+	CHG: GameInterface sub module renamed to Game.
+	CHG: Bit Flags types has been changed from ZEDWORD to typedefs.
+	ADD: ZEDrawParameters has been added.

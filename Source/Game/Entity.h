@@ -93,6 +93,7 @@ enum ZEBoundingVolumeMechnism
 };
 
 // ZEDrawFlags
+typedef ZEDWORD ZEDrawFlags;
 #define ZE_DF_NONE								0
 #define ZE_DF_DRAW								1
 #define ZE_DF_DRAW_COMPONENTS					2
@@ -103,11 +104,13 @@ enum ZEBoundingVolumeMechnism
 #define ZE_DF_AUTO								64
 
 // ZERayCastFlags
+typedef ZEDWORD ZERayCastFlags;
 #define ZE_RC_NONE								0
 #define ZE_RC_CAST_TO_ENTITY					1
 #define ZE_RC_CAST_TO_COMPONENTS				2
 
 // Entity Dirty Flags
+typedef ZEDWORD ZEEntityDirtyFlags;
 #define ZE_EDF_ALL								0xFFFFFFFF
 #define ZE_EDF_LOCAL_TRANSFORM					1
 #define ZE_EDF_WORLD_TRANSFORM					2
@@ -127,8 +130,8 @@ class ZEEntity : public ZEClass
 		ZEVector3								Velocity;
 		ZEVector3								OldPosition;
 
-		ZEDWORD									DrawFlags;
-		ZEDWORD									RayCastFlags;
+		ZEDrawFlags								DrawFlags;
+		ZERayCastFlags							RayCastFlags;
 
 		bool									Enabled;
 		bool									Visible;
@@ -142,7 +145,7 @@ class ZEEntity : public ZEClass
 		void									SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
 		void									SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
 
-		ZEDWORD									DirtyFlags;
+		ZEEntityDirtyFlags						DirtyFlags;
 
 		void									UpdateComponents();
 

@@ -42,6 +42,8 @@
 #include "ZEMath/Matrix.h"
 #include "ZEMath/AABoundingBox.h"
 
+// ZERenderOrderFlags
+typedef ZEDWORD ZERenderOrderFlags;
 #define	ZE_ROF_NONE									0
 #define	ZE_ROF_TRANSPARENT							1
 #define	ZE_ROF_IMPOSTER								2
@@ -99,6 +101,7 @@ struct ZERLLight
 		void						SetZero();
 };
 
+
 class ZEMaterial;
 class ZEVertexDeclaration;
 class ZEVertexBuffer;
@@ -107,7 +110,7 @@ class ZERenderOrder
 {
 	public:
 		int								Priority;
-		ZEDWORD							Flags;
+		ZERenderOrderFlags				Flags;
 		ZERLPrimitiveType				PrimitiveType;
 		ZEVertexDeclaration*			VertexDeclaration;
 		unsigned int					VertexBufferOffset;
