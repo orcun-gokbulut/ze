@@ -131,49 +131,6 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 	}
 	VertexBuffer->Unlock();
 	return true;
-
-	/*int LastIteration = zeCore->GetFrameId() + 1;
-
-	if (VertexBuffer == NULL)
-		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
-
-	if (!VertexBuffer->Create(Resource->Polygons.GetCount() * 3 * sizeof(ZEMapVertex)))
-		return false;
-
-	ZEMapVertex* Buffer = (ZEMapVertex*)VertexBuffer->Lock();
-
-	size_t VertexIndex = 0;
-	for (size_t I = 0; I < Resource->Polygons.GetCount(); I++)
-		if (Resource->Polygons[I].LastIteration != LastIteration)
-		{
-			ZEMaterial* Material = Resource->Polygons[I].Material;
-
-			ZERenderOrder* RenderOrder = RenderOrders.Add();
-			RenderOrder->SetZero();
-			RenderOrder->Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-			RenderOrder->Material = Material;
-			RenderOrder->PrimitiveType = ZE_ROPT_TRIANGLE;
-			RenderOrder->VertexBufferOffset = sizeof(ZEMapVertex) * VertexIndex;
-			RenderOrder->VertexBuffer = VertexBuffer;
-			RenderOrder->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();
-			ZEMatrix4x4::CreateIdentity(RenderOrder->WorldMatrix);
-			
-			RenderOrder->PrimitiveCount = 0;
-			for (size_t N = I; N < Resource->Polygons.GetCount(); N++)
-				if (Resource->Polygons[N].Material == Material)
-				{
-					//memcpy(Buffer + VertexIndex, Resource->Polygons[N].Vertices, sizeof(ZEMapVertex) * 3);
-					Buffer[VertexIndex].Position = ZEVector3(10.0f, 10.0f, 10.0f);
-					Buffer[VertexIndex + 1].Position = ZEVector3(10.0f, 10.0f, 10.0f);
-					Buffer[VertexIndex + 2].Position = ZEVector3(10.0f, 10.0f, 10.0f);
-					RenderOrder->PrimitiveCount++;
-					VertexIndex += 3;
-					(*(unsigned int*)&Resource->Polygons[N].LastIteration) = LastIteration;	
-				} 
-		}
-	VertexBuffer->Unlock();*/
-
-	return true;
 }
 
 void ZEPortalMapPortal::Deinitialize()
