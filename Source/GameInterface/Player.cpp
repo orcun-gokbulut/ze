@@ -86,7 +86,7 @@ void ZEPlayer::Tick(float Time)
 	ZEInputAction* Current;
 	zeInput->ProcessInputMap(&InputMap);
 	
-	float MetersPerSecond = 1.0f;
+	float MetersPerSecond = 10.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 	ZEComponent* HitComponent;
@@ -199,9 +199,9 @@ bool ZEPlayer::Initialize()
 
 	Listener->Initialize();
 	PointLight.SetLocalPosition(ZEVector3(0.0f, 5.0f, -5.0f));
-	PointLight.SetAttenuation(0.00000, 0.0000, 1.0f);
+	PointLight.SetAttenuation(0.00001, 0.0000, 1.0f);
 	PointLight.SetRange(10000.0f);
-	PointLight.SetIntensity(5.0f);
+	PointLight.SetIntensity(1.0f);
 	PointLight.SetColor(ZEVector3::One);
 	PointLight.SetEnabled(true);
 

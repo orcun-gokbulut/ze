@@ -67,7 +67,7 @@ bool ZEPortalMap::Initialize()
 		Portals.SetCount(Resource->GetPortals().GetCount());
 		
 		for (size_t I = 0; I < Portals.GetCount(); I++)
-			Portals[I].Initialize(this, &Resource->GetPortals()[I]);
+			Portals[I].Initialize(this, (ZEPortalMapResourcePortal*)&Resource->GetPortals()[I]);
 		
 		Doors.SetCount(Resource->GetDoors().GetCount());
 		for (size_t I = 0; I < Doors.GetCount(); I++)

@@ -45,7 +45,6 @@ class ZEPortalMapPortal;
 class ZEPortalMapDoor;
 class ZERenderer;
 class ZELight;
-
 class ZEPortalMap : public ZEMap
 {
 	friend class ZEPortalMapDoor;

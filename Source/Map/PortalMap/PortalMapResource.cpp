@@ -101,6 +101,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		
 		Materials[I] = CurrentMaterial;
 		CurrentMaterial->SetZero();
+		CurrentMaterial->SetTwoSided(false);
 		CurrentMaterial->SetDiffuseEnabled(true);
 		CurrentMaterial->SetAmbientEnabled(true);
 		CurrentMaterial->SetSpecularEnabled(true);

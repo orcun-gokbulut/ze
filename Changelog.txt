@@ -332,3 +332,6 @@
 	
 [13 May 2010 - Revision 184 - Orcun]
 	ADD: Resource file loading log messages added all resource files.
+
+[15 May 2010 - Revision 186 - Orcun]
+  FIX: ZEPortalMap rendering fixed. 

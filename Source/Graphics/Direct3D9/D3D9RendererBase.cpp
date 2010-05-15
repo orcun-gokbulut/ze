@@ -119,7 +119,7 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 
 	// If vertex buffer is static, setup vertex buffer
 	if (VertexBuffer->IsStatic())
-		GetDevice()->SetStreamSource(0, VertexBuffer->StaticBuffer, RenderOrder->VertexBufferOffset, RenderOrder->VertexDeclaration->GetVertexSize());
+		GetDevice()->SetStreamSource(0, VertexBuffer->StaticBuffer, 0, RenderOrder->VertexDeclaration->GetVertexSize());
 
 	// Setup Material
 	Material->SetupMaterial(RenderOrder, Camera);

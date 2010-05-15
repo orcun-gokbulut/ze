@@ -67,7 +67,7 @@ class ZEPortalMapPortal
 		const ZEAABoundingBox&				GetBoundingBox();
 		ZEPhysicalStaticMesh*				GetPhysicalMesh();
 
-		bool								Initialize(ZEPortalMap* Owner, const ZEPortalMapResourcePortal* Resource);
+		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);
 		void								Deinitialize();
 
 		void								Draw(ZERenderer* Renderer,  const ZESmartArray<ZELight*>& Lights);
