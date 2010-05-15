@@ -59,6 +59,7 @@ enum ZEModuleType
 	ZE_MT_GAME					= 6,
 	ZE_MT_CONSOLEINTERFACE		= 7,
 	ZE_MT_COMPONENT				= 8,
+	ZE_MT_DEBUG					= 9,
 	ZE_MT_OTHER
 };
 

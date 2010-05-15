@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "SoundDebugComponent.h"
+#include "SoundDebugModule.h"
 
 #include "Graphics/GraphicsModule.h"
 #include "Game/Game.h"

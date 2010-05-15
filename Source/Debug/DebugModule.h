@@ -37,22 +37,45 @@
 #ifndef __ZE_DEBUG_MODULE_H__
 #define __ZE_DEBUG_MODULE_H__
 
+#include "Core/Module.h"
+
+class ZEDebugModuleDescription : public ZEModuleDescription
+{
+	public:
+		virtual ZEModuleAttribute		GetAttributes();
+		virtual ZEModuleType			GetType();
+		virtual int						GetRequiredZinekEngineVersion();
+		virtual int						GetMajorVersion();
+		virtual int						GetMinorVersion();
+		virtual const char*				GetCopyright();
+		virtual const char*				GetName();
+
+		virtual ZEOptionSection*		GetOptions();
+		virtual	ZEModule*				CreateModuleInstance();
+		virtual	bool					CheckCompatible();
+};
+
 class ZEDebugModule : public ZEModule
 {
 	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Destroy();
-		
-		virtual void			PreProcess();
-		virtual void			Process(float ElapsedTime);
-		virtual void			PostProcess();
-		
-		virtual void			StartUp();
-		virtual void			ShutDown();
+		virtual ZEModuleDescription*	GetModuleDescription();
 
-		virtual void			Tick(float ElapsedTime);
-		virtual void			Render(float ElapsedTime);
+		virtual	bool					IsEnabled();
+		virtual void					SetEnabled(bool Enabled);
+
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
+		virtual void					Destroy();
+		
+		virtual void					PreProcess();
+		virtual void					Process(float ElapsedTime);
+		virtual void					PostProcess();
+		
+		virtual void					StartUp();
+		virtual void					ShutDown();
+
+		virtual void					Tick(float ElapsedTime);
+		virtual void					Render(float ElapsedTime);
 };
 
 #endif

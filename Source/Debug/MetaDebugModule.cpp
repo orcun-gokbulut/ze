@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "MetaDebugComponent.h"
+#include "MetaDebugModule.h"
 
 #include "Graphics/GraphicsModule.h"
 #include "Graphics/FixedMaterial.h"

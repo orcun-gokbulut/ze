@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysicsDebugComponent.h"
+#include "PhysicsDebugModule.h"
 
 #include "Core/Console.h"
 #include "Graphics/GraphicsModule.h"

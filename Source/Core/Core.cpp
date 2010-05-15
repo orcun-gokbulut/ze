@@ -47,7 +47,7 @@
 #include "Physics/PhysicsModule.h"
 #include "Sound/SoundModule.h"
 #include "Game/Game.h"
-#include "DebugComponent.h"
+#include "Debug/DebugModule.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>

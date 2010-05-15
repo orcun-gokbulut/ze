@@ -33,7 +33,73 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DebugComponent.h"
+#include "DebugModule.h"
+
+ZEModuleAttribute ZEDebugModuleDescription::GetAttributes()
+{
+	return ZE_MA_NONE;
+}
+
+ZEModuleType ZEDebugModuleDescription::GetType()
+{
+	return ZE_MT_DEBUG;
+}
+
+int ZEDebugModuleDescription::GetRequiredZinekEngineVersion()
+{
+	return 5;
+}
+
+int ZEDebugModuleDescription::GetMajorVersion()
+{
+	return 5;
+}
+
+int ZEDebugModuleDescription::GetMinorVersion()
+{
+	return 0;
+}
+
+const char* ZEDebugModuleDescription::GetCopyright()
+{
+	return "Copyright (C) 2010, Zinek Code House and Game Studio";
+}
+
+const char* ZEDebugModuleDescription::GetName()
+{
+	return "Debug Module";
+}
+
+ZEOptionSection* ZEDebugModuleDescription::GetOptions()
+{
+	return 0;
+}
+
+ZEModule* ZEDebugModuleDescription::CreateModuleInstance()
+{
+	return 0;
+}
+
+bool ZEDebugModuleDescription::CheckCompatible()
+{
+	return true;
+}
+
+ZEModuleDescription* ZEDebugModule::GetModuleDescription()
+{
+	static ZEDebugModuleDescription Desc;
+	return &Desc;
+}
+
+bool ZEDebugModule::IsEnabled()
+{
+	return true;
+}
+
+void ZEDebugModule::SetEnabled(bool Enabled)
+{
+	
+}
 
 bool ZEDebugModule::Initialize()
 {

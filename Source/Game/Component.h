@@ -54,16 +54,16 @@ ZE_META_CLASS_DESCRIPTION(ZEComponent);
 
 #define ZE_CDF_USER_FLAG_START		16
 
-class ZEComponent : public ZEClass
+class ZEComponent : public ZEEntity
 {
 	ZE_META_CLASS()
 	friend class ZEEntity;
 	private:
 		ZEEntity*						Owner;
-		ZEVector3						Position, OldPosition;
-		ZEVector3						Velocity;
-		ZEQuaternion					Rotation;
-		ZEVector3						Scale;
+		ZEVector3						LocalPosition, LocalOldPosition;
+		ZEVector3						LocalVelocity;
+		ZEQuaternion					LocalRotation;
+		ZEVector3						LocalScale;
 
 		ZEDWORD							DirtyFlags;
 

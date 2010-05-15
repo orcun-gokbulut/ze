@@ -46,56 +46,6 @@ class ZEPortalMapDoor;
 class ZERenderer;
 class ZELight;
 
-enum ZERenderPass
-{
-	ZE_RP_COLOR,
-	ZE_RP_DEPTH,
-	ZE_RP_SHADOW_MAP,
-	ZE_RP_OCCLUSION_MAP
-};
-
-enum ZEViewPortType
-{
-	ZE_VPT_CAMERA,
-	ZE_VPT_LIGHT
-};
-
-struct ZEViewPort
-{
-	ZEViewPortType	Type;
-	union
-	{
-		ZELight*	Light;
-		ZECamera*	Camera;
-	};
-
-	ZEVector3		Position;
-	ZEQuaternion	Rotation;
-	
-	float			FOV;
-	
-	float			Widht;
-	float			Height;
-	float			AspectRatio;
-
-	ZEMatrix4x4		ViewTransform;
-	ZEMatrix4x4		ProjectionTransform;
-	ZEMatrix4x4		ViewProjectionTransform;
-};
-
-typedef ZEDWORD ZERenderFlags;
-
-struct ZEDrawParameters
-{
-	ZERenderer*					Renderer;
-	ZERenderPass				Pass;
-	ZEDrawFlags					Flags;
-	ZEViewPort*					ViewPort;
-	ZEViewVolume*				ViewVolume;
-	
-	ZESmartArray<ZELight*>		Lights;
-};
-
 class ZEPortalMap : public ZEMap
 {
 	friend class ZEPortalMapDoor;

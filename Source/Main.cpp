@@ -44,9 +44,9 @@
 #include "Core/ModuleManager.h"
 #include "Core/Window.h"
 
-#include "DebugComponents/PhysicsDebugComponent.h"
-#include "DebugComponents/SoundDebugComponent.h"
-#include "DebugComponents/MetaDebugComponent.h"
+#include "Debug/PhysicsDebugModule.h"
+#include "Debug/SoundDebugModule.h"
+#include "Debug/MetaDebugModule.h"
 
 extern HINSTANCE ApplicationInstance;
 

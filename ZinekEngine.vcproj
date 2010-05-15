@@ -942,6 +942,15 @@
 			<File
 				RelativePath=".\Source\Game\CanvasBrush.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\Game\Component.cpp"
@@ -949,6 +958,23 @@
 			</File>
 			<File
 				RelativePath=".\Source\Game\Component.h"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Source\Game\DrawParameters.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Game\DrawParameters.h"
 				>
 			</File>
 			<File
@@ -958,6 +984,15 @@
 			<File
 				RelativePath=".\Source\Game\Entity.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\Game\EntityProvider.cpp"
@@ -994,6 +1029,15 @@
 			<File
 				RelativePath=".\Source\Game\LightBrush.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\Game\ModelBrush.cpp"
@@ -1002,6 +1046,15 @@
 			<File
 				RelativePath=".\Source\Game\ModelBrush.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\Game\Player.cpp"
@@ -1010,6 +1063,15 @@
 			<File
 				RelativePath=".\Source\Game\Player.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\Game\Portal.cpp"
@@ -1050,6 +1112,15 @@
 			<File
 				RelativePath=".\Source\Game\SkyBrush.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="$(InputPath).zpp"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter
@@ -2042,38 +2113,38 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="DebugComponents"
+			Name="Debug"
 			>
 			<File
-				RelativePath=".\Source\DebugComponents\DebugComponent.cpp"
+				RelativePath=".\Source\Debug\DebugModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\DebugComponents\DebugComponent.h"
+				RelativePath=".\Source\Debug\DebugModule.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\DebugComponents\MetaDebugComponent.cpp"
+				RelativePath=".\Source\Debug\MetaDebugModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\DebugComponents\MetaDebugComponent.h"
+				RelativePath=".\Source\Debug\MetaDebugModule.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\DebugComponents\PhysicsDebugComponent.cpp"
+				RelativePath=".\Source\Debug\PhysicsDebugModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\DebugComponents\PhysicsDebugComponent.h"
+				RelativePath=".\Source\Debug\PhysicsDebugModule.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\DebugComponents\SoundDebugComponent.cpp"
+				RelativePath=".\Source\Debug\SoundDebugModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\DebugComponents\SoundDebugComponent.h"
+				RelativePath=".\Source\Debug\SoundDebugModule.h"
 				>
 			</File>
 		</Filter>
@@ -2087,23 +2158,6 @@
 			<File
 				RelativePath=".\Source\Core\Command.h"
 				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Component.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Component.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\Core\Console.cpp"

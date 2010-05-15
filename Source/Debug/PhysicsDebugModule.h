@@ -37,7 +37,7 @@
 #ifndef __ZE_PHYSICS_DEBUG_MODULE_H__
 #define __ZE_PHYSICS_DEBUG_MODULE_H__
 
-#include "Core/DebugComponent.h"
+#include "DebugModule.h"
 #include "Physics/PhysicalCallbacks.h"
 #include "Game/ModelBrush.h"
 
