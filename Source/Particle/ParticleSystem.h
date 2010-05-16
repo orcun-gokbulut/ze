@@ -93,7 +93,7 @@ class ZEParticleSystem : public ZEClass
 		void								SetMaterial(ZEMaterial *Material);
 		ZEMaterial*							GetMaterial() const;
 
-		void								Draw(ZERenderer *Renderer, const ZESmartArray<const ZERLLight*> &Lights);
+		void								Draw(ZERenderer *Renderer, const ZESmartArray<ZELight*> &Lights);
 		void								Tick(float TimeElapsed);	
 
 		void								AddParticleEmitter(ZEParticleEmitter* ParticleEmitter);

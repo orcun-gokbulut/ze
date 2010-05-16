@@ -40,7 +40,7 @@ ZEDWORD ZEParticleEffectBrush::GetDrawFlags() const
 	return ZE_DF_DRAW | ZE_DF_DRAW_COMPONENTS;
 }
 
-void ZEParticleEffectBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
+void ZEParticleEffectBrush::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights)
 {
 	ParticleEffect.Draw(Renderer, Lights);
 }

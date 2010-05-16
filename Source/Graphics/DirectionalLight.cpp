@@ -51,19 +51,5 @@ void ZEDirectionalLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* Shado
 
 ZEDirectionalLight::ZEDirectionalLight()
 {
-	RenderOrderLight.Type = ZE_ROLT_DIRECTIONAL;
 	ShadowMap = NULL;
-}
-
-const ZEViewVolume& ZEDirectionalLight::GetViewVolume()
-{
-	if (UpdateViewVolume)
-	{
-		ZEVector3 Direction;
-		ZEQuaternion::VectorProduct(Direction, GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
-		ViewVolume.Create(GetWorldPosition(), Direction, GetRange());
-		UpdateViewVolume = false;
-	}
-
-	return ViewVolume;
 }

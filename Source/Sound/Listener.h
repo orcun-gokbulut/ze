@@ -37,7 +37,7 @@
 #ifndef	__ZE_LISTENER_H__
 #define __ZE_LISTENER_H__
 
-#include "Game/Entity.h"
+#include "Game/Component.h"
 
 class ZEListener: public ZEComponent
 {	

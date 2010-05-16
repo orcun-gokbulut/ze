@@ -109,7 +109,8 @@ class ZELightBrush : public ZEEntity
 
 		virtual void						Tick(float Time);
 		virtual void						Update();
-		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
+
+		virtual void						Draw(ZEDrawParameters* DrawParameters);
 
 											ZELightBrush();
 		virtual								~ZELightBrush();

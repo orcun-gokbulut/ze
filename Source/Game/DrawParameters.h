@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Camera.h
+ Zinek Engine - DrawParameters.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,74 +34,65 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_CAMERA_H__
-#define __ZE_CAMERA_H__
+#ifndef __ZE_DRAW_PARAMETERS_H__
+#define __ZE_DRAW_PARAMETERS_H__
 
-#include "Game/Component.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/Canvas.h"
-#include "Graphics/ViewVolume.h"
-#include "ZEMath/Plane.h"
-#include "ZEMath/Rectangle.h"
-#include "Game/Portal.h"
+#include "Types.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "ZEMath/Matrix.h"
+#include "ZEDS/Array.h"
 
-enum ZECameraProjectionType
+class ZELight;
+class ZECamera;
+class ZERenderer;
+class ZEViewVolume;
+
+enum ZERenderPass
 {
-	ZE_CPT_NONE,
-	ZE_CPT_ORTHOGRAPHICAL,
-	ZE_CPT_PERSPECTIVE
+	ZE_RP_COLOR,
+	ZE_RP_DEPTH,
+	ZE_RP_SHADOW_MAP,
+	ZE_RP_OCCLUSION_MAP
 };
 
-class ZEViewCone;
-class ZECamera : public ZEComponent
+enum ZEViewPortType
 {
-	private:
-		bool							UpdateViewFrustum;
-		bool							UpdateViewPoint;
-		bool							UpdateViewTransform;
-		bool							UpdateProjectionTransform;
-		bool							UpdateViewProjectionTransform;
+	ZE_VPT_CAMERA,
+	ZE_VPT_LIGHT
+};
 
+struct ZEViewPort
+{
+	ZEViewPortType			Type;
 
-		float							NearZ, FarZ;
-		float							FOV, AspectRatio;
-		float							Width, Height;
+	ZEVector3				Position;
+	ZEQuaternion			Rotation;
 
-		ZEMatrix4x4						ViewTransform;
-		ZEMatrix4x4						ProjectionTransform;
-		ZEMatrix4x4						ViewProjectionTransform;
+	float					FOV;
 
-		ZEViewFrustum					ViewFrustum;
+	float					Widht;
+	float					Height;
+	float					AspectRatio;
 
-	public:
-		void							SetNearZ(float NearZ);
-		float							GetNearZ();
+	ZEMatrix4x4				ViewTransform;
+	ZEMatrix4x4				ProjectionTransform;
+	ZEMatrix4x4				ViewProjectionTransform;
 
-		void							SetFarZ(float FarZ);
-		float							GetFarZ();
+	union
+	{
+		ZELight*			Light;
+		ZECamera*			Camera;
+	};
+};
 
-		void							SetFOV(float FOV);
-		float							GetFOV();
-
-		void							SetAspectRatio(float AspectRatio);
-		float							GetAspectRatio();
-
-		virtual const ZEMatrix4x4&		GetViewTransform();
-		virtual const ZEMatrix4x4&		GetProjectionTransform();
-		virtual const ZEMatrix4x4&		GetViewProjectionTransform();
-
-		virtual void					SetLocalPosition(const ZEVector3& NewPosition);	
-		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);
-
-		virtual void					OwnerWorldTransformChanged();	
-
-/*		const ZEViewPoint&				GetViewPoint();*/
-		const ZEViewVolume&				GetViewVolume();
-
-		void							GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY);
-
-										ZECamera();
+struct ZEDrawParameters
+{
+	ZERenderer*				Renderer;
+	ZERenderPass			Pass;
+	ZEViewPort*				ViewPort;
+	ZEViewVolume*			ViewVolume;
+	ZESmartArray<ZELight*>	Lights;
 };
 
 #endif

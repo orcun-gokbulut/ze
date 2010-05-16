@@ -71,16 +71,16 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 
 		virtual bool					SetupLightning() const;
 		virtual bool					SetupPointLightPass(bool Shadowed) const;
-		virtual size_t					DoPointLightPass(const ZERLLight** Lights, size_t Count) const;
+		virtual size_t					DoPointLightPass(ZEPointLight** Lights, size_t Count) const;
 
 		virtual bool					SetupDirectionalLightPass(bool Shadowed) const;
-		virtual size_t					DoDirectionalLightPass(const ZERLLight** Lights, size_t Count) const;
+		virtual size_t					DoDirectionalLightPass(ZEDirectionalLight** Lights, size_t Count) const;
 
 		virtual bool					SetupProjectiveLightPass(bool Shadowed) const;
-		virtual size_t					DoProjectiveLightPass(const ZERLLight** Lights, size_t Count) const;
+		virtual size_t					DoProjectiveLightPass(ZEProjectiveLight** Lights, size_t Count) const;
 
 		virtual bool					SetupOmniProjectiveLightPass(bool Shadowed) const;
-		virtual size_t					DoOmniProjectivePass(const ZERLLight** Lights, size_t Count) const;
+		virtual size_t					DoOmniProjectivePass(ZEOmniProjectiveLight** Lights, size_t Count) const;
 
 		virtual bool					SetupCustomPass(unsigned int CustomPassId) const;
 		virtual bool					DoCustomPass(unsigned int CustomPassId, void* CustomData) const;

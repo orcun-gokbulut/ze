@@ -264,7 +264,7 @@ void ZEComponent::Tick(float Time)
 	ZEVector3::Scale(LocalVelocity, LocalVelocity, Time);
 }
 
-void ZEComponent::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
+void ZEComponent::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights)
 {
 }
 

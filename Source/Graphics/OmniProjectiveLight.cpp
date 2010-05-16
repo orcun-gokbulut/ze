@@ -50,12 +50,12 @@ const ZETextureCube* ZEOmniProjectiveLight::GetShadowMap()
 
 const ZETextureCube* ZEOmniProjectiveLight::GetProjectionTexture()
 {
-	return RenderOrderLight.CubeProjectionMap;
+	return ProjectionTexture;
 }
 
 void ZEOmniProjectiveLight::SetProjectionTexture(const ZETextureCube* Texture)
 {
-	RenderOrderLight.CubeProjectionMap = Texture;
+	ProjectionTexture = Texture;
 }
 
 void ZEOmniProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
@@ -75,7 +75,7 @@ const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume()
 
 ZEOmniProjectiveLight::ZEOmniProjectiveLight()
 {
-	RenderOrderLight.Type = ZE_ROLT_OMNIPROJECTIVE;
+	ShadowMap = NULL;
 	ProjectionTexture = NULL;
 	ShadowMap = NULL;
 }

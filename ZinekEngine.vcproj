@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1254"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9,00"
+	Version="9.00"
 	Name="Zinek Engine"
 	ProjectGUID="{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}"
 	RootNamespace="ComponentDevelopment"
@@ -703,11 +703,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
@@ -947,7 +947,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -964,7 +964,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -989,7 +989,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -1034,7 +1034,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -1051,7 +1051,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -1068,7 +1068,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>
@@ -1117,7 +1117,7 @@
 					>
 					<Tool
 						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
 						Outputs="$(InputPath).zpp"
 					/>
 				</FileConfiguration>

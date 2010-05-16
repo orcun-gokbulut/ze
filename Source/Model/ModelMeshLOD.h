@@ -63,7 +63,7 @@ class ZEModelMeshLOD
 
 		bool								IsSkinned();
 
-		void								Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
+		void								Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights);
 		
 		void								Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource);
 		void								Deinitialize();

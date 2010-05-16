@@ -57,7 +57,7 @@ class ZECanvasBrush : public ZEEntity
 	public:
 		virtual ZEDWORD						GetDrawFlags() const;
 
-		ZERLPrimitiveType					PrimitiveType;
+		ZEROPrimitiveType					PrimitiveType;
 		ZEMaterial*							Material;
 		ZECanvas							Canvas;
 
@@ -65,7 +65,7 @@ class ZECanvasBrush : public ZEEntity
 
 		virtual void						Deinitialize();
 
-		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
+		virtual void						Draw(ZEDrawParameters* DrawParameters);
 		virtual void						Tick(float ElapsedTime);
 
 											ZECanvasBrush();

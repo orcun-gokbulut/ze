@@ -58,7 +58,7 @@ typedef ZEDWORD ZERenderOrderFlags;
 #define ZE_ROF_INDEXED								512
 
 
-enum ZERLPrimitiveType
+enum ZEROPrimitiveType
 {
 	ZE_ROPT_POINT,
 	ZE_ROPT_LINE,
@@ -66,42 +66,7 @@ enum ZERLPrimitiveType
 	ZE_ROPT_TRIANGLESTRIPT
 };
 
-enum ZERLLightType
-{
-	ZE_ROLT_POINT,
-	ZE_ROLT_DIRECTIONAL,
-	ZE_ROLT_PROJECTIVE,
-	ZE_ROLT_OMNIPROJECTIVE
-};
-
-class ZETexture2D;
-class ZETextureCube;
-struct ZERLLight
-{
-		ZERLLightType				Type;
-		ZEVector3					Color;
-		ZEVector3					Position;
-		ZEVector3					Direction;
-		ZEVector3					Attenuation;
-		float						Intensity;
-		float						Range;
-		ZEMatrix4x4					LightViewProjMatrix;
-		ZEMatrix4x4					LightRotationMatrix;
-		union
-		{
-			const ZETexture2D*		ProjectionMap;
-			const ZETextureCube*	CubeProjectionMap;
-		};
-		union
-		{
-			const ZETexture2D*		ShadowMap;
-			const ZETextureCube*	CubeShadowMap;
-		};
-
-		void						SetZero();
-};
-
-
+class ZELight;
 class ZEMaterial;
 class ZEVertexDeclaration;
 class ZEVertexBuffer;
@@ -111,10 +76,10 @@ class ZERenderOrder
 	public:
 		int								Priority;
 		ZERenderOrderFlags				Flags;
-		ZERLPrimitiveType				PrimitiveType;
+		ZEROPrimitiveType				PrimitiveType;
 		ZEVertexDeclaration*			VertexDeclaration;
-		unsigned int					VertexBufferOffset;
-		unsigned int					PrimitiveCount;
+		size_t							VertexBufferOffset;
+		size_t							PrimitiveCount;
 
 		const ZEMaterial*				Material;
 
@@ -126,7 +91,7 @@ class ZERenderOrder
 		ZEArray<ZERenderOrder*>			Instances;
 		ZEArray<ZEMatrix4x4>			BoneTransforms;
 
-		ZEArray<const ZERLLight*>		Lights;		
+		ZEArray<ZELight*>				Lights;		
 
 		void							SetZero();
 };

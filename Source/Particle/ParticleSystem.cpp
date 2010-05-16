@@ -199,7 +199,7 @@ void ZEParticleSystem::UpdateVertexBuffer() //Bitmedi
 	IsVertexBufferUpdated = true;
 }
 
-void ZEParticleSystem::Draw(ZERenderer *Renderer, const ZESmartArray<const ZERLLight *> &Lights)
+void ZEParticleSystem::Draw(ZERenderer *Renderer, const ZESmartArray<ZELight*> &Lights)
 {
 	if (GetTotalParticleCount() == 0)
 		return;

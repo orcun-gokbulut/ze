@@ -54,7 +54,7 @@ void ZEParticleEffect::Deinitialize()
 {
 }
 
-void ZEParticleEffect::Draw(ZERenderer *Renderer, const ZESmartArray<const ZERLLight*> &Lights)
+void ZEParticleEffect::Draw(ZERenderer *Renderer, const ZESmartArray<ZELight*> &Lights)
 {
 	for(unsigned int I = 0; I < SystemArray.GetCount(); I++)
 		SystemArray[I]->Draw(Renderer, Lights);

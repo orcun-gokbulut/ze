@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 #include "CanvasBrush.h"
 #include "Core/Error.h"
+#include "Game/DrawParameters.h"
 #include "Graphics/GraphicsModule.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/VertexBuffer.h"
@@ -74,11 +75,11 @@ void ZECanvasBrush::UpdateCanvas()
 	}
 }
 
-void ZECanvasBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
+void ZECanvasBrush::Draw(ZEDrawParameters* DrawParameters)
 {
 	if (RenderOrder.VertexBuffer != NULL)
 	{
-		RenderOrder.Lights.SetCount(Lights.GetCount());
+		RenderOrder.Lights.SetCount(DrawParameters->Lights.GetCount());
 		for (size_t I = 0; I < Lights.GetCount(); I++)
 			RenderOrder.Lights[I] = Lights[I];
 		switch(PrimitiveType)

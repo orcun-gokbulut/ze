@@ -47,6 +47,91 @@ ZEMaterial::~ZEMaterial()
 {
 }
 
+bool ZEMaterial::SetupPreLightning() const
+{
+	return false;
+}
+
+size_t ZEMaterial::DoPreLightningPass() const
+{
+	return 0;
+}
+
+bool ZEMaterial::SetupLightning() const
+{
+	return false;
+}
+
+bool ZEMaterial::SetupPointLightPass(bool Shadowed) const
+{
+	return false;
+}
+
+size_t ZEMaterial::DoPointLightPass(ZEPointLight** Lights, size_t Count) const
+{
+	return 0;
+}
+
+bool ZEMaterial::SetupDirectionalLightPass(bool Shadowed) const
+{
+	return false;
+}
+
+size_t ZEMaterial::DoDirectionalLightPass(ZEDirectionalLight** Lights, size_t Count) const
+{
+	return 0;
+}
+
+bool ZEMaterial::SetupProjectiveLightPass(bool Shadowed) const
+{
+	return false;
+}
+
+size_t ZEMaterial::DoProjectiveLightPass(ZEProjectiveLight** Lights, size_t Count) const
+{
+	return 0;
+}
+
+bool ZEMaterial::SetupOmniProjectiveLightPass(bool Shadowed) const
+{
+	return false;
+}
+
+size_t ZEMaterial::DoOmniProjectivePass(ZEOmniProjectiveLight** Lights, size_t Count) const
+{
+	return 0;
+}
+
+bool ZEMaterial::SetupCustomPass(unsigned int CustomPassId) const
+{
+	return false;
+}
+
+bool ZEMaterial::DoCustomPass(unsigned int CustomPassId, void* CustomData) const
+{
+	return false;
+}
+
+bool ZEMaterial::SetupShadowPass() const
+{
+	return false;
+}
+
+size_t ZEMaterial::DoShadowPass() const
+{
+	return 0;
+}
+
+void ZEMaterial::EndOfPasses() const
+{
+
+}
+
+void ZEMaterial::UpdateMaterial()
+{
+
+}
+
 void ZEMaterial::AdvanceAnimation(float TimeElapsed)
 {
 	if (GetAnimationController() != NULL)

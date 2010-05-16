@@ -64,44 +64,44 @@ void ZELight::OwnerWorldTransformChanged()
 
 void ZELight::SetColor(const ZEVector3& NewColor)
 {
-	RenderOrderLight.Color = NewColor;
+	Color = NewColor;
 }
 
 const ZEVector3& ZELight::GetColor() const
 {
-	return RenderOrderLight.Color;
+	return Color;
 }
 
 void ZELight::SetIntensity(float NewValue)
 {
-	RenderOrderLight.Intensity = NewValue;
+	Intensity = NewValue;
 }
 
 float ZELight::GetIntensity() const
 {
-	return RenderOrderLight.Intensity;
+	return Intensity;
 }
 
 void ZELight::SetRange(float NewValue)
 {
-	RenderOrderLight.Range = NewValue;
+	Range = NewValue;
 }
 
 float ZELight::GetRange() const
 {
-	return RenderOrderLight.Range;
+	return Range;
 }
 
 void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constant)
 {
-	RenderOrderLight.Attenuation.x = Constant;
-	RenderOrderLight.Attenuation.y = Distance;
-	RenderOrderLight.Attenuation.z = DistanceSquare;
+	Attenuation.x = Constant;
+	Attenuation.y = Distance;
+	Attenuation.z = DistanceSquare;
 }
 
 const ZEVector3& ZELight::GetAttenuation() const
 {
-	return RenderOrderLight.Attenuation;
+	return Attenuation;
 }
 
 void ZELight::SetEnabled(bool NewValue)
@@ -124,17 +124,11 @@ bool ZELight::GetCastsShadows() const
 	return CastsShadows;
 }
 
-const ZERLLight* ZELight::GetRenderOrderLight()
-{
-	RenderOrderLight.Position = ZEVector3(GetWorldPosition());
-	ZEQuaternion::VectorProduct(RenderOrderLight.Direction, GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
-	ZEQuaternion InvRotation;
-	ZEQuaternion::Conjugate(InvRotation, GetWorldRotation());
-	ZEMatrix4x4::CreateRotation(RenderOrderLight.LightRotationMatrix, InvRotation);
-	return &RenderOrderLight;
-}
-
 ZELight::ZELight()
 {
-	RenderOrderLight.SetZero();
+	Color = ZEVector3(1.0f, 1.0f, 1.0f);
+	Intensity = 1.0f;
+	Range = 100.0f;
+	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
+	CastsShadows = false;
 }

@@ -38,7 +38,6 @@
 #define __ZE_LIGHT_H__
 
 #include "Game/Component.h"
-#include "RenderOrder.h"
 #include "ViewVolume.h"
 
 enum ZELightType
@@ -60,7 +59,10 @@ class ZELight : public ZEComponent
 	protected:
 		bool							UpdateViewVolume;
 		bool							CastsShadows;
-		ZERLLight						RenderOrderLight;
+		ZEVector3						Color;
+		float							Intensity;
+		float							Range;
+		ZEVector3						Attenuation;
 
 	public:
 		virtual ZELightType				GetLightType() = 0;
@@ -91,7 +93,6 @@ class ZELight : public ZEComponent
 		bool							GetCastsShadows() const;
 		
 		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer) = 0;
-		virtual const ZERLLight*		GetRenderOrderLight();
 
 		virtual const ZEViewVolume&		GetViewVolume() = 0;
 

@@ -46,9 +46,10 @@
 #include "ZEMath/OBoundingBox.h"
 #include "ZEMath/BoundingSphere.h"
 #include "Definitions.h"
-#include "Component.h"
-#include "Graphics/Renderer.h"
 #include "Meta/Class.h"
+
+class ZEComponent;
+struct ZEDrawParameters;
 
 enum ZEEntityRunAt
 {
@@ -196,7 +197,8 @@ class ZEEntity : public ZEClass
 		virtual void							Reset();
 		
 		virtual void							Tick(float Time);
-		virtual void							Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
+		virtual void							Draw(ZEDrawParameters* DrawParameters);
+
 		virtual void							Update();
 
 		virtual bool							CastRay(const ZERay & Ray,const float Range,float &MinT);

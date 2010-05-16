@@ -163,7 +163,7 @@ class ZEModel : public ZEComponent
 		virtual void						SetLocalScale(const ZEVector3& NewScale);
 
 		void								Tick(float ElapsedTime);
-		void								Draw(ZERenderer* Renderer,  const ZESmartArray<const ZERLLight*>& Lights);
+		void								Draw(ZERenderer* Renderer,  const ZESmartArray<ZELight*>& Lights);
 
 		virtual void						OwnerWorldTransformChanged();
 		void								UpdateBoundingBox();

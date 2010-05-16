@@ -535,7 +535,7 @@ void ZEModel::UpdateBoneTransforms()
 	BoneTransformsDirtyFlag = true;
 }
 
-void ZEModel::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
+void ZEModel::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights)
 {
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Draw(Renderer, Lights);

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Camera.h
+ Zinek Engine - DrawParameters.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,76 +32,4 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-
-#pragma once
-#ifndef	__ZE_CAMERA_H__
-#define __ZE_CAMERA_H__
-
-#include "Game/Component.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/Canvas.h"
-#include "Graphics/ViewVolume.h"
-#include "ZEMath/Plane.h"
-#include "ZEMath/Rectangle.h"
-#include "Game/Portal.h"
-
-enum ZECameraProjectionType
-{
-	ZE_CPT_NONE,
-	ZE_CPT_ORTHOGRAPHICAL,
-	ZE_CPT_PERSPECTIVE
-};
-
-class ZEViewCone;
-class ZECamera : public ZEComponent
-{
-	private:
-		bool							UpdateViewFrustum;
-		bool							UpdateViewPoint;
-		bool							UpdateViewTransform;
-		bool							UpdateProjectionTransform;
-		bool							UpdateViewProjectionTransform;
-
-
-		float							NearZ, FarZ;
-		float							FOV, AspectRatio;
-		float							Width, Height;
-
-		ZEMatrix4x4						ViewTransform;
-		ZEMatrix4x4						ProjectionTransform;
-		ZEMatrix4x4						ViewProjectionTransform;
-
-		ZEViewFrustum					ViewFrustum;
-
-	public:
-		void							SetNearZ(float NearZ);
-		float							GetNearZ();
-
-		void							SetFarZ(float FarZ);
-		float							GetFarZ();
-
-		void							SetFOV(float FOV);
-		float							GetFOV();
-
-		void							SetAspectRatio(float AspectRatio);
-		float							GetAspectRatio();
-
-		virtual const ZEMatrix4x4&		GetViewTransform();
-		virtual const ZEMatrix4x4&		GetProjectionTransform();
-		virtual const ZEMatrix4x4&		GetViewProjectionTransform();
-
-		virtual void					SetLocalPosition(const ZEVector3& NewPosition);	
-		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);
-
-		virtual void					OwnerWorldTransformChanged();	
-
-/*		const ZEViewPoint&				GetViewPoint();*/
-		const ZEViewVolume&				GetViewVolume();
-
-		void							GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY);
-
-										ZECamera();
-};
-
-#endif
+#include "DrawParameters.h"

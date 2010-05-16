@@ -37,7 +37,7 @@
 #ifndef __ZE_COMPONENT_H__
 #define __ZE_COMPONENT_H__
 
-#include "Meta/Class.h"
+#include "Entity.h"
 #include "ZEDS/Array.h"
 #include "ZEMath/Matrix.h"
 #include "ZEMath/Vector.h"
@@ -48,7 +48,7 @@
 
 class ZERenderer;
 class ZEEntity;
-struct ZERLLight;
+struct ZELight;
 
 ZE_META_CLASS_DESCRIPTION(ZEComponent);
 
@@ -119,7 +119,7 @@ class ZEComponent : public ZEEntity
 		virtual void					SetWorldRotation(const ZEQuaternion& NewWorldRotation);
 
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& TEnterance, float &TExit);
-		virtual void					Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights);
+		virtual void					Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights);
 		virtual void					Tick(float TimeElapsed);
 
 		virtual bool					Initialize();

@@ -37,6 +37,7 @@
 #include "ZEMath/Matrix.h"
 #include "ZEMath/Ray.h"
 #include "Core/Error.h"
+#include "Component.h"
 #include <string.h>
 
 void ZEEntity::SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism)
@@ -377,7 +378,7 @@ void ZEEntity::Update()
 
 }
 
-void ZEEntity::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
+void ZEEntity::Draw(ZEDrawParameters* DrawParameters)
 {
 }
 

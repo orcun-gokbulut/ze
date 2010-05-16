@@ -51,7 +51,7 @@ class ZEPlayer : public ZEEntity
 	private:
 		ZEInputMap				InputMap;
 		ZECamera				Camera;
-		ZEVectorLight			PointLight;
+		ZEPointLight			PointLight;
 		ZEListener*				Listener;
 		float					Pitch, Yawn, Roll, FOV;
 	

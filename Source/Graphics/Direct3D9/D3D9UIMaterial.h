@@ -64,27 +64,6 @@ class ZED3D9UIMaterial : public ZEUIMaterial, public ZED3D9ComponentBase
 		virtual bool					SetupPreLightning() const;
 		virtual size_t					DoPreLightningPass() const;
 
-		virtual bool					SetupLightning() const;
-		virtual bool					SetupPointLightPass(bool Shadowed) const;
-		virtual size_t					DoPointLightPass(const ZERLLight** Lights, size_t Count) const;
-
-		virtual bool					SetupDirectionalLightPass(bool Shadowed) const;
-		virtual size_t					DoDirectionalLightPass(const ZERLLight** Lights, size_t Count) const;
-
-		virtual bool					SetupProjectiveLightPass(bool Shadowed) const;
-		virtual size_t					DoProjectiveLightPass(const ZERLLight** Lights, size_t Count) const;
-
-		virtual bool					SetupOmniProjectiveLightPass(bool Shadowed) const;
-		virtual size_t					DoOmniProjectivePass(const ZERLLight** Lights, size_t Count) const;
-
-		virtual bool					SetupCustomPass(unsigned int CustomPassId) const;
-		virtual bool					DoCustomPass(unsigned int CustomPassId, void* CustomData) const;
-
-		virtual bool					SetupShadowPass() const;	
-		virtual size_t					DoShadowPass() const;
-
-		virtual void					EndOfPasses() const;
-
 		virtual void					UpdateMaterial();
 
 		virtual void					Release();

@@ -52,8 +52,11 @@ enum ZEMaterialType
 #define ZE_MF_NOCACHING
  
 class ZERenderOrder;
-struct ZERLLight;
 class ZECamera;
+class ZEPointLight;
+class ZEProjectiveLight;
+class ZEDirectionalLight;
+class ZEOmniProjectiveLight;
 
 ZE_META_CLASS_DESCRIPTION(ZEMaterial)
 
@@ -75,32 +78,32 @@ class ZEMaterial : public ZEClass
 		// Render calls
 		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const = 0;
 
-		virtual bool					SetupPreLightning() const = 0;
-		virtual size_t					DoPreLightningPass() const = 0;
+		virtual bool					SetupPreLightning() const;
+		virtual size_t					DoPreLightningPass() const;
 
-		virtual bool					SetupLightning() const = 0;
+		virtual bool					SetupLightning() const;
 
-		virtual bool					SetupPointLightPass(bool Shadowed) const = 0;
-		virtual size_t					DoPointLightPass(const ZERLLight** Lights, size_t Count) const = 0;
+		virtual bool					SetupPointLightPass(bool Shadowed) const;
+		virtual size_t					DoPointLightPass(ZEPointLight** Lights, size_t Count) const;
 
-		virtual bool					SetupDirectionalLightPass(bool Shadowed) const = 0;
-		virtual size_t					DoDirectionalLightPass(const ZERLLight** Lights, size_t Count) const = 0;
+		virtual bool					SetupDirectionalLightPass(bool Shadowed) const;
+		virtual size_t					DoDirectionalLightPass(ZEDirectionalLight** Lights, size_t Count) const;
 
-		virtual bool					SetupProjectiveLightPass(bool Shadowed) const = 0;
-		virtual size_t					DoProjectiveLightPass(const ZERLLight** Lights, size_t Count) const = 0;
+		virtual bool					SetupProjectiveLightPass(bool Shadowed) const;
+		virtual size_t					DoProjectiveLightPass(ZEProjectiveLight** Lights, size_t Count) const;
 
-		virtual bool					SetupOmniProjectiveLightPass(bool Shadowed) const = 0;
-		virtual size_t					DoOmniProjectivePass(const ZERLLight** Lights, size_t Count) const = 0;
+		virtual bool					SetupOmniProjectiveLightPass(bool Shadowed) const;
+		virtual size_t					DoOmniProjectivePass(ZEOmniProjectiveLight** Lights, size_t Count) const;
 
-		virtual bool					SetupCustomPass(unsigned int CustomPassId) const = 0;
-		virtual bool					DoCustomPass(unsigned int CustomPassId, void* CustomData) const = 0;
+		virtual bool					SetupCustomPass(unsigned int CustomPassId) const;
+		virtual bool					DoCustomPass(unsigned int CustomPassId, void* CustomData) const;
 
-		virtual bool					SetupShadowPass() const = 0;	
-		virtual size_t					DoShadowPass() const = 0;
+		virtual bool					SetupShadowPass() const;	
+		virtual size_t					DoShadowPass() const;
 
-		virtual void					EndOfPasses() const = 0;
+		virtual void					EndOfPasses() const;
 
-		virtual void					UpdateMaterial() = 0;
+		virtual void					UpdateMaterial();
 
 		virtual void					AdvanceAnimation(float TimeElapsed);
 

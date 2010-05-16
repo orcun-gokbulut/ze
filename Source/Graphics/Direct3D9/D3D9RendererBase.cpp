@@ -48,6 +48,11 @@
 #include "Graphics/RenderOrder.h"
 #include "Core/Error.h"
 
+#include "Graphics/PointLight.h"
+#include "Graphics/DirectionalLight.h"
+#include "Graphics/ProjectiveLight.h"
+#include "Graphics/OmniProjectiveLight.h"
+
 #pragma warning(disable:4267)
 
 void ZED3D9RendererBase::PumpStreams(ZERenderOrder* RenderOrder)
@@ -131,80 +136,87 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 	PumpStreams(RenderOrder);
 
 	// Do light passes
-	if (Material->SetupLightning() && RenderOrder->Lights.GetCount() != 0)
+	if (RenderOrder->Lights.GetCount() != 0 && Material->SetupLightning())
 	{
 		// Sort the lights
-		const ZERLLight* PointLightList[64];
+		ZEPointLight* PointLightList[64];
 		size_t PointLightCount = 0;
-		const ZERLLight* DirectionalLightList[64];
+
+		ZEDirectionalLight* DirectionalLightList[64];
 		size_t DirectionalLightCount = 0;
-		const ZERLLight* ProjectiveLightList[64];
+
+		ZEProjectiveLight* ProjectiveLightList[64];
 		size_t ProjectiveLightCount = 0;
-		const ZERLLight* OmniProjectiveLightList[64];
+
+		ZEOmniProjectiveLight* OmniProjectiveLightList[64];
 		size_t OmniProjectiveLightCount = 0;
-		const ZERLLight* ShadowedPointLightList[64];
+
+		ZEPointLight* ShadowedPointLightList[64];
 		size_t ShadowedPointLightCount = 0;
-		const ZERLLight* ShadowedDirectionalLightList[64];
+
+		ZEDirectionalLight* ShadowedDirectionalLightList[64];
 		size_t ShadowedDirectionalLightCount = 0;
-		const ZERLLight* ShadowedProjectiveLightList[64];
+
+		ZEProjectiveLight* ShadowedProjectiveLightList[64];
 		size_t ShadowedProjectiveLightCount = 0;
-		const ZERLLight* ShadowedOmniProjectiveLightList[64];
+
+		ZEOmniProjectiveLight* ShadowedOmniProjectiveLightList[64];
 		size_t ShadowedOmniProjectiveLightCount = 0;
 
 		for (size_t I = 0; I < RenderOrder->Lights.GetCount(); I++)
 		{			
-			const ZERLLight* CurrentLight = RenderOrder->Lights[I];
-			switch (CurrentLight->Type)
+			ZELight* CurrentLight = RenderOrder->Lights[I];
+			switch (CurrentLight->GetLightType())
 			{
-				case ZE_ROLT_POINT:
-					if (CurrentLight->ShadowMap == NULL)
+				case ZE_LT_POINT:
+					if (CurrentLight->GetCastsShadows())
 					{
-						PointLightList[PointLightCount] = CurrentLight;
-						PointLightCount++;
+						ShadowedPointLightList[ShadowedPointLightCount] = (ZEPointLight*)CurrentLight;
+						ShadowedPointLightCount++;
 					}
 					else
 					{
-						ShadowedPointLightList[ShadowedPointLightCount] = CurrentLight;
-						ShadowedPointLightCount++;
+						PointLightList[PointLightCount] = (ZEPointLight*)CurrentLight;
+						PointLightCount++;
 					}
 					break;
 
-				case ZE_ROLT_DIRECTIONAL:
-					if (CurrentLight->ShadowMap == NULL)
+				case ZE_LT_DIRECTIONAL:
+					if (CurrentLight->GetCastsShadows() == NULL)
 					{
-						DirectionalLightList[DirectionalLightCount] = CurrentLight;
+						DirectionalLightList[DirectionalLightCount] = (ZEDirectionalLight*)CurrentLight;
 						DirectionalLightCount++;
 					}
 					else
 					{
-						ShadowedDirectionalLightList[ShadowedDirectionalLightCount] = CurrentLight;
+						ShadowedDirectionalLightList[ShadowedDirectionalLightCount] = (ZEDirectionalLight*)CurrentLight;
 						ShadowedDirectionalLightCount++;
 					}
 					break;
 
-				case ZE_ROLT_PROJECTIVE:
-					if (CurrentLight->ShadowMap == NULL)
+				case ZE_LT_PROJECTIVE:
+					if (CurrentLight->GetCastsShadows() == NULL)
 					{
-						ProjectiveLightList[PointLightCount] = CurrentLight;
+						ProjectiveLightList[PointLightCount] = (ZEProjectiveLight*)CurrentLight;
 						ProjectiveLightCount++;
 					}
 					else
 					{
-						ShadowedProjectiveLightList[ShadowedPointLightCount] = CurrentLight;
+						ShadowedProjectiveLightList[ShadowedPointLightCount] = (ZEProjectiveLight*)CurrentLight;
 						ShadowedProjectiveLightCount++;
 					}
 					break;
 
-				case ZE_ROLT_OMNIPROJECTIVE:
-					if (CurrentLight->ShadowMap == NULL)
+				case ZE_LT_OMNIPROJECTIVE:
+					if (CurrentLight->GetCastsShadows() == NULL)
 					{
-						OmniProjectiveLightList[OmniProjectiveLightCount] = CurrentLight;
+						OmniProjectiveLightList[OmniProjectiveLightCount] = (ZEOmniProjectiveLight*)CurrentLight;
 						OmniProjectiveLightCount++;
 
 					}
 					else
 					{
-						ShadowedOmniProjectiveLightList[OmniProjectiveLightCount] = CurrentLight;
+						ShadowedOmniProjectiveLightList[OmniProjectiveLightCount] = (ZEOmniProjectiveLight*)CurrentLight;
 						ShadowedOmniProjectiveLightCount++;
 					}
 					break;
@@ -212,10 +224,10 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 		}
 	
 		// Draw point light passes
-		if (PointLightCount != 0)
+		if (PointLightCount != 0 && Material->SetupPointLightPass(false))
 		{
 			// Setup material for point light passes
-			Material->SetupPointLightPass(false);			
+	
 			while (PointLightCount != 0)
 			{
 				// Setup point light pass and decrease processed light coun t
@@ -234,9 +246,8 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 		}
 
 		// Draw shadowed point light passes
-		if (ShadowedPointLightCount != 0)
+		if (ShadowedPointLightCount != 0 && Material->SetupPointLightPass(true))
 		{
-			Material->SetupPointLightPass(true);			
 			while (PointLightCount != 0)
 			{
 				ShadowedPointLightCount -= Material->DoPointLightPass(ShadowedPointLightList, PointLightCount);
@@ -245,9 +256,9 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 		}
 
 		// Draw directional light passes
-		if (DirectionalLightCount != 0)
+		if (DirectionalLightCount != 0 && Material->SetupDirectionalLightPass(false))
 		{
-			Material->SetupDirectionalLightPass(false);			
+				
 			while (DirectionalLightCount != 0)
 			{
 				DirectionalLightCount -= Material->DoDirectionalLightPass(DirectionalLightList, DirectionalLightCount);
@@ -256,9 +267,8 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 		}
 
 		// Draw shadowed directional light passes
-		if (ShadowedDirectionalLightCount != 0)
+		if (ShadowedDirectionalLightCount != 0 && Material->SetupDirectionalLightPass(true))
 		{
-			Material->SetupDirectionalLightPass(true);			
 			while (ShadowedDirectionalLightCount != 0)
 			{
 				ShadowedDirectionalLightCount -= Material->DoDirectionalLightPass(ShadowedDirectionalLightList, ShadowedDirectionalLightCount);
@@ -267,9 +277,8 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 		}
 
 		// Draw projective light passes
-		if (ProjectiveLightCount != 0)
+		if (ProjectiveLightCount != 0 && Material->SetupProjectiveLightPass(false))
 		{
-			Material->SetupProjectiveLightPass(false);			
 			while (ProjectiveLightCount != 0)
 			{
 				ProjectiveLightCount -= Material->DoProjectiveLightPass(ProjectiveLightList, ProjectiveLightCount);
@@ -278,9 +287,8 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 		}
 
 		// Draw shadowed projective light passes		
-		if (ShadowedProjectiveLightCount != 0)
+		if (ShadowedProjectiveLightCount != 0 && Material->SetupProjectiveLightPass(true))
 		{
-			Material->SetupProjectiveLightPass(true);			
 			while (ShadowedProjectiveLightCount != 0)
 			{
 				ShadowedProjectiveLightCount -= Material->DoProjectiveLightPass(ShadowedProjectiveLightList, ShadowedProjectiveLightCount);
@@ -289,9 +297,8 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 		}
 		
 		// Draw omni projective light passes
-		if (OmniProjectiveLightCount != 0)
+		if (OmniProjectiveLightCount != 0 && Material->SetupOmniProjectiveLightPass(false))
 		{
-			Material->SetupOmniProjectiveLightPass(false);			
 			while (OmniProjectiveLightCount != 0)
 			{
 				OmniProjectiveLightCount -= Material->DoOmniProjectivePass(OmniProjectiveLightList, OmniProjectiveLightCount);
@@ -300,9 +307,8 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 		}
 
 		// Draw shadowed omni projective light passes
-		if (ShadowedOmniProjectiveLightCount != 0)
+		if (ShadowedOmniProjectiveLightCount != 0 && Material->SetupOmniProjectiveLightPass(true))
 		{
-			Material->SetupOmniProjectiveLightPass(true);			
 			while (ShadowedOmniProjectiveLightCount != 0)
 			{
 				ShadowedOmniProjectiveLightCount -= Material->DoOmniProjectivePass(ShadowedOmniProjectiveLightList, ShadowedOmniProjectiveLightCount);

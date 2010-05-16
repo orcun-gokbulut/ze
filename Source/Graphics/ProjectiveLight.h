@@ -40,12 +40,16 @@
 #include "Light.h"
 #include "ViewVolume.h"
 
+class ZETexture2D;
+
 class ZEProjectiveLight : public ZELight
 {
 	private:
 		float							FOV;
 		float							AspectRatio;
 		ZEViewFrustum					ViewVolume;
+		const ZETexture2D*				ProjectionMap;
+		ZETexture2D*					ShadowMap;
 
 	public:
 		ZELightType						GetLightType();
@@ -63,7 +67,6 @@ class ZEProjectiveLight : public ZELight
 		const ZETexture2D*				GetProjectionTexture();
 
 		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
-		virtual const ZERLLight*		GetRenderOrderLight();
 		virtual const ZEViewVolume&		GetViewVolume();
 
 										ZEProjectiveLight();

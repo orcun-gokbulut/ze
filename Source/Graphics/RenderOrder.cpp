@@ -32,15 +32,5 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
 #include "RenderOrder.h"
-#include <memory.h>
-
-void ZERLLight::SetZero()
-{
-	memset(this, 0, sizeof(ZERLLight));
-}
-
-void ZERenderOrder::SetZero()
-{
-	memset(this, 0, sizeof(ZERenderOrder));
-}

@@ -68,27 +68,27 @@ float ZEProjectiveLight::GetAspectRatio()
 
 void ZEProjectiveLight::SetProjectionTexture(const ZETexture2D* Texture)
 {
-	RenderOrderLight.ProjectionMap = Texture;
+	ProjectionMap = Texture;
 }
 
 const ZETexture2D* ZEProjectiveLight::GetProjectionTexture()
 {
-	return RenderOrderLight.ProjectionMap;
+	return ProjectionMap;
 }
 
 const ZETexture2D* ZEProjectiveLight::GetShadowMap()
 {
-	return RenderOrderLight.ShadowMap;
+	return ShadowMap;
 }
 
 void ZEProjectiveLight::SetShadowMap(int Width, int Height)
 {
-	if (RenderOrderLight.ShadowMap != NULL)
-		((ZETexture2D*)RenderOrderLight.ShadowMap)->Release();
+	if (ShadowMap != NULL)
+		ShadowMap->Release();
 	else
-		RenderOrderLight.ShadowMap = ZETexture2D::CreateInstance();
+		ShadowMap = ZETexture2D::CreateInstance();
 
-	if (!((ZETexture2D*)RenderOrderLight.ShadowMap)->Create(Width, Height, ZE_TPF_SHADOWMAP, true))
+	if (!ShadowMap->Create(Width, Height, ZE_TPF_SHADOWMAP, true))
 	{
 		zeError("Projective Light", "Can not create shadow map texture.");
 		return;
@@ -97,7 +97,7 @@ void ZEProjectiveLight::SetShadowMap(int Width, int Height)
 
 void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
 {
-	if (!GetCastsShadows() || RenderOrderLight.ShadowMap == NULL || RenderOrderLight.ShadowMap->IsEmpty())
+	if (!GetCastsShadows() || ShadowMap == NULL || ShadowMap->IsEmpty())
 		return;
 
 	ZEViewPoint ViewPoint;
@@ -115,14 +115,14 @@ void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* Shadow
 	ZEMatrix4x4::CreatePerspectiveProjection(PerspectiveMatrix, FOV, AspectRatio, zeGraphics->GetNearZ(), GetRange());
 	ZEMatrix4x4::Multiply(ViewPoint.ViewProjMatrix, ViewMatrix, PerspectiveMatrix);
 
-	ShadowRenderer->SetOutput((ZETexture2D*)RenderOrderLight.ShadowMap);
+	ShadowRenderer->SetOutput((ZETexture2D*)ShadowMap);
 	ShadowRenderer->ClearList();
 //	ShadowRenderer->SetCamera(ViewPoint);
 	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
 	ShadowRenderer->Render();
 }
-
-const ZERLLight* ZEProjectiveLight::GetRenderOrderLight()
+/*
+const ZELight* ZEProjectiveLight::GetRenderOrderLight()
 {
 
 	ZEVector3 Position = GetWorldPosition();
@@ -161,7 +161,7 @@ const ZERLLight* ZEProjectiveLight::GetRenderOrderLight()
 
 	RenderOrderLight.Position = ZEVector3(GetWorldPosition());
 	return &RenderOrderLight;
-}
+}*/
 
 const ZEViewVolume& ZEProjectiveLight::GetViewVolume()
 {
@@ -176,12 +176,11 @@ const ZEViewVolume& ZEProjectiveLight::GetViewVolume()
 
 ZEProjectiveLight::ZEProjectiveLight()
 {
-	RenderOrderLight.Type = ZE_ROLT_PROJECTIVE;
-	RenderOrderLight.ShadowMap = NULL;
+	ShadowMap = NULL;
 }
 
 ZEProjectiveLight::~ZEProjectiveLight()
 {
-	if (RenderOrderLight.ShadowMap != NULL)
-		((ZETexture2D*)RenderOrderLight.ShadowMap)->Destroy();
+	if (ShadowMap != NULL)
+		ShadowMap->Destroy();
 }

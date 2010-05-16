@@ -330,7 +330,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 	// Check lightning enabled
  	if (LightsEnabled)
 		for (size_t I = 0; I < Entities.GetCount(); I++)
-			// Check wheather entity is light source or not. (Does it contains light component(s))
+			// Check whether entity is light source or not. (Does it contains light component(s))
 			if (Entities[I]->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
 			{
 				const ZEArray<ZEComponent*>& Components = Entities[I]->GetComponents();
@@ -366,7 +366,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 
 	// Step 2 : Draw entities and their components
 	ZESmartArray<ZELight*> EntityLights; // List of lights that affect particular entity
-	ZESmartArray<const ZERLLight*> Lights; 
+	ZESmartArray<ZELight*> Lights; 
 
 	// Loop throught scene entities;
 	CullStatistics.TotalEntityCount = Entities.GetCount();
@@ -379,7 +379,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 
 		ZEDWORD EntityDrawFlags = CurrentEntity->GetDrawFlags();
 
-		// Check wheather entity is drawable and visible
+		// Check whether entity is drawable and visible
 		if ((EntityDrawFlags & ZE_DF_DRAW) && CurrentEntity->GetVisible())
 		{
 			CullStatistics.DrawableEntityCount++;
@@ -406,7 +406,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 				if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || !LightViewVolume.CullTest(CurrentEntity))
 				{
 					// Add light to list which contains lights effect entity
-					Lights.Add(VisibleLights[M]->GetRenderOrderLight());
+					Lights.Add(VisibleLights[M]);
 					EntityLights.Add(VisibleLights[M]);
 				}
 			}
@@ -427,7 +427,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 			// Call entity's draw routine to make it draw it self
 			CurrentEntity->Draw(Renderer, Lights);
 
-			// Check wheather entity has drawable components or not
+			// Check whether entity has drawable components or not
 			if (EntityDrawFlags & ZE_DF_DRAW_COMPONENTS)
 			{
 				const ZEArray<ZEComponent*> Components = CurrentEntity->GetComponents();
@@ -437,7 +437,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 				{
 					ZEComponent* Component = Components[N];
 
-					// Check wheather component is drawable and visible also if it is cullable, test it with view volume
+					// Check whether component is drawable and visible also if it is cullable, test it with view volume
 					if ((Component->GetDrawFlags() & ZE_DF_DRAW))
 					{
 					
@@ -454,14 +454,14 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 							}
 
 							Lights.Clear();
-							// Loop throught the lights affecting entity in order to find lights affecting component
+							// Loop thought the lights affecting entity in order to find lights affecting component
 							for (size_t M = 0; M < EntityLights.GetCount(); M++)
 							{
 								// Test light view volume and entity's bounding volumes in order to detect entity lies in lights effect area
 								const ZEViewVolume& LightViewVolume = VisibleLights[M]->GetViewVolume();
 
 								if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || !LightViewVolume.CullTest(Components[N]))
-									Lights.Add(VisibleLights[M]->GetRenderOrderLight());
+									Lights.Add(VisibleLights[M]);
 							}
 
 							if (CullStatistics.MaxLightPerComponent < Lights.GetCount())
@@ -477,7 +477,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 							if (VisualDebugElements & ZE_VDE_COMPONENT_BOUNDINGSPHERE)
 								DebugDraw.DrawBoundingSphere(Component->GetWorldBoundingSphere(), Renderer, ZEVector4(0.25f, 0.25f, 0.0f, 1.0f));
 							
-							// Call components's draw routine to make it draw it self
+							// Call component's draw routine to make it draw it self
 							Component->Draw(Renderer, Lights);
 						}
 					}

@@ -123,7 +123,7 @@ float ZESkyBrush::GetSkyLightIntensity() const
 	return SkyLight.GetIntensity();
 }
 
-void ZESkyBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
+void ZESkyBrush::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights)
 {
 	if (SkyTexture != NULL)
 	{

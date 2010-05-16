@@ -57,7 +57,7 @@ bool ZEModelMeshLOD::IsSkinned()
 	return Skinned;
 }
 
-void ZEModelMeshLOD::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
+void ZEModelMeshLOD::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights)
 {
 	if (VertexBuffer == NULL)
 		return;

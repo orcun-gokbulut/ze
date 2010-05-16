@@ -203,7 +203,7 @@ void ZED3D9TextureRenderer::Render(float ElaspedTime)
 
 bool ZED3D9TextureRenderer::SetOutput(ZETexture2D* Texture)
 {
-	// Check wheather texture is render target or not
+	// Check whether texture is render target or not
 	if (!Texture->IsRenderTarget())
 	{
 		// If not rendere can't use it
@@ -232,7 +232,7 @@ bool ZED3D9TextureRenderer::SetOutput(ZETexture2D* Texture)
 
 bool ZED3D9TextureRenderer::SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face)
 {
-	// Check wheather texture is render target or not
+	// Check whether texture is render target or not
 	if (!Texture->IsRenderTarget())
 	{
 		// If not rendere can't use it

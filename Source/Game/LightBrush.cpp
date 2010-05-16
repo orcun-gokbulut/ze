@@ -35,7 +35,9 @@
 
 #include "LightBrush.h"
 #include "Core/Error.h"
+#include "Game/DrawParameters.h"
 #include "Graphics/Canvas.h"
+#include "Graphics/Renderer.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/FixedMaterial.h"
@@ -77,7 +79,7 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 	switch(LightType)
 	{
 		case ZE_LT_POINT:
-			Light = new ZEVectorLight();
+			Light = new ZEPointLight();
 			Canvas.AddSphere(2.0f, 8, 8);
 			break;
 
@@ -351,13 +353,13 @@ void ZELightBrush::Update()
 
 }
 
-void ZELightBrush::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
+void ZELightBrush::Draw(ZEDrawParameters* DrawParameters)
 {
 	if (Light != NULL)
 	{
 		RenderOrder.WorldMatrix = Light->GetWorldTransform();
 		Material->SetEmmisiveColor(Light->GetColor());
-		Renderer->AddToRenderList(&RenderOrder);
+		DrawParameters->Renderer->AddToRenderList(&RenderOrder);
 	}
 }
 

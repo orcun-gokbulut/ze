@@ -279,7 +279,7 @@ void ZEModelMesh::ModelWorldTransformChanged()
 	UpdateWorldTransform = true;
 }
 
-void ZEModelMesh::Draw(ZERenderer* Renderer, const ZESmartArray<const ZERLLight*>& Lights)
+void ZEModelMesh::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights)
 {
 	LODs[0].Draw(Renderer, Lights);	
 }

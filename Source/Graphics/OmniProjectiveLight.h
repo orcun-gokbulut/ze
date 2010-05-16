@@ -45,7 +45,7 @@ class ZEOmniProjectiveLight : public ZELight
 {
 	private:
 		ZETextureCube*					ShadowMap;
-		ZETextureCube*					ProjectionTexture;
+		const ZETextureCube*			ProjectionTexture;
 		ZEViewSphere					ViewVolume;
 
 	public:
