@@ -103,10 +103,10 @@ bool ZEPortalMap::SetResource(ZEMapResource* Resource)
 	return false;
 }
 
-void ZEPortalMap::Render(ZERenderer* Renderer,  const ZESmartArray<ZELight*>& SceneLights)
+void ZEPortalMap::Render(ZEDrawParameters* DrawParameters)
 {
 	for (size_t I = 0; I < Portals.GetCount(); I++)
-		Portals[I].Draw(Renderer, SceneLights);
+		Portals[I].Draw(DrawParameters);
 }
 
 bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT)

@@ -35,6 +35,7 @@
 
 #include "Model.h"
 #include "ModelFileFormat.h"
+#include "Game/DrawParameters.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/SimpleMaterial.h"
@@ -535,12 +536,12 @@ void ZEModel::UpdateBoneTransforms()
 	BoneTransformsDirtyFlag = true;
 }
 
-void ZEModel::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights)
+void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 {
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
-		Meshes[I].Draw(Renderer, Lights);
+		Meshes[I].Draw(DrawParameters);
 	
-	DebugDraw(Renderer);
+	DebugDraw(DrawParameters->Renderer);
 }
 
 void ZEModel::Tick(float ElapsedTime)

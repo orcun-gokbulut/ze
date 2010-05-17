@@ -54,10 +54,10 @@ void ZEParticleEffect::Deinitialize()
 {
 }
 
-void ZEParticleEffect::Draw(ZERenderer *Renderer, const ZESmartArray<ZELight*> &Lights)
+void ZEParticleEffect::Draw(ZEDrawParameters* DrawParameters)
 {
 	for(unsigned int I = 0; I < SystemArray.GetCount(); I++)
-		SystemArray[I]->Draw(Renderer, Lights);
+		SystemArray[I]->Draw(DrawParameters);
 }
 
 void ZEParticleEffect::Tick(float TimeElapsed)

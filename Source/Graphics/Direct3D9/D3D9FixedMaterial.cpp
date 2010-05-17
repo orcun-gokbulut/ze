@@ -456,7 +456,7 @@ size_t ZED3D9FixedMaterial::DoProjectiveLightPass(ZEProjectiveLight** Lights, si
 	GetDevice()->SetVertexShaderConstantF(24, (const float*)&Lights[0]->GetPosition(), 1);
 	GetDevice()->SetVertexShaderConstantF(25, (const float*)&Lights[0]->GetDirection(), 1);
 	GetDevice()->SetVertexShaderConstantF(26, (const float*)&Lights[0]->GetAttenuation(), 1);
-	GetDevice()->SetVertexShaderConstantF(28, (float*)&Lights[0]->LightViewProjMatrix, 4);
+	GetDevice()->SetVertexShaderConstantF(28, (float*)&Lights[0]->GetProjectionMatrix(), 4);
 
 	GetDevice()->SetPixelShaderConstantF(12, (const float*)&Lights[0]->GetColor(), 1);
 	GetDevice()->SetPixelShaderConstantF(13, (const float*)&ZEVector4(Lights[0]->GetIntensity(), 0.0f, 0.0f, 0.0f), 1);
@@ -505,10 +505,12 @@ size_t ZED3D9FixedMaterial::DoOmniProjectivePass(ZEOmniProjectiveLight** Lights,
 
 	GetDevice()->SetVertexShaderConstantF(24, (const float*)&Lights[0]->GetPosition(), 1);
 	GetDevice()->SetVertexShaderConstantF(25, (const float*)&Lights[0]->GetAttenuation(), 1);
-	GetDevice()->SetVertexShaderConstantF(28, (float*)&Lights[0]->LightRotationMatrix, 4);
+	ZEMatrix4x4 Temp;
+	ZEMatrix4x4::CreateRotation(Temp, Lights[0]->GetWorldRotation());
+	GetDevice()->SetVertexShaderConstantF(28, (float*)&Temp, 4);
 
 	GetDevice()->SetPixelShaderConstantF(12, (const float*)&Lights[0]->GetColor(), 1);
-	GetDevice()->SetPixelShaderConstantF(13, (const float*)&ZEVector4(Lights[0]->SetIntensity(), 0.0f, 0.0f, 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(13, (const float*)&ZEVector4(Lights[0]->GetIntensity(), 0.0f, 0.0f, 0.0f), 1);
 
 	if (Lights[0]->GetProjectionTexture() != NULL)
 		GetDevice()->SetTexture(9, ((ZED3D9TextureCube*)Lights[0]->GetProjectionTexture())->CubeTexture);

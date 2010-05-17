@@ -89,7 +89,7 @@ class ZEModelBrush : public ZEEntity
 		virtual void						Reset();
 
 		virtual void						Update();
-		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights);
+		virtual void						Draw(ZEDrawParameters* DrawParameters);
 
 											ZEModelBrush();
 		virtual								~ZEModelBrush();

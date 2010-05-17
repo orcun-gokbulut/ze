@@ -36,6 +36,7 @@
 #include "Core/Error.h"
 #include "Game/DrawParameters.h"
 #include "Graphics/GraphicsModule.h"
+#include "Graphics/Renderer.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/VertexBuffer.h"
 
@@ -80,8 +81,9 @@ void ZECanvasBrush::Draw(ZEDrawParameters* DrawParameters)
 	if (RenderOrder.VertexBuffer != NULL)
 	{
 		RenderOrder.Lights.SetCount(DrawParameters->Lights.GetCount());
-		for (size_t I = 0; I < Lights.GetCount(); I++)
-			RenderOrder.Lights[I] = Lights[I];
+		for (size_t I = 0; I < DrawParameters->Lights.GetCount(); I++)
+			RenderOrder.Lights[I] = DrawParameters->Lights[I];
+
 		switch(PrimitiveType)
 		{
 			case ZE_ROPT_POINT:
@@ -104,7 +106,7 @@ void ZECanvasBrush::Draw(ZEDrawParameters* DrawParameters)
 		RenderOrder.Material = Material;
 		RenderOrder.PrimitiveType = PrimitiveType;
 		RenderOrder.WorldMatrix = GetWorldTransform();
-		Renderer->AddToRenderList(&RenderOrder);
+		DrawParameters->Renderer->AddToRenderList(&RenderOrder);
 	}
 }
 

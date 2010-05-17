@@ -82,7 +82,7 @@ class ZESkyBrush : public ZEEntity
 		virtual void						SetSkyLightIntensity(float Intensity);
 		float								GetSkyLightIntensity() const;
 
-		virtual void						Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights);
+		virtual void						Draw(ZEDrawParameters* DrawParameters);
 		virtual void						Tick(float Time);
 
 											ZESkyBrush();

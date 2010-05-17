@@ -41,8 +41,8 @@
 #include "ZEDS/Array.h"
 #include "ParticleSystem.h"
 
-struct ZELight;
-class ZERenderer;
+class ZEDrawParameters;
+
 class ZEParticleEffect : public ZEComponent
 {
 	private:
@@ -54,7 +54,7 @@ class ZEParticleEffect : public ZEComponent
 		bool								Initialize();
 		void								Deinitialize();
 
-		void								Draw(ZERenderer *Renderer, const ZESmartArray<ZELight*> &Lights);
+		void								Draw(ZEDrawParameters* DrawParameters);
 		void								Tick(float TimeElapsed);
 
 		void								AddParticleSystem(ZEParticleSystem* ParticleSystem);

@@ -125,7 +125,7 @@ class ZEModelMesh
 		void								Initialize(ZEModel* Model, const ZEModelResourceMesh* MeshResource);
 		void								Deinitialize();
 
-		void								Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights);
+		void								Draw(ZEDrawParameters* DrawParameters);
 
 											ZEModelMesh();
 											~ZEModelMesh();

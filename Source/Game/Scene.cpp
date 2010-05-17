@@ -319,6 +319,14 @@ const ZECullStatistics& ZEScene::GetCullStatistics()
 
 void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bool LightsEnabled)
 {
+	ZEDrawParameters DrawParameters;
+
+	DrawParameters.ElapsedTime = zeCore->GetFrameTime();
+	DrawParameters.FrameId = zeCore->GetFrameId();
+	DrawParameters.Pass = 0;
+	DrawParameters.Renderer = Renderer;
+	DrawParameters.ViewVolume = &ActiveCamera->GetViewVolume();
+	DrawParameters.ViewPort = ActiveCamera->GetViewPort();
 	DebugDraw.Clean();
 
 	// Zero statistical data

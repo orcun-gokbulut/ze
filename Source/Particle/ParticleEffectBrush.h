@@ -55,7 +55,7 @@ class ZEParticleEffectBrush : public ZEEntity
 		void						AddParticleSystem(ZEParticleSystem* System);
 		ZEParticleEffect*			GetParticleEffect();
 
-		virtual void				Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights);
+		virtual void				Draw(ZEDrawParameters* DrawParameters);
 		virtual void				Tick(float Time);
 
 		void						LoadFromFile(const char* FileName);

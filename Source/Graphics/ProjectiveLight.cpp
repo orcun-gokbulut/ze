@@ -76,6 +76,11 @@ const ZETexture2D* ZEProjectiveLight::GetProjectionTexture()
 	return ProjectionMap;
 }
 
+const ZEMatrix4x4& ZEProjectiveLight::GetProjectionMatrix()
+{
+	return ZEMatrix4x4::Identity;
+}
+
 const ZETexture2D* ZEProjectiveLight::GetShadowMap()
 {
 	return ShadowMap;

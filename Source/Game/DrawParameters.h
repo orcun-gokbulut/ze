@@ -88,6 +88,9 @@ struct ZEViewPort
 
 struct ZEDrawParameters
 {
+	size_t					FrameId;
+	float					ElapsedTime;
+	float					Time;
 	ZERenderer*				Renderer;
 	ZERenderPass			Pass;
 	ZEViewPort*				ViewPort;

@@ -61,6 +61,7 @@ enum ZEParticleBillboardType
 class ZEStaricVertexBuffer;
 class ZEMaterial;
 class ZEStaticVertexBuffer;
+class ZEDrawParameters;
 
 class ZEParticleSystem : public ZEClass
 {
@@ -77,7 +78,8 @@ class ZEParticleSystem : public ZEClass
 		ZEMaterial*							ParticleMaterial;			// Material of the entire system
 		bool								IsVertexBufferUpdated;		// A boolean for checking Vertex Buffer
 		
-		void								UpdateVertexBuffer();
+		void								UpdateVertexBuffer(ZEDrawParameters* DrawParameters);
+
 		unsigned int						GetTotalParticleCount();
 
 	public:
@@ -93,7 +95,7 @@ class ZEParticleSystem : public ZEClass
 		void								SetMaterial(ZEMaterial *Material);
 		ZEMaterial*							GetMaterial() const;
 
-		void								Draw(ZERenderer *Renderer, const ZESmartArray<ZELight*> &Lights);
+		void								Draw(ZEDrawParameters* DrawParameters);
 		void								Tick(float TimeElapsed);	
 
 		void								AddParticleEmitter(ZEParticleEmitter* ParticleEmitter);

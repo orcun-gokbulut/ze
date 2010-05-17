@@ -37,16 +37,11 @@
 #ifndef __ZE_MAP_H__
 #define __ZE_MAP_H__
 
-#include "ZEDS/Array.h"
-#include "Physics/PhysicalStaticMesh.h"
-#include "Graphics/Canvas.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/FixedMaterial.h"
-
-class ZERenderer;
-class ZEViewVolume;
-class ZELight;
+class ZEDrawParameters;
 class ZEMapResource;
+class ZERay;
+class ZEVector3;
+
 class ZEMap
 {
 	protected:
@@ -63,7 +58,7 @@ class ZEMap
 		virtual bool					SetResource(ZEMapResource* MapResource) = 0;
 		virtual ZEMapResource*			GetResource() = 0;
 
-		virtual void					Render(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights) = 0;
+		virtual void					Render(ZEDrawParameters* DrawParameters) = 0;
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT) = 0;
 
 };

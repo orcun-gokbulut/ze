@@ -35,7 +35,7 @@
 
 #include "Game/Scene.h"
 #include "SkyBrush.h"
-#include "Game/Scene.h"
+#include "Game/DrawParameters.h"
 #include "Graphics/Camera.h"
 #include "Graphics/FixedMaterial.h"
 #include "Graphics/DirectionalLight.h"
@@ -123,7 +123,7 @@ float ZESkyBrush::GetSkyLightIntensity() const
 	return SkyLight.GetIntensity();
 }
 
-void ZESkyBrush::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights)
+void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
 {
 	if (SkyTexture != NULL)
 	{
@@ -133,7 +133,7 @@ void ZESkyBrush::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights
 		ZEMatrix4x4::CreateRotation(CameraRotation, Camera->GetWorldRotation());
 		ZEMatrix4x4::CreateRotation(SkyRotation, GetRotation());
 		ZEMatrix4x4::Multiply(SkyRenderOrder.WorldMatrix, CameraRotation, SkyRotation);
-		Renderer->AddToRenderList(&SkyRenderOrder);
+		DrawParameters->Renderer->AddToRenderList(&SkyRenderOrder);
 	}
 }
 

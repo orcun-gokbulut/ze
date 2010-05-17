@@ -286,6 +286,21 @@ const ZEVector3& ZEEntity::GetScale() const
 	return Scale;
 }
 
+ZEVector3 ZEEntity::GetDirection()
+{
+	return Rotation * ZEVector3::UnitZ;
+}
+
+ZEVector3 ZEEntity::GetRight()
+{
+	return Rotation * ZEVector3::UnitX;
+}
+
+ZEVector3 ZEEntity::GetUp()
+{
+	return Rotation * ZEVector3::UnitY;
+}
+
 const ZEMatrix4x4& ZEEntity::GetWorldTransform()
 {
 	if (DirtyFlags & ZE_EDF_WORLD_TRANSFORM)

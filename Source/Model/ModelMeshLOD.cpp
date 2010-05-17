@@ -36,6 +36,7 @@
 #include "ModelMeshLOD.h"
 #include "Model.h"
 #include "Graphics/Renderer.h"
+#include "Game/DrawParameters.h"
 
 void ZEModelMeshLOD::ResetMaterial()
 {
@@ -57,7 +58,7 @@ bool ZEModelMeshLOD::IsSkinned()
 	return Skinned;
 }
 
-void ZEModelMeshLOD::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights)
+void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters)
 {
 	if (VertexBuffer == NULL)
 		return;
@@ -74,8 +75,8 @@ void ZEModelMeshLOD::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Li
 		RenderOrder.WorldMatrix = OwnerMesh->GetWorldTransform();
 
 	RenderOrder.Lights.Clear();
-	RenderOrder.Lights.MassAdd(Lights.GetConstCArray(), Lights.GetCount());
-	Renderer->AddToRenderList(&RenderOrder);
+	RenderOrder.Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
+	DrawParameters->Renderer->AddToRenderList(&RenderOrder);
 }
 
 void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)

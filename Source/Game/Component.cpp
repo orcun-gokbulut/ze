@@ -83,6 +83,20 @@ const ZEVector3& ZEComponent::GetWorldVelocity()
 	return LocalVelocity;
 }
 
+ZEVector3 ZEComponent::GetDirection()
+{
+	return GetWorldRotation() * ZEVector3::UnitZ;
+}
+
+ZEVector3 ZEComponent::GetRight()
+{
+	return GetWorldRotation() * ZEVector3::UnitX;
+}
+
+ZEVector3 ZEComponent::GetUp()
+{
+	return GetWorldRotation() * ZEVector3::UnitY;
+}
 
 const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 {
@@ -264,7 +278,7 @@ void ZEComponent::Tick(float Time)
 	ZEVector3::Scale(LocalVelocity, LocalVelocity, Time);
 }
 
-void ZEComponent::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights)
+void ZEComponent::Draw(ZEDrawParameters* DrawParameters)
 {
 }
 

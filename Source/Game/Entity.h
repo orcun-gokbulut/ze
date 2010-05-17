@@ -186,6 +186,10 @@ class ZEEntity : public ZEClass
 		virtual void							SetScale(const ZEVector3& NewScale);
 		const ZEVector3&						GetScale() const;
 
+		ZEVector3								GetDirection();
+		ZEVector3								GetRight();
+		ZEVector3								GetUp();
+
 		virtual void							SetVelocity(const ZEVector3& NewVelocity);
 		const ZEVector3&						GetVelocity() const;
 

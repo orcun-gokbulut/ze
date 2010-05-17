@@ -51,6 +51,7 @@ class ZEQuaternion;
 class ZEMatrix4x4;
 class ZEFixedMaterial;
 class ZESimpleMaterial;
+class ZEDrawParameters;
 
 class ZEModel : public ZEComponent
 {	
@@ -163,7 +164,7 @@ class ZEModel : public ZEComponent
 		virtual void						SetLocalScale(const ZEVector3& NewScale);
 
 		void								Tick(float ElapsedTime);
-		void								Draw(ZERenderer* Renderer,  const ZESmartArray<ZELight*>& Lights);
+		void								Draw(ZEDrawParameters* DrawParameters);
 
 		virtual void						OwnerWorldTransformChanged();
 		void								UpdateBoundingBox();

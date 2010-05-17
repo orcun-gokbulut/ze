@@ -48,7 +48,7 @@
 
 class ZERenderer;
 class ZEEntity;
-struct ZELight;
+class ZELight;
 
 ZE_META_CLASS_DESCRIPTION(ZEComponent);
 
@@ -117,9 +117,13 @@ class ZEComponent : public ZEEntity
 
 		virtual const ZEQuaternion		GetWorldRotation() const;
 		virtual void					SetWorldRotation(const ZEQuaternion& NewWorldRotation);
+		
+		ZEVector3						GetDirection();
+		ZEVector3						GetRight();
+		ZEVector3						GetUp();
 
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& TEnterance, float &TExit);
-		virtual void					Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights);
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
 		virtual void					Tick(float TimeElapsed);
 
 		virtual bool					Initialize();

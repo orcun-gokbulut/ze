@@ -36,14 +36,14 @@
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/VertexTypes.h"
 #include "Graphics/Camera.h"
-#include "Game/Scene.h"
 #include "ParticleEmitter.h"
 #include "ParticleEffect.h"
 #include "ParticleSystem.h"
+#include "Game/DrawParameters.h"
 #include "Graphics/SimpleMaterial.h"
 #include "Graphics/FixedMaterial.h"
 
-void ZEParticleSystem::UpdateVertexBuffer() //Bitmedi
+void ZEParticleSystem::UpdateVertexBuffer(ZEDrawParameters* DrawParameters) //Bitmedi
 {
 	if (BillboardType == ZE_PBT_WORLD_ORIENTED)
 	{
@@ -63,7 +63,7 @@ void ZEParticleSystem::UpdateVertexBuffer() //Bitmedi
 		ZEMatrix4x4 InverseWorld;
 		ZEMatrix4x4::Inverse(InverseWorld, Owner->GetWorldTransform());
 		ZEMatrix4x4 Transform;
-		ZEMatrix4x4::Multiply(Transform, zeScene->GetActiveCamera()->GetWorldTransform(), InverseWorld);
+		ZEMatrix4x4::Multiply(Transform, DrawParameters->ViewPort->ViewTransform, InverseWorld);
 		ZEVector3 CamDir;
 		ZEMatrix4x4::Transform3x3(CamDir, Transform, ZEVector3(0.0f, 0.0f, 1.0f));
 
@@ -133,7 +133,7 @@ void ZEParticleSystem::UpdateVertexBuffer() //Bitmedi
 	
 		RenderOrder.PrimitiveCount = 0;
 		
-		ZEVector3 CameraPosition = zeScene->GetActiveCamera()->GetWorldPosition() - Owner->GetWorldPosition();
+		ZEVector3 CameraPosition = DrawParameters->ViewPort->Position - Owner->GetWorldPosition();
 
 		ZESimpleVertex* Buffer = (ZESimpleVertex*)VertexBuffer->Lock();
 		if (Buffer != NULL)
@@ -199,12 +199,12 @@ void ZEParticleSystem::UpdateVertexBuffer() //Bitmedi
 	IsVertexBufferUpdated = true;
 }
 
-void ZEParticleSystem::Draw(ZERenderer *Renderer, const ZESmartArray<ZELight*> &Lights)
+void ZEParticleSystem::Draw(ZEDrawParameters* DrawParameters)
 {
 	if (GetTotalParticleCount() == 0)
 		return;
 
-	UpdateVertexBuffer();
+	UpdateVertexBuffer(DrawParameters);
 
 	if (RenderOrder.PrimitiveCount == 0)
 		return;
@@ -215,7 +215,7 @@ void ZEParticleSystem::Draw(ZERenderer *Renderer, const ZESmartArray<ZELight*> &
 	RenderOrder.WorldMatrix = GetOwner()->GetWorldTransform();
 	RenderOrder.VertexBuffer = VertexBuffer;
 	RenderOrder.Material = ParticleMaterial;
-	Renderer->AddToRenderList(&RenderOrder);
+	DrawParameters->Renderer->AddToRenderList(&RenderOrder);
 }
 
 void ZEParticleSystem::Tick(float TimeElapsed)

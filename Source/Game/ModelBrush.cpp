@@ -196,10 +196,10 @@ void ZEModelBrush::Update()
 
 }
 
-void ZEModelBrush::Draw(ZERenderer* Renderer, const ZESmartArray<ZELight*>& Lights)
+void ZEModelBrush::Draw(ZEDrawParameters* DrawParameters)
 {
 	if (Model != NULL)
-		Model->Draw(Renderer, Lights);
+		Model->Draw(DrawParameters);
 }
 
 ZEModelBrush::ZEModelBrush()
