@@ -37,10 +37,12 @@
 #include "Game.h"
 #include "Core/Console.h"
 #include "Core/Error.h"
+#include "Core/Core.h"
 #include "Graphics/FrameBufferRenderer.h"
 #include "Graphics/ShadowRenderer.h"
 #include "Graphics/Camera.h"
 #include "Graphics/Light.h"
+#include "DrawParameters.h"
 #include "Serialization.h"
 #include "ZEMath/Ray.h"
 #include "Physics/PhysicalWorld.h"
@@ -323,10 +325,10 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 
 	DrawParameters.ElapsedTime = zeCore->GetFrameTime();
 	DrawParameters.FrameId = zeCore->GetFrameId();
-	DrawParameters.Pass = 0;
+	DrawParameters.Pass = ZE_RP_COLOR;
 	DrawParameters.Renderer = Renderer;
 	DrawParameters.ViewVolume = &ActiveCamera->GetViewVolume();
-	DrawParameters.ViewPort = ActiveCamera->GetViewPort();
+	DrawParameters.ViewPort = &ActiveCamera->GetViewPort();
 	DebugDraw.Clean();
 
 	// Zero statistical data
@@ -371,12 +373,14 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 				}
 			}
 
+	DrawParameters.Lights = VisibleLights;
+	if (Map != NULL)
+		Map->Render(&DrawParameters);
 
 	// Step 2 : Draw entities and their components
 	ZESmartArray<ZELight*> EntityLights; // List of lights that affect particular entity
-	ZESmartArray<ZELight*> Lights; 
 
-	// Loop throught scene entities;
+	// Loop thought scene entities;
 	CullStatistics.TotalEntityCount = Entities.GetCount();
 
 	for (size_t I = 0; I < Entities.GetCount(); I++)
@@ -403,7 +407,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 
 			// Step 2.5 : Find lights that have effect on entity.
 			EntityLights.Clear();
-			Lights.Clear();
+			DrawParameters.Lights.Clear();
 			
 			// Loop through lights that has effect on view area. Lights that tested and passed on Step 1
 			for (size_t M = 0; M < VisibleLights.GetCount(); M++)
@@ -414,7 +418,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 				if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || !LightViewVolume.CullTest(CurrentEntity))
 				{
 					// Add light to list which contains lights effect entity
-					Lights.Add(VisibleLights[M]);
+					DrawParameters.Lights.Add(VisibleLights[M]);
 					EntityLights.Add(VisibleLights[M]);
 				}
 			}
@@ -433,7 +437,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 				DebugDraw.DrawBoundingSphere(CurrentEntity->GetWorldBoundingSphere(), Renderer, ZEVector4(0.25f, 0.25f, 0.25f, 1.0f));
 
 			// Call entity's draw routine to make it draw it self
-			CurrentEntity->Draw(Renderer, Lights);
+			CurrentEntity->Draw(&DrawParameters);
 
 			// Check whether entity has drawable components or not
 			if (EntityDrawFlags & ZE_DF_DRAW_COMPONENTS)
@@ -461,7 +465,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 								continue;
 							}
 
-							Lights.Clear();
+							DrawParameters.Lights.Clear();
 							// Loop thought the lights affecting entity in order to find lights affecting component
 							for (size_t M = 0; M < EntityLights.GetCount(); M++)
 							{
@@ -469,11 +473,11 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 								const ZEViewVolume& LightViewVolume = VisibleLights[M]->GetViewVolume();
 
 								if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || !LightViewVolume.CullTest(Components[N]))
-									Lights.Add(VisibleLights[M]);
+									DrawParameters.Lights.Add(VisibleLights[M]);
 							}
 
-							if (CullStatistics.MaxLightPerComponent < Lights.GetCount())
-								CullStatistics.MaxLightPerComponent = Lights.GetCount();
+							if (CullStatistics.MaxLightPerComponent < DrawParameters.Lights.GetCount())
+								CullStatistics.MaxLightPerComponent = DrawParameters.Lights.GetCount();
 
 							// Draw bounding volumes of the components if enabled
 							if (VisualDebugElements & ZE_VDE_COMPONENT_ORIENTED_BOUNDINGBOX)
@@ -486,16 +490,13 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 								DebugDraw.DrawBoundingSphere(Component->GetWorldBoundingSphere(), Renderer, ZEVector4(0.25f, 0.25f, 0.0f, 1.0f));
 							
 							// Call component's draw routine to make it draw it self
-							Component->Draw(Renderer, Lights);
+							Component->Draw(&DrawParameters);
 						}
 					}
 				}
 			}
 		}
 	}
-	
-	if (Map != NULL)
-		Map->Render(Renderer, VisibleLights);
 
 	if (VisualDebugElements != NULL)
 		DebugDraw.Draw(Renderer);

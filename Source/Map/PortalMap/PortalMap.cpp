@@ -39,6 +39,7 @@
 #include "PortalMapDoor.h"
 #include "Core/Error.h"
 #include "Core/Console.h"
+#include "Game/DrawParameters.h"
 
 ZEPortalMap::ZEPortalMap()
 {

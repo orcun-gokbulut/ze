@@ -65,25 +65,21 @@ enum ZEViewPortType
 struct ZEViewPort
 {
 	ZEViewPortType			Type;
+	ZELight*				Light;
+	ZECamera*				Camera;
 
 	ZEVector3				Position;
 	ZEQuaternion			Rotation;
 
 	float					FOV;
 
-	float					Widht;
+	float					Width;
 	float					Height;
 	float					AspectRatio;
 
 	ZEMatrix4x4				ViewTransform;
 	ZEMatrix4x4				ProjectionTransform;
 	ZEMatrix4x4				ViewProjectionTransform;
-
-	union
-	{
-		ZELight*			Light;
-		ZECamera*			Camera;
-	};
 };
 
 struct ZEDrawParameters

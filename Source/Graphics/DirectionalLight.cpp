@@ -45,6 +45,12 @@ const ZETexture2D* ZEDirectionalLight::GetShadowMap()
 	return ShadowMap;
 }
 
+const ZEViewVolume& ZEDirectionalLight::GetViewVolume()
+{
+	ViewVolume.Create(GetWorldPosition(), GetDirection(), GetRange());
+	return ViewVolume;
+}
+
 void ZEDirectionalLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
 {
 }

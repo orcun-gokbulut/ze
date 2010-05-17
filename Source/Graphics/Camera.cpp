@@ -38,6 +38,7 @@
 #include "GraphicsModule.h"
 #include "Core/Error.h"
 #include "ZEMath/Ray.h"
+#include "Game/DrawParameters.h"
 
 const ZEMatrix4x4& ZECamera::GetViewTransform()
 {
@@ -97,6 +98,30 @@ void ZECamera::OwnerWorldTransformChanged()
 	UpdateViewTransform = true;
 	UpdateViewProjectionTransform = true;
 	ZEComponent::OwnerWorldTransformChanged();
+}
+
+ZEViewPort ZECamera::GetViewPort()
+{
+	ZEViewPort ViewPort;
+
+	ViewPort.Type = ZE_VPT_CAMERA;
+	ViewPort.Light = NULL;
+	ViewPort.Camera = this;
+
+	ViewPort.Position = GetWorldPosition();
+	ViewPort.Rotation = GetWorldRotation();
+
+	ViewPort.FOV = FOV;
+
+	ViewPort.Width = zeGraphics->GetScreenWidth();
+	ViewPort.Height = zeGraphics->GetScreenHeight();
+	ViewPort.AspectRatio = ViewPort.Width / ViewPort.Height;
+
+	ViewPort.ViewTransform = GetViewTransform();
+	ViewPort.ProjectionTransform = GetProjectionTransform();
+	ViewPort.ViewProjectionTransform = GetViewProjectionTransform();
+
+	return ViewPort;
 }
 
 void ZECamera::SetNearZ(float NearZ)
@@ -178,7 +203,7 @@ const ZEViewPoint& ZECamera::GetViewPoint()
 	return ViewPoint;
 }*/
 
-const ZEViewVolume& ZECamera::GetViewVolume()
+ZEViewVolume& ZECamera::GetViewVolume()
 {
 	if (!UpdateViewFrustum)
 		return ViewFrustum;

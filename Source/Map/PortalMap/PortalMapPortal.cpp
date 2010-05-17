@@ -39,6 +39,7 @@
 #include "Graphics/Light.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/Renderer.h"
+#include "Game/DrawParameters.h"
 
 ZEPortalMap* ZEPortalMapPortal::GetOwner()
 {
@@ -68,15 +69,14 @@ ZEPhysicalStaticMesh* ZEPortalMapPortal::GetPhysicalMesh()
 	return PhysicalMesh;
 }
 
-void ZEPortalMapPortal::Draw(ZERenderer* Renderer,  const ZESmartArray<ZELight*>& Lights)
+void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 {
 	for(size_t I = 0; I < RenderOrders.GetCount(); I++)
 	{
-		RenderOrders[I].Lights.Clear();
-		/*for (size_t N = 0; N < Lights.GetCount(); N++)
-			RenderOrders[I].Lights.Add(Lights[N]->GetRenderOrderLight());*/
+		//RenderOrders[I].Lights.Clear();
+		//RenderOrders[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
 
-		Renderer->AddToRenderList(&RenderOrders[I]);
+		DrawParameters->Renderer->AddToRenderList(&RenderOrders[I]);
 	}
 }
 

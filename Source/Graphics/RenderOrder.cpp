@@ -34,3 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "RenderOrder.h"
+#include <memory.h>
+
+void ZERenderOrder::SetZero()
+{
+	memset(this, 0, sizeof(ZERenderOrder));
+}

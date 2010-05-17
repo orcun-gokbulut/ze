@@ -53,7 +53,8 @@ enum ZECameraProjectionType
 	ZE_CPT_PERSPECTIVE
 };
 
-class ZEViewCone;
+class ZEViewPort;
+
 class ZECamera : public ZEComponent
 {
 	private:
@@ -96,8 +97,8 @@ class ZECamera : public ZEComponent
 
 		virtual void					OwnerWorldTransformChanged();	
 
-/*		const ZEViewPoint&				GetViewPoint();*/
-		const ZEViewVolume&				GetViewVolume();
+		ZEViewPort						GetViewPort();
+		ZEViewVolume&					GetViewVolume();
 
 		void							GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY);
 

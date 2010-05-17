@@ -44,8 +44,7 @@ class ZEPortalMap;
 class ZEPortalMapDoor;
 class ZEPortalMapResourcePortal;
 class ZEStaticVertexBuffer;
-class ZERenderer;
-class ZELight;
+class ZEDrawParameters;
 class ZEPhysicalStaticMesh;
 
 class ZEPortalMapPortal
@@ -70,7 +69,7 @@ class ZEPortalMapPortal
 		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);
 		void								Deinitialize();
 
-		void								Draw(ZERenderer* Renderer,  const ZESmartArray<ZELight*>& Lights);
+		void								Draw(ZEDrawParameters* DrawParameters);
 
 											ZEPortalMapPortal();
 											~ZEPortalMapPortal();

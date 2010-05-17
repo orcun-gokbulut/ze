@@ -39,6 +39,7 @@
 #include "Graphics/Renderer.h"
 #include "Game/Scene.h"
 #include "Physics/PhysicalRigidBody.h"
+#include "Game/DrawParameters.h"
 /*
 void ZEModelMesh::UpdatePhysicalBody()
 {

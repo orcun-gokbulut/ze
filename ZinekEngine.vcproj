@@ -444,10 +444,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\RenderOrder.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\Graphics\ShadowRenderer.cpp"
 				>
 			</File>
@@ -703,11 +699,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
@@ -2045,74 +2041,6 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="Map"
-			>
-			<File
-				RelativePath=".\Source\Map\Map.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\Map.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\MapResource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Map\MapResource.h"
-				>
-			</File>
-			<Filter
-				Name="PortalMap"
-				>
-				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMap.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMap.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapDoor.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapDoor.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapFileFormat.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapPortal.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapPortal.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapPortalOctree.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapPortalOctree.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapResource.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapResource.h"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
 			Name="Debug"
 			>
 			<File
@@ -2267,6 +2195,74 @@
 				RelativePath=".\My Inspector Results\r004mi3\r004mi3.insp"
 				>
 			</File>
+		</Filter>
+		<Filter
+			Name="Map"
+			>
+			<File
+				RelativePath=".\Source\Map\Map.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Map\Map.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Map\MapResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Map\MapResource.h"
+				>
+			</File>
+			<Filter
+				Name="PortalMap"
+				>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMap.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMap.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapDoor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapDoor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapFileFormat.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapPortal.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapPortal.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapPortalOctree.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapPortalOctree.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapResource.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Map\PortalMap\PortalMapResource.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<File
 			RelativePath=".\Changelog.txt"
