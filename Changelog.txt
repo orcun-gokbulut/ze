@@ -324,3 +324,6 @@
 [19 May 2010 - Revision 200 - Hakan]
 	ADD: Trigger.cpp & Trigger.h added.
 	ADD: ZETrigger registered to Game.	
+
+[19 May 2010 - Revision 201 - Hakan]
+	ADD: ZETrigger entity bounding box scale parameter fixed.

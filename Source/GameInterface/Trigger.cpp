@@ -41,6 +41,14 @@ ZEDWORD ZETrigger::GetDrawFlags()
 	return ZE_DF_NONE;
 }
 
+void ZETrigger::SetScale(const ZEVector3& Scale)
+{
+	// Scale bounding box
+
+	SetLocalBoundingBox(ZEAABoundingBox(ZEVector3(-0.5f * Scale.x, -0.5f * Scale.y, -0.5f * Scale.z), ZEVector3(0.5f * Scale.x, 0.5f * Scale.y, 0.5f * Scale.z)));
+	ZEEntity::SetScale(Scale);
+}
+
 void ZETrigger::SetCallback(ZETriggerCallback Callback)
 {
 	this->Callback = Callback;
@@ -135,8 +143,7 @@ void ZETrigger::Tick(float ElapsedTime)
 						Callback(this,CurrentEntity);
 					}
 
-					SetActivateTriggerOn(ZE_ATO_NONE);
-					//ActivateTriggerOn = ZE_ATO_NONE;
+					ActivateTriggerOn = ZE_ATO_NONE;
 				}
 		}
 }
@@ -151,8 +158,6 @@ ZETrigger::ZETrigger()
 
 	IsTriggerActive		= true;
 	IsTriggerFired		= false;
-
-	SetLocalBoundingBox(ZEAABoundingBox(ZEVector3(-0.5f, -0.5f, -0.5f), ZEVector3(0.5f, 0.5f, 0.5f)));
 }
 
 #include "Trigger.h.zpp"
