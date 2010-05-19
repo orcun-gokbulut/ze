@@ -1101,6 +1101,15 @@
 			<File
 				RelativePath=".\Source\GameInterface\Trigger.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;"
+						Outputs="&quot;$(InputPath)&quot;.zpp"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<Filter

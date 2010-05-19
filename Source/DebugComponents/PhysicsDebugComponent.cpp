@@ -186,10 +186,11 @@ bool ZEPhysicsDebugComponent::Initialize()
 		ZETrigger* Trigger = new ZETrigger();
 		Trigger->SetName("Test Trigger");
 		Trigger->SetCallback(&TriggerCallback);
-		//Trigger->SetPosition(ZEVector3(10.0f, 10.0f, 10.0f));
+		Trigger->SetPosition(ZEVector3(0.0f, 0.0f, 4.0f));
 		Trigger->SetScale(ZEVector3(2.0f, 2.0f, 2.0f));
 
 		Scene->AddEntity(Trigger);
+
 	}
 
 	return true;

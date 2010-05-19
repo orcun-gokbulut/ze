@@ -236,6 +236,7 @@ void ZEGame::Tick(float ElapsedTime)
 #include "LightBrush.h"
 #include "ModelBrush.h"
 #include "SkyBrush.h"
+#include "Trigger.h"
 #include "../Particle/ParticleEffectBrush.h"
 
 ZEGame::ZEGame()
@@ -247,6 +248,7 @@ ZEGame::ZEGame()
 	RegisterEntityDescription((ZEEntityDescription*)ZEModelBrush::ClassDescription());
 	RegisterEntityDescription((ZEEntityDescription*)ZESkyBrush::ClassDescription());
 	RegisterEntityDescription((ZEEntityDescription*)ZEParticleEffectBrush::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZETrigger::ClassDescription());
 }
 
 ZEGame::~ZEGame()
