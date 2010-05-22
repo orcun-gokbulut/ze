@@ -56,6 +56,8 @@ class ZEPlayer : public ZEEntity
 		float					Pitch, Yawn, Roll, FOV;
 	
 	public:
+		virtual ZEDrawFlags		GetDrawFlags();
+
 		ZECamera*				GetCamera();
 		ZEListener*				GetListener();
 

@@ -51,7 +51,7 @@ class ZEQuaternion;
 class ZEMatrix4x4;
 class ZEFixedMaterial;
 class ZESimpleMaterial;
-class ZEDrawParameters;
+struct ZEDrawParameters;
 
 class ZEModel : public ZEComponent
 {	

@@ -377,6 +377,7 @@ bool ZED3D9FixedMaterial::SetupLightning() const
 		GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 		GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
 		GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+		
 		return true;
 	}
 	else
@@ -398,11 +399,14 @@ size_t ZED3D9FixedMaterial::DoPointLightPass(ZEPointLight** Lights, size_t Count
 	if (Count == 0)
 		return 0; 
 
-	GetDevice()->SetVertexShaderConstantF(24, (const float*)&Lights[0]->GetPosition(), 1);
-	GetDevice()->SetVertexShaderConstantF(25, (const float*)&Lights[0]->GetAttenuation(), 1);
+	ZEVector3 Position = Camera->GetWorldPosition();
 
-	GetDevice()->SetPixelShaderConstantF(12, (const float*)&Lights[0]->GetColor(), 1);
-	GetDevice()->SetPixelShaderConstantF(13, (const float*)&ZEVector4(Lights[0]->GetIntensity(), Lights[0]->GetRange(), 0.0f, 0.0f), 1);
+	GetDevice()->SetVertexShaderConstantF(16, (float*)&ZEVector4(Position, 1.0f), 1);
+
+	GetDevice()->SetVertexShaderConstantF(24, (const float*)&ZEVector4(Lights[0]->GetWorldPosition(), 1.0f), 1);
+	GetDevice()->SetVertexShaderConstantF(25, (const float*)&ZEVector4(Lights[0]->GetAttenuation(), 0.0f), 1);
+
+	GetDevice()->SetPixelShaderConstantF(12, (const float*)&ZEVector4(Lights[0]->GetColor(), Lights[0]->GetIntensity()), 1);
 
 	if (Lights[0]->GetShadowMap() != NULL && RecivesShadow)
 		GetDevice()->SetTexture(8, ((ZED3D9TextureCube*)Lights[0]->GetShadowMap())->CubeTexture);
@@ -426,9 +430,9 @@ size_t ZED3D9FixedMaterial::DoDirectionalLightPass(ZEDirectionalLight** Lights, 
 	if (Count == 0)
 		return 0; 
 
-	GetDevice()->SetVertexShaderConstantF(24, (const float*)&Lights[0]->GetDirection(), 1);
+	GetDevice()->SetVertexShaderConstantF(24, (const float*)&ZEVector4(Lights[0]->GetDirection(), 0.0f), 1);
 
-	GetDevice()->SetPixelShaderConstantF(12, (const float*)&Lights[0]->GetColor(), 1);
+	GetDevice()->SetPixelShaderConstantF(12, (const float*)&ZEVector4(Lights[0]->GetColor(), 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(13, (const float*)&ZEVector4(Lights[0]->GetIntensity(), 0.0f, 0.0f, 0.0f), 1);
 	
 	if (Lights[0]->GetShadowMap() != NULL && RecivesShadow)
@@ -453,12 +457,12 @@ size_t ZED3D9FixedMaterial::DoProjectiveLightPass(ZEProjectiveLight** Lights, si
 	if (Count == 0)
 		return 0; 
 
-	GetDevice()->SetVertexShaderConstantF(24, (const float*)&Lights[0]->GetPosition(), 1);
-	GetDevice()->SetVertexShaderConstantF(25, (const float*)&Lights[0]->GetDirection(), 1);
-	GetDevice()->SetVertexShaderConstantF(26, (const float*)&Lights[0]->GetAttenuation(), 1);
+	GetDevice()->SetVertexShaderConstantF(24, (const float*)&ZEVector4(Lights[0]->GetWorldPosition(), 1.0f), 1);
+	GetDevice()->SetVertexShaderConstantF(25, (const float*)&ZEVector4(Lights[0]->GetDirection(), 0.0f), 1);
+	GetDevice()->SetVertexShaderConstantF(26, (const float*)&ZEVector4(Lights[0]->GetAttenuation(), 0.0f), 1);
 	GetDevice()->SetVertexShaderConstantF(28, (float*)&Lights[0]->GetProjectionMatrix(), 4);
 
-	GetDevice()->SetPixelShaderConstantF(12, (const float*)&Lights[0]->GetColor(), 1);
+	GetDevice()->SetPixelShaderConstantF(12, (const float*)&ZEVector4(Lights[0]->GetColor(), 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(13, (const float*)&ZEVector4(Lights[0]->GetIntensity(), 0.0f, 0.0f, 0.0f), 1);
 
 	GetDevice()->SetSamplerState(9, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
@@ -503,13 +507,13 @@ size_t ZED3D9FixedMaterial::DoOmniProjectivePass(ZEOmniProjectiveLight** Lights,
 	if (Count == 0)
 		return 0; 
 
-	GetDevice()->SetVertexShaderConstantF(24, (const float*)&Lights[0]->GetPosition(), 1);
-	GetDevice()->SetVertexShaderConstantF(25, (const float*)&Lights[0]->GetAttenuation(), 1);
+	GetDevice()->SetVertexShaderConstantF(24, (const float*)&ZEVector4(Lights[0]->GetWorldPosition(), 1.0f), 1);
+	GetDevice()->SetVertexShaderConstantF(25, (const float*)&ZEVector4(Lights[0]->GetAttenuation(), 0.0f), 1);
 	ZEMatrix4x4 Temp;
 	ZEMatrix4x4::CreateRotation(Temp, Lights[0]->GetWorldRotation());
 	GetDevice()->SetVertexShaderConstantF(28, (float*)&Temp, 4);
 
-	GetDevice()->SetPixelShaderConstantF(12, (const float*)&Lights[0]->GetColor(), 1);
+	GetDevice()->SetPixelShaderConstantF(12, (const float*)&ZEVector4(Lights[0]->GetColor(), 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(13, (const float*)&ZEVector4(Lights[0]->GetIntensity(), 0.0f, 0.0f, 0.0f), 1);
 
 	if (Lights[0]->GetProjectionTexture() != NULL)

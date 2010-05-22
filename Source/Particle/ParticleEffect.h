@@ -41,7 +41,7 @@
 #include "ZEDS/Array.h"
 #include "ParticleSystem.h"
 
-class ZEDrawParameters;
+struct ZEDrawParameters;
 
 class ZEParticleEffect : public ZEComponent
 {

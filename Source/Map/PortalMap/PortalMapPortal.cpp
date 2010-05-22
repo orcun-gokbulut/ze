@@ -73,8 +73,8 @@ void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 {
 	for(size_t I = 0; I < RenderOrders.GetCount(); I++)
 	{
-		//RenderOrders[I].Lights.Clear();
-		//RenderOrders[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
+		RenderOrders[I].Lights.Clear();
+		RenderOrders[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
 
 		DrawParameters->Renderer->AddToRenderList(&RenderOrders[I]);
 	}
@@ -119,8 +119,6 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 			for (size_t I = N; I < Resource->Polygons.GetCount(); I++)
 			{
 				memcpy(Buffer + VertexIndex, Resource->Polygons[I].Vertices, sizeof(ZEMapVertex) * 3);
-				zeLog("Portal", "I: %d, N: %d, VertexIndex: %d, PrimitiveCount: %d, Position: [%f, %f, %f]", I, N, VertexIndex, RenderOrder->PrimitiveCount,
-					Buffer[VertexIndex].Position.x, Buffer[VertexIndex].Position.y, Buffer[VertexIndex].Position.z);
 				VertexIndex += 3;
 				RenderOrder->PrimitiveCount++;
 				//Resource->Polygons[I].LastIteration = LastIteration;

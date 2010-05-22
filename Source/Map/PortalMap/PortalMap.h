@@ -43,7 +43,7 @@
 class ZEPortalMapResource;
 class ZEPortalMapPortal;
 class ZEPortalMapDoor;
-class ZEDrawParameters;
+struct ZEDrawParameters;
 class ZERay;
 class ZEVector3;
 

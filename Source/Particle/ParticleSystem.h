@@ -61,7 +61,7 @@ enum ZEParticleBillboardType
 class ZEStaricVertexBuffer;
 class ZEMaterial;
 class ZEStaticVertexBuffer;
-class ZEDrawParameters;
+struct ZEDrawParameters;
 
 class ZEParticleSystem : public ZEClass
 {

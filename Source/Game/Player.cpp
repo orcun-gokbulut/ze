@@ -57,6 +57,11 @@
 #define ACTIONID_CONSOLE		10
 #define ACTIONID_RAYCAST		11
 
+ZEDrawFlags ZEPlayer::GetDrawFlags()
+{
+	return ZE_DF_LIGHT_SOURCE;
+}
+
 ZECamera* ZEPlayer::GetCamera()
 {
 	return &Camera;
@@ -178,6 +183,10 @@ void ZEPlayer::Tick(float Time)
 		Rotation = Temp;
 		SetRotation(Rotation);
 	}
+
+	static float Temp = 0;
+	Temp += Time;
+	PointLight.SetPosition(ZEVector3(cosf(Temp), sinf(Temp), 1.0f));
 	ZEEntity::Tick(Time);
 }
 
@@ -198,11 +207,11 @@ bool ZEPlayer::Initialize()
 		Listener = ZEListener::CreateInstance();
 
 	Listener->Initialize();
-	PointLight.SetLocalPosition(ZEVector3(0.0f, 5.0f, -5.0f));
-	PointLight.SetAttenuation(0.00001, 0.0000, 1.0f);
+	PointLight.SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	PointLight.SetAttenuation(0.1f, 0.0f, 1.0f);
 	PointLight.SetRange(10000.0f);
-	PointLight.SetIntensity(1.0f);
-	PointLight.SetColor(ZEVector3::One);
+	PointLight.SetIntensity(5.0f);
+	PointLight.SetColor(ZEVector3(1.0f, 1.0f, 1.0));
 	PointLight.SetEnabled(true);
 
 	RegisterComponent(&PointLight);

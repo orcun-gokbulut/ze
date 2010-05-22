@@ -28,7 +28,6 @@
 float4x4  WorldViewProjMatrix			: register(c0);
 float4x4  WorldMatrix					: register(c4);
 float4x4  WorldInvTrpsMatrix			: register(c8);
-float4x4  WorldInvMatrix				: register(c12);
 
 // Other general constants 4 vectors
 float4    ViewPosition					: register(c16);
@@ -62,34 +61,13 @@ struct VS_OUTPUT
 	#endif
 
 	float2 Texcoord           : TEXCOORD1;
-	float4 ViewDirection      : TEXCOORD2;
+	float3 ViewDirection      : TEXCOORD2;
 	float4 LightDirection     : TEXCOORD3;
 
 	#ifdef ZESHADER_SHADOWMAP
 //		float2 ShadowMapCoord     : TEXCOORD4;
-	#endif
+	#endif 
 };
-
-inline void CalculatePointLight(
-								in float3 Position, 
-								in float3 LightPosition,
-								in float3 LightAttenuationFactors,
-								in float3x3 TangentTransform,
-								out float3 LightDirection,
-								out float LightAttenuation,
-								out float LightDistance)
-{
-	float3 LightDisplacement = LightPosition - Position;
-	LightDistance = length(LightDisplacement);
-
-	#ifdef ZESHADER_NORMALMAP
-		LightDirection = mul(TangentTransform, LightDisplacement);
-	#else
-		LightDirection = LightDisplacement;
-	#endif
-
-	LightAttenuation = 1.0f / (LightAttenuationFactors[0] + LightAttenuationFactors[1] * LightDistance + LightAttenuationFactors[2] * LightDistance * LightDistance);
-}
 
 VS_OUTPUT vs_main( VS_INPUT Input )
 {
@@ -99,6 +77,7 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 	float3 Tangent;
 	float3 Binormal;
 
+	// Transformation
 	#ifdef ZESHADER_SKINTRANSFORM
 		Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		Normal = float3(0.0f, 0.0f, 0.0f);
@@ -129,6 +108,8 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 	Output.Position = mul(Position, WorldViewProjMatrix);
 	float4 WorldPosition = mul(Position, WorldMatrix);
 
+
+	// Ligthning
 	float3 ViewDisplacement = ViewPosition - WorldPosition;
 	
 	float3x3 TangentTransform;
@@ -141,10 +122,20 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 		Output.Normal = mul(Normal, WorldInvTrpsMatrix);
 		Output.ViewDirection.xyz = ViewDisplacement;
 	#endif
-
-	Output.Texcoord = Input.Texcoord;
 	
-	CalculatePointLight(WorldPosition, LightPosition, LightAttenuationFactors, TangentTransform, Output.LightDirection.xyz, Output.LightDirection.w, Output.ViewDirection.w);
+	float3 LightDisplacement = LightPosition - WorldPosition;
+	float LightDistance = length(LightDisplacement);
+
+	#ifdef ZESHADER_NORMALMAP
+		Output.LightDirection.xyz = mul(TangentTransform, LightDisplacement);
+	#else
+		Output.LightDirection.xyz = LightDisplacement;
+	#endif
+
+	Output.LightDirection.w = 1.0f / (LightAttenuationFactors[0] + LightAttenuationFactors[1] * LightDistance + LightAttenuationFactors[2] * LightDistance * LightDistance);
+
+	// Texture Coordinates
+	Output.Texcoord = Input.Texcoord;
 
 	return(Output);
 }

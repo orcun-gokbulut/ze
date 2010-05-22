@@ -165,18 +165,24 @@ bool ZEPhysicsDebugModule::Initialize()
 
 		Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
 		Model->SetModelFile("test.zeModel");
+		Model->SetScale(ZEVector3(2.0f, 2.0f, 2.0f));
 		Scene->AddEntity(Model);
 		//Model->GetModel()->GetBones()[5].SetRelativeRotation(ZEQuaternion(ZE_PI_4, ZEVector3(0.0f, 1.0f, 0.0f)));
 		//Model->GetModel()->GetMeshes()[0].SetLocalScale(ZEVector3(0.1, 0.1, 0.1));
 		Model->SetAnimationName("Test");
-		Model->SetAnimationState(ZE_MAS_PLAYING);
+		//Model->SetAnimationState(ZE_MAS_PLAYING);
 		Model->SetAnimationSpeed(66.0f);
 		Model->SetAnimationLooping(true);
+
 		//zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
 		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);
 		World->SetEnabled(true);
 		Scene->LoadMap("test.zemap");
+
+		/*Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
+		Model->SetModelFile("test2.zeModel");
+		Scene->AddEntity(Model);*/
 	}
 
 	return true;

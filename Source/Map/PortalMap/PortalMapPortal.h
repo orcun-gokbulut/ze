@@ -44,8 +44,8 @@ class ZEPortalMap;
 class ZEPortalMapDoor;
 class ZEPortalMapResourcePortal;
 class ZEStaticVertexBuffer;
-class ZEDrawParameters;
 class ZEPhysicalStaticMesh;
+struct ZEDrawParameters;
 
 class ZEPortalMapPortal
 {

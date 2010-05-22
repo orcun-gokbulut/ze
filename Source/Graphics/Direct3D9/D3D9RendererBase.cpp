@@ -130,10 +130,16 @@ void ZED3D9RendererBase::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* C
 	Material->SetupMaterial(RenderOrder, Camera);
 
 	// Do prelightning pass
-	Material->SetupPreLightning();
-
-	Material->DoPreLightningPass();
-	PumpStreams(RenderOrder);
+	if (Material->SetupPreLightning())
+	{
+		size_t PassCount;
+		do
+		{
+			PassCount = Material->DoPreLightningPass();
+			PumpStreams(RenderOrder);
+		}
+		while(PassCount != 1);
+	}
 
 	// Do light passes
 	if (RenderOrder->Lights.GetCount() != 0 && Material->SetupLightning())

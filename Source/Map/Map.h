@@ -37,7 +37,7 @@
 #ifndef __ZE_MAP_H__
 #define __ZE_MAP_H__
 
-class ZEDrawParameters;
+struct ZEDrawParameters;
 class ZEMapResource;
 class ZERay;
 class ZEVector3;
