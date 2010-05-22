@@ -48,7 +48,10 @@ class ZEClassProvider
 		virtual bool						RegisterClass(ZEClassDescription* Description);
 		virtual void						UnregisterClass();
 
-		virtual ZEClass*					CreateInstance(size_t Index);
-		virtual ZEClass*					CreateInstance(const char* Name);
+		virtual ZEClass*					CreateClass(size_t Index);
+		virtual ZEClass*					CreateClass(const char* Name);
+
+		//static ZEClassProvider*				GetInstance();
 };
+
 #endif

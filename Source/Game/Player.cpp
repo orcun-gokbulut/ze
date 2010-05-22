@@ -94,7 +94,7 @@ void ZEPlayer::Tick(float Time)
 	float MetersPerSecond = 10.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
-	ZEComponent* HitComponent;
+	ZEEntityComponent* HitComponent;
 	ZEEntity* HitEntity;
 	for (size_t I = 0; I < InputMap.InputActionCount; I++)
 	{
@@ -195,7 +195,7 @@ bool ZEPlayer::Initialize()
 	FOV = ZE_PI_2;
 	Yawn = Pitch = Roll = 0;
 
-	Camera.SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	Camera.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Camera.SetLocalRotation(ZEQuaternion::Identity);
 	Camera.SetNearZ(zeGraphics->GetNearZ());
 	Camera.SetFarZ(zeGraphics->GetFarZ());
@@ -207,10 +207,10 @@ bool ZEPlayer::Initialize()
 		Listener = ZEListener::CreateInstance();
 
 	Listener->Initialize();
-	PointLight.SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	PointLight.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	PointLight.SetAttenuation(0.1f, 0.0f, 1.0f);
 	PointLight.SetRange(10000.0f);
-	PointLight.SetIntensity(5.0f);
+	PointLight.SetIntensity(15.0f);
 	PointLight.SetColor(ZEVector3(1.0f, 1.0f, 1.0));
 	PointLight.SetEnabled(true);
 
@@ -258,3 +258,8 @@ ZEPlayer::~ZEPlayer()
 }
 
 #include "Player.h.zpp"
+
+ZEEntityRunAt ZEPlayerDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}

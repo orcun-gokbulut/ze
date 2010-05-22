@@ -37,9 +37,9 @@
 #ifndef	__ZE_LISTENER_H__
 #define __ZE_LISTENER_H__
 
-#include "Game/Component.h"
+#include "Game/EntityComponent.h"
 
-class ZEListener: public ZEComponent
+class ZEListener: public ZEEntityComponent
 {	
 	protected:
 		float					DistanceFactor;

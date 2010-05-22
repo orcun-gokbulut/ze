@@ -215,3 +215,8 @@ ZEModelBrush::~ZEModelBrush()
 }
 
 #include "ModelBrush.h.zpp"
+
+ZEEntityRunAt ZEModelBrushDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}

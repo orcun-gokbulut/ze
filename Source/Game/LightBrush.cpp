@@ -110,9 +110,9 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 			return; 
 	}
 
-	Light->SetLocalPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Light->SetLocalRotation(ZEQuaternion::Identity);
-	Light->SetLocalScale(ZEVector3::One);
+	Light->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	Light->SetRotation(ZEQuaternion::Identity);
+	Light->SetScale(ZEVector3::One);
 	Light->SetColor(Color);
 	Light->SetIntensity(Intensity);
 	Light->SetRange(Range);
@@ -388,3 +388,8 @@ ZELightBrush::~ZELightBrush()
 }
 
 #include "LightBrush.h.zpp"
+
+ZEEntityRunAt ZELightBrushDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}

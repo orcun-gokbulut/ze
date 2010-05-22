@@ -53,7 +53,7 @@ class ZEPhysicsDebugModule : public ZEDebugModule
 		ZEPhysicalRigidBody*	PhysicalRigidBody;
 		ZEPhysicalSphereShape	Shape;	
 		ZEPhysicalSphereShape	Shape2;	
-		ZEModelBrush*			Model;
+		ZEModel*				Model;
 
 		void					TransformChanged(const ZEPhysicalTransformChange& TransformChange);
 		void					ColisionDetected(const ZEPhysicalCollision& Collision);

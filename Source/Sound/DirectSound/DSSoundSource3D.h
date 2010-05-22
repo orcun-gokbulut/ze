@@ -82,10 +82,8 @@ class ZEDSSoundSource3D : public ZESoundSource3D, public ZEDSComponentBase
 		void						Update(float ElapsedTime);
 
 		virtual void				SetSoundResource(ZESoundResource* Resource);
-
-	public:
-		virtual void				SetLocalPosition(const ZEVector3& NewPosition);
-		virtual void				SetLocalRotation(const ZEQuaternion& NewRotation);
+		virtual void				SetPosition(const ZEVector3& NewPosition);
+		virtual void				SetRotation(const ZEQuaternion& NewRotation);
 
 		virtual void				SetMinDistance(float  NewMinDistance);
 		virtual void				SetMaxDistance(float  NewMaxDistance);

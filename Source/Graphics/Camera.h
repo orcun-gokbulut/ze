@@ -37,7 +37,7 @@
 #ifndef	__ZE_CAMERA_H__
 #define __ZE_CAMERA_H__
 
-#include "Game/Component.h"
+#include "Game/EntityComponent.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Canvas.h"
@@ -55,7 +55,7 @@ enum ZECameraProjectionType
 
 class ZEViewPort;
 
-class ZECamera : public ZEComponent
+class ZECamera : public ZEEntityComponent
 {
 	private:
 		bool							UpdateViewFrustum;
@@ -92,7 +92,7 @@ class ZECamera : public ZEComponent
 		virtual const ZEMatrix4x4&		GetProjectionTransform();
 		virtual const ZEMatrix4x4&		GetViewProjectionTransform();
 
-		virtual void					SetLocalPosition(const ZEVector3& NewPosition);	
+		virtual void					SetPosition(const ZEVector3& NewPosition);	
 		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);
 
 		virtual void					OwnerWorldTransformChanged();	

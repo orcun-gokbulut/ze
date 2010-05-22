@@ -37,21 +37,20 @@
 #ifndef __ZE_LIGHTBRUSH_H__
 #define __ZE_LIGHTBRUSH_H__
 
-#include "Meta/Class.h"
-#include "Game/Entity.h"
+#include "Game/CompoundEntity.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Light.h"
 
-ZE_META_CLASS_DESCRIPTION(ZELightBrush);
+ZE_META_ENTITY_DESCRIPTION(ZELightBrush);
 
 class ZETexture2DResource;
 class ZETextureCubeResource;
 class ZEFixedMaterial;
 class ZELight;
 
-class ZELightBrush : public ZEEntity
+class ZELightBrush : public ZECompoundEntity
 {
-	ZE_META_CLASS()
+	ZE_META_ENTITY()
 	private:
 		ZELightType							LightType;
 		ZELight*							Light;
@@ -119,7 +118,7 @@ class ZELightBrush : public ZEEntity
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZELightBrush" parent="ZEEntity" icon="" description="Light brush">
+		<class name="ZELightBrush" parent="ZECompoundEntity" icon="" description="Light brush">
 			<property name="LightType" type="integer" autogetset="true" description="Type of the light">
 				<enumurator name="ZELightType">
 					<item name="None" value="ZE_LT_NONE"/>  

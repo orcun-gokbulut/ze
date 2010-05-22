@@ -37,7 +37,7 @@
 #ifndef	__ZE_LIGHT_H__
 #define __ZE_LIGHT_H__
 
-#include "Game/Component.h"
+#include "Game/EntityComponent.h"
 #include "ViewVolume.h"
 
 enum ZELightType
@@ -51,7 +51,7 @@ enum ZELightType
 
 class ZEShadowRenderer;
 class ZEScene;
-class ZELight : public ZEComponent
+class ZELight : public ZEEntityComponent
 {
 	private:
 		bool							Enabled;
@@ -69,8 +69,8 @@ class ZELight : public ZEComponent
 
 		virtual ZEDWORD					GetDrawFlags() const;
 
-		virtual	void					SetLocalPosition(const ZEVector3& NewPosition);
-		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);
+		virtual	void					SetPosition(const ZEVector3& NewPosition);
+		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
 		virtual void					OwnerWorldTransformChanged();
 

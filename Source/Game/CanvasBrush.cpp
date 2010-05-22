@@ -146,3 +146,8 @@ ZECanvasBrush::~ZECanvasBrush()
 }
 
 #include "CanvasBrush.h.zpp"
+
+ZEEntityRunAt ZECanvasBrushDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}

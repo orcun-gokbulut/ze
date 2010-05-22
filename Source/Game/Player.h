@@ -37,17 +37,17 @@
 #ifndef	__ZE_PLAYER_H__
 #define __ZE_PLAYER_H__
  
-#include "Meta/Class.h"
+#include "CompoundEntity.h"
 #include "Graphics/Camera.h"
 #include "Graphics/PointLight.h"
 #include "Input/InputMap.h"
 
-ZE_META_CLASS_DESCRIPTION(ZEPlayer);
+ZE_META_ENTITY_DESCRIPTION(ZEPlayer);
 
 class ZEListener;
-class ZEPlayer : public ZEEntity
+class ZEPlayer : public ZECompoundEntity
 {
-	ZE_META_CLASS()
+	ZE_META_ENTITY()
 	private:
 		ZEInputMap				InputMap;
 		ZECamera				Camera;
@@ -81,7 +81,7 @@ class ZEPlayer : public ZEEntity
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZEPlayer" parent="ZEEntity" description="Player spawn point"/>
+		<class name="ZEPlayer" parent="ZECompoundEntity" description="Player spawn point"/>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()

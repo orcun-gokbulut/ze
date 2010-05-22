@@ -34,20 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MODELBRUSH_H__
-#define __ZE_MODELBRUSH_H__
+#ifndef __ZE_MODEL_BRUSH_H__
+#define __ZE_MODEL_BRUSH_H__
 
-#include "Game/Entity.h"
+#include "CompoundEntity.h"
 #include "Model/Model.h"
 
-ZE_META_CLASS_DESCRIPTION(ZEModelBrush);
+ZE_META_ENTITY_DESCRIPTION(ZEModelBrush);
 
 class ZEModel;
 class ZEModelResource;
 
-class ZEModelBrush : public ZEEntity
+class ZEModelBrush : public ZECompoundEntity
 {
-	ZE_META_CLASS()
+	ZE_META_ENTITY()
 	private:
 		ZEModel*							Model;
 		ZEModelResource*					ModelResource;
@@ -99,7 +99,7 @@ class ZEModelBrush : public ZEEntity
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-	 	<class name="ZEModelBrush" parent="ZEEntity" icon="" description="This entity used for displaying animated visual models in the game environments like statues, mechineries, furnitures and etc.">
+	 	<class name="ZEModelBrush" parent="ZECompoundEntity" icon="" description="This entity used for displaying animated visual models in the game environments like statues, mechineries, furnitures and etc.">
 			<property name="ModelFile" type="string" autogetset="true" semantic="ZE_PS_FILENAME" fileextension="ZEMODEL" description="FileName of the model that will be used"/>
 			<property name="EnablePhysics" type="boolean" autogetset="true" description="Will model brush will have physical interaction"/>
 			<property name="AnimationState" type="integer" autogetset="true" description="Animation state of the model brush.">

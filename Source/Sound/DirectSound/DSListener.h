@@ -56,8 +56,8 @@ class ZEDSListener : public ZEListener, public ZEDSComponentBase
 		bool						IsActiveListener();
 		void						SetActiveListener();
 
-		virtual void				SetLocalPosition(const ZEVector3& NewPosition);
-		virtual void				SetLocalRotation(const ZEQuaternion& NewRotation);
+		virtual void				SetPosition(const ZEVector3& NewPosition);
+		virtual void				SetRotation(const ZEQuaternion& NewRotation);
 
 		virtual void				SetDistanceFactor(float NewDistanceFactor);	
 		virtual void				SetDopplerFactor(float NewDopplerFactor);

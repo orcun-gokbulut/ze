@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundSource3D.h
+ Zinek Engine - CompoundEntity.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,83 +34,84 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SOUND_SOURCE_3D_H__
-#define __ZE_SOUND_SOURCE_3D_H__
+#ifndef	__ZE_COMPOUND_ENTITY_H__
+#define __ZE_COMPOUND_ENTITY_H__
 
-#include "Game/EntityComponent.h"
+#include "Entity.h"
+#include "ZEDS/Array.h"
+#include "ZEDS/Variant.h"
+#include "ZEMath/Matrix.h"
+#include "ZEMath/Vector.h"
+#include "ZEMath/Quaternion.h"
+#include "ZEMath/AABoundingBox.h"
+#include "ZEMath/OBoundingBox.h"
+#include "ZEMath/BoundingSphere.h"
+#include "Definitions.h"
 #include "Meta/Class.h"
-#include "SoundSource.h"
 
-ZE_META_CLASS_DESCRIPTION(ZESoundSource3D);
+class ZEEntityComponent;
+struct ZEDrawParameters;
 
-class ZESoundSource3D : public ZESoundSource
+enum ZEBoundingVolumeMechnism
 {
-	ZE_META_CLASS();
+	ZE_BVM_NO_BOUNDING_VOLUME	= 0,
+	ZE_BVM_USE_LOCAL_ONLY		= 1,
+	ZE_BVM_USE_COMPONENTS		= 2,
+	ZE_BVM_USE_BOTH				= 3
+};
+
+ZE_META_ENTITY_DESCRIPTION(ZECompoundEntity);
+
+class ZECompoundEntity : public ZEEntity
+{
+	ZE_META_ENTITY()
+	private:
+		ZEDrawFlags								DrawFlags;
+		ZERayCastFlags							RayCastFlags;
+		ZEBoundingVolumeMechnism				BoundingVolumeMechanism;
+
 	protected:
-		float						MinDistance;
-		float						MaxDistance;
-		unsigned int				ConeInsideAngle;
-		unsigned int				ConeOutsideAngle;
-		ZEVector3					ConeDirection;
-		unsigned int				ConeOutsideVolume;
+		ZEArray<ZEEntityComponent*>				Components;
 
-									ZESoundSource3D();
-		virtual						~ZESoundSource3D();
+		void									RegisterComponent(ZEEntityComponent* Component);
+		void									UnregisterComponent(ZEEntityComponent* Component);	
 
-	public:	
-		virtual void				SetMinDistance(float  NewMinDistance) = 0;
-		float						GetMinDistance() const;
+		void									SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
+
+		void									UpdateComponents();
+
+	public:
+		virtual ZEEntityType					GetEntityType();
+
+		const ZEArray<ZEEntityComponent *>&		GetComponents();
+
+		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
+
+		virtual ZEDWORD							GetDrawFlags() const;
+		virtual ZEDWORD							GetRayCastFlags() const;
+
+		virtual void							SetPosition(const ZEVector3& NewPosition);
+		virtual void							SetRotation(const ZEQuaternion& NewRotation);
+		virtual void							SetScale(const ZEVector3& NewScale);
+		virtual void							SetVelocity(const ZEVector3& NewVelocity);
+
+		virtual bool							Initialize();
+		virtual void							Deinitialize();
 		
-		virtual void				SetMaxDistance(float  NewMaxDistance) = 0;
-		float						GetMaxDistance() const;
+		virtual void							Tick(float Time);
+		virtual void							Draw(ZEDrawParameters* DrawParameters);
 		
-		virtual void				SetConeInsideAngle(unsigned int NewInsideAngle) = 0;
-		unsigned int				GetConeInsideAngle() const;
+		void									UpdateBoundingVolumes();
 
-		virtual void				SetConeOutsideAngle(unsigned int NewOutsideAngle) = 0;
-		unsigned int				GetConeOutsideAngle() const;
-					
-		virtual void				SetConeOutsideVolume(unsigned int NewOutsideVolume) = 0;
-		unsigned int				GetConeOutsideVolume() const;
-
-		static ZESoundSource3D*		CreateInstance();
+												ZECompoundEntity();
+		virtual									~ZECompoundEntity();
 };
 
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZESoundSource3D" parent="ZESoundSource" noinstance="true">
-			<description>Sound Source</description>
-			<property name="MinDistance" type="integer" autogetset="yes">
-				<constraints>
-					<minvalue value="0"/>
-				</constraints>
-			</property>
-			<property name="MaxDistance" type="integer" autogetset="yes">
-				<constraints>
-					<minvalue value="0"/>
-				</constraints>
-			</property>
-			<property name="ConeInsideAngle" type="integer" autogetset="yes">
-				<constraints>
-					<minvalue value="0"/>
-					<maxvalue value="360"/>
-				</constraints>
-			</property>
-			<property name="ConeOutsideAngle" type="integer" autogetset="yes">
-				<constraints>
-					<minvalue value="0"/>
-					<maxvalue value="360"/>
-				</constraints>
-			</property>
-			<property name="ConeOutsideVolume" type="integer" autogetset="yes">
-				<constraints>
-					<minvalue value="ZE_SS_VOLUME_MIN"/>
-					<maxvalue value="ZE_SS_VOLUME_MAX"/>
-				</constraints>
-			</property>
-		</class>
+		<class name="ZECompoundEntity" parent="ZEEntity"/>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()

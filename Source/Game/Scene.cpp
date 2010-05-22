@@ -35,6 +35,8 @@
 
 #include "Scene.h"
 #include "Game.h"
+#include "Entity.h"
+#include "CompoundEntity.h"
 #include "Core/Console.h"
 #include "Core/Error.h"
 #include "Core/Core.h"
@@ -251,7 +253,7 @@ void ZEScene::Render(float ElapsedTime)
 
 ZEEntity* ZEScene::CastRay(const ZERay& Ray, float Range)
 {
-	float MinT, MaxT, CurrMinT = Range / Ray.v.Length();
+	/*float MinT, MaxT, CurrMinT = Range / Ray.v.Length();
 
 	ZEEntity* RayCaster = ActiveCamera->GetOwner();
 	ZEEntity* IntersectedEntity = NULL;
@@ -273,12 +275,13 @@ ZEEntity* ZEScene::CastRay(const ZERay& Ray, float Range)
 		}
 	}
 
-	return IntersectedEntity;
+	return IntersectedEntity;*/
+	return NULL;
 }
 
 bool ZEScene::CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntity, ZEVector3& Position, ZEVector3& Normal)
 {
-	float MinT, MaxT, CurrMinT = Range / Ray.v.Length();
+/*	float MinT, MaxT, CurrMinT = Range / Ray.v.Length();
 	*IntersectedEntity = NULL;
 
 	ZEEntity* RayCaster = ActiveCamera->GetOwner();
@@ -310,7 +313,8 @@ bool ZEScene::CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntit
 		Ray.GetPointOn(Position, MinT);
 	}
 
-	return *IntersectedEntity != NULL;
+	return *IntersectedEntity != NULL;*/
+	return NULL;
 }
 
 const ZECullStatistics& ZEScene::GetCullStatistics()
@@ -340,37 +344,63 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 	// Check lightning enabled
  	if (LightsEnabled)
 		for (size_t I = 0; I < Entities.GetCount(); I++)
-			// Check whether entity is light source or not. (Does it contains light component(s))
+			// Check whether entity is light source or not. (Is it a light or does it contains light component(s) ?)
 			if (Entities[I]->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
 			{
-				const ZEArray<ZEComponent*>& Components = Entities[I]->GetComponents();
-				
-				// Loop throught current entity's components
-				for (size_t N = 0; N < Components.GetCount(); N++)
+				if (Entities[I]->GetEntityType() == ZE_ET_COMPONENT)
 				{
-					ZEComponent* Component = Components[N];
-						
-					// Check entities component is light source or not. If light source then test its light volume is visible in camera's view volume
-					if ((Component->GetDrawFlags() & ZE_DF_LIGHT_SOURCE))
+					CullStatistics.TotalLightCount++;
+
+					if (!ViewVolume.LightCullTest((ZELight*)Entities[I]))
 					{
-						CullStatistics.TotalLightCount++;
+						CullStatistics.VisibleLightCount++;
+						// If visual debug elements enabled then visualize lights range
+						if (VisualDebugElements & ZE_VDE_LIGHT_RANGE)
+							DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Entities[I]->GetPosition(), ((ZELight*)Entities[I])->GetRange()), Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
 
-						if (!ViewVolume.LightCullTest((ZELight*)Component))
+						// If light is casting shadows generate shadow maps of the light
+						if (((ZELight*)Entities[I])->GetCastsShadows())
+							((ZELight*)Entities[I])->RenderShadowMap(this, ShadowRenderer);
+
+						// Add light to visible lights list.
+						VisibleLights.Add((ZELight*)Entities[I]);
+					}
+				}
+				else if (Entities[I]->GetEntityType() == ZE_ET_COMPOUND)
+				{
+					const ZEArray<ZEEntityComponent*>& Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
+					
+					// Loop through current entity's components
+					for (size_t N = 0; N < Components.GetCount(); N++)
+					{
+						ZEEntityComponent* Component = Components[N];
+							
+						// Check entities component is light source or not. If light source then test its light volume is visible in camera's view volume
+						if ((Component->GetDrawFlags() & ZE_DF_LIGHT_SOURCE))
 						{
-							CullStatistics.VisibleLightCount++;
-							// If visual debug elements enabled then visualize lights range
-							if (VisualDebugElements & ZE_VDE_LIGHT_RANGE)
-								DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Component->GetWorldPosition(), ((ZELight*)Component)->GetRange()), Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
+							CullStatistics.TotalLightCount++;
 
-							// If light is casting shadows generate shadow maps of the light
-							if (((ZELight*)Component)->GetCastsShadows())
-								((ZELight*)Component)->RenderShadowMap(this, ShadowRenderer);
+							if (!ViewVolume.LightCullTest((ZELight*)Component))
+							{
+								CullStatistics.VisibleLightCount++;
+								// If visual debug elements enabled then visualize lights range
+								if (VisualDebugElements & ZE_VDE_LIGHT_RANGE)
+									DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Component->GetWorldPosition(), ((ZELight*)Component)->GetRange()), Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
 
-							// Add light to visible lights list.
-							VisibleLights.Add((ZELight*)Component);
+								// If light is casting shadows generate shadow maps of the light
+								if (((ZELight*)Component)->GetCastsShadows())
+									((ZELight*)Component)->RenderShadowMap(this, ShadowRenderer);
+
+								// Add light to visible lights list.
+								VisibleLights.Add((ZELight*)Component);
+							}
 						}
 					}
 				}
+
+				zeAssert(Entities[I]->GetEntityType() == ZE_ET_REGULAR, 
+					"A regular entity claims that it is a light source. Please check entity's draw flags. (Entity Name : \"%s\", Entity Type : \"%s\")", 
+					Entities[I]->GetName(), Entities[I]->GetClassDescription()->GetName());
 			}
 
 	DrawParameters.Lights = VisibleLights;
@@ -387,7 +417,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 	{
 		ZEEntity* CurrentEntity = Entities[I];
 		
-		CullStatistics.TotalComponentCount += CurrentEntity->GetComponents().GetCount();
+		//CullStatistics.TotalComponentCount += CurrentEntity->GetComponents().GetCount();
 
 		ZEDWORD EntityDrawFlags = CurrentEntity->GetDrawFlags();
 
@@ -439,20 +469,29 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 			// Call entity's draw routine to make it draw it self
 			CurrentEntity->Draw(&DrawParameters);
 
-			// Check whether entity has drawable components or not
-			if (EntityDrawFlags & ZE_DF_DRAW_COMPONENTS)
-			{
-				const ZEArray<ZEComponent*> Components = CurrentEntity->GetComponents();
+			zeAssert(EntityDrawFlags & ZE_DF_DRAW_COMPONENTS && CurrentEntity->GetEntityType() != ZE_ET_COMPOUND, 
+				"A non compound entity claims it has drawable components. Please check entity's draw flags. (Entity Name: \"%s\", Entity Type: \"%s\")", 
+				CurrentEntity->GetName(),
+				CurrentEntity->GetClassDescription()->GetName());
 
-				// Loop throught entity's components
+			zeAssert(EntityDrawFlags & ZE_DF_CULL_COMPONENTS && CurrentEntity->GetEntityType() != ZE_ET_COMPOUND, 
+				"A non compound entity claims it has cullable components. Please check entity's draw flags. (Entity Name: \"%s\", Entity Type: \"%s\")", 
+				CurrentEntity->GetName(),
+				CurrentEntity->GetClassDescription()->GetName());
+
+			// Check whether entity has drawable components or not
+			if (EntityDrawFlags & ZE_DF_DRAW_COMPONENTS && CurrentEntity->GetEntityType() == ZE_ET_COMPOUND)
+			{
+				const ZEArray<ZEEntityComponent*> Components = ((ZECompoundEntity*)CurrentEntity)->GetComponents();
+
+				// Loop thought entity's components
 				for (size_t N = 0; N < Components.GetCount(); N++)
 				{
-					ZEComponent* Component = Components[N];
+					ZEEntityComponent* Component = Components[N];
 
 					// Check whether component is drawable and visible also if it is cullable, test it with view volume
 					if ((Component->GetDrawFlags() & ZE_DF_DRAW))
 					{
-					
 						CullStatistics.DrawableComponentCount++;
 
 						if (Component->GetVisible())

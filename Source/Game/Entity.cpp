@@ -37,14 +37,8 @@
 #include "ZEMath/Matrix.h"
 #include "ZEMath/Ray.h"
 #include "Core/Error.h"
-#include "Component.h"
+#include "EntityComponent.h"
 #include <string.h>
-
-void ZEEntity::SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism)
-{
-	BoundingVolumeMechanism = Mechanism;
-	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE;
-}
 
 void ZEEntity::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 {
@@ -52,75 +46,14 @@ void ZEEntity::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE;
 }
 
-const ZEAABoundingBox& ZEEntity::GetLocalBoundingBox()
+ZEEntityType ZEEntity::GetEntityType()
+{
+	return ZE_ET_REGULAR;
+}
+
+const ZEAABoundingBox& ZEEntity::GetLocalBoundingBox() const
 {
 	return LocalBoundingBox;
-}
-
-void ZEEntity::UpdateComponents()
-{
-	for (size_t I = 0; I < Components.GetCount(); I++)
-		Components[I]->OwnerWorldTransformChanged();
-}
-
-void ZEEntity::RegisterComponent(ZEComponent* Component)
-{
-	ZEDWORD ComponentRenderFlag = Component->GetDrawFlags();
-
-	if (Component->GetDrawFlags() & ZE_DF_DRAW)
-	{
-		if (Component->GetVisible())
-			UpdateBoundingVolumes();
-		DrawFlags |= ZE_DF_DRAW_COMPONENTS;
-	}
-
-	if (Component->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
-		DrawFlags |= ZE_DF_LIGHT_SOURCE;
-
-	Component->SetOwner(this);
-	Component->Initialize();
-	Components.Add(Component);
-}
-
-void ZEEntity::UnregisterComponent(ZEComponent* Component)
-{
-	Component->Deinitialize();
-	Components.DeleteValue(Component);
-
-	if (DrawFlags & ZE_DF_AUTO)
-	{
-		if (Component->GetDrawFlags() & ZE_DF_DRAW)
-		{
-			bool Drawable = false;
-			for (size_t I = 0; I < Components.GetCount(); I++)
-				if (Components[I]->GetDrawFlags() & ZE_DF_DRAW)
-				{
-					Drawable = true;
-					break;
-				}
-			if (Drawable)
-				DrawFlags |= ZE_DF_DRAW_COMPONENTS;
-			else
-				DrawFlags &= !ZE_DF_DRAW_COMPONENTS;
-		}
-
-
-		if (Component->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
-		{
-			bool HasLight = false;
-			for (size_t I = 0; I < Components.GetCount(); I++)
-				if (Components[I]->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
-				{
-					HasLight = true;
-					break;
-				}
-
-			if (HasLight)
-				DrawFlags |= ZE_DF_LIGHT_SOURCE;
-			else
-				DrawFlags &= !ZE_DF_LIGHT_SOURCE;
-		}
-	}
 }
 		
 ZEDWORD ZEEntity::GetRayCastFlags() const
@@ -138,67 +71,28 @@ int ZEEntity::GetEntityId() const
 	return EntityId;
 }
 
-const ZEArray<ZEComponent *> &	ZEEntity::GetComponents()
-{
-	return Components; 
-}
-
 const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 {
 	if (DirtyFlags & ZE_EDF_WORLD_BOUNDING_BOX)
 	{
-		bool NoBoundingBox = true;
-
-		if (BoundingVolumeMechanism == ZE_BVM_USE_BOTH || BoundingVolumeMechanism == ZE_BVM_USE_LOCAL_ONLY)
+		ZEVector3 Point;
+		const ZEMatrix4x4& WorldTransform = GetWorldTransform();
+		const ZEAABoundingBox& LocalBoundingBox = GetLocalBoundingBox();
+		ZEMatrix4x4::Transform(Point, WorldTransform, LocalBoundingBox.GetVertex(0));
+		WorldBoundingBox.Min = WorldBoundingBox.Max = Point;
+		for (int I = 1; I < 8; I++)
 		{
-			ZEVector3 Point;
-			ZEMatrix4x4 WorldTransform = GetWorldTransform();
-			ZEMatrix4x4::Transform(Point, WorldTransform, LocalBoundingBox.GetVertex(0));
-			WorldBoundingBox.Min = WorldBoundingBox.Max = Point;
-			for (int I = 1; I < 8; I++)
-			{
-				ZEMatrix4x4::Transform(Point, WorldTransform, LocalBoundingBox.GetVertex(I));
-				if (Point.x < WorldBoundingBox.Min.x) WorldBoundingBox.Min.x = Point.x;
-				if (Point.y < WorldBoundingBox.Min.y) WorldBoundingBox.Min.y = Point.y;
-				if (Point.z < WorldBoundingBox.Min.z) WorldBoundingBox.Min.z = Point.z;
+			ZEMatrix4x4::Transform(Point, WorldTransform, LocalBoundingBox.GetVertex(I));
+			if (Point.x < WorldBoundingBox.Min.x) WorldBoundingBox.Min.x = Point.x;
+			if (Point.y < WorldBoundingBox.Min.y) WorldBoundingBox.Min.y = Point.y;
+			if (Point.z < WorldBoundingBox.Min.z) WorldBoundingBox.Min.z = Point.z;
 
-				if (Point.x > WorldBoundingBox.Max.x) WorldBoundingBox.Max.x = Point.x;
-				if (Point.y > WorldBoundingBox.Max.y) WorldBoundingBox.Max.y = Point.y;
-				if (Point.z > WorldBoundingBox.Max.z) WorldBoundingBox.Max.z = Point.z;
-			}
-			NoBoundingBox = false;
+			if (Point.x > WorldBoundingBox.Max.x) WorldBoundingBox.Max.x = Point.x;
+			if (Point.y > WorldBoundingBox.Max.y) WorldBoundingBox.Max.y = Point.y;
+			if (Point.z > WorldBoundingBox.Max.z) WorldBoundingBox.Max.z = Point.z;
 		}
 
-		if (BoundingVolumeMechanism == ZE_BVM_USE_BOTH || BoundingVolumeMechanism == ZE_BVM_USE_COMPONENTS)
-			for (size_t I = 0; I < Components.GetCount(); I++)
-			{
-				if ((Components[I]->GetDrawFlags() & ZE_DF_DRAW) && Components[I]->GetVisible())
-				{
-					const ZEAABoundingBox& CompBoundingBox = Components[I]->GetWorldBoundingBox();
-					if (NoBoundingBox == true)
-					{
-						WorldBoundingBox.Min = WorldBoundingBox.Max = CompBoundingBox.GetVertex(0);
-						NoBoundingBox = false;
-					}
-
-					for (int N = 0; N < 8; N++)
-					{
-						ZEVector3 Point = CompBoundingBox.GetVertex(N);
-						if (Point.x < WorldBoundingBox.Min.x) WorldBoundingBox.Min.x = Point.x;
-						if (Point.y < WorldBoundingBox.Min.y) WorldBoundingBox.Min.y = Point.y;
-						if (Point.z < WorldBoundingBox.Min.z) WorldBoundingBox.Min.z = Point.z;
-
-						if (Point.x > WorldBoundingBox.Max.x) WorldBoundingBox.Max.x = Point.x;
-						if (Point.y > WorldBoundingBox.Max.y) WorldBoundingBox.Max.y = Point.y;
-						if (Point.z > WorldBoundingBox.Max.z) WorldBoundingBox.Max.z = Point.z;
-					}
-				}
-			}
-
-		if (NoBoundingBox == true)
-			WorldBoundingBox.Max = WorldBoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
-
-		DrawFlags &= ~ZE_EDF_WORLD_BOUNDING_BOX;
+		DirtyFlags &= ~ZE_EDF_WORLD_BOUNDING_BOX;
 	}
 
 	return WorldBoundingBox;
@@ -217,7 +111,7 @@ const ZEBoundingSphere&	ZEEntity::GetWorldBoundingSphere()
 
 ZEDWORD ZEEntity::GetDrawFlags() const
 {
-	return DrawFlags;
+	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
 void ZEEntity::SetName(const char* NewName)
@@ -254,7 +148,6 @@ void ZEEntity::SetPosition(const ZEVector3& NewPosition)
 {
 	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE | ZE_EDF_WORLD_TRANSFORM;
 	Position = NewPosition;
-	UpdateComponents();
 }
 
 const ZEVector3& ZEEntity::GetPosition() const
@@ -266,7 +159,6 @@ void ZEEntity::SetRotation(const ZEQuaternion& NewRotation)
 {
 	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE | ZE_EDF_WORLD_TRANSFORM;
 	Rotation = NewRotation;
-	UpdateComponents();
 }
 
 const ZEQuaternion& ZEEntity::GetRotation() const
@@ -278,7 +170,6 @@ void ZEEntity::SetScale(const ZEVector3& NewScale)
 {
 	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE | ZE_EDF_WORLD_TRANSFORM;
 	Scale = NewScale;
-	UpdateComponents();
 }
 
 const ZEVector3& ZEEntity::GetScale() const
@@ -342,55 +233,11 @@ void ZEEntity::Reset()
 	Initialize();
 }
 
-void ZEEntity::UpdateBoundingVolumes()
-{
-	if (BoundingVolumeMechanism == ZE_BVM_USE_BOTH || BoundingVolumeMechanism == ZE_BVM_USE_COMPONENTS)
-		DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE;
-}
-
-bool ZEEntity::CastRay(const ZERay & Ray,const float Range,float &MinT)
-{
-	float MaxT,CurrMinT = Range;
-
-	if (!ZEAABoundingBox::IntersectionTest(GetWorldBoundingBox(), Ray, MinT, MaxT))
-		return false;
-
-	if (BoundingVolumeMechanism != ZE_BVM_USE_COMPONENTS)
-		return true;
-
-	for (size_t I = 0; I < Components.GetSize(); I++)
-	{
-		ZERay LocalRay;
-		ZEMatrix4x4 InvWorldTransform;
-		ZEMatrix4x4::Inverse(InvWorldTransform, Components[I]->GetWorldTransform());
-		
-		ZEMatrix4x4::Transform(LocalRay.p, InvWorldTransform, Ray.p);
-		ZEMatrix4x4::Transform3x3(LocalRay.v, InvWorldTransform, Ray.p);
-		if (ZEAABoundingBox::IntersectionTest(Components[I]->GetLocalBoundingBox(), LocalRay, MinT,MaxT))
-			if (CurrMinT > MinT)
-				CurrMinT = MinT;		
-	}
-
-	if (Range < CurrMinT) 
-		return false;
-
-	MinT = CurrMinT;
-	return true;
-}
-
 void ZEEntity::Tick(float Time)
 {
-	for (size_t I = 0; I < Components.GetCount(); I++)
-		Components[I]->Tick(Time);
-
 	ZEVector3::Sub(Velocity, Position, OldPosition);
 	ZEVector3::Scale(Velocity, Velocity, 1.0f / Time);
 	OldPosition = Position;
-}
-
-void ZEEntity::Update()
-{
-
 }
 
 void ZEEntity::Draw(ZEDrawParameters* DrawParameters)
@@ -400,9 +247,6 @@ void ZEEntity::Draw(ZEDrawParameters* DrawParameters)
 ZEEntity::ZEEntity()
 {
 	Name[0] = '\0';
-	DrawFlags = ZE_DF_DRAW | ZE_DF_DRAW_COMPONENTS | ZE_DF_CULL | ZE_DF_CULL_COMPONENTS;
-
-	BoundingVolumeMechanism = ZE_BVM_USE_BOTH;
 
 	OldPosition = Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion::Identity;
@@ -416,12 +260,11 @@ ZEEntity::ZEEntity()
 
 ZEEntity::~ZEEntity()
 {
-	zeWarningAssert(Components.GetCount() != 0, "Entity : %s. There are uninitialized component available.", GetClassDescription()->GetName());
 }
 
 #include "Entity.h.zpp"
 
 ZEEntityRunAt ZEEntityDescription::GetRunAt() const
 {
-	return ZE_ERA_BOTH;
+	return ZE_ERA_NONE;
 }

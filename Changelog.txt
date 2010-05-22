@@ -351,3 +351,9 @@
 	BUG: Lightning is buggy in ZEFixedMaterial.
 	FIX: ZEModelResource material's specular factor and specular shiness bug fixed.
 	FIX: ZEMapResource material's specular factor and specular shiness bug fixed.
+	
+[23 May 2010 - Revision 203 - Orcun]
+	CHG: ZEEntity and ZEComponent has been combined.
+	ADD: ZECopoundEntity added.
+	CHG: ZEComponent has became a new kind of entity that can be contained by another new kind of entity CompoundEntity or can be directly added to scene.
+	-REM: Brushes will be removed in the future.

@@ -48,7 +48,8 @@
 #include "Definitions.h"
 #include "Meta/Class.h"
 
-class ZEComponent;
+class ZEEntityComponent;
+class ZECompoundEntity;
 struct ZEDrawParameters;
 
 enum ZEEntityRunAt
@@ -84,13 +85,11 @@ class ZEEntityDescription : public ZEClassDescription
 		virtual ZEEntityRunAt					GetRunAt() const;
 };
 
-
-enum ZEBoundingVolumeMechnism
+enum ZEEntityType
 {
-	ZE_BVM_NO_BOUNDING_VOLUME	= 0,
-	ZE_BVM_USE_LOCAL_ONLY		= 1,
-	ZE_BVM_USE_COMPONENTS		= 2,
-	ZE_BVM_USE_BOTH				= 3
+	ZE_ET_REGULAR,
+	ZE_ET_COMPOUND,
+	ZE_ET_COMPONENT
 };
 
 // ZEDrawFlags
@@ -121,6 +120,7 @@ typedef ZEDWORD ZEEntityDirtyFlags;
 class ZEEntity : public ZEClass
 {
 	ZE_META_ENTITY()
+	friend class ZECompoundEntity;
 	private: 
 		char									Name[ZE_MAX_NAME_SIZE];
 		int										EntityId;
@@ -131,34 +131,22 @@ class ZEEntity : public ZEClass
 		ZEVector3								Velocity;
 		ZEVector3								OldPosition;
 
-		ZEDrawFlags								DrawFlags;
-		ZERayCastFlags							RayCastFlags;
-
 		bool									Enabled;
 		bool									Visible;
 
-		ZEBoundingVolumeMechnism				BoundingVolumeMechanism;
 		ZEAABoundingBox							LocalBoundingBox;
 		ZEAABoundingBox							WorldBoundingBox;
 		ZEBoundingSphere						WorldBoundingSphere;
 
 	protected:
-		void									SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
+		ZEEntityDirtyFlags						DirtyFlags;	
+
 		void									SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
-
-		ZEEntityDirtyFlags						DirtyFlags;
-
-		void									UpdateComponents();
-
-		ZEArray<ZEComponent*>					Components;
-
-		void									RegisterComponent(ZEComponent* Component);
-		void									UnregisterComponent(ZEComponent* Component);
 	
 	public:
-		const ZEArray<ZEComponent *>&			GetComponents();
+		virtual ZEEntityType					GetEntityType();
 
-		virtual const ZEAABoundingBox&			GetLocalBoundingBox();
+		virtual const ZEAABoundingBox&			GetLocalBoundingBox() const;
 		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
 		const ZEBoundingSphere&					GetWorldBoundingSphere();
 
@@ -186,12 +174,12 @@ class ZEEntity : public ZEClass
 		virtual void							SetScale(const ZEVector3& NewScale);
 		const ZEVector3&						GetScale() const;
 
+		virtual void							SetVelocity(const ZEVector3& NewVelocity);
+		const ZEVector3&						GetVelocity() const;
+
 		ZEVector3								GetDirection();
 		ZEVector3								GetRight();
 		ZEVector3								GetUp();
-
-		virtual void							SetVelocity(const ZEVector3& NewVelocity);
-		const ZEVector3&						GetVelocity() const;
 
 		const ZEMatrix4x4&						GetWorldTransform();
 
@@ -202,12 +190,6 @@ class ZEEntity : public ZEClass
 		
 		virtual void							Tick(float Time);
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
-
-		virtual void							Update();
-
-		virtual bool							CastRay(const ZERay & Ray,const float Range,float &MinT);
-
-		void									UpdateBoundingVolumes();
 
 												ZEEntity();
 		virtual									~ZEEntity();

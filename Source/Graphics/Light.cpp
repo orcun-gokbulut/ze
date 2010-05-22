@@ -42,23 +42,23 @@ ZEDWORD ZELight::GetDrawFlags() const
 	return ZE_DF_LIGHT_SOURCE;
 }
 
-void ZELight::SetLocalPosition(const ZEVector3& NewPosition)
+void ZELight::SetPosition(const ZEVector3& NewPosition)
 {
 	UpdateViewVolume = true;
-	ZEComponent::SetLocalPosition(NewPosition);
+	ZEEntityComponent::SetPosition(NewPosition);
 }
 
-void ZELight::SetLocalRotation(const ZEQuaternion& NewRotation)
+void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 {
 	UpdateViewVolume = true;
-	ZEComponent::SetLocalRotation(NewRotation);
+	ZEEntityComponent::SetRotation(NewRotation);
 }
 
 
 void ZELight::OwnerWorldTransformChanged()
 {
 	UpdateViewVolume = true;
-	ZEComponent::OwnerWorldTransformChanged();
+	ZEEntityComponent::OwnerWorldTransformChanged();
 }
 
 

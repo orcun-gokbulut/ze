@@ -39,7 +39,7 @@
 #include "Graphics/Renderer.h"
 #include "Graphics/VertexBuffer.h"
 #include "Graphics/SimpleMaterial.h"
-#include "Game/Entity.h"
+#include "Game/CompoundEntity.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -496,27 +496,27 @@ const ZEAABoundingBox& ZEModel::GetLocalBoundingBox() const
 	return BoundingBox;
 }
 
-void ZEModel::SetLocalPosition(const ZEVector3& NewPosition)
+void ZEModel::SetPosition(const ZEVector3& NewPosition)
 {
-	ZEComponent::SetLocalPosition(NewPosition);
+	ZEEntityComponent::SetPosition(NewPosition);
 	LocalTransformChanged();
 }
 
-void ZEModel::SetLocalRotation(const ZEQuaternion& NewRotation)
+void ZEModel::SetRotation(const ZEQuaternion& NewRotation)
 {
-	ZEComponent::SetLocalRotation(NewRotation);
+	ZEEntityComponent::SetRotation(NewRotation);
 	LocalTransformChanged();
 }
 
-void ZEModel::SetLocalScale(const ZEVector3& NewScale)
+void ZEModel::SetScale(const ZEVector3& NewScale)
 {
-	ZEComponent::SetLocalScale(NewScale);
+	ZEEntityComponent::SetScale(NewScale);
 	LocalTransformChanged();
 }
 
 void ZEModel::OwnerWorldTransformChanged()
 {
-	ZEComponent::OwnerWorldTransformChanged();
+	ZEEntityComponent::OwnerWorldTransformChanged();
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].ModelWorldTransformChanged();
 
@@ -528,7 +528,8 @@ void ZEModel::UpdateBoundingBox()
 {
 	BoundingBoxDirtyFlag = true;
 	UpdateBoundingVolumes();
-	GetOwner()->UpdateBoundingVolumes();
+	if (GetOwner() != NULL)
+		GetOwner()->UpdateBoundingVolumes();
 }
 
 void ZEModel::UpdateBoneTransforms()

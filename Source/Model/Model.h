@@ -38,7 +38,7 @@
 #define __ZE_MODEL_H__
 
 #include "ZEDS/Array.h"
-#include "Game/Component.h"
+#include "Game/EntityComponent.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Canvas.h"
 #include "ModelResource.h"
@@ -53,7 +53,7 @@ class ZEFixedMaterial;
 class ZESimpleMaterial;
 struct ZEDrawParameters;
 
-class ZEModel : public ZEComponent
+class ZEModel : public ZEEntityComponent
 {	
 	friend class ZEPhysicalEnvironment;
 	private:
@@ -159,9 +159,9 @@ class ZEModel : public ZEComponent
 		void								PauseAnimation();
 		void								StopAnimation();
 
-		virtual void						SetLocalPosition(const ZEVector3& NewPosition);
-		virtual void						SetLocalRotation(const ZEQuaternion& NewRotation);
-		virtual void						SetLocalScale(const ZEVector3& NewScale);
+		virtual void						SetPosition(const ZEVector3& NewPosition);
+		virtual void						SetRotation(const ZEQuaternion& NewRotation);
+		virtual void						SetScale(const ZEVector3& NewScale);
 
 		void								Tick(float ElapsedTime);
 		void								Draw(ZEDrawParameters* DrawParameters);

@@ -37,18 +37,18 @@
 #ifndef __ZE_CANVASBRUSH_H__
 #define __ZE_CANVASBRUSH_H__
 
-#include "Entity.h"
+#include "CompoundEntity.h"
 #include "Graphics/Canvas.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/FixedMaterial.h"
 
-ZE_META_CLASS_DESCRIPTION(ZECanvasBrush);
+ZE_META_ENTITY_DESCRIPTION(ZECanvasBrush);
 
 class ZERenderer;
 class ZEMaterial;
-class ZECanvasBrush : public ZEEntity
+class ZECanvasBrush : public ZECompoundEntity
 {
-	ZE_META_CLASS()
+	ZE_META_ENTITY()
 	
 	private:
 		ZERenderOrder						RenderOrder;
@@ -76,7 +76,7 @@ class ZECanvasBrush : public ZEEntity
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZECanvasBrush" parent="ZEEntity" icon="" description="Canvas brush"/>
+		<class name="ZECanvasBrush" parent="ZECompoundEntity" icon="" description="Canvas brush"/>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()
