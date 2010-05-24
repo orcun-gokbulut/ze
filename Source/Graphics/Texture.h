@@ -47,9 +47,9 @@ enum ZETextureType
 enum ZETexturePixelFormat
 {
 	ZE_TPF_NOTSET,
-	ZE_TPF_ARGB32,
-	ZE_TPF_HDR,
-	ZE_TPF_SHADOWMAP,
+	ZE_TPF_RGBA_INT32,
+	ZE_TPF_RGBA_HDR,
+	ZE_TPF_LUM_HDR,
 	ZE_TPF_DEPTH
 };
 

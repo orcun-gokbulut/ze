@@ -101,7 +101,25 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 			}
 			Format = D3DFMT_A8R8G8B8;
 			break;
-		case ZE_TPF_HDR:
+
+		case ZE_TPF_SINGLE_HDR:
+			if (RenderTarget)
+			{
+				Usage = D3DUSAGE_RENDERTARGET;
+				Pool = D3DPOOL_DEFAULT;
+				MipMap = 1;
+
+			}
+			else
+			{
+				Usage = D3DUSAGE_AUTOGENMIPMAP;
+				Pool = D3DPOOL_MANAGED;
+				MipMap = 0;
+			}
+			Format = D3DFMT_R16F;
+			break;
+
+		case ZE_TPF_ARGB_HDR:
 			if (RenderTarget)
 			{
 				Usage = D3DUSAGE_RENDERTARGET;
@@ -117,10 +135,11 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 			}
 			Format = D3DFMT_A16B16G16R16F;
 			break;
+
 		case ZE_TPF_DEPTH:
 			if (RenderTarget)
 			{
-				Usage = D3DUSAGE_DEPTHSTENCIL;
+				Usage = D3DUSAGE_RENDERTARGET;
 				Pool = D3DPOOL_DEFAULT;
 				MipMap = 1;
 
@@ -131,22 +150,7 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 				Pool = D3DPOOL_MANAGED;
 				MipMap = 0;
 			}
-			Format = D3DFMT_D24X8;
-			break;
-		case ZE_TPF_SHADOWMAP:
-			if (RenderTarget)
-			{
-				Usage = D3DUSAGE_DEPTHSTENCIL;
-				Pool = D3DPOOL_DEFAULT;
-				MipMap = 1;
-			}
-			else
-			{
-				Usage = D3DUSAGE_AUTOGENMIPMAP;
-				Pool = D3DPOOL_MANAGED;
-				MipMap = 0;
-			}
-			Format = D3DFMT_D24X8;
+			Format = D3DFMT_R32F;
 			break;
 	}
 
