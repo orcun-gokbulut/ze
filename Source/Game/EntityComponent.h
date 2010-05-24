@@ -90,6 +90,7 @@ class ZEEntityComponent : public ZEEntity
 		const ZEMatrix4x4&				GetWorldTransform() const;
 		const ZEMatrix4x4&				GetLocalTransform() const;
 
+		virtual const ZEAABoundingBox&	GetLocalBoundingBox() const;
 		virtual const ZEAABoundingBox&	GetWorldBoundingBox() const;
 		const ZEBoundingSphere&			GetWorldBoundingSphere() const;
 
@@ -97,11 +98,14 @@ class ZEEntityComponent : public ZEEntity
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 		virtual void					SetScale(const ZEVector3& NewScale);
 
-		ZEVector3						GetWorldPosition() const;
-		ZEQuaternion					GetWorldRotation() const;
-		ZEVector3						GetWorldDirection();
-		ZEVector3						GetWorldRight();
-		ZEVector3						GetWorldUp();
+		const ZEVector3					GetWorldPosition() const;
+		const ZEQuaternion				GetWorldRotation() const;
+
+		ZEVector3						GetWorldDirectionVector() const;
+		ZEVector3						GetWorldRightVector() const;
+		ZEVector3						GetWorldUpVector() const;
+
+
 
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& TEnterance, float &TExit);
 		virtual void					Draw(ZEDrawParameters* DrawParameters);
