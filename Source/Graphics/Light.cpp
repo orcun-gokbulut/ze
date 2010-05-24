@@ -45,20 +45,20 @@ ZEDWORD ZELight::GetDrawFlags() const
 void ZELight::SetPosition(const ZEVector3& NewPosition)
 {
 	UpdateViewVolume = true;
-	ZEEntityComponent::SetPosition(NewPosition);
+	ZEComponent::SetPosition(NewPosition);
 }
 
 void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 {
 	UpdateViewVolume = true;
-	ZEEntityComponent::SetRotation(NewRotation);
+	ZEComponent::SetRotation(NewRotation);
 }
 
 
 void ZELight::OwnerWorldTransformChanged()
 {
 	UpdateViewVolume = true;
-	ZEEntityComponent::OwnerWorldTransformChanged();
+	ZEComponent::OwnerWorldTransformChanged();
 }
 
 

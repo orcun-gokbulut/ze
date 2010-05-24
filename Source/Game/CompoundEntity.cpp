@@ -37,7 +37,7 @@
 #include "ZEMath/Matrix.h"
 #include "ZEMath/Ray.h"
 #include "Core/Error.h"
-#include "EntityComponent.h"
+#include "Component.h"
 #include <string.h>
 
 void ZECompoundEntity::SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism)
@@ -52,7 +52,7 @@ void ZECompoundEntity::UpdateComponents()
 		Components[I]->OwnerWorldTransformChanged();
 }
 
-void ZECompoundEntity::RegisterComponent(ZEEntityComponent* Component)
+void ZECompoundEntity::RegisterComponent(ZEComponent* Component)
 {
 	ZEDWORD ComponentRenderFlag = Component->GetDrawFlags();
 
@@ -73,7 +73,7 @@ void ZECompoundEntity::RegisterComponent(ZEEntityComponent* Component)
 	Components.Add(Component);
 }
 
-void ZECompoundEntity::UnregisterComponent(ZEEntityComponent* Component)
+void ZECompoundEntity::UnregisterComponent(ZEComponent* Component)
 {
 	Component->Deinitialize();
 	Components.DeleteValue(Component);
@@ -125,7 +125,7 @@ ZEEntityType ZECompoundEntity::GetEntityType()
 	return ZE_ET_COMPOUND;
 }
 
-const ZEArray<ZEEntityComponent*>& ZECompoundEntity::GetComponents()
+const ZEArray<ZEComponent*>& ZECompoundEntity::GetComponents()
 {
 	return Components; 
 }

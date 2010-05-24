@@ -49,7 +49,7 @@
 #include "Definitions.h"
 #include "Meta/Class.h"
 
-class ZEEntityComponent;
+class ZEComponent;
 struct ZEDrawParameters;
 
 enum ZEBoundingVolumeMechnism
@@ -71,10 +71,10 @@ class ZECompoundEntity : public ZEEntity
 		ZEBoundingVolumeMechnism				BoundingVolumeMechanism;
 
 	protected:
-		ZEArray<ZEEntityComponent*>				Components;
+		ZEArray<ZEComponent*>				Components;
 
-		void									RegisterComponent(ZEEntityComponent* Component);
-		void									UnregisterComponent(ZEEntityComponent* Component);	
+		void									RegisterComponent(ZEComponent* Component);
+		void									UnregisterComponent(ZEComponent* Component);	
 
 		void									SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
 
@@ -83,7 +83,7 @@ class ZECompoundEntity : public ZEEntity
 	public:
 		virtual ZEEntityType					GetEntityType();
 
-		const ZEArray<ZEEntityComponent *>&		GetComponents();
+		const ZEArray<ZEComponent *>&		GetComponents();
 
 		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
 

@@ -37,7 +37,7 @@
 #ifndef	__ZE_LIGHT_H__
 #define __ZE_LIGHT_H__
 
-#include "Game/EntityComponent.h"
+#include "Game/Component.h"
 #include "ViewVolume.h"
 
 enum ZELightType
@@ -51,7 +51,7 @@ enum ZELightType
 
 class ZEShadowRenderer;
 class ZEScene;
-class ZELight : public ZEEntityComponent
+class ZELight : public ZEComponent
 {
 	private:
 		bool							Enabled;

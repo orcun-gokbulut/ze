@@ -38,7 +38,7 @@
 #define __ZE_MODEL_H__
 
 #include "ZEDS/Array.h"
-#include "Game/EntityComponent.h"
+#include "Game/Component.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Canvas.h"
 #include "ModelResource.h"
@@ -53,7 +53,7 @@ class ZEFixedMaterial;
 class ZESimpleMaterial;
 struct ZEDrawParameters;
 
-class ZEModel : public ZEEntityComponent
+class ZEModel : public ZEComponent
 {	
 	friend class ZEPhysicalEnvironment;
 	private:

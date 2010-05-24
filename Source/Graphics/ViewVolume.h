@@ -64,7 +64,7 @@ enum ZEDoorViewTest
 };
 
 class ZEEntity;
-class ZEEntityComponent;
+class ZEComponent;
 class ZELight;
 class ZEViewVolume
 {
@@ -74,7 +74,7 @@ class ZEViewVolume
 		virtual bool						LightCullTest(ZELight* Light) const = 0;
 		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const = 0;
 		virtual bool						CullTest(ZEEntity* Entity) const = 0;
-		virtual bool						CullTest(ZEEntityComponent* Component) const = 0;
+		virtual bool						CullTest(ZEComponent* Component) const = 0;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const = 0;
 };
 
@@ -104,7 +104,7 @@ class ZEViewFrustum : public ZEViewVolume
 		virtual bool						LightCullTest(ZELight* Light) const;
 		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
-		virtual bool						CullTest(ZEEntityComponent* Component) const;
+		virtual bool						CullTest(ZEComponent* Component) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
 		void								Create(const ZEVector3& Position, const ZEQuaternion& Rotation, 
@@ -123,7 +123,7 @@ class ZEViewSphere : public ZEViewVolume
 		virtual bool						LightCullTest(ZELight* Light) const;
 		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
-		virtual bool						CullTest(ZEEntityComponent* Component) const;
+		virtual bool						CullTest(ZEComponent* Component) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
 		void								Create(const ZEVector3& Position, float Radius, float NearZ);
@@ -141,7 +141,7 @@ class ZEViewHemiSphere : public ZEViewVolume
 		virtual bool						LightCullTest(ZELight* Light) const;
 		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
-		virtual bool						CullTest(ZEEntityComponent* Component) const;
+		virtual bool						CullTest(ZEComponent* Component) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
 		void								Create(const ZEVector3& Position, const ZEVector3& Direction, float Radius, float NearZ);
@@ -158,7 +158,7 @@ class ZEViewCuboid: public ZEViewVolume
 		virtual bool						LightCullTest(ZELight* Light) const;
 		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
-		virtual bool						CullTest(ZEEntityComponent* Component) const;
+		virtual bool						CullTest(ZEComponent* Component) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
 		void								Create(const ZEVector3& Position, const ZEQuaternion& Rotation,
@@ -178,7 +178,7 @@ class ZEViewPlane : public ZEViewVolume
 		virtual bool						LightCullTest(ZELight* Light) const;
 		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
-		virtual bool						CullTest(ZEEntityComponent* Component) const;
+		virtual bool						CullTest(ZEComponent* Component) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;				
 
 		void								Create(const ZEVector3& Position, const ZEVector3& Direction, float MaxDistance);

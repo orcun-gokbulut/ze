@@ -94,7 +94,7 @@ void ZEPlayer::Tick(float Time)
 	float MetersPerSecond = 10.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
-	ZEEntityComponent* HitComponent;
+	ZEComponent* HitComponent;
 	ZEEntity* HitEntity;
 	for (size_t I = 0; I < InputMap.InputActionCount; I++)
 	{

@@ -37,7 +37,7 @@
 #include "ZEMath/Matrix.h"
 #include "ZEMath/Ray.h"
 #include "Core/Error.h"
-#include "EntityComponent.h"
+#include "Component.h"
 #include <string.h>
 
 void ZEEntity::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)

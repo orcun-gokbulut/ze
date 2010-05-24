@@ -37,7 +37,7 @@
 #ifndef	__ZE_CAMERA_H__
 #define __ZE_CAMERA_H__
 
-#include "Game/EntityComponent.h"
+#include "Game/Component.h"
 #include "Graphics/Renderer.h"
 #include "Graphics/RenderOrder.h"
 #include "Graphics/Canvas.h"
@@ -55,7 +55,7 @@ enum ZECameraProjectionType
 
 class ZEViewPort;
 
-class ZECamera : public ZEEntityComponent
+class ZECamera : public ZEComponent
 {
 	private:
 		bool							UpdateViewFrustum;

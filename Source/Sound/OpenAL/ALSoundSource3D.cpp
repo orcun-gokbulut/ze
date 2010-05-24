@@ -551,18 +551,18 @@ void ZEALSoundSource3D::SetSoundResource(ZESoundResource* Resource)
 
 void ZEALSoundSource3D::SetPosition(const ZEVector3& NewPosition)
 {
-	ZEEntityComponent::SetPosition(NewPosition);
+	ZEComponent::SetPosition(NewPosition);
 
 	if (Allocated)
 	{
-		const ZEVector3& WorldPosition = ZEEntityComponent::GetWorldPosition();	
+		const ZEVector3& WorldPosition = ZEComponent::GetWorldPosition();	
 		alSource3f(ALSource, AL_POSITION, WorldPosition.x, WorldPosition.y, WorldPosition.z);
 	}
 }
 
 void ZEALSoundSource3D::SetRotation(const ZEQuaternion& NewRotation)
 {
-	ZEEntityComponent::SetRotation(NewRotation);
+	ZEComponent::SetRotation(NewRotation);
 
 	if (Allocated)
 	{

@@ -368,12 +368,12 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 				}
 				else if (Entities[I]->GetEntityType() == ZE_ET_COMPOUND)
 				{
-					const ZEArray<ZEEntityComponent*>& Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
+					const ZEArray<ZEComponent*>& Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
 					
 					// Loop through current entity's components
 					for (size_t N = 0; N < Components.GetCount(); N++)
 					{
-						ZEEntityComponent* Component = Components[N];
+						ZEComponent* Component = Components[N];
 							
 						// Check entities component is light source or not. If light source then test its light volume is visible in camera's view volume
 						if ((Component->GetDrawFlags() & ZE_DF_LIGHT_SOURCE))
@@ -482,12 +482,12 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 			// Check whether entity has drawable components or not
 			if (EntityDrawFlags & ZE_DF_DRAW_COMPONENTS && CurrentEntity->GetEntityType() == ZE_ET_COMPOUND)
 			{
-				const ZEArray<ZEEntityComponent*> Components = ((ZECompoundEntity*)CurrentEntity)->GetComponents();
+				const ZEArray<ZEComponent*> Components = ((ZECompoundEntity*)CurrentEntity)->GetComponents();
 
 				// Loop thought entity's components
 				for (size_t N = 0; N < Components.GetCount(); N++)
 				{
-					ZEEntityComponent* Component = Components[N];
+					ZEComponent* Component = Components[N];
 
 					// Check whether component is drawable and visible also if it is cullable, test it with view volume
 					if ((Component->GetDrawFlags() & ZE_DF_DRAW))

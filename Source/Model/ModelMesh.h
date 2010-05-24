@@ -40,7 +40,7 @@
 #include "ModelAnimation.h"
 #include "ModelMeshLod.h"
 
-#include "Game/EntityComponent.h"
+#include "Game/Component.h"
 #include "Graphics/RenderOrder.h"
 
 class ZEModel;

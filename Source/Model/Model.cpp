@@ -498,25 +498,25 @@ const ZEAABoundingBox& ZEModel::GetLocalBoundingBox() const
 
 void ZEModel::SetPosition(const ZEVector3& NewPosition)
 {
-	ZEEntityComponent::SetPosition(NewPosition);
+	ZEComponent::SetPosition(NewPosition);
 	LocalTransformChanged();
 }
 
 void ZEModel::SetRotation(const ZEQuaternion& NewRotation)
 {
-	ZEEntityComponent::SetRotation(NewRotation);
+	ZEComponent::SetRotation(NewRotation);
 	LocalTransformChanged();
 }
 
 void ZEModel::SetScale(const ZEVector3& NewScale)
 {
-	ZEEntityComponent::SetScale(NewScale);
+	ZEComponent::SetScale(NewScale);
 	LocalTransformChanged();
 }
 
 void ZEModel::OwnerWorldTransformChanged()
 {
-	ZEEntityComponent::OwnerWorldTransformChanged();
+	ZEComponent::OwnerWorldTransformChanged();
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].ModelWorldTransformChanged();
 

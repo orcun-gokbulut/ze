@@ -504,11 +504,11 @@ void ZEDSSoundSource3D::SetSoundResource(ZESoundResource* Resource)
 
 void ZEDSSoundSource3D::SetPosition(const ZEVector3& NewPosition)
 {
-	ZEEntityComponent::SetPosition(NewPosition);
+	ZEComponent::SetPosition(NewPosition);
 
 	if (DS3DBuffer != NULL)
 	{
-		const ZEVector3& WorldPosition = ZEEntityComponent::GetWorldPosition();
+		const ZEVector3& WorldPosition = ZEComponent::GetWorldPosition();
 
 		DS3DBuffer->SetPosition(WorldPosition.x, WorldPosition.y, WorldPosition.z, DS3D_DEFERRED);
 	}
@@ -516,12 +516,12 @@ void ZEDSSoundSource3D::SetPosition(const ZEVector3& NewPosition)
 
 void ZEDSSoundSource3D::SetRotation(const ZEQuaternion& NewRotation)
 {
-	ZEEntityComponent::SetRotation(NewRotation);
+	ZEComponent::SetRotation(NewRotation);
 
 	if (DS3DBuffer != NULL)
 	{
 		ZEVector3 Front;
-		ZEQuaternion::VectorProduct(Front, ZEEntityComponent::GetWorldRotation(), ZEVector3::UnitZ);
+		ZEQuaternion::VectorProduct(Front, ZEComponent::GetWorldRotation(), ZEVector3::UnitZ);
 
 		DS3DBuffer->SetConeOrientation(Front.x, Front.y, Front.z, DS3D_DEFERRED);
 	}

@@ -50,11 +50,11 @@ class ZERenderer;
 class ZECompoundEntity;
 class ZELight;
 
-ZE_META_ENTITY_DESCRIPTION(ZEEntityComponent);
+ZE_META_ENTITY_DESCRIPTION(ZEComponent);
 
 #define ZE_CDF_USER_FLAG_START		16
 
-class ZEEntityComponent : public ZEEntity
+class ZEComponent : public ZEEntity
 {
 	ZE_META_CLASS()
 	friend class ZECompoundEntity;
@@ -118,13 +118,13 @@ class ZEEntityComponent : public ZEEntity
 
 		virtual void					OwnerWorldTransformChanged();
 
-										ZEEntityComponent();
+										ZEComponent();
 };
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZEEntityComponent">
+		<class name="ZEComponent">
 			<description>Base Component Type</description>
 		</class>
 	</meta>

@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "EntityComponent.h"
+#include "Component.h"
 #include "Game/CompoundEntity.h"
 
 // ZEComponentDirtyTransfromFlags
@@ -43,7 +43,7 @@
 #define ZE_CDF_WORLD_BOUNDING_SPHERE		4
 #define ZE_CDF_WORLD_BOUNDING_BOX			8
 
-void ZEEntityComponent::UpdateBoundingVolumes()
+void ZEComponent::UpdateBoundingVolumes()
 {
 	DirtyFlags = ZE_CDF_ALL;
 
@@ -51,7 +51,7 @@ void ZEEntityComponent::UpdateBoundingVolumes()
 		Owner->UpdateBoundingVolumes();
 }
 
-void ZEEntityComponent::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
+void ZEComponent::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 {
 	LocalBoundingBox = BoundingBox;
 	DirtyFlags |= ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_SPHERE;
@@ -60,49 +60,49 @@ void ZEEntityComponent::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 		Owner->UpdateBoundingVolumes();
 }
 
-ZEDWORD ZEEntityComponent::GetDrawFlags() const
+ZEDWORD ZEComponent::GetDrawFlags() const
 {
 	return ZE_DF_NONE;
 }
 
-ZEEntityType ZEEntityComponent::GetEntityType()
+ZEEntityType ZEComponent::GetEntityType()
 {
 	return ZE_ET_COMPONENT;
 }
 
-ZECompoundEntity* ZEEntityComponent::GetOwner() const
+ZECompoundEntity* ZEComponent::GetOwner() const
 {
 	return Owner;
 }
 
-const ZEVector3& ZEEntityComponent::GetWorldVelocity()
+const ZEVector3& ZEComponent::GetWorldVelocity()
 {
 	return ZEVector3::Zero;// LocalVelocity;
 }
 
-ZEVector3 ZEEntityComponent::GetWorldDirectionVector() const
+ZEVector3 ZEComponent::GetWorldDirection() const
 {
 	return GetWorldRotation() * ZEVector3::UnitZ;
 }
 
-ZEVector3 ZEEntityComponent::GetWorldRightVector() const
+ZEVector3 ZEComponent::GetWorldRight() const
 {
 	return GetWorldRotation() * ZEVector3::UnitX;
 }
 
-ZEVector3 ZEEntityComponent::GetWorldUpVector() const
+ZEVector3 ZEComponent::GetWorldUp() const
 {
 	return GetWorldRotation() * ZEVector3::UnitY;
 }
 
-const ZEMatrix4x4& ZEEntityComponent::GetWorldTransform() const
+const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 {
 	if (Owner != NULL)
 	{
 		if (DirtyFlags & ZE_CDF_WORLD_TRANSFORM)
 		{
-			ZEMatrix4x4::Multiply(((ZEEntityComponent*)this)->WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
-			((ZEEntityComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_TRANSFORM;
+			ZEMatrix4x4::Multiply(((ZEComponent*)this)->WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
+			((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_TRANSFORM;
 		}
 
 		return WorldTransform;
@@ -111,45 +111,45 @@ const ZEMatrix4x4& ZEEntityComponent::GetWorldTransform() const
 		return LocalTransform;
 }
 
-const ZEMatrix4x4& ZEEntityComponent::GetLocalTransform() const 
+const ZEMatrix4x4& ZEComponent::GetLocalTransform() const 
 {
 	if (DirtyFlags & ZE_CDF_LOCAL_TRANSFORM)
 	{
-		ZEMatrix4x4::CreateOrientation(((ZEEntityComponent*)this)->LocalTransform, GetPosition(), GetRotation(), GetScale());
-		((ZEEntityComponent*)this)->DirtyFlags &= ~ZE_CDF_LOCAL_TRANSFORM;
+		ZEMatrix4x4::CreateOrientation(((ZEComponent*)this)->LocalTransform, GetPosition(), GetRotation(), GetScale());
+		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_LOCAL_TRANSFORM;
 	}
 
 	return LocalTransform;
 }
 
-const ZEAABoundingBox& ZEEntityComponent::GetLocalBoundingBox() const
+const ZEAABoundingBox& ZEComponent::GetLocalBoundingBox() const
 {
 	return LocalBoundingBox;
 }
 
-const ZEAABoundingBox& ZEEntityComponent::GetWorldBoundingBox() const
+const ZEAABoundingBox& ZEComponent::GetWorldBoundingBox() const
 {
 	if (DirtyFlags & ZE_CDF_WORLD_BOUNDING_BOX)
 	{
-		ZEAABoundingBox::Transform(((ZEEntityComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
-		((ZEEntityComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_BOUNDING_BOX;
+		ZEAABoundingBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_BOUNDING_BOX;
 	}
 
 	return WorldBoundingBox;
 }
 
-const ZEBoundingSphere& ZEEntityComponent::GetWorldBoundingSphere() const
+const ZEBoundingSphere& ZEComponent::GetWorldBoundingSphere() const
 {
 	if (DirtyFlags & ZE_CDF_WORLD_BOUNDING_SPHERE)
 	{
-		GetWorldBoundingBox().GenerateBoundingSphere(((ZEEntityComponent*)this)->WorldBoundingSphere);
-		((ZEEntityComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_BOUNDING_SPHERE;
+		GetWorldBoundingBox().GenerateBoundingSphere(((ZEComponent*)this)->WorldBoundingSphere);
+		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_BOUNDING_SPHERE;
 	}
 
 	return WorldBoundingSphere;
 }
 
-void ZEEntityComponent::SetPosition(const ZEVector3& NewPosition)
+void ZEComponent::SetPosition(const ZEVector3& NewPosition)
 {
 	ZEEntity::SetPosition(NewPosition);
 
@@ -157,7 +157,7 @@ void ZEEntityComponent::SetPosition(const ZEVector3& NewPosition)
 		Owner->UpdateBoundingVolumes();
 }
 
-void ZEEntityComponent::SetRotation(const ZEQuaternion& NewRotation)
+void ZEComponent::SetRotation(const ZEQuaternion& NewRotation)
 {
 	ZEEntity::SetRotation(NewRotation);
 
@@ -165,7 +165,7 @@ void ZEEntityComponent::SetRotation(const ZEQuaternion& NewRotation)
 		Owner->UpdateBoundingVolumes();
 }
 
-void ZEEntityComponent::SetScale(const ZEVector3& NewScale)
+void ZEComponent::SetScale(const ZEVector3& NewScale)
 {
 	DirtyFlags = ZE_CDF_ALL;
 
@@ -174,7 +174,7 @@ void ZEEntityComponent::SetScale(const ZEVector3& NewScale)
 }
 
 
-const ZEVector3 ZEEntityComponent::GetWorldPosition() const
+const ZEVector3 ZEComponent::GetWorldPosition() const
 {
 	if (Owner != NULL)
 	{
@@ -186,7 +186,7 @@ const ZEVector3 ZEEntityComponent::GetWorldPosition() const
 		return GetPosition();
 }
 
-const ZEQuaternion ZEEntityComponent::GetWorldRotation() const
+const ZEQuaternion ZEComponent::GetWorldRotation() const
 {
 	if (Owner != NULL)
 	{
@@ -199,12 +199,12 @@ const ZEQuaternion ZEEntityComponent::GetWorldRotation() const
 		return GetRotation();
 }
 
-bool ZEEntityComponent::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& TEnterance, float &TExit)
+bool ZEComponent::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& TEnterance, float &TExit)
 {
 	return false;
 }
 
-void ZEEntityComponent::Tick(float Time)
+void ZEComponent::Tick(float Time)
 {
 	const ZEVector3& WorldPosition = GetWorldPosition();
 
@@ -212,32 +212,32 @@ void ZEEntityComponent::Tick(float Time)
 	ZEVector3::Scale(LocalVelocity, LocalVelocity, Time);*/
 }
 
-void ZEEntityComponent::Draw(ZEDrawParameters* DrawParameters)
+void ZEComponent::Draw(ZEDrawParameters* DrawParameters)
 {
 }
 
-bool ZEEntityComponent::Initialize()
+bool ZEComponent::Initialize()
 {
 	return true;
 }
 
-void ZEEntityComponent::Deinitialize()
+void ZEComponent::Deinitialize()
 {
 
 }
 
-void ZEEntityComponent::Destroy()
+void ZEComponent::Destroy()
 {
 	delete this;
 }
 
-void ZEEntityComponent::OwnerWorldTransformChanged()
+void ZEComponent::OwnerWorldTransformChanged()
 {
 	DirtyFlags |= ZE_CDF_WORLD_TRANSFORM | ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_BOX;
 }
 
 
-ZEEntityComponent::ZEEntityComponent()
+ZEComponent::ZEComponent()
 {
 	Owner = NULL;
 
@@ -246,9 +246,9 @@ ZEEntityComponent::ZEEntityComponent()
 	Enabled = true;
 }
 
-#include "EntityComponent.h.zpp"
+#include "Component.h.zpp"
 
-ZEEntityRunAt ZEEntityComponentDescription::GetRunAt() const
+ZEEntityRunAt ZEComponentDescription::GetRunAt() const
 {
 	return ZE_ERA_NONE;
 }

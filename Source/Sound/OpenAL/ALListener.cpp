@@ -88,7 +88,7 @@ bool ZEALListener::IsActiveListener()
 
 void ZEALListener::SetPosition(const ZEVector3& Position)
 {
-	ZEEntityComponent::SetPosition(Position);
+	ZEComponent::SetPosition(Position);
 
 	if (IsActiveListener())
 	{
@@ -99,7 +99,7 @@ void ZEALListener::SetPosition(const ZEVector3& Position)
 
 void ZEALListener::SetRotation(const ZEQuaternion& Rotation)
 {
-	ZEEntityComponent::SetRotation(Rotation);
+	ZEComponent::SetRotation(Rotation);
 
 	if (IsActiveListener())
 	{
@@ -173,7 +173,7 @@ void ZEALListener::OwnerWorldTransformChanged()
 
 void ZEALListener::Tick(float ElapsedTime)
 {
-	ZEEntityComponent::Tick(ElapsedTime);
+	ZEComponent::Tick(ElapsedTime);
 
 	const ZEVector3& WorldVelocity = GetWorldVelocity();
 	alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);

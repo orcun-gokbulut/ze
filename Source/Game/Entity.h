@@ -48,7 +48,7 @@
 #include "Definitions.h"
 #include "Meta/Class.h"
 
-class ZEEntityComponent;
+class ZEComponent;
 class ZECompoundEntity;
 struct ZEDrawParameters;
 

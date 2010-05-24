@@ -37,13 +37,13 @@
 #ifndef __ZE_PARTICLE_EFFECT_H__
 #define __ZE_PARTICLE_EFFECT_H__
 
-#include "Game/EntityComponent.h"
+#include "Game/Component.h"
 #include "ZEDS/Array.h"
 #include "ParticleSystem.h"
 
 struct ZEDrawParameters;
 
-class ZEParticleEffect : public ZEEntityComponent
+class ZEParticleEffect : public ZEComponent
 {
 	private:
 		ZEArray<ZEParticleSystem*>			SystemArray;				// An effect might be composed of many systems

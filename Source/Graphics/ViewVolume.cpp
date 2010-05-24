@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ViewVolume.h"
-#include "Game/EntityComponent.h"
+#include "Game/Component.h"
 #include "Core/Error.h"
 #include "Game/Entity.h"
 #include "Graphics/Light.h"
@@ -168,7 +168,7 @@ bool ZEViewFrustum::CullTest(ZEEntity* Entity) const
 	return /*ConeCullTest(Entity->GetWorldBoundingSphere()) &&*/ CullTest(Entity->GetWorldBoundingBox());
 }
 
-bool ZEViewFrustum::CullTest(ZEEntityComponent* Component) const
+bool ZEViewFrustum::CullTest(ZEComponent* Component) const
 {
 	return /*ConeCullTest(Component->GetWorldBoundingSphere()) &&*/ CullTest(Component->GetWorldBoundingBox());
 }
@@ -243,7 +243,7 @@ bool ZEViewSphere::CullTest(ZEEntity* Entity) const
 	return false;
 }
 
-bool ZEViewSphere::CullTest(ZEEntityComponent* Component) const
+bool ZEViewSphere::CullTest(ZEComponent* Component) const
 {
 	ZEBoundingSphere ComponentBoundingSphere;
 	ZEAABoundingBox ComponentBoundingBox;
@@ -294,7 +294,7 @@ bool ZEViewHemiSphere::CullTest(ZEEntity* Entity) const
 		!ZEAABoundingBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere);
 }
 
-bool ZEViewHemiSphere::CullTest(ZEEntityComponent* Component) const
+bool ZEViewHemiSphere::CullTest(ZEComponent* Component) const
 {
 	return ZEBoundingSphere::PlaneHalfSpaceTest(Component->GetWorldBoundingSphere(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
 		!ZEBoundingSphere::CollisionTest(BoundingSphere, Component->GetWorldBoundingSphere()) ||
@@ -338,7 +338,7 @@ bool ZEViewCuboid::CullTest(ZEEntity* Entity) const
 	return true;
 }
 
-bool ZEViewCuboid::CullTest(ZEEntityComponent* Component) const
+bool ZEViewCuboid::CullTest(ZEComponent* Component) const
 {
 	zeWarningAssert(true, "NOT IMPLAMENTED");
 	//return ZEBoundingSphere::CollisionTest(Component->GetWorldBoundingSphere(), BoundingBox);
@@ -395,7 +395,7 @@ bool ZEViewPlane::CullTest(ZEEntity* Entity) const
 	return false;
 }
 
-bool ZEViewPlane::CullTest(ZEEntityComponent* Component) const
+bool ZEViewPlane::CullTest(ZEComponent* Component) const
 {
 	const ZEBoundingSphere& BoundingSphere = Component->GetWorldBoundingSphere();
 	if (ZEBoundingSphere::PlaneHalfSpaceTest(BoundingSphere, Plane) == ZEHALFSPACE_NEGATIVESIDE ||
