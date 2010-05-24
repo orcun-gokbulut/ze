@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - EntityComponent.h
+ Zinek Engine - Component.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -101,9 +101,9 @@ class ZEComponent : public ZEEntity
 		const ZEVector3					GetWorldPosition() const;
 		const ZEQuaternion				GetWorldRotation() const;
 
-		ZEVector3						GetWorldDirectionVector() const;
-		ZEVector3						GetWorldRightVector() const;
-		ZEVector3						GetWorldUpVector() const;
+		ZEVector3						GetWorldDirection() const;
+		ZEVector3						GetWorldRight() const;
+		ZEVector3						GetWorldUp() const;
 
 
 
