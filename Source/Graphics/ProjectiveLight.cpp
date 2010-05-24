@@ -93,7 +93,7 @@ void ZEProjectiveLight::SetShadowMap(int Width, int Height)
 	else
 		ShadowMap = ZETexture2D::CreateInstance();
 
-	if (!ShadowMap->Create(Width, Height, ZE_TPF_SHADOWMAP, true))
+	if (!ShadowMap->Create(Width, Height, ZE_TPF_DEPTH, true))
 	{
 		zeError("Projective Light", "Can not create shadow map texture.");
 		return;

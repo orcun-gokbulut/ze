@@ -178,7 +178,7 @@ bool ZED3D9ShadowRenderer::SetOutput(ZETexture2D* Texture)
 	OutputCubeTexture = NULL;
 	OutputTexture = Texture;
 
-	if (Texture->GetPixelFormat() != ZE_TPF_DEPTH && Texture->GetPixelFormat() != ZE_TPF_SHADOWMAP)
+	if (Texture->GetPixelFormat() != ZE_TPF_DEPTH && Texture->GetPixelFormat() != ZE_TPF_DEPTH)
 	{
 		zeError("D3D9 Shadow Renderer", "Can not set output texture becouse texture is not a depth texture.");
 		return false;
@@ -197,7 +197,7 @@ bool ZED3D9ShadowRenderer::SetOutput(ZETexture2D* Texture)
 		return false;
 	}
 
-	if (!ZED3D9CommonTools::CreateRenderTarget(&ColorRenderTarget, Texture->GetWidth(), Texture->GetHeight(), ZE_TPF_ARGB32))
+	if (!ZED3D9CommonTools::CreateRenderTarget(&ColorRenderTarget, Texture->GetWidth(), Texture->GetHeight(), ZE_TPF_RGBA_INT32))
 		return false;
 	
 	return true;
@@ -215,7 +215,7 @@ bool ZED3D9ShadowRenderer::SetOutput(ZETextureCube* Texture, ZETextureCubeFace F
 	OutputCubeTextureFace = Face;
 	OutputTexture = NULL;
 
-	if (Texture->GetPixelFormat() != ZE_TPF_DEPTH && Texture->GetPixelFormat() != ZE_TPF_SHADOWMAP)
+	if (Texture->GetPixelFormat() != ZE_TPF_DEPTH && Texture->GetPixelFormat() != ZE_TPF_DEPTH)
 	{
 		zeError("D3D9 Shadow Renderer", "Can not set output texture becouse texture is not a depth texture.");
 		return false;
@@ -235,7 +235,7 @@ bool ZED3D9ShadowRenderer::SetOutput(ZETextureCube* Texture, ZETextureCubeFace F
 	}
 
 
-	if (!ZED3D9CommonTools::CreateRenderTarget(&ColorRenderTarget, Texture->GetEdgeLenght(), Texture->GetEdgeLenght(), ZE_TPF_ARGB32))
+	if (!ZED3D9CommonTools::CreateRenderTarget(&ColorRenderTarget, Texture->GetEdgeLenght(), Texture->GetEdgeLenght(), ZE_TPF_RGBA_INT32))
 		return false;
 	
 	return true;

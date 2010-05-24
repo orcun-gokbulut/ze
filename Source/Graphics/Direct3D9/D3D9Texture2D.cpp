@@ -86,7 +86,7 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 
 	switch(PixelFormat)
 	{
-		case ZE_TPF_ARGB32:
+		case ZE_TPF_RGBA_INT32:
 			if (RenderTarget)
 			{
 				Usage = D3DUSAGE_RENDERTARGET;
@@ -102,7 +102,7 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 			Format = D3DFMT_A8R8G8B8;
 			break;
 
-		case ZE_TPF_SINGLE_HDR:
+		case ZE_TPF_LUM_HDR:
 			if (RenderTarget)
 			{
 				Usage = D3DUSAGE_RENDERTARGET;
@@ -119,7 +119,7 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 			Format = D3DFMT_R16F;
 			break;
 
-		case ZE_TPF_ARGB_HDR:
+		case ZE_TPF_RGBA_HDR:
 			if (RenderTarget)
 			{
 				Usage = D3DUSAGE_RENDERTARGET;

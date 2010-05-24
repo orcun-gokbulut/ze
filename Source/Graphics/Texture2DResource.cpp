@@ -153,27 +153,27 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceF
 			{
 				case 16:
 					zeWarning("Texture Resource", "There is performance hit converting 16 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
-					Format = ZE_TPF_ARGB32; 
+					Format = ZE_TPF_RGBA_INT32; 
 					ConvertedData = FreeImage_ConvertTo32Bits(Data);
 					FreeImage_Unload(Data);
 					Data = ConvertedData;
 					break;
 				case 8:
 					zeWarning("Texture Resource", "There is performance hit converting 8 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
-					Format = ZE_TPF_ARGB32;
+					Format = ZE_TPF_RGBA_INT32;
 					ConvertedData = FreeImage_ConvertTo32Bits(Data);
 					FreeImage_Unload(Data);
 					Data = ConvertedData;
 					break;
 				case 24:
 					zeWarning("Texture Resource", "There is performance hit converting 24 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
-					Format = ZE_TPF_ARGB32;
+					Format = ZE_TPF_RGBA_INT32;
 					ConvertedData = FreeImage_ConvertTo32Bits(Data);
 					FreeImage_Unload(Data);
 					Data = ConvertedData;
 					break;
 				case 32:
-					Format = ZE_TPF_ARGB32;
+					Format = ZE_TPF_RGBA_INT32;
 					break;
 				default:
 					zeError("Texture Resource", "Image pixel format is not supported. FileName : \"%s\"", ResourceFile->GetFileName());

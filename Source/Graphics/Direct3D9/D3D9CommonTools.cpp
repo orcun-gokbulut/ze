@@ -41,13 +41,13 @@ D3DFORMAT ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 {
 	switch(Format)
 	{
-		case ZE_TPF_ARGB32:
+		case ZE_TPF_RGBA_INT32:
 			return D3DFMT_A8R8G8B8;
-		case ZE_TPF_SHADOWMAP:
-			return D3DFMT_D32;
 		case ZE_TPF_DEPTH:
 			return D3DFMT_R32F;
-		case ZE_TPF_HDR:
+		case ZE_TPF_LUM_HDR:
+			return D3DFMT_R32F;
+		case ZE_TPF_RGBA_HDR:
 			return D3DFMT_A16B16G16R16F;
 		default:
 			return (D3DFORMAT)0;

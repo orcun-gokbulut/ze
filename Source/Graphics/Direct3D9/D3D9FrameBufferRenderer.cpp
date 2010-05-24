@@ -256,7 +256,7 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 			{
 				// If not release it and recreate it with the correct size
 				ColorTexture->Release();
-				if (ColorTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32))
+				if (ColorTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32))
 				{
 					zeCriticalError("D3D9 Frame Buffer Renderer", "Can not create color texture.");
 					return;
@@ -267,7 +267,7 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 		{
 			// If there is no older texture then create brand new one
 			ColorTexture = ZETexture2D::CreateInstance();
-			ColorTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32);
+			ColorTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32);
 		}
 	else
 		// If render color buffer is not enabled check color texture is available or not
@@ -285,7 +285,7 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 			if (DepthTexture->GetHeight() != ScreenWidth && DepthTexture->GetHeight() != ScreenHeight)
 			{
 				DepthTexture->Release();
-				if (!DepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32))
+				if (!DepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32))
 				{
 					zeCriticalError("D3D9 Frame Buffer Renderer", "Can not create depth texture.");
 					return;
@@ -295,7 +295,7 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 		else
 		{
 			DepthTexture = ZETexture2D::CreateInstance();
-			DepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32);
+			DepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32);
 		}
 	else
 		if (DepthTexture != NULL)
@@ -311,7 +311,7 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 			if (VelocityTexture->GetHeight() != ScreenWidth && VelocityTexture->GetHeight() != ScreenHeight)
 			{
 				VelocityTexture->Release();
-				if (!VelocityTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32))
+				if (!VelocityTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32))
 				{
 					zeCriticalError("D3D9 Frame Buffer Renderer", "Can not create velocity texture.");
 					return;
@@ -321,7 +321,7 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 		else
 		{
 			VelocityTexture = ZETexture2D::CreateInstance();
-			VelocityTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_ARGB32);
+			VelocityTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32);
 		}
 	else
 		if (VelocityTexture != NULL)
