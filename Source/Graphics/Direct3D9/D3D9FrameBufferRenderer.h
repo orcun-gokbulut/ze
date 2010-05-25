@@ -38,13 +38,19 @@
 #define __ZE_D3D9_FRAME_BUFFER_RENDERER_H__
 
 #include "Graphics/FrameBufferRenderer.h"
-//#include "Graphics/RenderOrder.h"
 #include "D3D9ComponentBase.h"
+#include "D3D9HDRProcessor.h"
 
 class ZED3D9FrameBufferRenderer : public ZEFrameBufferRenderer, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	private:
+		LPDIRECT3DSURFACE9					ColorRenderTarget;
+
+		ZED3D9HDRProcessor					HDRProcessor;
+		LPDIRECT3DTEXTURE9					HDRRenderTarget;
+		bool								HDREnabled;
+
 		bool								RenderColorTexture;
 		bool								RenderDepthTexture;
 		bool								RenderVelocityTexture;

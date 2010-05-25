@@ -58,7 +58,10 @@ ZED3D9FrameBufferRenderer::ZED3D9FrameBufferRenderer()
 	RenderDepthTexture = false;
 	RenderVelocityTexture = false;
 	RenderObjectTexture = false;
+	HDREnabled = true;
 
+	HDRRenderTarget = NULL;
+	ColorRenderTarget = NULL;
 	ColorTexture = NULL;
 	DepthTexture = NULL;
 	VelocityTexture = NULL;
@@ -73,27 +76,66 @@ ZED3D9FrameBufferRenderer::~ZED3D9FrameBufferRenderer()
 
 bool ZED3D9FrameBufferRenderer::Initialize() 
 { 
-	// No initialization core necessary
+	if (HDREnabled)
+	{
+		// HDR Rendering
+		ZED3D9CommonTools::CreateRenderTarget(&HDRRenderTarget, GetModule()->GetScreenWidth(), GetModule()->GetScreenHeight(), ZE_TPF_RGBA_HDR);
+		HDRRenderTarget->GetSurfaceLevel(0, &ColorRenderTarget);
+		HDRProcessor.Input = HDRRenderTarget;
+		HDRProcessor.Target = GetModule()->GetFrameColorBuffer();
+		HDRProcessor.Initialize();
+	}
+	else
+	{
+		// LDR Rendering
+		ColorRenderTarget = GetModule()->GetFrameColorBuffer();
+	}
 	return true; 
 } 
 
 void ZED3D9FrameBufferRenderer::Deinitialize()
 {
+	HDRProcessor.Deinitialize();
+
+	if (HDRRenderTarget != NULL)
+	{
+		HDRRenderTarget->Release();
+		HDRRenderTarget = NULL;
+	}
+
+	if (ColorRenderTarget != NULL)
+	{
+		ColorRenderTarget->Release();
+		ColorRenderTarget = NULL;
+	}
+
 	// If color texture is created destroy it
 	if (ColorTexture != NULL)
+	{
 		ColorTexture->Destroy();
+		ColorTexture = NULL;
+	}
 
 	// If depth texture is created destroy it
 	if (DepthTexture != NULL)
+	{
 		DepthTexture->Destroy();
+		DepthTexture = NULL;
+	}
 
 	// If velocity texture is created destroy it
 	if (VelocityTexture != NULL)
+	{
 		VelocityTexture->Destroy();
+		VelocityTexture = NULL;
+	}
 
 	// If object texture is created destroy it
 	if (ObjectTexture != NULL)
+	{
 		ObjectTexture->Destroy();
+		ObjectTexture = NULL;
+	}
 }
 
 void ZED3D9FrameBufferRenderer::SetRenderColorTexture(bool Enable)
@@ -235,7 +277,7 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 	// Check if there is a post process attached to render order
 	if (PostProcessors.GetCount() != NULL)
 	{
-		// If post process is attached then create offscreen render targets
+		// If post process is attached then create off screen render targets
 
 	}
 	else
@@ -244,6 +286,10 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 		GetDevice()->SetRenderTarget(0, GetModule()->GetFrameColorBuffer());
 		GetDevice()->SetDepthStencilSurface(GetModule()->GetFrameZBuffer());
 	}
+
+	GetDevice()->SetRenderTarget(0, ColorRenderTarget);
+	GetDevice()->SetDepthStencilSurface(GetModule()->GetFrameZBuffer());
+
 
 	// If renderer will give output to other mechanisms like post processors. It will enable render color buffer.
 	// Creating color texture if Render Color Texture enabled.
@@ -390,4 +436,10 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 
 	// Finish Drawing
 	GetDevice()->EndScene();
+
+	if (HDREnabled)
+	{
+		HDRProcessor.DoHDR();
+	}
+
 }

@@ -54,6 +54,84 @@ D3DFORMAT ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 	}
 }
 
+bool ZED3D9CommonTools::CompileVertexShaderFromFile(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* FileName, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
+{
+	LPD3DXBUFFER ShaderBuffer = NULL;
+	LPD3DXBUFFER CompilerOutput = NULL;
+
+	if (*VertexShader != NULL)
+		(*VertexShader)->Release();
+
+	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, "vs_main", ShaderProfile, D3DXSHADER_OPTIMIZATION_LEVEL3, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	{
+		if (CompilerOutput == NULL)
+		{
+			zeError("D3D9 Vertex Shader Compiler", "Can not vertex compile shader. Shader name : \"%s\"", ShaderName);
+		}
+		else
+		{
+			zeError("D3D9 Vertex Shader Compiler", "Can not compile vertex shader.\r\nShader name : \"%s\".\r\nCompile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
+		}
+
+		*VertexShader = NULL;
+		return false;
+	}
+
+	if (GetDevice()->CreateVertexShader((DWORD*)ShaderBuffer->GetBufferPointer(), VertexShader) != NULL)
+	{
+		zeError("D3D9 Vertex Shader Compiler", "Can not create vertex shader.\r\n");
+		*VertexShader = NULL;
+		return false;
+	}
+
+	if (ShaderBuffer != NULL)
+		ShaderBuffer->Release();
+
+	if (CompilerOutput != NULL)
+		CompilerOutput->Release();
+
+	return true;
+}
+
+
+bool ZED3D9CommonTools::CompilePixelShaderFromFile(LPDIRECT3DPIXELSHADER9* PixelShader, const char* FileName, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
+{
+	LPD3DXBUFFER ShaderBuffer = NULL;
+	LPD3DXBUFFER CompilerOutput = NULL;
+
+	if (*PixelShader != NULL)
+		(*PixelShader)->Release();
+
+	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, "ps_main", ShaderProfile, D3DXSHADER_OPTIMIZATION_LEVEL3 | D3DXSHADER_PARTIALPRECISION, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	{
+		if (CompilerOutput == NULL)
+		{
+			zeError("D3D9 Vertex Shader Compiler", "Can not vertex compile shader. Shader name : \"%s\"", ShaderName);
+		}
+		else
+		{
+			zeError("D3D9 Pixel Shader Compiler", "Can not compile pixel shader.\r\nShader Name : \"%s\".\r\n Compile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
+		}
+
+		*PixelShader = NULL;
+		return false;
+	}
+
+	if (GetDevice()->CreatePixelShader((DWORD*)ShaderBuffer->GetBufferPointer(), PixelShader) != NULL)
+	{
+		zeError("D3D9 Pixel Shader Compiler", "Can not create pixel shader.");
+		*PixelShader = NULL;
+		return false;
+	}
+
+	if (ShaderBuffer != NULL)
+		ShaderBuffer->Release();
+	if (CompilerOutput != NULL)
+		CompilerOutput->Release();
+
+	return true;
+}
+
 bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* Source, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
 {
 	LPD3DXBUFFER ShaderBuffer;
@@ -123,7 +201,8 @@ bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width
 	if (*Target != NULL)
 	{
 		(*Target)->GetLevelDesc(0, &SurDesc);
-		if (SurDesc.Width != Width ||SurDesc.Height != Height || SurDesc.Format != D3DFormat)
+		
+		if (SurDesc.Width != Width ||SurDesc.Height != Height || SurDesc.Format != D3DFormat || SurDesc.Usage != D3DUSAGE_RENDERTARGET)
 			(*Target)->Release();
 		else
 			return true;
