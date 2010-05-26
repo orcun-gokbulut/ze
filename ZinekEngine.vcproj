@@ -742,6 +742,14 @@
 						>
 					</File>
 					<File
+						RelativePath=".\RunDir\resources\shaders\FixedMaterial.hlsl"
+						>
+					</File>
+					<File
+						RelativePath=".\RunDir\resources\shaders\HDRProcessor.hlsl"
+						>
+					</File>
+					<File
 						RelativePath=".\RunDir\resources\shaders\OmniProjectiveLight.ps"
 						>
 					</File>

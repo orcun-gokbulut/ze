@@ -54,7 +54,7 @@ D3DFORMAT ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 	}
 }
 
-bool ZED3D9CommonTools::CompileVertexShaderFromFile(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* FileName, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
+bool ZED3D9CommonTools::CompileVertexShaderFromFile(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* FileName, const char* MainFunction, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
 {
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
@@ -62,7 +62,7 @@ bool ZED3D9CommonTools::CompileVertexShaderFromFile(LPDIRECT3DVERTEXSHADER9* Ver
 	if (*VertexShader != NULL)
 		(*VertexShader)->Release();
 
-	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, "vs_main", ShaderProfile, D3DXSHADER_OPTIMIZATION_LEVEL3, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, MainFunction, ShaderProfile, D3DXSHADER_OPTIMIZATION_LEVEL3, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
 		{
@@ -94,7 +94,7 @@ bool ZED3D9CommonTools::CompileVertexShaderFromFile(LPDIRECT3DVERTEXSHADER9* Ver
 }
 
 
-bool ZED3D9CommonTools::CompilePixelShaderFromFile(LPDIRECT3DPIXELSHADER9* PixelShader, const char* FileName, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
+bool ZED3D9CommonTools::CompilePixelShaderFromFile(LPDIRECT3DPIXELSHADER9* PixelShader, const char* FileName, const char* MainFunction, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
 {
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
@@ -102,7 +102,7 @@ bool ZED3D9CommonTools::CompilePixelShaderFromFile(LPDIRECT3DPIXELSHADER9* Pixel
 	if (*PixelShader != NULL)
 		(*PixelShader)->Release();
 
-	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, "ps_main", ShaderProfile, D3DXSHADER_OPTIMIZATION_LEVEL3 | D3DXSHADER_PARTIALPRECISION, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, MainFunction, ShaderProfile, D3DXSHADER_OPTIMIZATION_LEVEL3 | D3DXSHADER_PARTIALPRECISION, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
 		{

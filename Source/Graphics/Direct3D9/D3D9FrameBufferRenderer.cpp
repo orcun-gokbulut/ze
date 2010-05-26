@@ -433,13 +433,15 @@ void ZED3D9FrameBufferRenderer::Render(float ElaspedTime)
 		// Draw imposters last
 		for (size_t I = 0; I < Imposter.GetCount(); I++)
 			ZED3D9RendererBase::DrawRenderOrder(&Imposter[I], Camera);
+		
+		if (HDREnabled)
+		{
+			HDRProcessor.DoHDR();
+		}
 
 	// Finish Drawing
 	GetDevice()->EndScene();
 
-	if (HDREnabled)
-	{
-		HDRProcessor.DoHDR();
-	}
+
 
 }
