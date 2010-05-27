@@ -33,57 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-float2 PixelSize		: register(c0);
-float TimeElapsed		: register(c1);
+// Textures
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+sampler Input						: register(s0);
+sampler AverageLuminanceTexture		: register(s1);
+sampler Bloom						: register(s2);
+sampler OldAverageLuminanceTexture	: register(s3);
 
-sampler Input			: register(s0);
-sampler OldLimunance	: register(s1);
+// Parameters
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+float2 PixelSize			: register(c0);
+float4 Parameters0			: register(c1);
+float4 Parameters1			: register(c1);
+#define BrightPassTreshold	(Parameters0[0])
+#define Exposure			(Parameters0[1])
+#define BrightPassOffset	(Parameters0[2])
+#define BloomFactor			(Parameters0[3])
+#define ElapsedTime			(Parameters1[3])
+
 
 // Kernels
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float2 Kernel2x2[4] = 
-{
-	{-0.5f, -0.5f},
-	{-0.5f,  0.5f},
-	{ 0.5f, -0.5f},
-	{ 0.5f,  0.5f}
-};
+const float2 Kernel2x2[4]	: register(c10);
+const float2 Kernel[16]	: register(c15);
 
-float2 Kernel3x3[9] = 
-{
-	{-1.0f, -1.0f},
-	{-1.0f,  0.0f},
-	{-1.0f,  1.0f},
-	{ 0.0f, -1.0f},
-	{ 0.0f,  0.0f},
-	{ 0.0f,  1.0f},
-	{ 1.0f, -1.0f},
-	{ 1.0f,  0.0f},
-	{ 1.0f,  1.0f}
-};
-
-float2 Kernel4x4[16] = 
-{
-	{-1.5f, -1.5f},
-	{-1.5f, -0.5f},
-	{-1.5f,  0.5f},
-	{-1.5f,  1.5f},
-
-	{-0.5f, -1.5f},
-	{-0.5f, -0.5f},
-	{-0.5f,  0.5f},
-	{-0.5f,  1.5f},
-
-	{ 0.5f, -1.5f},
-	{ 0.5f, -0.5f},
-	{ 0.5f,  0.5f},
-	{ 0.5f,  1.5f},
-
-	{ 1.5f, -1.5f},
-	{ 1.5f, -0.5f},
-	{ 1.5f,  0.5f},
-	{ 1.5f,  1.5f}
-};
 
 // General Vertex Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,10 +69,11 @@ struct VS_InputOutput
 VS_InputOutput VS_Main (VS_InputOutput Input)
 {
 	VS_InputOutput Output;
-	Output.Position = Input.Position + float4(PixelSize, 0.0f, 0.0f);
+	Output.Position = Input.Position + float4(-PixelSize.x, PixelSize.y, 0.0f, 0.0f);
 	Output.Texcoord = Input.Texcoord;
 	return Output;
 }
+
 
 // Limunance Measurement (Start) Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,10 +83,11 @@ float4 PS_LumMeasureStart(float2 Texcoord : TEXCOORD0) : COLOR0
 	
 	float Luminance = 0.0f;
 	for (int I = 0; I < 4; I++)
-		Luminance = log(0.00001 + dot(tex2D(Input, Texcoord + PixelSize * Kernel2x2[I]).xyz, ColorWeights));
+		Luminance += log(0.00001f + dot(tex2D(Input, Texcoord + PixelSize * Kernel2x2[I]).xyz, ColorWeights));
 
-	return float4(exp(Luminance / 4.0f), 0.0f, 0.0f, 0.0f);
+	return float4(Luminance / 4.0f, 0.0f, 0.0f, 0.0f);
 }
+
 
 // Limunance Measurement (Down Sample) Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -121,10 +96,11 @@ float4 PS_LumDownSample3x(float2 Texcoord : TEXCOORD0) : COLOR0
 	float AvarageLuminance = 0.0f;
 
 	for (int I = 0; I < 9; I++)
-		AvarageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel3x3[I]).r;
+		AvarageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel[I]).r;
 
 	return float4(AvarageLuminance / 9.0f, 0.0f, 0.0f, 0.0f);
 }
+
 
 // Limunance Measurement (End) Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -133,12 +109,82 @@ float4 PS_LumMeasureEnd(float2 Texcoord : TEXCOORD0) : COLOR0
 	float AvarageLuminance = 0.0f;
 
 	for (int I = 0; I < 9; I++)
-		AvarageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel3x3[I]).r;
+		AvarageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel[I]).r;
 
-	AvarageLuminance /= 9.0f;
-
-	float Luminance = lerp(AvarageLuminance, tex2D(OldLimunance, float2(0.5f, 0.5f)), TimeElapsed);
-
-	return float4(Luminance, 0.0f, 0.0f, 0.0f);
+	return float4(exp(AvarageLuminance / 9.0f), 0.0f, 0.0f, 0.0f);
 }
 
+
+// Bright Pass Pixel Shader
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+float4 PS_BrightPass(float2 Texcoord : TEXCOORD0) : COLOR0
+{
+	const float3 ColorWeights = {0.299f, 0.587f, 0.114f};
+
+	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	for (int I = 0; I < 4; I++)
+		Color += tex2D(Input, Texcoord + PixelSize * Kernel2x2[I]);
+	Color /= 4.0f;
+	
+	float AvrgLuminance = tex2D(AverageLuminanceTexture, float2(0.5f, 0.5f));
+	Color *= Exposure / (AvrgLuminance + 0.0001f);
+	Color -= BrightPassTreshold;
+	Color = max(Color, 0.0f);
+	Color /= (BrightPassOffset + Color);
+		
+	return Color;
+}
+
+
+// Down Sample 4x Pixel Shader
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+float4 PS_ColorDownSample4x(float2 Texcoord : TEXCOORD0) : COLOR0
+{
+	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	for (int I = 0; I < 16; I++)
+		Color += tex2D(Input, Texcoord + PixelSize * Kernel[I]);
+	
+	Color /= 16.0f;
+	
+	return Color;
+}
+
+
+// Vertical Blur Pixel Shader
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+float4 PS_VerticalBlur(float2 Texcoord : TEXCOORD0) : COLOR0
+{
+	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	for (int I = 0; I < 7; I++)
+		Color += Kernel[I].y * tex2D(Input, Texcoord + float2(0.0f, PixelSize.y * Kernel[I].x));
+		
+	return Color;
+}
+
+
+// Horizontal Blur Pixel Shader
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+float4 PS_HorizontalBlur(float2 Texcoord : TEXCOORD0) : COLOR0
+{
+	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
+	for (int I = 0; I < 7; I++)
+		Color += Kernel[I].y * tex2D(Input, Texcoord + float2(PixelSize.x * Kernel[I].x, 0.0f));
+	
+	return Color;
+}
+
+
+// Tone Mapping Pixel Shader
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+float4 PS_ToneMap(float2 Texcoord : TEXCOORD0) : COLOR0
+{
+	float4 Color = tex2D(Input, Texcoord);
+	float AverageLuminance = tex2D(AverageLuminanceTexture, float2(0.5f, 0.5f));
+	
+	Color *= Exposure / (AverageLuminance + 0.0001f);
+	Color /= (1.0f + Color);
+	
+	Color += BloomFactor * tex2D(Bloom, Texcoord);
+	
+	return Color;
+}
