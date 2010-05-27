@@ -242,7 +242,7 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 				float Reserved0;
 			} Parameters;
 
-			Parameters.Exposure = 0.18f;
+			Parameters.Exposure = 0.48f;
 			Parameters.BrightPassTreshold = 5.0f;
 
 			Parameters.BloomFactor = 10.0f;

@@ -44,9 +44,9 @@ sampler OldAverageLuminanceTexture	: register(s3);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float2 PixelSize			: register(c0);
 float4 Parameters0			: register(c1);
-float4 Parameters1			: register(c1);
-#define BrightPassTreshold	(Parameters0[0])
-#define Exposure			(Parameters0[1])
+float4 Parameters1			: register(c2);
+#define Exposure			(Parameters0[0])
+#define BrightPassTreshold	(Parameters0[1])
 #define BrightPassOffset	(Parameters0[2])
 #define BloomFactor			(Parameters0[3])
 #define ElapsedTime			(Parameters1[3])
@@ -55,7 +55,7 @@ float4 Parameters1			: register(c1);
 // Kernels
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const float2 Kernel2x2[4]	: register(c10);
-const float2 Kernel[16]	: register(c15);
+const float2 Kernel[16]		: register(c15);
 
 
 // General Vertex Shader
@@ -178,11 +178,16 @@ float4 PS_HorizontalBlur(float2 Texcoord : TEXCOORD0) : COLOR0
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float4 PS_ToneMap(float2 Texcoord : TEXCOORD0) : COLOR0
 {
+	const float3 ColorWeights = {0.299f, 0.587f, 0.114f};
+	
 	float4 Color = tex2D(Input, Texcoord);
 	float AverageLuminance = tex2D(AverageLuminanceTexture, float2(0.5f, 0.5f));
 	
-	Color *= Exposure / (AverageLuminance + 0.0001f);
-	Color /= (1.0f + Color);
+	float Luminance = dot(Color, ColorWeights);
+	float ScaledLuminance = (Exposure / (AverageLuminance + 0.0001f)) * Luminance;
+	ScaledLuminance = ScaledLuminance / (1.0f + ScaledLuminance);
+	
+	Color *= ScaledLuminance;
 	
 	Color += BloomFactor * tex2D(Bloom, Texcoord);
 	

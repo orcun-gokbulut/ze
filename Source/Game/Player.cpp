@@ -184,9 +184,9 @@ void ZEPlayer::Tick(float Time)
 		SetRotation(Rotation);
 	}
 
-	static float Temp = 0;
+	/*static float Temp = 0;
 	Temp += Time;
-	PointLight.SetPosition(ZEVector3(cosf(Temp), sinf(Temp), 1.0f));
+	PointLight.SetPosition(ZEVector3(cosf(Temp), sinf(Temp), 1.0f));*/
 	ZEEntity::Tick(Time);
 }
 
@@ -207,14 +207,14 @@ bool ZEPlayer::Initialize()
 		Listener = ZEListener::CreateInstance();
 
 	Listener->Initialize();
-	PointLight.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+/*	PointLight.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	PointLight.SetAttenuation(0.1f, 0.0f, 1.0f);
 	PointLight.SetRange(10000.0f);
 	PointLight.SetIntensity(15.0f);
 	PointLight.SetColor(ZEVector3(1.0f, 1.0f, 1.0));
-	PointLight.SetEnabled(true);
+	PointLight.SetEnabled(true);*/
 
-	RegisterComponent(&PointLight);
+	//RegisterComponent(&PointLight);
 	RegisterComponent(&Camera);
 	RegisterComponent(Listener);
 

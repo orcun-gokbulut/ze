@@ -73,6 +73,7 @@ void ZEPhysicsDebugModule::ColisionDetected(const ZEPhysicalCollision& Collision
 	zeLog("Physical Object", "Collision Occured: Object1 : %x, Object2 : %x", Collision.Collider1, Collision.Collider2);
 }
 
+#include "Game/LightBrush.h"
 bool ZEPhysicsDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
@@ -179,6 +180,21 @@ bool ZEPhysicsDebugModule::Initialize()
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);
 		World->SetEnabled(true);
 		Scene->LoadMap("test2.zemap");
+
+		ZELightBrush* Light = new ZELightBrush();
+		Light->SetLightType(ZE_LT_POINT);
+		Light->SetPosition(ZEVector3(0.0f, 30.0f, 0.0f));
+		Light->SetScale(ZEVector3::One);
+		Light->GetLight()->SetRange(15000);
+		Light->SetRotation(ZEQuaternion::Identity);
+		Light->GetLight()->SetColor(ZEVector3::One);
+		Light->GetLight()->SetAttenuation(0.001f, 0.0f, 1.0f);
+		Light->GetLight()->SetIntensity(2.0f);
+		Light->GetLight()->SetCastsShadows(false);
+		/*Light->SetProjectionFOV(ZE_PI_2);
+		Light->SetProjectionAspectRatio(1.0f);
+		Light->SetProjectionTexture("test/pavyon.bmp");*/
+		Scene->AddEntity(Light);
 
 		/*Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
 		Model->SetModelFile("test2.zeModel");
