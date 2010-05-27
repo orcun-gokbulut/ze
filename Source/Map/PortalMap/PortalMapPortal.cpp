@@ -84,7 +84,7 @@ void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource)
 {	
 	//int LastIteration = zeCore->GetFrameId() + 1;
-
+	RenderOrders.Clear();
 	if (VertexBuffer == NULL)
 		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
 

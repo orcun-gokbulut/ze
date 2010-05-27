@@ -57,7 +57,7 @@ ZED3D9FrameBufferRenderer::ZED3D9FrameBufferRenderer()
 	RenderColorTexture = false;
 	RenderDepthTexture = false;
 	RenderVelocityTexture = false;
-	RenderObjectTexture = false;
+	RenderObjectTexture = true;
 	HDREnabled = true;
 
 	HDRRenderTarget = NULL;
