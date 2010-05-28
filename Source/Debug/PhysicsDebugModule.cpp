@@ -189,7 +189,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		Light->SetRotation(ZEQuaternion::Identity);
 		Light->GetLight()->SetColor(ZEVector3::One);
 		Light->GetLight()->SetAttenuation(0.001f, 0.0f, 1.0f);
-		Light->GetLight()->SetIntensity(8.0f);
+		Light->GetLight()->SetIntensity(2.0f);
 		Light->GetLight()->SetCastsShadows(false);
 		/*Light->SetProjectionFOV(ZE_PI_2);
 		Light->SetProjectionAspectRatio(1.0f);

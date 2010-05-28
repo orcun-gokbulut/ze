@@ -357,3 +357,9 @@
 	ADD: ZECopoundEntity added.
 	CHG: ZEComponent has became a new kind of entity that can be contained by another new kind of entity CompoundEntity or can be directly added to scene.
 	-REM: Brushes will be removed in the future.
+
+[28 May 2010 - Revision 216 - Orcun]
+	ADD: HDR Processor has been added. HDR Pipeline added.
+	FIX: ZED3D9FixedMaterialcrash has been fixed. (SetPixelShaderParameters)
+	FIX: ZE_DEBUG_SHADERS compile options, which allows debugging shaders on PIX and disabling shader optimizations, has been added.
+	+ADD: TraceLog mechanism has added. (Not fully completed)

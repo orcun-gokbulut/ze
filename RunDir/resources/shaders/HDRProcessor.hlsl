@@ -129,11 +129,13 @@ float4 PS_BrightPass(float2 Texcoord : TEXCOORD0) : COLOR0
 		Color += tex2D(Input, Texcoord + PixelSize * Kernel2x2[I]);
 	Color /= 4.0f;
 	
-	float AvrgLuminance = tex2D(AverageLuminanceTexture, float2(0.5f, 0.5f));
-	Color *= Exposure / (AvrgLuminance + 0.0001f);
-	Color -= BrightPassTreshold;
-	Color = max(Color, 0.0f);
-	Color /= (BrightPassOffset + Color);
+	float Luminance = dot(Color, ColorWeights);
+	float AverageLuminance = tex2D(AverageLuminanceTexture, float2(0.5f, 0.5f));
+	float ScaledLuminance = (Exposure / (AverageLuminance + 0.0001f)) * Luminance;
+	ScaledLuminance = ScaledLuminance / (1.0f + ScaledLuminance);
+	
+	Color = max(Color - BrightPassTreshold, 0.0f);
+	Color *= ScaledLuminance;
 		
 	return Color;
 }

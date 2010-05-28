@@ -37,6 +37,12 @@
 #include "Core/Error.h"
 #include <d3dx9.h>
 
+#ifdef ZE_DEBUG_SHADERS
+	#define ZE_SHADER_COMPILER_PARAMETERS	(D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION)
+#else
+	#define ZE_SHADER_COMPILER_PARAMETERS	D3DXSHADER_OPTIMIZATION_LEVEL3
+#endif
+
 D3DFORMAT ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 {
 	switch(Format)
@@ -62,7 +68,7 @@ bool ZED3D9CommonTools::CompileVertexShaderFromFile(LPDIRECT3DVERTEXSHADER9* Ver
 	if (*VertexShader != NULL)
 		(*VertexShader)->Release();
 
-	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, MainFunction, ShaderProfile, D3DXSHADER_OPTIMIZATION_LEVEL3, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
 		{
@@ -102,7 +108,7 @@ bool ZED3D9CommonTools::CompilePixelShaderFromFile(LPDIRECT3DPIXELSHADER9* Pixel
 	if (*PixelShader != NULL)
 		(*PixelShader)->Release();
 
-	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, MainFunction, ShaderProfile, D3DXSHADER_OPTIMIZATION_LEVEL3 | D3DXSHADER_PARTIALPRECISION, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
 		{
@@ -140,7 +146,7 @@ bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShade
 	if (*VertexShader != NULL)
 		(*VertexShader)->Release();
 
-	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, NULL, "vs_main", ShaderProfile, D3DXSHADER_OPTIMIZATION_LEVEL3, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, NULL, "vs_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		zeError("D3D9 Vertex Shader Compiler", "Can not compile vertex shader.\r\nShader name : \"%s\".\r\nCompile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
 		*VertexShader = NULL;
@@ -172,7 +178,7 @@ bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, 
 	if (*PixelShader != NULL)
 		(*PixelShader)->Release();
 
-	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, NULL, "ps_main", ShaderProfile, D3DXSHADER_OPTIMIZATION_LEVEL3 | D3DXSHADER_PARTIALPRECISION, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, NULL, "ps_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		zeError("D3D9 Pixel Shader Compiler", "Can not compile pixel shader.\r\nShader Name : \"%s\".\r\n Compile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
 		*PixelShader = NULL;

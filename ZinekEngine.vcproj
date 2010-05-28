@@ -45,7 +45,7 @@
 				AdditionalOptions="/MP8"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\PhysX\Cooking&quot;;&quot;$(ProjectDir)\include\PhysX\Foundation&quot;;&quot;$(ProjectDir)\include\PhysX\NxCharacter&quot;;&quot;$(ProjectDir)\include\PhysX\PhysXLoader&quot;;&quot;$(ProjectDir)\include\PhysX\Physics&quot;;&quot;$(ProjectDir)\include\OpenAL&quot;;&quot;$(ProjectDir)\include\DirectX&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_ZINEK_ENGINE;ZE_DEBUG_ENABLED;_ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_D3D9_PERFHUD;NX_USER_DEBUG_MODE"
+				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_ZINEK_ENGINE;ZE_DEBUG_ENABLED;_ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_D3D9_PERFHUD;ZE_DEBUG_SHADERS;NX_USER_DEBUG_MODE"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -707,11 +707,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
 					>
 				</File>
 				<File

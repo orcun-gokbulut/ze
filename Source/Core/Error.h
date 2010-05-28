@@ -98,6 +98,29 @@
 #endif
 
 #define zeNotice(Module, ...) ZEError::GetInstance()->RaiseError(Module, ZE_EL_NOTICE, __VA_ARGS__)
+/*
+#ifdef ZE_DEBUG_ENABLED
+	struct ZEDebugTraceLog
+	{
+		char* FunctionName;
+		char* FileName;
+		int LineNumber;
+
+		ZEDebugTraceLog(FunctionName, FileName, LineNumber)
+		{
+			this->FunctionName = FunctionName;
+			this->FileName = FileName;
+			this->LineNumber = LineNumber;
+		}
+	};
+
+	#define ZEDebugTrace ZEDebugTraceLog TraceLog
+	#define zeDebugTraceLog() ZEDebugTraceLog(__FUNCTION__, __FILE__, __LINE__)
+#else
+	#define ZEDebugTrace
+#define zeDebugTraceLog()
+#endif*/
+
 
 enum ZEErrorType
 {

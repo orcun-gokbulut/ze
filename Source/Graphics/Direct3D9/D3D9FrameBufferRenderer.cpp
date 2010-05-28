@@ -201,10 +201,12 @@ ZETexture2D* ZED3D9FrameBufferRenderer::GetObjectTexture()
 void ZED3D9FrameBufferRenderer::DeviceLost()
 {
 	// GetDevice() is lost so recreate hardware resources
+	HDRProcessor.OnDeviceLost();
 }
 
 bool ZED3D9FrameBufferRenderer::DeviceRestored()
 {
+	HDRProcessor.OnDeviceRestored();
 	return true;
 }
 
