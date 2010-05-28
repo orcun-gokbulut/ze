@@ -37,7 +37,7 @@
 #include "D3D9CommonTools.h"
 #include "D3D9ComponentBase.h"
 #include "D3D9Module.h"
-
+#include "Core/Core.h"
 class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 {
 	public:
@@ -242,14 +242,13 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 				float Reserved0;
 			} Parameters;
 
-			Parameters.Exposure = 0.48f;
-			Parameters.BrightPassTreshold = 5.0f;
-
-			Parameters.BloomFactor = 10.0f;
+			Parameters.Exposure = 0.75f;
+			Parameters.BrightPassTreshold = 0.7f;
+			Parameters.BloomFactor = 1.0f;
 			Parameters.MaxLimunance = 2.0f;
 
 			Parameters.MinLimunance = 0.2f;
-			Parameters.ElapsedTime = 0.0f;
+			Parameters.ElapsedTime = zeCore->GetFrameTime();
 
 			GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 			GetDevice()->SetRenderState(D3DRS_ZENABLE, FALSE);
@@ -309,9 +308,14 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			SetRenderTarget(Textures.Luminance1);
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
+			LPDIRECT3DTEXTURE9 TempTexture;
+			TempTexture = Textures.OldLuminance;
+			Textures.OldLuminance = Textures.Luminance;
+			Textures.Luminance = TempTexture;
+
 			// Luminance Measure End Pass
 			GetDevice()->SetTexture(0, Textures.Luminance1);
-			GetDevice()->SetTexture(1, Textures.OldLuminance);
+			GetDevice()->SetTexture(3, Textures.OldLuminance);
 			GetDevice()->SetPixelShader(Shaders.LumMeasureEnd);
 			GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f, 1.0f, 0.0f, 0.0f), 1);
 			GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / 3.0f, 1.0f / 3.0f, 0.0f, 0.0f), 1);

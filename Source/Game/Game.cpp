@@ -199,11 +199,11 @@ void ZEGame::Tick(float ElapsedTime)
 	FPSSamples[FPSSampleIndex] = 1 /ElapsedTime;
 	FPSSampleIndex = (FPSSampleIndex == 2999 ? 0 : FPSSampleIndex + 1);
 
-	float AvarageFPS = 0.0f;
+	float AverageFPS = 0.0f;
 	for (size_t I = 0; I < 3000; I++)
-		AvarageFPS += FPSSamples[I];
+		AverageFPS += FPSSamples[I];
 
-	AvarageFPS /= 3000.0f;
+	AverageFPS /= 3000.0f;
 
 
 	ZEVector3 Position;
@@ -224,8 +224,8 @@ void ZEGame::Tick(float ElapsedTime)
 	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, Rotation);
 	
 	char Buffer[400];
-	sprintf(Buffer, "Current FPS: %.0f, Avarage FPS: %.0f, Position : [%f, %f, %f], Rotation : [%f, %f, %f]", 
-		1.0f / ElapsedTime, AvarageFPS, Position.x, Position.y, Position.z,
+	sprintf(Buffer, "Current FPS: %.0f, Average FPS: %.0f, Position : [%f, %f, %f], Rotation : [%f, %f, %f]", 
+		1.0f / ElapsedTime, AverageFPS, Position.x, Position.y, Position.z,
 		Pitch, Yaw, Roll);
 	
 	((ZEUITextControl*)UIManager->GetControls()[0])->SetText(Buffer);

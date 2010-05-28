@@ -49,7 +49,7 @@ float4 Parameters1			: register(c2);
 #define BrightPassTreshold	(Parameters0[1])
 #define BrightPassOffset	(Parameters0[2])
 #define BloomFactor			(Parameters0[3])
-#define ElapsedTime			(Parameters1[3])
+#define ElapsedTime			(Parameters1[2])
 
 
 // Kernels
@@ -93,12 +93,12 @@ float4 PS_LumMeasureStart(float2 Texcoord : TEXCOORD0) : COLOR0
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float4 PS_LumDownSample3x(float2 Texcoord : TEXCOORD0) : COLOR0
 {
-	float AvarageLuminance = 0.0f;
+	float AverageLuminance = 0.0f;
 
 	for (int I = 0; I < 9; I++)
-		AvarageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel[I]).r;
+		AverageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel[I]).r;
 
-	return float4(AvarageLuminance / 9.0f, 0.0f, 0.0f, 0.0f);
+	return float4(AverageLuminance / 9.0f, 0.0f, 0.0f, 0.0f);
 }
 
 
@@ -106,12 +106,15 @@ float4 PS_LumDownSample3x(float2 Texcoord : TEXCOORD0) : COLOR0
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float4 PS_LumMeasureEnd(float2 Texcoord : TEXCOORD0) : COLOR0
 {
-	float AvarageLuminance = 0.0f;
+	float AverageLuminance = 0.0f;
 
 	for (int I = 0; I < 9; I++)
-		AvarageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel[I]).r;
-
-	return float4(exp(AvarageLuminance / 9.0f), 0.0f, 0.0f, 0.0f);
+		AverageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel[I]).r;
+	AverageLuminance = exp(AverageLuminance / 9.0f);
+	float OldAverageLuminance = tex2D(OldAverageLuminanceTexture, float2(0.5f, 0.5f));
+	float AdaptiveAverageLuminance = lerp(AverageLuminance, OldAverageLuminance, pow(0.00001f, ElapsedTime / 30.0f));
+	
+	return float4(AdaptiveAverageLuminance, 0.0f, 0.0f, 0.0f);
 }
 
 
