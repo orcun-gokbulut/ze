@@ -40,16 +40,24 @@
 #include "Graphics/FrameBufferRenderer.h"
 #include "D3D9ComponentBase.h"
 #include "D3D9HDRProcessor.h"
+#include "D3D9SSAOProcessor.h"
 
 class ZED3D9FrameBufferRenderer : public ZEFrameBufferRenderer, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	private:
-		LPDIRECT3DSURFACE9					ColorRenderTarget;
 
+		LPDIRECT3DSURFACE9					ColorRenderTarget;
+		LPDIRECT3DSURFACE9					DepthRenderTarget;
+		LPDIRECT3DSURFACE9					VelocityRenderTarget;
+		
 		ZED3D9HDRProcessor					HDRProcessor;
 		LPDIRECT3DTEXTURE9					HDRRenderTarget;
 		bool								HDREnabled;
+		
+		bool								SSAOEnabled;
+		ZED3D9SSAOProcessor					SSAOProcessor;
+
 
 		bool								RenderColorTexture;
 		bool								RenderDepthTexture;

@@ -85,11 +85,20 @@ bool ZED3D9FrameBufferRenderer::Initialize()
 		HDRProcessor.Target = GetModule()->GetFrameColorBuffer();
 		HDRProcessor.Initialize();
 	}
-	else
+
+/*	if (SSAOEnabled)
+	{
+		ZED3D9CommonTools::CreateDepthRenderTarget(DepthBuffer, GetModule()->GetScreenWidth(), GetModule()->GetScreenHeight());
+	}
+	
+	if (!HDREnabled && !SSAOEnabled)
 	{
 		// LDR Rendering
 		ColorRenderTarget = GetModule()->GetFrameColorBuffer();
-	}
+	}*/
+
+	SSAOProcessor.Initialize();
+
 	return true; 
 } 
 

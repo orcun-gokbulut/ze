@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - FixedMaterial.hlsl
+ Zinek Engine - SSOAProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sample ColorInput	: register(s0);
-sample DepthInput	: register(s1);
+// Textures
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+sampler ColorInput				: register(s0);
+sampler DepthInput				: register(s1);
+sampler RandomTexture			: register(s2);
 
-float2 Paramters0	: registers(c0);
+// Parameters
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+float2 PixelSize			: register(c0);
+float4 Parameters0			: register(c1);
+#define SSAOFactor			(Parameters0[0])
+#define Radius				(Parameters0[1])
+#define Attenuation			(Parameters0[2])
 
-#define SAOFactor	Parameters0[0]
-#define	SSAORadius	Parameters0[1]
-#define	SSAOValue	Parameters0[2]
 
+// Kernels
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+const float2 DiscKernel[12]	: register(c10);
 
-float2 Kernel[]		: registers(c10);
 
 // General Vertex Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-struct VS_Input
+struct VS_InputOutput
 {
 	float4		Position : POSITION0;
 	float2		Texcoord : TEXCOORD0;
 };
 
-struct VS_Output
+VS_InputOutput VS_Main (VS_InputOutput Input)
 {
-	float4		Position : POSITION0;
-	float2		Texcoord : TEXCOORD0;
-};
-
-VS_Output VS_Main (VS_Input Input)
-{
-	VS_Output Output;
+	VS_InputOutput Output;
 	Output.Position = Input.Position + float4(-PixelSize.x, PixelSize.y, 0.0f, 0.0f);
 	Output.Texcoord = Input.Texcoord;
 	return Output;
 }
 
-// SSOA Pass Pixel Shader
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PS_SSOA(float2 Texcoord : TEXCOORD0) : COLOR0
+
+float4 PS_SSAO(float2 Texcoord : TEXCOORD0) : COLOR0
 {
-	float4 Color = tex2D(ColorInput, Texcoord);
-	float OrginalDepth = tex2D(DepthInput, Texcoord).r;
-	float AmbientOcclusion = 0.0f;
-	for (size_t I = 0; I < 16; I++)
+	float CurrentDepth = tex2D(DepthInput, Texcoord);
+	
+	float AmbientOcclusion = 1.0f;
+
+	for (int I = 0; I < 12; I++)
 	{
-		float DepthSample = tex2D(DepthInput, Texcoord + Kernel[I]);
-		if (abs(DepthSample - OrginalDepth) < SSAORadius)
-			AmbientOcclusion += SSAOValue;
+		float2 Rnd = tex2D(RandomTexture, Texcoord);
+
+		float2 SamplePosition;
+		SamplePosition.x = Rnd.x * DiscKernel[I].x - Rnd.y * DiscKernel[I].y;
+		SamplePosition.x = Rnd.y * DiscKernel[I].x + Rnd.x * DiscKernel[I].y;
+
+		float Sample = tex2D(DepthInput, SamplePosition).r;
+		
+		if (abs(Sample - CurrentDepth) < Radius)
+			AmbientOcclusion -= 1.0f / 12.0f;
 	}
 	
-	return AmbientOcclusion * SSOAF * Color;
+	return AmbientOcclusion * tex2D(ColorInput, Texcoord);
 }
