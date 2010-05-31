@@ -36,7 +36,7 @@
 #include "D3D9ComponentBase.h"
 #include <d3d9.h>
 #include <stdlib.h>
-
+#include <freeimage.h>
 class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 {
 	public:
@@ -61,43 +61,27 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 			};
 			GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);*/
 
-
+			srand(GetTickCount());
 			// RandomTexture
-			GetDevice()->CreateTexture(64, 64, 0, NULL, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &RandomTexture, NULL);
-			D3DLOCKED_RECT Rect;
-			RandomTexture->LockRect(0, &Rect, NULL, NULL);
-
+			FIBITMAP* Bitmap = FreeImage_Allocate(64, 64, 32);
+			BYTE* Data = FreeImage_GetBits(Bitmap);
 			for (size_t Y = 0; Y < 64; Y++)
 				for (size_t X = 0; X < 64; X++)
 				{
-					char* Pixel = (char*)Rect.pBits + Rect.Pitch * Y + 4 * X;
-					float Value = (float)(rand() % 10000) / 10000.0f;
-					Pixel[1] = (float)(cosf(Value) * 256.0f);
-					Pixel[2] = (float)(sinf(Value) * 256.0f);
-					Pixel[3] = 0.0;
-					Pixel[0] = 0.0;
+					RGBQUAD* Quad = (RGBQUAD*)Data + Y * 64 +X;
+					float Value = (float)((rand() % (int)(ZE_PIx2 * 10000.0f)) / 10000.0f);
+					Quad->rgbRed = (int)((0.5f * cosf(Value) - 0.5f) * 256.0f);
+					Quad->rgbGreen = (int)((0.5f * sinf(Value) - 0.5f) * 256.0f);
+					Quad->rgbBlue = 0;
+					Quad->rgbReserved = 0;				
 				}
-			RandomTexture->UnlockRect(0);
-
+			FreeImage_Save(FIF_BMP, Bitmap, "c:\\Random.bmp");
+			FreeImage_Unload(Bitmap);
 
 		/*	// Compile Shaders
 			ZED3D9CommonTools::CompileVertexShaderFromFile(&VertexShader, "Resources/Shaders/SSOAProcessor.hlsl", "VS_Main", "SSOA", "vs_2_0", NULL);
 			ZED3D9CommonTools::CompilePixelShaderFromFile(&SSOAShader, "Resources/Shaders/SSOAProcessor.hlsl", "PS_LumMeasureStart", "SSOA", "ps_2_0", NULL);
-*/
-			for (size_t I = 0; I < 12; I++)
-			{
-				float KernelX = ((float)(rand() % 20000) / 10000.0f) - 1.0f;
-				float KernelY = ((float)(rand() % 20000) / 10000.0f) - 1.0f;
-				
-				if (ZEVector2(KernelX, KernelY).Length() > 1.0f)
-				{
-					I--;
-					continue;
-				}
-
-				zeLog("SSAO", "Kernel : %f, %f", KernelX, KernelY);
-			}
-			exit(0);
+		*/
 		}
 
 
