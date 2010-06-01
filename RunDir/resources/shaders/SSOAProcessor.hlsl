@@ -41,54 +41,109 @@ sampler RandomTexture			: register(s2);
 
 // Parameters
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float2 PixelSize			: register(c0);
-float4 Parameters0			: register(c1);
-#define SSAOFactor			(Parameters0[0])
-#define Radius				(Parameters0[1])
-#define Attenuation			(Parameters0[2])
+float4 Parameters0			: register(c0);
+#define PixelSize			(Parameters0.xy)
+#define FarZ				(Parameters0.z)
+#define FOV					(Parameters0.w)
+
+float4 Parameters1			: register(c1);
+#define SSAOFactor			(Parameters1[0])
+#define Radius				(Parameters1[1])
+#define Attenuation			(Parameters1[2])
+
+
+// Textures
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+sampler ColorInput            : register(s0);
+sampler DepthInput            : register(s1);
+sampler RandomTexture         : register(s2);
 
 
 // Kernels
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const float2 DiscKernel[12]	: register(c10);
+/*{
+	{ 0.6487,      -0.111764669,   0.0f, 0.0f},
+	{ 0.0923,       0.586844921,   0.0f, 0.0f},
+	{ 0.4026,      -0.185264587,   0.0f, 0.0f},
+	{-0.5019,       0.563529253,   0.0f, 0.0f},
+	{-0.6044,      -0.310119152,   0.0f, 0.0f},
+	{-0.1893,       0.311908484,   0.0f, 0.0f},
+	{ 0.5923,      -0.726073265,   0.0f, 0.0f},
+	{ 0.035603881,   -0.793983221,   0.0f, 0.0f},
+	{-0.296554923,   -0.939840794,   0.0f, 0.0f},
+	{-0.181980252,    0.935429335,   0.0f, 0.0f},
+	{-0.214773059,   -0.49524498,   0.0f, 0.0f},
+	{ 0.895886064,    0.058031559,   0.0f, 0.0f},
+};*/
 
-
-// General Vertex Shader
+// SSAO Vertex Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-struct VS_InputOutput
+struct VS_INPUT
 {
-	float4		Position : POSITION0;
-	float2		Texcoord : TEXCOORD0;
+	float4 Position			: POSITION0;
+	float2 Texcoord			: TEXCOORD0;
 };
 
-VS_InputOutput VS_Main (VS_InputOutput Input)
+struct VS_OUTPUT
 {
-	VS_InputOutput Output;
+   float4 Position			: POSITION0;
+   float2 DepthTexcoord		: TEXCOORD0;
+   float2 RandomTexcoord	: TEXCOORD1;
+   float3 ViewVector		: TEXCOORD2;
+};
+
+VS_OUTPUT vs_main(VS_INPUT Input)
+{
+	VS_OUTPUT Output;
+
 	Output.Position = Input.Position + float4(-PixelSize.x, PixelSize.y, 0.0f, 0.0f);
-	Output.Texcoord = Input.Texcoord;
+	Output.DepthTexcoord = Input.Texcoord;
+	
+	float2 ScreenSize = 1.0f / PixelSize;
+	
+	Output.RandomTexcoord = Output.DepthTexcoord * (ScreenSize / 64.0f);
+
+	Output.ViewVector.x = ((Output.DepthTexcoord.x * 2.0f) - 1.0f) * tan(FOV / 2.0f) * (ScreenSize.x / ScreenSize.y);	
+	Output.ViewVector.y = ((Output.DepthTexcoord.y * 2.0f) - 1.0f) * tan(FOV / 2.0f);
+	Output.ViewVector.z = 1.0f;
+	Output.ViewVector = normalize(Output.ViewVector);
+
 	return Output;
 }
 
 
-float4 PS_SSAO(float2 Texcoord : TEXCOORD0) : COLOR0
+// SSAO Pixel Shader
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct PS_INPUT
 {
-	float CurrentDepth = tex2D(DepthInput, Texcoord);
-	
+   float2 DepthTexcoord		: TEXCOORD0;
+   float2 RandomTexcoord	: TEXCOORD1;
+   float3 ViewVector		: TEXCOORD2;
+};
+
+float4 ps_main(PS_INPUT Input) : COLOR0
+{
+	float CurrentDepth = tex2D(DepthInput, Input.DepthTexcoord).r;
+	float3 CurrentPosition = (CurrentDepth * Input.ViewVector);
+
 	float AmbientOcclusion = 1.0f;
-
-	for (int I = 0; I < 12; I++)
-	{
-		float2 Rnd = tex2D(RandomTexture, Texcoord);
-
+	for (int I = 0; I < 9; I++)
+	{	/*
+		float2 Rnd = (tex2D(RandomTexture, Input.RandomTexcoord) * 2.0f) - 1.0f;
 		float2 SamplePosition;
 		SamplePosition.x = Rnd.x * DiscKernel[I].x - Rnd.y * DiscKernel[I].y;
-		SamplePosition.x = Rnd.y * DiscKernel[I].x + Rnd.x * DiscKernel[I].y;
+		SamplePosition.y = Rnd.y * DiscKernel[I].x + Rnd.x * DiscKernel[I].y;*/
 
-		float Sample = tex2D(DepthInput, SamplePosition).r;
-		
-		if (abs(Sample - CurrentDepth) < Radius)
-			AmbientOcclusion -= 1.0f / 12.0f;
+		float2 SampleCoord = (DiscKernel[I] * PixelSize) * Radius;
+		float SampleDepth = tex2D(DepthInput, SampleCoord).r;
+		float3 SamplePosition = (SampleDepth * ViewVector);
+
+		if (distance(CurrentPosition, SamplePosition) < Radius)
+			AmbientOcclusion -= 1.0f / 9.0f;
 	}
+
+	float4	CurrentColor = tex2D(ColorInput, Texcoord);
 	
-	return AmbientOcclusion * tex2D(ColorInput, Texcoord);
+	return AmbientOcclusion * CurrentColor;
 }

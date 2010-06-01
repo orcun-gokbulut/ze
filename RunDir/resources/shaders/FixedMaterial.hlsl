@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - FixedMaterial.hlsl
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,53 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sample ColorInput	: register(s0);
-sample DepthInput	: register(s1);
-
-float2 Paramters0	: registers(c0);
-
-#define SAOFactor	Parameters0[0]
-#define	SSAORadius	Parameters0[1]
-#define	SSAOValue	Parameters0[2]
-
-
-float2 Kernel[]		: registers(c10);
-
-// General Vertex Shader
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-struct VS_Input
-{
-	float4		Position : POSITION0;
-	float2		Texcoord : TEXCOORD0;
-};
-
-struct VS_Output
-{
-	float4		Position : POSITION0;
-	float2		Texcoord : TEXCOORD0;
-};
-
-VS_Output VS_Main (VS_Input Input)
-{
-	VS_Output Output;
-	Output.Position = Input.Position + float4(-PixelSize.x, PixelSize.y, 0.0f, 0.0f);
-	Output.Texcoord = Input.Texcoord;
-	return Output;
-}
-
-// SSOA Pass Pixel Shader
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PS_SSOA(float2 Texcoord : TEXCOORD0) : COLOR0
-{
-	float4 Color = tex2D(ColorInput, Texcoord);
-	float OrginalDepth = tex2D(DepthInput, Texcoord).r;
-	float AmbientOcclusion = 0.0f;
-	for (size_t I = 0; I < 16; I++)
-	{
-		float DepthSample = tex2D(DepthInput, Texcoord + Kernel[I]);
-		if (abs(DepthSample - OrginalDepth) < SSAORadius)
-			AmbientOcclusion += SSAOValue;
-	}
-	
-	return AmbientOcclusion * SSOAF * Color;
-}

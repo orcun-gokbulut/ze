@@ -46,42 +46,53 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 
 		LPDIRECT3DTEXTURE9				RandomTexture;
 
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+
 		LPDIRECT3DVERTEXSHADER9			VertexShader;
 		LPDIRECT3DPIXELSHADER9			SSOAShader;
-		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
 		void Initialize()
 		{
 			// Vertex Declaration
-			/*D3DVERTEXELEMENT9 Declaration[] = 
+			D3DVERTEXELEMENT9 Declaration[] = 
 			{
 				{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
 				{0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
 				D3DDECL_END()
 			};
-			GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);*/
+			GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
+
+
+
+			// RandomTexture
+			GetDevice()->CreateTexture(64, 64, 0, NULL, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, RandomTexture, NULL);
+			struct ZEARGBColor
+			{
+				unsigned char Alpha;
+				unsigned char Red;
+				unsigned char Green;
+				unsigned char Blue;
+			};
 
 			srand(GetTickCount());
-			// RandomTexture
-			FIBITMAP* Bitmap = FreeImage_Allocate(64, 64, 32);
-			BYTE* Data = FreeImage_GetBits(Bitmap);
+			
+			D3DLOCKED_RECT Rect;
+			RandomTexture->LockRect(0, &Rect, NULL, NULL);
 			for (size_t Y = 0; Y < 64; Y++)
 				for (size_t X = 0; X < 64; X++)
 				{
-					RGBQUAD* Quad = (RGBQUAD*)Data + Y * 64 +X;
+					ZEARGBColor* Quad = (ZEARGBColor*)(Rect.pBits + Y * Rect.Pitch) + X;
 					float Value = (float)((rand() % (int)(ZE_PIx2 * 10000.0f)) / 10000.0f);
-					Quad->rgbRed = (int)((0.5f * cosf(Value) - 0.5f) * 256.0f);
-					Quad->rgbGreen = (int)((0.5f * sinf(Value) - 0.5f) * 256.0f);
-					Quad->rgbBlue = 0;
-					Quad->rgbReserved = 0;				
+					Quad->Red = (int)((0.5f * cosf(Value) - 0.5f) * 256.0f);
+					Quad->Green = (int)((0.5f * sinf(Value) - 0.5f) * 256.0f);
+					Quad->Blue = 0;
+					Quad->Alpha= 0;				
 				}
-			FreeImage_Save(FIF_BMP, Bitmap, "c:\\Random.bmp");
-			FreeImage_Unload(Bitmap);
+			RandomTexture->UnlockRect(0);
 
-		/*	// Compile Shaders
+			// Compile Shaders
 			ZED3D9CommonTools::CompileVertexShaderFromFile(&VertexShader, "Resources/Shaders/SSOAProcessor.hlsl", "VS_Main", "SSOA", "vs_2_0", NULL);
 			ZED3D9CommonTools::CompilePixelShaderFromFile(&SSOAShader, "Resources/Shaders/SSOAProcessor.hlsl", "PS_LumMeasureStart", "SSOA", "ps_2_0", NULL);
-		*/
 		}
 
 
@@ -90,6 +101,7 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 			ZED3D_RELEASE(VertexShader);
 			ZED3D_RELEASE(SSOAShader);
 			ZED3D_RELEASE(RandomTexture);
+			ZED3D_RELEASE(VertexDeclaration);
 		}
 
 		void OnDeviceLost()
@@ -146,14 +158,22 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 			GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 			GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 			GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-			SetRenderTarget(InputColor);
+			GetDevice()->SetTexture(0, InputColor);
 
-			GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-			GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-			GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-			GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-			GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-			SetRenderTarget(InputDepth);
+
+			GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+			GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+			GetDevice()->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+			GetDevice()->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+			GetDevice()->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+			GetDevice()->SetTexture(1, InputDepth);
+
+			GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+			GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+			GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+			GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+			GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+			GetDevice()->SetTexture(2, RandomTexture);
 
 			GetDevice()->SetVertexShader(VertexShader);
 			GetDevice()->SetPixelShader(SSOAShader);

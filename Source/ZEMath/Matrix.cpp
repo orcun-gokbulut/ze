@@ -639,7 +639,7 @@ void ZEMatrix4x4::CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width,
 
 void ZEMatrix4x4::CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ)
 {
-	float Ys = 1 / tanf(FOV / 2.0f);
+	float Ys = 1.0f / tanf(FOV / 2.0f);
 	float Xs = Ys / AspectRatio;
 
 	Create(Matrix, 
