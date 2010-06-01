@@ -33,12 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-// Textures
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-sampler ColorInput				: register(s0);
-sampler DepthInput				: register(s1);
-sampler RandomTexture			: register(s2);
-
 // Parameters
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 float4 Parameters0			: register(c0);
@@ -137,13 +131,13 @@ float4 ps_main(PS_INPUT Input) : COLOR0
 
 		float2 SampleCoord = (DiscKernel[I] * PixelSize) * Radius;
 		float SampleDepth = tex2D(DepthInput, SampleCoord).r;
-		float3 SamplePosition = (SampleDepth * ViewVector);
+		float3 SamplePosition = (SampleDepth * Input.ViewVector);
 
 		if (distance(CurrentPosition, SamplePosition) < Radius)
 			AmbientOcclusion -= 1.0f / 9.0f;
 	}
 
-	float4	CurrentColor = tex2D(ColorInput, Texcoord);
+	float4	CurrentColor = tex2D(ColorInput, Input.DepthTexcoord);
 	
 	return AmbientOcclusion * CurrentColor;
 }

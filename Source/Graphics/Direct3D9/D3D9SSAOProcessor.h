@@ -62,10 +62,8 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 			};
 			GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
 
-
-
 			// RandomTexture
-			GetDevice()->CreateTexture(64, 64, 0, NULL, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, RandomTexture, NULL);
+			GetDevice()->CreateTexture(64, 64, 0, NULL, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &RandomTexture, NULL);
 			struct ZEARGBColor
 			{
 				unsigned char Alpha;
@@ -81,7 +79,7 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 			for (size_t Y = 0; Y < 64; Y++)
 				for (size_t X = 0; X < 64; X++)
 				{
-					ZEARGBColor* Quad = (ZEARGBColor*)(Rect.pBits + Y * Rect.Pitch) + X;
+					ZEARGBColor* Quad = (ZEARGBColor*)((char*)Rect.pBits + Y * Rect.Pitch) + X;
 					float Value = (float)((rand() % (int)(ZE_PIx2 * 10000.0f)) / 10000.0f);
 					Quad->Red = (int)((0.5f * cosf(Value) - 0.5f) * 256.0f);
 					Quad->Green = (int)((0.5f * sinf(Value) - 0.5f) * 256.0f);
@@ -91,8 +89,8 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 			RandomTexture->UnlockRect(0);
 
 			// Compile Shaders
-			ZED3D9CommonTools::CompileVertexShaderFromFile(&VertexShader, "Resources/Shaders/SSOAProcessor.hlsl", "VS_Main", "SSOA", "vs_2_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&SSOAShader, "Resources/Shaders/SSOAProcessor.hlsl", "PS_LumMeasureStart", "SSOA", "ps_2_0", NULL);
+			ZED3D9CommonTools::CompileVertexShaderFromFile(&VertexShader, "Resources/Shaders/SSOAProcessor.hlsl", "vs_main", "SSOA", "vs_3_0", NULL);
+			ZED3D9CommonTools::CompilePixelShaderFromFile(&SSOAShader, "Resources/Shaders/SSOAProcessor.hlsl", "ps_main", "SSOA", "ps_3_0", NULL);
 		}
 
 
