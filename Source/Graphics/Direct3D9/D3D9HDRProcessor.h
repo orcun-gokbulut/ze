@@ -72,8 +72,8 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			LPDIRECT3DPIXELSHADER9		LumMeasureEnd;
 			LPDIRECT3DPIXELSHADER9		BrightPass; 
 			LPDIRECT3DPIXELSHADER9		ColorDownSample4x;
-			LPDIRECT3DPIXELSHADER9		VerticalBlur;
-			LPDIRECT3DPIXELSHADER9		HorizontalBlur;
+			LPDIRECT3DPIXELSHADER9		VerticalBloom;
+			LPDIRECT3DPIXELSHADER9		HorizontalBloom;
 			LPDIRECT3DPIXELSHADER9		ToneMap;
 		} Shaders;
 
@@ -122,6 +122,44 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 
 		}
 
+		static float GausianFunction(float x, float StandartDeviation)
+		{
+			return (1.0f / (sqrtf(2.0f * ZE_PI) * StandartDeviation)) * powf(ZE_E, -((x * x) / (2.0f * StandartDeviation * StandartDeviation)));
+		}
+
+		static float GausianFunction(float x, float y, float StandartDeviation)
+		{
+			return (1.0f / (2.0f * ZE_PI * StandartDeviation * StandartDeviation)) * powf(ZE_E, -((x * x + y * y) / (2.0f * StandartDeviation * StandartDeviation))); 
+		}
+
+		static void FillGaussianKernel1D(float* Kernel, size_t KernelSize, float StandartDeviation)
+		{
+			int HalfKernelSize = (KernelSize - 1) / 2;
+			for (int x = 0; x < KernelSize; x++)
+			{
+				Kernel[4 * x] = x - HalfKernelSize;
+				Kernel[4 * x + 1] = GausianFunction(x - HalfKernelSize, StandartDeviation);
+				zeOutput("{%lff, %lff}, \r\n", Kernel[4 * x], Kernel[4 * x + 1]);
+			}
+		}
+
+		static void FillGaussianKernel2D(float* Kernel, size_t KernelSize, float StandartDeviation)
+		{
+			int HalfKernelSize = (KernelSize - 1) / 2;
+			for (int y = 0; y < KernelSize; y++)
+			{
+				for (int x = 0; x < KernelSize; x++)
+				{
+					float* CurrentSample = &Kernel[4 * KernelSize * y + x];
+					CurrentSample[0] = x - HalfKernelSize;
+					CurrentSample[1] = y - HalfKernelSize;
+					CurrentSample[2] = GausianFunction(x - HalfKernelSize, y - HalfKernelSize, StandartDeviation);
+					zeOutput("%lf ", CurrentSample[2]);
+				}
+				zeOutput("\r\n");
+			}
+		}
+
 		void Initialize()
 		{
 			size_t ScreenWidth, ScreenHeight;
@@ -139,19 +177,11 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.LumMeasureEnd, "Resources/Shaders/HDRProcessor.hlsl", "PS_LumMeasureEnd", "HDR - Luminance Measure (End)", "ps_2_0", NULL);
 			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.BrightPass, "Resources/Shaders/HDRProcessor.hlsl", "PS_BrightPass", "HDR - BrightPass", "ps_2_0", NULL);
 			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.ColorDownSample4x, "Resources/Shaders/HDRProcessor.hlsl", "PS_ColorDownSample4x", "HDR - Color Down Sample 4x", "ps_2_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.HorizontalBlur, "Resources/Shaders/HDRProcessor.hlsl", "PS_HorizontalBlur", "HDR - Horizontal Blur", "ps_2_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.VerticalBlur, "Resources/Shaders/HDRProcessor.hlsl", "PS_VerticalBlur", "HDR - Vertical Blur", "ps_2_0", NULL);
+			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.HorizontalBloom, "Resources/Shaders/HDRProcessor.hlsl", "PS_HorizontalBloom", "HDR - Horizontal Bloom", "ps_3_0", NULL);
+			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.VerticalBloom, "Resources/Shaders/HDRProcessor.hlsl", "PS_VerticalBloom", "HDR - Vertical Bloom", "ps_3_0", NULL);
 			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.ToneMap, "Resources/Shaders/HDRProcessor.hlsl", "PS_ToneMap", "HDR - Tone Map", "ps_2_0", NULL);
 			
-		/*	int KernelSize = 7;
-			float StandartDeviation = 0.84089642f;
 
-			for (size_t I = 0; I < KernelSize; I++)
-			{
-				float x = (float)I - (float)(KernelSize - 1.0f) * 0.5f;
-				float f = (1.0f / (sqrtf(2.0f * ZE_PI) * StandartDeviation)) * powf(ZE_E, -((x * x) / (2.0f * StandartDeviation * StandartDeviation)));
-				zeLog("Gaussian", "%f : %f", x, f);
-			}*/
 
 		}	
 		
@@ -164,8 +194,8 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			ZED3D_RELEASE(Shaders.LumDownSample3x); 
 			ZED3D_RELEASE(Shaders.LumMeasureEnd);
 			ZED3D_RELEASE(Shaders.BrightPass);
-			ZED3D_RELEASE(Shaders.HorizontalBlur);
-			ZED3D_RELEASE(Shaders.VerticalBlur);
+			ZED3D_RELEASE(Shaders.HorizontalBloom);
+			ZED3D_RELEASE(Shaders.VerticalBloom);
 			ZED3D_RELEASE(Shaders.ToneMap);
 
 			ReleaseRenderTargets();
@@ -245,17 +275,24 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 				{ 1.5f,  1.5f, 0.0f, 0.0f}
 			};
 
-			static const float BlurKernel[7][4] = 
+			static const float BloomKernel[15][4] = 
 			{
- 				{-3.0f, 0.000817, 0.0f, 0.0f},
-				{-2.0f, 0.028041, 0.0f, 0.0f},
-				{-1.0f, 0.233924, 0.0f, 0.0f}, 
-				{ 0.0f, 0.474425, 0.0f, 0.0f}, 
-				{ 1.0f, 0.233924, 0.0f, 0.0f}, 
-				{ 2.0f, 0.028041, 0.0f, 0.0f}, 
-				{ 3.0f, 0.000817, 0.0f, 0.0f}
+				{-7.000000f, 0.008741f, 0.0f, 0.0f}, 
+				{-6.000000f, 0.017997f, 0.0f, 0.0f}, 
+				{-5.000000f, 0.033159f, 0.0f, 0.0f}, 
+				{-4.000000f, 0.054670f, 0.0f, 0.0f}, 
+				{-3.000000f, 0.080657f, 0.0f, 0.0f}, 
+				{-2.000000f, 0.106483f, 0.0f, 0.0f}, 
+				{-1.000000f, 0.125794f, 0.0f, 0.0f}, 
+				{0.000000f, 0.132981f, 0.0f, 0.0f}, 
+				{1.000000f, 0.125794f, 0.0f, 0.0f}, 
+				{2.000000f, 0.106483f, 0.0f, 0.0f}, 
+				{3.000000f, 0.080657f, 0.0f, 0.0f}, 
+				{4.000000f, 0.054670f, 0.0f, 0.0f}, 
+				{5.000000f, 0.033159f, 0.0f, 0.0f}, 
+				{6.000000f, 0.017997f, 0.0f, 0.0f}, 
+				{7.000000f, 0.008741f, 0.0f, 0.0f}, 
 			};
-
 			struct 
 			{
 				float Exposure;
@@ -268,9 +305,10 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 				float Reserved0; 
 			} Parameters;
 
-			Parameters.Exposure = 0.18f;
-			Parameters.BrightPassTreshold = 1.0f;
-			Parameters.BloomFactor = 1.0f;
+			Parameters.Exposure = 0.78f;
+			Parameters.BrightPassTreshold = 0.5f;
+			Parameters.BrightPassOffset = 0.2f;
+			Parameters.BloomFactor = 1.5f;
 			Parameters.MaxLimunance = 2.0f;
 
 			Parameters.MinLimunance = 0.2f;
@@ -301,7 +339,7 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / 243.0f, 1.0f / 243.0f, 0.0f, 0.0f), 1);
 			GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / ScreenWidth, 1.0f / ScreenHeight, 0.0f, 0.0f), 1);
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
-
+			
 			// Luminance Measure Down Sample 3x (From : 243, To: 81)
 			GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 			GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
@@ -366,24 +404,23 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4 (1.0f / (ScreenWidth / 8.0f), 1.0f / (ScreenHeight / 8.0f), 0.0f, 0.0f), 1);
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
-			// Vertical Blur Pass
+			// Vertical Bloom Pass
 			SetRenderTarget(Textures.DownSampled8xB);
-			GetDevice()->SetPixelShaderConstantF(15, (const float*)BlurKernel, 7);
+			GetDevice()->SetPixelShaderConstantF(15, (const float*)BloomKernel, 15);
 			GetDevice()->SetTexture(0, Textures.DownSampled8xA);
-			GetDevice()->SetPixelShader(Shaders.VerticalBlur); 
+			GetDevice()->SetPixelShader(Shaders.VerticalBloom); 
 			GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (ScreenWidth / 8.0f), 1.0f / (ScreenWidth / 8.0f), 0.0f, 0.0f), 1);
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
-			// Horizontal Blur Pass
+			// Horizontal Bloom Pass
 			SetRenderTarget(Textures.DownSampled8xA);
 			GetDevice()->SetTexture(0, Textures.DownSampled8xB);
-			GetDevice()->SetPixelShader(Shaders.HorizontalBlur);
+			GetDevice()->SetPixelShader(Shaders.HorizontalBloom);
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 			// Tone Mapping Pass
 			GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 			GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-			GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 			GetDevice()->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 			GetDevice()->SetSamplerState(2, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 			GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);

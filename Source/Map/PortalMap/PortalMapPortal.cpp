@@ -110,7 +110,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 			RenderOrder->Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 			RenderOrder->Material = Material;
 			RenderOrder->PrimitiveType = ZE_ROPT_TRIANGLE;
-			RenderOrder->VertexBufferOffset = 0;
+			RenderOrder->VertexBufferOffset = VertexIndex;
 			RenderOrder->VertexBuffer = VertexBuffer;
 			RenderOrder->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();
 			ZEMatrix4x4::CreateIdentity(RenderOrder->WorldMatrix);
@@ -118,6 +118,9 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 			RenderOrder->PrimitiveCount = 0;
 			for (size_t I = N; I < Resource->Polygons.GetCount(); I++)
 			{
+				if (Resource->Polygons[I].Material != Material)
+					continue;
+
 				memcpy(Buffer + VertexIndex, Resource->Polygons[I].Vertices, sizeof(ZEMapVertex) * 3);
 				VertexIndex += 3;
 				RenderOrder->PrimitiveCount++;

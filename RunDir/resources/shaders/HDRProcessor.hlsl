@@ -155,24 +155,24 @@ float4 PS_ColorDownSample4x(float2 Texcoord : TEXCOORD0) : COLOR0
 }
 
 
-// Vertical Blur Pixel Shader
+// Vertical Bloom Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PS_VerticalBlur(float2 Texcoord : TEXCOORD0) : COLOR0
+float4 PS_VerticalBloom(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	for (int I = 0; I < 7; I++)
+	for (int I = 0; I < 15; I++)
 		Color += Kernel[I].y * tex2D(Input, Texcoord + float2(0.0f, PixelSize.y * Kernel[I].x));
 		
 	return Color;
 }
 
 
-// Horizontal Blur Pixel Shader
+// Horizontal Bloom Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PS_HorizontalBlur(float2 Texcoord : TEXCOORD0) : COLOR0
+float4 PS_HorizontalBloom(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	for (int I = 0; I < 7; I++)
+	for (int I = 0; I < 15; I++)
 		Color += Kernel[I].y * tex2D(Input, Texcoord + float2(PixelSize.x * Kernel[I].x, 0.0f));
 	
 	return Color;
