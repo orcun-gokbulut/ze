@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9FrameBufferRenderer.h
+ Zinek Engine - D3D9Renderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,18 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D9_FRAME_BUFFER_RENDERER_H__
-#define __ZE_D3D9_FRAME_BUFFER_RENDERER_H__
+#ifndef __ZE_D3D9_RENDERER_H__
+#define __ZE_D3D9_RENDERER_H__
 
-#include "Graphics/FrameBufferRenderer.h"
+#include "Graphics/Renderer.h"
 #include "D3D9ComponentBase.h"
 #include "D3D9HDRProcessor.h"
 #include "D3D9SSAOProcessor.h"
 
-class ZED3D9FrameBufferRenderer : public ZEFrameBufferRenderer, public ZED3D9ComponentBase
+class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
+	friend class ZED3D9ShadowRenderer;
 	private:
+		ZED3D9ViewPort*				ViewPort;
 
 		LPDIRECT3DSURFACE9					ColorRenderTarget;
 		LPDIRECT3DSURFACE9					DepthRenderTarget;
@@ -77,9 +79,13 @@ class ZED3D9FrameBufferRenderer : public ZEFrameBufferRenderer, public ZED3D9Com
 		
 		ZEArray<ZEPostProcessor*>			PostProcessors;
 
+		static bool							CheckRenderOrder(ZERenderOrder* RenderOrder);
+		static void							PumpStreams(ZERenderOrder* RenderOrder);
+		static void							DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* Camera);
+
 	protected:
-											ZED3D9FrameBufferRenderer();
-		virtual								~ZED3D9FrameBufferRenderer();					
+											ZED3D9Renderer();
+		virtual								~ZED3D9Renderer();					
 
 	public:
 		virtual void						SetRenderColorTexture(bool Enable);
@@ -98,6 +104,9 @@ class ZED3D9FrameBufferRenderer : public ZEFrameBufferRenderer, public ZED3D9Com
 		virtual ZETexture2D*				GetDepthTexture();
 		virtual ZETexture2D*				GetVelociyTexture();
 		virtual ZETexture2D*				GetObjectTexture();
+
+		virtual void						SetViewPort(ZEViewPort* ViewPort);
+		virtual ZEViewPort*					GetViewPort();
 
 		virtual bool						Initialize();
 		virtual void						Deinitialize();

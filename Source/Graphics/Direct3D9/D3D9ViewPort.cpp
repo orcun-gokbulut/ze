@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - TextureRenderer.h
+ Zinek Engine - D3D9ViewPort.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,22 +33,40 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TEXTURE_RENDERER_H__
-#define __ZE_TEXTURE_RENDERER_H__
+#include "D3D9ViewPort.h"
 
-#include "Renderer.h"
-
-class ZETexture2D;
-class ZETexture3D;
-class ZETextureCube;
-enum ZETextureCubeFace;
-class ZETextureRenderer : public ZERenderer
+float ZED3D9ViewPort::GetAspectRatio()
 {
-	public:
-		virtual bool						SetOutput(ZETexture2D* Texture) = 0;
-		virtual bool						SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face) = 0;
+	if (ColorBuffer != NULL)
+	{
+		D3DSURFACE_DESC Desc;
+		ColorBuffer->GetDesc(&Desc);
+		return Desc.Width / Desc.Height;
+	}
 
-		static ZETextureRenderer*			CreateInstance();
-};
-#endif
+	return 0.0f;
+}
+
+unsigned int ZED3D9ViewPort::GetWidth()
+{
+	if (ColorBuffer != NULL)
+	{
+		D3DSURFACE_DESC Desc;
+		ColorBuffer->GetDesc(&Desc);
+		return Desc.Width;
+	}
+
+	return 0;
+}
+
+unsigned int ZED3D9ViewPort::GetHeight()
+{
+	if (ColorBuffer != NULL)
+	{
+		D3DSURFACE_DESC Desc;
+		ColorBuffer->GetDesc(&Desc);
+		return Desc.Height;
+	}
+
+	return 0;;
+}

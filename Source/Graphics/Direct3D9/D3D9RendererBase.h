@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9RendererBase.h
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_RENDERER_BASE_H__
-#define __ZE_D3D9_RENDERER_BASE_H__
-
-#include "D3D9ComponentBase.h"
-#include <d3d9.h>
-
-class ZERenderOrder;
-class ZECamera;
-
-class ZED3D9RendererBase : public ZED3D9ComponentBase
-{
-	public:
-		static void			DoHDR();
-		static void			DoDOF();
-		static void			DoMotionBlur();
-
-		static bool			CheckRenderOrder(ZERenderOrder* RenderOrder);
-		static void			PumpStreams(ZERenderOrder* RenderOrder);
-		static void			DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* Camera);
-};
-
-#endif

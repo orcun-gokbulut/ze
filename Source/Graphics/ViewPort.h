@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - TextureRenderer.cpp
+ Zinek Engine - ViewPort.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "TextureRenderer.h"
-#include "GraphicsModule.h"
+#pragma once
+#ifndef __ZE_VIEW_PORT_H__
+#define __ZE_VIEW_PORT_H__
 
-ZETextureRenderer* ZETextureRenderer::CreateInstance()
+class ZEViewPort
 {
-	return zeGraphics->CreateTextureRenderer();
-}
+	public:
+		virtual float			GetAspectRatio() = 0;
+		virtual unsigned int	GetWidth() = 0;
+		virtual unsigned int	GetHeight() = 0;
+};
+
+#endif

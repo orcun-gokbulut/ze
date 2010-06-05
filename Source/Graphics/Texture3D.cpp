@@ -41,17 +41,17 @@ ZETextureType ZETexture3D::GetTextureType() const
 	return ZE_TT_3D;
 }
 
-int ZETexture3D::GetWidth() const
+unsigned int ZETexture3D::GetWidth() const
 {
 	return Width;
 }
 
-int ZETexture3D::GetHeight() const
+unsigned int ZETexture3D::GetHeight() const
 {
 	return Height;
 }
 
-int ZETexture3D::GetDepth() const
+unsigned int ZETexture3D::GetDepth() const
 {
 	return Height;
 }

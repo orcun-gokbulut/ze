@@ -66,9 +66,18 @@ void ZED3D9Texture2D::DeviceLost()
 bool ZED3D9Texture2D::DeviceRestored()
 {
 	if (RenderTarget)
+	{
 		return Create(Width, Height, PixelFormat, true);
+		Texture->GetSurfaceLevel(0, &ViewPort.ColorBuffer);
+		ViewPort.DepthBuffer = NULL;
+	}
 
 	return true;
+}
+
+ZEViewPort* ZED3D9Texture2D::GetViewPort()
+{
+	return &ViewPort;
 }
 
 bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget)
@@ -170,6 +179,11 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 	this->PixelFormat = PixelFormat;
 	this->RenderTarget = RenderTarget;
 
+	if (RenderTarget)
+	{
+		Texture->GetSurfaceLevel(0, &ViewPort.ColorBuffer);
+		ViewPort.DepthBuffer = NULL;
+	}
 	return true;
 
 }

@@ -39,11 +39,13 @@
 
 #include "Texture.h"
 
+class ZEViewPort;
+
 class ZETexture2D : public ZETexture
 {
 	protected:
-		int								Width;
-		int								Height;
+		unsigned int					Width;
+		unsigned int					Height;
 		ZETexturePixelFormat			PixelFormat;
 		bool							RenderTarget;
 
@@ -59,6 +61,8 @@ class ZETexture2D : public ZETexture
 		bool							IsRenderTarget() const;
 
 		virtual bool					IsEmpty() const = 0;
+
+		virtual ZEViewPort*				GetViewPort() = 0;
 
 		virtual bool					Create(int Width, int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
 		virtual void					Lock(void** Buffer, int* Pitch) = 0;

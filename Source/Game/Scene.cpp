@@ -40,7 +40,7 @@
 #include "Core/Console.h"
 #include "Core/Error.h"
 #include "Core/Core.h"
-#include "Graphics/FrameBufferRenderer.h"
+#include "Graphics/Renderer.h"
 #include "Graphics/ShadowRenderer.h"
 #include "Graphics/Camera.h"
 #include "Graphics/Light.h"
@@ -68,7 +68,7 @@ bool ZEScene::Initialize()
 	Deinitialize();
 
 	if (Renderer == NULL)
-		Renderer = ZEFrameBufferRenderer::CreateInstance();
+		Renderer = ZERenderer::CreateInstance();
 
 	if (Renderer == NULL)
 	{
@@ -332,7 +332,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 	DrawParameters.Pass = ZE_RP_COLOR;
 	DrawParameters.Renderer = Renderer;
 	DrawParameters.ViewVolume = &ActiveCamera->GetViewVolume();
-	DrawParameters.ViewPort = &ActiveCamera->GetViewPort();
+//	DrawParameters.ViewPort = &ActiveCamera->GetViewPort();
 	DebugDraw.Clean();
 
 	// Zero statistical data

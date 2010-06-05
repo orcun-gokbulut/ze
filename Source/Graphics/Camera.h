@@ -97,7 +97,7 @@ class ZECamera : public ZEComponent
 
 		virtual void					OwnerWorldTransformChanged();	
 
-		ZEViewPort						GetViewPort();
+		//ZEViewPort*						GetViewPort();
 		ZEViewVolume&					GetViewVolume();
 
 		void							GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY);

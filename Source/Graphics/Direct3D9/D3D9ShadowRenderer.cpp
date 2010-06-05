@@ -35,6 +35,7 @@
 
 #include "D3D9Module.h"
 #include "D3D9ShadowRenderer.h"
+#include "D3D9Renderer.h"
 #include "D3D9RendererBase.h"
 #include "D3D9CommonTools.h"
 #include "Core/ResourceFile.h"
@@ -152,6 +153,16 @@ ZECamera* ZED3D9ShadowRenderer::GetCamera()
 	return Camera;
 }
 
+void ZED3D9ShadowRenderer::SetViewPort(ZEViewPort* ViewPort)
+{
+	this->ViewPort = (ZED3D9ViewPort*)ViewPort;
+}
+
+ZEViewPort* ZED3D9ShadowRenderer::GetViewPort()
+{
+	return ViewPort;
+}
+
 ZEArray<ZEPostProcessor*>& ZED3D9ShadowRenderer::GetPostProcessors()
 {
 	return PostProcessors;
@@ -167,79 +178,6 @@ void ZED3D9ShadowRenderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
 	PostProcessors.DeleteValue(PostProcessor);
 }
 
-bool ZED3D9ShadowRenderer::SetOutput(ZETexture2D* Texture)
-{
-	if (!Texture->IsRenderTarget())
-	{
-		zeError("D3D9 Shadow Renderer", "Can not set output texture becouse texture is not render target.");
-		return false;
-	}
-
-	OutputCubeTexture = NULL;
-	OutputTexture = Texture;
-
-	if (Texture->GetPixelFormat() != ZE_TPF_DEPTH && Texture->GetPixelFormat() != ZE_TPF_DEPTH)
-	{
-		zeError("D3D9 Shadow Renderer", "Can not set output texture becouse texture is not a depth texture.");
-		return false;
-	}
-
-	LPDIRECT3DTEXTURE9 D3DTexture = ((ZED3D9Texture2D*)Texture)->Texture;
-	if (DepthRenderTarget != NULL)
-	{
-		DepthRenderTarget->Release();
-		DepthRenderTarget = NULL;
-	}
-
-	if (D3DTexture->GetSurfaceLevel(0, &DepthRenderTarget) != D3D_OK || DepthRenderTarget == NULL)
-	{
-		zeError("D3D9 Shadow Renderer", "Can not get shadow map surface.");
-		return false;
-	}
-
-	if (!ZED3D9CommonTools::CreateRenderTarget(&ColorRenderTarget, Texture->GetWidth(), Texture->GetHeight(), ZE_TPF_RGBA_INT32))
-		return false;
-	
-	return true;
-}
-
-bool ZED3D9ShadowRenderer::SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face)
-{
-	if (!Texture->IsRenderTarget())
-	{
-		zeError("D3D9 Shadow Renderer", "Can not set output texture becouse texture is not render target.");
-		return false;
-	}
-
-	OutputCubeTexture = Texture;
-	OutputCubeTextureFace = Face;
-	OutputTexture = NULL;
-
-	if (Texture->GetPixelFormat() != ZE_TPF_DEPTH && Texture->GetPixelFormat() != ZE_TPF_DEPTH)
-	{
-		zeError("D3D9 Shadow Renderer", "Can not set output texture becouse texture is not a depth texture.");
-		return false;
-	}
-
-	if (DepthRenderTarget != NULL)
-	{
-		DepthRenderTarget->Release();
-		DepthRenderTarget = NULL;
-	}
-
-	LPDIRECT3DCUBETEXTURE9 D3DTexture = ((ZED3D9TextureCube*)Texture)->CubeTexture;
-	if (D3DTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)Face, 0, &DepthRenderTarget) != D3D_OK || DepthRenderTarget == NULL)
-	{
-		zeError("D3D9 Shadow Renderer", "Can not get shadow map surface.");
-		return false;
-	}
-
-
-	if (!ZED3D9CommonTools::CreateRenderTarget(&ColorRenderTarget, Texture->GetEdgeLenght(), Texture->GetEdgeLenght(), ZE_TPF_RGBA_INT32))
-		return false;
-	
-	return true;
-}
 
 void ZED3D9ShadowRenderer::DeviceLost()
 {
@@ -248,11 +186,6 @@ void ZED3D9ShadowRenderer::DeviceLost()
 
 bool ZED3D9ShadowRenderer::DeviceRestored()
 {
-	if (OutputCubeTexture != NULL)
-		return SetOutput(OutputCubeTexture, OutputCubeTextureFace);
-	else if (OutputTexture != NULL)
-		return SetOutput(OutputTexture);
-
 	return true;
 }
 
@@ -263,8 +196,7 @@ bool ZED3D9ShadowRenderer::Initialize()
 
 void ZED3D9ShadowRenderer::Deinitialize()
 {
-	ZED3D_RELEASE(DepthRenderTarget);
-	ZED3D_RELEASE(ColorRenderTarget);
+
 }
 
 void ZED3D9ShadowRenderer::Destroy()
@@ -287,7 +219,7 @@ void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZE_DEBUG_ENABLED
 		// Check render order is valid
-		if (!ZED3D9RendererBase::CheckRenderOrder(RenderOrder))
+		if (!ZED3D9Renderer::CheckRenderOrder(RenderOrder))
 			return;
 	#endif
 
@@ -356,15 +288,10 @@ void ZED3D9ShadowRenderer::Render(float ElaspedTime)
 
 ZED3D9ShadowRenderer::ZED3D9ShadowRenderer()
 {
-	OutputTexture = NULL;
-	OutputCubeTexture = NULL;
-	ColorRenderTarget = NULL;
-	DepthRenderTarget = NULL;
+
 }
 
 ZED3D9ShadowRenderer::~ZED3D9ShadowRenderer()
 {
-	// Release depth and color render targets
-	ZED3D_RELEASE(ColorRenderTarget);
-	ZED3D_RELEASE(DepthRenderTarget);
+
 }

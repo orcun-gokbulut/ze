@@ -35,9 +35,8 @@
 
 // Transformation matrices 5 matrices
 float4x4  WorldViewProjMatrix			: register(c0);
-float4x4  WorldMatrix					: register(c4);
-float4x4  WorldInvTrpsMatrix			: register(c8);
-float4x4  WorldInvMatrix				: register(c12);
+float4x4  ViewMatrix					: register(c4);
+float4x4  ViewInvTrpsMatrix				: register(c8);
 
 // Other general constants 4 vectors
 float4    ViewPosition					: register(c16);
@@ -88,14 +87,18 @@ struct VS_OUTPUT
 	#ifdef ZESHADER_REFRACTION
 		float3 RefractionVector     : TEXCOORD4;
 	#endif
+
+	float4 NormalDepth 
 };
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
 	VS_OUTPUT Output;
+	// Pre Pipeline
+
+	// Vertex Transform;
 	float4 Position;
 	float3 Normal;
-
 	#ifdef ZESHADER_SKINTRANSFORM
 		Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
 		Normal = float3(0.0f, 0.0f, 0.0f);
@@ -110,8 +113,15 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 		Normal = Input.Normal;
 	#endif
 
+	// Pipeline 
 	Output.Position = mul(Position, WorldViewProjMatrix);
+	Output.NormalDepth.xyz = 0.5f * mul(Normal, ViewInvTrpsMatrix).xyz - 0.5f;
+	Output.NormalDepth.w = mul(Position, ViewMatrix).x / FarZ;
 
+	// Parameter Process
+	Output.Texcoord = Input.Texcoord;
+
+	// Lightning Effect
 	#if defined(ZESHADER_REFLECTION) || defined(ZESHADER_REFRACTION)
 		float3 CameraDirection = normalize(Position - ViewPosition);
 	#endif
@@ -128,7 +138,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 		Output.LightMapTexcoord = Input.LightMapTexcoord;
 	#endif
 
-	Output.Texcoord = Input.Texcoord;
-	
+	// Post Pipeline
+
 	return Output;
 }

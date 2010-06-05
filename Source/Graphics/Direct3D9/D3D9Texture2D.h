@@ -40,11 +40,14 @@
 #include "Graphics/Texture2D.h"
 #include "D3D9ComponentBase.h"
 #include <d3d9.h>
+#include "D3D9ViewPort.h"
 
 class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	protected:
+		ZED3D9ViewPort					ViewPort;
+
 										ZED3D9Texture2D();
 		virtual							~ZED3D9Texture2D();
 
@@ -56,6 +59,8 @@ class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 
 		virtual void					DeviceLost();
 		virtual bool					DeviceRestored();
+
+		virtual ZEViewPort*				GetViewPort();
 
 		virtual bool					Create(int Width, int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
 		virtual void					Lock(void** Buffer, int* Pitch);

@@ -46,10 +46,7 @@ enum ZETextureCubeFace;
 class ZEShadowRenderer : public ZERenderer
 {
 	public:
-		virtual bool						SetOutput(ZETexture2D* Output) = 0;
-		virtual bool						SetOutput(ZETextureCube* Output, ZETextureCubeFace Face) = 0;
-
-		static ZEShadowRenderer*			CreateInstance();
+		static ZEShadowRenderer*	CreateInstance();
 };
 
 #endif

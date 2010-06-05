@@ -42,9 +42,9 @@
 class ZETexture3D : public ZETexture
 {
 	protected:
-		int								Width;
-		int								Height;
-		int								Depth;
+		unsigned int					Width;
+		unsigned int					Height;
+		unsigned int					Depth;
 		ZETexturePixelFormat			PixelFormat;
 
 										ZETexture3D();
@@ -53,9 +53,9 @@ class ZETexture3D : public ZETexture
 	public:
 		virtual ZETextureType			GetTextureType() const;
 
-		int								GetWidth() const;
-		int								GetHeight() const;
-		int								GetDepth() const;
+		unsigned int					GetWidth() const;
+		unsigned int					GetHeight() const;
+		unsigned int					GetDepth() const;
 		ZETexturePixelFormat			GetPixelFormat() const;
 		bool							IsRenderTarget() const;
 

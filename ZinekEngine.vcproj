@@ -313,39 +313,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\DirectionalLight.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\DirectionalLight.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\FixedMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\FixedMaterial.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\FrameBufferRenderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\FrameBufferRenderer.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\Graphics\GraphicsModule.cpp"
 				>
 			</File>
@@ -355,76 +322,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\Graphics\IndexedPolygon.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Light.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Light.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Material.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Material.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Zinek Engine Post Processor"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\MaterialComponents.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\MaterialFileFormat.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\MaterialResource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\MaterialResource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\MaterialResource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\OmniProjectiveLight.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\OmniProjectiveLight.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\PointLight.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\PointLight.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\ProjectiveLight.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\ProjectiveLight.h"
 				>
 			</File>
 			<File
@@ -452,94 +349,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\SimpleMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\SimpleMaterial.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Texture.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Texture.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Texture2D.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Texture2D.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Texture2DResource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Texture2DResource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Texture3D.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Texture3D.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Texture3DResource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\Texture3DResource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\TextureCube.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\TextureCube.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\TextureCubeResource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\TextureCubeResource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\TextureRenderer.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\TextureRenderer.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\TextureResource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\TextureResource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\UIMaterial.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Graphics\UIMaterial.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\Graphics\VertexBuffer.cpp"
 				>
 			</File>
@@ -564,7 +373,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ViewPort.h"
+				RelativePath=".\Source\Graphics\ViewPort.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\Graphics\ViewPort.h"
 				>
 			</File>
 			<File
@@ -619,14 +432,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FrameBufferRenderer.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FrameBufferRenderer.h"
-					>
-				</File>
-				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9HDRProcessor.h"
 					>
 				</File>
@@ -647,11 +452,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9RendererBase.cpp"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9Renderer.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9RendererBase.h"
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9Renderer.h"
 					>
 				</File>
 				<File
@@ -699,23 +504,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9TextureRenderer.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9TextureRenderer.h"
-					>
-				</File>
-				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\D3D9UIMaterial.h"
 					>
 				</File>
 				<File
@@ -732,6 +525,14 @@
 				</File>
 				<File
 					RelativePath=".\Source\Graphics\Direct3D9\D3D9VertexDeclaration.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9ViewPort.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Direct3D9\D3D9ViewPort.h"
 					>
 				</File>
 				<Filter
@@ -944,6 +745,193 @@
 				</File>
 				<File
 					RelativePath=".\Source\Graphics\PostProcessor\PPVelocityInputNode.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Materials"
+				>
+				<File
+					RelativePath=".\Source\Graphics\FixedMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\FixedMaterial.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+							Outputs="$(InputPath).zpp"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Material.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Material.h"
+					>
+					<FileConfiguration
+						Name="Debug|Win32"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							Description="Zinek Engine Post Processor"
+							CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+							Outputs="$(InputPath).zpp"
+						/>
+					</FileConfiguration>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\MaterialComponents.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\MaterialFileFormat.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\MaterialResource.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\MaterialResource.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\MaterialResource.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\UIMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\UIMaterial.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Lights"
+				>
+				<File
+					RelativePath=".\Source\Graphics\DirectionalLight.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\DirectionalLight.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Light.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Light.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\OmniProjectiveLight.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\OmniProjectiveLight.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PointLight.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\PointLight.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\ProjectiveLight.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\ProjectiveLight.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\SimpleMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\SimpleMaterial.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="Textures"
+				>
+				<File
+					RelativePath=".\Source\Graphics\Texture.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Texture.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Texture2D.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Texture2D.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Texture2DResource.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Texture2DResource.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Texture3D.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Texture3D.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Texture3DResource.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\Texture3DResource.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\TextureCube.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\TextureCube.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\TextureCubeResource.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\TextureCubeResource.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\TextureResource.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\Graphics\TextureResource.h"
 					>
 				</File>
 			</Filter>

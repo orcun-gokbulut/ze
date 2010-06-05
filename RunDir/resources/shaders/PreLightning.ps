@@ -86,60 +86,70 @@ struct PS_INPUT
 	#endif
 };
 
-float4 ps_main(PS_INPUT Input) : COLOR0
+struct PS_OUTPUT
 {
-	float4 OutputColor = float4(0.0f, 0.0f ,0.0f ,1.0f);
+	float4	Color : COLOR2;
+	float4	NormalDepth	: COLOR1;
+};
+
+PS_OUTPUT ps_main(PS_INPUT Input)
+{
+	PS_OUTPUT Output;
+
+	Output.Color = float4(0.0f, 0.0f ,0.0f ,1.0f);
 
 	#ifdef ZESHADER_AMBIENT
-		OutputColor.rgb += MaterialAmbientColor;
+		Output.Color.rgb += MaterialAmbientColor;
 	#endif
 	
 	#ifdef ZESHADER_EMMISIVE
 		#ifdef ZESHADER_EMMISIVEMAP
-			OutpuColor.rgb += MaterialEmmisiveColor * tex2D(EmmisiveMap, Input.Texcoord);
+			Output.Color.rgb += MaterialEmmisiveColor * tex2D(EmmisiveMap, Input.Texcoord);
 		#else
-			OutputColor.rgb += MaterialEmmisiveColor;
+			Output.Color.rgb += MaterialEmmisiveColor;
 		#endif
 	#endif
 
 	#ifdef ZESHADER_DIFFUSEMAP
-		OutputColor.rgb *= tex2D(DiffuseMap, Input.Texcoord).rgb;
+		Output.Color.rgb *= tex2D(DiffuseMap, Input.Texcoord).rgb;
 	#endif
 
 	#ifdef ZESHADER_LIGHTMAP
-		OutputColor.rgb *= float4(tex2D(LightMap, Input.Texcoord).rgb, 1.0f);
+		Output.Color.rgb *= float4(tex2D(LightMap, Input.Texcoord).rgb, 1.0f);
 	#endif
 
 	#ifdef ZESHADER_REFLECTION
-		OutputColor.rgb += MaterialReflectionFactor * texCUBE(EnvironmentMap, normalize(Input.ReflectionVector)).rgb;
+		Output.Color.rgb += MaterialReflectionFactor * texCUBE(EnvironmentMap, normalize(Input.ReflectionVector)).rgb;
 	#endif
 
 	#ifdef ZESHADER_REFRACTION
-		OutputColor.rgb += MaterialRefractionFactor * texCUBE(EnvironmentMap, normalize(Input.RefractionVector)).rgb;
+		Output.Color.rgb += MaterialRefractionFactor * texCUBE(EnvironmentMap, normalize(Input.RefractionVector)).rgb;
 	#endif
 	
 	#ifdef ZESHADER_DISTORTION
 		float2 DistortionTexCoord = tex2D(DistortionMap, Input.Texcoord);
-		OutputColor.rgb += DistortionFactor * tex2D(ScreenMap, ScreenCoordinates + DistortionTexCoord);
+		Output.Color.rgb += DistortionFactor * tex2D(ScreenMap, ScreenCoordinates + DistortionTexCoord);
 	#endif
 
 	#ifdef ZESHADER_OPASITY
 		#ifdef ZESHADER_OPACITY_MAP
 			#ifdef ZESHADER_OPACITY_CONSTANT
-				OutputColor.a = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
+				Output.Color.a = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
 			#else
-				OutputColor.a = tex2D(DiffuseMap, Input.Texcoord).r;
+				Output.Color.a = tex2D(DiffuseMap, Input.Texcoord).r;
 			#endif
 		#elif defined(ZESHADER_OPACITY_DIFFUSEALPHA
 			#ifdef ZESHADER_OPACITY_CONSTANT
-				OutputColor.a = MaterialOpacity * tex2D(DiffuseMap, Input.Texcoord).a;
+				Output.Color.a = MaterialOpacity * tex2D(DiffuseMap, Input.Texcoord).a;
 			#else
-				OutputColor.a = tex2D(DiffuseMap, Input.Texcoord).a;
+				Output.Color.a = tex2D(DiffuseMap, Input.Texcoord).a;
 			#endif
 		#elif 
-			OutputColor.a = MaterialOpacity;
+			Output.Color.a = MaterialOpacity;
 		#endif
 	#endif
 
-	return OutputColor;
+	Output.NormalDepth = Input.NormalDepth;
+	
+	return Output;
 }

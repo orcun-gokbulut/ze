@@ -50,9 +50,9 @@ class ZEFixedMaterial;
 class ZEStaticVertexBuffer;
 class ZEVertexDeclaration;
 class ZERenderOrder;
-class ZEFrameBufferRenderer;
+class ZERenderer;
 class ZEShadowRenderer;
-class ZETextureRenderer;
+class ZEViewPort;
 class ZEPostProcessor;
 class ZEUIMaterial;
 class ZESimpleMaterial;
@@ -118,12 +118,12 @@ class ZEGraphicsModule : public ZEModule
 		virtual void						UpdateScreen() = 0;
 		virtual void						ClearFrameBuffer() = 0;
 
+		virtual ZEViewPort*					GetFrameBufferViewPort() = 0;
+
 		virtual ZEPostProcessor*			CreatePostProcessor() = 0;
 
-		virtual ZEFrameBufferRenderer*		CreateFrameBufferRenderer() = 0;
+		virtual ZERenderer*					CreateRenderer() = 0;
 		virtual ZEShadowRenderer*			CreateShadowRenderer() = 0;
-		virtual ZETextureRenderer*			CreateTextureRenderer() = 0;
-
 
 		virtual ZEStaticVertexBuffer*		CreateStaticVertexBuffer() = 0;
 		virtual ZEVertexDeclaration*		CreateVertexDeclaration() = 0;

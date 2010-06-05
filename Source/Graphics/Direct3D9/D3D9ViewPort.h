@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - FrameBufferRenderer.cpp
+ Zinek Engine - D3D9ViewPort.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "FrameBufferRenderer.h"
-#include "Graphics/GraphicsModule.h"
+#pragma once
+#ifndef __ZE_D3D9_RENDER_VIEW_PORT_H__
+#define __ZE_D3D9_RENDER_VIEW_PORT_H__
 
-ZEFrameBufferRenderer* ZEFrameBufferRenderer::CreateInstance()
+#include <d3d9.h>
+#include "Graphics/ViewPort.h"
+
+class ZED3D9ViewPort : public ZEViewPort
 {
-	return zeGraphics->CreateFrameBufferRenderer();
-}
+	public:
+		LPDIRECT3DSURFACE9		ColorBuffer;
+		LPDIRECT3DSURFACE9		DepthBuffer;
+
+		virtual float			GetAspectRatio();
+		virtual unsigned int	GetWidth();
+		virtual unsigned int	GetHeight();
+};
+
+#endif

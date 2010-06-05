@@ -56,6 +56,8 @@ class ZEPostProcessor;
 class ZECamera;
 class ZERenderOrder;
 class ZETexture2D;
+class ZEViewPort;
+
 class ZERenderer
 {
 	protected:
@@ -79,22 +81,28 @@ class ZERenderer
 		virtual ZETexture2D*				GetVelocityTexture();
 		virtual ZETexture2D*				GetObjectTexture();
 
+		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors() = 0;
+		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;
+		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor) = 0;
+
+		virtual void						SetViewPort(ZEViewPort* ViewPort) = 0;
+		virtual ZEViewPort*					GetViewPort() = 0;
+
+		virtual void						SetCamera(ZECamera* Camera) = 0;
+		virtual ZECamera*					GetCamera() = 0;
+
 		virtual bool						Initialize() = 0;
 		virtual void						Deinitialize() = 0;
 
 		virtual void						Destroy();
 
-		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors() = 0;
-		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;
-		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor) = 0;
-
-		virtual void						SetCamera(ZECamera* Camera) = 0;
-		virtual ZECamera*					GetCamera() = 0;
-
 		virtual void						AddToRenderList(ZERenderOrder* RenderOrder) = 0;
 		virtual void						ClearList() = 0;
 
 		virtual void						Render(float ElaspedTime = 0) = 0;
+
+
+		static ZERenderer*					CreateInstance();
 };
 
 #endif

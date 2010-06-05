@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9TextureRenderer.h
+ Zinek Engine - ViewPort.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,64 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_TEXTURE_RENDERER_H__
-#define __ZE_D3D9_TEXTURE_RENDERER_H__
-
-#include "Graphics/TextureRenderer.h"
-#include "D3D9ComponentBase.h"
-
-#include <d3d9.h>
-
-class ZETexture2D;
-class ZETexture3D;
-class ZETextureCube;
-enum ZETextureCubeFace;
-
-class ZED3D9TextureRenderer : public ZETextureRenderer, public ZED3D9ComponentBase
-{
-	friend class ZED3D9Module;
-	private:
-		ZETexture2D*							OutputTexture;
-		ZETextureCube*							OutputCubeTexture;
-		ZETextureCubeFace						OutputCubeTextureFace;
-		LPDIRECT3DSURFACE9						ColorRenderTarget;
-		LPDIRECT3DSURFACE9						DepthRenderTarget;
-
-		ZESmartArray<ZERenderOrder>				NonTransparent;
-		ZESmartArray<ZERenderOrder>				Transparent;
-		ZESmartArray<ZERenderOrder>				Imposter;
-
-		ZECamera*								Camera;
-
-		ZEArray<ZEPostProcessor*>				PostProcessors;
-
-	protected:
-												ZED3D9TextureRenderer();
-		virtual									~ZED3D9TextureRenderer();
-
-	public:	
-		virtual bool							SetOutput(ZETexture2D* Texture);
-		virtual bool							SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face);
-
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
-		virtual void							Destroy();
-
-		virtual void							DeviceLost();
-		virtual bool							DeviceRestored();
-
-		virtual void							SetCamera(ZECamera* Camera);
-		virtual ZECamera*						GetCamera();
-
-		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors();
-		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor);
-		virtual void							RemovePostProcessor(ZEPostProcessor* PostProcessor);
-
-		virtual void							AddToRenderList(ZERenderOrder* RenderOrder);
-		virtual void							ClearList();
-
-		virtual void							Render(float ElaspedTime);
-
-};
-#endif
+#include "ViewPort.h"

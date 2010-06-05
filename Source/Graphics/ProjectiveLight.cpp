@@ -120,7 +120,7 @@ void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* Shadow
 	ZEMatrix4x4::CreatePerspectiveProjection(PerspectiveMatrix, FOV, AspectRatio, zeGraphics->GetNearZ(), GetRange());
 	ZEMatrix4x4::Multiply(ViewPoint.ViewProjMatrix, ViewMatrix, PerspectiveMatrix);
 
-	ShadowRenderer->SetOutput((ZETexture2D*)ShadowMap);
+	//ShadowRenderer->SetOutput((ZETexture2D*)ShadowMap);
 	ShadowRenderer->ClearList();
 //	ShadowRenderer->SetCamera(ViewPoint);
 	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);

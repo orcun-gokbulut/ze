@@ -49,8 +49,7 @@
 #include "D3D9VertexBuffer.h"
 #include "D3D9VertexDeclaration.h"
 #include "PostProcessor/D3D9PostProcessor.h"
-#include "D3D9FrameBufferRenderer.h"
-#include "D3D9TextureRenderer.h"
+#include "D3D9Renderer.h"
 #include "D3D9ShadowRenderer.h"
 #include "D3D9UIMaterial.h"
 #include "D3D9SimpleMaterial.h"
@@ -86,12 +85,12 @@ D3DCAPS9* ZED3D9Module::GetDeviceCaps()
 
 LPDIRECT3DSURFACE9 ZED3D9Module::GetFrameColorBuffer()
 {
-	return FrameColorBuffer;
+	return FrameBufferViewPort.ColorBuffer;
 }
 
 LPDIRECT3DSURFACE9 ZED3D9Module::GetFrameZBuffer()
 {
-	return FrameZBuffer;
+	return FrameBufferViewPort.DepthBuffer;
 }
 
 ZED3D9PixelShaderVersion ZED3D9Module::GetPixelShaderVersion()
@@ -276,7 +275,7 @@ bool ZED3D9Module::Initialize()
 	}
 
 	// Get screen's back buffer
-	Result = Device->GetBackBuffer(0, 0,D3DBACKBUFFER_TYPE_MONO, &FrameColorBuffer);
+	Result = Device->GetBackBuffer(0, 0,D3DBACKBUFFER_TYPE_MONO, &FrameBufferViewPort.ColorBuffer);
 	if(FAILED(Result)) 
 	{
 		zeCriticalError("Direct3D9", "Can not create Direct3D Backbuffer.");
@@ -285,7 +284,7 @@ bool ZED3D9Module::Initialize()
 	}
 
 	// Get screen's z buffer
-	Result = Device->GetDepthStencilSurface(&FrameZBuffer);
+	Result = Device->GetDepthStencilSurface(&FrameBufferViewPort.DepthBuffer);
 	if(FAILED(Result)) 
 	{
 		zeCriticalError("Direct3D9", "Can not create Direct3D Backbuffer.");
@@ -335,16 +334,16 @@ void ZED3D9Module::Deinitialize()
 	D3D9Device = NULL;
 	D3D9Module = NULL;
 
-	if (FrameColorBuffer != NULL)
+	if (FrameBufferViewPort.ColorBuffer != NULL)
 	{
-		FrameColorBuffer->Release();
-		FrameColorBuffer = NULL;
+		FrameBufferViewPort.ColorBuffer->Release();
+		FrameBufferViewPort.ColorBuffer = NULL;
 	}
 
-	if (FrameZBuffer != NULL)
+	if (FrameBufferViewPort.DepthBuffer != NULL)
 	{
-		FrameZBuffer->Release();
-		FrameZBuffer = NULL;
+		FrameBufferViewPort.DepthBuffer->Release();
+		FrameBufferViewPort.DepthBuffer = NULL;
 	}
 
 	if (Device != NULL)
@@ -389,24 +388,21 @@ void ZED3D9Module::DeviceLost()
 	for (size_t I = 0; I < Renderers.GetCount(); I++)
 		Renderers[I]->DeviceLost();
 	
-	for (size_t I = 0; I < TextureRenderers.GetCount(); I++)
-		TextureRenderers[I]->DeviceLost();
-
 	for (size_t I = 0; I < ShadowRenderers.GetCount(); I++)
 		ShadowRenderers[I]->DeviceLost();
 
-	FrameColorBuffer->Release();
-	FrameColorBuffer = NULL;
-	FrameZBuffer->Release();
-	FrameZBuffer = NULL;
+	FrameBufferViewPort.ColorBuffer->Release();
+	FrameBufferViewPort.ColorBuffer = NULL;
+	FrameBufferViewPort.DepthBuffer->Release();
+	FrameBufferViewPort.DepthBuffer = NULL;
 }
 
 void ZED3D9Module::DeviceRestored()
 {
 	DeviceLostState = false;
 
-	Device->GetBackBuffer(0, 0,D3DBACKBUFFER_TYPE_MONO, &FrameColorBuffer);
-	Device->GetDepthStencilSurface(&FrameZBuffer);
+	Device->GetBackBuffer(0, 0,D3DBACKBUFFER_TYPE_MONO, &FrameBufferViewPort.ColorBuffer);
+	Device->GetDepthStencilSurface(&FrameBufferViewPort.DepthBuffer);
 
 	for (size_t I = 0; I < Texture2Ds.GetCount(); I++)
 		Texture2Ds[I]->DeviceRestored();
@@ -428,9 +424,6 @@ void ZED3D9Module::DeviceRestored()
 
 	for (size_t I = 0; I < Renderers.GetCount(); I++)
 		Renderers[I]->DeviceRestored();
-
-	for (size_t I = 0; I < TextureRenderers.GetCount(); I++)
-		TextureRenderers[I]->DeviceRestored();
 
 	for (size_t I = 0; I < ShadowRenderers.GetCount(); I++)
 		ShadowRenderers[I]->DeviceRestored();
@@ -547,9 +540,14 @@ unsigned int ZED3D9Module::GetMaterialComponentMask()
 	return 0xFFFFFFFF;
 }
 
-ZEFrameBufferRenderer* ZED3D9Module::CreateFrameBufferRenderer()
+ZEViewPort* ZED3D9Module::GetFrameBufferViewPort()
 {
-	ZED3D9FrameBufferRenderer* Renderer = new ZED3D9FrameBufferRenderer();
+	return &FrameBufferViewPort;
+}
+
+ZERenderer* ZED3D9Module::CreateRenderer()
+{
+	ZED3D9Renderer* Renderer = new ZED3D9Renderer();
 	if (!Renderer->Initialize())
 	{
 		Renderer->Destroy();
@@ -557,19 +555,6 @@ ZEFrameBufferRenderer* ZED3D9Module::CreateFrameBufferRenderer()
 	}
 
 	Renderers.Add(Renderer);
-	return Renderer;
-}
-
-ZETextureRenderer* ZED3D9Module::CreateTextureRenderer()
-{
-	ZED3D9TextureRenderer* Renderer = new ZED3D9TextureRenderer();
-	if (!Renderer->Initialize())
-	{
-		Renderer->Destroy();
-		return NULL;
-	}
-
-	TextureRenderers.Add(Renderer);
 	return Renderer;
 }
 
@@ -679,7 +664,6 @@ LPDIRECT3DDEVICE9 ZED3D9Module::GetD3D9Device()
 	return D3D9Device;
 }
 
-
 ZED3D9Module* ZED3D9Module::GetD3D9Module()
 {
 	return D3D9Module;
@@ -692,8 +676,8 @@ ZED3D9Module::ZED3D9Module()
 	D3D9Device = NULL;
 	D3D = NULL;
 	Device = NULL;
-	FrameColorBuffer = NULL;
-	FrameZBuffer = NULL;
+	FrameBufferViewPort.ColorBuffer = NULL;
+	FrameBufferViewPort.DepthBuffer = NULL;
 }
 
 ZED3D9Module::~ZED3D9Module()

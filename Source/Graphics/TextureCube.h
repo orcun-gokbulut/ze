@@ -39,6 +39,8 @@
 
 #include "Texture.h"
 
+class ZEViewPort;
+
 enum ZETextureCubeFace
 {
 	ZE_CTF_POSITIVEX	= 0,
@@ -52,7 +54,7 @@ enum ZETextureCubeFace
 class ZETextureCube : public ZETexture
 {
 	protected:
-		int								EdgeLength;
+		unsigned int					EdgeLength;
 		ZETexturePixelFormat			PixelFormat;
 		bool							RenderTarget;
 
@@ -64,6 +66,8 @@ class ZETextureCube : public ZETexture
 		int								GetEdgeLenght() const;
 		ZETexturePixelFormat			GetPixelFormat() const;
 		bool							IsRenderTarget() const;
+
+		virtual ZEViewPort*				GetViewPort(ZETextureCubeFace Face) = 0;
 
 		virtual	bool					Create(int EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
 		virtual void					Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch) = 0;

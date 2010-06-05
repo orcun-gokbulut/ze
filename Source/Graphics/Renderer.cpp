@@ -105,3 +105,8 @@ void ZERenderer::Destroy()
 {
 	delete this;
 }
+
+ZERenderer*  ZERenderer::CreateInstance()
+{
+	return ZEGraphicsModule::GetInstance()->CreateRenderer();
+}

@@ -112,7 +112,7 @@ float4 PS_LumMeasureEnd(float2 Texcoord : TEXCOORD0) : COLOR0
 		AverageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel[I]).r;
 	AverageLuminance = exp(AverageLuminance / 9.0f);
 	float OldAverageLuminance = tex2D(OldAverageLuminanceTexture, float2(0.5f, 0.5f));
-	float AdaptiveAverageLuminance = lerp(AverageLuminance, OldAverageLuminance, pow(0.00001f, ElapsedTime / 30.0f));
+	float AdaptiveAverageLuminance = lerp(AverageLuminance, OldAverageLuminance, pow(0.0001f, ElapsedTime / 30.0f));
 	
 	return float4(AdaptiveAverageLuminance, 0.0f, 0.0f, 0.0f);
 }

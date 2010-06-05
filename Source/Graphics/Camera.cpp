@@ -100,7 +100,7 @@ void ZECamera::OwnerWorldTransformChanged()
 	ZEComponent::OwnerWorldTransformChanged();
 }
 
-ZEViewPort ZECamera::GetViewPort()
+/*ZEViewPort ZECamera::GetViewPort()
 {
 	ZEViewPort ViewPort;
 
@@ -122,7 +122,7 @@ ZEViewPort ZECamera::GetViewPort()
 	ViewPort.ViewProjectionTransform = GetViewProjectionTransform();
 
 	return ViewPort;
-}
+}*/
 
 void ZECamera::SetNearZ(float NearZ)
 {

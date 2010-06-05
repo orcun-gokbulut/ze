@@ -38,6 +38,7 @@
 #define __ZE_D3D9_MODULE_H__
 
 #include "Graphics/GraphicsModule.h"
+#include "D3D9ViewPort.h"
 #include "ZEDS/Array.h"
 
 #ifdef ZE_DEBUG_ENABLED
@@ -58,9 +59,8 @@ class ZED3D9Texture3D;
 class ZED3D9TextureCube;
 class ZED3D9VertexDeclaration;
 class ZED3D9StaticVertexBuffer;
-class ZED3D9FrameBufferRenderer;
+class ZED3D9Renderer;
 class ZED3D9ShadowRenderer;
-class ZED3D9TextureRenderer;
 class ZED3D9PostProcessor;
 class ZED3D9FixedMaterialShader;
 
@@ -103,16 +103,16 @@ class ZED3D9Module : public ZEGraphicsModule
 
 		LPDIRECT3D9										D3D;
 		LPDIRECT3DDEVICE9								Device;
-		LPDIRECT3DSURFACE9								FrameColorBuffer;
-		LPDIRECT3DSURFACE9								FrameZBuffer;
+
+		ZED3D9ViewPort									FrameBufferViewPort;
 
 	protected:
 														ZED3D9Module();
 											 			~ZED3D9Module();
+
 	public:
-		ZEChunkArray<ZED3D9FrameBufferRenderer*, 50>	Renderers;
+		ZEChunkArray<ZED3D9Renderer*, 50>				Renderers;
 		ZEChunkArray<ZED3D9ShadowRenderer*, 50>			ShadowRenderers;
-		ZEChunkArray<ZED3D9TextureRenderer*, 50>		TextureRenderers;
 		ZEChunkArray<ZED3D9Texture2D*, 50>				Texture2Ds;
 		ZEChunkArray<ZED3D9Texture3D*, 50>				Texture3Ds;
 		ZEChunkArray<ZED3D9TextureCube*, 50>			TextureCubes;
@@ -160,10 +160,11 @@ class ZED3D9Module : public ZEGraphicsModule
 
 		virtual void									SetMaterialComponentMask(unsigned int Mask);
 		virtual unsigned int							GetMaterialComponentMask();
+		
+		virtual ZEViewPort*						GetFrameBufferViewPort();
 
-		virtual ZEFrameBufferRenderer*					CreateFrameBufferRenderer();
+		virtual ZERenderer*								CreateRenderer();
 		virtual ZEShadowRenderer*						CreateShadowRenderer();
-		virtual ZETextureRenderer*						CreateTextureRenderer();
 
 		virtual ZEPostProcessor*						CreatePostProcessor();
 

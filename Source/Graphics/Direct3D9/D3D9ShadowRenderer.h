@@ -50,12 +50,7 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 {
 	friend ZED3D9Module;
 	private:
-		ZETexture2D*							OutputTexture;
-		ZETextureCube*							OutputCubeTexture;
-		ZETextureCubeFace						OutputCubeTextureFace;
-
-		LPDIRECT3DSURFACE9						ColorRenderTarget;
-		LPDIRECT3DSURFACE9						DepthRenderTarget;
+		ZED3D9ViewPort*							ViewPort;
 
 		ZESmartArray<ZERenderOrder>				NonTransparent;
 		ZESmartArray<ZERenderOrder>				Transparent;
@@ -79,9 +74,6 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor);
 		virtual void							RemovePostProcessor(ZEPostProcessor* PostProcessor);
 
-		virtual bool							SetOutput(ZETexture2D* Texture);
-		virtual bool							SetOutput(ZETextureCube* Texture, ZETextureCubeFace Face);
-
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
 		virtual void							Destroy();
@@ -91,6 +83,9 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 
 		virtual void							SetCamera(ZECamera* Camera);
 		virtual ZECamera*						GetCamera();
+
+		virtual void							SetViewPort(ZEViewPort* ViewPort);
+		virtual ZEViewPort*						GetViewPort();
 
 		virtual void							AddToRenderList(ZERenderOrder* RenderOrder);
 		virtual void							ClearList();
