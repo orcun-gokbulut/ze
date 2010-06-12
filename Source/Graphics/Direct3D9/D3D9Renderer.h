@@ -62,12 +62,12 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 
 
 		bool								RenderColorTexture;
-		bool								RenderDepthTexture;
+		bool								RenderNormalDepthTexture;
 		bool								RenderVelocityTexture;
 		bool								RenderObjectTexture;
 
 		ZETexture2D*						ColorTexture;
-		ZETexture2D*						DepthTexture;
+		ZETexture2D*						NormalDepthTexture;
 		ZETexture2D*						VelocityTexture;
 		ZETexture2D*						ObjectTexture;
 

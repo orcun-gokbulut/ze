@@ -358,6 +358,8 @@ bool ZED3D9FixedMaterial::SetupPreLightning() const
 		GetDevice()->SetTexture(11, ((ZED3D9Texture2D*)DistortionMap)->Texture);
 	}
 
+	GetDevice()->SetVertexShaderConstantF(13, (float*)&ZEVector4(Camera->GetFarZ(), 0.0f, 0.0f, 0.0f), 1);
+	
 	SetShaderPass(&Shader->PreLightPass, RenderOrder->Flags & ZE_ROF_SKINNED);
 	return true;
 }

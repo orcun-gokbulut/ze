@@ -37,7 +37,7 @@
 float4x4  WorldViewProjMatrix			: register(c0);
 float4x4  ViewMatrix					: register(c4);
 float4x4  ViewInvTrpsMatrix				: register(c8);
-
+float		FarZ						: register(c13);
 // Other general constants 4 vectors
 float4    ViewPosition					: register(c16);
 float     MaterialRefractionIndex		: register(c17);
@@ -87,8 +87,9 @@ struct VS_OUTPUT
 	#ifdef ZESHADER_REFRACTION
 		float3 RefractionVector     : TEXCOORD4;
 	#endif
+	float4 NormalDepth               : TEXCOORD5;
 
-	float4 NormalDepth 
+	
 };
 
 VS_OUTPUT vs_main(VS_INPUT Input)

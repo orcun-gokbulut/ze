@@ -84,11 +84,13 @@ struct PS_INPUT
 	#ifdef ZESHADER_DISTORTION
 	float2 ScreenCoordinates    : TEXCOORD5;
 	#endif
+
+	float4 NormalDepth : TEXCOORD5;
 };
 
 struct PS_OUTPUT
 {
-	float4	Color : COLOR2;
+	float4	Color : COLOR0;
 	float4	NormalDepth	: COLOR1;
 };
 

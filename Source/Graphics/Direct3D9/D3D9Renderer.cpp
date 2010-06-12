@@ -383,7 +383,7 @@ bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 ZED3D9Renderer::ZED3D9Renderer()
 {
 	RenderColorTexture = false;
-	RenderDepthTexture = false;
+	RenderNormalDepthTexture = false;
 	RenderVelocityTexture = false;
 	RenderObjectTexture = true;
 	HDREnabled = true;
@@ -391,7 +391,7 @@ ZED3D9Renderer::ZED3D9Renderer()
 	HDRRenderTarget = NULL;
 	ColorRenderTarget = NULL;
 	ColorTexture = NULL;
-	DepthTexture = NULL;
+	NormalDepthTexture = NULL;
 	VelocityTexture = NULL;
 	ObjectTexture = NULL;
 
@@ -466,10 +466,10 @@ void ZED3D9Renderer::Deinitialize()
 	}
 
 	// If depth texture is created destroy it
-	if (DepthTexture != NULL)
+	if (NormalDepthTexture != NULL)
 	{
-		DepthTexture->Destroy();
-		DepthTexture = NULL;
+		NormalDepthTexture->Destroy();
+		NormalDepthTexture = NULL;
 	}
 
 	// If velocity texture is created destroy it
@@ -499,12 +499,12 @@ bool ZED3D9Renderer::GetRenderColorTexture()
 
 void ZED3D9Renderer::SetRenderDepthTexture(bool Enable)
 {
-	RenderDepthTexture = Enable;
+	RenderNormalDepthTexture = Enable;
 }
 
 bool ZED3D9Renderer::GetRenderDepthTexture()
 {
-	return RenderDepthTexture;
+	return RenderNormalDepthTexture;
 }
 
 void ZED3D9Renderer::SetRenderVelocityTexture(bool Enable)
@@ -534,7 +534,7 @@ ZETexture2D* ZED3D9Renderer::GetColorTexture()
 
 ZETexture2D* ZED3D9Renderer::GetDepthTexture()
 {
-	return DepthTexture;
+	return NormalDepthTexture;
 }
 
 ZETexture2D* ZED3D9Renderer::GetVelociyTexture()
@@ -676,13 +676,13 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 		}
 
 	// Create depth render texture if render depth texture enabled. Same process with color texture creation
-	if (RenderDepthTexture)
-		if (DepthTexture != NULL)
+	if (RenderNormalDepthTexture)
+		if (NormalDepthTexture != NULL)
 		{
-			if (DepthTexture->GetHeight() != ScreenWidth && DepthTexture->GetHeight() != ScreenHeight)
+			if (NormalDepthTexture->GetHeight() != ScreenWidth && NormalDepthTexture->GetHeight() != ScreenHeight)
 			{
-				DepthTexture->Release();
-				if (!DepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32))
+				NormalDepthTexture->Release();
+				if (!NormalDepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32))
 				{
 					zeCriticalError("D3D9 Frame Buffer Renderer", "Can not create depth texture.");
 					return;
@@ -691,14 +691,14 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 		}
 		else
 		{
-			DepthTexture = ZETexture2D::CreateInstance();
-			DepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32);
+			NormalDepthTexture = ZETexture2D::CreateInstance();
+			NormalDepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32);
 		}
 	else
-		if (DepthTexture != NULL)
+		if (NormalDepthTexture != NULL)
 		{
-			DepthTexture->Destroy();
-			DepthTexture = NULL;
+			NormalDepthTexture->Destroy();
+			NormalDepthTexture = NULL;
 		}
 
 	// Create velocity render texture if render depth texture enabled. Same process with color texture creation
@@ -770,7 +770,7 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 	// Enable color output
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
 
-	// Start Drawing
+		// Start Drawing
 	GetDevice()->BeginScene();
 
 		// Draw non-transparent object first
