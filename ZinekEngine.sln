@@ -8,6 +8,8 @@ Global
 		Debug|Win32 = Debug|Win32
 		Release(Symb)|Win32 = Release(Symb)|Win32
 		Release|Win32 = Release|Win32
+		ZESDK Debug|Win32 = ZESDK Debug|Win32
+		ZESDK Release|Win32 = ZESDK Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}.Debug|Win32.ActiveCfg = Debug|Win32
@@ -16,6 +18,10 @@ Global
 		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}.Release(Symb)|Win32.Build.0 = Release(Symb)|Win32
 		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}.Release|Win32.ActiveCfg = Release|Win32
 		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}.Release|Win32.Build.0 = Release|Win32
+		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}.ZESDK Debug|Win32.ActiveCfg = ZESDK Debug|Win32
+		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}.ZESDK Debug|Win32.Build.0 = ZESDK Debug|Win32
+		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}.ZESDK Release|Win32.ActiveCfg = ZESDK Release|Win32
+		{9CC3BAC9-51BE-4174-B3EC-F669BED2380D}.ZESDK Release|Win32.Build.0 = ZESDK Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

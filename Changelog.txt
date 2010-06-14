@@ -362,4 +362,9 @@
 	ADD: HDR Processor has been added. HDR Pipeline added.
 	FIX: ZED3D9FixedMaterialcrash has been fixed. (SetPixelShaderParameters)
 	FIX: ZE_DEBUG_SHADERS compile options, which allows debugging shaders on PIX and disabling shader optimizations, has been added.
-	+ADD: TraceLog mechanism has added. (Not fully completed)
+	+ADD: TraceLog mechanism has added. (Not fully completed) 
+	
+[14 July 2010 - Orcun]
+	CHG: ZESDK project has been integreated in to Zinek Engine project as configurations.
+	CHG: Migrated to new libraries.
+	REM: Multithreaded CRT configuration has been removed. (Only multithreaded dll crt available.)
