@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundDebugModule.h
+ Zinek Engine - ZEPhysicsDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,27 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SOUND_DEBUG_MODULE_H__
-#define __ZE_SOUND_DEBUG_MODULE_H__
+#ifndef __ZE_PHYSICS_DEBUG_MODULE_H__
+#define __ZE_PHYSICS_DEBUG_MODULE_H__
 
-#include "DebugModule.h"
+#include "ZEDebugModule.h"
+#include "ZEPhysics\ZEPhysicalCallbacks.h"
+#include "ZEGame\ZEModelBrush.h"
 
 class ZEPlayer;
-class ZESoundSource;
-class ZESoundSource3D;
+class ZEPhysicalRigidBody;
 
-class ZESoundDebugModule : public ZEDebugModule
+#include "ZEPhysics\ZEPhysicalShapes.h"
+
+class ZEPhysicsDebugModule : public ZEDebugModule
 {
 	private:
 		ZEPlayer*				Player;
-		ZESoundSource3D*		SoundSource;
-		
+		ZEPhysicalRigidBody*	PhysicalRigidBody;
+		ZEPhysicalSphereShape	Shape;	
+		ZEPhysicalSphereShape	Shape2;	
+		ZEModel*				Model;
+
+		void					TransformChanged(const ZEPhysicalTransformChange& TransformChange);
+		void					ColisionDetected(const ZEPhysicalCollision& Collision);
+
 	public:
+		virtual void			Process(float ElapsedTime);
+
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
 
-								ZESoundDebugModule();
-		virtual					~ZESoundDebugModule();
+
+
+								ZEPhysicsDebugModule();
+		virtual					~ZEPhysicsDebugModule();
 };
 
 #endif

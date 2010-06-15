@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MetaDebugModule.cpp
+ Zinek Engine - ZEMetaDebugModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,18 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "MetaDebugModule.h"
+#include "ZEMetaDebugModule.h"
 
-#include "Graphics/GraphicsModule.h"
-#include "Graphics/FixedMaterial.h"
-#include "Graphics/Texture2DResource.h"
-#include "Game/Game.h"
-#include "Game/Player.h"
-#include "Game/LightBrush.h"
-#include "Game/CanvasBrush.h"
-#include "Game/Scene.h"
-#include "Game/Serialization.h"
-#include "Meta/Animation.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZEGraphics\ZETexture2DResource.h"
+#include "ZEGame\ZEGame.h"
+#include "ZEGame\ZEPlayer.h"
+#include "ZEGame\ZELightBrush.h"
+#include "ZEGame\ZECanvasBrush.h"
+#include "ZEGame\ZEScene.h"
+#include "ZEGame\ZESerialization.h"
+#include "ZEMeta\ZEAnimation.h"
 #include <string.h>
 
 bool ZEMetaDebugModule::Initialize()

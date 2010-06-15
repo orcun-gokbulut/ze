@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsDebugModule.cpp
+ Zinek Engine - ZEPhysicsDebugModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,25 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysicsDebugModule.h"
+#include "ZEPhysicsDebugModule.h"
 
-#include "Core/Console.h"
-#include "Graphics/GraphicsModule.h"
-#include "Graphics/FixedMaterial.h"
-#include "Graphics/Texture2DResource.h"
-#include "Game/Game.h"
-#include "Game/Player.h"
-#include "Game/CanvasBrush.h"
-#include "Game/Scene.h"
-#include "Physics/PhysicsModule.h"
-#include "Physics/PhysicalWorld.h"
-#include "Physics/PhysicalRigidBody.h"
-#include "Physics/PhysicalShapes.h"
-#include "Physics/PhysicalStaticMesh.h"
-#include "Physics/PhysX/PhysXPhysicalWorld.h"
-#include "Model/Model.h"
-#include "Model/ModelMesh.h"
-#include "Model/ModelBone.h"
+#include "ZECore\ZEConsole.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZEGraphics\ZETexture2DResource.h"
+#include "ZEGame\ZEGame.h"
+#include "ZEGame\ZEPlayer.h"
+#include "ZEGame\ZECanvasBrush.h"
+#include "ZEGame\ZEScene.h"
+#include "ZEPhysics\ZEPhysicsModule.h"
+#include "ZEPhysics\ZEPhysicalWorld.h"
+#include "ZEPhysics\ZEPhysicalRigidBody.h"
+#include "ZEPhysics\ZEPhysicalShapes.h"
+#include "ZEPhysics\ZEPhysicalStaticMesh.h"
+#include "ZEPhysics\ZEPhysX\ZEPhysXPhysicalWorld.h"
+#include "ZEModel\ZEModel.h"
+#include "ZEModel\ZEModelMesh.h"
+#include "ZEModel\ZEModelBone.h"
 
 #include <NxScene.h>
 #include <NxActor.h>
@@ -73,7 +73,7 @@ void ZEPhysicsDebugModule::ColisionDetected(const ZEPhysicalCollision& Collision
 	zeLog("Physical Object", "Collision Occured: Object1 : %x, Object2 : %x", Collision.Collider1, Collision.Collider2);
 }
 
-#include "Game/LightBrush.h"
+#include "ZEGame\ZELightBrush.h"
 bool ZEPhysicsDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DebugModule.cpp
+ Zinek Engine - ZESoundDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,111 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DebugModule.h"
+#pragma once
+#ifndef __ZE_SOUND_DEBUG_MODULE_H__
+#define __ZE_SOUND_DEBUG_MODULE_H__
 
-ZEModuleAttribute ZEDebugModuleDescription::GetAttributes()
-{
-	return ZE_MA_NONE;
-}
+#include "ZEDebugModule.h"
 
-ZEModuleType ZEDebugModuleDescription::GetType()
-{
-	return ZE_MT_DEBUG;
-}
+class ZEPlayer;
+class ZESoundSource;
+class ZESoundSource3D;
 
-int ZEDebugModuleDescription::GetRequiredZinekEngineVersion()
+class ZESoundDebugModule : public ZEDebugModule
 {
-	return 5;
-}
+	private:
+		ZEPlayer*				Player;
+		ZESoundSource3D*		SoundSource;
+		
+	public:
+		virtual bool			Initialize();
+		virtual void			Deinitialize();
 
-int ZEDebugModuleDescription::GetMajorVersion()
-{
-	return 5;
-}
+								ZESoundDebugModule();
+		virtual					~ZESoundDebugModule();
+};
 
-int ZEDebugModuleDescription::GetMinorVersion()
-{
-	return 0;
-}
-
-const char* ZEDebugModuleDescription::GetCopyright()
-{
-	return "Copyright (C) 2010, Zinek Code House and Game Studio";
-}
-
-const char* ZEDebugModuleDescription::GetName()
-{
-	return "Debug Module";
-}
-
-ZEOptionSection* ZEDebugModuleDescription::GetOptions()
-{
-	return 0;
-}
-
-ZEModule* ZEDebugModuleDescription::CreateModuleInstance()
-{
-	return 0;
-}
-
-bool ZEDebugModuleDescription::CheckCompatible()
-{
-	return true;
-}
-
-ZEModuleDescription* ZEDebugModule::GetModuleDescription()
-{
-	static ZEDebugModuleDescription Desc;
-	return &Desc;
-}
-
-bool ZEDebugModule::IsEnabled()
-{
-	return true;
-}
-
-void ZEDebugModule::SetEnabled(bool Enabled)
-{
-	
-}
-
-bool ZEDebugModule::Initialize()
-{
-	return true;
-}
-
-void ZEDebugModule::Deinitialize()
-{
-}
-
-void ZEDebugModule::Destroy()
-{
-}
-
-void ZEDebugModule::PreProcess()
-{
-}
-
-void ZEDebugModule::Process(float ElapsedTime)
-{
-}
-
-void ZEDebugModule::PostProcess()
-{
-}
-
-void ZEDebugModule::StartUp()
-{
-}
-
-void ZEDebugModule::ShutDown()
-{
-}
-
-void ZEDebugModule::Tick(float ElapsedTime)
-{
-}
-
-void ZEDebugModule::Render(float ElapsedTime)
-{
-}
+#endif

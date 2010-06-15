@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicsDebugModule.h
+ Zinek Engine - ZEMetaDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,40 +34,28 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PHYSICS_DEBUG_MODULE_H__
-#define __ZE_PHYSICS_DEBUG_MODULE_H__
+#ifndef __ZE_META_DEBUG_MODULE_H__
+#define __ZE_META_DEBUG_MODULE_H__
 
-#include "DebugModule.h"
-#include "Physics/PhysicalCallbacks.h"
-#include "Game/ModelBrush.h"
+#include "ZEDebugModule.h"
 
 class ZEPlayer;
-class ZEPhysicalRigidBody;
+class ZECanvasBrush;
+class ZELightBrush;
 
-#include "Physics/PhysicalShapes.h"
-
-class ZEPhysicsDebugModule : public ZEDebugModule
+class ZEMetaDebugModule : public ZEDebugModule
 {
 	private:
 		ZEPlayer*				Player;
-		ZEPhysicalRigidBody*	PhysicalRigidBody;
-		ZEPhysicalSphereShape	Shape;	
-		ZEPhysicalSphereShape	Shape2;	
-		ZEModel*				Model;
-
-		void					TransformChanged(const ZEPhysicalTransformChange& TransformChange);
-		void					ColisionDetected(const ZEPhysicalCollision& Collision);
+		ZELightBrush*			Light;
+		ZECanvasBrush*			Canvas;
 
 	public:
-		virtual void			Process(float ElapsedTime);
-
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
 
-
-
-								ZEPhysicsDebugModule();
-		virtual					~ZEPhysicsDebugModule();
+								ZEMetaDebugModule();
+		virtual					~ZEMetaDebugModule();
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MetaDebugModule.h
+ Zinek Engine - ZEDebugModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,29 +33,111 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_META_DEBUG_MODULE_H__
-#define __ZE_META_DEBUG_MODULE_H__
+#include "ZEDebugModule.h"
 
-#include "DebugModule.h"
-
-class ZEPlayer;
-class ZECanvasBrush;
-class ZELightBrush;
-
-class ZEMetaDebugModule : public ZEDebugModule
+ZEModuleAttribute ZEDebugModuleDescription::GetAttributes()
 {
-	private:
-		ZEPlayer*				Player;
-		ZELightBrush*			Light;
-		ZECanvasBrush*			Canvas;
+	return ZE_MA_NONE;
+}
 
-	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
+ZEModuleType ZEDebugModuleDescription::GetType()
+{
+	return ZE_MT_DEBUG;
+}
 
-								ZEMetaDebugModule();
-		virtual					~ZEMetaDebugModule();
-};
+int ZEDebugModuleDescription::GetRequiredZinekEngineVersion()
+{
+	return 5;
+}
 
-#endif
+int ZEDebugModuleDescription::GetMajorVersion()
+{
+	return 5;
+}
+
+int ZEDebugModuleDescription::GetMinorVersion()
+{
+	return 0;
+}
+
+const char* ZEDebugModuleDescription::GetCopyright()
+{
+	return "Copyright (C) 2010, Zinek Code House and Game Studio";
+}
+
+const char* ZEDebugModuleDescription::GetName()
+{
+	return "Debug Module";
+}
+
+ZEOptionSection* ZEDebugModuleDescription::GetOptions()
+{
+	return 0;
+}
+
+ZEModule* ZEDebugModuleDescription::CreateModuleInstance()
+{
+	return 0;
+}
+
+bool ZEDebugModuleDescription::CheckCompatible()
+{
+	return true;
+}
+
+ZEModuleDescription* ZEDebugModule::GetModuleDescription()
+{
+	static ZEDebugModuleDescription Desc;
+	return &Desc;
+}
+
+bool ZEDebugModule::IsEnabled()
+{
+	return true;
+}
+
+void ZEDebugModule::SetEnabled(bool Enabled)
+{
+	
+}
+
+bool ZEDebugModule::Initialize()
+{
+	return true;
+}
+
+void ZEDebugModule::Deinitialize()
+{
+}
+
+void ZEDebugModule::Destroy()
+{
+}
+
+void ZEDebugModule::PreProcess()
+{
+}
+
+void ZEDebugModule::Process(float ElapsedTime)
+{
+}
+
+void ZEDebugModule::PostProcess()
+{
+}
+
+void ZEDebugModule::StartUp()
+{
+}
+
+void ZEDebugModule::ShutDown()
+{
+}
+
+void ZEDebugModule::Tick(float ElapsedTime)
+{
+}
+
+void ZEDebugModule::Render(float ElapsedTime)
+{
+}

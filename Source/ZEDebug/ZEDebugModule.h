@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundDebugModule.cpp
+ Zinek Engine - ZEDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,69 +33,49 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "SoundDebugModule.h"
+#pragma once
+#ifndef __ZE_DEBUG_MODULE_H__
+#define __ZE_DEBUG_MODULE_H__
 
-#include "Graphics/GraphicsModule.h"
-#include "Game/Game.h"
-#include "Game/Player.h"
-#include "Game/Scene.h"
-#include "Sound/SoundSource3D.h"
+#include "ZECore\ZEModule.h"
 
-bool ZESoundDebugModule::Initialize()
+class ZEDebugModuleDescription : public ZEModuleDescription
 {
-	ZEScene* Scene = zeGame->GetScene();
+	public:
+		virtual ZEModuleAttribute		GetAttributes();
+		virtual ZEModuleType			GetType();
+		virtual int						GetRequiredZinekEngineVersion();
+		virtual int						GetMajorVersion();
+		virtual int						GetMinorVersion();
+		virtual const char*				GetCopyright();
+		virtual const char*				GetName();
 
-	// Create the player
-	if (Player == NULL)
-	{
-		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
-		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
-		Player->SetRotation(ZEQuaternion::Identity);
-		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
-		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
-		Scene->SetActiveCamera(Player->GetCamera());
-		Scene->AddEntity(Player);
-	}
+		virtual ZEOptionSection*		GetOptions();
+		virtual	ZEModule*				CreateModuleInstance();
+		virtual	bool					CheckCompatible();
+};
 
-	if (SoundSource == NULL)
-	{
-		ZESoundSource3D* SoundSource = ZESoundSource3D::CreateInstance();
-
-		SoundSource->SetSoundResource(ZESoundResource::LoadResource("test.wav"));
-		SoundSource->SetCurrentPositionTime(50);
-		SoundSource->SetStartPositionTime(0);
-		/*SoundSource->SetEndPositionTime(70.5f);*/
-		SoundSource->SetPlaybackSpeed(1.0f);
-		SoundSource->SetLooping(true);
-		SoundSource->Play();
-		SoundSource->SetSoundSourceType(ZE_SST_MUSIC);
-	}
-
-	return true;
-}
-
-void ZESoundDebugModule::Deinitialize()
+class ZEDebugModule : public ZEModule
 {
-	if (Player != NULL)
-	{
-		Player->Destroy();
-		Player = NULL;
-	}
+	public:
+		virtual ZEModuleDescription*	GetModuleDescription();
 
-	if (SoundSource != NULL)
-	{
-		SoundSource->Destroy();
-		SoundSource = NULL;
-	}
-}
+		virtual	bool					IsEnabled();
+		virtual void					SetEnabled(bool Enabled);
 
-ZESoundDebugModule::ZESoundDebugModule()
-{
-	SoundSource = NULL;
-	Player = NULL;
-}
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
+		virtual void					Destroy();
+		
+		virtual void					PreProcess();
+		virtual void					Process(float ElapsedTime);
+		virtual void					PostProcess();
+		
+		virtual void					StartUp();
+		virtual void					ShutDown();
 
-ZESoundDebugModule::~ZESoundDebugModule()
-{
-	Deinitialize();
-}
+		virtual void					Tick(float ElapsedTime);
+		virtual void					Render(float ElapsedTime);
+};
+
+#endif
