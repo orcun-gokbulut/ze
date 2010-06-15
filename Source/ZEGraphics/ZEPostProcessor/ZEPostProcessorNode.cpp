@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PostProcessorNode.cpp
+ Zinek Engine - ZEPostProcessorNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PostProcessorNode.h"
-#include "Definitions.h"
+#include "ZEPostProcessorNode.h"
+#include "ZEDefinitions.h"
 
 ZEPostProcessorNode::ZEPostProcessorNode()
 {
@@ -96,3 +96,5 @@ bool ZEPostProcessorNode::Process()
 {
 	return true;
 }
+
+

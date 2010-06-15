@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXPhysicalWorld.cpp
+ Zinek Engine - ZEPhysXPhysicalWorld.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,13 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysXPhysicalWorld.h"
-#include "PhysXConversion.h"
-#include "Physics/PhysicalObject.h"
-#include "Physics/PhysicalRigidBody.h"
-#include "Core/Error.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/SimpleMaterial.h"
+#include "ZEPhysXPhysicalWorld.h"
+#include "ZEPhysXConversion.h"
+#include "ZEPhysics\ZEPhysicalObject.h"
+#include "ZEPhysics\ZEPhysicalRigidBody.h"
+#include "ZECore\ZEError.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZEGraphics\ZESimpleMaterial.h"
 #include <NxDebugRenderable.h>
 
 static ZEVector4 NX_TO_ZE(NxU32 color)
@@ -348,3 +348,5 @@ void ZEPhysXPhysicalWorld::Update()
 	Scene->fetchResults(NX_ALL_FINISHED, true);
 
 }
+
+

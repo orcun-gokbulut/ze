@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Animation.cpp
+ Zinek Engine - ZEAnimation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Animation.h"
-#include "Class.h"
-#include "Core/ResourceFile.h"
-#include "Types.h"
-#include "Core/Error.h"
+#include "ZEAnimation.h"
+#include "ZEClass.h"
+#include "ZECore\ZEResourceFile.h"
+#include "ZETypes.h"
+#include "ZECore\ZEError.h"
 #include <string.h>
 
 #define	ZE_ANIF_ANIMATION_CHUNKID					((ZEDWORD)'ANIM')
@@ -411,4 +411,6 @@ ZEAnimationController::ZEAnimationController()
 ZEAnimationController::~ZEAnimationController()
 {
 }
+
+
 

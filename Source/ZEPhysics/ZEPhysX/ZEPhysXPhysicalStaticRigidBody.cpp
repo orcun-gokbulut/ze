@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXPhysicalStaticRigidBody.cpp
+ Zinek Engine - ZEPhysXPhysicalStaticRigidBody.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Core/Error.h"
-#include "PhysXPhysicalStaticRigidBody.h"
-#include "PhysXPhysicalWorld.h"
-#include "Physics/PhysicalShapes.h"
-#include "PhysXConversion.h"
+#include "ZECore\ZEError.h"
+#include "ZEPhysXPhysicalStaticRigidBody.h"
+#include "ZEPhysXPhysicalWorld.h"
+#include "ZEPhysics\ZEPhysicalShapes.h"
+#include "ZEPhysXConversion.h"
 
 #include <NxShapeDesc.h>
 #include <NxBoxShapeDesc.h>
@@ -304,3 +304,5 @@ void ZEPhysXPhysicalStaticRigidBody::Deinitialize()
 		Actor = NULL;
 	}
 }
+
+

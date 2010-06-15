@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - TypedVariant.cpp
+ Zinek Engine - ZETypedVariant.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -40,9 +40,9 @@
 //  All rights reserved.									 //
 ///////////////////////////////////////////////////////////////
 
-#include "typedvariant.h"
+#include "ZEtypedvariant.h"
 #include <string.h>
-#include "definitions.h"
+#include "ZEdefinitions.h"
 #include <string.h>
 #pragma warning(push)
 #pragma warning(disable:4482 4996)
@@ -231,3 +231,6 @@ ZETypedVariant::~ZETypedVariant()
 	SetType(ZE_VRT_UNDEFINED);
 }
 #pragma warning(pop)
+
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PPTextureInputNode.h
+ Zinek Engine - ZEPPTextureInputNode.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef __ZE_PP_TEXTURE_INPUT_NODE_H__
 #define __ZE_PP_TEXTURE_INPUT_NODE_H__
 
-#include "PostProcessorNode.h"
+#include "ZEPostProcessorNode.h"
 
 class ZETexture2D;
 
@@ -62,3 +62,5 @@ class ZEPPTextureInputNode : public ZEPostProcessorNode
 };
 
 #endif
+
+

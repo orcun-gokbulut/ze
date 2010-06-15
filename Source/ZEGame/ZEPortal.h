@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Portal.h
+ Zinek Engine - ZEPortal.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,7 +36,7 @@
 #ifndef __ZE_PORTAL_H__
 #define __ZE_PORTAL_H__
 
-#include "ZEDS/Array.h"
+#include "ZEDS\ZEArray.h"
 
 class ZECamera;
 class ZEViewCone;
@@ -70,3 +70,6 @@ class ZEPortal
 };
 
 #endif
+
+
+

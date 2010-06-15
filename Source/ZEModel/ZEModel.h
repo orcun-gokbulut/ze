@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Model.h
+ Zinek Engine - ZEModel.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,14 +37,14 @@
 #ifndef	__ZE_MODEL_H__
 #define __ZE_MODEL_H__
 
-#include "ZEDS/Array.h"
-#include "Game/Component.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/Canvas.h"
-#include "ModelResource.h"
-#include "ModelBone.h"
-#include "ModelMesh.h"
-#include "ModelAnimation.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEGame\ZEComponent.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZECanvas.h"
+#include "ZEModelResource.h"
+#include "ZEModelBone.h"
+#include "ZEModelMesh.h"
+#include "ZEModelAnimation.h"
 
 #define ZE_MDF
 class ZEQuaternion;
@@ -183,4 +183,6 @@ class ZEModel : public ZEComponent
 											~ZEModel();
 };
 #endif
+
+
 

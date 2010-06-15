@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - GraphicsModule.cpp
+ Zinek Engine - ZEGraphicsModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#include "GraphicsModule.h"
-#include "Core/Core.h"
+#include "ZEGraphicsModule.h"
+#include "ZECore\ZECore.h"
 #include <freeimage.h>
 
 ZEOptionSection ZEGraphicsModule::GraphicsOptions;
@@ -216,3 +216,5 @@ ZEGraphicsModule* ZEGraphicsModule::GetInstance()
 {
 	return ZECore::GetInstance()->GetGraphicsModule();
 }
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ALListener.h
+ Zinek Engine - ZEALListener.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_AL_LISTENER_H__
 #define __ZE_AL_LISTENER_H__
 
-#include "../Listener.h"
-#include "ALComponentBase.h"
+#include "..\ZEListener.h"
+#include "ZEALComponentBase.h"
 
 class ZEALListener : public ZEListener, public ZEALComponentBase
 {	
@@ -69,3 +69,5 @@ class ZEALListener : public ZEListener, public ZEALComponentBase
 };
 
 #endif
+
+

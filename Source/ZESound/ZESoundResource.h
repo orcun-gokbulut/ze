@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundResource.h
+ Zinek Engine - ZESoundResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_SOUNDRESOURCE_H__
 #define __ZE_SOUNDRESOURCE_H__
 
-#include "Core/Resource.h"
+#include "ZECore\ZEResource.h"
 
 enum ZESoundFileFormat
 {
@@ -85,3 +85,5 @@ class ZESoundResource : public ZEResource
 };
 
 #endif
+
+

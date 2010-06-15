@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ModelFileFormat.h
+ Zinek Engine - ZEModelFileFormat.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,12 +37,12 @@
 #ifndef __ZE_MODEL_FILE_FORMAT_H__
 #define __ZE_MODEL_FILE_FORMAT_H__
 
-#include "../ZEMath/Vector.h"
-#include "../ZEMath/Quaternion.h"
-#include "../ZEMath/AABoundingBox.h"
-#include "../ZEDS/Array.h"
-#include "../Definitions.h"
-#include "../Types.h"
+#include "..\ZEMath\ZEVector.h"
+#include "..\ZEMath\ZEQuaternion.h"
+#include "..\ZEMath\ZEAABoundingBox.h"
+#include "..\ZEDS\ZEArray.h"
+#include "..\ZEDefinitions.h"
+#include "..\ZETypes.h"
 
 #define ZE_MDLF_MAX_NAME_SIZE						128
 #define ZE_MDLF_MAX_FILENAME_SIZE					256
@@ -362,3 +362,5 @@ struct ZEModelFileBoneChunk
 };
 
 #endif
+
+

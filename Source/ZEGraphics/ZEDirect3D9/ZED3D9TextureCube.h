@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9TextureCube.h
+ Zinek Engine - ZED3D9TextureCube.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef __ZE_D3D9_TEXTURE_CUBE_H__
 #define __ZE_D3D9_TEXTURE_CUBE_H__
 
-#include "Graphics/TextureCube.h"
-#include "D3D9ViewPort.h"
-#include "D3D9ComponentBase.h"
+#include "ZEGraphics\ZETextureCube.h"
+#include "ZED3D9ViewPort.h"
+#include "ZED3D9ComponentBase.h"
 #include <d3d9.h>
 
 class ZED3D9TextureCube : public ZETextureCube, public ZED3D9ComponentBase
@@ -68,3 +68,5 @@ class ZED3D9TextureCube : public ZETextureCube, public ZED3D9ComponentBase
 		virtual void					Destroy();
 };
 #endif
+
+

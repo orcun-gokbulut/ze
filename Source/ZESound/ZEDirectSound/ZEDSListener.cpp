@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSListener.cpp
+ Zinek Engine - ZEDSListener.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DSListener.h"
+#include "ZEDSListener.h"
 #define ZE_LISTENER_UPDATE_TRESHOLD 0.5f
 
 void ZEDSListener::ResetParameters()
@@ -164,3 +164,5 @@ void ZEDSListener::Tick(float ElapsedTime)
 		GetModule()->GetListener()->SetVelocity(WorldVelocity.x, WorldVelocity.y, WorldVelocity.z, DS3D_DEFERRED);	
 	}
 }
+
+

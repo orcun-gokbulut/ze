@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ProjectiveLight.cpp
+ Zinek Engine - ZEProjectiveLight.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,13 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ProjectiveLight.h"
-#include "Texture2D.h"
-#include "TextureCube.h"
-#include "Core/Error.h"
-#include "Game/Scene.h"
-#include "ShadowRenderer.h"
-#include "GraphicsModule.h"
+#include "ZEProjectiveLight.h"
+#include "ZETexture2D.h"
+#include "ZETextureCube.h"
+#include "ZECore\ZEError.h"
+#include "ZEGame\ZEScene.h"
+#include "ZEShadowRenderer.h"
+#include "ZEGraphicsModule.h"
 
 ZELightType ZEProjectiveLight::GetLightType()
 {
@@ -189,3 +189,5 @@ ZEProjectiveLight::~ZEProjectiveLight()
 	if (ShadowMap != NULL)
 		ShadowMap->Destroy();
 }
+
+

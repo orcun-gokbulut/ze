@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - CanvasBrush.cpp
+ Zinek Engine - ZECanvasBrush.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,13 +32,14 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "CanvasBrush.h"
-#include "Core/Error.h"
-#include "Game/DrawParameters.h"
-#include "Graphics/GraphicsModule.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/VertexBuffer.h"
+
+#include "ZECanvasBrush.h"
+#include "ZECore\ZEError.h"
+#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZEVertexBuffer.h"
 
 ZEDWORD ZECanvasBrush::GetDrawFlags() const
 {
@@ -145,9 +146,10 @@ ZECanvasBrush::~ZECanvasBrush()
 		((ZEStaticVertexBuffer*)RenderOrder.VertexBuffer)->Release();
 }
 
-#include "CanvasBrush.h.zpp"
+#include "ZECanvasBrush.h.zpp"
 
 ZEEntityRunAt ZECanvasBrushDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
+

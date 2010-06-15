@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - VertexTypes.cpp
+ Zinek Engine - ZEVertexTypes.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "VertexTypes.h"
-#include "VertexDeclaration.h"
-#include "Core/Error.h"
+#include "ZEVertexTypes.h"
+#include "ZEVertexDeclaration.h"
+#include "ZECore\ZEError.h"
 
 ZEVertexDeclaration* ZESimpleVertex::VertexDeclaration;
 ZEVertexDeclaration* ZESimpleVertex::GetVertexDeclaration()
@@ -192,3 +192,5 @@ ZEVertexDeclaration* ZEColoredVertex::GetVertexDeclaration()
 	zeAssert(VertexDeclaration->GetVertexSize() != sizeof(ZEColoredVertex), "Vertex decleration size does not matches.");
 	return VertexDeclaration;
 }
+
+

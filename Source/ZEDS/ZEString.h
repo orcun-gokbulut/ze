@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - String.h
+ Zinek Engine - ZEString.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef __ZE_STRING_H__
 #define __ZE_STRING_H__
 
-#include "Allocator.h"
+#include "ZEAllocator.h"
 #include <string>
 /*
 class ZEChar
@@ -227,3 +227,6 @@ class ZEString
 };
 
 #endif
+
+
+

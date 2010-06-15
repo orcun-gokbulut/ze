@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Renderer.cpp
+ Zinek Engine - ZERenderer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Renderer.h"
-#include "GraphicsModule.h"
+#include "ZERenderer.h"
+#include "ZEGraphicsModule.h"
 
 ZERenderer::ZERenderer()
 {
@@ -110,3 +110,5 @@ ZERenderer*  ZERenderer::CreateInstance()
 {
 	return ZEGraphicsModule::GetInstance()->CreateRenderer();
 }
+
+

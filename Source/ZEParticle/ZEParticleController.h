@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ParticleController.h
+ Zinek Engine - ZEParticleController.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_PARTICLE_CONTROLLER_H__
 #define __ZE_PARTICLE_CONTROLLER_H__
 
-#include "Particle.h"
-#include "ParticleSystem.h"
+#include "ZEParticle.h"
+#include "ZEParticleSystem.h"
 
 class ZEParticleControllerNode
 {
@@ -82,3 +82,5 @@ class ZEParticleController
 };
 
 #endif
+
+

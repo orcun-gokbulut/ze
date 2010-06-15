@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MaterialResource.h
+ Zinek Engine - ZEMaterialResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,10 +37,10 @@
 #ifndef __ZE_MATERIAL_RESOURCE_H__ 
 #define __ZE_MATERIAL_RESOURCE_H__
 
-#include "Core/Resource.h"
-#include "FixedMaterial.h"
-#include "ZEDS/Array.h"
-#include "Meta/Animation.h"
+#include "ZECore\ZEResource.h"
+#include "ZEFixedMaterial.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMeta\ZEAnimation.h"
 
 class ZETextureResource;
 class ZEResourceFile;
@@ -73,3 +73,5 @@ class ZEMaterialResource : public ZEResource
 };
 
 #endif
+
+

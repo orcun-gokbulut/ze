@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSSoundSource.h
+ Zinek Engine - ZEDSSoundSource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_DS_SOUND_SOURCE_H__
 #define __ZE_DS_SOUND_SOURCE_H__
 
-#include "DSComponentBase.h"
-#include "../SoundSource.h"
+#include "ZEDSComponentBase.h"
+#include "..\ZESoundSource.h"
 #include <dsound.h>
 
 class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
@@ -84,3 +84,5 @@ class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 };
 
 #endif
+
+

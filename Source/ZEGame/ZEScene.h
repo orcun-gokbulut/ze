@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Scene.h
+ Zinek Engine - ZEScene.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_SCENE_H__
 #define __ZE_SCENE_H__
 
-#include "ZEDS/Array.h"
-#include "SceneDebugDraw.h"
+#include "ZEDS\ZEArray.h"
+#include "ZESceneDebugDraw.h"
 
 class ZEViewVolume;
 class ZEBoundingBox;
@@ -169,3 +169,6 @@ class ZEPortalScene : public ZEScene
 };
 
 #endif
+
+
+

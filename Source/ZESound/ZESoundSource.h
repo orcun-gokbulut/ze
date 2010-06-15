@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundSource.h
+ Zinek Engine - ZESoundSource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef	__ZE_SOUND_SOURCE_H__
 #define __ZE_SOUND_SOURCE_H__
 
-#include "Game/Component.h"
-#include "Meta/Class.h"
-#include "SoundResource.h"
+#include "ZEGame\ZEComponent.h"
+#include "ZEMeta\ZEClass.h"
+#include "ZESoundResource.h"
 
 #define ZE_SS_PAN_LEFT				-100
 #define ZE_SS_PAN_MIDDLE			0
@@ -216,3 +216,5 @@ ZE_POST_PROCESSOR_START(Meta)
 ZE_POST_PROCESSOR_END()
 */
 #endif
+
+

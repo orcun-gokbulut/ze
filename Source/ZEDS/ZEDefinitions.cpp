@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Definitions.cpp
+ Zinek Engine - ZEDefinitions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -56,3 +56,6 @@ void stdWarningAssert(const char* Function, const char* File, int Line, const ch
 	va_end(Args);
 }
  
+
+
+

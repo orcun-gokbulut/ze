@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Line.h
+ Zinek Engine - ZELine.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_MATH_LINE_H__
 #define __ZE_MATH_LINE_H__
 
-#include "Vector.h"
+#include "ZEVector.h"
 
 #define MapLine(A, B)	(A).v = (B).v; (A).p = (B).p 
 #define MapLineToXYZ(L, _v, _p) (L).v = (_v); (L).p = (_p)
@@ -73,3 +73,5 @@ class ZELine
 							ZELine();
 };
 #endif
+
+

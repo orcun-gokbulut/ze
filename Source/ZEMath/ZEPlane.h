@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Plane.h
+ Zinek Engine - ZEPlane.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_MATH_PLANE_H__
 #define __ZE_MATH_PLANE_H__
 
-#include "Vector.h"
-#include "Line.h"
+#include "ZEVector.h"
+#include "ZELine.h"
 
 enum ZEPlaneIntersect
 {
@@ -80,3 +80,5 @@ class ZEPlane
 };
 
 #endif
+
+

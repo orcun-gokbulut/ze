@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9FixedMaterialShader.cpp
+ Zinek Engine - ZED3D9FixedMaterialShader.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,13 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9FixedMaterialShader.h"
-#include "D3D9CommonTools.h"
-#include "Core/Error.h"
-#include "Core/ResourceFile.h"
-#include "Graphics/Material.h"
-#include "Graphics/FixedMaterial.h"
-#include "Graphics/MaterialComponents.h"
+#include "ZED3D9FixedMaterialShader.h"
+#include "ZED3D9CommonTools.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEResourceFile.h"
+#include "ZEGraphics\ZEMaterial.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZEGraphics\ZEMaterialComponents.h"
 #include <stdio.h>
 
 bool ZED3D9FixedMateriaShaderPass::Compile(const char* VertexShaderSource, const char* PixelShaderSource, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)

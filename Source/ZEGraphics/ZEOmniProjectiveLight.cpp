@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - OmniProjectiveLight.cpp
+ Zinek Engine - ZEOmniProjectiveLight.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "OmniProjectiveLight.h"
-#include "Game/Scene.h"
-#include "ShadowRenderer.h"
-#include "Texture.h"
+#include "ZEOmniProjectiveLight.h"
+#include "ZEGame\ZEScene.h"
+#include "ZEShadowRenderer.h"
+#include "ZETexture.h"
 
 ZELightType ZEOmniProjectiveLight::GetLightType()
 {
@@ -79,3 +79,5 @@ ZEOmniProjectiveLight::ZEOmniProjectiveLight()
 	ProjectionTexture = NULL;
 	ShadowMap = NULL;
 }
+
+

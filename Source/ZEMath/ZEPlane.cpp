@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Plane.cpp
+ Zinek Engine - ZEPlane.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Plane.h"
-#include "Definitions.h"
-#include "Line.h"
-#include "LineSegment.h"
-#include "Ray.h"
+#include "ZEPlane.h"
+#include "ZEDefinitions.h"
+#include "ZELine.h"
+#include "ZELineSegment.h"
+#include "ZERay.h"
 #include <math.h>
 
 bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &t)
@@ -181,3 +181,5 @@ ZEPlane::ZEPlane()
 {
 
 }
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle3D.h
+ Zinek Engine - ZERectangle3D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_MATH_RECTANGLE_3D_H__
 #define __ZE_MATH_RECTANGLE_3D_H__
 
-#include "Vector.h"
-#include "Plane.h"
+#include "ZEVector.h"
+#include "ZEPlane.h"
 
 class ZERectangle3D
 {
@@ -53,3 +53,5 @@ class ZERectangle3D
 };
 
 #endif
+
+

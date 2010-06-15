@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SceneDebugDraw.cpp
+ Zinek Engine - ZESceneDebugDraw.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "SceneDebugDraw.h"
-#include "Graphics/SimpleMaterial.h"
-#include "Graphics/Renderer.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Matrix.h"
-#include "ZEMath/BoundingSphere.h"
-#include "ZEMath/AABoundingBox.h"
-#include "ZEMath/OBoundingBox.h"
+#include "ZESceneDebugDraw.h"
+#include "ZEGraphics\ZESimpleMaterial.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEMath\ZEBoundingSphere.h"
+#include "ZEMath\ZEAABoundingBox.h"
+#include "ZEMath\ZEOBoundingBox.h"
 
 void ZESceneDebugDraw::DrawOrientedBoundingBox(const ZEAABoundingBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, const ZEVector4& Color)
 {
@@ -127,3 +127,6 @@ ZESceneDebugDraw::~ZESceneDebugDraw()
 {
 	Deinitialize();
 }
+
+
+

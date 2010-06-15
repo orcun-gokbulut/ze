@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ParticleSystem.cpp
+ Zinek Engine - ZEParticleSystem.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,15 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/VertexTypes.h"
-#include "Graphics/Camera.h"
-#include "ParticleEmitter.h"
-#include "ParticleEffect.h"
-#include "ParticleSystem.h"
-#include "Game/DrawParameters.h"
-#include "Graphics/SimpleMaterial.h"
-#include "Graphics/FixedMaterial.h"
+#include "ZEGraphics\ZEVertexBuffer.h"
+#include "ZEGraphics\ZEVertexTypes.h"
+#include "ZEGraphics\ZECamera.h"
+#include "ZEParticleEmitter.h"
+#include "ZEParticleEffect.h"
+#include "ZEParticleSystem.h"
+#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGraphics\ZESimpleMaterial.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
 
 void ZEParticleSystem::UpdateVertexBuffer(ZEDrawParameters* DrawParameters) //Bitmedi
 {
@@ -316,4 +316,6 @@ ZEParticleSystem::~ZEParticleSystem()
 		VertexBuffer->Destroy();
 }
 
-#include "ParticleSystem.h.zpp"
+#include "ZEParticleSystem.h.zpp"
+
+

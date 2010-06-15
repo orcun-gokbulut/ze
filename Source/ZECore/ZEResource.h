@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Resource.h
+ Zinek Engine - ZEResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_RESOURCE_H__
 #define __ZE_RESOURCE_H__
 
-#include "ResourceFile.h"
+#include "ZEResourceFile.h"
 
 class ZEResourceManager;
 class ZEResource
@@ -72,3 +72,6 @@ class ZEResource
 		void					Release();
 };
 #endif
+
+
+

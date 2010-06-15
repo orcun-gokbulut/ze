@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMapResource.h
+ Zinek Engine - ZEPortalMapResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,15 +37,15 @@
 #ifndef __ZE_PORTAL_MAP_RESOURCE_H__
 #define __ZE_PORTAL_MAP_RESOURCE_H__
 
-#include "../MapResource.h"
-#include "ZEDS/Array.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Rectangle3D.h"
-#include "ZEMath/AABoundingBox.h"
-#include "Definitions.h"
-#include "Core/Resource.h"
-#include "Graphics/VertexTypes.h"
-#include "PortalMapPortalOctree.h"
+#include "..\ZEMapResource.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZERectangle3D.h"
+#include "ZEMath\ZEAABoundingBox.h"
+#include "ZEDefinitions.h"
+#include "ZECore\ZEResource.h"
+#include "ZEGraphics\ZEVertexTypes.h"
+#include "ZEPortalMapPortalOctree.h"
 
 class ZEMaterial;
 class ZETexture2D;
@@ -122,3 +122,5 @@ class ZEPortalMapResource : public ZEMapResource
 		static void									CacheResource(const char* FileName);
 };
 #endif
+
+

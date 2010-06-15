@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - VertexBuffer.cpp
+ Zinek Engine - ZEVertexBuffer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,9 +32,9 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "VertexBuffer.h"
-#include "Graphics/GraphicsModule.h"
-#include "Core/Core.h"
+#include "ZEVertexBuffer.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZECore\ZECore.h"
 
 ZEVertexBuffer::ZEVertexBuffer()
 {
@@ -74,3 +74,5 @@ bool ZEDynamicVertexBuffer::IsStatic()
 {
 	return false;
 }
+
+

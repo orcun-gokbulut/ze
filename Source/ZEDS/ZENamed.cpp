@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Named.cpp
+ Zinek Engine - ZENamed.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "named.h"
-#include "definitions.h"
+#include "ZEnamed.h"
+#include "ZEdefinitions.h"
 #include <string.h>
 
 #pragma warning(push)
@@ -76,3 +76,6 @@ ZENamed::~ZENamed()
 		delete[] Name;
 }
 #pragma warning(pop)
+
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXPhysicalStaticRigidBody.h
+ Zinek Engine - ZEPhysXPhysicalStaticRigidBody.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef __ZE_PHYSX_PHYSICAL_STATIC_RIGID_BODY_H__
 #define __ZE_PHYSX_PHYSICAL_STATIC_RIGID_BODY_H__
 
-#include "Physics/PhysicalStaticRigidBody.h"
+#include "ZEPhysics\ZEPhysicalStaticRigidBody.h"
 
 #include <NxActor.h>
 #include <NxActorDesc.h>
@@ -90,3 +90,5 @@ class ZEPhysXPhysicalStaticRigidBody : public ZEPhysicalStaticRigidBody
 };
 
 #endif
+
+

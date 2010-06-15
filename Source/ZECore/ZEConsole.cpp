@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Console.cpp
+ Zinek Engine - ZEConsole.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Console.h"
-#include "Command.h"
-#include "Option.h"
-#include "Core.h"
+#include "ZEConsole.h"
+#include "ZECommand.h"
+#include "ZEOption.h"
+#include "ZECore.h"
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -545,4 +545,7 @@ ZEConsole::~ZEConsole()
 
 	Instance = NULL;
 }
+
+
+
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundResource.cpp
+ Zinek Engine - ZESoundResource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,13 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "SoundResource.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
-#include "Core/ResourceManager.h"
-#include "SoundResourceMP3.h"
-#include "SoundResourceOGG.h"
-#include "SoundResourceWAV.h"
+#include "ZESoundResource.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
+#include "ZECore\ZEResourceManager.h"
+#include "ZESoundResourceMP3.h"
+#include "ZESoundResourceOGG.h"
+#include "ZESoundResourceWAV.h"
 
 ZESoundFileFormat ZESoundResource::GetFileFormat(const char* FileName)
 {
@@ -174,3 +174,5 @@ ZESoundResource::~ZESoundResource()
 {
 
 }
+
+

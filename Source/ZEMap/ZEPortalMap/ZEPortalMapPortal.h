@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMapPortal.h
+ Zinek Engine - ZEPortalMapPortal.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_PORTAL_MAP_PORTAL_H__
 #define __ZE_PORTAL_MAP_PORTAL_H__
 
-#include "ZEDS/Array.h"
-#include "Graphics/RenderOrder.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEGraphics\ZERenderOrder.h"
 
 class ZEPortalMap;
 class ZEPortalMapDoor;
@@ -76,3 +76,5 @@ class ZEPortalMapPortal
 };
 
 #endif
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PPDepthInputNode.cpp
+ Zinek Engine - ZEPPDepthInputNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PPDepthInputNode.h"
-#include "Graphics/Renderer.h"
-#include "Core/Error.h"
-#include "Definitions.h"
+#include "ZEPPDepthInputNode.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZECore\ZEError.h"
+#include "ZEDefinitions.h"
 
 ZEPPDepthInputNode::ZEPPDepthInputNode()
 {
@@ -95,3 +95,5 @@ ZEPPDepthInputNode* ZEPPDepthInputNode::CreateInstance()
 {
 	return new ZEPPDepthInputNode();
 }
+
+

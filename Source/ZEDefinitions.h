@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Definitions.h
+ Zinek Engine - ZEDefinitions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -44,3 +44,6 @@
 #define ZE_MAX_FILE_NAME_SIZE		256
 
 #endif
+
+
+

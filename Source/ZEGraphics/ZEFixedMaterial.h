@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - FixedMaterial.h
+ Zinek Engine - ZEFixedMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,12 +37,12 @@
 #ifndef __ZE_FIXED_MATERIAL_H__ 
 #define __ZE_FIXED_MATERIAL_H__
 
-#include "Material.h"
-#include "ZEMath/Vector.h"
-#include "Definitions.h"
-#include "ZEDS/Array.h"
-#include "ZEDS/Variant.h"
-#include "Meta/Class.h"
+#include "ZEMaterial.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEDefinitions.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEVariant.h"
+#include "ZEMeta\ZEClass.h"
 
 enum ZETextureFilterMode
 {
@@ -666,3 +666,5 @@ ZE_POST_PROCESSOR_START(Meta)
 ZE_POST_PROCESSOR_END()
 */
 #endif
+
+

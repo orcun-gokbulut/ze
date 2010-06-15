@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MapResource.cpp
+ Zinek Engine - ZEMapResource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "MapResource.h"
-#include "PortalMap/PortalMapResource.h"
+#include "ZEMapResource.h"
+#include "ZEPortalMap\ZEPortalMapResource.h"
 
 ZEMapResource* ZEMapResource::LoadResource(const char* FileName)
 {
@@ -49,3 +49,5 @@ void ZEMapResource::CacheResource(const char* FileName)
 {
 	ZEPortalMapResource::CacheResource(FileName);
 }
+
+

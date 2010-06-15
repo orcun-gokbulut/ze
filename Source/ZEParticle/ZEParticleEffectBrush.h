@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ParticleEffectBrush.h
+ Zinek Engine - ZEParticleEffectBrush.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_PARTICLE_SYSTEM_BRUSH_H__
 #define __ZE_PARTICLE_SYSTEM_BRUSH_H__
 
-#include "Game/CompoundEntity.h"
-#include "ParticleEffect.h"
+#include "ZEGame\ZECompoundEntity.h"
+#include "ZEParticleEffect.h"
 
 ZE_META_CLASS_DESCRIPTION(ZEParticleEffectBrush);
 
@@ -75,3 +75,5 @@ ZE_POST_PROCESSOR_END()
 */
 
 #endif
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9Renderer.cpp
+ Zinek Engine - ZED3D9Renderer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,21 +37,21 @@
 #define D3D_DEBUG_INFO
 #endif
 
-#include "D3D9Renderer.h"
-#include "D3D9VertexBuffer.h"
-#include "D3D9Texture2D.h"
-#include "D3D9Texture3D.h"
-#include "D3D9TextureCube.h"
-#include "D3D9Module.h"
-#include "D3D9CommonTools.h"
-#include "D3D9VertexDeclaration.h"
-#include "Graphics/Material.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/PointLight.h"
-#include "Graphics/DirectionalLight.h"
-#include "Graphics/ProjectiveLight.h"
-#include "Graphics/OmniProjectiveLight.h"
-#include "Core/Error.h"
+#include "ZED3D9Renderer.h"
+#include "ZED3D9VertexBuffer.h"
+#include "ZED3D9Texture2D.h"
+#include "ZED3D9Texture3D.h"
+#include "ZED3D9TextureCube.h"
+#include "ZED3D9Module.h"
+#include "ZED3D9CommonTools.h"
+#include "ZED3D9VertexDeclaration.h"
+#include "ZEGraphics\ZEMaterial.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZEPointLight.h"
+#include "ZEGraphics\ZEDirectionalLight.h"
+#include "ZEGraphics\ZEProjectiveLight.h"
+#include "ZEGraphics\ZEOmniProjectiveLight.h"
+#include "ZECore\ZEError.h"
 
 #pragma warning(disable:4267)
 
@@ -796,3 +796,5 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 
 
 }
+
+

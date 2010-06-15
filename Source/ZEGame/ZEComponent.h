@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Component.h
+ Zinek Engine - ZEComponent.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,14 +37,14 @@
 #ifndef __ZE_COMPONENT_H__
 #define __ZE_COMPONENT_H__
 
-#include "Entity.h"
-#include "ZEDS/Array.h"
-#include "ZEMath/Matrix.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "ZEMath/AABoundingBox.h"
-#include "ZEMath/OBoundingBox.h"
-#include "ZEMath/BoundingSphere.h"
+#include "ZEEntity.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath\ZEAABoundingBox.h"
+#include "ZEMath\ZEOBoundingBox.h"
+#include "ZEMath\ZEBoundingSphere.h"
 
 class ZERenderer;
 class ZECompoundEntity;
@@ -132,3 +132,6 @@ ZE_POST_PROCESSOR_START(Meta)
 ZE_POST_PROCESSOR_END()
 */
 #endif
+
+
+

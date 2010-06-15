@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXPhysicalWorld.h
+ Zinek Engine - ZEPhysXPhysicalWorld.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -40,14 +40,14 @@
 #include <NxScene.h>
 #include <NxSceneDesc.h>
 
-#include "Physics/PhysicalWorld.h"
-#include "PhysXComponentBase.h"
-#include "PhysXCollisionManager.h"
-#include "ZEDS/Array.h"
-#include "ZEMath/Vector.h"
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/VertexTypes.h"
-#include "Graphics/RenderOrder.h"
+#include "ZEPhysics\ZEPhysicalWorld.h"
+#include "ZEPhysXComponentBase.h"
+#include "ZEPhysXCollisionManager.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEGraphics\ZEVertexBuffer.h"
+#include "ZEGraphics\ZEVertexTypes.h"
+#include "ZEGraphics\ZERenderOrder.h"
 
 class ZEMaterial;
 class ZEPhysicalObject;
@@ -115,3 +115,5 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 };
 
 #endif
+
+

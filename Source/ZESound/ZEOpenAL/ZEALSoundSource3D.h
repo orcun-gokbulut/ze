@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ALSoundSource3D.h
+ Zinek Engine - ZEALSoundSource3D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_AL_SOUND_SOURCE_3D_H__
 #define __ZE_AL_SOUND_SOURCE_3D_H__
 
-#include "ALComponentBase.h"
-#include "../SoundSource3D.h"
+#include "ZEALComponentBase.h"
+#include "..\ZESoundSource3D.h"
 #include <al.h>
 
 class ZEALSoundSource3D : public ZESoundSource3D, public ZEALComponentBase
@@ -96,3 +96,5 @@ class ZEALSoundSource3D : public ZESoundSource3D, public ZEALComponentBase
 		virtual void				SetConeOutsideVolume(unsigned int NewOutsideVolume);
 };
 #endif
+
+

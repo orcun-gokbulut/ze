@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9PostProcessor.h
+ Zinek Engine - ZED3D9PostProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef __ZE_D3D9_POST_PROCESSOR_H__
 #define __ZE_D3D9_POST_PROCESSOR_H__
 
-#include "Graphics/PostProcessor/PostProcessor.h"
+#include "ZEGraphics\ZEPostProcessor\ZEPostProcessor.h"
 
 class ZEPostProcessorNode;
 
@@ -50,3 +50,5 @@ class ZED3D9PostProcessor : public ZEPostProcessor
 };
 
 #endif
+
+

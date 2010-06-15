@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - VirtualInputModuleDescription.cpp
+ Zinek Engine - ZEVirtualInputModuleDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "VirtualInputModuleDescription.h"
-#include "VirtualInputModule.h"
+#include "ZEVirtualInputModuleDescription.h"
+#include "ZEVirtualInputModule.h"
 
 ZEModuleType ZEVirtualInputModuleDescription::GetType()
 {
@@ -86,3 +86,5 @@ bool ZEVirtualInputModuleDescription::CheckCompatible()
 {
 	return true;
 }
+
+

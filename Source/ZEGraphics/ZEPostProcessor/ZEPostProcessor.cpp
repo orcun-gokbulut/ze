@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PostProcessor.cpp
+ Zinek Engine - ZEPostProcessor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PostProcessor.h"
-#include "PostProcessorNode.h"
-#include "Graphics/GraphicsModule.h"
-#include "Core/Error.h"
+#include "ZEPostProcessor.h"
+#include "ZEPostProcessorNode.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZECore\ZEError.h"
 #include <string.h>
 
 ZEPostProcessor::ZEPostProcessor()
@@ -52,10 +52,10 @@ ZEArray<ZEPostProcessorNode*>& ZEPostProcessor::GetNodes()
 	return Nodes;
 }
 
-#include "PPColorInputNode.h"
-#include "PPDepthInputNode.h"
-#include "PPVelocityInputNode.h"
-#include "PPTextureInputNode.h"
+#include "ZEPPColorInputNode.h"
+#include "ZEPPDepthInputNode.h"
+#include "ZEPPVelocityInputNode.h"
+#include "ZEPPTextureInputNode.h"
 
 ZEPostProcessorNode* ZEPostProcessor::CreateNode(const char* Name)
 {
@@ -145,3 +145,5 @@ ZEPostProcessor* ZEPostProcessor::CreateInstance()
 {
 	return zeGraphics->CreatePostProcessor();
 }
+
+

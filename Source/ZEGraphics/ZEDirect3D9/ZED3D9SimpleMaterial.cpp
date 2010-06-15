@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9SimpleMaterial.cpp
+ Zinek Engine - ZED3D9SimpleMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9SimpleMaterial.h"
-#include "D3D9CommonTools.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/Camera.h"
-#include "Core/ResourceFile.h"
+#include "ZED3D9SimpleMaterial.h"
+#include "ZED3D9CommonTools.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZECamera.h"
+#include "ZECore\ZEResourceFile.h"
 #include <D3D9.h>
 
 LPDIRECT3DVERTEXSHADER9 ZED3D9SimpleMaterial::VertexShader = NULL;
@@ -174,3 +174,5 @@ void ZED3D9SimpleMaterial::Release()
 {
 
 }
+
+

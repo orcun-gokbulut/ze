@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Quaternion.h
+ Zinek Engine - ZEQuaternion.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef	__ZE_MATH_QUATERNION_H__
 #define __ZE_MATH_QUATERNION_H__
 
-#include "definitions.h"
-#include "vector.h"
-#include "matrix.h"
+#include "ZEdefinitions.h"
+#include "ZEvector.h"
+#include "ZEmatrix.h"
 
 class ZEQuaternion
 {
@@ -94,3 +94,5 @@ class ZEQuaternion
 
 
 #endif
+
+

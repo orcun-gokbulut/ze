@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - VirtualInputModule.h
+ Zinek Engine - ZEVirtualInputModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,7 +38,7 @@
 #define __ZE_DUMMY_INPUT_MODULE_H__
 
 #define ZE_VIRTUAL_INPUT_MAX_INPUT_COUNT	50
-#include "Input/InputModule.h"
+#include "ZEInput\ZEInputModule.h"
 
 class ZEVirtualInputModule: public ZEInputModule 
 {	
@@ -84,5 +84,7 @@ class ZEVirtualInputModule: public ZEInputModule
 
 
   
+
+
 
 

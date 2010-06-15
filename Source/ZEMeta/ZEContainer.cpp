@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Container.cpp
+ Zinek Engine - ZEContainer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Container.h"
-#include "Class.h"
+#include "ZEContainer.h"
+#include "ZEClass.h"
 
 ZEClassDescription* ZEContainer::GetBaseClassDescription()
 {
@@ -67,3 +67,5 @@ ZEContainer::ZEContainer(ZEClassDescription* BaseClassDescription)
 {
 	this->BaseClassDescription = BaseClassDescription;
 }
+
+

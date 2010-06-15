@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ModelMeshLOD.h
+ Zinek Engine - ZEModelMeshLOD.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_MODEL_MESH_LOD_H__
 #define __ZE_MODEL_MESH_LOD_H__
 
-#include "Graphics/RenderOrder.h"
-#include "Graphics/Canvas.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZECanvas.h"
 
 class ZEModel;
 class ZEMaterial;
@@ -78,4 +78,6 @@ class ZEModelMeshLOD
 											~ZEModelMeshLOD();
 };
 #endif
+
+
 

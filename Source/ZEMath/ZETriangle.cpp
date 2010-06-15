@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Triangle.cpp
+ Zinek Engine - ZETriangle.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Triangle.h"
-#include "Plane.h"
-#include "Definitions.h"
-#include "LineSegment.h"
-#include "Line.h"
-#include "Ray.h"
+#include "ZETriangle.h"
+#include "ZEPlane.h"
+#include "ZEDefinitions.h"
+#include "ZELineSegment.h"
+#include "ZELine.h"
+#include "ZERay.h"
 #include <math.h>
 
 void ZETriangle::Create(ZETriangle& Triangle, const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2)
@@ -155,3 +155,5 @@ ZETriangle::ZETriangle(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3
 {
 	Create(*this, V0, V1, V2);
 }
+
+

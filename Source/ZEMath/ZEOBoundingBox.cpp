@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - OBoundingBox.cpp
+ Zinek Engine - ZEOBoundingBox.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "BoundingSphere.h"
-#include "AABoundingBox.h"
-#include "OBoundingBox.h"
+#include "ZEBoundingSphere.h"
+#include "ZEAABoundingBox.h"
+#include "ZEOBoundingBox.h"
 
 #include <math.h>
 
@@ -185,3 +185,5 @@ bool ZEOBoundingBox::CollisionTest(const ZEOBoundingBox& BoundingBox, const ZEBo
 	ZEASSERT(true "Not implamented");
 	return false;
 }*/
+
+

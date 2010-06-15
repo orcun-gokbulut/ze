@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ViewVolume.cpp
+ Zinek Engine - ZEViewVolume.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ViewVolume.h"
-#include "Game/Component.h"
-#include "Core/Error.h"
-#include "Game/Entity.h"
-#include "Graphics/Light.h"
+#include "ZEViewVolume.h"
+#include "ZEGame\ZEComponent.h"
+#include "ZECore\ZEError.h"
+#include "ZEGame\ZEEntity.h"
+#include "ZEGraphics\ZELight.h"
 
 bool ZEViewFrustum::ConeCullTest(const ZEBoundingSphere& BoundingSphere) const
 {
@@ -692,3 +692,5 @@ void CutPortalDoorWithLine(ZEVector3 & Out1,ZEVector3 & Out2,const ZERectangle3D
 
 	zeAssert(true, "PortalDoorVSFrustumPlaneIntersection test error, Ozan should control it");
 }*/
+
+

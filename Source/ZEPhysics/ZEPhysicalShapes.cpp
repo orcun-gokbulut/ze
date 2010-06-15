@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalShapes.cpp
+ Zinek Engine - ZEPhysicalShapes.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysicalShapes.h"
+#include "ZEPhysicalShapes.h"
 
 // Physical Shape
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -239,3 +239,5 @@ const ZEArray<ZEVector3>& ZEPhysicalConvexShape::GetConvexVertices()
 {
 	return ConvexVertices;
 }
+
+

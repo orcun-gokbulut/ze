@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Listener.cpp
+ Zinek Engine - ZEListener.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Listener.h"
-#include "SoundModule.h"
+#include "ZEListener.h"
+#include "ZESoundModule.h"
 
 ZEListener::ZEListener()
 {
@@ -92,3 +92,5 @@ ZEListener* ZEListener::CreateInstance()
 {
 	return zeSound->CreateListener();
 }
+
+

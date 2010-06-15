@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Ray.cpp
+ Zinek Engine - ZERay.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Definitions.h"
-#include "Ray.h"
-#include "LineSegment.h"
-#include "Vector.h"
-#include "Plane.h"
+#include "ZEDefinitions.h"
+#include "ZERay.h"
+#include "ZELineSegment.h"
+#include "ZEVector.h"
+#include "ZEPlane.h"
 #include <d3dx9.h>
 
 void ZERay::Create(ZERay & Ray, const ZEVector3 & Start,const ZEVector3 & End)
@@ -224,4 +224,6 @@ ZERay::ZERay(const ZEVector3 & v,const ZEVector3 &p)
 ZERay::ZERay() 
 {
 }
+
+
 

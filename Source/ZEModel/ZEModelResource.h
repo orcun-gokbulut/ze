@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ModelResource.h
+ Zinek Engine - ZEModelResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,13 +37,13 @@
 #ifndef	__ZE_MODEL_RESOURCE_H__
 #define __ZE_MODEL_RESOURCE_H__
 
-#include "Core/Resource.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "ZEMath/Matrix.h"
-#include "ZEMath/AABoundingBox.h"
-#include "ZEDS/Array.h"
-#include "Graphics/VertexTypes.h"
+#include "ZECore\ZEResource.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEMath\ZEAABoundingBox.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEGraphics\ZEVertexTypes.h"
 
 class ZEStaticVertexBuffer;
 class ZETexture2DResource;
@@ -52,8 +52,8 @@ class ZEMaterial;
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256
 
-#include "Physics/PhysicalRigidBody.h"
-#include "Physics/PhysicalShapes.h"
+#include "ZEPhysics\ZEPhysicalRigidBody.h"
+#include "ZEPhysics\ZEPhysicalShapes.h"
 
 /*
 enum ZEPhysicalShapeType
@@ -382,4 +382,6 @@ class ZEModelResource : public ZEResource
 };
 
 #endif
+
+
 

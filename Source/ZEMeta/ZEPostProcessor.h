@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PostProcessor.h
+ Zinek Engine - ZEPostProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -40,3 +40,5 @@
 #define ZE_POST_PROCESSOR_START(x)
 #define ZE_POST_PROCESSOR_ENDT(x)
 #endif
+
+

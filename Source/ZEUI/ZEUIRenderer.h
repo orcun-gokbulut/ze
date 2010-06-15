@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UIRenderer.h
+ Zinek Engine - ZEUIRenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,10 +37,10 @@
 #ifndef __ZE_UI_RENDERER_H__
 #define __ZE_UI_RENDERER_H__
 
-#include "UIRectangle.h"
-#include "ZEDS/Array.h"
-#include "ZEMath/Matrix.h"
-#include "Graphics/Renderer.h"
+#include "ZEUIRectangle.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEGraphics\ZERenderer.h"
 
 class ZEVertexDeclaration;
 class ZEUIRenderer
@@ -69,3 +69,5 @@ class ZEUIRenderer
 };
 
 #endif
+
+

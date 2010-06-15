@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMapPortal.cpp
+ Zinek Engine - ZEPortalMapPortal.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,14 +32,15 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "Core/Core.h"
-#include "PortalMapPortal.h"
-#include "PortalMapResource.h"
-#include "Physics/PhysicalStaticMesh.h"
-#include "Graphics/Light.h"
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/Renderer.h"
-#include "Game/DrawParameters.h"
+
+#include "ZECore\ZECore.h"
+#include "ZEPortalMapPortal.h"
+#include "ZEPortalMapResource.h"
+#include "ZEPhysics\ZEPhysicalStaticMesh.h"
+#include "ZEGraphics\ZELight.h"
+#include "ZEGraphics\ZEVertexBuffer.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZEGame\ZEDrawParameters.h"
 
 ZEPortalMap* ZEPortalMapPortal::GetOwner()
 {
@@ -80,7 +81,7 @@ void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 	}
 }
 
-#include "Core/Console.h"
+#include "ZECore\ZEConsole.h"
 bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource)
 {	
 	//int LastIteration = zeCore->GetFrameId() + 1;
@@ -163,3 +164,4 @@ ZEPortalMapPortal::~ZEPortalMapPortal()
 {
 	Deinitialize();
 }
+

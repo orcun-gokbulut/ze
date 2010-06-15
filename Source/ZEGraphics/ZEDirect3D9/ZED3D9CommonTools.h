@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9CommonTools.h
+ Zinek Engine - ZED3D9CommonTools.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -39,8 +39,8 @@
 
 #include <d3d9.h>
 #include <d3dx9.h>
-#include "Graphics/Texture.h"
-#include "D3D9ComponentBase.h"
+#include "ZEGraphics\ZETexture.h"
+#include "ZED3D9ComponentBase.h"
 
 #define ZED3D_RELEASE(x) if ((x) != NULL) {(x)->Release(); (x) = NULL;}
 
@@ -58,3 +58,5 @@ class ZED3D9CommonTools : public ZED3D9ComponentBase
 		static bool				CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height, ZETexturePixelFormat Format);
 };
 #endif
+
+

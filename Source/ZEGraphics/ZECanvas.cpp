@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Canvas.cpp
+ Zinek Engine - ZECanvas.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath/Definitions.h"
-#include "Canvas.h"
-#include "Core/Error.h"
-#include "Core/ResourceFile.h"
-#include "Graphics/VertexDeclaration.h"
+#include "ZEMath\ZEDefinitions.h"
+#include "ZECanvas.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEResourceFile.h"
+#include "ZEGraphics\ZEVertexDeclaration.h"
 
 #include <stdio.h>
 
@@ -767,3 +767,5 @@ ZECanvas::ZECanvas()
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
 }
+
+

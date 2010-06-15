@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - VertexDeclaration.cpp
+ Zinek Engine - ZEVertexDeclaration.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "VertexDeclaration.h"
-#include "Definitions.h"
-#include "Core/Error.h"
-#include "Core/ResourceFile.h"
-#include "Graphics/GraphicsModule.h"
+#include "ZEVertexDeclaration.h"
+#include "ZEDefinitions.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEResourceFile.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
 
 #define ZE_FILE_FORMAT_MAKEVERSION(Major, Minor)		((ZEDWORD)((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor)))
 #define ZE_FILE_FORMAT_GETMINORVERSION(x)				((ZEDWORD)((x) & 0x0000FFFF))
@@ -138,4 +138,6 @@ ZEVertexDeclaration* ZEVertexDeclaration::CreateInstance()
 {
 	return zeGraphics->CreateVertexDeclaration();
 }
+
+
 

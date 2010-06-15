@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Renderer.h
+ Zinek Engine - ZERenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef __ZE_RENDERER_H__
 #define __ZE_RENDERER_H__
 
-#include "ZEDS/Array.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Matrix.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEMatrix.h"
 
 struct ZEViewPoint
 {
@@ -106,3 +106,5 @@ class ZERenderer
 };
 
 #endif
+
+

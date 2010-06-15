@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UIControl.h
+ Zinek Engine - ZEUIControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,12 +37,12 @@
 #ifndef __ZE_UI_COMPONENT__
 #define __ZE_UI_COMPONENT__
 
-#include "ZEDS/Array.h"
-#include "ZEDS/String.h"
-#include "ZEMath/Vector.h"
-#include "UIRectangle.h"
-#include "UIEvents.h"
-#include "FastDelegate.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEString.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEUIRectangle.h"
+#include "ZEUIEvents.h"
+#include "ZEFastDelegate.h"
 
 enum ZEUIControlVisibility
 {
@@ -177,3 +177,5 @@ class ZEUIControl
 
 
 #endif
+
+

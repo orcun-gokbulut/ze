@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundResourceWAV.h
+ Zinek Engine - ZESoundResourceWAV.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_SOUND_RESOURCE_WAV_H__
 #define __ZE_SOUND_RESOURCE_WAV_H__
 
-#include "SoundResource.h"
+#include "ZESoundResource.h"
 
 class ZESoundResourceWAV : public ZESoundResource
 {
@@ -58,3 +58,5 @@ class ZESoundResourceWAV : public ZESoundResource
 };
 
 #endif
+
+

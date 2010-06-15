@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SimpleMaterial.h
+ Zinek Engine - ZESimpleMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef __ZE_SIMPLE_MATERIAL_H__ 
 #define __ZE_SIMPLE_MATERIAL_H__
 
-#include "Material.h"
+#include "ZEMaterial.h"
 
 class ZESimpleMaterial : public ZEMaterial
 {
@@ -62,3 +62,5 @@ class ZESimpleMaterial : public ZEMaterial
 };
 
 #endif
+
+

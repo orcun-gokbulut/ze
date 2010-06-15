@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ModelResource.cpp
+ Zinek Engine - ZEModelResource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,15 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ModelResource.h"
-#include "Core/ResourceManager.h"
-#include "Core/Console.h"
-#include "Core/Error.h"
-#include "Graphics/GraphicsModule.h"
-#include "Graphics/Texture2DResource.h"
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/FixedMaterial.h"
-#include "ModelFileFormat.h"
+#include "ZEModelResource.h"
+#include "ZECore\ZEResourceManager.h"
+#include "ZECore\ZEConsole.h"
+#include "ZECore\ZEError.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGraphics\ZETexture2DResource.h"
+#include "ZEGraphics\ZEVertexBuffer.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZEModelFileFormat.h"
 #include <memory.h>
 #include <string.h>
 
@@ -762,3 +762,5 @@ ZEModelResource::~ZEModelResource()
 	for (int I = 0; I < TextureResources.GetCount(); I++)
 		TextureResources[I]->Release();
 }
+
+

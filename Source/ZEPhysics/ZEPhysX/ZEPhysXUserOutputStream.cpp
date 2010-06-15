@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXUserOutputStream.cpp
+ Zinek Engine - ZEPhysXUserOutputStream.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysXUserOutputStream.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
+#include "ZEPhysXUserOutputStream.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
 
 void ZEPhysXUserOutputStream::reportError(NxErrorCode Code, const char* Message, const char* File, int Line)
 {
@@ -79,3 +79,5 @@ void ZEPhysXUserOutputStream::print(const char* Message)
 {
 	zeLog("PhysX", Message);
 }
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PointLight.h
+ Zinek Engine - ZEPointLight.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_POINT_LIGHT_H__
 #define __ZE_POINT_LIGHT_H__
 
-#include "Light.h"
-#include "ViewVolume.h"
+#include "ZELight.h"
+#include "ZEViewVolume.h"
 
 class ZETextureCube;
 
@@ -63,3 +63,5 @@ class ZEPointLight  : public ZELight
 };
 
 #endif
+
+

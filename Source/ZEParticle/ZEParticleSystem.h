@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ParticleSystem.h
+ Zinek Engine - ZEParticleSystem.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,11 +37,11 @@
 #ifndef __ZE_PARTICLE_SYSTEM_H__
 #define __ZE_PARTICLE_SYSTEM_H__
 
-#include "ZEDS/Array.h"
-#include "ZEDS/String.h"
-#include "ZEMath/Vector.h"
-#include "Graphics/RenderOrder.h"
-#include "Meta/Class.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEString.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEMeta\ZEClass.h"
 
 ZE_META_CLASS_DESCRIPTION(ZEParticleSystem);
 
@@ -129,3 +129,5 @@ ZE_POST_PROCESSOR_END()
 */
 
 #endif
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - InputDefinitions.h
+ Zinek Engine - ZEInputDefinitions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -283,3 +283,5 @@ const char* zeGetKeyboardButtonName(unsigned char Key);
 const char* zeGetKeyboardButtonShortName(unsigned char Key);
 
 #endif
+
+

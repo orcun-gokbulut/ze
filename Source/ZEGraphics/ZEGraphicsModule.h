@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - GraphicsModule.h
+ Zinek Engine - ZEGraphicsModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_GRAPHICS_MODULE_H__
 #define __ZE_GRAPHICS_MODULE_H__
 
-#include "Core/Module.h"
-#include "Core/Option.h"
+#include "ZECore\ZEModule.h"
+#include "ZECore\ZEOption.h"
 
 #define zeGraphics ZEGraphicsModule::GetInstance()
 
@@ -141,3 +141,5 @@ class ZEGraphicsModule : public ZEModule
 		static ZEGraphicsModule*			GetInstance();
 };
 #endif
+
+

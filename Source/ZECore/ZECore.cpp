@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Core.cpp
+ Zinek Engine - ZECore.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,21 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "CompileOptions.h"
-#include "Core.h"
-#include "Error.h"
-#include "Module.h"
-#include "ModuleManager.h"
-#include "Console.h"
-#include "ConsoleWindow.h"
-#include "ResourceManager.h"
-#include "Window.h"
-#include "Graphics/GraphicsModule.h"
-#include "Input/InputModule.h"
-#include "Physics/PhysicsModule.h"
-#include "Sound/SoundModule.h"
-#include "Game/Game.h"
-#include "Debug/DebugModule.h"
+#include "ZECompileOptions.h"
+#include "ZECore.h"
+#include "ZEError.h"
+#include "ZEModule.h"
+#include "ZEModuleManager.h"
+#include "ZEConsole.h"
+#include "ZEConsoleWindow.h"
+#include "ZEResourceManager.h"
+#include "ZEWindow.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEInput\ZEInputModule.h"
+#include "ZEPhysics\ZEPhysicsModule.h"
+#include "ZESound\ZESoundModule.h"
+#include "ZEGame\ZEGame.h"
+#include "ZEDebug\ZEDebugModule.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
@@ -541,7 +541,7 @@ void ZECore::ShutDown()
 	exit(0);
 }
 
-#include "Physics/PhysicalWorld.h"
+#include "ZEPhysics\ZEPhysicalWorld.h"
 void ZECore::MainLoop()
 {
 	if (DebugComponent != NULL)
@@ -647,3 +647,6 @@ ZECore::~ZECore()
 	delete Commands;
 	delete Console;
 }
+
+
+

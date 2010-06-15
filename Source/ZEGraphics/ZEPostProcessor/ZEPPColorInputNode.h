@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PPColorInputNode.h
+ Zinek Engine - ZEPPColorInputNode.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef __ZE_PP_COLOR_INPUT_NODE_H__
 #define __ZE_PP_COLOR_INPUT_NODE_H__
 
-#include "PostProcessorNode.h"
+#include "ZEPostProcessorNode.h"
 
 class ZETexture2D;
 class ZERenderer;
@@ -65,3 +65,5 @@ class ZEPPColorInputNode : public ZEPostProcessorNode
 };
 
 #endif
+
+

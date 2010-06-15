@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UIEvents.h
+ Zinek Engine - ZEUIEvents.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_UI_EVENTS_H__
 #define __ZE_UI_EVENTS_H__
 
-#include "ZEMath/Vector.h"
-#include <fastdelegate.h>
+#include "ZEMath\ZEVector.h"
+#include "ZEFastDelegate.h"
 
 enum ZEUIMouseKey
 {
@@ -74,3 +74,5 @@ typedef fastdelegate::FastDelegate1<bool, void>								ZEUIEventWindowClosed;
 typedef fastdelegate::FastDelegate0<void>									ZEUIEventWindowMinimized;
 
 #endif
+
+

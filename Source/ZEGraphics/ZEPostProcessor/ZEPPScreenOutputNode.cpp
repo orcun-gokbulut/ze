@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PPScreenOutputNode.cpp
+ Zinek Engine - ZEPPScreenOutputNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PPScreenOutputNode.h"
-#include "Definitions.h"
+#include "ZEPPScreenOutputNode.h"
+#include "ZEDefinitions.h"
 
 ZEPPScreenOutputNode::ZEPPScreenOutputNode()
 {
@@ -65,3 +65,5 @@ ZEPostProcessorNode* ZEPPScreenOutputNode::GetInput()
 {
 	return Input;
 }
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9CommonTools.cpp
+ Zinek Engine - ZED3D9CommonTools.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9CommonTools.h"
-#include "Core/Error.h"
+#include "ZED3D9CommonTools.h"
+#include "ZECore\ZEError.h"
 #include <d3dx9.h>
 
 #ifdef ZE_DEBUG_SHADERS
@@ -295,3 +295,5 @@ bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DTEXTURE9* Target, int 
 
 	return true;
 }
+
+

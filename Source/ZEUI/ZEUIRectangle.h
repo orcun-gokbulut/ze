@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UIRectangle.h
+ Zinek Engine - ZEUIRectangle.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_UI_RECTANGLE_H__
 #define __ZE_UI_RECTANGLE_H__
 
-#include "ZEMath/Vector.h"
-#include "ZEMath/Rectangle.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZERectangle.h"
 
 struct ZEUIVertex;
 class ZEMaterial;
@@ -55,3 +55,5 @@ class ZEUIRectangle
 		void				ConvertToVertices(ZEUIVertex* Buffer) const;
 };
 #endif
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9PPScreenOutputNode.cpp
+ Zinek Engine - ZED3D9PPScreenOutputNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9PPScreenOutputNode.h"
-#include "Core/Error.h"
-#include "Graphics/Texture2D.h"
-#include "../D3D9CommonTools.h"
-#include "../D3D9Module.h"
+#include "ZED3D9PPScreenOutputNode.h"
+#include "ZECore\ZEError.h"
+#include "ZEGraphics\ZETexture2D.h"
+#include "..\ZED3D9CommonTools.h"
+#include "..\ZED3D9Module.h"
 
 LPDIRECT3DPIXELSHADER9 ZED3D9PPScreenOutputNode::PixelShader = NULL;
 LPDIRECT3DVERTEXSHADER9 ZED3D9PPScreenOutputNode::VertexShader = NULL;
@@ -164,3 +164,5 @@ ZETexture2D* ZED3D9PPScreenOutputNode::GetOutput()
 {
 	return NULL;
 }
+
+

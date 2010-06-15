@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - FontFile.h
+ Zinek Engine - ZEFontFile.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Types.h"
+#include "ZETypes.h"
 
 #define ZE_FONT_FILE_HEADER						((ZEDWORD)((ZEDWORD)'ZEFF' + (ZEDWORD)'FONT'))
 #define ZE_FONT_FILE_CHARACTER_COUNT			256
 
-#include "ZEMath/Rectangle.h"
+#include "ZEMath\ZERectangle.h"
 
 struct ZEFontFileCharacter
 {
@@ -52,3 +52,5 @@ struct ZEFontFileHeader
 	ZEDWORD						TextureCount;
 	ZEFontFileCharacter			Characters[ZE_FONT_FILE_CHARACTER_COUNT];
 };
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - FontResource.h
+ Zinek Engine - ZEFontResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef	__ZE_FONT_RESOURCE_H__
 #define __ZE_FONT_RESOURCE_H__
 
-#include "Core/Resource.h"
-#include "ZEDS/Array.h"
-#include "ZEMath/Rectangle.h"
+#include "ZECore\ZEResource.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZERectangle.h"
 
 #define ZE_FONT_CHARACTER_COUNT				256
 
@@ -78,3 +78,5 @@ class ZEFontResource : public ZEResource
 
 };
 #endif
+
+

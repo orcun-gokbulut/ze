@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DirectInputModule.cpp
+ Zinek Engine - ZEDirectInputModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DirectInputModule.h"
-#include "DirectInputModuleDescription.h"
-#include "Core/Error.h"
-#include "Core/Window.h"
-#include "Core/Console.h"
-#include "Core/Core.h"
+#include "ZEDirectInputModule.h"
+#include "ZEDirectInputModuleDescription.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEWindow.h"
+#include "ZECore\ZEConsole.h"
+#include "ZECore\ZECore.h"
 #include <dinput.h>
 
 #define WINDOWS_MEAN_AND_LEAN
@@ -518,3 +518,5 @@ ZEDirectInputModule::~ZEDirectInputModule()
 {
 	Deinitialize();
 }
+
+

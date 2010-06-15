@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MapResource.h
+ Zinek Engine - ZEMapResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_MAP_RESOURCE_H__
 #define __ZE_MAP_RESOURCE_H__
 
-#include "Core/Resource.h"
-#include "ZEDS/Array.h"
+#include "ZECore\ZEResource.h"
+#include "ZEDS\ZEArray.h"
 
 class ZEMapResource : public ZEResource
 {
@@ -49,3 +49,5 @@ class ZEMapResource : public ZEResource
 };
 
 #endif
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PPFilter1DNode.h
+ Zinek Engine - ZEPPFilter1DNode.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_PP_LINEAR_KERNEL_FILTER_NODE_H__
 #define __ZE_PP_LINEAR_KERNEL_FILTER_NODE_H__
 
-#include "ZEDS/Array.h"
-#include "PostProcessorNode.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEPostProcessorNode.h"
 
 class ZETexture2D;
 
@@ -85,3 +85,5 @@ class ZEPPFilter1DNode : public ZEPostProcessorNode
 };
 
 #endif
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UIRenderer.cpp
+ Zinek Engine - ZEUIRenderer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,13 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "UIRenderer.h"
-#include "Graphics/GraphicsModule.h"
-#include "Graphics/VertexDeclaration.h"
-#include "Graphics/FixedMaterial.h"
-#include "Graphics/VertexTypes.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/VertexBuffer.h"
+#include "ZEUIRenderer.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGraphics\ZEVertexDeclaration.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZEGraphics\ZEVertexTypes.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZEVertexBuffer.h"
 
 ZEUIRenderer::ZEUIRenderer()
 {
@@ -146,3 +146,5 @@ ZEUIRenderer* ZEUIRenderer::CreateInstance()
 {
 	return new ZEUIRenderer();
 }
+
+

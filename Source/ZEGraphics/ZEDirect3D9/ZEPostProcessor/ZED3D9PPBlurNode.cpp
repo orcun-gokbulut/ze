@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9PPBlurNode.cpp
+ Zinek Engine - ZED3D9PPBlurNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9PPBlurNode.h"
-#include "Core/Error.h"
-#include "../D3D9CommonTools.h"
-#include "../D3D9Texture2D.h"
-#include "../D3D9Module.h"
+#include "ZED3D9PPBlurNode.h"
+#include "ZECore\ZEError.h"
+#include "..\ZED3D9CommonTools.h"
+#include "..\ZED3D9Texture2D.h"
+#include "..\ZED3D9Module.h"
 
 LPDIRECT3DVERTEXSHADER9 ZED3D9PPBlurNode::VertexShader = NULL;
 LPDIRECT3DPIXELSHADER9 ZED3D9PPBlurNode::VerticalPassPixelShader = NULL;
@@ -386,3 +386,5 @@ ZETexture2D* ZED3D9PPBlurNode::GetOutput()
 {
 	return Output;
 }*/
+
+

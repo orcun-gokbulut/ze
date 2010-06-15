@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSModule.cpp
+ Zinek Engine - ZEDSModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DSModule.h"
-#include "DSModuleDescription.h"
-#include "ZEMath/Vector.h"
-#include "Core/Core.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
-#include "Core/Window.h"
-#include "DSListener.h"
-#include "DSSoundSource.h"
-#include "DSSoundSource3D.h"
+#include "ZEDSModule.h"
+#include "ZEDSModuleDescription.h"
+#include "ZEMath\ZEVector.h"
+#include "ZECore\ZECore.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
+#include "ZECore\ZEWindow.h"
+#include "ZEDSListener.h"
+#include "ZEDSSoundSource.h"
+#include "ZEDSSoundSource3D.h"
 #include <dsound.h>
 
 #define MAX_SOUNDBUFFER_COUNT	256
@@ -376,3 +376,5 @@ ZEListener* ZEDSModule::CreateListener()
 	Listeners.Add(Listener);
 	return Listener;
 }
+
+

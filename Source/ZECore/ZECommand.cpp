@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Command.cpp
+ Zinek Engine - ZECommand.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#include "Command.h"
-#include "Core.h"
-#include "Error.h"
-#include "Console.h"
+#include "ZECommand.h"
+#include "ZECore.h"
+#include "ZEError.h"
+#include "ZEConsole.h"
 #include <stdarg.h>
 
 #pragma warning(push)
@@ -335,3 +335,6 @@ ZECommandManager::~ZECommandManager()
 }
 
 #pragma warning(pop)
+
+
+

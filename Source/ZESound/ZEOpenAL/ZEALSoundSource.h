@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ALSoundSource.h
+ Zinek Engine - ZEALSoundSource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_AL_SOUND_SOURCE_H__
 #define __ZE_AL_SOUND_SOURCE_H__
 
-#include "ALComponentBase.h"
-#include "../SoundSource.h"
+#include "ZEALComponentBase.h"
+#include "..\ZESoundSource.h"
 #include <al.h>
 
 class ZEALSoundSource : public ZESoundSource, public ZEALComponentBase
@@ -88,3 +88,5 @@ class ZEALSoundSource : public ZESoundSource, public ZEALComponentBase
 };
 
 #endif
+
+

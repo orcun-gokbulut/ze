@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9ShadowRenderer.h
+ Zinek Engine - ZED3D9ShadowRenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_D3D9_SHADOW_RENDERER_H__
 #define __ZE_D3D9_SHADOW_RENDERER_H__
 
-#include "Graphics/ShadowRenderer.h"
-#include "D3D9ComponentBase.h"
+#include "ZEGraphics\ZEShadowRenderer.h"
+#include "ZED3D9ComponentBase.h"
 #include <d3d9.h>
 
 class ZETexture2D;
@@ -94,3 +94,5 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 };
 
 #endif
+
+

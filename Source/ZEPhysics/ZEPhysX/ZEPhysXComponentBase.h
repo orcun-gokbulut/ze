@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXComponentBase.h
+ Zinek Engine - ZEPhysXComponentBase.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_PHYSX_COMPONENT_BASE_H__
 #define __ZE_PHYSX_COMPONENT_BASE_H__
 
-#include "PhysXModule.h"
+#include "ZEPhysXModule.h"
 
 class NxPhysicsSDK;
 
@@ -83,3 +83,5 @@ class ZEPhysXComponentBase
 };
 
 #endif
+
+

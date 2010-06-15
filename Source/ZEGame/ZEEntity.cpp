@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Entity.cpp
+ Zinek Engine - ZEEntity.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Entity.h"
-#include "ZEMath/Matrix.h"
-#include "ZEMath/Ray.h"
-#include "Core/Error.h"
-#include "Component.h"
+#include "ZEEntity.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEMath\ZERay.h"
+#include "ZECore\ZEError.h"
+#include "ZEComponent.h"
 #include <string.h>
 
 void ZEEntity::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
@@ -262,9 +262,12 @@ ZEEntity::~ZEEntity()
 {
 }
 
-#include "Entity.h.zpp"
+#include "ZEEntity.h.zpp"
 
 ZEEntityRunAt ZEEntityDescription::GetRunAt() const
 {
 	return ZE_ERA_NONE;
 }
+
+
+

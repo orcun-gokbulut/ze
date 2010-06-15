@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ConsoleWindow.h
+ Zinek Engine - ZEConsoleWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_WIN32_CONSOLE_H__
 #define __ZE_WIN32_CONSOLE_H__
 
-#include "Core/Console.h"
+#include "ZECore\ZEConsole.h"
 
 class ZEConsoleWindow : public ZEConsoleInterface
 {
@@ -63,3 +63,6 @@ class ZEConsoleWindow : public ZEConsoleInterface
 								~ZEConsoleWindow(void);
 };
 #endif
+
+
+

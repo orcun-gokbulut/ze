@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXPhysicalStaticMesh.h
+ Zinek Engine - ZEPhysXPhysicalStaticMesh.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_PHYSX_PHYSICAL_STATIC_MESH_H__
 #define __ZE_PHYSX_PHYSICAL_STATIC_MESH_H__
 
-#include "Physics/PhysicalStaticMesh.h"
-#include "PhysXComponentBase.h"
+#include "ZEPhysics\ZEPhysicalStaticMesh.h"
+#include "ZEPhysXComponentBase.h"
 
 #include <NxActor.h>
 #include <NxActorDesc.h>
@@ -98,3 +98,5 @@ class ZEPhysXPhysicalStaticMesh : public ZEPhysicalStaticMesh, private ZEPhysXCo
 };
 
 #endif
+
+

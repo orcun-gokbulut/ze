@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ParticleEffect.h
+ Zinek Engine - ZEParticleEffect.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef __ZE_PARTICLE_EFFECT_H__
 #define __ZE_PARTICLE_EFFECT_H__
 
-#include "Game/Component.h"
-#include "ZEDS/Array.h"
-#include "ParticleSystem.h"
+#include "ZEGame\ZEComponent.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEParticleSystem.h"
 
 struct ZEDrawParameters;
 
@@ -68,3 +68,5 @@ class ZEParticleEffect : public ZEComponent
 };
 
 #endif
+
+

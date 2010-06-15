@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ModelBone.h
+ Zinek Engine - ZEModelBone.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,10 +37,10 @@
 #ifndef	__ZE_MODEL_BONE_H__
 #define __ZE_MODEL_BONE_H__
 
-#include "ZEDS/Array.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Matrix.h"
-#include "ModelAnimation.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEModelAnimation.h"
 
 class ZEModel;
 class ZEPhysicalRigidBody;
@@ -134,4 +134,6 @@ class ZEModelBone
 											~ZEModelBone();
 };
 #endif
+
+
 

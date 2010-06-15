@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DirectInputModuleDescription.cpp
+ Zinek Engine - ZEDirectInputModuleDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DirectInputModuleDescription.h"
-#include "DirectInputModule.h"
+#include "ZEDirectInputModuleDescription.h"
+#include "ZEDirectInputModule.h"
 
 ZEModuleType ZEDirectInputModuleDescription::GetType()
 {
@@ -86,3 +86,5 @@ bool ZEDirectInputModuleDescription::CheckCompatible()
 {
 	return true;
 }
+
+

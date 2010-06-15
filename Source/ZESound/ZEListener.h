@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Listener.h
+ Zinek Engine - ZEListener.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_LISTENER_H__
 #define __ZE_LISTENER_H__
 
-#include "Game/Component.h"
+#include "ZEGame\ZEComponent.h"
 
 class ZEListener: public ZEComponent
 {	
@@ -66,3 +66,5 @@ class ZEListener: public ZEComponent
 };
 
 #endif
+
+

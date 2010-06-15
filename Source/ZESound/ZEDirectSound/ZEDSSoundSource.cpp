@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSSoundSource.cpp
+ Zinek Engine - ZEDSSoundSource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DSSoundSource.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
+#include "ZEDSSoundSource.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
 
 bool ZEDSSoundSource::CreateBuffer(bool Is3D)
 {
@@ -445,3 +445,5 @@ void ZEDSSoundSource::SetSoundResource(ZESoundResource* Resource)
 		}
 	}
 }
+
+

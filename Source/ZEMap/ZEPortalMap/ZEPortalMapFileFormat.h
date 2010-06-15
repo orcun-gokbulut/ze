@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMapFileFormat.h
+ Zinek Engine - ZEPortalMapFileFormat.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,11 +37,11 @@
 #ifndef __ZE_PORTAL_MAP_FILE_FORMAT_H__
 #define __ZE_PORTAL_MAP_FILE_FORMAT_H__
 
-#include "Definitions.h"
-#include "Types.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/AABoundingBox.h"
-#include "ZEMath/Rectangle3D.h"
+#include "ZEDefinitions.h"
+#include "ZETypes.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEAABoundingBox.h"
+#include "ZEMath\ZERectangle3D.h"
 
 #define ZE_MAP_MAX_NAME_SIZE ZE_MAX_NAME_SIZE
 #define ZE_MAP_MAX_FILENAME_SIZE ZE_MAX_FILE_NAME_SIZE
@@ -169,3 +169,5 @@ struct ZEMapFileHeader
 };
 
 #endif
+
+

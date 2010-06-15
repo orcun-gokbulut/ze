@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - CompoundEntity.cpp
+ Zinek Engine - ZECompoundEntity.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "CompoundEntity.h"
-#include "ZEMath/Matrix.h"
-#include "ZEMath/Ray.h"
-#include "Core/Error.h"
-#include "Component.h"
+#include "ZECompoundEntity.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEMath\ZERay.h"
+#include "ZECore\ZEError.h"
+#include "ZEComponent.h"
 #include <string.h>
 
 void ZECompoundEntity::SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism)
@@ -284,4 +284,7 @@ ZEEntityRunAt ZECompoundEntityDescription::GetRunAt() const
 	return ZE_ERA_BOTH;
 }
 
-#include "CompoundEntity.h.zpp"
+#include "ZECompoundEntity.h.zpp"
+
+
+

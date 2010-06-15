@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9VertexBuffer.cpp
+ Zinek Engine - ZED3D9VertexBuffer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9VertexBuffer.h"
-#include "D3D9Module.h"
-#include "Core/Error.h"
+#include "ZED3D9VertexBuffer.h"
+#include "ZED3D9Module.h"
+#include "ZECore\ZEError.h"
 
 unsigned int ZED3D9StaticVertexBuffer::GetBufferSize()
 {
@@ -105,3 +105,5 @@ ZED3D9StaticVertexBuffer::~ZED3D9StaticVertexBuffer()
 {
 	Release();
 }
+
+

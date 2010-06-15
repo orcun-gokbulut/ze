@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Light.cpp
+ Zinek Engine - ZELight.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Light.h"
-#include "RenderOrder.h"
-#include "Game/Entity.h"
+#include "ZELight.h"
+#include "ZERenderOrder.h"
+#include "ZEGame\ZEEntity.h"
 
 ZEDWORD ZELight::GetDrawFlags() const
 {
@@ -132,3 +132,5 @@ ZELight::ZELight()
 	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
 	CastsShadows = false;
 }
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - AABoundingBox.cpp
+ Zinek Engine - ZEAABoundingBox.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "BoundingSphere.h"
-#include "AABoundingBox.h"
-#include "OBoundingBox.h"
-#include "Ray.h"
-#include "LineSegment.h"
-#include "Line.h"
+#include "ZEBoundingSphere.h"
+#include "ZEAABoundingBox.h"
+#include "ZEOBoundingBox.h"
+#include "ZERay.h"
+#include "ZELineSegment.h"
+#include "ZELine.h"
 #include <math.h>
 
 ZEVector3 ZEAABoundingBox::GetCenter() const
@@ -411,3 +411,5 @@ bool ZEAABoundingBox::CollisionTest(const ZEAABoundingBox& BoundingBox, const ZE
 
 	return sqrt(totalDistance) <= BoundingSphere.Radius;
 }
+
+

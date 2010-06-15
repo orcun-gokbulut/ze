@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Command.h
+ Zinek Engine - ZECommand.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,10 +37,10 @@
 #ifndef	__ZE_COMMAND_H__
 #define __ZE_COMMAND_H__
 
-#include "ZEDS/Named.h"
-#include "ZEDS/Array.h"
-#include "ZEDS/Variant.h"
-#include "fastdelegate.h"
+#include "ZEDS\ZENamed.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEVariant.h"
+#include "ZEFastDelegate.h"
 
 #define zeCommands ZECommandManager::GetInstance()
 class ZECommand;
@@ -117,3 +117,6 @@ class ZECommandManager
 									~ZECommandManager();
 };
 #endif
+
+
+

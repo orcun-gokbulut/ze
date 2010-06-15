@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundSource3D.h
+ Zinek Engine - ZESoundSource3D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef	__ZE_SOUND_SOURCE_3D_H__
 #define __ZE_SOUND_SOURCE_3D_H__
 
-#include "Game/Component.h"
-#include "Meta/Class.h"
-#include "SoundSource.h"
+#include "ZEGame\ZEComponent.h"
+#include "ZEMeta\ZEClass.h"
+#include "ZESoundSource.h"
 
 ZE_META_CLASS_DESCRIPTION(ZESoundSource3D);
 
@@ -116,3 +116,5 @@ ZE_POST_PROCESSOR_START(Meta)
 ZE_POST_PROCESSOR_END()
 */
 #endif
+
+

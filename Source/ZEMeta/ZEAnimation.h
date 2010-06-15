@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Animation.h
+ Zinek Engine - ZEAnimation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef __ZE_ANIMATION_H__
 #define __ZE_ANIMATION_H__
 
-#include "Definitions.h"
-#include "ZEDS/Array.h"
-#include "ZEDS/Variant.h"
+#include "ZEDefinitions.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEVariant.h"
 
 enum ZEAnimationState
 {
@@ -126,3 +126,5 @@ class ZEAnimationController
 										~ZEAnimationController();
 };
 #endif
+
+

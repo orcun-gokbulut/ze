@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PPFilter1DNode.cpp
+ Zinek Engine - ZEPPFilter1DNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PPFilter1DNode.h"
-#include "Core/Error.h"
-#include "Graphics/Texture2D.h"
+#include "ZEPPFilter1DNode.h"
+#include "ZECore\ZEError.h"
+#include "ZEGraphics\ZETexture2D.h"
 
 ZEPPFilter1DNode::ZEPPFilter1DNode()
 {
@@ -116,3 +116,5 @@ bool ZEPPFilter1DNode::GetVerticalPass()
 {
 	return VerticalPass;
 }
+
+

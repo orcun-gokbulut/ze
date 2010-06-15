@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ModelBrush.cpp
+ Zinek Engine - ZEModelBrush.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ModelBrush.h"
-#include "Core/Error.h"
-#include "Graphics/Canvas.h"
-#include "Model/Model.h"
-#include "Model/ModelResource.h"
+#include "ZEModelBrush.h"
+#include "ZECore\ZEError.h"
+#include "ZEGraphics\ZECanvas.h"
+#include "ZEModel\ZEModel.h"
+#include "ZEModel\ZEModelResource.h"
 
 #include <string.h>
 
@@ -214,9 +214,12 @@ ZEModelBrush::~ZEModelBrush()
 	Deinitialize();
 }
 
-#include "ModelBrush.h.zpp"
+#include "ZEModelBrush.h.zpp"
 
 ZEEntityRunAt ZEModelBrushDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
+
+
+

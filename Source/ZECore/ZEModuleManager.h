@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ModuleManager.h
+ Zinek Engine - ZEModuleManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef	__ZE_MODULE_MANAGER_H__
 #define __ZE_MODULE_MANAGER_H__
 
-#include "Option.h"
-#include "ZEDS/Array.h"
-#include "Module.h"
+#include "ZEOption.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEModule.h"
 
 class ZEModuleManager
 {
@@ -68,3 +68,6 @@ class ZEModuleManager
 										~ZEModuleManager();
 };
 #endif
+
+
+

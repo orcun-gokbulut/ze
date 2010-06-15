@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9PostProcessor.cpp
+ Zinek Engine - ZED3D9PostProcessor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9PostProcessor.h"
+#include "ZED3D9PostProcessor.h"
 #include <string.h>
 
-#include "D3D9PPBlurNode.h"
-#include "D3D9PPScreenOutputNode.h"
+#include "ZED3D9PPBlurNode.h"
+#include "ZED3D9PPScreenOutputNode.h"
 
 ZEPostProcessorNode* ZED3D9PostProcessor::CreateNode(const char* TypeName)
 {
@@ -54,3 +54,5 @@ ZEPostProcessorNode* ZED3D9PostProcessor::CreateNode(size_t TypeId)
 {
 	return NULL;
 }
+
+

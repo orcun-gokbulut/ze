@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Error.cpp
+ Zinek Engine - ZEError.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Error.h"
-#include "Core.h"
-#include "Console.h"
-#include "ConsoleWindow.h"
+#include "ZEError.h"
+#include "ZECore.h"
+#include "ZEConsole.h"
+#include "ZEConsoleWindow.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <assert.h>
@@ -197,3 +197,6 @@ ZEError::~ZEError()
 {
 	zeOptions->UnregisterSection(&ErrorOptions);
 }
+
+
+

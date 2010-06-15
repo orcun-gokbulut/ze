@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ConsoleWindow.cpp
+ Zinek Engine - ZEConsoleWindow.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,13 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ConsoleWindow.h"
+#include "ZEConsoleWindow.h"
 #define NOMINMAX
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
-#include "Core.h"
-#include "Error.h"
-#include "WindowResource.h"
+#include "ZECore.h"
+#include "ZEError.h"
+#include "ZEWindowResource.h"
 #include <stdarg.h>
 
 #pragma warning(push)
@@ -233,3 +233,6 @@ ZEConsoleWindow::~ZEConsoleWindow(void)
 {
 }
 #pragma warning(pop)
+
+
+

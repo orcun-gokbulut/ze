@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalStaticRigidBody.cpp
+ Zinek Engine - ZEPhysicalStaticRigidBody.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysicalStaticRigidBody.h"
-#include "PhysicsModule.h"
+#include "ZEPhysicalStaticRigidBody.h"
+#include "ZEPhysicsModule.h"
 
 ZEPhysicalObjectType ZEPhysicalStaticRigidBody::GetPhysicalObjectType()
 {
@@ -45,3 +45,5 @@ ZEPhysicalStaticRigidBody* ZEPhysicalStaticRigidBody::CreateInstance()
 {
 	return zePhysics->CreatePhysicalStaticRigidBody();
 }
+
+

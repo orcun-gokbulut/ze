@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXComponentBase.cpp
+ Zinek Engine - ZEPhysXComponentBase.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysXComponentBase.h"
+#include "ZEPhysXComponentBase.h"
 
 ZEPhysXModule* ZEPhysXComponentBase::Module = NULL;
 NxPhysicsSDK* ZEPhysXComponentBase::PhysicsSDK = NULL;
 NxCookingInterface*	 ZEPhysXComponentBase::CookingInterface = NULL;
+
+

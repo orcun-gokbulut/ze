@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ALModule.cpp
+ Zinek Engine - ZEALModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ALModule.h"
-#include "ALModuleDescription.h"
-#include "ZEMath/Vector.h"
-#include "Core/Core.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
-#include "Core/Window.h"
-#include "ALListener.h"
-#include "ALSoundSource.h"
-#include "ALSoundSource3D.h"
+#include "ZEALModule.h"
+#include "ZEALModuleDescription.h"
+#include "ZEMath\ZEVector.h"
+#include "ZECore\ZECore.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
+#include "ZECore\ZEWindow.h"
+#include "ZEALListener.h"
+#include "ZEALSoundSource.h"
+#include "ZEALSoundSource3D.h"
 #include <dsound.h>
 
 #define MAX_SOUNDBUFFER_COUNT	256
@@ -311,3 +311,5 @@ ZEListener* ZEALModule::CreateListener()
 {
 	return new ZEALListener();
 }
+
+

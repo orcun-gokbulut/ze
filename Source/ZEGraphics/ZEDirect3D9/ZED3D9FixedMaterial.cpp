@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9FixedMaterial.cpp
+ Zinek Engine - ZED3D9FixedMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,17 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9FixedMaterial.h"
-#include "Graphics/RenderOrder.h"
-#include "D3D9Texture2D.h"
-#include "D3D9TextureCube.h"
-#include "Graphics/Camera.h"
-#include "Graphics/MaterialComponents.h"
-#include "Graphics/Light.h"
-#include "Graphics/PointLight.h"
-#include "Graphics/DirectionalLight.h"
-#include "Graphics/ProjectiveLight.h"
-#include "Graphics/OmniProjectiveLight.h"
+#include "ZED3D9FixedMaterial.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZED3D9Texture2D.h"
+#include "ZED3D9TextureCube.h"
+#include "ZEGraphics\ZECamera.h"
+#include "ZEGraphics\ZEMaterialComponents.h"
+#include "ZEGraphics\ZELight.h"
+#include "ZEGraphics\ZEPointLight.h"
+#include "ZEGraphics\ZEDirectionalLight.h"
+#include "ZEGraphics\ZEProjectiveLight.h"
+#include "ZEGraphics\ZEOmniProjectiveLight.h"
 
 ZED3D9FixedMaterial::~ZED3D9FixedMaterial()
 {
@@ -568,3 +568,5 @@ void ZED3D9FixedMaterial::Release()
 	if (Shader != NULL)
 		Shader->Destroy();
 }
+
+

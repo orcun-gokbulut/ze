@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - FontResource.cpp
+ Zinek Engine - ZEFontResource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "FontResource.h"
-#include "Graphics/UIMaterial.h"
-#include "Graphics/Texture2DResource.h"
-#include "Core/ResourceManager.h"
-#include "Core/Console.h"
-#include "Core/Error.h"
-#include "Core/ResourceFile.h"
-#include "FontFile.h"
+#include "ZEFontResource.h"
+#include "ZEGraphics\ZEUIMaterial.h"
+#include "ZEGraphics\ZETexture2DResource.h"
+#include "ZECore\ZEResourceManager.h"
+#include "ZECore\ZEConsole.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEResourceFile.h"
+#include "ZEFontFile.h"
 
 ZEFontResource::ZEFontResource()
 {
@@ -172,3 +172,5 @@ void ZEFontResource::CacheResource(const char* FileName)
 		}
 	}
 }
+
+

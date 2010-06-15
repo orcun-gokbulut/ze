@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalCallbacks.h
+ Zinek Engine - ZEPhysicalCallbacks.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef	__ZE_PHYSICAL_CALLBACKS_H__
 #define __ZE_PHYSICAL_CALLBACKS_H__
 
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "FastDelegate.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEFastDelegate.h"
 
 #define ZE_PCCF_ON_TOUCH			1
 #define ZE_PCCF_ON_START_TOUCH		2
@@ -68,3 +68,5 @@ struct ZEPhysicalTransformChange
 typedef fastdelegate::FastDelegate1<const ZEPhysicalTransformChange&> ZEPhysicalTransformChangeCallback;
 
 #endif
+
+

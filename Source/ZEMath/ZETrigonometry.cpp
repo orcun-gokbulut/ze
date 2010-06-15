@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Trigonometry.cpp
+ Zinek Engine - ZETrigonometry.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "trigonometry.h"
+#include "ZEtrigonometry.h"
 #include <math.h>
-#include "definitions.h"
+#include "ZEdefinitions.h"
 float SinTable[451];
 
 void InitTrigTables()
@@ -84,3 +84,5 @@ float FastTan(float Angle)
 {
 	return FastSin(Angle) / FastCos(Angle);
 }
+
+

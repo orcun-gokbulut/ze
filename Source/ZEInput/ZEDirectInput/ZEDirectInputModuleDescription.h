@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DirectInputModuleDescription.h
+ Zinek Engine - ZEDirectInputModuleDescription.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_DIRECT_INPUT_MODULE_DESCRIPTION_H__
 #define __ZE_DIRECT_INPUT_MODULE_DESCRIPTION_H__
 
-#include "Core/Module.h"
+#include "ZECore\ZEModule.h"
 
 class ZEDirectInputModule;
 class ZEDirectInputModuleDescription : public ZEModuleDescription
@@ -57,3 +57,5 @@ class ZEDirectInputModuleDescription : public ZEModuleDescription
 };
 
 #endif
+
+

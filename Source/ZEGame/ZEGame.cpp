@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Game.cpp
+ Zinek Engine - ZEGame.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Game.h"
-#include "Core/Core.h"
-#include "Core/Error.h"
-#include "UI/UIManager.h"
-#include "Graphics/Camera.h"
+#include "ZEGame.h"
+#include "ZECore\ZECore.h"
+#include "ZECore\ZEError.h"
+#include "ZEUI\ZEUIManager.h"
+#include "ZEGraphics\ZECamera.h"
 #include <string.h>
 
 ZEGameDescription* ZEGame::GetGameDescription()
@@ -129,7 +129,7 @@ ZEEntity* ZEGame::CreateEntityInstance(const char* EntityTypeName)
 	}
 }
 
-#include "UI\FontResource.h"
+#include "ZEUI\ZEFontResource.h"
 
 bool ZEGame::Initialize()
 {
@@ -187,8 +187,8 @@ void ZEGame::Render(float ElapsedTime)
 	Scene->GetRenderer()->ClearList();
 }
 
-#include "ZEDS/String.h"
-#include "UI/UITextControl.h"
+#include "ZEDS\ZEString.h"
+#include "ZEUI\ZEUITextControl.h"
 
 #include <stdio.h>
 void ZEGame::Tick(float ElapsedTime)
@@ -232,11 +232,11 @@ void ZEGame::Tick(float ElapsedTime)
 	Scene->Tick(ElapsedTime);
 }
  
-#include "Player.h"
-#include "LightBrush.h"
-#include "ModelBrush.h"
-#include "SkyBrush.h"
-#include "../Particle/ParticleEffectBrush.h"
+#include "ZEPlayer.h"
+#include "ZELightBrush.h"
+#include "ZEModelBrush.h"
+#include "ZESkyBrush.h"
+#include "..\ZEParticle\ZEParticleEffectBrush.h"
 
 ZEGame::ZEGame()
 {
@@ -258,3 +258,6 @@ ZEGame* ZEGame::GetInstance()
 {
 	return zeCore->GetGame();
 }
+
+
+

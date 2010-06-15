@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PointLight.cpp
+ Zinek Engine - ZEPointLight.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PointLight.h"
+#include "ZEPointLight.h"
 
 ZELightType ZEPointLight::GetLightType()
 {
@@ -69,3 +69,5 @@ ZEPointLight::ZEPointLight()
 {
 	ShadowMap = NULL;
 }
+
+

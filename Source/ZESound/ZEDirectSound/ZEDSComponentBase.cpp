@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSComponentBase.cpp
+ Zinek Engine - ZEDSComponentBase.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DSComponentBase.h"
-#include "DSModule.h"
+#include "ZEDSComponentBase.h"
+#include "ZEDSModule.h"
 
 ZEDSModule* ZEDSComponentBase::Module;
 LPDIRECTSOUND8 ZEDSComponentBase::Device;
@@ -49,3 +49,5 @@ bool ZEDSComponentBase::BaseInitialize(ZEDSModule* Mdl)
 	PrimaryBuffer = Mdl->GetPrimaryBuffer();
 	return true;
 }
+
+

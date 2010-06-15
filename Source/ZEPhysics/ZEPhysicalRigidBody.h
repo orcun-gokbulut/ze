@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalRigidBody.h
+ Zinek Engine - ZEPhysicalRigidBody.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_PHYSICAL_RIGID_BODY_H__
 #define __ZE_PHYSICAL_RIGID_BODY_H__
 
-#include "PhysicalObject.h"
-#include "ZEDS\Array.h"
+#include "ZEPhysicalObject.h"
+#include "ZEDS\ZEArray.h"
 
 class ZEPhysicalShape;
 
@@ -121,3 +121,5 @@ class ZEPhysicalRigidBody : public ZEPhysicalObject
 };
 
 #endif
+
+

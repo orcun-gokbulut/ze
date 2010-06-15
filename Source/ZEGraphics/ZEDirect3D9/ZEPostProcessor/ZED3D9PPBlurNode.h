@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9PPBlurNode.h
+ Zinek Engine - ZED3D9PPBlurNode.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_D3D9_BLUR_NODE_H__
 #define __ZE_D3D9_BLUR_NODE_H__
 
-#include "Graphics/PostProcessor/PPBlurNode.h"
-#include "../D3D9ComponentBase.h"
+#include "ZEGraphics\ZEPostProcessor\ZEPPBlurNode.h"
+#include "..\ZED3D9ComponentBase.h"
 #include <d3d9.h>
 
 class ZETexture2D;
@@ -71,3 +71,5 @@ class ZED3D9PPBlurNode : public ZEPPBlurNode, private ZED3D9ComponentBase
 };
 
 #endif
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DrawParameters.h
+ Zinek Engine - ZEDrawParameters.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,11 +37,11 @@
 #ifndef __ZE_DRAW_PARAMETERS_H__
 #define __ZE_DRAW_PARAMETERS_H__
 
-#include "Types.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "ZEMath/Matrix.h"
-#include "ZEDS/Array.h"
+#include "ZETypes.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEDS\ZEArray.h"
 
 class ZELight;
 class ZECamera;
@@ -95,3 +95,6 @@ struct ZEDrawParameters
 };
 
 #endif
+
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ResourceFile.cpp
+ Zinek Engine - ZEResourceFile.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Definitions.h"
-#include "ResourceFile.h"
-#include "Core/Error.h"
+#include "ZEDefinitions.h"
+#include "ZEResourceFile.h"
+#include "ZECore\ZEError.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -250,3 +250,6 @@ bool ZEPartialResourceFile::Eof()
 }
 
 #pragma warning(pop)
+
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ResourceManager.cpp
+ Zinek Engine - ZEResourceManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ResourceManager.h"
+#include "ZEResourceManager.h"
 #include <string.h>
-#include "Core.h"
-#include "Core/Error.h"
+#include "ZECore.h"
+#include "ZECore\ZEError.h"
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
@@ -116,3 +116,6 @@ ZEResourceManager*  ZEResourceManager::GetInstance()
 }
 
 #pragma warning(pop)
+
+
+

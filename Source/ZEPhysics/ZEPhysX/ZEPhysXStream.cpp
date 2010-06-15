@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXStream.cpp
+ Zinek Engine - ZEPhysXStream.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysXStream.h"
-#include "Core/Error.h"
+#include "ZEPhysXStream.h"
+#include "ZECore\ZEError.h"
 #include <stdio.h>
 
 // ZEPhysXFileStream
@@ -372,3 +372,5 @@ NxStream& ZEPhysXMemoryReadStream::storeBuffer(const void* buffer, NxU32 size)
 	zeAssert(true, "ZEPhysXMemoryReadStream can only used for reading.");
 	return *this;
 }
+
+

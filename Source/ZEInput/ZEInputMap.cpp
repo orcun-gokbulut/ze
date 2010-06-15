@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - InputMap.cpp
+ Zinek Engine - ZEInputMap.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,8 +32,8 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "InputMap.h"
-#include "InputDefinitions.h"
+#include "ZEInputMap.h"
+#include "ZEInputDefinitions.h"
 #include <string.h>
 #include <stdio.h>
 
@@ -167,3 +167,5 @@ ZEInputEvent::ZEInputEvent(ZEInputDeviceType DeviceType, ZEDWORD DeviceIndex, un
 	this->AxisId = AxisId;
 	this->AxisSign = AxisSign;
 }
+
+

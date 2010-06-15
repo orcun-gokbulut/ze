@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Option.h
+ Zinek Engine - ZEOption.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,11 +37,11 @@
 #ifndef	__ZE_OPTION_H__
 #define __ZE_OPTION_H__
 
-#include "ZEDS/Named.h"
-#include "ZEDS/Array.h"
-#include "ZEDS/TypedVariant.h"
-#include "fastdelegate.h"
-#include "Command.h"
+#include "ZEDS\ZENamed.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZETypedVariant.h"
+#include "ZEFastDelegate.h"
+#include "ZECommand.h"
 
 #define zeOptions ZEOptionManager::GetInstance()
 
@@ -167,3 +167,6 @@ class ZEOptionManager
 									~ZEOptionManager();
 };
 #endif
+
+
+

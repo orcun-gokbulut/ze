@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - LightBrush.cpp
+ Zinek Engine - ZELightBrush.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "LightBrush.h"
-#include "Core/Error.h"
-#include "Game/DrawParameters.h"
-#include "Graphics/Canvas.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/FixedMaterial.h"
-#include "Graphics/Texture2DResource.h"
-#include "Graphics/TextureCubeResource.h"
-#include "Graphics/PointLight.h"
-#include "Graphics/DirectionalLight.h"
-#include "Graphics/ProjectiveLight.h"
-#include "Graphics/OmniProjectiveLight.h"
+#include "ZELightBrush.h"
+#include "ZECore\ZEError.h"
+#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGraphics\ZECanvas.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZEVertexBuffer.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZEGraphics\ZETexture2DResource.h"
+#include "ZEGraphics\ZETextureCubeResource.h"
+#include "ZEGraphics\ZEPointLight.h"
+#include "ZEGraphics\ZEDirectionalLight.h"
+#include "ZEGraphics\ZEProjectiveLight.h"
+#include "ZEGraphics\ZEOmniProjectiveLight.h"
 
 ZEDWORD ZELightBrush::GetDrawFlags() const
 {
@@ -387,9 +387,12 @@ ZELightBrush::~ZELightBrush()
 	Deinitialize();
 }
 
-#include "LightBrush.h.zpp"
+#include "ZELightBrush.h.zpp"
 
 ZEEntityRunAt ZELightBrushDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
+
+
+

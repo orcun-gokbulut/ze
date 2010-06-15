@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalShapes.h
+ Zinek Engine - ZEPhysicalShapes.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,10 +38,10 @@
 #ifndef	__ZE_PHYSICAL_SHAPES_H__
 #define __ZE_PHYSICAL_SHAPES_H__
 
-#include "ZEDS/Array.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "PhysicalMaterial.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEPhysicalMaterial.h"
 
 enum  ZEPhysicalShapeType
 {
@@ -167,3 +167,5 @@ class  ZEPhysicalConvexShape : public  ZEPhysicalShape
 		const ZEArray<ZEVector3>&		GetConvexVertices();
 };
 #endif
+
+

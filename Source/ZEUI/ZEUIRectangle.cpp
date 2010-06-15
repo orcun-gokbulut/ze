@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UIRectangle.cpp
+ Zinek Engine - ZEUIRectangle.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "UIRectangle.h"
-#include "Graphics/VertexTypes.h"
+#include "ZEUIRectangle.h"
+#include "ZEGraphics\ZEVertexTypes.h"
 
 void ZEUIRectangle::ConvertToVertices(ZEUIVertex* Buffer) const
 {
@@ -130,3 +130,5 @@ bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, 
 		return false;
 	}
 }
+
+

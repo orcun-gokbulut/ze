@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - OBoundingBox.h
+ Zinek Engine - ZEOBoundingBox.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,9 +36,9 @@
 #pragma once
 #ifndef __ZE_MATH_BOUNDINGVOLUME_H__
 #define __ZE_MATH_BOUNDINGVOLUME_H__
-#include "Vector.h"
-#include "Matrix.h"
-#include "Plane.h"
+#include "ZEVector.h"
+#include "ZEMatrix.h"
+#include "ZEPlane.h"
 
 class ZEBoundingSphere;
 class ZEAABoundingBox;
@@ -62,3 +62,5 @@ class ZEOBoundingBox
 								ZEOBoundingBox(const ZEVector3 Position, const ZEVector3 U, const ZEVector3 V,const ZEVector3 N);
 };
 #endif
+
+

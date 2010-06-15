@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Player.h
+ Zinek Engine - ZEPlayer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,10 +37,10 @@
 #ifndef	__ZE_PLAYER_H__
 #define __ZE_PLAYER_H__
  
-#include "CompoundEntity.h"
-#include "Graphics/Camera.h"
-#include "Graphics/PointLight.h"
-#include "Input/InputMap.h"
+#include "ZECompoundEntity.h"
+#include "ZEGraphics\ZECamera.h"
+#include "ZEGraphics\ZEPointLight.h"
+#include "ZEInput\ZEInputMap.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEPlayer);
 
@@ -87,3 +87,6 @@ ZE_POST_PROCESSOR_START(Meta)
 ZE_POST_PROCESSOR_END()
 */
 #endif
+
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Main.cpp
+ Zinek Engine - ZEMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Core/Core.h"
+#include "ZECore\ZECore.h"
 
 #define NOMINMAX
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 
-#include "Core/Core.h"
-#include "Core/ConsoleWindow.h"
-#include "Core/ModuleManager.h"
-#include "Core/Window.h"
+#include "ZECore\ZECore.h"
+#include "ZECore\ZEConsoleWindow.h"
+#include "ZECore\ZEModuleManager.h"
+#include "ZECore\ZEWindow.h"
 
-#include "Debug/PhysicsDebugModule.h"
-#include "Debug/SoundDebugModule.h"
-#include "Debug/MetaDebugModule.h"
+#include "ZEDebug\ZEPhysicsDebugModule.h"
+#include "ZEDebug\ZESoundDebugModule.h"
+#include "ZEDebug\ZEMetaDebugModule.h"
 
 extern HINSTANCE ApplicationInstance;
 
@@ -80,3 +80,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
  	if (zeCore->StartUp())
 		zeCore->Run(); 
 }
+
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - LightBrush.h
+ Zinek Engine - ZELightBrush.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef __ZE_LIGHTBRUSH_H__
 #define __ZE_LIGHTBRUSH_H__
 
-#include "Game/CompoundEntity.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/Light.h"
+#include "ZEGame\ZECompoundEntity.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZELight.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZELightBrush);
 
@@ -142,3 +142,6 @@ ZE_POST_PROCESSOR_START(Meta)
 ZE_POST_PROCESSOR_END() 
 */
 #endif
+
+
+

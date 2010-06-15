@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ALModuleDescription.cpp
+ Zinek Engine - ZEALModuleDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,8 +32,9 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "ALModuleDescription.h"
-#include "ALModule.h"
+
+#include "ZEALModuleDescription.h"
+#include "ZEALModule.h"
 
 ZEModuleType ZEALModuleDescription::GetType()
 {
@@ -84,3 +85,4 @@ bool ZEALModuleDescription::CheckCompatible()
 {
 	return true;
 }
+

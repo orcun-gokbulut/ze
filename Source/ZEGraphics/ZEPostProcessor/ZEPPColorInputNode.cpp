@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PPColorInputNode.cpp
+ Zinek Engine - ZEPPColorInputNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PPColorInputNode.h"
-#include "Graphics/Renderer.h"
-#include "Core/Error.h"
-#include "Definitions.h"
+#include "ZEPPColorInputNode.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZECore\ZEError.h"
+#include "ZEDefinitions.h"
 
 ZEPPColorInputNode::ZEPPColorInputNode()
 {
@@ -96,3 +96,5 @@ ZEPPColorInputNode* ZEPPColorInputNode::CreateInstance()
 {
 	return new ZEPPColorInputNode();
 }
+
+

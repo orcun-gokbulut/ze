@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ResourceFile.h
+ Zinek Engine - ZEResourceFile.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_RESOURCE_FILE_H__
 #define __ZE_RESOURCE_FILE_H__
 
-#include "Game/Serialization.h"
-#include "Definitions.h"
+#include "ZEGame\ZESerialization.h"
+#include "ZEDefinitions.h"
 
 enum ZESeekFrom
 {
@@ -92,3 +92,6 @@ class ZEPartialResourceFile : public ZEResourceFile
 							ZEPartialResourceFile();
 };
 #endif
+
+
+

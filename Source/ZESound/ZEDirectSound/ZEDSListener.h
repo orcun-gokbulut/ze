@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSListener.h
+ Zinek Engine - ZEDSListener.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_DS_LISTENER_H__
 #define __ZE_DS_LISTENER_H__
 
-#include "../Listener.h"
-#include "DSComponentBase.h"
+#include "..\ZEListener.h"
+#include "ZEDSComponentBase.h"
 
 class ZEDSListener : public ZEListener, public ZEDSComponentBase
 {	
@@ -69,3 +69,5 @@ class ZEDSListener : public ZEListener, public ZEDSComponentBase
 };
 
 #endif
+
+

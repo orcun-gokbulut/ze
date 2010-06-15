@@ -22,6 +22,7 @@
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="0"
+			ExcludeBuckets="3"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
@@ -30,6 +31,8 @@
 			<Tool
 				Name="VCCustomBuildTool"
 				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -115,18 +118,26 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				Description="Post Processing"
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
+				ExecutionBucket="2"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+				ExecutionBucket="3"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
 			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
 				Name="VCMIDLTool"
+				ExecutionBucket="4"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				ExecutionBucket="6"
 				AdditionalOptions="/I ."
 				Optimization="3"
 				InlineFunctionExpansion="2"
@@ -149,15 +160,19 @@
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
+				ExecutionBucket="7"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				ExecutionBucket="8"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
+				ExecutionBucket="9"
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				ExecutionBucket="10"
 				AdditionalOptions="/fixed:no"
 				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg.lib libvorbis.lib libvorbisfile.lib freeimage.lib libmpg123.lib OpenAL32.lib PhysXLoader.lib NxCooking.lib"
 				LinkIncremental="1"
@@ -173,25 +188,31 @@
 			/>
 			<Tool
 				Name="VCALinkTool"
+				ExecutionBucket="11"
 			/>
 			<Tool
 				Name="VCManifestTool"
+				ExecutionBucket="12"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
+				ExecutionBucket="13"
 			/>
 			<Tool
 				Name="VCBscMakeTool"
+				ExecutionBucket="14"
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
+				ExecutionBucket="15"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName).$(ConfigurationName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
+				ExecutionBucket="16"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 		</Configuration>
 		<Configuration
@@ -208,18 +229,25 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
+				ExecutionBucket="2"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+				ExecutionBucket="3"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
 			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
 				Name="VCMIDLTool"
+				ExecutionBucket="4"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				ExecutionBucket="6"
 				AdditionalOptions="/I ."
 				Optimization="0"
 				InlineFunctionExpansion="2"
@@ -242,15 +270,19 @@
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
+				ExecutionBucket="7"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				ExecutionBucket="8"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
+				ExecutionBucket="9"
 			/>
 			<Tool
 				Name="VCLinkerTool"
+				ExecutionBucket="10"
 				AdditionalOptions="/fixed:no"
 				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg.lib libvorbis.lib libvorbisfile.lib freeimage.lib libmpg123.lib OpenAL32.lib PhysXLoader.lib NxCooking.lib"
 				LinkIncremental="1"
@@ -266,25 +298,31 @@
 			/>
 			<Tool
 				Name="VCALinkTool"
+				ExecutionBucket="11"
 			/>
 			<Tool
 				Name="VCManifestTool"
+				ExecutionBucket="12"
 			/>
 			<Tool
 				Name="VCXDCMakeTool"
+				ExecutionBucket="13"
 			/>
 			<Tool
 				Name="VCBscMakeTool"
+				ExecutionBucket="14"
 			/>
 			<Tool
 				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
+				ExecutionBucket="15"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
 				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName).$(ConfigurationName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
+				ExecutionBucket="16"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
 			/>
 		</Configuration>
 		<Configuration
@@ -301,18 +339,24 @@
 			<Tool
 				Name="VCCustomBuildTool"
 				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
+				ExecutionBucket="2"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+				ExecutionBucket="3"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
 			/>
 			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
 				Name="VCMIDLTool"
+				ExecutionBucket="4"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				ExecutionBucket="6"
 				AdditionalOptions="/MP8"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\PhysX\Cooking&quot;;&quot;$(ProjectDir)\include\PhysX\Foundation&quot;;&quot;$(ProjectDir)\include\PhysX\NxCharacter&quot;;&quot;$(ProjectDir)\include\PhysX\PhysXLoader&quot;;&quot;$(ProjectDir)\include\PhysX\Physics&quot;;&quot;$(ProjectDir)\include\OpenAL&quot;;&quot;$(ProjectDir)\include\DirectX&quot;"
@@ -332,12 +376,15 @@
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
+				ExecutionBucket="7"
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
+				ExecutionBucket="8"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
+				ExecutionBucket="9"
 			/>
 			<Tool
 				Name="VCLibrarianTool"
@@ -374,6 +421,9 @@
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
+				CommandLine=""
+				AdditionalDependencies=""
+				Outputs=""
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -433,7 +483,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy &quot;$(ProjectDir)Source\*.h&quot; &quot;$(ProjectDir)ZESDK\Include\ZESDK&quot; /S /Y&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;"
+				CommandLine="xcopy &quot;$(ProjectDir)Source\*.h&quot; &quot;$(ProjectDir)ZESDK\Include\ZESDK&quot; /S /Y&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
@@ -441,245 +491,241 @@
 	</References>
 	<Files>
 		<Filter
-			Name="Graphics"
+			Name="ZEGraphics"
 			>
 			<File
-				RelativePath=".\Source\Graphics\Camera.cpp"
+				RelativePath=".\Source\ZEGraphics\ZECamera.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\Camera.h"
+				RelativePath=".\Source\ZEGraphics\ZECamera.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\Canvas.cpp"
+				RelativePath=".\Source\ZEGraphics\ZECanvas.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\Canvas.h"
+				RelativePath=".\Source\ZEGraphics\ZECanvas.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\GraphicsModule.cpp"
+				RelativePath=".\Source\ZEGraphics\ZEGraphicsModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\GraphicsModule.h"
+				RelativePath=".\Source\ZEGraphics\ZEGraphicsModule.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\IndexedPolygon.h"
+				RelativePath=".\Source\ZEGraphics\ZEIndexedPolygon.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\Renderer.cpp"
+				RelativePath=".\Source\ZEGraphics\ZERenderer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\Renderer.h"
+				RelativePath=".\Source\ZEGraphics\ZERenderer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\RenderOrder.cpp"
+				RelativePath=".\Source\ZEGraphics\ZERenderOrder.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\RenderOrder.h"
+				RelativePath=".\Source\ZEGraphics\ZERenderOrder.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\ShadowRenderer.cpp"
+				RelativePath=".\Source\ZEGraphics\ZEShadowRenderer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\ShadowRenderer.h"
+				RelativePath=".\Source\ZEGraphics\ZEShadowRenderer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\VertexBuffer.cpp"
+				RelativePath=".\Source\ZEGraphics\ZEVertexBuffer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\VertexBuffer.h"
+				RelativePath=".\Source\ZEGraphics\ZEVertexBuffer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\VertexDeclaration.cpp"
+				RelativePath=".\Source\ZEGraphics\ZEVertexDeclaration.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\VertexDeclaration.h"
+				RelativePath=".\Source\ZEGraphics\ZEVertexDeclaration.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\VertexTypes.cpp"
+				RelativePath=".\Source\ZEGraphics\ZEVertexTypes.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\VertexTypes.h"
+				RelativePath=".\Source\ZEGraphics\ZEVertexTypes.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\ViewPort.cpp"
+				RelativePath=".\Source\ZEGraphics\ZEViewPort.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\ViewPort.h"
+				RelativePath=".\Source\ZEGraphics\ZEViewPort.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\ViewVolume.cpp"
+				RelativePath=".\Source\ZEGraphics\ZEViewVolume.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Graphics\ViewVolume.h"
+				RelativePath=".\Source\ZEGraphics\ZEViewVolume.h"
 				>
 			</File>
 			<Filter
-				Name="Direct3D9"
+				Name="ZEDirect3D9"
 				>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Common.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Common.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Common.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9CommonTools.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9CommonTools.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9CommonTools.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9CommonTools.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9ComponentBase.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9ComponentBase.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9ComponentBase.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9ComponentBase.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9FixedMaterial.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9FixedMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterial.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9FixedMaterialShader.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterialShader.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9FixedMaterialShader.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9FixedMaterialShader.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9HDRProcessor.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9HDRProcessor.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Module.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Module.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Module.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Module.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9ModuleDescription.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9ModuleDescription.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9ModuleDescription.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9ModuleDescription.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Renderer.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Renderer.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Renderer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Renderer.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9ShadowRenderer.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9ShadowRenderer.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9ShadowRenderer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9ShadowRenderer.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9SimpleMaterial.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9SimpleMaterial.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9SimpleMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9SimpleMaterial.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9SSAOProcessor.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9SSAOProcessor.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Texture2D.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Texture2D.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Texture2D.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Texture2D.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Texture3D.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Texture3D.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Texture3D.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9Texture3D.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9TextureCube.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9TextureCube.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9TextureCube.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9TextureCube.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9UIMaterial.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9UIMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9UIMaterial.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9VertexBuffer.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9VertexBuffer.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9VertexBuffer.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9VertexBuffer.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9VertexDeclaration.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9VertexDeclaration.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9VertexDeclaration.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9VertexDeclaration.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9ViewPort.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9ViewPort.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\Direct3D9\D3D9ViewPort.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9ViewPort.h"
 					>
 				</File>
 				<Filter
@@ -775,209 +821,83 @@
 					</File>
 				</Filter>
 				<Filter
-					Name="PostProcessor"
+					Name="ZED3D9PostProcessor"
 					>
 					<File
-						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PostProcessor.cpp"
+						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PostProcessor.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PostProcessor.h"
+						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PostProcessor.h"
 						>
 					</File>
 					<File
-						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PPBlurNode.cpp"
+						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PPBlurNode.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PPBlurNode.h"
+						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PPBlurNode.h"
 						>
 					</File>
 					<File
-						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PPScreenOutputNode.cpp"
+						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PPScreenOutputNode.cpp"
 						>
 					</File>
 					<File
-						RelativePath=".\Source\Graphics\Direct3D9\PostProcessor\D3D9PPScreenOutputNode.h"
+						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PPScreenOutputNode.h"
 						>
 					</File>
 				</Filter>
 			</Filter>
 			<Filter
-				Name="PostProcessor"
-				>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PostProcessor.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PostProcessor.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PostProcessorNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PostProcessorNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPBlurNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPBlurNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPColorInputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPColorInputNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPDepthInputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPDepthInputNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPFilter1DNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPFilter1DNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPFilter2DNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPFilter2DNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPScreenOutputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPScreenOutputNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPTextureInputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPTextureInputNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPTextureOutputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPTextureOutputNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPVelocityInputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\PostProcessor\PPVelocityInputNode.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="Materials"
 				>
 				<File
-					RelativePath=".\Source\Graphics\FixedMaterial.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEFixedMaterial.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\FixedMaterial.h"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-							CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-							Outputs="$(InputPath).zpp"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ZESDK Debug|Win32"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-							CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-							Outputs="$(InputPath).zpp"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\Material.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEFixedMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Material.h"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-							Description="Zinek Engine Post Processor"
-							CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-							Outputs="$(InputPath).zpp"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ZESDK Debug|Win32"
-						>
-						<Tool
-							Name="VCCustomBuildTool"
-							Description="Zinek Engine Post Processor"
-							CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-							Outputs="$(InputPath).zpp"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\MaterialComponents.h"
+					RelativePath=".\Source\ZEGraphics\ZEMaterial.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\MaterialFileFormat.h"
+					RelativePath=".\Source\ZEGraphics\ZEMaterial.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\MaterialResource.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEMaterialComponents.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\MaterialResource.h"
+					RelativePath=".\Source\ZEGraphics\ZEMaterialFileFormat.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\MaterialResource.h"
+					RelativePath=".\Source\ZEGraphics\ZEMaterialResource.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\UIMaterial.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEMaterialResource.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\UIMaterial.h"
+					RelativePath=".\Source\ZEGraphics\ZESimpleMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZESimpleMaterial.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEUIMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEUIMaterial.h"
 					>
 				</File>
 			</Filter>
@@ -985,51 +905,43 @@
 				Name="Lights"
 				>
 				<File
-					RelativePath=".\Source\Graphics\DirectionalLight.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEDirectionalLight.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\DirectionalLight.h"
+					RelativePath=".\Source\ZEGraphics\ZEDirectionalLight.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Light.cpp"
+					RelativePath=".\Source\ZEGraphics\ZELight.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Light.h"
+					RelativePath=".\Source\ZEGraphics\ZELight.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\OmniProjectiveLight.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEOmniProjectiveLight.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\OmniProjectiveLight.h"
+					RelativePath=".\Source\ZEGraphics\ZEOmniProjectiveLight.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\PointLight.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEPointLight.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\PointLight.h"
+					RelativePath=".\Source\ZEGraphics\ZEPointLight.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\ProjectiveLight.cpp"
+					RelativePath=".\Source\ZEGraphics\ZEProjectiveLight.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\ProjectiveLight.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\SimpleMaterial.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Graphics\SimpleMaterial.h"
+					RelativePath=".\Source\ZEGraphics\ZEProjectiveLight.h"
 					>
 				</File>
 			</Filter>
@@ -1037,1093 +949,764 @@
 				Name="Textures"
 				>
 				<File
-					RelativePath=".\Source\Graphics\Texture.cpp"
+					RelativePath=".\Source\ZEGraphics\ZETexture.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Texture.h"
+					RelativePath=".\Source\ZEGraphics\ZETexture.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Texture2D.cpp"
+					RelativePath=".\Source\ZEGraphics\ZETexture2D.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Texture2D.h"
+					RelativePath=".\Source\ZEGraphics\ZETexture2D.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Texture2DResource.cpp"
+					RelativePath=".\Source\ZEGraphics\ZETexture2DResource.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Texture2DResource.h"
+					RelativePath=".\Source\ZEGraphics\ZETexture2DResource.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Texture3D.cpp"
+					RelativePath=".\Source\ZEGraphics\ZETexture3D.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Texture3D.h"
+					RelativePath=".\Source\ZEGraphics\ZETexture3D.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Texture3DResource.cpp"
+					RelativePath=".\Source\ZEGraphics\ZETexture3DResource.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\Texture3DResource.h"
+					RelativePath=".\Source\ZEGraphics\ZETexture3DResource.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\TextureCube.cpp"
+					RelativePath=".\Source\ZEGraphics\ZETextureCube.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\TextureCube.h"
+					RelativePath=".\Source\ZEGraphics\ZETextureCube.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\TextureCubeResource.cpp"
+					RelativePath=".\Source\ZEGraphics\ZETextureCubeResource.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\TextureCubeResource.h"
+					RelativePath=".\Source\ZEGraphics\ZETextureCubeResource.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\TextureResource.cpp"
+					RelativePath=".\Source\ZEGraphics\ZETextureResource.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Graphics\TextureResource.h"
+					RelativePath=".\Source\ZEGraphics\ZETextureResource.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ZEPostProcessor"
+				>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPostProcessor.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPostProcessor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPostProcessorNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPostProcessorNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPBlurNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPBlurNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPColorInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPColorInputNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPDepthInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPDepthInputNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPFilter1DNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPFilter1DNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPFilter2DNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPFilter2DNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPScreenOutputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPScreenOutputNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPTextureInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPTextureInputNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPTextureOutputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPTextureOutputNode.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPVelocityInputNode.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPVelocityInputNode.h"
 					>
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Game"
+			Name="ZEGame"
 			>
 			<File
-				RelativePath=".\Source\Game\CanvasBrush.cpp"
+				RelativePath=".\Source\ZEGame\ZECanvasBrush.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\CanvasBrush.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Game\Component.cpp"
+				RelativePath=".\Source\ZEGame\ZECanvasBrush.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\Component.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Game\CompoundEntity.cpp"
+				RelativePath=".\Source\ZEGame\ZEComponent.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\CompoundEntity.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Game\DrawParameters.cpp"
+				RelativePath=".\Source\ZEGame\ZEComponent.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\DrawParameters.h"
+				RelativePath=".\Source\ZEGame\ZECompoundEntity.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\Entity.cpp"
+				RelativePath=".\Source\ZEGame\ZECompoundEntity.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\Entity.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Game\Game.cpp"
+				RelativePath=".\Source\ZEGame\ZEDrawParameters.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\Game.h"
+				RelativePath=".\Source\ZEGame\ZEDrawParameters.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\GameManager.h"
+				RelativePath=".\Source\ZEGame\ZEEntity.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\GameProvider.cpp"
+				RelativePath=".\Source\ZEGame\ZEEntity.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\GameProvider.h"
+				RelativePath=".\Source\ZEGame\ZEEntityProvider.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\LightBrush.cpp"
+				RelativePath=".\Source\ZEGame\ZEEntityProvider.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\LightBrush.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Game\ModelBrush.cpp"
+				RelativePath=".\Source\ZEGame\ZEGame.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\ModelBrush.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Game\Player.cpp"
+				RelativePath=".\Source\ZEGame\ZEGame.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\Player.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Game\Scene.cpp"
+				RelativePath=".\Source\ZEGame\ZEGameManager.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\Scene.h"
+				RelativePath=".\Source\ZEGame\ZEGameProvider.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\SceneDebugDraw.cpp"
+				RelativePath=".\Source\ZEGame\ZEGameProvider.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\SceneDebugDraw.h"
+				RelativePath=".\Source\ZEGame\ZELightBrush.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\Serialization.cpp"
+				RelativePath=".\Source\ZEGame\ZELightBrush.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\Serialization.h"
+				RelativePath=".\Source\ZEGame\ZEModelBrush.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\SkyBrush.cpp"
+				RelativePath=".\Source\ZEGame\ZEModelBrush.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Game\SkyBrush.h"
+				RelativePath=".\Source\ZEGame\ZEPlayer.cpp"
 				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZEPlayer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZEPortal.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZEPortal.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZEScene.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZEScene.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZESceneDebugDraw.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZESceneDebugDraw.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZESerialization.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZESerialization.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZESkyBrush.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZESkyBrush.h"
+				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Input"
+			Name="ZEInput"
 			>
 			<File
-				RelativePath=".\Source\Input\InputDefinitions.cpp"
+				RelativePath=".\Source\ZEInput\ZEInputDefinitions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Input\InputDefinitions.h"
+				RelativePath=".\Source\ZEInput\ZEInputDefinitions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Input\InputMap.cpp"
+				RelativePath=".\Source\ZEInput\ZEInputMap.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Input\InputMap.h"
+				RelativePath=".\Source\ZEInput\ZEInputMap.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Input\InputModule.cpp"
+				RelativePath=".\Source\ZEInput\ZEInputModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Input\InputModule.h"
+				RelativePath=".\Source\ZEInput\ZEInputModule.h"
 				>
 			</File>
 			<Filter
-				Name="DirectInput"
+				Name="ZEDirectInput"
 				>
 				<File
-					RelativePath=".\Source\Input\DirectInput\DirectInputModule.cpp"
-					>
-					<FileConfiguration
-						Name="Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release(Symb)|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ZESDK Debug|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="ZESDK Release|Win32"
-						>
-						<Tool
-							Name="VCCLCompilerTool"
-							ObjectFile="$(IntDir)\$(InputName)1.obj"
-							XMLDocumentationFileName="$(IntDir)\$(InputName)1.xdc"
-						/>
-					</FileConfiguration>
-				</File>
-				<File
-					RelativePath=".\Source\Input\DirectInput\DirectInputModule.h"
+					RelativePath=".\Source\ZEInput\ZEDirectInput\ZEDirectInputModule.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Input\DirectInput\DirectInputModuleDescription.cpp"
+					RelativePath=".\Source\ZEInput\ZEDirectInput\ZEDirectInputModule.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Input\DirectInput\DirectInputModuleDescription.h"
+					RelativePath=".\Source\ZEInput\ZEDirectInput\ZEDirectInputModuleDescription.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEInput\ZEDirectInput\ZEDirectInputModuleDescription.h"
 					>
 				</File>
 			</Filter>
 			<Filter
 				Name="WindowInput"
 				>
-			</Filter>
-			<Filter
-				Name="DummyInput"
-				>
 				<File
-					RelativePath=".\Source\Input\DummyInput\DummyInputModule.cpp"
+					RelativePath=".\Source\ZEInput\ZEWindowInput\ZEWindowsInputModule.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Input\DummyInput\DummyInputModule.h"
+					RelativePath=".\Source\ZEInput\ZEWindowInput\ZEWindowsInputModule.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Input\DummyInput\DummyInputModuleDescription.cpp"
+					RelativePath=".\Source\ZEInput\ZEWindowInput\ZEWindowsModuleDescription.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Input\DummyInput\DummyInputModuleDescription.h"
+					RelativePath=".\Source\ZEInput\ZEWindowInput\ZEWindowsModuleDescription.h"
 					>
 				</File>
 			</Filter>
 			<Filter
-				Name="VirtualInput"
+				Name="ZEDummyInput"
 				>
 				<File
-					RelativePath=".\Source\Input\VirtualInput\VirtualInputModule.cpp"
+					RelativePath=".\Source\ZEInput\ZEDummyInput\ZEDummyInputModule.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Input\VirtualInput\VirtualInputModule.h"
+					RelativePath=".\Source\ZEInput\ZEDummyInput\ZEDummyInputModule.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Input\VirtualInput\VirtualInputModuleDescription.cpp"
+					RelativePath=".\Source\ZEInput\ZEDummyInput\ZEDummyInputModuleDescription.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Input\VirtualInput\VirtualInputModuleDescription.h"
-					>
-				</File>
-			</Filter>
-		</Filter>
-		<Filter
-			Name="Sound"
-			>
-			<File
-				RelativePath=".\Source\Sound\Listener.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\Listener.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundModule.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundModule.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundResource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundResource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundResourceMP3.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundResourceMP3.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundResourceOGG.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundResourceOGG.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundResourceWAV.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundResourceWAV.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundSource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundSource.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundSource3D.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Sound\SoundSource3D.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<Filter
-				Name="DirectSound"
-				>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSComponentBase.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSComponentBase.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSListener.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSListener.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSModule.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSModule.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSModuleDescription.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSModuleDescription.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSSoundSource.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSSoundSource.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSSoundSource3D.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\DirectSound\DSSoundSource3D.h"
+					RelativePath=".\Source\ZEInput\ZEDummyInput\ZEDummyInputModuleDescription.h"
 					>
 				</File>
 			</Filter>
 			<Filter
-				Name="OpenAL"
+				Name="ZEVirtualInput"
 				>
 				<File
-					RelativePath=".\Source\Sound\OpenAL\ALComponentBase.cpp"
+					RelativePath=".\Source\ZEInput\ZEVirtualInput\ZEVirtualInputModule.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Sound\OpenAL\ALComponentBase.h"
+					RelativePath=".\Source\ZEInput\ZEVirtualInput\ZEVirtualInputModule.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Sound\OpenAL\ALListener.cpp"
+					RelativePath=".\Source\ZEInput\ZEVirtualInput\ZEVirtualInputModuleDescription.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Sound\OpenAL\ALListener.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\OpenAL\ALModule.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\OpenAL\ALModule.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\OpenAL\ALModuleDescription.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\OpenAL\ALModuleDescription.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\OpenAL\ALSoundSource.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\OpenAL\ALSoundSource.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\OpenAL\ALSoundSource3D.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\Sound\OpenAL\ALSoundSource3D.h"
+					RelativePath=".\Source\ZEInput\ZEVirtualInput\ZEVirtualInputModuleDescription.h"
 					>
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Physics"
+			Name="ZESound"
 			>
 			<File
-				RelativePath=".\Source\Physics\PhysicalCallbacks.cpp"
+				RelativePath=".\Source\ZESound\ZEListener.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalCallbacks.h"
+				RelativePath=".\Source\ZESound\ZEListener.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalMaterial.cpp"
+				RelativePath=".\Source\ZESound\ZESoundFX.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalMaterial.h"
+				RelativePath=".\Source\ZESound\ZESoundModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalObject.cpp"
+				RelativePath=".\Source\ZESound\ZESoundModule.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalObject.h"
+				RelativePath=".\Source\ZESound\ZESoundResource.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalRigidBody.cpp"
+				RelativePath=".\Source\ZESound\ZESoundResource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalRigidBody.h"
+				RelativePath=".\Source\ZESound\ZESoundResourceMP3.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalShapes.cpp"
+				RelativePath=".\Source\ZESound\ZESoundResourceMP3.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalShapes.h"
+				RelativePath=".\Source\ZESound\ZESoundResourceOGG.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalStaticMesh.cpp"
+				RelativePath=".\Source\ZESound\ZESoundResourceOGG.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalStaticMesh.h"
+				RelativePath=".\Source\ZESound\ZESoundResourceWAV.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalStaticRigidBody.cpp"
+				RelativePath=".\Source\ZESound\ZESoundResourceWAV.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalStaticRigidBody.h"
+				RelativePath=".\Source\ZESound\ZESoundSource.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalTrigger.cpp"
+				RelativePath=".\Source\ZESound\ZESoundSource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalTrigger.h"
+				RelativePath=".\Source\ZESound\ZESoundSource3D.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Physics\PhysicalWorld.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Physics\PhysicalWorld.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Physics\PhysicsModule.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Physics\PhysicsModule.h"
+				RelativePath=".\Source\ZESound\ZESoundSource3D.h"
 				>
 			</File>
 			<Filter
-				Name="PhysX"
+				Name="ZEDirectSound"
 				>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXCollisionManager.cpp"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSComponentBase.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXCollisionManager.h"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSComponentBase.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXComponentBase.cpp"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSListener.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXComponentBase.h"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSListener.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXConversion.cpp"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSModule.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXConversion.h"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSModule.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXModule.cpp"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSModuleDescription.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXModule.h"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSModuleDescription.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXModuleDescription.cpp"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSSoundSource.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXModuleDescription.h"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSSoundSource.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalRigidBody.cpp"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSSoundSource3D.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalRigidBody.h"
+					RelativePath=".\Source\ZESound\ZEDirectSound\ZEDSSoundSource3D.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ZEOpenAL"
+				>
+				<File
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALComponentBase.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticMesh.cpp"
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALComponentBase.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticMesh.h"
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALListener.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticRigidBody.cpp"
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALListener.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalStaticRigidBody.h"
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALModule.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalWorld.cpp"
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALModule.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXPhysicalWorld.h"
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALModuleDescription.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXStream.cpp"
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALModuleDescription.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXStream.h"
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALSoundSource.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXUserOutputStream.cpp"
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALSoundSource.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Physics\PhysX\PhysXUserOutputStream.h"
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALSoundSource3D.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZESound\ZEOpenAL\ZEALSoundSource3D.h"
 					>
 				</File>
 			</Filter>
 		</Filter>
 		<Filter
-			Name="Particle"
+			Name="ZEParticle"
 			>
 			<File
-				RelativePath=".\Source\Particle\Particle.cpp"
+				RelativePath=".\Source\ZEParticle\ZEParticle.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Particle\Particle.h"
+				RelativePath=".\Source\ZEParticle\ZEParticle.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Particle\ParticleController.cpp"
+				RelativePath=".\Source\ZEParticle\ZEParticleController.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Particle\ParticleController.h"
+				RelativePath=".\Source\ZEParticle\ZEParticleController.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Particle\ParticleEffect.cpp"
+				RelativePath=".\Source\ZEParticle\ZEParticleEffect.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Particle\ParticleEffect.h"
+				RelativePath=".\Source\ZEParticle\ZEParticleEffect.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Particle\ParticleEffectBrush.cpp"
+				RelativePath=".\Source\ZEParticle\ZEParticleEffectBrush.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Particle\ParticleEffectBrush.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						AdditionalDependencies=""
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						AdditionalDependencies=""
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Particle\ParticleEmitter.cpp"
+				RelativePath=".\Source\ZEParticle\ZEParticleEffectBrush.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Particle\ParticleEmitter.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\Source\Particle\ParticleSystem.cpp"
+				RelativePath=".\Source\ZEParticle\ZEParticleEmitter.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Particle\ParticleSystem.h"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="ZESDK Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						CommandLine="&quot;$(ProjectDir)postprocess\zepp.exe&quot; &quot;$(InputPath)&quot;&#x0D;&#x0A;"
-						Outputs="$(InputPath).zpp"
-					/>
-				</FileConfiguration>
-			</File>
-		</Filter>
-		<Filter
-			Name="Model"
-			>
-			<File
-				RelativePath=".\Source\Model\Model.cpp"
+				RelativePath=".\Source\ZEParticle\ZEParticleEmitter.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Model\Model.h"
+				RelativePath=".\Source\ZEParticle\ZEParticleSystem.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Model\ModelAnimation.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model\ModelAnimation.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model\ModelBone.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model\ModelBone.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model\ModelFileFormat.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model\ModelFileFormat.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model\ModelMesh.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model\ModelMesh.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model\ModelMeshLOD.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model\ModelMeshLOD.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model\ModelResource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Model\ModelResource.h"
+				RelativePath=".\Source\ZEParticle\ZEParticleSystem.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Script"
+			Name="ZEModel"
+			>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelAnimation.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelAnimation.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelBone.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelBone.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelFileFormat.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelFileFormat.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelMesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelMesh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelMeshLOD.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelMeshLOD.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEModel\ZEModelResource.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="ZEScript"
 			>
 		</Filter>
 		<Filter
-			Name="UI"
+			Name="ZEUI"
 			>
 			<File
-				RelativePath=".\Source\UI\FontFile.cpp"
+				RelativePath=".\Source\ZEUI\ZEFontFile.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\FontFile.h"
+				RelativePath=".\Source\ZEUI\ZEFontFile.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\FontResource.cpp"
+				RelativePath=".\Source\ZEUI\ZEFontResource.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\FontResource.h"
+				RelativePath=".\Source\ZEUI\ZEFontResource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UIControl.cpp"
+				RelativePath=".\Source\ZEUI\ZEUIControl.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UIControl.h"
+				RelativePath=".\Source\ZEUI\ZEUIControl.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UIEvents.cpp"
+				RelativePath=".\Source\ZEUI\ZEUIEvents.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UIEvents.h"
+				RelativePath=".\Source\ZEUI\ZEUIEvents.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UIManager.cpp"
+				RelativePath=".\Source\ZEUI\ZEUIManager.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UIManager.h"
+				RelativePath=".\Source\ZEUI\ZEUIManager.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UIRectangle.cpp"
+				RelativePath=".\Source\ZEUI\ZEUIRectangle.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UIRectangle.h"
+				RelativePath=".\Source\ZEUI\ZEUIRectangle.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UIRenderer.cpp"
+				RelativePath=".\Source\ZEUI\ZEUIRenderer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UIRenderer.h"
+				RelativePath=".\Source\ZEUI\ZEUIRenderer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UITextControl.cpp"
+				RelativePath=".\Source\ZEUI\ZEUITextControl.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\UI\UITextControl.h"
+				RelativePath=".\Source\ZEUI\ZEUITextControl.h"
 				>
 			</File>
 		</Filter>
@@ -2131,51 +1714,51 @@
 			Name="ZEDS"
 			>
 			<File
-				RelativePath=".\Source\ZEDS\Allocator.h"
+				RelativePath=".\Source\ZEDS\ZEAllocator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Array.h"
+				RelativePath=".\Source\ZEDS\ZEArray.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Definitions.cpp"
+				RelativePath=".\Source\ZEDS\ZEDefinitions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Definitions.h"
+				RelativePath=".\Source\ZEDS\ZEDefinitions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Named.cpp"
+				RelativePath=".\Source\ZEDS\ZENamed.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Named.h"
+				RelativePath=".\Source\ZEDS\ZENamed.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\String.cpp"
+				RelativePath=".\Source\ZEDS\ZEString.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\String.h"
+				RelativePath=".\Source\ZEDS\ZEString.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\TypedVariant.cpp"
+				RelativePath=".\Source\ZEDS\ZETypedVariant.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\TypedVariant.h"
+				RelativePath=".\Source\ZEDS\ZETypedVariant.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Variant.cpp"
+				RelativePath=".\Source\ZEDS\ZEVariant.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Variant.h"
+				RelativePath=".\Source\ZEDS\ZEVariant.h"
 				>
 			</File>
 		</Filter>
@@ -2183,382 +1766,570 @@
 			Name="ZEMath"
 			>
 			<File
-				RelativePath=".\Source\ZEMath\AABoundingBox.cpp"
+				RelativePath=".\Source\ZEMath\ZEAABoundingBox.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\AABoundingBox.h"
+				RelativePath=".\Source\ZEMath\ZEAABoundingBox.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\BoundingSphere.cpp"
+				RelativePath=".\Source\ZEMath\ZEBoundingSphere.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\BoundingSphere.h"
+				RelativePath=".\Source\ZEMath\ZEBoundingSphere.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Definitions.h"
+				RelativePath=".\Source\ZEMath\ZEDefinitions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Line.cpp"
+				RelativePath=".\Source\ZEMath\ZELine.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Line.h"
+				RelativePath=".\Source\ZEMath\ZELine.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\LineSegment.cpp"
+				RelativePath=".\Source\ZEMath\ZELineSegment.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\LineSegment.h"
+				RelativePath=".\Source\ZEMath\ZELineSegment.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Matrix.cpp"
+				RelativePath=".\Source\ZEMath\ZEMatrix.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Matrix.h"
+				RelativePath=".\Source\ZEMath\ZEMatrix.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\OBoundingBox.cpp"
+				RelativePath=".\Source\ZEMath\ZEOBoundingBox.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\OBoundingBox.h"
+				RelativePath=".\Source\ZEMath\ZEOBoundingBox.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Plane.cpp"
+				RelativePath=".\Source\ZEMath\ZEPlane.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Plane.h"
+				RelativePath=".\Source\ZEMath\ZEPlane.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Quaternion.cpp"
+				RelativePath=".\Source\ZEMath\ZEQuaternion.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Quaternion.h"
+				RelativePath=".\Source\ZEMath\ZEQuaternion.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Ray.cpp"
+				RelativePath=".\Source\ZEMath\ZERay.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Ray.h"
+				RelativePath=".\Source\ZEMath\ZERay.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Rectangle.cpp"
+				RelativePath=".\Source\ZEMath\ZERectangle.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Rectangle.h"
+				RelativePath=".\Source\ZEMath\ZERectangle.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Rectangle3D.cpp"
+				RelativePath=".\Source\ZEMath\ZERectangle3D.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Rectangle3D.h"
+				RelativePath=".\Source\ZEMath\ZERectangle3D.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Triangle.cpp"
+				RelativePath=".\Source\ZEMath\ZETriangle.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Triangle.h"
+				RelativePath=".\Source\ZEMath\ZETriangle.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Trigonometry.cpp"
+				RelativePath=".\Source\ZEMath\ZETrigonometry.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Trigonometry.h"
+				RelativePath=".\Source\ZEMath\ZETrigonometry.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Vector.cpp"
+				RelativePath=".\Source\ZEMath\ZEVector.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Vector.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Meta"
-			>
-			<File
-				RelativePath=".\Source\Meta\Animation.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Meta\Animation.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Meta\Class.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Meta\Class.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Meta\Container.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Meta\Container.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Meta\PostProcessor.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Meta\PostProcessor.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Meta\Property.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Meta\Property.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Meta\Provider.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Meta\Provider.h"
+				RelativePath=".\Source\ZEMath\ZEVector.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Debug"
+			Name="ZEMeta"
 			>
 			<File
-				RelativePath=".\Source\Debug\DebugModule.cpp"
+				RelativePath=".\Source\ZEMeta\ZEAnimation.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Debug\DebugModule.h"
+				RelativePath=".\Source\ZEMeta\ZEAnimation.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Debug\MetaDebugModule.cpp"
+				RelativePath=".\Source\ZEMeta\ZEClass.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Debug\MetaDebugModule.h"
+				RelativePath=".\Source\ZEMeta\ZEClass.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Debug\PhysicsDebugModule.cpp"
+				RelativePath=".\Source\ZEMeta\ZEContainer.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Debug\PhysicsDebugModule.h"
+				RelativePath=".\Source\ZEMeta\ZEContainer.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Debug\SoundDebugModule.cpp"
+				RelativePath=".\Source\ZEMeta\ZEPostProcessor.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Debug\SoundDebugModule.h"
+				RelativePath=".\Source\ZEMeta\ZEPostProcessor.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMeta\ZEProperty.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMeta\ZEProperty.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMeta\ZEProvider.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMeta\ZEProvider.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Core"
+			Name="ZEDebug"
 			>
 			<File
-				RelativePath=".\Source\Core\Command.cpp"
+				RelativePath=".\Source\ZEDebug\ZEDebugModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Core\Command.h"
+				RelativePath=".\Source\ZEDebug\ZEDebugModule.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Core\Console.cpp"
+				RelativePath=".\Source\ZEDebug\ZEMetaDebugModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Core\Console.h"
+				RelativePath=".\Source\ZEDebug\ZEMetaDebugModule.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Core\ConsoleWindow.cpp"
+				RelativePath=".\Source\ZEDebug\ZEPhysicsDebugModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Core\ConsoleWindow.h"
+				RelativePath=".\Source\ZEDebug\ZEPhysicsDebugModule.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Core\Core.cpp"
+				RelativePath=".\Source\ZEDebug\ZESoundDebugModule.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Core\Core.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Error.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Error.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Module.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Module.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ModuleManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ModuleManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Option.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Option.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Resource.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Resource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ResourceFile.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ResourceFile.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ResourceManager.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\ResourceManager.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Window.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\Window.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\WindowResource.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\Core\WindowResource.rc"
+				RelativePath=".\Source\ZEDebug\ZESoundDebugModule.h"
 				>
 			</File>
 		</Filter>
 		<Filter
-			Name="Map"
+			Name="ZECore"
 			>
 			<File
-				RelativePath=".\Source\Map\Map.cpp"
+				RelativePath=".\Source\ZECore\ZECommand.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Map\Map.h"
+				RelativePath=".\Source\ZECore\ZECommand.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Map\MapResource.cpp"
+				RelativePath=".\Source\ZECore\ZEConsole.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\Map\MapResource.h"
+				RelativePath=".\Source\ZECore\ZEConsole.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEConsoleWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEConsoleWindow.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZECore.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZECore.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEError.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEError.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEModule.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEModule.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEModuleManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEModuleManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEOption.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEOption.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEResource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEResourceFile.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEResourceFile.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEResourceManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEResourceManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEWindow.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEWindow.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEWindowResource.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZECore\ZEWindowResource.rc"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="ZEMap"
+			>
+			<File
+				RelativePath=".\Source\ZEMap\ZEMap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMap\ZEMap.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMap\ZEMapResource.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMap\ZEMapResource.h"
 				>
 			</File>
 			<Filter
-				Name="PortalMap"
+				Name="ZEPortalMap"
 				>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMap.cpp"
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMap.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMap.h"
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMap.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapDoor.cpp"
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapDoor.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapDoor.h"
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapDoor.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapFileFormat.h"
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapFileFormat.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapPortal.cpp"
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapOctree.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapPortal.h"
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapOctree.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapPortalOctree.cpp"
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapPortal.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapPortalOctree.h"
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapPortal.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapResource.cpp"
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapPortalDoor.h"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\Map\PortalMap\PortalMapResource.h"
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapPortalOctree.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapPortalOctree.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapResource.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEMap\ZEPortalMap\ZEPortalMapResource.h"
+					>
+				</File>
+			</Filter>
+		</Filter>
+		<Filter
+			Name="ZEPhysics"
+			>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalCallbacks.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalCallbacks.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalMaterial.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalObject.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalObject.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalRigidBody.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalRigidBody.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalShapes.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalShapes.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalStaticMesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalStaticMesh.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalStaticRigidBody.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalStaticRigidBody.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalTrigger.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalTrigger.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalWorld.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalWorld.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicsModule.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicsModule.h"
+				>
+			</File>
+			<Filter
+				Name="PhysX"
+				>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXCollisionManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXCollisionManager.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXComponentBase.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXComponentBase.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXConversion.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXConversion.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXModule.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXModule.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXModuleDescription.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXModuleDescription.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalRigidBody.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalRigidBody.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalStaticMesh.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalStaticMesh.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalStaticRigidBody.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalStaticRigidBody.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalWorld.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalWorld.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXStream.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXUserOutputStream.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXUserOutputStream.h"
 					>
 				</File>
 			</Filter>
@@ -2568,19 +2339,23 @@
 			>
 		</File>
 		<File
-			RelativePath=".\Source\CompileOptions.h"
+			RelativePath=".\Source\ZECompileOptions.h"
 			>
 		</File>
 		<File
-			RelativePath=".\Source\Definitions.h"
+			RelativePath=".\Source\ZEDefinitions.h"
 			>
 		</File>
 		<File
-			RelativePath=".\Source\Main.cpp"
+			RelativePath=".\Source\ZEFastDelegate.h"
 			>
 		</File>
 		<File
-			RelativePath=".\Source\Types.h"
+			RelativePath=".\Source\ZEFastDelegateBind.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\ZEMain.cpp"
 			>
 		</File>
 		<File
@@ -2589,6 +2364,10 @@
 		</File>
 		<File
 			RelativePath=".\Source\ZESDK.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Source\ZETypes.h"
 			>
 		</File>
 	</Files>

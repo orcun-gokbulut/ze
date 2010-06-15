@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - VirtualInputModule.cpp
+ Zinek Engine - ZEVirtualInputModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Core/Error.h"
-#include "Core/Console.h"
-#include "VirtualInputModule.h"
-#include "VirtualInputModuleDescription.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
+#include "ZEVirtualInputModule.h"
+#include "ZEVirtualInputModuleDescription.h"
 
 ZEModuleDescription* ZEVirtualInputModule::GetModuleDescription()
 {
@@ -187,3 +187,5 @@ ZEVirtualInputModule::ZEVirtualInputModule()
 {
 	VirtualInputEventCount = 0;
 }
+
+

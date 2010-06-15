@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9VertexDeclaration.h
+ Zinek Engine - ZED3D9VertexDeclaration.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,9 +38,9 @@
 #ifndef	__ZE_D3D9_VERTEX_DECLARATION_H__
 #define __ZE_D3D9_VERTEX_DECLARATION_H__
 
-#include "D3D9ComponentBase.h"
-#include "Graphics/VertexDeclaration.h"
-#include "ZEDS/Array.h"
+#include "ZED3D9ComponentBase.h"
+#include "ZEGraphics\ZEVertexDeclaration.h"
+#include "ZEDS\ZEArray.h"
 
 class ZED3D9VertexDeclaration : public ZEVertexDeclaration, private ZED3D9ComponentBase
 {
@@ -69,3 +69,5 @@ class ZED3D9VertexDeclaration : public ZEVertexDeclaration, private ZED3D9Compon
 };
 
 #endif
+
+

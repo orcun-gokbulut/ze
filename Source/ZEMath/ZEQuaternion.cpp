@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Quaternion.cpp
+ Zinek Engine - ZEQuaternion.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Quaternion.h"
-#include "Definitions.h"
+#include "ZEQuaternion.h"
+#include "ZEDefinitions.h"
 #include <math.h>
 
 const ZEQuaternion ZEQuaternion::Zero = ZEQuaternion(0.0f, 0.0f, 0.0f, 0.0f);
@@ -351,4 +351,6 @@ ZEQuaternion::ZEQuaternion(float Angle, const ZEVector3& Axis)
 ZEQuaternion::ZEQuaternion()
 {
 }
+
+
 

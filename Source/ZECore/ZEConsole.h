@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Console.h
+ Zinek Engine - ZEConsole.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_CONSOLE_H__
 #define __ZE_CONSOLE_H__
 
-#include "ZEDS/Array.h"
-#include "ZEDS/Variant.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEVariant.h"
 #include <string.h>
 
 #define zeConsole ZEConsole::GetInstance()
@@ -103,3 +103,6 @@ class ZEConsole
 };
 
 #endif
+
+
+

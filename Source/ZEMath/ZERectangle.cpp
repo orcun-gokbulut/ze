@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle.cpp
+ Zinek Engine - ZERectangle.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Rectangle.h"
+#include "ZERectangle.h"
 //#include "Core/Error.h"
 
 bool ZERectangle::IsEmpty()
@@ -135,3 +135,5 @@ ZERectangle::ZERectangle(const ZEVector2& UpLeft, float Width, float Height)
 	this->RightDown.x = UpLeft.x + Width;
 	this->RightDown.y = UpLeft.y - Height;
 }
+
+

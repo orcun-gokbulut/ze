@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundResourceMP3.h
+ Zinek Engine - ZESoundResourceMP3.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_SOUND_RESOURCE_MP3_H__
 #define __ZE_SOUND_RESOURCE_MP3_H__
 
-#include "SoundResource.h"
+#include "ZESoundResource.h"
 #include <mpg123/mpg123.h>
 
 class ZESoundResourceMP3 : public ZESoundResource
@@ -68,3 +68,5 @@ class ZESoundResourceMP3 : public ZESoundResource
 };
 
 #endif
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Window.cpp
+ Zinek Engine - ZEWindow.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Window.h"
-#include "Core.h"
-#include "Error.h"
-#include "Console.h"
-#include "Input/InputModule.h"
-#include "Graphics/GraphicsModule.h"
+#include "ZEWindow.h"
+#include "ZECore.h"
+#include "ZEError.h"
+#include "ZEConsole.h"
+#include "ZEInput\ZEInputModule.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #define NOMINMAX
@@ -371,3 +371,6 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	}
 	return 0;
 }
+
+
+

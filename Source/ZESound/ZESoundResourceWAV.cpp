@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundResourceWAV.cpp
+ Zinek Engine - ZESoundResourceWAV.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "SoundResourceWAV.h"
-#include "Core/Error.h"
+#include "ZESoundResourceWAV.h"
+#include "ZECore\ZEError.h"
 #include <memory.h>
 
 ZESoundResourceWAV::ZESoundResourceWAV()
@@ -145,3 +145,5 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const char* FileName)
 
 	return NewResource;
 }
+
+

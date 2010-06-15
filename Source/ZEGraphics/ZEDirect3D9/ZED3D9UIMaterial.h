@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9UIMaterial.h
+ Zinek Engine - ZED3D9UIMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef __ZE_D3D9_UI_MATERIAL_H__
 #define __ZE_D3D9_UI_MATERIAL_H__
 
-#include "D3D9ComponentBase.h"
-#include "Graphics/UIMaterial.h"
-#include "Graphics/RenderOrder.h"
+#include "ZED3D9ComponentBase.h"
+#include "ZEGraphics\ZEUIMaterial.h"
+#include "ZEGraphics\ZERenderOrder.h"
 
 class ZED3D9UIMaterial : public ZEUIMaterial, public ZED3D9ComponentBase
 {
@@ -71,3 +71,5 @@ class ZED3D9UIMaterial : public ZEUIMaterial, public ZED3D9ComponentBase
 };
 
 #endif
+
+

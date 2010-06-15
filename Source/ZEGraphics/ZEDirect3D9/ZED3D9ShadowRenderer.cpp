@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9ShadowRenderer.cpp
+ Zinek Engine - ZED3D9ShadowRenderer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9Module.h"
-#include "D3D9ShadowRenderer.h"
-#include "D3D9Renderer.h"
-#include "D3D9RendererBase.h"
-#include "D3D9CommonTools.h"
-#include "Core/ResourceFile.h"
-#include "D3D9TextureCube.h"
-#include "D3D9Texture2D.h"
-#include "Core/Error.h"
-#include "Graphics/RenderOrder.h"
+#include "ZED3D9Module.h"
+#include "ZED3D9ShadowRenderer.h"
+#include "ZED3D9Renderer.h"
+#include "ZED3D9CommonTools.h"
+#include "ZECore\ZEResourceFile.h"
+#include "ZED3D9TextureCube.h"
+#include "ZED3D9Texture2D.h"
+#include "ZECore\ZEError.h"
+#include "ZEGraphics\ZERenderOrder.h"
 
 #define ZE_MAX_SHADER_SOURCE_SIZE 32768
 
@@ -295,3 +294,4 @@ ZED3D9ShadowRenderer::~ZED3D9ShadowRenderer()
 {
 
 }
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - FixedMaterial.cpp
+ Zinek Engine - ZEFixedMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,15 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "FixedMaterial.h"
+#include "ZEFixedMaterial.h"
 #include <Memory.h>
 
 #ifndef NULL
 #define NULL 0
 #endif
 
-#include "GraphicsModule.h"
-#include "MaterialComponents.h"
+#include "ZEGraphicsModule.h"
+#include "ZEMaterialComponents.h"
 
 void ZEFixedMaterial::SetZero()
 {
@@ -921,5 +921,7 @@ ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 	return zeGraphics->CreateFixedMaterial();
 }
 
-#include "FixedMaterial.h.zpp"
+#include "ZEFixedMaterial.h.zpp"
+
+
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Light.h
+ Zinek Engine - ZELight.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_LIGHT_H__
 #define __ZE_LIGHT_H__
 
-#include "Game/Component.h"
-#include "ViewVolume.h"
+#include "ZEGame\ZEComponent.h"
+#include "ZEViewVolume.h"
 
 enum ZELightType
 {
@@ -99,3 +99,5 @@ class ZELight : public ZEComponent
 										ZELight();
 };	
 #endif
+
+

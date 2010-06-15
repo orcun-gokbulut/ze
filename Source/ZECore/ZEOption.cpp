@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Option.cpp
+ Zinek Engine - ZEOption.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Option.h"
-#include "Core.h"
-#include "Error.h"
-#include "Console.h"
+#include "ZEOption.h"
+#include "ZECore.h"
+#include "ZEError.h"
+#include "ZEConsole.h"
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
@@ -729,3 +729,6 @@ ZEOptionManager::~ZEOptionManager()
 	zeCommands->UnregisterSection(&Commands);
 }
 #pragma warning(pop)
+
+
+

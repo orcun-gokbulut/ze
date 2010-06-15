@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PPBlurNode.cpp
+ Zinek Engine - ZEPPBlurNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PPBlurNode.h"
-#include "Core/Error.h"
-#include "ZEMath/Definitions.h"
+#include "ZEPPBlurNode.h"
+#include "ZECore\ZEError.h"
+#include "ZEMath\ZEDefinitions.h"
 
 void ZEPPBlurNode::UpdateKernel()
 {
@@ -140,3 +140,5 @@ float ZEPPBlurNode::GetStandartDeviation()
 {
 	return StandartDeviation;
 }
+
+

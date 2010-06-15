@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Serialization.cpp
+ Zinek Engine - ZESerialization.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,8 +32,8 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "Core/Error.h"
-#include "Serialization.h"
+#include "ZECore\ZEError.h"
+#include "ZESerialization.h"
 #include <stdio.h>
 
 size_t ZEFileSerializer::Write(const void* Buffer, size_t Size, size_t Count)
@@ -107,4 +107,7 @@ ZEFileUnserializer::~ZEFileUnserializer()
 	if (File != NULL)
 		CloseFile();
 }
+
+
+
 

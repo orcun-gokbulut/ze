@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - String.cpp
+ Zinek Engine - ZEString.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "String.h"
-#include "Definitions.h"
+#include "ZEString.h"
+#include "ZEDefinitions.h"
 
 #include <string.h>
 #include <memory.h>
@@ -854,3 +854,6 @@ ZEString::~ZEString()
 	#endif
 
 }
+
+
+

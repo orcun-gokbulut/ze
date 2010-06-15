@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMapPortalOctree.cpp
+ Zinek Engine - ZEPortalMapOctree.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,12 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 /*#include "PortalMapPortalOctree.h"
-#include "Graphics/GraphicsModule.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/ViewVolume.h"
-#include "Graphics/Light.h"
-#include "MapResource.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZEViewVolume.h"
+#include "ZEGraphics\ZELight.h"
+#include "ZEMapResource.h"
 
 ZEFixedMaterial* ZEOctree::OctreeBBoxMaterial;
 ZERenderOrder ZEOctree::OctreeBBoxRenderOrder;
@@ -136,3 +136,5 @@ ZEPortalMapOctree::~ZEPortalMapOctree()
 			delete SubTrees[I];
 }
 */
+
+

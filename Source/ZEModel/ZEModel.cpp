@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Model.cpp
+ Zinek Engine - ZEModel.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,13 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Model.h"
-#include "ModelFileFormat.h"
-#include "Game/DrawParameters.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/VertexBuffer.h"
-#include "Graphics/SimpleMaterial.h"
-#include "Game/CompoundEntity.h"
+#include "ZEModel.h"
+#include "ZEModelFileFormat.h"
+#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZEGraphics\ZEVertexBuffer.h"
+#include "ZEGraphics\ZESimpleMaterial.h"
+#include "ZEGame\ZECompoundEntity.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -674,3 +674,5 @@ ZEModel::~ZEModel()
 	if (ModelResource != NULL)
 		((ZEModelResource*)ModelResource)->Release();
 }
+
+

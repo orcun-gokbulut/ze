@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9HDRProcessor.h
+ Zinek Engine - ZED3D9HDRProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,13 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include <d3d9.h>
-#include "D3D9CommonTools.h"
-#include "D3D9ComponentBase.h"
-#include "D3D9Module.h"
-#include "Core/Core.h"
+#include "ZED3D9CommonTools.h"
+#include "ZED3D9ComponentBase.h"
+#include "ZED3D9Module.h"
+#include "ZECore\ZECore.h"
 
 
-#include "Core/Console.h"
+#include "ZECore\ZEConsole.h"
 class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 {
 	public:

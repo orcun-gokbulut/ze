@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9SSAOProcessor.h
+ Zinek Engine - ZED3D9SSAOProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9ComponentBase.h"
+#include "ZED3D9ComponentBase.h"
 #include <d3d9.h>
 #include <stdlib.h>
 #include <freeimage.h>

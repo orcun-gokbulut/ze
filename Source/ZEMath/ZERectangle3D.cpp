@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle3D.cpp
+ Zinek Engine - ZERectangle3D.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Rectangle3D.h"
+#include "ZERectangle3D.h"
 //#include "Core/Error.h"
 
 void ZERectangle3D::GetPlane(ZEPlane & Plane) const
@@ -69,3 +69,5 @@ ZERectangle3D::ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEV
 	this->P3 = P3;
 	this->P4 = P4;
 }
+
+

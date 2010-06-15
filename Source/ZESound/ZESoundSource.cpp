@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundSource.cpp
+ Zinek Engine - ZESoundSource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "SoundSource.h"
-#include "SoundModule.h"
+#include "ZESoundSource.h"
+#include "ZESoundModule.h"
 
 ZESoundSource::ZESoundSource()
 {
@@ -363,4 +363,6 @@ ZESoundSource* ZESoundSource::CreateInstance()
 }
 
 
-#include "SoundSource.h.zpp"
+#include "ZESoundSource.h.zpp"
+
+

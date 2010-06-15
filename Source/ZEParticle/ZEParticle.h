@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Particle.h
+ Zinek Engine - ZEParticle.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef __ZE_PARTICLE_H__
 #define __ZE_PARTICLE_H__
 
-#include "ZEMath/Vector.h"
+#include "ZEMath\ZEVector.h"
 
 class ZEParticle
 {
@@ -59,3 +59,5 @@ class ZEParticle
 };
 
 #endif
+
+

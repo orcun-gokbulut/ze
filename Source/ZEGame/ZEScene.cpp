@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Scene.cpp
+ Zinek Engine - ZEScene.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,24 +33,24 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Scene.h"
-#include "Game.h"
-#include "Entity.h"
-#include "CompoundEntity.h"
-#include "Core/Console.h"
-#include "Core/Error.h"
-#include "Core/Core.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/ShadowRenderer.h"
-#include "Graphics/Camera.h"
-#include "Graphics/Light.h"
-#include "DrawParameters.h"
-#include "Serialization.h"
-#include "ZEMath/Ray.h"
-#include "Physics/PhysicalWorld.h"
-#include "Sound/SoundModule.h"
-#include "Map/PortalMap/PortalMap.h"
-#include "Map/PortalMap/PortalMapResource.h"
+#include "ZEScene.h"
+#include "ZEGame.h"
+#include "ZEEntity.h"
+#include "ZECompoundEntity.h"
+#include "ZECore\ZEConsole.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZECore.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZEGraphics\ZEShadowRenderer.h"
+#include "ZEGraphics\ZECamera.h"
+#include "ZEGraphics\ZELight.h"
+#include "ZEDrawParameters.h"
+#include "ZESerialization.h"
+#include "ZEMath\ZERay.h"
+#include "ZEPhysics\ZEPhysicalWorld.h"
+#include "ZESound\ZESoundModule.h"
+#include "ZEMap\ZEPortalMap\ZEPortalMap.h"
+#include "ZEMap\ZEPortalMap\ZEPortalMapResource.h"
 #include <memory.h>
 
 void ZEScene::SetVisualDebugElements(ZEDWORD VisualDebugElements)
@@ -693,3 +693,6 @@ ZEScene* ZEScene::GetInstance()
 {
 	return zeGame->GetScene();
 }
+
+
+

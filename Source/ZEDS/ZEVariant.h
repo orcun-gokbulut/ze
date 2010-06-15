@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Variant.h
+ Zinek Engine - ZEVariant.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -40,10 +40,10 @@
 #pragma warning(push)
 #pragma warning(disable:4482)
 
-#include "ZEMath/Matrix.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "Game/Serialization.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEGame\ZESerialization.h"
 
 enum ZEVariantType
 {
@@ -176,3 +176,6 @@ class ZEVariant : public ZESerializable
 
 #pragma warning(pop)
 #endif
+
+
+

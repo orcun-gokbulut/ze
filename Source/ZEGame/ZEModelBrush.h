@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ModelBrush.h
+ Zinek Engine - ZEModelBrush.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_MODEL_BRUSH_H__
 #define __ZE_MODEL_BRUSH_H__
 
-#include "CompoundEntity.h"
-#include "Model/Model.h"
+#include "ZECompoundEntity.h"
+#include "ZEModel\ZEModel.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEModelBrush);
 
@@ -127,3 +127,6 @@ ZE_POST_PROCESSOR_START(Meta)
 ZE_POST_PROCESSOR_END()
 */
 #endif 
+
+
+

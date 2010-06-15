@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMapPortalOctree.h
+ Zinek Engine - ZEPortalMapOctree.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,11 +37,11 @@
 #ifndef __ZE_PORTAL_MAP_OCTREE_H__
 #define __ZE_PORTAL_MAP_OCTREE_H__
 /*
-#include "ZEMath/AABoundingBox.h"
-#include "ZEDS/Array.h"
-#include "Graphics/FixedMaterial.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/Canvas.h"
+#include "ZEMath\ZEAABoundingBox.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZECanvas.h"
 
 struct ZEMapPolygon;
 class ZEMap;
@@ -76,3 +76,5 @@ class ZEPortalMapPortalOctree
 };
 */
 #endif
+
+

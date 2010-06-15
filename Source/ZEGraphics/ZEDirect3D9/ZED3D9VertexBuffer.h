@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9VertexBuffer.h
+ Zinek Engine - ZED3D9VertexBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_D3D9_VERTEX_BUFFER_H__
 #define __ZE_D3D9_VERTEX_BUFFER_H__
 
-#include "Graphics/VertexBuffer.h"
-#include "D3D9ComponentBase.h"
+#include "ZEGraphics\ZEVertexBuffer.h"
+#include "ZED3D9ComponentBase.h"
 #include <d3d9.h>
 
 class ZED3D9StaticVertexBuffer : public ZEStaticVertexBuffer, public ZED3D9ComponentBase
@@ -61,3 +61,5 @@ class ZED3D9StaticVertexBuffer : public ZEStaticVertexBuffer, public ZED3D9Compo
 		virtual						~ZED3D9StaticVertexBuffer();
 };
 #endif
+
+

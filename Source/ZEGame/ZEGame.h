@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Game.h
+ Zinek Engine - ZEGame.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef	__ZE_GAME_H__
 #define __ZE_GAME_H__
 
-#include "ZEDS/Array.h"
-#include "Entity.h"
-#include "Scene.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEEntity.h"
+#include "ZEScene.h"
 
 #define zeGame ZEGame::GetInstance()
 
@@ -101,3 +101,6 @@ class ZEGame
 		static ZEGame*							GetInstance();
 };
 #endif
+
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ALModule.h
+ Zinek Engine - ZEALModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef	__ZE_AL_MODULE_H__
 #define __ZE_AL_MODULE_H__
 
-#include "ZEDS/Array.h"
-#include "Sound/SoundModule.h"
-#include "Sound/SoundSource.h"
+#include "ZEDS\ZEArray.h"
+#include "ZESound\ZESoundModule.h"
+#include "ZESound\ZESoundSource.h"
 #include <al.h>
 #include <alc.h>
 
@@ -124,3 +124,5 @@ class ZEALModule : public ZESoundModule
 		virtual ZEListener*					CreateListener();
 };		
 #endif
+
+

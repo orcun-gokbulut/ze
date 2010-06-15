@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Texture2DResource.cpp
+ Zinek Engine - ZETexture2DResource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Texture2DResource.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
-#include "Core/ResourceManager.h"
-#include "Core/ResourceFile.h"
-#include "Texture2D.h"
+#include "ZETexture2DResource.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
+#include "ZECore\ZEResourceManager.h"
+#include "ZECore\ZEResourceFile.h"
+#include "ZETexture2D.h"
 
 #include <freeimage.h>
 
@@ -258,3 +258,5 @@ ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const char* FileNam
 	else
 		return NewResource;
 }
+
+

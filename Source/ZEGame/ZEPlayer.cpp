@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Player.cpp
+ Zinek Engine - ZEPlayer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Player.h"
+#include "ZEPlayer.h"
 
-#include "Core/Console.h"
-#include "Input/InputModule.h"
-#include "Input/InputDefinitions.h"
-#include "Graphics/GraphicsModule.h"
-#include "Game.h"
-#include "ZEMath/Ray.h"
-#include "ZEMath/Ray.h"
-#include "Sound/Listener.h"
+#include "ZECore\ZEConsole.h"
+#include "ZEInput\ZEInputModule.h"
+#include "ZEInput\ZEInputDefinitions.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGame.h"
+#include "ZEMath\ZERay.h"
+#include "ZEMath\ZERay.h"
+#include "ZESound\ZEListener.h"
 
 #define ACTIONID_FORWARD		0
 #define ACTIONID_BACKWARD		1
@@ -257,9 +257,12 @@ ZEPlayer::~ZEPlayer()
 	Deinitialize();
 }
 
-#include "Player.h.zpp"
+#include "ZEPlayer.h.zpp"
 
 ZEEntityRunAt ZEPlayerDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
+
+
+

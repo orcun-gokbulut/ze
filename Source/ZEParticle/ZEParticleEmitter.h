@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ParticleEmitter.h
+ Zinek Engine - ZEParticleEmitter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,13 +37,13 @@
 #ifndef __ZE_PARTICLE_EMITTER_H__
 #define __ZE_PARTICLE_EMITTER_H__
 
-#include "Definitions.h"
-#include "ZEDS/Array.h"
-#include "ZEMath/Vector.h"
-#include "ParticleSystem.h"
-#include "Particle.h"
-#include "ParticleController.h"
-#include "Meta/Class.h"
+#include "ZEDefinitions.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEParticleSystem.h"
+#include "ZEParticle.h"
+#include "ZEParticleController.h"
+#include "ZEMeta\ZEClass.h"
 
 ZE_META_CLASS_DESCRIPTION(ZEParticleEmitter);
 
@@ -266,3 +266,5 @@ ZE_POST_PROCESSOR_END()
 
 
 #endif
+
+

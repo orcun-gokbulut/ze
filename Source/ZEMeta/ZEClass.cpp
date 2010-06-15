@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Class.cpp
+ Zinek Engine - ZEClass.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Class.h"
+#include "ZEClass.h"
 #include <string.h>
-#include "Core/Error.h"
-#include "Animation.h"
+#include "ZECore\ZEError.h"
+#include "ZEAnimation.h"
 
 bool ZEClassDescription::CheckParent(ZEClassDescription* Parent, ZEClassDescription* Children)
 {
@@ -152,3 +152,5 @@ ZEClass::ZEClass()
 {
 	AnimationController = NULL;
 }
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ALSoundSource.cpp
+ Zinek Engine - ZEALSoundSource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -41,9 +41,9 @@
 // OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
 // OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
 
-#include "ALSoundSource.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
+#include "ZEALSoundSource.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
 
 static const char* ConvertErrorToString(ALenum Error)
 {
@@ -525,3 +525,5 @@ void ZEALSoundSource::SetSoundResource(ZESoundResource* Resource)
 		SoundSourceState = ZE_SSS_NONE;
 	}
 }
+
+

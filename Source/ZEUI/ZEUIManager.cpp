@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UIManager.cpp
+ Zinek Engine - ZEUIManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "UIManager.h"
-#include "UIRenderer.h"
-#include "UIControl.h"
-#include "Core/Error.h"
+#include "ZEUIManager.h"
+#include "ZEUIRenderer.h"
+#include "ZEUIControl.h"
+#include "ZECore\ZEError.h"
 
 ZEUIManager::ZEUIManager() 
 {
@@ -66,8 +66,8 @@ ZEArray<ZEUIControl*>& ZEUIManager::GetControls()
 	return Controls;
 }
 
-#include "UITextControl.h"
-#include "FontResource.h"
+#include "ZEUITextControl.h"
+#include "ZEFontResource.h"
 
 bool ZEUIManager::Initialize()
 {
@@ -123,3 +123,5 @@ ZEUIManager* ZEUIManager::CreateInstance()
 {
 	return new ZEUIManager();
 }
+
+

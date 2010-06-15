@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DSSoundSource3D.cpp
+ Zinek Engine - ZEDSSoundSource3D.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DSSoundSource3D.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
+#include "ZEDSSoundSource3D.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
 
 bool ZEDSSoundSource3D::CreateBuffer()
 {
@@ -578,3 +578,5 @@ void ZEDSSoundSource3D::SetConeOutsideVolume(unsigned int NewOutsideVolume)
 	if (DSBuffer != NULL)
 		DS3DBuffer->SetConeOutsideVolume(log10f((float)EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f, DS3D_DEFERRED);
 }
+
+

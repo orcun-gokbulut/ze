@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Window.h
+ Zinek Engine - ZEWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -91,3 +91,6 @@ class ZEWindow
 								~ZEWindow();
 };
 #endif
+
+
+

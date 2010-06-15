@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ALSoundSource3D.cpp
+ Zinek Engine - ZEALSoundSource3D.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -41,10 +41,10 @@
 // OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
 // OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
 
-#include "ALSoundSource3d.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
-#include "Sound/Listener.h"
+#include "ZEALSoundSource3d.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
+#include "ZESound\ZEListener.h"
 
 static const char* ConvertErrorToString(ALenum Error)
 {
@@ -630,3 +630,5 @@ void ZEALSoundSource3D::SetConeOutsideVolume(unsigned int NewOutsideVolume)
 	if (Allocated)
 		alSourcei(ALSource, AL_CONE_OUTER_GAIN, EffectiveVolume / 100.0f);
 }
+
+

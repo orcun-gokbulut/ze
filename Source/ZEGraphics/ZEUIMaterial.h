@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UIMaterial.h
+ Zinek Engine - ZEUIMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef __ZE_UI_MATERIAL_H__ 
 #define __ZE_UI_MATERIAL_H__
 
-#include "Material.h"
+#include "ZEMaterial.h"
 
 class ZETexture2D;
 
@@ -68,3 +68,5 @@ class ZEUIMaterial : public ZEMaterial
 };
 
 #endif
+
+

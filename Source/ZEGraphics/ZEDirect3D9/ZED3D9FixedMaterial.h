@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9FixedMaterial.h
+ Zinek Engine - ZED3D9FixedMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,9 +38,9 @@
 #define __ZE_D3D9_FIXED_MATERIAL_H__
 
 #include <d3d9.h>
-#include "D3D9ComponentBase.h"
-#include "D3D9FixedMaterialShader.h"
-#include "Graphics/FixedMaterial.h"
+#include "ZED3D9ComponentBase.h"
+#include "ZED3D9FixedMaterialShader.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
 
 class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 {
@@ -95,3 +95,5 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 		virtual void					Release();
 };
 #endif
+
+

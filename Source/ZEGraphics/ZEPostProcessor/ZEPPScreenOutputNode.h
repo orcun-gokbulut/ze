@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PPScreenOutputNode.h
+ Zinek Engine - ZEPPScreenOutputNode.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef __ZE_PP_SCREEN_OUTPUT_NODE_H__
 #define __ZE_PP_SCREEN_OUTPUT_NODE_H__
 
-#include "PostProcessorNode.h"
+#include "ZEPostProcessorNode.h"
 
 class ZETexture2D;
 
@@ -61,3 +61,5 @@ class ZEPPScreenOutputNode : public ZEPostProcessorNode
 };
 
 #endif
+
+

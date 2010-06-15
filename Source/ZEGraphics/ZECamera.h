@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Camera.h
+ Zinek Engine - ZECamera.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,14 +37,14 @@
 #ifndef	__ZE_CAMERA_H__
 #define __ZE_CAMERA_H__
 
-#include "Game/Component.h"
-#include "Graphics/Renderer.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/Canvas.h"
-#include "Graphics/ViewVolume.h"
-#include "ZEMath/Plane.h"
-#include "ZEMath/Rectangle.h"
-#include "Game/Portal.h"
+#include "ZEGame\ZEComponent.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZECanvas.h"
+#include "ZEGraphics\ZEViewVolume.h"
+#include "ZEMath\ZEPlane.h"
+#include "ZEMath\ZERectangle.h"
+#include "ZEGame\ZEPortal.h"
 
 enum ZECameraProjectionType
 {
@@ -106,3 +106,5 @@ class ZECamera : public ZEComponent
 };
 
 #endif
+
+

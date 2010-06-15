@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Texture2DResource.h
+ Zinek Engine - ZETexture2DResource.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_TEXTURE_2D_RESOURCE_H__
 #define __ZE_TEXTURE_2D_RESOURCE_H__
 
-#include "TextureResource.h"
+#include "ZETextureResource.h"
 
 class ZETexture2D;
 class ZEResourceFile;
@@ -64,3 +64,5 @@ class ZETexture2DResource : public ZETextureResource
 };
 
 #endif
+
+

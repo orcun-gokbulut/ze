@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXModule.cpp
+ Zinek Engine - ZEPhysXModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysXModule.h"
-#include "PhysXModuleDescription.h"
-#include "PhysXPhysicalWorld.h"
-#include "PhysXPhysicalRigidBody.h"
-#include "PhysXPhysicalStaticRigidBody.h"
-#include "PhysXPhysicalStaticMesh.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
+#include "ZEPhysXModule.h"
+#include "ZEPhysXModuleDescription.h"
+#include "ZEPhysXPhysicalWorld.h"
+#include "ZEPhysXPhysicalRigidBody.h"
+#include "ZEPhysXPhysicalStaticRigidBody.h"
+#include "ZEPhysXPhysicalStaticMesh.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
 
 #include <NxPhysics.h>
 #include <NxCooking.h>
@@ -215,3 +215,5 @@ ZEPhysicalCharacterController* ZEPhysXModule::CreatePhysicalController()
 {
 	return NULL;
 }
+
+

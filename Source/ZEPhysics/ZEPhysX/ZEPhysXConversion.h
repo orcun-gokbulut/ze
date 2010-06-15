@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXConversion.h
+ Zinek Engine - ZEPhysXConversion.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_PHYSX_CONVERSION_H__
 #define __ZE_PHYSX_CONVERSION_H__
 
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
 #include <NxVec3.h>
 #include <NxQuat.h>
 
@@ -68,3 +68,5 @@ __forceinline const ZEQuaternion NX_TO_ZE(const NxQuat& Quaternion)
 }
 
 #endif
+
+

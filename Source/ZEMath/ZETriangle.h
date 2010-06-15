@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Triangle.h
+ Zinek Engine - ZETriangle.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef	__ZE_MATH_TRIANGLE_H__
 #define __ZE_MATH_TRIANGLE_H__
 
-#include "Vector.h"
-#include "Line.h"
-#include "Plane.h"
+#include "ZEVector.h"
+#include "ZELine.h"
+#include "ZEPlane.h"
 
 class ZETriangle
 {
@@ -68,3 +68,5 @@ class ZETriangle
 };
 
 #endif
+
+

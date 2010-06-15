@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ModuleManager.cpp
+ Zinek Engine - ZEModuleManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ModuleManager.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
+#include "ZEModuleManager.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
 
 ZEOptionSection ZEModuleManager::ModuleManagerOptions;
 
@@ -240,13 +240,13 @@ void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
 	ModuleList.DeleteValue(ModuleDesc);
 }
 
-#include "Graphics/Direct3D9/D3D9ModuleDescription.h"
-#include "Sound/DirectSound/DSModuleDescription.h"
-#include "Input/DirectInput/DirectInputModuleDescription.h"
-#include "Input/DummyInput/DummyInputModuleDescription.h"
-#include "Input/VirtualInput/VirtualInputModuleDescription.h"
-#include "Sound/OpenAL/ALModuleDescription.h"
-#include "Physics/PhysX/PhysXModuleDescription.h"
+#include "ZEGraphics\ZEDirect3D9\ZED3D9ModuleDescription.h"
+#include "ZESound\ZEDirectSound\ZEDSModuleDescription.h"
+#include "ZEInput\ZEDirectInput\ZEDirectInputModuleDescription.h"
+#include "ZEInput\ZEDummyInput\ZEDummyInputModuleDescription.h"
+#include "ZEInput\ZEVirtualInput\ZEVirtualInputModuleDescription.h"
+#include "ZESound\ZEOpenAL\ZEALModuleDescription.h"
+#include "ZEPhysics\ZEPhysX\ZEPhysXModuleDescription.h"
 
 ZEModuleManager::ZEModuleManager()
 {
@@ -273,3 +273,6 @@ ZEModuleManager::~ZEModuleManager()
 	for (size_t I = 0; I < ModuleList.GetCount(); I++)
 		delete ModuleList[I];
 }
+
+
+

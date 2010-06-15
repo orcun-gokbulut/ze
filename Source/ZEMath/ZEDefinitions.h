@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Definitions.h
+ Zinek Engine - ZEDefinitions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -59,3 +59,5 @@
 #define ZEDEG2RAD(Angle) ((Angle) * ZE_PI/180)
 #define ZERAD2DEG(Angle) ((Angle) * 180/ZE_PI)
 #endif
+
+

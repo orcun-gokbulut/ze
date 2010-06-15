@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - TextureCube.cpp
+ Zinek Engine - ZETextureCube.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "TextureCube.h"
-#include "GraphicsModule.h"
+#include "ZETextureCube.h"
+#include "ZEGraphicsModule.h"
 
 ZETextureType ZETextureCube::GetTextureType() const
 {
@@ -72,3 +72,5 @@ ZETextureCube* ZETextureCube::CreateInstance()
 {
 	return zeGraphics->CreateTextureCube();
 }
+
+

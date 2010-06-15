@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMapDoor.cpp
+ Zinek Engine - ZEPortalMapDoor.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,10 +32,11 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "PortalMapDoor.h"
-#include "PortalMapResource.h"
-#include "PortalMap.h"
-#include "PortalMapPortal.h"
+
+#include "ZEPortalMapDoor.h"
+#include "ZEPortalMapResource.h"
+#include "ZEPortalMap.h"
+#include "ZEPortalMapPortal.h"
 
 ZEPortalMap* ZEPortalMapDoor::GetOwner()
 {
@@ -95,3 +96,4 @@ ZEPortalMapDoor::ZEPortalMapDoor()
 	Owner = NULL;
 	Resource = NULL;
 }
+

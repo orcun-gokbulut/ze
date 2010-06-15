@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - TextureCubeResource.cpp
+ Zinek Engine - ZETextureCubeResource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "TextureCubeResource.h"
-#include "TextureCube.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
-#include "Core/ResourceManager.h"
+#include "ZETextureCubeResource.h"
+#include "ZETextureCube.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
+#include "ZECore\ZEResourceManager.h"
 #include <freeimage.h>
 
 unsigned DLL_CALLCONV FreeImageFile_Read_Cube(void *buffer, unsigned size, unsigned count, fi_handle handle) 
@@ -272,3 +272,5 @@ ZETextureCubeResource::~ZETextureCubeResource()
 	if (Texture != NULL)
 		Texture->Destroy();
 };
+
+

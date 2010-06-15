@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PortalMap.cpp
+ Zinek Engine - ZEPortalMap.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,13 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PortalMap.h"
-#include "PortalMapResource.h" 
-#include "PortalMapPortal.h"
-#include "PortalMapDoor.h"
-#include "Core/Error.h"
-#include "Core/Console.h"
-#include "Game/DrawParameters.h"
+#include "ZEPortalMap.h"
+#include "ZEPortalMapResource.h"
+#include "ZEPortalMapPortal.h"
+#include "ZEPortalMapDoor.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
+#include "ZEGame\ZEDrawParameters.h"
 
 ZEPortalMap::ZEPortalMap()
 {
@@ -119,3 +119,5 @@ ZEPortalMap* ZEPortalMap::CreateInstance()
 {
 	return new ZEPortalMap();
 }
+
+

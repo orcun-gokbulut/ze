@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SkyBrush.cpp
+ Zinek Engine - ZESkyBrush.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,13 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Game/Scene.h"
-#include "SkyBrush.h"
-#include "Game/DrawParameters.h"
-#include "Graphics/Camera.h"
-#include "Graphics/FixedMaterial.h"
-#include "Graphics/DirectionalLight.h"
-#include "Graphics/TextureCubeResource.h"
+#include "ZEGame\ZEScene.h"
+#include "ZESkyBrush.h"
+#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGraphics\ZECamera.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZEGraphics\ZEDirectionalLight.h"
+#include "ZEGraphics\ZETextureCubeResource.h"
 #include <string.h>
 
 const ZEAABoundingBox& ZESkyBrush::GetWorldBoundingBox()
@@ -169,4 +169,7 @@ ZESkyBrush::~ZESkyBrush()
 }
 
 
-#include "SkyBrush.h.zpp"
+#include "ZESkyBrush.h.zpp"
+
+
+

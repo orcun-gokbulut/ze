@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PPVelocityInputNode.cpp
+ Zinek Engine - ZEPPVelocityInputNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PPVelocityInputNode.h"
-#include "Graphics/Renderer.h"
-#include "Core/Error.h"
-#include "Definitions.h"
+#include "ZEPPVelocityInputNode.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZECore\ZEError.h"
+#include "ZEDefinitions.h"
 
 ZEPPVelocityInputNode::ZEPPVelocityInputNode()
 {
@@ -96,3 +96,5 @@ ZEPPVelocityInputNode* ZEPPVelocityInputNode::CreateInstance()
 {
 	return new ZEPPVelocityInputNode();
 }
+
+

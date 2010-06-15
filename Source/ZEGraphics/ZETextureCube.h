@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - TextureCube.h
+ Zinek Engine - ZETextureCube.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef __ZE_TEXTURE_CUBE_H__
 #define __ZE_TEXTURE_CUBE_H__
 
-#include "Texture.h"
+#include "ZETexture.h"
 
 class ZEViewPort;
 
@@ -76,3 +76,5 @@ class ZETextureCube : public ZETexture
 		static ZETextureCube*			CreateInstance();
 };
 #endif
+
+

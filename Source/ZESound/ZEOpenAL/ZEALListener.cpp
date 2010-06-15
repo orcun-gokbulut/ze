@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ALListener.cpp
+ Zinek Engine - ZEALListener.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ALListener.h"
+#include "ZEALListener.h"
 #define ZE_LISTENER_UPDATE_TRESHOLD 0.5f
 
 void ZEALListener::ResetParameters()
@@ -178,3 +178,5 @@ void ZEALListener::Tick(float ElapsedTime)
 	const ZEVector3& WorldVelocity = GetWorldVelocity();
 	alListener3f(AL_VELOCITY, WorldVelocity.x, WorldVelocity.y, WorldVelocity.z);
 }
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ALModuleDescription.h
+ Zinek Engine - ZEALModuleDescription.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,11 +32,12 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
 #pragma once
 #ifndef __ZE_AL_MODULE_DESCRIPTION_H__
 #define __ZE_AL_MODULE_DESCRIPTION_H__
 
-#include "Core/Module.h"
+#include "ZECore\ZEModule.h"
 
 class ZEOptionSection;
 class ZEALModuleDescription : public ZEModuleDescription
@@ -56,3 +57,4 @@ class ZEALModuleDescription : public ZEModuleDescription
 };
 
 #endif
+

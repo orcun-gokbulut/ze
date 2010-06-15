@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalObject.h
+ Zinek Engine - ZEPhysicalObject.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,11 +37,11 @@
 #ifndef __ZE_PHYSICAL_OBJECT_H__
 #define __ZE_PHYSICAL_OBJECT_H__
 
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "Types.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZETypes.h"
 
-#include "PhysicalCallbacks.h"
+#include "ZEPhysicalCallbacks.h"
 
 enum ZEPhysicalObjectType
 {
@@ -96,3 +96,5 @@ class ZEPhysicalObject
 		void									Destroy();
 };
 #endif
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalWorld.h
+ Zinek Engine - ZEPhysicalWorld.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -42,7 +42,7 @@ class ZEPhysicsCollision;
 class ZEPhysicsTrigger;
 class ZEVector3;
 
-#include "ZEDS/Array.h"
+#include "ZEDS\ZEArray.h"
 
 class ZEPhysicalObject;
 class ZERenderer;
@@ -80,3 +80,5 @@ class ZEPhysicalWorld
 };
 
 #endif
+
+

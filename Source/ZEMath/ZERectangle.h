@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Rectangle.h
+ Zinek Engine - ZERectangle.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_MATH_RECTANGLE_H__
 #define __ZE_MATH_RECTANGLE_H__
 
-#include "Vector.h"
-#include "Plane.h"
+#include "ZEVector.h"
+#include "ZEPlane.h"
 
 enum ZERectangleCorner
 {
@@ -85,3 +85,5 @@ class ZERectangle
 								ZERectangle(const ZEVector2& LeftUp, float Width, float Height);
 };
 #endif
+
+

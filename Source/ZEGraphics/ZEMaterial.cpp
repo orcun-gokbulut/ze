@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - material.cpp
+ Zinek Engine - ZEMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Material.h"
-#include "Core/Core.h"
-#include "memory.h"
-#include "GraphicsModule.h"
-#include "Meta/Animation.h"
+#include "ZEMaterial.h"
+#include "ZECore\ZECore.h"
+#include "ZEGraphicsModule.h"
+#include "ZEMeta\ZEAnimation.h"
+#include <memory.h>
 
 ZEMaterial::ZEMaterial()
 {
@@ -143,4 +143,6 @@ void ZEMaterial::Destroy()
 	delete this;
 }
 
-#include "Material.h.zpp"
+#include "ZEMaterial.h.zpp"
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Texture3DResource.cpp
+ Zinek Engine - ZETexture3DResource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Texture3DResource.h"
-#include "Core/Error.h"
-#include "Core/ResourceManager.h"
-#include "GraphicsModule.h"
-#include "Texture3D.h"
+#include "ZETexture3DResource.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEResourceManager.h"
+#include "ZEGraphicsModule.h"
+#include "ZETexture3D.h"
 #include <freeimage.h>
 
 const char* ZETexture3DResource::GetResourceType() const
@@ -65,3 +65,5 @@ ZETexture3DResource::~ZETexture3DResource()
 	if (Texture != NULL)
 		Texture->Destroy();
 };
+
+

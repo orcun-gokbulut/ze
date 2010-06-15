@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9TextureCube.cpp
+ Zinek Engine - ZED3D9TextureCube.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9TextureCube.h"
-#include "D3D9Module.h"
-#include "D3D9CommonTools.h"
-#include "Core/Error.h"
+#include "ZED3D9TextureCube.h"
+#include "ZED3D9Module.h"
+#include "ZED3D9CommonTools.h"
+#include "ZECore\ZEError.h"
 
 ZED3D9TextureCube::ZED3D9TextureCube()
 {
@@ -151,3 +151,5 @@ void ZED3D9TextureCube::Destroy()
 	GetModule()->TextureCubes.DeleteValue((ZED3D9TextureCube*)this);
 	delete this;
 }
+
+

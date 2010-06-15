@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Texture2D.cpp
+ Zinek Engine - ZETexture2D.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Texture2D.h"
-#include "GraphicsModule.h"
+#include "ZETexture2D.h"
+#include "ZEGraphicsModule.h"
 
 ZETextureType ZETexture2D::GetTextureType() const
 {
@@ -77,3 +77,5 @@ ZETexture2D* ZETexture2D::CreateInstance()
 {
 	return zeGraphics->CreateTexture2D();
 }
+
+

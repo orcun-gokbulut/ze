@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SkyBrush.h
+ Zinek Engine - ZESkyBrush.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef __ZE_SKYBRUSH_H__
 #define __ZE_SKYBRUSH_H__
 
-#include "Entity.h"
-#include "Graphics/DirectionalLight.h"
-#include "Graphics/Canvas.h"
+#include "ZEEntity.h"
+#include "ZEGraphics\ZEDirectionalLight.h"
+#include "ZEGraphics\ZECanvas.h"
 
 ZE_META_CLASS_DESCRIPTION(ZESkyBrush);
 
@@ -105,3 +105,6 @@ ZE_POST_PROCESSOR_START(Meta)
 ZE_POST_PROCESSOR_END()
 */
 #endif
+
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - VirtualInputModuleDescription.h
+ Zinek Engine - ZEVirtualInputModuleDescription.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_VIRTUAL_INPUT_MODULE_DESCRIPTION_H__
 #define __ZE_VIRTUAL_INPUT_MODULE_DESCRIPTION_H__
 
-#include "Core/Module.h"
+#include "ZECore\ZEModule.h"
 
 class ZEVirtualInputModuleDescription : public ZEModuleDescription
 {
@@ -56,3 +56,5 @@ class ZEVirtualInputModuleDescription : public ZEModuleDescription
 };
 
 #endif
+
+

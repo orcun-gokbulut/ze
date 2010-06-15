@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9Module.h
+ Zinek Engine - ZED3D9Module.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,9 +37,9 @@
 #ifndef	__ZE_D3D9_MODULE_H__
 #define __ZE_D3D9_MODULE_H__
 
-#include "Graphics/GraphicsModule.h"
-#include "D3D9ViewPort.h"
-#include "ZEDS/Array.h"
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZED3D9ViewPort.h"
+#include "ZEDS\ZEArray.h"
 
 #ifdef ZE_DEBUG_ENABLED
 #define D3D_DEBUG_INFO
@@ -186,4 +186,6 @@ class ZED3D9Module : public ZEGraphicsModule
 };
 
 #endif
+
+
 

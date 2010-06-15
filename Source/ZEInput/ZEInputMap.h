@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - InputMap.h
+ Zinek Engine - ZEInputMap.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_INPUT_MAP_H__
 #define __ZE_INPUT_MAP_H__
 
-#include "ZEDS/Array.h"
+#include "ZEDS\ZEArray.h"
 
 enum ZEInputButtonState
 {
@@ -142,5 +142,7 @@ class ZEInputMap
 
 
   
+
+
 
 

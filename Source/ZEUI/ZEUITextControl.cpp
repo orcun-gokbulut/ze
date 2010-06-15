@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - UITextControl.cpp
+ Zinek Engine - ZEUITextControl.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "UITextControl.h"
-#include "UIRenderer.h"
-#include "FontResource.h"
-#include "Graphics/Texture2D.h"
+#include "ZEUITextControl.h"
+#include "ZEUIRenderer.h"
+#include "ZEFontResource.h"
+#include "ZEGraphics\ZETexture2D.h"
 
 void ZEUITextControl::SetText(const ZEString& Value)
 {
@@ -174,4 +174,6 @@ ZEUITextControl::~ZEUITextControl()
 	if (FontResource != NULL)
 		FontResource->Release();
 }
+
+
 

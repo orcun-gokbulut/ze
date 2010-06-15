@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9Renderer.h
+ Zinek Engine - ZED3D9Renderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,10 +37,10 @@
 #ifndef __ZE_D3D9_RENDERER_H__
 #define __ZE_D3D9_RENDERER_H__
 
-#include "Graphics/Renderer.h"
-#include "D3D9ComponentBase.h"
-#include "D3D9HDRProcessor.h"
-#include "D3D9SSAOProcessor.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZED3D9ComponentBase.h"
+#include "ZED3D9HDRProcessor.h"
+#include "ZED3D9SSAOProcessor.h"
 
 class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 {
@@ -129,3 +129,5 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 };
 
 #endif
+
+

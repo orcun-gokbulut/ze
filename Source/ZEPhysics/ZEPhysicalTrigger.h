@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalTrigger.h
+ Zinek Engine - ZEPhysicalTrigger.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_PHYSICAL_TRIGGER_H__
 #define __ZE_PHYSICAL_TRIGGER_H__
 
-#include "FastDelegate.h"
+#include "ZEFastDelegate.h"
 
 class ZEPhysicsBody;
 struct ZEPhysicsTrigger
@@ -49,3 +49,5 @@ struct ZEPhysicsTrigger
 typedef fastdelegate::FastDelegate1<ZEPhysicsTrigger*>   ZETriggerCallback;
 
 #endif
+
+

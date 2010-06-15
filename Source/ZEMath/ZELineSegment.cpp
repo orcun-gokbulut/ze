@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - LineSegment.cpp
+ Zinek Engine - ZELineSegment.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Definitions.h"
-#include "LineSegment.h"
-#include "Ray.h"
-#include "Vector.h"
-#include "Plane.h"
+#include "ZEDefinitions.h"
+#include "ZELineSegment.h"
+#include "ZERay.h"
+#include "ZEVector.h"
+#include "ZEPlane.h"
 #include <d3dx9.h>
 
 inline void ZELineSegment::Create(ZELine& Line, const ZEVector3& Start, const ZEVector3& End)
@@ -336,3 +336,5 @@ ZELineSegment::ZELineSegment()
 {
 
 }
+
+

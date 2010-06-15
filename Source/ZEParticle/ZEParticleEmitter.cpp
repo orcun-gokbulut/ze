@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ParticleEmitter.cpp
+ Zinek Engine - ZEParticleEmitter.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 #include <cmath>
-#include "ParticleEffect.h"
-#include "ParticleSystem.h"
-#include "ParticleEmitter.h"
+#include "ZEParticleEffect.h"
+#include "ZEParticleSystem.h"
+#include "ZEParticleEmitter.h"
 
 #define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max - Min) * ((float)rand() / RAND_MAX)) + Min)
 
@@ -525,4 +525,6 @@ ZEParticleEmitter::~ZEParticleEmitter()
 {
 }
 
-#include "ParticleEmitter.h.zpp"
+#include "ZEParticleEmitter.h.zpp"
+
+

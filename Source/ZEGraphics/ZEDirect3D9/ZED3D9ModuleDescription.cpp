@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - D3D9ModuleDescription.cpp
+ Zinek Engine - ZED3D9ModuleDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "D3D9ModuleDescription.h"
-#include "D3D9Module.h"
-#include "d3dx9.h"
+#include "ZED3D9ModuleDescription.h"
+#include "ZED3D9Module.h"
+#include <d3dx9.h>
 
 #define NULL 0
 ZEModuleType ZED3D9ModuleDescription::GetType()
@@ -87,3 +87,5 @@ bool ZED3D9ModuleDescription::CheckCompatible()
 {
 	return true;
 }
+
+

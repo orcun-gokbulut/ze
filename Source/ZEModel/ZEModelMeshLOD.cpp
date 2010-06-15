@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ModelMeshLOD.cpp
+ Zinek Engine - ZEModelMeshLOD.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ModelMeshLOD.h"
-#include "Model.h"
-#include "Graphics/Renderer.h"
-#include "Game/DrawParameters.h"
+#include "ZEModelMeshLOD.h"
+#include "ZEModel.h"
+#include "ZEGraphics\ZERenderer.h"
+#include "ZEGame\ZEDrawParameters.h"
 
 void ZEModelMeshLOD::ResetMaterial()
 {
@@ -82,7 +82,7 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters)
 	DrawParameters->Renderer->AddToRenderList(&NormalRenderOrder);*/
 }
 
-#include "Graphics/SimpleMaterial.h"
+#include "ZEGraphics\ZESimpleMaterial.h"
 void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)
 {
 	Owner = Model;
@@ -199,3 +199,5 @@ ZEModelMeshLOD::~ZEModelMeshLOD()
 {
 	Deinitialize();
 }
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXModule.h
+ Zinek Engine - ZEPhysXModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,9 +38,9 @@
 #ifndef	__ZE_PHYSX_PHYSICS_MODULE_H__
 #define __ZE_PHYSX_PHYSICS_MODULE_H__
 
-#include "Physics/PhysicsModule.h"
-#include "PhysXUserOutputStream.h"
-#include "ZEDS/Array.h"
+#include "ZEPhysics\ZEPhysicsModule.h"
+#include "ZEPhysXUserOutputStream.h"
+#include "ZEDS\ZEArray.h"
 
 class NxPhysicsSDK;
 class NxCookingInterface;
@@ -95,3 +95,5 @@ class ZEPhysXModule : public ZEPhysicsModule
 };
 
 #endif
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DummyInputModuleDescription.cpp
+ Zinek Engine - ZEDummyInputModuleDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "DummyInputModuleDescription.h"
-#include "DummyInputModule.h"
+#include "ZEDummyInputModuleDescription.h"
+#include "ZEDummyInputModule.h"
 
 ZEModuleType ZEDummyInputModuleDescription::GetType()
 {
@@ -86,3 +86,5 @@ bool ZEDummyInputModuleDescription::CheckCompatible()
 {
 	return true;
 }
+
+

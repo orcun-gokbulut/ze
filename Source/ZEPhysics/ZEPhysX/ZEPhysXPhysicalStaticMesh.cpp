@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysXPhysicalStaticMesh.cpp
+ Zinek Engine - ZEPhysXPhysicalStaticMesh.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "PhysXPhysicalStaticMesh.h"
-#include "PhysXPhysicalWorld.h"
-#include "PhysXStream.h"
-#include "PhysXConversion.h"
-#include "Core/Error.h"
+#include "ZEPhysXPhysicalStaticMesh.h"
+#include "ZEPhysXPhysicalWorld.h"
+#include "ZEPhysXStream.h"
+#include "ZEPhysXConversion.h"
+#include "ZECore\ZEError.h"
 
 #include <NxShapeDesc.h>
 #include <NxTriangleMeshShapeDesc.h>
@@ -250,3 +250,5 @@ void ZEPhysXPhysicalStaticMesh::Deinitialize()
 		Actor = NULL;
 	}
 }
+
+

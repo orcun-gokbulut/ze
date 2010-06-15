@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Canvas.h
+ Zinek Engine - ZECanvas.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,13 +37,13 @@
 #ifndef __ZE_CANVAS_H__
 #define __ZE_CANVAS_H__
 
-#include "VertexTypes.h"
-#include "VertexBuffer.h"
-#include "ZEDS/Array.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Matrix.h"
-#include "ZEMath/Quaternion.h"
-#include "ZEMath/AABoundingBox.h"
+#include "ZEVertexTypes.h"
+#include "ZEVertexBuffer.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath\ZEAABoundingBox.h"
 
 class ZECanvasVertex
 {
@@ -139,3 +139,5 @@ class ZECanvas : public ZEDynamicVertexBuffer
 };
 
 #endif
+
+

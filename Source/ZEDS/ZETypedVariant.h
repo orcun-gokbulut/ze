@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - TypedVariant.h
+ Zinek Engine - ZETypedVariant.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -47,7 +47,7 @@
 #pragma warning(push)
 #pragma warning(disable:4482)
 
-#include "Variant.h"
+#include "ZEVariant.h"
 class ZETypedVariant : public ZEVariant
 {
 	public:
@@ -80,3 +80,6 @@ class ZETypedVariant : public ZEVariant
 
 #pragma warning(pop)
 #endif
+
+
+

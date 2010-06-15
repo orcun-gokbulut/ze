@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - CanvasBrush.h
+ Zinek Engine - ZECanvasBrush.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,10 +37,10 @@
 #ifndef __ZE_CANVASBRUSH_H__
 #define __ZE_CANVASBRUSH_H__
 
-#include "CompoundEntity.h"
-#include "Graphics/Canvas.h"
-#include "Graphics/RenderOrder.h"
-#include "Graphics/FixedMaterial.h"
+#include "ZECompoundEntity.h"
+#include "ZEGraphics\ZECanvas.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZECanvasBrush);
 
@@ -82,3 +82,5 @@ ZE_POST_PROCESSOR_START(Meta)
 ZE_POST_PROCESSOR_END()
 */
 #endif
+
+

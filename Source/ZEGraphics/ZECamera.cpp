@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Camera.cpp
+ Zinek Engine - ZECamera.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Camera.h"
+#include "ZECamera.h"
 #include <math.h>
-#include "GraphicsModule.h"
-#include "Core/Error.h"
-#include "ZEMath/Ray.h"
-#include "Game/DrawParameters.h"
+#include "ZEGraphicsModule.h"
+#include "ZECore\ZEError.h"
+#include "ZEMath\ZERay.h"
+#include "ZEGame\ZEDrawParameters.h"
 
 const ZEMatrix4x4& ZECamera::GetViewTransform()
 {
@@ -240,4 +240,6 @@ ZECamera::ZECamera()
 	UpdateViewProjectionTransform = true;
 	UpdateProjectionTransform = true;
 }
+
+
 

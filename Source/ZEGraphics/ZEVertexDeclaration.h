@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - VertexDeclaration.h
+ Zinek Engine - ZEVertexDeclaration.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef	__ZE_VERTEX_DECLARATION_H__
 #define __ZE_VERTEX_DECLARATION_H__
 
-#include "ZEDS/Array.h"
-#include "Types.h"
+#include "ZEDS\ZEArray.h"
+#include "ZETypes.h"
 
 #define ZE_VE_POSITION				0x00000008
 #define ZE_VE_NORMAL				0x00000010
@@ -112,3 +112,5 @@ enum ZEVertexType
 	ZE_VT_GUIVERTEX				= 5
 };
 #endif
+
+

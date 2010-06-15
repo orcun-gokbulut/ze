@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SoundResourceOGG.cpp
+ Zinek Engine - ZESoundResourceOGG.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "SoundResourceOGG.h"
-#include "Core/Error.h"
+#include "ZESoundResourceOGG.h"
+#include "ZECore\ZEError.h"
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>
 #include <Memory.h>
@@ -172,3 +172,5 @@ ZESoundResource* ZESoundResourceOGG::LoadResource(const char* FileName)
 	bool Seekable = ov_seekable(&NewResource->OggFile);
 	return NewResource;
 }
+
+

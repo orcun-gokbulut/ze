@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Array.h
+ Zinek Engine - ZEArray.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -62,9 +62,9 @@ ZEArray<*>{
 #define __ZEDS_ARRAY_H__
 
 #include <stdlib.h>
-#include "Definitions.h"
-#include "..\Types.h"
-#include "Allocator.h"
+#include "ZEDefinitions.h"
+#include "..\ZETypes.h"
+#include "ZEAllocator.h"
 
 #ifdef ZE_DEBUG_CHECK_MEMORY
 #include <crtdbg.h>
@@ -471,3 +471,6 @@ class ZEChunkArray : public ZEArray<Type, ZEChunkAllocator<Type, ChunkSize> >
 {};
 
 #endif
+
+
+

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DummyInputModule.cpp
+ Zinek Engine - ZEDummyInputModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Core/Error.h"
-#include "Core/Console.h"
-#include "DummyInputModule.h"
-#include "DummyInputModuleDescription.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
+#include "ZEDummyInputModule.h"
+#include "ZEDummyInputModuleDescription.h"
 
 bool ZEDummyInputModule::IsEnabled()
 {
@@ -101,3 +101,5 @@ bool ZEDummyInputModule::GetRawInputEvent(ZEInputEvent& InputEvent)
 {
 	return false;
 }
+
+

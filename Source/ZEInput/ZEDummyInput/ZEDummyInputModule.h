@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - DummyInputModule.h
+ Zinek Engine - ZEDummyInputModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef	__ZE_DUMMY_INPUT_MODULE_H__
 #define __ZE_DUMMY_INPUT_MODULE_H__
 
-#include "Input/InputModule.h"
+#include "ZEInput\ZEInputModule.h"
 
 class ZEDummyInputModule: public ZEInputModule 
 {	
@@ -73,5 +73,7 @@ class ZEDummyInputModule: public ZEInputModule
 
 
   
+
+
 
 

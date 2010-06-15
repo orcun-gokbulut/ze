@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PhysicalStaticMesh.h
+ Zinek Engine - ZEPhysicalStaticMesh.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,8 +37,8 @@
 #ifndef __ZE_PHYSICAL_STATIC_MESH_H__
 #define __ZE_PHYSICAL_STATIC_MESH_H__
 
-#include "PhysicalObject.h"
-#include "PhysicalMaterial.h"
+#include "ZEPhysicalObject.h"
+#include "ZEPhysicalMaterial.h"
 
 struct ZEPhysicalTriangle
 {
@@ -59,3 +59,5 @@ class ZEPhysicalStaticMesh : public ZEPhysicalObject
 };
 
 #endif
+
+
