@@ -368,3 +368,10 @@
 	CHG: ZESDK project has been integreated in to Zinek Engine project as configurations.
 	CHG: Migrated to new libraries.
 	REM: Multithreaded CRT configuration has been removed. (Only multithreaded dll crt available.)
+	
+[16 July 2010 - Orcun]
+	CHG: ZENotation file name section has been changed. ZE tag added to all source files.
+	CHG: ZEPP has been upgreaded.
+	CHG: PostProcess directory renamed to ZEPP.
+	ADD: Build directory, which contains projects intermediate compiler outputs, added to repository.
+	

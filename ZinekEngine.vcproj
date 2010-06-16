@@ -18,8 +18,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)Build\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)Build\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="0"
 			ExcludeBuckets="3"
@@ -106,8 +106,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)Build\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)Build\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -217,8 +217,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release(Symb)|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)Build\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)Build\$(ConfigurationName)"
 			ConfigurationType="1"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -327,8 +327,8 @@
 		</Configuration>
 		<Configuration
 			Name="ZESDK Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)Build\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)Build\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="0"
 			>
@@ -409,8 +409,8 @@
 		</Configuration>
 		<Configuration
 			Name="ZESDK Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)Build\$(ConfigurationName)"
+			IntermediateDirectory="$(SolutionDir)Build\$(ConfigurationName)"
 			ConfigurationType="4"
 			CharacterSet="0"
 			WholeProgramOptimization="1"
@@ -1292,22 +1292,6 @@
 			<Filter
 				Name="WindowInput"
 				>
-				<File
-					RelativePath=".\Source\ZEInput\ZEWindowInput\ZEWindowsInputModule.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEInput\ZEWindowInput\ZEWindowsInputModule.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEInput\ZEWindowInput\ZEWindowsModuleDescription.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEInput\ZEWindowInput\ZEWindowsModuleDescription.h"
-					>
-				</File>
 			</Filter>
 			<Filter
 				Name="ZEDummyInput"
