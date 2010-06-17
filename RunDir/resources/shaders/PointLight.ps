@@ -50,12 +50,10 @@ float4	  MaterialParams4			 : register(c4);
 #define	  MaterialRefractionFactor     MaterialParams4.y;
 #define	  MaterialDetailMapTiling      MaterialParams4.zw;
 
-float3    LightParameters0           : register(c12);
-float2    LightParameters1           : register(c13);
+float4    LightParameters0           : register(c12);
 
 #define LightColor						LightParameters0.xyz
-#define LightIntensity					LightParameters1.x
-#define LightRange						LightParameters1.y
+#define LightIntensity					LightParameters0.w
 
 sampler   DiffuseMap                 : register(s0);
 sampler   NormalMap                  : register(s1);
@@ -74,7 +72,7 @@ struct PS_INPUT
 	#endif
 
 	float2 Texcoord           : TEXCOORD1;
-	float4 ViewDirection      : TEXCOORD2;
+	float3 ViewDirection      : TEXCOORD2;
 	float4 LightDirection     : TEXCOORD3;
 
 	#ifdef ZESHADER_SHADOWMAP
@@ -82,79 +80,61 @@ struct PS_INPUT
 	#endif
 };
 
-inline void CalculateShadow(in sampler ShadowMap)
+float4 ps_main(PS_INPUT Input) : COLOR0
 {
-}
+	float4 OutputColor;
 
-inline void CalculatePointLight(
-								in float3 Normal,
-								in float3 LightDirectionUN,
-								in float  DistanceAttenuation,
-								in float3 ViewDirection,
-								in float LightIntensity_,
-								in half3 LightColor_,
-								in float2 Texcoord,
-								inout half3 OutputColor)
-{
-	float3 LightDirection = normalize(LightDirectionUN);
-	float3 HalfVector = normalize(ViewDirection + LightDirection);
-	float DiffuseAngularAttenuation = saturate(dot(LightDirection, Normal));
-	
-	#ifdef ZESHADER_DIFFUSEMAP
-		#ifdef ZESHADER_DETAILMAP
-			half3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor * tex2D(DiffuseMap, Texcoord).rgb * tex2D(DetailMap, Texcoord * MaterialDetailMapTiling);
-		#else
-			half3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor * tex2D(DiffuseMap, Texcoord).rgb;
-		#endif
+	#ifdef ZESHADER_NORMALMAP
+		float3 Normal = (2.0f * tex2D(NormalMap, Input.Texcoord) - 1.0f);
 	#else
-		#ifdef ZESHADER_DETAILMAP
-			half3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor * tex2D(DetailMap, Texcoord * MaterialDetailMapTiling);
+		float3 Normal = normalize(Input.Normal);
+	#endif 
+
+	// Transparancy
+	#ifdef ZESHADER_OPASITYMAP
+		OutputColor.a = MaterialOpasity * tex2D(OpacityMap, Input.Texcoord).r;
+	#else
+		#ifdef ZESHADER_DIFFUSEMAP
+			OutputColor.a = MaterialOpasity * tex2D(DiffuseMap, Input.Texcoord).a;
 		#else
-			half3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor;
+			OutputColor.a = MaterialOpasity;
 		#endif
 	#endif
-	float SpecularAngularAttenuation;
-	if (DiffuseAngularAttenuation > 0.0f)
-	{
-		SpecularAngularAttenuation = pow(saturate(dot(HalfVector, Normal)), MaterialSpecularFactor);
-		#ifdef ZESHADER_SPECULARMAP
-			half3 SpecularColor = SpecularAngularAttenuation * MaterialSpecularColor * tex2D(SpecularMap, Texcoord).rgb;
-		#else
-			half3 SpecularColor = SpecularAngularAttenuation * MaterialSpecularColor;
-		#endif
-		OutputColor = (DiffuseColor + SpecularColor) * LightColor_ * (DistanceAttenuation * LightIntensity_);
-	}
-	else
-		OutputColor = DiffuseColor * LightColor_ * (DistanceAttenuation * LightIntensity_);
-}
+		
+	float3 ViewDirection = normalize(Input.ViewDirection);
+	float3 LightDirection = normalize(Input.LightDirection.xyz);
 
-half4 ps_main(PS_INPUT Input) : COLOR0
-{
-	if (true)//LightRange > Input.ViewDirection.w)
-	{
-		#ifdef ZESHADER_NORMALMAP
-			float3 Normal = (2.0f * tex2D(NormalMap, Input.Texcoord) - 1.0f);
-		#else
-			float3 Normal = normalize(Input.Normal);
-		#endif 
-
-		// Transparancy
-		#ifdef ZESHADER_OPASITYMAP
-			half4 OutputColor = half4(0.0f, 0.0f, 0.0f, MaterialOpasity * tex2D(OpacityMap, Input.Texcoord).r);
-		#else
-			#ifdef ZESHADER_DIFFUSEMAP
-				half4 OutputColor = half4(0.0f, 0.0f, 0.0f, MaterialOpasity * tex2D(DiffuseMap, Input.Texcoord).a);
+	float3 HalfVector = normalize(ViewDirection + LightDirection);
+	float DiffuseAngularAttenuation = saturate(dot(LightDirection, Normal));
+	/*if (DiffuseAngularAttenuation > 0.0f)
+	{*/	
+		#ifdef ZESHADER_DIFFUSEMAP
+			#ifdef ZESHADER_DETAILMAP
+				float3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor * tex2D(DiffuseMap, Input.Texcoord).rgb * tex2D(DetailMap, Input.Texcoord * MaterialDetailMapTiling);
 			#else
-				half4 OutputColor = half4(0.0f, 0.0f, 0.0f, MaterialOpasity);
+				float3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor * tex2D(DiffuseMap, Input.Texcoord).rgb;
+			#endif
+		#else
+			#ifdef ZESHADER_DETAILMAP
+				float3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor * tex2D(DetailMap, Input.Texcoord * MaterialDetailMapTiling);
+			#else
+				float3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor;
 			#endif
 		#endif
-			
-		float3 ViewDirection = normalize(Input.ViewDirection);
-		
-		CalculatePointLight(Normal, Input.LightDirection.xyz, Input.LightDirection.w, ViewDirection, LightIntensity, LightColor, Input.Texcoord, OutputColor.rgb);
-		
-		return OutputColor;
-	}
+
+		float SpecularAngularAttenuation;
+
+		SpecularAngularAttenuation = pow(saturate(dot(HalfVector, Normal)), MaterialSpecularFactor);
+		#ifdef ZESHADER_SPECULARMAP
+			float3 SpecularColor = SpecularAngularAttenuation * MaterialSpecularColor * tex2D(SpecularMap, Input.Texcoord).rgb;
+		#else
+			float3 SpecularColor = SpecularAngularAttenuation * MaterialSpecularColor;
+		#endif
+		OutputColor.rgb = (DiffuseColor + SpecularColor) * LightColor * (Input.LightDirection.w * LightIntensity);
+	/*}
 	else
-		return half4(0.0f, 0.0f, 0.0f, 0.0f);
+		OutputColor.rgb = float3(0.0f, 0.0f, 0.0f);	*/
+
+	return OutputColor;
+
 }

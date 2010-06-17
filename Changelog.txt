@@ -316,14 +316,70 @@
 	FIX: ZED3D9FixedMaterial, ZED3D9SimpleMaterial ZE_ROF_VIEW_TRANSFORM and ZE_ROF_PROJECTION_TRANSFORM bug fixed.
 	CHG: ZEPhysicalStaticObject renamed to ZEPhysicalStaticRigidBody.
 	
-[12 May 2010 - Revision 183 - Hakan]
+[10 May 2010 - Revision 182 - Orcun]
+	CHG: ZEMap sub-system has been revised.
+	ADD: ZEMap abstract class (interface) added to ZEMap system.
+	ADD: ZEPortalMap, ZEPortalMapPortal, ZEPortalMapDoor components added to ZEMap subsystem.
+	CHG: ZEMap file format has been changed. DoorCount attribute has added to head chunk and Entity count has removed from head chunk. Portal Door's are now dicreet entities in ZEMap file.
+	REM: Entity data removed from ZEMap file.
+	REM: Portal brushes removed from ZEMap file.
+	ADD: ZEPortalMapOctree component added.
+	
+[12 May 2010 - Revision 183 - Orcun, Hakan]
 	FIX: ZEEntity::GetWorldBoundingBox() DirtyFlag bug fixed.
 	FIX: ZEError::LogFileName initial termination escape character bug fixed.
 	FIX: ZEAABoundingBox::IntersectionTest point version has been fixed.
+	FIX: ZEPortalMap file structures fixed.
+	ADD: Major improvements on ZEPortalMap.
+	FIX: ZEPortalMap file has been loaded.
+	
+[13 May 2010 - Revision 184 - Orcun]
+	ADD: Resource file loading log messages added all resource files.
 
-[19 May 2010 - Revision 200 - Hakan]
+[15 May 2010 - Revision 186 - Orcun]
+	FIX: ZEPortalMap rendering fixed. 
+
+[15 May 2010 - Revision 192, 193 - Orcun]
+	CHG: GameInterface sub module renamed to Game.
+	CHG: Bit Flags types has been changed from ZEDWORD to typedefs.
+	ADD: ZEDrawParameters has been added.
+	CHG: ZEComponent moved to ZEGame sub-system.
+	CHG: ZEDebugComponent renamed to ZEDebugModule and became ZEModule.
+	CHG: DebugComponnent folder renamed to Debug.
+	CHG: ZEDebugModule moved to Debug folder.
+	
+[19 May 2010 - Revision 200, 201 - Hakan]
 	ADD: Trigger.cpp & Trigger.h added.
 	ADD: ZETrigger registered to Game.	
+	ADD: ZETrigger entity bounding box scale parameter fixed.	
+	
+[22 May 2010 - Revision 202 - Orcun]
+	ADD: Debug rendering capabilities added to ZEModel. (Rendering Normal, Tangent and Binormal lines)
+	FIX: ViewPosition bug fixed in ZEFixedMaterial Point Light.
+	BUG: Lightning is buggy in ZEFixedMaterial.
+	FIX: ZEModelResource material's specular factor and specular shiness bug fixed.
+	FIX: ZEMapResource material's specular factor and specular shiness bug fixed.
+	
+[23 May 2010 - Revision 203 - Orcun]
+	CHG: ZEEntity and ZEComponent has been combined.
+	ADD: ZECopoundEntity added.
+	CHG: ZEComponent has became a new kind of entity that can be contained by another new kind of entity CompoundEntity or can be directly added to scene.
+	-REM: Brushes will be removed in the future.
 
-[19 May 2010 - Revision 201 - Hakan]
-	ADD: ZETrigger entity bounding box scale parameter fixed.
+[28 May 2010 - Revision 216 - Orcun]
+	ADD: HDR Processor has been added. HDR Pipeline added.
+	FIX: ZED3D9FixedMaterialcrash has been fixed. (SetPixelShaderParameters)
+	FIX: ZE_DEBUG_SHADERS compile options, which allows debugging shaders on PIX and disabling shader optimizations, has been added.
+	+ADD: TraceLog mechanism has added. (Not fully completed) 
+	
+[14 July 2010 - Orcun]
+	CHG: ZESDK project has been integreated in to Zinek Engine project as configurations.
+	CHG: Migrated to new libraries.
+	REM: Multithreaded CRT configuration has been removed. (Only multithreaded dll crt available.)
+	
+[16 July 2010 - Orcun]
+	CHG: ZENotation file name section has been changed. ZE tag added to all source files.
+	CHG: ZEPP has been upgreaded.
+	CHG: PostProcess directory renamed to ZEPP.
+	ADD: Build directory, which contains projects intermediate compiler outputs, added to repository.
+	
