@@ -26,7 +26,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\building.mp3&quot;"
+				CommandLine="&quot;$(ProjectDir)ZEPP\madplay.exe&quot; -q &quot;$(ProjectDir)ZEPP\building.mp3&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -101,7 +101,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName).$(ConfigurationName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)rundir\$(TargetName).$(ConfigurationName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(ProjectDir)ZEPP\madplay.exe&quot; -q &quot;$(ProjectDir)ZEPP\complete.mp3&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -114,7 +114,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\building.mp3&quot;"
+				CommandLine="&quot;$(ProjectDir)ZEPP\madplay.exe&quot; -q &quot;$(ProjectDir)ZEPP\building.mp3&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -208,7 +208,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName).$(ConfigurationName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)rundir\$(TargetName).$(ConfigurationName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(ProjectDir)ZEPP\madplay.exe&quot; -q &quot;$(ProjectDir)ZEPP\complete.mp3&quot;&#x0D;&#x0A;"
 				ExecutionBucket="16"
 			/>
 			<Tool
@@ -225,7 +225,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\building.mp3&quot;"
+				CommandLine="&quot;$(ProjectDir)ZEPP\madplay.exe&quot; -q &quot;$(ProjectDir)ZEPP\building.mp3&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -318,7 +318,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(SolutionDir)rundir\$(TargetName).$(ConfigurationName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(ProjectDir)rundir\$(TargetName).$(ConfigurationName)$(TargetExt)&quot;&#x0D;&#x0A;&quot;$(ProjectDir)ZEPP\madplay.exe&quot; -q &quot;$(ProjectDir)ZEPP\complete.mp3&quot;&#x0D;&#x0A;"
 				ExecutionBucket="16"
 			/>
 			<Tool
@@ -334,7 +334,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\building.mp3&quot;"
+				CommandLine="&quot;$(ProjectDir)ZEPP\madplay.exe&quot; -q &quot;$(ProjectDir)ZEPP\building.mp3&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -404,7 +404,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy &quot;$(ProjectDir)Source\*.h&quot; &quot;$(ProjectDir)ZESDK\Include\ZESDK&quot; /S /Y&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
+				CommandLine="xcopy &quot;$(ProjectDir)Source\*.h&quot; &quot;$(ProjectDir)ZESDK\Include&quot; /S /Y&#x0D;&#x0A;&quot;$(ProjectDir)ZEPP\madplay.exe&quot; -q &quot;$(ProjectDir)ZEPP\complete.mp3&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 		<Configuration
@@ -417,7 +417,7 @@
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\building.mp3&quot;"
+				CommandLine="&quot;$(ProjectDir)ZEPP\madplay.exe&quot; -q &quot;$(ProjectDir)ZEPP\building.mp3&quot;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -483,7 +483,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="xcopy &quot;$(ProjectDir)Source\*.h&quot; &quot;$(ProjectDir)ZESDK\Include\ZESDK&quot; /S /Y&#x0D;&#x0A;&quot;$(SolutionDir)postprocess\madplay.exe&quot; -q &quot;$(SolutionDir)postprocess\complete.mp3&quot;&#x0D;&#x0A;"
+				CommandLine="xcopy &quot;$(ProjectDir)Source\*.h&quot; &quot;$(ProjectDir)ZESDK\Include&quot; /S /Y&#x0D;&#x0A;&quot;$(ProjectDir)ZEPP\madplay.exe&quot; -q &quot;$(ProjectDir)ZEPP\complete.mp3&quot;&#x0D;&#x0A;"
 			/>
 		</Configuration>
 	</Configurations>
