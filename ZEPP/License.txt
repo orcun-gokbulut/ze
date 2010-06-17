@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////////////////////////////////////
 //                                                                                  //
-//  ZE_LICENSE_FILE_NAME - Zinek Engine 0.5 Source Code                                 
+//  ZE_LICENSE_FILE_NAME - Zinek Engine ZE_LICENSE_VERSION Source Code                                 
 // -------------------------------------------------------------------------------- //
 //  Copyright (c) 2007-2010 Y. Orçun GÖKBULUT. All rights reserved.                 //
 //                                                                                  //

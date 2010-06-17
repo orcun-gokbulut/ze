@@ -83,7 +83,7 @@ END
 // Bitmap
 //
 
-IDB_LOGO                BITMAP                  "console_logo.bmp"
+IDB_LOGO                BITMAP                  "ZEConsoleLogo.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //

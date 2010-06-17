@@ -297,3 +297,5 @@ bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DTEXTURE9* Target, int 
 }
 
 
+
+

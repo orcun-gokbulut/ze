@@ -194,3 +194,5 @@ ZEVertexDeclaration* ZEColoredVertex::GetVertexDeclaration()
 }
 
 
+
+

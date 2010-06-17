@@ -40,3 +40,5 @@ NxPhysicsSDK* ZEPhysXComponentBase::PhysicsSDK = NULL;
 NxCookingInterface*	 ZEPhysXComponentBase::CookingInterface = NULL;
 
 
+
+

@@ -96,3 +96,5 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 #endif
 
 
+
+

@@ -694,3 +694,5 @@ void CutPortalDoorWithLine(ZEVector3 & Out1,ZEVector3 & Out2,const ZERectangle3D
 }*/
 
 
+
+

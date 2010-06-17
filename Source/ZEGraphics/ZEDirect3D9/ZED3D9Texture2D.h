@@ -73,3 +73,5 @@ class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 #endif
 
 
+
+
