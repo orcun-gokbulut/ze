@@ -160,4 +160,4 @@ ZETrigger::ZETrigger()
 	IsTriggerFired		= false;
 }
 
-#include "Trigger.h.zpp"
+#include "ZETrigger.h.zpp"
