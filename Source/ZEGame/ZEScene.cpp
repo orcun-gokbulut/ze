@@ -677,6 +677,7 @@ ZEScene::ZEScene()
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
 	PhysicalWorld = NULL;
+	MapResource = NULL;
 	Map = NULL;
 
 	memset(&CullStatistics, 0, sizeof(ZECullStatistics));

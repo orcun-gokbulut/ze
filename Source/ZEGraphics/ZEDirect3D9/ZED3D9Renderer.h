@@ -47,7 +47,7 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 	friend class ZED3D9Module;
 	friend class ZED3D9ShadowRenderer;
 	private:
-		ZED3D9ViewPort*				ViewPort;
+		ZED3D9ViewPort*						ViewPort;
 
 		LPDIRECT3DSURFACE9					ColorRenderTarget;
 		LPDIRECT3DSURFACE9					DepthRenderTarget;

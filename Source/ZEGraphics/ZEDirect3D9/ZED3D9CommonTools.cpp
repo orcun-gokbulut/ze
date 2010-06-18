@@ -65,8 +65,7 @@ bool ZED3D9CommonTools::CompileVertexShaderFromFile(LPDIRECT3DVERTEXSHADER9* Ver
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
 
-	if (*VertexShader != NULL)
-		(*VertexShader)->Release();
+	ZED3D_RELEASE(*VertexShader);
 
 	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
@@ -105,8 +104,8 @@ bool ZED3D9CommonTools::CompilePixelShaderFromFile(LPDIRECT3DPIXELSHADER9* Pixel
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
 
-	if (*PixelShader != NULL)
-		(*PixelShader)->Release();
+	ZED3D_RELEASE(*PixelShader);
+
 
 	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
@@ -143,8 +142,7 @@ bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShade
 	LPD3DXBUFFER ShaderBuffer;
 	LPD3DXBUFFER CompilerOutput;
 	
-	if (*VertexShader != NULL)
-		(*VertexShader)->Release();
+	ZED3D_RELEASE(*VertexShader);
 
 	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, NULL, "vs_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
@@ -175,8 +173,7 @@ bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, 
 	LPD3DXBUFFER ShaderBuffer;
 	LPD3DXBUFFER CompilerOutput;
 	
-	if (*PixelShader != NULL)
-		(*PixelShader)->Release();
+	ZED3D_RELEASE(*PixelShader);
 
 	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, NULL, "ps_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{

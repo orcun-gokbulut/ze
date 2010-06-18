@@ -42,7 +42,7 @@
 #include "ZEGraphics\ZETexture.h"
 #include "ZED3D9ComponentBase.h"
 
-#define ZED3D_RELEASE(x) if ((x) != NULL) {(x)->Release(); (x) = NULL;}
+#define ZED3D_RELEASE(x) {if ((x) != NULL) {(x)->Release(); (x) = NULL;}}
 
 class ZED3D9CommonTools : public ZED3D9ComponentBase
 {

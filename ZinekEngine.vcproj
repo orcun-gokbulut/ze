@@ -388,7 +388,10 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				LinkLibraryDependencies="true"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg.lib libvorbis.lib libvorbisfile.lib freeimage.lib libmpg123.lib OpenAL32.lib PhysXLoader.lib NxCooking.lib"
 				OutputFile="$(ProjectDir)ZESDK\Lib\ZESDKd.lib"
+				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Win x86\&quot;;&quot;$(ProjectDir)\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)\lib\Win x86\OpenAL&quot;;&quot;$(ProjectDir)\lib\Win x86\Debug&quot;"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -467,7 +470,10 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
+				LinkLibraryDependencies="true"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg.lib libvorbis.lib libvorbisfile.lib freeimage.lib libmpg123.lib OpenAL32.lib PhysXLoader.lib NxCooking.lib"
 				OutputFile="$(ProjectDir)ZESDK\Lib\ZESDK.lib"
+				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Win x86\&quot;;&quot;$(ProjectDir)\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)\lib\Win x86\OpenAL&quot;;&quot;$(ProjectDir)\lib\Win x86\Release&quot;"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -1239,6 +1245,14 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEGame\ZESkyBrush.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZETrigger.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZETrigger.h"
 				>
 			</File>
 		</Filter>

@@ -419,11 +419,14 @@ bool ZED3D9Renderer::Initialize()
 	if (HDREnabled)
 	{
 		// HDR Rendering
-		ZED3D9CommonTools::CreateRenderTarget(&HDRRenderTarget, GetModule()->GetScreenWidth(), GetModule()->GetScreenHeight(), ZE_TPF_RGBA_HDR);
-		HDRRenderTarget->GetSurfaceLevel(0, &ColorRenderTarget);
-		HDRProcessor.Input = HDRRenderTarget;
-		HDRProcessor.Target = GetModule()->GetFrameColorBuffer();
-		HDRProcessor.Initialize();
+		if (HDRRenderTarget == NULL)
+		{
+			ZED3D9CommonTools::CreateRenderTarget(&HDRRenderTarget, GetModule()->GetScreenWidth(), GetModule()->GetScreenHeight(), ZE_TPF_RGBA_HDR);
+			HDRRenderTarget->GetSurfaceLevel(0, &ColorRenderTarget);
+			HDRProcessor.Input = HDRRenderTarget;
+			HDRProcessor.Target = GetModule()->GetFrameColorBuffer();
+			HDRProcessor.Initialize();
+		}
 	}
 
 /*	if (SSAOEnabled)
@@ -549,12 +552,17 @@ ZETexture2D* ZED3D9Renderer::GetObjectTexture()
 
 void ZED3D9Renderer::DeviceLost()
 {
-	// GetDevice() is lost so recreate hardware resources
+	ZED3D_RELEASE(HDRRenderTarget);
+	ZED3D_RELEASE(ColorRenderTarget);
 	HDRProcessor.OnDeviceLost();
 }
 
 bool ZED3D9Renderer::DeviceRestored()
 {
+	ZED3D9CommonTools::CreateRenderTarget(&HDRRenderTarget, GetModule()->GetScreenWidth(), GetModule()->GetScreenHeight(), ZE_TPF_RGBA_HDR);
+	HDRRenderTarget->GetSurfaceLevel(0, &ColorRenderTarget);
+	HDRProcessor.Input = HDRRenderTarget;
+	HDRProcessor.Target = GetModule()->GetFrameColorBuffer();
 	HDRProcessor.OnDeviceRestored();
 	return true;
 }

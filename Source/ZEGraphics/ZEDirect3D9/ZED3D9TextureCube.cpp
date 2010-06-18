@@ -61,17 +61,29 @@ bool ZED3D9TextureCube::IsEmpty() const
 void ZED3D9TextureCube::DeviceLost()
 {
 	if (RenderTarget)
-		if (CubeTexture != NULL)
-		{
-			CubeTexture->Release();
-			CubeTexture = NULL;
-		}
+	{
+		for (size_t I = 0; I < 8; I++)
+			ZED3D_RELEASE(ViewPorts[I].ColorBuffer);
+
+		ZED3D_RELEASE(CubeTexture);
+	}
 }
 
 bool ZED3D9TextureCube::DeviceRestored()
 {
 	if (RenderTarget)
-		return Create(EdgeLength, PixelFormat, true);
+	{
+		if (!Create(EdgeLength, PixelFormat, true))
+			return false;
+
+		for (size_t I = 0; I < 6; I++)
+		{
+			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].ColorBuffer);
+			ViewPorts[I].DepthBuffer = NULL;
+		}
+
+	}
+
 	return true;
 }
 
@@ -136,12 +148,8 @@ void ZED3D9TextureCube::Release()
 	if (RenderTarget)
 		for (size_t I = 0; I < 6; I++)
 		{
+			ZED3D_RELEASE(ViewPorts[I].ColorBuffer);
 			ViewPorts[I].DepthBuffer = NULL;
-			if (ViewPorts[I].ColorBuffer != NULL)
-			{
-				ViewPorts[I].ColorBuffer->Release();
-				ViewPorts[I].ColorBuffer = NULL;
-			}
 		}
 }
 

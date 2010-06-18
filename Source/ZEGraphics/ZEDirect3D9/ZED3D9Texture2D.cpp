@@ -56,11 +56,10 @@ bool ZED3D9Texture2D::IsEmpty() const
 void ZED3D9Texture2D::DeviceLost()
 {
 	if (RenderTarget)
-		if (Texture != NULL)
-		{
-			Texture->Release();
-			Texture = NULL;
-		}
+	{
+		ZED3D_RELEASE(Texture);
+		ZED3D_RELEASE(ViewPort.ColorBuffer);
+	}
 }
 
 bool ZED3D9Texture2D::DeviceRestored()
@@ -209,11 +208,8 @@ void ZED3D9Texture2D::Release()
 	PixelFormat = ZE_TPF_NOTSET;;
 	RenderTarget = false;
 
-	if (Texture != NULL)
-	{
-		Texture->Release();
-		Texture = NULL;
-	}
+	ZED3D_RELEASE(Texture);
+	ZED3D_RELEASE(ViewPort.ColorBuffer);
 }
 
 void ZED3D9Texture2D::Destroy()
