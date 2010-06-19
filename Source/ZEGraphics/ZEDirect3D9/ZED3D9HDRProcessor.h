@@ -59,9 +59,8 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			LPDIRECT3DTEXTURE9			Luminance1;
 			LPDIRECT3DTEXTURE9			Luminance;
 			LPDIRECT3DTEXTURE9			OldLuminance;
-			LPDIRECT3DTEXTURE9			DownSampled2x;
-			LPDIRECT3DTEXTURE9			DownSampled8xA;
-			LPDIRECT3DTEXTURE9			DownSampled8xB;
+			LPDIRECT3DTEXTURE9			DownSampled4xA;
+			LPDIRECT3DTEXTURE9			DownSampled4xB;
 		} Textures;
 
 		struct
@@ -85,9 +84,9 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 
 		void CreateRenderTargets()
 		{
-			ZED3D9CommonTools::CreateRenderTarget(&Textures.DownSampled2x, ScreenWidth / 2, ScreenHeight / 2, ZE_TPF_RGBA_HDR);
-			ZED3D9CommonTools::CreateRenderTarget(&Textures.DownSampled8xA, ScreenWidth / 8, ScreenHeight / 8, ZE_TPF_RGBA_HDR);
-			ZED3D9CommonTools::CreateRenderTarget(&Textures.DownSampled8xB, ScreenWidth / 8, ScreenHeight / 8, ZE_TPF_RGBA_HDR);
+			//ZED3D9CommonTools::CreateRenderTarget(&Textures.DownSampled2x, ScreenWidth / 2, ScreenHeight / 2, ZE_TPF_RGBA_HDR);
+			ZED3D9CommonTools::CreateRenderTarget(&Textures.DownSampled4xA, ScreenWidth / 4, ScreenHeight / 4, ZE_TPF_RGBA_HDR);
+			ZED3D9CommonTools::CreateRenderTarget(&Textures.DownSampled4xB, ScreenWidth / 4, ScreenHeight / 4, ZE_TPF_RGBA_HDR);
 
 			ZED3D9CommonTools::CreateRenderTarget(&Textures.Luminance5, 243, 243, ZE_TPF_LUM_HDR);
 			ZED3D9CommonTools::CreateRenderTarget(&Textures.Luminance4, 81, 81, ZE_TPF_LUM_HDR);
@@ -100,9 +99,9 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 
 		void ReleaseRenderTargets()
 		{
-			ZED3D_RELEASE(Textures.DownSampled2x);
-			ZED3D_RELEASE(Textures.DownSampled8xA);
-			ZED3D_RELEASE(Textures.DownSampled8xB);
+			//ZED3D_RELEASE(Textures.DownSampled2x);
+			ZED3D_RELEASE(Textures.DownSampled4xA);
+			ZED3D_RELEASE(Textures.DownSampled4xB);
 
 			ZED3D_RELEASE(Textures.Luminance5);
 			ZED3D_RELEASE(Textures.Luminance4);
@@ -317,6 +316,9 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 
 			GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 			GetDevice()->SetRenderState(D3DRS_ZENABLE, FALSE);
+			GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+			GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+
 			GetDevice()->SetVertexDeclaration(VertexDeclaration);
 			GetDevice()->SetVertexShader(Shaders.VertexShader);
 
@@ -388,34 +390,40 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 			// Bright Pass
-			SetRenderTarget(Textures.DownSampled2x);
+			SetRenderTarget(Textures.DownSampled4xA);
 			GetDevice()->SetTexture(0, Input);
 			GetDevice()->SetTexture(1, Textures.Luminance);
 			GetDevice()->SetPixelShader(Shaders.BrightPass);
-			GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / ScreenWidth, 1.0f / ScreenHeight, 0.0f, 0.0f), 1);
-			GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / (ScreenHeight / 2.0f), 1.0f / (ScreenHeight / 2.0f), 0.0f, 0.0f), 1);
+		
+			GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / ScreenWidth, 1.0f / ScreenHeight, 0.0f, 0.0f), 1);
+			GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (ScreenHeight / 4.0f), 1.0f / (ScreenHeight / 4.0f), 0.0f, 0.0f), 1);
+
+			GetDevice()->SetPixelShaderConstantF(15, (const float*) Kernel4x4, 16);
+
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 			// Down Sample 4x
-			SetRenderTarget(Textures.DownSampled8xA);
+			/*SetRenderTarget(Textures.DownSampled8xA);
 			GetDevice()->SetPixelShaderConstantF(15, (const float*) Kernel4x4, 16);
-			GetDevice()->SetTexture(0, Textures.DownSampled2x);
+			GetDevice()->SetTexture(0, Textures.DownSampled4xB);
 			GetDevice()->SetPixelShader(Shaders.ColorDownSample4x);
-			GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (ScreenWidth / 2.0f), 1.0f / (ScreenWidth / 2.0f), 0.0f, 0.0f), 1);
-			GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4 (1.0f / (ScreenWidth / 8.0f), 1.0f / (ScreenHeight / 8.0f), 0.0f, 0.0f), 1);
-			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+			
+			GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (ScreenWidth / 4.0f), 1.0f / (ScreenWidth / 4.0f), 0.0f, 0.0f), 1);
+			GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4 (1.0f / (ScreenWidth / 4.0f), 1.0f / (ScreenHeight / 4.0f), 0.0f, 0.0f), 1);
+			
+			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));*/
 
 			// Vertical Bloom Pass
-			GetDevice()->SetTexture(0, Textures.DownSampled8xA);
-			SetRenderTarget(Textures.DownSampled8xB);
+			GetDevice()->SetTexture(0, Textures.DownSampled4xA);
+			SetRenderTarget(Textures.DownSampled4xB);
 			GetDevice()->SetPixelShaderConstantF(15, (const float*)BloomKernel, 15);
 			GetDevice()->SetPixelShader(Shaders.VerticalBloom); 
-			GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (ScreenWidth / 8.0f), 1.0f / (ScreenWidth / 8.0f), 0.0f, 0.0f), 1);
+			//GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (ScreenWidth / 8.0f), 1.0f / (ScreenWidth / 8.0f), 0.0f, 0.0f), 1);
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 			// Horizontal Bloom Pass
-			GetDevice()->SetTexture(0, Textures.DownSampled8xB);
-			SetRenderTarget(Textures.DownSampled8xA);
+			GetDevice()->SetTexture(0, Textures.DownSampled4xB);
+			SetRenderTarget(Textures.DownSampled4xA);
 			GetDevice()->SetPixelShader(Shaders.HorizontalBloom);
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
@@ -429,7 +437,7 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			GetDevice()->SetRenderTarget(0, Target);
 			GetDevice()->SetTexture(0, Input);
 			GetDevice()->SetTexture(1, Textures.Luminance);
-			GetDevice()->SetTexture(2, Textures.DownSampled8xB);
+			GetDevice()->SetTexture(2, Textures.DownSampled4xB);
 			GetDevice()->SetPixelShader(Shaders.ToneMap);
 			GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4 (1.0f / ScreenWidth, 1.0f / ScreenHeight, 0.0f, 0.0f), 1);
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
