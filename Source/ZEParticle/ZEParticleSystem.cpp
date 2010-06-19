@@ -63,7 +63,7 @@ void ZEParticleSystem::UpdateVertexBuffer(ZEDrawParameters* DrawParameters) //Bi
 		ZEMatrix4x4 InverseWorld;
 		ZEMatrix4x4::Inverse(InverseWorld, Owner->GetWorldTransform());
 		ZEMatrix4x4 Transform;
-		ZEMatrix4x4::Multiply(Transform, DrawParameters->ViewPort->ViewTransform, InverseWorld);
+		ZEMatrix4x4::Multiply(Transform, DrawParameters->View->ViewTransform, InverseWorld);
 		ZEVector3 CamDir;
 		ZEMatrix4x4::Transform3x3(CamDir, Transform, ZEVector3(0.0f, 0.0f, 1.0f));
 
@@ -133,7 +133,7 @@ void ZEParticleSystem::UpdateVertexBuffer(ZEDrawParameters* DrawParameters) //Bi
 	
 		RenderOrder.PrimitiveCount = 0;
 		
-		ZEVector3 CameraPosition = DrawParameters->ViewPort->Position - Owner->GetWorldPosition();
+		ZEVector3 CameraPosition = DrawParameters->View->Position - Owner->GetWorldPosition();
 
 		ZESimpleVertex* Buffer = (ZESimpleVertex*)VertexBuffer->Lock();
 		if (Buffer != NULL)

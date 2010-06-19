@@ -180,30 +180,26 @@ float ZECamera::GetAspectRatio()
 {
 	return AspectRatio;
 }
-/*
-const ZEViewPoint& ZECamera::GetViewPoint()
+
+const ZEView& ZECamera::GetView()
 {
-	if (!UpdateViewPoint)
-		return ViewPoint;
-	
-	ZEMatrix4x4 ViewPositionTransform, ViewRotationTransform;
+	if (!UpdateView)
+		return View;
 
-	const ZEVector3& ViewPosition = GetWorldPosition();
-	ZEQuaternion ViewRotation;
-	ZEQuaternion::Conjugate(ViewRotation, GetWorldRotation());
-	ZEMatrix4x4::CreateTranslation(ViewPositionTransform, -ViewPosition.x, -ViewPosition.y, -ViewPosition.z);
-	ZEMatrix4x4::CreateRotation(ViewRotationTransform, ViewRotation);
-	ZEMatrix4x4::Multiply(ViewPoint.ViewMatrix, ViewPositionTransform, ViewRotationTransform);
-	
-	ZEMatrix4x4::CreatePerspectiveProjection(ViewPoint.ProjMatrix, FOV, AspectRatio, zeGraphics->GetNearZ(), zeGraphics->GetFarZ());
-	ZEMatrix4x4::Multiply(ViewPoint.ViewProjMatrix, ViewPoint.ViewMatrix, ViewPoint.ProjMatrix);
-	ViewPoint.ViewPosition = ViewPosition;
+	View.Type = ZE_VPT_CAMERA;
+	View.Camera = this;
+	View.FOV = GetFOV();
+	View.ProjectionTransform = GetProjectionTransform();
+	View.ViewTransform = GetViewTransform();
+	View.ViewProjectionTransform = GetViewProjectionTransform();
+	View.Rotation = GetWorldRotation();
+	View.Direction = GetWorldDirection();
 
-	UpdateViewPoint = false;
-	return ViewPoint;
-}*/
+	UpdateView = false;
+	return View;
+}
 
-ZEViewVolume& ZECamera::GetViewVolume()
+const ZEViewVolume& ZECamera::GetViewVolume()
 {
 	if (!UpdateViewFrustum)
 		return ViewFrustum;
@@ -234,7 +230,7 @@ void ZECamera::GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY)
 
 ZECamera::ZECamera()
 {
-	UpdateViewPoint = true;
+	UpdateView = true;
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;
 	UpdateViewProjectionTransform = true;

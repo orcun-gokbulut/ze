@@ -406,16 +406,16 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 			// Vertical Bloom Pass
+			GetDevice()->SetTexture(0, Textures.DownSampled8xA);
 			SetRenderTarget(Textures.DownSampled8xB);
 			GetDevice()->SetPixelShaderConstantF(15, (const float*)BloomKernel, 15);
-			GetDevice()->SetTexture(0, Textures.DownSampled8xA);
 			GetDevice()->SetPixelShader(Shaders.VerticalBloom); 
 			GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (ScreenWidth / 8.0f), 1.0f / (ScreenWidth / 8.0f), 0.0f, 0.0f), 1);
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 			// Horizontal Bloom Pass
-			SetRenderTarget(Textures.DownSampled8xA);
 			GetDevice()->SetTexture(0, Textures.DownSampled8xB);
+			SetRenderTarget(Textures.DownSampled8xA);
 			GetDevice()->SetPixelShader(Shaders.HorizontalBloom);
 			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 

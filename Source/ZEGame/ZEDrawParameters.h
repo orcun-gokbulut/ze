@@ -56,31 +56,30 @@ enum ZERenderPass
 	ZE_RP_OCCLUSION_MAP
 };
 
-enum ZEViewPortType
+enum ZEViewType
 {
 	ZE_VPT_CAMERA,
 	ZE_VPT_LIGHT
 };
 
-struct ZEViewPort
+struct ZEView
 {
-	ZEViewPortType			Type;
+	ZEViewType				Type;
 	ZELight*				Light;
 	ZECamera*				Camera;
 
 	ZEVector3				Position;
 	ZEQuaternion			Rotation;
+	ZEVector3				Direction;
 
 	float					FOV;
-
-	float					Width;
-	float					Height;
-	float					AspectRatio;
 
 	ZEMatrix4x4				ViewTransform;
 	ZEMatrix4x4				ProjectionTransform;
 	ZEMatrix4x4				ViewProjectionTransform;
 };
+
+class ZEViewPort;
 
 struct ZEDrawParameters
 {
@@ -89,8 +88,11 @@ struct ZEDrawParameters
 	float					Time;
 	ZERenderer*				Renderer;
 	ZERenderPass			Pass;
-	ZEViewPort*				ViewPort;
-	ZEViewVolume*			ViewVolume;
+
+	const ZEView*			View;
+	const ZEViewPort*		ViewPort;
+	const ZEViewVolume*		ViewVolume;
+
 	ZESmartArray<ZELight*>	Lights;
 };
 

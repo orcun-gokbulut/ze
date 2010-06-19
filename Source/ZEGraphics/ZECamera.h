@@ -45,6 +45,7 @@
 #include "ZEMath\ZEPlane.h"
 #include "ZEMath\ZERectangle.h"
 #include "ZEGame\ZEPortal.h"
+#include "ZEGame\ZEDrawParameters.h"
 
 enum ZECameraProjectionType
 {
@@ -59,7 +60,7 @@ class ZECamera : public ZEComponent
 {
 	private:
 		bool							UpdateViewFrustum;
-		bool							UpdateViewPoint;
+		bool							UpdateView;
 		bool							UpdateViewTransform;
 		bool							UpdateProjectionTransform;
 		bool							UpdateViewProjectionTransform;
@@ -74,6 +75,7 @@ class ZECamera : public ZEComponent
 		ZEMatrix4x4						ViewProjectionTransform;
 
 		ZEViewFrustum					ViewFrustum;
+		ZEView							View;
 
 	public:
 		void							SetNearZ(float NearZ);
@@ -97,8 +99,8 @@ class ZECamera : public ZEComponent
 
 		virtual void					OwnerWorldTransformChanged();	
 
-		//ZEViewPort*						GetViewPort();
-		ZEViewVolume&					GetViewVolume();
+		const ZEView&					GetView();
+		const ZEViewVolume&				GetViewVolume();
 
 		void							GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY);
 

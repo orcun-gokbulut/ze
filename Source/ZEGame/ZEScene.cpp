@@ -331,8 +331,8 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 	DrawParameters.FrameId = zeCore->GetFrameId();
 	DrawParameters.Pass = ZE_RP_COLOR;
 	DrawParameters.Renderer = Renderer;
-	DrawParameters.ViewVolume = &ActiveCamera->GetViewVolume();
-//	DrawParameters.ViewPort = &ActiveCamera->GetViewPort();
+	DrawParameters.ViewVolume = (ZEViewVolume*)&ActiveCamera->GetViewVolume();
+	DrawParameters.View = (ZEView*)&ActiveCamera->GetView();
 	DebugDraw.Clean();
 
 	// Zero statistical data
@@ -440,18 +440,19 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 			DrawParameters.Lights.Clear();
 			
 			// Loop through lights that has effect on view area. Lights that tested and passed on Step 1
-			for (size_t M = 0; M < VisibleLights.GetCount(); M++)
-			{
-				const ZEViewVolume& LightViewVolume = VisibleLights[M]->GetViewVolume();
-
-				// Test light view volume and entity's bounding volumes in order to detect entity lies in lights effect area
-				if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || !LightViewVolume.CullTest(CurrentEntity))
+			if (EntityDrawFlags & ZE_DF_LIGHT_RECIVER)
+				for (size_t M = 0; M < VisibleLights.GetCount(); M++)
 				{
-					// Add light to list which contains lights effect entity
-					DrawParameters.Lights.Add(VisibleLights[M]);
-					EntityLights.Add(VisibleLights[M]);
+					const ZEViewVolume& LightViewVolume = VisibleLights[M]->GetViewVolume();
+
+					// Test light view volume and entity's bounding volumes in order to detect entity lies in lights effect area
+					if (VisibleLights[M]->GetLightType() == ZE_LT_DIRECTIONAL || !LightViewVolume.CullTest(CurrentEntity))
+					{
+						// Add light to list which contains lights effect entity
+						DrawParameters.Lights.Add(VisibleLights[M]);
+						EntityLights.Add(VisibleLights[M]);
+					}
 				}
-			}
 
 			if (CullStatistics.MaxLightPerEntity < EntityLights.GetCount())
 				CullStatistics.MaxLightPerEntity = EntityLights.GetCount();
