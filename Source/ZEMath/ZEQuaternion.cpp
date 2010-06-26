@@ -36,6 +36,8 @@
 #include "ZEQuaternion.h"
 #include "ZEDefinitions.h"
 #include <math.h>
+#include <float.h>
+#include <stdlib.h>
 
 const ZEQuaternion ZEQuaternion::Zero = ZEQuaternion(0.0f, 0.0f, 0.0f, 0.0f);
 const ZEQuaternion ZEQuaternion::Identity = ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f);
@@ -107,6 +109,51 @@ void ZEQuaternion::CreateIdentity(ZEQuaternion& Output)
 	Output.x = 0.0f;
 	Output.y = 0.0f;
 	Output.z = 0.0f;
+}
+
+void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Up)
+{
+	ZEVector3 Right, NewUp;
+
+	ZEVector3::CrossProduct(Right, Up, Direction);
+	ZEVector3::CrossProduct(NewUp, Direction, Right);
+	
+	/*ZEMatrix3x3 Basis(
+	Right.x, Right.y, Right.z,                                        
+	NewUp.x, NewUp.y, NewUp.z,                          
+	Direction.x, Direction.y, Direction.z);
+
+	ZEQuaternion Quat;
+
+	Quat.w = sqrtf(1.0f + Basis.M11 + Basis.M22 + Basis.M33) / 2.0f;
+	double Scale = Quat.w * 4.0f;
+	Quat.x = (Basis.M32 - Basis.M23) / Scale;
+	Quat.y = (Basis.M13 - Basis.M31) / Scale;
+	Quat.z = (Basis.M21 - Basis.M12) / Scale;*/
+	
+
+	ZEQuaternion Quat;
+	Quat.w = sqrtf(1.0f + Right.x + NewUp.y + Direction.z) / 2.0f;
+	float Scale = Quat.w * 4.0f;
+	Quat.x = (Direction.y - NewUp.z) / Scale;
+	Quat.y = (Right.z - Direction.x) / Scale;
+	Quat.z = (NewUp.x - Right.y) / Scale;
+
+	ZEQuaternion::Normalize(Quat, Quat);
+}
+
+void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Matrix)
+{
+	ZEQuaternion Quat;
+	Quat.w = sqrt(__max(0.0f, 1.0f + Matrix.M11 + Matrix.M22 + Matrix.M33)) / 2.0f;
+	Quat.x = sqrt(__max(0.0f, 1.0f + Matrix.M11 - Matrix.M22 - Matrix.M33)) / 2.0f;
+	Quat.y = sqrt(__max(0.0f, 1.0f - Matrix.M11 + Matrix.M22 - Matrix.M33)) / 2.0f;
+	Quat.z = sqrt(__max(0.0f, 1.0f - Matrix.M11 - Matrix.M22 + Matrix.M33)) / 2.0f;
+	Quat.x = _copysign(Quat.x, Matrix.M32 - Matrix.M23);
+	Quat.y = _copysign(Quat.y, Matrix.M13 - Matrix.M31);
+	Quat.z = _copysign(Quat.z, Matrix.M21 - Matrix.M12);
+
+	ZEQuaternion::Normalize(Quat, Quat);
 }
 
 void ZEQuaternion::Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B)

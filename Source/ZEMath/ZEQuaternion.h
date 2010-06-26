@@ -61,7 +61,8 @@ class ZEQuaternion
 		static void						Create(ZEQuaternion& Output, float Pitch, float Yawn, float Roll);
 		static void						Create(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Right);
 		static void						CreateIdentity(ZEQuaternion& Output);
-
+		static void						CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Matrix);
+		static void						CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Up = ZEVector3(0.0f, 1.0f, 0.0));
 		static void						Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B);
 		static void						VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaternion, const ZEVector3& Vector);
 
