@@ -36,12 +36,12 @@
 float4	  SkyColor					 : register(c0);
 sampler   SkyTexture                 : register(s0);
 
-struct PS_INPUT
+struct PSInput
 {
 	float3 CubeTexcoord       : TEXCOORD0;
 };
 
-half4 ps_main(PS_INPUT Input) : COLOR0
+half4 ps_main(PSInput Input) : COLOR0
 {
 	return SkyColor * texCUBE(SkyTexture, normalize(Input.CubeTexcoord));
 }

@@ -1,0 +1,103 @@
+#include <string.h>
+
+ZEClassDescription* ZEMaterialDescription::GetParent() const
+{
+    return NULL;
+}
+
+const char* ZEMaterialDescription::GetName() const
+{
+    return "ZEMaterial";
+ }
+
+const char* ZEMaterialDescription::GetType() const
+{
+    return "";
+}
+
+const char* ZEMaterialDescription::GetIcon() const
+{
+   return "";
+}
+
+const char* ZEMaterialDescription::GetDescription() const
+{
+    return "Base class of materials.";
+}
+
+const ZEPropertyDescription* ZEMaterialDescription::GetProperties() const
+{   
+   return NULL;
+}
+
+size_t ZEMaterialDescription::GetPropertyCount() const
+{
+    return 0;
+}
+
+size_t ZEMaterialDescription::GetPropertyOffset() const
+{
+    return 0;
+}
+
+const ZEMethodDescription* ZEMaterialDescription::GetMethods() const
+{
+    return NULL;
+}
+
+size_t ZEMaterialDescription::GetMethodCount() const
+{
+    return 0;
+}
+
+size_t ZEMaterialDescription::GetMethodOffset() const
+{
+    return 0;
+}
+
+ZEClassProvider* ZEMaterialDescription::GetProvider() const
+{
+    return NULL;
+}
+
+ZEClass* ZEMaterialDescription::CreateInstance() const
+{
+    return NULL;
+}
+
+ZEClassDescription* ZEMaterial::ClassDescription()
+{
+    static ZEMaterialDescription Desc;
+    return &Desc;
+}
+
+ZEClassDescription* ZEMaterial::GetClassDescription()
+{
+    return ZEMaterial::ClassDescription();
+}
+
+int ZEMaterial::GetPropertyId(const char* Name) const
+{
+    return -1;
+}
+
+bool ZEMaterial::SetProperty(int PropertyId, const ZEVariant& Value)
+{
+    return false;
+}
+
+bool ZEMaterial::SetProperty(const char* Name, const ZEVariant& Value)
+{
+    return false;
+}
+
+bool ZEMaterial::GetProperty(int PropertyId, ZEVariant& Value) const
+{
+    return false;
+}
+
+bool ZEMaterial::GetProperty(const char* Name, ZEVariant& Value) const
+{
+    return false;
+}
+

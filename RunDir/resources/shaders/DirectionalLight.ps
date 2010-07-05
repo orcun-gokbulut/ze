@@ -63,7 +63,7 @@ sampler   EnvironmentMap             : register(s6);
 sampler   LightMap                   : register(s7);
 sampler   ShadowMap                  : register(s8);
 
-struct PS_INPUT
+struct PSInput
 {
 	#ifndef ZESHADER_NORMALMAP
 	float3 Normal             : TEXCOORD0;
@@ -131,7 +131,7 @@ inline void CalculatePointLight(
 
 }
 
-half4 ps_main(PS_INPUT Input) : COLOR0
+half4 ps_main(PSInput Input) : COLOR0
 {
 	#ifdef ZESHADER_NORMALMAP
 		float3 Normal = (2.0f * tex2D(NormalMap, Input.Texcoord).rgb - 1.0f);

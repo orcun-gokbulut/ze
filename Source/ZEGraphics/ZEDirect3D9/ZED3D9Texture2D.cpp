@@ -58,7 +58,7 @@ void ZED3D9Texture2D::DeviceLost()
 	if (RenderTarget)
 	{
 		ZED3D_RELEASE(Texture);
-		ZED3D_RELEASE(ViewPort.ColorBuffer);
+		ZED3D_RELEASE(ViewPort.FrameBuffer);
 	}
 }
 
@@ -67,8 +67,8 @@ bool ZED3D9Texture2D::DeviceRestored()
 	if (RenderTarget)
 	{
 		return Create(Width, Height, PixelFormat, true);
-		Texture->GetSurfaceLevel(0, &ViewPort.ColorBuffer);
-		ViewPort.DepthBuffer = NULL;
+		Texture->GetSurfaceLevel(0, &ViewPort.FrameBuffer);
+		ViewPort.ZBuffer = NULL;
 	}
 
 	return true;
@@ -180,8 +180,8 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 
 	if (RenderTarget)
 	{
-		Texture->GetSurfaceLevel(0, &ViewPort.ColorBuffer);
-		ViewPort.DepthBuffer = NULL;
+		Texture->GetSurfaceLevel(0, &ViewPort.FrameBuffer);
+		ViewPort.ZBuffer = NULL;
 	}
 	return true;
 
@@ -209,7 +209,7 @@ void ZED3D9Texture2D::Release()
 	RenderTarget = false;
 
 	ZED3D_RELEASE(Texture);
-	ZED3D_RELEASE(ViewPort.ColorBuffer);
+	ZED3D_RELEASE(ViewPort.FrameBuffer);
 }
 
 void ZED3D9Texture2D::Destroy()

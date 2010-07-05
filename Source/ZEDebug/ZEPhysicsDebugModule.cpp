@@ -166,7 +166,7 @@ bool ZEPhysicsDebugModule::Initialize()
 
 		Model = new ZEModel();
 		Model->SetModelResource(ZEModelResource::LoadResource("test.zeModel"));
-		Model->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
+		Model->SetScale(ZEVector3(300.0f, 300.0f, 300.0f));
 		Scene->AddEntity(Model);
 		//Model->GetModel()->GetBones()[5].SetRelativeRotation(ZEQuaternion(ZE_PI_4, ZEVector3(0.0f, 1.0f, 0.0f)));
 		//Model->GetModel()->GetMeshes()[0].SetLocalScale(ZEVector3(0.1, 0.1, 0.1));
@@ -183,7 +183,7 @@ bool ZEPhysicsDebugModule::Initialize()
 
 		ZELightBrush* Light = new ZELightBrush();
 		Light->SetLightType(ZE_LT_POINT);
-		Light->SetPosition(ZEVector3(0.0f, 15.0f, -15.0f));
+		Light->SetPosition(ZEVector3(-10.0f, 15.0f, -15.0f));
 		Light->SetScale(ZEVector3::One);
 		Light->GetLight()->SetRange(15000);
 		Light->SetRotation(ZEQuaternion::Identity);

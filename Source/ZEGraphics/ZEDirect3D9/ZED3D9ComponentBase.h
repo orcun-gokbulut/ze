@@ -64,9 +64,8 @@ class ZED3D9ComponentBase
 	public:
 		static bool						BaseInitialize(ZED3D9Module* D3DModule);
 
+/*		virtual	void					OnDeviceLost();
+		virtual bool					OnDeviceRestored();*/
 };
+
 #endif
-
-
-
-

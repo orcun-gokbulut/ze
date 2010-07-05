@@ -34,23 +34,25 @@
 /*ZE_POST_PROCESSOR_END()*/
 
 // Transformation matrices 5 matrices
-float4x4  WorldViewProjMatrix			: register(c0);
-float4x4  ViewMatrix					: register(c4);
-float4x4  ViewInvTrpsMatrix				: register(c8);
-float		FarZ						: register(c13);
-// Other general constants 4 vectors
-float4    ViewPosition					: register(c16);
-float     MaterialRefractionIndex		: register(c17);
+float4x4 WorldViewProjMatrix : register(c0);
+float4x4 WorldViewMatrix : register(c4);
+float4x4 WorldViewInvTrpsMatrix : register(c8);
+float FarZ : register(c13);
 
+// Other general constants 4 vectors
+float4 ViewPosition : register(c16);
+float MaterialRefractionIndex : register(c17);
+
+#define MaterialProperties
 //First light 4 vector 1 matrix
-float4    LightPosition					: register(c24);
-float3    LightAttenuationFactors		: register(c25);
-float4x4  LightMapMatrix				: register(c28);
+float4    LightPosition : register(c24);
+float3    LightAttenuationFactors : register(c25);
+float4x4  LightMapMatrix : register(c28);
 
 // Bone matrices rest of the space
-float4x4  BoneMatrices[58]				: register(c32);
+float4x4  BoneMatrices[58] : register(c32);
 
-struct VS_INPUT 
+struct VSInput 
 {
 	float4 Position             : POSITION0;
 	float3 Normal               : NORMAL0;
@@ -65,70 +67,58 @@ struct VS_INPUT
 	#endif
 };
 
-struct VS_OUTPUT 
+struct VSOutput 
 {
-	float4 Position                : POSITION0;
-	float2 Texcoord                : TEXCOORD0;
+	float4 Position : POSITION0;
+	float4 NormalDepth : TEXCOORD0;
+	float2 Texcoord : TEXCOORD1;
+
 	#ifdef ZESHADER_LIGHTMAP
-		float2 LightMapTexcoord     : TEXCOORD1;
+		float2 LightMapTexcoord : TEXCOORD2;
 	#endif
-	#ifdef ZESHADER_HEMISPHERELIGHTNING
-		#ifdef ZESHADER_TANGENTSPACE
-			float3 SkyVector            : TEXCOORD2;
-		#else
-			float3 Normal               : TEXCOORD2;
-		#endif
-	#endif
-
 	#ifdef ZESHADER_REFLECTION
-		float3 ReflectionVector     : TEXCOORD3;
+		float3 ReflectionVector : TEXCOORD3;
 	#endif
-
 	#ifdef ZESHADER_REFRACTION
-		float3 RefractionVector     : TEXCOORD4;
+		float3 RefractionVector : TEXCOORD4;
 	#endif
-	float4 NormalDepth               : TEXCOORD5;
-
-	
+	#ifdef ZESHADER_DISTORTION
+		float3 Distortion
+	#endif
+	float3 _Position : TEXCOORD5;
 };
 
-VS_OUTPUT vs_main(VS_INPUT Input)
+#include "SkinTransform.hlsl"
+
+VSOutput vs_main(VSInput Input)
 {
-	VS_OUTPUT Output;
+	VSOutput Output;
+
 	// Pre Pipeline
 
 	// Vertex Transform;
 	float4 Position;
 	float3 Normal;
-	#ifdef ZESHADER_SKINTRANSFORM
-		Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
-		Normal = float3(0.0f, 0.0f, 0.0f);
-		for (int I = 0; I < 4; I++)
-			if (Input.BoneWeights[I] > 0.0f)
-			{
-				Position += mul(Input.Position, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
-				Normal += mul(Input.Normal, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
-			}	
-	#else
-		Position = Input.Position;
-		Normal = Input.Normal;
-	#endif
+
+	SkinTransform(Input);
 
 	// Pipeline 
-	Output.Position = mul(Position, WorldViewProjMatrix);
-	Output.NormalDepth.xyz = 0.5f * mul(Normal, ViewInvTrpsMatrix).xyz - 0.5f;
-	Output.NormalDepth.w = mul(Position, ViewMatrix).x / FarZ;
+	Output.Position = mul(Input.Position, WorldViewProjMatrix);
+	Output.NormalDepth.xyz = mul(Input.Normal, WorldViewInvTrpsMatrix).xyz;
+	Output.NormalDepth.w = mul(Input.Position, WorldViewMatrix).z;
 
+	Output._Position = mul(Input.Position, WorldViewMatrix).xyz;
+	
 	// Parameter Process
 	Output.Texcoord = Input.Texcoord;
 
 	// Lightning Effect
 	#if defined(ZESHADER_REFLECTION) || defined(ZESHADER_REFRACTION)
-		float3 CameraDirection = normalize(Position - ViewPosition);
+		float3 CameraDirection = normalize(Input.Position - ViewPosition);
 	#endif
 	
 	#ifdef ZESHADER_REFLECTION
-		Output.ReflectionVector = reflect(-CameraDirection, Normal);
+		Output.ReflectionVector = reflect(-CameraDirection, Input.Normal);
 	#endif
 	
 	#ifdef ZESHADER_REFRACTION

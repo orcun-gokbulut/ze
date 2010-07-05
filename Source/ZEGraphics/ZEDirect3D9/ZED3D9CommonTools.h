@@ -47,6 +47,7 @@
 class ZED3D9CommonTools : public ZED3D9ComponentBase
 {
 	public:
+		static void				SetRenderTarget(size_t RenderTarget, LPDIRECT3DTEXTURE9 Texture);
 		static D3DFORMAT		ConvertPixelFormat(ZETexturePixelFormat Format);
 		static bool				CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* Source, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros = NULL);
 		static bool				CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, const char* Source, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros = NULL);

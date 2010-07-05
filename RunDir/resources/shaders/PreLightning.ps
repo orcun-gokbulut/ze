@@ -33,75 +33,84 @@
 //////////////////////////////////////////////////////////////////////////////////////
 /*ZE_POST_PROCESSOR_END()*/
 
-float4	  MaterialParams0			 : register(c0);
-float4	  MaterialParams1			 : register(c1);
-float4	  MaterialParams2			 : register(c2);
-float4	  MaterialParams3			 : register(c3);
-float4	  MaterialParams4			 : register(c4);
+float4 MaterialParams0 : register(c0);
+float4 MaterialParams1 : register(c1);
+float4 MaterialParams2 : register(c2);
+float4 MaterialParams3 : register(c3);
+float4 MaterialParams4 : register(c4);
+float4 MaterialParams5 : register(c5);
+float FarZ : register(c6);
 
-#define	  MaterialAmbientColor         MaterialParams0.xyz
-#define	  MaterialOpacity			   MaterialParams0.w
-#define	  MaterialDiffuseColor         MaterialParams1.xyz
-#define	  MaterialSpecularColor        MaterialParams2.xyz
-#define	  MaterialSpecularFactor	   MaterialParams2.w
-#define	  MaterialEmmisiveColor        MaterialParams3.xyz
-#define	  MaterialEmmisiveFactor	   MaterialParams3.w
-#define	  MaterialReflectionFactor	   MaterialParams4.x
-#define	  MaterialRefractionFactor     MaterialParams4.y;
-#define	  MaterialDetailMapTiling      MaterialParams4.zw;
+#define	MaterialAmbientColor        MaterialParams0.xyz
+#define	MaterialOpacity				MaterialParams0.w
+#define	MaterialDiffuseColor        MaterialParams1.xyz
+#define	MaterialSpecularColor       MaterialParams2.xyz
+#define	MaterialSpecularFactor		MaterialParams2.w
+#define	MaterialEmmisiveColor       MaterialParams3.xyz
+#define	MaterialEmmisiveFactor		MaterialParams3.w
+#define	MaterialReflectionFactor	MaterialParams4.x
+#define	MaterialRefractionFactor    MaterialParams4.y;
+#define	MaterialDetailMapTiling     MaterialParams4.zw;
+#define MaterialDistortionFactor	MaterialParams5.x;
+#define MaterialDistortionAmount	MaterialParams5.y;
 
-float4    LightColor                 : register(c12);
-float     LightIntensity             : register(c13);
+float4 LightColor : register(c12);
+float LightIntensity : register(c13);
 
 // General Material Properties 
-sampler   DiffuseMap                 : register(s0);
-sampler   NormalMap                  : register(s1);
-sampler	  ParallaxMap				 : register(s2);
-sampler   SpecularMap                : register(s3);
-sampler   OpacityMap				 : register(s4);
-sampler   DetailDiffuseMap           : register(s5);
-sampler   DetailNormalMap            : register(s6);
+sampler2D BaseMap : register(s0);
+sampler2D NormalMap : register(s1);
+sampler2D ParallaxMap : register(s2);
+sampler2D SpecularMap : register(s3);
+sampler2D OpacityMap : register(s4);
+sampler2D DetailDiffuseMap : register(s5);
+sampler2D DetailNormalMap : register(s6);
 
 // PreLightning Material Properties
-sampler   EmmisiveMap                : register(s7);
-sampler	  ReflectionMap				 : register(s8);
-sampler   RefractionMap              : register(s9);
-sampler   LightMap                   : register(s10);
-sampler	  DistortionMap				 : register(s11);
+sampler2D EmmisiveMap : register(s7);
+sampler2D ReflectionMap : register(s8);
+sampler2D RefractionMap : register(s9);
+sampler2D LightMap : register(s10);
+sampler2D DistortionMap : register(s11);
 
-struct PS_INPUT
+struct PSInput
 {
-	float2 Texcoord             : TEXCOORD0;
+	float4 NormalDepth : TEXCOORD0;
+	float2 Texcoord : TEXCOORD1;
 	#ifdef ZESHADER_LIGHTMAP
-	float2 LightMapTexcoord     : TEXCOORD1;
+	float2 LightMapTexcoord : TEXCOORD2;
 	#endif
 	#ifdef ZESHADER_REFLECTION
-	float3 ReflectionVector     : TEXCOORD3;
+	float3 ReflectionVector : TEXCOORD3;
 	#endif
 	#ifdef ZESHADER_REFRACTION
-	float3 RefractionVector     : TEXCOORD4;
+	float3 RefractionVector : TEXCOORD4;
 	#endif
 	#ifdef ZESHADER_DISTORTION 
-	float2 ScreenCoordinates    : TEXCOORD5;
+	float2 ScreenCoordinates : TEXCOORD5;
 	#endif
-
-	float4 NormalDepth : TEXCOORD5;
+	float3 Position : TEXCOORD5;
 };
 
-struct PS_OUTPUT
+struct PSOutput
 {
-	float4	Color : COLOR0;
-	float4	NormalDepth	: COLOR1;
+	float4 Color : COLOR0;
+	float4 NormalDepth : COLOR1;
+	float4 Position : COLOR2;
 };
 
-PS_OUTPUT ps_main(PS_INPUT Input)
+PSOutput ps_main(PSInput Input)
 {
-	PS_OUTPUT Output;
+	PSOutput Output;
 
 	Output.Color = float4(0.0f, 0.0f ,0.0f ,1.0f);
 
 	#ifdef ZESHADER_AMBIENT
-		Output.Color.rgb += MaterialAmbientColor;
+		#ifdef ZESHADER_DIFFUSEMAP
+			Output.Color.rgb = MaterialAmbientColor * tex2D(BaseMap, Input.Texcoord).rgb;
+		#else
+			Output.Color.rgb = MaterialAmbientColor;
+		#endif
 	#endif
 	
 	#ifdef ZESHADER_EMMISIVE
@@ -110,10 +119,6 @@ PS_OUTPUT ps_main(PS_INPUT Input)
 		#else
 			Output.Color.rgb += MaterialEmmisiveColor;
 		#endif
-	#endif
-
-	#ifdef ZESHADER_DIFFUSEMAP
-		Output.Color.rgb *= tex2D(DiffuseMap, Input.Texcoord).rgb;
 	#endif
 
 	#ifdef ZESHADER_LIGHTMAP
@@ -140,7 +145,7 @@ PS_OUTPUT ps_main(PS_INPUT Input)
 			#else
 				Output.Color.a = tex2D(DiffuseMap, Input.Texcoord).r;
 			#endif
-		#elif defined(ZESHADER_OPACITY_DIFFUSEALPHA
+		#elif defined(ZESHADER_OPACITY_BASE_MAP_ALPHA
 			#ifdef ZESHADER_OPACITY_CONSTANT
 				Output.Color.a = MaterialOpacity * tex2D(DiffuseMap, Input.Texcoord).a;
 			#else
@@ -151,7 +156,8 @@ PS_OUTPUT ps_main(PS_INPUT Input)
 		#endif
 	#endif
 
-	Output.NormalDepth = Input.NormalDepth;
-	
+	Output.NormalDepth.xyz = Input.NormalDepth.xyz;
+	Output.NormalDepth.w = Input.NormalDepth.w / FarZ;
+	Output.Position = float4(Input.Position.xyz, 1.0f);
 	return Output;
 }

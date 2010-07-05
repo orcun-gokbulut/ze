@@ -50,7 +50,7 @@ float4x4  LightRotationMatrix			: register(c28);
 // Bone matrices rest of the space
 float4x4  BoneMatrices[58]				: register(c32);
 
-struct VS_INPUT 
+struct VSInput 
 {
 	float4 Position    : POSITION0;
 	float3 Normal      : NORMAL0;
@@ -63,7 +63,7 @@ struct VS_INPUT
 	#endif
 };
 
-struct VS_OUTPUT 
+struct VSOutput 
 {
 	float4 Position           : POSITION0;
 	#ifndef ZESHADER_NORMALMAP
@@ -89,9 +89,9 @@ inline void CalculatePointLight(
 {
 }
 
-VS_OUTPUT vs_main( VS_INPUT Input )
+VSOutput vs_main( VSInput Input )
 {
-	VS_OUTPUT Output;
+	VSOutput Output;
 	float4 Position;
 	float3 Normal;
 	float3 Tangent;

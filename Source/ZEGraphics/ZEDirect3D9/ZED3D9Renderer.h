@@ -42,34 +42,22 @@
 #include "ZED3D9HDRProcessor.h"
 #include "ZED3D9SSAOProcessor.h"
 
+class ZED3D9ViewPort;
+
 class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	friend class ZED3D9ShadowRenderer;
+
 	private:
 		ZED3D9ViewPort*						ViewPort;
 
-		LPDIRECT3DSURFACE9					ColorRenderTarget;
-		LPDIRECT3DSURFACE9					DepthRenderTarget;
-		LPDIRECT3DSURFACE9					VelocityRenderTarget;
-		
+		LPDIRECT3DTEXTURE9					AmbientColorRenderTarget;
+		LPDIRECT3DTEXTURE9					NormalDepthRenderTarget;
+		LPDIRECT3DTEXTURE9					PositionRenderTarget;
+		LPDIRECT3DTEXTURE9					TempRenderTarget;
 		ZED3D9HDRProcessor					HDRProcessor;
-		LPDIRECT3DTEXTURE9					HDRRenderTarget;
-		bool								HDREnabled;
-		
-		bool								SSAOEnabled;
 		ZED3D9SSAOProcessor					SSAOProcessor;
-
-
-		bool								RenderColorTexture;
-		bool								RenderNormalDepthTexture;
-		bool								RenderVelocityTexture;
-		bool								RenderObjectTexture;
-
-		ZETexture2D*						ColorTexture;
-		ZETexture2D*						NormalDepthTexture;
-		ZETexture2D*						VelocityTexture;
-		ZETexture2D*						ObjectTexture;
 
 		ZESmartArray<ZERenderOrder>			NonTransparent;
 		ZESmartArray<ZERenderOrder>			Transparent;
@@ -81,32 +69,22 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 
 		static bool							CheckRenderOrder(ZERenderOrder* RenderOrder);
 		static void							PumpStreams(ZERenderOrder* RenderOrder);
-		static void							DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* Camera);
+		static void							DrawAmbientPass(ZERenderOrder* RenderOrder, ZECamera* Camera);
+		static void							DrawLightPasses(ZERenderOrder* RenderOrder, ZECamera* Camera);
+
+		void								CreateRenderTargets();
+		void								DestroyRenderTargets();
 
 	protected:
 											ZED3D9Renderer();
 		virtual								~ZED3D9Renderer();					
 
 	public:
-		virtual void						SetRenderColorTexture(bool Enable);
-		virtual bool						GetRenderColorTexture();
-
-		virtual void						SetRenderDepthTexture(bool Enable);
-		virtual bool						GetRenderDepthTexture();
-
-		virtual void						SetRenderVelocityTexture(bool Enable);
-		virtual bool						GetRenderVelocityTexture();
-
-		virtual void						SetRenderObjectTexture(bool Enable);
-		virtual bool						GetRenderObjectTexture();
-	
-		virtual ZETexture2D*				GetColorTexture();
-		virtual ZETexture2D*				GetDepthTexture();
-		virtual ZETexture2D*				GetVelociyTexture();
-		virtual ZETexture2D*				GetObjectTexture();
-
 		virtual void						SetViewPort(ZEViewPort* ViewPort);
 		virtual ZEViewPort*					GetViewPort();
+
+		virtual void						SetCamera(ZECamera* Camera);
+		virtual ZECamera*					GetCamera();
 
 		virtual bool						Initialize();
 		virtual void						Deinitialize();
@@ -114,9 +92,6 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 
 		virtual void						DeviceLost();
 		virtual bool						DeviceRestored();
-
-		virtual void						SetCamera(ZECamera* Camera);
-		virtual ZECamera*					GetCamera();
 
 		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors();
 		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor);

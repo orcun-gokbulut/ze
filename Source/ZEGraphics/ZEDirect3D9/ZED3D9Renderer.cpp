@@ -100,7 +100,7 @@ void ZED3D9Renderer::PumpStreams(ZERenderOrder* RenderOrder)
 	}
 }
 
-void ZED3D9Renderer::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* Camera)
+void ZED3D9Renderer::DrawAmbientPass(ZERenderOrder* RenderOrder, ZECamera* Camera)
 {
 	// Get Vertex buffer of render order
 	ZED3D9StaticVertexBuffer* VertexBuffer = (ZED3D9StaticVertexBuffer*)RenderOrder->VertexBuffer;
@@ -129,7 +129,7 @@ void ZED3D9Renderer::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* Camer
 	// Setup Material
 	Material->SetupMaterial(RenderOrder, Camera);
 
-	// Do prelightning pass
+	// Do pre-lightning pass
 	if (Material->SetupPreLightning())
 	{
 		size_t PassCount;
@@ -140,6 +140,36 @@ void ZED3D9Renderer::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* Camer
 		}
 		while(PassCount != 1);
 	}
+}
+
+void ZED3D9Renderer::DrawLightPasses(ZERenderOrder* RenderOrder, ZECamera* Camera)
+{
+	// Get Vertex buffer of render order
+	ZED3D9StaticVertexBuffer* VertexBuffer = (ZED3D9StaticVertexBuffer*)RenderOrder->VertexBuffer;
+
+	// Check render order has vertex buffer and one or more primitives.
+	if (RenderOrder->VertexBuffer == NULL || RenderOrder->PrimitiveCount == 0)
+		return;
+
+	// Get material of the render order
+	const ZEMaterial* Material = RenderOrder->Material;
+
+	// Setup vertex declaration
+	RenderOrder->VertexDeclaration->SetupVertexDeclaration();
+
+	/* NO INDEX BUFFERS SUPPORTED ANYMORE */
+	/*
+	// Setup index buffer if available
+	if (RenderOrder->IndexBuffer != NULL)
+	GetDevice()->SetIndices(RenderOrder->IndexBuffer);
+	*/
+
+	// If vertex buffer is static, setup vertex buffer
+	if (VertexBuffer->IsStatic())
+		GetDevice()->SetStreamSource(0, VertexBuffer->StaticBuffer, 0, RenderOrder->VertexDeclaration->GetVertexSize());
+
+	// Setup Material
+	Material->SetupMaterial(RenderOrder, Camera);
 
 	// Do light passes
 	if (RenderOrder->Lights.GetCount() != 0 && Material->SetupLightning())
@@ -328,244 +358,141 @@ void ZED3D9Renderer::DrawRenderOrder(ZERenderOrder* RenderOrder, ZECamera* Camer
 
 bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 {
-#ifdef ZE_DEBUG_ENABLED
-	// Check render order material is available
-	if (RenderOrder->Material == NULL)
-	{
-		zeError("Direct3D9 Renderer", "RenderOrder's material does not have valid material.");
+	#ifdef ZE_DEBUG_ENABLED
+		// Check render order material is available
+		if (RenderOrder->Material == NULL)
+		{
+			zeError("Direct3D9 Renderer", "RenderOrder's material does not have valid material.");
+			return false;
+		}
+
+		// Check render order material has shader
+		/*if (RenderOrder->Material->GetShader() == NULL)
+		{
+		zeError("Direct3D9 Renderer", "RenderOrder's material does not have valid shader.");
 		return false;
-	}
+		}*/
 
-	// Check render order material has shader
-	/*if (RenderOrder->Material->GetShader() == NULL)
-	{
-	zeError("Direct3D9 Renderer", "RenderOrder's material does not have valid shader.");
-	return false;
-	}*/
+		// Check vertex declaration is available
+		if (RenderOrder->VertexDeclaration == NULL)
+		{
+			zeError("Direct3D9 Renderer", "RenderOrder's vertex declaration is invalid.");
+			return false;
+		}
 
-	// Check vertex declaration is available
-	if (RenderOrder->VertexDeclaration == NULL)
-	{
-		zeError("Direct3D9 Renderer", "RenderOrder's vertex declaration is invalid.");
-		return false;
-	}
+		// Check render order has valid primitive type
+		if (RenderOrder->PrimitiveType != ZE_ROPT_POINT &&
+			RenderOrder->PrimitiveType != ZE_ROPT_LINE &&
+			RenderOrder->PrimitiveType != ZE_ROPT_TRIANGLE &&
+			RenderOrder->PrimitiveType != ZE_ROPT_TRIANGLESTRIPT)
+		{
+			zeError("Direct3D9 Renderer", "RenderOrder's primitive type is not valid.");
+			return false;
+		}
 
-	// Check render order has valid primitive type
-	if (RenderOrder->PrimitiveType != ZE_ROPT_POINT &&
-		RenderOrder->PrimitiveType != ZE_ROPT_LINE &&
-		RenderOrder->PrimitiveType != ZE_ROPT_TRIANGLE &&
-		RenderOrder->PrimitiveType != ZE_ROPT_TRIANGLESTRIPT)
-	{
-		zeError("Direct3D9 Renderer", "RenderOrder's primitive type is not valid.");
-		return false;
-	}
+		// Check render order has vertex buffer
+		/*if (RenderOrder->VertexBuffer == NULL)
+		{
+			zeError("Direct3D9 Renderer", "RenderOrder's vertex buffer is not valid.");
+			return false;
+		}*/
 
-	// Check render order has vertex buffer
-	/*if (RenderOrder->VertexBuffer == NULL)
-	{
-	zeError("Direct3D9 Renderer", "RenderOrder's vertex buffer is not valid.");
-	return false;
-	}*/
-
-	// Check render order has one or more primitive
-	/*if (RenderOrder->PrimitiveCount == 0)
-	{
-	zeError("Direct3D9 Renderer", "RenderOrder's primitive count is zero.");
-	return false;
-	}*/
-#else
-	if (RenderOrder->PrimitiveCount == 0)
-		return false;
-#endif
+		// Check render order has one or more primitive
+		/*if (RenderOrder->PrimitiveCount == 0)
+		{
+			zeError("Direct3D9 Renderer", "RenderOrder's primitive count is zero.");
+			return false;
+		}*/
+	#else
+		if (RenderOrder->PrimitiveCount == 0)
+			return false;
+	#endif
 
 	return true;
 }
+
+void ZED3D9Renderer::CreateRenderTargets()
+{
+	ZED3D9CommonTools::CreateRenderTarget(&AmbientColorRenderTarget, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
+	ZED3D9CommonTools::CreateRenderTarget(&NormalDepthRenderTarget, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
+	ZED3D9CommonTools::CreateRenderTarget(&PositionRenderTarget, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
+	ZED3D9CommonTools::CreateRenderTarget(&TempRenderTarget, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
+}
+
+
+void ZED3D9Renderer::DestroyRenderTargets()
+{
+	ZED3D_RELEASE(AmbientColorRenderTarget);
+	ZED3D_RELEASE(NormalDepthRenderTarget);
+	ZED3D_RELEASE(PositionRenderTarget);
+	ZED3D_RELEASE(TempRenderTarget);
+}
+
+
 ZED3D9Renderer::ZED3D9Renderer()
 {
-	RenderColorTexture = false;
-	RenderNormalDepthTexture = false;
-	RenderVelocityTexture = false;
-	RenderObjectTexture = true;
-	HDREnabled = true;
-
-	HDRRenderTarget = NULL;
-	ColorRenderTarget = NULL;
-	ColorTexture = NULL;
-	NormalDepthTexture = NULL;
-	VelocityTexture = NULL;
-	ObjectTexture = NULL;
-
+	PositionRenderTarget = NULL;
+	AmbientColorRenderTarget = NULL;
+	NormalDepthRenderTarget = NULL;
+	TempRenderTarget = NULL;
 	SetViewPort(zeGraphics->GetFrameBufferViewPort());
 }
 
+
 ZED3D9Renderer::~ZED3D9Renderer()
 {
-	// Deinitialize renderer
 	Deinitialize();
 }
+
 
 void ZED3D9Renderer::SetViewPort(ZEViewPort* ViewPort)
 {
 	this->ViewPort = (ZED3D9ViewPort*)ViewPort;
 }
 
+
 ZEViewPort* ZED3D9Renderer::GetViewPort()
 {
 	return ViewPort;
 }
 
+
 bool ZED3D9Renderer::Initialize() 
 { 
-	if (HDREnabled)
-	{
-		// HDR Rendering
-		if (HDRRenderTarget == NULL)
-		{
-			ZED3D9CommonTools::CreateRenderTarget(&HDRRenderTarget, GetModule()->GetScreenWidth(), GetModule()->GetScreenHeight(), ZE_TPF_RGBA_HDR);
-			HDRRenderTarget->GetSurfaceLevel(0, &ColorRenderTarget);
-			HDRProcessor.Input = HDRRenderTarget;
-			HDRProcessor.Target = GetModule()->GetFrameColorBuffer();
-			HDRProcessor.Initialize();
-		}
-	}
-
-/*	if (SSAOEnabled)
-	{
-		ZED3D9CommonTools::CreateDepthRenderTarget(DepthBuffer, GetModule()->GetScreenWidth(), GetModule()->GetScreenHeight());
-	}
-	
-	if (!HDREnabled && !SSAOEnabled)
-	{
-		// LDR Rendering
-		ColorRenderTarget = GetModule()->GetFrameColorBuffer();
-	}*/
-
+	CreateRenderTargets();
+	SSAOProcessor.Renderer = this;
+	HDRProcessor.Initialize();
 	SSAOProcessor.Initialize();
 
 	return true; 
 } 
 
+
 void ZED3D9Renderer::Deinitialize()
 {
 	HDRProcessor.Deinitialize();
-
-	if (HDRRenderTarget != NULL)
-	{
-		HDRRenderTarget->Release();
-		HDRRenderTarget = NULL;
-	}
-
-	if (ColorRenderTarget != NULL)
-	{
-		ColorRenderTarget->Release();
-		ColorRenderTarget = NULL;
-	}
-
-	// If color texture is created destroy it
-	if (ColorTexture != NULL)
-	{
-		ColorTexture->Destroy();
-		ColorTexture = NULL;
-	}
-
-	// If depth texture is created destroy it
-	if (NormalDepthTexture != NULL)
-	{
-		NormalDepthTexture->Destroy();
-		NormalDepthTexture = NULL;
-	}
-
-	// If velocity texture is created destroy it
-	if (VelocityTexture != NULL)
-	{
-		VelocityTexture->Destroy();
-		VelocityTexture = NULL;
-	}
-
-	// If object texture is created destroy it
-	if (ObjectTexture != NULL)
-	{
-		ObjectTexture->Destroy();
-		ObjectTexture = NULL;
-	}
+	SSAOProcessor.Deinitialize();
+	DestroyRenderTargets();
 }
 
-void ZED3D9Renderer::SetRenderColorTexture(bool Enable)
-{
-	RenderColorTexture = Enable;
-}
-
-bool ZED3D9Renderer::GetRenderColorTexture()
-{
-	return RenderColorTexture;
-}
-
-void ZED3D9Renderer::SetRenderDepthTexture(bool Enable)
-{
-	RenderNormalDepthTexture = Enable;
-}
-
-bool ZED3D9Renderer::GetRenderDepthTexture()
-{
-	return RenderNormalDepthTexture;
-}
-
-void ZED3D9Renderer::SetRenderVelocityTexture(bool Enable)
-{
-	RenderVelocityTexture = Enable;
-}
-
-bool ZED3D9Renderer::GetRenderVelocityTexture()
-{
-	return RenderVelocityTexture;
-}
-
-void ZED3D9Renderer::SetRenderObjectTexture(bool Enable)
-{
-	RenderObjectTexture = Enable;
-}
-
-bool ZED3D9Renderer::GetRenderObjectTexture()
-{
-	return RenderObjectTexture;
-}
-
-ZETexture2D* ZED3D9Renderer::GetColorTexture()
-{
-	return ColorTexture;
-}
-
-ZETexture2D* ZED3D9Renderer::GetDepthTexture()
-{
-	return NormalDepthTexture;
-}
-
-ZETexture2D* ZED3D9Renderer::GetVelociyTexture()
-{
-	return VelocityTexture;
-}
-
-ZETexture2D* ZED3D9Renderer::GetObjectTexture()
-{
-	return ObjectTexture;
-}
 
 void ZED3D9Renderer::DeviceLost()
 {
-	ZED3D_RELEASE(HDRRenderTarget);
-	ZED3D_RELEASE(ColorRenderTarget);
 	HDRProcessor.OnDeviceLost();
+	SSAOProcessor.OnDeviceLost();
+	DestroyRenderTargets();
 }
+
 
 bool ZED3D9Renderer::DeviceRestored()
 {
-	ZED3D9CommonTools::CreateRenderTarget(&HDRRenderTarget, GetModule()->GetScreenWidth(), GetModule()->GetScreenHeight(), ZE_TPF_RGBA_HDR);
-	HDRRenderTarget->GetSurfaceLevel(0, &ColorRenderTarget);
-	HDRProcessor.Input = HDRRenderTarget;
-	HDRProcessor.Target = GetModule()->GetFrameColorBuffer();
 	HDRProcessor.OnDeviceRestored();
+	SSAOProcessor.OnDeviceRestored();
+	CreateRenderTargets();
+
 	return true;
 }
+
 
 void ZED3D9Renderer::Destroy()
 {
@@ -574,30 +501,36 @@ void ZED3D9Renderer::Destroy()
 	delete this;
 }
 
+
 void ZED3D9Renderer::SetCamera(ZECamera* Camera)
 {
 	this->Camera = Camera;
 }
+
 
 ZECamera* ZED3D9Renderer::GetCamera()
 {
 	return Camera;
 }
 
+
 ZEArray<ZEPostProcessor*>& ZED3D9Renderer::GetPostProcessors()
 {
 	return PostProcessors;
 }
+
 
 void ZED3D9Renderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
 {
 	PostProcessors.Add(PostProcessor);
 }
 
+
 void ZED3D9Renderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
 {
 	PostProcessors.DeleteValue(PostProcessor);
 }
+
 
 void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
@@ -616,6 +549,7 @@ void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
 		NonTransparent.Add(*RenderOrder);
 }
 
+
 void ZED3D9Renderer::ClearList()
 {
 	//Clear render lists
@@ -623,6 +557,7 @@ void ZED3D9Renderer::ClearList()
 	Transparent.Clear(true);
 	NonTransparent.Clear(true);
 }
+
 
 void ZED3D9Renderer::Render(float ElaspedTime)
 {
@@ -633,178 +568,103 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost())
 		return;
 
-	// Check if there is a post process attached to render order
-	if (PostProcessors.GetCount() != NULL)
-	{
-		// If post process is attached then create off screen render targets
-
-	}
-	else
-	{
-		// If there is no post process attached then use directly frame buffer
-		GetDevice()->SetRenderTarget(0, GetModule()->GetFrameColorBuffer());
-		GetDevice()->SetDepthStencilSurface(GetModule()->GetFrameZBuffer());
-	}
-
-	GetDevice()->SetRenderTarget(0, ColorRenderTarget);
-	GetDevice()->SetDepthStencilSurface(GetModule()->GetFrameZBuffer());
-
-
-	// If renderer will give output to other mechanisms like post processors. It will enable render color buffer.
-	// Creating color texture if Render Color Texture enabled.
-	if (RenderColorTexture)
-		// Checking older texture available
-		if (ColorTexture != NULL)
-		{
-			// Checking older texture match the size of the screen. If it matches dont do anything
-			if (ColorTexture->GetHeight() != ScreenWidth && ColorTexture->GetHeight() != ScreenHeight)
-			{
-				// If not release it and recreate it with the correct size
-				ColorTexture->Release();
-				if (ColorTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32))
-				{
-					zeCriticalError("D3D9 Frame Buffer Renderer", "Can not create color texture.");
-					return;
-				}
-			}
-		}
-		else
-		{
-			// If there is no older texture then create brand new one
-			ColorTexture = ZETexture2D::CreateInstance();
-			ColorTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32);
-		}
-	else
-		// If render color buffer is not enabled check color texture is available or not
-		if (ColorTexture != NULL)
-		{
-			// If available then destroy it in order to save memory
-			ColorTexture->Destroy();
-			ColorTexture = NULL;
-		}
-
-	// Create depth render texture if render depth texture enabled. Same process with color texture creation
-	if (RenderNormalDepthTexture)
-		if (NormalDepthTexture != NULL)
-		{
-			if (NormalDepthTexture->GetHeight() != ScreenWidth && NormalDepthTexture->GetHeight() != ScreenHeight)
-			{
-				NormalDepthTexture->Release();
-				if (!NormalDepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32))
-				{
-					zeCriticalError("D3D9 Frame Buffer Renderer", "Can not create depth texture.");
-					return;
-				}
-			}
-		}
-		else
-		{
-			NormalDepthTexture = ZETexture2D::CreateInstance();
-			NormalDepthTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32);
-		}
-	else
-		if (NormalDepthTexture != NULL)
-		{
-			NormalDepthTexture->Destroy();
-			NormalDepthTexture = NULL;
-		}
-
-	// Create velocity render texture if render depth texture enabled. Same process with color texture creation
-	if (RenderVelocityTexture)
-		if (VelocityTexture != NULL)
-		{
-			if (VelocityTexture->GetHeight() != ScreenWidth && VelocityTexture->GetHeight() != ScreenHeight)
-			{
-				VelocityTexture->Release();
-				if (!VelocityTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32))
-				{
-					zeCriticalError("D3D9 Frame Buffer Renderer", "Can not create velocity texture.");
-					return;
-				}
-			}
-		}
-		else
-		{
-			VelocityTexture = ZETexture2D::CreateInstance();
-			VelocityTexture->Create(ScreenWidth, ScreenHeight, ZE_TPF_RGBA_INT32);
-		}
-	else
-		if (VelocityTexture != NULL)
-		{
-			VelocityTexture->Destroy();
-			VelocityTexture = NULL;
-		}
-
 	// Set z-buffer options
 	GetDevice()->SetRenderState(D3DRS_DEPTHBIAS, 0);
 	GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, 0);
-
-	// Clear render targets
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00, 1.0f, 0x00000000);
-
-	// Setup Texture sampling properties (Will be changed)
-	for (int I = 0; I < 10; I++)
-	{
-		if (I < 8)
-		{
-			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
-		} 
-		else
-		{
-			GetDevice()->SetSamplerState(I, D3DSAMP_BORDERCOLOR, 0x0f);
-			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
-			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
-			GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
-		}
-
-		if (I == 8)
-		{
-			GetDevice()->SetSamplerState(I, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-			GetDevice()->SetSamplerState(I, D3DSAMP_MAGFILTER, D3DTEXF_POINT);	
-			GetDevice()->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-		}
-		else
-		{
-			GetDevice()->SetSamplerState(I, D3DSAMP_MINFILTER, (GetModule()->GetAnisotropicFilter() ? D3DTEXF_ANISOTROPIC : D3DTEXF_LINEAR));
-			GetDevice()->SetSamplerState(I, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-			GetDevice()->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-		}
-
-
-	}
-
+	
 	// Enable color output
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
 
-		// Start Drawing
+	// Start Drawing
 	GetDevice()->BeginScene();
+		// Select Render Targets
+		GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
+	//	ZED3D9CommonTools::SetRenderTarget(0, AmbientColorRenderTarget);
+		ZED3D9CommonTools::SetRenderTarget(1, NormalDepthRenderTarget);
+		ZED3D9CommonTools::SetRenderTarget(2, PositionRenderTarget);
+		GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
+
+		// Clear Render Targets
+		GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x0, 1.0f, 0x0);
+
+		// Set z-buffer options
+		GetDevice()->SetRenderState(D3DRS_DEPTHBIAS, 0);
+		GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, 0);
+
+		// Draw ambient
+		for (size_t I = 0; I < NonTransparent.GetCount(); I++)	
+			DrawAmbientPass(&NonTransparent[I], Camera);
+
+		GetDevice()->SetRenderTarget(1, NULL);
+		GetDevice()->SetRenderTarget(2, NULL);
+
+		SSAOProcessor.SetIntensity(2.0f);
+		SSAOProcessor.SetSampleRadius(0.5f);
+		SSAOProcessor.SetSampleScale(0.5f);
+		SSAOProcessor.SetSampleBias(0.1f);
+		SSAOProcessor.InputColor = AmbientColorRenderTarget;
+		SSAOProcessor.InputDepth = NormalDepthRenderTarget;
+		SSAOProcessor.InputPosition = PositionRenderTarget;
+		SSAOProcessor.Output = ViewPort->FrameBuffer;
+		//SSAOProcessor.Process();
+		/*LPDIRECT3DSURFACE9 TempRenderTargetSurface;
+		TempRenderTarget->GetSurfaceLevel(0, &TempRenderTargetSurface);
+		SSAOProcessor.Output = TempRenderTargetSurface;
+		SSAOProcessor.Process();*/
+
+		//ZED3D9CommonTools::SetRenderTarget(0, Fr);
+
+//		GetDevice()->SetRenderTarget(0, AmbientColorRenderTarget);
+		//GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x0, 1.0f, 0x0);
+		//TempRenderTargetSurface->Release();
+
+		// Setup Texture sampling properties (Will be changed)
+		for (int I = 0; I < 10; I++)
+		{
+			if (I < 8)
+			{
+				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
+				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+			} 
+			else
+			{
+				GetDevice()->SetSamplerState(I, D3DSAMP_BORDERCOLOR, 0x0f);
+				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
+				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
+				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
+			}
+
+			if (I == 8)
+			{
+				GetDevice()->SetSamplerState(I, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+				GetDevice()->SetSamplerState(I, D3DSAMP_MAGFILTER, D3DTEXF_POINT);	
+				GetDevice()->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
+			}
+			else
+			{
+				GetDevice()->SetSamplerState(I, D3DSAMP_MINFILTER, (GetModule()->GetAnisotropicFilter() ? D3DTEXF_ANISOTROPIC : D3DTEXF_LINEAR));
+				GetDevice()->SetSamplerState(I, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+				GetDevice()->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+			}
+		}
 
 		// Draw non-transparent object first
 		for (size_t I = 0; I < NonTransparent.GetCount(); I++)
-			DrawRenderOrder(&NonTransparent[I], Camera);
+			DrawLightPasses(&NonTransparent[I], Camera);
 
 		// Draw transparent objects
 		for (size_t I = 0; I < Transparent.GetCount(); I++)
-			DrawRenderOrder(&Transparent[I], Camera);
+			DrawAmbientPass(&Transparent[I], Camera);
 
 		// Draw imposers last
 		for (size_t I = 0; I < Imposter.GetCount(); I++)
-			DrawRenderOrder(&Imposter[I], Camera);
+			DrawAmbientPass(&Imposter[I], Camera);
 		
-		if (HDREnabled)
-		{
-			HDRProcessor.DoHDR();
-		}
+		/*HDRProcessor.Input = TempRenderTarget;
+		HDRProcessor.Target = ViewPort->FrameBuffer;
+		HDRProcessor.DoHDR();*/
 
 	// Finish Drawing
 	GetDevice()->EndScene();
-
-
-
 }
-
-
-
-

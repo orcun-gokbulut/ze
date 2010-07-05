@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9HDRProcessor.h
+ Zinek Engine - SkinTransform.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,63 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_HDR_PROCESSOR_H__
-#define __ZE_D3D9_HDR_PROCESSOR_H__
-
-#include "ZED3D9ComponentBase.h"
-#include <d3d9.h>
-
-class ZED3D9HDRProcessor : public ZED3D9ComponentBase
+void SkinTransform(inout VSInput Vertex)
 {
-	public:
-		LPDIRECT3DTEXTURE9 Input;
-		LPDIRECT3DSURFACE9 Target;
-		size_t ScreenWidth, ScreenHeight;
-
-		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
-
-		struct 
+	#ifdef ZESHADER_SKINTRANSFORM
+		float4 Position = float4(mul(Vertex.Position, BoneMatrices[Vertex.BoneIndices[0]]).xyz * Vertex.BoneWeights[0], 1.0f);
+		float3 Normal = mul(Vertex.Normal, BoneMatrices[Vertex.BoneIndices[0]]) * Vertex.BoneWeights[0];
+		#ifdef ZESHADER_TANGENT_SPACE
+			float3 Tangent = mul(Vertex.Tangent, BoneMatrices[Vertex.BoneIndices[0]]) * Vertex.BoneWeights[0];
+			float3 Binormal = mul(Vertex.Binormal, BoneMatrices[Input.BoneIndices[0]]) * Vertex.BoneWeights[0];
+		#endif
+		
+		for (int I = 1; I < 4; I++)
 		{
-			LPDIRECT3DTEXTURE9			Luminance5;
-			LPDIRECT3DTEXTURE9			Luminance4;
-			LPDIRECT3DTEXTURE9			Luminance3;
-			LPDIRECT3DTEXTURE9			Luminance2;
-			LPDIRECT3DTEXTURE9			Luminance1;
-			LPDIRECT3DTEXTURE9			Luminance;
-			LPDIRECT3DTEXTURE9			OldLuminance;
-			LPDIRECT3DTEXTURE9			DownSampled4xA;
-			LPDIRECT3DTEXTURE9			DownSampled4xB;
-		} Textures;
-
-		struct
-		{
-			LPDIRECT3DVERTEXSHADER9		VertexShader;
-			LPDIRECT3DPIXELSHADER9		LumMeasureStart;
-			LPDIRECT3DPIXELSHADER9		LumDownSample3x;
-			LPDIRECT3DPIXELSHADER9		LumMeasureEnd;
-			LPDIRECT3DPIXELSHADER9		BrightPass; 
-			LPDIRECT3DPIXELSHADER9		ColorDownSample4x;
-			LPDIRECT3DPIXELSHADER9		VerticalBloom;
-			LPDIRECT3DPIXELSHADER9		HorizontalBloom;
-			LPDIRECT3DPIXELSHADER9		ToneMap;
-		} Shaders;
-
-										ZED3D9HDRProcessor();
-
-		void							SetRenderTarget(LPDIRECT3DTEXTURE9 Texture);
-		void							CreateRenderTargets();
-		void							ReleaseRenderTargets();
-
-	public:
-		void							OnDeviceLost();
-		void							OnDeviceRestored();
-
-		void							Initialize();
-		void							Deinitialize();
-
-
-		void							DoHDR();
-};
-
-#endif
+			Position.xyz += mul(Vertex.Position, BoneMatrices[Vertex.BoneIndices[I]]).xyz * Vertex.BoneWeights[I];
+			Normal += mul(Vertex.Normal, BoneMatrices[Vertex.BoneIndices[I]]) * Vertex.BoneWeights[I];
+			#ifdef ZESHADER_TANGENT_SPACE
+				Tangent += mul(Vertex.Tangent, BoneMatrices[Vertex.BoneIndices[I]]) * Vertex.BoneWeights[I];
+				Binormal += mul(Vertex.Binormal, BoneMatrices[Input.BoneIndices[I]]) * Vertex.BoneWeights[I];
+			#endif
+		}
+		
+		Vertex.Position = Position;
+		Vertex.Normal = Normal;
+		#ifdef ZESHADER_TANGENT_SPACE 
+			Vertex.Tangent = Tangent;
+			Vertex.Binormal = Binormal;
+		#endif
+	#endif
+}

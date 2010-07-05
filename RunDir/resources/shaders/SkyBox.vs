@@ -43,20 +43,20 @@ float4x4  WorldInvMatrix				: register(c12);
 float4    ViewPosition					: register(c16);
 float     MaterialRefractionIndex		: register(c17);
 
-struct VS_INPUT 
+struct VSInput 
 {
 	float4 Position				: POSITION0;
 };
 
-struct VS_OUTPUT 
+struct VSOutput 
 {
 	float4 Position				: POSITION0;
 	float3 CubeTexcoord			: TEXCOORD0;
 };
 
-VS_OUTPUT vs_main(VS_INPUT Input)
+VSOutput vs_main(VSInput Input)
 {
-	VS_OUTPUT Output;
+	VSOutput Output;
 
 	Output.Position = Input.Position;
 	Output.CubeTexcoord = mul(Input.Position, WorldViewProjMatrix);

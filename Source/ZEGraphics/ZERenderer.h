@@ -65,22 +65,6 @@ class ZERenderer
 		virtual								~ZERenderer();
 
 	public:
-		virtual void						SetRenderColorTexture(bool Enable);
-		virtual bool						GetRenderColorTexture();
-		virtual void						SetRenderDepthTexture(bool Enable);
-		virtual bool						GetRenderDepthTexture();
-
-		virtual void						SetRenderVelocityTexture(bool Enable);
-		virtual bool						GetRenderVelocityTexture();
-
-		virtual void						SetRenderObjectTexture(bool Enable);
-		virtual bool						GetRenderObjectTexture();
-
-		virtual ZETexture2D*				GetColorTexture();
-		virtual ZETexture2D*				GetDepthTexture();
-		virtual ZETexture2D*				GetVelocityTexture();
-		virtual ZETexture2D*				GetObjectTexture();
-
 		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors() = 0;
 		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;
 		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor) = 0;

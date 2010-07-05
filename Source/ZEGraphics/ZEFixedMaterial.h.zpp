@@ -1,0 +1,925 @@
+#include <string.h>
+
+ZEClassDescription* ZEFixedMaterialDescription::GetParent() const
+{
+    return NULL;
+}
+
+const char* ZEFixedMaterialDescription::GetName() const
+{
+    return "ZEFixedMaterial";
+ }
+
+const char* ZEFixedMaterialDescription::GetType() const
+{
+    return "";
+}
+
+const char* ZEFixedMaterialDescription::GetIcon() const
+{
+   return "";
+}
+
+const char* ZEFixedMaterialDescription::GetDescription() const
+{
+    return "Material System";
+}
+
+const ZEPropertyDescription* ZEFixedMaterialDescription::GetProperties() const
+{   
+   static ZEPropertyEnumuratorItem EnumItems0[] =
+   {
+      {"No Transparancy", ZE_MTM_NOTRANSPARACY},
+      {"Alpha Test", ZE_MTM_ALPHACULL},
+      {"Regular", ZE_MTM_REGULAR},
+      {"Adaptive", ZE_MTM_ADDAPTIVE},
+      {"Subtractive", ZE_MTM_SUBTRACTIVE}
+   };
+
+   static ZEPropertyEnumurator Enum0 = {"ZEMaterialTransparancyMode", EnumItems0, 5};
+
+   static ZEPropertyEnumuratorItem EnumItems1[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum1 = {"ZETextureAddressMode", EnumItems1, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems2[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum2 = {"ZETextureAddressMode", EnumItems2, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems3[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum3 = {"ZETextureAddressMode", EnumItems3, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems4[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum4 = {"ZETextureAddressMode", EnumItems4, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems5[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum5 = {"ZETextureAddressMode", EnumItems5, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems6[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum6 = {"ZETextureAddressMode", EnumItems6, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems7[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum7 = {"ZETextureAddressMode", EnumItems7, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems8[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum8 = {"ZETextureAddressMode", EnumItems8, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems9[] =
+   {
+      {"Constant", ZE_MOC_CONSTANT},
+      {"Diffuse Map Alpha", ZE_MOC_DIFFUSE_ALPHA},
+      {"Opacity Map", ZE_MOC_OPACITYMAP}
+   };
+
+   static ZEPropertyEnumurator Enum9 = {"ZEMaterialOpacityComponent", EnumItems9, 3};
+
+   static ZEPropertyEnumuratorItem EnumItems10[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum10 = {"ZETextureAddressMode", EnumItems10, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems11[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum11 = {"ZETextureAddressMode", EnumItems11, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems12[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum12 = {"ZETextureAddressMode", EnumItems12, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems13[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum13 = {"ZETextureAddressMode", EnumItems13, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems14[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum14 = {"ZETextureAddressMode", EnumItems14, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems15[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum15 = {"ZETextureAddressMode", EnumItems15, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems16[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum16 = {"ZETextureAddressMode", EnumItems16, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems17[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum17 = {"ZETextureAddressMode", EnumItems17, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems18[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum18 = {"ZETextureAddressMode", EnumItems18, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems19[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum19 = {"ZETextureAddressMode", EnumItems19, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems20[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum20 = {"ZETextureAddressMode", EnumItems20, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems21[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum21 = {"ZETextureAddressMode", EnumItems21, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems22[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum22 = {"ZETextureAddressMode", EnumItems22, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems23[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum23 = {"ZETextureAddressMode", EnumItems23, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems24[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum24 = {"ZETextureAddressMode", EnumItems24, 4};
+
+   static ZEPropertyEnumuratorItem EnumItems25[] =
+   {
+      {"Wrap", ZE_TAM_WRAP},
+      {"Clamp", ZE_TAM_CLAMP},
+      {"Mirror", ZE_TAM_MIRROR},
+      {"Border", ZE_TAM_BORDER}
+   };
+
+   static ZEPropertyEnumurator Enum25 = {"ZETextureAddressMode", EnumItems25, 4};
+
+    static const ZEPropertyDescription Properties[] = {
+         {"TwoSided", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Shading", ZE_PS_NONE, NULL, NULL},
+         {"LightningEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Shading", ZE_PS_NONE, NULL, NULL},
+         {"RecivesShadow", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Shading", ZE_PS_NONE, NULL, NULL},
+         {"Wireframe", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Shading", ZE_PS_NONE, NULL, NULL},
+         {"TransparancyCullLimit", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Transparancy", ZE_PS_NONE, NULL, NULL},
+         {"TransparancyMode", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Transparancy", ZE_PS_NONE, NULL, &Enum0},
+         {"AmbientEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Ambient", ZE_PS_NONE, NULL, NULL},
+         {"AmbientFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Ambient", ZE_PS_NONE, NULL, NULL},
+         {"AmbientColor", ZE_VRT_VECTOR3, ZE_PA_READWRITE, true, false, "", "Ambient", ZE_PS_COLOR, NULL, NULL},
+         {"DiffuseEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Diffuse", ZE_PS_NONE, NULL, NULL},
+         {"DiffuseColor", ZE_VRT_VECTOR3, ZE_PA_READWRITE, true, false, "", "Diffuse", ZE_PS_COLOR, NULL, NULL},
+         {"DiffuseFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Diffuse", ZE_PS_NONE, NULL, NULL},
+         {"SpecularEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Specular", ZE_PS_NONE, NULL, NULL},
+         {"SpecularFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Specular", ZE_PS_NONE, NULL, NULL},
+         {"SpecularShininess", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Specular", ZE_PS_NONE, NULL, NULL},
+         {"SpecularColor", ZE_VRT_VECTOR3, ZE_PA_READWRITE, true, false, "", "Specular", ZE_PS_COLOR, NULL, NULL},
+         {"SpecularMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Specular", ZE_PS_NONE, NULL, &Enum1},
+         {"SpecularMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Specular", ZE_PS_NONE, NULL, &Enum2},
+         {"EmmisiveEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Emmisive", ZE_PS_NONE, NULL, NULL},
+         {"EmmisiveFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Emmisive", ZE_PS_NONE, NULL, NULL},
+         {"EmmisiveColor", ZE_VRT_VECTOR3, ZE_PA_READWRITE, true, false, "", "Emmisive", ZE_PS_COLOR, NULL, NULL},
+         {"EmmisiveMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Emmisive", ZE_PS_NONE, NULL, &Enum3},
+         {"EmmisiveMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Emmisive", ZE_PS_NONE, NULL, &Enum4},
+         {"NormalMapEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Normal", ZE_PS_NONE, NULL, NULL},
+         {"NormalMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Normal", ZE_PS_NONE, NULL, &Enum5},
+         {"NormalMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Normal", ZE_PS_NONE, NULL, &Enum6},
+         {"ParallaxMapEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Parallax", ZE_PS_NONE, NULL, NULL},
+         {"ParallaxMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Parallax", ZE_PS_NONE, NULL, &Enum7},
+         {"ParallaxMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Parallax", ZE_PS_NONE, NULL, &Enum8},
+         {"OpacityEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Opacity", ZE_PS_NONE, NULL, NULL},
+         {"Opacity", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Opacity", ZE_PS_NONE, NULL, NULL},
+         {"OpacityComponent", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Opacity", ZE_PS_NONE, NULL, &Enum9},
+         {"OpacityMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Opacity", ZE_PS_NONE, NULL, &Enum10},
+         {"OpacityMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Opacity", ZE_PS_NONE, NULL, &Enum11},
+         {"ReflectionEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Reflection", ZE_PS_NONE, NULL, NULL},
+         {"ReflectionFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Reflection", ZE_PS_NONE, NULL, NULL},
+         {"ReflectionMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Reflection", ZE_PS_NONE, NULL, &Enum12},
+         {"ReflectionMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Reflection", ZE_PS_NONE, NULL, &Enum13},
+         {"ReflectionMapAddressModeW", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Reflection", ZE_PS_NONE, NULL, &Enum14},
+         {"RefractionEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, NULL},
+         {"RefractionFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, NULL},
+         {"RefractionIndex", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, NULL},
+         {"RefractionMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, &Enum15},
+         {"RefractionMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, &Enum16},
+         {"RefractionMapAddressModeW", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, &Enum17},
+         {"DetailMapEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, NULL},
+         {"DetailMapTiling", ZE_VRT_VECTOR2, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, NULL},
+         {"DetailDiffuseMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum18},
+         {"DetailDiffuseMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum19},
+         {"DetailNormalMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum20},
+         {"DetailNormalMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum21},
+         {"LightMapEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Light Map", ZE_PS_NONE, NULL, NULL},
+         {"LightMapFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Light Map", ZE_PS_NONE, NULL, NULL},
+         {"LightMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Light Map", ZE_PS_NONE, NULL, &Enum22},
+         {"LightMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Light Map", ZE_PS_NONE, NULL, &Enum23},
+         {"DistortionEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Distortion", ZE_PS_NONE, NULL, NULL},
+         {"DistortionFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Distortion", ZE_PS_NONE, NULL, NULL},
+         {"DistortionMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Distortion", ZE_PS_NONE, NULL, &Enum24},
+         {"DistortionMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Distortion", ZE_PS_NONE, NULL, &Enum25}
+    };
+    return (const ZEPropertyDescription*)&Properties;
+}
+
+size_t ZEFixedMaterialDescription::GetPropertyCount() const
+{
+    return 59;
+}
+
+size_t ZEFixedMaterialDescription::GetPropertyOffset() const
+{
+    return 0;
+}
+
+const ZEMethodDescription* ZEFixedMaterialDescription::GetMethods() const
+{
+    return NULL;
+}
+
+size_t ZEFixedMaterialDescription::GetMethodCount() const
+{
+    return 0;
+}
+
+size_t ZEFixedMaterialDescription::GetMethodOffset() const
+{
+    return 0;
+}
+
+ZEClassProvider* ZEFixedMaterialDescription::GetProvider() const
+{
+    return NULL;
+}
+
+ZEClass* ZEFixedMaterialDescription::CreateInstance() const
+{
+    return NULL;
+}
+
+ZEClassDescription* ZEFixedMaterial::ClassDescription()
+{
+    static ZEFixedMaterialDescription Desc;
+    return &Desc;
+}
+
+ZEClassDescription* ZEFixedMaterial::GetClassDescription()
+{
+    return ZEFixedMaterial::ClassDescription();
+}
+
+int ZEFixedMaterial::GetPropertyId(const char* Name) const
+{
+    static struct
+    {
+        const char* Name;
+        unsigned int Hash;
+        size_t Index;
+    }
+    PropertyIds[] =
+    {
+        {"Opacity", 729, 30},
+        {"TwoSided", 803, 0},
+        {"Wireframe", 930, 3},
+        {"AmbientColor", 1215, 8},
+        {"DiffuseColor", 1221, 10},
+        {"AmbientFactor", 1311, 7},
+        {"DiffuseFactor", 1317, 11},
+        {"RecivesShadow", 1335, 2},
+        {"EmmisiveColor", 1342, 20},
+        {"SpecularColor", 1342, 15},
+        {"AmbientEnabled", 1387, 6},
+        {"DiffuseEnabled", 1393, 9},
+        {"LightMapFactor", 1397, 52},
+        {"OpacityEnabled", 1412, 29},
+        {"EmmisiveFactor", 1438, 19},
+        {"SpecularFactor", 1438, 13},
+        {"LightMapEnabled", 1473, 51},
+        {"DetailMapTiling", 1496, 46},
+        {"SpecularEnabled", 1514, 12},
+        {"EmmisiveEnabled", 1514, 18},
+        {"RefractionIndex", 1541, 41},
+        {"DetailMapEnabled", 1564, 45},
+        {"NormalMapEnabled", 1586, 23},
+        {"LightningEnabled", 1615, 1},
+        {"ReflectionFactor", 1642, 35},
+        {"RefractionFactor", 1644, 40},
+        {"TransparancyMode", 1659, 5},
+        {"OpacityComponent", 1676, 31},
+        {"DistortionFactor", 1678, 56},
+        {"ReflectionEnabled", 1718, 34},
+        {"RefractionEnabled", 1720, 39},
+        {"DistortionEnabled", 1754, 55},
+        {"SpecularShininess", 1779, 14},
+        {"ParallaxMapEnabled", 1790, 26},
+        {"LightMapAddressModeU", 1974, 54},
+        {"LightMapAddressModeU", 1974, 53},
+        {"NormalMapAddressModeU", 2087, 24},
+        {"NormalMapAddressModeV", 2088, 25},
+        {"TransparancyCullLimit", 2181, 4},
+        {"OpacityMapAddressModeU", 2199, 32},
+        {"OpacityMapAddressModeV", 2200, 33},
+        {"ParallaxMapAddressModeU", 2291, 27},
+        {"ParallaxMapAddressModeV", 2292, 28},
+        {"SpecularMapAddressModeU", 2301, 16},
+        {"EmmisiveMapAddressModeU", 2301, 21},
+        {"EmmisiveMapAddressModeV", 2302, 22},
+        {"SpecularMapAddressModeV", 2302, 17},
+        {"ReflectionMapAddressModeU", 2505, 36},
+        {"ReflectionMapAddressModeV", 2506, 37},
+        {"ReflectionMapAddressModeW", 2507, 38},
+        {"RefractionMapAddressModeU", 2507, 42},
+        {"RefractionMapAddressModeV", 2508, 43},
+        {"RefractionMapAddressModeW", 2509, 44},
+        {"DistortionMapAddressModeU", 2541, 57},
+        {"DistortionMapAddressModeU", 2541, 58},
+        {"DetailNormalMapAddressModeU", 2682, 49},
+        {"DetailNormalMapAddressModeV", 2683, 50},
+        {"DetailDiffuseMapAddressModeU", 2775, 47},
+        {"DetailDiffuseMapAddressModeV", 2776, 48},
+    };
+
+    int Hash = 0;
+    size_t NameLen = strlen(Name);
+    for (size_t I = 0; I < NameLen; I++)
+        Hash += Name[I];
+
+    int LowBound = 0;
+    int HighBound = 58;
+    int Probe = 0;
+    int ProbeHash;
+    while (HighBound >= LowBound)
+    {
+        Probe = (HighBound + LowBound) / 2;
+        ProbeHash = PropertyIds[Probe].Hash;
+
+        if (Hash > ProbeHash)
+	          LowBound = Probe + 1;
+        else if (Hash < ProbeHash)
+	          HighBound = Probe - 1;
+        else
+        {
+            int SemiProbe = Probe;
+            //Check Left
+            while (PropertyIds[SemiProbe].Hash == Hash && Probe >= 0)
+            {
+	              if (strncmp(PropertyIds[SemiProbe].Name, Name, ZE_MAX_NAME_SIZE) == 0)
+	    	          return PropertyIds[SemiProbe].Index + ZEFixedMaterial::ClassDescription()->GetPropertyOffset();
+	              SemiProbe--;
+            }
+
+            SemiProbe = Probe + 1;
+            //Check Right
+            while (PropertyIds[SemiProbe].Hash == Hash && Probe < 59)
+            {
+	              if (strncmp(PropertyIds[SemiProbe].Name, Name, ZE_MAX_NAME_SIZE) == 0)
+		              return PropertyIds[SemiProbe].Index + ZEFixedMaterial::ClassDescription()->GetPropertyOffset();
+	              SemiProbe++;
+            } 
+            break;
+        }
+    }
+
+    return -1;
+}
+
+bool ZEFixedMaterial::SetProperty(int PropertyId, const ZEVariant& Value)
+{
+    int Index = PropertyId - ZEFixedMaterial::ClassDescription()->GetPropertyOffset();
+
+
+    if (Index >= 59)
+        return false;
+
+    if (ZEFixedMaterial::ClassDescription()->GetProperties()[Index].Type != Value.GetType())
+         return false;
+
+    switch(Index)
+    {
+        case 0:
+            SetTwoSided(Value.GetBoolean());
+            break;
+        case 1:
+            SetLightningEnabled(Value.GetBoolean());
+            break;
+        case 2:
+            SetRecivesShadow(Value.GetBoolean());
+            break;
+        case 3:
+            SetWireframe(Value.GetBoolean());
+            break;
+        case 4:
+            SetTransparancyCullLimit(Value.GetInteger());
+            break;
+        case 5:
+            SetTransparancyMode((ZEMaterialTransparancyMode)Value.GetInteger());
+            break;
+        case 6:
+            SetAmbientEnabled(Value.GetBoolean());
+            break;
+        case 7:
+            SetAmbientFactor(Value.GetFloat());
+            break;
+        case 8:
+            SetAmbientColor(Value.GetVector3());
+            break;
+        case 9:
+            SetDiffuseEnabled(Value.GetBoolean());
+            break;
+        case 10:
+            SetDiffuseColor(Value.GetVector3());
+            break;
+        case 11:
+            SetDiffuseFactor(Value.GetFloat());
+            break;
+        case 12:
+            SetSpecularEnabled(Value.GetBoolean());
+            break;
+        case 13:
+            SetSpecularFactor(Value.GetFloat());
+            break;
+        case 14:
+            SetSpecularShininess(Value.GetFloat());
+            break;
+        case 15:
+            SetSpecularColor(Value.GetVector3());
+            break;
+        case 16:
+            SetSpecularMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 17:
+            SetSpecularMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 18:
+            SetEmmisiveEnabled(Value.GetBoolean());
+            break;
+        case 19:
+            SetEmmisiveFactor(Value.GetFloat());
+            break;
+        case 20:
+            SetEmmisiveColor(Value.GetVector3());
+            break;
+        case 21:
+            SetEmmisiveMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 22:
+            SetEmmisiveMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 23:
+            SetNormalMapEnabled(Value.GetBoolean());
+            break;
+        case 24:
+            SetNormalMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 25:
+            SetNormalMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 26:
+            SetParallaxMapEnabled(Value.GetBoolean());
+            break;
+        case 27:
+            SetParallaxMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 28:
+            SetParallaxMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 29:
+            SetOpacityEnabled(Value.GetBoolean());
+            break;
+        case 30:
+            SetOpacity(Value.GetFloat());
+            break;
+        case 31:
+            SetOpacityComponent((ZEMaterialOpacityComponent)Value.GetInteger());
+            break;
+        case 32:
+            SetOpacityMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 33:
+            SetOpacityMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 34:
+            SetReflectionEnabled(Value.GetBoolean());
+            break;
+        case 35:
+            SetReflectionFactor(Value.GetFloat());
+            break;
+        case 36:
+            SetReflectionMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 37:
+            SetReflectionMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 38:
+            SetReflectionMapAddressModeW((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 39:
+            SetRefractionEnabled(Value.GetBoolean());
+            break;
+        case 40:
+            SetRefractionFactor(Value.GetFloat());
+            break;
+        case 41:
+            SetRefractionIndex(Value.GetFloat());
+            break;
+        case 42:
+            SetRefractionMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 43:
+            SetRefractionMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 44:
+            SetRefractionMapAddressModeW((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 45:
+            SetDetailMapEnabled(Value.GetBoolean());
+            break;
+        case 46:
+            SetDetailMapTiling(Value.GetVector2());
+            break;
+        case 47:
+            SetDetailDiffuseMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 48:
+            SetDetailDiffuseMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 49:
+            SetDetailNormalMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 50:
+            SetDetailNormalMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 51:
+            SetLightMapEnabled(Value.GetBoolean());
+            break;
+        case 52:
+            SetLightMapFactor(Value.GetFloat());
+            break;
+        case 53:
+            SetLightMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 54:
+            SetLightMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 55:
+            SetDistortionEnabled(Value.GetBoolean());
+            break;
+        case 56:
+            SetDistortionFactor(Value.GetFloat());
+            break;
+        case 57:
+            SetDistortionMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        case 58:
+            SetDistortionMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            break;
+        default:
+            return false;
+    }
+    return true;
+}
+
+bool ZEFixedMaterial::SetProperty(const char* Name, const ZEVariant& Value)
+{
+    int PropertyId = GetPropertyId(Name);
+
+    if (PropertyId != -1)
+        return SetProperty(PropertyId, Value);
+    else
+        return false;
+}
+
+bool ZEFixedMaterial::GetProperty(int PropertyId, ZEVariant& Value) const
+{
+    int Index = PropertyId - ZEFixedMaterial::ClassDescription()->GetPropertyOffset();
+
+    if (Index < 0)
+        return false;
+
+    if (Index >= 59)
+        return false;
+
+    switch(Index)
+    {
+        case 0:
+            Value = (bool)GetTwoSided();
+            break;
+        case 1:
+            Value = (bool)GetLightningEnabled();
+            break;
+        case 2:
+            Value = (bool)GetRecivesShadow();
+            break;
+        case 3:
+            Value = (bool)GetWireframe();
+            break;
+        case 4:
+            Value = (int)GetTransparancyCullLimit();
+            break;
+        case 5:
+            Value = (int)GetTransparancyMode();
+            break;
+        case 6:
+            Value = (bool)GetAmbientEnabled();
+            break;
+        case 7:
+            Value = (float)GetAmbientFactor();
+            break;
+        case 8:
+            Value = (ZEVector3)GetAmbientColor();
+            break;
+        case 9:
+            Value = (bool)GetDiffuseEnabled();
+            break;
+        case 10:
+            Value = (ZEVector3)GetDiffuseColor();
+            break;
+        case 11:
+            Value = (float)GetDiffuseFactor();
+            break;
+        case 12:
+            Value = (bool)GetSpecularEnabled();
+            break;
+        case 13:
+            Value = (float)GetSpecularFactor();
+            break;
+        case 14:
+            Value = (float)GetSpecularShininess();
+            break;
+        case 15:
+            Value = (ZEVector3)GetSpecularColor();
+            break;
+        case 16:
+            Value = (int)GetSpecularMapAddressModeU();
+            break;
+        case 17:
+            Value = (int)GetSpecularMapAddressModeV();
+            break;
+        case 18:
+            Value = (bool)GetEmmisiveEnabled();
+            break;
+        case 19:
+            Value = (float)GetEmmisiveFactor();
+            break;
+        case 20:
+            Value = (ZEVector3)GetEmmisiveColor();
+            break;
+        case 21:
+            Value = (int)GetEmmisiveMapAddressModeU();
+            break;
+        case 22:
+            Value = (int)GetEmmisiveMapAddressModeV();
+            break;
+        case 23:
+            Value = (bool)GetNormalMapEnabled();
+            break;
+        case 24:
+            Value = (int)GetNormalMapAddressModeU();
+            break;
+        case 25:
+            Value = (int)GetNormalMapAddressModeV();
+            break;
+        case 26:
+            Value = (bool)GetParallaxMapEnabled();
+            break;
+        case 27:
+            Value = (int)GetParallaxMapAddressModeU();
+            break;
+        case 28:
+            Value = (int)GetParallaxMapAddressModeV();
+            break;
+        case 29:
+            Value = (bool)GetOpacityEnabled();
+            break;
+        case 30:
+            Value = (float)GetOpacity();
+            break;
+        case 31:
+            Value = (int)GetOpacityComponent();
+            break;
+        case 32:
+            Value = (int)GetOpacityMapAddressModeU();
+            break;
+        case 33:
+            Value = (int)GetOpacityMapAddressModeV();
+            break;
+        case 34:
+            Value = (bool)GetReflectionEnabled();
+            break;
+        case 35:
+            Value = (float)GetReflectionFactor();
+            break;
+        case 36:
+            Value = (int)GetReflectionMapAddressModeU();
+            break;
+        case 37:
+            Value = (int)GetReflectionMapAddressModeV();
+            break;
+        case 38:
+            Value = (int)GetReflectionMapAddressModeW();
+            break;
+        case 39:
+            Value = (bool)GetRefractionEnabled();
+            break;
+        case 40:
+            Value = (float)GetRefractionFactor();
+            break;
+        case 41:
+            Value = (float)GetRefractionIndex();
+            break;
+        case 42:
+            Value = (int)GetRefractionMapAddressModeU();
+            break;
+        case 43:
+            Value = (int)GetRefractionMapAddressModeV();
+            break;
+        case 44:
+            Value = (int)GetRefractionMapAddressModeW();
+            break;
+        case 45:
+            Value = (bool)GetDetailMapEnabled();
+            break;
+        case 46:
+            Value = (ZEVector2)GetDetailMapTiling();
+            break;
+        case 47:
+            Value = (int)GetDetailDiffuseMapAddressModeU();
+            break;
+        case 48:
+            Value = (int)GetDetailDiffuseMapAddressModeV();
+            break;
+        case 49:
+            Value = (int)GetDetailNormalMapAddressModeU();
+            break;
+        case 50:
+            Value = (int)GetDetailNormalMapAddressModeV();
+            break;
+        case 51:
+            Value = (bool)GetLightMapEnabled();
+            break;
+        case 52:
+            Value = (float)GetLightMapFactor();
+            break;
+        case 53:
+            Value = (int)GetLightMapAddressModeU();
+            break;
+        case 54:
+            Value = (int)GetLightMapAddressModeU();
+            break;
+        case 55:
+            Value = (bool)GetDistortionEnabled();
+            break;
+        case 56:
+            Value = (float)GetDistortionFactor();
+            break;
+        case 57:
+            Value = (int)GetDistortionMapAddressModeU();
+            break;
+        case 58:
+            Value = (int)GetDistortionMapAddressModeU();
+            break;
+        default:
+            return false;
+    }
+    return true;
+}
+
+bool ZEFixedMaterial::GetProperty(const char* Name, ZEVariant& Value) const
+{
+    int PropertyId = GetPropertyId(Name);
+
+    if (PropertyId != -1)
+        return GetProperty(PropertyId, Value);
+    else
+        return false;
+}
+

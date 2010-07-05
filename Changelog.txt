@@ -382,4 +382,6 @@
 	CHG: ZEPP has been upgreaded.
 	CHG: PostProcess directory renamed to ZEPP.
 	ADD: Build directory, which contains projects intermediate compiler outputs, added to repository.
-	
+
+[26 July 2010 - Orcun]
+	ADD: ZEQuaternion::CreateFromDirection and ZEQuaternion::CreateFromMatrix functions added.

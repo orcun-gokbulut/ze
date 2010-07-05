@@ -43,7 +43,7 @@ float2 MaterialProperties0;
 #define MaterialOpasity	MaterialProperties0[0]
 
 
-struct PS_INPUT
+struct PSInput
 {
 	float2 Depth    : TEXCOORD0;
    	#ifdef ZESHADER_TRANSPARANT
@@ -53,7 +53,7 @@ struct PS_INPUT
 };
 
 
-float4 ps_main(PS_INPUT Input) : COLOR0
+float4 ps_main(PSInput Input) : COLOR0
 {
 
 	#ifdef ZESHADER_OPASITYMAP

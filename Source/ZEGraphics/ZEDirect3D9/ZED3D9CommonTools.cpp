@@ -36,14 +36,52 @@
 #include "ZED3D9CommonTools.h"
 #include "ZECore\ZEError.h"
 #include <d3dx9.h>
+#include <stdio.h>
 
 #ifdef ZE_DEBUG_SHADERS
-	#define ZE_SHADER_COMPILER_PARAMETERS	(D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION)
+	#define ZE_SHADER_COMPILER_PARAMETERS	(D3DXSHADER_SKIPOPTIMIZATION)
 #else
 	#define ZE_SHADER_COMPILER_PARAMETERS	D3DXSHADER_OPTIMIZATION_LEVEL3
 #endif
 
-D3DFORMAT ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
+class ZED3DXInclude : public ID3DXInclude
+{
+	public:
+		virtual HRESULT __stdcall Open(D3DXINCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID * ppData, UINT * pBytes)
+		{
+			char RelativeFileName[258];
+			sprintf(RelativeFileName, "resources\\shaders\\%s", pFileName);
+			FILE* File = fopen(RelativeFileName, "rb");
+			if (File == NULL)
+				return S_FALSE;
+
+			fseek(File, 0, SEEK_END);
+			*pBytes = ftell(File);
+			fseek(File, 0, SEEK_SET);
+			*ppData = (void*)new char[*pBytes];
+			fread((void*)*ppData, 1, *pBytes, File);
+			fclose(File);
+
+			return S_OK;
+		}
+
+		virtual HRESULT __stdcall Close(LPCVOID pData)
+		{
+			if (pData != NULL)
+				delete[] pData;
+			return S_OK;
+		}
+} D3DIncludeInterface;
+
+void ZED3D9CommonTools::SetRenderTarget(size_t RenderTarget, LPDIRECT3DTEXTURE9 Texture)
+{
+	LPDIRECT3DSURFACE9 Surface;
+	Texture->GetSurfaceLevel(0, &Surface);
+	GetDevice()->SetRenderTarget(RenderTarget, Surface);
+	Surface->Release();
+}
+
+D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 {
 	switch(Format)
 	{
@@ -67,7 +105,7 @@ bool ZED3D9CommonTools::CompileVertexShaderFromFile(LPDIRECT3DVERTEXSHADER9* Ver
 
 	ZED3D_RELEASE(*VertexShader);
 
-	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	if (D3DXCompileShaderFromFile(FileName, Macros, &D3DIncludeInterface, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
 		{
@@ -107,7 +145,7 @@ bool ZED3D9CommonTools::CompilePixelShaderFromFile(LPDIRECT3DPIXELSHADER9* Pixel
 	ZED3D_RELEASE(*PixelShader);
 
 
-	if (D3DXCompileShaderFromFile(FileName, Macros, NULL, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	if (D3DXCompileShaderFromFile(FileName, Macros, &D3DIncludeInterface, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
 		{
@@ -144,7 +182,7 @@ bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShade
 	
 	ZED3D_RELEASE(*VertexShader);
 
-	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, NULL, "vs_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, &D3DIncludeInterface, "vs_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		zeError("D3D9 Vertex Shader Compiler", "Can not compile vertex shader.\r\nShader name : \"%s\".\r\nCompile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
 		*VertexShader = NULL;
@@ -175,7 +213,7 @@ bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, 
 	
 	ZED3D_RELEASE(*PixelShader);
 
-	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, NULL, "ps_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
+	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, &D3DIncludeInterface, "ps_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		zeError("D3D9 Pixel Shader Compiler", "Can not compile pixel shader.\r\nShader Name : \"%s\".\r\n Compile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
 		*PixelShader = NULL;

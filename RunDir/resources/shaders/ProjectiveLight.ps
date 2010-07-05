@@ -155,7 +155,7 @@ inline void CalculatePointLight(in float3 Normal,
 	}
 }
 
-struct PS_INPUT
+struct PSInput
 {
 	#ifndef ZESHADER_NORMALMAP
 		float3 Normal         : TEXCOORD0;
@@ -168,7 +168,7 @@ struct PS_INPUT
 	float4 Position			  : TEXCOORD5;
 };
 
-half4 ps_main(PS_INPUT Input) : COLOR0
+half4 ps_main(PSInput Input) : COLOR0
 {	
 	if (Input.Position.x < 0.8)
 	{

@@ -35,22 +35,22 @@
 
 float4x4	TransformMatrix				: register(c0);
 
-struct VS_INPUT 
+struct VSInput 
 {
 	float4 Position             : POSITION0;
 	float4 Color                : TEXCOORD1;
 
 };
 
-struct VS_OUTPUT 
+struct VSOutput 
 {
 	float4 Position             : POSITION0;
 	float4 Color				: TEXCOORD1;
 };
 
-VS_OUTPUT vs_main(VS_INPUT Input)
+VSOutput vs_main(VSInput Input)
 {
-	VS_OUTPUT Output;
+	VSOutput Output;
 
 	Output.Position = mul(Input.Position, TransformMatrix);
 	Output.Color = Input.Color;

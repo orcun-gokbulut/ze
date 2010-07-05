@@ -33,12 +33,12 @@
 //////////////////////////////////////////////////////////////////////////////////////
 /*ZE_POST_PROCESSOR_END()*/
 
-struct PS_INPUT
+struct PSInput
 {
 	float4 Color			    : TEXCOORD1;
 };
 
-float4 ps_main(PS_INPUT Input) : COLOR0
+float4 ps_main(PSInput Input) : COLOR0
 {
 	return Input.Color;
 }

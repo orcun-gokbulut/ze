@@ -48,7 +48,7 @@
 				AdditionalOptions="/MP8"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\PhysX\Cooking&quot;;&quot;$(ProjectDir)\include\PhysX\Foundation&quot;;&quot;$(ProjectDir)\include\PhysX\NxCharacter&quot;;&quot;$(ProjectDir)\include\PhysX\PhysXLoader&quot;;&quot;$(ProjectDir)\include\PhysX\Physics&quot;;&quot;$(ProjectDir)\include\OpenAL&quot;;&quot;$(ProjectDir)\include\DirectX&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_ZINEK_ENGINE;ZE_DEBUG_ENABLED;_ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_D3D9_PERFHUD;ZE_DEBUG_SHADERS;NX_USER_DEBUG_MODE"
+				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_ZINEK_ENGINE;ZE_DEBUG_ENABLED;_ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_D3D9_PERFHUD;ZE_DEBUG_SHADERS;ZE_DEBUG_CHECK_MEMORY;NX_USER_DEBUG_MODE"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -631,6 +631,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9HDRProcessor.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9HDRProcessor.h"
 					>
 				</File>
@@ -672,6 +676,10 @@
 				</File>
 				<File
 					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9SimpleMaterial.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9SSAOProcessor.cpp"
 					>
 				</File>
 				<File
@@ -799,6 +807,10 @@
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\SimpleVertexShader.vs"
+						>
+					</File>
+					<File
+						RelativePath=".\RunDir\resources\shaders\SkinTransform.hlsl"
 						>
 					</File>
 					<File
@@ -2334,6 +2346,10 @@
 		</Filter>
 		<File
 			RelativePath=".\Changelog.txt"
+			>
+		</File>
+		<File
+			RelativePath=".\ClassDiagram1.cd"
 			>
 		</File>
 		<File

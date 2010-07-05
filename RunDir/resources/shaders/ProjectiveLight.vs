@@ -50,7 +50,7 @@ float4x4  LightProjectionMatrix			: register(c28);
 // Bone matrices rest of the space
 float4x4  BoneMatrices[58]				: register(c32);
 
-struct VS_INPUT 
+struct VSInput 
 {
 	float4 Position    : POSITION;
 	float3 Normal      : NORMAL0;
@@ -63,7 +63,7 @@ struct VS_INPUT
 	#endif
 };
 
-struct VS_OUTPUT 
+struct VSOutput 
 {
 	float4 Position           : POSITION;
 	#ifndef ZESHADER_NORMALMAP
@@ -97,9 +97,9 @@ inline void CalculatePointLight(
 	LightAttenuation = 1.0f / (LightAttenuationFactors[0] + LightAttenuationFactors[1] * LightDistance + LightAttenuationFactors[2] * LightDistance * LightDistance);
 }
 
-VS_OUTPUT vs_main(VS_INPUT Input)
+VSOutput vs_main(VSInput Input)
 {
-	VS_OUTPUT Output;
+	VSOutput Output;
 	float4 Position;
 	float3 Normal;
 	float3 Tangent;

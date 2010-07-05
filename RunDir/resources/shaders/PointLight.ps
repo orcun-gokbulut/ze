@@ -18,7 +18,7 @@
 //  These terms at above can only be changed by Y. Orçun GÖKBULUT.                  //
 //                                                                                  //
 //  Contact Information:                                                            //
-//     Adress : Zinek Code House & Game Studio                                      //                                             
+//     Adress : Zinek Code House & Game Studio                                      //
 //              Aydinlar Mahallesi.                                                 //
 //              Mimar Sokak. 33/5                                                   //
 //              06450  Ankara/TURKEY                                                //
@@ -65,7 +65,7 @@ sampler   EnvironmentMap             : register(s6);
 sampler   LightMap                   : register(s7);
 sampler   ShadowMap                  : register(s8);
 
-struct PS_INPUT
+struct PSInput
 {
 	#ifndef ZESHADER_NORMALMAP
 		float3 Normal             : TEXCOORD0;
@@ -80,7 +80,7 @@ struct PS_INPUT
 	#endif
 };
 
-float4 ps_main(PS_INPUT Input) : COLOR0
+float4 ps_main(PSInput Input) : COLOR0
 {
 	float4 OutputColor;
 

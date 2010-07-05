@@ -43,8 +43,8 @@ ZED3D9TextureCube::ZED3D9TextureCube()
 	CubeTexture = NULL;
 	for (size_t I = 0; I < 6; I++)
 	{
-		ViewPorts[I].ColorBuffer = NULL;
-		ViewPorts[I].DepthBuffer = NULL;
+		ViewPorts[I].FrameBuffer = NULL;
+		ViewPorts[I].ZBuffer = NULL;
 	}
 }
 
@@ -63,7 +63,7 @@ void ZED3D9TextureCube::DeviceLost()
 	if (RenderTarget)
 	{
 		for (size_t I = 0; I < 8; I++)
-			ZED3D_RELEASE(ViewPorts[I].ColorBuffer);
+			ZED3D_RELEASE(ViewPorts[I].FrameBuffer);
 
 		ZED3D_RELEASE(CubeTexture);
 	}
@@ -78,8 +78,8 @@ bool ZED3D9TextureCube::DeviceRestored()
 
 		for (size_t I = 0; I < 6; I++)
 		{
-			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].ColorBuffer);
-			ViewPorts[I].DepthBuffer = NULL;
+			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].FrameBuffer);
+			ViewPorts[I].ZBuffer = NULL;
 		}
 
 	}
@@ -117,8 +117,8 @@ bool ZED3D9TextureCube::Create(int EdgeLength, ZETexturePixelFormat PixelFormat,
 	if (RenderTarget)
 		for (size_t I = 0; I < 6; I++)
 		{
-			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].ColorBuffer);
-			ViewPorts[I].DepthBuffer = NULL;
+			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].FrameBuffer);
+			ViewPorts[I].ZBuffer = NULL;
 		}
 
 	return true;
@@ -148,8 +148,8 @@ void ZED3D9TextureCube::Release()
 	if (RenderTarget)
 		for (size_t I = 0; I < 6; I++)
 		{
-			ZED3D_RELEASE(ViewPorts[I].ColorBuffer);
-			ViewPorts[I].DepthBuffer = NULL;
+			ZED3D_RELEASE(ViewPorts[I].FrameBuffer);
+			ViewPorts[I].ZBuffer = NULL;
 		}
 }
 
