@@ -171,15 +171,15 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			};
 			GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
 
-			ZED3D9CommonTools::CompileVertexShaderFromFile(&Shaders.VertexShader, "Resources/Shaders/HDRProcessor.hlsl", "VS_Main", "HDR - Pass Vertex Shader", "vs_3_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.LumMeasureStart, "Resources/Shaders/HDRProcessor.hlsl", "PS_LumMeasureStart", "HDR - Luminance Measure (Start)", "ps_3_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.LumDownSample3x, "Resources/Shaders/HDRProcessor.hlsl", "PS_LumDownSample3x", "HDR - Luminance Down Sample 4x", "ps_3_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.LumMeasureEnd, "Resources/Shaders/HDRProcessor.hlsl", "PS_LumMeasureEnd", "HDR - Luminance Measure (End)", "ps_3_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.BrightPass, "Resources/Shaders/HDRProcessor.hlsl", "PS_BrightPass", "HDR - BrightPass", "ps_3_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.ColorDownSample4x, "Resources/Shaders/HDRProcessor.hlsl", "PS_ColorDownSample4x", "HDR - Color Down Sample 4x", "ps_3_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.HorizontalBloom, "Resources/Shaders/HDRProcessor.hlsl", "PS_HorizontalBloom", "HDR - Horizontal Bloom", "ps_3_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.VerticalBloom, "Resources/Shaders/HDRProcessor.hlsl", "PS_VerticalBloom", "HDR - Vertical Bloom", "ps_3_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.ToneMap, "Resources/Shaders/HDRProcessor.hlsl", "PS_ToneMap", "HDR - Tone Map", "ps_3_0", NULL);
+			ZED3D9CommonTools::CompileVertexShaderFromFile(&Shaders.VertexShader, "Resources/Shaders/HDRProcessor.hlsl", "VSMain", "HDR - Pass Vertex Shader", "vs_3_0", NULL);
+			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.LumMeasureStart, "Resources/Shaders/HDRProcessor.hlsl", "PSLumMeasureStart", "HDR - Luminance Measure (Start)", "ps_3_0", NULL);
+			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.LumDownSample3x, "Resources/Shaders/HDRProcessor.hlsl", "PSLumDownSample3x", "HDR - Luminance Down Sample 4x", "ps_3_0", NULL);
+			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.LumMeasureEnd, "Resources/Shaders/HDRProcessor.hlsl", "PSLumMeasureEnd", "HDR - Luminance Measure (End)", "ps_3_0", NULL);
+			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.BrightPass, "Resources/Shaders/HDRProcessor.hlsl", "PSBrightPass", "HDR - BrightPass", "ps_3_0", NULL);
+			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.ColorDownSample4x, "Resources/Shaders/HDRProcessor.hlsl", "PSColorDownSample4x", "HDR - Color Down Sample 4x", "ps_3_0", NULL);
+			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.HorizontalBloom, "Resources/Shaders/HDRProcessor.hlsl", "PSHorizontalBloom", "HDR - Horizontal Bloom", "ps_3_0", NULL);
+			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.VerticalBloom, "Resources/Shaders/HDRProcessor.hlsl", "PSVerticalBloom", "HDR - Vertical Bloom", "ps_3_0", NULL);
+			ZED3D9CommonTools::CompilePixelShaderFromFile(&Shaders.ToneMap, "Resources/Shaders/HDRProcessor.hlsl", "PSToneMap", "HDR - Tone Map", "ps_3_0", NULL);
 			
 
 

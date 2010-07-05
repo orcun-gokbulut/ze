@@ -440,7 +440,7 @@ bool ZED3D9Renderer::Initialize()
 		ColorRenderTarget = GetModule()->GetFrameColorBuffer();
 	}*/
 
-	SSAOProcessor.Initialize();
+	//SSAOProcessor.Initialize();
 
 	return true; 
 } 
