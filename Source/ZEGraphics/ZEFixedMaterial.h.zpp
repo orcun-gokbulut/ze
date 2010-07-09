@@ -667,10 +667,10 @@ bool ZEFixedMaterial::SetProperty(int PropertyId, const ZEVariant& Value)
             SetDetailMapTiling(Value.GetVector2());
             break;
         case 47:
-            SetDetailDiffuseMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            SetDetailBaseMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
             break;
         case 48:
-            SetDetailDiffuseMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
+            SetDetailBaseMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
             break;
         case 49:
             SetDetailNormalMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
@@ -872,10 +872,10 @@ bool ZEFixedMaterial::GetProperty(int PropertyId, ZEVariant& Value) const
             Value = (ZEVector2)GetDetailMapTiling();
             break;
         case 47:
-            Value = (int)GetDetailDiffuseMapAddressModeU();
+            Value = (int)GetDetailBaseMapAddressModeU();
             break;
         case 48:
-            Value = (int)GetDetailDiffuseMapAddressModeV();
+            Value = (int)GetDetailBaseMapAddressModeV();
             break;
         case 49:
             Value = (int)GetDetailNormalMapAddressModeU();

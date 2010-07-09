@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9FixedMaterial.h
+ Zinek Engine - FixedMaterialComponents.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,62 +33,94 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_FIXED_MATERIAL_H__
-#define __ZE_D3D9_FIXED_MATERIAL_H__
-
-#include <d3d9.h>
-#include "ZED3D9ComponentBase.h"
-#include "ZED3D9Material.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
-
-class ZED3D9VertexShader;
-class ZED3D9PixelShader;
-
-class ZED3D9FixedMaterial : public ZEFixedMaterial, public ZED3D9Material, private ZED3D9ComponentBase
-{
-	friend class ZED3D9Module;
-	private:
-		ZERenderOrder*					RenderOrder;
-		ZECamera*						Camera;
-
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
-
-		ZED3D9VertexShader*				PreZPassVertexShader;
-		ZED3D9PixelShader*				PreZPassPixelShader;
-		ZED3D9VertexShader*				GBufferPassVertexShader;
-		ZED3D9PixelShader*				GBufferPassPixelShader;
-		ZED3D9VertexShader*				ForwardPassVertexShader;
-		ZED3D9PixelShader*				ForwardPassPixelShader;
-		ZED3D9VertexShader*				ShadowPassVertexShader;
-		ZED3D9PixelShader*				ShadowPassPixelShader;
-
-		void							CreateShaders();
-		void							ReleaseShaders();
-
-	protected:
-										ZED3D9FixedMaterial();
-		virtual							~ZED3D9FixedMaterial();
-
-	public:
-		virtual const char*				GetMaterialUID() const;
-		virtual unsigned int			GetMaterialFlags() const;
-		virtual ZEMaterialType			GetMaterialType() const;
-
-		const char*						ConvertToString(unsigned int MaterialComponent);
-
-		virtual bool					SetupPreZPass() const;
-		virtual bool					SetupGBufferPass() const;
-		virtual bool					SetupMaterialPass() const;
-		virtual bool					SetupShadowPass() const;	
-
-		virtual void					UpdateMaterial();
-
-		virtual void					Release();
-};
+#if ZE_SHADER_COMPONENTS & (1 << 1)
+#define ZE_SHADER_AMBIENT
 #endif
 
+#if ZE_SHADER_COMPONENTS & (1 << 2)
+#define ZE_SHADER_DIFFUSE
+#endif
 
+#if ZE_SHADER_COMPONENTS & (1 << 3)
+#define ZE_SHADER_BASE_MAP
+#endif
 
+/*#if ZE_SHADER_COMPONENTS & (1 << 1)
+#define ZE_SHADER_BUMP_MAPPING
+#endif*/
 
+#if ZE_SHADER_COMPONENTS & (1 << 4)
+#define ZE_SHADER_NORMAL_MAP
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 5)
+#define ZE_SHADER_PARALLAX_MAP
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 6)
+#define ZE_SHADER_SPECULAR
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 7)
+#define ZE_SHADER_SPECULAR_MAP
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 8)
+#define ZE_SHADER_EMMISIVE
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 9)
+#define ZE_SHADER_EMMISIVE_MAP
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 10)
+#define ZE_SHADER_OPACITY
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 11)
+#define ZE_SHADER_OPACITY_BASE_ALPHA
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 12)
+#define ZE_SHADER_OPACITY_CONSTANT	
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 13)
+#define ZE_SHADER_OPACITY_MAP
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 14)
+#define ZE_SHADER_DETAIL_MAP
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 15)
+#define ZE_SHADER_DETAIL_DIFFUSE_MAP
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 16)
+#define ZE_SHADER_DETAIL_NORMAL_MAP
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 17)
+#define ZE_SHADER_REFLECTION
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 18)
+#define ZE_SHADER_REFRACTION
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 19)
+#define ZE_SHADER_LIGHT_MAP
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 20)
+#define ZE_SHADER_DISTORTIONMAP
+#endif
+
+#if ZE_SHADER_COMPONENTS & (1 << 21)
+#define ZE_SHADER_SKINTRANSFORM
+#endif
+
+#if defined(ZE_SHADER_NORMAL_MAP) || defined(ZE_SHADER_PARALLAX_MAP)
+#define ZE_SHADER_TANGENT_SPACE
+#endif

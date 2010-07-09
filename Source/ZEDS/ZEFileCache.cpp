@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9FixedMaterial.h
+ Zinek Engine - ZEFileCache.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,62 +33,93 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_FIXED_MATERIAL_H__
-#define __ZE_D3D9_FIXED_MATERIAL_H__
-
-#include <d3d9.h>
-#include "ZED3D9ComponentBase.h"
-#include "ZED3D9Material.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
-
-class ZED3D9VertexShader;
-class ZED3D9PixelShader;
-
-class ZED3D9FixedMaterial : public ZEFixedMaterial, public ZED3D9Material, private ZED3D9ComponentBase
+#include "ZEFileCache.h"
+#include <stdio.h>
+void ZEFileCache::ReadItemList()
 {
-	friend class ZED3D9Module;
-	private:
-		ZERenderOrder*					RenderOrder;
-		ZECamera*						Camera;
+	fseek((FILE*)File, 0, SEEK_END);
+	ZEDWORD ItemCount;
+	fread(&ItemCount, sizeof(ZEDWORD), 1, (FILE*)File);
+	fseek((FILE*)File, -sizeof(ZEFileCacheItem) * ItemCount, SEEK_CUR);
+	Items.Resize(ItemCount);
+	fread(Items.GetCArray(), sizeof(ZEFileCacheItem), ItemCount, (FILE*)File);
+}
 
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
+void ZEFileCache::DumpItemList()
+{
+	fseek((FILE*)File, 0, SEEK_END);
+	fwrite(Items.GetConstCArray(), sizeof(ZEFileCacheItem), Items.GetCount(), (FILE*)File);
+	ZEDWORD ItemCount = Items.GetCount();
+	fwrite(&ItemCount, sizeof(ZEDWORD), 1, (FILE*)File);
+}
 
-		ZED3D9VertexShader*				PreZPassVertexShader;
-		ZED3D9PixelShader*				PreZPassPixelShader;
-		ZED3D9VertexShader*				GBufferPassVertexShader;
-		ZED3D9PixelShader*				GBufferPassPixelShader;
-		ZED3D9VertexShader*				ForwardPassVertexShader;
-		ZED3D9PixelShader*				ForwardPassPixelShader;
-		ZED3D9VertexShader*				ShadowPassVertexShader;
-		ZED3D9PixelShader*				ShadowPassPixelShader;
+bool ZEFileCache::OpenCache(const char* FileName, bool OnlineMode)
+{
+	File = fopen(FileName, "rwb");
+	if (File == NULL)
+	{
+		zeError("File Cache", "Can not open file cache. (File Name : \"%s\")", FileName);
+		return false;
+	}
+	this->OnlineMode = OnlineMode;
+	ReadItemList();
+}
 
-		void							CreateShaders();
-		void							ReleaseShaders();
+void ZEFileCache::CloseCache()
+{
+	if (File != NULL)
+	{
+		fclose((FILE*)File);
+		File = NULL;
+	}
+}
 
-	protected:
-										ZED3D9FixedMaterial();
-		virtual							~ZED3D9FixedMaterial();
+void ZEFileCache::Add(ZEDWORD Hash, void* Data, size_t Size)
+{
+	fseek((FILE*)File, sizeof(ZEFileCacheItem) * Items.GetCount() + sizeof(ZEDWORD), SEEK_END);
+	ZEDWORD Position = ftell((FILE*)File);
 
-	public:
-		virtual const char*				GetMaterialUID() const;
-		virtual unsigned int			GetMaterialFlags() const;
-		virtual ZEMaterialType			GetMaterialType() const;
+	fwrite(Data, Size, 1, (FILE*)File);
 
-		const char*						ConvertToString(unsigned int MaterialComponent);
+	ZEFileCacheItem* Item = Items.Add();
+	Item->FilePosition = Position;
+	Item->Hash = Hash;
+	Item->Size = Size;
 
-		virtual bool					SetupPreZPass() const;
-		virtual bool					SetupGBufferPass() const;
-		virtual bool					SetupMaterialPass() const;
-		virtual bool					SetupShadowPass() const;	
+	DumpItemList();
+	fflush((FILE*)File);
+}
 
-		virtual void					UpdateMaterial();
+ZEFileCacheScan ZEFileCache::StartScan(ZEDWORD Hash)
+{
+	ZEFileCacheScan Scan;
+	Scan.Cursor = 0;
+	Scan.Hash = Hash;
+}
 
-		virtual void					Release();
-};
-#endif
+bool ZEFileCache::GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan)
+{
+	for (size_t I = Scan.Cursor; I < Items.GetCount(); I++)
+		if (Items[I].Hash == Scan.Hash)
+		{
+			ResourceFile.Initialize((FILE*)File, Items[I].FilePosition, Items[I].Size);
+			return true;
+		}
 
+		return false;
+}
 
+void ZEFileCache::Clear()
+{
+	CloseCache();
+}
 
+ZEFileCache::ZEFileCache()
+{
+	File = NULL;
+}
 
+ZEFileCache::~ZEFileCache()
+{
+	CloseCache();
+}

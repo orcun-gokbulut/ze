@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9FixedMaterial.h
+ Zinek Engine - SkyBox.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,62 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_FIXED_MATERIAL_H__
-#define __ZE_D3D9_FIXED_MATERIAL_H__
+// Transformation matrices 5 matrices
+float4x4 WorldViewProjMatrix : register(vs, c0);
+float4x4 WorldMatrix : register(vs, c4);
+float4x4 WorldInvTrpsMatrix : register(vs, c8);
+float4x4 WorldInvMatrix : register(vs, c12);
 
-#include <d3d9.h>
-#include "ZED3D9ComponentBase.h"
-#include "ZED3D9Material.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
+// Other general constants 4 vectors
+float4 ViewPosition : register(vs, c16);
+float MaterialRefractionIndex : register(vs, c17);
 
-class ZED3D9VertexShader;
-class ZED3D9PixelShader;
+float4 SkyColor : register(ps, c0);
+sampler SkyTexture : register(ps, s0);
 
-class ZED3D9FixedMaterial : public ZEFixedMaterial, public ZED3D9Material, private ZED3D9ComponentBase
+struct VSInput 
 {
-	friend class ZED3D9Module;
-	private:
-		ZERenderOrder*					RenderOrder;
-		ZECamera*						Camera;
-
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
-
-		ZED3D9VertexShader*				PreZPassVertexShader;
-		ZED3D9PixelShader*				PreZPassPixelShader;
-		ZED3D9VertexShader*				GBufferPassVertexShader;
-		ZED3D9PixelShader*				GBufferPassPixelShader;
-		ZED3D9VertexShader*				ForwardPassVertexShader;
-		ZED3D9PixelShader*				ForwardPassPixelShader;
-		ZED3D9VertexShader*				ShadowPassVertexShader;
-		ZED3D9PixelShader*				ShadowPassPixelShader;
-
-		void							CreateShaders();
-		void							ReleaseShaders();
-
-	protected:
-										ZED3D9FixedMaterial();
-		virtual							~ZED3D9FixedMaterial();
-
-	public:
-		virtual const char*				GetMaterialUID() const;
-		virtual unsigned int			GetMaterialFlags() const;
-		virtual ZEMaterialType			GetMaterialType() const;
-
-		const char*						ConvertToString(unsigned int MaterialComponent);
-
-		virtual bool					SetupPreZPass() const;
-		virtual bool					SetupGBufferPass() const;
-		virtual bool					SetupMaterialPass() const;
-		virtual bool					SetupShadowPass() const;	
-
-		virtual void					UpdateMaterial();
-
-		virtual void					Release();
+	float4 Position				: POSITION0;
 };
-#endif
 
+struct VSOutput 
+{
+	float4 Position				: POSITION0;
+	float3 CubeTexcoord			: TEXCOORD0;
+};
 
+VSOutput vs_main(VSInput Input)
+{
+	VSOutput Output;
 
+	Output.Position = Input.Position;
+	Output.CubeTexcoord = mul(Input.Position, WorldViewProjMatrix);
+	
+	return Output;
+}
 
+struct PSInput
+{
+	float3 CubeTexcoord       : TEXCOORD0;
+};
+
+half4 ps_main(PSInput Input) : COLOR0
+{
+	return SkyColor * texCUBE(SkyTexture, normalize(Input.CubeTexcoord));
+}

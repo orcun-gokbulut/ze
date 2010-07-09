@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9FixedMaterial.h
+ Zinek Engine - ZED3D9ShaderManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,61 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D9_FIXED_MATERIAL_H__
-#define __ZE_D3D9_FIXED_MATERIAL_H__
+#ifndef	__ZE_D3D9_SHADER_MANAGER_H__
+#define __ZE_D3D9_SHADER_MANAGER_H__
 
-#include <d3d9.h>
-#include "ZED3D9ComponentBase.h"
-#include "ZED3D9Material.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZED3D9Shader.h"
+#include "ZEDS\ZEArray.h"
 
-class ZED3D9VertexShader;
-class ZED3D9PixelShader;
-
-class ZED3D9FixedMaterial : public ZEFixedMaterial, public ZED3D9Material, private ZED3D9ComponentBase
+class ZED3D9ShaderManager
 {
-	friend class ZED3D9Module;
+	friend void ZED3D9Shader::Release();
 	private:
-		ZERenderOrder*					RenderOrder;
-		ZECamera*						Camera;
+		ZESmartArray<ZED3D9Shader*>		Shaders;
+//		ZEFileCache						ShaderFileCache;
 
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
-
-		ZED3D9VertexShader*				PreZPassVertexShader;
-		ZED3D9PixelShader*				PreZPassPixelShader;
-		ZED3D9VertexShader*				GBufferPassVertexShader;
-		ZED3D9PixelShader*				GBufferPassPixelShader;
-		ZED3D9VertexShader*				ForwardPassVertexShader;
-		ZED3D9PixelShader*				ForwardPassPixelShader;
-		ZED3D9VertexShader*				ShadowPassVertexShader;
-		ZED3D9PixelShader*				ShadowPassPixelShader;
-
-		void							CreateShaders();
-		void							ReleaseShaders();
-
-	protected:
-										ZED3D9FixedMaterial();
-		virtual							~ZED3D9FixedMaterial();
+		ZEDWORD							CalculateHash(const char* FileName, const char* FunctionName, ZEDWORD Components);
+		void							ReleaseShader(ZED3D9Shader* Shader);
+		bool							ReadFromFileCache(const char* Filename, const char* FunctionName, ZEDWORD Components);
+		void							WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEDWORD Components);
 
 	public:
-		virtual const char*				GetMaterialUID() const;
-		virtual unsigned int			GetMaterialFlags() const;
-		virtual ZEMaterialType			GetMaterialType() const;
+		ZED3D9Shader*					GetShader(const char* FileName, const char* FunctionName, ZEDWORD Components, ZED3D9ShaderType Type, const char* Profile);
+		ZED3D9PixelShader*				GetPixelShader(const char* FileName, const char* FunctionName, ZEDWORD Components, const char* Profile);	
+		ZED3D9VertexShader*				GetVertexShader(const char* FileName, const char* FunctionName, ZEDWORD Components, const char* Profile);
 
-		const char*						ConvertToString(unsigned int MaterialComponent);
-
-		virtual bool					SetupPreZPass() const;
-		virtual bool					SetupGBufferPass() const;
-		virtual bool					SetupMaterialPass() const;
-		virtual bool					SetupShadowPass() const;	
-
-		virtual void					UpdateMaterial();
-
-		virtual void					Release();
+		static ZED3D9ShaderManager*		GetInstance();
 };
 #endif
-
-
-
-

@@ -129,7 +129,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		CanvasMaterial->SetAmbientColor(ZEVector3(0.1f, 0.1f, 0.1f));
 		CanvasMaterial->SetDiffuseEnabled(true);
 		CanvasMaterial->SetDiffuseColor(ZEVector3::One);
-		CanvasMaterial->SetDiffuseMap(ZETexture2DResource::LoadResource("Test\\Diffuse.tga")->GetTexture());
+		CanvasMaterial->SetBaseMap(ZETexture2DResource::LoadResource("Test\\Diffuse.tga")->GetTexture());
 		CanvasMaterial->SetSpecularEnabled(true);
 		CanvasMaterial->SetSpecularColor(ZEVector3::One);
 		CanvasMaterial->SetSpecularShininess(64.0f);

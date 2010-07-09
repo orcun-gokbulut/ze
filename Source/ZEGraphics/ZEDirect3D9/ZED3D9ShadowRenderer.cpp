@@ -63,14 +63,14 @@ bool ZED3D9ShadowRenderer::BaseInitialize()
 	ZED3D9CommonTools::CompilePixelShader(&ShadowMapPS, SourcePS, "Shadow Renderer Shadow Pass", "ps_2_0", Macros.GetCArray());
 
 	Macros.Add();
-	Macros[0].Name = "ZESHADER_TRANSPARANT";
+	Macros[0].Name = "ZE_SHADER_TRANSPARANT";
 	Macros[0].Definition = "";
 	Macros.Add();
 	Macros[1].Name = NULL;
 	Macros[1].Definition = NULL;
 	ZED3D9CommonTools::CompileVertexShader(&ShadowMapTextVS, SourceVS, "Transparant Shadow Pass", "vs_2_0", Macros.GetCArray());
 
-	Macros[1].Name = "ZESHADER_OPASITYMAP";
+	Macros[1].Name = "ZE_SHADER_OPASITYMAP";
 	Macros[1].Definition = "";
 	Macros.Add();
 	Macros[2].Name = NULL;
@@ -78,7 +78,7 @@ bool ZED3D9ShadowRenderer::BaseInitialize()
 	ZED3D9CommonTools::CompilePixelShader(&ShadowMapOpasityPS, SourcePS, "Opasity Map Transparant Shadow Pass", "ps_2_0", Macros.GetCArray());
 
 	Macros.Add();
-	Macros[1].Name = "ZESHADER_DIFFUSEMAP";
+	Macros[1].Name = "ZE_SHADER_BASE_MAP";
 	Macros[1].Definition = "";
 	ZED3D9CommonTools::CompilePixelShader(&ShadowMapDiffuseAlphaPS, SourcePS, "Diffuse Map Alpha Transparant Shadow Pass", "ps_2_0", Macros.GetCArray());
 */

@@ -143,13 +143,13 @@ class ZEFixedMaterial : public ZEMaterial
 		{
 			struct
 			{
-				const ZETexture2D*		DiffuseMap;
+				const ZETexture2D*		BaseMap;
 				const ZETexture2D*		NormalMap;
 				const ZETexture2D*		ParallaxMap;
 				const ZETexture2D*		SpecularMap;
 				const ZETexture2D*		EmmisiveMap;
 				const ZETexture2D*		OpacityMap;
-				const ZETexture2D*		DetailDiffuseMap;
+				const ZETexture2D*		DetailBaseMap;
 				const ZETexture2D*		DetailNormalMap;
 				const ZETextureCube*	ReflectionMap;
 				const ZETextureCube*	RefractionMap;
@@ -159,8 +159,8 @@ class ZEFixedMaterial : public ZEMaterial
 			ZETexture2D*					Textures[12];
 		};
 
-		ZETextureAddressMode			DiffuseMapAddressModeU;
-		ZETextureAddressMode			DiffuseMapAddressModeV;
+		ZETextureAddressMode			BaseMapAddressModeU;
+		ZETextureAddressMode			BaseMapAddressModeV;
 
 		ZETextureAddressMode			NormalMapAddressModeU;
 		ZETextureAddressMode			NormalMapAddressModeV;
@@ -177,8 +177,8 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETextureAddressMode			OpacityMapAddressModeU;
 		ZETextureAddressMode			OpacityMapAddressModeV;
 
-		ZETextureAddressMode			DetailDiffuseMapAddressModeU;
-		ZETextureAddressMode			DetailDiffuseMapAddressModeV;
+		ZETextureAddressMode			DetailBaseMapAddressModeU;
+		ZETextureAddressMode			DetailBaseMapAddressModeV;
 
 		ZETextureAddressMode			DetailNormalMapAddressModeU;
 		ZETextureAddressMode			DetailNormalMapAddressModeV;
@@ -230,12 +230,12 @@ class ZEFixedMaterial : public ZEMaterial
 		const ZEVector3&				GetDiffuseColor() const;
 		void							SetDiffuseFactor(float Factor);
 		float							GetDiffuseFactor() const;
-		void							SetDiffuseMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetDiffuseMap() const;
-		void							SetDiffuseMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDiffuseMapAddressModeU() const;
-		void							SetDiffuseMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDiffuseMapAddressModeV() const;
+		void							SetBaseMap(const ZETexture2D* Texture);
+		const ZETexture2D*				GetBaseMap() const;
+		void							SetBaseMapAddressModeU(ZETextureAddressMode Mode);
+		ZETextureAddressMode			GetBaseMapAddressModeU() const;
+		void							SetBaseMapAddressModeV(ZETextureAddressMode Mode);
+		ZETextureAddressMode			GetBaseMapAddressModeV() const;
 
 		// Specular
 		void							SetSpecularEnabled(bool Enabled);
@@ -335,12 +335,12 @@ class ZEFixedMaterial : public ZEMaterial
 		bool							GetDetailMapEnabled() const;
 		void							SetDetailMapTiling(const ZEVector2& Tiling);
 		const ZEVector2&				GetDetailMapTiling() const;
-		void							SetDetailDiffuseMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetDetailDiffuseMap() const;
-		void							SetDetailDiffuseMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDetailDiffuseMapAddressModeU() const;
-		void							SetDetailDiffuseMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetDetailDiffuseMapAddressModeV() const;
+		void							SetDetailBaseMap(const ZETexture2D* Texture);
+		const ZETexture2D*				GetDetailBaseMap() const;
+		void							SetDetailBaseMapAddressModeU(ZETextureAddressMode Mode);
+		ZETextureAddressMode			GetDetailBaseMapAddressModeU() const;
+		void							SetDetailBaseMapAddressModeV(ZETextureAddressMode Mode);
+		ZETextureAddressMode			GetDetailBaseMapAddressModeV() const;
 		void							SetDetailNormalMap(const ZETexture2D* Texture);
 		const ZETexture2D*				GetDetailNormalMap() const;
 		void							SetDetailNormalMapAddressModeU(ZETextureAddressMode Mode);
@@ -408,7 +408,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="DiffuseEnabled" groupname="Diffuse" type="boolean" autogetset="yes"/>
 			<property name="DiffuseColor" groupname="Diffuse" semantic="ZE_PS_COLOR" type="ZEVector3" autogetset="yes"/>
 			<property name="DiffuseFactor" groupname="Diffuse" type="float" autogetset="yes"/>
-			<!--<property name="DiffuseMap" groupname="Diffuse" type="string" autogetset="yes"/>-->
+			<!--<property name="BaseMap" groupname="Diffuse" type="string" autogetset="yes"/>-->
 
 
 			<property name="SpecularEnabled" groupname="Specular" type="boolean" autogetset="yes"/>
@@ -584,8 +584,8 @@ ZE_POST_PROCESSOR_START(Meta)
 
 			<property name="DetailMapEnabled" groupname="Detail" type="boolean" autogetset="yes" />
 			<property name="DetailMapTiling" groupname="Detail" type="ZEVector2" autogetset="yes" />
-			<!--<property name="DetailDiffuseMap" groupname="Detail" type="string" autogetset="yes" />-->
-			<property name="DetailDiffuseMapAddressModeU" groupname="Detail" type="integer" autogetset="yes">
+			<!--<property name="DetailBaseMap" groupname="Detail" type="string" autogetset="yes" />-->
+			<property name="DetailBaseMapAddressModeU" groupname="Detail" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -593,7 +593,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name="DetailDiffuseMapAddressModeV" groupname="Detail" type="integer" autogetset="yes">
+			<property name="DetailBaseMapAddressModeV" groupname="Detail" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9FixedMaterial.h
+ Zinek Engine - ZEFileCache.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,62 +33,56 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_FIXED_MATERIAL_H__
-#define __ZE_D3D9_FIXED_MATERIAL_H__
+#ifndef __ZE_FILE_CACHE_H__
+#define __ZE_FILE_CACHE_H__
 
-#include <d3d9.h>
-#include "ZED3D9ComponentBase.h"
-#include "ZED3D9Material.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZECore/ZEResourceFile.h"
+#include "ZEArray.h"
+#include "ZETypes.h"
 
-class ZED3D9VertexShader;
-class ZED3D9PixelShader;
-
-class ZED3D9FixedMaterial : public ZEFixedMaterial, public ZED3D9Material, private ZED3D9ComponentBase
+struct ZEFileCacheItem
 {
-	friend class ZED3D9Module;
-	private:
-		ZERenderOrder*					RenderOrder;
-		ZECamera*						Camera;
+	ZEDWORD Hash;
+	ZEDWORD FilePosition;
+	ZEDWORD Size;
+};
 
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
+struct ZEFileCacheScan
+{
+	ZEDWORD Hash;
+	ZEDWORD Cursor;
+};
 
-		ZED3D9VertexShader*				PreZPassVertexShader;
-		ZED3D9PixelShader*				PreZPassPixelShader;
-		ZED3D9VertexShader*				GBufferPassVertexShader;
-		ZED3D9PixelShader*				GBufferPassPixelShader;
-		ZED3D9VertexShader*				ForwardPassVertexShader;
-		ZED3D9PixelShader*				ForwardPassPixelShader;
-		ZED3D9VertexShader*				ShadowPassVertexShader;
-		ZED3D9PixelShader*				ShadowPassPixelShader;
-
-		void							CreateShaders();
-		void							ReleaseShaders();
-
+class ZECachePartialResourceFile : public ZEPartialResourceFile
+{
+	friend class ZEFileCache;
 	protected:
-										ZED3D9FixedMaterial();
-		virtual							~ZED3D9FixedMaterial();
+		void							Initialize(void* File, size_t StartPosition, size_t EndPosition);
+};
+
+class ZEFileCache
+{
+	private:
+		void*							File;
+
+		bool							OnlineMode;
+		ZESmartArray<ZEFileCacheItem>	Items;
+
+		void							ReadItemList();
+		void							DumpItemList();
 
 	public:
-		virtual const char*				GetMaterialUID() const;
-		virtual unsigned int			GetMaterialFlags() const;
-		virtual ZEMaterialType			GetMaterialType() const;
+		bool							OpenCache(const char* FileName, bool OnlineMode = true);
+		void							CloseCache();
 
-		const char*						ConvertToString(unsigned int MaterialComponent);
+		void							Add(ZEDWORD Hash, void* Data, size_t Size);
+		ZEFileCacheScan					StartScan(ZEDWORD Hash);
+		bool							GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan);
 
-		virtual bool					SetupPreZPass() const;
-		virtual bool					SetupGBufferPass() const;
-		virtual bool					SetupMaterialPass() const;
-		virtual bool					SetupShadowPass() const;	
+		void							Clear();
 
-		virtual void					UpdateMaterial();
-
-		virtual void					Release();
+										ZEFileCache();
+										~ZEFileCache();
 };
+
 #endif
-
-
-
-

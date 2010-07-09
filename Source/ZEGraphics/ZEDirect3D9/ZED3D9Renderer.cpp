@@ -100,262 +100,6 @@ void ZED3D9Renderer::PumpStreams(ZERenderOrder* RenderOrder)
 	}
 }
 
-void ZED3D9Renderer::DrawAmbientPass(ZERenderOrder* RenderOrder, ZECamera* Camera)
-{
-	// Get Vertex buffer of render order
-	ZED3D9StaticVertexBuffer* VertexBuffer = (ZED3D9StaticVertexBuffer*)RenderOrder->VertexBuffer;
-
-	// Check render order has vertex buffer and one or more primitives.
-	if (RenderOrder->VertexBuffer == NULL || RenderOrder->PrimitiveCount == 0)
-		return;
-
-	// Get material of the render order
-	const ZEMaterial* Material = RenderOrder->Material;
-
-	// Setup vertex declaration
-	RenderOrder->VertexDeclaration->SetupVertexDeclaration();
-
-	/* NO INDEX BUFFERS SUPPORTED ANYMORE */
-	/*
-	// Setup index buffer if available
-	if (RenderOrder->IndexBuffer != NULL)
-	GetDevice()->SetIndices(RenderOrder->IndexBuffer);
-	*/
-
-	// If vertex buffer is static, setup vertex buffer
-	if (VertexBuffer->IsStatic())
-		GetDevice()->SetStreamSource(0, VertexBuffer->StaticBuffer, 0, RenderOrder->VertexDeclaration->GetVertexSize());
-
-	// Setup Material
-	Material->SetupMaterial(RenderOrder, Camera);
-
-	// Do pre-lightning pass
-	if (Material->SetupPreLightning())
-	{
-		size_t PassCount;
-		do
-		{
-			PassCount = Material->DoPreLightningPass();
-			PumpStreams(RenderOrder);
-		}
-		while(PassCount != 1);
-	}
-}
-
-void ZED3D9Renderer::DrawLightPasses(ZERenderOrder* RenderOrder, ZECamera* Camera)
-{
-	// Get Vertex buffer of render order
-	ZED3D9StaticVertexBuffer* VertexBuffer = (ZED3D9StaticVertexBuffer*)RenderOrder->VertexBuffer;
-
-	// Check render order has vertex buffer and one or more primitives.
-	if (RenderOrder->VertexBuffer == NULL || RenderOrder->PrimitiveCount == 0)
-		return;
-
-	// Get material of the render order
-	const ZEMaterial* Material = RenderOrder->Material;
-
-	// Setup vertex declaration
-	RenderOrder->VertexDeclaration->SetupVertexDeclaration();
-
-	/* NO INDEX BUFFERS SUPPORTED ANYMORE */
-	/*
-	// Setup index buffer if available
-	if (RenderOrder->IndexBuffer != NULL)
-	GetDevice()->SetIndices(RenderOrder->IndexBuffer);
-	*/
-
-	// If vertex buffer is static, setup vertex buffer
-	if (VertexBuffer->IsStatic())
-		GetDevice()->SetStreamSource(0, VertexBuffer->StaticBuffer, 0, RenderOrder->VertexDeclaration->GetVertexSize());
-
-	// Setup Material
-	Material->SetupMaterial(RenderOrder, Camera);
-
-	// Do light passes
-	if (RenderOrder->Lights.GetCount() != 0 && Material->SetupLightning())
-	{
-		// Sort the lights
-		ZEPointLight* PointLightList[64];
-		size_t PointLightCount = 0;
-
-		ZEDirectionalLight* DirectionalLightList[64];
-		size_t DirectionalLightCount = 0;
-
-		ZEProjectiveLight* ProjectiveLightList[64];
-		size_t ProjectiveLightCount = 0;
-
-		ZEOmniProjectiveLight* OmniProjectiveLightList[64];
-		size_t OmniProjectiveLightCount = 0;
-
-		ZEPointLight* ShadowedPointLightList[64];
-		size_t ShadowedPointLightCount = 0;
-
-		ZEDirectionalLight* ShadowedDirectionalLightList[64];
-		size_t ShadowedDirectionalLightCount = 0;
-
-		ZEProjectiveLight* ShadowedProjectiveLightList[64];
-		size_t ShadowedProjectiveLightCount = 0;
-
-		ZEOmniProjectiveLight* ShadowedOmniProjectiveLightList[64];
-		size_t ShadowedOmniProjectiveLightCount = 0;
-
-		for (size_t I = 0; I < RenderOrder->Lights.GetCount(); I++)
-		{			
-			ZELight* CurrentLight = RenderOrder->Lights[I];
-			switch (CurrentLight->GetLightType())
-			{
-			case ZE_LT_POINT:
-				if (CurrentLight->GetCastsShadows())
-				{
-					ShadowedPointLightList[ShadowedPointLightCount] = (ZEPointLight*)CurrentLight;
-					ShadowedPointLightCount++;
-				}
-				else
-				{
-					PointLightList[PointLightCount] = (ZEPointLight*)CurrentLight;
-					PointLightCount++;
-				}
-				break;
-
-			case ZE_LT_DIRECTIONAL:
-				if (CurrentLight->GetCastsShadows() == NULL)
-				{
-					DirectionalLightList[DirectionalLightCount] = (ZEDirectionalLight*)CurrentLight;
-					DirectionalLightCount++;
-				}
-				else
-				{
-					ShadowedDirectionalLightList[ShadowedDirectionalLightCount] = (ZEDirectionalLight*)CurrentLight;
-					ShadowedDirectionalLightCount++;
-				}
-				break;
-
-			case ZE_LT_PROJECTIVE:
-				if (CurrentLight->GetCastsShadows() == NULL)
-				{
-					ProjectiveLightList[PointLightCount] = (ZEProjectiveLight*)CurrentLight;
-					ProjectiveLightCount++;
-				}
-				else
-				{
-					ShadowedProjectiveLightList[ShadowedPointLightCount] = (ZEProjectiveLight*)CurrentLight;
-					ShadowedProjectiveLightCount++;
-				}
-				break;
-
-			case ZE_LT_OMNIPROJECTIVE:
-				if (CurrentLight->GetCastsShadows() == NULL)
-				{
-					OmniProjectiveLightList[OmniProjectiveLightCount] = (ZEOmniProjectiveLight*)CurrentLight;
-					OmniProjectiveLightCount++;
-
-				}
-				else
-				{
-					ShadowedOmniProjectiveLightList[OmniProjectiveLightCount] = (ZEOmniProjectiveLight*)CurrentLight;
-					ShadowedOmniProjectiveLightCount++;
-				}
-				break;
-			}
-		}
-
-		// Draw point light passes
-		if (PointLightCount != 0 && Material->SetupPointLightPass(false))
-		{
-			// Setup material for point light passes
-
-			while (PointLightCount != 0)
-			{
-				// Setup point light pass and decrease processed light coun t
-				//		Materials can have multiple lights per pass or multiple pass per light so DoPointLightPass 
-				//		function returns how many light will be processed in a particular pass. If its returns zero
-				//		it means renderer should do multiple passes per lights. On multiple pass per light situation
-				//		DoPointLightPass will return 0 until light has been successfully processed. Then it will return
-				//		one. (In multiple lights per multiple pass it will return more than zero) 
-				// Decrease number of light count.
-
-				PointLightCount -= Material->DoPointLightPass(PointLightList, PointLightCount);
-
-				// Draw primitives
-				PumpStreams(RenderOrder);
-			}
-		}
-
-		// Draw shadowed point light passes
-		if (ShadowedPointLightCount != 0 && Material->SetupPointLightPass(true))
-		{
-			while (PointLightCount != 0)
-			{
-				ShadowedPointLightCount -= Material->DoPointLightPass(ShadowedPointLightList, PointLightCount);
-				PumpStreams(RenderOrder);
-			}
-		}
-
-		// Draw directional light passes
-		if (DirectionalLightCount != 0 && Material->SetupDirectionalLightPass(false))
-		{
-
-			while (DirectionalLightCount != 0)
-			{
-				DirectionalLightCount -= Material->DoDirectionalLightPass(DirectionalLightList, DirectionalLightCount);
-				PumpStreams(RenderOrder);
-			}
-		}
-
-		// Draw shadowed directional light passes
-		if (ShadowedDirectionalLightCount != 0 && Material->SetupDirectionalLightPass(true))
-		{
-			while (ShadowedDirectionalLightCount != 0)
-			{
-				ShadowedDirectionalLightCount -= Material->DoDirectionalLightPass(ShadowedDirectionalLightList, ShadowedDirectionalLightCount);
-				PumpStreams(RenderOrder);
-			}
-		}
-
-		// Draw projective light passes
-		if (ProjectiveLightCount != 0 && Material->SetupProjectiveLightPass(false))
-		{
-			while (ProjectiveLightCount != 0)
-			{
-				ProjectiveLightCount -= Material->DoProjectiveLightPass(ProjectiveLightList, ProjectiveLightCount);
-				PumpStreams(RenderOrder);
-			}
-		}
-
-		// Draw shadowed projective light passes		
-		if (ShadowedProjectiveLightCount != 0 && Material->SetupProjectiveLightPass(true))
-		{
-			while (ShadowedProjectiveLightCount != 0)
-			{
-				ShadowedProjectiveLightCount -= Material->DoProjectiveLightPass(ShadowedProjectiveLightList, ShadowedProjectiveLightCount);
-				PumpStreams(RenderOrder);
-			}
-		}
-
-		// Draw omni projective light passes
-		if (OmniProjectiveLightCount != 0 && Material->SetupOmniProjectiveLightPass(false))
-		{
-			while (OmniProjectiveLightCount != 0)
-			{
-				OmniProjectiveLightCount -= Material->DoOmniProjectivePass(OmniProjectiveLightList, OmniProjectiveLightCount);
-				PumpStreams(RenderOrder);
-			}
-		}
-
-		// Draw shadowed omni projective light passes
-		if (ShadowedOmniProjectiveLightCount != 0 && Material->SetupOmniProjectiveLightPass(true))
-		{
-			while (ShadowedOmniProjectiveLightCount != 0)
-			{
-				ShadowedOmniProjectiveLightCount -= Material->DoOmniProjectivePass(ShadowedOmniProjectiveLightList, ShadowedOmniProjectiveLightCount);
-				PumpStreams(RenderOrder);
-			}
-		}
-	}
-}
-
-
-
 bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZE_DEBUG_ENABLED
@@ -409,6 +153,51 @@ bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 	#endif
 
 	return true;
+}
+
+void ZED3D9Renderer::DoPreZPass()
+{
+
+	// Disable Color Write
+	// Find non transparants
+	// Setup Their Z-Pass Materials
+	// Draw
+	Device()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00000000);
+	Device()->SetRenderState(D3DRS_ZENABLE, TRUE);
+	Device()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+	Device()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
+	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
+	{
+		ZERenderOrder* RenderOrder = NonTransparent[I];
+		ZED3D9Material RenderOrder->Material
+		
+	}
+}
+
+void ZED3D9Renderer::DoGBufferPass()
+{
+
+}
+
+void ZED3D9Renderer::DoLightningPass()
+{
+	
+}
+
+void ZED3D9Renderer::DoDrawingPass()
+{
+
+}
+
+void ZED3D9Renderer::DoForwardPass()
+{
+
+}
+
+void ZED3D9Renderer::DoPostProcessPass()
+{
+
 }
 
 void ZED3D9Renderer::CreateRenderTargets()

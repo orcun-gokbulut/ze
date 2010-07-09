@@ -623,19 +623,19 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9FixedMaterialShader.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9FixedMaterialShader.h"
-					>
-				</File>
-				<File
 					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9HDRProcessor.cpp"
 					>
 				</File>
 				<File
 					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9HDRProcessor.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Material.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Material.h"
 					>
 				</File>
 				<File
@@ -660,6 +660,22 @@
 				</File>
 				<File
 					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Renderer.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Shader.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Shader.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9ShaderManager.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9ShaderManager.h"
 					>
 				</File>
 				<File
@@ -746,15 +762,11 @@
 					Name="Shaders"
 					>
 					<File
-						RelativePath=".\RunDir\resources\shaders\DirectionalLight.ps"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\DirectionalLight.vs"
-						>
-					</File>
-					<File
 						RelativePath=".\RunDir\resources\shaders\FixedMaterial.hlsl"
+						>
+					</File>
+					<File
+						RelativePath=".\RunDir\resources\shaders\Old Shaders\FixedMaterialComponents.h"
 						>
 					</File>
 					<File
@@ -762,51 +774,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\RunDir\resources\shaders\OmniProjectiveLight.ps"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\OmniProjectiveLight.vs"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\PointLight.ps"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\PointLight.vs"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\PreLightning.ps"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\PreLightning.vs"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\ProjectiveLight.ps"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\ProjectiveLight.vs"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\ShadowPass.ps"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\ShadowPass.vs"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\SimplePixelShader.ps"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\SimpleVertexShader.vs"
+						RelativePath=".\RunDir\resources\shaders\SimpleShader.hlsl"
 						>
 					</File>
 					<File
@@ -814,11 +782,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\RunDir\resources\shaders\SkyBox.ps"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\SkyBox.vs"
+						RelativePath=".\RunDir\resources\shaders\SkyBox.hlsl"
 						>
 					</File>
 					<File
@@ -826,15 +790,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\RunDir\resources\shaders\UISolidPixelShader.ps"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\UITexturedPixelShader.ps"
-						>
-					</File>
-					<File
-						RelativePath=".\RunDir\resources\shaders\UIVertexShader.vs"
+						RelativePath=".\RunDir\resources\shaders\UIVertexShader.hlsl"
 						>
 					</File>
 				</Filter>
@@ -1737,6 +1693,14 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEDS\ZEDefinitions.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEDS\ZEFileCache.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEDS\ZEFileCache.h"
 				>
 			</File>
 			<File

@@ -33,292 +33,219 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-// Vertex Shader Parameters
-///////////////////////////////////////////////////////////////////////////////////////
-// Transformation matrices 5 matrices
-float4x4  WorldViewProjMatrix			: register(c0);
-float4x4  WorldMatrix					: register(c4);
-float4x4  WorldInvTrpsMatrix			: register(c8);
-float4x4  WorldInvMatrix				: register(c12);
+#include "SkinTransform.hlsl"
+#include "FixedShaderComponents.hlsl"
+
+//* Vertex Shader Constants
+/////////////////////////////////////////////////////////////////////////////////////////
+
+// Vertex Transformation
+float4x4 WorldViewProjMatrix : register(c0);
+float4x4 WorldViewMatrix : register(c4);
+float4x4 WorldViewInvTrpsMatrix : register(c8);
 
 // Other general constants 4 vectors
-float4    ViewPosition					: register(c16);
-float     MaterialRefractionIndex		: register(c17);
-
-//First light 4 vector 1 matrix
-float4    LightPosition					: register(c24);
-float3    LightAttenuationFactors		: register(c25);
-float4x4  LightMapMatrix				: register(c28);
-
-// Bone matrices rest of the space
-float4x4  BoneMatrices[58]				: register(c32);
+float4 ViewPosition : register(vs, c16);
+float MaterialRefractionIndex : register(vs, c17);
 
 
-// Prelighning Pass
-///////////////////////////////////////////////////////////////////////////////////////
-struct VSInput 
+// Pixel Shader Constants
+/////////////////////////////////////////////////////////////////////////////////////////
+
+// Fixed Material Properties
+float4 MaterialParams0 : register(ps, c0);
+float4 MaterialParams1 : register(ps, c1);
+float4 MaterialParams2 : register(ps, c2);
+float4 MaterialParams3 : register(ps, c3);
+float4 MaterialParams4 : register(ps, c4);
+float4 MaterialParams5 : register(ps, c5);
+float FarZ : register(c6);
+
+#define	MaterialAmbientColor        MaterialParams0.xyz
+#define	MaterialOpacity				MaterialParams0.w
+#define	MaterialDiffuseColor        MaterialParams1.xyz
+#define	MaterialSpecularColor       MaterialParams2.xyz
+#define	MaterialSpecularFactor		MaterialParams2.w
+#define	MaterialEmmisiveColor       MaterialParams3.xyz
+#define	MaterialEmmisiveFactor		MaterialParams3.w
+#define	MaterialReflectionFactor	MaterialParams4.x
+#define	MaterialRefractionFactor    MaterialParams4.y;
+#define	MaterialDetailMapTiling     MaterialParams4.zw;
+#define MaterialDistortionFactor	MaterialParams5.x;
+#define MaterialDistortionAmount	MaterialParams5.y;
+
+
+// Textures
+/////////////////////////////////////////////////////////////////////////////////////////
+
+// Pipeline Textures
+sampler2D LightBuffer;
+sampler2D SSAOBuffer;
+
+// Material Textures
+sampler2D BaseMap : register(s0);
+sampler2D NormalMap : register(s1);
+sampler2D ParallaxMap : register(s2);
+sampler2D SpecularMap : register(s3);
+sampler2D OpacityMap : register(s4);
+sampler2D DetailDiffuseMap : register(s5);
+sampler2D DetailNormalMap : register(s6);
+sampler2D EmmisiveMap : register(s7);
+sampler2D ReflectionMap : register(s8);
+sampler2D RefractionMap : register(s9);
+sampler2D LightMap : register(s10);
+sampler2D DistortionMap : register(s11);
+
+
+// Pre Z Pass
+/////////////////////////////////////////////////////////////////////////////////////////
+
+struct PreZVSInput 
+{
+	float4 Position : POSITION0;
+
+	#ifdef ZE_SHADER_SKINTRANSFORM
+		int4 BoneIndices : BLENDINDICES0;
+		float4 BoneWeights : BLENDWEIGHT0;
+	#endif
+};
+
+struct PreZVSOutput
+{
+	float4 Position : POSITION0;
+}
+
+PreZVSOutput PreZVSMain(VSInput Input)
+{
+	PreZVSOutput Output;
+
+	SkinTransform(Input);
+
+	Output.Position = mul(Input.Position, WorldViewProjMatrix);
+}
+
+float4 PreZPSOutput()
+{
+	return 0.0f;
+}
+
+// G-Buffer Pass
+/////////////////////////////////////////////////////////////////////////////////////////
+struct GBVSInput 
 {
 	float4 Position             : POSITION0;
 	float3 Normal               : NORMAL0;
 	float2 Texcoord             : TEXCOORD0;
-	#ifdef ZESHADER_LIGHTMAP
-		float2 LightMapTexcoord : TEXCOORD1;
-	#endif
 
-	#ifdef ZESHADER_SKINTRANSFORM
+	#ifdef ZE_SHADER_SKINTRANSFORM
 		int4 BoneIndices        : BLENDINDICES0;
 		float4 BoneWeights      : BLENDWEIGHT0;
 	#endif
 };
 
-struct VSOutput 
+struct GBVSOutput 
 {
-	float4 Position                : POSITION0;
-	float2 Texcoord                : TEXCOORD0;
-	#ifdef ZESHADER_LIGHTMAP
-		float2 LightMapTexcoord     : TEXCOORD1;
+	float4 Position : POSITION0;
+	float4 NormalDepth : TEXCOORD0;
+	#if defined(ZE_SHADER_TEXCOORD)
+		float2 Texcoord : TEXCOORD1;
 	#endif
-	#ifdef ZESHADER_HEMISPHERELIGHTNING
-		#ifdef ZESHADER_TANGENTSPACE
-			float3 SkyVector            : TEXCOORD2;
-		#else
-			float3 Normal               : TEXCOORD2;
-		#endif
-	#endif
-
-	#ifdef ZESHADER_REFLECTION
-		float3 ReflectionVector     : TEXCOORD3;
-	#endif
-
-	#ifdef ZESHADER_REFRACTION
-		float3 RefractionVector     : TEXCOORD4;
+	
+	#if defined(ZE_SHADER_TANGENT_SPACE)
+		float3 Tangent : TEXCOORD2;
+		float3 Binormal : TEXCOORD3;
 	#endif
 };
 
-VSOutput vs_prelightning(VSInput Input)
+void GBVSTransformNormals(in GBVSInput Input, out GBVSOutput Output)
 {
-	VSOutput Output;
-	float4 Position;
-	float3 Normal;
-
-	#ifdef ZESHADER_SKINTRANSFORM
-		Position = float4(0.0f, 0.0f, 0.0f, 0.0f);
-		Normal = float3(0.0f, 0.0f, 0.0f);
-		for (int I = 0; I < 4; I++)
-			if (Input.BoneWeights[I] > 0.0f)
-			{
-				Position += mul(Input.Position, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
-				Normal += mul(Input.Normal, BoneMatrices[Input.BoneIndices[I]]) * Input.BoneWeights[I];
-			}	
-	#else
-		Position = Input.Position;
-		Normal = Input.Normal;
-	#endif
-
-	Output.Position = mul(Position, WorldViewProjMatrix);
-
-	#if defined(ZESHADER_REFLECTION) || defined(ZESHADER_REFRACTION)
-		float3 CameraDirection = normalize(Position - ViewPosition);
-	#endif
+	Output.NormalDepth.xyz = mul(Input.Normal, WorldViewInvTrpsMatrix).xyz;
+	Output.Tangent.xyz = mul(Input.Tangent, WorldViewInvTrpsMatrix).xyz;
+	Output.Binormal.xyz = mul(Input.Binormal, WorldViewInvTrpsMatrix).xyz;
 	
-	#ifdef ZESHADER_REFLECTION
-		Output.ReflectionVector = reflect(-CameraDirection, Normal);
-	#endif
-	
-	#ifdef ZESHADER_REFRACTION
-		Output.RefractionVector = refract(-CameraDirection, Normal, MaterialRefractionIndex);
+}
+GBVSOutput GBVSMain(GBVSInput Input)
+{
+	GBVSOutput Output;
+
+	SkinTransform(Input);
+
+	// Pipeline 
+	Output.Position = mul(Input.Position, WorldViewProjMatrix);
+	GBVSTransformNormals(Input, Output);
+	Output.NormalDepth.w = mul(Input.Position, WorldViewMatrix).z;
+
+	#if defined(ZE_SHADER_TEXCOORD)
+		Output.Texcoord = Input.Texcoord;
 	#endif
 
-	#ifdef ZESHADER_LIGHTMAP
-		Output.LightMapTexcoord = Input.LightMapTexcoord;
-	#endif
-
-	Output.Texcoord = Input.Texcoord;
-	
 	return Output;
 }
 
-float4	  MaterialParams0			 : register(c0);
-float4	  MaterialParams1			 : register(c1);
-float4	  MaterialParams2			 : register(c2);
-float4	  MaterialParams3			 : register(c3);
-float4	  MaterialParams4			 : register(c4);
-
-#define	  MaterialAmbientColor         MaterialParams0.xyz
-#define	  MaterialOpacity			   MaterialParams0.w
-#define	  MaterialDiffuseColor         MaterialParams1.xyz
-#define	  MaterialSpecularColor        MaterialParams2.xyz
-#define	  MaterialSpecularFactor	   MaterialParams2.w
-#define	  MaterialEmmisiveColor        MaterialParams3.xyz
-#define	  MaterialEmmisiveFactor	   MaterialParams3.w
-#define	  MaterialReflectionFactor	   MaterialParams4.x
-#define	  MaterialRefractionFactor     MaterialParams4.y;
-#define	  MaterialDetailMapTiling      MaterialParams4.zw;
-
-float4    LightColor                 : register(c12);
-float     LightIntensity             : register(c13);
-
-// General Material Properties 
-sampler   DiffuseMap                 : register(s0);
-sampler   NormalMap                  : register(s1);
-sampler	  ParallaxMap				 : register(s2);
-sampler   SpecularMap                : register(s3);
-sampler   OpacityMap				 : register(s4);
-sampler   DetailDiffuseMap           : register(s5);
-sampler   DetailNormalMap            : register(s6);
-
-// PreLightning Material Properties
-sampler   EmmisiveMap                : register(s7);
-sampler	  ReflectionMap				 : register(s8);
-sampler   RefractionMap              : register(s9);
-sampler   LightMap                   : register(s10);
-sampler	  DistortionMap				 : register(s11);
-
-struct PSInput
+struct GBPSInput
 {
-	float2 Texcoord             : TEXCOORD0;
-	#ifdef ZESHADER_LIGHTMAP
-	float2 LightMapTexcoord     : TEXCOORD1;
+	float4 NormalDepth : TEXCOORD0;
+	#if defined(ZE_SHADER_SPECULAR_GLOSS_MAP) || defined(ZE_SHADER_NORMAL_MAP)
+		float2 Texcoord : TEXCOORD1;
 	#endif
-	#ifdef ZESHADER_REFLECTION
-	float3 ReflectionVector     : TEXCOORD3;
+	#if defined(ZE_SHADER_TANGENT_SPACE)
+		float3 Tangent : TEXCOORD2;
+		float3 Binormal : TEXCOORD3;
 	#endif
-	#ifdef ZESHADER_REFRACTION
-	float3 RefractionVector     : TEXCOORD4;
-	#endif
-	#ifdef ZESHADER_DISTORTION
-	float2 ScreenCoordinates    : TEXCOORD5;
-	#endif
+	float3 
 };
 
-float4 ps_prelightning(PSInput Input) : COLOR0
+struct GBPSOutput
 {
-	float4 OutputColor = float4(0.0f, 0.0f ,0.0f ,1.0f);
-
-	#ifdef ZESHADER_AMBIENT
-		OutputColor.rgb += MaterialAmbientColor;
-	#endif
-	
-	#ifdef ZESHADER_EMMISIVE
-		#ifdef ZESHADER_EMMISIVEMAP
-			OutpuColor.rgb += MaterialEmmisiveColor * tex2D(EmmisiveMap, Input.Texcoord);
-		#else
-			OutputColor.rgb += MaterialEmmisiveColor;
-		#endif
-	#endif
-
-	#ifdef ZESHADER_DIFFUSEMAP
-		OutputColor.rgb *= tex2D(DiffuseMap, Input.Texcoord).rgb;
-	#endif
-
-	#ifdef ZESHADER_LIGHTMAP
-		OutputColor.rgb *= float4(tex2D(LightMap, Input.Texcoord).rgb, 1.0f);
-	#endif
-
-	#ifdef ZESHADER_REFLECTION
-		OutputColor.rgb += MaterialReflectionFactor * texCUBE(EnvironmentMap, normalize(Input.ReflectionVector)).rgb;
-	#endif
-
-	#ifdef ZESHADER_REFRACTION
-		OutputColor.rgb += MaterialRefractionFactor * texCUBE(EnvironmentMap, normalize(Input.RefractionVector)).rgb;
-	#endif
-	
-	#ifdef ZESHADER_DISTORTION
-		float2 DistortionTexCoord = tex2D(DistortionMap, Input.Texcoord);
-		OutputColor.rgb += DistortionFactor * tex2D(ScreenMap, ScreenCoordinates + DistortionTexCoord);
-	#endif
-
-	#ifdef ZESHADER_OPASITY
-		#ifdef ZESHADER_OPACITY_MAP
-			#ifdef ZESHADER_OPACITY_CONSTANT
-				OutputColor.a = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
-			#else
-				OutputColor.a = tex2D(DiffuseMap, Input.Texcoord).r;
-			#endif
-		#elif defined(ZESHADER_OPACITY_DIFFUSEALPHA
-			#ifdef ZESHADER_OPACITY_CONSTANT
-				OutputColor.a = MaterialOpacity * tex2D(DiffuseMap, Input.Texcoord).a;
-			#else
-				OutputColor.a = tex2D(DiffuseMap, Input.Texcoord).a;
-			#endif
-		#elif 
-			OutputColor.a = MaterialOpacity;
-		#endif
-	#endif
-
-	return OutputColor;
-}
-
-struct PSInput
-{
-	#ifndef ZESHADER_NORMALMAP
-		float3 Normal             : TEXCOORD0;
-	#endif
-
-	float2 Texcoord           : TEXCOORD1;
-	float3 ViewDirection      : TEXCOORD2;
-	float4 LightDirection     : TEXCOORD3;
-
-	#ifdef ZESHADER_SHADOWMAP
-	//float3 ShadowMapCoord     : TEXCOORD4;
-	#endif
+	float4 NormalGloss : COLOR0;
+	float4 Depth : COLOR1;
 };
 
-float4 ps_main(PSInput Input) : COLOR0
+void GBDoParallax(inout GBPSInput Input)
 {
-	float4 OutputColor;
-
-	#ifdef ZESHADER_NORMALMAP
-		float3 Normal = (2.0f * tex2D(NormalMap, Input.Texcoord) - 1.0f);
-	#else
-		float3 Normal = normalize(Input.Normal);
-	#endif 
-
-	// Transparancy
-	#ifdef ZESHADER_OPASITYMAP
-		OutputColor.a = MaterialOpasity * tex2D(OpacityMap, Input.Texcoord).r;
-	#else
-		#ifdef ZESHADER_DIFFUSEMAP
-			OutputColor.a = MaterialOpasity * tex2D(DiffuseMap, Input.Texcoord).a;
-		#else
-			OutputColor.a = MaterialOpasity;
-		#endif
-	#endif
-		
-	float3 ViewDirection = normalize(Input.ViewDirection);
-	float3 LightDirection = normalize(Input.LightDirection.xyz);
-
-	float3 HalfVector = normalize(ViewDirection + LightDirection);
-	float DiffuseAngularAttenuation = saturate(dot(LightDirection, Normal));
-	/*if (DiffuseAngularAttenuation > 0.0f)
-	{*/	
-		#ifdef ZESHADER_DIFFUSEMAP
-			#ifdef ZESHADER_DETAILMAP
-				float3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor * tex2D(DiffuseMap, Input.Texcoord).rgb * tex2D(DetailMap, Input.Texcoord * MaterialDetailMapTiling);
-			#else
-				float3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor * tex2D(DiffuseMap, Input.Texcoord).rgb;
-			#endif
-		#else
-			#ifdef ZESHADER_DETAILMAP
-				float3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor * tex2D(DetailMap, Input.Texcoord * MaterialDetailMapTiling);
-			#else
-				float3 DiffuseColor =  DiffuseAngularAttenuation * MaterialDiffuseColor;
-			#endif
-		#endif
-
-		float SpecularAngularAttenuation;
-
-		SpecularAngularAttenuation = pow(saturate(dot(HalfVector, Normal)), MaterialSpecularFactor);
-		#ifdef ZESHADER_SPECULARMAP
-			float3 SpecularColor = SpecularAngularAttenuation * MaterialSpecularColor * tex2D(SpecularMap, Input.Texcoord).rgb;
-		#else
-			float3 SpecularColor = SpecularAngularAttenuation * MaterialSpecularColor;
-		#endif
-		OutputColor.rgb = (DiffuseColor + SpecularColor) * LightColor * (Input.LightDirection.w * LightIntensity);
-	/*}
-	else
-		OutputColor.rgb = float3(0.0f, 0.0f, 0.0f);	*/
-
-	return OutputColor;
-
+	// Trace Ray
+	// Recalculate Depth and Texcoord
 }
+
+float3 GBGetNormal(in GBPSInput Input)
+{
+	#ifdef ZE_SHADER_TANGENT_SPACE
+		float3 Normal = tex2D(NormalMap, Input.Texcoord);
+		Normal = normalize(Normal.x * Input.Tangent + Normal.y * Input.Binormal + Normal.z * Input.Normal);
+		Input.NormalDepth.xyz = Normal * 0.5f + 0.5f;	
+	#else
+		Output.NormalDepth.xyz = Input.NormalDepth.xyz * 0.5f + 0.5f;
+	#endif	
+}
+
+float GBGetGloss(in GBPSInput Input)
+{
+	#ifdef ZE_SHADER_SPECULAR_GLOSS_MAP
+		return tex2D(GlossMap, Input.Texcoord).x;
+	#else
+		return 0.0f;
+	#end
+}
+
+float GBGetDepth(in GBPSInput Input)
+{
+	return Input.NormalDpeht.w / FarZ;
+}
+
+GBPSOutput GBPSMain(GBPSInput Input)
+{
+	PSOutput Output;
+	
+	GBDoParallax(Input);
+	
+	Output.NormalGloss.xyz = GBGetNormal(Input);
+	Output.NormalGloss.w = GBGetSpecular(Input);
+	Output.Depth = GBGetDepth(Input);
+	return Output;
+}
+
+// Material Pass
+/////////////////////////////////////////////////////////////////////////////////////////
+
+// Shadow Pass
+/////////////////////////////////////////////////////////////////////////////////////////

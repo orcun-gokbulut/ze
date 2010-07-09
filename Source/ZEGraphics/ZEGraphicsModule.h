@@ -75,6 +75,7 @@ class ZEGraphicsModule : public ZEModule
 		bool								ToneMappingEnabled;
 		int									AnisotropicFilter;
 
+
 	public:
 		static ZEOptionSection				GraphicsOptions;
 		static void							BaseInitialize();

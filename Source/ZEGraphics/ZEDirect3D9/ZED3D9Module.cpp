@@ -42,7 +42,6 @@
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEConsole.h"
 #include "ZED3D9FixedMaterial.h"
-#include "ZED3D9FixedMaterialShader.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9Texture3D.h"
 #include "ZED3D9TextureCube.h"
@@ -302,14 +301,6 @@ bool ZED3D9Module::Initialize()
 		return false;
 	}
 
-	// Initialize fixed material shader
-	if (ZED3D9FixedMaterialShader::BaseInitialize() == false)
-	{
-		zeCriticalError("Direct3D9", "Can not initialize shader manager.");
-		Destroy();
-		return false;
-	}
-
 	/*if (!ZED3D9PostProcessor::BaseInitialize())
 	{
 		zeCriticalError("Direct3D9", "Can not initialize D3D9 component base.");
@@ -331,7 +322,6 @@ void ZED3D9Module::Deinitialize()
 	zeLog("Direct3D9", "Destroying Direct3D.\r\n");
 	ZED3D9ShadowRenderer::BaseDeinitialize();
 	//ZED3D9PostProcessor::BaseDeinitialize();
-	ZED3D9FixedMaterialShader::BaseDeinitialize();
 	D3D9Device = NULL;
 	D3D9Module = NULL;
 
@@ -543,6 +533,16 @@ unsigned int ZED3D9Module::GetMaterialComponentMask()
 ZEViewPort* ZED3D9Module::GetFrameBufferViewPort()
 {
 	return &FrameBufferViewPort;
+}
+
+ZED3D9ShaderManager* ZED3D9Module::GetShaderManager()
+{
+	return &ShaderManager;
+}
+
+ZED3D9ShaderManager* ZED3D9Module::GetShaderManager()
+{
+	return &ShaderManager;
 }
 
 ZERenderer* ZED3D9Module::CreateRenderer()

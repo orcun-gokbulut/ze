@@ -69,8 +69,12 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 
 		static bool							CheckRenderOrder(ZERenderOrder* RenderOrder);
 		static void							PumpStreams(ZERenderOrder* RenderOrder);
-		static void							DrawAmbientPass(ZERenderOrder* RenderOrder, ZECamera* Camera);
-		static void							DrawLightPasses(ZERenderOrder* RenderOrder, ZECamera* Camera);
+
+		void								DoPreZPass();
+		void								DoGBufferPass();
+		void								DoLightningPass();
+		void								DoDrawingPass();
+		void								DoPostProcess();
 
 		void								CreateRenderTargets();
 		void								DestroyRenderTargets();

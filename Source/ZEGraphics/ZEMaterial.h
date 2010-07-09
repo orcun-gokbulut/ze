@@ -75,34 +75,6 @@ class ZEMaterial : public ZEClass
 		// SetUp
 		virtual void					SetZero() = 0;
 
-		// Render calls
-		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const = 0;
-
-		virtual bool					SetupPreLightning() const;
-		virtual size_t					DoPreLightningPass() const;
-
-		virtual bool					SetupLightning() const;
-
-		virtual bool					SetupPointLightPass(bool Shadowed) const;
-		virtual size_t					DoPointLightPass(ZEPointLight** Lights, size_t Count) const;
-
-		virtual bool					SetupDirectionalLightPass(bool Shadowed) const;
-		virtual size_t					DoDirectionalLightPass(ZEDirectionalLight** Lights, size_t Count) const;
-
-		virtual bool					SetupProjectiveLightPass(bool Shadowed) const;
-		virtual size_t					DoProjectiveLightPass(ZEProjectiveLight** Lights, size_t Count) const;
-
-		virtual bool					SetupOmniProjectiveLightPass(bool Shadowed) const;
-		virtual size_t					DoOmniProjectivePass(ZEOmniProjectiveLight** Lights, size_t Count) const;
-
-		virtual bool					SetupCustomPass(unsigned int CustomPassId) const;
-		virtual bool					DoCustomPass(unsigned int CustomPassId, void* CustomData) const;
-
-		virtual bool					SetupShadowPass() const;	
-		virtual size_t					DoShadowPass() const;
-
-		virtual void					EndOfPasses() const;
-
 		virtual void					UpdateMaterial();
 
 		virtual void					AdvanceAnimation(float TimeElapsed);

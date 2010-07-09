@@ -106,6 +106,8 @@ class ZED3D9Module : public ZEGraphicsModule
 
 		ZED3D9ViewPort									FrameBufferViewPort;
 
+		ZED3D9ShaderManager								ShaderManager;
+
 	protected:
 														ZED3D9Module();
 											 			~ZED3D9Module();
@@ -115,7 +117,6 @@ class ZED3D9Module : public ZEGraphicsModule
 		ZEChunkArray<ZED3D9ShadowRenderer*, 50>			ShadowRenderers;
 		ZEChunkArray<ZED3D9Texture2D*, 50>				Texture2Ds;
 		ZEChunkArray<ZED3D9Texture3D*, 50>				Texture3Ds;
-		ZEChunkArray<ZED3D9TextureCube*, 50>			TextureCubes;
 		ZEChunkArray<ZED3D9FixedMaterialShader*, 50>	Shaders;
 		ZEChunkArray<ZED3D9StaticVertexBuffer*, 50>		VertexBuffers;
 		ZEChunkArray<ZED3D9PostProcessor*, 50>			PostProcessors;
@@ -161,7 +162,8 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual void									SetMaterialComponentMask(unsigned int Mask);
 		virtual unsigned int							GetMaterialComponentMask();
 		
-		virtual ZEViewPort*						GetFrameBufferViewPort();
+		virtual ZEViewPort*								GetFrameBufferViewPort();
+		virtual ZED3D9ShaderManager*					GetShaderManager();
 
 		virtual ZERenderer*								CreateRenderer();
 		virtual ZEShadowRenderer*						CreateShadowRenderer();
