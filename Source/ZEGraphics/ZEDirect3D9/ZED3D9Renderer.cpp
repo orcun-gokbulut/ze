@@ -43,6 +43,7 @@
 #include "ZED3D9Texture3D.h"
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9Module.h"
+#include "ZED3D9Material.h"
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9VertexDeclaration.h"
 #include "ZEGraphics\ZEMaterial.h"
@@ -110,13 +111,6 @@ bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 			return false;
 		}
 
-		// Check render order material has shader
-		/*if (RenderOrder->Material->GetShader() == NULL)
-		{
-		zeError("Direct3D9 Renderer", "RenderOrder's material does not have valid shader.");
-		return false;
-		}*/
-
 		// Check vertex declaration is available
 		if (RenderOrder->VertexDeclaration == NULL)
 		{
@@ -135,11 +129,11 @@ bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 		}
 
 		// Check render order has vertex buffer
-		/*if (RenderOrder->VertexBuffer == NULL)
+		if (RenderOrder->VertexBuffer == NULL)
 		{
 			zeError("Direct3D9 Renderer", "RenderOrder's vertex buffer is not valid.");
 			return false;
-		}*/
+		}
 
 		// Check render order has one or more primitive
 		/*if (RenderOrder->PrimitiveCount == 0)
@@ -157,73 +151,90 @@ bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 
 void ZED3D9Renderer::DoPreZPass()
 {
+	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
+	GetDevice()->SetRenderTarget(1, NULL);
+	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
 
-	// Disable Color Write
-	// Find non transparants
-	// Setup Their Z-Pass Materials
-	// Draw
-	Device()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00000000);
-	Device()->SetRenderState(D3DRS_ZENABLE, TRUE);
-	Device()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-	Device()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00000000);
+	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
-		ZERenderOrder* RenderOrder = NonTransparent[I];
-		ZED3D9Material RenderOrder->Material
-		
+		ZERenderOrder* RenderOrder = &NonTransparent[I];
+		ZED3D9Material* Material = (ZED3D9Material*)RenderOrder->Material;
+		Material->SetupPreZPass();
+		PumpStreams(RenderOrder);
 	}
 }
 
 void ZED3D9Renderer::DoGBufferPass()
 {
+	ZED3D9CommonTools::SetRenderTarget(0, GBuffer1);
+	ZED3D9CommonTools::SetRenderTarget(1, GBuffer2);
 
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
+	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);
+
+	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
+	{
+		ZERenderOrder* RenderOrder = &NonTransparent[I];
+		ZED3D9Material* Material = (ZED3D9Material*)RenderOrder->Material;
+		Material->SetupGBufferPass();
+		PumpStreams(RenderOrder);
+	}
 }
 
 void ZED3D9Renderer::DoLightningPass()
 {
-	
+	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
+	ZED3D9CommonTools::SetRenderTarget(1, LBuffer2);
+
+	// Do lighting passes
 }
 
-void ZED3D9Renderer::DoDrawingPass()
-{
-
-}
 
 void ZED3D9Renderer::DoForwardPass()
 {
-
-}
-
-void ZED3D9Renderer::DoPostProcessPass()
-{
-
+	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
+	{
+		ZERenderOrder* RenderOrder = &NonTransparent[I];
+		ZED3D9Material* Material = (ZED3D9Material*)RenderOrder->Material;
+		Material->SetupForwardPass();
+		PumpStreams(RenderOrder);
+	}	
 }
 
 void ZED3D9Renderer::CreateRenderTargets()
 {
-	ZED3D9CommonTools::CreateRenderTarget(&AmbientColorRenderTarget, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&NormalDepthRenderTarget, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&PositionRenderTarget, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&TempRenderTarget, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
+	ZED3D9CommonTools::CreateRenderTarget(&GBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
+	ZED3D9CommonTools::CreateRenderTarget(&GBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
+	ZED3D9CommonTools::CreateRenderTarget(&LBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
+	ZED3D9CommonTools::CreateRenderTarget(&LBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
+	ZED3D9CommonTools::CreateRenderTarget(&AccumulationBuffer, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 }
 
 
 void ZED3D9Renderer::DestroyRenderTargets()
 {
-	ZED3D_RELEASE(AmbientColorRenderTarget);
-	ZED3D_RELEASE(NormalDepthRenderTarget);
-	ZED3D_RELEASE(PositionRenderTarget);
-	ZED3D_RELEASE(TempRenderTarget);
+	ZED3D_RELEASE(GBuffer1);
+	ZED3D_RELEASE(GBuffer2);
+	ZED3D_RELEASE(LBuffer1);
+	ZED3D_RELEASE(LBuffer2);
+	ZED3D_RELEASE(AccumulationBuffer);
 }
 
 
 ZED3D9Renderer::ZED3D9Renderer()
 {
-	PositionRenderTarget = NULL;
-	AmbientColorRenderTarget = NULL;
-	NormalDepthRenderTarget = NULL;
-	TempRenderTarget = NULL;
+	GBuffer1 = NULL;
+	GBuffer2 = NULL;
+	LBuffer1 = NULL;
+	LBuffer2 = NULL;
+	AccumulationBuffer = NULL;
 	SetViewPort(zeGraphics->GetFrameBufferViewPort());
 }
 
@@ -350,7 +361,17 @@ void ZED3D9Renderer::ClearList()
 
 void ZED3D9Renderer::Render(float ElaspedTime)
 {
-	unsigned int ScreenWidth = zeGraphics->GetScreenWidth();
+	// Do Pre-Z
+	DoPreZPass();
+
+	// Do GBuffer
+	// Do SSAO
+	// Do Light Passes
+	// Do Deferred Forward
+	// Do Forward
+	// Do Post Processes
+
+/*	unsigned int ScreenWidth = zeGraphics->GetScreenWidth();
 	unsigned int ScreenHeight = zeGraphics->GetScreenHeight();
 
 	// Check render module is enabled and the device is not lost
@@ -399,7 +420,7 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 		/*LPDIRECT3DSURFACE9 TempRenderTargetSurface;
 		TempRenderTarget->GetSurfaceLevel(0, &TempRenderTargetSurface);
 		SSAOProcessor.Output = TempRenderTargetSurface;
-		SSAOProcessor.Process();*/
+		SSAOProcessor.Process();
 
 		//ZED3D9CommonTools::SetRenderTarget(0, Fr);
 
@@ -452,8 +473,8 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 		
 		/*HDRProcessor.Input = TempRenderTarget;
 		HDRProcessor.Target = ViewPort->FrameBuffer;
-		HDRProcessor.DoHDR();*/
+		HDRProcessor.DoHDR();
 
 	// Finish Drawing
-	GetDevice()->EndScene();
+	GetDevice()->EndScene();*/
 }

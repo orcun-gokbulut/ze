@@ -40,10 +40,10 @@
 class ZED3D9Material
 {
 	public:
-		virtual bool			SetupPreZPass() const;
-		virtual bool			SetupGBufferPass() const;
-		virtual bool			SetupMaterialPass() const;
-		virtual bool			SetupShadowPass() const;	
+		virtual bool			SetupPreZPass() const = 0;
+		virtual bool			SetupGBufferPass() const = 0;
+		virtual bool			SetupForwardPass() const = 0;
+		virtual bool			SetupShadowPass() const = 0;
 };
 
 #endif

@@ -62,7 +62,7 @@ ZEArray<*>{
 #define __ZEDS_ARRAY_H__
 
 #include <stdlib.h>
-#include "ZEDefinitions.h"
+#include "ZEDSDefinitions.h"
 #include "..\ZETypes.h"
 #include "ZEAllocator.h"
 

@@ -91,9 +91,5 @@ class ZEPartialResourceFile : public ZEResourceFile
 		virtual bool		Eof();
 		virtual size_t		Tell();
 };
+
 #endif
-
-
-
-
-

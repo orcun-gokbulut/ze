@@ -53,6 +53,7 @@
 #include "ZED3D9UIMaterial.h"
 #include "ZED3D9SimpleMaterial.h"
 #include "ZED3D9Common.h"
+#include "ZED3D9ShaderManager.h"
 
 #include <d3dx9.h>
 
@@ -301,6 +302,8 @@ bool ZED3D9Module::Initialize()
 		return false;
 	}
 
+	ShaderManager = new ZED3D9ShaderManager();
+
 	/*if (!ZED3D9PostProcessor::BaseInitialize())
 	{
 		zeCriticalError("Direct3D9", "Can not initialize D3D9 component base.");
@@ -325,29 +328,13 @@ void ZED3D9Module::Deinitialize()
 	D3D9Device = NULL;
 	D3D9Module = NULL;
 
-	if (FrameBufferViewPort.FrameBuffer != NULL)
-	{
-		FrameBufferViewPort.FrameBuffer->Release();
-		FrameBufferViewPort.FrameBuffer = NULL;
-	}
+	if (ShaderManager != NULL)
+		delete ShaderManager;
 
-	if (FrameBufferViewPort.ZBuffer != NULL)
-	{
-		FrameBufferViewPort.ZBuffer->Release();
-		FrameBufferViewPort.ZBuffer = NULL;
-	}
-
-	if (Device != NULL)
-	{
-		Device->Release();
-		Device = NULL;
-	}
-
-	if (D3D != NULL)
-	{
-		D3D->Release();
-		D3D = NULL;
-	}
+	ZED3D_RELEASE(FrameBufferViewPort.FrameBuffer);
+	ZED3D_RELEASE(FrameBufferViewPort.ZBuffer);
+	ZED3D_RELEASE(Device);
+	ZED3D_RELEASE(D3D);
 }
 
 bool ZED3D9Module::IsDeviceLost()
@@ -537,12 +524,7 @@ ZEViewPort* ZED3D9Module::GetFrameBufferViewPort()
 
 ZED3D9ShaderManager* ZED3D9Module::GetShaderManager()
 {
-	return &ShaderManager;
-}
-
-ZED3D9ShaderManager* ZED3D9Module::GetShaderManager()
-{
-	return &ShaderManager;
+	return ShaderManager;
 }
 
 ZERenderer* ZED3D9Module::CreateRenderer()
@@ -678,6 +660,7 @@ ZED3D9Module::ZED3D9Module()
 	Device = NULL;
 	FrameBufferViewPort.FrameBuffer = NULL;
 	FrameBufferViewPort.ZBuffer = NULL;
+	ShaderManager = NULL;
 }
 
 ZED3D9Module::~ZED3D9Module()

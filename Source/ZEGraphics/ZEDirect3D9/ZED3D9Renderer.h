@@ -52,10 +52,12 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 	private:
 		ZED3D9ViewPort*						ViewPort;
 
-		LPDIRECT3DTEXTURE9					AmbientColorRenderTarget;
-		LPDIRECT3DTEXTURE9					NormalDepthRenderTarget;
-		LPDIRECT3DTEXTURE9					PositionRenderTarget;
-		LPDIRECT3DTEXTURE9					TempRenderTarget;
+		LPDIRECT3DTEXTURE9					GBuffer1;
+		LPDIRECT3DTEXTURE9					GBuffer2;
+		LPDIRECT3DTEXTURE9					LBuffer1;
+		LPDIRECT3DTEXTURE9					LBuffer2;
+		LPDIRECT3DTEXTURE9					AccumulationBuffer;
+
 		ZED3D9HDRProcessor					HDRProcessor;
 		ZED3D9SSAOProcessor					SSAOProcessor;
 
@@ -73,7 +75,7 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		void								DoPreZPass();
 		void								DoGBufferPass();
 		void								DoLightningPass();
-		void								DoDrawingPass();
+		void								DoForwardPass();
 		void								DoPostProcess();
 
 		void								CreateRenderTargets();

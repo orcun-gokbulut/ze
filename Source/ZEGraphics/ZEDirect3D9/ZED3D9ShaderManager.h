@@ -43,6 +43,7 @@
 class ZED3D9ShaderManager
 {
 	friend void ZED3D9Shader::Release();
+	friend ZED3D9Module;
 	private:
 		ZESmartArray<ZED3D9Shader*>		Shaders;
 //		ZEFileCache						ShaderFileCache;
@@ -52,6 +53,8 @@ class ZED3D9ShaderManager
 		bool							ReadFromFileCache(const char* Filename, const char* FunctionName, ZEDWORD Components);
 		void							WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEDWORD Components);
 
+										ZED3D9ShaderManager();
+										~ZED3D9ShaderManager();
 	public:
 		ZED3D9Shader*					GetShader(const char* FileName, const char* FunctionName, ZEDWORD Components, ZED3D9ShaderType Type, const char* Profile);
 		ZED3D9PixelShader*				GetPixelShader(const char* FileName, const char* FunctionName, ZEDWORD Components, const char* Profile);	

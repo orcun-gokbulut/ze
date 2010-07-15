@@ -33,6 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
 #ifndef __ZE_FILE_CACHE_H__
 #define __ZE_FILE_CACHE_H__
 

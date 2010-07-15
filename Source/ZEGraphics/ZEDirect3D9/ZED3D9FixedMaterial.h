@@ -80,7 +80,7 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, public ZED3D9Material, priva
 
 		virtual bool					SetupPreZPass() const;
 		virtual bool					SetupGBufferPass() const;
-		virtual bool					SetupMaterialPass() const;
+		virtual bool					SetupForwardPass() const;
 		virtual bool					SetupShadowPass() const;	
 
 		virtual void					UpdateMaterial();
@@ -88,7 +88,3 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, public ZED3D9Material, priva
 		virtual void					Release();
 };
 #endif
-
-
-
-

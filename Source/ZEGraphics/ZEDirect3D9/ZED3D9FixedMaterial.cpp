@@ -197,11 +197,12 @@ bool ZED3D9FixedMaterial::SetupGBufferPass() const
 	return true;
 }
 
-bool ZED3D9FixedMaterial::SetupMaterialPass() const
+bool ZED3D9FixedMaterial::SetupForwardPass() const
 {
 	GetDevice()->SetPixelShader(ForwardPassPixelShader->GetPixelShader());
 	GetDevice()->SetVertexShader(ForwardPassVertexShader->GetVertexShader());
-
+	
+	return false;
 }
 
 bool ZED3D9FixedMaterial::SetupShadowPass() const

@@ -35,6 +35,14 @@
 
 #include "ZEFileCache.h"
 #include <stdio.h>
+
+void ZECachePartialResourceFile::Initialize(void* File, size_t StartPosition, size_t EndPosition)
+{
+	this->File = File;
+	this->StartPosition = StartPosition;
+	this->EndPosition = EndPosition;
+}
+
 void ZEFileCache::ReadItemList()
 {
 	fseek((FILE*)File, 0, SEEK_END);
@@ -95,6 +103,7 @@ ZEFileCacheScan ZEFileCache::StartScan(ZEDWORD Hash)
 	ZEFileCacheScan Scan;
 	Scan.Cursor = 0;
 	Scan.Hash = Hash;
+	return Scan;
 }
 
 bool ZEFileCache::GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan)
