@@ -148,6 +148,47 @@ bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 
 	return true;
 }
+void ZED3D9Renderer::DrawPointLight(ZEPointLight* Light)
+{
+	
+}
+
+void ZED3D9Renderer::DrawDirectionalLight(ZEDirectionalLight* Light)
+{
+
+}
+
+void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
+{
+
+}
+
+void ZED3D9Renderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
+{
+
+}
+
+void ZED3D9Renderer::DrawLights()
+{
+
+	for (size_t I = 0; I < Lights.GetCount(); I++)
+	{
+		switch(Lights[I]->GetLightType())
+		{
+			case ZE_LT_POINT:
+				DrawPointLight();
+			case ZE_LT_DIRECTIONAL:
+				DrawDirectionalLight();
+				break;
+			case ZE_LT_PROJECTIVE:
+				DrawProjectiveLight();
+				break;
+			case ZE_LT_OMNIPROJECTIVE:
+				DrawOmniProjectiveLight();
+				break;
+		}
+	}
+}
 
 void ZED3D9Renderer::DoPreZPass()
 {

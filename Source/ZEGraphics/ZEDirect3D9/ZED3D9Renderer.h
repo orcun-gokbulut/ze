@@ -66,11 +66,19 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		ZESmartArray<ZERenderOrder>			Imposter;
 		
 		ZECamera*							Camera;
-		
+
+		ZEArray<ZELight*>					Lights;
 		ZEArray<ZEPostProcessor*>			PostProcessors;
 
 		static bool							CheckRenderOrder(ZERenderOrder* RenderOrder);
 		static void							PumpStreams(ZERenderOrder* RenderOrder);
+
+		void								DrawPointLight(ZEPointLight* Light);
+		void								DrawDirectionalLight(ZEDirectionalLight* Light);
+		void								DrawProjectiveLight(ZEProjectiveLight* Light);
+		void								DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light);
+		
+		void								DrawLights();
 
 		void								DoPreZPass();
 		void								DoGBufferPass();
@@ -78,6 +86,7 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		void								DoForwardPass();
 		void								DoPostProcess();
 
+	
 		void								CreateRenderTargets();
 		void								DestroyRenderTargets();
 
@@ -103,6 +112,8 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor);
 		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor);
 
+		virtual void						SetLights(ZEArray<ZELight*>& Lights);
+		
 		virtual void						AddToRenderList(ZERenderOrder* RenderOrder);
 		virtual void						ClearList();
 

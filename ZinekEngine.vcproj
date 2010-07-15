@@ -14,9 +14,6 @@
 		/>
 	</Platforms>
 	<ToolFiles>
-		<DefaultToolFile
-			FileName="fx.rules"
-		/>
 	</ToolFiles>
 	<Configurations>
 		<Configuration
@@ -36,9 +33,6 @@
 				CommandLine=""
 				AdditionalDependencies=""
 				Outputs=""
-			/>
-			<Tool
-				Name="CompileShader"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -135,14 +129,11 @@
 				ExecutionBucket="3"
 			/>
 			<Tool
-				Name="CompileShader"
+				Name="VCXMLDataGeneratorTool"
 			/>
 			<Tool
 				Name="VCMIDLTool"
 				ExecutionBucket="4"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
@@ -248,14 +239,11 @@
 				ExecutionBucket="3"
 			/>
 			<Tool
-				Name="CompileShader"
+				Name="VCXMLDataGeneratorTool"
 			/>
 			<Tool
 				Name="VCMIDLTool"
 				ExecutionBucket="4"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
@@ -360,9 +348,6 @@
 				ExecutionBucket="3"
 			/>
 			<Tool
-				Name="CompileShader"
-			/>
-			<Tool
 				Name="VCXMLDataGeneratorTool"
 			/>
 			<Tool
@@ -442,9 +427,6 @@
 				CommandLine=""
 				AdditionalDependencies=""
 				Outputs=""
-			/>
-			<Tool
-				Name="CompileShader"
 			/>
 			<Tool
 				Name="VCXMLDataGeneratorTool"
@@ -782,98 +764,34 @@
 					<File
 						RelativePath=".\RunDir\resources\shaders\FixedMaterial.hlsl"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="CompileShader"
-								Profile="18"
-							/>
-						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\FixedMaterialComponents.hlsl"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="CompileShader"
-								Profile="18"
-							/>
-						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\HDRProcessor.hlsl"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="CompileShader"
-								Profile="18"
-							/>
-						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\SimpleShader.hlsl"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="CompileShader"
-								Profile="18"
-							/>
-						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\SkinTransform.hlsl"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="CompileShader"
-								Profile="18"
-							/>
-						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\SkyBox.hlsl"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="CompileShader"
-								Profile="18"
-							/>
-						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\SSOAProcessor.hlsl"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="CompileShader"
-								Profile="18"
-							/>
-						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\UIVertexShader.hlsl"
 						>
-						<FileConfiguration
-							Name="Debug|Win32"
-							>
-							<Tool
-								Name="CompileShader"
-								Profile="18"
-							/>
-						</FileConfiguration>
 					</File>
 				</Filter>
 				<Filter
