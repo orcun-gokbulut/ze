@@ -46,17 +46,14 @@ void ZED3D9FixedMaterial::CreateShaders()
 {
 	ReleaseShaders();
 
-	PreZPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "PreZVSMain", MaterialComponents, "VS_2_0");
-	PreZPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "PrePVSMain", MaterialComponents, "PS_2_0");
+	PreZPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "PreZVSMain", MaterialComponents, "vs_2_0");
+	PreZPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "PreZPSMain", MaterialComponents, "ps_2_0");
 
-	GBufferPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "GBVSMain", MaterialComponents, "VS_2_0");
-	GBufferPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "GBPVSMain", MaterialComponents, "PS_2_0");
+	GBufferPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "GBVSMain", MaterialComponents, "vs_2_0");
+	GBufferPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "GBPSMain", MaterialComponents, "ps_2_0");
 
-	ForwardPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "ForwardVSMain", MaterialComponents, "VS_2_0");
-	ForwardPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "ForwardPVSMain", MaterialComponents, "PS_2_0");
-
-	ShadowPassVertexShader = NULL;
-	ShadowPassPixelShader = NULL;
+	/*ForwardPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "ForwardVSMain", MaterialComponents, "vs_2_0");
+	ForwardPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "ForwardPSMain", MaterialComponents, "ps_2_0");*/
 }
 
 void ZED3D9FixedMaterial::ReleaseShaders()

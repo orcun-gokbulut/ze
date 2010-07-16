@@ -111,8 +111,8 @@ void ZED3D9SSAOProcessor::Initialize()
 	RandomTextureResource = ZETexture2DResource::LoadSharedResource("RandomNormal.tga");
 
 	// Compile Shaders
-	ZED3D9CommonTools::CompileVertexShaderFromFile(&VertexShader, "SSOAProcessor.hlsl", "VSMain", "SSOA", "vs_3_0", NULL);
-	ZED3D9CommonTools::CompilePixelShaderFromFile(&PixelShader, "SSOAProcessor.hlsl", "PSMain", "SSOA", "ps_3_0", NULL);
+	ZED3D9CommonTools::CompileVertexShader(&VertexShader, "SSOAProcessor.hlsl", "VSMain", "vs_3_0", NULL);
+	ZED3D9CommonTools::CompilePixelShader(&PixelShader, "SSOAProcessor.hlsl", "PSMain", "ps_3_0", NULL);
 }
 
 

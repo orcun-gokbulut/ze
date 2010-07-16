@@ -43,6 +43,11 @@
 #include "ZED3D9SSAOProcessor.h"
 
 class ZED3D9ViewPort;
+class ZELight;
+class ZEPointLight;
+class ZEDirectionalLight;
+class ZEProjectiveLight;
+class ZEOmniProjectiveLight;
 
 class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 {
@@ -70,15 +75,16 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		ZEArray<ZELight*>					Lights;
 		ZEArray<ZEPostProcessor*>			PostProcessors;
 
+		LPDIRECT3DVERTEXBUFFER9				Light;
+
 		static bool							CheckRenderOrder(ZERenderOrder* RenderOrder);
 		static void							PumpStreams(ZERenderOrder* RenderOrder);
 
+		void								CreateLightMeshes();
 		void								DrawPointLight(ZEPointLight* Light);
 		void								DrawDirectionalLight(ZEDirectionalLight* Light);
 		void								DrawProjectiveLight(ZEProjectiveLight* Light);
 		void								DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light);
-		
-		void								DrawLights();
 
 		void								DoPreZPass();
 		void								DoGBufferPass();

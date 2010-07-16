@@ -98,22 +98,30 @@ D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 	}
 }
 
-bool ZED3D9CommonTools::CompileVertexShaderFromFile(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* FileName, const char* MainFunction, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
+bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* FileName, const char* MainFunction, const char* ShaderProfile, ZEDWORD Components)
 {
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
 
 	ZED3D_RELEASE(*VertexShader);
+	
+	D3DXMACRO Macros[2];
+	char ComponentText[12];
+	sprintf(ComponentText, "%X", Components);
+	Macros[0].Name = "ZE_SHADER_COMPONENTS";
+	Macros[0].Definition = ComponentText;
+	Macros[1].Name = NULL;
+	Macros[1].Definition = NULL;
 
 	if (D3DXCompileShaderFromFile(FileName, Macros, &D3DIncludeInterface, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
 		{
-			zeError("D3D9 Vertex Shader Compiler", "Can not vertex compile shader. Shader name : \"%s\"", ShaderName);
+			zeError("D3D9 Vertex Shader Compiler", "Can not vertex compile shader. Shader file name : \"%s\"", FileName);
 		}
 		else
 		{
-			zeError("D3D9 Vertex Shader Compiler", "Can not compile vertex shader.\r\nShader name : \"%s\".\r\nCompile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
+			zeError("D3D9 Vertex Shader Compiler", "Can not compile vertex shader.\r\nShader file name : \"%s\".\r\nCompile output :\r\n%s\r\n", FileName, CompilerOutput->GetBufferPointer());
 		}
 
 		*VertexShader = NULL;
@@ -137,23 +145,30 @@ bool ZED3D9CommonTools::CompileVertexShaderFromFile(LPDIRECT3DVERTEXSHADER9* Ver
 }
 
 
-bool ZED3D9CommonTools::CompilePixelShaderFromFile(LPDIRECT3DPIXELSHADER9* PixelShader, const char* FileName, const char* MainFunction, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
+bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, const char* FileName, const char* MainFunction, const char* ShaderProfile, ZEDWORD Components)
 {
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
 
 	ZED3D_RELEASE(*PixelShader);
 
+	D3DXMACRO Macros[2];
+	char ComponentText[12];
+	sprintf(ComponentText, "%X", Components);
+	Macros[0].Name = "ZE_SHADER_COMPONENTS";
+	Macros[0].Definition = ComponentText;
+	Macros[1].Name = NULL;
+	Macros[1].Definition = NULL;
 
 	if (D3DXCompileShaderFromFile(FileName, Macros, &D3DIncludeInterface, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
 		{
-			zeError("D3D9 Vertex Shader Compiler", "Can not vertex compile shader. Shader name : \"%s\"", ShaderName);
+			zeError("D3D9 Vertex Shader Compiler", "Can not vertex compile shader. Shader file : \"%s\"", FileName);
 		}
 		else
 		{
-			zeError("D3D9 Pixel Shader Compiler", "Can not compile pixel shader.\r\nShader Name : \"%s\".\r\n Compile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
+			zeError("D3D9 Pixel Shader Compiler", "Can not compile pixel shader.\r\nShader file : \"%s\".\r\n Compile output :\r\n%s\r\n", FileName, CompilerOutput->GetBufferPointer());
 		}
 
 		*PixelShader = NULL;
@@ -175,12 +190,20 @@ bool ZED3D9CommonTools::CompilePixelShaderFromFile(LPDIRECT3DPIXELSHADER9* Pixel
 	return true;
 }
 
-bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* Source, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
+bool ZED3D9CommonTools::CompileVertexShaderFromMemory(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEDWORD Components)
 {
 	LPD3DXBUFFER ShaderBuffer;
 	LPD3DXBUFFER CompilerOutput;
 	
 	ZED3D_RELEASE(*VertexShader);
+
+	D3DXMACRO Macros[2];
+	char ComponentText[12];
+	sprintf(ComponentText, "%X", Components);
+	Macros[0].Name = "ZE_SHADER_COMPONENTS";
+	Macros[0].Definition = ComponentText;
+	Macros[1].Name = NULL;
+	Macros[1].Definition = NULL;
 
 	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, &D3DIncludeInterface, "vs_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
@@ -206,12 +229,20 @@ bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShade
 }
 
 
-bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, const char* Source, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros)
+bool ZED3D9CommonTools::CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* PixelShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEDWORD Components)
 {
 	LPD3DXBUFFER ShaderBuffer;
 	LPD3DXBUFFER CompilerOutput;
 	
 	ZED3D_RELEASE(*PixelShader);
+
+	D3DXMACRO Macros[2];
+	char ComponentText[12];
+	sprintf(ComponentText, "%X", Components);
+	Macros[0].Name = "ZE_SHADER_COMPONENTS";
+	Macros[0].Definition = ComponentText;
+	Macros[1].Name = NULL;
+	Macros[1].Definition = NULL;
 
 	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, &D3DIncludeInterface, "ps_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{

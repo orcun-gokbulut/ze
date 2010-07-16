@@ -128,15 +128,9 @@ void ZED3D9UIMaterial::UpdateMaterial()
 {
 	if (VertexShader == NULL)
 	{
-		char SourceBuffer[65536];
-		ZEResourceFile::ReadTextFile("Shaders\\UIVertexShader.vs", SourceBuffer, 65536);
-		ZED3D9CommonTools::CompileVertexShader(&VertexShader, SourceBuffer, "UI Material Vertex Shader", "vs_2_0", NULL);
-
-		ZEResourceFile::ReadTextFile("Shaders\\UISolidPixelShader.ps", SourceBuffer, 65536);
-		ZED3D9CommonTools::CompilePixelShader(&SolidPixelShader, SourceBuffer, "UI Material Solid Pixel Shader", "ps_2_0", NULL);
-
-		ZEResourceFile::ReadTextFile("Shaders\\UITexturedPixelShader.ps", SourceBuffer, 65536);
-		ZED3D9CommonTools::CompilePixelShader(&TexturedPixelShader, SourceBuffer, "UI Material Textured Pixel Shader", "ps_2_0", NULL);
+		ZED3D9CommonTools::CompileVertexShader(&VertexShader, "UI.hlsl", "VSMain", "vs_2_0", NULL);
+		ZED3D9CommonTools::CompilePixelShader(&SolidPixelShader, "UI.hlsl", "PSMain", "ps_2_0", NULL);
+		ZED3D9CommonTools::CompilePixelShader(&TexturedPixelShader, "UI.hlsl", "PSMainTextured", "ps_2_0", NULL);
 	}
 }
 

@@ -148,9 +148,35 @@ bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 
 	return true;
 }
+
 void ZED3D9Renderer::DrawPointLight(ZEPointLight* Light)
 {
-	
+	// Setup Light
+	// Check Distance and radius
+		// Draw Stenciled
+		// Draw NonStenciled
+
+	// Draw Light Volume
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1024);
+}
+
+#include "ZEGraphics/ZECanvas.h"
+void ZED3D9Renderer::CreateLightMeshes()
+{
+	ZECanvas Canvas;
+	// Point/OmniProjective
+	Canvas.AddSphere(1.0f, 24, 24);
+	Canvas.AddSphere(1.0f, 12, 12);
+
+	// Directional
+	Canvas.AddQuad(ZEVector3(0.0f, 0.0f, 0.0f),
+		ZEVector3(0.0f, 0.0f, 0.0f),
+		ZEVector3(0.0f, 0.0f, 0.0f),
+		ZEVector3(0.0f, 0.0f, 0.0f));
+
+	// Projective
+	Canvas.AddCone(1.0f, 24, 1.0f);
+	Canvas.AddCone(1.0f, 12, 1.0f);
 }
 
 void ZED3D9Renderer::DrawDirectionalLight(ZEDirectionalLight* Light)
@@ -166,28 +192,6 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 void ZED3D9Renderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 {
 
-}
-
-void ZED3D9Renderer::DrawLights()
-{
-
-	for (size_t I = 0; I < Lights.GetCount(); I++)
-	{
-		switch(Lights[I]->GetLightType())
-		{
-			case ZE_LT_POINT:
-				DrawPointLight();
-			case ZE_LT_DIRECTIONAL:
-				DrawDirectionalLight();
-				break;
-			case ZE_LT_PROJECTIVE:
-				DrawProjectiveLight();
-				break;
-			case ZE_LT_OMNIPROJECTIVE:
-				DrawOmniProjectiveLight();
-				break;
-		}
-	}
 }
 
 void ZED3D9Renderer::DoPreZPass()
@@ -231,12 +235,57 @@ void ZED3D9Renderer::DoGBufferPass()
 
 void ZED3D9Renderer::DoLightningPass()
 {
+	// Z-Buffer
+	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+
+	// Alpha blending
+	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCCOLOR);
+	GetDevice()->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
+	GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_DESTCOLOR);
+	GetDevice()->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
+	GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+
+	// Stencil Buffer
+	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+
+	// GBuffers
+	GetDevice()->SetTexture(0, GBuffer1);
+	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+
+	GetDevice()->SetTexture(1, GBuffer2);
+	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
+	GetDevice()->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
+	GetDevice()->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
+
+	// Render Targets
 	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
 	ZED3D9CommonTools::SetRenderTarget(1, LBuffer2);
 
-	// Do lighting passes
+	for (size_t I = 0; I < Lights.GetCount(); I++)
+		switch(Lights[I]->GetLightType())
+		{
+		case ZE_LT_POINT:
+			DrawPointLight((ZEPointLight*)Lights[I]);
+		case ZE_LT_DIRECTIONAL:
+			DrawDirectionalLight((ZEDirectionalLight*)Lights[I]);
+			break;
+		case ZE_LT_PROJECTIVE:
+			DrawProjectiveLight((ZEProjectiveLight*)Lights[I]);
+			break;
+		case ZE_LT_OMNIPROJECTIVE:
+			DrawOmniProjectiveLight((ZEOmniProjectiveLight*)Lights[I]);
+			break;
+		}
 }
-
 
 void ZED3D9Renderer::DoForwardPass()
 {
@@ -258,7 +307,6 @@ void ZED3D9Renderer::CreateRenderTargets()
 	ZED3D9CommonTools::CreateRenderTarget(&AccumulationBuffer, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 }
 
-
 void ZED3D9Renderer::DestroyRenderTargets()
 {
 	ZED3D_RELEASE(GBuffer1);
@@ -267,7 +315,6 @@ void ZED3D9Renderer::DestroyRenderTargets()
 	ZED3D_RELEASE(LBuffer2);
 	ZED3D_RELEASE(AccumulationBuffer);
 }
-
 
 ZED3D9Renderer::ZED3D9Renderer()
 {
@@ -279,18 +326,15 @@ ZED3D9Renderer::ZED3D9Renderer()
 	SetViewPort(zeGraphics->GetFrameBufferViewPort());
 }
 
-
 ZED3D9Renderer::~ZED3D9Renderer()
 {
 	Deinitialize();
 }
 
-
 void ZED3D9Renderer::SetViewPort(ZEViewPort* ViewPort)
 {
 	this->ViewPort = (ZED3D9ViewPort*)ViewPort;
 }
-
 
 ZEViewPort* ZED3D9Renderer::GetViewPort()
 {
@@ -304,10 +348,11 @@ bool ZED3D9Renderer::Initialize()
 	SSAOProcessor.Renderer = this;
 	HDRProcessor.Initialize();
 	SSAOProcessor.Initialize();
+	
+	CreateLightMeshes();
 
 	return true; 
 } 
-
 
 void ZED3D9Renderer::Deinitialize()
 {
@@ -316,14 +361,12 @@ void ZED3D9Renderer::Deinitialize()
 	DestroyRenderTargets();
 }
 
-
 void ZED3D9Renderer::DeviceLost()
 {
 	HDRProcessor.OnDeviceLost();
 	SSAOProcessor.OnDeviceLost();
 	DestroyRenderTargets();
 }
-
 
 bool ZED3D9Renderer::DeviceRestored()
 {
@@ -334,7 +377,6 @@ bool ZED3D9Renderer::DeviceRestored()
 	return true;
 }
 
-
 void ZED3D9Renderer::Destroy()
 {
 	// Remove renderer from modules renderer list
@@ -342,36 +384,35 @@ void ZED3D9Renderer::Destroy()
 	delete this;
 }
 
-
 void ZED3D9Renderer::SetCamera(ZECamera* Camera)
 {
 	this->Camera = Camera;
 }
-
 
 ZECamera* ZED3D9Renderer::GetCamera()
 {
 	return Camera;
 }
 
-
 ZEArray<ZEPostProcessor*>& ZED3D9Renderer::GetPostProcessors()
 {
 	return PostProcessors;
 }
-
 
 void ZED3D9Renderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
 {
 	PostProcessors.Add(PostProcessor);
 }
 
-
 void ZED3D9Renderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
 {
 	PostProcessors.DeleteValue(PostProcessor);
 }
 
+void ZED3D9Renderer::SetLights(ZEArray<ZELight*>& Lights)
+{
+
+}
 
 void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
@@ -390,7 +431,6 @@ void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
 		NonTransparent.Add(*RenderOrder);
 }
 
-
 void ZED3D9Renderer::ClearList()
 {
 	//Clear render lists
@@ -399,11 +439,12 @@ void ZED3D9Renderer::ClearList()
 	NonTransparent.Clear(true);
 }
 
-
 void ZED3D9Renderer::Render(float ElaspedTime)
 {
 	// Do Pre-Z
 	DoPreZPass();
+	DoGBufferPass();
+	DoForwardPass();
 
 	// Do GBuffer
 	// Do SSAO

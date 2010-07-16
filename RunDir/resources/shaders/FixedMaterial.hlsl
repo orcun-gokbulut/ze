@@ -33,7 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "SkinTransform.hlsl"
 #include "FixedShaderComponents.hlsl"
 
 //* Vertex Shader Constants
@@ -97,23 +96,27 @@ sampler2D LightMap : register(s10);
 sampler2D DistortionMap : register(s11);
 
 
-// Pre Z Pass
-/////////////////////////////////////////////////////////////////////////////////////////
-
-struct PreZVSInput 
+struct VSInput 
 {
-	float4 Position : POSITION0;
+	float4 Position             : POSITION0;
+	float3 Normal               : NORMAL0;
+	float2 Texcoord             : TEXCOORD0;
 
 	#ifdef ZE_SHADER_SKINTRANSFORM
-		int4 BoneIndices : BLENDINDICES0;
-		float4 BoneWeights : BLENDWEIGHT0;
+		int4 BoneIndices        : BLENDINDICES0;
+		float4 BoneWeights      : BLENDWEIGHT0;
 	#endif
 };
+
+#include "SkinTransform.hlsl"
+
+// Pre Z Pass
+/////////////////////////////////////////////////////////////////////////////////////////
 
 struct PreZVSOutput
 {
 	float4 Position : POSITION0;
-}
+};
 
 PreZVSOutput PreZVSMain(VSInput Input)
 {
@@ -122,15 +125,19 @@ PreZVSOutput PreZVSMain(VSInput Input)
 	SkinTransform(Input);
 
 	Output.Position = mul(Input.Position, WorldViewProjMatrix);
+	
+	return Output;
 }
 
-float4 PreZPSOutput()
+float4 PreZPSMain() : COLOR0
 {
 	return 0.0f;
 }
 
 // G-Buffer Pass
 /////////////////////////////////////////////////////////////////////////////////////////
+
+// Vertex Shader
 struct GBVSInput 
 {
 	float4 Position             : POSITION0;
@@ -157,13 +164,7 @@ struct GBVSOutput
 	#endif
 };
 
-void GBVSTransformNormals(in GBVSInput Input, out GBVSOutput Output)
-{
-	Output.NormalDepth.xyz = mul(Input.Normal, WorldViewInvTrpsMatrix).xyz;
-	Output.Tangent.xyz = mul(Input.Tangent, WorldViewInvTrpsMatrix).xyz;
-	Output.Binormal.xyz = mul(Input.Binormal, WorldViewInvTrpsMatrix).xyz;
-	
-}
+
 GBVSOutput GBVSMain(GBVSInput Input)
 {
 	GBVSOutput Output;
@@ -172,7 +173,11 @@ GBVSOutput GBVSMain(GBVSInput Input)
 
 	// Pipeline 
 	Output.Position = mul(Input.Position, WorldViewProjMatrix);
-	GBVSTransformNormals(Input, Output);
+	Output.NormalDepth.xyz = mul(Input.Normal, WorldViewInvTrpsMatrix).xyz;
+	#ifdef ZE_SHADER_TANGENT_SPACE
+		Output.Tangent = mul(Input.Tangent, WorldViewInvTrpsMatrix).xyz;
+		Output.Binormal = mul(Input.Binormal, WorldViewInvTrpsMatrix).xyz;
+	#endif
 	Output.NormalDepth.w = mul(Input.Position, WorldViewMatrix).z;
 
 	#if defined(ZE_SHADER_TEXCOORD)
@@ -182,6 +187,7 @@ GBVSOutput GBVSMain(GBVSInput Input)
 	return Output;
 }
 
+// Pixel Shader
 struct GBPSInput
 {
 	float4 NormalDepth : TEXCOORD0;
@@ -192,7 +198,6 @@ struct GBPSInput
 		float3 Tangent : TEXCOORD2;
 		float3 Binormal : TEXCOORD3;
 	#endif
-	float3 
 };
 
 struct GBPSOutput
@@ -212,9 +217,9 @@ float3 GBGetNormal(in GBPSInput Input)
 	#ifdef ZE_SHADER_TANGENT_SPACE
 		float3 Normal = tex2D(NormalMap, Input.Texcoord);
 		Normal = normalize(Normal.x * Input.Tangent + Normal.y * Input.Binormal + Normal.z * Input.Normal);
-		Input.NormalDepth.xyz = Normal * 0.5f + 0.5f;	
+		return Normal * 0.5f + 0.5f;	
 	#else
-		Output.NormalDepth.xyz = Input.NormalDepth.xyz * 0.5f + 0.5f;
+		return Input.NormalDepth.xyz * 0.5f + 0.5f;
 	#endif	
 }
 
@@ -224,22 +229,22 @@ float GBGetGloss(in GBPSInput Input)
 		return tex2D(GlossMap, Input.Texcoord).x;
 	#else
 		return 0.0f;
-	#end
+	#endif
 }
 
 float GBGetDepth(in GBPSInput Input)
 {
-	return Input.NormalDpeht.w / FarZ;
+	return Input.NormalDepth.w / FarZ;
 }
 
 GBPSOutput GBPSMain(GBPSInput Input)
 {
-	PSOutput Output;
+	GBPSOutput Output;
 	
 	GBDoParallax(Input);
 	
 	Output.NormalGloss.xyz = GBGetNormal(Input);
-	Output.NormalGloss.w = GBGetSpecular(Input);
+	Output.NormalGloss.w = GBGetGloss(Input);
 	Output.Depth = GBGetDepth(Input);
 	return Output;
 }

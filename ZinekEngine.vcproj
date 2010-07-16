@@ -790,7 +790,7 @@
 						>
 					</File>
 					<File
-						RelativePath=".\RunDir\resources\shaders\UIVertexShader.hlsl"
+						RelativePath=".\RunDir\resources\shaders\UI.hlsl"
 						>
 					</File>
 				</Filter>

@@ -375,6 +375,21 @@ void ZECanvas::AddWireframePyramid(float Width, float Height, float Length)
 	ZECANVAS_ADDWIREVERTEX(Verts[15], Transformation, ZEVector3(Width, 0.0f, Length));
 }
 
+void ZECanvas::AddWireframeCone(float Radius, unsigned int Segments, float Height)
+{
+	ZECanvasVertex* Verts = Vertices.MassAdd(Segments * 4);
+	float HAngle = ((2.0f * ZE_PI) / Segments);
+	size_t N = 0;
+	for (size_t X = 0; X < Segments; X++)
+	{
+		ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(Radius * sinf(X * HAngle), 0.0f, Radius * cosf(X * HAngle)));
+		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * sinf((X + 1) * HAngle), 0.0f, Radius * cosf((X + 1) * HAngle)));
+		Verts[N + 2] = Verts[N + 1];
+		ZECANVAS_ADDWIREVERTEX(Verts[N + 3], Transformation, ZEVector3(0.0f, Height, 0.0f));
+		N += 4;
+	}
+}
+
 void ZECanvas::AddPoint(const ZEVector3& Point)
 {
 	ZECanvasVertex* Vertex = Vertices.Add();
@@ -617,8 +632,6 @@ void ZECanvas::AddDisc(float Radius, unsigned int Segments)
 
 void ZECanvas::AddPyramid(float Width, float Height, float Length)
 {
-	
-
 	ZECanvasVertex* Verts = Vertices.MassAdd(18);
 	Width *= 0.5f;
 	Length *= 0.5f;
@@ -650,6 +663,20 @@ void ZECanvas::AddPyramid(float Width, float Height, float Length)
 	ZECANVAS_ADDVERTEX(Verts[15], Transformation, ZEVector3(-Width, 0.0f, -Length), ZEVector3(0.0f,-1.0f,0.0f), ZEVector2(0.0f,0.0f));
 	ZECANVAS_ADDVERTEX(Verts[17], Transformation, ZEVector3(Width, 0.0f, Length), ZEVector3(0.0f,-1.0f,0.0f), ZEVector2(1.0f,1.0f));
 	ZECANVAS_ADDVERTEX(Verts[16], Transformation, ZEVector3(-Width, 0.0f, Length),  ZEVector3(0.0f,-1.0f,0.0f), ZEVector2(0.0f,1.0f));
+}
+
+void ZECanvas::AddCone(float Radius, unsigned int Segments, float Height)
+{
+	ZECanvasVertex* Verts = Vertices.MassAdd(Segments * 3);
+	float HAngle = ((2.0f * ZE_PI) / Segments);
+	size_t N = 0;
+	for (size_t X = 0; X < Segments; X++)
+	{
+		ZECANVAS_ADDWIREVERTEX(Verts[N], Transformation, ZEVector3(Radius * sinf(X * HAngle), 0.0f, Radius * cosf(X * HAngle)));
+		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * sinf((X + 1) * HAngle), 0.0f, Radius * cosf((X + 1) * HAngle)));
+		ZECANVAS_ADDWIREVERTEX(Verts[N + 2], Transformation, ZEVector3(0.0f, Height, 0.0f));
+		N += 3;
+	}
 }
 
 void ZECanvas::AddVertex(const ZECanvasVertex& Vertex)
