@@ -335,8 +335,8 @@ const ZEPropertyDescription* ZEFixedMaterialDescription::GetProperties() const
          {"RefractionMapAddressModeW", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, &Enum17},
          {"DetailMapEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, NULL},
          {"DetailMapTiling", ZE_VRT_VECTOR2, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, NULL},
-         {"DetailDiffuseMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum18},
-         {"DetailDiffuseMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum19},
+         {"DetailBaseMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum18},
+         {"DetailBaseMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum19},
          {"DetailNormalMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum20},
          {"DetailNormalMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum21},
          {"LightMapEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Light Map", ZE_PS_NONE, NULL, NULL},
@@ -392,7 +392,7 @@ ZEClassDescription* ZEFixedMaterial::ClassDescription()
     return &Desc;
 }
 
-ZEClassDescription* ZEFixedMaterial::GetClassDescription()
+ZEClassDescription* ZEFixedMaterial::GetClassDescription() const
 {
     return ZEFixedMaterial::ClassDescription();
 }
@@ -425,8 +425,8 @@ int ZEFixedMaterial::GetPropertyId(const char* Name) const
         {"SpecularFactor", 1438, 13},
         {"LightMapEnabled", 1473, 51},
         {"DetailMapTiling", 1496, 46},
-        {"SpecularEnabled", 1514, 12},
         {"EmmisiveEnabled", 1514, 18},
+        {"SpecularEnabled", 1514, 12},
         {"RefractionIndex", 1541, 41},
         {"DetailMapEnabled", 1564, 45},
         {"NormalMapEnabled", 1586, 23},
@@ -454,6 +454,8 @@ int ZEFixedMaterial::GetPropertyId(const char* Name) const
         {"EmmisiveMapAddressModeU", 2301, 21},
         {"EmmisiveMapAddressModeV", 2302, 22},
         {"SpecularMapAddressModeV", 2302, 17},
+        {"DetailBaseMapAddressModeU", 2444, 47},
+        {"DetailBaseMapAddressModeV", 2445, 48},
         {"ReflectionMapAddressModeU", 2505, 36},
         {"ReflectionMapAddressModeV", 2506, 37},
         {"ReflectionMapAddressModeW", 2507, 38},
@@ -464,8 +466,6 @@ int ZEFixedMaterial::GetPropertyId(const char* Name) const
         {"DistortionMapAddressModeU", 2541, 58},
         {"DetailNormalMapAddressModeU", 2682, 49},
         {"DetailNormalMapAddressModeV", 2683, 50},
-        {"DetailDiffuseMapAddressModeU", 2775, 47},
-        {"DetailDiffuseMapAddressModeV", 2776, 48},
     };
 
     int Hash = 0;

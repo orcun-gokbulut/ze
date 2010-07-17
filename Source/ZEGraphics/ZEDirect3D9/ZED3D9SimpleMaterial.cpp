@@ -43,21 +43,6 @@
 LPDIRECT3DVERTEXSHADER9 ZED3D9SimpleMaterial::VertexShader = NULL;
 LPDIRECT3DPIXELSHADER9 ZED3D9SimpleMaterial::PixelShader = NULL;
 
-const char* ZED3D9SimpleMaterial::GetMaterialUID() const 
-{
-	return "";
-}
-
-unsigned int ZED3D9SimpleMaterial::GetMaterialFlags() const 
-{
-	return NULL;
-}
-
-ZEMaterialType ZED3D9SimpleMaterial::GetMaterialType() const 
-{
-	return ZE_MT_FIXED;
-}
-
 bool ZED3D9SimpleMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const 
 {
 	((ZED3D9SimpleMaterial*)this)->UpdateMaterial();

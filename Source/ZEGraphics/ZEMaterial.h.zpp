@@ -71,7 +71,7 @@ ZEClassDescription* ZEMaterial::ClassDescription()
     return &Desc;
 }
 
-ZEClassDescription* ZEMaterial::GetClassDescription()
+ZEClassDescription* ZEMaterial::GetClassDescription() const
 {
     return ZEMaterial::ClassDescription();
 }

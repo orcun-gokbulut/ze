@@ -106,6 +106,16 @@ ZEFixedMaterial::~ZEFixedMaterial()
 
 }
 
+ZEMaterialType ZEFixedMaterial::GetMaterialType() const
+{
+	return ZE_MTT_DEFERRED;
+}
+
+ZEMaterialFlags ZEFixedMaterial::GetMaterialFlags() const
+{
+	return ZE_MTF_G_BUFFER_PASS | ZE_MTF_PREZ_PASS | ZE_MTF_SUPPORTS_SKINNING;
+}
+
 void ZEFixedMaterial::SetTwoSided(bool Enable)
 {
 	TwoSided = Enable;

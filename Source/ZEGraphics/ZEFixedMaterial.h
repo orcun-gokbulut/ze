@@ -201,6 +201,9 @@ class ZEFixedMaterial : public ZEMaterial
 		virtual							~ZEFixedMaterial();
 
 	public:
+		virtual ZEMaterialType			GetMaterialType() const;
+		virtual ZEMaterialFlags			GetMaterialFlags() const;
+
 		// Material Options
 		void							SetTwoSided(bool Enable);
 		bool							GetTwoSided() const;

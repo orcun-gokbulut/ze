@@ -41,22 +41,22 @@
 
 enum ZEMaterialType
 {
-	ZE_MT_NONE,
-	ZE_MT_FIXED,
-	ZE_MT_CUSTOM,
-	ZE_MT_CGFX,
-	ZE_MT_OTHERs
+	ZE_MTT_NONE,
+	ZE_MTT_NON_ILLUMUNATED,
+	ZE_MTT_DEFERRED,
+	ZE_MTT_FORWARD,
 };
- 
-// ZEMaterialFlags
-#define ZE_MF_NOCACHING
- 
+
+typedef ZEDWORD ZEMaterialFlags;
+#define ZE_MTF_NONE						0
+#define ZE_MTF_PREZ_PASS				1
+#define ZE_MTF_G_BUFFER_PASS			2
+#define ZE_MTF_SUPPORTS_SKINNING		4
+#define ZE_MTF_SUPPORTS_MORPHING		8
+#define ZE_MTF_SUPPORTS_INSTANCING		16
+
+class ZERenderer;
 class ZERenderOrder;
-class ZECamera;
-class ZEPointLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZEOmniProjectiveLight;
 
 ZE_META_CLASS_DESCRIPTION(ZEMaterial)
 
@@ -68,12 +68,17 @@ class ZEMaterial : public ZEClass
 		virtual							~ZEMaterial();
 
 	public:
-		virtual const char*				GetMaterialUID() const = 0;
-		virtual unsigned int			GetMaterialFlags() const = 0;
 		virtual ZEMaterialType			GetMaterialType() const = 0;
+		virtual ZEMaterialFlags			GetMaterialFlags() const = 0;
 
 		// SetUp
 		virtual void					SetZero() = 0;
+		
+		// Render Pass
+		virtual bool					SetupPreZPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupShadowPass() const;	
 
 		virtual void					UpdateMaterial();
 

@@ -45,6 +45,27 @@ ZEMaterial::ZEMaterial()
 
 ZEMaterial::~ZEMaterial()
 {
+
+}
+
+bool ZEMaterial::SetupPreZPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const
+{
+	return false;
+}
+
+bool ZEMaterial::SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const
+{
+	return false;
+}
+
+bool ZEMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const
+{
+	return false;
+}
+
+bool ZEMaterial::SetupShadowPass() const
+{
+	return false;
 }
 
 void ZEMaterial::UpdateMaterial()

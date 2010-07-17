@@ -48,6 +48,7 @@ class ZEPointLight;
 class ZEDirectionalLight;
 class ZEProjectiveLight;
 class ZEOmniProjectiveLight;
+class ZED3D9StaticVertexBuffer;
 
 class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 {
@@ -76,6 +77,7 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		ZEArray<ZEPostProcessor*>			PostProcessors;
 
 		LPDIRECT3DVERTEXBUFFER9				Light;
+		ZED3D9StaticVertexBuffer*			LightMeshes;
 
 		static bool							CheckRenderOrder(ZERenderOrder* RenderOrder);
 		static void							PumpStreams(ZERenderOrder* RenderOrder);

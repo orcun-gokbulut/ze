@@ -46,6 +46,16 @@ ZESimpleMaterial::~ZESimpleMaterial()
 	
 }
 
+ZEMaterialType ZESimpleMaterial::GetMaterialType() const
+{
+	return ZE_MTT_NON_ILLUMUNATED;
+}
+
+ZEMaterialFlags ZESimpleMaterial::GetMaterialFlags() const
+{
+	return ZE_MTF_NONE;
+}
+
 void ZESimpleMaterial::SetZero()
 {
 	WireFrame = false;

@@ -179,7 +179,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);
 		World->SetEnabled(true);
-		Scene->LoadMap("deneme.zemap");
+		Scene->LoadMap("PerfTest.zemap");
 
 		ZELightBrush* Light = new ZELightBrush();
 		Light->SetLightType(ZE_LT_POINT);

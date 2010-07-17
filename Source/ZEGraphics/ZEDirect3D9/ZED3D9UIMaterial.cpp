@@ -44,19 +44,14 @@ LPDIRECT3DVERTEXSHADER9 ZED3D9UIMaterial::VertexShader = NULL;
 LPDIRECT3DPIXELSHADER9 ZED3D9UIMaterial::SolidPixelShader = NULL;
 LPDIRECT3DPIXELSHADER9 ZED3D9UIMaterial::TexturedPixelShader = NULL;
 
-const char* ZED3D9UIMaterial::GetMaterialUID() const 
+ZED3D9UIMaterial::ZED3D9UIMaterial()
 {
-	return "";
+
 }
 
-unsigned int ZED3D9UIMaterial::GetMaterialFlags() const 
+ZED3D9UIMaterial::~ZED3D9UIMaterial()
 {
-	return NULL;
-}
 
-ZEMaterialType ZED3D9UIMaterial::GetMaterialType() const 
-{
-	return ZE_MT_FIXED;
 }
 
 bool ZED3D9UIMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const 

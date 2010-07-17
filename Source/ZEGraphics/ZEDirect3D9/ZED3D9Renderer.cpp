@@ -43,7 +43,6 @@
 #include "ZED3D9Texture3D.h"
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9Module.h"
-#include "ZED3D9Material.h"
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9VertexDeclaration.h"
 #include "ZEGraphics\ZEMaterial.h"
@@ -60,20 +59,22 @@ void ZED3D9Renderer::PumpStreams(ZERenderOrder* RenderOrder)
 {
 	ZEVertexBuffer* VertexBuffer = RenderOrder->VertexBuffer;
 
+	((ZED3D9VertexDeclaration*)RenderOrder->VertexDeclaration)->SetupVertexDeclaration();
+
 	// Figure out primitive type
 	D3DPRIMITIVETYPE PrimitiveType;
 	switch(RenderOrder->PrimitiveType)
 	{
-	default:
-	case ZE_ROPT_POINT:
-		PrimitiveType = D3DPT_POINTLIST;
-		break;
-	case ZE_ROPT_LINE:
-		PrimitiveType = D3DPT_LINELIST;
-		break;
-	case ZE_ROPT_TRIANGLE:
-		PrimitiveType = D3DPT_TRIANGLELIST;
-		break;
+		default:
+		case ZE_ROPT_POINT:
+			PrimitiveType = D3DPT_POINTLIST;
+			break;
+		case ZE_ROPT_LINE:
+			PrimitiveType = D3DPT_LINELIST;
+			break;
+		case ZE_ROPT_TRIANGLE:
+			PrimitiveType = D3DPT_TRIANGLELIST;
+			break;
 	}
 
 	// Make draw call
@@ -93,7 +94,10 @@ void ZED3D9Renderer::PumpStreams(ZERenderOrder* RenderOrder)
 	{
 		// Check wheater render order has static vertex buffer or not
 		if (VertexBuffer->IsStatic())
+		{
+			GetDevice()->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)RenderOrder->VertexBuffer)->StaticBuffer, 0, RenderOrder->VertexDeclaration->GetVertexSize());
 			GetDevice()->DrawPrimitive(PrimitiveType, RenderOrder->VertexBufferOffset, RenderOrder->PrimitiveCount);
+		}
 		else
 			GetDevice()->DrawPrimitiveUP(PrimitiveType, RenderOrder->PrimitiveCount, 
 			(char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderOrder->VertexBufferOffset * RenderOrder->VertexDeclaration->GetVertexSize(),  
@@ -149,57 +153,64 @@ bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 	return true;
 }
 
-void ZED3D9Renderer::DrawPointLight(ZEPointLight* Light)
-{
-	// Setup Light
-	// Check Distance and radius
-		// Draw Stenciled
-		// Draw NonStenciled
-
-	// Draw Light Volume
-	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 1024);
-}
-
 #include "ZEGraphics/ZECanvas.h"
 void ZED3D9Renderer::CreateLightMeshes()
 {
-	ZECanvas Canvas;
-	// Point/OmniProjective
-	Canvas.AddSphere(1.0f, 24, 24);
-	Canvas.AddSphere(1.0f, 12, 12);
+	/*
+	Primitive	Start		Start(Byte)	Vertex Count	Prim. Count		Size (Bytes)
+	Quad		0			0			6				2				288
+	Sphere12	6			288			936				312				44928
+	Sphere24	942			45216		3600			1200			172800
+	Cone12		4542		218016		36				12				1728
+	Cone24		4578		219744		72				24				3456
+	End			4650				
+	*/
 
+	ZECanvas Canvas;
 	// Directional
 	Canvas.AddQuad(ZEVector3(0.0f, 0.0f, 0.0f),
 		ZEVector3(0.0f, 0.0f, 0.0f),
 		ZEVector3(0.0f, 0.0f, 0.0f),
 		ZEVector3(0.0f, 0.0f, 0.0f));
 
+	// Point/OmniProjective
+	Canvas.AddSphere(1.0f, 12, 12);
+	Canvas.AddSphere(1.0f, 24, 24);
+
 	// Projective
-	Canvas.AddCone(1.0f, 24, 1.0f);
 	Canvas.AddCone(1.0f, 12, 1.0f);
+	Canvas.AddCone(1.0f, 24, 1.0f);
+
+	LightMeshes = (ZED3D9StaticVertexBuffer*)Canvas.CreateStaticVertexBuffer();
+}
+
+void ZED3D9Renderer::DrawPointLight(ZEPointLight* Light)
+{
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 942, 1200); // Sphere 2
 }
 
 void ZED3D9Renderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 {
-
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 2); // Quad
 }
 
 void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 {
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 12); // Cone 1
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4578, 24); // Cone 2
 
 }
 
 void ZED3D9Renderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 {
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 942, 1200); // Sphere 2
 
 }
 
 void ZED3D9Renderer::DoPreZPass()
 {
-	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
-	GetDevice()->SetRenderTarget(1, NULL);
-	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
-
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00000000);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
@@ -208,27 +219,44 @@ void ZED3D9Renderer::DoPreZPass()
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
 		ZERenderOrder* RenderOrder = &NonTransparent[I];
-		ZED3D9Material* Material = (ZED3D9Material*)RenderOrder->Material;
-		Material->SetupPreZPass();
+		
+		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_PREZ_PASS) == 0)
+			continue;
+
+		if (!RenderOrder->Material->SetupPreZPass(this, RenderOrder))
+			zeCriticalError("Renderer", "Can not set material's Pre-Z pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
+
 		PumpStreams(RenderOrder);
 	}
 }
 
 void ZED3D9Renderer::DoGBufferPass()
 {
-	ZED3D9CommonTools::SetRenderTarget(0, GBuffer1);
+	//ZED3D9CommonTools::SetRenderTarget(0, GBuffer1);
 	ZED3D9CommonTools::SetRenderTarget(1, GBuffer2);
 
-	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
+	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
+	//GetDevice()->SetRenderTarget(1, ViewPort->FrameBuffer);
+
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
-	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);
+	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+
+	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
 		ZERenderOrder* RenderOrder = &NonTransparent[I];
-		ZED3D9Material* Material = (ZED3D9Material*)RenderOrder->Material;
-		Material->SetupGBufferPass();
+
+		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS) == 0)
+			continue;
+
+		if (!RenderOrder->Material->SetupGBufferPass(this, RenderOrder))
+			zeCriticalError("Renderer", "Can not set material's GBuffer pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
+
 		PumpStreams(RenderOrder);
 	}
 }
@@ -292,8 +320,9 @@ void ZED3D9Renderer::DoForwardPass()
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
 		ZERenderOrder* RenderOrder = &NonTransparent[I];
-		ZED3D9Material* Material = (ZED3D9Material*)RenderOrder->Material;
-		Material->SetupForwardPass();
+		
+		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
+			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
 		PumpStreams(RenderOrder);
 	}	
 }
@@ -441,10 +470,24 @@ void ZED3D9Renderer::ClearList()
 
 void ZED3D9Renderer::Render(float ElaspedTime)
 {
+	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost())
+		return;
+
+	GetDevice()->SetRenderState(D3DRS_DEPTHBIAS, 0);
+	GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, 0);
+
+	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
+	GetDevice()->SetRenderTarget(1, NULL);
+	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00, 1.0f, 0x00);
+
+	GetDevice()->BeginScene();
 	// Do Pre-Z
-	DoPreZPass();
+	//DoPreZPass();
 	DoGBufferPass();
-	DoForwardPass();
+	//DoForwardPass();
+	GetDevice()->EndScene();
+	//GetDevice()->Present(NULL, NULL, NULL, NULL);
 
 	// Do GBuffer
 	// Do SSAO

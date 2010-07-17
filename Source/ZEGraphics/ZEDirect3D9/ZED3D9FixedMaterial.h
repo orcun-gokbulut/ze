@@ -39,19 +39,15 @@
 
 #include <d3d9.h>
 #include "ZED3D9ComponentBase.h"
-#include "ZED3D9Material.h"
 #include "ZEGraphics\ZEFixedMaterial.h"
 
 class ZED3D9VertexShader;
 class ZED3D9PixelShader;
 
-class ZED3D9FixedMaterial : public ZEFixedMaterial, public ZED3D9Material, private ZED3D9ComponentBase
+class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	private:
-		ZERenderOrder*					RenderOrder;
-		ZECamera*						Camera;
-
 		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
 		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
 
@@ -72,15 +68,11 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, public ZED3D9Material, priva
 		virtual							~ZED3D9FixedMaterial();
 
 	public:
-		virtual const char*				GetMaterialUID() const;
-		virtual unsigned int			GetMaterialFlags() const;
-		virtual ZEMaterialType			GetMaterialType() const;
-
 		const char*						ConvertToString(unsigned int MaterialComponent);
 
-		virtual bool					SetupPreZPass() const;
-		virtual bool					SetupGBufferPass() const;
-		virtual bool					SetupForwardPass() const;
+		virtual bool					SetupPreZPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
 		virtual bool					SetupShadowPass() const;	
 
 		virtual void					UpdateMaterial();

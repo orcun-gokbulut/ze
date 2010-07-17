@@ -41,6 +41,7 @@
 #include "ZEGraphics\ZEUIMaterial.h"
 #include "ZEGraphics\ZERenderOrder.h"
 
+class ZECamera;
 class ZED3D9UIMaterial : public ZEUIMaterial, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
@@ -51,14 +52,10 @@ class ZED3D9UIMaterial : public ZEUIMaterial, public ZED3D9ComponentBase
 		static LPDIRECT3DPIXELSHADER9   TexturedPixelShader;
 
 	protected:
-										ZED3D9UIMaterial() {}
-										~ZED3D9UIMaterial(){}
+										ZED3D9UIMaterial();
+		virtual							~ZED3D9UIMaterial();
 
 	public:
-		virtual const char*				GetMaterialUID() const;
-		virtual unsigned int			GetMaterialFlags() const;
-		virtual ZEMaterialType			GetMaterialType() const;
-
 		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const;
 
 		virtual bool					SetupPreLightning() const;

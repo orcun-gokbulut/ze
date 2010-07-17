@@ -47,6 +47,16 @@ ZEUIMaterial::~ZEUIMaterial()
 	
 }
 
+ZEMaterialType ZEUIMaterial::GetMaterialType() const
+{
+	return ZE_MTT_NON_ILLUMUNATED;
+}
+
+ZEMaterialFlags ZEUIMaterial::GetMaterialFlags() const
+{
+	return ZE_MTF_NONE;
+}
+
 void ZEUIMaterial::SetZero()
 {
 	WireFrame = false;

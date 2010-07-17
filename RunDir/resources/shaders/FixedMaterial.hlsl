@@ -39,13 +39,12 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Vertex Transformation
-float4x4 WorldViewProjMatrix : register(c0);
-float4x4 WorldViewMatrix : register(c4);
-float4x4 WorldViewInvTrpsMatrix : register(c8);
+float4x4 WorldViewProjMatrix : register(vs, c0);
+float4x4 WorldViewMatrix : register(vs, c4);
+float4x4 WorldViewInvTrpsMatrix : register(vs, c8);
 
 // Other general constants 4 vectors
-float4 ViewPosition : register(vs, c16);
-float MaterialRefractionIndex : register(vs, c17);
+float MaterialRefractionIndex : register(vs, c16);
 
 
 // Pixel Shader Constants
@@ -58,6 +57,7 @@ float4 MaterialParams2 : register(ps, c2);
 float4 MaterialParams3 : register(ps, c3);
 float4 MaterialParams4 : register(ps, c4);
 float4 MaterialParams5 : register(ps, c5);
+float4 MaterialParams6 : register(vs, c12);
 float FarZ : register(c6);
 
 #define	MaterialAmbientColor        MaterialParams0.xyz
@@ -68,11 +68,11 @@ float FarZ : register(c6);
 #define	MaterialEmmisiveColor       MaterialParams3.xyz
 #define	MaterialEmmisiveFactor		MaterialParams3.w
 #define	MaterialReflectionFactor	MaterialParams4.x
-#define	MaterialRefractionFactor    MaterialParams4.y;
-#define	MaterialDetailMapTiling     MaterialParams4.zw;
-#define MaterialDistortionFactor	MaterialParams5.x;
-#define MaterialDistortionAmount	MaterialParams5.y;
-
+#define	MaterialRefractionFactor    MaterialParams4.y
+#define	MaterialDetailMapTiling     MaterialParams4.zw
+#define MaterialDistortionFactor	MaterialParams5.x
+#define MaterialDistortionAmount	MaterialParams5.y
+#define MaterialRefractionIndex		MaterialParams6.x
 
 // Textures
 /////////////////////////////////////////////////////////////////////////////////////////

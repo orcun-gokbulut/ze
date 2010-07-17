@@ -41,6 +41,8 @@
 #include "ZEGraphics\ZESimpleMaterial.h"
 #include "ZEGraphics\ZERenderOrder.h"
 
+class ZECamera;
+
 class ZED3D9SimpleMaterial : public ZESimpleMaterial, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
@@ -54,10 +56,6 @@ class ZED3D9SimpleMaterial : public ZESimpleMaterial, public ZED3D9ComponentBase
 										~ZED3D9SimpleMaterial(){}
 
 	public:
-		virtual const char*				GetMaterialUID() const;
-		virtual unsigned int			GetMaterialFlags() const;
-		virtual ZEMaterialType			GetMaterialType() const;
-
 		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const;
 
 		virtual bool					SetupPreLightning() const;
