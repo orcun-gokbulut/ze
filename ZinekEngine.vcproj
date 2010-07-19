@@ -756,34 +756,145 @@
 					<File
 						RelativePath=".\RunDir\resources\shaders\FixedMaterial.hlsl"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								CommandLine="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Utilities\bin\x86\fxc.exe&quot; &quot;$(InputPath)&quot;"
+								Outputs="$(InputPath)"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\FixedMaterialComponents.hlsl"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								CommandLine="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Utilities\bin\x86\fxc.exe&quot; &quot;$(InputPath)&quot;"
+								Outputs="$(InputPath)"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\RunDir\resources\shaders\GBuffer.hlsl"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								CommandLine="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Utilities\bin\x86\fxc.exe&quot; &quot;$(InputPath)&quot;"
+								Outputs="$(InputPath)"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\HDRProcessor.hlsl"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								CommandLine="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Utilities\bin\x86\fxc.exe&quot; &quot;$(InputPath)&quot;"
+								Outputs="$(InputPath)"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\RunDir\resources\shaders\LBuffer.hlsl"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								CommandLine="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Utilities\bin\x86\fxc.exe&quot; &quot;$(InputPath)&quot;"
+								Outputs="$(InputPath)"
+							/>
+						</FileConfiguration>
+					</File>
+					<File
+						RelativePath=".\RunDir\resources\shaders\Lights.hlsl"
+						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								CommandLine="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Utilities\bin\x86\fxc.exe&quot; &quot;$(InputPath)&quot;"
+								Outputs="$(InputPath)"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\SimpleShader.hlsl"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								CommandLine="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Utilities\bin\x86\fxc.exe&quot; &quot;$(InputPath)&quot;"
+								Outputs="$(InputPath)"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\SkinTransform.hlsl"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								CommandLine="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Utilities\bin\x86\fxc.exe&quot; &quot;$(InputPath)&quot;"
+								Outputs="$(InputPath)"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\SkyBox.hlsl"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								CommandLine="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Utilities\bin\x86\fxc.exe&quot; &quot;$(InputPath)&quot;"
+								Outputs="$(InputPath)"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\SSOAProcessor.hlsl"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								CommandLine="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Utilities\bin\x86\fxc.exe&quot; &quot;$(InputPath)&quot;"
+								Outputs="$(InputPath)"
+							/>
+						</FileConfiguration>
 					</File>
 					<File
 						RelativePath=".\RunDir\resources\shaders\UI.hlsl"
 						>
+						<FileConfiguration
+							Name="Debug|Win32"
+							>
+							<Tool
+								Name="VCCustomBuildTool"
+								CommandLine="&quot;C:\Program Files (x86)\Microsoft DirectX SDK (August 2009)\Utilities\bin\x86\fxc.exe&quot; &quot;$(InputPath)&quot;"
+								Outputs="$(InputPath)"
+							/>
+						</FileConfiguration>
 					</File>
 				</Filter>
 				<Filter
@@ -1910,6 +2021,16 @@
 			<File
 				RelativePath=".\Source\ZEDebug\ZEDebugModule.h"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description=""
+						CommandLine=""
+						Outputs=""
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\ZEDebug\ZEMetaDebugModule.cpp"

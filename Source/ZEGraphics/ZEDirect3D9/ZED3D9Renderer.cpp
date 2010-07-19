@@ -45,6 +45,7 @@
 #include "ZED3D9Module.h"
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9VertexDeclaration.h"
+#include "ZED3D9Shader.h"
 #include "ZEGraphics\ZEMaterial.h"
 #include "ZEGraphics\ZERenderOrder.h"
 #include "ZEGraphics\ZEPointLight.h"
@@ -154,8 +155,10 @@ bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 }
 
 #include "ZEGraphics/ZECanvas.h"
-void ZED3D9Renderer::CreateLightMeshes()
+
+void ZED3D9Renderer::InitializeLightning()
 {
+	// Create Static Vertex Buffer;
 	/*
 	Primitive	Start		Start(Byte)	Vertex Count	Prim. Count		Size (Bytes)
 	Quad		0			0			6				2				288
@@ -181,7 +184,23 @@ void ZED3D9Renderer::CreateLightMeshes()
 	Canvas.AddCone(1.0f, 12, 1.0f);
 	Canvas.AddCone(1.0f, 24, 1.0f);
 
-	LightMeshes = (ZED3D9StaticVertexBuffer*)Canvas.CreateStaticVertexBuffer();
+	if (LightningComponents.LightMeshVB == NULL)
+		LightningComponents.LightMeshVB = (ZED3D9StaticVertexBuffer*)Canvas.CreateStaticVertexBuffer();
+	LightningComponents.PointLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "PLVSMain", 0, "vs_2_0");
+	LightningComponents.PointLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PLPSMain", 0, "vs_2_0");
+}
+
+void ZED3D9Renderer::DeinitializeLightning()
+{
+	ZED3D_RELEASE(LightningComponents.LightMeshVB);
+	ZED3D_RELEASE(LightningComponents.PointLightVS);
+	ZED3D_RELEASE(LightningComponents.PointLightPS);
+	ZED3D_RELEASE(LightningComponents.DirectionalLightVS);
+	ZED3D_RELEASE(LightningComponents.DirectionalLightPS);
+	ZED3D_RELEASE(LightningComponents.ProjectiveLightVS);
+	ZED3D_RELEASE(LightningComponents.ProjectiveLightPS);
+	ZED3D_RELEASE(LightningComponents.OmniProjectiveLightVS);
+	ZED3D_RELEASE(LightningComponents.OmniProjectiveLightPS);
 }
 
 void ZED3D9Renderer::DrawPointLight(ZEPointLight* Light)
@@ -327,7 +346,7 @@ void ZED3D9Renderer::DoForwardPass()
 	}	
 }
 
-void ZED3D9Renderer::CreateRenderTargets()
+void ZED3D9Renderer::InitializeRenderTargets()
 {
 	ZED3D9CommonTools::CreateRenderTarget(&GBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
 	ZED3D9CommonTools::CreateRenderTarget(&GBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
@@ -336,7 +355,7 @@ void ZED3D9Renderer::CreateRenderTargets()
 	ZED3D9CommonTools::CreateRenderTarget(&AccumulationBuffer, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 }
 
-void ZED3D9Renderer::DestroyRenderTargets()
+void ZED3D9Renderer::DeinitializeRenderTargets()
 {
 	ZED3D_RELEASE(GBuffer1);
 	ZED3D_RELEASE(GBuffer2);
@@ -352,6 +371,17 @@ ZED3D9Renderer::ZED3D9Renderer()
 	LBuffer1 = NULL;
 	LBuffer2 = NULL;
 	AccumulationBuffer = NULL;
+
+	LightningComponents.LightMeshVB = NULL;
+	LightningComponents.PointLightVS = NULL;
+	LightningComponents.PointLightPS = NULL;
+	LightningComponents.DirectionalLightVS = NULL;
+	LightningComponents.DirectionalLightPS = NULL;
+	LightningComponents.ProjectiveLightVS = NULL;
+	LightningComponents.ProjectiveLightPS = NULL;
+	LightningComponents.OmniProjectiveLightVS = NULL;
+	LightningComponents.OmniProjectiveLightPS = NULL;
+
 	SetViewPort(zeGraphics->GetFrameBufferViewPort());
 }
 
@@ -373,12 +403,12 @@ ZEViewPort* ZED3D9Renderer::GetViewPort()
 
 bool ZED3D9Renderer::Initialize() 
 { 
-	CreateRenderTargets();
+	InitializeRenderTargets();
 	SSAOProcessor.Renderer = this;
 	HDRProcessor.Initialize();
 	SSAOProcessor.Initialize();
 	
-	CreateLightMeshes();
+	InitializeLightning();
 
 	return true; 
 } 
@@ -387,21 +417,21 @@ void ZED3D9Renderer::Deinitialize()
 {
 	HDRProcessor.Deinitialize();
 	SSAOProcessor.Deinitialize();
-	DestroyRenderTargets();
+	DeinitializeLightning();
 }
 
 void ZED3D9Renderer::DeviceLost()
 {
 	HDRProcessor.OnDeviceLost();
 	SSAOProcessor.OnDeviceLost();
-	DestroyRenderTargets();
+	DeinitializeRenderTargets();
 }
 
 bool ZED3D9Renderer::DeviceRestored()
 {
 	HDRProcessor.OnDeviceRestored();
 	SSAOProcessor.OnDeviceRestored();
-	CreateRenderTargets();
+	InitializeRenderTargets();
 
 	return true;
 }
@@ -482,124 +512,10 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00, 1.0f, 0x00);
 
 	GetDevice()->BeginScene();
-	// Do Pre-Z
-	//DoPreZPass();
-	DoGBufferPass();
-	//DoForwardPass();
+
+		//DoPreZPass();
+		DoGBufferPass();
+		DoLightningPass();
+		//DoForwardPass();
 	GetDevice()->EndScene();
-	//GetDevice()->Present(NULL, NULL, NULL, NULL);
-
-	// Do GBuffer
-	// Do SSAO
-	// Do Light Passes
-	// Do Deferred Forward
-	// Do Forward
-	// Do Post Processes
-
-/*	unsigned int ScreenWidth = zeGraphics->GetScreenWidth();
-	unsigned int ScreenHeight = zeGraphics->GetScreenHeight();
-
-	// Check render module is enabled and the device is not lost
-	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost())
-		return;
-
-	// Set z-buffer options
-	GetDevice()->SetRenderState(D3DRS_DEPTHBIAS, 0);
-	GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, 0);
-	
-	// Enable color output
-	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0000000F);
-
-	// Start Drawing
-	GetDevice()->BeginScene();
-		// Select Render Targets
-		GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
-	//	ZED3D9CommonTools::SetRenderTarget(0, AmbientColorRenderTarget);
-		ZED3D9CommonTools::SetRenderTarget(1, NormalDepthRenderTarget);
-		ZED3D9CommonTools::SetRenderTarget(2, PositionRenderTarget);
-		GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
-
-		// Clear Render Targets
-		GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x0, 1.0f, 0x0);
-
-		// Set z-buffer options
-		GetDevice()->SetRenderState(D3DRS_DEPTHBIAS, 0);
-		GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, 0);
-
-		// Draw ambient
-		for (size_t I = 0; I < NonTransparent.GetCount(); I++)	
-			DrawAmbientPass(&NonTransparent[I], Camera);
-
-		GetDevice()->SetRenderTarget(1, NULL);
-		GetDevice()->SetRenderTarget(2, NULL);
-
-		SSAOProcessor.SetIntensity(2.0f);
-		SSAOProcessor.SetSampleRadius(0.5f);
-		SSAOProcessor.SetSampleScale(0.5f);
-		SSAOProcessor.SetSampleBias(0.1f);
-		SSAOProcessor.InputColor = AmbientColorRenderTarget;
-		SSAOProcessor.InputDepth = NormalDepthRenderTarget;
-		SSAOProcessor.InputPosition = PositionRenderTarget;
-		SSAOProcessor.Output = ViewPort->FrameBuffer;
-		//SSAOProcessor.Process();
-		/*LPDIRECT3DSURFACE9 TempRenderTargetSurface;
-		TempRenderTarget->GetSurfaceLevel(0, &TempRenderTargetSurface);
-		SSAOProcessor.Output = TempRenderTargetSurface;
-		SSAOProcessor.Process();
-
-		//ZED3D9CommonTools::SetRenderTarget(0, Fr);
-
-//		GetDevice()->SetRenderTarget(0, AmbientColorRenderTarget);
-		//GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x0, 1.0f, 0x0);
-		//TempRenderTargetSurface->Release();
-
-		// Setup Texture sampling properties (Will be changed)
-		for (int I = 0; I < 10; I++)
-		{
-			if (I < 8)
-			{
-				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
-			} 
-			else
-			{
-				GetDevice()->SetSamplerState(I, D3DSAMP_BORDERCOLOR, 0x0f);
-				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
-				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSU, D3DTADDRESS_BORDER);
-				GetDevice()->SetSamplerState(I, D3DSAMP_ADDRESSV, D3DTADDRESS_BORDER);
-			}
-
-			if (I == 8)
-			{
-				GetDevice()->SetSamplerState(I, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-				GetDevice()->SetSamplerState(I, D3DSAMP_MAGFILTER, D3DTEXF_POINT);	
-				GetDevice()->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
-			}
-			else
-			{
-				GetDevice()->SetSamplerState(I, D3DSAMP_MINFILTER, (GetModule()->GetAnisotropicFilter() ? D3DTEXF_ANISOTROPIC : D3DTEXF_LINEAR));
-				GetDevice()->SetSamplerState(I, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-				GetDevice()->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-			}
-		}
-
-		// Draw non-transparent object first
-		for (size_t I = 0; I < NonTransparent.GetCount(); I++)
-			DrawLightPasses(&NonTransparent[I], Camera);
-
-		// Draw transparent objects
-		for (size_t I = 0; I < Transparent.GetCount(); I++)
-			DrawAmbientPass(&Transparent[I], Camera);
-
-		// Draw imposers last
-		for (size_t I = 0; I < Imposter.GetCount(); I++)
-			DrawAmbientPass(&Imposter[I], Camera);
-		
-		/*HDRProcessor.Input = TempRenderTarget;
-		HDRProcessor.Target = ViewPort->FrameBuffer;
-		HDRProcessor.DoHDR();
-
-	// Finish Drawing
-	GetDevice()->EndScene();*/
 }

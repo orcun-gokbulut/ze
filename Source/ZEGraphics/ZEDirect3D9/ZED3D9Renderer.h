@@ -49,6 +49,8 @@ class ZEDirectionalLight;
 class ZEProjectiveLight;
 class ZEOmniProjectiveLight;
 class ZED3D9StaticVertexBuffer;
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
 
 class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 {
@@ -76,13 +78,29 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		ZEArray<ZELight*>					Lights;
 		ZEArray<ZEPostProcessor*>			PostProcessors;
 
-		LPDIRECT3DVERTEXBUFFER9				Light;
-		ZED3D9StaticVertexBuffer*			LightMeshes;
+		struct 
+		{
+			ZED3D9StaticVertexBuffer*		LightMeshVB;
+			ZED3D9VertexShader*				PointLightVS;
+			ZED3D9PixelShader*				PointLightPS;
+			ZED3D9VertexShader*				DirectionalLightVS;
+			ZED3D9PixelShader*				DirectionalLightPS;
+			ZED3D9VertexShader*				ProjectiveLightVS;
+			ZED3D9PixelShader*				ProjectiveLightPS;
+			ZED3D9VertexShader*				OmniProjectiveLightVS;
+			ZED3D9PixelShader*				OmniProjectiveLightPS;
+		} LightningComponents;
+
 
 		static bool							CheckRenderOrder(ZERenderOrder* RenderOrder);
 		static void							PumpStreams(ZERenderOrder* RenderOrder);
 
-		void								CreateLightMeshes();
+		void								InitializeLightning();
+		void								DeinitializeLightning();
+
+		void								InitializeRenderTargets();
+		void								DeinitializeRenderTargets();
+
 		void								DrawPointLight(ZEPointLight* Light);
 		void								DrawDirectionalLight(ZEDirectionalLight* Light);
 		void								DrawProjectiveLight(ZEProjectiveLight* Light);
@@ -94,9 +112,7 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		void								DoForwardPass();
 		void								DoPostProcess();
 
-	
-		void								CreateRenderTargets();
-		void								DestroyRenderTargets();
+
 
 	protected:
 											ZED3D9Renderer();
@@ -129,7 +145,3 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 };
 
 #endif
-
-
-
-
