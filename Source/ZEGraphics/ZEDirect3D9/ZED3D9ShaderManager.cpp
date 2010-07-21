@@ -117,7 +117,7 @@ ZED3D9Shader* ZED3D9ShaderManager::GetShader(const char* FileName, const char* F
 	if (Type == ZE_D3D9_ST_PIXEL)
 	{
 		LPDIRECT3DPIXELSHADER9 PixelShader = NULL;
-		if (!ZED3D9CommonTools::CompilePixelShader(&PixelShader, FileName, FunctionName, Profile))
+		if (!ZED3D9CommonTools::CompilePixelShader(&PixelShader, FileName, FunctionName, Profile, Components))
 			return NULL;
 
 		Shader = new ZED3D9PixelShader();
@@ -126,7 +126,7 @@ ZED3D9Shader* ZED3D9ShaderManager::GetShader(const char* FileName, const char* F
 	else if (Type == ZE_D3D9_ST_VERTEX)
 	{
 		LPDIRECT3DVERTEXSHADER9 VertexShader = NULL;
-		if (!ZED3D9CommonTools::CompileVertexShader(&VertexShader, FileName, FunctionName, Profile))
+		if (!ZED3D9CommonTools::CompileVertexShader(&VertexShader, FileName, FunctionName, Profile, Components))
 			return NULL;
 
 		Shader = new ZED3D9VertexShader();

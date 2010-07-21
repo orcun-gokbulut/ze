@@ -92,6 +92,10 @@ ZED3D9FixedMaterial::ZED3D9FixedMaterial()
 
 void ZED3D9FixedMaterial::SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const
 {
+	GetDevice()->SetSamplerState(Id, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(Id, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(Id, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+
 	switch(AddressU)
 	{
 		case ZE_TAM_WRAP:
@@ -220,9 +224,6 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* 
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&WorldViewMatrix, 4);
-
-	// Set Camera Position
-	GetDevice()->SetVertexShaderConstantF(16, (float*)&ZEVector4(Camera->GetWorldPosition(), 1.0f), 1);
 
 	// Setup ZCulling
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)

@@ -40,12 +40,12 @@
 float4x4 WorldViewProjMatrix : register(vs, c0);
 float4x4 WorldViewMatrix : register(vs, c4);
 float3 ViewVector : register(vs, c8);
-
+float2 PixelSize : register(vs, c9);
 
 // Light Parameters
 float4 LightParameters0 : register(ps, c0);
 float4 LightParameters1 : register(ps, c1);
-float4 LightParameters1 : register(ps, c2);
+float4 LightParameters2 : register(ps, c2);
 
 #define LightPosition			LightParameters0.xyz
 #define LightColor				LightParameters1.xyz
@@ -60,29 +60,35 @@ sampler2D GBuffer2;
 // Point Light
 struct PLVSOutput
 {
-	float3 Position : POSITION0;
+	float4 Position : POSITION0;
 	float2 ScreenPosition : TEXCOORD0;
-	float3 ViewVector : TEXCOORD0;
+	float3 ViewVector : TEXCOORD1;
 };
 
 PLVSOutput PLVSMain(float3 Position : POSITION0)
 {
 	PLVSOutput Output;
+	
 	Output.Position = mul(Position, WorldViewProjMatrix);
+	Output.ScreenPosition = Output.Position * 0.5f - 0.5f + PixelSize * 0.5f;
 	Output.ViewVector = Output.Position * ViewVector;
+	
+	return Output;
 }
 
 struct PLVSInput
 {
 	float2 ScreenPosition : TEXCOORD0;
-	float3 ViewVector : TEXCOORD0;
+	float3 ViewVector : TEXCOORD1;
 };
 
 float4 PLPSMain(PLVSInput Input) : COLOR0
 {
-	float3 Position = GetViewPosition(Input.ScreenPosition, Input.ViewVector);
-	float3 Normal = GetViewNormal(Input.ScreenPosition);
-	float3 SpecularPower = GetSpecularPower(GetSpecularGlossiness(Input.ScreenPosition));
+	float4 Output;
+	
+	float3 Position = GetViewPosition(GBuffer1, Input.ScreenPosition, Input.ViewVector);
+	float3 Normal = GetViewNormal(GBuffer2, Input.ScreenPosition);
+	float3 SpecularPower = GetSpecularPower(GBuffer2, Input.ScreenPosition);
 
 	// Light Derived Parameters
 	float3 LightDisplacement = LightPosition - Position;
@@ -94,7 +100,9 @@ float4 PLPSMain(PLVSInput Input) : COLOR0
 	float AngularAttenuation = saturate(dot(LightDirection, Normal));
 	float DistanceAttenuation = 1.0f / dot(LightAttenuationFactors, float3(LightDistance * LightDistance, LightDistance, 1.0f));
 	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensity * LightColor;
-	Output.w = AngularAttenuation * pow(dot(Normal * HalfVector), SpecularPower) * DistanceAttenuation;
+	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
+	
+	return Output;
 }
 
 // Directional Light

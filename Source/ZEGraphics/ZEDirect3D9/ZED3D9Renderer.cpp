@@ -187,7 +187,7 @@ void ZED3D9Renderer::InitializeLightning()
 	if (LightningComponents.LightMeshVB == NULL)
 		LightningComponents.LightMeshVB = (ZED3D9StaticVertexBuffer*)Canvas.CreateStaticVertexBuffer();
 	LightningComponents.PointLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "PLVSMain", 0, "vs_2_0");
-	LightningComponents.PointLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PLPSMain", 0, "vs_2_0");
+	LightningComponents.PointLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PLPSMain", 0, "ps_2_0");
 }
 
 void ZED3D9Renderer::DeinitializeLightning()
@@ -230,6 +230,8 @@ void ZED3D9Renderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 
 void ZED3D9Renderer::DoPreZPass()
 {
+	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
+
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00000000);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
@@ -251,11 +253,8 @@ void ZED3D9Renderer::DoPreZPass()
 
 void ZED3D9Renderer::DoGBufferPass()
 {
-	//ZED3D9CommonTools::SetRenderTarget(0, GBuffer1);
+	ZED3D9CommonTools::SetRenderTarget(0, GBuffer1);
 	ZED3D9CommonTools::SetRenderTarget(1, GBuffer2);
-
-	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
-	//GetDevice()->SetRenderTarget(1, ViewPort->FrameBuffer);
 
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
@@ -278,10 +277,17 @@ void ZED3D9Renderer::DoGBufferPass()
 
 		PumpStreams(RenderOrder);
 	}
+	
+	ZED3D9CommonTools::SetRenderTarget(0, NULL);
+	ZED3D9CommonTools::SetRenderTarget(1, NULL);
 }
 
 void ZED3D9Renderer::DoLightningPass()
 {
+	// Render Targets
+	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
+	ZED3D9CommonTools::SetRenderTarget(1, LBuffer2);
+
 	// Z-Buffer
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
@@ -313,10 +319,6 @@ void ZED3D9Renderer::DoLightningPass()
 	GetDevice()->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	// Render Targets
-	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
-	ZED3D9CommonTools::SetRenderTarget(1, LBuffer2);
-
 	for (size_t I = 0; I < Lights.GetCount(); I++)
 		switch(Lights[I]->GetLightType())
 		{
@@ -332,10 +334,16 @@ void ZED3D9Renderer::DoLightningPass()
 			DrawOmniProjectiveLight((ZEOmniProjectiveLight*)Lights[I]);
 			break;
 		}
+
+	// Render Targets
+	ZED3D9CommonTools::SetRenderTarget(0, NULL);
+	ZED3D9CommonTools::SetRenderTarget(1, NULL);
 }
 
 void ZED3D9Renderer::DoForwardPass()
 {
+	ZED3D9CommonTools::SetRenderTarget(0, AccumulationBuffer);
+
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
 		ZERenderOrder* RenderOrder = &NonTransparent[I];
@@ -343,13 +351,13 @@ void ZED3D9Renderer::DoForwardPass()
 		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
 			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
 		PumpStreams(RenderOrder);
-	}	
+	}
 }
 
 void ZED3D9Renderer::InitializeRenderTargets()
 {
-	ZED3D9CommonTools::CreateRenderTarget(&GBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
-	ZED3D9CommonTools::CreateRenderTarget(&GBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
+	ZED3D9CommonTools::CreateRenderTarget(&GBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
+	ZED3D9CommonTools::CreateRenderTarget(&GBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 	ZED3D9CommonTools::CreateRenderTarget(&LBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 	ZED3D9CommonTools::CreateRenderTarget(&LBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 	ZED3D9CommonTools::CreateRenderTarget(&AccumulationBuffer, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
@@ -506,8 +514,9 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 	GetDevice()->SetRenderState(D3DRS_DEPTHBIAS, 0);
 	GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, 0);
 
-	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
-	GetDevice()->SetRenderTarget(1, NULL);
+	/*GetDevice()->SetRenderTarget(0, GBuffer1);
+	GetDevice()->SetRenderTarget(1, GBuffer2);*/
+
 	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00, 1.0f, 0x00);
 
@@ -517,5 +526,10 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 		DoGBufferPass();
 		DoLightningPass();
 		//DoForwardPass();
+		SSAOProcessor.InputNormal = GBuffer1;
+		SSAOProcessor.InputDepth = GBuffer2;
+		SSAOProcessor.Output = ViewPort->FrameBuffer;
+		SSAOProcessor.Process();
+
 	GetDevice()->EndScene();
 }

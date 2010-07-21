@@ -33,14 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D ColorInput : register(s0);
-sampler2D NormalDepthInput : register(s1);
-sampler2D RandomNormalInput : register(s2);
-sampler2D PositionInput : register(s3);
+sampler2D DepthBuffer : register(s0);
+sampler2D NormalBuffer : register(s1);
+sampler2D RandomNormalBuffer : register(s2);
 
 float4 Parameters0 : register(c0);
-float2 Parameters1 : register(c1);
-float3 Parameters2 : register(c2);
+float2 PixelSize : register(c1);
+float3 ViewVector_ : register(c2);
 
 const float2 SampleKernel[4] : register(c5);
 
@@ -49,8 +48,7 @@ const float2 SampleKernel[4] : register(c5);
 #define SampleScale		Parameters0[2]
 #define SampleBias		Parameters0[3]
 
-#define PixelSize		(Parameters1.xy) //vs
-#define ViewVector_		(Parameters2.xyz)
+#include "GBuffer.hlsl"
 
 struct VSInput
 {
@@ -78,29 +76,15 @@ struct PSOutput
    float4 Color : COLOR0;
 };
 
-float3 GetPixelPosition(in float2 Texcoord, in float3 ViewVector)
-{
-	return tex2D(PositionInput, Texcoord).xyz;
-	//return ViewVector * tex2D(NormalDepthInput, Texcoord).w;
-}
-
-void GetPixelPositionNormal(in float2 Texcoord, in float3 ViewVector, out float3 Position, out float3 Normal)
-{
-	float4 PixelNormalDepth = tex2D(NormalDepthInput, Texcoord);
-	
-	Position = tex2D(PositionInput, Texcoord).xyz;
-	//Position = ViewVector * PixelNormalDepth.w;
-	Normal = PixelNormalDepth.xyz;
-}
-
 float2 GetRandomVector(in float2 Texcoord)
 {
-	return normalize(tex2D(RandomNormalInput, Texcoord).xy * 2.0f - 1.0f);
+	return normalize(tex2D(RandomNormalBuffer, Texcoord).xy * 2.0f - 1.0f);
 }
 
 float AmbientOcclusion(in float2 Texcoord, in float3 PixelPosition, in float3 PixelNormal, in float3 ViewVector)
 {
-	float3 Diff = GetPixelPosition(Texcoord, ViewVector) - PixelPosition;// + float3(0.0f, 0.0f, 0.001f);
+	//float3 Diff = GetViewPosition(DepthBuffer, Texcoord, ViewVector) - PixelPosition;
+	float3 Diff = tex2D(DepthBuffer, Texcoord).yzw - PixelPosition;
 	const float3 v = normalize(Diff);
 	const float Dist = length(Diff) * SampleScale;
 	return max(0.0f, dot(PixelNormal, v) - SampleBias) * (1.0f / (1.0f + Dist)) * Intensity;
@@ -114,8 +98,7 @@ VSOutput VSMain(VSInput Input)
 	Output.ScreenTexcoord = Input.Texcoord + PixelSize * 0.5f;
 	Output.RandomTexcoord = Output.ScreenTexcoord * (1.0f / PixelSize) / 64.0f;
 	
-	Output.ViewVector.x = Input.Position.x * ViewVector_.x;
-	Output.ViewVector.y = Input.Position.y * ViewVector_.y;
+	Output.ViewVector.xy = Input.Position.xy * ViewVector_.xy;
 	Output.ViewVector.z = ViewVector_.z;
 
 	return Output;
@@ -125,8 +108,9 @@ PSOutput PSMain(PSInput Input)
 {   
 	PSOutput Output;
 	
-	float3 PixelPosition, PixelNormal;
-	GetPixelPositionNormal(Input.Texcoord, Input.ViewVector, PixelPosition, PixelNormal);
+	float3 PixelPosition = tex2D(DepthBuffer, Input.Texcoord).yzw;//GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector);
+	float3 PixelNormal = GetViewNormal(NormalBuffer, Input.Texcoord);
+	
 
 	float2 RandomNormal = GetRandomVector(Input.RandomTexcoord);
 
@@ -146,6 +130,7 @@ PSOutput PSMain(PSInput Input)
 	} 
 	
 	Occlusion /= (float)IterationCount * 4.0;
-	Output.Color = (1.0f - Occlusion); //* tex2D(ColorInput, Input.Texcoord);
+	Output.Color = (1.0f - Occlusion);
+	//Output.Color = float4(abs(PixelPosition - GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector)) * 10, 0.0f);
 	return Output;
 }

@@ -35,10 +35,10 @@
 
 void SkinTransform(inout VSInput Vertex)
 {
-	#ifdef ZE_SHADER_SKINTRANSFORM
+	#if defined(ZE_SHADER_SKIN_TRANSFORM)
 		float4 Position = float4(mul(Vertex.Position, BoneMatrices[Vertex.BoneIndices[0]]).xyz * Vertex.BoneWeights[0], 1.0f);
 		float3 Normal = mul(Vertex.Normal, BoneMatrices[Vertex.BoneIndices[0]]) * Vertex.BoneWeights[0];
-		#ifdef ZE_SHADER_TANGENT_SPACE
+		#if defined(ZE_SHADER_TANGENT_SPACE)
 			float3 Tangent = mul(Vertex.Tangent, BoneMatrices[Vertex.BoneIndices[0]]) * Vertex.BoneWeights[0];
 			float3 Binormal = mul(Vertex.Binormal, BoneMatrices[Input.BoneIndices[0]]) * Vertex.BoneWeights[0];
 		#endif
@@ -47,7 +47,7 @@ void SkinTransform(inout VSInput Vertex)
 		{
 			Position.xyz += mul(Vertex.Position, BoneMatrices[Vertex.BoneIndices[I]]).xyz * Vertex.BoneWeights[I];
 			Normal += mul(Vertex.Normal, BoneMatrices[Vertex.BoneIndices[I]]) * Vertex.BoneWeights[I];
-			#ifdef ZE_SHADER_TANGENT_SPACE
+			#if defined(ZE_SHADER_TANGENT_SPACE)
 				Tangent += mul(Vertex.Tangent, BoneMatrices[Vertex.BoneIndices[I]]) * Vertex.BoneWeights[I];
 				Binormal += mul(Vertex.Binormal, BoneMatrices[Input.BoneIndices[I]]) * Vertex.BoneWeights[I];
 			#endif
@@ -55,7 +55,7 @@ void SkinTransform(inout VSInput Vertex)
 		
 		Vertex.Position = Position;
 		Vertex.Normal = Normal;
-		#ifdef ZE_SHADER_TANGENT_SPACE 
+		#if defined(ZE_SHADER_TANGENT_SPACE)
 			Vertex.Tangent = Tangent;
 			Vertex.Binormal = Binormal;
 		#endif

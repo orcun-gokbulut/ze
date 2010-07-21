@@ -33,32 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-float GetViewPosition(float2 Texcoord, float3 ViewVector)
+float3 GetViewPosition(sampler2D GBuffer, float2 Texcoord, float3 ViewVector)
 {
-	return ViewVector * tex2D(GBuffer1, Texcoord).x;
+	return ViewVector * tex2D(GBuffer, Texcoord).x;
 }
 
-float GetViewDepth(float2 Texcoord)
+float GetViewDepth(sampler2D GBuffer, float2 Texcoord, float3 ViewVector)
 {
-	return tex2D(GBuffer1, Texcoord).x;
+	return ViewVector.z * tex2D(GBuffer, Texcoord).x;
 }
 
-float3 GetViewNormal(float2 Texcoord)
+float3 GetViewNormal(sampler2D GBuffer, float2 Texcoord)
 {
-	return 2.0f * tex2D(GBuffer2, Texcoord).xyz - 1.0f;
+	return 2.0f * tex2D(GBuffer, Texcoord).xyz - 1.0f;
 }
 
-float GetSpecularGlossiness(float2 Texcoord)
+float GetSpecularGlossiness(sampler2D GBuffer, float2 Texcoord)
 {
-	return tex2D(GBuffer2, Texcoord).w;
+	return tex2D(GBuffer, Texcoord).w;
 }
 
-float GetSpecularPower(float Glossiness)
+float GetSpecularPower(sampler2D GBuffer, float2 Texcoord)
 {
-	return 128.0f - Glossiness * 128.0f;
+	return 128.0f - GetSpecularGlossiness(GBuffer, Texcoord) * 120.0f;
 }
 
-float2 GetScreenVelocity(float2 Texcoord)
+float2 GetScreenVelocity(sampler2D GBuffer, float2 Texcoord)
 {
-	//return tex2D(GBuffer3, Texcoord).xy;
+	return tex2D(GBuffer, Texcoord).xy;
 }

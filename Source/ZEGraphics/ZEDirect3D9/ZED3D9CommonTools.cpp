@@ -39,7 +39,7 @@
 #include <stdio.h>
 
 #ifdef ZE_DEBUG_SHADERS
-	#define ZE_SHADER_COMPILER_PARAMETERS	(D3DXSHADER_SKIPOPTIMIZATION)
+	#define ZE_SHADER_COMPILER_PARAMETERS	(D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION)
 #else
 	#define ZE_SHADER_COMPILER_PARAMETERS	D3DXSHADER_OPTIMIZATION_LEVEL3
 #endif
@@ -75,6 +75,12 @@ class ZED3DXInclude : public ID3DXInclude
 
 void ZED3D9CommonTools::SetRenderTarget(size_t RenderTarget, LPDIRECT3DTEXTURE9 Texture)
 {
+	if (Texture == NULL)
+	{
+		GetDevice()->SetRenderTarget(RenderTarget, NULL);
+		return;
+	}
+
 	LPDIRECT3DSURFACE9 Surface;
 	Texture->GetSurfaceLevel(0, &Surface);
 	GetDevice()->SetRenderTarget(RenderTarget, Surface);
@@ -105,13 +111,21 @@ bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShade
 
 	ZED3D_RELEASE(*VertexShader);
 	
-	D3DXMACRO Macros[2];
-	char ComponentText[12];
-	sprintf(ComponentText, "%X", Components);
-	Macros[0].Name = "ZE_SHADER_COMPONENTS";
-	Macros[0].Definition = ComponentText;
-	Macros[1].Name = NULL;
-	Macros[1].Definition = NULL;
+	D3DXMACRO Macros[33];
+	char ComponentTexts[32][26];
+
+	int ComponentCount = 0;
+	for (int I = 0; I < 32; I++)
+		if (Components & (1 << I))
+		{
+			sprintf(ComponentTexts[ComponentCount], "ZE_SHADER_COMPONENT_%d", I);
+			Macros[ComponentCount].Name = ComponentTexts[ComponentCount];
+			Macros[ComponentCount].Definition = "";
+			ComponentCount++;
+		}
+		Macros[ComponentCount].Name = NULL;
+		Macros[ComponentCount].Definition = NULL;
+
 
 	if (D3DXCompileShaderFromFile(FileName, Macros, &D3DIncludeInterface, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
@@ -152,14 +166,20 @@ bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, 
 
 	ZED3D_RELEASE(*PixelShader);
 
-	D3DXMACRO Macros[2];
-	char ComponentText[12];
-	sprintf(ComponentText, "%X", Components);
-	Macros[0].Name = "ZE_SHADER_COMPONENTS";
-	Macros[0].Definition = ComponentText;
-	Macros[1].Name = NULL;
-	Macros[1].Definition = NULL;
+	D3DXMACRO Macros[33];
+	char ComponentTexts[32][26];
 
+	int ComponentCount = 0;
+	for (int I = 0; I < 32; I++)
+		if (Components & (1 << I))
+		{
+			sprintf(ComponentTexts[ComponentCount], "ZE_SHADER_COMPONENT_%d", I);
+			Macros[ComponentCount].Name = ComponentTexts[ComponentCount];
+			Macros[ComponentCount].Definition = "";
+			ComponentCount++;
+		}
+		Macros[ComponentCount].Name = NULL;
+		Macros[ComponentCount].Definition = NULL;
 	if (D3DXCompileShaderFromFile(FileName, Macros, &D3DIncludeInterface, MainFunction, ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
 		if (CompilerOutput == NULL)
@@ -197,13 +217,20 @@ bool ZED3D9CommonTools::CompileVertexShaderFromMemory(LPDIRECT3DVERTEXSHADER9* V
 	
 	ZED3D_RELEASE(*VertexShader);
 
-	D3DXMACRO Macros[2];
-	char ComponentText[12];
-	sprintf(ComponentText, "%X", Components);
-	Macros[0].Name = "ZE_SHADER_COMPONENTS";
-	Macros[0].Definition = ComponentText;
-	Macros[1].Name = NULL;
-	Macros[1].Definition = NULL;
+	D3DXMACRO Macros[33];
+	char ComponentTexts[32][26];
+
+	int ComponentCount = 0;
+	for (int I = 0; I < 32; I++)
+		if (Components & (1 << I))
+		{
+			sprintf(ComponentTexts[ComponentCount], "ZE_SHADER_COMPONENT_%d", I);
+			Macros[ComponentCount].Name = ComponentTexts[ComponentCount];
+			Macros[ComponentCount].Definition = "";
+			ComponentCount++;
+		}
+		Macros[ComponentCount].Name = NULL;
+		Macros[ComponentCount].Definition = NULL;
 
 	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, &D3DIncludeInterface, "vs_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
@@ -236,13 +263,20 @@ bool ZED3D9CommonTools::CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* Pix
 	
 	ZED3D_RELEASE(*PixelShader);
 
-	D3DXMACRO Macros[2];
-	char ComponentText[12];
-	sprintf(ComponentText, "%X", Components);
-	Macros[0].Name = "ZE_SHADER_COMPONENTS";
-	Macros[0].Definition = ComponentText;
-	Macros[1].Name = NULL;
-	Macros[1].Definition = NULL;
+	D3DXMACRO Macros[33];
+	char ComponentTexts[32][26];
+
+	int ComponentCount = 0;
+	for (int I = 0; I < 32; I++)
+		if (Components & (1 << I))
+		{
+			sprintf(ComponentTexts[ComponentCount], "ZE_SHADER_COMPONENT_%d", I);
+			Macros[ComponentCount].Name = ComponentTexts[ComponentCount];
+			Macros[ComponentCount].Definition = "";
+			ComponentCount++;
+		}
+		Macros[ComponentCount].Name = NULL;
+		Macros[ComponentCount].Definition = NULL;
 
 	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, &D3DIncludeInterface, "ps_main", ShaderProfile, ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{

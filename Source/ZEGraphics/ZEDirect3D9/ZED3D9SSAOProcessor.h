@@ -51,9 +51,8 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 		LPDIRECT3DVERTEXSHADER9			VertexShader;
 		LPDIRECT3DPIXELSHADER9			PixelShader;
 
-		LPDIRECT3DTEXTURE9				InputColor;
 		LPDIRECT3DTEXTURE9				InputDepth;
-		LPDIRECT3DTEXTURE9				InputPosition;
+		LPDIRECT3DTEXTURE9				InputNormal;
 		LPDIRECT3DSURFACE9				Output;
 
 		int								IterationCount;
