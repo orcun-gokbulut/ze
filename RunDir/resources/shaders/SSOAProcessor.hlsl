@@ -83,8 +83,8 @@ float2 GetRandomVector(in float2 Texcoord)
 
 float AmbientOcclusion(in float2 Texcoord, in float3 PixelPosition, in float3 PixelNormal, in float3 ViewVector)
 {
-	//float3 Diff = GetViewPosition(DepthBuffer, Texcoord, ViewVector) - PixelPosition;
-	float3 Diff = tex2D(DepthBuffer, Texcoord).yzw - PixelPosition;
+	float3 Diff = GetViewPosition(DepthBuffer, Texcoord, ViewVector) - PixelPosition;
+	//float3 Diff = tex2D(DepthBuffer, Texcoord).yzw - PixelPosition;
 	const float3 v = normalize(Diff);
 	const float Dist = length(Diff) * SampleScale;
 	return max(0.0f, dot(PixelNormal, v) - SampleBias) * (1.0f / (1.0f + Dist)) * Intensity;
@@ -108,7 +108,8 @@ PSOutput PSMain(PSInput Input)
 {   
 	PSOutput Output;
 	
-	float3 PixelPosition = tex2D(DepthBuffer, Input.Texcoord).yzw;//GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector);
+	//float3 PixelPosition = tex2D(DepthBuffer, Input.Texcoord).yzw;
+	float3 PixelPosition = GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector);
 	float3 PixelNormal = GetViewNormal(NormalBuffer, Input.Texcoord);
 	
 
@@ -131,6 +132,9 @@ PSOutput PSMain(PSInput Input)
 	
 	Occlusion /= (float)IterationCount * 4.0;
 	Output.Color = (1.0f - Occlusion);
-	//Output.Color = float4(abs(PixelPosition - GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector)) * 10, 0.0f);
+	float3 OrigPos = tex2D(DepthBuffer, Input.Texcoord).yzw;
+	float3 DepthPos = GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector);
+	Output.Color = float4(abs(OrigPos - DepthPos) * 1000, 0.0f);
+	//Output.Color = GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector).xyzz;
 	return Output;
 }
