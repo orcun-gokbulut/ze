@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMain.cpp
+ Zinek Engine - ZEGraphicsDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,47 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore\ZECore.h"
+#pragma once
+#ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
+#define __ZE_GRAPHICS_DEBUG_MODULE_H__
 
-#define NOMINMAX
-#define WINDOWS_LEAN_AND_MEAN
-#include <windows.h>
+#include "ZEDebugModule.h"
+#include "ZEGame\ZEModelBrush.h"
 
-#include "ZECore\ZECore.h"
-#include "ZECore\ZEConsoleWindow.h"
-#include "ZECore\ZEModuleManager.h"
-#include "ZECore\ZEWindow.h"
+class ZEPlayer;
+class ZEPointLight;
 
-#include "ZEDebug\ZEPhysicsDebugModule.h"
-#include "ZEDebug\ZEGraphicsDebugModule.h"
-#include "ZEDebug\ZESoundDebugModule.h"
-#include "ZEDebug\ZEMetaDebugModule.h"
-
-extern HINSTANCE ApplicationInstance;
-
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
+class ZEGraphicsDebugModule : public ZEDebugModule
 {
-	MessageBox(NULL, "Attach it while you can !", "Zinek Engine", MB_OK); 
-	_set_SSE2_enable(1); 
-	ApplicationInstance = hInstance;
-	
-	ZEGraphicsDebugModule DebugModule;
-	zeCore->SetDebugComponent(&DebugModule);
+	private:
+		ZEPlayer*				Player;
+		ZEPointLight*			PointLight1;
+		ZEPointLight*			PointLight2;
+		ZEPointLight*			PointLight3;
+		ZEPointLight*			PointLight4;
+		ZEPointLight*			PointLight5;
 
-	zeCore->GetOptions()->Load("options.ini");
-	zeCore->GetOptions()->ResetChanges();
-	zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_GRAPHICS));
-	zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_SOUND));
-	zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_INPUT));
-	zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_PHYSICS));
-	ZEConsoleWindow ConsoleWindow;
-	zeCore->GetConsole()->SetConsoleInterface(&ConsoleWindow);
-	zeCore->GetWindow()->SetWindowType(zeCore->GetOptions()->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean() ? ZE_WT_FULLSCREEN : ZE_WT_RESIZABLE);
-	zeCore->GetWindow()->SetWindowSize(zeCore->GetOptions()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger(), zeCore->GetOptions()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger());
 
- 	if (zeCore->StartUp())
-		zeCore->Run(); 
-}
+	public:
+		virtual bool			Initialize();
+		virtual void			Deinitialize();
+
+
+								ZEGraphicsDebugModule();
+		virtual					~ZEGraphicsDebugModule();
+};
+
+#endif
 
 
 

@@ -57,6 +57,7 @@ class ZECamera;
 class ZERenderOrder;
 class ZETexture2D;
 class ZEViewPort;
+class ZELight;
 
 class ZERenderer
 {
@@ -82,6 +83,8 @@ class ZERenderer
 
 		virtual void						AddToRenderList(ZERenderOrder* RenderOrder) = 0;
 		virtual void						ClearList() = 0;
+		
+		virtual void						SetLights(ZESmartArray<ZELight*>& Lights) = 0;
 
 		virtual void						Render(float ElaspedTime = 0) = 0;
 

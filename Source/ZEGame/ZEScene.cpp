@@ -403,6 +403,8 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 					Entities[I]->GetName(), Entities[I]->GetClassDescription()->GetName());
 			}
 
+	Renderer->SetLights(VisibleLights);
+
 	DrawParameters.Lights = VisibleLights;
 	if (Map != NULL)
 		Map->Render(&DrawParameters);

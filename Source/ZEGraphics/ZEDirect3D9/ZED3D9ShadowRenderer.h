@@ -87,6 +87,8 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		virtual void							SetViewPort(ZEViewPort* ViewPort);
 		virtual ZEViewPort*						GetViewPort();
 
+		virtual void							SetLights(ZESmartArray<ZELight*>& Lights);
+
 		virtual void							AddToRenderList(ZERenderOrder* RenderOrder);
 		virtual void							ClearList();
 

@@ -64,7 +64,7 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		LPDIRECT3DTEXTURE9					GBuffer2;
 		LPDIRECT3DTEXTURE9					LBuffer1;
 		LPDIRECT3DTEXTURE9					LBuffer2;
-		LPDIRECT3DTEXTURE9					AccumulationBuffer;
+		LPDIRECT3DTEXTURE9					ABuffer;
 
 		ZED3D9HDRProcessor					HDRProcessor;
 		ZED3D9SSAOProcessor					SSAOProcessor;
@@ -75,7 +75,7 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		
 		ZECamera*							Camera;
 
-		ZEArray<ZELight*>					Lights;
+		ZESmartArray<ZELight*>				Lights;
 		ZEArray<ZEPostProcessor*>			PostProcessors;
 
 		struct 
@@ -136,7 +136,7 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor);
 		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor);
 
-		virtual void						SetLights(ZEArray<ZELight*>& Lights);
+		virtual void						SetLights(ZESmartArray<ZELight*>& Lights);
 		
 		virtual void						AddToRenderList(ZERenderOrder* RenderOrder);
 		virtual void						ClearList();

@@ -108,7 +108,6 @@ PSOutput PSMain(PSInput Input)
 {   
 	PSOutput Output;
 	
-	//float3 PixelPosition = tex2D(DepthBuffer, Input.Texcoord).yzw;
 	float3 PixelPosition = GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector);
 	float3 PixelNormal = GetViewNormal(NormalBuffer, Input.Texcoord);
 	
@@ -132,9 +131,10 @@ PSOutput PSMain(PSInput Input)
 	
 	Occlusion /= (float)IterationCount * 4.0;
 	Output.Color = (1.0f - Occlusion);
-	float3 OrigPos = tex2D(DepthBuffer, Input.Texcoord).yzw;
-	float3 DepthPos = GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector);
-	Output.Color = float4(abs(OrigPos - DepthPos) * 1000, 0.0f);
+	//float3 OrigPos = tex2D(DepthBuffer, Input.Texcoord).yzw;
+	//float3 DepthPos = GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector);
+	//Output.Color = float4(abs(OrigPos - DepthPos), 0.0f);
 	//Output.Color = GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector).xyzz;
+	//Output.Color = tex2D(DepthBuffer, Input.Texcoord).x;
 	return Output;
 }

@@ -37,10 +37,10 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Vertex Transformation
-float4x4 WorldViewProjMatrix : register(vs, c0);
-float4x4 WorldViewMatrix : register(vs, c4);
-float3 ViewVector : register(vs, c8);
-float2 PixelSize : register(vs, c9);
+float3 ViewVector : register(vs, c0);
+float2 PixelSize : register(vs, c1);
+
+float4x4 WorldViewProjMatrix : register(vs, c4);
 
 // Light Parameters
 float4 LightParameters0 : register(ps, c0);
@@ -48,6 +48,7 @@ float4 LightParameters1 : register(ps, c1);
 float4 LightParameters2 : register(ps, c2);
 
 #define LightPosition			LightParameters0.xyz
+#define LightRange			
 #define LightColor				LightParameters1.xyz
 #define LightIntensity			LightParameters1.w
 #define LightAttenuationFactors	LightParameters2.xyz

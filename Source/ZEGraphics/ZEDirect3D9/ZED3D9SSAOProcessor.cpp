@@ -181,9 +181,9 @@ void ZED3D9SSAOProcessor::Process()
 	GetDevice()->SetVertexShaderConstantF(1, (const float*)&ZEVector4(1.0f / SurfaceDesc.Width, 1.0f / SurfaceDesc.Height, 0.0f, 0.0f), 1);
 	
 	ZEVector4 ViewVector;
-	ViewVector.y = tanf(Renderer->GetCamera()->GetFOV() * 0.5f) * Renderer->GetCamera()->GetFarZ();
+	ViewVector.y = tanf(Renderer->GetCamera()->GetFOV() * 0.5f);// * Renderer->GetCamera()->GetFarZ();
 	ViewVector.x = ViewVector.y * Renderer->GetViewPort()->GetAspectRatio();
-	ViewVector.z = Renderer->GetCamera()->GetFarZ();
+	ViewVector.z = 1.0f;//Renderer->GetCamera()->GetFarZ();
 	ViewVector.w = 0.0f;
 	GetDevice()->SetVertexShaderConstantF(2, (const float*)&ViewVector, 1);
 
@@ -202,19 +202,12 @@ void ZED3D9SSAOProcessor::Process()
 	GetDevice()->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 	GetDevice()->SetTexture(1, InputNormal);
 
-	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
+	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
+	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)RandomTextureResource->GetTexture())->Texture);
-
-	/*GetDevice()->SetSamplerState(3, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-	GetDevice()->SetSamplerState(3, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-	GetDevice()->SetSamplerState(3, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-	GetDevice()->SetSamplerState(3, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-	GetDevice()->SetSamplerState(3, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-	GetDevice()->SetTexture(3, InputPosition);*/
 
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 }

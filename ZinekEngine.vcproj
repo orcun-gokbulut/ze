@@ -2033,6 +2033,14 @@
 				</FileConfiguration>
 			</File>
 			<File
+				RelativePath=".\Source\ZEDebug\ZEGraphicsDebugModule.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEDebug\ZEGraphicsDebugModule.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEDebug\ZEMetaDebugModule.cpp"
 				>
 			</File>

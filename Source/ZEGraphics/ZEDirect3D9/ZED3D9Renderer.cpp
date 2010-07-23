@@ -52,6 +52,7 @@
 #include "ZEGraphics\ZEDirectionalLight.h"
 #include "ZEGraphics\ZEProjectiveLight.h"
 #include "ZEGraphics\ZEOmniProjectiveLight.h"
+#include "ZEGraphics\ZECamera.h"
 #include "ZECore\ZEError.h"
 
 #pragma warning(disable:4267)
@@ -205,8 +206,36 @@ void ZED3D9Renderer::DeinitializeLightning()
 
 void ZED3D9Renderer::DrawPointLight(ZEPointLight* Light)
 {
+	// Light Parameters
+	struct
+	{
+		ZEVector3		Position;
+		float			Range;
+		ZEVector3		Color;
+		float			Intensity;
+		ZEVector3		Attenuation;
+		float			Reserved1;
+	} LightParameters;
+	ZEMatrix4x4::Transform(LightParameters.Position, Camera->GetViewTransform(), Light->GetWorldPosition());
+	LightParameters.Color = Light->GetColor();
+	LightParameters.Attenuation = Light->GetAttenuation();
+	LightParameters.Range = Light->GetRange();
+	LightParameters.Intensity = Light->GetIntensity();
+	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 3);
+	
+	// Transformation
+	ZEMatrix4x4 WorldTransform;
+	ZEMatrix4x4 WorldViewProjTransform;
+	ZEMatrix4x4::CreateOrientation(WorldTransform, LightParameters.Position, 
+		ZEQuaternion::Identity, 
+		ZEVector3(LightParameters.Range, LightParameters.Range, LightParameters.Range));
+	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
+	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjTransform, 4);
+	
+	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
+	
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
-	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 942, 1200); // Sphere 2
+	//GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 942, 1200); // Sphere 2
 }
 
 void ZED3D9Renderer::DrawDirectionalLight(ZEDirectionalLight* Light)
@@ -278,14 +307,14 @@ void ZED3D9Renderer::DoGBufferPass()
 		PumpStreams(RenderOrder);
 	}
 	
-	ZED3D9CommonTools::SetRenderTarget(0, NULL);
 	ZED3D9CommonTools::SetRenderTarget(1, NULL);
 }
 
 void ZED3D9Renderer::DoLightningPass()
 {
 	// Render Targets
-	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
+	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
+	//ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
 	ZED3D9CommonTools::SetRenderTarget(1, LBuffer2);
 
 	// Z-Buffer
@@ -319,20 +348,33 @@ void ZED3D9Renderer::DoLightningPass()
 	GetDevice()->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
+	// ViewVector & PixelSize
+	ZEVector4 ViewVector;
+	ViewVector.y = tanf(Camera->GetFOV() * 0.5f) * Camera->GetFarZ();
+	ViewVector.x = ViewVector.y * ViewPort->GetAspectRatio();
+	ViewVector.z = Camera->GetFarZ();
+	ViewVector.w = 0.0f;
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ViewVector, 1);
+	GetDevice()->SetVertexShaderConstantF(1, (const float*)&ZEVector4(1.0f / ViewPort->GetWidth(), 1.0f / ViewPort->GetHeight(), 0.0f, 0.0f), 1);
+
+	// Vertex Buffer and Vertex Shader
+	GetDevice()->SetStreamSource(0, LightningComponents.LightMeshVB->StaticBuffer, 0, sizeof(ZECanvasVertex));
+	ZECanvasVertex::GetVertexDeclaration()->SetupVertexDeclaration();
+
 	for (size_t I = 0; I < Lights.GetCount(); I++)
 		switch(Lights[I]->GetLightType())
 		{
-		case ZE_LT_POINT:
-			DrawPointLight((ZEPointLight*)Lights[I]);
-		case ZE_LT_DIRECTIONAL:
-			DrawDirectionalLight((ZEDirectionalLight*)Lights[I]);
-			break;
-		case ZE_LT_PROJECTIVE:
-			DrawProjectiveLight((ZEProjectiveLight*)Lights[I]);
-			break;
-		case ZE_LT_OMNIPROJECTIVE:
-			DrawOmniProjectiveLight((ZEOmniProjectiveLight*)Lights[I]);
-			break;
+			case ZE_LT_POINT:
+				DrawPointLight((ZEPointLight*)Lights[I]);
+			case ZE_LT_DIRECTIONAL:
+				DrawDirectionalLight((ZEDirectionalLight*)Lights[I]);
+				break;
+			case ZE_LT_PROJECTIVE:
+				DrawProjectiveLight((ZEProjectiveLight*)Lights[I]);
+				break;
+			case ZE_LT_OMNIPROJECTIVE:
+				DrawOmniProjectiveLight((ZEOmniProjectiveLight*)Lights[I]);
+				break;
 		}
 
 	// Render Targets
@@ -342,7 +384,7 @@ void ZED3D9Renderer::DoLightningPass()
 
 void ZED3D9Renderer::DoForwardPass()
 {
-	ZED3D9CommonTools::SetRenderTarget(0, AccumulationBuffer);
+	ZED3D9CommonTools::SetRenderTarget(0, ABuffer);
 
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
@@ -360,7 +402,7 @@ void ZED3D9Renderer::InitializeRenderTargets()
 	ZED3D9CommonTools::CreateRenderTarget(&GBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 	ZED3D9CommonTools::CreateRenderTarget(&LBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 	ZED3D9CommonTools::CreateRenderTarget(&LBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&AccumulationBuffer, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
+	ZED3D9CommonTools::CreateRenderTarget(&ABuffer, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 }
 
 void ZED3D9Renderer::DeinitializeRenderTargets()
@@ -369,7 +411,7 @@ void ZED3D9Renderer::DeinitializeRenderTargets()
 	ZED3D_RELEASE(GBuffer2);
 	ZED3D_RELEASE(LBuffer1);
 	ZED3D_RELEASE(LBuffer2);
-	ZED3D_RELEASE(AccumulationBuffer);
+	ZED3D_RELEASE(ABuffer);
 }
 
 ZED3D9Renderer::ZED3D9Renderer()
@@ -378,7 +420,7 @@ ZED3D9Renderer::ZED3D9Renderer()
 	GBuffer2 = NULL;
 	LBuffer1 = NULL;
 	LBuffer2 = NULL;
-	AccumulationBuffer = NULL;
+	ABuffer = NULL;
 
 	LightningComponents.LightMeshVB = NULL;
 	LightningComponents.PointLightVS = NULL;
@@ -476,9 +518,9 @@ void ZED3D9Renderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
 	PostProcessors.DeleteValue(PostProcessor);
 }
 
-void ZED3D9Renderer::SetLights(ZEArray<ZELight*>& Lights)
+void ZED3D9Renderer::SetLights(ZESmartArray<ZELight*>& Lights)
 {
-
+	this->Lights = Lights;
 }
 
 void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
@@ -526,10 +568,10 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 		DoGBufferPass();
 		DoLightningPass();
 		//DoForwardPass();
-		SSAOProcessor.InputNormal = GBuffer1;
-		SSAOProcessor.InputDepth = GBuffer2;
+		SSAOProcessor.InputDepth = GBuffer1;
+		SSAOProcessor.InputNormal = GBuffer2;
 		SSAOProcessor.Output = ViewPort->FrameBuffer;
-		SSAOProcessor.Process();
+		//SSAOProcessor.Process();
 
 	GetDevice()->EndScene();
 }

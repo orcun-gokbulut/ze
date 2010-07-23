@@ -196,8 +196,8 @@ struct GBPSInput
 
 struct GBPSOutput
 {
-	float4 NormalGloss : COLOR0;
-	float4 Depth : COLOR1;
+	float4 Position : COLOR0;
+	float4 NormalGloss : COLOR1;
 };
 
 void GBDoParallax(inout GBPSInput Input)
@@ -228,8 +228,8 @@ float GBGetGloss(in GBPSInput Input)
 
 float GBGetDepth(in GBPSInput Input)
 {
-	//return length(Input.Position) / FarZ;
-	return Input.NormalDepth.w / FarZ;
+	return length(Input.Position);
+	//return Input.NormalDepth.w;
 }
 
 GBPSOutput GBPSMain(GBPSInput Input)
@@ -240,8 +240,8 @@ GBPSOutput GBPSMain(GBPSInput Input)
 	
 	Output.NormalGloss.xyz = GBGetNormal(Input);
 	Output.NormalGloss.w = GBGetGloss(Input);
-	Output.Depth = GBGetDepth(Input);
-	Output.Depth.yzw = Input.Position;
+	//Output.Depth = GBGetDepth(Input);
+	Output.Position = float4(Input.Position.xyz, 1.0f);
 	return Output;
 }
 

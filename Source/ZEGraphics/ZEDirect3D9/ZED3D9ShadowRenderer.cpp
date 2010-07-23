@@ -214,6 +214,11 @@ void ZED3D9ShadowRenderer::ClearList()
 	NonTransparent.Clear(true);
 }
 
+void ZED3D9ShadowRenderer::SetLights(ZESmartArray<ZELight*>& Lights)
+{
+
+}
+
 void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZE_DEBUG_ENABLED

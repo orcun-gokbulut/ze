@@ -35,12 +35,14 @@
 
 float3 GetViewPosition(sampler2D GBuffer, float2 Texcoord, float3 ViewVector)
 {
-	return ViewVector * tex2D(GBuffer, Texcoord).x;
+	return tex2D(GBuffer, Texcoord).xyz;
+	//return normalize(ViewVector) * tex2D(GBuffer, Texcoord).x;
 }
 
 float GetViewDepth(sampler2D GBuffer, float2 Texcoord, float3 ViewVector)
 {
-	return ViewVector.z * tex2D(GBuffer, Texcoord).x;
+	return tex2D(GBuffer, Texcoord).x;
+	//return ViewVector.z * tex2D(GBuffer, Texcoord).x;
 }
 
 float3 GetViewNormal(sampler2D GBuffer, float2 Texcoord)
