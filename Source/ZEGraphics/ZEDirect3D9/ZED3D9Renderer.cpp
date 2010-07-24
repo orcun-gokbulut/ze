@@ -221,18 +221,22 @@ void ZED3D9Renderer::DrawPointLight(ZEPointLight* Light)
 	LightParameters.Attenuation = Light->GetAttenuation();
 	LightParameters.Range = Light->GetRange();
 	LightParameters.Intensity = Light->GetIntensity();
+	
 	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 3);
 	
 	// Transformation
 	ZEMatrix4x4 WorldTransform;
 	ZEMatrix4x4 WorldViewProjTransform;
-	ZEMatrix4x4::CreateOrientation(WorldTransform, LightParameters.Position, 
+	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), 
 		ZEQuaternion::Identity, 
 		ZEVector3(LightParameters.Range, LightParameters.Range, LightParameters.Range));
 	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
-	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjTransform, 4);
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
 	
 	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
+
+	GetDevice()->SetVertexShader(LightningComponents.PointLightVS->GetVertexShader());
+	GetDevice()->SetPixelShader(LightningComponents.PointLightPS->GetPixelShader());
 	
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
 	//GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 942, 1200); // Sphere 2
@@ -261,6 +265,7 @@ void ZED3D9Renderer::DoPreZPass()
 {
 	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
 
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00000000);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
@@ -285,6 +290,7 @@ void ZED3D9Renderer::DoGBufferPass()
 	ZED3D9CommonTools::SetRenderTarget(0, GBuffer1);
 	ZED3D9CommonTools::SetRenderTarget(1, GBuffer2);
 
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
@@ -315,11 +321,14 @@ void ZED3D9Renderer::DoLightningPass()
 	// Render Targets
 	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
 	//ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
-	ZED3D9CommonTools::SetRenderTarget(1, LBuffer2);
+	//ZED3D9CommonTools::SetRenderTarget(1, LBuffer2);
 
 	// Z-Buffer
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATER);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 
 	// Alpha blending
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
@@ -361,11 +370,13 @@ void ZED3D9Renderer::DoLightningPass()
 	GetDevice()->SetStreamSource(0, LightningComponents.LightMeshVB->StaticBuffer, 0, sizeof(ZECanvasVertex));
 	ZECanvasVertex::GetVertexDeclaration()->SetupVertexDeclaration();
 
+	// Draw lights
 	for (size_t I = 0; I < Lights.GetCount(); I++)
 		switch(Lights[I]->GetLightType())
 		{
 			case ZE_LT_POINT:
 				DrawPointLight((ZEPointLight*)Lights[I]);
+				break;
 			case ZE_LT_DIRECTIONAL:
 				DrawDirectionalLight((ZEDirectionalLight*)Lights[I]);
 				break;
@@ -378,13 +389,14 @@ void ZED3D9Renderer::DoLightningPass()
 		}
 
 	// Render Targets
-	ZED3D9CommonTools::SetRenderTarget(0, NULL);
-	ZED3D9CommonTools::SetRenderTarget(1, NULL);
+
+	//ZED3D9CommonTools::SetRenderTarget(1, NULL);
 }
 
 void ZED3D9Renderer::DoForwardPass()
 {
 	ZED3D9CommonTools::SetRenderTarget(0, ABuffer);
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
@@ -400,8 +412,8 @@ void ZED3D9Renderer::InitializeRenderTargets()
 {
 	ZED3D9CommonTools::CreateRenderTarget(&GBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 	ZED3D9CommonTools::CreateRenderTarget(&GBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&LBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&LBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
+	ZED3D9CommonTools::CreateRenderTarget(&LBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
+	ZED3D9CommonTools::CreateRenderTarget(&LBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
 	ZED3D9CommonTools::CreateRenderTarget(&ABuffer, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 }
 

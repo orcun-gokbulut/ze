@@ -343,11 +343,12 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 	
 	// Check lightning enabled
  	if (LightsEnabled)
+	{
 		for (size_t I = 0; I < Entities.GetCount(); I++)
-			// Check whether entity is light source or not. (Is it a light or does it contains light component(s) ?)
+		{	// Check whether entity is light source or not. (Is it a light or does it contains light component(s) ?)
 			if (Entities[I]->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
 			{
-				if (Entities[I]->GetEntityType() == ZE_ET_COMPONENT)
+				if (Entities[I]->GetEntityType() == ZE_ET_COMPONENT && Entities[I]->GetEnabled())
 				{
 					CullStatistics.TotalLightCount++;
 
@@ -366,7 +367,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 						VisibleLights.Add((ZELight*)Entities[I]);
 					}
 				}
-				else if (Entities[I]->GetEntityType() == ZE_ET_COMPOUND)
+				else if (Entities[I]->GetEntityType() == ZE_ET_COMPOUND && Entities[I]->GetEnabled())
 				{
 					const ZEArray<ZEComponent*>& Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
 					
@@ -402,6 +403,8 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 					"A regular entity claims that it is a light source. Please check entity's draw flags. (Entity Name : \"%s\", Entity Type : \"%s\")", 
 					Entities[I]->GetName(), Entities[I]->GetClassDescription()->GetName());
 			}
+		}
+}
 
 	Renderer->SetLights(VisibleLights);
 

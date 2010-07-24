@@ -63,45 +63,45 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight1 = new ZEPointLight();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
 	PointLight1->SetColor(ZEVector3::One);
-	PointLight1->SetAttenuation(0.001f, 0.0f, 1.0f);
+	PointLight1->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight1->SetIntensity(1.0f);
-	PointLight1->SetRange(15);
+	PointLight1->SetRange(55.0f);
 	PointLight1->SetCastShadows(false);
 	Scene->AddEntity(PointLight1);
 
 	PointLight2 = new ZEPointLight();
 	PointLight2->SetPosition(ZEVector3(-15.0f, 3.0f, -15.0f));
 	PointLight2->SetColor(ZEVector3(0.5f, 0.5f, 1.0f));
-	PointLight2->SetAttenuation(0.001f, 0.0f, 1.0f);
+	PointLight2->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight2->SetIntensity(1.0f);
-	PointLight2->SetRange(15);
+	PointLight2->SetRange(40.0f);
 	PointLight2->SetCastShadows(false);
 	Scene->AddEntity(PointLight2);
 
 	PointLight3 = new ZEPointLight();
 	PointLight3->SetPosition(ZEVector3(-33.0f, 3.0f, -1.0f));
 	PointLight3->SetColor(ZEVector3(0.5f, 1.0f, 1.0f));
-	PointLight3->SetAttenuation(0.001f, 0.0f, 1.0f);
+	PointLight3->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight3->SetIntensity(1.0f);
-	PointLight3->SetRange(15);
+	PointLight3->SetRange(40.0f);
 	PointLight3->SetCastShadows(false);
 	Scene->AddEntity(PointLight3);
 
 	PointLight4 = new ZEPointLight();
 	PointLight4->SetPosition(ZEVector3(-17.0f, 4.0f, 37.0f));
 	PointLight4->SetColor(ZEVector3(0.25f, 0.0f, 0.75f));
-	PointLight4->SetAttenuation(0.003f, 0.0f, 1.0f);
+	PointLight4->SetAttenuation(0.03f, 0.0f, 1.0f);
 	PointLight4->SetIntensity(2.0f);
-	PointLight4->SetRange(10);
+	PointLight4->SetRange(40.0f);
 	PointLight4->SetCastShadows(false);
 	Scene->AddEntity(PointLight4);
 
 	PointLight5 = new ZEPointLight();
 	PointLight5->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
 	PointLight5->SetColor(ZEVector3(0.5f, 0.5f, 1.0f));
-	PointLight5->SetAttenuation(0.003f, 0.0f, 1.0f);
+	PointLight5->SetAttenuation(0.03f, 0.0f, 1.0f);
 	PointLight5->SetIntensity(2.0f);
-	PointLight5->SetRange(10);
+	PointLight5->SetRange(40.0f);
 	PointLight5->SetCastShadows(false);
 	Scene->AddEntity(PointLight5);
 

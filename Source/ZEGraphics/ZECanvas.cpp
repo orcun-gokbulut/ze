@@ -793,6 +793,7 @@ ZECanvas::ZECanvas()
 	Translation = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
+	Color = ZEVector4::One;
 }
 
 
