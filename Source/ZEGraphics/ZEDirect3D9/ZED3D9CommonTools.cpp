@@ -98,7 +98,7 @@ D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 		case ZE_TPF_LUM_HDR:
 			return D3DFMT_R32F;
 		case ZE_TPF_RGBA_HDR:
-			return D3DFMT_A32B32G32R32F;
+			return D3DFMT_A16B16G16R16F;
 		default:
 			return (D3DFORMAT)0;
 	}

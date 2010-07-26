@@ -38,7 +38,6 @@
 
 // Vertex Transformation
 float3 ViewVector : register(vs, c0);
-float2 PixelSize : register(vs, c1);
 
 float4x4 WorldViewProjMatrix : register(vs, c4);
 
@@ -46,6 +45,7 @@ float4x4 WorldViewProjMatrix : register(vs, c4);
 float4 LightParameters0 : register(ps, c0);
 float4 LightParameters1 : register(ps, c1);
 float4 LightParameters2 : register(ps, c2);
+float2 PixelSize_2 : register(ps, c5);
 
 #define LightPosition			LightParameters0.xyz
 #define LightRange				LightParameters0.w
@@ -88,7 +88,7 @@ float4 PLPSMain(PLVSInput Input) : COLOR0
 {
 	float4 Output;
 	
-	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.z * 0.5f + 0.5f;
+	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.z * 0.5f + 0.5f + PixelSize_2;
 	float3 Position = GetViewPosition(GBuffer1, ScreenPosition, Input.ViewVector);
 	float3 Normal = GetViewNormal(GBuffer2, ScreenPosition);
 	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);

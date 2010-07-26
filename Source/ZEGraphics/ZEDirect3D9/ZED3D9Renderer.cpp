@@ -333,9 +333,9 @@ void ZED3D9Renderer::DoLightningPass()
 	// Alpha blending
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-	GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCCOLOR);
+	GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
 	GetDevice()->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
-	GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_DESTCOLOR);
+	GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
 	GetDevice()->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_ONE);
 	GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 
@@ -364,7 +364,7 @@ void ZED3D9Renderer::DoLightningPass()
 	ViewVector.z = Camera->GetFarZ();
 	ViewVector.w = 0.0f;
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ViewVector, 1);
-	GetDevice()->SetVertexShaderConstantF(1, (const float*)&ZEVector4(1.0f / ViewPort->GetWidth(), 1.0f / ViewPort->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(5, (const float*)&ZEVector4(0.5f / ViewPort->GetWidth(), 0.5f / ViewPort->GetHeight(), 0.0f, 0.0f), 1);
 
 	// Vertex Buffer and Vertex Shader
 	GetDevice()->SetStreamSource(0, LightningComponents.LightMeshVB->StaticBuffer, 0, sizeof(ZECanvasVertex));
