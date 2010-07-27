@@ -168,8 +168,9 @@ void ZED3D9SSAOProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-	
-	GetDevice()->SetRenderTarget(0, Output);
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+
+	ZED3D9CommonTools::SetRenderTarget(0, Output);
 
 	GetDevice()->SetVertexShader(VertexShader);
 	GetDevice()->SetPixelShader(PixelShader);
@@ -208,7 +209,7 @@ void ZED3D9SSAOProcessor::Process()
 	GetDevice()->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)RandomTextureResource->GetTexture())->Texture);
-
+	
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 }
 

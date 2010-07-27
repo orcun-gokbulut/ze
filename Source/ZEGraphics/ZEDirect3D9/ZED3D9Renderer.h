@@ -64,6 +64,7 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 		LPDIRECT3DTEXTURE9					GBuffer2;
 		LPDIRECT3DTEXTURE9					LBuffer1;
 		LPDIRECT3DTEXTURE9					LBuffer2;
+		LPDIRECT3DTEXTURE9					SSAOBuffer;
 		LPDIRECT3DTEXTURE9					ABuffer;
 
 		ZED3D9HDRProcessor					HDRProcessor;

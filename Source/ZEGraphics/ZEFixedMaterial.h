@@ -151,8 +151,7 @@ class ZEFixedMaterial : public ZEMaterial
 				const ZETexture2D*		OpacityMap;
 				const ZETexture2D*		DetailBaseMap;
 				const ZETexture2D*		DetailNormalMap;
-				const ZETextureCube*	ReflectionMap;
-				const ZETextureCube*	RefractionMap;
+				const ZETextureCube*	EnvironmentMap;
 				const ZETexture2D*		LightMap;
 				const ZETexture2D*		DistortionMap;
 			};
@@ -183,13 +182,9 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETextureAddressMode			DetailNormalMapAddressModeU;
 		ZETextureAddressMode			DetailNormalMapAddressModeV;
 
-		ZETextureAddressMode			ReflectionMapAddressModeU;
-		ZETextureAddressMode			ReflectionMapAddressModeV;
-		ZETextureAddressMode			ReflectionMapAddressModeW;
-
-		ZETextureAddressMode			RefractionMapAddressModeU;
-		ZETextureAddressMode			RefractionMapAddressModeV;
-		ZETextureAddressMode			RefractionMapAddressModeW;
+		ZETextureAddressMode			EnvironmentMapAddressModeU;
+		ZETextureAddressMode			EnvironmentMapAddressModeV;
+		ZETextureAddressMode			EnvironmentMapAddressModeW;
 
 		ZETextureAddressMode			LightMapAddressModeU;
 		ZETextureAddressMode			LightMapAddressModeV;
@@ -304,19 +299,21 @@ class ZEFixedMaterial : public ZEMaterial
 		void							SetOpacityMapAddressModeV(ZETextureAddressMode Mode);
 		ZETextureAddressMode			GetOpacityMapAddressModeV() const;
 
+		// Environment Map
+		void							SetEnvironmentMap(const ZETextureCube* Texture);
+		const ZETextureCube*			GetEnvironmentMap() const;
+		void							SetEnvironmentMapAddressModeU(ZETextureAddressMode Mode);
+		ZETextureAddressMode			GetEnvironmentMapAddressModeU() const;
+		void							SetEnvironmentMapAddressModeV(ZETextureAddressMode Mode);
+		ZETextureAddressMode			GetEnvironmentMapAddressModeV() const;
+		void							SetEnvironmentMapAddressModeW(ZETextureAddressMode Mode);
+		ZETextureAddressMode			GetEnvironmentMapAddressModeW() const;
+
 		// Reflection
 		void							SetReflectionEnabled(bool Enabled);
 		bool							GetReflectionEnabled() const;
 		void							SetReflectionFactor(float Factor);
 		float							GetReflectionFactor() const;
-		void							SetReflectionMap(const ZETextureCube* Texture);
-		const ZETextureCube*			GetReflectionMap() const;
-		void							SetReflectionMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetReflectionMapAddressModeU() const;
-		void							SetReflectionMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetReflectionMapAddressModeV() const;
-		void							SetReflectionMapAddressModeW(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetReflectionMapAddressModeW() const;
 
 		// Refraction
 		void							SetRefractionEnabled(bool Enabled);
@@ -325,14 +322,7 @@ class ZEFixedMaterial : public ZEMaterial
 		float							GetRefractionIndex() const;
 		void							SetRefractionFactor(float Factor);
 		float							GetRefractionFactor() const;
-		void							SetRefractionMap(const ZETextureCube* Texture);
-		const ZETextureCube*			GetRefractionMap() const;
-		void							SetRefractionMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetRefractionMapAddressModeU() const;
-		void							SetRefractionMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetRefractionMapAddressModeV() const;
-		void							SetRefractionMapAddressModeW(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetRefractionMapAddressModeW() const;
+
 		// Detail Map  
 		void							SetDetailMapEnabled(bool Enabled); 
 		bool							GetDetailMapEnabled() const;
@@ -526,11 +516,8 @@ ZE_POST_PROCESSOR_START(Meta)
 				</enumurator>
 			</property>
 
-
-			<property name = "ReflectionEnabled" groupname="Reflection" type="boolean" autogetset="yes" />
-			<property name = "ReflectionFactor" groupname="Reflection" type="float" autogetset="yes" />
-			<!--<property name="ReflectionMap" groupname="Reflection" type="string" autogetset="yes"/>-->
-			<property name = "ReflectionMapAddressModeU" groupname="Reflection" type="integer" autogetset="yes">
+			<!--<property name="EnvironmentMap" groupname="Environment" type="string" autogetset="yes"/>-->
+			<property name = "EnvironmentMapAddressModeU" groupname="Environment" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -538,7 +525,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name = "ReflectionMapAddressModeV" groupname="Reflection" type="integer" autogetset="yes">
+			<property name = "EnvironmentMapAddressModeV" groupname="Environment" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -546,7 +533,7 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-			<property name = "ReflectionMapAddressModeW" groupname="Reflection" type="integer" autogetset="yes">
+			<property name = "EnvironmentMapAddressModeW" groupname="Environment" type="integer" autogetset="yes">
 				<enumurator name="ZETextureAddressMode">
 					<item name="Wrap" value="ZE_TAM_WRAP"/>
 					<item name="Clamp" value="ZE_TAM_CLAMP"/>
@@ -554,36 +541,12 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Border" value="ZE_TAM_BORDER"/>
 				</enumurator>
 			</property>
-
-
-			<property name = "RefractionEnabled" groupname="Refraction" type="boolean" autogetset="yes" />
-			<property name = "RefractionFactor" groupname="Refraction" type="float" autogetset="yes" />
-			<property name = "RefractionIndex" groupname="Refraction" type="float" autogetset="yes" />
-			<!--<property name="RefractionMap" groupname="Refraction" type="string" autogetset="yes"/>-->
-			<property name = "RefractionMapAddressModeU" groupname="Refraction" type="integer" autogetset="yes">
-				<enumurator name="ZETextureAddressMode">
-					<item name="Wrap" value="ZE_TAM_WRAP"/>
-					<item name="Clamp" value="ZE_TAM_CLAMP"/>
-			 		<item name="Mirror" value="ZE_TAM_MIRROR"/>
-					<item name="Border" value="ZE_TAM_BORDER"/>
-				</enumurator>
-			</property>
-			<property name = "RefractionMapAddressModeV" groupname="Refraction" type="integer" autogetset="yes">
-				<enumurator name="ZETextureAddressMode">
-					<item name="Wrap" value="ZE_TAM_WRAP"/>
-					<item name="Clamp" value="ZE_TAM_CLAMP"/>
-			 		<item name="Mirror" value="ZE_TAM_MIRROR"/>
-					<item name="Border" value="ZE_TAM_BORDER"/>
-				</enumurator>
-			</property>
-			<property name = "RefractionMapAddressModeW" groupname="Refraction" type="integer" autogetset="yes">
-				<enumurator name="ZETextureAddressMode">
-					<item name="Wrap" value="ZE_TAM_WRAP"/>
-					<item name="Clamp" value="ZE_TAM_CLAMP"/>
-			 		<item name="Mirror" value="ZE_TAM_MIRROR"/>
-					<item name="Border" value="ZE_TAM_BORDER"/>
-				</enumurator>
-			</property>
+			<property name = "ReflectionEnabled" groupname="Environment" type="boolean" autogetset="yes" />
+			<property name = "ReflectionFactor" groupname="Environment" type="float" autogetset="yes" />
+			<property name = "RefractionEnabled" groupname="Environment" type="boolean" autogetset="yes" />
+			<property name = "RefractionFactor" groupname="Environment" type="float" autogetset="yes" />
+			<property name = "RefractionIndex" groupname="Environment" type="float" autogetset="yes" />
+		
 
 			<property name="DetailMapEnabled" groupname="Detail" type="boolean" autogetset="yes" />
 			<property name="DetailMapTiling" groupname="Detail" type="ZEVector2" autogetset="yes" />

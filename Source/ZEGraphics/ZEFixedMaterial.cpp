@@ -581,6 +581,47 @@ ZETextureAddressMode ZEFixedMaterial::GetOpacityMapAddressModeV() const
 	return OpacityMapAddressModeV;
 }
 
+
+void ZEFixedMaterial::SetEnvironmentMap(const ZETextureCube* Texture)
+{
+	EnvironmentMap = Texture;
+}
+
+const ZETextureCube* ZEFixedMaterial::GetEnvironmentMap() const
+{
+	return EnvironmentMap;
+}
+
+void ZEFixedMaterial::SetEnvironmentMapAddressModeU(ZETextureAddressMode Mode)
+{
+	EnvironmentMapAddressModeU = Mode;
+}
+
+ZETextureAddressMode ZEFixedMaterial::GetEnvironmentMapAddressModeU() const
+{
+	return EnvironmentMapAddressModeU;
+}
+
+void ZEFixedMaterial::SetEnvironmentMapAddressModeV(ZETextureAddressMode Mode)
+{
+	EnvironmentMapAddressModeV = Mode;
+}
+
+ZETextureAddressMode ZEFixedMaterial::GetEnvironmentMapAddressModeV() const
+{
+	return EnvironmentMapAddressModeV;
+}
+
+void ZEFixedMaterial::SetEnvironmentMapAddressModeW(ZETextureAddressMode Mode)
+{
+	EnvironmentMapAddressModeW = Mode;
+}
+
+ZETextureAddressMode ZEFixedMaterial::GetEnvironmentMapAddressModeW() const
+{
+	return EnvironmentMapAddressModeW;
+}
+
 void ZEFixedMaterial::SetReflectionEnabled(bool Enabled)
 {
 	if (Enabled)
@@ -602,51 +643,6 @@ void ZEFixedMaterial::SetReflectionFactor(float Factor)
 float ZEFixedMaterial::GetReflectionFactor() const
 {
 	return ReflectionFactor;
-}
-
-void ZEFixedMaterial::SetReflectionMap(const ZETextureCube* Texture)
-{
-	if (Texture == NULL)
-		MaterialComponents &= ~ZE_SHADER_REFLECTION;
-	else
-		MaterialComponents |= ZE_SHADER_REFLECTION;
-
-	ReflectionMap = Texture;
-}
-
-const ZETextureCube* ZEFixedMaterial::GetReflectionMap() const
-{
-	return ReflectionMap;
-}
-
-void ZEFixedMaterial::SetReflectionMapAddressModeU(ZETextureAddressMode Mode)
-{
-	ReflectionMapAddressModeU = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetReflectionMapAddressModeU() const
-{
-	return ReflectionMapAddressModeU;
-}
-
-void ZEFixedMaterial::SetReflectionMapAddressModeV(ZETextureAddressMode Mode)
-{
-	ReflectionMapAddressModeV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetReflectionMapAddressModeV() const
-{
-	return ReflectionMapAddressModeV;
-}
-
-void ZEFixedMaterial::SetReflectionMapAddressModeW(ZETextureAddressMode Mode)
-{
-	ReflectionMapAddressModeW = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetReflectionMapAddressModeW() const
-{
-	return ReflectionMapAddressModeW;
 }
 
 void ZEFixedMaterial::SetRefractionEnabled(bool Enabled)
@@ -682,51 +678,6 @@ float ZEFixedMaterial::GetRefractionFactor() const
 	return RefractionFactor;
 }
 
-void ZEFixedMaterial::SetRefractionMap(const ZETextureCube* Texture)
-{
-	if (Texture == NULL)
-		MaterialComponents &= ~ZE_SHADER_REFRACTION;
-	else
-		MaterialComponents |= ZE_SHADER_REFRACTION;
-
-	RefractionMap = Texture;
-}
-
-const ZETextureCube* ZEFixedMaterial::GetRefractionMap() const
-{
-	return RefractionMap;
-}
-
-void ZEFixedMaterial::SetRefractionMapAddressModeU(ZETextureAddressMode Mode)
-{
-	RefractionMapAddressModeU = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetRefractionMapAddressModeU() const
-{
-	return RefractionMapAddressModeU;
-}
-
-void ZEFixedMaterial::SetRefractionMapAddressModeV(ZETextureAddressMode Mode)
-{
-	RefractionMapAddressModeV = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetRefractionMapAddressModeV() const
-{
-	return RefractionMapAddressModeV;
-}
-
-void ZEFixedMaterial::SetRefractionMapAddressModeW(ZETextureAddressMode Mode)
-{
-	RefractionMapAddressModeW = Mode;
-}
-
-ZETextureAddressMode ZEFixedMaterial::GetRefractionMapAddressModeW() const
-{
-	return RefractionMapAddressModeW;
-}
-
 void ZEFixedMaterial::SetDetailMapEnabled(bool Enabled)
 {
 	if (Enabled)
@@ -753,9 +704,9 @@ const ZEVector2& ZEFixedMaterial::GetDetailMapTiling() const
 void ZEFixedMaterial::SetDetailBaseMap(const ZETexture2D* Texture)
 {
 	if (Texture == NULL)
-		MaterialComponents &= ~ZE_SHADER_DETAIL_DIFFUSE_MAP;
+		MaterialComponents &= ~ZE_SHADER_DETAIL_BASE_MAP;
 	else
-		MaterialComponents |= ZE_SHADER_DETAIL_DIFFUSE_MAP;
+		MaterialComponents |= ZE_SHADER_DETAIL_BASE_MAP;
 
 	DetailBaseMap = Texture;
 }
@@ -876,14 +827,14 @@ ZETextureAddressMode ZEFixedMaterial::GetLightMapAddressModeV() const
 void ZEFixedMaterial::SetDistortionEnabled(bool Enabled)
 {
 	if (Enabled)
-		MaterialComponents |= ZE_SHADER_DISTORTIONMAP;
+		MaterialComponents |= ZE_SHADER_DISTORTION_MAP;
 	else
-		MaterialComponents &= ~ZE_SHADER_DISTORTIONMAP;
+		MaterialComponents &= ~ZE_SHADER_DISTORTION_MAP;
 }
 
 bool ZEFixedMaterial::GetDistortionEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_DISTORTIONMAP;
+	return MaterialComponents & ZE_SHADER_DISTORTION_MAP;
 }
 
 void ZEFixedMaterial::SetDistortionFactor(float Factor)

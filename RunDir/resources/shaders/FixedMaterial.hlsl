@@ -59,6 +59,7 @@ float4 MaterialParams4 : register(ps, c4);
 float4 MaterialParams5 : register(ps, c5);
 float4 MaterialParams6 : register(vs, c12);
 float FarZ : register(c6);
+float PixelSize_2 : register(ps, c6);
 
 #define	MaterialAmbientColor        MaterialParams0.xyz
 #define	MaterialOpacity				MaterialParams0.w
@@ -78,23 +79,24 @@ float FarZ : register(c6);
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Pipeline Textures
-sampler2D LightBuffer;
-sampler2D SSAOBuffer;
+sampler2D GBuffer1 : register(s0);
+sampler2D GBuffer2 : register(s1);
+sampler2D LBuffer1 : register(s2);
+sampler2D LBuffer2 : register(s3);
+sampler2D SSAOBuffer : register(s4);
 
 // Material Textures
-sampler2D BaseMap : register(s0);
-sampler2D NormalMap : register(s1);
-sampler2D ParallaxMap : register(s2);
-sampler2D SpecularMap : register(s3);
-sampler2D OpacityMap : register(s4);
-sampler2D DetailDiffuseMap : register(s5);
-sampler2D DetailNormalMap : register(s6);
-sampler2D EmmisiveMap : register(s7);
-sampler2D ReflectionMap : register(s8);
-sampler2D RefractionMap : register(s9);
-sampler2D LightMap : register(s10);
-sampler2D DistortionMap : register(s11);
-
+sampler2D BaseMap : register(s5);
+sampler2D NormalMap : register(s6);
+sampler2D ParallaxMap : register(s7);
+sampler2D SpecularMap : register(s8);
+sampler2D OpacityMap : register(s9);
+sampler2D EmmisiveMap : register(s10);
+sampler2D EnvironmentMap : register(s11);
+sampler2D LightMap : register(s12);
+sampler2D DistortionMap : register(s13);
+sampler2D DetailDiffuseMap : register(s14);
+sampler2D DetailNormalMap : register(s15);
 
 struct VSInput 
 {
@@ -139,12 +141,12 @@ float4 PreZPSMain() : COLOR0
 	return 0.0f;
 }
 
+
+
 // G-Buffer Pass
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Vertex Shader
-
-
 struct GBVSOutput 
 {
 	float4 Position : POSITION0;
@@ -245,8 +247,166 @@ GBPSOutput GBPSMain(GBPSInput Input)
 	return Output;
 }
 
-// Material Pass
+
+
+// Forward Pass
 /////////////////////////////////////////////////////////////////////////////////////////
+struct FPVSOutput
+{
+	float4 Position : POSITION0;
+	float2 Texcoord : TEXCOORD0;
+	float3 ScreenPosition : TEXCOORD1;
+	
+	#ifdef ZE_SHADER_DETAIL_MAP
+	float2 DetailTexcoord : TEXCOORD1;
+	#endif
+	
+	#ifdef ZE_SHADER_LIGHT_MAP
+		float2 LightMapTexcoord     : TEXCOORD2;
+	#endif
+	
+	#ifdef ZESHADER_REFLECTION
+		float3 ReflectionVector     : TEXCOORD3;
+	#endif
+
+	#ifdef ZESHADER_REFRACTION
+		float3 RefractionVector     : TEXCOORD4;
+	#endif	
+};
+
+FPVSOutput FPVSMain(VSInput Input)
+{
+	FPVSOutput Output;
+	SkinTransform(Input);
+
+	// Pipeline 
+	Output.Position = mul(Input.Position, WorldViewProjMatrix);
+	//Output.Normal.xyz = mul(Input.Normal, WorldViewInvTrpsMatrix).xyz;
+	
+	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y);
+	Output.ScreenPosition.z = Output.Position.w;
+	
+	#ifdef ZE_SHADER_REFLECTION
+		Output.ReflectionVector = reflect(-CameraDirection, Normal);
+	#endif
+	
+	#ifdef ZE_SHADER_REFRACTION
+		Output.RefractionVector = refract(-CameraDirection, Normal, MaterialRefractionIndex);
+	#endif
+
+	#ifdef ZE_SHADER_LIGHTMAP
+		Output.LightMapTexcoord = Input.LightMapTexcoord;
+	#endif
+}
+
+struct FPPSOutput
+{
+	float4	Color : COLOR0;
+};
+
+struct FPPSInput
+{
+	float2 Texcoord : TEXCOORD0;
+	float3 ScreenPosition : TEXCOORD1;
+	
+	#ifdef ZE_SHADER_DETAIL_MAP
+		float2 DetailTexcoord : TEXCOORD1;
+	#endif
+	
+	#ifdef ZE_SHADER_LIGHT_MAP
+		float2 LightMapTexcoord     : TEXCOORD2;
+	#endif
+	
+	#ifdef ZESHADER_REFLECTION
+		float3 ReflectionVector     : TEXCOORD3;
+	#endif
+
+	#ifdef ZESHADER_REFRACTION
+		float3 RefractionVector     : TEXCOORD4;
+	#endif	
+};
+
+FPPSOutput FPPSMain(FPPSInput Input)
+{
+	FPPSOutput Output;
+	Output.Color = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	
+	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.z * 0.5f + 0.5f + PixelSize_2;
+
+	#ifdef ZE_SHADER_AMBIENT
+		float3 AmbientColor = MaterialAmbientColor;
+		#ifdef ZE_SHADER_BASE_MAP
+			AmbientColor *= tex2D(BaseMap, Input.Texcoord).rgb;
+		#endif
+		#ifdef ZE_SHADER_SSAO
+			AmbientColor *= tex2D(SSAOMap, ScreenPosition).r;
+		#endif
+		
+		#ifdef ZE_SHADER_LIGHT_MAP
+			AmbientColor *= tex2D(LightMap, Input.Texcoord).rgb;
+		#endif
+		
+		Output.Color.rgb = AmbientColor;
+	#endif
+	
+	#ifdef ZE_SHADER_DIFFUSE
+		float3 DiffuseColor = MaterialDiffuseColor;
+		#ifdef ZE_SHADER_BASE_MAP
+			DiffuseColor *= tex2D(BaseMap, Input.Texcoord).rgb;
+		#endif
+	
+		DiffuseColor *= tex2D(LBuffer, ScreenPosition).rgb;
+		
+		Output.Color.rgb += DiffuseColor;
+	#endif
+	
+	#ifdef ZE_SHADER_SPECULAR
+		float3 SpecularColor = MaterialSpecularColor;
+		#ifdef ZE_SHADER_SPECULAR_MAP
+			SpecularColor *= tex2D(SpecularMap, Input.Texcoord).rgb;
+		#endif
+		
+		SpecularColor *= tex2D(LBufer, ScreenPosition).a * tex2D(LBuffer, ScreenPosition).rgb;
+		
+		Output.Color.rgb += SpecularColor;
+	#endif
+	
+	#ifdef ZESHADER_EMMISIVE
+		float3 EmmisiveColor = MaterialEmmisiveColor;
+		#ifdef ZE_SHADER_EMMISIVE_MAP
+			EmmisiveColor *= MaterialEmmisiveCotex2D(EmmisiveMap, Input.Texcoord);
+		#endif
+
+		Output.Color.rgb += EmmisiveColor;
+	#endif
+
+	#ifdef ZE_SHADER_REFLECTION
+			Output.Color.rgb += MaterialReflectionFactor * texCUBE(EnvironmentMap, normalize(Input.ReflectionVector)).rgb;
+	#endif
+		
+	#ifdef ZE_SHADER_REFRACTION
+			Output.Color.rgb += MaterialRefractionFactor * texCUBE(EnvironmentMap, normalize(Input.RefractionVector)).rgb;
+	#endif
+		
+	#ifdef ZE_SHADER_OPASITY
+		#ifdef ZE_SHADER_OPACITY_MAP
+			#ifdef ZESHADER_OPACITY_CONSTANT
+				Output.Color.a = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
+			#else
+				Output.Color.a = tex2D(DiffuseMap, Input.Texcoord).r;
+			#endif
+		#elif defined(ZESHADER_OPACITY_DIFFUSE_ALPHA)
+			#ifdef ZESHADER_OPACITY_CONSTANT
+				Output.Color.a = MaterialOpacity * tex2D(DiffuseMap, Input.Texcoord).a;
+			#else
+				Output.Color.a = tex2D(DiffuseMap, Input.Texcoord).a;
+			#endif
+		#elif 
+			Output.Color.a = MaterialOpacity;
+		#endif
+	#endif
+}
+
 
 // Shadow Pass
 /////////////////////////////////////////////////////////////////////////////////////////

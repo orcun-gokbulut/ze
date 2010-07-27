@@ -53,7 +53,7 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 
 		LPDIRECT3DTEXTURE9				InputDepth;
 		LPDIRECT3DTEXTURE9				InputNormal;
-		LPDIRECT3DSURFACE9				Output;
+		LPDIRECT3DTEXTURE9				Output;
 
 		int								IterationCount;
 		bool							HalfResolution;
