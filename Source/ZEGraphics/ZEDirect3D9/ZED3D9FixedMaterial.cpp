@@ -52,8 +52,8 @@ void ZED3D9FixedMaterial::CreateShaders()
 	GBufferPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "GBVSMain", MaterialComponents, "vs_2_0");
 	GBufferPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "GBPSMain", MaterialComponents, "ps_2_0");
 
-	/*ForwardPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "ForwardVSMain", MaterialComponents, "vs_2_0");
-	ForwardPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "ForwardPSMain", MaterialComponents, "ps_2_0");*/
+	ForwardPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "FPVSMain", MaterialComponents, "vs_2_0");
+	ForwardPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "FPPSMain", MaterialComponents, "ps_2_0");
 }
 
 void ZED3D9FixedMaterial::ReleaseShaders()
@@ -234,7 +234,6 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* 
 			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 		else
 			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-
 	}
 	else
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
@@ -252,8 +251,6 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* 
 		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
 	// Setup Transparancy
-	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-
 	if (TransparancyMode != ZE_MTM_NOTRANSPARACY)
 	{
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
@@ -275,32 +272,32 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* 
 	// Setup Textures
 	if (MaterialComponents & ZE_SHADER_NORMAL_MAP && NormalMap != NULL)
 	{
-		SetTextureStage(1, NormalMapAddressModeU, NormalMapAddressModeV);
-		GetDevice()->SetTexture(1, ((ZED3D9Texture2D*)NormalMap)->Texture);
+		SetTextureStage(6, NormalMapAddressModeU, NormalMapAddressModeV);
+		GetDevice()->SetTexture(6, ((ZED3D9Texture2D*)NormalMap)->Texture);
 	}
 
 	if (MaterialComponents & ZE_SHADER_PARALLAX_MAP && ParallaxMap != NULL)
 	{
-		SetTextureStage(2, ParallaxMapAddressModeU, ParallaxMapAddressModeV);
-		GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)ParallaxMap)->Texture);
+		SetTextureStage(7, ParallaxMapAddressModeU, ParallaxMapAddressModeV);
+		GetDevice()->SetTexture(7, ((ZED3D9Texture2D*)ParallaxMap)->Texture);
 	}
 
 	if (MaterialComponents & ZE_SHADER_SPECULAR_MAP && SpecularMap != NULL)
 	{
-		SetTextureStage(3, SpecularMapAddressModeU, SpecularMapAddressModeV);
-		GetDevice()->SetTexture(3, ((ZED3D9Texture2D*)SpecularMap)->Texture);
+		SetTextureStage(8, SpecularMapAddressModeU, SpecularMapAddressModeV);
+		GetDevice()->SetTexture(8, ((ZED3D9Texture2D*)SpecularMap)->Texture);
 	}
 
 	if (MaterialComponents & ZE_SHADER_OPACITY && Opacity != NULL && OpacityMap != NULL)
 	{
-		SetTextureStage(4, OpacityMapAddressModeU, OpacityMapAddressModeV);
-		GetDevice()->SetTexture(4, ((ZED3D9Texture2D*)OpacityMap)->Texture);
+		SetTextureStage(9, OpacityMapAddressModeU, OpacityMapAddressModeV);
+		GetDevice()->SetTexture(9, ((ZED3D9Texture2D*)OpacityMap)->Texture);
 	}
 
 	if (MaterialComponents & ZE_SHADER_DETAIL_NORMAL_MAP && DetailNormalMap != NULL)
 	{
-		SetTextureStage(6, DetailNormalMapAddressModeU, DetailNormalMapAddressModeV);
-		GetDevice()->SetTexture(6, ((ZED3D9Texture2D*)DetailNormalMap)->Texture);
+		SetTextureStage(15, DetailNormalMapAddressModeU, DetailNormalMapAddressModeV);
+		GetDevice()->SetTexture(15, ((ZED3D9Texture2D*)DetailNormalMap)->Texture);
 	}
 
 	GetDevice()->SetPixelShader(GBufferPassPixelShader->GetPixelShader());
@@ -426,13 +423,13 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* 
 	// Setup Material Properties
 	GetDevice()->SetVertexShaderConstantF(14, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants) / 16);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
-	GetDevice()->SetPixelShaderConstantF(6, (const float*)&ZEVector4(Camera->GetFarZ(), 0.0f, 0.0f, 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(6, (const float*)&ZEVector4(0.5f / (float)Renderer->GetViewPort()->GetWidth(), 0.5f / (float)Renderer->GetViewPort()->GetHeight(), Camera->GetFarZ(), 0.0f), 1);
 
 	// Setup Textures
 	if (MaterialComponents & ZE_SHADER_BASE_MAP && BaseMap != NULL)
 	{
 		SetTextureStage(5, BaseMapAddressModeU, BaseMapAddressModeV);
-		GetDevice()->SetTexture(5, ((ZED3D9Texture2D*)DiffuseMap)->Texture);
+		GetDevice()->SetTexture(5, ((ZED3D9Texture2D*)BaseMap)->Texture);
 	}
 
 	if (MaterialComponents & ZE_SHADER_NORMAL_MAP && NormalMap != NULL)
@@ -467,8 +464,8 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* 
 
 	if ((MaterialComponents & ZE_SHADER_REFLECTION || MaterialComponents & ZE_SHADER_REFRACTION) && EnvironmentMap != NULL)
 	{
-		SetTextureStage(11, EnvironmentMap, EnvironmentMapAddressModeV, EnvironmentMapAddressModeW);
-		GetDevice()->SetTexture(11, ((ZED3D9TextureCube*)ReflectionMap)->CubeTexture);
+		SetTextureStage(11, EnvironmentMapAddressModeU, EnvironmentMapAddressModeV, EnvironmentMapAddressModeW);
+		GetDevice()->SetTexture(11, ((ZED3D9TextureCube*)EnvironmentMap)->CubeTexture);
 	}
 
 	if (MaterialComponents & ZE_SHADER_LIGHT_MAP && LightMap != NULL)
@@ -483,7 +480,7 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* 
 		GetDevice()->SetTexture(13, ((ZED3D9Texture2D*)DistortionMap)->Texture);
 	}
 	
-	if (MaterialComponents & ZE_SHADER_DETAIL_BASE_MAP && DetailDiffuseMap != NULL)
+	if (MaterialComponents & ZE_SHADER_DETAIL_BASE_MAP && DetailBaseMap != NULL)
 	{
 		SetTextureStage(14, DetailBaseMapAddressModeU, DetailBaseMapAddressModeV);
 		GetDevice()->SetTexture(14, ((ZED3D9Texture2D*)DetailBaseMap)->Texture);
@@ -498,7 +495,7 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* 
 	GetDevice()->SetPixelShader(ForwardPassPixelShader->GetPixelShader());
 	GetDevice()->SetVertexShader(ForwardPassVertexShader->GetVertexShader());
 	
-	return false;
+	return true;
 }
 
 bool ZED3D9FixedMaterial::SetupShadowPass() const

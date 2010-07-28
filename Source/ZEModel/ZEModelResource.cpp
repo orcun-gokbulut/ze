@@ -192,10 +192,14 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_DETAILNORMALMAP);
 		CurrentMaterial->SetDetailBaseMap(ManageModelMaterialTextures(MaterialChunk.DetailMap, Model->TextureResources));
 		CurrentMaterial->SetDetailNormalMap(ManageModelMaterialTextures(MaterialChunk.DetailNormalMap, Model->TextureResources));
-		CurrentMaterial->SetReflectionEnabled(false);
-		CurrentMaterial->SetRefractionMap(NULL);//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap, TextureResources);
-		CurrentMaterial->SetRefractionEnabled(false);
-		CurrentMaterial->SetRefractionMap(NULL);
+		
+		/*CurrentMaterial->SetReflectionEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_REFLECTION);
+		CurrentMaterial->SetReflectionFactor(MaterialChunk.ReflectionFactor);
+		CurrentMaterial->SetRefractionEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_REFRACTION);
+		CurrentMaterial->SetRefractionFactor(MaterialChunk.RefractionFactor);
+//		CurrentMaterial->SetRefractionIndex(MaterialC>)
+		CurrentMaterial->SetEnvironmentMap(ManageMapMaterialTextures(MaterialChunk.EnvironmentMap, TextureResources));
+		CurrentMaterial->SetRefractionMap(NULL);*/
 
 		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_LIGHTMAP);
 		CurrentMaterial->SetLightMap(ManageModelMaterialTextures(MaterialChunk.LightMap, Model->TextureResources));

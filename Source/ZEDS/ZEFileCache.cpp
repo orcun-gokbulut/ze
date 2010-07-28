@@ -35,6 +35,7 @@
 
 #include "ZEFileCache.h"
 #include <stdio.h>
+#include "ZECore/ZEError.h"
 
 void ZECachePartialResourceFile::Initialize(void* File, size_t StartPosition, size_t EndPosition)
 {

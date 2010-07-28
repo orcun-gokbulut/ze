@@ -319,8 +319,7 @@ void ZED3D9Renderer::DoGBufferPass()
 void ZED3D9Renderer::DoLightningPass()
 {
 	// Render Targets
-	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
-	//ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
+	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
 	//ZED3D9CommonTools::SetRenderTarget(1, LBuffer2);
 
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00, 0.0f, 0);
@@ -434,9 +433,14 @@ void ZED3D9Renderer::DoForwardPass()
 	GetDevice()->SetSamplerState(4, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(4, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	ZED3D9CommonTools::SetRenderTarget(0, ABuffer);
-	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	//ZED3D9CommonTools::SetRenderTarget(0, ABuffer);
+	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
 
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
 		ZERenderOrder* RenderOrder = &NonTransparent[I];
@@ -624,7 +628,7 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 		SSAOProcessor.InputNormal = GBuffer2;
 		SSAOProcessor.Output = SSAOBuffer;
 		SSAOProcessor.Process();
-		//DoForwardPass();
+		DoForwardPass();
 
 	GetDevice()->EndScene();
 }

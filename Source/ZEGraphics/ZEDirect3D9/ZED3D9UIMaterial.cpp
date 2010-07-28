@@ -54,7 +54,7 @@ ZED3D9UIMaterial::~ZED3D9UIMaterial()
 
 }
 
-bool ZED3D9UIMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const 
+bool ZED3D9UIMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const 
 {
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
@@ -107,16 +107,6 @@ bool ZED3D9UIMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camer
 		GetDevice()->SetPixelShader(SolidPixelShader);
 
 	return true;
-}
-
-bool ZED3D9UIMaterial::SetupPreLightning() const 
-{
-	return true;
-}
-
-size_t ZED3D9UIMaterial::DoPreLightningPass() const 
-{
-	return 1;
 }
 
 void ZED3D9UIMaterial::UpdateMaterial()

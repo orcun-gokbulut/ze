@@ -57,9 +57,10 @@ float4 MaterialParams2 : register(ps, c2);
 float4 MaterialParams3 : register(ps, c3);
 float4 MaterialParams4 : register(ps, c4);
 float4 MaterialParams5 : register(ps, c5);
+float4 PipelineParameters0 : register(ps, c6);
 float4 MaterialParams6 : register(vs, c12);
-float FarZ : register(c6);
-float PixelSize_2 : register(ps, c6);
+
+
 
 #define	MaterialAmbientColor        MaterialParams0.xyz
 #define	MaterialOpacity				MaterialParams0.w
@@ -74,6 +75,9 @@ float PixelSize_2 : register(ps, c6);
 #define MaterialDistortionFactor	MaterialParams5.x
 #define MaterialDistortionAmount	MaterialParams5.y
 #define MaterialRefractionIndex		MaterialParams6.x
+
+#define PixelSize_2					PipelineParameters0.xy
+#define FarZ						PipelineParameters0.z
 
 // Textures
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -281,7 +285,7 @@ FPVSOutput FPVSMain(VSInput Input)
 
 	// Pipeline 
 	Output.Position = mul(Input.Position, WorldViewProjMatrix);
-	//Output.Normal.xyz = mul(Input.Normal, WorldViewInvTrpsMatrix).xyz;
+	Output.Texcoord = Input.Texcoord;
 	
 	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y);
 	Output.ScreenPosition.z = Output.Position.w;
@@ -297,6 +301,8 @@ FPVSOutput FPVSMain(VSInput Input)
 	#ifdef ZE_SHADER_LIGHTMAP
 		Output.LightMapTexcoord = Input.LightMapTexcoord;
 	#endif
+	
+	return Output;
 }
 
 struct FPPSOutput
@@ -338,9 +344,9 @@ FPPSOutput FPPSMain(FPPSInput Input)
 		#ifdef ZE_SHADER_BASE_MAP
 			AmbientColor *= tex2D(BaseMap, Input.Texcoord).rgb;
 		#endif
-		#ifdef ZE_SHADER_SSAO
-			AmbientColor *= tex2D(SSAOMap, ScreenPosition).r;
-		#endif
+		//#ifdef ZE_SHADER_SSAO
+			AmbientColor *= tex2D(SSAOBuffer, ScreenPosition).r;
+		//#endif
 		
 		#ifdef ZE_SHADER_LIGHT_MAP
 			AmbientColor *= tex2D(LightMap, Input.Texcoord).rgb;
@@ -355,7 +361,7 @@ FPPSOutput FPPSMain(FPPSInput Input)
 			DiffuseColor *= tex2D(BaseMap, Input.Texcoord).rgb;
 		#endif
 	
-		DiffuseColor *= tex2D(LBuffer, ScreenPosition).rgb;
+		DiffuseColor *= tex2D(LBuffer1, ScreenPosition).rgb;
 		
 		Output.Color.rgb += DiffuseColor;
 	#endif
@@ -366,7 +372,7 @@ FPPSOutput FPPSMain(FPPSInput Input)
 			SpecularColor *= tex2D(SpecularMap, Input.Texcoord).rgb;
 		#endif
 		
-		SpecularColor *= tex2D(LBufer, ScreenPosition).a * tex2D(LBuffer, ScreenPosition).rgb;
+		SpecularColor *= tex2D(LBuffer1, ScreenPosition).a * normalize(tex2D(LBuffer1, ScreenPosition)).rgb;
 		
 		Output.Color.rgb += SpecularColor;
 	#endif
@@ -374,18 +380,18 @@ FPPSOutput FPPSMain(FPPSInput Input)
 	#ifdef ZESHADER_EMMISIVE
 		float3 EmmisiveColor = MaterialEmmisiveColor;
 		#ifdef ZE_SHADER_EMMISIVE_MAP
-			EmmisiveColor *= MaterialEmmisiveCotex2D(EmmisiveMap, Input.Texcoord);
+			EmmisiveColor *= MaterialEmmisiveFactor * tex2D(EmmisiveMap, Input.Texcoord);
 		#endif
 
 		Output.Color.rgb += EmmisiveColor;
 	#endif
 
 	#ifdef ZE_SHADER_REFLECTION
-			Output.Color.rgb += MaterialReflectionFactor * texCUBE(EnvironmentMap, normalize(Input.ReflectionVector)).rgb;
+		Output.Color.rgb += MaterialReflectionFactor * texCUBE(EnvironmentMap, normalize(Input.ReflectionVector)).rgb;
 	#endif
 		
 	#ifdef ZE_SHADER_REFRACTION
-			Output.Color.rgb += MaterialRefractionFactor * texCUBE(EnvironmentMap, normalize(Input.RefractionVector)).rgb;
+		Output.Color.rgb += MaterialRefractionFactor * texCUBE(EnvironmentMap, normalize(Input.RefractionVector)).rgb;
 	#endif
 		
 	#ifdef ZE_SHADER_OPASITY
@@ -401,10 +407,12 @@ FPPSOutput FPPSMain(FPPSInput Input)
 			#else
 				Output.Color.a = tex2D(DiffuseMap, Input.Texcoord).a;
 			#endif
-		#elif 
+		#else 
 			Output.Color.a = MaterialOpacity;
 		#endif
 	#endif
+	
+	return Output;
 }
 
 

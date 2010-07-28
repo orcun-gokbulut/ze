@@ -54,12 +54,12 @@
 #define ZE_SHADER_SPECULAR_MAP				8
 #define ZE_SHADER_EMMISIVE_MAP				16
 #define ZE_SHADER_OPACITY_MAP				32
-#define ZE_SHADER_DETAIL_DIFFUSE_MAP			64
+#define ZE_SHADER_DETAIL_BASE_MAP			64
 #define ZE_SHADER_DETAIL_NORMAL_MAP			128
 #define ZE_SHADER_REFLECTION					256
 #define ZE_SHADER_REFRACTION					512
 #define ZE_SHADER_LIGHT_MAP					1024
-#define ZE_SHADER_DISTORTIONMAP				2048
+#define ZE_SHADER_DISTORTION_MAP				2048
 
 const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(char* FileName)
 {
@@ -135,10 +135,9 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_DETAIL_NORMAL_MAP);
 		CurrentMaterial->SetDetailBaseMap(ManageMapMaterialTextures(MaterialChunk.DetailMap));
 		CurrentMaterial->SetDetailNormalMap(ManageMapMaterialTextures(MaterialChunk.DetailNormalMap));
+
 		CurrentMaterial->SetReflectionEnabled(false);
-		CurrentMaterial->SetRefractionMap(NULL);//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap);
 		CurrentMaterial->SetRefractionEnabled(false);
-		CurrentMaterial->SetRefractionMap(NULL);
 
 		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_LIGHT_MAP);
 		CurrentMaterial->SetLightMap(ManageMapMaterialTextures(MaterialChunk.LightMap));

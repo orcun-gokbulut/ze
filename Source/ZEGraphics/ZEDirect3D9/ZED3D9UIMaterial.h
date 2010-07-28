@@ -56,11 +56,8 @@ class ZED3D9UIMaterial : public ZEUIMaterial, public ZED3D9ComponentBase
 		virtual							~ZED3D9UIMaterial();
 
 	public:
-		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const;
-
-		virtual bool					SetupPreLightning() const;
-		virtual size_t					DoPreLightningPass() const;
-
+		virtual bool					SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		
 		virtual void					UpdateMaterial();
 
 		virtual void					Release();

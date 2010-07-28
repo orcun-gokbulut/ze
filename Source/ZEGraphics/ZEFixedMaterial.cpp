@@ -70,12 +70,9 @@ void ZEFixedMaterial::SetZero()
 	DetailBaseMapAddressModeV = ZE_TAM_WRAP;
 	DetailNormalMapAddressModeU = ZE_TAM_WRAP;
 	DetailNormalMapAddressModeV = ZE_TAM_WRAP;
-	ReflectionMapAddressModeU = ZE_TAM_WRAP;
-	ReflectionMapAddressModeV = ZE_TAM_WRAP;
-	ReflectionMapAddressModeW = ZE_TAM_WRAP;
-	RefractionMapAddressModeU = ZE_TAM_WRAP;
-	RefractionMapAddressModeV = ZE_TAM_WRAP;
-	RefractionMapAddressModeW = ZE_TAM_WRAP;
+	EnvironmentMapAddressModeU = ZE_TAM_WRAP;
+	EnvironmentMapAddressModeV = ZE_TAM_WRAP;
+	EnvironmentMapAddressModeW = ZE_TAM_WRAP;
 	LightMapAddressModeU = ZE_TAM_WRAP;
 	LightMapAddressModeV = ZE_TAM_WRAP;
 	DistortionMapAddressModeU = ZE_TAM_WRAP;

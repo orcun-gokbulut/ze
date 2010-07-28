@@ -257,36 +257,6 @@ const ZEPropertyDescription* ZEFixedMaterialDescription::GetProperties() const
 
    static ZEPropertyEnumurator Enum22 = {"ZETextureAddressMode", EnumItems22, 4};
 
-   static ZEPropertyEnumuratorItem EnumItems23[] =
-   {
-      {"Wrap", ZE_TAM_WRAP},
-      {"Clamp", ZE_TAM_CLAMP},
-      {"Mirror", ZE_TAM_MIRROR},
-      {"Border", ZE_TAM_BORDER}
-   };
-
-   static ZEPropertyEnumurator Enum23 = {"ZETextureAddressMode", EnumItems23, 4};
-
-   static ZEPropertyEnumuratorItem EnumItems24[] =
-   {
-      {"Wrap", ZE_TAM_WRAP},
-      {"Clamp", ZE_TAM_CLAMP},
-      {"Mirror", ZE_TAM_MIRROR},
-      {"Border", ZE_TAM_BORDER}
-   };
-
-   static ZEPropertyEnumurator Enum24 = {"ZETextureAddressMode", EnumItems24, 4};
-
-   static ZEPropertyEnumuratorItem EnumItems25[] =
-   {
-      {"Wrap", ZE_TAM_WRAP},
-      {"Clamp", ZE_TAM_CLAMP},
-      {"Mirror", ZE_TAM_MIRROR},
-      {"Border", ZE_TAM_BORDER}
-   };
-
-   static ZEPropertyEnumurator Enum25 = {"ZETextureAddressMode", EnumItems25, 4};
-
     static const ZEPropertyDescription Properties[] = {
          {"TwoSided", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Shading", ZE_PS_NONE, NULL, NULL},
          {"LightningEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Shading", ZE_PS_NONE, NULL, NULL},
@@ -322,38 +292,35 @@ const ZEPropertyDescription* ZEFixedMaterialDescription::GetProperties() const
          {"OpacityComponent", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Opacity", ZE_PS_NONE, NULL, &Enum9},
          {"OpacityMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Opacity", ZE_PS_NONE, NULL, &Enum10},
          {"OpacityMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Opacity", ZE_PS_NONE, NULL, &Enum11},
-         {"ReflectionEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Reflection", ZE_PS_NONE, NULL, NULL},
-         {"ReflectionFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Reflection", ZE_PS_NONE, NULL, NULL},
-         {"ReflectionMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Reflection", ZE_PS_NONE, NULL, &Enum12},
-         {"ReflectionMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Reflection", ZE_PS_NONE, NULL, &Enum13},
-         {"ReflectionMapAddressModeW", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Reflection", ZE_PS_NONE, NULL, &Enum14},
-         {"RefractionEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, NULL},
-         {"RefractionFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, NULL},
-         {"RefractionIndex", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, NULL},
-         {"RefractionMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, &Enum15},
-         {"RefractionMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, &Enum16},
-         {"RefractionMapAddressModeW", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Refraction", ZE_PS_NONE, NULL, &Enum17},
+         {"EnvironmentMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Environment", ZE_PS_NONE, NULL, &Enum12},
+         {"EnvironmentMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Environment", ZE_PS_NONE, NULL, &Enum13},
+         {"EnvironmentMapAddressModeW", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Environment", ZE_PS_NONE, NULL, &Enum14},
+         {"ReflectionEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Environment", ZE_PS_NONE, NULL, NULL},
+         {"ReflectionFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Environment", ZE_PS_NONE, NULL, NULL},
+         {"RefractionEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Environment", ZE_PS_NONE, NULL, NULL},
+         {"RefractionFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Environment", ZE_PS_NONE, NULL, NULL},
+         {"RefractionIndex", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Environment", ZE_PS_NONE, NULL, NULL},
          {"DetailMapEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, NULL},
          {"DetailMapTiling", ZE_VRT_VECTOR2, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, NULL},
-         {"DetailBaseMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum18},
-         {"DetailBaseMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum19},
-         {"DetailNormalMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum20},
-         {"DetailNormalMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum21},
+         {"DetailBaseMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum15},
+         {"DetailBaseMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum16},
+         {"DetailNormalMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum17},
+         {"DetailNormalMapAddressModeV", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Detail", ZE_PS_NONE, NULL, &Enum18},
          {"LightMapEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Light Map", ZE_PS_NONE, NULL, NULL},
          {"LightMapFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Light Map", ZE_PS_NONE, NULL, NULL},
-         {"LightMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Light Map", ZE_PS_NONE, NULL, &Enum22},
-         {"LightMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Light Map", ZE_PS_NONE, NULL, &Enum23},
+         {"LightMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Light Map", ZE_PS_NONE, NULL, &Enum19},
+         {"LightMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Light Map", ZE_PS_NONE, NULL, &Enum20},
          {"DistortionEnabled", ZE_VRT_BOOLEAN, ZE_PA_READWRITE, true, false, "", "Distortion", ZE_PS_NONE, NULL, NULL},
          {"DistortionFactor", ZE_VRT_FLOAT, ZE_PA_READWRITE, true, false, "", "Distortion", ZE_PS_NONE, NULL, NULL},
-         {"DistortionMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Distortion", ZE_PS_NONE, NULL, &Enum24},
-         {"DistortionMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Distortion", ZE_PS_NONE, NULL, &Enum25}
+         {"DistortionMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Distortion", ZE_PS_NONE, NULL, &Enum21},
+         {"DistortionMapAddressModeU", ZE_VRT_INTEGER, ZE_PA_READWRITE, true, false, "", "Distortion", ZE_PS_NONE, NULL, &Enum22}
     };
     return (const ZEPropertyDescription*)&Properties;
 }
 
 size_t ZEFixedMaterialDescription::GetPropertyCount() const
 {
-    return 59;
+    return 56;
 }
 
 size_t ZEFixedMaterialDescription::GetPropertyOffset() const
@@ -419,30 +386,30 @@ int ZEFixedMaterial::GetPropertyId(const char* Name) const
         {"SpecularColor", 1342, 15},
         {"AmbientEnabled", 1387, 6},
         {"DiffuseEnabled", 1393, 9},
-        {"LightMapFactor", 1397, 52},
+        {"LightMapFactor", 1397, 49},
         {"OpacityEnabled", 1412, 29},
         {"EmmisiveFactor", 1438, 19},
         {"SpecularFactor", 1438, 13},
-        {"LightMapEnabled", 1473, 51},
-        {"DetailMapTiling", 1496, 46},
+        {"LightMapEnabled", 1473, 48},
+        {"DetailMapTiling", 1496, 43},
         {"EmmisiveEnabled", 1514, 18},
         {"SpecularEnabled", 1514, 12},
         {"RefractionIndex", 1541, 41},
-        {"DetailMapEnabled", 1564, 45},
+        {"DetailMapEnabled", 1564, 42},
         {"NormalMapEnabled", 1586, 23},
         {"LightningEnabled", 1615, 1},
-        {"ReflectionFactor", 1642, 35},
+        {"ReflectionFactor", 1642, 38},
         {"RefractionFactor", 1644, 40},
         {"TransparancyMode", 1659, 5},
         {"OpacityComponent", 1676, 31},
-        {"DistortionFactor", 1678, 56},
-        {"ReflectionEnabled", 1718, 34},
+        {"DistortionFactor", 1678, 53},
+        {"ReflectionEnabled", 1718, 37},
         {"RefractionEnabled", 1720, 39},
-        {"DistortionEnabled", 1754, 55},
+        {"DistortionEnabled", 1754, 52},
         {"SpecularShininess", 1779, 14},
         {"ParallaxMapEnabled", 1790, 26},
-        {"LightMapAddressModeU", 1974, 54},
-        {"LightMapAddressModeU", 1974, 53},
+        {"LightMapAddressModeU", 1974, 51},
+        {"LightMapAddressModeU", 1974, 50},
         {"NormalMapAddressModeU", 2087, 24},
         {"NormalMapAddressModeV", 2088, 25},
         {"TransparancyCullLimit", 2181, 4},
@@ -450,22 +417,19 @@ int ZEFixedMaterial::GetPropertyId(const char* Name) const
         {"OpacityMapAddressModeV", 2200, 33},
         {"ParallaxMapAddressModeU", 2291, 27},
         {"ParallaxMapAddressModeV", 2292, 28},
-        {"SpecularMapAddressModeU", 2301, 16},
         {"EmmisiveMapAddressModeU", 2301, 21},
+        {"SpecularMapAddressModeU", 2301, 16},
         {"EmmisiveMapAddressModeV", 2302, 22},
         {"SpecularMapAddressModeV", 2302, 17},
-        {"DetailBaseMapAddressModeU", 2444, 47},
-        {"DetailBaseMapAddressModeV", 2445, 48},
-        {"ReflectionMapAddressModeU", 2505, 36},
-        {"ReflectionMapAddressModeV", 2506, 37},
-        {"ReflectionMapAddressModeW", 2507, 38},
-        {"RefractionMapAddressModeU", 2507, 42},
-        {"RefractionMapAddressModeV", 2508, 43},
-        {"RefractionMapAddressModeW", 2509, 44},
-        {"DistortionMapAddressModeU", 2541, 57},
-        {"DistortionMapAddressModeU", 2541, 58},
-        {"DetailNormalMapAddressModeU", 2682, 49},
-        {"DetailNormalMapAddressModeV", 2683, 50},
+        {"DetailBaseMapAddressModeU", 2444, 44},
+        {"DetailBaseMapAddressModeV", 2445, 45},
+        {"DistortionMapAddressModeU", 2541, 54},
+        {"DistortionMapAddressModeU", 2541, 55},
+        {"EnvironmentMapAddressModeU", 2643, 34},
+        {"EnvironmentMapAddressModeV", 2644, 35},
+        {"EnvironmentMapAddressModeW", 2645, 36},
+        {"DetailNormalMapAddressModeU", 2682, 46},
+        {"DetailNormalMapAddressModeV", 2683, 47},
     };
 
     int Hash = 0;
@@ -474,7 +438,7 @@ int ZEFixedMaterial::GetPropertyId(const char* Name) const
         Hash += Name[I];
 
     int LowBound = 0;
-    int HighBound = 58;
+    int HighBound = 55;
     int Probe = 0;
     int ProbeHash;
     while (HighBound >= LowBound)
@@ -499,7 +463,7 @@ int ZEFixedMaterial::GetPropertyId(const char* Name) const
 
             SemiProbe = Probe + 1;
             //Check Right
-            while (PropertyIds[SemiProbe].Hash == Hash && Probe < 59)
+            while (PropertyIds[SemiProbe].Hash == Hash && Probe < 56)
             {
 	              if (strncmp(PropertyIds[SemiProbe].Name, Name, ZE_MAX_NAME_SIZE) == 0)
 		              return PropertyIds[SemiProbe].Index + ZEFixedMaterial::ClassDescription()->GetPropertyOffset();
@@ -517,7 +481,7 @@ bool ZEFixedMaterial::SetProperty(int PropertyId, const ZEVariant& Value)
     int Index = PropertyId - ZEFixedMaterial::ClassDescription()->GetPropertyOffset();
 
 
-    if (Index >= 59)
+    if (Index >= 56)
         return false;
 
     if (ZEFixedMaterial::ClassDescription()->GetProperties()[Index].Type != Value.GetType())
@@ -628,19 +592,19 @@ bool ZEFixedMaterial::SetProperty(int PropertyId, const ZEVariant& Value)
             SetOpacityMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
             break;
         case 34:
-            SetReflectionEnabled(Value.GetBoolean());
+            SetEnvironmentMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
             break;
         case 35:
-            SetReflectionFactor(Value.GetFloat());
+            SetEnvironmentMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
             break;
         case 36:
-            SetReflectionMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
+            SetEnvironmentMapAddressModeW((ZETextureAddressMode)Value.GetInteger());
             break;
         case 37:
-            SetReflectionMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
+            SetReflectionEnabled(Value.GetBoolean());
             break;
         case 38:
-            SetReflectionMapAddressModeW((ZETextureAddressMode)Value.GetInteger());
+            SetReflectionFactor(Value.GetFloat());
             break;
         case 39:
             SetRefractionEnabled(Value.GetBoolean());
@@ -652,54 +616,45 @@ bool ZEFixedMaterial::SetProperty(int PropertyId, const ZEVariant& Value)
             SetRefractionIndex(Value.GetFloat());
             break;
         case 42:
-            SetRefractionMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
-            break;
-        case 43:
-            SetRefractionMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
-            break;
-        case 44:
-            SetRefractionMapAddressModeW((ZETextureAddressMode)Value.GetInteger());
-            break;
-        case 45:
             SetDetailMapEnabled(Value.GetBoolean());
             break;
-        case 46:
+        case 43:
             SetDetailMapTiling(Value.GetVector2());
             break;
-        case 47:
+        case 44:
             SetDetailBaseMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
             break;
-        case 48:
+        case 45:
             SetDetailBaseMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
             break;
-        case 49:
+        case 46:
             SetDetailNormalMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
             break;
-        case 50:
+        case 47:
             SetDetailNormalMapAddressModeV((ZETextureAddressMode)Value.GetInteger());
             break;
-        case 51:
+        case 48:
             SetLightMapEnabled(Value.GetBoolean());
             break;
-        case 52:
+        case 49:
             SetLightMapFactor(Value.GetFloat());
             break;
-        case 53:
+        case 50:
             SetLightMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
             break;
-        case 54:
+        case 51:
             SetLightMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
             break;
-        case 55:
+        case 52:
             SetDistortionEnabled(Value.GetBoolean());
             break;
-        case 56:
+        case 53:
             SetDistortionFactor(Value.GetFloat());
             break;
-        case 57:
+        case 54:
             SetDistortionMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
             break;
-        case 58:
+        case 55:
             SetDistortionMapAddressModeU((ZETextureAddressMode)Value.GetInteger());
             break;
         default:
@@ -725,7 +680,7 @@ bool ZEFixedMaterial::GetProperty(int PropertyId, ZEVariant& Value) const
     if (Index < 0)
         return false;
 
-    if (Index >= 59)
+    if (Index >= 56)
         return false;
 
     switch(Index)
@@ -833,19 +788,19 @@ bool ZEFixedMaterial::GetProperty(int PropertyId, ZEVariant& Value) const
             Value = (int)GetOpacityMapAddressModeV();
             break;
         case 34:
-            Value = (bool)GetReflectionEnabled();
+            Value = (int)GetEnvironmentMapAddressModeU();
             break;
         case 35:
-            Value = (float)GetReflectionFactor();
+            Value = (int)GetEnvironmentMapAddressModeV();
             break;
         case 36:
-            Value = (int)GetReflectionMapAddressModeU();
+            Value = (int)GetEnvironmentMapAddressModeW();
             break;
         case 37:
-            Value = (int)GetReflectionMapAddressModeV();
+            Value = (bool)GetReflectionEnabled();
             break;
         case 38:
-            Value = (int)GetReflectionMapAddressModeW();
+            Value = (float)GetReflectionFactor();
             break;
         case 39:
             Value = (bool)GetRefractionEnabled();
@@ -857,54 +812,45 @@ bool ZEFixedMaterial::GetProperty(int PropertyId, ZEVariant& Value) const
             Value = (float)GetRefractionIndex();
             break;
         case 42:
-            Value = (int)GetRefractionMapAddressModeU();
-            break;
-        case 43:
-            Value = (int)GetRefractionMapAddressModeV();
-            break;
-        case 44:
-            Value = (int)GetRefractionMapAddressModeW();
-            break;
-        case 45:
             Value = (bool)GetDetailMapEnabled();
             break;
-        case 46:
+        case 43:
             Value = (ZEVector2)GetDetailMapTiling();
             break;
-        case 47:
+        case 44:
             Value = (int)GetDetailBaseMapAddressModeU();
             break;
-        case 48:
+        case 45:
             Value = (int)GetDetailBaseMapAddressModeV();
             break;
-        case 49:
+        case 46:
             Value = (int)GetDetailNormalMapAddressModeU();
             break;
-        case 50:
+        case 47:
             Value = (int)GetDetailNormalMapAddressModeV();
             break;
-        case 51:
+        case 48:
             Value = (bool)GetLightMapEnabled();
             break;
-        case 52:
+        case 49:
             Value = (float)GetLightMapFactor();
             break;
-        case 53:
+        case 50:
             Value = (int)GetLightMapAddressModeU();
             break;
-        case 54:
+        case 51:
             Value = (int)GetLightMapAddressModeU();
             break;
-        case 55:
+        case 52:
             Value = (bool)GetDistortionEnabled();
             break;
-        case 56:
+        case 53:
             Value = (float)GetDistortionFactor();
             break;
-        case 57:
+        case 54:
             Value = (int)GetDistortionMapAddressModeU();
             break;
-        case 58:
+        case 55:
             Value = (int)GetDistortionMapAddressModeU();
             break;
         default:

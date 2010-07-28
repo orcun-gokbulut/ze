@@ -103,7 +103,7 @@ float4 PLPSMain(PLVSInput Input) : COLOR0
 	float AngularAttenuation = saturate(dot(LightDirection, Normal));
 	float DistanceAttenuation = 1.0f / dot(LightAttenuationFactors, float3(1.0f, LightDistance, LightDistance * LightDistance));
 	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensity * LightColor;
-	Output.w = 1.0f;// AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
+	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
 	
 	return Output;
 }
