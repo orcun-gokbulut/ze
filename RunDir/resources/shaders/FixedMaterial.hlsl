@@ -208,8 +208,7 @@ struct GBPSOutput
 
 void GBDoParallax(inout GBPSInput Input)
 {
-	// Trace Ray
-	// Recalculate Depth and Texcoord
+
 }
 
 float3 GBGetNormal(in GBPSInput Input)

@@ -59,6 +59,7 @@ sampler2D GBuffer2;
 #include "GBuffer.hlsl"
 
 // Point Light
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct PLVSOutput
 {
 	float4 Position : POSITION0;
@@ -109,7 +110,61 @@ float4 PLPSMain(PLVSInput Input) : COLOR0
 }
 
 // Directional Light
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Projective Light
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Omni Projective Light
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct PLVSOutput
+{
+	float4 Position : POSITION0;
+	float3 ScreenPosition : TEXCOORD0;
+	float3 ViewVector : TEXCOORD1;
+};
+
+PLVSOutput PLVSMain(float4 Position : POSITION0)
+{
+	PLVSOutput Output;
+	
+	Output.Position = mul(Position, WorldViewProjMatrix);
+	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y);
+	Output.ScreenPosition.z = Output.Position.w;
+	Output.ViewVector = Output.Position * ViewVector;
+	
+	return Output;
+}
+
+struct PLVSInput
+{
+	float3 ScreenPosition : TEXCOORD0;
+	float3 ScreenPosition : TEXCOORD0;
+	float3 ViewVector : TEXCOORD1;
+};
+	
+float4 OPLPSMain(PLVSInput Input) : COLOR0
+{
+	float4 Output;
+	
+	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.z * 0.5f + 0.5f + PixelSize_2;
+	float3 Position = GetViewPosition(GBuffer1, ScreenPosition, Input.ViewVector);
+	float3 Normal = GetViewNormal(GBuffer2, ScreenPosition);
+	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
+
+	// Light Derived Parameters
+	float3 LightColor = texCUBE(OmniProjectionTexture, Input.ProjectionDirection);
+	
+	float3 LightDisplacement = LightPosition - Position;
+	float LightDistance = length(LightDisplacement);
+	float3 LightDirection = LightDisplacement / LightDistance;
+	float ViewDirection = normalize(-Position);
+	float3 HalfVector = normalize(LightDirection + ViewDirection);
+		
+	float AngularAttenuation = saturate(dot(LightDirection, Normal));
+	float DistanceAttenuation = 1.0f / dot(LightAttenuationFactors, float3(1.0f, LightDistance, LightDistance * LightDistance));
+	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensity * LightColor;
+	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
+	
+	return Output;
+}
