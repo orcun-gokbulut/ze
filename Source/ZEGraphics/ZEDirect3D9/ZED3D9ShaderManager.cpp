@@ -133,6 +133,11 @@ ZED3D9Shader* ZED3D9ShaderManager::GetShader(const char* FileName, const char* F
 		((ZED3D9VertexShader*)Shader)->VertexShader = VertexShader;
 	}
 
+	strncpy(Shader->FileName, FileName, 100);
+	strncpy(Shader->FunctionName, FunctionName, 100);
+	Shader->Components = Components;
+	Shader->Hash = CalculateHash(FileName, FunctionName, Components);
+
 	// Add to shader list
 	bool Found = false;
 	for (size_t I = 0; I < Shaders.GetCount(); I++)

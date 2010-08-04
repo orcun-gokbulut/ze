@@ -42,6 +42,7 @@
 #include "ZED3D9ViewPort.h"
 #include "ZED3D9Texture2D.h"
 #include "ZEGraphics/ZECamera.h"
+#include "ZED3D9Profiler.h"
 
 #include <d3d9.h>
 #include <stdlib.h>
@@ -143,6 +144,8 @@ void ZED3D9SSAOProcessor::OnDeviceRestored()
 
 void ZED3D9SSAOProcessor::Process()
 {
+	zeProfilerStart("SSAO Pass");
+
 	static struct Vert  
 	{
 		float Position[3];
@@ -211,6 +214,8 @@ void ZED3D9SSAOProcessor::Process()
 	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)RandomTextureResource->GetTexture())->Texture);
 	
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	
+	zeProfilerEnd();
 }
 
 

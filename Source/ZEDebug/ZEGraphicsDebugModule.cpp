@@ -40,6 +40,8 @@
 #include "ZEGame\ZEScene.h"
 #include "ZEGraphics\ZEGraphicsModule.h"
 #include "ZEGraphics\ZEPointLight.h"
+#include "ZEGraphics\ZEOmniProjectiveLight.h"
+#include "ZEGraphics\ZETextureCubeResource.h"
 
 
 bool ZEGraphicsDebugModule::Initialize()
@@ -98,18 +100,29 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	PointLight5 = new ZEPointLight();
 	PointLight5->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
-	PointLight5->SetColor(ZEVector3(0.5f, 0.5f, 1.0f));
+	PointLight5->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	PointLight5->SetAttenuation(0.03f, 0.0f, 1.0f);
 	PointLight5->SetIntensity(2.0f);
 	PointLight5->SetRange(40.0f);
 	PointLight5->SetCastShadows(false);
 	Scene->AddEntity(PointLight5);
 
-	PointLight1->SetEnabled(true);
-	PointLight2->SetEnabled(true);
-	PointLight3->SetEnabled(true);
-	PointLight4->SetEnabled(true);
-	PointLight5->SetEnabled(true);
+	OmniProjectiveLight0 = new ZEOmniProjectiveLight();
+	OmniProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
+	OmniProjectiveLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
+	OmniProjectiveLight0->SetAttenuation(0.03f, 0.0f, 1.0f);
+	OmniProjectiveLight0->SetIntensity(2.0f);
+	OmniProjectiveLight0->SetRange(40.0f);
+	OmniProjectiveLight0->SetProjectionTexture(ZETextureCubeResource::LoadResource("cubetest.tga")->GetTexture());
+	OmniProjectiveLight0->SetCastsShadows(false);
+	Scene->AddEntity(OmniProjectiveLight0);
+
+	PointLight1->SetEnabled(false);
+	PointLight2->SetEnabled(false);
+	PointLight3->SetEnabled(false);
+	PointLight4->SetEnabled(false);
+	PointLight5->SetEnabled(false);
+	OmniProjectiveLight0->SetEnabled(true);
 	return true;
 }
 

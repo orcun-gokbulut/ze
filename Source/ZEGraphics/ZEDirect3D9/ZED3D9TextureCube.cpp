@@ -127,7 +127,7 @@ bool ZED3D9TextureCube::Create(int EdgeLength, ZETexturePixelFormat PixelFormat,
 void ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch)
 {
 	D3DLOCKED_RECT Rect;
-	CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, 0, &Rect, NULL, D3DLOCK_DISCARD);
+	CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, 0, &Rect, NULL, 0);
 	*Buffer = Rect.pBits;
 	*Pitch = Rect.Pitch;
 }

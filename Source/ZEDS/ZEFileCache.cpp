@@ -72,6 +72,8 @@ bool ZEFileCache::OpenCache(const char* FileName, bool OnlineMode)
 	}
 	this->OnlineMode = OnlineMode;
 	ReadItemList();
+
+	return true;
 }
 
 void ZEFileCache::CloseCache()

@@ -36,6 +36,7 @@
 //* Vertex Shader Constants
 /////////////////////////////////////////////////////////////////////////////////////////
 
+
 // Vertex Transformation
 float3 ViewVector : register(vs, c0);
 
@@ -53,8 +54,12 @@ float2 PixelSize_2 : register(ps, c5);
 #define LightIntensity			LightParameters1.w
 #define LightAttenuationFactors	LightParameters2.xyz
 
-sampler2D GBuffer1;
-sampler2D GBuffer2;
+float3x3 LightRotation : register(ps, c10);
+
+sampler2D GBuffer1 : register(ps, s0);
+sampler2D GBuffer2 : register(ps, s1);
+sampler2D ProjectionMap : register(ps, s2);
+samplerCUBE OmniProjectionMap : register(ps, s3);
 
 #include "GBuffer.hlsl"
 
@@ -79,13 +84,13 @@ PLVSOutput PLVSMain(float4 Position : POSITION0)
 	return Output;
 }
 
-struct PLVSInput
+struct PLPSInput
 {
 	float3 ScreenPosition : TEXCOORD0;
 	float3 ViewVector : TEXCOORD1;
 };
 
-float4 PLPSMain(PLVSInput Input) : COLOR0
+float4 PLPSMain(PLPSInput Input) : COLOR0
 {
 	float4 Output;
 	
@@ -117,16 +122,16 @@ float4 PLPSMain(PLVSInput Input) : COLOR0
 
 // Omni Projective Light
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-struct PLVSOutput
+struct OPLVSOutput
 {
 	float4 Position : POSITION0;
 	float3 ScreenPosition : TEXCOORD0;
 	float3 ViewVector : TEXCOORD1;
 };
 
-PLVSOutput PLVSMain(float4 Position : POSITION0)
+PLVSOutput OPLVSMain(float4 Position : POSITION0)
 {
-	PLVSOutput Output;
+	OPLVSOutput Output;
 	
 	Output.Position = mul(Position, WorldViewProjMatrix);
 	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y);
@@ -136,14 +141,13 @@ PLVSOutput PLVSMain(float4 Position : POSITION0)
 	return Output;
 }
 
-struct PLVSInput
+struct OPLPSInput
 {
-	float3 ScreenPosition : TEXCOORD0;
 	float3 ScreenPosition : TEXCOORD0;
 	float3 ViewVector : TEXCOORD1;
 };
 	
-float4 OPLPSMain(PLVSInput Input) : COLOR0
+float4 OPLPSMain(OPLPSInput Input) : COLOR0
 {
 	float4 Output;
 	
@@ -153,17 +157,19 @@ float4 OPLPSMain(PLVSInput Input) : COLOR0
 	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
 
 	// Light Derived Parameters
-	float3 LightColor = texCUBE(OmniProjectionTexture, Input.ProjectionDirection);
-	
 	float3 LightDisplacement = LightPosition - Position;
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
+	
+	float3 TextureLookup = mul(-LightDirection, LightRotation);
+	float3 ProjLightColor = texCUBE(OmniProjectionMap, TextureLookup);
+	
 	float ViewDirection = normalize(-Position);
 	float3 HalfVector = normalize(LightDirection + ViewDirection);
 		
 	float AngularAttenuation = saturate(dot(LightDirection, Normal));
 	float DistanceAttenuation = 1.0f / dot(LightAttenuationFactors, float3(1.0f, LightDistance, LightDistance * LightDistance));
-	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensity * LightColor;
+	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensity * ProjLightColor;
 	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
 	
 	return Output;

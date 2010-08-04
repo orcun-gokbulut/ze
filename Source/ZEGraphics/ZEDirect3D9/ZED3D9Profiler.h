@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDebugModule.h
+ Zinek Engine - ZED3D9Profiler.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,40 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
-#define __ZE_GRAPHICS_DEBUG_MODULE_H__
+#ifndef ZE_D3D9_PROFILER_H__
+#define ZE_D3D9_PROFILER_H__
 
-#include "ZEDebugModule.h"
-#include "ZEGame\ZEModelBrush.h"
+//#ifdef ZE_DEBUG_D3D9_PROFILE 
+	#define zeProfilerStart(EventName) zeD3D9ProfileStart(EventName, __FILE__, __LINE__)
+	#define zeProfilerEnd() zeD3D9ProfileEnd()
+/*#else
+	#define zeProfilerStart(EventName)
+	#define zeProfilerEnd()
+#endif*/
 
-class ZEPlayer;
-class ZEPointLight;
-class ZEOmniProjectiveLight;
-
-class ZEGraphicsDebugModule : public ZEDebugModule
-{
-	private:
-		ZEPlayer*				Player;
-		ZEPointLight*			PointLight1;
-		ZEPointLight*			PointLight2;
-		ZEPointLight*			PointLight3;
-		ZEPointLight*			PointLight4;
-		ZEPointLight*			PointLight5;
-
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
-
-	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-
-
-								ZEGraphicsDebugModule();
-		virtual					~ZEGraphicsDebugModule();
-};
+void zeD3D9ProfileStart(const char* EventName, const char* FileName, int Line);
+void zeD3D9ProfileEnd();
 
 #endif
-
-
-
-
-

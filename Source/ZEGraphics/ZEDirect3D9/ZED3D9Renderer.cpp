@@ -46,6 +46,8 @@
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9VertexDeclaration.h"
 #include "ZED3D9Shader.h"
+#include "ZED3D9Profiler.h"
+
 #include "ZEGraphics\ZEMaterial.h"
 #include "ZEGraphics\ZERenderOrder.h"
 #include "ZEGraphics\ZEPointLight.h"
@@ -53,6 +55,7 @@
 #include "ZEGraphics\ZEProjectiveLight.h"
 #include "ZEGraphics\ZEOmniProjectiveLight.h"
 #include "ZEGraphics\ZECamera.h"
+
 #include "ZECore\ZEError.h"
 
 #pragma warning(disable:4267)
@@ -187,8 +190,13 @@ void ZED3D9Renderer::InitializeLightning()
 
 	if (LightningComponents.LightMeshVB == NULL)
 		LightningComponents.LightMeshVB = (ZED3D9StaticVertexBuffer*)Canvas.CreateStaticVertexBuffer();
+
 	LightningComponents.PointLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "PLVSMain", 0, "vs_2_0");
 	LightningComponents.PointLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PLPSMain", 0, "ps_2_0");
+
+	LightningComponents.OmniProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "OPLVSMain", 0, "vs_2_0");
+	LightningComponents.OmniProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "OPLPSMain", 0, "ps_2_0");
+
 }
 
 void ZED3D9Renderer::DeinitializeLightning()
@@ -206,6 +214,8 @@ void ZED3D9Renderer::DeinitializeLightning()
 
 void ZED3D9Renderer::DrawPointLight(ZEPointLight* Light)
 {
+	zeProfilerStart("Light Pass");
+
 	// Light Parameters
 	struct
 	{
@@ -239,30 +249,83 @@ void ZED3D9Renderer::DrawPointLight(ZEPointLight* Light)
 	GetDevice()->SetPixelShader(LightningComponents.PointLightPS->GetPixelShader());
 	
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
-	//GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 942, 1200); // Sphere 2
+
+	zeProfilerEnd();
 }
 
 void ZED3D9Renderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 {
+	zeProfilerStart("Directional Light Pass");
+
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 2); // Quad
+
+	zeProfilerEnd();
 }
 
 void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 {
+	zeProfilerStart("Projective Light Pass");
+
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 12); // Cone 1
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4578, 24); // Cone 2
 
+	zeProfilerEnd();
 }
 
 void ZED3D9Renderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 {
-	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
-	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 942, 1200); // Sphere 2
+	if (Light->GetProjectionTexture() == NULL)
+		return;
 
+	zeProfilerStart("Omni Projective Light Pass");
+
+	// Light Parameters
+	struct
+	{
+		ZEVector3		Position;
+		float			Range;
+		ZEVector3		Color;
+		float			Intensity;
+		ZEVector3		Attenuation;
+		float			Reserved1;
+	} LightParameters;
+	ZEMatrix4x4::Transform(LightParameters.Position, Camera->GetViewTransform(), Light->GetWorldPosition());
+	LightParameters.Color = Light->GetColor();
+	LightParameters.Attenuation = Light->GetAttenuation();
+	LightParameters.Range = Light->GetRange();
+	LightParameters.Intensity = Light->GetIntensity();
+
+	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 3);
+
+	// Transformation
+	ZEMatrix4x4 WorldTransform;
+	ZEMatrix4x4 WorldViewProjTransform;
+	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), 
+		ZEQuaternion::Identity, 
+		ZEVector3(LightParameters.Range, LightParameters.Range, LightParameters.Range));
+	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
+
+	ZEMatrix4x4 LightRotation, LightRotationView;
+	ZEMatrix4x4::CreateRotation(LightRotation, Light->GetWorldRotation());
+	ZEMatrix4x4::Multiply(LightRotationView, LightRotation, Camera->GetViewTransform());
+	GetDevice()->SetPixelShaderConstantF(10, (float*)&LightRotationView, 3);
+
+	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
+	GetDevice()->SetVertexShader(LightningComponents.OmniProjectiveLightVS->GetVertexShader());
+	GetDevice()->SetPixelShader(LightningComponents.OmniProjectiveLightPS->GetPixelShader());
+
+	GetDevice()->SetTexture(3, ((ZED3D9TextureCube*)Light->GetProjectionTexture())->CubeTexture);
+
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
+
+	zeProfilerEnd();
 }
 
 void ZED3D9Renderer::DoPreZPass()
 {
+	zeProfilerStart("PreZ Pass");
+
 	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
 
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
@@ -283,10 +346,14 @@ void ZED3D9Renderer::DoPreZPass()
 
 		PumpStreams(RenderOrder);
 	}
+
+	zeProfilerEnd();
 }
 
 void ZED3D9Renderer::DoGBufferPass()
 {
+	zeProfilerStart("GBuffer Pass");
+	
 	ZED3D9CommonTools::SetRenderTarget(0, GBuffer1);
 	ZED3D9CommonTools::SetRenderTarget(1, GBuffer2);
 
@@ -302,6 +369,8 @@ void ZED3D9Renderer::DoGBufferPass()
 
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
+		zeProfilerStart("Object Pass");
+
 		ZERenderOrder* RenderOrder = &NonTransparent[I];
 
 		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS) == 0)
@@ -311,13 +380,19 @@ void ZED3D9Renderer::DoGBufferPass()
 			zeCriticalError("Renderer", "Can not set material's GBuffer pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
 
 		PumpStreams(RenderOrder);
+
+		zeProfilerEnd();
 	}
 	
 	ZED3D9CommonTools::SetRenderTarget(1, NULL);
+	
+	zeProfilerEnd();
 }
 
 void ZED3D9Renderer::DoLightningPass()
 {
+	zeProfilerStart("Lightning Pass");
+
 	// Render Targets
 	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
 	//ZED3D9CommonTools::SetRenderTarget(1, LBuffer2);
@@ -392,10 +467,14 @@ void ZED3D9Renderer::DoLightningPass()
 	// Render Targets
 
 	//ZED3D9CommonTools::SetRenderTarget(1, NULL);
+
+	zeProfilerEnd();
 }
 
 void ZED3D9Renderer::DoForwardPass()
 {
+	zeProfilerStart("Forward Pass");
+
 	// GBuffers
 	GetDevice()->SetTexture(0, GBuffer1);
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
@@ -443,12 +522,24 @@ void ZED3D9Renderer::DoForwardPass()
 	
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
+		zeProfilerStart("Object Pass");
+		
 		ZERenderOrder* RenderOrder = &NonTransparent[I];
 		
 		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
 			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
 		PumpStreams(RenderOrder);
+		
+		zeProfilerEnd();
 	}
+
+	GetDevice()->SetTexture(0, NULL);
+	GetDevice()->SetTexture(1, NULL);
+	GetDevice()->SetTexture(2, NULL);
+	GetDevice()->SetTexture(3, NULL);
+	GetDevice()->SetTexture(4, NULL);
+
+	zeProfilerEnd();
 }
 
 void ZED3D9Renderer::InitializeRenderTargets()
@@ -610,6 +701,8 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost())
 		return;
 
+	zeProfilerStart("Rendering");
+
 	GetDevice()->SetRenderState(D3DRS_DEPTHBIAS, 0);
 	GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, 0);
 
@@ -631,4 +724,6 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 		DoForwardPass();
 
 	GetDevice()->EndScene();
+	
+	zeProfilerEnd();
 }
