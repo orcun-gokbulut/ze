@@ -133,7 +133,6 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 				Usage = D3DUSAGE_RENDERTARGET;
 				Pool = D3DPOOL_DEFAULT;
 				MipMap = 1;
-
 			}
 			else
 			{
@@ -150,7 +149,6 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 				Usage = D3DUSAGE_RENDERTARGET;
 				Pool = D3DPOOL_DEFAULT;
 				MipMap = 1;
-
 			}
 			else
 			{
@@ -170,9 +168,6 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 		return false;
 	}
 
-	if (MipMap != 1)
-		Texture->GenerateMipSubLevels();
-	
 	this->Width = Width;
 	this->Height = Height;
 	this->PixelFormat = PixelFormat;
@@ -217,7 +212,3 @@ void ZED3D9Texture2D::Destroy()
 	GetModule()->Texture2Ds.DeleteValue((ZED3D9Texture2D*)this);
 	delete this;
 }
-
-
-
-

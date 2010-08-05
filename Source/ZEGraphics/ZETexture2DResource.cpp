@@ -213,6 +213,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceF
 		memcpy((unsigned char*)Buffer + (I * Pitch), Bits + (Height - I - 1) * Width * BPP, Width * BPP);
 
 	Texture->Unlock();
+
 	FreeImage_Unload(Data);
 	TextureResource->SetFileName(ResourceFile->GetFileName());
 	TextureResource->Cached = false;

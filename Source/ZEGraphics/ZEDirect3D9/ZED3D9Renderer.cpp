@@ -369,13 +369,14 @@ void ZED3D9Renderer::DoGBufferPass()
 
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
-		zeProfilerStart("Object Pass");
+
 
 		ZERenderOrder* RenderOrder = &NonTransparent[I];
 
 		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS) == 0)
 			continue;
 
+		zeProfilerStart("Object Pass");
 		if (!RenderOrder->Material->SetupGBufferPass(this, RenderOrder))
 			zeCriticalError("Renderer", "Can not set material's GBuffer pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
 
@@ -391,6 +392,9 @@ void ZED3D9Renderer::DoGBufferPass()
 
 void ZED3D9Renderer::DoLightningPass()
 {
+	if (Lights.GetCount() == 0)
+		return;
+
 	zeProfilerStart("Lightning Pass");
 
 	// Render Targets
@@ -717,10 +721,10 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 		//DoPreZPass();
 		DoGBufferPass();
 		DoLightningPass();
-		SSAOProcessor.InputDepth = GBuffer1;
+		/*SSAOProcessor.InputDepth = GBuffer1;
 		SSAOProcessor.InputNormal = GBuffer2;
 		SSAOProcessor.Output = SSAOBuffer;
-		SSAOProcessor.Process();
+		SSAOProcessor.Process();*/
 		DoForwardPass();
 
 	GetDevice()->EndScene();
