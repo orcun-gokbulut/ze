@@ -500,6 +500,14 @@
 			Name="ZEGraphics"
 			>
 			<File
+				RelativePath=".\ZEBitmap.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\ZEBitmap.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEGraphics\ZECamera.cpp"
 				>
 			</File>
@@ -2436,18 +2444,6 @@
 					>
 				</File>
 			</Filter>
-		</Filter>
-		<Filter
-			Name="My Amplifier Results"
-			>
-			<File
-				RelativePath=".\My Amplifier Results\r000hs\r000hs.ampl"
-				>
-			</File>
-			<File
-				RelativePath=".\My Amplifier Results\r001hs\r001hs.ampl"
-				>
-			</File>
 		</Filter>
 		<File
 			RelativePath=".\Changelog.txt"

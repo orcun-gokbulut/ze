@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9TextureCube.h
+ Zinek Engine - ZEBitmap.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,41 +34,47 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D9_TEXTURE_CUBE_H__
-#define __ZE_D3D9_TEXTURE_CUBE_H__
+#ifndef __ZE_BITMAP_H__
+#define __ZE_BITMAP_H__
 
-#include "ZEGraphics\ZETextureCube.h"
-#include "ZED3D9ViewPort.h"
-#include "ZED3D9ComponentBase.h"
-#include <d3d9.h>
-
-class ZED3D9TextureCube : public ZETextureCube, public ZED3D9ComponentBase
+enum ZEBitmapFileFormat
 {
-	friend class ZED3D9Module;
-	protected:
-		ZED3D9ViewPort					ViewPorts[6];
-										ZED3D9TextureCube();
-		virtual							~ZED3D9TextureCube();
+	ZE_BFF_BMP,
+	ZE_BFF_TGA,
+	ZE_BFF_PNG,
+	ZE_BFF_JPG,
+	ZE_BFF_TIFF
+};
+
+class ZEBitmap
+{
+	private:
+		unsigned int		Width;
+		unsigned int		Height;
+		unsigned int		Pitch;
+		unsigned int		PixelSize;
+		ZEBYTE*				Pixels;
 
 	public:
-		LPDIRECT3DCUBETEXTURE9			CubeTexture;
+		bool				Create(unsigned int Width, unsigned int Height, unsigned int BPP);
 
-		virtual bool					IsEmpty() const;
+		unsigned int		GetWidth();
+		unsigned int		GetHeight();
+		unsigned int		GetPitch();
+		unsigned int		GetPixelSize();
+		unsigned int		GetBPP();
 
-		virtual void					DeviceLost();
-		virtual bool					DeviceRestored();
+		ZEBYTE*				GetPixels();
 
-		virtual ZEViewPort*				GetViewPort(ZETextureCubeFace Face);
+		void				CopyFrom(ZEBYTE* SourceBuffer, unsigned int SourcePitch, 
+								unsigned int Width = 0, unsigned int Height = 0, 
+								unsigned int OffsetX = 0, unsigned int OffsetY = 0);
+		void				CopyTo(ZEBYTE* DestinationBuffer, unsigned int DestinationPitch, 
+								unsigned int Width = 0, unsigned int Height = 0, 
+								unsigned int OffsetX = 0, unsigned int OffsetY = 0);
 
-		virtual bool					Create(int EdgeLenght, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
-		virtual bool					Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch);
-		virtual void					Unlock(ZETextureCubeFace Face);
-		virtual void					Release();
-
-		virtual void					Destroy();
+		ZEBitmap*			Load(const char* Filename);
+		void				Save(const char* FileName, ZEBitmapFileFormat Format);
 };
+
 #endif
-
-
-
-

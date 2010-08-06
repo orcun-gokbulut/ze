@@ -91,21 +91,22 @@ ZETextureCubeResource* ZETextureCubeResource::LoadSharedResource(const char* Fil
 		return NewResource;
 }
 
-bool LoadCubeFace(ZETextureCube* Texture, ZETextureCubeFace Face, unsigned char* FIBuffer, int EdgeLenght, int OffsetX, int OffsetY, int BPP)
+static bool CopyCubeFace(ZETextureCube* Texture, ZETextureCubeFace Face, unsigned char* SourceBuffer, int SourcePitch, int EdgeLenght, int OffsetX, int OffsetY, int BytesPerPixel)
 {
-	void* Buffer;
-	int Pitch;
+	void* DestinationBuffer;
+	int DestinationPitch;
 
-	Texture->Lock(Face, &Buffer, &Pitch);
-	if (Buffer == NULL)
+	
+	if (!Texture->Lock(Face, &DestinationBuffer, &DestinationPitch))
 	{
 		zeError("Cube Texture Resource", "Can not lock texture resource. (Face : %d)", Face);
 		return false;
 	}
 
 	for (int I = 0; I < EdgeLenght; I++)
-		memcpy((unsigned char*)Buffer + (I * Pitch), 
-		FIBuffer + (EdgeLenght * 3 * (OffsetY + EdgeLenght - I - 1) + OffsetX) * BPP, EdgeLenght * BPP);
+		memcpy((unsigned char*)DestinationBuffer + (I * DestinationPitch), 
+		SourceBuffer + SourcePitch * (OffsetY + EdgeLenght - I - 1) + OffsetX * BytesPerPixel,
+		EdgeLenght * BytesPerPixel);
 
 	Texture->Unlock(Face);
 	return true;
@@ -219,16 +220,16 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 		return NULL;
 	}
 
-	void* FIBuffer;
-	int BPP = FreeImage_GetBPP(Data) / 8;
-	unsigned char* Bits = FreeImage_GetBits((FIBITMAP*)Data);
+	unsigned int BytesPerPixel = FreeImage_GetBPP(Data) / 8;
+	unsigned int Pitch = FreeImage_GetPitch(Data);
+	unsigned char* Bits = FreeImage_GetBits(Data);
 
-	if (!LoadCubeFace(Texture, ZE_CTF_NEGATIVEX, Bits, EdgeLenght, 0,				EdgeLenght, BPP) ||
-		!LoadCubeFace(Texture, ZE_CTF_POSITIVEZ, Bits, EdgeLenght, EdgeLenght,		EdgeLenght, BPP) ||
-		!LoadCubeFace(Texture, ZE_CTF_POSITIVEX, Bits, EdgeLenght, EdgeLenght * 2,	EdgeLenght, BPP) ||
-		!LoadCubeFace(Texture, ZE_CTF_NEGATIVEZ, Bits, EdgeLenght, 0,				0, BPP) ||
-		!LoadCubeFace(Texture, ZE_CTF_NEGATIVEY, Bits, EdgeLenght, EdgeLenght,		0, BPP) ||
-		!LoadCubeFace(Texture, ZE_CTF_POSITIVEY, Bits, EdgeLenght, EdgeLenght * 2,	0, BPP))
+	if (!CopyCubeFace(Texture, ZE_CTF_NEGATIVEX, Bits, Pitch, EdgeLenght, 0,				EdgeLenght, BytesPerPixel) ||
+		!CopyCubeFace(Texture, ZE_CTF_POSITIVEZ, Bits, Pitch, EdgeLenght, EdgeLenght,		EdgeLenght, BytesPerPixel) ||
+		!CopyCubeFace(Texture, ZE_CTF_POSITIVEX, Bits, Pitch, EdgeLenght, EdgeLenght * 2,	EdgeLenght, BytesPerPixel) ||
+		!CopyCubeFace(Texture, ZE_CTF_NEGATIVEZ, Bits, Pitch, EdgeLenght, 0,				0,			BytesPerPixel) ||
+		!CopyCubeFace(Texture, ZE_CTF_NEGATIVEY, Bits, Pitch, EdgeLenght, EdgeLenght,		0,			BytesPerPixel) ||
+		!CopyCubeFace(Texture, ZE_CTF_POSITIVEY, Bits, Pitch, EdgeLenght, EdgeLenght * 2,	0,			BytesPerPixel))
 	{
 		zeError("Cube Texture Resource", "Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFileName());
 		delete TextureResource;

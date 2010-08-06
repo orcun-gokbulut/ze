@@ -98,15 +98,24 @@ ZEViewPort* ZED3D9TextureCube::GetViewPort(ZETextureCubeFace Face)
 bool ZED3D9TextureCube::Create(int EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget)
 {
 	if (CubeTexture != NULL)
-		CubeTexture->Release();
+		if (this->EdgeLength == EdgeLength)
+			return true;
+		else
+		{
+			CubeTexture->Release();
+			CubeTexture = NULL;
+		}
+
+	DWORD Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP);
+	DWORD MipMap = (RenderTarget ? 1 : 0);
+	D3DPOOL Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
+	D3DFORMAT Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
 
 	HRESULT Hr;
-	Hr = GetDevice()->CreateCubeTexture(EdgeLength, 0, 
-		(RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP), ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), 
-		(RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED), &CubeTexture, NULL);  
+	Hr = GetDevice()->CreateCubeTexture(EdgeLength, MipMap, Usage, Format, Pool, &CubeTexture, NULL);  
 	if (Hr != D3D_OK)
 	{
-		zeError("D3D9 GetModule()", "Can not create volume texture resource.");
+		zeError("D3D9 Texture Cube", "Can not create cube texture.");
 		return false;
 	}
 
@@ -124,12 +133,17 @@ bool ZED3D9TextureCube::Create(int EdgeLength, ZETexturePixelFormat PixelFormat,
 	return true;
 }
 
-void ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch)
+bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch)
 {
 	D3DLOCKED_RECT Rect;
-	CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, 0, &Rect, NULL, 0);
+	HRESULT hr = CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, 0, &Rect, NULL, 0);
+	if (hr != D3D_OK)
+		return false;
+	
 	*Buffer = Rect.pBits;
 	*Pitch = Rect.Pitch;
+
+	return true;
 }
 
 void ZED3D9TextureCube::Unlock(ZETextureCubeFace Face)

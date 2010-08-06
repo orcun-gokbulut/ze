@@ -85,86 +85,21 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 		if (this->Width == Width || this->Height == Height || this->PixelFormat == PixelFormat || this->RenderTarget == RenderTarget)
 			return true;
 		else
+		{
 			Texture->Release();
-
+			Texture = NULL;
+		}
 	
-	DWORD Usage, MipMap;
-	D3DFORMAT Format;
-	D3DPOOL Pool;
-
-	switch(PixelFormat)
-	{
-		case ZE_TPF_RGBA_INT32:
-			if (RenderTarget)
-			{
-				Usage = D3DUSAGE_RENDERTARGET;
-				Pool = D3DPOOL_DEFAULT;
-				MipMap = 1;
-			}
-			else
-			{
-				Usage = D3DUSAGE_AUTOGENMIPMAP;
-				Pool = D3DPOOL_MANAGED;
-				MipMap = 0;
-			}
-			Format = D3DFMT_A8R8G8B8;
-			break;
-
-		case ZE_TPF_LUM_HDR:
-			if (RenderTarget)
-			{
-				Usage = D3DUSAGE_RENDERTARGET;
-				Pool = D3DPOOL_DEFAULT;
-				MipMap = 1;
-
-			}
-			else
-			{
-				Usage = D3DUSAGE_AUTOGENMIPMAP;
-				Pool = D3DPOOL_MANAGED;
-				MipMap = 0;
-			}
-			Format = D3DFMT_R16F;
-			break;
-
-		case ZE_TPF_RGBA_HDR:
-			if (RenderTarget)
-			{
-				Usage = D3DUSAGE_RENDERTARGET;
-				Pool = D3DPOOL_DEFAULT;
-				MipMap = 1;
-			}
-			else
-			{
-				Usage = D3DUSAGE_AUTOGENMIPMAP;
-				Pool = D3DPOOL_MANAGED;
-				MipMap = 0;
-			}
-			Format = D3DFMT_A16B16G16R16F;
-			break;
-
-		case ZE_TPF_DEPTH:
-			if (RenderTarget)
-			{
-				Usage = D3DUSAGE_RENDERTARGET;
-				Pool = D3DPOOL_DEFAULT;
-				MipMap = 1;
-			}
-			else
-			{
-				Usage = D3DUSAGE_AUTOGENMIPMAP;
-				Pool = D3DPOOL_MANAGED;
-				MipMap = 0;
-			}
-			Format = D3DFMT_R32F;
-			break;
-	}
+	DWORD Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP);
+	DWORD MipMap = (RenderTarget ? 1 : 0);
+	D3DPOOL Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
+	D3DFORMAT Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
 
 	HRESULT Hr;
 	Hr = GetDevice()->CreateTexture(Width, Height, MipMap, Usage, Format, Pool, &Texture, NULL); 
 	if (Hr != D3D_OK)
 	{
-		zeError("D3D9 GetModule()", "Can not create texture resource.");
+		zeError("D3D9 Texture 2D", "Can not create 2D texture.");
 		return false;
 	}
 
