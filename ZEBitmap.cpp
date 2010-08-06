@@ -84,52 +84,126 @@ ZEBYTE* ZEBitmap::GetPixels()
 }
 
 void ZEBitmap::CopyFrom(ZEBYTE* SourceBuffer, unsigned int SourcePitch, 
-						unsigned int Width = 0, unsigned int Height = 0, 
-						unsigned int OffsetX = 0, unsigned int OffsetY = 0)
-{
+						unsigned int Width, unsigned int Height, 
+						unsigned int SourceOffsetX, unsigned int SourceOffsetY,
+						unsigned int DestinationOffsetX, unsigned int DestinationOffsetY)
 
+{
+	if (Height == 0)
+		Height = this->Height;
+
+	if (Width == 0)
+		Width = this->Width;
+
+	for (size_t I = 0; I < Height; I++)
+		memcpy(Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
+			SourceBuffer + (SourceOffsetY + I) * SourcePitch + SourceOffsetX * PixelSize, 
+			Width * PixelSize);
 }
 
 void ZEBitmap::CopyTo(ZEBYTE* DestinationBuffer, unsigned int DestinationPitch, 
-					  unsigned int Width = 0, unsigned int Height = 0, 
-					  unsigned int OffsetX = 0, unsigned int OffsetY = 0)
+					  unsigned int Width, unsigned int Height, 
+					  unsigned int DestinationOffsetX, unsigned int DestinationOffsetY,
+					  unsigned int SourceOffsetX, unsigned int SourceOffsetY)
 {
+	if (Height == 0)
+		Height = this->Height;
+
+	if (Width == 0)
+		Width = this->Width;
+
+	for (size_t I = 0; I < Height; I++)
+		memcpy(DestinationBuffer + (DestinationOffsetY + I) * DestinationPitch + DestinationOffsetX * PixelSize, 
+			Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
+			Width * PixelSize);
 }
 
-bool ZEBitmap::Load(const char* Filename)
+bool ZEBitmap::Load(const char* FileName)
 {
 	FREE_IMAGE_FORMAT fif = FreeImage_GetFileType(FileName, 0);
 
-	FIBITMAP* bitmap = FreeImage_Load (fif, FileName, 0);
-	if (Bitmap == NULL)
+	FIBITMAP* FIBitmap = FreeImage_Load (fif, FileName, 0);
+	if (FIBitmap == NULL)
 	{
 		zeError("ZEBitmap", "Can not open bitmap file.");
 		return false;
 	}
 
-
-	Width = FreeImage_GetWidth(ConvertedBitmap);
-	Height = FreeImage_GetHeight(ConvertedBitmap);
-	Pitch = FreeImage_GetPitch(ConvertedBitmap);
-	PixelSize = FreeImage_GetBPP(ConvertedBitmap) / 8;
+	Width = FreeImage_GetWidth(FIBitmap);
+	Height = FreeImage_GetHeight(FIBitmap);
+	Pitch = FreeImage_GetPitch(FIBitmap);
+	PixelSize = FreeImage_GetBPP(FIBitmap) / 8;
 	
+	FIBITMAP* ConvertedBitmap;
 	if (PixelSize != 4)
-	FIBITMAP* ConvertedBitmap = FreeImage_ConvertTo32Bits(bitmap);
-	Create(Width, Height, PixelSize);
+	{
+		ConvertedBitmap = FreeImage_ConvertTo32Bits(bitmap);
+		FreeImage_Unload(FIBitmap);
+	}
+	else
+		ConvertedBitmap = FIBitmap;
 
 	PixelSize = 4;
-	FreeImage_ConvertToRawBits(Bitmap->Data, ConvertedBitmap, Bitmap->Pitch, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, FALSE);
+	Create(Width, Height, PixelSize);
+
+	FreeImage_ConvertToRawBits(Pixels, ConvertedBitmap, Bitmap->Pitch, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, FALSE);
+
+	FreeImage_Unload(FIBitmap);
 
 	return true;
 }
 
 void ZEBitmap::Save(const char* FileName, ZEBitmapFileFormat Format)
 {
-	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits(Bitmap->Data, Bitmap->Width, Bitmap->Height, Bitmap->Pitch, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, FALSE);
-	FreeImage_Save(FIF_BMP, FIBitmap, FileName);
+	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits(Pixels, Width, Height, Pitch, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, FALSE);
+	FREE_IMAGE_FORMAT FIFormat;
+	switch(Format)
+	{
+		default:
+		case ZE_BFF_BMP:
+			FIFormat = FIF_BMP;
+			break;
+		case ZE_BFF_TGA:
+			FIFormat = FIF_TARGA;
+			break;
+		case ZE_BFF_PNG:
+			FIFormat = FIF_PNG;
+			break;
+		case ZE_BFF_JPG:
+			FIFormat = FIF_JPEG;
+			break;
+		case ZE_BFF_TIFF:
+			FIFormat = FIF_TIFF;
+			break;
+	}
+
+	FreeImage_Save(FIFormat, FIBitmap, FileName);
 
 	FreeImage_Unload(FIBitmap);
+}
 
-	// Deinitialise
-	FreeImage_DeInitialise();
+void ZEBitmap::Release()
+{
+	if (Pixels != NULL)
+		delete[] Pixels;
+	
+	Width = 0;
+	Height = 0;
+	Pitch = 0;
+	PixelSize = 0;
+	Pixels = NULL;
+}
+
+ZEBitmap::ZEBitmap()
+{
+	Width = 0;
+	Height = 0;
+	Pitch = 0;
+	PixelSize = 0;
+	Pixels = NULL;
+}
+
+ZEBitmap::~ZEBitmap()
+{
+	Release();
 }

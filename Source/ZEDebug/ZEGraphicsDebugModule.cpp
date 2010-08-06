@@ -113,7 +113,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	OmniProjectiveLight0->SetAttenuation(0.03f, 0.0f, 1.0f);
 	OmniProjectiveLight0->SetIntensity(2.0f);
 	OmniProjectiveLight0->SetRange(40.0f);
-	OmniProjectiveLight0->SetProjectionTexture(ZETextureCubeResource::LoadResource("cubetest.tga")->GetTexture());
+	OmniProjectiveLight0->SetProjectionTexture(ZETextureCubeResource::LoadResource("alarm.tga")->GetTexture());
 	OmniProjectiveLight0->SetCastsShadows(false);
 	Scene->AddEntity(OmniProjectiveLight0);
 
