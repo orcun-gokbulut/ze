@@ -37,8 +37,6 @@
 #ifndef __ZE_BITMAP_H__
 #define __ZE_BITMAP_H__
 
-#include "ZETypes.h"
-
 enum ZEBitmapFileFormat
 {
 	ZE_BFF_BMP,
@@ -55,10 +53,10 @@ class ZEBitmap
 		unsigned int		Height;
 		unsigned int		Pitch;
 		unsigned int		PixelSize;
-		ZEBYTE*				Pixels;
+		void*				Pixels;
 
 	public:
-		bool				Create(unsigned int Width, unsigned int Height, unsigned int BPP);
+		bool				Create(unsigned int Width, unsigned int Height, unsigned int PixelSize);
 
 		unsigned int		GetWidth();
 		unsigned int		GetHeight();
@@ -66,16 +64,24 @@ class ZEBitmap
 		unsigned int		GetPixelSize();
 		unsigned int		GetBPP();
 
-		ZEBYTE*				GetPixels();
+		void*				GetPixels();
+		void*				GetPixel(unsigned int x, unsigned int y);
+		void*				GetRow(unsigned int Index);
 
-		void				CopyFrom(ZEBYTE* SourceBuffer, unsigned int SourcePitch, 
-								unsigned int Width = 0, unsigned int Height = 0, 
-								unsigned int OffsetX = 0, unsigned int OffsetY = 0);
-		void				CopyTo(ZEBYTE* DestinationBuffer, unsigned int DestinationPitch, 
-								unsigned int Width = 0, unsigned int Height = 0, 
-								unsigned int OffsetX = 0, unsigned int OffsetY = 0);
+		void				CopyFrom(void* SourceBuffer, unsigned int SourcePitch, 
+								unsigned int Width, unsigned int Height, 
+								unsigned int SourceOffsetX = 0, unsigned int SourceOffsetY = 0,
+								unsigned int DestinationOffsetX = 0, unsigned int DestinationOffsetY = 0);
 
-		ZEBitmap*			Load(const char* Filename);
+		void				CopyTo(void* DestinationBuffer, unsigned int DestinationPitch, 
+								unsigned int Width, unsigned int Height, 
+								unsigned int DestinationOffsetX = 0, unsigned int DestinationOffsetY = 0,
+								unsigned int SourceOffsetX = 0, unsigned int SourceOffsetY = 0);
+
+		void				Fill(unsigned int Color);
+		void				Clear();
+
+		bool				Load(const char* Filename);
 		void				Save(const char* FileName, ZEBitmapFileFormat Format);
 
 		void				Release();

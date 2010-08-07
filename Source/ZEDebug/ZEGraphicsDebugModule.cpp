@@ -43,7 +43,7 @@
 #include "ZEGraphics\ZEOmniProjectiveLight.h"
 #include "ZEGraphics\ZETextureCubeResource.h"
 
-
+#include "ZEModel/ZEModel.h"
 bool ZEGraphicsDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
@@ -61,6 +61,10 @@ bool ZEGraphicsDebugModule::Initialize()
 	}
 
 	Scene->LoadMap("PerfTest.zemap");
+
+	ZEModel* Model = new ZEModel();
+	Model->SetModelResource(ZEModelResource::LoadResource("test.zemodel"));
+	Scene->AddEntity(Model);
 
 	PointLight1 = new ZEPointLight();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
@@ -111,9 +115,9 @@ bool ZEGraphicsDebugModule::Initialize()
 	OmniProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
 	OmniProjectiveLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	OmniProjectiveLight0->SetAttenuation(0.03f, 0.0f, 1.0f);
-	OmniProjectiveLight0->SetIntensity(2.0f);
+	OmniProjectiveLight0->SetIntensity(5.0f);
 	OmniProjectiveLight0->SetRange(40.0f);
-	OmniProjectiveLight0->SetProjectionTexture(ZETextureCubeResource::LoadResource("alarm.tga")->GetTexture());
+	OmniProjectiveLight0->SetProjectionTexture(ZETextureCubeResource::LoadResource("cubetest.tga")->GetTexture());
 	OmniProjectiveLight0->SetCastsShadows(false);
 	Scene->AddEntity(OmniProjectiveLight0);
 

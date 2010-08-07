@@ -500,11 +500,11 @@
 			Name="ZEGraphics"
 			>
 			<File
-				RelativePath=".\ZEBitmap.cpp"
+				RelativePath=".\Source\ZEGraphics\ZEBitmap.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\ZEBitmap.h"
+				RelativePath=".\Source\ZEGraphics\ZEBitmap.h"
 				>
 			</File>
 			<File

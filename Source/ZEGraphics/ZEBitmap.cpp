@@ -34,6 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEBitmap.h"
+#include "ZECore/ZEError.h"
+#include "ZETypes.h"
+#include <memory.h>
+
 #include <FreeImage.h>
 
 bool ZEBitmap::Create(unsigned int Width, unsigned int Height, unsigned int PixelSize)
@@ -41,7 +45,7 @@ bool ZEBitmap::Create(unsigned int Width, unsigned int Height, unsigned int Pixe
 	if (Pixels != NULL && this->Width == Width && this->Height == Height && this->PixelSize == PixelSize)
 		return true;
 
-	if (Width == 0 || Height == 0 || Pixels == 0)
+	if (Width == 0 || Height == 0 || PixelSize == 0)
 	{
 		zeError("ZEBitmap", "Can not create bitmap with zero dimension.");
 		return false;
@@ -51,6 +55,7 @@ bool ZEBitmap::Create(unsigned int Width, unsigned int Height, unsigned int Pixe
 	this->Width = Width;
 	this->Height = Height;
 	this->PixelSize = PixelSize;
+	this->Pixels = new ZEBYTE[Width * Height * PixelSize];
 }
 
 unsigned int ZEBitmap::GetWidth()
@@ -78,12 +83,22 @@ unsigned int ZEBitmap::GetBPP()
 	return PixelSize * 8;
 }
 
-ZEBYTE* ZEBitmap::GetPixels()
+void* ZEBitmap::GetPixels()
 {
 	return Pixels;
 }
 
-void ZEBitmap::CopyFrom(ZEBYTE* SourceBuffer, unsigned int SourcePitch, 
+void* ZEBitmap::GetPixel(unsigned int x, unsigned int y)
+{
+	return (ZEBYTE*)Pixels + y * Pitch + x;
+}
+
+void* ZEBitmap::GetRow(unsigned int Index)
+{
+	return (ZEBYTE*)Pixels + Index * Pitch;
+}
+
+void ZEBitmap::CopyFrom(void* SourceBuffer, unsigned int SourcePitch, 
 						unsigned int Width, unsigned int Height, 
 						unsigned int SourceOffsetX, unsigned int SourceOffsetY,
 						unsigned int DestinationOffsetX, unsigned int DestinationOffsetY)
@@ -96,12 +111,12 @@ void ZEBitmap::CopyFrom(ZEBYTE* SourceBuffer, unsigned int SourcePitch,
 		Width = this->Width;
 
 	for (size_t I = 0; I < Height; I++)
-		memcpy(Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
-			SourceBuffer + (SourceOffsetY + I) * SourcePitch + SourceOffsetX * PixelSize, 
+		memcpy((ZEBYTE*)Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
+			(ZEBYTE*)SourceBuffer + (SourceOffsetY + I) * SourcePitch + SourceOffsetX * PixelSize, 
 			Width * PixelSize);
 }
 
-void ZEBitmap::CopyTo(ZEBYTE* DestinationBuffer, unsigned int DestinationPitch, 
+void ZEBitmap::CopyTo(void* DestinationBuffer, unsigned int DestinationPitch, 
 					  unsigned int Width, unsigned int Height, 
 					  unsigned int DestinationOffsetX, unsigned int DestinationOffsetY,
 					  unsigned int SourceOffsetX, unsigned int SourceOffsetY)
@@ -113,9 +128,19 @@ void ZEBitmap::CopyTo(ZEBYTE* DestinationBuffer, unsigned int DestinationPitch,
 		Width = this->Width;
 
 	for (size_t I = 0; I < Height; I++)
-		memcpy(DestinationBuffer + (DestinationOffsetY + I) * DestinationPitch + DestinationOffsetX * PixelSize, 
-			Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
+		memcpy((ZEBYTE*)DestinationBuffer + (DestinationOffsetY + I) * DestinationPitch + DestinationOffsetX * PixelSize, 
+			(ZEBYTE*)Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
 			Width * PixelSize);
+}
+
+void ZEBitmap::Fill(unsigned int Color)
+{
+	memset(Pixels, Color, Height * Pitch);
+}
+
+void ZEBitmap::Clear()
+{
+	Fill(0x00);
 }
 
 bool ZEBitmap::Load(const char* FileName)
@@ -134,19 +159,19 @@ bool ZEBitmap::Load(const char* FileName)
 	Pitch = FreeImage_GetPitch(FIBitmap);
 	PixelSize = FreeImage_GetBPP(FIBitmap) / 8;
 	
-	FIBITMAP* ConvertedBitmap;
+	FIBITMAP* FIConvertedBitmap;
 	if (PixelSize != 4)
 	{
-		ConvertedBitmap = FreeImage_ConvertTo32Bits(bitmap);
+		FIConvertedBitmap = FreeImage_ConvertTo32Bits(FIBitmap);
 		FreeImage_Unload(FIBitmap);
 	}
 	else
-		ConvertedBitmap = FIBitmap;
+		FIConvertedBitmap = FIBitmap;
 
 	PixelSize = 4;
 	Create(Width, Height, PixelSize);
 
-	FreeImage_ConvertToRawBits(Pixels, ConvertedBitmap, Bitmap->Pitch, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, FALSE);
+	FreeImage_ConvertToRawBits((BYTE*)Pixels, FIConvertedBitmap, Pitch, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, FALSE);
 
 	FreeImage_Unload(FIBitmap);
 
@@ -155,7 +180,7 @@ bool ZEBitmap::Load(const char* FileName)
 
 void ZEBitmap::Save(const char* FileName, ZEBitmapFileFormat Format)
 {
-	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits(Pixels, Width, Height, Pitch, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, FALSE);
+	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits((BYTE*)Pixels, Width, Height, Pitch, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, FALSE);
 	FREE_IMAGE_FORMAT FIFormat;
 	switch(Format)
 	{

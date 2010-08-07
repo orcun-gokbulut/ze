@@ -306,15 +306,24 @@ void ZED3D9Renderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
 
-	ZEMatrix4x4 LightRotation, LightRotationView;
-	ZEMatrix4x4::CreateRotation(LightRotation, Light->GetWorldRotation());
-	ZEMatrix4x4::Multiply(LightRotationView, LightRotation, Camera->GetViewTransform());
-	GetDevice()->SetPixelShaderConstantF(10, (float*)&LightRotationView, 3);
+	ZEQuaternion InvLightRotation;
+	ZEQuaternion InvViewRotation;
+	ZEQuaternion::Conjugate(InvLightRotation, Light->GetWorldRotation());
+	ZEQuaternion::Product(InvViewRotation, Camera->GetWorldRotation(), InvLightRotation);
+	ZEMatrix4x4 InvViewRotationMatrix;
+	ZEMatrix4x4::CreateRotation(InvViewRotationMatrix, InvViewRotation);
+	GetDevice()->SetPixelShaderConstantF(10, (float*)&InvViewRotationMatrix, 3);
 
 	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
 	GetDevice()->SetVertexShader(LightningComponents.OmniProjectiveLightVS->GetVertexShader());
 	GetDevice()->SetPixelShader(LightningComponents.OmniProjectiveLightPS->GetPixelShader());
 
+	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetTexture(3, ((ZED3D9TextureCube*)Light->GetProjectionTexture())->CubeTexture);
 
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
