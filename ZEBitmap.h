@@ -77,6 +77,11 @@ class ZEBitmap
 
 		ZEBitmap*			Load(const char* Filename);
 		void				Save(const char* FileName, ZEBitmapFileFormat Format);
+
+		void				Release();
+							
+							ZEBitmap();
+							~ZEBitmap();
 };
 
 #endif
