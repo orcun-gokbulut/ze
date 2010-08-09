@@ -41,7 +41,9 @@
 #include "ZEGraphics\ZEGraphicsModule.h"
 #include "ZEGraphics\ZEPointLight.h"
 #include "ZEGraphics\ZEOmniProjectiveLight.h"
+#include "ZEGraphics\ZEProjectiveLight.h"
 #include "ZEGraphics\ZETextureCubeResource.h"
+#include "ZEGraphics\ZETexture2DResource.h"
 
 #include "ZEModel/ZEModel.h"
 bool ZEGraphicsDebugModule::Initialize()
@@ -121,12 +123,25 @@ bool ZEGraphicsDebugModule::Initialize()
 	OmniProjectiveLight0->SetCastsShadows(false);
 	Scene->AddEntity(OmniProjectiveLight0);
 
-	PointLight1->SetEnabled(false);
+	ProjectiveLight0 = new ZEProjectiveLight();
+	OmniProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
+	OmniProjectiveLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
+	OmniProjectiveLight0->SetAttenuation(0.03f, 0.0f, 1.0f);
+	ProjectiveLight0->SetIntensity(2.0f);
+	ProjectiveLight0->SetRange(5.0f);
+	ProjectiveLight0->SetCastsShadows(false);
+	ProjectiveLight0->SetFOV(ZE_PI_2);
+	ProjectiveLight0->SetAspectRatio(1.0f);
+	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
+	Scene->AddEntity(ProjectiveLight0);
+
+	PointLight1->SetEnabled(true);
 	PointLight2->SetEnabled(false);
 	PointLight3->SetEnabled(false);
 	PointLight4->SetEnabled(false);
 	PointLight5->SetEnabled(false);
-	OmniProjectiveLight0->SetEnabled(true);
+	OmniProjectiveLight0->SetEnabled(false);
+	ProjectiveLight0->SetEnabled(true);
 	return true;
 }
 
@@ -137,6 +152,13 @@ void ZEGraphicsDebugModule::Deinitialize()
 		Player->Destroy();
 		Player = NULL;
 	}
+
+	delete Player;
+	delete PointLight1;
+	delete PointLight2;
+	delete PointLight3;
+	delete PointLight4;
+	delete PointLight5;
 }
 
 

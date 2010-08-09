@@ -145,7 +145,7 @@ struct PjLPSInput
 	float3 ViewVector : TEXCOORD1;
 };
 	
-float4 PjLPSMain(OPLPSInput Input) : COLOR0
+float4 PjLPSMain(PjLPSInput Input) : COLOR0
 {
 	float4 Output;
 	
@@ -175,7 +175,7 @@ float4 PjLPSMain(OPLPSInput Input) : COLOR0
 
 // Omni Projective Light
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-struct PLVSOutput
+struct OPLVSOutput
 {
 	float4 Position : POSITION0;
 	float3 ScreenPosition : TEXCOORD0;

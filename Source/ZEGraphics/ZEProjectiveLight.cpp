@@ -129,6 +129,12 @@ void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* Shadow
 /*
 const ZELight* ZEProjectiveLight::GetRenderOrderLight()
 {
+	ZEMatrix4x4 InvViewTranslationMatrix;
+	Camer
+	ZEMatrix4x4 InvViewRotationMatrix;
+
+	ZEMatrix4x4 InvViewMatrix;
+
 
 	ZEVector3 Position = GetWorldPosition();
 	ZEQuaternion Rotation;

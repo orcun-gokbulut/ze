@@ -264,9 +264,59 @@ void ZED3D9Renderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 
 void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 {
+	if (Light->GetProjectionTexture() == NULL)
+		return;
+
 	zeProfilerStart("Projective Light Pass");
 
-	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 12); // Cone 1
+	// Light Parameters
+	struct
+	{
+		ZEVector3		Position;
+		float			Range;
+		ZEVector3		Color;
+		float			Intensity;
+		ZEVector3		Attenuation;
+		float			Reserved1;
+	} LightParameters;
+
+	ZEMatrix4x4::Transform(LightParameters.Position, Camera->GetViewTransform(), Light->GetWorldPosition());
+	LightParameters.Color = Light->GetColor();
+	LightParameters.Attenuation = Light->GetAttenuation();
+	LightParameters.Range = Light->GetRange();
+	LightParameters.Intensity = Light->GetIntensity();
+
+	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 3);
+
+	// Transformation
+	ZEMatrix4x4 InvCameraViewMatrix;
+	ZEMatrix4x4::Inverse(InvCameraViewMatrix, Camera->GetViewProjectionTransform());
+
+	ZEMatrix4x4 LightViewProjectionMatrix;
+	ZEMatrix4x4 LightViewMatrix;
+	ZEMatrix4x4::CreateViewTransform(LightViewMatrix, Light->GetWorldPosition(), Light->GetWorldRotation());
+	ZEMatrix4x4 LightProjectionMatrix;
+	ZEMatrix4x4::CreatePerspectiveProjection(LightProjectionMatrix, Light->GetFOV(), Light->GetAspectRatio(), 1.0f, Light->GetRange());
+	ZEMatrix4x4::Multiply(LightViewProjectionMatrix, LightViewMatrix, LightProjectionMatrix);
+
+	ZEMatrix4x4 TextureMatrix;
+	ZEMatrix4x4::Create(TextureMatrix, 0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.5f, 0.0f,
+		0.5f + 0.5f / Light->GetProjectionTexture()->GetWidth(), 0.5f + 0.5f / Light->GetProjectionTexture()->GetHeight(), 0.0f, 1.0f);
+
+	ZEMatrix4x4 ProjectionMatrix, Temp;
+	ZEMatrix4x4::Multiply(Temp, InvCameraViewMatrix, LightViewProjectionMatrix);
+	ZEMatrix4x4::Multiply(ProjectionMatrix, Temp, TextureMatrix);
+
+	GetDevice()->SetPixelShaderConstantF(15, (float*)&ProjectionMatrix, 4);
+
+	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
+	GetDevice()->SetVertexShader(LightningComponents.OmniProjectiveLightVS->GetVertexShader());
+	GetDevice()->SetPixelShader(LightningComponents.OmniProjectiveLightPS->GetPixelShader());
+
+	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)Light->GetProjectionTexture())->Texture);
+
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4578, 24); // Cone 2
 
 	zeProfilerEnd();

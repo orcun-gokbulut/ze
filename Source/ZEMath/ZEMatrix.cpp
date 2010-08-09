@@ -620,6 +620,7 @@ void ZEMatrix4x4::CreateIdentity(ZEMatrix4x4& Matrix)
 			0.0f, 0.0f, 1.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 1.0f );
 }
+
 void ZEMatrix4x4::CreateZero(ZEMatrix4x4& Matrix)
 {
 	Create(Matrix,
@@ -628,6 +629,37 @@ void ZEMatrix4x4::CreateZero(ZEMatrix4x4& Matrix)
 			0.0f, 0.0f, 0.0f, 0.0f,
 			0.0f, 0.0f, 0.0f, 0.0f );
 }
+
+void ZEMatrix4x4::CreateViewTransform(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation)
+{
+	ZEMatrix4x4 ViewPositionTransform, ViewRotationTransform;
+	ZEQuaternion ViewRotation;
+	ZEQuaternion::Conjugate(ViewRotation, Rotation);
+	ZEMatrix4x4::CreateTranslation(ViewPositionTransform, -Position.x, -Position.y, -Position.z);
+	ZEMatrix4x4::CreateRotation(ViewRotationTransform, ViewRotation);
+	ZEMatrix4x4::Multiply(Matrix, ViewPositionTransform, ViewRotationTransform);
+	
+}
+
+void ZEMatrix4x4::CreateLookAtTransform(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEVector3& Target, const ZEVector3& Up)
+{
+	ZEVector3 XAxis;
+	ZEVector3 YAxis;
+	ZEVector3 ZAxis;
+
+	ZEVector3::Normalize(ZAxis, Target - Position);
+	ZEVector3::CrossProduct(XAxis, Up, ZAxis);
+	ZEVector3::Normalize(XAxis, XAxis);
+	ZEVector3::CrossProduct(YAxis, ZAxis, XAxis);
+
+	ZEMatrix4x4::Create(Matrix, XAxis.x, YAxis.x, ZAxis.x, 0.0f,
+		XAxis.y, YAxis.y, ZAxis.y, 0.0f,
+		XAxis.z, YAxis.z, ZAxis.z, 0.0f,
+		-ZEVector3::DotProduct(XAxis, Position), 
+		-ZEVector3::DotProduct(YAxis, Position), 
+		-ZEVector3::DotProduct(ZAxis, Position), 1.0f);
+}
+
 void ZEMatrix4x4::CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width, float Height, float NearZ, float FarZ)
 {
 	Create(Matrix,
@@ -1051,8 +1083,5 @@ ZEMatrix4x4::ZEMatrix4x4(float M[16])
 
 ZEMatrix4x4::ZEMatrix4x4()
 {
+
 }
-
-
-
-
