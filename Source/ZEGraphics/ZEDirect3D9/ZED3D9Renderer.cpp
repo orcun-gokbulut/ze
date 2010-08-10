@@ -168,8 +168,7 @@ void ZED3D9Renderer::InitializeLightning()
 	Quad		0			0			6				2				288
 	Sphere12	6			288			936				312				44928
 	Sphere24	942			45216		3600			1200			172800
-	Cone12		4542		218016		36				12				1728
-	Cone24		4578		219744		72				24				3456
+	Cone12		4542		218016		18				6				864
 	End			4650				
 	*/
 
@@ -185,8 +184,11 @@ void ZED3D9Renderer::InitializeLightning()
 	Canvas.AddSphere(1.0f, 24, 24);
 
 	// Projective
-	Canvas.AddPyramid(1.0f, 12, 1.0f);
-	Canvas.AddPyramid(1.0f, 24, 1.0f);
+	Canvas.PushTransformation();
+	Canvas.SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
+	Canvas.SetTranslation(-ZEVector3::UnitZ);
+	Canvas.AddPyramid(1.0f, 1.0f, 1.0f);
+	Canvas.PopTransformation();
 
 	if (LightningComponents.LightMeshVB == NULL)
 		LightningComponents.LightMeshVB = (ZED3D9StaticVertexBuffer*)Canvas.CreateStaticVertexBuffer();
@@ -318,7 +320,7 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 
 	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)Light->GetProjectionTexture())->Texture);
 
-	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4578, 24); // Cone 2
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 6); // Cone 2
 
 	zeProfilerEnd();
 }
@@ -622,6 +624,7 @@ void ZED3D9Renderer::DeinitializeRenderTargets()
 	ZED3D_RELEASE(GBuffer2);
 	ZED3D_RELEASE(LBuffer1);
 	ZED3D_RELEASE(LBuffer2);
+	ZED3D_RELEASE(SSAOBuffer);
 	ZED3D_RELEASE(ABuffer);
 }
 
