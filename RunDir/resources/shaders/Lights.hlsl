@@ -55,7 +55,7 @@ float2 PixelSize_2 : register(ps, c5);
 #define LightAttenuationFactors	LightParameters2.xyz
 
 float3x3 LightRotation : register(ps, c10);
-float3x3 LightProjectionMatrix : register(ps, c14);
+float4x4 LightProjectionMatrix : register(ps, c15);
 
 sampler2D GBuffer1 : register(ps, s0);
 sampler2D GBuffer2 : register(ps, s1);
@@ -69,7 +69,7 @@ samplerCUBE OmniProjectionMap : register(ps, s3);
 struct PLVSOutput
 {
 	float4 Position : POSITION0;
-	float3 ScreenPosition : TEXCOORD0;
+	float4 ScreenPosition : TEXCOORD0;
 	float3 ViewVector : TEXCOORD1;
 };
 
@@ -78,8 +78,9 @@ PLVSOutput PLVSMain(float4 Position : POSITION0)
 	PLVSOutput Output;
 	
 	Output.Position = mul(Position, WorldViewProjMatrix);
-	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y);
-	Output.ScreenPosition.z = Output.Position.w;
+	
+	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y) * 0.5f;
+	Output.ScreenPosition.zw = Output.Position.zw;
 	Output.ViewVector = Output.Position * ViewVector;
 	
 	return Output;
@@ -87,7 +88,7 @@ PLVSOutput PLVSMain(float4 Position : POSITION0)
 
 struct PLPSInput
 {
-	float3 ScreenPosition : TEXCOORD0;
+	float4 ScreenPosition : TEXCOORD0;
 	float3 ViewVector : TEXCOORD1;
 };
 
@@ -95,7 +96,7 @@ float4 PLPSMain(PLPSInput Input) : COLOR0
 {
 	float4 Output;
 	
-	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.z * 0.5f + 0.5f + PixelSize_2;
+	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.w + 0.5f + PixelSize_2;
 	float3 Position = GetViewPosition(GBuffer1, ScreenPosition, Input.ViewVector);
 	float3 Normal = GetViewNormal(GBuffer2, ScreenPosition);
 	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
@@ -123,7 +124,7 @@ float4 PLPSMain(PLPSInput Input) : COLOR0
 struct PjLVSOutput
 {
 	float4 Position : POSITION0;
-	float3 ScreenPosition : TEXCOORD0;
+	float4 ScreenPosition : TEXCOORD0;
 	float3 ViewVector : TEXCOORD1;
 };
 
@@ -132,16 +133,17 @@ PjLVSOutput PjLVSMain(float4 Position : POSITION0)
 	PjLVSOutput Output;
 	
 	Output.Position = mul(Position, WorldViewProjMatrix);
-	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y);
-	Output.ScreenPosition.z = Output.Position.w;
+	Output.ScreenPosition = Output.Position;
 	Output.ViewVector = Output.Position * ViewVector;
-
+	Output.ScreenPosition = Output.Position * 0.5f ;
+	Output.ScreenPosition.y = -Output.ScreenPosition.y;
+	Output.ScreenPosition.zw = Output.Position.zw;
 	return Output;
 }
 
 struct PjLPSInput
 {
-	float3 ScreenPosition : TEXCOORD0;
+	float4 ScreenPosition : TEXCOORD0;
 	float3 ViewVector : TEXCOORD1;
 };
 	
@@ -149,7 +151,7 @@ float4 PjLPSMain(PjLPSInput Input) : COLOR0
 {
 	float4 Output;
 	
-	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.z * 0.5f + 0.5f + PixelSize_2;
+	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.w + 0.5f + PixelSize_2;
 	float3 Position = GetViewPosition(GBuffer1, ScreenPosition, Input.ViewVector);
 	float3 Normal = GetViewNormal(GBuffer2, ScreenPosition);
 	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
@@ -159,8 +161,8 @@ float4 PjLPSMain(PjLPSInput Input) : COLOR0
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
 	
-	float3 TextureLookup = mul(ScreenPosition, LightProjectionMatrix);
-	float3 ProjLightColor = tex2D(ProjectionMap, TextureLookup);
+	float4 TextureLookup = mul(float4(Position, 1.0f), LightProjectionMatrix);
+	float3 ProjLightColor = tex2Dproj(ProjectionMap, TextureLookup);
 	
 	float ViewDirection = normalize(-Position);
 	float3 HalfVector = normalize(LightDirection + ViewDirection);
@@ -173,6 +175,7 @@ float4 PjLPSMain(PjLPSInput Input) : COLOR0
 	return Output;
 }
 
+
 // Omni Projective Light
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct OPLVSOutput
@@ -182,7 +185,7 @@ struct OPLVSOutput
 	float3 ViewVector : TEXCOORD1;
 };
 
-PLVSOutput OPLVSMain(float4 Position : POSITION0)
+OPLVSOutput OPLVSMain(float4 Position : POSITION0)
 {
 	OPLVSOutput Output;
 	

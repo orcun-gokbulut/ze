@@ -185,8 +185,8 @@ void ZED3D9Renderer::InitializeLightning()
 	Canvas.AddSphere(1.0f, 24, 24);
 
 	// Projective
-	Canvas.AddCone(1.0f, 12, 1.0f);
-	Canvas.AddCone(1.0f, 24, 1.0f);
+	Canvas.AddPyramid(1.0f, 12, 1.0f);
+	Canvas.AddPyramid(1.0f, 24, 1.0f);
 
 	if (LightningComponents.LightMeshVB == NULL)
 		LightningComponents.LightMeshVB = (ZED3D9StaticVertexBuffer*)Canvas.CreateStaticVertexBuffer();
@@ -196,6 +196,9 @@ void ZED3D9Renderer::InitializeLightning()
 
 	LightningComponents.OmniProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "OPLVSMain", 0, "vs_2_0");
 	LightningComponents.OmniProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "OPLPSMain", 0, "ps_2_0");
+
+	LightningComponents.ProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "PjLVSMain", 0, "vs_2_0");
+	LightningComponents.ProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PjLPSMain", 0, "ps_2_0");
 
 }
 
@@ -289,9 +292,6 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 3);
 
 	// Transformation
-	ZEMatrix4x4 InvCameraViewMatrix;
-	ZEMatrix4x4::Inverse(InvCameraViewMatrix, Camera->GetViewProjectionTransform());
-
 	ZEMatrix4x4 LightViewProjectionMatrix;
 	ZEMatrix4x4 LightViewMatrix;
 	ZEMatrix4x4::CreateViewTransform(LightViewMatrix, Light->GetWorldPosition(), Light->GetWorldRotation());
@@ -300,20 +300,21 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	ZEMatrix4x4::Multiply(LightViewProjectionMatrix, LightViewMatrix, LightProjectionMatrix);
 
 	ZEMatrix4x4 TextureMatrix;
-	ZEMatrix4x4::Create(TextureMatrix, 0.5f, 0.0f, 0.0f, 0.0f,
+	ZEMatrix4x4::Create(TextureMatrix, 
+		0.5f, 0.0f, 0.0f, 0.0f,
 		0.0f, 0.5f, 0.0f, 0.0f,
 		0.0f, 0.0f, 0.5f, 0.0f,
-		0.5f + 0.5f / Light->GetProjectionTexture()->GetWidth(), 0.5f + 0.5f / Light->GetProjectionTexture()->GetHeight(), 0.0f, 1.0f);
+		0.5f, 0.5f, 0.0f, 1.0f);
 
 	ZEMatrix4x4 ProjectionMatrix, Temp;
-	ZEMatrix4x4::Multiply(Temp, InvCameraViewMatrix, LightViewProjectionMatrix);
+	ZEMatrix4x4::Multiply(Temp, Camera->GetWorldTransform(), LightViewProjectionMatrix);
 	ZEMatrix4x4::Multiply(ProjectionMatrix, Temp, TextureMatrix);
 
 	GetDevice()->SetPixelShaderConstantF(15, (float*)&ProjectionMatrix, 4);
 
 	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
-	GetDevice()->SetVertexShader(LightningComponents.OmniProjectiveLightVS->GetVertexShader());
-	GetDevice()->SetPixelShader(LightningComponents.OmniProjectiveLightPS->GetPixelShader());
+	GetDevice()->SetVertexShader(LightningComponents.ProjectiveLightVS->GetVertexShader());
+	GetDevice()->SetPixelShader(LightningComponents.ProjectiveLightPS->GetPixelShader());
 
 	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)Light->GetProjectionTexture())->Texture);
 
