@@ -70,6 +70,4 @@ ZEPointLight::ZEPointLight()
 	ShadowMap = NULL;
 }
 
-
-
-
+#include "ZEPointLight.h.zpp"

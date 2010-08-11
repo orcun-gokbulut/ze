@@ -51,7 +51,7 @@ void ZEProjectiveLight::SetFOV(float FOV)
 	this->FOV = FOV;
 }
 
-float ZEProjectiveLight::GetFOV()
+float ZEProjectiveLight::GetFOV() const
 {
 	return FOV;
 }
@@ -61,7 +61,7 @@ void ZEProjectiveLight::SetAspectRatio(float AspectRatio)
 	this->AspectRatio = AspectRatio;
 }
 
-float ZEProjectiveLight::GetAspectRatio()
+float ZEProjectiveLight::GetAspectRatio() const
 {
 	return AspectRatio;
 }
@@ -102,7 +102,7 @@ void ZEProjectiveLight::SetShadowMap(int Width, int Height)
 
 void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
 {
-	if (!GetCastsShadows() || ShadowMap == NULL || ShadowMap->IsEmpty())
+	if (!GetCastsShadow() || ShadowMap == NULL || ShadowMap->IsEmpty())
 		return;
 
 	ZEViewPoint ViewPoint;
@@ -196,6 +196,4 @@ ZEProjectiveLight::~ZEProjectiveLight()
 		ShadowMap->Destroy();
 }
 
-
-
-
+#include "ZEProjectiveLight.h.zpp"

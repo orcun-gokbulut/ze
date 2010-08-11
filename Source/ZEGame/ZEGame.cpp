@@ -234,19 +234,43 @@ void ZEGame::Tick(float ElapsedTime)
 }
  
 #include "ZEPlayer.h"
+#include "ZEGraphics/ZEPointLight.h"
+#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZEGraphics/ZEOmniProjectiveLight.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEParticle/ZEParticleEffect.h"
+#include "ZESound/ZESoundSource.h"
+#include "ZESound/ZESoundSource3D.h"
+#include "ZESound/ZEListener.h"
+#include "ZEModel/ZEModel.h"
+#include "ZESkyBrush.h"
+
+// Deprecated
 #include "ZELightBrush.h"
 #include "ZEModelBrush.h"
-#include "ZESkyBrush.h"
-#include "..\ZEParticle\ZEParticleEffectBrush.h"
+#include "ZEParticle/ZEParticleEffectBrush.h"
 
 ZEGame::ZEGame()
 {
 	Scene = NULL;
 	UIManager = NULL;
 	RegisterEntityDescription((ZEEntityDescription*)ZEPlayer::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEPointLight::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEDirectionalLight::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEProjectiveLight::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEOmniProjectiveLight::ClassDescription());
+	//RegisterEntityDescription((ZEEntityDescription*)ZEModel::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEParticleEffect::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZESkyBrush::ClassDescription());
+	//RegisterEntityDescription((ZEEntityDescription*)ZECamera::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZESoundSource::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZESoundSource3D::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEListener::ClassDescription());
+
+	// Deprecated
 	RegisterEntityDescription((ZEEntityDescription*)ZELightBrush::ClassDescription());
 	RegisterEntityDescription((ZEEntityDescription*)ZEModelBrush::ClassDescription());
-	RegisterEntityDescription((ZEEntityDescription*)ZESkyBrush::ClassDescription());
 	RegisterEntityDescription((ZEEntityDescription*)ZEParticleEffectBrush::ClassDescription());
 }
 

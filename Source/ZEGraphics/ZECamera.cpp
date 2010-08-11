@@ -48,6 +48,7 @@ const ZEMatrix4x4& ZECamera::GetViewTransform()
 	ZEMatrix4x4::CreateViewTransform(ViewTransform, GetWorldPosition(), GetWorldRotation())	;
 
 	UpdateViewTransform = false;
+	
 	return ViewTransform;
 }
 
@@ -57,15 +58,21 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 		return ProjectionTransform;*/
 
 	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, FOV, zeGraphics->GetAspectRatio(), zeGraphics->GetNearZ(), zeGraphics->GetFarZ());
+	
+	//UpdateProjectionTransform = false;
+
 	return ProjectionTransform;
 }
 
 const ZEMatrix4x4& ZECamera::GetViewProjectionTransform()
 {
-	if (!UpdateViewProjectionTransform)
-		return ViewProjectionTransform;
+	/*if (!UpdateViewProjectionTransform)
+		return ViewProjectionTransform;*/
 
 	ZEMatrix4x4::Multiply(ViewProjectionTransform, GetViewTransform(), GetProjectionTransform());
+	
+	//UpdateViewTransform = false;
+	
 	return ViewProjectionTransform;
 }
 

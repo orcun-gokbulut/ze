@@ -360,7 +360,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 							DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Entities[I]->GetPosition(), ((ZELight*)Entities[I])->GetRange()), Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
 
 						// If light is casting shadows generate shadow maps of the light
-						if (((ZELight*)Entities[I])->GetCastsShadows())
+						if (((ZELight*)Entities[I])->GetCastsShadow())
 							((ZELight*)Entities[I])->RenderShadowMap(this, ShadowRenderer);
 
 						// Add light to visible lights list.
@@ -389,7 +389,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 									DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Component->GetWorldPosition(), ((ZELight*)Component)->GetRange()), Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
 
 								// If light is casting shadows generate shadow maps of the light
-								if (((ZELight*)Component)->GetCastsShadows())
+								if (((ZELight*)Component)->GetCastsShadow())
 									((ZELight*)Component)->RenderShadowMap(this, ShadowRenderer);
 
 								// Add light to visible lights list.

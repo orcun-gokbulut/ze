@@ -42,8 +42,11 @@
 
 class ZETextureCube;
 
+ZE_META_CLASS_DESCRIPTION(ZEPointLight);
+
 class ZEPointLight  : public ZELight
 {
+	ZE_META_ENTITY()
 	private:
 		ZETextureCube*					ShadowMap;
 		ZEViewSphere					ViewVolume;
@@ -64,6 +67,13 @@ class ZEPointLight  : public ZELight
 
 #endif
 
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEPointLight" parent="ZELight" description="Point Light"/>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 

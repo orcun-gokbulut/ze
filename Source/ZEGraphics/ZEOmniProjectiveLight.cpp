@@ -80,6 +80,4 @@ ZEOmniProjectiveLight::ZEOmniProjectiveLight()
 	ShadowMap = NULL;
 }
 
-
-
-
+#include "ZEOmniProjectiveLight.h.zpp"

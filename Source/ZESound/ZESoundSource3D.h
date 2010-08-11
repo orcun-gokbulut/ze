@@ -80,7 +80,7 @@ class ZESoundSource3D : public ZESoundSource
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZESoundSource3D" parent="ZESoundSource" noinstance="true">
+		<class name="ZESoundSource3D" noinstance="true" parent="ZESoundSource">
 			<description>Sound Source</description>
 			<property name="MinDistance" type="integer" autogetset="yes">
 				<constraints>

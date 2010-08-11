@@ -42,8 +42,11 @@
 
 class ZETexture2D;
 
+ZE_META_CLASS_DESCRIPTION(ZEProjectiveLight);
+
 class ZEProjectiveLight : public ZELight
 {
+	ZE_META_ENTITY()
 	private:
 		float							FOV;
 		float							AspectRatio;
@@ -55,10 +58,10 @@ class ZEProjectiveLight : public ZELight
 		ZELightType						GetLightType();
 
 		void							SetFOV(float FOV);
-		float							GetFOV();
+		float							GetFOV() const;
 
 		void							SetAspectRatio(float AspectRatio);
-		float							GetAspectRatio();
+		float							GetAspectRatio() const;
  
 		const ZETexture2D*				GetShadowMap();
 		void							SetShadowMap(int Width, int Height);
@@ -74,6 +77,19 @@ class ZEProjectiveLight : public ZELight
 										ZEProjectiveLight();
 										~ZEProjectiveLight();
 };
+
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEProjectiveLight" parent="ZELight" description="Point Light">
+			<property name="FOV" groupname="Light" type="float" autogetset="yes"/>
+			<property name="AspectRatio" groupname="Light" type="float" autogetset="yes"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 
 #endif
 

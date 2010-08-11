@@ -54,7 +54,7 @@ class ZESimpleMaterial;
 struct ZEDrawParameters;
 
 class ZEModel : public ZEComponent
-{	
+{
 	friend class ZEPhysicalEnvironment;
 	private:
 		const ZEModelResource*				ModelResource;

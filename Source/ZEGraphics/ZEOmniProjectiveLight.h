@@ -41,8 +41,12 @@
 #include "ZEViewVolume.h"
 
 class ZETextureCube;
+
+ZE_META_CLASS_DESCRIPTION(ZEOmniProjectiveLight);
+
 class ZEOmniProjectiveLight : public ZELight
 {
+	ZE_META_ENTITY()
 	private:
 		ZETextureCube*					ShadowMap;
 		const ZETextureCube*			ProjectionTexture;
@@ -63,6 +67,15 @@ class ZEOmniProjectiveLight : public ZELight
 
 };
 
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEOmniProjectiveLight" parent="ZELight" description="Omni Projective Light"/>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 #endif
 
 

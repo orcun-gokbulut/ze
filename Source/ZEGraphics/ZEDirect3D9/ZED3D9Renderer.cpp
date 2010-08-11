@@ -184,11 +184,9 @@ void ZED3D9Renderer::InitializeLightning()
 	Canvas.AddSphere(1.0f, 24, 24);
 
 	// Projective
-	Canvas.PushTransformation();
 	Canvas.SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
 	Canvas.SetTranslation(-ZEVector3::UnitZ);
 	Canvas.AddPyramid(1.0f, 1.0f, 1.0f);
-	Canvas.PopTransformation();
 
 	if (LightningComponents.LightMeshVB == NULL)
 		LightningComponents.LightMeshVB = (ZED3D9StaticVertexBuffer*)Canvas.CreateStaticVertexBuffer();
@@ -294,6 +292,11 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 3);
 
 	// Transformation
+	ZEMatrix4x4 WorldViewProjTransform;
+	ZEMatrix4x4::Multiply(WorldViewProjTransform, Light->GetWorldTransform(), Camera->GetViewProjectionTransform());
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
+
+	// Projection Transformation
 	ZEMatrix4x4 LightViewProjectionMatrix;
 	ZEMatrix4x4 LightViewMatrix;
 	ZEMatrix4x4::CreateViewTransform(LightViewMatrix, Light->GetWorldPosition(), Light->GetWorldRotation());
@@ -304,20 +307,27 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	ZEMatrix4x4 TextureMatrix;
 	ZEMatrix4x4::Create(TextureMatrix, 
 		0.5f, 0.0f, 0.0f, 0.0f,
-		0.0f, 0.5f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.5f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
 		0.5f, 0.5f, 0.0f, 1.0f);
 
+	ZEMatrix4x4 InvViewMatrix;
+	ZEMatrix4x4::Inverse(InvViewMatrix, Camera->GetViewTransform());
 	ZEMatrix4x4 ProjectionMatrix, Temp;
-	ZEMatrix4x4::Multiply(Temp, Camera->GetWorldTransform(), LightViewProjectionMatrix);
+	ZEMatrix4x4::Multiply(Temp, InvViewMatrix, LightViewProjectionMatrix);
 	ZEMatrix4x4::Multiply(ProjectionMatrix, Temp, TextureMatrix);
 
-	GetDevice()->SetPixelShaderConstantF(15, (float*)&ProjectionMatrix, 4);
+	GetDevice()->SetPixelShaderConstantF(16, (float*)&ProjectionMatrix, 4);
 
 	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
 	GetDevice()->SetVertexShader(LightningComponents.ProjectiveLightVS->GetVertexShader());
 	GetDevice()->SetPixelShader(LightningComponents.ProjectiveLightPS->GetPixelShader());
 
+	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(2, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)Light->GetProjectionTexture())->Texture);
 
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 6); // Cone 2
@@ -365,18 +375,18 @@ void ZED3D9Renderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 	ZEQuaternion::Product(InvViewRotation, Camera->GetWorldRotation(), InvLightRotation);
 	ZEMatrix4x4 InvViewRotationMatrix;
 	ZEMatrix4x4::CreateRotation(InvViewRotationMatrix, InvViewRotation);
-	GetDevice()->SetPixelShaderConstantF(10, (float*)&InvViewRotationMatrix, 3);
+	GetDevice()->SetPixelShaderConstantF(12, (float*)&InvViewRotationMatrix, 3);
 
 	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
 	GetDevice()->SetVertexShader(LightningComponents.OmniProjectiveLightVS->GetVertexShader());
 	GetDevice()->SetPixelShader(LightningComponents.OmniProjectiveLightPS->GetPixelShader());
 
-	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
-	GetDevice()->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-	GetDevice()->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-	GetDevice()->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(3, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(3, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(3, D3DSAMP_ADDRESSW, D3DTADDRESS_CLAMP);
+	GetDevice()->SetSamplerState(3, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(3, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+	GetDevice()->SetSamplerState(3, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetTexture(3, ((ZED3D9TextureCube*)Light->GetProjectionTexture())->CubeTexture);
 
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
@@ -431,8 +441,6 @@ void ZED3D9Renderer::DoGBufferPass()
 
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
-
-
 		ZERenderOrder* RenderOrder = &NonTransparent[I];
 
 		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS) == 0)

@@ -108,7 +108,7 @@ const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 		return WorldTransform;
 	}
 	else
-		return LocalTransform;
+		return GetLocalTransform();
 }
 
 const ZEMatrix4x4& ZEComponent::GetLocalTransform() const 
@@ -167,7 +167,7 @@ void ZEComponent::SetRotation(const ZEQuaternion& NewRotation)
 
 void ZEComponent::SetScale(const ZEVector3& NewScale)
 {
-	DirtyFlags = ZE_CDF_ALL;
+	ZEEntity::SetScale(NewScale);
 
 	if (GetDrawFlags() | ZE_DF_CULL && Owner != NULL)
 		Owner->UpdateBoundingVolumes();

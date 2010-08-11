@@ -412,7 +412,6 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 	HRESULT DeviceState, Hr;
 	do
 	{
-		Sleep(100);
 		DeviceState = Device->TestCooperativeLevel();
 
 		if (DeviceState == D3DERR_DRIVERINTERNALERROR)
@@ -427,10 +426,12 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 				break;
 			}
 			else if (hr == D3DERR_DEVICELOST)
+			{
+				Sleep(100);
 				continue;
+			}
 			else
 				zeCriticalError("Direct3D9", "Can not restore Direct3D Device.");
-
 		}
 	}
 	while (DeviceState == D3DERR_DEVICELOST);

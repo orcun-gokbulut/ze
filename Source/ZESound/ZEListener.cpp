@@ -58,7 +58,7 @@ bool ZEListener::IsActiveListener()
 	return zeSound->GetActiveListener() == this;
 }
 
-float ZEListener::GetDistanceFactor()
+float ZEListener::GetDistanceFactor() const
 {
 	return DistanceFactor;
 }
@@ -68,7 +68,7 @@ void ZEListener::SetDistanceFactor(float NewDistanceFactor)
 	DistanceFactor = NewDistanceFactor;
 }
 
-float ZEListener::GetDopplerFactor()
+float ZEListener::GetDopplerFactor() const
 {
 	return DopplerFactor;
 }
@@ -78,7 +78,7 @@ void ZEListener::SetDopplerFactor(float NewDopplerFactor)
 	DopplerFactor = NewDopplerFactor;
 }
 
-float ZEListener::GetRollOffFactor()
+float ZEListener::GetRollOffFactor() const
 {
 	return RollOffFactor;
 }
@@ -93,6 +93,4 @@ ZEListener* ZEListener::CreateInstance()
 	return zeSound->CreateListener();
 }
 
-
-
-
+#include "ZEListener.h.zpp"

@@ -117,7 +117,7 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 	Light->SetIntensity(Intensity);
 	Light->SetRange(Range);
 	Light->SetAttenuation(Attenuation.x, Attenuation.y, Attenuation.z);
-	Light->SetCastsShadows(CastsShadow);
+	Light->SetCastsShadow(CastsShadow);
 	Light->SetEnabled(GetEnabled());
 
 	if (LightType == ZE_LT_PROJECTIVE)
@@ -235,7 +235,7 @@ void ZELightBrush::SetCastsShadow(bool NewValue)
 	CastsShadow = NewValue;
 	if (Light != NULL)
 	
-		Light->SetCastsShadows(NewValue);
+		Light->SetCastsShadow(NewValue);
 }
 
 bool ZELightBrush::GetCastsShadow() const

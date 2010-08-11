@@ -46,6 +46,7 @@ float4x4 WorldViewProjMatrix : register(vs, c4);
 float4 LightParameters0 : register(ps, c0);
 float4 LightParameters1 : register(ps, c1);
 float4 LightParameters2 : register(ps, c2);
+float4 LightParameters3 : register(ps, c3);
 float2 PixelSize_2 : register(ps, c5);
 
 #define LightPosition			LightParameters0.xyz
@@ -53,9 +54,10 @@ float2 PixelSize_2 : register(ps, c5);
 #define LightColor				LightParameters1.xyz
 #define LightIntensity			LightParameters1.w
 #define LightAttenuationFactors	LightParameters2.xyz
+#define LightDirection_			LightParameters3.xyz
 
-float3x3 LightRotation : register(ps, c10);
-float4x4 LightProjectionMatrix : register(ps, c15);
+float3x3 LightRotation : register(ps, c12);
+float4x4 LightProjectionMatrix : register(ps, c16);
 
 sampler2D GBuffer1 : register(ps, s0);
 sampler2D GBuffer2 : register(ps, s1);
@@ -162,7 +164,7 @@ float4 PjLPSMain(PjLPSInput Input) : COLOR0
 	float3 LightDirection = LightDisplacement / LightDistance;
 	
 	float4 TextureLookup = mul(float4(Position, 1.0f), LightProjectionMatrix);
-	float3 ProjLightColor = tex2Dproj(ProjectionMap, TextureLookup);
+	float3 ProjLightColor = /*tex2Dproj(ProjectionMap, TextureLookup) */  LightColor;
 	
 	float ViewDirection = normalize(-Position);
 	float3 HalfVector = normalize(LightDirection + ViewDirection);
@@ -218,7 +220,7 @@ float4 OPLPSMain(OPLPSInput Input) : COLOR0
 	float3 LightDirection = LightDisplacement / LightDistance;
 	
 	float3 TextureLookup = mul(-LightDirection, (float3x3)LightRotation);
-	float3 ProjLightColor = texCUBE(OmniProjectionMap, TextureLookup);
+	float3 ProjLightColor = texCUBE(OmniProjectionMap, TextureLookup).rgb * LightColor;
 	
 	float ViewDirection = normalize(-Position);
 	float3 HalfVector = normalize(LightDirection + ViewDirection);

@@ -120,19 +120,20 @@ bool ZEGraphicsDebugModule::Initialize()
 	OmniProjectiveLight0->SetIntensity(5.0f);
 	OmniProjectiveLight0->SetRange(40.0f);
 	OmniProjectiveLight0->SetProjectionTexture(ZETextureCubeResource::LoadResource("cubetest.tga")->GetTexture());
-	OmniProjectiveLight0->SetCastsShadows(false);
+	OmniProjectiveLight0->SetCastsShadow(false);
 	Scene->AddEntity(OmniProjectiveLight0);
 
 	ProjectiveLight0 = new ZEProjectiveLight();
-	OmniProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 2.0f));
-	OmniProjectiveLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-	OmniProjectiveLight0->SetAttenuation(0.03f, 0.0f, 1.0f);
-	ProjectiveLight0->SetIntensity(2.0f);
+	ProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 2.0f));
+	ProjectiveLight0->SetScale(ZEVector3(5.0f, 5.0f, 30.0f));
+	ProjectiveLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
+	ProjectiveLight0->SetAttenuation(0.0f, 0.0f, 1.0f);
+	ProjectiveLight0->SetIntensity(5.0f);
 	ProjectiveLight0->SetRange(5.0f);
-	ProjectiveLight0->SetCastsShadows(false);
+	ProjectiveLight0->SetCastsShadow(false);
 	ProjectiveLight0->SetFOV(ZE_PI_2);
 	ProjectiveLight0->SetAspectRatio(1.0f);
-	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("white.png")->GetTexture());
+	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
 	Scene->AddEntity(ProjectiveLight0);
 
 	PointLight1->SetEnabled(true);
