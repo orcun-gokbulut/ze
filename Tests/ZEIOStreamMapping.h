@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDebugModule.h
+ Zinek Engine - ZEIOStreamMapping.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
-#define __ZE_GRAPHICS_DEBUG_MODULE_H__
+#include <iostream>
 
-#include "ZEDebugModule.h"
-#include "ZEGame\ZEModelBrush.h"
+class ZEString;
+class ZEVector2;
+class ZEVector3;
+class ZEVector4;
+class ZEQuaternion;
+class ZEMatrix3x3;
+class ZEMatrix4x4;
 
-class ZEPlayer;
-class ZEPointLight;
-class ZEOmniProjectiveLight;
-class ZEProjectiveLight;
-
-class ZEGraphicsDebugModule : public ZEDebugModule
-{
-	private:
-		ZEPlayer*				Player;
-		ZEPointLight*			PointLight1;
-		ZEPointLight*			PointLight2;
-		ZEPointLight*			PointLight3;
-		ZEPointLight*			PointLight4;
-		ZEPointLight*			PointLight5;
-
-		ZEProjectiveLight*		ProjectiveLight0;
-
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
-
-	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Process(float ElapsedTime);
-
-
-								ZEGraphicsDebugModule();
-		virtual					~ZEGraphicsDebugModule();
-};
-
-#endif
-
-
-
-
-
+std::ostream& operator<<(std::ostream& Out, const ZEString& Input);
+std::ostream& operator<<(std::ostream& Out, const ZEVector2& Input);
+std::ostream& operator<<(std::ostream& Out, const ZEVector3& Input);
+std::ostream& operator<<(std::ostream& Out, const ZEVector4& Input);
+std::ostream& operator<<(std::ostream& Out, const ZEQuaternion& Input);
+std::ostream& operator<<(std::ostream& Out, const ZEMatrix3x3& Input);
+std::ostream& operator<<(std::ostream& Out, const ZEMatrix4x4& Input);

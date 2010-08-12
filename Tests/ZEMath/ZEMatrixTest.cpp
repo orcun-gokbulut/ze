@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MatrixTest.cpp
+ Zinek Engine - ZEMatrixTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,11 +36,11 @@
 #include <UnitTest/UnitTest++.h>
 #include <d3dx9.h>
 #include <math.h>
-#include "../IOStreamMapping.h"
-#include "ZEMath/Matrix.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "ZEMath/Definitions.h"
+#include "ZEIOStreamMapping.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEDefinitions.h"
 
        
 SUITE(ZEMatrix3x3)

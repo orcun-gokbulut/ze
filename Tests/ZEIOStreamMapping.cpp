@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - RectangleTest.cpp
+ Zinek Engine - ZEIOStreamMapping.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,94 +33,60 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "UnitTest/UnitTest++.h"
-#include "../IOStreamMapping.h"
-#include "ZEMath/Rectangle.h"
-#include "ZEMath/Vector.h"
-#include <math.h>
+#include "ZEIOStreamMapping.h"
+#include <iostream>
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEMatrix.h"
 
-SUITE(Rectangle)
+using namespace std;
+
+ostream& operator<<(ostream& Out, const ZEString& Input)
 {
+	return Out;// << (char)Input;
+}
 
-	TEST(RECT_Constructor)
-	{
-		ZEPoint2 LU(1.0f, 4.0f);
-		ZEPoint2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-		CHECK_EQUAL(R.LeftUp, ZEPoint2(1.0f, 4.0f));
-		CHECK_EQUAL(R.RightDown, ZEPoint2(3.0f, 2.0f));
+ostream& operator<<(ostream& Out, const ZEVector2& Input)
+{
+	return Out << "[x:" << Input.x << ", y:" << Input.y << "]";
+}
 
-		ZERectangle R2(LU, 2.0f, 2.0f);
-		CHECK_EQUAL(R2.LeftUp, ZEPoint2(1.0f, 4.0f));
-		CHECK_EQUAL(R2.RightDown, ZEPoint2(3.0f, 2.0f));
+ostream& operator<<(ostream& Out, const ZEVector3& Input)
+{
+	return Out << "[x:" << Input.x << ", y:" << Input.y << ", z:" << Input.z << "]";
+}
 
+ostream& operator<<(ostream& Out, const ZEVector4& Input)
+{
+	return Out << "[x:" << Input.x << ", y:" << Input.y << ", z:" << Input.z << "w:" << Input.w;
+}
 
+ostream& operator<<(ostream& Out, const ZEQuaternion& Input)
+{
+	return Out << "[w:" << Input.w << ", x:" << Input.x << ", y:" << Input.y << ", z:" << Input.z << "]";
+}
 
-	}
+ostream& operator<<(ostream& Out, const ZEMatrix3x3& Input)
+{
+	 Out << "[";
+	for (size_t I = 0; I < 9; I++)
+		if (I != 8)
+			Out << Input.M[I] << ", ";
+		else
+			Out << Input.M[I] << "]";
 
-	TEST(RECT_BoundingTest)
-	{
-		
+	return Out;
+}
 
-		ZEPoint2 LU(1.0f, 4.0f);
-		ZEPoint2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
+ostream& operator<<(ostream& Out, const ZEMatrix4x4& Input)
+{
+	Out << "[";
+	for (size_t I = 0; I < 16; I++)
+		if (I != 15)
+			Out << Input.M[I] << ", ";
+		else
+			Out << Input.M[I] << "]";
 
-		ZEPoint2 P(2.0f, 3.0f);
-		bool result = R.BoundingTest(P);
-		CHECK_EQUAL(result, true);
-
-		ZEPoint2 P2(0.0f, 0.0f);
-		bool result2 = R.BoundingTest(P2);
-		CHECK_EQUAL(result2, false);
-
-		ZEPoint2 P3(2.0f, 2.0f);
-		bool result3 = R.BoundingTest(P3);
-		CHECK_EQUAL(result3, true);
-	}
-
-	TEST(RECT_GetCorner)
-	{
-		ZEPoint2 LU(1.0f, 4.0f);
-		ZEPoint2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-
-		ZEPoint2 C1 = R.GetCorner(ZERECTANGLECORNER_LEFTDOWN);
-		ZEPoint2 C2 = R.GetCorner(ZERECTANGLECORNER_LEFTUP);
-		ZEPoint2 C3 = R.GetCorner(ZERECTANGLECORNER_RIGHTDOWN);
-		ZEPoint2 C4 = R.GetCorner(ZERECTANGLECORNER_RIGHTUP);
-
-		CHECK_EQUAL(C1, ZEPoint2(1.0f, 2.0f));
-		CHECK_EQUAL(C2, ZEPoint2(1.0f, 4.0f));
-		CHECK_EQUAL(C3, ZEPoint2(3.0f, 2.0f));
-		CHECK_EQUAL(C4, ZEPoint2(3.0f, 4.0f));
-
-	}
-
-	TEST(RECT_GetWidth)
-	{
-		ZEPoint2 LU(1.0f, 4.0f);
-		ZEPoint2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-
-		float w = R.GetWidth();
-
-		CHECK_EQUAL(w, 2.0f);
-
-	}
-
-	TEST(RECT_GetHeight)
-	{
-		ZEPoint2 LU(1.0f, 4.0f);
-		ZEPoint2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-
-		float h = R.GetHeight();
-
-		CHECK_EQUAL(h, 2.0f);
-
-	}
-
-
-
+	return Out;
 }

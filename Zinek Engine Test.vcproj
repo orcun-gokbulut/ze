@@ -41,11 +41,11 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)Include;$(ProjectDir)Test;$(ProjectDir)Source"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)Include&quot;;&quot;$(ProjectDir)Tests&quot;;&quot;$(ProjectDir)Source&quot;"
 				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;ZE_DEBUG_ENABLED;ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_CHECK_MEMORY"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
-				RuntimeLibrary="1"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				DebugInformationFormat="4"
@@ -61,7 +61,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="unittest.lib d3dx9.lib"
+				AdditionalDependencies="libunittest++.lib d3dx9.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Win x86\&quot;;&quot;$(ProjectDir)\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)\lib\Win x86\Debug&quot;;&quot;$(ProjectDir)\lib\Win x86\Debug\MT&quot;"
 				GenerateDebugInformation="true"
@@ -174,58 +174,126 @@
 	</References>
 	<Files>
 		<Filter
+			Name="ZEDSTests"
+			>
+			<File
+				RelativePath=".\Tests\ZEDS\ZEStringTests.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="ZEMathTests"
+			>
+			<File
+				RelativePath=".\Tests\ZEMath\ZEAABoundingBoxTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZEBoundingSphereTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZELineSegmentTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZELineTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZEMathTests.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZEMathTests.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZEMatrixTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZEOBoundingBoxTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZEPlaneTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZEQuaternionTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZERayTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZERectangle3DTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZETriangleTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZETrigonometryTest.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Tests\ZEMath\ZEVectorTest.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
 			Name="ZEDS"
 			>
 			<File
-				RelativePath=".\Source\ZEDS\Allocator.h"
+				RelativePath=".\Source\ZEDS\ZEAllocator.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Array.h"
+				RelativePath=".\Source\ZEDS\ZEArray.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Definitions.cpp"
+				RelativePath=".\Source\ZEDS\ZEDSDefinitions.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Definitions.h"
+				RelativePath=".\Source\ZEDS\ZEDSDefinitions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Named.cpp"
+				RelativePath=".\Source\ZEDS\ZENamed.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Named.h"
+				RelativePath=".\Source\ZEDS\ZENamed.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\String.cpp"
+				RelativePath=".\Source\ZEDS\ZEString.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\String.h"
+				RelativePath=".\Source\ZEDS\ZEString.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Tests\ZEDS\StringTests.cpp"
+				RelativePath=".\Source\ZEDS\ZETypedVariant.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\TypedVariant.cpp"
+				RelativePath=".\Source\ZEDS\ZETypedVariant.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\TypedVariant.h"
+				RelativePath=".\Source\ZEDS\ZEVariant.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEDS\Variant.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEDS\Variant.h"
+				RelativePath=".\Source\ZEDS\ZEVariant.h"
 				>
 			</File>
 		</Filter>
@@ -233,128 +301,136 @@
 			Name="ZEMath"
 			>
 			<File
-				RelativePath=".\Source\ZEMath\AABoundingBox.cpp"
+				RelativePath=".\Source\ZEMath\ZEAABoundingBox.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\AABoundingBox.h"
+				RelativePath=".\Source\ZEMath\ZEAABoundingBox.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\BoundingSphere.cpp"
+				RelativePath=".\Source\ZEMath\ZEBoundingSphere.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\BoundingSphere.h"
+				RelativePath=".\Source\ZEMath\ZEBoundingSphere.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Definitions.h"
+				RelativePath=".\Source\ZEMath\ZEDefinitions.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Line.cpp"
+				RelativePath=".\Source\ZEMath\ZELine.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Line.h"
+				RelativePath=".\Source\ZEMath\ZELine.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\LineSegment.cpp"
+				RelativePath=".\Source\ZEMath\ZELineSegment.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\LineSegment.h"
+				RelativePath=".\Source\ZEMath\ZELineSegment.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Matrix.cpp"
+				RelativePath=".\Source\ZEMath\ZEMatrix.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Matrix.h"
+				RelativePath=".\Source\ZEMath\ZEMatrix.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\OBoundingBox.cpp"
+				RelativePath=".\Source\ZEMath\ZEOBoundingBox.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\OBoundingBox.h"
+				RelativePath=".\Source\ZEMath\ZEOBoundingBox.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Plane.cpp"
+				RelativePath=".\Source\ZEMath\ZEPlane.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Plane.h"
+				RelativePath=".\Source\ZEMath\ZEPlane.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Quaternion.cpp"
+				RelativePath=".\Source\ZEMath\ZEQuaternion.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Quaternion.h"
+				RelativePath=".\Source\ZEMath\ZEQuaternion.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Ray.cpp"
+				RelativePath=".\Source\ZEMath\ZERay.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Ray.h"
+				RelativePath=".\Source\ZEMath\ZERay.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Rectangle.cpp"
+				RelativePath=".\Source\ZEMath\ZERectangle.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Rectangle.h"
+				RelativePath=".\Source\ZEMath\ZERectangle.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Rectangle3D.cpp"
+				RelativePath=".\Source\ZEMath\ZERectangle3D.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Rectangle3D.h"
+				RelativePath=".\Source\ZEMath\ZERectangle3D.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Triangle.cpp"
+				RelativePath=".\Source\ZEMath\ZETriangle.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Triangle.h"
+				RelativePath=".\Source\ZEMath\ZETriangle.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Trigonometry.cpp"
+				RelativePath=".\Source\ZEMath\ZETrigonometry.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Trigonometry.h"
+				RelativePath=".\Source\ZEMath\ZETrigonometry.h"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Vector.cpp"
+				RelativePath=".\Source\ZEMath\ZEVector.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEMath\Vector.h"
+				RelativePath=".\Source\ZEMath\ZEVector.h"
 				>
 			</File>
 		</Filter>
 		<File
-			RelativePath=".\Tests\Test.cpp"
+			RelativePath=".\Tests\ZEIOStreamMapping.cpp"
 			>
 		</File>
 		<File
-			RelativePath=".\Tests\Test.h"
+			RelativePath=".\Tests\ZEIOStreamMapping.h"
+			>
+		</File>
+		<File
+			RelativePath=".\Tests\ZETest.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\Tests\ZETest.h"
 			>
 		</File>
 	</Files>

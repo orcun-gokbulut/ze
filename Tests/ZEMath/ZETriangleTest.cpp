@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - TriangleTest.cpp
+ Zinek Engine - ZETriangleTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,12 +35,12 @@
 
 #include <math.h>
 #include <UnitTest/UnitTest++.h>
-#include "ZEMath/Triangle.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/LineSegment.h"
-#include "ZEMath/Ray.h"
-#include "ZEMath/Definitions.h"
-#include "../IOStreamMapping.h"
+#include "ZEMath/ZETriangle.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZELineSegment.h"
+#include "ZEMath/ZERay.h"
+#include "ZEMath/ZEDefinitions.h"
+#include "ZEIOStreamMapping.h"
 
 
 SUITE(ZETriangle)
@@ -108,7 +108,7 @@ SUITE(ZETriangle)
 
 	TEST(TRI_InsideTest)
 	{
-		ZEPoint3 P(1.0f, 2.0f, 3.0f);
+		ZEVector3 P(1.0f, 2.0f, 3.0f);
 
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -174,7 +174,7 @@ SUITE(ZETriangle)
 
 		ZETriangle T(V0, V1, V2);
 		ZERay R;
-		R.p = ZEPoint3(1.0f, 2.0f, 3.0f);
+		R.p = ZEVector3(1.0f, 2.0f, 3.0f);
 		R.v = N;
 
 		float t;

@@ -580,6 +580,15 @@ void ZEMatrix4x4::CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Positi
 	ZEMatrix4x4::Multiply(Matrix, D, C);
 }
 
+void ZEMatrix4x4::CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation)
+{
+	ZEMatrix4x4 A, B;
+
+	ZEMatrix4x4::CreateRotation(A, Rotation);
+	ZEMatrix4x4::CreateTranslation(B, Position);
+	ZEMatrix4x4::Multiply(Matrix, A, B);
+}
+
 void ZEMatrix4x4::CreateTranslation(ZEMatrix4x4& Matrix, const ZEVector3& Position)
 {
 	Create(Matrix,

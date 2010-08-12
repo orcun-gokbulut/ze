@@ -190,10 +190,10 @@ const ZEQuaternion ZEComponent::GetWorldRotation() const
 {
 	if (Owner != NULL)
 	{
-		ZEQuaternion Temp, Temp1;
+		ZEQuaternion Temp;
 		ZEQuaternion::Product(Temp, Owner->GetRotation(), GetRotation());
-		ZEQuaternion::Normalize(Temp1, Temp);
-		return Temp1;
+		ZEQuaternion::Normalize(Temp, Temp);
+		return Temp;
 	}
 	else
 		return GetRotation();

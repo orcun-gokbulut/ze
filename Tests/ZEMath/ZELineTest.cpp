@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - LineTest.cpp
+ Zinek Engine - ZELineTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,17 +36,17 @@
 #include <UnitTest/UnitTest++.h>
 #include <d3dx9.h>
 #include <math.h>
-#include "../IOStreamMapping.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Line.h"
-#include "ZEMath/Definitions.h"
+#include "ZEIOStreamMapping.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZELine.h"
+#include "ZEMath/ZEDefinitions.h"
 
 SUITE(ZELine)
 {
 	TEST(LN_Constructor)
 	{
-		ZEPoint3 P0(0.0f, 1.0f, 0.0f);
-		ZEPoint3 P1(1.0f, 2.0f, 3.0f);
+		ZEVector3 P0(0.0f, 1.0f, 0.0f);
+		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZELine L(P0, P1);
 		CHECK_EQUAL(L.p, P0);
 		CHECK_EQUAL(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
@@ -55,8 +55,8 @@ SUITE(ZELine)
 	TEST(LN_Create)
 	{
 		ZELine L;
-		ZEPoint3 P0(0.0f, 1.0f, 0.0f);
-		ZEPoint3 P1(1.0f, 2.0f, 3.0f);
+		ZEVector3 P0(0.0f, 1.0f, 0.0f);
+		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZELine::Create(L, P0, P1);
 		CHECK_EQUAL(L.p, P0);
 		CHECK_EQUAL(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
@@ -66,7 +66,7 @@ SUITE(ZELine)
 	{
 		ZELine L;
 		ZEVector3 V(1.0, 4.0f, 9.0f);
-		ZEPoint3 P (1.0, 0.0f, 0.0f);
+		ZEVector3 P (1.0, 0.0f, 0.0f);
 		ZELine::CreateParametric(L, V, P);
 		CHECK_EQUAL(L.p, P);
 		CHECK_EQUAL(L.v, V);
@@ -74,25 +74,25 @@ SUITE(ZELine)
 
 	TEST(LN_MinimumDistance1)
 	{
-		ZEPoint3 P1(0,3,0);
-		ZEPoint3 P2(1,4,-1);
-		ZEPoint3 P3(5,8,2);
-		ZEPoint3 P4(8,15,1);
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
+		ZEVector3 P3(5,8,2);
+		ZEVector3 P4(8,15,1);
 		
 		ZELine L1(P1,P2);
 		ZELine L2(P3,P4);
 		
 		float d = ZELine::MinimumDistance(L1, L2);
 
-		CHECK_EQUAL(d, sqrt(14.0f));
+		CHECK_EQUAL(d, sqrtf(14.0f));
 	}
 
 	TEST(LN_MinimumDistance2)
 	{
-		ZEPoint3 P1(0,3,0);
-		ZEPoint3 P2(1,4,-1);
-		ZEPoint3 P3(5,8,2);
-		ZEPoint3 P4(8,15,1);
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
+		ZEVector3 P3(5,8,2);
+		ZEVector3 P4(8,15,1);
 		
 		ZELine L1(P1,P2);
 		ZELine L2(P3,P4);
@@ -100,32 +100,32 @@ SUITE(ZELine)
 		float tA, tB;
 		float d = ZELine::MinimumDistance(L1, L2, tA, tB);
 
-		CHECK_EQUAL(d, sqrt(14.0f));
+		CHECK_EQUAL(d, sqrtf(14.0f));
 	}
 
 	TEST(LN_DistanceToPoint)
 	{
-		ZEPoint3 P(5,8,2);
-		ZEPoint3 P1(0,3,0);
-		ZEPoint3 P2(1,4,-1);
+		ZEVector3 P(5,8,2);
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
 		ZELine L(P1,P2);
 		float t;
 		float d;
 
-		d = ZELine::DistanceToPoint(L,P,t);
+		d = ZELine::MinimumDistance(L,P,t);
 
 		CHECK_CLOSE(d, 4.61880215, 0.000001);
 	}
 
 	TEST(LN_GetPointOn)
 	{
-		ZEPoint3 P1(0,3,0);
-		ZEPoint3 P2(1,4,-1);
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
 		ZEVector3 A;
 		ZEVector3 B;
 		const ZELine L=ZELine::ZELine(P1,P2);
-		ZEPoint3 P;
-		ZEPoint3 P3;
+		ZEVector3 P;
+		ZEVector3 P3;
 		L.GetPointOn(P,3);
 		A=P;
 		

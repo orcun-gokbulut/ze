@@ -155,6 +155,7 @@ class ZEMatrix4x4
 		static void						CreateTranslation(ZEMatrix4x4& Matrix, float x, float y, float z);
 		static void						CreateTranslation(ZEMatrix4x4& Matrix, const ZEVector3& Position);
 		static void						CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale);
+		static void						CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);
 		static void						CreateOffset(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);
 		static void						CreateIdentity(ZEMatrix4x4& Matrix);
 		static void						CreateZero(ZEMatrix4x4& Matrix);

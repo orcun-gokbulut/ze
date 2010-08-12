@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - MathTests.cpp
+ Zinek Engine - ZEMathTests.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,10 +36,10 @@
 #include <stdio.h>
 #include <math.h>
 #include <d3dx9.h>
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "ZEMath/Matrix.h"
-#include "ZEMath/Line.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZELine.h"
 
 #define MATHLIB_FLOATTRESHOLD 0.00001f
 
@@ -150,7 +150,8 @@ bool CheckVector(const ZEVector3& Vect, const ZEVector3& RefVect)
 	printf("\n");
 	return false;
 }
-bool CheckPoint(const ZEPoint3& Point, const ZEPoint3& RefPoint)
+
+bool CheckPoint(const ZEVector3& Point, const ZEVector3& RefPoint)
 {
 	if (fabs(Point.x - RefPoint.x) < MATHLIB_FLOATTRESHOLD)
 		if (fabs(Point.y - RefPoint.y) < MATHLIB_FLOATTRESHOLD)
@@ -236,7 +237,7 @@ bool CheckQuaternion(const ZEQuaternion& Quat, const D3DXQUATERNION& RefQuat)
 
 	return false;
 }
-bool CheckLine(const ZELine& L, ZEVector3& v, const ZEPoint3& P0, const ZEPoint3& P1)
+bool CheckLine(const ZELine& L, ZEVector3& v, const ZEVector3& P0, const ZEVector3& P1)
 {
 	ZEVector3::Sub(v,P1,P0);
 
@@ -836,13 +837,13 @@ bool TestLine()
 	bool Succeed = true;
 	printf("\n----------------------------------------------------\n Line Test in progress...\n----------------------------------------------------\n");
 
-	// Create(ZELine& Line, const ZEPoint3& P0, const ZEPoint3& P1);
+	// Create(ZELine& Line, const ZEVector3& P0, const ZEVector3& P1);
 	{
-		ZEPoint3 P0(1.0f, 2.0f, 3.0f);
-		ZEPoint3 P1(5.0f, 6.0f, 7.0f);
+		ZEVector3 P0(1.0f, 2.0f, 3.0f);
+		ZEVector3 P1(5.0f, 6.0f, 7.0f);
 		D3DXVECTOR3 DA, DB, DC;
 		ZELine L;
-		printf ("\nCreate(const ZEPoint3& P0, const ZEPoint3& P1)->");
+		printf ("\nCreate(const ZEVector3& P0, const ZEVector3& P1)->");
 
 		ZELine::Create(L,P0,P1);
 		ZEVector3 A;
@@ -850,12 +851,12 @@ bool TestLine()
 		Succeed=CheckLine(L,A,P0,P1)&Succeed;
 	}
 	
-	// ZELine(const ZEPoint3& P0, const ZEPoint3& P1)
+	// ZELine(const ZEVector3& P0, const ZEVector3& P1)
 	{	
-		ZEPoint3 P0(1.0f, 2.0f, 3.0f);
-		ZEPoint3 P1(5.0f, 6.0f, 7.0f);
+		ZEVector3 P0(1.0f, 2.0f, 3.0f);
+		ZEVector3 P1(5.0f, 6.0f, 7.0f);
 		D3DXVECTOR3 DA, DB, DC;
-		printf ("\nZELine(const ZEPoint3& P0, const ZEPoint3& P1)->");
+		printf ("\nZELine(const ZEVector3& P0, const ZEVector3& P1)->");
 
 		ZELine L(P0,P1);
 		ZEVector3 A;
@@ -866,10 +867,10 @@ bool TestLine()
 	{
 		printf ("\nMinimumDistance(const ZELine& LineA, const ZELine& LineB, float& tA, float &tB)->");
 		long double d;
-		ZEPoint3 P1(0,3,0);
-		ZEPoint3 P2(1,4,-1);
-		ZEPoint3 P3(5,8,2);
-		ZEPoint3 P4(8,15,1);
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
+		ZEVector3 P3(5,8,2);
+		ZEVector3 P4(8,15,1);
 
 		ZELine A(P1,P2);
 		ZELine B(P3,P4);
@@ -893,17 +894,17 @@ bool TestLine()
 		}
 	
 	}
-	//DistanceToPoint(const ZELine& Line, const ZEPoint3& Point, float &t)
+	//DistanceToPoint(const ZELine& Line, const ZEVector3& Point, float &t)
 	printf ("\n\nDistanceToPoint(const ZELine& LineA, const ZELine& LineB, float& tA, float &tB)->");
 	{
-		ZEPoint3 P(5,8,2);
-		ZEPoint3 P1(0,3,0);
-		ZEPoint3 P2(1,4,-1);
+		ZEVector3 P(5,8,2);
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
 		ZELine L(P1,P2);
 		float t;
 		float d;
 
-		d=ZELine::DistanceToPoint(L,P,t);
+		d=ZELine::MinimumDistance(L,P,t);
 
 		Succeed = (fabs(d-4.61880215)<=MATHLIB_FLOATTRESHOLD)&&Succeed;
 		if(Succeed)
@@ -920,16 +921,16 @@ bool TestLine()
 			printf("\n  Output    : %lf", d);
 		}
 	}
-	//GetPointOn(ZEPoint3& Point, float t) const
+	//GetPointOn(ZEVector3& Point, float t) const
 	{
-		printf ("\n\nGetPointOn(const ZELine& Line, const ZEPoint3& Point, float &t)->");
-		ZEPoint3 P1(0,3,0);
-		ZEPoint3 P2(1,4,-1);
+		printf ("\n\nGetPointOn(const ZELine& Line, const ZEVector3& Point, float &t)->");
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
 		ZEVector3 A;
 		ZEVector3 B;
 		const ZELine L=ZELine::ZELine(P1,P2);
-		ZEPoint3 P;
-		ZEPoint3 P3;
+		ZEVector3 P;
+		ZEVector3 P3;
 		L.GetPointOn(P,3);
 		A=P;
 		
@@ -939,11 +940,11 @@ bool TestLine()
 
 		Succeed = CheckVector(A,B) & Succeed;
 	}
-	// CreateParametric(ZELine& Line, const ZEVector3& v, const ZEPoint3& p);
+	// CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p);
 	{
-		printf ("\n\nCreateParametric(ZELine& Line, const ZEVector3& v, const ZEPoint3& p)->\n");
+		printf ("\n\nCreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p)->\n");
 		ZEVector3 Vct(4.0f,5.0f,2.0f);
-		ZEPoint3  Pnt(1.0f,2.0f,3.0f);
+		ZEVector3  Pnt(1.0f,2.0f,3.0f);
 		ZELine L;
 		ZELine::CreateParametric(L,Vct,Pnt);
 

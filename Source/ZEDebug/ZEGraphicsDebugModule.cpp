@@ -115,11 +115,11 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	OmniProjectiveLight0 = new ZEOmniProjectiveLight();
 	OmniProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
-	OmniProjectiveLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
+	OmniProjectiveLight0->SetColor(ZEVector3(1.0f, 0.0f, 0.0f));
 	OmniProjectiveLight0->SetAttenuation(0.03f, 0.0f, 1.0f);
 	OmniProjectiveLight0->SetIntensity(5.0f);
 	OmniProjectiveLight0->SetRange(40.0f);
-	OmniProjectiveLight0->SetProjectionTexture(ZETextureCubeResource::LoadResource("cubetest.tga")->GetTexture());
+	OmniProjectiveLight0->SetProjectionTexture(ZETextureCubeResource::LoadResource("alarm.tga")->GetTexture());
 	OmniProjectiveLight0->SetCastsShadow(false);
 	Scene->AddEntity(OmniProjectiveLight0);
 
@@ -141,7 +141,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight3->SetEnabled(false);
 	PointLight4->SetEnabled(false);
 	PointLight5->SetEnabled(false);
-	OmniProjectiveLight0->SetEnabled(false);
+	OmniProjectiveLight0->SetEnabled(true);
 	ProjectiveLight0->SetEnabled(true);
 	return true;
 }
@@ -159,6 +159,14 @@ void ZEGraphicsDebugModule::Deinitialize()
 	delete PointLight3;
 	delete PointLight4;
 	delete PointLight5;
+}
+
+void ZEGraphicsDebugModule::Process(float ElapsedTime)
+{
+	static ZEQuaternion Rotation = ZEQuaternion::Identity;
+	
+	Rotation = Rotation * ZEQuaternion(ZE_PIx2 * ElapsedTime, ZEVector3::UnitY);
+	OmniProjectiveLight0->SetRotation(Rotation);
 }
 
 

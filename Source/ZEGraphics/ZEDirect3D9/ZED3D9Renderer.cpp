@@ -369,13 +369,21 @@ void ZED3D9Renderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
 
-	ZEQuaternion InvLightRotation;
+	// Projection Transform
+	ZEQuaternion ProjectionRotation;
+	ZEQuaternion::Product(ProjectionRotation, Light->GetWorldRotation().Conjugate(), Camera->GetWorldRotation());
+	
+	ZEQuaternion::Normalize(ProjectionRotation, ProjectionRotation);
+
+	/*ZEQuaternion InvLightRotation;
 	ZEQuaternion InvViewRotation;
 	ZEQuaternion::Conjugate(InvLightRotation, Light->GetWorldRotation());
 	ZEQuaternion::Product(InvViewRotation, Camera->GetWorldRotation(), InvLightRotation);
-	ZEMatrix4x4 InvViewRotationMatrix;
-	ZEMatrix4x4::CreateRotation(InvViewRotationMatrix, InvViewRotation);
-	GetDevice()->SetPixelShaderConstantF(12, (float*)&InvViewRotationMatrix, 3);
+	ZEMatrix4x4 InvViewRotationMatrix;*/
+
+	ZEMatrix4x4 ProjectionMatrix;
+	ZEMatrix4x4::CreateRotation(ProjectionMatrix, ProjectionRotation);
+	GetDevice()->SetPixelShaderConstantF(12, (float*)&ProjectionMatrix, 3);
 
 	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
 	GetDevice()->SetVertexShader(LightningComponents.OmniProjectiveLightVS->GetVertexShader());

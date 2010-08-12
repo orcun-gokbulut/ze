@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - QuaternionTest.cpp
+ Zinek Engine - ZEQuaternionTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,11 +36,11 @@
 #include <UnitTest/UnitTest++.h>
 #include <d3dx9.h>
 #include <math.h>
-#include "../IOStreamMapping.h"
-#include "ZEMath/Matrix.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Quaternion.h"
-#include "ZEMath/Definitions.h"
+#include "ZEIOStreamMapping.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEDefinitions.h"
 
 SUITE(Quaternion)
 {
@@ -121,9 +121,9 @@ SUITE(Quaternion)
 
 	TEST(QTRN_Conjugate2)
 	{
-		ZEQuaternion C(1.0f, 2.0f, 3.0f, 4.0f);
-		C.Conjugate();
-		CHECK_EQUAL(C, ZEQuaternion(1.0f, -2.0f, -3.0f, -4.0f));
+		ZEQuaternion A, C(1.0f, 2.0f, 3.0f, 4.0f);
+		A = C.Conjugate();
+		CHECK_EQUAL(A, ZEQuaternion(1.0f, -2.0f, -3.0f, -4.0f));
 	}
 	
 	TEST(QTRN_Slerp)
@@ -159,10 +159,10 @@ SUITE(Quaternion)
 	
 	TEST(QTRN_Normalize1)
 	{
-		ZEQuaternion Q(0.1f, 0.2f, 0.3f, 0.4f);
-		Q.Normalize();
+		ZEQuaternion A, Q(0.1f, 0.2f, 0.3f, 0.4f);
+		A = Q.Normalize();
 
-		CHECK_EQUAL(Q, ZEQuaternion(0.1f/sqrt(0.3f), 0.2f/sqrt(0.3f), 0.3f/sqrt(0.3f), 0.4f/sqrt(0.3f)));
+		CHECK_EQUAL(A, ZEQuaternion(0.1f/sqrt(0.3f), 0.2f/sqrt(0.3f), 0.3f/sqrt(0.3f), 0.4f/sqrt(0.3f)));
 
 	}
 

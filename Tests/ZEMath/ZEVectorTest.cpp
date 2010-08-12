@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - VectorTest.cpp
+ Zinek Engine - ZEVectorTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,9 +35,9 @@
 
 #include <UnitTest/UnitTest++.h>
 #include <math.h>
-#include "../IOStreamMapping.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Definitions.h"
+#include "ZEIOStreamMapping.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEDefinitions.h"
 
 bool operator>=(const ZEVector2& A, const ZEVector2& B)
 {

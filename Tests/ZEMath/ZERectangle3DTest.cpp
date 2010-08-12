@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDebugModule.h
+ Zinek Engine - ZERectangle3DTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
-#define __ZE_GRAPHICS_DEBUG_MODULE_H__
+#include "UnitTest/UnitTest++.h"
+#include "ZEIOStreamMapping.h"
+#include "ZEMath/ZERectangle3D.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEPlane.h"
+#include <math.h>
 
-#include "ZEDebugModule.h"
-#include "ZEGame\ZEModelBrush.h"
 
-class ZEPlayer;
-class ZEPointLight;
-class ZEOmniProjectiveLight;
-class ZEProjectiveLight;
-
-class ZEGraphicsDebugModule : public ZEDebugModule
+SUITE(Rectangle3D)
 {
-	private:
-		ZEPlayer*				Player;
-		ZEPointLight*			PointLight1;
-		ZEPointLight*			PointLight2;
-		ZEPointLight*			PointLight3;
-		ZEPointLight*			PointLight4;
-		ZEPointLight*			PointLight5;
+	TEST(RECT3D_Constructor)
+	{
+		ZEVector3 A(1.0f, 2.0f, 3.0f);
+		ZEVector3 B(4.0f, 5.0f, 6.0f);
+		ZEVector3 C(7.0f, 8.0f, 9.0f);
+		ZEVector3 D(10.0f, 11.0f, 12.0f);
+		
+		ZERectangle3D R(A, B, C, D);
 
-		ZEProjectiveLight*		ProjectiveLight0;
+		CHECK_EQUAL(R.P1, A);
+		CHECK_EQUAL(R.P2, B);
+		CHECK_EQUAL(R.P3, C);
+		CHECK_EQUAL(R.P4, D);
+	}
 
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
+	TEST(RECT3D_GetPlane)
+	{
+		ZEVector3 A(1.0f, 4.0f, 6.0f);
+		ZEVector3 B(3.0f, 4.0f, 6.0f);
+		ZEVector3 C(1.0f, 2.0f, 6.0f);
+		ZEVector3 D(3.0f, 2.0f, 6.0f);
+		
+		ZERectangle3D R(A, B, C, D);
 
-	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Process(float ElapsedTime);
+		ZEPlane P ;
+		R.GetPlane(P);
 
+		CHECK_EQUAL(P.n , ZEVector3(0.0f, 0.0f, -4.0f));
+		CHECK_EQUAL(P.p , ZEVector3(1.0f, 2.0f, 6.0f));
+	}
 
-								ZEGraphicsDebugModule();
-		virtual					~ZEGraphicsDebugModule();
-};
+	TEST(RECT3D_GetPoint)
+	{
+		ZEVector3 A(1.0f, 4.0f, 6.0f);
+		ZEVector3 B(3.0f, 4.0f, 6.0f);
+		ZEVector3 C(1.0f, 2.0f, 6.0f);
+		ZEVector3 D(3.0f, 2.0f, 6.0f);
+		
+		ZERectangle3D R(A, B, C, D);
 
-#endif
+		ZEVector3 P1 = R.GetPoint(0);
+		ZEVector3 P2 = R.GetPoint(1);
+		ZEVector3 P3 = R.GetPoint(2);
+		ZEVector3 P4 = R.GetPoint(3);
 
-
-
-
-
+		CHECK_EQUAL(A, P1);
+		CHECK_EQUAL(B, P2);
+		CHECK_EQUAL(C, P3);
+		CHECK_EQUAL(D, P4);
+	}
+}

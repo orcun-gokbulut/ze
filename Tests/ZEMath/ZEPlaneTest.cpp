@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PlaneTest.cpp
+ Zinek Engine - ZEPlaneTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,20 +36,20 @@
 #include <UnitTest/UnitTest++.h>
 #include <d3dx9.h>
 #include <math.h>
-#include "../IOStreamMapping.h"
-#include "ZEMath/Vector.h"
-#include "ZEMath/Plane.h"
-#include "ZEMath/Line.h"
-#include "ZEMath/Ray.h"
-#include "ZEMath/LineSegment.h"
-#include "ZEMath/Definitions.h"
+#include "ZEIOStreamMapping.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEPlane.h"
+#include "ZEMath/ZELine.h"
+#include "ZEMath/ZERay.h"
+#include "ZEMath/ZELineSegment.h"
+#include "ZEMath/ZEDefinitions.h"
 
 SUITE(ZEPlane)
 {
 	TEST(Constructor)
 	{
 		ZEVector3 n(1.0f, 2.0f, 3.0f);
-		ZEPoint3 p(0.0f, 6.0f, 0.0f);
+		ZEVector3 p(0.0f, 6.0f, 0.0f);
 		ZEPlane P(n, p);
 
 		CHECK_EQUAL(P.n, n);
@@ -59,7 +59,7 @@ SUITE(ZEPlane)
 	TEST(Create1)
 	{
 		ZEVector3 n(1.0f, 2.0f, 3.0f);
-		ZEPoint3 p(0.0f, 6.0f, 0.0f);
+		ZEVector3 p(0.0f, 6.0f, 0.0f);
 		ZEPlane P;
 		ZEPlane::Create(P, n, p);
 		
@@ -70,9 +70,9 @@ SUITE(ZEPlane)
 
 	TEST(Create2)
 	{
-		ZEPosition3 P1(1.0f, 2.0f, 3.0f);
-		ZEPosition3 P2(0.0f, 3.0f, 1.0f);
-		ZEPosition3 P3(2.0f, 5.0f, 8.0f);
+		ZEVector3 P1(1.0f, 2.0f, 3.0f);
+		ZEVector3 P2(0.0f, 3.0f, 1.0f);
+		ZEVector3 P3(2.0f, 5.0f, 8.0f);
 		ZEPlane P;
 
 		ZEPlane::Create(P, P1, P2, P3);
@@ -83,9 +83,9 @@ SUITE(ZEPlane)
 
 	TEST(Distance)
 	{
-		ZEPoint3 p(-4.0f, 0.0f, 0.0f);
+		ZEVector3 p(-4.0f, 0.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);
-		ZEPoint3 X(4.0f, -4.0f, 3.0f);
+		ZEVector3 X(4.0f, -4.0f, 3.0f);
 		ZEPlane P;
 		ZEPlane::Create(P, n, p);
 		float d = ZEPlane::Distance(P, X);
@@ -94,13 +94,13 @@ SUITE(ZEPlane)
 
 	TEST(TestHalfSpace)
 	{
-		ZEPoint3 p(-4.0f, 0.0f, 0.0f);
+		ZEVector3 p(-4.0f, 0.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);
 		ZEPlane P(n, p);
 		
-		ZEPoint3 X( 4.0f, -4.0f, 3.0f);
-		ZEPoint3 Y(-5.0f,  0.0f, 0.0f);
-		ZEPoint3 Z( 0.0f,  4.0f, 0.0f);
+		ZEVector3 X( 4.0f, -4.0f, 3.0f);
+		ZEVector3 Y(-5.0f,  0.0f, 0.0f);
+		ZEVector3 Z( 0.0f,  4.0f, 0.0f);
 		ZEHalfSpace a = ZEPlane::TestHalfSpace(P, X);
 		CHECK_EQUAL(a, 1);
 		CHECK_EQUAL(ZEPlane::TestHalfSpace(P, Y), -1);
@@ -109,10 +109,10 @@ SUITE(ZEPlane)
 
 	TEST(IntersectionTest1)
 	{
-		ZEPoint3 P0( 1.0f, 2.0f, 3.0f);
-		ZEPoint3 P1(-4.0f, 0.0f, 0.0f);
+		ZEVector3 P0( 1.0f, 2.0f, 3.0f);
+		ZEVector3 P1(-4.0f, 0.0f, 0.0f);
 
-		ZEPoint3  p(0.0f,  4.0f, 0.0f);
+		ZEVector3  p(0.0f,  4.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);
 
 		ZELine L1(P0, P1);
@@ -123,8 +123,8 @@ SUITE(ZEPlane)
 
 		CHECK_EQUAL(result1, true);
 		
-		ZEPoint3 P2( 1.0f,  2.0f,  3.0f);
-		ZEPoint3 P3( 5.0f,  6.0f , 3.0f);
+		ZEVector3 P2( 1.0f,  2.0f,  3.0f);
+		ZEVector3 P3( 5.0f,  6.0f , 3.0f);
 
 		ZELine L2(P2, P3);
 
@@ -136,10 +136,10 @@ SUITE(ZEPlane)
 
 	TEST(IntersectionTest2)
 	{
-		ZEPoint3 P0( 1.0f, 2.0f, 3.0f);
-		ZEPoint3 P1(-4.0f, 0.0f, 0.0f);
+		ZEVector3 P0( 1.0f, 2.0f, 3.0f);
+		ZEVector3 P1(-4.0f, 0.0f, 0.0f);
 
-		ZEPoint3  p(0.0f,  4.0f, 0.0f);
+		ZEVector3  p(0.0f,  4.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);
 
 		ZELineSegment LS1(P0, P1);
@@ -150,8 +150,8 @@ SUITE(ZEPlane)
 
 		CHECK_EQUAL(result1, true);
 		
-		ZEPoint3 P2( 1.0f,  2.0f,  3.0f);
-		ZEPoint3 P3( 5.0f,  6.0f , 3.0f);
+		ZEVector3 P2( 1.0f,  2.0f,  3.0f);
+		ZEVector3 P3( 5.0f,  6.0f , 3.0f);
 
 		ZELineSegment LS2(P2, P3);
 
@@ -163,10 +163,10 @@ SUITE(ZEPlane)
 	TEST(IntersectionTest3)
 	{
 		
-		ZEPoint3 P0( 1.0f, 2.0f, 3.0f);
-		ZEPoint3 P1(-4.0f, 0.0f, 0.0f);
+		ZEVector3 P0( 1.0f, 2.0f, 3.0f);
+		ZEVector3 P1(-4.0f, 0.0f, 0.0f);
 
-		ZEPoint3  p(0.0f,  4.0f, 0.0f);
+		ZEVector3  p(0.0f,  4.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);
 
 		ZERay R1(P0, P1);
@@ -177,8 +177,8 @@ SUITE(ZEPlane)
 
 		CHECK_EQUAL(result1, true);
 		
-		ZEPoint3 P2( 1.0f,  2.0f,  3.0f);
-		ZEPoint3 P3( 5.0f,  6.0f , 3.0f);
+		ZEVector3 P2( 1.0f,  2.0f,  3.0f);
+		ZEVector3 P3( 5.0f,  6.0f , 3.0f);
 
 		ZERay R2(P2, P3);
 
@@ -189,16 +189,16 @@ SUITE(ZEPlane)
 	
 	TEST(IntersectionTest4)
 	{
-		ZEPoint3  p(0.0f,  4.0f, 0.0f);
+		ZEVector3  p(0.0f,  4.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);
 		ZEPlane P(n, p);
 
-		ZEPoint3  p0(5.0f,  2.0f, 1.0f);
+		ZEVector3  p0(5.0f,  2.0f, 1.0f);
 		ZEVector3 n0(4.0f, -4.0f, 10.0f);
 		ZEPlane P0(n0, p0);
 
 
-		ZEPoint3  p1(4.0f, 6.0f, 7.0f);
+		ZEVector3  p1(4.0f, 6.0f, 7.0f);
 		ZEVector3 n1(2.0f, 2.0f, 0.0f);
 		ZEPlane P1(n1, p1);
 

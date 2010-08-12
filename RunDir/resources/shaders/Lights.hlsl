@@ -54,7 +54,7 @@ float2 PixelSize_2 : register(ps, c5);
 #define LightColor				LightParameters1.xyz
 #define LightIntensity			LightParameters1.w
 #define LightAttenuationFactors	LightParameters2.xyz
-#define LightDirection_			LightParameters3.xyz
+#define LightDirection_			LightParameters0.xyz
 
 float3x3 LightRotation : register(ps, c12);
 float4x4 LightProjectionMatrix : register(ps, c16);
@@ -120,6 +120,51 @@ float4 PLPSMain(PLPSInput Input) : COLOR0
 
 // Directional Light
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct DLVSOutput
+{
+	float4 Position : POSITION0;
+	float4 ScreenPosition : TEXCOORD0;
+	float3 ViewVector : TEXCOORD1;
+};
+
+PLVSOutput DLVSMain(float4 Position : POSITION0)
+{
+	DLVSOutput Output;
+	
+	Output.Position = mul(Position, WorldViewProjMatrix);
+	
+	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y) * 0.5f;
+	Output.ScreenPosition.zw = Output.Position.zw;
+	Output.ViewVector = Output.Position * ViewVector;
+	
+	return Output;
+}
+
+struct DLPSInput
+{
+	float4 ScreenPosition : TEXCOORD0;
+	float3 ViewVector : TEXCOORD1;
+};
+
+float4 DLPSMain(PLPSInput Input) : COLOR0
+{
+	float4 Output;
+	
+	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.w + 0.5f + PixelSize_2;
+	float3 Position = GetViewPosition(GBuffer1, ScreenPosition, Input.ViewVector);
+	float3 Normal = GetViewNormal(GBuffer2, ScreenPosition);
+	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
+
+	// Light Derived Parameters
+	float ViewDirection = normalize(-Position);
+	float3 HalfVector = normalize(LightDirection_ + ViewDirection);
+		
+	float AngularAttenuation = saturate(dot(LightDirection_, Normal));
+	Output.xyz = AngularAttenuation * LightIntensity * LightColor;
+	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower);
+	
+	return Output;
+}
 
 // Projective Light
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -219,7 +264,7 @@ float4 OPLPSMain(OPLPSInput Input) : COLOR0
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
 	
-	float3 TextureLookup = mul(-LightDirection, (float3x3)LightRotation);
+	float3 TextureLookup = mul(LightDirection, (float3x3)LightRotation);
 	float3 ProjLightColor = texCUBE(OmniProjectionMap, TextureLookup).rgb * LightColor;
 	
 	float ViewDirection = normalize(-Position);
