@@ -375,12 +375,6 @@ void ZED3D9Renderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 	
 	ZEQuaternion::Normalize(ProjectionRotation, ProjectionRotation);
 
-	/*ZEQuaternion InvLightRotation;
-	ZEQuaternion InvViewRotation;
-	ZEQuaternion::Conjugate(InvLightRotation, Light->GetWorldRotation());
-	ZEQuaternion::Product(InvViewRotation, Camera->GetWorldRotation(), InvLightRotation);
-	ZEMatrix4x4 InvViewRotationMatrix;*/
-
 	ZEMatrix4x4 ProjectionMatrix;
 	ZEMatrix4x4::CreateRotation(ProjectionMatrix, ProjectionRotation);
 	GetDevice()->SetPixelShaderConstantF(12, (float*)&ProjectionMatrix, 3);
