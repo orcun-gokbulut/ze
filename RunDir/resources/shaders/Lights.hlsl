@@ -131,8 +131,7 @@ PLVSOutput DLVSMain(float4 Position : POSITION0)
 {
 	DLVSOutput Output;
 	
-	Output.Position = mul(Position, WorldViewProjMatrix);
-	
+	Output.Position = Position;
 	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y) * 0.5f;
 	Output.ScreenPosition.zw = Output.Position.zw;
 	Output.ViewVector = Output.Position * ViewVector;

@@ -44,6 +44,7 @@ class ZEPlayer;
 class ZEPointLight;
 class ZEOmniProjectiveLight;
 class ZEProjectiveLight;
+class ZEDirectionalLight;
 
 class ZEGraphicsDebugModule : public ZEDebugModule
 {
@@ -58,6 +59,8 @@ class ZEGraphicsDebugModule : public ZEDebugModule
 		ZEProjectiveLight*		ProjectiveLight0;
 
 		ZEOmniProjectiveLight*	OmniProjectiveLight0;
+
+		ZEDirectionalLight*		DirectionalLight0;
 
 	public:
 		virtual bool			Initialize();

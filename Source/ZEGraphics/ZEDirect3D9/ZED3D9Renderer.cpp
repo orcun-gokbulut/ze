@@ -174,10 +174,11 @@ void ZED3D9Renderer::InitializeLightning()
 
 	ZECanvas Canvas;
 	// Directional
-	Canvas.AddQuad(ZEVector3(0.0f, 0.0f, 0.0f),
-		ZEVector3(0.0f, 0.0f, 0.0f),
-		ZEVector3(0.0f, 0.0f, 0.0f),
-		ZEVector3(0.0f, 0.0f, 0.0f));
+	Canvas.AddQuad(
+		ZEVector3( 1.0f,  1.0f, 1.0f),
+		ZEVector3(-1.0f,  1.0f, 1.0f),
+		ZEVector3(-1.0f, -1.0f, 1.0f),
+		ZEVector3( 1.0f, -1.0f, 1.0f));
 
 	// Point/OmniProjective
 	Canvas.AddSphere(1.0f, 12, 12);
@@ -193,6 +194,9 @@ void ZED3D9Renderer::InitializeLightning()
 
 	LightningComponents.PointLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "PLVSMain", 0, "vs_2_0");
 	LightningComponents.PointLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PLPSMain", 0, "ps_2_0");
+
+	LightningComponents.DirectionalLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "DLVSMain", 0, "vs_2_0");
+	LightningComponents.DirectionalLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "DLPSMain", 0, "ps_2_0");
 
 	LightningComponents.OmniProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "OPLVSMain", 0, "vs_2_0");
 	LightningComponents.OmniProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "OPLPSMain", 0, "ps_2_0");
@@ -260,6 +264,38 @@ void ZED3D9Renderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 {
 	zeProfilerStart("Directional Light Pass");
 
+	// Light Parameters
+	struct
+	{
+		ZEVector3		Direction;
+		float			Range;
+		ZEVector3		Color;
+		float			Intensity;
+		ZEVector3		Attenuation;
+		float			Reserved1;
+	} LightParameters;
+	ZEMatrix4x4::Transform3x3(LightParameters.Direction, Camera->GetViewTransform(), Light->GetWorldDirection());
+	LightParameters.Color = Light->GetColor();
+	LightParameters.Attenuation = Light->GetAttenuation();
+	LightParameters.Range = Light->GetRange();
+	LightParameters.Intensity = Light->GetIntensity();
+	
+	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 3);
+	
+	// Transformation
+	/*ZEMatrix4x4 WorldTransform;
+	ZEMatrix4x4 WorldViewProjTransform;
+	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), 
+		ZEQuaternion::Identity, 
+		ZEVector3(LightParameters.Range, LightParameters.Range, LightParameters.Range));
+	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);*/
+	
+	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
+
+	GetDevice()->SetVertexShader(LightningComponents.DirectionalLightVS->GetVertexShader());
+	GetDevice()->SetPixelShader(LightningComponents.DirectionalLightPS->GetPixelShader());
+	
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 2); // Quad
 
 	zeProfilerEnd();

@@ -40,6 +40,7 @@
 #include "ZEGame\ZEScene.h"
 #include "ZEGraphics\ZEGraphicsModule.h"
 #include "ZEGraphics\ZEPointLight.h"
+#include "ZEGraphics\ZEDirectionalLight.h"
 #include "ZEGraphics\ZEOmniProjectiveLight.h"
 #include "ZEGraphics\ZEProjectiveLight.h"
 #include "ZEGraphics\ZETextureCubeResource.h"
@@ -136,6 +137,13 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
 	Scene->AddEntity(ProjectiveLight0);
 
+	DirectionalLight0 = new ZEDirectionalLight();
+	DirectionalLight0->SetRotation(ZEQuaternion(-ZE_PI_4, ZEVector3::UnitX));
+	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
+	DirectionalLight0->SetIntensity(2.0f);
+	DirectionalLight0->SetCastsShadow(false);
+	Scene->AddEntity(DirectionalLight0);
+
 	PointLight1->SetEnabled(true);
 	PointLight2->SetEnabled(false);
 	PointLight3->SetEnabled(false);
@@ -143,6 +151,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight5->SetEnabled(false);
 	OmniProjectiveLight0->SetEnabled(true);
 	ProjectiveLight0->SetEnabled(true);
+	DirectionalLight0->SetEnabled(true);
 	return true;
 }
 
@@ -159,6 +168,10 @@ void ZEGraphicsDebugModule::Deinitialize()
 	delete PointLight3;
 	delete PointLight4;
 	delete PointLight5;
+
+	delete OmniProjectiveLight0;
+	delete ProjectiveLight0;
+	delete DirectionalLight0;
 }
 
 void ZEGraphicsDebugModule::Process(float ElapsedTime)
