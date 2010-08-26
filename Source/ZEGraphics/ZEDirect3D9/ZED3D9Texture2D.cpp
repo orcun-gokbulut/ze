@@ -79,88 +79,21 @@ ZEViewPort* ZED3D9Texture2D::GetViewPort()
 	return &ViewPort;
 }
 
-bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget)
+bool ZED3D9Texture2D::Create(unsigned int Width, unsigned int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget, unsigned int MipLevel)
 {
 	if (Texture != NULL)
 		if (this->Width == Width || this->Height == Height || this->PixelFormat == PixelFormat || this->RenderTarget == RenderTarget)
 			return true;
 		else
 			Texture->Release();
-
 	
-	DWORD Usage, MipMap;
-	D3DFORMAT Format;
-	D3DPOOL Pool;
+	if (MipLevel == 0)
+		MipLevel == 1;
 
-	switch(PixelFormat)
-	{
-		case ZE_TPF_RGBA_INT32:
-			if (RenderTarget)
-			{
-				Usage = D3DUSAGE_RENDERTARGET;
-				Pool = D3DPOOL_DEFAULT;
-				MipMap = 1;
-			}
-			else
-			{
-				Usage = D3DUSAGE_AUTOGENMIPMAP;
-				Pool = D3DPOOL_MANAGED;
-				MipMap = 0;
-			}
-			Format = D3DFMT_A8R8G8B8;
-			break;
-
-		case ZE_TPF_LUM_HDR:
-			if (RenderTarget)
-			{
-				Usage = D3DUSAGE_RENDERTARGET;
-				Pool = D3DPOOL_DEFAULT;
-				MipMap = 1;
-
-			}
-			else
-			{
-				Usage = D3DUSAGE_AUTOGENMIPMAP;
-				Pool = D3DPOOL_MANAGED;
-				MipMap = 0;
-			}
-			Format = D3DFMT_R16F;
-			break;
-
-		case ZE_TPF_RGBA_HDR:
-			if (RenderTarget)
-			{
-				Usage = D3DUSAGE_RENDERTARGET;
-				Pool = D3DPOOL_DEFAULT;
-				MipMap = 1;
-
-			}
-			else
-			{
-				Usage = D3DUSAGE_AUTOGENMIPMAP;
-				Pool = D3DPOOL_MANAGED;
-				MipMap = 0;
-			}
-			Format = D3DFMT_A16B16G16R16F;
-			break;
-
-		case ZE_TPF_DEPTH:
-			if (RenderTarget)
-			{
-				Usage = D3DUSAGE_RENDERTARGET;
-				Pool = D3DPOOL_DEFAULT;
-				MipMap = 1;
-
-			}
-			else
-			{
-				Usage = D3DUSAGE_AUTOGENMIPMAP;
-				Pool = D3DPOOL_MANAGED;
-				MipMap = 0;
-			}
-			Format = D3DFMT_R32F;
-			break;
-	}
+	DWORD Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : 0);
+	DWORD MipMap = (RenderTarget ? 1 : MipLevel);
+	D3DPOOL Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
+	D3DFORMAT Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
 
 	HRESULT Hr;
 	Hr = GetDevice()->CreateTexture(Width, Height, MipMap, Usage, Format, Pool, &Texture, NULL); 
@@ -170,27 +103,25 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 		return false;
 	}
 
-	if (MipMap != 1)
-		Texture->GenerateMipSubLevels();
-	
 	this->Width = Width;
 	this->Height = Height;
 	this->PixelFormat = PixelFormat;
 	this->RenderTarget = RenderTarget;
+	this->MipLevel = Texture->GetLevelCount();
 
 	if (RenderTarget)
 	{
 		Texture->GetSurfaceLevel(0, &ViewPort.ColorBuffer);
 		ViewPort.DepthBuffer = NULL;
 	}
-	return true;
 
+	return true;
 }
 
-void ZED3D9Texture2D::Lock(void** Buffer, int* Pitch)
+void ZED3D9Texture2D::Lock(void** Buffer, unsigned int* Pitch, unsigned int MipLevel)
 {
 	D3DLOCKED_RECT Rect;
-	Texture->LockRect(0, &Rect, NULL, NULL);
+	Texture->LockRect(MipLevel, &Rect, NULL, NULL);
 	*Buffer = Rect.pBits;
 	*Pitch = Rect.Pitch;
 }

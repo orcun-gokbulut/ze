@@ -45,7 +45,9 @@ class ZETexture2D : public ZETexture
 {
 	protected:
 		unsigned int					Width;
-		unsigned int					Height;
+		unsigned int					Height;	
+		unsigned int					MipLevel;
+
 		ZETexturePixelFormat			PixelFormat;
 		bool							RenderTarget;
 
@@ -55,8 +57,10 @@ class ZETexture2D : public ZETexture
 	public:
 		virtual ZETextureType			GetTextureType() const;
 
-		int								GetWidth() const;
-		int								GetHeight() const;
+		unsigned int					GetWidth() const;
+		unsigned int					GetHeight() const;
+		unsigned int					GetMipLevel() const;
+
 		ZETexturePixelFormat			GetPixelFormat() const;
 		bool							IsRenderTarget() const;
 
@@ -64,8 +68,8 @@ class ZETexture2D : public ZETexture
 
 		virtual ZEViewPort*				GetViewPort() = 0;
 
-		virtual bool					Create(int Width, int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual void					Lock(void** Buffer, int* Pitch) = 0;
+		virtual bool					Create(unsigned int Width, unsigned int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, unsigned int MipLevel = 0) = 0;
+		virtual void					Lock(void** Buffer, unsigned int* Pitch, unsigned int MipLevel = 0) = 0;
 		virtual void					Unlock() = 0;
 
 		static ZETexture2D*				CreateInstance();
