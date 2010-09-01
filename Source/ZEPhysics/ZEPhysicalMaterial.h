@@ -38,11 +38,24 @@
 #ifndef	__ZE_PHYSICAL_MATERIAL_H__
 #define __ZE_PHYSICAL_MATERIAL_H__
 
-struct ZEPhysicalMaterial
+class ZEPhysicalMaterial
 {
-	float		StaticFriction;
-	float		DynamicFriction;
-	float		Restitution;
+	private:
+
+	public:
+		virtual void					SetStaticFriction(float Friction) = 0;
+		virtual float					GetStaticFriction() const;
+
+
+		virtual void					SetDynamicFriction(float Friction) = 0;
+		virtual float					GetDynamicFriction() const = 0;
+
+		virtual void					SetRestitution(float Restitution) = 0;
+		virtual float					GetRestitution() const = 0;
+
+		virtual void					Destroy() = 0;
+
+		static ZEPhysicalMaterial*		CreateInstance();
 };
 
 #endif

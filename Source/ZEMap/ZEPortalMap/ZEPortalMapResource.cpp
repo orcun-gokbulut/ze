@@ -148,79 +148,6 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 	return true;
 }
 
-/*static bool ReadOctreeNodeFromFile(ZEResourceFile* ResourceFile, ZEOctree* Octree, ZEArray<ZEMaterial*>& Materials)
-{
-	ZEMapFileOctreeChunk	FileOctree;
-	
-	// Read octree header
-	ResourceFile->Read(&FileOctree, sizeof(ZEMapFileOctreeChunk), 1);
-
-	// Check chunk id
-	if (FileOctree.ChunkIdentifier != ZE_MAP_OCTREE_CHUNK)
-	{
-		zeError("Map Resource", "Octree chunk's id does not match.");
-		return false;
-	}
-
-	// Map octree attributes
-	Octree->BoundingBox = FileOctree.BoundingBox;
-	Octree->IsLeaf = FileOctree.IsLeaf;
-	
-	if (FileOctree.PolygonCount != 0)
-	{
-		// if node is leaf node then read polygon ids.
-		ZEDWORD ChunkIndentifier;
-		ResourceFile->Read(&ChunkIndentifier, sizeof(ZEDWORD), 1);
-
-		// Check chunk indentifier
-		if (ChunkIndentifier != ZE_MAP_OCTREE_POLYGONIDS_CHUNK)
-		{
-			zeError("Map Resource", "Octree Polygons' chunk id does not match.");
-			return false;
-		}
-
-		// Read ids of polygons that is included in this octree node
-		ZEArray<ZEMapFilePolygonChunk> MapPolygons;
-		MapPolygons.SetCount(FileOctree.PolygonCount);
-		ResourceFile->Read(MapPolygons.GetCArray(), sizeof(ZEMapFilePolygonChunk), MapPolygons.GetCount());
-		if (!SortVertices((ZEStaticVertexBuffer**)&Octree->VertexBuffer, Octree->RenderOrders, MapPolygons, Materials))
-			return false;
-
-	}
-
-	if(!FileOctree.IsLeaf)
-	{
-		// if node is not leaf recursively create and load sub nodes
-		for(int I = 0; I < 8; I++)
-			if(FileOctree.SubSpaces[I])
-			{
-				// if sub note is available create it and load it
-				Octree->SubTrees[I] = new ZEOctree();
-				Octree->SubTrees[I]->Depth = Octree->Depth + 1;
-				if (!ReadOctreeNodeFromFile(ResourceFile, Octree->SubTrees[I], Materials))
-					return false;
-			}
-			else
-				Octree->SubTrees[I] = NULL;
-	}
-
-	return true;
-}
-
-static bool ReadOctreeFromFile(ZEResourceFile* ResourceFile, ZEOctree** Octree, ZEArray<ZEMaterial*>& Materials)
-{
-	// Create octree
-	*Octree = new ZEOctree();
-	(*Octree)->Depth = 0;
-
-	// Load it
-	if (!ReadOctreeNodeFromFile(ResourceFile, *Octree, Materials))
-		return false;
-
-	return true;
-}*/
-
-
 bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourcePortal* Portal)
 {
 	// Read physical mesh header
@@ -259,7 +186,12 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile,
 
 	// Read physical mesh polygons
 	Portal->PhysicalMesh.Polygons.SetCount(FilePhysicalMesh.PolygonCount);
-	ResourceFile->Read(Portal->PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygonChunk), Portal->PhysicalMesh.Polygons.GetCount());
+	for (size_t I = 0; I < FilePhysicalMesh.PolygonCount; I++)
+	{
+		ZEMapFilePhysicalMeshPolygonChunk Chunk;
+		ResourceFile->Read(Chunk, sizeof(ZEMapFilePhysicalMeshPolygonChunk), 1);
+		Portal->PhysicalMesh.Polygons[I].Indices = Chunk.Indices;
+	}
 
 	return true;
 }
