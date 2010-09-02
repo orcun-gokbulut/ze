@@ -72,7 +72,7 @@ class ZEPhysicalWorld
 
 		virtual void					Process(float ElapsedTime) = 0;
 		virtual void					Update() = 0;
-
+		
 		virtual void					Destroy();
 
 		virtual void					Draw(ZERenderer* Renderer) = 0;

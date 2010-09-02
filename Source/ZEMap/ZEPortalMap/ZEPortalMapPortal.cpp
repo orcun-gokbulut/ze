@@ -131,13 +131,13 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 	}
 
 	// Initialize Physical Components
-	if (PhysicalMesh != NULL && Resource->HasPhysicalMesh)
+	/*if (PhysicalMesh != NULL && Resource->HasPhysicalMesh)
 	{
 		PhysicalMesh = ZEPhysicalStaticMesh::CreateInstance();
 		PhysicalMesh->SetData(Resource->PhysicalMesh.Vertices.GetCArray(), Resource->PhysicalMesh.Vertices.GetCount(),
 			Resource->PhysicalMesh.Polygons.GetCArray(), Resource->Polygons.GetCount(),
 			NULL, 0);
-	}
+	}*/
 
 	return true;
 }

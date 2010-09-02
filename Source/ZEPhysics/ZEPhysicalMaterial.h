@@ -38,13 +38,19 @@
 #ifndef	__ZE_PHYSICAL_MATERIAL_H__
 #define __ZE_PHYSICAL_MATERIAL_H__
 
+class ZEPhysicalWorld;
 class ZEPhysicalMaterial
 {
-	private:
+	protected:
+										ZEPhysicalMaterial();
+		virtual							~ZEPhysicalMaterial();
 
 	public:
+		virtual void					SetPhysicalWorld(ZEPhysicalWorld* World) = 0;
+		virtual ZEPhysicalWorld*		GetPhysicalWorld() const = 0;
+
 		virtual void					SetStaticFriction(float Friction) = 0;
-		virtual float					GetStaticFriction() const;
+		virtual float					GetStaticFriction() const = 0;
 
 
 		virtual void					SetDynamicFriction(float Friction) = 0;
@@ -52,7 +58,10 @@ class ZEPhysicalMaterial
 
 		virtual void					SetRestitution(float Restitution) = 0;
 		virtual float					GetRestitution() const = 0;
-
+		
+		virtual bool					Initialize() = 0;
+		virtual void					Deinitialize() = 0;
+		
 		virtual void					Destroy() = 0;
 
 		static ZEPhysicalMaterial*		CreateInstance();

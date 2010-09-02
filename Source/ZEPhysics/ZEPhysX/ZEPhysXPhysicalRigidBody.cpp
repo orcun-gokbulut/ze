@@ -71,7 +71,11 @@ ZEPhysXPhysicalRigidBody::~ZEPhysXPhysicalRigidBody()
 
 void ZEPhysXPhysicalRigidBody::SetPhysicalWorld(ZEPhysicalWorld* World)
 {
+	if (PhysicalWorld == World)
+		return;
+
 	PhysicalWorld = (ZEPhysXPhysicalWorld*)World;
+
 	if (Actor != NULL)
 		ReCreate();
 }
@@ -460,7 +464,10 @@ void ZEPhysXPhysicalRigidBody::ReCreate()
 bool ZEPhysXPhysicalRigidBody::Initialize()
 {
 	if (Actor != NULL || PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
+	{
+		zeError("PhysX Physical Body", "Can not create actor. Physical world is not initialized.");
 		return false;
+	}
 
 	ActorDesc.shapes.clear();
 	for (size_t I = 0; I < Shapes.GetCount(); I++)

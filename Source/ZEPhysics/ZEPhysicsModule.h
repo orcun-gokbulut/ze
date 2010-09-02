@@ -51,6 +51,7 @@ class ZEPhysicalStaticHeightField;
 class ZEPhysicalTrigger;
 class ZEPhysicalVehicle;
 class ZEPhysicalCharacterController;
+class ZEPhysicalMaterial;
 
 #define zePhysics ZEPhysicsModule::GetInstance()
 
@@ -74,6 +75,8 @@ class ZEPhysicsModule : public ZEModule
 
 		virtual ZEPhysicalVehicle*				CreatePhysicalVehicle() = 0;
 		virtual ZEPhysicalCharacterController*	CreatePhysicalController() = 0;
+
+		virtual ZEPhysicalMaterial*				CreatePhysicalMaterial() = 0;
 
 		virtual	void							Process(float ElapsedTime) = 0;
 		virtual void							UpdateWorlds() = 0;

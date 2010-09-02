@@ -63,7 +63,7 @@ class ZEPhysicalShape
 		ZEVector3						Position;
 		ZEQuaternion					Rotation;
 		bool							Trigger;
-		ZEPhysicalMaterial				Material;
+		ZEPhysicalMaterial*				Material;
 
 	public:
 		virtual ZEPhysicalShapeType		GetPhysicalShapeType() = 0;
@@ -77,8 +77,8 @@ class ZEPhysicalShape
 		void							SetRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion&				GetRotation();
 
-		void							SetMaterial(const ZEPhysicalMaterial& NewMaterial);
-		const ZEPhysicalMaterial&		GetMaterial();
+		void							SetMaterial(ZEPhysicalMaterial* NewMaterial);
+		ZEPhysicalMaterial*				GetMaterial();
 
 										ZEPhysicalShape();
 };

@@ -2283,6 +2283,10 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalMaterial.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalMaterial.h"
 					>
 				</File>

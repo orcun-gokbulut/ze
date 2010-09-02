@@ -34,7 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPhysicalMaterial.h"
+#include "ZEPhysicsModule.h"
 
+ZEPhysicalMaterial::ZEPhysicalMaterial()
+{
 
+}
 
+ZEPhysicalMaterial::~ZEPhysicalMaterial()
+{
+
+}
+
+ZEPhysicalMaterial* ZEPhysicalMaterial::CreateInstance()
+{
+	return ZEPhysicsModule::GetInstance()->CreatePhysicalMaterial();
+}
 

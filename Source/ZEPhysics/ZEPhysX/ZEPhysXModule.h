@@ -90,6 +90,8 @@ class ZEPhysXModule : public ZEPhysicsModule
 
 		virtual ZEPhysicalTrigger*				CreatePhysicalTrigger();
 
+		virtual ZEPhysicalMaterial*				CreatePhysicalMaterial();
+
 		virtual ZEPhysicalVehicle*				CreatePhysicalVehicle();
 		virtual ZEPhysicalCharacterController*	CreatePhysicalController();
 };

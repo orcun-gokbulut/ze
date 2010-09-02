@@ -65,9 +65,16 @@ ZEPhysXPhysicalStaticRigidBody::~ZEPhysXPhysicalStaticRigidBody()
 
 void ZEPhysXPhysicalStaticRigidBody::SetPhysicalWorld(ZEPhysicalWorld* World)
 {
+	if (PhysicalWorld == World)
+		return;
+
 	PhysicalWorld = (ZEPhysXPhysicalWorld*)World;
+
 	if (Actor != NULL)
+	{
+		Deinitialize();
 		Initialize();
+	}
 }
 
 ZEPhysicalWorld* ZEPhysXPhysicalStaticRigidBody::GetPhysicalWorld()

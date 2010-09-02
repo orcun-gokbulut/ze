@@ -39,6 +39,8 @@
 #include "ZEPhysXPhysicalRigidBody.h"
 #include "ZEPhysXPhysicalStaticRigidBody.h"
 #include "ZEPhysXPhysicalStaticMesh.h"
+#include "ZEPhysXPhysicalMaterial.h"
+
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEConsole.h"
 
@@ -205,6 +207,12 @@ ZEPhysicalTrigger* ZEPhysXModule::CreatePhysicalTrigger()
 {
 	return NULL;
 }
+
+ZEPhysicalMaterial* ZEPhysXModule::CreatePhysicalMaterial()
+{
+	return new ZEPhysXPhysicalMaterial();
+}
+
 
 ZEPhysicalVehicle* ZEPhysXModule::CreatePhysicalVehicle()
 {
