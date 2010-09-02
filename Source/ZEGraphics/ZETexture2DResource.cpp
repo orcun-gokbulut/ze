@@ -312,7 +312,8 @@ ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const char* FileNam
 //}
 
 
-// OK
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Coding Style Problem. It should be hidden from user. Non member static function
 ZEBYTE* ZETexture2DResource::Compress(ZEBYTE* Image, int Width, int Height, int Pitch, CompressionType CType, CompressionSpeed CSpeed)
 {	
 	ATI_TC_FORMAT	Format;
@@ -358,6 +359,8 @@ ZEBYTE* ZETexture2DResource::Compress(ZEBYTE* Image, int Width, int Height, int 
 			break;
 	};
 	///////////////////////////////////////COMPRESS///////////////////////////////////
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Performance Problem ! Unnecessary Memory Allocation.
 	ZEBYTE* CompressedData = new ZEBYTE[Height * CompressedPitch];
 	
 	ATI_TC_Texture srcTexture;
@@ -415,17 +418,24 @@ ZEBYTE* ZETexture2DResource::Compress(ZEBYTE* Image, int Width, int Height, int 
 	
 	ATI_TC_ConvertTexture(&srcTexture1, &destTexture1, &options1, NULL, NULL, NULL);
 
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Coding style problem. Wrong comment style.
 	///////////////////////////END OF DECOMPRESS(TEMP)////////////////////////////
-		
+	
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Performance Problem ! Unnecessary Memory Allocation.
 	delete [] CompressedData;
 
 	return DecompressedImage;
 }
 
 
-// OK
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Coding Style Problem. It should be hidden from user. Non member static function
 bool ZETexture2DResource::CheckInFileCache(const char *FileName)
 {	
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Performance Problem ! Unnecessary Memory Allocation.
 	char *CompletePath = new char[strlen(FileName) + strlen(".cache") + 1];
 	strcpy (CompletePath, FileName);
 	strcat (CompletePath, ".cache");
@@ -438,13 +448,16 @@ bool ZETexture2DResource::CheckInFileCache(const char *FileName)
 	
 	delete[] CompletePath;
 
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Performance Problem ! Unnecessary Memory Allocation.
 	if (Stat == 0)
 		return TRUE;
 
 	return FALSE;
 }
 
-// DEGISECEK
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Coding Style Problem. It should be hidden from user. Non member static function
 void ZETexture2DResource::SaveToFileCache(const ZEBYTE* Image, int Width, int Height, int BPP, int Pitch, const char* FileName)
 {
 	char CacheFileName[ZE_MAX_FILE_NAME_SIZE];
@@ -466,10 +479,14 @@ void ZETexture2DResource::SaveToFileCache(const ZEBYTE* Image, int Width, int He
 	fclose(FileToWrite);
 }
 
-// DEGISECEK
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Coding Style Problem. It should be hidden from user. Non member static function
 ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(const char *FileName)
 {
 	zeLog("Texture2D Resource", "LOADING texture from FILE CACHE \"%s\".", FileName);
+
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Performance Problem ! Unnecessary Memory Allocation.
 	char* ResourceFilePath  = new char [ZE_MAX_FILE_NAME_SIZE];
 	sprintf(ResourceFilePath, "%s.cache", FileName);
 	
@@ -487,6 +504,8 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(const char *FileName
 	fread(&BPP, 4, 1, FileToRead);
 	fread(&Pitch, 4, 1, FileToRead);
 
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Performance Problem ! Unnecessary Memory Allocation.
 	ZEBYTE* Image = new ZEBYTE [Height * Pitch];
 	fread (Image, 1, Height * Pitch, FileToRead);
 
@@ -511,13 +530,16 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(const char *FileName
 	
 	zeLog("Texture2D Resource", "Texture file \"%s\" has been loaded from FILE CACHE.", FileName);
 	
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Performance Problem ! Unnecessary Memory Allocation.
 	delete [] Image;
 	delete [] ResourceFilePath;
 	
 	return TextureResource;
 }
 
-// OK
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Coding Style Problem. It should be hidden from user. Non member static function
 bool ZETexture2DResource::LoadFromOriginalFile(ZEResourceFile* ResourceFile, unsigned char* &Image, unsigned int &Width, unsigned int &Height, unsigned int &BPP, unsigned int &Pitch)
 {
 	const char *FileName = ResourceFile->GetFileName();
@@ -564,7 +586,8 @@ bool ZETexture2DResource::LoadFromOriginalFile(ZEResourceFile* ResourceFile, uns
 	}
 }
 
-// OK
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Coding Style Problem. It should be hidden from user. Non member static function
 void ZETexture2DResource::WriteToDevice(ZETexture2DResource *TextureResource, const unsigned char *Source, int Width, int Height, int BPP, unsigned int Pitch, unsigned int Level)
 {
 	void* Buffer = NULL;
@@ -576,14 +599,19 @@ void ZETexture2DResource::WriteToDevice(ZETexture2DResource *TextureResource, co
 	TextureResource->Texture->Unlock();
 }
 
-// OK
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Coding Style Problem. It should be hidden from user. Non member static function
 bool ZETexture2DResource::Rescale(const unsigned char* DestinationData, const unsigned char* SourceData, unsigned int &SourceWidth, unsigned int &SourceHeight, unsigned int &SourcePitch, unsigned int &SourceBPP, unsigned int RescaleRatio)
 {
 	int DestinationHeight = SourceHeight / RescaleRatio;
 	int DestinationWidth = SourceWidth / RescaleRatio;
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// BUG !!! Memory Access Problem. DestinationPitch != SourcePitch / RescaleRatio;
 	int DestinationPitch = SourcePitch / RescaleRatio;
 	int destinationBPP = SourceBPP * 8;
 
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Performance Problem ! Unnecessary Memory Allocation.
 	FIBITMAP* Bitmap = FreeImage_ConvertFromRawBits((BYTE*)SourceData, SourceWidth, SourceHeight, SourcePitch, SourceBPP * 8, 0x00FF0000, 0x0000FF00, 0x000000FF);
 	FIBITMAP* ResizedBitmap = FreeImage_Rescale(Bitmap, DestinationWidth, DestinationHeight, FILTER_BOX);
 
@@ -593,13 +621,68 @@ bool ZETexture2DResource::Rescale(const unsigned char* DestinationData, const un
 	
 	FreeImage_ConvertToRawBits((BYTE*)DestinationData, ResizedBitmap, DestinationPitch, destinationBPP, 0x00FF0000, 0x0000FF00, 0x000000FF);
 
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Performance Problem ! Unnecessary Memory Allocation.
 	FreeImage_Unload(ResizedBitmap);
 	FreeImage_Unload(Bitmap);
 	
 	return TRUE;
 }
 
-// OK
+struct ZEColorARGB
+{
+	ZEBYTE Alpha;
+	ZEBYTE Red;
+	ZEBYTE Blue;
+	ZEBYTE Green;
+};
+
+static void DownSample2x(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int SourceWidth, unsigned int SourceHeight, unsigned int SourcePitch)
+{
+	int DestinationHeight = SourceHeight / 2;
+	int DestinationWidth = SourceWidth / 2;
+
+	for (size_t y = 0; y < DestinationHeight; y++)
+	{
+		for (size_t x = 0; x < DestinationWidth; x++)
+		{
+			ZEColorARGB* Source = (ZEColorARGB*)((ZEBYTE*)SourceData + SourcePitch * y + x * 4);
+
+			ZEWORD Red, Green, Blue, Alpha;
+			Alpha = Source->Alpha;
+			Red   = Source->Red;
+			Green = Source->Green;
+			Blue  = Source->Blue;
+			Source++;
+
+			Alpha += Source->Alpha
+			Red   += Source->Red;
+			Green += Source->Green
+			Blue  += Source->Blue;
+			Source += (ZEColorARGB*)((ZEBYTE*)Source + SourcePitch - 2 * 4);
+
+			Alpha += Source->Alpha
+			Red   += Source->Red;
+			Green += Source->Green
+			Blue  += Source->Blue;
+			Source++;
+
+			Alpha += Source->Alpha
+			Red   += Source->Red;
+			Green += Source->Green
+			Blue  += Source->Blue;
+
+			ZEColorARGB* Destination = (ZEColorARGB*)((ZEBYTE*)DestinationData + DestinationPitch * y + x * 4);
+			Destination>Alpha = Alpha / 4;
+			Destination>Red   = Red   / 4;
+			Destination>Green = Green / 4;
+			Destination>Blue  = Blue  / 4;
+		}
+	}
+}
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// Coding Style Problem. It should be hidden from user. Non member static function
 void ZETexture2DResource::CreateMipmaps(ZETexture2DResource* TextureResource, const ZEBYTE* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, unsigned int Level, bool DoResize, bool DoCompress, CompressionType Type, CompressionSpeed Speed)
 {
 	zeLog("Texture2D Resource", "Creeating MipMaps for the texture:  \"%s\".", TextureResource->GetFileName());
@@ -665,6 +748,10 @@ void ZETexture2DResource::CreateMipmaps(ZETexture2DResource* TextureResource, co
 // OK
 unsigned int ZETexture2DResource::GetMipmapCount(unsigned int Width, unsigned int Height)
 {
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	// Type Conversion Problem. User logf instead of log. Conversion must be double to int not int to double.
+	// You can use own log base 2 with switch statements. Texture size only varies in power of 2
+
 	unsigned int WidthCount = (unsigned int)(log((double)Width) / log(2.0));
 	unsigned int HeightCount = (unsigned int)(log((double)Height) / log(2.0));
 
