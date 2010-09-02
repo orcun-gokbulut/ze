@@ -148,7 +148,7 @@ void ZEGraphicsModule::SetTextureQuality(int Quality)
 
 int ZEGraphicsModule::GetTextureQuality()
 {
-	return TextureQuality;
+	return 2;
 }
 
 void ZEGraphicsModule::SetModelQuality(int Quality)

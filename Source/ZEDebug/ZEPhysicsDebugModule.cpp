@@ -164,7 +164,7 @@ bool ZEPhysicsDebugModule::Initialize()
 
 		//World->AddPhysicalObject(PhysicalMesh);
 
-		Model = new ZEModel();
+		/*Model = new ZEModel();
 		Model->SetModelResource(ZEModelResource::LoadResource("test.zeModel"));
 		Model->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
 		Scene->AddEntity(Model);
@@ -173,23 +173,23 @@ bool ZEPhysicsDebugModule::Initialize()
 		Model->SetAnimationByName("Test");
 		//Model->SetAnimationState(ZE_MAS_PLAYING);
 		Model->SetAnimationSpeed(66.0f);
-		Model->SetAnimationLooping(true);
+		Model->SetAnimationLooping(true);*/
 
 		//zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
 		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);
 		World->SetEnabled(true);
-		Scene->LoadMap("deneme.zemap");
+		Scene->LoadMap("deneme.ZEMAP");
 
 		ZELightBrush* Light = new ZELightBrush();
 		Light->SetLightType(ZE_LT_POINT);
-		Light->SetPosition(ZEVector3(0.0f, 15.0f, -15.0f));
+		Light->SetPosition(ZEVector3(-25.0f, 3.0f, -7.0f)); 
 		Light->SetScale(ZEVector3::One);
 		Light->GetLight()->SetRange(15000);
 		Light->SetRotation(ZEQuaternion::Identity);
 		Light->GetLight()->SetColor(ZEVector3::One);
-		Light->GetLight()->SetAttenuation(0.001f, 0.0f, 1.0f);
-		Light->GetLight()->SetIntensity(2.0f);
+		Light->GetLight()->SetAttenuation(0.01f, 0.0f, 1.0f);
+		Light->GetLight()->SetIntensity(5.0f);
 		Light->GetLight()->SetCastsShadows(false);
 		/*Light->SetProjectionFOV(ZE_PI_2);
 		Light->SetProjectionAspectRatio(1.0f);

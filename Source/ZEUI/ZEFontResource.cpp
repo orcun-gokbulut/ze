@@ -122,13 +122,13 @@ ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 
 ZEFontResource* ZEFontResource::LoadResource(const char* FileName)
 {
-	ZEFontResource* TextureResource;
+	ZEFontResource* FontResource;
 	ZEResourceFile File;
 	if (File.Open(FileName))
 	{
-		TextureResource = LoadResource(&File);
+		FontResource = LoadResource(&File);
 		File.Close();
-		return TextureResource;
+		return FontResource;
 	}
 	else
 	{

@@ -73,8 +73,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg.lib libvorbis.lib libvorbisfile.lib freeimage.lib libmpg123.lib OpenAL32.lib PhysXLoader.lib NxCooking.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg.lib libvorbis.lib libvorbisfile.lib freeimage.lib libsquish.lib libmpg123.lib OpenAL32.lib PhysXLoader.lib NxCooking.lib ATI_Compress_MT_VC8.lib"
 				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Win x86\&quot;;&quot;$(ProjectDir)\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)\lib\Win x86\OpenAL&quot;;&quot;$(ProjectDir)\lib\Win x86\Debug&quot;"
+				UACExecutionLevel="1"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="true"
 				SubSystem="2"
@@ -174,7 +175,7 @@
 				Name="VCLinkerTool"
 				ExecutionBucket="10"
 				AdditionalOptions="/fixed:no"
-				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg.lib libvorbis.lib libvorbisfile.lib freeimage.lib libmpg123.lib OpenAL32.lib PhysXLoader.lib NxCooking.lib"
+				AdditionalDependencies="d3d9.lib d3dx9.lib dinput8.lib dsound.lib winmm.lib dxguid.lib libogg.lib libvorbis.lib libvorbisfile.lib freeimage.lib libmpg123.lib OpenAL32.lib PhysXLoader.lib NxCooking.lib ATI_Compress_MT_DLL_VC8.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(ProjectDir)\lib\Win x86\&quot;;&quot;$(ProjectDir)\lib\Win x86\PhysX&quot;;&quot;$(ProjectDir)\lib\Win x86\DirectX&quot;;&quot;$(ProjectDir)\lib\Win x86\OpenAL&quot;;&quot;$(ProjectDir)\lib\Win x86\Release&quot;"
 				IgnoreDefaultLibraryNames=""

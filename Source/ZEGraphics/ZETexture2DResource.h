@@ -37,7 +37,32 @@
 #ifndef	__ZE_TEXTURE_2D_RESOURCE_H__
 #define __ZE_TEXTURE_2D_RESOURCE_H__
 
+#include <freeimage.h>
+#include <sys/stat.h> 
+#include <string>
+#include <stdio.h>
+
 #include "ZETextureResource.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZETypes.h"
+#include "Squish.h"
+
+
+enum CompressionType
+{
+	ZE_T2DR_Dxt1,	//BC1
+	ZE_T2DR_Dxt3,	//BC2
+	ZE_T2DR_Dxt5,	//BC3
+	ZE_T2DR_BC5,	
+
+};
+
+enum CompressionSpeed
+{
+	ZE_T2DR_Normal,
+	ZE_T2DR_Fast,
+	ZE_T2DR_SuperFast
+};
 
 class ZETexture2D;
 class ZEResourceFile;
@@ -60,7 +85,23 @@ class ZETexture2DResource : public ZETextureResource
 		static void							CacheResource(const char* FileName);
 		static ZETexture2DResource*			LoadSharedResource(const char* FileName);
 		static ZETexture2DResource*			LoadResource(const char* FileName);
-		static ZETexture2DResource*			LoadResource(ZEResourceFile* ResourceFile);
+		static ZETexture2DResource*			LoadResource(ZEResourceFile* ResourceFile, bool EmbededResource = true, bool CreateMipMap = TRUE, unsigned int MinTextureQuality = 1);
+
+		static bool							CheckInFileCache(const char* FileName);
+		static ZETexture2DResource*			LoadFromFileCache(const char* FileName);
+		static bool							LoadFromOriginalFile(ZEResourceFile* ResourceFile, unsigned char* &Image, unsigned int &Width, unsigned int &Height, unsigned int &BPP, unsigned int &Pitch);
+		static void							SaveToFileCache(const ZEBYTE* Image, int Width, int Height, int BPP, int Pitch, const char* FileName);
+		
+		//static void						CopyFromChunk(ZEBYTE* Output, const ZEBYTE* Input, unsigned int ChunkX, unsigned int ChunkY, unsigned int Pitch);
+		//static void						CopyToChunk(ZEBYTE* Output, const ZEBYTE* Input, unsigned int ChunkX, unsigned int ChunkY, unsigned int Pitch);
+		static ZEBYTE*						Compress(ZEBYTE* Image, int Width, int Height, int Pitch, CompressionType CType, CompressionSpeed CSpeed);
+
+		static void							WriteToDevice(ZETexture2DResource* TextureResource, const unsigned char* Source,int Width, int Height, int BPP, unsigned int Pitch, unsigned int Level = 0);
+
+		static void							CreateMipmaps(ZETexture2DResource* TextureResource, const unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, unsigned int Level, bool DoResize = FALSE, bool DoCompress = FALSE, CompressionType Type = ZE_T2DR_Dxt3, CompressionSpeed Speed = ZE_T2DR_Normal);
+		static unsigned int					GetMipmapCount(unsigned int Width, unsigned int Height);
+
+		static bool							Rescale(const unsigned char* DestinationData, const unsigned char* SourceData, unsigned int &SourceWidth, unsigned int &SourceHeight, unsigned int &SourcePitch, unsigned int &SourceBPP, unsigned int RescaleRatio);
 };
 
 #endif

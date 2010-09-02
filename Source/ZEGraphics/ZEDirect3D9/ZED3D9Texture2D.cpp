@@ -82,13 +82,15 @@ ZEViewPort* ZED3D9Texture2D::GetViewPort()
 bool ZED3D9Texture2D::Create(unsigned int Width, unsigned int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget, unsigned int MipLevel)
 {
 	if (Texture != NULL)
+	{
 		if (this->Width == Width || this->Height == Height || this->PixelFormat == PixelFormat || this->RenderTarget == RenderTarget)
 			return true;
 		else
 			Texture->Release();
-	
+	}
+
 	if (MipLevel == 0)
-		MipLevel == 1;
+		MipLevel = 1;
 
 	DWORD Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : 0);
 	DWORD MipMap = (RenderTarget ? 1 : MipLevel);
