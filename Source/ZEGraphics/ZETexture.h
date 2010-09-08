@@ -53,7 +53,8 @@ enum ZETexturePixelFormat
 	ZE_TPF_DEPTH,
 	ZE_TPF_RGBA_DXT1,
 	ZE_TPF_RGBA_DXT3,
-	ZE_TPF_RGBA_DXT5
+	ZE_TPF_RGBA_DXT5,
+	ZE_TPF_NORM_3DC
 };
 
 class ZETexture

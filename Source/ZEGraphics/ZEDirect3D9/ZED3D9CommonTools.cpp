@@ -55,6 +55,15 @@ D3DFORMAT ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 			return D3DFMT_R32F;
 		case ZE_TPF_RGBA_HDR:
 			return D3DFMT_A16B16G16R16F;
+		case ZE_TPF_RGBA_DXT1:
+			return D3DFMT_DXT1;
+		case ZE_TPF_RGBA_DXT3:
+			return D3DFMT_DXT3;
+		case ZE_TPF_RGBA_DXT5:
+			return D3DFMT_DXT5;
+		case ZE_TPF_NORM_3DC:
+			return MAKEFOURCC('A', 'T', 'I', '2');
+
 		default:
 			return (D3DFORMAT)0;
 	}
