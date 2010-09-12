@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEContainer.h
+ Zinek Engine - ZEMethod.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,29 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_CONTAINER_H__
-#define __ZE_META_CONTAINER_H__
+#ifndef __ZE_META_METHOD_H__
+#define __ZE_META_METHOD_H__
 
-enum ZEContainerAccess
+enum ZEMethodAccess
 {
-	ZE_CA_NO_ACCESS			= 0,
-	ZE_CA_READ_ONLY			= 1,
-	ZE_CA_WRITE_ONLY		= 2,
-	ZE_CA_READ_AND_WRITE	= 3,
+	ZE_MA_NO_ACCESS			= 0,
+	ZE_MA_READ_ONLY			= 1,
+	ZE_MA_WRITE_ONLY		= 2,
+	ZE_MA_READ_AND_WRITE	= 3,
 };
 
-class ZEClassProvider;
-class ZEClassDescription;
-
-struct ZEContainerDescription
+struct ZEMethodDescription
 {
 	const char*				Name;
-	ZEClassDescription*		BaseClass;
-	bool					AllowDerivatedClasses;
-	ZEClassProvider*		ItemProvider;
-	ZEContainerAccess		Access;
+	ZEMethodAccess			Access;
 	bool					Visibility;
 	const char*				GroupName;
+	const ZEVariantType*	Parameters;
+	unsigned int			ParameterCount;
+	ZEVariantType			ReturnType;
 };
 
 #endif

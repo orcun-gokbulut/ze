@@ -37,7 +37,8 @@
 #ifndef __ZE_CLASS_DESCRIPTION_H__
 #define __ZE_CLASS_DESCRIPTION_H__
 
-#include "ZEDS\ZEVariant.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEVariant.h"
 #include "ZEProperty.h"
 
 #define ZE_META_CLASS_DESCRIPTION(ClassName)\
@@ -132,37 +133,66 @@ class ZEClassDescription
 class ZEClass
 {
 	private:
+		ZEClass*								Owner;
 		ZEAnimationController*					AnimationController;
 
 	public:
 		virtual ZEClassDescription*				GetClassDescription() = 0;
 
+		// Owner
+		virtual void							SetOwner(ZEClass* Class);
+		virtual ZEClass*						GetOwner();
+
 		// Property Functions
 		virtual int								GetPropertyId(const char* PropertyName) const = 0;
 
-/*		virtual bool							SetPropertyController(int PropertyId, ZEClass* Class, int PropertyId);
-		virtual bool							SetPropertyController(int PropertyId, ZEClass* Class, const char* PropertyName);
-		virtual bool							SetPropertyController(const char* PropertyName, ZEClass* Class, int PropertyId);
-		virtual bool							SetPropertyController(const char* PropertyName, ZEClass* Class, const char* PropertyName);*/
-
 		virtual bool							SetProperty(int PropertyId, const ZEVariant& Value) = 0;
-		virtual bool							SetProperty(const char* PropertyName, const ZEVariant& Value) = 0;
+		bool									SetProperty(const char* PropertyName, const ZEVariant& Value) = 0;
 
 		virtual bool							GetProperty(int PropertyId, ZEVariant& Value) const = 0;
-		virtual bool							GetProperty(const char* PropertyName, ZEVariant& Value) const = 0;
+		bool									GetProperty(const char* PropertyName, ZEVariant& Value) const = 0;
 
+		// Collections
+		virtual int								GetCollectionId(const char* CollectionName) const = 0;
+
+		virtual bool							AddToCollection(int CollectionId, ZEClass* Item) = 0;
+		bool									AddToCollection(const char* CollectionName, ZEClass* Item);
+		
+		virtual bool							RemoveFromCollection(int CollectionId, ZEClass* Item) = 0;
+		bool									RemoveFromCollection(const char* CollectionName, ZEClass* Item);
+		
+		virtual ZEClass**						GetCollectionItems(int CollectionId) const = 0;
+		ZEClass**								GetCollectionItems(const char* CollectionName) const;
+		
+		virtual size_t							GetCollectionItemCount(int CollectionId) const = 0;
+		size_t									GetCollectionItemCount(const char* CollectionName) const;
+
+		// Methods
+		virtual int								GetMethodId(const char* MethodName) const = 0;
+
+		virtual bool							CallMethod(int MethodId, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue) = 0;
+		bool									CallMethod(const char* MethodName, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue);
+		bool									CallMethod(int MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue);
+		bool									CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue);
+
+		// Scripting
+
+		// Controllers
+
+		// Animation
+		virtual void							SetAnimationController(ZEAnimationController* AnimationController);
+		virtual ZEAnimationController*			GetAnimationController();
+
+		// Navigation
+		bool									GetChildClass(const char* Path, ZEClass* ChildClass);
+		
+		// Serialization
 		virtual bool							Serialize(ZESerializer* Serializer);
 		virtual bool							Unserialize(ZEUnserializer* Unserialzier);
 
-		// Methods
-
-		// Child Classes
-
-		// Animation Controller
-		virtual void							SetAnimationController(ZEAnimationController* AnimationController);
-		virtual ZEAnimationController*			GetAnimationController();
 									
 												ZEClass();
+		virtual									~ZEClass();
 };
 
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEContainer.h
+ Zinek Engine - ZEProperty.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_META_CONTAINER_H__
-#define __ZE_META_CONTAINER_H__
+#include "ZEProperty.h"
 
-enum ZEContainerAccess
-{
-	ZE_CA_NO_ACCESS			= 0,
-	ZE_CA_READ_ONLY			= 1,
-	ZE_CA_WRITE_ONLY		= 2,
-	ZE_CA_READ_AND_WRITE	= 3,
-};
 
-class ZEClassProvider;
-class ZEClassDescription;
 
-struct ZEContainerDescription
-{
-	const char*				Name;
-	ZEClassDescription*		BaseClass;
-	bool					AllowDerivatedClasses;
-	ZEClassProvider*		ItemProvider;
-	ZEContainerAccess		Access;
-	bool					Visibility;
-	const char*				GroupName;
-};
-
-#endif
 

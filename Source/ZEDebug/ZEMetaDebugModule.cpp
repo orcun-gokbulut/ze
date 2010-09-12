@@ -35,16 +35,20 @@
 
 #include "ZEMetaDebugModule.h"
 
-#include "ZEGraphics\ZEGraphicsModule.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
-#include "ZEGraphics\ZETexture2DResource.h"
-#include "ZEGame\ZEGame.h"
-#include "ZEGame\ZEPlayer.h"
-#include "ZEGame\ZELightBrush.h"
-#include "ZEGame\ZECanvasBrush.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEGame\ZESerialization.h"
-#include "ZEMeta\ZEAnimation.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEGame/ZEGame.h"
+#include "ZEGame/ZEPlayer.h"
+#include "ZEGame/ZELightBrush.h"
+#include "ZEGame/ZECanvasBrush.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZESerialization.h"
+#include "ZEMeta/ZEAnimation.h"
+#include "ZEMeta/ZEProvider.h"
+#include "ZEGraphics/ZEMaterial.h"
+#include "ZEGraphics/ZECamera.h"
+
 #include <string.h>
 
 bool ZEMetaDebugModule::Initialize()
@@ -159,6 +163,18 @@ bool ZEMetaDebugModule::Initialize()
 		CanvasMaterial->GetAnimationController()->SetLooping(true);
 		CanvasMaterial->GetAnimationController()->PlayAnimation();
 		Scene->AddEntity(CanvasBrush);
+
+		ZEClassProvider Provider;
+		Provider.SetBaseClassType(ZEEntity::ClassDescription());
+		Provider.RegisterClass(ZEPlayer::ClassDescription());
+		Provider.RegisterClass(ZECanvasBrush::ClassDescription());
+		Provider.RegisterClass(ZECanvasBrush::ClassDescription());
+		Provider.RegisterClass(ZECamera::ClassDescription());
+		Provider.RegisterClass(ZEMaterial::ClassDescription());
+
+		Provider.UnregisterClass(ZEPlayer::ClassDescription());
+	
+		ZEClass* Class = Provider.CreateInstance("ZECamera");
 	}
 
 	return true;

@@ -34,7 +34,75 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEProvider.h"
+#include "ZEClass.h"
+#include <string.h>
+
+void ZEClassProvider::SetBaseClassType(ZEClassDescription* ClassType)
+{
+	BaseClassType = ClassType;
+}
+
+ZEClassDescription* ZEClassProvider::GetBaseClassType()
+{
+	return BaseClassType;
+}
+
+const ZEArray<ZEClassDescription*>& ZEClassProvider::GetClasses()
+{
+	return Classes;
+}
+
+bool ZEClassProvider::RegisterClass(ZEClassDescription* Description)
+{
+	zeAssert(Description == NULL, "Description can not be NULL.");
+
+	if (Classes.Exists(Description))
+	{
+		zeError("Class Provider", "Can not add class type to provider. Class type is already exists.");
+		return false;
+	}
 
 
+	if (BaseClassType != NULL && !ZEClassDescription::CheckParent(BaseClassType, Description))
+	{
+		zeError("Class Provider", "Can not add class type to provider. Class type is not derived from base class.");
+		return false;
+	}
 
+	Classes.Add(Description);
+	return true;
+}
 
+void ZEClassProvider::UnregisterClass(ZEClassDescription* Description)
+{
+	zeAssert(Description == NULL, "Description can not be NULL.");
+	zeAssert(!Classes.Exists(Description), "Can not remove class type from provider. Class type is not exists. "
+		"Class Type : \"%s\".", Description->GetName());
+
+	Classes.DeleteValue(Description);
+}
+
+ZEClass* ZEClassProvider::CreateInstance(size_t Index) const
+{
+	return Classes[Index]->CreateInstance();
+}
+
+ZEClass* ZEClassProvider::CreateInstance(const char* Name) const
+{
+	for(size_t I = 0; I < Classes.GetCount(); I++)
+		if (strcmp(Classes[I]->GetName(), Name) == 0)
+			return Classes[I]->CreateInstance();
+
+	zeError("Class Provider", "Can not create instance of a class. Class does not exists. Class Name : \"%s\".", Name);
+	return NULL;
+}
+
+ZEClassProvider::ZEClassProvider()
+{
+	BaseClassType = NULL;
+}
+
+ZEClassProvider::~ZEClassProvider()
+{
+
+}

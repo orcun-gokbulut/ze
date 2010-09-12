@@ -1908,6 +1908,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEMeta\ZEMethod.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMeta\ZEMethod.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEMeta\ZEPostProcessor.cpp"
 				>
 			</File>

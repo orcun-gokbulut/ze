@@ -59,6 +59,36 @@ struct ZEClassFileChunk
 	ZEDWORD		PropertyCount;
 };
 
+bool ZEClass::SetProperty(const char* PropertyName, const ZEVariant& Value)
+{
+	int PropertyId = GetPropertyId(Name);
+
+    if (PropertyId != -1)
+        return SetProperty(PropertyId, Value);
+    else
+        return false;
+}
+
+bool ZEClass::GetProperty(const char* PropertyName, ZEVariant& Value) const
+{
+	int PropertyId = GetPropertyId(Name);
+
+    if (PropertyId != -1)
+        return SetProperty(PropertyId, Value);
+    else
+        return false;
+}
+
+bool ZEClass::AddToCollection(const char* CollectionName, ZEClass* Item)
+{
+	return false;
+}
+
+bool ZEClass::RemoveFromCollection(const char* CollectionName, ZEClass* Item)
+ZEClass** ZEClass::GetCollectionItems(const char* CollectionName)
+size_t ZEClass::GetCollectionItemCount(const char* CollectionName)
+size_t ZEClass::CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
+
 
 bool ZEClass::Serialize(ZESerializer* Serializer)
 {
