@@ -53,6 +53,9 @@
 			virtual const ZEPropertyDescription*	GetProperties() const;\
 			virtual size_t							GetPropertyCount() const;\
 			virtual size_t							GetPropertyOffset() const;\
+			virtual const ZEContainerDescription*	GetContainers() const;\
+			virtual size_t							GetContainerCount() const;\
+			virtual size_t							GetContainerOffset() const;\
 			virtual const ZEMethodDescription*		GetMethods() const;\
 			virtual size_t							GetMethodCount() const;\
 			virtual size_t							GetMethodOffset() const;\
@@ -72,6 +75,9 @@
 			virtual const ZEPropertyDescription*	GetProperties() const;\
 			virtual size_t							GetPropertyCount() const;\
 			virtual size_t							GetPropertyOffset() const;\
+			virtual const ZEContainerDescription*	GetContainers() const;\
+			virtual size_t							GetContainerCount() const;\
+			virtual size_t							GetContainerOffset() const;\
 			virtual const ZEMethodDescription*		GetMethods() const;\
 			virtual size_t							GetMethodCount() const;\
 			virtual size_t							GetMethodOffset() const;\
@@ -86,9 +92,14 @@
 		static ZEClassDescription* ClassDescription();\
 		virtual int GetPropertyId(const char* PropertyName) const;\
 		virtual bool SetProperty(int PropertyId, const ZEVariant& Value);\
-		virtual bool SetProperty(const char* PropertyName, const ZEVariant& Value);\
 		virtual bool GetProperty(int PropertyId, ZEVariant& Value) const;\
-		virtual bool GetProperty(const char* PropertyName, ZEVariant& Value) const;\
+		virtual int GetCollectionId(const char* CollectionName) const;\
+		virtual bool AddToCollection(int CollectionId, ZEClass* Item);\
+		virtual bool RemoveFromCollection(int CollectionId, ZEClass* Item);\
+		virtual ZEClass** GetCollectionItems(int CollectionId) const;\
+		virtual size_t GetCollectionItemCount(int CollectionId) const;\
+		virtual int GetMethodId(const char* MethodName) const;\
+		virtual bool CallMethod(int MethodId, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue);\
 	private:
 
 #define ZE_META_EXTENDED_CLASS(ExtensionClass, Extension)\
@@ -97,9 +108,14 @@
 		static ZEClassDescription* ClassDescription();\
 		virtual int GetPropertyId(const char* PropertyName) const;\
 		virtual bool SetProperty(int PropertyId, const ZEVariant& Value);\
-		virtual bool SetProperty(const char* PropertyName, const ZEVariant& Value);\
 		virtual bool GetProperty(int PropertyId, ZEVariant& Value) const;\
-		virtual bool GetProperty(const char* PropertyName, ZEVariant& Value) const;\
+		virtual int GetCollectionId(const char* CollectionName) const;\
+		virtual bool AddToCollection(int CollectionId, ZEClass* Item);\
+		virtual bool RemoveFromCollection(int CollectionId, ZEClass* Item);\
+		virtual ZEClass** GetCollectionItems(int CollectionId) const;\
+		virtual size_t GetCollectionItemCount(int CollectionId) const;\
+		virtual int GetMethodId(const char* MethodName) const;\
+		virtual bool CallMethod(int MethodId, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue);\
 		Extension\
 	private:
 
@@ -121,10 +137,16 @@ class ZEClassDescription
 		virtual size_t							GetPropertyCount() const = 0;
 		virtual size_t							GetPropertyOffset() const = 0;
 
+		virtual const ZEContainerDescription*	GetContainers() const = 0;
+		virtual size_t							GetContainerCount() const = 0;
+		virtual size_t							GetContainerOffset() const = 0;
+
 		virtual const ZEMethodDescription*		GetMethods() const = 0;
 		virtual size_t							GetMethodCount() const = 0;
 		virtual size_t							GetMethodOffset() const = 0;
+		
 		virtual ZEClassProvider*				GetProvider() const = 0;
+		
 		virtual ZEClass*						CreateInstance() const = 0;
 
 		static bool								CheckParent(ZEClassDescription* Parent, ZEClassDescription* Children);
@@ -147,10 +169,10 @@ class ZEClass
 		virtual int								GetPropertyId(const char* PropertyName) const = 0;
 
 		virtual bool							SetProperty(int PropertyId, const ZEVariant& Value) = 0;
-		bool									SetProperty(const char* PropertyName, const ZEVariant& Value) = 0;
+		bool									SetProperty(const char* PropertyName, const ZEVariant& Value);
 
 		virtual bool							GetProperty(int PropertyId, ZEVariant& Value) const = 0;
-		bool									GetProperty(const char* PropertyName, ZEVariant& Value) const = 0;
+		bool									GetProperty(const char* PropertyName, ZEVariant& Value) const;
 
 		// Collections
 		virtual int								GetCollectionId(const char* CollectionName) const = 0;

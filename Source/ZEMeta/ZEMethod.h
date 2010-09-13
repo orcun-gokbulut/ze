@@ -37,20 +37,13 @@
 #ifndef __ZE_META_METHOD_H__
 #define __ZE_META_METHOD_H__
 
-enum ZEMethodAccess
-{
-	ZE_MA_NO_ACCESS			= 0,
-	ZE_MA_READ_ONLY			= 1,
-	ZE_MA_WRITE_ONLY		= 2,
-	ZE_MA_READ_AND_WRITE	= 3,
-};
-
 struct ZEMethodDescription
 {
 	const char*				Name;
-	ZEMethodAccess			Access;
-	bool					Visibility;
+	const char*				Description;
 	const char*				GroupName;
+	bool					Visibility;
+
 	const ZEVariantType*	Parameters;
 	unsigned int			ParameterCount;
 	ZEVariantType			ReturnType;

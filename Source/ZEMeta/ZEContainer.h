@@ -37,13 +37,12 @@
 #ifndef __ZE_META_CONTAINER_H__
 #define __ZE_META_CONTAINER_H__
 
-enum ZEContainerAccess
-{
-	ZE_CA_NO_ACCESS			= 0,
-	ZE_CA_READ_ONLY			= 1,
-	ZE_CA_WRITE_ONLY		= 2,
-	ZE_CA_READ_AND_WRITE	= 3,
-};
+typedef unsigned int ZEContainerAccess;
+#define ZE_CA_NO_ACCESS		0
+#define ZE_CA_ADD			1
+#define ZE_CA_REMOVE		2
+#define ZE_CA_GET			4
+
 
 class ZEClassProvider;
 class ZEClassDescription;
@@ -51,12 +50,14 @@ class ZEClassDescription;
 struct ZEContainerDescription
 {
 	const char*				Name;
+	const char*				Description;
+	const char*				GroupName;
+	ZEContainerAccess		Access;
+	bool					Visibility;
+
 	ZEClassDescription*		BaseClass;
 	bool					AllowDerivatedClasses;
 	ZEClassProvider*		ItemProvider;
-	ZEContainerAccess		Access;
-	bool					Visibility;
-	const char*				GroupName;
 };
 
 #endif

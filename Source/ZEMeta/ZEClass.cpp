@@ -38,6 +38,15 @@
 #include "ZECore\ZEError.h"
 #include "ZEAnimation.h"
 
+#define ZE_CLSF_CLASS_CHUNKID ((ZEDWORD)'CLAS')
+
+struct ZEClassFileChunk
+{
+	ZEDWORD		Header;
+	char		ClassType[ZE_MAX_NAME_SIZE];
+	ZEDWORD		PropertyCount;
+};
+
 bool ZEClassDescription::CheckParent(ZEClassDescription* Parent, ZEClassDescription* Children)
 {
 	ZEClassDescription* Current = Children->GetParent();
@@ -50,23 +59,14 @@ bool ZEClassDescription::CheckParent(ZEClassDescription* Parent, ZEClassDescript
 	return false;
 }
 
-#define ZE_CLSF_CLASS_CHUNKID ((ZEDWORD)'CLAS')
-
-struct ZEClassFileChunk
-{
-	ZEDWORD		Header;
-	char		ClassType[ZE_MAX_NAME_SIZE];
-	ZEDWORD		PropertyCount;
-};
-
 bool ZEClass::SetProperty(const char* PropertyName, const ZEVariant& Value)
 {
 	int PropertyId = GetPropertyId(Name);
 
     if (PropertyId != -1)
         return SetProperty(PropertyId, Value);
-    else
-        return false;
+
+	return false;
 }
 
 bool ZEClass::GetProperty(const char* PropertyName, ZEVariant& Value) const
@@ -75,19 +75,74 @@ bool ZEClass::GetProperty(const char* PropertyName, ZEVariant& Value) const
 
     if (PropertyId != -1)
         return SetProperty(PropertyId, Value);
-    else
-        return false;
+
+    return false;
 }
 
 bool ZEClass::AddToCollection(const char* CollectionName, ZEClass* Item)
 {
+	int CollectionId = GetCollectionId(CollectionName);
+
+	if (CollectionId != -1)
+		return AddToCollection(CollectionId, Item);
+
 	return false;
 }
 
 bool ZEClass::RemoveFromCollection(const char* CollectionName, ZEClass* Item)
+{
+	int CollectionId = GetCollectionId(CollectionName);
+
+	if (CollectionId != -1)
+		return RemoveFromCollection(CollectionId, Item);
+
+	return false;
+}
+
 ZEClass** ZEClass::GetCollectionItems(const char* CollectionName)
+{
+	int CollectionId = GetCollectionId(CollectionName);
+
+	if (CollectionId != -1)
+		return GetCollectionItems(CollectionId);
+
+	return NULL;
+}
+
 size_t ZEClass::GetCollectionItemCount(const char* CollectionName)
-size_t ZEClass::CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
+{
+	int CollectionId = GetCollectionId(CollectionName);
+
+	if (CollectionId != -1)
+		return GetCollectionItemCount(CollectionId);
+
+	return 0;
+}
+
+bool ZEClass::CallMethod(const char* MethodName, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue)
+{
+	int MethodId = GetMethodId(MethodName);
+
+	if (MethodId != -1)
+		return CallMethod(MethodId, Parameters, ParameterCount, ReturnValue);
+
+	return false;
+}
+
+bool ZEClass::CallMethod(int MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
+{
+	return CallMethod(MethodId, Parameters.GetConstCArray(), Parameters.GetCount(), ReturnValue);
+}
+
+bool ZEClass::CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
+{
+	int MethodId = GetMethodId(MethodName);
+
+	if (MethodId != -1)
+		return CallMethod(MethodId, Parameters.GetConstCArray(), Parameters.GetCount(), ReturnValue);
+
+	return false;
+}
 
 
 bool ZEClass::Serialize(ZESerializer* Serializer)

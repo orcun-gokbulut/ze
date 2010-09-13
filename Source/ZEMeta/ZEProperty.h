@@ -51,13 +51,10 @@ enum ZEPropertySemantic
 	ZE_PS_COLOR,
 };
 
-enum ZEPropertyAccess
-{
-	ZE_PA_NOACCESS		= 0,
-	ZE_PA_READONLY		= 1,
-	ZE_PA_WRITEONLY		= 2,
-	ZE_PA_READWRITE		= 3,
-};
+typedef unsigned int ZEPropertyAccess;
+#define	ZE_PA_NO_ACCESS		0
+#define	ZE_PA_READ			1
+#define	ZE_PA_WRITE			2
 
 struct ZEPropertyEnumuratorItem
 {
@@ -77,12 +74,13 @@ struct ZEPropertyEnumurator
 struct ZEPropertyDescription
 {
 	const char*									Name;
-	ZEVariantType								Type;
-	ZEPropertyAccess							Access;
-	bool										Visibility;
-	bool										Animatable;
 	const char*									Description;
 	const char*									GroupName;
+	ZEPropertyAccess							Access;
+	bool										Visibility;
+
+	ZEVariantType								Type;
+	bool										Animatable;
 	ZEPropertySemantic							Semantic;
 	void*										SemanticProperties;
 	ZEPropertyEnumurator*						Enumurators;
