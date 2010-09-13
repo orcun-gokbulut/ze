@@ -62,7 +62,7 @@ D3DFORMAT ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 		case ZE_TPF_RGBA_DXT5:
 			return D3DFMT_DXT5;
 		case ZE_TPF_NORM_3DC:
-			return MAKEFOURCC('A', 'T', 'I', '2');
+			return (D3DFORMAT)MAKEFOURCC('A', 'T', 'I', '2');
 
 		default:
 			return (D3DFORMAT)0;
