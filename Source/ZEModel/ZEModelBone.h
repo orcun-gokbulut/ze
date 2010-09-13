@@ -79,6 +79,8 @@ class ZEModelBone
 		bool								UpdateWorldTransform;
 
 		ZEPhysicalRigidBody*				PhysicalBody;
+		ZEPhysicalJoint*					PhysicalJoint;
+
 		bool								PhysicsEnabled;
 
 		ZEModelAnimationType				AnimationType;

@@ -553,7 +553,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 
 void ZEPhysXPhysicalRigidBody::Deinitialize()
 {
-	if (Actor != NULL && PhysicalWorld != NULL && PhysicalWorld->GetScene() != NULL)
+	if (Actor != NULL)
 	{
 		PhysicalWorld->GetScene()->releaseActor(*Actor);
 		Actor = NULL;

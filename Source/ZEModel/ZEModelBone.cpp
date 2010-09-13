@@ -288,6 +288,73 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 	UpdateWorldTransform = true;
 	UpdateModelBoundingBox = true;
 	UpdateWorldBoundingBox = true;
+
+	if (BoneResource->PhysicalJoint->JointType != ZE_PJT_NONE && BoneResource->ParentBone != -1)
+	{
+		if (PhysicalJoint == NULL)
+			PhysicalJoint = ZEPhysicalJoint::CreateInstance();
+		else
+			PhysicalJoint->Deinitialize();
+
+		PhysicalJoint->SetBodyA(ParentBone->PhysicalBody);
+		PhysicalJoint->SetBodyB(PhysicalBody);
+
+		PhysicalJoint->SetEnabled(BoneResource->PhysicalJoint.Enabled);
+
+		PhysicalJoint->SetPosition(BoneResource->PhysicalJoint.GlobalAnchor);
+		PhysicalJoint->SetRotation(BoneResource->PhysicalJoint.GlobalAxis);
+
+		PhysicalJoint->SetBodyAConnectionPosition(ParentBone->PhysicalBody->GetPosition());
+		PhysicalJoint->SetBodyAConnectionOrientation(ParentBone->PhysicalBody->GetRotation());
+
+		PhysicalJoint->SetBodyBConnectionPosition(PhysicalBody->GetPosition());
+		PhysicalJoint->SetBodyBConnectionOrientation(PhysicalBody->GetRotation());
+
+		if(BoneResource->PhysicalJoint.Breakable)
+		{
+			PhysicalJoint->SetBreakForce(BoneResource->PhysicalJoint.BreakForce);
+			PhysicalJoint->SetBreakTorque(BoneResource->PhysicalJoint.BreakTorque);
+		}
+
+		if(BoneResource->PhysicalJoint.XMotion || BoneResource->PhysicalJoint.YMotion || BoneResource->PhysicalJoint.ZMotion)
+		{
+			PhysicalJoint->SetLinearLimitValue(BoneResource->PhysicalJoint.LinearLimitValue);
+			PhysicalJoint->SetLinearLimitRestitution(BoneResource->PhysicalJoint.LinearLimitRestitution);
+			PhysicalJoint->SetLinearLimitSpring(BoneResource->PhysicalJoint.LinearLimitSpring);
+			PhysicalJoint->SetLinearLimitDamping(BoneResource->PhysicalJoint.LinearLimitDamping);
+		}
+
+		if (BoneResource->PhysicalJoint.Swing1Motion)
+		{
+			PhysicalJoint->SetSwing1LimitValue(BoneResource->PhysicalJoint.Swing1LimitValue);
+			PhysicalJoint->SetSwing1LimitRestitution(BoneResource->PhysicalJoint.Swing1LimitRestitution);
+			PhysicalJoint->SetSwing1LimitSpring(BoneResource->PhysicalJoint.Swing1LimitSpring);
+			PhysicalJoint->SetSwing1LimitDamping(BoneResource->PhysicalJoint.Swing1LimitDamping);
+		}
+
+		if (BoneResource->PhysicalJoint.Swing2Motion)
+		{
+			PhysicalJoint->SetSwing2LimitValue(BoneResource->PhysicalJoint.Swing2LimitValue);
+			PhysicalJoint->SetSwing2LimitRestitution(BoneResource->PhysicalJoint.Swing2LimitRestitution);
+			PhysicalJoint->SetSwing2LimitSpring(BoneResource->PhysicalJoint.Swing2LimitSpring);
+			PhysicalJoint->SetSwing2LimitDamping(BoneResource->PhysicalJoint.Swing2LimitDamping);
+		}
+
+		if (BoneResource->PhysicalJoint.TwistMotion)
+		{
+			PhysicalJoint->SetTwistLowLimitValue(BoneResource->PhysicalJoint.TwistLowLimitValue);
+			PhysicalJoint->SetTwistLowLimitRestitution(BoneResource->PhysicalJoint.TwistLowLimitRestitution);
+			PhysicalJoint->SetTwistLowLimitSpring(BoneResource->PhysicalJoint.TwistLowLimitSpring);
+			PhysicalJoint->SetTwistLowLimitDamping(BoneResource->PhysicalJoint.TwistLowLimitDamping);
+
+			PhysicalJoint->SetTwistHighLimitValue(BoneResource->PhysicalJoint.TwistHighLimitValue);
+			PhysicalJoint->SetTwistHighLimitRestitution(BoneResource->PhysicalJoint.TwistHighLimitRestitution);
+			PhysicalJoint->SetTwistHighLimitSpring(BoneResource->PhysicalJoint.TwistHighLimitSpring);
+			PhysicalJoint->SetTwistHighLimitDamping(BoneResource->PhysicalJoint.TwistHighLimitDamping);
+		}
+
+		PhysicalJoint->Initialize();
+	}
 	Owner->UpdateBoneTransforms();
 }
 
@@ -295,6 +362,18 @@ void ZEModelBone::Deinitialize()
 {
 	Owner = NULL;
 	ParentBone = NULL;
+	if (PhysicalBody != NULL)
+	{
+		PhysicalBody->Destroy();
+		PhysicalBody = NULL;
+	}
+
+	if (PhysicalJoint != NULL)
+	{
+		PhysicalJoint->Destroy();
+		PhysicalJoint = NULL;
+	}
+
 	ChildBones.Clear();
 
 	UpdateRelativeTransform = true;
@@ -326,6 +405,9 @@ ZEModelBone::ZEModelBone()
 {
 	Owner = NULL;
 	ParentBone = NULL;
+	PhysicalJoint = NULL;
+	PhysicalBody = NULL;
+
 	UpdateRelativeTransform = true;
 	UpdateVertexTransform = true;
 	UpdateModelTransform = true;

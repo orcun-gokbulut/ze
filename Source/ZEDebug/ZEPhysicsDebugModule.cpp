@@ -49,9 +49,15 @@
 #include "ZEPhysics\ZEPhysicalShapes.h"
 #include "ZEPhysics\ZEPhysicalStaticMesh.h"
 #include "ZEPhysics\ZEPhysX\ZEPhysXPhysicalWorld.h"
+#include "ZEPhysics\ZEPhysX\ZEPhysXPhysicalJoint.h"
 #include "ZEModel\ZEModel.h"
 #include "ZEModel\ZEModelMesh.h"
 #include "ZEModel\ZEModelBone.h"
+#include "ZEMap\ZEPortalMap\ZEPortalMap.h"
+#include "ZEMap\ZEMapResource.h"
+#include "ZEMap\ZEPortalMap\ZEPortalMapPortal.h"
+
+#include "ZEMap\ZEPortalMap\ZEPortalMapResource.h"
 
 #include <NxScene.h>
 #include <NxActor.h>
@@ -74,6 +80,7 @@ void ZEPhysicsDebugModule::ColisionDetected(const ZEPhysicalCollision& Collision
 }
 
 #include "ZEGame\ZELightBrush.h"
+
 bool ZEPhysicsDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
@@ -82,7 +89,7 @@ bool ZEPhysicsDebugModule::Initialize()
 	if (Player == NULL)
 	{
 		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
-		Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
+		Player->SetPosition(ZEVector3(0.0f, 10.0f, -1.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
@@ -107,15 +114,15 @@ bool ZEPhysicsDebugModule::Initialize()
 		PhysicalRigidBody->SetCollisionCallback(ZEPhysicalCollisionCallback(this, &ZEPhysicsDebugModule::ColisionDetected));
 		PhysicalRigidBody->SetTransformChangeCallback(ZEPhysicalTransformChangeCallback(this, &ZEPhysicsDebugModule::TransformChanged));
 
-		//PhysicalRigidBody->SetLinearDamping(0.01f);
+		PhysicalRigidBody->SetLinearDamping(0.01f);
 		//World->AddPhysicalObject(PhysicalRigidBody);
 		PhysicalRigidBody->ApplyForce(ZEVector3(1000.0f, 0.0f, 0.0f));
 
 		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
-		CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
-		CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
+		//CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
+		//CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
 		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-		CanvasBrush->Canvas.LoadFromFile("Test\\test.zeCanvas");
+		CanvasBrush->Canvas.LoadFromFile("TestCanvasMap.zeCanvas");
 		CanvasBrush->UpdateCanvas();
 		ZEFixedMaterial* CanvasMaterial = ZEFixedMaterial::CreateInstance();
 		
@@ -126,15 +133,15 @@ bool ZEPhysicsDebugModule::Initialize()
 		CanvasMaterial->SetTwoSided(false);
 		CanvasMaterial->SetRecivesShadow(false);
 		CanvasMaterial->SetAmbientEnabled(true);
-		CanvasMaterial->SetAmbientColor(ZEVector3(0.1f, 0.1f, 0.1f));
+		CanvasMaterial->SetAmbientColor(ZEVector3(0.4f, 0.4f, 0.4f));
 		CanvasMaterial->SetDiffuseEnabled(true);
 		CanvasMaterial->SetDiffuseColor(ZEVector3::One);
-		CanvasMaterial->SetDiffuseMap(ZETexture2DResource::LoadResource("Test\\Diffuse.tga")->GetTexture());
+		//CanvasMaterial->SetDiffuseMap(ZETexture2DResource::LoadResource("Test\\Diffuse.tga")->GetTexture());
 		CanvasMaterial->SetSpecularEnabled(true);
 		CanvasMaterial->SetSpecularColor(ZEVector3::One);
 		CanvasMaterial->SetSpecularShininess(64.0f);
 		CanvasMaterial->UpdateMaterial();
-		//zeScene->AddEntity(CanvasBrush);
+		zeScene->AddEntity(CanvasBrush);
 
 		ZEArray<ZEVector3> PhysicalVertices;
 		ZEArray<ZEPhysicalTriangle> PhysicalTriangles;
@@ -162,9 +169,20 @@ bool ZEPhysicsDebugModule::Initialize()
 			PhysicalTriangles.GetConstCArray(), PhysicalTriangles.GetCount(),
 			NULL, 0);
 
-		//World->AddPhysicalObject(PhysicalMesh);
+		World->AddPhysicalObject(PhysicalMesh);
 
-		Model = new ZEModel();
+		ZEPhysicalBoxShape BoxShape;
+		ZEPhysicalRigidBody* TestBody = ZEPhysicalRigidBody::CreateInstance();
+		TestBody->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+		TestBody->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3::UnitY));
+		BoxShape.SetHeight(1);
+		BoxShape.SetWidth(1);
+		BoxShape.SetLength(1);
+		TestBody->AddPhysicalShape(&BoxShape);
+		TestBody->SetKinematic(true);
+		World->AddPhysicalObject(TestBody);
+
+		/*Model = new ZEModel();
 		Model->SetModelResource(ZEModelResource::LoadResource("test.zeModel"));
 		Model->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
 		Scene->AddEntity(Model);
@@ -173,13 +191,14 @@ bool ZEPhysicsDebugModule::Initialize()
 		Model->SetAnimationByName("Test");
 		//Model->SetAnimationState(ZE_MAS_PLAYING);
 		Model->SetAnimationSpeed(66.0f);
-		Model->SetAnimationLooping(true);
+		Model->SetAnimationLooping(true);*/
 
 		//zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
+
 		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);
 		World->SetEnabled(true);
-		Scene->LoadMap("deneme.zemap");
+		
 
 		ZELightBrush* Light = new ZELightBrush();
 		Light->SetLightType(ZE_LT_POINT);
@@ -194,13 +213,95 @@ bool ZEPhysicsDebugModule::Initialize()
 		/*Light->SetProjectionFOV(ZE_PI_2);
 		Light->SetProjectionAspectRatio(1.0f);
 		Light->SetProjectionTexture("test/pavyon.bmp");*/
-		Scene->AddEntity(Light);
+		//Scene->AddEntity(Light);
 
 		/*Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
 		Model->SetModelFile("test2.zeModel");
 		Scene->AddEntity(Model);*/
-	}
 
+		NxPhysicsSDK* gPhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION);
+
+		gPhysicsSDK->getFoundationSDK().getRemoteDebugger()->connect ("localhost", 5425);
+
+
+		ZEPhysicalBoxShape Object1Shape;
+		ZEPhysicalRigidBody* Object1 = ZEPhysicalRigidBody::CreateInstance();
+		Object1 = ZEPhysicalRigidBody::CreateInstance();
+		Object1->SetPosition(ZEVector3(0.0f, 10.0f, 0.0f));
+		Object1Shape.SetLength(0.5f);
+		Object1Shape.SetWidth(0.25f);
+		Object1Shape.SetHeight(1.0f);
+		Object1->AddPhysicalShape(&Object1Shape);
+		Object1->SetKinematic(true);
+
+		World->AddPhysicalObject(Object1);
+
+
+		ZEPhysicalBoxShape Object2Shape;
+		ZEPhysicalRigidBody* Object2 = ZEPhysicalRigidBody::CreateInstance();
+		Object2 = ZEPhysicalRigidBody::CreateInstance();
+		Object2->SetPosition(ZEVector3(0.0f, 9.0f, 0.0f));
+		Object2Shape.SetLength(0.5f);
+		Object2Shape.SetWidth(0.25f);
+		Object2Shape.SetHeight(1.0f);
+		Object2->AddPhysicalShape(&Object2Shape);
+		Object2->SetKinematic(false);
+		Object2->SetLinearDamping(0.5f);
+
+		World->AddPhysicalObject(Object2);
+
+
+		ZEPhysicalBoxShape Object3Shape;
+		ZEPhysicalRigidBody* Object3 = ZEPhysicalRigidBody::CreateInstance();
+		Object3->SetPosition(ZEVector3(0.0f, 8.0f, 0.0f));
+		Object3Shape.SetLength(0.5f);
+		Object3Shape.SetWidth(0.25f);
+		Object3Shape.SetHeight(1.0f);
+		Object3->AddPhysicalShape(&Object3Shape);
+		Object3->SetKinematic(false);
+		Object3->SetLinearDamping(0.5f);
+
+		World->AddPhysicalObject(Object3);
+
+
+		ZEPhysicalJoint* Joint = ZEPhysicalJoint::CreateInstance();
+		Joint->SetBodyA(Object1);
+		Joint->SetBodyB(Object2);
+
+		ZEQuaternion TempRotation;
+		ZEQuaternion::Create(TempRotation, ZE_PI / 2, ZEVector3(0.0f, 0.0f, -1.0f));
+
+		Joint->SetPosition(ZEVector3(0.0f, 10.0f, 0.0f));
+		Joint->SetRotation(TempRotation);
+
+		Joint->SetTwistMotion(ZE_PJMOTION_FREE);
+		Joint->SetSwing1Motion(ZE_PJMOTION_LOCKED);
+		Joint->SetSwing2Motion(ZE_PJMOTION_LOCKED);
+		Joint->SetXMotion(ZE_PJMOTION_LOCKED);
+		Joint->SetYMotion(ZE_PJMOTION_LOCKED);
+		Joint->SetZMotion(ZE_PJMOTION_LOCKED);
+
+		World->AddPhysicalObject(Joint);
+
+
+		ZEPhysicalJoint* Joint2 = ZEPhysicalJoint::CreateInstance();
+		Joint2->SetBodyA(Object2);
+		Joint2->SetBodyB(Object3);
+
+		Joint2->SetPosition(ZEVector3(0.0f, 9.0f, 0.0f));
+		Joint2->SetRotation(TempRotation);
+
+		Joint2->SetTwistMotion(ZE_PJMOTION_FREE);
+		Joint2->SetSwing1Motion(ZE_PJMOTION_LOCKED);
+		Joint2->SetSwing2Motion(ZE_PJMOTION_LOCKED);
+		Joint2->SetXMotion(ZE_PJMOTION_LOCKED);
+		Joint2->SetYMotion(ZE_PJMOTION_LOCKED);
+		Joint2->SetZMotion(ZE_PJMOTION_LOCKED);
+		Joint2->SetBreakForce(20);
+
+		World->AddPhysicalObject(Joint2);
+
+	}
 	return true;
 }
 

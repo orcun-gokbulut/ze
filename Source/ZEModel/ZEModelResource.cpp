@@ -410,7 +410,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceF
 static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEResourceFile* ResourceFile)
 {
 	ZEModelFilePhysicalJointChunk JointChunk;
-	ResourceFile->Read(&JointChunk, sizeof(ZEModelResourcePhysicalJoint), 1);
+	ResourceFile->Read(&JointChunk, sizeof(ZEPhysicalJoint), 1);
 
 	if (JointChunk.ChunkId != ZE_MDLF_PHYSICAL_JOINT_CHUNKID)
 	{
@@ -418,124 +418,77 @@ static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZERes
 		return false;
 	}
 
-	Joint->JointType			= JointChunk.Type;
-	Joint->Enabled				= JointChunk.Enabled;
-	Joint->Body1Id				= JointChunk.Body1Id;
-	Joint->Body2Id				= JointChunk.Body2Id;
-	Joint->Breakable			= JointChunk.Breakable;
-	Joint->BreakForce			= JointChunk.BreakForce;
-	Joint->BreakTorque			= JointChunk.BreakTorque;
-	Joint->CollideBodies		= JointChunk.CollideBodies;
-	Joint->UseGlobalAnchorAxis	= JointChunk.UseGlobalAnchorAxis;
-	Joint->GlobalAnchor			= JointChunk.GlobalAnchor;
-	Joint->GlobalAxis			= JointChunk.GlobalAxis;
-	Joint->LocalAnchor1			= JointChunk.LocalAnchor1;
-	Joint->LocalAnchor2			= JointChunk.LocalAnchor2;
-	Joint->LocalAxis1			= JointChunk.LocalAxis1;
-	Joint->LocalAxis2			= JointChunk.LocalAxis2;
+	Joint->JointType					= JointChunk.JointType;
+	Joint->Enabled						= JointChunk.Enabled;
+	Joint->Body1Id						= JointChunk.Body1Id;
+	Joint->Body2Id						= JointChunk.Body2Id;
+	Joint->Breakable					= JointChunk.Breakable;
+	Joint->BreakForce					= JointChunk.BreakForce;
+	Joint->BreakTorque					= JointChunk.BreakTorque;
+	Joint->CollideBodies				= JointChunk.CollideBodies;
+	Joint->UseGlobalAnchorAxis			= JointChunk.UseGlobalAnchorAxis;
+	Joint->GlobalAnchor					= JointChunk.GlobalAnchor;
+	Joint->GlobalAxis					= JointChunk.GlobalAxis;
+	Joint->LocalAnchor1					= JointChunk.LocalAnchor1;
+	Joint->LocalAnchor2					= JointChunk.LocalAnchor2;
+	Joint->LocalAxis1					= JointChunk.LocalAxis1;
+	Joint->LocalAxis2					= JointChunk.LocalAxis2;
 
-	switch (Joint->JointType)
-	{
-		case ZE_PJT_SPHERICAL:
-			Joint->Spherical.SwingLimit				= JointChunk.Spherical.SwingLimit;
-			Joint->Spherical.SwingLimitRestitution	= JointChunk.Spherical.SwingLimitRestitution;
-			Joint->Spherical.SwingLimitValue		= JointChunk.Spherical.SwingLimitValue;
-			Joint->Spherical.TwistLimit				= JointChunk.Spherical.TwistLimit;
-			Joint->Spherical.TwistLimitHighValue	= JointChunk.Spherical.TwistLimitHighValue;
-			Joint->Spherical.TwistLimitLowValue		= JointChunk.Spherical.TwistLimitLowValue;
-			Joint->Spherical.TwistLimitRestitution	= JointChunk.Spherical.TwistLimitRestitution;
-			break;
+	Joint->XMotion						= JointChunk.XMotion;
+	Joint->YMotion						= JointChunk.YMotion;
+	Joint->ZMotion						= JointChunk.ZMotion;
 
-		case ZE_PJT_REVOLUTE:
-			Joint->Revolute.HasLimit				= JointChunk.Revolute.HasLimit;
-			Joint->Revolute.HasMotor				= JointChunk.Revolute.HasMotor;
-			Joint->Revolute.HasSpring				= JointChunk.Revolute.HasSpring;
-			Joint->Revolute.LimitHighValue			= JointChunk.Revolute.LimitHighValue;
-			Joint->Revolute.LimitLowValue			= JointChunk.Revolute.LimitLowValue;
-			Joint->Revolute.LimitRestitution		= JointChunk.Revolute.LimitRestitution;
-			Joint->Revolute.MotorForce				= JointChunk.Revolute.MotorForce;
-			Joint->Revolute.MotorVelocity			= JointChunk.Revolute.MotorVelocity;
-			Joint->Revolute.SpringDamper			= JointChunk.Revolute.SpringDamper;
-			Joint->Revolute.SpringTarget			= JointChunk.Revolute.SpringTarget;
-			Joint->Revolute.SpringValue				= JointChunk.Revolute.SpringValue;
-			break;
+	Joint->LinearLimitDamping			= JointChunk.LinearLimitDamping;
+	Joint->LinearLimitRestitution		= JointChunk.LinearLimitRestitution;
+	Joint->LinearLimitSpring			= JointChunk.LinearLimitSpring;
+	Joint->LinearLimitValue				= JointChunk.LinearLimitValue;
 
-		case ZE_PJT_DISTANCE:
-			Joint->Distance.HasMaxLimit				= JointChunk.Distance.HasMaxLimit;
-			Joint->Distance.HasMinLimit				= JointChunk.Distance.HasMinLimit;
-			Joint->Distance.HasSpring				= JointChunk.Distance.HasSpring;
-			Joint->Distance.MaxDistance				= JointChunk.Distance.MaxDistance;
-			Joint->Distance.MinDistance				= JointChunk.Distance.MinDistance;
-			Joint->Distance.SpringDamper			= JointChunk.Distance.SpringDamper;
-			Joint->Distance.SpringValue				= JointChunk.Distance.SpringValue;
-			break;
+	Joint->Swing1Motion					= JointChunk.Swing1Motion;
+	Joint->Swing1LimitDamping			= JointChunk.Swing1LimitDamping;
+	Joint->Swing1LimitRestitution		= JointChunk.Swing1LimitRestitution;
+	Joint->Swing1LimitSpring			= JointChunk.Swing1LimitSpring;
+	Joint->Swing1LimitValue				= JointChunk.Swing1LimitValue;
 
-		case ZE_PJT_PULLEY:
-			Joint->Pulley.Distance					= JointChunk.Pulley.Distance;
-			Joint->Pulley.HasMotor					= JointChunk.Pulley.HasMotor;
-			Joint->Pulley.IsRigid					= JointChunk.Pulley.IsRigid;
-			Joint->Pulley.MotorForce				= JointChunk.Pulley.MotorForce;
-			Joint->Pulley.MotorVelocity				= JointChunk.Pulley.MotorVelocity;
-			Joint->Pulley.Pulley1					= JointChunk.Pulley.Pulley1;
-			Joint->Pulley.Pulley2					= JointChunk.Pulley.Pulley2;
-			Joint->Pulley.Ratio						= JointChunk.Pulley.Ratio;
-			Joint->Pulley.Stiffness					= JointChunk.Pulley.Stiffness;
-			break;
+	Joint->Swing2Motion					= JointChunk.Swing2Motion;
+	Joint->Swing2LimitDamping			= JointChunk.Swing2LimitDamping;
+	Joint->Swing2LimitRestitution		= JointChunk.Swing2LimitRestitution;
+	Joint->Swing2LimitSpring			= JointChunk.Swing2LimitSpring;
+	Joint->Swing2LimitValue				= JointChunk.Swing2LimitValue;
 
-		case ZE_PJT_FREE:
-			Joint->Free.XMotion						= JointChunk.Free.XMotion;
-			Joint->Free.YMotion						= JointChunk.Free.YMotion;
-			Joint->Free.ZMotion						= JointChunk.Free.ZMotion;
-			Joint->Free.LinearLimitDamper			= JointChunk.Free.LinearLimitDamper;
-			Joint->Free.LinearLimitRestitution		= JointChunk.Free.LinearLimitRestitution;
-			Joint->Free.LinearLimitSpring			= JointChunk.Free.LinearLimitSpring;
-			Joint->Free.LinearLimitValue			= JointChunk.Free.LinearLimitValue;
+	Joint->TwistMotion					= JointChunk.TwistMotion;
+	Joint->TwistLowLimitDamping			= JointChunk.TwistLowLimitDamping;
+	Joint->TwistLowLimitValue			= JointChunk.TwistLowLimitValue;
+	Joint->TwistLowLimitValue			= JointChunk.TwistLowLimitValue;
+	Joint->TwistLowLimitRestitution		= JointChunk.TwistLowLimitRestitution;
+	Joint->TwistLowLimitSpring			= JointChunk.TwistLowLimitSpring;
+	Joint->TwistHighLimitDamping		= JointChunk.TwistHighLimitDamping;
+	Joint->TwistHighLimitValue			= JointChunk.TwistHighLimitValue;
+	Joint->TwistHighLimitValue			= JointChunk.TwistHighLimitValue;
+	Joint->TwistHighLimitRestitution	= JointChunk.TwistHighLimitRestitution;
+	Joint->TwistHighLimitSpring			= JointChunk.TwistHighLimitSpring;
 
-			Joint->Free.Swing1Motion				= JointChunk.Free.Swing1Motion;
-			Joint->Free.Swing1LimitDamper			= JointChunk.Free.Swing1LimitDamper;
-			Joint->Free.Swing1LimitRestitution		= JointChunk.Free.Swing1LimitRestitution;
-			Joint->Free.Swing1LimitSpring			= JointChunk.Free.Swing1LimitSpring;
-			Joint->Free.Swing1LimitValue			= JointChunk.Free.Swing1LimitValue;
+	Joint->LinearMotorPosition			= JointChunk.LinearMotorPosition;
+	Joint->LinearMotorVelocity			= JointChunk.LinearMotorVelocity;
+	Joint->LinearXMotor					= JointChunk.LinearXMotor;
+	Joint->LinearXMotorDamper			= JointChunk.LinearXMotorDamper;
+	Joint->LinearXMotorForce			= JointChunk.LinearXMotorForce;
+	Joint->LinearXMotorSpring			= JointChunk.LinearXMotorSpring;
+	Joint->LinearYMotor					= JointChunk.LinearYMotor;
+	Joint->LinearYMotorDamper			= JointChunk.LinearYMotorDamper;
+	Joint->LinearYMotorForce			= JointChunk.LinearYMotorForce;
+	Joint->LinearYMotorSpring			= JointChunk.LinearYMotorSpring;
+	Joint->LinearZMotor					= JointChunk.LinearZMotor;
+	Joint->LinearZMotorDamper			= JointChunk.LinearZMotorDamper;
+	Joint->LinearZMotorForce			= JointChunk.LinearZMotorForce;
+	Joint->LinearZMotorSpring			= JointChunk.LinearZMotorSpring;
+	
+	Joint->AngularMotor					= JointChunk.AngularMotor;
+	Joint->AngularMotorDamper			= JointChunk.AngularMotorDamper;
+	Joint->AngularMotorForce			= JointChunk.AngularMotorForce;
+	Joint->AngularMotorOrientation		= JointChunk.AngularMotorOrientation;
+	Joint->AngularMotorSpring			= JointChunk.AngularMotorSpring;
+	Joint->AngularMotorVelocity			= JointChunk.AngularMotorVelocity;
 
-			Joint->Free.Swing2Motion				= JointChunk.Free.Swing2Motion;
-			Joint->Free.Swing2LimitDamper			= JointChunk.Free.Swing2LimitDamper;
-			Joint->Free.Swing2LimitRestitution		= JointChunk.Free.Swing2LimitRestitution;
-			Joint->Free.Swing2LimitSpring			= JointChunk.Free.Swing2LimitSpring;
-			Joint->Free.Swing2LimitValue			= JointChunk.Free.Swing2LimitValue;
-
-			Joint->Free.TwistMotion					= JointChunk.Free.TwistMotion;
-			Joint->Free.TwistLimitDamper			= JointChunk.Free.TwistLimitDamper;
-			Joint->Free.TwistLimitHighValue			= JointChunk.Free.TwistLimitHighValue;
-			Joint->Free.TwistLimitLowValue			= JointChunk.Free.TwistLimitLowValue;
-			Joint->Free.TwistLimitRestitution		= JointChunk.Free.TwistLimitRestitution;
-			Joint->Free.TwistLimitSpring			= JointChunk.Free.TwistLimitSpring;
-
-			Joint->Free.LinearMotorPosition			= JointChunk.Free.LinearMotorPosition;
-			Joint->Free.LinearMotorVelocity			= JointChunk.Free.LinearMotorVelocity;
-			Joint->Free.LinearXMotor				= JointChunk.Free.LinearXMotor;
-			Joint->Free.LinearXMotorDamper			= JointChunk.Free.LinearXMotorDamper;
-			Joint->Free.LinearXMotorForce			= JointChunk.Free.LinearXMotorForce;
-			Joint->Free.LinearXMotorSpring			= JointChunk.Free.LinearXMotorSpring;
-			Joint->Free.LinearYMotor				= JointChunk.Free.LinearYMotor;
-			Joint->Free.LinearYMotorDamper			= JointChunk.Free.LinearYMotorDamper;
-			Joint->Free.LinearYMotorForce			= JointChunk.Free.LinearYMotorForce;
-			Joint->Free.LinearYMotorSpring			= JointChunk.Free.LinearYMotorSpring;
-			Joint->Free.LinearZMotor				= JointChunk.Free.LinearZMotor;
-			Joint->Free.LinearZMotorDamper			= JointChunk.Free.LinearZMotorDamper;
-			Joint->Free.LinearZMotorForce			= JointChunk.Free.LinearZMotorForce;
-			Joint->Free.LinearZMotorSpring			= JointChunk.Free.LinearZMotorSpring;
-
-			Joint->Free.AngularMotor				= JointChunk.Free.AngularMotor;
-			Joint->Free.AngularMotorDamper			= JointChunk.Free.AngularMotorDamper;
-			Joint->Free.AngularMotorForce			= JointChunk.Free.AngularMotorForce;
-			Joint->Free.AngularMotorOrientation		= JointChunk.Free.AngularMotorOrientation;
-			Joint->Free.AngularMotorSpring			= JointChunk.Free.AngularMotorSpring;
-			Joint->Free.AngularMotorVelocity		= JointChunk.Free.AngularMotorVelocity;
-			break;
-		default:
-			zeError("Model Resource", "Corrupted ZEModel file. There is no such a joint type. (Joint Type : %d)", JointChunk.Type);
-			return false;
-	}
 	return true;
 }
 

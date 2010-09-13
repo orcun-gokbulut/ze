@@ -79,7 +79,7 @@ ZEPhysicalMaterial* ZEPhysicalShape::GetMaterial()
 
 ZEPhysicalShape::ZEPhysicalShape()
 {
-	Position = ZEVector3::UnitX;
+	Position = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
 	Material = NULL;
 }

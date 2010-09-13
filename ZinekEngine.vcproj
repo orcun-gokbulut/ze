@@ -2168,6 +2168,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalJoint.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalJoint.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEPhysics\ZEPhysicalMaterial.cpp"
 				>
 			</File>
@@ -2280,6 +2288,14 @@
 				</File>
 				<File
 					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXModuleDescription.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalJoint.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalJoint.h"
 					>
 				</File>
 				<File

@@ -199,131 +199,87 @@ struct ZEModelFilePhysicalBodyChunk
 struct ZEModelFilePhysicalJointChunk
 {
 	ZEDWORD								ChunkId;
-	ZEDWORD								Type;
+	
+	ZEDWORD								JointType;
+
 	bool								Enabled;
-	ZEDWORD								Body1Type;
+
 	ZEDWORD								Body1Id;
 	ZEDWORD								Body2Id;
+
+	bool								CollideBodies;
+
 	bool								UseGlobalAnchorAxis;
+
 	ZEVector3							GlobalAnchor;
 	ZEQuaternion						GlobalAxis;
+
 	ZEVector3							LocalAnchor1;
 	ZEVector3							LocalAnchor2;
+
 	ZEQuaternion						LocalAxis1;
 	ZEQuaternion						LocalAxis2;
-	bool								CollideBodies;
+
 	bool								Breakable;
 	float								BreakForce;
 	float								BreakTorque;
 
-	union
-	{
-		struct
-		{
-			bool						SwingLimit;
-			float						SwingLimitValue;
-			float						SwingLimitRestitution;
-			bool						TwistLimit;
-			float						TwistLimitLowValue;
-			float						TwistLimitHighValue;
-			float						TwistLimitRestitution;
-		} Spherical;
+	ZEDWORD								XMotion;
+	ZEDWORD								YMotion;
+	ZEDWORD								ZMotion;
 
-		struct
-		{
-			bool						HasLimit;
-			float						LimitLowValue;
-			float 						LimitHighValue;
-			float 						LimitRestitution;
-			bool 						HasSpring;
-			float 						SpringValue;
-			float 						SpringDamper;
-			float 						SpringTarget;
-			bool 						HasMotor;
-			float 						MotorForce;
-			float 						MotorVelocity;
-		} Revolute;
+	float 								LinearLimitValue;
+	float 								LinearLimitRestitution;
+	float 								LinearLimitSpring;
+	float 								LinearLimitDamping;
 
-		struct
-		{
-			bool 						HasMinLimit;
-			float 						MinDistance;
-			bool 						HasMaxLimit;
-			float 						MaxDistance;
-			bool 						HasSpring;
-			float 						SpringValue;
-			float 						SpringDamper;
-		} Distance;
-	};
+	ZEDWORD								TwistMotion;
+	float 								TwistLowLimitValue;
+	float 								TwistLowLimitRestitution;
+	float 								TwistLowLimitSpring;
+	float 								TwistLowLimitDamping;
+	float 								TwistHighLimitValue;
+	float 								TwistHighLimitRestitution;
+	float 								TwistHighLimitSpring;
+	float 								TwistHighLimitDamping;
 
-	struct
-	{
-		ZEVector3 						Pulley1;
-		ZEVector3 						Pulley2;
-		float 							Distance;
-		float 							Ratio;
-		float 							Stiffness;
-		bool 							IsRigid;
-		bool 							HasMotor;
-		float 							MotorForce;
-		float 							MotorVelocity;
-	} Pulley;
+	ZEDWORD								Swing1Motion;
+	float 								Swing1LimitValue;
+	float 								Swing1LimitRestitution;
+	float 								Swing1LimitSpring;
+	float 								Swing1LimitDamping;
 
-	struct
-	{
-		ZEDWORD 						XMotion;
-		ZEDWORD 						YMotion;
-		ZEDWORD 						ZMotion;
-		float 							LinearLimitValue;
-		float 							LinearLimitRestitution;
-		float 							LinearLimitSpring;
-		float 							LinearLimitDamper;
+	ZEDWORD								Swing2Motion;
+	float 								Swing2LimitValue;
+	float 								Swing2LimitRestitution;
+	float 								Swing2LimitSpring;
+	float 								Swing2LimitDamping;
 
-		ZEDWORD 						TwistMotion;
-		float 							TwistLimitHighValue;
-		float 							TwistLimitLowValue;
-		float 							TwistLimitRestitution;
-		float 							TwistLimitSpring;
-		float 							TwistLimitDamper;
- 							
-		ZEDWORD 						Swing1Motion;
-		float 							Swing1LimitValue;
-		float 							Swing1LimitRestitution;
-		float 							Swing1LimitSpring;
-		float 							Swing1LimitDamper;
-		
-		ZEDWORD 						Swing2Motion;
-		float 							Swing2LimitValue;
-		float 							Swing2LimitRestitution;
-		float 							Swing2LimitSpring;
-		float 							Swing2LimitDamper;
+	ZEVector3 							LinearMotorPosition;
+	ZEVector3 							LinearMotorVelocity;
 
-		ZEVector3 						LinearMotorPosition;
-		ZEVector3 						LinearMotorVelocity;
+	ZEDWORD 							LinearXMotor;
+	float 								LinearXMotorForce;
+	float 								LinearXMotorSpring;
+	float 								LinearXMotorDamper;
 
-		ZEDWORD 						LinearXMotor;
-		float 							LinearXMotorForce;
-		float 							LinearXMotorSpring;
-		float 							LinearXMotorDamper;
+	ZEDWORD 							LinearYMotor;
+	float 								LinearYMotorForce;
+	float 								LinearYMotorSpring;
+	float 								LinearYMotorDamper;
 
-		ZEDWORD 						LinearYMotor;
-		float 							LinearYMotorForce;
-		float 							LinearYMotorSpring;
-		float 							LinearYMotorDamper;
+	ZEDWORD 							LinearZMotor;
+	float 								LinearZMotorForce;
+	float 								LinearZMotorSpring;
+	float 								LinearZMotorDamper;
 
-		ZEDWORD 						LinearZMotor;
-		float 							LinearZMotorForce;
-		float 							LinearZMotorSpring;
-		float 							LinearZMotorDamper;
- 							
-		ZEQuaternion 					AngularMotorOrientation;
-		ZEVector3 						AngularMotorVelocity;
+	ZEQuaternion 						AngularMotorOrientation;
+	ZEVector3 							AngularMotorVelocity;
 
-		ZEDWORD 						AngularMotor;
-		float 							AngularMotorForce;
-		float 							AngularMotorSpring;
-		float 							AngularMotorDamper;
-	} Free;
+	ZEDWORD 							AngularMotor;
+	float 								AngularMotorForce;
+	float 								AngularMotorSpring;
+	float 								AngularMotorDamper;
 };
 
 struct ZEModelFileMeshLODChunk

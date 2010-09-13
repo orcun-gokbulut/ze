@@ -46,7 +46,9 @@ class ZEPhysicalShape;
 class ZEPhysXPhysicalWorld;
 class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 {
+	friend class ZEPhysXPhysicalJoint;
 	friend class ZEPhysXModule;
+
 	private:
 		ZEPhysXPhysicalWorld*			PhysicalWorld;
 		ZEArray<ZEPhysicalShape*>		Shapes;
