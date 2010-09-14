@@ -92,7 +92,7 @@ struct ZETextureLoadOptions
 	};
 };
 
-static ZETextureLoadOptions Default = {ZE_TQ_VERY_LOW, ZE_TQ_VERY_HIGH, false, {ZE_TCT_AUTO, ZE_TCQ_NORMAL, ZE_TDS_AUTO, true, true, 20}};
+static ZETextureLoadOptions Default = {ZE_TQ_VERY_LOW, ZE_TQ_VERY_HIGH, true, {ZE_TCT_DXT3, ZE_TCQ_NORMAL, ZE_TDS_NONE, true, true, 0}};
 
 class ZETexture2D;
 class ZEResourceFile;
@@ -101,9 +101,9 @@ class ZETexture2DResource : public ZETextureResource
 {
 	friend static ZETexture2DResource*		LoadFromFileCache(const char *FileName);
 	friend static ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile* ResourceFile, ZETextureLoadOptions *UserOptions = &Default);
-	friend static void						WriteToDevice(ZETexture2DResource* TextureResource, const unsigned char* SourceData, int Width, int Height, unsigned int Level = 0);
-	friend static void						CreateMipmaps(ZETexture2DResource* TextureResource, const unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, unsigned int Level, ZETextureLoadOptions *UserOptions = &Default);
-	friend static void						Compress(ZETexture2DResource* TextureResource, ZEBYTE* Image, int Width, int Height, int Pitch, ZETextureCompressionType CType, ZETextureCompressionQuality CSpeed, unsigned int Level = 0);
+	friend static void						WriteToDevice(ZETexture2DResource* TextureResource, const unsigned char* SourceData, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Level = 0, ZETextureLoadOptions *UserOptions = &Default);
+	friend static void						CreateMipmaps(ZETexture2DResource* TextureResource, const unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable = true, bool IsCompressible = true, unsigned int Level = 0, ZETextureLoadOptions *UserOptions = &Default);
+	friend static void						Compress(ZETexture2DResource* TextureResource, ZEBYTE* Image, unsigned int Width, unsigned int Height, unsigned int Pitch, unsigned int BPP, unsigned int Level = 0, ZETextureLoadOptions *UserOptions = &Default);
 
 	private:
 		ZETexture2D*						Texture;
