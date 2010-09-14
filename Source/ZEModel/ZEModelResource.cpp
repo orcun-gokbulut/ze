@@ -418,7 +418,7 @@ static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZERes
 		return false;
 	}
 
-	Joint->JointType					= JointChunk.JointType;
+	Joint->JointType					= (ZEPhysicalJointType)JointChunk.JointType;
 	Joint->Enabled						= JointChunk.Enabled;
 	Joint->Body1Id						= JointChunk.Body1Id;
 	Joint->Body2Id						= JointChunk.Body2Id;
@@ -434,28 +434,28 @@ static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZERes
 	Joint->LocalAxis1					= JointChunk.LocalAxis1;
 	Joint->LocalAxis2					= JointChunk.LocalAxis2;
 
-	Joint->XMotion						= JointChunk.XMotion;
-	Joint->YMotion						= JointChunk.YMotion;
-	Joint->ZMotion						= JointChunk.ZMotion;
+	Joint->XMotion						= (ZEPhysicalJointMotion)JointChunk.XMotion;
+	Joint->YMotion						= (ZEPhysicalJointMotion)JointChunk.YMotion;
+	Joint->ZMotion						= (ZEPhysicalJointMotion)JointChunk.ZMotion;
 
 	Joint->LinearLimitDamping			= JointChunk.LinearLimitDamping;
 	Joint->LinearLimitRestitution		= JointChunk.LinearLimitRestitution;
 	Joint->LinearLimitSpring			= JointChunk.LinearLimitSpring;
 	Joint->LinearLimitValue				= JointChunk.LinearLimitValue;
 
-	Joint->Swing1Motion					= JointChunk.Swing1Motion;
+	Joint->Swing1Motion					= (ZEPhysicalJointMotion)JointChunk.Swing1Motion;
 	Joint->Swing1LimitDamping			= JointChunk.Swing1LimitDamping;
 	Joint->Swing1LimitRestitution		= JointChunk.Swing1LimitRestitution;
 	Joint->Swing1LimitSpring			= JointChunk.Swing1LimitSpring;
 	Joint->Swing1LimitValue				= JointChunk.Swing1LimitValue;
 
-	Joint->Swing2Motion					= JointChunk.Swing2Motion;
+	Joint->Swing2Motion					= (ZEPhysicalJointMotion)JointChunk.Swing2Motion;
 	Joint->Swing2LimitDamping			= JointChunk.Swing2LimitDamping;
 	Joint->Swing2LimitRestitution		= JointChunk.Swing2LimitRestitution;
 	Joint->Swing2LimitSpring			= JointChunk.Swing2LimitSpring;
 	Joint->Swing2LimitValue				= JointChunk.Swing2LimitValue;
 
-	Joint->TwistMotion					= JointChunk.TwistMotion;
+	Joint->TwistMotion					= (ZEPhysicalJointMotion)JointChunk.TwistMotion;
 	Joint->TwistLowLimitDamping			= JointChunk.TwistLowLimitDamping;
 	Joint->TwistLowLimitValue			= JointChunk.TwistLowLimitValue;
 	Joint->TwistLowLimitValue			= JointChunk.TwistLowLimitValue;

@@ -2299,14 +2299,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalMaterial.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalMaterial.h"
-					>
-				</File>
-				<File
 					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalRigidBody.cpp"
 					>
 				</File>

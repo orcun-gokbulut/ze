@@ -40,7 +40,7 @@
 #include "ZEPhysXPhysicalStaticRigidBody.h"
 #include "ZEPhysXPhysicalStaticMesh.h"
 #include "ZEPhysXPhysicalJoint.h"
-#include "ZEPhysXPhysicalMaterial.h"
+//#include "ZEPhysXPhysicalMaterial.h"
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEConsole.h"
 
@@ -210,7 +210,8 @@ ZEPhysicalTrigger* ZEPhysXModule::CreatePhysicalTrigger()
 
 ZEPhysicalMaterial* ZEPhysXModule::CreatePhysicalMaterial()
 {
-	return new ZEPhysXPhysicalMaterial();
+//	return new ZEPhysXPhysicalMaterial();
+	return NULL;
 }
 
 

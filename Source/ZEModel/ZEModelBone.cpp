@@ -289,7 +289,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 	UpdateModelBoundingBox = true;
 	UpdateWorldBoundingBox = true;
 
-	if (BoneResource->PhysicalJoint->JointType != ZE_PJT_NONE && BoneResource->ParentBone != -1)
+	if (BoneResource->PhysicalJoint.JointType != ZE_PJT_NONE && BoneResource->ParentBone != -1)
 	{
 		if (PhysicalJoint == NULL)
 			PhysicalJoint = ZEPhysicalJoint::CreateInstance();

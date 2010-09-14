@@ -224,26 +224,24 @@ bool ZEPhysicsDebugModule::Initialize()
 		gPhysicsSDK->getFoundationSDK().getRemoteDebugger()->connect ("localhost", 5425);
 
 
-		ZEPhysicalBoxShape Object1Shape;
+		ZEPhysicalCapsuleShape Object1Shape;
 		ZEPhysicalRigidBody* Object1 = ZEPhysicalRigidBody::CreateInstance();
 		Object1 = ZEPhysicalRigidBody::CreateInstance();
 		Object1->SetPosition(ZEVector3(0.0f, 10.0f, 0.0f));
-		Object1Shape.SetLength(0.5f);
-		Object1Shape.SetWidth(0.25f);
-		Object1Shape.SetHeight(1.0f);
+		Object1Shape.SetHeight(2.0f);
+		Object1Shape.SetRadius(0.5f);
 		Object1->AddPhysicalShape(&Object1Shape);
 		Object1->SetKinematic(true);
 
 		World->AddPhysicalObject(Object1);
 
 
-		ZEPhysicalBoxShape Object2Shape;
+		ZEPhysicalCapsuleShape Object2Shape;
 		ZEPhysicalRigidBody* Object2 = ZEPhysicalRigidBody::CreateInstance();
 		Object2 = ZEPhysicalRigidBody::CreateInstance();
-		Object2->SetPosition(ZEVector3(0.0f, 9.0f, 0.0f));
-		Object2Shape.SetLength(0.5f);
-		Object2Shape.SetWidth(0.25f);
-		Object2Shape.SetHeight(1.0f);
+		Object2->SetPosition(ZEVector3(0.0f, 7.0f, 0.0f));
+		Object2Shape.SetHeight(2.0f);
+		Object2Shape.SetRadius(0.5f);
 		Object2->AddPhysicalShape(&Object2Shape);
 		Object2->SetKinematic(false);
 		Object2->SetLinearDamping(0.5f);
@@ -251,12 +249,11 @@ bool ZEPhysicsDebugModule::Initialize()
 		World->AddPhysicalObject(Object2);
 
 
-		ZEPhysicalBoxShape Object3Shape;
+		ZEPhysicalCapsuleShape Object3Shape;
 		ZEPhysicalRigidBody* Object3 = ZEPhysicalRigidBody::CreateInstance();
-		Object3->SetPosition(ZEVector3(0.0f, 8.0f, 0.0f));
-		Object3Shape.SetLength(0.5f);
-		Object3Shape.SetWidth(0.25f);
-		Object3Shape.SetHeight(1.0f);
+		Object3->SetPosition(ZEVector3(0.0f, 4.0f, 0.0f));
+		Object3Shape.SetHeight(2.0f);
+		Object3Shape.SetRadius(0.5f);
 		Object3->AddPhysicalShape(&Object3Shape);
 		Object3->SetKinematic(false);
 		Object3->SetLinearDamping(0.5f);
@@ -271,12 +268,12 @@ bool ZEPhysicsDebugModule::Initialize()
 		ZEQuaternion TempRotation;
 		ZEQuaternion::Create(TempRotation, ZE_PI / 2, ZEVector3(0.0f, 0.0f, -1.0f));
 
-		Joint->SetPosition(ZEVector3(0.0f, 10.0f, 0.0f));
+		Joint->SetPosition(ZEVector3(0.0f, 8.0f, 0.0f));
 		Joint->SetRotation(TempRotation);
 
 		Joint->SetTwistMotion(ZE_PJMOTION_FREE);
-		Joint->SetSwing1Motion(ZE_PJMOTION_LOCKED);
-		Joint->SetSwing2Motion(ZE_PJMOTION_LOCKED);
+		Joint->SetSwing1Motion(ZE_PJMOTION_FREE);
+		Joint->SetSwing2Motion(ZE_PJMOTION_FREE);
 		Joint->SetXMotion(ZE_PJMOTION_LOCKED);
 		Joint->SetYMotion(ZE_PJMOTION_LOCKED);
 		Joint->SetZMotion(ZE_PJMOTION_LOCKED);
@@ -288,16 +285,15 @@ bool ZEPhysicsDebugModule::Initialize()
 		Joint2->SetBodyA(Object2);
 		Joint2->SetBodyB(Object3);
 
-		Joint2->SetPosition(ZEVector3(0.0f, 9.0f, 0.0f));
+		Joint2->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
 		Joint2->SetRotation(TempRotation);
 
 		Joint2->SetTwistMotion(ZE_PJMOTION_FREE);
-		Joint2->SetSwing1Motion(ZE_PJMOTION_LOCKED);
-		Joint2->SetSwing2Motion(ZE_PJMOTION_LOCKED);
+		Joint2->SetSwing1Motion(ZE_PJMOTION_FREE);
+		Joint2->SetSwing2Motion(ZE_PJMOTION_FREE);
 		Joint2->SetXMotion(ZE_PJMOTION_LOCKED);
 		Joint2->SetYMotion(ZE_PJMOTION_LOCKED);
 		Joint2->SetZMotion(ZE_PJMOTION_LOCKED);
-		Joint2->SetBreakForce(20);
 
 		World->AddPhysicalObject(Joint2);
 

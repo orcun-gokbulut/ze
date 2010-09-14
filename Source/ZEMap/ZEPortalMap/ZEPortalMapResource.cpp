@@ -189,8 +189,10 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile,
 	for (size_t I = 0; I < FilePhysicalMesh.PolygonCount; I++)
 	{
 		ZEMapFilePhysicalMeshPolygonChunk Chunk;
-		ResourceFile->Read(Chunk, sizeof(ZEMapFilePhysicalMeshPolygonChunk), 1);
-		Portal->PhysicalMesh.Polygons[I].Indices = Chunk.Indices;
+		ResourceFile->Read(&Chunk, sizeof(ZEMapFilePhysicalMeshPolygonChunk), 1);
+		Portal->PhysicalMesh.Polygons[I].Indices[0] = Chunk.Indices[0];
+		Portal->PhysicalMesh.Polygons[I].Indices[1] = Chunk.Indices[1];
+		Portal->PhysicalMesh.Polygons[I].Indices[2] = Chunk.Indices[2];
 	}
 
 	return true;

@@ -51,8 +51,8 @@ class ZEPhysicsDebugModule : public ZEDebugModule
 	private:
 		ZEPlayer*				Player;
 		ZEPhysicalRigidBody*	PhysicalRigidBody;
-		ZEPhysicalSphereShape	Shape;	
-		ZEPhysicalSphereShape	Shape2;	
+		ZEPhysicalCapsuleShape	Shape;	
+		ZEPhysicalCapsuleShape	Shape2;	
 		ZEModel*				Model;
 
 		void					TransformChanged(const ZEPhysicalTransformChange& TransformChange);
