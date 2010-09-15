@@ -54,7 +54,7 @@ class ZESoundDebugModule : public ZEDebugModule
 		ZESoundSource3D*		SoundSource;
 
 		ZESoundBrush2D*			SoundBrush2D;
-		ZESoundBrush3D*			SoundBrush3D;
+	//	ZESoundBrush3D*			SoundBrush3D;
 
 		ZEDGrid*				Grid;
 		
