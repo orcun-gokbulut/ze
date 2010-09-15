@@ -279,6 +279,7 @@ void ZEALModule::ProcessSound(float ElapsedTime)
 #undef PlaySound
 void ZEALModule::PlaySound(ZESoundResource* SoundResource)
 {
+
 }
 
 void ZEALModule::SetActiveListener(ZEListener* Listener)

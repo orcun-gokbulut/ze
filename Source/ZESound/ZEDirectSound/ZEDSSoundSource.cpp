@@ -251,18 +251,6 @@ unsigned int ZEDSSoundSource::GetCurrentPosition()
 			return 0;
 }
 
-void ZEDSSoundSource::SetStartPosition(unsigned int SampleIndex)
-{
-	if (SoundResource != NULL)
-		if (SampleIndex > SoundResource->GetSampleCount())
-		{
-			EffectiveStartPosition = SampleIndex % SoundResource->GetSampleCount();
-			return;
-		}
-
-	EffectiveStartPosition = SampleIndex;
-}
-
 void ZEDSSoundSource::SetEndPosition(unsigned int SampleIndex)
 {
 	if (SoundResource != NULL)
@@ -285,7 +273,10 @@ void ZEDSSoundSource::SetPan(int NewPan)
 		Pan = NewPan;
 
 	if (DSBuffer != NULL)
+	{
+		int A = (((Pan + 100)*(DSBPAN_RIGHT - DSBPAN_LEFT))/200) + DSBPAN_LEFT;
 		DSBuffer->SetPan((((Pan + 100)*(DSBPAN_RIGHT - DSBPAN_LEFT))/200) + DSBPAN_LEFT);
+	}
 }
 
 void ZEDSSoundSource::SetPlaybackSpeed(float Speed)

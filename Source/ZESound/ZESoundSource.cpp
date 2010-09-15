@@ -207,7 +207,7 @@ float ZESoundSource::GetStartPositionTime() const
 float ZESoundSource::GetStartPositionPersentage() const
 {
 	if (SoundResource != NULL)
-		return (StartPosition / SoundResource->GetSampleCount()) * 100.0f;
+		return ((float)StartPosition / SoundResource->GetSampleCount()) * 100.0f;
 	else
 		return 0.0f;
 }
