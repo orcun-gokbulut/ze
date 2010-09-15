@@ -96,8 +96,8 @@ void ZESoundSource::SetCurrentPositionTime(float Seconds)
 	if (SoundResource != NULL)
 	{
 		unsigned int SampleIndex = (float)SoundResource->GetSamplesPerSecond() * Seconds;
-		if (SampleIndex > SoundResource->GetSampleCount())
-			SetStartPosition(SoundResource->GetSampleCount());
+		if (SampleIndex < SoundResource->GetSampleCount())
+			SetCurrentPosition(SampleIndex);
 	}
 }
 
