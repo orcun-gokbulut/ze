@@ -41,6 +41,7 @@
 #include "ZEGame\ZEScene.h"
 #include "ZESound\ZESoundSource3D.h"
 
+
 bool ZESoundDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
@@ -57,21 +58,53 @@ bool ZESoundDebugModule::Initialize()
 		Scene->AddEntity(Player);
 	}
 
-	if (SoundSource == NULL)
+	/*if (SoundSource == NULL)
 	{
 		ZESoundSource3D* SoundSource = ZESoundSource3D::CreateInstance();
 
 		SoundSource->SetSoundResource(ZESoundResource::LoadResource("test.wav"));
 		SoundSource->SetCurrentPositionTime(50);
 		SoundSource->SetStartPositionTime(0);
-		/*SoundSource->SetEndPositionTime(70.5f);*/
+		SoundSource->SetEndPositionTime(70.5f);
 		SoundSource->SetPlaybackSpeed(1.0f);
 		SoundSource->SetLooping(true);
 		SoundSource->Play();
 		SoundSource->SetSoundSourceType(ZE_SST_MUSIC);
-	}
+	}*/
+
+	Grid = new ZEDGrid(Scene);
+
+	SoundBrush2D = new ZESoundBrush2D();
+	
+	SoundBrush3D = new ZESoundBrush3D();
+
+	SoundBrush2D->SetSoundResource(ZESoundResource::LoadResource("sample2.ogg"));
+	SoundBrush2D->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	
+	
+	//SoundBrush2D->GetSoundSource()->SetStartPositionTime(10);
+	//SoundBrush2D->GetSoundSource()->SetEndPositionTime(13);
+	//SoundBrush2D->GetSoundSource()->SetLimitsEnabled(true);
+
+	SoundBrush2D->GetSoundSource()->SetPan(100);
+
+	SoundBrush2D->GetSoundSource()->Play();
+
+	Scene->AddEntity(SoundBrush2D);
 
 	return true;
+}
+
+void ZESoundDebugModule::Process(float ElapsedTime)
+{
+	/*float StartPositionPersentage = SoundBrush2D->GetSoundSource()->GetStartPositionPersentage();
+	float StartPositonTime = SoundBrush2D->GetSoundSource()->GetStartPositionTime();
+	unsigned int StartPosition = SoundBrush2D->GetSoundSource()->GetStartPosition();
+
+	if (StartPositionPersentage != 0)
+	{
+		StartPositionPersentage++;
+	}*/
 }
 
 void ZESoundDebugModule::Deinitialize()
