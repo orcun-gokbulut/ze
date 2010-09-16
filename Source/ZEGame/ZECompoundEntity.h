@@ -71,7 +71,7 @@ class ZECompoundEntity : public ZEEntity
 		ZEBoundingVolumeMechnism				BoundingVolumeMechanism;
 
 	protected:
-		ZEArray<ZEComponent*>				Components;
+		ZEArray<ZEComponent*>					Components;
 
 		void									RegisterComponent(ZEComponent* Component);
 		void									UnregisterComponent(ZEComponent* Component);	
@@ -83,7 +83,7 @@ class ZECompoundEntity : public ZEEntity
 	public:
 		virtual ZEEntityType					GetEntityType();
 
-		const ZEArray<ZEComponent *>&		GetComponents();
+		const ZEArray<ZEComponent *>&			GetComponents() const;
 
 		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
 
@@ -111,7 +111,14 @@ class ZECompoundEntity : public ZEEntity
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZECompoundEntity" parent="ZEEntity"/>
+		<class name="ZECompoundEntity" parent="ZEEntity">
+			<container name="Components" baseclass="ZEComponent" allowderived="true"
+				addfunction="RegisterComponent"
+				removefunction="UnregisterComponent"
+				getfunction="GetComponents().GetConstCArray"
+				getcountfunction="GetComponents().GetCount"
+				description="This container contains components that entity includes"/>
+		</class>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()

@@ -77,6 +77,9 @@ class ZEEntityDescription : public ZEClassDescription
 		virtual const ZEPropertyDescription*	GetProperties() const;
 		virtual size_t							GetPropertyCount() const;
 		virtual size_t							GetPropertyOffset() const;
+		virtual const ZEContainerDescription*	GetContainers() const;
+		virtual size_t							GetContainerCount() const;
+		virtual size_t							GetContainerOffset() const;
 		virtual const ZEMethodDescription*		GetMethods() const;
 		virtual size_t							GetMethodCount() const;
 		virtual size_t							GetMethodOffset() const;

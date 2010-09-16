@@ -56,8 +56,7 @@ struct ZEContainerDescription
 	bool					Visibility;
 
 	ZEClassDescription*		BaseClass;
-	bool					AllowDerivatedClasses;
-	ZEClassProvider*		ItemProvider;
+	bool					AllowDerived;
 };
 
 #endif

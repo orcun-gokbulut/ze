@@ -362,9 +362,4 @@ ZESoundSource* ZESoundSource::CreateInstance()
 	return zeSound->CreateSoundSource();
 }
 
-
 #include "ZESoundSource.h.zpp"
-
-
-
-

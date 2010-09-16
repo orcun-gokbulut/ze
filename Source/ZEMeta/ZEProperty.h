@@ -86,14 +86,6 @@ struct ZEPropertyDescription
 	ZEPropertyEnumurator*						Enumurators;
 };
 
-struct ZEMethodDescription
-{
-	const char*									Name;
-	size_t										ParameterCount;
-	const ZEVariantType* const					Parameters;
-	ZEVariantType								ReturnType;
-};
-
 #endif
 
 

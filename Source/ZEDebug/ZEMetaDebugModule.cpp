@@ -97,6 +97,9 @@ bool ZEMetaDebugModule::Initialize()
 		CanvasBrush->UpdateCanvas();
 		ZEFixedMaterial* CanvasMaterial = ZEFixedMaterial::CreateInstance();
 		
+		CanvasBrush->AddToContainer("Components", new ZECamera());
+		const ZEComponent** Components = (const ZEComponent**)CanvasBrush->GetContainerItems("Components");
+		size_t Count = CanvasBrush->GetContainerItemCount("Components");
 		CanvasBrush->SetProperty("Position", ZEVector3(0.0f, 0.0f, 0.0f));
 		CanvasBrush->Material = CanvasMaterial;
 		CanvasMaterial->SetZero();

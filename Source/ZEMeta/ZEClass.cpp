@@ -59,9 +59,19 @@ bool ZEClassDescription::CheckParent(ZEClassDescription* Parent, ZEClassDescript
 	return false;
 }
 
+void ZEClass::SetOwner(ZEClass* Class)
+{
+	Owner = Class;
+}
+
+ZEClass* ZEClass::GetOwner()
+{
+	return Owner;
+}
+
 bool ZEClass::SetProperty(const char* PropertyName, const ZEVariant& Value)
 {
-	int PropertyId = GetPropertyId(Name);
+	int PropertyId = GetPropertyId(PropertyName);
 
     if (PropertyId != -1)
         return SetProperty(PropertyId, Value);
@@ -71,50 +81,50 @@ bool ZEClass::SetProperty(const char* PropertyName, const ZEVariant& Value)
 
 bool ZEClass::GetProperty(const char* PropertyName, ZEVariant& Value) const
 {
-	int PropertyId = GetPropertyId(Name);
+	int PropertyId = GetPropertyId(PropertyName);
 
     if (PropertyId != -1)
-        return SetProperty(PropertyId, Value);
+        return GetProperty(PropertyId, Value);
 
     return false;
 }
 
-bool ZEClass::AddToCollection(const char* CollectionName, ZEClass* Item)
+bool ZEClass::AddToContainer(const char* ContainerName, ZEClass* Item)
 {
-	int CollectionId = GetCollectionId(CollectionName);
+	int ContainerId = GetContainerId(ContainerName);
 
-	if (CollectionId != -1)
-		return AddToCollection(CollectionId, Item);
+	if (ContainerId != -1)
+		return AddToContainer(ContainerId, Item);
 
 	return false;
 }
 
-bool ZEClass::RemoveFromCollection(const char* CollectionName, ZEClass* Item)
+bool ZEClass::RemoveFromContainer(const char* ContainerName, ZEClass* Item)
 {
-	int CollectionId = GetCollectionId(CollectionName);
+	int ContainerId = GetContainerId(ContainerName);
 
-	if (CollectionId != -1)
-		return RemoveFromCollection(CollectionId, Item);
+	if (ContainerId != -1)
+		return RemoveFromContainer(ContainerId, Item);
 
 	return false;
 }
 
-ZEClass** ZEClass::GetCollectionItems(const char* CollectionName)
+const ZEClass** ZEClass::GetContainerItems(const char* ContainerName) const
 {
-	int CollectionId = GetCollectionId(CollectionName);
+	int ContainerId = GetContainerId(ContainerName);
 
-	if (CollectionId != -1)
-		return GetCollectionItems(CollectionId);
+	if (ContainerId != -1)
+		return GetContainerItems(ContainerId);
 
 	return NULL;
 }
 
-size_t ZEClass::GetCollectionItemCount(const char* CollectionName)
+size_t ZEClass::GetContainerItemCount(const char* ContainerName) const 
 {
-	int CollectionId = GetCollectionId(CollectionName);
+	int ContainerId = GetContainerId(ContainerName);
 
-	if (CollectionId != -1)
-		return GetCollectionItemCount(CollectionId);
+	if (ContainerId != -1)
+		return GetContainerItemCount(ContainerId);
 
 	return 0;
 }
@@ -171,7 +181,7 @@ bool ZEClass::Serialize(ZESerializer* Serializer)
 		for (size_t I = 0; I < PropertyCount; I++)
 		{
 			Serializer->Write((void*)Properties[I].Name, sizeof(char), ZE_MAX_NAME_SIZE);
-			if (Properties[I].Access == ZE_PA_READWRITE)
+			if (Properties[I].Access == ZE_PA_READ | ZE_PA_WRITE)
 				if (!GetProperty(PropertyOffset + I, Value))
 				{
 					zeError("Class Serialize", "Class does not have specified property. (Class Type Name : \"%s\", Property Name : \"%s\")", GetClassDescription()->GetName(), Properties[I].Name);
@@ -238,6 +248,8 @@ ZEClass::ZEClass()
 	AnimationController = NULL;
 }
 
-
+ZEClass::~ZEClass()
+{
+}
 
 

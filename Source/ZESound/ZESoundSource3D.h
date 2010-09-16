@@ -82,12 +82,12 @@ ZE_POST_PROCESSOR_START(Meta)
 	<meta> 
 		<class name="ZESoundSource3D" parent="ZESoundSource" noinstance="true">
 			<description>Sound Source</description>
-			<property name="MinDistance" type="integer" autogetset="yes">
+			<property name="MinDistance" type="float" autogetset="yes">
 				<constraints>
 					<minvalue value="0"/>
 				</constraints>
 			</property>
-			<property name="MaxDistance" type="integer" autogetset="yes">
+			<property name="MaxDistance" type="float" autogetset="yes">
 				<constraints>
 					<minvalue value="0"/>
 				</constraints>

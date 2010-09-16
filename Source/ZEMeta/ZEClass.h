@@ -40,6 +40,8 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEProperty.h"
+#include "ZEContainer.h"
+#include "ZEMethod.h"
 
 #define ZE_META_CLASS_DESCRIPTION(ClassName)\
 	class ClassName##Description : public ZEClassDescription\
@@ -88,34 +90,29 @@
 
 #define ZE_META_CLASS()\
 	public:\
-		virtual ZEClassDescription* GetClassDescription();\
+		virtual ZEClassDescription* GetClassDescription() const;\
 		static ZEClassDescription* ClassDescription();\
 		virtual int GetPropertyId(const char* PropertyName) const;\
+		using ZEClass::SetProperty;\
 		virtual bool SetProperty(int PropertyId, const ZEVariant& Value);\
+		using ZEClass::GetProperty;\
 		virtual bool GetProperty(int PropertyId, ZEVariant& Value) const;\
-		virtual int GetCollectionId(const char* CollectionName) const;\
-		virtual bool AddToCollection(int CollectionId, ZEClass* Item);\
-		virtual bool RemoveFromCollection(int CollectionId, ZEClass* Item);\
-		virtual ZEClass** GetCollectionItems(int CollectionId) const;\
-		virtual size_t GetCollectionItemCount(int CollectionId) const;\
+		virtual int GetContainerId(const char* ContainerName) const;\
+		using ZEClass::AddToContainer;\
+		virtual bool AddToContainer(int ContainerId, ZEClass* Item);\
+		using ZEClass::RemoveFromContainer;\
+		virtual bool RemoveFromContainer(int ContainerId, ZEClass* Item);\
+		using ZEClass::GetContainerItems;\
+		virtual const ZEClass** GetContainerItems(int ContainerId) const;\
+		virtual size_t GetContainerItemCount(int ContainerId) const;\
 		virtual int GetMethodId(const char* MethodName) const;\
+		using ZEClass::CallMethod;\
 		virtual bool CallMethod(int MethodId, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue);\
 	private:
 
 #define ZE_META_EXTENDED_CLASS(ExtensionClass, Extension)\
+		ZE_META_CLASS()\
 	public:\
-		virtual ZEClassDescription* GetClassDescription();\
-		static ZEClassDescription* ClassDescription();\
-		virtual int GetPropertyId(const char* PropertyName) const;\
-		virtual bool SetProperty(int PropertyId, const ZEVariant& Value);\
-		virtual bool GetProperty(int PropertyId, ZEVariant& Value) const;\
-		virtual int GetCollectionId(const char* CollectionName) const;\
-		virtual bool AddToCollection(int CollectionId, ZEClass* Item);\
-		virtual bool RemoveFromCollection(int CollectionId, ZEClass* Item);\
-		virtual ZEClass** GetCollectionItems(int CollectionId) const;\
-		virtual size_t GetCollectionItemCount(int CollectionId) const;\
-		virtual int GetMethodId(const char* MethodName) const;\
-		virtual bool CallMethod(int MethodId, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue);\
 		Extension\
 	private:
 
@@ -159,7 +156,7 @@ class ZEClass
 		ZEAnimationController*					AnimationController;
 
 	public:
-		virtual ZEClassDescription*				GetClassDescription() = 0;
+		virtual ZEClassDescription*				GetClassDescription() const = 0;
 
 		// Owner
 		virtual void							SetOwner(ZEClass* Class);
@@ -174,20 +171,20 @@ class ZEClass
 		virtual bool							GetProperty(int PropertyId, ZEVariant& Value) const = 0;
 		bool									GetProperty(const char* PropertyName, ZEVariant& Value) const;
 
-		// Collections
-		virtual int								GetCollectionId(const char* CollectionName) const = 0;
+		// Containers
+		virtual int								GetContainerId(const char* ContainerName) const = 0;
 
-		virtual bool							AddToCollection(int CollectionId, ZEClass* Item) = 0;
-		bool									AddToCollection(const char* CollectionName, ZEClass* Item);
+		virtual bool							AddToContainer(int ContainerId, ZEClass* Item) = 0;
+		bool									AddToContainer(const char* ContainerName, ZEClass* Item);
 		
-		virtual bool							RemoveFromCollection(int CollectionId, ZEClass* Item) = 0;
-		bool									RemoveFromCollection(const char* CollectionName, ZEClass* Item);
+		virtual bool							RemoveFromContainer(int ContainerId, ZEClass* Item) = 0;
+		bool									RemoveFromContainer(const char* ContainerName, ZEClass* Item);
 		
-		virtual ZEClass**						GetCollectionItems(int CollectionId) const = 0;
-		ZEClass**								GetCollectionItems(const char* CollectionName) const;
+		virtual const ZEClass**					GetContainerItems(int ContainerId) const = 0;
+		const ZEClass**							GetContainerItems(const char* ContainerName) const;
 		
-		virtual size_t							GetCollectionItemCount(int CollectionId) const = 0;
-		size_t									GetCollectionItemCount(const char* CollectionName) const;
+		virtual size_t							GetContainerItemCount(int ContainerId) const = 0;
+		size_t									GetContainerItemCount(const char* ContainerName) const;
 
 		// Methods
 		virtual int								GetMethodId(const char* MethodName) const = 0;
