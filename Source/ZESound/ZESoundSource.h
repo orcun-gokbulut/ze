@@ -209,6 +209,10 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Paused" value="ZE_SSS_PAUSED"/>
 				</enumurator>
 			</property>
+			<method name="Play" auto="true" description="Starts playing sound sample"/>
+			<method name="Resume" auto="true" description="Starts playing sound sample"/>
+			<method name="Pause" auto="true" description="Starts playing sound sample"/>
+			<method name="Stop" auto="true" description="Starts playing sound sample"/>
 		</class>
 	</meta>
 </zinek>

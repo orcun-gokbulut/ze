@@ -97,7 +97,7 @@ bool ZEMetaDebugModule::Initialize()
 		CanvasBrush->UpdateCanvas();
 		ZEFixedMaterial* CanvasMaterial = ZEFixedMaterial::CreateInstance();
 		
-		CanvasBrush->AddToContainer("Components", new ZECamera());
+		CanvasBrush->AddToContainer("Components", ZECamera::CreateInstance());
 		const ZEComponent** Components = (const ZEComponent**)CanvasBrush->GetContainerItems("Components");
 		size_t Count = CanvasBrush->GetContainerItemCount("Components");
 		CanvasBrush->SetProperty("Position", ZEVector3(0.0f, 0.0f, 0.0f));
@@ -171,9 +171,8 @@ bool ZEMetaDebugModule::Initialize()
 		Provider.SetBaseClassType(ZEEntity::ClassDescription());
 		Provider.RegisterClass(ZEPlayer::ClassDescription());
 		Provider.RegisterClass(ZECanvasBrush::ClassDescription());
-		Provider.RegisterClass(ZECanvasBrush::ClassDescription());
 		Provider.RegisterClass(ZECamera::ClassDescription());
-		Provider.RegisterClass(ZEMaterial::ClassDescription());
+		//Provider.RegisterClass(ZEMaterial::ClassDescription());
 
 		Provider.UnregisterClass(ZEPlayer::ClassDescription());
 	

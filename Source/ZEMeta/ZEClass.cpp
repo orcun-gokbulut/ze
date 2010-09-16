@@ -49,7 +49,8 @@ struct ZEClassFileChunk
 
 bool ZEClassDescription::CheckParent(ZEClassDescription* Parent, ZEClassDescription* Children)
 {
-	ZEClassDescription* Current = Children->GetParent();
+	ZEClassDescription* Current = Children;
+	
 	while (Current != NULL)
 	{
 		if (Current == Parent)

@@ -50,7 +50,7 @@ class ZEPlayer : public ZECompoundEntity
 	ZE_META_ENTITY()
 	private:
 		ZEInputMap				InputMap;
-		ZECamera				Camera;
+		ZECamera*				Camera;
 		ZEPointLight			PointLight;
 		ZEListener*				Listener;
 		float					Pitch, Yawn, Roll, FOV;

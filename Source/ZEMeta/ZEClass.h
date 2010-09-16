@@ -104,6 +104,7 @@
 		virtual bool RemoveFromContainer(int ContainerId, ZEClass* Item);\
 		using ZEClass::GetContainerItems;\
 		virtual const ZEClass** GetContainerItems(int ContainerId) const;\
+		using ZEClass::GetContainerItemCount;\
 		virtual size_t GetContainerItemCount(int ContainerId) const;\
 		virtual int GetMethodId(const char* MethodName) const;\
 		using ZEClass::CallMethod;\

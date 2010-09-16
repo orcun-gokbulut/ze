@@ -211,6 +211,9 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="Scale" type="ZEVector3" autogetset="yes" description="World scale of the entity"/>
 			<property name="Enabled" type="boolean" autogetset="yes" description="If entity is disabled it will not recive Ticks so it will not interact with player. However this property does not affect entity physical interactions. A entity can be disabled but physically active."/>
 			<property name="Visible" type="boolean" autogetset="yes" description="Is entity visible"/>
+			<method name="Tick" auto="true">
+				<parameter name="Time" type="float"/>
+			</method>
 		</class>
 	</meta>
 </zinek>

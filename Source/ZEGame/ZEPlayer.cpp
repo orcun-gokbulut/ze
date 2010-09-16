@@ -64,7 +64,7 @@ ZEDrawFlags ZEPlayer::GetDrawFlags()
 
 ZECamera* ZEPlayer::GetCamera()
 {
-	return &Camera;
+	return Camera;
 }
 
 ZEListener* ZEPlayer::GetListener()
@@ -128,12 +128,12 @@ void ZEPlayer::Tick(float Time)
 			case ACTIONID_ZOOMIN:
 				if (FOV > ZE_PI_8 * 0.5)
 					FOV -= Current->AxisValue * 0.0005f;
-				Camera.SetFOV(FOV);
+				Camera->SetFOV(FOV);
 				break;
 			case ACTIONID_ZOOMOUT:
 				if (FOV < ZE_PI - ZE_PI_8)
 					FOV += Current->AxisValue * 0.0005f;
-				Camera.SetFOV(FOV);
+				Camera->SetFOV(FOV);
 				break;
 			case ACTIONID_TURNLEFT:
 				Yawn = Yawn - 0.005f * Current->AxisValue;
@@ -154,10 +154,10 @@ void ZEPlayer::Tick(float Time)
 					zeConsole->ShowConsole();
 				break;
 			case ACTIONID_RAYCAST:
-				/*ZEQuaternion::VectorProduct(RayDirection, Camera.GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
-				if (zeCore->GetGame()->GetScene()->CastRay(ZERay(RayDirection, Camera.GetWorldPosition()), 100000000000000.0f) != NULL)
+				/*ZEQuaternion::VectorProduct(RayDirection, Camera->GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
+				if (zeCore->GetGame()->GetScene()->CastRay(ZERay(RayDirection, Camera->GetWorldPosition()), 100000000000000.0f) != NULL)
 					continue;
-				if (zeGame->GetScene()->CastRay(ZERay(RayDirection, Camera.GetWorldPosition()), 100000000000000.0f, &HitEntity, HitPosition, HitNormal) != NULL)
+				if (zeGame->GetScene()->CastRay(ZERay(RayDirection, Camera->GetWorldPosition()), 100000000000000.0f, &HitEntity, HitPosition, HitNormal) != NULL)
 					continue;*/
 				break;
 		}
@@ -192,21 +192,25 @@ void ZEPlayer::Tick(float Time)
 
 bool ZEPlayer::Initialize()
 {
+	
 	FOV = ZE_PI_2;
 	Yawn = Pitch = Roll = 0;
 
-	Camera.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Camera.SetLocalRotation(ZEQuaternion::Identity);
-	Camera.SetNearZ(zeGraphics->GetNearZ());
-	Camera.SetFarZ(zeGraphics->GetFarZ());
-	Camera.SetFOV(FOV);
-	Camera.SetAspectRatio(zeGraphics->GetAspectRatio());
+	if (Camera == NULL)
+		Camera = ZECamera::CreateInstance();
 
-	Camera.Initialize();
+	Camera->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	Camera->SetLocalRotation(ZEQuaternion::Identity);
+	Camera->SetNearZ(zeGraphics->GetNearZ());
+	Camera->SetFarZ(zeGraphics->GetFarZ());
+	Camera->SetFOV(FOV);
+	Camera->SetAspectRatio(zeGraphics->GetAspectRatio());
+	Camera->Initialize();
+
 	if (Listener == NULL)
 		Listener = ZEListener::CreateInstance();
-
 	Listener->Initialize();
+
 /*	PointLight.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	PointLight.SetAttenuation(0.1f, 0.0f, 1.0f);
 	PointLight.SetRange(10000.0f);
@@ -215,10 +219,10 @@ bool ZEPlayer::Initialize()
 	PointLight.SetEnabled(true);*/
 
 	//RegisterComponent(&PointLight);
-	RegisterComponent(&Camera);
+	RegisterComponent(Camera);
 	RegisterComponent(Listener);
 
-	zeScene->SetActiveCamera(&Camera);
+	zeScene->SetActiveCamera(Camera);
 	zeScene->SetActiveListener(Listener);
 
 	return true;
@@ -226,8 +230,17 @@ bool ZEPlayer::Initialize()
 
 void ZEPlayer::Deinitialize()
 {
-	Camera.Deinitialize();
-	Listener->Deinitialize();
+	if (Camera != NULL)
+	{
+		Camera->Destroy();
+		Camera = NULL;
+	}
+
+	if (Listener != NULL)
+	{
+		Listener->Destroy();
+		Listener = NULL;
+	}
 }
 
 void ZEPlayer::Draw(ZERenderer * Renderer)
@@ -237,6 +250,7 @@ void ZEPlayer::Draw(ZERenderer * Renderer)
 
 ZEPlayer::ZEPlayer()
 {
+	Camera = NULL;
 	Listener = NULL;
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,		"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_ALL)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,	"Move Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_ALL)));
