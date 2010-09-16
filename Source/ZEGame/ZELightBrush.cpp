@@ -80,30 +80,30 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 	{
 		case ZE_LT_POINT:
 			Light = new ZEPointLight();
-			Canvas.AddSphere(2.0f, 8, 8);
+			Canvas.AddSphere(0.1f, 8, 8);
 			break;
 
 		case ZE_LT_DIRECTIONAL:
 			Light = new ZEDirectionalLight();
 			ZEMatrix4x4::CreateOffset(Offset, ZEVector3(0.0f, 0.0f, 1.0f), ZEQuaternion(ZE_PI_2, ZEVector3(1.0f, 0.0f, 0.0f)));
 			Canvas.SetTransfomation(Offset);
-			Canvas.AddPyramid(1.0f, 1.0f, 1.0f);
+			Canvas.AddPyramid(0.1f, 0.1f, 0.1f);
 
 			ZEMatrix4x4::CreateRotation(Rotation, ZEQuaternion(ZE_PI_2, ZEVector3(1.0f, 0.0f, 0.0f)));
 			Canvas.SetTransfomation(Rotation);
-			Canvas.AddBox(0.5f, 1.0f, 0.5f);
+			Canvas.AddBox(0.05f, 0.1f, 0.05f);
 			break;
 
 		case ZE_LT_PROJECTIVE:
 			ZEMatrix4x4::CreateRotation(Rotation, ZEQuaternion(-ZE_PI_2, ZEVector3(1.0f, 0.0f, 0.0f)));
 			Canvas.SetTransfomation(Rotation);
-			Canvas.AddPyramid(2.0f, 2.0f, 2.0f);
+			Canvas.AddPyramid(0.2f, 0.2f, 0.2f);
 			Light = new ZEProjectiveLight();
 			break;
 
 		case ZE_LT_OMNIPROJECTIVE:
 			Light = new ZEOmniProjectiveLight();
-			Canvas.AddBox(2.0f, 2.0f, 2.0f);
+			Canvas.AddBox(0.2f, 0.2f, 0.2f);
 			break;
 		default:
 			zeError("Light", "Light type does not supported.");
