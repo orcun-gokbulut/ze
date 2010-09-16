@@ -110,7 +110,9 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetTwoSided(MaterialChunk.TwoSided);
 		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
-		CurrentMaterial->SetTransparancyMode(MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE : ZE_MTM_NOTRANSPARACY);
+		CurrentMaterial->SetTransparancyMode(MaterialChunk.Transparant ? ZE_MTM_ALPHACULL : ZE_MTM_NOTRANSPARACY);
+		CurrentMaterial->SetTransparancyCullLimit(0x00010);
+		CurrentMaterial->SetOpacityComponent(ZE_MOC_OPACITYMAP);
 
 		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor);
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);

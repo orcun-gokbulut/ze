@@ -118,28 +118,26 @@ void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Di
 	ZEVector3::CrossProduct(Right, Up, Direction);
 	ZEVector3::CrossProduct(NewUp, Direction, Right);
 	
-	/*ZEMatrix3x3 Basis(
-	Right.x, Right.y, Right.z,                                        
-	NewUp.x, NewUp.y, NewUp.z,                          
-	Direction.x, Direction.y, Direction.z);
+	ZEMatrix3x3 Basis(
+	Right.x, NewUp.x, Direction.x,                                        
+	Right.y, NewUp.y, Direction.y,                          
+	Right.z, NewUp.z, Direction.z);
 
-	ZEQuaternion Quat;
-
-	Quat.w = sqrtf(1.0f + Basis.M11 + Basis.M22 + Basis.M33) / 2.0f;
-	double Scale = Quat.w * 4.0f;
-	Quat.x = (Basis.M32 - Basis.M23) / Scale;
-	Quat.y = (Basis.M13 - Basis.M31) / Scale;
-	Quat.z = (Basis.M21 - Basis.M12) / Scale;*/
+	Output.w = sqrtf(1.0f + Basis.M11 + Basis.M22 + Basis.M33) / 2.0f;
+	double Scale = Output.w * 4.0f;
+	Output.x = (Basis.M32 - Basis.M23) / Scale;
+	Output.y = (Basis.M13 - Basis.M31) / Scale;
+	Output.z = (Basis.M21 - Basis.M12) / Scale;
 	
-
+/*
 	ZEQuaternion Quat;
 	Quat.w = sqrtf(1.0f + Right.x + NewUp.y + Direction.z) / 2.0f;
 	float Scale = Quat.w * 4.0f;
 	Quat.x = (Direction.y - NewUp.z) / Scale;
 	Quat.y = (Right.z - Direction.x) / Scale;
-	Quat.z = (NewUp.x - Right.y) / Scale;
+	Quat.z = (NewUp.x - Right.y) / Scale;*/
 
-	ZEQuaternion::Normalize(Quat, Quat);
+	ZEQuaternion::Normalize(Output, Output);
 }
 
 void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Matrix)

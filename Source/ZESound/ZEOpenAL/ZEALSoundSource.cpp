@@ -374,8 +374,10 @@ void ZEALSoundSource::SetPlaybackSpeed(float Speed)
 
 void ZEALSoundSource::SetVolume(unsigned int NewVolume)
 {
-	if (Volume > ZE_SS_VOLUME_MAX)
+	if (NewVolume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;
+	else
+		Volume = NewVolume;
 
 	float EffectiveVolume = (float)Volume * ((float)GetModule()->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
 	

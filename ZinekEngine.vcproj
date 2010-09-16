@@ -1140,6 +1140,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEGame\ZEDGrid.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZEDGrid.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEGame\ZEDrawParameters.cpp"
 				>
 			</File>
@@ -1245,6 +1253,22 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEGame\ZESkyBrush.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZESoundBrush2D.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZESoundBrush2D.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZESoundBrush3D.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZESoundBrush3D.h"
 				>
 			</File>
 			<File

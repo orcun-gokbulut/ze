@@ -53,6 +53,10 @@ class ZESoundDebugModule : public ZEDebugModule
 		ZEPlayer*				Player;
 		ZESoundSource3D*		SoundSource;
 
+		float					TotalTime;
+
+		bool					EnterFlag;
+
 		ZESoundBrush2D*			SoundBrush2D;
 	//	ZESoundBrush3D*			SoundBrush3D;
 

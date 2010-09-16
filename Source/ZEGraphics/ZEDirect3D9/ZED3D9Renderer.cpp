@@ -740,7 +740,7 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 	GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, 0);
 
 	// Clear render targets
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00, 1.0f, 0x00000000);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00555555, 1.0f, 0x00000000);
 
 	// Setup Texture sampling properties (Will be changed)
 	for (int I = 0; I < 10; I++)

@@ -601,7 +601,7 @@ void ZED3D9Module::ClearFrameBuffer()
 	if (Device->TestCooperativeLevel() != D3D_OK)
 		RestoreDevice();
 
-	Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00, 1, 0);
+	Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00555555, 1, 0);
 }
 
 ZEStaticVertexBuffer* ZED3D9Module::CreateStaticVertexBuffer()

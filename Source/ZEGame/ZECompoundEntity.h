@@ -83,7 +83,7 @@ class ZECompoundEntity : public ZEEntity
 	public:
 		virtual ZEEntityType					GetEntityType();
 
-		const ZEArray<ZEComponent *>&		GetComponents();
+		const ZEArray<ZEComponent *>&			GetComponents();
 
 		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
 

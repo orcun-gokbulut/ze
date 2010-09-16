@@ -78,12 +78,16 @@ bool ZESoundDebugModule::Initialize()
 	
 	//SoundBrush3D = new ZESoundBrush3D();
 
-	SoundBrush2D->SetSoundResource(ZESoundResource::LoadResource("test.wav"));
+	SoundBrush2D->SetSoundResource(ZESoundResource::LoadResource("sample.ogg"));
 	SoundBrush2D->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	
 	//SoundBrush2D->GetSoundSource()->SetLimitsEnabled(true);
 	//SoundBrush2D->GetSoundSource()->SetStartPositionTime(10);
-	//SoundBrush2D->GetSoundSource()->SetEndPositionTime(13);
+	//SoundBrush2D->GetSoundSource()->SetStartPositionPersentage(3.6f);
+	//SoundBrush2D->GetSoundSource()->SetStartPositionTime(10);
+	//SoundBrush2D->GetSoundSource()->SetEndPositionTime(40);
+	//SoundBrush2D->GetSoundSource()->SetEndPositionPercentage(4.5f);
+	SoundBrush2D->GetSoundSource()->SetVolume(100);
 	
 	SoundBrush2D->GetSoundSource()->SetLooping(true);
 	
@@ -99,15 +103,47 @@ bool ZESoundDebugModule::Initialize()
 
 void ZESoundDebugModule::Process(float ElapsedTime)
 {
-	float StartPositionPersentage = SoundBrush2D->GetSoundSource()->GetStartPositionPersentage();
-	float StartPositonTime = SoundBrush2D->GetSoundSource()->GetStartPositionTime();
-	unsigned int StartPosition = SoundBrush2D->GetSoundSource()->GetStartPosition();
-	short int BitsPerSample = SoundBrush2D->GetSoundSource()->GetSoundResource()->GetBitsPerSample();
+	TotalTime += ElapsedTime;
 
-	if (StartPositionPersentage != 0)
+	float StartPositionPersentage		= SoundBrush2D->GetSoundSource()->GetStartPositionPersentage();
+	float EndPositionPersentage			= SoundBrush2D->GetSoundSource()->GetEndPositionPersentage();
+
+	float StartPositonTime				= SoundBrush2D->GetSoundSource()->GetStartPositionTime();
+	float EndPositionTime				= SoundBrush2D->GetSoundSource()->GetEndPositionTime();
+
+
+	unsigned int StartPosition			= SoundBrush2D->GetSoundSource()->GetStartPosition();
+	unsigned int EndPosition			= SoundBrush2D->GetSoundSource()->GetEndPosition();
+
+	unsigned int Volume					= SoundBrush2D->GetSoundSource()->GetVolume();
+
+	float CurrentPositionPersentage		= SoundBrush2D->GetSoundSource()->GetCurrentPositionPersentage();
+
+	short int BitsPerSample				= SoundBrush2D->GetSoundSource()->GetSoundResource()->GetBitsPerSample();
+
+	/*if (EnterFlag == false && (int)TotalTime == 5)
 	{
-		StartPositionPersentage++;
+		SoundBrush2D->GetSoundSource()->Pause();
+		EnterFlag = true;
 	}
+
+	if (EnterFlag == true && (int)TotalTime == 10)
+	{
+		SoundBrush2D->GetSoundSource()->Resume();
+		EnterFlag = false;
+	}
+
+	if (EnterFlag == false && (int)TotalTime == 15)
+	{
+		SoundBrush2D->GetSoundSource()->Stop();
+		EnterFlag = true;
+	}
+
+	if (EnterFlag == true && (int)TotalTime == 20)
+	{
+		SoundBrush2D->GetSoundSource()->Play();
+		EnterFlag = false;
+	}*/
 }
 
 void ZESoundDebugModule::Deinitialize()
@@ -129,6 +165,8 @@ ZESoundDebugModule::ZESoundDebugModule()
 {
 	SoundSource = NULL;
 	Player = NULL;
+	TotalTime = 0;
+	EnterFlag = false;
 }
 
 ZESoundDebugModule::~ZESoundDebugModule()

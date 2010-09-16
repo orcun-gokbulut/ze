@@ -251,18 +251,6 @@ unsigned int ZEDSSoundSource::GetCurrentPosition()
 			return 0;
 }
 
-void ZEDSSoundSource::SetEndPosition(unsigned int SampleIndex)
-{
-	if (SoundResource != NULL)
-		if (SampleIndex > SoundResource->GetSampleCount())
-		{
-			EffectiveEndPosition = SampleIndex % SoundResource->GetSampleCount();
-			return;
-		}
-
-	EffectiveEndPosition = SampleIndex;
-}
-
 void ZEDSSoundSource::SetPan(int NewPan)
 {
 	if (NewPan> ZE_SS_PAN_RIGHT)
@@ -289,8 +277,10 @@ void ZEDSSoundSource::SetPlaybackSpeed(float Speed)
 
 void ZEDSSoundSource::SetVolume(unsigned int NewVolume)
 {
-	if (Volume > ZE_SS_VOLUME_MAX)
+	if (NewVolume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;
+	else
+		Volume = NewVolume;
 
 	float EffectiveVolume = (float)Volume * ((float)GetModule()->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
 	

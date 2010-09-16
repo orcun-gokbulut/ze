@@ -65,7 +65,6 @@ class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 		virtual void				SetSoundSourceState(ZESoundSourceState State);
 		virtual void				SetCurrentPosition(unsigned int SampleIndex);
 		virtual unsigned int		GetCurrentPosition();
-		virtual void				SetEndPosition(unsigned int SampleIndex);
 
 		virtual void				SetPan(int NewPan);
 		virtual void				SetPlaybackSpeed(float Speed);
