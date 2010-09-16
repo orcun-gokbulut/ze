@@ -211,7 +211,10 @@ void ZEALSoundSource::DestroyBufferSource()
 		alDeleteSources(1, &ALSource);
 	
 	if (InnerStreamBuffer != NULL)
+	{
 		delete[] InnerStreamBuffer;
+		InnerStreamBuffer = NULL;
+	}
 
 	Allocated = false;
 }
@@ -360,6 +363,8 @@ void ZEALSoundSource::SetPan(int NewPan)
 		Pan = ZE_SS_PAN_LEFT;
 	else
 		Pan = NewPan;
+
+	zeLog("OpenAL","Panning is not supported with OpenAL");
 
 	// No panning support in OpenAL!
 }
@@ -518,7 +523,7 @@ void ZEALSoundSource::SetSoundResource(ZESoundResource* Resource)
 			SoundResource = NULL;
 			return;
 		}
-		SoundSourceState = ZE_SSS_STOPPED;		
+
 		SoundResource->AddReferance();
 	}
 	else

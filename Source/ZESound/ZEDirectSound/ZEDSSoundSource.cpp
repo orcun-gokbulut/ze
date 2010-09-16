@@ -411,7 +411,6 @@ void ZEDSSoundSource::SetSoundResource(ZESoundResource* Resource)
 	{
 		Resource->AddReferance();
 		SoundResource = Resource;
-		SoundSourceState = ZE_SSS_STOPPED;
 		CreateBuffer(false);
 		SetLimitsEnabled(LimitsEnabled);
 

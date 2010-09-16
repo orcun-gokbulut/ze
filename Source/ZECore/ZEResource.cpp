@@ -86,7 +86,7 @@ void ZEResource::Release()
 {
 	ReferenceCount--;
 
-	zeAssert("Resource", "Referance count is lower than 0. (Resource Name : \"%s\")", GetFileName());
+	//zeAssert("Resource", "Referance count is lower than 0. (Resource Name : \"%s\")", GetFileName());
 
 	if(ReferenceCount == 0)
 		if (!Cached)
@@ -103,7 +103,7 @@ ZEResource::ZEResource()
 	this->Cached = false;
 	this->Shared = false;
 	this->Internal = false;
-	this->ReferenceCount = 0;
+	this->ReferenceCount = 1;
 }
 
 ZEResource::~ZEResource()
