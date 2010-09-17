@@ -334,7 +334,10 @@ void ZEALSoundSource::SetCurrentPosition(unsigned int SampleIndex)
 			SampleIndex = SoundResource->GetSampleCount();
 
 		if (Streaming)
+		{
 			CurrentPosition = SampleIndex;
+			ResetStream();
+		}
 		else
 			alSourcei(ALSource, AL_SAMPLE_OFFSET, SampleIndex);
 	}

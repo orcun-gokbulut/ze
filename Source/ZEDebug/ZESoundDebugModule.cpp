@@ -85,9 +85,9 @@ bool ZESoundDebugModule::Initialize()
 	SoundBrush2D->GetSoundSource()->SetStartPositionTime(10);
 	//SoundBrush2D->GetSoundSource()->SetStartPositionPersentage(3.6f);
 
-	SoundBrush2D->GetSoundSource()->SetEndPositionTime(13);
+	SoundBrush2D->GetSoundSource()->SetEndPositionTime(40);
 	//SoundBrush2D->GetSoundSource()->SetEndPositionPercentage(4.5f);
-	SoundBrush2D->GetSoundSource()->SetVolume(100);
+	SoundBrush2D->GetSoundSource()->SetVolume(0);
 	
 	//SoundBrush2D->GetSoundSource()->SetLooping(true);
 	
@@ -127,26 +127,27 @@ void ZESoundDebugModule::Process(float ElapsedTime)
 		//SoundBrush2D->GetSoundSource()->Stop();
 		//SoundBrush2D->GetSoundSource()->SetSoundResource(ZESoundResource::LoadResource("sample2.ogg"));
 		//SoundBrush2D->GetSoundSource()->Play();
-		EnterFlag = true;
+		//SoundBrush2D->GetSoundSource()->SetCurrentPositionTime(20);
+		//EnterFlag = true;
 	}
 
-	/*if (EnterFlag == true && (int)TotalTime == 10)
-	{
-		SoundBrush2D->GetSoundSource()->Resume();
-		EnterFlag = false;
-	}
+	//if (EnterFlag == true && (int)TotalTime == 10)
+	//{
+	//	SoundBrush2D->GetSoundSource()->Resume();
+	//	EnterFlag = false;
+	//}
 
-	if (EnterFlag == false && (int)TotalTime == 15)
-	{
-		SoundBrush2D->GetSoundSource()->Stop();
-		EnterFlag = true;
-	}
+	//if (EnterFlag == false && (int)TotalTime == 15)
+	//{
+	//	SoundBrush2D->GetSoundSource()->Stop();
+	//	EnterFlag = true;
+	//}
 
-	if (EnterFlag == true && (int)TotalTime == 20)
-	{
-		SoundBrush2D->GetSoundSource()->Play();
-		EnterFlag = false;
-	}*/
+	//if (EnterFlag == true && (int)TotalTime == 20)
+	//{
+	//	SoundBrush2D->GetSoundSource()->Play();
+	//	EnterFlag = false;
+	//}
 }
 
 void ZESoundDebugModule::Deinitialize()

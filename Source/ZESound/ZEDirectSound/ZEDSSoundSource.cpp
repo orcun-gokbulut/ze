@@ -229,7 +229,11 @@ void ZEDSSoundSource::SetCurrentPosition(unsigned int SampleIndex)
 			SampleIndex = SoundResource->GetSampleCount();
 
 		if (Streaming)
+		{
 			CurrentPosition = SampleIndex;
+			ResetStream();
+		}
+
 		else
 			DSBuffer->SetCurrentPosition(SampleIndex * SoundResource->GetBlockAlign());
 	}
