@@ -384,10 +384,19 @@
 	ADD: Build directory, which contains projects intermediate compiler outputs, added to repository.
 	
 [17 September 2010 - Orcun]
-	ADD: Container support added to ZEMeta.
-	ADD: Method support added to ZEMeta.
+	ADD: Container support added to ZEMeta sub-system.
+	ADD: Method support added to ZEMeta sub-system.
+	ADD: ZEProvider class, which provides machanisms for creating instances of classes in run time, has been added to ZEMeta sub-system.
+	ADD: ZEArray::Exists function, which check whather given items is included in the array or not, has been added.
+	FIX: ZEComponent meta directive no parent bug fixed. ZEEntity is defined as parent of ZEComponent.
+	ADD: Components container added to ZECompoundEntity.
+	CHG: ZECompoundEntity::GetComponents has became const function. (In order to migrate to ZEMeta containers)
 	ADD: Method support added to ZEClass.
 	ADD: Method support added to ZEClass.
+	ADD: ZECamere has been revised. ZECamere::CreateInstance function added. 
+	ADD: ZECamera's public constructors became private.
+	CHG: Becouse of the revision in Camere ZEPlayer's initialization and deinitialization function has been changed. Camera member variable became pointer.
 	FIX: ZECamera's missing ZEMeta directives added.
 	ADD: ZEMeta methods directives added to ZESoundSource. (ZESoundSource::Play, ZESoundSource::Stop, ZESoundSource::Pause, ZESoundSource::Resume)
 	ADD: ZEMeta methods directives added to ZEEntity. (ZEEntity::Tick)
+	CHG: ZEPP utility updated. It supports ZEMethods and ZEContainers.
