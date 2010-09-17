@@ -37,16 +37,22 @@
 #ifndef __ZE_META_METHOD_H__
 #define __ZE_META_METHOD_H__
 
+struct ZEMethodParameter
+{
+	const char*					Name;
+	ZEVariantType				Type;
+};
+
 struct ZEMethodDescription
 {
-	const char*				Name;
-	const char*				Description;
-	const char*				GroupName;
-	bool					Visibility;
+	const char*					Name;
+	const char*					Description;
+	const char*					GroupName;
+	bool						Visibility;
 
-	const ZEVariantType*	Parameters;
-	unsigned int			ParameterCount;
-	ZEVariantType			ReturnType;
+	const ZEMethodParameter*	Parameters;
+	unsigned int				ParameterCount;
+	ZEVariantType				ReturnType;
 };
 
 #endif

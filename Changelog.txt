@@ -383,3 +383,11 @@
 	CHG: PostProcess directory renamed to ZEPP.
 	ADD: Build directory, which contains projects intermediate compiler outputs, added to repository.
 	
+[17 September 2010 - Orcun]
+	ADD: Container support added to ZEMeta.
+	ADD: Method support added to ZEMeta.
+	ADD: Method support added to ZEClass.
+	ADD: Method support added to ZEClass.
+	FIX: ZECamera's missing ZEMeta directives added.
+	ADD: ZEMeta methods directives added to ZESoundSource. (ZESoundSource::Play, ZESoundSource::Stop, ZESoundSource::Pause, ZESoundSource::Resume)
+	ADD: ZEMeta methods directives added to ZEEntity. (ZEEntity::Tick)
