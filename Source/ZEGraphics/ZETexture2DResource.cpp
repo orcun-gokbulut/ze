@@ -555,12 +555,18 @@ static void CreateMipmaps(ZETexture2DResource* TextureResource, const unsigned c
 	
 	unsigned int MipmapLevels = LoadingOptions->MaximumMipmapLevel;
 	ZETextureCompressionType CompType = LoadingOptions->CompressionType;
-	// Storage For the Copy of Image
-	unsigned char* Temp = new unsigned char[Height * Pitch];
+	unsigned char* Temp;
+	
+	// bu if en son eklendi ve hatalı
+	if (IsResizeable && LoadingOptions->CompressionType != ZE_TCT_NONE)
+	{
+		// Storage For the Copy of Image
+		Temp = new unsigned char[Height * Pitch];
 
-	// Copy The Image
-	for (int I = 0; I < Height; I++)
-		memcpy( Temp + (I * Pitch), Image + (I * Pitch), Width * BPP);
+		// Copy The Image
+		for (int I = 0; I < Height; I++)
+			memcpy( Temp + (I * Pitch), Image + (I * Pitch), Width * BPP);
+	}
 	
 	// If Resizeable Then Create Mipmaps 
 	if (IsResizeable && LoadingOptions->MipMapping)
