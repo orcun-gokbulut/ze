@@ -300,7 +300,7 @@ bool ZEPhysicsDebugModule::Initialize()
 	}
 
 	ZEModelBrush* Skeleton = new ZEModelBrush();
-	Skeleton->SetModelFile("3Bones1Nub.zemodel");
+	Skeleton->SetModelFile("3Bones.zemodel");
 	Scene->AddEntity(Skeleton);
 	Skeleton->SetPosition(ZEVector3(0,0,2));
 
