@@ -196,6 +196,21 @@ bool ZEPhysicsDebugModule::Initialize()
 		Light->SetProjectionTexture("test/pavyon.bmp");*/
 		Scene->AddEntity(Light);
 
+		ZELightBrush* Light2 = new ZELightBrush();
+		Light2->SetLightType(ZE_LT_POINT);
+		Light2->SetPosition(ZEVector3(25.0f, 25.0f, -7.0f)); 
+		Light2->SetScale(ZEVector3::One);
+		Light2->GetLight()->SetRange(15000);
+		Light2->SetRotation(ZEQuaternion::Identity);
+		Light2->GetLight()->SetColor(ZEVector3::One);
+		Light2->GetLight()->SetAttenuation(0.01f, 0.0f, 1.0f);
+		Light2->GetLight()->SetIntensity(5.0f);
+		Light2->GetLight()->SetCastsShadows(false);
+		/*Light->SetProjectionFOV(ZE_PI_2);
+		Light->SetProjectionAspectRatio(1.0f);
+		Light->SetProjectionTexture("test/pavyon.bmp");*/
+		Scene->AddEntity(Light2);
+
 		/*Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
 		Model->SetModelFile("test2.zeModel");
 		Scene->AddEntity(Model);*/

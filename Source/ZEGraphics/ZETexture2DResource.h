@@ -92,7 +92,7 @@ struct ZETextureLoadOptions
 	};
 };
 
-static ZETextureLoadOptions Default = {ZE_TQ_VERY_LOW, ZE_TQ_VERY_HIGH, true, {ZE_TCT_DXT3, ZE_TCQ_NORMAL, ZE_TDS_NONE, true, true, 0}};
+static ZETextureLoadOptions Default = {ZE_TQ_VERY_LOW, ZE_TQ_VERY_HIGH, false, {ZE_TCT_DXT3, ZE_TCQ_NORMAL, ZE_TDS_AUTO, true, true, 0}};
 
 class ZETexture2D;
 class ZEResourceFile;
@@ -100,13 +100,13 @@ class ZEResourceFile;
 class ZETexture2DResource : public ZETextureResource
 {
 	friend static ZETexture2DResource*		LoadFromFileCache(const char *FileName);
-	friend static ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile* ResourceFile, ZETextureLoadOptions *UserOptions = &Default);
-	friend static void						WriteToDevice(ZETexture2DResource* TextureResource, const unsigned char* SourceData, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Level = 0, ZETextureLoadOptions *UserOptions = &Default);
-	friend static void						CreateMipmaps(ZETexture2DResource* TextureResource, const unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable = true, bool IsCompressible = true, unsigned int Level = 0, ZETextureLoadOptions *UserOptions = &Default);
-	friend static void						Compress(ZETexture2DResource* TextureResource, ZEBYTE* Image, unsigned int Width, unsigned int Height, unsigned int Pitch, unsigned int BPP, unsigned int Level = 0, ZETextureLoadOptions *UserOptions = &Default);
+	friend static ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile* ResourceFile, const ZETextureLoadOptions *UserOptions = &Default);
+	friend static void						WriteToDevice(ZETexture2DResource* TextureResource, const unsigned char* SourceData, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Level, ZETextureCompressionType CompressionType);
+	friend static void						CreateMipmaps(ZETexture2DResource* TextureResource, const unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable, const ZETextureLoadOptions *LoadingOptions = &Default);
+	friend static void						Compress(ZETexture2DResource* TextureResource, ZEBYTE* Image, unsigned int Width, unsigned int Height, unsigned int Pitch, unsigned int BPP, unsigned int Level = 0,const ZETextureLoadOptions *UserOptions = &Default);
 
 	private:
-		ZETexture2D*						Texture;
+		ZETexture2D							*Texture;
 
 	protected:
 											ZETexture2DResource();
@@ -119,9 +119,9 @@ class ZETexture2DResource : public ZETextureResource
 		const ZETexture2D*					GetTexture() const;
 
 		static void							CacheResource(const char* FileName);
-		static ZETexture2DResource*			LoadSharedResource(const char* FileName, ZETextureLoadOptions* UserOptions = &Default);
-		static ZETexture2DResource*			LoadResource(const char* FileName, ZETextureLoadOptions* UserOptions = &Default);
-		static ZETexture2DResource*			LoadResource(ZEResourceFile* ResourceFile, bool EmbededResource = true, ZETextureLoadOptions* UserOptions = &Default);
+		static ZETexture2DResource*			LoadSharedResource(const char* FileName, const ZETextureLoadOptions* UserOptions = &Default);
+		static ZETexture2DResource*			LoadResource(const char* FileName, const ZETextureLoadOptions* UserOptions = &Default);
+		static ZETexture2DResource*			LoadResource(ZEResourceFile* ResourceFile, bool EmbededResource = true, const ZETextureLoadOptions* UserOptions = &Default);
 
 		
 };
