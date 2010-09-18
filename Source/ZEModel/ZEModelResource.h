@@ -68,16 +68,16 @@ enum ZEPhysicalShapeType
 	ZE_PST_CAPSULE			= 4,
 	ZE_PST_CONVEX			= 5,
 	ZE_PST_TRIMESH          = 6
+};*/
+
+enum ZEModelResourcePhysicalBodyType
+{
+	ZE_MRPBT_NONE			= 0,
+	ZE_MRPBT_RIGID			= 1,
+	ZE_MRPBT_DEFORMABLE		= 2,
+	ZE_MRPBT_CLOTH			= 3
 };
 
-enum ZEPhysicalBodyType
-{
-	ZE_PBT_NONE				= 0,
-	ZE_PBT_RIGID			= 1,
-	ZE_PBT_DEFORMABLE		= 2,
-	ZE_PBT_CLOTH			= 3
-};
-*/
 
 
 struct ZEModelResourcePhysicalPolygon
@@ -93,22 +93,9 @@ struct ZEModelResourcePhysicalShape
 	float										Restitution;
 	float										StaticFriction;
 	float										DynamicFriction;
-	ZEDWORD										CollisionMask1;
-	ZEDWORD										CollisionMask2;
-	ZEDWORD										CollisionMask3;
-	ZEDWORD										CollisionMask4;
-	bool										Trigger;
 	
 	union
 	{
-		struct
-		{
-			float								Height;
-			float								NormalX;
-			float								NormalY;
-			float								NormalZ;
-		} Plane;
-
 		struct
 		{
 			float								Width;
@@ -126,26 +113,28 @@ struct ZEModelResourcePhysicalShape
 			float								Radius;
 			float								Height;
 		} Capsule;
+
+		struct
+		{
+			float								Radius;
+			float								Height;
+		} Cylinder;
 	};
 
 	struct
 	{
-		ZEArray<ZEVector3>			Vertices;
-	} Convex;
-
-	struct
-	{
 		ZEArray<ZEVector3>						Vertices;
-		ZEArray<ZEModelResourcePhysicalPolygon>	Indices;
-	} TriMesh;
+	} Convex;
 };
 
 struct ZEModelResourcePhysicalBody
 {
-	ZEPhysicalBodyType							Type;
+	ZEModelResourcePhysicalBodyType				Type;
 	bool										Enabled;
 	float										Mass;
-	bool										Kinematic;
+
+	//H.C -EDIT- Kinematic Attribute removed
+	//bool										Kinematic;
 	float										LinearDamping;
 	float										AngularDamping;
 	ZEVector3									Position;

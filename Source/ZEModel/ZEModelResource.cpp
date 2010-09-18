@@ -211,8 +211,9 @@ enum ZEPhysicalShapeType_
 	_ZE_PST_BOX				= 1,
 	_ZE_PST_SPHERE			= 2,
 	_ZE_PST_CAPSULE			= 3,
-	_ZE_PST_CONVEX			= 4,
-	_ZE_PST_TRIMESH         = 5
+	_ZE_PST_CYLINDER		= 4,
+	_ZE_PST_CONVEX			= 5,
+	_ZE_PST_TRIMESH         = 6
 };
 
 static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile* ResourceFile)
@@ -226,10 +227,12 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResour
 		return false;
 	}
 
-	Body->Type				= (ZEPhysicalBodyType)BodyChunk.Type;
+	Body->Type				= (ZEModelResourcePhysicalBodyType)BodyChunk.Type;
 	Body->Enabled			= BodyChunk.Enabled;
 	Body->Mass				= BodyChunk.Mass;
-	Body->Kinematic			= BodyChunk.Kinematic;
+
+	//H.C -EDIT- Kinematic Attribute Removed from ModelFileFormat
+	//Body->Kinematic			= BodyChunk.Kinematic;
 	Body->AngularDamping	= BodyChunk.AngularDamping;
 	Body->LinearDamping		= BodyChunk.LinearDamping;
 	Body->MassCenter		= BodyChunk.MassCenter;
@@ -239,8 +242,8 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResour
 	{
 		ZEModelResourcePhysicalShape* Shape = &Body->Shapes[I];
 
-		ZEModelFilePhysicalBodyShapeChunk ShapeChunk;
-		ResourceFile->Read(&ShapeChunk, sizeof(ZEModelFilePhysicalBodyShapeChunk), 1);
+		ZEModelFilePhysicalShapeChunk ShapeChunk;
+		ResourceFile->Read(&ShapeChunk, sizeof(ZEModelFilePhysicalShapeChunk), 1);
 
 		if(ShapeChunk.ChunkId != ZE_MDLF_PHYSICAL_BODY_SHAPE_CHUNKID)
 		{
@@ -254,22 +257,9 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResour
 		Shape->StaticFriction			= ShapeChunk.StaticFriction;
 		Shape->DynamicFriction			= ShapeChunk.DynamicFriction;
 		Shape->Restitution				= ShapeChunk.Restitution;
-		Shape->Trigger					= ShapeChunk.Trigger;
-		Shape->CollisionMask1 			= ShapeChunk.CollisionMask1;
-		Shape->CollisionMask2			= ShapeChunk.CollisionMask2;
-		Shape->CollisionMask3			= ShapeChunk.CollisionMask3;
-		Shape->CollisionMask4			= ShapeChunk.CollisionMask4;
 
 		switch (Shape->Type)
 		{
-			case _ZE_PST_PLANE:
-			{
-				Shape->Plane.Height		= ShapeChunk.Plane.Height;
-				Shape->Plane.NormalX	= ShapeChunk.Plane.NormalX;
-				Shape->Plane.NormalY	= ShapeChunk.Plane.NormalY;
-				Shape->Plane.NormalZ	= ShapeChunk.Plane.NormalZ;
-				break;
-			}
 			case _ZE_PST_BOX:
 			{
 				Shape->Box.Width		= 0.5 * ShapeChunk.Box.Width;
@@ -288,6 +278,12 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResour
 				Shape->Capsule.Radius	= ShapeChunk.Capsule.Radius;
 				break;
 			}
+			case _ZE_PST_CYLINDER:
+			{
+				Shape->Cylinder.Height	= ShapeChunk.Cylinder.Height;
+				Shape->Cylinder.Radius	= ShapeChunk.Cylinder.Radius;
+				break;
+			}
 			case _ZE_PST_CONVEX:
 			{
 				ZEDWORD ChunkId;
@@ -302,7 +298,7 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResour
 				ResourceFile->Read(Shape->Convex.Vertices.GetCArray(), sizeof(ZEVector3), Shape->Convex.Vertices.GetCount());
 				break;
 			}
-			case _ZE_PST_TRIMESH:
+			/*case _ZE_PST_TRIMESH:
 			{
 				//vertices
 				ZEDWORD ChunkId;
@@ -327,7 +323,7 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResour
 				Shape->TriMesh.Indices.SetCount(ShapeChunk.TriMesh.IndexCount);
 				ResourceFile->Read(Shape->TriMesh.Indices.GetCArray(), sizeof(ZEModelFilePhysicalPolygonChunk), Shape->TriMesh.Indices.GetCount());
 				break;
-			}
+			}*/
 			default:
 				zeError("Model Resource", "Wrong physical shape type. (Physical Shape : %d)", Shape->Type);
 				return false;

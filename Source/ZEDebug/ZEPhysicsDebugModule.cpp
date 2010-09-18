@@ -298,6 +298,12 @@ bool ZEPhysicsDebugModule::Initialize()
 		World->AddPhysicalObject(Joint2);
 
 	}
+
+	ZEModelBrush* Skeleton = new ZEModelBrush();
+	Skeleton->SetModelFile("3Bones1Nub.zemodel");
+	Scene->AddEntity(Skeleton);
+	Skeleton->SetPosition(ZEVector3(0,0,2));
+
 	return true;
 }
 

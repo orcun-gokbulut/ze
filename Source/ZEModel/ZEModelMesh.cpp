@@ -242,18 +242,84 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	this->MeshResource = MeshResource;
 	ActiveLOD = 0;
 	AutoLOD = true;
-	PhysicsEnabled = false;
 	AnimationType = ZE_MAT_PREDEFINED;
 	Position = MeshResource->Position;
 	Rotation = MeshResource->Rotation;
 	Scale = MeshResource->Scale;
 	LocalBoundingBox = MeshResource->BoundingBox;
+	PhysicsEnabled = false;
 
 	UpdateWorldBoundingBox = true;
 	UpdateWorldTransform = true;
 	UpdateModelBoundingBox = true;
 	UpdateModelTransform = true;
 	UpdateLocalTransform = true;
+
+	if (MeshResource->PhysicalBody.Type != ZE_MRPBT_RIGID)
+	{
+		if (PhysicalBody != NULL)
+			PhysicalBody->Destroy();
+
+		PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
+		PhysicalBody->SetEnabled(MeshResource->PhysicalBody.Enabled);
+		PhysicalBody->SetEnabled(MeshResource->PhysicalBody.Mass);
+		PhysicalBody->SetLinearDamping(MeshResource->PhysicalBody.LinearDamping);
+		PhysicalBody->SetAngularDamping(MeshResource->PhysicalBody.AngularDamping);
+		PhysicalBody->SetPosition(MeshResource->PhysicalBody.Position);
+		PhysicalBody->SetRotation(MeshResource->PhysicalBody.Orientation);
+		PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenter);
+
+		for (size_t I = 0; I < MeshResource->PhysicalBody.Shapes.GetCount(); I++)
+		{
+			const ZEModelResourcePhysicalShape* Shape = &MeshResource->PhysicalBody.Shapes[I];
+			switch(Shape->Type)
+			{
+				case ZE_PST_BOX:
+				{
+					ZEPhysicalBoxShape BoxShape;
+					BoxShape.SetWidth(Shape->Box.Width);
+					BoxShape.SetHeight(Shape->Box.Height);
+					BoxShape.SetLength(Shape->Box.Length);
+					BoxShape.SetPosition(Shape->Position);
+					BoxShape.SetRotation(Shape->Rotation);
+					PhysicalBody->AddPhysicalShape(&BoxShape);
+					break;
+				}
+
+				case ZE_PST_SPHERE:
+				{
+					ZEPhysicalSphereShape SphereShape;
+					SphereShape.SetRadius(Shape->Sphere.Radius);
+					SphereShape.SetPosition(Shape->Position);
+					SphereShape.SetRotation(Shape->Rotation);
+					PhysicalBody->AddPhysicalShape(&SphereShape);
+					break;
+				}
+				case ZE_PST_CYLINDER:
+				{
+					// Problematic
+					break;
+				}
+
+				case ZE_PST_CAPSULE:
+				{
+					ZEPhysicalCapsuleShape CapsuleShape;
+					CapsuleShape.SetRadius(Shape->Capsule.Radius);
+					CapsuleShape.SetHeight(Shape->Capsule.Height);
+					CapsuleShape.SetPosition(Shape->Position);
+					CapsuleShape.SetRotation(Shape->Rotation);
+					PhysicalBody->AddPhysicalShape(&CapsuleShape);
+					break;
+				}
+
+				case ZE_PST_CONVEX:
+					// Problematic
+					break;
+			}
+		}
+
+		PhysicalBody->Initialize();
+	}
 
 	LODs.SetCount(MeshResource->LODs.GetCount());
 	for (size_t I = 0; I < MeshResource->LODs.GetCount(); I++)

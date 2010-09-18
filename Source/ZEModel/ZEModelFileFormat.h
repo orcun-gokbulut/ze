@@ -127,7 +127,9 @@ struct ZEModelFilePhysicalPolygonChunk
 	int									VertexIndexes[3];
 };
 
-struct ZEModelFilePhysicalBodyShapeChunk
+//H.C -EDIT- ZEModelFilePhysicalBodyShapeChunk renamed to ZEModelFilePhysicalShapeChunk
+
+struct ZEModelFilePhysicalShapeChunk
 {
 	ZEDWORD								ChunkId;
 	ZEDWORD								Type;
@@ -136,21 +138,17 @@ struct ZEModelFilePhysicalBodyShapeChunk
 	float								Restitution;
 	float								StaticFriction;
 	float								DynamicFriction;
-	ZEDWORD								CollisionMask1;
-	ZEDWORD								CollisionMask2;
-	ZEDWORD								CollisionMask3;
-	ZEDWORD								CollisionMask4;
-	bool								Trigger;
 	
+	//H.C -EDIT- Plane and TriMesh structs removed Cylinder struct added
 	union
 	{
-		struct
-		{
-			float						Height;
-			float                       NormalX;
-			float                       NormalY;
-			float                       NormalZ;
-		} Plane;
+		//struct
+		//{
+		//	float						Height;
+		//	float                       NormalX;
+		//	float                       NormalY;
+		//	float                       NormalZ;
+		//} Plane;
 
 		struct
 		{
@@ -170,26 +168,34 @@ struct ZEModelFilePhysicalBodyShapeChunk
 			float						Height;
 		} Capsule;
 
+		struct  
+		{
+			float						Radius;
+			float						Height;
+		} Cylinder;
+
 		struct
 		{
 			ZEDWORD						VertexCount;
 		} Convex;
 
-		struct
-		{
-			ZEDWORD						VertexCount;
-			ZEDWORD						IndexCount;
-		} TriMesh;
+		//struct
+		//{
+		//	ZEDWORD						VertexCount;
+		//	ZEDWORD						IndexCount;
+		//} TriMesh;
 	};
 };
 
+
+//H.C -EDIT- Kinematic Attribute Removed
 struct ZEModelFilePhysicalBodyChunk
 {
 	ZEDWORD								ChunkId;
 	ZEDWORD				                Type;
 	bool								Enabled;
 	float								Mass;
-	bool								Kinematic;
+	//bool								Kinematic;
 	float								LinearDamping;
 	float								AngularDamping;
 	ZEVector3							MassCenter;

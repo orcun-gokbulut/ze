@@ -48,6 +48,7 @@ class ZEPhysicalJoint;
 
 class ZEModelBone
 {
+	friend ZEModel;
 	private:
 		ZEModel*							Owner;
 		const ZEModelResourceBone*			BoneResource;

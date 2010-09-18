@@ -46,6 +46,7 @@
 #define ZE_PCCF_ON_END_TOUCH		4
 
 class ZEPhysicalObject;
+
 struct ZEPhysicalCollision
 {
 	ZEPhysicalObject*			Collider1;

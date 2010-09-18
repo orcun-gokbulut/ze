@@ -296,6 +296,13 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		else
 			PhysicalJoint->Deinitialize();
 
+		if (BoneResource->ParentBone == -1)
+		{
+			return;
+		}
+
+		//ParentBone->GetChildBones()
+
 		PhysicalJoint->SetBodyA(ParentBone->PhysicalBody);
 		PhysicalJoint->SetBodyB(PhysicalBody);
 
