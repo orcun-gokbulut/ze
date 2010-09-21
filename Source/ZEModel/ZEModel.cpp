@@ -176,6 +176,7 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 		Meshes[I].Initialize(this, &ModelResource->Meshes[I]);
 	}
 
+	Bones.SetCount(ModelResource->Bones.GetCount());
 	for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
 		if (ModelResource->Bones[I].ParentBone != -1)
 			Bones[I].ParentBone = &Bones[ModelResource->Bones[I].ParentBone];
@@ -186,7 +187,6 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 			Bones[ModelResource->Bones[I].ParentBone].AddChild(&Bones[I]);
 	}
 
-	Bones.SetCount(ModelResource->Bones.GetCount());
 	for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
 	{
 		Bones[I].Initialize(this, &ModelResource->Bones[I]);

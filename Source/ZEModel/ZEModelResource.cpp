@@ -463,27 +463,40 @@ static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZERes
 	Joint->TwistHighLimitRestitution	= JointChunk.TwistHighLimitRestitution;
 	Joint->TwistHighLimitSpring			= JointChunk.TwistHighLimitSpring;
 
-	Joint->LinearMotorPosition			= JointChunk.LinearMotorPosition;
-	Joint->LinearMotorVelocity			= JointChunk.LinearMotorVelocity;
-	Joint->LinearXMotor					= JointChunk.LinearXMotor;
+	Joint->MotorTargetPosition			= JointChunk.MotorTargetPosition;
+	Joint->MotorTargetOrientation		= JointChunk.MotorTargetOrientation;
+	Joint->MotorTargetVelocity			= JointChunk.MotorTargetVelocity;
+	Joint->MotorTargetAngularVelocity	= JointChunk.MotorTargetAngularVelocity;
+
+	Joint->LinearXMotor					= (ZEPhysicalJointMotorType)JointChunk.LinearXMotor;
 	Joint->LinearXMotorDamper			= JointChunk.LinearXMotorDamper;
 	Joint->LinearXMotorForce			= JointChunk.LinearXMotorForce;
 	Joint->LinearXMotorSpring			= JointChunk.LinearXMotorSpring;
-	Joint->LinearYMotor					= JointChunk.LinearYMotor;
+
+	Joint->LinearYMotor					= (ZEPhysicalJointMotorType)JointChunk.LinearYMotor;
 	Joint->LinearYMotorDamper			= JointChunk.LinearYMotorDamper;
 	Joint->LinearYMotorForce			= JointChunk.LinearYMotorForce;
 	Joint->LinearYMotorSpring			= JointChunk.LinearYMotorSpring;
-	Joint->LinearZMotor					= JointChunk.LinearZMotor;
+
+	Joint->LinearZMotor					= (ZEPhysicalJointMotorType)JointChunk.LinearZMotor;
 	Joint->LinearZMotorDamper			= JointChunk.LinearZMotorDamper;
 	Joint->LinearZMotorForce			= JointChunk.LinearZMotorForce;
 	Joint->LinearZMotorSpring			= JointChunk.LinearZMotorSpring;
-	
-	Joint->AngularMotor					= JointChunk.AngularMotor;
-	Joint->AngularMotorDamper			= JointChunk.AngularMotorDamper;
-	Joint->AngularMotorForce			= JointChunk.AngularMotorForce;
-	Joint->AngularMotorOrientation		= JointChunk.AngularMotorOrientation;
-	Joint->AngularMotorSpring			= JointChunk.AngularMotorSpring;
-	Joint->AngularMotorVelocity			= JointChunk.AngularMotorVelocity;
+
+	Joint->AngularSwingMotor			= (ZEPhysicalJointMotorType)JointChunk.AngularSwingMotor;
+	Joint->AngularSwingMotorDamper		= JointChunk.AngularSwingMotorDamper;
+	Joint->AngularSwingMotorForce		= JointChunk.AngularSwingMotorForce;
+	Joint->AngularSwingMotorSpring		= JointChunk.AngularSwingMotorSpring;
+
+	Joint->AngularTwistMotor			= (ZEPhysicalJointMotorType)JointChunk.AngularTwistMotor;
+	Joint->AngularTwistMotorDamper		= JointChunk.AngularTwistMotorDamper;
+	Joint->AngularTwistMotorForce		= JointChunk.AngularTwistMotorForce;
+	Joint->AngularTwistMotorSpring		= JointChunk.AngularTwistMotorSpring;
+
+	Joint->AngularSlerpMotor			= (ZEPhysicalJointMotorType)JointChunk.AngularSlerpMotor;
+	Joint->AngularSlerpMotorDamper		= JointChunk.AngularSlerpMotorDamper;
+	Joint->AngularSlerpMotorForce		= JointChunk.AngularSlerpMotorForce;
+	Joint->AngularSlerpMotorSpring		= JointChunk.AngularSlerpMotorSpring;
 
 	return true;
 }

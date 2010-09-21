@@ -63,6 +63,13 @@
 #define	ZE_MDLF_ANIMATION_CHUNKID					((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'ANIM'))
 #define	ZE_MDLF_ANIMATION_KEYFRAME_CHUNKID			((ZEDWORD)(ZE_MDLF_ANIMATION_CHUNKID + (ZEDWORD)'ANKF'))
 
+typedef ZEDWORD ZEModelFilePhysicalShapeType;
+#define ZE_MFPST_BOX								0
+#define ZE_MFPST_SPHERE								1
+#define ZE_MFPST_CAPSULE							2
+#define ZE_MFPST_CYLINDER							3
+#define ZE_MFPST_CONVEX								4
+
 struct ZEModelFileMaterialChunk
 {
 	ZEDWORD								ChunkId;
@@ -127,29 +134,18 @@ struct ZEModelFilePhysicalPolygonChunk
 	int									VertexIndexes[3];
 };
 
-//H.C -EDIT- ZEModelFilePhysicalBodyShapeChunk renamed to ZEModelFilePhysicalShapeChunk
-
 struct ZEModelFilePhysicalShapeChunk
 {
 	ZEDWORD								ChunkId;
-	ZEDWORD								Type;
+	ZEModelFilePhysicalShapeType		Type;
 	ZEVector3							Position;
 	ZEQuaternion						Rotation;
 	float								Restitution;
 	float								StaticFriction;
 	float								DynamicFriction;
 	
-	//H.C -EDIT- Plane and TriMesh structs removed Cylinder struct added
 	union
 	{
-		//struct
-		//{
-		//	float						Height;
-		//	float                       NormalX;
-		//	float                       NormalY;
-		//	float                       NormalZ;
-		//} Plane;
-
 		struct
 		{
 			float						Width;
@@ -178,24 +174,15 @@ struct ZEModelFilePhysicalShapeChunk
 		{
 			ZEDWORD						VertexCount;
 		} Convex;
-
-		//struct
-		//{
-		//	ZEDWORD						VertexCount;
-		//	ZEDWORD						IndexCount;
-		//} TriMesh;
 	};
 };
 
-
-//H.C -EDIT- Kinematic Attribute Removed
 struct ZEModelFilePhysicalBodyChunk
 {
 	ZEDWORD								ChunkId;
 	ZEDWORD				                Type;
 	bool								Enabled;
 	float								Mass;
-	//bool								Kinematic;
 	float								LinearDamping;
 	float								AngularDamping;
 	ZEVector3							MassCenter;
@@ -261,8 +248,10 @@ struct ZEModelFilePhysicalJointChunk
 	float 								Swing2LimitSpring;
 	float 								Swing2LimitDamping;
 
-	ZEVector3 							LinearMotorPosition;
-	ZEVector3 							LinearMotorVelocity;
+	ZEVector3 							MotorTargetPosition;
+	ZEQuaternion 						MotorTargetOrientation;
+	ZEVector3 							MotorTargetVelocity;
+	ZEVector3 							MotorTargetAngularVelocity;
 
 	ZEDWORD 							LinearXMotor;
 	float 								LinearXMotorForce;
@@ -279,13 +268,20 @@ struct ZEModelFilePhysicalJointChunk
 	float 								LinearZMotorSpring;
 	float 								LinearZMotorDamper;
 
-	ZEQuaternion 						AngularMotorOrientation;
-	ZEVector3 							AngularMotorVelocity;
+	ZEDWORD								AngularSwingMotor;
+	float								AngularSwingMotorForce;
+	float								AngularSwingMotorSpring;
+	float								AngularSwingMotorDamper;
 
-	ZEDWORD 							AngularMotor;
-	float 								AngularMotorForce;
-	float 								AngularMotorSpring;
-	float 								AngularMotorDamper;
+	ZEDWORD								AngularTwistMotor;
+	float								AngularTwistMotorForce;
+	float								AngularTwistMotorSpring;
+	float								AngularTwistMotorDamper;
+
+	ZEDWORD								AngularSlerpMotor;
+	float								AngularSlerpMotorForce;
+	float								AngularSlerpMotorSpring;
+	float								AngularSlerpMotorDamper;
 };
 
 struct ZEModelFileMeshLODChunk

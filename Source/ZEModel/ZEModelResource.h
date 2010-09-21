@@ -132,9 +132,6 @@ struct ZEModelResourcePhysicalBody
 	ZEModelResourcePhysicalBodyType				Type;
 	bool										Enabled;
 	float										Mass;
-
-	//H.C -EDIT- Kinematic Attribute removed
-	//bool										Kinematic;
 	float										LinearDamping;
 	float										AngularDamping;
 	ZEVector3									Position;
@@ -200,31 +197,40 @@ struct ZEModelResourcePhysicalJoint
 	float 										Swing2LimitSpring;
 	float 										Swing2LimitDamping;
 
-	ZEVector3 									LinearMotorPosition;
-	ZEVector3 									LinearMotorVelocity;
+	ZEVector3 									MotorTargetPosition;
+	ZEQuaternion 								MotorTargetOrientation;
+	ZEVector3 									MotorTargetVelocity;
+	ZEVector3 									MotorTargetAngularVelocity;
 
-	ZEDWORD 									LinearXMotor;
+	ZEPhysicalJointMotorType					LinearXMotor;
 	float 										LinearXMotorForce;
 	float 										LinearXMotorSpring;
 	float 										LinearXMotorDamper;
 
-	ZEDWORD 									LinearYMotor;
+	ZEPhysicalJointMotorType					LinearYMotor;
 	float 										LinearYMotorForce;
 	float 										LinearYMotorSpring;
 	float 										LinearYMotorDamper;
 
-	ZEDWORD 									LinearZMotor;
+	ZEPhysicalJointMotorType					LinearZMotor;
 	float 										LinearZMotorForce;
 	float 										LinearZMotorSpring;
 	float 										LinearZMotorDamper;
-						
-	ZEQuaternion 								AngularMotorOrientation;
-	ZEVector3 									AngularMotorVelocity;
 
-	ZEDWORD 									AngularMotor;
-	float 										AngularMotorForce;
-	float 										AngularMotorSpring;
-	float 										AngularMotorDamper;
+	ZEPhysicalJointMotorType					AngularSwingMotor;
+	float										AngularSwingMotorForce;
+	float										AngularSwingMotorSpring;
+	float										AngularSwingMotorDamper;
+
+	ZEPhysicalJointMotorType					AngularTwistMotor;
+	float										AngularTwistMotorForce;
+	float										AngularTwistMotorSpring;
+	float										AngularTwistMotorDamper;
+
+	ZEPhysicalJointMotorType					AngularSlerpMotor;
+	float										AngularSlerpMotorForce;
+	float										AngularSlerpMotorSpring;
+	float										AngularSlerpMotorDamper;
 };
 
 struct ZEModelResourceAnimationKey
