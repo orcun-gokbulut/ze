@@ -102,7 +102,7 @@ class ZETexture2DResource : public ZETextureResource
 	friend static ZETexture2DResource*		LoadFromFileCache(const char *FileName);
 	friend static ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile* ResourceFile, const ZETextureLoadOptions *UserOptions = &Default);
 	friend static void						WriteToDevice(ZETexture2DResource* TextureResource, const unsigned char* SourceData, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Level, ZETextureCompressionType CompressionType);
-	friend static void						CreateMipmaps(ZETexture2DResource* TextureResource, const unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable, const ZETextureLoadOptions *LoadingOptions = &Default);
+	friend static void						CreateMipmaps(ZETexture2DResource* TextureResource, unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable, const ZETextureLoadOptions *LoadingOptions = &Default);
 	friend static void						Compress(ZETexture2DResource* TextureResource, ZEBYTE* Image, unsigned int Width, unsigned int Height, unsigned int Pitch, unsigned int BPP, unsigned int Level = 0,const ZETextureLoadOptions *UserOptions = &Default);
 
 	private:

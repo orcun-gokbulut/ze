@@ -54,7 +54,7 @@ static bool						CheckInFileCache(const char *FileName);
 static void						SaveToFileCache(const ZEBYTE* Image, int Width, int Height, int BPP, int Pitch, const char* FileName);
 
 static bool						Rescale(const unsigned char* DestinationData, const unsigned char* SourceData, unsigned int &SourceWidth, unsigned int &SourceHeight, unsigned int &SourcePitch, unsigned int &SourceBPP, unsigned int RescaleRatio);
-static void						DownSample2x(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int SourceWidth, unsigned int SourceHeight, unsigned int SourcePitch);
+static void						DownSample2x(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int &SourceWidth, unsigned int &SourceHeight, unsigned int &SourcePitch);
 static unsigned int				GetMipmapCount(unsigned int Width, unsigned int Height);
 
 
@@ -133,6 +133,8 @@ static void Compress(ZETexture2DResource* TextureResource, ZEBYTE* Image, unsign
 	ATI_TC_ConvertTexture(&srcTexture, &destTexture, &options, NULL, NULL, NULL);
 
 	WriteToDevice(TextureResource, CompressedData, Width, Height, BPP, Level, LoadingOptions->CompressionType);
+
+	delete [] CompressedData;
 }
 
 // Ok
@@ -218,7 +220,7 @@ static ZETexture2DResource* LoadFromOriginalFile(ZEResourceFile* ResourceFile, c
 
 		FreeImage_Unload(Bitmap);
 		FreeImage_Unload(ConvertedData);
-
+		
 		File.Close();
 	}
 	
@@ -344,28 +346,50 @@ static ZETexture2DResource* LoadFromOriginalFile(ZEResourceFile* ResourceFile, c
 			// Set Mipmap Level
 			EngineLoadingOptions.MaximumMipmapLevel = PossibleMaxMipmapNumber;
 		}
-		
 	}
 	
 	//Decide Pixel Format
 	switch(EngineLoadingOptions.CompressionType)
 	{
-	case ZE_TCT_AUTO:
-	case ZE_TCT_DXT3:
-		PixelFormat = ZE_TPF_RGBA_DXT3;
-		break;
+		case ZE_TCT_AUTO:
+		case ZE_TCT_DXT3:
+			PixelFormat = ZE_TPF_RGBA_DXT3;
+			break;
 
-	case ZE_TCT_NONE:
-		PixelFormat = ZE_TPF_RGBA_INT32;
-		break;
+		case ZE_TCT_NONE:
+			PixelFormat = ZE_TPF_RGBA_INT32;
+			break;
 
-	case ZE_TCT_DXT1:
-		PixelFormat = ZE_TPF_RGBA_DXT1;
-		break;
+		case ZE_TCT_DXT1:
+			PixelFormat = ZE_TPF_RGBA_DXT1;
+			break;
 
-	case ZE_TCT_DXT5:
-		PixelFormat = ZE_TPF_RGBA_DXT5;
-		break;
+		case ZE_TCT_DXT5:
+			PixelFormat = ZE_TPF_RGBA_DXT5;
+			break;
+	}
+	
+	FIBITMAP *Deneme;
+	// Resize According to Loading Options
+	switch (EngineLoadingOptions.DownSample)
+	{
+		case ZE_TDS_4X:
+			zeLog("Texture2D Resource", "RESIZING texture by 4X:  \"%s\".", ResourceFile->GetFileName());
+			Rescale(Image, Image, Width, Height, Pitch, BPP, 2);
+			Rescale(Image, Image, Width, Height, Pitch, BPP, 2);
+			break;
+
+		case ZE_TDS_2X:
+			zeLog("Texture2D Resource", "RESIZING texture by 2X:  \"%s\".", ResourceFile->GetFileName());
+			Rescale(Image, Image, Width, Height, Pitch, BPP, 2);
+			break;
+
+		case ZE_TDS_NONE:
+		case ZE_TDS_AUTO:
+			break;
+
+		default:
+			break;
 	}
 	
 	// Create TextureResource 
@@ -383,28 +407,6 @@ static ZETexture2DResource* LoadFromOriginalFile(ZEResourceFile* ResourceFile, c
 		zeError("Texture Resource", "Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFileName());
 		delete TextureResource;
 		return NULL;
-	}
-
-	// Resize According to Loading Options
-	switch (EngineLoadingOptions.DownSample)
-	{
-		case ZE_TDS_4X:
-			zeLog("Texture2D Resource", "RESIZING texture file:  \"%s\".", ResourceFile->GetFileName());
-			Rescale(Image, Image, Width, Height, Pitch, BPP, 2);
-			Rescale(Image, Image, Width, Height, Pitch, BPP, 2);
-			break;
-		
-		case ZE_TDS_2X:
-			zeLog("Texture2D Resource", "RESIZING texture file:  \"%s\".", ResourceFile->GetFileName());
-			Rescale(Image, Image, Width, Height, Pitch, BPP, 2);
-			break;
-		
-		case ZE_TDS_NONE:
-		case ZE_TDS_AUTO:
-			break;
-		
-		default:
-			break;
 	}
 
 	CreateMipmaps(TextureResource, Image, Width, Height, BPP, Pitch, IsResizeable, &EngineLoadingOptions);
@@ -504,7 +506,7 @@ struct ZEColorARGB
 };
 
 
-static void DownSample2x(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int SourceWidth, unsigned int SourceHeight, unsigned int SourcePitch)
+static void DownSample2x(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int &SourceWidth, unsigned int &SourceHeight, unsigned int &SourcePitch)
 {
 	int DestinationHeight = SourceHeight / 2;
 	int DestinationWidth = SourceWidth / 2;
@@ -546,10 +548,13 @@ static void DownSample2x(void* DestinationData, unsigned int DestinationPitch, v
 			Destination->Blue  = Blue  / 4;
 		}
 	}
+	SourceWidth /= 2; 
+	SourceHeight /= 2;
+	SourcePitch /= 2;
 }
 
 
-static void CreateMipmaps(ZETexture2DResource* TextureResource, const unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable, const ZETextureLoadOptions *LoadingOptions)
+static void CreateMipmaps(ZETexture2DResource* TextureResource, unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable, const ZETextureLoadOptions *LoadingOptions)
 {
 	zeLog("Texture2D Resource", "Creeating MipMaps for the texture:  \"%s\".", TextureResource->GetFileName());
 	
@@ -557,8 +562,8 @@ static void CreateMipmaps(ZETexture2DResource* TextureResource, const unsigned c
 	ZETextureCompressionType CompType = LoadingOptions->CompressionType;
 	unsigned char* Temp;
 	
-	// bu if en son eklendi ve hatalı
-	if (IsResizeable && LoadingOptions->CompressionType != ZE_TCT_NONE)
+	// If Resizeable(Mipmapping is On) Then Create Mipmaps 
+	if (LoadingOptions->MipMapping)
 	{
 		// Storage For the Copy of Image
 		Temp = new unsigned char[Height * Pitch];
@@ -566,11 +571,8 @@ static void CreateMipmaps(ZETexture2DResource* TextureResource, const unsigned c
 		// Copy The Image
 		for (int I = 0; I < Height; I++)
 			memcpy( Temp + (I * Pitch), Image + (I * Pitch), Width * BPP);
-	}
-	
-	// If Resizeable Then Create Mipmaps 
-	if (IsResizeable && LoadingOptions->MipMapping)
-	{
+		
+		
 		// Compressible
 		if ((LoadingOptions->CompressionType != ZE_TCT_NONE) && (MipmapLevels > 2))
 		{
@@ -599,19 +601,17 @@ static void CreateMipmaps(ZETexture2DResource* TextureResource, const unsigned c
 			}
 		}
 
-		
+		delete [] Temp;
 	}
 	else
 	{
 		// If Compressible
 		if(LoadingOptions->CompressionType != ZE_TCT_NONE)
-			Compress(TextureResource,Temp, Width, Height, Pitch,BPP, 0, LoadingOptions);
+			Compress(TextureResource, Image, Width, Height, Pitch, BPP, 0, LoadingOptions);
 		else
 			// Write Mipmap to device level 0
 			WriteToDevice(TextureResource, Image, Width, Height, BPP, 0, CompType);
 	}
-	delete [] Temp;
-
 }
 
 // DEGISTIR
@@ -625,8 +625,6 @@ static unsigned int GetMipmapCount(unsigned int Width, unsigned int Height)
 
 	return WidthCount >= HeightCount ? HeightCount + 1 : WidthCount + 1;
 }
-
-
 
 
 static unsigned DLL_CALLCONV FreeImageFile_Read_2D(void *buffer, unsigned size, unsigned count, fi_handle handle) 
@@ -689,7 +687,6 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const char* FileName, con
 	ZETexture2DResource* TextureResource;
 	ZEResourceFile File;
 
-	zeLog("Texture2D Resource", "LOADING file:  \"%s\".", FileName);
 	if (File.Open(FileName))
 	{
 		TextureResource = LoadResource(&File, false, UserOptions);
@@ -732,10 +729,9 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceF
 	
 ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const char* FileName, const ZETextureLoadOptions *UserOptions)
 {	
-	
 	ZETexture2DResource* NewResource =(ZETexture2DResource*)zeResources->GetResource(FileName);
 	if (NewResource == NULL)
-	{
+	{		
 		NewResource = LoadResource(FileName, UserOptions);
 		if (NewResource != NULL)
 		{
@@ -748,8 +744,6 @@ ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const char* FileNam
 		else
 			return NULL;
 	}
-	else
-		return NewResource;
 }
 
 // NOT NEEDED ANYMORE
