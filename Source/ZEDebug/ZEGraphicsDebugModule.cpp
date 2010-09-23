@@ -126,11 +126,11 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	ProjectiveLight0 = new ZEProjectiveLight();
 	ProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 2.0f));
-	ProjectiveLight0->SetScale(ZEVector3(5.0f, 5.0f, 30.0f));
+	ProjectiveLight0->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
 	ProjectiveLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	ProjectiveLight0->SetAttenuation(0.0f, 0.0f, 1.0f);
 	ProjectiveLight0->SetIntensity(5.0f);
-	ProjectiveLight0->SetRange(5.0f);
+	ProjectiveLight0->SetRange(55.0f);
 	ProjectiveLight0->SetCastsShadow(false);
 	ProjectiveLight0->SetFOV(ZE_PI_2);
 	ProjectiveLight0->SetAspectRatio(1.0f);
@@ -142,16 +142,16 @@ bool ZEGraphicsDebugModule::Initialize()
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
 	DirectionalLight0->SetIntensity(2.0f);
 	DirectionalLight0->SetCastsShadow(false);
-	Scene->AddEntity(DirectionalLight0);
+	//Scene->AddEntity(DirectionalLight0);
 
 	PointLight1->SetEnabled(true);
-	PointLight2->SetEnabled(false);
-	PointLight3->SetEnabled(false);
-	PointLight4->SetEnabled(false);
-	PointLight5->SetEnabled(false);
+	PointLight2->SetEnabled(true);
+	PointLight3->SetEnabled(true);
+	PointLight4->SetEnabled(true);
+	PointLight5->SetEnabled(true);
 	OmniProjectiveLight0->SetEnabled(true);
 	ProjectiveLight0->SetEnabled(true);
-	DirectionalLight0->SetEnabled(true);
+	DirectionalLight0->SetEnabled(false);
 	return true;
 }
 

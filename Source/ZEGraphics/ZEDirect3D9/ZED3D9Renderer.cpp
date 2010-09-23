@@ -267,12 +267,14 @@ void ZED3D9Renderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 	// Light Parameters
 	struct
 	{
-		ZEVector3		Direction;
+		ZEVector3		Reverved0;
 		float			Range;
 		ZEVector3		Color;
 		float			Intensity;
 		ZEVector3		Attenuation;
 		float			Reserved1;
+		ZEVector3		Direction;
+		float			Reserverd2;
 	} LightParameters;
 	ZEMatrix4x4::Transform3x3(LightParameters.Direction, Camera->GetViewTransform(), Light->GetWorldDirection());
 	LightParameters.Color = Light->GetColor();
@@ -316,7 +318,8 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 		ZEVector3		Color;
 		float			Intensity;
 		ZEVector3		Attenuation;
-		float			Reserved1;
+		ZEVector3		Direction;
+		float			FOV;
 	} LightParameters;
 
 	ZEMatrix4x4::Transform(LightParameters.Position, Camera->GetViewTransform(), Light->GetWorldPosition());
@@ -324,12 +327,16 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	LightParameters.Attenuation = Light->GetAttenuation();
 	LightParameters.Range = Light->GetRange();
 	LightParameters.Intensity = Light->GetIntensity();
+	LightParameters.FOV = Light->GetFOV();
+	ZEMatrix4x4::Transform3x3(LightParameters.Direction, Camera->GetViewTransform(), Light->GetWorldDirection());
 
 	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 3);
 
 	// Transformation
-	ZEMatrix4x4 WorldViewProjTransform;
-	ZEMatrix4x4::Multiply(WorldViewProjTransform, Light->GetWorldTransform(), Camera->GetViewProjectionTransform());
+	ZEMatrix4x4 WorldViewProjTransform, WorldTransform;
+	float TanFovRange = tanf(Light->GetFOV() * 0.5f) * Light->GetRange();
+	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), Light->GetWorldRotation(), ZEVector3(TanFovRange * Light->GetAspectRatio(), TanFovRange, Light->GetRange()));
+	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
 
 	// Projection Transformation
@@ -365,6 +372,16 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	GetDevice()->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)Light->GetProjectionTexture())->Texture);
+/*
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
+	GetDevice()->SetRenderState(D3DRS_STENCILZFAIL, D3D REPLACE);
+	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
+	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
+	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
+*/
+
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 6); // Cone 2
 
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 6); // Cone 2
 

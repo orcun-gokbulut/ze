@@ -49,15 +49,16 @@ float4 LightParameters2 : register(ps, c2);
 float4 LightParameters3 : register(ps, c3);
 float2 PixelSize_2 : register(ps, c5);
 
-#define LightPosition			LightParameters0.xyz
-#define LightRange				LightParameters0.w
-#define LightColor				LightParameters1.xyz
-#define LightIntensity			LightParameters1.w
-#define LightAttenuationFactors	LightParameters2.xyz
-#define LightDirection_			LightParameters0.xyz
+#define LightPositionParam			LightParameters0.xyz
+#define LightRange					LightParameters0.w
+#define LightColorParam				LightParameters1.xyz
+#define LightIntensityParam			LightParameters1.w
+#define LightAttenuationParam		LightParameters2.xyz
+#define LightDirectionParam			LightParameters3.xyz
+#define LightFOVParam				LightParameters3.w
 
-float3x3 LightRotation : register(ps, c12);
-float4x4 LightProjectionMatrix : register(ps, c16);
+float3x3 LightRotationParam : register(ps, c12);
+float4x4 LightProjectionMatrixParam : register(ps, c16);
 
 sampler2D GBuffer1 : register(ps, s0);
 sampler2D GBuffer2 : register(ps, s1);
@@ -104,15 +105,15 @@ float4 PLPSMain(PLPSInput Input) : COLOR0
 	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
 
 	// Light Derived Parameters
-	float3 LightDisplacement = LightPosition - Position;
+	float3 LightDisplacement = LightPositionParam - Position;
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
 	float ViewDirection = normalize(-Position);
 	float3 HalfVector = normalize(LightDirection + ViewDirection);
 		
 	float AngularAttenuation = saturate(dot(LightDirection, Normal));
-	float DistanceAttenuation = 1.0f / dot(LightAttenuationFactors, float3(1.0f, LightDistance, LightDistance * LightDistance));
-	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensity * LightColor;
+	float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
+	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensityParam * LightColorParam;
 	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
 	
 	return Output;
@@ -156,10 +157,10 @@ float4 DLPSMain(PLPSInput Input) : COLOR0
 
 	// Light Derived Parameters
 	float ViewDirection = normalize(-Position);
-	float3 HalfVector = normalize(LightDirection_ + ViewDirection);
+	float3 HalfVector = normalize(LightDirectionParam + ViewDirection);
 		
-	float AngularAttenuation = saturate(dot(LightDirection_, Normal));
-	Output.xyz = AngularAttenuation * LightIntensity * LightColor;
+	float AngularAttenuation = saturate(dot(LightDirectionParam, Normal));
+	Output.xyz = AngularAttenuation * LightIntensityParam * LightColorParam;
 	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower);
 	
 	return Output;
@@ -203,21 +204,22 @@ float4 PjLPSMain(PjLPSInput Input) : COLOR0
 	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
 
 	// Light Derived Parameters
-	float3 LightDisplacement = LightPosition - Position;
+	float3 LightDisplacement = LightPositionParam - Position;
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
-	
-	float4 TextureLookup = mul(float4(Position, 1.0f), LightProjectionMatrix);
-	float3 ProjLightColor = /*tex2Dproj(ProjectionMap, TextureLookup) */  LightColor;
-	
-	float ViewDirection = normalize(-Position);
-	float3 HalfVector = normalize(LightDirection + ViewDirection);
+	if (dot(LightDirection, LightDirectionParam) < LightFOVParam)
+	{
+		float4 TextureLookup = mul(float4(Position, 1.0f), LightProjectionMatrixParam);
+		float3 ProjLightColor = /*tex2Dproj(ProjectionMap, TextureLookup) */  LightColorParam;
 		
-	float AngularAttenuation = saturate(dot(LightDirection, Normal));
-	float DistanceAttenuation = 1.0f / dot(LightAttenuationFactors, float3(1.0f, LightDistance, LightDistance * LightDistance));
-	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensity * ProjLightColor;
-	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
-	
+		float ViewDirection = normalize(-Position);
+		float3 HalfVector = normalize(LightDirection + ViewDirection);
+			
+		float AngularAttenuation = saturate(dot(LightDirection, Normal));
+		float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
+		Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensityParam * ProjLightColor;
+		Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
+	}
 	return Output;
 }
 
@@ -259,19 +261,19 @@ float4 OPLPSMain(OPLPSInput Input) : COLOR0
 	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
 
 	// Light Derived Parameters
-	float3 LightDisplacement = LightPosition - Position;
+	float3 LightDisplacement = LightPositionParam - Position;
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
 	
-	float3 TextureLookup = mul(LightDirection, (float3x3)LightRotation);
-	float3 ProjLightColor = texCUBE(OmniProjectionMap, TextureLookup).rgb * LightColor;
+	float3 TextureLookup = mul(LightDirection, (float3x3)LightRotationParam);
+	float3 ProjLightColor = texCUBE(OmniProjectionMap, TextureLookup).rgb * LightColorParam;
 	
 	float ViewDirection = normalize(-Position);
 	float3 HalfVector = normalize(LightDirection + ViewDirection);
 		
 	float AngularAttenuation = saturate(dot(LightDirection, Normal));
-	float DistanceAttenuation = 1.0f / dot(LightAttenuationFactors, float3(1.0f, LightDistance, LightDistance * LightDistance));
-	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensity * ProjLightColor;
+	float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
+	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensityParam * ProjLightColor;
 	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
 	
 	return Output;
