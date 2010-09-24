@@ -71,6 +71,36 @@ const ZEVector2& ZERectangle::GetPosition() const
 	return LeftUp;
 }
 
+void ZERectangle::SetSize(const ZEVector2& Size)
+{
+	ZEVector2::Add(RightDown, LeftUp, Size);
+}
+
+ZEVector2 ZERectangle::GetSize()
+{
+	return RightDown - LeftUp;
+}
+
+void ZERectangle::SetLeft(float Left)
+{
+	LeftUp.x = Left;
+}
+
+float ZERectangle::GetLeft()
+{
+	return LeftUp.x;
+}
+
+void ZERectangle::SetTop(float Top)
+{
+	LeftUp.y = Top;
+}
+
+float ZERectangle::GetTop()
+{
+	return LeftUp.y;
+}
+
 void ZERectangle::SetWidth(float Width)
 {
 	RightDown.x = LeftUp.x + Width;

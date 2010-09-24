@@ -382,4 +382,11 @@
 	CHG: ZEPP has been upgreaded.
 	CHG: PostProcess directory renamed to ZEPP.
 	ADD: Build directory, which contains projects intermediate compiler outputs, added to repository.
-	
+
+[24 September 2010 - Orcun]
+	ADD: ZERectangle::SetSize function added.
+	ADD: ZERectangle::GetSize function added.
+	ADD: ZERectangle::SetLeft function added.
+	ADD: ZERectangle::GetLeft function added.
+	ADD: ZERectangle::SetTop function added.
+	ADD: ZERectangle::GetTop function added.
