@@ -956,6 +956,10 @@
 				Name="Textures"
 				>
 				<File
+					RelativePath=".\Source\ZEGraphics\TextureOptions.cpp"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\ZEGraphics\ZETexture.cpp"
 					>
 				</File>
@@ -1009,6 +1013,10 @@
 				</File>
 				<File
 					RelativePath=".\Source\ZEGraphics\ZETextureCubeResource.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZETextureOptions.h"
 					>
 				</File>
 				<File

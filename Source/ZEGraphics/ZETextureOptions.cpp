@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETexture2DResource.h
+ Zinek Engine - ZETextureOptions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_TEXTURE_2D_RESOURCE_H__
-#define __ZE_TEXTURE_2D_RESOURCE_H__
-
-#include "ZETextureResource.h"
-#include "ZEGraphicsModule.h"
-#include "ZETypes.h"
-
-class ZETexture2D;
-class ZEResourceFile;
-
-class ZETexture2DResource : public ZETextureResource
-{
-	friend static ZETexture2DResource*		LoadFromFileCache(const char *FileName);
-	friend static ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
-	friend static void						WriteToDevice(ZETexture2DResource* TextureResource, const unsigned char* SourceData, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Level, ZETextureCompressionType CompressionType);
-	friend static void						CreateMipmaps(ZETexture2DResource* TextureResource, unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable, const ZETextureOptions* LoadingOptions = NULL);
-	friend static void						Compress(ZETexture2DResource* TextureResource, ZEBYTE* Image, unsigned int Width, unsigned int Height, unsigned int Pitch, unsigned int BPP, unsigned int Level = 0,const ZETextureOptions* UserOptions = NULL);
-
-	private:
-		ZETexture2D*						Texture;
-
-	protected:
-											ZETexture2DResource();
-		virtual 							~ZETexture2DResource();
-
-	public:
-		virtual const char*					GetResourceType() const;
-		virtual ZETextureType				GetTextureType() const;
-
-		const ZETexture2D*					GetTexture() const;
-
-		static void							CacheResource(const char* FileName);
-		static ZETexture2DResource*			LoadSharedResource(const char* FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadResource(const char* FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadResource(ZEResourceFile* ResourceFile, bool EmbededResource = true, const ZETextureOptions* UserOptions = NULL);
-
-		
-};
-
-#endif
-
+#include "ZETextureOptions.h"

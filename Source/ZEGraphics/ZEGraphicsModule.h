@@ -56,6 +56,8 @@ class ZEViewPort;
 class ZEPostProcessor;
 class ZEUIMaterial;
 class ZESimpleMaterial;
+enum ZETextureQuality;
+struct ZETextureOptions;
 
 class ZEGraphicsModule : public ZEModule
 {	
@@ -66,7 +68,7 @@ class ZEGraphicsModule : public ZEModule
 		float								NearZ, FarZ;
 		bool								VerticalSync;
 		int									ShaderQuality;
-		int									TextureQuality;
+		ZETextureQuality					TextureQuality;
 		int									ModelQuality;
 		int									ShadowQuality;
 		int									PostEffectQuality;
@@ -95,8 +97,8 @@ class ZEGraphicsModule : public ZEModule
 		bool								GetVerticalSync();
 		virtual void						SetShaderQuality(int Quality);
 		int									GetShaderQuality();
-		virtual void						SetTextureQuality(int Quality);
-		int									GetTextureQuality();
+		virtual void						SetTextureQuality(ZETextureQuality Quality);
+		ZETextureQuality					GetTextureQuality();
 		virtual void						SetModelQuality(int Quality);
 		int									GetModelQuality();
 		virtual void						SetShadowQuality(int Quality);
@@ -109,6 +111,8 @@ class ZEGraphicsModule : public ZEModule
 		int									GetAntiAliasing();
 		virtual void						SetAnisotropicFilter(int Level);
 		bool								GetAnisotropicFilter();
+
+		virtual ZETextureOptions*		GetTextureOptions();
 
 		size_t								GetCurrentFrameId();
 

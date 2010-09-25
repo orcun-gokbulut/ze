@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETexture2DResource.h
+ Zinek Engine - ZETextureOptions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,44 +34,69 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_2D_RESOURCE_H__
-#define __ZE_TEXTURE_2D_RESOURCE_H__
+#ifndef	__ZE_TEXTURE_OPTIONS_H__
+#define __ZE_TEXTURE_OPTIONS_H__
 
-#include "ZETextureResource.h"
-#include "ZEGraphicsModule.h"
-#include "ZETypes.h"
-
-class ZETexture2D;
-class ZEResourceFile;
-
-class ZETexture2DResource : public ZETextureResource
+enum ZETextureQuality
 {
-	friend static ZETexture2DResource*		LoadFromFileCache(const char *FileName);
-	friend static ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
-	friend static void						WriteToDevice(ZETexture2DResource* TextureResource, const unsigned char* SourceData, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Level, ZETextureCompressionType CompressionType);
-	friend static void						CreateMipmaps(ZETexture2DResource* TextureResource, unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable, const ZETextureOptions* LoadingOptions = NULL);
-	friend static void						Compress(ZETexture2DResource* TextureResource, ZEBYTE* Image, unsigned int Width, unsigned int Height, unsigned int Pitch, unsigned int BPP, unsigned int Level = 0,const ZETextureOptions* UserOptions = NULL);
+	ZE_TQ_ULTRA_LOW = 0,
+	ZE_TQ_VERY_LOW	= 1,
+	ZE_TQ_LOW		= 2,
+	ZE_TQ_NORMAL	= 3,
+	ZE_TQ_HIGH		= 4,
+	ZE_TQ_VERY_HIGH	= 5,
+	ZE_TQ_AUTO		= 6
+};
 
-	private:
-		ZETexture2D*						Texture;
+enum ZETextureCompressionType
+{
+	ZE_TCT_NONE		= 0,
+	ZE_TCT_DXT1		= 1,	//BC1
+	ZE_TCT_DXT3		= 2,	//BC2
+	ZE_TCT_DXT5		= 3,	//BC3
+	ZE_TCT_3DC		= 4,
+	ZE_TCT_AUTO		= 5
+};
 
-	protected:
-											ZETexture2DResource();
-		virtual 							~ZETexture2DResource();
+enum ZETextureCompressionQuality
+{
+	ZE_TCQ_LOW		= 1,
+	ZE_TCQ_NORMAL	= 2,
+	ZE_TCQ_HIGH		= 3,
+	ZE_TCQ_AUTO		= 4
+};
 
-	public:
-		virtual const char*					GetResourceType() const;
-		virtual ZETextureType				GetTextureType() const;
+enum ZETextureDownSampling
+{
+	ZE_TDS_NONE		= 0,
+	ZE_TDS_2X		= 1,
+	ZE_TDS_4X		= 2,
+	ZE_TDS_16X		= 3,
+	ZE_TDS_AUTO		= 4
+};
 
-		const ZETexture2D*					GetTexture() const;
+enum ZETextureFileCaching
+{
+	ZE_TFC_DISABLED = 0,
+	ZE_TFC_ENABLED	= 1,
+	ZE_TFC_AUTO		= 3
+};
 
-		static void							CacheResource(const char* FileName);
-		static ZETexture2DResource*			LoadSharedResource(const char* FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadResource(const char* FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadResource(ZEResourceFile* ResourceFile, bool EmbededResource = true, const ZETextureOptions* UserOptions = NULL);
+enum ZETextureMipMapping
+{
+	ZE_TMM_DISABLED = 0,
+	ZE_TMM_ENABLED	= 1,
+	ZE_TMM_AUTO		= 2
+};
 
-		
+struct ZETextureOptions
+{
+	ZETextureCompressionType		CompressionType;
+	ZETextureCompressionQuality		CompressionQuality;
+	ZETextureDownSampling			DownSample;
+	ZETextureFileCaching			FileCaching;
+	ZETextureMipMapping				MipMapping;
+	unsigned int					MaximumMipmapLevel;
 };
 
 #endif
-

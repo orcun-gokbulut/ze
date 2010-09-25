@@ -40,6 +40,7 @@
 #include "ZECore\ZEResource.h"
 #include "ZECore\ZEResourceFile.h"
 #include "ZETexture.h"
+#include "ZETextureOptions.h"
 
 class ZEFileCacheManager
 {

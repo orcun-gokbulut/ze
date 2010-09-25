@@ -37,8 +37,42 @@
 #include "ZEGraphicsModule.h"
 #include "ZECore\ZECore.h"
 #include <freeimage.h>
+#include "ZETexture2DResource.h"
 
 ZEOptionSection ZEGraphicsModule::GraphicsOptions;
+
+ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
+{
+	static ZETextureOptions VeryHigh	= {ZE_TCT_NONE, ZE_TCQ_NORMAL, ZE_TDS_NONE, ZE_TFC_DISABLED, ZE_TMM_ENABLED, 0};
+	static ZETextureOptions High		= {ZE_TCT_DXT5, ZE_TCQ_NORMAL, ZE_TDS_NONE, ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 0};
+	static ZETextureOptions Normal		= {ZE_TCT_NONE, ZE_TCQ_NORMAL, ZE_TDS_2X,   ZE_TFC_DISABLED, ZE_TMM_ENABLED, 0};
+	static ZETextureOptions Low			= {ZE_TCT_DXT5, ZE_TCQ_NORMAL, ZE_TDS_2X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 0};
+	static ZETextureOptions VeryLow		= {ZE_TCT_DXT5, ZE_TCQ_NORMAL, ZE_TDS_4X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 0};
+	static ZETextureOptions UltraLow	= {ZE_TCT_DXT5, ZE_TCQ_NORMAL, ZE_TDS_16X,  ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 0};
+
+	switch(TextureQuality)
+	{
+		case ZE_TQ_VERY_HIGH:
+			return &VeryHigh;
+			break;
+		case ZE_TQ_HIGH:
+			return &High;
+			break;
+		default:
+		case ZE_TQ_NORMAL:
+			return &Normal;
+			break;
+		case ZE_TQ_LOW:
+			return &Low;
+			break;
+		case ZE_TQ_VERY_LOW:
+			return &VeryLow;
+			break;
+		case ZE_TQ_ULTRA_LOW:
+			return &UltraLow;
+			break;
+	}
+}
 
 size_t ZEGraphicsModule::GetCurrentFrameId()
 {
@@ -57,7 +91,7 @@ void ZEGraphicsModule::BaseInitialize()
 	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilter", 0, ZEOPTIONATTRIBUTE_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilterLevel", 8, ZEOPTIONATTRIBUTE_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ShaderQuality", 5, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("TextureQuality", 5, ZEOPTIONATTRIBUTE_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("TextureQuality", ZE_TQ_LOW, ZEOPTIONATTRIBUTE_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ModelQuality", 5, ZEOPTIONATTRIBUTE_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("PostEffectQuality", 5, ZEOPTIONATTRIBUTE_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZEOPTIONATTRIBUTE_NORMAL));
@@ -141,14 +175,14 @@ int ZEGraphicsModule::GetShaderQuality()
 	return ShaderQuality;
 }
 
-void ZEGraphicsModule::SetTextureQuality(int Quality)
+void ZEGraphicsModule::SetTextureQuality(ZETextureQuality Quality)
 {
-	ShaderQuality = Quality;
+	TextureQuality = Quality;
 }
 
-int ZEGraphicsModule::GetTextureQuality()
+ZETextureQuality ZEGraphicsModule::GetTextureQuality()
 {
-	return 5;
+	return ZE_TQ_HIGH;
 }
 
 void ZEGraphicsModule::SetModelQuality(int Quality)
