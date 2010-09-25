@@ -87,6 +87,7 @@ struct ZEModelResourcePhysicalPolygon
 
 struct ZEModelResourcePhysicalShape
 {
+
 	ZEPhysicalShapeType							Type;
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;

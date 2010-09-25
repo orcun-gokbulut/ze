@@ -53,6 +53,7 @@
 ZEPhysXPhysicalRigidBody::ZEPhysXPhysicalRigidBody()
 {
 	Actor = NULL;
+	ActorDesc.setToDefault();
 	ActorDesc.userData = this;
 	ActorDesc.body = &BodyDesc;
 	ActorDesc.contactReportFlags |= NX_NOTIFY_ON_START_TOUCH;
@@ -62,6 +63,8 @@ ZEPhysXPhysicalRigidBody::ZEPhysXPhysicalRigidBody()
 
 	BodyDesc.mass = 1.0f;
 	BodyDesc.flags &= ~NX_BF_KINEMATIC;
+
+	PhysicalWorld = NULL;
 }
 
 ZEPhysXPhysicalRigidBody::~ZEPhysXPhysicalRigidBody()
@@ -479,6 +482,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 			case ZE_PST_BOX:
 			{
 				NxBoxShapeDesc BoxShapeDesc;
+				BoxShapeDesc.setToDefault();
 
 				BoxShapeDesc.userData = CurrentShape;
 				BoxShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
@@ -498,7 +502,8 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 				zeWarningAssert(Scale.x != Scale.y && Scale.y != Scale.z, "Sphere physical shape does not support non uniform scaling. Only scale.x parameter will be used.");
 
 				NxSphereShapeDesc SphereShapeDesc;
-				
+				SphereShapeDesc.setToDefault();
+
 				SphereShapeDesc.userData = CurrentShape;
 				SphereShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
 				SphereShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
@@ -514,6 +519,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 				zeWarningAssert(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Capsule physical shape does not support scaling. Shape did not scaled.");
 				
 				NxCapsuleShapeDesc CapsuleShapeDesc;
+				CapsuleShapeDesc.setToDefault();
 
 				CapsuleShapeDesc.userData = CurrentShape;
 				CapsuleShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());

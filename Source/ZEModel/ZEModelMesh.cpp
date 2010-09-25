@@ -262,7 +262,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 
 		PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
 		PhysicalBody->SetEnabled(MeshResource->PhysicalBody.Enabled);
-		PhysicalBody->SetEnabled(MeshResource->PhysicalBody.Mass);
+		PhysicalBody->SetMass(MeshResource->PhysicalBody.Mass);
 		PhysicalBody->SetLinearDamping(MeshResource->PhysicalBody.LinearDamping);
 		PhysicalBody->SetAngularDamping(MeshResource->PhysicalBody.AngularDamping);
 		PhysicalBody->SetPosition(MeshResource->PhysicalBody.Position);

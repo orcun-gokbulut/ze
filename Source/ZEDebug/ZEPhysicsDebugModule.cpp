@@ -171,6 +171,7 @@ bool ZEPhysicsDebugModule::Initialize()
 
 		World->AddPhysicalObject(PhysicalMesh);
 
+		/*
 		ZEPhysicalBoxShape BoxShape;
 		ZEPhysicalRigidBody* TestBody = ZEPhysicalRigidBody::CreateInstance();
 		TestBody->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
@@ -181,6 +182,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		TestBody->AddPhysicalShape(&BoxShape);
 		TestBody->SetKinematic(true);
 		World->AddPhysicalObject(TestBody);
+		*/
 
 		/*Model = new ZEModel();
 		Model->SetModelResource(ZEModelResource::LoadResource("test.zeModel"));
@@ -223,7 +225,7 @@ bool ZEPhysicsDebugModule::Initialize()
 
 		gPhysicsSDK->getFoundationSDK().getRemoteDebugger()->connect ("localhost", 5425);
 
-
+		/*
 		ZEPhysicalCapsuleShape Object1Shape;
 		ZEPhysicalRigidBody* Object1 = ZEPhysicalRigidBody::CreateInstance();
 		Object1 = ZEPhysicalRigidBody::CreateInstance();
@@ -295,7 +297,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		Joint2->SetYMotion(ZE_PJMOTION_LOCKED);
 		Joint2->SetZMotion(ZE_PJMOTION_LOCKED);
 
-		World->AddPhysicalObject(Joint2);
+		World->AddPhysicalObject(Joint2);*/
 
 	}
 

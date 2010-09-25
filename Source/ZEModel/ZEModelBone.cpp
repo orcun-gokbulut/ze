@@ -35,6 +35,7 @@
 
 #include "ZEModelBone.h"
 #include "ZEModel.h"
+#include "ZEGame/ZEScene.h"
 #include <stdio.h>
 #include "ZECore\ZECore.h"
 
@@ -289,17 +290,77 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 	UpdateModelBoundingBox = true;
 	UpdateWorldBoundingBox = true;
 
+	if(PhysicalBody == NULL)
+	{
+		PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
+
+		PhysicalBody->SetEnabled(BoneResource->PhysicalBody.Enabled);
+		PhysicalBody->SetMass(BoneResource->PhysicalBody.Mass);
+		PhysicalBody->SetLinearDamping(BoneResource->PhysicalBody.LinearDamping);
+		PhysicalBody->SetAngularDamping(BoneResource->PhysicalBody.AngularDamping);
+		PhysicalBody->SetPosition(this->GetWorldPosition());
+		PhysicalBody->SetRotation(this->GetWorldRotation());
+		PhysicalBody->SetMassCenterPosition(BoneResource->PhysicalBody.MassCenter);
+
+		for (size_t I = 0; I < BoneResource->PhysicalBody.Shapes.GetCount(); I++)
+		{
+			const ZEModelResourcePhysicalShape* Shape = &BoneResource->PhysicalBody.Shapes[I];
+			switch(Shape->Type)
+			{
+				case ZE_PST_BOX:
+				{
+					ZEPhysicalBoxShape BoxShape;
+					BoxShape.SetWidth(Shape->Box.Width);
+					BoxShape.SetHeight(Shape->Box.Height);
+					BoxShape.SetLength(Shape->Box.Length);
+					BoxShape.SetPosition(Shape->Position);
+					BoxShape.SetRotation(Shape->Rotation);
+					PhysicalBody->AddPhysicalShape(&BoxShape);
+					break;
+				}
+
+				case ZE_PST_SPHERE:
+				{
+					ZEPhysicalSphereShape SphereShape;
+					SphereShape.SetRadius(Shape->Sphere.Radius);
+					SphereShape.SetPosition(Shape->Position);
+					SphereShape.SetRotation(Shape->Rotation);
+					PhysicalBody->AddPhysicalShape(&SphereShape);
+					break;
+				}
+				case ZE_PST_CYLINDER:
+				{
+					// Problematic
+					break;
+				}
+
+				case ZE_PST_CAPSULE:
+				{
+					ZEPhysicalCapsuleShape* CapsuleShape = new ZEPhysicalCapsuleShape();
+					CapsuleShape->SetRadius(Shape->Capsule.Radius);
+					CapsuleShape->SetHeight(Shape->Capsule.Height);
+					CapsuleShape->SetPosition(Shape->Position);
+					CapsuleShape->SetRotation(Shape->Rotation);
+					PhysicalBody->AddPhysicalShape(CapsuleShape);
+					break;
+				}
+
+				case ZE_PST_CONVEX:
+					// Problematic
+					break;
+			}
+		}
+		PhysicalBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+		PhysicalBody->Initialize();
+
+	}
+
 	if (BoneResource->PhysicalJoint.JointType != ZE_PJT_NONE && BoneResource->ParentBone != -1)
 	{
 		if (PhysicalJoint == NULL)
 			PhysicalJoint = ZEPhysicalJoint::CreateInstance();
 		else
 			PhysicalJoint->Deinitialize();
-
-		if (BoneResource->ParentBone == -1)
-		{
-			return;
-		}
 
 		PhysicalJoint->SetBodyA(ParentBone->PhysicalBody);
 		PhysicalJoint->SetBodyB(PhysicalBody);
@@ -320,7 +381,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 			PhysicalJoint->SetBreakForce(BoneResource->PhysicalJoint.BreakForce);
 			PhysicalJoint->SetBreakTorque(BoneResource->PhysicalJoint.BreakTorque);
 		}
-
+		
 		if(BoneResource->PhysicalJoint.XMotion || BoneResource->PhysicalJoint.YMotion || BoneResource->PhysicalJoint.ZMotion)
 		{
 			PhysicalJoint->SetLinearLimitValue(BoneResource->PhysicalJoint.LinearLimitValue);
@@ -363,36 +424,55 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->SetMotorTargetVelocity(BoneResource->PhysicalJoint.MotorTargetVelocity);
 		PhysicalJoint->SetMotorTargetAngularVelocity(BoneResource->PhysicalJoint.MotorTargetAngularVelocity);
 
+		if(!BoneResource->PhysicalJoint.LinearXMotor)
+		{
 		PhysicalJoint->SetLinearXMotor(BoneResource->PhysicalJoint.LinearXMotor);
 		PhysicalJoint->SetLinearXMotorForce(BoneResource->PhysicalJoint.LinearXMotorForce);
 		PhysicalJoint->SetLinearXMotorSpring(BoneResource->PhysicalJoint.LinearXMotorSpring);
 		PhysicalJoint->SetLinearXMotorDamper(BoneResource->PhysicalJoint.LinearXMotorDamper);
+		}
 
+		if(!BoneResource->PhysicalJoint.LinearYMotor)
+		{
 		PhysicalJoint->SetLinearYMotor(BoneResource->PhysicalJoint.LinearYMotor);
 		PhysicalJoint->SetLinearYMotorForce(BoneResource->PhysicalJoint.LinearYMotorForce);
 		PhysicalJoint->SetLinearYMotorSpring(BoneResource->PhysicalJoint.LinearYMotorSpring);
 		PhysicalJoint->SetLinearYMotorDamper(BoneResource->PhysicalJoint.LinearYMotorDamper);
+		}
 
+		if(!BoneResource->PhysicalJoint.LinearZMotor)
+		{
 		PhysicalJoint->SetLinearZMotor(BoneResource->PhysicalJoint.LinearZMotor);
 		PhysicalJoint->SetLinearZMotorForce(BoneResource->PhysicalJoint.LinearZMotorForce);
 		PhysicalJoint->SetLinearZMotorSpring(BoneResource->PhysicalJoint.LinearZMotorSpring);
 		PhysicalJoint->SetLinearZMotorDamper(BoneResource->PhysicalJoint.LinearZMotorDamper);
+		}
 
+		if(!BoneResource->PhysicalJoint.AngularSwingMotor)
+		{
 		PhysicalJoint->SetAngularSwingMotor(BoneResource->PhysicalJoint.AngularSwingMotor);
 		PhysicalJoint->SetAngularSwingMotorForce(BoneResource->PhysicalJoint.AngularSwingMotorForce);
 		PhysicalJoint->SetAngularSwingMotorSpring(BoneResource->PhysicalJoint.AngularSwingMotorSpring);
 		PhysicalJoint->SetAngularSwingMotorDamper(BoneResource->PhysicalJoint.AngularSwingMotorDamper);
+		}
 
+		if(!BoneResource->PhysicalJoint.AngularTwistMotor)
+		{
 		PhysicalJoint->SetAngularTwistMotor(BoneResource->PhysicalJoint.AngularTwistMotor);
 		PhysicalJoint->SetAngularTwistMotorForce(BoneResource->PhysicalJoint.AngularTwistMotorForce);
 		PhysicalJoint->SetAngularTwistMotorSpring(BoneResource->PhysicalJoint.AngularTwistMotorSpring);
 		PhysicalJoint->SetAngularTwistMotorDamper(BoneResource->PhysicalJoint.AngularTwistMotorDamper);
+		}
 
+		if(!BoneResource->PhysicalJoint.AngularSlerpMotor)
+		{
 		PhysicalJoint->SetAngularSlerpMotor(BoneResource->PhysicalJoint.AngularSlerpMotor);
 		PhysicalJoint->SetAngularSlerpMotorForce(BoneResource->PhysicalJoint.AngularSlerpMotorForce);
 		PhysicalJoint->SetAngularSlerpMotorSpring(BoneResource->PhysicalJoint.AngularSlerpMotorSpring);
 		PhysicalJoint->SetAngularSlerpMotorDamper(BoneResource->PhysicalJoint.AngularSlerpMotorDamper);
+		}
 
+		PhysicalJoint->SetPhysicalWorld(zeScene->GetPhysicalWorld());
 		PhysicalJoint->Initialize();
 	}
 	Owner->UpdateBoneTransforms();

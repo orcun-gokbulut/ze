@@ -205,17 +205,6 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 	return true;
 }
 
-enum ZEPhysicalShapeType_
-{
-	_ZE_PST_PLANE           = 0,
-	_ZE_PST_BOX				= 1,
-	_ZE_PST_SPHERE			= 2,
-	_ZE_PST_CAPSULE			= 3,
-	_ZE_PST_CYLINDER		= 4,
-	_ZE_PST_CONVEX			= 5,
-	_ZE_PST_TRIMESH         = 6
-};
-
 static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile* ResourceFile)
 {
 	ZEModelFilePhysicalBodyChunk BodyChunk;
@@ -260,31 +249,31 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResour
 
 		switch (Shape->Type)
 		{
-			case _ZE_PST_BOX:
+			case ZE_MFPST_BOX:
 			{
 				Shape->Box.Width		= 0.5 * ShapeChunk.Box.Width;
 				Shape->Box.Height		= 0.5 * ShapeChunk.Box.Height;
 				Shape->Box.Length		= 0.5 * ShapeChunk.Box.Length;
 				break;
 			}
-			case _ZE_PST_SPHERE:
+			case ZE_MFPST_SPHERE:
 			{
 				Shape->Sphere.Radius	= ShapeChunk.Sphere.Radius;
 				break;
 			}
-			case _ZE_PST_CAPSULE:
+			case ZE_MFPST_CAPSULE:
 			{
 				Shape->Capsule.Height	= ShapeChunk.Capsule.Height;
 				Shape->Capsule.Radius	= ShapeChunk.Capsule.Radius;
 				break;
 			}
-			case _ZE_PST_CYLINDER:
+			case ZE_MFPST_CYLINDER:
 			{
 				Shape->Cylinder.Height	= ShapeChunk.Cylinder.Height;
 				Shape->Cylinder.Radius	= ShapeChunk.Cylinder.Radius;
 				break;
 			}
-			case _ZE_PST_CONVEX:
+			case ZE_MFPST_CONVEX:
 			{
 				ZEDWORD ChunkId;
 				ResourceFile->Read(&ChunkId, sizeof(ZEDWORD), 1);

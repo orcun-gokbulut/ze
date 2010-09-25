@@ -101,6 +101,7 @@ enum ZEPhysicalJointVisualizations
 
 enum ZEPhysicalJointMotorType
 {
+	ZE_PJMT_NONE				= 0,
 	ZE_PJMT_POSITION			= 1<<0,
 	ZE_PJMT_VELOCITY			= 1<<1,
 };
