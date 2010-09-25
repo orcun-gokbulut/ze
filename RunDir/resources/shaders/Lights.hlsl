@@ -207,19 +207,18 @@ float4 PjLPSMain(PjLPSInput Input) : COLOR0
 	float3 LightDisplacement = LightPositionParam - Position;
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
-	if (dot(LightDirection, LightDirectionParam) < LightFOVParam)
-	{
-		float4 TextureLookup = mul(float4(Position, 1.0f), LightProjectionMatrixParam);
-		float3 ProjLightColor = /*tex2Dproj(ProjectionMap, TextureLookup) */  LightColorParam;
+
+	float4 TextureLookup = mul(float4(Position, 1.0f), LightProjectionMatrixParam);
+	float3 ProjLightColor = tex2Dproj(ProjectionMap, TextureLookup) * LightColorParam;
+	
+	float ViewDirection = normalize(-Position);
+	float3 HalfVector = normalize(LightDirection + ViewDirection);
 		
-		float ViewDirection = normalize(-Position);
-		float3 HalfVector = normalize(LightDirection + ViewDirection);
-			
-		float AngularAttenuation = saturate(dot(LightDirection, Normal));
-		float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
-		Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensityParam * ProjLightColor;
-		Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
-	}
+	float AngularAttenuation = saturate(dot(LightDirection, Normal));
+	float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
+	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensityParam * ProjLightColor;
+	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
+	
 	return Output;
 }
 

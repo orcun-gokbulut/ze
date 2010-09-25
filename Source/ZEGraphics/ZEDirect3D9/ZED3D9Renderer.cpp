@@ -335,7 +335,7 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	// Transformation
 	ZEMatrix4x4 WorldViewProjTransform, WorldTransform;
 	float TanFovRange = tanf(Light->GetFOV() * 0.5f) * Light->GetRange();
-	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), Light->GetWorldRotation(), ZEVector3(TanFovRange * Light->GetAspectRatio(), TanFovRange, Light->GetRange()));
+	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), Light->GetWorldRotation(), ZEVector3(TanFovRange * Light->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, Light->GetRange()));
 	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
 

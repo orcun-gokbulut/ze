@@ -126,10 +126,11 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	ProjectiveLight0 = new ZEProjectiveLight();
 	ProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 2.0f));
+	ProjectiveLight0->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3::UnitY));
 	ProjectiveLight0->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
 	ProjectiveLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-	ProjectiveLight0->SetAttenuation(0.0f, 0.0f, 1.0f);
-	ProjectiveLight0->SetIntensity(5.0f);
+	ProjectiveLight0->SetAttenuation(0.1f, 0.0f, 1.0f);
+	ProjectiveLight0->SetIntensity(40.0f);
 	ProjectiveLight0->SetRange(55.0f);
 	ProjectiveLight0->SetCastsShadow(false);
 	ProjectiveLight0->SetFOV(ZE_PI_2);
@@ -145,10 +146,10 @@ bool ZEGraphicsDebugModule::Initialize()
 	//Scene->AddEntity(DirectionalLight0);
 
 	PointLight1->SetEnabled(true);
-	PointLight2->SetEnabled(true);
-	PointLight3->SetEnabled(true);
-	PointLight4->SetEnabled(true);
-	PointLight5->SetEnabled(true);
+	PointLight2->SetEnabled(false);
+	PointLight3->SetEnabled(false);
+	PointLight4->SetEnabled(false);
+	PointLight5->SetEnabled(false);
 	OmniProjectiveLight0->SetEnabled(true);
 	ProjectiveLight0->SetEnabled(true);
 	DirectionalLight0->SetEnabled(false);
