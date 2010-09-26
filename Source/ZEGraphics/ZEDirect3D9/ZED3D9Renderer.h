@@ -58,6 +58,8 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 	friend class ZED3D9ShadowRenderer;
 
 	private:
+		ZEDWORD								LightStencilMaskValue;
+
 		ZED3D9ViewPort*						ViewPort;
 
 		LPDIRECT3DTEXTURE9					GBuffer1;

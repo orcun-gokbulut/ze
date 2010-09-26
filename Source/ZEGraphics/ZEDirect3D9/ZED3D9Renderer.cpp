@@ -365,6 +365,29 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
 	GetDevice()->SetVertexShader(LightningComponents.ProjectiveLightVS->GetVertexShader());
 	GetDevice()->SetPixelShader(LightningComponents.ProjectiveLightPS->GetPixelShader());
+	
+
+	// Stencil Test
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATER);
+	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
+	GetDevice()->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_REPLACE);
+	GetDevice()->SetRenderState(D3DRS_STENCILREF, LightStencilMaskValue);
+	GetDevice()->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
+	GetDevice()->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);
+	LightStencilMaskValue++;
+
+	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 6); // Cone 2
+	
+	// Draw Light
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFF);
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_NOTEQUAL);
+	GetDevice()->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
+	
 
 	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
@@ -372,19 +395,10 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	GetDevice()->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)Light->GetProjectionTexture())->Texture);
-/*
-	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
-	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
-	GetDevice()->SetRenderState(D3DRS_STENCILZFAIL, D3D REPLACE);
-	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
-	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
-	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
-*/
 
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 6); // Cone 2
 
-	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 6); // Cone 2
-
+	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 	zeProfilerEnd();
 }
 
@@ -840,7 +854,9 @@ void ZED3D9Renderer::Render(float ElaspedTime)
 	GetDevice()->SetRenderTarget(1, GBuffer2);*/
 
 	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00, 1.0f, 0x00);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x00, 1.0f, 0x00);
+	
+	LightStencilMaskValue = 1;
 
 	GetDevice()->BeginScene();
 
