@@ -68,6 +68,15 @@ class ZERectangle
 		void					SetPosition(const ZEVector2& Position);
 		const ZEVector2&		GetPosition() const;
 
+		void					SetSize(const ZEVector2& Size);
+		ZEVector2				GetSize();
+
+		void					SetLeft(float Left);
+		float					GetLeft();
+
+		void					SetTop(float Top);
+		float					GetTop();
+
 		void					SetWidth(float Width);
 		float					GetWidth() const;
 	

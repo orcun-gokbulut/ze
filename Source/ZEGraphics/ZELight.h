@@ -97,9 +97,67 @@ class ZELight : public ZEComponent
 		virtual const ZEViewVolume&		GetViewVolume() = 0;
 
 										ZELight();
-};	
+};
+
+/*
+ZE_POST_PROCESSOR_START(Meta)
+	<zinek>
+		<meta> 
+			<class name="ZELight" parent="ZEComponent">
+
+			<description>Base Light Type</description>
+
+				<property name="CastsShadows" type="boolean" autogetset="yes" description="Enables or disables shadow casting for this light."/>
+
+				<property name="Color" type="ZEVector3" autogetset="yes" description="Color of the light."/>
+
+				<property name="Intensity" type="ZEVector3" autogetset="yes" description="Intensity(light amount emmited from light) of the light."/>
+
+				<property name="Range" type="float" autogetset="yes" description="Maximum effect range of the light."/>
+
+				<property name="Attenuation" type="ZEVector3" autogetset="yes" description="Light amount decrease according to distance."/>
+
+				<method name="SetRange">
+				<parameter name="NewRange" type="float"/>
+				</method>
+
+				<method name="GetRange" returntype="float">
+				</method>
+
+				<method name="SetColor">
+				<parameter name="NewColor" type="ZEVector3"/>
+				</method>
+
+				<method name="GetColor" returntype="ZEVector3">
+				</method>
+
+				<method name="SetIntensity">
+				<parameter name="NewIntensity" type="integer"/>
+				</method>
+
+				<method name="GetIntensity" returntype="integer">
+				</method>
+
+				<method name="SetAttenuation">
+				<parameter name="DistanceSquare" type="float"/>
+				<parameter name="Distance" type="float"/>
+				<parameter name="Constant" type="float"/>
+				</method>
+
+				<method name="GetAttenuation" returntype="ZEVector3">
+				</method>
+
+				<method name="SetCastsShadows">
+				<parameter name="NewValue" type="boolean"/>
+				</method>
+
+				<method name="GetCastsShadows" returntype="boolean">
+				</method>
+
+			</class>
+		</meta>
+	</zinek>
+ZE_POST_PROCESSOR_END()
+*/
+
 #endif
-
-
-
-

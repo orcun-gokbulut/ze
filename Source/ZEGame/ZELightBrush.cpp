@@ -80,7 +80,7 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 	{
 		case ZE_LT_POINT:
 			Light = new ZEPointLight();
-			Canvas.AddSphere(2.0f, 8, 8);
+			Canvas.AddSphere(0.1f, 8, 8);
 			break;
 
 		case ZE_LT_DIRECTIONAL:

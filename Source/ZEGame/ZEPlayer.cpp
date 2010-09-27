@@ -75,6 +75,7 @@ ZEListener* ZEPlayer::GetListener()
 void ZEPlayer::SetFOV(float FOV)
 {
 	this->FOV = FOV;
+	Camera->SetFOV(FOV);
 }
 
 float ZEPlayer::GetFOV()

@@ -155,6 +155,7 @@ class ZEClass
 	private:
 		ZEClass*								Owner;
 		ZEAnimationController*					AnimationController;
+		ZEArray<ZERunTimeProperty>				CustomProperties;
 
 	public:
 		virtual ZEClassDescription*				GetClassDescription() const = 0;
@@ -171,6 +172,11 @@ class ZEClass
 
 		virtual bool							GetProperty(int PropertyId, ZEVariant& Value) const = 0;
 		bool									GetProperty(const char* PropertyName, ZEVariant& Value) const;
+
+		bool									AddCustomProperty(ZERunTimeProperty Property);
+		bool									RemoveCustomProperty(const char* PropertyName);
+
+		const ZEArray<ZERunTimeProperty>*		GetCustomProperties() const;
 
 		// Containers
 		virtual int								GetContainerId(const char* ContainerName) const = 0;

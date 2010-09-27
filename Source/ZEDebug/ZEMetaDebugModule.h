@@ -50,9 +50,14 @@ class ZEMetaDebugModule : public ZEDebugModule
 		ZELightBrush*			Light;
 		ZECanvasBrush*			Canvas;
 
+		bool					IfEnteredFlag;
+		float					TotalTime;
+
 	public:
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
+
+		virtual void			Process(float ElapsedTime);
 
 								ZEMetaDebugModule();
 		virtual					~ZEMetaDebugModule();

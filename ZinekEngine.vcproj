@@ -1140,6 +1140,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEGame\ZEDGrid.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZEDGrid.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEGame\ZEDrawParameters.cpp"
 				>
 			</File>

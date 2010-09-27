@@ -37,6 +37,7 @@
 #include <string.h>
 #include "ZECore\ZEError.h"
 #include "ZEAnimation.h"
+#include "ZECore\ZEConsole.h"
 
 #define ZE_CLSF_CLASS_CHUNKID ((ZEDWORD)'CLAS')
 
@@ -77,6 +78,26 @@ bool ZEClass::SetProperty(const char* PropertyName, const ZEVariant& Value)
     if (PropertyId != -1)
         return SetProperty(PropertyId, Value);
 
+	else
+	{
+		unsigned int Hash = 0;
+		size_t	NameLength = strlen(PropertyName);
+
+		for (size_t I = 0; I < NameLength ; I++)
+		{
+			Hash += PropertyName[I];
+		}
+
+		for (int I = 0; I < CustomProperties.GetCount(); I++)
+		{
+			if (CustomProperties[I].Hash == Hash && Value.GetType() == CustomProperties[I].Type)
+			{
+				CustomProperties[I].Value = Value;
+				return true;
+			}
+		}
+	}
+
 	return false;
 }
 
@@ -86,8 +107,77 @@ bool ZEClass::GetProperty(const char* PropertyName, ZEVariant& Value) const
 
     if (PropertyId != -1)
         return GetProperty(PropertyId, Value);
+	
+	else
+	{
+		unsigned int Hash = 0;
+		size_t	NameLength = strlen(PropertyName);
+
+		for (size_t I = 0; I < NameLength ; I++)
+		{
+			Hash += PropertyName[I];
+		}
+
+		for (int I = 0; I < CustomProperties.GetCount(); I++)
+		{
+			if (CustomProperties[I].Hash == Hash)
+			{
+				Value = CustomProperties[I].Value;
+				return true;
+			}
+		}
+	}
 
     return false;
+}
+
+bool ZEClass::AddCustomProperty(ZERunTimeProperty Property)
+{
+	for (int I = 0; I < CustomProperties.GetCount(); I++)
+	{
+		if (GetProperty(Property.Name, ZEVariant()))
+		{
+			zeLog("Meta", "Property Already exists, Property name : %s", Property.Name);
+			return false;
+		}		
+	}
+
+	Property.Hash = 0;
+	size_t NameLength = strlen(Property.Name);
+
+	for(size_t I = 0; I < NameLength; I++)
+		Property.Hash += Property.Name[I];
+
+	CustomProperties.Add(Property);
+
+	return true;
+}
+
+bool ZEClass::RemoveCustomProperty(const char* PropertyName)
+{
+	unsigned int Hash = 0;
+	size_t	NameLength = strlen(PropertyName);
+
+	for (size_t I = 0; I < NameLength ; I++)
+	{
+		Hash += PropertyName[I];
+	}
+
+	for (int I = 0; I < CustomProperties.GetCount(); I++)
+	{
+		if (CustomProperties[I].Hash == Hash)
+		{
+			CustomProperties.DeleteAt(I);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+const ZEArray<ZERunTimeProperty>* ZEClass::GetCustomProperties() const
+{
+	return &CustomProperties;
 }
 
 bool ZEClass::AddToContainer(const char* ContainerName, ZEClass* Item)
@@ -247,6 +337,7 @@ ZEAnimationController* ZEClass::GetAnimationController()
 ZEClass::ZEClass()
 {
 	AnimationController = NULL;
+	CustomProperties.SetCount(0);
 }
 
 ZEClass::~ZEClass()

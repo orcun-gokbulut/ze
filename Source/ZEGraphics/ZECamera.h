@@ -122,6 +122,48 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="FarZ" type="float" autogetset="yes" description="The farest distance that camera can show"/>
 			<property name="FOV" type="float" autogetset="yes" description="Field of view"/>
 			<property name="AspectRatio" type="float" autogetset="yes" description="Width vs Height aspect ratio"/>
+
+			<method name="SetNearZ">
+			<parameter name="NearZ" type="float"/>
+			</method>
+
+			<method name="GetNearZ" returntype="float">
+			</method>
+
+			<method name="SetFarZ">
+			<parameter name="FarZ" type="float"/>
+			</method>
+
+			<method name="GetFarZ" returntype="float">
+			</method>
+
+			<method name="SetFOV">
+			<parameter name="FOV" type="float"/>
+			</method>
+
+			<method name="GetFOV" returntype="float">
+			</method>
+
+			<method name="SetAspectRatio">
+			<parameter name="NewAspectRatio" type="float"/>
+			</method>
+
+			<method name="GetAspectRatio" returntype="float">
+			</method>
+
+			<method name="GetViewTransform" returntype="ZEMatrix4x4">
+			</method>
+
+			<method name="GetProjectionTransform" returntype="ZEMatrix4x4">
+			</method>
+
+			<method name="GetViewProjectionTransform" returntype="ZEMatrix4x4">
+			</method>
+
+			<method name="SetLocalRotation">
+			<parameter name="NewRotation" type="ZEQuaternion"/>
+			</method>
+
 		</class>
 	</meta>
 </zinek>

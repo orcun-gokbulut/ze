@@ -63,12 +63,43 @@ void ZERectangle::SetPosition(const ZEVector2& Position)
 {
 	ZEVector2 Temp;
 	ZEVector2::Substution(Temp, Position, LeftUp);	
-	ZEVector2::Substution(RightDown, RightDown, Temp);
+	ZEVector2::Add(RightDown, RightDown, Temp);
+	LeftUp = Position;
 }
 
 const ZEVector2& ZERectangle::GetPosition() const
 {
 	return LeftUp;
+}
+
+void ZERectangle::SetSize(const ZEVector2& Size)
+{
+	ZEVector2::Add(RightDown, LeftUp, Size);
+}
+
+ZEVector2 ZERectangle::GetSize()
+{
+	return RightDown - LeftUp;
+}
+
+void ZERectangle::SetLeft(float Left)
+{
+	LeftUp.x = Left;
+}
+
+float ZERectangle::GetLeft()
+{
+	return LeftUp.x;
+}
+
+void ZERectangle::SetTop(float Top)
+{
+	LeftUp.y = Top;
+}
+
+float ZERectangle::GetTop()
+{
+	return LeftUp.y;
 }
 
 void ZERectangle::SetWidth(float Width)
@@ -79,6 +110,11 @@ void ZERectangle::SetWidth(float Width)
 float ZERectangle::GetWidth() const
 {
 	return RightDown.x - LeftUp.x;
+}
+
+void ZERectangle::SetHeight(float Height)
+{
+	RightDown.y = LeftUp.y + Height;
 }
 
 float ZERectangle::GetHeight() const

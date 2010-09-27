@@ -58,32 +58,41 @@ typedef unsigned int ZEPropertyAccess;
 
 struct ZEPropertyEnumuratorItem
 {
-	const char*									Name;
-	int											Value;
+	const char*						Name;
+	int								Value;
 };
 
 struct ZEPropertyEnumurator
 {
-	const char*									Name;
-	ZEPropertyEnumuratorItem*					Items;
-	size_t										ItemCount;
+	const char*						Name;
+	ZEPropertyEnumuratorItem*		Items;
+	size_t							ItemCount;
 };
 
 
 
 struct ZEPropertyDescription
 {
-	const char*									Name;
-	const char*									Description;
-	const char*									GroupName;
-	ZEPropertyAccess							Access;
-	bool										Visibility;
+	const char*						Name;
+	const char*						Description;
+	const char*						GroupName;
+	ZEPropertyAccess				Access;
+	bool							Visibility;
 
-	ZEVariantType								Type;
-	bool										Animatable;
-	ZEPropertySemantic							Semantic;
-	void*										SemanticProperties;
-	ZEPropertyEnumurator*						Enumurators;
+	ZEVariantType					Type;
+	bool							Animatable;
+	ZEPropertySemantic				Semantic;
+	void*							SemanticProperties;
+	ZEPropertyEnumurator*			Enumurators;
+};
+
+struct ZERunTimeProperty
+{
+	const char*						Name;
+	ZEVariantType					Type;
+	ZEVariant						Value;
+	unsigned int					Hash;
+	ZEPropertySemantic				Semantic;
 };
 
 #endif
