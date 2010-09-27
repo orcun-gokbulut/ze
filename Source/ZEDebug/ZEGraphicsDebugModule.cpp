@@ -73,7 +73,10 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	ZECanvasBrush* Brush = new ZECanvasBrush();
 	Brush->Canvas.AddPyramid(10, 10, 10);
-	Brush->Material = ZESimpleMaterial::CreateInstance();
+	ZESimpleMaterial* Material = ZESimpleMaterial::CreateInstance();
+	Brush->Material = Material;
+	Material->SetTwoSided(true);
+	Material->SetMaterialCOlr
 	Brush->UpdateBoundingVolumes();
 	Scene->AddEntity(Brush);
 
