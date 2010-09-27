@@ -37,16 +37,24 @@
 #include "ZEUIRenderer.h"
 #include "ZEUIControl.h"
 #include "ZECore\ZEError.h"
+#include "ZEGraphics\ZEFixedMaterial.h"
 
 ZEUIManager::ZEUIManager() 
 {
 	UIRenderer = NULL;
+	OldMousePosition = ZEVector2::Zero;
+	LastInteractedControl = NULL;
 }
 
 ZEUIManager::~ZEUIManager() 
 {
 	if (UIRenderer != NULL)
 		UIRenderer->Destroy();
+}
+
+void ZEUIManager::SetActiveCursor(ZEUICursorControl* Cursor)
+{
+	this->Cursor = Cursor;
 }
 
 void ZEUIManager::AddControl(ZEUIControl* Control)
@@ -68,6 +76,8 @@ ZEArray<ZEUIControl*>& ZEUIManager::GetControls()
 
 #include "ZEUITextControl.h"
 #include "ZEFontResource.h"
+#include "ZEUICursorControl.h"
+#include "ZEUIButtonControl.h"
 
 bool ZEUIManager::Initialize()
 {
@@ -90,7 +100,14 @@ bool ZEUIManager::Initialize()
 	TestControl->SetFontSize(ZEVector2::One);
 	TestControl->SetFont(ZEFontResource::LoadResource("OldEnglish.zeFont"));
 
+	ZEUICursorControl* NewCursor = new ZEUICursorControl();
+
+	ZEUIButtonControl* Button = new ZEUIButtonControl();
+
 	AddControl(TestControl);
+	AddControl(NewCursor);
+	SetActiveCursor(NewCursor);
+	AddControl(Button);
 
 	return true;
 }
@@ -103,6 +120,28 @@ void ZEUIManager::Deinitialize()
 
 void ZEUIManager::ProcessEvents()
 {
+	ZEVector2 CursorPosition = Cursor->GetPosition();
+
+	if (OldMousePosition != CursorPosition)
+	{
+		for (int I = 0; I < Controls.GetCount(); I++)
+		{
+			if(ZERectangle::BoundingTest(Controls[I]->GetVisibleRectangle(), CursorPosition))
+			{
+				Controls[I]->MouseHovered(CursorPosition);
+				LastInteractedControl = Controls[I];
+			}
+
+			else if (LastInteractedControl != NULL)
+			{
+				((ZEFixedMaterial*)(((ZEUIButtonControl*)(LastInteractedControl))->Button.Material))->SetAmbientColor(ZEVector3::One);
+			}
+
+			
+		}
+	}
+
+	OldMousePosition = CursorPosition;
 }
 
 void ZEUIManager::Render(ZERenderer* Renderer)
@@ -112,6 +151,15 @@ void ZEUIManager::Render(ZERenderer* Renderer)
 		Controls[I]->Draw(UIRenderer);
 
 	UIRenderer->Render(Renderer);
+}
+
+void ZEUIManager::Tick(float ElapsedTime)
+{
+	for (int I = 0; I < Controls.GetCount(); I++)
+		if (Controls[I]->GetEnabled())
+			Controls[I]->Tick(ElapsedTime);
+
+	ProcessEvents();
 }
 
 void ZEUIManager::Destroy()

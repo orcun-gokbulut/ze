@@ -114,45 +114,45 @@ const ZEString& ZEUIControl::GetName()
 void ZEUIControl::SetPosition(const ZEVector2& Position)
 {
 	DirtyVisibleRectangle = true;
-	Rectangle.LeftUp = Position;
+	Rectangle.SetPosition(Position);
 }
 
 const ZEVector2& ZEUIControl::GetPosition()
 {
-	return Rectangle.LeftUp;
+	return Rectangle.GetPosition();
 }
 
 void ZEUIControl::SetSize(const ZEVector2& Size)
 {
 	DirtyVisibleRectangle = true;
-	ZEVector2::Add(Rectangle.RightDown, Rectangle.LeftUp, Size);
+	Rectangle.SetSize(Size);
 }
 
 ZEVector2 ZEUIControl::GetSize()
 {
-	return Rectangle.RightDown - Rectangle.LeftUp;
+	return Rectangle.GetSize();
 }
 
 void ZEUIControl::SetWidth(float Width)
 {
 	DirtyVisibleRectangle = true;
-	Rectangle.RightDown.x = Rectangle.LeftUp.x + Width;
+	Rectangle.SetWidth(Width);
 }
 
 float ZEUIControl::GetWidth()
 {
-	return Rectangle.RightDown.x - Rectangle.LeftUp.x;
+	return Rectangle.GetWidth();
 }
 
 void ZEUIControl::SetHeight(float Height)
 {
 	DirtyVisibleRectangle = true;
-	Rectangle.RightDown.y = Rectangle.LeftUp.y + Height;
+	Rectangle.SetHeight(Height);
 }
 
 float ZEUIControl::GetHeight()
 {
-	return Rectangle.RightDown.y - Rectangle.LeftUp.y;
+	return Rectangle.GetHeight();
 }
 
 bool ZEUIControl::IsVisible()
@@ -335,6 +335,11 @@ void ZEUIControl::Draw(ZEUIRenderer* Renderer)
 			ChildControls[I]->Draw(Renderer);
 }
 
+void ZEUIControl::Tick(float ElapsedTime)
+{
+
+}
+
 ZEUIControl::ZEUIControl()
 {
 	ParentControl = NULL;
@@ -343,6 +348,8 @@ ZEUIControl::ZEUIControl()
 	BackgroundTexture = NULL;
 	HoverState = false;
 	FocusState = false;
+	Rectangle.LeftUp = ZEVector2::Zero;
+	Rectangle.RightDown = ZEVector2::One;
 }
 
 ZEUIControl::~ZEUIControl()

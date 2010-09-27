@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEUIButtonControl.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,51 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#include "ZEUIButtonControl.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
+#include "zeui/ZEUIRenderer.h"
+#include "ZEGraphics/ZETexture2DResource.h"
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
-
-class ZEUIControl;
-class ZEUICursorControl;
-
-class ZEUIManager
+void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
 {
-	private:
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		ZEUIControl*				LastInteractedControl;
+	ZEUIControl::Draw(Renderer);
+	Renderer->AddRectangle(Button);
 
-		ZEVector2					OldMousePosition;
+}
 
-									ZEUIManager();
-									~ZEUIManager();
+void ZEUIButtonControl::Tick(float ElapsedTime)
+{
+	if (DirtyVisibleRectangle)
+	{
+		Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
+		Button.Positions.RightDown = GetVisibleRectangle().RightDown;
+	}
+}
 
-	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
+void ZEUIButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+{
+	ZEUIControl::MouseButtonPressed(Button, MousePosition);
+	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitY);
+}
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+void ZEUIButtonControl::MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+{
+	ZEUIControl::MouseButtonReleased(Button, MousePosition);
+	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::One);
+}
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+void ZEUIButtonControl::MouseHovered(const ZEVector2& MousePosition)
+{
+	ZEUIControl::MouseHovered(MousePosition);
+	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitX);
+}
 
-		void						Destroy();
+ZEUIButtonControl::ZEUIButtonControl()
+{
+	Button.Material = ZEFixedMaterial::CreateInstance();
+	((ZEFixedMaterial*)(Button.Material))->SetZero();
+	((ZEFixedMaterial*)(Button.Material))->SetAmbientEnabled(true);
+	((ZEFixedMaterial*)(Button.Material))->SetAmbientColor(ZEVector3::One);
+	((ZEFixedMaterial*)(Button.Material))->UpdateMaterial();
 
-		static ZEUIManager*			CreateInstance();
-};
+	SetHeight(25);
+	SetWidth(80);
+	SetPosition(ZEVector2(200,200));
 
-#endif
+	Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
+	Button.Positions.RightDown = GetVisibleRectangle().RightDown;
+}
 
+ZEUIButtonControl::~ZEUIButtonControl()
+{
 
-
-
+}

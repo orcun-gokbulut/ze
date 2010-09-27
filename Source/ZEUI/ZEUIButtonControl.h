@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEUIButtonControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,50 +34,36 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#ifndef __ZE_UI_BUTTON_CONTROL__
+#define __ZE_UI_BUTTON_CONTROL__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
+#include "zeui/ZEUIControl.h"
+#include "zeui/ZEUIRectangle.h"
 
-class ZEUIControl;
-class ZEUICursorControl;
+class ZETexture2D;
 
-class ZEUIManager
+class ZEUIButtonControl : public ZEUIControl
 {
+	friend class ZEUIManager;
+
 	private:
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		ZEUIControl*				LastInteractedControl;
+		
+		ZEUIRectangle		Button;
 
-		ZEVector2					OldMousePosition;
+	protected:
 
-									ZEUIManager();
-									~ZEUIManager();
+		virtual void 		MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		virtual void 		MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		virtual void 		MouseHovered(const ZEVector2& MousePosition);
 
 	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+		virtual void		Draw(ZEUIRenderer* Renderer);
+		virtual void		Tick(float ElapsedTime);
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+							ZEUIButtonControl();
+							~ZEUIButtonControl();
 
-		void						Destroy();
-
-		static ZEUIManager*			CreateInstance();
 };
 
 #endif
-
-
-
-

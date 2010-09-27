@@ -61,6 +61,8 @@ class ZEUIRenderer;
 class ZETexture2D;
 class ZEUIControl
 {
+	friend class ZEUIManager;
+
 	private:
 		ZEString						Name;
 
@@ -80,7 +82,6 @@ class ZEUIControl
 		bool							Visibility;
 		bool							Enabled;
 		int								ZOrder;
-		bool							DirtyVisibleRectangle;
 
 
 		ZEUIEventMouseClicked			MouseClickedEvent;
@@ -96,6 +97,9 @@ class ZEUIControl
 		ZEUIEventFocusLost				FocusLostEvent;
 
 	protected:
+
+		bool							DirtyVisibleRectangle;
+
 		void							SetParent(ZEUIControl *ParentName);
 
 		const ZEArray<ZEUIControl*>&	GetChildControls();			
@@ -170,6 +174,7 @@ class ZEUIControl
 		void 			 				SetFocusLostEvent(const ZEUIEventFocusLost& Event);
 
 		virtual void					Draw(ZEUIRenderer* Renderer);
+		virtual void					Tick(float ElapsedTime);
 
 										ZEUIControl();
 										~ZEUIControl();
