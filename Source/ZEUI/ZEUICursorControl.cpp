@@ -97,26 +97,32 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 
 			case ACTIONID_LEFT_PRESS:
 				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::UnitX);
+				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_LEFT;
 				break;
 
 			case ACTIONID_RIGHT_PRESS:
 				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::UnitY);
+				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_RIGHT;
 				break;
 
 			case ACTIONID_MIDDLE_PRESS:
 				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::UnitZ);
+				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_MIDDLE;
 				break;
 
 			case ACTIONID_LEFT_RELEASE:
 				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::One);
+				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
 				break;
 
 			case ACTIONID_RIGHT_RELEASE:
 				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::One);
+				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
 				break;
 
 			case ACTIONID_MIDDLE_RELEASE:
 				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::One);
+				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
 				break;
 
 			case ACTIONID_SCROLL_UP:
@@ -151,6 +157,11 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 	{
 		SetPosition(ZEVector2(GetPosition().x, 0));
 	}
+}
+
+ZEUIMouseKey ZEUICursorControl::GetCurrentButton()
+{
+	return CurentButton;
 }
 
 ZEUICursorControl::ZEUICursorControl()
@@ -198,6 +209,8 @@ ZEUICursorControl::ZEUICursorControl()
 
 
 	SetEnabled(true);
+
+	CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
 	
 }
 

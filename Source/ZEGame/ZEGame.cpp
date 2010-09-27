@@ -230,6 +230,8 @@ void ZEGame::Tick(float ElapsedTime)
 	
 	((ZEUITextControl*)UIManager->GetControls()[0])->SetText(Buffer);
 	Scene->Tick(ElapsedTime);
+
+	UIManager->Tick(ElapsedTime);
 }
  
 #include "ZEPlayer.h"

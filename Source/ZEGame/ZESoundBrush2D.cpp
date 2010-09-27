@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.cpp
+ Zinek Engine - ZESoundBrush2D.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,77 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUIButtonControl.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
-#include "zeui/ZEUIRenderer.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZESoundBrush2D.h"
+#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGame/ZEDrawParameters.h"
 
-void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
+void ZESoundBrush2D::Draw(ZEDrawParameters* DrawParameters)
 {
-	ZEUIControl::Draw(Renderer);
-	Renderer->AddRectangle(Button);
-
-}
-
-void ZEUIButtonControl::Tick(float ElapsedTime)
-{
-	if (DirtyVisibleRectangle)
+	if (SoundSource != NULL)
 	{
-		Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
-		Button.Positions.RightDown = GetVisibleRectangle().RightDown;
+		RenderOrder.WorldMatrix = SoundSource->GetWorldTransform();
+		DrawParameters->Renderer->AddToRenderList(&RenderOrder);
 	}
 }
 
-void ZEUIButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+ZEDWORD ZESoundBrush2D::GetDrawFlags() const
 {
-	ZEUIControl::MouseButtonPressed(Button, MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitY);
+	return ZE_DF_DRAW;
 }
 
-void ZEUIButtonControl::MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+ZESoundSource* ZESoundBrush2D::GetSoundSource()
 {
-	ZEUIControl::MouseButtonReleased(Button, MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::One);
+	return SoundSource;
 }
 
-void ZEUIButtonControl::MouseEnterEvent(const ZEVector2& MousePosition)
+void ZESoundBrush2D::SetSoundResource(ZESoundResource* SoundResource)
 {
-	ZEUIControl::MouseEnterEvent(MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitX);
+	SoundSource->SetSoundResource(SoundResource);
 }
 
-void ZEUIButtonControl::MouseLeaveEvent(const ZEVector2& MousePosition)
+ZESoundResource* ZESoundBrush2D::GetSoundResource()
 {
-	ZEUIControl::MouseLeaveEvent(MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::One);
+	return SoundSource->GetSoundResource();
 }
 
-ZEUIButtonControl::ZEUIButtonControl()
+bool ZESoundBrush2D::Initialize()
 {
-	Button.Material = ZEFixedMaterial::CreateInstance();
-	((ZEFixedMaterial*)(Button.Material))->SetZero();
-	((ZEFixedMaterial*)(Button.Material))->SetAmbientEnabled(true);
-	((ZEFixedMaterial*)(Button.Material))->SetAmbientColor(ZEVector3::One);
-	((ZEFixedMaterial*)(Button.Material))->UpdateMaterial();
-
-	SetHeight(25);
-	SetWidth(80);
-	SetPosition(ZEVector2(200,200));
-
-	Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
-	Button.Positions.RightDown = GetVisibleRectangle().RightDown;
+	return true;
+}
+void ZESoundBrush2D::Deinitialize()
+{
+	if (SoundSource != NULL)
+	{
+		UnregisterComponent(SoundSource);
+		SoundSource->Destroy();
+		SoundSource = NULL;
+	}
 }
 
-ZEUIButtonControl::~ZEUIButtonControl()
+ZESoundBrush2D::ZESoundBrush2D()
 {
+	Material = ZEFixedMaterial::CreateInstance();
+	Material->SetZero();
+	Material->SetAmbientEnabled(true);
+	Material->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
+	Material->SetAmbientFactor(1.0f);
+	this->SoundSource = ZESoundSource::CreateInstance();
+	Canvas.AddSphere(0.1f, 16, 16);
 
+	SoundSource->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+
+	RenderOrder.SetZero();
+	RenderOrder.Material = Material;
+	RenderOrder.WorldMatrix = GetWorldTransform();
+	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
+	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	RenderOrder.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
+
+	RenderOrder.VertexBuffer = Canvas.CreateStaticVertexBuffer();
+	RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
+
+	SetBoundingVolumeMechanism(ZE_BVM_USE_BOTH);
+
+	RegisterComponent(SoundSource);
 }

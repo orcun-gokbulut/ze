@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.cpp
+ Zinek Engine - ZESoundBrush2D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,43 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUIButtonControl.h"
+#pragma once
+#ifndef __ZE_SOUND_BRUSH_2D_H__
+#define __ZE_SOUND_BRUSH_2D_H__
+
+#include "ZEMeta/ZEClass.h"
+#include "ZECompoundEntity.h"
+#include "ZESound/ZESoundSource.h"
+#include "ZESound/ZESoundResource.h"
+#include "ZEGraphics/ZERenderOrder.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
-#include "zeui/ZEUIRenderer.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEGraphics/ZECanvas.h"
 
-void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
+class ZERLLight;
+
+class ZESoundBrush2D : public ZECompoundEntity
 {
-	ZEUIControl::Draw(Renderer);
-	Renderer->AddRectangle(Button);
+	private:
 
-}
+		ZESoundSource*		SoundSource;
 
-void ZEUIButtonControl::Tick(float ElapsedTime)
-{
-	if (DirtyVisibleRectangle)
-	{
-		Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
-		Button.Positions.RightDown = GetVisibleRectangle().RightDown;
-	}
-}
+		ZERenderOrder		RenderOrder;
+		ZEFixedMaterial*	Material;
+		ZECanvas			Canvas;
 
-void ZEUIButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseButtonPressed(Button, MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitY);
-}
+	public:
 
-void ZEUIButtonControl::MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseButtonReleased(Button, MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::One);
-}
+		ZESoundSource*		GetSoundSource();
 
-void ZEUIButtonControl::MouseEnterEvent(const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseEnterEvent(MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitX);
-}
+		void				SetSoundResource(ZESoundResource* SoundResource);
+		ZESoundResource*	GetSoundResource();
 
-void ZEUIButtonControl::MouseLeaveEvent(const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseLeaveEvent(MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::One);
-}
+		virtual bool		Initialize();
+		virtual void		Deinitialize();
+		virtual ZEDWORD		GetDrawFlags() const;
+		virtual void		Draw(ZEDrawParameters* DrawParameters);
 
-ZEUIButtonControl::ZEUIButtonControl()
-{
-	Button.Material = ZEFixedMaterial::CreateInstance();
-	((ZEFixedMaterial*)(Button.Material))->SetZero();
-	((ZEFixedMaterial*)(Button.Material))->SetAmbientEnabled(true);
-	((ZEFixedMaterial*)(Button.Material))->SetAmbientColor(ZEVector3::One);
-	((ZEFixedMaterial*)(Button.Material))->UpdateMaterial();
+							ZESoundBrush2D();
+};
 
-	SetHeight(25);
-	SetWidth(80);
-	SetPosition(ZEVector2(200,200));
-
-	Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
-	Button.Positions.RightDown = GetVisibleRectangle().RightDown;
-}
-
-ZEUIButtonControl::~ZEUIButtonControl()
-{
-
-}
+#endif

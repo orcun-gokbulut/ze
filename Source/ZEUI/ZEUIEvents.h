@@ -53,6 +53,7 @@ typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseCl
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseDoubleClicked;
 typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseButtonPressed;
 typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseButtonReleased;
+typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseHovered;
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseEntered;
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseLeft;
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseMoved;

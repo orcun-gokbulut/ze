@@ -86,15 +86,16 @@ class ZEUIControl
 
 		ZEUIEventMouseClicked			MouseClickedEvent;
 		ZEUIEventMouseDoubleClicked		MouseDoubleClickedEvent;
-		ZEUIEventMouseButtonPressed		MouseButtonPressedEvent;
-		ZEUIEventMouseButtonReleased	MouseButtonReleasedEvent;
-		ZEUIEventMouseEntered			MouseEnteredEvent;
-		ZEUIEventMouseLeft				MouseLeftEvent;
+		ZEUIEventMouseButtonPressed		MouseButtonPressedEvent;//
+		ZEUIEventMouseButtonReleased	MouseButtonReleasedEvent;//
+		ZEUIEventMouseHovered			MouseHoveredEvent;//
+		ZEUIEventMouseEntered			MouseEnteredEvent;//
+		ZEUIEventMouseLeft				MouseLeftEvent;//
 		ZEUIEventMouseMoved				MouseMovedEvent;
-		ZEUIEventKeyPressed				KeyPressedEvent;
-		ZEUIEventKeyReleased			KeyReleasedEvent;
-		ZEUIEventFocusGained			FocusGainedEvent;
-		ZEUIEventFocusLost				FocusLostEvent;
+		ZEUIEventKeyPressed				KeyPressedEvent;//
+		ZEUIEventKeyReleased			KeyReleasedEvent;//
+		ZEUIEventFocusGained			FocusGainedEvent;//
+		ZEUIEventFocusLost				FocusLostEvent;//
 
 	protected:
 
@@ -115,6 +116,8 @@ class ZEUIControl
 		virtual void					MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 		virtual void					MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 		virtual void					MouseHovered(const ZEVector2& MousePosition);
+		virtual	void					MouseEnterEvent(const ZEVector2& MousePosition);
+		virtual	void					MouseLeaveEvent(const ZEVector2& MousePosition);
 
 		virtual void					FocusLost();
 		virtual void					FocusGained();

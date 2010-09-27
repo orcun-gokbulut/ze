@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.cpp
+ Zinek Engine - ZEIUCheckBoxControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUIButtonControl.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
-#include "zeui/ZEUIRenderer.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+/*#pragma once
+#ifndef __ZE_UI_CHECK_BOX_CONTROL__
+#define __ZE_UI_CHECK_BOX_CONTROL__
 
-void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
+#include "zeui/ZEUIControl.h"
+#include "zeui/ZEUIRectangle.h"
+
+class ZEUICheckBoxControl : public ZEUIControl
 {
-	ZEUIControl::Draw(Renderer);
-	Renderer->AddRectangle(Button);
+	friend class ZEUIManager;
 
-}
+private:
 
-void ZEUIButtonControl::Tick(float ElapsedTime)
-{
-	if (DirtyVisibleRectangle)
-	{
-		Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
-		Button.Positions.RightDown = GetVisibleRectangle().RightDown;
-	}
-}
+	ZEUIRectangle		CheckBox;
+	ZEUITextControl		Label;
 
-void ZEUIButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseButtonPressed(Button, MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitY);
-}
+protected:
 
-void ZEUIButtonControl::MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseButtonReleased(Button, MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::One);
-}
+	virtual void 		MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+	virtual void 		MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+	virtual void 		MouseEnterEvent(const ZEVector2& MousePosition);
+	virtual void 		MouseLeaveEvent(const ZEVector2& MousePosition);
 
-void ZEUIButtonControl::MouseEnterEvent(const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseEnterEvent(MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitX);
-}
+public:
 
-void ZEUIButtonControl::MouseLeaveEvent(const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseLeaveEvent(MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::One);
-}
+	virtual void		Draw(ZEUIRenderer* Renderer);
+	virtual void		Tick(float ElapsedTime);
 
-ZEUIButtonControl::ZEUIButtonControl()
-{
-	Button.Material = ZEFixedMaterial::CreateInstance();
-	((ZEFixedMaterial*)(Button.Material))->SetZero();
-	((ZEFixedMaterial*)(Button.Material))->SetAmbientEnabled(true);
-	((ZEFixedMaterial*)(Button.Material))->SetAmbientColor(ZEVector3::One);
-	((ZEFixedMaterial*)(Button.Material))->UpdateMaterial();
+						ZEUICheckBoxControl();
+						~ZEUICheckBoxControl();
 
-	SetHeight(25);
-	SetWidth(80);
-	SetPosition(ZEVector2(200,200));
+};
 
-	Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
-	Button.Positions.RightDown = GetVisibleRectangle().RightDown;
-}
-
-ZEUIButtonControl::~ZEUIButtonControl()
-{
-
-}
+#endif*/

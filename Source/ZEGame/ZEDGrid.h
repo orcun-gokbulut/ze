@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.cpp
+ Zinek Engine - ZEDGrid.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUIButtonControl.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
-#include "zeui/ZEUIRenderer.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#pragma once
+#ifndef __ZED_GRID_H__
+#define __ZED_GRID_H__
 
-void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
+#include "ZECanvasBrush.h"
+
+class ZEScene;
+
+class ZEDGrid
 {
-	ZEUIControl::Draw(Renderer);
-	Renderer->AddRectangle(Button);
+	private:
 
-}
+		ZECanvasBrush*				Grid;
+		int							GridSpacing;
+		int							MajorLineSpacing;
+		int							GridSize;
+		ZEScene*					Scene;
 
-void ZEUIButtonControl::Tick(float ElapsedTime)
-{
-	if (DirtyVisibleRectangle)
-	{
-		Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
-		Button.Positions.RightDown = GetVisibleRectangle().RightDown;
-	}
-}
+		void						GenerateGrid();
 
-void ZEUIButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseButtonPressed(Button, MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitY);
-}
+	public:
 
-void ZEUIButtonControl::MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseButtonReleased(Button, MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::One);
-}
+		int							GetGridSpacing() const;
+		void						SetGridSpacing(int Spacing);
+		int							GetMajorLineSpacing() const;
+		void						SetMajorLineSpacing(int MajorLineSpacing);
+		int							GetGridSize() const;
+		void						SetGridSize(int GridSize);
+		bool						GetVisible();
+		void						SetVisible(bool Visibility);
 
-void ZEUIButtonControl::MouseEnterEvent(const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseEnterEvent(MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitX);
-}
+									ZEDGrid(ZEScene* Scene, int Spacing = 1, int MajorLineSpacing = 5, int GridSize = 50);
 
-void ZEUIButtonControl::MouseLeaveEvent(const ZEVector2& MousePosition)
-{
-	ZEUIControl::MouseLeaveEvent(MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::One);
-}
+};
 
-ZEUIButtonControl::ZEUIButtonControl()
-{
-	Button.Material = ZEFixedMaterial::CreateInstance();
-	((ZEFixedMaterial*)(Button.Material))->SetZero();
-	((ZEFixedMaterial*)(Button.Material))->SetAmbientEnabled(true);
-	((ZEFixedMaterial*)(Button.Material))->SetAmbientColor(ZEVector3::One);
-	((ZEFixedMaterial*)(Button.Material))->UpdateMaterial();
-
-	SetHeight(25);
-	SetWidth(80);
-	SetPosition(ZEVector2(200,200));
-
-	Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
-	Button.Positions.RightDown = GetVisibleRectangle().RightDown;
-}
-
-ZEUIButtonControl::~ZEUIButtonControl()
-{
-
-}
+#endif

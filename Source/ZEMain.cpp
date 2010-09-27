@@ -47,6 +47,7 @@
 #include "ZEDebug\ZEPhysicsDebugModule.h"
 #include "ZEDebug\ZESoundDebugModule.h"
 #include "ZEDebug\ZEMetaDebugModule.h"
+#include "ZEDebug\ZEGUIDebugModule.h"
 
 extern HINSTANCE ApplicationInstance;
 
@@ -62,6 +63,9 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	ZESoundDebugModule SoundDebugComponent;
 	//zeCore->SetDebugComponent(&SoundDebugComponent);
 
+	ZEGUIDebugModule GUIDebugComponent;
+	//zeCore->SetDebugComponent(&SoundDebugComponent);
+
 /*	ZEMetaDebugComponent MetaDebugComponent;
 	zeCore->SetDebugComponent(&MetaDebugComponent);
 */
@@ -71,7 +75,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_SOUND));
 	zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_INPUT));
 	zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_PHYSICS));
-	zeCore->SetDebugComponent(&SoundDebugComponent);
+	zeCore->SetDebugComponent(&GUIDebugComponent);
 	ZEConsoleWindow ConsoleWindow;
 	zeCore->GetConsole()->SetConsoleInterface(&ConsoleWindow);
 	zeCore->GetWindow()->SetWindowType(zeCore->GetOptions()->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean() ? ZE_WT_FULLSCREEN : ZE_WT_RESIZABLE);

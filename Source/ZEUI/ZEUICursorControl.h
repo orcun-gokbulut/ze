@@ -50,10 +50,14 @@ class ZEUICursorControl : public ZEUIControl
 		ZEUIRectangle	Cursor;
 		ZEInputMap		InputMap;
 
+		ZEUIMouseKey	CurentButton;
+
 	public:
 
 		virtual void	Draw(ZEUIRenderer* Renderer);
 		virtual void	Tick(float ElapsedTime);
+
+		ZEUIMouseKey	GetCurrentButton();
 
 						ZEUICursorControl();
 						~ZEUICursorControl();

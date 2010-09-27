@@ -43,7 +43,8 @@ ZEUIManager::ZEUIManager()
 {
 	UIRenderer = NULL;
 	OldMousePosition = ZEVector2::Zero;
-	LastInteractedControl = NULL;
+	LastHoveredControl = NULL;
+	LastPressedControl = NULL;
 }
 
 ZEUIManager::~ZEUIManager() 
@@ -100,14 +101,9 @@ bool ZEUIManager::Initialize()
 	TestControl->SetFontSize(ZEVector2::One);
 	TestControl->SetFont(ZEFontResource::LoadResource("OldEnglish.zeFont"));
 
-	ZEUICursorControl* NewCursor = new ZEUICursorControl();
-
-	ZEUIButtonControl* Button = new ZEUIButtonControl();
+	PressedButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
 
 	AddControl(TestControl);
-	AddControl(NewCursor);
-	SetActiveCursor(NewCursor);
-	AddControl(Button);
 
 	return true;
 }
@@ -122,26 +118,96 @@ void ZEUIManager::ProcessEvents()
 {
 	ZEVector2 CursorPosition = Cursor->GetPosition();
 
+	/************************************************************************/
+	/*                          HOVER ENTER AND LEAVE                       */
+	/************************************************************************/
 	if (OldMousePosition != CursorPosition)
 	{
 		for (int I = 0; I < Controls.GetCount(); I++)
 		{
-			if(ZERectangle::BoundingTest(Controls[I]->GetVisibleRectangle(), CursorPosition))
+			if (LastHoveredControl != NULL && ZERectangle::BoundingTest(LastHoveredControl->GetVisibleRectangle(), CursorPosition) == false)
 			{
-				Controls[I]->MouseHovered(CursorPosition);
-				LastInteractedControl = Controls[I];
+				LastHoveredControl->MouseLeaveEvent(CursorPosition);
 			}
 
-			else if (LastInteractedControl != NULL)
+			ZEUIControl* Reciever = NULL;
+
+			if (Controls[I] == Cursor)
+				continue;
+
+			for (int I = 0; I < Controls.GetCount(); I++)
 			{
-				((ZEFixedMaterial*)(((ZEUIButtonControl*)(LastInteractedControl))->Button.Material))->SetAmbientColor(ZEVector3::One);
+				if (ZERectangle::BoundingTest(Controls[I]->GetVisibleRectangle(), CursorPosition))
+				{
+					if (Controls[I]->GetChildControls().GetCount() == 0)
+					{
+						Reciever = Controls[I];
+					}
+
+					else
+						Reciever = FindEventReciever(Controls[I]);
+				}
 			}
 
-			
+			if (Reciever != NULL && Reciever != LastHoveredControl)
+			{
+				Reciever->MouseEnterEvent(CursorPosition);
+				LastHoveredControl = Reciever;
+			}
 		}
 	}
+	/************************************************************************/
+	/*                          HOVER ENTER AND LEAVE                       */
+	/************************************************************************/
+
+	/************************************************************************/
+	/*                         MOUSE PRESS AND RELEASE EVENT                */
+	/************************************************************************/
+
+	if (Cursor->GetCurrentButton() != ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE)
+	{
+		LastHoveredControl->MouseButtonPressed(Cursor->GetCurrentButton(), CursorPosition);
+		LastPressedControl = LastHoveredControl;
+	}
+
+	if (LastPressedControl != NULL && Cursor->GetCurrentButton() == ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE)
+	{
+		LastPressedControl->MouseButtonReleased(PressedButton, CursorPosition);
+
+		if (ZERectangle::BoundingTest(LastPressedControl->GetVisibleRectangle(), CursorPosition))
+		{
+			LastPressedControl->MouseEnterEvent(CursorPosition);
+			LastHoveredControl = LastPressedControl;
+		}
+
+		LastPressedControl = NULL;
+	}
+
+	/************************************************************************/
+	/*                         MOUSE PRESS RELEASE EVENT                    */
+	/************************************************************************/
 
 	OldMousePosition = CursorPosition;
+}
+
+ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
+{
+	for (int I = 0; I < ParentControl->GetChildControls().GetCount(); I++)
+	{
+		if (ZERectangle::BoundingTest(ParentControl->GetVisibleRectangle(), Cursor->GetPosition()))
+		{
+			if (ParentControl->GetChildControls().GetItem(I)->GetChildControls().GetCount() == 0)
+			{
+				return ParentControl->GetChildControls()[I];
+			}
+
+			else
+				FindEventReciever(ParentControl->GetChildControls()[I]);
+		}
+
+		else 
+			return  NULL;
+	}
 }
 
 void ZEUIManager::Render(ZERenderer* Renderer)

@@ -62,14 +62,24 @@ void ZEUIControl::MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& Mous
 
 void ZEUIControl::MouseHovered(const ZEVector2& MousePosition)
 {
-	if (HoverState)
-	{
-		if (MouseMovedEvent != NULL)
-			MouseMovedEvent(MousePosition);
-	}
-	else
-		if (MouseEnteredEvent != NULL)
-			MouseEnteredEvent(MousePosition);
+	if (MouseHoveredEvent != NULL)
+		MouseHoveredEvent(MousePosition);
+}
+
+void ZEUIControl::MouseEnterEvent(const ZEVector2& MousePosition)
+{
+	if (MouseEnteredEvent != NULL)
+		MouseEnteredEvent(MousePosition);
+	
+	HoverState = true;
+}
+
+void ZEUIControl::MouseLeaveEvent(const ZEVector2& MousePosition)
+{
+	if (MouseLeftEvent != NULL)
+		MouseLeftEvent(MousePosition);
+
+	HoverState = false;
 }
 
 void ZEUIControl::FocusLost()
@@ -89,6 +99,11 @@ void ZEUIControl::FocusGained()
 void ZEUIControl::SetParent(ZEUIControl* Parent)
 {
 	this->ParentControl = Parent; 
+}
+
+const ZEArray<ZEUIControl*>& ZEUIControl::GetChildControls()
+{
+	return ChildControls;
 }
 
 ZEUIControl* ZEUIControl::GetParentControl()

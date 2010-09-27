@@ -209,7 +209,6 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Paused" value="ZE_SSS_PAUSED"/>
 				</enumurator>
 			</property>
-			<container name="Effects" type="ZESoundEffect"/>
 		</class>
 	</meta>
 </zinek>

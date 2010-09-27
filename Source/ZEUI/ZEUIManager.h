@@ -39,6 +39,7 @@
 
 #include "ZEDS\ZEArray.h"
 #include "ZEUIRenderer.h"
+#include "ZEUIEvents.h"
 
 class ZEUIControl;
 class ZEUICursorControl;
@@ -49,9 +50,15 @@ class ZEUIManager
 		ZEArray<ZEUIControl*>		Controls;
 		ZEUIRenderer*				UIRenderer;
 		ZEUICursorControl*			Cursor;
-		ZEUIControl*				LastInteractedControl;
+		
+		ZEUIControl*				LastHoveredControl;
+		ZEUIControl*				LastPressedControl;
+
+		ZEUIMouseKey				PressedButton;
 
 		ZEVector2					OldMousePosition;
+
+		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
 
 									ZEUIManager();
 									~ZEUIManager();
