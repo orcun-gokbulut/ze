@@ -42,24 +42,27 @@
 #include "ZEGraphics\ZERenderOrder.h"
 
 class ZECamera;
+class ZED3D9VertexShader;
+class ZED3D9PixelShader;
 
 class ZED3D9SimpleMaterial : public ZESimpleMaterial, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 
 	private:
-		static LPDIRECT3DVERTEXSHADER9	VertexShader;
-		static LPDIRECT3DPIXELSHADER9	PixelShader;
+		ZED3D9VertexShader*				VertexShader;
+		ZED3D9PixelShader*				PixelShader;
+		ZED3D9PixelShader*				TexturedPixelShader;
+
+		void							CreateShaders();
+		void							ReleaseShaders();
 
 	protected:
 										ZED3D9SimpleMaterial(){}
 										~ZED3D9SimpleMaterial(){}
 
 	public:
-		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const;
-
-		virtual bool					SetupPreLightning() const;
-		virtual size_t					DoPreLightningPass() const;
+		virtual bool					SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
 
 		virtual void					UpdateMaterial();
 

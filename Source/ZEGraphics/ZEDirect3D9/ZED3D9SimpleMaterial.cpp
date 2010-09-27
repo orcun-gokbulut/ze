@@ -38,14 +38,32 @@
 #include "ZEGraphics\ZERenderOrder.h"
 #include "ZEGraphics\ZECamera.h"
 #include "ZECore\ZEResourceFile.h"
+#include "ZED3D9Texture2D.h"
+#include "ZED3D9Shader.h"
 #include <D3D9.h>
 
-LPDIRECT3DVERTEXSHADER9 ZED3D9SimpleMaterial::VertexShader = NULL;
-LPDIRECT3DPIXELSHADER9 ZED3D9SimpleMaterial::PixelShader = NULL;
-
-bool ZED3D9SimpleMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const 
+void ZED3D9SimpleMaterial::CreateShaders()
 {
+	ReleaseShaders();
+
+	VertexShader = ZED3D9VertexShader::CreateShader("SimpleMaterial.hlsl", "VSMain", 0, "vs_2_0");
+	PixelShader = ZED3D9PixelShader::CreateShader("SimpleMaterial.hlsl", "PSMain", 0, "ps_2_0");
+	TexturedPixelShader = ZED3D9PixelShader::CreateShader("SimpleMaterial.hlsl", "TexturedPSMain", 1, "ps_2_0");
+}
+
+void ZED3D9SimpleMaterial::ReleaseShaders()
+{
+	ZED3D_RELEASE(VertexShader);
+	ZED3D_RELEASE(PixelShader);
+	ZED3D_RELEASE(TexturedPixelShader);
+}
+
+bool ZED3D9SimpleMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const 
+{
+	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9SimpleMaterial*)this)->UpdateMaterial();
+
+	ZECamera* Camera = Renderer->GetCamera();
 
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
@@ -59,23 +77,21 @@ bool ZED3D9SimpleMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* C
 		ViewProjMatrix = ZEMatrix4x4::Identity;
 
 	ZEMatrix4x4 WorldViewProjMatrix;
+	ZEMatrix4x4 WorldViewMatrix;
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+	{
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewProjMatrix);
+		ZEMatrix4x4::Multiply(WorldViewMatrix, RenderOrder->WorldMatrix, Camera->GetViewTransform());
+	}
 	else
+	{
 		WorldViewProjMatrix = ViewProjMatrix;
-		
-	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
+		WorldViewMatrix = Camera->GetViewTransform();
+	}
 
-	if (RenderOrder->Flags == ZE_ROF_ENABLE_WORLD_TRANSFORM)
-	{
-		GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);
-		GetDevice()->SetVertexShaderConstantF(8, (float*)&RenderOrder->WorldMatrix, 4);
-	}
-	else
-	{
-		GetDevice()->SetVertexShaderConstantF(4, (float*)&ZEMatrix4x4::Identity, 4);
-		GetDevice()->SetVertexShaderConstantF(8, (float*)&ZEMatrix4x4::Identity, 4);
-	}
+	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewMatrix, 4);
+	GetDevice()->SetVertexShaderConstantF(8, (float*)&WorldViewMatrix, 4);
 
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
@@ -88,19 +104,6 @@ bool ZED3D9SimpleMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* C
 	}
 	else
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
-	
-	// Disable Culling
-	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-
-	// Setup Wireframe
-	if (WireFrame)
-		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-	else
-		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
-	
-	// Setup Alpha Blending
-	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	
 	// Setup ZCulling
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
@@ -111,53 +114,85 @@ bool ZED3D9SimpleMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* C
 			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 		else
 			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-
 	}
 	else
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 
-	// Setup Point Size
-	GetDevice()->SetRenderState(D3DRS_POINTSPRITEENABLE, TRUE);
-	GetDevice()->SetRenderState(D3DRS_POINTSCALEENABLE, TRUE);
+	// Setup Backface Culling
+	if (TwoSided)
+		GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	else
+		GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+
+	// Setup Wireframe
+	if (Wireframe)
+		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
+	else
+		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	
-	float PointSize = 4.0f;
-	float PointScaleB = 1.0f;
-	GetDevice()->SetRenderState(D3DRS_POINTSIZE, *((DWORD*)&PointSize));
-	GetDevice()->SetRenderState(D3DRS_POINTSCALE_B, *((DWORD*)&PointScaleB));
+	// Setup Transparancy
+	if (TransparancyMode != ZE_MTM_NONE)
+	{
+		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+		GetDevice()->SetRenderState(D3DRS_ALPHAREF, TransparancyCullLimit);
+		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
+
+		switch(TransparancyMode)
+		{
+			case ZE_MTM_ADDAPTIVE:
+				GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+				GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+				GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+				break;
+			case ZE_MTM_SUBTRACTIVE:
+				GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+				GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_SUBTRACT);
+				GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+				break;
+			case ZE_MTM_REGULAR:
+				GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+				GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+				GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+			case ZE_MTM_ALPHACULL:
+				break;
+		}
+
+	}
+	else
+	{
+		GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	}
 
 	// Setup Shaders
-	GetDevice()->SetVertexShader(VertexShader);
-	GetDevice()->SetPixelShader(PixelShader);
+	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
+
+	if (Texture != NULL)
+	{
+		//GetDevice()->SetTextureStageState(0, TextureAddressModeU, TextureAddressModeV);
+		GetDevice()->SetPixelShader(TexturedPixelShader->GetPixelShader());
+		GetDevice()->SetTexture(0, ((ZED3D9Texture2D*)Texture)->Texture);
+	}
+	else
+	{
+		GetDevice()->SetPixelShader(PixelShader->GetPixelShader());
+		GetDevice()->SetTexture(0, NULL);
+	}
 
 	return true;
-}
-
-bool ZED3D9SimpleMaterial::SetupPreLightning() const 
-{
-	return true;
-}
-
-size_t ZED3D9SimpleMaterial::DoPreLightningPass() const 
-{
-	return 1;
 }
 
 void ZED3D9SimpleMaterial::UpdateMaterial()
 {
-	if (VertexShader == NULL)
-	{
-		char SourceBuffer[65536];
-		ZEResourceFile::ReadTextFile("Shaders\\SimpleVertexShader.vs", SourceBuffer, 65536);
-		ZED3D9CommonTools::CompileVertexShader(&VertexShader, SourceBuffer, "Simple Material Vertex Shader", "vs_2_0", NULL);
-
-		ZEResourceFile::ReadTextFile("Shaders\\SimplePixelShader.ps", SourceBuffer, 65536);
-		ZED3D9CommonTools::CompilePixelShader(&PixelShader, SourceBuffer, "Simple Material Solid Pixel Shader", "ps_2_0", NULL);
-	}
+	CreateShaders();
 }
 
 void ZED3D9SimpleMaterial::Release()
 {
-
+	ReleaseShaders();
 }
 
 

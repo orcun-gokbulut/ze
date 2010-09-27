@@ -370,7 +370,7 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	// Stencil Test
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
-	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATER);
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATEREQUAL);
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
 	GetDevice()->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_REPLACE);

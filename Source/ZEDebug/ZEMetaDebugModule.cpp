@@ -97,7 +97,7 @@ bool ZEMetaDebugModule::Initialize()
 		CanvasBrush->Material = CanvasMaterial;
 		CanvasMaterial->SetZero();
 		CanvasMaterial->SetLightningEnabled(true);
-		CanvasMaterial->SetTransparancyMode(ZE_MTM_NOTRANSPARACY);
+		CanvasMaterial->SetTransparancyMode(ZE_MTM_NONE);
 		CanvasMaterial->SetTwoSided(false);
 		CanvasMaterial->SetRecivesShadow(false);
 		CanvasMaterial->SetAmbientEnabled(true);

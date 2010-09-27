@@ -45,6 +45,8 @@
 #include "ZEGraphics\ZEProjectiveLight.h"
 #include "ZEGraphics\ZETextureCubeResource.h"
 #include "ZEGraphics\ZETexture2DResource.h"
+#include "ZEGame\ZECanvasBrush.h"
+#include "ZEGraphics\ZESimpleMaterial.h"
 
 #include "ZEModel/ZEModel.h"
 bool ZEGraphicsDebugModule::Initialize()
@@ -68,6 +70,12 @@ bool ZEGraphicsDebugModule::Initialize()
 	ZEModel* Model = new ZEModel();
 	Model->SetModelResource(ZEModelResource::LoadResource("test.zemodel"));
 	Scene->AddEntity(Model);
+
+	ZECanvasBrush* Brush = new ZECanvasBrush();
+	Brush->Canvas.AddPyramid(10, 10, 10);
+	Brush->Material = ZESimpleMaterial::CreateInstance();
+	Brush->UpdateBoundingVolumes();
+	Scene->AddEntity(Brush);
 
 	PointLight1 = new ZEPointLight();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));

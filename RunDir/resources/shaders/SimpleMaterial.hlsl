@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SimpleShader.hlsl
+ Zinek Engine - SimpleMaterial.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-float4x4	TransformMatrix				: register(c0);
+sampler2D Texture			: register(s0);
+float4x4 TransformMatrix	: register(c0);
+
+bool4 EnableParameters		: register(b0);
+#define EnableTexture		EnableParameters[0];
+#define EnableVertexColor	EnableParameters[1];
+#define EnableColor			EnableParameters[2];
+
+float4 MaterialColor		: register(c10);
 
 struct VSInput 
 {
@@ -44,10 +52,11 @@ struct VSInput
 struct VSOutput 
 {
 	float4 Position             : POSITION0;
+	float2 Texcoord				: TEXCOORD0;
 	float4 Color				: TEXCOORD1;
 };
 
-VSOutput vs_main(VSInput Input)
+VSOutput VSMain(VSInput Input)
 {
 	VSOutput Output;
 
@@ -59,10 +68,19 @@ VSOutput vs_main(VSInput Input)
 
 struct PSInput
 {
+	float2 Texcoord				: TEXCOORD0;
 	float4 Color			    : TEXCOORD1;
 };
 
-float4 ps_main(PSInput Input) : COLOR0
+float4 PSMain(PSInput Input) : COLOR0
 {
-	return Input.Color;
+	float4 Color = MaterialColor;
+	
+	if (EnableVertexColor)
+		Color *= Input.Color;
+	
+	if (EnableTexture)
+		Color *= tex2D(Texture, Input.Texcoord);	
+		
+	return Color;
 }

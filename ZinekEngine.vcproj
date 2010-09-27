@@ -848,7 +848,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\RunDir\resources\shaders\SimpleShader.hlsl"
+						RelativePath=".\RunDir\resources\shaders\SimpleMaterial.hlsl"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"

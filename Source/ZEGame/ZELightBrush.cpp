@@ -292,7 +292,7 @@ bool ZELightBrush::Initialize()
 	Material->SetEmmisiveEnabled(true);
 	Material->SetLightningEnabled(false);
 	Material->SetTwoSided(false);
-	Material->SetTransparancyMode(ZE_MTM_NOTRANSPARACY);
+	Material->SetTransparancyMode(ZE_MTM_NONE);
 	Material->UpdateMaterial();
 	
 	RenderOrder.Material = Material;

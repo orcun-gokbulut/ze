@@ -44,39 +44,6 @@
 #include "ZEDS\ZEVariant.h"
 #include "ZEMeta\ZEClass.h"
 
-enum ZETextureFilterMode
-{
-	ZE_TF_AUTO					= 0,
-	ZE_TF_FORCE_POINT			= 1,
-	ZE_TF_FORCE_LINEAR			= 2,
-	ZE_TF_FORCE_TRILINEAR		= 3,
-	ZE_TF_FORCE_ANISOTROPHIC	= 4,
-};
-
-enum ZETextureAddressMode
-{
-	ZE_TAM_WRAP					= 0,
-	ZE_TAM_CLAMP				= 1,
-	ZE_TAM_MIRROR				= 2,
-	ZE_TAM_BORDER				= 3,
-};
-
-enum ZEMaterialTransparancyMode
-{
-	ZE_MTM_NOTRANSPARACY		= 0,
-	ZE_MTM_ALPHACULL			= 1,
-	ZE_MTM_REGULAR				= 2,
-	ZE_MTM_ADDAPTIVE			= 3,
-	ZE_MTM_SUBTRACTIVE			= 4,
-}; 
-
-enum ZEMaterialOpacityComponent
-{
-	ZE_MOC_CONSTANT				= 0,
-	ZE_MOC_DIFFUSE_ALPHA		= 1,
-	ZE_MOC_OPACITYMAP			= 2,
-};
-
 ZE_META_CLASS_DESCRIPTION(ZEFixedMaterial)
 
 class ZETextureCube;

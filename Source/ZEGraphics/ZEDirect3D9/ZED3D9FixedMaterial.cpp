@@ -251,7 +251,7 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* 
 		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
 	// Setup Transparancy
-	if (TransparancyMode != ZE_MTM_NOTRANSPARACY)
+	if (TransparancyMode != ZE_MTM_NONE)
 	{
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 		GetDevice()->SetRenderState(D3DRS_ALPHAREF, TransparancyCullLimit);
@@ -370,7 +370,7 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* 
 	// Setup Transparancy
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 
-	if (TransparancyMode != ZE_MTM_NOTRANSPARACY)
+	if (TransparancyMode != ZE_MTM_NONE)
 	{
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 		GetDevice()->SetRenderState(D3DRS_ALPHAREF, TransparancyCullLimit);
@@ -384,7 +384,7 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* 
 		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
 
 	// Setup Transparancy
-	if (TransparancyMode != ZE_MTM_NOTRANSPARACY)
+	if (TransparancyMode != ZE_MTM_NONE)
 	{
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 		GetDevice()->SetRenderState(D3DRS_ALPHAREF, TransparancyCullLimit);
