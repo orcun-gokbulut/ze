@@ -42,40 +42,44 @@ void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
 {
 	ZEUIControl::Draw(Renderer);
 	Renderer->AddRectangle(Button);
-
 }
 
 void ZEUIButtonControl::Tick(float ElapsedTime)
 {
-	if (DirtyVisibleRectangle)
-	{
-		Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
-		Button.Positions.RightDown = GetVisibleRectangle().RightDown;
-	}
+	Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
+	Button.Positions.RightDown = GetVisibleRectangle().RightDown;
 }
 
 void ZEUIButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {
 	ZEUIControl::MouseButtonPressed(Button, MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitY);
 }
 
 void ZEUIButtonControl::MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {
 	ZEUIControl::MouseButtonReleased(Button, MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::One);
 }
 
 void ZEUIButtonControl::MouseEnterEvent(const ZEVector2& MousePosition)
 {
 	ZEUIControl::MouseEnterEvent(MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::UnitX);
 }
 
 void ZEUIButtonControl::MouseLeaveEvent(const ZEVector2& MousePosition)
 {
 	ZEUIControl::MouseLeaveEvent(MousePosition);
-	((ZEFixedMaterial*)(this->Button.Material))->SetAmbientColor(ZEVector3::One);
+}
+
+void ZEUIButtonControl::FocusGained()
+{
+	ZEUIControl::FocusGained();
+	((ZEFixedMaterial*)(Button.Material))->SetAmbientColor(ZEVector3::UnitX);
+}
+
+void ZEUIButtonControl::FocusLost()
+{
+	ZEUIControl::FocusLost();
+	((ZEFixedMaterial*)(Button.Material))->SetAmbientColor(ZEVector3::One);
 }
 
 ZEUIButtonControl::ZEUIButtonControl()
@@ -92,6 +96,8 @@ ZEUIButtonControl::ZEUIButtonControl()
 
 	Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
 	Button.Positions.RightDown = GetVisibleRectangle().RightDown;
+
+	SetFocusable(false);
 }
 
 ZEUIButtonControl::~ZEUIButtonControl()

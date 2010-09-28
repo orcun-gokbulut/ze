@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEIUCheckBoxControl.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEIUCheckBoxControl.h"
+#include "ZEFontResource.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
+
+void ZEUICheckBoxControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+{
+
+}
+
+void ZEUICheckBoxControl::Draw(ZEUIRenderer* Renderer)
+{
+	ZEUIControl::Draw(Renderer);
+}
+
+void ZEUICheckBoxControl::Tick(float ElapsedTime)
+{
+
+}
+
+void ZEUICheckBoxControl::SetState(ZEUICheckBoxState State)
+{
+	this->State = State;
+}
+
+ZEUICheckBoxState ZEUICheckBoxControl::GetState() const
+{
+	return State;
+}
+
+void ZEUICheckBoxControl::SetText(ZEString Text)
+{
+	Label.SetText(Text);
+}
+
+ZEString ZEUICheckBoxControl::GetText()
+{
+	return Label.GetText();
+}
+
+ZEUICheckBoxControl::ZEUICheckBoxControl()
+{
+	State = ZE_UI_CBS_UNCHECKED;
+	Label.SetFont(ZEFontResource::LoadResource("OldEnglish.zefont"));
+	Label.SetText(ZEString("Test"));
+	SetHeight(25);
+
+	Box.Material = ZEFixedMaterial::CreateInstance();
+	((ZEFixedMaterial*)(Box.Material))->SetZero();
+	((ZEFixedMaterial*)(Box.Material))->SetAmbientEnabled(true);
+	((ZEFixedMaterial*)(Box.Material))->SetAmbientFactor(1.0f);
+	((ZEFixedMaterial*)(Box.Material))->SetAmbientColor(ZEVector3::One);
+	((ZEFixedMaterial*)(Box.Material))->UpdateMaterial();
+
+	//AddChildControl(&Box);
+	AddChildControl(&Label);
+}
+
+ZEUICheckBoxControl::~ZEUICheckBoxControl()
+{
+
+}

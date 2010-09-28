@@ -79,6 +79,8 @@ class ZEUIControl
 		bool							HoverState;
 		bool							FocusState;
 
+		bool							Focusable;
+
 		bool							Visibility;
 		bool							Enabled;
 		int								ZOrder;
@@ -157,6 +159,10 @@ class ZEUIControl
 
 		virtual void					SetVisiblity(bool Visible);
 		bool							GetVisibilty();
+
+		void							SetFocusable(bool Focusable);
+		virtual bool					GetFocusable();
+		bool							GetFocusState();
 
 		void							SetBackgroundColor(const ZEVector4& Color);
 		const ZEVector4&				GetBackgroundColor();

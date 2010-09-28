@@ -56,6 +56,8 @@ class ZEUIButtonControl : public ZEUIControl
 		virtual void 		MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 		virtual void 		MouseEnterEvent(const ZEVector2& MousePosition);
 		virtual void 		MouseLeaveEvent(const ZEVector2& MousePosition);
+		virtual void		FocusGained();
+		virtual void		FocusLost();
 
 	public:
 

@@ -96,6 +96,16 @@ void ZEUIControl::FocusGained()
 		FocusGainedEvent();
 }
 
+void ZEUIControl::SetFocusable(bool Focusable)
+{
+	this->Focusable = Focusable;
+}
+
+bool ZEUIControl::GetFocusable()
+{
+	return Focusable;
+}
+
 void ZEUIControl::SetParent(ZEUIControl* Parent)
 {
 	this->ParentControl = Parent; 
@@ -238,6 +248,11 @@ void ZEUIControl::GainFocus()
 	// IMPLAMENT !!!!!
 }
 
+bool ZEUIControl::GetFocusState()
+{
+	return FocusState;
+}
+
 void ZEUIControl::SetBackgroundColor(const ZEVector4& Color)
 {
 	BackgroundColor = Color;
@@ -365,6 +380,7 @@ ZEUIControl::ZEUIControl()
 	FocusState = false;
 	Rectangle.LeftUp = ZEVector2::Zero;
 	Rectangle.RightDown = ZEVector2::One;
+	Focusable = true;
 }
 
 ZEUIControl::~ZEUIControl()

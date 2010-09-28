@@ -45,6 +45,7 @@ ZEUIManager::ZEUIManager()
 	OldMousePosition = ZEVector2::Zero;
 	LastHoveredControl = NULL;
 	LastPressedControl = NULL;
+	LastFocusedControl = NULL;
 }
 
 ZEUIManager::~ZEUIManager() 
@@ -168,6 +169,18 @@ void ZEUIManager::ProcessEvents()
 	{
 		LastHoveredControl->MouseButtonPressed(Cursor->GetCurrentButton(), CursorPosition);
 		LastPressedControl = LastHoveredControl;
+
+		if (LastFocusedControl != NULL && LastFocusedControl != LastPressedControl && LastPressedControl->GetFocusable())
+		{
+			LastFocusedControl->FocusLost();
+			LastFocusedControl = NULL;
+		}
+
+		if (LastPressedControl->GetFocusable() && !LastPressedControl->GetFocusState() && LastFocusedControl == NULL)
+		{
+			LastPressedControl->FocusGained();
+			LastFocusedControl = LastPressedControl;
+		}
 	}
 
 	if (LastPressedControl != NULL && Cursor->GetCurrentButton() == ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE)
@@ -176,7 +189,6 @@ void ZEUIManager::ProcessEvents()
 
 		if (ZERectangle::BoundingTest(LastPressedControl->GetVisibleRectangle(), CursorPosition))
 		{
-			LastPressedControl->MouseEnterEvent(CursorPosition);
 			LastHoveredControl = LastPressedControl;
 		}
 
@@ -214,7 +226,8 @@ void ZEUIManager::Render(ZERenderer* Renderer)
 {
 	UIRenderer->Clean();
 	for (size_t I = 0; I < Controls.GetCount(); I++)
-		Controls[I]->Draw(UIRenderer);
+		if (Controls[I]->GetVisibilty())
+			Controls[I]->Draw(UIRenderer);
 
 	UIRenderer->Render(Renderer);
 }

@@ -33,12 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-/*#pragma once
+#pragma once
 #ifndef __ZE_UI_CHECK_BOX_CONTROL__
 #define __ZE_UI_CHECK_BOX_CONTROL__
 
-#include "zeui/ZEUIControl.h"
-#include "zeui/ZEUIRectangle.h"
+#include "ZEUIControl.h"
+#include "ZEUITextControl.h"
+#include "ZEUIRectangle.h"
+
+enum ZEUICheckBoxState
+{
+	ZE_UI_CBS_UNCHECKED		= 0,
+	ZE_UI_CBS_CHECKED		= 1,
+	ZE_UI_CBS_SEMICHECKED	= 2
+};
+
+class ZEString;
 
 class ZEUICheckBoxControl : public ZEUIControl
 {
@@ -46,24 +56,29 @@ class ZEUICheckBoxControl : public ZEUIControl
 
 private:
 
-	ZEUIRectangle		CheckBox;
+	ZEUICheckBoxState	State;
+
+	ZEUIRectangle		Box;
 	ZEUITextControl		Label;
 
 protected:
 
 	virtual void 		MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-	virtual void 		MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-	virtual void 		MouseEnterEvent(const ZEVector2& MousePosition);
-	virtual void 		MouseLeaveEvent(const ZEVector2& MousePosition);
 
 public:
 
 	virtual void		Draw(ZEUIRenderer* Renderer);
 	virtual void		Tick(float ElapsedTime);
 
+	void				SetState(ZEUICheckBoxState State);
+	ZEUICheckBoxState	GetState() const;	
+
+	void				SetText(ZEString Text);
+	ZEString			GetText();
+
 						ZEUICheckBoxControl();
 						~ZEUICheckBoxControl();
 
 };
 
-#endif*/
+#endif

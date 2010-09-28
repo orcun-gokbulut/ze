@@ -201,14 +201,11 @@ ZEUICursorControl::ZEUICursorControl()
 	((ZEFixedMaterial*)(Cursor.Material))->SetAmbientEnabled(true);
 	((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::One);
 	((ZEFixedMaterial*)(Cursor.Material))->SetAmbientFactor(1.0f);
-	//((ZEFixedMaterial*)(Cursor.Material))->SetDiffuseEnabled(true);
-	//((ZEFixedMaterial*)(Cursor.Material))->SetDiffuseMap(ZETexture2DResource::LoadResource("ZECursor.png")->GetTexture());
 	((ZEFixedMaterial*)(Cursor.Material))->UpdateMaterial();
 
 	SetZOrder(1000);
-
-
 	SetEnabled(true);
+	SetFocusable(false);
 
 	CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
 	

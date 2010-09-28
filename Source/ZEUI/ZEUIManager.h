@@ -53,6 +53,7 @@ class ZEUIManager
 		
 		ZEUIControl*				LastHoveredControl;
 		ZEUIControl*				LastPressedControl;
+		ZEUIControl*				LastFocusedControl;
 
 		ZEUIMouseKey				PressedButton;
 
