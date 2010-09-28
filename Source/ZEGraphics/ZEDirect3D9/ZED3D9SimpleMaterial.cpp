@@ -42,20 +42,30 @@
 #include "ZED3D9Shader.h"
 #include <D3D9.h>
 
+ZED3D9SimpleMaterial::ZED3D9SimpleMaterial()
+{
+	VertexShader = NULL;
+	PixelShader = NULL;
+}
+
+ZED3D9SimpleMaterial::~ZED3D9SimpleMaterial()
+{
+	ReleaseShaders();
+}
+
+
 void ZED3D9SimpleMaterial::CreateShaders()
 {
 	ReleaseShaders();
 
-	VertexShader = ZED3D9VertexShader::CreateShader("SimpleMaterial.hlsl", "VSMain", 0, "vs_2_0");
-	PixelShader = ZED3D9PixelShader::CreateShader("SimpleMaterial.hlsl", "PSMain", 0, "ps_2_0");
-	TexturedPixelShader = ZED3D9PixelShader::CreateShader("SimpleMaterial.hlsl", "TexturedPSMain", 1, "ps_2_0");
+	VertexShader = ZED3D9VertexShader::CreateShader("SimpleMaterial.hlsl", "VSMain", 0, "vs_3_0");
+	PixelShader = ZED3D9PixelShader::CreateShader("SimpleMaterial.hlsl", "PSMain", 0, "ps_3_0");
 }
 
 void ZED3D9SimpleMaterial::ReleaseShaders()
 {
 	ZED3D_RELEASE(VertexShader);
 	ZED3D_RELEASE(PixelShader);
-	ZED3D_RELEASE(TexturedPixelShader);
 }
 
 bool ZED3D9SimpleMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const 
@@ -79,19 +89,12 @@ bool ZED3D9SimpleMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder*
 	ZEMatrix4x4 WorldViewProjMatrix;
 	ZEMatrix4x4 WorldViewMatrix;
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
-	{
 		ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewProjMatrix);
-		ZEMatrix4x4::Multiply(WorldViewMatrix, RenderOrder->WorldMatrix, Camera->GetViewTransform());
-	}
 	else
-	{
 		WorldViewProjMatrix = ViewProjMatrix;
-		WorldViewMatrix = Camera->GetViewTransform();
-	}
 
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
-	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewMatrix, 4);
-	GetDevice()->SetVertexShaderConstantF(8, (float*)&WorldViewMatrix, 4);
+
 
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
@@ -169,25 +172,24 @@ bool ZED3D9SimpleMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder*
 
 	// Setup Shaders
 	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
+	GetDevice()->SetPixelShader(PixelShader->GetPixelShader());
 
-	if (Texture != NULL)
-	{
-		//GetDevice()->SetTextureStageState(0, TextureAddressModeU, TextureAddressModeV);
-		GetDevice()->SetPixelShader(TexturedPixelShader->GetPixelShader());
-		GetDevice()->SetTexture(0, ((ZED3D9Texture2D*)Texture)->Texture);
-	}
-	else
-	{
-		GetDevice()->SetPixelShader(PixelShader->GetPixelShader());
-		GetDevice()->SetTexture(0, NULL);
-	}
+	GetDevice()->SetPixelShaderConstantF(10, (float*)&MaterialColor, 1);
+
+	// Setup Constants
+	BOOL Options[] = {Texture != NULL, VertexColorEnabled};
+	GetDevice()->SetPixelShaderConstantB(0, Options, 2);
+	
+	// Setup Texture
+	GetDevice()->SetTexture(5, Texture != NULL ? ((ZED3D9Texture2D*)Texture)->Texture : NULL);
 
 	return true;
 }
 
 void ZED3D9SimpleMaterial::UpdateMaterial()
 {
-	CreateShaders();
+	if (VertexShader == NULL)
+		CreateShaders();
 }
 
 void ZED3D9SimpleMaterial::Release()

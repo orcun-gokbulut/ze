@@ -352,7 +352,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="TransparancyCullLimit" groupname="Transparancy" type="integer" autogetset="yes"/>
 			<property name="TransparancyMode" groupname="Transparancy" type="integer" autogetset="yes">
 				<enumurator name="ZEMaterialTransparancyMode">
-					<item name="No Transparancy" value="ZE_MTM_NOTRANSPARACY"/>
+					<item name="No Transparancy" value="ZE_MTM_NONE"/>
 					<item name="Alpha Test" value="ZE_MTM_ALPHACULL"/>
 					<item name="Regular" value="ZE_MTM_REGULAR"/>
 					<item name="Adaptive" value="ZE_MTM_ADDAPTIVE"/>

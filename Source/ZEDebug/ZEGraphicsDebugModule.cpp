@@ -71,14 +71,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	Model->SetModelResource(ZEModelResource::LoadResource("test.zemodel"));
 	Scene->AddEntity(Model);
 
-	ZECanvasBrush* Brush = new ZECanvasBrush();
-	Brush->Canvas.AddPyramid(10, 10, 10);
-	ZESimpleMaterial* Material = ZESimpleMaterial::CreateInstance();
-	Brush->Material = Material;
-	Material->SetTwoSided(true);
-	Material->SetMaterialCOlr
-	Brush->UpdateBoundingVolumes();
-	Scene->AddEntity(Brush);
+
 
 	PointLight1 = new ZEPointLight();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
@@ -140,21 +133,42 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3::UnitY));
 	ProjectiveLight0->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
 	ProjectiveLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-	ProjectiveLight0->SetAttenuation(0.1f, 0.0f, 1.0f);
-	ProjectiveLight0->SetIntensity(40.0f);
+	ProjectiveLight0->SetAttenuation(0.01f, 0.0f, 1.0f);
+	ProjectiveLight0->SetIntensity(5.0f);
 	ProjectiveLight0->SetRange(55.0f);
 	ProjectiveLight0->SetCastsShadow(false);
 	ProjectiveLight0->SetFOV(ZE_PI_2);
 	ProjectiveLight0->SetAspectRatio(1.0f);
 	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
 	Scene->AddEntity(ProjectiveLight0);
+	
+	// Transformation
+	ZEMatrix4x4 WorldTransform;
+	float TanFovRange = tanf(ProjectiveLight0->GetFOV() * 0.5f) * ProjectiveLight0->GetRange();
+	ZEMatrix4x4::CreateOrientation(WorldTransform, ProjectiveLight0->GetWorldPosition(), ProjectiveLight0->GetWorldRotation(), ZEVector3(TanFovRange * ProjectiveLight0->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, ProjectiveLight0->GetRange()));
 
+	ZECanvasBrush* Brush = new ZECanvasBrush();
+	Brush->Canvas.SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
+	Brush->Canvas.SetTranslation(-ZEVector3::UnitZ);
+	Brush->Canvas.ApplyTransformationAfter(WorldTransform);
+	Brush->Canvas.SetColor(ZEVector4(ProjectiveLight0->GetColor(), 1.0f));
+	Brush->Canvas.AddPyramid(1, 1, 1);
+
+	ZESimpleMaterial* Material = ZESimpleMaterial::CreateInstance();
+	
+	Brush->Material = Material;
+	Material->SetTwoSided(true);
+	Material->SetVertexColor(true);
+	Material->SetWireframe(true);
+	Brush->UpdateCanvas();
+	Scene->AddEntity(Brush);
 	DirectionalLight0 = new ZEDirectionalLight();
+	DirectionalLight0->SetEnabled(false);
 	DirectionalLight0->SetRotation(ZEQuaternion(-ZE_PI_4, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
 	DirectionalLight0->SetIntensity(2.0f);
 	DirectionalLight0->SetCastsShadow(false);
-	//Scene->AddEntity(DirectionalLight0);
+	Scene->AddEntity(DirectionalLight0);
 
 	PointLight1->SetEnabled(true);
 	PointLight2->SetEnabled(false);

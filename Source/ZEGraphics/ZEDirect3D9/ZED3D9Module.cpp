@@ -145,7 +145,7 @@ bool ZED3D9Module::Initialize()
 	D3DPP.MultiSampleQuality = 0;
 
 	D3DPP.EnableAutoDepthStencil = true;
-	D3DPP.AutoDepthStencilFormat = D3DFMT_D24X8;
+	D3DPP.AutoDepthStencilFormat = D3DFMT_D24S8;
 
 	D3DPP.Windowed = !Fullscreen;
 	D3DPP.hDeviceWindow = (HWND)zeWindow->GetHandle();

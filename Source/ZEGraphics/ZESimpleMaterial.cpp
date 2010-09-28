@@ -60,10 +60,11 @@ void ZESimpleMaterial::SetZero()
 {
 	Wireframe = false;
 	TwoSided = false;
+	VertexColorEnabled = true;
 	TransparancyMode = ZE_MTM_NONE;
 	TransparancyCullLimit = 0x80;
 	MaterialColor = ZEVector4::One;
-	Texture == NULL;
+	Texture = NULL;
 	TextureAddressModeU = ZE_TAM_MIRROR;
 	TextureAddressModeV = ZE_TAM_MIRROR;
 }
@@ -87,6 +88,17 @@ bool ZESimpleMaterial::GetWireframe() const
 {
 	return Wireframe;
 }
+
+void ZESimpleMaterial::SetVertexColor(bool Enable)
+{
+	VertexColorEnabled = Enable;
+}
+
+bool ZESimpleMaterial::GetVertexColor()
+{
+	return VertexColorEnabled;
+}
+
 
 void ZESimpleMaterial::SetMaterialColor(const ZEVector4& Color)
 {
@@ -122,7 +134,7 @@ unsigned int ZESimpleMaterial::GetTransparancyCullLimit() const
 
 void ZESimpleMaterial::SetTexture(const ZETexture2D* Texture)
 {
-	Texture = Texture;
+	this->Texture = Texture;
 }
 
 const ZETexture2D* ZESimpleMaterial::GetTexture() const

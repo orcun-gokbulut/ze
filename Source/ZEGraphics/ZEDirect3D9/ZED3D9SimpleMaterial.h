@@ -52,14 +52,13 @@ class ZED3D9SimpleMaterial : public ZESimpleMaterial, public ZED3D9ComponentBase
 	private:
 		ZED3D9VertexShader*				VertexShader;
 		ZED3D9PixelShader*				PixelShader;
-		ZED3D9PixelShader*				TexturedPixelShader;
 
 		void							CreateShaders();
 		void							ReleaseShaders();
 
 	protected:
-										ZED3D9SimpleMaterial(){}
-										~ZED3D9SimpleMaterial(){}
+										ZED3D9SimpleMaterial();
+										~ZED3D9SimpleMaterial();
 
 	public:
 		virtual bool					SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;

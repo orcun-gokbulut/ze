@@ -47,6 +47,8 @@ class ZESimpleMaterial : public ZEMaterial
 	protected:
 		bool							TwoSided;
 		bool							Wireframe;
+		bool							VertexColorEnabled;
+
 		ZEMaterialTransparancyMode		TransparancyMode;
 		unsigned int					TransparancyCullLimit;
 		ZEVector4						MaterialColor;
@@ -69,6 +71,9 @@ class ZESimpleMaterial : public ZEMaterial
 
 		void							SetWireframe(bool Enable);
 		bool							GetWireframe() const;
+
+		void							SetVertexColor(bool Enable);
+		bool							GetVertexColor();
 
 		void							SetMaterialColor(const ZEVector4& Color);
 		const ZEVector4&				GetMaterialColor() const;

@@ -369,8 +369,8 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 
 	// Stencil Test
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
-	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
-	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATEREQUAL);
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_ALWAYS);
 	GetDevice()->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_REPLACE);
@@ -383,11 +383,12 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	
 	// Draw Light
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFF);
-	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESS);
+
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_GREATER);
 	GetDevice()->SetRenderState(D3DRS_STENCILFUNC, D3DCMP_NOTEQUAL);
 	GetDevice()->SetRenderState(D3DRS_STENCILZFAIL, D3DSTENCILOP_KEEP);
 	
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CW);
 
 	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);

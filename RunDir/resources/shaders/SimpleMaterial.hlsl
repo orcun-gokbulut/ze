@@ -33,27 +33,26 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D Texture			: register(s0);
+sampler2D Texture			: register(s5);
 float4x4 TransformMatrix	: register(c0);
 
-bool4 EnableParameters		: register(b0);
-#define EnableTexture		EnableParameters[0];
-#define EnableVertexColor	EnableParameters[1];
-#define EnableColor			EnableParameters[2];
+bool EnableTexture			: register(b0);
+bool EnableVertexColor		: register(b1);
 
 float4 MaterialColor		: register(c10);
 
 struct VSInput 
 {
-	float4 Position : POSITION0;
-	float4 Color : TEXCOORD1;
+	float4 Position			: POSITION0;
+	float2 Textcoord		: TEXCOORD0;
+	float4 Color			: TEXCOORD1;
 };
 
 struct VSOutput 
 {
-	float4 Position             : POSITION0;
-	float2 Texcoord				: TEXCOORD0;
-	float4 Color				: TEXCOORD1;
+	float4 Position			: POSITION0;
+	float2 Texcoord			: TEXCOORD0;
+	float4 Color			: TEXCOORD1;
 };
 
 VSOutput VSMain(VSInput Input)
@@ -61,6 +60,7 @@ VSOutput VSMain(VSInput Input)
 	VSOutput Output;
 
 	Output.Position = mul(Input.Position, TransformMatrix);
+	Output.Texcoord = Input.Textcoord;
 	Output.Color = Input.Color;
 	
 	return Output;
