@@ -162,7 +162,7 @@ void ZEUIManager::ProcessEvents()
 	/************************************************************************/
 
 	/************************************************************************/
-	/*                         MOUSE PRESS AND RELEASE EVENT                */
+	/*        MOUSE PRESS, RELEASE EVENT AND FOCUSGAIN, FOCUSLOST           */
 	/************************************************************************/
 
 	if (Cursor->GetCurrentButton() != ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE)
@@ -196,7 +196,7 @@ void ZEUIManager::ProcessEvents()
 	}
 
 	/************************************************************************/
-	/*                         MOUSE PRESS RELEASE EVENT                    */
+	/*        MOUSE PRESS, RELEASE EVENT AND FOCUSGAIN, FOCUSLOST           */
 	/************************************************************************/
 
 	OldMousePosition = CursorPosition;

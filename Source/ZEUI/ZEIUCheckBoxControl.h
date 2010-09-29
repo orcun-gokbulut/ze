@@ -39,7 +39,7 @@
 
 #include "ZEUIControl.h"
 #include "ZEUITextControl.h"
-#include "ZEUIRectangle.h"
+#include "ZEUIButtonControl.h"
 
 enum ZEUICheckBoxState
 {
@@ -58,7 +58,7 @@ private:
 
 	ZEUICheckBoxState	State;
 
-	ZEUIRectangle		Box;
+	ZEUIButtonControl	Box;
 	ZEUITextControl		Label;
 
 protected:

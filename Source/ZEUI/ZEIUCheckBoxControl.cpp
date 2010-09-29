@@ -78,15 +78,21 @@ ZEUICheckBoxControl::ZEUICheckBoxControl()
 	Label.SetFont(ZEFontResource::LoadResource("OldEnglish.zefont"));
 	Label.SetText(ZEString("Test"));
 	SetHeight(25);
+	SetWidth(80);
 
-	Box.Material = ZEFixedMaterial::CreateInstance();
-	((ZEFixedMaterial*)(Box.Material))->SetZero();
-	((ZEFixedMaterial*)(Box.Material))->SetAmbientEnabled(true);
-	((ZEFixedMaterial*)(Box.Material))->SetAmbientFactor(1.0f);
-	((ZEFixedMaterial*)(Box.Material))->SetAmbientColor(ZEVector3::One);
-	((ZEFixedMaterial*)(Box.Material))->UpdateMaterial();
+	Box.Button.Material = ZEFixedMaterial::CreateInstance();
+	((ZEFixedMaterial*)(Box.Button.Material))->SetZero();
+	((ZEFixedMaterial*)(Box.Button.Material))->SetAmbientEnabled(true);
+	((ZEFixedMaterial*)(Box.Button.Material))->SetAmbientFactor(1.0f);
+	((ZEFixedMaterial*)(Box.Button.Material))->SetAmbientColor(ZEVector3::One);
+	((ZEFixedMaterial*)(Box.Button.Material))->UpdateMaterial();
+	Box.SetWidth(25);
+	Box.SetHeight(25);
 
-	//AddChildControl(&Box);
+	//Box.Button.Positions.LeftUp = GetRectangle().LeftUp;
+	//Box.Button.Positions.RightDown = ZEVector2(Box.Button.Positions.LeftUp.x + 25, Box.Button.Positions.LeftUp.x + 25);
+
+	AddChildControl(&Box);
 	AddChildControl(&Label);
 }
 

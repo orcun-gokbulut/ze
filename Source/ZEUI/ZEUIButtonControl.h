@@ -45,6 +45,7 @@ class ZETexture2D;
 class ZEUIButtonControl : public ZEUIControl
 {
 	friend class ZEUIManager;
+	friend class ZEUICheckBoxControl;
 
 	private:
 		
@@ -63,6 +64,8 @@ class ZEUIButtonControl : public ZEUIControl
 
 		virtual void		Draw(ZEUIRenderer* Renderer);
 		virtual void		Tick(float ElapsedTime);
+
+		virtual void		SetWidth()
 
 							ZEUIButtonControl();
 							~ZEUIButtonControl();

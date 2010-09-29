@@ -35,7 +35,6 @@
 
 #include "ZEUIControl.h"
 #include "ZEUIRenderer.h"
-
 void ZEUIControl::KeyPressed(unsigned char Key)
 {
 	if (KeyPressedEvent != NULL)
@@ -114,6 +113,11 @@ void ZEUIControl::SetParent(ZEUIControl* Parent)
 const ZEArray<ZEUIControl*>& ZEUIControl::GetChildControls()
 {
 	return ChildControls;
+}
+
+void ZEUIControl::AddChildControl(ZEUIControl* Control)
+{
+	ChildControls.Add(Control);
 }
 
 ZEUIControl* ZEUIControl::GetParentControl()
@@ -367,7 +371,9 @@ void ZEUIControl::Draw(ZEUIRenderer* Renderer)
 
 void ZEUIControl::Tick(float ElapsedTime)
 {
-
+	for (int I = 0; I < ChildControls.GetCount(); I++)
+		if (ChildControls[I]->GetEnabled() == true)
+			ChildControls[I]->Tick(ElapsedTime);
 }
 
 ZEUIControl::ZEUIControl()
