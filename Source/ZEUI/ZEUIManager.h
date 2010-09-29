@@ -56,6 +56,7 @@ class ZEUIManager
 		ZEUIControl*				LastFocusedControl;
 
 		ZEUIMouseKey				PressedButton;
+		ZEUIMouseKey				PreviousPressedButton;
 
 		ZEVector2					OldMousePosition;
 

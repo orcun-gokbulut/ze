@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.h
+ Zinek Engine - ZEGUIDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,44 +34,31 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_BUTTON_CONTROL__
-#define __ZE_UI_BUTTON_CONTROL__
+#ifndef __ZE_GUI_DEBUG_MODULE_H__
+#define __ZE_GUI_DEBUG_MODULE_H__
 
-#include "zeui/ZEUIControl.h"
-#include "zeui/ZEUIRectangle.h"
+#include "ZEDebugModule.h"
 
-class ZETexture2D;
+class ZEDGrid;
+class ZEPlayer;
+class ZEScene;
 
-class ZEUIButtonControl : public ZEUIControl
+class ZEGUIDebugModule : public ZEDebugModule
 {
-	friend class ZEUIManager;
-	friend class ZEUICheckBoxControl;
-
-	protected:
-
-		ZEUIRectangle		Button;
-
-		virtual void 		MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-		virtual void 		MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-		virtual void 		MouseEnterEvent(const ZEVector2& MousePosition);
-		virtual void 		MouseLeaveEvent(const ZEVector2& MousePosition);
-		virtual void		FocusGained();
-		virtual void		FocusLost();
+	private:
+		ZEPlayer*				Player;
+		ZEDGrid*				Grid;
+		ZEScene*				Scene;
 
 	public:
 
-		virtual void		Draw(ZEUIRenderer* Renderer);
-		virtual void		Tick(float ElapsedTime);
+		virtual bool			Initialize();
+		virtual void			Deinitialize();
 
-		virtual void		SetWidth(float Width);
-		virtual void		SetHeight(float Height);
-		virtual void		SetSize(const ZEVector2& Size);
+		virtual void			Process(float ElapsedTime);
 
-		virtual void		SetPosition(const ZEVector2& Position);
-
-							ZEUIButtonControl();
-							~ZEUIButtonControl();
-
+								ZEGUIDebugModule();
+		virtual					~ZEGUIDebugModule();
 };
 
 #endif

@@ -39,7 +39,26 @@
 
 void ZEUICheckBoxControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {
-
+	if (State == ZE_UI_CBS_UNCHECKED)
+	{
+		State = ZEUICheckBoxState::ZE_UI_CBS_SEMICHECKED;
+		Label.SetText("SemiChecked");
+		((ZEFixedMaterial*)(Box.Button.Material))->SetAmbientColor(ZEVector3::UnitX);
+	}
+	
+	else if (State == ZE_UI_CBS_SEMICHECKED)
+	{	
+		State = ZEUICheckBoxState::ZE_UI_CBS_CHECKED;
+		Label.SetText("Checked");
+		((ZEFixedMaterial*)(Box.Button.Material))->SetAmbientColor(ZEVector3::UnitY);
+	}
+	
+	else if (State == ZE_UI_CBS_CHECKED)
+	{	
+		State = ZEUICheckBoxState::ZE_UI_CBS_UNCHECKED;
+		Label.SetText("UnChecked");
+		((ZEFixedMaterial*)(Box.Button.Material))->SetAmbientColor(ZEVector3::One);
+	}
 }
 
 void ZEUICheckBoxControl::Draw(ZEUIRenderer* Renderer)
@@ -49,6 +68,11 @@ void ZEUICheckBoxControl::Draw(ZEUIRenderer* Renderer)
 
 void ZEUICheckBoxControl::Tick(float ElapsedTime)
 {
+		
+
+		
+
+		
 
 }
 
@@ -72,6 +96,13 @@ ZEString ZEUICheckBoxControl::GetText()
 	return Label.GetText();
 }
 
+void ZEUICheckBoxControl::SetPosition(const ZEVector2& Position)
+{
+	ZEUIControl::SetPosition(Position);
+	Box.SetPosition(Position);
+	Label.SetPosition(ZEVector2(GetPosition().x + Box.GetWidth(), GetPosition().y));
+}
+
 ZEUICheckBoxControl::ZEUICheckBoxControl()
 {
 	State = ZE_UI_CBS_UNCHECKED;
@@ -86,14 +117,22 @@ ZEUICheckBoxControl::ZEUICheckBoxControl()
 	((ZEFixedMaterial*)(Box.Button.Material))->SetAmbientFactor(1.0f);
 	((ZEFixedMaterial*)(Box.Button.Material))->SetAmbientColor(ZEVector3::One);
 	((ZEFixedMaterial*)(Box.Button.Material))->UpdateMaterial();
+
+	Box.Button.Positions.LeftUp = GetRectangle().LeftUp;
+
 	Box.SetWidth(25);
 	Box.SetHeight(25);
+	Label.SetWidth(100);
+	Label.SetHeight(25);
+	//BlockChildEvents = true;
 
-	//Box.Button.Positions.LeftUp = GetRectangle().LeftUp;
-	//Box.Button.Positions.RightDown = ZEVector2(Box.Button.Positions.LeftUp.x + 25, Box.Button.Positions.LeftUp.x + 25);
+	//Box.SetFocusable(true);
+	//SetFocusable(true);
 
 	AddChildControl(&Box);
 	AddChildControl(&Label);
+
+	Box.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUICheckBoxControl::MouseButtonPressed));
 }
 
 ZEUICheckBoxControl::~ZEUICheckBoxControl()

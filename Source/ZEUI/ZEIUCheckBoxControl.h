@@ -76,6 +76,9 @@ public:
 	void				SetText(ZEString Text);
 	ZEString			GetText();
 
+	virtual void		SetPosition(const ZEVector2& Position);
+
+
 						ZEUICheckBoxControl();
 						~ZEUICheckBoxControl();
 

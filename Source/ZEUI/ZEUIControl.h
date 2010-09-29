@@ -102,6 +102,7 @@ class ZEUIControl
 	protected:
 
 		bool							DirtyVisibleRectangle;
+		//bool							BlockChildEvents;
 
 		void							SetParent(ZEUIControl *ParentName);
 
@@ -139,14 +140,16 @@ class ZEUIControl
 		virtual void					SetSize(const ZEVector2& Size);
 		ZEVector2						GetSize();
 
-		void							SetWidth(float Width);
+		virtual void					SetWidth(float Width);
 		float							GetWidth();
 
-		void							SetHeight(float Height);
+		virtual void					SetHeight(float Height);
 		float							GetHeight();
 
 		const ZERectangle&				GetVisibleRectangle();
 		const ZERectangle&				GetRectangle();
+
+		//bool							GetBlockChildEvents() const;
 
 		bool							HasFocus();
 		void							GainFocus();

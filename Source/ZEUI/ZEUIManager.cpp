@@ -103,6 +103,7 @@ bool ZEUIManager::Initialize()
 	TestControl->SetFont(ZEFontResource::LoadResource("OldEnglish.zeFont"));
 
 	PressedButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
+	PreviousPressedButton = ZE_UI_MOUSE_BUTTON_NONE;
 
 	AddControl(TestControl);
 
@@ -165,10 +166,11 @@ void ZEUIManager::ProcessEvents()
 	/*        MOUSE PRESS, RELEASE EVENT AND FOCUSGAIN, FOCUSLOST           */
 	/************************************************************************/
 
-	if (Cursor->GetCurrentButton() != ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE)
+	if (Cursor->GetCurrentButton() != ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE && PreviousPressedButton == ZE_UI_MOUSE_BUTTON_NONE)
 	{
 		LastHoveredControl->MouseButtonPressed(Cursor->GetCurrentButton(), CursorPosition);
 		LastPressedControl = LastHoveredControl;
+		PreviousPressedButton = Cursor->GetCurrentButton();
 
 		if (LastFocusedControl != NULL && LastFocusedControl != LastPressedControl && LastPressedControl->GetFocusable())
 		{
@@ -193,6 +195,7 @@ void ZEUIManager::ProcessEvents()
 		}
 
 		LastPressedControl = NULL;
+		PreviousPressedButton = ZE_UI_MOUSE_BUTTON_NONE;
 	}
 
 	/************************************************************************/

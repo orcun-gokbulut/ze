@@ -46,8 +46,7 @@ void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
 
 void ZEUIButtonControl::Tick(float ElapsedTime)
 {
-	Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
-	Button.Positions.RightDown = GetVisibleRectangle().RightDown;
+
 }
 
 void ZEUIButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
@@ -82,6 +81,35 @@ void ZEUIButtonControl::FocusLost()
 	((ZEFixedMaterial*)(Button.Material))->SetAmbientColor(ZEVector3::One);
 }
 
+void ZEUIButtonControl::SetWidth(float Width)
+{
+	ZEUIControl::SetWidth(Width);
+	Button.Positions.LeftUp = GetRectangle().LeftUp;
+	Button.Positions.RightDown = GetRectangle().RightDown;
+}
+
+void ZEUIButtonControl::SetHeight(float Height)
+{
+	ZEUIControl::SetHeight(Height);
+	Button.Positions.LeftUp = GetRectangle().LeftUp;
+	Button.Positions.RightDown = GetRectangle().RightDown;
+}
+
+void ZEUIButtonControl::SetSize(const ZEVector2& Size)
+{
+	ZEUIControl::SetSize(Size);
+	Button.Positions.LeftUp = GetRectangle().LeftUp;
+	Button.Positions.RightDown = GetRectangle().RightDown;
+}
+
+void ZEUIButtonControl::SetPosition(const ZEVector2& Position)
+{
+	ZEUIControl::SetPosition(Position);
+	Button.Positions.LeftUp = GetRectangle().LeftUp;
+	Button.Positions.RightDown = GetRectangle().RightDown;
+
+}
+
 ZEUIButtonControl::ZEUIButtonControl()
 {
 	Button.Material = ZEFixedMaterial::CreateInstance();
@@ -92,12 +120,11 @@ ZEUIButtonControl::ZEUIButtonControl()
 
 	SetHeight(25);
 	SetWidth(80);
-	SetPosition(ZEVector2(200,200));
 
 	Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
 	Button.Positions.RightDown = GetVisibleRectangle().RightDown;
 
-	SetFocusable(false);
+	SetFocusable(true);
 }
 
 ZEUIButtonControl::~ZEUIButtonControl()

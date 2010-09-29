@@ -241,6 +241,11 @@ bool ZEUIControl::GetVisibilty()
 {
 	return Visibility;
 }
+/*
+bool ZEUIControl::GetBlockChildEvents() const
+{
+	return BlockChildEvents;
+}*/
 
 bool ZEUIControl::HasFocus()
 {
@@ -337,7 +342,7 @@ void ZEUIControl::Draw(ZEUIRenderer* Renderer)
 	if (!IsVisible())
 		return;
 
-	if (BackgroundType == ZE_UI_BT_SOLID)
+	/*if (BackgroundType == ZE_UI_BT_SOLID)
 		if (ParentControl != NULL)
 		{
 			ZEUIRectangle UIRectangle, Output;
@@ -361,7 +366,7 @@ void ZEUIControl::Draw(ZEUIRenderer* Renderer)
 			Output.ZOrder = ZOrder;
 			Output.Color = BackgroundColor;
 			Renderer->AddRectangle(Output);
-		}
+		}*/
 
 	// Draw Self
 	for (size_t I = 0; I < ChildControls.GetCount(); I++)
@@ -387,6 +392,7 @@ ZEUIControl::ZEUIControl()
 	Rectangle.LeftUp = ZEVector2::Zero;
 	Rectangle.RightDown = ZEVector2::One;
 	Focusable = true;
+	//BlockChildEvents = false;
 }
 
 ZEUIControl::~ZEUIControl()
