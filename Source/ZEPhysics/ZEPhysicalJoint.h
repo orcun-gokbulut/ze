@@ -74,9 +74,9 @@ enum ZEPhysicalJointState
 
 enum ZEPhysicalJointMotion
 {
-	ZE_PJMOTION_FREE			= 0,
-	ZE_PJMOTION_LIMITED			= 1,
-	ZE_PJMOTION_LOCKED			= 2,
+	ZE_PJMOTION_FREE			= 1,
+	ZE_PJMOTION_LIMITED			= 2,
+	ZE_PJMOTION_LOCKED			= 3,
 };
 
 enum ZEPhysicalJointProjectionMode

@@ -362,27 +362,35 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		else
 			PhysicalJoint->Deinitialize();
 
-		PhysicalJoint->SetBodyA(ParentBone->PhysicalBody);
-		PhysicalJoint->SetBodyB(PhysicalBody);
+		PhysicalJoint->SetBodyA(PhysicalBody);
+		PhysicalJoint->SetBodyB(ParentBone->PhysicalBody);
 
 		PhysicalJoint->SetEnabled(BoneResource->PhysicalJoint.Enabled);
 
-		PhysicalJoint->SetPosition(BoneResource->PhysicalJoint.GlobalAnchor);
-		PhysicalJoint->SetRotation(BoneResource->PhysicalJoint.GlobalAxis);
+		PhysicalJoint->SetPosition(GetWorldPosition());
 
-		PhysicalJoint->SetBodyAConnectionPosition(ParentBone->PhysicalBody->GetPosition());
-		PhysicalJoint->SetBodyAConnectionOrientation(ParentBone->PhysicalBody->GetRotation());
+		ZEQuaternion TempRotation;
+		ZEQuaternion::Create(TempRotation, ZE_PI / 2, ZEVector3(0.0f, 0.0f, -1.0f));
 
-		PhysicalJoint->SetBodyBConnectionPosition(PhysicalBody->GetPosition());
-		PhysicalJoint->SetBodyBConnectionOrientation(PhysicalBody->GetRotation());
+		PhysicalJoint->SetRotation(TempRotation);
+
+		//PhysicalJoint->SetBodyAConnectionPosition(GetWorldPosition());
+		//PhysicalJoint->SetBodyAConnectionOrientation(GetWorldRotation());
+
+		//PhysicalJoint->SetBodyBConnectionPosition(GetWorldPosition());
+		//PhysicalJoint->SetBodyBConnectionOrientation(GetWorldRotation());
 
 		if(BoneResource->PhysicalJoint.Breakable)
 		{
 			PhysicalJoint->SetBreakForce(BoneResource->PhysicalJoint.BreakForce);
 			PhysicalJoint->SetBreakTorque(BoneResource->PhysicalJoint.BreakTorque);
 		}
-		
-		if(BoneResource->PhysicalJoint.XMotion || BoneResource->PhysicalJoint.YMotion || BoneResource->PhysicalJoint.ZMotion)
+
+		PhysicalJoint->SetXMotion(BoneResource->PhysicalJoint.XMotion);
+		PhysicalJoint->SetYMotion(BoneResource->PhysicalJoint.YMotion);
+		PhysicalJoint->SetZMotion(BoneResource->PhysicalJoint.ZMotion);
+
+		if(BoneResource->PhysicalJoint.XMotion != ZEPhysicalJointMotion::ZE_PJMOTION_LOCKED || BoneResource->PhysicalJoint.YMotion != ZEPhysicalJointMotion::ZE_PJMOTION_LOCKED || BoneResource->PhysicalJoint.ZMotion != ZEPhysicalJointMotion::ZE_PJMOTION_LOCKED)
 		{
 			PhysicalJoint->SetLinearLimitValue(BoneResource->PhysicalJoint.LinearLimitValue);
 			PhysicalJoint->SetLinearLimitRestitution(BoneResource->PhysicalJoint.LinearLimitRestitution);
@@ -390,7 +398,9 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 			PhysicalJoint->SetLinearLimitDamping(BoneResource->PhysicalJoint.LinearLimitDamping);
 		}
 
-		if (BoneResource->PhysicalJoint.Swing1Motion)
+		PhysicalJoint->SetSwing1Motion(BoneResource->PhysicalJoint.Swing1Motion);
+
+		if (BoneResource->PhysicalJoint.Swing1Motion != ZEPhysicalJointMotion::ZE_PJMOTION_LOCKED)
 		{
 			PhysicalJoint->SetSwing1LimitValue(BoneResource->PhysicalJoint.Swing1LimitValue);
 			PhysicalJoint->SetSwing1LimitRestitution(BoneResource->PhysicalJoint.Swing1LimitRestitution);
@@ -398,7 +408,9 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 			PhysicalJoint->SetSwing1LimitDamping(BoneResource->PhysicalJoint.Swing1LimitDamping);
 		}
 
-		if (BoneResource->PhysicalJoint.Swing2Motion)
+		PhysicalJoint->SetSwing2Motion(BoneResource->PhysicalJoint.Swing2Motion);
+
+		if (BoneResource->PhysicalJoint.Swing2Motion != ZEPhysicalJointMotion::ZE_PJMOTION_LOCKED)
 		{
 			PhysicalJoint->SetSwing2LimitValue(BoneResource->PhysicalJoint.Swing2LimitValue);
 			PhysicalJoint->SetSwing2LimitRestitution(BoneResource->PhysicalJoint.Swing2LimitRestitution);
@@ -406,7 +418,9 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 			PhysicalJoint->SetSwing2LimitDamping(BoneResource->PhysicalJoint.Swing2LimitDamping);
 		}
 
-		if (BoneResource->PhysicalJoint.TwistMotion)
+		PhysicalJoint->SetTwistMotion(BoneResource->PhysicalJoint.TwistMotion);
+
+		if (BoneResource->PhysicalJoint.TwistMotion != ZEPhysicalJointMotion::ZE_PJMOTION_LOCKED)
 		{
 			PhysicalJoint->SetTwistLowLimitValue(BoneResource->PhysicalJoint.TwistLowLimitValue);
 			PhysicalJoint->SetTwistLowLimitRestitution(BoneResource->PhysicalJoint.TwistLowLimitRestitution);
@@ -424,7 +438,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->SetMotorTargetVelocity(BoneResource->PhysicalJoint.MotorTargetVelocity);
 		PhysicalJoint->SetMotorTargetAngularVelocity(BoneResource->PhysicalJoint.MotorTargetAngularVelocity);
 
-		if(!BoneResource->PhysicalJoint.LinearXMotor)
+		if(BoneResource->PhysicalJoint.LinearXMotor != ZEPhysicalJointMotorType::ZE_PJMT_NONE)
 		{
 		PhysicalJoint->SetLinearXMotor(BoneResource->PhysicalJoint.LinearXMotor);
 		PhysicalJoint->SetLinearXMotorForce(BoneResource->PhysicalJoint.LinearXMotorForce);
@@ -432,7 +446,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->SetLinearXMotorDamper(BoneResource->PhysicalJoint.LinearXMotorDamper);
 		}
 
-		if(!BoneResource->PhysicalJoint.LinearYMotor)
+		if(BoneResource->PhysicalJoint.LinearYMotor != ZEPhysicalJointMotorType::ZE_PJMT_NONE)
 		{
 		PhysicalJoint->SetLinearYMotor(BoneResource->PhysicalJoint.LinearYMotor);
 		PhysicalJoint->SetLinearYMotorForce(BoneResource->PhysicalJoint.LinearYMotorForce);
@@ -440,7 +454,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->SetLinearYMotorDamper(BoneResource->PhysicalJoint.LinearYMotorDamper);
 		}
 
-		if(!BoneResource->PhysicalJoint.LinearZMotor)
+		if(BoneResource->PhysicalJoint.LinearZMotor != ZEPhysicalJointMotorType::ZE_PJMT_NONE)
 		{
 		PhysicalJoint->SetLinearZMotor(BoneResource->PhysicalJoint.LinearZMotor);
 		PhysicalJoint->SetLinearZMotorForce(BoneResource->PhysicalJoint.LinearZMotorForce);
@@ -448,7 +462,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->SetLinearZMotorDamper(BoneResource->PhysicalJoint.LinearZMotorDamper);
 		}
 
-		if(!BoneResource->PhysicalJoint.AngularSwingMotor)
+		if(BoneResource->PhysicalJoint.AngularSwingMotor != ZEPhysicalJointMotorType::ZE_PJMT_NONE)
 		{
 		PhysicalJoint->SetAngularSwingMotor(BoneResource->PhysicalJoint.AngularSwingMotor);
 		PhysicalJoint->SetAngularSwingMotorForce(BoneResource->PhysicalJoint.AngularSwingMotorForce);
@@ -456,7 +470,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->SetAngularSwingMotorDamper(BoneResource->PhysicalJoint.AngularSwingMotorDamper);
 		}
 
-		if(!BoneResource->PhysicalJoint.AngularTwistMotor)
+		if(BoneResource->PhysicalJoint.AngularTwistMotor != ZEPhysicalJointMotorType::ZE_PJMT_NONE)
 		{
 		PhysicalJoint->SetAngularTwistMotor(BoneResource->PhysicalJoint.AngularTwistMotor);
 		PhysicalJoint->SetAngularTwistMotorForce(BoneResource->PhysicalJoint.AngularTwistMotorForce);
@@ -464,7 +478,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->SetAngularTwistMotorDamper(BoneResource->PhysicalJoint.AngularTwistMotorDamper);
 		}
 
-		if(!BoneResource->PhysicalJoint.AngularSlerpMotor)
+		if(BoneResource->PhysicalJoint.AngularSlerpMotor != ZEPhysicalJointMotorType::ZE_PJMT_NONE)
 		{
 		PhysicalJoint->SetAngularSlerpMotor(BoneResource->PhysicalJoint.AngularSlerpMotor);
 		PhysicalJoint->SetAngularSlerpMotorForce(BoneResource->PhysicalJoint.AngularSlerpMotorForce);

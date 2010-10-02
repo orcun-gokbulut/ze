@@ -89,7 +89,7 @@ bool ZEPhysicsDebugModule::Initialize()
 	if (Player == NULL)
 	{
 		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
-		Player->SetPosition(ZEVector3(0.0f, 10.0f, -1.0f));
+		Player->SetPosition(ZEVector3(0.0f, 90.0f, -135.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
@@ -123,6 +123,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		//CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
 		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 		CanvasBrush->Canvas.LoadFromFile("TestCanvasMap.zeCanvas");
+		CanvasBrush->SetScale(ZEVector3(10,10,10));
 		CanvasBrush->UpdateCanvas();
 		ZEFixedMaterial* CanvasMaterial = ZEFixedMaterial::CreateInstance();
 		
@@ -229,9 +230,9 @@ bool ZEPhysicsDebugModule::Initialize()
 		ZEPhysicalCapsuleShape Object1Shape;
 		ZEPhysicalRigidBody* Object1 = ZEPhysicalRigidBody::CreateInstance();
 		Object1 = ZEPhysicalRigidBody::CreateInstance();
-		Object1->SetPosition(ZEVector3(0.0f, 10.0f, 0.0f));
-		Object1Shape.SetHeight(2.0f);
-		Object1Shape.SetRadius(0.5f);
+		Object1->SetPosition(ZEVector3(0.0f, 60.0f, 0.0f));
+		Object1Shape.SetHeight(20);
+		Object1Shape.SetRadius(2);
 		Object1->AddPhysicalShape(&Object1Shape);
 		Object1->SetKinematic(true);
 
@@ -241,9 +242,9 @@ bool ZEPhysicsDebugModule::Initialize()
 		ZEPhysicalCapsuleShape Object2Shape;
 		ZEPhysicalRigidBody* Object2 = ZEPhysicalRigidBody::CreateInstance();
 		Object2 = ZEPhysicalRigidBody::CreateInstance();
-		Object2->SetPosition(ZEVector3(0.0f, 7.0f, 0.0f));
-		Object2Shape.SetHeight(2.0f);
-		Object2Shape.SetRadius(0.5f);
+		Object2->SetPosition(ZEVector3(0.0f, 40.0f, 0.0f));
+		Object2Shape.SetHeight(20);
+		Object2Shape.SetRadius(2);
 		Object2->AddPhysicalShape(&Object2Shape);
 		Object2->SetKinematic(false);
 		Object2->SetLinearDamping(0.5f);
@@ -253,9 +254,9 @@ bool ZEPhysicsDebugModule::Initialize()
 
 		ZEPhysicalCapsuleShape Object3Shape;
 		ZEPhysicalRigidBody* Object3 = ZEPhysicalRigidBody::CreateInstance();
-		Object3->SetPosition(ZEVector3(0.0f, 4.0f, 0.0f));
-		Object3Shape.SetHeight(2.0f);
-		Object3Shape.SetRadius(0.5f);
+		Object3->SetPosition(ZEVector3(0.0f, 20.0f, 0.0f));
+		Object3Shape.SetHeight(20);
+		Object3Shape.SetRadius(2);
 		Object3->AddPhysicalShape(&Object3Shape);
 		Object3->SetKinematic(false);
 		Object3->SetLinearDamping(0.5f);
@@ -270,7 +271,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		ZEQuaternion TempRotation;
 		ZEQuaternion::Create(TempRotation, ZE_PI / 2, ZEVector3(0.0f, 0.0f, -1.0f));
 
-		Joint->SetPosition(ZEVector3(0.0f, 8.0f, 0.0f));
+		Joint->SetPosition(ZEVector3(0.0f, 50.0f, 0.0f));
 		Joint->SetRotation(TempRotation);
 
 		Joint->SetTwistMotion(ZE_PJMOTION_FREE);
@@ -287,7 +288,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		Joint2->SetBodyA(Object2);
 		Joint2->SetBodyB(Object3);
 
-		Joint2->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
+		Joint2->SetPosition(ZEVector3(0.0f, 30.0f, 0.0f));
 		Joint2->SetRotation(TempRotation);
 
 		Joint2->SetTwistMotion(ZE_PJMOTION_FREE);
@@ -297,12 +298,13 @@ bool ZEPhysicsDebugModule::Initialize()
 		Joint2->SetYMotion(ZE_PJMOTION_LOCKED);
 		Joint2->SetZMotion(ZE_PJMOTION_LOCKED);
 
-		World->AddPhysicalObject(Joint2);*/
+		World->AddPhysicalObject(Joint2);
+		*/
 
 	}
 
 	ZEModelBrush* Skeleton = new ZEModelBrush();
-	Skeleton->SetModelFile("3Bones.zemodel");
+	Skeleton->SetModelFile("3Box.zemodel");
 	Scene->AddEntity(Skeleton);
 	Skeleton->SetPosition(ZEVector3(0,0,2));
 

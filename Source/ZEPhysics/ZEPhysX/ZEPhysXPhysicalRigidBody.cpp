@@ -525,8 +525,8 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 				CapsuleShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
 				CapsuleShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
 
-				CapsuleShapeDesc.height = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetHeight();
 				CapsuleShapeDesc.radius = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetRadius();
+				CapsuleShapeDesc.height = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetHeight() - 2 * CapsuleShapeDesc.radius;
 
 				ActorDesc.shapes.push_back(&CapsuleShapeDesc);
 				break;

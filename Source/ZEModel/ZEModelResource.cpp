@@ -234,7 +234,7 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResour
 		ZEModelFilePhysicalShapeChunk ShapeChunk;
 		ResourceFile->Read(&ShapeChunk, sizeof(ZEModelFilePhysicalShapeChunk), 1);
 
-		if(ShapeChunk.ChunkId != ZE_MDLF_PHYSICAL_BODY_SHAPE_CHUNKID)
+		if(ShapeChunk.ChunkId != ZE_MDLF_PHYSICAL_SHAPE_CHUNKID)
 		{
 			zeError("Model Resource", "Corrupted ZEModel file. Physical shape chunk id does not matches.");
 			return false;
@@ -251,9 +251,9 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResour
 		{
 			case ZE_MFPST_BOX:
 			{
-				Shape->Box.Width		= 0.5 * ShapeChunk.Box.Width;
-				Shape->Box.Height		= 0.5 * ShapeChunk.Box.Height;
-				Shape->Box.Length		= 0.5 * ShapeChunk.Box.Length;
+				Shape->Box.Width		= ShapeChunk.Box.Width;
+				Shape->Box.Height		= ShapeChunk.Box.Height;
+				Shape->Box.Length		= ShapeChunk.Box.Length;
 				break;
 			}
 			case ZE_MFPST_SPHERE:
@@ -277,7 +277,7 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResour
 			{
 				ZEDWORD ChunkId;
 				ResourceFile->Read(&ChunkId, sizeof(ZEDWORD), 1);
-				if (ChunkId != ZE_MDLF_PHYSICAL_BODY_SHAPE_VERTEX_CHUNKID)
+				if (ChunkId != ZE_MDLF_PHYSICAL_SHAPE_VERTEX_CHUNKID)
 				{
 					zeError("Model Resource", "Corrupted ZEModel file. Physical vertex chunk id does not matches.");
 					return false;
@@ -395,7 +395,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceF
 static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEResourceFile* ResourceFile)
 {
 	ZEModelFilePhysicalJointChunk JointChunk;
-	ResourceFile->Read(&JointChunk, sizeof(ZEPhysicalJoint), 1);
+	ResourceFile->Read(&JointChunk, sizeof(ZEModelFilePhysicalJointChunk), 1);
 
 	if (JointChunk.ChunkId != ZE_MDLF_PHYSICAL_JOINT_CHUNKID)
 	{
