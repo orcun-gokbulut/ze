@@ -112,7 +112,7 @@ class ZEGraphicsModule : public ZEModule
 		virtual void						SetAnisotropicFilter(int Level);
 		bool								GetAnisotropicFilter();
 
-		virtual ZETextureOptions*		GetTextureOptions();
+		virtual ZETextureOptions*			GetTextureOptions();
 
 		size_t								GetCurrentFrameId();
 

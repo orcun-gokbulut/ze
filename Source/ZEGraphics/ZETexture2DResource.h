@@ -48,9 +48,10 @@ class ZETexture2DResource : public ZETextureResource
 {
 	friend static ZETexture2DResource*		LoadFromFileCache(const char *FileName);
 	friend static ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
-	friend static void						WriteToDevice(ZETexture2DResource* TextureResource, const unsigned char* SourceData, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Level, ZETextureCompressionType CompressionType);
+	friend static void						WriteToDevice(ZETexture2DResource* TextureResource, const unsigned char* SourceData, unsigned int Width, unsigned int Height, unsigned int Level, ZETextureCompressionType CompressionType);
 	friend static void						CreateMipmaps(ZETexture2DResource* TextureResource, unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable, const ZETextureOptions* LoadingOptions = NULL);
-	friend static void						Compress(ZETexture2DResource* TextureResource, ZEBYTE* Image, unsigned int Width, unsigned int Height, unsigned int Pitch, unsigned int BPP, unsigned int Level = 0,const ZETextureOptions* UserOptions = NULL);
+	friend static void						Compress(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int SourceWidth, unsigned int SourceHeight, unsigned int SourcePitch, const ZETextureOptions* Options = NULL);
+	
 
 	private:
 		ZETexture2D*						Texture;

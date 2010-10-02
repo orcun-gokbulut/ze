@@ -71,7 +71,7 @@ enum ZETextureDownSampling
 	ZE_TDS_NONE		= 0,
 	ZE_TDS_2X		= 1,
 	ZE_TDS_4X		= 2,
-	ZE_TDS_16X		= 3,
+	ZE_TDS_8X		= 3,
 	ZE_TDS_AUTO		= 4
 };
 

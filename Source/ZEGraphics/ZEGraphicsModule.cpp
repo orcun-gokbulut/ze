@@ -43,25 +43,28 @@ ZEOptionSection ZEGraphicsModule::GraphicsOptions;
 
 ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 {
-	static ZETextureOptions VeryHigh	= {ZE_TCT_NONE, ZE_TCQ_NORMAL, ZE_TDS_NONE, ZE_TFC_DISABLED, ZE_TMM_ENABLED, 0};
-	static ZETextureOptions High		= {ZE_TCT_DXT5, ZE_TCQ_NORMAL, ZE_TDS_NONE, ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 0};
-	static ZETextureOptions Normal		= {ZE_TCT_NONE, ZE_TCQ_NORMAL, ZE_TDS_2X,   ZE_TFC_DISABLED, ZE_TMM_ENABLED, 0};
-	static ZETextureOptions Low			= {ZE_TCT_DXT5, ZE_TCQ_NORMAL, ZE_TDS_2X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 0};
-	static ZETextureOptions VeryLow		= {ZE_TCT_DXT5, ZE_TCQ_NORMAL, ZE_TDS_4X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 0};
-	static ZETextureOptions UltraLow	= {ZE_TCT_DXT5, ZE_TCQ_NORMAL, ZE_TDS_16X,  ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 0};
+	static ZETextureOptions VeryHigh	= {ZE_TCT_NONE, ZE_TCQ_NORMAL, ZE_TDS_NONE, ZE_TFC_DISABLED, ZE_TMM_ENABLED, 25};
+	static ZETextureOptions High		= {ZE_TCT_DXT3, ZE_TCQ_LOW,    ZE_TDS_NONE, ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
+	static ZETextureOptions Normal		= {ZE_TCT_NONE, ZE_TCQ_NORMAL, ZE_TDS_2X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
+	static ZETextureOptions Low			= {ZE_TCT_DXT3, ZE_TCQ_NORMAL, ZE_TDS_2X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
+	static ZETextureOptions VeryLow		= {ZE_TCT_DXT3, ZE_TCQ_LOW,	   ZE_TDS_4X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
+	static ZETextureOptions UltraLow	= {ZE_TCT_DXT3, ZE_TCQ_LOW,	   ZE_TDS_8X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
 
 	switch(TextureQuality)
-	{
+	{	
+			
 		case ZE_TQ_VERY_HIGH:
 			return &VeryHigh;
 			break;
+		
 		case ZE_TQ_HIGH:
 			return &High;
 			break;
-		default:
+			
 		case ZE_TQ_NORMAL:
 			return &Normal;
 			break;
+		default:
 		case ZE_TQ_LOW:
 			return &Low;
 			break;
@@ -182,7 +185,7 @@ void ZEGraphicsModule::SetTextureQuality(ZETextureQuality Quality)
 
 ZETextureQuality ZEGraphicsModule::GetTextureQuality()
 {
-	return ZE_TQ_HIGH;
+	return TextureQuality;
 }
 
 void ZEGraphicsModule::SetModelQuality(int Quality)
