@@ -126,53 +126,6 @@ void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* Shadow
 	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
 	ShadowRenderer->Render();
 }
-/*
-const ZELight* ZEProjectiveLight::GetRenderOrderLight()
-{
-	ZEMatrix4x4 InvViewTranslationMatrix;
-	Camer
-	ZEMatrix4x4 InvViewRotationMatrix;
-
-	ZEMatrix4x4 InvViewMatrix;
-
-
-	ZEVector3 Position = GetWorldPosition();
-	ZEQuaternion Rotation;
-	
-	ZEMatrix4x4 PerspectiveMatrix, ViewMatrix, ViewProjMatrix, TranslationMatrix, RotationMatrix;
-	ZEMatrix4x4::CreateTranslation(TranslationMatrix, -Position.x, -Position.y, -Position.z);
-	
-	ZEQuaternion::Conjugate(Rotation, GetWorldRotation());
-	ZEMatrix4x4::CreateRotation(RotationMatrix, Rotation);
-
-	ZEMatrix4x4::Multiply(ViewMatrix, TranslationMatrix, RotationMatrix);
-
-	if (RenderOrderLight.ProjectionMap != NULL)
-	{
-		float OffsetW = 0.5f + (0.5f / (float)RenderOrderLight.ProjectionMap->GetWidth());
-		float OffsetH = 0.5f + (0.5f / (float)RenderOrderLight.ProjectionMap->GetHeight());
-		ZEMatrix4x4 ScaleBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
-									0.0f, -0.5f, 0.0f, 0.0f,
-									0.0f, 0.0f, 1.0f, 0.0f,
-									OffsetW, OffsetH, 0.0f, 1.0f);
-
-		ZEMatrix4x4::CreatePerspectiveProjection(PerspectiveMatrix, FOV, AspectRatio, zeGraphics->GetNearZ(), GetRange());
-		ZEMatrix4x4::Multiply(ViewProjMatrix, ViewMatrix, PerspectiveMatrix);
-		ZEMatrix4x4::Multiply(RenderOrderLight.LightViewProjMatrix, ViewProjMatrix, ScaleBiasMatrix);
-	}
-
-	ZEQuaternion::VectorProduct(RenderOrderLight.Direction, GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
-
-	if (CastsShadows)
-	{
-	}
-	else
-		RenderOrderLight.ShadowMap = NULL;
-
-
-	RenderOrderLight.Position = ZEVector3(GetWorldPosition());
-	return &RenderOrderLight;
-}*/
 
 const ZEViewVolume& ZEProjectiveLight::GetViewVolume()
 {

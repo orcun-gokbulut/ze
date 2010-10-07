@@ -168,6 +168,23 @@ float4 DLPSMain(PLPSInput Input) : COLOR0
 
 // Projective Light
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+float PjSampleShadowMap(sampler2D ShadowMap, float4 Texcoord, float Depth)
+{
+	// Shadow Quality 0 (No Shadow Mapping)
+	//return 1.0f;
+	
+	// Shadow Quality 1: No Filtering
+	return  tex2Dproj(ShadowMap, Texcoord) < Depth ? 1.0f : 0.0f;
+	 
+	// Shadow Quality 2: 2x2 PCF Filtering
+	
+	// Shadow Quality 3: 4x4 PCF Filtering
+	
+	// Shadow Quality 4: 12 tap Possion Filtering
+	
+	// Shadow Quality 5: 12 tap Randomly Rotated Possion Filtering
+}
+
 struct PjLVSOutput
 {
 	float4 Position : POSITION0;
@@ -210,7 +227,7 @@ float4 PjLPSMain(PjLPSInput Input) : COLOR0
 
 	float4 TextureLookup = mul(float4(Position, 1.0f), LightProjectionMatrixParam);
 	float3 ProjLightColor = tex2Dproj(ProjectionMap, TextureLookup) * LightColorParam;
-	
+		
 	float ViewDirection = normalize(-Position);
 	float3 HalfVector = normalize(LightDirection + ViewDirection);
 		
@@ -218,6 +235,9 @@ float4 PjLPSMain(PjLPSInput Input) : COLOR0
 	float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
 	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensityParam * ProjLightColor;
 	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
+	
+	/*if (ShadowMappingEnabled)
+		Output.xyz *= PjSampleShadowMap(ShadowMap, TextureLookup, Position.z);*/
 	
 	return Output;
 }

@@ -848,6 +848,10 @@
 						</FileConfiguration>
 					</File>
 					<File
+						RelativePath=".\RunDir\resources\shaders\Shadow.hlsl"
+						>
+					</File>
+					<File
 						RelativePath=".\RunDir\resources\shaders\SimpleMaterial.hlsl"
 						>
 						<FileConfiguration

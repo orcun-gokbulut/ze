@@ -43,55 +43,35 @@
 #include "ZECore\ZEError.h"
 #include "ZEGraphics\ZERenderOrder.h"
 
-#define ZE_MAX_SHADER_SOURCE_SIZE 32768
-
-LPDIRECT3DVERTEXSHADER9 ShadowMapVS = NULL;
-LPDIRECT3DVERTEXSHADER9 ShadowMapTextVS = NULL;
-LPDIRECT3DPIXELSHADER9 ShadowMapPS = NULL;
-LPDIRECT3DPIXELSHADER9 ShadowMapOpasityPS = NULL;
-LPDIRECT3DPIXELSHADER9 ShadowMapDiffuseAlphaPS = NULL;
+ZED3D9VertexShader* OmniLightVS = NULL;
+ZED3D9PixelShader* OmniLightPS = NULL;
+ZED3D9VertexShader* DirectionalLightVS = NULL;
+ZED3D9PixelShader* DirectionalLightPS = NULL;
+ZED3D9VertexShader* ProjectiveLightVS = NULL;
+ZED3D9PixelShader* ProjectiveLightPS = NULL;
 	
-bool ZED3D9ShadowRenderer::BaseInitialize()
+bool ZED3D9ShadowRenderer::InitializeShaders()
 {
-/*	char SourceVS[ZE_MAX_SHADER_SOURCE_SIZE], SourcePS[ZE_MAX_SHADER_SOURCE_SIZE];
-	ZEArray<D3DXMACRO> Macros;
+	OmniLightVS = ZED3D9VertexShader::CreateShader("Shadows.hlsl", "OmniVSMain", 0, "vs_3_0");
+	OmniLightPS = ZED3D9PixelShader::CreateShader("Shadows.hlsl", "OmniPSMain", 0, "ps_3_0");
 
-	ZEResourceFile::ReadTextFile("Shaders\\ShadowPass.vs", SourceVS, ZE_MAX_SHADER_SOURCE_SIZE);
-	ZEResourceFile::ReadTextFile("Shaders\\ShadowPass.ps", SourcePS, ZE_MAX_SHADER_SOURCE_SIZE);
-	
-	ZED3D9CommonTools::CompileVertexShader(&ShadowMapVS, SourceVS, "Shadow Renderer Shadow Pass", "vs_2_0", Macros.GetCArray());
-	ZED3D9CommonTools::CompilePixelShader(&ShadowMapPS, SourcePS, "Shadow Renderer Shadow Pass", "ps_2_0", Macros.GetCArray());
+	DirectionalLightVS = ZED3D9VertexShader::CreateShader("Shadows.hlsl", "DirectionalVSMain", 0, "vs_3_0");
+	DirectionalLightPS = ZED3D9PixelShader::CreateShader("Shadows.hlsl", "DirectionalPSMain", 0, "ps_3_0");
 
-	Macros.Add();
-	Macros[0].Name = "ZE_SHADER_TRANSPARANT";
-	Macros[0].Definition = "";
-	Macros.Add();
-	Macros[1].Name = NULL;
-	Macros[1].Definition = NULL;
-	ZED3D9CommonTools::CompileVertexShader(&ShadowMapTextVS, SourceVS, "Transparant Shadow Pass", "vs_2_0", Macros.GetCArray());
+	ProjectiveLightVS = ZED3D9VertexShader::CreateShader("Shadows.hlsl", "ProjectiveVSMain", 0, "vs_3_0");
+	ProjectiveLightPS = ZED3D9PixelShader::CreateShader("Shadows.hlsl", "ProjectivePSMain", 0, "ps_3_0");
 
-	Macros[1].Name = "ZE_SHADER_OPASITYMAP";
-	Macros[1].Definition = "";
-	Macros.Add();
-	Macros[2].Name = NULL;
-	Macros[2].Definition = NULL;
-	ZED3D9CommonTools::CompilePixelShader(&ShadowMapOpasityPS, SourcePS, "Opasity Map Transparant Shadow Pass", "ps_2_0", Macros.GetCArray());
-
-	Macros.Add();
-	Macros[1].Name = "ZE_SHADER_BASE_MAP";
-	Macros[1].Definition = "";
-	ZED3D9CommonTools::CompilePixelShader(&ShadowMapDiffuseAlphaPS, SourcePS, "Diffuse Map Alpha Transparant Shadow Pass", "ps_2_0", Macros.GetCArray());
-*/
 	return true;
 }
 
-void ZED3D9ShadowRenderer::BaseDeinitialize()
+void ZED3D9ShadowRenderer::DeinitializeShaders()
 {
-	ZED3D_RELEASE(ShadowMapVS);
-	ZED3D_RELEASE(ShadowMapTextVS);
-	ZED3D_RELEASE(ShadowMapPS);
-	ZED3D_RELEASE(ShadowMapOpasityPS);
-	ZED3D_RELEASE(ShadowMapDiffuseAlphaPS);
+	ZED3D_RELEASE(OmniLightVS);
+	ZED3D_RELEASE(OmniLightVS);
+	ZED3D_RELEASE(DirectionalLightVS);
+	ZED3D_RELEASE(DirectionalLightPS);
+	ZED3D_RELEASE(ProjectiveLightVS);
+	ZED3D_RELEASE(ProjectiveLightVS);
 }
 
 void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
@@ -142,14 +122,8 @@ void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
 	//PumpStreams(RenderOrder);
 }
 
-void ZED3D9ShadowRenderer::SetCamera(ZECamera* Camera)
+void ZED3D9ShadowRenderer::SetLight(ZELight* Light)
 {
-	this->Camera = Camera;
-}
-
-ZECamera* ZED3D9ShadowRenderer::GetCamera()
-{
-	return Camera;
 }
 
 void ZED3D9ShadowRenderer::SetViewPort(ZEViewPort* ViewPort)
@@ -214,11 +188,6 @@ void ZED3D9ShadowRenderer::ClearList()
 	NonTransparent.Clear(true);
 }
 
-void ZED3D9ShadowRenderer::SetLights(ZESmartArray<ZELight*>& Lights)
-{
-
-}
-
 void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZE_DEBUG_ENABLED
@@ -238,6 +207,18 @@ void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 
 void ZED3D9ShadowRenderer::Render(float ElaspedTime)
 {
+
+	switch(Light->GetLightType())
+	{
+		case ZE_LT_POINT:
+		case ZE_LT_OMNIPROJECTIVE:
+		case ZE_LT_DIRECTIONAL:
+			return;
+
+		case ZE_LT_PROJECTIVE:
+			GetDevice()->SetPixelShader(ProjectiveLightPS->)
+	}
+
 /*	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost)
 		return;
 

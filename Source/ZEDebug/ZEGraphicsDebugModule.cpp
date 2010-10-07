@@ -137,9 +137,9 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetIntensity(5.0f);
 	ProjectiveLight0->SetRange(55.0f);
 	ProjectiveLight0->SetCastsShadow(false);
-	ProjectiveLight0->SetFOV(ZE_PI_2);
+	ProjectiveLight0->SetFOV(ZE_PI_4);
 	ProjectiveLight0->SetAspectRatio(1.0f);
-	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
+	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\flashlight.png")->GetTexture());
 	Scene->AddEntity(ProjectiveLight0);
 	
 	// Transformation
@@ -148,6 +148,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	ZEMatrix4x4::CreateOrientation(WorldTransform, ProjectiveLight0->GetWorldPosition(), ProjectiveLight0->GetWorldRotation(), ZEVector3(TanFovRange * ProjectiveLight0->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, ProjectiveLight0->GetRange()));
 
 	ZECanvasBrush* Brush = new ZECanvasBrush();
+	Brush->SetVisible(false);
 	Brush->Canvas.SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
 	Brush->Canvas.SetTranslation(-ZEVector3::UnitZ);
 	Brush->Canvas.ApplyTransformationAfter(WorldTransform);
@@ -206,6 +207,7 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 	
 	Rotation = Rotation * ZEQuaternion(ZE_PIx2 * ElapsedTime, ZEVector3::UnitY);
 	OmniProjectiveLight0->SetRotation(Rotation);
+	//ProjectiveLight0->SetRotation(Rotation.Conjugate());
 }
 
 

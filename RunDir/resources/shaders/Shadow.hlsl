@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9ShadowRenderer.h
+ Zinek Engine - Shadow.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,69 +33,40 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_SHADOW_RENDERER_H__
-#define __ZE_D3D9_SHADOW_RENDERER_H__
+//* Vertex Shader Constants
+/////////////////////////////////////////////////////////////////////////////////////////
 
-#include "ZEGraphics\ZEShadowRenderer.h"
-#include "ZED3D9ComponentBase.h"
-#include <d3d9.h>
 
-class ZETexture2D;
-class ZETextureCube;
-class ZERenderOrder;
-enum ZETextureCubeFace;
+// Vertex Transformation
+float4x4 WorldLightMatrix : register(vs, c0);
+float4x4 WorldLightProjMatrix : register(vs, c4);
 
-class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
+// Projective Light Shadow Map Generation
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct ShVSOutput
 {
-	friend ZED3D9Module;
-	private:
-		ZED3D9ViewPort*							ViewPort;
-
-		ZESmartArray<ZERenderOrder>				NonTransparent;
-		ZESmartArray<ZERenderOrder>				Transparent;
-		ZESmartArray<ZERenderOrder>				Imposter;
-
-		ZEArray<ZEPostProcessor*>				PostProcessors;
-
-		ZELight*								Camera;
-
-	protected:
-												ZED3D9ShadowRenderer();
-		virtual									~ZED3D9ShadowRenderer();
-
-		void									DrawRenderOrder(ZERenderOrder* RenderOrder);
-
-	public:	
-		static bool								BaseInitialize();
-		static void								BaseDeinitialize();
-
-		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors();
-		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor);
-		virtual void							RemovePostProcessor(ZEPostProcessor* PostProcessor);
-
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
-		virtual void							Destroy();
-
-		virtual void							DeviceLost();
-		virtual bool							DeviceRestored();
-
-		virtual void							SetLight(ZELight* Light)
-
-		virtual void							SetViewPort(ZEViewPort* ViewPort);
-		virtual ZEViewPort*						GetViewPort();
-
-		virtual void							SetLights(ZESmartArray<ZELight*>& Lights);
-
-		virtual void							AddToRenderList(ZERenderOrder* RenderOrder);
-		virtual void							ClearList();
-
-		virtual void							Render(float ElaspedTime);
+	float4 Position : POSITION0;
+	float Depth : TEXCOORD0;
 };
 
-#endif
+PLSVSOutput ShVSMain(float4 Position : POSITION0)
+{
+	PLVSOutput Output;
+	
+	Output.Position = mul(Position, WorldLightProjMatrix);	
+	Output.Depth = mul(Position, WorldLightMatrix).z;
+	
+	return Output;
+}
 
+struct ShPSInput
+{
+	float Depth : TEXCOORD0;
+};
 
-
-
+float4 ShPSMain(PLPSInput Input) : COLOR0
+{
+	float Output = Input.Depth;
+	
+	return Output.xxxx;
+}
