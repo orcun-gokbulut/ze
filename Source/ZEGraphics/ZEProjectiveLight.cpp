@@ -105,24 +105,11 @@ void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* Shadow
 	if (!GetCastsShadow() || ShadowMap == NULL || ShadowMap->IsEmpty())
 		return;
 
-	ZEViewPoint ViewPoint;
-	ViewPoint.ViewPosition = GetWorldPosition();
-	
-	ZEMatrix4x4 PerspectiveMatrix, ViewMatrix, ViewProjMatrix, TranslationMatrix, RotationMatrix;
-	ZEMatrix4x4::CreateTranslation(TranslationMatrix, -ViewPoint.ViewPosition.x, -ViewPoint.ViewPosition.y, -ViewPoint.ViewPosition.z);
-	
-	ZEQuaternion Rotation;
-	ZEQuaternion::Conjugate(Rotation, GetWorldRotation());
-	ZEMatrix4x4::CreateRotation(RotationMatrix, Rotation);
+	ShadowRenderer->SetLight(this);
+	ShadowRenderer->SetViewPort(ShadowMap->GetViewPort());
 
-	ZEMatrix4x4::Multiply(ViewMatrix, TranslationMatrix, RotationMatrix);
-
-	ZEMatrix4x4::CreatePerspectiveProjection(PerspectiveMatrix, FOV, AspectRatio, zeGraphics->GetNearZ(), GetRange());
-	ZEMatrix4x4::Multiply(ViewPoint.ViewProjMatrix, ViewMatrix, PerspectiveMatrix);
-
-	//ShadowRenderer->SetOutput((ZETexture2D*)ShadowMap);
 	ShadowRenderer->ClearList();
-//	ShadowRenderer->SetCamera(ViewPoint);
+
 	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
 	ShadowRenderer->Render();
 }

@@ -114,7 +114,7 @@ class ZED3D9Module : public ZEGraphicsModule
 											 			~ZED3D9Module();
 
 	public:
-		ZEChunkArray<ZED3D9FrameRenderer*, 50>				Renderers;
+		ZEChunkArray<ZED3D9FrameRenderer*, 50>			Renderers;
 		ZEChunkArray<ZED3D9ShadowRenderer*, 50>			ShadowRenderers;
 		ZEChunkArray<ZED3D9Texture2D*, 50>				Texture2Ds;
 		ZEChunkArray<ZED3D9Texture3D*, 50>				Texture3Ds;
@@ -129,8 +129,6 @@ class ZED3D9Module : public ZEGraphicsModule
 		LPDIRECT3D9										GetDirect3D();
 		LPDIRECT3DDEVICE9								GetDevice();
 		D3DCAPS9*										GetDeviceCaps();
-		LPDIRECT3DSURFACE9								GetFrameColorBuffer();
-		LPDIRECT3DSURFACE9								GetFrameZBuffer();
 
 		ZED3D9PixelShaderVersion						GetPixelShaderVersion();
 		ZED3D9VertexShaderVersion						GetVertexShaderVersion();
@@ -165,6 +163,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual unsigned int							GetMaterialComponentMask();
 		
 		virtual ZEViewPort*								GetFrameBufferViewPort();
+
 		virtual ZED3D9ShaderManager*					GetShaderManager();
 
 		virtual ZEFrameRenderer*						CreateFrameRenderer();

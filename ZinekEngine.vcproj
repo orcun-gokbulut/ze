@@ -856,7 +856,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\RunDir\resources\shaders\Shadow.hlsl"
+						RelativePath=".\RunDir\resources\shaders\ShadowMaterial.hlsl"
 						>
 					</File>
 					<File

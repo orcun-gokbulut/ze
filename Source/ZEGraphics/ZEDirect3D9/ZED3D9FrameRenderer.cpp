@@ -192,17 +192,17 @@ void ZED3D9FrameRenderer::InitializeLightning()
 	if (LightningComponents.LightMeshVB == NULL)
 		LightningComponents.LightMeshVB = (ZED3D9StaticVertexBuffer*)Canvas.CreateStaticVertexBuffer();
 
-	LightningComponents.PointLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "PLVSMain", 0, "vs_2_0");
-	LightningComponents.PointLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PLPSMain", 0, "ps_2_0");
+	LightningComponents.PointLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "PLVSMain", 0, "vs_3_0");
+	LightningComponents.PointLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PLPSMain", 0, "ps_3_0");
 
-	LightningComponents.DirectionalLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "DLVSMain", 0, "vs_2_0");
-	LightningComponents.DirectionalLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "DLPSMain", 0, "ps_2_0");
+	LightningComponents.DirectionalLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "DLVSMain", 0, "vs_3_0");
+	LightningComponents.DirectionalLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "DLPSMain", 0, "ps_3_0");
 
-	LightningComponents.OmniProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "OPLVSMain", 0, "vs_2_0");
-	LightningComponents.OmniProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "OPLPSMain", 0, "ps_2_0");
+	LightningComponents.OmniProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "OPLVSMain", 0, "vs_3_0");
+	LightningComponents.OmniProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "OPLPSMain", 0, "ps_3_0");
 
-	LightningComponents.ProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "PjLVSMain", 0, "vs_2_0");
-	LightningComponents.ProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PjLPSMain", 0, "ps_2_0");
+	LightningComponents.ProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "PjLVSMain", 0, "vs_3_0");
+	LightningComponents.ProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PjLPSMain", 0, "ps_3_0");
 
 }
 
@@ -350,7 +350,7 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	ZEMatrix4x4 TextureMatrix;
 	ZEMatrix4x4::Create(TextureMatrix, 
 		0.5f, 0.0f, 0.0f, 0.0f,
-		0.0f, -0.5f, 0.0f, 0.0f,
+		0.0f, 0.5f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.5f, 0.5f, 0.0f, 1.0f);
 
@@ -396,7 +396,8 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	GetDevice()->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)Light->GetProjectionTexture())->Texture);
-
+	if (Light->GetCastsShadow() && Light->GetShadowMap() != NULL)
+		GetDevice()->SetTexture(4, ((ZED3D9Texture2D*)Light->GetShadowMap())->Texture);
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 6); // Cone 2
 
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
@@ -499,6 +500,9 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	ZED3D9CommonTools::SetRenderTarget(0, GBuffer1);
 	ZED3D9CommonTools::SetRenderTarget(1, GBuffer2);
 
+	GetDevice()->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x00000000, 1.0f, 0x00);
+
+	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, D3DCOLORWRITEENABLE_ALPHA | D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
@@ -848,15 +852,8 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 
 	zeProfilerStart("Rendering");
 
-	GetDevice()->SetRenderState(D3DRS_DEPTHBIAS, 0);
-	GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, 0);
-
-	/*GetDevice()->SetRenderTarget(0, GBuffer1);
-	GetDevice()->SetRenderTarget(1, GBuffer2);*/
-
 	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x00, 1.0f, 0x00);
-	
+
 	LightStencilMaskValue = 1;
 
 	GetDevice()->BeginScene();

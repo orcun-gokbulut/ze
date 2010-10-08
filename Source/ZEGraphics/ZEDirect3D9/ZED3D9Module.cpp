@@ -84,16 +84,6 @@ D3DCAPS9* ZED3D9Module::GetDeviceCaps()
 	return &DeviceCaps;
 }
 
-LPDIRECT3DSURFACE9 ZED3D9Module::GetFrameColorBuffer()
-{
-	return FrameBufferViewPort.FrameBuffer;
-}
-
-LPDIRECT3DSURFACE9 ZED3D9Module::GetFrameZBuffer()
-{
-	return FrameBufferViewPort.ZBuffer;
-}
-
 ZED3D9PixelShaderVersion ZED3D9Module::GetPixelShaderVersion()
 {
 	return PixelShaderVersion;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - Shadow.hlsl
+ Zinek Engine - ShadowMaterial.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,35 +38,30 @@
 
 
 // Vertex Transformation
-float4x4 WorldLightMatrix : register(vs, c0);
-float4x4 WorldLightProjMatrix : register(vs, c4);
+float4x4 WorldViewProjMatrix : register(vs, c0);
+float4x4 WorldViewMatrix : register(vs, c4);
 
 // Projective Light Shadow Map Generation
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-struct ShVSOutput
+struct ProjectiveSMVSOutput
 {
 	float4 Position : POSITION0;
 	float Depth : TEXCOORD0;
 };
 
-PLSVSOutput ShVSMain(float4 Position : POSITION0)
+ProjectiveSMVSOutput ProjectiveSMVSMain(float4 Position : POSITION0)
 {
-	PLVSOutput Output;
+	ProjectiveSMVSOutput Output;
 	
-	Output.Position = mul(Position, WorldLightProjMatrix);	
-	Output.Depth = mul(Position, WorldLightMatrix).z;
+	Output.Position = mul(Position, WorldViewProjMatrix);	
+	Output.Depth = mul(Position, WorldViewMatrix).z;
 	
 	return Output;
 }
 
-struct ShPSInput
+float4 ProjectiveSMPSMain(float Depth : TEXCOORD0) : COLOR0
 {
-	float Depth : TEXCOORD0;
-};
-
-float4 ShPSMain(PLPSInput Input) : COLOR0
-{
-	float Output = Input.Depth;
+	float Output = Depth;
 	
 	return Output.xxxx;
 }

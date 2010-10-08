@@ -37,12 +37,12 @@
 #include <d3d9.h>
 void zeD3D9ProfileStart(const char* EventName, const char* FileName, int Line)
 {
-	wchar_t Temp[250];
+	/*wchar_t Temp[250];
 	mbstowcs(Temp, EventName, 250);
-	D3DPERF_BeginEvent(0x00, Temp);
+	D3DPERF_BeginEvent(0x00, Temp);*/
 }
 
 void zeD3D9ProfileEnd()
 {
-	D3DPERF_EndEvent();
+	//D3DPERF_EndEvent();
 }

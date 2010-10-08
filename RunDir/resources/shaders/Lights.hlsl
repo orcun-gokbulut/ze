@@ -64,6 +64,8 @@ sampler2D GBuffer1 : register(ps, s0);
 sampler2D GBuffer2 : register(ps, s1);
 sampler2D ProjectionMap : register(ps, s2);
 samplerCUBE OmniProjectionMap : register(ps, s3);
+sampler2D ProjectionShadowMap : register(ps, s4);
+samplerCUBE OmniProjectionShadowMap : register(ps, s5);
 
 #include "GBuffer.hlsl"
 
@@ -236,8 +238,7 @@ float4 PjLPSMain(PjLPSInput Input) : COLOR0
 	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensityParam * ProjLightColor;
 	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
 	
-	/*if (ShadowMappingEnabled)
-		Output.xyz *= PjSampleShadowMap(ShadowMap, TextureLookup, Position.z);*/
+	Output.xyz *= PjSampleShadowMap(ProjectionShadowMap, TextureLookup, Position.z);
 	
 	return Output;
 }

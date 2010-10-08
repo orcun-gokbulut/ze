@@ -140,6 +140,8 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetFOV(ZE_PI_4);
 	ProjectiveLight0->SetAspectRatio(1.0f);
 	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
+	ProjectiveLight0->SetCastsShadow(true);
+	ProjectiveLight0->SetShadowMap(512, 512);
 	Scene->AddEntity(ProjectiveLight0);
 	
 	// Transformation

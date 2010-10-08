@@ -65,6 +65,12 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		bool									InitializeShaders();
 		void									DeinitializeShaders();
 
+		void									RenderProjectiveLight();
+		void									RenderOmniLight();
+		void									RenderDirectionalLight();
+
+		LPDIRECT3DSURFACE9						ShadowMapZBuffer;
+
 	protected:
 												ZED3D9ShadowRenderer();
 		virtual									~ZED3D9ShadowRenderer();
