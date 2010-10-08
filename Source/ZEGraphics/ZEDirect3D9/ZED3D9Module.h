@@ -59,7 +59,7 @@ class ZED3D9Texture3D;
 class ZED3D9TextureCube;
 class ZED3D9VertexDeclaration;
 class ZED3D9StaticVertexBuffer;
-class ZED3D9Renderer;
+class ZED3D9FrameRenderer;
 class ZED3D9ShadowRenderer;
 class ZED3D9PostProcessor;
 class ZED3D9FixedMaterialShader;
@@ -114,7 +114,7 @@ class ZED3D9Module : public ZEGraphicsModule
 											 			~ZED3D9Module();
 
 	public:
-		ZEChunkArray<ZED3D9Renderer*, 50>				Renderers;
+		ZEChunkArray<ZED3D9FrameRenderer*, 50>				Renderers;
 		ZEChunkArray<ZED3D9ShadowRenderer*, 50>			ShadowRenderers;
 		ZEChunkArray<ZED3D9Texture2D*, 50>				Texture2Ds;
 		ZEChunkArray<ZED3D9Texture3D*, 50>				Texture3Ds;
@@ -167,7 +167,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual ZEViewPort*								GetFrameBufferViewPort();
 		virtual ZED3D9ShaderManager*					GetShaderManager();
 
-		virtual ZERenderer*								CreateRenderer();
+		virtual ZEFrameRenderer*						CreateFrameRenderer();
 		virtual ZEShadowRenderer*						CreateShadowRenderer();
 
 		virtual ZEPostProcessor*						CreatePostProcessor();

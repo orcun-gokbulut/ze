@@ -174,7 +174,7 @@ float PjSampleShadowMap(sampler2D ShadowMap, float4 Texcoord, float Depth)
 	//return 1.0f;
 	
 	// Shadow Quality 1: No Filtering
-	return  tex2Dproj(ShadowMap, Texcoord) < Depth ? 1.0f : 0.0f;
+	return tex2Dproj(ShadowMap, Texcoord) < Depth ? 1.0f : 0.0f;
 	 
 	// Shadow Quality 2: 2x2 PCF Filtering
 	

@@ -139,7 +139,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetCastsShadow(false);
 	ProjectiveLight0->SetFOV(ZE_PI_4);
 	ProjectiveLight0->SetAspectRatio(1.0f);
-	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\flashlight.png")->GetTexture());
+	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
 	Scene->AddEntity(ProjectiveLight0);
 	
 	// Transformation

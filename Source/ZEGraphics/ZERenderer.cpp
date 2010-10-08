@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERenderer.h"
-#include "ZEGraphicsModule.h"
 
 ZERenderer::ZERenderer()
 {
@@ -48,11 +47,6 @@ ZERenderer::~ZERenderer()
 void ZERenderer::Destroy()
 {
 	delete this;
-}
-
-ZERenderer*  ZERenderer::CreateInstance()
-{
-	return ZEGraphicsModule::GetInstance()->CreateRenderer();
 }
 
 

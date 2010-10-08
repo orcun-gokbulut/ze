@@ -40,7 +40,7 @@
 #include "ZECore\ZEConsole.h"
 #include "ZECore\ZEError.h"
 #include "ZECore\ZECore.h"
-#include "ZEGraphics\ZERenderer.h"
+#include "ZEGraphics\ZEFrameRenderer.h"
 #include "ZEGraphics\ZEShadowRenderer.h"
 #include "ZEGraphics\ZECamera.h"
 #include "ZEGraphics\ZELight.h"
@@ -68,7 +68,7 @@ bool ZEScene::Initialize()
 	Deinitialize();
 
 	if (Renderer == NULL)
-		Renderer = ZERenderer::CreateInstance();
+		Renderer = ZEFrameRenderer::CreateInstance();
 
 	if (Renderer == NULL)
 	{
@@ -406,7 +406,8 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 		}
 	}
 
-	Renderer->SetLights(VisibleLights);
+	if (Renderer->GetRendererType() == ZE_RT_FRAME)
+		((ZEFrameRenderer*)Renderer)->SetLights(VisibleLights);
 
 	DrawParameters.Lights = VisibleLights;
 	if (Map != NULL)

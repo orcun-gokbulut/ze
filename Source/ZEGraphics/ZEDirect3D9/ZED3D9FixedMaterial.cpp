@@ -34,13 +34,14 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9FixedMaterial.h"
-#include "ZEGraphics\ZERenderOrder.h"
+#include "ZED3D9FrameRenderer.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9TextureCube.h"
-#include "ZEGraphics\ZECamera.h"
-#include "ZEGraphics\ZEMaterialComponents.h"
 #include "ZED3D9Shader.h"
 #include "ZED3D9CommonTools.h"
+#include "ZEGraphics\ZECamera.h"
+#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics\ZEMaterialComponents.h"
 
 void ZED3D9FixedMaterial::CreateShaders()
 {
@@ -182,7 +183,7 @@ void ZED3D9FixedMaterial::SetTextureStage(unsigned int Id, ZETextureAddressMode 
 
 }
 
-bool ZED3D9FixedMaterial::SetupPreZPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZED3D9FixedMaterial::SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
 {
 	GetDevice()->SetPixelShader(PreZPassPixelShader->GetPixelShader());
 	GetDevice()->SetVertexShader(PreZPassVertexShader->GetVertexShader());
@@ -190,7 +191,7 @@ bool ZED3D9FixedMaterial::SetupPreZPass(ZERenderer* Renderer, ZERenderOrder* Ren
 	return true;
 }
 
-bool ZED3D9FixedMaterial::SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9FixedMaterial*)this)->UpdateMaterial();
@@ -306,7 +307,7 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* 
 	return true;
 }
 
-bool ZED3D9FixedMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9FixedMaterial*)this)->UpdateMaterial();

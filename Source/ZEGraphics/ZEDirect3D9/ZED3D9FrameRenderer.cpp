@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9Renderer.cpp
+ Zinek Engine - ZED3D9FrameRenderer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #define D3D_DEBUG_INFO
 #endif
 
-#include "ZED3D9Renderer.h"
+#include "ZED3D9FrameRenderer.h"
 #include "ZED3D9VertexBuffer.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9Texture3D.h"
@@ -60,7 +60,7 @@
 
 #pragma warning(disable:4267)
 
-void ZED3D9Renderer::PumpStreams(ZERenderOrder* RenderOrder)
+void ZED3D9FrameRenderer::PumpStreams(ZERenderOrder* RenderOrder)
 {
 	ZEVertexBuffer* VertexBuffer = RenderOrder->VertexBuffer;
 
@@ -110,7 +110,7 @@ void ZED3D9Renderer::PumpStreams(ZERenderOrder* RenderOrder)
 	}
 }
 
-bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
+bool ZED3D9FrameRenderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZE_DEBUG_ENABLED
 		// Check render order material is available
@@ -160,7 +160,7 @@ bool ZED3D9Renderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 
 #include "ZEGraphics/ZECanvas.h"
 
-void ZED3D9Renderer::InitializeLightning()
+void ZED3D9FrameRenderer::InitializeLightning()
 {
 	// Create Static Vertex Buffer;
 	/*
@@ -206,7 +206,7 @@ void ZED3D9Renderer::InitializeLightning()
 
 }
 
-void ZED3D9Renderer::DeinitializeLightning()
+void ZED3D9FrameRenderer::DeinitializeLightning()
 {
 	ZED3D_RELEASE(LightningComponents.LightMeshVB);
 	ZED3D_RELEASE(LightningComponents.PointLightVS);
@@ -219,7 +219,7 @@ void ZED3D9Renderer::DeinitializeLightning()
 	ZED3D_RELEASE(LightningComponents.OmniProjectiveLightPS);
 }
 
-void ZED3D9Renderer::DrawPointLight(ZEPointLight* Light)
+void ZED3D9FrameRenderer::DrawPointLight(ZEPointLight* Light)
 {
 	zeProfilerStart("Light Pass");
 
@@ -260,7 +260,7 @@ void ZED3D9Renderer::DrawPointLight(ZEPointLight* Light)
 	zeProfilerEnd();
 }
 
-void ZED3D9Renderer::DrawDirectionalLight(ZEDirectionalLight* Light)
+void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 {
 	zeProfilerStart("Directional Light Pass");
 
@@ -303,7 +303,7 @@ void ZED3D9Renderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 	zeProfilerEnd();
 }
 
-void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
+void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 {
 	if (Light->GetProjectionTexture() == NULL)
 		return;
@@ -403,7 +403,7 @@ void ZED3D9Renderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	zeProfilerEnd();
 }
 
-void ZED3D9Renderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
+void ZED3D9FrameRenderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 {
 	if (Light->GetProjectionTexture() == NULL)
 		return;
@@ -464,7 +464,7 @@ void ZED3D9Renderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 	zeProfilerEnd();
 }
 
-void ZED3D9Renderer::DoPreZPass()
+void ZED3D9FrameRenderer::DoPreZPass()
 {
 	zeProfilerStart("PreZ Pass");
 
@@ -492,7 +492,7 @@ void ZED3D9Renderer::DoPreZPass()
 	zeProfilerEnd();
 }
 
-void ZED3D9Renderer::DoGBufferPass()
+void ZED3D9FrameRenderer::DoGBufferPass()
 {
 	zeProfilerStart("GBuffer Pass");
 	
@@ -530,7 +530,7 @@ void ZED3D9Renderer::DoGBufferPass()
 	zeProfilerEnd();
 }
 
-void ZED3D9Renderer::DoLightningPass()
+void ZED3D9FrameRenderer::DoLightningPass()
 {
 	if (Lights.GetCount() == 0)
 		return;
@@ -615,7 +615,7 @@ void ZED3D9Renderer::DoLightningPass()
 	zeProfilerEnd();
 }
 
-void ZED3D9Renderer::DoForwardPass()
+void ZED3D9FrameRenderer::DoForwardPass()
 {
 	zeProfilerStart("Forward Pass");
 
@@ -686,7 +686,7 @@ void ZED3D9Renderer::DoForwardPass()
 	zeProfilerEnd();
 }
 
-void ZED3D9Renderer::InitializeRenderTargets()
+void ZED3D9FrameRenderer::InitializeRenderTargets()
 {
 	ZED3D9CommonTools::CreateRenderTarget(&GBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
 	ZED3D9CommonTools::CreateRenderTarget(&GBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
@@ -696,7 +696,7 @@ void ZED3D9Renderer::InitializeRenderTargets()
 	ZED3D9CommonTools::CreateRenderTarget(&ABuffer, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
 }
 
-void ZED3D9Renderer::DeinitializeRenderTargets()
+void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 {
 	ZED3D_RELEASE(GBuffer1);
 	ZED3D_RELEASE(GBuffer2);
@@ -706,7 +706,7 @@ void ZED3D9Renderer::DeinitializeRenderTargets()
 	ZED3D_RELEASE(ABuffer);
 }
 
-ZED3D9Renderer::ZED3D9Renderer()
+ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 {
 	GBuffer1 = NULL;
 	GBuffer2 = NULL;
@@ -728,23 +728,23 @@ ZED3D9Renderer::ZED3D9Renderer()
 	SetViewPort(zeGraphics->GetFrameBufferViewPort());
 }
 
-ZED3D9Renderer::~ZED3D9Renderer()
+ZED3D9FrameRenderer::~ZED3D9FrameRenderer()
 {
 	Deinitialize();
 }
 
-void ZED3D9Renderer::SetViewPort(ZEViewPort* ViewPort)
+void ZED3D9FrameRenderer::SetViewPort(ZEViewPort* ViewPort)
 {
 	this->ViewPort = (ZED3D9ViewPort*)ViewPort;
 }
 
-ZEViewPort* ZED3D9Renderer::GetViewPort()
+ZEViewPort* ZED3D9FrameRenderer::GetViewPort()
 {
 	return ViewPort;
 }
 
 
-bool ZED3D9Renderer::Initialize() 
+bool ZED3D9FrameRenderer::Initialize() 
 { 
 	InitializeRenderTargets();
 	SSAOProcessor.Renderer = this;
@@ -756,21 +756,21 @@ bool ZED3D9Renderer::Initialize()
 	return true; 
 } 
 
-void ZED3D9Renderer::Deinitialize()
+void ZED3D9FrameRenderer::Deinitialize()
 {
 	HDRProcessor.Deinitialize();
 	SSAOProcessor.Deinitialize();
 	DeinitializeLightning();
 }
 
-void ZED3D9Renderer::DeviceLost()
+void ZED3D9FrameRenderer::DeviceLost()
 {
 	HDRProcessor.OnDeviceLost();
 	SSAOProcessor.OnDeviceLost();
 	DeinitializeRenderTargets();
 }
 
-bool ZED3D9Renderer::DeviceRestored()
+bool ZED3D9FrameRenderer::DeviceRestored()
 {
 	HDRProcessor.OnDeviceRestored();
 	SSAOProcessor.OnDeviceRestored();
@@ -779,44 +779,44 @@ bool ZED3D9Renderer::DeviceRestored()
 	return true;
 }
 
-void ZED3D9Renderer::Destroy()
+void ZED3D9FrameRenderer::Destroy()
 {
 	// Remove renderer from modules renderer list
-	GetModule()->Renderers.DeleteValue((ZED3D9Renderer*)this);
+	GetModule()->Renderers.DeleteValue((ZED3D9FrameRenderer*)this);
 	delete this;
 }
 
-void ZED3D9Renderer::SetCamera(ZECamera* Camera)
+void ZED3D9FrameRenderer::SetCamera(ZECamera* Camera)
 {
 	this->Camera = Camera;
 }
 
-ZECamera* ZED3D9Renderer::GetCamera()
+ZECamera* ZED3D9FrameRenderer::GetCamera()
 {
 	return Camera;
 }
 
-ZEArray<ZEPostProcessor*>& ZED3D9Renderer::GetPostProcessors()
+ZEArray<ZEPostProcessor*>& ZED3D9FrameRenderer::GetPostProcessors()
 {
 	return PostProcessors;
 }
 
-void ZED3D9Renderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
+void ZED3D9FrameRenderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
 {
 	PostProcessors.Add(PostProcessor);
 }
 
-void ZED3D9Renderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
+void ZED3D9FrameRenderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
 {
 	PostProcessors.DeleteValue(PostProcessor);
 }
 
-void ZED3D9Renderer::SetLights(ZESmartArray<ZELight*>& Lights)
+void ZED3D9FrameRenderer::SetLights(ZESmartArray<ZELight*>& Lights)
 {
 	this->Lights = Lights;
 }
 
-void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
+void ZED3D9FrameRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZE_DEBUG_ENABLED
 		// Check render order is valid
@@ -833,7 +833,7 @@ void ZED3D9Renderer::AddToRenderList(ZERenderOrder* RenderOrder)
 		NonTransparent.Add(*RenderOrder);
 }
 
-void ZED3D9Renderer::ClearList()
+void ZED3D9FrameRenderer::ClearList()
 {
 	//Clear render lists
 	Imposter.Clear(true);
@@ -841,7 +841,7 @@ void ZED3D9Renderer::ClearList()
 	NonTransparent.Clear(true);
 }
 
-void ZED3D9Renderer::Render(float ElaspedTime)
+void ZED3D9FrameRenderer::Render(float ElaspedTime)
 {
 	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost())
 		return;

@@ -40,12 +40,12 @@
 #include "ZED3D9ComponentBase.h"
 
 class ZETexture2DResource;
-class ZED3D9Renderer;
+class ZED3D9FrameRenderer;
 
 class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 {
 	public:
-		ZED3D9Renderer*					Renderer;
+		ZED3D9FrameRenderer*					Renderer;
 		
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 		LPDIRECT3DVERTEXSHADER9			VertexShader;

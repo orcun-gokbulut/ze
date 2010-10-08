@@ -88,7 +88,7 @@ enum ZEMaterialOpacityComponent
 	ZE_MOC_OPACITYMAP			= 2,
 };
 
-class ZERenderer;
+class ZEFrameRenderer;
 class ZERenderOrder;
 
 ZE_META_CLASS_DESCRIPTION(ZEMaterial)
@@ -108,9 +108,9 @@ class ZEMaterial : public ZEClass
 		virtual void					SetZero() = 0;
 		
 		// Render Pass
-		virtual bool					SetupPreZPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
-		virtual bool					SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
-		virtual bool					SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
 		virtual bool					SetupShadowPass() const;	
 
 		virtual void					UpdateMaterial();

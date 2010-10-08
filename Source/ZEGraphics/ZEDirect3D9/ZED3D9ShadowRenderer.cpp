@@ -33,15 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED3D9Module.h"
 #include "ZED3D9ShadowRenderer.h"
-#include "ZED3D9Renderer.h"
+#include "ZED3D9FrameRenderer.h"
+#include "ZED3D9Module.h"
 #include "ZED3D9CommonTools.h"
-#include "ZECore\ZEResourceFile.h"
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9Texture2D.h"
-#include "ZECore\ZEError.h"
-#include "ZEGraphics\ZERenderOrder.h"
+#include "ZED3D9Shader.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZEGraphics/ZEPointLight.h"
+#include "ZEGraphics/ZEOmniProjectiveLight.h"
+#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZECore/ZEError.h"
+#include "ZECore/ZEResourceFile.h"
 
 ZED3D9VertexShader* OmniLightVS = NULL;
 ZED3D9PixelShader* OmniLightPS = NULL;
@@ -122,10 +127,6 @@ void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
 	//PumpStreams(RenderOrder);
 }
 
-void ZED3D9ShadowRenderer::SetLight(ZELight* Light)
-{
-}
-
 void ZED3D9ShadowRenderer::SetViewPort(ZEViewPort* ViewPort)
 {
 	this->ViewPort = (ZED3D9ViewPort*)ViewPort;
@@ -134,6 +135,16 @@ void ZED3D9ShadowRenderer::SetViewPort(ZEViewPort* ViewPort)
 ZEViewPort* ZED3D9ShadowRenderer::GetViewPort()
 {
 	return ViewPort;
+}
+
+void ZED3D9ShadowRenderer::SetLight(ZELight* Light)
+{
+	this->Light = Light;
+}
+
+ZELight* ZED3D9ShadowRenderer::GetLight()
+{
+	return Light;
 }
 
 ZEArray<ZEPostProcessor*>& ZED3D9ShadowRenderer::GetPostProcessors()
@@ -192,7 +203,7 @@ void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZE_DEBUG_ENABLED
 		// Check render order is valid
-		if (!ZED3D9Renderer::CheckRenderOrder(RenderOrder))
+		if (!ZED3D9FrameRenderer::CheckRenderOrder(RenderOrder))
 			return;
 	#endif
 
@@ -216,7 +227,9 @@ void ZED3D9ShadowRenderer::Render(float ElaspedTime)
 			return;
 
 		case ZE_LT_PROJECTIVE:
-			GetDevice()->SetPixelShader(ProjectiveLightPS->)
+			GetDevice()->SetVertexShader(ProjectiveLightVS->GetVertexShader());
+			GetDevice()->SetPixelShader(ProjectiveLightPS->GetPixelShader());
+			break;
 	}
 
 /*	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost)

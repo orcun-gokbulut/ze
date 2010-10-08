@@ -44,6 +44,7 @@
 class ZECamera;
 class ZED3D9VertexShader;
 class ZED3D9PixelShader;
+class ZEFrameRenderer;
 
 class ZED3D9SimpleMaterial : public ZESimpleMaterial, public ZED3D9ComponentBase
 {
@@ -61,7 +62,7 @@ class ZED3D9SimpleMaterial : public ZESimpleMaterial, public ZED3D9ComponentBase
 										~ZED3D9SimpleMaterial();
 
 	public:
-		virtual bool					SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
 
 		virtual void					UpdateMaterial();
 

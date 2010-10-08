@@ -56,7 +56,7 @@ class ZED3D9UIMaterial : public ZEUIMaterial, public ZED3D9ComponentBase
 		virtual							~ZED3D9UIMaterial();
 
 	public:
-		virtual bool					SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
 		
 		virtual void					UpdateMaterial();
 

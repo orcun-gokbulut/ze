@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9FixedMaterial.h
+ Zinek Engine - ZEFrameRenderer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,50 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_FIXED_MATERIAL_H__
-#define __ZE_D3D9_FIXED_MATERIAL_H__
+#include "ZEFrameRenderer.h"
+#include "ZEGraphicsModule.h"
 
-#include <d3d9.h>
-#include "ZED3D9ComponentBase.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
-
-class ZED3D9VertexShader;
-class ZED3D9PixelShader;
-
-class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
+ZERendererType ZEFrameRenderer::GetRendererType()
 {
-	friend class ZED3D9Module;
-	private:
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
+	return ZE_RT_FRAME;
+}
 
-		ZED3D9VertexShader*				PreZPassVertexShader;
-		ZED3D9PixelShader*				PreZPassPixelShader;
-		ZED3D9VertexShader*				GBufferPassVertexShader;
-		ZED3D9PixelShader*				GBufferPassPixelShader;
-		ZED3D9VertexShader*				ForwardPassVertexShader;
-		ZED3D9PixelShader*				ForwardPassPixelShader;
-		ZED3D9VertexShader*				ShadowPassVertexShader;
-		ZED3D9PixelShader*				ShadowPassPixelShader;
-
-		void							CreateShaders();
-		void							ReleaseShaders();
-
-	protected:
-										ZED3D9FixedMaterial();
-		virtual							~ZED3D9FixedMaterial();
-
-	public:
-		const char*						ConvertToString(unsigned int MaterialComponent);
-
-		virtual bool					SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
-		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
-		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
-		virtual bool					SetupShadowPass() const;	
-
-		virtual void					UpdateMaterial();
-
-		virtual void					Release();
-};
-#endif
+ZEFrameRenderer* ZEFrameRenderer::CreateInstance()
+{
+	return zeGraphics->CreateFrameRenderer();
+}

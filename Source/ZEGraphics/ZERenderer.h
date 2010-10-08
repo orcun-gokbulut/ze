@@ -59,6 +59,12 @@ class ZETexture2D;
 class ZEViewPort;
 class ZELight;
 
+enum ZERendererType
+{
+	ZE_RT_FRAME,
+	ZE_RT_SHADOW
+};
+
 class ZERenderer
 {
 	protected:
@@ -66,15 +72,14 @@ class ZERenderer
 		virtual								~ZERenderer();
 
 	public:
+		virtual ZERendererType				GetRendererType() = 0;
+
 		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors() = 0;
 		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;
 		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor) = 0;
 
 		virtual void						SetViewPort(ZEViewPort* ViewPort) = 0;
 		virtual ZEViewPort*					GetViewPort() = 0;
-
-		virtual void						SetCamera(ZECamera* Camera) = 0;
-		virtual ZECamera*					GetCamera() = 0;
 
 		virtual bool						Initialize() = 0;
 		virtual void						Deinitialize() = 0;
@@ -84,16 +89,7 @@ class ZERenderer
 		virtual void						AddToRenderList(ZERenderOrder* RenderOrder) = 0;
 		virtual void						ClearList() = 0;
 		
-		virtual void						SetLights(ZESmartArray<ZELight*>& Lights) = 0;
-
 		virtual void						Render(float ElaspedTime = 0) = 0;
-
-
-		static ZERenderer*					CreateInstance();
 };
 
 #endif
-
-
-
-

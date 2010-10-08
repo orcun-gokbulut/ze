@@ -46,6 +46,11 @@ enum ZETextureCubeFace;
 class ZEShadowRenderer : public ZERenderer
 {
 	public:
+		virtual ZERendererType		GetRendererType();
+
+		virtual void				SetLight(ZELight* Light) = 0;
+		virtual ZELight*			GetLight() = 0;
+
 		static ZEShadowRenderer*	CreateInstance();
 };
 

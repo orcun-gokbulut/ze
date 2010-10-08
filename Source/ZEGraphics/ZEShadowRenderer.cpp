@@ -36,6 +36,11 @@
 #include "ZEShadowRenderer.h"
 #include "ZEGraphicsModule.h"
 
+ZERendererType ZEShadowRenderer::GetRendererType()
+{
+	return ZE_RT_SHADOW;
+}
+
 ZEShadowRenderer* ZEShadowRenderer::CreateInstance()
 {
 	return zeGraphics->CreateShadowRenderer();

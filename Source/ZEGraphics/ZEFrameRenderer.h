@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9FixedMaterial.h
+ Zinek Engine - ZEFrameRenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,49 +34,22 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D9_FIXED_MATERIAL_H__
-#define __ZE_D3D9_FIXED_MATERIAL_H__
+#ifndef __ZE_FRAME_RENDERER_H__
+#define __ZE_FRAME_RENDERER_H__
 
-#include <d3d9.h>
-#include "ZED3D9ComponentBase.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZERenderer.h"
 
-class ZED3D9VertexShader;
-class ZED3D9PixelShader;
-
-class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
+class ZEFrameRenderer : public ZERenderer
 {
-	friend class ZED3D9Module;
-	private:
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
-
-		ZED3D9VertexShader*				PreZPassVertexShader;
-		ZED3D9PixelShader*				PreZPassPixelShader;
-		ZED3D9VertexShader*				GBufferPassVertexShader;
-		ZED3D9PixelShader*				GBufferPassPixelShader;
-		ZED3D9VertexShader*				ForwardPassVertexShader;
-		ZED3D9PixelShader*				ForwardPassPixelShader;
-		ZED3D9VertexShader*				ShadowPassVertexShader;
-		ZED3D9PixelShader*				ShadowPassPixelShader;
-
-		void							CreateShaders();
-		void							ReleaseShaders();
-
-	protected:
-										ZED3D9FixedMaterial();
-		virtual							~ZED3D9FixedMaterial();
-
 	public:
-		const char*						ConvertToString(unsigned int MaterialComponent);
+		virtual ZERendererType				GetRendererType();
 
-		virtual bool					SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
-		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
-		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
-		virtual bool					SetupShadowPass() const;	
+		virtual void						SetCamera(ZECamera* Camera) = 0;
+		virtual ZECamera*					GetCamera() = 0;
 
-		virtual void					UpdateMaterial();
+		virtual void						SetLights(ZESmartArray<ZELight*>& Lights) = 0;
 
-		virtual void					Release();
+		static ZEFrameRenderer*				CreateInstance();
 };
+
 #endif

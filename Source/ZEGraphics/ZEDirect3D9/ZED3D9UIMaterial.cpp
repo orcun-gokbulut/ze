@@ -54,7 +54,7 @@ ZED3D9UIMaterial::~ZED3D9UIMaterial()
 
 }
 
-bool ZED3D9UIMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const 
+bool ZED3D9UIMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const 
 {
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{

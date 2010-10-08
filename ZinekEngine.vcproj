@@ -524,6 +524,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEGraphics\ZEFrameRenderer.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGraphics\ZEFrameRenderer.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEGraphics\ZEGraphicsModule.cpp"
 				>
 			</File>
@@ -631,6 +639,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9FrameRenderer.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9FrameRenderer.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9HDRProcessor.cpp"
 					>
 				</File>
@@ -660,14 +676,6 @@
 				</File>
 				<File
 					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Profiler.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Renderer.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9Renderer.h"
 					>
 				</File>
 				<File

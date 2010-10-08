@@ -48,7 +48,7 @@
 #include "ZED3D9VertexBuffer.h"
 #include "ZED3D9VertexDeclaration.h"
 #include "ZEPostProcessor\ZED3D9PostProcessor.h"
-#include "ZED3D9Renderer.h"
+#include "ZED3D9FrameRenderer.h"
 #include "ZED3D9ShadowRenderer.h"
 #include "ZED3D9UIMaterial.h"
 #include "ZED3D9SimpleMaterial.h"
@@ -304,27 +304,13 @@ bool ZED3D9Module::Initialize()
 
 	ShaderManager = new ZED3D9ShaderManager();
 
-	/*if (!ZED3D9PostProcessor::BaseInitialize())
-	{
-		zeCriticalError("Direct3D9", "Can not initialize D3D9 component base.");
-		return false;
-	}*/
-
-	// Initialize shadow renderer
-	if (!ZED3D9ShadowRenderer::BaseInitialize())
-	{
-		zeCriticalError("Direct3D9", "Can not initialize D3D9 shadow renderer base.");
-		return false;
-	}
-
 	return true;
 }
 
 void ZED3D9Module::Deinitialize()
 {
 	zeLog("Direct3D9", "Destroying Direct3D.\r\n");
-	ZED3D9ShadowRenderer::BaseDeinitialize();
-	//ZED3D9PostProcessor::BaseDeinitialize();
+
 	D3D9Device = NULL;
 	D3D9Module = NULL;
 
@@ -528,9 +514,9 @@ ZED3D9ShaderManager* ZED3D9Module::GetShaderManager()
 	return ShaderManager;
 }
 
-ZERenderer* ZED3D9Module::CreateRenderer()
+ZEFrameRenderer* ZED3D9Module::CreateFrameRenderer()
 {
-	ZED3D9Renderer* Renderer = new ZED3D9Renderer();
+	ZED3D9FrameRenderer* Renderer = new ZED3D9FrameRenderer();
 	if (!Renderer->Initialize())
 	{
 		Renderer->Destroy();

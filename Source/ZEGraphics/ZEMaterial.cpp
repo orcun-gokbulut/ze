@@ -48,17 +48,17 @@ ZEMaterial::~ZEMaterial()
 
 }
 
-bool ZEMaterial::SetupPreZPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZEMaterial::SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
 {
 	return false;
 }
 
-bool ZEMaterial::SetupGBufferPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZEMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
 {
 	return false;
 }
 
-bool ZEMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZEMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
 {
 	return false;
 }

@@ -44,6 +44,8 @@
 class ZETexture2D;
 class ZETextureCube;
 class ZERenderOrder;
+class ZEViewPort;
+class ZED3D9ViewPort;
 enum ZETextureCubeFace;
 
 class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
@@ -58,7 +60,10 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 
 		ZEArray<ZEPostProcessor*>				PostProcessors;
 
-		ZELight*								Camera;
+		ZELight*								Light;
+
+		bool									InitializeShaders();
+		void									DeinitializeShaders();
 
 	protected:
 												ZED3D9ShadowRenderer();
@@ -67,9 +72,6 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		void									DrawRenderOrder(ZERenderOrder* RenderOrder);
 
 	public:	
-		static bool								BaseInitialize();
-		static void								BaseDeinitialize();
-
 		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors();
 		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor);
 		virtual void							RemovePostProcessor(ZEPostProcessor* PostProcessor);
@@ -81,12 +83,11 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		virtual void							DeviceLost();
 		virtual bool							DeviceRestored();
 
-		virtual void							SetLight(ZELight* Light)
+		virtual void							SetLight(ZELight* Light);
+		virtual ZELight*						GetLight();
 
 		virtual void							SetViewPort(ZEViewPort* ViewPort);
 		virtual ZEViewPort*						GetViewPort();
-
-		virtual void							SetLights(ZESmartArray<ZELight*>& Lights);
 
 		virtual void							AddToRenderList(ZERenderOrder* RenderOrder);
 		virtual void							ClearList();

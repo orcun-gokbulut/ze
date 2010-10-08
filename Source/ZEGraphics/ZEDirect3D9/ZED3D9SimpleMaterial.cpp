@@ -33,13 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZED3D9FrameRenderer.h"
 #include "ZED3D9SimpleMaterial.h"
+#include "ZED3D9Texture2D.h"
+#include "ZED3D9Shader.h"
 #include "ZED3D9CommonTools.h"
 #include "ZEGraphics\ZERenderOrder.h"
 #include "ZEGraphics\ZECamera.h"
 #include "ZECore\ZEResourceFile.h"
-#include "ZED3D9Texture2D.h"
-#include "ZED3D9Shader.h"
 #include <D3D9.h>
 
 ZED3D9SimpleMaterial::ZED3D9SimpleMaterial()
@@ -68,7 +69,7 @@ void ZED3D9SimpleMaterial::ReleaseShaders()
 	ZED3D_RELEASE(PixelShader);
 }
 
-bool ZED3D9SimpleMaterial::SetupForwardPass(ZERenderer* Renderer, ZERenderOrder* RenderOrder) const 
+bool ZED3D9SimpleMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const 
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9SimpleMaterial*)this)->UpdateMaterial();

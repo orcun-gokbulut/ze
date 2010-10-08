@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9Renderer.h
+ Zinek Engine - ZED3D9FrameRenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_D3D9_RENDERER_H__
-#define __ZE_D3D9_RENDERER_H__
+#ifndef __ZE_D3D9_FRAME_RENDERER_H__
+#define __ZE_D3D9_FRAME_RENDERER_H__
 
-#include "ZEGraphics\ZERenderer.h"
+#include "ZEGraphics\ZEFrameRenderer.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZED3D9HDRProcessor.h"
 #include "ZED3D9SSAOProcessor.h"
@@ -52,7 +52,7 @@ class ZED3D9StaticVertexBuffer;
 class ZED3D9PixelShader;
 class ZED3D9VertexShader;
 
-class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
+class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	friend class ZED3D9ShadowRenderer;
@@ -118,8 +118,8 @@ class ZED3D9Renderer : public ZERenderer, public ZED3D9ComponentBase
 
 
 	protected:
-											ZED3D9Renderer();
-		virtual								~ZED3D9Renderer();					
+											ZED3D9FrameRenderer();
+		virtual								~ZED3D9FrameRenderer();					
 
 	public:
 		virtual void						SetViewPort(ZEViewPort* ViewPort);
