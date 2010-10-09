@@ -44,6 +44,7 @@
 #include "zeui/ZEUIManager.h"
 #include "zeui/ZEUIButtonControl.h"
 #include "zeui/ZEIUCheckBoxControl.h"
+#include "zeui/ZEUIHorizontalSliderControl.h"
 
 bool ZEGUIDebugModule::Initialize()
 {
@@ -68,10 +69,17 @@ bool ZEGUIDebugModule::Initialize()
 	ZEUICursorControl* Cursor = new ZEUICursorControl();
 	ZEUIButtonControl* Button = new ZEUIButtonControl();
 	ZEUICheckBoxControl* CheckBox = new ZEUICheckBoxControl();
+	ZEUIHorizontalSliderControl* HorizontalSlider = new ZEUIHorizontalSliderControl();
+	ZEUIHorizontalSliderControl* HorizontalSlider2 = new ZEUIHorizontalSliderControl();
 
 	zeGame->UIManager->AddControl(Cursor);
 	zeGame->UIManager->AddControl(Button);
 	zeGame->UIManager->AddControl(CheckBox);
+	zeGame->UIManager->AddControl(HorizontalSlider);
+	zeGame->UIManager->AddControl(HorizontalSlider2);
+
+	HorizontalSlider->SetPosition(ZEVector2(500, 700));
+	HorizontalSlider2->SetPosition(ZEVector2(500, 600));
 
 	Button->SetPosition(ZEVector2(20,100));
 

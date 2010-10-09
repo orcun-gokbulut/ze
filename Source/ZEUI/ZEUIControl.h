@@ -121,6 +121,7 @@ class ZEUIControl
 		virtual void					MouseHovered(const ZEVector2& MousePosition);
 		virtual	void					MouseEnterEvent(const ZEVector2& MousePosition);
 		virtual	void					MouseLeaveEvent(const ZEVector2& MousePosition);
+		virtual void					MouseMoveEvent(const ZEVector2& MoveAmount);
 
 		virtual void					FocusLost();
 		virtual void					FocusGained();
@@ -128,6 +129,7 @@ class ZEUIControl
 	public:
 		virtual bool					IsInactive();
 		bool							IsVisible();
+		bool							GetHoverState();
 
 		ZEUIControl*					GetParentControl();
 

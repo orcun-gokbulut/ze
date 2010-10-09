@@ -81,6 +81,12 @@ void ZEUIControl::MouseLeaveEvent(const ZEVector2& MousePosition)
 	HoverState = false;
 }
 
+void ZEUIControl::MouseMoveEvent(const ZEVector2& MoveAmount)
+{
+	if (MouseMovedEvent != NULL)
+		MouseMovedEvent(MoveAmount);
+}
+
 void ZEUIControl::FocusLost()
 {
 	FocusState = false;
@@ -128,6 +134,11 @@ ZEUIControl* ZEUIControl::GetParentControl()
 bool ZEUIControl::IsInactive()
 {
 	return false;
+}
+
+bool ZEUIControl::GetHoverState()
+{
+	return HoverState;
 }
 
 void ZEUIControl::SetName(const ZEString& Name)

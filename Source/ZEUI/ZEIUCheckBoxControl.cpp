@@ -61,21 +61,6 @@ void ZEUICheckBoxControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector
 	}
 }
 
-void ZEUICheckBoxControl::Draw(ZEUIRenderer* Renderer)
-{
-	ZEUIControl::Draw(Renderer);
-}
-
-void ZEUICheckBoxControl::Tick(float ElapsedTime)
-{
-		
-
-		
-
-		
-
-}
-
 void ZEUICheckBoxControl::SetState(ZEUICheckBoxState State)
 {
 	this->State = State;
@@ -108,8 +93,9 @@ ZEUICheckBoxControl::ZEUICheckBoxControl()
 	State = ZE_UI_CBS_UNCHECKED;
 	Label.SetFont(ZEFontResource::LoadResource("OldEnglish.zefont"));
 	Label.SetText(ZEString("Test"));
+	
 	SetHeight(25);
-	SetWidth(80);
+	SetWidth(25);
 
 	Box.Button.Material = ZEFixedMaterial::CreateInstance();
 	((ZEFixedMaterial*)(Box.Button.Material))->SetZero();
@@ -124,11 +110,6 @@ ZEUICheckBoxControl::ZEUICheckBoxControl()
 	Box.SetHeight(25);
 	Label.SetWidth(100);
 	Label.SetHeight(25);
-	//BlockChildEvents = true;
-
-	//Box.SetFocusable(true);
-	//SetFocusable(true);
-
 	AddChildControl(&Box);
 	AddChildControl(&Label);
 

@@ -112,19 +112,21 @@ void ZEUIButtonControl::SetPosition(const ZEVector2& Position)
 
 ZEUIButtonControl::ZEUIButtonControl()
 {
+	Button.Texcoords = ZERectangle(ZEVector2::Zero, ZEVector2(50,50));
 	Button.Material = ZEFixedMaterial::CreateInstance();
 	((ZEFixedMaterial*)(Button.Material))->SetZero();
 	((ZEFixedMaterial*)(Button.Material))->SetAmbientEnabled(true);
 	((ZEFixedMaterial*)(Button.Material))->SetAmbientColor(ZEVector3::One);
+	((ZEFixedMaterial*)(Button.Material))->SetDiffuseEnabled(true);
+	((ZEFixedMaterial*)(Button.Material))->SetDiffuseColor(ZEVector3::One);
+	((ZEFixedMaterial*)(Button.Material))->SetDiffuseMap(ZETexture2DResource::LoadResource("Button.jpg")->GetTexture());
+	((ZEFixedMaterial*)(Button.Material))->SetDiffuseFactor(1.0f);
 	((ZEFixedMaterial*)(Button.Material))->UpdateMaterial();
-
 	SetHeight(25);
 	SetWidth(80);
-
 	Button.Positions.LeftUp = GetVisibleRectangle().LeftUp;
 	Button.Positions.RightDown = GetVisibleRectangle().RightDown;
-
-	SetFocusable(true);
+	SetFocusable(false);
 }
 
 ZEUIButtonControl::~ZEUIButtonControl()

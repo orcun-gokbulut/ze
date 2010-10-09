@@ -46,6 +46,7 @@ ZEUIManager::ZEUIManager()
 	LastHoveredControl = NULL;
 	LastPressedControl = NULL;
 	LastFocusedControl = NULL;
+	MouseMoveEventFlag = false;
 }
 
 ZEUIManager::~ZEUIManager() 
@@ -127,20 +128,26 @@ void ZEUIManager::ProcessEvents()
 	{
 		for (int I = 0; I < Controls.GetCount(); I++)
 		{
+			if (Controls[I] == Cursor)
+			{
+				continue;
+			}
+
 			if (LastHoveredControl != NULL && ZERectangle::BoundingTest(LastHoveredControl->GetVisibleRectangle(), CursorPosition) == false)
 			{
 				LastHoveredControl->MouseLeaveEvent(CursorPosition);
+				LastHoveredControl = NULL;
 			}
 
 			ZEUIControl* Reciever = NULL;
-
-			if (Controls[I] == Cursor)
-				continue;
 
 			for (int I = 0; I < Controls.GetCount(); I++)
 			{
 				if (ZERectangle::BoundingTest(Controls[I]->GetVisibleRectangle(), CursorPosition))
 				{
+					if(Controls[I] == Cursor)
+						continue;
+
 					if (Controls[I]->GetChildControls().GetCount() == 0)
 					{
 						Reciever = Controls[I];
@@ -151,7 +158,7 @@ void ZEUIManager::ProcessEvents()
 				}
 			}
 
-			if (Reciever != NULL && Reciever != LastHoveredControl)
+			if (Reciever != NULL && Reciever != LastHoveredControl && MouseMoveEventFlag == false && !Reciever->GetHoverState())
 			{
 				Reciever->MouseEnterEvent(CursorPosition);
 				LastHoveredControl = Reciever;
@@ -166,7 +173,7 @@ void ZEUIManager::ProcessEvents()
 	/*        MOUSE PRESS, RELEASE EVENT AND FOCUSGAIN, FOCUSLOST           */
 	/************************************************************************/
 
-	if (Cursor->GetCurrentButton() != ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE && PreviousPressedButton == ZE_UI_MOUSE_BUTTON_NONE)
+	if (Cursor->GetCurrentButton() != ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE && PreviousPressedButton == ZE_UI_MOUSE_BUTTON_NONE && LastHoveredControl != NULL)
 	{
 		LastHoveredControl->MouseButtonPressed(Cursor->GetCurrentButton(), CursorPosition);
 		LastPressedControl = LastHoveredControl;
@@ -188,6 +195,7 @@ void ZEUIManager::ProcessEvents()
 	if (LastPressedControl != NULL && Cursor->GetCurrentButton() == ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE)
 	{
 		LastPressedControl->MouseButtonReleased(PressedButton, CursorPosition);
+		MouseMoveEventFlag = false;
 
 		if (ZERectangle::BoundingTest(LastPressedControl->GetVisibleRectangle(), CursorPosition))
 		{
@@ -196,6 +204,15 @@ void ZEUIManager::ProcessEvents()
 
 		LastPressedControl = NULL;
 		PreviousPressedButton = ZE_UI_MOUSE_BUTTON_NONE;
+	}
+
+	if (LastPressedControl != NULL)
+		MouseMoveEventFlag = true;
+
+	if (MouseMoveEventFlag == true && LastPressedControl != NULL)
+	{
+		if (LastPressedControl != Cursor)
+			LastPressedControl->MouseMoveEvent(OldMousePosition - CursorPosition);
 	}
 
 	/************************************************************************/

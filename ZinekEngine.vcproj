@@ -1724,6 +1724,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEUI\ZEUIHorizontalSliderControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUIHorizontalSliderControl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEUI\ZEUIManager.cpp"
 				>
 			</File>
@@ -1745,6 +1753,14 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEUI\ZEUIRenderer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUISliderControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUISliderControl.h"
 				>
 			</File>
 			<File

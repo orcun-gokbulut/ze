@@ -67,9 +67,6 @@ protected:
 
 public:
 
-	virtual void		Draw(ZEUIRenderer* Renderer);
-	virtual void		Tick(float ElapsedTime);
-
 	void				SetState(ZEUICheckBoxState State);
 	ZEUICheckBoxState	GetState() const;	
 
