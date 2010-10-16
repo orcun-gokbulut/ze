@@ -33,9 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include <Shadow.hlsl>
+
 //* Vertex Shader Constants
 /////////////////////////////////////////////////////////////////////////////////////////
-
 
 // Vertex Transformation
 float3 ViewVector : register(vs, c0);
@@ -99,24 +100,33 @@ struct PLPSInput
 
 float4 PLPSMain(PLPSInput Input) : COLOR0
 {
-	float4 Output;
+	float4 Output = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	
 	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.w + 0.5f + PixelSize_2;
 	float3 Position = GetViewPosition(GBuffer1, ScreenPosition, Input.ViewVector);
 	float3 Normal = GetViewNormal(GBuffer2, ScreenPosition);
-	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
 
-	// Light Derived Parameters
 	float3 LightDisplacement = LightPositionParam - Position;
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
-	float ViewDirection = normalize(-Position);
-	float3 HalfVector = normalize(LightDirection + ViewDirection);
-		
+	
 	float AngularAttenuation = saturate(dot(LightDirection, Normal));
-	float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
-	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensityParam * LightColorParam;
-	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
+	if (AngularAttenuation > 0.0f)
+	{
+		float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
+
+		float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
+
+		float ViewDirection = normalize(-Position);
+		float3 HalfVector = normalize(LightDirection + ViewDirection);		
+
+		Output.xyz = LightIntensityParam * LightColorParam;
+		Output.w = pow(dot(Normal, HalfVector), SpecularPower);
+
+		Output *= AngularAttenuation;
+		Output *= DistanceAttenuation;
+
+	}
 	
 	return Output;
 }
@@ -162,30 +172,16 @@ float4 DLPSMain(PLPSInput Input) : COLOR0
 	float3 HalfVector = normalize(LightDirectionParam + ViewDirection);
 		
 	float AngularAttenuation = saturate(dot(LightDirectionParam, Normal));
-	Output.xyz = AngularAttenuation * LightIntensityParam * LightColorParam;
-	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower);
+	Output.xyz = LightIntensityParam * LightColorParam;
+	Output.w = pow(dot(Normal, HalfVector), SpecularPower);
 	
+	Output *= AngularAttenuation;
+
 	return Output;
 }
 
 // Projective Light
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float PjSampleShadowMap(sampler2D ShadowMap, float4 Texcoord, float Depth)
-{
-	// Shadow Quality 0 (No Shadow Mapping)
-	//return 1.0f;
-	
-	// Shadow Quality 1: No Filtering
-	return tex2Dproj(ShadowMap, Texcoord) < Depth ? 1.0f : 0.0f;
-	 
-	// Shadow Quality 2: 2x2 PCF Filtering
-	
-	// Shadow Quality 3: 4x4 PCF Filtering
-	
-	// Shadow Quality 4: 12 tap Possion Filtering
-	
-	// Shadow Quality 5: 12 tap Randomly Rotated Possion Filtering
-}
 
 struct PjLVSOutput
 {
@@ -215,31 +211,37 @@ struct PjLPSInput
 	
 float4 PjLPSMain(PjLPSInput Input) : COLOR0
 {
-	float4 Output;
+	float4 Output = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	
 	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.w + 0.5f + PixelSize_2;
 	float3 Position = GetViewPosition(GBuffer1, ScreenPosition, Input.ViewVector);
 	float3 Normal = GetViewNormal(GBuffer2, ScreenPosition);
-	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
 
-	// Light Derived Parameters
 	float3 LightDisplacement = LightPositionParam - Position;
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
 
-	float4 TextureLookup = mul(float4(Position, 1.0f), LightProjectionMatrixParam);
-	float3 ProjLightColor = tex2Dproj(ProjectionMap, TextureLookup) * LightColorParam;
-		
-	float ViewDirection = normalize(-Position);
-	float3 HalfVector = normalize(LightDirection + ViewDirection);
-		
 	float AngularAttenuation = saturate(dot(LightDirection, Normal));
-	float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
-	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensityParam * ProjLightColor;
-	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
-	
-	Output.xyz *= PjSampleShadowMap(ProjectionShadowMap, TextureLookup, Position.z);
-	
+	if (AngularAttenuation > 0.0f)
+	{
+		float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
+
+		float ViewDirection = normalize(-Position);
+		float3 HalfVector = normalize(LightDirection + ViewDirection);
+
+		float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
+
+		float4 TextureLookup = mul(float4(Position, 1.0f), LightProjectionMatrixParam);
+		float3 ProjLightColor = tex2Dproj(ProjectionMap, TextureLookup) * LightColorParam;
+
+		Output.xyz = LightIntensityParam * ProjLightColor;
+		Output.w = pow(dot(Normal, HalfVector), SpecularPower);
+
+		Output *= AngularAttenuation;
+		Output *= DistanceAttenuation;
+
+		Output *= SampleShadowMap(ProjectionShadowMap, TextureLookup);
+	}
 	return Output;
 }
 
@@ -273,28 +275,34 @@ struct OPLPSInput
 	
 float4 OPLPSMain(OPLPSInput Input) : COLOR0
 {
-	float4 Output;
+	float4 Output = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	
 	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.z * 0.5f + 0.5f + PixelSize_2;
 	float3 Position = GetViewPosition(GBuffer1, ScreenPosition, Input.ViewVector);
 	float3 Normal = GetViewNormal(GBuffer2, ScreenPosition);
-	float3 SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
 
-	// Light Derived Parameters
 	float3 LightDisplacement = LightPositionParam - Position;
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
 	
-	float3 TextureLookup = mul(LightDirection, (float3x3)LightRotationParam);
-	float3 ProjLightColor = texCUBE(OmniProjectionMap, TextureLookup).rgb * LightColorParam;
-	
-	float ViewDirection = normalize(-Position);
-	float3 HalfVector = normalize(LightDirection + ViewDirection);
-		
 	float AngularAttenuation = saturate(dot(LightDirection, Normal));
-	float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
-	Output.xyz = AngularAttenuation * DistanceAttenuation * LightIntensityParam * ProjLightColor;
-	Output.w = AngularAttenuation * pow(dot(Normal, HalfVector), SpecularPower) * DistanceAttenuation;
+	if (AngularAttenuation > 0.0f)
+	{	
+		float SpecularPower = GetSpecularPower(GBuffer2, ScreenPosition);
+		
+		float3 TextureLookup = mul(LightDirection, (float3x3)LightRotationParam);
+		float3 ProjLightColor = texCUBE(OmniProjectionMap, TextureLookup).rgb * LightColorParam;
+		
+		float ViewDirection = normalize(-Position);
+		float3 HalfVector = normalize(LightDirection + ViewDirection);
+			
+		float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
+		Output.xyz = LightIntensityParam * ProjLightColor;
+		Output.w = pow(dot(Normal, HalfVector), SpecularPower);
+		
+		Output *= AngularAttenuation;
+		Output *= DistanceAttenuation;
+	}
 	
 	return Output;
 }

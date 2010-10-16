@@ -63,7 +63,7 @@ class ZEProjectiveLight : public ZELight
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio() const;
  
-		const ZETexture2D*				GetShadowMap();
+		ZETexture2D*					GetShadowMap();
 		void							SetShadowMap(int Width, int Height);
 
 		void							SetProjectionTexture(const ZETexture2D* Texture);

@@ -99,6 +99,8 @@ D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 			return D3DFMT_R32F;
 		case ZE_TPF_RGBA_HDR:
 			return D3DFMT_A16B16G16R16F;
+		case ZE_TPF_SHADOW_MAP:
+			return D3DFMT_D24X8;
 		default:
 			return (D3DFORMAT)0;
 	}

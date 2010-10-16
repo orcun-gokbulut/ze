@@ -39,14 +39,13 @@
 
 // Vertex Transformation
 float4x4 WorldViewProjMatrix : register(vs, c0);
-float4x4 WorldViewMatrix : register(vs, c4);
 
 // Projective Light Shadow Map Generation
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct ProjectiveSMVSOutput
 {
 	float4 Position : POSITION0;
-	float Depth : TEXCOORD0;
+	float2 Depth : TEXCOORD0;
 };
 
 ProjectiveSMVSOutput ProjectiveSMVSMain(float4 Position : POSITION0)
@@ -54,14 +53,14 @@ ProjectiveSMVSOutput ProjectiveSMVSMain(float4 Position : POSITION0)
 	ProjectiveSMVSOutput Output;
 	
 	Output.Position = mul(Position, WorldViewProjMatrix);	
-	Output.Depth = mul(Position, WorldViewMatrix).z;
-	
+	Output.Depth.xy = Output.Position.zw;
+
 	return Output;
 }
 
-float4 ProjectiveSMPSMain(float Depth : TEXCOORD0) : COLOR0
+float4 ProjectiveSMPSMain(float2 Depth : TEXCOORD0) : COLOR0
 {
-	float Output = Depth;
+	float Output = Depth.x / Depth.y;
 	
 	return Output.xxxx;
 }

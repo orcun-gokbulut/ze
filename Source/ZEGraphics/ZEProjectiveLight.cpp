@@ -81,7 +81,7 @@ const ZEMatrix4x4& ZEProjectiveLight::GetProjectionMatrix()
 	return ZEMatrix4x4::Identity;
 }
 
-const ZETexture2D* ZEProjectiveLight::GetShadowMap()
+ZETexture2D* ZEProjectiveLight::GetShadowMap()
 {
 	return ShadowMap;
 }
@@ -93,7 +93,7 @@ void ZEProjectiveLight::SetShadowMap(int Width, int Height)
 	else
 		ShadowMap = ZETexture2D::CreateInstance();
 
-	if (!ShadowMap->Create(Width, Height, ZE_TPF_DEPTH, true))
+	if (!ShadowMap->Create(Width, Height, ZE_TPF_SHADOW_MAP, true))
 	{
 		zeError("Projective Light", "Can not create shadow map texture.");
 		return;

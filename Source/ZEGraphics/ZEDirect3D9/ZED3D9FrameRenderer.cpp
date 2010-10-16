@@ -185,8 +185,8 @@ void ZED3D9FrameRenderer::InitializeLightning()
 	Canvas.AddSphere(1.0f, 24, 24);
 
 	// Projective
-	Canvas.SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
-	Canvas.SetTranslation(-ZEVector3::UnitZ);
+	Canvas.SetRotation(ZEQuaternion(-ZE_PI_2, ZEVector3::UnitX));
+	Canvas.SetTranslation(ZEVector3::UnitZ);
 	Canvas.AddPyramid(1.0f, 1.0f, 1.0f);
 
 	if (LightningComponents.LightMeshVB == NULL)
@@ -344,20 +344,20 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	ZEMatrix4x4 LightViewMatrix;
 	ZEMatrix4x4::CreateViewTransform(LightViewMatrix, Light->GetWorldPosition(), Light->GetWorldRotation());
 	ZEMatrix4x4 LightProjectionMatrix;
-	ZEMatrix4x4::CreatePerspectiveProjection(LightProjectionMatrix, Light->GetFOV(), Light->GetAspectRatio(), 1.0f, Light->GetRange());
+	ZEMatrix4x4::CreatePerspectiveProjection(LightProjectionMatrix, Light->GetFOV(), Light->GetAspectRatio(), zeGraphics->GetNearZ(), Light->GetRange());
 	ZEMatrix4x4::Multiply(LightViewProjectionMatrix, LightViewMatrix, LightProjectionMatrix);
 
 	ZEMatrix4x4 TextureMatrix;
 	ZEMatrix4x4::Create(TextureMatrix, 
 		0.5f, 0.0f, 0.0f, 0.0f,
-		0.0f, 0.5f, 0.0f, 0.0f,
+		0.0f, -0.5f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
-		0.5f, 0.5f, 0.0f, 1.0f);
+		0.5f, 0.5f, -0.001f, 1.0f);
 
-	ZEMatrix4x4 InvViewMatrix;
-	ZEMatrix4x4::Inverse(InvViewMatrix, Camera->GetViewTransform());
+	ZEMatrix4x4 InvCameraViewMatrix;
+	ZEMatrix4x4::Inverse(InvCameraViewMatrix, Camera->GetViewTransform());
 	ZEMatrix4x4 ProjectionMatrix, Temp;
-	ZEMatrix4x4::Multiply(Temp, InvViewMatrix, LightViewProjectionMatrix);
+	ZEMatrix4x4::Multiply(Temp, InvCameraViewMatrix, LightViewProjectionMatrix);
 	ZEMatrix4x4::Multiply(ProjectionMatrix, Temp, TextureMatrix);
 
 	GetDevice()->SetPixelShaderConstantF(16, (float*)&ProjectionMatrix, 4);
@@ -397,7 +397,14 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)Light->GetProjectionTexture())->Texture);
 	if (Light->GetCastsShadow() && Light->GetShadowMap() != NULL)
+	{
 		GetDevice()->SetTexture(4, ((ZED3D9Texture2D*)Light->GetShadowMap())->Texture);
+		GetDevice()->SetSamplerState(4, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+		GetDevice()->SetSamplerState(4, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
+		GetDevice()->SetSamplerState(4, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+		GetDevice()->SetSamplerState(4, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+		GetDevice()->SetSamplerState(4, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+	}
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 6); // Cone 2
 
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);

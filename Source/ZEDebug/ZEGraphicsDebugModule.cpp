@@ -129,8 +129,8 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(OmniProjectiveLight0);
 
 	ProjectiveLight0 = new ZEProjectiveLight();
-	ProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 2.0f));
-	ProjectiveLight0->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3::UnitY));
+	ProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, -10.0f));
+	//ProjectiveLight0->SetRotation(ZEQuaternion(ZE_PI_4 + ZE_PI_8, ZEVector3::UnitY));
 	ProjectiveLight0->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
 	ProjectiveLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	ProjectiveLight0->SetAttenuation(0.01f, 0.0f, 1.0f);
@@ -147,27 +147,24 @@ bool ZEGraphicsDebugModule::Initialize()
 	// Transformation
 	ZEMatrix4x4 WorldTransform;
 	float TanFovRange = tanf(ProjectiveLight0->GetFOV() * 0.5f) * ProjectiveLight0->GetRange();
-	ZEMatrix4x4::CreateOrientation(WorldTransform, ProjectiveLight0->GetWorldPosition(), ProjectiveLight0->GetWorldRotation(), ZEVector3(TanFovRange * ProjectiveLight0->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, ProjectiveLight0->GetRange()));
-
-	ZECanvasBrush* Brush = new ZECanvasBrush();
+	Brush = new ZECanvasBrush();
 	Brush->SetVisible(false);
-	Brush->Canvas.SetRotation(ZEQuaternion(ZE_PI_2, ZEVector3::UnitX));
-	Brush->Canvas.SetTranslation(-ZEVector3::UnitZ);
-	Brush->Canvas.ApplyTransformationAfter(WorldTransform);
+	Brush->Canvas.SetRotation(ZEQuaternion(-ZE_PI_2, ZEVector3::UnitX));
+	Brush->Canvas.SetTranslation(ZEVector3::UnitZ);
+	Brush->Canvas.SetScale(ZEVector3(TanFovRange * ProjectiveLight0->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, ProjectiveLight0->GetRange()));
 	Brush->Canvas.SetColor(ZEVector4(ProjectiveLight0->GetColor(), 1.0f));
 	Brush->Canvas.AddPyramid(1, 1, 1);
-
 	ZESimpleMaterial* Material = ZESimpleMaterial::CreateInstance();
-	
 	Brush->Material = Material;
 	Material->SetTwoSided(true);
 	Material->SetVertexColor(true);
 	Material->SetWireframe(true);
 	Brush->UpdateCanvas();
 	Scene->AddEntity(Brush);
+
 	DirectionalLight0 = new ZEDirectionalLight();
 	DirectionalLight0->SetEnabled(false);
-	DirectionalLight0->SetRotation(ZEQuaternion(-ZE_PI_4, ZEVector3::UnitX));
+	DirectionalLight0->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
 	DirectionalLight0->SetIntensity(2.0f);
 	DirectionalLight0->SetCastsShadow(false);
@@ -175,7 +172,7 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	PointLight1->SetEnabled(true);
 	PointLight2->SetEnabled(false);
-	PointLight3->SetEnabled(false);
+	PointLight3->SetEnabled(true);
 	PointLight4->SetEnabled(false);
 	PointLight5->SetEnabled(false);
 	OmniProjectiveLight0->SetEnabled(true);
@@ -209,7 +206,9 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 	
 	Rotation = Rotation * ZEQuaternion(ZE_PIx2 * ElapsedTime, ZEVector3::UnitY);
 	OmniProjectiveLight0->SetRotation(Rotation);
-	//ProjectiveLight0->SetRotation(Rotation.Conjugate());
+	
+	//ProjectiveLight0->SetRotation(Rotation);
+	Brush->SetRotation(Rotation);
 }
 
 
@@ -222,8 +221,3 @@ ZEGraphicsDebugModule::~ZEGraphicsDebugModule()
 {
 	Deinitialize();
 }
-
-
-
-
-

@@ -69,7 +69,7 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		void									RenderOmniLight();
 		void									RenderDirectionalLight();
 
-		LPDIRECT3DSURFACE9						ShadowMapZBuffer;
+		LPDIRECT3DSURFACE9						ShadowMapFrameBuffer;
 
 	protected:
 												ZED3D9ShadowRenderer();

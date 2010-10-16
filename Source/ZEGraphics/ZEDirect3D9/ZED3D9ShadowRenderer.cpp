@@ -176,10 +176,10 @@ bool ZED3D9ShadowRenderer::DeviceRestored()
 bool ZED3D9ShadowRenderer::Initialize()
 {
 	InitializeShaders();
-	HRESULT hr = GetDevice()->CreateDepthStencilSurface(512, 512, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapZBuffer, NULL);
+	HRESULT hr = GetDevice()->CreateRenderTarget(512, 512, D3DFMT_X8R8G8B8, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapFrameBuffer, NULL);
 	if (hr != S_OK)
 	{
-		zeError("D3D9 Shadow Renderer", "Can not create shadow map z buffer.");
+		zeError("D3D9 Shadow Renderer", "Can not create shadow map frame buffer.");
 		return false;
 	}
 
@@ -189,7 +189,7 @@ bool ZED3D9ShadowRenderer::Initialize()
 void ZED3D9ShadowRenderer::Deinitialize()
 {
 	DeinitializeShaders();
-	ZED3D_RELEASE(ShadowMapZBuffer);
+	ZED3D_RELEASE(ShadowMapFrameBuffer);
 }
 
 void ZED3D9ShadowRenderer::Destroy()
@@ -228,6 +228,13 @@ void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 void ZED3D9ShadowRenderer::RenderProjectiveLight()
 {
 	ZEProjectiveLight* Light = (ZEProjectiveLight*)this->Light;
+	if (Light->GetShadowMap() == NULL)
+		Light->SetShadowMap(512, 512);
+	GetDevice()->SetRenderTarget(0, ShadowMapFrameBuffer);
+	GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)Light->GetShadowMap()->GetViewPort())->FrameBuffer);
+	float MaxFloat = FLT_MAX;
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, *(int*)&MaxFloat, 1.0f, 0x00);
+
 	GetDevice()->SetVertexShader(ProjectiveLightVS->GetVertexShader());
 	GetDevice()->SetPixelShader(ProjectiveLightPS->GetPixelShader());
 	
@@ -247,25 +254,17 @@ void ZED3D9ShadowRenderer::RenderProjectiveLight()
 		else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
 			ViewProjMatrix = ViewTransform;
 		else if (RenderOrder->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
-			ViewProjMatrix = ViewProjectionTransform;
+			ViewProjMatrix = ProjectionTransform;
 		else
 			ViewProjMatrix = ZEMatrix4x4::Identity;
 
 		ZEMatrix4x4 WorldViewProjMatrix;
-		ZEMatrix4x4 WorldViewMatrix;
 		if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
-		{
 			ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewProjMatrix);
-			ZEMatrix4x4::Multiply(WorldViewMatrix, RenderOrder->WorldMatrix, ViewTransform);
-		}
 		else
-		{
 			WorldViewProjMatrix = ViewProjectionTransform;
-			WorldViewMatrix = ViewTransform;
-		}
 
 		GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
-		GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewMatrix, 4);
 
 		// Setup ZCulling
 		if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
@@ -302,14 +301,10 @@ void ZED3D9ShadowRenderer::RenderOmniLight()
 
 void ZED3D9ShadowRenderer::Render(float ElaspedTime)
 {
-	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
-	GetDevice()->SetDepthStencilSurface(ShadowMapZBuffer);
-	GetDevice()->Clear(0, NULL, D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x00000000, 1.0f, 0x00);
-	
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFF);
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
@@ -323,17 +318,16 @@ void ZED3D9ShadowRenderer::Render(float ElaspedTime)
 			return;
 
 		case ZE_LT_PROJECTIVE:
-			if (((ZEProjectiveLight*)Light)->GetShadowMap() == NULL)
-				((ZEProjectiveLight*)Light)->SetShadowMap(512, 512);
 
 			RenderProjectiveLight();
 			break;
 	}
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFF);
 }
 
 ZED3D9ShadowRenderer::ZED3D9ShadowRenderer()
 {
-	ShadowMapZBuffer = NULL;
+	ShadowMapFrameBuffer = NULL;
 }
 
 ZED3D9ShadowRenderer::~ZED3D9ShadowRenderer()

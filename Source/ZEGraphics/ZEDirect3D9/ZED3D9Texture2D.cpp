@@ -89,11 +89,26 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 			Texture->Release();
 			Texture = NULL;
 		}
-	
-	DWORD Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP);
-	DWORD MipMap = (RenderTarget ? 1 : 0);
-	D3DPOOL Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
-	D3DFORMAT Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
+
+	DWORD Usage;
+	DWORD MipMap;
+	D3DPOOL Pool;
+	D3DFORMAT Format;
+
+	if (PixelFormat == ZE_TPF_SHADOW_MAP)
+	{
+		Usage = D3DUSAGE_DEPTHSTENCIL;
+		MipMap = 1;
+		Pool = D3DPOOL_DEFAULT;
+		Format = D3DFMT_D24X8;
+	}
+	else
+	{
+		Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP);
+		MipMap = (RenderTarget ? 1 : 0);
+		Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
+		Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
+	}
 
 	HRESULT Hr;
 	Hr = GetDevice()->CreateTexture(Width, Height, MipMap, Usage, Format, Pool, &Texture, NULL); 
