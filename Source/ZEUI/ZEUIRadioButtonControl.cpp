@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEIUCheckBoxControl.cpp
+ Zinek Engine - ZEUIRadioButtonControl.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,114 +33,100 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEIUCheckBoxControl.h"
+#include "ZEUIRadioButtonControl.h"
 #include "ZEFontResource.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEGraphics/ZETexture2DResource.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
-void ZEUICheckBoxControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+void ZEUIRadioButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {
+	ZEUIControl::MouseButtonPressed(Button, MousePosition);
+
+	if (State == ZE_UI_RBS_CHECKED)
+		return;
+
 	if(Button == ZE_UI_MOUSE_BUTTON_LEFT)
 	{
-		if (State == ZE_UI_CBS_UNCHECKED)
-		{
-			if (IsTriState)
-			{
-				State = ZE_UI_CBS_SEMICHECKED;
-				((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("SemiChecked.png")->GetTexture());
-			}
-			else
-			{
-				State = ZE_UI_CBS_CHECKED;
-				((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("Checked.png")->GetTexture());
-			}
-		}
-		
-		else if (State == ZE_UI_CBS_SEMICHECKED)
-		{	
-			State = ZE_UI_CBS_CHECKED;
-			((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("Checked.png")->GetTexture());
-		}
-		
-		else if (State == ZE_UI_CBS_CHECKED)
-		{	
-			State = ZE_UI_CBS_UNCHECKED;
-			((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
-		}
-	}
+		SetState(ZE_UI_RBS_CHECKED);
 
-	ZEUIControl::MouseButtonPressed(Button, MousePosition);
+		for (int I = 0; I < InteractingRadioButtons.GetCount(); I++)
+			InteractingRadioButtons[I]->SetState(ZE_UI_RBS_UNCHECKED);
+	}
 }
 
-void ZEUICheckBoxControl::SetState(ZEUICheckBoxState State)
+void ZEUIRadioButtonControl::AddInteractingRadioButton(ZEUIRadioButtonControl* RadioButton)
+{
+	InteractingRadioButtons.Add(RadioButton);
+}
+
+void ZEUIRadioButtonControl::RemoveInteractingRadioButton(ZEUIRadioButtonControl* RadioButton)
+{
+	InteractingRadioButtons.DeleteValue(RadioButton);
+}
+
+void ZEUIRadioButtonControl::SetState(ZEUIRadioButtonState State)
 {
 	this->State = State;
+
+	if (State == ZE_UI_RBS_CHECKED)
+		((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("SemiChecked.png")->GetTexture());
+
+	else if (State == ZE_UI_RBS_UNCHECKED)
+		((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
 }
 
-ZEUICheckBoxState ZEUICheckBoxControl::GetState() const
+ZEUIRadioButtonState ZEUIRadioButtonControl::GetState() const
 {
 	return State;
 }
 
-void ZEUICheckBoxControl::SetText(ZEString Text)
+void ZEUIRadioButtonControl::SetText(ZEString Text)
 {
 	Label.SetText(Text);
 }
 
-ZEString ZEUICheckBoxControl::GetText()
+ZEString ZEUIRadioButtonControl::GetText()
 {
 	return Label.GetText();
 }
 
-void ZEUICheckBoxControl::SetTriState(bool Tristate)
-{
-	IsTriState = Tristate;
-}
-
-bool ZEUICheckBoxControl::GetTristate() const
-{
-	return IsTriState;
-}
-
-ZEMaterial*	ZEUICheckBoxControl::GetMaterial() const
+ZEMaterial*	ZEUIRadioButtonControl::GetMaterial() const
 {
 	return NULL;
 }
 
-void ZEUICheckBoxControl::SetMaterial(ZEMaterial* Material)
+void ZEUIRadioButtonControl::SetMaterial(ZEMaterial* Material)
 {
-	Box.Button.Material = Material;
+	//Box.Button.Material = Material;
 }
 
-ZEUICheckBoxControl::ZEUICheckBoxControl()
+ZEUIRadioButtonControl::ZEUIRadioButtonControl()
 {
-	State = ZE_UI_CBS_UNCHECKED;
+	State = ZE_UI_RBS_UNCHECKED;
 	Label.SetFont(ZEFontResource::LoadResource("OldEnglish.zefont"));
 	Label.SetText(ZEString("Test"));
 
-	IsTriState = false;
-
 	Box.SetWidth(24);
 	Box.SetHeight(24);
-	Label.SetWidth(100);
+	Label.SetWidth(120);
 	Label.SetHeight(25);
 
 	AddChildControl(&Box);
 	AddChildControl(&Label);
 	Box.SetPosition(ZEVector2::Zero);
 	Label.SetPosition(ZEVector2(Box.GetPosition().x + Box.GetWidth(), Box.GetPosition().y));
-	
+
 	SetHeight(Box.GetHeight());
 	SetWidth(Box.GetWidth() + Label.GetWidth());
 
-	Box.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUICheckBoxControl::MouseButtonPressed));
-	Label.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUICheckBoxControl::MouseButtonPressed));
+	Box.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUIRadioButtonControl::MouseButtonPressed));
+	Label.SetMouseButtonPressedEvent(BindDelegate(this, &ZEUIRadioButtonControl::MouseButtonPressed));
 
 	((ZEUIMaterial*)Box.GetMaterial())->SetTexture(ZETexture2DResource::LoadResource("UnChecked.png")->GetTexture());
 }
 
-ZEUICheckBoxControl::~ZEUICheckBoxControl()
+ZEUIRadioButtonControl::~ZEUIRadioButtonControl()
 {
 
 }

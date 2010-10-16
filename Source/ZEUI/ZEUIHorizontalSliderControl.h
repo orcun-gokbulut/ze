@@ -41,18 +41,21 @@
 
 class ZEUIHorizontalSliderControl : public ZEUISliderControl
 {
+	protected:
+
+		virtual void	SetSliderValueByButton(const ZEVector2& MoveAmount);
+		virtual void	MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+
 	public:
 
-		void			Draw(ZEUIRenderer* Renderer);
-		//void			Tick(float ElapsedTime);
+		virtual void	Draw(ZEUIRenderer* Renderer);
 
 		virtual void	SetCurretnValue(float NewValue);
 
 		virtual	void	SetPosition(const ZEVector2& Position);
+		virtual void	SetWidth(float Width);
 
-		void			MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-		void			MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-		void			MouseMoveEvent(const ZEVector2& MoveAmount);
+		
 
 						ZEUIHorizontalSliderControl();
 };

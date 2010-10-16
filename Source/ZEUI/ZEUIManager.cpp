@@ -38,6 +38,41 @@
 #include "ZEUIControl.h"
 #include "ZECore\ZEError.h"
 #include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZEInput\ZEInputDefinitions.h"
+#include "ZEInput\ZEInputModule.h"
+
+#define ACTIONID_Q 0
+#define	ACTIONID_W 1
+#define	ACTIONID_E 2
+#define	ACTIONID_R 3
+#define	ACTIONID_T 4
+#define	ACTIONID_Y 5
+#define	ACTIONID_U 6
+#define	ACTIONID_I 7
+#define	ACTIONID_O 8
+#define	ACTIONID_P 9
+#define	ACTIONID_A 10
+#define	ACTIONID_S 11
+#define	ACTIONID_D 12
+#define	ACTIONID_F 13
+#define	ACTIONID_G 14
+#define	ACTIONID_H 15
+#define	ACTIONID_J 16
+#define	ACTIONID_K 17
+#define	ACTIONID_L 18
+#define	ACTIONID_Z 19
+#define	ACTIONID_X 20
+#define	ACTIONID_C 21
+#define	ACTIONID_V 22
+#define	ACTIONID_B 23
+#define	ACTIONID_N 24
+#define	ACTIONID_M 25
+#define	ACTIONID_SPACE		26
+#define	ACTIONID_BACKSPACE  27
+#define	ACTIONID_LEFTARROW  28
+#define	ACTIONID_RIGHTARROW 29
+#define	ACTIONID_UPARROW    30
+#define	ACTIONID_DOWNARROW  31
 
 ZEUIManager::ZEUIManager() 
 {
@@ -47,6 +82,40 @@ ZEUIManager::ZEUIManager()
 	LastPressedControl = NULL;
 	LastFocusedControl = NULL;
 	MouseMoveEventFlag = false;
+
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_Q,		"Q",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_Q, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_W,		"W",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_E,		"E",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_E, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_R,		"R",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_R, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_T,		"T",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_T, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_Y,		"Y",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_Y, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_U,		"U",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_U, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_I,		"I",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_I, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_O,		"O",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_O, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_P,		"P",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_P, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_A,		"A",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_A, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_S,		"S",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_D,		"D",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_D, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_F,		"F",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_G,		"G",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_G, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_H,		"H",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_H, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_J,		"J",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_J, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_K,		"K",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_K, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_L,		"L",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_L, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_Z,		"Z",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_Z, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_X,		"X",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_X, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_C,		"C",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_C, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_V,		"V",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_V, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_B,		"B",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_B, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_N,		"N",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_N, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_M,		"M",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_M, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SPACE,		"Space",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_SPACE, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKSPACE,	"BackSpace",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_BACKSPACE, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_LEFTARROW,	"LeftArrow",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_LEFTARROW, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHTARROW,	"RightArrow",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_RIGHTARROW, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_UPARROW,		"UpArrow",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_UPARROW, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_DOWNARROW,	"DownArrow",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_DOWNARROW, ZE_IBS_PRESSED)));
+
 }
 
 ZEUIManager::~ZEUIManager() 
@@ -133,6 +202,9 @@ void ZEUIManager::ProcessEvents()
 				continue;
 			}
 
+			if (Controls[I]->GetVisiblity() == false)
+				continue;
+
 			if (LastHoveredControl != NULL && ZERectangle::BoundingTest(LastHoveredControl->GetVisibleRectangle(), CursorPosition) == false)
 			{
 				LastHoveredControl->MouseLeaveEvent(CursorPosition);
@@ -143,8 +215,12 @@ void ZEUIManager::ProcessEvents()
 
 			for (int I = 0; I < Controls.GetCount(); I++)
 			{
+				if (Controls[I]->GetVisiblity() == false)
+					continue;
+
 				if (ZERectangle::BoundingTest(Controls[I]->GetVisibleRectangle(), CursorPosition))
 				{
+
 					if(Controls[I] == Cursor)
 						continue;
 
@@ -154,13 +230,19 @@ void ZEUIManager::ProcessEvents()
 					}
 
 					else
+					{
 						Reciever = FindEventReciever(Controls[I]);
+					}
 				}
 			}
 
-			if (Reciever != NULL && Reciever != LastHoveredControl && MouseMoveEventFlag == false && !Reciever->GetHoverState())
+			if (Reciever != NULL && Reciever != LastHoveredControl && MouseMoveEventFlag == false && !Reciever->GetHovered())
 			{
 				Reciever->MouseEnterEvent(CursorPosition);
+
+				if (LastHoveredControl != NULL)
+					LastHoveredControl->SetHovered(false);
+
 				LastHoveredControl = Reciever;
 			}
 		}
@@ -185,7 +267,7 @@ void ZEUIManager::ProcessEvents()
 			LastFocusedControl = NULL;
 		}
 
-		if (LastPressedControl->GetFocusable() && !LastPressedControl->GetFocusState() && LastFocusedControl == NULL)
+		if (LastPressedControl->GetFocusable() && !LastPressedControl->GetFocused() && LastFocusedControl == NULL)
 		{
 			LastPressedControl->FocusGained();
 			LastFocusedControl = LastPressedControl;
@@ -211,7 +293,7 @@ void ZEUIManager::ProcessEvents()
 
 	if (MouseMoveEventFlag == true && LastPressedControl != NULL)
 	{
-		if (LastPressedControl != Cursor)
+		if (LastPressedControl != Cursor && OldMousePosition != CursorPosition)
 			LastPressedControl->MouseMoveEvent(OldMousePosition - CursorPosition);
 	}
 
@@ -220,33 +302,180 @@ void ZEUIManager::ProcessEvents()
 	/************************************************************************/
 
 	OldMousePosition = CursorPosition;
+
+	/************************************************************************/
+	/*                          KEYPRESS EVENTS                             */
+	/************************************************************************/
+
+	if (LastFocusedControl != NULL)
+	{
+		zeInput->ProcessInputMap(&InputMap);
+
+		for (size_t I = 0; I < InputMap.InputActionCount; I++)
+		{
+			switch (InputMap.InputActions[I].Id)
+			{
+				case ACTIONID_Q:
+					LastFocusedControl->KeyPressed('Q');
+					break;
+
+				case ACTIONID_W:
+					LastFocusedControl->KeyPressed('W');
+					break;
+
+				case ACTIONID_E:
+					LastFocusedControl->KeyPressed('E');
+					break;
+
+				case ACTIONID_R:
+					LastFocusedControl->KeyPressed('R');
+					break;
+
+				case ACTIONID_T:
+					LastFocusedControl->KeyPressed('T');
+					break;
+
+				case ACTIONID_Y:
+					LastFocusedControl->KeyPressed('Y');
+					break;
+
+				case ACTIONID_U:
+					LastFocusedControl->KeyPressed('U');
+					break;
+
+				case ACTIONID_I:
+					LastFocusedControl->KeyPressed('I');
+					break;
+
+				case ACTIONID_O:
+					LastFocusedControl->KeyPressed('O');
+					break;
+
+				case ACTIONID_P:
+					LastFocusedControl->KeyPressed('P');
+					break;
+
+				case ACTIONID_A:
+					LastFocusedControl->KeyPressed('A');
+					break;
+
+				case ACTIONID_S:
+					LastFocusedControl->KeyPressed('S');
+					break;
+
+				case ACTIONID_D:
+					LastFocusedControl->KeyPressed('D');
+					break;
+
+				case ACTIONID_F:
+					LastFocusedControl->KeyPressed('F');
+					break;
+
+				case ACTIONID_G:
+					LastFocusedControl->KeyPressed('G');
+					break;
+
+				case ACTIONID_H:
+					LastFocusedControl->KeyPressed('H');
+					break;
+
+				case ACTIONID_J:
+					LastFocusedControl->KeyPressed('J');
+					break;
+
+				case ACTIONID_K:
+					LastFocusedControl->KeyPressed('K');
+					break;
+
+				case ACTIONID_L:
+					LastFocusedControl->KeyPressed('L');
+					break;
+
+				case ACTIONID_Z:
+					LastFocusedControl->KeyPressed('Z');
+					break;
+
+				case ACTIONID_X:
+					LastFocusedControl->KeyPressed('X');
+					break;
+
+				case ACTIONID_C:
+					LastFocusedControl->KeyPressed('C');
+					break;
+
+				case ACTIONID_V:
+					LastFocusedControl->KeyPressed('V');
+					break;
+
+				case ACTIONID_B:
+					LastFocusedControl->KeyPressed('B');
+					break;
+
+				case ACTIONID_N:
+					LastFocusedControl->KeyPressed('N');
+					break;
+
+				case ACTIONID_M:
+					LastFocusedControl->KeyPressed('M');
+					break;
+
+				case ACTIONID_SPACE:
+					LastFocusedControl->KeyPressed(' ');
+					break;
+
+				case ACTIONID_BACKSPACE:
+					LastFocusedControl->KeyPressed('\b');
+					break;
+
+				/*case ACTIONID_LEFTARROW:
+					LastFocusedControl->KeyPressed('');
+					break;
+
+				case ACTIONID_RIGHTARROW:
+					LastFocusedControl->KeyPressed('');
+					break;
+
+				case ACTIONID_UPARROW:
+					LastFocusedControl->KeyPressed('');
+					break;
+
+				case ACTIONID_DOWNARROW:
+					LastFocusedControl->KeyPressed('');
+					break;*/
+			}
+		}
+	}
+
+	/************************************************************************/
+	/*                          KEYPRESS EVENTS                             */
+	/************************************************************************/
 }
 
 ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 {
 	for (int I = 0; I < ParentControl->GetChildControls().GetCount(); I++)
 	{
-		if (ZERectangle::BoundingTest(ParentControl->GetVisibleRectangle(), Cursor->GetPosition()))
+		ZEUIControl* CurrentControl = ParentControl->GetChildControls()[I];
+		if (ZERectangle::BoundingTest(CurrentControl->GetVisibleRectangle(), Cursor->GetPosition()))
 		{
-			if (ParentControl->GetChildControls().GetItem(I)->GetChildControls().GetCount() == 0)
+			if (CurrentControl->GetChildControls().GetCount() != 0)
 			{
-				return ParentControl->GetChildControls()[I];
+				return FindEventReciever(CurrentControl);
 			}
 
-			else
-				FindEventReciever(ParentControl->GetChildControls()[I]);
+			else 
+				return CurrentControl;
 		}
-
-		else 
-			return  NULL;
 	}
+
+	return ParentControl;
 }
 
 void ZEUIManager::Render(ZERenderer* Renderer)
 {
 	UIRenderer->Clean();
 	for (size_t I = 0; I < Controls.GetCount(); I++)
-		if (Controls[I]->GetVisibilty())
+		if (Controls[I]->GetVisiblity())
 			Controls[I]->Draw(UIRenderer);
 
 	UIRenderer->Render(Renderer);

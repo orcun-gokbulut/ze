@@ -65,6 +65,7 @@ class ZEUIControl
 
 	private:
 		ZEString						Name;
+		ZEString						ToolTip;
 
 		ZEUIControl*					ParentControl;
 		ZEArray<ZEUIControl*>			ChildControls;
@@ -73,18 +74,28 @@ class ZEUIControl
 		ZERectangle						VisibleRectangle;
 	
 		ZEVector4						BackgroundColor;
+		ZEVector4						HoverColor;
+		ZEVector4						PressedColor;
+		ZEVector4						DisabledColor;
+
 		ZETexture2D*					BackgroundTexture;
+
 		ZEUIBackgroundType				BackgroundType;
 
-		bool							HoverState;
-		bool							FocusState;
-
-		bool							Focusable;
-
-		bool							Visibility;
-		bool							Enabled;
+		bool							IsFocusable;
+		bool							IsMoveable;
+		bool							IsFixedSized;
+		bool							IsModal;
+		bool							IsVisible;
+		bool							IsEnabled;
+		bool							IsHovered;
+		bool							IsFocused;
+		bool							IsPressed;       
+		
 		int								ZOrder;
 
+		ZEVector2						MaximumSize;
+		ZEVector2						MinimumSize;
 
 		ZEUIEventMouseClicked			MouseClickedEvent;
 		ZEUIEventMouseDoubleClicked		MouseDoubleClickedEvent;
@@ -102,13 +113,11 @@ class ZEUIControl
 	protected:
 
 		bool							DirtyVisibleRectangle;
-		//bool							BlockChildEvents;
-
 		void							SetParent(ZEUIControl *ParentName);
 
-		const ZEArray<ZEUIControl*>&	GetChildControls();			
-		void							AddChildControl(ZEUIControl* Control);
-		void							RemoveChildControl(ZEUIControl* Control);
+		void							SetHovered(bool Hovered);
+		void							SetFocused(bool Focused);
+		void							SetPressed(bool Pressed);							
 
 		ZEUIControl*					FindFocusedComponent();
 		ZEUIControl*					FindChildComponent(const ZEVector2& Position);
@@ -122,19 +131,53 @@ class ZEUIControl
 		virtual	void					MouseEnterEvent(const ZEVector2& MousePosition);
 		virtual	void					MouseLeaveEvent(const ZEVector2& MousePosition);
 		virtual void					MouseMoveEvent(const ZEVector2& MoveAmount);
-
 		virtual void					FocusLost();
 		virtual void					FocusGained();
 
 	public:
-		virtual bool					IsInactive();
-		bool							IsVisible();
-		bool							GetHoverState();
 
-		ZEUIControl*					GetParentControl();
+		ZEUIControl*					GetParentControl() const;
+
+		virtual void					AddChildControl(ZEUIControl* Control);
+		const ZEArray<ZEUIControl*>&	GetChildControls();			
+		void							RemoveChildControl(ZEUIControl* Control);
 
 		void							SetName(const ZEString& Name);
 		const ZEString&					GetName();
+
+		void							SetToolTip(const ZEString& ToolTip);
+		const ZEString&					GetToolTip();
+
+		void							SetVisiblity(bool Visiblity);
+		bool							GetVisiblity() const;
+
+		void							SetEnabled(bool Enabled);
+		bool							GetEnabled() const;
+
+		void							SetModal(bool Modal);
+		bool							GetModal() const;
+
+		void							SetFocusable(bool Focusable);
+		bool							GetFocusable();
+
+		virtual void					SetMoveable(bool Moveable);
+		bool							GetMoveable() const;
+
+		void							SetFixedSized(bool FixedSized);
+		bool							GetFixedSized() const; 
+
+		bool							GetHovered() const;
+		bool							GetFocused() const;
+		bool							GetPressed() const;
+
+		void							SetZOrder(int Z);
+		int								GetZOrder() const;
+
+		void							SetMinimumSize(ZEVector2 MinimumSize);
+		ZEVector2						GetMinimumSize() const;
+
+		void							SetMaximumSize(ZEVector2 MaximumSize);
+		ZEVector2						GetMaximumSize() const;
 
 		virtual void					SetPosition(const ZEVector2& Position);
 		const ZEVector2&				GetPosition();
@@ -151,26 +194,17 @@ class ZEUIControl
 		const ZERectangle&				GetVisibleRectangle();
 		const ZERectangle&				GetRectangle();
 
-		//bool							GetBlockChildEvents() const;
-
-		bool							HasFocus();
-		void							GainFocus();
-
-		virtual void					SetZOrder(int Z);
-		int								GetZOrder();
-
-		virtual void					SetEnabled(bool Enabled);
-		bool							GetEnabled();
-
-		virtual void					SetVisiblity(bool Visible);
-		bool							GetVisibilty();
-
-		void							SetFocusable(bool Focusable);
-		virtual bool					GetFocusable();
-		bool							GetFocusState();
-
 		void							SetBackgroundColor(const ZEVector4& Color);
 		const ZEVector4&				GetBackgroundColor();
+
+		void							SetHoverColor(const ZEVector4& Color);
+		const ZEVector4&				GetHoverColor();
+
+		void							SetPressedColor(const ZEVector4& Color);
+		const ZEVector4&				GetPressedColor();
+
+		void							SetDisabledColor(const ZEVector4& Color);
+		const ZEVector4&				GetDisabledColor();
 
 		void							SetBackgroundType(ZEUIBackgroundType Type);
 		ZEUIBackgroundType				GetBackgroundType();
@@ -189,6 +223,9 @@ class ZEUIControl
 
 		virtual void					Draw(ZEUIRenderer* Renderer);
 		virtual void					Tick(float ElapsedTime);
+
+		virtual ZEMaterial*				GetMaterial() const = 0;
+		virtual void					SetMaterial(ZEMaterial* Material) = 0;
 
 										ZEUIControl();
 										~ZEUIControl();

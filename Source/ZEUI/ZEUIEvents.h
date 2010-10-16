@@ -59,8 +59,8 @@ typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseLe
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseMoved;
 
 // Keyboard Events
-typedef fastdelegate::FastDelegate1<char, void>								ZEUIEventKeyPressed;
-typedef fastdelegate::FastDelegate1<char, void>								ZEUIEventKeyReleased;
+typedef fastdelegate::FastDelegate1<unsigned char, void>								ZEUIEventKeyPressed;
+typedef fastdelegate::FastDelegate1<unsigned char, void>								ZEUIEventKeyReleased;
 
 // Component Event
 typedef fastdelegate::FastDelegate0<void>									ZEUIEventDestroyed;

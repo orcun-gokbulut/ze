@@ -40,6 +40,7 @@
 #include "ZEDS\ZEArray.h"
 #include "ZEUIRenderer.h"
 #include "ZEUIEvents.h"
+#include "ZEInput/ZEInputMap.h"
 
 class ZEUIControl;
 class ZEUICursorControl;
@@ -47,6 +48,9 @@ class ZEUICursorControl;
 class ZEUIManager
 {
 	private:
+		
+		ZEInputMap					InputMap;
+
 		ZEArray<ZEUIControl*>		Controls;
 		ZEUIRenderer*				UIRenderer;
 		ZEUICursorControl*			Cursor;

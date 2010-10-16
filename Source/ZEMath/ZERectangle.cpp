@@ -119,7 +119,7 @@ void ZERectangle::SetHeight(float Height)
 
 float ZERectangle::GetHeight() const
 {
-	return LeftUp.y - RightDown.y;
+	return RightDown.y - LeftUp.y;
 }
 
 bool ZERectangle::IntersectionTest(const ZERectangle& RectangleA, const ZERectangle& RectangleB)

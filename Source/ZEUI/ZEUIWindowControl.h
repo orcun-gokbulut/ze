@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.cpp
+ Zinek Engine - ZEUIWindowControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,82 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUIButtonControl.h"
+#pragma once
+#ifndef __ZE_UI_WINDOW_CONTROL__
+#define __ZE_UI_WINDOW_CONTROL__
+
+#include "zeui/ZEUIControl.h"
+#include "zeui/ZEUIRectangle.h"
+#include "ZEUIFrameControl.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
-#include "zeui/ZEUIRenderer.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEUITextControl.h"
+#include "ZEUIButtonControl.h"
 
-void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
+class ZEUIWindowTitleBarControl : public ZEUIFrameControl
 {
-	if (!GetVisiblity())
-		return;
+	friend class ZEUIWindowControl;
 
-	ZEUIControl::Draw(Renderer);
-	ZEUIRectangle Output;
-		
-	if(!ZEUIRectangle::Clip(Output, Button, GetVisibleRectangle()))
-		Renderer->AddRectangle(Output);
+	protected:
+	
+		ZEUITextControl				Title;
+		ZEUIButtonControl			CloseButton;
+		ZEUIButtonControl			MinimizeButton;
 
-}
+		virtual void				MouseMoveEvent(const ZEVector2& MoveAmount);
 
-void ZEUIButtonControl::SetWidth(float Width)
+	public:
+
+		void						SetTitleText(const char* TitleText);
+		const char*					GetTitleText();
+
+		virtual void				SetWidth(float Width);
+
+									ZEUIWindowTitleBarControl();
+};
+
+class ZEUIWindowControl : public ZEUIControl
 {
-	ZEUIControl::SetWidth(Width);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-}
+	friend class ZEUIWindowTitleBarControl;
 
-void ZEUIButtonControl::SetHeight(float Height)
-{
-	ZEUIControl::SetHeight(Height);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-}
+	private:
 
-void ZEUIButtonControl::SetSize(const ZEVector2& Size)
-{
-	ZEUIControl::SetSize(Size);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-}
+		ZEUIWindowTitleBarControl	TitleBar;
+		ZEUIButtonControl			ResizeButton;
+		ZEUIFrameControl			ContentArea;
 
-void ZEUIButtonControl::SetPosition(const ZEVector2& Position)
-{
-	ZEUIControl::SetPosition(Position);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
+		virtual void				ResizeWindow(const ZEVector2& ResizeAmount);
+		virtual void				HideContentArea(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		virtual void				CloseWindow(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 
-}
+	public:
 
-ZEMaterial* ZEUIButtonControl::GetMaterial() const
-{
-	return ButtonMaterial;
-}
+		virtual void				SetMoveable(bool Moveable);
+		virtual void				SetWidth(float Width);
+		virtual void				SetHeight(float Height);
+		virtual void				AddChildControl(ZEUIControl* Control);
 
-void ZEUIButtonControl::SetMaterial(ZEMaterial* Material)
-{
-	ButtonMaterial = (ZEUIMaterial*)Material;
-}
+		virtual void				SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial*			GetMaterial() const;
 
-ZEUIButtonControl::ZEUIButtonControl()
-{
-	Button.Texcoords = ZERectangle(ZEVector2::Zero, ZEVector2(50,50));
-	ButtonMaterial = ZEUIMaterial::CreateInstance();
-	ButtonMaterial->SetZero();
-	ButtonMaterial->SetTexture(ZETexture2DResource::LoadResource("Button.jpg")->GetTexture());
-	Button.Color = ZEVector4::One;
+									ZEUIWindowControl();
+};
 
-	Button.Material = ButtonMaterial;
-
-	SetHeight(25);
-	SetWidth(80);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-	Button.Texcoords.LeftUp = ZEVector2::Zero;
-	Button.Texcoords.RightDown = ZEVector2::One;
-}
-
-ZEUIButtonControl::~ZEUIButtonControl()
-{
-
-}
+#endif

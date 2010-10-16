@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.cpp
+ Zinek Engine - ZEUIRadioButtonControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,82 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef __ZE_UI_RADIO_BUTTON_CONTROL__
+#define __ZE_UI_RADIO_BUTTON_CONTROL__
+
+#include "ZEUIControl.h"
+#include "ZEUITextControl.h"
 #include "ZEUIButtonControl.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
-#include "zeui/ZEUIRenderer.h"
-#include "ZEGraphics/ZETexture2DResource.h"
 
-void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
+enum ZEUIRadioButtonState
 {
-	if (!GetVisiblity())
-		return;
+	ZE_UI_RBS_UNCHECKED		= 0,
+	ZE_UI_RBS_CHECKED		= 1
+};
 
-	ZEUIControl::Draw(Renderer);
-	ZEUIRectangle Output;
-		
-	if(!ZEUIRectangle::Clip(Output, Button, GetVisibleRectangle()))
-		Renderer->AddRectangle(Output);
+class ZEString;
 
-}
-
-void ZEUIButtonControl::SetWidth(float Width)
+class ZEUIRadioButtonControl : public ZEUIControl
 {
-	ZEUIControl::SetWidth(Width);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-}
+	friend class ZEUIManager;
 
-void ZEUIButtonControl::SetHeight(float Height)
-{
-	ZEUIControl::SetHeight(Height);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-}
+	private:
 
-void ZEUIButtonControl::SetSize(const ZEVector2& Size)
-{
-	ZEUIControl::SetSize(Size);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-}
+		ZEUIRadioButtonState				State;
 
-void ZEUIButtonControl::SetPosition(const ZEVector2& Position)
-{
-	ZEUIControl::SetPosition(Position);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
+		ZEUIButtonControl					Box;
+		ZEUITextControl						Label;
 
-}
+		ZEArray<ZEUIRadioButtonControl*>	InteractingRadioButtons;
 
-ZEMaterial* ZEUIButtonControl::GetMaterial() const
-{
-	return ButtonMaterial;
-}
+	protected:
 
-void ZEUIButtonControl::SetMaterial(ZEMaterial* Material)
-{
-	ButtonMaterial = (ZEUIMaterial*)Material;
-}
+		virtual void 						MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 
-ZEUIButtonControl::ZEUIButtonControl()
-{
-	Button.Texcoords = ZERectangle(ZEVector2::Zero, ZEVector2(50,50));
-	ButtonMaterial = ZEUIMaterial::CreateInstance();
-	ButtonMaterial->SetZero();
-	ButtonMaterial->SetTexture(ZETexture2DResource::LoadResource("Button.jpg")->GetTexture());
-	Button.Color = ZEVector4::One;
+	public:
 
-	Button.Material = ButtonMaterial;
+		void								AddInteractingRadioButton(ZEUIRadioButtonControl* RadioButton);
+		void								RemoveInteractingRadioButton(ZEUIRadioButtonControl* RadioButton);
 
-	SetHeight(25);
-	SetWidth(80);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-	Button.Texcoords.LeftUp = ZEVector2::Zero;
-	Button.Texcoords.RightDown = ZEVector2::One;
-}
+		void								SetState(ZEUIRadioButtonState State);
+		ZEUIRadioButtonState				GetState() const;	
 
-ZEUIButtonControl::~ZEUIButtonControl()
-{
+		void								SetText(ZEString Text);
+		ZEString							GetText();
 
-}
+		virtual ZEMaterial*					GetMaterial() const;
+		virtual void						SetMaterial(ZEMaterial* Material);
+
+
+											ZEUIRadioButtonControl();
+											~ZEUIRadioButtonControl();
+
+};
+
+#endif

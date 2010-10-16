@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.h
+ Zinek Engine - ZEUTextEditControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,39 +34,41 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_BUTTON_CONTROL__
-#define __ZE_UI_BUTTON_CONTROL__
+#ifndef __ZE_UI_TEXT_EDIT_CONTROL__
+#define __ZE_UI_TEXT_EDIT_CONTROL__
 
-#include "zeui/ZEUIControl.h"
-#include "zeui/ZEUIRectangle.h"
-#include "ZEGraphics/ZEUIMaterial.h"
+#include "zeui/ZEUIFrameControl.h"
+#include "ZEUITextControl.h"
 
-class ZEUIButtonControl : public ZEUIControl
+class ZEMaterial;
+
+class ZEUITextEditControl : public ZEUIFrameControl
 {
-	friend class ZEUIManager;
-	friend class ZEUICheckBoxControl;
+	private:
+
+		ZEUITextControl		TextDisplayer;
+
+		float				CursorBlinkTime;
+		float				TotalTime;
+		ZEUIRectangle		Cursor;
+		bool				CursorVisible;
 
 	protected:
 
-		ZEUIRectangle		Button;
-		ZEUIMaterial*		ButtonMaterial;
+		virtual void		KeyPressed(unsigned char Key);
 
 	public:
 
-		virtual void		Draw(ZEUIRenderer* Renderer);
+		virtual void		SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial* GetMaterial() const;
 
 		virtual void		SetWidth(float Width);
 		virtual void		SetHeight(float Height);
-		virtual void		SetSize(const ZEVector2& Size);
 
-		virtual void		SetPosition(const ZEVector2& Position);
+		virtual void		Tick(float ElapsedTime);
+		virtual void		Draw(ZEUIRenderer* Renderer);
 
-		virtual ZEMaterial*	GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
-
-							ZEUIButtonControl();
-							~ZEUIButtonControl();
-
+							ZEUITextEditControl();
 };
 
 #endif

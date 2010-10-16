@@ -70,6 +70,17 @@ float ZEUISliderControl::GetCurrentValue() const
 	return CurrentValue;
 }
 
+void ZEUISliderControl::SetMaterial(ZEMaterial* Material)
+{
+	SliderButtonMaterial = (ZEFixedMaterial*)Material;
+	SliderButton.SetMaterial(SliderButtonMaterial);
+}
+
+ZEMaterial* ZEUISliderControl::GetMaterial() const
+{
+	return SliderButtonMaterial;
+}
+
 ZEUISliderControl::ZEUISliderControl()
 {
 	SliderButtonMaterial = ZEFixedMaterial::CreateInstance();
@@ -78,4 +89,9 @@ ZEUISliderControl::ZEUISliderControl()
 	SliderLineMaterial = ZEFixedMaterial::CreateInstance();
 	SliderLineMaterial->SetZero();
 	SliderLine.Material = SliderLineMaterial;
+
+	SetMoveable(false);
+	SliderButton.SetMoveable(true);
+
+	StepSize = 10;
 }

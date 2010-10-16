@@ -68,6 +68,8 @@ class ZEUISliderControl : public ZEUIControl
 		float					MinimumValue;
 		float					StepSize;
 
+		float					SliderLineThickness;
+
 	public:
 
 		virtual void			SetCurretnValue(float NewValue) = 0;
@@ -81,6 +83,9 @@ class ZEUISliderControl : public ZEUIControl
 
 		void					SetStepSize(float StepSize);
 		float					GetStepSize();
+
+		virtual void			SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial*		GetMaterial() const;
 };
 
 #endif

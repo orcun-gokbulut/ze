@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.h
+ Zinek Engine - ZEUIFrameControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,22 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_BUTTON_CONTROL__
-#define __ZE_UI_BUTTON_CONTROL__
+#ifndef __ZE_UI_FRAME_CONTROL__
+#define __ZE_UI_FRAME_CONTROL__
 
 #include "zeui/ZEUIControl.h"
 #include "zeui/ZEUIRectangle.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 
-class ZEUIButtonControl : public ZEUIControl
+class ZEUIFrameControl : public ZEUIControl
 {
-	friend class ZEUIManager;
-	friend class ZEUICheckBoxControl;
-
 	protected:
 
-		ZEUIRectangle		Button;
-		ZEUIMaterial*		ButtonMaterial;
+		ZEUIRectangle		Frame;
+		ZEUIMaterial*		FrameMaterial;
+
+		virtual void		MouseMoveEvent(const ZEVector2& MoveAmount);
 
 	public:
 
@@ -57,16 +56,13 @@ class ZEUIButtonControl : public ZEUIControl
 
 		virtual void		SetWidth(float Width);
 		virtual void		SetHeight(float Height);
-		virtual void		SetSize(const ZEVector2& Size);
-
-		virtual void		SetPosition(const ZEVector2& Position);
 
 		virtual ZEMaterial*	GetMaterial() const;
 		virtual void		SetMaterial(ZEMaterial* Material);
 
-							ZEUIButtonControl();
-							~ZEUIButtonControl();
+		virtual void		SetPosition(const ZEVector2& Position);
 
+							ZEUIFrameControl();
 };
 
 #endif

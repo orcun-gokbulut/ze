@@ -40,6 +40,7 @@
 #include "zeui/ZEUIControl.h"
 #include "zeui/ZEUIRectangle.h"
 #include "ZEInput/ZEInputMap.h"
+#include "ZEGraphics/ZEUIMaterial.h"
 
 class ZEVector3;
 
@@ -47,20 +48,24 @@ class ZEUICursorControl : public ZEUIControl
 {
 	private:
 
-		ZEUIRectangle	Cursor;
-		ZEInputMap		InputMap;
+		ZEUIMaterial*		CursorMaterial;
+		ZEUIRectangle		Cursor;
+		ZEInputMap			InputMap;
 
-		ZEUIMouseKey	CurentButton;
+		ZEUIMouseKey		CurentButton;
 
 	public:
 
-		virtual void	Draw(ZEUIRenderer* Renderer);
-		virtual void	Tick(float ElapsedTime);
+		virtual void		Draw(ZEUIRenderer* Renderer);
+		virtual void		Tick(float ElapsedTime);
 
-		ZEUIMouseKey	GetCurrentButton();
+		virtual ZEMaterial* GetMaterial() const;
+		virtual void		SetMaterial(ZEMaterial* Material);
 
-						ZEUICursorControl();
-						~ZEUICursorControl();
+		ZEUIMouseKey		GetCurrentButton();
+
+							ZEUICursorControl();
+							~ZEUICursorControl();
 };
 
 #endif

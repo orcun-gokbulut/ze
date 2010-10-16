@@ -1724,6 +1724,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEUI\ZEUIFrameControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUIFrameControl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEUI\ZEUIHorizontalSliderControl.cpp"
 				>
 			</File>
@@ -1737,6 +1745,22 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEUI\ZEUIManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUIMultiLineTextEdit.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUIMultiLineTextEdit.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUIRadioButtonControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUIRadioButtonControl.h"
 				>
 			</File>
 			<File
@@ -1769,6 +1793,30 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEUI\ZEUITextControl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUIVerticalSliderControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUIVerticalSliderControl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUIWindowControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUIWindowControl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUTextEditControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUTextEditControl.h"
 				>
 			</File>
 		</Filter>

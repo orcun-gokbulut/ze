@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.h
+ Zinek Engine - ZEUIVerticalSliderControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,39 +34,28 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_BUTTON_CONTROL__
-#define __ZE_UI_BUTTON_CONTROL__
+#ifndef __ZE_UI_VERTICAL_SLIDER_CONTROL__
+#define __ZE_UI_VERTICAL_SLIDER_CONTROL__
 
-#include "zeui/ZEUIControl.h"
-#include "zeui/ZEUIRectangle.h"
-#include "ZEGraphics/ZEUIMaterial.h"
+#include "ZEUISliderControl.h"
 
-class ZEUIButtonControl : public ZEUIControl
+class ZEUIVerticalSliderControl : public ZEUISliderControl
 {
-	friend class ZEUIManager;
-	friend class ZEUICheckBoxControl;
-
 	protected:
 
-		ZEUIRectangle		Button;
-		ZEUIMaterial*		ButtonMaterial;
+		virtual void	SetSliderValueByButton(const ZEVector2& MoveAmount);
+		virtual void	MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 
 	public:
 
-		virtual void		Draw(ZEUIRenderer* Renderer);
+		virtual void	Draw(ZEUIRenderer* Renderer);
 
-		virtual void		SetWidth(float Width);
-		virtual void		SetHeight(float Height);
-		virtual void		SetSize(const ZEVector2& Size);
+		virtual void	SetCurretnValue(float NewValue);
 
-		virtual void		SetPosition(const ZEVector2& Position);
+		virtual	void	SetPosition(const ZEVector2& Position);
+		virtual void	SetHeight(float Height);
 
-		virtual ZEMaterial*	GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
-
-							ZEUIButtonControl();
-							~ZEUIButtonControl();
-
+						ZEUIVerticalSliderControl();
 };
 
 #endif

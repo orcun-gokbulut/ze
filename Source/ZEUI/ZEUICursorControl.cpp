@@ -34,10 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUICursorControl.h"
-#include "ZEMath/ZEVector.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputModule.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
 #include "zeui/ZEUIRenderer.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
@@ -59,6 +57,9 @@
 
 void ZEUICursorControl::Draw(ZEUIRenderer* Renderer)
 {
+	if (GetVisiblity() == false)
+		return;
+
 	ZEUIControl::Draw(Renderer);
 	Renderer->AddRectangle(Cursor);
 }
@@ -96,41 +97,33 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 				break;
 
 			case ACTIONID_LEFT_PRESS:
-				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::UnitX);
 				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_LEFT;
 				break;
 
 			case ACTIONID_RIGHT_PRESS:
-				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::UnitY);
 				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_RIGHT;
 				break;
 
 			case ACTIONID_MIDDLE_PRESS:
-				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::UnitZ);
 				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_MIDDLE;
 				break;
 
 			case ACTIONID_LEFT_RELEASE:
-				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::One);
 				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
 				break;
 
 			case ACTIONID_RIGHT_RELEASE:
-				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::One);
 				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
 				break;
 
 			case ACTIONID_MIDDLE_RELEASE:
-				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::One);
 				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
 				break;
 
 			case ACTIONID_SCROLL_UP:
-				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
 				break;
 
 			case ACTIONID_SCROLL_DOWN:
-				((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3(0.0f, 1.0f, 1.0f));
 				break;
 		}
 	}
@@ -164,6 +157,16 @@ ZEUIMouseKey ZEUICursorControl::GetCurrentButton()
 	return CurentButton;
 }
 
+ZEMaterial* ZEUICursorControl::GetMaterial() const
+{
+	return CursorMaterial;
+}
+
+void ZEUICursorControl::SetMaterial(ZEMaterial* Material)
+{
+	Cursor.Material = (ZEUIMaterial*)Material;
+}
+
 ZEUICursorControl::ZEUICursorControl()
 {
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_UP,				"Move Up",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS,		ZE_IAS_NEGATIVE)));
@@ -182,8 +185,8 @@ ZEUICursorControl::ZEUICursorControl()
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_UP,		"Scroll Up",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_SCROLL_AXIS,		ZE_IAS_POSITIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_DOWN,		"Scroll Down",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_SCROLL_AXIS,		ZE_IAS_NEGATIVE)));
 
-	SetHeight(16);
-	SetWidth(16);	
+	SetHeight(24);
+	SetWidth(24);	
 
 	int Width, Height;
 	zeCore->GetWindow()->GetWindowSize(Width, Height);
@@ -195,15 +198,12 @@ ZEUICursorControl::ZEUICursorControl()
 	Cursor.Texcoords.LeftUp = ZEVector2::Zero;
 	Cursor.Texcoords.RightDown = ZEVector2::One;
 
-	Cursor.Material = ZEFixedMaterial::CreateInstance();
+	CursorMaterial = ZEUIMaterial::CreateInstance();
+	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("Cursor.png")->GetTexture());
+	CursorMaterial->SetZero();
+	Cursor.Material = CursorMaterial;
+	Cursor.Color = GetBackgroundColor();
 
-	((ZEFixedMaterial*)(Cursor.Material))->SetZero();
-	((ZEFixedMaterial*)(Cursor.Material))->SetAmbientEnabled(true);
-	((ZEFixedMaterial*)(Cursor.Material))->SetAmbientColor(ZEVector3::One);
-	((ZEFixedMaterial*)(Cursor.Material))->SetAmbientFactor(1.0f);
-	((ZEFixedMaterial*)(Cursor.Material))->UpdateMaterial();
-
-	SetZOrder(1000);
 	SetEnabled(true);
 	SetFocusable(false);
 

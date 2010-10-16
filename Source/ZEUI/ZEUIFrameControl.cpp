@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIButtonControl.cpp
+ Zinek Engine - ZEUIFrameControl.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,82 +33,78 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUIButtonControl.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
-#include "zeui/ZEUIRenderer.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEUIFrameControl.h"
+#include "ZEUIRenderer.h"
+#include "ZEIUCheckBoxControl.h"
+#include "ZEUIHorizontalSliderControl.h"
 
-void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
+void ZEUIFrameControl::MouseMoveEvent(const ZEVector2& MoveAmount)
 {
-	if (!GetVisiblity())
+	ZEUIControl::MouseMoveEvent(MoveAmount);
+
+	if (!GetMoveable())
 		return;
 
-	ZEUIControl::Draw(Renderer);
+	else
+		SetPosition(GetPosition() + MoveAmount);
+}
+
+void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
+{
+	if (GetVisiblity() == false)
+		return;
+
 	ZEUIRectangle Output;
-		
-	if(!ZEUIRectangle::Clip(Output, Button, GetVisibleRectangle()))
+
+	if(!ZEUIRectangle::Clip(Output, Frame, GetVisibleRectangle()))
 		Renderer->AddRectangle(Output);
 
+	ZEUIControl::Draw(Renderer);
 }
 
-void ZEUIButtonControl::SetWidth(float Width)
+void ZEUIFrameControl::SetWidth(float Width)
 {
 	ZEUIControl::SetWidth(Width);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
+	Frame.Positions.LeftUp = GetRectangle().LeftUp;
+	Frame.Positions.RightDown = GetRectangle().RightDown;
 }
 
-void ZEUIButtonControl::SetHeight(float Height)
+void ZEUIFrameControl::SetHeight(float Height)
 {
 	ZEUIControl::SetHeight(Height);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
+	Frame.Positions.LeftUp = GetRectangle().LeftUp;
+	Frame.Positions.RightDown = GetRectangle().RightDown;
 }
 
-void ZEUIButtonControl::SetSize(const ZEVector2& Size)
-{
-	ZEUIControl::SetSize(Size);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-}
-
-void ZEUIButtonControl::SetPosition(const ZEVector2& Position)
+void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
 {
 	ZEUIControl::SetPosition(Position);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-
+	Frame.Positions.LeftUp = GetRectangle().LeftUp;
+	Frame.Positions.RightDown = GetRectangle().RightDown;
 }
 
-ZEMaterial* ZEUIButtonControl::GetMaterial() const
+ZEMaterial* ZEUIFrameControl::GetMaterial() const
 {
-	return ButtonMaterial;
+	return FrameMaterial;
 }
 
-void ZEUIButtonControl::SetMaterial(ZEMaterial* Material)
+void ZEUIFrameControl::SetMaterial(ZEMaterial* Material)
 {
-	ButtonMaterial = (ZEUIMaterial*)Material;
+	FrameMaterial = (ZEUIMaterial*)Material;
+	Frame.Material = FrameMaterial;
 }
 
-ZEUIButtonControl::ZEUIButtonControl()
+ZEUIFrameControl::ZEUIFrameControl()
 {
-	Button.Texcoords = ZERectangle(ZEVector2::Zero, ZEVector2(50,50));
-	ButtonMaterial = ZEUIMaterial::CreateInstance();
-	ButtonMaterial->SetZero();
-	ButtonMaterial->SetTexture(ZETexture2DResource::LoadResource("Button.jpg")->GetTexture());
-	Button.Color = ZEVector4::One;
+	FrameMaterial = ZEUIMaterial::CreateInstance();
+	FrameMaterial->SetZero();
+	Frame.Material = FrameMaterial;
+	Frame.Color = GetBackgroundColor();
+	Frame.Texcoords.LeftUp = ZEVector2::Zero;
+	Frame.Texcoords.RightDown = ZEVector2::One;
 
-	Button.Material = ButtonMaterial;
+	SetWidth(200);
+	SetHeight(200);
 
-	SetHeight(25);
-	SetWidth(80);
-	Button.Positions.LeftUp = GetRectangle().LeftUp;
-	Button.Positions.RightDown = GetRectangle().RightDown;
-	Button.Texcoords.LeftUp = ZEVector2::Zero;
-	Button.Texcoords.RightDown = ZEVector2::One;
-}
-
-ZEUIButtonControl::~ZEUIButtonControl()
-{
-
+	SetMoveable(true);
 }

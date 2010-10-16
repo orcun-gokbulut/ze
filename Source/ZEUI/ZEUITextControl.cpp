@@ -105,7 +105,7 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 	const ZERectangle& ControlRectangle = GetVisibleRectangle();
 	float ZOrder = GetZOrder();
 
-	ZEUIRectangle Temporary, Output;
+	ZEUIRectangle Temporary;
 	Temporary.Material = NULL;
 	Temporary.Color = TextColor;
 
@@ -159,6 +159,16 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 
 		Temporary.Positions.LeftUp.x = Temporary.Positions.RightDown.x;
 	}
+}
+
+void ZEUITextControl::SetMaterial(ZEMaterial* Material)
+{
+	
+}
+
+ZEMaterial* ZEUITextControl::GetMaterial() const
+{
+	return NULL;
 }
 
 ZEUITextControl::ZEUITextControl()

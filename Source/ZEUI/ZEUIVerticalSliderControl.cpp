@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIHorizontalSliderControl.cpp
+ Zinek Engine - ZEUIVerticalSliderControl.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,76 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEUIHorizontalSliderControl.h"
+#include "ZEUIVerticalSliderControl.h"
 #include "ZEUIRenderer.h"
 
-void ZEUIHorizontalSliderControl::SetSliderValueByButton(const ZEVector2& MoveAmount)
+void ZEUIVerticalSliderControl::SetSliderValueByButton(const ZEVector2& MoveAmount)
 {
-	float SliderLineWidth = SliderLine.Positions.RightDown.x - SliderLine.Positions.LeftUp.x - SliderButton.GetWidth();
+	float SliderLineHeight = SliderLine.Positions.RightDown.y - SliderLine.Positions.LeftUp.y - SliderButton.GetHeight();
 	float Range = MaximumValue - MinimumValue;
-	float NewValue = CurrentValue + ((Range / SliderLineWidth) * MoveAmount.x);
+	float NewValue = CurrentValue + ((Range / SliderLineHeight) * -MoveAmount.y);
 
 	if (NewValue >= MaximumValue)
 	{
 		CurrentValue = MaximumValue;
-		SliderButton.SetPosition(ZEVector2(SliderLine.Positions.RightDown.x - SliderButton.GetWidth(), SliderButton.GetPosition().y));
+		SliderButton.SetPosition(ZEVector2(SliderButton.GetPosition().x, SliderLine.Positions.LeftUp.y));
 		((ZEFixedMaterial*)(SliderLine.Material))->SetAmbientColor(ZEVector3(CurrentValue / 100, CurrentValue / 100, CurrentValue / 100));
 	}
 
 	else if (NewValue <= MinimumValue)
 	{
 		CurrentValue = MinimumValue;
-		SliderButton.SetPosition(ZEVector2(SliderLine.Positions.LeftUp.x, SliderButton.GetPosition().y));
+		SliderButton.SetPosition(ZEVector2(SliderButton.GetPosition().x, SliderLine.Positions.RightDown.y - SliderButton.GetHeight()));
 		((ZEFixedMaterial*)(SliderLine.Material))->SetAmbientColor(ZEVector3(CurrentValue / 100, CurrentValue / 100, CurrentValue / 100));
 	}
 
 	else
 	{
-		ZEVector2 NewSliderButtonPosition = ZEVector2(SliderButton.GetPosition().x +  MoveAmount.x, SliderButton.GetPosition().y);
+		ZEVector2 NewSliderButtonPosition = ZEVector2(SliderButton.GetPosition().x, SliderButton.GetPosition().y +  MoveAmount.y);
 		SliderButton.SetPosition(NewSliderButtonPosition);
 		((ZEFixedMaterial*)(SliderLine.Material))->SetAmbientColor(ZEVector3(NewValue / 100, NewValue / 100, NewValue / 100));
 		CurrentValue = NewValue;
 	}	
 }
-void ZEUIHorizontalSliderControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+
+void ZEUIVerticalSliderControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {
 	/*if (Button != ZE_UI_MOUSE_BUTTON_LEFT)
 		return;
 
-	if (MousePosition.x > SliderButton.GetPosition().x)
+	if (MousePosition.y < SliderButton.GetPosition().y)
 		SetCurretnValue(GetCurrentValue() + StepSize);
 
 	else
 		SetCurretnValue(GetCurrentValue() - StepSize);*/
 }
 
-void ZEUIHorizontalSliderControl::SetCurretnValue(float NewValue)
+void ZEUIVerticalSliderControl::SetCurretnValue(float NewValue)
 {
 	if (NewValue >= MaximumValue)
 	{
 		CurrentValue = MaximumValue;
-		SliderButton.SetPosition(ZEVector2(SliderLine.Positions.RightDown.x, SliderButton.GetPosition().y));
+		SliderButton.SetPosition(ZEVector2(SliderButton.GetPosition().x, SliderLine.Positions.LeftUp.y));
 	}
 
 	else if (NewValue <= MinimumValue)
 	{
 		CurrentValue = MinimumValue;
-		SliderButton.SetPosition(ZEVector2(SliderLine.Positions.LeftUp.x, SliderButton.GetPosition().y));
+		SliderButton.SetPosition(ZEVector2(SliderButton.GetPosition().x, SliderLine.Positions.RightDown.y));
 	}
 
 	else
 	{
 		float Range = MaximumValue - MinimumValue;
 		float Persentage = NewValue / Range;
-		float Length = SliderLine.Positions.RightDown.x - SliderLine.Positions.LeftUp.x;
-		float NewPositionX = Length * Persentage;
-		SliderButton.SetPosition(ZEVector2(SliderButton.GetPosition().x + NewPositionX, SliderButton.GetPosition().y));
+		float Length = SliderLine.Positions.RightDown.y - SliderLine.Positions.LeftUp.y;
+		float NewPositionY = Length * Persentage;
+		SliderButton.SetPosition(ZEVector2(SliderButton.GetPosition().x, SliderButton.GetPosition().y + NewPositionY));
 		CurrentValue = NewValue;
 	}
 }
 
-void ZEUIHorizontalSliderControl::Draw(ZEUIRenderer* Renderer)
+void ZEUIVerticalSliderControl::Draw(ZEUIRenderer* Renderer)
 {
 	if (GetVisiblity() == false)
 		return;	
@@ -113,43 +114,44 @@ void ZEUIHorizontalSliderControl::Draw(ZEUIRenderer* Renderer)
 	ZEUIControl::Draw(Renderer);
 }
 
-void ZEUIHorizontalSliderControl::SetPosition(const ZEVector2& Position)
+void ZEUIVerticalSliderControl::SetPosition(const ZEVector2& Position)
 {
 	ZEUIControl::SetPosition(Position);
-	SliderLine.Positions.LeftUp = ZEVector2(Position.x, SliderButton.GetPosition().y - (SliderLineThickness / 2) + (SliderButton.GetHeight() / 2));
-	SliderLine.Positions.RightDown = ZEVector2(Position.x + GetWidth() + SliderButton.GetWidth(), SliderLine.Positions.LeftUp.y + SliderLineThickness);
+	SliderLine.Positions.LeftUp = ZEVector2(SliderButton.GetPosition().x - (SliderLineThickness / 2) + (SliderButton.GetWidth() / 2), SliderButton.GetPosition().y);
+	SliderLine.Positions.RightDown = ZEVector2(SliderLine.Positions.LeftUp.x + SliderLineThickness, SliderButton.GetPosition().y + GetHeight() + SliderButton.GetHeight());
+	
 }
 
-void ZEUIHorizontalSliderControl::SetWidth(float Width)
+void ZEUIVerticalSliderControl::SetHeight(float Height)
 {
-	ZEUIControl::SetWidth(Width);
-	SliderLine.Positions.RightDown.x = SliderLine.Positions.LeftUp.x + Width;
+	ZEUIControl::SetHeight(Height);
+	SliderLine.Positions.RightDown.y = SliderLine.Positions.LeftUp.y + Height;
 }
 
-ZEUIHorizontalSliderControl::ZEUIHorizontalSliderControl()
+ZEUIVerticalSliderControl::ZEUIVerticalSliderControl()
 {
-	SetWidth(100);
-	SetHeight(20);
+	SetWidth(20);
+	SetHeight(100);
 
 	SliderLineThickness = 4;
 
-	CurrentValue = 0;
-	SliderButton.SetPosition(this->GetPosition());
-	SliderButton.SetHeight(20);
-	SliderButton.SetWidth(10);
+	CurrentValue = 100;
 
-	SliderLine.Positions.LeftUp = ZEVector2(GetPosition().x , SliderButton.GetPosition().y - (SliderLineThickness / 2) + (SliderButton.GetHeight() / 2));
-	SliderLine.Positions.RightDown = ZEVector2(GetPosition().x + GetWidth() + SliderButton.GetWidth(), SliderLine.Positions.LeftUp.y + SliderLineThickness);
+	SliderButton.SetPosition(this->GetPosition());
+	SliderButton.SetHeight(10);
+	SliderButton.SetWidth(20);
+
+	SliderLine.Positions.LeftUp = ZEVector2(SliderButton.GetPosition().x - (SliderLineThickness / 2) + (SliderButton.GetWidth() / 2), SliderButton.GetPosition().y);
+	SliderLine.Positions.RightDown = ZEVector2(SliderLine.Positions.LeftUp.x + SliderLineThickness, SliderButton.GetPosition().y + GetHeight() + SliderButton.GetHeight());
 
 	SliderLineMaterial->SetAmbientEnabled(true);
 	SliderLineMaterial->SetAmbientFactor(1.0f);
 	SliderLineMaterial->SetAmbientColor(ZEVector3::UnitY);
 
 	AddChildControl(&SliderButton);
-	SliderButton.SetVisiblity(true);
 
 	MinimumValue = 0;
 	MaximumValue = 100;
 
-	SliderButton.SetMouseMovedEvent(BindDelegate(this, &ZEUIHorizontalSliderControl::SetSliderValueByButton));
+	SliderButton.SetMouseMovedEvent(BindDelegate(this, &ZEUIVerticalSliderControl::SetSliderValueByButton));
 }

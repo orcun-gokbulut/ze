@@ -45,9 +45,19 @@
 #include "zeui/ZEUIButtonControl.h"
 #include "zeui/ZEIUCheckBoxControl.h"
 #include "zeui/ZEUIHorizontalSliderControl.h"
+#include "zeui/ZEUIVerticalSliderControl.h"
+#include "zeui/ZEUIFrameControl.h"
+#include "zeui/ZEUIWindowControl.h"
+#include "zeui/ZEUTextEditControl.h"
+#include "zeui/ZEUIMultiLineTextEdit.h"
+#include "zeui/ZEUIRadioButtonControl.h"
+
+#include "windows.h"
 
 bool ZEGUIDebugModule::Initialize()
 {
+	ShowCursor(false);
+
 	Scene = zeGame->GetScene();
 
 	if (Player == NULL)
@@ -70,49 +80,75 @@ bool ZEGUIDebugModule::Initialize()
 	ZEUIButtonControl* Button = new ZEUIButtonControl();
 	ZEUICheckBoxControl* CheckBox = new ZEUICheckBoxControl();
 	ZEUIHorizontalSliderControl* HorizontalSlider = new ZEUIHorizontalSliderControl();
-	ZEUIHorizontalSliderControl* HorizontalSlider2 = new ZEUIHorizontalSliderControl();
+	ZEUIVerticalSliderControl*	 VerticalSlider = new ZEUIVerticalSliderControl();
+	ZEUIFrameControl* Frame = new ZEUIFrameControl();
+	ZEUIWindowControl* Window = new ZEUIWindowControl();
+	ZEUIWindowControl* Window2 = new ZEUIWindowControl();
+	ZEUITextEditControl* LineEdit = new ZEUITextEditControl();
+	ZEUITextEditControl* LineEdit2 = new ZEUITextEditControl();
+	ZEUIMultiLineTextEdit* MultiLine = new ZEUIMultiLineTextEdit();
 
-	zeGame->UIManager->AddControl(Cursor);
-	zeGame->UIManager->AddControl(Button);
+	ZEUIRadioButtonControl* RadioButton1 = new ZEUIRadioButtonControl();
+	ZEUIRadioButtonControl* RadioButton2 = new ZEUIRadioButtonControl();
+	ZEUIRadioButtonControl* RadioButton3 = new ZEUIRadioButtonControl();
+
+	RadioButton1->AddInteractingRadioButton(RadioButton2);
+	RadioButton1->AddInteractingRadioButton(RadioButton3);
+
+	RadioButton2->AddInteractingRadioButton(RadioButton1);
+	RadioButton2->AddInteractingRadioButton(RadioButton3);
+
+	RadioButton3->AddInteractingRadioButton(RadioButton2);
+	RadioButton3->AddInteractingRadioButton(RadioButton1);
+
+	
+	//zeGame->UIManager->AddControl(Button);
 	zeGame->UIManager->AddControl(CheckBox);
-	zeGame->UIManager->AddControl(HorizontalSlider);
-	zeGame->UIManager->AddControl(HorizontalSlider2);
+	zeGame->UIManager->AddControl(RadioButton1);
+	zeGame->UIManager->AddControl(RadioButton2);
+	zeGame->UIManager->AddControl(RadioButton3);
+	//zeGame->UIManager->AddControl(HorizontalSlider);
+	//zeGame->UIManager->AddControl(VerticalSlider);
+	//zeGame->UIManager->AddControl(Frame);
+	zeGame->UIManager->AddControl(Window);
+	//zeGame->UIManager->AddControl(Window2);
+	zeGame->UIManager->AddControl(LineEdit);
+	//zeGame->UIManager->AddControl(LineEdit2);
+	zeGame->UIManager->AddControl(MultiLine);
 
-	HorizontalSlider->SetPosition(ZEVector2(500, 700));
-	HorizontalSlider2->SetPosition(ZEVector2(500, 600));
+	LineEdit->SetPosition(ZEVector2(500,450));
+	LineEdit2->SetPosition(ZEVector2(70,100));
+	MultiLine->SetPosition(ZEVector2(300,300));
+
+	Window->AddChildControl(HorizontalSlider);
+	//Window->AddChildControl(LineEdit2);
+	Window2->AddChildControl(VerticalSlider);
+
+	HorizontalSlider->SetPosition(ZEVector2(70,70));
+	VerticalSlider->SetPosition(ZEVector2(70,70));
+
+	Frame->SetPosition(ZEVector2(300,300));
+
+	HorizontalSlider->SetWidth(200);
+	VerticalSlider->SetHeight(200);
 
 	Button->SetPosition(ZEVector2(20,100));
 
+	CheckBox->SetPosition(ZEVector2(500,500));
+	CheckBox->SetTriState(true);
+
+	RadioButton1->SetPosition(ZEVector2(500,550));
+	RadioButton2->SetPosition(ZEVector2(500,580));
+	RadioButton3->SetPosition(ZEVector2(500,610));
+
+	zeGame->UIManager->AddControl(Cursor);
 	zeGame->UIManager->SetActiveCursor(Cursor);
 
-	Button = new ZEUIButtonControl();
-	zeGame->UIManager->AddControl(Button);
-	Button->SetPosition(ZEVector2(20,130));
+	RadioButton1->SetText("RadioButton1");
+	RadioButton2->SetText("RadioButton2");
+	RadioButton3->SetText("RadioButton3");
 
-	Button = new ZEUIButtonControl();
-	zeGame->UIManager->AddControl(Button);
-	Button->SetPosition(ZEVector2(20,160));
-	Button->SetVisiblity(true);
-	
-	Button = new ZEUIButtonControl();
-	zeGame->UIManager->AddControl(Button);
-	Button->SetPosition(ZEVector2(20,190));
-
-	Button = new ZEUIButtonControl();
-	zeGame->UIManager->AddControl(Button);
-	Button->SetPosition(ZEVector2(20,220));
-	Button->SetFocusable(true);
-
-	Button = new ZEUIButtonControl();
-	zeGame->UIManager->AddControl(Button);
-	Button->SetPosition(ZEVector2(20,250));
-
-	Button = new ZEUIButtonControl();
-	zeGame->UIManager->AddControl(Button);
-	Button->SetPosition(ZEVector2(20,280));
-	Button->SetFocusable(true);
-
-	CheckBox->SetPosition(ZEVector2(500,500));
+	CheckBox->SetText("CheckBox");
 
 	return true;
 }
