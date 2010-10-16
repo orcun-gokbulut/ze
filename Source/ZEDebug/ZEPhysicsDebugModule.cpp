@@ -82,7 +82,7 @@ bool ZEPhysicsDebugModule::Initialize()
 	if (Player == NULL)
 	{
 		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
-		Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
+		Player->SetPosition(ZEVector3(-19.0f, 5.0f, 10.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
@@ -183,33 +183,27 @@ bool ZEPhysicsDebugModule::Initialize()
 
 		ZELightBrush* Light = new ZELightBrush();
 		Light->SetLightType(ZE_LT_POINT);
-		Light->SetPosition(ZEVector3(-25.0f, 3.0f, -7.0f)); 
-		Light->SetScale(ZEVector3::One);
-		Light->GetLight()->SetRange(15000);
+		Light->SetPosition(ZEVector3(-19.0f, 6.0f, 30.0f)); 
+		Light->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
+		Light->GetLight()->SetRange(6000);
 		Light->SetRotation(ZEQuaternion::Identity);
-		Light->GetLight()->SetColor(ZEVector3::One);
-		Light->GetLight()->SetAttenuation(0.01f, 0.0f, 1.0f);
+		Light->GetLight()->SetColor(ZEVector3(0.7f, 0.0f, 0.7f));
+		Light->GetLight()->SetAttenuation(0.01f, 0.01f, 0.01f);
 		Light->GetLight()->SetIntensity(5.0f);
 		Light->GetLight()->SetCastsShadows(false);
-		/*Light->SetProjectionFOV(ZE_PI_2);
-		Light->SetProjectionAspectRatio(1.0f);
-		Light->SetProjectionTexture("test/pavyon.bmp");*/
 		Scene->AddEntity(Light);
 
-		ZELightBrush* Light2 = new ZELightBrush();
+		/*ZELightBrush* Light2 = new ZELightBrush();
 		Light2->SetLightType(ZE_LT_POINT);
-		Light2->SetPosition(ZEVector3(25.0f, 25.0f, -7.0f)); 
+		Light2->SetPosition(ZEVector3(-45.0f, 7.0f, -5.0f)); 
 		Light2->SetScale(ZEVector3::One);
-		Light2->GetLight()->SetRange(15000);
+		Light2->GetLight()->SetRange(5000);
 		Light2->SetRotation(ZEQuaternion::Identity);
 		Light2->GetLight()->SetColor(ZEVector3::One);
-		Light2->GetLight()->SetAttenuation(0.01f, 0.0f, 1.0f);
-		Light2->GetLight()->SetIntensity(5.0f);
+		Light2->GetLight()->SetAttenuation(0.01f, 0.01f, 0.01f);
+		Light2->GetLight()->SetIntensity(3.0f);
 		Light2->GetLight()->SetCastsShadows(false);
-		/*Light->SetProjectionFOV(ZE_PI_2);
-		Light->SetProjectionAspectRatio(1.0f);
-		Light->SetProjectionTexture("test/pavyon.bmp");*/
-		Scene->AddEntity(Light2);
+		Scene->AddEntity(Light2);*/
 
 		/*Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
 		Model->SetModelFile("test2.zeModel");

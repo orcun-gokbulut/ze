@@ -36,53 +36,20 @@
 #include "ZEFileCache.h"
 #include <stdio.h>
 #include "ZECore/ZEError.h"
+#include <sys/stat.h> 
 
-void ZECachePartialResourceFile::Initialize(void* File, size_t StartPosition, size_t EndPosition)
+
+void ZEFileCache::WriteItemListToCacheFile()
 {
-	this->File = File;
-	this->StartPosition = StartPosition;
-	this->EndPosition = EndPosition;
+	// Will Be Written
 }
 
-void ZEFileCache::ReadItemList()
-{
-	fseek((FILE*)File, 0, SEEK_END);
-	ZEDWORD ItemCount;
-	fread(&ItemCount, sizeof(ZEDWORD), 1, (FILE*)File);
-	fseek((FILE*)File, -sizeof(ZEFileCacheItem) * ItemCount, SEEK_CUR);
-	Items.Resize(ItemCount);
-	fread(Items.GetCArray(), sizeof(ZEFileCacheItem), ItemCount, (FILE*)File);
-}
-
-void ZEFileCache::DumpItemList()
+void ZEFileCache::DumpItemListOfCacheFile()
 {
 	fseek((FILE*)File, 0, SEEK_END);
 	fwrite(Items.GetConstCArray(), sizeof(ZEFileCacheItem), Items.GetCount(), (FILE*)File);
 	ZEDWORD ItemCount = Items.GetCount();
 	fwrite(&ItemCount, sizeof(ZEDWORD), 1, (FILE*)File);
-}
-
-bool ZEFileCache::OpenCache(const char* FileName, bool OnlineMode)
-{
-	File = fopen(FileName, "rwb");
-	if (File == NULL)
-	{
-		zeError("File Cache", "Can not open file cache. (File Name : \"%s\")", FileName);
-		return false;
-	}
-	this->OnlineMode = OnlineMode;
-	ReadItemList();
-
-	return true;
-}
-
-void ZEFileCache::CloseCache()
-{
-	if (File != NULL)
-	{
-		fclose((FILE*)File);
-		File = NULL;
-	}
 }
 
 void ZEFileCache::Add(ZEDWORD Hash, void* Data, size_t Size)
@@ -97,11 +64,12 @@ void ZEFileCache::Add(ZEDWORD Hash, void* Data, size_t Size)
 	Item->Hash = Hash;
 	Item->Size = Size;
 
-	DumpItemList();
+	DumpItemListOfCacheFile();
 	fflush((FILE*)File);
 }
 
-ZEFileCacheScan ZEFileCache::StartScan(ZEDWORD Hash)
+// NOT COMPLETE
+ZEFileCacheScan ZEFileCache::Scan(ZEDWORD Hash)
 {
 	ZEFileCacheScan Scan;
 	Scan.Cursor = 0;
@@ -112,26 +80,127 @@ ZEFileCacheScan ZEFileCache::StartScan(ZEDWORD Hash)
 bool ZEFileCache::GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan)
 {
 	for (size_t I = Scan.Cursor; I < Items.GetCount(); I++)
+	{
 		if (Items[I].Hash == Scan.Hash)
 		{
 			ResourceFile.Initialize((FILE*)File, Items[I].FilePosition, Items[I].Size);
 			return true;
 		}
+	}
 
-		return false;
+	return false;
 }
 
-void ZEFileCache::Clear()
+// Reads the list of items in the file cache from cache file
+void ZEFileCache::ReadItemListFromCacheFile()
 {
-	CloseCache();
+	// Go to the end
+	fseek((FILE*)File, 0, SEEK_END);
+	// Go backward to get the size of the list
+	fseek((FILE*)File, -1 * sizeof(ZEWORD), SEEK_CUR);
+	ZEDWORD ItemCount;
+	// Get the item count
+	fread(&ItemCount, sizeof(ZEDWORD), 1, (FILE*)File);
+	// Go to the beginning of item list
+	fseek((FILE*)File, -1 * (sizeof(ZEFileCacheItem) * ItemCount), SEEK_CUR);
+	// Resize the Items array
+	Items.Resize(ItemCount);
+	// Read the list
+	fread(Items.GetCArray(), sizeof(ZEFileCacheItem), ItemCount, (FILE*)File);
+	// Reset the position indicator
+	rewind((FILE*)File);
 }
 
+// For Creating a new cache which have the same name with an existing one. Deletes the previous one
+bool ZEFileCache::CreateNewCacheFile(const char* FileName, bool OnlineMode)
+{
+	DeleteCacheFile(FileName);
+	return OpenCacheFile(FileName, OnlineMode);
+}
+
+// Opens the cache file with specified options(online/offline) and gets the list of items stored in the cache file
+bool ZEFileCache::OpenCacheFile(const char* FileName, bool OnlineMode)
+{
+	File = fopen(FileName, "rwb");
+	if (File == NULL)
+	{
+		zeError("File Cache", "Can not open file cache. (File Name : \"%s\")", FileName);
+		return false;
+	}
+	this->OnlineMode = OnlineMode;
+	ReadItemListFromCacheFile();
+
+	return true;
+}
+
+// Closes the cache file.
+void ZEFileCache::CloseCacheFile()
+{
+	if (File != NULL)
+	{
+		fclose((FILE*)File);
+		File = NULL;
+	}
+}
+
+// Empties the list of items in the cache and creates a new cache with the same name
+void ZEFileCache::ClearCacheFile(const char* FileName)
+{
+	Items.Clear(false);
+	CreateNewCacheFile(FileName, true);
+}
+
+// Deletes an existing cache file
+bool ZEFileCache::DeleteCacheFile(const char* FileName)
+{
+	if(CacheFileExists(FileName))
+	{
+		if(remove(FileName) != 0)
+		{
+			zeError("File Cache", "Can not delete existing cache. (File Name : \"%s\")", FileName);
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+// Checks if cache file exists
+bool ZEFileCache::CacheFileExists(const char* FileName)
+{
+	char CompletePath[256];
+	sprintf(CompletePath, "resources\\%s.cache", FileName);
+
+	int Stat;
+	struct stat FileInfo;
+
+	Stat = stat(CompletePath, &FileInfo);
+
+	if (Stat == 0)
+		return true;
+
+	return false;
+}
+
+// Constructor
 ZEFileCache::ZEFileCache()
 {
 	File = NULL;
 }
 
+// Destructor
 ZEFileCache::~ZEFileCache()
 {
-	CloseCache();
+	CloseCacheFile();
+}
+
+// Initializes the parameters(that will be use to to write data to a partial cache file) 
+void ZECachePartialResourceFile::Initialize(void* File, size_t StartPosition, size_t EndPosition)
+{
+	this->File = File;
+	this->StartPosition = StartPosition;
+	this->EndPosition = EndPosition;
 }

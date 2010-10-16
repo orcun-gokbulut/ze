@@ -69,18 +69,24 @@ class ZEFileCache
 		bool							OnlineMode;
 		ZESmartArray<ZEFileCacheItem>	Items;
 
-		void							ReadItemList();
-		void							DumpItemList();
+		void							ReadItemListFromCacheFile();
+		void							DumpItemListOfCacheFile();
+		void							WriteItemListToCacheFile();
 
 	public:
-		bool							OpenCache(const char* FileName, bool OnlineMode = true);
-		void							CloseCache();
-
+		bool							CacheFileExists(const char* FileName);
+		
+		bool							CreateNewCacheFile(const char* FileName, bool OnlineMode = true);
+		void							ClearCacheFile(const char* FileName);
+		bool							DeleteCacheFile(const char* FileName);
+		
+		bool							OpenCacheFile(const char* FileName, bool OnlineMode = true);
+		void							CloseCacheFile();
 		void							Add(ZEDWORD Hash, void* Data, size_t Size);
-		ZEFileCacheScan					StartScan(ZEDWORD Hash);
+		ZEFileCacheScan					Scan(ZEDWORD Hash);
 		bool							GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan);
 
-		void							Clear();
+		
 
 										ZEFileCache();
 										~ZEFileCache();

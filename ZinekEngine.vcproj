@@ -1737,6 +1737,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEDS\ZEFileCache.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEDS\ZEFileCache.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEDS\ZENamed.cpp"
 				>
 			</File>

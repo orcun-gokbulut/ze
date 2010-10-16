@@ -44,7 +44,7 @@ enum ZESeekFrom
 {
 	ZE_SF_BEGINING	= 0,
 	ZE_SF_END		= 1,
-	ZE_SF_CURRENT	= 2
+	ZE_SF_CURRENT	= 2,
 };
 
 class ZEPartialResourceFile;
@@ -52,7 +52,7 @@ class ZEResourceFile : public ZEUnserializer
 {
 	protected:
 		void*				File;
-		char				FileName[ZE_MAX_FILE_NAME_SIZE];
+		char				FileName[256];
 
 	public:
 		const char*			GetFileName();
@@ -78,6 +78,8 @@ class ZEResourceFile : public ZEUnserializer
 class ZEPartialResourceFile : public ZEResourceFile
 {
 	friend class ZEResourceFile;
+	friend class ZECachePartialResourceFile;
+	
 	private:
 		size_t				StartPosition;
 		size_t				EndPosition;
