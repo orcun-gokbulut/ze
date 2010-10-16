@@ -123,7 +123,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		//CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
 		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 		CanvasBrush->Canvas.LoadFromFile("TestCanvasMap.zeCanvas");
-		CanvasBrush->SetScale(ZEVector3(10,10,10));
+		CanvasBrush->SetScale(ZEVector3(50.0f,50.0f,50.0f));
 		CanvasBrush->UpdateCanvas();
 		ZEFixedMaterial* CanvasMaterial = ZEFixedMaterial::CreateInstance();
 		
@@ -304,7 +304,7 @@ bool ZEPhysicsDebugModule::Initialize()
 	}
 
 	ZEModelBrush* Skeleton = new ZEModelBrush();
-	Skeleton->SetModelFile("3Box.zemodel");
+	Skeleton->SetModelFile("testskeleton.zemodel");
 	Scene->AddEntity(Skeleton);
 	Skeleton->SetPosition(ZEVector3(0,0,2));
 

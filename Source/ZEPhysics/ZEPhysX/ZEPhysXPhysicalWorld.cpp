@@ -78,7 +78,7 @@ void ZEPhysXPhysicalWorld::InitializeDebugDraw()
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_MASS_AXES, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_LIN_VELOCITY, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_ANG_VELOCITY, 1.0f);
-	GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_JOINT_GROUPS, 1.0f);
+	//GetPhysicsSDK()->setParameter(NX_VISUALIZE_BODY_JOINT_GROUPS, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_LOCAL_AXES, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_WORLD_AXES, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_JOINT_LIMITS, 1.0f);
@@ -91,8 +91,8 @@ void ZEPhysXPhysicalWorld::InitializeDebugDraw()
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_SHAPES, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_AXES, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_COMPOUNDS, 1.0f);
-	//GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_VNORMALS, 1.0f);
-	//GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_FNORMALS, 1.0f);
+	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_VNORMALS, 1.0f);
+	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_FNORMALS, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_EDGES, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_SPHERES, 1.0f);
 	GetPhysicsSDK()->setParameter(NX_VISUALIZE_COLLISION_STATIC, 1.0f);
@@ -219,7 +219,9 @@ bool ZEPhysXPhysicalWorld::GetEnabled()
 
 bool ZEPhysXPhysicalWorld::Initialize()
 {	
+	SceneDesc.gravity = ZE_TO_NX(ZEVector3(0.0f, -9.8f, 0.0f));
 	SceneDesc.flags |= NX_SF_ENABLE_ACTIVETRANSFORMS;
+
 	Scene = GetPhysicsSDK()->createScene(SceneDesc);
 	if (Scene == NULL) 
 	{
@@ -227,11 +229,15 @@ bool ZEPhysXPhysicalWorld::Initialize()
 		return false;
 	}
 
+	NxMaterial* DefaultMaterial = Scene->getMaterialFromIndex(0);
+	DefaultMaterial->setRestitution(0.5f);
+	DefaultMaterial->setDynamicFriction(0.5f);
+	DefaultMaterial->setStaticFriction(0.5f);
+
 	Scene->setTiming(1.0f / 60.0f, 4, NX_TIMESTEP_FIXED);
 
 	for (size_t I = 0; I < PhysicalObjects.GetCount(); I++)
 		PhysicalObjects[I]->Initialize();
-
 
 	for (size_t I = 0; I < PhysicalObjects.GetCount(); I++)
 		PhysicalObjects[I]->Initialize();

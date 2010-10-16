@@ -51,6 +51,10 @@ class ZEQuaternion;
 class ZEMatrix4x4;
 class ZEFixedMaterial;
 class ZESimpleMaterial;
+
+class ZEPhysicalRigidBody;
+class ZEPhysicalJoint;
+
 struct ZEDrawParameters;
 
 class ZEModel : public ZEComponent
@@ -63,6 +67,9 @@ class ZEModel : public ZEComponent
 		
 		ZEArray<ZEModelMesh>				Meshes;
 		ZEArray<ZEModelBone>				Bones;
+
+		ZEPhysicalRigidBody*				ParentlessBoneBody;
+		ZEPhysicalBoxShape*					ParentlessBoneShape;
 
 		bool								Visibility;
 		bool								AutoLOD;
@@ -165,6 +172,8 @@ class ZEModel : public ZEComponent
 
 		void								Tick(float ElapsedTime);
 		void								Draw(ZEDrawParameters* DrawParameters);
+
+		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
 
 		virtual void						OwnerWorldTransformChanged();
 		void								UpdateBoundingBox();

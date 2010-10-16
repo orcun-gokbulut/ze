@@ -40,6 +40,7 @@
 #include "ZEGraphics\ZEVertexBuffer.h"
 #include "ZEGraphics\ZESimpleMaterial.h"
 #include "ZEGame\ZECompoundEntity.h"
+#include "ZEGame\ZEScene.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -194,7 +195,35 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 			Skeleton.Add(&Bones[I]);
 	}
 
+	if(Skeleton.GetCount() > 1)
+	{
+		ZEVector3 AveragePosition = ZEVector3::Zero;
 
+		for(size_t I = 0; I < Skeleton.GetCount(); I++)
+		{
+			AveragePosition += Skeleton[I]->PhysicalBody->GetPosition();
+		}
+		ZEVector3::Scale(AveragePosition, AveragePosition , 1.0f / Skeleton.GetCount());
+
+		ParentlessBoneBody = ZEPhysicalRigidBody::CreateInstance();
+		ParentlessBoneShape = new ZEPhysicalBoxShape();
+		ParentlessBoneBody->SetPosition(AveragePosition);
+		ParentlessBoneBody->SetEnabled(true);
+		ParentlessBoneBody->SetMass(50.0f);
+		ParentlessBoneShape->SetWidth(10.0f);
+		ParentlessBoneShape->SetHeight(10.0f);
+		ParentlessBoneShape->SetLength(10.0f);
+		ParentlessBoneShape->SetPosition(ZEVector3::Zero);
+		ParentlessBoneBody->AddPhysicalShape(ParentlessBoneShape);
+
+		ParentlessBoneBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+		ParentlessBoneBody->Initialize();
+
+		for(size_t I = 0; I < Skeleton.GetCount(); I++)
+		{
+			LinkParentlessBones(Skeleton[I]);
+		}
+	}
 
 	UpdateBoundingBox();
 	UpdateBoneTransforms();
@@ -543,6 +572,27 @@ void ZEModel::UpdateBoneTransforms()
 	BoneTransformsDirtyFlag = true;
 }
 
+void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
+{
+	ZEPhysicalJoint* ParentlessBoneJoint = ZEPhysicalJoint::CreateInstance();
+
+	ParentlessBoneJoint->SetBodyA(ParentlessBone->PhysicalBody);
+	ParentlessBoneJoint->SetBodyB(ParentlessBoneBody);
+
+	ParentlessBoneJoint->SetPosition(ParentlessBoneBody->GetPosition());
+	ParentlessBoneJoint->SetRotation(ParentlessBoneBody->GetRotation());
+
+	ParentlessBoneJoint->SetXMotion(ZE_PJMOTION_LOCKED);
+	ParentlessBoneJoint->SetYMotion(ZE_PJMOTION_LOCKED);
+	ParentlessBoneJoint->SetZMotion(ZE_PJMOTION_LOCKED);
+	ParentlessBoneJoint->SetSwing1Motion(ZE_PJMOTION_LOCKED);
+	ParentlessBoneJoint->SetSwing2Motion(ZE_PJMOTION_LOCKED);
+	ParentlessBoneJoint->SetTwistMotion(ZE_PJMOTION_LOCKED);
+
+	ParentlessBoneJoint->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+	ParentlessBoneJoint->Initialize();
+}
+
 void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 {
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
@@ -680,7 +730,6 @@ ZEModel::~ZEModel()
 	if (ModelResource != NULL)
 		((ZEModelResource*)ModelResource)->Release();
 }
-
 
 
 

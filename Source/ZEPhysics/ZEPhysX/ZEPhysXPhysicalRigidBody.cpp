@@ -493,6 +493,8 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 				BoxShapeDesc.dimensions.z = ((ZEPhysicalBoxShape*)CurrentShape)->GetLength() * 0.5f;
 				BoxShapeDesc.dimensions.arrayMultiply(BoxShapeDesc.dimensions, ZE_TO_NX(Scale)); 
 
+				BoxShapeDesc.density = 1.0f;
+
 				ActorDesc.shapes.push_back(&BoxShapeDesc);
 				break;
 			}
@@ -509,6 +511,8 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 				SphereShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
 
 				SphereShapeDesc.radius = Scale.x * ((ZEPhysicalSphereShape*)CurrentShape)->GetRadius();
+
+				SphereShapeDesc.density = 1.0f;
 
 				ActorDesc.shapes.push_back(&SphereShapeDesc);
 				break;
@@ -527,6 +531,8 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 
 				CapsuleShapeDesc.radius = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetRadius();
 				CapsuleShapeDesc.height = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetHeight() - 2 * CapsuleShapeDesc.radius;
+
+				CapsuleShapeDesc.density = 1.0f;
 
 				ActorDesc.shapes.push_back(&CapsuleShapeDesc);
 				break;
