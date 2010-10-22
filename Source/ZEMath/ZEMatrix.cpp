@@ -678,16 +678,28 @@ void ZEMatrix4x4::CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width,
 			0.0f, 0.0f, NearZ/(NearZ - FarZ), 1.0f);
 }
 
+void ZEMatrix4x4::CreatePerspectiveProjectionLinearZ(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ)
+{
+	float Ys = 1.0f / tanf(FOV * 0.5f);
+	float Xs = Ys / AspectRatio;
+
+	Create(Matrix, 
+			(FarZ - NearZ) * Xs, 0.0f, 0.0f, 0.0f,
+			0.0f, (FarZ - NearZ) * Ys, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, (FarZ - NearZ),
+			0.0f, 0.0f, -NearZ, 0.0f);
+}
+
 void ZEMatrix4x4::CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ)
 {
 	float Ys = 1.0f / tanf(FOV * 0.5f);
 	float Xs = Ys / AspectRatio;
 
 	Create(Matrix, 
-			Xs, 0.0f, 0.0f, 0.0f,
-			0.0f, Ys, 0.0f, 0.0f,
-			0.0f, 0.0f, FarZ / (FarZ - NearZ), 1.0f,
-			0.0f, 0.0f, -NearZ * FarZ / (FarZ - NearZ), 0.0f);
+		Xs, 0.0f, 0.0f, 0.0f,
+		0.0f, Ys, 0.0f, 0.0f,
+		0.0f, 0.0f, FarZ / (FarZ - NearZ), 1.0f,
+		0.0f, 0.0f, -NearZ * FarZ / (FarZ - NearZ), 0.0f);
 }
 
 void ZEMatrix4x4::CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Top, float Bottom, float NearZ, float FarZ)

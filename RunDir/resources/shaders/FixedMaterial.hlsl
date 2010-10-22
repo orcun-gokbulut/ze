@@ -173,6 +173,7 @@ GBVSOutput GBVSMain(VSInput Input)
 
 	// Pipeline 
 	Output.Position = mul(Input.Position, WorldViewProjMatrix);
+
 	Output.NormalDepth.xyz = mul(Input.Normal, WorldViewInvTrpsMatrix).xyz;
 	#if defined(ZE_SHADER_TANGENT_SPACE)
 		Output.Tangent = mul(Input.Tangent, WorldViewInvTrpsMatrix).xyz;

@@ -125,7 +125,6 @@ float4 PLPSMain(PLPSInput Input) : COLOR0
 
 		Output *= AngularAttenuation;
 		Output *= DistanceAttenuation;
-
 	}
 	
 	return Output;

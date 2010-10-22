@@ -39,14 +39,14 @@
 #define ZE_SHF_ATI					2
 
 
-#define ShadowFiltering				0
+#define ShadowFiltering				1
 #define ZE_SF_NONE					0
 #define ZE_SF_PCF_2X2				1
 #define ZE_SF_PCF_4X4				2
 #define ZE_SF_POISSION_PCF			3
 #define ZE_SF_RR_POISSION_PCF		4
 
-#define ShadowMapping				0
+#define ShadowMapping				1
 #define ZE_SM_DISABLED				0
 #define ZE_SM_ENABLED				1
 
@@ -102,4 +102,8 @@ float SampleShadowMap(sampler2D ShadowMap, float4 Texcoord)
 	#else
 		return 1.0f;
 	#endif
+}
+
+float SampleParaboloidShadowMap(sampler2D FrontShadowMap, sampler2D BackShadowMap, float3 Position)
+{
 }

@@ -61,15 +61,19 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		ZEArray<ZEPostProcessor*>				PostProcessors;
 
 		ZELight*								Light;
+		
+		bool									Face;
 
 		bool									InitializeShaders();
 		void									DeinitializeShaders();
 
 		void									RenderProjectiveLight();
-		void									RenderOmniLight();
+		void									RenderPointLight();
+		void									RenderOmniProjectiveLight();
 		void									RenderDirectionalLight();
 
 		LPDIRECT3DSURFACE9						ShadowMapFrameBuffer;
+		LPDIRECT3DSURFACE9						ShadowMapZBuffer;
 
 	protected:
 												ZED3D9ShadowRenderer();
@@ -91,6 +95,9 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 
 		virtual void							SetLight(ZELight* Light);
 		virtual ZELight*						GetLight();
+
+		virtual	void							SetFace(bool Front);
+		virtual bool							GetFace();
 
 		virtual void							SetViewPort(ZEViewPort* ViewPort);
 		virtual ZEViewPort*						GetViewPort();

@@ -40,27 +40,57 @@
 // Vertex Transformation
 float4x4 WorldViewProjMatrix : register(vs, c0);
 
+float Range : register(vs, c4);
 // Projective Light Shadow Map Generation
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 struct ProjectiveSMVSOutput
 {
 	float4 Position : POSITION0;
-	float2 Depth : TEXCOORD0;
 };
 
 ProjectiveSMVSOutput ProjectiveSMVSMain(float4 Position : POSITION0)
 {
 	ProjectiveSMVSOutput Output;
 	
-	Output.Position = mul(Position, WorldViewProjMatrix);	
-	Output.Depth.xy = Output.Position.zw;
+	Output.Position = mul(Position, WorldViewProjMatrix);
+	Output.Position.z *= Output.Position.z;
 
 	return Output;
 }
 
-float4 ProjectiveSMPSMain(float2 Depth : TEXCOORD0) : COLOR0
+float4 ProjectiveSMPSMain(float Depth : TEXCOORD0) : COLOR0
 {
-	float Output = Depth.x / Depth.y;
+	return Depth.xxxx;
+}
+
+// Omni Light Shadow Map Generation
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+struct OmniSMVSOutput
+{
+	float4 Position : POSITION0;
+	float Depth : TEXCOORD0;
+};
+
+OmniSMVSOutput OmniSMVSMain(float4 Position : POSITION0) 
+{
+	OmniSMVSOutput Output;
 	
-	return Output.xxxx;
+	Output.Position = mul(Position, WorldViewProjMatrix);
+	Output.Position = Output.Position / Output.Position.w;
+	
+	float Distance = length(Output.Position);
+	
+	Output.Position /= Distance;
+	
+	Output.Position.xy /= (Output.Position.z + 1.0f);
+	Output.Position.z = Distance / Range;
+	Output.Position.w = 1.0f;
+	
+	Output.Depth = Output.Position.z;
+	return Output;
+}
+
+float4 OmniSMPSMain(float Depth : TEXCOORD0) : COLOR0
+{
+	return Depth.xxxx;
 }

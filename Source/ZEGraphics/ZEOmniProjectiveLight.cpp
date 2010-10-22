@@ -37,15 +37,11 @@
 #include "ZEGame\ZEScene.h"
 #include "ZEShadowRenderer.h"
 #include "ZETexture.h"
+#include "ZETexture2D.h"
 
 ZELightType ZEOmniProjectiveLight::GetLightType()
 {
 	return ZE_LT_OMNIPROJECTIVE;
-}
-
-const ZETextureCube* ZEOmniProjectiveLight::GetShadowMap()
-{
-	return ShadowMap;
 }
 
 const ZETextureCube* ZEOmniProjectiveLight::GetProjectionTexture()
@@ -58,8 +54,64 @@ void ZEOmniProjectiveLight::SetProjectionTexture(const ZETextureCube* Texture)
 	ProjectionTexture = Texture;
 }
 
+void ZEOmniProjectiveLight::SetCastsShadow(bool NewValue)
+{
+	if (NewValue == false)
+	{
+		if (FrontShadowMap != NULL)
+		{
+			FrontShadowMap->Destroy();
+			FrontShadowMap = NULL;
+		}
+
+		if (BackShadowMap != NULL)
+		{
+			BackShadowMap->Destroy();
+			BackShadowMap = NULL;
+		}
+	}
+
+	ZELight::SetCastsShadow(NewValue);
+}
+
+void ZEOmniProjectiveLight::Deinitialize()
+{
+	if (FrontShadowMap != NULL)
+	{
+		FrontShadowMap->Destroy();
+		FrontShadowMap = NULL;
+	}
+
+	if (BackShadowMap != NULL)
+	{
+		BackShadowMap->Destroy();
+		BackShadowMap = NULL;
+	}
+}
+
+ZETexture2D* ZEOmniProjectiveLight::GetFrontShadowMap()
+{
+	return FrontShadowMap;
+}
+
+ZETexture2D* ZEOmniProjectiveLight::GetBackShadowMap()
+{
+	return BackShadowMap;
+}
+
 void ZEOmniProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
 {
+	if (FrontShadowMap == NULL)
+	{
+		FrontShadowMap = ZETexture2D::CreateInstance();
+		FrontShadowMap->Create(512, 512, ZE_TPF_SHADOW_MAP, false);
+	}
+
+	if (BackShadowMap == NULL)
+	{
+		BackShadowMap = ZETexture2D::CreateInstance();
+		BackShadowMap->Create(512, 512, ZE_TPF_SHADOW_MAP, false);
+	}
 }
 
 const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume()
@@ -75,9 +127,15 @@ const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume()
 
 ZEOmniProjectiveLight::ZEOmniProjectiveLight()
 {
-	ShadowMap = NULL;
 	ProjectionTexture = NULL;
-	ShadowMap = NULL;
+
+	FrontShadowMap = NULL;
+	BackShadowMap = NULL;
+}
+
+ZEOmniProjectiveLight::~ZEOmniProjectiveLight()
+{
+	Deinitialize();
 }
 
 #include "ZEOmniProjectiveLight.h.zpp"

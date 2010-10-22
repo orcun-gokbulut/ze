@@ -62,17 +62,21 @@ class ZEProjectiveLight : public ZELight
 
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio() const;
- 
-		ZETexture2D*					GetShadowMap();
-		void							SetShadowMap(int Width, int Height);
 
 		void							SetProjectionTexture(const ZETexture2D* Texture);
 		const ZETexture2D*				GetProjectionTexture();
 
 		const ZEMatrix4x4&				GetProjectionMatrix();
 
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
 		virtual const ZEViewVolume&		GetViewVolume();
+
+		virtual void					SetCastsShadow(bool NewValue);
+
+		virtual void					Deinitialize();
+
+		ZETexture2D*					GetShadowMap();
+		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
+
 
 										ZEProjectiveLight();
 										~ZEProjectiveLight();

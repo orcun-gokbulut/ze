@@ -86,24 +86,16 @@ ZETexture2D* ZEProjectiveLight::GetShadowMap()
 	return ShadowMap;
 }
 
-void ZEProjectiveLight::SetShadowMap(int Width, int Height)
-{
-	if (ShadowMap != NULL)
-		ShadowMap->Release();
-	else
-		ShadowMap = ZETexture2D::CreateInstance();
-
-	if (!ShadowMap->Create(Width, Height, ZE_TPF_SHADOW_MAP, true))
-	{
-		zeError("Projective Light", "Can not create shadow map texture.");
-		return;
-	}
-}
-
 void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
 {
-	if (!GetCastsShadow() || ShadowMap == NULL || ShadowMap->IsEmpty())
+	if (!GetCastsShadow())
 		return;
+
+	if (ShadowMap == NULL)
+	{
+		ShadowMap = ZETexture2D::CreateInstance();
+		ShadowMap->Create(512, 512, ZE_TPF_SHADOW_MAP, true);
+	}
 
 	ShadowRenderer->SetLight(this);
 	ShadowRenderer->SetViewPort(ShadowMap->GetViewPort());
@@ -125,6 +117,27 @@ const ZEViewVolume& ZEProjectiveLight::GetViewVolume()
 	return ViewVolume;
 }
 
+void ZEProjectiveLight::SetCastsShadow(bool NewValue)
+{
+	if (NewValue == false)
+		if (ShadowMap != NULL)
+		{
+			ShadowMap->Destroy();
+			ShadowMap = NULL;
+		}
+
+	ZELight::SetCastsShadow(NewValue);
+}
+
+void ZEProjectiveLight::Deinitialize()
+{
+	if (ShadowMap != NULL)
+	{
+		ShadowMap->Destroy();
+		ShadowMap = NULL;
+	}
+}
+
 ZEProjectiveLight::ZEProjectiveLight()
 {
 	ShadowMap = NULL;
@@ -132,8 +145,7 @@ ZEProjectiveLight::ZEProjectiveLight()
 
 ZEProjectiveLight::~ZEProjectiveLight()
 {
-	if (ShadowMap != NULL)
-		ShadowMap->Destroy();
+	Deinitialize();
 }
 
 #include "ZEProjectiveLight.h.zpp"

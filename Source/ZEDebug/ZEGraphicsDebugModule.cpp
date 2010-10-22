@@ -79,7 +79,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight1->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight1->SetIntensity(1.0f);
 	PointLight1->SetRange(55.0f);
-	PointLight1->SetCastShadows(false);
+	PointLight1->SetCastShadows(true);
 	Scene->AddEntity(PointLight1);
 
 	PointLight2 = new ZEPointLight();
@@ -141,7 +141,6 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetAspectRatio(1.0f);
 	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
 	ProjectiveLight0->SetCastsShadow(true);
-	ProjectiveLight0->SetShadowMap(512, 512);
 	Scene->AddEntity(ProjectiveLight0);
 	
 	// Transformation

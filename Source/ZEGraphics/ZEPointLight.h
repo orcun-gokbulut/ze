@@ -40,7 +40,7 @@
 #include "ZELight.h"
 #include "ZEViewVolume.h"
 
-class ZETextureCube;
+class ZETexture2D;
 
 ZE_META_CLASS_DESCRIPTION(ZEPointLight);
 
@@ -48,7 +48,9 @@ class ZEPointLight  : public ZELight
 {
 	ZE_META_ENTITY()
 	private:
-		ZETextureCube*					ShadowMap;
+		ZETexture2D*					FrontShadowMap;
+		ZETexture2D*					BackShadowMap;
+
 		ZEViewSphere					ViewVolume;
 
 	public:
@@ -56,13 +58,16 @@ class ZEPointLight  : public ZELight
 
 		virtual void					SetCastShadows(bool NewValue);
 
-		const ZETextureCube*			GetShadowMap();
+		ZETexture2D*					GetFrontShadowMap();
+		ZETexture2D*					GetBackShadowMap();
+
+		virtual void					Deinitialize();
 
 		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
 		virtual const ZEViewVolume&		GetViewVolume();
 
 										ZEPointLight();
-
+										~ZEPointLight();
 };
 
 #endif

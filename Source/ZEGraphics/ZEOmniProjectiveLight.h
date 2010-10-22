@@ -41,6 +41,7 @@
 #include "ZEViewVolume.h"
 
 class ZETextureCube;
+class ZETexture2D;
 
 ZE_META_CLASS_DESCRIPTION(ZEOmniProjectiveLight);
 
@@ -48,9 +49,10 @@ class ZEOmniProjectiveLight : public ZELight
 {
 	ZE_META_ENTITY()
 	private:
-		ZETextureCube*					ShadowMap;
 		const ZETextureCube*			ProjectionTexture;
 		ZEViewSphere					ViewVolume;
+		ZETexture2D*					FrontShadowMap;
+		ZETexture2D*					BackShadowMap;
 
 	public:
 		ZELightType						GetLightType();
@@ -60,11 +62,19 @@ class ZEOmniProjectiveLight : public ZELight
 		void							SetProjectionTexture(const ZETextureCube* Texture);
 		const ZETextureCube*			GetProjectionTexture();
 
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
+		virtual void					SetCastsShadow(bool NewValue);
+		
+		virtual void					Deinitialize();
+
 		virtual const ZEViewVolume&		GetViewVolume();
 
-										ZEOmniProjectiveLight();
+		ZETexture2D*					GetFrontShadowMap();
+		ZETexture2D*					GetBackShadowMap();
 
+		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
+
+										ZEOmniProjectiveLight();
+										~ZEOmniProjectiveLight();
 };
 
 /*

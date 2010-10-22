@@ -48,6 +48,9 @@ class ZEShadowRenderer : public ZERenderer
 	public:
 		virtual ZERendererType		GetRendererType();
 
+		virtual void				SetFace(bool Front) = 0;
+		virtual bool				GetFace() = 0;
+
 		virtual void				SetLight(ZELight* Light) = 0;
 		virtual ZELight*			GetLight() = 0;
 
