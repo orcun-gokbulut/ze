@@ -43,6 +43,8 @@
 
 class ZEUIFrameControl : public ZEUIControl
 {
+	friend class ZEUIBorderedFrameControl;
+
 	protected:
 
 		ZEUIRectangle		Frame;

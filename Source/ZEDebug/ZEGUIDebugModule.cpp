@@ -51,6 +51,7 @@
 #include "zeui/ZEUTextEditControl.h"
 #include "zeui/ZEUIMultiLineTextEdit.h"
 #include "zeui/ZEUIRadioButtonControl.h"
+#include "zeui/ZEUIBorderedFrameControl.h"
 
 #include "windows.h"
 
@@ -92,6 +93,8 @@ bool ZEGUIDebugModule::Initialize()
 	ZEUIRadioButtonControl* RadioButton2 = new ZEUIRadioButtonControl();
 	ZEUIRadioButtonControl* RadioButton3 = new ZEUIRadioButtonControl();
 
+	ZEUIBorderedFrameControl*	BorderedFrame = new ZEUIBorderedFrameControl();
+
 	RadioButton1->AddInteractingRadioButton(RadioButton2);
 	RadioButton1->AddInteractingRadioButton(RadioButton3);
 
@@ -115,6 +118,16 @@ bool ZEGUIDebugModule::Initialize()
 	zeGame->UIManager->AddControl(LineEdit);
 	//zeGame->UIManager->AddControl(LineEdit2);
 	zeGame->UIManager->AddControl(MultiLine);
+	zeGame->UIManager->AddControl(BorderedFrame);
+
+	BorderedFrame->SetPosition(ZEVector2(100,100));
+	BorderedFrame->SetHeight(25);
+	BorderedFrame->SetWidth(80);
+	//BorderedFrame->SetWidth(500);
+	//BorderedFrame->SetHeight(500);
+	//BorderedFrame->SetElementVisibilities(ZEUI_BFC_EL_TOPEDGE | ZEUI_BFC_EL_BOTTOMEDGE | ZEUI_BFC_EL_LEFTEDGE | ZEUI_BFC_EL_RIGHTEDGE, false);
+	//BorderedFrame->SetElementVisibilities(ZEUI_BFC_EL_LEFTUPCORNER | ZEUI_BFC_EL_LEFTDOWNCORNER | ZEUI_BFC_EL_RIGHTUPCORNER | ZEUI_BFC_EL_RIGHTDOWNCORNER, false);
+	BorderedFrame->SetBorderThickness(6);
 
 	LineEdit->SetPosition(ZEVector2(500,450));
 	LineEdit2->SetPosition(ZEVector2(70,100));

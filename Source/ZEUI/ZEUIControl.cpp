@@ -316,36 +316,6 @@ const ZEVector4& ZEUIControl::GetBackgroundColor()
 	return BackgroundColor;
 }
 
-void ZEUIControl::SetHoverColor(const ZEVector4& Color)
-{
-	HoverColor = Color;
-}
-
-const ZEVector4& ZEUIControl::GetHoverColor()
-{
-	return HoverColor;
-}
-
-void ZEUIControl::SetPressedColor(const ZEVector4& Color)
-{
-	PressedColor = Color;
-}
-
-const ZEVector4& ZEUIControl::GetPressedColor()
-{
-	return PressedColor;
-}
-
-void ZEUIControl::SetDisabledColor(const ZEVector4& Color)
-{
-	DisabledColor = DisabledColor;
-}
-
-const ZEVector4& ZEUIControl::GetDisabledColor()
-{
-	return DisabledColor;
-}
-
 void ZEUIControl::SetMouseClickedEvent(const ZEUIEventMouseClicked& Event)
 {
 	MouseClickedEvent = Event;
@@ -423,10 +393,22 @@ void ZEUIControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& Mouse
 
 void ZEUIControl::MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {
+	if (IsPressed)
+		MouseClickEvent(Button, MousePosition);
+
 	IsPressed = false;
 
 	if (MouseButtonReleasedEvent != NULL)
 		MouseButtonReleasedEvent(Button, MousePosition);
+}
+
+void ZEUIControl::MouseClickEvent(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+{
+	if (!IsHovered)
+		return;
+
+	if (MouseClickedEvent != NULL)
+		MouseClickedEvent(Button, MousePosition);
 }
 
 void ZEUIControl::MouseHovered(const ZEVector2& MousePosition)

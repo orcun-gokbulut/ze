@@ -97,18 +97,18 @@ class ZEUIControl
 		ZEVector2						MaximumSize;
 		ZEVector2						MinimumSize;
 
-		ZEUIEventMouseClicked			MouseClickedEvent;
+		ZEUIEventMouseClicked			MouseClickedEvent;			//Done
 		ZEUIEventMouseDoubleClicked		MouseDoubleClickedEvent;
-		ZEUIEventMouseButtonPressed		MouseButtonPressedEvent;//
-		ZEUIEventMouseButtonReleased	MouseButtonReleasedEvent;//
-		ZEUIEventMouseHovered			MouseHoveredEvent;//
-		ZEUIEventMouseEntered			MouseEnteredEvent;//
-		ZEUIEventMouseLeft				MouseLeftEvent;//
-		ZEUIEventMouseMoved				MouseMovedEvent;
-		ZEUIEventKeyPressed				KeyPressedEvent;//
-		ZEUIEventKeyReleased			KeyReleasedEvent;//
-		ZEUIEventFocusGained			FocusGainedEvent;//
-		ZEUIEventFocusLost				FocusLostEvent;//
+		ZEUIEventMouseButtonPressed		MouseButtonPressedEvent;	//Done
+		ZEUIEventMouseButtonReleased	MouseButtonReleasedEvent;	//Done
+		ZEUIEventMouseHovered			MouseHoveredEvent;			//Done
+		ZEUIEventMouseEntered			MouseEnteredEvent;			//Done
+		ZEUIEventMouseLeft				MouseLeftEvent;				//Done
+		ZEUIEventMouseMoved				MouseMovedEvent;			//Done
+		ZEUIEventKeyPressed				KeyPressedEvent;			//Done
+		ZEUIEventKeyReleased			KeyReleasedEvent;			//Done
+		ZEUIEventFocusGained			FocusGainedEvent;			//Done
+		ZEUIEventFocusLost				FocusLostEvent;				//Done
 
 	protected:
 
@@ -127,6 +127,7 @@ class ZEUIControl
 
 		virtual void					MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 		virtual void					MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		virtual void					MouseClickEvent(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 		virtual void					MouseHovered(const ZEVector2& MousePosition);
 		virtual	void					MouseEnterEvent(const ZEVector2& MousePosition);
 		virtual	void					MouseLeaveEvent(const ZEVector2& MousePosition);
@@ -197,15 +198,6 @@ class ZEUIControl
 		void							SetBackgroundColor(const ZEVector4& Color);
 		const ZEVector4&				GetBackgroundColor();
 
-		void							SetHoverColor(const ZEVector4& Color);
-		const ZEVector4&				GetHoverColor();
-
-		void							SetPressedColor(const ZEVector4& Color);
-		const ZEVector4&				GetPressedColor();
-
-		void							SetDisabledColor(const ZEVector4& Color);
-		const ZEVector4&				GetDisabledColor();
-
 		void							SetBackgroundType(ZEUIBackgroundType Type);
 		ZEUIBackgroundType				GetBackgroundType();
 
@@ -233,7 +225,3 @@ class ZEUIControl
 
 
 #endif
-
-
-
-

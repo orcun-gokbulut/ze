@@ -42,14 +42,14 @@
 
 enum ZEUIMouseKey
 {
-	ZE_UI_MOUSE_BUTTON_NONE	= 0,
-	ZE_UI_MOUSE_BUTTON_LEFT	= 1,
+	ZE_UI_MOUSE_BUTTON_NONE		= 0,
+	ZE_UI_MOUSE_BUTTON_LEFT		= 1,
 	ZE_UI_MOUSE_BUTTON_RIGHT	= 2,
 	ZE_UI_MOUSE_BUTTON_MIDDLE	= 3,
 };
 
 // Mouse Events
-typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseClicked;
+typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseClicked;
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseDoubleClicked;
 typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseButtonPressed;
 typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseButtonReleased;

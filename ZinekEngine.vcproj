@@ -1692,6 +1692,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEUI\ZEUIBorderedFrameControl.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEUI\ZEUIBorderedFrameControl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEUI\ZEUIButtonControl.cpp"
 				>
 			</File>
