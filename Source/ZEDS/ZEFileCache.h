@@ -70,7 +70,6 @@ class ZEFileCache
 		ZESmartArray<ZEFileCacheItem>	Items;
 
 		void							ReadItemListFromCacheFile();
-		void							DumpItemListOfCacheFile();
 		void							WriteItemListToCacheFile();
 
 	public:

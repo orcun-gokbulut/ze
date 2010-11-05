@@ -38,43 +38,17 @@
 #include "ZECore/ZEError.h"
 #include <sys/stat.h> 
 
+//INITIALIZE(),GETNEXTFILE(), SCAN() kalanlar.
+//GETDATA() spesifik datayý almak için böle biþey lazýmmý yoksa getnext file(cache partial resource file) ile istenilen alýnabilir mi?
 
-void ZEFileCache::WriteItemListToCacheFile()
+
+
+// Initializes the parameters(that will be use to write data to a partial cache file) 
+void ZECachePartialResourceFile::Initialize(void* File, size_t StartPosition, size_t EndPosition)
 {
-	// Will Be Written
-}
-
-void ZEFileCache::DumpItemListOfCacheFile()
-{
-	fseek((FILE*)File, 0, SEEK_END);
-	fwrite(Items.GetConstCArray(), sizeof(ZEFileCacheItem), Items.GetCount(), (FILE*)File);
-	ZEDWORD ItemCount = Items.GetCount();
-	fwrite(&ItemCount, sizeof(ZEDWORD), 1, (FILE*)File);
-}
-
-void ZEFileCache::Add(ZEDWORD Hash, void* Data, size_t Size)
-{
-	fseek((FILE*)File, sizeof(ZEFileCacheItem) * Items.GetCount() + sizeof(ZEDWORD), SEEK_END);
-	ZEDWORD Position = ftell((FILE*)File);
-
-	fwrite(Data, Size, 1, (FILE*)File);
-
-	ZEFileCacheItem* Item = Items.Add();
-	Item->FilePosition = Position;
-	Item->Hash = Hash;
-	Item->Size = Size;
-
-	DumpItemListOfCacheFile();
-	fflush((FILE*)File);
-}
-
-// NOT COMPLETE
-ZEFileCacheScan ZEFileCache::Scan(ZEDWORD Hash)
-{
-	ZEFileCacheScan Scan;
-	Scan.Cursor = 0;
-	Scan.Hash = Hash;
-	return Scan;
+	this->File = File;
+	this->StartPosition = StartPosition;
+	this->EndPosition = EndPosition;
 }
 
 bool ZEFileCache::GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan)
@@ -89,6 +63,47 @@ bool ZEFileCache::GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCa
 	}
 
 	return false;
+}
+
+// ????? galiba eksik
+ZEFileCacheScan ZEFileCache::Scan(ZEDWORD Hash)
+{
+	ZEFileCacheScan Scan;
+	Scan.Cursor = 0;
+	Scan.Hash = Hash;
+	return Scan;
+}
+
+// Adds data to cache file
+void ZEFileCache::Add(ZEDWORD Hash, void* Data, size_t Size)
+{
+	// Go to the beginning of item list(also means the end of previously added data)
+	fseek((FILE*)File, -1 * (sizeof(ZEFileCacheItem) * Items.GetCount() + sizeof(ZEDWORD)), SEEK_END);
+	// Save position
+	ZEDWORD Position = ftell((FILE*)File);
+	// Write the data
+	fwrite(Data, Size, 1, (FILE*)File);
+	// Add to Items List and set the item properties
+	ZEFileCacheItem* Item = Items.Add();
+	Item->FilePosition = Position;
+	Item->Hash = Hash;
+	Item->Size = Size;
+	// Write the item list
+	WriteItemListToCacheFile();
+	// flush after an output 
+	fflush((FILE*)File);
+}
+
+// Writes the item list to the end of cache
+void ZEFileCache::WriteItemListToCacheFile()
+{
+	// Go to the end
+	fseek((FILE*)File, 0, SEEK_END);
+	// Write the item list
+	fwrite(Items.GetConstCArray(), sizeof(ZEFileCacheItem), Items.GetCount(), (FILE*)File);
+	ZEDWORD ItemCount = Items.GetCount();
+	// Write the item count
+	fwrite(&ItemCount, sizeof(ZEDWORD), 1, (FILE*)File);
 }
 
 // Reads the list of items in the file cache from cache file
@@ -114,11 +129,14 @@ void ZEFileCache::ReadItemListFromCacheFile()
 // For Creating a new cache which have the same name with an existing one. Deletes the previous one
 bool ZEFileCache::CreateNewCacheFile(const char* FileName, bool OnlineMode)
 {
-	DeleteCacheFile(FileName);
+	if(DeleteCacheFile(FileName))
+	{
+		zeLog("File Cache:", "Deleting the cache file which have the name with: \"%s\".", FileName);
+	}
 	return OpenCacheFile(FileName, OnlineMode);
 }
 
-// Opens the cache file with specified options(online/offline) and gets the list of items stored in the cache file
+// Opens the cache file with specified option(online/offline) and gets the list of items stored in the cache file
 bool ZEFileCache::OpenCacheFile(const char* FileName, bool OnlineMode)
 {
 	File = fopen(FileName, "rwb");
@@ -140,6 +158,9 @@ void ZEFileCache::CloseCacheFile()
 	{
 		fclose((FILE*)File);
 		File = NULL;
+
+		// Delete the items list
+		Items.Clear(false);
 	}
 }
 
@@ -160,10 +181,8 @@ bool ZEFileCache::DeleteCacheFile(const char* FileName)
 			zeError("File Cache", "Can not delete existing cache. (File Name : \"%s\")", FileName);
 			return false;
 		}
-		else
-		{
-			return true;
-		}
+		
+		return true;
 	}
 	return false;
 }
@@ -197,10 +216,3 @@ ZEFileCache::~ZEFileCache()
 	CloseCacheFile();
 }
 
-// Initializes the parameters(that will be use to to write data to a partial cache file) 
-void ZECachePartialResourceFile::Initialize(void* File, size_t StartPosition, size_t EndPosition)
-{
-	this->File = File;
-	this->StartPosition = StartPosition;
-	this->EndPosition = EndPosition;
-}
