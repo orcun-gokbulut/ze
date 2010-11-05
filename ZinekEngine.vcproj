@@ -1224,6 +1224,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEGame\ZEPresentationSlide.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZEPresentationSlide.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEGame\ZEScene.cpp"
 				>
 			</File>
