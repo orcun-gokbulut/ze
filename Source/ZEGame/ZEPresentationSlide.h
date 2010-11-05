@@ -58,9 +58,6 @@ class ZEPresentationSlide : public ZECompoundEntity
 		ZEStaticVertexBuffer*				VertexBuffer;
 		ZEFixedMaterial*					Material;
 		ZETexture2DResource*				Texture;
-		size_t								OldVertexCount;
-
-		ZEROPrimitiveType					PrimitiveType;
 		char								PresentationSlide[255];
 
 	

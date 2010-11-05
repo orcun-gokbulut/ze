@@ -83,7 +83,6 @@ void ZEPresentationSlide::Draw(ZEDrawParameters* DrawParameters)
 
 		RenderOrder.VertexBuffer = VertexBuffer;
 		RenderOrder.Material = Material;
-		RenderOrder.PrimitiveType = PrimitiveType;
 		RenderOrder.WorldMatrix = GetWorldTransform();
 		DrawParameters->Renderer->AddToRenderList(&RenderOrder);
 	}
@@ -152,13 +151,14 @@ ZEPresentationSlide::ZEPresentationSlide()
 	VertexBuffer = NULL;
 	Texture = NULL;
 	Material = NULL;
-	OldVertexCount = 0;
+	
 	SetBoundingVolumeMechanism(ZE_BVM_USE_LOCAL_ONLY);
+	
 	RenderOrder.SetZero();
-	PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	RenderOrder.Material = Material;
+	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
+	RenderOrder.PrimitiveCount = 2;
 }
 
 ZEPresentationSlide::~ZEPresentationSlide()
