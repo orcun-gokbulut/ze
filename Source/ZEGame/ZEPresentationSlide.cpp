@@ -52,6 +52,20 @@ ZEDWORD ZEPresentationSlide::GetDrawFlags() const
 void ZEPresentationSlide::SetPresentationSlide(const char* FileName)
 {
 	strcpy(PresentationSlide, FileName);
+	if (Initialized)
+	{
+		if (Texture != NULL)
+		{
+			Texture->Release();
+			Texture = NULL;
+		}
+
+		if (strlen(PresentationSlide) != 0)
+			Texture = ZETexture2DResource::LoadSharedResource(PresentationSlide);
+
+		if (Texture != NULL)
+			Material->SetDiffuseMap(Texture->GetTexture());
+	}
 }
 
 const char* ZEPresentationSlide::GetPresentationSlide() const
@@ -109,6 +123,8 @@ bool ZEPresentationSlide::Initialize()
 	if (Texture != NULL)
 		Material->SetDiffuseMap(Texture->GetTexture());
 
+	Initialized = true;
+
 	return true;
 }
 
@@ -119,6 +135,8 @@ void ZEPresentationSlide::Deinitialize()
 
 	if (Material != NULL)
 		Material->Destroy();
+	
+	Initialized = false;
 }
 
 void ZEPresentationSlide::Tick(float ElapsedTime)
@@ -129,12 +147,14 @@ void ZEPresentationSlide::Tick(float ElapsedTime)
 
 ZEPresentationSlide::ZEPresentationSlide()
 {
+	Initialized = false;
 	PresentationSlide[0] = '\0';
 	VertexBuffer = NULL;
+	Texture = NULL;
+	Material = NULL;
 	OldVertexCount = 0;
 	SetBoundingVolumeMechanism(ZE_BVM_USE_LOCAL_ONLY);
 	RenderOrder.SetZero();
-	Material = NULL;
 	PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;

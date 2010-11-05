@@ -53,6 +53,7 @@ class ZEPresentationSlide : public ZECompoundEntity
 	ZE_META_ENTITY()
 
 	private:
+		bool								Initialized;
 		ZERenderOrder						RenderOrder;
 		ZEStaticVertexBuffer*				VertexBuffer;
 		ZEFixedMaterial*					Material;
