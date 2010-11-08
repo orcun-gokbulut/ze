@@ -504,8 +504,8 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 {
 	zeProfilerStart("GBuffer Pass");
 	
-	ZED3D9CommonTools::SetRenderTarget(0, GBuffer1);
-	ZED3D9CommonTools::SetRenderTarget(1, GBuffer2);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)GBuffer1->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(1, ((ZED3D9ViewPort*)GBuffer2->GetViewPort())->FrameBuffer);
 
 	GetDevice()->Clear(0, 0, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0x00000000, 1.0f, 0x00);
 
@@ -549,8 +549,8 @@ void ZED3D9FrameRenderer::DoLightningPass()
 	zeProfilerStart("Lightning Pass");
 
 	// Render Targets
-	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
-	//ZED3D9CommonTools::SetRenderTarget(1, LBuffer2);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)LBuffer1->GetViewPort())->FrameBuffer);
+	//GetDevice()->SetRenderTarget(1, ((ZED3D9ViewPort*)LBuffer2->GetViewPort())->FrameBuffer);
 
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00, 0.0f, 0);
 
@@ -574,14 +574,14 @@ void ZED3D9FrameRenderer::DoLightningPass()
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 
 	// GBuffers
-	GetDevice()->SetTexture(0, GBuffer1);
+	GetDevice()->SetTexture(0, GBuffer1->Texture);
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	GetDevice()->SetTexture(1, GBuffer2);
+	GetDevice()->SetTexture(1, GBuffer2->Texture);
 	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
@@ -631,14 +631,14 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	zeProfilerStart("Forward Pass");
 
 	// GBuffers
-	GetDevice()->SetTexture(0, GBuffer1);
+	GetDevice()->SetTexture(0, GBuffer1->Texture);
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	GetDevice()->SetTexture(1, GBuffer2);
+	GetDevice()->SetTexture(1, GBuffer2->Texture);
 	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
@@ -646,21 +646,21 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
 	// GBuffers
-	GetDevice()->SetTexture(2, LBuffer1);
+	GetDevice()->SetTexture(2, LBuffer1->Texture);
 	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	GetDevice()->SetTexture(3, LBuffer2);
+	GetDevice()->SetTexture(3, LBuffer2->Texture);
 	GetDevice()->SetSamplerState(3, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(3, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(3, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(3, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(3, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	GetDevice()->SetTexture(4, SSAOBuffer);
+	GetDevice()->SetTexture(4, SSAOBuffer->Texture);
 	GetDevice()->SetSamplerState(4, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(4, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(4, D3DSAMP_MINFILTER, D3DTEXF_POINT);
@@ -699,22 +699,39 @@ void ZED3D9FrameRenderer::DoForwardPass()
 
 void ZED3D9FrameRenderer::InitializeRenderTargets()
 {
-	ZED3D9CommonTools::CreateRenderTarget(&GBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&GBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&LBuffer1, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
-	ZED3D9CommonTools::CreateRenderTarget(&LBuffer2, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
-	ZED3D9CommonTools::CreateRenderTarget(&SSAOBuffer, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
-	ZED3D9CommonTools::CreateRenderTarget(&ABuffer, ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32);
+	if (GBuffer1 == NULL)
+		GBuffer1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	GBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
+	
+	if (GBuffer2 == NULL)
+		GBuffer2 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	GBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
+
+	if (LBuffer1 == NULL)
+		LBuffer1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	LBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
+
+	if (LBuffer2 == NULL)
+		LBuffer2 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	LBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
+
+	if (SSAOBuffer == NULL)
+		SSAOBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	SSAOBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
+
+	if (ABuffer == NULL)
+		ABuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	ABuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
 }
 
 void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 {
-	ZED3D_RELEASE(GBuffer1);
-	ZED3D_RELEASE(GBuffer2);
-	ZED3D_RELEASE(LBuffer1);
-	ZED3D_RELEASE(LBuffer2);
-	ZED3D_RELEASE(SSAOBuffer);
-	ZED3D_RELEASE(ABuffer);
+	ZED3D_DESTROY(GBuffer1);
+	ZED3D_DESTROY(GBuffer2);
+	ZED3D_DESTROY(LBuffer1);
+	ZED3D_DESTROY(LBuffer2);
+	ZED3D_DESTROY(SSAOBuffer);
+	ZED3D_DESTROY(ABuffer);
 }
 
 ZED3D9FrameRenderer::ZED3D9FrameRenderer()
@@ -758,7 +775,7 @@ ZEViewPort* ZED3D9FrameRenderer::GetViewPort()
 bool ZED3D9FrameRenderer::Initialize() 
 { 
 	InitializeRenderTargets();
-	SSAOProcessor.Renderer = this;
+	SSAOProcessor.SetRenderer(this);
 	HDRProcessor.Initialize();
 	SSAOProcessor.Initialize();
 	
@@ -772,21 +789,16 @@ void ZED3D9FrameRenderer::Deinitialize()
 	HDRProcessor.Deinitialize();
 	SSAOProcessor.Deinitialize();
 	DeinitializeLightning();
+	DeinitializeRenderTargets();
 }
 
 void ZED3D9FrameRenderer::DeviceLost()
 {
-	HDRProcessor.OnDeviceLost();
-	SSAOProcessor.OnDeviceLost();
-	DeinitializeRenderTargets();
+
 }
 
 bool ZED3D9FrameRenderer::DeviceRestored()
 {
-	HDRProcessor.OnDeviceRestored();
-	SSAOProcessor.OnDeviceRestored();
-	InitializeRenderTargets();
-
 	return true;
 }
 
@@ -862,6 +874,8 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
 
 	LightStencilMaskValue = 1;
+	
+	InitializeRenderTargets();
 
 	GetDevice()->BeginScene();
 

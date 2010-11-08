@@ -40,56 +40,63 @@
 #include "ZED3D9ComponentBase.h"
 #include <d3d9.h>
 
+class ZETexture2D;
+class ZED3D9Texture2D;
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
+
 class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 {
-	public:
-		LPDIRECT3DTEXTURE9 Input;
-		LPDIRECT3DSURFACE9 Target;
-		size_t ScreenWidth, ScreenHeight;
+	private:
+		ZED3D9Texture2D*				Input;
+		ZED3D9Texture2D*				Output;
+		size_t							ScreenWidth, ScreenHeight;
 
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
 		struct 
 		{
-			LPDIRECT3DTEXTURE9			Luminance5;
-			LPDIRECT3DTEXTURE9			Luminance4;
-			LPDIRECT3DTEXTURE9			Luminance3;
-			LPDIRECT3DTEXTURE9			Luminance2;
-			LPDIRECT3DTEXTURE9			Luminance1;
-			LPDIRECT3DTEXTURE9			Luminance;
-			LPDIRECT3DTEXTURE9			OldLuminance;
-			LPDIRECT3DTEXTURE9			DownSampled4xA;
-			LPDIRECT3DTEXTURE9			DownSampled4xB;
+			ZED3D9Texture2D*			Luminance5;
+			ZED3D9Texture2D*			Luminance4;
+			ZED3D9Texture2D*			Luminance3;
+			ZED3D9Texture2D*			Luminance2;
+			ZED3D9Texture2D*			Luminance1;
+			ZED3D9Texture2D*			Luminance;
+			ZED3D9Texture2D*			OldLuminance;
+			ZED3D9Texture2D*			DownSampled4xA;
+			ZED3D9Texture2D*			DownSampled4xB;
 		} Textures;
 
 		struct
 		{
-			LPDIRECT3DVERTEXSHADER9		VertexShader;
-			LPDIRECT3DPIXELSHADER9		LumMeasureStart;
-			LPDIRECT3DPIXELSHADER9		LumDownSample3x;
-			LPDIRECT3DPIXELSHADER9		LumMeasureEnd;
-			LPDIRECT3DPIXELSHADER9		BrightPass; 
-			LPDIRECT3DPIXELSHADER9		ColorDownSample4x;
-			LPDIRECT3DPIXELSHADER9		VerticalBloom;
-			LPDIRECT3DPIXELSHADER9		HorizontalBloom;
-			LPDIRECT3DPIXELSHADER9		ToneMap;
+			ZED3D9VertexShader*			VertexShader;
+			ZED3D9PixelShader*			LumMeasureStart;
+			ZED3D9PixelShader*			LumDownSample3x;
+			ZED3D9PixelShader*			LumMeasureEnd;
+			ZED3D9PixelShader*			BrightPass; 
+			ZED3D9PixelShader*			ColorDownSample4x;
+			ZED3D9PixelShader*			VerticalBloom;
+			ZED3D9PixelShader*			HorizontalBloom;
+			ZED3D9PixelShader*			ToneMap;
 		} Shaders;
 
-										ZED3D9HDRProcessor();
-
-		void							SetRenderTarget(LPDIRECT3DTEXTURE9 Texture);
 		void							CreateRenderTargets();
 		void							ReleaseRenderTargets();
 
 	public:
-		void							OnDeviceLost();
-		void							OnDeviceRestored();
-
 		void							Initialize();
 		void							Deinitialize();
 
+		void							SetInput(ZETexture2D* Input);
+		ZETexture2D*					GetInput();
 
-		void							DoHDR();
+		void							SetOutput(ZETexture2D* Output);
+		ZETexture2D*					GetOutput();
+
+		void							Process();
+
+										ZED3D9HDRProcessor();
+										~ZED3D9HDRProcessor();
 };
 
 #endif

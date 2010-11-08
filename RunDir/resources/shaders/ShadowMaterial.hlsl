@@ -46,6 +46,7 @@ float Range : register(vs, c4);
 struct ProjectiveSMVSOutput
 {
 	float4 Position : POSITION0;
+	float Depth : TEXCOORD0;
 };
 
 ProjectiveSMVSOutput ProjectiveSMVSMain(float4 Position : POSITION0)
@@ -54,7 +55,8 @@ ProjectiveSMVSOutput ProjectiveSMVSMain(float4 Position : POSITION0)
 	
 	Output.Position = mul(Position, WorldViewProjMatrix);
 	Output.Position.z *= Output.Position.z;
-
+	Output.Depth = Output.Position.z;
+	
 	return Output;
 }
 

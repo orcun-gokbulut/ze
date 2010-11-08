@@ -79,7 +79,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight1->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight1->SetIntensity(1.0f);
 	PointLight1->SetRange(55.0f);
-	PointLight1->SetCastShadows(true);
+	PointLight1->SetCastShadows(false);
 	Scene->AddEntity(PointLight1);
 
 	PointLight2 = new ZEPointLight();
@@ -136,11 +136,10 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetAttenuation(0.01f, 0.0f, 1.0f);
 	ProjectiveLight0->SetIntensity(5.0f);
 	ProjectiveLight0->SetRange(55.0f);
-	ProjectiveLight0->SetCastsShadow(false);
 	ProjectiveLight0->SetFOV(ZE_PI_4);
 	ProjectiveLight0->SetAspectRatio(1.0f);
 	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
-	ProjectiveLight0->SetCastsShadow(true);
+	ProjectiveLight0->SetCastsShadow(false);
 	Scene->AddEntity(ProjectiveLight0);
 	
 	// Transformation
@@ -170,7 +169,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(DirectionalLight0);
 
 	PointLight1->SetEnabled(true);
-	PointLight2->SetEnabled(false);
+	PointLight2->SetEnabled(true);
 	PointLight3->SetEnabled(true);
 	PointLight4->SetEnabled(false);
 	PointLight5->SetEnabled(false);

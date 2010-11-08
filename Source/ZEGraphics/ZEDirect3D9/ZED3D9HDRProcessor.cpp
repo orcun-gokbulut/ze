@@ -37,8 +37,11 @@
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZED3D9Module.h"
-#include "ZECore\ZECore.h"
-#include "ZECore\ZEConsole.h"
+#include "ZED3D9Texture2D.h"
+#include "ZED3D9Shader.h"
+
+#include "ZECore/ZECore.h"
+#include "ZECore/ZEConsole.h"
 
 static float GausianFunction(float x, float StandartDeviation)
 {
@@ -81,58 +84,64 @@ static void FillGaussianKernel2D(float* Kernel, size_t KernelSize, float Standar
 	}
 }
 
-
-
-ZED3D9HDRProcessor::ZED3D9HDRProcessor()
-{
-	memset(&Textures, 0, sizeof(Textures));
-	memset(&Shaders, 0, sizeof(Shaders));
-}
-
-
 void ZED3D9HDRProcessor::CreateRenderTargets()
 {
-	//ZED3D9CommonTools::CreateRenderTarget(&Textures.DownSampled2x, ScreenWidth / 2, ScreenHeight / 2, ZE_TPF_RGBA_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&Textures.DownSampled4xA, ScreenWidth / 4, ScreenHeight / 4, ZE_TPF_RGBA_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&Textures.DownSampled4xB, ScreenWidth / 4, ScreenHeight / 4, ZE_TPF_RGBA_HDR);
+	if (Textures.Luminance5 == NULL)
+		Textures.Luminance5 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	Textures.Luminance5->Create(243, 243, ZE_TPF_LUM_HDR);
 
-	ZED3D9CommonTools::CreateRenderTarget(&Textures.Luminance5, 243, 243, ZE_TPF_LUM_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&Textures.Luminance4, 81, 81, ZE_TPF_LUM_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&Textures.Luminance3, 27, 27, ZE_TPF_LUM_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&Textures.Luminance2, 9, 9, ZE_TPF_LUM_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&Textures.Luminance1, 3, 3, ZE_TPF_LUM_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&Textures.Luminance, 1, 1, ZE_TPF_LUM_HDR);
-	ZED3D9CommonTools::CreateRenderTarget(&Textures.OldLuminance, 1, 1, ZE_TPF_LUM_HDR);
+	if (Textures.Luminance4 == NULL)
+		Textures.Luminance4 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	Textures.Luminance4->Create(81, 81, ZE_TPF_LUM_HDR);
+
+	if (Textures.Luminance3 == NULL)
+		Textures.Luminance3 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	Textures.Luminance3->Create(27, 27, ZE_TPF_LUM_HDR);
+
+	if (Textures.Luminance2 == NULL)
+		Textures.Luminance2 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	Textures.Luminance2->Create(9, 9, ZE_TPF_LUM_HDR);
+
+	if (Textures.Luminance1 == NULL)
+		Textures.Luminance1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	Textures.Luminance1->Create(3, 3, ZE_TPF_LUM_HDR);
+
+	if (Textures.Luminance == NULL)
+		Textures.Luminance = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	Textures.Luminance->Create(1, 1, ZE_TPF_LUM_HDR);
+
+	if (Textures.OldLuminance == NULL)
+		Textures.OldLuminance = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	Textures.OldLuminance->Create(1, 1, ZE_TPF_LUM_HDR);
+
+	/*if (Textures.DownSampled2x == NULL)
+		Textures.DownSampled2x = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	Textures.DownSampled2x->Create( ScreenWidth / 2, ScreenHeight / 2, ZE_TPF_RGBA_HDR);*/
+
+	if (Textures.DownSampled4xA == NULL)
+		Textures.DownSampled4xA = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	Textures.DownSampled4xA->Create( ScreenWidth / 4, ScreenHeight / 4, ZE_TPF_RGBA_HDR);
+
+	if (Textures.DownSampled4xB == NULL)
+		Textures.DownSampled4xB = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	Textures.DownSampled4xB->Create( ScreenWidth / 4, ScreenHeight / 4, ZE_TPF_RGBA_HDR);
 }
 
 
 void ZED3D9HDRProcessor::ReleaseRenderTargets()
 {
-	//ZED3D_RELEASE(Textures.DownSampled2x);
-	ZED3D_RELEASE(Textures.DownSampled4xA);
-	ZED3D_RELEASE(Textures.DownSampled4xB);
+	//ZED3D_DESTROY(Textures.DownSampled2x);
+	ZED3D_DESTROY(Textures.DownSampled4xA);
+	ZED3D_DESTROY(Textures.DownSampled4xB);
 
-	ZED3D_RELEASE(Textures.Luminance5);
-	ZED3D_RELEASE(Textures.Luminance4);
-	ZED3D_RELEASE(Textures.Luminance3);
-	ZED3D_RELEASE(Textures.Luminance2);
-	ZED3D_RELEASE(Textures.Luminance1);
-	ZED3D_RELEASE(Textures.Luminance);
-	ZED3D_RELEASE(Textures.OldLuminance);
+	ZED3D_DESTROY(Textures.Luminance5);
+	ZED3D_DESTROY(Textures.Luminance4);
+	ZED3D_DESTROY(Textures.Luminance3);
+	ZED3D_DESTROY(Textures.Luminance2);
+	ZED3D_DESTROY(Textures.Luminance1);
+	ZED3D_DESTROY(Textures.Luminance);
+	ZED3D_DESTROY(Textures.OldLuminance);
 }
-
-
-void ZED3D9HDRProcessor::OnDeviceLost()
-{
-	ReleaseRenderTargets();
-}
-
-
-void ZED3D9HDRProcessor::OnDeviceRestored()
-{
-
-}
-
 
 void ZED3D9HDRProcessor::Initialize()
 {
@@ -145,15 +154,15 @@ void ZED3D9HDRProcessor::Initialize()
 	};
 	GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
 
-	ZED3D9CommonTools::CompileVertexShader(&Shaders.VertexShader, "HDRProcessor.hlsl", "VSMain", "vs_3_0", NULL);
-	ZED3D9CommonTools::CompilePixelShader(&Shaders.LumMeasureStart, "HDRProcessor.hlsl", "PSLumMeasureStart", "ps_3_0", NULL);
-	ZED3D9CommonTools::CompilePixelShader(&Shaders.LumDownSample3x, "HDRProcessor.hlsl", "PSLumDownSample3x", "ps_3_0", NULL);
-	ZED3D9CommonTools::CompilePixelShader(&Shaders.LumMeasureEnd, "HDRProcessor.hlsl", "PSLumMeasureEnd", "ps_3_0", NULL);
-	ZED3D9CommonTools::CompilePixelShader(&Shaders.BrightPass, "HDRProcessor.hlsl", "PSBrightPass", "ps_3_0", NULL);
-	ZED3D9CommonTools::CompilePixelShader(&Shaders.ColorDownSample4x, "HDRProcessor.hlsl", "PSColorDownSample4x", "ps_3_0", NULL);
-	ZED3D9CommonTools::CompilePixelShader(&Shaders.HorizontalBloom, "HDRProcessor.hlsl", "PSHorizontalBloom", "ps_3_0", NULL);
-	ZED3D9CommonTools::CompilePixelShader(&Shaders.VerticalBloom, "HDRProcessor.hlsl", "PSVerticalBloom", "ps_3_0", NULL);
-	ZED3D9CommonTools::CompilePixelShader(&Shaders.ToneMap, "HDRProcessor.hlsl", "PSToneMap", "ps_3_0", NULL);
+	Shaders.VertexShader = ZED3D9VertexShader::CreateShader("HDRProcessor.hlsl", "VSMain", 0, "vs_3_0");
+	Shaders.LumMeasureStart = ZED3D9PixelShader::CreateShader("HDRProcessor.hlsl", "PSLumMeasureStart", 0, "ps_3_0");
+	Shaders.LumDownSample3x = ZED3D9PixelShader::CreateShader("HDRProcessor.hlsl", "PSLumDownSample3x", 0, "ps_3_0");
+	Shaders.LumMeasureEnd = ZED3D9PixelShader::CreateShader("HDRProcessor.hlsl", "PSLumMeasureEnd", 0, "ps_3_0");
+	Shaders.BrightPass = ZED3D9PixelShader::CreateShader("HDRProcessor.hlsl", "PSBrightPass", 0, "ps_3_0");
+	Shaders.ColorDownSample4x = ZED3D9PixelShader::CreateShader("HDRProcessor.hlsl", "PSColorDownSample4x", 0, "ps_3_0");
+	Shaders.HorizontalBloom = ZED3D9PixelShader::CreateShader("HDRProcessor.hlsl", "PSHorizontalBloom", 0, "ps_3_0");
+	Shaders.VerticalBloom = ZED3D9PixelShader::CreateShader("HDRProcessor.hlsl", "PSVerticalBloom", 0, "ps_3_0");
+	Shaders.ToneMap = ZED3D9PixelShader::CreateShader("HDRProcessor.hlsl", "PSToneMap", 0, "ps_3_0");
 }	
 
 
@@ -173,17 +182,7 @@ void ZED3D9HDRProcessor::Deinitialize()
 	ReleaseRenderTargets();
 }
 
-
-void ZED3D9HDRProcessor::SetRenderTarget(LPDIRECT3DTEXTURE9 Texture)
-{
-	LPDIRECT3DSURFACE9 Surface;
-	Texture->GetSurfaceLevel(0, &Surface);
-	GetDevice()->SetRenderTarget(0, Surface);
-	Surface->Release();
-}
-
-
-void ZED3D9HDRProcessor::DoHDR()
+void ZED3D9HDRProcessor::Process()
 {
 	ScreenWidth = GetModule()->GetScreenWidth();
 	ScreenHeight = GetModule()->GetScreenHeight();
@@ -295,7 +294,7 @@ void ZED3D9HDRProcessor::DoHDR()
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
 	GetDevice()->SetVertexDeclaration(VertexDeclaration);
-	GetDevice()->SetVertexShader(Shaders.VertexShader);
+	GetDevice()->SetVertexShader(Shaders.VertexShader->GetVertexShader());
 
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
@@ -311,9 +310,9 @@ void ZED3D9HDRProcessor::DoHDR()
 	GetDevice()->SetPixelShaderConstantF(15, (const float*) Kernel3x3, 9);
 
 	// Luminance Measure Start Pass
-	SetRenderTarget(Textures.Luminance5);
-	GetDevice()->SetTexture(0, Input);
-	GetDevice()->SetPixelShader(Shaders.LumMeasureStart);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance5->GetViewPort())->FrameBuffer);
+	GetDevice()->SetTexture(0, Input->Texture);
+	GetDevice()->SetPixelShader(Shaders.LumMeasureStart->GetPixelShader());
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / 243.0f, 1.0f / 243.0f, 0.0f, 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / ScreenWidth, 1.0f / ScreenHeight, 0.0f, 0.0f), 1);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
@@ -322,53 +321,53 @@ void ZED3D9HDRProcessor::DoHDR()
 	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 
-	SetRenderTarget(Textures.Luminance4);
-	GetDevice()->SetTexture(0, Textures.Luminance5);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance4->GetViewPort())->FrameBuffer);
+	GetDevice()->SetTexture(0, Textures.Luminance5->Texture);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / 81.0f, 1.0f / 81.0f, 0.0f, 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / 243.0f, 1.0f / 243.0f, 0.0f, 0.0f), 1);
-	GetDevice()->SetPixelShader(Shaders.LumDownSample3x);
+	GetDevice()->SetPixelShader(Shaders.LumDownSample3x->GetPixelShader());
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 	// Luminance Measure Down Sample 3x (From : 81, To: 27)
-	SetRenderTarget(Textures.Luminance3);
-	GetDevice()->SetTexture(0, Textures.Luminance4);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance3->GetViewPort())->FrameBuffer);
+	GetDevice()->SetTexture(0, Textures.Luminance4->Texture);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / 27.0f, 1.0f / 27.0f, 0.0f, 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / 81.0f, 1.0f / 81.0f, 0.0f, 0.0f), 1);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 	// Luminance Measure Down Sample 3x (From : 27, To: 9)
-	SetRenderTarget(Textures.Luminance2);
-	GetDevice()->SetTexture(0, Textures.Luminance3);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance2->GetViewPort())->FrameBuffer);
+	GetDevice()->SetTexture(0, Textures.Luminance3->Texture);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / 9.0f, 1.0f / 9.0f, 0.0f, 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / 27.0f, 1.0f / 27.0f, 0.0f, 0.0f), 1);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 	// Luminance Measure Down Sample 3x (From : 9, To: 3)
-	SetRenderTarget(Textures.Luminance1);
-	GetDevice()->SetTexture(0, Textures.Luminance2);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance1->GetViewPort())->FrameBuffer);
+	GetDevice()->SetTexture(0, Textures.Luminance2->Texture);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / 3.0f, 1.0f / 3.0f, 0.0f, 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / 9.0f, 1.0f / 9.0f, 0.0f, 0.0f), 1);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
-	LPDIRECT3DTEXTURE9 TempTexture;
+	ZED3D9Texture2D* TempTexture;
 	TempTexture = Textures.OldLuminance;
 	Textures.OldLuminance = Textures.Luminance;
 	Textures.Luminance = TempTexture;
 
 	// Luminance Measure End Pass
-	SetRenderTarget(Textures.Luminance);
-	GetDevice()->SetTexture(0, Textures.Luminance1);
-	GetDevice()->SetTexture(3, Textures.OldLuminance);
-	GetDevice()->SetPixelShader(Shaders.LumMeasureEnd);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.Luminance->GetViewPort())->FrameBuffer);
+	GetDevice()->SetTexture(0, Textures.Luminance1->Texture);
+	GetDevice()->SetTexture(3, Textures.OldLuminance->Texture);
+	GetDevice()->SetPixelShader(Shaders.LumMeasureEnd->GetPixelShader());
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f, 1.0f, 0.0f, 0.0f), 1);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / 3.0f, 1.0f / 3.0f, 0.0f, 0.0f), 1);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 	// Bright Pass
-	SetRenderTarget(Textures.DownSampled4xA);
-	GetDevice()->SetTexture(0, Input);
-	GetDevice()->SetTexture(1, Textures.Luminance);
-	GetDevice()->SetPixelShader(Shaders.BrightPass);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.DownSampled4xA->GetViewPort())->FrameBuffer);
+	GetDevice()->SetTexture(0, Input->Texture);
+	GetDevice()->SetTexture(1, Textures.Luminance->Texture);
+	GetDevice()->SetPixelShader(Shaders.BrightPass->GetPixelShader());
 
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / ScreenWidth, 1.0f / ScreenHeight, 0.0f, 0.0f), 1);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (ScreenHeight / 4.0f), 1.0f / (ScreenHeight / 4.0f), 0.0f, 0.0f), 1);
@@ -389,17 +388,17 @@ void ZED3D9HDRProcessor::DoHDR()
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));*/
 
 	// Vertical Bloom Pass
-	GetDevice()->SetTexture(0, Textures.DownSampled4xA);
-	SetRenderTarget(Textures.DownSampled4xB);
+	GetDevice()->SetTexture(0, Textures.DownSampled4xA->Texture);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.DownSampled4xB->GetViewPort())->FrameBuffer);
 	GetDevice()->SetPixelShaderConstantF(15, (const float*)BloomKernel, 15);
-	GetDevice()->SetPixelShader(Shaders.VerticalBloom); 
+	GetDevice()->SetPixelShader(Shaders.VerticalBloom->GetPixelShader()); 
 	//GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / (ScreenWidth / 8.0f), 1.0f / (ScreenWidth / 8.0f), 0.0f, 0.0f), 1);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 	// Horizontal Bloom Pass
-	GetDevice()->SetTexture(0, Textures.DownSampled4xB);
-	SetRenderTarget(Textures.DownSampled4xA);
-	GetDevice()->SetPixelShader(Shaders.HorizontalBloom);
+	GetDevice()->SetTexture(0, Textures.DownSampled4xB->Texture);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Textures.DownSampled4xA->GetViewPort())->FrameBuffer);
+	GetDevice()->SetPixelShader(Shaders.HorizontalBloom->GetPixelShader());
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 
 	// Tone Mapping Pass
@@ -409,11 +408,22 @@ void ZED3D9HDRProcessor::DoHDR()
 	GetDevice()->SetSamplerState(2, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	GetDevice()->SetRenderTarget(0, Target);
-	GetDevice()->SetTexture(0, Input);
-	GetDevice()->SetTexture(1, Textures.Luminance);
-	GetDevice()->SetTexture(2, Textures.DownSampled4xB);
-	GetDevice()->SetPixelShader(Shaders.ToneMap);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Output->GetViewPort())->FrameBuffer);
+	GetDevice()->SetTexture(0, Input->Texture);
+	GetDevice()->SetTexture(1, Textures.Luminance->Texture);
+	GetDevice()->SetTexture(2, Textures.DownSampled4xB->Texture);
+	GetDevice()->SetPixelShader(Shaders.ToneMap->GetPixelShader());
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4 (1.0f / ScreenWidth, 1.0f / ScreenHeight, 0.0f, 0.0f), 1);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+}
+
+ZED3D9HDRProcessor::ZED3D9HDRProcessor()
+{
+	memset(&Textures, 0, sizeof(Textures));
+	memset(&Shaders, 0, sizeof(Shaders));
+}
+
+ZED3D9HDRProcessor::~ZED3D9HDRProcessor()
+{
+	Deinitialize();
 }

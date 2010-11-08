@@ -51,6 +51,7 @@ class ZEOmniProjectiveLight;
 class ZED3D9StaticVertexBuffer;
 class ZED3D9PixelShader;
 class ZED3D9VertexShader;
+class ZED3D9Texture2D;
 
 class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 {
@@ -62,12 +63,12 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 
 		ZED3D9ViewPort*						ViewPort;
 
-		LPDIRECT3DTEXTURE9					GBuffer1;
-		LPDIRECT3DTEXTURE9					GBuffer2;
-		LPDIRECT3DTEXTURE9					LBuffer1;
-		LPDIRECT3DTEXTURE9					LBuffer2;
-		LPDIRECT3DTEXTURE9					SSAOBuffer;
-		LPDIRECT3DTEXTURE9					ABuffer;
+		ZED3D9Texture2D* 					GBuffer1;
+		ZED3D9Texture2D*					GBuffer2;
+		ZED3D9Texture2D*					LBuffer1;
+		ZED3D9Texture2D*					LBuffer2;
+		ZED3D9Texture2D*					SSAOBuffer;
+		ZED3D9Texture2D*					ABuffer;
 
 		ZED3D9HDRProcessor					HDRProcessor;
 		ZED3D9SSAOProcessor					SSAOProcessor;
@@ -114,8 +115,6 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		void								DoLightningPass();
 		void								DoForwardPass();
 		void								DoPostProcess();
-
-
 
 	protected:
 											ZED3D9FrameRenderer();

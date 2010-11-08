@@ -54,30 +54,6 @@ ZED3D9VertexShader* DirectionalLightVS = NULL;
 ZED3D9PixelShader* DirectionalLightPS = NULL;
 ZED3D9VertexShader* ProjectiveLightVS = NULL;
 ZED3D9PixelShader* ProjectiveLightPS = NULL;
-	
-bool ZED3D9ShadowRenderer::InitializeShaders()
-{
-	OmniLightVS = ZED3D9VertexShader::CreateShader("ShadowMaterial.hlsl", "OmniSMVSMain", 0, "vs_3_0");
-	OmniLightPS = ZED3D9PixelShader::CreateShader("ShadowMaterial.hlsl", "OmniSMPSMain", 0, "ps_3_0");
-
-	//DirectionalLightVS = ZED3D9VertexShader::CreateShader("ShadowMaterial.hlsl", "DirectionalVSMain", 0, "vs_3_0");
-	//DirectionalLightPS = ZED3D9PixelShader::CreateShader("ShadowMaterial.hlsl", "DirectionalPSMain", 0, "ps_3_0");
-
-	ProjectiveLightVS = ZED3D9VertexShader::CreateShader("ShadowMaterial.hlsl", "ProjectiveSMVSMain", 0, "vs_3_0");
-	ProjectiveLightPS = ZED3D9PixelShader::CreateShader("ShadowMaterial.hlsl", "ProjectiveSMPSMain", 0, "ps_3_0");
-
-	return true;
-}
-
-void ZED3D9ShadowRenderer::DeinitializeShaders()
-{
-	ZED3D_RELEASE(OmniLightVS);
-	ZED3D_RELEASE(OmniLightVS);
-	ZED3D_RELEASE(DirectionalLightVS);
-	ZED3D_RELEASE(DirectionalLightPS);
-	ZED3D_RELEASE(ProjectiveLightVS);
-	ZED3D_RELEASE(ProjectiveLightVS);
-}
 
 void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
 {
@@ -180,24 +156,41 @@ void ZED3D9ShadowRenderer::DeviceLost()
 
 bool ZED3D9ShadowRenderer::DeviceRestored()
 {
+	Initialize();
 	return true;
 }
 
 bool ZED3D9ShadowRenderer::Initialize()
 {
-	InitializeShaders();
-	HRESULT hr = GetDevice()->CreateRenderTarget(512, 512, D3DFMT_R32F, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapFrameBuffer, NULL);
-	if (hr != S_OK)
+	Deinitialize();
+
+	OmniLightVS = ZED3D9VertexShader::CreateShader("ShadowMaterial.hlsl", "OmniSMVSMain", 0, "vs_3_0");
+	OmniLightPS = ZED3D9PixelShader::CreateShader("ShadowMaterial.hlsl", "OmniSMPSMain", 0, "ps_3_0");
+
+	//DirectionalLightVS = ZED3D9VertexShader::CreateShader("ShadowMaterial.hlsl", "DirectionalVSMain", 0, "vs_3_0");
+	//DirectionalLightPS = ZED3D9PixelShader::CreateShader("ShadowMaterial.hlsl", "DirectionalPSMain", 0, "ps_3_0");
+
+	ProjectiveLightVS = ZED3D9VertexShader::CreateShader("ShadowMaterial.hlsl", "ProjectiveSMVSMain", 0, "vs_3_0");
+	ProjectiveLightPS = ZED3D9PixelShader::CreateShader("ShadowMaterial.hlsl", "ProjectiveSMPSMain", 0, "ps_3_0");
+
+	if (ShadowMapFrameBuffer == NULL)
 	{
-		zeError("D3D9 Shadow Renderer", "Can not create shadow map frame buffer.");
-		return false;
+		HRESULT hr = GetDevice()->CreateRenderTarget(512, 512, D3DFMT_R32F, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapFrameBuffer, NULL);
+		if (hr != S_OK)
+		{
+			zeError("D3D9 Shadow Renderer", "Can not create shadow map frame buffer.");
+			return false;
+		}
 	}
 
-	hr = GetDevice()->CreateDepthStencilSurface(512, 512, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapZBuffer, NULL);
-	if (hr != S_OK)
+	if (ShadowMapZBuffer == NULL)
 	{
-		zeError("D3D9 Shadow Renderer", "Can not create shadow map z buffer.");
-		return false;
+		HRESULT hr = GetDevice()->CreateDepthStencilSurface(512, 512, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapZBuffer, NULL);
+		if (hr != S_OK)
+		{
+			zeError("D3D9 Shadow Renderer", "Can not create shadow map z buffer.");
+			return false;
+		}
 	}
 
 	return true;
@@ -205,7 +198,13 @@ bool ZED3D9ShadowRenderer::Initialize()
 
 void ZED3D9ShadowRenderer::Deinitialize()
 {
-	DeinitializeShaders();
+	ZED3D_RELEASE(OmniLightVS);
+	ZED3D_RELEASE(OmniLightVS);
+	ZED3D_RELEASE(DirectionalLightVS);
+	ZED3D_RELEASE(DirectionalLightPS);
+	ZED3D_RELEASE(ProjectiveLightVS);
+	ZED3D_RELEASE(ProjectiveLightVS);
+
 	ZED3D_RELEASE(ShadowMapFrameBuffer);
 	ZED3D_RELEASE(ShadowMapZBuffer);
 }
@@ -313,7 +312,7 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 {
 	ZEPointLight* Light = (ZEPointLight*)this->Light;
 
-	GetDevice()->SetDepthStencilSurface(ShadowMapFrameBuffer);
+	GetDevice()->SetDepthStencilSurface(ShadowMapZBuffer);
 	if (Face)
 		GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)Light->GetFrontShadowMap()->GetViewPort())->FrameBuffer);
 	else

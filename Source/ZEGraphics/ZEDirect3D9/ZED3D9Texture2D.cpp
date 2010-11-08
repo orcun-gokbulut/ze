@@ -41,6 +41,8 @@
 ZED3D9Texture2D::ZED3D9Texture2D()
 {
 	Texture = NULL;
+	ViewPort.FrameBuffer = NULL;
+	ViewPort.ZBuffer = NULL;
 }
 
 ZED3D9Texture2D::~ZED3D9Texture2D()
@@ -57,8 +59,8 @@ void ZED3D9Texture2D::DeviceLost()
 {
 	if (RenderTarget)
 	{
-		ZED3D_RELEASE(Texture);
 		ZED3D_RELEASE(ViewPort.FrameBuffer);
+		ZED3D_RELEASE(Texture);
 	}
 }
 
@@ -66,9 +68,7 @@ bool ZED3D9Texture2D::DeviceRestored()
 {
 	if (RenderTarget)
 	{
-		return Create(Width, Height, PixelFormat, true);
-		Texture->GetSurfaceLevel(0, &ViewPort.FrameBuffer);
-		ViewPort.ZBuffer = NULL;
+		Create(Width, Height, PixelFormat, true);
 	}
 
 	return true;
@@ -82,7 +82,7 @@ ZEViewPort* ZED3D9Texture2D::GetViewPort()
 bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget)
 {
 	if (Texture != NULL)
-		if (this->Width == Width || this->Height == Height || this->PixelFormat == PixelFormat || this->RenderTarget == RenderTarget)
+		if (this->Width == Width && this->Height == Height && this->PixelFormat == PixelFormat && this->RenderTarget == RenderTarget)
 			return true;
 		else
 		{
@@ -101,6 +101,7 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 		MipMap = 1;
 		Pool = D3DPOOL_DEFAULT;
 		Format = D3DFMT_D24X8;
+		RenderTarget = true;
 	}
 	else
 	{
@@ -125,6 +126,7 @@ bool ZED3D9Texture2D::Create(int Width, int Height, ZETexturePixelFormat PixelFo
 
 	if (RenderTarget)
 	{
+		ZED3D_RELEASE(ViewPort.FrameBuffer);	
 		Texture->GetSurfaceLevel(0, &ViewPort.FrameBuffer);
 		ViewPort.ZBuffer = NULL;
 	}

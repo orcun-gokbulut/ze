@@ -39,21 +39,26 @@
 
 #include "ZED3D9ComponentBase.h"
 
-class ZETexture2DResource;
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
+class ZED3D9Texture2D;
+class ZETexture2D;
+class ZEFrameRenderer;
 class ZED3D9FrameRenderer;
+class ZETexture2DResource;
 
 class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 {
-	public:
-		ZED3D9FrameRenderer*					Renderer;
+	private:
+		ZED3D9FrameRenderer*			Renderer;
 		
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
-		LPDIRECT3DVERTEXSHADER9			VertexShader;
-		LPDIRECT3DPIXELSHADER9			PixelShader;
+		ZED3D9VertexShader*				VertexShader;
+		ZED3D9PixelShader*				PixelShader;
 
-		LPDIRECT3DTEXTURE9				InputDepth;
-		LPDIRECT3DTEXTURE9				InputNormal;
-		LPDIRECT3DTEXTURE9				Output;
+		ZED3D9Texture2D*				InputDepth;
+		ZED3D9Texture2D*				InputNormal;
+		ZED3D9Texture2D*				Output;
 
 		int								IterationCount;
 		bool							HalfResolution;
@@ -69,6 +74,18 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 		ZETexture2DResource*			RandomTextureResource;
 
 	public:
+		void							SetRenderer(ZEFrameRenderer* Renderer);
+		ZEFrameRenderer*				GetRenderer();
+
+		void							SetInputDepth(ZETexture2D* Texture);
+		ZETexture2D*					GetInputDepth();
+
+		void							SetInputNormal(ZETexture2D* Texture);
+		ZETexture2D*					GetInputNormal();
+
+		void							SetOutput(ZETexture2D* Texture);
+		ZETexture2D*					GetOutput();
+
 		void							SetIterationCount(int Iteration);
 		int								GetIterationCount();
 

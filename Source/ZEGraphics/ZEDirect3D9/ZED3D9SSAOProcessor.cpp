@@ -43,11 +43,53 @@
 #include "ZED3D9Texture2D.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZED3D9Profiler.h"
+#include "ZED3D9Shader.h"
 
 #include <d3d9.h>
 #include <stdlib.h>
 #include <freeimage.h>
 #include <math.h>
+
+void ZED3D9SSAOProcessor::SetRenderer(ZEFrameRenderer* Renderer)
+{
+	this->Renderer = (ZED3D9FrameRenderer*)Renderer;
+}
+
+ZEFrameRenderer* ZED3D9SSAOProcessor::GetRenderer()
+{
+	return Renderer;
+}
+
+void ZED3D9SSAOProcessor::SetInputDepth(ZETexture2D* Texture)
+{
+	InputDepth = (ZED3D9Texture2D*)Texture;
+}
+
+ZETexture2D* ZED3D9SSAOProcessor::GetInputDepth()
+{
+	return InputDepth;
+}
+
+void ZED3D9SSAOProcessor::SetInputNormal(ZETexture2D* Texture)
+{
+	InputNormal = (ZED3D9Texture2D*)Texture;
+}
+
+ZETexture2D* ZED3D9SSAOProcessor::GetInputNormal()
+{
+	return InputNormal;
+}
+
+void ZED3D9SSAOProcessor::SetOutput(ZETexture2D* Texture)
+{
+	Output = (ZED3D9Texture2D*)Texture;
+}
+
+ZETexture2D* ZED3D9SSAOProcessor::GetOutput()
+{
+	return Output;
+}
+
 
 void ZED3D9SSAOProcessor::SetIntensity(float Intensity)
 {
@@ -112,8 +154,8 @@ void ZED3D9SSAOProcessor::Initialize()
 	RandomTextureResource = ZETexture2DResource::LoadSharedResource("RandomNormal.tga");
 
 	// Compile Shaders
-	ZED3D9CommonTools::CompileVertexShader(&VertexShader, "SSOAProcessor.hlsl", "VSMain", "vs_3_0", NULL);
-	ZED3D9CommonTools::CompilePixelShader(&PixelShader, "SSOAProcessor.hlsl", "PSMain", "ps_3_0", NULL);
+	VertexShader = ZED3D9VertexShader::CreateShader("SSOAProcessor.hlsl", "VSMain", 0, "vs_3_0");
+	PixelShader = ZED3D9PixelShader::CreateShader("SSOAProcessor.hlsl", "PSMain", 0, "ps_3_0");
 }
 
 
@@ -173,16 +215,15 @@ void ZED3D9SSAOProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
-	ZED3D9CommonTools::SetRenderTarget(0, Output);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Output->GetViewPort())->FrameBuffer);
 
-	GetDevice()->SetVertexShader(VertexShader);
-	GetDevice()->SetPixelShader(PixelShader);
+	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
+	GetDevice()->SetPixelShader(PixelShader->GetPixelShader());
 	GetDevice()->SetVertexDeclaration(VertexDeclaration);
 
-	D3DSURFACE_DESC SurfaceDesc;
-	InputDepth->GetLevelDesc(0, &SurfaceDesc);
+
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&Parameters, 1);
-	GetDevice()->SetVertexShaderConstantF(1, (const float*)&ZEVector4(1.0f / SurfaceDesc.Width, 1.0f / SurfaceDesc.Height, 0.0f, 0.0f), 1);
+	GetDevice()->SetVertexShaderConstantF(1, (const float*)&ZEVector4(1.0f / InputDepth->GetWidth(), 1.0f / InputDepth->GetHeight(), 0.0f, 0.0f), 1);
 	
 	ZEVector4 ViewVector;
 	ViewVector.y = tanf(Renderer->GetCamera()->GetFOV() * 0.5f);// * Renderer->GetCamera()->GetFarZ();
@@ -197,14 +238,14 @@ void ZED3D9SSAOProcessor::Process()
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-	GetDevice()->SetTexture(0, InputDepth);
+	GetDevice()->SetTexture(0, InputDepth->Texture);
 
 	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	GetDevice()->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-	GetDevice()->SetTexture(1, InputNormal);
+	GetDevice()->SetTexture(1, InputNormal->Texture);
 
 	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
 	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);

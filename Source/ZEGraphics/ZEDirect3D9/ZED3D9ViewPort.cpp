@@ -68,7 +68,7 @@ unsigned int ZED3D9ViewPort::GetHeight()
 		return Desc.Height;
 	}
 
-	return 0;;
+	return 0;
 }
 
 

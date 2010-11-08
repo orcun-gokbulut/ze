@@ -302,6 +302,7 @@ bool ZED3D9CommonTools::CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* Pix
 	return true;
 }
 
+/*
 bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height, ZETexturePixelFormat Format)
 {
 	D3DSURFACE_DESC SurDesc;
@@ -397,7 +398,4 @@ bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DTEXTURE9* Target, int 
 
 	return true;
 }
-
-
-
-
+*/
