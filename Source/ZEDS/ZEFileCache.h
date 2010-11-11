@@ -73,6 +73,9 @@ class ZEFileCache
 		void							WriteItemListToCacheFile();
 
 	public:
+		void							SetMode(bool OnlineMode);
+		void							IsOnlineModeOn();
+		
 		bool							CacheFileExists(const char* FileName);
 		
 		bool							CreateNewCacheFile(const char* FileName, bool OnlineMode = true);
@@ -81,7 +84,9 @@ class ZEFileCache
 		
 		bool							OpenCacheFile(const char* FileName, bool OnlineMode = true);
 		void							CloseCacheFile();
-		void							Add(ZEDWORD Hash, void* Data, size_t Size);
+		void							AddChunk(ZEDWORD Hash, void* Data, size_t Size);
+		ZEPartialResourceFile			GetChunk(ZEDWORD Hash);
+
 		ZEFileCacheScan					Scan(ZEDWORD Hash);
 		bool							GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan);
 
