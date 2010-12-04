@@ -62,8 +62,6 @@ float4 MaterialParams5 : register(ps, c5);
 float4 PipelineParameters0 : register(ps, c6);
 float4 MaterialParams6 : register(vs, c12);
 
-
-
 #define	MaterialAmbientColor        MaterialParams0.xyz
 #define	MaterialOpacity				MaterialParams0.w
 #define	MaterialDiffuseColor        MaterialParams1.xyz
@@ -80,6 +78,8 @@ float4 MaterialParams6 : register(vs, c12);
 
 #define PixelSize_2					PipelineParameters0.xy
 #define FarZ						PipelineParameters0.z
+
+bool EnableSkin : register(b0);
 
 // Textures
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -111,10 +111,10 @@ struct VSInput
 	
 	float2 Texcoord             : TEXCOORD0;
 
-	#if defined(ZE_SHADER_SKIN_TRANSFORM)
+	//#if defined(ZE_SHADER_SKIN_TRANSFORM)
 		int4 BoneIndices        : BLENDINDICES0;
 		float4 BoneWeights      : BLENDWEIGHT0;
-	#endif
+	//#endif
 };
 
 #include "SkinTransform.hlsl"
@@ -167,7 +167,8 @@ GBVSOutput GBVSMain(VSInput Input)
 {
 	GBVSOutput Output;
 
-	SkinTransform(Input);
+	if (EnableSkin)
+		SkinTransform(Input);
 
 	// Pipeline 
 	Output.Position_ = mul(Input.Position, WorldViewProjMatrix);
@@ -252,7 +253,9 @@ struct FPVSOutput
 FPVSOutput FPVSMain(VSInput Input)
 {
 	FPVSOutput Output;
-	SkinTransform(Input);
+	
+	if (EnableSkin)
+		SkinTransform(Input);
 
 	// Pipeline 
 	Output.Position = mul(Input.Position, WorldViewProjMatrix);

@@ -70,6 +70,9 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	ZEModel* Model = new ZEModel();
 	Model->SetModelResource(ZEModelResource::LoadResource("test.zemodel"));
+	Model->SetAnimationByName("Test");
+	Model->SetAnimationState(ZE_MAS_PLAYING);
+	Model->SetAnimationLooping(true);
 	Scene->AddEntity(Model);
 
 

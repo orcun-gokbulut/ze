@@ -71,7 +71,3 @@ class ZEUIMaterial : public ZEMaterial
 };
 
 #endif
-
-
-
-

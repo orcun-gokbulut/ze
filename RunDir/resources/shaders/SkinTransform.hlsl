@@ -35,29 +35,27 @@
 
 void SkinTransform(inout VSInput Vertex)
 {
-	#if defined(ZE_SHADER_SKIN_TRANSFORM)
-		float4 Position = float4(mul(Vertex.Position, BoneMatrices[Vertex.BoneIndices[0]]).xyz * Vertex.BoneWeights[0], 1.0f);
-		float3 Normal = mul(Vertex.Normal, BoneMatrices[Vertex.BoneIndices[0]]) * Vertex.BoneWeights[0];
+	float4 Position = float4(mul(Vertex.Position, BoneMatrices[Vertex.BoneIndices[0]]).xyz * Vertex.BoneWeights[0], 1.0f);
+	float3 Normal = mul(Vertex.Normal, BoneMatrices[Vertex.BoneIndices[0]]) * Vertex.BoneWeights[0];
+	#if defined(ZE_SHADER_TANGENT_SPACE)
+		float3 Tangent = mul(Vertex.Tangent, BoneMatrices[Vertex.BoneIndices[0]]) * Vertex.BoneWeights[0];
+		float3 Binormal = mul(Vertex.Binormal, BoneMatrices[Vertex.BoneIndices[0]]) * Vertex.BoneWeights[0];
+	#endif
+	
+	for (int I = 1; I < 4; I++)
+	{
+		Position.xyz += mul(Vertex.Position, BoneMatrices[Vertex.BoneIndices[I]]).xyz * Vertex.BoneWeights[I];
+		Normal += mul(Vertex.Normal, BoneMatrices[Vertex.BoneIndices[I]]) * Vertex.BoneWeights[I];
 		#if defined(ZE_SHADER_TANGENT_SPACE)
-			float3 Tangent = mul(Vertex.Tangent, BoneMatrices[Vertex.BoneIndices[0]]) * Vertex.BoneWeights[0];
-			float3 Binormal = mul(Vertex.Binormal, BoneMatrices[Input.BoneIndices[0]]) * Vertex.BoneWeights[0];
+			Tangent += mul(Vertex.Tangent, BoneMatrices[Vertex.BoneIndices[I]]) * Vertex.BoneWeights[I];
+			Binormal += mul(Vertex.Binormal, BoneMatrices[Vertex.BoneIndices[I]]) * Vertex.BoneWeights[I];
 		#endif
-		
-		for (int I = 1; I < 4; I++)
-		{
-			Position.xyz += mul(Vertex.Position, BoneMatrices[Vertex.BoneIndices[I]]).xyz * Vertex.BoneWeights[I];
-			Normal += mul(Vertex.Normal, BoneMatrices[Vertex.BoneIndices[I]]) * Vertex.BoneWeights[I];
-			#if defined(ZE_SHADER_TANGENT_SPACE)
-				Tangent += mul(Vertex.Tangent, BoneMatrices[Vertex.BoneIndices[I]]) * Vertex.BoneWeights[I];
-				Binormal += mul(Vertex.Binormal, BoneMatrices[Input.BoneIndices[I]]) * Vertex.BoneWeights[I];
-			#endif
-		}
-		
-		Vertex.Position = Position;
-		Vertex.Normal = Normal;
-		#if defined(ZE_SHADER_TANGENT_SPACE)
-			Vertex.Tangent = Tangent;
-			Vertex.Binormal = Binormal;
-		#endif
+	}
+	
+	Vertex.Position = Position;
+	Vertex.Normal = Normal;
+	#if defined(ZE_SHADER_TANGENT_SPACE)
+		Vertex.Tangent = Tangent;
+		Vertex.Binormal = Binormal;
 	#endif
 }

@@ -262,8 +262,14 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 	// Setup Bone Transforms
+	BOOL SkinEnabled = false;
 	if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
+	{
 		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+		SkinEnabled = true;
+	}
+
+	GetDevice()->SetVertexShaderConstantB(0, &SkinEnabled, 1);
 
 	// Setup Material Properties
 	GetDevice()->SetVertexShaderConstantF(14, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants) / 16);
@@ -381,8 +387,14 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 	// Setup Bone Transforms
+	BOOL SkinEnabled = false;
 	if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
+	{
 		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+		SkinEnabled = true;
+	}
+	
+	GetDevice()->SetVertexShaderConstantB(0, &SkinEnabled, 1);
 
 	// Setup Transparancy
 	if (TransparancyMode != ZE_MTM_NONE)
