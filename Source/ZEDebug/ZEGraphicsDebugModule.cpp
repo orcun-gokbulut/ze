@@ -33,6 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
 #include "ZEGraphicsDebugModule.h"
 
 #include "ZEGame\ZEGame.h"
@@ -57,7 +58,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	if (Player == NULL)
 	{
 		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
-		Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
+		Player->SetPosition(ZEVector3(-40.0f, 0.0f, -1.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
@@ -161,7 +162,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(Brush);
 
 	DirectionalLight0 = new ZEDirectionalLight();
-	DirectionalLight0->SetEnabled(false);
+	DirectionalLight0->SetEnabled(true);
 	DirectionalLight0->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
 	DirectionalLight0->SetIntensity(2.0f);
@@ -169,12 +170,12 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(DirectionalLight0);
 
 	PointLight1->SetEnabled(true);
-	PointLight2->SetEnabled(true);
-	PointLight3->SetEnabled(true);
+	PointLight2->SetEnabled(false);
+	PointLight3->SetEnabled(false);
 	PointLight4->SetEnabled(false);
 	PointLight5->SetEnabled(false);
 	OmniProjectiveLight0->SetEnabled(true);
-	ProjectiveLight0->SetEnabled(true);
+	ProjectiveLight0->SetEnabled(false);
 	DirectionalLight0->SetEnabled(false);
 	return true;
 }
@@ -205,6 +206,7 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 	Rotation = Rotation * ZEQuaternion(ZE_PIx2 * ElapsedTime, ZEVector3::UnitY);
 	OmniProjectiveLight0->SetRotation(Rotation);
 	
+	//Player->SetRotation(Rotation);
 	//ProjectiveLight0->SetRotation(Rotation);
 	Brush->SetRotation(Rotation);
 }

@@ -48,7 +48,3 @@ bool ZED3D9ComponentBase::BaseInitialize(ZED3D9Module* Mdl)
 
 	return true;
 }
-
-
-
-

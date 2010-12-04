@@ -33,12 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-float3 GetDiffuseAccumulation(float2 Texcoord)
+struct ZELBuffer
 {
+	float4 DiffuseSpecular : COLOR0;
+};
 
+sampler2D LBuffer1 : register(s2);
+
+void ZELBuffer_SetDiffuse(inout ZELBuffer LBuffer, float3 Diffuse)
+{
+	LBuffer.DiffuseSpecular.xyz = Diffuse;
 }
 
-float3 GetSpecularAccumulation(float2 Texcoord)
+float3 ZELBuffer_GetDiffuse(float2 Texcoord)
 {
-
+	return tex2D(LBuffer1, Texcoord).rgb;	
 }
+
+void ZELBuffer_SetSpecular(inout ZELBuffer LBuffer, float Specular)
+{
+	LBuffer.DiffuseSpecular.a = Specular;
+}
+
+float3 ZELBuffer_GetSpecular(float2 Texcoord)
+{
+	float4 Total = tex2D(LBuffer1, Texcoord);
+	return normalize(Total.rgb) * Total.a;
+}
+

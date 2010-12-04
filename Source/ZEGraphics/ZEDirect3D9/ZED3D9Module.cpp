@@ -47,7 +47,7 @@
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9VertexBuffer.h"
 #include "ZED3D9VertexDeclaration.h"
-#include "ZEPostProcessor\ZED3D9PostProcessor.h"
+//#include "ZEPostProcessor\ZED3D9PostProcessor.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9ShadowRenderer.h"
 #include "ZED3D9UIMaterial.h"
@@ -532,7 +532,7 @@ ZEShadowRenderer* ZED3D9Module::CreateShadowRenderer()
 
 ZEPostProcessor* ZED3D9Module::CreatePostProcessor()
 {
-	return new  ZED3D9PostProcessor();
+	return NULL;//new  ZED3D9PostProcessor();
 }
 
 ZEVertexDeclaration* ZED3D9Module::CreateVertexDeclaration()

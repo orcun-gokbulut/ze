@@ -34,6 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "FixedMaterialComponents.hlsl"
+#include "GBuffer.hlsl"
+#include "LBuffer.hlsl"
 
 //* Vertex Shader Constants
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -83,10 +85,6 @@ float4 MaterialParams6 : register(vs, c12);
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Pipeline Textures
-sampler2D GBuffer1 : register(s0);
-sampler2D GBuffer2 : register(s1);
-sampler2D LBuffer1 : register(s2);
-sampler2D LBuffer2 : register(s3);
 sampler2D SSAOBuffer : register(s4);
 
 // Material Textures
@@ -153,14 +151,14 @@ float4 PreZPSMain() : COLOR0
 // Vertex Shader
 struct GBVSOutput 
 {
-	float4 Position : POSITION0;
-	float4 NormalDepth : TEXCOORD0;
-	float2 Texcoord : TEXCOORD1;
-	float3 Position_ : TEXCOORD5;
+	float4 Position_ : POSITION0;
+	float3 Position : TEXCOORD0;
+	float3 Normal : TEXCOORD1;
+	float2 Texcoord : TEXCOORD2;
 	
 	#if defined(ZE_SHADER_TANGENT_SPACE)
-		float3 Binormal : TEXCOORD2;
-		float3 Tangent : TEXCOORD3;
+		float3 Binormal : TEXCOORD3;
+		float3 Tangent : TEXCOORD4;
 	#endif
 };
 
@@ -172,16 +170,14 @@ GBVSOutput GBVSMain(VSInput Input)
 	SkinTransform(Input);
 
 	// Pipeline 
-	Output.Position = mul(Input.Position, WorldViewProjMatrix);
-
-	Output.NormalDepth.xyz = mul(Input.Normal, WorldViewInvTrpsMatrix).xyz;
+	Output.Position_ = mul(Input.Position, WorldViewProjMatrix);
+	
+	Output.Position = mul(Input.Position, WorldViewMatrix).xyz;
+	Output.Normal.xyz = mul(Input.Normal, WorldViewInvTrpsMatrix).xyz;
 	#if defined(ZE_SHADER_TANGENT_SPACE)
 		Output.Tangent = mul(Input.Tangent, WorldViewInvTrpsMatrix).xyz;
 		Output.Binormal = mul(Input.Binormal, WorldViewInvTrpsMatrix).xyz;
 	#endif
-	
-	Output.NormalDepth.w = mul(Input.Position, WorldViewMatrix).z;
-	Output.Position_ = mul(Input.Position, WorldViewMatrix).xyz;
 	
 	Output.Texcoord = Input.Texcoord;
 	return Output;
@@ -190,65 +186,40 @@ GBVSOutput GBVSMain(VSInput Input)
 // Pixel Shader
 struct GBPSInput
 {
-	float4 NormalDepth : TEXCOORD0;
+	float3 Position : TEXCOORD0;
+	float3 Normal : TEXCOORD1;
 	#if defined(ZE_SHADER_SPECULAR_GLOSS_MAP) || defined(ZE_SHADER_NORMAL_MAP)
-		float2 Texcoord : TEXCOORD1;
+		float2 Texcoord : TEXCOORD2;
 	#endif
-	float3 Position: TEXCOORD5;
 	#if defined(ZE_SHADER_TANGENT_SPACE)
-		float3 Binormal : TEXCOORD2;
-		float3 Tangent : TEXCOORD3;
+		float3 Binormal : TEXCOORD3;
+		float3 Tangent : TEXCOORD4;
 	#endif
 };
 
-struct GBPSOutput
+ZEGBuffer GBPSMain(GBPSInput Input)
 {
-	float4 Position : COLOR0;
-	float4 NormalGloss : COLOR1;
-};
+	ZEGBuffer GBuffer = (ZEGBuffer)0;
+	
+	//GBDoParallax(Input);
+	
+	ZEGBuffer_SetViewPosition(GBuffer, Input.Position);
 
-void GBDoParallax(inout GBPSInput Input)
-{
-
-}
-
-float3 GBGetNormal(in GBPSInput Input)
-{
 	#if defined(ZE_SHADER_NORMAL_MAP)
 		float3 Normal = tex2D(NormalMap, Input.Texcoord) * 2.0f - 1.0f;
-		Normal = normalize(Normal.x * Input.Tangent + Normal.y * Input.Binormal + Normal.z * Input.NormalDepth.xyz);
-		return Normal * 0.5f + 0.5f;	
+		Normal = normalize(Normal.x * Input.Tangent + Normal.y * Input.Binormal + Normal.z * Input.Normal);
+		ZEGBuffer_SetViewNormal(GBuffer, Normal);	
 	#else
-		return Input.NormalDepth.xyz * 0.5f + 0.5f;
+		ZEGBuffer_SetViewNormal(GBuffer, Input.Normal);
 	#endif	
-}
-
-float GBGetGloss(in GBPSInput Input)
-{
+	
 	#if defined(ZE_SHADER_SPECULAR_GLOSS_MAP)
-		return tex2D(GlossMap, Input.Texcoord).x;
+		ZEGBuffer_SetSpecularGlossiness(GBuffer, MaterialSpecularFactor * tex2D(GlossMap, Input.Texcoord).x);
 	#else
-		return 0.0f;
+		ZEGBuffer_SetSpecularGlossiness(GBuffer, MaterialSpecularFactor);
 	#endif
-}
 
-float GBGetDepth(in GBPSInput Input)
-{
-	return length(Input.Position);
-	//return Input.NormalDepth.w;
-}
-
-GBPSOutput GBPSMain(GBPSInput Input)
-{
-	GBPSOutput Output;
-	
-	GBDoParallax(Input);
-	
-	Output.NormalGloss.xyz = GBGetNormal(Input);
-	Output.NormalGloss.w = GBGetGloss(Input);
-	//Output.Depth = GBGetDepth(Input);
-	Output.Position = float4(Input.Position.xyz, 1.0f);
-	return Output;
+	return GBuffer;
 }
 
 
@@ -287,8 +258,7 @@ FPVSOutput FPVSMain(VSInput Input)
 	Output.Position = mul(Input.Position, WorldViewProjMatrix);
 	Output.Texcoord = Input.Texcoord;
 	
-	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y);
-	Output.ScreenPosition.z = Output.Position.w;
+	Output.ScreenPosition = float3(Output.Position.x, -Output.Position.y, Output.Position.w);
 	
 	#ifdef ZE_SHADER_REFLECTION
 		Output.ReflectionVector = reflect(-CameraDirection, Normal);
@@ -337,7 +307,7 @@ FPPSOutput FPPSMain(FPPSInput Input)
 	FPPSOutput Output;
 	Output.Color = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	
-	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.z * 0.5f + 0.5f + PixelSize_2;
+	float2 ScreenPosition = (Input.ScreenPosition.xy / Input.ScreenPosition.z) * 0.5f + 0.5f + PixelSize_2;
 
 	#ifdef ZE_SHADER_AMBIENT
 		float3 AmbientColor = MaterialAmbientColor;
@@ -345,7 +315,7 @@ FPPSOutput FPPSMain(FPPSInput Input)
 			AmbientColor *= tex2D(BaseMap, Input.Texcoord).rgb;
 		#endif
 		//#ifdef ZE_SHADER_SSAO
-			AmbientColor *= tex2D(SSAOBuffer, ScreenPosition).r;
+			//AmbientColor *= tex2D(SSAOBuffer, ScreenPosition).r;
 		//#endif
 		
 		#ifdef ZE_SHADER_LIGHT_MAP
@@ -361,7 +331,7 @@ FPPSOutput FPPSMain(FPPSInput Input)
 			DiffuseColor *= tex2D(BaseMap, Input.Texcoord).rgb;
 		#endif
 	
-		DiffuseColor *= tex2D(LBuffer1, ScreenPosition).rgb;
+		DiffuseColor *= ZELBuffer_GetDiffuse(ScreenPosition);
 		
 		Output.Color.rgb += DiffuseColor;
 	#endif
@@ -372,7 +342,7 @@ FPPSOutput FPPSMain(FPPSInput Input)
 			SpecularColor *= tex2D(SpecularMap, Input.Texcoord).rgb;
 		#endif
 		
-		SpecularColor *= tex2D(LBuffer1, ScreenPosition).a * normalize(tex2D(LBuffer1, ScreenPosition)).rgb;
+		SpecularColor *= ZELBuffer_GetSpecular(ScreenPosition);
 		
 		Output.Color.rgb += SpecularColor;
 	#endif
@@ -414,7 +384,3 @@ FPPSOutput FPPSMain(FPPSInput Input)
 	
 	return Output;
 }
-
-
-// Shadow Pass
-/////////////////////////////////////////////////////////////////////////////////////////

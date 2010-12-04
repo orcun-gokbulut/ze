@@ -33,34 +33,70 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-float3 GetViewPosition(sampler2D GBuffer, float2 Texcoord, float3 ViewVector)
+sampler2D GBuffer1 : register(s0);
+sampler2D GBuffer2 : register(s1);
+
+float3 ZEGBuffer_ViewVector : register(vs, c0);
+float4 ZEGBuffer_PipelineParameters0 : register(ps, c6);
+#define ZEGBuffer_PixelSize_2				ZEGBuffer_PipelineParameters0.xy
+#define ZEGBuffer_FarZ						ZEGBuffer_PipelineParameters0.z
+
+struct ZEGBuffer
 {
-	return tex2D(GBuffer, Texcoord).xyz;
-	//return normalize(ViewVector) * tex2D(GBuffer, Texcoord).x;
+	float4 Position : COLOR0;
+	float4 NormalGloss : COLOR1;
+};
+
+// View Vector
+float3 ZEGBuffer_GetViewVector(float4 ClipPosition)
+{
+	return float3((ClipPosition.xy / ClipPosition.w) * ZEGBuffer_ViewVector.xy, ZEGBuffer_ViewVector.z);
 }
 
-float GetViewDepth(sampler2D GBuffer, float2 Texcoord, float3 ViewVector)
+// View Position
+void ZEGBuffer_SetViewPosition(inout ZEGBuffer Output, float3 ViewPosition)
 {
-	return tex2D(GBuffer, Texcoord).x;
-	//return ViewVector.z * tex2D(GBuffer, Texcoord).x;
+	Output.Position.x = length(ViewPosition.z);
+	Output.Position.yzw = ViewPosition;
 }
 
-float3 GetViewNormal(sampler2D GBuffer, float2 Texcoord)
+float3 ZEGBuffer_GetViewPosition(float2 Texcoord, float3 ViewVector)
 {
-	return 2.0f * tex2D(GBuffer, Texcoord).xyz - 1.0f;
+	//return ;
+	float3 ViewPosition = tex2D(GBuffer1, Texcoord).yzw;
+	float3 Position = ViewVector * tex2D(GBuffer1, Texcoord).x;
+	return Position;
 }
 
-float GetSpecularGlossiness(sampler2D GBuffer, float2 Texcoord)
+// View Normal
+void ZEGBuffer_SetViewNormal(inout ZEGBuffer Output, float3 ViewNormal)
 {
-	return tex2D(GBuffer, Texcoord).w;
+	Output.NormalGloss.xyz = ViewNormal * 0.5f + 0.5f;
 }
 
-float GetSpecularPower(sampler2D GBuffer, float2 Texcoord)
+float3 ZEGBuffer_GetViewNormal(float2 Texcoord)
 {
-	return 128.0f - GetSpecularGlossiness(GBuffer, Texcoord) * 120.0f;
+	return 2.0f * tex2D(GBuffer2, Texcoord).xyz - 1.0f;
 }
 
-float2 GetScreenVelocity(sampler2D GBuffer, float2 Texcoord)
+// Specular Glossiness
+void ZEGBuffer_SetSpecularGlossiness(inout ZEGBuffer Output, float SpecularGlossiness)
 {
-	return tex2D(GBuffer, Texcoord).xy;
+	Output.NormalGloss.w = SpecularGlossiness;
+}
+
+float ZEGBuffer_GetSpecularGlossiness(float2 Texcoord)
+{
+	return tex2D(GBuffer2, Texcoord).w;
+}
+
+float ZEGBuffer_GetSpecularPower(float2 Texcoord)
+{
+	return 128.0f - ZEGBuffer_GetSpecularGlossiness(Texcoord) * 120.0f;
+}
+
+// Velocity
+float2 ZEGBuffer_GetScreenVelocity(float2 Texcoord)
+{
+	return float2(0.0f, 0.0f);
 }

@@ -192,17 +192,17 @@ void ZED3D9FrameRenderer::InitializeLightning()
 	if (LightningComponents.LightMeshVB == NULL)
 		LightningComponents.LightMeshVB = (ZED3D9StaticVertexBuffer*)Canvas.CreateStaticVertexBuffer();
 
-	LightningComponents.PointLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "PLVSMain", 0, "vs_3_0");
-	LightningComponents.PointLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PLPSMain", 0, "ps_3_0");
+	LightningComponents.PointLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "ZEPointLight_VertexShader", 0, "vs_3_0");
+	LightningComponents.PointLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "ZEPointLight_PixelShader", 0, "ps_3_0");
 
-	LightningComponents.DirectionalLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "DLVSMain", 0, "vs_3_0");
-	LightningComponents.DirectionalLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "DLPSMain", 0, "ps_3_0");
+	LightningComponents.DirectionalLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "ZEDirectionalLight_VertexShader", 0, "vs_3_0");
+	LightningComponents.DirectionalLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "ZEDirectionalLight_PixelShader", 0, "ps_3_0");
 
-	LightningComponents.OmniProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "OPLVSMain", 0, "vs_3_0");
-	LightningComponents.OmniProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "OPLPSMain", 0, "ps_3_0");
+	LightningComponents.OmniProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "ZEOmniProjectiveLight_VertexShader", 0, "vs_3_0");
+	LightningComponents.OmniProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "ZEOmniProjectiveLight_PixelShader", 0, "ps_3_0");
 
-	LightningComponents.ProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "PjLVSMain", 0, "vs_3_0");
-	LightningComponents.ProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "PjLPSMain", 0, "ps_3_0");
+	LightningComponents.ProjectiveLightVS = ZED3D9VertexShader::CreateShader("Lights.hlsl", "ZEProjectiveLight_VertexShader", 0, "vs_3_0");
+	LightningComponents.ProjectiveLightPS = ZED3D9PixelShader::CreateShader("Lights.hlsl", "ZEProjectiveLight_PixelShader", 0, "ps_3_0");
 
 }
 
@@ -537,7 +537,6 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	}
 	
 	ZED3D9CommonTools::SetRenderTarget(1, NULL);
-	
 	zeProfilerEnd();
 }
 
@@ -590,10 +589,11 @@ void ZED3D9FrameRenderer::DoLightningPass()
 
 	// ViewVector & PixelSize
 	ZEVector4 ViewVector;
-	ViewVector.y = tanf(Camera->GetFOV() * 0.5f) * Camera->GetFarZ();
+	ViewVector.y = tanf(Camera->GetFOV() * 0.5f);
 	ViewVector.x = ViewVector.y * ViewPort->GetAspectRatio();
-	ViewVector.z = Camera->GetFarZ();
+	ViewVector.z = 1.0f;
 	ViewVector.w = 0.0f;
+	//ZEVector4::Normalize(ViewVector, ViewVector);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ViewVector, 1);
 	GetDevice()->SetPixelShaderConstantF(5, (const float*)&ZEVector4(0.5f / ViewPort->GetWidth(), 0.5f / ViewPort->GetHeight(), 0.0f, 0.0f), 1);
 
@@ -688,11 +688,11 @@ void ZED3D9FrameRenderer::DoForwardPass()
 		zeProfilerEnd();
 	}
 
-	GetDevice()->SetTexture(0, NULL);
+	/*GetDevice()->SetTexture(0, NULL);
 	GetDevice()->SetTexture(1, NULL);
 	GetDevice()->SetTexture(2, NULL);
 	GetDevice()->SetTexture(3, NULL);
-	GetDevice()->SetTexture(4, NULL);
+	GetDevice()->SetTexture(4, NULL);*/
 
 	zeProfilerEnd();
 }
@@ -882,11 +882,8 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		//DoPreZPass();
 		DoGBufferPass();
 		DoLightningPass();
-		/*SSAOProcessor.InputDepth = GBuffer1;
-		SSAOProcessor.InputNormal = GBuffer2;
-		SSAOProcessor.Output = SSAOBuffer;
-		SSAOProcessor.Process();*/
 		DoForwardPass();
+
 
 	GetDevice()->EndScene();
 	

@@ -268,7 +268,7 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 	// Setup Material Properties
 	GetDevice()->SetVertexShaderConstantF(14, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants) / 16);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
-	GetDevice()->SetPixelShaderConstantF(6, (const float*)&ZEVector4(Camera->GetFarZ(), 0.0f, 0.0f, 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(6, (const float*)&ZEVector4(0.0f, 0.0f, Camera->GetFarZ(), 0.0f), 1);
 	
 	// Setup Textures
 	if (MaterialComponents & ZE_SHADER_NORMAL_MAP && NormalMap != NULL)
@@ -393,25 +393,26 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 
 		switch(TransparancyMode)
 		{
-		case ZE_MTM_ADDAPTIVE:
-			GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-			GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-			GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-			break;
-		case ZE_MTM_SUBTRACTIVE:
-			GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-			GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_SUBTRACT);
-			GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
-			break;
-		case ZE_MTM_REGULAR:
-			GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-			GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-			GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-			GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-		case ZE_MTM_ALPHACULL:
-			break;
+			case ZE_MTM_ADDAPTIVE:
+				GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+				GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+				GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+				break;
+			case ZE_MTM_SUBTRACTIVE:
+				GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+				GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_SUBTRACT);
+				GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_ONE);
+				break;
+			case ZE_MTM_REGULAR:
+				GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+				GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+				GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+				GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+				break;
+			case ZE_MTM_ALPHACULL:
+				break;
 		}
 
 	}

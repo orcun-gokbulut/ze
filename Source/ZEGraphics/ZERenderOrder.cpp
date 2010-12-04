@@ -40,7 +40,3 @@ void ZERenderOrder::SetZero()
 {
 	memset(this, 0, sizeof(ZERenderOrder));
 }
-
-
-
-

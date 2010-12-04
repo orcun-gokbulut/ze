@@ -83,7 +83,7 @@ float2 GetRandomVector(in float2 Texcoord)
 
 float AmbientOcclusion(in float2 Texcoord, in float3 PixelPosition, in float3 PixelNormal, in float3 ViewVector)
 {
-	float3 Diff = GetViewPosition(DepthBuffer, Texcoord, ViewVector) - PixelPosition;
+	float3 Diff = ZEGBuffer_GetViewPosition(Texcoord, ViewVector) - PixelPosition;
 	//float3 Diff = tex2D(DepthBuffer, Texcoord).yzw - PixelPosition;
 	const float3 v = normalize(Diff);
 	const float Dist = length(Diff) * SampleScale;
@@ -108,8 +108,8 @@ PSOutput PSMain(PSInput Input)
 {   
 	PSOutput Output;
 	
-	float3 PixelPosition = GetViewPosition(DepthBuffer, Input.Texcoord, Input.ViewVector);
-	float3 PixelNormal = GetViewNormal(NormalBuffer, Input.Texcoord);
+	float3 PixelPosition = ZEGBuffer_GetViewPosition(Input.Texcoord, Input.ViewVector);
+	float3 PixelNormal = ZEGBuffer_GetViewNormal(Input.Texcoord);
 	
 
 	float2 RandomNormal = GetRandomVector(Input.RandomTexcoord);

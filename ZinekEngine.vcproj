@@ -139,7 +139,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="6"
 				AdditionalOptions="/I ."
-				Optimization="3"
+				Optimization="2"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
@@ -249,7 +249,7 @@
 				Name="VCCLCompilerTool"
 				ExecutionBucket="6"
 				AdditionalOptions="/I ."
-				Optimization="0"
+				Optimization="2"
 				InlineFunctionExpansion="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="1"
@@ -929,34 +929,6 @@
 						</FileConfiguration>
 					</File>
 				</Filter>
-				<Filter
-					Name="ZED3D9PostProcessor"
-					>
-					<File
-						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PostProcessor.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PostProcessor.h"
-						>
-					</File>
-					<File
-						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PPBlurNode.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PPBlurNode.h"
-						>
-					</File>
-					<File
-						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PPScreenOutputNode.cpp"
-						>
-					</File>
-					<File
-						RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZEPostProcessor\ZED3D9PPScreenOutputNode.h"
-						>
-					</File>
-				</Filter>
 			</Filter>
 			<Filter
 				Name="Materials"
@@ -1119,98 +1091,6 @@
 				</File>
 				<File
 					RelativePath=".\Source\ZEGraphics\ZETextureResource.h"
-					>
-				</File>
-			</Filter>
-			<Filter
-				Name="ZEPostProcessor"
-				>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPostProcessor.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPostProcessor.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPostProcessorNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPostProcessorNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPBlurNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPBlurNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPColorInputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPColorInputNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPDepthInputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPDepthInputNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPFilter1DNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPFilter1DNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPFilter2DNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPFilter2DNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPScreenOutputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPScreenOutputNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPTextureInputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPTextureInputNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPTextureOutputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPTextureOutputNode.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPVelocityInputNode.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEGraphics\ZEPostProcessor\ZEPPVelocityInputNode.h"
 					>
 				</File>
 			</Filter>
