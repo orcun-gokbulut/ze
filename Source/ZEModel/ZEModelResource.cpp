@@ -167,7 +167,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetTwoSided(MaterialChunk.TwoSided);
 		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
-		CurrentMaterial->SetTransparancyMode(ZE_MTM_NOTRANSPARACY);//MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE: ZE_MTM_NOTRANSPARACY);
+		CurrentMaterial->SetTransparancyMode(ZE_MTM_NONE);//MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE: ZE_MTM_NOTRANSPARACY);
 
 		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor);
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);
@@ -175,13 +175,13 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetEmmisiveColor(MaterialChunk.EmmisiveColor);
 		CurrentMaterial->SetEmmisiveFactor(MaterialChunk.EmmisiveFactor);
 		CurrentMaterial->SetSpecularFactor(1.0f);
-		CurrentMaterial->SetSpecularShininess((1.25f - MaterialChunk.SpecularFactor) * 128.0f);
+		CurrentMaterial->SetSpecularShininess(MaterialChunk.SpecularFactor);
 		CurrentMaterial->SetOpacity(MaterialChunk.Opasity);
 		CurrentMaterial->SetReflectionFactor(MaterialChunk.ReflectionFactor);
 		CurrentMaterial->SetRefractionFactor(MaterialChunk.RefractionFactor);
 		CurrentMaterial->SetDetailMapTiling(MaterialChunk.DetailMapTiling);
 
-		CurrentMaterial->SetDiffuseMap(ManageModelMaterialTextures(MaterialChunk.DiffuseMap, Model->TextureResources));
+		CurrentMaterial->SetBaseMap(ManageModelMaterialTextures(MaterialChunk.DiffuseMap, Model->TextureResources));
 		
 		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_NORMALMAP);
 		CurrentMaterial->SetNormalMap(ManageModelMaterialTextures(MaterialChunk.NormalMap, Model->TextureResources));
@@ -190,12 +190,16 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetOpacityMap(ManageModelMaterialTextures(MaterialChunk.OpasityMap, Model->TextureResources));
 		
 		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_DETAILNORMALMAP);
-		CurrentMaterial->SetDetailDiffuseMap(ManageModelMaterialTextures(MaterialChunk.DetailMap, Model->TextureResources));
+		CurrentMaterial->SetDetailBaseMap(ManageModelMaterialTextures(MaterialChunk.DetailMap, Model->TextureResources));
 		CurrentMaterial->SetDetailNormalMap(ManageModelMaterialTextures(MaterialChunk.DetailNormalMap, Model->TextureResources));
-		CurrentMaterial->SetReflectionEnabled(false);
-		CurrentMaterial->SetRefractionMap(NULL);//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap, TextureResources);
-		CurrentMaterial->SetRefractionEnabled(false);
-		CurrentMaterial->SetRefractionMap(NULL);
+		
+		/*CurrentMaterial->SetReflectionEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_REFLECTION);
+		CurrentMaterial->SetReflectionFactor(MaterialChunk.ReflectionFactor);
+		CurrentMaterial->SetRefractionEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_REFRACTION);
+		CurrentMaterial->SetRefractionFactor(MaterialChunk.RefractionFactor);
+//		CurrentMaterial->SetRefractionIndex(MaterialC>)
+		CurrentMaterial->SetEnvironmentMap(ManageMapMaterialTextures(MaterialChunk.EnvironmentMap, TextureResources));
+		CurrentMaterial->SetRefractionMap(NULL);*/
 
 		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_LIGHTMAP);
 		CurrentMaterial->SetLightMap(ManageModelMaterialTextures(MaterialChunk.LightMap, Model->TextureResources));

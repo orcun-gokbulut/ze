@@ -41,22 +41,55 @@
 
 enum ZEMaterialType
 {
-	ZE_MT_NONE,
-	ZE_MT_FIXED,
-	ZE_MT_CUSTOM,
-	ZE_MT_CGFX,
-	ZE_MT_OTHERs
+	ZE_MTT_NONE,
+	ZE_MTT_NON_ILLUMUNATED,
+	ZE_MTT_DEFERRED,
+	ZE_MTT_FORWARD,
 };
- 
-// ZEMaterialFlags
-#define ZE_MF_NOCACHING
- 
+
+typedef ZEDWORD ZEMaterialFlags;
+#define ZE_MTF_NONE						0
+#define ZE_MTF_PREZ_PASS				1
+#define ZE_MTF_G_BUFFER_PASS			2
+#define ZE_MTF_SUPPORTS_SKINNING		4
+#define ZE_MTF_SUPPORTS_MORPHING		8
+#define ZE_MTF_SUPPORTS_INSTANCING		16
+
+enum ZETextureFilterMode
+{
+	ZE_TF_AUTO					= 0,
+	ZE_TF_FORCE_POINT			= 1,
+	ZE_TF_FORCE_LINEAR			= 2,
+	ZE_TF_FORCE_TRILINEAR		= 3,
+	ZE_TF_FORCE_ANISOTROPHIC	= 4,
+};
+
+enum ZETextureAddressMode
+{
+	ZE_TAM_WRAP					= 0,
+	ZE_TAM_CLAMP				= 1,
+	ZE_TAM_MIRROR				= 2,
+	ZE_TAM_BORDER				= 3,
+};
+
+enum ZEMaterialTransparancyMode
+{
+	ZE_MTM_NONE		= 0,
+	ZE_MTM_ALPHACULL			= 1,
+	ZE_MTM_REGULAR				= 2,
+	ZE_MTM_ADDAPTIVE			= 3,
+	ZE_MTM_SUBTRACTIVE			= 4,
+}; 
+
+enum ZEMaterialOpacityComponent
+{
+	ZE_MOC_CONSTANT				= 0,
+	ZE_MOC_DIFFUSE_ALPHA		= 1,
+	ZE_MOC_OPACITYMAP			= 2,
+};
+
+class ZEFrameRenderer;
 class ZERenderOrder;
-class ZECamera;
-class ZEPointLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZEOmniProjectiveLight;
 
 ZE_META_CLASS_DESCRIPTION(ZEMaterial)
 
@@ -68,40 +101,17 @@ class ZEMaterial : public ZEClass
 		virtual							~ZEMaterial();
 
 	public:
-		virtual const char*				GetMaterialUID() const = 0;
-		virtual unsigned int			GetMaterialFlags() const = 0;
 		virtual ZEMaterialType			GetMaterialType() const = 0;
+		virtual ZEMaterialFlags			GetMaterialFlags() const = 0;
 
 		// SetUp
 		virtual void					SetZero() = 0;
-
-		// Render calls
-		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const = 0;
-
-		virtual bool					SetupPreLightning() const;
-		virtual size_t					DoPreLightningPass() const;
-
-		virtual bool					SetupLightning() const;
-
-		virtual bool					SetupPointLightPass(bool Shadowed) const;
-		virtual size_t					DoPointLightPass(ZEPointLight** Lights, size_t Count) const;
-
-		virtual bool					SetupDirectionalLightPass(bool Shadowed) const;
-		virtual size_t					DoDirectionalLightPass(ZEDirectionalLight** Lights, size_t Count) const;
-
-		virtual bool					SetupProjectiveLightPass(bool Shadowed) const;
-		virtual size_t					DoProjectiveLightPass(ZEProjectiveLight** Lights, size_t Count) const;
-
-		virtual bool					SetupOmniProjectiveLightPass(bool Shadowed) const;
-		virtual size_t					DoOmniProjectivePass(ZEOmniProjectiveLight** Lights, size_t Count) const;
-
-		virtual bool					SetupCustomPass(unsigned int CustomPassId) const;
-		virtual bool					DoCustomPass(unsigned int CustomPassId, void* CustomData) const;
-
+		
+		// Render Pass
+		virtual bool					SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
 		virtual bool					SetupShadowPass() const;	
-		virtual size_t					DoShadowPass() const;
-
-		virtual void					EndOfPasses() const;
 
 		virtual void					UpdateMaterial();
 
@@ -121,7 +131,3 @@ ZE_POST_PROCESSOR_START(Meta)
 ZE_POST_PROCESSOR_END()
 */
 #endif
-
-
-
-

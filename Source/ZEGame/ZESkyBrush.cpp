@@ -127,7 +127,7 @@ void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
 {
 	if (SkyTexture != NULL)
 	{
-		SkyMaterial->SetDetailDiffuseMap((ZETexture2D*)SkyTexture->GetTexture());
+		SkyMaterial->SetBaseMap((ZETexture2D*)SkyTexture->GetTexture());
 		ZECamera* Camera = zeScene->GetActiveCamera();
 		ZEMatrix4x4 CameraRotation, SkyRotation;
 		ZEMatrix4x4::CreateRotation(CameraRotation, Camera->GetWorldRotation());
@@ -150,7 +150,7 @@ ZESkyBrush::ZESkyBrush()
 	SkyMaterial->SetZero();
 	SkyMaterial->SetRecivesShadow(false);
 	SkyMaterial->SetLightningEnabled(false);
-	//SkyMaterial->SetShaderComponents(ZESHADER_SKY);
+	//SkyMaterial->SetShaderComponents(ZE_SHADER_SKY);
 	SkyMaterial->SetTwoSided(true);
 
 	SkyRenderOrder.SetZero();

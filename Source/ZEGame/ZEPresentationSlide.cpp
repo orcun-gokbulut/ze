@@ -64,7 +64,7 @@ void ZEPresentationSlide::SetPresentationSlide(const char* FileName)
 			Texture = ZETexture2DResource::LoadSharedResource(PresentationSlide);
 
 		if (Texture != NULL)
-			Material->SetDiffuseMap(Texture->GetTexture());
+			Material->SetBaseMap(Texture->GetTexture());
 	}
 }
 
@@ -120,7 +120,7 @@ bool ZEPresentationSlide::Initialize()
 		Texture = ZETexture2DResource::LoadSharedResource(PresentationSlide);
 
 	if (Texture != NULL)
-		Material->SetDiffuseMap(Texture->GetTexture());
+		Material->SetBaseMap(Texture->GetTexture());
 
 	Initialized = true;
 

@@ -58,7 +58,7 @@ class ZEViewPort;
 
 class ZECamera : public ZEComponent
 {
-	private:
+	protected:
 		bool							UpdateViewFrustum;
 		bool							UpdateView;
 		bool							UpdateViewTransform;
@@ -90,9 +90,9 @@ class ZECamera : public ZEComponent
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio();
 
-		virtual const ZEMatrix4x4&		GetViewTransform();
-		virtual const ZEMatrix4x4&		GetProjectionTransform();
-		virtual const ZEMatrix4x4&		GetViewProjectionTransform();
+		const ZEMatrix4x4&				GetViewTransform();
+		const ZEMatrix4x4&				GetProjectionTransform();
+		const ZEMatrix4x4&				GetViewProjectionTransform();
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);	
 		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);

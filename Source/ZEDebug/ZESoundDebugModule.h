@@ -59,9 +59,7 @@ class ZESoundDebugModule : public ZEDebugModule
 
 		ZESoundBrush2D*			SoundBrush2D;
 	//	ZESoundBrush3D*			SoundBrush3D;
-
-		ZEDGrid*				Grid;
-		
+	
 	public:
 		virtual bool			Initialize();
 		virtual void			Deinitialize();

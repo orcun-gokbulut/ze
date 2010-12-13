@@ -41,27 +41,28 @@
 #include "ZEGraphics\ZESimpleMaterial.h"
 #include "ZEGraphics\ZERenderOrder.h"
 
+class ZECamera;
+class ZED3D9VertexShader;
+class ZED3D9PixelShader;
+class ZEFrameRenderer;
+
 class ZED3D9SimpleMaterial : public ZESimpleMaterial, public ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 
 	private:
-		static LPDIRECT3DVERTEXSHADER9	VertexShader;
-		static LPDIRECT3DPIXELSHADER9	PixelShader;
+		ZED3D9VertexShader*				VertexShader;
+		ZED3D9PixelShader*				PixelShader;
+
+		void							CreateShaders();
+		void							ReleaseShaders();
 
 	protected:
-										ZED3D9SimpleMaterial(){}
-										~ZED3D9SimpleMaterial(){}
+										ZED3D9SimpleMaterial();
+										~ZED3D9SimpleMaterial();
 
 	public:
-		virtual const char*				GetMaterialUID() const;
-		virtual unsigned int			GetMaterialFlags() const;
-		virtual ZEMaterialType			GetMaterialType() const;
-
-		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const;
-
-		virtual bool					SetupPreLightning() const;
-		virtual size_t					DoPreLightningPass() const;
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
 
 		virtual void					UpdateMaterial();
 

@@ -92,6 +92,11 @@ float ZELight::GetRange() const
 	return Range;
 }
 
+void ZELight::SetAttenuation(const ZEVector3& Attenuation)
+{
+	this->Attenuation = Attenuation;
+}
+
 void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constant)
 {
 	Attenuation.x = Constant;
@@ -104,22 +109,12 @@ const ZEVector3& ZELight::GetAttenuation() const
 	return Attenuation;
 }
 
-void ZELight::SetEnabled(bool NewValue)
-{
-	Enabled = NewValue;
-}
-
-bool ZELight::GetEnabled() const
-{
-	return Enabled;
-}
-
-void ZELight::SetCastsShadows(bool NewValue)
+void ZELight::SetCastsShadow(bool NewValue)
 {
 	CastsShadows = NewValue;
 }
 
-bool ZELight::GetCastsShadows() const
+bool ZELight::GetCastsShadow() const
 {
 	return CastsShadows;
 }
@@ -133,6 +128,4 @@ ZELight::ZELight()
 	CastsShadows = false;
 }
 
-
-
-
+#include "ZELight.h.zpp"

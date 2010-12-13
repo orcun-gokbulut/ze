@@ -53,14 +53,14 @@ bool ZED3D9PPScreenOutputNode::Initialize()
 		}
 
 		if (!ZED3D9CommonTools::CompileVertexShader(&VertexShader,
-			"struct VS_OUTPUT"
+			"struct VSOutput"
 			"{"
 				"float4 Position : POSITION0;"
 				"float2 TexCoord : TEXCOORD0;"
 			"};"
-			"VS_OUTPUT vs_main(float4 Position : POSITION0, float2 TexCoord : TEXCOORD0)"
+			"VSOutput vs_main(float4 Position : POSITION0, float2 TexCoord : TEXCOORD0)"
 			"{"
-				"VS_OUTPUT Output;"
+				"VSOutput Output;"
 				"Output.Position = float4(Position.xy, 0.0f, 1.0f);"
 				"Output.TexCoord = TexCoord;"
 				"return Output;"
@@ -152,7 +152,7 @@ bool ZED3D9PPScreenOutputNode::Proces()
 	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 
-	GetDevice()->SetRenderTarget(0, GetModule()->GetFrameColorBuffer());
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)GetModule()->GetFrameBufferViewPort())->FrameBuffer);
 	GetDevice()->SetPixelShader(PixelShader);
 	GetDevice()->SetVertexShader(VertexShader);
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, ScreenAlignedQuad, 5 * 4);
@@ -164,7 +164,3 @@ ZETexture2D* ZED3D9PPScreenOutputNode::GetOutput()
 {
 	return NULL;
 }
-
-
-
-

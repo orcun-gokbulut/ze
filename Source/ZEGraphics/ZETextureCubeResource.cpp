@@ -45,12 +45,26 @@ unsigned DLL_CALLCONV FreeImageFile_Read_Cube(void *buffer, unsigned size, unsig
 	return (unsigned int)((ZEResourceFile*)handle)->Read(buffer, size, count);
 }
 
-int DLL_CALLCONV FreeImageFile_Seek_Cube(fi_handle handle, long offset, int origin) 
+static int DLL_CALLCONV FreeImageFile_Seek_Cube(fi_handle handle, long offset, int origin) 
 {
-	return ((ZEResourceFile*)handle)->Seek(offset, (ZESeekFrom)origin);
+	ZESeekFrom OriginNorm;
+	switch(origin)
+	{
+	case SEEK_SET:
+		OriginNorm = ZE_SF_BEGINING;
+		break;
+	case SEEK_CUR:
+		OriginNorm = ZE_SF_CURRENT;
+		break;
+	case SEEK_END:
+		OriginNorm = ZE_SF_END;
+		break;
+	}
+
+	return ((ZEResourceFile*)handle)->Seek(offset, OriginNorm);
 }
 
-long DLL_CALLCONV FreeImageFile_Tell_Cube(fi_handle handle) 
+static long DLL_CALLCONV FreeImageFile_Tell_Cube(fi_handle handle) 
 {
 	return (long)((ZEResourceFile*)handle)->Tell();
 }
@@ -91,21 +105,23 @@ ZETextureCubeResource* ZETextureCubeResource::LoadSharedResource(const char* Fil
 		return NewResource;
 }
 
-bool LoadCubeFace(ZETextureCube* Texture, ZETextureCubeFace Face, unsigned char* FIBuffer, int EdgeLenght, int OffsetX, int OffsetY, int BPP)
+#include "ZEBitmap.h"
+static bool CopyCubeFace(ZETextureCube* Texture, ZETextureCubeFace Face, unsigned char* SourceBuffer, int SourcePitch, int EdgeLenght, int OffsetX, int OffsetY, int BytesPerPixel)
 {
-	void* Buffer;
-	int Pitch;
+	void* DestinationBuffer;
+	int DestinationPitch;
 
-	Texture->Lock(Face, &Buffer, &Pitch);
-	if (Buffer == NULL)
+	
+	if (!Texture->Lock(Face, &DestinationBuffer, &DestinationPitch))
 	{
 		zeError("Cube Texture Resource", "Can not lock texture resource. (Face : %d)", Face);
 		return false;
 	}
 
 	for (int I = 0; I < EdgeLenght; I++)
-		memcpy((unsigned char*)Buffer + (I * Pitch), 
-		FIBuffer + (EdgeLenght * 3 * (OffsetY + EdgeLenght - I - 1) + OffsetX) * BPP, EdgeLenght * BPP);
+		memcpy((unsigned char*)DestinationBuffer + (I * DestinationPitch), 
+		SourceBuffer + SourcePitch * (OffsetY + EdgeLenght - I - 1) + OffsetX * BytesPerPixel,
+		EdgeLenght * BytesPerPixel);
 
 	Texture->Unlock(Face);
 	return true;
@@ -144,17 +160,12 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 		return NULL;
 	}
 
-	ZETextureCubeResource* TextureResource = new ZETextureCubeResource();
-	ZETextureCube* Texture = TextureResource->Texture = ZETextureCube::CreateInstance();
-
-	if (Texture == NULL)
+	FIBITMAP* Data = FreeImage_LoadFromHandle(TextureFormat, &Callbacks, ResourceFile);
+	if (Data == NULL)
 	{
-		delete TextureResource;
+		zeError("Texture 2D Resource", "Can not load texture file. File Name : %s.", ResourceFile->GetFileName());
 		return NULL;
 	}
-
-	FIBITMAP* Data = FreeImage_LoadFromHandle(TextureFormat, &Callbacks, ResourceFile);
-	FIBITMAP* ConvertedData;
 
 	int Width = FreeImage_GetWidth(Data);
 	int Height = FreeImage_GetHeight(Data);
@@ -168,26 +179,27 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 	int EdgeLenght = Width / 3;
 
 	ZETexturePixelFormat Format;
+	FIBITMAP* ConvertedData;
 
 	switch(FreeImage_GetImageType(Data))
 	{
 		case FIT_BITMAP:
 			switch (FreeImage_GetBPP(Data))
 			{
-				case 16:
-					zeWarning("Texture Resource", "There is performance hit converting 16 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
-					Format = ZE_TPF_RGBA_INT32; 
-					ConvertedData = FreeImage_ConvertTo32Bits(Data);
-					FreeImage_Unload(Data);
-					Data = ConvertedData;
-					break;
 				case 8:
 					zeWarning("Texture Resource", "There is performance hit converting 8 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
 					Format = ZE_TPF_RGBA_INT32;
 					ConvertedData = FreeImage_ConvertTo32Bits(Data);
 					FreeImage_Unload(Data);
 					Data = ConvertedData;
+				break;				case 16:
+					zeWarning("Texture Resource", "There is performance hit converting 16 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
+					Format = ZE_TPF_RGBA_INT32; 
+					ConvertedData = FreeImage_ConvertTo32Bits(Data);
+					FreeImage_Unload(Data);
+					Data = ConvertedData;
 					break;
+
 				case 24:
 					zeWarning("Texture Resource", "There is performance hit converting 24 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
 					Format = ZE_TPF_RGBA_INT32;
@@ -200,16 +212,22 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 					break;
 				default:
 					zeError("Texture Resource", "Image pixel format is not supported. FileName : \"%s\"", ResourceFile->GetFileName());
-					delete TextureResource;
 					return NULL;
 					break;			
 			}
 			break;
 		default:
 			zeError("Texture Resource", "Image pixel format is not supported. FileName : \"%s\"", ResourceFile->GetFileName());
-			delete TextureResource;
 			return NULL;
 			break;			
+	}
+
+	ZETextureCubeResource* TextureResource = new ZETextureCubeResource();
+	ZETextureCube* Texture = TextureResource->Texture = ZETextureCube::CreateInstance();
+	if (Texture == NULL)
+	{
+		delete TextureResource;
+		return NULL;
 	}
 
 	if (!Texture->Create(EdgeLenght, Format))
@@ -219,16 +237,16 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 		return NULL;
 	}
 
-	void* FIBuffer;
-	int BPP = FreeImage_GetBPP(Data) / 8;
-	unsigned char* Bits = FreeImage_GetBits((FIBITMAP*)Data);
-
-	if (!LoadCubeFace(Texture, ZE_CTF_NEGATIVEX, Bits, EdgeLenght, 0,				EdgeLenght, BPP) ||
-		!LoadCubeFace(Texture, ZE_CTF_POSITIVEZ, Bits, EdgeLenght, EdgeLenght,		EdgeLenght, BPP) ||
-		!LoadCubeFace(Texture, ZE_CTF_POSITIVEX, Bits, EdgeLenght, EdgeLenght * 2,	EdgeLenght, BPP) ||
-		!LoadCubeFace(Texture, ZE_CTF_NEGATIVEZ, Bits, EdgeLenght, 0,				0, BPP) ||
-		!LoadCubeFace(Texture, ZE_CTF_NEGATIVEY, Bits, EdgeLenght, EdgeLenght,		0, BPP) ||
-		!LoadCubeFace(Texture, ZE_CTF_POSITIVEY, Bits, EdgeLenght, EdgeLenght * 2,	0, BPP))
+	unsigned int BytesPerPixel = FreeImage_GetBPP(Data) / 8;
+	unsigned int Pitch = FreeImage_GetPitch(Data);
+	unsigned char* Bits = FreeImage_GetBits(Data);
+	
+	if (!CopyCubeFace(Texture, ZE_CTF_NEGATIVEX, Bits, Pitch, EdgeLenght, 0,				EdgeLenght, BytesPerPixel) ||
+		!CopyCubeFace(Texture, ZE_CTF_POSITIVEZ, Bits, Pitch, EdgeLenght, EdgeLenght,		EdgeLenght, BytesPerPixel) ||
+		!CopyCubeFace(Texture, ZE_CTF_POSITIVEX, Bits, Pitch, EdgeLenght, EdgeLenght * 2,	EdgeLenght, BytesPerPixel) ||
+		!CopyCubeFace(Texture, ZE_CTF_NEGATIVEZ, Bits, Pitch, EdgeLenght, 0,				0,			BytesPerPixel) ||
+		!CopyCubeFace(Texture, ZE_CTF_NEGATIVEY, Bits, Pitch, EdgeLenght, EdgeLenght,		0,			BytesPerPixel) ||
+		!CopyCubeFace(Texture, ZE_CTF_POSITIVEY, Bits, Pitch, EdgeLenght, EdgeLenght * 2,	0,			BytesPerPixel))
 	{
 		zeError("Cube Texture Resource", "Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFileName());
 		delete TextureResource;

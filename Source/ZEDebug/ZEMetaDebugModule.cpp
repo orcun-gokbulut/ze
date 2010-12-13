@@ -75,7 +75,7 @@ bool ZEMetaDebugModule::Initialize()
 		Light->GetLight()->SetColor(ZEVector3::One);
 		Light->GetLight()->SetAttenuation(0.001f, 0.0f, 2.0f);
 		Light->GetLight()->SetIntensity(5.0f);
-		Light->GetLight()->SetCastsShadows(false);
+		Light->GetLight()->SetCastsShadow(false);
 		Light->SetProjectionFOV(ZE_PI_2);
 		Light->SetProjectionAspectRatio(1.0f);
 		Light->SetProjectionTexture("test/pavyon.bmp");
@@ -97,14 +97,14 @@ bool ZEMetaDebugModule::Initialize()
 		CanvasBrush->Material = CanvasMaterial;
 		CanvasMaterial->SetZero();
 		CanvasMaterial->SetLightningEnabled(true);
-		CanvasMaterial->SetTransparancyMode(ZE_MTM_NOTRANSPARACY);
+		CanvasMaterial->SetTransparancyMode(ZE_MTM_NONE);
 		CanvasMaterial->SetTwoSided(false);
 		CanvasMaterial->SetRecivesShadow(false);
 		CanvasMaterial->SetAmbientEnabled(true);
 		CanvasMaterial->SetAmbientColor(ZEVector3(0.1f, 0.1f, 0.1f));
 		CanvasMaterial->SetDiffuseEnabled(true);
 		CanvasMaterial->SetDiffuseColor(ZEVector3::One);
-		CanvasMaterial->SetDiffuseMap(ZETexture2DResource::LoadResource("Test\\Diffuse.tga")->GetTexture());
+		CanvasMaterial->SetBaseMap(ZETexture2DResource::LoadResource("Test\\Diffuse.tga")->GetTexture());
 		CanvasMaterial->SetSpecularEnabled(true);
 		CanvasMaterial->SetSpecularColor(ZEVector3::One);
 		CanvasMaterial->SetSpecularShininess(64.0f);

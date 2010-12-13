@@ -61,14 +61,14 @@ bool ZED3D9PPBlurNode::Initialize()
 		// Create general vertex shader
 		if (VertexShader == NULL)
 			if (!ZED3D9CommonTools::CompileVertexShader(&VertexShader,
-					"struct VS_OUTPUT"
+					"struct VSOutput"
 					"{"
 						"float4 Position : POSITION0;"
 						"float2 TexCoord : TEXCOORD0;"
 					"};"
-					"VS_OUTPUT vs_main(float4 Position : POSITION0, float2 TexCoord : TEXCOORD0)"
+					"VSOutput vs_main(float4 Position : POSITION0, float2 TexCoord : TEXCOORD0)"
 					"{"
-						"VS_OUTPUT Output;"
+						"VSOutput Output;"
 						"Output.Position = float4(Position.xy, 0.0f, 1.0f);"
 						"Output.TexCoord = TexCoord;"
 						"return Output;"
@@ -386,7 +386,3 @@ ZETexture2D* ZED3D9PPBlurNode::GetOutput()
 {
 	return Output;
 }*/
-
-
-
-

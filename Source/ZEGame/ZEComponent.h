@@ -124,7 +124,7 @@ class ZEComponent : public ZEEntity
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZEComponent">
+		<class name="ZEComponent" parent="ZEEntity">
 			<description>Base Component Type</description>
 		</class>
 	</meta>

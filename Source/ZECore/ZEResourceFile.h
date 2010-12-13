@@ -78,22 +78,18 @@ class ZEResourceFile : public ZEUnserializer
 class ZEPartialResourceFile : public ZEResourceFile
 {
 	friend class ZEResourceFile;
-	private:
+	protected:
 		size_t				StartPosition;
 		size_t				EndPosition;
 		bool				IsEof;
 
-	public:
-		bool				Seek(size_t Offset, ZESeekFrom Origin);
-		size_t				Read(void* Buffer, size_t Size, size_t Count);
-		bool				Eof();
-		size_t				Tell();
-
 							ZEPartialResourceFile();
+
+	public:
+		virtual bool		Seek(size_t Offset, ZESeekFrom Origin);
+		virtual size_t		Read(void* Buffer, size_t Size, size_t Count);
+		virtual bool		Eof();
+		virtual size_t		Tell();
 };
+
 #endif
-
-
-
-
-

@@ -72,8 +72,6 @@ bool ZESoundDebugModule::Initialize()
 		SoundSource->SetSoundSourceType(ZE_SST_MUSIC);
 	}*/
 
-	Grid = new ZEDGrid(Scene);
-
 	SoundBrush2D = new ZESoundBrush2D();
 	
 	//SoundBrush3D = new ZESoundBrush3D();

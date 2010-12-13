@@ -33,161 +33,87 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef __ZE_D3D9_SSAO_PROCESSOR_H__
+#define __ZE_D3D9_SSAO_PROCESSOR_H__
+
 #include "ZED3D9ComponentBase.h"
-#include <d3d9.h>
-#include <stdlib.h>
-#include <freeimage.h>
+
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
+class ZED3D9Texture2D;
+class ZETexture2D;
+class ZEFrameRenderer;
+class ZED3D9FrameRenderer;
+class ZETexture2DResource;
+
 class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 {
-	public:
-		LPDIRECT3DTEXTURE9				InputColor;
-		LPDIRECT3DTEXTURE9				InputDepth;
-		LPDIRECT3DSURFACE9				Output;
-
-		LPDIRECT3DTEXTURE9				RandomTexture;
-
-		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
-
-		LPDIRECT3DVERTEXSHADER9			VertexShader;
-		LPDIRECT3DPIXELSHADER9			SSOAShader;
-
-		void Initialize()
-		{
-			// Vertex Declaration
-			D3DVERTEXELEMENT9 Declaration[] = 
-			{
-				{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-				{0, 12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
-				D3DDECL_END()
-			};
-			GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
-
-			// RandomTexture
-			GetDevice()->CreateTexture(64, 64, 0, NULL, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &RandomTexture, NULL);
-			struct ZEARGBColor
-			{
-				unsigned char Alpha;
-				unsigned char Red;
-				unsigned char Green;
-				unsigned char Blue;
-			};
-
-			srand(GetTickCount());
-			
-			D3DLOCKED_RECT Rect;
-			RandomTexture->LockRect(0, &Rect, NULL, NULL);
-			for (size_t Y = 0; Y < 64; Y++)
-				for (size_t X = 0; X < 64; X++)
-				{
-					ZEARGBColor* Quad = (ZEARGBColor*)((char*)Rect.pBits + Y * Rect.Pitch) + X;
-					float Value = (float)((rand() % (int)(ZE_PIx2 * 10000.0f)) / 10000.0f);
-					Quad->Red = (int)((0.5f * cosf(Value) - 0.5f) * 256.0f);
-					Quad->Green = (int)((0.5f * sinf(Value) - 0.5f) * 256.0f);
-					Quad->Blue = 0;
-					Quad->Alpha= 0;				
-				}
-			RandomTexture->UnlockRect(0);
-
-			// Compile Shaders
-			ZED3D9CommonTools::CompileVertexShaderFromFile(&VertexShader, "Resources/Shaders/SSOAProcessor.hlsl", "vs_main", "SSOA", "vs_3_0", NULL);
-			ZED3D9CommonTools::CompilePixelShaderFromFile(&SSOAShader, "Resources/Shaders/SSOAProcessor.hlsl", "ps_main", "SSOA", "ps_3_0", NULL);
-		}
-
-
-		void Deinitialize()
-		{
-			ZED3D_RELEASE(VertexShader);
-			ZED3D_RELEASE(SSOAShader);
-			ZED3D_RELEASE(RandomTexture);
-			ZED3D_RELEASE(VertexDeclaration);
-		}
-
-		void OnDeviceLost()
-		{
+	private:
+		ZED3D9FrameRenderer*			Renderer;
 		
-		}
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+		ZED3D9VertexShader*				VertexShader;
+		ZED3D9PixelShader*				PixelShader;
 
-		void OnDeviceRestored()
+		ZED3D9Texture2D*				InputDepth;
+		ZED3D9Texture2D*				InputNormal;
+		ZED3D9Texture2D*				Output;
+
+		int								IterationCount;
+		bool							HalfResolution;
+
+		struct
 		{
+			float						Intensity;
+			float						SampleRadius;
+			float						SampleScale;
+			float						SampleBias;
+		} Parameters;
 
-		}
+		ZETexture2DResource*			RandomTextureResource;
 
-		void SetRenderTarget(LPDIRECT3DTEXTURE9 Texture)
-		{
-			LPDIRECT3DSURFACE9 Surface;
-			Texture->GetSurfaceLevel(0, &Surface);
-			GetDevice()->SetRenderTarget(0, Surface);
-			Surface->Release();
-		}
+	public:
+		void							SetRenderer(ZEFrameRenderer* Renderer);
+		ZEFrameRenderer*				GetRenderer();
 
-		void Process()
-		{
-			static struct Vert  
-			{
-				float Position[3];
-				float Texcoord[2];
-			} 
-			Vertices[] =
-			{
-				{{-1.0f,  1.0f, 0.0f}, {0.0f, 0.0f}},
-				{{ 1.0f,  1.0f, 0.0f}, {1.0f, 0.0f}},
-				{{-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},
-				{{ 1.0f, -1.0f, 0.0f}, {1.0f, 1.0f}}
-			};
+		void							SetInputDepth(ZETexture2D* Texture);
+		ZETexture2D*					GetInputDepth();
 
-			static const float KernelDisc[12][4] =
-			{
-				{ 0.6487f,		-0.111764669f,	0.0f, 0.0f},
-				{ 0.0923f,		 0.586844921f,	0.0f, 0.0f},
-				{ 0.4026f,		-0.185264587f,	0.0f, 0.0f},
-				{-0.5019f,		 0.563529253f,	0.0f, 0.0f},
-				{-0.6044f,		-0.310119152f,	0.0f, 0.0f},
-				{-0.1893f,		 0.311908484f,	0.0f, 0.0f},
-				{ 0.5923f,		-0.726073265f,	0.0f, 0.0f},
-				{ 0.035603881f,	-0.793983221f,	0.0f, 0.0f},
-				{-0.296554923f,	-0.939840794f,	0.0f, 0.0f},
-				{-0.181980252f,	 0.935429335f,	0.0f, 0.0f},
-				{-0.214773059f,	-0.49524498f,	0.0f, 0.0f},
-				{ 0.895886064f,	 0.058031559f,	0.0f, 0.0f},
-			};
+		void							SetInputNormal(ZETexture2D* Texture);
+		ZETexture2D*					GetInputNormal();
 
-			GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-			GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-			GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-			GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-			GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
-			GetDevice()->SetTexture(0, InputColor);
+		void							SetOutput(ZETexture2D* Texture);
+		ZETexture2D*					GetOutput();
 
+		void							SetIterationCount(int Iteration);
+		int								GetIterationCount();
 
-			GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-			GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-			GetDevice()->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-			GetDevice()->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-			GetDevice()->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-			GetDevice()->SetTexture(1, InputDepth);
+		void							SetHalfResolution(bool HalfResolution);
+		bool							GetHalfResolution();
 
-			GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_WRAP);
-			GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_WRAP);
-			GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-			GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-			GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-			GetDevice()->SetTexture(2, RandomTexture);
+		void							SetIntensity(float Intensity);
+		float							GetIntensity() const;
 
-			GetDevice()->SetVertexShader(VertexShader);
-			GetDevice()->SetPixelShader(SSOAShader);
-			GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
-		}
+		void							SetSampleRadius(float Radius);
+		float							GetSampleRadius() const;
 
-		ZED3D9SSAOProcessor()
-		{
-			VertexShader = NULL;
-			SSOAShader = NULL;
-			SSOAShader = NULL;
-		}
+		void							SetSampleScale(float Scale);
+		float							GetSampleScale() const;
 
-		~ZED3D9SSAOProcessor()
-		{
-			Deinitialize();
-		}
+		void							SetSampleBias(float Bias);
+		float							GetSampleBias() const;
 
+		void							Initialize();
+		void							Deinitialize();
+
+		void							OnDeviceLost();
+		void							OnDeviceRestored();
+
+		void							Process();
+	
+										ZED3D9SSAOProcessor();
+										~ZED3D9SSAOProcessor();
 };
+
+#endif

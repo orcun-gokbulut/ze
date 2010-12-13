@@ -193,18 +193,18 @@ void ZEGame::Render(float ElapsedTime)
 #include <stdio.h>
 void ZEGame::Tick(float ElapsedTime)
 {
-	static float FPSSamples[3000];
-	static size_t FPSSampleIndex;
+	static float TotalElapsedTime = 0;
+	static unsigned int AverageFPS = 0;
+	static unsigned int FrameCount = 0;
 
-	FPSSamples[FPSSampleIndex] = 1 /ElapsedTime;
-	FPSSampleIndex = (FPSSampleIndex == 2999 ? 0 : FPSSampleIndex + 1);
-
-	float AverageFPS = 0.0f;
-	for (size_t I = 0; I < 3000; I++)
-		AverageFPS += FPSSamples[I];
-
-	AverageFPS /= 3000.0f;
-
+	FrameCount++;
+	TotalElapsedTime += ElapsedTime;
+	if (TotalElapsedTime > 1.0f)
+	{
+		TotalElapsedTime = 0.0f;
+		AverageFPS = FrameCount;
+		FrameCount = 0;
+	}
 
 	ZEVector3 Position;
 	ZEQuaternion Rotation;
@@ -224,31 +224,54 @@ void ZEGame::Tick(float ElapsedTime)
 	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, Rotation);
 	
 	char Buffer[400];
-	sprintf(Buffer, "Current FPS: %.0f, Average FPS: %.0f, Position : [%f, %f, %f], Rotation : [%f, %f, %f]", 
-		1.0f / ElapsedTime, AverageFPS, Position.x, Position.y, Position.z,
-		Pitch, Yaw, Roll);
+	sprintf(Buffer, "Position : [%.2f, %.2f, %.2f], Rotation : [%.2f, %.2f, %.2f], Average FPS: %d, Current FPS: %.0f", 
+		Position.x, Position.y, Position.z,
+		ZERAD2DEG(Pitch), ZERAD2DEG(Yaw), ZERAD2DEG(Roll), 
+		AverageFPS, 1.0f / ElapsedTime);
 	
 	((ZEUITextControl*)UIManager->GetControls()[0])->SetText(Buffer);
 	Scene->Tick(ElapsedTime);
 }
  
 #include "ZEPlayer.h"
+#include "ZEGraphics/ZEPointLight.h"
+#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZEGraphics/ZEOmniProjectiveLight.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEParticle/ZEParticleEffect.h"
+#include "ZESound/ZESoundSource.h"
+#include "ZESound/ZESoundSource3D.h"
+#include "ZESound/ZEListener.h"
+#include "ZEModel/ZEModel.h"
+#include "ZESkyBrush.h"
+
+// Deprecated
 #include "ZELightBrush.h"
 #include "ZEModelBrush.h"
-#include "ZESkyBrush.h"
-#include "ZEParticle\ZEParticleEffectBrush.h"
-#include "ZEPresentationSlide.h"
+#include "ZEParticle/ZEParticleEffectBrush.h"
 
 ZEGame::ZEGame()
 {
 	Scene = NULL;
 	UIManager = NULL;
 	RegisterEntityDescription((ZEEntityDescription*)ZEPlayer::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEPointLight::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEDirectionalLight::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEProjectiveLight::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEOmniProjectiveLight::ClassDescription());
+	//RegisterEntityDescription((ZEEntityDescription*)ZEModel::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEParticleEffect::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZESkyBrush::ClassDescription());
+	//RegisterEntityDescription((ZEEntityDescription*)ZECamera::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZESoundSource::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZESoundSource3D::ClassDescription());
+	RegisterEntityDescription((ZEEntityDescription*)ZEListener::ClassDescription());
+
+	// Deprecated
 	RegisterEntityDescription((ZEEntityDescription*)ZELightBrush::ClassDescription());
 	RegisterEntityDescription((ZEEntityDescription*)ZEModelBrush::ClassDescription());
-	RegisterEntityDescription((ZEEntityDescription*)ZESkyBrush::ClassDescription());
 	RegisterEntityDescription((ZEEntityDescription*)ZEParticleEffectBrush::ClassDescription());
-	RegisterEntityDescription((ZEEntityDescription*)ZEPresentationSlide::ClassDescription());
 }
 
 ZEGame::~ZEGame()

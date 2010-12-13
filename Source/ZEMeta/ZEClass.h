@@ -81,7 +81,7 @@
 
 #define ZE_META_CLASS()\
 	public:\
-		virtual ZEClassDescription* GetClassDescription();\
+		virtual ZEClassDescription* GetClassDescription() const;\
 		static ZEClassDescription* ClassDescription();\
 		virtual int GetPropertyId(const char* PropertyName) const;\
 		virtual bool SetProperty(int PropertyId, const ZEVariant& Value);\
@@ -92,7 +92,7 @@
 
 #define ZE_META_EXTENDED_CLASS(ExtensionClass, Extension)\
 	public:\
-		virtual ZEClassDescription* GetClassDescription();\
+		virtual ZEClassDescription* GetClassDescription() const;\
 		static ZEClassDescription* ClassDescription();\
 		virtual int GetPropertyId(const char* PropertyName) const;\
 		virtual bool SetProperty(int PropertyId, const ZEVariant& Value);\
@@ -135,7 +135,7 @@ class ZEClass
 		ZEAnimationController*					AnimationController;
 
 	public:
-		virtual ZEClassDescription*				GetClassDescription() = 0;
+		virtual ZEClassDescription*				GetClassDescription() const = 0;
 
 		// Property Functions
 		virtual int								GetPropertyId(const char* PropertyName) const = 0;

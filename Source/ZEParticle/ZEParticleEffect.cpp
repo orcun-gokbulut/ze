@@ -90,6 +90,4 @@ ZEParticleEffect::~ZEParticleEffect()
 {
 }
 
-
-
-
+#include "ZEParticleEffect.h.zpp"

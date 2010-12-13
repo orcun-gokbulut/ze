@@ -45,6 +45,7 @@
 #include "ZECore\ZEWindow.h"
 
 #include "ZEDebug\ZEPhysicsDebugModule.h"
+#include "ZEDebug\ZEGraphicsDebugModule.h"
 #include "ZEDebug\ZESoundDebugModule.h"
 #include "ZEDebug\ZEMetaDebugModule.h"
 
@@ -53,25 +54,18 @@ extern HINSTANCE ApplicationInstance;
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	//MessageBox(NULL, "Attach it while you can !", "Zinek Engine", MB_OK); 
-	_set_SSE2_enable(1);
+	_set_SSE2_enable(1); 
 	ApplicationInstance = hInstance;
 	
-	/*ZEPhysicsDebugModule PhysicsDebugComponent;
-	zeCore->SetDebugComponent(&PhysicsDebugComponent);*/
+	ZEGraphicsDebugModule DebugModule;
+	zeCore->SetDebugComponent(&DebugModule);
 
-	ZESoundDebugModule SoundDebugComponent;
-	//zeCore->SetDebugComponent(&SoundDebugComponent);
-
-/*	ZEMetaDebugComponent MetaDebugComponent;
-	zeCore->SetDebugComponent(&MetaDebugComponent);
-*/
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();
 	zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_GRAPHICS));
 	zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_SOUND));
 	zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_INPUT));
 	zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_PHYSICS));
-	zeCore->SetDebugComponent(&SoundDebugComponent);
 	ZEConsoleWindow ConsoleWindow;
 	zeCore->GetConsole()->SetConsoleInterface(&ConsoleWindow);
 	zeCore->GetWindow()->SetWindowType(zeCore->GetOptions()->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean() ? ZE_WT_FULLSCREEN : ZE_WT_RESIZABLE);

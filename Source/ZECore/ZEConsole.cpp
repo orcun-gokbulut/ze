@@ -483,12 +483,13 @@ void ZEConsole::Log(const char* Module, const char* Format, ...)
 	OutputHistory.Add(HistBuffer);
 	if (ConsoleInterface != NULL)
 		ConsoleInterface->Output(Buffer2);
-	
-	if (!_CrtCheckMemory())
-		OutputDebugString("Jackpot");
-#ifdef ZE_DEBUG_ENABLED
-	OutputDebugString(Buffer2);
-#endif
+	#ifdef ZE_DEBUG_CHECK_HEAP
+		if (!_CrtCheckMemory())
+			OutputDebugString("Jackpot");
+	#endif
+	#ifdef ZE_DEBUG_ENABLED
+		OutputDebugString(Buffer2);
+	#endif
 }
 
 void ZEConsole::Output(const char* Format, ...)
@@ -504,9 +505,13 @@ void ZEConsole::Output(const char* Format, ...)
 	OutputHistory.Add(HistBuffer);
 	if (ConsoleInterface != NULL)
 		ConsoleInterface->Output(Buffer);
-#ifdef ZE_DEBUG_ENABLED
-	OutputDebugString(Buffer);
-#endif
+	#ifdef ZE_DEBUG_CHECK_HEAP
+		if (!_CrtCheckMemory())
+			OutputDebugString("Jackpot");
+	#endif
+	#ifdef ZE_DEBUG_ENABLED
+		OutputDebugString(Buffer);
+	#endif
 }
 
 void ZEConsole::Input(const char* Input)
@@ -542,7 +547,10 @@ ZEConsole::~ZEConsole()
 	for (size_t I = 0; I < InputHistory.GetCount(); I++)
 		delete[] InputHistory[I];
 	InputHistory.Clear();
-
+	#ifdef ZE_DEBUG_CHECK_HEAP
+		if (!_CrtCheckMemory())
+			OutputDebugString("Jackpot");
+	#endif
 	Instance = NULL;
 }
 

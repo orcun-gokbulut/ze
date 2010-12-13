@@ -32,7 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-
+/*
 #include "ZEPPDepthInputNode.h"
 #include "ZEGraphics\ZERenderer.h"
 #include "ZECore\ZEError.h"
@@ -95,7 +95,4 @@ ZEPPDepthInputNode* ZEPPDepthInputNode::CreateInstance()
 {
 	return new ZEPPDepthInputNode();
 }
-
-
-
-
+*/

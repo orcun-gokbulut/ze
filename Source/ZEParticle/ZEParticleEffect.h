@@ -43,8 +43,11 @@
 
 struct ZEDrawParameters;
 
+ZE_META_CLASS_DESCRIPTION(ZEParticleEffect);
+
 class ZEParticleEffect : public ZEComponent
 {
+	ZE_META_ENTITY()
 	private:
 		ZEArray<ZEParticleSystem*>			SystemArray;				// An effect might be composed of many systems
 
@@ -69,6 +72,15 @@ class ZEParticleEffect : public ZEComponent
 
 #endif
 
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEParticleEffect" parent="ZEComponent">
+			<description>Particle Effect</description>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 
