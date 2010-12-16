@@ -175,10 +175,10 @@ void ZED3D9FrameRenderer::InitializeLightning()
 	ZECanvas Canvas;
 	// Directional
 	Canvas.AddQuad(
-		ZEVector3( 1.0f,  1.0f, 1.0f),
-		ZEVector3(-1.0f,  1.0f, 1.0f),
-		ZEVector3(-1.0f, -1.0f, 1.0f),
-		ZEVector3( 1.0f, -1.0f, 1.0f));
+		ZEVector3( 1.0f,  1.0f, 0.0f),
+		ZEVector3(-1.0f,  1.0f, 0.0f),
+		ZEVector3(-1.0f, -1.0f, 0.0f),
+		ZEVector3( 1.0f, -1.0f, 0.0f));
 
 	// Point/OmniProjective
 	Canvas.AddSphere(1.0f, 12, 12);
@@ -595,7 +595,7 @@ void ZED3D9FrameRenderer::DoLightningPass()
 	ViewVector.w = 0.0f;
 	//ZEVector4::Normalize(ViewVector, ViewVector);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ViewVector, 1);
-	GetDevice()->SetPixelShaderConstantF(5, (const float*)&ZEVector4(0.5f / ViewPort->GetWidth(), 0.5f / ViewPort->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(5, (const float*)&ZEVector4(1.0f / ViewPort->GetWidth(), 1.0f / ViewPort->GetHeight(), 0.5f / ViewPort->GetWidth(), 0.5f / ViewPort->GetHeight()), 1);
 
 	// Vertex Buffer and Vertex Shader
 	GetDevice()->SetStreamSource(0, LightningComponents.LightMeshVB->StaticBuffer, 0, sizeof(ZECanvasVertex));
@@ -701,11 +701,11 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 {
 	if (GBuffer1 == NULL)
 		GBuffer1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	GBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_DEPTH, true);
+	GBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
 	
 	if (GBuffer2 == NULL)
 		GBuffer2 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	GBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
+	GBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
 
 	if (LBuffer1 == NULL)
 		LBuffer1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();

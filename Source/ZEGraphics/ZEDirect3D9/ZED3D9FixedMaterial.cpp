@@ -47,20 +47,15 @@ void ZED3D9FixedMaterial::CreateShaders()
 {
 	ReleaseShaders();
 
-	PreZPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "PreZVSMain", MaterialComponents, "vs_2_0");
-	PreZPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "PreZPSMain", MaterialComponents, "ps_2_0");
+	GBufferPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "ZEFixedMaterial_GBuffer_VertexShader", MaterialComponents, "vs_3_0");
+	GBufferPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "ZEFixedMaterial_GBuffer_PixelShader", MaterialComponents, "ps_3_0");
 
-	GBufferPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "GBVSMain", MaterialComponents, "vs_2_0");
-	GBufferPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "GBPSMain", MaterialComponents, "ps_2_0");
-
-	ForwardPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "FPVSMain", MaterialComponents, "vs_2_0");
-	ForwardPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "FPPSMain", MaterialComponents, "ps_2_0");
+	ForwardPassVertexShader = ZED3D9VertexShader::CreateShader("FixedMaterial.hlsl", "ZEFixedMaterial_ForwardPass_VertexShader", MaterialComponents, "vs_3_0");
+	ForwardPassPixelShader = ZED3D9PixelShader::CreateShader("FixedMaterial.hlsl", "ZEFixedMaterial_ForwardPass_PixelShader", MaterialComponents, "ps_3_0");
 }
 
 void ZED3D9FixedMaterial::ReleaseShaders()
 {
-	ZED3D_RELEASE(PreZPassVertexShader);
-	ZED3D_RELEASE(PreZPassPixelShader);
 
 	ZED3D_RELEASE(GBufferPassVertexShader);
 	ZED3D_RELEASE(GBufferPassPixelShader);
@@ -79,9 +74,6 @@ ZED3D9FixedMaterial::~ZED3D9FixedMaterial()
 
 ZED3D9FixedMaterial::ZED3D9FixedMaterial()
 {
-	PreZPassPixelShader = NULL;
-	PreZPassVertexShader = NULL;
-	PreZPassPixelShader = NULL;
 	GBufferPassVertexShader = NULL;
 	GBufferPassPixelShader = NULL;
 	ForwardPassVertexShader = NULL;
@@ -181,14 +173,6 @@ void ZED3D9FixedMaterial::SetTextureStage(unsigned int Id, ZETextureAddressMode 
 			break;
 	}
 
-}
-
-bool ZED3D9FixedMaterial::SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
-{
-	GetDevice()->SetPixelShader(PreZPassPixelShader->GetPixelShader());
-	GetDevice()->SetVertexShader(PreZPassVertexShader->GetVertexShader());
-
-	return true;
 }
 
 bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
@@ -437,7 +421,7 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 	// Setup Material Properties
 	GetDevice()->SetVertexShaderConstantF(14, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants) / 16);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
-	GetDevice()->SetPixelShaderConstantF(6, (const float*)&ZEVector4(0.5f / (float)Renderer->GetViewPort()->GetWidth(), 0.5f / (float)Renderer->GetViewPort()->GetHeight(), Camera->GetFarZ(), 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(6, (const float*)&ZEVector4(1.0f / (float)Renderer->GetViewPort()->GetWidth(), 1.0f / (float)Renderer->GetViewPort()->GetHeight(), 0.5f / (float)Renderer->GetViewPort()->GetWidth(), 0.5f / (float)Renderer->GetViewPort()->GetHeight()), 1);
 
 	// Setup Textures
 	if (MaterialComponents & ZE_SHADER_BASE_MAP && BaseMap != NULL)

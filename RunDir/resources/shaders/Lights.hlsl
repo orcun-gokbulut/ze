@@ -46,7 +46,7 @@ float4 LightParameters0 : register(ps, c0);
 float4 LightParameters1 : register(ps, c1);
 float4 LightParameters2 : register(ps, c2);
 float4 LightParameters3 : register(ps, c3);
-float2 PixelSize_2 : register(ps, c5);
+float4 ScreenToTextureParams : register(ps, c5);
 
 #define LightPositionParam			LightParameters0.xyz
 #define LightRange					LightParameters0.w
@@ -72,8 +72,7 @@ samplerCUBE OmniProjectionShadowMap : register(ps, s5);
 struct ZEPointLight_VSOutput
 {
 	float4 Position : POSITION0;
-	float4 ScreenPosition : TEXCOORD0;
-	float3 ViewVector : TEXCOORD1;
+	float3 ViewVector : TEXCOORD0;
 };
 
 ZEPointLight_VSOutput ZEPointLight_VertexShader(in float4 Position : POSITION0)
@@ -82,8 +81,6 @@ ZEPointLight_VSOutput ZEPointLight_VertexShader(in float4 Position : POSITION0)
 	
 	Output.Position = mul(Position, WorldViewProjMatrix);
 	
-	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y) * 0.5f;
-	Output.ScreenPosition.zw = Output.Position.zw;
 	Output.ViewVector = ZEGBuffer_GetViewVector(Output.Position);
 	
 	return Output;
@@ -91,15 +88,15 @@ ZEPointLight_VSOutput ZEPointLight_VertexShader(in float4 Position : POSITION0)
 
 struct ZEPointLight_PSInput
 {
-	float4 ScreenPosition : TEXCOORD0;
-	float3 ViewVector : TEXCOORD1;
+	float4 ScreenPosition : VPOS;
+	float3 ViewVector : TEXCOORD0;
 };
 
 ZELBuffer ZEPointLight_PixelShader(ZEPointLight_PSInput Input) : COLOR0
 {
 	ZELBuffer LBuffer = (ZELBuffer)0;
-		
-	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.w + 0.5f + PixelSize_2;
+	
+	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
 	float3 Position = ZEGBuffer_GetViewPosition(ScreenPosition, Input.ViewVector);
 	float3 Normal = ZEGBuffer_GetViewNormal(ScreenPosition);
 
@@ -136,8 +133,7 @@ ZELBuffer ZEPointLight_PixelShader(ZEPointLight_PSInput Input) : COLOR0
 struct ZEDirectionalLight_VSOutput
 {
 	float4 Position : POSITION0;
-	float4 ScreenPosition : TEXCOORD0;
-	float3 ViewVector : TEXCOORD1;
+	float3 ViewVector : TEXCOORD0;
 };
 
 ZEDirectionalLight_VSOutput ZEDirectionalLight_VertexShader(float4 Position : POSITION0)
@@ -145,8 +141,7 @@ ZEDirectionalLight_VSOutput ZEDirectionalLight_VertexShader(float4 Position : PO
 	ZEDirectionalLight_VSOutput Output;
 	
 	Output.Position = Position;
-	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y) * 0.5f;
-	Output.ScreenPosition.zw = Output.Position.zw;
+
 	Output.ViewVector = ZEGBuffer_GetViewVector(Output.Position);
 	
 	return Output;
@@ -154,15 +149,15 @@ ZEDirectionalLight_VSOutput ZEDirectionalLight_VertexShader(float4 Position : PO
 
 struct ZEDirectionalLight_PSInput
 {
-	float4 ScreenPosition : TEXCOORD0;
-	float3 ViewVector : TEXCOORD1;
+	float4 ScreenPosition : VPOS;
+	float3 ViewVector : TEXCOORD0;
 };
 
 ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COLOR0
 {
 	ZELBuffer LBuffer = (ZELBuffer)0;
 		
-	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.w + 0.5f + PixelSize_2;
+	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
 	float3 Position = ZEGBuffer_GetViewPosition(ScreenPosition, Input.ViewVector);
 	float3 Normal = ZEGBuffer_GetViewNormal(ScreenPosition);
 	float3 SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
@@ -191,8 +186,7 @@ ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COL
 struct ZEProjectiveLight_VSOutput
 {
 	float4 Position : POSITION0;
-	float4 ScreenPosition : TEXCOORD0;
-	float3 ViewVector : TEXCOORD1;
+	float3 ViewVector : TEXCOORD0;
 };
 
 ZEProjectiveLight_VSOutput ZEProjectiveLight_VertexShader(float4 Position : POSITION0)
@@ -200,9 +194,6 @@ ZEProjectiveLight_VSOutput ZEProjectiveLight_VertexShader(float4 Position : POSI
 	ZEProjectiveLight_VSOutput Output;
 	
 	Output.Position = mul(Position, WorldViewProjMatrix);
-
-	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y) * 0.5f;
-	Output.ScreenPosition.zw = Output.Position.zw;
 	
 	Output.ViewVector = ZEGBuffer_GetViewVector(Output.Position);
 
@@ -211,15 +202,15 @@ ZEProjectiveLight_VSOutput ZEProjectiveLight_VertexShader(float4 Position : POSI
 
 struct ZEProjectiveLight_PSInput
 {
-	float4 ScreenPosition : TEXCOORD0;
-	float3 ViewVector : TEXCOORD1;
+	float4 ScreenPosition : VPOS;
+	float3 ViewVector : TEXCOORD0;
 };
 	
 ZELBuffer ZEProjectiveLight_PixelShader(ZEProjectiveLight_PSInput Input) : COLOR0
 {
 	ZELBuffer LBuffer = (ZELBuffer)0;
-		
-	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.w + 0.5f + PixelSize_2;
+
+	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;			
 	float3 Position = ZEGBuffer_GetViewPosition(ScreenPosition, Input.ViewVector);
 	float3 Normal = ZEGBuffer_GetViewNormal(ScreenPosition);
 
@@ -262,8 +253,7 @@ ZELBuffer ZEProjectiveLight_PixelShader(ZEProjectiveLight_PSInput Input) : COLOR
 struct ZEOmniProjectiveLight_VSOutput
 {
 	float4 Position : POSITION0;
-	float3 ScreenPosition : TEXCOORD0;
-	float3 ViewVector : TEXCOORD1;
+	float3 ViewVector : TEXCOORD0;
 };
 
 ZEOmniProjectiveLight_VSOutput ZEOmniProjectiveLight_VertexShader(float4 Position : POSITION0)
@@ -271,8 +261,6 @@ ZEOmniProjectiveLight_VSOutput ZEOmniProjectiveLight_VertexShader(float4 Positio
 	ZEOmniProjectiveLight_VSOutput Output;
 	
 	Output.Position = mul(Position, WorldViewProjMatrix);
-	Output.ScreenPosition.xy = float2(Output.Position.x, -Output.Position.y) * 0.5f;
-	Output.ScreenPosition.z = Output.Position.w;
 	Output.ViewVector = ZEGBuffer_GetViewVector(Output.Position);
 	
 	return Output;
@@ -280,15 +268,15 @@ ZEOmniProjectiveLight_VSOutput ZEOmniProjectiveLight_VertexShader(float4 Positio
 
 struct ZEOmniProjectiveLight_PSInput
 {
-	float3 ScreenPosition : TEXCOORD0;
-	float3 ViewVector : TEXCOORD1;
+	float3 ScreenPosition : VPOS;
+	float3 ViewVector : TEXCOORD0;
 };
 	
 ZELBuffer ZEOmniProjectiveLight_PixelShader(ZEOmniProjectiveLight_PSInput Input) : COLOR0
 {
 	ZELBuffer LBuffer = (ZELBuffer)0;
 	
-	float2 ScreenPosition = Input.ScreenPosition.xy / Input.ScreenPosition.z + 0.5f + PixelSize_2;
+	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
 	float3 Position = ZEGBuffer_GetViewPosition(ScreenPosition, Input.ViewVector);
 	float3 Normal = ZEGBuffer_GetViewNormal(ScreenPosition);
 

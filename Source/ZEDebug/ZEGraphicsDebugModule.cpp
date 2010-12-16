@@ -69,10 +69,11 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->LoadMap("deneme.zemap");
 
 	ZEModel* Model = new ZEModel();
-	Model->SetModelResource(ZEModelResource::LoadResource("test.zemodel"));
+	Model->SetModelResource(ZEModelResource::LoadResource("Soldier.zemodel"));
 	Model->SetAnimationByName("Test");
 	Model->SetAnimationState(ZE_MAS_PLAYING);
 	Model->SetAnimationLooping(true);
+	Model->SetAnimationSpeed(30);
 	Scene->AddEntity(Model);
 
 

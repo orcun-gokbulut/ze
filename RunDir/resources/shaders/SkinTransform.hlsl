@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-void SkinTransform(inout VSInput Vertex)
+void SkinTransform(inout ZE_SHADER_VERTEX_INPUT_TYPE Vertex)
 {
 	float4 Position = float4(mul(Vertex.Position, BoneMatrices[Vertex.BoneIndices[0]]).xyz * Vertex.BoneWeights[0], 1.0f);
 	float3 Normal = mul(Vertex.Normal, BoneMatrices[Vertex.BoneIndices[0]]) * Vertex.BoneWeights[0];

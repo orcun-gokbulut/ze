@@ -51,8 +51,6 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
 		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
 
-		ZED3D9VertexShader*				PreZPassVertexShader;
-		ZED3D9PixelShader*				PreZPassPixelShader;
 		ZED3D9VertexShader*				GBufferPassVertexShader;
 		ZED3D9PixelShader*				GBufferPassPixelShader;
 		ZED3D9VertexShader*				ForwardPassVertexShader;
@@ -70,7 +68,6 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 	public:
 		const char*						ConvertToString(unsigned int MaterialComponent);
 
-		virtual bool					SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
 		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
 		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
 		virtual bool					SetupShadowPass() const;	

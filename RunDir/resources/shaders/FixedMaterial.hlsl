@@ -59,8 +59,8 @@ float4 MaterialParams2 : register(ps, c2);
 float4 MaterialParams3 : register(ps, c3);
 float4 MaterialParams4 : register(ps, c4);
 float4 MaterialParams5 : register(ps, c5);
-float4 PipelineParameters0 : register(ps, c6);
 float4 MaterialParams6 : register(vs, c12);
+float4 PipelineParameters0 : register(ps, c6);
 
 #define	MaterialAmbientColor        MaterialParams0.xyz
 #define	MaterialOpacity				MaterialParams0.w
@@ -76,8 +76,8 @@ float4 MaterialParams6 : register(vs, c12);
 #define MaterialDistortionAmount	MaterialParams5.y
 #define MaterialRefractionIndex		MaterialParams6.x
 
-#define PixelSize_2					PipelineParameters0.xy
-#define FarZ						PipelineParameters0.z
+#define ScreenToTextureParams		PipelineParameters0
+//#define FarZ						PipelineParameters0.z
 
 bool EnableSkin : register(b0);
 
@@ -100,7 +100,7 @@ sampler2D DistortionMap : register(s13);
 sampler2D DetailDiffuseMap : register(s14);
 sampler2D DetailNormalMap : register(s15);
 
-struct VSInput 
+struct ZEFixedMaterial_VSInput 
 {
 	float4 Position : POSITION0;
 	float3 Normal : NORMAL0;
@@ -117,39 +117,14 @@ struct VSInput
 	//#endif
 };
 
+#define ZE_SHADER_VERTEX_INPUT_TYPE ZEFixedMaterial_VSInput
 #include "SkinTransform.hlsl"
-
-// Pre Z Pass
-/////////////////////////////////////////////////////////////////////////////////////////
-
-struct PreZVSOutput
-{
-	float4 Position : POSITION0;
-};
-
-PreZVSOutput PreZVSMain(VSInput Input)
-{
-	PreZVSOutput Output;
-
-	SkinTransform(Input);
-
-	Output.Position = mul(Input.Position, WorldViewProjMatrix);
-	
-	return Output;
-}
-
-float4 PreZPSMain() : COLOR0
-{
-	return 0.0f;
-}
-
-
 
 // G-Buffer Pass
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Vertex Shader
-struct GBVSOutput 
+struct ZEFixedMaterial_GBuffer_VSOutput 
 {
 	float4 Position_ : POSITION0;
 	float3 Position : TEXCOORD0;
@@ -163,9 +138,9 @@ struct GBVSOutput
 };
 
 
-GBVSOutput GBVSMain(VSInput Input)
+ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMaterial_VSInput Input)
 {
-	GBVSOutput Output;
+	ZEFixedMaterial_GBuffer_VSOutput Output;
 
 	if (EnableSkin)
 		SkinTransform(Input);
@@ -185,7 +160,7 @@ GBVSOutput GBVSMain(VSInput Input)
 }
 
 // Pixel Shader
-struct GBPSInput
+struct ZEFixedMaterial_GBuffer_PSInput
 {
 	float3 Position : TEXCOORD0;
 	float3 Normal : TEXCOORD1;
@@ -198,7 +173,7 @@ struct GBPSInput
 	#endif
 };
 
-ZEGBuffer GBPSMain(GBPSInput Input)
+ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput Input)
 {
 	ZEGBuffer GBuffer = (ZEGBuffer)0;
 	
@@ -223,70 +198,12 @@ ZEGBuffer GBPSMain(GBPSInput Input)
 	return GBuffer;
 }
 
-
-
 // Forward Pass
 /////////////////////////////////////////////////////////////////////////////////////////
-struct FPVSOutput
+struct ZEFixedMaterial_ForwardPass_VSOutput
 {
 	float4 Position : POSITION0;
 	float2 Texcoord : TEXCOORD0;
-	float3 ScreenPosition : TEXCOORD1;
-	
-	#ifdef ZE_SHADER_DETAIL_MAP
-	float2 DetailTexcoord : TEXCOORD1;
-	#endif
-	
-	#ifdef ZE_SHADER_LIGHT_MAP
-		float2 LightMapTexcoord     : TEXCOORD2;
-	#endif
-	
-	#ifdef ZESHADER_REFLECTION
-		float3 ReflectionVector     : TEXCOORD3;
-	#endif
-
-	#ifdef ZESHADER_REFRACTION
-		float3 RefractionVector     : TEXCOORD4;
-	#endif	
-};
-
-FPVSOutput FPVSMain(VSInput Input)
-{
-	FPVSOutput Output;
-	
-	if (EnableSkin)
-		SkinTransform(Input);
-
-	// Pipeline 
-	Output.Position = mul(Input.Position, WorldViewProjMatrix);
-	Output.Texcoord = Input.Texcoord;
-	
-	Output.ScreenPosition = float3(Output.Position.x, -Output.Position.y, Output.Position.w);
-	
-	#ifdef ZE_SHADER_REFLECTION
-		Output.ReflectionVector = reflect(-CameraDirection, Normal);
-	#endif
-	
-	#ifdef ZE_SHADER_REFRACTION
-		Output.RefractionVector = refract(-CameraDirection, Normal, MaterialRefractionIndex);
-	#endif
-
-	#ifdef ZE_SHADER_LIGHTMAP
-		Output.LightMapTexcoord = Input.LightMapTexcoord;
-	#endif
-	
-	return Output;
-}
-
-struct FPPSOutput
-{
-	float4	Color : COLOR0;
-};
-
-struct FPPSInput
-{
-	float2 Texcoord : TEXCOORD0;
-	float3 ScreenPosition : TEXCOORD1;
 	
 	#ifdef ZE_SHADER_DETAIL_MAP
 		float2 DetailTexcoord : TEXCOORD1;
@@ -305,12 +222,66 @@ struct FPPSInput
 	#endif	
 };
 
-FPPSOutput FPPSMain(FPPSInput Input)
+ZEFixedMaterial_ForwardPass_VSOutput ZEFixedMaterial_ForwardPass_VertexShader(ZEFixedMaterial_VSInput Input)
 {
-	FPPSOutput Output;
+	ZEFixedMaterial_ForwardPass_VSOutput Output;
+	
+	if (EnableSkin)
+		SkinTransform(Input);
+
+	// Pipeline 
+	Output.Position = mul(Input.Position, WorldViewProjMatrix);
+	Output.Texcoord = Input.Texcoord;
+	
+	#ifdef ZE_SHADER_REFLECTION
+		Output.ReflectionVector = reflect(-CameraDirection, Normal);
+	#endif
+	
+	#ifdef ZE_SHADER_REFRACTION
+		Output.RefractionVector = refract(-CameraDirection, Normal, MaterialRefractionIndex);
+	#endif
+
+	#ifdef ZE_SHADER_LIGHTMAP
+		Output.LightMapTexcoord = Input.LightMapTexcoord;
+	#endif
+	
+	return Output;
+}
+
+struct ZEFixedMaterial_ForwardPass_PSOutput
+{
+	float4	Color : COLOR0;
+};
+
+struct ZEFixedMaterial_ForwardPass_PSInput
+{
+	float3 ScreenPosition : VPOS;
+
+	float2 Texcoord : TEXCOORD0;
+	
+	#ifdef ZE_SHADER_DETAIL_MAP
+		float2 DetailTexcoord : TEXCOORD1;
+	#endif
+	
+	#ifdef ZE_SHADER_LIGHT_MAP
+		float2 LightMapTexcoord     : TEXCOORD2;
+	#endif
+	
+	#ifdef ZESHADER_REFLECTION
+		float3 ReflectionVector     : TEXCOORD3;
+	#endif
+
+	#ifdef ZESHADER_REFRACTION
+		float3 RefractionVector     : TEXCOORD4;
+	#endif	
+};
+
+ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEFixedMaterial_ForwardPass_PSInput Input)
+{
+	ZEFixedMaterial_ForwardPass_PSOutput Output;
 	Output.Color = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	
-	float2 ScreenPosition = (Input.ScreenPosition.xy / Input.ScreenPosition.z) * 0.5f + 0.5f + PixelSize_2;
+	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
 
 	#ifdef ZE_SHADER_AMBIENT
 		float3 AmbientColor = MaterialAmbientColor;
