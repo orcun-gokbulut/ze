@@ -36,33 +36,7 @@
 #include "ZEModelMesh.h"
 #include "ZEModel.h"
 #include "ZEModelFileFormat.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEPhysics\ZEPhysicalRigidBody.h"
-#include "ZEGame\ZEDrawParameters.h"
-/*
-void ZEModelMesh::UpdatePhysicalBody()
-{
-	PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
-
-	PhysicalBody->SetEnabled(MeshResource->PhysicalBody.Enabled);
-	PhysicalBody.Mass;
-	PhysicalBody->SetLinearDamping(MeshResource->PhysicalBody.LinearDamping);
-	PhysicalBody->SetAngularDamping(MeshResource->PhysicalBody.AngularDamping);
-	PhysicalBody->SetPosition(GetWorldTransform() * MeshResource->PhysicalBody.Position);
-	PhysicalBody->SetRotation(Owner->GetWorldRotation() * Rotation * MeshResource->PhysicalBody.Orientation);
-	
-	PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenter);
-	
-	//PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenterPosition);
-	//PhysicalBody->SetMassCenterRotation(MeshResource->PhysicalBody.MassCenterRotation);
-
-	for (size_t I = 0; I < MeshResource->PhysicalBody.Shapes.GetCount(); I++)
-	{
-		ZE
-	}
-
-}*/
+#include "ZEGraphics/ZERenderer.h"
 
 void ZEModelMesh::SetActiveLOD(size_t LOD)
 {
@@ -221,10 +195,6 @@ ZEModelAnimationType ZEModelMesh::GetAnimationType()
 	return AnimationType;
 }
 
-ZEPhysicalRigidBody* ZEModelMesh::GetPhysicalBody()
-{
-	return PhysicalBody;
-}
 
 void ZEModelMesh::SetPhysicsEnabled(bool Enabled)
 {
@@ -296,7 +266,3 @@ ZEModelMesh::~ZEModelMesh()
 {
 	Deinitialize();
 }
-
-
-
-

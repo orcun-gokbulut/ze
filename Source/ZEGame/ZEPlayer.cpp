@@ -105,24 +105,28 @@ void ZEPlayer::Tick(float Time)
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, 1));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
+				//Position.y = 1.7f;
 				SetPosition(Position);
 				break;
 			case ACTIONID_BACKWARD:
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, -1));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
+				//Position.y = 1.7f;
 				SetPosition(Position);
 				break;
 			case ACTIONID_STRAFELEFT:
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(-1, 0, 0));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
+				//Position.y = 1.7f;
 				SetPosition(Position);
 				break;
 			case ACTIONID_STRAFERIGHT:
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(1, 0, 0));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
+				//Position.y = 1.7f;
 				SetPosition(Position);
 				break;
 			case ACTIONID_ZOOMIN:
@@ -177,7 +181,7 @@ void ZEPlayer::Tick(float Time)
 		else if (Roll > ZE_PI)
 			Roll = ZE_PI;
 
-		ZEQuaternion::Create(Rotation, Pitch, Yawn, Roll);
+		ZEQuaternion::CreateFromEuler(Rotation, Pitch, Yawn, Roll);
 		ZEQuaternion Temp;
 		ZEQuaternion::Normalize(Temp,Rotation);
 		Rotation = Temp;
@@ -207,14 +211,14 @@ bool ZEPlayer::Initialize()
 		Listener = ZEListener::CreateInstance();
 
 	Listener->Initialize();
-/*	PointLight.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	PointLight.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	PointLight.SetAttenuation(0.1f, 0.0f, 1.0f);
-	PointLight.SetRange(10000.0f);
-	PointLight.SetIntensity(15.0f);
+	PointLight.SetRange(1000.0f);
+	PointLight.SetIntensity(10.0f);
 	PointLight.SetColor(ZEVector3(1.0f, 1.0f, 1.0));
-	PointLight.SetEnabled(true);*/
+	PointLight.SetEnabled(true);
 
-	//RegisterComponent(&PointLight);
+	RegisterComponent(&PointLight);
 	RegisterComponent(&Camera);
 	RegisterComponent(Listener);
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDefinitions.h
+ Zinek Engine - ZEModelAnimationTrack.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,33 +33,82 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATH_DEFINITIONS_H__
-#define __ZE_MATH_DEFINITIONS_H__
+#ifndef __ZE_MODEL_ANIMATION_TRACK_H__
+#define __ZE_MODEL_ANIMATION_TRACK_H__
 
-#define ZE_ZERO_TRESHOLD		0.00000001 
+#include "ZEModelAnimation.h"
 
-#define ZE_PIx2				6.28318530717958647692f
-#define ZE_E				2.71828182845904523536f
-#define ZE_LOG2E			1.44269504088896340736f
-#define ZE_LOG10E			0.434294481903251827651f
-#define ZE_LN2				0.693147180559945309417f
-#define ZE_LN10				2.30258509299404568402f
-#define ZE_PI				3.14159265358979323846f		// 180  Degree
-#define ZE_PI_2				1.57079632679489661923f		// 90   Degree
-#define ZE_PI_4				0.78539816339744830962f		// 45   Degree 
-#define ZE_PI_8				0.39269908169872415481f		// 22.5 Degree 
-#define ZE_PI_12			0.26179938779914943654f		// 15	Degree 
-#define ZE_1_PI				0.318309886183790671538f
-#define ZE_2_PI				0.636619772367581343076f
-#define ZE_2_SQRTPI			1.12837916709551257390f
-#define ZE_SQRT2			1.41421356237309504880f
-#define ZE_SQRT1_2			0.707106781186547524401f
+class ZEModel;
 
-#define ZEDEG2RAD(Angle) ((Angle) * ZE_PI/180)
-#define ZERAD2DEG(Angle) ((Angle) * 180/ZE_PI)
+enum ZEModelAnimationBlendMode
+{
+	ZE_MABM_NONE		= 0,
+	ZE_MABM_INTERPOLATE = 1,
+	ZE_MABM_ADDAPTIVE	= 2,
+	ZE_MABM_OVERWRITE	= 3,
+};
+
+class ZEModelAnimationTrack
+{
+	private:
+		ZEModel*						Owner;
+		const ZEModelAnimation*			Animation;
+		ZEModelAnimationState			State;
+		float							BlendFactor;
+		ZEModelAnimationBlendMode		BlendMode;
+		float							Speed;
+		float							CurrentFrame;
+		ZEDWORD							StartFrame;
+		ZEDWORD							EndFrame;
+		bool							Looping;
+		int								LOD;
+
+	public:
+		void							SetOwner(ZEModel* Model);
+		ZEModel*						GetOwner();
+
+		void							SetAnimation(const ZEModelAnimation* Animation);
+		const ZEModelAnimation*			GetAnimation();
+
+		void							SetAnimationByName(const char* Name);
+		const char*						GetAnimationName();
+
+		void							SetState(ZEModelAnimationState State);
+		ZEModelAnimationState			GetState();
+
+		void							SetLOD(int LOD);
+		int								GetLOD();
+
+		void							SetSpeed(float Factor);
+		float							GetSpeed();
+
+		void							SetBlendMode(ZEModelAnimationBlendMode Mode);
+		ZEModelAnimationBlendMode		GetBlendMode();
+
+		void							SetBlendFactor(float Factor);
+		float							GetBlendFactor();
+
+		void							SetLooping(bool Looping);
+		bool							GetLooping();
+
+		void							SetCurrentFrame(unsigned int Frame);	
+		unsigned int 					GetCurrentFrame();
+
+		void							SetStartFrame(unsigned int Frame);
+		unsigned int					GetStartFrame();
+
+		void							SetEndFrame(unsigned int Frame);
+		unsigned int					GetEndFrame();
+
+		void							Play(unsigned int StartFrame, unsigned int EndFrame);
+		void							Play();
+		void							Resume();
+		void							Pause();
+		void							Stop();
+
+		void							AdvanceAnimation(float ElapsedTime);
+
+										ZEModelAnimationTrack();
+};
+
 #endif
-
-
-
-

@@ -37,13 +37,13 @@
 #ifndef	__ZE_MODEL_RESOURCE_H__
 #define __ZE_MODEL_RESOURCE_H__
 
-#include "ZECore\ZEResource.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEMath\ZEAABoundingBox.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEGraphics\ZEVertexTypes.h"
+#include "ZECore/ZEResource.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEGraphics/ZEVertexTypes.h"
 
 class ZEStaticVertexBuffer;
 class ZETexture2DResource;
@@ -52,8 +52,8 @@ class ZEMaterial;
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256
 
-#include "ZEPhysics\ZEPhysicalRigidBody.h"
-#include "ZEPhysics\ZEPhysicalShapes.h"
+#include "ZEPhysics/ZEPhysicalRigidBody.h"
+#include "ZEPhysics/ZEPhysicalShapes.h"
 
 /*
 enum ZEPhysicalShapeType
@@ -382,8 +382,4 @@ class ZEModelResource : public ZEResource
 };
 
 #endif
-
-
-
-
 

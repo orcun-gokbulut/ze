@@ -37,18 +37,18 @@
 #ifndef __ZE_MODEL_FILE_FORMAT_H__
 #define __ZE_MODEL_FILE_FORMAT_H__
 
-#include "..\ZEMath\ZEVector.h"
-#include "..\ZEMath\ZEQuaternion.h"
-#include "..\ZEMath\ZEAABoundingBox.h"
-#include "..\ZEDS\ZEArray.h"
-#include "..\ZEDefinitions.h"
-#include "..\ZETypes.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDefinitions.h"
+#include "ZETypes.h"
 
 #define ZE_MDLF_MAX_NAME_SIZE						128
 #define ZE_MDLF_MAX_FILENAME_SIZE					256
 
 #define ZE_FILE_MAKEVERSION(Major, Minor)			((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor))
-#define ZE_MDLF_VERSION								ZE_FILE_MAKEVERSION(0, 40)
+#define ZE_MDLF_VERSION								ZE_FILE_MAKEVERSION(0,40)
 #define ZE_MDLF_HEADER								((ZEDWORD)((ZEDWORD)'ZEMF' + (ZEDWORD)'MDL '))
 
 #define	ZE_MDLF_MATERIAL_CHUNKID					((ZEDWORD)(ZE_MDLF_HEADER + (ZEDWORD)'MTRL'))
@@ -362,7 +362,3 @@ struct ZEModelFileBoneChunk
 };
 
 #endif
-
-
-
-

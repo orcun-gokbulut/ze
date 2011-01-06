@@ -112,6 +112,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
 		CurrentMaterial->SetTransparancyMode(MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE : ZE_MTM_NONE);
 
+		CurrentMaterial->SetAmbientFactor(0.1f);
 		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor);
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);
 		CurrentMaterial->SetSpecularColor(MaterialChunk.SpecularColor);

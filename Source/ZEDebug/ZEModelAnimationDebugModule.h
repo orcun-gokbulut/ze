@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDGrid.h
+ Zinek Engine - ZEModelAnimationDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,38 +34,47 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_GRID_H__
-#define __ZED_GRID_H__
+#ifndef __ZE_MODEL_ANIMATION_DEBUG_MODULE_H__
+#define __ZE_MODEL_ANIMATION_DEBUG_MODULE_H__
 
-#include "ZECanvasBrush.h"
+#include "ZEDebugModule.h"
+#include "ZEGame\ZEModelBrush.h"
+#include "ZEInput\ZEInputMap.h"
 
-class ZEScene;
+class ZEPlayer;
+class ZEPointLight;
+class ZEGrid;
+class ZECamera;
+class ZEModelAnimationTrack;
 
-class ZEDGrid
+class ZEModelAnimationDebugModule : public ZEDebugModule
 {
 	private:
+		ZEPlayer*				Player;
+		ZECamera*				Camera;
+		ZEPointLight*			Light;
+		ZEGrid*					Grid;
+		ZEModel*				Model;
 
-		ZECanvasBrush*				Grid;
-		int							GridSpacing;
-		int							MajorLineSpacing;
-		int							GridSize;
-		ZEScene*					Scene;
+		ZEInputMap				InputMap;
 
-		void						GenerateGrid();
+		ZEModelAnimationTrack*	IdleTrack;
+		ZEModelAnimationTrack*	WalkTrack;
+		ZEModelAnimationTrack*	RunTrack;
 
 	public:
+		virtual bool			Initialize();
+		virtual void			Deinitialize();
+		virtual void			Process(float ElapsedTime);
 
-		int							GetGridSpacing() const;
-		void						SetGridSpacing(int Spacing);
-		int							GetMajorLineSpacing() const;
-		void						SetMajorLineSpacing(int MajorLineSpacing);
-		int							GetGridSize() const;
-		void						SetGridSize(int GridSize);
-		bool						GetVisible();
-		void						SetVisible(bool Visibility);
 
-									ZEDGrid(ZEScene* Scene, int Spacing = 1, int MajorLineSpacing = 5, int GridSize = 50);
-
+								ZEModelAnimationDebugModule();
+		virtual					~ZEModelAnimationDebugModule();
 };
 
 #endif
+
+
+
+
+

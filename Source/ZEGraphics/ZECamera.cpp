@@ -205,6 +205,10 @@ void ZECamera::GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY)
 
 ZECamera::ZECamera()
 {
+	FOV = ZE_PI_2;
+	AspectRatio = zeGraphics->GetAspectRatio();
+	NearZ = zeGraphics->GetNearZ();
+	FarZ = zeGraphics->GetFarZ();
 	UpdateView = true;
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;

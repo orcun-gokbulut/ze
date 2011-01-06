@@ -45,6 +45,7 @@
 #include "ZECore\ZEWindow.h"
 
 #include "ZEDebug\ZEPhysicsDebugModule.h"
+#include "ZEDebug\ZEModelAnimationDebugModule.h"
 #include "ZEDebug\ZEGraphicsDebugModule.h"
 #include "ZEDebug\ZESoundDebugModule.h"
 #include "ZEDebug\ZEMetaDebugModule.h"
@@ -57,7 +58,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	_set_SSE2_enable(1); 
 	ApplicationInstance = hInstance;
 	
-	ZEGraphicsDebugModule DebugModule;
+	ZEModelAnimationDebugModule DebugModule;
+	//ZEGraphicsDebugModule DebugModule;
 	zeCore->SetDebugComponent(&DebugModule);
 
 	zeCore->GetOptions()->Load("options.ini");

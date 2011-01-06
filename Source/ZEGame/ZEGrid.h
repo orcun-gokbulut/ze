@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelAnimation.h
+ Zinek Engine - ZEGrid.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,26 +34,91 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_ANIMATION_H__
-#define __ZE_MODEL_ANIMATION_H__
+#ifndef __ZE_GRID_H__
+#define __ZE_GRID_H__
 
-#include "ZEModelResource.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZECanvasBrush.h"
+#include "ZEGraphics/ZERenderOrder.h"
 
-enum ZEModelAnimationState
+ZE_META_ENTITY_DESCRIPTION(ZEGrid);
+
+class ZEListener;
+class ZEScene;
+class ZESimpleMaterial;
+
+class ZEGrid : public ZEEntity
 {
-	ZE_MAS_STATICFRAME,
-	ZE_MAS_PLAYING,
-	ZE_MAS_PAUSED,
-	ZE_MAS_STOPPED
+	ZE_META_ENTITY()
+	private:
+		ZECanvas					MinorGrid;
+		ZECanvas					MajorGrid;
+		ZECanvas					AxisX;
+		ZECanvas					AxisZ;
+
+		ZESimpleMaterial*			Material;
+		ZERenderOrder				RenderOrder;
+
+		ZEVector2					GridSize;
+		bool						FollowerGrid;
+
+		bool						MinorGridEnabled;
+		ZEVector2					MinorGridUnitSize;
+		ZEVector3					MinorGridColor;
+
+		bool						MajorGridEnabled;
+		ZEVector2					MajorGridUnitSize;
+		ZEVector3					MajorGridColor;
+
+		bool						AxisEnabled;
+		ZEVector3					AxisColor;
+
+		void						GenerateGrid();
+
+	public:
+		ZEDrawFlags					GetDrawFlags() const;
+
+		void						SetGridSize(const ZEVector2& Size);
+		const ZEVector2&			GetGridSize();
+
+		void						SetMinorGridEnabled(bool Enable);
+		bool						GetMinorGridEnabled();
+		void						SetMinorGridUnitSize(const ZEVector2& Size);
+		const ZEVector2&			GetMinorGridUnitSize();
+		void						SetMinorGridColor(const ZEVector3& Color);
+		const ZEVector3&			GetMinorGridColor();
+
+		void						SetMajorGridEnabled(bool Enabled);
+		bool						GetMajorGridEnabled();
+		void						SetMajorGridUnitSize(const ZEVector2& Size);
+		const ZEVector2&			GetMajorGridUnitSize();
+		void						SetMajorGridColor(const ZEVector3& Color);
+		const ZEVector3&			GetMajorGridColor();
+
+		void						SetAxisEnabled(bool Enabled);
+		bool						GetAxisEnabled();
+		void						SetAxisColor(const ZEVector3& Color);
+		const ZEVector3&			GetAxisColor();
+
+		virtual void				Draw(ZEDrawParameters* Parameters);
+
+		virtual bool				Initialize();
+		virtual void				Deinitialize();
+
+									ZEGrid();
+
 };
 
-enum ZEModelAnimationType
-{
-	ZE_MAT_NOANIMATION,
-	ZE_MAT_PREDEFINED,
-	ZE_MAT_PHYSICAL
-};
-
-typedef ZEModelResourceAnimation ZEModelAnimation;
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEGrid" parent="ZEEntity">
+			<description>Base Entity Type</description>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 
 #endif

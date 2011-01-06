@@ -95,12 +95,13 @@ bool ZEModelBrush::GetEnablePhysics() const
 
 void ZEModelBrush::SetAnimationState(ZEModelAnimationState AnimationState)
 {
-	Model->SetAnimationState(AnimationState);
+//	Model->SetAnimationState(AnimationState);
 }
 
 ZEModelAnimationState ZEModelBrush::GetAnimationState() const
 {
-	return Model->GetAnimationState();
+//	return Model->GetAnimationState();
+	return ZE_MAS_STOPPED;
 }
 
 void ZEModelBrush::SetAnimationType(ZEModelAnimationType AnimationType)
@@ -115,45 +116,48 @@ ZEModelAnimationType ZEModelBrush::GetAnimationType() const
 
 void ZEModelBrush::SetAnimationName(const char* AnimationName)
 {
-	Model->SetAnimationByName(strcmp(AnimationName, "") == 0 ? NULL : AnimationName);
+//	Model->SetAnimationByName(strcmp(AnimationName, "") == 0 ? NULL : AnimationName);
 }
 
 const char* ZEModelBrush::GetAnimationName() const
 {
-	if (Model->GetAnimation() != NULL)
+/*	if (Model->GetAnimation() != NULL)
 		return Model->GetAnimation()->Name;
-	else
+	else*/
 		return "";
 }
 
 void ZEModelBrush::SetAnimationLooping(bool AnimationLooping)
 {
-	Model->SetAnimationLooping(AnimationLooping);
+//	Model->SetAnimationLooping(AnimationLooping);
 }
 
 bool ZEModelBrush::GetAnimationLooping() const
 {
-	return Model->GetAnimationLooping();
+//	return Model->GetAnimationLooping();
+	return false;
 }
 
 void ZEModelBrush::SetAnimationFrame(int AnimationFrame)
 {
-		Model->SetAnimationFrame(AnimationFrame);
+//	Model->SetAnimationFrame(AnimationFrame);
 }
 
 int ZEModelBrush::GetAnimationFrame() const
 {
-	return Model->GetAnimationFrame();
+//	return Model->GetAnimationFrame();
+	return 0;
 }
 
 void ZEModelBrush::SetAnimationSpeed(float AnimationSpeed)
 {
-	Model->SetAnimationSpeed(AnimationSpeed);
+//	Model->SetAnimationSpeed(AnimationSpeed);
 }
 
 float ZEModelBrush::GetAnimationSpeed() const
 {
-	return Model->GetAnimationSpeed();
+//	return Model->GetAnimationSpeed();
+	return 0.0f;
 }
 
 bool ZEModelBrush::Initialize()

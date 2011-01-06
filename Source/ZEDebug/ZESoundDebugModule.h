@@ -40,7 +40,7 @@
 #include "ZEDebugModule.h"
 #include "ZEGame/ZESoundBrush2D.h"
 #include "ZEGame/ZESoundBrush3D.h"
-#include "ZEGame\ZEDGrid.h"
+#include "ZEGame/ZEGrid.h"
 
 class ZEPlayer;
 class ZESoundSource;

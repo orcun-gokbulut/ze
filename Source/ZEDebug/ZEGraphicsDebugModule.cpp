@@ -58,7 +58,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	if (Player == NULL)
 	{
 		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
-		Player->SetPosition(ZEVector3(-40.0f, 0.0f, -1.0f));
+		Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
@@ -67,16 +67,6 @@ bool ZEGraphicsDebugModule::Initialize()
 	}
 
 	Scene->LoadMap("deneme.zemap");
-
-	ZEModel* Model = new ZEModel();
-	Model->SetModelResource(ZEModelResource::LoadResource("Soldier.zemodel"));
-	Model->SetAnimationByName("Test");
-	Model->SetAnimationState(ZE_MAS_PLAYING);
-	Model->SetAnimationLooping(true);
-	Model->SetAnimationSpeed(30);
-	Scene->AddEntity(Model);
-
-
 
 	PointLight1 = new ZEPointLight();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
@@ -147,23 +137,22 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetCastsShadow(false);
 	Scene->AddEntity(ProjectiveLight0);
 	
-	// Transformation
-	ZEMatrix4x4 WorldTransform;
-	float TanFovRange = tanf(ProjectiveLight0->GetFOV() * 0.5f) * ProjectiveLight0->GetRange();
-	Brush = new ZECanvasBrush();
-	Brush->SetVisible(false);
-	Brush->Canvas.SetRotation(ZEQuaternion(-ZE_PI_2, ZEVector3::UnitX));
-	Brush->Canvas.SetTranslation(ZEVector3::UnitZ);
-	Brush->Canvas.SetScale(ZEVector3(TanFovRange * ProjectiveLight0->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, ProjectiveLight0->GetRange()));
-	Brush->Canvas.SetColor(ZEVector4(ProjectiveLight0->GetColor(), 1.0f));
-	Brush->Canvas.AddPyramid(1, 1, 1);
-	ZESimpleMaterial* Material = ZESimpleMaterial::CreateInstance();
-	Brush->Material = Material;
-	Material->SetTwoSided(true);
-	Material->SetVertexColor(true);
-	Material->SetWireframe(true);
-	Brush->UpdateCanvas();
-	Scene->AddEntity(Brush);
+	/*ZEModel* Model = NULL;
+	if (Model == NULL)
+	{
+		Model = new ZEModel();		
+		Model->SetModelResource(ZEModelResource::LoadResource("soldier.zemodel"));
+
+		ZEModelAnimationTrack* IdleTrack = Model->GetAnimationTracks().Add();
+		IdleTrack->SetOwner(Model);
+		IdleTrack->SetAnimationByName("Test");
+		IdleTrack->SetSpeed(30.0f);
+		IdleTrack->SetStartFrame(0);
+		IdleTrack->SetEndFrame(5960);
+		IdleTrack->SetLooping(true);
+		IdleTrack->Play();
+		Scene->AddEntity(Model);
+	}*/
 
 	DirectionalLight0 = new ZEDirectionalLight();
 	DirectionalLight0->SetEnabled(true);
@@ -178,9 +167,9 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight3->SetEnabled(false);
 	PointLight4->SetEnabled(false);
 	PointLight5->SetEnabled(false);
-	OmniProjectiveLight0->SetEnabled(true);
+	OmniProjectiveLight0->SetEnabled(false);
 	ProjectiveLight0->SetEnabled(false);
-	DirectionalLight0->SetEnabled(false);
+	DirectionalLight0->SetEnabled(true);
 	return true;
 }
 
@@ -212,7 +201,7 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 	
 	//Player->SetRotation(Rotation);
 	//ProjectiveLight0->SetRotation(Rotation);
-	Brush->SetRotation(Rotation);
+//	Brush->SetRotation(Rotation);
 }
 
 
