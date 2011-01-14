@@ -2225,7 +2225,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\ZECharacter.h"
+				RelativePath=".\Source\ZEGame\ZECharacter.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEGame\ZECharacter.h"
 				>
 			</File>
 			<File

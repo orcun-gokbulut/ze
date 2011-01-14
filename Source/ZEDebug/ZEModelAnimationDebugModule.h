@@ -38,29 +38,22 @@
 #define __ZE_MODEL_ANIMATION_DEBUG_MODULE_H__
 
 #include "ZEDebugModule.h"
-#include "ZEGame\ZEModelBrush.h"
 #include "ZEInput\ZEInputMap.h"
 
-class ZEPlayer;
+class ZECharacter;
 class ZEPointLight;
 class ZEGrid;
 class ZECamera;
-class ZEModelAnimationTrack;
 
 class ZEModelAnimationDebugModule : public ZEDebugModule
 {
 	private:
-		ZEPlayer*				Player;
 		ZECamera*				Camera;
 		ZEPointLight*			Light;
 		ZEGrid*					Grid;
-		ZEModel*				Model;
+		ZECharacter*			Character;
 
 		ZEInputMap				InputMap;
-
-		ZEModelAnimationTrack*	IdleTrack;
-		ZEModelAnimationTrack*	WalkTrack;
-		ZEModelAnimationTrack*	RunTrack;
 
 	public:
 		virtual bool			Initialize();

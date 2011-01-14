@@ -36,28 +36,32 @@
 
 #include "ZEModelAnimationDebugModule.h"
 
-#include "ZEGame\ZEGame.h"
-#include "ZEGame\ZEPlayer.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEGame\ZEGrid.h"
-#include "ZEGraphics\ZEGraphicsModule.h"
-#include "ZEGraphics\ZEPointLight.h"
-#include "ZEModel\ZEModel.h"
-#include "ZEInput\ZEInputModule.h"
-#include "ZEInput\ZEInputDefinitions.h"
+#include "ZECore/ZEConsole.h"
+#include "ZEGame/ZEGame.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEGrid.h"
+#include "ZEGame/ZECharacter.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEPointLight.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEInput/ZEInputModule.h"
+#include "ZEInput/ZEInputDefinitions.h"
+#include "ZEInput/ZEInputMap.h"
 
-#define ACTIONID_FORWARD		0
-#define ACTIONID_BACKWARD		1
-#define ACTIONID_STRAFELEFT		2
-#define ACTIONID_STRAFERIGHT	3
-#define ACTIONID_TURNLEFT		4
-#define ACTIONID_TURNRIGHT		5
-#define ACTIONID_TURNUP			6
-#define ACTIONID_TURNDOWN		7
-#define ACTIONID_ZOOMIN			8
-#define ACTIONID_ZOOMOUT		9
-#define ACTIONID_CONSOLE		10
-#define ACTIONID_RAYCAST		11
+#define ZE_ACTIONID_CAMERA_TURN_LEFT		0
+#define ZE_ACTIONID_CAMERA_TURN_RIGHT		1
+#define ZE_ACTIONID_CAMERA_TURN_UP			2
+#define ZE_ACTIONID_CAMERA_TURN_DOWN		3
+#define ZE_ACTIONID_CAMERA_ZOOM_IN			4
+#define ZE_ACTIONID_CAMERA_ZOOM_OUT			5
+#define ZE_ACTIONID_CHARACTER_MOVE_FORWARD	6
+#define ZE_ACTIONID_CHARACTER_MOVE_BACKWARD	7
+#define ZE_ACTIONID_CHARACTER_RUN			8
+#define ZE_ACTIONID_CHARACTER_STRAFE_LEFT   9
+#define ZE_ACTIONID_CHARACTER_STRAFE_RIGHT  10
+#define ZE_ACTIONID_CHARACTER_TURN_LEFT		11
+#define ZE_ACTIONID_CHARACTER_TURN_RIGHT	12
+
 
 bool ZEModelAnimationDebugModule::Initialize()
 {
@@ -86,68 +90,33 @@ bool ZEModelAnimationDebugModule::Initialize()
 		Light->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
 		Light->SetColor(ZEVector3::One);
 		Light->SetAttenuation(0.01f, 0.0f, 1.0f);
-		Light->SetIntensity(0.3f);
+		Light->SetIntensity(1.0f);
 		Light->SetRange(55.0f);
 		Light->SetCastShadows(false);
 		Scene->AddEntity(Light);
 	}
 
-	if (Model == NULL)
+	if (Character == NULL)
 	{
-		Model = new ZEModel();		
-		Model->SetModelResource(ZEModelResource::LoadResource("soldier.zemodel"));
-		
-		IdleTrack = Model->GetAnimationTracks().Add();
-		IdleTrack->SetOwner(Model);
-		IdleTrack->SetAnimationByName("Test");
-		IdleTrack->SetSpeed(30.0f);
-		IdleTrack->SetStartFrame(5);
-		IdleTrack->SetEndFrame(105);
-		IdleTrack->SetLooping(true);
-		IdleTrack->Play();
-
-
-		// Walk
-		WalkTrack = Model->GetAnimationTracks().Add();
-		WalkTrack->SetOwner(Model);
-		WalkTrack->SetAnimationByName("Test");
-		WalkTrack->SetSpeed(30.0f);
-		WalkTrack->SetStartFrame(315);
-		WalkTrack->SetEndFrame(355);
-		WalkTrack->SetLooping(true);
-		WalkTrack->SetBlendFactor(0.0f);
-		WalkTrack->Play();
-
-		// Run
-		RunTrack = Model->GetAnimationTracks().Add();
-		RunTrack->SetOwner(Model);
-		RunTrack->SetAnimationByName("Test");
-		RunTrack->SetSpeed(30.0f);
-		RunTrack->SetStartFrame(405);
-		RunTrack->SetEndFrame(435);
-		RunTrack->SetLooping(true);
-		RunTrack->SetBlendFactor(0.0f);
-		RunTrack->Play();
-
-		Scene->AddEntity(Model);
+		Character = new ZECharacter();
+		Scene->AddEntity(Character);
 	}
 
-	IdleTrack = &Model->GetAnimationTracks()[0];
-	WalkTrack = &Model->GetAnimationTracks()[1];
-	RunTrack = &Model->GetAnimationTracks()[2];
+	InputMap.InputBindings.Clear();
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,		"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_ALL)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,	"Move Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_ALL)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT, "Strafe Right",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_D, ZE_IBS_ALL)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFELEFT,	"Strafe Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_A, ZE_IBS_ALL)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNUP,		"Turn Up",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNDOWN,	"Turn Down",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNRIGHT,	"Turn Right",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNLEFT,	"Turn Left",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_ZOOMIN,		"Zoom In",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_SCROLL_AXIS, ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_ZOOMOUT,		"Zoom Out",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_SCROLL_AXIS, ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RAYCAST,		"Ray Cast",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_R, ZE_IBS_RELEASED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_CONSOLE,		"Console",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_GRAVE, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_UP,			"Turn Up",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_DOWN,			"Turn Down",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_RIGHT,		"Turn Right",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_LEFT,			"Turn Left",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_ZOOM_IN,			"Zoom In",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_SCROLL_AXIS, ZE_IAS_POSITIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_ZOOM_OUT,			"Zoom Out",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_SCROLL_AXIS, ZE_IAS_NEGATIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RUN,			"Run",				ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_LSHIFT, ZE_IBS_ALL)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_MOVE_FORWARD,	"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_ALL)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_MOVE_BACKWARD,	"Move Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_ALL)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_TURN_RIGHT,		"Turn Right",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_D, ZE_IBS_ALL)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_TURN_LEFT,		"Turn Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_A, ZE_IBS_ALL)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_STRAFE_RIGHT,	"Turn Right",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_E, ZE_IBS_ALL)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_STRAFE_LEFT,	"Turn Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_Q, ZE_IBS_ALL)));
 
 	return true;
 }
@@ -160,11 +129,12 @@ void ZEModelAnimationDebugModule::Deinitialize()
 		Camera = NULL;
 	}
 
-	if (Model != NULL)
+	if (Character != NULL)
 	{
-		Model->Destroy();
-		Model = NULL;
+		Character->Destroy();
+		Character = NULL;
 	}
+
 	if (Grid != NULL)
 	{
 		Grid->Destroy();
@@ -183,73 +153,66 @@ void ZEModelAnimationDebugModule::Process(float ElapsedTime)
 	static float Elevation = 0.0f;
 	static float Rotation = 0.0f;
 	static float Radious = 5.0f;
-	static float Movement = 0.0f;
+
 	zeInput->ProcessInputMap(&InputMap);
 
 	for (size_t I = 0; I < InputMap.InputActionCount; I++)
 	{
 		ZEInputAction* CurrentAction = &InputMap.InputActions[I];
 		switch (CurrentAction->Id)
-		{
-			case ACTIONID_FORWARD:
-				Movement += 0.1f * ElapsedTime;
+		{	
+			case ZE_ACTIONID_CHARACTER_MOVE_FORWARD:
+				if (InputMap.CheckInputAction(ZE_ACTIONID_CHARACTER_RUN) != NULL)
+					Character->RunForward();
+				else
+					Character->WalkForward();
 				break;
 
-			case ACTIONID_BACKWARD:
-				Movement -= 0.1f * ElapsedTime;
+			case ZE_ACTIONID_CHARACTER_MOVE_BACKWARD:
+				Character->Stop();
 				break;
 
-			case ACTIONID_TURNUP:
+			case ZE_ACTIONID_CHARACTER_TURN_LEFT:
+				Character->TurnLeft();
+				break;
+
+			case ZE_ACTIONID_CHARACTER_TURN_RIGHT:
+				Character->TurnRight();
+				break;
+
+			case ZE_ACTIONID_CHARACTER_STRAFE_LEFT:
+				Character->StrafeLeft();
+				break;
+
+			case ZE_ACTIONID_CHARACTER_STRAFE_RIGHT:
+				Character->StrafeRight();
+				break;
+
+			case ZE_ACTIONID_CAMERA_TURN_UP:
 				Elevation += 0.001f * CurrentAction->AxisValue;
 				break;
 
-			case ACTIONID_TURNDOWN:
+			case ZE_ACTIONID_CAMERA_TURN_DOWN:
 				Elevation -= 0.001f * CurrentAction->AxisValue;
 				break;
 
-			case ACTIONID_TURNRIGHT:
+			case ZE_ACTIONID_CAMERA_TURN_RIGHT:
 				Rotation += 0.001f * CurrentAction->AxisValue;
 				break;
 
-			case ACTIONID_TURNLEFT:
+			case ZE_ACTIONID_CAMERA_TURN_LEFT:
 				Rotation -= 0.001f * CurrentAction->AxisValue;
 				break;
 
-			case ACTIONID_ZOOMIN:
+			case ZE_ACTIONID_CAMERA_ZOOM_IN:
 				Radious -= 0.001f * CurrentAction->AxisValue;
 				break;
 	
-			case ACTIONID_ZOOMOUT:
+			case ZE_ACTIONID_CAMERA_ZOOM_OUT:
 				Radious += 0.001f * CurrentAction->AxisValue;
 				break;
 		}
 	}
-
-	/*if (Movement < 0.0f)
-		Movement = 0.0f;
-	else if (Movement > 1.0f)
-		Movement = 1.0f;
-
-	if (Movement > 0.5f)
-	{
-		RunTrack->SetSpeed((Movement - 0.5f) * 60.0f);
-		WalkTrack->Stop();
-		RunTrack->Play();
-
-	}
-	else if (Movement > 0.0f)
-	{
-		WalkTrack->SetSpeed(Movement * 60.0f);
-		WalkTrack->Play();
-		RunTrack->Stop();
-		IdleTrack->Stop();
-	}
-	else
-	{
-		WalkTrack->Stop();
-		RunTrack->Stop();
-		IdleTrack->Play();
-	}*/
 
 	if (Elevation < -ZE_PI)
 		Elevation = -ZE_PI;
@@ -266,24 +229,21 @@ void ZEModelAnimationDebugModule::Process(float ElapsedTime)
 
 	ZEVector3 CameraPosition;
 	ZEVector3::CreateFromSpherical(CameraPosition, Radious, Elevation, Rotation);
-	ZEVector3::Add(CameraPosition, Model->GetWorldPosition(), CameraPosition);
+	ZEVector3::Add(CameraPosition, ZEVector3(Character->GetPosition().x, 1.0f, Character->GetPosition().z), CameraPosition);
 	Camera->SetPosition(CameraPosition);
-
+	Light->SetPosition(CameraPosition);
 	ZEQuaternion CameraRotation;
 
 	ZEQuaternion::CreateFromEuler(CameraRotation, ZE_PI_2 + Elevation, ZE_PI_2 - Rotation, 0.0f);
 	Camera->SetRotation(CameraRotation);
-
-
 }
 
 ZEModelAnimationDebugModule::ZEModelAnimationDebugModule()
 {
 	Camera = NULL;
-	Player = NULL;
 	Grid = NULL;
 	Light = NULL;
-	Model = NULL;
+	Character = NULL;
 }
 
 ZEModelAnimationDebugModule::~ZEModelAnimationDebugModule()

@@ -164,7 +164,7 @@ bool ZEGrid::Initialize()
 	RenderOrder.SetZero();
 	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 	RenderOrder.PrimitiveType = ZE_ROPT_LINE;
-	RenderOrder.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;// | ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_NO_Z_WRITE;
+	RenderOrder.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_NO_Z_WRITE;
 	RenderOrder.Material = Material;
 
 	return true;
