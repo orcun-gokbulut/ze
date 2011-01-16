@@ -39,9 +39,11 @@
 
 #include "ZEDebugModule.h"
 #include "ZEInput\ZEInputMap.h"
+#include "ZEMath/ZEVector.h"
 
 class ZECharacter;
 class ZEPointLight;
+class ZEProjectiveLight;
 class ZEGrid;
 class ZECamera;
 class ZESkyBrush;
@@ -54,7 +56,9 @@ class ZEModelAnimationDebugModule : public ZEDebugModule
 		ZEGrid*					Grid;
 		ZECharacter*			Character;
 		ZESkyBrush*				Sky;
+		ZEProjectiveLight*		FlashLight;
 
+		ZEVector3				TargetPosition;
 		ZEInputMap				InputMap;
 
 	public:

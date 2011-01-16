@@ -118,6 +118,7 @@ class ZECharacter : public ZECompoundEntity
 		float						RunTransitionTime;
 		float						RunSpeed;
 
+public:
 		float						TurnAngle;
 		float						TurnRatio;
 		ZECharacterTurnStatus		TurnStatus;

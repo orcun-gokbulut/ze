@@ -348,11 +348,11 @@ void ZECharacter::Turning(float ElapsedTime)
 
 	TurnAngle += TurnRatio * (MovementRatio < 1.0f ? TurnSpeed : MovementTurnSpeed) * ElapsedTime;
 
-	if (TurnAngle > ZE_PIx2)
-		TurnAngle = fmodf(TurnAngle, ZE_PIx2);
+	if (TurnAngle > ZE_PI)
+		TurnAngle = -ZE_PI; //fmodf(TurnAngle, ZE_PI);
 	
-	if (TurnAngle < -ZE_PIx2)
-		TurnAngle = ZE_PIx2 - fmodf(TurnAngle, ZE_PIx2);
+	if (TurnAngle < -ZE_PI)
+		TurnAngle = ZE_PI;// - fmodf(TurnAngle, ZE_PI);
 
 	ZEQuaternion Rotation(TurnAngle, ZEVector3(0.0f, 1.0f, 0.0f));
 	SetRotation(Rotation);
@@ -548,10 +548,9 @@ void ZECharacter::AdvanceRecording(float ElapsedTime)
 void ZECharacter::Tick(float ElapsedTime)
 {
 	AdvanceRecording(ElapsedTime);
-
+	Turning(ElapsedTime);
 	Movement(ElapsedTime);
 	Strafe(ElapsedTime);
-	Turning(ElapsedTime);
 
 	Model->Tick(ElapsedTime);
 	ZEEntity::Tick(ElapsedTime);

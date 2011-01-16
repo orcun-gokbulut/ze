@@ -586,17 +586,28 @@ bool ZEScene::Save(const char* FileName)
 		
 		Serializer.Write(&LastEntityId, sizeof(int), 1);
 		if (MapResource != NULL)
-			Serializer.Write(MapResource->GetFileName(), sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+		{
+			char NameBuffer[ZE_MAX_NAME_SIZE];
+			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
+			strcpy(NameBuffer, MapResource->GetFileName());
+
+			Serializer.Write(NameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+		}
 		else
 		{
-			char Temp[ZE_MAX_FILE_NAME_SIZE];
-			Temp[0] = '\0';
-			Serializer.Write(&Temp, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+			char NameBuffer[ZE_MAX_NAME_SIZE];
+			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
+
+			Serializer.Write(&NameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
 		}
 
 		for (size_t I = 0; I < Entities.GetCount(); I++)
 		{
-			Serializer.Write((void*)Entities[I]->GetClassDescription()->GetType(), sizeof(char), ZE_MAX_NAME_SIZE);
+			char NameBuffer[ZE_MAX_NAME_SIZE];
+			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
+			strcpy(NameBuffer, Entities[I]->GetClassDescription()->GetName());
+			Serializer.Write((void*)NameBuffer, sizeof(char), ZE_MAX_NAME_SIZE);
+
 			if (!Entities[I]->Serialize((ZESerializer*)&Serializer))
 			{
 				zeError("Scene", "Serialization of entity \"%s\" has failed.", Entities[I]->GetName());
@@ -633,13 +644,14 @@ bool ZEScene::Load(const char* FileName)
 		Unserializer.Read(&LastEntityId, sizeof(int), 1);
 		char MapFile[ZE_MAX_FILE_NAME_SIZE];
 		Unserializer.Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
-		Map->Initialize();
-		if (!LoadMap(MapFile))
-		{ 
-			zeError("Scene", "Unserialization can not load map file. (Map File : \"%s\")", MapFile);
-			zeError("Scene", "Unserialization failed.");
-			return false;
-		}
+
+		if (strcmp(MapFile, "") != 0)
+			if (!LoadMap(MapFile))
+			{ 
+				zeError("Scene", "Unserialization can not load map file. (Map File : \"%s\")", MapFile);
+				zeError("Scene", "Unserialization failed.");
+				return false;
+			}
 
 		Entities.Clear();
 		Entities.SetCount(EntityCount);

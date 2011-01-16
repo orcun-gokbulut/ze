@@ -85,7 +85,11 @@ bool ZEClass::Serialize(ZESerializer* Serializer)
 
 		for (size_t I = 0; I < PropertyCount; I++)
 		{
-			Serializer->Write((void*)Properties[I].Name, sizeof(char), ZE_MAX_NAME_SIZE);
+			char NameBuffer[ZE_MAX_NAME_SIZE];
+			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
+			strcpy(NameBuffer, Properties[I].Name);
+
+			Serializer->Write((void*)NameBuffer, sizeof(char), ZE_MAX_NAME_SIZE);
 			if (Properties[I].Access == ZE_PA_READWRITE)
 				if (!GetProperty(PropertyOffset + I, Value))
 				{

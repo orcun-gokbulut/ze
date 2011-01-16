@@ -103,7 +103,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetZero();
 		CurrentMaterial->SetTwoSided(false);
 		CurrentMaterial->SetDiffuseEnabled(true);
-		CurrentMaterial->SetAmbientEnabled(true);
+		CurrentMaterial->SetAmbientEnabled(false);
 		CurrentMaterial->SetSpecularEnabled(true);
 		CurrentMaterial->SetEmmisiveEnabled(true);
 		
@@ -112,24 +112,23 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
 		CurrentMaterial->SetTransparancyMode(MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE : ZE_MTM_NONE);
 
-		CurrentMaterial->SetAmbientFactor(0.5f);
-		CurrentMaterial->SetAmbientColor(ZEVector3(1.0f, 1.0f, 1.0f)); //MaterialChunk.AmbientColor);
+		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor);
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);
 		CurrentMaterial->SetSpecularColor(MaterialChunk.SpecularColor);
 		CurrentMaterial->SetEmmisiveColor(MaterialChunk.EmmisiveColor);
 		CurrentMaterial->SetEmmisiveFactor(MaterialChunk.EmmisiveFactor);
 		CurrentMaterial->SetSpecularEnabled(false);
-		CurrentMaterial->SetSpecularFactor(1.0f);
+		CurrentMaterial->SetSpecularFactor(0.2f);
 		CurrentMaterial->SetSpecularShininess(MaterialChunk.SpecularFactor);
 		CurrentMaterial->SetOpacity(MaterialChunk.Transparancy);
 		CurrentMaterial->SetReflectionFactor(MaterialChunk.ReflectionFactor);
 		CurrentMaterial->SetRefractionFactor(MaterialChunk.RefractionFactor);
 		CurrentMaterial->SetDetailMapTiling(MaterialChunk.DetailMapTiling);
 
-		CurrentMaterial->SetBaseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap));
+		//CurrentMaterial->SetBaseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap));
 		
 		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_NORMAL_MAP);
-		CurrentMaterial->SetNormalMap(ManageMapMaterialTextures(MaterialChunk.NormalMap));
+		//CurrentMaterial->SetNormalMap(ManageMapMaterialTextures(MaterialChunk.NormalMap));
 		CurrentMaterial->SetSpecularMap(ManageMapMaterialTextures(MaterialChunk.SpecularMap));
 		CurrentMaterial->SetEmmisiveMap(ManageMapMaterialTextures(MaterialChunk.EmmisiveMap));
 		CurrentMaterial->SetOpacityMap(ManageMapMaterialTextures(MaterialChunk.OpacityMap));
