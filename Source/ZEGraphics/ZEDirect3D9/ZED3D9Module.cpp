@@ -52,6 +52,7 @@
 #include "ZED3D9ShadowRenderer.h"
 #include "ZED3D9UIMaterial.h"
 #include "ZED3D9SimpleMaterial.h"
+#include "ZED3D9SkyBoxMaterial.h"
 #include "ZED3D9Common.h"
 #include "ZED3D9ShaderManager.h"
 
@@ -607,6 +608,11 @@ ZEUIMaterial* ZED3D9Module::CreateUIMaterial()
 ZESimpleMaterial* ZED3D9Module::CreateSimpleMaterial()
 {
 	return new ZED3D9SimpleMaterial();
+}
+
+ZESkyBoxMaterial* ZED3D9Module::CreateSkyBoxMaterial()
+{
+	return new ZED3D9SkyBoxMaterial();
 }
 
 ZEFixedMaterial* ZED3D9Module::CreateCustomMaterial()

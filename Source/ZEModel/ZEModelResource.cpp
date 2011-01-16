@@ -168,7 +168,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
 		CurrentMaterial->SetTransparancyMode(ZE_MTM_NONE);//MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE: ZE_MTM_NOTRANSPARACY);
 
-		CurrentMaterial->SetAmbientColor(ZEVector3(0.1, 0.1, 0.1));
+		CurrentMaterial->SetAmbientColor(ZEVector3(0.5, 0.5, 0.5));
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);
 		CurrentMaterial->SetSpecularColor(MaterialChunk.SpecularColor);
 		CurrentMaterial->SetEmmisiveColor(MaterialChunk.EmmisiveColor);

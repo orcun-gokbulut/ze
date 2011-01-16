@@ -48,7 +48,7 @@
 				AdditionalOptions="/MP8"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\PhysX\Cooking&quot;;&quot;$(ProjectDir)\include\PhysX\Foundation&quot;;&quot;$(ProjectDir)\include\PhysX\NxCharacter&quot;;&quot;$(ProjectDir)\include\PhysX\PhysXLoader&quot;;&quot;$(ProjectDir)\include\PhysX\Physics&quot;;&quot;$(ProjectDir)\include\OpenAL&quot;;&quot;$(ProjectDir)\include\DirectX&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_ZINEK_ENGINE;ZE_DEBUG_ENABLED;_ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_D3D9_PERFHUD;ZE_DEBUG_SHADERS;ZE_DEBUG_CHECK_MEMORY;ZE_DEBUG_D3D9_PROFILER;NX_USER_DEBUG_MODE"
+				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_ZINEK_ENGINE;ZE_DEBUG_ENABLED;_ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_D3D9_PERFHUD;_ZE_DEBUG_SHADERS;_ZE_DEBUG_CHECK_MEMORY;ZE_DEBUG_D3D9_PROFILER;NX_USER_DEBUG_MODE"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				ExceptionHandling="1"
@@ -711,6 +711,14 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9SkyBoxMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9SkyBoxMaterial.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\ZEGraphics\ZEDirect3D9\ZED3D9SSAOProcessor.cpp"
 					>
 				</File>
@@ -890,7 +898,7 @@
 						</FileConfiguration>
 					</File>
 					<File
-						RelativePath=".\RunDir\resources\shaders\SkyBox.hlsl"
+						RelativePath=".\RunDir\resources\shaders\SkyBoxMaterial.hlsl"
 						>
 						<FileConfiguration
 							Name="Debug|Win32"
@@ -971,6 +979,14 @@
 				</File>
 				<File
 					RelativePath=".\Source\ZEGraphics\ZESimpleMaterial.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZESkyBoxMaterial.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEGraphics\ZESkyBoxMaterial.h"
 					>
 				</File>
 				<File

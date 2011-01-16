@@ -44,6 +44,7 @@ class ZECharacter;
 class ZEPointLight;
 class ZEGrid;
 class ZECamera;
+class ZESkyBrush;
 
 class ZEModelAnimationDebugModule : public ZEDebugModule
 {
@@ -52,6 +53,7 @@ class ZEModelAnimationDebugModule : public ZEDebugModule
 		ZEPointLight*			Light;
 		ZEGrid*					Grid;
 		ZECharacter*			Character;
+		ZESkyBrush*				Sky;
 
 		ZEInputMap				InputMap;
 

@@ -214,7 +214,7 @@ bool ZEPlayer::Initialize()
 	PointLight.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	PointLight.SetAttenuation(0.1f, 0.0f, 1.0f);
 	PointLight.SetRange(1000.0f);
-	PointLight.SetIntensity(10.0f);
+	PointLight.SetIntensity(15.0f);
 	PointLight.SetColor(ZEVector3(1.0f, 1.0f, 1.0));
 	PointLight.SetEnabled(true);
 

@@ -224,6 +224,7 @@ void ZEEntity::Deinitialize()
 
 void ZEEntity::Destroy()
 {
+	Deinitialize();
 	delete this;
 }
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SkyBox.hlsl
+ Zinek Engine - ZESkyBoxMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,67 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-// Transformation matrices 5 matrices
-float4x4 WorldViewProjMatrix : register(vs, c0);
-float4x4 WorldMatrix : register(vs, c4);
-float4x4 WorldInvTrpsMatrix : register(vs, c8);
-float4x4 WorldInvMatrix : register(vs, c12);
+#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZESkyBoxMaterial.h"
 
-// Other general constants 4 vectors
-float4 ViewPosition : register(vs, c16);
-float MaterialRefractionIndex : register(vs, c17);
-
-float4 SkyColor : register(ps, c0);
-sampler SkyTexture : register(ps, s0);
-
-struct VSInput 
+ZESkyBoxMaterial::ZESkyBoxMaterial()
 {
-	float4 Position				: POSITION0;
-};
-
-struct VSOutput 
-{
-	float4 Position				: POSITION0;
-	float3 CubeTexcoord			: TEXCOORD0;
-};
-
-VSOutput vs_main(VSInput Input)
-{
-	VSOutput Output;
-
-	Output.Position = Input.Position;
-	Output.CubeTexcoord = mul(Input.Position, WorldViewProjMatrix);
-	
-	return Output;
+	SetZero();
 }
 
-struct PSInput
+ZESkyBoxMaterial::~ZESkyBoxMaterial()
 {
-	float3 CubeTexcoord       : TEXCOORD0;
-};
+	
+}
 
-half4 ps_main(PSInput Input) : COLOR0
+ZEMaterialType ZESkyBoxMaterial::GetMaterialType() const
 {
-	return SkyColor * texCUBE(SkyTexture, normalize(Input.CubeTexcoord));
+	return ZE_MTT_NON_ILLUMUNATED;
+}
+
+ZEMaterialFlags ZESkyBoxMaterial::GetMaterialFlags() const
+{
+	return ZE_MTF_NONE;
+}
+
+void ZESkyBoxMaterial::SetZero()
+{
+	Color = ZEVector3::One;
+	Brightness = 1.0f;
+	Texture = NULL;
+}
+
+void ZESkyBoxMaterial::SetColor(const ZEVector3& Color)
+{
+	this->Color = Color;
+}
+
+const ZEVector3& ZESkyBoxMaterial::GetColor() const
+{
+	return Color;
+}
+
+void ZESkyBoxMaterial::SetBrightness(float Brightness)
+{
+	this->Brightness = Brightness;
+}
+
+float ZESkyBoxMaterial::GetBrightness() const
+{
+	return Brightness;
+}
+
+void ZESkyBoxMaterial::SetTexture(const ZETextureCube* Texture)
+{
+	this->Texture = Texture;
+}
+
+const ZETextureCube* ZESkyBoxMaterial::GetTexture() const
+{
+	return Texture;
+}
+
+ZESkyBoxMaterial* ZESkyBoxMaterial::CreateInstance()
+{
+	return zeGraphics->CreateSkyBoxMaterial();
 }

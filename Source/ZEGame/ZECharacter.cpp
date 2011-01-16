@@ -93,6 +93,20 @@ void ZECharacter::Movement(float ElapsedTime)
 		zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
 		break;
 
+	case ZE_CMS_WALKING_BACKWARD:
+		if (MovementRatio < -1.0f)
+		{
+			MovementRatio += ElapsedTime / WalkBackwardTransitionTime;
+		}
+		else
+		{
+			MovementRatio -= ElapsedTime / WalkBackwardTransitionTime;
+			if (MovementRatio < -1.0f)
+				MovementRatio = -1.0f;
+		}
+		zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
+		break;
+
 	case ZE_CMS_RUNNING_FORWARD:
 		if (MovementRatio > 2.0f)
 		{
@@ -119,6 +133,7 @@ void ZECharacter::Movement(float ElapsedTime)
 		RunAnimationTrack->SetBlendFactor(1.0f);
 		IdleAnimationTrack->SetBlendFactor(0.0f);
 		WalkAnimationTrack->SetBlendFactor(0.0f);
+		WalkBackwardAnimationTrack->SetBlendFactor(0.0f);
 
 		MovementSpeed = RunSpeed;
 	}
@@ -134,6 +149,7 @@ void ZECharacter::Movement(float ElapsedTime)
 		RunAnimationTrack->SetBlendFactor(MovementRatio - 1.0f);
 		WalkAnimationTrack->SetBlendFactor(1.0f - (MovementRatio - 1.0f));
 		IdleAnimationTrack->SetBlendFactor(0.0f);
+		WalkBackwardAnimationTrack->SetBlendFactor(0.0f);
 
 		MovementSpeed = WalkSpeed + (RunSpeed - WalkSpeed) * (MovementRatio - 1.0f);
 	}
@@ -149,6 +165,7 @@ void ZECharacter::Movement(float ElapsedTime)
 		RunAnimationTrack->SetBlendFactor(0.0f);
 		WalkAnimationTrack->SetBlendFactor(MovementRatio);
 		IdleAnimationTrack->SetBlendFactor(0.0f);
+		WalkBackwardAnimationTrack->SetBlendFactor(0.0f);
 
 		IdleAnimationTrack->Resume();
 		MovementSpeed = WalkSpeed;
@@ -162,6 +179,7 @@ void ZECharacter::Movement(float ElapsedTime)
 		RunAnimationTrack->SetBlendFactor(0.0f);
 		WalkAnimationTrack->SetBlendFactor(MovementRatio);
 		IdleAnimationTrack->SetBlendFactor(1.0f - MovementRatio);
+		WalkBackwardAnimationTrack->SetBlendFactor(0.0f);
 
 		MovementSpeed = WalkSpeed * MovementRatio;
 	}
@@ -178,15 +196,42 @@ void ZECharacter::Movement(float ElapsedTime)
 		RunAnimationTrack->Stop();
 		RunAnimationTrack->SetBlendFactor(0.0f);
 
+		WalkBackwardAnimationTrack->Stop();
+		WalkBackwardAnimationTrack->SetBlendFactor(0.0f);
+
 		MovementSpeed = 0.0f;
 	}
 	else if (MovementRatio < 0.0f && MovementRatio > -1.0f)
 	{
-		// Idle <-> Backward
+		// Walk <-> Idle
+		if (WalkBackwardAnimationTrack->GetState() == ZE_MAS_STOPPED)
+			WalkBackwardAnimationTrack->Play();
+
+		if (IdleAnimationTrack->GetState() == ZE_MAS_STOPPED)
+			IdleAnimationTrack->Play();
+
+		RunAnimationTrack->SetBlendFactor(0.0f);
+		WalkAnimationTrack->SetBlendFactor(0.0f);
+		WalkBackwardAnimationTrack->SetBlendFactor(-MovementRatio);
+		IdleAnimationTrack->SetBlendFactor(1.0f + MovementRatio);
+
+		MovementSpeed = WalkSpeed * MovementRatio;
 	}
 	else if (MovementRatio == -1.0f)
 	{
 		// Walk Backward
+		if (WalkBackwardAnimationTrack->GetState() == ZE_MAS_STOPPED)
+			WalkBackwardAnimationTrack->Play();
+
+		if (IdleAnimationTrack->GetState() == ZE_MAS_STOPPED)
+			IdleAnimationTrack->Play();
+
+		RunAnimationTrack->SetBlendFactor(0.0f);
+		WalkAnimationTrack->SetBlendFactor(0.0f);
+		IdleAnimationTrack->SetBlendFactor(0.0f);
+		WalkBackwardAnimationTrack->SetBlendFactor(1.0f);
+
+		MovementSpeed = -WalkSpeed;
 	}
 	else if (MovementRatio < -1.0f && MovementRatio > -2.0f)
 	{
@@ -294,6 +339,11 @@ void ZECharacter::Turning(float ElapsedTime)
 			TurnLeftAnimationTrack->SetBlendFactor(1.0f);
 		}
 	}
+	else
+	{
+		TurnLeftAnimationTrack->SetBlendFactor(0.0f);
+		TurnRightAnimationTrack->SetBlendFactor(0.0f);
+	}
 
 
 	TurnAngle += TurnRatio * (MovementRatio < 1.0f ? TurnSpeed : MovementTurnSpeed) * ElapsedTime;
@@ -301,7 +351,7 @@ void ZECharacter::Turning(float ElapsedTime)
 	if (TurnAngle > ZE_PIx2)
 		TurnAngle = fmodf(TurnAngle, ZE_PIx2);
 	
-	if (TurnAngle < ZE_PIx2)
+	if (TurnAngle < -ZE_PIx2)
 		TurnAngle = ZE_PIx2 - fmodf(TurnAngle, ZE_PIx2);
 
 	ZEQuaternion Rotation(TurnAngle, ZEVector3(0.0f, 1.0f, 0.0f));
@@ -400,6 +450,11 @@ void ZECharacter::Strafe(float ElapsedTime)
 			StrafeLeftAnimationTrack->SetBlendFactor(1.0f);
 		}
 	}
+	else
+	{
+		StrafeLeftAnimationTrack->SetBlendFactor(0.0f);
+		StrafeRightAnimationTrack->SetBlendFactor(0.0f);
+	}
 
 
 	ZEQuaternion::VectorProduct(StrafeVelocity, GetRotation(), ZEVector3::UnitX);
@@ -409,41 +464,133 @@ void ZECharacter::Strafe(float ElapsedTime)
 	StrafeStatus = ZE_CSS_NO_STRAFE;
 }
 
+#define ZE_CRRE_WALKING_FORWARD 1
+#define ZE_CRRE_WALKING_BACKWARD 2
+#define ZE_CRRE_RUNNING_FORWARD 3
+#define ZE_CRRE_TURNING_RIGHT 4
+#define ZE_CRRE_TURNING_LEFT 5
+#define ZE_CRRE_STRAFE_RIGHT 6 
+#define ZE_CRRE_STRAFE_LEFT 7
+
+void ZECharacter::RecordEvent(ZEDWORD Event)
+{
+	if (RecordingStatus != ZE_CRS_RECORDING)
+		return;
+
+	ZECharacterRecordingKey Key;
+	Key.Event = Event;
+	Key.Time = RecordingTime;
+	Key.Position = GetPosition();
+	Key.Rotation = GetRotation();
+	Key.TurnAngle = TurnAngle;
+	Records.Add(Key);
+}
+
+void ZECharacter::AdvanceRecording(float ElapsedTime)
+{
+	if (RecordingStatus == ZE_CRS_RECORDING)
+	{
+		RecordingTime += ElapsedTime;
+	}
+	else if (RecordingStatus == ZE_CRS_PLAYING)
+	{
+		if (RecordingFrame >= Records.GetCount())
+			RecordingStatus = ZE_CRS_STOPPED;
+
+		for (size_t I = RecordingFrame; I < Records.GetCount(); I++)
+		{
+			if (Records[I].Time > RecordingTime)
+				break;
+
+			SetPosition(Records[I].Position);
+			SetRotation(Records[I].Rotation);
+			TurnAngle = Records[I].TurnAngle;
+			
+			switch (Records[I].Event)
+			{
+				case ZE_CRRE_WALKING_FORWARD:
+					WalkForward();
+					break;
+
+				case ZE_CRRE_WALKING_BACKWARD:
+					WalkBackward();
+					break;
+
+				case ZE_CRRE_RUNNING_FORWARD:
+					RunForward();
+					break;
+
+				case ZE_CRRE_TURNING_RIGHT:
+					TurnRight();
+					break;
+
+				case ZE_CRRE_TURNING_LEFT:
+					TurnLeft();
+					break;
+
+				case ZE_CRRE_STRAFE_RIGHT:
+					StrafeRight();
+					break;
+
+				case ZE_CRRE_STRAFE_LEFT:
+					StrafeLeft();
+					break;
+			}
+
+			RecordingFrame++;
+		}
+		
+		RecordingTime += ElapsedTime;
+	}
+}
+
+
 void ZECharacter::Tick(float ElapsedTime)
 {
+	AdvanceRecording(ElapsedTime);
+
 	Movement(ElapsedTime);
 	Strafe(ElapsedTime);
 	Turning(ElapsedTime);
 
 	Model->Tick(ElapsedTime);
 	ZEEntity::Tick(ElapsedTime);
-
-
 }
 
 void ZECharacter::WalkForward()
 {
 	MovementStatus = ZE_CMS_WALKING_FORWARD;
+	RecordEvent(ZE_CRRE_WALKING_FORWARD);
 }
 
 void ZECharacter::RunForward()
 {
 	MovementStatus = ZE_CMS_RUNNING_FORWARD;
+	RecordEvent(ZE_CRRE_RUNNING_FORWARD);
+}
+
+void ZECharacter::WalkBackward()
+{
+	MovementStatus = ZE_CMS_WALKING_BACKWARD;
+	RecordEvent(ZE_CRRE_WALKING_BACKWARD);
 }
 
 void ZECharacter::SprintForward()
 {
 	MovementStatus = ZE_CMS_SPRINT_FORWARD;
+	//RecordEvent(ZE_CRRE_WALKING_FORWARD);
 }
 
 void ZECharacter::StrafeLeft()
 {
 	StrafeStatus = ZE_CSS_STRAFE_LEFT;
+	RecordEvent(ZE_CRRE_STRAFE_LEFT);
 }
 
 void ZECharacter::StrafeRight()
 {
 	StrafeStatus = ZE_CSS_STRAFE_RIGHT;
+	RecordEvent(ZE_CRRE_STRAFE_RIGHT);
 }
 
 void ZECharacter::Stop()
@@ -454,11 +601,61 @@ void ZECharacter::Stop()
 void ZECharacter::TurnRight()
 {
 	TurnStatus = ZE_CTS_TURN_RIGHT;
+	RecordEvent(ZE_CRRE_TURNING_RIGHT);
 }
 
 void ZECharacter::TurnLeft()
 {
 	TurnStatus = ZE_CTS_TURN_LEFT;
+	RecordEvent(ZE_CRRE_TURNING_LEFT);
+}
+
+void ZECharacter::StartRecording()
+{
+	Records.Clear();
+	RecordingTime = 0.0f;
+	RecordingFrame = 0;
+	RecordingStatus = ZE_CRS_RECORDING;
+	RecordEvent(-1);
+}
+
+void ZECharacter::StopRecording()
+{
+	RecordingTime = 0.0f;
+	RecordingFrame = 0;
+	RecordingStatus = ZE_CRS_STOPPED;
+}
+
+void ZECharacter::PlayRecording()
+{
+	RecordingTime = 0.0f;
+	RecordingFrame = 0;
+	RecordingStatus = ZE_CRS_PLAYING;
+}
+
+void ZECharacter::SaveRecording(const char* FileName)
+{
+	FILE* File = fopen(FileName, "wb");
+
+	ZEDWORD KeyCount = Records.GetCount();
+	fwrite(&KeyCount, sizeof(ZEDWORD), 1, File);
+
+	fwrite(Records.GetCArray(), sizeof(ZECharacterRecordingKey), KeyCount, File);
+
+	fclose(File);
+}
+
+void ZECharacter::LoadRecording(const char* FileName)
+{
+	FILE* File = fopen(FileName, "rb");
+
+	ZEDWORD KeyCount;
+	fread(&KeyCount, sizeof(ZEDWORD), 1, File);
+
+	Records.SetCount(KeyCount);
+	fread(Records.GetCArray(), sizeof(ZECharacterRecordingKey), KeyCount, File);
+
+	fclose(File);
 }
 
 bool ZECharacter::Initialize()
@@ -540,6 +737,17 @@ bool ZECharacter::Initialize()
 	StrafeRightAnimationTrack->SetLooping(true);
 	StrafeRightAnimationTrack->SetBlendFactor(0.0f);
 
+	// Walk Backward
+	WalkBackwardAnimationTrack = Model->GetAnimationTracks().Add();
+	WalkBackwardAnimationTrack->SetOwner(Model);
+	WalkBackwardAnimationTrack->SetAnimationByName("Test");
+	WalkBackwardAnimationTrack->SetSpeed(30.0f);
+	WalkBackwardAnimationTrack->SetStartFrame(2005);
+	WalkBackwardAnimationTrack->SetEndFrame(2045);
+	WalkBackwardAnimationTrack->SetLooping(true);
+	WalkBackwardAnimationTrack->SetBlendFactor(0.0f);
+
+
 	IdleAnimationTrack = &Model->GetAnimationTracks()[0];
 	WalkAnimationTrack = &Model->GetAnimationTracks()[1];
 	RunAnimationTrack = &Model->GetAnimationTracks()[2];
@@ -547,6 +755,7 @@ bool ZECharacter::Initialize()
 	TurnRightAnimationTrack = &Model->GetAnimationTracks()[4];
 	StrafeLeftAnimationTrack = &Model->GetAnimationTracks()[5];
 	StrafeRightAnimationTrack = &Model->GetAnimationTracks()[6];
+	WalkBackwardAnimationTrack = &Model->GetAnimationTracks()[7];
 
 	Model->Initialize();
 
@@ -585,6 +794,9 @@ ZECharacter::ZECharacter()
 	StrafeSpeed = 1.0f;
 	StrafeStatus = ZE_CSS_NO_STRAFE;
 	StrafeTransitionTime = 0.3f;
+
+	WalkBackwardTransitionTime = 0.3;
+	WalkBackwardSpeed = 0.7f;
 }
 
 ZECharacter::~ZECharacter()

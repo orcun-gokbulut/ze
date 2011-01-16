@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESkyBrush.h
+ Zinek Engine - SkyBoxMaterial.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,88 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_SKYBRUSH_H__
-#define __ZE_SKYBRUSH_H__
+samplerCUBE SkyTexture : register(s5);
 
-#include "ZEEntity.h"
-#include "ZEGraphics\ZEDirectionalLight.h"
-#include "ZEGraphics\ZECanvas.h"
+float4x4 WorldViewProjMatrix: register(c0);
+float4x4 WorldViewMatrix : register(c4);
 
-ZE_META_CLASS_DESCRIPTION(ZESkyBrush);
+float3 SkyColor : register(c10);
 
-class ZEScene;
-class ZETextureCubeResource;
-class ZESkyBoxMaterial;
-
-class ZESkyBrush : public ZEEntity
+struct VSInput 
 {
-	ZE_META_CLASS()
-	private:
-		ZETextureCubeResource*				SkyTexture;
-		ZESkyBoxMaterial*					SkyMaterial;
-		ZECanvas							SkyBox;
-		ZERenderOrder						SkyRenderOrder;
+	float4 Position : POSITION0;
+};
 
-		ZEVector3							SkyColor;
-		float								SkyBrightness;
+struct VSOutput 
+{
+	float4 Position : POSITION0;
+	float4 CubeTexcoord : TEXCOORD0;
+};
 
-		ZEScene*							Scene;
+VSOutput VSMain(VSInput Input)
+{
+	VSOutput Output;
 
-	public:
-		virtual const ZEAABoundingBox&		GetWorldBoundingBox();
+	Output.Position = mul(Input.Position, WorldViewProjMatrix).xyzz;
+	Output.CubeTexcoord =  Input.Position;
+	return Output;
+}
 
-		virtual ZEDWORD						GetDrawFlags() const;
+struct PSInput
+{
+	float4 CubeTexcoord : TEXCOORD0;
+};
 
-		virtual void						SetSkyTexture(const char* FileName);
-		const char*							GetSkyTexture() const;
-	
-		virtual void						SetSkyBrightness(float Brightness);
-		float								GetSkyBrightness() const;
-
-		virtual void						SetSkyColor(const ZEVector3& Color);
-		const ZEVector3&					GetSkyColor() const;
-
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
-
-		virtual void						Draw(ZEDrawParameters* DrawParameters);
-		virtual void						Tick(float Time);
-
-											ZESkyBrush();
-											~ZESkyBrush();
-};	
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZESkyBrush"	parent="ZEEntity"	description="Sky Brush">
-			<property name="SkyColor"
-				type="ZEVector3"
-				autogetset="true"
-				default="ZEVector3::One"
-				description="Color of the sky"
-				semantic="ZE_PS_COLOR"/>
-			<property name="SkyBrightness"		
-				type="float"
-				autogetset="true"
-				default="1.0f"
-				description="Intensity of the light"/>
-			<property name="SkyTexture"
-				type="string"
-				autogetset="true"
-				default=""
-				description="Texture of the sky"
-				semantic="ZE_PS_FILENAME"
-				fileextension="IMAGE"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-#endif
-
-
-
-
-
+float4 PSMain(PSInput Input) : COLOR0
+{
+	return float4(SkyColor * texCUBE(SkyTexture, normalize(Input.CubeTexcoord.xyz / Input.CubeTexcoord.w)), 1.0f);
+}

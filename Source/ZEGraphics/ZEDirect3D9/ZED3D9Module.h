@@ -181,6 +181,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual ZEFixedMaterial*						CreateFixedMaterial();
 		virtual ZEUIMaterial*							CreateUIMaterial();
 		virtual ZESimpleMaterial*						CreateSimpleMaterial();
+		virtual ZESkyBoxMaterial*						CreateSkyBoxMaterial();
 		virtual ZEFixedMaterial*						CreateCustomMaterial();
 		virtual ZEFixedMaterial*						CreateCGFXMaterial();
 

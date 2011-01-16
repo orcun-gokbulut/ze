@@ -47,6 +47,7 @@
 #include "ZEInput/ZEInputModule.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputMap.h"
+#include "ZEGame/ZESkyBrush.h"
 
 #define ZE_ACTIONID_CAMERA_TURN_LEFT		0
 #define ZE_ACTIONID_CAMERA_TURN_RIGHT		1
@@ -61,6 +62,11 @@
 #define ZE_ACTIONID_CHARACTER_STRAFE_RIGHT  10
 #define ZE_ACTIONID_CHARACTER_TURN_LEFT		11
 #define ZE_ACTIONID_CHARACTER_TURN_RIGHT	12
+#define ZE_ACTIONID_CHARACTER_RECORD_START	13
+#define ZE_ACTIONID_CHARACTER_RECORD_PLAY	14
+#define ZE_ACTIONID_CHARACTER_RECORD_STOP	15
+#define ZE_ACTIONID_CHARACTER_RECORD_SAVE	16
+#define ZE_ACTIONID_CHARACTER_RECORD_LOAD	17
 
 
 bool ZEModelAnimationDebugModule::Initialize()
@@ -68,42 +74,51 @@ bool ZEModelAnimationDebugModule::Initialize()
 	ZEScene* Scene = zeGame->GetScene();
 
 	// Create the player
-	if (Camera == NULL)
-	{
-		Camera = new ZECamera();
-		Camera->SetNearZ(zeGraphics->GetNearZ());
-		Camera->SetFarZ(zeGraphics->GetFarZ());
-		Scene->SetActiveCamera(Camera);
-		Scene->AddEntity(Camera);
-	}
+	Camera = new ZECamera();
+	Camera->SetNearZ(zeGraphics->GetNearZ());
+	Camera->SetFarZ(zeGraphics->GetFarZ());
+	Scene->SetActiveCamera(Camera);
+	Scene->AddEntity(Camera);
 	
-	if (Grid == NULL)
-	{
-		Grid = new ZEGrid();
-		Scene->AddEntity(Grid);
-		Grid->SetVisible(true);
-	}
+	Grid = new ZEGrid();
+	Grid->SetVisible(true);
+	Scene->AddEntity(Grid);
 
-	if (Light == NULL)
-	{
-		Light = new ZEPointLight();
-		Light->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
-		Light->SetColor(ZEVector3::One);
-		Light->SetAttenuation(0.01f, 0.0f, 1.0f);
-		Light->SetIntensity(1.0f);
-		Light->SetRange(55.0f);
-		Light->SetCastShadows(false);
-		Scene->AddEntity(Light);
-	}
+	Sky = new ZESkyBrush();
+	Sky->SetSkyTexture("cubetest.tga");
+	Scene->AddEntity(Sky);
 
-	if (Character == NULL)
-	{
-		Character = new ZECharacter();
-		Scene->AddEntity(Character);
-	}
+	Light = new ZEPointLight();
+	Light->SetPosition(ZEVector3(-61.0f, 4.0f, -2.0f));
+	Light->SetColor(ZEVector3::One);
+	Light->SetAttenuation(0.01f, 0.0f, 1.0f);
+	Light->SetIntensity(1.0f);
+	Light->SetRange(55.0f);
+	Light->SetCastShadows(false);
+	Scene->AddEntity(Light);
+
+	Light = new ZEPointLight();
+	Light->SetPosition(ZEVector3(28.0f, 5.0f, 41.0f));
+	Light->SetColor(ZEVector3::One);
+	Light->SetAttenuation(0.01f, 0.0f, 1.0f);
+	Light->SetIntensity(1.0f);
+	Light->SetRange(55.0f);
+	Light->SetCastShadows(false);
+	Scene->AddEntity(Light);
+
+	Light = new ZEPointLight();
+	Light->SetPosition(ZEVector3(-9.0f, 4.0f, -12.0f));
+	Light->SetColor(ZEVector3::One);
+	Light->SetAttenuation(0.01f, 0.0f, 1.0f);
+	Light->SetIntensity(1.0f);
+	Light->SetRange(55.0f);
+	Light->SetCastShadows(false);
+	Scene->AddEntity(Light);
+	
+	Character = new ZECharacter();
+	Scene->AddEntity(Character);
 
 	InputMap.InputBindings.Clear();
-
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_UP,			"Turn Up",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_DOWN,			"Turn Down",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_RIGHT,		"Turn Right",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE)));
@@ -117,6 +132,11 @@ bool ZEModelAnimationDebugModule::Initialize()
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_TURN_LEFT,		"Turn Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_A, ZE_IBS_ALL)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_STRAFE_RIGHT,	"Turn Right",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_E, ZE_IBS_ALL)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_STRAFE_LEFT,	"Turn Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_Q, ZE_IBS_ALL)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RECORD_START,	"Turn Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F1, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RECORD_PLAY,	"Turn Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F12, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RECORD_STOP,	"Turn Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F2, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RECORD_SAVE,	"Turn Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F5, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RECORD_LOAD,	"Turn Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F7, ZE_IBS_PRESSED)));
 
 	return true;
 }
@@ -169,7 +189,7 @@ void ZEModelAnimationDebugModule::Process(float ElapsedTime)
 				break;
 
 			case ZE_ACTIONID_CHARACTER_MOVE_BACKWARD:
-				Character->Stop();
+				Character->WalkBackward();
 				break;
 
 			case ZE_ACTIONID_CHARACTER_TURN_LEFT:
@@ -211,6 +231,26 @@ void ZEModelAnimationDebugModule::Process(float ElapsedTime)
 			case ZE_ACTIONID_CAMERA_ZOOM_OUT:
 				Radious += 0.001f * CurrentAction->AxisValue;
 				break;
+
+			case ZE_ACTIONID_CHARACTER_RECORD_START:
+				Character->StartRecording();
+				break;
+
+			case ZE_ACTIONID_CHARACTER_RECORD_PLAY:
+				Character->PlayRecording();
+				break;
+
+			case ZE_ACTIONID_CHARACTER_RECORD_STOP:
+				Character->StopRecording();
+				break;
+
+			case ZE_ACTIONID_CHARACTER_RECORD_SAVE:
+				Character->SaveRecording("c:\\Record.zerec");
+				break;
+
+			case ZE_ACTIONID_CHARACTER_RECORD_LOAD:
+				Character->LoadRecording("c:\\Record.zerec");
+				break;
 		}
 	}
 
@@ -231,9 +271,10 @@ void ZEModelAnimationDebugModule::Process(float ElapsedTime)
 	ZEVector3::CreateFromSpherical(CameraPosition, Radious, Elevation, Rotation);
 	ZEVector3::Add(CameraPosition, ZEVector3(Character->GetPosition().x, 1.0f, Character->GetPosition().z), CameraPosition);
 	Camera->SetPosition(CameraPosition);
-	Light->SetPosition(CameraPosition);
+	
+	//Light->SetPosition(Character->GetPosition() + ZEVector3(0.0f, 2.1f, 0.0f));
+	
 	ZEQuaternion CameraRotation;
-
 	ZEQuaternion::CreateFromEuler(CameraRotation, ZE_PI_2 + Elevation, ZE_PI_2 - Rotation, 0.0f);
 	Camera->SetRotation(CameraRotation);
 }

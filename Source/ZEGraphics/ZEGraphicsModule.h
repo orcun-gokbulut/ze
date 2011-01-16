@@ -56,6 +56,8 @@ class ZEViewPort;
 class ZEPostProcessor;
 class ZEUIMaterial;
 class ZESimpleMaterial;
+class ZESkyBoxMaterial;
+
 
 class ZEGraphicsModule : public ZEModule
 {	
@@ -136,6 +138,7 @@ class ZEGraphicsModule : public ZEModule
 		virtual ZEUIMaterial*				CreateUIMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateFixedMaterial() = 0;
 		virtual ZESimpleMaterial*			CreateSimpleMaterial() = 0;
+		virtual ZESkyBoxMaterial*			CreateSkyBoxMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCustomMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCGFXMaterial() = 0;
 

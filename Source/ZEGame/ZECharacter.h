@@ -39,6 +39,7 @@
  
 #include "ZECompoundEntity.h"
 #include "ZEInput/ZEInputMap.h"
+#include <stdio.h>
 
 class ZEModel;
 class ZEModelAnimationTrack;
@@ -69,10 +70,32 @@ enum ZECharacterStrafeStatus
 	ZE_CSS_STRAFE_LEFT
 };
 
+struct ZECharacterRecordingKey
+{
+	float Time;
+	ZEDWORD Event;
+	ZEVector3 Position;
+	ZEQuaternion Rotation;
+	float TurnAngle;
+};
+
+enum ZECharacterRecordingStatus
+{
+	ZE_CRS_STOPPED,
+	ZE_CRS_RECORDING,
+	ZE_CRS_PLAYING
+};
+
 class ZECharacter : public ZECompoundEntity
 {
 	ZE_META_ENTITY()
 	private:
+		ZEChunkArray<ZECharacterRecordingKey, 29127> 
+									Records;
+		ZECharacterRecordingStatus	RecordingStatus;
+		float						RecordingTime;
+		int							RecordingFrame;
+
 		ZEModel*					Model;
 		ZEInputMap					InputMap;
 
@@ -86,6 +109,10 @@ class ZECharacter : public ZECompoundEntity
 		ZEModelAnimationTrack*		WalkAnimationTrack;
 		float						WalkTransitionTime;
 		float						WalkSpeed;
+
+		ZEModelAnimationTrack*		WalkBackwardAnimationTrack;
+		float						WalkBackwardTransitionTime;
+		float						WalkBackwardSpeed;
 
 		ZEModelAnimationTrack*		RunAnimationTrack;
 		float						RunTransitionTime;
@@ -114,6 +141,8 @@ class ZECharacter : public ZECompoundEntity
 		void						Movement(float ElapsedTime);
 		void						Strafe(float ElapsedTime);
 		void						Turning(float ElapsedTime);
+		void						RecordEvent(ZEDWORD Event);
+		void						AdvanceRecording(float ElapsedTime);
 
 	public:
 		virtual ZEDrawFlags			GetDrawFlags();
@@ -123,12 +152,19 @@ class ZECharacter : public ZECompoundEntity
 
 		void						WalkForward();
 		void						RunForward();
+		void						WalkBackward();
 		void						SprintForward();
 		void						StrafeRight();
 		void						StrafeLeft();
 		void						TurnRight();
 		void						TurnLeft();
 		void						Stop();
+		
+		void						StartRecording();
+		void						StopRecording();
+		void						PlayRecording();
+		void						SaveRecording(const char* FileName);
+		void						LoadRecording(const char* FileName);
 
 		virtual void				Tick(float ElapsedTime);
 

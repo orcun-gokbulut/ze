@@ -228,6 +228,7 @@ void ZEComponent::Deinitialize()
 
 void ZEComponent::Destroy()
 {
+	Deinitialize();
 	delete this;
 }
 
