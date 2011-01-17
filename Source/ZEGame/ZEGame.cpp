@@ -182,7 +182,7 @@ void ZEGame::Destroy()
 void ZEGame::Render(float ElapsedTime)
 {
 	Scene->Render(ElapsedTime);
-	UIManager->Render(Scene->GetRenderer());
+	//UIManager->Render(Scene->GetRenderer());
 	Scene->GetRenderer()->Render(ElapsedTime);
 	Scene->GetRenderer()->ClearList();
 }

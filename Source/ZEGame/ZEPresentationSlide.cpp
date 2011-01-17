@@ -75,7 +75,7 @@ const char* ZEPresentationSlide::GetPresentationSlide() const
 
 void ZEPresentationSlide::Draw(ZEDrawParameters* DrawParameters)
 {
-	if (RenderOrder.VertexBuffer != NULL)
+	if (VertexBuffer != NULL)
 	{
 		RenderOrder.Lights.SetCount(DrawParameters->Lights.GetCount());
 		for (size_t I = 0; I < DrawParameters->Lights.GetCount(); I++)
@@ -105,10 +105,11 @@ bool ZEPresentationSlide::Initialize()
 
 	Material = ZEFixedMaterial::CreateInstance();
 	Material->SetZero();
+	Material->SetTwoSided(true);
 	Material->SetAmbientEnabled(true);
-	Material->SetAmbientColor(ZEVector3(0.1f, 0.1f, 0.1f));
+	Material->SetAmbientColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	Material->SetDiffuseEnabled(true);
-	Material->SetDiffuseColor(ZEVector3(0.0f, 0.0f, 0.0f));
+	Material->SetDiffuseColor(ZEVector3(1.0f, 1.0f, 1.0f));
 
 	if (Texture != NULL)
 	{

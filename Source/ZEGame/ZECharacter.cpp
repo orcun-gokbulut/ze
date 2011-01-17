@@ -40,6 +40,8 @@
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEModel/ZEModel.h"
 #include "ZEGame/ZEGame.h"
+#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZEGraphics/ZETexture2DResource.h"
 
 #define ACTIONID_FORWARD		0
 #define ACTIONID_BACKWARD		1
@@ -53,7 +55,7 @@
 
 ZEDrawFlags ZECharacter::GetDrawFlags()
 {
-	return ZE_DF_DRAW_COMPONENTS | ZE_DF_CULL_COMPONENTS;
+	return ZE_DF_DRAW_COMPONENTS | ZE_DF_CULL_COMPONENTS | ZE_DF_LIGHT_SOURCE;
 }
 
 void ZECharacter::Movement(float ElapsedTime)
@@ -67,7 +69,7 @@ void ZECharacter::Movement(float ElapsedTime)
 				if (MovementRatio < 0.0f)
 					MovementRatio = 0.0f;
 
-				zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
+				//zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
 			}
 			else if (MovementRatio < 0.0f)
 			{
@@ -75,7 +77,7 @@ void ZECharacter::Movement(float ElapsedTime)
 				if (MovementRatio > 0.0f)
 					MovementRatio = 0.0f;
 
-				zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);		
+				//zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);		
 			}
 			break;
 
@@ -90,7 +92,7 @@ void ZECharacter::Movement(float ElapsedTime)
 			if (MovementRatio > 1.0f)
 				MovementRatio = 1.0f;
 		}
-		zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
+		//zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
 		break;
 
 	case ZE_CMS_WALKING_BACKWARD:
@@ -104,7 +106,7 @@ void ZECharacter::Movement(float ElapsedTime)
 			if (MovementRatio < -1.0f)
 				MovementRatio = -1.0f;
 		}
-		zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
+		//zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
 		break;
 
 	case ZE_CMS_RUNNING_FORWARD:
@@ -119,7 +121,7 @@ void ZECharacter::Movement(float ElapsedTime)
 				MovementRatio = 2.0f;
 		}
 
-		zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
+		//zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
 		break;
 	}
 
@@ -260,7 +262,7 @@ void ZECharacter::Turning(float ElapsedTime)
 				if (TurnRatio < 0.0f)
 					TurnRatio = 0.0f;
 
-				zeLog("Character", "Turn Status : %d, Movement Ratio : %f", TurnStatus, TurnRatio);
+				//zeLog("Character", "Turn Status : %d, Movement Ratio : %f", TurnStatus, TurnRatio);
 			}
 			else if (TurnRatio < 0.0f)
 			{
@@ -268,7 +270,7 @@ void ZECharacter::Turning(float ElapsedTime)
 				if (TurnRatio > 0.0f)
 					TurnRatio = 0.0f;
 
-				zeLog("Character", "Turn Status : %d, Movement Ratio : %f", TurnStatus, TurnRatio);		
+				//zeLog("Character", "Turn Status : %d, Movement Ratio : %f", TurnStatus, TurnRatio);		
 			}
 			break;
 
@@ -277,7 +279,7 @@ void ZECharacter::Turning(float ElapsedTime)
 			if (TurnRatio < -1.0f)
 				TurnRatio = -1.0f;
 
-			zeLog("Character", "Turn Status : %d, Turn Ratio : %f", TurnStatus, TurnRatio);
+			//zeLog("Character", "Turn Status : %d, Turn Ratio : %f", TurnStatus, TurnRatio);
 			break;
 
 		case ZE_CTS_TURN_RIGHT:
@@ -285,7 +287,7 @@ void ZECharacter::Turning(float ElapsedTime)
 			if (TurnRatio > 1.0f)
 				TurnRatio = 1.0f;
 
-			zeLog("Character", "Turn Status : %d, Turn Ratio : %f", TurnStatus, TurnRatio);
+			//zeLog("Character", "Turn Status : %d, Turn Ratio : %f", TurnStatus, TurnRatio);
 			break;
 	}
 
@@ -371,7 +373,7 @@ void ZECharacter::Strafe(float ElapsedTime)
 				if (StrafeRatio < 0.0f)
 					StrafeRatio = 0.0f;
 
-				zeLog("Character", "Strafe Status : %d, Movement Ratio : %f", StrafeStatus, StrafeRatio);
+				//zeLog("Character", "Strafe Status : %d, Movement Ratio : %f", StrafeStatus, StrafeRatio);
 			}
 			else if (StrafeRatio < 0.0f)
 			{
@@ -379,7 +381,7 @@ void ZECharacter::Strafe(float ElapsedTime)
 				if (StrafeRatio > 0.0f)
 					StrafeRatio = 0.0f;
 
-				zeLog("Character", "Strafe Status : %d, Movement Ratio : %f", StrafeStatus, StrafeRatio);		
+				//zeLog("Character", "Strafe Status : %d, Movement Ratio : %f", StrafeStatus, StrafeRatio);		
 			}
 			break;
 
@@ -388,7 +390,7 @@ void ZECharacter::Strafe(float ElapsedTime)
 			if (StrafeRatio < -1.0f)
 				StrafeRatio = -1.0f;
 
-			zeLog("Character", "Strafe Status : %d, Strafe Ratio : %f", StrafeStatus, StrafeRatio);
+			//zeLog("Character", "Strafe Status : %d, Strafe Ratio : %f", StrafeStatus, StrafeRatio);
 			break;
 
 		case ZE_CSS_STRAFE_RIGHT:
@@ -396,7 +398,7 @@ void ZECharacter::Strafe(float ElapsedTime)
 			if (StrafeRatio > 1.0f)
 				StrafeRatio = 1.0f;
 
-			zeLog("Character", "Strafe Status : %d, Strafe Ratio : %f", StrafeStatus, StrafeRatio);
+			//zeLog("Character", "Strafe Status : %d, Strafe Ratio : %f", StrafeStatus, StrafeRatio);
 			break;
 	}
 
@@ -553,6 +555,13 @@ void ZECharacter::Tick(float ElapsedTime)
 	Strafe(ElapsedTime);
 
 	Model->Tick(ElapsedTime);
+
+	ZEModelMesh Weapon = Model->GetMeshes()[2];
+	ZEQuaternion FlashLightRotation = Model->GetRotation() * Weapon.GetLocalRotation();
+	ZEVector3 FlashLightPosition = Model->GetLocalTransform() * Weapon.GetLocalPostion() - ZEVector3(0,-0.1, 0.5);
+	FlashLight->SetPosition(FlashLightPosition);
+	FlashLight->SetRotation(FlashLightRotation);
+
 	ZEEntity::Tick(ElapsedTime);
 }
 
@@ -663,6 +672,21 @@ bool ZECharacter::Initialize()
 		Model = new ZEModel();
 
 	Model->SetModelResource(ZEModelResource::LoadResource("soldier.zemodel"));
+
+	FlashLight = new ZEProjectiveLight();
+	FlashLight->SetRange(50);
+	FlashLight->SetIntensity(1.0f);	
+	FlashLight->SetProjectionTexture(ZETexture2DResource::LoadResource("flashlight.jpg")->GetTexture());
+	FlashLight->SetAspectRatio(1.0f);
+	FlashLight->SetFOV(ZE_PI_2);
+	//FlashLight->SetCastsShadow(true);
+
+	ZEModelMesh Weapon = Model->GetMeshes()[2];
+	ZEQuaternion FlashLightRotation = Model->GetRotation() * Weapon.GetLocalRotation();
+	ZEVector3 FlashLightPosition = Model->GetLocalTransform() * Weapon.GetLocalPostion() - ZEVector3(0,-0.1, 0.5);
+	FlashLight->SetPosition(FlashLightPosition);
+	FlashLight->SetRotation(FlashLightRotation);
+	RegisterComponent(FlashLight);
 
 	IdleAnimationTrack = Model->GetAnimationTracks().Add();
 	IdleAnimationTrack->SetOwner(Model);

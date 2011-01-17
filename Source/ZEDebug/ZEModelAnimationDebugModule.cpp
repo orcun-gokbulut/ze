@@ -79,7 +79,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
 
-	//Scene->LoadMap("triplex.zemap");
+	Scene->LoadMap("triplex.zemap");
 
 	//Create the player
 	Camera = new ZECamera();
@@ -185,6 +185,25 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetPosition(ZEVector3(-6.41f, -3.76f, -1.91f));
 	Scene->AddEntity(PointLight);
 
+	Swat1 = new ZECharacter();
+	Scene->AddEntity(Swat1);
+	Swat1->LoadRecording("c:\\1.zerec");
+	Swat1->Stop();
+
+	Swat2 = new ZECharacter();
+	Scene->AddEntity(Swat2);
+	Swat2->LoadRecording("c:\\2.zerec");
+	Swat2->Stop();
+
+	Swat3 = new ZECharacter();
+	Scene->AddEntity(Swat3);
+	Swat3->LoadRecording("c:\\3.zerec");
+	Swat3->Stop();
+
+	Swat4 = new ZECharacter();
+	Scene->AddEntity(Swat4);
+	Swat4->LoadRecording("c:\\4.zerec");
+	Swat4->Stop();
 
 	Character = new ZECharacter();
 	Scene->AddEntity(Character);
@@ -213,6 +232,9 @@ bool ZEModelAnimationDebugModule::Initialize()
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RECORD_STOP,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F2, ZE_IBS_PRESSED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RECORD_SAVE,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F5, ZE_IBS_PRESSED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RECORD_LOAD,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F7, ZE_IBS_PRESSED)));
+
+
+	Grid->SetVisible(false);
 
 	return true;
 }
@@ -329,6 +351,10 @@ void ZEModelAnimationDebugModule::Process(float ElapsedTime)
 
 			case ZE_ACTIONID_CHARACTER_RECORD_START:
 				Character->StartRecording();
+				Swat1->PlayRecording();
+				Swat2->PlayRecording();
+				Swat3->PlayRecording();
+				Swat4->PlayRecording();
 				break;
 
 			case ZE_ACTIONID_CHARACTER_RECORD_PLAY:
@@ -337,6 +363,10 @@ void ZEModelAnimationDebugModule::Process(float ElapsedTime)
 
 			case ZE_ACTIONID_CHARACTER_RECORD_STOP:
 				Character->StopRecording();
+				Swat1->Stop();
+				Swat2->Stop();
+				Swat3->Stop();
+				Swat4->Stop();
 				break;
 
 			case ZE_ACTIONID_CHARACTER_RECORD_SAVE:

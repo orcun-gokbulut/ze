@@ -86,6 +86,8 @@ enum ZECharacterRecordingStatus
 	ZE_CRS_PLAYING
 };
 
+class ZEProjectiveLight;
+
 class ZECharacter : public ZECompoundEntity
 {
 	ZE_META_ENTITY()
@@ -117,6 +119,8 @@ class ZECharacter : public ZECompoundEntity
 		ZEModelAnimationTrack*		RunAnimationTrack;
 		float						RunTransitionTime;
 		float						RunSpeed;
+
+		ZEProjectiveLight*			FlashLight;
 
 public:
 		float						TurnAngle;

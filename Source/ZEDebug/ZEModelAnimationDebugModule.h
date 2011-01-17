@@ -55,6 +55,12 @@ class ZEModelAnimationDebugModule : public ZEDebugModule
 		ZEPointLight*			Light;
 		ZEGrid*					Grid;
 		ZECharacter*			Character;
+
+		ZECharacter*			Swat1;
+		ZECharacter*			Swat2;
+		ZECharacter*			Swat3;
+		ZECharacter*			Swat4;
+
 		ZESkyBrush*				Sky;
 		ZEProjectiveLight*		FlashLight;
 
