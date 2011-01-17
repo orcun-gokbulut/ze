@@ -48,7 +48,7 @@
 				AdditionalOptions="/MP8"
 				Optimization="0"
 				AdditionalIncludeDirectories="&quot;$(ProjectDir)\source&quot;;&quot;$(ProjectDir)\include&quot;;&quot;$(ProjectDir)\include\PhysX\Cooking&quot;;&quot;$(ProjectDir)\include\PhysX\Foundation&quot;;&quot;$(ProjectDir)\include\PhysX\NxCharacter&quot;;&quot;$(ProjectDir)\include\PhysX\PhysXLoader&quot;;&quot;$(ProjectDir)\include\PhysX\Physics&quot;;&quot;$(ProjectDir)\include\OpenAL&quot;;&quot;$(ProjectDir)\include\DirectX&quot;"
-				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_ZINEK_ENGINE;ZE_DEBUG_ENABLED;_ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_D3D9_PERFHUD;_ZE_DEBUG_SHADERS;_ZE_DEBUG_CHECK_MEMORY;ZE_DEBUG_D3D9_PROFILER;NX_USER_DEBUG_MODE"
+				PreprocessorDefinitions="WIN32;_DEBUG;FREEIMAGE_LIB;ZE_ZINEK_ENGINE;ZE_DEBUG_ENABLED;_ZE_DEBUG_BREAK_ON_WARNING;ZE_DEBUG_BREAK_ON_ERROR;ZE_DEBUG_D3D9_PERFHUD;ZE_DEBUG_SHADERS;_ZE_DEBUG_CHECK_MEMORY;ZE_DEBUG_D3D9_PROFILER;NX_USER_DEBUG_MODE"
 				GeneratePreprocessedFile="0"
 				MinimalRebuild="true"
 				ExceptionHandling="1"

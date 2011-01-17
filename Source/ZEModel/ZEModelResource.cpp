@@ -159,7 +159,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 
 		CurrentMaterial->SetZero();
 		CurrentMaterial->SetDiffuseEnabled(true);
-		CurrentMaterial->SetAmbientEnabled(true);
+		CurrentMaterial->SetAmbientEnabled(false);
 		CurrentMaterial->SetSpecularEnabled(true);
 		CurrentMaterial->SetEmmisiveEnabled(true);
 		

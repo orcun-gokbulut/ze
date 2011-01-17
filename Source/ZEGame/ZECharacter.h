@@ -147,9 +147,10 @@ public:
 		void						Strafe(float ElapsedTime);
 		void						Turning(float ElapsedTime);
 		void						RecordEvent(ZEDWORD Event);
+	public:
 		void						AdvanceRecording(float ElapsedTime);
 
-	public:
+
 		virtual ZEDrawFlags			GetDrawFlags();
 
 		virtual bool				Initialize();

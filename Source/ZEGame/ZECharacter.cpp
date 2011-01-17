@@ -692,8 +692,8 @@ bool ZECharacter::Initialize()
 	IdleAnimationTrack->SetOwner(Model);
 	IdleAnimationTrack->SetAnimationByName("Test");
 	IdleAnimationTrack->SetSpeed(30.0f);
-	IdleAnimationTrack->SetStartFrame(5);
-	IdleAnimationTrack->SetEndFrame(105);
+	IdleAnimationTrack->SetStartFrame(2560);
+	IdleAnimationTrack->SetEndFrame(2660);
 	IdleAnimationTrack->SetLooping(true);
 	IdleAnimationTrack->SetBlendFactor(1.0f);
 	//IdleAnimationTrack->Play();

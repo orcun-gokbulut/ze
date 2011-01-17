@@ -236,6 +236,7 @@ void ZEModelAnimationTrack::Pause()
 void ZEModelAnimationTrack::Stop()
 {
 	State = ZE_MAS_STOPPED;
+	AdvanceAnimation(0.0f);
 }
 
 void ZEModelAnimationTrack::AdvanceAnimation(float ElapsedTime)

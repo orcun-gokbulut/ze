@@ -48,6 +48,10 @@
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputMap.h"
 #include "ZEGame/ZESkyBrush.h"
+#include "ZEGame/ZEPlayer.h"
+#include "ZESound/ZESoundSource.h"
+#include "ZESound/ZESoundResource.h"
+#include "ZEModel/ZEModel.h"
 
 #define ZE_ACTIONID_CAMERA_TURN_LEFT		100
 #define ZE_ACTIONID_CAMERA_TURN_RIGHT		101
@@ -60,6 +64,7 @@
 #define ZE_ACTIONID_CAMERA_MOVE_RIGHT		108
 #define ZE_ACTIONID_CAMERA_MOVE_LEFT		109	
 #define ZE_ACTIONID_CAMERA_TURN_UP			110	
+#define ZE_ACTIONID_CAMERA_CHANGE			111
 
 #define ZE_ACTIONID_CHARACTER_MOVE_FORWARD	200
 #define ZE_ACTIONID_CHARACTER_MOVE_BACKWARD	201
@@ -73,6 +78,8 @@
 #define ZE_ACTIONID_CHARACTER_RECORD_STOP	209
 #define ZE_ACTIONID_CHARACTER_RECORD_SAVE	210
 #define ZE_ACTIONID_CHARACTER_RECORD_LOAD	211
+#define ZE_ACTIONID_INCREASE_INTENSITY		212
+#define ZE_ACTIONID_DECREASE_INTENSITY		213
 
 
 bool ZEModelAnimationDebugModule::Initialize()
@@ -80,11 +87,24 @@ bool ZEModelAnimationDebugModule::Initialize()
 	ZEScene* Scene = zeGame->GetScene();
 
 	Scene->LoadMap("triplex.zemap");
+	Door = new ZEModel();
+	ZEModelResource* DoorResource = ZEModelResource::LoadResource("Door.zemodel");
+	Door->SetModelResource(DoorResource);
+	ZEModelAnimationTrack DoorAnimation;
+	DoorAnimation.SetOwner(Door);
+	DoorAnimation.SetAnimation(&(DoorResource->Animations[0]));
+	DoorAnimation.SetSpeed(33);
+	DoorAnimation.SetBlendFactor(1.0f);
+	DoorAnimation.SetStartFrame(0);
+	DoorAnimation.SetEndFrame(15);
+	Door->GetAnimationTracks().Add(DoorAnimation);
+	Scene->AddEntity(Door);
 
 	//Create the player
 	Camera = new ZECamera();
 	Camera->SetNearZ(zeGraphics->GetNearZ());
 	Camera->SetFarZ(zeGraphics->GetFarZ());
+	Camera->SetFOV(ZE_PI_4 + ZE_PI_8);
 	Scene->SetActiveCamera(Camera);
 	Scene->AddEntity(Camera);
 	
@@ -96,9 +116,11 @@ bool ZEModelAnimationDebugModule::Initialize()
 	Sky->SetSkyTexture("night.tga");
 	Scene->AddEntity(Sky);
 
-	//FlashLight = new ZEProjectiveLight();
-	
-	ZEPointLight* PointLight = NULL;
+	SoundSource1 = ZESoundSource::CreateInstance();
+	SoundSource1->SetSoundResource(ZESoundResource::LoadResource("Telsiz1.mp3"));
+
+	SoundSource2 = ZESoundSource::CreateInstance();
+	SoundSource2->SetSoundResource(ZESoundResource::LoadResource("Telsiz2.mp3"));
 
 	PointLight = new ZEPointLight();
 	PointLight->SetIntensity(6.0f);
@@ -106,6 +128,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(-2.42f, 1.72f, -1.85f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
 	PointLight = new ZEPointLight();
 	PointLight->SetIntensity(5.0f);
@@ -113,6 +136,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(-4.33f, 1.10f, -3.44f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
 	PointLight = new ZEPointLight();
 	PointLight->SetIntensity(7.0f);
@@ -120,6 +144,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(-6.24f, 1.88f, -0.58f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
 	PointLight = new ZEPointLight();
 	PointLight->SetIntensity(3.0f);
@@ -127,6 +152,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(3.91f, 0.66f, -2.89f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
 
 	PointLight = new ZEPointLight();
@@ -135,6 +161,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(1.52f, 0.64f, -0.25f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
 	PointLight = new ZEPointLight();
 	PointLight->SetIntensity(3.0f);
@@ -142,6 +169,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(7.02f, 1.22f, 0.82f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
 	PointLight = new ZEPointLight();
 	PointLight->SetIntensity(2.0f);
@@ -149,6 +177,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(5.10f, 1.93f, 2.95f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
 	PointLight = new ZEPointLight();
 	PointLight->SetIntensity(2.0f);
@@ -156,6 +185,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(-6.43f, 2.16f, 3.50f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
 	PointLight = new ZEPointLight();
 	PointLight->SetIntensity(2.0f);
@@ -163,6 +193,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(-9.80f, 2.16f, 3.50f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
 	PointLight = new ZEPointLight();
 	PointLight->SetIntensity(2.0f);
@@ -170,6 +201,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(-13.67f, 2.16f, 3.50f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
 	PointLight = new ZEPointLight();
 	PointLight->SetIntensity(2.0f);
@@ -177,6 +209,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(1.74f, -3.76f, -1.91f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
 	PointLight = new ZEPointLight();
 	PointLight->SetIntensity(2.0f);
@@ -184,7 +217,11 @@ bool ZEModelAnimationDebugModule::Initialize()
 	PointLight->SetColor(ZEVector3::One);
 	PointLight->SetPosition(ZEVector3(-6.41f, -3.76f, -1.91f));
 	Scene->AddEntity(PointLight);
+	Lights.Add(PointLight);
 
+	Player = new ZEPlayer();
+	Player->SetPosition(ZEVector3(-9.0f, 1.8f, 3.5f));
+	Scene->AddEntity(Player);
 	Swat1 = new ZECharacter();
 	Scene->AddEntity(Swat1);
 	Swat1->LoadRecording("c:\\1.zerec");
@@ -206,7 +243,25 @@ bool ZEModelAnimationDebugModule::Initialize()
 	Swat4->Stop();
 
 	Character = new ZECharacter();
+	Character->SetPosition(ZEVector3(-9.0f, 0.0f, 3.0f));
 	Scene->AddEntity(Character);
+
+	Swat1->PlayRecording();
+	Swat1->AdvanceRecording(0.1f);
+	Swat1->StopRecording();
+
+	Swat2->PlayRecording();
+	Swat1->AdvanceRecording(0.1f);
+	Swat2->StopRecording();
+
+	Swat3->PlayRecording();
+	Swat1->AdvanceRecording(0.1f);
+	Swat3->StopRecording();
+
+	Swat4->PlayRecording();
+	Swat1->AdvanceRecording(0.1f);
+	Swat4->StopRecording();
+
 
 	InputMap.InputBindings.Clear();
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_MOVE_FORWARD,		"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_UP, ZE_IBS_ALL)));
@@ -219,7 +274,8 @@ bool ZEModelAnimationDebugModule::Initialize()
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_LEFT,			"",	ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_ZOOM_IN,			"",	ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_SCROLL_AXIS, ZE_IAS_POSITIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_ZOOM_OUT,			"",	ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_SCROLL_AXIS, ZE_IAS_NEGATIVE)));
-	
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_CHANGE,			"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_C, ZE_IBS_PRESSED)));
+
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RUN,			"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_LSHIFT, ZE_IBS_ALL)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_MOVE_FORWARD,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_ALL)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_MOVE_BACKWARD,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_ALL)));
@@ -232,6 +288,15 @@ bool ZEModelAnimationDebugModule::Initialize()
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RECORD_STOP,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F2, ZE_IBS_PRESSED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RECORD_SAVE,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F5, ZE_IBS_PRESSED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CHARACTER_RECORD_LOAD,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F7, ZE_IBS_PRESSED)));
+
+	InputMap.InputBindings.Add(ZEInputBinding(250,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F3, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(251,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_F4, ZE_IBS_PRESSED)));
+
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_INCREASE_INTENSITY,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_ADD,		ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_DECREASE_INTENSITY,	"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_SUBTRACT, ZE_IBS_PRESSED)));
+	
+	InputMap.InputBindings.Add(ZEInputBinding(555,			"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_1, ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(556,			"",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_2, ZE_IBS_PRESSED)));
 
 
 	Grid->SetVisible(false);
@@ -278,105 +343,150 @@ void ZEModelAnimationDebugModule::Process(float ElapsedTime)
 	for (size_t I = 0; I < InputMap.InputActionCount; I++)
 	{
 		ZEInputAction* CurrentAction = &InputMap.InputActions[I];
-		switch (CurrentAction->Id)
-		{	
-			case ZE_ACTIONID_CAMERA_TURN_UP:
-				Elevation += 0.001f * CurrentAction->AxisValue;
-				break;
 
-			case ZE_ACTIONID_CAMERA_TURN_DOWN:
-				Elevation -= 0.001f * CurrentAction->AxisValue;
-				break;
-
-			case ZE_ACTIONID_CAMERA_TURN_RIGHT:
-				Rotation += 0.001f * CurrentAction->AxisValue;
-				Character->TurnRight();
-				break;
-
-			case ZE_ACTIONID_CAMERA_TURN_LEFT:
-				Rotation -= 0.001f * CurrentAction->AxisValue;
-				Character->TurnLeft();
-				break;
-
-			case ZE_ACTIONID_CAMERA_MOVE_FORWARD:
-				//TargetPosition += Camera->GetDirection() * (ElapsedTime * 5.0f);
-				break;
-
-			case ZE_ACTIONID_CAMERA_MOVE_BACKWARD:
-				//TargetPosition -= Camera->GetDirection() * (ElapsedTime * 5.0f);
-				break;
-
-			case ZE_ACTIONID_CAMERA_MOVE_RIGHT:
-				//TargetPosition += Camera->GetRight() * (ElapsedTime * 5.0f);
-				break;
-
-			case ZE_ACTIONID_CAMERA_MOVE_LEFT:
-				//TargetPosition -= Camera->GetRight() * (ElapsedTime * 5.0f);
-				break;
-
-			case ZE_ACTIONID_CAMERA_ZOOM_IN:
-				Radious -= 0.001f * CurrentAction->AxisValue;
-				break;
-
-			case ZE_ACTIONID_CAMERA_ZOOM_OUT:
-				Radious += 0.001f * CurrentAction->AxisValue;
-				break;
-
-			case ZE_ACTIONID_CHARACTER_MOVE_FORWARD:
-				if (InputMap.CheckInputAction(ZE_ACTIONID_CHARACTER_RUN) != NULL)
-					Character->RunForward();
-				else
-					Character->WalkForward();
-				break;
-
-			case ZE_ACTIONID_CHARACTER_MOVE_BACKWARD:
-				Character->WalkBackward();
-				break;
-
-			case ZE_ACTIONID_CHARACTER_TURN_LEFT:
-				Character->TurnLeft();
-				break;
-
-			case ZE_ACTIONID_CHARACTER_TURN_RIGHT:
-				Character->TurnRight();
-				break;
-
-			case ZE_ACTIONID_CHARACTER_STRAFE_LEFT:
-				Character->StrafeLeft();
-				break;
-
-			case ZE_ACTIONID_CHARACTER_STRAFE_RIGHT:
-				Character->StrafeRight();
-				break;
-
-			case ZE_ACTIONID_CHARACTER_RECORD_START:
-				Character->StartRecording();
-				Swat1->PlayRecording();
-				Swat2->PlayRecording();
-				Swat3->PlayRecording();
-				Swat4->PlayRecording();
-				break;
-
-			case ZE_ACTIONID_CHARACTER_RECORD_PLAY:
-				Character->PlayRecording();
-				break;
-
-			case ZE_ACTIONID_CHARACTER_RECORD_STOP:
-				Character->StopRecording();
-				Swat1->Stop();
-				Swat2->Stop();
-				Swat3->Stop();
-				Swat4->Stop();
-				break;
-
-			case ZE_ACTIONID_CHARACTER_RECORD_SAVE:
-				Character->SaveRecording("c:\\Record.zerec");
-				break;
-
-			case ZE_ACTIONID_CHARACTER_RECORD_LOAD:
-				Character->LoadRecording("c:\\Record.zerec");
-				break;
+		if (InputMap.CheckInputAction(ZE_ACTIONID_CAMERA_CHANGE) != NULL)
+		{
+			PlayerActive = !PlayerActive;
+			if (PlayerActive)
+			{
+				Player->SetEnabled(true);
+				Player->Activate();
+			}
+			else
+			{
+				Player->SetEnabled(false);
+				zeScene->SetActiveCamera(Camera);
+			}
+			break;
 		}
+
+		if (!PlayerActive)
+			switch (CurrentAction->Id)
+			{	
+				case ZE_ACTIONID_CAMERA_TURN_UP:
+					Elevation += 0.001f * CurrentAction->AxisValue;
+					break;
+
+				case ZE_ACTIONID_CAMERA_TURN_DOWN:
+					Elevation -= 0.001f * CurrentAction->AxisValue;
+					break;
+
+				case ZE_ACTIONID_CAMERA_TURN_RIGHT:
+					Rotation += 0.001f * CurrentAction->AxisValue;
+					Character->TurnRight();
+					break;
+
+				case ZE_ACTIONID_CAMERA_TURN_LEFT:
+					Rotation -= 0.001f * CurrentAction->AxisValue;
+					Character->TurnLeft();
+					break;
+
+				case ZE_ACTIONID_CAMERA_MOVE_FORWARD:
+					//TargetPosition += Camera->GetDirection() * (ElapsedTime * 5.0f);
+					break;
+
+				case ZE_ACTIONID_CAMERA_MOVE_BACKWARD:
+					//TargetPosition -= Camera->GetDirection() * (ElapsedTime * 5.0f);
+					break;
+
+				case ZE_ACTIONID_CAMERA_MOVE_RIGHT:
+					//TargetPosition += Camera->GetRight() * (ElapsedTime * 5.0f);
+					break;
+
+				case ZE_ACTIONID_CAMERA_MOVE_LEFT:
+					//TargetPosition -= Camera->GetRight() * (ElapsedTime * 5.0f);
+					break;
+
+				case ZE_ACTIONID_CAMERA_ZOOM_IN:
+					Radious -= 0.001f * CurrentAction->AxisValue;
+					break;
+
+				case ZE_ACTIONID_CAMERA_ZOOM_OUT:
+					Radious += 0.001f * CurrentAction->AxisValue;
+					break;
+
+				case ZE_ACTIONID_CHARACTER_MOVE_FORWARD:
+					if (InputMap.CheckInputAction(ZE_ACTIONID_CHARACTER_RUN) != NULL)
+						Character->RunForward();
+					else
+						Character->WalkForward();
+					break;
+
+				case ZE_ACTIONID_CHARACTER_MOVE_BACKWARD:
+					Character->WalkBackward();
+					break;
+
+				case ZE_ACTIONID_CHARACTER_TURN_LEFT:
+					Character->TurnLeft();
+					break;
+
+				case ZE_ACTIONID_CHARACTER_TURN_RIGHT:
+					Character->TurnRight();
+					break;
+
+				case ZE_ACTIONID_CHARACTER_STRAFE_LEFT:
+					Character->StrafeLeft();
+					break;
+
+				case ZE_ACTIONID_CHARACTER_STRAFE_RIGHT:
+					Character->StrafeRight();
+					break;
+
+				case ZE_ACTIONID_CHARACTER_RECORD_START:
+					Character->StartRecording();
+					Swat1->PlayRecording();
+					Swat2->PlayRecording();
+					Swat3->PlayRecording();
+					Swat4->PlayRecording();
+					Door->GetAnimationTracks()[0].Play();
+					break;
+				
+				case 555:
+					SoundSource1->Stop();
+					SoundSource1->Play();
+					break;
+
+				case 556:
+					SoundSource2->Stop();
+					SoundSource2->Play();
+					break;
+
+				case ZE_ACTIONID_CHARACTER_RECORD_STOP:
+					Character->StopRecording();
+					Swat1->StopRecording();
+					Swat2->StopRecording();
+					Swat3->StopRecording();
+					Swat4->StopRecording();
+					Door->GetAnimationTracks()[0].Stop();
+					Door->GetAnimationTracks()[0].SetCurrentFrame(0);
+					break;
+
+				case ZE_ACTIONID_CHARACTER_RECORD_PLAY:
+					Character->PlayRecording();
+					break;
+	
+				case ZE_ACTIONID_CHARACTER_RECORD_SAVE:
+					Character->SaveRecording("c:\\Record.zerec");
+					break;
+
+				case ZE_ACTIONID_CHARACTER_RECORD_LOAD:
+					Character->LoadRecording("c:\\Record.zerec");
+					break;
+
+				case ZE_ACTIONID_INCREASE_INTENSITY:
+					for (int I = 0; I < Lights.GetCount(); I++)
+					{
+						Lights[I]->SetIntensity(Lights[I]->GetIntensity() + 0.1f);
+					}
+					break;
+
+				case ZE_ACTIONID_DECREASE_INTENSITY:
+					for (int I = 0; I < Lights.GetCount(); I++)
+					{
+						Lights[I]->SetIntensity(Lights[I]->GetIntensity() - 0.1f);
+					}
+					break;
+			}
 	}
 
 	if (Elevation < -ZE_PI_4 - ZE_PI_8)
@@ -403,8 +513,6 @@ void ZEModelAnimationDebugModule::Process(float ElapsedTime)
 	ZEVector3::Add(CameraPosition, ZEVector3(TargetPosition.x, 1.0f, TargetPosition.z), CameraPosition);
 	Camera->SetPosition(CameraPosition);
 	
-	//Light->SetPosition(Character->GetPosition() + ZEVector3(0.0f, 2.1f, 0.0f));
-	
 	ZEQuaternion CameraRotation;
 	ZEQuaternion::CreateFromEuler(CameraRotation, ZE_PI_2 + Elevation, ZE_PI_2 - Rotation, 0.0f);
 	Camera->SetRotation(CameraRotation);
@@ -417,6 +525,7 @@ ZEModelAnimationDebugModule::ZEModelAnimationDebugModule()
 	Grid = NULL;
 	Light = NULL;
 	Character = NULL;
+	PlayerActive = false;
 	TargetPosition = ZEVector3::Zero;
 }
 

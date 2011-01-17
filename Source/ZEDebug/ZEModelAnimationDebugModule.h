@@ -47,6 +47,11 @@ class ZEProjectiveLight;
 class ZEGrid;
 class ZECamera;
 class ZESkyBrush;
+class ZEPlayer;
+class ZESoundResource;
+class ZESoundSource;
+class ZEModel;
+class ZELight;
 
 class ZEModelAnimationDebugModule : public ZEDebugModule
 {
@@ -54,6 +59,7 @@ class ZEModelAnimationDebugModule : public ZEDebugModule
 		ZECamera*				Camera;
 		ZEPointLight*			Light;
 		ZEGrid*					Grid;
+		ZEPointLight*			PointLight;
 		ZECharacter*			Character;
 
 		ZECharacter*			Swat1;
@@ -61,8 +67,16 @@ class ZEModelAnimationDebugModule : public ZEDebugModule
 		ZECharacter*			Swat3;
 		ZECharacter*			Swat4;
 
+		ZEModel*				Door;
+
 		ZESkyBrush*				Sky;
-		ZEProjectiveLight*		FlashLight;
+		ZEPlayer*				Player;
+		ZESoundSource*			SoundSource1;
+		ZESoundSource*			SoundSource2;
+
+		ZEArray<ZELight*>		Lights;
+
+		bool					PlayerActive;
 
 		ZEVector3				TargetPosition;
 		ZEInputMap				InputMap;

@@ -61,14 +61,12 @@ class ZEPlayer : public ZECompoundEntity
 		ZECamera*				GetCamera();
 		ZEListener*				GetListener();
 
-		void					SetFOV(float Fov);
+		void					SetFOV(float FOV);
 		float					GetFOV();
 
-		void					SetActive(bool);
+		void					Activate();
 
 		virtual void			Tick(float Time);
-		virtual void			Draw(ZERenderer * Renderer);
-
 		
 		virtual	bool			Initialize();
 		virtual void			Deinitialize();

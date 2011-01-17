@@ -59,7 +59,7 @@
 
 ZEDrawFlags ZEPlayer::GetDrawFlags()
 {
-	return ZE_DF_LIGHT_SOURCE;
+	return ZE_DF_NONE; //ZE_DF_LIGHT_SOURCE;
 }
 
 ZECamera* ZEPlayer::GetCamera()
@@ -82,6 +82,12 @@ float ZEPlayer::GetFOV()
 	return FOV;
 }
 
+void ZEPlayer::Activate()
+{
+	zeScene->SetActiveCamera(&Camera);
+	zeScene->SetActiveListener(Listener);
+}
+
 void ZEPlayer::Tick(float Time)
 {
 	ZEVector3 Position = GetPosition();
@@ -91,7 +97,7 @@ void ZEPlayer::Tick(float Time)
 	ZEInputAction* Current;
 	zeInput->ProcessInputMap(&InputMap);
 	
-	float MetersPerSecond = 10.0f;
+	float MetersPerSecond = 3.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 	ZEComponent* HitComponent;
@@ -105,28 +111,24 @@ void ZEPlayer::Tick(float Time)
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, 1));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
-				//Position.y = 1.7f;
 				SetPosition(Position);
 				break;
 			case ACTIONID_BACKWARD:
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, -1));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
-				//Position.y = 1.7f;
 				SetPosition(Position);
 				break;
 			case ACTIONID_STRAFELEFT:
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(-1, 0, 0));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
-				//Position.y = 1.7f;
 				SetPosition(Position);
 				break;
 			case ACTIONID_STRAFERIGHT:
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(1, 0, 0));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
-				//Position.y = 1.7f;
 				SetPosition(Position);
 				break;
 			case ACTIONID_ZOOMIN:
@@ -165,6 +167,9 @@ void ZEPlayer::Tick(float Time)
 					continue;*/
 				break;
 		}
+		
+		ZEVector3 A = GetPosition();
+		SetPosition(ZEVector3(A.x, 1.7f, A.z));
 
 		if (Yawn < -ZE_PI)
 			Yawn = ZE_PI;
@@ -218,12 +223,8 @@ bool ZEPlayer::Initialize()
 	PointLight.SetColor(ZEVector3(1.0f, 1.0f, 1.0));
 	PointLight.SetEnabled(true);
 
-	RegisterComponent(&PointLight);
 	RegisterComponent(&Camera);
 	RegisterComponent(Listener);
-
-	zeScene->SetActiveCamera(&Camera);
-	zeScene->SetActiveListener(Listener);
 
 	return true;
 }
@@ -232,11 +233,6 @@ void ZEPlayer::Deinitialize()
 {
 	Camera.Deinitialize();
 	Listener->Deinitialize();
-}
-
-void ZEPlayer::Draw(ZERenderer * Renderer)
-{
-
 }
 
 ZEPlayer::ZEPlayer()
