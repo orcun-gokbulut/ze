@@ -41,11 +41,29 @@
 class ZEClassDescription;
 class ZEClass;
 
+template <class Type>
+class ZERegisterClass
+{
+	ZERegisterClass()
+	{
+		Type::ClassDescription()->GetProvider()->RegisterClass(Type);
+	}
+};
+
+template <class Type>
+{
+	ZERegister
+};
+
 class ZEClassProvider
 {
 	private:
 		ZEClassDescription*				BaseClassType;
 		ZEArray<ZEClassDescription*>	Classes;
+
+	protected:
+										ZEClassProvider();
+										~ZEClassProvider();
 
 	public:
 		void							SetBaseClassType(ZEClassDescription* ClassType);
@@ -58,9 +76,6 @@ class ZEClassProvider
 
 		ZEClass*						CreateInstance(size_t Index) const;
 		ZEClass*						CreateInstance(const char* Name) const;
-
-										ZEClassProvider();
-										~ZEClassProvider();
 };
 
 #endif

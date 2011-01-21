@@ -49,7 +49,7 @@
 #include "ZEGraphics/ZEMaterial.h"
 #include "ZEGraphics/ZECamera.h"
 
-#include "ZEGame/ZEDGrid.h"
+//#include "ZEGame/ZED.h"
 
 #include <string.h>
 
@@ -103,7 +103,7 @@ bool ZEMetaDebugModule::Initialize()
 	Light->GetProperty("CustomTestProperty", Reader);
 	Light->RemoveCustomProperty("CustomTestProperty");
 
-	new ZEDGrid(Scene);
+	//new ZEDGrid(Scene);
  
 	return true;
 }
