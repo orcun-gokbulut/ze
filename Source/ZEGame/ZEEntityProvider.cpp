@@ -37,8 +37,7 @@
 
 ZEEntityProvider::ZEEntityProvider()
 {
-	SetAllowBaseType(true);
-	SetType(ZEEntity::ClassDescription());
+	SetBaseClassType(ZEEntity::ClassDescription());
 }
 
 ZEEntityProvider::~ZEEntityProvider()

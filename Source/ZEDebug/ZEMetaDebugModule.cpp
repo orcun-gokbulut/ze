@@ -39,6 +39,7 @@
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEGraphics/ZETexture2DResource.h"
 #include "ZEGame/ZEGame.h"
+#include "ZEGame/ZEEntityProvider.h"
 #include "ZEGame/ZEPlayer.h"
 #include "ZEGame/ZELightBrush.h"
 #include "ZEGame/ZECanvasBrush.h"
@@ -57,14 +58,13 @@ bool ZEMetaDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
 
-	ZEClassProvider* TestProvider = new ZEClassProvider();
-	TestProvider->RegisterClass(ZEPlayer::ClassDescription());
-	TestProvider->RegisterClass(ZELightBrush::ClassDescription());
+	ZEEntityProvider::GetInstance()->RegisterClass(ZEPlayer::ClassDescription());
+	ZEEntityProvider::GetInstance()->RegisterClass(ZELightBrush::ClassDescription());
 
 	// Create the player
 	if (Player == NULL)
 	{
-		Player = (ZEPlayer*)(TestProvider->CreateInstance("ZEPlayer"));
+		Player = (ZEPlayer*)(ZEEntityProvider::GetInstance()->CreateInstance("ZEPlayer"));
 
 		//Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
 		Scene->AddEntity(Player);
@@ -75,7 +75,7 @@ bool ZEMetaDebugModule::Initialize()
 		Scene->SetActiveCamera(Player->GetCamera());
 	}
 
-	ZELightBrush* Light = (ZELightBrush*)(TestProvider->CreateInstance("ZELightBrush"));
+	ZELightBrush* Light = (ZELightBrush*)(ZEEntityProvider::GetInstance()->CreateInstance("ZELightBrush"));
 	Light->SetLightType(ZE_LT_POINT);
 	Scene->AddEntity(Light);
 	Light->SetPosition(ZEVector3::Zero);

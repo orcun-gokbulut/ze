@@ -37,22 +37,22 @@
 #include "ZEClass.h"
 #include <string.h>
 
-void ZEClassProvider::SetBaseClassType(ZEClassDescription* ClassType)
+void ZEProvider::SetBaseClass(ZEClassDescription* ClassType)
 {
-	BaseClassType = ClassType;
+	BaseClass = ClassType;
 }
 
-ZEClassDescription* ZEClassProvider::GetBaseClassType()
+ZEClassDescription* ZEProvider::GetBaseClass()
 {
-	return BaseClassType;
+	return BaseClass;
 }
 
-const ZEArray<ZEClassDescription*>& ZEClassProvider::GetClasses()
+const ZEArray<ZEClassDescription*>& ZEProvider::GetClasses()
 {
 	return Classes;
 }
 
-bool ZEClassProvider::RegisterClass(ZEClassDescription* Description)
+bool ZEProvider::RegisterClass(ZEClassDescription* Description)
 {
 	zeAssert(Description == NULL, "Description can not be NULL.");
 
@@ -63,7 +63,7 @@ bool ZEClassProvider::RegisterClass(ZEClassDescription* Description)
 	}
 
 
-	if (BaseClassType != NULL && !ZEClassDescription::CheckParent(BaseClassType, Description))
+	if (BaseClass != NULL && !ZEClassDescription::CheckParent(BaseClass, Description))
 	{
 		zeError("Class Provider", "Can not add class type to provider. Class type is not derived from base class.");
 		return false;
@@ -73,7 +73,7 @@ bool ZEClassProvider::RegisterClass(ZEClassDescription* Description)
 	return true;
 }
 
-void ZEClassProvider::UnregisterClass(ZEClassDescription* Description)
+void ZEProvider::UnregisterClass(ZEClassDescription* Description)
 {
 	zeAssert(Description == NULL, "Description can not be NULL.");
 	zeAssert(!Classes.Exists(Description), "Can not remove class type from provider. Class type is not exists. "
@@ -82,12 +82,12 @@ void ZEClassProvider::UnregisterClass(ZEClassDescription* Description)
 	Classes.DeleteValue(Description);
 }
 
-ZEClass* ZEClassProvider::CreateInstance(size_t Index) const
+ZEClass* ZEProvider::CreateInstance(size_t Index) const
 {
 	return Classes[Index]->CreateInstance();
 }
 
-ZEClass* ZEClassProvider::CreateInstance(const char* Name) const
+ZEClass* ZEProvider::CreateInstance(const char* Name) const
 {
 	for(size_t I = 0; I < Classes.GetCount(); I++)
 		if (strcmp(Classes[I]->GetName(), Name) == 0)
@@ -97,12 +97,12 @@ ZEClass* ZEClassProvider::CreateInstance(const char* Name) const
 	return NULL;
 }
 
-ZEClassProvider::ZEClassProvider()
+ZEProvider::ZEProvider()
 {
-	BaseClassType = NULL;
+	BaseClass = NULL;
 }
 
-ZEClassProvider::~ZEClassProvider()
+ZEProvider::~ZEProvider()
 {
 
 }

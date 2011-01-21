@@ -50,27 +50,22 @@ class ZERegisterClass
 	}
 };
 
-template <class Type>
-{
-	ZERegister
-};
-
-class ZEClassProvider
+class ZEProvider
 {
 	private:
-		ZEClassDescription*				BaseClassType;
+		ZEClassDescription*				BaseClass;
 		ZEArray<ZEClassDescription*>	Classes;
 
 	protected:
-										ZEClassProvider();
-										~ZEClassProvider();
+		void							SetBaseClass(ZEClassDescription* ClassType);
+		ZEClassDescription*				GetBaseClass();
+
+										ZEProvider();
+										~ZEProvider();
 
 	public:
-		void							SetBaseClassType(ZEClassDescription* ClassType);
-		ZEClassDescription*				GetBaseClassType();
-
-		const ZEArray<ZEClassDescription*>&
-										GetClasses();
+		const 
+		ZEArray<ZEClassDescription*>&	GetClasses();
 		bool							RegisterClass(ZEClassDescription* Description);
 		void							UnregisterClass(ZEClassDescription* Description);
 
