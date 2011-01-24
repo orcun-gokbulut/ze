@@ -125,10 +125,10 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetRefractionFactor(MaterialChunk.RefractionFactor);
 		CurrentMaterial->SetDetailMapTiling(MaterialChunk.DetailMapTiling);
 
-		CurrentMaterial->SetBaseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap));//
+		CurrentMaterial->SetBaseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap));
 		
 		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_NORMAL_MAP);
-		CurrentMaterial->SetNormalMap(ManageMapMaterialTextures(MaterialChunk.NormalMap));//
+		CurrentMaterial->SetNormalMap(ManageMapMaterialTextures(MaterialChunk.NormalMap));
 		CurrentMaterial->SetSpecularMap(ManageMapMaterialTextures(MaterialChunk.SpecularMap));
 		CurrentMaterial->SetEmmisiveMap(ManageMapMaterialTextures(MaterialChunk.EmmisiveMap));
 		CurrentMaterial->SetOpacityMap(ManageMapMaterialTextures(MaterialChunk.OpacityMap));

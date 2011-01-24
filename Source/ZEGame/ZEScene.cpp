@@ -180,7 +180,7 @@ void ZEScene::Destroy()
 	}
 
 	for (size_t I = 0; I < Entities.GetCount(); I++)
-		Entities[I]->Destroy();
+ 		Entities[I]->Destroy();
 	Entities.Clear();
 
 	delete this;

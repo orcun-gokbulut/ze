@@ -789,8 +789,11 @@ bool ZECharacter::Initialize()
 
 void ZECharacter::Deinitialize()
 {
-	Model->Destroy();
-	Model = NULL;
+	if (Model != NULL)
+	{
+		Model->Destroy();
+		Model = NULL;
+	}
 }
 
 ZECharacter::ZECharacter()

@@ -122,7 +122,7 @@ class ZECharacter : public ZECompoundEntity
 
 		ZEProjectiveLight*			FlashLight;
 
-public:
+	public:
 		float						TurnAngle;
 		float						TurnRatio;
 		ZECharacterTurnStatus		TurnStatus;

@@ -59,26 +59,10 @@ class ZEModelAnimationDebugModule : public ZEDebugModule
 		ZECamera*				Camera;
 		ZEPointLight*			Light;
 		ZEGrid*					Grid;
-		ZEPointLight*			PointLight;
+		ZEPointLight*			PointLight0;
+		ZEPointLight*			PointLight1;
+		ZEPointLight*			PointLight2;
 		ZECharacter*			Character;
-
-		ZECharacter*			Swat1;
-		ZECharacter*			Swat2;
-		ZECharacter*			Swat3;
-		ZECharacter*			Swat4;
-
-		ZEModel*				Door;
-
-		ZESkyBrush*				Sky;
-		ZEPlayer*				Player;
-		ZESoundSource*			SoundSource1;
-		ZESoundSource*			SoundSource2;
-
-		ZEArray<ZELight*>		Lights;
-
-		bool					PlayerActive;
-
-		ZEVector3				TargetPosition;
 		ZEInputMap				InputMap;
 
 	public:
