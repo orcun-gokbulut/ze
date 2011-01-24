@@ -47,10 +47,10 @@ ZE_META_ENTITY_DESCRIPTION(ZEPlayer);
 class ZEListener;
 class ZEPlayer : public ZECompoundEntity
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZEPlayer)
 	private:
 		ZEInputMap				InputMap;
-		ZECamera				Camera;
+		ZECamera*				Camera;
 		ZEPointLight			PointLight;
 		ZEListener*				Listener;
 		float					Pitch, Yawn, Roll, FOV;
@@ -79,7 +79,16 @@ class ZEPlayer : public ZECompoundEntity
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZEPlayer" parent="ZECompoundEntity" description="Player spawn point"/>
+		<class name="ZEPlayer" parent="ZECompoundEntity" description="Player spawn point">
+
+			<method name="SetFOV">
+			<parameter name="NewId" type="float"/>
+			</method>
+
+			<method name="GetFOV" returntype="float">
+			</method>
+
+		</class>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()

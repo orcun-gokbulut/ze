@@ -39,6 +39,9 @@
 #include "ZECore\ZEError.h"
 #include "ZEMath\ZERay.h"
 #include "ZEGame\ZEDrawParameters.h"
+#include "ZEGame\ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZECamera)
 
 const ZEMatrix4x4& ZECamera::GetViewTransform()
 {
@@ -109,7 +112,7 @@ void ZECamera::SetNearZ(float NearZ)
 	UpdateViewProjectionTransform = true;
 }
 
-float ZECamera::GetNearZ()
+float ZECamera::GetNearZ() const
 {
 	return NearZ;
 }
@@ -123,7 +126,7 @@ void ZECamera::SetFarZ(float FarZ)
 	UpdateViewProjectionTransform = true;
 }
 
-float ZECamera::GetFarZ()
+float ZECamera::GetFarZ() const
 {
 	return FarZ;
 }
@@ -137,7 +140,7 @@ void ZECamera::SetFOV(float FOV)
 	UpdateViewProjectionTransform = true;
 }
 
-float ZECamera::GetFOV()
+float ZECamera::GetFOV() const
 {
 	return FOV;
 }
@@ -151,7 +154,7 @@ void ZECamera::SetAspectRatio(float AspectRatio)
 	UpdateViewProjectionTransform = true;
 }
 
-float ZECamera::GetAspectRatio()
+float ZECamera::GetAspectRatio() const
 {
 	return AspectRatio;
 }
@@ -216,7 +219,9 @@ ZECamera::ZECamera()
 	UpdateProjectionTransform = true;
 }
 
+ZECamera* ZECamera::CreateInstance()
+{
+	return new ZECamera();
+}
 
-
-
-
+#include "ZECamera.h.zpp"

@@ -44,7 +44,7 @@ ZE_META_CLASS_DESCRIPTION(ZEParticleEffectBrush);
 
 class ZEParticleEffectBrush : public ZECompoundEntity
 {
-	ZE_META_CLASS()
+	ZE_META_CLASS(ZEMaterial)
 
 	private:
 		ZEParticleEffect			ParticleEffect;

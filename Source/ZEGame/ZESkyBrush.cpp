@@ -41,6 +41,9 @@
 #include "ZEGraphics\ZEDirectionalLight.h"
 #include "ZEGraphics\ZETextureCubeResource.h"
 #include <string.h>
+#include "ZEGame/ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZESkyBrush);
 
 const ZEAABoundingBox& ZESkyBrush::GetWorldBoundingBox()
 {
@@ -168,5 +171,8 @@ ZESkyBrush::~ZESkyBrush()
 
 #include "ZESkyBrush.h.zpp"
 
-
+ZEEntityRunAt ZESkyBrushDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}
 

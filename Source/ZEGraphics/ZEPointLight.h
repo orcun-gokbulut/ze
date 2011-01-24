@@ -46,7 +46,7 @@ ZE_META_CLASS_DESCRIPTION(ZEPointLight);
 
 class ZEPointLight  : public ZELight
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZEPointLight)
 	private:
 		ZETexture2D*					FrontShadowMap;
 		ZETexture2D*					BackShadowMap;

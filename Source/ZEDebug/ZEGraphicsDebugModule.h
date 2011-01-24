@@ -38,7 +38,6 @@
 #define __ZE_GRAPHICS_DEBUG_MODULE_H__
 
 #include "ZEDebugModule.h"
-#include "ZEGame\ZEModelBrush.h"
 
 class ZEPlayer;
 class ZEPointLight;

@@ -47,7 +47,7 @@ ZE_META_CLASS_DESCRIPTION(ZEParticleEffect);
 
 class ZEParticleEffect : public ZEComponent
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZEParticleEffect)
 	private:
 		ZEArray<ZEParticleSystem*>			SystemArray;				// An effect might be composed of many systems
 

@@ -48,7 +48,7 @@ class ZERenderer;
 class ZEMaterial;
 class ZECanvasBrush : public ZECompoundEntity
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZECanvasBrush)
 	
 	private:
 		ZERenderOrder						RenderOrder;

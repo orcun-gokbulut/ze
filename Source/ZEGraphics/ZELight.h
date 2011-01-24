@@ -55,7 +55,7 @@ class ZEShadowRenderer;
 class ZEScene;
 class ZELight : public ZEComponent
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZELight)
 	private:
 		bool							Enabled;
 
@@ -98,20 +98,24 @@ class ZELight : public ZEComponent
 		virtual const ZEViewVolume&		GetViewVolume() = 0;
 
 										ZELight();
-};	
-#endif
+};
+
 /*
 ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZELight" parent="ZEComponent" noinstance="true" description="Light Base Class">
-			<property name="Color" groupname="Light" type="ZEVector3" autogetset="yes"/>
-			<property name="Intensity" groupname="Light" type="float" autogetset="yes"/>
-			<property name="Attenuation" groupname="Light" type="ZEVector3" autogetset="yes"/>
-			<property name="Range" groupname="Light" type="float" autogetset="yes"/>
-			<property name="CastsShadow" groupname="Light" type="boolean" autogetset="yes"/>
-		</class>
-	</meta>
-</zinek>
+	<zinek>
+		<meta> 
+			<class name="ZELight" parent="ZEComponent">
+			<noinstance>true</noinstance>
+			<description>Base Light Type</description>
+				<property name="CastsShadow" type="boolean" autogetset="yes" description="Enables or disables shadow casting for this light."/>
+				<property name="Color" type="ZEVector3" autogetset="yes" description="Color of the light."/>
+				<property name="Intensity" type="float" autogetset="yes" description="Intensity(light amount emmited from light) of the light."/>
+				<property name="Range" type="float" autogetset="yes" description="Maximum effect range of the light."/>
+				<property name="Attenuation" type="ZEVector3" autogetset="yes" description="Light amount decrease according to distance."/>
+			</class>
+		</meta>
+	</zinek>
 ZE_POST_PROCESSOR_END()
 */
+
+#endif

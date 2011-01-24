@@ -52,6 +52,7 @@
 #include "ZEModel\ZEModel.h"
 #include "ZEModel\ZEModelMesh.h"
 #include "ZEModel\ZEModelBone.h"
+#include "ZEGame\ZEEntityProvider.h"
 
 #include <NxScene.h>
 #include <NxActor.h>
@@ -73,7 +74,6 @@ void ZEPhysicsDebugModule::ColisionDetected(const ZEPhysicalCollision& Collision
 	zeLog("Physical Object", "Collision Occured: Object1 : %x, Object2 : %x", Collision.Collider1, Collision.Collider2);
 }
 
-#include "ZEGame\ZELightBrush.h"
 bool ZEPhysicsDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
@@ -81,7 +81,7 @@ bool ZEPhysicsDebugModule::Initialize()
 	// Create the player
 	if (Player == NULL)
 	{
-		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
+		Player = (ZEPlayer*)ZEEntityProvider::GetInstance()->CreateInstance("ZEPlayer");
 		Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
@@ -170,16 +170,15 @@ bool ZEPhysicsDebugModule::Initialize()
 		World->SetEnabled(true);
 		Scene->LoadMap("PerfTest.zemap");
 
-		ZELightBrush* Light = new ZELightBrush();
-		Light->SetLightType(ZE_LT_POINT);
+		ZEPointLight* Light = (ZEPointLight*)ZEEntityProvider::GetInstance()->CreateInstance("ZEPointLight");
 		Light->SetPosition(ZEVector3(-10.0f, 15.0f, -15.0f));
 		Light->SetScale(ZEVector3::One);
-		Light->GetLight()->SetRange(15000);
+		Light->SetRange(15000);
 		Light->SetRotation(ZEQuaternion::Identity);
-		Light->GetLight()->SetColor(ZEVector3::One);
-		Light->GetLight()->SetAttenuation(0.001f, 0.0f, 1.0f);
-		Light->GetLight()->SetIntensity(2.0f);
-		Light->GetLight()->SetCastsShadow(false);
+		Light->SetColor(ZEVector3::One);
+		Light->SetAttenuation(0.001f, 0.0f, 1.0f);
+		Light->SetIntensity(2.0f);
+		Light->SetCastsShadow(false);
 		/*Light->SetProjectionFOV(ZE_PI_2);
 		Light->SetProjectionAspectRatio(1.0f);
 		Light->SetProjectionTexture("test/pavyon.bmp");*/

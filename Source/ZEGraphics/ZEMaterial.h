@@ -95,7 +95,7 @@ ZE_META_CLASS_DESCRIPTION(ZEMaterial)
 
 class ZEMaterial : public ZEClass
 {
-	ZE_META_CLASS() 
+	ZE_META_CLASS(ZEMaterial) 
 	protected:
 										ZEMaterial();
 		virtual							~ZEMaterial();

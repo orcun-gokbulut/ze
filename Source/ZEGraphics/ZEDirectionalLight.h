@@ -46,7 +46,7 @@ ZE_META_CLASS_DESCRIPTION(ZEDirectionalLight);
 
 class ZEDirectionalLight : public ZELight
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZEDirectionalLight)
 	private:
 		ZETexture2D*					ShadowMap;
 		ZEViewPlane						ViewVolume;

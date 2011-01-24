@@ -44,6 +44,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "ZEGame/ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEModel);
+
 void ZEModel::CalculateBoundingBox()
 {
 	bool NotInitialized = true;

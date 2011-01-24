@@ -49,7 +49,7 @@ class ZESimpleMaterial;
 
 class ZEGrid : public ZEEntity
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZEGrid)
 	private:
 		ZECanvas					MinorGrid;
 		ZECanvas					MajorGrid;

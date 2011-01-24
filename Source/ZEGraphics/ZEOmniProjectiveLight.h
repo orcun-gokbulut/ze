@@ -47,7 +47,7 @@ ZE_META_CLASS_DESCRIPTION(ZEOmniProjectiveLight);
 
 class ZEOmniProjectiveLight : public ZELight
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZEOmniProjectiveLight)
 	private:
 		const ZETextureCube*			ProjectionTexture;
 		ZEViewSphere					ViewVolume;

@@ -41,6 +41,7 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEGrid.h"
 #include "ZEGame/ZECharacter.h"
+#include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEPointLight.h"
 #include "ZEGraphics/ZECamera.h"
@@ -77,7 +78,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
 
-	Camera = new ZECamera();
+	Camera = (ZECamera*)ZEEntityProvider::GetInstance()->CreateInstance("ZECamera");
 	Camera->SetNearZ(zeGraphics->GetNearZ());
 	Camera->SetFarZ(zeGraphics->GetFarZ());
 	Camera->SetFOV(ZE_PI_4 + ZE_PI_8);

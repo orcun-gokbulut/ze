@@ -56,7 +56,7 @@ ZE_META_ENTITY_DESCRIPTION(ZEComponent);
 
 class ZEComponent : public ZEEntity
 {
-	ZE_META_CLASS()
+	ZE_META_ENTITY(ZEComponent)
 	friend class ZECompoundEntity;
 	private:
 		ZECompoundEntity*				Owner;
@@ -125,7 +125,30 @@ ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
 		<class name="ZEComponent" parent="ZEEntity">
+
 			<description>Base Component Type</description>
+
+			<method name="GetWorldVelocity" returntype="ZEVector3">
+			</method>
+
+			<method name="GetLocalTransform" returntype="ZEMatrix4x4">
+			</method>
+
+			<method name="GetWorldPosition" returntype="ZEVector3">
+			</method>
+
+			<method name="GetWorldRotation" returntype="ZEQuaternion">
+			</method>
+
+			<method name="GetWorldDirection" returntype="ZEVector3">
+			</method>
+
+			<method name="GetWorldRight" returntype="ZEVector3">
+			</method>
+
+			<method name="GetWorldUp" returntype="ZEVector3">
+			</method>
+
 		</class>
 	</meta>
 </zinek>

@@ -90,7 +90,7 @@ class ZEProjectiveLight;
 
 class ZECharacter : public ZECompoundEntity
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZECharacter)
 	private:
 		ZEChunkArray<ZECharacterRecordingKey, 29127> 
 									Records;

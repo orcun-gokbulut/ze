@@ -38,6 +38,9 @@
 #include "ZEShadowRenderer.h"
 #include "ZETexture.h"
 #include "ZETexture2D.h"
+#include "ZEGame/ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEOmniProjectiveLight);
 
 ZELightType ZEOmniProjectiveLight::GetLightType()
 {

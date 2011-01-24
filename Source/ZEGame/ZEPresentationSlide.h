@@ -50,7 +50,7 @@ class ZETexture2DResource;
 
 class ZEPresentationSlide : public ZECompoundEntity
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZEPresentationSlide)
 
 	private:
 		bool								Initialized;

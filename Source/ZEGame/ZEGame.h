@@ -68,10 +68,6 @@ class ZEGame
 {
 	protected:
 		ZEScene*								Scene;
-		ZEArray<ZEEntityDescription*>			EntityDescriptions;
-
-		bool									RegisterEntityDescription(ZEEntityDescription* EntityDescription);
-		void									UnregisterEntityDescription(ZEEntityDescription* EntityDescription);
 
 	public:
 		ZEUIManager*							UIManager;
@@ -84,13 +80,6 @@ class ZEGame
 		virtual bool							Initialize();
 		virtual bool							Deinitialize();
 		virtual void							Destroy();
-
-		const ZEArray<ZEEntityDescription*>		GetEntityDescriptions();
-		ZEEntityDescription*					GetEntityDescription(size_t Index);
-		ZEEntityDescription*					GetEntityDescription(const char* EntityTypeName);
-	
-		ZEEntity*								CreateEntityInstance(size_t Index);
-		ZEEntity*								CreateEntityInstance(const char* EntityTypeName);
 
 		virtual void							Tick(float ElapsedTime);
 		virtual void							Render(float ElapsedTime);

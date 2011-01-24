@@ -56,9 +56,12 @@ enum ZECameraProjectionType
 
 class ZEViewPort;
 
+ZE_META_CLASS_DESCRIPTION(ZECamera);
+
 class ZECamera : public ZEComponent
 {
-	protected:
+	ZE_META_CLASS(ZECamera)
+	private:
 		bool							UpdateViewFrustum;
 		bool							UpdateView;
 		bool							UpdateViewTransform;
@@ -76,19 +79,19 @@ class ZECamera : public ZEComponent
 
 		ZEViewFrustum					ViewFrustum;
 		ZEView							View;
-
+										ZECamera();
 	public:
 		void							SetNearZ(float NearZ);
-		float							GetNearZ();
+		float							GetNearZ() const;
 
 		void							SetFarZ(float FarZ);
-		float							GetFarZ();
+		float							GetFarZ() const;
 
 		void							SetFOV(float FOV);
-		float							GetFOV();
+		float							GetFOV() const;
 
 		void							SetAspectRatio(float AspectRatio);
-		float							GetAspectRatio();
+		float							GetAspectRatio() const;
 
 		const ZEMatrix4x4&				GetViewTransform();
 		const ZEMatrix4x4&				GetProjectionTransform();
@@ -104,11 +107,23 @@ class ZECamera : public ZEComponent
 
 		void							GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY);
 
-										ZECamera();
+		static ZECamera*				CreateInstance();
 };
 
 #endif
 
-
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZECamera" parent="ZEComponent" noinstance="false">
+			<description>Camera</description>
+			<property name="NearZ" type="float" autogetset="yes" description="The nearest distance that camera can show"/>
+			<property name="FarZ" type="float" autogetset="yes" description="The farest distance that camera can show"/>
+			<property name="FOV" type="float" autogetset="yes" description="Field of view"/>
+			<property name="AspectRatio" type="float" autogetset="yes" description="Width vs Height aspect ratio"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/

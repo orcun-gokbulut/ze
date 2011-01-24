@@ -41,7 +41,7 @@
 #include "ZEEntity.h"
 #include "ZEFastDelegate.h"
 
-ZE_META_CLASS_DESCRIPTION(ZETrigger);
+ZE_META_ENTITY_DESCRIPTION(ZETrigger);
 
 class ZETrigger;
 
@@ -77,7 +77,7 @@ typedef fastdelegate::FastDelegate2<ZETrigger*, ZEEntity*, void> ZETriggerCallba
 
 class ZETrigger : public ZEEntity
 {
-	ZE_META_CLASS()
+	ZE_META_ENTITY(ZETrigger)
 	private:
 		ZETriggerCallback			Callback;
 

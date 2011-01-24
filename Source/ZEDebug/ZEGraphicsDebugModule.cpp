@@ -48,6 +48,8 @@
 #include "ZEGraphics\ZETexture2DResource.h"
 #include "ZEGame\ZECanvasBrush.h"
 #include "ZEGraphics\ZESimpleMaterial.h"
+#include "ZEGame/ZEEntityProvider.h"
+
 
 #include "ZEModel/ZEModel.h"
 bool ZEGraphicsDebugModule::Initialize()
@@ -57,7 +59,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	// Create the player
 	if (Player == NULL)
 	{
-		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
+		Player = (ZEPlayer*)ZEEntityProvider::GetInstance()->CreateInstance("ZEPlayer");
 		Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());

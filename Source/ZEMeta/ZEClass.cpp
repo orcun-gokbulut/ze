@@ -37,18 +37,7 @@
 #include <string.h>
 #include "ZECore\ZEError.h"
 #include "ZEAnimation.h"
-
-bool ZEClassDescription::CheckParent(ZEClassDescription* Parent, ZEClassDescription* Children)
-{
-	ZEClassDescription* Current = Children->GetParent();
-	while (Current != NULL)
-	{
-		if (Current == Parent)
-			return true;
-		Current = Current->GetParent();
-	}
-	return false;
-}
+#include "ZECore\ZEConsole.h"
 
 #define ZE_CLSF_CLASS_CHUNKID ((ZEDWORD)'CLAS')
 
@@ -58,6 +47,203 @@ struct ZEClassFileChunk
 	char		ClassType[ZE_MAX_NAME_SIZE];
 	ZEDWORD		PropertyCount;
 };
+
+bool ZEClassDescription::CheckParent(ZEClassDescription* Parent, ZEClassDescription* Children)
+{
+	ZEClassDescription* Current = Children;
+	
+	while (Current != NULL)
+	{
+		if (Current == Parent)
+			return true;
+		Current = Current->GetParent();
+	}
+	return false;
+}
+
+void ZEClass::SetOwner(ZEClass* Class)
+{
+	Owner = Class;
+}
+
+ZEClass* ZEClass::GetOwner()
+{
+	return Owner;
+}
+
+bool ZEClass::SetProperty(const char* PropertyName, const ZEVariant& Value)
+{
+	int PropertyId = GetPropertyId(PropertyName);
+
+    if (PropertyId != -1)
+        return SetProperty(PropertyId, Value);
+
+	else
+	{
+		unsigned int Hash = 0;
+		size_t	NameLength = strlen(PropertyName);
+
+		for (size_t I = 0; I < NameLength ; I++)
+		{
+			Hash += PropertyName[I];
+		}
+
+		for (int I = 0; I < CustomProperties.GetCount(); I++)
+		{
+			if (CustomProperties[I].Hash == Hash && Value.GetType() == CustomProperties[I].Type)
+			{
+				CustomProperties[I].Value = Value;
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+bool ZEClass::GetProperty(const char* PropertyName, ZEVariant& Value) const
+{
+	int PropertyId = GetPropertyId(PropertyName);
+
+    if (PropertyId != -1)
+        return GetProperty(PropertyId, Value);
+	
+	else
+	{
+		unsigned int Hash = 0;
+		size_t	NameLength = strlen(PropertyName);
+
+		for (size_t I = 0; I < NameLength ; I++)
+		{
+			Hash += PropertyName[I];
+		}
+
+		for (int I = 0; I < CustomProperties.GetCount(); I++)
+		{
+			if (CustomProperties[I].Hash == Hash)
+			{
+				Value = CustomProperties[I].Value;
+				return true;
+			}
+		}
+	}
+
+    return false;
+}
+
+bool ZEClass::AddCustomProperty(ZERunTimeProperty Property)
+{
+	for (int I = 0; I < CustomProperties.GetCount(); I++)
+	{
+		if (GetProperty(Property.Name, ZEVariant()))
+		{
+			zeLog("Meta", "Property Already exists, Property name : %s", Property.Name);
+			return false;
+		}		
+	}
+
+	Property.Hash = 0;
+	size_t NameLength = strlen(Property.Name);
+
+	for(size_t I = 0; I < NameLength; I++)
+		Property.Hash += Property.Name[I];
+
+	CustomProperties.Add(Property);
+
+	return true;
+}
+
+bool ZEClass::RemoveCustomProperty(const char* PropertyName)
+{
+	unsigned int Hash = 0;
+	size_t	NameLength = strlen(PropertyName);
+
+	for (size_t I = 0; I < NameLength ; I++)
+	{
+		Hash += PropertyName[I];
+	}
+
+	for (int I = 0; I < CustomProperties.GetCount(); I++)
+	{
+		if (CustomProperties[I].Hash == Hash)
+		{
+			CustomProperties.DeleteAt(I);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+const ZEArray<ZERunTimeProperty>* ZEClass::GetCustomProperties() const
+{
+	return &CustomProperties;
+}
+
+bool ZEClass::AddToContainer(const char* ContainerName, ZEClass* Item)
+{
+	int ContainerId = GetContainerId(ContainerName);
+
+	if (ContainerId != -1)
+		return AddToContainer(ContainerId, Item);
+
+	return false;
+}
+
+bool ZEClass::RemoveFromContainer(const char* ContainerName, ZEClass* Item)
+{
+	int ContainerId = GetContainerId(ContainerName);
+
+	if (ContainerId != -1)
+		return RemoveFromContainer(ContainerId, Item);
+
+	return false;
+}
+
+const ZEClass** ZEClass::GetContainerItems(const char* ContainerName) const
+{
+	int ContainerId = GetContainerId(ContainerName);
+
+	if (ContainerId != -1)
+		return GetContainerItems(ContainerId);
+
+	return NULL;
+}
+
+size_t ZEClass::GetContainerItemCount(const char* ContainerName) const 
+{
+	int ContainerId = GetContainerId(ContainerName);
+
+	if (ContainerId != -1)
+		return GetContainerItemCount(ContainerId);
+
+	return 0;
+}
+
+bool ZEClass::CallMethod(const char* MethodName, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue)
+{
+	int MethodId = GetMethodId(MethodName);
+
+	if (MethodId != -1)
+		return CallMethod(MethodId, Parameters, ParameterCount, ReturnValue);
+
+	return false;
+}
+
+bool ZEClass::CallMethod(int MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
+{
+	return CallMethod(MethodId, Parameters.GetConstCArray(), Parameters.GetCount(), ReturnValue);
+}
+
+bool ZEClass::CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
+{
+	int MethodId = GetMethodId(MethodName);
+
+	if (MethodId != -1)
+		return CallMethod(MethodId, Parameters.GetConstCArray(), Parameters.GetCount(), ReturnValue);
+
+	return false;
+}
 
 
 bool ZEClass::Serialize(ZESerializer* Serializer)
@@ -90,7 +276,7 @@ bool ZEClass::Serialize(ZESerializer* Serializer)
 			strcpy(NameBuffer, Properties[I].Name);
 
 			Serializer->Write((void*)NameBuffer, sizeof(char), ZE_MAX_NAME_SIZE);
-			if (Properties[I].Access == ZE_PA_READWRITE)
+			if (Properties[I].Access == ZE_PA_READ | ZE_PA_WRITE)
 				if (!GetProperty(PropertyOffset + I, Value))
 				{
 					zeError("Class Serialize", "Class does not have specified property. (Class Type Name : \"%s\", Property Name : \"%s\")", GetClassDescription()->GetName(), Properties[I].Name);
@@ -155,8 +341,11 @@ ZEAnimationController* ZEClass::GetAnimationController()
 ZEClass::ZEClass()
 {
 	AnimationController = NULL;
+	CustomProperties.SetCount(0);
 }
 
-
+ZEClass::~ZEClass()
+{
+}
 
 

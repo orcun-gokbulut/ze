@@ -65,7 +65,7 @@ struct ZEDrawParameters;
 
 class ZEParticleSystem : public ZEClass
 {
-	ZE_META_CLASS()
+	ZE_META_CLASS(ZEMaterial)
 
 	private:
 		ZEString							Name;						// Used in editor

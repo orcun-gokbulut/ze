@@ -40,6 +40,9 @@
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEGraphics/ZESimpleMaterial.h"
 #include "ZEGraphics/ZECamera.h"
+#include "ZEGame/ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEGrid);
 
 ZEDrawFlags ZEGrid::GetDrawFlags() const
 {

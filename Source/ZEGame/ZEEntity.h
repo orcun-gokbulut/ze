@@ -64,7 +64,7 @@ enum ZEEntityRunAt
 		virtual ZEEntityRunAt GetRunAt() const;
 
 #define ZE_META_ENTITY_DESCRIPTION(ClassName) ZE_META_EXTENDED_CLASS_DESCRIPTION(ClassName, ZEEntityDescription, ZE_META_ENTITY_CLASS_EXTENSION)
-#define ZE_META_ENTITY() ZE_META_EXTENDED_CLASS(ZEEntityDescription, )
+#define ZE_META_ENTITY(Class) ZE_META_EXTENDED_CLASS(ZEEntityDescription, ,Class)
 
 class ZEEntityDescription : public ZEClassDescription
 {
@@ -77,6 +77,9 @@ class ZEEntityDescription : public ZEClassDescription
 		virtual const ZEPropertyDescription*	GetProperties() const;
 		virtual size_t							GetPropertyCount() const;
 		virtual size_t							GetPropertyOffset() const;
+		virtual const ZEContainerDescription*	GetContainers() const;
+		virtual size_t							GetContainerCount() const;
+		virtual size_t							GetContainerOffset() const;
 		virtual const ZEMethodDescription*		GetMethods() const;
 		virtual size_t							GetMethodCount() const;
 		virtual size_t							GetMethodOffset() const;
@@ -119,7 +122,7 @@ typedef ZEDWORD ZEEntityDirtyFlags;
 
 class ZEEntity : public ZEClass
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZEEntity)
 	friend class ZECompoundEntity;
 	private: 
 		char									Name[ZE_MAX_NAME_SIZE];
@@ -199,15 +202,19 @@ class ZEEntity : public ZEClass
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZEEntity">
+		<class name="ZEEntity">		
 			<description>Base Entity Type</description>
-			<property name="EntityId" type="integer" autogetset="yes" description="Unique number that indentifes entity"/>
+			<property name="EntityId" type="integer" autogetset="yes" description="Unique number that indentifes entity"/>	
 			<property name="Name" type="string" autogetset="yes" description="Name of the entity"/>
 			<property name="Position" type="ZEVector3" autogetset="yes" description="World position of the entity"/>
 			<property name="Rotation" type="ZEQuaternion" autogetset="yes" description="World rotation of the entity"/>
 			<property name="Scale" type="ZEVector3" autogetset="yes" description="World scale of the entity"/>
 			<property name="Enabled" type="boolean" autogetset="yes" description="If entity is disabled it will not recive Ticks so it will not interact with player. However this property does not affect entity physical interactions. A entity can be disabled but physically active."/>
 			<property name="Visible" type="boolean" autogetset="yes" description="Is entity visible"/>
+			<property name="Up" type="ZEVector3" getfunction="GetUp"/>
+			<property name="Right" type="ZEVector3" getfunction="GetRight"/>
+			<property name="Direction" type="ZEVector3" getfunction="GetDirection"/>
+			<property name="WorldTransform" type="ZEMatrix4x4" getfunction="GetWorldTransform"/>
 		</class>
 	</meta>
 </zinek>

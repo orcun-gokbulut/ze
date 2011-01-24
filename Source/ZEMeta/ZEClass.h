@@ -37,8 +37,11 @@
 #ifndef __ZE_CLASS_DESCRIPTION_H__
 #define __ZE_CLASS_DESCRIPTION_H__
 
-#include "ZEDS\ZEVariant.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEVariant.h"
 #include "ZEProperty.h"
+#include "ZEContainer.h"
+#include "ZEMethod.h"
 
 #define ZE_META_CLASS_DESCRIPTION(ClassName)\
 	class ClassName##Description : public ZEClassDescription\
@@ -52,6 +55,9 @@
 			virtual const ZEPropertyDescription*	GetProperties() const;\
 			virtual size_t							GetPropertyCount() const;\
 			virtual size_t							GetPropertyOffset() const;\
+			virtual const ZEContainerDescription*	GetContainers() const;\
+			virtual size_t							GetContainerCount() const;\
+			virtual size_t							GetContainerOffset() const;\
 			virtual const ZEMethodDescription*		GetMethods() const;\
 			virtual size_t							GetMethodCount() const;\
 			virtual size_t							GetMethodOffset() const;\
@@ -71,6 +77,9 @@
 			virtual const ZEPropertyDescription*	GetProperties() const;\
 			virtual size_t							GetPropertyCount() const;\
 			virtual size_t							GetPropertyOffset() const;\
+			virtual const ZEContainerDescription*	GetContainers() const;\
+			virtual size_t							GetContainerCount() const;\
+			virtual size_t							GetContainerOffset() const;\
 			virtual const ZEMethodDescription*		GetMethods() const;\
 			virtual size_t							GetMethodCount() const;\
 			virtual size_t							GetMethodOffset() const;\
@@ -79,26 +88,33 @@
 			Extension\
 	};	
 
-#define ZE_META_CLASS()\
+#define ZE_META_CLASS(ClassName)\
+	friend class ClassName##Description;\
 	public:\
 		virtual ZEClassDescription* GetClassDescription() const;\
 		static ZEClassDescription* ClassDescription();\
 		virtual int GetPropertyId(const char* PropertyName) const;\
+		using ZEClass::SetProperty;\
 		virtual bool SetProperty(int PropertyId, const ZEVariant& Value);\
-		virtual bool SetProperty(const char* PropertyName, const ZEVariant& Value);\
+		using ZEClass::GetProperty;\
 		virtual bool GetProperty(int PropertyId, ZEVariant& Value) const;\
-		virtual bool GetProperty(const char* PropertyName, ZEVariant& Value) const;\
+		virtual int GetContainerId(const char* ContainerName) const;\
+		using ZEClass::AddToContainer;\
+		virtual bool AddToContainer(int ContainerId, ZEClass* Item);\
+		using ZEClass::RemoveFromContainer;\
+		virtual bool RemoveFromContainer(int ContainerId, ZEClass* Item);\
+		using ZEClass::GetContainerItems;\
+		virtual const ZEClass** GetContainerItems(int ContainerId) const;\
+		using ZEClass::GetContainerItemCount;\
+		virtual size_t GetContainerItemCount(int ContainerId) const;\
+		virtual int GetMethodId(const char* MethodName) const;\
+		using ZEClass::CallMethod;\
+		virtual bool CallMethod(int MethodId, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue);\
 	private:
 
-#define ZE_META_EXTENDED_CLASS(ExtensionClass, Extension)\
+#define ZE_META_EXTENDED_CLASS(ExtensionClass, Extension, Class)\
+		ZE_META_CLASS()\
 	public:\
-		virtual ZEClassDescription* GetClassDescription() const;\
-		static ZEClassDescription* ClassDescription();\
-		virtual int GetPropertyId(const char* PropertyName) const;\
-		virtual bool SetProperty(int PropertyId, const ZEVariant& Value);\
-		virtual bool SetProperty(const char* PropertyName, const ZEVariant& Value);\
-		virtual bool GetProperty(int PropertyId, ZEVariant& Value) const;\
-		virtual bool GetProperty(const char* PropertyName, ZEVariant& Value) const;\
 		Extension\
 	private:
 
@@ -120,10 +136,16 @@ class ZEClassDescription
 		virtual size_t							GetPropertyCount() const = 0;
 		virtual size_t							GetPropertyOffset() const = 0;
 
+		virtual const ZEContainerDescription*	GetContainers() const = 0;
+		virtual size_t							GetContainerCount() const = 0;
+		virtual size_t							GetContainerOffset() const = 0;
+
 		virtual const ZEMethodDescription*		GetMethods() const = 0;
 		virtual size_t							GetMethodCount() const = 0;
 		virtual size_t							GetMethodOffset() const = 0;
+		
 		virtual ZEClassProvider*				GetProvider() const = 0;
+		
 		virtual ZEClass*						CreateInstance() const = 0;
 
 		static bool								CheckParent(ZEClassDescription* Parent, ZEClassDescription* Children);
@@ -132,37 +154,72 @@ class ZEClassDescription
 class ZEClass
 {
 	private:
+		ZEClass*								Owner;
 		ZEAnimationController*					AnimationController;
+		ZEArray<ZERunTimeProperty>				CustomProperties;
 
 	public:
 		virtual ZEClassDescription*				GetClassDescription() const = 0;
 
+		// Owner
+		virtual void							SetOwner(ZEClass* Class);
+		virtual ZEClass*						GetOwner();
+
 		// Property Functions
 		virtual int								GetPropertyId(const char* PropertyName) const = 0;
 
-/*		virtual bool							SetPropertyController(int PropertyId, ZEClass* Class, int PropertyId);
-		virtual bool							SetPropertyController(int PropertyId, ZEClass* Class, const char* PropertyName);
-		virtual bool							SetPropertyController(const char* PropertyName, ZEClass* Class, int PropertyId);
-		virtual bool							SetPropertyController(const char* PropertyName, ZEClass* Class, const char* PropertyName);*/
-
 		virtual bool							SetProperty(int PropertyId, const ZEVariant& Value) = 0;
-		virtual bool							SetProperty(const char* PropertyName, const ZEVariant& Value) = 0;
+		bool									SetProperty(const char* PropertyName, const ZEVariant& Value);
 
 		virtual bool							GetProperty(int PropertyId, ZEVariant& Value) const = 0;
-		virtual bool							GetProperty(const char* PropertyName, ZEVariant& Value) const = 0;
+		bool									GetProperty(const char* PropertyName, ZEVariant& Value) const;
 
+		bool									AddCustomProperty(ZERunTimeProperty Property);
+		bool									RemoveCustomProperty(const char* PropertyName);
+
+		const ZEArray<ZERunTimeProperty>*		GetCustomProperties() const;
+
+		// Containers
+		virtual int								GetContainerId(const char* ContainerName) const = 0;
+
+		virtual bool							AddToContainer(int ContainerId, ZEClass* Item) = 0;
+		bool									AddToContainer(const char* ContainerName, ZEClass* Item);
+		
+		virtual bool							RemoveFromContainer(int ContainerId, ZEClass* Item) = 0;
+		bool									RemoveFromContainer(const char* ContainerName, ZEClass* Item);
+		
+		virtual const ZEClass**					GetContainerItems(int ContainerId) const = 0;
+		const ZEClass**							GetContainerItems(const char* ContainerName) const;
+		
+		virtual size_t							GetContainerItemCount(int ContainerId) const = 0;
+		size_t									GetContainerItemCount(const char* ContainerName) const;
+
+		// Methods
+		virtual int								GetMethodId(const char* MethodName) const = 0;
+
+		virtual bool							CallMethod(int MethodId, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue) = 0;
+		bool									CallMethod(const char* MethodName, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue);
+		bool									CallMethod(int MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue);
+		bool									CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue);
+
+		// Scripting
+
+		// Controllers
+
+		// Animation
+		virtual void							SetAnimationController(ZEAnimationController* AnimationController);
+		virtual ZEAnimationController*			GetAnimationController();
+
+		// Navigation
+		bool									GetChildClass(const char* Path, ZEClass* ChildClass);
+		
+		// Serialization
 		virtual bool							Serialize(ZESerializer* Serializer);
 		virtual bool							Unserialize(ZEUnserializer* Unserialzier);
 
-		// Methods
-
-		// Child Classes
-
-		// Animation Controller
-		virtual void							SetAnimationController(ZEAnimationController* AnimationController);
-		virtual ZEAnimationController*			GetAnimationController();
 									
 												ZEClass();
+		virtual									~ZEClass();
 };
 
 #endif

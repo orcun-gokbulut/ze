@@ -41,7 +41,7 @@
 #include "ZEGraphics\ZEDirectionalLight.h"
 #include "ZEGraphics\ZECanvas.h"
 
-ZE_META_CLASS_DESCRIPTION(ZESkyBrush);
+ZE_META_ENTITY_DESCRIPTION(ZESkyBrush);
 
 class ZEScene;
 class ZETextureCubeResource;
@@ -49,7 +49,7 @@ class ZESkyBoxMaterial;
 
 class ZESkyBrush : public ZEEntity
 {
-	ZE_META_CLASS()
+	ZE_META_ENTITY(ZESkyBrush)
 	private:
 		ZETextureCubeResource*				SkyTexture;
 		ZESkyBoxMaterial*					SkyMaterial;

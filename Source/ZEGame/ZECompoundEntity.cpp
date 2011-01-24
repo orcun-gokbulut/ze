@@ -125,7 +125,7 @@ ZEEntityType ZECompoundEntity::GetEntityType()
 	return ZE_ET_COMPOUND;
 }
 
-const ZEArray<ZEComponent*>& ZECompoundEntity::GetComponents()
+const ZEArray<ZEComponent*>& ZECompoundEntity::GetComponents() const
 {
 	return Components; 
 }

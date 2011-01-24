@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProjectiveLight.h
+ Zinek Engine - ZEEvent.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,69 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_PROJECTIVE_LIGHT_H__
-#define __ZE_PROJECTIVE_LIGHT_H__
-
-#include "ZELight.h"
-#include "ZEViewVolume.h"
-
-class ZETexture2D;
-
-ZE_META_CLASS_DESCRIPTION(ZEProjectiveLight);
-
-class ZEProjectiveLight : public ZELight
-{
-	ZE_META_ENTITY(ZEProjectiveLight)
-	private:
-		float							FOV;
-		float							AspectRatio;
-		ZEViewFrustum					ViewVolume;
-		const ZETexture2D*				ProjectionMap;
-		ZETexture2D*					ShadowMap;
-
-	public:
-		ZELightType						GetLightType();
-
-		void							SetFOV(float FOV);
-		float							GetFOV() const;
-
-		void							SetAspectRatio(float AspectRatio);
-		float							GetAspectRatio() const;
-
-		void							SetProjectionTexture(const ZETexture2D* Texture);
-		const ZETexture2D*				GetProjectionTexture();
-
-		const ZEMatrix4x4&				GetProjectionMatrix();
-
-		virtual const ZEViewVolume&		GetViewVolume();
-
-		virtual void					SetCastsShadow(bool NewValue);
-
-		virtual void					Deinitialize();
-
-		ZETexture2D*					GetShadowMap();
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
-
-
-										ZEProjectiveLight();
-										~ZEProjectiveLight();
-};
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEProjectiveLight" parent="ZELight" description="Point Light">
-			<property name="FOV" groupname="Light" type="float" autogetset="yes"/>
-			<property name="AspectRatio" groupname="Light" type="float" autogetset="yes"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-
-#endif
+#include "ZEProperty.h"
 
 
 

@@ -1779,6 +1779,22 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEMeta\ZEEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMeta\ZEEvent.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMeta\ZEMethod.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMeta\ZEMethod.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEMeta\ZEPostProcessor.cpp"
 				>
 			</File>
@@ -2314,22 +2330,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEGame\ZEGrid.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEGame\ZELightBrush.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEGame\ZELightBrush.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEGame\ZEModelBrush.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEGame\ZEModelBrush.h"
 				>
 			</File>
 			<File

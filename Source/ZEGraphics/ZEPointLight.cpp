@@ -37,6 +37,9 @@
 #include "ZETexture2D.h"
 #include "ZEShadowRenderer.h"
 #include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPointLight);
 
 ZELightType ZEPointLight::GetLightType()
 {

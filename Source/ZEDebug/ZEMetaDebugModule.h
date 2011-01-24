@@ -42,17 +42,23 @@
 class ZEPlayer;
 class ZECanvasBrush;
 class ZELightBrush;
+class ZEPointLight;
 
 class ZEMetaDebugModule : public ZEDebugModule
 {
 	private:
 		ZEPlayer*				Player;
-		ZELightBrush*			Light;
+		ZEPointLight*			Light;
 		ZECanvasBrush*			Canvas;
+
+		bool					IfEnteredFlag;
+		float					TotalTime;
 
 	public:
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
+
+		virtual void			Process(float ElapsedTime);
 
 								ZEMetaDebugModule();
 		virtual					~ZEMetaDebugModule();

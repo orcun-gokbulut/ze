@@ -140,16 +140,6 @@ const ZEVector4& ZECanvas::GetColor()
 	return Color;
 }
 
-void ZECanvas::ApplyTransformationBefore(const ZEMatrix4x4& Matrix)
-{
-	ZEMatrix4x4::Multiply(Transformation, Matrix, ZEMatrix4x4(Transformation));
-}
-
-void ZECanvas::ApplyTransformationAfter(const ZEMatrix4x4& Matrix)
-{
-	ZEMatrix4x4::Multiply(Transformation, ZEMatrix4x4(Transformation), Matrix);
-}
-
 void ZECanvas::ApplyTranslation(const ZEVector3& Translation)
 {
 	ZEMatrix4x4 TranslationMatrix;

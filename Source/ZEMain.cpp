@@ -62,6 +62,12 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	//ZEGraphicsDebugModule DebugModule;
 	zeCore->SetDebugComponent(&DebugModule);
 
+	ZESoundDebugModule SoundDebugComponent;
+	//zeCore->SetDebugComponent(&SoundDebugComponent);
+
+	ZEMetaDebugModule MetaDebugComponent;
+	//zeCore->SetDebugComponent(&MetaDebugComponent);
+
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();
 	zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_GRAPHICS));

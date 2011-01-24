@@ -39,10 +39,10 @@
 
 #include "ZEDebugModule.h"
 #include "ZEPhysics\ZEPhysicalCallbacks.h"
-#include "ZEGame\ZEModelBrush.h"
 
 class ZEPlayer;
 class ZEPhysicalRigidBody;
+class ZEModel;
 
 #include "ZEPhysics\ZEPhysicalShapes.h"
 

@@ -81,6 +81,7 @@ ZESoundSource3D* ZESoundSource3D::CreateInstance()
 
 #include "ZESoundSource3D.h.zpp"
 
-
-
-
+ZEEntityRunAt ZESoundSource3DDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}

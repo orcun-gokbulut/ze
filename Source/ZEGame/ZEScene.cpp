@@ -51,6 +51,8 @@
 #include "ZESound\ZESoundModule.h"
 #include "ZEMap\ZEPortalMap\ZEPortalMap.h"
 #include "ZEMap\ZEPortalMap\ZEPortalMapResource.h"
+#include "ZEEntityProvider.h"
+
 #include <memory.h>
 
 void ZEScene::SetVisualDebugElements(ZEDWORD VisualDebugElements)
@@ -659,7 +661,7 @@ bool ZEScene::Load(const char* FileName)
 		for (size_t I = 0; I < Entities.GetCount(); I++)
 		{
 			Unserializer.Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
-			Entities[I] = zeGame->CreateEntityInstance(EntityTypeName);
+			Entities[I] = (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(EntityTypeName);
 			if (Entities[I] == NULL)
 			{
 				zeError("Scene", "Unserialization can not create entity type \"%s\".", EntityTypeName);

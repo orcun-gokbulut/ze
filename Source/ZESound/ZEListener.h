@@ -39,11 +39,11 @@
 
 #include "ZEGame\ZEComponent.h"
 
-ZE_META_CLASS_DESCRIPTION(ZEListener);
+ZE_META_ENTITY_DESCRIPTION(ZEListener);
 
 class ZEListener: public ZEComponent
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZEListener)
 	protected:
 		float					DistanceFactor;
 		float					DopplerFactor;

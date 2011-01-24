@@ -223,6 +223,15 @@ class ZEArray
 			return &Items[Count - 1];
 		}
 		
+		inline bool Exists(Type& Value)
+		{
+			for (size_t I = 0; I < Count; I++)
+				if (Items[I] == Value)
+					return true;
+
+			return false;
+		}
+
 		inline Type* Insert(size_t Index)
 		{
 			zedsAssert(Index < 0 || Index > Count, "ZEArray::Insert operation failed. Index is out of range. (0 <= Index <= Count)");
