@@ -44,12 +44,13 @@ class ZETexture2D;
 class ZED3D9Texture2D;
 class ZED3D9PixelShader;
 class ZED3D9VertexShader;
+class ZED3D9ViewPort;
 
 class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 {
 	private:
 		ZED3D9Texture2D*				Input;
-		ZED3D9Texture2D*					Output;
+		ZED3D9ViewPort*					Output;
 		size_t							ScreenWidth, ScreenHeight;
 
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
@@ -87,11 +88,11 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 		void							Initialize();
 		void							Deinitialize();
 
-		void							SetInput(ZETexture2D* Input);
-		ZETexture2D*					GetInput();
+		void							SetInput(ZED3D9Texture2D* Input);
+		ZED3D9Texture2D*				GetInput();
 
-		void							SetOutput(ZED3D9Texture2D* Output);
-		ZETexture2D*					GetOutput();
+		void							SetOutput(ZED3D9ViewPort* Output);
+		ZED3D9ViewPort*					GetOutput();
 
 		void							Process();
 

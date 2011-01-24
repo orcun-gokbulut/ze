@@ -667,8 +667,8 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetSamplerState(4, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
 	GetDevice()->SetSamplerState(4, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	//ZED3D9CommonTools::SetRenderTarget(0, ABuffer);
-	GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)ABuffer->GetViewPort())->FrameBuffer);
+	//GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
 
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
@@ -883,6 +883,10 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DoLightningPass();
 		DoForwardPass();
 
+	HDRProcessor.SetInput(ABuffer);
+	HDRProcessor.SetOutput(ViewPort);
+
+	HDRProcessor.Process();
 
 	GetDevice()->EndScene();
 	

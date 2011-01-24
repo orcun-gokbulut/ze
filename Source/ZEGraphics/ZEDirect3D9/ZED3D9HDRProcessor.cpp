@@ -165,6 +165,25 @@ void ZED3D9HDRProcessor::Initialize()
 	Shaders.ToneMap = ZED3D9PixelShader::CreateShader("HDRProcessor.hlsl", "PSToneMap", 0, "ps_3_0");
 }	
 
+void ZED3D9HDRProcessor::SetInput(ZED3D9Texture2D* Input)
+{
+	this->Input = Input;
+}
+
+ZED3D9Texture2D* ZED3D9HDRProcessor::GetInput()
+{
+	return Input;
+}
+
+void ZED3D9HDRProcessor::SetOutput(ZED3D9ViewPort* Output)
+{
+	this->Output = Output;
+}
+
+ZED3D9ViewPort* ZED3D9HDRProcessor::GetOutput()
+{
+	return Output;
+}
 
 void ZED3D9HDRProcessor::Deinitialize()
 {
@@ -408,7 +427,7 @@ void ZED3D9HDRProcessor::Process()
 	GetDevice()->SetSamplerState(2, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)Output->GetViewPort())->FrameBuffer);
+	GetDevice()->SetRenderTarget(0, Output->FrameBuffer);
 	GetDevice()->SetTexture(0, Input->Texture);
 	GetDevice()->SetTexture(1, Textures.Luminance->Texture);
 	GetDevice()->SetTexture(2, Textures.DownSampled4xB->Texture);
