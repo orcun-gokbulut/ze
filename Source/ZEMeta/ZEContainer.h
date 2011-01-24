@@ -80,11 +80,11 @@ class ZEContainer
 		void						SetContainerMode(ZEContainerMode Mode);
 		ZEContainerMode				GetContainerMode();
 
-		void						SetType(ZEClassDescription* Type);
-		ZEClassDescription*			GetType();
+		void						SetBaseClass(ZEClassDescription* Type);
+		ZEClassDescription*			GetBaseClass();
 
-		void						SetAllowDerivedTypes(bool Allow);
-		bool						GetAllowDerivedTypes();
+		void						SetAllowDerivedClasses(bool Allow);
+		bool						GetAllowDerivedClasses();
 
 		const ZEArray<ZEClass*>&	GetInstances();
 		bool						AddInstance(ZEClass* Instance);

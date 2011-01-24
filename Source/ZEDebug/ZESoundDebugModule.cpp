@@ -40,6 +40,7 @@
 #include "ZEGame\ZEPlayer.h"
 #include "ZEGame\ZEScene.h"
 #include "ZESound\ZESoundSource3D.h"
+#include "ZEGame\ZEEntityProvider.h"
 
 bool ZESoundDebugModule::Initialize()
 {
@@ -48,7 +49,7 @@ bool ZESoundDebugModule::Initialize()
 	// Create the player
 	if (Player == NULL)
 	{
-		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
+		Player = (ZEPlayer*)ZEEntityProvider::GetInstance()->CreateInstance("ZEPlayer");
 		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());

@@ -41,14 +41,15 @@
 class ZEClassDescription;
 class ZEClass;
 
-template <class Type>
-class ZERegisterClass
-{
-	ZERegisterClass()
-	{
-		Type::ClassDescription()->GetProvider()->RegisterClass(Type);
-	}
-};
+#define ZE_META_REGISTER_CLASS(Provider, Class)\
+static class Provider##Class##Registration\
+{\
+	public: \
+	Provider##Class##Registration()\
+		{\
+		Provider::GetInstance()->RegisterClass(Class::ClassDescription());\
+		}\
+} Provider##Class##Registration_;
 
 class ZEProvider
 {

@@ -119,9 +119,7 @@ ZE_POST_PROCESSOR_START(Meta)
 				getcountfunction="GetComponents().GetCount"
 				description="This container contains components that entity includes"/>
 
-				<method name="UpdateBoundingVolumes">
-				</method>
-
+			<method name="UpdateBoundingVolumes"/>
 		</class>
 	</meta>
 </zinek>

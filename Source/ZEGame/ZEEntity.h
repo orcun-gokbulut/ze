@@ -202,96 +202,30 @@ class ZEEntity : public ZEClass
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZEEntity">
-			
+		<class name="ZEEntity">		
 			<description>Base Entity Type</description>
-			
-			<property name="EntityId" type="integer" autogetset="yes" description="Unique number that indentifes entity"/>
-			
+			<property name="EntityId" type="integer" autogetset="yes" description="Unique number that indentifes entity"/>	
 			<property name="Name" type="string" autogetset="yes" description="Name of the entity"/>
-			
 			<property name="Position" type="ZEVector3" autogetset="yes" description="World position of the entity"/>
-			
 			<property name="Rotation" type="ZEQuaternion" autogetset="yes" description="World rotation of the entity"/>
-			
 			<property name="Scale" type="ZEVector3" autogetset="yes" description="World scale of the entity"/>
-			
 			<property name="Enabled" type="boolean" autogetset="yes" description="If entity is disabled it will not recive Ticks so it will not interact with player. However this property does not affect entity physical interactions. A entity can be disabled but physically active."/>
-			
 			<property name="Visible" type="boolean" autogetset="yes" description="Is entity visible"/>
-			
 			<method name="Tick">
 				<parameter name="Time" type="float"/>
 			</method>
-
 			<method name="SetEntityId">
-			<parameter name="NewId" type="integer"/>
+				<parameter name="NewId" type="integer"/>
 			</method>
-
-			<method name="GetEntityId" returntype="integer">
-			</method>
-
+			<method name="GetEntityId" returntype="integer"/>
 			<method name="SetPosition">
-			<parameter name="NewPosition" type="ZEVector3"/>
+				<parameter name="NewPosition" type="ZEVector3"/>
 			</method>
-
-			<method name="GetPosition" returntype="ZEVector3">
-			</method>
-
-			<method name="SetRotation">
-			<parameter name="NewRotation" type="ZEQuaternion"/>
-			</method>
-
-			<method name="GetRotation" returntype="ZEQuaternion">
-			</method>
-
-			<method name="SetScale">
-			<parameter name="NewScale" type="ZEVector3"/>
-			</method>
-
-			<method name="GetScale" returntype="ZEVector3">
-			</method>
-
-			<method name="SetVelocity">
-			<parameter name="NewVelocity" type="ZEVector3"/>
-			</method>
-
-			<method name="GetVelocity" returntype="ZEVector3">
-			</method>
-
-			<method name="SetName">
-			<parameter name="NewName" type="string"/>
-			</method>
-
-			<method name="GetName" returntype="string">
-			</method>
-
-			<method name="SetVisible">
-			<parameter name="Enable" type="boolean"/>
-			</method>
-
-			<method name="GetVisible" returntype="boolean">
-			</method>
-
-			<method name="SetEnabled">
-			<parameter name="Enable" type="boolean"/>
-			</method>
-
-			<method name="GetEnabled" returntype="boolean">
-			</method>
-
-			<method name="GetDirection" returntype="ZEVector3">
-			</method>
-
-			<method name="GetUp" returntype="ZEVector3">
-			</method>
-
-			<method name="GetRight" returntype="ZEVector3">
-			</method>
-
-			<method name="GetWorldTransform" returntype="ZEMatrix4x4">
-			</method>
-
+			<method name="GetPosition" returntype="ZEVector3"/>
+			<method name="GetDirection" returntype="ZEVector3"/>
+			<method name="GetUp" returntype="ZEVector3"/>
+			<method name="GetRight" returntype="ZEVector3"/>
+			<method name="GetWorldTransform" returntype="ZEMatrix4x4"/>
 		</class>
 	</meta>
 </zinek>

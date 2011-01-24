@@ -109,6 +109,7 @@ class ZELightBrush : public ZECompoundEntity
 		virtual void						Tick(float Time);
 		virtual void						Update();
 
+		bool								DoSomething(float AFloat, const char* String, int AInnt, ZEVector3 Vector);
 		virtual void						Draw(ZEDrawParameters* DrawParameters);
 
 											ZELightBrush();
@@ -136,6 +137,13 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="ProjectionTexture" type="string" autogetset="true" semantic="ZE_PS_FILENAME" description="Projection texture"/>
 			<property name="ProjectionFOV" type="float" autogetset="true" description="Field of view of the projection"/>
 			<property name="ProjectionAspectRatio" type="float" autogetset="true" description="Aspect Ratio of the projection"/>
+			<method name="DoSomething">
+				<parameter name="AFloat" type="float"/>
+				<parameter name="String" type="string"/>
+				<parameter name="AInnt" type="integer"/>
+				<parameter name="Vector" type="ZEVector3"/>
+				<returntype>boolean</returntype>
+			</method>
 		</class>
 	</meta>
 </zinek>

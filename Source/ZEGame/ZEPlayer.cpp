@@ -43,6 +43,9 @@
 #include "ZEMath\ZERay.h"
 #include "ZEMath\ZERay.h"
 #include "ZESound\ZEListener.h"
+#include "ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
 
 #define ACTIONID_FORWARD		0
 #define ACTIONID_BACKWARD		1

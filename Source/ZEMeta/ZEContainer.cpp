@@ -46,22 +46,22 @@ ZEContainerMode ZEContainer::GetContainerMode()
 	return Mode;
 }
 
-void ZEContainer::SetType(ZEClassDescription* Type)
+void ZEContainer::SetBaseClass(ZEClassDescription* Type)
 {
 	this->Type = Type;
 }
 
-ZEClassDescription* ZEContainer::GetType()
+ZEClassDescription* ZEContainer::GetBaseClass()
 {
 	return Type;
 }
 
-void ZEContainer::SetAllowDerivedTypes(bool Allow)
+void ZEContainer::SetAllowDerivedClasses(bool Allow)
 {
 	AllowDerivedTypes = Allow;
 }
 
-bool ZEContainer::GetAllowDerivedTypes()
+bool ZEContainer::GetAllowDerivedClasses()
 {
 	return AllowDerivedTypes;
 }

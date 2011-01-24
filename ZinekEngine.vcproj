@@ -1186,6 +1186,14 @@
 			<File
 				RelativePath=".\Source\ZEGame\ZELightBrush.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						GeneratePreprocessedFile="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\Source\ZEGame\ZELightBrush.h"
@@ -1905,6 +1913,14 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEMeta\ZEContainer.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMeta\ZEEvent.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEMeta\ZEEvent.h"
 				>
 			</File>
 			<File

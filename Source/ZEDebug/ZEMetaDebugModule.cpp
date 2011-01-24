@@ -58,20 +58,17 @@ bool ZEMetaDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
 
-	ZEEntityProvider::GetInstance()->RegisterClass(ZEPlayer::ClassDescription());
-	ZEEntityProvider::GetInstance()->RegisterClass(ZELightBrush::ClassDescription());
-
 	// Create the player
 	if (Player == NULL)
 	{
 		Player = (ZEPlayer*)(ZEEntityProvider::GetInstance()->CreateInstance("ZEPlayer"));
 
-		//Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
 		Scene->AddEntity(Player);
 		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
+		Player->AddToContainer("Components", new ZEPointLight());
 		Scene->SetActiveCamera(Player->GetCamera());
 	}
 
@@ -94,14 +91,19 @@ bool ZEMetaDebugModule::Initialize()
 
 	Light->AddCustomProperty(NewProperty);
 
-	
-
 	ZEVariant Reader;
-
 	Light->GetProperty("CustomTestProperty", Reader);
 	Light->SetProperty("CustomTestProperty", ZEVariant(ZEVector3(20,20,20)));
 	Light->GetProperty("CustomTestProperty", Reader);
 	Light->RemoveCustomProperty("CustomTestProperty");
+
+	ZEVariant Parameters[4];
+	Parameters[0] = 1.0f;
+	Parameters[1] = "Orcun";
+	Parameters[2] = 5;
+	Parameters[3] = ZEVector3(4.0f, 6.0f, 7.0f);
+	ZEVariant Return;
+	Light->CallMethod("DoSomething",Parameters, 4, Return);
 
 	//new ZEDGrid(Scene);
  

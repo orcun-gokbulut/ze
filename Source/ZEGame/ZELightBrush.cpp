@@ -47,6 +47,9 @@
 #include "ZEGraphics\ZEDirectionalLight.h"
 #include "ZEGraphics\ZEProjectiveLight.h"
 #include "ZEGraphics\ZEOmniProjectiveLight.h"
+#include "ZEGame\ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZELightBrush);
 
 ZEDWORD ZELightBrush::GetDrawFlags() const
 {
@@ -351,6 +354,11 @@ void ZELightBrush::Tick(float Time)
 void ZELightBrush::Update()
 {
 
+}
+
+bool ZELightBrush::DoSomething(float AFloat, const char* String, int AInnt, ZEVector3 Vector)
+{
+	return false;
 }
 
 void ZELightBrush::Draw(ZEDrawParameters* DrawParameters)

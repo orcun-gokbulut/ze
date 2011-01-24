@@ -52,6 +52,7 @@
 #include "ZEModel\ZEModel.h"
 #include "ZEModel\ZEModelMesh.h"
 #include "ZEModel\ZEModelBone.h"
+#include "ZEGame\ZEEntityProvider.h"
 
 #include <NxScene.h>
 #include <NxActor.h>
@@ -81,7 +82,7 @@ bool ZEPhysicsDebugModule::Initialize()
 	// Create the player
 	if (Player == NULL)
 	{
-		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
+		Player = (ZEPlayer*)ZEEntityProvider::GetInstance()->CreateInstance("ZEPlayer");
 		Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
