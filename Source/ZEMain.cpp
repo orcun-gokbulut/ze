@@ -45,6 +45,8 @@
 #include "ZECore\ZEWindow.h"
 
 #include "ZEDebug\ZEPhysicsDebugModule.h"
+#include "ZEDebug\ZEModelAnimationDebugModule.h"
+#include "ZEDebug\ZEGraphicsDebugModule.h"
 #include "ZEDebug\ZESoundDebugModule.h"
 #include "ZEDebug\ZEMetaDebugModule.h"
 
@@ -53,14 +55,15 @@ extern HINSTANCE ApplicationInstance;
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	//MessageBox(NULL, "Attach it while you can !", "Zinek Engine", MB_OK); 
-	_set_SSE2_enable(1);
+	_set_SSE2_enable(1); 
 	ApplicationInstance = hInstance;
 	
-	/*ZEPhysicsDebugModule PhysicsDebugComponent;
-	zeCore->SetDebugComponent(&PhysicsDebugComponent);*/
+	ZEModelAnimationDebugModule DebugModule;
+	//ZEGraphicsDebugModule DebugModule;
+	zeCore->SetDebugComponent(&DebugModule);
 
-	/*ZESoundDebugComponent SoundDebugComponent;
-	zeCore->SetDebugComponent(&SoundDebugComponent);*/
+	ZESoundDebugModule SoundDebugComponent;
+	//zeCore->SetDebugComponent(&SoundDebugComponent);
 
 	ZEMetaDebugModule MetaDebugComponent;
 	zeCore->SetDebugComponent(&MetaDebugComponent);

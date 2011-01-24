@@ -37,7 +37,7 @@
 #include "ZEGraphics\ZERenderer.h"
 #include "ZECore\ZEError.h"
 #include "ZEDefinitions.h"
-
+/*
 ZEPPColorInputNode::ZEPPColorInputNode()
 {
 	Renderer = NULL;
@@ -96,7 +96,4 @@ ZEPPColorInputNode* ZEPPColorInputNode::CreateInstance()
 {
 	return new ZEPPColorInputNode();
 }
-
-
-
-
+*/

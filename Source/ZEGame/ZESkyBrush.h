@@ -45,17 +45,19 @@ ZE_META_CLASS_DESCRIPTION(ZESkyBrush);
 
 class ZEScene;
 class ZETextureCubeResource;
-class ZEFixedMaterial;
+class ZESkyBoxMaterial;
+
 class ZESkyBrush : public ZEEntity
 {
 	ZE_META_CLASS()
 	private:
 		ZETextureCubeResource*				SkyTexture;
-		ZEFixedMaterial*					SkyMaterial;
+		ZESkyBoxMaterial*					SkyMaterial;
 		ZECanvas							SkyBox;
 		ZERenderOrder						SkyRenderOrder;
 
-		ZEDirectionalLight					SkyLight;
+		ZEVector3							SkyColor;
+		float								SkyBrightness;
 
 		ZEScene*							Scene;
 
@@ -66,21 +68,15 @@ class ZESkyBrush : public ZEEntity
 
 		virtual void						SetSkyTexture(const char* FileName);
 		const char*							GetSkyTexture() const;
-		
+	
+		virtual void						SetSkyBrightness(float Brightness);
+		float								GetSkyBrightness() const;
+
 		virtual void						SetSkyColor(const ZEVector3& Color);
 		const ZEVector3&					GetSkyColor() const;
 
-		virtual void						SetSkyLightEnabled(bool Enabled);
-		bool								GetSkyLightEnabled() const;
-
-		virtual void						SetSkyLightColor(const ZEVector3& Color);
-		const ZEVector3&					GetSkyLightColor() const;
-		
-		virtual void						SetSkyLightDirection(const ZEVector3& Direction);
-		const ZEVector3&					GetSkyLightDirection() const;
-
-		virtual void						SetSkyLightIntensity(float Intensity);
-		float								GetSkyLightIntensity() const;
+		virtual bool						Initialize();
+		virtual void						Deinitialize();
 
 		virtual void						Draw(ZEDrawParameters* DrawParameters);
 		virtual void						Tick(float Time);
@@ -93,12 +89,24 @@ ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
 		<class name="ZESkyBrush"	parent="ZEEntity"	description="Sky Brush">
-			<property name="SkyColor"			type="ZEVector3"	autogetset="true"	default="ZEVector3::One"				description="Color of the sky"			semantic="ZE_PS_COLOR"/>
-			<property name="SkyTexture"			type="string"		autogetset="true"	default=""								description="Texture of the sky"		semantic="ZE_PS_FILENAME"		fileextension="IMAGE"/>
-			<property name="SkyLightEnabled"	type="boolean"		autogetset="true"	default="false"							description="Sun light enabled"/>
-			<property name="SkyLightColor"		type="ZEVector3"	autogetset="true"	default="ZEVector3::One"				description="Color of the sun"			semantic="ZE_PS_COLOR"/>
-			<property name="SkyLightDirection"	type="ZEVector3"	autogetset="true"	default="ZEVector3(0.0f, -1.0f, 0.0f)"	description="Direction of the light"	semantic="ZE_PS_DIRECTION"/>
-			<property name="SkyLightIntensity"	type="float"		autogetset="true"	default="1.0f"							description="Intensity of the light"/>
+			<property name="SkyColor"
+				type="ZEVector3"
+				autogetset="true"
+				default="ZEVector3::One"
+				description="Color of the sky"
+				semantic="ZE_PS_COLOR"/>
+			<property name="SkyBrightness"		
+				type="float"
+				autogetset="true"
+				default="1.0f"
+				description="Intensity of the light"/>
+			<property name="SkyTexture"
+				type="string"
+				autogetset="true"
+				default=""
+				description="Texture of the sky"
+				semantic="ZE_PS_FILENAME"
+				fileextension="IMAGE"/>
 		</class>
 	</meta>
 </zinek>

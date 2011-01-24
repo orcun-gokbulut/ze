@@ -62,7 +62,7 @@ ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
 
 ZEDrawFlags ZEPlayer::GetDrawFlags()
 {
-	return ZE_DF_LIGHT_SOURCE;
+	return ZE_DF_NONE; //ZE_DF_LIGHT_SOURCE;
 }
 
 ZECamera* ZEPlayer::GetCamera()
@@ -86,6 +86,12 @@ float ZEPlayer::GetFOV()
 	return FOV;
 }
 
+void ZEPlayer::Activate()
+{
+	zeScene->SetActiveCamera(&Camera);
+	zeScene->SetActiveListener(Listener);
+}
+
 void ZEPlayer::Tick(float Time)
 {
 	ZEVector3 Position = GetPosition();
@@ -95,7 +101,7 @@ void ZEPlayer::Tick(float Time)
 	ZEInputAction* Current;
 	zeInput->ProcessInputMap(&InputMap);
 	
-	float MetersPerSecond = 10.0f;
+	float MetersPerSecond = 3.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 	ZEComponent* HitComponent;
@@ -165,6 +171,9 @@ void ZEPlayer::Tick(float Time)
 					continue;*/
 				break;
 		}
+		
+		ZEVector3 A = GetPosition();
+		SetPosition(ZEVector3(A.x, 1.7f, A.z));
 
 		if (Yawn < -ZE_PI)
 			Yawn = ZE_PI;
@@ -181,7 +190,7 @@ void ZEPlayer::Tick(float Time)
 		else if (Roll > ZE_PI)
 			Roll = ZE_PI;
 
-		ZEQuaternion::Create(Rotation, Pitch, Yawn, Roll);
+		ZEQuaternion::CreateFromEuler(Rotation, Pitch, Yawn, Roll);
 		ZEQuaternion Temp;
 		ZEQuaternion::Normalize(Temp,Rotation);
 		Rotation = Temp;
@@ -215,14 +224,13 @@ bool ZEPlayer::Initialize()
 		Listener = ZEListener::CreateInstance();
 	Listener->Initialize();
 
-/*	PointLight.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	PointLight.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	PointLight.SetAttenuation(0.1f, 0.0f, 1.0f);
-	PointLight.SetRange(10000.0f);
+	PointLight.SetRange(1000.0f);
 	PointLight.SetIntensity(15.0f);
 	PointLight.SetColor(ZEVector3(1.0f, 1.0f, 1.0));
-	PointLight.SetEnabled(true);*/
+	PointLight.SetEnabled(true);
 
-	//RegisterComponent(&PointLight);
 	RegisterComponent(Camera);
 	RegisterComponent(Listener);
 
@@ -245,11 +253,6 @@ void ZEPlayer::Deinitialize()
 		Listener->Destroy();
 		Listener = NULL;
 	}
-}
-
-void ZEPlayer::Draw(ZERenderer * Renderer)
-{
-
 }
 
 ZEPlayer::ZEPlayer()

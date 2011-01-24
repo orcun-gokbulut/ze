@@ -39,63 +39,41 @@
 
 #include <d3d9.h>
 #include "ZED3D9ComponentBase.h"
-#include "ZED3D9FixedMaterialShader.h"
 #include "ZEGraphics\ZEFixedMaterial.h"
+
+class ZED3D9VertexShader;
+class ZED3D9PixelShader;
 
 class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	private:
-		ZED3D9FixedMaterialShader*		Shader;
-		ZERenderOrder*					RenderOrder;
-		ZECamera*						Camera;
-		void							SetShaderPass(ZED3D9FixedMateriaShaderPass* Pass, bool Skinned) const;
 		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
 		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
+
+		ZED3D9VertexShader*				GBufferPassVertexShader;
+		ZED3D9PixelShader*				GBufferPassPixelShader;
+		ZED3D9VertexShader*				ForwardPassVertexShader;
+		ZED3D9PixelShader*				ForwardPassPixelShader;
+		ZED3D9VertexShader*				ShadowPassVertexShader;
+		ZED3D9PixelShader*				ShadowPassPixelShader;
+
+		void							CreateShaders();
+		void							ReleaseShaders();
 
 	protected:
 										ZED3D9FixedMaterial();
 		virtual							~ZED3D9FixedMaterial();
 
 	public:
-		virtual const char*				GetMaterialUID() const;
-		virtual unsigned int			GetMaterialFlags() const;
-		virtual ZEMaterialType			GetMaterialType() const;
-
 		const char*						ConvertToString(unsigned int MaterialComponent);
 
-		virtual bool					SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const;
-
-		virtual bool					SetupPreLightning() const;
-		virtual size_t					DoPreLightningPass() const;
-
-		virtual bool					SetupLightning() const;
-		virtual bool					SetupPointLightPass(bool Shadowed) const;
-		virtual size_t					DoPointLightPass(ZEPointLight** Lights, size_t Count) const;
-
-		virtual bool					SetupDirectionalLightPass(bool Shadowed) const;
-		virtual size_t					DoDirectionalLightPass(ZEDirectionalLight** Lights, size_t Count) const;
-
-		virtual bool					SetupProjectiveLightPass(bool Shadowed) const;
-		virtual size_t					DoProjectiveLightPass(ZEProjectiveLight** Lights, size_t Count) const;
-
-		virtual bool					SetupOmniProjectiveLightPass(bool Shadowed) const;
-		virtual size_t					DoOmniProjectivePass(ZEOmniProjectiveLight** Lights, size_t Count) const;
-
-		virtual bool					SetupCustomPass(unsigned int CustomPassId) const;
-		virtual bool					DoCustomPass(unsigned int CustomPassId, void* CustomData) const;
-
+		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
 		virtual bool					SetupShadowPass() const;	
-		virtual size_t					DoShadowPass() const;
-
-		virtual void					EndOfPasses() const;
 
 		virtual void					UpdateMaterial();
 
 		virtual void					Release();
 };
 #endif
-
-
-
-

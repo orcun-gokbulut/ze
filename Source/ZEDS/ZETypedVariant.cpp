@@ -42,7 +42,7 @@
 
 #include "ZEtypedvariant.h"
 #include <string.h>
-#include "ZEdefinitions.h"
+#include "ZEDSDefinitions.h"
 #include <string.h>
 #pragma warning(push)
 #pragma warning(disable:4482 4996)

@@ -37,15 +37,14 @@
 #ifndef	__ZE_MODEL_MESH_LOD_H__
 #define __ZE_MODEL_MESH_LOD_H__
 
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEGraphics\ZECanvas.h"
+#include "ZEGraphics/ZERenderOrder.h"
 
+struct ZEDrawParameters;
 class ZEModel;
 class ZEMaterial;
 class ZEModelMesh;
 class ZEModelResourceMeshLOD;
-struct ZEDrawParameters;
-class ZESimpleMaterial;
+class ZERenderer;
 
 class ZEModelMeshLOD
 {
@@ -57,10 +56,6 @@ class ZEModelMeshLOD
 		ZERenderOrder						RenderOrder;
 		const ZEMaterial*					Material;
 		bool								Skinned;
-
-		ZESimpleMaterial*					NormalMaterial;
-		ZECanvas							NormalCanvas;
-		ZERenderOrder						NormalRenderOrder;
 
 	public:
 		void								ResetMaterial();
@@ -78,8 +73,4 @@ class ZEModelMeshLOD
 											~ZEModelMeshLOD();
 };
 #endif
-
-
-
-
 

@@ -51,7 +51,7 @@ void ZEProjectiveLight::SetFOV(float FOV)
 	this->FOV = FOV;
 }
 
-float ZEProjectiveLight::GetFOV()
+float ZEProjectiveLight::GetFOV() const
 {
 	return FOV;
 }
@@ -61,7 +61,7 @@ void ZEProjectiveLight::SetAspectRatio(float AspectRatio)
 	this->AspectRatio = AspectRatio;
 }
 
-float ZEProjectiveLight::GetAspectRatio()
+float ZEProjectiveLight::GetAspectRatio() const
 {
 	return AspectRatio;
 }
@@ -81,92 +81,30 @@ const ZEMatrix4x4& ZEProjectiveLight::GetProjectionMatrix()
 	return ZEMatrix4x4::Identity;
 }
 
-const ZETexture2D* ZEProjectiveLight::GetShadowMap()
+ZETexture2D* ZEProjectiveLight::GetShadowMap()
 {
 	return ShadowMap;
 }
 
-void ZEProjectiveLight::SetShadowMap(int Width, int Height)
-{
-	if (ShadowMap != NULL)
-		ShadowMap->Release();
-	else
-		ShadowMap = ZETexture2D::CreateInstance();
-
-	if (!ShadowMap->Create(Width, Height, ZE_TPF_DEPTH, true))
-	{
-		zeError("Projective Light", "Can not create shadow map texture.");
-		return;
-	}
-}
-
 void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
 {
-	if (!GetCastsShadows() || ShadowMap == NULL || ShadowMap->IsEmpty())
+	if (!GetCastsShadow())
 		return;
 
-	ZEViewPoint ViewPoint;
-	ViewPoint.ViewPosition = GetWorldPosition();
-	
-	ZEMatrix4x4 PerspectiveMatrix, ViewMatrix, ViewProjMatrix, TranslationMatrix, RotationMatrix;
-	ZEMatrix4x4::CreateTranslation(TranslationMatrix, -ViewPoint.ViewPosition.x, -ViewPoint.ViewPosition.y, -ViewPoint.ViewPosition.z);
-	
-	ZEQuaternion Rotation;
-	ZEQuaternion::Conjugate(Rotation, GetWorldRotation());
-	ZEMatrix4x4::CreateRotation(RotationMatrix, Rotation);
+	if (ShadowMap == NULL)
+	{
+		ShadowMap = ZETexture2D::CreateInstance();
+		ShadowMap->Create(512, 512, ZE_TPF_SHADOW_MAP, true);
+	}
 
-	ZEMatrix4x4::Multiply(ViewMatrix, TranslationMatrix, RotationMatrix);
+	ShadowRenderer->SetLight(this);
+	ShadowRenderer->SetViewPort(ShadowMap->GetViewPort());
 
-	ZEMatrix4x4::CreatePerspectiveProjection(PerspectiveMatrix, FOV, AspectRatio, zeGraphics->GetNearZ(), GetRange());
-	ZEMatrix4x4::Multiply(ViewPoint.ViewProjMatrix, ViewMatrix, PerspectiveMatrix);
-
-	//ShadowRenderer->SetOutput((ZETexture2D*)ShadowMap);
 	ShadowRenderer->ClearList();
-//	ShadowRenderer->SetCamera(ViewPoint);
+
 	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
 	ShadowRenderer->Render();
 }
-/*
-const ZELight* ZEProjectiveLight::GetRenderOrderLight()
-{
-
-	ZEVector3 Position = GetWorldPosition();
-	ZEQuaternion Rotation;
-	
-	ZEMatrix4x4 PerspectiveMatrix, ViewMatrix, ViewProjMatrix, TranslationMatrix, RotationMatrix;
-	ZEMatrix4x4::CreateTranslation(TranslationMatrix, -Position.x, -Position.y, -Position.z);
-	
-	ZEQuaternion::Conjugate(Rotation, GetWorldRotation());
-	ZEMatrix4x4::CreateRotation(RotationMatrix, Rotation);
-
-	ZEMatrix4x4::Multiply(ViewMatrix, TranslationMatrix, RotationMatrix);
-
-	if (RenderOrderLight.ProjectionMap != NULL)
-	{
-		float OffsetW = 0.5f + (0.5f / (float)RenderOrderLight.ProjectionMap->GetWidth());
-		float OffsetH = 0.5f + (0.5f / (float)RenderOrderLight.ProjectionMap->GetHeight());
-		ZEMatrix4x4 ScaleBiasMatrix(0.5f, 0.0f, 0.0f, 0.0f,
-									0.0f, -0.5f, 0.0f, 0.0f,
-									0.0f, 0.0f, 1.0f, 0.0f,
-									OffsetW, OffsetH, 0.0f, 1.0f);
-
-		ZEMatrix4x4::CreatePerspectiveProjection(PerspectiveMatrix, FOV, AspectRatio, zeGraphics->GetNearZ(), GetRange());
-		ZEMatrix4x4::Multiply(ViewProjMatrix, ViewMatrix, PerspectiveMatrix);
-		ZEMatrix4x4::Multiply(RenderOrderLight.LightViewProjMatrix, ViewProjMatrix, ScaleBiasMatrix);
-	}
-
-	ZEQuaternion::VectorProduct(RenderOrderLight.Direction, GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));
-
-	if (CastsShadows)
-	{
-	}
-	else
-		RenderOrderLight.ShadowMap = NULL;
-
-
-	RenderOrderLight.Position = ZEVector3(GetWorldPosition());
-	return &RenderOrderLight;
-}*/
 
 const ZEViewVolume& ZEProjectiveLight::GetViewVolume()
 {
@@ -179,6 +117,27 @@ const ZEViewVolume& ZEProjectiveLight::GetViewVolume()
 	return ViewVolume;
 }
 
+void ZEProjectiveLight::SetCastsShadow(bool NewValue)
+{
+	if (NewValue == false)
+		if (ShadowMap != NULL)
+		{
+			ShadowMap->Destroy();
+			ShadowMap = NULL;
+		}
+
+	ZELight::SetCastsShadow(NewValue);
+}
+
+void ZEProjectiveLight::Deinitialize()
+{
+	if (ShadowMap != NULL)
+	{
+		ShadowMap->Destroy();
+		ShadowMap = NULL;
+	}
+}
+
 ZEProjectiveLight::ZEProjectiveLight()
 {
 	ShadowMap = NULL;
@@ -186,10 +145,7 @@ ZEProjectiveLight::ZEProjectiveLight()
 
 ZEProjectiveLight::~ZEProjectiveLight()
 {
-	if (ShadowMap != NULL)
-		ShadowMap->Destroy();
+	Deinitialize();
 }
 
-
-
-
+#include "ZEProjectiveLight.h.zpp"

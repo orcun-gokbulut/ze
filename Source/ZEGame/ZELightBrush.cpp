@@ -90,23 +90,23 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 			Light = new ZEDirectionalLight();
 			ZEMatrix4x4::CreateOffset(Offset, ZEVector3(0.0f, 0.0f, 1.0f), ZEQuaternion(ZE_PI_2, ZEVector3(1.0f, 0.0f, 0.0f)));
 			Canvas.SetTransfomation(Offset);
-			Canvas.AddPyramid(1.0f, 1.0f, 1.0f);
+			Canvas.AddPyramid(0.1f, 0.1f, 0.1f);
 
 			ZEMatrix4x4::CreateRotation(Rotation, ZEQuaternion(ZE_PI_2, ZEVector3(1.0f, 0.0f, 0.0f)));
 			Canvas.SetTransfomation(Rotation);
-			Canvas.AddBox(0.5f, 1.0f, 0.5f);
+			Canvas.AddBox(0.05f, 0.1f, 0.05f);
 			break;
 
 		case ZE_LT_PROJECTIVE:
 			ZEMatrix4x4::CreateRotation(Rotation, ZEQuaternion(-ZE_PI_2, ZEVector3(1.0f, 0.0f, 0.0f)));
 			Canvas.SetTransfomation(Rotation);
-			Canvas.AddPyramid(2.0f, 2.0f, 2.0f);
+			Canvas.AddPyramid(0.2f, 0.2f, 0.2f);
 			Light = new ZEProjectiveLight();
 			break;
 
 		case ZE_LT_OMNIPROJECTIVE:
 			Light = new ZEOmniProjectiveLight();
-			Canvas.AddBox(2.0f, 2.0f, 2.0f);
+			Canvas.AddBox(0.2f, 0.2f, 0.2f);
 			break;
 		default:
 			zeError("Light", "Light type does not supported.");
@@ -120,7 +120,7 @@ void ZELightBrush::SetLightType(ZELightType LightType)
 	Light->SetIntensity(Intensity);
 	Light->SetRange(Range);
 	Light->SetAttenuation(Attenuation.x, Attenuation.y, Attenuation.z);
-	Light->SetCastsShadows(CastsShadow);
+	Light->SetCastsShadow(CastsShadow);
 	Light->SetEnabled(GetEnabled());
 
 	if (LightType == ZE_LT_PROJECTIVE)
@@ -238,7 +238,7 @@ void ZELightBrush::SetCastsShadow(bool NewValue)
 	CastsShadow = NewValue;
 	if (Light != NULL)
 	
-		Light->SetCastsShadows(NewValue);
+		Light->SetCastsShadow(NewValue);
 }
 
 bool ZELightBrush::GetCastsShadow() const
@@ -295,7 +295,7 @@ bool ZELightBrush::Initialize()
 	Material->SetEmmisiveEnabled(true);
 	Material->SetLightningEnabled(false);
 	Material->SetTwoSided(false);
-	Material->SetTransparancyMode(ZE_MTM_NOTRANSPARACY);
+	Material->SetTransparancyMode(ZE_MTM_NONE);
 	Material->UpdateMaterial();
 	
 	RenderOrder.Material = Material;

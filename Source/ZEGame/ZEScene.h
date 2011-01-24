@@ -44,6 +44,7 @@ class ZEViewVolume;
 class ZEBoundingBox;
 class ZECamera;
 class ZEListener;
+class ZEFrameRenderer;
 class ZEShadowRenderer;
 class ZEPostProcessor;
 class ZEFixedMaterial;
@@ -111,9 +112,9 @@ class ZEScene
 
 		ZEPhysicalWorld*						PhysicalWorld;
 
-		ZERenderer*								Renderer;
-		ZEPostProcessor*						PostProcessor;
+		ZEFrameRenderer*						Renderer;
 		ZEShadowRenderer*						ShadowRenderer;
+		ZEPostProcessor*						PostProcessor;
 		ZECamera*								ActiveCamera;
 		ZEListener*								ActiveListener;
 

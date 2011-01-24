@@ -123,14 +123,14 @@ bool ZEPhysicsDebugModule::Initialize()
 		CanvasBrush->Material = CanvasMaterial;
 		CanvasMaterial->SetZero();
 		CanvasMaterial->SetLightningEnabled(true);
-		CanvasMaterial->SetTransparancyMode(ZE_MTM_NOTRANSPARACY);
+		CanvasMaterial->SetTransparancyMode(ZE_MTM_NONE);
 		CanvasMaterial->SetTwoSided(false);
 		CanvasMaterial->SetRecivesShadow(false);
 		CanvasMaterial->SetAmbientEnabled(true);
 		CanvasMaterial->SetAmbientColor(ZEVector3(0.1f, 0.1f, 0.1f));
 		CanvasMaterial->SetDiffuseEnabled(true);
 		CanvasMaterial->SetDiffuseColor(ZEVector3::One);
-		CanvasMaterial->SetDiffuseMap(ZETexture2DResource::LoadResource("Test\\Diffuse.tga")->GetTexture());
+		CanvasMaterial->SetBaseMap(ZETexture2DResource::LoadResource("Test\\Diffuse.tga")->GetTexture());
 		CanvasMaterial->SetSpecularEnabled(true);
 		CanvasMaterial->SetSpecularColor(ZEVector3::One);
 		CanvasMaterial->SetSpecularShininess(64.0f);
@@ -165,33 +165,22 @@ bool ZEPhysicsDebugModule::Initialize()
 
 		//World->AddPhysicalObject(PhysicalMesh);
 
-		Model = new ZEModel();
-		Model->SetModelResource(ZEModelResource::LoadResource("test.zeModel"));
-		Model->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
-		Scene->AddEntity(Model);
-		//Model->GetModel()->GetBones()[5].SetRelativeRotation(ZEQuaternion(ZE_PI_4, ZEVector3(0.0f, 1.0f, 0.0f)));
-		//Model->GetModel()->GetMeshes()[0].SetLocalScale(ZEVector3(0.1, 0.1, 0.1));
-		Model->SetAnimationByName("Test");
-		//Model->SetAnimationState(ZE_MAS_PLAYING);
-		Model->SetAnimationSpeed(66.0f);
-		Model->SetAnimationLooping(true);
-
 		//zeGame->GetScene()->LoadEnvironment("catacombs.zeMap");
 		World->SetVisualize(true);
 		Scene->SetVisualDebugElements(ZE_VDE_ALL);
 		World->SetEnabled(true);
-		Scene->LoadMap("deneme.zemap");
+		Scene->LoadMap("PerfTest.zemap");
 
 		ZELightBrush* Light = new ZELightBrush();
 		Light->SetLightType(ZE_LT_POINT);
-		Light->SetPosition(ZEVector3(0.0f, 15.0f, -15.0f));
+		Light->SetPosition(ZEVector3(-10.0f, 15.0f, -15.0f));
 		Light->SetScale(ZEVector3::One);
 		Light->GetLight()->SetRange(15000);
 		Light->SetRotation(ZEQuaternion::Identity);
 		Light->GetLight()->SetColor(ZEVector3::One);
 		Light->GetLight()->SetAttenuation(0.001f, 0.0f, 1.0f);
 		Light->GetLight()->SetIntensity(2.0f);
-		Light->GetLight()->SetCastsShadows(false);
+		Light->GetLight()->SetCastsShadow(false);
 		/*Light->SetProjectionFOV(ZE_PI_2);
 		Light->SetProjectionAspectRatio(1.0f);
 		Light->SetProjectionTexture("test/pavyon.bmp");*/

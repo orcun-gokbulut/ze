@@ -60,6 +60,4 @@ ZEDirectionalLight::ZEDirectionalLight()
 	ShadowMap = NULL;
 }
 
-
-
-
+#include "ZEDirectionalLight.h.zpp"

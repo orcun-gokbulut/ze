@@ -37,25 +37,25 @@
 #ifndef	__ZE_MODEL_H__
 #define __ZE_MODEL_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEGame\ZEComponent.h"
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEGraphics\ZECanvas.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEGame/ZEComponent.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZECanvas.h"
 #include "ZEModelResource.h"
 #include "ZEModelBone.h"
 #include "ZEModelMesh.h"
 #include "ZEModelAnimation.h"
+#include "ZEModelAnimationTrack.h"
 
-#define ZE_MDF
 class ZEQuaternion;
 class ZEMatrix4x4;
 class ZEFixedMaterial;
 class ZESimpleMaterial;
-struct ZEDrawParameters;
 
 class ZEModel : public ZEComponent
 {	
 	friend class ZEPhysicalEnvironment;
+	friend class ZEModelAnimationTrack;
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
@@ -70,14 +70,8 @@ class ZEModel : public ZEComponent
 		bool								PhysicsEnabled;
 
 		ZEModelAnimationType				AnimationType;
-		ZEModelAnimationState				AnimationState;
-		const ZEModelAnimation*				Animation;	
 
-		float								AnimationFrame;
-		float								AnimationStartFrame;
-		float								AnimationEndFrame;
-		bool								AnimationLooping;
-		float								AnimationSpeed;
+		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
 		ZEAABoundingBox						BoundingBox;
 
@@ -118,26 +112,10 @@ class ZEModel : public ZEComponent
 		const ZEArray<ZEModelMesh>&			GetMeshes();
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
 
-		void								SetAnimation(const ZEModelAnimation* Animation);
-		void								SetAnimationById(size_t AnimationIndex);
-		void								SetAnimationByName(const char* AnimationName);
-
-		const ZEModelAnimation*				GetAnimation();
-
-		void								SetAnimationState(ZEModelAnimationState State);
-		ZEModelAnimationState				GetAnimationState();
-
-		void								SetAnimationFrame(unsigned int Frame);	
-		size_t								GetAnimationFrame();
-
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
 
-		void								SetAnimationSpeed(float Factor);
-		float								GetAnimationSpeed();
-
-		void								SetAnimationLooping(bool Looping);
-		bool								GetAnimationLooping();
+		ZEArray<ZEModelAnimationTrack>&		GetAnimationTracks();
 
 		void								SetAutoLOD(bool Enabled);
 		bool								GetAutoLOD();
@@ -151,13 +129,6 @@ class ZEModel : public ZEComponent
 		void								SetStaticPose(const ZEModelAnimation* Animation, unsigned int Frame);
 		void								SetStaticPoseByIndex(size_t AnimationIndex, unsigned int Frame);
 		void								SetStaticPoseByName(const char* AnimationName, unsigned int Frame);
-
-		void								PlayAnimation(const ZEModelAnimation* Animation, unsigned int StartFrame = 0, unsigned int EndFrame = 0);
-		void								PlayAnimationByName(const char* AnimationName, unsigned int StartFrame = 0, unsigned int EndFrame = 0);
-		void								PlayAnimationByIndex(size_t AnimationIndex, unsigned int StartFrame = 0, unsigned int EndFrame = 0);
-		void								ResumeAnimation();
-		void								PauseAnimation();
-		void								StopAnimation();
 
 		virtual void						SetPosition(const ZEVector3& NewPosition);
 		virtual void						SetRotation(const ZEQuaternion& NewRotation);
@@ -183,8 +154,4 @@ class ZEModel : public ZEComponent
 											~ZEModel();
 };
 #endif
-
-
-
-
 

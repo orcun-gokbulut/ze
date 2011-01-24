@@ -229,7 +229,11 @@ void ZEDSSoundSource::SetCurrentPosition(unsigned int SampleIndex)
 			SampleIndex = SoundResource->GetSampleCount();
 
 		if (Streaming)
+		{
 			CurrentPosition = SampleIndex;
+			ResetStream();
+		}
+
 		else
 			DSBuffer->SetCurrentPosition(SampleIndex * SoundResource->GetBlockAlign());
 	}
@@ -251,30 +255,6 @@ unsigned int ZEDSSoundSource::GetCurrentPosition()
 			return 0;
 }
 
-void ZEDSSoundSource::SetStartPosition(unsigned int SampleIndex)
-{
-	if (SoundResource != NULL)
-		if (SampleIndex > SoundResource->GetSampleCount())
-		{
-			EffectiveStartPosition = SampleIndex % SoundResource->GetSampleCount();
-			return;
-		}
-
-	EffectiveStartPosition = SampleIndex;
-}
-
-void ZEDSSoundSource::SetEndPosition(unsigned int SampleIndex)
-{
-	if (SoundResource != NULL)
-		if (SampleIndex > SoundResource->GetSampleCount())
-		{
-			EffectiveEndPosition = SampleIndex % SoundResource->GetSampleCount();
-			return;
-		}
-
-	EffectiveEndPosition = SampleIndex;
-}
-
 void ZEDSSoundSource::SetPan(int NewPan)
 {
 	if (NewPan> ZE_SS_PAN_RIGHT)
@@ -285,7 +265,10 @@ void ZEDSSoundSource::SetPan(int NewPan)
 		Pan = NewPan;
 
 	if (DSBuffer != NULL)
+	{
+		int A = (((Pan + 100)*(DSBPAN_RIGHT - DSBPAN_LEFT))/200) + DSBPAN_LEFT;
 		DSBuffer->SetPan((((Pan + 100)*(DSBPAN_RIGHT - DSBPAN_LEFT))/200) + DSBPAN_LEFT);
+	}
 }
 
 void ZEDSSoundSource::SetPlaybackSpeed(float Speed)
@@ -298,8 +281,10 @@ void ZEDSSoundSource::SetPlaybackSpeed(float Speed)
 
 void ZEDSSoundSource::SetVolume(unsigned int NewVolume)
 {
-	if (Volume > ZE_SS_VOLUME_MAX)
+	if (NewVolume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;
+	else
+		Volume = NewVolume;
 
 	float EffectiveVolume = (float)Volume * ((float)GetModule()->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
 	
@@ -430,7 +415,6 @@ void ZEDSSoundSource::SetSoundResource(ZESoundResource* Resource)
 	{
 		Resource->AddReferance();
 		SoundResource = Resource;
-		SoundSourceState = ZE_SSS_STOPPED;
 		CreateBuffer(false);
 		SetLimitsEnabled(LimitsEnabled);
 

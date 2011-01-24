@@ -41,7 +41,7 @@
 ///////////////////////////////////////////////////////////////
 
 #include "ZEVariant.h"
-#include "ZEDefinitions.h"
+#include "ZEDSDefinitions.h"
 #include "..\ZETypes.h"
 #include <string.h>
 #pragma warning(push)

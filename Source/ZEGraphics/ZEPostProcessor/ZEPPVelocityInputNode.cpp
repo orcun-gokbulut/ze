@@ -32,7 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-
+/*
 #include "ZEPPVelocityInputNode.h"
 #include "ZEGraphics\ZERenderer.h"
 #include "ZECore\ZEError.h"
@@ -96,7 +96,4 @@ ZEPPVelocityInputNode* ZEPPVelocityInputNode::CreateInstance()
 {
 	return new ZEPPVelocityInputNode();
 }
-
-
-
-
+*/

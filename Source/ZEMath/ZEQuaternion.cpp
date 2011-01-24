@@ -61,47 +61,22 @@ void ZEQuaternion::Create(ZEQuaternion& Output, float Angle, const ZEVector3& Ax
 	
 }
 
-void ZEQuaternion::Create(ZEQuaternion& Output, float Pitch, float Yawn, float Roll)
+void ZEQuaternion::CreateFromEuler(ZEQuaternion& Output, float Pitch, float Yawn, float Roll)
 {
-       float SinPitch		= sinf(Pitch * 0.5f);
-       float CosPitch		= cosf(Pitch * 0.5f);
-       float SinYaw			= sinf(Yawn * 0.5f);
-       float CosYaw			= cosf(Yawn * 0.5f);
-       float SinRoll		= sinf(Roll * 0.5f);
-       float CosRoll		= cosf(Roll * 0.5f);
-       float CosPitchCosYaw	= CosPitch * CosYaw;
-       float SinPitchSinYaw	= SinPitch * SinYaw;
-      
-	   Output.w = CosRoll * CosPitchCosYaw + SinRoll * SinPitchSinYaw;
-       Output.x = CosRoll * SinPitch * CosYaw + SinRoll * CosPitch * SinYaw;
-       Output.y = CosRoll * CosPitch * SinYaw - SinRoll * SinPitch * CosYaw;
-       Output.z = SinRoll * CosPitchCosYaw - CosRoll * SinPitchSinYaw;
+   float SinPitch		= sinf(Pitch * 0.5f);
+   float CosPitch		= cosf(Pitch * 0.5f);
+   float SinYaw			= sinf(Yawn * 0.5f);
+   float CosYaw			= cosf(Yawn * 0.5f);
+   float SinRoll		= sinf(Roll * 0.5f);
+   float CosRoll		= cosf(Roll * 0.5f);
+   float CosPitchCosYaw	= CosPitch * CosYaw;
+   float SinPitchSinYaw	= SinPitch * SinYaw;
+  
+   Output.w = CosRoll * CosPitchCosYaw + SinRoll * SinPitchSinYaw;
+   Output.x = CosRoll * SinPitch * CosYaw + SinRoll * CosPitch * SinYaw;
+   Output.y = CosRoll * CosPitch * SinYaw - SinRoll * SinPitch * CosYaw;
+   Output.z = SinRoll * CosPitchCosYaw - CosRoll * SinPitchSinYaw;
 }
-
-void ZEQuaternion::Create(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Up)
-{
-	 ZEVector3 Right, NewUp;
-	 ZEVector3::CrossProduct(Right, Up, Direction);   
-	 ZEVector3::CrossProduct(NewUp, Direction, Right);
-
-	 /*Matrix mBasis = new Matrix(
-		 vRight.X, vRight.Y, vRight.Z, 0.0f,
-		 vUp.X, vUp.Y, vUp.Z, 0.0f,
-		 vDirection.X, vDirection.Y, vDirection.Z, 0.0f,
-		 0.0f, 0.0f, 0.0f, 1.0f); */
-
-	 Output.w = sqrtf(1.0f + Right.x + NewUp.y + Direction.z) / 2.0f;
-	 float Scale = Output.w * 4.0f;
-
-/*	 qrot.X = (mBasis.M32 - mBasis.M23) / Scale;
-	 qrot.Y = (mBasis.M13 - mBasis.M31) / Scale;
-	 qrot.Z = (mBasis.M21 - mBasis.M12) / Scale;*/
-
-	 Output.x = (Direction.y - NewUp.z) / Scale;
-	 Output.y = (Right.z - Direction.x) / Scale;
-	 Output.z = (NewUp.x - Right.y) / Scale;
-}
-
 
 void ZEQuaternion::CreateIdentity(ZEQuaternion& Output)
 {
@@ -118,28 +93,26 @@ void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Di
 	ZEVector3::CrossProduct(Right, Up, Direction);
 	ZEVector3::CrossProduct(NewUp, Direction, Right);
 	
-	/*ZEMatrix3x3 Basis(
-	Right.x, Right.y, Right.z,                                        
-	NewUp.x, NewUp.y, NewUp.z,                          
-	Direction.x, Direction.y, Direction.z);
+	ZEMatrix3x3 Basis(
+	Right.x, NewUp.x, Direction.x,                                        
+	Right.y, NewUp.y, Direction.y,                          
+	Right.z, NewUp.z, Direction.z);
 
-	ZEQuaternion Quat;
-
-	Quat.w = sqrtf(1.0f + Basis.M11 + Basis.M22 + Basis.M33) / 2.0f;
-	double Scale = Quat.w * 4.0f;
-	Quat.x = (Basis.M32 - Basis.M23) / Scale;
-	Quat.y = (Basis.M13 - Basis.M31) / Scale;
-	Quat.z = (Basis.M21 - Basis.M12) / Scale;*/
+	Output.w = sqrtf(1.0f + Basis.M11 + Basis.M22 + Basis.M33) / 2.0f;
+	double Scale = Output.w * 4.0f;
+	Output.x = (Basis.M32 - Basis.M23) / Scale;
+	Output.y = (Basis.M13 - Basis.M31) / Scale;
+	Output.z = (Basis.M21 - Basis.M12) / Scale;
 	
-
+/*
 	ZEQuaternion Quat;
 	Quat.w = sqrtf(1.0f + Right.x + NewUp.y + Direction.z) / 2.0f;
 	float Scale = Quat.w * 4.0f;
 	Quat.x = (Direction.y - NewUp.z) / Scale;
 	Quat.y = (Right.z - Direction.x) / Scale;
-	Quat.z = (NewUp.x - Right.y) / Scale;
+	Quat.z = (NewUp.x - Right.y) / Scale;*/
 
-	ZEQuaternion::Normalize(Quat, Quat);
+	ZEQuaternion::Normalize(Output, Output);
 }
 
 void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Matrix)

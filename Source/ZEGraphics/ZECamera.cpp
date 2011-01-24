@@ -45,16 +45,10 @@ const ZEMatrix4x4& ZECamera::GetViewTransform()
 	if (!UpdateViewTransform)
 		return ViewTransform;
 	
-	ZEMatrix4x4 ViewPositionTransform, ViewRotationTransform;
+	ZEMatrix4x4::CreateViewTransform(ViewTransform, GetWorldPosition(), GetWorldRotation())	;
 
-	const ZEVector3& ViewPosition = GetWorldPosition();
-	ZEQuaternion ViewRotation;
-	ZEQuaternion::Conjugate(ViewRotation, GetWorldRotation());
-	ZEMatrix4x4::CreateTranslation(ViewPositionTransform, -ViewPosition.x, -ViewPosition.y, -ViewPosition.z);
-	ZEMatrix4x4::CreateRotation(ViewRotationTransform, ViewRotation);
-	ZEMatrix4x4::Multiply(ViewTransform, ViewPositionTransform, ViewRotationTransform);
-	
 	UpdateViewTransform = false;
+	
 	return ViewTransform;
 }
 
@@ -64,15 +58,21 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 		return ProjectionTransform;*/
 
 	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, FOV, zeGraphics->GetAspectRatio(), zeGraphics->GetNearZ(), zeGraphics->GetFarZ());
+	
+	//UpdateProjectionTransform = false;
+
 	return ProjectionTransform;
 }
 
 const ZEMatrix4x4& ZECamera::GetViewProjectionTransform()
 {
-	if (!UpdateViewProjectionTransform)
-		return ViewProjectionTransform;
+	/*if (!UpdateViewProjectionTransform)
+		return ViewProjectionTransform;*/
 
 	ZEMatrix4x4::Multiply(ViewProjectionTransform, GetViewTransform(), GetProjectionTransform());
+	
+	//UpdateViewTransform = false;
+	
 	return ViewProjectionTransform;
 }
 
@@ -99,30 +99,6 @@ void ZECamera::OwnerWorldTransformChanged()
 	UpdateViewProjectionTransform = true;
 	ZEComponent::OwnerWorldTransformChanged();
 }
-
-/*ZEViewPort ZECamera::GetViewPort()
-{
-	ZEViewPort ViewPort;
-
-	ViewPort.Type = ZE_VPT_CAMERA;
-	ViewPort.Light = NULL;
-	ViewPort.Camera = this;
-
-	ViewPort.Position = GetWorldPosition();
-	ViewPort.Rotation = GetWorldRotation();
-
-	ViewPort.FOV = FOV;
-
-	ViewPort.Width = zeGraphics->GetScreenWidth();
-	ViewPort.Height = zeGraphics->GetScreenHeight();
-	ViewPort.AspectRatio = ViewPort.Width / ViewPort.Height;
-
-	ViewPort.ViewTransform = GetViewTransform();
-	ViewPort.ProjectionTransform = GetProjectionTransform();
-	ViewPort.ViewProjectionTransform = GetViewProjectionTransform();
-
-	return ViewPort;
-}*/
 
 void ZECamera::SetNearZ(float NearZ)
 {
@@ -151,7 +127,6 @@ float ZECamera::GetFarZ() const
 {
 	return FarZ;
 }
-
 
 void ZECamera::SetFOV(float FOV)
 {
@@ -230,6 +205,10 @@ void ZECamera::GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY)
 
 ZECamera::ZECamera()
 {
+	FOV = ZE_PI_2;
+	AspectRatio = zeGraphics->GetAspectRatio();
+	NearZ = zeGraphics->GetNearZ();
+	FarZ = zeGraphics->GetFarZ();
 	UpdateView = true;
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;

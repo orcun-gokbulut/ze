@@ -36,7 +36,6 @@
 #include "ZEModelBone.h"
 #include "ZEModel.h"
 #include <stdio.h>
-#include "ZECore\ZECore.h"
 
 const char* ZEModelBone::GetName()
 {
@@ -339,7 +338,3 @@ ZEModelBone::~ZEModelBone()
 {
 	Deinitialize();
 }
-
-
-
-

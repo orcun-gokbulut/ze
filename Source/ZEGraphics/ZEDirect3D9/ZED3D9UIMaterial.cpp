@@ -44,22 +44,17 @@ LPDIRECT3DVERTEXSHADER9 ZED3D9UIMaterial::VertexShader = NULL;
 LPDIRECT3DPIXELSHADER9 ZED3D9UIMaterial::SolidPixelShader = NULL;
 LPDIRECT3DPIXELSHADER9 ZED3D9UIMaterial::TexturedPixelShader = NULL;
 
-const char* ZED3D9UIMaterial::GetMaterialUID() const 
+ZED3D9UIMaterial::ZED3D9UIMaterial()
 {
-	return "";
+
 }
 
-unsigned int ZED3D9UIMaterial::GetMaterialFlags() const 
+ZED3D9UIMaterial::~ZED3D9UIMaterial()
 {
-	return NULL;
+
 }
 
-ZEMaterialType ZED3D9UIMaterial::GetMaterialType() const 
-{
-	return ZE_MT_FIXED;
-}
-
-bool ZED3D9UIMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camera) const 
+bool ZED3D9UIMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const 
 {
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
@@ -114,29 +109,13 @@ bool ZED3D9UIMaterial::SetupMaterial(ZERenderOrder* RenderOrder, ZECamera* Camer
 	return true;
 }
 
-bool ZED3D9UIMaterial::SetupPreLightning() const 
-{
-	return true;
-}
-
-size_t ZED3D9UIMaterial::DoPreLightningPass() const 
-{
-	return 1;
-}
-
 void ZED3D9UIMaterial::UpdateMaterial()
 {
 	if (VertexShader == NULL)
 	{
-		char SourceBuffer[65536];
-		ZEResourceFile::ReadTextFile("Shaders\\UIVertexShader.vs", SourceBuffer, 65536);
-		ZED3D9CommonTools::CompileVertexShader(&VertexShader, SourceBuffer, "UI Material Vertex Shader", "vs_2_0", NULL);
-
-		ZEResourceFile::ReadTextFile("Shaders\\UISolidPixelShader.ps", SourceBuffer, 65536);
-		ZED3D9CommonTools::CompilePixelShader(&SolidPixelShader, SourceBuffer, "UI Material Solid Pixel Shader", "ps_2_0", NULL);
-
-		ZEResourceFile::ReadTextFile("Shaders\\UITexturedPixelShader.ps", SourceBuffer, 65536);
-		ZED3D9CommonTools::CompilePixelShader(&TexturedPixelShader, SourceBuffer, "UI Material Textured Pixel Shader", "ps_2_0", NULL);
+		ZED3D9CommonTools::CompileVertexShader(&VertexShader, "UI.hlsl", "VSMain", "vs_2_0", NULL);
+		ZED3D9CommonTools::CompilePixelShader(&SolidPixelShader, "UI.hlsl", "PSMain", "ps_2_0", NULL);
+		ZED3D9CommonTools::CompilePixelShader(&TexturedPixelShader, "UI.hlsl", "PSMainTextured", "ps_2_0", NULL);
 	}
 }
 

@@ -35,20 +35,16 @@
 
 #include "ZED3D9ComponentBase.h"
 #include "ZED3D9Module.h"
-#include "ZECore\ZEError.h"
-#include <d3dx9.h>
 
 ZED3D9Module* ZED3D9ComponentBase::Module;
 LPDIRECT3DDEVICE9 ZED3D9ComponentBase::Device;
+LPDIRECT3D9 ZED3D9ComponentBase::Direct3D;
 
 bool ZED3D9ComponentBase::BaseInitialize(ZED3D9Module* Mdl)
 {
 	Module = Mdl;
 	Device = Mdl->GetDevice();
+	Direct3D = Mdl->GetDirect3D();
 
 	return true;
 }
-
-
-
-

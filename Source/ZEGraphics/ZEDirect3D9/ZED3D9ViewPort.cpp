@@ -37,11 +37,11 @@
 
 float ZED3D9ViewPort::GetAspectRatio()
 {
-	if (ColorBuffer != NULL)
+	if (FrameBuffer != NULL)
 	{
 		D3DSURFACE_DESC Desc;
-		ColorBuffer->GetDesc(&Desc);
-		return Desc.Width / Desc.Height;
+		FrameBuffer->GetDesc(&Desc);
+		return (float)Desc.Width / (float)Desc.Height;
 	}
 
 	return 0.0f;
@@ -49,10 +49,10 @@ float ZED3D9ViewPort::GetAspectRatio()
 
 unsigned int ZED3D9ViewPort::GetWidth()
 {
-	if (ColorBuffer != NULL)
+	if (FrameBuffer != NULL)
 	{
 		D3DSURFACE_DESC Desc;
-		ColorBuffer->GetDesc(&Desc);
+		FrameBuffer->GetDesc(&Desc);
 		return Desc.Width;
 	}
 
@@ -61,14 +61,14 @@ unsigned int ZED3D9ViewPort::GetWidth()
 
 unsigned int ZED3D9ViewPort::GetHeight()
 {
-	if (ColorBuffer != NULL)
+	if (FrameBuffer != NULL)
 	{
 		D3DSURFACE_DESC Desc;
-		ColorBuffer->GetDesc(&Desc);
+		FrameBuffer->GetDesc(&Desc);
 		return Desc.Height;
 	}
 
-	return 0;;
+	return 0;
 }
 
 

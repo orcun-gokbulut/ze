@@ -35,18 +35,15 @@
 
 #include "ZEModel.h"
 #include "ZEModelFileFormat.h"
-#include "ZEGame\ZEDrawParameters.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZEGraphics\ZEVertexBuffer.h"
-#include "ZEGraphics\ZESimpleMaterial.h"
-#include "ZEGame\ZECompoundEntity.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZECompoundEntity.h"
 
 #include <stdio.h>
 #include <string.h>
 
-// MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL
-// MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL
-// MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL MODEL
 void ZEModel::CalculateBoundingBox()
 {
 	bool NotInitialized = true;
@@ -249,67 +246,6 @@ bool ZEModel::GetPhysicsEnabled()
 	return PhysicsEnabled;
 }
 
-void ZEModel::SetAnimationState(ZEModelAnimationState State)
-{
-	if (Animation == NULL)
-		AnimationState = ZE_MAS_STOPPED;
-	else
-		AnimationState = State;
-}
-
-ZEModelAnimationState ZEModel::GetAnimationState()
-{
-	return AnimationState;
-}
-
-void ZEModel::SetAnimation(const ZEModelAnimation* Animation)
-{
-	this->Animation = Animation;
-}
-
-void ZEModel::SetAnimationById(size_t AnimationIndex)
-{
-	Animation = NULL;
-
-	if (ModelResource == NULL)
-		return;
-
-	Animation = &ModelResource->Animations[AnimationIndex];
-	AnimationStartFrame = 0;
-	AnimationEndFrame = Animation->Frames.GetCount() - 1;
-}
-
-void ZEModel::SetAnimationByName(const char* AnimationName)
-{
-	Animation = NULL;
-
-	if (ModelResource == NULL)
-		return;
-
-	for (size_t I = 0; I < ModelResource->Animations.GetCount(); I++)
-		if (strnicmp(AnimationName, ModelResource->Animations[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
-		{
-			Animation = &ModelResource->Animations[I];
-			AnimationStartFrame = 0;
-			AnimationEndFrame = Animation->Frames.GetCount() - 1;
-			return;
-		}
-}
-
-const ZEModelAnimation* ZEModel::GetAnimation()
-{
-	return Animation;
-}
-
-void ZEModel::SetAnimationFrame(unsigned int Frame)
-{
-	AnimationFrame = Frame;
-}
-
-size_t ZEModel::GetAnimationFrame()
-{
-	return AnimationFrame;
-}
 
 void ZEModel::SetAnimationType(ZEModelAnimationType AnimationType)
 {
@@ -325,14 +261,10 @@ ZEModelAnimationType ZEModel::GetAnimationType()
 	return AnimationType;
 }
 
-void ZEModel::SetAnimationSpeed(float Factor)
-{
-	AnimationSpeed = Factor;
-}
 
-float ZEModel::GetAnimationSpeed()
+ZEArray<ZEModelAnimationTrack>& ZEModel::GetAnimationTracks()
 {
-	return AnimationSpeed;
+	return AnimationTracks;
 }
 
 void ZEModel::SetAutoLOD(bool Enabled)
@@ -347,16 +279,7 @@ bool ZEModel::GetAutoLOD()
 	return AutoLOD;
 }
 
-void ZEModel::SetAnimationLooping(bool Looping)
-{
-	AnimationLooping = Looping;
-}
-
-bool ZEModel::GetAnimationLooping()
-{
-	return AnimationLooping;
-}
-
+/*
 void ZEModel::SetStaticPoseByName(const char* AnimationName, unsigned int Frame)
 {
 	Animation = NULL;
@@ -417,6 +340,7 @@ void ZEModel::SetStaticPose(const ZEModelAnimation* Animation, unsigned int Fram
 
 void ZEModel::PlayAnimationByName(const char* AnimationName, unsigned int StartFrame, unsigned int EndFrame)
 {
+	
 	Animation = NULL;
 	AnimationState = ZE_MAS_STOPPED;
 
@@ -429,10 +353,12 @@ void ZEModel::PlayAnimationByName(const char* AnimationName, unsigned int StartF
 			PlayAnimation(&ModelResource->Animations[I], StartFrame, EndFrame);
 			return;
 		}
+	
 }
 
 void ZEModel::PlayAnimationByIndex(size_t AnimationIndex, unsigned int StartFrame, unsigned int EndFrame)
 {
+	
 	Animation = NULL;
 	AnimationState = ZE_MAS_STOPPED;
 
@@ -440,10 +366,12 @@ void ZEModel::PlayAnimationByIndex(size_t AnimationIndex, unsigned int StartFram
 		return;
 	
 	PlayAnimation(&ModelResource->Animations[AnimationIndex], StartFrame, EndFrame);
+	
 }
 
 void ZEModel::PlayAnimation(const ZEModelAnimation* Animation, unsigned int StartFrame, unsigned int EndFrame)
 {
+	
 	this->Animation = Animation;
 
 	if (Animation == NULL)
@@ -469,22 +397,24 @@ void ZEModel::PlayAnimation(const ZEModelAnimation* Animation, unsigned int Star
 		AnimationEndFrame = (EndFrame == 0 ? Animation->Frames.GetCount() - 1 : EndFrame);
 	
 	AnimationState = ZE_MAS_PLAYING;
+	
 }
 
 void ZEModel::ResumeAnimation()
 {
-	AnimationState = ZE_MAS_PLAYING;
+	//AnimationState = ZE_MAS_PLAYING;
 }
 
 void ZEModel::PauseAnimation()
 {
-	AnimationState = ZE_MAS_PAUSED;
+	//AnimationState = ZE_MAS_PAUSED;
 }
 
 void ZEModel::StopAnimation()
 {
-	AnimationState = ZE_MAS_STOPPED;
+	//AnimationState = ZE_MAS_STOPPED;
 }
+*/
 
 const ZEAABoundingBox& ZEModel::GetLocalBoundingBox() const
 {
@@ -547,119 +477,18 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 
 void ZEModel::Tick(float ElapsedTime)
 {
-	if (AnimationState == ZE_MAS_PLAYING)
-	{
-		if (AnimationFrame >= AnimationEndFrame)
-		{
-			if (AnimationLooping)
-				AnimationFrame = AnimationStartFrame + fmodf(AnimationFrame, AnimationEndFrame - AnimationStartFrame);
-			else
-			{
-				AnimationFrame = AnimationEndFrame;
-				AnimationState = ZE_MAS_STOPPED;
-			}
-		}
-			
-		float Interpolation = AnimationFrame - floorf(AnimationFrame);
-
-		int NextFrameId = (int)ceilf(AnimationFrame);
-		if (NextFrameId >= Animation->Frames.GetCount())
-			NextFrameId = AnimationStartFrame + fmodf(AnimationFrame, AnimationEndFrame - AnimationStartFrame);
-
-		const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[(int)floorf(AnimationFrame)];
-		const ZEModelResourceAnimationFrame* NextFrame = &Animation->Frames[NextFrameId];
-
-
-		for (size_t I = 0; I < Frame->BoneKeys.GetCount(); I++)
-		{
-			const ZEModelResourceAnimationKey* Key = &Frame->BoneKeys[I];
-			const ZEModelResourceAnimationKey* NextKey = &NextFrame->BoneKeys[I];
-			
-			ZEVector3 Position;
-			ZEVector3::Lerp(Position, Key->Position, NextKey->Position, Interpolation);
-			Bones[Key->ItemId].SetRelativePosition(Position);
-
-			ZEQuaternion Rotation;
-			ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
-			Bones[Key->ItemId].SetRelativeRotation(Rotation);
-		}
-		
-		for (size_t I = 0; I < Frame->MeshKeys.GetCount(); I++)
-		{
-			const ZEModelResourceAnimationKey* Key = &Frame->MeshKeys[I];
-			const ZEModelResourceAnimationKey* NextKey = &NextFrame->MeshKeys[I];
-			
-			ZEVector3 Position;
-			ZEVector3::Lerp(Position, Key->Position, NextKey->Position, Interpolation);
-			Meshes[Key->ItemId].SetLocalPosition(Position);
-
-			ZEQuaternion Rotation;
-			ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
-			Meshes[Key->ItemId].SetLocalRotation(Rotation);
-
-			ZEVector3 Scale;
-			ZEVector3::Lerp(Scale, Key->Scale, NextKey->Scale, Interpolation);
-			Meshes[Key->ItemId].SetLocalScale(Scale);
-		}
-		AnimationFrame += AnimationSpeed * ElapsedTime;
-	}
-
-	/*if (Meshes.GetCount()>0)
-	{
-		//Meshes[0].SetLocalPosition(ZEVector3::Zero);
-		//Meshes[0].GetPhysicalBody()->SetPosition(ZEVector3::Zero);
-		//ZEVector3 ewrt = Meshes[0].GetPhysicalBody()->GetPosition();
-		
-		for (int i=0;i<Meshes.GetCount();i++)
-		{
-			Meshes[i].SetLocalPosition(Meshes[i].GetPhysicalBody()->GetPosition());
-			Meshes[i].SetLocalRotation(Meshes[i].GetPhysicalBody()->GetOrientation());
-
-			//Meshes[i].SetLocalPosition(ZEVector3::Zero);
-			//ZEQuaternion q;
-			//static float rrr;
-			//rrr += ZE_PI * ElapsedTime;
-			//ZEQuaternion::Create(q, rrr, ZEVector3::UnitX);
-			//Meshes[i].SetLocalRotation(q);
-		}
-
-		//this->SetWorldPosition(ZEVector3::Zero);
-		//this->SetLocalPosition(ZEVector3::Zero);
-		/*this->SetWorldRotation(ZEQuaternion::Identity);
-		this->SetLocalRotation(ZEQuaternion::Identity);
-
-		//for (int i=0;i<Meshes.GetCount();i++)
-		//{
-		//	Meshes[i].SetLocalPosition(ZEVector3(0,0,0));
-		//	Meshes[i].SetLocalRotation(Meshes[i].GetPhysicalBody()->GetOrientation());
-		//}
-		//ZEVector3 ewrt = Meshes[0].GetPhysicalBody()->GetPosition();
-		//this->SetWorldPosition(Meshes[0].GetPhysicalBody()->GetPosition());
-		//this->SetWorldRotation(Meshes[0].GetPhysicalBody()->GetOrientation());
-		//this->SetLocalPosition(Meshes[0].GetPhysicalBody()->GetPosition());
-		//this->SetLocalRotation(Meshes[0].GetPhysicalBody()->GetOrientation());
-
-		//this->SetWorldPosition(ZEVector3::Zero);
-		//this->SetLocalPosition(ZEVector3::Zero);
-	}*/
+	for(size_t I = 0; I < AnimationTracks.GetCount(); I++)
+		AnimationTracks[I].AdvanceAnimation(ElapsedTime);
 }
 
 ZEModel::ZEModel()
 {
-	AnimationFrame = 0.0f;
-	AnimationStartFrame = 0.0f;
-	AnimationEndFrame = 0.0f;
 	ModelResource = NULL;
-	AnimationSpeed = 1.0f;
 	Visibility = true;
 	AutoLOD = true;
 	ActiveLOD = 0;
 	BoundingBoxDirtyFlag = true;
 	BoneTransformsDirtyFlag = true;
-	AnimationState = ZE_MAS_STOPPED;
-	Animation = NULL;	
-	AnimationFrame = 0;
-	AnimationLooping = false;
 	DebugDrawComponents.Material = NULL;
 	DrawSkeleton = false;
 }
@@ -674,7 +503,3 @@ ZEModel::~ZEModel()
 	if (ModelResource != NULL)
 		((ZEModelResource*)ModelResource)->Release();
 }
-
-
-
-
