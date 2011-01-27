@@ -64,8 +64,8 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			ZED3D9Texture2D*			Luminance1;
 			ZED3D9Texture2D*			Luminance;
 			ZED3D9Texture2D*			OldLuminance;
-			ZED3D9Texture2D*			DownSampled4xA;
-			ZED3D9Texture2D*			DownSampled4xB;
+			ZED3D9Texture2D*			DownSampled2xA;
+			ZED3D9Texture2D*			DownSampled2xB;
 		} Textures;
 
 		struct
@@ -75,7 +75,7 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			ZED3D9PixelShader*			LumDownSample3x;
 			ZED3D9PixelShader*			LumMeasureEnd;
 			ZED3D9PixelShader*			BrightPass; 
-			ZED3D9PixelShader*			ColorDownSample4x;
+			ZED3D9PixelShader*			ColorDownSample2x;
 			ZED3D9PixelShader*			VerticalBloom;
 			ZED3D9PixelShader*			HorizontalBloom;
 			ZED3D9PixelShader*			ToneMap;

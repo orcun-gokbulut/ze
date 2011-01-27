@@ -79,6 +79,9 @@ class ZECompoundEntity : public ZEEntity
 		void									SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
 
 		void									UpdateComponents();
+		
+												ZECompoundEntity();
+		virtual									~ZECompoundEntity();
 
 	public:
 		virtual ZEEntityType					GetEntityType();
@@ -102,9 +105,6 @@ class ZECompoundEntity : public ZEEntity
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
 		
 		void									UpdateBoundingVolumes();
-
-												ZECompoundEntity();
-		virtual									~ZECompoundEntity();
 };
 
 /*
@@ -112,6 +112,7 @@ ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
 		<class name="ZECompoundEntity" parent="ZEEntity">
+			<noinstance>true</noinstance>
 			<container name="Components" baseclass="ZEComponent" allowderived="true"
 				addfunction="RegisterComponent"
 				removefunction="UnregisterComponent"

@@ -60,18 +60,18 @@ bool ZEMetaDebugModule::Initialize()
 	// Create the player
 	if (Player == NULL)
 	{
-		Player = (ZEPlayer*)(ZEEntityProvider::GetInstance()->CreateInstance("ZEPlayer"));
+		Player = ZEPlayer::CreateInstance();
 
 		Scene->AddEntity(Player);
 		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
-		Player->AddToContainer("Components", new ZEPointLight());
+		Player->AddToContainer("Components", ZEPointLight::CreateInstance());
 		Scene->SetActiveCamera(Player->GetCamera());
 	}
 
-	ZEPointLight* Light = (ZEPointLight*)(ZEEntityProvider::GetInstance()->CreateInstance("ZEPointLight"));
+	ZEPointLight* Light = ZEPointLight::CreateInstance();
 	Light->SetPosition(ZEVector3::Zero);
 	Light->SetColor(ZEVector3(0,1,0));
 	Scene->AddEntity(Light);

@@ -51,6 +51,8 @@ class ZEDirectionalLight : public ZELight
 		ZETexture2D*					ShadowMap;
 		ZEViewPlane						ViewVolume;
 
+										ZEDirectionalLight();
+
 	public:
 		ZELightType						GetLightType();
 
@@ -59,7 +61,7 @@ class ZEDirectionalLight : public ZELight
 		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
 		virtual const ZEViewVolume&		GetViewVolume();
 
-										ZEDirectionalLight();
+		static ZEDirectionalLight*		CreateInstance();
 };
 
 #endif

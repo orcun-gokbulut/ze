@@ -214,6 +214,8 @@ class ZEParticleEmitter : public ZEClass
 
 										ZEParticleEmitter();
 										~ZEParticleEmitter();
+
+		static ZEParticleEmitter*		CreateInstance();
 };
 
 /*

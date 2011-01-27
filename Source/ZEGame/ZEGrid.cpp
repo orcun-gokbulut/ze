@@ -205,10 +205,14 @@ ZEGrid::ZEGrid()
 	AxisColor = ZEVector3::Zero;
 }
 
+ZEGrid* ZEGrid::CreateInstance()
+{
+	return new ZEGrid();
+}
+
 #include "ZEGrid.h.zpp"
 
 ZEEntityRunAt ZEGridDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
-

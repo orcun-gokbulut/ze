@@ -1407,14 +1407,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\Source\ZEParticle\ZEParticleEffectBrush.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEParticle\ZEParticleEffectBrush.h"
-				>
-			</File>
-			<File
 				RelativePath=".\Source\ZEParticle\ZEParticleEmitter.cpp"
 				>
 			</File>

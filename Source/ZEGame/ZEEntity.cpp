@@ -38,6 +38,7 @@
 #include "ZEMath\ZERay.h"
 #include "ZECore\ZEError.h"
 #include "ZEComponent.h"
+#include "ZEEntityProvider.h"
 #include <string.h>
 
 void ZEEntity::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
@@ -213,13 +214,20 @@ const ZEVector3& ZEEntity::GetVelocity() const
 	return Velocity;
 }
 
+bool ZEEntity::GetInitialized()
+{
+	return Initialized;
+}
+
 bool ZEEntity::Initialize()
 {
+	Initialized = true;
 	return true;
 }
 
 void ZEEntity::Deinitialize()
 {
+	Initialized = false;
 }
 
 void ZEEntity::Destroy()
@@ -254,6 +262,7 @@ ZEEntity::ZEEntity()
 	Scale = ZEVector3::One;
 	Enabled = true;
 	Visible = true;
+	Initialized = false;
 
 	DirtyFlags = ZE_EDF_ALL;
 	Visible = true;
@@ -263,14 +272,14 @@ ZEEntity::~ZEEntity()
 {
 }
 
+ZEEntity* ZEEntity::CreateInstance(const char* Name)
+{
+	return (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(Name);
+}
+
 #include "ZEEntity.h.zpp"
 
 ZEEntityRunAt ZEEntityDescription::GetRunAt() const
 {
 	return ZE_ERA_NONE;
 }
-
-
-
-
-

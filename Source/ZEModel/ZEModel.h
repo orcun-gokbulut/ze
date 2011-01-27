@@ -52,8 +52,12 @@ class ZEMatrix4x4;
 class ZEFixedMaterial;
 class ZESimpleMaterial;
 
+ZE_META_ENTITY_DESCRIPTION(ZEModel)
+
 class ZEModel : public ZEComponent
 {	
+	ZE_META_ENTITY(ZEModel)
+
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelAnimationTrack;
 	private:
@@ -96,10 +100,16 @@ class ZEModel : public ZEComponent
 
 		void								DebugDraw(ZERenderer* Renderer);
 
+											ZEModel();
+		virtual								~ZEModel();
+
 	public:
 		virtual	ZEDWORD						GetDrawFlags() const;
 
 		virtual const ZEAABoundingBox&		GetLocalBoundingBox() const;
+
+		void								SetModelFile(const char* ModelFile);
+		const char*							GetModelFile() const;
 
 		void								SetModelResource(const ZEModelResource* ModelResource);	
 		const ZEModelResource*				GetModelResource();
@@ -108,7 +118,6 @@ class ZEModel : public ZEComponent
 
 		ZEArray<ZEModelBone>&				GetBones();
 		const ZEArray<ZEMatrix4x4>&			GetBoneTransforms();
-
 		const ZEArray<ZEModelMesh>&			GetMeshes();
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
 
@@ -150,8 +159,21 @@ class ZEModel : public ZEComponent
 		void								SetDrawPhysicalJoints(bool Enabled);
 		bool								GetDrawPhysicalJoints();
 
-											ZEModel();
-											~ZEModel();
+		static ZEModel*						CreateInstance();
 };
 #endif
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZEModel" parent="ZEComponent" description="Sky Brush">
+			<property name="ModelFile"
+				type="string"
+				autogetset="true"
+				description="Model file"
+				semantic="ZE_PS_FILENAME"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/

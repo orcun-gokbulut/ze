@@ -61,6 +61,9 @@ class ZESkyBrush : public ZEEntity
 
 		ZEScene*							Scene;
 
+											ZESkyBrush();
+		virtual								~ZESkyBrush();
+
 	public:
 		virtual const ZEAABoundingBox&		GetWorldBoundingBox();
 
@@ -81,8 +84,8 @@ class ZESkyBrush : public ZEEntity
 		virtual void						Draw(ZEDrawParameters* DrawParameters);
 		virtual void						Tick(float Time);
 
-											ZESkyBrush();
-											~ZESkyBrush();
+		static ZESkyBrush*					CreateInstance();
+
 };	
 /*
 ZE_POST_PROCESSOR_START(Meta)

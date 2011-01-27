@@ -63,4 +63,9 @@ ZEDirectionalLight::ZEDirectionalLight()
 	ShadowMap = NULL;
 }
 
+ZEDirectionalLight* ZEDirectionalLight::CreateInstance()
+{
+	return new ZEDirectionalLight();
+}
+
 #include "ZEDirectionalLight.h.zpp"

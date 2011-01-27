@@ -74,7 +74,7 @@ class ZEListener: public ZEComponent
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZEListener" noinstance="true" parent="ZEComponent">
+		<class name="ZEListener" parent="ZEComponent">
 			<description>Listener</description>
 			<property name="DistanceFactor" type="float" autogetset="yes"/>
 			<property name="DopplerFactor" type="float" autogetset="yes"/>

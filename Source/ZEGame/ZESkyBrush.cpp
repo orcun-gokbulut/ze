@@ -168,6 +168,10 @@ ZESkyBrush::~ZESkyBrush()
 	Deinitialize();
 }
 
+ZESkyBrush* ZESkyBrush::CreateInstance()
+{
+	return new ZESkyBrush();
+}
 
 #include "ZESkyBrush.h.zpp"
 

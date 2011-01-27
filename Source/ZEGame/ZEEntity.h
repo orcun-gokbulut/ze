@@ -134,6 +134,7 @@ class ZEEntity : public ZEClass
 		ZEVector3								Velocity;
 		ZEVector3								OldPosition;
 
+		bool									Initialized;
 		bool									Enabled;
 		bool									Visible;
 
@@ -146,6 +147,9 @@ class ZEEntity : public ZEClass
 
 		void									SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
 	
+												ZEEntity();
+		virtual									~ZEEntity();
+
 	public:
 		virtual ZEEntityType					GetEntityType();
 
@@ -186,6 +190,8 @@ class ZEEntity : public ZEClass
 
 		const ZEMatrix4x4&						GetWorldTransform();
 
+		bool									GetInitialized();
+
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
 		virtual void							Destroy();
@@ -194,8 +200,7 @@ class ZEEntity : public ZEClass
 		virtual void							Tick(float Time);
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
 
-												ZEEntity();
-		virtual									~ZEEntity();
+		ZEEntity*								CreateInstance(const char* Name);
 };
 
 /*
@@ -203,6 +208,7 @@ ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
 		<class name="ZEEntity">		
+			<noinstance>true</noinstance>
 			<description>Base Entity Type</description>
 			<property name="EntityId" type="integer" autogetset="yes" description="Unique number that indentifes entity"/>	
 			<property name="Name" type="string" autogetset="yes" description="Name of the entity"/>

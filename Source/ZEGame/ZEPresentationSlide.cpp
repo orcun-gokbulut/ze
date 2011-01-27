@@ -167,6 +167,11 @@ ZEPresentationSlide::~ZEPresentationSlide()
 	Deinitialize();
 }
 
+ZEPresentationSlide* ZEPresentationSlide::CreateInstance()
+{
+	return new ZEPresentationSlide();
+}
+
 #include "ZEPresentationSlide.h.zpp"
 
 ZEEntityRunAt ZEPresentationSlideDescription::GetRunAt() const

@@ -75,6 +75,8 @@ class ZEGrid : public ZEEntity
 
 		void						GenerateGrid();
 
+									ZEGrid();
+
 	public:
 		ZEDrawFlags					GetDrawFlags() const;
 
@@ -105,8 +107,7 @@ class ZEGrid : public ZEEntity
 		virtual bool				Initialize();
 		virtual void				Deinitialize();
 
-									ZEGrid();
-
+		static ZEGrid*				CreateInstance();
 };
 
 /*

@@ -51,6 +51,9 @@ class ZEParticleEffect : public ZEComponent
 	private:
 		ZEArray<ZEParticleSystem*>			SystemArray;				// An effect might be composed of many systems
 
+	protected:
+											ZEParticleEffect();
+		virtual								~ZEParticleEffect();
 	public:
 		virtual	ZEDWORD						GetDrawFlags() const;
 
@@ -65,9 +68,9 @@ class ZEParticleEffect : public ZEComponent
 		const ZEArray<ZEParticleSystem*>&	GetParticleSystems();
 
 		void								LoadFromFile(const char* FileName);
-			
-											ZEParticleEffect();
-											~ZEParticleEffect();
+		
+		static ZEParticleEffect*			CreateInstance();
+
 };
 
 #endif

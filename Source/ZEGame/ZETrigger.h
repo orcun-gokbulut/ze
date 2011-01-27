@@ -91,6 +91,9 @@ class ZETrigger : public ZEEntity
 		ZEActivateTriggerOn			ActivateTriggerOn;
 		ZEReportBehaviour			ReportBehaviour;
 
+	protected:
+									ZETrigger();
+
 	public:
 		virtual	ZEDWORD				GetDrawFlags();
 
@@ -113,7 +116,7 @@ class ZETrigger : public ZEEntity
 
 		virtual void				Tick(float ElapsedTime);
 
-									ZETrigger();
+		static ZETrigger*			CreateInstance();
 };
 /*
 ZE_POST_PROCESSOR_START(Meta)

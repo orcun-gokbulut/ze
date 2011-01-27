@@ -101,7 +101,7 @@ void ZEPlayer::Tick(float Time)
 	ZEInputAction* Current;
 	zeInput->ProcessInputMap(&InputMap);
 	
-	float MetersPerSecond = 3.0f;
+	float MetersPerSecond = 10.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 	ZEComponent* HitComponent;
@@ -172,9 +172,6 @@ void ZEPlayer::Tick(float Time)
 				break;
 		}
 		
-		ZEVector3 A = GetPosition();
-		SetPosition(ZEVector3(A.x, 1.7f, A.z));
-
 		if (Yawn < -ZE_PI)
 			Yawn = ZE_PI;
 		else if (Yawn > ZE_PI)
@@ -205,34 +202,13 @@ void ZEPlayer::Tick(float Time)
 
 bool ZEPlayer::Initialize()
 {
-	
+	if (GetInitialized())
+		return false;
+
 	FOV = ZE_PI_2;
 	Yawn = Pitch = Roll = 0;
 
-	if (Camera == NULL)
-		Camera = ZECamera::CreateInstance();
-
-	Camera->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Camera->SetLocalRotation(ZEQuaternion::Identity);
-	Camera->SetNearZ(zeGraphics->GetNearZ());
-	Camera->SetFarZ(zeGraphics->GetFarZ());
-	Camera->SetFOV(FOV);
-	Camera->SetAspectRatio(zeGraphics->GetAspectRatio());
-	Camera->Initialize();
-
-	if (Listener == NULL)
-		Listener = ZEListener::CreateInstance();
-	Listener->Initialize();
-
-	PointLight.SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	PointLight.SetAttenuation(0.1f, 0.0f, 1.0f);
-	PointLight.SetRange(1000.0f);
-	PointLight.SetIntensity(15.0f);
-	PointLight.SetColor(ZEVector3(1.0f, 1.0f, 1.0));
-	PointLight.SetEnabled(true);
-
-	RegisterComponent(Camera);
-	RegisterComponent(Listener);
+	ZECompoundEntity::Initialize();
 
 	zeScene->SetActiveCamera(Camera);
 	zeScene->SetActiveListener(Listener);
@@ -242,23 +218,14 @@ bool ZEPlayer::Initialize()
 
 void ZEPlayer::Deinitialize()
 {
-	if (Camera != NULL)
-	{
-		Camera->Destroy();
-		Camera = NULL;
-	}
+	if (!GetInitialized())
+		return;
 
-	if (Listener != NULL)
-	{
-		Listener->Destroy();
-		Listener = NULL;
-	}
+	ZECompoundEntity::Deinitialize();
 }
 
 ZEPlayer::ZEPlayer()
 {
-	Camera = NULL;
-	Listener = NULL;
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,		"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_ALL)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,	"Move Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_ALL)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT, "Strafe Right",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_D, ZE_IBS_ALL)));
@@ -271,11 +238,28 @@ ZEPlayer::ZEPlayer()
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_ZOOMOUT,		"Zoom Out",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_SCROLL_AXIS, ZE_IAS_NEGATIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RAYCAST,		"Ray Cast",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_R, ZE_IBS_RELEASED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_CONSOLE,		"Console",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_GRAVE, ZE_IBS_PRESSED)));
+
+	Camera = ZECamera::CreateInstance();
+	Camera->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	Camera->SetLocalRotation(ZEQuaternion::Identity);
+	Camera->SetNearZ(zeGraphics->GetNearZ());
+	Camera->SetFarZ(zeGraphics->GetFarZ());
+	Camera->SetFOV(FOV);
+	Camera->SetAspectRatio(zeGraphics->GetAspectRatio());
+	RegisterComponent(Camera);
+
+	Listener = ZEListener::CreateInstance();
+	RegisterComponent(Listener);
 }
 
 ZEPlayer::~ZEPlayer()
 {
 	Deinitialize();
+}
+
+ZEPlayer* ZEPlayer::CreateInstance()
+{
+	return new ZEPlayer();
 }
 
 #include "ZEPlayer.h.zpp"
@@ -284,8 +268,3 @@ ZEEntityRunAt ZEPlayerDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
-
-
-
-
-

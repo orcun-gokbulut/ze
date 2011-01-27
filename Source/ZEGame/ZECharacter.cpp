@@ -668,12 +668,10 @@ void ZECharacter::LoadRecording(const char* FileName)
 
 bool ZECharacter::Initialize()
 {
-	if (Model == NULL)
-		Model = new ZEModel();
 
 	Model->SetModelResource(ZEModelResource::LoadResource("soldier.zemodel"));
 
-	FlashLight = new ZEProjectiveLight();
+	FlashLight = ZEProjectiveLight::CreateInstance();
 	FlashLight->SetRange(50);
 	FlashLight->SetIntensity(1.0f);	
 	FlashLight->SetProjectionTexture(ZETexture2DResource::LoadResource("flashlight.jpg")->GetTexture());
@@ -780,10 +778,6 @@ bool ZECharacter::Initialize()
 	StrafeRightAnimationTrack = &Model->GetAnimationTracks()[6];
 	WalkBackwardAnimationTrack = &Model->GetAnimationTracks()[7];
 
-	Model->Initialize();
-
-	RegisterComponent(Model);
-
 	return true;
 }
 
@@ -798,7 +792,9 @@ void ZECharacter::Deinitialize()
 
 ZECharacter::ZECharacter()
 {
-	Model = NULL;
+	Model = ZEModel::CreateInstance();
+	RegisterComponent(Model);
+
 	MovementVelocity = ZEVector3::Zero;
 	MovementRatio = 0.0f;
 	MovementStatus = ZE_CMS_IDLE;
@@ -828,6 +824,11 @@ ZECharacter::ZECharacter()
 ZECharacter::~ZECharacter()
 {
 	Deinitialize();
+}
+
+ZECharacter* ZECharacter::CreateInstance()
+{
+	return new ZECharacter();
 }
 
 #include "ZECharacter.h.zpp"

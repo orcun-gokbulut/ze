@@ -122,6 +122,11 @@ class ZECharacter : public ZECompoundEntity
 
 		ZEProjectiveLight*			FlashLight;
 
+	protected:
+
+									ZECharacter();
+									~ZECharacter();
+
 	public:
 		float						TurnAngle;
 		float						TurnRatio;
@@ -174,8 +179,8 @@ class ZECharacter : public ZECompoundEntity
 
 		virtual void				Tick(float ElapsedTime);
 
-									ZECharacter();
-									~ZECharacter();
+		static ZECharacter*			CreateInstance();
+
 };
 
 /*

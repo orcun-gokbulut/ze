@@ -56,21 +56,18 @@ bool ZEGraphicsDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
 
-	// Create the player
-	if (Player == NULL)
-	{
-		Player = (ZEPlayer*)ZEEntityProvider::GetInstance()->CreateInstance("ZEPlayer");
-		Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
-		Player->SetRotation(ZEQuaternion::Identity);
-		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
-		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
-		Scene->SetActiveCamera(Player->GetCamera());
-		Scene->AddEntity(Player);
-	}
+	Player = ZEPlayer::CreateInstance();
+	Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
+	Player->SetRotation(ZEQuaternion::Identity);
+	Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
+	Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
+	Scene->SetActiveCamera(Player->GetCamera());
+	Scene->AddEntity(Player);
+
 
 	Scene->LoadMap("deneme.zemap");
 
-	PointLight1 = new ZEPointLight();
+	PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
 	PointLight1->SetColor(ZEVector3::One);
 	PointLight1->SetAttenuation(0.01f, 0.0f, 1.0f);
@@ -79,7 +76,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight1->SetCastShadows(false);
 	Scene->AddEntity(PointLight1);
 
-	PointLight2 = new ZEPointLight();
+	PointLight2 = ZEPointLight::CreateInstance();
 	PointLight2->SetPosition(ZEVector3(-15.0f, 3.0f, -15.0f));
 	PointLight2->SetColor(ZEVector3(0.5f, 0.5f, 1.0f));
 	PointLight2->SetAttenuation(0.01f, 0.0f, 1.0f);
@@ -88,7 +85,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight2->SetCastShadows(false);
 	Scene->AddEntity(PointLight2);
 
-	PointLight3 = new ZEPointLight();
+	PointLight3 = ZEPointLight::CreateInstance();
 	PointLight3->SetPosition(ZEVector3(-33.0f, 3.0f, -1.0f));
 	PointLight3->SetColor(ZEVector3(0.5f, 1.0f, 1.0f));
 	PointLight3->SetAttenuation(0.01f, 0.0f, 1.0f);
@@ -97,7 +94,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight3->SetCastShadows(false);
 	Scene->AddEntity(PointLight3);
 
-	PointLight4 = new ZEPointLight();
+	PointLight4 = ZEPointLight::CreateInstance();
 	PointLight4->SetPosition(ZEVector3(-17.0f, 4.0f, 37.0f));
 	PointLight4->SetColor(ZEVector3(0.25f, 0.0f, 0.75f));
 	PointLight4->SetAttenuation(0.03f, 0.0f, 1.0f);
@@ -106,7 +103,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight4->SetCastShadows(false);
 	Scene->AddEntity(PointLight4);
 
-	PointLight5 = new ZEPointLight();
+	PointLight5 = ZEPointLight::CreateInstance();
 	PointLight5->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
 	PointLight5->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	PointLight5->SetAttenuation(0.03f, 0.0f, 1.0f);
@@ -115,7 +112,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight5->SetCastShadows(false);
 	Scene->AddEntity(PointLight5);
 
-	OmniProjectiveLight0 = new ZEOmniProjectiveLight();
+	OmniProjectiveLight0 = ZEOmniProjectiveLight::CreateInstance();
 	OmniProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
 	OmniProjectiveLight0->SetColor(ZEVector3(1.0f, 0.0f, 0.0f));
 	OmniProjectiveLight0->SetAttenuation(0.03f, 0.0f, 1.0f);
@@ -125,7 +122,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	OmniProjectiveLight0->SetCastsShadow(false);
 	Scene->AddEntity(OmniProjectiveLight0);
 
-	ProjectiveLight0 = new ZEProjectiveLight();
+	ProjectiveLight0 = ZEProjectiveLight::CreateInstance();
 	ProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, -10.0f));
 	//ProjectiveLight0->SetRotation(ZEQuaternion(ZE_PI_4 + ZE_PI_8, ZEVector3::UnitY));
 	ProjectiveLight0->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
@@ -156,7 +153,7 @@ bool ZEGraphicsDebugModule::Initialize()
 		Scene->AddEntity(Model);
 	}*/
 
-	DirectionalLight0 = new ZEDirectionalLight();
+	DirectionalLight0 = ZEDirectionalLight::CreateInstance();
 	DirectionalLight0->SetEnabled(true);
 	DirectionalLight0->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
@@ -165,33 +162,29 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(DirectionalLight0);
 
 	PointLight1->SetEnabled(true);
-	PointLight2->SetEnabled(false);
-	PointLight3->SetEnabled(false);
-	PointLight4->SetEnabled(false);
-	PointLight5->SetEnabled(false);
-	OmniProjectiveLight0->SetEnabled(false);
-	ProjectiveLight0->SetEnabled(false);
+	PointLight2->SetEnabled(true);
+	PointLight3->SetEnabled(true);
+	PointLight4->SetEnabled(true);
+	PointLight5->SetEnabled(true);
+	OmniProjectiveLight0->SetEnabled(true);
+	ProjectiveLight0->SetEnabled(true);
 	DirectionalLight0->SetEnabled(true);
 	return true;
 }
 
 void ZEGraphicsDebugModule::Deinitialize()
 {
-	if (Player != NULL)
-	{
-		Player->Destroy();
-		Player = NULL;
-	}
+	Player->Destroy();
 
-	delete PointLight1;
-	delete PointLight2;
-	delete PointLight3;
-	delete PointLight4;
-	delete PointLight5;
+	PointLight1->Destroy();
+	PointLight2->Destroy();
+	PointLight3->Destroy();
+	PointLight4->Destroy();
+	PointLight5->Destroy();
 
-	delete OmniProjectiveLight0;
-	delete ProjectiveLight0;
-	delete DirectionalLight0;
+	OmniProjectiveLight0->Destroy();
+	ProjectiveLight0->Destroy();
+	DirectionalLight0->Destroy();
 }
 
 void ZEGraphicsDebugModule::Process(float ElapsedTime)
@@ -209,7 +202,7 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 
 ZEGraphicsDebugModule::ZEGraphicsDebugModule()
 {
-	Player = NULL;
+
 }
 
 ZEGraphicsDebugModule::~ZEGraphicsDebugModule()

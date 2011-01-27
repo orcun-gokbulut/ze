@@ -78,38 +78,43 @@ bool ZEModelAnimationDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
 
-	Camera = (ZECamera*)ZEEntityProvider::GetInstance()->CreateInstance("ZECamera");
+	Camera = ZECamera::CreateInstance();
 	Camera->SetNearZ(zeGraphics->GetNearZ());
 	Camera->SetFarZ(zeGraphics->GetFarZ());
 	Camera->SetFOV(ZE_PI_4 + ZE_PI_8);
 	Scene->AddEntity(Camera);
 	Scene->SetActiveCamera(Camera);
 	
-	Grid = new ZEGrid();
+	Grid = ZEGrid::CreateInstance();
 	Grid->SetVisible(true);
 	Scene->AddEntity(Grid);
 
-	PointLight0 = new ZEPointLight();
+	PointLight0 = ZEPointLight::CreateInstance();
 	PointLight0->SetIntensity(5.0f);
 	PointLight0->SetAttenuation(0.02f, 0.0f, 1.0f);
 	PointLight0->SetColor(ZEVector3(1.0f, 0.7f, 0.8f));
 	Scene->AddEntity(PointLight0);
 
-	PointLight1 = new ZEPointLight();
+	PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetIntensity(5.0f);
 	PointLight1->SetAttenuation(0.02f, 0.0f, 1.0f);
 	PointLight1->SetColor(ZEVector3(1.0f, 0.8f, 0.7f));
 	Scene->AddEntity(PointLight1);
 
-	PointLight2 = new ZEPointLight();
+	PointLight2 = ZEPointLight::CreateInstance();
 	PointLight2->SetIntensity(5.0f);
 	PointLight2->SetAttenuation(0.02f, 0.0f, 1.0f);
 	PointLight2->SetColor(ZEVector3(0.7f, 0.8f, 1.0f));
 	Scene->AddEntity(PointLight2);
 
-	Character = new ZECharacter();
+	Character = ZECharacter::CreateInstance();
 	Character->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Scene->AddEntity(Character);
+
+	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
+	Sky->SetSkyTexture("Night.tga");
+	Sky->SetSkyBrightness(5.5f);
+	Scene->AddEntity(Sky);
 
 	InputMap.InputBindings.Clear();
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_UP,			"",	ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));

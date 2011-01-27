@@ -55,8 +55,9 @@ float4 Parameters1			: register(c2);
 
 // Kernels
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const float2 Kernel4x4[16]	: register(c10);
-const float2 Kernel[16]		: register(c15);
+const float2 Kernel2x2[4]	: register(c10);
+const float2 Kernel3x3[9]	: register(c14);
+const float2 Kernel4x4[16]	: register(c23);
 
 
 // General Vertex Shader
@@ -84,7 +85,7 @@ float4 PSLumMeasureStart(float2 Texcoord : TEXCOORD0) : COLOR0
 	
 	float Luminance = 0.0f;
 	for (int I = 0; I < 4; I++)
-		Luminance += log(0.00001f + dot(tex2D(Input, Texcoord + PixelSize * Kernel4x4[I]).xyz, ColorWeights));
+		Luminance += log(0.00001f + dot(tex2D(Input, Texcoord + PixelSize * Kernel2x2[I]).xyz, ColorWeights));
 
 	return float4(Luminance / 4.0f, 0.0f, 0.0f, 0.0f);
 }
@@ -97,7 +98,7 @@ float4 PSLumDownSample3x(float2 Texcoord : TEXCOORD0) : COLOR0
 	float AverageLuminance = 0.0f;
 
 	for (int I = 0; I < 9; I++)
-		AverageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel[I]).r;
+		AverageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel3x3[I]).r;
 
 	return float4(AverageLuminance / 9.0f, 0.0f, 0.0f, 0.0f);
 }
@@ -110,12 +111,12 @@ float4 PSLumMeasureEnd(float2 Texcoord : TEXCOORD0) : COLOR0
 	float AverageLuminance = 0.0f;
 
 	for (int I = 0; I < 9; I++)
-		AverageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel[I]).r;
+		AverageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel3x3[I]).r;
 	AverageLuminance = exp(AverageLuminance / 9.0f);
 	float OldAverageLuminance = tex2D(OldAverageLuminanceTexture, float2(0.5f, 0.5f));
 	float AdaptiveAverageLuminance = lerp(AverageLuminance, OldAverageLuminance, pow(0.000001f, ElapsedTime / 30.0f));
 	
-	return float4(AdaptiveAverageLuminance, 0.0f, 0.0f, 0.0f);
+	return float4(AverageLuminance, 0.0f, 0.0f, 0.0f);
 }
 
 
@@ -126,9 +127,9 @@ float4 PSBrightPass(float2 Texcoord : TEXCOORD0) : COLOR0
 	const float3 ColorWeights = {0.299f, 0.587f, 0.114f};
 
 	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	for (int I = 0; I < 16; I++)
-		Color += tex2D(Input, Texcoord + PixelSize * Kernel4x4[I]);
-	Color /= 16.0f;
+	for (int I = 0; I < 4; I++)
+		Color += tex2D(Input, Texcoord + PixelSize * Kernel2x2[I]);
+	Color /= 4.0f;
 	
 	float Luminance = dot(Color, ColorWeights);
 	float AverageLuminance = tex2D(AverageLuminanceTexture, float2(0.5f, 0.5f));
@@ -142,17 +143,17 @@ float4 PSBrightPass(float2 Texcoord : TEXCOORD0) : COLOR0
 }
 
 
-// Down Sample 4x Pixel Shader
+// Down Sample 2x Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PSColorDownSample4x(float2 Texcoord : TEXCOORD0) : COLOR0
+float4 PSColorDownSample2x(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	for (int I = 0; I < 16; I++)
-		Color += tex2D(Input, Texcoord + PixelSize * Kernel[I]);
+	for (int I = 0; I < 4; I++)
+		Color += tex2D(Input, Texcoord + PixelSize * Kernel2x2[I]);
 	
-	Color /= 16.0f;
+	Color /= 4.0f;
 	
-	return Color;
+	return tex2D(Input, Texcoord);
 }
 
 
@@ -162,7 +163,7 @@ float4 PSVerticalBloom(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	for (int I = 0; I < 15; I++)
-		Color += Kernel[I].y * tex2D(Input, Texcoord + float2(0.0f, PixelSize.y * Kernel[I].x));
+		Color += Kernel4x4[I].y * tex2D(Input, Texcoord + float2(0.0f, PixelSize.y * Kernel4x4[I].x));
 		
 	return Color;
 }
@@ -174,7 +175,7 @@ float4 PSHorizontalBloom(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	for (int I = 0; I < 15; I++)
-		Color += Kernel[I].y * tex2D(Input, Texcoord + float2(PixelSize.x * Kernel[I].x, 0.0f));
+		Color += Kernel4x4[I].y * tex2D(Input, Texcoord + float2(PixelSize.x * Kernel4x4[I].x, 0.0f));
 	
 	return Color;
 }

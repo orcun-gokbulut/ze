@@ -51,10 +51,12 @@ class ZEPlayer : public ZECompoundEntity
 	private:
 		ZEInputMap				InputMap;
 		ZECamera*				Camera;
-		ZEPointLight			PointLight;
 		ZEListener*				Listener;
 		float					Pitch, Yawn, Roll, FOV;
-	
+
+								ZEPlayer();
+		virtual					~ZEPlayer();
+
 	public:
 		virtual ZEDrawFlags		GetDrawFlags();
 
@@ -70,9 +72,8 @@ class ZEPlayer : public ZECompoundEntity
 		
 		virtual	bool			Initialize();
 		virtual void			Deinitialize();
-
-								ZEPlayer();
-								~ZEPlayer();
+		
+		static ZEPlayer*		CreateInstance();
 };
 
 /*

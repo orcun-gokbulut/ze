@@ -162,33 +162,70 @@ ZEDWORD ZEModel::GetDrawFlags() const
 	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
+void ZEModel::SetModelFile(const char* ModelFile)
+{
+	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource(ModelFile);
+
+
+	if (ModelResource == NULL)
+	{
+		zeError("Model", "Can not load model file.");
+		return;
+	}
+
+	SetModelResource(ModelResource);
+
+}
+
+const char* ZEModel::GetModelFile() const
+{
+	if (ModelResource != NULL)
+		return ModelResource->GetFileName();
+	else
+		return "";
+}
+
 void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 {
 	if (this->ModelResource != NULL)
 		((ZEModelResource*)this->ModelResource)->Release();
 	this->ModelResource = ModelResource;
 
+
 	if (ModelResource == NULL)
+	{
+		for (size_t I = 0; Meshes.GetCount(); I++)
+			Meshes[I].Deinitialize();
+		Meshes.SetCount(0);
+
+		for (size_t I = 0; Meshes.GetCount(); I++)
+			Bones[I].Deinitialize();
+		Bones.SetCount(0);
+
+		Skeleton.SetCount(0);
 		return;
-
-	Meshes.SetCount(ModelResource->Meshes.GetCount());
-	for (size_t I = 0; I < ModelResource->Meshes.GetCount(); I++)
-	{
-		Meshes[I].Initialize(this, &ModelResource->Meshes[I]);
 	}
-
-	Bones.SetCount(ModelResource->Bones.GetCount());
-	for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
+	else
 	{
-		Bones[I].Initialize(this, &ModelResource->Bones[I]);
-		if (Bones[I].GetParentBone() == NULL)
-			Skeleton.Add(&Bones[I]);
-	}
+		Meshes.SetCount(ModelResource->Meshes.GetCount());
+		for (size_t I = 0; I < ModelResource->Meshes.GetCount(); I++)
+		{
+			Meshes[I].Initialize(this, &ModelResource->Meshes[I]);
+		}
 
-	for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
-	{
-		if (ModelResource->Bones[I].ParentBone != -1)
-			Bones[ModelResource->Bones[I].ParentBone].AddChild(&Bones[I]);
+		Bones.SetCount(ModelResource->Bones.GetCount());
+		for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
+		{
+			Bones[I].Initialize(this, &ModelResource->Bones[I]);
+			if (Bones[I].GetParentBone() == NULL)
+				Skeleton.Add(&Bones[I]);
+		}
+
+		for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
+		{
+			if (ModelResource->Bones[I].ParentBone != -1)
+				Bones[ModelResource->Bones[I].ParentBone].AddChild(&Bones[I]);
+		}
 	}
 
 	UpdateBoundingBox();
@@ -506,4 +543,16 @@ ZEModel::~ZEModel()
 
 	if (ModelResource != NULL)
 		((ZEModelResource*)ModelResource)->Release();
+}
+
+ZEModel* ZEModel::CreateInstance()
+{
+	return new ZEModel();
+}
+
+#include "ZEModel.h.zpp"
+
+ZEEntityRunAt ZEModelDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
 }

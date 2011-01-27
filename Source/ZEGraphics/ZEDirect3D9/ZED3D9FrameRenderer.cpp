@@ -668,6 +668,8 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetSamplerState(4, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
 
 	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)ABuffer->GetViewPort())->FrameBuffer);
+
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x333333, 1.0f, 0x00);
 	//GetDevice()->SetRenderTarget(0, ViewPort->FrameBuffer);
 
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
@@ -709,11 +711,11 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 
 	if (LBuffer1 == NULL)
 		LBuffer1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	LBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
+	LBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
 
 	if (LBuffer2 == NULL)
 		LBuffer2 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	LBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
+	LBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
 
 	if (SSAOBuffer == NULL)
 		SSAOBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
@@ -721,7 +723,7 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 
 	if (ABuffer == NULL)
 		ABuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	ABuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
+	ABuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
 }
 
 void ZED3D9FrameRenderer::DeinitializeRenderTargets()

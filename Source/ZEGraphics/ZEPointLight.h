@@ -53,6 +53,9 @@ class ZEPointLight  : public ZELight
 
 		ZEViewSphere					ViewVolume;
 
+										ZEPointLight();
+		virtual							~ZEPointLight();
+
 	public:
 		ZELightType						GetLightType();
 
@@ -66,8 +69,7 @@ class ZEPointLight  : public ZELight
 		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
 		virtual const ZEViewVolume&		GetViewVolume();
 
-										ZEPointLight();
-										~ZEPointLight();
+		static ZEPointLight*			CreateInstance();
 };
 
 #endif

@@ -60,7 +60,9 @@ class ZEPresentationSlide : public ZECompoundEntity
 		ZETexture2DResource*				Texture;
 		char								PresentationSlide[255];
 
-	
+		ZEPresentationSlide();
+		virtual								~ZEPresentationSlide();
+
 	public:
 		virtual ZEDWORD						GetDrawFlags() const;
 
@@ -73,8 +75,7 @@ class ZEPresentationSlide : public ZECompoundEntity
 		virtual void						Draw(ZEDrawParameters* DrawParameters);
 		virtual void						Tick(float ElapsedTime);
 
-											ZEPresentationSlide();
-		virtual								~ZEPresentationSlide();
+		static ZEPresentationSlide*			CreateInstance();
 };
 
 /*

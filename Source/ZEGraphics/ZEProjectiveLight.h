@@ -54,6 +54,9 @@ class ZEProjectiveLight : public ZELight
 		const ZETexture2D*				ProjectionMap;
 		ZETexture2D*					ShadowMap;
 
+										ZEProjectiveLight();
+		virtual							~ZEProjectiveLight();
+
 	public:
 		ZELightType						GetLightType();
 
@@ -77,9 +80,7 @@ class ZEProjectiveLight : public ZELight
 		ZETexture2D*					GetShadowMap();
 		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
 
-
-										ZEProjectiveLight();
-										~ZEProjectiveLight();
+		static ZEProjectiveLight*		CreateInstance();
 };
 
 /*

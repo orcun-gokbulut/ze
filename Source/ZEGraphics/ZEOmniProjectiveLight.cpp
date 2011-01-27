@@ -141,4 +141,9 @@ ZEOmniProjectiveLight::~ZEOmniProjectiveLight()
 	Deinitialize();
 }
 
+ZEOmniProjectiveLight* ZEOmniProjectiveLight::CreateInstance()
+{
+	return new ZEOmniProjectiveLight();
+}
+
 #include "ZEOmniProjectiveLight.h.zpp"

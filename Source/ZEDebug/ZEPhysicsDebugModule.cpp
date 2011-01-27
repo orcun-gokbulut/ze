@@ -81,7 +81,7 @@ bool ZEPhysicsDebugModule::Initialize()
 	// Create the player
 	if (Player == NULL)
 	{
-		Player = (ZEPlayer*)ZEEntityProvider::GetInstance()->CreateInstance("ZEPlayer");
+		Player = ZEPlayer::CreateInstance();
 		Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
@@ -111,7 +111,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		//World->AddPhysicalObject(PhysicalRigidBody);
 		PhysicalRigidBody->ApplyForce(ZEVector3(1000.0f, 0.0f, 0.0f));
 
-		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
+		ZECanvasBrush* CanvasBrush = ZECanvasBrush::CreateInstance();
 		CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
 		CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
 		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
@@ -170,7 +170,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		World->SetEnabled(true);
 		Scene->LoadMap("PerfTest.zemap");
 
-		ZEPointLight* Light = (ZEPointLight*)ZEEntityProvider::GetInstance()->CreateInstance("ZEPointLight");
+		ZEPointLight* Light = ZEPointLight::CreateInstance();
 		Light->SetPosition(ZEVector3(-10.0f, 15.0f, -15.0f));
 		Light->SetScale(ZEVector3::One);
 		Light->SetRange(15000);

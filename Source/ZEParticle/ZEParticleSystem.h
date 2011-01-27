@@ -105,6 +105,8 @@ class ZEParticleSystem : public ZEClass
 	
 											ZEParticleSystem();
 											~ZEParticleSystem();
+
+		static ZEParticleSystem*			CreateInstance();
 };
 
 /*

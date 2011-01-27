@@ -125,29 +125,15 @@ ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
 		<class name="ZEComponent" parent="ZEEntity">
-
+			<noinstance>true</noinstance>
 			<description>Base Component Type</description>
-
-			<method name="GetWorldVelocity" returntype="ZEVector3">
-			</method>
-
-			<method name="GetLocalTransform" returntype="ZEMatrix4x4">
-			</method>
-
-			<method name="GetWorldPosition" returntype="ZEVector3">
-			</method>
-
-			<method name="GetWorldRotation" returntype="ZEQuaternion">
-			</method>
-
-			<method name="GetWorldDirection" returntype="ZEVector3">
-			</method>
-
-			<method name="GetWorldRight" returntype="ZEVector3">
-			</method>
-
-			<method name="GetWorldUp" returntype="ZEVector3">
-			</method>
+			<proptery name="WorldVelocity" type="ZEVector3" getfunction="GetWorldVelocty"/>
+			<proptery name="LocalTransform" type="ZEMatrix4x4" getfunction="GetLocalTransform"/>
+			<proptery name="WorldPosition" type="ZEVector3" getfunction="GetWorldPosition"/>
+			<proptery name="WorldRotation" type="ZEQuaternion" getfunction="GetWorldRotation"/>
+			<proptery name="WorldDirection" type="ZEVector3" getfunction="GetWorldDirection"/>
+			<proptery name="WorldRight" type="ZEVector3" getfunction="GetWorldRight"/>
+			<proptery name="WorldUp"	type="ZEVector3" getfunction="GetWorldUp"/>
 
 		</class>
 	</meta>
