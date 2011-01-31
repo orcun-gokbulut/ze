@@ -41,6 +41,7 @@
 #include "ZEViewVolume.h"
 
 class ZETexture2D;
+class ZETexture2DResource;
 
 ZE_META_CLASS_DESCRIPTION(ZEProjectiveLight);
 
@@ -51,8 +52,11 @@ class ZEProjectiveLight : public ZELight
 		float							FOV;
 		float							AspectRatio;
 		ZEViewFrustum					ViewVolume;
-		const ZETexture2D*				ProjectionMap;
+		const ZETexture2D*				ProjectionTexture;
 		ZETexture2D*					ShadowMap;
+		
+		ZETexture2DResource*			ProjectionTextureResource;
+		char							ProjectionTextureFile[ZE_MAX_FILE_NAME_SIZE];
 
 										ZEProjectiveLight();
 		virtual							~ZEProjectiveLight();
@@ -66,6 +70,9 @@ class ZEProjectiveLight : public ZELight
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio() const;
 
+		void							SetProjectionTextureFile(const char* Filename);
+		const char*						GetProjectionTextureFile();
+
 		void							SetProjectionTexture(const ZETexture2D* Texture);
 		const ZETexture2D*				GetProjectionTexture();
 
@@ -75,6 +82,7 @@ class ZEProjectiveLight : public ZELight
 
 		virtual void					SetCastsShadow(bool NewValue);
 
+		virtual bool					Initialize();
 		virtual void					Deinitialize();
 
 		ZETexture2D*					GetShadowMap();
@@ -90,6 +98,7 @@ ZE_POST_PROCESSOR_START(Meta)
 		<class name="ZEProjectiveLight" parent="ZELight" description="Point Light">
 			<property name="FOV" groupname="Light" type="float" autogetset="yes"/>
 			<property name="AspectRatio" groupname="Light" type="float" autogetset="yes"/>
+			<property name="ProjectionTextureFile" groupname="Light" type="string" autogetset="yes"/>
 		</class>
 	</meta>
 </zinek>

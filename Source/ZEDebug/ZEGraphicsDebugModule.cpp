@@ -49,9 +49,10 @@
 #include "ZEGame\ZECanvasBrush.h"
 #include "ZEGraphics\ZESimpleMaterial.h"
 #include "ZEGame/ZEEntityProvider.h"
-
-
+#include "ZEGraphics/ZECamera.h"
+#include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEModel/ZEModel.h"
+
 bool ZEGraphicsDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
@@ -158,7 +159,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	DirectionalLight0->SetEnabled(true);
 	DirectionalLight0->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
-	DirectionalLight0->SetIntensity(2.0f);
+	DirectionalLight0->SetIntensity(20.0f);
 	DirectionalLight0->SetCastsShadow(false);
 	Scene->AddEntity(DirectionalLight0);
 

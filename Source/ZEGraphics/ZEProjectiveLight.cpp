@@ -35,12 +35,15 @@
 
 #include "ZEProjectiveLight.h"
 #include "ZETexture2D.h"
+#include "ZETexture2DResource.h"
 #include "ZETextureCube.h"
 #include "ZECore\ZEError.h"
 #include "ZEGame\ZEScene.h"
 #include "ZEShadowRenderer.h"
 #include "ZEGraphicsModule.h"
 #include "ZEGame/ZEEntityProvider.h"
+#include <string.h>
+
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEProjectiveLight);
 
@@ -71,12 +74,36 @@ float ZEProjectiveLight::GetAspectRatio() const
 
 void ZEProjectiveLight::SetProjectionTexture(const ZETexture2D* Texture)
 {
-	ProjectionMap = Texture;
+	ProjectionTexture = Texture;
 }
 
 const ZETexture2D* ZEProjectiveLight::GetProjectionTexture()
 {
-	return ProjectionMap;
+	return ProjectionTexture;
+}
+
+void ZEProjectiveLight::SetProjectionTextureFile(const char* Filename)
+{
+	strncpy(ProjectionTextureFile, Filename, ZE_MAX_FILE_NAME_SIZE);
+	if (GetInitialized())
+	{
+		if (ProjectionTextureResource != NULL)
+			ProjectionTextureResource->Release();
+
+		ProjectionTextureResource = ZETexture2DResource::LoadSharedResource(ProjectionTextureFile);
+		if (ProjectionTextureResource != NULL)
+			ProjectionTexture = ProjectionTextureResource->GetTexture();
+		else
+			zeError("PointLight", "Can not load projection texture.");
+	}
+}
+
+const char* ZEProjectiveLight::GetProjectionTextureFile()
+{
+	if (strlen(ProjectionTextureFile) == 0)
+		return "";
+	else
+		return ProjectionTextureFile;
 }
 
 const ZEMatrix4x4& ZEProjectiveLight::GetProjectionMatrix()
@@ -132,8 +159,37 @@ void ZEProjectiveLight::SetCastsShadow(bool NewValue)
 	ZELight::SetCastsShadow(NewValue);
 }
 
+bool ZEProjectiveLight::Initialize()
+{
+	if (GetInitialized())
+		return false;
+
+	if (strlen(ProjectionTextureFile) != 0)
+	{
+		if (ProjectionTextureResource != NULL)
+			ProjectionTextureResource->Release();
+
+		ProjectionTextureResource = ZETexture2DResource::LoadSharedResource(ProjectionTextureFile);
+		if (ProjectionTextureResource != NULL)
+			ProjectionTexture = ProjectionTextureResource->GetTexture();
+		else
+			zeError("PointLight", "Can not load projection texture.");
+	}
+
+	return true;
+}
+
 void ZEProjectiveLight::Deinitialize()
 {
+	if (!GetInitialized())
+		return;
+
+	if (ProjectionTextureResource != NULL)
+	{
+		ProjectionTextureResource->Release();
+		ProjectionTextureResource = NULL;
+	}
+
 	if (ShadowMap != NULL)
 	{
 		ShadowMap->Destroy();
@@ -143,7 +199,12 @@ void ZEProjectiveLight::Deinitialize()
 
 ZEProjectiveLight::ZEProjectiveLight()
 {
+	FOV = ZE_PI_2;
+	AspectRatio = 1.0f;
 	ShadowMap = NULL;
+	ProjectionTexture = NULL;
+	ProjectionTextureResource = NULL;
+	memset(ProjectionTextureFile, 0, ZE_MAX_FILE_NAME_SIZE);
 }
 
 ZEProjectiveLight::~ZEProjectiveLight()

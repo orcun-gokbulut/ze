@@ -38,13 +38,14 @@
 #define __ZE_PLAYER_H__
  
 #include "ZECompoundEntity.h"
-#include "ZEGraphics\ZECamera.h"
-#include "ZEGraphics\ZEPointLight.h"
 #include "ZEInput\ZEInputMap.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEPlayer);
 
 class ZEListener;
+class ZEProjectiveLight;
+class ZECamera;
+
 class ZEPlayer : public ZECompoundEntity
 {
 	ZE_META_ENTITY(ZEPlayer)
@@ -52,6 +53,8 @@ class ZEPlayer : public ZECompoundEntity
 		ZEInputMap				InputMap;
 		ZECamera*				Camera;
 		ZEListener*				Listener;
+		ZEProjectiveLight*		Light;
+
 		float					Pitch, Yawn, Roll, FOV;
 
 								ZEPlayer();

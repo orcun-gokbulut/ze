@@ -282,7 +282,7 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 	LightParameters.Range = Light->GetRange();
 	LightParameters.Intensity = Light->GetIntensity();
 	
-	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 3);
+	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 4);
 	
 	// Transformation
 	/*ZEMatrix4x4 WorldTransform;

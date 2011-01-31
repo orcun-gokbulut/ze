@@ -53,6 +53,8 @@
 #include "ZEModel\ZEModelMesh.h"
 #include "ZEModel\ZEModelBone.h"
 #include "ZEGame\ZEEntityProvider.h"
+#include "ZEGraphics\ZECamera.h"
+#include "ZEGraphics\ZEPointLight.h"
 
 #include <NxScene.h>
 #include <NxActor.h>

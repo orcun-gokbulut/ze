@@ -77,6 +77,7 @@ struct VSInputOutput
 	float2		Texcoord : TEXCOORD0;
 };
 
+
 VSInputOutput ZED3D9HDRProcessor_VertexShader(VSInputOutput Input)
 {
 	VSInputOutput Output;
@@ -85,23 +86,24 @@ VSInputOutput ZED3D9HDRProcessor_VertexShader(VSInputOutput Input)
 	return Output;
 }
 
+
 float ZED3D9HDRProcessor_LuminanceTransform(float3 Color)
 {
 	const float3 ColorWeights = {0.299f, 0.587f, 0.114f};
 	return dot(Color, ColorWeights);
 }
 
+
 float ZED3D9HDRProcessor_LuminanceAdaptationOperator(float OldLuminance, float NewLuminance)
 {
-	//return NewLuminance;
 	return lerp(NewLuminance, OldLuminance, pow(0.5f, ElapsedTime));
-/*
-	if (OldLuminance > NewLuminance)
+
+	/*if (OldLuminance > NewLuminance)
 		return max(OldLuminance - MaxLuminanceChange, NewLuminance);
 	else
-		return min(OldLuminance + MaxLuminanceChange, NewLuminance);
-		*/
+		return min(OldLuminance + MaxLuminanceChange, NewLuminance);*/
 }
+
 
 float4 ZED3D9HDRProcessor_ToneMapOperator(float4 Color, float Luminance)
 {

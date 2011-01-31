@@ -44,6 +44,8 @@
 #include "ZEMath\ZERay.h"
 #include "ZESound\ZEListener.h"
 #include "ZEEntityProvider.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEGraphics/ZEProjectiveLight.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
 
@@ -194,9 +196,6 @@ void ZEPlayer::Tick(float Time)
 		SetRotation(Rotation);
 	}
 
-	/*static float Temp = 0;
-	Temp += Time;
-	PointLight.SetPosition(ZEVector3(cosf(Temp), sinf(Temp), 1.0f));*/
 	ZEEntity::Tick(Time);
 }
 
@@ -250,6 +249,10 @@ ZEPlayer::ZEPlayer()
 
 	Listener = ZEListener::CreateInstance();
 	RegisterComponent(Listener);
+
+	Light = ZEProjectiveLight::CreateInstance();
+	Light->SetProjectionTextureFile("FlashLight.jpg");
+	RegisterComponent(Light);
 }
 
 ZEPlayer::~ZEPlayer()
