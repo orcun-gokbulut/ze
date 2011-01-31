@@ -71,7 +71,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
 	PointLight1->SetColor(ZEVector3::One);
 	PointLight1->SetAttenuation(0.01f, 0.0f, 1.0f);
-	PointLight1->SetIntensity(1.0f);
+	PointLight1->SetIntensity(5.0f);
 	PointLight1->SetRange(55.0f);
 	PointLight1->SetCastShadows(false);
 	Scene->AddEntity(PointLight1);
@@ -89,7 +89,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight3->SetPosition(ZEVector3(-33.0f, 3.0f, -1.0f));
 	PointLight3->SetColor(ZEVector3(0.5f, 1.0f, 1.0f));
 	PointLight3->SetAttenuation(0.01f, 0.0f, 1.0f);
-	PointLight3->SetIntensity(1.0f);
+	PointLight3->SetIntensity(2.0f);
 	PointLight3->SetRange(40.0f);
 	PointLight3->SetCastShadows(false);
 	Scene->AddEntity(PointLight3);
@@ -97,8 +97,8 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight4 = ZEPointLight::CreateInstance();
 	PointLight4->SetPosition(ZEVector3(-17.0f, 4.0f, 37.0f));
 	PointLight4->SetColor(ZEVector3(0.25f, 0.0f, 0.75f));
-	PointLight4->SetAttenuation(0.03f, 0.0f, 1.0f);
-	PointLight4->SetIntensity(2.0f);
+	PointLight4->SetAttenuation(0.01f, 0.0f, 1.0f);
+	PointLight4->SetIntensity(3.0f);
 	PointLight4->SetRange(40.0f);
 	PointLight4->SetCastShadows(false);
 	Scene->AddEntity(PointLight4);
@@ -106,8 +106,8 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight5 = ZEPointLight::CreateInstance();
 	PointLight5->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
 	PointLight5->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-	PointLight5->SetAttenuation(0.03f, 0.0f, 1.0f);
-	PointLight5->SetIntensity(2.0f);
+	PointLight5->SetAttenuation(0.01f, 0.0f, 1.0f);
+	PointLight5->SetIntensity(4.0f);
 	PointLight5->SetRange(40.0f);
 	PointLight5->SetCastShadows(false);
 	Scene->AddEntity(PointLight5);
@@ -115,7 +115,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	OmniProjectiveLight0 = ZEOmniProjectiveLight::CreateInstance();
 	OmniProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
 	OmniProjectiveLight0->SetColor(ZEVector3(1.0f, 0.0f, 0.0f));
-	OmniProjectiveLight0->SetAttenuation(0.03f, 0.0f, 1.0f);
+	OmniProjectiveLight0->SetAttenuation(0.01f, 0.0f, 1.0f);
 	OmniProjectiveLight0->SetIntensity(5.0f);
 	OmniProjectiveLight0->SetRange(40.0f);
 	OmniProjectiveLight0->SetProjectionTexture(ZETextureCubeResource::LoadResource("alarm.tga")->GetTexture());
@@ -136,6 +136,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetCastsShadow(false);
 	Scene->AddEntity(ProjectiveLight0);
 	
+
 	/*ZEModel* Model = NULL;
 	if (Model == NULL)
 	{

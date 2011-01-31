@@ -693,7 +693,7 @@ bool ZECharacter::Initialize()
 	IdleAnimationTrack->SetStartFrame(2560);
 	IdleAnimationTrack->SetEndFrame(2660);
 	IdleAnimationTrack->SetLooping(true);
-	IdleAnimationTrack->SetBlendFactor(1.0f);
+	IdleAnimationTrack->SetBlendFactor(0.0f);
 	//IdleAnimationTrack->Play();
 
 

@@ -102,7 +102,7 @@ bool ZEModelAnimationDebugModule::Initialize()
 	Scene->AddEntity(PointLight1);
 
 	PointLight2 = ZEPointLight::CreateInstance();
-	PointLight2->SetIntensity(5.0f);
+	PointLight2->SetIntensity(15.0f);
 	PointLight2->SetAttenuation(0.02f, 0.0f, 1.0f);
 	PointLight2->SetColor(ZEVector3(0.7f, 0.8f, 1.0f));
 	Scene->AddEntity(PointLight2);
@@ -114,8 +114,9 @@ bool ZEModelAnimationDebugModule::Initialize()
 	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
 	Sky->SetSkyTexture("Night.tga");
 	Sky->SetSkyBrightness(5.5f);
-	Scene->AddEntity(Sky);
 
+	Scene->AddEntity(Sky);
+	
 	InputMap.InputBindings.Clear();
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_UP,			"",	ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ZE_ACTIONID_CAMERA_TURN_DOWN,			"",	ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE)));

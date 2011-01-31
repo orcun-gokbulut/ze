@@ -66,16 +66,22 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 			ZED3D9Texture2D*			OldLuminance;
 			ZED3D9Texture2D*			DownSampled2xA;
 			ZED3D9Texture2D*			DownSampled2xB;
+			ZED3D9Texture2D*			DownSampled4xA;
+			ZED3D9Texture2D*			DownSampled4xB;
+			ZED3D9Texture2D*			DownSampled8xA;
+			ZED3D9Texture2D*			DownSampled8xB;
+			ZED3D9Texture2D*			DownSampled16xA;
+			ZED3D9Texture2D*			DownSampled16xB;
 		} Textures;
 
 		struct
 		{
 			ZED3D9VertexShader*			VertexShader;
-			ZED3D9PixelShader*			LumMeasureStart;
-			ZED3D9PixelShader*			LumDownSample3x;
-			ZED3D9PixelShader*			LumMeasureEnd;
+			ZED3D9PixelShader*			MeasureLuminanceStart;
+			ZED3D9PixelShader*			MeasureLuminanceDownSample3x;
+			ZED3D9PixelShader*			MeasureLuminanceEnd;
 			ZED3D9PixelShader*			BrightPass; 
-			ZED3D9PixelShader*			ColorDownSample2x;
+			ZED3D9PixelShader*			DownSample2x;
 			ZED3D9PixelShader*			VerticalBloom;
 			ZED3D9PixelShader*			HorizontalBloom;
 			ZED3D9PixelShader*			ToneMap;
@@ -84,9 +90,57 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 		void							CreateRenderTargets();
 		void							ReleaseRenderTargets();
 
+		void							MeasureLuminance(ZED3D9Texture2D* Input, ZED3D9Texture2D* OldLuminance, ZED3D9ViewPort* Output);
+		void							BrightPass(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
+		void							BlurPass(ZED3D9Texture2D* Input, ZED3D9Texture2D* Temp, ZED3D9ViewPort* Output);
+		void							DownSample2x(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
+		void							ToneMap(ZED3D9Texture2D* Input, ZED3D9ViewPort* Output);
+		
+		struct 
+		{
+			float Key;
+			float BrightPassTreshold;
+			float BloomFactor;
+			float BloomStandardDeviation;
+			
+			float MaxLuminanceChange;
+			float MaxLuminanceChangePerSecond;
+			float Reserved1;
+			float Reserved2;
+		} Parameters;
+
+		struct
+		{
+			int BloomSampleCount;
+			int	BloomPassCount;
+			int Reserved0;
+			int Reserved1;
+		} IntParameters;
+
 	public:
 		void							Initialize();
 		void							Deinitialize();
+
+		void							SetKey(float Key);
+		float							GetKey();
+
+		void							SetBrightPassTreshold(float Treshold);
+		float							GetBrightPassTreshold();
+
+		void							SetMaxLuminanceChangePerSecond(float LuminanceChange);
+		float							GetMaxLuminanceChangePerSecond();
+
+		void							SetBloomFactor(float Factor);
+		float							GetBloomFactor();
+
+		void							SetBloomStandardDeviation(float Deviation);
+		float							GetBloomStandardDeviation();
+
+		void							SetBloomSampleCount(unsigned int Count);
+		unsigned int					GetBloomSampleCount();
+
+		void							SetBloomPassCount(unsigned int Count);
+		unsigned int					GetBloomPassCount();
 
 		void							SetInput(ZED3D9Texture2D* Input);
 		ZED3D9Texture2D*				GetInput();
@@ -94,7 +148,7 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase
 		void							SetOutput(ZED3D9ViewPort* Output);
 		ZED3D9ViewPort*					GetOutput();
 
-		void							Process();
+		void							Process(float ElapsedTime);
 
 										ZED3D9HDRProcessor();
 										~ZED3D9HDRProcessor();

@@ -46,10 +46,16 @@
 #define ZED3D_RELEASE(x) {if ((x) != NULL) {(x)->Release(); (x) = NULL;}}
 #define ZED3D_DESTROY(x) {if ((x) != NULL) {(x)->Destroy(); (x) = NULL;}}
 
+class ZETexture2D;
+class ZEViewPort;
+
 class ZED3D9CommonTools : public ZED3D9ComponentBase
 {
 	public:
-		static void				SetRenderTarget(size_t RenderTarget, LPDIRECT3DTEXTURE9 Texture);
+		static void				SetRenderTarget(DWORD RenderTarget, ZEViewPort* Texture);
+		static void				SetRenderTarget(DWORD RenderTarget, ZETexture2D* Texture);
+		static void				SetTexture(DWORD Stage, ZETexture2D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
+
 		static D3DFORMAT		ConvertPixelFormat(ZETexturePixelFormat Format);
 		static bool				CompileVertexShaderFromMemory(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEDWORD Components = 0);
 		static bool				CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* PixelShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEDWORD Components = 0);

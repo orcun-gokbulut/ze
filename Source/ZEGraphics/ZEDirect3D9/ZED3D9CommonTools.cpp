@@ -35,6 +35,8 @@
 
 #include "ZED3D9CommonTools.h"
 #include "ZECore\ZEError.h"
+#include "ZED3D9Texture2D.h"
+#include "ZED3D9ViewPort.h"
 #include <d3dx9.h>
 #include <stdio.h>
 
@@ -73,18 +75,31 @@ class ZED3DXInclude : public ID3DXInclude
 		}
 } D3DIncludeInterface;
 
-void ZED3D9CommonTools::SetRenderTarget(size_t RenderTarget, LPDIRECT3DTEXTURE9 Texture)
+void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZEViewPort* ViewPort)
 {
-	if (Texture == NULL)
-	{
-		GetDevice()->SetRenderTarget(RenderTarget, NULL);
-		return;
-	}
+	zeAssert(ViewPort == NULL, "ViewPort is null.");
 
-	LPDIRECT3DSURFACE9 Surface;
-	Texture->GetSurfaceLevel(0, &Surface);
-	GetDevice()->SetRenderTarget(RenderTarget, Surface);
-	Surface->Release();
+	GetDevice()->SetRenderTarget(RenderTarget, ((ZED3D9ViewPort*)ViewPort)->FrameBuffer);
+}
+
+void ZED3D9CommonTools::SetRenderTarget(DWORD RenderTarget, ZETexture2D* Texture)
+{
+	zeAssert(!Texture->IsRenderTarget(), "Texture is not render target.");
+	zeAssert(Texture == NULL, "Texture is null.");
+
+	GetDevice()->SetRenderTarget(RenderTarget, ((ZED3D9ViewPort*)Texture->GetViewPort())->FrameBuffer);
+	
+	return;
+}
+
+void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture2D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
+{
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Addressing);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
+	GetDevice()->SetTexture(Stage, ((ZED3D9Texture2D*)Texture)->Texture);
 }
 
 D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)

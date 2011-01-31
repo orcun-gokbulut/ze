@@ -37,8 +37,11 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
 sampler Input						: register(s0);
 sampler AverageLuminanceTexture		: register(s1);
-sampler Bloom						: register(s2);
-sampler OldAverageLuminanceTexture	: register(s3);
+sampler OldAverageLuminanceTexture	: register(s2);
+sampler Bloom2x						: register(s3);
+sampler Bloom4x						: register(s4);
+sampler Bloom8x						: register(s5);
+sampler Bloom16x					: register(s6);
 
 
 // Parameters
@@ -46,18 +49,24 @@ sampler OldAverageLuminanceTexture	: register(s3);
 float2 PixelSize			: register(c0);
 float4 Parameters0			: register(c1);
 float4 Parameters1			: register(c2);
-#define Exposure			(Parameters0[0])
+#define Key					(Parameters0[0])
 #define BrightPassTreshold	(Parameters0[1])
-#define BrightPassOffset	(Parameters0[2])
-#define BloomFactor			(Parameters0[3])
-#define ElapsedTime			(Parameters1[2])
+#define BloomFactor			(Parameters0[2])
 
+#define ElapsedTime	(Parameters1[0])
+
+int4 IntParameters0			: register(i0);
+
+#define BloomSampleCount	(IntParameters0[0])
+
+bool BloomPass1				: register(b0);
+bool BloomPass2				: register(b1);
+bool BloomPass3				: register(b2);
+bool BloomPass4				: register(b3);
 
 // Kernels
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-const float2 Kernel2x2[4]	: register(c10);
-const float2 Kernel3x3[9]	: register(c14);
-const float2 Kernel4x4[16]	: register(c23);
+const float2 Kernel[16]	: register(c10);
 
 
 // General Vertex Shader
@@ -68,7 +77,7 @@ struct VSInputOutput
 	float2		Texcoord : TEXCOORD0;
 };
 
-VSInputOutput VSMain(VSInputOutput Input)
+VSInputOutput ZED3D9HDRProcessor_VertexShader(VSInputOutput Input)
 {
 	VSInputOutput Output;
 	Output.Position = Input.Position;
@@ -76,16 +85,37 @@ VSInputOutput VSMain(VSInputOutput Input)
 	return Output;
 }
 
+float ZED3D9HDRProcessor_LuminanceTransform(float3 Color)
+{
+	const float3 ColorWeights = {0.299f, 0.587f, 0.114f};
+	return dot(Color, ColorWeights);
+}
+
+float ZED3D9HDRProcessor_LuminanceAdaptationOperator(float OldLuminance, float NewLuminance)
+{
+	//return NewLuminance;
+	return lerp(NewLuminance, OldLuminance, pow(0.5f, ElapsedTime));
+/*
+	if (OldLuminance > NewLuminance)
+		return max(OldLuminance - MaxLuminanceChange, NewLuminance);
+	else
+		return min(OldLuminance + MaxLuminanceChange, NewLuminance);
+		*/
+}
+
+float4 ZED3D9HDRProcessor_ToneMapOperator(float4 Color, float Luminance)
+{
+
+}
+
 
 // Limunance Measurement (Start) Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PSLumMeasureStart(float2 Texcoord : TEXCOORD0) : COLOR0
+float4 ZED3D9HDRProcessor_MeasureLuminanceStart(float2 Texcoord : TEXCOORD0) : COLOR0
 {
-	const float3 ColorWeights = {0.299f, 0.587f, 0.114f};
-	
 	float Luminance = 0.0f;
 	for (int I = 0; I < 4; I++)
-		Luminance += log(0.00001f + dot(tex2D(Input, Texcoord + PixelSize * Kernel2x2[I]).xyz, ColorWeights));
+		Luminance += log(0.00001f + ZED3D9HDRProcessor_LuminanceTransform(tex2D(Input, Texcoord + PixelSize * Kernel[I]).xyz));
 
 	return float4(Luminance / 4.0f, 0.0f, 0.0f, 0.0f);
 }
@@ -93,12 +123,12 @@ float4 PSLumMeasureStart(float2 Texcoord : TEXCOORD0) : COLOR0
 
 // Limunance Measurement (Down Sample) Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PSLumDownSample3x(float2 Texcoord : TEXCOORD0) : COLOR0
+float4 ZED3D9HDRProcessor_MeasureLuminanceDownSample3x(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	float AverageLuminance = 0.0f;
 
 	for (int I = 0; I < 9; I++)
-		AverageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel3x3[I]).r;
+		AverageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel[I]).r;
 
 	return float4(AverageLuminance / 9.0f, 0.0f, 0.0f, 0.0f);
 }
@@ -106,64 +136,66 @@ float4 PSLumDownSample3x(float2 Texcoord : TEXCOORD0) : COLOR0
 
 // Limunance Measurement (End) Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PSLumMeasureEnd(float2 Texcoord : TEXCOORD0) : COLOR0
+float4 ZED3D9HDRProcessor_MeasureLuminanceEnd(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	float AverageLuminance = 0.0f;
 
 	for (int I = 0; I < 9; I++)
-		AverageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel3x3[I]).r;
+		AverageLuminance += tex2D(Input, Texcoord + PixelSize * Kernel[I]).r;
+		
 	AverageLuminance = exp(AverageLuminance / 9.0f);
 	float OldAverageLuminance = tex2D(OldAverageLuminanceTexture, float2(0.5f, 0.5f));
-	float AdaptiveAverageLuminance = lerp(AverageLuminance, OldAverageLuminance, pow(0.000001f, ElapsedTime / 30.0f));
+	float AdaptiveAverageLuminance = ZED3D9HDRProcessor_LuminanceAdaptationOperator(OldAverageLuminance, AverageLuminance);
 	
-	return float4(AverageLuminance, 0.0f, 0.0f, 0.0f);
+	return float4(AdaptiveAverageLuminance, 0.0f, 0.0f, 0.0f);
 }
 
 
 // Bright Pass Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PSBrightPass(float2 Texcoord : TEXCOORD0) : COLOR0
+float4 ZED3D9HDRProcessor_BrightPass(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	const float3 ColorWeights = {0.299f, 0.587f, 0.114f};
 
 	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	for (int I = 0; I < 4; I++)
-		Color += tex2D(Input, Texcoord + PixelSize * Kernel2x2[I]);
+		Color += tex2D(Input, Texcoord + PixelSize * Kernel[I]);
 	Color /= 4.0f;
 	
-	float Luminance = dot(Color, ColorWeights);
+	float Luminance = ZED3D9HDRProcessor_LuminanceTransform(Color);
 	float AverageLuminance = tex2D(AverageLuminanceTexture, float2(0.5f, 0.5f));
-	float ScaledLuminance = (Exposure / (AverageLuminance + 0.0001f)) * Luminance;
+	float ScaledLuminance = (Key / (AverageLuminance + 0.0001f)) * Luminance;
 	ScaledLuminance = ScaledLuminance / (1.0f + ScaledLuminance);
-	
-	Color = max(Color - BrightPassTreshold, 0.0f);
 	Color *= ScaledLuminance;
-		
+	
+	if (ScaledLuminance < BrightPassTreshold)
+		Color = 0.0f;
+
 	return Color;
 }
 
 
 // Down Sample 2x Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PSColorDownSample2x(float2 Texcoord : TEXCOORD0) : COLOR0
+float4 ZED3D9HDRProcessor_DownSample2x(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
 	for (int I = 0; I < 4; I++)
-		Color += tex2D(Input, Texcoord + PixelSize * Kernel2x2[I]);
+		Color += tex2D(Input, Texcoord + PixelSize * Kernel[I]);
 	
 	Color /= 4.0f;
 	
-	return tex2D(Input, Texcoord);
+	return Color;
 }
 
 
 // Vertical Bloom Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PSVerticalBloom(float2 Texcoord : TEXCOORD0) : COLOR0
+float4 ZED3D9HDRProcessor_VerticalBloom(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	for (int I = 0; I < 15; I++)
-		Color += Kernel4x4[I].y * tex2D(Input, Texcoord + float2(0.0f, PixelSize.y * Kernel4x4[I].x));
+	for (int I = 0; I < 7; I++)
+		Color += Kernel[I].y * tex2D(Input, Texcoord + float2(0.0f, PixelSize.y * Kernel[I].x));
 		
 	return Color;
 }
@@ -171,11 +203,11 @@ float4 PSVerticalBloom(float2 Texcoord : TEXCOORD0) : COLOR0
 
 // Horizontal Bloom Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PSHorizontalBloom(float2 Texcoord : TEXCOORD0) : COLOR0
+float4 ZED3D9HDRProcessor_HorizontalBloom(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	float4 Color = float4(0.0f, 0.0f, 0.0f, 0.0f);
-	for (int I = 0; I < 15; I++)
-		Color += Kernel4x4[I].y * tex2D(Input, Texcoord + float2(PixelSize.x * Kernel4x4[I].x, 0.0f));
+	for (int I = 0; I < 7; I++)
+		Color += Kernel[I].y * tex2D(Input, Texcoord + float2(PixelSize.x * Kernel[I].x, 0.0f));
 	
 	return Color;
 }
@@ -183,20 +215,33 @@ float4 PSHorizontalBloom(float2 Texcoord : TEXCOORD0) : COLOR0
 
 // Tone Mapping Pixel Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////
-float4 PSToneMap(float2 Texcoord : TEXCOORD0) : COLOR0
+float4 ZED3D9HDRProcessor_ToneMap(float2 Texcoord : TEXCOORD0) : COLOR0
 {
 	const float3 ColorWeights = {0.299f, 0.587f, 0.114f};
 	
 	float4 Color = tex2D(Input, Texcoord);
+
+	float Luminance = ZED3D9HDRProcessor_LuminanceTransform(Color);
 	float AverageLuminance = tex2D(AverageLuminanceTexture, float2(0.5f, 0.5f));
-	
-	float Luminance = dot(Color, ColorWeights);
-	float ScaledLuminance = (Exposure / (AverageLuminance + 0.0001f)) * Luminance;
+	float ScaledLuminance = (Key / (AverageLuminance + 0.0001f)) * Luminance;
 	ScaledLuminance = ScaledLuminance / (1.0f + ScaledLuminance);
-	
+
 	Color *= ScaledLuminance;
 	
-	Color += BloomFactor * tex2D(Bloom, Texcoord);
+	float3 Bloom = float3(0.0f, 0.0f, 0.0f);
+	if (BloomPass1)
+		Bloom = tex2D(Bloom2x, Texcoord).rgb;
+
+	if (BloomPass2)
+		Bloom = tex2D(Bloom4x, Texcoord).rgb;
+
+	if (BloomPass3)
+		Bloom = tex2D(Bloom8x, Texcoord).rgb;
+
+	if (BloomPass4)
+		Bloom = tex2D(Bloom16x, Texcoord).rgb;
+		
+	Color.rgb += BloomFactor * Bloom;
 	
 	return Color;
 }
