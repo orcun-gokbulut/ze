@@ -41,8 +41,7 @@
 
 class ZEPhysicalWorld;
 class ZEPhysicalRigidBody;
-class ZEPhysicalStaticRigidBody;
-class ZEPhysicalStaticMesh;
+class ZEPhysicalMesh;
 class ZEPhysicalJoint;
 class ZEPhysicalCloth;
 class ZEPhysicalSoftBody;
@@ -61,10 +60,9 @@ class ZEPhysicsModule : public ZEModule
 		virtual ZEPhysicalWorld*				CreatePhysicalWorld() = 0;
 
 		virtual ZEPhysicalRigidBody*			CreatePhysicalRigidBody() = 0;
-		virtual ZEPhysicalStaticRigidBody*		CreatePhysicalStaticRigidBody() = 0;
 		virtual ZEPhysicalSoftBody*				CreatePhysicalSoftBody() = 0;
 		virtual ZEPhysicalCloth*				CreatePhysicalCloth() = 0;
-		virtual ZEPhysicalStaticMesh*			CreatePhysicalStaticMesh() = 0;
+		virtual ZEPhysicalMesh*			CreatePhysicalStaticMesh() = 0;
 		virtual ZEPhysicalStaticHeightField*	CreatePhysicalStaticHeightField() = 0;
 
 		virtual ZEPhysicalForceField*			CreatePhysicalForceField() = 0;

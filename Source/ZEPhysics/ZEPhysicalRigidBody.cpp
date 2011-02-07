@@ -40,22 +40,21 @@ ZEPhysicalObjectType ZEPhysicalRigidBody::GetPhysicalObjectType()
 {
 	return ZE_POT_RIGID_BODY;
 }
-
-void ZEPhysicalRigidBody::SetTransformChangeCallback(const ZEPhysicalTransformChangeCallback& Callback)
+/*
+void ZEPhysicalRigidBody::SetCollisionEvent(const ZEPhysicalCollisionEvent& Event)
 {
-	TransformChangeCallback = Callback;
+	CollisionEvent = Event;
 }
 
-const ZEPhysicalTransformChangeCallback& ZEPhysicalRigidBody::GetTransformChangeCallback()
+const ZEPhysicalCollisionEvent& ZEPhysicalRigidBody::GetCollisionEvent()
 {
-	return TransformChangeCallback;	
+	return CollisionEvent;
 }
-
+*/
 ZEPhysicalRigidBody* ZEPhysicalRigidBody::CreateInstance()
 {
 	return zePhysics->CreatePhysicalRigidBody();
 }
-
 
 
 

@@ -35,6 +35,16 @@
 
 #include "ZEPhysicalJoint.h"
 
+void ZEPhysicalJoint::SetJointEvent(const ZEPhysicalJointEvent& Event)
+{
+	JointEvent = Event;
+}
+
+const ZEPhysicalJointEvent& ZEPhysicalJoint::GetJointEvent()
+{
+	return JointEvent;
+}
+
 ZEPhysicalJoint::ZEPhysicalJoint()
 {
 

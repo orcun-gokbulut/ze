@@ -36,11 +36,13 @@
 #include "ZECore\ZECore.h"
 #include "ZEPortalMapPortal.h"
 #include "ZEPortalMapResource.h"
-#include "ZEPhysics\ZEPhysicalStaticMesh.h"
+#include "ZEPhysics\ZEPhysicalMesh.h"
 #include "ZEGraphics\ZELight.h"
 #include "ZEGraphics\ZEVertexBuffer.h"
 #include "ZEGraphics\ZERenderer.h"
 #include "ZEGame\ZEDrawParameters.h"
+#include "ZEGame\ZEScene.h"
+#include "ZEPhysics\ZEPhysicalWorld.h"
 
 ZEPortalMap* ZEPortalMapPortal::GetOwner()
 {
@@ -65,7 +67,7 @@ const ZEAABoundingBox& ZEPortalMapPortal::GetBoundingBox()
 	return Resource->BoundingBox;
 }
 
-ZEPhysicalStaticMesh* ZEPortalMapPortal::GetPhysicalMesh()
+ZEPhysicalMesh* ZEPortalMapPortal::GetPhysicalMesh()
 {
 	return PhysicalMesh;
 }
@@ -90,7 +92,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
 		if (!VertexBuffer->Create(Resource->Polygons.GetCount() * 3 * sizeof(ZEMapVertex)))
 			return false;
-		
+
 		ZEArray<bool> Processed;
 		Processed.SetCount(Resource->Polygons.GetCount());
 		Processed.FillWith(false);
@@ -112,7 +114,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 				RenderOrder->VertexBuffer = VertexBuffer;
 				RenderOrder->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();
 				ZEMatrix4x4::CreateIdentity(RenderOrder->WorldMatrix);
-				
+
 				RenderOrder->PrimitiveCount = 0;
 				for (size_t I = N; I < Resource->Polygons.GetCount(); I++)
 				{
@@ -130,14 +132,37 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 		VertexBuffer->Unlock();
 	}
 
-	// Initialize Physical Components
-	/*if (PhysicalMesh != NULL && Resource->HasPhysicalMesh)
+	ZEArray<ZEVector3> PhysicalVertices;
+	ZEArray<ZEPhysicalTriangle> PhysicalTriangles;
+
+	PhysicalVertices.SetCount(Resource->Polygons.GetCount() * 3);
+	PhysicalTriangles.SetCount(Resource->Polygons.GetCount());
+
+	for (size_t I = 0; I < PhysicalTriangles.GetCount(); I++)
 	{
-		PhysicalMesh = ZEPhysicalStaticMesh::CreateInstance();
-		PhysicalMesh->SetData(Resource->PhysicalMesh.Vertices.GetCArray(), Resource->PhysicalMesh.Vertices.GetCount(),
-			Resource->PhysicalMesh.Polygons.GetCArray(), Resource->Polygons.GetCount(),
-			NULL, 0);
-	}*/
+		PhysicalVertices[3 * I] = Resource->Polygons[I].Vertices[0].Position;
+		PhysicalVertices[3 * I + 1] = Resource->Polygons[I].Vertices[1].Position;
+		PhysicalVertices[3 * I + 2] = Resource->Polygons[I].Vertices[2].Position;
+	}
+	for (size_t I = 0; I < PhysicalTriangles.GetCount(); I++)
+	{
+		PhysicalTriangles[I].MaterialIndex = 0;
+		PhysicalTriangles[I].Indices[0] =  3 * I;
+		PhysicalTriangles[I].Indices[1] =  3 * I + 1;
+		PhysicalTriangles[I].Indices[2] =  3 * I + 2;
+	}
+
+	if (PhysicalMesh == NULL && Resource->HasPhysicalMesh)
+	{
+		PhysicalMesh = ZEPhysicalMesh::CreateInstance();
+		PhysicalMesh->SetData(PhysicalVertices.GetConstCArray(), 
+							  PhysicalVertices.GetCount(),
+							  PhysicalTriangles.GetConstCArray(), 
+							  PhysicalTriangles.GetCount(),
+							  NULL, 0);
+		PhysicalMesh->Initialize();
+		zeScene->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
+	}
 
 	return true;
 }
@@ -172,6 +197,3 @@ ZEPortalMapPortal::~ZEPortalMapPortal()
 {
 	Deinitialize();
 }
-
-
-

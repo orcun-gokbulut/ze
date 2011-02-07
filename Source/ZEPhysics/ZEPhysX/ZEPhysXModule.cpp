@@ -37,8 +37,7 @@
 #include "ZEPhysXModuleDescription.h"
 #include "ZEPhysXPhysicalWorld.h"
 #include "ZEPhysXPhysicalRigidBody.h"
-#include "ZEPhysXPhysicalStaticRigidBody.h"
-#include "ZEPhysXPhysicalStaticMesh.h"
+#include "ZEPhysXPhysicalMesh.h"
 #include "ZEPhysXPhysicalJoint.h"
 //#include "ZEPhysXPhysicalMaterial.h"
 #include "ZECore\ZEError.h"
@@ -109,10 +108,13 @@ bool ZEPhysXModule::Initialize()
 		zeError("PhysX Module", "Can not initilize PhysX cooking library.");
 		return false;
 	}
+
+	PhysicsSDK->setParameter(NX_SKIN_WIDTH, 0.002f);
 	
 	ZEPhysXComponentBase::InitializeBase(this);
 
 	zeLog("PhysX Module", "PhysX intialized.");
+
 	return true;
 }
 
@@ -168,14 +170,9 @@ ZEPhysicalRigidBody* ZEPhysXModule::CreatePhysicalRigidBody()
 	return new ZEPhysXPhysicalRigidBody();
 }
 
-ZEPhysicalStaticRigidBody* ZEPhysXModule::CreatePhysicalStaticRigidBody()
+ZEPhysicalMesh* ZEPhysXModule::CreatePhysicalStaticMesh()
 {
-	return new ZEPhysXPhysicalStaticRigidBody();
-}
-
-ZEPhysicalStaticMesh* ZEPhysXModule::CreatePhysicalStaticMesh()
-{
-	return new ZEPhysXPhysicalStaticMesh();
+	return new ZEPhysXPhysicalMesh();
 }
 
 ZEPhysicalStaticHeightField* ZEPhysXModule::CreatePhysicalStaticHeightField()

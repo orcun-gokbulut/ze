@@ -233,13 +233,13 @@ const ZEQuaternion ZEModelBone::GetWorldRotation()
 	if (ParentBone == NULL)
 	{
 		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, RelativeRotation, Owner->GetWorldRotation());
+		ZEQuaternion::Product(Temp, Owner->GetWorldRotation(), RelativeRotation);
 		return Temp;
 	}
 	else
 	{
 		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, RelativeRotation, ParentBone->GetWorldRotation());
+		ZEQuaternion::Product(Temp, ParentBone->GetWorldRotation(), RelativeRotation);
 		return Temp;
 	}
 }
@@ -367,12 +367,12 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 
 		PhysicalJoint->SetEnabled(BoneResource->PhysicalJoint.Enabled);
 
-		PhysicalJoint->SetPosition(GetWorldPosition());
+		PhysicalJoint->SetPosition(PhysicalBody->GetPosition());
 
-		ZEQuaternion TempRotation;
-		ZEQuaternion::Create(TempRotation, ZE_PI / 2, ZEVector3(0.0f, 0.0f, -1.0f));
+		//ZEQuaternion TempRotation;
+		//ZEQuaternion::Create(TempRotation, ZE_PI / 2, ZEVector3(0.0f, 0.0f, -1.0f));
 
-		PhysicalJoint->SetRotation(TempRotation);
+		PhysicalJoint->SetRotation(PhysicalBody->GetRotation());
 
 		//PhysicalJoint->SetBodyAConnectionPosition(GetWorldPosition());
 		//PhysicalJoint->SetBodyAConnectionOrientation(GetWorldRotation());
@@ -385,6 +385,9 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 			PhysicalJoint->SetBreakForce(BoneResource->PhysicalJoint.BreakForce);
 			PhysicalJoint->SetBreakTorque(BoneResource->PhysicalJoint.BreakTorque);
 		}
+
+		PhysicalJoint->SetBodiesCollide(BoneResource->PhysicalJoint.CollideBodies);
+		PhysicalJoint->SetMassInertiaTensor(PhysicalBody->GetMass());
 
 		PhysicalJoint->SetXMotion(BoneResource->PhysicalJoint.XMotion);
 		PhysicalJoint->SetYMotion(BoneResource->PhysicalJoint.YMotion);
@@ -490,6 +493,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->Initialize();
 	}
 	Owner->UpdateBoneTransforms();
+//	PhysicalJoint->SetTransformChangeEvent(Owner->BoneTransformChangeEvent());
 }
 
 void ZEModelBone::Deinitialize()
@@ -524,6 +528,11 @@ void ZEModelBone::ModelWorldTransformChanged()
 	UpdateVertexTransform = true;
 	UpdateWorldTransform = true;
 	UpdateWorldBoundingBox = true;
+	if (PhysicalBody != NULL)
+	{
+		PhysicalBody->SetPosition(GetWorldPosition());
+		PhysicalBody->SetRotation(GetWorldRotation());
+	}
 }
 
 void ZEModelBone::ModelTransformChanged()
@@ -533,6 +542,11 @@ void ZEModelBone::ModelTransformChanged()
 	UpdateWorldTransform = true;
 	UpdateModelBoundingBox = true;
 	UpdateWorldBoundingBox = true;
+	if (PhysicalBody != NULL)
+	{
+		PhysicalBody->SetPosition(GetWorldPosition());
+		PhysicalBody->SetRotation(GetWorldRotation());
+	}
 }
 
 ZEModelBone::ZEModelBone()

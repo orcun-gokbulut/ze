@@ -122,27 +122,6 @@ bool ZEPhysXPhysicalRigidBody::GetEnabled()
 	return Enabled;
 }
 
-void ZEPhysXPhysicalRigidBody::SetKinematic(bool Enabled)
-{
-	if (Enabled)
-	{
-		BodyDesc.flags |= NX_BF_KINEMATIC;
-		if (Actor != NULL)
-			Actor->raiseBodyFlag(NX_BF_KINEMATIC);
-	}
-	else
-	{
-		BodyDesc.flags &= ~NX_BF_KINEMATIC;
-		if (Actor != NULL)
-			Actor->clearBodyFlag(NX_BF_KINEMATIC);
-	}
-}
-
-bool ZEPhysXPhysicalRigidBody::GetKinematic()
-{
-	return BodyDesc.flags & NX_BF_KINEMATIC;
-}
-
 void ZEPhysXPhysicalRigidBody::SetPosition(const ZEVector3& NewPosition)
 {
 	ActorDesc.globalPose.t = ZE_TO_NX(NewPosition);
@@ -210,7 +189,16 @@ void ZEPhysXPhysicalRigidBody::RemovePhysicalShape(ZEPhysicalShape* Shape)
 	if (Actor != NULL)
 		if (OldCount != Shapes.GetCount())
 			ReCreate();
-	
+}
+
+void ZEPhysXPhysicalRigidBody::SetPhysicalBodyType( ZEPhysicalBodyType Type )
+{
+	PhysicalBodyType = Type;
+}
+
+ZEPhysicalBodyType ZEPhysXPhysicalRigidBody::GetPhysicalBodyType() const
+{
+	return PhysicalBodyType;
 }
 
 void ZEPhysXPhysicalRigidBody::SetMass(float NewMass)
@@ -407,20 +395,18 @@ ZEVector3 ZEPhysXPhysicalRigidBody::GetAngularMomentum()
 		return NX_TO_ZE(BodyDesc.angularVelocity * BodyDesc.mass);
 }
 
-void ZEPhysXPhysicalRigidBody::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags)
+void ZEPhysXPhysicalRigidBody::SetCollisionEventFlags(ZEDWORD CollisionEventFlags)
 {
-	
 	ActorDesc.contactReportFlags = (ActorDesc.contactReportFlags & ~(NX_NOTIFY_ON_TOUCH | NX_NOTIFY_ON_START_TOUCH | NX_NOTIFY_ON_END_TOUCH)) |
-		((CollisionCallbackFlags & ZE_PCCF_ON_TOUCH) ? NX_NOTIFY_ON_TOUCH : NULL) |
-		((CollisionCallbackFlags & ZE_PCCF_ON_START_TOUCH) ? NX_NOTIFY_ON_START_TOUCH : NULL) |
-		((CollisionCallbackFlags & ZE_PCCF_ON_END_TOUCH) ? NX_NOTIFY_ON_END_TOUCH : NULL);
+		((CollisionEventFlags & ZE_PCCF_ON_TOUCH) ? NX_NOTIFY_ON_TOUCH : NULL) |
+		((CollisionEventFlags & ZE_PCCF_ON_START_TOUCH) ? NX_NOTIFY_ON_START_TOUCH : NULL) |
+		((CollisionEventFlags & ZE_PCCF_ON_END_TOUCH) ? NX_NOTIFY_ON_END_TOUCH : NULL);
 	
 	if (Actor != NULL)
 		Actor->setContactReportFlags(ActorDesc.contactReportFlags);
-	
 }
 
-ZEDWORD ZEPhysXPhysicalRigidBody::GetCollisionCallbackFlags()
+ZEDWORD ZEPhysXPhysicalRigidBody::GetCollisionEventFlags()
 {
 	return (ActorDesc.contactReportFlags & NX_NOTIFY_ON_START_TOUCH ? ZE_PCCF_ON_START_TOUCH : NULL) |
 		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_END_TOUCH ? ZE_PCCF_ON_END_TOUCH : NULL) |
@@ -488,12 +474,10 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 				BoxShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
 				BoxShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
 
-				BoxShapeDesc.dimensions.x = ((ZEPhysicalBoxShape*)CurrentShape)->GetWidth() * 0.5f;
-				BoxShapeDesc.dimensions.y = ((ZEPhysicalBoxShape*)CurrentShape)->GetHeight() * 0.5f;
-				BoxShapeDesc.dimensions.z = ((ZEPhysicalBoxShape*)CurrentShape)->GetLength() * 0.5f;
+				BoxShapeDesc.dimensions.x = ((ZEPhysicalBoxShape*)CurrentShape)->GetWidth();
+				BoxShapeDesc.dimensions.y = ((ZEPhysicalBoxShape*)CurrentShape)->GetHeight();
+				BoxShapeDesc.dimensions.z = ((ZEPhysicalBoxShape*)CurrentShape)->GetLength();
 				BoxShapeDesc.dimensions.arrayMultiply(BoxShapeDesc.dimensions, ZE_TO_NX(Scale)); 
-
-				BoxShapeDesc.density = 1.0f;
 
 				ActorDesc.shapes.push_back(&BoxShapeDesc);
 				break;
@@ -511,8 +495,6 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 				SphereShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
 
 				SphereShapeDesc.radius = Scale.x * ((ZEPhysicalSphereShape*)CurrentShape)->GetRadius();
-
-				SphereShapeDesc.density = 1.0f;
 
 				ActorDesc.shapes.push_back(&SphereShapeDesc);
 				break;
@@ -532,8 +514,6 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 				CapsuleShapeDesc.radius = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetRadius();
 				CapsuleShapeDesc.height = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetHeight() - 2 * CapsuleShapeDesc.radius;
 
-				CapsuleShapeDesc.density = 1.0f;
-
 				ActorDesc.shapes.push_back(&CapsuleShapeDesc);
 				break;
 			}
@@ -550,6 +530,34 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 				break;
 			}
 		}
+	}
+
+	switch (PhysicalBodyType)
+	{
+	case ZE_PBT_DYNAMIC:
+
+		break;
+
+	case ZE_PBT_KINEMATIC:
+		if (Enabled)
+		{
+			BodyDesc.flags |= NX_BF_KINEMATIC;
+			if (Actor != NULL)
+				Actor->raiseBodyFlag(NX_BF_KINEMATIC);
+		}
+		else
+		{
+			BodyDesc.flags &= ~NX_BF_KINEMATIC;
+			if (Actor != NULL)
+				Actor->clearBodyFlag(NX_BF_KINEMATIC);
+		}
+		break;
+
+	case ZE_PBT_STATIC:
+
+		ActorDesc.body = NULL;
+
+		break;
 	}
 
 	NxScene* Scene = PhysicalWorld->GetScene();
@@ -571,7 +579,5 @@ void ZEPhysXPhysicalRigidBody::Deinitialize()
 		Actor = NULL;
 	}
 }
-
-
 
 

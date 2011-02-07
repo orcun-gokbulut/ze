@@ -114,6 +114,8 @@ struct ZEPhysicalLimitPlane : ZEPlane
 class ZEPhysicalJoint : public ZEPhysicalObject
 {
 	protected:
+		ZEPhysicalJointEvent					JointEvent;
+
 												ZEPhysicalJoint();
 		virtual									~ZEPhysicalJoint();
 
@@ -152,6 +154,9 @@ class ZEPhysicalJoint : public ZEPhysicalObject
 		virtual void							SetBreakTorque(float BreakTorque) = 0;
 		virtual float							GetBreakTorque() const = 0;
 
+		virtual void							SetBodiesCollide(bool BodiesCollide) = 0;
+		virtual bool							GetBodiesCollide() const = 0;
+
 		virtual void							SetDrivePosition(const ZEVector3& Position) = 0;
 		virtual ZEVector3						GetDrivePosition() const = 0;
 
@@ -163,6 +168,9 @@ class ZEPhysicalJoint : public ZEPhysicalObject
 
 		virtual void							SetDriveAngularVelocity(const ZEVector3& AngularVelocity) = 0;
 		virtual ZEVector3						GetDriveAngularVelocity() const = 0;
+
+		virtual void							SetMassInertiaTensor(float MassInertiaTensor) = 0;
+		virtual float							GetMassInertiaTensor() const = 0;
 
 		virtual const 
 		ZEArray<ZEPhysicalLimitPlane>&			GetLimitPlanes() const = 0;
@@ -346,6 +354,10 @@ class ZEPhysicalJoint : public ZEPhysicalObject
 		virtual float							GetAngularSlerpMotorDamper() const = 0;
 
 //		virtual void							SetDefaultValues(ZEPhysicalJointType Type = ZE_PJT_NONE) = 0;
+
+		virtual void							SetJointEvent(const ZEPhysicalJointEvent& Event);
+		virtual const
+		ZEPhysicalJointEvent&					GetJointEvent();		
 
 		virtual bool							Initialize() = 0;
 		virtual void							Deinitialize() = 0;

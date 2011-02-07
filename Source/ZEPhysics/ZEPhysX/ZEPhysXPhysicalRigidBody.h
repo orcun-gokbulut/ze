@@ -65,9 +65,6 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 		virtual							~ZEPhysXPhysicalRigidBody();
 								
 	public:
-		virtual void					SetKinematic(bool Enabled);
-		virtual bool					GetKinematic();
-
 		virtual void					SetPhysicalWorld(ZEPhysicalWorld* World);
 		virtual ZEPhysicalWorld*		GetPhysicalWorld();
 
@@ -87,6 +84,9 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 		ZEArray<ZEPhysicalShape*>&		GetPhysicalShapes();
 		virtual void					AddPhysicalShape(ZEPhysicalShape* Shape);
 		virtual void					RemovePhysicalShape(ZEPhysicalShape* Shape);
+
+		virtual void					SetPhysicalBodyType(ZEPhysicalBodyType Type);
+		virtual ZEPhysicalBodyType		GetPhysicalBodyType() const;
 
 		virtual void					SetMass(float NewMass);
 		virtual float					GetMass();
@@ -124,8 +124,8 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 		virtual void					SetAngularMomentum(const ZEVector3& NewAngularMomentum);
 		virtual ZEVector3				GetAngularMomentum();
 
-		virtual void					SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags);
-		virtual ZEDWORD					GetCollisionCallbackFlags();
+		virtual void					SetCollisionEventFlags(ZEDWORD CollisionEventFlags);
+		virtual ZEDWORD					GetCollisionEventFlags();
 
 		virtual void					ApplyForce(const ZEVector3& Force);
 		virtual void					ApplyTorque(const ZEVector3& Torque);

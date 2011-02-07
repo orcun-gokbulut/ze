@@ -47,29 +47,51 @@
 
 class ZEPhysicalObject;
 
-struct ZEPhysicalCollision
+struct ZEPhysicalCollisionEventArgument
 {
-	ZEPhysicalObject*			Collider1;
-	ZEPhysicalObject*			Collider2;
+	ZEPhysicalObject*					Collider1;
+	ZEPhysicalObject*					Collider2;
 
-	ZEVector3					Position;
-	ZEVector3					Normal;
-	float						Power;
+	ZEVector3							Position;
+	ZEVector3							Normal;
+	float								Power;
 };
 
-typedef fastdelegate::FastDelegate1<const ZEPhysicalCollision&> ZEPhysicalCollisionCallback;
+typedef fastdelegate::FastDelegate1<const ZEPhysicalCollisionEventArgument&> ZEPhysicalCollisionEvent;
 
-struct ZEPhysicalTransformChange
+struct ZEPhysicalTransformChangeEventArgument
 {
-	ZEPhysicalObject*			PhysicalObject;
-	ZEVector3					NewPosition;
-	ZEQuaternion				NewRotation;
+	ZEPhysicalObject*					PhysicalObject;
+	ZEVector3							NewPosition;
+	ZEQuaternion						NewRotation;
 };
 
-typedef fastdelegate::FastDelegate1<const ZEPhysicalTransformChange&> ZEPhysicalTransformChangeCallback;
+typedef fastdelegate::FastDelegate1<const ZEPhysicalTransformChangeEventArgument&> ZEPhysicalTransformChangeEvent;
+
+struct ZEPhysicalJointEventArgument
+{
+	ZEPhysicalObject*					PhysicalJointParent;
+	ZEPhysicalObject*					PhysicalJoint;
+
+	ZEVector3							NewPosition;
+	ZEQuaternion						NewRotation;
+
+	bool								IsJointBroken;
+};
+
+typedef fastdelegate::FastDelegate1<const ZEPhysicalJointEventArgument> ZEPhysicalJointEvent;
+
+struct ZEPhysicalTriggerEventArgument
+{
+	ZEPhysicalObject*					Trigger;
+	ZEPhysicalObject*					TriggerFiredBy;
+
+	ZEVector3							TriggerFiredAt;				
+
+	bool								IsTriggerActive;
+	bool								IsTriggerFired;
+};
+
+typedef fastdelegate::FastDelegate1<const ZEPhysicalTriggerEventArgument*> ZEPhysicalTriggerEvent;
 
 #endif
-
-
-
-

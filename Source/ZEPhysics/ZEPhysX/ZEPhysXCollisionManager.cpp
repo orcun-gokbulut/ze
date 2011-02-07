@@ -35,38 +35,33 @@
 
 #include "ZEPhysXCollisionManager.h"
 #include "ZEPhysics\ZEPhysicalCallbacks.h"
-#include "ZEPhysics\ZEPhysicalObject.h"
+#include "ZEPhysics\ZEPhysicalRigidBody.h"
 #include <NxActor.h>
 
 void ZEPhysXCollisionManager::onContactNotify(NxContactPair& pair, NxU32 events)
 {
-	ZEPhysicalCollision Collision;
+	ZEPhysicalCollisionEventArgument Collision;
 	if (!pair.isDeletedActor[0])
-		Collision.Collider1 = (ZEPhysicalObject*)pair.actors[0]->userData;
+		Collision.Collider1 = (ZEPhysicalRigidBody*)pair.actors[0]->userData;
 	else
 		Collision.Collider1 = NULL;
 
 	if (!pair.isDeletedActor[0])
-		Collision.Collider2 = (ZEPhysicalObject*)pair.actors[1]->userData;
+		Collision.Collider2 = (ZEPhysicalRigidBody*)pair.actors[1]->userData;
 	else
 		Collision.Collider2 = NULL;
-	
+
 	if (Collision.Collider1 != NULL)
 	{
-		const ZEPhysicalCollisionCallback& Callback = ((ZEPhysicalObject*)Collision.Collider1)->GetCollisionCallback();
+		const ZEPhysicalCollisionEvent& Callback = ((ZEPhysicalRigidBody*)Collision.Collider1)->GetCollisionEvent();
 		if (!Callback.empty())
 			Callback(Collision);
 	}
 
 	if (Collision.Collider2 != NULL)
 	{
-		const ZEPhysicalCollisionCallback& Callback = ((ZEPhysicalObject*)Collision.Collider2)->GetCollisionCallback();
+		const ZEPhysicalCollisionEvent& Callback = ((ZEPhysicalRigidBody*)Collision.Collider2)->GetCollisionEvent();
 		if (!Callback.empty())
 			Callback(Collision);
 	}
-
 }
-
-
-
-

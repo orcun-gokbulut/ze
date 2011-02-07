@@ -209,10 +209,10 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 		ParentlessBoneShape = new ZEPhysicalBoxShape();
 		ParentlessBoneBody->SetPosition(AveragePosition);
 		ParentlessBoneBody->SetEnabled(true);
-		ParentlessBoneBody->SetMass(50.0f);
-		ParentlessBoneShape->SetWidth(10.0f);
-		ParentlessBoneShape->SetHeight(10.0f);
-		ParentlessBoneShape->SetLength(10.0f);
+		ParentlessBoneBody->SetMass(1.00f);
+		ParentlessBoneShape->SetWidth(0.01f);
+		ParentlessBoneShape->SetHeight(0.01f);
+		ParentlessBoneShape->SetLength(0.01f);
 		ParentlessBoneShape->SetPosition(ZEVector3::Zero);
 		ParentlessBoneBody->AddPhysicalShape(ParentlessBoneShape);
 
@@ -657,6 +657,7 @@ void ZEModel::Tick(float ElapsedTime)
 			ZEVector3::Lerp(Scale, Key->Scale, NextKey->Scale, Interpolation);
 			Meshes[Key->ItemId].SetLocalScale(Scale);
 		}
+		
 		AnimationFrame += AnimationSpeed * ElapsedTime;
 	}
 
@@ -698,6 +699,34 @@ void ZEModel::Tick(float ElapsedTime)
 		//this->SetWorldPosition(ZEVector3::Zero);
 		//this->SetLocalPosition(ZEVector3::Zero);
 	}*/
+	BoneTransformChangeEvent();
+}
+
+void ZEModel::BoneTransformChangeEvent()
+{
+	for (int I = 0; I < Bones.GetCount(); I++)
+	{
+		if(Bones[I].GetParentBone() != NULL)
+		{
+			ZEQuaternion Inverse;
+			ZEQuaternion::Conjugate(Inverse, Bones[I].GetParentBone()->GetWorldRotation());
+
+			ZEMatrix4x4 InvParent;
+			ZEMatrix4x4::Inverse(InvParent, Bones[I].GetParentBone()->GetWorldTransform());
+			ZEVector3 Position;
+			ZEMatrix4x4::Transform(Position, InvParent, Bones[I].PhysicalBody->GetPosition());
+
+			Bones[I].SetRelativePosition(Position);
+			Bones[I].SetRelativeRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
+		}
+		else
+		{
+			ZEQuaternion Inverse;
+			ZEQuaternion::Conjugate(Inverse, this->GetWorldRotation());
+			Bones[I].SetRelativePosition(Bones[I].PhysicalBody->GetPosition() - GetWorldPosition());
+			Bones[I].SetRelativeRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
+		}
+	}
 }
 
 ZEModel::ZEModel()
@@ -730,6 +759,5 @@ ZEModel::~ZEModel()
 	if (ModelResource != NULL)
 		((ZEModelResource*)ModelResource)->Release();
 }
-
 
 

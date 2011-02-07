@@ -44,7 +44,7 @@
 #include "ZECore\ZEResourceManager.h"
 #include "ZEGraphics\ZETexture2DResource.h"
 #include "ZEGraphics\ZEFixedMaterial.h"
-#include "ZEPhysics\ZEPhysicalStaticMesh.h"
+#include "ZEPhysics\ZEPhysicalMesh.h"
 #include <string.h>
 
 // Reading

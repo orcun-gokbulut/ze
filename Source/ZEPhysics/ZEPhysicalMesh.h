@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPhysicalStaticRigidBody.cpp
+ Zinek Engine - ZEPhysicalMesh.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,18 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPhysicalStaticRigidBody.h"
-#include "ZEPhysicsModule.h"
+#pragma once
+#ifndef __ZE_PHYSICAL_STATIC_MESH_H__
+#define __ZE_PHYSICAL_STATIC_MESH_H__
 
-ZEPhysicalObjectType ZEPhysicalStaticRigidBody::GetPhysicalObjectType()
-{
-	return ZE_POT_STATIC_OBJECT;
-}
+#include "ZEPhysicalObject.h"
+#include "ZEPhysicalMaterial.h"
 
-ZEPhysicalStaticRigidBody* ZEPhysicalStaticRigidBody::CreateInstance()
+struct ZEPhysicalTriangle
 {
-	return zePhysics->CreatePhysicalStaticRigidBody();
-}
+	unsigned int Indices[3];
+	unsigned int MaterialIndex;
+};
+
+class ZEPhysicalMesh : public ZEPhysicalObject
+{
+	public:
+		virtual ZEPhysicalObjectType	GetPhysicalObjectType();
+
+		virtual bool					SetData(const ZEVector3* Vertices, size_t VertexCount, 
+												const ZEPhysicalTriangle* Triangles, size_t PolygonCount, 
+												const ZEPhysicalMaterial* Materials, size_t MaterialCount) = 0;
+
+		static ZEPhysicalMesh*	CreateInstance();
+};
+
+#endif
 
 
 

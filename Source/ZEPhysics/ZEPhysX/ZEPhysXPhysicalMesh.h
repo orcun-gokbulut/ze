@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPhysicalStaticMesh.h
+ Zinek Engine - ZEPhysXPhysicalMesh.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,28 +34,72 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PHYSICAL_STATIC_MESH_H__
-#define __ZE_PHYSICAL_STATIC_MESH_H__
+#ifndef __ZE_PHYSX_PHYSICAL_STATIC_MESH_H__
+#define __ZE_PHYSX_PHYSICAL_STATIC_MESH_H__
 
-#include "ZEPhysicalObject.h"
-#include "ZEPhysicalMaterial.h"
+#include "ZEPhysics\ZEPhysicalMesh.h"
+#include "ZEPhysXComponentBase.h"
 
-struct ZEPhysicalTriangle
+#include <NxActor.h>
+#include <NxActorDesc.h>
+#include <NxTriangleMesh.h>
+#include <NxTriangleMeshDesc.h>
+#include <NxTriangleMeshShapeDesc.h>
+
+class ZEPhysXPhysicalWorld;
+class ZEPhysXPhysicalMesh : public ZEPhysicalMesh, private ZEPhysXComponentBase
 {
-	unsigned int Indices[3];
-	unsigned int MaterialIndex;
-};
+	friend class ZEPhysXModule;
 
-class ZEPhysicalStaticMesh : public ZEPhysicalObject
-{
+	private:
+		ZEPhysXPhysicalWorld*				PhysicalWorld;
+		
+		NxActor*							Actor;
+		NxActorDesc							ActorDesc;
+		NxTriangleMeshShapeDesc				TriangleMeshShapeDesc;	
+
+		ZEDWORD								CollisionFlags;
+		ZEPhysicalCollisionEventArgument	CollisionCallback;
+
+		ZEVector3							Scale;
+		bool								Enabled;
+
+		float								SkinWidth;
+
+		void								ReCreate();
+
+											ZEPhysXPhysicalMesh();
+		virtual								~ZEPhysXPhysicalMesh();
+
 	public:
-		virtual ZEPhysicalObjectType	GetPhysicalObjectType();
+		virtual void						SetPhysicalWorld(ZEPhysicalWorld* World);
+		virtual ZEPhysicalWorld*			GetPhysicalWorld();
 
-		virtual bool					SetData(const ZEVector3* Vertices, size_t VertexCount, 
-												const ZEPhysicalTriangle* Triangles, size_t PolygonCount, 
-												const ZEPhysicalMaterial* Materials, size_t MaterialCount) = 0;
+		virtual void						SetEnabled(bool Enabled);
+		virtual bool						GetEnabled();
 
-		static ZEPhysicalStaticMesh*	CreateInstance();
+		virtual void						SetPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3					GetPosition();
+		
+		virtual void						SetRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion				GetRotation();
+
+		virtual void						SetScale(const ZEVector3& NewScale);
+		virtual ZEVector3					GetScale();
+
+		virtual void						SetSkinWidth(float Width);
+		virtual float						GetSkinWidth() const;
+
+		virtual bool						SetData(const ZEVector3* Vertices, size_t VertexCount, 
+													const ZEPhysicalTriangle* Triangles, size_t PolygonCount, 
+													const ZEPhysicalMaterial* Materials, size_t MaterialCount);
+
+		virtual void						SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags);
+		virtual ZEDWORD						GetCollisionCallbackFlags();
+
+		virtual bool						Initialize();
+		virtual void						Deinitialize();	
+
 };
 
 #endif

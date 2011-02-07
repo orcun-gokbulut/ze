@@ -55,8 +55,8 @@ class ZEPhysicsDebugModule : public ZEDebugModule
 		ZEPhysicalCapsuleShape	Shape2;	
 		ZEModel*				Model;
 
-		void					TransformChanged(const ZEPhysicalTransformChange& TransformChange);
-		void					ColisionDetected(const ZEPhysicalCollision& Collision);
+		void					TransformChanged(const ZEPhysicalTransformChangeEventArgument& TransformChange);
+		void					ColisionDetected(const ZEPhysicalCollisionEventArgument& Collision);
 
 	public:
 		virtual void			Process(float ElapsedTime);

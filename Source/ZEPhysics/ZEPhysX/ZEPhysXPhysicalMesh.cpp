@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPhysXPhysicalStaticMesh.cpp
+ Zinek Engine - ZEPhysXPhysicalMesh.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPhysXPhysicalStaticMesh.h"
+#include "ZEPhysXPhysicalMesh.h"
 #include "ZEPhysXPhysicalWorld.h"
 #include "ZEPhysXStream.h"
 #include "ZEPhysXConversion.h"
@@ -46,7 +46,7 @@
 #include <NxQuat.h>
 #include <NxVec3.h>
 
-ZEPhysXPhysicalStaticMesh::ZEPhysXPhysicalStaticMesh()
+ZEPhysXPhysicalMesh::ZEPhysXPhysicalMesh()
 {
 	PhysicalWorld = NULL;
 	Actor = NULL;
@@ -57,12 +57,12 @@ ZEPhysXPhysicalStaticMesh::ZEPhysXPhysicalStaticMesh()
 	Enabled = true;
 }
 
-ZEPhysXPhysicalStaticMesh::~ZEPhysXPhysicalStaticMesh()
+ZEPhysXPhysicalMesh::~ZEPhysXPhysicalMesh()
 {
 	Deinitialize();
 }
 
-void ZEPhysXPhysicalStaticMesh::SetPhysicalWorld(ZEPhysicalWorld* World)
+void ZEPhysXPhysicalMesh::SetPhysicalWorld(ZEPhysicalWorld* World)
 {
 	if (PhysicalWorld == World)
 		return;
@@ -76,12 +76,12 @@ void ZEPhysXPhysicalStaticMesh::SetPhysicalWorld(ZEPhysicalWorld* World)
 	}
 }
 
-ZEPhysicalWorld* ZEPhysXPhysicalStaticMesh::GetPhysicalWorld()
+ZEPhysicalWorld* ZEPhysXPhysicalMesh::GetPhysicalWorld()
 {
 	return PhysicalWorld;
 }
 
-void ZEPhysXPhysicalStaticMesh::SetEnabled(bool Enabled)
+void ZEPhysXPhysicalMesh::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
 
@@ -107,12 +107,12 @@ void ZEPhysXPhysicalStaticMesh::SetEnabled(bool Enabled)
 	}
 }
 
-bool ZEPhysXPhysicalStaticMesh::GetEnabled()
+bool ZEPhysXPhysicalMesh::GetEnabled()
 {
 	return Enabled;
 }
 
-void ZEPhysXPhysicalStaticMesh::SetPosition(const ZEVector3& NewPosition)
+void ZEPhysXPhysicalMesh::SetPosition(const ZEVector3& NewPosition)
 {
 	ActorDesc.globalPose.t = ZE_TO_NX(NewPosition);
 	if (Actor != NULL)
@@ -122,7 +122,7 @@ void ZEPhysXPhysicalStaticMesh::SetPosition(const ZEVector3& NewPosition)
 	}
 }
 
-ZEVector3 ZEPhysXPhysicalStaticMesh::GetPosition()
+ZEVector3 ZEPhysXPhysicalMesh::GetPosition()
 {
 	if (Actor != NULL)
 		return NX_TO_ZE(Actor->getGlobalPosition());
@@ -130,7 +130,7 @@ ZEVector3 ZEPhysXPhysicalStaticMesh::GetPosition()
 		return NX_TO_ZE(ActorDesc.globalPose.t);
 }
 
-void ZEPhysXPhysicalStaticMesh::SetRotation(const ZEQuaternion& NewRotation)
+void ZEPhysXPhysicalMesh::SetRotation(const ZEQuaternion& NewRotation)
 {
 	ActorDesc.globalPose.M.fromQuat(ZE_TO_NX(NewRotation));
 	if (Actor != NULL)
@@ -140,7 +140,7 @@ void ZEPhysXPhysicalStaticMesh::SetRotation(const ZEQuaternion& NewRotation)
 	}
 }
 
-ZEQuaternion ZEPhysXPhysicalStaticMesh::GetRotation()
+ZEQuaternion ZEPhysXPhysicalMesh::GetRotation()
 {
 	if (Actor != NULL)
 		return NX_TO_ZE(Actor->getGlobalOrientationQuat());
@@ -152,26 +152,36 @@ ZEQuaternion ZEPhysXPhysicalStaticMesh::GetRotation()
 	}
 }
 
-void ZEPhysXPhysicalStaticMesh::SetScale(const ZEVector3& NewScale)
+void ZEPhysXPhysicalMesh::SetScale(const ZEVector3& NewScale)
 {
 	Scale = NewScale;
 	if (Actor != NULL)
 		ReCreate();
 }
 
-ZEVector3 ZEPhysXPhysicalStaticMesh::GetScale()
+ZEVector3 ZEPhysXPhysicalMesh::GetScale()
 {
 	return Scale;
 }
 
-void ZEPhysXPhysicalStaticMesh::ReCreate()
+void ZEPhysXPhysicalMesh::SetSkinWidth( float Width )
+{
+	TriangleMeshShapeDesc.skinWidth = Width;
+}
+
+float ZEPhysXPhysicalMesh::GetSkinWidth() const
+{
+	return this->SkinWidth;
+}
+
+void ZEPhysXPhysicalMesh::ReCreate()
 {
 	ActorDesc.globalPose.t = Actor->getGlobalPosition();
 	ActorDesc.globalPose.M.fromQuat(Actor->getGlobalOrientationQuat()); 
 	Initialize();
 }
 
-bool ZEPhysXPhysicalStaticMesh::SetData(const ZEVector3* Vertices, size_t VertexCount, 
+bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, size_t VertexCount, 
 										const ZEPhysicalTriangle* Triangles, size_t TriangleCount, 
 										const ZEPhysicalMaterial* Materials, size_t MaterialCount)
 {
@@ -207,12 +217,12 @@ bool ZEPhysXPhysicalStaticMesh::SetData(const ZEVector3* Vertices, size_t Vertex
 	TriangleMeshShapeDesc.meshData = GetPhysicsSDK()->createTriangleMesh(ReadStream);
 	if (TriangleMeshShapeDesc.meshData == NULL)
 	{
-		zeError("PhysX Physical Static Mesh", "Can not crewate triangle mesh.");
+		zeError("PhysX Physical Static Mesh", "Can not create triangle mesh.");
 		return false;
 	}
 }
 
-void ZEPhysXPhysicalStaticMesh::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags)
+void ZEPhysXPhysicalMesh::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags)
 {
 	
 	ActorDesc.contactReportFlags = (ActorDesc.contactReportFlags & ~(NX_NOTIFY_ON_TOUCH | NX_NOTIFY_ON_START_TOUCH | NX_NOTIFY_ON_END_TOUCH)) |
@@ -225,14 +235,14 @@ void ZEPhysXPhysicalStaticMesh::SetCollisionCallbackFlags(ZEDWORD CollisionCallb
 	
 }
 
-ZEDWORD ZEPhysXPhysicalStaticMesh::GetCollisionCallbackFlags()
+ZEDWORD ZEPhysXPhysicalMesh::GetCollisionCallbackFlags()
 {
 	return (ActorDesc.contactReportFlags & NX_NOTIFY_ON_START_TOUCH ? ZE_PCCF_ON_START_TOUCH : NULL) |
 		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_END_TOUCH ? ZE_PCCF_ON_END_TOUCH : NULL) |
 		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_TOUCH ? ZE_PCCF_ON_TOUCH : NULL);
 }
 
-bool ZEPhysXPhysicalStaticMesh::Initialize()
+bool ZEPhysXPhysicalMesh::Initialize()
 {
 	Deinitialize();
 	if (PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
@@ -249,7 +259,7 @@ bool ZEPhysXPhysicalStaticMesh::Initialize()
 	return true;
 }
 
-void ZEPhysXPhysicalStaticMesh::Deinitialize()
+void ZEPhysXPhysicalMesh::Deinitialize()
 {
 	if (Actor != NULL && PhysicalWorld != NULL && PhysicalWorld->GetScene() != NULL)
 	{

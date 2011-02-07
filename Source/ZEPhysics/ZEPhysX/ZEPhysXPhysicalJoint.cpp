@@ -288,6 +288,23 @@ float ZEPhysXPhysicalJoint::GetBreakTorque() const
 	return JointDesc.maxTorque;
 }
 
+void ZEPhysXPhysicalJoint::SetBodiesCollide(bool BodiesCollide)
+{
+	if (BodiesCollide)
+	{
+		JointDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
+	}
+}
+
+bool ZEPhysXPhysicalJoint::GetBodiesCollide() const
+{
+	if (JointDesc.jointFlags == NX_JF_COLLISION_ENABLED)
+	{
+		return true;
+	}
+	return false;
+}
+
 void ZEPhysXPhysicalJoint::SetDrivePosition(const ZEVector3& DrivePosition)
 {
 	Joint->setDrivePosition(ZE_TO_NX(DrivePosition));
@@ -339,6 +356,18 @@ void ZEPhysXPhysicalJoint::SetDriveAngularVelocity(const ZEVector3& DriveAngular
 ZEVector3 ZEPhysXPhysicalJoint::GetDriveAngularVelocity() const
 {
 	return NX_TO_ZE(JointDesc.driveAngularVelocity);
+}
+
+void ZEPhysXPhysicalJoint::SetMassInertiaTensor(float MassInertiaTensor)
+{
+	MassInertiaTensor = MassInertiaTensor / 100;
+	JointDesc.actor[0]->setMassSpaceInertiaTensor(NxVec3(MassInertiaTensor, MassInertiaTensor, MassInertiaTensor));
+	JointDesc.actor[1]->setMassSpaceInertiaTensor(NxVec3(MassInertiaTensor, MassInertiaTensor, MassInertiaTensor));
+}
+
+float ZEPhysXPhysicalJoint::GetMassInertiaTensor() const
+{
+	return MassInertiaTensor;
 }
 
 const ZEArray<ZEPhysicalLimitPlane>& ZEPhysXPhysicalJoint::GetLimitPlanes() const
@@ -1108,12 +1137,12 @@ ZEVector3 ZEPhysXPhysicalJoint::GetScale()
 	return ZEVector3.Zero;
 }
 
-void ZEPhysXPhysicalJoint::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags)
+void ZEPhysXPhysicalJoint::SetCollisionEventFlags(ZEDWORD CollisionEventFlags)
 {
 
 }
 
-ZEDWORD ZEPhysXPhysicalJoint::GetCollisionCallbackFlags()
+ZEDWORD ZEPhysXPhysicalJoint::GetCollisionEventFlags()
 {
 	return NULL;
 }
@@ -1153,7 +1182,6 @@ ZEPhysXPhysicalJoint::ZEPhysXPhysicalJoint()
 	//memset(&JointDesc, 0, sizeof(NxD6JointDesc));
 	JointDesc.userData = this;
 	JointDesc.projectionMode = NX_JPM_NONE;
-	JointDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
 }
 
 ZEPhysXPhysicalJoint::~ZEPhysXPhysicalJoint()

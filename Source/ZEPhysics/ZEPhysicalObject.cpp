@@ -35,14 +35,24 @@
 
 #include "ZEPhysicalObject.h"
 
-void ZEPhysicalObject::SetCollisionCallback(const ZEPhysicalCollisionCallback& Callback)
+void ZEPhysicalObject::SetCollisionEvent(const ZEPhysicalCollisionEvent& Event)
 {
-	CollisionCallback = Callback;
+	CollisionEvent = Event;
 }
 
-const ZEPhysicalCollisionCallback& ZEPhysicalObject::GetCollisionCallback()
+const ZEPhysicalCollisionEvent& ZEPhysicalObject::GetCollisionEvent()
 {
-	return CollisionCallback;
+	return CollisionEvent;
+}
+
+void ZEPhysicalObject::SetTransformChangeEvent(const ZEPhysicalTransformChangeEvent& Event)
+{
+	TransformChangeEvent = Event;
+}
+
+const ZEPhysicalTransformChangeEvent& ZEPhysicalObject::GetTransformChangeEvent()
+{
+	return TransformChangeEvent;	
 }
 
 void ZEPhysicalObject::Destroy()

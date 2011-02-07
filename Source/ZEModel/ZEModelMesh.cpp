@@ -255,7 +255,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	UpdateModelTransform = true;
 	UpdateLocalTransform = true;
 
-	if (MeshResource->PhysicalBody.Type != ZE_MRPBT_RIGID)
+	if (MeshResource->PhysicalBody.Type == ZE_MRPBT_RIGID)
 	{
 		if (PhysicalBody != NULL)
 			PhysicalBody->Destroy();
@@ -318,6 +318,8 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			}
 		}
 
+		PhysicalBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+
 		PhysicalBody->Initialize();
 	}
 
@@ -356,6 +358,7 @@ ZEModelMesh::ZEModelMesh()
 {
 	Owner = NULL;
 	MeshResource = NULL;
+	PhysicalBody = NULL;
 }
 
 ZEModelMesh::~ZEModelMesh()

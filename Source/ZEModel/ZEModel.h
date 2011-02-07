@@ -172,6 +172,7 @@ class ZEModel : public ZEComponent
 
 		void								Tick(float ElapsedTime);
 		void								Draw(ZEDrawParameters* DrawParameters);
+		void								BoneTransformChangeEvent();
 
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
 

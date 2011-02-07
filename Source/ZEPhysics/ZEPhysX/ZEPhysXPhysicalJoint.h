@@ -62,6 +62,8 @@ class ZEPhysXPhysicalJoint: public ZEPhysicalJoint
 
 		ZEQuaternion							GlobalOrientation;
 
+		float									MassInertiaTensor;
+
 		ZEArray<ZEPhysicalLimitPlane>			LimitPlanes;
 
 		virtual void							ReCreate();
@@ -110,6 +112,9 @@ class ZEPhysXPhysicalJoint: public ZEPhysicalJoint
 		virtual void							SetBreakTorque(float BreakTorque);
 		virtual float							GetBreakTorque() const;
 
+		virtual void							SetBodiesCollide(bool BodiesCollide);
+		virtual bool							GetBodiesCollide() const;
+
 		virtual void							SetDrivePosition(const ZEVector3& DrivePosition);
 		virtual ZEVector3						GetDrivePosition() const;
 
@@ -121,6 +126,9 @@ class ZEPhysXPhysicalJoint: public ZEPhysicalJoint
 
 		virtual void							SetDriveAngularVelocity(const ZEVector3& DriveAngularVelocity);
 		virtual ZEVector3						GetDriveAngularVelocity() const;
+
+		virtual void							SetMassInertiaTensor(float MassInertiaTensor);
+		virtual float							GetMassInertiaTensor() const;
 
 		virtual const 
 		ZEArray<ZEPhysicalLimitPlane>&			GetLimitPlanes() const;
@@ -308,8 +316,8 @@ class ZEPhysXPhysicalJoint: public ZEPhysicalJoint
 		virtual void							SetScale(const ZEVector3& NewScale);
 		virtual ZEVector3						GetScale();
 
-		virtual void							SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags);
-		virtual ZEDWORD							GetCollisionCallbackFlags();
+		virtual void							SetCollisionEventFlags(ZEDWORD CollisionEventFlags);
+		virtual ZEDWORD							GetCollisionEventFlags();
 
 		//virtual void							SetDefaultValues(ZEPhysicalJointType Type);
 
