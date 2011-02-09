@@ -40,17 +40,7 @@ ZEPhysicalObjectType ZEPhysicalRigidBody::GetPhysicalObjectType()
 {
 	return ZE_POT_RIGID_BODY;
 }
-/*
-void ZEPhysicalRigidBody::SetCollisionEvent(const ZEPhysicalCollisionEvent& Event)
-{
-	CollisionEvent = Event;
-}
 
-const ZEPhysicalCollisionEvent& ZEPhysicalRigidBody::GetCollisionEvent()
-{
-	return CollisionEvent;
-}
-*/
 ZEPhysicalRigidBody* ZEPhysicalRigidBody::CreateInstance()
 {
 	return zePhysics->CreatePhysicalRigidBody();

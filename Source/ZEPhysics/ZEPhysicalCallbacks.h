@@ -79,7 +79,7 @@ struct ZEPhysicalJointEventArgument
 	bool								IsJointBroken;
 };
 
-typedef fastdelegate::FastDelegate1<const ZEPhysicalJointEventArgument> ZEPhysicalJointEvent;
+typedef fastdelegate::FastDelegate1<const ZEPhysicalJointEventArgument&> ZEPhysicalJointEvent;
 
 struct ZEPhysicalTriggerEventArgument
 {
@@ -92,6 +92,6 @@ struct ZEPhysicalTriggerEventArgument
 	bool								IsTriggerFired;
 };
 
-typedef fastdelegate::FastDelegate1<const ZEPhysicalTriggerEventArgument*> ZEPhysicalTriggerEvent;
+typedef fastdelegate::FastDelegate1<const ZEPhysicalTriggerEventArgument&> ZEPhysicalTriggerEvent;
 
 #endif

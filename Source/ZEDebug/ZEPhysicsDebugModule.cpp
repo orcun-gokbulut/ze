@@ -89,7 +89,7 @@ bool ZEPhysicsDebugModule::Initialize()
 	if (Player == NULL)
 	{
 		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
-		Player->SetPosition(ZEVector3(-45.0f, 60.0f, 45.0f));
+		Player->SetPosition(ZEVector3(-7.0f, 44.0f, 7.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 		Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());

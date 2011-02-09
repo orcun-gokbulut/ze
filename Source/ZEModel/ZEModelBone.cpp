@@ -301,6 +301,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalBody->SetPosition(this->GetWorldPosition());
 		PhysicalBody->SetRotation(this->GetWorldRotation());
 		PhysicalBody->SetMassCenterPosition(BoneResource->PhysicalBody.MassCenter);
+		PhysicalBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this->Owner, &ZEModel::BoneTransformChangeEvent));
 
 		for (size_t I = 0; I < BoneResource->PhysicalBody.Shapes.GetCount(); I++)
 		{

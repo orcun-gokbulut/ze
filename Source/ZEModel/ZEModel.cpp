@@ -699,10 +699,9 @@ void ZEModel::Tick(float ElapsedTime)
 		//this->SetWorldPosition(ZEVector3::Zero);
 		//this->SetLocalPosition(ZEVector3::Zero);
 	}*/
-	BoneTransformChangeEvent();
 }
 
-void ZEModel::BoneTransformChangeEvent()
+void ZEModel::BoneTransformChangeEvent(const ZEPhysicalTransformChangeEventArgument& TransformChange)
 {
 	for (int I = 0; I < Bones.GetCount(); I++)
 	{

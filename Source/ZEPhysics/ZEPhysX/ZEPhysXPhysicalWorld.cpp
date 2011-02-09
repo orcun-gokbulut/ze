@@ -322,7 +322,7 @@ void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 	{
 		if (ActiveTransforms[I].userData != NULL)
 		{
-			const ZEPhysicalTransformChangeEvent& Callback = ((ZEPhysicalRigidBody*)ActiveTransforms[I].userData)->GetTransformChangeEvent();
+			const ZEPhysicalTransformChangeEvent& Callback = ((ZEPhysicalObject*)ActiveTransforms[I].userData)->GetTransformChangeEvent();
 			if (!Callback.empty())
 			{
 				ZEPhysicalTransformChangeEventArgument Change;
@@ -333,7 +333,7 @@ void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 				ActiveTransforms[I].actor2World.M.toQuat(Quat);
 				Change.NewRotation = NX_TO_ZE(Quat);
 
-				Change.PhysicalObject = ((ZEPhysicalRigidBody*)ActiveTransforms[I].userData);
+				Change.PhysicalObject = ((ZEPhysicalObject*)ActiveTransforms[I].userData);
 
 				Callback(Change);
 			}

@@ -57,7 +57,7 @@ const ZEPhysicalTransformChangeEvent& ZEPhysicalObject::GetTransformChangeEvent(
 
 void ZEPhysicalObject::Destroy()
 {
-	Deinitialize();
+	Deinitialize(); 
 	delete this;
 }
 
