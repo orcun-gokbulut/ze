@@ -159,7 +159,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	DirectionalLight0->SetEnabled(true);
 	DirectionalLight0->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
-	DirectionalLight0->SetIntensity(20.0f);
+	DirectionalLight0->SetIntensity(3.0f);
 	DirectionalLight0->SetCastsShadow(false);
 	Scene->AddEntity(DirectionalLight0);
 
@@ -170,7 +170,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight5->SetEnabled(true);
 	OmniProjectiveLight0->SetEnabled(true);
 	ProjectiveLight0->SetEnabled(true);
-	DirectionalLight0->SetEnabled(true);
+	DirectionalLight0->SetEnabled(false);
 	return true;
 }
 

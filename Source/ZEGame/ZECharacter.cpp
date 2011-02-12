@@ -556,12 +556,6 @@ void ZECharacter::Tick(float ElapsedTime)
 
 	Model->Tick(ElapsedTime);
 
-	ZEModelMesh Weapon = Model->GetMeshes()[2];
-	ZEQuaternion FlashLightRotation = Model->GetRotation() * Weapon.GetLocalRotation();
-	ZEVector3 FlashLightPosition = Model->GetLocalTransform() * Weapon.GetLocalPostion() - ZEVector3(0,-0.1, 0.5);
-	FlashLight->SetPosition(FlashLightPosition);
-	FlashLight->SetRotation(FlashLightRotation);
-
 	ZEEntity::Tick(ElapsedTime);
 }
 
@@ -671,20 +665,6 @@ bool ZECharacter::Initialize()
 
 	Model->SetModelResource(ZEModelResource::LoadResource("soldier.zemodel"));
 
-	FlashLight = ZEProjectiveLight::CreateInstance();
-	FlashLight->SetRange(50);
-	FlashLight->SetIntensity(1.0f);	
-	FlashLight->SetProjectionTexture(ZETexture2DResource::LoadResource("flashlight.jpg")->GetTexture());
-	FlashLight->SetAspectRatio(1.0f);
-	FlashLight->SetFOV(ZE_PI_2);
-	//FlashLight->SetCastsShadow(true);
-
-	ZEModelMesh Weapon = Model->GetMeshes()[2];
-	ZEQuaternion FlashLightRotation = Model->GetRotation() * Weapon.GetLocalRotation();
-	ZEVector3 FlashLightPosition = Model->GetLocalTransform() * Weapon.GetLocalPostion() - ZEVector3(0,-0.1, 0.5);
-	FlashLight->SetPosition(FlashLightPosition);
-	FlashLight->SetRotation(FlashLightRotation);
-	RegisterComponent(FlashLight);
 
 	IdleAnimationTrack = Model->GetAnimationTracks().Add();
 	IdleAnimationTrack->SetOwner(Model);

@@ -64,7 +64,7 @@ ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
 
 ZEDrawFlags ZEPlayer::GetDrawFlags()
 {
-	return ZE_DF_NONE; //ZE_DF_LIGHT_SOURCE;
+	return ZE_DF_NONE | ZE_DF_LIGHT_SOURCE;
 }
 
 ZECamera* ZEPlayer::GetCamera()
@@ -251,7 +251,13 @@ ZEPlayer::ZEPlayer()
 	RegisterComponent(Listener);
 
 	Light = ZEProjectiveLight::CreateInstance();
-	Light->SetProjectionTextureFile("FlashLight.jpg");
+	Light->SetProjectionTextureFile("flashlight.jpg");
+	Light->SetAttenuation(0.01f, 0.0f, 1.0f);
+	Light->SetIntensity(3.0f);
+	Light->SetRange(55.0f);
+	Light->SetFOV(ZE_PI_2);
+	Light->SetAspectRatio(1.0f);
+	Light->SetCastsShadow(true);
 	RegisterComponent(Light);
 }
 

@@ -175,10 +175,10 @@ void ZED3D9FrameRenderer::InitializeLightning()
 	ZECanvas Canvas;
 	// Directional
 	Canvas.AddQuad(
-		ZEVector3( 1.0f,  1.0f, 0.0f),
-		ZEVector3(-1.0f,  1.0f, 0.0f),
-		ZEVector3(-1.0f, -1.0f, 0.0f),
-		ZEVector3( 1.0f, -1.0f, 0.0f));
+		ZEVector3( 1.0f,  1.0f, 1.0f),
+		ZEVector3(-1.0f,  1.0f, 1.0f),
+		ZEVector3(-1.0f, -1.0f, 1.0f),
+		ZEVector3( 1.0f, -1.0f, 1.0f));
 
 	// Point/OmniProjective
 	Canvas.AddSphere(1.0f, 12, 12);

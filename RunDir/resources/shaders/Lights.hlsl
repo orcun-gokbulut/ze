@@ -111,7 +111,7 @@ ZELBuffer ZEPointLight_PixelShader(ZEPointLight_PSInput Input) : COLOR0
 
 		float3 SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
 
-		float ViewDirection = normalize(-Position);
+		float3 ViewDirection = normalize(-Position);
 		float3 HalfVector = normalize(LightDirection + ViewDirection);		
 
 		float4 Output;
@@ -223,7 +223,7 @@ ZELBuffer ZEProjectiveLight_PixelShader(ZEProjectiveLight_PSInput Input) : COLOR
 	{
 		float3 SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
 
-		float ViewDirection = normalize(-Position);
+		float3 ViewDirection = normalize(-Position);
 		float3 HalfVector = normalize(LightDirection + ViewDirection);
 
 		float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
@@ -238,7 +238,7 @@ ZELBuffer ZEProjectiveLight_PixelShader(ZEProjectiveLight_PSInput Input) : COLOR
 		Output *= AngularAttenuation;
 		Output *= DistanceAttenuation;
 
-		Output *= SampleShadowMap(ProjectionShadowMap, TextureLookup);
+		//Output *= SampleShadowMap(ProjectionShadowMap, TextureLookup);
 		
 		ZELBuffer_SetDiffuse(LBuffer, Output.rgb);
 		ZELBuffer_SetSpecular(LBuffer, Output.a);
@@ -292,7 +292,7 @@ ZELBuffer ZEOmniProjectiveLight_PixelShader(ZEOmniProjectiveLight_PSInput Input)
 		float3 TextureLookup = mul(LightDirection, (float3x3)LightRotationParam);
 		float3 ProjLightColor = texCUBE(OmniProjectionMap, TextureLookup).rgb * LightColorParam;
 		
-		float ViewDirection = normalize(-Position);
+		float3 ViewDirection = normalize(-Position);
 		float3 HalfVector = normalize(LightDirection + ViewDirection);
 			
 		float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));

@@ -120,8 +120,6 @@ class ZECharacter : public ZECompoundEntity
 		float						RunTransitionTime;
 		float						RunSpeed;
 
-		ZEProjectiveLight*			FlashLight;
-
 	protected:
 
 									ZECharacter();

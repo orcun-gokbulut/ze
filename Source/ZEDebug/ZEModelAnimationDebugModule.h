@@ -52,6 +52,8 @@ class ZESoundResource;
 class ZESoundSource;
 class ZEModel;
 class ZELight;
+class ZEDirectionalLight;
+class ZEProjectiveLight;
 
 class ZEModelAnimationDebugModule : public ZEDebugModule
 {
@@ -64,6 +66,9 @@ class ZEModelAnimationDebugModule : public ZEDebugModule
 		ZEPointLight*			PointLight2;
 		ZECharacter*			Character;
 		ZEInputMap				InputMap;
+		ZEDirectionalLight*		DirectionalLight;
+		ZEProjectiveLight*		ProjectiveLight;
+
 
 	public:
 		virtual bool			Initialize();
