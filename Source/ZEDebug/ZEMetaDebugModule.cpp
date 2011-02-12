@@ -48,6 +48,7 @@
 #include "ZEMeta/ZEProvider.h"
 #include "ZEGraphics/ZEMaterial.h"
 #include "ZEGraphics/ZECamera.h"
+#include "ZEGraphics/ZEPointLight.h"
 
 //#include "ZEGame/ZED.h"
 

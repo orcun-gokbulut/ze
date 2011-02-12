@@ -126,7 +126,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		CanvasMaterial->SetLightningEnabled(true);
 		CanvasMaterial->SetTransparancyMode(ZE_MTM_NONE);
 		CanvasMaterial->SetTwoSided(false);
-		CanvasMaterial->SetRecivesShadow(false);
+		CanvasMaterial->SetShadowReciver(false);
 		CanvasMaterial->SetAmbientEnabled(true);
 		CanvasMaterial->SetAmbientColor(ZEVector3(0.1f, 0.1f, 0.1f));
 		CanvasMaterial->SetDiffuseEnabled(true);

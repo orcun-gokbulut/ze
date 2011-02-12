@@ -53,7 +53,6 @@ class ZESkyBoxMaterial : public ZEMaterial
 		virtual							~ZESkyBoxMaterial();
 
 	public:
-		ZEMaterialType					GetMaterialType() const;
 		ZEMaterialFlags					GetMaterialFlags() const;
 
 		void							SetZero();

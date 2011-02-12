@@ -235,16 +235,6 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 	else
 		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
-	// Setup Transparancy
-	if (TransparancyMode != ZE_MTM_NONE)
-	{
-		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-		GetDevice()->SetRenderState(D3DRS_ALPHAREF, TransparancyCullLimit);
-		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
-	}
-	else
-		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-
 	// Setup Bone Transforms
 	BOOL SkinEnabled = false;
 	if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
@@ -261,6 +251,18 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 	GetDevice()->SetPixelShaderConstantF(6, (const float*)&ZEVector4(0.0f, 0.0f, Camera->GetFarZ(), 0.0f), 1);
 	
 	// Setup Textures
+	if ((GetAlphaCullEnabled() || TransparancyMode != ZE_MTM_NONE) && OpacityComponent == ZE_MOC_BASE_MAP_ALPHA && MaterialComponents & ZE_SHADER_BASE_MAP && BaseMap != NULL)
+	{
+		SetTextureStage(5, BaseMapAddressModeU, BaseMapAddressModeV);
+		GetDevice()->SetTexture(5, ((ZED3D9Texture2D*)BaseMap)->Texture);
+	}
+
+	if ((GetAlphaCullEnabled() || TransparancyMode != ZE_MTM_NONE) && OpacityComponent == ZE_MOC_OPACITY_MAP && MaterialComponents & ZE_SHADER_OPACITY_MAP && Opacity != NULL && OpacityMap != NULL)
+	{
+		SetTextureStage(9, OpacityMapAddressModeU, OpacityMapAddressModeV);
+		GetDevice()->SetTexture(9, ((ZED3D9Texture2D*)OpacityMap)->Texture);
+	}
+
 	if (MaterialComponents & ZE_SHADER_NORMAL_MAP && NormalMap != NULL)
 	{
 		SetTextureStage(6, NormalMapAddressModeU, NormalMapAddressModeV);
@@ -361,15 +363,6 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 	// Setup Transparancy
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 
-	if (TransparancyMode != ZE_MTM_NONE)
-	{
-		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-		GetDevice()->SetRenderState(D3DRS_ALPHAREF, TransparancyCullLimit);
-		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
-	}
-	else
-		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-
 	// Setup Bone Transforms
 	BOOL SkinEnabled = false;
 	if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
@@ -383,10 +376,6 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 	// Setup Transparancy
 	if (TransparancyMode != ZE_MTM_NONE)
 	{
-		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-		GetDevice()->SetRenderState(D3DRS_ALPHAREF, TransparancyCullLimit);
-		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
-
 		switch(TransparancyMode)
 		{
 			case ZE_MTM_ADDAPTIVE:
@@ -407,16 +396,11 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 				GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 				GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 				break;
-			case ZE_MTM_ALPHACULL:
-				break;
 		}
 
 	}
 	else
-	{
 		GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-	}
 
 	// Setup Material Properties
 	GetDevice()->SetVertexShaderConstantF(14, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants) / 16);

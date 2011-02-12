@@ -56,13 +56,13 @@
 #define ZE_SHADER_OPACITY_CONSTANT			(1 << 12)
 #define ZE_SHADER_OPACITY_MAP				(1 << 13)
 #define ZE_SHADER_DETAIL_MAP				(1 << 14)
-#define ZE_SHADER_DETAIL_BASE_MAP		(1 << 15)
+#define ZE_SHADER_DETAIL_BASE_MAP			(1 << 15)
 #define ZE_SHADER_DETAIL_NORMAL_MAP			(1 << 16)
 #define ZE_SHADER_REFLECTION				(1 << 17)
 #define ZE_SHADER_REFRACTION				(1 << 18)
 #define ZE_SHADER_LIGHT_MAP					(1 << 19)
-#define ZE_SHADER_DISTORTION_MAP				(1 << 20)
-
+#define ZE_SHADER_DISTORTION_MAP			(1 << 20)
+#define ZE_SHADER_ALPHA_CULL				(1 << 22)
 #endif
 
 

@@ -61,7 +61,6 @@ class ZESimpleMaterial : public ZEMaterial
 		virtual							~ZESimpleMaterial();
 
 	public:
-		ZEMaterialType					GetMaterialType() const;
 		ZEMaterialFlags					GetMaterialFlags() const;
 
 		void							SetZero();

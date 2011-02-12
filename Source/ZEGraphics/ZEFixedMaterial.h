@@ -55,13 +55,13 @@ class ZEFixedMaterial : public ZEMaterial
 		unsigned int					OldMaterialComponents;
 		unsigned int					MaterialComponents;
 
+		ZEMaterialOpacityComponent		OpacityComponent;
+
 		bool							TwoSided;
-		bool							LightningEnabled;
 		bool							Wireframe;
+	
 		ZEMaterialTransparancyMode		TransparancyMode;
-		bool							RecivesShadow;
-		unsigned int					TransparancyCullLimit;
-		
+
 		ZEVector3						AmbientColor;
 		float							AmbientFactor;
 
@@ -93,8 +93,13 @@ class ZEFixedMaterial : public ZEMaterial
 				float					ReflectionFactor;
 				float					RefractionFactor;
 				ZEVector2				DetailMapTiling;
+
+				float					AlphaCullLimit;
+				float					Reserved0;
+				float					Reserved1;
+				float					Reserved2;
 			};
-			float						PixelShaderConstants[20];
+			float						PixelShaderConstants[24];
 		};
 
 		union
@@ -104,6 +109,16 @@ class ZEFixedMaterial : public ZEMaterial
 				float					RefractionIndex;
 			};
 			float						VertexShaderConstants[4];
+		};
+
+		union
+		{
+			struct 
+			{
+				bool					SkinTransform;
+				bool					ShadowReciver;
+			};
+			float						PixelShaderBoolConstants[2];
 		};
 
 		union
@@ -163,22 +178,23 @@ class ZEFixedMaterial : public ZEMaterial
 		virtual							~ZEFixedMaterial();
 
 	public:
-		virtual ZEMaterialType			GetMaterialType() const;
 		virtual ZEMaterialFlags			GetMaterialFlags() const;
 
 		// Material Options
 		void							SetTwoSided(bool Enable);
 		bool							GetTwoSided() const;
-		void							SetLightningEnabled(bool Enable);
-		bool							GetLightningEnabled() const;
+
 		void							SetWireframe(bool Enable);
 		bool							GetWireframe() const;
+
 		void							SetTransparancyMode(ZEMaterialTransparancyMode Mode);
 		ZEMaterialTransparancyMode		GetTransparancyMode() const;
-		void							SetTransparancyCullLimit(unsigned int Limit);
-		unsigned int					GetTransparancyCullLimit() const;
-		void							SetRecivesShadow(bool Enable);
-		bool							GetRecivesShadow() const;
+
+		void							SetAlphaCullEnabled(bool Enabled);
+		bool							GetAlphaCullEnabled() const;
+
+		void							SetAlphaCullLimit(int Limit);
+		int								GetAlphaCullLimit() const;
 
 		// Ambient
 		void							SetAmbientEnabled(bool Enabled);
@@ -346,19 +362,17 @@ ZE_POST_PROCESSOR_START(Meta)
 		<class name="ZEFixedMaterial" noinstance="true">
 			<description>Material System</description>
 			<property name="TwoSided" groupname="Shading" type="boolean" autogetset="yes"/>
-			<property name="LightningEnabled" groupname="Shading" type="boolean" autogetset="yes"/>
-			<property name="RecivesShadow" groupname="Shading" type="boolean" autogetset="yes"/>
 			<property name="Wireframe" groupname="Shading" type="boolean" autogetset="yes"/>
-			<property name="TransparancyCullLimit" groupname="Transparancy" type="integer" autogetset="yes"/>
+			<property name="AlphaCullEnabled" groupname="Transparancy" type="boolean" autogetset="yes"/>
+			<property name="AlphaCullLimit" groupname="Transparancy" type="integer" autogetset="yes"/>
 			<property name="TransparancyMode" groupname="Transparancy" type="integer" autogetset="yes">
 				<enumurator name="ZEMaterialTransparancyMode">
 					<item name="No Transparancy" value="ZE_MTM_NONE"/>
-					<item name="Alpha Test" value="ZE_MTM_ALPHACULL"/>
 					<item name="Regular" value="ZE_MTM_REGULAR"/>
 					<item name="Adaptive" value="ZE_MTM_ADDAPTIVE"/>
 					<item name="Subtractive" value="ZE_MTM_SUBTRACTIVE"/>
 				</enumurator>
-			</property>			  
+			</property>		
 
 			<property name="AmbientEnabled" groupname="Ambient" type="boolean" autogetset="yes"/>
 			<property name="AmbientFactor" groupname="Ambient" type="float" autogetset="yes"/>
@@ -461,8 +475,8 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="OpacityComponent" groupname="Opacity" type="integer" autogetset="yes">
 				<enumurator name = "ZEMaterialOpacityComponent">
 					<item name="Constant" value="ZE_MOC_CONSTANT"/>
-					<item name="Diffuse Map Alpha" value="ZE_MOC_DIFFUSE_ALPHA"/>
-					<item name="Opacity Map" value="ZE_MOC_OPACITYMAP"/>
+					<item name="Diffuse Map Alpha" value="ZE_MOC_BASE_MAP_ALPHA"/>
+					<item name="Opacity Map" value="ZE_MOC_OPACITY_MAP"/>
 				</enumurator>
 			</property>
 			<!--<property name="OpacityMap" groupname="Opacity" type="string" autogetset="yes"/>-->

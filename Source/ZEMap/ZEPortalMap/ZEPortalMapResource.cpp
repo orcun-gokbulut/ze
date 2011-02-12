@@ -118,7 +118,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetEmmisiveColor(MaterialChunk.EmmisiveColor);
 		CurrentMaterial->SetEmmisiveFactor(MaterialChunk.EmmisiveFactor);
 		CurrentMaterial->SetSpecularEnabled(false);
-		CurrentMaterial->SetSpecularFactor(0.2f);
+		CurrentMaterial->SetSpecularFactor(1.0f);
 		CurrentMaterial->SetSpecularShininess(MaterialChunk.SpecularFactor);
 		CurrentMaterial->SetOpacity(MaterialChunk.Transparancy);
 		CurrentMaterial->SetReflectionFactor(MaterialChunk.ReflectionFactor);
@@ -142,6 +142,9 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 
 		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_LIGHT_MAP);
 		CurrentMaterial->SetLightMap(ManageMapMaterialTextures(MaterialChunk.LightMap));
+
+		CurrentMaterial->SetAlphaCullEnabled(true);
+		CurrentMaterial->SetAlphaCullLimit(50);
 
 		CurrentMaterial->UpdateMaterial();
 	}

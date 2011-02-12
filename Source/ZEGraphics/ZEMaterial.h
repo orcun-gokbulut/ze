@@ -39,21 +39,14 @@
 
 #include "ZEMeta\ZEClass.h"
 
-enum ZEMaterialType
-{
-	ZE_MTT_NONE,
-	ZE_MTT_NON_ILLUMUNATED,
-	ZE_MTT_DEFERRED,
-	ZE_MTT_FORWARD,
-};
-
 typedef ZEDWORD ZEMaterialFlags;
 #define ZE_MTF_NONE						0
-#define ZE_MTF_PREZ_PASS				1
+#define ZE_MTF_PRE_Z_PASS				1
 #define ZE_MTF_G_BUFFER_PASS			2
-#define ZE_MTF_SUPPORTS_SKINNING		4
-#define ZE_MTF_SUPPORTS_MORPHING		8
-#define ZE_MTF_SUPPORTS_INSTANCING		16
+#define ZE_MTF_L_BUFFER_PASS			4
+#define ZE_MTF_SUPPORTS_SKINNING		8
+#define ZE_MTF_SUPPORTS_MORPHING		16
+#define ZE_MTF_SUPPORTS_INSTANCING		32
 
 enum ZETextureFilterMode
 {
@@ -74,8 +67,7 @@ enum ZETextureAddressMode
 
 enum ZEMaterialTransparancyMode
 {
-	ZE_MTM_NONE		= 0,
-	ZE_MTM_ALPHACULL			= 1,
+	ZE_MTM_NONE					= 0,
 	ZE_MTM_REGULAR				= 2,
 	ZE_MTM_ADDAPTIVE			= 3,
 	ZE_MTM_SUBTRACTIVE			= 4,
@@ -84,8 +76,8 @@ enum ZEMaterialTransparancyMode
 enum ZEMaterialOpacityComponent
 {
 	ZE_MOC_CONSTANT				= 0,
-	ZE_MOC_DIFFUSE_ALPHA		= 1,
-	ZE_MOC_OPACITYMAP			= 2,
+	ZE_MOC_BASE_MAP_ALPHA		= 1,
+	ZE_MOC_OPACITY_MAP			= 2,
 };
 
 class ZEFrameRenderer;
@@ -97,16 +89,29 @@ class ZEMaterial : public ZEClass
 {
 	ZE_META_CLASS(ZEMaterial) 
 	protected:
+		bool							ShadowCaster;
+		bool							ShadowReciver;
+		bool							LightningEnabled;
+
 										ZEMaterial();
 		virtual							~ZEMaterial();
 
 	public:
-		virtual ZEMaterialType			GetMaterialType() const = 0;
 		virtual ZEMaterialFlags			GetMaterialFlags() const = 0;
 
 		// SetUp
-		virtual void					SetZero() = 0;
-		
+		virtual void					SetZero() = 0;	
+
+		// Options
+		void							SetShadowCaster(bool Value);
+		bool							GetShadowCaster() const;
+
+		void							SetShadowReciver(bool Value);
+		bool							GetShadowReciver() const;
+
+		void							SetLightningEnabled(bool Enabled);
+		bool							GetLightningEnabled() const;
+
 		// Render Pass
 		virtual bool					SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
 		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
@@ -125,7 +130,11 @@ class ZEMaterial : public ZEClass
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZEMaterial" noinstance="true" description="Base class of materials."/>
+		<class name="ZEMaterial" noinstance="true" description="Base class of materials.">
+			<property name="LightningEnabled" groupname="Shading" type="boolean" autogetset="yes"/>
+			<property name="ShadowReciver" groupname="Shadows" type="boolean" autogetset="yes"/>
+			<property name="ShadowCaster" groupname="Shadows" type="boolean" autogetset="yes"/>
+		</class>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()

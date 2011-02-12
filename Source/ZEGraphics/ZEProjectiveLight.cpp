@@ -77,7 +77,7 @@ void ZEProjectiveLight::SetProjectionTexture(const ZETexture2D* Texture)
 	ProjectionTexture = Texture;
 }
 
-const ZETexture2D* ZEProjectiveLight::GetProjectionTexture()
+const ZETexture2D* ZEProjectiveLight::GetProjectionTexture() const
 {
 	return ProjectionTexture;
 }
@@ -98,7 +98,7 @@ void ZEProjectiveLight::SetProjectionTextureFile(const char* Filename)
 	}
 }
 
-const char* ZEProjectiveLight::GetProjectionTextureFile()
+const char* ZEProjectiveLight::GetProjectionTextureFile() const
 {
 	if (strlen(ProjectionTextureFile) == 0)
 		return "";

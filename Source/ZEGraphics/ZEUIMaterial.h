@@ -53,7 +53,6 @@ class ZEUIMaterial : public ZEMaterial
 		virtual					~ZEUIMaterial();
 
 	public:
-		ZEMaterialType			GetMaterialType() const;
 		ZEMaterialFlags			GetMaterialFlags() const;
 
 		void					SetZero();

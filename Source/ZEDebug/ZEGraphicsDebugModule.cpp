@@ -66,7 +66,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(Player);
 
 
-	Scene->LoadMap("deneme.zemap");
+	//Scene->LoadMap("Graveyard.zemap");
 
 	PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
@@ -138,22 +138,9 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(ProjectiveLight0);
 	
 
-	/*ZEModel* Model = NULL;
-	if (Model == NULL)
-	{
-		Model = new ZEModel();		
-		Model->SetModelResource(ZEModelResource::LoadResource("soldier.zemodel"));
-
-		ZEModelAnimationTrack* IdleTrack = Model->GetAnimationTracks().Add();
-		IdleTrack->SetOwner(Model);
-		IdleTrack->SetAnimationByName("Test");
-		IdleTrack->SetSpeed(30.0f);
-		IdleTrack->SetStartFrame(0);
-		IdleTrack->SetEndFrame(5960);
-		IdleTrack->SetLooping(true);
-		IdleTrack->Play();
-		Scene->AddEntity(Model);
-	}*/
+	ZEModel* Model = ZEModel::CreateInstance();		
+	Model->SetModelResource(ZEModelResource::LoadResource("branch.zemodel"));
+	Scene->AddEntity(Model);
 
 	DirectionalLight0 = ZEDirectionalLight::CreateInstance();
 	DirectionalLight0->SetEnabled(true);
@@ -163,13 +150,13 @@ bool ZEGraphicsDebugModule::Initialize()
 	DirectionalLight0->SetCastsShadow(false);
 	Scene->AddEntity(DirectionalLight0);
 
-	PointLight1->SetEnabled(true);
-	PointLight2->SetEnabled(true);
-	PointLight3->SetEnabled(true);
-	PointLight4->SetEnabled(true);
-	PointLight5->SetEnabled(true);
-	OmniProjectiveLight0->SetEnabled(true);
-	ProjectiveLight0->SetEnabled(true);
+	PointLight1->SetEnabled(false);
+	PointLight2->SetEnabled(false);
+	PointLight3->SetEnabled(false);
+	PointLight4->SetEnabled(false);
+	PointLight5->SetEnabled(false);
+	OmniProjectiveLight0->SetEnabled(false);
+	ProjectiveLight0->SetEnabled(false);
 	DirectionalLight0->SetEnabled(false);
 	return true;
 }

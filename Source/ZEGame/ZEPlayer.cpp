@@ -204,9 +204,6 @@ bool ZEPlayer::Initialize()
 	if (GetInitialized())
 		return false;
 
-	FOV = ZE_PI_2;
-	Yawn = Pitch = Roll = 0;
-
 	ZECompoundEntity::Initialize();
 
 	zeScene->SetActiveCamera(Camera);
@@ -225,6 +222,10 @@ void ZEPlayer::Deinitialize()
 
 ZEPlayer::ZEPlayer()
 {
+
+	FOV = ZE_PI_2;
+	Yawn = Pitch = Roll = 0;
+
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,		"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_ALL)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,	"Move Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_ALL)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT, "Strafe Right",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_D, ZE_IBS_ALL)));
@@ -258,7 +259,7 @@ ZEPlayer::ZEPlayer()
 	Light->SetFOV(ZE_PI_2);
 	Light->SetAspectRatio(1.0f);
 	Light->SetCastsShadow(true);
-	Light->SetPosition(ZEVector3(0.0f, -2.0f, 0.0f));
+	//Light->SetPosition(ZEVector3(0.0f, -2.0f, 0.0f));
 	RegisterComponent(Light);
 }
 

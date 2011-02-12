@@ -60,6 +60,7 @@ float4 MaterialParams3 : register(ps, c3);
 float4 MaterialParams4 : register(ps, c4);
 float4 MaterialParams5 : register(ps, c5);
 float4 MaterialParams6 : register(vs, c12);
+float4 MaterialParams7 : register(vs, c16);
 float4 PipelineParameters0 : register(ps, c6);
 
 #define	MaterialAmbientColor        MaterialParams0.xyz
@@ -75,11 +76,13 @@ float4 PipelineParameters0 : register(ps, c6);
 #define MaterialDistortionFactor	MaterialParams5.x
 #define MaterialDistortionAmount	MaterialParams5.y
 #define MaterialRefractionIndex		MaterialParams6.x
+#define AlphaCullLimit				MaterialParams7.x
 
 #define ScreenToTextureParams		PipelineParameters0
 //#define FarZ						PipelineParameters0.z
 
-bool EnableSkin : register(b0);
+bool EnableSkin : register(vs, b0);
+bool ShadowReciever : register(ps, b0);
 
 // Textures
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -162,9 +165,10 @@ ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMat
 // Pixel Shader
 struct ZEFixedMaterial_GBuffer_PSInput
 {
+	float Side : VFACE;
 	float3 Position : TEXCOORD0;
 	float3 Normal : TEXCOORD1;
-	#if defined(ZE_SHADER_SPECULAR_GLOSS_MAP) || defined(ZE_SHADER_NORMAL_MAP)
+	#if defined(ZE_SHADER_SPECULAR_GLOSS_MAP) || defined(ZE_SHADER_NORMAL_MAP) || defined(ZE_SHADER_ALPHA_CULL)
 		float2 Texcoord : TEXCOORD2;
 	#endif
 	#if defined(ZE_SHADER_TANGENT_SPACE)
@@ -178,15 +182,33 @@ ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput In
 	ZEGBuffer GBuffer = (ZEGBuffer)0;
 	
 	//GBDoParallax(Input);
+
 	
+	#ifdef ZE_SHADER_ALPHA_CULL
+		#ifdef ZE_SHADER_OPACITY_MAP
+			float Alpha = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
+		#elif defined(ZE_SHADER_OPACITY_BASE_ALPHA)
+			float Alpha = MaterialOpacity * tex2D(BaseMap, Input.Texcoord).r;
+		#else 
+			float Alpha = MaterialOpacity;
+		#endif
+			
+		if (Alpha <= AlphaCullLimit)
+		{
+			discard;
+			return GBuffer;
+		}
+	#endif
+	
+		
 	ZEGBuffer_SetViewPosition(GBuffer, Input.Position);
 
 	#if defined(ZE_SHADER_NORMAL_MAP)
 		float3 Normal = tex2D(NormalMap, Input.Texcoord) * 2.0f - 1.0f;
 		Normal = normalize(Normal.x * Input.Tangent + Normal.y * Input.Binormal + Normal.z * Input.Normal);
-		ZEGBuffer_SetViewNormal(GBuffer, Normal);	
+		ZEGBuffer_SetViewNormal(GBuffer, Normal * Input.Side);	
 	#else
-		ZEGBuffer_SetViewNormal(GBuffer, Input.Normal);
+		ZEGBuffer_SetViewNormal(GBuffer, Input.Normal * Input.Side);
 	#endif	
 	
 	#if defined(ZE_SHADER_SPECULAR_GLOSS_MAP)
@@ -256,7 +278,6 @@ struct ZEFixedMaterial_ForwardPass_PSOutput
 struct ZEFixedMaterial_ForwardPass_PSInput
 {
 	float3 ScreenPosition : VPOS;
-
 	float2 Texcoord : TEXCOORD0;
 	
 	#ifdef ZE_SHADER_DETAIL_MAP
@@ -280,6 +301,25 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 {
 	ZEFixedMaterial_ForwardPass_PSOutput Output;
 	Output.Color = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	
+	#ifdef ZE_SHADER_OPACITY
+		#ifdef ZE_SHADER_OPACITY_MAP
+				Output.Color.a = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
+		#elif defined(ZE_SHADER_OPACITY_BASE_ALPHA)
+				Output.Color.a = MaterialOpacity * tex2D(BaseMap, Input.Texcoord).a;
+		#else 
+			Output.Color.a = MaterialOpacity;
+		#endif
+	#endif
+	
+	#ifdef ZE_SHADER_ALPHA_CULL
+		if (Output.Color.a <= AlphaCullLimit)
+		{
+			discard;
+			return Output;
+		}		
+	#endif
+	
 	
 	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
 
@@ -338,23 +378,5 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		Output.Color.rgb += MaterialRefractionFactor * texCUBE(EnvironmentMap, normalize(Input.RefractionVector)).rgb;
 	#endif
 		
-	#ifdef ZE_SHADER_OPASITY
-		#ifdef ZE_SHADER_OPACITY_MAP
-			#ifdef ZESHADER_OPACITY_CONSTANT
-				Output.Color.a = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
-			#else
-				Output.Color.a = tex2D(DiffuseMap, Input.Texcoord).r;
-			#endif
-		#elif defined(ZESHADER_OPACITY_DIFFUSE_ALPHA)
-			#ifdef ZESHADER_OPACITY_CONSTANT
-				Output.Color.a = MaterialOpacity * tex2D(DiffuseMap, Input.Texcoord).a;
-			#else
-				Output.Color.a = tex2D(DiffuseMap, Input.Texcoord).a;
-			#endif
-		#else 
-			Output.Color.a = MaterialOpacity;
-		#endif
-	#endif
-	
 	return Output;
 }

@@ -488,7 +488,7 @@ void ZED3D9FrameRenderer::DoPreZPass()
 	{
 		ZERenderOrder* RenderOrder = &NonTransparent[I];
 		
-		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_PREZ_PASS) == 0)
+		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_PRE_Z_PASS) == 0)
 			continue;
 
 		if (!RenderOrder->Material->SetupPreZPass(this, RenderOrder))
@@ -542,9 +542,6 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 
 void ZED3D9FrameRenderer::DoLightningPass()
 {
-	if (Lights.GetCount() == 0)
-		return;
-
 	zeProfilerStart("Lightning Pass");
 
 	// Render Targets
@@ -552,6 +549,9 @@ void ZED3D9FrameRenderer::DoLightningPass()
 	//GetDevice()->SetRenderTarget(1, ((ZED3D9ViewPort*)LBuffer2->GetViewPort())->FrameBuffer);
 
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00, 0.0f, 0);
+	
+	if (Lights.GetCount() == 0)
+		return;
 
 	// Z-Buffer
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
@@ -690,11 +690,11 @@ void ZED3D9FrameRenderer::DoForwardPass()
 		zeProfilerEnd();
 	}
 
-	/*GetDevice()->SetTexture(0, NULL);
+	GetDevice()->SetTexture(0, NULL);
 	GetDevice()->SetTexture(1, NULL);
 	GetDevice()->SetTexture(2, NULL);
 	GetDevice()->SetTexture(3, NULL);
-	GetDevice()->SetTexture(4, NULL);*/
+	GetDevice()->SetTexture(4, NULL);
 
 	zeProfilerEnd();
 }

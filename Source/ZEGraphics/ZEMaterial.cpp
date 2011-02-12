@@ -41,11 +41,44 @@
 
 ZEMaterial::ZEMaterial()
 {
+	LightningEnabled = true;
+	ShadowCaster = true;
+	ShadowReciver = true;
+}
+
+void ZEMaterial::SetShadowCaster(bool Value)
+{
+	ShadowCaster = Value;
+}
+
+bool ZEMaterial::GetShadowCaster() const
+{
+	return ShadowCaster;
+}
+
+void ZEMaterial::SetShadowReciver(bool Value)
+{
+	ShadowReciver = Value;
+}
+
+bool ZEMaterial::GetShadowReciver() const
+{
+	return ShadowReciver;
 }
 
 ZEMaterial::~ZEMaterial()
 {
 
+}
+
+void ZEMaterial::SetLightningEnabled(bool Enabled)
+{
+	LightningEnabled = Enabled;
+}
+
+bool ZEMaterial::GetLightningEnabled() const
+{
+	return LightningEnabled;
 }
 
 bool ZEMaterial::SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const

@@ -167,6 +167,11 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
 		CurrentMaterial->SetTransparancyMode(ZE_MTM_NONE);//MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE: ZE_MTM_NOTRANSPARACY);
+		CurrentMaterial->SetAlphaCullEnabled(true);
+		CurrentMaterial->SetAlphaCullLimit(10);
+		CurrentMaterial->SetOpacity(1.0f);
+		CurrentMaterial->SetOpacityEnabled(true);
+		CurrentMaterial->SetOpacityComponent(ZE_MOC_BASE_MAP_ALPHA);
 
 		CurrentMaterial->SetAmbientColor(ZEVector3(0.5, 0.5, 0.5));
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);

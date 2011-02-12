@@ -71,10 +71,10 @@ class ZEProjectiveLight : public ZELight
 		float							GetAspectRatio() const;
 
 		void							SetProjectionTextureFile(const char* Filename);
-		const char*						GetProjectionTextureFile();
+		const char*						GetProjectionTextureFile() const;
 
 		void							SetProjectionTexture(const ZETexture2D* Texture);
-		const ZETexture2D*				GetProjectionTexture();
+		const ZETexture2D*				GetProjectionTexture() const;
 
 		const ZEMatrix4x4&				GetProjectionMatrix();
 

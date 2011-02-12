@@ -160,10 +160,7 @@ bool ZED3D9SimpleMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderO
 				GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
 				GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 				GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-			case ZE_MTM_ALPHACULL:
-				break;
 		}
-
 	}
 	else
 	{

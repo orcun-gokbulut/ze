@@ -48,12 +48,11 @@ void ZEFixedMaterial::SetZero()
 	OldMaterialComponents = 0;
 	MaterialComponents = 0;
 	TwoSided = false;
-	LightningEnabled = true;
 	Wireframe = false;
 	TransparancyMode = ZE_MTM_NONE;
-	TransparancyCullLimit = 0;
+	AlphaCullLimit = 1;
+	OpacityComponent = ZE_MOC_CONSTANT;
 	Opacity = 1.0f;
-
 	BaseMapAddressModeU = ZE_TAM_WRAP;
 	BaseMapAddressModeV = ZE_TAM_WRAP;
 	NormalMapAddressModeU = ZE_TAM_WRAP;
@@ -103,14 +102,9 @@ ZEFixedMaterial::~ZEFixedMaterial()
 
 }
 
-ZEMaterialType ZEFixedMaterial::GetMaterialType() const
-{
-	return ZE_MTT_DEFERRED;
-}
-
 ZEMaterialFlags ZEFixedMaterial::GetMaterialFlags() const
 {
-	return ZE_MTF_G_BUFFER_PASS | ZE_MTF_PREZ_PASS | ZE_MTF_SUPPORTS_SKINNING;
+	return ZE_MTF_G_BUFFER_PASS | ZE_MTF_PRE_Z_PASS | ZE_MTF_SUPPORTS_SKINNING;
 }
 
 void ZEFixedMaterial::SetTwoSided(bool Enable)
@@ -121,16 +115,6 @@ void ZEFixedMaterial::SetTwoSided(bool Enable)
 bool ZEFixedMaterial::GetTwoSided() const
 {
 	return TwoSided;
-}
-
-void ZEFixedMaterial::SetLightningEnabled(bool Enable)
-{
-	LightningEnabled = Enable;
-}
-
-bool ZEFixedMaterial::GetLightningEnabled() const
-{
-	return LightningEnabled;
 }
 
 void ZEFixedMaterial::SetWireframe(bool Enable)
@@ -146,7 +130,6 @@ bool ZEFixedMaterial::GetWireframe() const
 void ZEFixedMaterial::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
 {
 	TransparancyMode = Mode;
-
 }
 
 ZEMaterialTransparancyMode ZEFixedMaterial::GetTransparancyMode() const
@@ -154,24 +137,27 @@ ZEMaterialTransparancyMode ZEFixedMaterial::GetTransparancyMode() const
 	return TransparancyMode;
 }
 
-void ZEFixedMaterial::SetTransparancyCullLimit(unsigned int Limit)
+void ZEFixedMaterial::SetAlphaCullEnabled(bool Enabled)
 {
-	Limit = TransparancyCullLimit;
+	if (Enabled)
+		MaterialComponents |= ZE_SHADER_ALPHA_CULL;
+	else
+		MaterialComponents &= ~ZE_SHADER_ALPHA_CULL;
 }
 
-unsigned int ZEFixedMaterial::GetTransparancyCullLimit() const
+bool ZEFixedMaterial::GetAlphaCullEnabled() const
 {
-	return TransparancyCullLimit;
+	return MaterialComponents & ZE_SHADER_ALPHA_CULL;
 }
 
-void ZEFixedMaterial::SetRecivesShadow(bool Enable)
+void ZEFixedMaterial::SetAlphaCullLimit(int Limit)
 {
-	RecivesShadow = Enable;
+	AlphaCullLimit = Limit;
 }
 
-bool ZEFixedMaterial::GetRecivesShadow() const
+int ZEFixedMaterial::GetAlphaCullLimit() const
 {
-	return RecivesShadow;
+	return AlphaCullLimit;
 }
 
 void ZEFixedMaterial::SetAmbientEnabled(bool Enabled)
@@ -539,13 +525,30 @@ float ZEFixedMaterial::GetOpacity() const
 
 void ZEFixedMaterial::SetOpacityComponent(ZEMaterialOpacityComponent Component)
 {
-	#pragma message("Task: Implament Fixed Material Ocapacity Component")
+	MaterialComponents &= ~(ZE_SHADER_OPACITY_BASE_ALPHA | ZE_SHADER_OPACITY_CONSTANT | ZE_SHADER_OPACITY_MAP);
+	switch(Component)
+	{
+		case ZE_MOC_BASE_MAP_ALPHA:
+			OpacityComponent = ZE_MOC_BASE_MAP_ALPHA;
+			MaterialComponents |= ZE_SHADER_OPACITY_BASE_ALPHA;
+			break;
+
+		default:
+		case ZE_MOC_CONSTANT:
+			OpacityComponent = ZE_MOC_CONSTANT;
+			MaterialComponents |= ZE_SHADER_OPACITY_CONSTANT;
+			break;
+
+		case ZE_MOC_OPACITY_MAP:
+			OpacityComponent = ZE_MOC_OPACITY_MAP;
+			MaterialComponents |= ZE_SHADER_OPACITY_MAP;
+			break;
+	}
 }
 
-ZEMaterialOpacityComponent  ZEFixedMaterial::GetOpacityComponent() const
+ZEMaterialOpacityComponent ZEFixedMaterial::GetOpacityComponent() const
 {
-	#pragma message("Task: Implament Fixed Material Ocapacity Component")
-	return ZE_MOC_CONSTANT;
+	return OpacityComponent;
 }
 
 void ZEFixedMaterial::SetOpacityMap(const ZETexture2D* Texture)

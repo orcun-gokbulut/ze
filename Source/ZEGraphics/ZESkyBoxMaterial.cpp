@@ -46,11 +46,6 @@ ZESkyBoxMaterial::~ZESkyBoxMaterial()
 	
 }
 
-ZEMaterialType ZESkyBoxMaterial::GetMaterialType() const
-{
-	return ZE_MTT_NON_ILLUMUNATED;
-}
-
 ZEMaterialFlags ZESkyBoxMaterial::GetMaterialFlags() const
 {
 	return ZE_MTF_NONE;
