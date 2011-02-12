@@ -35,6 +35,9 @@
 
 #include "ZESoundModule.h"
 #include "ZESoundSource3D.h"
+#include "ZEGame\ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZESoundSource3D);
 
 ZESoundSource3D::ZESoundSource3D()
 {
