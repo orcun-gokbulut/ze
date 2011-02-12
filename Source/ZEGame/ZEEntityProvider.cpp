@@ -47,10 +47,7 @@ ZEEntityProvider::~ZEEntityProvider()
 
 ZEEntityProvider* ZEEntityProvider::GetInstance()
 {
-	static ZEEntityProvider* Provider = NULL;
-	
-	if (Provider == NULL)
-		Provider = new ZEEntityProvider();
+	static ZEEntityProvider* Provider = new ZEEntityProvider();
 
 	return Provider;
 }
