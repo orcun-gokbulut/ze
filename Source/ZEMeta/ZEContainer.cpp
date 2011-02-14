@@ -36,38 +36,99 @@
 #include "ZEContainer.h"
 #include "ZEClass.h"
 
-ZEClassDescription* ZEContainer::GetBaseClassDescription()
+void ZEContainer::SetContainerMode(ZEContainerMode Mode)
 {
-	return BaseClassDescription;
+	this->Mode = Mode;
 }
 
-bool ZEContainer::Add(ZEClass* Item)
+ZEContainerMode ZEContainer::GetContainerMode()
 {
-	ZEClassDescription* Description;
-	while(Description = Item->GetClassDescription())
+	return Mode;
+}
+
+void ZEContainer::SetBaseClass(ZEClassDescription* Type)
+{
+	this->Type = Type;
+}
+
+ZEClassDescription* ZEContainer::GetBaseClass()
+{
+	return Type;
+}
+
+void ZEContainer::SetAllowDerivedClasses(bool Allow)
+{
+	AllowDerivedTypes = Allow;
+}
+
+bool ZEContainer::GetAllowDerivedClasses()
+{
+	return AllowDerivedTypes;
+}
+
+const ZEArray<ZEClass*>& ZEContainer::GetInstances()
+{
+	return Instances;
+}
+
+bool ZEContainer::AddInstance(ZEClass* Instance)
+{
+	if (Type == NULL)
 	{
-		if (Description == BaseClassDescription)
-			Items.Add(Item);
+		Instances.Add(Instance);
+		return true;
 	}
 
-	return false;
+	if (AllowDerivedTypes)
+	{
+		ZEClassDescription* CurrentType = Instance->GetClassDescription();
+		while (CurrentType != NULL)
+		{
+			if (Type == CurrentType)
+			{
+				Instances.Add(Instance);
+				return true;
+			}
+			CurrentType = CurrentType->GetParent();
+		}
+	}
+	else
+	{
+		if (Type == Instance->GetClassDescription())
+		{
+			Instances.Add(Instance);
+			return true;
+		}
+		else
+			return false;
+	}
 }
 
-void ZEContainer::Remove(ZEClass* Item)
+bool ZEContainer::RemoveInstance(ZEClass* Instance)
 {
-	Items.DeleteValue(Item);
+	Instances.DeleteValue(Instance);
+	return true;
 }
 
-const ZEArray<ZEClass*>& ZEContainer::GetItems()
+ZEContainer::ZEContainer()
 {
-	return Items;
+	Mode = ZE_CM_OWNER;
+	Type = NULL;
+	AllowDerivedTypes = true;
 }
 
-ZEContainer::ZEContainer(ZEClassDescription* BaseClassDescription)
+ZEContainer::ZEContainer(ZEContainerMode Mode, ZEClassDescription* Type, bool AllowDerived)
 {
-	this->BaseClassDescription = BaseClassDescription;
+	this->Mode = Mode;
+	this->Type = Type;
+	this->AllowDerivedTypes = AllowDerived;
 }
 
-
-
-
+ZEContainer::~ZEContainer()
+{
+	if (Mode == ZE_CM_OWNER)
+		for (size_t I = 0; I < Instances.GetCount(); I++)
+			delete Instances[I];
+	
+	Instances.Clear();
+}

@@ -41,7 +41,7 @@
 ///////////////////////////////////////////////////////////////
 
 #include "ZEVariant.h"
-#include "ZEDefinitions.h"
+#include "ZEDSDefinitions.h"
 #include "..\ZETypes.h"
 #include <string.h>
 #pragma warning(push)
@@ -168,7 +168,7 @@ size_t ZEVariant::SizeOf() const
 		case ZE_VRT_POINTER:
 			return sizeof(void*);
 		default:
-			zedsAssert(true, "ZEVariant::SetVariant operation failed. Error in variant type.");
+			zedsAssert(true, "ZEVariant::SizeOf is wrong type.");
 			return 0;
 	}
 }
@@ -646,8 +646,3 @@ ZEVariant::~ZEVariant()
 }
 
 #pragma warning(pop)
-
-
-
-
-

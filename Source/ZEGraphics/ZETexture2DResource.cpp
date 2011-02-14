@@ -42,12 +42,12 @@
 
 #include <freeimage.h>
 
-unsigned DLL_CALLCONV FreeImageFile_Read_2D(void *buffer, unsigned size, unsigned count, fi_handle handle) 
+static unsigned DLL_CALLCONV FreeImageFile_Read_2D(void *buffer, unsigned size, unsigned count, fi_handle handle) 
 {
 	return (unsigned int)((ZEResourceFile*)handle)->Read(buffer, size, count);
 }
 
-int DLL_CALLCONV FreeImageFile_Seek_2D(fi_handle handle, long offset, int origin) 
+static int DLL_CALLCONV FreeImageFile_Seek_2D(fi_handle handle, long offset, int origin) 
 {
 	ZESeekFrom OriginNorm;
 	switch(origin)
@@ -66,7 +66,7 @@ int DLL_CALLCONV FreeImageFile_Seek_2D(fi_handle handle, long offset, int origin
 	return ((ZEResourceFile*)handle)->Seek(offset, OriginNorm);
 }
 
-long DLL_CALLCONV FreeImageFile_Tell_2D(fi_handle handle) 
+static long DLL_CALLCONV FreeImageFile_Tell_2D(fi_handle handle) 
 {
 	return (long)((ZEResourceFile*)handle)->Tell();
 }
@@ -114,6 +114,8 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const char* FileName)
 	}
 }
 
+#include "ZEBitmap.h"
+
 ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceFile)
 {
 	zeLog("Texture2D Resource", "Loading texture file \"%s\".", ResourceFile->GetFileName());
@@ -140,6 +142,12 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceF
 	}
 
 	FIBITMAP* Data = FreeImage_LoadFromHandle(TextureFormat, &Callbacks, ResourceFile);
+	if (Data == NULL)
+	{
+		zeError("Texture 2D Resource", "Can not load texture file. File Name : %s.", ResourceFile->GetFileName());
+		return NULL;
+	}
+
 	FIBITMAP* ConvertedData;
 
 	int Width = FreeImage_GetWidth(Data);
@@ -211,8 +219,8 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceF
 	unsigned char* Bits = FreeImage_GetBits(Data);
 	for (int I = 0; I < Height; I++)
 		memcpy((unsigned char*)Buffer + (I * Pitch), Bits + (Height - I - 1) * Width * BPP, Width * BPP);
-
 	Texture->Unlock();
+
 	FreeImage_Unload(Data);
 	TextureResource->SetFileName(ResourceFile->GetFileName());
 	TextureResource->Cached = false;

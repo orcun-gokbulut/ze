@@ -37,15 +37,12 @@
 #ifndef	__ZE_MODEL_BONE_H__
 #define __ZE_MODEL_BONE_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEMatrix.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
 #include "ZEModelAnimation.h"
 
 class ZEModel;
-class ZEPhysicalRigidBody;
-class ZEPhysicalJoint;
-
 class ZEModelBone
 {
 	friend ZEModel;
@@ -128,6 +125,7 @@ class ZEModelBone
 		bool								GetPhysicsEnabled();
 
 		void								Initialize(ZEModel* Model, const ZEModelResourceBone* BoneResource);
+
 		void								Deinitialize();
 
 		void								ModelTransformChanged();
@@ -137,8 +135,4 @@ class ZEModelBone
 											~ZEModelBone();
 };
 #endif
-
-
-
-
 

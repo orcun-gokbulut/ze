@@ -60,6 +60,7 @@ ZEPhysXPhysicalRigidBody::ZEPhysXPhysicalRigidBody()
 
 	Scale = ZEVector3::One;
 	Enabled = true;
+	IsWakeUp = true;
 
 	BodyDesc.mass = 1.0f;
 	BodyDesc.flags &= ~NX_BF_KINEMATIC;
@@ -414,28 +415,55 @@ ZEDWORD ZEPhysXPhysicalRigidBody::GetCollisionEventFlags()
 }
 
 
-void ZEPhysXPhysicalRigidBody::ApplyForce(const ZEVector3& Force)
+void ZEPhysXPhysicalRigidBody::ApplyForce(const ZEVector3& Force, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
 {
 	if (Actor != NULL)
-		Actor->addForce(ZE_TO_NX(Force));
+		Actor->addForce(ZE_TO_NX(Force), (NxForceMode)ForceMode, IsWakeUp);
 }
 
-void ZEPhysXPhysicalRigidBody::ApplyTorque(const ZEVector3& Torque)
+void ZEPhysXPhysicalRigidBody::ApplyTorque(const ZEVector3& Torque, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
 {
 	if (Actor != NULL)
-		Actor->addTorque(ZE_TO_NX(Torque));
+		Actor->addTorque(ZE_TO_NX(Torque), (NxForceMode)ForceMode, IsWakeUp);
 }
 
-void ZEPhysXPhysicalRigidBody::ApplyLocalForce(const ZEVector3& Force)
+void ZEPhysXPhysicalRigidBody::ApplyLocalForce(const ZEVector3& Force, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
 {
 	if (Actor != NULL)
-		Actor->addLocalForce(ZE_TO_NX(Force));
+		Actor->addLocalForce(ZE_TO_NX(Force), (NxForceMode)ForceMode, IsWakeUp);
 }
 
-void ZEPhysXPhysicalRigidBody::ApplyLocalTorque(const ZEVector3& Torque)
+void ZEPhysXPhysicalRigidBody::ApplyLocalTorque(const ZEVector3& Torque, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
 {
 	if (Actor != NULL)
-		Actor->addLocalTorque(ZE_TO_NX(Torque));
+		Actor->addLocalTorque(ZE_TO_NX(Torque), (NxForceMode)ForceMode, IsWakeUp);
+}
+
+void ZEPhysXPhysicalRigidBody::ApplyForceAtPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
+{
+	if (Actor != NULL)
+		Actor->addForceAtPos(ZE_TO_NX(Force), ZE_TO_NX(Position), (NxForceMode)ForceMode, IsWakeUp);
+}
+void ZEPhysXPhysicalRigidBody::ApplyForceAtLocalPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
+{
+	if (Actor != NULL)
+		Actor->addForceAtLocalPos(ZE_TO_NX(Force), ZE_TO_NX(Position), (NxForceMode)ForceMode, IsWakeUp);
+}
+
+void ZEPhysXPhysicalRigidBody::ApplyLocalForceAtPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
+{
+	if (Actor != NULL)
+		Actor->addLocalForceAtPos(ZE_TO_NX(Force), ZE_TO_NX(Position), (NxForceMode)ForceMode, IsWakeUp);
+}
+void ZEPhysXPhysicalRigidBody::ApplyLocalForceAtLocalPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
+{
+	if (Actor != NULL)
+		Actor->addLocalForceAtLocalPos(ZE_TO_NX(Force), ZE_TO_NX(Position), (NxForceMode)ForceMode, IsWakeUp);
+}
+
+float ZEPhysXPhysicalRigidBody::GetComputedKineticEnergy() const
+{
+	return Actor->computeKineticEnergy();
 }
 
 void ZEPhysXPhysicalRigidBody::ReCreate()
@@ -458,6 +486,8 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 		return false;
 	}
 
+	ZEArray<NxShapeDesc*> ShapeDescList;
+
 	ActorDesc.shapes.clear();
 	for (size_t I = 0; I < Shapes.GetCount(); I++)
 	{
@@ -467,19 +497,20 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 		{
 			case ZE_PST_BOX:
 			{
-				NxBoxShapeDesc BoxShapeDesc;
-				BoxShapeDesc.setToDefault();
+				NxBoxShapeDesc* BoxShapeDesc = new NxBoxShapeDesc();
+				BoxShapeDesc->setToDefault();
 
-				BoxShapeDesc.userData = CurrentShape;
-				BoxShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
-				BoxShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
+				BoxShapeDesc->userData = CurrentShape;
+				BoxShapeDesc->localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
+				BoxShapeDesc->localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
 
-				BoxShapeDesc.dimensions.x = ((ZEPhysicalBoxShape*)CurrentShape)->GetWidth();
-				BoxShapeDesc.dimensions.y = ((ZEPhysicalBoxShape*)CurrentShape)->GetHeight();
-				BoxShapeDesc.dimensions.z = ((ZEPhysicalBoxShape*)CurrentShape)->GetLength();
-				BoxShapeDesc.dimensions.arrayMultiply(BoxShapeDesc.dimensions, ZE_TO_NX(Scale)); 
+				BoxShapeDesc->dimensions.x = ((ZEPhysicalBoxShape*)CurrentShape)->GetWidth();
+				BoxShapeDesc->dimensions.y = ((ZEPhysicalBoxShape*)CurrentShape)->GetHeight();
+				BoxShapeDesc->dimensions.z = ((ZEPhysicalBoxShape*)CurrentShape)->GetLength();
+				BoxShapeDesc->dimensions.arrayMultiply(BoxShapeDesc->dimensions, ZE_TO_NX(Scale)); 
 
-				ActorDesc.shapes.push_back(&BoxShapeDesc);
+				ShapeDescList.Add(BoxShapeDesc);
+				ActorDesc.shapes.push_back(BoxShapeDesc);
 				break;
 			}
 
@@ -487,16 +518,17 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 			{
 				zeWarningAssert(Scale.x != Scale.y && Scale.y != Scale.z, "Sphere physical shape does not support non uniform scaling. Only scale.x parameter will be used.");
 
-				NxSphereShapeDesc SphereShapeDesc;
-				SphereShapeDesc.setToDefault();
+				NxSphereShapeDesc* SphereShapeDesc = new NxSphereShapeDesc();
+				SphereShapeDesc->setToDefault();
 
-				SphereShapeDesc.userData = CurrentShape;
-				SphereShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
-				SphereShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
+				SphereShapeDesc->userData = CurrentShape;
+				SphereShapeDesc->localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
+				SphereShapeDesc->localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
 
-				SphereShapeDesc.radius = Scale.x * ((ZEPhysicalSphereShape*)CurrentShape)->GetRadius();
+				SphereShapeDesc->radius = Scale.x * ((ZEPhysicalSphereShape*)CurrentShape)->GetRadius();
 
-				ActorDesc.shapes.push_back(&SphereShapeDesc);
+				ShapeDescList.Add(SphereShapeDesc);
+				ActorDesc.shapes.push_back(SphereShapeDesc);
 				break;
 			}
 
@@ -504,17 +536,18 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 			{
 				zeWarningAssert(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Capsule physical shape does not support scaling. Shape did not scaled.");
 				
-				NxCapsuleShapeDesc CapsuleShapeDesc;
-				CapsuleShapeDesc.setToDefault();
+				NxCapsuleShapeDesc* CapsuleShapeDesc = new NxCapsuleShapeDesc();
+				CapsuleShapeDesc->setToDefault();
 
-				CapsuleShapeDesc.userData = CurrentShape;
-				CapsuleShapeDesc.localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
-				CapsuleShapeDesc.localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
+				CapsuleShapeDesc->userData = CurrentShape;
+				CapsuleShapeDesc->localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
+				CapsuleShapeDesc->localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
 
-				CapsuleShapeDesc.radius = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetRadius();
-				CapsuleShapeDesc.height = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetHeight() - 2 * CapsuleShapeDesc.radius;
+				CapsuleShapeDesc->radius = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetRadius();
+				CapsuleShapeDesc->height = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetHeight() - 2 * CapsuleShapeDesc->radius;
 
-				ActorDesc.shapes.push_back(&CapsuleShapeDesc);
+				ShapeDescList.Add(CapsuleShapeDesc);
+				ActorDesc.shapes.push_back(CapsuleShapeDesc);
 				break;
 			}
 
@@ -565,8 +598,18 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 	if (Actor == NULL)
 	{
 		zeError("PhysX Physical Body", "Can not create actor.");
+
+		for (size_t I = 0; I < ShapeDescList.GetCount(); I++)
+			delete ShapeDescList[I];
+		ShapeDescList.Clear();
+
 		return false;
 	}
+
+
+	for (size_t I = 0; I < ShapeDescList.GetCount(); I++)
+		delete ShapeDescList[I];
+	ShapeDescList.Clear();
 
 	return true;
 }

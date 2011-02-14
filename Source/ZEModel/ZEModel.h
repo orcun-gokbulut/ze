@@ -37,16 +37,16 @@
 #ifndef	__ZE_MODEL_H__
 #define __ZE_MODEL_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEGame\ZEComponent.h"
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEGraphics\ZECanvas.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEGame/ZEComponent.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZECanvas.h"
 #include "ZEModelResource.h"
 #include "ZEModelBone.h"
 #include "ZEModelMesh.h"
 #include "ZEModelAnimation.h"
+#include "ZEModelAnimationTrack.h"
 
-#define ZE_MDF
 class ZEQuaternion;
 class ZEMatrix4x4;
 class ZEFixedMaterial;
@@ -57,9 +57,14 @@ class ZEPhysicalJoint;
 
 struct ZEDrawParameters;
 
+ZE_META_ENTITY_DESCRIPTION(ZEModel)
+
 class ZEModel : public ZEComponent
 {	
+	ZE_META_ENTITY(ZEModel)
+
 	friend class ZEPhysicalEnvironment;
+	friend class ZEModelAnimationTrack;
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
@@ -70,6 +75,7 @@ class ZEModel : public ZEComponent
 
 		ZEPhysicalRigidBody*				ParentlessBoneBody;
 		ZEPhysicalBoxShape*					ParentlessBoneShape;
+		ZEVector3							ParentlessBoneBodyPosition;
 
 		bool								Visibility;
 		bool								AutoLOD;
@@ -77,14 +83,8 @@ class ZEModel : public ZEComponent
 		bool								PhysicsEnabled;
 
 		ZEModelAnimationType				AnimationType;
-		ZEModelAnimationState				AnimationState;
-		const ZEModelAnimation*				Animation;	
 
-		float								AnimationFrame;
-		float								AnimationStartFrame;
-		float								AnimationEndFrame;
-		bool								AnimationLooping;
-		float								AnimationSpeed;
+		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
 		ZEAABoundingBox						BoundingBox;
 
@@ -109,10 +109,16 @@ class ZEModel : public ZEComponent
 
 		void								DebugDraw(ZERenderer* Renderer);
 
+											ZEModel();
+		virtual								~ZEModel();
+
 	public:
 		virtual	ZEDWORD						GetDrawFlags() const;
 
 		virtual const ZEAABoundingBox&		GetLocalBoundingBox() const;
+
+		void								SetModelFile(const char* ModelFile);
+		const char*							GetModelFile() const;
 
 		void								SetModelResource(const ZEModelResource* ModelResource);	
 		const ZEModelResource*				GetModelResource();
@@ -121,30 +127,13 @@ class ZEModel : public ZEComponent
 
 		ZEArray<ZEModelBone>&				GetBones();
 		const ZEArray<ZEMatrix4x4>&			GetBoneTransforms();
-
 		const ZEArray<ZEModelMesh>&			GetMeshes();
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
-
-		void								SetAnimation(const ZEModelAnimation* Animation);
-		void								SetAnimationById(size_t AnimationIndex);
-		void								SetAnimationByName(const char* AnimationName);
-
-		const ZEModelAnimation*				GetAnimation();
-
-		void								SetAnimationState(ZEModelAnimationState State);
-		ZEModelAnimationState				GetAnimationState();
-
-		void								SetAnimationFrame(unsigned int Frame);	
-		size_t								GetAnimationFrame();
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
 
-		void								SetAnimationSpeed(float Factor);
-		float								GetAnimationSpeed();
-
-		void								SetAnimationLooping(bool Looping);
-		bool								GetAnimationLooping();
+		ZEArray<ZEModelAnimationTrack>&		GetAnimationTracks();
 
 		void								SetAutoLOD(bool Enabled);
 		bool								GetAutoLOD();
@@ -159,20 +148,13 @@ class ZEModel : public ZEComponent
 		void								SetStaticPoseByIndex(size_t AnimationIndex, unsigned int Frame);
 		void								SetStaticPoseByName(const char* AnimationName, unsigned int Frame);
 
-		void								PlayAnimation(const ZEModelAnimation* Animation, unsigned int StartFrame = 0, unsigned int EndFrame = 0);
-		void								PlayAnimationByName(const char* AnimationName, unsigned int StartFrame = 0, unsigned int EndFrame = 0);
-		void								PlayAnimationByIndex(size_t AnimationIndex, unsigned int StartFrame = 0, unsigned int EndFrame = 0);
-		void								ResumeAnimation();
-		void								PauseAnimation();
-		void								StopAnimation();
-
 		virtual void						SetPosition(const ZEVector3& NewPosition);
 		virtual void						SetRotation(const ZEQuaternion& NewRotation);
 		virtual void						SetScale(const ZEVector3& NewScale);
 
 		void								Tick(float ElapsedTime);
 		void								Draw(ZEDrawParameters* DrawParameters);
-		void								BoneTransformChangeEvent(const ZEPhysicalTransformChangeEventArgument& TransformChange);
+		void								TransformChangeEvent(const ZEPhysicalTransformChangeEventArgument& TransformChange);
 
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
 
@@ -189,12 +171,21 @@ class ZEModel : public ZEComponent
 		void								SetDrawPhysicalJoints(bool Enabled);
 		bool								GetDrawPhysicalJoints();
 
-											ZEModel();
-											~ZEModel();
+		static ZEModel*						CreateInstance();
 };
 #endif
-
-
-
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZEModel" parent="ZEComponent" description="Sky Brush">
+			<property name="ModelFile"
+				type="string"
+				autogetset="true"
+				description="Model file"
+				semantic="ZE_PS_FILENAME"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/

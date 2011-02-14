@@ -40,7 +40,7 @@
 #include "ZECore\ZEConsole.h"
 #include "ZECore\ZEError.h"
 #include "ZECore\ZECore.h"
-#include "ZEGraphics\ZERenderer.h"
+#include "ZEGraphics\ZEFrameRenderer.h"
 #include "ZEGraphics\ZEShadowRenderer.h"
 #include "ZEGraphics\ZECamera.h"
 #include "ZEGraphics\ZELight.h"
@@ -51,6 +51,8 @@
 #include "ZESound\ZESoundModule.h"
 #include "ZEMap\ZEPortalMap\ZEPortalMap.h"
 #include "ZEMap\ZEPortalMap\ZEPortalMapResource.h"
+#include "ZEEntityProvider.h"
+
 #include <memory.h>
 
 void ZEScene::SetVisualDebugElements(ZEDWORD VisualDebugElements)
@@ -68,7 +70,7 @@ bool ZEScene::Initialize()
 	Deinitialize();
 
 	if (Renderer == NULL)
-		Renderer = ZERenderer::CreateInstance();
+		Renderer = ZEFrameRenderer::CreateInstance();
 
 	if (Renderer == NULL)
 	{
@@ -180,7 +182,7 @@ void ZEScene::Destroy()
 	}
 
 	for (size_t I = 0; I < Entities.GetCount(); I++)
-		Entities[I]->Destroy();
+ 		Entities[I]->Destroy();
 	Entities.Clear();
 
 	delete this;
@@ -343,11 +345,12 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 	
 	// Check lightning enabled
  	if (LightsEnabled)
+	{
 		for (size_t I = 0; I < Entities.GetCount(); I++)
-			// Check whether entity is light source or not. (Is it a light or does it contains light component(s) ?)
+		{	// Check whether entity is light source or not. (Is it a light or does it contains light component(s) ?)
 			if (Entities[I]->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
 			{
-				if (Entities[I]->GetEntityType() == ZE_ET_COMPONENT)
+				if (Entities[I]->GetEntityType() == ZE_ET_COMPONENT && Entities[I]->GetEnabled())
 				{
 					CullStatistics.TotalLightCount++;
 
@@ -359,14 +362,14 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 							DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Entities[I]->GetPosition(), ((ZELight*)Entities[I])->GetRange()), Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
 
 						// If light is casting shadows generate shadow maps of the light
-						if (((ZELight*)Entities[I])->GetCastsShadows())
+						if (((ZELight*)Entities[I])->GetCastsShadow())
 							((ZELight*)Entities[I])->RenderShadowMap(this, ShadowRenderer);
 
 						// Add light to visible lights list.
 						VisibleLights.Add((ZELight*)Entities[I]);
 					}
 				}
-				else if (Entities[I]->GetEntityType() == ZE_ET_COMPOUND)
+				else if (Entities[I]->GetEntityType() == ZE_ET_COMPOUND && Entities[I]->GetEnabled())
 				{
 					const ZEArray<ZEComponent*>& Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
 					
@@ -388,7 +391,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 									DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Component->GetWorldPosition(), ((ZELight*)Component)->GetRange()), Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
 
 								// If light is casting shadows generate shadow maps of the light
-								if (((ZELight*)Component)->GetCastsShadows())
+								if (((ZELight*)Component)->GetCastsShadow())
 									((ZELight*)Component)->RenderShadowMap(this, ShadowRenderer);
 
 								// Add light to visible lights list.
@@ -402,6 +405,11 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 					"A regular entity claims that it is a light source. Please check entity's draw flags. (Entity Name : \"%s\", Entity Type : \"%s\")", 
 					Entities[I]->GetName(), Entities[I]->GetClassDescription()->GetName());
 			}
+		}
+	}
+
+	if (Renderer->GetRendererType() == ZE_RT_FRAME)
+		((ZEFrameRenderer*)Renderer)->SetLights(VisibleLights);
 
 	DrawParameters.Lights = VisibleLights;
 	if (Map != NULL)
@@ -580,17 +588,28 @@ bool ZEScene::Save(const char* FileName)
 		
 		Serializer.Write(&LastEntityId, sizeof(int), 1);
 		if (MapResource != NULL)
-			Serializer.Write(MapResource->GetFileName(), sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+		{
+			char NameBuffer[ZE_MAX_NAME_SIZE];
+			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
+			strcpy(NameBuffer, MapResource->GetFileName());
+
+			Serializer.Write(NameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+		}
 		else
 		{
-			char Temp[ZE_MAX_FILE_NAME_SIZE];
-			Temp[0] = '\0';
-			Serializer.Write(&Temp, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+			char NameBuffer[ZE_MAX_NAME_SIZE];
+			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
+
+			Serializer.Write(&NameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
 		}
 
 		for (size_t I = 0; I < Entities.GetCount(); I++)
 		{
-			Serializer.Write((void*)Entities[I]->GetClassDescription()->GetType(), sizeof(char), ZE_MAX_NAME_SIZE);
+			char NameBuffer[ZE_MAX_NAME_SIZE];
+			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
+			strcpy(NameBuffer, Entities[I]->GetClassDescription()->GetName());
+			Serializer.Write((void*)NameBuffer, sizeof(char), ZE_MAX_NAME_SIZE);
+
 			if (!Entities[I]->Serialize((ZESerializer*)&Serializer))
 			{
 				zeError("Scene", "Serialization of entity \"%s\" has failed.", Entities[I]->GetName());
@@ -627,13 +646,14 @@ bool ZEScene::Load(const char* FileName)
 		Unserializer.Read(&LastEntityId, sizeof(int), 1);
 		char MapFile[ZE_MAX_FILE_NAME_SIZE];
 		Unserializer.Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
-		Map->Initialize();
-		if (!LoadMap(MapFile))
-		{ 
-			zeError("Scene", "Unserialization can not load map file. (Map File : \"%s\")", MapFile);
-			zeError("Scene", "Unserialization failed.");
-			return false;
-		}
+
+		if (strcmp(MapFile, "") != 0)
+			if (!LoadMap(MapFile))
+			{ 
+				zeError("Scene", "Unserialization can not load map file. (Map File : \"%s\")", MapFile);
+				zeError("Scene", "Unserialization failed.");
+				return false;
+			}
 
 		Entities.Clear();
 		Entities.SetCount(EntityCount);
@@ -641,7 +661,7 @@ bool ZEScene::Load(const char* FileName)
 		for (size_t I = 0; I < Entities.GetCount(); I++)
 		{
 			Unserializer.Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
-			Entities[I] = zeGame->CreateEntityInstance(EntityTypeName);
+			Entities[I] = (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(EntityTypeName);
 			if (Entities[I] == NULL)
 			{
 				zeError("Scene", "Unserialization can not create entity type \"%s\".", EntityTypeName);

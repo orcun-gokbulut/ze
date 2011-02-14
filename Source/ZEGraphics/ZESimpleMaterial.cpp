@@ -38,7 +38,7 @@
 
 ZESimpleMaterial::ZESimpleMaterial()
 {
-	WireFrame = false;
+	SetZero();
 }
 
 ZESimpleMaterial::~ZESimpleMaterial()
@@ -46,30 +46,120 @@ ZESimpleMaterial::~ZESimpleMaterial()
 	
 }
 
+ZEMaterialType ZESimpleMaterial::GetMaterialType() const
+{
+	return ZE_MTT_NON_ILLUMUNATED;
+}
+
+ZEMaterialFlags ZESimpleMaterial::GetMaterialFlags() const
+{
+	return ZE_MTF_NONE;
+}
+
 void ZESimpleMaterial::SetZero()
 {
-	WireFrame = false;
-	WireSize = 0.0f;
+	Wireframe = false;
+	TwoSided = false;
+	VertexColorEnabled = true;
+	TransparancyMode = ZE_MTM_NONE;
+	TransparancyCullLimit = 0x80;
+	MaterialColor = ZEVector4::One;
+	Texture = NULL;
+	TextureAddressModeU = ZE_TAM_MIRROR;
+	TextureAddressModeV = ZE_TAM_MIRROR;
 }
 
-void ZESimpleMaterial::SetWireFrame(bool Enabled)
+void ZESimpleMaterial::SetTwoSided(bool Enable)
 {
-	WireFrame = Enabled;
+	TwoSided = Enable;
 }
 
-bool ZESimpleMaterial::GetWireFrame() const
+bool ZESimpleMaterial::GetTwoSided() const
 {
-	return WireFrame;
+	return TwoSided;
 }
 
-void ZESimpleMaterial::SetWireSize(float Size)
+void ZESimpleMaterial::SetWireframe(bool Enable)
 {
-	WireSize = Size;
+	Wireframe = Enable;
 }
 
-float ZESimpleMaterial::GetWireSize() const
+bool ZESimpleMaterial::GetWireframe() const
 {
-	return WireSize;
+	return Wireframe;
+}
+
+void ZESimpleMaterial::SetVertexColor(bool Enable)
+{
+	VertexColorEnabled = Enable;
+}
+
+bool ZESimpleMaterial::GetVertexColor()
+{
+	return VertexColorEnabled;
+}
+
+
+void ZESimpleMaterial::SetMaterialColor(const ZEVector4& Color)
+{
+	MaterialColor = Color;
+}
+
+const ZEVector4& ZESimpleMaterial::GetMaterialColor() const
+{
+	return MaterialColor;
+}
+
+void ZESimpleMaterial::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
+{
+	TransparancyMode = Mode;
+
+}
+
+ZEMaterialTransparancyMode ZESimpleMaterial::GetTransparancyMode() const
+{
+	return TransparancyMode;
+}
+
+void ZESimpleMaterial::SetTransparancyCullLimit(unsigned int Limit)
+{
+	Limit = TransparancyCullLimit;
+}
+
+unsigned int ZESimpleMaterial::GetTransparancyCullLimit() const
+{
+	return TransparancyCullLimit;
+}
+
+
+void ZESimpleMaterial::SetTexture(const ZETexture2D* Texture)
+{
+	this->Texture = Texture;
+}
+
+const ZETexture2D* ZESimpleMaterial::GetTexture() const
+{
+	return Texture;
+}
+
+void ZESimpleMaterial::SetTextureAddressModeU(ZETextureAddressMode Mode)
+{
+	TextureAddressModeU = Mode;
+}
+
+ZETextureAddressMode ZESimpleMaterial::GetTextureAddressModeU() const
+{
+	return TextureAddressModeU;
+}
+
+void ZESimpleMaterial::SetTextureAddressModeV(ZETextureAddressMode Mode)
+{
+	TextureAddressModeV = Mode;
+}
+
+ZETextureAddressMode ZESimpleMaterial::GetTextureAddressModeV() const
+{
+	return TextureAddressModeV;
 }
 
 ZESimpleMaterial* ZESimpleMaterial::CreateInstance()

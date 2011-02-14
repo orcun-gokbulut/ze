@@ -41,21 +41,30 @@
 #include <d3dx9.h>
 #include "ZEGraphics\ZETexture.h"
 #include "ZED3D9ComponentBase.h"
+#include "ZETypes.h"
 
 #define ZED3D_RELEASE(x) {if ((x) != NULL) {(x)->Release(); (x) = NULL;}}
+#define ZED3D_DESTROY(x) {if ((x) != NULL) {(x)->Destroy(); (x) = NULL;}}
+
+class ZETexture2D;
+class ZEViewPort;
 
 class ZED3D9CommonTools : public ZED3D9ComponentBase
 {
 	public:
+		static void				SetRenderTarget(DWORD RenderTarget, ZEViewPort* Texture);
+		static void				SetRenderTarget(DWORD RenderTarget, ZETexture2D* Texture);
+		static void				SetTexture(DWORD Stage, ZETexture2D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
+
 		static D3DFORMAT		ConvertPixelFormat(ZETexturePixelFormat Format);
-		static bool				CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* Source, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros = NULL);
-		static bool				CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, const char* Source, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros = NULL);
-		static bool				CompileVertexShaderFromFile(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* FileName, const char* MainFunction, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros = NULL);
-		static bool				CompilePixelShaderFromFile(LPDIRECT3DPIXELSHADER9* PixelShader, const char* FileNamee, const char* MainFunction, const char* ShaderName, const char* ShaderProfile, D3DXMACRO* Macros = NULL);
-		static bool				CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height);
+		static bool				CompileVertexShaderFromMemory(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEDWORD Components = 0);
+		static bool				CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* PixelShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEDWORD Components = 0);
+		static bool				CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* FileName, const char* MainFunction, const char* ShaderProfile, ZEDWORD Components = 0);
+		static bool				CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, const char* FileNamee, const char* MainFunction, const char* ShaderProfile, ZEDWORD Components = 0);
+		/*static bool				CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height);
 		static bool				CreateDepthRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height);
 		static bool				CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height, ZETexturePixelFormat Format);
-		static bool				CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height, ZETexturePixelFormat Format);
+		static bool				CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height, ZETexturePixelFormat Format);*/
 };
 #endif
 

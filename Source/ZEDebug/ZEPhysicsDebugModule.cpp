@@ -53,11 +53,16 @@
 #include "ZEModel\ZEModel.h"
 #include "ZEModel\ZEModelMesh.h"
 #include "ZEModel\ZEModelBone.h"
+#include "ZEGame\ZEEntityProvider.h"
+#include "ZEGraphics\ZECamera.h"
+#include "ZEGraphics\ZEPointLight.h"
 #include "ZEMap\ZEPortalMap\ZEPortalMap.h"
 #include "ZEMap\ZEMapResource.h"
 #include "ZEMap\ZEPortalMap\ZEPortalMapPortal.h"
 
 #include "ZEMap\ZEPortalMap\ZEPortalMapResource.h"
+
+#include "../ZEGraphics/ZEDirectionalLight.h"
 
 #include <NxScene.h>
 #include <NxActor.h>
@@ -79,7 +84,6 @@ void ZEPhysicsDebugModule::ColisionDetected(const ZEPhysicalCollisionEventArgume
 	zeLog("Physical Object", "Collision Occured: Object1 : %x, Object2 : %x", Collision.Collider1, Collision.Collider2);
 }
 
-#include "ZEGame\ZELightBrush.h"
 
 bool ZEPhysicsDebugModule::Initialize()
 {
@@ -88,7 +92,7 @@ bool ZEPhysicsDebugModule::Initialize()
 	// Create the player
 	if (Player == NULL)
 	{
-		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
+		Player = ZEPlayer::CreateInstance();
 		Player->SetPosition(ZEVector3(-7.0f, 44.0f, 7.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
@@ -97,154 +101,62 @@ bool ZEPhysicsDebugModule::Initialize()
 		Scene->AddEntity(Player);
 	}
 
-	if (PhysicalRigidBody == NULL)
-	{
-		ZEPhysXPhysicalWorld* World = (ZEPhysXPhysicalWorld*)zeScene->GetPhysicalWorld();
+	ZEPhysXPhysicalWorld* World = (ZEPhysXPhysicalWorld*)zeScene->GetPhysicalWorld();
 
-		PhysicalRigidBody = ZEPhysicalRigidBody::CreateInstance();
-		PhysicalRigidBody->SetPosition(ZEVector3(0.0f, 100.0f, 1.0f));
-		Shape.SetRadius(10.0f);
-		PhysicalRigidBody->AddPhysicalShape(&Shape);
-		Shape2.SetPosition(ZEVector3(10.0f, 0.0f, 0.0f));
-		Shape2.SetRadius(4.0f);
-		PhysicalRigidBody->AddPhysicalShape(&Shape2);
-		PhysicalRigidBody->SetMass(10.0f);
-		PhysicalRigidBody->SetGravityEnabled(true);
-		PhysicalRigidBody->SetCollisionEvent(ZEPhysicalCollisionEvent(this, &ZEPhysicsDebugModule::ColisionDetected));
-		PhysicalRigidBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this, &ZEPhysicsDebugModule::TransformChanged));
+	World->SetVisualize(true);
+	//Scene->SetVisualDebugElements(ZE_VDE_ALL);
+	Scene->SetVisualDebugElements(ZE_VDE_NONE);
+	World->SetEnabled(true);
 
-		PhysicalRigidBody->SetLinearDamping(0.01f);
-		//World->AddPhysicalObject(PhysicalRigidBody);
-		PhysicalRigidBody->ApplyForce(ZEVector3(1000.0f, 0.0f, 0.0f));
-
-		/*
-		/////////////
-
-		ZECanvasBrush* CanvasBrush = new ZECanvasBrush();
-		//CanvasBrush->SetRotation(ZEQuaternion(ZE_PI_8, ZEVector3(0.0f, 1.0f, 0.0f)));
-		//CanvasBrush->SetScale(ZEVector3(0.5f, 0.5f, 0.5f));
-		CanvasBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-		CanvasBrush->Canvas.LoadFromFile("TestCanvasMap.zeCanvas");
-		CanvasBrush->SetScale(ZEVector3(1.0f,1.0f,1.0f));
-		CanvasBrush->UpdateCanvas();
-		ZEFixedMaterial* CanvasMaterial = ZEFixedMaterial::CreateInstance();
-		
-	
-		CanvasBrush->Material = CanvasMaterial;
-		CanvasMaterial->SetZero();
-		CanvasMaterial->SetLightningEnabled(true);
-		CanvasMaterial->SetTransparancyMode(ZE_MTM_NOTRANSPARACY);
-		CanvasMaterial->SetTwoSided(false);
-		CanvasMaterial->SetRecivesShadow(false);
-		CanvasMaterial->SetAmbientEnabled(true);
-		CanvasMaterial->SetAmbientColor(ZEVector3(0.4f, 0.4f, 0.4f));
-		CanvasMaterial->SetDiffuseEnabled(true);
-		CanvasMaterial->SetDiffuseColor(ZEVector3::One);
-		//CanvasMaterial->SetDiffuseMap(ZETexture2DResource::LoadResource("Test\\Diffuse.tga")->GetTexture());
-		CanvasMaterial->SetSpecularEnabled(true);
-		CanvasMaterial->SetSpecularColor(ZEVector3::One);
-		CanvasMaterial->SetSpecularShininess(64.0f);
-		CanvasMaterial->UpdateMaterial();
-		zeScene->AddEntity(CanvasBrush);
-
-		ZEArray<ZEVector3> PhysicalVertices;
-		ZEArray<ZEPhysicalTriangle> PhysicalTriangles;
-
-		PhysicalVertices.SetCount(CanvasBrush->Canvas.Vertices.GetCount());
-		PhysicalTriangles.SetCount(PhysicalVertices.GetCount() / 3);
-
-		for (size_t I = 0; I < PhysicalVertices.GetCount(); I++)
-			PhysicalVertices[I] = CanvasBrush->Canvas.Vertices[I].Position;
-
-		for (size_t I = 0; I < PhysicalTriangles.GetCount(); I++)
-		{
-			PhysicalTriangles[I].MaterialIndex = 0;
-			PhysicalTriangles[I].Indices[0] =  3 * I;
-			PhysicalTriangles[I].Indices[1] =  3 * I + 1;
-			PhysicalTriangles[I].Indices[2] =  3 * I + 2;
-		}
-
-		ZEPhysicalMesh* PhysicalMesh = ZEPhysicalMesh::CreateInstance();
-		PhysicalMesh->SetPosition(CanvasBrush->GetPosition());
-		PhysicalMesh->SetRotation(CanvasBrush->GetRotation());
-		PhysicalMesh->SetScale(CanvasBrush->GetScale());
-
-		PhysicalMesh->SetData(PhysicalVertices.GetConstCArray(), PhysicalVertices.GetCount(),
-			PhysicalTriangles.GetConstCArray(), PhysicalTriangles.GetCount(),
-			NULL, 0);
-
-		World->AddPhysicalObject(PhysicalMesh);
-
-		
-		ZEPhysicalBoxShape BoxShape;
-		ZEPhysicalRigidBody* TestBody = ZEPhysicalRigidBody::CreateInstance();
-		TestBody->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-		TestBody->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3::UnitY));
-		BoxShape.SetHeight(1);
-		BoxShape.SetWidth(1);
-		BoxShape.SetLength(1);
-		TestBody->AddPhysicalShape(&BoxShape);
-		TestBody->SetKinematic(true);
-		World->AddPhysicalObject(TestBody);
-		
-
-		Model = new ZEModel();
-		Model->SetModelResource(ZEModelResource::LoadResource("test.zeModel"));
-		Model->SetScale(ZEVector3(1.0f, 1.0f, 1.0f));
-		Scene->AddEntity(Model);
-		//Model->GetModel()->GetBones()[5].SetRelativeRotation(ZEQuaternion(ZE_PI_4, ZEVector3(0.0f, 1.0f, 0.0f)));
-		//Model->GetModel()->GetMeshes()[0].SetLocalScale(ZEVector3(0.1, 0.1, 0.1));
-		Model->SetAnimationByName("Test");
-		//Model->SetAnimationState(ZE_MAS_PLAYING);
-		Model->SetAnimationSpeed(66.0f);
-		Model->SetAnimationLooping(true);
-		////////////////
-		*/
-
-		World->SetVisualize(true);
-		//Scene->SetVisualDebugElements(ZE_VDE_ALL);
-		Scene->SetVisualDebugElements(ZE_VDE_NONE);
-		World->SetEnabled(true);
-
-		ZELightBrush* Light = new ZELightBrush();
-		Light->SetLightType(ZE_LT_POINT);
-		Light->SetPosition(ZEVector3(0.0f, 15.0f, -15.0f));
-		Light->SetScale(ZEVector3::One);
-		Light->GetLight()->SetRange(15000);
-		Light->SetRotation(ZEQuaternion::Identity);
-		Light->GetLight()->SetColor(ZEVector3::One);
-		Light->GetLight()->SetAttenuation(0.001f, 0.0f, 1.0f);
-		Light->GetLight()->SetIntensity(2.0f);
-		Light->GetLight()->SetCastsShadows(false);
-		/*Light->SetProjectionFOV(ZE_PI_2);
-		Light->SetProjectionAspectRatio(1.0f);
-		Light->SetProjectionTexture("test/pavyon.bmp");*/
-		//Scene->AddEntity(Light);
-
-		/*Model = (ZEModelBrush*)zeGame->CreateEntityInstance("ZEModelBrush");
-		Model->SetModelFile("test2.zeModel");
-		Scene->AddEntity(Model);*/
-
-		NxPhysicsSDK* gPhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION);
-
-		gPhysicsSDK->getFoundationSDK().getRemoteDebugger()->connect ("localhost", 5425);
-	}
+	ZEDirectionalLight* Light = ZEDirectionalLight::CreateInstance();
+	ZEQuaternion TempQuat;
+	ZEQuaternion::CreateFromEuler(TempQuat, -ZE_PI_4, -ZE_PI_4, 0);
+	Light->SetRotation(TempQuat);
+	Light->SetIntensity(0.6f);
+	Scene->AddEntity(Light);
 
 	Scene->LoadMap("HakanTest.zemap");
 
-	ZEModelBrush* Skeleton = new ZEModelBrush();
-	Skeleton->SetModelFile("Orkun.zemodel");
-	Scene->AddEntity(Skeleton);
-	Skeleton->SetPosition(ZEVector3(0,45,0));
+	/*
+	TestBody = ZEModel::CreateInstance();
+	TestBody->SetModelFile("Orkun.zemodel");
+	TestBody->SetPosition(ZEVector3(0,50,0));
+	Scene->AddEntity(TestBody);
+	*/
 
+	TestBody = ZEModel::CreateInstance();
+	TestBody->SetModelFile("demlik.zemodel");
+	TestBody->SetPosition(ZEVector3(0,60,0));
+	Scene->AddEntity(TestBody);
+
+	/*int StartPos = -40.0f;
+
+	for (int I = 0; I < 10; I++)
+	{
+		TestBody = ZEModel::CreateInstance();
+		TestBody->SetModelFile("Orkun.zemodel");
+		TestBody->SetPosition(ZEVector3(StartPos, 50, 0));
+		StartPos = StartPos + 3;
+		Scene->AddEntity(TestBody);
+	}*/
 	
+	//TestBody = ZEModel::CreateInstance();
+	//TestBody->SetModelFile("Orkun.zemodel");
+	//TestBody->SetPosition(ZEVector3(0,60,0));
+	//Scene->AddEntity(TestBody);
 
-	ZELightBrush* Lb = new ZELightBrush();
-	Lb->SetLightType(ZE_LT_POINT);
-	Lb->SetColor(ZEVector3::One);
-	Lb->SetIntensity(0.5f);
-	Scene->AddEntity(Lb);
-	Lb->SetPosition(ZEVector3(0,50,0));
+	ZEPointLight* PointLight = ZEPointLight::CreateInstance();
+	PointLight->SetIntensity(2);
+	PointLight->SetAttenuation(ZEVector3(0.01f, 0.0f, 0.01f));
+	PointLight->SetPosition(ZEVector3(0,70,0));
+	Scene->AddEntity(PointLight);
+
+
+	NxPhysicsSDK* gPhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION);
+
+	gPhysicsSDK->getFoundationSDK().getRemoteDebugger()->connect ("localhost", 5425);
+
+
 
 	return true;
 }
@@ -269,7 +181,7 @@ void ZEPhysicsDebugModule::Process(float ElapsedTime)
 	static float TotalTime = 0.0f;
 
 	TotalTime += ElapsedTime;
-	if (TotalTime > 1.0f)
+	if (TotalTime > 5.0f)
 	{
 		const ZECullStatistics& Stats = zeScene->GetCullStatistics();
 

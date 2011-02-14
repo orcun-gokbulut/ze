@@ -34,6 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPointLight.h"
+#include "ZETexture2D.h"
+#include "ZEShadowRenderer.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPointLight);
 
 ZELightType ZEPointLight::GetLightType()
 {
@@ -42,16 +48,79 @@ ZELightType ZEPointLight::GetLightType()
 
 void ZEPointLight::SetCastShadows(bool NewValue)
 {
-	CastsShadows = NewValue;
+	if (NewValue == false)
+	{
+		if (FrontShadowMap)
+		{
+			FrontShadowMap->Destroy();
+			FrontShadowMap = NULL;
+		}
+
+		if (BackShadowMap)
+		{
+			BackShadowMap->Destroy();
+			BackShadowMap = NULL;
+		}
+	}
+
+	ZELight::SetCastsShadow(NewValue);
 }
 
-const ZETextureCube* ZEPointLight::GetShadowMap()
+ZETexture2D* ZEPointLight::GetFrontShadowMap()
 {
-	return ShadowMap;
+	return FrontShadowMap;
+}
+
+ZETexture2D* ZEPointLight::GetBackShadowMap()
+{
+	return FrontShadowMap;
+}
+
+void ZEPointLight::Deinitialize()
+{
+	if (FrontShadowMap)
+	{
+		FrontShadowMap->Destroy();
+		FrontShadowMap = NULL;
+	}
+
+	if (BackShadowMap)
+	{
+		BackShadowMap->Destroy();
+		BackShadowMap = NULL;
+	}
 }
 
 void ZEPointLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
 {
+	if (!CastsShadows)
+		return;
+
+	if (FrontShadowMap == NULL)
+	{
+		FrontShadowMap = ZETexture2D::CreateInstance();
+		FrontShadowMap->Create(512, 512, ZE_TPF_SHADOW_MAP, true);
+	}
+
+	if (BackShadowMap == NULL)
+	{
+		BackShadowMap = ZETexture2D::CreateInstance();
+		BackShadowMap->Create(512, 512, ZE_TPF_SHADOW_MAP, true);
+	}
+
+	ShadowRenderer->SetLight(this);
+
+	ShadowRenderer->SetFace(true);
+	ShadowRenderer->SetViewPort(FrontShadowMap->GetViewPort());
+	ShadowRenderer->ClearList();
+	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
+	ShadowRenderer->Render();
+
+	ShadowRenderer->SetFace(false);
+	ShadowRenderer->SetViewPort(BackShadowMap->GetViewPort());
+	ShadowRenderer->ClearList();
+	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
+	ShadowRenderer->Render();
 }
 
 const ZEViewVolume& ZEPointLight::GetViewVolume()
@@ -67,9 +136,18 @@ const ZEViewVolume& ZEPointLight::GetViewVolume()
 
 ZEPointLight::ZEPointLight()
 {
-	ShadowMap = NULL;
+	FrontShadowMap = NULL;
+	BackShadowMap = NULL;
 }
 
+ZEPointLight::~ZEPointLight()
+{
+	Deinitialize();
+}
 
+ZEPointLight* ZEPointLight::CreateInstance()
+{
+	return new ZEPointLight();
+}
 
-
+#include "ZEPointLight.h.zpp"

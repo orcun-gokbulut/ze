@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEString.h"
-#include "ZEDefinitions.h"
+#include "ZEDSDefinitions.h"
 
 #include <string.h>
 #include <memory.h>

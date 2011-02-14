@@ -131,9 +131,20 @@ class ZEInputAction
 class ZEInputMap
 {
 	public:
-		ZEArray<ZEInputBinding>		InputBindings;
 		ZEInputAction				InputActions[50];
 		int							InputActionCount;
+
+	public:
+		ZEArray<ZEInputBinding>		InputBindings;
+
+		size_t						GetInputActionCount();
+		const ZEInputAction*		GetInputActions();
+
+		const ZEInputAction*		CheckInputAction(int Id);
+
+		void						Update();
+
+									ZEInputMap();
 };
 
 #endif

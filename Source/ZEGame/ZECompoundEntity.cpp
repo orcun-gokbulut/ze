@@ -69,15 +69,17 @@ void ZECompoundEntity::RegisterComponent(ZEComponent* Component)
 	zeAssert(Component->Owner != NULL, "Component already has a owner. Can not register component.");
 
 	Component->Owner = this;
-	Component->Initialize();
+	
+	if (GetInitialized())
+		Component->Initialize();
+
 	Components.Add(Component);
 }
 
 void ZECompoundEntity::UnregisterComponent(ZEComponent* Component)
 {
-	Component->Deinitialize();
-	Components.DeleteValue(Component);
-	Component->Owner = NULL;
+	if (GetInitialized())
+		Component->Deinitialize();
 
 	if (DrawFlags & ZE_DF_AUTO)
 	{
@@ -96,7 +98,6 @@ void ZECompoundEntity::UnregisterComponent(ZEComponent* Component)
 				DrawFlags &= !ZE_DF_DRAW_COMPONENTS;
 		}
 
-
 		if (Component->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
 		{
 			bool HasLight = false;
@@ -113,6 +114,11 @@ void ZECompoundEntity::UnregisterComponent(ZEComponent* Component)
 				DrawFlags &= !ZE_DF_LIGHT_SOURCE;
 		}
 	}
+
+	Components.DeleteValue(Component);
+	Component->Owner = NULL;
+
+	Component->Destroy();
 } 
 		
 ZEDWORD ZECompoundEntity::GetRayCastFlags() const
@@ -125,7 +131,7 @@ ZEEntityType ZECompoundEntity::GetEntityType()
 	return ZE_ET_COMPOUND;
 }
 
-const ZEArray<ZEComponent*>& ZECompoundEntity::GetComponents()
+const ZEArray<ZEComponent*>& ZECompoundEntity::GetComponents() const
 {
 	return Components; 
 }
@@ -232,13 +238,15 @@ bool ZECompoundEntity::Initialize()
 	for (size_t I = 0; I < Components.GetCount(); I++)
 		Components[I]->Initialize();
 
-	return true;
+	return ZEEntity::Initialize();
 }
 
 void ZECompoundEntity::Deinitialize()
 {
 	for (size_t I = 0; I < Components.GetCount(); I++)
 		Components[I]->Deinitialize();
+
+	ZEEntity::Deinitialize();
 }
 
 /*

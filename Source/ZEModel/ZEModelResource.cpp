@@ -34,13 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModelResource.h"
-#include "ZECore\ZEResourceManager.h"
-#include "ZECore\ZEConsole.h"
-#include "ZECore\ZEError.h"
-#include "ZEGraphics\ZEGraphicsModule.h"
-#include "ZEGraphics\ZETexture2DResource.h"
-#include "ZEGraphics\ZEVertexBuffer.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZECore/ZEResourceManager.h"
+#include "ZECore/ZEError.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEModelFileFormat.h"
 #include <memory.h>
 #include <string.h>
@@ -160,28 +159,27 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 
 		CurrentMaterial->SetZero();
 		CurrentMaterial->SetDiffuseEnabled(true);
-		CurrentMaterial->SetAmbientEnabled(true);
+		CurrentMaterial->SetAmbientEnabled(false);
 		CurrentMaterial->SetSpecularEnabled(true);
 		CurrentMaterial->SetEmmisiveEnabled(true);
 		
 		CurrentMaterial->SetTwoSided(MaterialChunk.TwoSided);
 		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
-		CurrentMaterial->SetTransparancyMode(ZE_MTM_NOTRANSPARACY);//MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE: ZE_MTM_NOTRANSPARACY);
+		CurrentMaterial->SetTransparancyMode(ZE_MTM_NONE);//MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE: ZE_MTM_NOTRANSPARACY);
 
-		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor);
+		CurrentMaterial->SetAmbientColor(ZEVector3(0.5, 0.5, 0.5));
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);
 		CurrentMaterial->SetSpecularColor(MaterialChunk.SpecularColor);
 		CurrentMaterial->SetEmmisiveColor(MaterialChunk.EmmisiveColor);
 		CurrentMaterial->SetEmmisiveFactor(MaterialChunk.EmmisiveFactor);
-		CurrentMaterial->SetSpecularFactor(1.0f);
-		CurrentMaterial->SetSpecularShininess((1.25f - MaterialChunk.SpecularFactor) * 128.0f);
+		CurrentMaterial->SetSpecularFactor(MaterialChunk.SpecularFactor);
 		CurrentMaterial->SetOpacity(MaterialChunk.Opasity);
 		CurrentMaterial->SetReflectionFactor(MaterialChunk.ReflectionFactor);
 		CurrentMaterial->SetRefractionFactor(MaterialChunk.RefractionFactor);
 		CurrentMaterial->SetDetailMapTiling(MaterialChunk.DetailMapTiling);
 
-		CurrentMaterial->SetDiffuseMap(ManageModelMaterialTextures(MaterialChunk.DiffuseMap, Model->TextureResources));
+		CurrentMaterial->SetBaseMap(ManageModelMaterialTextures(MaterialChunk.DiffuseMap, Model->TextureResources));
 		
 		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_NORMALMAP);
 		CurrentMaterial->SetNormalMap(ManageModelMaterialTextures(MaterialChunk.NormalMap, Model->TextureResources));
@@ -190,12 +188,11 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetOpacityMap(ManageModelMaterialTextures(MaterialChunk.OpasityMap, Model->TextureResources));
 		
 		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_DETAILNORMALMAP);
-		CurrentMaterial->SetDetailDiffuseMap(ManageModelMaterialTextures(MaterialChunk.DetailMap, Model->TextureResources));
+		CurrentMaterial->SetDetailBaseMap(ManageModelMaterialTextures(MaterialChunk.DetailMap, Model->TextureResources));
 		CurrentMaterial->SetDetailNormalMap(ManageModelMaterialTextures(MaterialChunk.DetailNormalMap, Model->TextureResources));
 		CurrentMaterial->SetReflectionEnabled(false);
-		CurrentMaterial->SetRefractionMap(NULL);//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap, TextureResources);
 		CurrentMaterial->SetRefractionEnabled(false);
-		CurrentMaterial->SetRefractionMap(NULL);
+		CurrentMaterial->SetEnvironmentMap(NULL);//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap, TextureResources));
 
 		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_LIGHTMAP);
 		CurrentMaterial->SetLightMap(ManageModelMaterialTextures(MaterialChunk.LightMap, Model->TextureResources));
@@ -588,7 +585,6 @@ static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEResourceFile* Resou
 
 static bool ReadModelFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 {
-	zeLog("Model Resource", "Loading model file \"%s\".", ResourceFile->GetFileName());
 	ZEModelFileHeaderChunk HeaderChunk;
 	ResourceFile->Read(&HeaderChunk, sizeof(ZEModelFileHeaderChunk), 1);
 
@@ -631,8 +627,6 @@ static bool ReadModelFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFi
 		zeError("Model Resource", "Corrupted ZEModel file. Can not read model file.");
 		return false;
 	}
-
-	zeLog("Model Resource", "Model file \"%s\" loaded.", ResourceFile->GetFileName());
 
 	return true;
 }
@@ -713,7 +707,3 @@ ZEModelResource::~ZEModelResource()
 	for (int I = 0; I < TextureResources.GetCount(); I++)
 		TextureResources[I]->Release();
 }
-
-
-
-

@@ -64,14 +64,14 @@ ZE_META_ENTITY_DESCRIPTION(ZECompoundEntity);
 
 class ZECompoundEntity : public ZEEntity
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZECompoundEntity)
 	private:
 		ZEDrawFlags								DrawFlags;
 		ZERayCastFlags							RayCastFlags;
 		ZEBoundingVolumeMechnism				BoundingVolumeMechanism;
 
 	protected:
-		ZEArray<ZEComponent*>				Components;
+		ZEArray<ZEComponent*>					Components;
 
 		void									RegisterComponent(ZEComponent* Component);
 		void									UnregisterComponent(ZEComponent* Component);	
@@ -79,11 +79,14 @@ class ZECompoundEntity : public ZEEntity
 		void									SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
 
 		void									UpdateComponents();
+		
+												ZECompoundEntity();
+		virtual									~ZECompoundEntity();
 
 	public:
 		virtual ZEEntityType					GetEntityType();
 
-		const ZEArray<ZEComponent *>&		GetComponents();
+		const ZEArray<ZEComponent *>&			GetComponents() const;
 
 		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
 
@@ -102,16 +105,23 @@ class ZECompoundEntity : public ZEEntity
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
 		
 		void									UpdateBoundingVolumes();
-
-												ZECompoundEntity();
-		virtual									~ZECompoundEntity();
 };
 
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZECompoundEntity" parent="ZEEntity"/>
+		<class name="ZECompoundEntity" parent="ZEEntity">
+			<noinstance>true</noinstance>
+			<container name="Components" baseclass="ZEComponent" allowderived="true"
+				addfunction="RegisterComponent"
+				removefunction="UnregisterComponent"
+				getfunction="GetComponents().GetConstCArray"
+				getcountfunction="GetComponents().GetCount"
+				description="This container contains components that entity includes"/>
+
+			<method name="UpdateBoundingVolumes"/>
+		</class>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()

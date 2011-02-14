@@ -38,57 +38,63 @@
 #define __ZE_PLAYER_H__
  
 #include "ZECompoundEntity.h"
-#include "ZEGraphics\ZECamera.h"
-#include "ZEGraphics\ZEPointLight.h"
 #include "ZEInput\ZEInputMap.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEPlayer);
 
 class ZEListener;
+class ZEProjectiveLight;
+class ZECamera;
+
 class ZEPlayer : public ZECompoundEntity
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZEPlayer)
 	private:
 		ZEInputMap				InputMap;
-		ZECamera				Camera;
-		ZEPointLight			PointLight;
+		ZECamera*				Camera;
 		ZEListener*				Listener;
+		ZEProjectiveLight*		Light;
+
 		float					Pitch, Yawn, Roll, FOV;
-	
+
+								ZEPlayer();
+		virtual					~ZEPlayer();
+
 	public:
 		virtual ZEDrawFlags		GetDrawFlags();
 
 		ZECamera*				GetCamera();
 		ZEListener*				GetListener();
 
-		void					SetFOV(float Fov);
+		void					SetFOV(float FOV);
 		float					GetFOV();
 
-		void					SetActive(bool);
+		void					Activate();
 
 		virtual void			Tick(float Time);
-		virtual void			Draw(ZERenderer * Renderer);
-
 		
 		virtual	bool			Initialize();
 		virtual void			Deinitialize();
-
-								ZEPlayer();
-								~ZEPlayer();
+		
+		static ZEPlayer*		CreateInstance();
 };
 
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
-		<class name="ZEPlayer" parent="ZECompoundEntity" description="Player spawn point"/>
+		<class name="ZEPlayer" parent="ZECompoundEntity" description="Player spawn point">
+
+			<method name="SetFOV">
+			<parameter name="NewId" type="float"/>
+			</method>
+
+			<method name="GetFOV" returntype="float">
+			</method>
+
+		</class>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()
 */
 #endif
-
-
-
-
-

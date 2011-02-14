@@ -62,7 +62,7 @@ class ZEPhysXPhysicalJoint: public ZEPhysicalJoint
 
 		ZEQuaternion							GlobalOrientation;
 
-		float									MassInertiaTensor;
+		ZEVector3*								MassInertiaTensor;
 
 		ZEArray<ZEPhysicalLimitPlane>			LimitPlanes;
 
@@ -127,8 +127,11 @@ class ZEPhysXPhysicalJoint: public ZEPhysicalJoint
 		virtual void							SetDriveAngularVelocity(const ZEVector3& DriveAngularVelocity);
 		virtual ZEVector3						GetDriveAngularVelocity() const;
 
-		virtual void							SetMassInertiaTensor(float MassInertiaTensor);
-		virtual float							GetMassInertiaTensor() const;
+		virtual void							SetMassInertiaTensor(const ZEVector3& InertiaTensor);
+		virtual ZEVector3						GetMassInertiaTensor() const;
+
+		virtual void							SetSolverExtrapolationFactor(float SolverExtrapolationFactor);
+		virtual float							GetSolverExtrapolationFactor() const;
 
 		virtual const 
 		ZEArray<ZEPhysicalLimitPlane>&			GetLimitPlanes() const;

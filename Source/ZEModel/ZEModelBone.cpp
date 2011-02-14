@@ -37,7 +37,6 @@
 #include "ZEModel.h"
 #include "ZEGame/ZEScene.h"
 #include <stdio.h>
-#include "ZECore\ZECore.h"
 
 const char* ZEModelBone::GetName()
 {
@@ -290,6 +289,8 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 	UpdateModelBoundingBox = true;
 	UpdateWorldBoundingBox = true;
 
+	ZEArray<ZEPhysicalShape*> ShapeList;
+
 	if(PhysicalBody == NULL)
 	{
 		PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
@@ -301,7 +302,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalBody->SetPosition(this->GetWorldPosition());
 		PhysicalBody->SetRotation(this->GetWorldRotation());
 		PhysicalBody->SetMassCenterPosition(BoneResource->PhysicalBody.MassCenter);
-		PhysicalBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this->Owner, &ZEModel::BoneTransformChangeEvent));
+		PhysicalBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this->Owner, &ZEModel::TransformChangeEvent));
 
 		for (size_t I = 0; I < BoneResource->PhysicalBody.Shapes.GetCount(); I++)
 		{
@@ -310,23 +311,25 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 			{
 				case ZE_PST_BOX:
 				{
-					ZEPhysicalBoxShape BoxShape;
-					BoxShape.SetWidth(Shape->Box.Width);
-					BoxShape.SetHeight(Shape->Box.Height);
-					BoxShape.SetLength(Shape->Box.Length);
-					BoxShape.SetPosition(Shape->Position);
-					BoxShape.SetRotation(Shape->Rotation);
-					PhysicalBody->AddPhysicalShape(&BoxShape);
+					ZEPhysicalBoxShape* BoxShape = new ZEPhysicalBoxShape();
+					BoxShape->SetWidth(Shape->Box.Width);
+					BoxShape->SetHeight(Shape->Box.Height);
+					BoxShape->SetLength(Shape->Box.Length);
+					BoxShape->SetPosition(Shape->Position);
+					BoxShape->SetRotation(Shape->Rotation);
+					ShapeList.Add(BoxShape);
+					PhysicalBody->AddPhysicalShape(BoxShape);
 					break;
 				}
 
 				case ZE_PST_SPHERE:
 				{
-					ZEPhysicalSphereShape SphereShape;
-					SphereShape.SetRadius(Shape->Sphere.Radius);
-					SphereShape.SetPosition(Shape->Position);
-					SphereShape.SetRotation(Shape->Rotation);
-					PhysicalBody->AddPhysicalShape(&SphereShape);
+					ZEPhysicalSphereShape* SphereShape = new ZEPhysicalSphereShape();
+					SphereShape->SetRadius(Shape->Sphere.Radius);
+					SphereShape->SetPosition(Shape->Position);
+					SphereShape->SetRotation(Shape->Rotation);
+					ShapeList.Add(SphereShape);
+					PhysicalBody->AddPhysicalShape(SphereShape);
 					break;
 				}
 				case ZE_PST_CYLINDER:
@@ -342,6 +345,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 					CapsuleShape->SetHeight(Shape->Capsule.Height);
 					CapsuleShape->SetPosition(Shape->Position);
 					CapsuleShape->SetRotation(Shape->Rotation);
+					ShapeList.Add(CapsuleShape);
 					PhysicalBody->AddPhysicalShape(CapsuleShape);
 					break;
 				}
@@ -369,17 +373,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->SetEnabled(BoneResource->PhysicalJoint.Enabled);
 
 		PhysicalJoint->SetPosition(PhysicalBody->GetPosition());
-
-		//ZEQuaternion TempRotation;
-		//ZEQuaternion::Create(TempRotation, ZE_PI / 2, ZEVector3(0.0f, 0.0f, -1.0f));
-
 		PhysicalJoint->SetRotation(PhysicalBody->GetRotation());
-
-		//PhysicalJoint->SetBodyAConnectionPosition(GetWorldPosition());
-		//PhysicalJoint->SetBodyAConnectionOrientation(GetWorldRotation());
-
-		//PhysicalJoint->SetBodyBConnectionPosition(GetWorldPosition());
-		//PhysicalJoint->SetBodyBConnectionOrientation(GetWorldRotation());
 
 		if(BoneResource->PhysicalJoint.Breakable)
 		{
@@ -387,8 +381,9 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 			PhysicalJoint->SetBreakTorque(BoneResource->PhysicalJoint.BreakTorque);
 		}
 
+		float MassInertia = PhysicalBody->GetMass() * 0.13; // Optimum mass inertia tensor is (%13 mass)
+		PhysicalJoint->SetMassInertiaTensor(ZEVector3(MassInertia, MassInertia, MassInertia));
 		PhysicalJoint->SetBodiesCollide(BoneResource->PhysicalJoint.CollideBodies);
-		PhysicalJoint->SetMassInertiaTensor(PhysicalBody->GetMass());
 
 		PhysicalJoint->SetXMotion(BoneResource->PhysicalJoint.XMotion);
 		PhysicalJoint->SetYMotion(BoneResource->PhysicalJoint.YMotion);
@@ -494,7 +489,10 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->Initialize();
 	}
 	Owner->UpdateBoneTransforms();
-//	PhysicalJoint->SetTransformChangeEvent(Owner->BoneTransformChangeEvent());
+
+	for (size_t I = 0; I < ShapeList.GetCount(); I++)
+		delete ShapeList[I];
+	ShapeList.Clear();
 }
 
 void ZEModelBone::Deinitialize()
@@ -570,7 +568,3 @@ ZEModelBone::~ZEModelBone()
 {
 	Deinitialize();
 }
-
-
-
-

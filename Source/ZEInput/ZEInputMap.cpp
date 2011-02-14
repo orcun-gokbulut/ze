@@ -32,6 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#include "ZEInputModule.h"
 #include "ZEInputMap.h"
 #include "ZEInputDefinitions.h"
 #include <string.h>
@@ -44,11 +45,9 @@ ZEInputBinding::ZEInputBinding(int ActionId, const char* Name, ZEInputEvent& Eve
 	this->Event = Event;
 }
 
-
 ZEInputBinding::ZEInputBinding()
 {
 }
-
 
 void ZEInputEvent::GetEventName(char* Buffer, size_t MaxSize)
 {
@@ -168,6 +167,31 @@ ZEInputEvent::ZEInputEvent(ZEInputDeviceType DeviceType, ZEDWORD DeviceIndex, un
 	this->AxisSign = AxisSign;
 }
 
+size_t ZEInputMap::GetInputActionCount()
+{
+	return InputActionCount;
+}
 
+const ZEInputAction* ZEInputMap::GetInputActions()
+{
+	return InputActions;
+}
 
+const ZEInputAction* ZEInputMap::CheckInputAction(int Id)
+{
+	for (size_t I = 0; I < InputActionCount; I++)
+		if (InputActions[I].Id == Id)
+			return &InputActions[I];
+	
+	return NULL;
+}
 
+void ZEInputMap::Update()
+{
+	zeInput->ProcessInputMap(this);
+}
+
+ZEInputMap::ZEInputMap()
+{
+	InputActionCount = 0;	
+}

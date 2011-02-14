@@ -291,9 +291,7 @@ float ZEPhysXPhysicalJoint::GetBreakTorque() const
 void ZEPhysXPhysicalJoint::SetBodiesCollide(bool BodiesCollide)
 {
 	if (BodiesCollide)
-	{
 		JointDesc.jointFlags |= NX_JF_COLLISION_ENABLED;
-	}
 }
 
 bool ZEPhysXPhysicalJoint::GetBodiesCollide() const
@@ -358,17 +356,27 @@ ZEVector3 ZEPhysXPhysicalJoint::GetDriveAngularVelocity() const
 	return NX_TO_ZE(JointDesc.driveAngularVelocity);
 }
 
-void ZEPhysXPhysicalJoint::SetMassInertiaTensor(float MassInertiaTensor)
+void ZEPhysXPhysicalJoint::SetMassInertiaTensor(const ZEVector3& InertiaTensor)
 {
-	MassInertiaTensor = MassInertiaTensor / 100;
-	JointDesc.actor[0]->setMassSpaceInertiaTensor(NxVec3(MassInertiaTensor, MassInertiaTensor, MassInertiaTensor));
-	JointDesc.actor[1]->setMassSpaceInertiaTensor(NxVec3(MassInertiaTensor, MassInertiaTensor, MassInertiaTensor));
+	JointDesc.actor[0]->setMassSpaceInertiaTensor(ZE_TO_NX(InertiaTensor));
+	JointDesc.actor[1]->setMassSpaceInertiaTensor(ZE_TO_NX(InertiaTensor));
 }
 
-float ZEPhysXPhysicalJoint::GetMassInertiaTensor() const
+ZEVector3 ZEPhysXPhysicalJoint::GetMassInertiaTensor() const
 {
-	return MassInertiaTensor;
+	return NX_TO_ZE(JointDesc.actor[0]->getMassSpaceInertiaTensor());
 }
+
+void ZEPhysXPhysicalJoint::SetSolverExtrapolationFactor(float SolverExtrapolationFactor)
+{
+	JointDesc.solverExtrapolationFactor = SolverExtrapolationFactor;
+}
+
+float ZEPhysXPhysicalJoint::GetSolverExtrapolationFactor() const
+{
+	return JointDesc.solverExtrapolationFactor;
+}
+
 
 const ZEArray<ZEPhysicalLimitPlane>& ZEPhysXPhysicalJoint::GetLimitPlanes() const
 {

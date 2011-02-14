@@ -34,28 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_ENTITYPROVIDER_H__
-#define __ZE_ENTITYPROVIDER_H__
+#ifndef	__ZE_ENTITY_PROVIDER_H__
+#define __ZE_ENTITY_PROVIDER_H__
 
-#include "ZEDS\ZEDS.h"
 #include "ZEGame\ZEEntity.h"
+#include "ZEMeta\ZEProvider.h"
 
-class ZEEntityProvider
+class ZEEntityProvider : public ZEProvider
 {
 	private:
-		ZEArray<ZEEntityDescription*>	EntityDescriptions;
-
-	protected:
-		bool							RegisterEntityDecleration(ZEEntityDescription* EntityDescription);
-		void							UnregisterEntityDecleration(ZEEntityDescription* EntityDescription);
-
+									ZEEntityProvider();
+									~ZEEntityProvider();
 	public:
-		size_t							GetEntityDescriptionCount();
-		ZEEntityDescription*			GetEntityDescription(size_t Index);
-		ZEEntityDescription*			GetEntityDescription(const char* EntityTypeName);
-
-		ZEEntity*						CreateEntityInstance(size_t Index);
-		ZEEntity*						CreateEntityInstance(const char* EntityTypeName);
+		static ZEEntityProvider*	GetInstance();
 };
 
 #endif

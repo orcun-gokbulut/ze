@@ -81,6 +81,7 @@ class ZERenderOrder
 		size_t							VertexBufferOffset;
 		size_t							PrimitiveCount;
 
+		//const ZECamera*					Camera;
 		const ZEMaterial*				Material;
 
 		void*							IndexBuffer;

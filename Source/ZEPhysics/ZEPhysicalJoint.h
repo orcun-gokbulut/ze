@@ -169,8 +169,11 @@ class ZEPhysicalJoint : public ZEPhysicalObject
 		virtual void							SetDriveAngularVelocity(const ZEVector3& AngularVelocity) = 0;
 		virtual ZEVector3						GetDriveAngularVelocity() const = 0;
 
-		virtual void							SetMassInertiaTensor(float MassInertiaTensor) = 0;
-		virtual float							GetMassInertiaTensor() const = 0;
+		virtual void							SetMassInertiaTensor(const ZEVector3& InertiaTensor) = 0;
+		virtual ZEVector3						GetMassInertiaTensor() const = 0;
+
+		virtual void							SetSolverExtrapolationFactor(float SolverExtrapolationFactor) = 0;
+		virtual float							GetSolverExtrapolationFactor() const = 0;
 
 		virtual const 
 		ZEArray<ZEPhysicalLimitPlane>&			GetLimitPlanes() const = 0;

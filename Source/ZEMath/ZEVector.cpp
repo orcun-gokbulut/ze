@@ -57,6 +57,17 @@ inline void ZEVector2::Create(const ZEVector2 &Start, const ZEVector2 &End)
 	this->y = End.y - Start.y;
 }
 
+void ZEVector2::CreateFromPolar(float Radius, float Theta)
+{
+	x = Radius * cosf(Theta);
+	y = Radius * sinf(Theta);
+}
+
+void ZEVector2::ConvertToPolar(float& Radius, float& Theta)
+{
+	Radius = sqrtf(x * x + y * y);
+}
+
 inline void ZEVector2::Add(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
 {
 	Out.x = A.x + B.x;
@@ -259,6 +270,35 @@ inline void ZEVector3::Create(ZEVector3& Out, const ZEVector3 &Start, const ZEVe
 	Out.x = End.x - Start.x;
 	Out.y = End.y - Start.y;
 	Out.z = End.z - Start.z;
+}
+
+void ZEVector3::CreateFromSpherical(ZEVector3& Out, float Radius, float Theta, float Phi)
+{
+	float SinTheta = sinf(Theta);
+	Out.x = Radius * SinTheta * cosf(Phi);
+	Out.y = Radius * cosf(Theta);
+	Out.z = Radius * SinTheta * sinf(Phi);
+}
+
+void ZEVector3::CreateFromCylindirical(ZEVector3& Out, float Radius, float Theta, float Height)
+{
+	Out.x = Radius * cosf(Theta);
+	Out.y = Height;
+	Out.z = Radius * sinf(Theta);
+}
+
+void ZEVector3::ConvertToSpherical(const ZEVector3& In, float& Radius, float& Theta, float& Phi)
+{
+	Radius = sqrtf(In.x * In.x + In.y * In.y + In.z * In.z);
+	Theta =  atan(In.y / sqrtf(In.x * In.x + In.z * In.z));
+	Phi = atanf(In.z / In.x);
+}
+
+void ZEVector3::ConvertToCylindirical(const ZEVector3& In, float& Radius, float& Theta, float& Height)
+{
+	Radius = sqrtf(In.x * In.x + In.z * In.z);
+	Theta = atanf(In.z / In.x);
+	Height = In.y;
 }
 
 inline void ZEVector3::Add(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)

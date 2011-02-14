@@ -37,13 +37,13 @@
 #ifndef	__ZE_MODEL_RESOURCE_H__
 #define __ZE_MODEL_RESOURCE_H__
 
-#include "ZECore\ZEResource.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEMath\ZEAABoundingBox.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEGraphics\ZEVertexTypes.h"
+#include "ZECore/ZEResource.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEGraphics/ZEVertexTypes.h"
 
 
 class ZEStaticVertexBuffer;
@@ -321,8 +321,4 @@ class ZEModelResource : public ZEResource
 };
 
 #endif
-
-
-
-
 

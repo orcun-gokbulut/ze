@@ -72,11 +72,11 @@ enum  ZESoundSourceState
 
 class ZESoundSourceEffect;
 
-ZE_META_CLASS_DESCRIPTION(ZESoundSource);
+ZE_META_ENTITY_DESCRIPTION(ZESoundSource);
 
 class ZESoundSource : public ZEComponent
 {
-	ZE_META_CLASS()
+	ZE_META_ENTITY(ZESoundSource)
 	private:
 		unsigned int				StartPosition;
 		unsigned int				EndPosition;
@@ -173,7 +173,7 @@ class ZESoundSource : public ZEComponent
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZESoundSource" parent="ZEComponent" noinstance="true">
+		<class name="ZESoundSource" noinstance="true" parent="ZEComponent">
 			<description>Sound Source</description>
 			<property name="CurrentPosition" type="integer" autogetset="yes">
 				<constraints>
@@ -209,7 +209,10 @@ ZE_POST_PROCESSOR_START(Meta)
 					<item name="Paused" value="ZE_SSS_PAUSED"/>
 				</enumurator>
 			</property>
-			<container name="Effects" type="ZESoundEffect"/>
+			<method name="Play" auto="true" description="Starts playing sound sample from the begining."/>
+			<method name="Resume" auto="true" description="Starts playing sound sample from paused time."/>
+			<method name="Pause" auto="true" description="Pauses sound sample."/>
+			<method name="Stop" auto="true" description="Stops sound sample."/>
 		</class>
 	</meta>
 </zinek>

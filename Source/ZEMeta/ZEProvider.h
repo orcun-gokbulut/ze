@@ -36,22 +36,42 @@
 #ifndef __ZE_META_CLASS_PROVIDER_H__
 #define __ZE_META_CLASS_PROVIDER_H__
 
+#include <ZEDS/ZEArray.h>
+
 class ZEClassDescription;
 class ZEClass;
-class ZEClassProvider
+
+#define ZE_META_REGISTER_CLASS(Provider, Class)\
+static class Provider##Class##Registration\
+{\
+	public: \
+	Provider##Class##Registration()\
+		{\
+		Provider::GetInstance()->RegisterClass(Class::ClassDescription());\
+		}\
+} Provider##Class##Registration_;
+
+class ZEProvider
 {
+	private:
+		ZEClassDescription*				BaseClass;
+		ZEArray<ZEClassDescription*>	Classes;
+
+	protected:
+		void							SetBaseClass(ZEClassDescription* ClassType);
+		ZEClassDescription*				GetBaseClass();
+
+										ZEProvider();
+										~ZEProvider();
+
 	public:
-		virtual ZEClassDescription*			GetBaseClassDescription() = 0;
-		virtual ZEClassDescription*			GetClassDescriptions() = 0;
-		virtual size_t						GetClassDescriptionCount() = 0;
+		const 
+		ZEArray<ZEClassDescription*>&	GetClasses();
+		bool							RegisterClass(ZEClassDescription* Description);
+		void							UnregisterClass(ZEClassDescription* Description);
 
-		virtual bool						RegisterClass(ZEClassDescription* Description);
-		virtual void						UnregisterClass();
-
-		virtual ZEClass*					CreateClass(size_t Index);
-		virtual ZEClass*					CreateClass(const char* Name);
-
-		//static ZEClassProvider*				GetInstance();
+		ZEClass*						CreateInstance(size_t Index) const;
+		ZEClass*						CreateInstance(const char* Name) const;
 };
 
 #endif

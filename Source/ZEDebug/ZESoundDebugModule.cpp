@@ -40,6 +40,9 @@
 #include "ZEGame\ZEPlayer.h"
 #include "ZEGame\ZEScene.h"
 #include "ZESound\ZESoundSource3D.h"
+#include "ZEGame\ZEEntityProvider.h"
+#include "../ZEGraphics/ZECamera.h"
+	
 
 bool ZESoundDebugModule::Initialize()
 {
@@ -48,7 +51,7 @@ bool ZESoundDebugModule::Initialize()
 	// Create the player
 	if (Player == NULL)
 	{
-		Player = (ZEPlayer*)zeGame->CreateEntityInstance("ZEPlayer");
+		Player = ZEPlayer::CreateInstance();
 		Player->SetPosition(ZEVector3(0.0f, 5.0f, 0.0f));
 		Player->SetRotation(ZEQuaternion::Identity);
 		Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
@@ -57,21 +60,108 @@ bool ZESoundDebugModule::Initialize()
 		Scene->AddEntity(Player);
 	}
 
-	if (SoundSource == NULL)
+	/*if (SoundSource == NULL)
 	{
 		ZESoundSource3D* SoundSource = ZESoundSource3D::CreateInstance();
 
 		SoundSource->SetSoundResource(ZESoundResource::LoadResource("test.wav"));
 		SoundSource->SetCurrentPositionTime(50);
 		SoundSource->SetStartPositionTime(0);
-		/*SoundSource->SetEndPositionTime(70.5f);*/
+		SoundSource->SetEndPositionTime(70.5f);
 		SoundSource->SetPlaybackSpeed(1.0f);
 		SoundSource->SetLooping(true);
 		SoundSource->Play();
 		SoundSource->SetSoundSourceType(ZE_SST_MUSIC);
-	}
+	}*/
+
+	SoundBrush2D = new ZESoundBrush2D();
+	
+	//SoundBrush3D = new ZESoundBrush3D();
+
+	SoundBrush2D->SetSoundResource(ZESoundResource::LoadResource("sample2.ogg"));
+	SoundBrush2D->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	
+	//SoundBrush2D->GetSoundSource()->SetLimitsEnabled(true);
+	//SoundBrush2D->GetSoundSource()->SetStartPositionTime(10);
+	//SoundBrush2D->GetSoundSource()->SetStartPositionPersentage(3.6f);
+
+	//SoundBrush2D->GetSoundSource()->SetEndPositionTime(40);
+	//SoundBrush2D->GetSoundSource()->SetEndPositionPercentage(4.5f);
+	SoundBrush2D->GetSoundSource()->SetVolume(80);
+	
+	//SoundBrush2D->GetSoundSource()->SetLooping(true);
+	
+
+	//SoundBrush2D->GetSoundSource()->SetPan(100);
+
+	SoundBrush2D->GetSoundSource()->Play();
+
+	Scene->AddEntity(SoundBrush2D);
+
+	SoundBrush2D = new ZESoundBrush2D();
+	SoundBrush2D->GetSoundSource()->SetSoundResource(ZESoundResource::LoadResource("test.wav"));
+	SoundBrush2D->GetSoundSource()->SetLooping(true);
+	SoundBrush2D->GetSoundSource()->SetVolume(40);
+	//SoundBrush2D->GetSoundSource()->Play();
+
+	SoundBrush2D = new ZESoundBrush2D();
+	SoundBrush2D->GetSoundSource()->SetSoundResource(ZESoundResource::LoadResource("mozart.mp3"));
+	SoundBrush2D->GetSoundSource()->SetLooping(true);
+	SoundBrush2D->GetSoundSource()->SetVolume(40);
+	//SoundBrush2D->GetSoundSource()->Play();
 
 	return true;
+}
+
+void ZESoundDebugModule::Process(float ElapsedTime)
+{
+	TotalTime += ElapsedTime;
+
+	float StartPositionPersentage		= SoundBrush2D->GetSoundSource()->GetStartPositionPersentage();
+	float EndPositionPersentage			= SoundBrush2D->GetSoundSource()->GetEndPositionPersentage();
+
+	float StartPositonTime				= SoundBrush2D->GetSoundSource()->GetStartPositionTime();
+	float EndPositionTime				= SoundBrush2D->GetSoundSource()->GetEndPositionTime();
+
+
+	unsigned int StartPosition			= SoundBrush2D->GetSoundSource()->GetStartPosition();
+	unsigned int EndPosition			= SoundBrush2D->GetSoundSource()->GetEndPosition();
+
+	unsigned int Volume					= SoundBrush2D->GetSoundSource()->GetVolume();
+
+	float CurrentPositionPersentage		= SoundBrush2D->GetSoundSource()->GetCurrentPositionPersentage();
+
+	float CurrentPositionTime			= SoundBrush2D->GetSoundSource()->GetCurrentPositionTime();
+
+	short int BitsPerSample				= SoundBrush2D->GetSoundSource()->GetSoundResource()->GetBitsPerSample();
+
+	if (EnterFlag == false && (int)TotalTime == 5)
+	{
+		//SoundBrush2D->GetSoundSource()->Pause();
+		//SoundBrush2D->GetSoundSource()->Stop();
+		//SoundBrush2D->GetSoundSource()->SetSoundResource(ZESoundResource::LoadResource("sample2.ogg"));
+		//SoundBrush2D->GetSoundSource()->Play();
+		//SoundBrush2D->GetSoundSource()->SetCurrentPositionTime(30);
+		EnterFlag = true;
+	}
+
+	//if (EnterFlag == true && (int)TotalTime == 10)
+	//{
+	//	SoundBrush2D->GetSoundSource()->Resume();
+	//	EnterFlag = false;
+	//}
+
+	//if (EnterFlag == false && (int)TotalTime == 15)
+	//{
+	//	SoundBrush2D->GetSoundSource()->Stop();
+	//	EnterFlag = true;
+	//}
+
+	//if (EnterFlag == true && (int)TotalTime == 20)
+	//{
+	//	SoundBrush2D->GetSoundSource()->Play();
+	//	EnterFlag = false;
+	//}
 }
 
 void ZESoundDebugModule::Deinitialize()
@@ -93,6 +183,8 @@ ZESoundDebugModule::ZESoundDebugModule()
 {
 	SoundSource = NULL;
 	Player = NULL;
+	TotalTime = 0;
+	EnterFlag = false;
 }
 
 ZESoundDebugModule::~ZESoundDebugModule()

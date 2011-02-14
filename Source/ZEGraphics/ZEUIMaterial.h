@@ -53,6 +53,9 @@ class ZEUIMaterial : public ZEMaterial
 		virtual					~ZEUIMaterial();
 
 	public:
+		ZEMaterialType			GetMaterialType() const;
+		ZEMaterialFlags			GetMaterialFlags() const;
+
 		void					SetZero();
 
 		void					SetWireFrame(bool Enabled);
@@ -68,7 +71,3 @@ class ZEUIMaterial : public ZEMaterial
 };
 
 #endif
-
-
-
-

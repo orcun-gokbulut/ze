@@ -39,10 +39,10 @@
 
 #include "ZEDebugModule.h"
 #include "ZEPhysics\ZEPhysicalCallbacks.h"
-#include "ZEGame\ZEModelBrush.h"
 
 class ZEPlayer;
 class ZEPhysicalRigidBody;
+class ZEModel;
 
 #include "ZEPhysics\ZEPhysicalShapes.h"
 
@@ -54,6 +54,8 @@ class ZEPhysicsDebugModule : public ZEDebugModule
 		ZEPhysicalCapsuleShape	Shape;	
 		ZEPhysicalCapsuleShape	Shape2;	
 		ZEModel*				Model;
+
+		ZEModel*				TestBody;
 
 		void					TransformChanged(const ZEPhysicalTransformChangeEventArgument& TransformChange);
 		void					ColisionDetected(const ZEPhysicalCollisionEventArgument& Collision);
