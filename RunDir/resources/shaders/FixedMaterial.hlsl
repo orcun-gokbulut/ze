@@ -53,33 +53,29 @@ float MaterialRefractionIndex : register(vs, c16);
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Fixed Material Properties
-float4 MaterialParams0 : register(ps, c0);
-float4 MaterialParams1 : register(ps, c1);
-float4 MaterialParams2 : register(ps, c2);
-float4 MaterialParams3 : register(ps, c3);
-float4 MaterialParams4 : register(ps, c4);
-float4 MaterialParams5 : register(ps, c5);
-float4 MaterialParams6 : register(vs, c12);
-float4 MaterialParams7 : register(vs, c16);
-float4 PipelineParameters0 : register(ps, c6);
+float4 PipelineParamatersPS[10] : register(c0);
+float4 MaterialParametersPS[20] : register(ps, c10);
 
-#define	MaterialAmbientColor        MaterialParams0.xyz
-#define	MaterialOpacity				MaterialParams0.w
-#define	MaterialDiffuseColor        MaterialParams1.xyz
-#define	MaterialSpecularColor       MaterialParams2.xyz
-#define	MaterialSpecularFactor		MaterialParams2.w
-#define	MaterialEmmisiveColor       MaterialParams3.xyz
-#define	MaterialEmmisiveFactor		MaterialParams3.w
-#define	MaterialReflectionFactor	MaterialParams4.x
-#define	MaterialRefractionFactor    MaterialParams4.y
-#define	MaterialDetailMapTiling     MaterialParams4.zw
-#define MaterialDistortionFactor	MaterialParams5.x
-#define MaterialDistortionAmount	MaterialParams5.y
-#define MaterialRefractionIndex		MaterialParams6.x
-#define AlphaCullLimit				MaterialParams7.x
 
-#define ScreenToTextureParams		PipelineParameters0
-//#define FarZ						PipelineParameters0.z
+#define	MaterialAmbientColor        			MaterialParametersPS[0].xyz
+#define	MaterialOpacity							MaterialParametersPS[0].w
+#define	MaterialDiffuseColor        			MaterialParametersPS[1].xyz
+#define	MaterialSpecularColor       			MaterialParametersPS[2].xyz
+#define	MaterialSpecularFactor					MaterialParametersPS[2].w
+#define	MaterialEmmisiveColor       			MaterialParametersPS[3].xyz
+#define	MaterialEmmisiveFactor					MaterialParametersPS[3].w
+#define	MaterialReflectionFactor				MaterialParametersPS[4].x
+#define	MaterialRefractionFactor    			MaterialParametersPS[4].y
+#define	MaterialDetailMapTiling     			MaterialParametersPS[4].zw
+
+/*#define MaterialDistortionFactor				MaterialParametersPS[5].x
+#define MaterialDistortionAmount				MaterialParametersPS[5].y*/
+
+#define MaterialSubSurfaceScatteringFactor		MaterialParametersPS[5].x
+#define MaterialAlphaCullLimit					MaterialParametersPS[5].y
+
+#define MaterialRefractionIndex					0
+#define ScreenToTextureParams					PipelineParamatersPS[0]
 
 bool EnableSkin : register(vs, b0);
 bool ShadowReciever : register(ps, b0);
@@ -102,6 +98,7 @@ sampler2D LightMap : register(s12);
 sampler2D DistortionMap : register(s13);
 sampler2D DetailDiffuseMap : register(s14);
 sampler2D DetailNormalMap : register(s15);
+sampler2D SubsurfaceScatteringMap : register(s16);
 
 struct ZEFixedMaterial_VSInput 
 {
@@ -188,12 +185,12 @@ ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput In
 		#ifdef ZE_SHADER_OPACITY_MAP
 			float Alpha = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
 		#elif defined(ZE_SHADER_OPACITY_BASE_ALPHA)
-			float Alpha = MaterialOpacity * tex2D(BaseMap, Input.Texcoord).r;
+			float Alpha = MaterialOpacity * tex2D(BaseMap, Input.Texcoord).a;
 		#else 
 			float Alpha = MaterialOpacity;
 		#endif
 			
-		if (Alpha <= AlphaCullLimit)
+		if (Alpha <= MaterialAlphaCullLimit)
 		{
 			discard;
 			return GBuffer;
@@ -215,6 +212,12 @@ ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput In
 		ZEGBuffer_SetSpecularGlossiness(GBuffer, MaterialSpecularFactor * tex2D(GlossMap, Input.Texcoord).x);
 	#else
 		ZEGBuffer_SetSpecularGlossiness(GBuffer, MaterialSpecularFactor);
+	#endif
+	
+	#if defined(ZE_SHADER_SUBSURFACE_SCATTERING_MAP)
+		ZEGBuffer_SetSubSurfaceScattering(GBuffer, tex2D(SubSurfaceScatteringMap, MaterialSubSurfaceScatteringFactor * Input.Texcoord).x);
+	#else
+		ZEGBuffer_SetSubSurfaceScatteringFactor(GBuffer, MaterialSubSurfaceScatteringFactor);
 	#endif
 
 	return GBuffer;
@@ -313,7 +316,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	#endif
 	
 	#ifdef ZE_SHADER_ALPHA_CULL
-		if (Output.Color.a <= AlphaCullLimit)
+		if (Output.Color.a <= MaterialAlphaCullLimit)
 		{
 			discard;
 			return Output;

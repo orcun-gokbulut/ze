@@ -94,8 +94,8 @@ class ZEFixedMaterial : public ZEMaterial
 				float					RefractionFactor;
 				ZEVector2				DetailMapTiling;
 
+				float					SubSurfaceScatteringFactor;
 				float					AlphaCullLimit;
-				float					Reserved0;
 				float					Reserved1;
 				float					Reserved2;
 			};
@@ -193,8 +193,8 @@ class ZEFixedMaterial : public ZEMaterial
 		void							SetAlphaCullEnabled(bool Enabled);
 		bool							GetAlphaCullEnabled() const;
 
-		void							SetAlphaCullLimit(int Limit);
-		int								GetAlphaCullLimit() const;
+		void							SetAlphaCullLimit(float Limit);
+		float							GetAlphaCullLimit() const;
 
 		// Ambient
 		void							SetAmbientEnabled(bool Enabled);
@@ -204,6 +204,13 @@ class ZEFixedMaterial : public ZEMaterial
 		void							SetAmbientColor(const ZEVector3& Color);
 		const ZEVector3&				GetAmbientColor() const;
 
+		void							SetBaseMap(const ZETexture2D* Texture);
+		const ZETexture2D*				GetBaseMap() const;
+		void							SetBaseMapAddressModeU(ZETextureAddressMode Mode);
+		ZETextureAddressMode			GetBaseMapAddressModeU() const;
+		void							SetBaseMapAddressModeV(ZETextureAddressMode Mode);
+		ZETextureAddressMode			GetBaseMapAddressModeV() const;
+
 		// Diffuse
 		void							SetDiffuseEnabled(bool Enabled);
 		bool							GetDiffuseEnabled() const;
@@ -211,12 +218,8 @@ class ZEFixedMaterial : public ZEMaterial
 		const ZEVector3&				GetDiffuseColor() const;
 		void							SetDiffuseFactor(float Factor);
 		float							GetDiffuseFactor() const;
-		void							SetBaseMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetBaseMap() const;
-		void							SetBaseMapAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetBaseMapAddressModeU() const;
-		void							SetBaseMapAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetBaseMapAddressModeV() const;
+		void							SetDiffuseSubSurfaceScatteringFactor(float Factor);
+		float							GetDiffuseSubSurfaceScatteringFactor();
 
 		// Specular
 		void							SetSpecularEnabled(bool Enabled);

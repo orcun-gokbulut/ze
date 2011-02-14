@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+sampler2D LBuffer1 : register(s3);
+
 struct ZELBuffer
 {
 	float4 DiffuseSpecular : COLOR0;
 };
-
-sampler2D LBuffer1 : register(s2);
 
 void ZELBuffer_SetDiffuse(inout ZELBuffer LBuffer, float3 Diffuse)
 {

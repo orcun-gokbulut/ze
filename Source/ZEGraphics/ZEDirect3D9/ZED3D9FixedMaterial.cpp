@@ -210,6 +210,17 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&WorldViewMatrix, 4);
 
+	if (GetAlphaCullEnabled())
+	{
+		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+		GetDevice()->SetRenderState(D3DRS_ALPHAREF, (int)(256.0f * AlphaCullLimit));
+		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+		GetDevice()->SetRenderState(D3DRS_ADAPTIVETESS_Y, (D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C'));
+	}
+	else
+		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
+
 	// Setup ZCulling
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
@@ -247,15 +258,9 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 
 	// Setup Material Properties
 	GetDevice()->SetVertexShaderConstantF(14, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants) / 16);
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
-	GetDevice()->SetPixelShaderConstantF(6, (const float*)&ZEVector4(0.0f, 0.0f, Camera->GetFarZ(), 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(10, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
 	
 	// Setup Textures
-	if ((GetAlphaCullEnabled() || TransparancyMode != ZE_MTM_NONE) && OpacityComponent == ZE_MOC_BASE_MAP_ALPHA && MaterialComponents & ZE_SHADER_BASE_MAP && BaseMap != NULL)
-	{
-		SetTextureStage(5, BaseMapAddressModeU, BaseMapAddressModeV);
-		GetDevice()->SetTexture(5, ((ZED3D9Texture2D*)BaseMap)->Texture);
-	}
 
 	if ((GetAlphaCullEnabled() || TransparancyMode != ZE_MTM_NONE) && OpacityComponent == ZE_MOC_OPACITY_MAP && MaterialComponents & ZE_SHADER_OPACITY_MAP && Opacity != NULL && OpacityMap != NULL)
 	{
@@ -281,10 +286,10 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 		GetDevice()->SetTexture(8, ((ZED3D9Texture2D*)SpecularMap)->Texture);
 	}
 
-	if (MaterialComponents & ZE_SHADER_OPACITY && Opacity != NULL && OpacityMap != NULL)
+	if ((GetAlphaCullEnabled() || TransparancyMode != ZE_MTM_NONE) && OpacityComponent == ZE_MOC_BASE_MAP_ALPHA && MaterialComponents & ZE_SHADER_BASE_MAP && BaseMap != NULL)
 	{
-		SetTextureStage(9, OpacityMapAddressModeU, OpacityMapAddressModeV);
-		GetDevice()->SetTexture(9, ((ZED3D9Texture2D*)OpacityMap)->Texture);
+		SetTextureStage(5, BaseMapAddressModeU, BaseMapAddressModeV);
+		GetDevice()->SetTexture(5, ((ZED3D9Texture2D*)BaseMap)->Texture);
 	}
 
 	if (MaterialComponents & ZE_SHADER_DETAIL_NORMAL_MAP && DetailNormalMap != NULL)
@@ -338,12 +343,7 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-		if (RenderOrder->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
-			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-		else
-			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
-
+		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);
 	}
 	else
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
@@ -353,6 +353,16 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 		GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	else
 		GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
+
+	if (GetAlphaCullEnabled())
+	{
+		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+		GetDevice()->SetRenderState(D3DRS_ALPHAREF, (int)(256.0f * AlphaCullLimit));
+		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+		GetDevice()->SetRenderState(D3DRS_ADAPTIVETESS_Y, (D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C'));
+	}
+	else
+		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 	// Setup Wireframe
 	if (Wireframe)
@@ -404,8 +414,8 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 
 	// Setup Material Properties
 	GetDevice()->SetVertexShaderConstantF(14, (const float*)VertexShaderConstants, sizeof(VertexShaderConstants) / 16);
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
-	GetDevice()->SetPixelShaderConstantF(6, (const float*)&ZEVector4(1.0f / (float)Renderer->GetViewPort()->GetWidth(), 1.0f / (float)Renderer->GetViewPort()->GetHeight(), 0.5f / (float)Renderer->GetViewPort()->GetWidth(), 0.5f / (float)Renderer->GetViewPort()->GetHeight()), 1);
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)Renderer->GetViewPort()->GetWidth(), 1.0f / (float)Renderer->GetViewPort()->GetHeight(), 0.5f / (float)Renderer->GetViewPort()->GetWidth(), 0.5f / (float)Renderer->GetViewPort()->GetHeight()), 1);
+	GetDevice()->SetPixelShaderConstantF(10, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
 
 	// Setup Textures
 	if (MaterialComponents & ZE_SHADER_BASE_MAP && BaseMap != NULL)

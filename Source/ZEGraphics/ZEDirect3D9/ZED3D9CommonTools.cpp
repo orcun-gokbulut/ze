@@ -36,6 +36,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZECore\ZEError.h"
 #include "ZED3D9Texture2D.h"
+#include "ZED3D9TextureCube.h"
 #include "ZED3D9ViewPort.h"
 #include <d3dx9.h>
 #include <stdio.h>
@@ -96,6 +97,17 @@ void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture2D* Texture, DWORD Filt
 {
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Addressing);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
+	GetDevice()->SetTexture(Stage, ((ZED3D9Texture2D*)Texture)->Texture);
+}
+
+void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCube* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
+{
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Addressing);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSW, Addressing);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);

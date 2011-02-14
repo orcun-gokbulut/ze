@@ -45,6 +45,10 @@
 
 void ZEFixedMaterial::SetZero()
 {
+	memset(Textures, 0, sizeof(Textures));
+	memset(PixelShaderConstants, 0, sizeof(PixelShaderConstants));
+	memset(VertexShaderConstants, 0, sizeof(VertexShaderConstants));
+
 	OldMaterialComponents = 0;
 	MaterialComponents = 0;
 	TwoSided = false;
@@ -86,10 +90,7 @@ void ZEFixedMaterial::SetZero()
 	DiffuseColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	SpecularColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	EmmisiveColor = ZEVector3(0.0f, 0.0f, 0.0f);
-
-	memset(Textures, 0, sizeof(Textures));
-	memset(PixelShaderConstants, 0, sizeof(PixelShaderConstants));
-	memset(VertexShaderConstants, 0, sizeof(VertexShaderConstants));
+	SubSurfaceScatteringFactor = 0.3f;
 }
 
 ZEFixedMaterial::ZEFixedMaterial()
@@ -150,12 +151,12 @@ bool ZEFixedMaterial::GetAlphaCullEnabled() const
 	return MaterialComponents & ZE_SHADER_ALPHA_CULL;
 }
 
-void ZEFixedMaterial::SetAlphaCullLimit(int Limit)
+void ZEFixedMaterial::SetAlphaCullLimit(float Limit)
 {
 	AlphaCullLimit = Limit;
 }
 
-int ZEFixedMaterial::GetAlphaCullLimit() const
+float ZEFixedMaterial::GetAlphaCullLimit() const
 {
 	return AlphaCullLimit;
 }
@@ -229,6 +230,16 @@ void ZEFixedMaterial::SetDiffuseFactor(float Factor)
 float ZEFixedMaterial::GetDiffuseFactor() const
 {
 	return DiffuseFactor;
+}
+
+void ZEFixedMaterial::SetDiffuseSubSurfaceScatteringFactor(float Factor)
+{
+	SubSurfaceScatteringFactor = Factor;
+}
+
+float ZEFixedMaterial::GetDiffuseSubSurfaceScatteringFactor()
+{
+	return SubSurfaceScatteringFactor;
 }
 
 void ZEFixedMaterial::SetBaseMap(const ZETexture2D* Texture)

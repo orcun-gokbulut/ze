@@ -104,6 +104,7 @@ ZELBuffer ZEPointLight_PixelShader(ZEPointLight_PSInput Input) : COLOR0
 	float LightDistance = length(LightDisplacement);
 	float3 LightDirection = LightDisplacement / LightDistance;
 	
+	float4 Output;
 	float AngularAttenuation = saturate(dot(LightDirection, Normal));
 	if (AngularAttenuation > 0.0f)
 	{
@@ -114,17 +115,26 @@ ZELBuffer ZEPointLight_PixelShader(ZEPointLight_PSInput Input) : COLOR0
 		float3 ViewDirection = normalize(-Position);
 		float3 HalfVector = normalize(LightDirection + ViewDirection);		
 
-		float4 Output;
 		Output.rgb = LightIntensityParam * LightColorParam;
 		Output.a = pow(dot(Normal, HalfVector), SpecularPower);
 
 		Output *= AngularAttenuation;
 		Output *= DistanceAttenuation;
-		
-		ZELBuffer_SetDiffuse(LBuffer, Output.rgb);
-		ZELBuffer_SetSpecular(LBuffer, Output.a);
 	}
-	
+	else
+	{
+		float SubSurfaceScatteringFactor = ZEGBuffer_GetSubSurfaceScatteringFactor(ScreenPosition);
+		if (SubSurfaceScatteringFactor > 0.0f)
+		{
+			float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
+			Output.rgb = SubSurfaceScatteringFactor * -AngularAttenuation * DistanceAttenuation * LightIntensityParam * LightColorParam;
+			Output.a = 0.0f;
+		}
+	}
+		
+	ZELBuffer_SetDiffuse(LBuffer, Output.rgb);
+	ZELBuffer_SetSpecular(LBuffer, Output.a);
+		
 	return LBuffer;
 }
 
@@ -163,17 +173,25 @@ ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COL
 	float3 SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
 
 	// Light Derived Parameters
-	float3 ViewDirection = normalize(-Position);
-	float3 HalfVector = normalize(LightDirectionParam + ViewDirection);
-		
-	float AngularAttenuation = saturate(dot(LightDirectionParam, Normal));
-	
 	float4 Output;
-	Output.rgb = LightIntensityParam * LightColorParam;
-	Output.a = pow(dot(Normal, HalfVector), SpecularPower);
-	
-	Output *= AngularAttenuation;
-	
+	float AngularAttenuation = dot(LightDirectionParam, Normal);
+	if (AngularAttenuation > 0.0f)
+	{
+		float3 ViewDirection = normalize(-Position);
+		float3 HalfVector = normalize(LightDirectionParam + ViewDirection);
+		
+		Output.rgb = LightIntensityParam * LightColorParam;
+		Output.a = pow(dot(Normal, HalfVector), SpecularPower);
+		Output *= saturate(AngularAttenuation);
+	}
+	else
+	{
+		float SubSurfaceScatteringFactor = ZEGBuffer_GetSubSurfaceScatteringFactor(ScreenPosition);
+		Output.rgb =  LightIntensityParam * LightColorParam;
+		Output.a = 0.0f;
+		Output *= 0.3f * saturate(dot(LightDirectionParam, -Normal));
+	}
+		
 	ZELBuffer_SetDiffuse(LBuffer, Output.rgb);
 	ZELBuffer_SetSpecular(LBuffer, Output.a);
 

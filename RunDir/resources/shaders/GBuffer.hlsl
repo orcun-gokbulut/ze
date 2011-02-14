@@ -35,6 +35,7 @@
 
 sampler2D GBuffer1 : register(s0);
 sampler2D GBuffer2 : register(s1);
+sampler2D GBuffer3 : register(s2);
 
 float3 ZEGBuffer_ViewVector : register(vs, c0);
 float4 ZEGBuffer_PipelineParameters0 : register(ps, c6);
@@ -45,6 +46,7 @@ struct ZEGBuffer
 {
 	float4 Position : COLOR0;
 	float4 NormalGloss : COLOR1;
+	float4 SSSVelocity : COLOR2;
 };
 
 // View Vector
@@ -94,7 +96,23 @@ float ZEGBuffer_GetSpecularPower(float2 Texcoord)
 }
 
 // Velocity
+void ZEGBuffer_SetScreenVelocity(inout ZEGBuffer Output, float2 Velocity)
+{
+	Output.SSSVelocity.xy = Velocity;
+}
+
 float2 ZEGBuffer_GetScreenVelocity(float2 Texcoord)
 {
-	return float2(0.0f, 0.0f);
+	return tex2D(GBuffer3, Texcoord).xy;
+}
+
+// Sub Surface Scattering
+void ZEGBuffer_SetSubSurfaceScatteringFactor(inout ZEGBuffer Output, float Factor)
+{
+	Output.SSSVelocity.z = Factor;
+}
+
+float2 ZEGBuffer_GetSubSurfaceScatteringFactor(float2 Texcoord)
+{
+	return tex2D(GBuffer3, Texcoord).z;
 }
