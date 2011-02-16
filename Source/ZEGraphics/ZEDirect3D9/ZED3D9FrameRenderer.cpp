@@ -522,6 +522,7 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	}
 	
 	GetDevice()->SetRenderTarget(1, NULL);
+	GetDevice()->SetRenderTarget(2, NULL);
 	zeProfilerEnd();
 }
 
@@ -529,7 +530,7 @@ void ZED3D9FrameRenderer::DoLightningPass()
 {
 	zeProfilerStart("Lightning Pass");
 
-	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)LBuffer1->GetViewPort())->FrameBuffer);
+	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00, 0.0f, 0);
 	
 	if (Lights.GetCount() == 0)
@@ -599,13 +600,13 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	zeProfilerStart("Forward Pass");
 
 	// GBuffers
+	ZED3D9CommonTools::SetRenderTarget(0, ABuffer);
+
 	ZED3D9CommonTools::SetTexture(0, GBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, GBuffer2, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(2, GBuffer3, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(3, LBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(4, SSAOBuffer, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
-
-	ZED3D9CommonTools::SetRenderTarget(0, ABuffer);
 
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x333333, 1.0f, 0x00);
 

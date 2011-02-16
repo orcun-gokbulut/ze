@@ -139,12 +139,12 @@ bool ZEGraphicsDebugModule::Initialize()
 	
 
 	ZEModel* Model = ZEModel::CreateInstance();		
-	Model->SetModelResource(ZEModelResource::LoadResource("branch.zemodel"));
+	Model->SetModelResource(ZEModelResource::LoadResource("subsurfacetest.zemodel"));
 	Scene->AddEntity(Model);
 
 	DirectionalLight0 = ZEDirectionalLight::CreateInstance();
 	DirectionalLight0->SetEnabled(true);
-	DirectionalLight0->SetRotation(ZEQuaternion(ZE_PI_4, ZEVector3::UnitX));
+	DirectionalLight0->SetRotation(ZEQuaternion(-ZE_PI_2, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
 	DirectionalLight0->SetIntensity(3.0f);
 	DirectionalLight0->SetCastsShadow(false);

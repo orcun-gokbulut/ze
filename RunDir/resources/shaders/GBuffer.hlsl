@@ -46,7 +46,7 @@ struct ZEGBuffer
 {
 	float4 Position : COLOR0;
 	float4 NormalGloss : COLOR1;
-	float4 SSSVelocity : COLOR2;
+	float4 VelocitySubSurfaceScatteringFactor : COLOR2;
 };
 
 // View Vector
@@ -98,7 +98,7 @@ float ZEGBuffer_GetSpecularPower(float2 Texcoord)
 // Velocity
 void ZEGBuffer_SetScreenVelocity(inout ZEGBuffer Output, float2 Velocity)
 {
-	Output.SSSVelocity.xy = Velocity;
+	Output.VelocitySubSurfaceScatteringFactor.xy = Velocity;
 }
 
 float2 ZEGBuffer_GetScreenVelocity(float2 Texcoord)
@@ -109,7 +109,7 @@ float2 ZEGBuffer_GetScreenVelocity(float2 Texcoord)
 // Sub Surface Scattering
 void ZEGBuffer_SetSubSurfaceScatteringFactor(inout ZEGBuffer Output, float Factor)
 {
-	Output.SSSVelocity.z = Factor;
+	Output.VelocitySubSurfaceScatteringFactor.z = Factor;
 }
 
 float2 ZEGBuffer_GetSubSurfaceScatteringFactor(float2 Texcoord)
