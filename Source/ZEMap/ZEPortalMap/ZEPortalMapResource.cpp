@@ -143,9 +143,6 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_LIGHT_MAP);
 		CurrentMaterial->SetLightMap(ManageMapMaterialTextures(MaterialChunk.LightMap));
 
-		CurrentMaterial->SetAlphaCullEnabled(true);
-		CurrentMaterial->SetAlphaCullLimit(50);
-
 		CurrentMaterial->UpdateMaterial();
 	}
 	return true;

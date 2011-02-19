@@ -628,6 +628,19 @@ void ZED3D9FrameRenderer::DoForwardPass()
 		zeProfilerEnd();
 	}
 
+	for (size_t I = 0; I < Transparent.GetCount(); I++)
+	{
+		zeProfilerStart("Object Pass");
+
+		ZERenderOrder* RenderOrder = &NonTransparent[I];
+
+		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
+			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
+		PumpStreams(RenderOrder);
+
+		zeProfilerEnd();
+	}
+
 	GetDevice()->SetTexture(0, NULL);
 	GetDevice()->SetTexture(1, NULL);
 	GetDevice()->SetTexture(2, NULL);

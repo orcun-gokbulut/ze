@@ -169,7 +169,7 @@ void ZEModel::SetModelFile(const char* ModelFile)
 
 	if (ModelResource == NULL)
 	{
-		zeError("Model", "Can not load model file.");
+//		zeError("Model", "Can not load model file.");
 		return;
 	}
 

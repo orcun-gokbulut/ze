@@ -66,7 +66,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(Player);
 
 
-	//Scene->LoadMap("Graveyard.zemap");
+	Scene->LoadMap("deneme.zemap");
 
 	PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
@@ -150,12 +150,12 @@ bool ZEGraphicsDebugModule::Initialize()
 	DirectionalLight0->SetCastsShadow(false);
 	Scene->AddEntity(DirectionalLight0);
 
-	PointLight1->SetEnabled(false);
-	PointLight2->SetEnabled(false);
-	PointLight3->SetEnabled(false);
-	PointLight4->SetEnabled(false);
-	PointLight5->SetEnabled(false);
-	OmniProjectiveLight0->SetEnabled(false);
+	PointLight1->SetEnabled(true);
+	PointLight2->SetEnabled(true);
+	PointLight3->SetEnabled(true);
+	PointLight4->SetEnabled(true);
+	PointLight5->SetEnabled(true);
+	OmniProjectiveLight0->SetEnabled(true);
 	ProjectiveLight0->SetEnabled(false);
 	DirectionalLight0->SetEnabled(true);
 	return true;
