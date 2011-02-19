@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModuleManager.h
+ Zinek Engine - ZEOptionSection.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,43 +33,98 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_MODULE_MANAGER_H__
-#define __ZE_MODULE_MANAGER_H__
-
-#include "ZEDS\ZEArray.h"
 #include "ZEOptionSection.h"
-#include "ZEModule.h"
+#include "ZEOption.h"
+#include "ZEError.h"
+#include <ctype.h>
+#include <string.h>
 
-class ZEModuleManager
+bool ZEOptionSection::AddOption(ZEOption* Option)
 {
-	private:
-		ZEArray<ZEModuleDescription*>	ModuleList;
-		bool							CheckModule(ZEModuleDescription* ModuleDesc);
+	if (GetOption(Option->GetName()) != NULL)
+	{
+		zeError("Options Section", 
+			"Can not add option to option section. An option with same name is already exist in the option section. (Option Section Name : \"%s\", Option Name : \"%s\")", 
+			this->GetName(),
+			Option->GetName());
+		return false;
+	}
+	Option->Section = this;
+	Options.Add(Option);
+	return true;
+}
 
-	public:
-		static ZEOptionSection			ModuleManagerOptions;
+void ZEOptionSection::DeleteOption(size_t Index)
+{
+	Options.DeleteAt(Index);
+}
 
-		size_t							GetModuleCount();
-		ZEModuleDescription*			GetModuleDescription(size_t Index);
-		ZEModuleDescription*			GetModuleDescription(const char* Name);
-		ZEModuleDescription*			GetModuleDescription(ZEModuleType ModuleType);
+size_t ZEOptionSection::GetNumberOfOptions()
+{
+	return Options.GetCount();
+}
 
-		ZEModule*						CreateModule(size_t Index);
-		ZEModule*						CreateModule(const char* Name);
-		ZEModule*						CreateModule(ZEModuleType ModuleType);
+ZEOption* ZEOptionSection::GetOption(const char* OptionName)
+{
+	for(size_t I=0; I < Options.GetCount(); I++)
+		if (_stricmp(Options[I]->GetName(), OptionName) == 0)
+			return Options[I];
+	return NULL;
+}
 
-		bool							LoadInternalModule(ZEModuleDescription* ModuleDesc);		
-		bool							LoadExternalModule(const char* FileName);
-		void							SeekAndLoadExternalModules(const char* Directory);
-		void							UnloadModule(ZEModuleDescription* ModuleDesc);
-										
-										ZEModuleManager();
-										~ZEModuleManager();
-};
-#endif
+ZEOption* ZEOptionSection::GetOption(size_t Index)
+{
+	if (Index >= 0 && Index < Options.GetCount())
+			return Options[Index];
+	else
+		return NULL;
+}
+
+void ZEOptionSection::SetEventHandler(ZEOptionsChangedEventCallback NewEventHandler)
+{
+	EventHandler = NewEventHandler;
+}
+
+bool ZEOptionSection::HasChanges()
+{
+	return Changed;
+}
+
+void ZEOptionSection::CommitChanges()
+{
+	if (!Changed)
+	{
+		zeWarning("Option Section",  "Wrong change commit made on option section. Options in option section was not changed. (Option Section Name : \"%s\")", this->GetName());
+	}
+	else
+		if (EventHandler != NULL)
+			EventHandler();
+}
+
+void ZEOptionSection::ResetChanges()
+{
+	ZEOption* CurrOption;
+	for (size_t I = 0; I < Options.GetCount(); I++)
+	{
+		CurrOption = Options[I];
+		if (CurrOption->IsChanged())
+			CurrOption->ChangeCommitted();
+	}
+}
 
 
+ZEOptionSection::ZEOptionSection()
+{
 
+}
 
+ZEOptionSection::ZEOptionSection(const char* Name)
+{
+	SetName(Name);
+}
 
+ZEOptionSection::~ZEOptionSection()
+{
+	for (size_t I = 0; I < Options.GetCount(); I++)
+		delete Options[I];
+}

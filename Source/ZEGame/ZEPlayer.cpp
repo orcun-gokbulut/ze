@@ -160,10 +160,10 @@ void ZEPlayer::Tick(float Time)
 				Pitch = Pitch - 0.005f * Current->AxisValue;
 				break;
 			case ACTIONID_CONSOLE:
-				if (zeConsole->IsVisible())
-					zeConsole->HideConsole();
+				if (ZEConsole::GetInstance()->IsVisible())
+					ZEConsole::GetInstance()->HideConsole();
 				else
-					zeConsole->ShowConsole();
+					ZEConsole::GetInstance()->ShowConsole();
 				break;
 			case ACTIONID_RAYCAST:
 				/*ZEQuaternion::VectorProduct(RayDirection, Camera->GetWorldRotation(), ZEVector3(0.0f, 0.0f, 1.0f));

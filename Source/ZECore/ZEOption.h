@@ -38,25 +38,21 @@
 #define __ZE_OPTION_H__
 
 #include "ZEDS\ZENamed.h"
-#include "ZEDS\ZEArray.h"
 #include "ZEDS\ZETypedVariant.h"
 #include "ZEFastDelegate.h"
-#include "ZECommand.h"
-
-#define zeOptions ZEOptionManager::GetInstance()
 
 enum ZEOptionAttribute
 {
-	ZEOPTIONATTRIBUTE_NORMAL,			// This option is public.
-	ZEOPTIONATTRIBUTE_HIDDEN,			// This option won't be written to option files. Exp : Game::Cheats=true ;)
-	ZEOPTIONATTRIBUTE_INTERNAL,	    // This option won't be readen/writen from/to option files.
+	ZE_OA_NORMAL,
+	ZE_OA_HIDDEN,
+	ZE_OA_INTERNAL,
 };
 
 enum ZEOptionType
 {
-	OPTIONTYPE_NORMAL,
-	OPTIONTYPE_ENUMERATOR,
-	OPTIONTYPE_RANGED
+	ZE_OT_NORMAL,
+	ZE_OT_ENUMERATOR,
+	ZE_OT_RANGED
 };
 
 class ZEOption;
@@ -100,75 +96,4 @@ class ZEOption : public ZENamed
 										 ZEOptionAttribute InitialAttribute);
 };
 
-class ZEOptionSection : public ZENamed
-{
-	friend class ZEOption;
-	private:
-		ZEArray<ZEOption*>				Options;
-		bool							Changed;
-		ZEOptionsChangedEventCallback	EventHandler;
-
-	public:
-		bool							AddOption(ZEOption* Option);
-		void							DeleteOption(size_t Index);
-		size_t							GetNumberOfOptions();
-
-		ZEOption*						GetOption(const char* OptionName);
-		ZEOption*						GetOption(size_t Index);
-
-		void							SetEventHandler (ZEOptionsChangedEventCallback NewEventHandler);
-		
-		bool							HasChanges();
-		void							CommitChanges();
-		void							ResetChanges();
-
-										ZEOptionSection();
-										ZEOptionSection(const char* Name);
-										~ZEOptionSection();
-};
-
-class ZEOptionManager
-{
-	private:
-		ZECommandSection			Commands;
-		ZEArray<ZEOptionSection*>	Sections;
-
-		bool						MatchSet(char* Line, char* Match);
-		void						MatchOption(char* Line, char* MatchName, char* MatchValue);
-
-		bool						LoadCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						SaveCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ListSectionsCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ListOptionsCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						CommitChangesCommand(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						ResetChangesCommand(ZECommand* Command, const ZECommandParameterList* Params);
-
-	public:
-		bool						RegisterSection (ZEOptionSection* Ref);
-		bool						UnregisterSection (ZEOptionSection* Ref);
-		
-		size_t						GetNumberOfSections();
-		
-		ZEOptionSection*			GetSection(const char* Name);
-		ZEOptionSection*			GetSection(size_t Index);
-
-		ZEOption*					GetOption(const char* SectionName, const char* Name);
-
-		void						Save(const char *FileName);
-		void						Load(const char *FileName);
-		void						ParseParameters(const char *Parameters);
-		
-		void						CommitChanges();
-		void						ResetChanges();
-
-		static ZEOptionManager*		GetInstance();
-
-									ZEOptionManager();
-									~ZEOptionManager();
-};
 #endif
-
-
-
-
-

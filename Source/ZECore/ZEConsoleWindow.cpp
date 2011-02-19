@@ -65,7 +65,7 @@ INT_PTR CALLBACK InputBoxCallback(HWND hwndEdit, UINT uMsg, WPARAM wParam, LPARA
 
 				if (wParam == VK_ESCAPE)
 				{
-					zeConsole->HideConsole();
+					ZEConsole::GetInstance()->HideConsole();
 					return 0;
 				}
 				if (wParam == VK_RETURN) 
@@ -73,7 +73,7 @@ INT_PTR CALLBACK InputBoxCallback(HWND hwndEdit, UINT uMsg, WPARAM wParam, LPARA
 					char Buffer[100];
 					SendMessage(hwndEdit, WM_GETTEXT, 100, (LPARAM)Buffer);
 					SendMessage(hwndEdit, WM_SETTEXT, 0, (LPARAM)"");
-					zeConsole->Input(Buffer);
+					ZEConsole::GetInstance()->Input(Buffer);
 					 return 0;
 				}
 				return CallWindowProc(OrgInputBoxCallback, hwndEdit, uMsg, wParam, lParam);
@@ -109,7 +109,7 @@ INT_PTR CALLBACK ConsoleCallback(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
 					char Buffer[100];
 					SendMessage(GetDlgItem(hwndDlg, IDC_INPUT), WM_GETTEXT, 100, (LPARAM)Buffer);
 					SendMessage(GetDlgItem(hwndDlg, IDC_INPUT), WM_SETTEXT, 0, (LPARAM)"");
-					zeConsole->Input(Buffer);
+					ZEConsole::GetInstance()->Input(Buffer);
 					break;
 				}
 			}
@@ -147,8 +147,8 @@ bool ZEConsoleWindow::Initialize()
 
 	ShowWindow((HWND)Handle, SW_HIDE);
 
-	for (size_t I = 0; I < zeConsole->OutputHistory.GetCount(); I++)
-		Output(zeConsole->OutputHistory[I]);
+	for (size_t I = 0; I < ZEConsole::GetInstance()->OutputHistory.GetCount(); I++)
+		Output(ZEConsole::GetInstance()->OutputHistory[I]);
 
 	return true;
 }

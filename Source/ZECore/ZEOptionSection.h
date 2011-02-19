@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModuleManager.h
+ Zinek Engine - ZEOptionSection.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,43 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODULE_MANAGER_H__
-#define __ZE_MODULE_MANAGER_H__
+#ifndef	__ZE_OPTION_SECTION_H__
+#define __ZE_OPTION_SECTION_H__
 
+#include "ZEDS\ZENamed.h"
 #include "ZEDS\ZEArray.h"
-#include "ZEOptionSection.h"
-#include "ZEModule.h"
+#include "ZEDS\ZETypedVariant.h"
+#include "ZEFastDelegate.h"
+#include "ZECommand.h"
+#include "ZECommandSection.h"
 
-class ZEModuleManager
+typedef fastdelegate::FastDelegate0<void> ZEOptionsChangedEventCallback;
+
+class ZEOptionSection : public ZENamed
 {
+	friend class ZEOption;
 	private:
-		ZEArray<ZEModuleDescription*>	ModuleList;
-		bool							CheckModule(ZEModuleDescription* ModuleDesc);
+		ZEArray<ZEOption*>				Options;
+		bool							Changed;
+		ZEOptionsChangedEventCallback	EventHandler;
 
 	public:
-		static ZEOptionSection			ModuleManagerOptions;
+		bool							AddOption(ZEOption* Option);
+		void							DeleteOption(size_t Index);
+		size_t							GetNumberOfOptions();
 
-		size_t							GetModuleCount();
-		ZEModuleDescription*			GetModuleDescription(size_t Index);
-		ZEModuleDescription*			GetModuleDescription(const char* Name);
-		ZEModuleDescription*			GetModuleDescription(ZEModuleType ModuleType);
+		ZEOption*						GetOption(const char* OptionName);
+		ZEOption*						GetOption(size_t Index);
 
-		ZEModule*						CreateModule(size_t Index);
-		ZEModule*						CreateModule(const char* Name);
-		ZEModule*						CreateModule(ZEModuleType ModuleType);
+		void							SetEventHandler (ZEOptionsChangedEventCallback NewEventHandler);
 
-		bool							LoadInternalModule(ZEModuleDescription* ModuleDesc);		
-		bool							LoadExternalModule(const char* FileName);
-		void							SeekAndLoadExternalModules(const char* Directory);
-		void							UnloadModule(ZEModuleDescription* ModuleDesc);
-										
-										ZEModuleManager();
-										~ZEModuleManager();
+		bool							HasChanges();
+		void							CommitChanges();
+		void							ResetChanges();
+
+										ZEOptionSection();
+										ZEOptionSection(const char* Name);
+										~ZEOptionSection();
 };
+
 #endif
-
-
-
-
-

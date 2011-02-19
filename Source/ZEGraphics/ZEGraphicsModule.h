@@ -38,7 +38,7 @@
 #define __ZE_GRAPHICS_MODULE_H__
 
 #include "ZECore\ZEModule.h"
-#include "ZECore\ZEOption.h"
+#include "ZECore\ZEOptionSection.h"
 
 #define zeGraphics ZEGraphicsModule::GetInstance()
 

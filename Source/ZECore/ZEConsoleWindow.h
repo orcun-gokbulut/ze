@@ -59,8 +59,8 @@ class ZEConsoleWindow : public ZEConsoleInterface
 
 		void					ProcessConsole();
 
-								ZEConsoleWindow(void);
-								~ZEConsoleWindow(void);
+								ZEConsoleWindow();
+								~ZEConsoleWindow();
 };
 #endif
 

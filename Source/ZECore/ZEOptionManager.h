@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModuleManager.h
+ Zinek Engine - ZEOptionManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,57 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODULE_MANAGER_H__
-#define __ZE_MODULE_MANAGER_H__
+#ifndef	__ZE_OPTION_MANAGER_H__
+#define __ZE_OPTION_MANAGER_H__
 
-#include "ZEDS\ZEArray.h"
+#include "ZEOption.h"
 #include "ZEOptionSection.h"
-#include "ZEModule.h"
+#include "ZEDS\ZENamed.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZETypedVariant.h"
+#include "ZEFastDelegate.h"
+#include "ZECommand.h"
+#include "ZECommandSection.h"
 
-class ZEModuleManager
+class ZEOptionManager
 {
+	friend class ZECore;
 	private:
-		ZEArray<ZEModuleDescription*>	ModuleList;
-		bool							CheckModule(ZEModuleDescription* ModuleDesc);
+		ZECommandSection			Commands;
+		ZEArray<ZEOptionSection*>	Sections;
+
+		bool						MatchSet(char* Line, char* Match);
+		void						MatchOption(char* Line, char* MatchName, char* MatchValue);
+
+		bool						LoadCommand(ZECommand* Command, const ZECommandParameterList* Params);
+		bool						SaveCommand(ZECommand* Command, const ZECommandParameterList* Params);
+		bool						ListSectionsCommand(ZECommand* Command, const ZECommandParameterList* Params);
+		bool						ListOptionsCommand(ZECommand* Command, const ZECommandParameterList* Params);
+		bool						CommitChangesCommand(ZECommand* Command, const ZECommandParameterList* Params);
+		bool						ResetChangesCommand(ZECommand* Command, const ZECommandParameterList* Params);
+
+									ZEOptionManager();
+									~ZEOptionManager();
 
 	public:
-		static ZEOptionSection			ModuleManagerOptions;
+		bool						RegisterSection (ZEOptionSection* Ref);
+		bool						UnregisterSection (ZEOptionSection* Ref);
+		
+		size_t						GetNumberOfSections();
+		
+		ZEOptionSection*			GetSection(const char* Name);
+		ZEOptionSection*			GetSection(size_t Index);
 
-		size_t							GetModuleCount();
-		ZEModuleDescription*			GetModuleDescription(size_t Index);
-		ZEModuleDescription*			GetModuleDescription(const char* Name);
-		ZEModuleDescription*			GetModuleDescription(ZEModuleType ModuleType);
+		ZEOption*					GetOption(const char* SectionName, const char* Name);
 
-		ZEModule*						CreateModule(size_t Index);
-		ZEModule*						CreateModule(const char* Name);
-		ZEModule*						CreateModule(ZEModuleType ModuleType);
+		void						Save(const char *FileName);
+		void						Load(const char *FileName);
+		void						ParseParameters(const char *Parameters);
+		
+		void						CommitChanges();
+		void						ResetChanges();
 
-		bool							LoadInternalModule(ZEModuleDescription* ModuleDesc);		
-		bool							LoadExternalModule(const char* FileName);
-		void							SeekAndLoadExternalModules(const char* Directory);
-		void							UnloadModule(ZEModuleDescription* ModuleDesc);
-										
-										ZEModuleManager();
-										~ZEModuleManager();
+		static ZEOptionManager*		GetInstance();
 };
+
 #endif
-
-
-
-
-

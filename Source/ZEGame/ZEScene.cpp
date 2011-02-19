@@ -703,7 +703,7 @@ ZEScene::ZEScene()
 
 	memset(&CullStatistics, 0, sizeof(ZECullStatistics));
 
-	VisualDebugElements = ZE_VDE_ENTITY_AXISALIGNED_BOUNDINGBOX;
+	VisualDebugElements = ZE_VDE_ALL;
 }
 
 ZEScene::~ZEScene()

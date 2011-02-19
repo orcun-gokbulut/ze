@@ -34,7 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEConsole.h"
-#include "ZECommand.h"
+#include "ZECommandManager.h"
+#include "ZEOptionManager.h"
 #include "ZEOption.h"
 #include "ZECore.h"
 #include <ctype.h>
@@ -69,7 +70,7 @@ ZEConsole* ZEConsole::Instance = NULL;
 
 void ZEConsoleInterface::Input(const char* Input)
 {
-	zeConsole->Input(Input);
+	ZEConsole::GetInstance()->Input(Input);
 }
 
 
@@ -327,7 +328,7 @@ bool ZEConsole::ParseInput(const char* Input)
 			case PARSERSTATE_PARAMETER:
 				if (ParseParameters(Input, Cursor, &ParamList))
 				{				
-					if (zeCommands->ExecuteCommand(Section, Name, &ParamList))
+					if (ZECommandManager::GetInstance()->ExecuteCommand(Section, Name, &ParamList))
 						State = PARSERSTATE_NEXTCOMMAND;
 					else
 					{
@@ -342,7 +343,7 @@ bool ZEConsole::ParseInput(const char* Input)
 			case PARSERSTATE_ASSINGMENT:
 				if (ParseConstant(Input, Cursor, &Constant))
 				{	
-					Opt = zeOptions->GetOption(Section, Name);
+					Opt = ZEOptionManager::GetInstance()->GetOption(Section, Name);
 					if (Opt != NULL)
 						if (Opt->GetValueType() == Constant.GetType())
 						{
@@ -365,7 +366,7 @@ bool ZEConsole::ParseInput(const char* Input)
 				break;
 
 			case PARSERSTATE_DISPLAY:
-				Opt = zeOptions->GetOption(Section, Name);
+				Opt = ZEOptionManager::GetInstance()->GetOption(Section, Name);
 				if (Opt != NULL)
 				{
 					switch(Opt->GetValueType())

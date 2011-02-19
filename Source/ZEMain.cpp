@@ -42,6 +42,7 @@
 #include "ZECore\ZECore.h"
 #include "ZECore\ZEConsoleWindow.h"
 #include "ZECore\ZEModuleManager.h"
+#include "ZECore\ZEOptionManager.h"
 #include "ZECore\ZEWindow.h"
 
 #include "ZEDebug\ZEPhysicsDebugModule.h"

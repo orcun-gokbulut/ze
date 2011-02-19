@@ -93,7 +93,7 @@ bool ZESceneDebugDraw::Initialize()
 
 	RenderOrder.SetZero();
 	RenderOrder.Material = Material;
-	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_Z_CULLING;
+	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 	RenderOrder.PrimitiveType = ZE_ROPT_LINE;
 	RenderOrder.VertexBuffer = &VertexBuffer;

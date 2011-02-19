@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModuleManager.h
+ Zinek Engine - ZECommandSection.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,33 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODULE_MANAGER_H__
-#define __ZE_MODULE_MANAGER_H__
+#ifndef	__ZE_COMMAND_SECTION_H__
+#define __ZE_COMMAND_SECTION_H__
 
+#include "ZEDS\ZENamed.h"
 #include "ZEDS\ZEArray.h"
-#include "ZEOptionSection.h"
-#include "ZEModule.h"
+#include "ZEDS\ZEVariant.h"
 
-class ZEModuleManager
+class ZECommand;
+class ZECommandSection : public ZENamed
 {
 	private:
-		ZEArray<ZEModuleDescription*>	ModuleList;
-		bool							CheckModule(ZEModuleDescription* ModuleDesc);
+		ZEArray<ZECommand*>			Commands;
 
 	public:
-		static ZEOptionSection			ModuleManagerOptions;
+		size_t						GetNumberOfCommands();
+		
+		bool						AddCommand(ZECommand* Command);
+		void						DeleteCommand(size_t Index);
 
-		size_t							GetModuleCount();
-		ZEModuleDescription*			GetModuleDescription(size_t Index);
-		ZEModuleDescription*			GetModuleDescription(const char* Name);
-		ZEModuleDescription*			GetModuleDescription(ZEModuleType ModuleType);
+		ZECommand*					GetCommand(const char* Name);
+		ZECommand*					GetCommand(size_t Index);
 
-		ZEModule*						CreateModule(size_t Index);
-		ZEModule*						CreateModule(const char* Name);
-		ZEModule*						CreateModule(ZEModuleType ModuleType);
+		bool						ExecuteCommand(const char* Name, ZEArray<ZEVariant>* Paramlist);
 
-		bool							LoadInternalModule(ZEModuleDescription* ModuleDesc);		
-		bool							LoadExternalModule(const char* FileName);
-		void							SeekAndLoadExternalModules(const char* Directory);
-		void							UnloadModule(ZEModuleDescription* ModuleDesc);
-										
-										ZEModuleManager();
-										~ZEModuleManager();
+									ZECommandSection();
+									ZECommandSection(const char* Name);
+									~ZECommandSection();
 };
+
 #endif
-
-
-
-
-

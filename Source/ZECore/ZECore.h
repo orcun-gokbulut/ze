@@ -37,6 +37,7 @@
 #ifndef	__ZE_CORE_H__
 #define __ZE_CORE_H__
 
+#include "ZEAPI.h"
 #include "ZEOption.h"
 
 #define zeCore ZECore::GetInstance()
@@ -102,10 +103,13 @@ class ZECore
 		ZEGame*							Game;
 		ZENetworkModule*				Network;
 
-		ZEDebugModule*				DebugComponent;
+		ZEDebugModule*					DebugComponent;
 
 		bool							InitializeModule(ZEModule* Module);
 		void							DeInitializeModule(ZEModule** Module);
+
+										ZECore();
+										~ZECore();
 
 	public:
 		static ZEOptionSection			CoreOptions;
@@ -140,7 +144,7 @@ class ZECore
 		ZEGame*							GetGame();
 
 		void							SetDebugComponent(ZEDebugModule* Component);
-		ZEDebugModule*				GetDebugComponent();
+		ZEDebugModule*					GetDebugComponent();
 
 		float							GetFrameTime();
 		float							GetRuningTime();
@@ -170,10 +174,7 @@ class ZECore
 
 		void							MainLoop();
 
-		static ZECore*					GetInstance();
-
-										ZECore();
-										~ZECore();
+		ZEAPI static ZECore*			GetInstance();
 };
 #endif
 

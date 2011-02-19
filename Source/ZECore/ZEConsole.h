@@ -41,9 +41,8 @@
 #include "ZEDS\ZEVariant.h"
 #include <string.h>
 
-#define zeConsole ZEConsole::GetInstance()
-#define zeLog(Module, ...) ZEConsole::GetInstance()->Log(Module, __VA_ARGS__)
 #define zeOutput(...) ZEConsole::GetInstance()->Output(__VA_ARGS__)
+#define zeLog(Module, ...) ZEConsole::GetInstance()->Log(Module, __VA_ARGS__)
 
 class ZEConsoleInterface
 {
@@ -63,6 +62,7 @@ class ZEConsoleInterface
 
 class ZEConsole
 {	
+	friend class ZECore;
 	private:
 		static ZEConsole*		Instance;
 
@@ -76,6 +76,9 @@ class ZEConsole
 		int						ParseOperator(const char* Input, int &Cursor);
 		bool					ParseScope(const char* Input, int &Cursor);
 		bool					ParseParameters(const char* Input, int &Cursor, ZEArray<ZEVariant>* Output);
+
+								ZEConsole();
+								~ZEConsole();
 
 	public:
 		ZEArray<char*>			OutputHistory;
@@ -97,9 +100,6 @@ class ZEConsole
 		void					Input(const char* Input);
 
 		static ZEConsole*		GetInstance();
-
-								ZEConsole();
-								~ZEConsole();
 };
 
 #endif

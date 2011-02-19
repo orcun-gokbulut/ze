@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModuleManager.h
+ Zinek Engine - ZECommandManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,39 +34,41 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODULE_MANAGER_H__
-#define __ZE_MODULE_MANAGER_H__
+#ifndef	__ZE_COMMAND_MANAGER_H__
+#define __ZE_COMMAND_MANAGER_H__
 
 #include "ZEDS\ZEArray.h"
-#include "ZEOptionSection.h"
-#include "ZEModule.h"
+#include "ZECommand.h"
+#include "ZECommandSection.h"
 
-class ZEModuleManager
+class ZECommandManager 
 {
+	friend class ZECore;
 	private:
-		ZEArray<ZEModuleDescription*>	ModuleList;
-		bool							CheckModule(ZEModuleDescription* ModuleDesc);
+		ZEArray<ZECommandSection*>	Sections;
+		
+		bool						Callback_ListSections(ZECommand* Command, const ZECommandParameterList* Params);
+		bool						Callback_ListCommands(ZECommand* Command, const ZECommandParameterList* Params);
+
+		ZECommandSection			Commands;
+
+									ZECommandManager();
+									~ZECommandManager();
 
 	public:
-		static ZEOptionSection			ModuleManagerOptions;
+		size_t						GetNumberOfSections();
 
-		size_t							GetModuleCount();
-		ZEModuleDescription*			GetModuleDescription(size_t Index);
-		ZEModuleDescription*			GetModuleDescription(const char* Name);
-		ZEModuleDescription*			GetModuleDescription(ZEModuleType ModuleType);
+		ZECommandSection*			GetCommandSection(const char* Name);
+		ZECommand*					GetCommand(const char* Section, const char* Name);
 
-		ZEModule*						CreateModule(size_t Index);
-		ZEModule*						CreateModule(const char* Name);
-		ZEModule*						CreateModule(ZEModuleType ModuleType);
-
-		bool							LoadInternalModule(ZEModuleDescription* ModuleDesc);		
-		bool							LoadExternalModule(const char* FileName);
-		void							SeekAndLoadExternalModules(const char* Directory);
-		void							UnloadModule(ZEModuleDescription* ModuleDesc);
-										
-										ZEModuleManager();
-										~ZEModuleManager();
+		bool						ExecuteCommand(const char* Section, const char* Name, ZEArray<ZEVariant>* ParamList);
+				
+		bool						RegisterSection(ZECommandSection* Section);
+		bool						UnregisterSection(ZECommandSection* Section);
+		
+		static ZECommandManager*	GetInstance();
 };
+
 #endif
 
 

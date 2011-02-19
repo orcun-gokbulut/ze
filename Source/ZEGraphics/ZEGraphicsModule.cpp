@@ -35,6 +35,7 @@
 
 #pragma once
 #include "ZEGraphicsModule.h"
+#include "ZECore\ZEOptionManager.h"
 #include "ZECore\ZECore.h"
 #include <freeimage.h>
 
@@ -49,29 +50,29 @@ void ZEGraphicsModule::BaseInitialize()
 {
 	FreeImage_Initialise();
 	GraphicsOptions.SetName("Graphics");
-	GraphicsOptions.AddOption(new ZEOption("ScreenWidth", 640, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ScreenHeight", 480, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("Fullscreen", false, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("VerticalSync", false, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("Antialiasing", 0, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilter", 0, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilterLevel", 8, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ShaderQuality", 5, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("TextureQuality", 5, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ModelQuality", 5, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("PostEffectQuality", 5, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ShadowQuality", 1, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("LightQuantity", 1, ZEOPTIONATTRIBUTE_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("NearZ", 0.1f, ZEOPTIONATTRIBUTE_INTERNAL));
-	GraphicsOptions.AddOption(new ZEOption("FarZ", 1000.0f, ZEOPTIONATTRIBUTE_INTERNAL));
-	zeOptions->RegisterSection(&GraphicsOptions);
+	GraphicsOptions.AddOption(new ZEOption("ScreenWidth", 640, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("ScreenHeight", 480, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("Fullscreen", false, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("VerticalSync", false, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("Antialiasing", 0, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilter", 0, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilterLevel", 8, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("ShaderQuality", 5, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("TextureQuality", 5, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("ModelQuality", 5, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("PostEffectQuality", 5, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("ShadowQuality", 1, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("LightQuantity", 1, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("NearZ", 0.1f, ZE_OA_INTERNAL));
+	GraphicsOptions.AddOption(new ZEOption("FarZ", 1000.0f, ZE_OA_INTERNAL));
+	ZEOptionManager::GetInstance()->RegisterSection(&GraphicsOptions);
 }
 
 void ZEGraphicsModule::BaseDeinitialize()
 {
 	FreeImage_DeInitialise();
-	zeOptions->UnregisterSection(&GraphicsOptions);
+	ZEOptionManager::GetInstance()->UnregisterSection(&GraphicsOptions);
 }
 
 void ZEGraphicsModule::SetScreenSize(int Width, int Height)

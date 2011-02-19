@@ -142,6 +142,7 @@ class ZETypedVariant;
 
 class ZEError
 {
+	friend class					ZECore;
 	private:
 		bool						FileLogging;
 		char						LogFileName[ZEERROR_MAX_FILENAME_SIZE];
@@ -149,6 +150,9 @@ class ZEError
 		static char*				ErrorLevelToString(ZEErrorType ErrorLevel);
 		void						LogToFile(const char* Module, ZEErrorType ErrorType, const char* Error);
 		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
+
+									ZEError();
+									~ZEError();
 	public:
 		void						EnableFileLogging();
 		void						DisableFileLogging();
@@ -160,9 +164,6 @@ class ZEError
 		void						RaiseAssert(ZEAssertType AssertType, const char* Function, const char* File, int Line, const char* Message, ...);
 
 		static ZEError*				GetInstance();
-
-									ZEError();
-									~ZEError();
 };
 
 #endif

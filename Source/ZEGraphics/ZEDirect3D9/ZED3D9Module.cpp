@@ -41,13 +41,13 @@
 #include "ZECore\ZEWindow.h"
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEConsole.h"
+#include "ZECore\ZEOptionManager.h"
 #include "ZED3D9FixedMaterial.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9Texture3D.h"
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9VertexBuffer.h"
 #include "ZED3D9VertexDeclaration.h"
-//#include "ZEPostProcessor\ZED3D9PostProcessor.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9ShadowRenderer.h"
 #include "ZED3D9UIMaterial.h"
@@ -115,13 +115,13 @@ bool ZED3D9Module::Initialize()
 	zeLog("Direct3D9", "Initializing Direct3D 9 module.");
 
 	// Read options
-	ScreenWidth = zeOptions->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger();
-	ScreenHeight = zeOptions->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger();
-	Fullscreen = zeOptions->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean();
-	FarZ = zeOptions->GetOption("Graphics", "FarZ")->GetValue().GetFloat();
-	NearZ = zeOptions->GetOption("Graphics", "NearZ")->GetValue().GetFloat();
-	VerticalSync = zeOptions->GetOption("Graphics", "VerticalSync")->GetValue().GetBoolean();
-	AnisotropicFilter = zeOptions->GetOption("Graphics", "AnisotropicFilter")->GetValue().GetInteger();
+	ScreenWidth = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger();
+	ScreenHeight = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger();
+	Fullscreen = ZEOptionManager::GetInstance()->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean();
+	FarZ = ZEOptionManager::GetInstance()->GetOption("Graphics", "FarZ")->GetValue().GetFloat();
+	NearZ = ZEOptionManager::GetInstance()->GetOption("Graphics", "NearZ")->GetValue().GetFloat();
+	VerticalSync = ZEOptionManager::GetInstance()->GetOption("Graphics", "VerticalSync")->GetValue().GetBoolean();
+	AnisotropicFilter = ZEOptionManager::GetInstance()->GetOption("Graphics", "AnisotropicFilter")->GetValue().GetInteger();
 
 	HRESULT Result;
 	

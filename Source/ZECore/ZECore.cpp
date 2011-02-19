@@ -48,6 +48,8 @@
 #include "ZESound\ZESoundModule.h"
 #include "ZEGame\ZEGame.h"
 #include "ZEDebug\ZEDebugModule.h"
+#include "ZEOptionManager.h"
+#include "ZECommandManager.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>

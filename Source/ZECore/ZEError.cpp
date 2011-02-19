@@ -37,6 +37,8 @@
 #include "ZECore.h"
 #include "ZEConsole.h"
 #include "ZEConsoleWindow.h"
+#include "ZEOptionManager.h"
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <assert.h>
@@ -151,7 +153,7 @@ void ZEError::RaiseError(const char* From, ZEErrorType Level, const char* ErrorF
 		zeOutput("[%s] %s : %s\r\n", From, ErrorLevelToString(Level), Buffer);
 	
 	if (Level == ZE_EL_NONCRITICAL)
-		zeConsole->ShowConsole();
+		ZEConsole::GetInstance()->ShowConsole();
 
 	if (Level == ZE_EL_CRITICAL)
 	{
@@ -188,14 +190,14 @@ ZEError::ZEError()
 	FileLogging = false;
 	LogFileName[0] = '\0';
 	ErrorOptions.SetName("Error");
-	ErrorOptions.AddOption(new ZEOption("FileLogging", false, ZEOPTIONATTRIBUTE_NORMAL));
-	ErrorOptions.AddOption(new ZEOption("LogFile", "error.log", ZEOPTIONATTRIBUTE_NORMAL));
-	zeOptions->RegisterSection(&ErrorOptions);
+	ErrorOptions.AddOption(new ZEOption("FileLogging", false, ZE_OA_NORMAL));
+	ErrorOptions.AddOption(new ZEOption("LogFile", "error.log", ZE_OA_NORMAL));
+	ZEOptionManager::GetInstance()->RegisterSection(&ErrorOptions);
 }
 
 ZEError::~ZEError()
 {
-	zeOptions->UnregisterSection(&ErrorOptions);
+	ZEOptionManager::GetInstance()->UnregisterSection(&ErrorOptions);
 }
 
 

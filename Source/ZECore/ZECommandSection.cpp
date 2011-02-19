@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModuleManager.h
+ Zinek Engine - ZECommandSection.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,73 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODULE_MANAGER_H__
-#define __ZE_MODULE_MANAGER_H__
+#include "ZECommand.h"
+#include "ZECommandSection.h"
+#include "ZEError.h"
+#include <string.h>
 
-#include "ZEDS\ZEArray.h"
-#include "ZEOptionSection.h"
-#include "ZEModule.h"
-
-class ZEModuleManager
+size_t ZECommandSection::GetNumberOfCommands()
 {
-	private:
-		ZEArray<ZEModuleDescription*>	ModuleList;
-		bool							CheckModule(ZEModuleDescription* ModuleDesc);
+	return Commands.GetCount();
+}
 
-	public:
-		static ZEOptionSection			ModuleManagerOptions;
+bool ZECommandSection::AddCommand(ZECommand* Command)
+{
+	if (GetCommand(Command->GetName()) != NULL)
+	{
+		zeError("Command Section",
+			"Can not add command to command section. An command with same name is already exist in the command section. (Command Section Name : \"%s\", Command Name : \"%s\")", 
+			this->GetName(),
+			Command->GetName());
+		return false;
+	}
+	Commands.Add(Command);
+	return true;
+}
 
-		size_t							GetModuleCount();
-		ZEModuleDescription*			GetModuleDescription(size_t Index);
-		ZEModuleDescription*			GetModuleDescription(const char* Name);
-		ZEModuleDescription*			GetModuleDescription(ZEModuleType ModuleType);
+ZECommand* ZECommandSection::GetCommand(const char* Name)
+{
+	for(size_t I=0; I < Commands.GetCount(); I++)
+		if (_stricmp(Commands[I]->GetName(), Name) == 0)
+			return Commands[I];
+	return NULL;
+}
 
-		ZEModule*						CreateModule(size_t Index);
-		ZEModule*						CreateModule(const char* Name);
-		ZEModule*						CreateModule(ZEModuleType ModuleType);
+ZECommand* ZECommandSection::GetCommand(size_t Index)
+{
+	return Commands.GetItem(Index);
+}
 
-		bool							LoadInternalModule(ZEModuleDescription* ModuleDesc);		
-		bool							LoadExternalModule(const char* FileName);
-		void							SeekAndLoadExternalModules(const char* Directory);
-		void							UnloadModule(ZEModuleDescription* ModuleDesc);
-										
-										ZEModuleManager();
-										~ZEModuleManager();
-};
-#endif
+void ZECommandSection::DeleteCommand(size_t Index)
+{
+	Commands.DeleteAt(Index);
+}
 
+bool ZECommandSection::ExecuteCommand(const char* Name, ZEArray<ZEVariant>* Paramlist)
+{
+	ZECommand* Temp = GetCommand(Name);
+	if (Temp != NULL)
+	{
+		Temp->Execute(Paramlist);
+		return true;
+	}
+	else 
+		return false;
+}
 
+ZECommandSection::ZECommandSection()
+{
+	SetName("");
+}
 
+ZECommandSection::ZECommandSection(const char* Name)
+{
+	SetName(Name);
+}
 
-
+ZECommandSection::~ZECommandSection()
+{
+	for(size_t I = 0; I < Commands.GetCount(); I++)
+		delete Commands[I];
+	Commands.Clear();
+}
