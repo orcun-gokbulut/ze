@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZENamed.h
+ Zinek Engine - ZEAPI.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,25 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_NAMED_H__
-#define __ZE_NAMED_H__
+#ifndef	__ZE_API_H__
+#define __ZE_API_H__
 
-class ZENamed
-{
-	private:
-		char*			Name;
-
-	public:
-		void			SetName(const char* NewName);
-		const char*		GetName();
-
-						ZENamed();
-						~ZENamed();
-};
-
+#ifdef ZE_API_BUILDING_DLL
+	#define ZEAPI __declspec(dllimport)
+#else
+	#define ZEAPI __declspec(dllexport)
 #endif
 
-
-
-
-
+#endif
