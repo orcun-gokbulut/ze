@@ -48,17 +48,12 @@
 #include "ZEPhysics\ZEPhysicalRigidBody.h"
 #include "ZEPhysics\ZEPhysicalShapes.h"
 #include "ZEPhysics\ZEPhysicalStaticMesh.h"
-#include "ZEPhysics\ZEPhysX\ZEPhysXPhysicalWorld.h"
 #include "ZEModel\ZEModel.h"
 #include "ZEModel\ZEModelMesh.h"
 #include "ZEModel\ZEModelBone.h"
 #include "ZEGame\ZEEntityProvider.h"
 #include "ZEGraphics\ZECamera.h"
 #include "ZEGraphics\ZEPointLight.h"
-
-#include <NxScene.h>
-#include <NxActor.h>
-#include <NxPlaneShapeDesc.h>
 
 void ZEPhysicsDebugModule::TransformChanged(const ZEPhysicalTransformChange& TransformChange)
 {
@@ -94,7 +89,7 @@ bool ZEPhysicsDebugModule::Initialize()
 
 	if (PhysicalRigidBody == NULL)
 	{
-		ZEPhysXPhysicalWorld* World = (ZEPhysXPhysicalWorld*)zeScene->GetPhysicalWorld();
+		ZEPhysicalWorld* World = (ZEPhysicalWorld*)zeScene->GetPhysicalWorld();
 
 		PhysicalRigidBody = ZEPhysicalRigidBody::CreateInstance();
 		PhysicalRigidBody->SetPosition(ZEVector3(0.0f, 100.0f, 1.0f));

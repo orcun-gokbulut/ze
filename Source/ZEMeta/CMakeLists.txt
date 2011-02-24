@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEData.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,6 +30,27 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
+cmake_minimum_required(VERSION 2.8)
+
+
+add_source(ZEAnimation.cpp ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEAnimation.h ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEClass.cpp ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEClass.h ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEContainer.cpp ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEContainer.h ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEEvent.cpp ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEEvent.h ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEMethod.cpp ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEMethod.h ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEPostProcessor.cpp ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEPostProcessor.h ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEProperty.cpp ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEProperty.h ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEProvider.cpp ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEProvider.h ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
+
+add_library(ZEMeta ${ZEMeta_SOURCE_FILES})

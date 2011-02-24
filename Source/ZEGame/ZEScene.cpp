@@ -703,7 +703,7 @@ ZEScene::ZEScene()
 
 	memset(&CullStatistics, 0, sizeof(ZECullStatistics));
 
-	VisualDebugElements = ZE_VDE_ALL;
+	VisualDebugElements = ZE_VDE_NONE;
 }
 
 ZEScene::~ZEScene()
