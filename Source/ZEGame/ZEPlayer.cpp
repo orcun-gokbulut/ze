@@ -259,8 +259,8 @@ ZEPlayer::ZEPlayer()
 	Light->SetFOV(ZE_PI_2);
 	Light->SetAspectRatio(1.0f);
 	Light->SetCastsShadow(true);
-	//Light->SetPosition(ZEVector3(0.0f, -2.0f, 0.0f));
-	//RegisterComponent(Light);
+	Light->SetPosition(ZEVector3(0.0f, -2.0f, 0.0f));
+	RegisterComponent(Light);
 }
 
 ZEPlayer::~ZEPlayer()

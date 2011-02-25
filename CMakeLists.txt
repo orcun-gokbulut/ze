@@ -34,10 +34,11 @@
 #ZE_SOURCE_PROCESSOR_END()
 
 cmake_minimum_required (VERSION 2.8)
+
 project (ZinekEngine) 
 
-include(CPack)
- 
+## Configuration
+#########################################################################################
 set(CMAKE_MODULE_PATH ${ZinekEngine_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
  
 include(MacroOutOfSourceBuild)
@@ -71,4 +72,30 @@ SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS OFF)
 
 source_group (ZPP REGULAR_EXPRESSION ".*\\.zpp")
 
+## Files
+#########################################################################################
 add_subdirectory (Source)
+
+
+## PACKING
+#########################################################################################
+INCLUDE(InstallRequiredSystemLibraries)
+
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Zinek Engine")
+SET(CPACK_PACKAGE_VENDOR "Zinek Code House and Game Studio")
+SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/Installation/ReadMe.txt")
+SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/Installation/License.txt")
+SET(CPACK_PACKAGE_VERSION_MAJOR "0")
+SET(CPACK_PACKAGE_VERSION_MINOR "5")
+SET(CPACK_PACKAGE_VERSION_PATCH "0")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "Zinek Engine")
+SET(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}/Installation/Release\\\\InstallIcon.bmp")
+SET(CPACK_NSIS_INSTALLED_ICON_NAME "ZinekEngine.exe")
+SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_INSTALL_DIRECTORY} Zinek Engine")
+SET(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.zinekengine.com\\\\en\\\\docs\\\\install")
+SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.zinekengine.com")
+SET(CPACK_NSIS_CONTACT "contact@zinekengine.com")
+SET(CPACK_NSIS_MODIFY_PATH ON)
+
+SET(CPACK_PACKAGE_EXECUTABLES "MyExecutable" "My Executable")
+INCLUDE(CPack)
