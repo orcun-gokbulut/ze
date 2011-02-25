@@ -33,42 +33,20 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
-project (ZinekEngine) 
-
-include(CPack)
- 
-set(CMAKE_MODULE_PATH ${ZinekEngine_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
- 
-include(MacroOutOfSourceBuild)
-include(ParseArguments)
-include(AddSource)
-
-macro_ensure_out_of_source_build ("${PROJECT_NAME} requires an out of source build.")
-
-SET (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
-
-add_definitions(-DZE_ZINEK_ENGINE)
-
-#	add_definition (-DZE_DEBUG_ENABLED)
-#	add_definition (-DZE_DEBUG_BREAK_ON_ERROR)
-#	add_definition (-DZE_DEBUG_BREAK_ON_WARNING)
-#	add_definition (-DZE_DEBUG_ENABLE_MEMORY_CHECKS)
+cmake_minimum_required(VERSION 2.8)
 
 
-set (ZESDK_INCLUDES)
-set (ZEToolSDK_INCLUDES)
-set (ZEGameSDK_INCLUDES)
-set (ZEModuleSDK_INCLUDES)
+add_source(ZEDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEGraphicsDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEGraphicsDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEModelAnimationDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEModelAnimationDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEMetaDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEMetaDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEPhysicsDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZEPhysicsDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZESoundDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source(ZESoundDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
 
-set (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
-set (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
-
-include_directories (Source Include)
-link_directories("${PROJECT_SOURCE_DIR}/Lib/Win x86/Debug" "${PROJECT_SOURCE_DIR}/Lib/Win x86/DirectX" "${PROJECT_SOURCE_DIR}/Lib/Win x86/OpenAL" "${PROJECT_SOURCE_DIR}/Lib/Win x86/PhysX")
-
-SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS OFF)
-
-source_group (ZPP REGULAR_EXPRESSION ".*\\.zpp")
-
-add_subdirectory (Source)
+add_library(ZEDebug ${ZEDebug_SOURCE_FILES})
