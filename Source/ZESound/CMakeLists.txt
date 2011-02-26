@@ -58,3 +58,6 @@ add_source(ZESoundSource3D.h ZESound_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZESound ${ZESound_SOURCE_FILES})
 target_link_libraries(ZESound libvorbis.lib libvorbisfile.lib libogg.lib libmpg123.lib)
+
+install(TARGETS ZESound COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZESound)

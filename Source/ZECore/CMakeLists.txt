@@ -71,5 +71,5 @@ add_source(ZEWindowResource.h ZECore_SOURCE_FILES)
 
 add_library(ZECore ${ZECore_SOURCE_FILES})
 
-install(TARGETS ZECore COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install(FILES zesdk_INCLUDES COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZECore)
+install(TARGETS ZECore COMPONENT "Libraries" CONFIGURATIONS Release ARCHIVE DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES} COMPONENT "Includes" DESTINATION Includes/ZECore)

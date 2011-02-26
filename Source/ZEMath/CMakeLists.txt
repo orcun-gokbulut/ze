@@ -67,3 +67,6 @@ add_source(ZEVector.cpp ZEMath_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZEVector.h ZEMath_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEMath ${ZEMath_SOURCE_FILES})
+
+install(TARGETS ZEMath COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEMath)

@@ -109,3 +109,6 @@ add_source(ZEViewVolume.h ZEGraphics_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_definitions(-DFREEIMAGE_LIB)
 add_library(ZEGraphics ${ZEGraphics_SOURCE_FILES})
 target_link_libraries(ZEGraphics freeimage.lib)
+
+install(TARGETS ZEGraphics COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEGraphics)

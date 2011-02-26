@@ -47,3 +47,6 @@ add_source(ZEInputModule.cpp ZEInput_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZEInputModule.h ZEInput_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEInput ${ZEInput_SOURCE_FILES})
+
+install(TARGETS ZEInput COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEInput)

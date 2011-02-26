@@ -43,3 +43,6 @@ add_source(ZEMapResource.cpp ZEMap_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZEMapResource.h ZEMap_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEMap ${ZEMap_SOURCE_FILES})
+
+install(TARGETS ZEMap COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEMap)

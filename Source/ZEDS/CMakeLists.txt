@@ -54,3 +54,6 @@ add_source(ZEVariant.cpp ZEDS_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZEVariant.h ZEDS_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEDS ${ZEDS_SOURCE_FILES})
+
+install(TARGETS ZEDS COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEDS)

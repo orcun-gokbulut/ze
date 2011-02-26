@@ -52,3 +52,6 @@ add_source(ZEPortalMapResource.cpp ZEPortalMap_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZEPortalMapResource.h ZEPortalMap_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEPortalMap ${ZEPortalMap_SOURCE_FILES})
+
+install(TARGETS ZEPortalMap COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEMap/ZEPortalMap)

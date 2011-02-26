@@ -79,3 +79,6 @@ add_source(ZETrigger.cpp ZEGame_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZETrigger.h ZEGame_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEGame ${ZEGame_SOURCE_FILES})
+
+install(TARGETS ZEGame COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEGame)

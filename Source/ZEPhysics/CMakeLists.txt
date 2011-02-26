@@ -59,3 +59,6 @@ add_source(ZEPhysicsModule.cpp ZEPhysics_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZEPhysicsModule.h ZEPhysics_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEPhysics ${ZEPhysics_SOURCE_FILES})
+
+install(TARGETS ZEPhysics COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEPhysics)

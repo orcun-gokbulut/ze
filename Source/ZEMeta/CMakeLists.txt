@@ -54,3 +54,6 @@ add_source(ZEProvider.cpp ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZEProvider.h ZEMeta_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEMeta ${ZEMeta_SOURCE_FILES})
+
+install(TARGETS ZEMeta COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEMeta)

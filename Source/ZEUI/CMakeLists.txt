@@ -54,3 +54,6 @@ add_source(ZEUITextControl.cpp ZEUI_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZEUITextControl.h ZEUI_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEUI ${ZEUI_SOURCE_FILES})
+
+install(TARGETS ZEUI COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEUI)

@@ -48,3 +48,6 @@ add_source(ZEParticleSystem.cpp ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZEParticleSystem.h ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEParticle ${ZEParticle_SOURCE_FILES})
+
+install(TARGETS ZEParticle COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEParticle)

@@ -50,3 +50,6 @@ add_source(ZESoundDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZESoundDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEDebug ${ZEDebug_SOURCE_FILES})
+
+install(TARGETS ZEDebug COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEDebug)

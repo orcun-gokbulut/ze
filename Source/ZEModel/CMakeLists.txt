@@ -54,3 +54,6 @@ add_source(ZEModelResource.cpp ZEModel_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_source(ZEModelResource.h ZEModel_SOURCE_FILES INCLUDED_SDKS zesdk)
 
 add_library(ZEModel ${ZEModel_SOURCE_FILES})
+
+install(TARGETS ZEModel COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEModel)

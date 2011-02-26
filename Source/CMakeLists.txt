@@ -65,3 +65,7 @@ add_source(ZETypes.h Source_SOURCE_FILES INCLUDED_SDKS zesdk)
 add_executable(ZE WIN32 ${Source_SOURCE_FILES})
 target_link_libraries(ZE ZECore ZEDebug ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
 target_link_libraries(ZE ZEDirect3D9 ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
+
+install(TARGETS ZE RUNTIME DESTINATION bin COMPONENT "Runtime")
+install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Dll/ CONFIGURATIONS Release ARCHIVE DESTINATION bin COMPONENT "Runtime")
