@@ -35,10 +35,24 @@
 
 #include "ZEFileCache.h"
 #include <stdio.h>
+#include "ZEConsole.h"
 #include "ZECore/ZEError.h"
 #include <sys/stat.h> 
 
-// EKSÝK
+void ZEFileCacheItem::reset(void)
+{
+	Index = Hash = FilePosition = Size = 0;
+}
+
+ZEFileCacheItem::ZEFileCacheItem(ZEFileCacheItem &CacheItem)
+{
+	Index = CacheItem.Index;
+	Hash = CacheItem.Hash;
+	FilePosition = CacheItem.FilePosition;
+	Size = CacheItem.Size;
+}
+
+
 // Initializes the parameters(that will be use to write data to a partial cache file) 
 void ZECachePartialResourceFile::Initialize(void* File, size_t StartPosition, size_t EndPosition)
 {
@@ -47,45 +61,79 @@ void ZECachePartialResourceFile::Initialize(void* File, size_t StartPosition, si
 	this->EndPosition = EndPosition;
 }
 
-// EKSÝK
-// Returns the first data that matches to hash. 
-// If it is not the needed item user have to call getnextchunk() function
-ZEPartialResourceFile ZEFileCache::GetChunk(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan)
+// Get data of a valid cache item represented by ZEFileCacheItem
+bool ZEFileCache::GetChunk(ZECachePartialResourceFile& ResourceFile, ZEFileCacheItem& Item)
 {
-	for (size_t I = 0; I < Items.GetCount(); I++)
-	{
-		if(Items[I].Hash == Scan.Hash)
-			ResourceFile.Initialize((FILE*)File, Items[I].FilePosition, Items[I].FilePosition + Items[I].Size);
-	}
+	ResourceFile.Initialize((FILE*)File, Item.FilePosition, Item.FilePosition + Item.Size);
+	return true;
 }
 
-// EKSÝK
-bool ZEFileCache::GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan)
+
+// Scan by hash
+// Searches the item list in cache file one by one to find the specified hash value
+// Returns first found! User should pass a ZEFileCacheItem struct with a specified hash value.  
+// The function fills the rest of the struct ! Afterwards The Chunk can be loaded by sending the 
+// filled ZEFileCacheItem to GetChunk() function. If the returned item by GetChunk() it is not the 
+// desired item user should use ScanByHash() again with the same struct filled before so that the function will
+// set the  ZEFileCacheItem struct with the information of the next item which have the same hash.
+// Function returns true if it finds/fills the struct or false if search fails. in  case of getting a false 
+// return data the ZEFileCacheItem must be reseted by reset() to be able to be used again. 
+// Also if u get a false return the last state of struct is conserved
+bool ZEFileCache::ScanByHash(ZEFileCacheItem &FileScan)
 {
-	//bir sonraki dosyayý bulmak için deðiþtirmek lazým lazým
-	for (size_t I = Scan.Cursor; I < Items.GetCount(); I++)
+	size_t I = 0;
+	
+	if (FileScan.Index > 0)
+		I = FileScan.Index;
+	
+	if (IsOnlineModeOn())
 	{
-		if (Items[I].Hash == Scan.Hash)
-		{
-			ResourceFile.Initialize((FILE*)File, Items[I].FilePosition, Items[I].FilePosition + Items[I].Size);
-			return true;
+		for ( ; I < Items.GetCount(); I++)
+			if (Items[I].Hash == FileScan.Hash)
+			{
+				FileScan.Index = I;
+				FileScan.FilePosition = Items[I].FilePosition;
+				FileScan.Size = Items[I].Size;
+				return true;
+			}
+	}
+	else
+	{
+		// Go to the end to get the size of the list
+		fseek((FILE*)File, -sizeof(ZEWORD), SEEK_END);
+		ZEDWORD ItemCount;
+		// Get the item count
+		fread(&ItemCount, sizeof(ZEDWORD), 1, (FILE*)File);
+		// Go to the beginning of item list + Index + 1
+		fseek((FILE*)File, -(sizeof(ZEFileCacheItem) * (ItemCount - I + 1)) -sizeof(ZEDWORD), SEEK_END);
+		
+		ZEFileCacheItem	Item(0, 0, 0, 0);
+		
+		// Check until we find the first item in the list that fits the hash
+		for ( ; I < ItemCount; I++)
+		{	
+			// Read the item data
+			fread(&Item, sizeof(ZEFileCacheItem), 1, (FILE*)File);
+
+			if (Item.Hash == FileScan.Hash)
+			{
+				FileScan.Index = I;
+				FileScan.FilePosition = Item.FilePosition;
+				FileScan.Size = Item.Size;
+				return Scan;
+			}
 		}
 	}
 
+	zeError("File Cache:", "Cannot find the data specified by the hash %d in specified cache file \"%s\"", FileScan.Hash, File);
 	return false;
-}
 
-// EKSÝK
-// Scan by hash
-ZEFileCacheScan ZEFileCache::Scan(ZEDWORD Hash)
-{
-	// hash ile arama yapar ilk buldugu(dogru item olmayabilir) item için bir ZEFileCacheScan dondurur.
-	// dondurulen item getchunk()'a gönderilerek alýnabilir.
-	// Istenen item gelmezse getnextfile()/getnextchunk() ile bir sonraki item alýnarak denenebilir
 }
 
 // Adds data to cache file
-void ZEFileCache::AddChunk(ZEDWORD Hash, void* Data, size_t Size)
+// The mode does not make much difference since we need to get the whole list 
+// into the memory and write it to the end of the cache file in both modes
+void ZEFileCache::AddChunk(ZEDWORD Hash, void* Data, ZEDWORD Size)
 {
 	// If online mode on
 	if (this->OnlineMode == true)
@@ -103,14 +151,14 @@ void ZEFileCache::AddChunk(ZEDWORD Hash, void* Data, size_t Size)
 		Item->Size = Size;
 		// Write the item list
 		WriteItemListToCacheFile();
-		// flush after an output 
+		// Flush after an output 
 		fflush((FILE*)File);
 	}
-	else
+	else // If mode is offline
 	{
 		// Get item list for temp usage
 		ReadItemListFromCacheFile();
-		fseek(File, -sizeof(ZEFileCacheItem) * Items.GetCount() - sizeof(ZEDWORD), SEEK_END);
+		fseek((FILE*)File, -sizeof(ZEFileCacheItem) * Items.GetCount() - sizeof(ZEDWORD), SEEK_END);
 		// Save data position
 		ZEDWORD Position = ftell((FILE*)File);
 		// Write the data
@@ -122,12 +170,11 @@ void ZEFileCache::AddChunk(ZEDWORD Hash, void* Data, size_t Size)
 		Item->Size = Size;
 		// Write the item list
 		WriteItemListToCacheFile();
-		// flush after an output 
+		// Flush after an output 
 		fflush((FILE*)File);
 		// Delete item list from memory
 		Items.Clear(false);
 	}
-	
 }
 
 // Writes the item list to the end of cache file
@@ -145,7 +192,7 @@ void ZEFileCache::WriteItemListToCacheFile()
 	}
 }
 
-// Reads the list of items from cache files
+// Reads the list of items from cache files to memory
 void ZEFileCache::ReadItemListFromCacheFile()
 {
 	if (this->OnlineMode == true)
@@ -168,7 +215,7 @@ void ZEFileCache::ReadItemListFromCacheFile()
 
 // For Creating a new cache which have the same name and mode with an existing one. Deletes the previous one
 // It Automatically opens the file
-bool ZEFileCache::CreateNewCacheFile(const char* FileName, bool OnlineMode)
+bool ZEFileCache::CreateCacheFile(const char* FileName, bool OnlineMode)
 {
 	// Delete if there is already a cache file with the same name
 	if(DeleteCacheFile(FileName))
@@ -218,10 +265,11 @@ void ZEFileCache::ClearCacheFile(const char* FileName)
 {
 	if (this->OnlineMode == true)
 		Items.Clear(false);
-	CreateNewCacheFile(FileName, OnlineMode);
+	CreateCacheFile(FileName, OnlineMode);
 }
 
 // Deletes an existing cache file
+// Also deletes from memory
 bool ZEFileCache::DeleteCacheFile(const char* FileName)
 {
 	if(CacheFileExists(FileName))
@@ -259,6 +307,8 @@ bool ZEFileCache::CacheFileExists(const char* FileName)
 }
 
 // For Changing Mode
+// When mode changes from online to offline the item list is dumped
+// In opposite situation the item list is read from the cache file
 void ZEFileCache::SetMode(bool OnlineMode)
 {
 	// If mode is online but user wants offline
@@ -276,7 +326,7 @@ void ZEFileCache::SetMode(bool OnlineMode)
 }
 
 // Get Mode
-void ZEFileCache::IsOnlineModeOn()
+bool ZEFileCache::IsOnlineModeOn()
 {
 	return this->OnlineMode;
 }

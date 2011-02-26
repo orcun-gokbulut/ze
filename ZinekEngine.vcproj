@@ -2354,6 +2354,10 @@
 			>
 		</File>
 		<File
+			RelativePath=".\ClassDiagram1.cd"
+			>
+		</File>
+		<File
 			RelativePath=".\Source\ZECompileOptions.h"
 			>
 		</File>

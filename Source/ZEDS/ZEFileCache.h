@@ -42,24 +42,27 @@
 #include "ZETypes.h"
 
 struct ZEFileCacheItem
-{
-	ZEDWORD Hash;
-	ZEDWORD FilePosition;
-	ZEDWORD Size;
+{	
+	public:
+		ZEDWORD	Index;
+		ZEDWORD Hash;
+		ZEDWORD FilePosition;
+		ZEDWORD Size;
+
+				ZEFileCacheItem(ZEDWORD	Index, ZEDWORD Hash, ZEDWORD FilePosition, ZEDWORD Size) : 
+					Index(Index), Hash(Hash), FilePosition(FilePosition), Size(Size) {}
+				ZEFileCacheItem(ZEFileCacheItem &CacheItem);
+		void	reset(void);
+
 };
 
-struct ZEFileCacheScan
-{
-	ZEDWORD Hash;
-	ZEDWORD Cursor;
-};
 
 class ZECachePartialResourceFile : public ZEPartialResourceFile
 {
 	friend class ZEFileCache;
 	protected:
 		void							Initialize(void* File, size_t StartPosition, size_t EndPosition);
-};
+}; /* class ZECachePartialResourceFile */
 
 class ZEFileCache
 {
@@ -73,27 +76,27 @@ class ZEFileCache
 		void							WriteItemListToCacheFile();
 
 	public:
+
+										ZEFileCache();
+										~ZEFileCache();
+
 		void							SetMode(bool OnlineMode);
-		void							IsOnlineModeOn();
+		bool							IsOnlineModeOn();
 		
 		bool							CacheFileExists(const char* FileName);
 		
-		bool							CreateNewCacheFile(const char* FileName, bool OnlineMode = true);
+		bool							CreateCacheFile(const char* FileName, bool OnlineMode = true);
 		void							ClearCacheFile(const char* FileName);
 		bool							DeleteCacheFile(const char* FileName);
 		
 		bool							OpenCacheFile(const char* FileName, bool OnlineMode = true);
 		void							CloseCacheFile();
 		void							AddChunk(ZEDWORD Hash, void* Data, size_t Size);
-		ZEPartialResourceFile			GetChunk(ZEDWORD Hash);
 
-		ZEFileCacheScan					Scan(ZEDWORD Hash);
-		bool							GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan);
-
+		bool							ScanByHash(ZEFileCacheItem &FileScan);
 		
+		bool							GetChunk(ZECachePartialResourceFile& ResourceFile, ZEFileCacheItem& Scan);
+									
+}; /* class ZEFileCache */
 
-										ZEFileCache();
-										~ZEFileCache();
-};
-
-#endif
+#endif	/* __ZE_FILE_CACHE_H__ */
