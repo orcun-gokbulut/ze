@@ -45,8 +45,6 @@
 #include "ZEMath\ZEQuaternion.h"
 #include "ZEMath\ZEPlane.h"
 
-#include "NxJoint.h"
-
 class	ZEPhysicalWorld;
 class	ZEPhysicalObject;		
 

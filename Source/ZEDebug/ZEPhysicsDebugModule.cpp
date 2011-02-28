@@ -48,7 +48,6 @@
 #include "ZEPhysics\ZEPhysicalRigidBody.h"
 #include "ZEPhysics\ZEPhysicalShapes.h"
 #include "ZEPhysics\ZEPhysicalMesh.h"
-#include "ZEPhysics\ZEPhysX\ZEPhysXPhysicalJoint.h"
 #include "ZEModel\ZEModel.h"
 #include "ZEModel\ZEModelMesh.h"
 #include "ZEModel\ZEModelBone.h"
@@ -58,14 +57,11 @@
 #include "ZEMap\ZEPortalMap\ZEPortalMap.h"
 #include "ZEMap\ZEMapResource.h"
 #include "ZEMap\ZEPortalMap\ZEPortalMapPortal.h"
+#include "ZEMath\ZEMathDefinitions.h"
 
 #include "ZEMap\ZEPortalMap\ZEPortalMapResource.h"
 
 #include "../ZEGraphics/ZEDirectionalLight.h"
-
-#include <NxScene.h>
-#include <NxActor.h>
-#include <NxPlaneShapeDesc.h>
 
 void ZEPhysicsDebugModule::TransformChanged(const ZEPhysicalTransformChangeEventArgument& TransformChange)
 {
@@ -100,7 +96,7 @@ bool ZEPhysicsDebugModule::Initialize()
 		Scene->AddEntity(Player);
 	}
 
-	ZEPhysXPhysicalWorld* World = (ZEPhysXPhysicalWorld*)zeScene->GetPhysicalWorld();
+	ZEPhysicalWorld* World = (ZEPhysicalWorld*)zeScene->GetPhysicalWorld();
 
 	World->SetVisualize(true);
 	//Scene->SetVisualDebugElements(ZE_VDE_ALL);
@@ -151,9 +147,8 @@ bool ZEPhysicsDebugModule::Initialize()
 	Scene->AddEntity(PointLight);
 
 
-	NxPhysicsSDK* gPhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION);
-
-	gPhysicsSDK->getFoundationSDK().getRemoteDebugger()->connect ("localhost", 5425);
+//	NxPhysicsSDK* gPhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION);
+//	gPhysicsSDK->getFoundationSDK().getRemoteDebugger()->connect ("localhost", 5425);
 
 
 
