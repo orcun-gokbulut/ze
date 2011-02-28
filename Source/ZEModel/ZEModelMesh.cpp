@@ -37,6 +37,7 @@
 #include "ZEModel.h"
 #include "ZEModelFileFormat.h"
 #include "ZEGraphics/ZERenderer.h"
+#include "../ZEGame/ZEScene.h"
 
 void ZEModelMesh::SetActiveLOD(size_t LOD)
 {
@@ -212,12 +213,12 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	this->MeshResource = MeshResource;
 	ActiveLOD = 0;
 	AutoLOD = true;
-	PhysicsEnabled = false;
 	AnimationType = ZE_MAT_PREDEFINED;
 	Position = MeshResource->Position;
 	Rotation = MeshResource->Rotation;
 	Scale = MeshResource->Scale;
 	LocalBoundingBox = MeshResource->BoundingBox;
+	PhysicsEnabled = false;
 
 	UpdateWorldBoundingBox = true;
 	UpdateWorldTransform = true;
@@ -225,9 +226,89 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	UpdateModelTransform = true;
 	UpdateLocalTransform = true;
 
+	ZEArray<ZEPhysicalShape*> ShapeList;
+
+	if(PhysicalBody == NULL)
+	{
+		if (MeshResource->PhysicalBody.Type == ZE_MRPBT_RIGID)
+		{
+			PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
+
+			PhysicalBody->SetEnabled(MeshResource->PhysicalBody.Enabled);
+			PhysicalBody->SetMass(MeshResource->PhysicalBody.Mass);
+			PhysicalBody->SetLinearDamping(MeshResource->PhysicalBody.LinearDamping);
+			PhysicalBody->SetAngularDamping(MeshResource->PhysicalBody.AngularDamping);
+			PhysicalBody->SetPosition(Owner->GetWorldPosition());
+			PhysicalBody->SetRotation(Owner->GetWorldRotation());
+			PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenter);
+			PhysicalBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this->Owner, &ZEModel::TransformChangeEvent));
+
+			for (size_t I = 0; I < MeshResource->PhysicalBody.Shapes.GetCount(); I++)
+			{
+				const ZEModelResourcePhysicalShape* Shape = &MeshResource->PhysicalBody.Shapes[I];
+				switch(Shape->Type)
+				{
+					case ZE_PST_BOX:
+					{
+						ZEPhysicalBoxShape* BoxShape = new ZEPhysicalBoxShape();
+						BoxShape->SetWidth(Shape->Box.Width);
+						BoxShape->SetHeight(Shape->Box.Height);
+						BoxShape->SetLength(Shape->Box.Length);
+						BoxShape->SetPosition(Shape->Position);
+						BoxShape->SetRotation(Shape->Rotation);
+						ShapeList.Add(BoxShape);
+						PhysicalBody->AddPhysicalShape(BoxShape);
+						break;
+					}
+
+					case ZE_PST_SPHERE:
+					{
+						ZEPhysicalSphereShape* SphereShape = new ZEPhysicalSphereShape();
+						SphereShape->SetRadius(Shape->Sphere.Radius);
+						SphereShape->SetPosition(Shape->Position);
+						SphereShape->SetRotation(Shape->Rotation);
+						ShapeList.Add(SphereShape);
+						PhysicalBody->AddPhysicalShape(SphereShape);
+						break;
+					}
+					case ZE_PST_CYLINDER:
+					{
+						// Problematic
+						break;
+					}
+
+					case ZE_PST_CAPSULE:
+					{
+						ZEPhysicalCapsuleShape* CapsuleShape = new ZEPhysicalCapsuleShape();
+						CapsuleShape->SetRadius(Shape->Capsule.Radius);
+						CapsuleShape->SetHeight(Shape->Capsule.Height);
+						CapsuleShape->SetPosition(Shape->Position);
+						CapsuleShape->SetRotation(Shape->Rotation);
+						ShapeList.Add(CapsuleShape);
+						PhysicalBody->AddPhysicalShape(CapsuleShape);
+						break;
+					}
+
+					case ZE_PST_CONVEX:
+						// Problematic
+						break;
+				}
+			}
+
+			PhysicalBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+			PhysicalBody->Initialize();
+		}
+	}
+
 	LODs.SetCount(MeshResource->LODs.GetCount());
 	for (size_t I = 0; I < MeshResource->LODs.GetCount(); I++)
 		LODs[I].Initialize(Owner, this, &MeshResource->LODs[I]);
+
+	for (size_t I = 0; I < ShapeList.GetCount(); I++)
+		delete ShapeList[I];
+	ShapeList.Clear();
+
+
 }
 
 void ZEModelMesh::Deinitialize()
@@ -242,6 +323,11 @@ void ZEModelMesh::ModelTransformChanged()
 	UpdateWorldTransform = true;
 	UpdateModelBoundingBox = true;
 	UpdateModelTransform = true;
+	if (PhysicalBody != NULL)
+	{
+		PhysicalBody->SetPosition(Owner->GetWorldPosition());
+		PhysicalBody->SetRotation(Owner->GetWorldRotation());
+	}
 }
 
 void ZEModelMesh::ModelWorldTransformChanged()
@@ -260,6 +346,7 @@ ZEModelMesh::ZEModelMesh()
 {
 	Owner = NULL;
 	MeshResource = NULL;
+	PhysicalBody = NULL;
 }
 
 ZEModelMesh::~ZEModelMesh()

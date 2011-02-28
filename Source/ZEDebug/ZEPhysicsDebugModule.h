@@ -51,12 +51,14 @@ class ZEPhysicsDebugModule : public ZEDebugModule
 	private:
 		ZEPlayer*				Player;
 		ZEPhysicalRigidBody*	PhysicalRigidBody;
-		ZEPhysicalSphereShape	Shape;	
-		ZEPhysicalSphereShape	Shape2;	
+		ZEPhysicalCapsuleShape	Shape;	
+		ZEPhysicalCapsuleShape	Shape2;	
 		ZEModel*				Model;
 
-		void					TransformChanged(const ZEPhysicalTransformChange& TransformChange);
-		void					ColisionDetected(const ZEPhysicalCollision& Collision);
+		ZEModel*				TestBody;
+
+		void					TransformChanged(const ZEPhysicalTransformChangeEventArgument& TransformChange);
+		void					ColisionDetected(const ZEPhysicalCollisionEventArgument& Collision);
 
 	public:
 		virtual void			Process(float ElapsedTime);

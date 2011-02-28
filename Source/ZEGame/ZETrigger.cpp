@@ -59,7 +59,7 @@ void ZETrigger::SetCallback(ZETriggerCallback Callback)
 
 ZETriggerCallback ZETrigger::GetCallback()
 {
-	return Callback;
+	return this->Callback;
 }
 
 void ZETrigger::SetTriggerShape(ZETriggerShape TriggerShape)

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPhysicalStaticMesh.cpp
+ Zinek Engine - ZEPhysicalMesh.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,15 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPhysicalStaticMesh.h"
+#include "ZEPhysicalMesh.h"
 #include "ZEPhysicsModule.h"
 
-ZEPhysicalObjectType ZEPhysicalStaticMesh::GetPhysicalObjectType()
+ZEPhysicalObjectType ZEPhysicalMesh::GetPhysicalObjectType()
 {
 	return ZE_POT_STATIC_MESH;
 }
 
-ZEPhysicalStaticMesh* ZEPhysicalStaticMesh::CreateInstance()
+ZEPhysicalMesh* ZEPhysicalMesh::CreateInstance()
 {
 	return zePhysics->CreatePhysicalStaticMesh();
 }

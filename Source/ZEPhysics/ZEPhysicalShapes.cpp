@@ -67,23 +67,21 @@ const ZEQuaternion& ZEPhysicalShape::GetRotation()
 	return Rotation;
 }
 
-void ZEPhysicalShape::SetMaterial(const ZEPhysicalMaterial& NewMaterial)
+void ZEPhysicalShape::SetMaterial(ZEPhysicalMaterial* NewMaterial)
 {
 	Material = NewMaterial;
 }
 
-const ZEPhysicalMaterial&  ZEPhysicalShape::GetMaterial()
+ZEPhysicalMaterial* ZEPhysicalShape::GetMaterial()
 {
 	return Material;
 }
 
 ZEPhysicalShape::ZEPhysicalShape()
 {
-	Position = ZEVector3::UnitX;
+	Position = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
-	Material.DynamicFriction = 1.0f;
-	Material.StaticFriction = 1.0f;
-	Material.Restitution = 1.0f;
+	Material = NULL;
 }
 
 // Physical Box Shape

@@ -2105,11 +2105,27 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalJoint.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalJoint.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Source\ZEPhysics\ZEPhysicalMaterial.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\Source\ZEPhysics\ZEPhysicalMaterial.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalMesh.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Source\ZEPhysics\ZEPhysicalMesh.h"
 				>
 			</File>
 			<File
@@ -2134,22 +2150,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEPhysics\ZEPhysicalShapes.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEPhysics\ZEPhysicalStaticMesh.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEPhysics\ZEPhysicalStaticMesh.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEPhysics\ZEPhysicalStaticRigidBody.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEPhysics\ZEPhysicalStaticRigidBody.h"
 				>
 			</File>
 			<File
@@ -2220,6 +2220,30 @@
 					>
 				</File>
 				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalCharacterController.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalCharacterController.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalJoint.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalJoint.h"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalMesh.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalMesh.h"
+					>
+				</File>
+				<File
 					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalRigidBody.cpp"
 					>
 				</File>
@@ -2228,19 +2252,11 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalStaticMesh.cpp"
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalTrigger.cpp"
 					>
 				</File>
 				<File
-					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalStaticMesh.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalStaticRigidBody.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalStaticRigidBody.h"
+					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalTrigger.h"
 					>
 				</File>
 				<File

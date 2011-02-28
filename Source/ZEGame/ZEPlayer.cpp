@@ -103,7 +103,7 @@ void ZEPlayer::Tick(float Time)
 	ZEInputAction* Current;
 	zeInput->ProcessInputMap(&InputMap);
 	
-	float MetersPerSecond = 10.0f;
+	float MetersPerSecond = 50.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 	ZEComponent* HitComponent;
@@ -250,7 +250,7 @@ ZEPlayer::ZEPlayer()
 
 	Listener = ZEListener::CreateInstance();
 	RegisterComponent(Listener);
-
+	/*
 	Light = ZEProjectiveLight::CreateInstance();
 	Light->SetProjectionTextureFile("flashlight.jpg");
 	Light->SetAttenuation(0.01f, 0.0f, 1.0f);
@@ -261,6 +261,7 @@ ZEPlayer::ZEPlayer()
 	Light->SetCastsShadow(true);
 	Light->SetPosition(ZEVector3(0.0f, -2.0f, 0.0f));
 	RegisterComponent(Light);
+	*/
 }
 
 ZEPlayer::~ZEPlayer()

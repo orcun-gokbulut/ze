@@ -62,8 +62,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	ZEModelAnimationDebugModule DebugModule;
 	//zeCore->SetDebugComponent(&DebugModule);
 
-	ZEGraphicsDebugModule GraphicsDebugModule;
-	zeCore->SetDebugComponent(&GraphicsDebugModule);
+	//ZEGraphicsDebugModule GraphicsDebugModule;
+	//zeCore->SetDebugComponent(&GraphicsDebugModule);
+
+	ZEPhysicsDebugModule PhysicsDebugModule;
+	zeCore->SetDebugComponent(&PhysicsDebugModule);
 
 	ZESoundDebugModule SoundDebugComponent;
 	//zeCore->SetDebugComponent(&SoundDebugComponent);

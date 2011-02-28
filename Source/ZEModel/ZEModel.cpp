@@ -40,6 +40,7 @@
 #include "ZEGraphics/ZESimpleMaterial.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZECompoundEntity.h"
+#include "ZEGame\ZEScene.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -214,17 +215,50 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 		}
 
 		Bones.SetCount(ModelResource->Bones.GetCount());
+
+		for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
+		{
+			if (ModelResource->Bones[I].ParentBone != -1)
+				Bones[ModelResource->Bones[I].ParentBone].AddChild(&Bones[I]);
+		}
+
 		for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
 		{
 			Bones[I].Initialize(this, &ModelResource->Bones[I]);
 			if (Bones[I].GetParentBone() == NULL)
 				Skeleton.Add(&Bones[I]);
 		}
+	}
 
-		for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
+	if(Skeleton.GetCount() > 1)
+	{
+		ZEVector3 AveragePosition = ZEVector3::Zero;
+
+		for(size_t I = 0; I < Skeleton.GetCount(); I++)
 		{
-			if (ModelResource->Bones[I].ParentBone != -1)
-				Bones[ModelResource->Bones[I].ParentBone].AddChild(&Bones[I]);
+			AveragePosition += Skeleton[I]->PhysicalBody->GetPosition();
+		}
+		ZEVector3::Scale(AveragePosition, AveragePosition , 1.0f / Skeleton.GetCount());
+
+		ParentlessBoneBodyPosition = AveragePosition;
+
+		ParentlessBoneBody = ZEPhysicalRigidBody::CreateInstance();
+		ParentlessBoneShape = new ZEPhysicalBoxShape();
+		ParentlessBoneBody->SetPosition(ParentlessBoneBodyPosition);
+		ParentlessBoneBody->SetEnabled(true);
+		ParentlessBoneBody->SetMass(1.0f); //This must be average of other bone parts' mass
+		ParentlessBoneShape->SetWidth(0.01f);
+		ParentlessBoneShape->SetHeight(0.01f);
+		ParentlessBoneShape->SetLength(0.01f);
+		ParentlessBoneShape->SetPosition(ZEVector3::Zero);
+		ParentlessBoneBody->AddPhysicalShape(ParentlessBoneShape);
+
+		ParentlessBoneBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+		ParentlessBoneBody->Initialize();
+
+		for(size_t I = 0; I < Skeleton.GetCount(); I++)
+		{
+			LinkParentlessBones(Skeleton[I]);
 		}
 	}
 
@@ -469,6 +503,11 @@ const ZEAABoundingBox& ZEModel::GetLocalBoundingBox() const
 
 void ZEModel::SetPosition(const ZEVector3& NewPosition)
 {
+	if (ParentlessBoneBody != NULL && Bones.GetCount() > 0)
+	{
+		ParentlessBoneBody->SetPosition(NewPosition + ParentlessBoneBodyPosition);
+	}
+
 	ZEComponent::SetPosition(NewPosition);
 	LocalTransformChanged();
 }
@@ -508,6 +547,30 @@ void ZEModel::UpdateBoneTransforms()
 	BoneTransformsDirtyFlag = true;
 }
 
+void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
+{
+	ZEPhysicalJoint* ParentlessBoneJoint = ZEPhysicalJoint::CreateInstance();
+
+	ParentlessBoneJoint->SetBodyA(ParentlessBone->PhysicalBody);
+	ParentlessBoneJoint->SetBodyB(ParentlessBoneBody);
+
+	ParentlessBoneJoint->SetPosition(ParentlessBoneBody->GetPosition());
+	ParentlessBoneJoint->SetRotation(ParentlessBoneBody->GetRotation());
+
+	ParentlessBoneJoint->SetXMotion(ZE_PJMOTION_LOCKED);
+	ParentlessBoneJoint->SetYMotion(ZE_PJMOTION_LOCKED);
+	ParentlessBoneJoint->SetZMotion(ZE_PJMOTION_LOCKED);
+
+	ParentlessBoneJoint->SetSwing1Motion(ZE_PJMOTION_LOCKED);
+	ParentlessBoneJoint->SetSwing2Motion(ZE_PJMOTION_LOCKED);
+	ParentlessBoneJoint->SetTwistMotion(ZE_PJMOTION_LOCKED);
+
+	ParentlessBoneJoint->SetMassInertiaTensor(ZEVector3(1,1,1)); // For solid joint connection
+
+	ParentlessBoneJoint->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+	ParentlessBoneJoint->Initialize();
+}
+
 void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 {
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
@@ -520,6 +583,44 @@ void ZEModel::Tick(float ElapsedTime)
 {
 	for(size_t I = 0; I < AnimationTracks.GetCount(); I++)
 		AnimationTracks[I].AdvanceAnimation(ElapsedTime);
+}
+
+void ZEModel::TransformChangeEvent(const ZEPhysicalTransformChangeEventArgument& TransformChange)
+{
+	for (int I = 0; I < Bones.GetCount(); I++)
+	{
+		if(Bones[I].GetParentBone() != NULL)
+		{
+			ZEQuaternion Inverse;
+			ZEQuaternion::Conjugate(Inverse, Bones[I].GetParentBone()->GetWorldRotation());
+
+			ZEMatrix4x4 InvParent;
+			ZEMatrix4x4::Inverse(InvParent, Bones[I].GetParentBone()->GetWorldTransform());
+			ZEVector3 Position;
+			ZEMatrix4x4::Transform(Position, InvParent, Bones[I].PhysicalBody->GetPosition());
+
+			Bones[I].SetRelativePosition(Position);
+			Bones[I].SetRelativeRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
+		}
+		else
+		{
+			ZEQuaternion Inverse;
+			ZEQuaternion::Conjugate(Inverse, this->GetWorldRotation());
+			Bones[I].SetRelativePosition(Bones[I].PhysicalBody->GetPosition() - GetWorldPosition());
+			Bones[I].SetRelativeRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
+		}
+	}
+
+	for (int I = 0; I < Meshes.GetCount(); I++)
+	{
+		if (Meshes[I].GetPhysicalBody() != NULL)
+		{
+			ZEQuaternion Inverse;
+			ZEQuaternion::Conjugate(Inverse, this->GetWorldRotation());
+			Meshes[I].SetLocalPosition(Meshes[I].GetPhysicalBody()->GetPosition() - GetWorldPosition());
+			Meshes[I].SetLocalRotation(Inverse * Meshes[I].GetPhysicalBody()->GetRotation());
+		}
+	}
 }
 
 ZEModel::ZEModel()

@@ -42,7 +42,8 @@
 #include "ZEGame\ZEScene.h"
 #include "ZESound\ZESoundSource3D.h"
 #include "ZEGame\ZEEntityProvider.h"
-
+#include "../ZEGraphics/ZECamera.h"
+	
 
 bool ZESoundDebugModule::Initialize()
 {

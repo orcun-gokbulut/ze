@@ -64,7 +64,7 @@ class ZEModelMesh
 		ZEMatrix4x4							WorldTransform;
 
 		bool								PhysicsEnabled;
-		ZEPhysicsBody*						PhysicalBody;
+		ZEPhysicalRigidBody*				PhysicalBody;
 
 		bool								AutoLOD;
 		size_t								ActiveLOD;
@@ -82,7 +82,7 @@ class ZEModelMesh
 
 	public:
 		const char*							GetName();
-		ZEPhysicsBody*						GetPhysicalBody() { return PhysicalBody; }
+		ZEPhysicalRigidBody*				GetPhysicalBody() { return PhysicalBody; }
 
 		const ZEAABoundingBox&				GetLocalBoundingBox();
 		const ZEAABoundingBox&				GetModelBoundingBox();

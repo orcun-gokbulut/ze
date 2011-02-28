@@ -49,34 +49,35 @@ class ZERenderer;
 class ZEPhysicalWorld
 {
 	protected:
-													ZEPhysicalWorld(){}
-		virtual										~ZEPhysicalWorld(){}
+										ZEPhysicalWorld(){}
+		virtual							~ZEPhysicalWorld(){}
 
 	public:
-		virtual void								SetGravity(const ZEVector3& Gravity) = 0;
-		virtual ZEVector3							GetGravity() = 0;
+		virtual void					SetGravity(const ZEVector3& Gravity) = 0;
+		virtual ZEVector3				GetGravity() = 0;
 
-		virtual const ZEArray<ZEPhysicalObject*>&	GetPhysicalObjects() = 0;
-		virtual void								AddPhysicalObject(ZEPhysicalObject* Object) = 0;
-		virtual void								RemovePhysicalObject(ZEPhysicalObject* Object) = 0;
+		virtual const 
+		ZEArray<ZEPhysicalObject*>&		GetPhysicalObjects() = 0;
+		virtual void					AddPhysicalObject(ZEPhysicalObject* Object) = 0;
+		virtual void					RemovePhysicalObject(ZEPhysicalObject* Object) = 0;
 
-		virtual void								SetEnabled(bool Enabled) = 0;
-		virtual bool								GetEnabled() = 0;
+		virtual void					SetEnabled(bool Enabled) = 0;
+		virtual bool					GetEnabled() = 0;
 
-		virtual void								SetVisualize(bool Enabled) = 0;
-		virtual bool								GetVisualize() = 0;
+		virtual void					SetVisualize(bool Enabled) = 0;
+		virtual bool					GetVisualize() = 0;
 
-		virtual bool								Initialize() = 0;
-		virtual void								Deinitialize() = 0;
+		virtual bool					Initialize() = 0;
+		virtual void					Deinitialize() = 0;
 
-		virtual void								Process(float ElapsedTime) = 0;
-		virtual void								Update() = 0;
+		virtual void					Process(float ElapsedTime) = 0;
+		virtual void					Update() = 0;
+		
+		virtual void					Destroy();
 
-		virtual void								Destroy();
+		virtual void					Draw(ZERenderer* Renderer) = 0;
 
-		virtual void								Draw(ZERenderer* Renderer) = 0;
-
-		static ZEPhysicalWorld*						CreateInstance();
+		static ZEPhysicalWorld*			CreateInstance();
 };
 
 #endif

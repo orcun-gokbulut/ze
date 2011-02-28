@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPhysXPhysicalStaticMesh.h
+ Zinek Engine - ZEPhysicalJoint.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,72 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PHYSX_PHYSICAL_STATIC_MESH_H__
-#define __ZE_PHYSX_PHYSICAL_STATIC_MESH_H__
+#include "ZEPhysicalJoint.h"
 
-#include "ZEPhysics\ZEPhysicalStaticMesh.h"
-#include "ZEPhysXComponentBase.h"
-
-#include <NxActor.h>
-#include <NxActorDesc.h>
-#include <NxTriangleMesh.h>
-#include <NxTriangleMeshDesc.h>
-#include <NxTriangleMeshShapeDesc.h>
-
-class ZEPhysXPhysicalWorld;
-class ZEPhysXPhysicalStaticMesh : public ZEPhysicalStaticMesh, private ZEPhysXComponentBase
+void ZEPhysicalJoint::SetJointEvent(const ZEPhysicalJointEvent& Event)
 {
-	friend class ZEPhysXModule;
+	JointEvent = Event;
+}
 
-	private:
-		ZEPhysXPhysicalWorld*			PhysicalWorld;
-		
-		NxActor*						Actor;
-		NxActorDesc						ActorDesc;
-		NxTriangleMeshShapeDesc			TriangleMeshShapeDesc;	
+const ZEPhysicalJointEvent& ZEPhysicalJoint::GetJointEvent()
+{
+	return JointEvent;
+}
 
-		ZEDWORD							CollisionFlags;
-		ZEPhysicalCollisionCallback		CollisionCallback;
+ZEPhysicalJoint::ZEPhysicalJoint()
+{
 
-		ZEVector3						Scale;
-		bool							Enabled;
+}
 
-		void							ReCreate();
+ZEPhysicalJoint::~ZEPhysicalJoint()
+{
 
-										ZEPhysXPhysicalStaticMesh();
-		virtual							~ZEPhysXPhysicalStaticMesh();
+}
 
-	public:
-		virtual void					SetPhysicalWorld(ZEPhysicalWorld* World);
-		virtual ZEPhysicalWorld*		GetPhysicalWorld();
+ZEPhysicalJoint* ZEPhysicalJoint::CreateInstance()
+{
+	return zePhysics->CreatePhysicalJoint();
+}
 
-		virtual void					SetEnabled(bool Enabled);
-		virtual bool					GetEnabled();
-
-		virtual void					SetPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3				GetPosition();
-		
-		virtual void					SetRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion			GetRotation();
-
-		virtual void					SetScale(const ZEVector3& NewScale);
-		virtual ZEVector3				GetScale();
-
-		virtual bool					SetData(const ZEVector3* Vertices, size_t VertexCount, 
-												const ZEPhysicalTriangle* Triangles, size_t PolygonCount, 
-												const ZEPhysicalMaterial* Materials, size_t MaterialCount);
-
-		virtual void					SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags);
-		virtual ZEDWORD					GetCollisionCallbackFlags();
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();	
-
-};
-
-#endif
-
-
-
-
+void ZEPhysicalJoint::Destroy()
+{
+	Deinitialize();
+	delete this;
+}

@@ -35,6 +35,33 @@
 
 #include "ZEPhysics\ZEPhysicalTrigger.h"
 
+void ZEPhysicalTrigger::SetTriggerEvent(const ZEPhysicalTriggerEvent& Event)
+{
+	TriggerEvent = Event;
+}
 
+const ZEPhysicalTriggerEvent& ZEPhysicalTrigger::GetTriggerEvent()
+{
+	return TriggerEvent;
+}
 
+ZEPhysicalTrigger::ZEPhysicalTrigger()
+{
 
+}
+
+ZEPhysicalTrigger::~ZEPhysicalTrigger()
+{
+
+}
+
+ZEPhysicalTrigger* ZEPhysicalTrigger::CreateInstance()
+{
+	return zePhysics->CreatePhysicalTrigger();
+}
+
+void ZEPhysicalTrigger::Destroy()
+{
+	Deinitialize();
+	delete this;
+}

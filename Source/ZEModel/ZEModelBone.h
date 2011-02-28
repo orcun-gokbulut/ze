@@ -45,6 +45,7 @@
 class ZEModel;
 class ZEModelBone
 {
+	friend ZEModel;
 	private:
 		ZEModel*							Owner;
 		const ZEModelResourceBone*			BoneResource;
@@ -75,7 +76,9 @@ class ZEModelBone
 		bool								UpdateModelTransform;
 		bool								UpdateWorldTransform;
 
-		void*								PhysicalBody;
+		ZEPhysicalRigidBody*				PhysicalBody;
+		ZEPhysicalJoint*					PhysicalJoint;
+
 		bool								PhysicsEnabled;
 
 		ZEModelAnimationType				AnimationType;
@@ -122,6 +125,7 @@ class ZEModelBone
 		bool								GetPhysicsEnabled();
 
 		void								Initialize(ZEModel* Model, const ZEModelResourceBone* BoneResource);
+
 		void								Deinitialize();
 
 		void								ModelTransformChanged();
