@@ -493,11 +493,8 @@ void ZEModel::StopAnimation()
 
 const ZEAABoundingBox& ZEModel::GetLocalBoundingBox() const
 {
-	if (BoundingBoxDirtyFlag)
-	{
-		((ZEModel*)this)->CalculateBoundingBox();
-		((ZEModel*)this)->BoundingBoxDirtyFlag = false;
-	}
+
+	((ZEModel*)this)->CalculateBoundingBox();
 	return BoundingBox;
 }
 
@@ -536,7 +533,6 @@ void ZEModel::OwnerWorldTransformChanged()
 
 void ZEModel::UpdateBoundingBox()
 {
-	BoundingBoxDirtyFlag = true;
 	UpdateBoundingVolumes();
 	if (GetOwner() != NULL)
 		GetOwner()->UpdateBoundingVolumes();
@@ -544,7 +540,7 @@ void ZEModel::UpdateBoundingBox()
 
 void ZEModel::UpdateBoneTransforms()
 {
-	BoneTransformsDirtyFlag = true;
+
 }
 
 void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
@@ -629,8 +625,6 @@ ZEModel::ZEModel()
 	Visibility = true;
 	AutoLOD = true;
 	ActiveLOD = 0;
-	BoundingBoxDirtyFlag = true;
-	BoneTransformsDirtyFlag = true;
 	DebugDrawComponents.Material = NULL;
 	DrawSkeleton = false;
 }

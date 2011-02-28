@@ -82,66 +82,44 @@ const ZEAABoundingBox& ZEModelMesh::GetLocalBoundingBox()
 
 const ZEAABoundingBox& ZEModelMesh::GetModelBoundingBox()
 {
-	if (UpdateModelBoundingBox)
-	{
-		ZEAABoundingBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
-		UpdateModelBoundingBox = false;
-	}
-	
+	ZEAABoundingBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
+
 	return ModelBoundingBox;
 }
 
 
 const ZEAABoundingBox& ZEModelMesh::GetWorldBoundingBox()
 {
-	if (UpdateWorldBoundingBox)
-	{
-		ZEAABoundingBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
-		UpdateWorldBoundingBox = false;
-	}
+
+	ZEAABoundingBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+
 	return WorldBoundingBox;
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetLocalTransform()
 {
-	if (UpdateLocalTransform)
-	{
-		ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
-		UpdateLocalTransform = false;
-	}
-	
+	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
+
 	return LocalTransform;
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
 {
-	if (UpdateModelTransform)
-	{
-		ZEMatrix4x4::Multiply(ModelTransform, GetLocalTransform(), Owner->GetLocalTransform());
-		UpdateModelTransform = false;
-	}
+	ZEMatrix4x4::Multiply(ModelTransform, GetLocalTransform(), Owner->GetLocalTransform());
+
 	return ModelTransform;	
 	
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
 {
-	if (UpdateWorldTransform)
-	{
-		ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
-		UpdateWorldTransform = false;
-	}
+	ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
+
 	return WorldTransform;	
 }
 	
 void ZEModelMesh::SetLocalPosition(const ZEVector3& LocalPosition)
 {
-	UpdateWorldBoundingBox = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-	UpdateModelTransform = true;
-	UpdateLocalTransform = true;
 	Owner->UpdateBoundingBox();
 
 	Position = LocalPosition;
@@ -154,11 +132,6 @@ const ZEVector3& ZEModelMesh::GetLocalPostion()
 
 void ZEModelMesh::SetLocalRotation(const ZEQuaternion& LocalRotation)
 {
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateLocalTransform = true;
 	Owner->UpdateBoundingBox();
 
 	Rotation = LocalRotation;
@@ -171,11 +144,6 @@ const ZEQuaternion& ZEModelMesh::GetLocalRotation()
 
 void ZEModelMesh::SetLocalScale(const ZEVector3& LocalScale)
 {
-	UpdateWorldBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateModelTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateLocalTransform = true;
 	Owner->UpdateBoundingBox();
 
 	Scale = LocalScale;
@@ -219,12 +187,6 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	Scale = MeshResource->Scale;
 	LocalBoundingBox = MeshResource->BoundingBox;
 	PhysicsEnabled = false;
-
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateLocalTransform = true;
 
 	ZEArray<ZEPhysicalShape*> ShapeList;
 
@@ -319,10 +281,6 @@ void ZEModelMesh::Deinitialize()
 
 void ZEModelMesh::ModelTransformChanged()
 {
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
 	if (PhysicalBody != NULL)
 	{
 		PhysicalBody->SetPosition(Owner->GetWorldPosition());
@@ -332,8 +290,7 @@ void ZEModelMesh::ModelTransformChanged()
 
 void ZEModelMesh::ModelWorldTransformChanged()
 {
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
+
 }
 
 void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)

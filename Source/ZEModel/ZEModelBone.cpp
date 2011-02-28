@@ -65,21 +65,15 @@ const ZEAABoundingBox& ZEModelBone::GetLocalBoundingBox()
 
 const ZEAABoundingBox& ZEModelBone::GetModelBoundingBox()
 {
-	if (UpdateModelBoundingBox)
-	{
-		ZEAABoundingBox::Transform(ModelBoundingBox, BoneResource->BoundingBox, GetModelTransform());
-		UpdateModelBoundingBox = false;
-	}
+	ZEAABoundingBox::Transform(ModelBoundingBox, BoneResource->BoundingBox, GetModelTransform());
+
 	return ModelBoundingBox;
 }
 
 const ZEAABoundingBox& ZEModelBone::GetWorldBoundingBox()
 {
-	if (UpdateWorldBoundingBox)
-	{
-		ZEAABoundingBox::Transform(WorldBoundingBox, BoneResource->BoundingBox, GetWorldTransform());
-		UpdateWorldBoundingBox = false;
-	}
+	ZEAABoundingBox::Transform(WorldBoundingBox, BoneResource->BoundingBox, GetWorldTransform());
+
 	return WorldBoundingBox;
 }
 
@@ -90,64 +84,46 @@ const ZEMatrix4x4& ZEModelBone::GetInverseTransform()
 
 const ZEMatrix4x4& ZEModelBone::GetLocalTransform()
 {
-	//if (UpdateLocalTransform)
+
+	if (ParentBone == NULL)
+		LocalTransform = GetRelativeTransform();
+	else
 	{
-		if (ParentBone == NULL)
-			LocalTransform = GetRelativeTransform();
-		else
-		{
-			ZEMatrix4x4::Multiply(LocalTransform, GetRelativeTransform(), ParentBone->GetLocalTransform());
-			return LocalTransform;
-		}
-		UpdateLocalTransform = false;
+		ZEMatrix4x4::Multiply(LocalTransform, GetRelativeTransform(), ParentBone->GetLocalTransform());
+		return LocalTransform;
 	}
+
 	return LocalTransform;
 }
 
 const ZEMatrix4x4& ZEModelBone::GetWorldTransform()
 {
-//	if (UpdateWorldTransform)
-	{
-		ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
-		UpdateWorldTransform = false;
-	}
+	ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
 
 	return WorldTransform;
 }
 
 const ZEMatrix4x4& ZEModelBone::GetModelTransform()
 {
-	//if (UpdateWorldTransform)
-	{
-		ZEMatrix4x4::Multiply(WorldTransform, Owner->GetLocalTransform(), GetLocalTransform());
-		UpdateWorldTransform = false;
-	}
+	ZEMatrix4x4::Multiply(WorldTransform, Owner->GetLocalTransform(), GetLocalTransform());
+
 
 	return WorldTransform;
 }
 
 const ZEMatrix4x4& ZEModelBone::GetVertexTransform()
 {
-//	if (UpdateVertexTransform)
-	{
-		ZEMatrix4x4::Multiply(VertexTransform, BoneResource->InverseTransform, GetLocalTransform());
-		UpdateVertexTransform = false;
-	}
-
+	ZEMatrix4x4::Multiply(VertexTransform, BoneResource->InverseTransform, GetLocalTransform());
 	return VertexTransform;
 }
 
 const ZEMatrix4x4& ZEModelBone::GetRelativeTransform()
 {
-//	if (UpdateRelativeTransform)
-	{
-		ZEMatrix4x4 Temp1, Temp2;
-		ZEMatrix4x4::CreateTranslation(Temp1, RelativePosition);
-		ZEMatrix4x4::CreateRotation(Temp2, RelativeRotation);
-		ZEMatrix4x4::Multiply(RelativeTransform, Temp2, Temp1);
+	ZEMatrix4x4 Temp1, Temp2;
+	ZEMatrix4x4::CreateTranslation(Temp1, RelativePosition);
+	ZEMatrix4x4::CreateRotation(Temp2, RelativeRotation);
+	ZEMatrix4x4::Multiply(RelativeTransform, Temp2, Temp1);
 
-		UpdateRelativeTransform = false;
-	}
 	return RelativeTransform;
 }
 
@@ -158,12 +134,6 @@ const ZEVector3& ZEModelBone::GetRelativePosition()
 
 void ZEModelBone::SetRelativePosition(const ZEVector3& Position)
 {
-	UpdateRelativeTransform = true;
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
 	Owner->UpdateBoundingBox();
 
 	RelativePosition = Position;
@@ -176,12 +146,6 @@ const ZEQuaternion& ZEModelBone::GetRelativeRotation()
 
 void ZEModelBone::SetRelativeRotation(const ZEQuaternion& Rotation)
 {
-	UpdateRelativeTransform = true;
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
 	Owner->UpdateBoundingBox();
 	Owner->UpdateBoneTransforms();
 	RelativeRotation = Rotation;
@@ -282,16 +246,9 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 	RelativePosition = BoneResource->RelativePosition;
 	RelativeRotation = BoneResource->RelativeRotation;
 
-	UpdateRelativeTransform = true;
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
-
 	ZEArray<ZEPhysicalShape*> ShapeList;
 
-	if(PhysicalBody == NULL)
+	if(BoneResource->PhysicalBody.Type != ZE_MRPBT_NONE)
 	{
 		PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
 
@@ -512,21 +469,10 @@ void ZEModelBone::Deinitialize()
 	}
 
 	ChildBones.Clear();
-
-	UpdateRelativeTransform = true;
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
 }
 
 void ZEModelBone::ModelWorldTransformChanged()
 {
-	UpdateVertexTransform = true;
-	UpdateWorldTransform = true;
-	UpdateWorldBoundingBox = true;
 	if (PhysicalBody != NULL)
 	{
 		PhysicalBody->SetPosition(GetWorldPosition());
@@ -536,11 +482,6 @@ void ZEModelBone::ModelWorldTransformChanged()
 
 void ZEModelBone::ModelTransformChanged()
 {
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
 	if (PhysicalBody != NULL)
 	{
 		PhysicalBody->SetPosition(GetWorldPosition());
@@ -554,14 +495,6 @@ ZEModelBone::ZEModelBone()
 	ParentBone = NULL;
 	PhysicalJoint = NULL;
 	PhysicalBody = NULL;
-
-	UpdateRelativeTransform = true;
-	UpdateVertexTransform = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-
-	UpdateModelBoundingBox = true;
-	UpdateWorldBoundingBox = true;
 }
 
 ZEModelBone::~ZEModelBone()

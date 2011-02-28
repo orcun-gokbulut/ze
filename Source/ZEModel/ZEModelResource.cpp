@@ -537,9 +537,20 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFi
 		Bone->RelativeScale = BoneChunk.RelativeScale;
 		if (BoneChunk.HasPhysicalBody)
 			ReadPhysicalBodyFromFile(&Bone->PhysicalBody, ResourceFile);
+		else
+		{
+			memset(&Bone->PhysicalBody, 0, sizeof(ZEModelResourcePhysicalBody));
+			Bone->PhysicalBody.Type = ZE_MRPBT_NONE;
+		}
+
 
 		if (BoneChunk.HasPhysicalJoint)
 			ReadPhysicalJointFromFile(&Bone->PhysicalJoint, ResourceFile);
+		else
+		{
+			memset(&Bone->PhysicalJoint, 0, sizeof(ZEModelResourcePhysicalJoint));
+			Bone->PhysicalJoint.JointType = ZE_PJT_NONE;
+		}
 	}
 
 	for (size_t I = 0; I < Model->Bones.GetCount(); I++)

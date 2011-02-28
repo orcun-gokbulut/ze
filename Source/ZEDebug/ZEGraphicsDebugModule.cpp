@@ -186,7 +186,7 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 	
 	//Player->SetRotation(Rotation);
 	//ProjectiveLight0->SetRotation(Rotation);
-//	Brush->SetRotation(Rotation);
+	Model->SetPosition(ZEVector3(0.1f, 0.0f, 0.0f) * ElapsedTime);
 }
 
 

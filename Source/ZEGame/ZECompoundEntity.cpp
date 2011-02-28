@@ -138,7 +138,7 @@ const ZEArray<ZEComponent*>& ZECompoundEntity::GetComponents() const
 
 const ZEAABoundingBox &	 ZECompoundEntity::GetWorldBoundingBox()
 {
-	if (DirtyFlags & ZE_EDF_WORLD_BOUNDING_BOX)
+	//if (DirtyFlags & ZE_EDF_WORLD_BOUNDING_BOX)
 	{
 		bool NoBoundingBox = true;
 

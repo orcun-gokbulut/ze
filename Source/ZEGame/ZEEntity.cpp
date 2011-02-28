@@ -74,7 +74,7 @@ int ZEEntity::GetEntityId() const
 
 const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 {
-	if (DirtyFlags & ZE_EDF_WORLD_BOUNDING_BOX)
+	//if (DirtyFlags & ZE_EDF_WORLD_BOUNDING_BOX)
 	{
 		ZEVector3 Point;
 		const ZEMatrix4x4& WorldTransform = GetWorldTransform();
@@ -101,7 +101,7 @@ const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
 
 const ZEBoundingSphere&	ZEEntity::GetWorldBoundingSphere()
 {
-	if (DirtyFlags & ZE_EDF_WORLD_BOUNDING_SPHERE)
+	//if (DirtyFlags & ZE_EDF_WORLD_BOUNDING_SPHERE)
 	{
 		GetWorldBoundingBox().GenerateBoundingSphere(WorldBoundingSphere);
 		DirtyFlags &= ~ZE_EDF_WORLD_BOUNDING_SPHERE;
@@ -195,7 +195,7 @@ ZEVector3 ZEEntity::GetUp()
 
 const ZEMatrix4x4& ZEEntity::GetWorldTransform()
 {
-	if (DirtyFlags & ZE_EDF_WORLD_TRANSFORM)
+	//if (DirtyFlags & ZE_EDF_WORLD_TRANSFORM)
 	{
 		ZEMatrix4x4::CreateOrientation(WorldTransform, Position, Rotation, Scale);
 		DirtyFlags &= ~ZE_EDF_WORLD_TRANSFORM;

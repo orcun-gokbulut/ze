@@ -99,7 +99,7 @@ const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 {
 	if (Owner != NULL)
 	{
-		if (DirtyFlags & ZE_CDF_WORLD_TRANSFORM)
+		//if (DirtyFlags & ZE_CDF_WORLD_TRANSFORM)
 		{
 			ZEMatrix4x4::Multiply(((ZEComponent*)this)->WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
 			((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_TRANSFORM;
@@ -113,7 +113,7 @@ const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 
 const ZEMatrix4x4& ZEComponent::GetLocalTransform() const 
 {
-	if (DirtyFlags & ZE_CDF_LOCAL_TRANSFORM)
+	//if (DirtyFlags & ZE_CDF_LOCAL_TRANSFORM)
 	{
 		ZEMatrix4x4::CreateOrientation(((ZEComponent*)this)->LocalTransform, GetPosition(), GetRotation(), GetScale());
 		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_LOCAL_TRANSFORM;
@@ -129,7 +129,7 @@ const ZEAABoundingBox& ZEComponent::GetLocalBoundingBox() const
 
 const ZEAABoundingBox& ZEComponent::GetWorldBoundingBox() const
 {
-	if (DirtyFlags & ZE_CDF_WORLD_BOUNDING_BOX)
+	//if (DirtyFlags & ZE_CDF_WORLD_BOUNDING_BOX)
 	{
 		ZEAABoundingBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
 		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_BOUNDING_BOX;
@@ -140,7 +140,7 @@ const ZEAABoundingBox& ZEComponent::GetWorldBoundingBox() const
 
 const ZEBoundingSphere& ZEComponent::GetWorldBoundingSphere() const
 {
-	if (DirtyFlags & ZE_CDF_WORLD_BOUNDING_SPHERE)
+	//if (DirtyFlags & ZE_CDF_WORLD_BOUNDING_SPHERE)
 	{
 		GetWorldBoundingBox().GenerateBoundingSphere(((ZEComponent*)this)->WorldBoundingSphere);
 		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_BOUNDING_SPHERE;

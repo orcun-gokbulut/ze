@@ -65,17 +65,6 @@ class ZEModelBone
 		ZEAABoundingBox						ModelBoundingBox;
 		ZEAABoundingBox						WorldBoundingBox;
 
-		ZEDWORD								DirtyFlags;
-
-		bool								UpdateModelBoundingBox;
-		bool								UpdateWorldBoundingBox;
-		bool								UpdateRelativeTransform;
-
-		bool								UpdateLocalTransform;
-		bool								UpdateVertexTransform;
-		bool								UpdateModelTransform;
-		bool								UpdateWorldTransform;
-
 		ZEPhysicalRigidBody*				PhysicalBody;
 		ZEPhysicalJoint*					PhysicalJoint;
 

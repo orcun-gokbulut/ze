@@ -69,12 +69,6 @@ class ZEModelMesh
 		bool								AutoLOD;
 		size_t								ActiveLOD;
 
-		bool								UpdateLocalTransform;
-		bool								UpdateModelTransform;
-		bool								UpdateWorldTransform;
-		bool								UpdateModelBoundingBox;
-		bool								UpdateWorldBoundingBox;
-
 		ZEModelAnimationType				AnimationType;
 		bool								Visible;		
 
