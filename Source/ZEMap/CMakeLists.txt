@@ -33,16 +33,16 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-add_subdirectory(ZEPortalMap)
+add_subdirectory (ZEPortalMap)
 
-add_source(ZEMap.cpp ZEMap_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEMap.h ZEMap_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEMapResource.cpp ZEMap_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEMapResource.h ZEMap_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source (ZEMap.cpp			Source)
+add_source (ZEMap.h				Source ZESDK)
+add_source (ZEMapResource.cpp	Source)
+add_source (ZEMapResource.h		Source ZESDK)
 
-add_library(ZEMap ${ZEMap_SOURCE_FILES})
+add_library(ZEMap ${Source})
 
-install(TARGETS ZEMap COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEMap)
+install (TARGETS ZEMap COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEMap)

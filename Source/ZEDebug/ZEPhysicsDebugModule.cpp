@@ -54,6 +54,7 @@
 #include "ZEGame\ZEEntityProvider.h"
 #include "ZEGraphics\ZECamera.h"
 #include "ZEGraphics\ZEPointLight.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
 void ZEPhysicsDebugModule::TransformChanged(const ZEPhysicalTransformChange& TransformChange)
 {

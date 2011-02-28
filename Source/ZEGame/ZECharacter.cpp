@@ -42,6 +42,7 @@
 #include "ZEGame/ZEGame.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
 #define ACTIONID_FORWARD		0
 #define ACTIONID_BACKWARD		1

@@ -38,6 +38,7 @@
 #include "ZECore\ZEError.h"
 #include "ZEUI\ZEUIManager.h"
 #include "ZEGraphics\ZECamera.h"
+#include "ZEMath/ZEMathDefinitions.h"
 #include <string.h>
 
 ZEGameDescription* ZEGame::GetGameDescription()

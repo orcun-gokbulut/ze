@@ -35,7 +35,7 @@
 
 #include "ZEtrigonometry.h"
 #include <math.h>
-#include "ZEdefinitions.h"
+#include "ZEMathDefinitions.h"
 float SinTable[451];
 
 void InitTrigTables()

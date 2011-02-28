@@ -50,6 +50,8 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZEPointLight.h"
 
+#include "ZEMath/ZEMathDefinitions.h"
+
 //#include "ZEGame/ZED.h"
 
 #include <string.h>

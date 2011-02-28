@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESoundBrush2D.cpp
+ Zinek Engine - ZEMathDefinitions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,77 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESoundBrush2D.h"
-#include "ZEMath/ZEAABoundingBox.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEMathDefinitions.h"
 
-void ZESoundBrush2D::Draw(ZEDrawParameters* DrawParameters)
-{
-	if (SoundSource != NULL)
-	{
-		RenderOrder.WorldMatrix = SoundSource->GetWorldTransform();
-		DrawParameters->Renderer->AddToRenderList(&RenderOrder);
-	}
-}
 
-ZEDWORD ZESoundBrush2D::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
-}
-
-ZESoundSource* ZESoundBrush2D::GetSoundSource()
-{
-	return SoundSource;
-}
-
-void ZESoundBrush2D::SetSoundResource(ZESoundResource* SoundResource)
-{
-	SoundSource->SetSoundResource(SoundResource);
-}
-
-ZESoundResource* ZESoundBrush2D::GetSoundResource()
-{
-	return SoundSource->GetSoundResource();
-}
-
-bool ZESoundBrush2D::Initialize()
-{
-	return true;
-}
-void ZESoundBrush2D::Deinitialize()
-{
-	if (SoundSource != NULL)
-	{
-		UnregisterComponent(SoundSource);
-		SoundSource->Destroy();
-		SoundSource = NULL;
-	}
-}
-
-ZESoundBrush2D::ZESoundBrush2D()
-{
-	Material = ZEFixedMaterial::CreateInstance();
-	Material->SetZero();
-	Material->SetAmbientEnabled(true);
-	Material->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
-	Material->SetAmbientFactor(1.0f);
-	this->SoundSource = ZESoundSource::CreateInstance();
-	Canvas.AddSphere(0.1f, 16, 16);
-
-	SoundSource->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-
-	RenderOrder.SetZero();
-	RenderOrder.Material = Material;
-	RenderOrder.WorldMatrix = GetWorldTransform();
-	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderOrder.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-
-	RenderOrder.VertexBuffer = Canvas.CreateStaticVertexBuffer();
-	RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
-
-	SetBoundingVolumeMechanism(ZE_BVM_USE_BOTH);
-
-	RegisterComponent(SoundSource);
-}

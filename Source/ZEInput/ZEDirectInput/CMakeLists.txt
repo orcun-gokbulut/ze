@@ -33,12 +33,12 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-add_source(ZEDirectInputModule.cpp ZEDirectInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEDirectInputModule.h ZEDirectInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEDirectInputModuleDescription.cpp ZEDirectInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEDirectInputModuleDescription.h ZEDirectInput_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source (ZEDirectInputModule.cpp				Sources)
+add_source (ZEDirectInputModule.h				Sources)
+add_source (ZEDirectInputModuleDescription.cpp	Sources)
+add_source (ZEDirectInputModuleDescription.h	Sources)
 
-add_library(ZEDirectInput ${ZEDirectInput_SOURCE_FILES})
-target_link_libraries(ZEDirectInput dinput8.lib dxguid.lib)
+add_library (ZEDirectInput ${Sources})
+target_link_libraries (ZEDirectInput dinput8.lib dxguid.lib)

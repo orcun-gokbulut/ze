@@ -40,6 +40,7 @@
 #include "ZEMath\ZERay.h"
 #include "ZEGame\ZEDrawParameters.h"
 #include "ZEGame\ZEEntityProvider.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZECamera)
 

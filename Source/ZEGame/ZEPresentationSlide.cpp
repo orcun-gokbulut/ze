@@ -44,6 +44,8 @@
 #include "ZEGraphics\ZETexture2DResource.h"
 #include <string.h>
 
+#include "ZEMath/ZEMathDefinitions.h"
+
 ZEDWORD ZEPresentationSlide::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;

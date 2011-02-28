@@ -33,22 +33,21 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
+add_source (ZEALComponentBase.cpp		Sources)
+add_source (ZEALComponentBase.h			Sources)
+add_source (ZEALListener.cpp			Sources)
+add_source (ZEALListener.h				Sources)
+add_source (ZEALModule.cpp				Sources)
+add_source (ZEALModule.h				Sources)
+add_source (ZEALModuleDescription.cpp	Sources)
+add_source (ZEALModuleDescription.h		Sources)
+add_source (ZEALSoundSource.cpp			Sources)
+add_source (ZEALSoundSource.h			Sources)
+add_source (ZEALSoundSource3D.cpp		Sources)
+add_source (ZEALSoundSource3D.h			Sources)
 
-add_source(ZEALComponentBase.cpp ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEALComponentBase.h ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEALListener.cpp ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEALListener.h ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEALModule.cpp ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEALModule.h ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEALModuleDescription.cpp ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEALModuleDescription.h ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEALSoundSource.cpp ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEALSoundSource.h ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEALSoundSource3D.cpp ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEALSoundSource3D.h ZEOpenAL_SOURCE_FILES INCLUDED_SDKS zesdk)
-
-add_library(ZEOpenAL ${ZEOpenAL_SOURCE_FILES})
-target_link_libraries(ZEOpenAL OpenAL32.lib)
+add_library (ZEOpenAL ${Sources})
+target_link_libraries (ZEOpenAL OpenAL32.lib)
 

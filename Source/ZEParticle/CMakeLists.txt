@@ -35,19 +35,18 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+add_source (ZEParticle.cpp				Sources)
+add_source (ZEParticle.h				Sources ZESDK)
+add_source (ZEParticleController.cpp	Sources)
+add_source (ZEParticleController.h		Sources ZESDK)
+add_source (ZEParticleEffect.cpp		Sources)
+add_source (ZEParticleEffect.h			Sources ZESDK)
+add_source (ZEParticleEmitter.cpp		Sources)
+add_source (ZEParticleEmitter.h			Sources ZESDK)
+add_source (ZEParticleSystem.cpp		Sources)
+add_source (ZEParticleSystem.h			Sources ZESDK)
 
-add_source(ZEParticle.cpp ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEParticle.h ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEParticleController.cpp ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEParticleController.h ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEParticleEffect.cpp ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEParticleEffect.h ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEParticleEmitter.cpp ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEParticleEmitter.h ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEParticleSystem.cpp ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEParticleSystem.h ZEParticle_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_library (ZEParticle ${Sources})
 
-add_library(ZEParticle ${ZEParticle_SOURCE_FILES})
-
-install(TARGETS ZEParticle COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEParticle)
+install (TARGETS ZEParticle COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEParticle)

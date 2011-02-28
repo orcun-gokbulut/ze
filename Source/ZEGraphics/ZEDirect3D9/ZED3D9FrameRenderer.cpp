@@ -55,6 +55,7 @@
 #include "ZEGraphics\ZEProjectiveLight.h"
 #include "ZEGraphics\ZEOmniProjectiveLight.h"
 #include "ZEGraphics\ZECamera.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
 #include "ZECore\ZEError.h"
 

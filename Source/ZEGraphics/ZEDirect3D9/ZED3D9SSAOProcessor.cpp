@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9SSAOProcessor.h"
-#include "ZEMath\ZEDefinitions.h"
+#include "ZEMath\ZEMathDefinitions.h"
 #include "ZED3D9Common.h"
 #include "ZED3D9CommonTools.h"
 #include "ZEGraphics/ZETexture2DResource.h"

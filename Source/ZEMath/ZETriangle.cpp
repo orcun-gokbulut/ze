@@ -35,7 +35,7 @@
 
 #include "ZETriangle.h"
 #include "ZEPlane.h"
-#include "ZEDefinitions.h"
+#include "ZEMathDefinitions.h"
 #include "ZELineSegment.h"
 #include "ZELine.h"
 #include "ZERay.h"

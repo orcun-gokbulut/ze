@@ -33,20 +33,20 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-add_subdirectory(ZEDirectInput)
-add_subdirectory(ZEDummyInput)
-add_subdirectory(ZEVirtualInput)
+add_subdirectory (ZEDirectInput)
+add_subdirectory (ZEDummyInput)
+add_subdirectory (ZEVirtualInput)
 
-add_source(ZEInputDefinitions.cpp ZEInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEInputDefinitions.h ZEInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEInputMap.cpp ZEInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEInputMap.h ZEInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEInputModule.cpp ZEInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEInputModule.h ZEInput_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source (ZEInputDefinitions.cpp	Sources)
+add_source (ZEInputDefinitions.h	Sources ZESDK)
+add_source (ZEInputMap.cpp			Sources)
+add_source (ZEInputMap.h			Sources ZESDK)
+add_source (ZEInputModule.cpp		Sources)
+add_source (ZEInputModule.h			Sources ZESDK)
 
-add_library(ZEInput ${ZEInput_SOURCE_FILES})
+add_library (ZEInput ${Sources})
 
-install(TARGETS ZEInput COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEInput)
+install (TARGETS ZEInput COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEInput)

@@ -43,6 +43,8 @@
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
 
+#include "ZEMath/ZEMathDefinitions.h"
+
 static float GausianFunction(float x, float StandartDeviation)
 {
 	return (1.0f / (sqrtf(2.0f * ZE_PI) * StandartDeviation)) * powf(ZE_E, -((x * x) / (2.0f * StandartDeviation * StandartDeviation)));

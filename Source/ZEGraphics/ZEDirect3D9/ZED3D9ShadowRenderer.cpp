@@ -47,6 +47,7 @@
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZECore/ZEError.h"
 #include "ZECore/ZEResourceFile.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
 ZED3D9VertexShader* OmniLightVS = NULL;
 ZED3D9PixelShader* OmniLightPS = NULL;

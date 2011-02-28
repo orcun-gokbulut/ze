@@ -42,6 +42,7 @@
 #include "ZEShadowRenderer.h"
 #include "ZEGraphicsModule.h"
 #include "ZEGame/ZEEntityProvider.h"
+#include "ZEMath/ZEMathDefinitions.h"
 #include <string.h>
 
 

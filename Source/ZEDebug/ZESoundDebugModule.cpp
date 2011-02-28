@@ -74,41 +74,41 @@ bool ZESoundDebugModule::Initialize()
 		SoundSource->SetSoundSourceType(ZE_SST_MUSIC);
 	}*/
 
-	SoundBrush2D = new ZESoundBrush2D();
+	SoundBrush2D = ZESoundSource::CreateInstance();
 	
-	//SoundBrush3D = new ZESoundBrush3D();
+	//SoundBrush3D = new ZESoundSource3D::CreateInstance();
 
 	SoundBrush2D->SetSoundResource(ZESoundResource::LoadResource("sample2.ogg"));
 	SoundBrush2D->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	
-	//SoundBrush2D->GetSoundSource()->SetLimitsEnabled(true);
-	//SoundBrush2D->GetSoundSource()->SetStartPositionTime(10);
-	//SoundBrush2D->GetSoundSource()->SetStartPositionPersentage(3.6f);
+	//SoundBrush2D->SetLimitsEnabled(true);
+	//SoundBrush2D->SetStartPositionTime(10);
+	//SoundBrush2D->SetStartPositionPersentage(3.6f);
 
-	//SoundBrush2D->GetSoundSource()->SetEndPositionTime(40);
-	//SoundBrush2D->GetSoundSource()->SetEndPositionPercentage(4.5f);
-	SoundBrush2D->GetSoundSource()->SetVolume(80);
+	//SoundBrush2D->SetEndPositionTime(40);
+	//SoundBrush2D->SetEndPositionPercentage(4.5f);
+	SoundBrush2D->SetVolume(80);
 	
-	//SoundBrush2D->GetSoundSource()->SetLooping(true);
+	//SoundBrush2D->SetLooping(true);
 	
 
-	//SoundBrush2D->GetSoundSource()->SetPan(100);
+	//SoundBrush2D->SetPan(100);
 
-	SoundBrush2D->GetSoundSource()->Play();
+	SoundBrush2D->Play();
 
 	Scene->AddEntity(SoundBrush2D);
 
-	SoundBrush2D = new ZESoundBrush2D();
-	SoundBrush2D->GetSoundSource()->SetSoundResource(ZESoundResource::LoadResource("test.wav"));
-	SoundBrush2D->GetSoundSource()->SetLooping(true);
-	SoundBrush2D->GetSoundSource()->SetVolume(40);
-	//SoundBrush2D->GetSoundSource()->Play();
+	SoundBrush2D = ZESoundSource::CreateInstance();
+	SoundBrush2D->SetSoundResource(ZESoundResource::LoadResource("test.wav"));
+	SoundBrush2D->SetLooping(true);
+	SoundBrush2D->SetVolume(40);
+	//SoundBrush2D->Play();
 
-	SoundBrush2D = new ZESoundBrush2D();
-	SoundBrush2D->GetSoundSource()->SetSoundResource(ZESoundResource::LoadResource("mozart.mp3"));
-	SoundBrush2D->GetSoundSource()->SetLooping(true);
-	SoundBrush2D->GetSoundSource()->SetVolume(40);
-	//SoundBrush2D->GetSoundSource()->Play();
+	SoundBrush2D = ZESoundSource::CreateInstance();
+	SoundBrush2D->SetSoundResource(ZESoundResource::LoadResource("mozart.mp3"));
+	SoundBrush2D->SetLooping(true);
+	SoundBrush2D->SetVolume(40);
+	//SoundBrush2D->Play();
 
 	return true;
 }
@@ -117,23 +117,23 @@ void ZESoundDebugModule::Process(float ElapsedTime)
 {
 	TotalTime += ElapsedTime;
 
-	float StartPositionPersentage		= SoundBrush2D->GetSoundSource()->GetStartPositionPersentage();
-	float EndPositionPersentage			= SoundBrush2D->GetSoundSource()->GetEndPositionPersentage();
+	float StartPositionPersentage		= SoundBrush2D->GetStartPositionPersentage();
+	float EndPositionPersentage			= SoundBrush2D->GetEndPositionPersentage();
 
-	float StartPositonTime				= SoundBrush2D->GetSoundSource()->GetStartPositionTime();
-	float EndPositionTime				= SoundBrush2D->GetSoundSource()->GetEndPositionTime();
+	float StartPositonTime				= SoundBrush2D->GetStartPositionTime();
+	float EndPositionTime				= SoundBrush2D->GetEndPositionTime();
 
 
-	unsigned int StartPosition			= SoundBrush2D->GetSoundSource()->GetStartPosition();
-	unsigned int EndPosition			= SoundBrush2D->GetSoundSource()->GetEndPosition();
+	unsigned int StartPosition			= SoundBrush2D->GetStartPosition();
+	unsigned int EndPosition			= SoundBrush2D->GetEndPosition();
 
-	unsigned int Volume					= SoundBrush2D->GetSoundSource()->GetVolume();
+	unsigned int Volume					= SoundBrush2D->GetVolume();
 
-	float CurrentPositionPersentage		= SoundBrush2D->GetSoundSource()->GetCurrentPositionPersentage();
+	float CurrentPositionPersentage		= SoundBrush2D->GetCurrentPositionPersentage();
 
-	float CurrentPositionTime			= SoundBrush2D->GetSoundSource()->GetCurrentPositionTime();
+	float CurrentPositionTime			= SoundBrush2D->GetCurrentPositionTime();
 
-	short int BitsPerSample				= SoundBrush2D->GetSoundSource()->GetSoundResource()->GetBitsPerSample();
+	short int BitsPerSample				= SoundBrush2D->GetSoundResource()->GetBitsPerSample();
 
 	if (EnterFlag == false && (int)TotalTime == 5)
 	{

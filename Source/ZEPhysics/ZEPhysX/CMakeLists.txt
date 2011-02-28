@@ -33,40 +33,39 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
+add_source (ZEPhysXCollisionManager.cpp			Sources)
+add_source (ZEPhysXCollisionManager.h			Sources)
+add_source (ZEPhysXComponentBase.cpp			Sources)
+add_source (ZEPhysXComponentBase.h				Sources)
+add_source (ZEPhysXConversion.cpp				Sources)
+add_source (ZEPhysXConversion.h					Sources)
+add_source (ZEPhysXModule.cpp					Sources)
+add_source (ZEPhysXModule.h						Sources)
+add_source (ZEPhysXModuleDescription.cpp		Sources)
+add_source (ZEPhysXModuleDescription.h			Sources)
+add_source (ZEPhysXPhysicalRigidBody.cpp		Sources)
+add_source (ZEPhysXPhysicalRigidBody.h			Sources)
+add_source (ZEPhysXPhysicalStaticMesh.cpp		Sources)
+add_source (ZEPhysXPhysicalStaticMesh.h			Sources)
+add_source (ZEPhysXPhysicalStaticRigidBody.cpp	Sources)
+add_source (ZEPhysXPhysicalStaticRigidBody.h	Sources)
+add_source (ZEPhysXPhysicalWorld.cpp			Sources)
+add_source (ZEPhysXPhysicalWorld.h				Sources)
+add_source (ZEPhysXStream.cpp					Sources)
+add_source (ZEPhysXStream.h						Sources)
+add_source (ZEPhysXUserOutputStream.cpp			Sources)
+add_source (ZEPhysXUserOutputStream.h			Sources)
 
-add_source(ZEPhysXCollisionManager.cpp ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXCollisionManager.h ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXComponentBase.cpp ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXComponentBase.h ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXConversion.cpp ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXConversion.h ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXModule.cpp ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXModule.h ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXModuleDescription.cpp ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXModuleDescription.h ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXPhysicalRigidBody.cpp ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXPhysicalRigidBody.h ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXPhysicalStaticMesh.cpp ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXPhysicalStaticMesh.h ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXPhysicalStaticRigidBody.cpp ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXPhysicalStaticRigidBody.h ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXPhysicalWorld.cpp ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXPhysicalWorld.h ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXStream.cpp ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXStream.h ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXUserOutputStream.cpp ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysXUserOutputStream.h ZEPhysX_SOURCE_FILES INCLUDED_SDKS zesdk)
+#add_definitions (-DNX_USER_DEBUG_MODE)
 
-#add_definitions(-DNX_USER_DEBUG_MODE)
-
-include_directories(
+include_directories (
 	${PROJECT_SOURCE_DIR}/Include/physx/Cooking 
 	${PROJECT_SOURCE_DIR}/Include/physx/Foundation 
 	${PROJECT_SOURCE_DIR}/Include/physx/NxCharacter 
 	${PROJECT_SOURCE_DIR}/Include/physx/PhysXLoader
 	${PROJECT_SOURCE_DIR}/Include/physx/Physics)
 
-add_library(ZEPhysX ${ZEPhysX_SOURCE_FILES})
-target_link_libraries(ZEPhysX PhysXLoader.lib NxCooking.lib)
+add_library (ZEPhysX ${Sources})
+target_link_libraries (ZEPhysX PhysXLoader.lib NxCooking.lib)

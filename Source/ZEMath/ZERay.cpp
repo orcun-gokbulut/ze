@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDefinitions.h"
+#include "ZEMathDefinitions.h"
 #include "ZERay.h"
 #include "ZELineSegment.h"
 #include "ZEVector.h"

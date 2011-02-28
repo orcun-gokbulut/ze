@@ -52,6 +52,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEModel/ZEModel.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
 bool ZEGraphicsDebugModule::Initialize()
 {

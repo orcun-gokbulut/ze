@@ -33,13 +33,13 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-add_source(ZED3D9PostProcessor.cpp ZED3D9PostProcessor_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZED3D9PostProcessor.h ZED3D9PostProcessor_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZED3D9PPBlurNode.cpp ZED3D9PostProcessor_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZED3D9PPBlurNode.h ZED3D9PostProcessor_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZED3D9PPScreenOutputNode.cpp ZED3D9PostProcessor_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZED3D9PPScreenOutputNode.h ZED3D9PostProcessor_SOURCE_FILES INCLUDED_SDKS zesdk)
+add_source (ZED3D9PostProcessor.cpp			Sources)
+add_source (ZED3D9PostProcessor.h			Sources)
+add_source (ZED3D9PPBlurNode.cpp			Sources)
+add_source (ZED3D9PPBlurNode.h				Sources)
+add_source (ZED3D9PPScreenOutputNode.cpp	Sources)
+add_source (ZED3D9PPScreenOutputNode.h		Sources)
 
-add_library(ZED3D9PostProcessor ${ZED3D9PostProcessor_SOURCE_FILES})
+add_library (ZED3D9PostProcessor ${Sources})

@@ -38,8 +38,6 @@
 #define __ZE_SOUND_DEBUG_MODULE_H__
 
 #include "ZEDebugModule.h"
-#include "ZEGame/ZESoundBrush2D.h"
-#include "ZEGame/ZESoundBrush3D.h"
 #include "ZEGame/ZEGrid.h"
 
 class ZEPlayer;
@@ -57,7 +55,7 @@ class ZESoundDebugModule : public ZEDebugModule
 
 		bool					EnterFlag;
 
-		ZESoundBrush2D*			SoundBrush2D;
+		ZESoundSource*			SoundBrush2D;
 	//	ZESoundBrush3D*			SoundBrush3D;
 	
 	public:

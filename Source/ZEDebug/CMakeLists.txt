@@ -33,23 +33,19 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
+add_source (ZEDebugModule.cpp					Sources)
+add_source (ZEDebugModule.h						Sources)
+add_source (ZEGraphicsDebugModule.cpp			Sources)
+add_source (ZEGraphicsDebugModule.h				Sources)
+add_source (ZEModelAnimationDebugModule.cpp		Sources)
+add_source (ZEModelAnimationDebugModule.h		Sources)
+add_source (ZEMetaDebugModule.cpp				Sources)
+add_source (ZEMetaDebugModule.h					Sources)
+add_source (ZEPhysicsDebugModule.cpp			Sources)
+add_source (ZEPhysicsDebugModule.h				Sources)
+add_source (ZESoundDebugModule.cpp				Sources)
+add_source (ZESoundDebugModule.h				Sources)
 
-add_source(ZEDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEGraphicsDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEGraphicsDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEModelAnimationDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEModelAnimationDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEMetaDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEMetaDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysicsDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEPhysicsDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZESoundDebugModule.cpp ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZESoundDebugModule.h ZEDebug_SOURCE_FILES INCLUDED_SDKS zesdk)
-
-add_library(ZEDebug ${ZEDebug_SOURCE_FILES})
-
-install(TARGETS ZEDebug COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install(FILES ${zesdk_INCLUDES}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Includes/ZEDebug)
+add_library (ZEDebug ${Sources})

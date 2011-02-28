@@ -33,12 +33,11 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
+add_source (ZEDummyInputModule.cpp				Sources)
+add_source (ZEDummyInputModule.h				Sources)
+add_source (ZEDummyInputModuleDescription.cpp	Sources)
+add_source (ZEDummyInputModuleDescription.h		Sources)
 
-add_source(ZEDummyInputModule.cpp ZEDummyInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEDummyInputModule.h ZEDummyInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEDummyInputModuleDescription.cpp ZEDummyInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEDummyInputModuleDescription.h ZEDummyInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-
-add_library(ZEDummyInput ${ZEDummyInput_SOURCE_FILES})
+add_library (ZEDummyInput ${Sources})

@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEQuaternion.h"
-#include "ZEDefinitions.h"
+#include "ZEMathDefinitions.h"
 #include <math.h>
 #include <float.h>
 #include <stdlib.h>

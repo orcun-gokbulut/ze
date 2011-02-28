@@ -35,10 +35,9 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+add_source(ZEVirtualInputModule.cpp				Sources)
+add_source(ZEVirtualInputModule.h				Sources ZESDK)
+add_source(ZEVirtualInputModuleDescription.cpp	Sources)
+add_source(ZEVirtualInputModuleDescription.h	Sources ZESDK)
 
-add_source(ZEVirtualInputModule.cpp ZEVirtualInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEVirtualInputModule.h ZEVirtualInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEVirtualInputModuleDescription.cpp ZEVirtualInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-add_source(ZEVirtualInputModuleDescription.h ZEVirtualInput_SOURCE_FILES INCLUDED_SDKS zesdk)
-
-add_library(ZEVirtualInput ${ZEVirtualInput_SOURCE_FILES})
+add_library(ZEVirtualInput ${Sources})
