@@ -139,7 +139,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(ProjectiveLight0);
 	
 
-	ZEModel* Model = ZEModel::CreateInstance();		
+	Model = ZEModel::CreateInstance();		
 	Model->SetModelResource(ZEModelResource::LoadResource("subsurfacetest.zemodel"));
 	Scene->AddEntity(Model);
 
@@ -186,7 +186,7 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 	
 	//Player->SetRotation(Rotation);
 	//ProjectiveLight0->SetRotation(Rotation);
-	Model->SetPosition(ZEVector3(0.1f, 0.0f, 0.0f) * ElapsedTime);
+	Model->SetPosition(Model->GetPosition() + ZEVector3(0.1f, 0.0f, 0.0f) * ElapsedTime);
 }
 
 

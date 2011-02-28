@@ -69,3 +69,6 @@ include_directories (
 
 add_library (ZEPhysX ${Sources})
 target_link_libraries (ZEPhysX PhysXLoader.lib NxCooking.lib)
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZEPhysX PROPERTY FOLDER "Zinek Engine")

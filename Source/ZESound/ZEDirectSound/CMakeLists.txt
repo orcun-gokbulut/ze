@@ -50,3 +50,6 @@ add_source (ZEDSSoundSource3D.h			Sources)
 
 add_library (ZEDirectSound ${Sources})
 target_link_libraries (ZEDirectSound dsound.lib)
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZEDirectSound PROPERTY FOLDER "Zinek Engine")

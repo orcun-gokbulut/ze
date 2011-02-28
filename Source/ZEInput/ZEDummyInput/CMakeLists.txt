@@ -41,3 +41,6 @@ add_source (ZEDummyInputModuleDescription.cpp	Sources)
 add_source (ZEDummyInputModuleDescription.h		Sources)
 
 add_library (ZEDummyInput ${Sources})
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZEDummyInput PROPERTY FOLDER "Zinek Engine")

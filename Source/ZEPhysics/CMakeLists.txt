@@ -62,3 +62,6 @@ add_library (ZEPhysics ${Sources})
 
 install (TARGETS ZEPhysics COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEPhysics)
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZEPhysics PROPERTY FOLDER "Zinek Engine")

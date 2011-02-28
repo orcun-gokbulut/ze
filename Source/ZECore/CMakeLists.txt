@@ -71,5 +71,8 @@ add_source (ZEWindowResource.h			Sources)
 
 add_library (ZECore ${Sources})
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property (TARGET ZECore PROPERTY FOLDER "Zinek Engine")
+
 install (TARGETS ZECore COMPONENT "Libraries" CONFIGURATIONS Release ARCHIVE DESTINATION Lib)
 install (FILES ${ZESDK} COMPONENT "Includes" DESTINATION Include/ZECore)

@@ -68,5 +68,8 @@ add_source (ZEVector.h				Sources ZESDK)
 
 add_library (ZEMath ${Sources})
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZEMath PROPERTY FOLDER "Zinek Engine")
+
 install (TARGETS ZEMath COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEMath)

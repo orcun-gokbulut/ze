@@ -59,5 +59,8 @@ add_source (ZESoundSource3D.h			Sources ZESDK)
 add_library (ZESound ${Sources})
 target_link_libraries (ZESound libvorbis.lib libvorbisfile.lib libogg.lib libmpg123.lib)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZESound PROPERTY FOLDER "Zinek Engine")
+
 install (TARGETS ZESound COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZESound)

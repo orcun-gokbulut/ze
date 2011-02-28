@@ -51,3 +51,5 @@ add_source (ZEALSoundSource3D.h			Sources)
 add_library (ZEOpenAL ${Sources})
 target_link_libraries (ZEOpenAL OpenAL32.lib)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZEOpenAL PROPERTY FOLDER "Zinek Engine")

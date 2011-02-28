@@ -42,3 +42,6 @@ add_source (ZEDirectInputModuleDescription.h	Sources)
 
 add_library (ZEDirectInput ${Sources})
 target_link_libraries (ZEDirectInput dinput8.lib dxguid.lib)
+
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZEDirectInput PROPERTY FOLDER "Zinek Engine")

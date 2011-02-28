@@ -66,6 +66,9 @@ add_executable (ZE WIN32 ${Sources})
 target_link_libraries (ZE ZECore ZEDebug ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
 target_link_libraries (ZE ZEDirect3D9 ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZE PROPERTY FOLDER "Zinek Engine")
+
 install (TARGETS ZE RUNTIME DESTINATION bin COMPONENT "Runtime")
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include)
 install (DIRECTORY ${CMAKE_SOURCE_DIR}/Dll/ CONFIGURATIONS Release ARCHIVE DESTINATION bin COMPONENT "Runtime")

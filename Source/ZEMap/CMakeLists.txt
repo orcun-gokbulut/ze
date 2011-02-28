@@ -44,5 +44,8 @@ add_source (ZEMapResource.h		Source ZESDK)
 
 add_library(ZEMap ${Source})
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZEMap PROPERTY FOLDER "Zinek Engine")
+
 install (TARGETS ZEMap COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEMap)

@@ -54,5 +54,8 @@ add_source (ZEUITextControl.h		Sources ZESDK)
 
 add_library (ZEUI ${Sources})
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZEUI PROPERTY FOLDER "Zinek Engine")
+
 install (TARGETS ZEUI COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEUI)

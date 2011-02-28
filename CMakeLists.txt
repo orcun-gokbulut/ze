@@ -59,13 +59,9 @@ add_definitions(-DZE_ZINEK_ENGINE)
 #	add_definition (-DZE_DEBUG_ENABLE_MEMORY_CHECKS)
 
 
-set (ZESDK_INCLUDES)
-set (ZEToolSDK_INCLUDES)
-set (ZEGameSDK_INCLUDES)
-set (ZEModuleSDK_INCLUDES)
-
 set (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+set_property (GLOBAL PROPERTY USE_FOLDERS ON)
 
 include_directories (Source Include)
 link_directories("${PROJECT_SOURCE_DIR}/Lib/Win x86/Debug" "${PROJECT_SOURCE_DIR}/Lib/Win x86/DirectX" "${PROJECT_SOURCE_DIR}/Lib/Win x86/OpenAL" "${PROJECT_SOURCE_DIR}/Lib/Win x86/PhysX")

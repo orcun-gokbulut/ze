@@ -43,3 +43,5 @@ add_source (ZED3D9PPScreenOutputNode.cpp	Sources)
 add_source (ZED3D9PPScreenOutputNode.h		Sources)
 
 add_library (ZED3D9PostProcessor ${Sources})
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZED3D9PostProcessor PROPERTY FOLDER "Zinek Engine")

@@ -110,5 +110,8 @@ add_definitions (-DFREEIMAGE_LIB)
 add_library (ZEGraphics ${Sources})
 target_link_libraries (ZEGraphics freeimage.lib)
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZEGraphics PROPERTY FOLDER "Zinek Engine")
+
 install (TARGETS ZEGraphics COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEGraphics)

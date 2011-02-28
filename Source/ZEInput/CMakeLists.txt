@@ -48,5 +48,8 @@ add_source (ZEInputModule.h			Sources ZESDK)
 
 add_library (ZEInput ${Sources})
 
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+set_property(TARGET ZEInput PROPERTY FOLDER "Zinek Engine")
+
 install (TARGETS ZEInput COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEInput)
