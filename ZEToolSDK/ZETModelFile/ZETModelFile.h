@@ -33,17 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "../ZEMath/Vector.h"
-#include "../ZEMath/Quaternion.h"
-#include "../ZEMath/AABoundingBox.h"
-#include "../ZEDS/Array.h"
-#include "../Types.h"
-#include "../Definitions.h"
+#pragma once
+#ifndef __ZET_MODEL_FILE_H__
+#define __ZET_MODEL_FILE_H__
+
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEDS/ZEArray.h"
+#include "ZETTypes.h"
+#include "ZETDefinitions.h"
 
 #define ZE_MDLF_MAX_NAME_SIZE					ZE_MAX_NAME_SIZE
 #define ZE_MDLF_MAX_FILENAME_SIZE				ZE_MAX_FILE_NAME_SIZE
-
-
 
 enum ZEPhysicalShapeType
 {
@@ -371,3 +373,5 @@ class ZEModelFile
 		bool									ReadFromFile(const char* FileName);
 		bool									Validate();
 };
+
+#endif

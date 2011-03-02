@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModel/ModelFile.h"
-#include "ZEModel/ModelFileFormat.h"
-#include "iostream"
+#include "ZETModelFile/ZETModelFile.h"
+#include "ZETModelFile/ZETModelFileFormat.h"
+#include <iostream>
 
 class ZEModelFile;
 

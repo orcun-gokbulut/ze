@@ -42,5 +42,4 @@ add_source(ZEVirtualInputModuleDescription.h	Sources ZESDK)
 
 add_library(ZEVirtualInput ${Sources})
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEVirtualInput PROPERTY FOLDER "Zinek Engine")

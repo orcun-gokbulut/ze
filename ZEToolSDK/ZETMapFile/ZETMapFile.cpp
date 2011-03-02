@@ -33,12 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETOutput.h"
+#include "ZETMapFile.h"
+#include "ZETMapOctree.h"
+#include "ZETMapFileFormat.h"
+
 #include <stdio.h>
 #include <string.h>
-#include "..\output.h"
-#include "MapFile.h"
-#include "Octree.h"
-#include "MapFileFormat.h"
 
 #pragma warning(push)
 #pragma warning(disable:4307 4267 4018)

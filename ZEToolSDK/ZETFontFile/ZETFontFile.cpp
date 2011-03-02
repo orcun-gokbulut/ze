@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETFontFile.h"
 #include <stdio.h>
-#include "FontFile.h"
 
 #define ZEFONTFILE_HEADER									((ZEDWORD)((ZEDWORD)'ZEFF' + (ZEDWORD)'FONT'))
 

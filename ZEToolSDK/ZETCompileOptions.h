@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_COMPILE_OPTIONS_H__
-#define __ZE_COMPILE_OPTIONS_H__
+#ifndef __ZET_COMPILE_OPTIONS_H__
+#define __ZET_COMPILE_OPTIONS_H__
 
 #define ZEMAKEVERSION(Major, Minor, Build) ((unsigned int)(Major) << 24 | (unsigned int)(Minor)<<16 | (Build))
 #define ZESDKVERSION ZEMAKEVERSION(0, 1, 005)

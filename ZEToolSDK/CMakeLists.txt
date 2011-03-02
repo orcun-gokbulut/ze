@@ -35,6 +35,18 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+project (ZEToolSDK)
+
+include_directories (${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/../Include ${PROJECT_SOURCE_DIR}/../ZEFoundation)
+link_directories(
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/Debug" 
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX")
+	
+include_directories(.)
+include_directories(ZEFoundation)
+
 add_subdirectory (ZETFontFile)
 add_subdirectory (ZETMapFile)
 add_subdirectory (ZETMaterialFile)
@@ -52,6 +64,7 @@ add_library (ZEToolSDK ${Sources})
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEToolSDK PROPERTY FOLDER "ZEToolSDK")
+
 
 install (TARGETS ZEToolSDK COMPONENT "ZEToolSDK Libraries" CONFIGURATIONS Release DESTINATION Lib)
 install (FILES ${ZEToolSDK}  COMPONENT "ZEToolSDK Includes" CONFIGURATIONS Release DESTINATION Include/ZEToolSDK)

@@ -35,14 +35,21 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+project (ZinekEngine)
+
+include_directories (${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/../Include ${PROJECT_SOURCE_DIR}/../ZEFoundation)
+link_directories(
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/Debug" 
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX")
+
 add_subdirectory (ZECore)
 add_subdirectory (ZEDebug)
-add_subdirectory (ZEDS)
 add_subdirectory (ZEGame)
 add_subdirectory (ZEGraphics)
 add_subdirectory (ZEInput)
 add_subdirectory (ZEMap)
-add_subdirectory (ZEMath)
 add_subdirectory (ZEMeta)
 add_subdirectory (ZEModel)
 add_subdirectory (ZENetwork)
@@ -63,12 +70,13 @@ add_source (ZESDK.h 				Sources ZESDK)
 add_source (ZETypes.h				Sources ZESDK)
 
 add_executable (ZE WIN32 ${Sources})
-target_link_libraries (ZE ZECore ZEDebug ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
-target_link_libraries (ZE ZEDirect3D9 ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
-
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZE PROPERTY FOLDER "Zinek Engine")
 
+target_link_libraries (ZE ZECore ZEDebug ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
+target_link_libraries (ZE ZEDirect3D9 ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
+
+message(${PROJECT_SOURCE_DIR})
 install (TARGETS ZE RUNTIME DESTINATION bin COMPONENT "Runtime")
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include)
 install (DIRECTORY ${CMAKE_SOURCE_DIR}/Dll/ CONFIGURATIONS Release ARCHIVE DESTINATION bin COMPONENT "Runtime")

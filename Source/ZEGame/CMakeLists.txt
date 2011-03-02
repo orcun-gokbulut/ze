@@ -74,7 +74,6 @@ add_source (ZETrigger.h				Sources ZESDK)
 
 add_library (ZEGame ${Sources})
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEGame PROPERTY FOLDER "Zinek Engine")
 
 install (TARGETS ZEGame COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)

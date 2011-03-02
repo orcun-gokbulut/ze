@@ -34,15 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MAPFILEFORMAT_H__
-#define __ZE_MAPFILEFORMAT_H__
+#ifndef __ZET_MAP_FILE_FORMAT_H__
+#define __ZET_MAP_FILE_FORMAT_H__
 
-#include "../Definitions.h"
-#include "../Types.h"
-#include "../ZEDS/Variant.h"
-#include "../ZEMath/Vector.h"
-#include "../ZEMath/AABoundingBox.h"
-#include "../ZEMath/Rectangle3D.h"
+#include "ZETDefinitions.h"
+#include "ZETTypes.h"
+#include "ZEDS/ZEVariant.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZERectangle3D.h"
 
 #define ZE_MPFL_MAX_NAME_SIZE				ZE_MAX_NAME_SIZE
 #define ZE_MPFL_MAX_FILENAME_SIZE			ZE_MAX_FILE_NAME_SIZE

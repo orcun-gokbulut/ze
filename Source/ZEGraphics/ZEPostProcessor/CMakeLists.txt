@@ -60,5 +60,4 @@ add_source (ZEPPVelocityInputNode.h		Sources ZESDK)
 
 add_library (ZEPostProcessor ${Sources})
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEPostProcessor PROPERTY FOLDER "Zinek Engine")

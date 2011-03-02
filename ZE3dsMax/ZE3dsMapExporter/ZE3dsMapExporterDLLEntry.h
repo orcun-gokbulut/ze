@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ResourceFilePart.h
+ Zinek Engine - ZE3dsMapExporterDLLEntry.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZESDK_RESOURCE_INTERNAL_FILE__
-#define __ZESDK_RESOURCE_INTERNAL_FILE__
+#pragma once
+#ifndef __ZE3DS_MAP_EXPORTER_DLL_ENTRY_H__
+#define __ZE3DS_MAP_EXPORTER_DLL_ENTRY_H__
 
-#include "../Types.h"
-#include <stdio.h>
-
-class ZEResourceInternalFile
-{
-	private:
-		ZEDWORD						Size;
-		unsigned char*				Data;
-
-	public:
-		ZEDWORD						GetFileSize() const;
-		unsigned char*				GetFileBuffer() const;
-		void						AllocateBuffer(ZEDWORD Size);
-		
-		bool						WriteToResourceFile(FILE* File) const;
-		bool						ReadFromResourceFile(FILE* File);
-
-		bool						WriteToExternalFile(const char* Filename) const;
-		bool						ReadFromExternalFile(const char* Filename);
-
-		void						CopyTo(ZEResourceInternalFile& Destination) const;
-
-		ZEResourceInternalFile&		operator=(const ZEResourceInternalFile& Source);
-
-									ZEResourceInternalFile(const ZEResourceInternalFile& Source);
-									ZEResourceInternalFile();
-									~ZEResourceInternalFile();
-};
 #endif

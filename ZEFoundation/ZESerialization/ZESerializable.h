@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETOctree.h
+ Zinek Engine - ZESerializable.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,40 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MAPFILEOCTREE_H__
-#define __ZE_MAPFILEOCTREE_H__
+#ifndef __ZE_SERIALIZABLE_H__
+#define __ZE_SERIALIZABLE_H__
 
-#include "../Definitions.h"
-#include "../ZEDS/Array.h"
-#include "../ZEMath/AABoundingBox.h"
-#include "MapFile.h"
+class ZESerializer;
+class ZEUnserializer;
 
-enum ZEOctreeSubspace
+class ZESerializable
 {
-	ZEOCTREESUBSPACE_LEFTDOWNFRONT	 = 0,
-	ZEOCTREESUBSPACE_LEFTDOWNBACK	 = 1,
-	ZEOCTREESUBSPACE_LEFTUPFRONT	 = 2,
-	ZEOCTREESUBSPACE_LEFTUPBACK		 = 3,
-	ZEOCTREESUBSPACE_RIGHTDOWNFRONT	 = 4,
-	ZEOCTREESUBSPACE_RIGHTDOWNBACK	 = 5,
-	ZEOCTREESUBSPACE_RIGHTUPFRONT	 = 6,
-	ZEOCTREESUBSPACE_RIGHTUPBACK	 = 7
-};
-
-class ZEMapFileOctree
-{
-	public:	
-		bool						IsLeaf;
-		int							Depth;
-		ZEMapFileOctree*			SubTrees[8];
-
-		ZEAABoundingBox				BoundingBox;
-		ZESmartArray<ZEDWORD>		PolygonIds;
-
-		static ZEMapFileOctree*		GenerateOctree(ZEArray<ZEMapFilePolygon>& Polygons, unsigned int MaxDepth);
-
-									ZEMapFileOctree();
-									~ZEMapFileOctree();
+	public:
+		virtual bool				Serialize(ZESerializer* Serializer) = 0;
+		virtual	bool				Unserialize(ZEUnserializer* Unserializer) = 0;
 };
 
 #endif

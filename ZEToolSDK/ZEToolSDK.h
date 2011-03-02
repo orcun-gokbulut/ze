@@ -33,8 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_SDK_H__
-#define __ZE_SDK_H__
-#include "Output.h"
+#ifndef __ZE_TOOL_SDK_H__
+#define __ZE_TOOL_SDK_H__
+
+#include "ZETOutput.h"
 
 #endif

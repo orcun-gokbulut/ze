@@ -33,17 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "output.h"
+#include "ZETOutput.h"
 #include <stdio.h>
 #include <stdarg.h>
 #include <stdlib.h>
 
 void (*Out)(const char*) = NULL;
 
-#ifdef ZESDK_DEBUG_ENABLED
-ZESDKOutputLevel OutputLevel = ZESDK_OL_DEBUG;
+#ifdef ZET_DEBUG_ENABLED
+ZESDKOutputLevel OutputLevel = ZET_OL_DEBUG;
 #else
-ZESDKOutputLevel OutputLevel = ZESDK_OL_WARNINGS;
+ZESDKOutputLevel OutputLevel = ZET_OL_WARNINGS;
 #endif
 
 void ZESDKOutput::SetOutputCallback(void (*OutputCallback)(const char*) )
@@ -66,15 +66,15 @@ const char* GetOutputLevelString(ZESDKOutputLevel Level)
 {
 	switch(Level)
 	{
-		case ZESDK_OL_ERROR:
+		case ZET_OL_ERROR:
 			return "Error";
-		case ZESDK_OL_WARNINGS:
+		case ZET_OL_WARNINGS:
 			return "Warning";
-		case ZESDK_OL_LOG:
+		case ZET_OL_LOG:
 			return "Log";
-		case ZESDK_OL_NOTICE:
+		case ZET_OL_NOTICE:
 			return "Notice";
-		case ZESDK_OL_DEBUG:
+		case ZET_OL_DEBUG:
 			return "Debug Output";
 		default:
 			return "";
@@ -83,7 +83,7 @@ const char* GetOutputLevelString(ZESDKOutputLevel Level)
 
 void ZESDKOutput::Output(const char* Module, const char* Format, ...)
 {
-	if (Out != NULL && OutputLevel != ZESDK_OL_NOOUTPUT)
+	if (Out != NULL && OutputLevel != ZET_OL_NOOUTPUT)
 	{
 		char Buffer[1024];
 		char Buffer2[1024];
@@ -113,7 +113,7 @@ void ZESDKOutput::Output(const char* Module, ZESDKOutputLevel Level, const char*
 }
 void ZESDKOutput::DebugOutput(const char* File, const char* Function, int Line, bool Warning, const char* Format, ...)
 {
-	if (Out != NULL && ZESDK_OL_DEBUG <= OutputLevel)
+	if (Out != NULL && ZET_OL_DEBUG <= OutputLevel)
 	{
 		char Buffer[1024];
 

@@ -1,0 +1,143 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "ZE3dsModelExporterResources.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "ZE3dsModelExporterResources.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDS_LIBDESCRIPTION      "Zinek Engine Static Model Exporter"
+    IDS_CATEGORY            "Exporter"
+    IDS_CLASS_NAME          "ZEStaticModelExporter"
+    IDS_PARAMS              "Parameters"
+    IDS_SPIN                "Spin"
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Turkish resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_TRK)
+#ifdef _WIN32
+LANGUAGE LANG_TURKISH, SUBLANG_DEFAULT
+#pragma code_page(1254)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+3 TEXTINCLUDE 
+BEGIN
+    "\r\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_OPTIONS DIALOGEX 0, 0, 310, 223
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Zinek Engine Map Export"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LTEXT           "Zinek Engine Directory :",IDC_STATIC,16,24,77,8
+    EDITTEXT        IDC_ZINEKDIR,102,24,196,12,ES_AUTOHSCROLL
+    PUSHBUTTON      "Browse",IDC_BROWSE,255,41,42,12
+    PUSHBUTTON      "Export",IDC_EXPORT,203,197,48,18
+    GROUPBOX        "Zinek Engine Resource Options",IDC_STATIC,6,6,297,53
+    PUSHBUTTON      "Cancel",IDC_CANCEL,253,197,48,18
+    GROUPBOX        "Logging",IDC_STATIC,4,114,298,79
+    LTEXT           "File :",IDC_STATIC,13,162,16,12
+    EDITTEXT        IDC_LOGFILE,101,159,194,12,ES_AUTOHSCROLL
+    LTEXT           "Log Level :",IDC_STATIC,13,128,36,12
+    COMBOBOX        IDC_LOGLEVEL,99,128,196,30,CBS_DROPDOWNLIST | CBS_SORT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Browse",IDC_BROWSEFILE,253,178,42,12
+    CONTROL         "Output to file",IDC_OUTPUTTOFILE,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,13,144,75,12
+    GROUPBOX        "Export ",IDC_STATIC,6,60,298,48
+    CONTROL         "Export Animation",IDC_EXPORTANIMATION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,12,74,66,10
+    EDITTEXT        IDC_ANIMATIONNAME,98,89,120,12,ES_AUTOHSCROLL
+    LTEXT           "Animation Name :",IDC_STATIC,11,90,57,8
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_OPTIONS, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 222
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Turkish resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

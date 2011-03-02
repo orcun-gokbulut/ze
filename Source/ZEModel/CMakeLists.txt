@@ -54,7 +54,6 @@ add_source (ZEModelResource.h			Sources ZESDK)
 
 add_library (ZEModel ${Sources})
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEModel PROPERTY FOLDER "Zinek Engine")
 
 install (TARGETS ZEModel COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)

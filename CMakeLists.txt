@@ -35,13 +35,14 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-project (ZinekEngine) 
+project (ZinekPlatform)
+ 
 set (ZinekEngine_VERSION_MAJOR 0)
 set (ZinekEngine_VERSION_MINOR 5)
 
 ## Configuration
 #########################################################################################
-set(CMAKE_MODULE_PATH ${ZinekEngine_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
  
 include(MacroOutOfSourceBuild)
 include(ParseArguments)
@@ -63,17 +64,16 @@ set (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set_property (GLOBAL PROPERTY USE_FOLDERS ON)
 
-include_directories (Source Include)
-link_directories("${PROJECT_SOURCE_DIR}/Lib/Win x86/Debug" "${PROJECT_SOURCE_DIR}/Lib/Win x86/DirectX" "${PROJECT_SOURCE_DIR}/Lib/Win x86/OpenAL" "${PROJECT_SOURCE_DIR}/Lib/Win x86/PhysX")
 
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS OFF)
 
-source_group (ZPP REGULAR_EXPRESSION ".*\\.zpp")
 
 ## Files
 #########################################################################################
 add_subdirectory (Source)
 add_subdirectory (ZEToolSDK)
+add_subdirectory (ZEFoundation)
+add_subdirectory (ZE3dsMax)
 
 ## PACKING
 #########################################################################################

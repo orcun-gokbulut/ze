@@ -55,7 +55,6 @@ add_source(ZEProvider.h			Sources ZESDK)
 
 add_library(ZEMeta ${Sources})
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEMeta PROPERTY FOLDER "Zinek Engine")
 
 install(TARGETS ZEMeta COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)

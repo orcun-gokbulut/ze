@@ -42,7 +42,6 @@ add_source (ZETModelFileFormat.cpp		Sources)
 
 add_library (ZETModelFile ${Sources})
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZETModelFile PROPERTY FOLDER "ZEToolSDK")
 
 install (TARGETS ZETModelFile COMPONENT "ZEToolSDK Libraries" CONFIGURATIONS Release DESTINATION Lib)

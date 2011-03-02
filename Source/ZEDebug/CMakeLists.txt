@@ -49,5 +49,4 @@ add_source (ZESoundDebugModule.cpp				Sources)
 add_source (ZESoundDebugModule.h				Sources)
 
 add_library (ZEDebug ${Sources})
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEDebug PROPERTY FOLDER "Zinek Engine")

@@ -34,10 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATERIAL_FILE_FORMAT_H__
-#define __ZE_MATERIAL_FILE_FORMAT_H__
+#ifndef __ZET_MATERIAL_FILE_FORMAT_H__
+#define __ZET_MATERIAL_FILE_FORMAT_H__
 
-#include "Common/Types.h"
+#include "ZETTypes.h"
+#include "ZEDS/ZEVariant.h"
+#include "ZEMath/ZEVector.h"
 
 #define ZE_MTLF_MAX_NAME_SIZE					128
 #define ZE_MTLF_MAX_FILENAME_SIZE				256
@@ -95,7 +97,7 @@ struct ZEMaterialFileFixedMaterialChunk
 	bool							TwoSided;
 	bool							LightningEnabled;
 	bool							Wireframe;
-	ZEMaterialTransparancyMode		TransparancyMode;
+	ZEDWORD							TransparancyMode;
 	bool							RecivesShadow;
 	unsigned int					TransparancyCullLimit;
 

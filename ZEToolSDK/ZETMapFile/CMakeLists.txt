@@ -39,12 +39,11 @@ add_source (ZETMapFile.cpp				Sources)
 add_source (ZETMapFile.h				Sources ZEToolSDK)
 add_source (ZETMapFileFormat.cpp		Sources)
 add_source (ZETMapFileFormat.h			Sources)
-add_source (ZETOctree.cpp				Sources)
-add_source (ZETOctree.h					Sources)
+add_source (ZETMapOctree.cpp			Sources)
+add_source (ZETMapOctree.h				Sources)
 
 add_library (ZETMapFile ${Sources})
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZETMapFile PROPERTY FOLDER "ZEToolSDK")
 
 install (TARGETS ZETMapFile COMPONENT "ZEToolSDK Libraries" CONFIGURATIONS Release DESTINATION Lib)

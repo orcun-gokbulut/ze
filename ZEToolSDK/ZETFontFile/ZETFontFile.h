@@ -34,13 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_FONT_FILE_H__
-#define __ZE_FONT_FILE_H__
+#ifndef __ZET_FONT_FILE_H__
+#define __ZET_FONT_FILE_H__
 
-#include "../ZEDS/Array.h"
-#include "../ZEMath/Rectangle.h"
-#include "../Common/ResourceFilePart.h"
-#include "../Types.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZERectangle.h"
+#include "ZETCommon/ZETResourceFilePart.h"
+#include "ZETTypes.h"
 
 #define ZEFONTFILE_CHARACTERCOUNT 256
 

@@ -34,12 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATERIAL_FILE_H__
-#define __ZE_MATERIAL_FILE_H__
+#ifndef __ZET_MATERIAL_FILE_H__
+#define __ZET_MATERIAL_FILE_H__
 
-#include "Common/Definitions.h"
-#include "Common/ZEDS/Array.h"
-#include "Common/ZEDS/Variant.h"
+#include "ZETDefinitions.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEVariant.h"
+#include <stdio.h>
 
 enum ZETextureFilterMode
 {
@@ -76,13 +77,13 @@ enum ZEMaterialOpacityComponent
 
 struct ZEMaterialTexture
 {	
-	private:
+	public:
 		char							FileName[ZE_MAX_FILE_NAME_SIZE];
 		bool							Internal;
 		size_t							Size;
 		char*							Data;
 
-	public:
+
 		void							SetInternal();
 		bool							IsInternal();
 

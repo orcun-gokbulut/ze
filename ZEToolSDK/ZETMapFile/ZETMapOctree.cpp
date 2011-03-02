@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETOctree.cpp
+ Zinek Engine - ZETMapOctree.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "Octree.h"
+#include "ZETMapOctree.h"
 
 #define IsAtFront(x)				(((x) & 1) == 0)
 #define IsAtLeft(x)					(((x) & 4) == 0)

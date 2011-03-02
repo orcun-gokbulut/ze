@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEFINITIONS_H__
-#define __ZE_DEFINITIONS_H__
+#ifndef __ZET_DEFINITIONS_H__
+#define __ZET_DEFINITIONS_H__
 
 #define ZE_MAX_NAME_SIZE			128
 #define ZE_MAX_FILE_NAME_SIZE		256

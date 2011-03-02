@@ -87,5 +87,4 @@ add_source (ZED3D9ViewPort.h				Sources)
 add_library (ZEDirect3D9 ${Sources})
 target_link_libraries (ZEDirect3D9 d3d9.lib d3dx9.lib)
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEDirect3D9 PROPERTY FOLDER "Zinek Engine")

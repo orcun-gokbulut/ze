@@ -34,15 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MODEL_FILE_FORMAT_H__
-#define __ZE_MODEL_FILE_FORMAT_H__
+#ifndef __ZET_MODEL_FILE_FORMAT_H__
+#define __ZET_MODEL_FILE_FORMAT_H__
 
-#include "..\ZEMath\Vector.h"
-#include "..\ZEMath\Quaternion.h"
-#include "..\ZEMath\AABoundingBox.h"
-#include "..\ZEDS\Array.h"
-#include "..\Definitions.h"
-#include "..\Types.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath\ZEAABoundingBox.h"
+#include "ZEDS\ZEArray.h"
+#include "ZETDefinitions.h"
+#include "ZETTypes.h"
 
 #define ZE_MDLF_MAX_NAME_SIZE						128
 #define ZE_MDLF_MAX_FILENAME_SIZE					256

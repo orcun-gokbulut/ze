@@ -33,9 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "MaterialFile.h"
+#include "ZETMaterialFile.h"
 #include <memory.h>
 #include <string.h>
+
 #ifndef NULL
 #define NULL 0
 #endif

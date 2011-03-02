@@ -42,7 +42,6 @@ add_source (ZETFontFile.h			Sources ZEToolSDK)
 
 add_library (ZETFontFile ${Sources})
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZETFontFile PROPERTY FOLDER "ZEToolSDK")
 
 install (TARGETS ZETFontFile COMPONENT "ZEToolSDK Libraries" CONFIGURATIONS Release DESTINATION Lib)

@@ -38,10 +38,10 @@ cmake_minimum_required (VERSION 2.8)
 add_source (ZETMaterialFile.cpp			Sources)
 add_source (ZETMaterialFile.h			Sources ZEToolSDK)
 add_source (ZETMaterialFileFormat.h		Sources)
+add_source (ZETMaterialFileFormat.cpp	Sources)
 
 add_library (ZETMaterialFile ${Sources})
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZETMaterialFile PROPERTY FOLDER "ZEToolSDK")
 
 install (TARGETS ZETMaterialFile COMPONENT "ZEToolSDK Libraries" CONFIGURATIONS Release DESTINATION Lib)

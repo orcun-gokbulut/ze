@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_FONT_BAKER_H__
-#define __ZE_FONT_BAKER_H__
+#ifndef __ZET_FONT_BAKER_H__
+#define __ZET_FONT_BAKER_H__
 
-#include "FontFile.h"
+#include "ZETFontFile.h"
 
 class ZEFontBaker
 {

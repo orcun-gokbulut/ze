@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DATATYPES_H__
-#define __ZE_DATATYPES_H__
+#ifndef __ZET_DATA_TYPES_H__
+#define __ZET_DATA_TYPES_H__
 
 #define ZEINT8		__int8
 #define ZEINT16		__int16

@@ -33,11 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ModelFile.h"
-#include "ModelFileFormat.h"
+#include "ZETModelFile.h"
+#include "ZETModelFileFormat.h"
+#include "ZETOutput.h"
+
 #include <string.h>
 #include <stdio.h>
-#include "../Output.h"
 
 #pragma warning(push)
 #pragma warning(disable:4307 4267 4018 4996)
