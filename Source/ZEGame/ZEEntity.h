@@ -108,9 +108,9 @@ typedef ZEDWORD ZEDrawFlags;
 
 // ZERayCastFlags
 typedef ZEDWORD ZERayCastFlags;
-#define ZE_RC_NONE								0
-#define ZE_RC_CAST_TO_ENTITY					1
-#define ZE_RC_CAST_TO_COMPONENTS				2
+#define ZE_RCF_NONE								0
+#define ZE_RCF_BOUNDING_BOX						1
+#define ZE_RCF_INTERNAL							2
 
 // Entity Dirty Flags
 typedef ZEDWORD ZEEntityDirtyFlags;
@@ -119,6 +119,7 @@ typedef ZEDWORD ZEEntityDirtyFlags;
 #define ZE_EDF_WORLD_TRANSFORM					2
 #define ZE_EDF_WORLD_BOUNDING_SPHERE			4
 #define ZE_EDF_WORLD_BOUNDING_BOX				8
+
 
 class ZEEntity : public ZEClass
 {
@@ -191,6 +192,8 @@ class ZEEntity : public ZEClass
 		const ZEMatrix4x4&						GetWorldTransform();
 
 		bool									GetInitialized();
+
+		virtual bool							CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal);
 
 		virtual bool							Initialize();
 		virtual void							Deinitialize();

@@ -37,6 +37,11 @@ cmake_minimum_required (VERSION 2.8)
 
 project (ZinekEngine)
 
+add_definitions (-DZE_DEBUG_ENABLED)
+add_definitions (-DZE_DEBUG_BREAK_ON_ERROR)
+#add_definitions (-DZE_DEBUG_BREAK_ON_WARNING)
+#add_definitions (-DZE_DEBUG_ENABLE_MEMORY_CHECKS)
+
 include_directories (${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/../Include ${PROJECT_SOURCE_DIR}/../ZEFoundation)
 link_directories(
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/Debug" 
@@ -68,6 +73,8 @@ add_source (ZEMain.cpp 				Sources)
 add_source (ZESDK.cpp 				Sources)
 add_source (ZESDK.h 				Sources ZESDK)
 add_source (ZETypes.h				Sources ZESDK)
+
+add_source (ZECore/ZEWindowResources.rc	Sources)
 
 add_executable (ZE WIN32 ${Sources})
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

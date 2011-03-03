@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SkyBoxMaterial.hlsl
+ Zinek Engine - ZERayCaster.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-samplerCUBE SkyTexture : register(s5);
+#pragma once
+#ifndef __ZE_RAY_CASTER_H__
+#define __ZE_RAY_CASTER_H__
 
-float4x4 WorldViewProjMatrix: register(c0);
-float3 SkyColor : register(c10);
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZERay.h"
+class ZEEntity;
+class ZEScene;
+class ZERay;
 
-struct VSInput 
+class ZERayCaster
 {
-	float4 Position : POSITION0;
+	public:
+		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float Range = 100000000.0f);
+		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float& T, float Range = 100000000.0f);
+		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, float Range = 100000000.0f);
+		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float Range = 100000000.0f);
+		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float& T, ZEVector3& Position, ZEVector3& Normal, float Range = 100000000.0f);
 };
 
-struct VSOutput 
-{
-	float4 Position : POSITION0;
-	float3 CubeTexcoord : TEXCOORD0;
-};
+#endif
 
-VSOutput VSMain(VSInput Input)
-{
-	VSOutput Output;
 
-	Output.Position = mul(Input.Position, WorldViewProjMatrix).xyzz;
-	Output.CubeTexcoord = Input.Position.xyz;
-	return Output;
-}
 
-struct PSInput
-{
-	float3 CubeTexcoord : TEXCOORD0;
-};
 
-float4 PSMain(PSInput Input) : COLOR0
-{
-	return float4(SkyColor * texCUBE(SkyTexture, Input.CubeTexcoord), 1.0f);
-}
+

@@ -53,6 +53,7 @@
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEModel/ZEModel.h"
 #include "ZEMath/ZEMathDefinitions.h"
+#include "ZEGame\ZESkyBrush.h"
 
 bool ZEGraphicsDebugModule::Initialize()
 {
@@ -67,7 +68,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(Player);
 
 
-	Scene->LoadMap("deneme.zemap");
+	Scene->LoadMap("terrain.zemap");
 
 	PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
@@ -139,9 +140,13 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(ProjectiveLight0);
 	
 
-	Model = ZEModel::CreateInstance();		
+	/*Model = ZEModel::CreateInstance();		
 	Model->SetModelResource(ZEModelResource::LoadResource("subsurfacetest.zemodel"));
-	Scene->AddEntity(Model);
+	Scene->AddEntity(Model);*/
+
+	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
+	Sky->SetSkyTexture("cubetest.tga");
+	Scene->AddEntity(Sky);
 
 	DirectionalLight0 = ZEDirectionalLight::CreateInstance();
 	DirectionalLight0->SetEnabled(true);
@@ -186,7 +191,7 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 	
 	//Player->SetRotation(Rotation);
 	//ProjectiveLight0->SetRotation(Rotation);
-	Model->SetPosition(Model->GetPosition() + ZEVector3(0.1f, 0.0f, 0.0f) * ElapsedTime);
+//	Model->SetPosition(Model->GetPosition() + ZEVector3(0.1f, 0.0f, 0.0f) * ElapsedTime);
 }
 
 

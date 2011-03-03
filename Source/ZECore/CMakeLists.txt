@@ -67,7 +67,8 @@ add_source (ZEResourceManager.cpp		Sources)
 add_source (ZEResourceManager.h			Sources ZESDK)
 add_source (ZEWindow.cpp				Sources)
 add_source (ZEWindow.h					Sources ZESDK)
-add_source (ZEWindowResource.h			Sources)
+add_source (ZEWindowResources.h			Sources)
+add_source (ZEWindowResources.rc		Sources)
 
 add_library (ZECore ${Sources})
 

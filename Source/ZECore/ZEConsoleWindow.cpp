@@ -39,7 +39,7 @@
 #include <windows.h>
 #include "ZECore.h"
 #include "ZEError.h"
-#include "ZEWindowResource.h"
+#include "ZEWindowResources.h"
 #include <stdarg.h>
 
 #pragma warning(push)

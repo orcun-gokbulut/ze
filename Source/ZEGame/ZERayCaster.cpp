@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - SkyBoxMaterial.hlsl
+ Zinek Engine - ZERayCaster.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,70 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-samplerCUBE SkyTexture : register(s5);
+#include "ZERayCaster.h"
+#include "ZEEntity.h"
+#include "ZEScene.h"
 
-float4x4 WorldViewProjMatrix: register(c0);
-float3 SkyColor : register(c10);
-
-struct VSInput 
+ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float Range)
 {
-	float4 Position : POSITION0;
-};
-
-struct VSOutput 
-{
-	float4 Position : POSITION0;
-	float3 CubeTexcoord : TEXCOORD0;
-};
-
-VSOutput VSMain(VSInput Input)
-{
-	VSOutput Output;
-
-	Output.Position = mul(Input.Position, WorldViewProjMatrix).xyzz;
-	Output.CubeTexcoord = Input.Position.xyz;
-	return Output;
+	float T;
+	ZEVector3 Position, Normal;
+	return ZERayCaster::CastRay(Scene, Ray, T, Position, Normal, Range);
 }
 
-struct PSInput
+ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float& T, float Range)
 {
-	float3 CubeTexcoord : TEXCOORD0;
-};
-
-float4 PSMain(PSInput Input) : COLOR0
-{
-	return float4(SkyColor * texCUBE(SkyTexture, Input.CubeTexcoord), 1.0f);
+	ZEVector3 Position, Normal;
+	return ZERayCaster::CastRay(Scene, Ray, T, Position, Normal, Range);
 }
+
+ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float& T, ZEVector3& Position, float Range)
+{
+	ZEVector3 Normal;
+	return ZERayCaster::CastRay(Scene, Ray, T, Position, Normal, Range);
+
+}
+
+ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float& T, ZEVector3& Position, ZEVector3& Normal, float Range)
+{
+	float MinT, MaxT;
+	T = Range / Ray.v.Length();
+
+	ZEEntity* IntersectedEntity = NULL;
+
+	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
+
+	for (size_t I = 0; I < Entities.GetCount(); I++)
+	{
+		ZEEntity* CurrentEntity = Entities[I];
+
+		ZEDWORD RayCastFlags = CurrentEntity->GetRayCastFlags();
+		if (RayCastFlags & ZE_RCF_BOUNDING_BOX)
+		{
+			if (!ZEAABoundingBox::IntersectionTest(CurrentEntity->GetWorldBoundingBox(), Ray, MinT, MaxT))
+				continue;
+
+			if (MinT < T)
+				continue;
+
+			IntersectedEntity = CurrentEntity;
+			T = MinT;
+			Position = Ray.GetPointOn(T);
+			Normal = -Ray.v;
+		}
+
+		if (RayCastFlags & ZE_RCF_INTERNAL)
+		{
+			if (!CurrentEntity->CastRay(Ray, T, Position, Normal))
+				continue;
+
+			if (MinT < T)
+				continue;
+
+			IntersectedEntity = CurrentEntity;
+		}
+	}
+
+	return IntersectedEntity;
+}
+
