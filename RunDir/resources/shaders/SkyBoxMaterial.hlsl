@@ -48,7 +48,7 @@ struct VSInput
 struct VSOutput 
 {
 	float4 Position : POSITION0;
-	float4 CubeTexcoord : TEXCOORD0;
+	float3 CubeTexcoord : TEXCOORD0;
 };
 
 VSOutput VSMain(VSInput Input)
@@ -56,16 +56,16 @@ VSOutput VSMain(VSInput Input)
 	VSOutput Output;
 
 	Output.Position = mul(Input.Position, WorldViewProjMatrix).xyzz;
-	Output.CubeTexcoord =  Input.Position;
+	Output.CubeTexcoord = Input.Position.xyz;
 	return Output;
 }
 
 struct PSInput
 {
-	float4 CubeTexcoord : TEXCOORD0;
+	float3 CubeTexcoord : TEXCOORD0;
 };
 
 float4 PSMain(PSInput Input) : COLOR0
 {
-	return float4(SkyColor * texCUBE(SkyTexture, normalize(Input.CubeTexcoord.xyz / Input.CubeTexcoord.w)), 1.0f);
+	return float4(SkyColor * texCUBE(SkyTexture, Input.CubeTexcoord), 1.0f);
 }
