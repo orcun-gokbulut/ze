@@ -35,7 +35,6 @@
 
 #include "ZEPortalMapResource.h"
 #include "ZEPortalMapFileFormat.h"
-#include "ZEPortalMapPortalOctree.h"
 
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEConsole.h"
@@ -368,7 +367,7 @@ const ZEArray<ZEPortalMapResourceDoor>& ZEPortalMapResource::GetDoors()
 	return Doors;
 }
 
-const ZEPortalMapResource* ZEPortalMapResource::LoadSharedResource(const char* FileName)
+ZEPortalMapResource* ZEPortalMapResource::LoadSharedResource(const char* FileName)
 {
 	// Try to get instance of shared ZEMap file from resource manager
 	ZEPortalMapResource* Resource = (ZEPortalMapResource*)zeResources->GetResource(FileName);

@@ -253,72 +253,6 @@ void ZEScene::Render(float ElapsedTime)
 	CullScene(Renderer, ActiveCamera->GetViewVolume(), true);
 }
 
-ZEEntity* ZEScene::CastRay(const ZERay& Ray, float Range)
-{
-	/*float MinT, MaxT, CurrMinT = Range / Ray.v.Length();
-
-	ZEEntity* RayCaster = ActiveCamera->GetOwner();
-	ZEEntity* IntersectedEntity = NULL;
-
-	for (size_t I = 0; I < Entities.GetCount(); I++)
-	{
-		ZEEntity* CurrentEntity = Entities[I];
-
-		if (CurrentEntity == RayCaster)
-			continue;
-
-		if (ZEAABoundingBox::IntersectionTest(CurrentEntity->GetWorldBoundingBox(),Ray,MinT,MaxT))
-		{
-			if (MinT < CurrMinT)
-			{
-				IntersectedEntity = CurrentEntity;
-				CurrMinT = MinT;
-			}
-		}
-	}
-
-	return IntersectedEntity;*/
-	return NULL;
-}
-
-bool ZEScene::CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntity, ZEVector3& Position, ZEVector3& Normal)
-{
-/*	float MinT, MaxT, CurrMinT = Range / Ray.v.Length();
-	*IntersectedEntity = NULL;
-
-	ZEEntity* RayCaster = ActiveCamera->GetOwner();
-
-	for (size_t I = 0; I < Entities.GetCount(); I++)
-	{
-		ZEEntity* CurrentEntity = Entities[I];
-
-		if (CurrentEntity == RayCaster)
-			continue;
-
-		if (CurrentEntity->CastRay(Ray,Range,MinT))
-			if (MinT < CurrMinT)
-			{
-				CurrMinT = MinT;
-				*IntersectedEntity = CurrentEntity;
-			}
-	}
-
-	if (Map != NULL)
-	{
-		if (Map->CastRay(Ray, Position, Normal, MinT))
-			if (MinT < CurrMinT)
-			{
-				*IntersectedEntity = NULL;
-				return true;
-			}
-
-		Ray.GetPointOn(Position, MinT);
-	}
-
-	return *IntersectedEntity != NULL;*/
-	return NULL;
-}
-
 const ZECullStatistics& ZEScene::GetCullStatistics()
 {
 	return CullStatistics;
@@ -412,8 +346,6 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 		((ZEFrameRenderer*)Renderer)->SetLights(VisibleLights);
 
 	DrawParameters.Lights = VisibleLights;
-	if (Map != NULL)
-		Map->Render(&DrawParameters);
 
 	// Step 2 : Draw entities and their components
 	ZESmartArray<ZELight*> EntityLights; // List of lights that affect particular entity
@@ -550,32 +482,6 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 		DebugDraw.Draw(Renderer);
 }
 
-
-bool ZEScene::LoadMap(const char* FileName)
-{
-	zeLog("Scene", "Loading map.");
-
-	if (Map == NULL)
-		Map = ZEPortalMap::CreateInstance();
-
-	ZEPortalMapResource* MapResource = ZEPortalMapResource::LoadResource(FileName);
-	if (MapResource == NULL)
-	{
-		zeError("Scene", "Can not load map file.");
-		return false;
-	}
-
-	Map->SetResource(MapResource);
-	if (!Map->Initialize())
-	{
-		zeError("Scene", "Can not initialize map.");
-		return false;
-	}
-	
-	zeLog("Scene", "Map loaded.");
-	return true;
-}
-
 bool ZEScene::Save(const char* FileName)
 {
 	zeLog("Scene", "Saving scene file \"%s\".", FileName);
@@ -644,16 +550,6 @@ bool ZEScene::Load(const char* FileName)
 		Unserializer.Read(&EntityCount, sizeof(ZEDWORD), 1);
 
 		Unserializer.Read(&LastEntityId, sizeof(int), 1);
-		char MapFile[ZE_MAX_FILE_NAME_SIZE];
-		Unserializer.Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
-
-		if (strcmp(MapFile, "") != 0)
-			if (!LoadMap(MapFile))
-			{ 
-				zeError("Scene", "Unserialization can not load map file. (Map File : \"%s\")", MapFile);
-				zeError("Scene", "Unserialization failed.");
-				return false;
-			}
 
 		Entities.Clear();
 		Entities.SetCount(EntityCount);

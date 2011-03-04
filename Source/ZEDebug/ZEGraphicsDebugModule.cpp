@@ -54,6 +54,7 @@
 #include "ZEModel/ZEModel.h"
 #include "ZEMath/ZEMathDefinitions.h"
 #include "ZEGame\ZESkyBrush.h"
+#include "ZEMap\ZEPortalMap\ZEPortalMap.h"
 
 bool ZEGraphicsDebugModule::Initialize()
 {
@@ -68,7 +69,9 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->AddEntity(Player);
 
 
-	Scene->LoadMap("terrain.zemap");
+	ZEPortalMap* Map = ZEPortalMap::CreateInstance();
+	Map->SetMapFile("terrain.zemap");
+	Scene->AddEntity(Map);
 
 	PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));

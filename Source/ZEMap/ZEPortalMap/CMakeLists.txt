@@ -36,17 +36,13 @@
 cmake_minimum_required (VERSION 2.8)
 
 add_source (ZEPortalMap.cpp					Sources)
-add_source (ZEPortalMap.h					Sources ZESDK)
+add_source (ZEPortalMap.h					Sources ZESDK ZEPP)
 add_source (ZEPortalMapDoor.cpp				Sources)
 add_source (ZEPortalMapDoor.h				Sources ZESDK)
 add_source (ZEPortalMapFileFormat.h			Sources)
-add_source (ZEPortalMapOctree.cpp			Sources)
-add_source (ZEPortalMapOctree.h				Sources ZESDK)
 add_source (ZEPortalMapPortal.cpp			Sources)
 add_source (ZEPortalMapPortal.h				Sources ZESDK)
 add_source (ZEPortalMapPortalDoor.h			Sources ZESDK)
-add_source (ZEPortalMapPortalOctree.cpp		Sources)
-add_source (ZEPortalMapPortalOctree.h		Sources ZESDK)
 add_source (ZEPortalMapResource.cpp			Sources)
 add_source (ZEPortalMapResource.h			Sources ZESDK)
 
@@ -56,3 +52,5 @@ install (TARGETS ZEPortalMap COMPONENT "Libraries" CONFIGURATIONS Release DESTIN
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEMap/ZEPortalMap)
 
 set_property(TARGET ZEPortalMap PROPERTY FOLDER "Zinek Engine")
+
+set_property (SOURCE ZEPortalMap.h PROPERTY LANGUAGE CXX)

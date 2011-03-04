@@ -57,60 +57,57 @@ class ZEChar
 		void						SetASCII(char Value);
 		void						SetUTF8(unsigned char Value);
 		void						SetUTF16(unsigned short Value);
-		void						SetWChar(wchar_t Value);
+		void						SetWChar(char Value);
 		
 		char						GetAASCII()
 		unsigned char				GetUTF8();
 		unsigned short				GetUTF16();
-		wchar_t						GetWChar();		
+		char						GetWChar();		
 		int							GetInteger();
 		
 		ZEChar						ToUpper();
 		ZEChar						ToLower();
 		
 		bool						operator==(ZEChar Value);
-		bool						operator==(wchar_t Value);
+		bool						operator==(char Value);
 		bool						operator==(char Value);
 		bool						operator==(unsigned char Value);
 
 		bool						operator>(ZEChar Value);
-		bool						operator>(wchar_t Value);
+		bool						operator>(char Value);
 		bool						operator>(char Value);
 		bool						operator>(unsigned char Value);
 
 		bool						operator<(ZEChar Value);
-		bool						operator<(wchar_t Value);
+		bool						operator<(char Value);
 		bool						operator<(char Value);
 		bool						operator<(unsigned char Value);
 
 		bool						operator==(ZEChar Value);
-		bool						operator==(wchar_t Value);
+		bool						operator==(char Value);
 		bool						operator==(char Value);
 
 		ZEChar						operator=(char Value);
-		ZEChar						operator=(wchar_t Value);
+		ZEChar						operator=(char Value);
 		ZEChar						operator=(unsigned char Value);
 		ZEChar						operator=(ZEChar Value);
 
 		boo
 }*/
 
+// Internally UTF8
 class ZEString
 {
 	public:
-		ZEAllocatorBase<wchar_t>	Allocator;
-		wchar_t*					Buffer;
-		char*						CharBuffer;
+		ZEAllocatorBase<char>		Allocator;
+		char*						Buffer;
 
 	protected:
 		void						SetSize();
 
 	public:			
-		void						SetValue(char Character);
-		void						SetValue(wchar_t Character);
-		void						SetValue(const wchar_t* String);
 		void						SetValue(const char* String);
-		const wchar_t*				GetValue() const;
+		const char*					GetValue() const;
 
 		void						SetNumbericValue(char Value, unsigned int Base = 10);
 		void						SetNumbericValue(unsigned char Value, unsigned int Base = 10);
@@ -124,8 +121,8 @@ class ZEString
 		void						SetNumbericValue(double Value, unsigned int NumberOfDigits = 6);
 		void						SetBooleanValue(bool Value);
 
-		wchar_t						GetCharacter(size_t Position) const;
-		void						SetCharacter(size_t Position, wchar_t Value);
+		char						GetCharacter(size_t Position) const;
+		void						SetCharacter(size_t Position, char Value);
 
 		bool						IsEmpty() const;
 		size_t						GetLength() const;
@@ -135,25 +132,23 @@ class ZEString
 		void						Clear();
 
 		void						Append(const ZEString& String);
-		void						Append(const wchar_t* String);
-		void						Append(wchar_t Character);
-
+		void						Append(const char* String);
 		void						Insert(const ZEString& String);
-		void						Insert(const wchar_t* String);
+		void						Insert(const char* String);
 		void						Insert(size_t Position, const ZEString& String);
-		void						Insert(size_t Position, const wchar_t* String);
-		void						Insert(size_t Position, wchar_t Character);
+		void						Insert(size_t Position, const char* String);
+		void						Insert(size_t Position, char Character);
 		void						Remove(size_t Position, unsigned int Count = 1);
 
-		size_t						Contains(const wchar_t* String) const;	
+		size_t						Contains(const char* String) const;	
 		size_t						Contains(const ZEString& String) const;
-		void						Replace(const wchar_t* StringToReplace, const wchar_t* Replace);
+		void						Replace(const char* StringToReplace, const char* Replace);
 		void						Replace(const ZEString& Find, const ZEString& Replace);
-		void						Delete(const wchar_t* StringToRemove);
+		void						Delete(const char* StringToRemove);
 		void						Delete(const ZEString& String);
 		
 		bool						Equals(const ZEString& String) const;
-		bool						Equals(const wchar_t* String) const;
+		bool						Equals(const char* String) const;
 
 		void						CopyTo(ZEString& String) const;
 		void						CopyFrom(const ZEString& String);
@@ -176,51 +171,30 @@ class ZEString
 		double						ToDouble();
 
 		ZEString&					operator=(const ZEString& String);
-		ZEString&					operator=(const wchar_t* String);
 		ZEString&					operator=(const char* String);
 
 		ZEString					operator+(const ZEString& String);
-		ZEString					operator+(const wchar_t* String);
 		ZEString					operator+(const char* String);
 
 		ZEString&					operator+=(const ZEString& String);
-		ZEString&					operator+=(const wchar_t* String);
 		ZEString&					operator+=(const char* String);
 
-		const wchar_t				operator[](size_t Index) const;
-		wchar_t&					operator[](size_t Index);
+		char&						operator[](size_t Index);
+		char						operator[](size_t Index) const;
 
 		bool						operator!=(const ZEString& String) const;
-		bool						operator!=(const wchar_t* String) const;
 		bool						operator!=(const char* String) const;
 
 		bool						operator==(const ZEString& String) const;
-		bool						operator==(const wchar_t* String) const;
 		bool						operator==(const char* String) const;
 	
 									operator std::string() const;
-									operator std::wstring() const;
-
-									operator const wchar_t*() const;
-									operator wchar_t*();
-
 									operator const char*() const;
-									operator char();
 
-									ZEString();
-									
-	/*								ZEString(const short& Number);
-									ZEString(const int& Number);
-									ZEString(const long& Number);
-									ZEString(unsigned short& Number);
-									ZEString(unsigned int& Number);
-									ZEString(unsigned long& Number);
-									ZEString(unsigne*/
+									ZEString();					
 									ZEString(const char* String);
-									ZEString(const wchar_t* String);
 									ZEString(const ZEString& String);
 									ZEString(std::string& String);
-									ZEString(std::wstring& String);
 									~ZEString();
 
 

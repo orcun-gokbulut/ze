@@ -49,6 +49,8 @@ link_directories(
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX")
 
+SET (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
+
 add_subdirectory (ZECore)
 add_subdirectory (ZEDebug)
 add_subdirectory (ZEGame)
@@ -83,7 +85,6 @@ set_property(TARGET ZE PROPERTY FOLDER "Zinek Engine")
 target_link_libraries (ZE ZECore ZEDebug ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
 target_link_libraries (ZE ZEDirect3D9 ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
 
-message(${PROJECT_SOURCE_DIR})
 install (TARGETS ZE RUNTIME DESTINATION bin COMPONENT "Runtime")
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include)
 install (DIRECTORY ${CMAKE_SOURCE_DIR}/Dll/ CONFIGURATIONS Release ARCHIVE DESTINATION bin COMPONENT "Runtime")

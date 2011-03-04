@@ -75,8 +75,8 @@ class ZEPortalMapResource;
 
 class ZESceneBridge
 {
-	virtual void*								GetScene() = 0;
-	virtual void*								OnEntityChanged(ZEEntity* Entity) = 0;
+	virtual void*						GetScene() = 0;
+	virtual void*						OnEntityChanged(ZEEntity* Entity) = 0;
 };
 
 
@@ -140,13 +140,9 @@ class ZEScene
 		void									SetVisualDebugElements(ZEDWORD VisualDebugElements);
 		ZEDWORD									GetVisualDebugElements();
 
-		virtual ZEEntity*						CastRay(const ZERay& Ray, float Range);
-		virtual bool							CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntity, ZEVector3& Position, ZEVector3& Normal);
-
 		const ZECullStatistics&					GetCullStatistics();
 
 		virtual void							CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bool LightsEnabled = true);
-		bool									LoadMap(const char* FileName);
 
 		bool									Save(const char* FileName);
 		bool									Load(const char* FileName);

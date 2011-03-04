@@ -59,7 +59,7 @@ const ZEAABoundingBox& ZEEntity::GetLocalBoundingBox() const
 		
 ZEDWORD ZEEntity::GetRayCastFlags() const
 {
-	return 0;
+	return ZE_RCF_BOUNDING_BOX;
 }
 
 void ZEEntity::SetEntityId(int EntityId)
@@ -213,6 +213,12 @@ const ZEVector3& ZEEntity::GetVelocity() const
 {
 	return Velocity;
 }
+
+bool ZEEntity::CastRay(const ZERay& Ray, float& TRay, ZEVector3& Position, ZEVector3& Normal)
+{
+	return false;
+}
+
 
 bool ZEEntity::GetInitialized()
 {

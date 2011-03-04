@@ -110,8 +110,6 @@ bool ZEPhysicsDebugModule::Initialize()
 	Light->SetIntensity(0.6f);
 	Scene->AddEntity(Light);
 
-	Scene->LoadMap("HakanTest.zemap");
-
 	/*
 	TestBody = ZEModel::CreateInstance();
 	TestBody->SetModelFile("Orkun.zemodel");

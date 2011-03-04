@@ -108,7 +108,7 @@ typedef ZEDWORD ZEDrawFlags;
 
 // ZERayCastFlags
 typedef ZEDWORD ZERayCastFlags;
-#define ZE_RCF_NONE								0
+#define ZE_RCF_INTERNAL								0
 #define ZE_RCF_BOUNDING_BOX						1
 #define ZE_RCF_INTERNAL							2
 
@@ -193,7 +193,7 @@ class ZEEntity : public ZEClass
 
 		bool									GetInitialized();
 
-		virtual bool							CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal);
+		virtual bool							CastRay(const ZERay& Ray, float& TRay, ZEVector3& Position, ZEVector3& Normal);
 
 		virtual bool							Initialize();
 		virtual void							Deinitialize();

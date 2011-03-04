@@ -50,17 +50,17 @@ ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float& T, float
 	return ZERayCaster::CastRay(Scene, Ray, T, Position, Normal, Range);
 }
 
-ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float& T, ZEVector3& Position, float Range)
+ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, float Range)
 {
 	ZEVector3 Normal;
-	return ZERayCaster::CastRay(Scene, Ray, T, Position, Normal, Range);
+	return ZERayCaster::CastRay(Scene, Ray, Position, Normal, Range);
 
 }
 
-ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float& T, ZEVector3& Position, ZEVector3& Normal, float Range)
+ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float Range)
 {
 	float MinT, MaxT;
-	T = Range / Ray.v.Length();
+	float T = Range / Ray.v.Length();
 
 	ZEEntity* IntersectedEntity = NULL;
 

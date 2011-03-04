@@ -37,8 +37,11 @@
 #ifndef __ZE_PORTAL_MAP_H__
 #define __ZE_PORTAL_MAP_H__
 
-#include "..\ZEMap.h"
+#include "ZEGame\ZEEntity.h"
 #include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEString.h"
+
+ZE_META_ENTITY_DESCRIPTION(ZEPortalMap)
 
 class ZEPortalMapResource;
 class ZEPortalMapPortal;
@@ -47,13 +50,17 @@ struct ZEDrawParameters;
 class ZERay;
 class ZEVector3;
 
-class ZEPortalMap : public ZEMap
+class ZEPortalMap : public ZEEntity
 {
+	ZE_META_ENTITY(ZEPortalMap)
 	friend class ZEPortalMapDoor;
 	private:
+		ZEString								PortalMapFile;
 		ZEPortalMapResource*					Resource;
 		ZEArray<ZEPortalMapPortal>				Portals;
-		ZEArray<ZEPortalMapDoor>				Doors;
+		ZEArray<ZEPortalMapDoor>				Doors; 
+
+		void									LoadPortalResource(ZEPortalMapResource* Resource);
 
 												ZEPortalMap();
 												~ZEPortalMap();
@@ -62,20 +69,36 @@ class ZEPortalMap : public ZEMap
 		const ZEArray<ZEPortalMapPortal>&		GetPortals();
 		const ZEArray<ZEPortalMapDoor>&			GetDoors();
 
+		virtual ZEDrawFlags						GetDrawFlags() const;
+
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
 
-		virtual void							Render(ZEDrawParameters* DrawParameters);
+		virtual void							Draw(ZEDrawParameters* DrawParameters);
 		virtual bool							CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT);
 
-		virtual bool							SetResource(ZEMapResource* Resource);
-		virtual ZEMapResource*					GetResource();
-										
+		virtual bool							SetMapFile(const ZEString& FileName);
+		virtual const ZEString&					GetMapFile() const;
+
 		static ZEPortalMap*						CreateInstance();
 
 };
+
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZEPortalMap"	parent="ZEEntity"	description="Portal map">
+			<property name="MapFile"
+				type="string"
+				autogetset="true"
+				default=""
+				description="Map file"
+				semantic="ZE_PS_FILENAME"
+				fileextension="*.zeMap"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 #endif
-
-
-
-
