@@ -113,7 +113,7 @@
 	private:
 
 #define ZE_META_EXTENDED_CLASS(ExtensionClass, Extension, Class)\
-		ZE_META_CLASS()\
+		ZE_META_CLASS(Class)\
 	public:\
 		Extension\
 	private:

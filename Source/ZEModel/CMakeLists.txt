@@ -36,7 +36,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 add_source (ZEModel.cpp					Sources)
-add_source (ZEModel.h					Sources ZESDK)
+add_source (ZEModel.h					Sources ZESDK ZEPP)
 add_source (ZEModelAnimation.cpp		Sources)
 add_source (ZEModelAnimation.h			Sources ZESDK)
 add_source (ZEModelAnimationTrack.cpp	Sources)
