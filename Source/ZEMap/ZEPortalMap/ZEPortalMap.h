@@ -70,6 +70,7 @@ class ZEPortalMap : public ZEEntity
 		const ZEArray<ZEPortalMapDoor>&			GetDoors();
 
 		virtual ZEDrawFlags						GetDrawFlags() const;
+		virtual ZERayCastFlags					GetRayCastFlags() const;
 
 		virtual bool							Initialize();
 		virtual void							Deinitialize();

@@ -60,7 +60,7 @@ ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Posi
 ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float Range)
 {
 	float MinT, MaxT;
-	float T = Range / Ray.v.Length();
+	float CurrentT = Range / Ray.v.Length();
 
 	ZEEntity* IntersectedEntity = NULL;
 
@@ -71,29 +71,39 @@ ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Posi
 		ZEEntity* CurrentEntity = Entities[I];
 
 		ZEDWORD RayCastFlags = CurrentEntity->GetRayCastFlags();
-		if (RayCastFlags & ZE_RCF_BOUNDING_BOX)
+		if (RayCastFlags == ZE_RCF_BOUNDING_BOX)
 		{
 			if (!ZEAABoundingBox::IntersectionTest(CurrentEntity->GetWorldBoundingBox(), Ray, MinT, MaxT))
 				continue;
 
-			if (MinT < T)
+			if (CurrentT < MinT)
 				continue;
 
-			IntersectedEntity = CurrentEntity;
-			T = MinT;
-			Position = Ray.GetPointOn(T);
+			Position = Ray.GetPointOn(CurrentT);
 			Normal = -Ray.v;
-		}
 
-		if (RayCastFlags & ZE_RCF_INTERNAL)
+			IntersectedEntity = CurrentEntity;
+			MinT = CurrentT;
+		}
+		else if (RayCastFlags & ZE_RCF_INTERNAL)
 		{
-			if (!CurrentEntity->CastRay(Ray, T, Position, Normal))
+			if (RayCastFlags & ZE_RCF_BOUNDING_BOX)
+			{
+				if (!ZEAABoundingBox::IntersectionTest(CurrentEntity->GetWorldBoundingBox(), Ray, MinT, MaxT))
+					continue;
+
+				if (CurrentT < MaxT)
+					continue;
+			}
+
+			if (!CurrentEntity->CastRay(Ray, CurrentT, Position, Normal))
 				continue;
 
-			if (MinT < T)
+			if (MinT < CurrentT)
 				continue;
 
 			IntersectedEntity = CurrentEntity;
+			MinT = CurrentT;
 		}
 	}
 

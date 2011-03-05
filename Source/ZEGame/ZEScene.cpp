@@ -551,6 +551,9 @@ bool ZEScene::Load(const char* FileName)
 
 		Unserializer.Read(&LastEntityId, sizeof(int), 1);
 
+		char MapFile[ZE_MAX_FILE_NAME_SIZE];
+		Unserializer.Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+
 		Entities.Clear();
 		Entities.SetCount(EntityCount);
 
