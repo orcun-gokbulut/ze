@@ -568,14 +568,15 @@ bool ZEScene::Load(const char* FileName)
 				return false;
 			}
 			
-			Entities[I]->Initialize();
-
 			if (!Entities[I]->Unserialize((ZEUnserializer*)&Unserializer))
 			{
 				zeError("Scene", "Unserialization of entity \"%s\" has failed.", Entities[I]->GetName());
 				zeError("Scene", "Unserialization failed.");
 				return false;
 			}
+			
+			if (Initialized)
+				Entities[I]->Initialize();
 		}
 
 		zeLog("Scene", "Scene file \"%s\" has been loaded.", FileName);

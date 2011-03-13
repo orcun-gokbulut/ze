@@ -111,7 +111,7 @@ bool ZESkyBrush::Initialize()
 	if (SkyTexture != NULL)
 		SkyMaterial->SetTexture(SkyTexture->GetTexture());
 	
-	return true;
+	return ZEEntity::Initialize();
 }
 
 void ZESkyBrush::Deinitialize()
