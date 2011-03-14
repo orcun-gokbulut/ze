@@ -54,6 +54,8 @@ char*  Parameters;
 ZEWindow* Window = NULL;
 bool WindowInitialization;
 
+void OnWMRawInputRecived(HRAWINPUT Handle);
+
 void ShowWindowError()
 {
     char szBuf[256]; 
@@ -346,13 +348,16 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	{
 		case WM_CREATE:
 			break;
+
 		case WM_SIZE:
 			if (!WindowInitialization)
 				Window->WindowResized(LOWORD(lParam), HIWORD(lParam));
 			break;
+
 		case WM_PAINT:
 			ValidateRect(hWnd, NULL);
 			break;
+
 		case WM_ACTIVATE:
 			if (wParam == WA_INACTIVE)
 				Window->WindowLostFocus();
@@ -360,19 +365,24 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				Window->WindowGainedFocus();
 			return DefWindowProc(hWnd, msg, wParam, lParam);
 			break;
+
 		case WM_CLOSE:
 			if (MessageBox(hWnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
 				Window->WindowDestroyed();
 			break;
+
 		case WM_DESTROY:
 			Window->WindowDestroyed();
+			break;
+
+		case WM_INPUT:
+		{
+			OnWMRawInputRecived((HRAWINPUT)lParam);
+			return 0;
+		}
+
 		default:
 			return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 	return 0;
 }
-
-
-
-
-

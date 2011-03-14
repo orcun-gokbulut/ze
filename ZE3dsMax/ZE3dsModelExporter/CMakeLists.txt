@@ -46,10 +46,25 @@ add_source (ZE3dsModelExporterOptions.h			Sources)
 add_source (ZE3dsModelExporterOptions.cpp		Sources)
 add_source (ZE3dsModelExporterResources.rc		Sources)
 add_source (ZE3dsModelExporterResources.h		Sources)
+add_source (ZE3dsModelExporter.def				Sources)
+add_source (../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc				Sources)
 
 add_library (ZE3dsModelExporter SHARED ${Sources})
 
 target_link_libraries (ZE3dsModelExporter ZETModelFile ZEToolSDK ZE3dsProgressDialog ZEDS ZEMath)
-target_link_libraries (ZE3dsModelExporter core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib igame.lib )
+target_link_libraries (ZE3dsModelExporter core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib igame.lib)
 
-set_property(TARGET ZE3dsModelExporter PROPERTY FOLDER "ZE3dsMax")
+set (LOCAL_WARNING_FLAGS /W3)
+set (LOCAL_RTTI_FLAGS /GR)
+
+set_property (TARGET ZE3dsModelExporter PROPERTY FOLDER "ZE3dsMax")
+set_property (TARGET ZE3dsModelExporter PROPERTY SUFFIX ".dle")
+set_property (TARGET ZE3dsModelExporter PROPERTY CLEAN_DIRECT_OUTPUT 1)
+
+set (MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max 2010")
+
+get_property(TargetPath TARGET ZE3dsModelExporter PROPERTY LOCATION)
+file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)
+add_custom_command (TARGET ZE3dsModelExporter POST_BUILD COMMAND copy "${NativeTargetPath}" "${MAX_BINARY_DIRECTORY}\\plugins")
+
+install (TARGETS ZE3dsModelExporter CONFIGURATIONS Release COMPONENT "3ds Max Exporters" DESTINATION "Exporters/3dsMax")

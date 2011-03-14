@@ -94,7 +94,7 @@ bool GetProperty<const char*>(IExportEntity * Object, PropType Type, const char*
 	{
 		TCHAR* Bla;
 
-		if (Prop->GetPropertyValue(Bla))
+		if (Prop->GetPropertyValue(Value))
 		{
 			Value = Bla;
 			return true;

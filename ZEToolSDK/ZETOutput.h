@@ -40,11 +40,11 @@
 enum ZESDKOutputLevel
 {
 	ZET_OL_NOOUTPUT				= 0,
-	ZET_OL_ERROR	 				= 1,
+	ZET_OL_ERROR	 			= 1,
 	ZET_OL_WARNINGS				= 2,
-	ZET_OL_NOTICE					= 3,
+	ZET_OL_NOTICE				= 3,
 	ZET_OL_LOG					= 4,
-	ZET_OL_DEBUG					= 5,
+	ZET_OL_DEBUG				= 5,
 };
 
 #if defined(ZET_DEBUG_ENABLED) && defined(ZET_PLATFORM_WINDOWS)
@@ -53,14 +53,14 @@ enum ZESDKOutputLevel
 	#include <stdlib.h> 
 #endif
 
-#define zesdkBreak() __asm { int 3 }
+#define zesdkBreak(Condition) if (Condition) { __asm { int 3 }}
 #define zesdkPrint(...) ZESDKOutput::Output(__VA_ARGS__)
 #define zesdkLog(Module, ...) ZESDKOutput::Output(Module, ZET_OL_LOG, __VA_ARGS__)
 #define zesdkNotice(Module, ...) ZESDKOutput::Output(Module, ZET_OL_NOTICE, __VA_ARGS__)
 
 #if defined(ZET_DEBUG_ENABLED) && defined(ZET_DEBUG_BREAK_ON_WARNING)
 	#ifdef ZE_PLATFORM_WINDOWS
-		#define zesdkWarning(Module, ...) {ZESDKOutput::Output(Module, ZET_OL_WARNINGS, __VA_ARGS__); if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();}
+		#define zesdkWarning(Module, ...) {ZESDKOutput::Output(Module, ZET_OL_WARNINGS, __VA_ARGS__); if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zesdkBreak(true);}
 	#else
 		#define zesdkWarning(Module, ...) {ZESDKOutput::Output(Module, ZET_OL_WARNINGS, __VA_ARGS__); abort();}
 	#endif
@@ -70,7 +70,7 @@ enum ZESDKOutputLevel
 
 #if defined(ZET_DEBUG_ENABLED) && defined(ZET_DEBUG_BREAK_ON_ERROR)
 	#ifdef ZE_PLATFORM_WINDOWS
-		#define zesdkError(Module, ...) {ZESDKOutput::Output(Module, ZET_OL_ERROR, __VA_ARGS__); if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();}
+		#define zesdkError(Module, ...) {ZESDKOutput::Output(Module, ZET_OL_ERROR, __VA_ARGS__); if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zesdkBreak(true);}
 	#else
 		#define zesdkError(Module, ...) {ZESDKOutput::Output(Module, ZET_OL_ERROR, __VA_ARGS__); abort();}
 	#endif
@@ -86,8 +86,8 @@ enum ZESDKOutputLevel
 
 #ifdef ZET_DEBUG_ENABLED
 	#ifdef ZET_PLATFORM_WINDOWS
-		#define zeskdAssert(Condition, ...) if (Condition) {ZESDKOutput::DebugOutput(false, __FUNCTION__, __FILE__, __LINE, __VA_ARGS__); if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();}
-		#define zesdkWarningAssert(Condition, ...) if (Condition) {ZESDKOutput::DebugOutput(true, __FUNCTION__, __FILE__, __LINE, __VA_ARGS__, true); if (_CrtDbgReport(_CRT_WARNING, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();}
+		#define zeskdAssert(Condition, ...) if (Condition) {ZESDKOutput::DebugOutput(false, __FUNCTION__, __FILE__, __LINE, __VA_ARGS__); if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zesdkBreak(true);}
+		#define zesdkWarningAssert(Condition, ...) if (Condition) {ZESDKOutput::DebugOutput(true, __FUNCTION__, __FILE__, __LINE, __VA_ARGS__, true); if (_CrtDbgReport(_CRT_WARNING, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zesdkBreak(true);}
 	#else
 		#define zesdkAssert(Condition, ...) if (Condition) {ZESDKOutput::DebugOutput(true, __VA_ARGS__); abort();}
 		#define zeskdWarningAssert(Condition, ...) if (Condition) {ZESDKOutput::DebugOutput(true, __FUNCTION__, __FILE__, __LINE, __VA_ARGS__, true); abort();}

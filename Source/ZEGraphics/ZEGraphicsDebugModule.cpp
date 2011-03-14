@@ -60,13 +60,7 @@ bool ZEGraphicsDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
 
-	Scene->Load("Backup.ZESCENE");
-
-	ZEPortalMap* Map = ZEPortalMap::CreateInstance();
-	Map->SetMapFile("terrain.zemap");
-	Scene->AddEntity(Map);
-
-	/*Player = ZEPlayer::CreateInstance();
+	Player = ZEPlayer::CreateInstance();
 	Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
 	Player->SetRotation(ZEQuaternion::Identity);
 	Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
@@ -74,7 +68,9 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->SetActiveCamera(Player->GetCamera());
 	Scene->AddEntity(Player);
 
+	Scene->Load("Backup.ZESCENE");
 
+	/*
 	ZEPortalMap* Map = ZEPortalMap::CreateInstance();
 	//Map->SetMapFile("terrain.zemap");
 	Scene->AddEntity(Map);
@@ -194,10 +190,10 @@ void ZEGraphicsDebugModule::Deinitialize()
 
 void ZEGraphicsDebugModule::Process(float ElapsedTime)
 {
-/*	static ZEQuaternion Rotation = ZEQuaternion::Identity;
+	static ZEQuaternion Rotation = ZEQuaternion::Identity;
 	
 	Rotation = Rotation * ZEQuaternion(ZE_PIx2 * ElapsedTime, ZEVector3::UnitY);
-	OmniProjectiveLight0->SetRotation(Rotation);*/
+	OmniProjectiveLight0->SetRotation(Rotation);
 	
 	//Player->SetRotation(Rotation);
 	//ProjectiveLight0->SetRotation(Rotation);

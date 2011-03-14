@@ -245,6 +245,7 @@ void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
 #include "ZESound\ZEDirectSound\ZEDSModuleDescription.h"
 #include "ZEInput\ZEDirectInput\ZEDirectInputModuleDescription.h"
 #include "ZEInput\ZEDummyInput\ZEDummyInputModuleDescription.h"
+#include "ZEInput\ZEWindowsInput\ZEWindowsInputModuleDescription.h"
 #include "ZEInput\ZEVirtualInput\ZEVirtualInputModuleDescription.h"
 #include "ZESound\ZEOpenAL\ZEALModuleDescription.h"
 #include "ZEPhysics\ZEPhysX\ZEPhysXModuleDescription.h"
@@ -258,6 +259,7 @@ ZEModuleManager::ZEModuleManager()
 	LoadInternalModule(new ZEDirectInputModuleDescription());
 	LoadInternalModule(new ZEALModuleDescription());
 	LoadInternalModule(new ZEPhysXModuleDescription());
+	LoadInternalModule(new ZEWindowsInputModuleDescription());
 
 	ModuleManagerOptions.SetName("ModuleManager");
 	ModuleManagerOptions.AddOption(new ZEOption("GraphicsModule", "Direct3D9", ZE_OA_NORMAL));

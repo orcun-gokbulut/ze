@@ -47,11 +47,11 @@
 
 #define ZEERROR_MAX_FILENAME_SIZE	255
 
-#define zeBreak() __asm{ int 3 }
+#define zeBreak(Condition) if (Condition) { __asm{ int 3 }}
 
 #ifdef ZE_DEBUG_ENABLED
 	#ifdef ZE_PLATFORM_WINDOWS
-		#define zeAssert(Condition, ...) if (Condition){ZEError::GetInstance()->RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); if (_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();} 
+		#define zeAssert(Condition, ...) if (Condition){ZEError::GetInstance()->RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); if (_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true);} 
 		#define zeWarningAssert(Condition, ...) if (Condition) ZEError::GetInstance()->RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
 	#else
 		#define zeAssert(Condition, ...) if (Condition){ZEError::GetInstance()->RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); abort();} 
@@ -69,7 +69,7 @@
 
 #if defined(ZE_DEBUG_ENABLED) && defined(ZE_DEBUG_BREAK_ON_ERROR)
 	#ifdef ZE_PLATFORM_WINDOWS
-		#define zeCriticalError(Module, ...) {if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();ZEError::GetInstance()->RaiseError(Module, ZE_EL_CRITICAL, __VA_ARGS__);}
+		#define zeCriticalError(Module, ...) {if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true);ZEError::GetInstance()->RaiseError(Module, ZE_EL_CRITICAL, __VA_ARGS__);}
 	#else
 		#define zeCriticalError(Module, ...) {abort(); ZEError::GetInstance()->RaiseError(Module, ZE_EL_CRITICAL, __VA_ARGS__);}
 	#endif
@@ -79,7 +79,7 @@
 
 #if defined(ZE_DEBUG_ENABLED) && defined(ZE_DEBUG_BREAK_ON_ERROR)
 	#ifdef ZE_PLATFORM_WINDOWS
-		#define zeError(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_EL_NONCRITICAL, __VA_ARGS__); if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak();}
+		#define zeError(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_EL_NONCRITICAL, __VA_ARGS__); if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true);}
 	#else
 		#define zeError(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_EL_NONCRITICAL, __VA_ARGS__); abort();}
 	#endif
@@ -89,7 +89,7 @@
 
 #if defined(ZE_DEBUG_ENABLED) && defined(ZE_DEBUG_BREAK_ON_WARNING)
 	#ifdef ZE_PLATFORM_WINDOWS
-		#define zeWarning(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_EL_WARNING, __VA_ARGS__); if(_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) ==  1) zeBreak();}
+		#define zeWarning(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_EL_WARNING, __VA_ARGS__); if(_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) ==  1) zeBreak(true);}
 	#else
 		#define zeWarning(Module, ...) {ZEError::GetInstance()->RaiseError(Module, ZE_EL_WARNING, __VA_ARGS__); abort();}
 	#endif

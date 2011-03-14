@@ -42,7 +42,7 @@
 HINSTANCE hInstance;
 int controlsInit = FALSE;
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL,ULONG fdwReason,LPVOID /*lpvReserved*/)
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
 {
 	if( fdwReason == DLL_PROCESS_ATTACH )
 	{
@@ -53,17 +53,17 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL,ULONG fdwReason,LPVOID /*lpvReserved*/)
 	return TRUE;
 }
 
-extern "C" __declspec( dllexport ) const TCHAR* LibDescription()
+__declspec( dllexport ) const TCHAR* LibDescription()
 {
 	return "ZEModel Exporter";
 }
 
-extern "C" __declspec( dllexport ) int LibNumberClasses()
+__declspec( dllexport ) int LibNumberClasses()
 {
 	return 1;
 }
 
-extern "C" __declspec( dllexport ) ClassDesc* LibClassDesc(int i)
+__declspec( dllexport ) ClassDesc* LibClassDesc(int i)
 {
 	switch(i) 
 	{
@@ -75,17 +75,17 @@ extern "C" __declspec( dllexport ) ClassDesc* LibClassDesc(int i)
 	}
 }
 
-extern "C" __declspec( dllexport ) ULONG LibVersion()
+__declspec( dllexport ) ULONG LibVersion()
 {
 	return VERSION_3DSMAX;
 }
 
-extern "C" __declspec( dllexport ) int LibInitialize(void)
+__declspec( dllexport ) int LibInitialize(void)
 {
 	return TRUE;
 }
 
-extern "C" __declspec( dllexport ) int LibShutdown(void)
+__declspec( dllexport ) int LibShutdown(void)
 {
 	return TRUE;
 }

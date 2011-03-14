@@ -47,7 +47,7 @@
 #include "ZEPhysics\ZEPhysicsModule.h"
 #include "ZESound\ZESoundModule.h"
 #include "ZEGame\ZEGame.h"
-#include "ZEDebug\ZEDebugModule.h"
+#include "ZEDebugModule.h"
 #include "ZEOptionManager.h"
 #include "ZECommandManager.h"
 

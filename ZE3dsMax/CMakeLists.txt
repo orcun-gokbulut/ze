@@ -40,11 +40,11 @@ project (ZE3dsMax)
 include_directories (
 	${PROJECT_SOURCE_DIR} 
 	${PROJECT_SOURCE_DIR}/../Include 
-	${PROJECT_SOURCE_DIR}/../Include/3dsMax
+	${PROJECT_SOURCE_DIR}/../Include/3dsMax/2010
 	${PROJECT_SOURCE_DIR}/../ZEFoundation
 	${PROJECT_SOURCE_DIR}/../ZEToolSDK)
 	
-link_directories("${PROJECT_SOURCE_DIR}/../Lib/Win x86/3dsMax")
+link_directories("${PROJECT_SOURCE_DIR}/../Lib/Win x86/3dsMax/2010")
 	
 
 add_subdirectory (ZE3dsProgressDialog)
@@ -52,3 +52,5 @@ add_subdirectory (ZE3dsMapExporter)
 add_subdirectory (ZE3dsModelExporter)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
+install (DIRECTORY ZE3dsMaxScript CONFIGURATIONS Release DESTINATION "Exporters/3dsMax/MaxScript" COMPONENT "3ds Max Exporters" PATTERN .svn EXCLUDE)

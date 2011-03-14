@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEModelDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,26 +30,59 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZE_MODEL_ANIMATION_DEBUG_MODULE_H__
+#define __ZE_MODEL_ANIMATION_DEBUG_MODULE_H__
 
-add_subdirectory (ZEDirectInput)
-add_subdirectory (ZEDummyInput)
-add_subdirectory (ZEVirtualInput)
-add_subdirectory (ZEWindowsInput)
+#include "ZECore\ZEDebugModule.h"
+#include "ZEInput\ZEInputMap.h"
+#include "ZEMath/ZEVector.h"
 
-add_source (ZEInputDefinitions.cpp	Sources)
-add_source (ZEInputDefinitions.h	Sources ZESDK)
-add_source (ZEInputMap.cpp			Sources)
-add_source (ZEInputMap.h			Sources ZESDK)
-add_source (ZEInputModule.cpp		Sources)
-add_source (ZEInputModule.h			Sources ZESDK)
+class ZECharacter;
+class ZEPointLight;
+class ZEProjectiveLight;
+class ZEGrid;
+class ZECamera;
+class ZESkyBrush;
+class ZEPlayer;
+class ZESoundResource;
+class ZESoundSource;
+class ZEModel;
+class ZELight;
+class ZEDirectionalLight;
+class ZEProjectiveLight;
 
-add_library (ZEInput ${Sources})
+class ZEModelAnimationDebugModule : public ZEDebugModule
+{
+	private:
+		ZECamera*				Camera;
+		ZEPointLight*			Light;
+		ZEGrid*					Grid;
+		ZEPointLight*			PointLight0;
+		ZEPointLight*			PointLight1;
+		ZEPointLight*			PointLight2;
+		ZECharacter*			Character;
+		ZEInputMap				InputMap;
+		ZEDirectionalLight*		DirectionalLight;
+		ZEProjectiveLight*		ProjectiveLight;
 
-set_property(TARGET ZEInput PROPERTY FOLDER "Zinek Engine")
 
-install (TARGETS ZEInput COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEInput)
+	public:
+		virtual bool			Initialize();
+		virtual void			Deinitialize();
+		virtual void			Process(float ElapsedTime);
+
+
+								ZEModelAnimationDebugModule();
+		virtual					~ZEModelAnimationDebugModule();
+};
+
+#endif
+
+
+
+
+

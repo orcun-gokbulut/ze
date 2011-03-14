@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,26 +30,57 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZE_DEBUG_MODULE_H__
+#define __ZE_DEBUG_MODULE_H__
 
-add_subdirectory (ZEDirectInput)
-add_subdirectory (ZEDummyInput)
-add_subdirectory (ZEVirtualInput)
-add_subdirectory (ZEWindowsInput)
+#include "ZECore\ZEModule.h"
 
-add_source (ZEInputDefinitions.cpp	Sources)
-add_source (ZEInputDefinitions.h	Sources ZESDK)
-add_source (ZEInputMap.cpp			Sources)
-add_source (ZEInputMap.h			Sources ZESDK)
-add_source (ZEInputModule.cpp		Sources)
-add_source (ZEInputModule.h			Sources ZESDK)
+class ZEDebugModuleDescription : public ZEModuleDescription
+{
+	public:
+		virtual ZEModuleAttribute		GetAttributes();
+		virtual ZEModuleType			GetType();
+		virtual int						GetRequiredZinekEngineVersion();
+		virtual int						GetMajorVersion();
+		virtual int						GetMinorVersion();
+		virtual const char*				GetCopyright();
+		virtual const char*				GetName();
 
-add_library (ZEInput ${Sources})
+		virtual ZEOptionSection*		GetOptions();
+		virtual	ZEModule*				CreateModuleInstance();
+		virtual	bool					CheckCompatible();
+};
 
-set_property(TARGET ZEInput PROPERTY FOLDER "Zinek Engine")
+class ZEDebugModule : public ZEModule
+{
+	public:
+		virtual ZEModuleDescription*	GetModuleDescription();
 
-install (TARGETS ZEInput COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEInput)
+		virtual	bool					IsEnabled();
+		virtual void					SetEnabled(bool Enabled);
+
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
+		virtual void					Destroy();
+		
+		virtual void					PreProcess();
+		virtual void					Process(float ElapsedTime);
+		virtual void					PostProcess();
+		
+		virtual void					StartUp();
+		virtual void					ShutDown();
+
+		virtual void					Tick(float ElapsedTime);
+		virtual void					Render(float ElapsedTime);
+};
+
+#endif
+
+
+
+
+

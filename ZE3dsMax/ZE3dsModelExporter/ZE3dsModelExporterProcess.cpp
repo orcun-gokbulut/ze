@@ -180,7 +180,7 @@ bool GetProperty<const char*>(IExportEntity * Object, PropType Type, const char*
 	{
 		TCHAR* Bla;
 
-		if (Prop->GetPropertyValue(Bla))
+		if (Prop->GetPropertyValue(Value))
 		{
 			Value = Bla;
 			return true;
@@ -1170,7 +1170,7 @@ bool ZEModelExporter::DumpPropertyContainer(IExportEntity* Node)
 		int IntValue;
 		Point3 Point3Value;
 		Point4 Point4Value;
-		TCHAR* StringValue;
+		const char* StringValue;
 		IParamBlock2* ParamBlock;
 		int ParamId;
 		ParamType2 ParamType;

@@ -45,11 +45,11 @@
 #include "ZECore\ZEOptionManager.h"
 #include "ZECore\ZEWindow.h"
 
-#include "ZEDebug\ZEPhysicsDebugModule.h"
-#include "ZEDebug\ZEModelAnimationDebugModule.h"
-#include "ZEDebug\ZEGraphicsDebugModule.h"
-#include "ZEDebug\ZESoundDebugModule.h"
-#include "ZEDebug\ZEMetaDebugModule.h"
+#include "ZEPhysics\ZEPhysicsDebugModule.h"
+#include "ZEModel\ZEModelDebugModule.h"
+#include "ZEGraphics\ZEGraphicsDebugModule.h"
+#include "ZESound\ZESoundDebugModule.h"
+#include "ZEMeta\ZEMetaDebugModule.h"
 
 extern HINSTANCE ApplicationInstance;
 

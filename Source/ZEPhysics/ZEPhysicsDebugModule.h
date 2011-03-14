@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEPhysicsDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,26 +30,51 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZE_PHYSICS_DEBUG_MODULE_H__
+#define __ZE_PHYSICS_DEBUG_MODULE_H__
 
-add_subdirectory (ZEDirectInput)
-add_subdirectory (ZEDummyInput)
-add_subdirectory (ZEVirtualInput)
-add_subdirectory (ZEWindowsInput)
+#include "ZECore\ZEDebugModule.h"
+#include "ZEPhysics\ZEPhysicalCallbacks.h"
 
-add_source (ZEInputDefinitions.cpp	Sources)
-add_source (ZEInputDefinitions.h	Sources ZESDK)
-add_source (ZEInputMap.cpp			Sources)
-add_source (ZEInputMap.h			Sources ZESDK)
-add_source (ZEInputModule.cpp		Sources)
-add_source (ZEInputModule.h			Sources ZESDK)
+class ZEPlayer;
+class ZEPhysicalRigidBody;
+class ZEModel;
 
-add_library (ZEInput ${Sources})
+#include "ZEPhysics\ZEPhysicalShapes.h"
 
-set_property(TARGET ZEInput PROPERTY FOLDER "Zinek Engine")
+class ZEPhysicsDebugModule : public ZEDebugModule
+{
+	private:
+		ZEPlayer*				Player;
+		ZEPhysicalRigidBody*	PhysicalRigidBody;
+		ZEPhysicalCapsuleShape	Shape;	
+		ZEPhysicalCapsuleShape	Shape2;	
+		ZEModel*				Model;
 
-install (TARGETS ZEInput COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEInput)
+		ZEModel*				TestBody;
+
+		void					TransformChanged(const ZEPhysicalTransformChangeEventArgument& TransformChange);
+		void					ColisionDetected(const ZEPhysicalCollisionEventArgument& Collision);
+
+	public:
+		virtual void			Process(float ElapsedTime);
+
+		virtual bool			Initialize();
+		virtual void			Deinitialize();
+
+
+
+								ZEPhysicsDebugModule();
+		virtual					~ZEPhysicsDebugModule();
+};
+
+#endif
+
+
+
+
+

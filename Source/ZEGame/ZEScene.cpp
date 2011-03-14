@@ -568,6 +568,9 @@ bool ZEScene::Load(const char* FileName)
 				return false;
 			}
 			
+			if (Initialized)
+				Entities[I]->Initialize();
+
 			if (!Entities[I]->Unserialize((ZEUnserializer*)&Unserializer))
 			{
 				zeError("Scene", "Unserialization of entity \"%s\" has failed.", Entities[I]->GetName());
@@ -603,7 +606,7 @@ ZEScene::ZEScene()
 
 	memset(&CullStatistics, 0, sizeof(ZECullStatistics));
 
-	VisualDebugElements = ZE_VDE_NONE;
+	VisualDebugElements = ZE_VDE_ENTITY_ORIENTED_BOUNDINGBOX;
 }
 
 ZEScene::~ZEScene()
