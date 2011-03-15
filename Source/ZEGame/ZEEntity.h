@@ -139,27 +139,26 @@ class ZEEntity : public ZEClass
 		bool									Enabled;
 		bool									Visible;
 
-		ZEAABoundingBox							LocalBoundingBox;
 		ZEAABoundingBox							WorldBoundingBox;
-		ZEBoundingSphere						WorldBoundingSphere;
+		ZEAABoundingBox							LocalBoundingBox;
 
 	protected:
-		ZEEntityDirtyFlags						DirtyFlags;	
-
 		void									SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
-	
+
 												ZEEntity();
 		virtual									~ZEEntity();
 
 	public:
+		virtual ZEDWORD							GetDrawFlags() const;
+		virtual ZEDWORD							GetRayCastFlags() const;
+
 		virtual ZEEntityType					GetEntityType();
 
 		virtual const ZEAABoundingBox&			GetLocalBoundingBox() const;
 		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
-		const ZEBoundingSphere&					GetWorldBoundingSphere();
+		virtual const ZEMatrix4x4&				GetWorldTransform();
 
-		virtual ZEDWORD							GetDrawFlags() const;
-		virtual ZEDWORD							GetRayCastFlags() const;
+		bool									GetInitialized();
 
 		void									SetEntityId(int EntityId);
 		int										GetEntityId() const;
@@ -189,12 +188,6 @@ class ZEEntity : public ZEClass
 		ZEVector3								GetRight();
 		ZEVector3								GetUp();
 
-		const ZEMatrix4x4&						GetWorldTransform();
-
-		bool									GetInitialized();
-
-		virtual bool							CastRay(const ZERay& Ray, float& TRay, ZEVector3& Position, ZEVector3& Normal);
-
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
 		virtual void							Destroy();
@@ -202,6 +195,8 @@ class ZEEntity : public ZEClass
 		
 		virtual void							Tick(float Time);
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
+
+		virtual bool							CastRay(const ZERay& Ray, float& TRay, ZEVector3& Position, ZEVector3& Normal);
 
 		ZEEntity*								CreateInstance(const char* Name);
 };

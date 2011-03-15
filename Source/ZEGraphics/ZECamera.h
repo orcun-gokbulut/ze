@@ -79,7 +79,11 @@ class ZECamera : public ZEComponent
 
 		ZEViewFrustum					ViewFrustum;
 		ZEView							View;
+
 										ZECamera();
+
+		virtual void					OnTransformChanged();
+
 	public:
 		void							SetNearZ(float NearZ);
 		float							GetNearZ() const;
@@ -99,8 +103,6 @@ class ZECamera : public ZEComponent
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);	
 		virtual void					SetLocalRotation(const ZEQuaternion& NewRotation);
-
-		virtual void					OwnerWorldTransformChanged();	
 
 		const ZEView&					GetView();
 		const ZEViewVolume&				GetViewVolume();

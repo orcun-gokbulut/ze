@@ -48,8 +48,10 @@ class ZEModelResourceMesh;
 class ZEPhysicsBody;
 class ZEModelMesh
 {
+	friend class ZEModel;
 	private:
 		ZEModel*							Owner;
+
 		const ZEModelResourceMesh*			MeshResource;
 		ZEAABoundingBox						LocalBoundingBox;
 		ZEAABoundingBox						ModelBoundingBox;
@@ -74,6 +76,8 @@ class ZEModelMesh
 
 		ZEArray<ZEModelMeshLOD>				LODs;
 
+		void								OnTransformChanged();
+
 	public:
 		const char*							GetName();
 		ZEPhysicalRigidBody*				GetPhysicalBody() { return PhysicalBody; }
@@ -97,9 +101,6 @@ class ZEModelMesh
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
-
-		void								ModelTransformChanged();
-		void								ModelWorldTransformChanged();
 
 		void								SetActiveLOD(size_t LOD);
 		size_t								GetActiveLOD();

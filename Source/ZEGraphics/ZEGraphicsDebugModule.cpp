@@ -70,12 +70,12 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	Scene->Load("Backup.ZESCENE");
 
-	/*
+
 	ZEPortalMap* Map = ZEPortalMap::CreateInstance();
-	//Map->SetMapFile("terrain.zemap");
+	Map->SetMapFile("terrain.zemap");
 	Scene->AddEntity(Map);
 
-	PointLight1 = ZEPointLight::CreateInstance();
+	/*PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
 	PointLight1->SetColor(ZEVector3::One);
 	PointLight1->SetAttenuation(0.01f, 0.0f, 1.0f);
@@ -142,18 +142,23 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetAspectRatio(1.0f);
 	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
 	ProjectiveLight0->SetCastsShadow(false);
-	Scene->AddEntity(ProjectiveLight0);
+	Scene->AddEntity(ProjectiveLight0);*/
 	
 
 	Model = ZEModel::CreateInstance();		
-	Model->SetModelResource(ZEModelResource::LoadResource("subsurfacetest.zemodel"));
+	Model->SetModelResource(ZEModelResource::LoadResource("Bench.zemodel"));
+	Scene->AddEntity(Model);
+
+	Model = ZEModel::CreateInstance();		
+	Model->SetModelResource(ZEModelResource::LoadResource("Light.zemodel"));
+	Model->SetPosition(ZEVector3(-100.0f, 0.0f, 0.0f));
 	Scene->AddEntity(Model);
 
 	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
 	Sky->SetSkyTexture("cubetest.tga");
 	Scene->AddEntity(Sky);
 
-	DirectionalLight0 = ZEDirectionalLight::CreateInstance();
+	/*DirectionalLight0 = ZEDirectionalLight::CreateInstance();
 	DirectionalLight0->SetEnabled(true);
 	DirectionalLight0->SetRotation(ZEQuaternion(-ZE_PI_2, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
@@ -192,8 +197,8 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 {
 	static ZEQuaternion Rotation = ZEQuaternion::Identity;
 	
-	Rotation = Rotation * ZEQuaternion(ZE_PIx2 * ElapsedTime, ZEVector3::UnitY);
-	OmniProjectiveLight0->SetRotation(Rotation);
+//	Rotation = Rotation * ZEQuaternion(ZE_PIx2 * ElapsedTime, ZEVector3::UnitY);
+//	OmniProjectiveLight0->SetRotation(Rotation);
 	
 	//Player->SetRotation(Rotation);
 	//ProjectiveLight0->SetRotation(Rotation);

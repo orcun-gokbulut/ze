@@ -655,15 +655,15 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 {
 	if (GBuffer1 == NULL)
 		GBuffer1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	GBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
+	GBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_DEPTH, true);
 	
 	if (GBuffer2 == NULL)
 		GBuffer2 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	GBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
+	GBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
 
 	if (GBuffer3 == NULL)
 		GBuffer3 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	GBuffer3->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
+	GBuffer3->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
 
 	if (LBuffer1 == NULL)
 		LBuffer1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();

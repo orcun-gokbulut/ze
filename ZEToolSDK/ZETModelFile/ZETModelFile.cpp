@@ -39,6 +39,7 @@
 
 #include <string.h>
 #include <stdio.h>
+#include <float.h>
 
 #pragma warning(push)
 #pragma warning(disable:4307 4267 4018 4996)
@@ -274,6 +275,44 @@ bool WritePhysicalJointToFile(ZEModelFilePhysicalJoint* Joint, FILE* File)
 	return true;
 }
 
+static void CalculateBoundingBox(ZEModelFileMesh* Mesh)
+{
+	Mesh->BoundingBox.Min = ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX);
+	Mesh->BoundingBox.Max = ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+	for (size_t I = 0; I < Mesh->LODs.GetCount(); I++)
+	{
+		ZEModelFileMeshLOD* CurrentLOD = &Mesh->LODs[I];
+		if (Mesh->IsSkinned)
+		{
+			for (size_t N = 0; N < CurrentLOD->SkinnedVertices.GetCount(); N++)
+			{
+				ZEVector3& Position = CurrentLOD->SkinnedVertices[I].Position;
+
+				if (Position.x < Mesh->BoundingBox.Min.x) Mesh->BoundingBox.Min.x = Position.x;
+				if (Position.y < Mesh->BoundingBox.Min.y) Mesh->BoundingBox.Min.y = Position.y;
+				if (Position.z < Mesh->BoundingBox.Min.z) Mesh->BoundingBox.Min.z = Position.z;
+				if (Position.x > Mesh->BoundingBox.Max.x) Mesh->BoundingBox.Max.x = Position.x;
+				if (Position.y > Mesh->BoundingBox.Max.y) Mesh->BoundingBox.Max.y = Position.y;
+				if (Position.z > Mesh->BoundingBox.Max.z) Mesh->BoundingBox.Max.z = Position.z;
+			}
+		}
+		else
+		{
+			for (size_t N = 0; N < CurrentLOD->Vertices.GetCount(); N++)
+			{
+				ZEVector3& Position = CurrentLOD->Vertices[I].Position;
+
+				if (Position.x < Mesh->BoundingBox.Min.x) Mesh->BoundingBox.Min.x = Position.x;
+				if (Position.y < Mesh->BoundingBox.Min.y) Mesh->BoundingBox.Min.y = Position.y;
+				if (Position.z < Mesh->BoundingBox.Min.z) Mesh->BoundingBox.Min.z = Position.z;
+				if (Position.x > Mesh->BoundingBox.Max.x) Mesh->BoundingBox.Max.x = Position.x;
+				if (Position.y > Mesh->BoundingBox.Max.y) Mesh->BoundingBox.Max.y = Position.y;
+				if (Position.z > Mesh->BoundingBox.Max.z) Mesh->BoundingBox.Max.z = Position.z;
+			}
+		}
+	}
+}
 
 static void WriteMeshesToFile(FILE *File, ZEModelFile* Model)
 {

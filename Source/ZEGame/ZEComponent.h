@@ -61,38 +61,30 @@ class ZEComponent : public ZEEntity
 	private:
 		ZECompoundEntity*				Owner;
 
-		ZEDWORD							DirtyFlags;
-
 		ZEMatrix4x4						LocalTransform;
 		ZEMatrix4x4						WorldTransform;
 
 		ZEAABoundingBox					LocalBoundingBox;
 		ZEAABoundingBox					WorldBoundingBox;
-		ZEBoundingSphere				WorldBoundingSphere;
 
 		bool							Enabled;
 		bool							Visible;
 
 	protected: 
-		void							UpdateBoundingVolumes();
 		void							SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
+		virtual	void					OnTransformChanged();
 
 	public:
-
 		ZEEntityType					GetEntityType();
-		
+
 		virtual ZECompoundEntity*		GetOwner() const;
-
 		virtual	ZEDWORD					GetDrawFlags() const;
-
-		const ZEVector3&				GetWorldVelocity();
 
 		const ZEMatrix4x4&				GetWorldTransform() const;
 		const ZEMatrix4x4&				GetLocalTransform() const;
 
 		virtual const ZEAABoundingBox&	GetLocalBoundingBox() const;
 		virtual const ZEAABoundingBox&	GetWorldBoundingBox() const;
-		const ZEBoundingSphere&			GetWorldBoundingSphere() const;
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);
@@ -105,18 +97,9 @@ class ZEComponent : public ZEEntity
 		ZEVector3						GetWorldRight() const;
 		ZEVector3						GetWorldUp() const;
 
-
+		const ZEVector3&				GetWorldVelocity();
 
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& TEnterance, float &TExit);
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
-		virtual void					Tick(float TimeElapsed);
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
-	
-		virtual void					Destroy();
-
-		virtual void					OwnerWorldTransformChanged();
 
 										ZEComponent();
 };

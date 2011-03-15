@@ -404,9 +404,6 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 			if (VisualDebugElements & ZE_VDE_ENTITY_AXISALIGNED_BOUNDINGBOX)
 				DebugDraw.DrawAxisAlignedBoundingBox(CurrentEntity->GetWorldBoundingBox(), Renderer, ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));
 
-			if (VisualDebugElements & ZE_VDE_ENTITY_BOUNDINGSPHERE)
-				DebugDraw.DrawBoundingSphere(CurrentEntity->GetWorldBoundingSphere(), Renderer, ZEVector4(0.25f, 0.25f, 0.25f, 1.0f));
-
 			// Call entity's draw routine to make it draw it self
 			CurrentEntity->Draw(&DrawParameters);
 
@@ -465,10 +462,7 @@ void ZEScene::CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bo
 
 							if (VisualDebugElements & ZE_VDE_COMPONENT_AXISALIGNED_BOUNDINGBOX)
 								DebugDraw.DrawAxisAlignedBoundingBox(Component->GetWorldBoundingBox(), Renderer, ZEVector4(0.5f, 0.5f, 0.0f, 1.0f));
-
-							if (VisualDebugElements & ZE_VDE_COMPONENT_BOUNDINGSPHERE)
-								DebugDraw.DrawBoundingSphere(Component->GetWorldBoundingSphere(), Renderer, ZEVector4(0.25f, 0.25f, 0.0f, 1.0f));
-							
+						
 							// Call component's draw routine to make it draw it self
 							Component->Draw(&DrawParameters);
 						}

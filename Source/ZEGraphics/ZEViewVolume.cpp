@@ -165,12 +165,7 @@ bool ZEViewFrustum::LightCullTest(ZELight* Light) const
 
 bool ZEViewFrustum::CullTest(ZEEntity* Entity) const
 {
-	return /*ConeCullTest(Entity->GetWorldBoundingSphere()) &&*/ CullTest(Entity->GetWorldBoundingBox());
-}
-
-bool ZEViewFrustum::CullTest(ZEComponent* Component) const
-{
-	return /*ConeCullTest(Component->GetWorldBoundingSphere()) &&*/ CullTest(Component->GetWorldBoundingBox());
+	return CullTest(Entity->GetWorldBoundingBox());
 }
 
 ZEDoorViewTest ZEViewFrustum::CullTest(const ZERectangle3D& PortalDoor) const
@@ -237,21 +232,9 @@ bool ZEViewSphere::CullTest(const ZEAABoundingBox& BoundingBox) const
 
 bool ZEViewSphere::CullTest(ZEEntity* Entity) const
 {
-	if (!ZEBoundingSphere::CollisionTest(Entity->GetWorldBoundingSphere(), BoundingSphere) 
-		&& !ZEAABoundingBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere))
+	if (!ZEAABoundingBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere))
 			return true;
 	return false;
-}
-
-bool ZEViewSphere::CullTest(ZEComponent* Component) const
-{
-	ZEBoundingSphere ComponentBoundingSphere;
-	ZEAABoundingBox ComponentBoundingBox;
-
-	zeWarningAssert(true, "NearZ cull test not implamented");
-
-	return !ZEBoundingSphere::CollisionTest(Component->GetWorldBoundingSphere(), BoundingSphere) 
-		&& !ZEAABoundingBox::CollisionTest(Component->GetWorldBoundingBox(), BoundingSphere);
 }
 
 ZEDoorViewTest ZEViewSphere::CullTest(const ZERectangle3D& PortalDoor) const
@@ -288,18 +271,11 @@ bool ZEViewHemiSphere::CullTest(const ZEAABoundingBox& BoundingBox) const
 
 bool ZEViewHemiSphere::CullTest(ZEEntity* Entity) const
 {
-	return ZEBoundingSphere::PlaneHalfSpaceTest(Entity->GetWorldBoundingSphere(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
-		!ZEBoundingSphere::CollisionTest(BoundingSphere, Entity->GetWorldBoundingSphere()) ||
+	return 
+//		ZEBoundingSphere::PlaneHalfSpaceTest(Entity->GetWorldBoundingSphere(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
+//		!ZEBoundingSphere::CollisionTest(BoundingSphere, Entity->GetWorldBoundingSphere()) ||
 		ZEAABoundingBox::PlaneHalfSpaceTest(Entity->GetWorldBoundingBox(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
 		!ZEAABoundingBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere);
-}
-
-bool ZEViewHemiSphere::CullTest(ZEComponent* Component) const
-{
-	return ZEBoundingSphere::PlaneHalfSpaceTest(Component->GetWorldBoundingSphere(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
-		!ZEBoundingSphere::CollisionTest(BoundingSphere, Component->GetWorldBoundingSphere()) ||
-		ZEAABoundingBox::PlaneHalfSpaceTest(Component->GetWorldBoundingBox(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
-		!ZEAABoundingBox::CollisionTest(Component->GetWorldBoundingBox(), BoundingSphere);
 }
 
 ZEDoorViewTest ZEViewHemiSphere::CullTest(const ZERectangle3D& PortalDoor) const
@@ -335,13 +311,6 @@ bool ZEViewCuboid::CullTest(ZEEntity* Entity) const
 {
 	zeWarningAssert(true, "NOT IMPLAMENTED");
 	//return ZEBoundingSphere::CollisionTest(Entity->GetWorldBoundingSphere(), BoundingBox);
-	return true;
-}
-
-bool ZEViewCuboid::CullTest(ZEComponent* Component) const
-{
-	zeWarningAssert(true, "NOT IMPLAMENTED");
-	//return ZEBoundingSphere::CollisionTest(Component->GetWorldBoundingSphere(), BoundingBox);
 	return true;
 }
 
@@ -387,20 +356,10 @@ bool ZEViewPlane::CullTest(const ZEAABoundingBox& BoundingBox) const
 
 bool ZEViewPlane::CullTest(ZEEntity* Entity) const
 {
-	const ZEBoundingSphere& BoundingSphere = Entity->GetWorldBoundingSphere();
+/*	const ZEBoundingSphere& BoundingSphere = Entity->GetWorldBoundingSphere();
 	if (ZEBoundingSphere::PlaneHalfSpaceTest(BoundingSphere, Plane) == ZEHALFSPACE_NEGATIVESIDE ||
 		ZEPlane::Distance(Plane, BoundingSphere.Position) - BoundingSphere.Radius > MaxDistance)
-		return true;
-
-	return false;
-}
-
-bool ZEViewPlane::CullTest(ZEComponent* Component) const
-{
-	const ZEBoundingSphere& BoundingSphere = Component->GetWorldBoundingSphere();
-	if (ZEBoundingSphere::PlaneHalfSpaceTest(BoundingSphere, Plane) == ZEHALFSPACE_NEGATIVESIDE ||
-		ZEPlane::Distance(Plane, BoundingSphere.Position) - BoundingSphere.Radius > MaxDistance)
-		return true;
+		return true;*/
 
 	return false;
 }

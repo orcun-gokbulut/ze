@@ -155,8 +155,6 @@ ZEPresentationSlide::ZEPresentationSlide()
 	Texture = NULL;
 	Material = NULL;
 	
-	SetBoundingVolumeMechanism(ZE_BVM_USE_LOCAL_ONLY);
-	
 	RenderOrder.SetZero();
 	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;

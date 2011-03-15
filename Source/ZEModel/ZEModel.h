@@ -89,7 +89,7 @@ class ZEModel : public ZEComponent
 		ZEAABoundingBox						BoundingBox;
 
 		void								CalculateBoundingBox();		
-		void								LocalTransformChanged();
+		void								UpdateTransforms();
 
 		bool								DrawSkeleton;
 		bool								DrawPhysicalBodies;
@@ -154,10 +154,6 @@ class ZEModel : public ZEComponent
 		void								TransformChangeEvent(const ZEPhysicalTransformChangeEventArgument& TransformChange);
 
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
-
-		virtual void						OwnerWorldTransformChanged();
-		void								UpdateBoundingBox();
-		void								UpdateBoneTransforms();
 
 		void								SetDrawSkeleton(bool Enabled);
 		bool								GetDrawSkeleton();

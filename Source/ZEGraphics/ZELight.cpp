@@ -55,10 +55,10 @@ void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 }
 
 
-void ZELight::OwnerWorldTransformChanged()
+void ZELight::OnTransformChanged()
 {
 	UpdateViewVolume = true;
-	ZEComponent::OwnerWorldTransformChanged();
+	ZEComponent::OnTransformChanged();
 }
 
 

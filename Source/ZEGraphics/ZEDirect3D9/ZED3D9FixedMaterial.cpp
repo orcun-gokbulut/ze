@@ -215,7 +215,7 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 		GetDevice()->SetRenderState(D3DRS_ALPHAREF, (int)(256.0f * AlphaCullLimit));
 		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
-		GetDevice()->SetRenderState(D3DRS_ADAPTIVETESS_Y, (D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C'));
+		//GetDevice()->SetRenderState(D3DRS_ADAPTIVETESS_Y, (D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C'));
 	}
 	else
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
@@ -354,14 +354,14 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 	else
 		GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 
-	if (GetAlphaCullEnabled())
+	/*if (GetAlphaCullEnabled())
 	{
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 		GetDevice()->SetRenderState(D3DRS_ALPHAREF, (int)(256.0f * AlphaCullLimit));
 		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 		GetDevice()->SetRenderState(D3DRS_ADAPTIVETESS_Y, (D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C'));
 	}
-	else
+	else*/
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 	// Setup Wireframe

@@ -315,14 +315,13 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		#endif
 	#endif
 	
-	#ifdef ZE_SHADER_ALPHA_CULL
+/*	#ifdef ZE_SHADER_ALPHA_CULL
 		if (Output.Color.a <= MaterialAlphaCullLimit)
 		{
 			discard;
 			return Output;
 		}		
-	#endif
-	
+	#endif*/
 	
 	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
 

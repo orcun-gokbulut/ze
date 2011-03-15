@@ -550,14 +550,13 @@ void ZECharacter::AdvanceRecording(float ElapsedTime)
 
 void ZECharacter::Tick(float ElapsedTime)
 {
-	AdvanceRecording(ElapsedTime);
 	Turning(ElapsedTime);
 	Movement(ElapsedTime);
 	Strafe(ElapsedTime);
 
 	Model->Tick(ElapsedTime);
 
-	ZEEntity::Tick(ElapsedTime);
+	ZECompoundEntity::Tick(ElapsedTime);
 }
 
 void ZECharacter::WalkForward()

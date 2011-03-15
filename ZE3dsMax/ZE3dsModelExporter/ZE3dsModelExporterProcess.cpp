@@ -177,17 +177,7 @@ bool GetProperty<const char*>(IExportEntity * Object, PropType Type, const char*
 
 	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
 	if (Prop != NULL && Prop->GetType() == Type)
-	{
-		TCHAR* Bla;
-
-		if (Prop->GetPropertyValue(Value))
-		{
-			Value = Bla;
-			return true;
-		}
-		else
-			return false;
-	}
+		return Prop->GetPropertyValue(Value);
 	else
 		return false;
 }

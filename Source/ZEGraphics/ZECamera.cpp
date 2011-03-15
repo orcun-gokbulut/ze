@@ -96,12 +96,12 @@ void ZECamera::SetLocalRotation(const ZEQuaternion& NewRotation)
 	ZEComponent::SetRotation(NewRotation);
 }
 
-void ZECamera::OwnerWorldTransformChanged()
+void ZECamera::OnTransformChanged()
 {
 	UpdateViewFrustum = true;
 	UpdateViewTransform = true;
 	UpdateViewProjectionTransform = true;
-	ZEComponent::OwnerWorldTransformChanged();
+	ZEComponent::OnTransformChanged();
 }
 
 void ZECamera::SetNearZ(float NearZ)

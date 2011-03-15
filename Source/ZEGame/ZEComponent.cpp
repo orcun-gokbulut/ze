@@ -36,28 +36,13 @@
 #include "ZEComponent.h"
 #include "ZEGame\ZECompoundEntity.h"
 
-// ZEComponentDirtyTransfromFlags
-#define ZE_CDF_ALL							0xFFFFFFFF
-#define ZE_CDF_LOCAL_TRANSFORM				1
-#define ZE_CDF_WORLD_TRANSFORM				2
-#define ZE_CDF_WORLD_BOUNDING_SPHERE		4
-#define ZE_CDF_WORLD_BOUNDING_BOX			8
-
-void ZEComponent::UpdateBoundingVolumes()
-{
-	DirtyFlags = ZE_CDF_ALL;
-
-	if (Owner != NULL)
-		Owner->UpdateBoundingVolumes();
-}
-
 void ZEComponent::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 {
 	LocalBoundingBox = BoundingBox;
-	DirtyFlags |= ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_SPHERE;
+}
 
-	if (Owner != NULL)
-		Owner->UpdateBoundingVolumes();
+void ZEComponent::OnTransformChanged()
+{
 }
 
 ZEDWORD ZEComponent::GetDrawFlags() const
@@ -99,12 +84,7 @@ const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 {
 	if (Owner != NULL)
 	{
-		//if (DirtyFlags & ZE_CDF_WORLD_TRANSFORM)
-		{
-			ZEMatrix4x4::Multiply(((ZEComponent*)this)->WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
-			((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_TRANSFORM;
-		}
-
+		ZEMatrix4x4::Multiply(((ZEComponent*)this)->WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
 		return WorldTransform;
 	}
 	else
@@ -113,12 +93,7 @@ const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 
 const ZEMatrix4x4& ZEComponent::GetLocalTransform() const 
 {
-	//if (DirtyFlags & ZE_CDF_LOCAL_TRANSFORM)
-	{
-		ZEMatrix4x4::CreateOrientation(((ZEComponent*)this)->LocalTransform, GetPosition(), GetRotation(), GetScale());
-		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_LOCAL_TRANSFORM;
-	}
-
+	ZEMatrix4x4::CreateOrientation(((ZEComponent*)this)->LocalTransform, GetPosition(), GetRotation(), GetScale());
 	return LocalTransform;
 }
 
@@ -129,48 +104,23 @@ const ZEAABoundingBox& ZEComponent::GetLocalBoundingBox() const
 
 const ZEAABoundingBox& ZEComponent::GetWorldBoundingBox() const
 {
-	//if (DirtyFlags & ZE_CDF_WORLD_BOUNDING_BOX)
-	{
-		ZEAABoundingBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
-		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_BOUNDING_BOX;
-	}
-
+	ZEAABoundingBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
 	return WorldBoundingBox;
-}
-
-const ZEBoundingSphere& ZEComponent::GetWorldBoundingSphere() const
-{
-	//if (DirtyFlags & ZE_CDF_WORLD_BOUNDING_SPHERE)
-	{
-		GetWorldBoundingBox().GenerateBoundingSphere(((ZEComponent*)this)->WorldBoundingSphere);
-		((ZEComponent*)this)->DirtyFlags &= ~ZE_CDF_WORLD_BOUNDING_SPHERE;
-	}
-
-	return WorldBoundingSphere;
 }
 
 void ZEComponent::SetPosition(const ZEVector3& NewPosition)
 {
 	ZEEntity::SetPosition(NewPosition);
-
-	if (GetDrawFlags() | ZE_DF_CULL && Owner != NULL)
-		Owner->UpdateBoundingVolumes();
 }
 
 void ZEComponent::SetRotation(const ZEQuaternion& NewRotation)
 {
 	ZEEntity::SetRotation(NewRotation);
-
-	if (GetDrawFlags() | ZE_DF_CULL && Owner != NULL)
-		Owner->UpdateBoundingVolumes();
 }
 
 void ZEComponent::SetScale(const ZEVector3& NewScale)
 {
 	ZEEntity::SetScale(NewScale);
-
-	if (GetDrawFlags() | ZE_DF_CULL && Owner != NULL)
-		Owner->UpdateBoundingVolumes();
 }
 
 
@@ -204,45 +154,10 @@ bool ZEComponent::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norm
 	return false;
 }
 
-void ZEComponent::Tick(float Time)
-{
-	const ZEVector3& WorldPosition = GetWorldPosition();
-
-/*	ZEVector3::Sub(LocalVelocity, WorldPosition, LocalOldPosition);
-	ZEVector3::Scale(LocalVelocity, LocalVelocity, Time);*/
-}
-
-void ZEComponent::Draw(ZEDrawParameters* DrawParameters)
-{
-}
-
-bool ZEComponent::Initialize()
-{
-	return true;
-}
-
-void ZEComponent::Deinitialize()
-{
-
-}
-
-void ZEComponent::Destroy()
-{
-	Deinitialize();
-	delete this;
-}
-
-void ZEComponent::OwnerWorldTransformChanged()
-{
-	DirtyFlags |= ZE_CDF_WORLD_TRANSFORM | ZE_CDF_WORLD_BOUNDING_BOX | ZE_CDF_WORLD_BOUNDING_BOX;
-}
-
-
 ZEComponent::ZEComponent()
 {
 	Owner = NULL;
 
-	DirtyFlags = ZE_CDF_ALL;
 	Visible = true;
 	Enabled = true;
 }

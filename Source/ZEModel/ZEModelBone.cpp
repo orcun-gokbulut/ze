@@ -38,6 +38,15 @@
 #include "ZEGame/ZEScene.h"
 #include <stdio.h>
 
+void ZEModelBone::OnTransformChanged()
+{
+	if (PhysicalBody != NULL)
+	{
+		PhysicalBody->SetPosition(GetWorldPosition());
+		PhysicalBody->SetRotation(GetWorldRotation());
+	}
+}
+
 const char* ZEModelBone::GetName()
 {
 	return BoneResource->Name;
@@ -107,7 +116,6 @@ const ZEMatrix4x4& ZEModelBone::GetModelTransform()
 {
 	ZEMatrix4x4::Multiply(WorldTransform, Owner->GetLocalTransform(), GetLocalTransform());
 
-
 	return WorldTransform;
 }
 
@@ -134,8 +142,6 @@ const ZEVector3& ZEModelBone::GetRelativePosition()
 
 void ZEModelBone::SetRelativePosition(const ZEVector3& Position)
 {
-	Owner->UpdateBoundingBox();
-
 	RelativePosition = Position;
 }
 
@@ -146,8 +152,6 @@ const ZEQuaternion& ZEModelBone::GetRelativeRotation()
 
 void ZEModelBone::SetRelativeRotation(const ZEQuaternion& Rotation)
 {
-	Owner->UpdateBoundingBox();
-	Owner->UpdateBoneTransforms();
 	RelativeRotation = Rotation;
 }
 
@@ -445,7 +449,6 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->SetPhysicalWorld(zeScene->GetPhysicalWorld());
 		PhysicalJoint->Initialize();
 	}
-	Owner->UpdateBoneTransforms();
 
 	for (size_t I = 0; I < ShapeList.GetCount(); I++)
 		delete ShapeList[I];
@@ -469,24 +472,6 @@ void ZEModelBone::Deinitialize()
 	}
 
 	ChildBones.Clear();
-}
-
-void ZEModelBone::ModelWorldTransformChanged()
-{
-	if (PhysicalBody != NULL)
-	{
-		PhysicalBody->SetPosition(GetWorldPosition());
-		PhysicalBody->SetRotation(GetWorldRotation());
-	}
-}
-
-void ZEModelBone::ModelTransformChanged()
-{
-	if (PhysicalBody != NULL)
-	{
-		PhysicalBody->SetPosition(GetWorldPosition());
-		PhysicalBody->SetRotation(GetWorldRotation());
-	}
 }
 
 ZEModelBone::ZEModelBone()

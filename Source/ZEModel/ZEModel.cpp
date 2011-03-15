@@ -44,6 +44,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <float.h>
 
 #include "ZEGame/ZEEntityProvider.h"
 
@@ -51,17 +52,19 @@ ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEModel);
 
 void ZEModel::CalculateBoundingBox()
 {
-	bool NotInitialized = true;
+	if (Meshes.GetCount() == 0 && Bones.GetCount() == 0)
+	{
+		BoundingBox = ZEAABoundingBox(ZEVector3::Zero, ZEVector3::Zero);
+		return;
+	}
+
+	BoundingBox.Min = ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX);
+	BoundingBox.Max = ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
 	{
-		const ZEAABoundingBox& CurrentBoundingBox = Meshes[I].GetModelBoundingBox();
-
-		if (NotInitialized)
-		{
-			BoundingBox.Min = BoundingBox.Max = CurrentBoundingBox.GetVertex(0);
-			NotInitialized = false;
-		}
+		ZEAABoundingBox CurrentBoundingBox;
+		ZEAABoundingBox::Transform(CurrentBoundingBox, Meshes[I].GetLocalBoundingBox(), Meshes[I].GetLocalTransform());
 
 		for (int N = 0; N < 8; N++)
 		{
@@ -74,18 +77,11 @@ void ZEModel::CalculateBoundingBox()
 			if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
 			if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
 		}
-
 	}
 
-	for (size_t I = 0; I < Bones.GetCount(); I++)
+	/*for (size_t I = 0; I < Bones.GetCount(); I++)
 	{
 		ZEVector3 BonePosition = Bones[I].GetModelPosition();
-
-		if (NotInitialized)
-		{
-			BoundingBox.Min = BoundingBox.Max = BonePosition;
-			NotInitialized = false;
-		}
 
 		if (BonePosition.x < BoundingBox.Min.x) BoundingBox.Min.x = BonePosition.x;
 		if (BonePosition.y < BoundingBox.Min.y) BoundingBox.Min.y = BonePosition.y;
@@ -94,10 +90,16 @@ void ZEModel::CalculateBoundingBox()
 		if (BonePosition.x > BoundingBox.Max.x) BoundingBox.Max.x = BonePosition.x;
 		if (BonePosition.y > BoundingBox.Max.y) BoundingBox.Max.y = BonePosition.y;
 		if (BonePosition.z > BoundingBox.Max.z) BoundingBox.Max.z = BonePosition.z;
-	}
+	}*/
+}
 
-	if (NotInitialized )
-		BoundingBox.Max = BoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
+void ZEModel::UpdateTransforms()
+{
+	for (size_t I = 0; I < Bones.GetCount(); I++)
+		Bones[I].OnTransformChanged();
+
+	for (size_t I = 0; I < Meshes.GetCount(); I++)
+		Meshes[I].OnTransformChanged();
 }
 
 void ZEModel::DebugDraw(ZERenderer* Renderer)
@@ -145,16 +147,6 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 		Renderer->AddToRenderList(&DebugDrawComponents.BonesRenderOrder);
 		Renderer->AddToRenderList(&DebugDrawComponents.BonePositionsRenderOrder);
 	}
-
-}
-
-void ZEModel::LocalTransformChanged()
-{
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
-		Meshes[I].ModelTransformChanged();
-
-	for (size_t I = 0; I < Bones.GetCount(); I++)
-		Bones[I].ModelTransformChanged();
 
 }
 
@@ -261,9 +253,6 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 			LinkParentlessBones(Skeleton[I]);
 		}
 	}
-
-	UpdateBoundingBox();
-	UpdateBoneTransforms();
 }
 
 const ZEModelResource* ZEModel::GetModelResource()
@@ -354,143 +343,6 @@ bool ZEModel::GetAutoLOD()
 	return AutoLOD;
 }
 
-/*
-void ZEModel::SetStaticPoseByName(const char* AnimationName, unsigned int Frame)
-{
-	Animation = NULL;
-	AnimationState = ZE_MAS_STOPPED;
-
-	if (ModelResource == NULL)
-		return;
-
-	for (size_t I = 0; I < ModelResource->Animations.GetCount(); I++)
-		if (strnicmp(Animation->Name, ModelResource->Animations[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
-		{
-			SetStaticPose(&ModelResource->Animations[I], Frame);
-			return;
-		}
-}
-
-void ZEModel::SetStaticPoseByIndex(size_t AnimationIndex, unsigned int Frame)
-{
-	Animation = NULL;
-	AnimationState = ZE_MAS_STOPPED;
-
-	if (ModelResource == NULL)
-		return;
-	
-	SetStaticPose(&ModelResource->Animations[AnimationIndex], Frame);
-}
-
-
-void ZEModel::SetStaticPose(const ZEModelAnimation* Animation, unsigned int Frame)
-{
-	if (Animation == NULL)
-		AnimationState = ZE_MAS_STOPPED;
-	else
-	{
-		size_t FrameId = Frame % Animation->Frames.GetCount();
-
-		const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[FrameId];
-
-		const ZEModelResourceAnimationKey* Key, NextKey;
-		for (size_t I = 0; I < Frame->BoneKeys.GetCount(); I++)
-		{
-			Key = &Frame->BoneKeys[I];
-
-			Bones[Key->ItemId].SetRelativePosition(Key->Position);
-			Bones[Key->ItemId].SetRelativeRotation(Key->Rotation);
-		}
-		
-		for (size_t I = 0; I < Frame->MeshKeys.GetCount(); I++)
-		{
-			Key = &Frame->MeshKeys[I];
-			
-			Meshes[Key->ItemId].SetLocalPosition(Key->Position);
-			Meshes[Key->ItemId].SetLocalRotation(Key->Rotation);
-			Meshes[Key->ItemId].SetLocalScale(Key->Scale);
-		}
-	}
-}
-
-void ZEModel::PlayAnimationByName(const char* AnimationName, unsigned int StartFrame, unsigned int EndFrame)
-{
-	
-	Animation = NULL;
-	AnimationState = ZE_MAS_STOPPED;
-
-	if (ModelResource == NULL)
-		return;
-
-	for (size_t I = 0; I < ModelResource->Animations.GetCount(); I++)
-		if (strnicmp(AnimationName, ModelResource->Animations[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
-		{
-			PlayAnimation(&ModelResource->Animations[I], StartFrame, EndFrame);
-			return;
-		}
-	
-}
-
-void ZEModel::PlayAnimationByIndex(size_t AnimationIndex, unsigned int StartFrame, unsigned int EndFrame)
-{
-	
-	Animation = NULL;
-	AnimationState = ZE_MAS_STOPPED;
-
-	if (ModelResource == NULL)
-		return;
-	
-	PlayAnimation(&ModelResource->Animations[AnimationIndex], StartFrame, EndFrame);
-	
-}
-
-void ZEModel::PlayAnimation(const ZEModelAnimation* Animation, unsigned int StartFrame, unsigned int EndFrame)
-{
-	
-	this->Animation = Animation;
-
-	if (Animation == NULL)
-	{
-		AnimationState = ZE_MAS_STOPPED;
-		return;
-	}
-
-	if (StartFrame > Animation->Frames.GetCount())
-	{
-		AnimationStartFrame = Animation->Frames.GetCount() - 1;
-		AnimationFrame = AnimationStartFrame;
-	}
-	else
-	{
-		AnimationFrame = StartFrame;
-		AnimationStartFrame = StartFrame;
-	}
-
-	if (AnimationEndFrame > Animation->Frames.GetCount())
-		AnimationEndFrame = Animation->Frames.GetCount() - 1;
-	else
-		AnimationEndFrame = (EndFrame == 0 ? Animation->Frames.GetCount() - 1 : EndFrame);
-	
-	AnimationState = ZE_MAS_PLAYING;
-	
-}
-
-void ZEModel::ResumeAnimation()
-{
-	//AnimationState = ZE_MAS_PLAYING;
-}
-
-void ZEModel::PauseAnimation()
-{
-	//AnimationState = ZE_MAS_PAUSED;
-}
-
-void ZEModel::StopAnimation()
-{
-	//AnimationState = ZE_MAS_STOPPED;
-}
-*/
-
 const ZEAABoundingBox& ZEModel::GetLocalBoundingBox() const
 {
 
@@ -506,41 +358,19 @@ void ZEModel::SetPosition(const ZEVector3& NewPosition)
 	}
 
 	ZEComponent::SetPosition(NewPosition);
-	LocalTransformChanged();
+	UpdateTransforms();
 }
 
 void ZEModel::SetRotation(const ZEQuaternion& NewRotation)
 {
 	ZEComponent::SetRotation(NewRotation);
-	LocalTransformChanged();
+	UpdateTransforms();
 }
 
 void ZEModel::SetScale(const ZEVector3& NewScale)
 {
 	ZEComponent::SetScale(NewScale);
-	LocalTransformChanged();
-}
-
-void ZEModel::OwnerWorldTransformChanged()
-{
-	ZEComponent::OwnerWorldTransformChanged();
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
-		Meshes[I].ModelWorldTransformChanged();
-
-	for (size_t I = 0; I < Bones.GetCount(); I++)
-		Bones[I].ModelWorldTransformChanged();
-}
-
-void ZEModel::UpdateBoundingBox()
-{
-	UpdateBoundingVolumes();
-	if (GetOwner() != NULL)
-		GetOwner()->UpdateBoundingVolumes();
-}
-
-void ZEModel::UpdateBoneTransforms()
-{
-
+	UpdateTransforms();
 }
 
 void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )

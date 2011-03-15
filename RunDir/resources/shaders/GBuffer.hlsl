@@ -58,14 +58,14 @@ float3 ZEGBuffer_GetViewVector(float4 ClipPosition)
 // View Position
 void ZEGBuffer_SetViewPosition(inout ZEGBuffer Output, float3 ViewPosition)
 {
-	Output.Position = ViewPosition.zxyz;
-	//Output.Position.xyzw = ViewPosition.z;
+	//Output.Position = ViewPosition.zxyz;
+	Output.Position.xyzw = ViewPosition.z;
 }
 
 float3 ZEGBuffer_GetViewPosition(float2 Texcoord, float3 ViewVector)
 {
-	return tex2D(GBuffer1, Texcoord).yzw;
-	//return ViewVector * tex2D(GBuffer1, Texcoord).x;
+	//return tex2D(GBuffer1, Texcoord).yzw;
+	return ViewVector * tex2D(GBuffer1, Texcoord).x;
 }
 
 // View Normal

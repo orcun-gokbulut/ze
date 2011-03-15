@@ -67,6 +67,8 @@ class ZELight : public ZEComponent
 		float							Range;
 		ZEVector3						Attenuation;
 
+		virtual void					OnTransformChanged();
+
 	public:
 		virtual ZELightType				GetLightType() = 0;
 
@@ -74,8 +76,6 @@ class ZELight : public ZEComponent
 
 		virtual	void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);
-
-		virtual void					OwnerWorldTransformChanged();
 
 		void							SetColor(const ZEVector3& NewColor);
 		const ZEVector3&				GetColor() const;

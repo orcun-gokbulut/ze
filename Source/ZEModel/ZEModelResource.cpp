@@ -43,6 +43,7 @@
 #include "ZEModelFileFormat.h"
 #include <memory.h>
 #include <string.h>
+#include <float.h>
 
 ZEStaticVertexBuffer* ZEModelResourceMeshLOD::GetSharedVertexBuffer() const
 {
@@ -324,6 +325,45 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResour
 	return true;
 }
 
+static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
+{
+	Mesh->BoundingBox.Min = ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX);
+	Mesh->BoundingBox.Max = ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
+
+	for (size_t I = 0; I < Mesh->LODs.GetCount(); I++)
+	{
+		ZEModelResourceMeshLOD* CurrentLOD = &Mesh->LODs[I];
+		if (Mesh->IsSkinned)
+		{
+			for (size_t N = 0; N < CurrentLOD->SkinnedVertices.GetCount(); N++)
+			{
+				ZEVector3& Position = CurrentLOD->SkinnedVertices[N].Position;
+
+				if (Position.x < Mesh->BoundingBox.Min.x) Mesh->BoundingBox.Min.x = Position.x;
+				if (Position.y < Mesh->BoundingBox.Min.y) Mesh->BoundingBox.Min.y = Position.y;
+				if (Position.z < Mesh->BoundingBox.Min.z) Mesh->BoundingBox.Min.z = Position.z;
+				if (Position.x > Mesh->BoundingBox.Max.x) Mesh->BoundingBox.Max.x = Position.x;
+				if (Position.y > Mesh->BoundingBox.Max.y) Mesh->BoundingBox.Max.y = Position.y;
+				if (Position.z > Mesh->BoundingBox.Max.z) Mesh->BoundingBox.Max.z = Position.z;
+			}
+		}
+		else
+		{
+			for (size_t N = 0; N < CurrentLOD->Vertices.GetCount(); N++)
+			{
+				ZEVector3& Position = CurrentLOD->Vertices[N].Position;
+
+				if (Position.x < Mesh->BoundingBox.Min.x) Mesh->BoundingBox.Min.x = Position.x;
+				if (Position.y < Mesh->BoundingBox.Min.y) Mesh->BoundingBox.Min.y = Position.y;
+				if (Position.z < Mesh->BoundingBox.Min.z) Mesh->BoundingBox.Min.z = Position.z;
+				if (Position.x > Mesh->BoundingBox.Max.x) Mesh->BoundingBox.Max.x = Position.x;
+				if (Position.y > Mesh->BoundingBox.Max.y) Mesh->BoundingBox.Max.y = Position.y;
+				if (Position.z > Mesh->BoundingBox.Max.z) Mesh->BoundingBox.Max.z = Position.z;
+			}
+		}
+	}
+}
+
 static bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
 {
 	for (size_t I = 0; I < Model->Meshes.GetCount(); I++)
@@ -341,7 +381,6 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceF
 
 		strncpy(Mesh->Name, MeshChunk.Name, ZE_MDLF_MAX_NAME_SIZE);
 		Mesh->IsSkinned		= MeshChunk.IsSkinned;
-		Mesh->BoundingBox	= MeshChunk.BoundingBox;
 		Mesh->Position		= MeshChunk.Position;
 		Mesh->Rotation		= MeshChunk.Rotation;
 		Mesh->Scale			= MeshChunk.Scale;
@@ -380,6 +419,8 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceF
 				ResourceFile->Read(LOD->Vertices.GetCArray(), sizeof(ZEModelVertex),  LOD->Vertices.GetCount());
 			}
 		}
+
+		CalculateBoundingBox(Mesh);
 
 		if (MeshChunk.HasPhysicalBody)
 		{

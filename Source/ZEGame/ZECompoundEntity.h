@@ -73,12 +73,10 @@ class ZECompoundEntity : public ZEEntity
 	protected:
 		ZEArray<ZEComponent*>					Components;
 
+		void									UpdateComponentTransforms();
+
 		void									RegisterComponent(ZEComponent* Component);
 		void									UnregisterComponent(ZEComponent* Component);	
-
-		void									SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
-
-		void									UpdateComponents();
 		
 												ZECompoundEntity();
 		virtual									~ZECompoundEntity();
@@ -87,8 +85,6 @@ class ZECompoundEntity : public ZEEntity
 		virtual ZEEntityType					GetEntityType();
 
 		const ZEArray<ZEComponent *>&			GetComponents() const;
-
-		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
 
 		virtual ZEDWORD							GetDrawFlags() const;
 		virtual ZEDWORD							GetRayCastFlags() const;
@@ -102,9 +98,6 @@ class ZECompoundEntity : public ZEEntity
 		virtual void							Deinitialize();
 		
 		virtual void							Tick(float Time);
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-		
-		void									UpdateBoundingVolumes();
 };
 
 /*
@@ -119,8 +112,6 @@ ZE_POST_PROCESSOR_START(Meta)
 				getfunction="GetComponents().GetConstCArray"
 				getcountfunction="GetComponents().GetCount"
 				description="This container contains components that entity includes"/>
-
-			<method name="UpdateBoundingVolumes"/>
 		</class>
 	</meta>
 </zinek>

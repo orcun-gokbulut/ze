@@ -87,7 +87,6 @@ const ZEAABoundingBox& ZEModelMesh::GetModelBoundingBox()
 	return ModelBoundingBox;
 }
 
-
 const ZEAABoundingBox& ZEModelMesh::GetWorldBoundingBox()
 {
 
@@ -108,7 +107,6 @@ const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
 	ZEMatrix4x4::Multiply(ModelTransform, GetLocalTransform(), Owner->GetLocalTransform());
 
 	return ModelTransform;	
-	
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
@@ -120,8 +118,6 @@ const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
 	
 void ZEModelMesh::SetLocalPosition(const ZEVector3& LocalPosition)
 {
-	Owner->UpdateBoundingBox();
-
 	Position = LocalPosition;
 }
 
@@ -132,8 +128,6 @@ const ZEVector3& ZEModelMesh::GetLocalPostion()
 
 void ZEModelMesh::SetLocalRotation(const ZEQuaternion& LocalRotation)
 {
-	Owner->UpdateBoundingBox();
-
 	Rotation = LocalRotation;
 }
 
@@ -144,8 +138,6 @@ const ZEQuaternion& ZEModelMesh::GetLocalRotation()
 
 void ZEModelMesh::SetLocalScale(const ZEVector3& LocalScale)
 {
-	Owner->UpdateBoundingBox();
-
 	Scale = LocalScale;
 }
 
@@ -279,7 +271,7 @@ void ZEModelMesh::Deinitialize()
 	LODs.Clear();
 }
 
-void ZEModelMesh::ModelTransformChanged()
+void ZEModelMesh::OnTransformChanged()
 {
 	if (PhysicalBody != NULL)
 	{
@@ -288,13 +280,9 @@ void ZEModelMesh::ModelTransformChanged()
 	}
 }
 
-void ZEModelMesh::ModelWorldTransformChanged()
-{
-
-}
-
 void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 {
+	
 	LODs[0].Draw(DrawParameters);	
 }
 

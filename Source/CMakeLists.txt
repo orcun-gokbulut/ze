@@ -37,8 +37,8 @@ cmake_minimum_required (VERSION 2.8)
 
 project (ZinekEngine)
 
-add_definitions (-DZE_DEBUG_ENABLED)
-add_definitions (-DZE_DEBUG_BREAK_ON_ERROR)
+#add_definitions (-DZE_DEBUG_ENABLED)
+#add_definitions (-DZE_DEBUG_BREAK_ON_ERROR)
 #add_definitions (-DZE_DEBUG_BREAK_ON_WARNING)
 #add_definitions (-DZE_DEBUG_ENABLE_MEMORY_CHECKS)
 
@@ -84,6 +84,12 @@ set_property(TARGET ZE PROPERTY FOLDER "Zinek Engine")
 
 target_link_libraries (ZE ZECore ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
 target_link_libraries (ZE ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
+
+get_property(TargetPath TARGET ZE PROPERTY LOCATION)
+file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)
+add_custom_command (TARGET ZE CONFIGURATIONS Release RelWithDebInfo POST_BUILD COMMAND copy "${NativeTargetPath}" "${CMAKE_SOURCE_DIR}\\RunDir\\ZE.release.exe")
+add_custom_command (TARGET ZE CONFIGURATIONS Debug POST_BUILD COMMAND copy "${NativeTargetPath}" "${CMAKE_SOURCE_DIR}\\RunDir\\ZE.debug.exe")
+
 
 install (TARGETS ZE DESTINATION bin COMPONENT "Runtime")
 install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include)
