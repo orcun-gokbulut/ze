@@ -68,12 +68,17 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->SetActiveCamera(Player->GetCamera());
 	Scene->AddEntity(Player);
 
-	Scene->Load("Backup.ZESCENE");
 
 
-	ZEPortalMap* Map = ZEPortalMap::CreateInstance();
-	Map->SetMapFile("terrain.zemap");
-	Scene->AddEntity(Map);
+	ZEPortalMap* Map1 = ZEPortalMap::CreateInstance();
+	Map1->SetMapFile("terrain2.zemap");
+	Map1->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	Scene->AddEntity(Map1);
+
+	ZEPortalMap* Map2 = ZEPortalMap::CreateInstance();
+	Map2->SetMapFile("terrain2.zemap");
+	Map2->SetPosition(ZEVector3(0.0f, 0.0f, 200.0f));
+	Scene->AddEntity(Map2);
 
 	/*PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
@@ -142,7 +147,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetAspectRatio(1.0f);
 	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
 	ProjectiveLight0->SetCastsShadow(false);
-	Scene->AddEntity(ProjectiveLight0);*/
+	Scene->AddEntity(ProjectiveLight0);
 	
 
 	Model = ZEModel::CreateInstance();		
@@ -158,7 +163,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	Sky->SetSkyTexture("cubetest.tga");
 	Scene->AddEntity(Sky);
 
-	/*DirectionalLight0 = ZEDirectionalLight::CreateInstance();
+	DirectionalLight0 = ZEDirectionalLight::CreateInstance();
 	DirectionalLight0->SetEnabled(true);
 	DirectionalLight0->SetRotation(ZEQuaternion(-ZE_PI_2, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));

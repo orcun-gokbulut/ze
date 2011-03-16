@@ -86,8 +86,13 @@ class ZERenderer
 
 		virtual void						Destroy();
 
+		virtual void						AddToLightList(ZELight* Light);
+		virtual void						ClearLightList();
+
 		virtual void						AddToRenderList(ZERenderOrder* RenderOrder) = 0;
-		virtual void						ClearList() = 0;
+		virtual void						ClearRenderList() = 0;
+
+		void								ClearLists();
 		
 		virtual void						Render(float ElaspedTime = 0) = 0;
 };

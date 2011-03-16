@@ -58,7 +58,7 @@ bool ZEModelMeshLOD::IsSkinned()
 	return Skinned;
 }
 
-void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters)
+void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DistanceSquare)
 {
 	if (VertexBuffer == NULL)
 		return;
@@ -74,6 +74,8 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters)
 	else
 		RenderOrder.WorldMatrix = OwnerMesh->GetWorldTransform();
 
+	RenderOrder.Order = DistanceSquare;
+
 	DrawParameters->Renderer->AddToRenderList(&RenderOrder);
 }
 
@@ -86,6 +88,7 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	Skinned = LODResource->Vertices.GetCount() == 0 ? true : false;
 
 	RenderOrder.SetZero();
+	RenderOrder.Priority = 3;
 	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | (Skinned ? ZE_ROF_SKINNED : 0);
 	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderOrder.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();

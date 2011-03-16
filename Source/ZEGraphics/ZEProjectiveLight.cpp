@@ -119,7 +119,7 @@ ZETexture2D* ZEProjectiveLight::GetShadowMap()
 
 void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer)
 {
-	if (!GetCastsShadow())
+	/*if (!GetCastsShadow())
 		return;
 
 	if (ShadowMap == NULL)
@@ -134,7 +134,7 @@ void ZEProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* Shadow
 	ShadowRenderer->ClearList();
 
 	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
-	ShadowRenderer->Render();
+	ShadowRenderer->Render();*/
 }
 
 const ZEViewVolume& ZEProjectiveLight::GetViewVolume()

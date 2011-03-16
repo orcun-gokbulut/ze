@@ -74,10 +74,8 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9HDRProcessor					HDRProcessor;
 		ZED3D9SSAOProcessor					SSAOProcessor;
 
-		ZESmartArray<ZERenderOrder>			NonTransparent;
-		ZESmartArray<ZERenderOrder>			Transparent;
-		ZESmartArray<ZERenderOrder>			Imposter;
-		
+		ZESmartArray<ZERenderOrder>			RenderList;
+
 		ZECamera*							Camera;
 
 		ZESmartArray<ZELight*>				Lights;
@@ -140,9 +138,12 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		virtual void						RemovePostProcessor(ZEPostProcessor* PostProcessor);
 
 		virtual void						SetLights(ZESmartArray<ZELight*>& Lights);
-		
+
+		virtual void						AddToLightList(ZELight* Light);
+		virtual void						ClearLightList();
+
 		virtual void						AddToRenderList(ZERenderOrder* RenderOrder);
-		virtual void						ClearList();
+		virtual void						ClearRenderList();
 
 		virtual void						Render(float ElaspedTime);
 };

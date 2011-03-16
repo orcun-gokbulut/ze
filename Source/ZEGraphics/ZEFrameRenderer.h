@@ -47,8 +47,6 @@ class ZEFrameRenderer : public ZERenderer
 		virtual void						SetCamera(ZECamera* Camera) = 0;
 		virtual ZECamera*					GetCamera() = 0;
 
-		virtual void						SetLights(ZESmartArray<ZELight*>& Lights) = 0;
-
 		static ZEFrameRenderer*				CreateInstance();
 };
 

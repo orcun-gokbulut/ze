@@ -103,7 +103,7 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		virtual ZEViewPort*						GetViewPort();
 
 		virtual void							AddToRenderList(ZERenderOrder* RenderOrder);
-		virtual void							ClearList();
+		virtual void							ClearRenderList();
 
 		virtual void							Render(float ElaspedTime);
 };

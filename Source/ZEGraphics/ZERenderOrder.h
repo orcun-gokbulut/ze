@@ -75,6 +75,7 @@ class ZERenderOrder
 {
 	public:
 		int								Priority;
+		float							Order;
 		ZERenderOrderFlags				Flags;
 		ZEROPrimitiveType				PrimitiveType;
 		ZEVertexDeclaration*			VertexDeclaration;

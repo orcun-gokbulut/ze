@@ -62,9 +62,6 @@ add_source (ZETTypes.h					Sources ZEToolSDK)
 
 add_library (ZEToolSDK ${Sources})
 
-add_executable (ZEMC ZETCalculateBoundingBox.cpp)
-target_link_libraries (ZEMC ZEToolSDK ZETModelFile ZEMath ZEDS)
-
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEToolSDK PROPERTY FOLDER "ZEToolSDK")
 

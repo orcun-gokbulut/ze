@@ -44,6 +44,22 @@ ZERenderer::~ZERenderer()
 
 }
 
+void ZERenderer::AddToLightList(ZELight* Light)
+{
+
+}
+
+void ZERenderer::ClearLightList()
+{
+
+}
+
+void ZERenderer::ClearLists()
+{
+	ClearLightList();
+	ClearRenderList();
+}
+
 void ZERenderer::Destroy()
 {
 	delete this;

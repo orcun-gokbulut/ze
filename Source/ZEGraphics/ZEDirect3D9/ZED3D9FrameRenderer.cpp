@@ -469,9 +469,9 @@ void ZED3D9FrameRenderer::DoPreZPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 
-	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
+	for (size_t I = 0; I < RenderList.GetCount(); I++)
 	{
-		ZERenderOrder* RenderOrder = &NonTransparent[I];
+		ZERenderOrder* RenderOrder = &RenderList[I];
 		
 		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_PRE_Z_PASS) == 0)
 			continue;
@@ -506,9 +506,9 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
-	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
+	for (size_t I = 0; I < RenderList.GetCount(); I++)
 	{
-		ZERenderOrder* RenderOrder = &NonTransparent[I];
+		ZERenderOrder* RenderOrder = &RenderList[I];
 
 		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS) == 0)
 			continue;
@@ -616,29 +616,16 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	
-	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
+	for (size_t I = 0; I < RenderList.GetCount(); I++)
 	{
 		zeProfilerStart("Object Pass");
 		
-		ZERenderOrder* RenderOrder = &NonTransparent[I];
+		ZERenderOrder* RenderOrder = &RenderList[I];
 		
 		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
 			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
 		PumpStreams(RenderOrder);
 		
-		zeProfilerEnd();
-	}
-
-	for (size_t I = 0; I < Transparent.GetCount(); I++)
-	{
-		zeProfilerStart("Object Pass");
-
-		ZERenderOrder* RenderOrder = &NonTransparent[I];
-
-		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
-			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
-		PumpStreams(RenderOrder);
-
 		zeProfilerEnd();
 	}
 
@@ -798,6 +785,16 @@ void ZED3D9FrameRenderer::SetLights(ZESmartArray<ZELight*>& Lights)
 	this->Lights = Lights;
 }
 
+void ZED3D9FrameRenderer::AddToLightList(ZELight* Light)
+{
+	Lights.Add(Light);
+}
+
+void ZED3D9FrameRenderer::ClearLightList()
+{
+	Lights.Clear();
+}
+
 void ZED3D9FrameRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZE_DEBUG_ENABLED
@@ -806,27 +803,37 @@ void ZED3D9FrameRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 			return;
 	#endif
 
-	// Add render orders to render order lists according to their properties
-	if (RenderOrder->Flags & ZE_ROF_IMPOSTER)
-		Imposter.Add(*RenderOrder);
-	if (RenderOrder->Flags & ZE_ROF_TRANSPARENT)
-		Transparent.Add(*RenderOrder);
-	else
-		NonTransparent.Add(*RenderOrder);
+		RenderList.Add(*RenderOrder);
 }
 
-void ZED3D9FrameRenderer::ClearList()
+void ZED3D9FrameRenderer::ClearRenderList()
 {
-	//Clear render lists
-	Imposter.Clear(true);
-	Transparent.Clear(true);
-	NonTransparent.Clear(true);
+	RenderList.Clear(true);
+}
+
+static int RenderOrderCompare(const void* A, const void* B)
+{
+	if (((ZERenderOrder*)A)->Priority == ((ZERenderOrder*)B)->Priority)
+	{
+		if (((ZERenderOrder*)A)->Order == ((ZERenderOrder*)B)->Order)
+			return 0;
+		else if (((ZERenderOrder*)A)->Order > ((ZERenderOrder*)B)->Order)
+			return 1;
+		else
+			return -1;
+	}
+	else if (((ZERenderOrder*)A)->Priority > ((ZERenderOrder*)B)->Priority)
+		return 1;
+	else
+		return -1;
 }
 
 void ZED3D9FrameRenderer::Render(float ElaspedTime)
 {
 	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost())
 		return;
+
+	RenderList.Sort(RenderOrderCompare);
 
 	zeProfilerStart("Rendering");
 

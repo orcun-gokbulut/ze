@@ -106,7 +106,7 @@ void ZEGame::Render(float ElapsedTime)
 	Scene->Render(ElapsedTime);
 	//UIManager->Render(Scene->GetRenderer());
 	Scene->GetRenderer()->Render(ElapsedTime);
-	Scene->GetRenderer()->ClearList();
+	Scene->GetRenderer()->ClearLists();
 }
 
 #include "ZEDS\ZEString.h"

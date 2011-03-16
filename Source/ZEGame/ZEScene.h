@@ -79,25 +79,6 @@ class ZESceneBridge
 	virtual void*						OnEntityChanged(ZEEntity* Entity) = 0;
 };
 
-
-
-struct ZECullStatistics
-{
-	size_t								TotalEntityCount;
-	size_t								TotalComponentCount;
-	size_t								TotalLightCount;
-	size_t								DrawableEntityCount;
-	size_t								DrawableComponentCount;
-	size_t								VisibleEntityCount;
-	size_t								VisibleComponentCount;
-	size_t								VisibleLightCount;
-	size_t								CulledEntityCount;
-	size_t								CulledComponentCount;
-	size_t								CulledLightCount;
-	size_t								MaxLightPerEntity;
-	size_t								MaxLightPerComponent;
-};
-
 class ZEScene
 {
 	private:
@@ -121,8 +102,6 @@ class ZEScene
 		ZEDWORD									VisualDebugElements;
 		ZESceneDebugDraw						DebugDraw;
 
-		ZECullStatistics						CullStatistics;
-
 	public:
 		void									AddEntity(ZEEntity* Entity);
 		void									RemoveEntity(ZEEntity* Entity);
@@ -140,17 +119,12 @@ class ZEScene
 		void									SetVisualDebugElements(ZEDWORD VisualDebugElements);
 		ZEDWORD									GetVisualDebugElements();
 
-		const ZECullStatistics&					GetCullStatistics();
-
-		virtual void							CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bool LightsEnabled = true);
-
 		bool									Save(const char* FileName);
 		bool									Load(const char* FileName);
 
 		bool									Initialize();
 		void									Deinitialize();
 		void									Destroy();
-
 
 		void									Tick(float ElapsedTime);
 		void									Render(float ElapsedTime);

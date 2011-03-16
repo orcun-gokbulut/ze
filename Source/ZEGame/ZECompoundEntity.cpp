@@ -48,16 +48,6 @@ void ZECompoundEntity::UpdateComponentTransforms()
 
 void ZECompoundEntity::RegisterComponent(ZEComponent* Component)
 {
-	ZEDWORD ComponentRenderFlag = Component->GetDrawFlags();
-
-	if (Component->GetDrawFlags() & ZE_DF_DRAW)
-	{
-		DrawFlags |= ZE_DF_DRAW_COMPONENTS;
-	}
-
-	if (Component->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
-		DrawFlags |= ZE_DF_LIGHT_SOURCE;
-
 	zeAssert(Component->Owner != NULL, "Component already has a owner. Can not register component.");
 
 	Component->Owner = this;
@@ -72,40 +62,6 @@ void ZECompoundEntity::UnregisterComponent(ZEComponent* Component)
 {
 	if (GetInitialized())
 		Component->Deinitialize();
-
-	if (DrawFlags & ZE_DF_AUTO)
-	{
-		if (Component->GetDrawFlags() & ZE_DF_DRAW)
-		{
-			bool Drawable = false;
-			for (size_t I = 0; I < Components.GetCount(); I++)
-				if (Components[I]->GetDrawFlags() & ZE_DF_DRAW)
-				{
-					Drawable = true;
-					break;
-				}
-			if (Drawable)
-				DrawFlags |= ZE_DF_DRAW_COMPONENTS;
-			else
-				DrawFlags &= !ZE_DF_DRAW_COMPONENTS;
-		}
-
-		if (Component->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
-		{
-			bool HasLight = false;
-			for (size_t I = 0; I < Components.GetCount(); I++)
-				if (Components[I]->GetDrawFlags() & ZE_DF_LIGHT_SOURCE)
-				{
-					HasLight = true;
-					break;
-				}
-
-			if (HasLight)
-				DrawFlags |= ZE_DF_LIGHT_SOURCE;
-			else
-				DrawFlags &= !ZE_DF_LIGHT_SOURCE;
-		}
-	}
 
 	Components.DeleteValue(Component);
 	Component->Owner = NULL;

@@ -52,14 +52,6 @@
 class ZEComponent;
 struct ZEDrawParameters;
 
-enum ZEBoundingVolumeMechnism
-{
-	ZE_BVM_NO_BOUNDING_VOLUME	= 0,
-	ZE_BVM_USE_LOCAL_ONLY		= 1,
-	ZE_BVM_USE_COMPONENTS		= 2,
-	ZE_BVM_USE_BOTH				= 3
-};
-
 ZE_META_ENTITY_DESCRIPTION(ZECompoundEntity);
 
 class ZECompoundEntity : public ZEEntity
@@ -68,7 +60,6 @@ class ZECompoundEntity : public ZEEntity
 	private:
 		ZEDrawFlags								DrawFlags;
 		ZERayCastFlags							RayCastFlags;
-		ZEBoundingVolumeMechnism				BoundingVolumeMechanism;
 
 	protected:
 		ZEArray<ZEComponent*>					Components;

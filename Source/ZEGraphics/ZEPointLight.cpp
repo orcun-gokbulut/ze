@@ -108,6 +108,7 @@ void ZEPointLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRende
 		BackShadowMap->Create(512, 512, ZE_TPF_SHADOW_MAP, true);
 	}
 
+	/*
 	ShadowRenderer->SetLight(this);
 
 	ShadowRenderer->SetFace(true);
@@ -118,9 +119,10 @@ void ZEPointLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRende
 
 	ShadowRenderer->SetFace(false);
 	ShadowRenderer->SetViewPort(BackShadowMap->GetViewPort());
-	ShadowRenderer->ClearList();
+	ShadowRenderer->ClearLists();
 	Scene->CullScene((ZERenderer*)ShadowRenderer, GetViewVolume(), false);
 	ShadowRenderer->Render();
+	*/
 }
 
 const ZEViewVolume& ZEPointLight::GetViewVolume()

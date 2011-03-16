@@ -64,7 +64,7 @@ class ZEModelMeshLOD
 
 		bool								IsSkinned();
 
-		void								Draw(ZEDrawParameters* DrawParameters);
+		void								Draw(ZEDrawParameters* DrawParameters, float DistanceSquare);
 		
 		void								Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource);
 		void								Deinitialize();

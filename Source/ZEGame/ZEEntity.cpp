@@ -48,7 +48,7 @@ void ZEEntity::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 		
 ZEDWORD ZEEntity::GetDrawFlags() const
 {
-	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
+	return ZE_DF_NONE;
 }
 
 ZEDWORD ZEEntity::GetRayCastFlags() const

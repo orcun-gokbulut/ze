@@ -36,8 +36,10 @@
 #include "ZEModelMesh.h"
 #include "ZEModel.h"
 #include "ZEModelFileFormat.h"
+#include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZERenderer.h"
-#include "../ZEGame/ZEScene.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEDrawParameters.h"
 
 void ZEModelMesh::SetActiveLOD(size_t LOD)
 {
@@ -282,8 +284,29 @@ void ZEModelMesh::OnTransformChanged()
 
 void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 {
-	
-	LODs[0].Draw(DrawParameters);	
+	ZEVector3 WorldPosition;
+	ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), ZEVector3::Zero);
+	float DistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->Camera->GetWorldPosition(), WorldPosition);
+
+	int Lod = 0;
+	int LastLod = LODs.GetCount() - 1;
+
+	if (DistanceSquare > 40 * 40) 
+		Lod = -1;
+	else if (DistanceSquare > 20 * 20)
+		Lod = 2;
+	else if (DistanceSquare > 10 * 10)
+		Lod = 1;
+	else
+		Lod = 0;
+
+	if (Lod == -1)
+		return;
+
+	if (Lod > LastLod)
+		Lod = LastLod;
+
+	LODs[Lod].Draw(DrawParameters, DistanceSquare);
 }
 
 

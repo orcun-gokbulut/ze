@@ -43,7 +43,7 @@
 #include "ZEGame\ZEDrawParameters.h"
 #include "ZEGame\ZEScene.h"
 #include "ZEPhysics\ZEPhysicalWorld.h"
-
+#include "ZEMap\ZEPortalMap\ZEPortalMap.h"
 ZEPortalMap* ZEPortalMapPortal::GetOwner()
 {
 	return Owner;
@@ -76,6 +76,7 @@ void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 {
 	for(size_t I = 0; I < RenderOrders.GetCount(); I++)
 	{
+		RenderOrders[I].WorldMatrix = Owner->GetWorldTransform();
 		RenderOrders[I].Lights.Clear();
 		RenderOrders[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
 
@@ -107,7 +108,9 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 				ZERenderOrder* RenderOrder = RenderOrders.Add();
 
 				RenderOrder->SetZero();
-				RenderOrder->Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
+				RenderOrder->Priority = 2;
+				RenderOrder->Order = 1;
+				RenderOrder->Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 				RenderOrder->Material = Material;
 				RenderOrder->PrimitiveType = ZE_ROPT_TRIANGLE;
 				RenderOrder->VertexBufferOffset = VertexIndex;
@@ -163,6 +166,8 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 		PhysicalMesh->Initialize();
 		zeScene->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
 	}
+
+	this->Owner = Owner;
 
 	return true;
 }

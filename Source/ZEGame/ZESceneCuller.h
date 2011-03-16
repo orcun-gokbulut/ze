@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEShadowRenderer.h
+ Zinek Engine - ZESceneCuller.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,24 +34,45 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SHADOW_RENDERER_H__
-#define __ZE_SHADOW_RENDERER_H__
+#ifndef __ZE_SCENE_CULLER_H__
+#define __ZE_SCENE_CULLER_H__
 
-#include "ZERenderer.h"
+#include "ZEDS\ZEArray.h"
+#include "ZESceneDebugDraw.h"
 
-class ZETexture2D;
-class ZETextureCube;
-enum ZETextureCubeFace;
+class ZEScene;
+class ZEEntity;
+class ZELight;
+class ZEDrawParameters;
 
-class ZEShadowRenderer : public ZERenderer
+struct ZECullStatistics
 {
+	size_t								TotalEntityCount;
+	size_t								DrawableEntityCount;
+	size_t								VisibleEntityCount;
+	size_t								CulledEntityCount;
+	size_t								DrawedEntityCount;
+
+	size_t								TotalLightCount;
+	size_t								VisibleLightCount;
+	size_t								CulledLightCount;
+	size_t								DrawedLightCount;
+};
+
+class ZESceneCuller
+{
+	private:
+		ZECullStatistics				Statistics;
+
+		bool							CullLight(ZELight* Light, ZEDrawParameters* DrawParameters);
+		void							CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters);
+
+		bool							CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
+		void							CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameters);
+
 	public:
-		virtual ZERendererType		GetRendererType();
-
-		virtual void				SetFace(bool Front) = 0;
-		virtual bool				GetFace() = 0;
-
-		static ZEShadowRenderer*	CreateInstance();
+		virtual const ZECullStatistics&	GetStatistics();
+		virtual void					CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters);
 };
 
 #endif

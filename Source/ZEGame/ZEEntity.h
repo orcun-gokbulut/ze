@@ -108,7 +108,7 @@ typedef ZEDWORD ZEDrawFlags;
 
 // ZERayCastFlags
 typedef ZEDWORD ZERayCastFlags;
-#define ZE_RCF_INTERNAL								0
+#define ZE_RCF_INTERNAL							0
 #define ZE_RCF_BOUNDING_BOX						1
 #define ZE_RCF_INTERNAL							2
 

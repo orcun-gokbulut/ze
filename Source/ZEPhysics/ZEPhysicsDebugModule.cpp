@@ -175,9 +175,9 @@ void ZEPhysicsDebugModule::Process(float ElapsedTime)
 	TotalTime += ElapsedTime;
 	if (TotalTime > 5.0f)
 	{
-		const ZECullStatistics& Stats = zeScene->GetCullStatistics();
+		/*const ZECullStatistics& Stats = zeScene->GetCullStatistics();
 
-		/*zeLog("Scene", 
+		zeLog("Scene", 
 		"TotalEntityCount: %d, \r\n"
 		"TotalComponentCount: %d, \r\n"
 		"TotalLightCount: %d, \r\n"

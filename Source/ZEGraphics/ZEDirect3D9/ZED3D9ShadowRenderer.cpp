@@ -218,7 +218,7 @@ void ZED3D9ShadowRenderer::Destroy()
 }
 
 
-void ZED3D9ShadowRenderer::ClearList()
+void ZED3D9ShadowRenderer::ClearRenderList()
 {
 	//Clear render lists
 	Imposter.Clear(true);

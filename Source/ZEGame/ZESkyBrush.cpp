@@ -156,6 +156,8 @@ ZESkyBrush::ZESkyBrush()
 	SkyBox.AddBox(2.0f, 2.0, 2.0f);
 	
 	SkyRenderOrder.SetZero();
+	SkyRenderOrder.Priority = 4;
+	SkyRenderOrder.Order = 0.0f;
 	SkyRenderOrder.VertexBuffer = &SkyBox;
 	SkyRenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	SkyRenderOrder.PrimitiveCount = SkyBox.Vertices.GetCount() / 3;

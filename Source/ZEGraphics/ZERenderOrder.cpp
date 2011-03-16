@@ -39,4 +39,5 @@
 void ZERenderOrder::SetZero()
 {
 	memset(this, 0, sizeof(ZERenderOrder));
+	this->Priority = 3;
 }
