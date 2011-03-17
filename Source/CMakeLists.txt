@@ -37,8 +37,8 @@ cmake_minimum_required (VERSION 2.8)
 
 project (ZinekEngine)
 
-#add_definitions (-DZE_DEBUG_ENABLED)
-#add_definitions (-DZE_DEBUG_BREAK_ON_ERROR)
+add_definitions (-DZE_DEBUG_ENABLED)
+add_definitions (-DZE_DEBUG_BREAK_ON_ERROR)
 #add_definitions (-DZE_DEBUG_BREAK_ON_WARNING)
 #add_definitions (-DZE_DEBUG_ENABLE_MEMORY_CHECKS)
 

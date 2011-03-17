@@ -42,6 +42,21 @@
 #include "ZEDrawParameters.h"
 #include "ZEGraphics/ZEViewVolume.h"
 
+void ZESceneCuller::DebugDrawEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
+{
+	if (DebugDrawElements & ZE_VDE_ENTITY_LOCAL_BOUNDING_BOX)
+		DebugDraw.DrawOrientedBoundingBox(Entity->GetLocalBoundingBox(), Entity->GetWorldTransform(), DrawParameters->Renderer, ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
+
+	if (DebugDrawElements & ZE_VDE_ENTITY_WORLD_BOUNDING_BOX)
+		DebugDraw.DrawAxisAlignedBoundingBox(Entity->GetWorldBoundingBox(), DrawParameters->Renderer, ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));
+}
+
+void ZESceneCuller::DebugDrawLight(ZELight* Light, ZEDrawParameters* DrawParameters)
+{
+	if (DebugDrawElements & ZE_VDE_LIGHT_RANGE)
+		DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Light->GetWorldPosition(), Light->GetRange()), DrawParameters->Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
+}
+
 bool ZESceneCuller::CullLight(ZELight* Light, ZEDrawParameters* DrawParameters)
 {
 	Statistics.TotalLightCount++;
@@ -73,13 +88,10 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 		{
 			if (CullLight((ZELight*)Entities[I], DrawParameters))
 			{
-				DrawParameters->Renderer->AddToLightList((ZELight*)Entities[I]);
-
-				/*if (VisualDebugElements & ZE_VDE_LIGHT_RANGE)
-					DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Light->GetWorldPosition(), ((ZELight*)Light)->GetRange()), Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));*/
+				DrawParameters->Renderer->AddToLightList((ZELight*)Entities[I]);	
+				DebugDrawLight((ZELight*)Entities[I], DrawParameters);
 			}
 		}
-
 
 		if (Entities[I]->GetEntityType() == ZE_ET_COMPOUND)
 		{
@@ -90,10 +102,8 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 				if (ZEClassDescription::CheckParent(ZELight::ClassDescription(), Components[N]->GetClassDescription()))
 					if (CullLight((ZELight*)Components[N], DrawParameters))
 					{
-						DrawParameters->Renderer->AddToLightList((ZELight*)Entities[I]);
-
-						/*if (VisualDebugElements & ZE_VDE_LIGHT_RANGE)
-						DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Light->GetWorldPosition(), ((ZELight*)Light)->GetRange()), Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));*/
+						DrawParameters->Renderer->AddToLightList((ZELight*)Components[N]);
+						DebugDrawLight((ZELight*)Components[N], DrawParameters);
 					}
 			}
 		}
@@ -105,7 +115,7 @@ bool ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameter
 	Statistics.TotalEntityCount++;
 
 	ZEDWORD EntityDrawFlags = Entity->GetDrawFlags();
-	if (EntityDrawFlags & ZE_DF_DRAW == false)
+	if ((EntityDrawFlags & ZE_DF_DRAW) != ZE_DF_DRAW)
 		return false;
 
 	Statistics.DrawableEntityCount++;
@@ -123,35 +133,25 @@ bool ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameter
 
 void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 {
-	ZESmartArray<ZEEntity*> Entities = Scene->GetEntities();
+	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
 
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 	{
 		if (CullEntity(Entities[I], DrawParameters))
 		{
 			Entities[I]->Draw(DrawParameters);
-
-			/*if (VisualDebugElements & ZE_VDE_ENTITY_ORIENTED_BOUNDINGBOX)
-			DebugDraw.DrawOrientedBoundingBox(Entity->GetLocalBoundingBox(), Components[N]->GetWorldTransform(), Renderer, ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
-
-			if (VisualDebugElements & ZE_VDE_ENTITY_AXISALIGNED_BOUNDINGBOX)
-			DebugDraw.DrawAxisAlignedBoundingBox(Components[N]->GetWorldBoundingBox(), Renderer, ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));*/
+			DebugDrawEntity(Entities[I], DrawParameters);
 		}
 
 		if (Entities[I]->GetEntityType() == ZE_ET_COMPOUND)
 		{
-			const ZEArray<ZEComponent*> Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
+			const ZEArray<ZEComponent*>& Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
 
 			for (size_t N = 0; N < Components.GetCount(); N++)
 				if (CullEntity(Components[N], DrawParameters))
 				{
 					Components[N]->Draw(DrawParameters);
-
-					/*if (VisualDebugElements & ZE_VDE_ENTITY_ORIENTED_BOUNDINGBOX)
-						DebugDraw.DrawOrientedBoundingBox(Entity->GetLocalBoundingBox(), Components[N]->GetWorldTransform(), Renderer, ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
-
-					if (VisualDebugElements & ZE_VDE_ENTITY_AXISALIGNED_BOUNDINGBOX)
-						DebugDraw.DrawAxisAlignedBoundingBox(Components[N]->GetWorldBoundingBox(), Renderer, ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));*/
+					DebugDrawEntity(Components[N], DrawParameters);
 				}
 		}
 	}
@@ -162,12 +162,41 @@ const ZECullStatistics& ZESceneCuller::GetStatistics()
 	return Statistics;
 }
 
+void ZESceneCuller::SetDebugDrawElements(ZEDWORD Elements)
+{
+	this->DebugDrawElements = Elements;
+}
+
+ZEDWORD ZESceneCuller::SetDebugDrawElements()
+{
+	return this->DebugDrawElements;
+}
+
 void ZESceneCuller::CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 {
+	if (DebugDrawElements == ZE_VDE_NONE)
+		DebugDraw.Deinitialize();
+	else
+		DebugDraw.Initialize();
+
 	memset(&Statistics, 0, sizeof(ZECullStatistics));
+
+	DebugDraw.Clean();
 
 	if (DrawParameters->Renderer->GetRendererType() == ZE_RT_FRAME)
 		CullLights(Scene, DrawParameters);
 
 	CullEntities(Scene, DrawParameters);
+	
+	DebugDraw.Draw(DrawParameters->Renderer);
+}
+
+ZESceneCuller::ZESceneCuller()
+{
+	DebugDrawElements = ZE_VDE_NONE;
+}
+
+ZESceneCuller::~ZESceneCuller()
+{
+	DebugDraw.Deinitialize();
 }

@@ -53,6 +53,8 @@ class ZESceneDebugDraw
 		ZECanvas					VertexBuffer;
 		ZERenderOrder				RenderOrder;
 
+		bool						Initialized;
+
 	public:
 		bool						Initialize();
 		void						Deinitialize();

@@ -84,7 +84,7 @@ class ZEComponent : public ZEEntity
 		const ZEMatrix4x4&				GetLocalTransform() const;
 
 		virtual const ZEAABoundingBox&	GetLocalBoundingBox() const;
-		virtual const ZEAABoundingBox&	GetWorldBoundingBox() const;
+		virtual const ZEAABoundingBox&	GetWorldBoundingBox();
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);

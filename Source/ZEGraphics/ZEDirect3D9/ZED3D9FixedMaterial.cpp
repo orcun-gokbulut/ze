@@ -206,6 +206,11 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 		WorldViewMatrix = Camera->GetViewTransform();
 	}
 
+	ZEVector3 T;
+	ZEMatrix4x4::Transform3x3(T, WorldViewMatrix, ZEVector3::UnitY);
+
+	GetDevice()->SetPixelShaderConstantF(20, (float*)&ZEVector4(T, 0.0f), 4);
+
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&WorldViewMatrix, 4);

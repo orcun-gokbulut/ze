@@ -39,6 +39,7 @@
 
 #include "ZEDS\ZEArray.h"
 #include "ZESceneDebugDraw.h"
+#include "ZESceneCuller.h"
 
 class ZEViewVolume;
 class ZEBoundingBox;
@@ -53,30 +54,19 @@ class ZEPhysicalWorld;
 class ZEPortalMap;
 class ZEPortalMapResource;
 
-#define ZE_RCF_ENTITY								1
-#define ZE_RCF_COMPONENT							2
-#define ZE_RCF_MAP									4
-#define ZE_RCF_POSITON								8
-#define ZE_RCF_NORMAL								16
-
-#define ZE_VDE_NONE									0
-#define ZE_VDE_ENTITY_ORIENTED_BOUNDINGBOX			1
-#define ZE_VDE_ENTITY_AXISALIGNED_BOUNDINGBOX		2
-#define ZE_VDE_ENTITY_BOUNDINGSPHERE				8
-#define ZE_VDE_ENTITY_DEBUGDRAW						16
-#define ZE_VDE_COMPONENT_ORIENTED_BOUNDINGBOX		32
-#define ZE_VDE_COMPONENT_AXISALIGNED_BOUNDINGBOX	64
-#define ZE_VDE_COMPONENT_BOUNDINGSPHERE				128
-#define ZE_VDE_COMPONENT_DEBUGDRAW					256
-#define ZE_VDE_LIGHT_RANGE							512
-#define ZE_VDE_ALL									1023
+#define ZE_RCF_ENTITY							1
+#define ZE_RCF_COMPONENT						2
+#define ZE_RCF_MAP								4
+#define ZE_RCF_POSITON							8
+#define ZE_RCF_NORMAL							16
 
 #define zeScene ZEScene::GetInstance()
 
 class ZESceneBridge
 {
-	virtual void*						GetScene() = 0;
-	virtual void*						OnEntityChanged(ZEEntity* Entity) = 0;
+	public:
+		virtual void*							GetScene() = 0;
+		virtual void*							OnEntityChanged(ZEEntity* Entity) = 0;
 };
 
 class ZEScene
@@ -85,6 +75,8 @@ class ZEScene
 		bool									Initialized;
 
 		unsigned int							LastEntityId;
+
+		ZESceneCuller							Culler;
 
 		ZEPortalMap*							Map;
 		ZEPortalMapResource*					MapResource;
@@ -99,9 +91,6 @@ class ZEScene
 		ZECamera*								ActiveCamera;
 		ZEListener*								ActiveListener;
 
-		ZEDWORD									VisualDebugElements;
-		ZESceneDebugDraw						DebugDraw;
-
 	public:
 		void									AddEntity(ZEEntity* Entity);
 		void									RemoveEntity(ZEEntity* Entity);
@@ -115,9 +104,6 @@ class ZEScene
 
 		void									SetActiveListener(ZEListener* Listener);
 		ZEListener*								GetActiveListener();
-
-		void									SetVisualDebugElements(ZEDWORD VisualDebugElements);
-		ZEDWORD									GetVisualDebugElements();
 
 		bool									Save(const char* FileName);
 		bool									Load(const char* FileName);

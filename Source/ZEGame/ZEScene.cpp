@@ -56,16 +56,6 @@
 
 #include <memory.h>
 
-void ZEScene::SetVisualDebugElements(ZEDWORD VisualDebugElements)
-{
-	this->VisualDebugElements = VisualDebugElements;
-}
-
-ZEDWORD ZEScene::GetVisualDebugElements()
-{
-	return this->VisualDebugElements;
-}
-
 bool ZEScene::Initialize()
 {
 	Deinitialize();
@@ -114,9 +104,7 @@ bool ZEScene::Initialize()
 		zeCriticalError("Scene", "Can not create physical world.");
 		return false;
 	}
-	
-	if (!DebugDraw.Initialize())
-		zeError("Scene", "Can not initialize scene debug draw.");
+
 
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Initialize();
@@ -135,8 +123,6 @@ void ZEScene::Deinitialize()
 
 	if (Map != NULL)
 		Map->Deinitialize();
-
-	DebugDraw.Deinitialize();
 
 	if (Renderer != NULL)
 		Renderer->Deinitialize();
@@ -251,7 +237,6 @@ void ZEScene::Render(float ElapsedTime)
 		return;
 
 	Renderer->SetCamera(ActiveCamera);
-	ZESceneCuller Culler;
 	
 	ZEDrawParameters DrawParameters;
 	DrawParameters.ElapsedTime = zeCore->GetFrameTime();
@@ -263,8 +248,6 @@ void ZEScene::Render(float ElapsedTime)
 	DrawParameters.Lights.Clear();
 
 	Culler.CullScene(this, &DrawParameters);
-
-//	CullScene(Renderer, ActiveCamera->GetViewVolume(), true);
 }
 
 bool ZEScene::Save(const char* FileName)
@@ -333,7 +316,6 @@ bool ZEScene::Load(const char* FileName)
 	{
 		ZEDWORD EntityCount;
 		Unserializer.Read(&EntityCount, sizeof(ZEDWORD), 1);
-
 		Unserializer.Read(&LastEntityId, sizeof(int), 1);
 
 		char MapFile[ZE_MAX_FILE_NAME_SIZE];
@@ -388,8 +370,6 @@ ZEScene::ZEScene()
 	PhysicalWorld = NULL;
 	MapResource = NULL;
 	Map = NULL;
-
-	VisualDebugElements = ZE_VDE_ENTITY_ORIENTED_BOUNDINGBOX;
 }
 
 ZEScene::~ZEScene()

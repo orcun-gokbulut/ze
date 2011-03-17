@@ -58,7 +58,6 @@ class ZECompoundEntity : public ZEEntity
 {
 	ZE_META_ENTITY(ZECompoundEntity)
 	private:
-		ZEDrawFlags								DrawFlags;
 		ZERayCastFlags							RayCastFlags;
 
 	protected:
@@ -77,7 +76,6 @@ class ZECompoundEntity : public ZEEntity
 
 		const ZEArray<ZEComponent *>&			GetComponents() const;
 
-		virtual ZEDWORD							GetDrawFlags() const;
 		virtual ZEDWORD							GetRayCastFlags() const;
 
 		virtual void							SetPosition(const ZEVector3& NewPosition);

@@ -102,7 +102,7 @@ const ZEAABoundingBox& ZEComponent::GetLocalBoundingBox() const
 	return LocalBoundingBox;
 }
 
-const ZEAABoundingBox& ZEComponent::GetWorldBoundingBox() const
+const ZEAABoundingBox& ZEComponent::GetWorldBoundingBox()
 {
 	ZEAABoundingBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
 	return WorldBoundingBox;
@@ -129,7 +129,8 @@ const ZEVector3 ZEComponent::GetWorldPosition() const
 	if (Owner != NULL)
 	{
 		ZEVector3 Temp;
-		ZEVector3::Add(Temp, Owner->GetPosition(), GetPosition());
+		ZEMatrix4x4::Transform(Temp, Owner->GetWorldTransform(), GetPosition());
+		//ZEVector3::Add(Temp, Owner->GetPosition(), GetPosition());
 		return Temp;
 	}
 	else

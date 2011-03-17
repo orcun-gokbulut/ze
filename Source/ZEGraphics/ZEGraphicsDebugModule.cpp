@@ -70,6 +70,10 @@ bool ZEGraphicsDebugModule::Initialize()
 
 
 
+	/*ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
+	Sky->SetSkyTexture("cubetest.tga");
+	Scene->AddEntity(Sky);*/
+
 	ZEPortalMap* Map1 = ZEPortalMap::CreateInstance();
 	Map1->SetMapFile("terrain2.zemap");
 	Map1->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
@@ -157,21 +161,17 @@ bool ZEGraphicsDebugModule::Initialize()
 	Model = ZEModel::CreateInstance();		
 	Model->SetModelResource(ZEModelResource::LoadResource("Light.zemodel"));
 	Model->SetPosition(ZEVector3(-100.0f, 0.0f, 0.0f));
-	Scene->AddEntity(Model);
+	Scene->AddEntity(Model);*/
 
-	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
-	Sky->SetSkyTexture("cubetest.tga");
-	Scene->AddEntity(Sky);
-
-	DirectionalLight0 = ZEDirectionalLight::CreateInstance();
+	/*DirectionalLight0 = ZEDirectionalLight::CreateInstance();
 	DirectionalLight0->SetEnabled(true);
 	DirectionalLight0->SetRotation(ZEQuaternion(-ZE_PI_2, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
 	DirectionalLight0->SetIntensity(3.0f);
 	DirectionalLight0->SetCastsShadow(false);
-	Scene->AddEntity(DirectionalLight0);
+	Scene->AddEntity(DirectionalLight0);*/
 
-	PointLight1->SetEnabled(true);
+	/*PointLight1->SetEnabled(true);
 	PointLight2->SetEnabled(true);
 	PointLight3->SetEnabled(true);
 	PointLight4->SetEnabled(true);

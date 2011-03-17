@@ -79,7 +79,7 @@ void ZEModel::CalculateBoundingBox()
 		}
 	}
 
-	/*for (size_t I = 0; I < Bones.GetCount(); I++)
+	for (size_t I = 0; I < Bones.GetCount(); I++)
 	{
 		ZEVector3 BonePosition = Bones[I].GetModelPosition();
 
@@ -90,7 +90,7 @@ void ZEModel::CalculateBoundingBox()
 		if (BonePosition.x > BoundingBox.Max.x) BoundingBox.Max.x = BonePosition.x;
 		if (BonePosition.y > BoundingBox.Max.y) BoundingBox.Max.y = BonePosition.y;
 		if (BonePosition.z > BoundingBox.Max.z) BoundingBox.Max.z = BonePosition.z;
-	}*/
+	}
 }
 
 void ZEModel::UpdateTransforms()

@@ -59,10 +59,22 @@ struct ZECullStatistics
 	size_t								DrawedLightCount;
 };
 
+#define ZE_VDE_NONE									0
+#define ZE_VDE_ENTITY_LOCAL_BOUNDING_BOX			1
+#define ZE_VDE_ENTITY_WORLD_BOUNDING_BOX			2
+#define ZE_VDE_LIGHT_RANGE							4
+#define ZE_VDE_ALL									7
+
 class ZESceneCuller
 {
 	private:
 		ZECullStatistics				Statistics;
+
+		ZESceneDebugDraw				DebugDraw;
+		ZEDWORD							DebugDrawElements;
+
+		void							DebugDrawEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
+		void							DebugDrawLight(ZELight* Light, ZEDrawParameters* DrawParameters);
 
 		bool							CullLight(ZELight* Light, ZEDrawParameters* DrawParameters);
 		void							CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters);
@@ -72,7 +84,14 @@ class ZESceneCuller
 
 	public:
 		virtual const ZECullStatistics&	GetStatistics();
+
+		void							SetDebugDrawElements(ZEDWORD Elements);
+		ZEDWORD							SetDebugDrawElements();
+
 		virtual void					CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters);
+
+										ZESceneCuller();
+										~ZESceneCuller();
 };
 
 #endif

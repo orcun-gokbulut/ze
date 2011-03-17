@@ -99,8 +99,6 @@ bool ZEPhysicsDebugModule::Initialize()
 	ZEPhysicalWorld* World = (ZEPhysicalWorld*)zeScene->GetPhysicalWorld();
 
 	World->SetVisualize(true);
-	//Scene->SetVisualDebugElements(ZE_VDE_ALL);
-	Scene->SetVisualDebugElements(ZE_VDE_NONE);
 	World->SetEnabled(true);
 
 	ZEDirectionalLight* Light = ZEDirectionalLight::CreateInstance();

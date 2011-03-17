@@ -84,10 +84,6 @@ const ZEArray<ZEComponent*>& ZECompoundEntity::GetComponents() const
 	return Components; 
 }
 
-ZEDWORD ZECompoundEntity::GetDrawFlags() const
-{
-	return DrawFlags;
-}
 void ZECompoundEntity::SetPosition(const ZEVector3& NewPosition) 
 {
 	ZEEntity::SetPosition(NewPosition);
