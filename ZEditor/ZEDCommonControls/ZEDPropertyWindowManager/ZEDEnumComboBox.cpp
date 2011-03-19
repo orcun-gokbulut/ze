@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDEnumComboBox.h"
-#include "..\ZEDUndoRedo\ZEDUndoRedo.h"
-#include "..\ZEDUndoRedo\ZEDPropertyUndoRedo.h"
-#include "..\ZEDGUI\CSS.h"
+#include "ZEDUndoRedo\ZEDUndoRedo.h"
+#include "ZEDPropertyUndoRedo.h"
+#include "ZEDCommonControls/CSS.h"
 
 ZEDPropertyComboBox::ZEDPropertyComboBox(QWidget* Parent) : QComboBox(Parent)
 {

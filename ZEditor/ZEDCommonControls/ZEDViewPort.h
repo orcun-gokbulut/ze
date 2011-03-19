@@ -48,11 +48,10 @@
 #include "ZEGame\ZEEntity.h"
 #include "ZEGame\ZEScene.h"
 #include "ZEGame\ZEPlayer.h"
-#include "ZEDPlugIns\ZEDPlugIn.h"
-#include "ZEDGizmo\ZEDGizmo.h"
-#include "ZEDSelectionItems\ZEDSelectionItem.h"
-#include "..\ZEDUndoRedo\ZEDGizmoUndoRedo.h"
-#include "..\ZEDRayCaster\ZEDRayCaster.h"
+#include "ZEDCore\ZEDPlugIn.h"
+#include "ZEDCommonEntities\ZEDGizmo.h"
+#include "ZEDSceneEditor\ZEDSelectionItem.h"
+#include "ZEDCommonEntities\ZEDGizmoUndoRedo.h"
 
 class MapEditor;
 
@@ -61,8 +60,6 @@ class ZEDViewPort : public QFrame
 	Q_OBJECT
 
 	private:
-	
-		ZEDRayCaster				RayCaster;
 
 		int							StepSize;
 

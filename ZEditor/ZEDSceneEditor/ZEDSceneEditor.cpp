@@ -45,7 +45,7 @@
 #include <QTabWidget>
 #include <windows.h>
 #include "ZESDK.h"
-#include "ZEDMapEditor.h"
+#include "ZEDSceneEditor.h"
 #include "ZEGame\ZEPlayer.h"
 #include "ZEGame\ZEGame.h"
 #include "ZEGame\ZEScene.h"

@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDScreenAxisHelper.h"
+#include "ZEDScreenAxis.h"
 #include <ZEGame/ZEPlayer.h>
 
 void ZEDScreenAxisHelper::Tick(float Time)

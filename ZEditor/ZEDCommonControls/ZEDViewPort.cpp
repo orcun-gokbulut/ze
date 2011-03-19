@@ -35,7 +35,7 @@
 
 #include <QDir>
 #include <QChar>
-#include "ZEDMapEditor.h"
+#include "ZEDSceneEditor/ZEDSceneEditor.h"
 #include "ZEDViewPort.h"
 #include "ZESDK.h"
 #include "ZEGame\ZEGame.h"

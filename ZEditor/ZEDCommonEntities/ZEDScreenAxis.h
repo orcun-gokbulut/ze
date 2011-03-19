@@ -37,7 +37,7 @@
 #ifndef __ZED_SCREEN_AXIS_HELPER_H__
 #define __ZED_SCREEN_AXIS_HELPER_H__
 
-#include "../ZEDGizmo/ZEDGizmo.h"
+#include "ZEDGizmo.h"
 
 class ZEPlayer;
 

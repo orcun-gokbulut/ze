@@ -40,7 +40,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 #include "ZEDFloatIntLineEdit.h"
-#include "../ZEDGUI/CSS.h"
+#include "ZEDCommonControls/CSS.h"
 
 
 ZEDFloatIntLineEditPreviewer::ZEDFloatIntLineEditPreviewer(QWidget* Parent) : QWidget(Parent)

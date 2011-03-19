@@ -83,7 +83,7 @@ add_source (ZED3D9VertexDeclaration.cpp		Sources)
 add_source (ZED3D9VertexDeclaration.h		Sources)
 add_source (ZED3D9ViewPort.cpp				Sources)
 add_source (ZED3D9ViewPort.h				Sources)
- 
+
 add_library (ZEDirect3D9 ${Sources})
 target_link_libraries (ZEDirect3D9 d3d9.lib d3dx9.lib)
 

@@ -39,7 +39,7 @@
 
 #include "ZEMeta\ZEClass.h"
 #include <QWidget>
-#include "..\ZEDGizmo\ZEDGizmo.h"
+#include "ZEDCommonEntities/ZEDGizmo.h"
 
 enum ZEDGizmoMode;
 

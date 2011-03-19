@@ -38,7 +38,7 @@
 #ifndef __NEW_ZED_ASSERT_BROWSER_H__
 #define __NEW_ZED_ASSERT_BROWSER_H__
 
-#include "ui_ZEDAssertBrowser.h"
+#include <ui_ZEDAssertBrowser.h>
 
 #include <QLabel>
 #include <QLineEdit>
@@ -49,7 +49,7 @@
 
 #include <zeds/ZEArray.h>
 
-#include "../ZEDAssertBrowserPlugIns/ZEDAssertBrowserPlugIn.h"
+#include "ZEDAssertBrowserPlugIn.h"
 #include "NewZEDAssertBrowserItem.h"
 
 class NewZEDAssertBrowser : public QMainWindow

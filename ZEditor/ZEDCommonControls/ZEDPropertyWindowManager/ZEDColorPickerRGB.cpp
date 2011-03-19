@@ -35,9 +35,9 @@
 
 #include <QColorDialog>
 #include "ZEDColorPickerRGB.h"
-#include "..\ZEDUndoRedo\ZEDUndoRedo.h"
-#include "..\ZEDUndoRedo\ZEDPropertyUndoRedo.h"
-#include "../ZEDGUI/CSS.h"
+#include "ZEDUndoRedo\ZEDUndoRedo.h"
+#include "ZEDPropertyUndoRedo.h"
+#include "ZEDCommonControls/CSS.h"
 
 ZEDColorPickerRGB::ZEDColorPickerRGB(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
 {

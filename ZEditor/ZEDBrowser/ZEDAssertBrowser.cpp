@@ -36,7 +36,7 @@
 #include <QFile>
 #include "ZEDAssertBrowser.h"
 #include <FreeImage.h>
-#include "ZEDAssertBrowserPlugIns\ZEDAssertBrowserFontFilePlugIn.h"
+#include "ZEDAssertBrowserFontFilePlugIn.h"
 
 ZEDAssertBrowser::ZEDAssertBrowser(QString WorkingDirectory)
 {

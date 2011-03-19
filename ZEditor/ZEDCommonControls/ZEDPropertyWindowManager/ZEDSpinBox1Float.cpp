@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDSpinBox1Float.h"
-#include "..\ZEDUndoRedo\ZEDUndoRedo.h"
-#include "..\ZEDUndoRedo\ZEDPropertyUndoRedo.h"
+#include "ZEDUndoRedo\ZEDUndoRedo.h"
+#include "ZEDPropertyUndoRedo.h"
 
 ZEDSpinBox1Float::ZEDSpinBox1Float(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
 {

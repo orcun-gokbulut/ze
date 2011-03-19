@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QFileInfo>
+/*#include <QFileInfo>
 
 #include "ZEDAssertBrowserFontFilePlugIn.h"
 
@@ -118,3 +118,4 @@ ZEDFontFilePlugIn::ZEDFontFilePlugIn()
 {
 
 }
+*/

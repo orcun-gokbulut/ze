@@ -53,8 +53,8 @@
 #include <QPixmap>
 
 #include "ZEDAssertBrowserViewPortItem.h"
-#include "ZEDPlugIns\ZEDPlugIn.h"
-#include "ZEDAssertBrowserPlugIns\ZEDAssertBrowserPlugIn.h"
+#include "ZEDCore\ZEDPlugIn.h"
+#include "ZEDAssertBrowserPlugIn.h"
 
 class ZEDAssertBrowser : public QWidget
 {

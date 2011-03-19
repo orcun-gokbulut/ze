@@ -39,7 +39,7 @@
 #define __ZED_SELECTION_ITEM_PLUG_IN_H__
 
 #include <QString>
-#include "../ZEDPlugIns/ZEDPlugIn.h"
+#include "ZEDCore/ZEDPlugIn.h"
 
 class	ZEDSelectionItem;
 class	ZEClass;

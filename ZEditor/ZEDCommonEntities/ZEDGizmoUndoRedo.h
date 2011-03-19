@@ -38,7 +38,7 @@
 #ifndef __ZED_GIZMO_UNDO_REDO_H__
 #define __ZED_GIZMO_UNDO_REDO_H__
 
-#include "ZEDUndoRedo.h"
+#include "ZEDUndoRedo\ZEDUndoRedo.h"
 #include "ZEMeta\ZEClass.h"
 #include "ZEDS\ZEVariant.h"
 

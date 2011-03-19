@@ -38,26 +38,26 @@
 #define MAPEDITOR_H
 
 #include <QtGui/QMainWindow>
-#include <QPoint.h>
-#include <QTimer.h>
-#include <QString.h>
-#include "ui_ZEDMapEditor.h"
-#include "ZEDViewPort.h"
+#include <QtCore/QPoint.h>
+#include <QtCore/QTimer.h>
+#include <QtCore/QString.h>
+#include "ui_ZEDSceneEditor.h"
+#include "ZEDCommonControls\ZEDViewPort.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEDEntitySelector.h"
-#include "ZEDPropertyWindowManager\ZEDPropertyWindowManager.h"
-#include "ZEDLoadingScreen.h"
-#include "ZEDConsoleInterface\ZEDConsoleInterface.h"
-#include "ZEDPlugIns\ZEDPlugIn.h"
+#include "ZEDCommonControls/ZEDPropertyWindowManager/ZEDPropertyWindowManager.h"
+#include "ZEDCommonControls\ZEDLoadingScreen.h"
+#include "ZEDCommonControls\ZEDConsoleInterface.h"
+#include "ZEDCore\ZEDPlugIn.h"
 #include "..\ZEDUndoRedo\ZEDUndoRedo.h"
-#include "..\ZEDSelectionItems\ZEDSelectionItem.h"
-#include "..\ZEDSelectionPlugins\ZEDSelectionItemPlugin.h"
-#include "..\ZEDSceneList\ZEDSceneList.h"
-#include "../ZEDGrid/ZEDGrid.h"
+#include "ZEDSelectionItem.h"
+#include "ZEDSelectionItemPlugin.h"
+#include "ZEDSceneList.h"
+#include "ZEDCommonEntities/ZEDGrid.h"
 #include <ZEModel/ZEModel.h>
 
 //test
-#include "../ZEDAssertBrowser/NewZEDAssertBrowser.h"
+#include "ZEDBrowser/NewZEDAssertBrowser.h"
 //test
 
 using namespace Qt;

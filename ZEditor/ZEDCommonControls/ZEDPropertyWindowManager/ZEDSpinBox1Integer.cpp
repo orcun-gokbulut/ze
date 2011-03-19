@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDSpinBox1Integer.h"
-#include "..\ZEDUndoRedo\ZEDUndoRedo.h"
-#include "..\ZEDUndoRedo\ZEDPropertyUndoRedo.h"
+#include "ZEDUndoRedo\ZEDUndoRedo.h"
+#include "ZEDPropertyUndoRedo.h"
 
 ZEDSpinBox1Integer::ZEDSpinBox1Integer(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
 {

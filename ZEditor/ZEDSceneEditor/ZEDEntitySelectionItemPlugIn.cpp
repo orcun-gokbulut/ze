@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDEntitySelectionItemPlugIn.h"
-#include "..\ZEDSelectionItems\ZEDEntitySelectionItem\ZEDEntitySelectionItem.h"
+#include "ZEDEntitySelectionItem.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEMeta\ZEClass.h"
 

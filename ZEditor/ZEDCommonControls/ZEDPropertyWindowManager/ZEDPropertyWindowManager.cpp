@@ -42,7 +42,7 @@
 #include <QModelIndex>
 #include <QPainter>
 #include <QStyleOptionViewItem>
-#include "../ZEDGUI/CSS.h"
+#include "ZEDCommonControls/CSS.h"
 
 ZEDPropertyWindowManagerGroup::ZEDPropertyWindowManagerGroup(QString GroupName, QTreeWidgetItem* Parent)
 {

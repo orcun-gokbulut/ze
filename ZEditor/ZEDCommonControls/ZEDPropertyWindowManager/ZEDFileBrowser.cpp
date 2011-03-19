@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDFileBrowser.h"
-#include "..\ZEDUndoRedo\ZEDUndoRedo.h"
-#include "..\ZEDUndoRedo\ZEDPropertyUndoRedo.h"
-#include "../ZEDGUI/CSS.h"
+#include "ZEDUndoRedo\ZEDUndoRedo.h"
+#include "ZEDPropertyUndoRedo.h"
+#include "ZEDCommonControls/CSS.h"
 
 ZEDFileBrowser::ZEDFileBrowser(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute, QString WorkingDirectory) : QTreeWidgetItem(parent)
 {

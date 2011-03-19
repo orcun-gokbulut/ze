@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDGizmoUndoRedo.h"
-#include "..\ZEDGizmo\ZEDGizmo.h"
+#include "ZEDGizmo.h"
 
 void ZEDGizmoUndoRedoOperation::SetOldValues(ZEArray<ZEVariant> OldValues)
 {

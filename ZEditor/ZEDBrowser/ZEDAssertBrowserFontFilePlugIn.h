@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+/*#pragma once
 
 #ifndef __ZED_ASSERT_BROWSER_FONT_FILE_PLUG_IN_H__
 #define __ZED_ASSERT_BROWSER_FONT_FILE_PLUG_IN_H__
@@ -57,4 +57,4 @@ class ZEDFontFilePlugIn : public ZEDFilePlugIn
 								ZEDFontFilePlugIn();
 };
 
-#endif
+#endif*/

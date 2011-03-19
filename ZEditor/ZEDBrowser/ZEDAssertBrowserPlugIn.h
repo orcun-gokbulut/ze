@@ -41,7 +41,7 @@
 #include <QString>
 #include <QWidget>
 #include <QLayout>
-#include "../ZEDPlugIns/ZEDPlugIn.h"
+#include "../ZEDCore//ZEDPlugIn.h"
 #include <ZEGame/ZEEntity.h>
 
 #define ZEMAP QString("ZEMAP")

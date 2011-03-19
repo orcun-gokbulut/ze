@@ -35,7 +35,7 @@
 
 #pragma once
 #include <QtGui/QApplication>
-#include "ZEDGUI\ZEDMapEditor.h"
+#include "ZEDSceneEditor\ZEDSceneEditor.h"
 
 int main(int argc, char *argv[])
 {

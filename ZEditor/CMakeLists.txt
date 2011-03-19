@@ -37,9 +37,11 @@ cmake_minimum_required (VERSION 2.8)
 
 project (ZEditior)
 
+find_package(Qt4 REQUIRED)
+
 include_directories (
 	${PROJECT_SOURCE_DIR}
-	${PROJECT_SOURCE_DIR}/../ZE
+	${PROJECT_SOURCE_DIR}/../Source
 	${PROJECT_SOURCE_DIR}/../ZEFoundation
 	${PROJECT_SOURCE_DIR}/../ZEToolSDK
 	${PROJECT_SOURCE_DIR}/../Include 
@@ -51,22 +53,25 @@ include_directories (
 	${PROJECT_SOURCE_DIR}/../Include/PhysX/NxCharacter
 	${PROJECT_SOURCE_DIR}/../Include/PhysX/Physics
 	${PROJECT_SOURCE_DIR}/../Include/Curl
-	${PROJECT_SOURCE_DIR}/../ZEFoundation)
+	${PROJECT_SOURCE_DIR}/../ZEFoundation
+	${QT_INCLUDE_DIR})
 	
 link_directories(
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/Debug" 
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/$(Configuration)" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX")
-find_package(Qt4 REQUIRED)
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX"
+	${QT_LIBRARIES})
+
+add_definitions(${QT_DEFINITIONS})
 
 add_subdirectory (ZEDBrowser)
-#add_subdirectory (ZEDCommonControls)
-#add_subdirectory (ZEDCommonEntities)
-#add_subdirectory (ZEDCore)
-#add_subdirectory (ZEDSceneEditor)
-#add_subdirectory (ZEDScriptEditor)
-#add_subdirectory (ZEDUndoRedo)
+add_subdirectory (ZEDCommonControls)
+add_subdirectory (ZEDCommonEntities)
+add_subdirectory (ZEDCore)
+add_subdirectory (ZEDSceneEditor)
+add_subdirectory (ZEDScriptEditor)
+add_subdirectory (ZEDUndoRedo)
 
 add_source (ZEDMain.cpp		Sources)
 

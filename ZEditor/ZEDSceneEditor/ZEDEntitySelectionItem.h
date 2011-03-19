@@ -37,11 +37,11 @@
 #ifndef __ZED_LIGHT_BRUSH_SELECTION_ITEM_H__
 #define __ZED_LIGHT_BRUSH_SELECTION_ITEM_H__
 
-#include "..\ZEDSelectionItem.h"
+#include "ZEDSelectionItem.h"
 #include "ZEGame\ZEScene.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEGame\ZECanvasBrush.h"
-#include "..\..\ZEDGizmo\ZEDGizmo.h"
+#include "ZEDCommonEntities\ZEDGizmo.h"
 
 class ZEDEntitySelectionItem : public ZEDSelectionItem
 {
