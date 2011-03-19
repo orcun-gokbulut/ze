@@ -54,6 +54,8 @@ include_directories (
 	${PROJECT_SOURCE_DIR}/../Include/PhysX/Physics
 	${PROJECT_SOURCE_DIR}/../Include/Curl
 	${PROJECT_SOURCE_DIR}/../ZEFoundation
+	${PROJECT_BINARY_DIR}/ZEDSceneEditor
+	${PROJECT_BINARY_DIR}/ZEDBrowser
 	${QT_INCLUDE_DIR})
 	
 link_directories(

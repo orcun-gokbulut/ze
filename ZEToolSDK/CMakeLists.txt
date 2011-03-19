@@ -61,6 +61,7 @@ add_source (ZETOutput.cpp				Sources)
 add_source (ZETTypes.h					Sources ZEToolSDK)
 
 add_library (ZEToolSDK ${Sources})
+target_link_libraries (ZEToolSDK ZETMapFile ZETModelFile ZETMaterialFile ZETFontFile)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEToolSDK PROPERTY FOLDER "ZEToolSDK")

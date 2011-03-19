@@ -46,6 +46,7 @@ add_source (ZETypes.h 				Sources ZESDK)
 add_source (ZETypes.cpp 			Sources)
 
 add_library(ZEFoundation ${Sources})
+target_link_libraries (ZEFoundation ZEMath ZEDS ZESerialization)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEFoundation PROPERTY FOLDER "ZEFoundation")

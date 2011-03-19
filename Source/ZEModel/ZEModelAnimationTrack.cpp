@@ -175,8 +175,6 @@ void ZEModelAnimationTrack::Play()
 	if (State == ZE_MAS_PLAYING)
 		return;
 
-	this->Animation = Animation;
-
 	if (Animation == NULL)
 	{
 		State = ZE_MAS_STOPPED;
@@ -196,8 +194,6 @@ void ZEModelAnimationTrack::Play()
 
 void ZEModelAnimationTrack::Play(unsigned int StartFrame, unsigned int EndFrame)
 {
-	this->Animation = Animation;
-
 	if (Animation == NULL)
 	{
 		State = ZE_MAS_STOPPED;
@@ -225,7 +221,22 @@ void ZEModelAnimationTrack::Play(unsigned int StartFrame, unsigned int EndFrame)
 
 void ZEModelAnimationTrack::Resume()
 {
+	if (Animation == NULL)
+	{
+		State = ZE_MAS_STOPPED;
+		return;
+	}
+
+	if (CurrentFrame >= Animation->Frames.GetCount())
+		CurrentFrame = Animation->Frames.GetCount() - 1;
+
+	if (this->EndFrame > Animation->Frames.GetCount())
+		this->EndFrame = Animation->Frames.GetCount() - 1;
+	else
+		this->EndFrame = (EndFrame == 0 ? Animation->Frames.GetCount() - 1 : EndFrame);
+
 	State = ZE_MAS_PLAYING;
+
 }
 
 void ZEModelAnimationTrack::Pause()
