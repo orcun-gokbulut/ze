@@ -38,7 +38,8 @@
 #include "ZELineSegment.h"
 #include "ZEVector.h"
 #include "ZEPlane.h"
-#include <d3dx9.h>
+
+#include <math.h>
 
 void ZERay::Create(ZERay & Ray, const ZEVector3 & Start,const ZEVector3 & End)
 {
@@ -224,8 +225,3 @@ ZERay::ZERay(const ZEVector3 & v,const ZEVector3 &p)
 ZERay::ZERay() 
 {
 }
-
-
-
-
-

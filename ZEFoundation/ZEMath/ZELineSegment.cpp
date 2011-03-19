@@ -38,7 +38,8 @@
 #include "ZERay.h"
 #include "ZEVector.h"
 #include "ZEPlane.h"
-#include <d3dx9.h>
+
+#include <math.h>
 
 inline void ZELineSegment::Create(ZELine& Line, const ZEVector3& Start, const ZEVector3& End)
 {

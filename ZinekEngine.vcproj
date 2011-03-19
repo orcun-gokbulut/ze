@@ -2220,14 +2220,6 @@
 					>
 				</File>
 				<File
-					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalCharacterController.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalCharacterController.h"
-					>
-				</File>
-				<File
 					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalJoint.cpp"
 					>
 				</File>
@@ -2249,14 +2241,6 @@
 				</File>
 				<File
 					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalRigidBody.h"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalTrigger.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Source\ZEPhysics\ZEPhysX\ZEPhysXPhysicalTrigger.h"
 					>
 				</File>
 				<File
@@ -2426,22 +2410,6 @@
 			</File>
 			<File
 				RelativePath=".\Source\ZEGame\ZESkyBrush.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEGame\ZESoundBrush2D.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEGame\ZESoundBrush2D.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEGame\ZESoundBrush3D.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\Source\ZEGame\ZESoundBrush3D.h"
 				>
 			</File>
 			<File

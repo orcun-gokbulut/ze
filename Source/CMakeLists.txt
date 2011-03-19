@@ -42,7 +42,18 @@ add_definitions (-DZE_DEBUG_BREAK_ON_ERROR)
 #add_definitions (-DZE_DEBUG_BREAK_ON_WARNING)
 #add_definitions (-DZE_DEBUG_ENABLE_MEMORY_CHECKS)
 
-include_directories (${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/../Include ${PROJECT_SOURCE_DIR}/../ZEFoundation)
+include_directories (
+	${PROJECT_SOURCE_DIR} 
+	${PROJECT_SOURCE_DIR}/../Include 
+	${PROJECT_SOURCE_DIR}/../Include/DirectX
+	${PROJECT_SOURCE_DIR}/../Include/OpenAL
+	${PROJECT_SOURCE_DIR}/../Include/DirectX
+	${PROJECT_SOURCE_DIR}/../Include/PhysX/Cooking
+	${PROJECT_SOURCE_DIR}/../Include/PhysX/Foundation
+	${PROJECT_SOURCE_DIR}/../Include/PhysX/NxCharacter
+	${PROJECT_SOURCE_DIR}/../Include/PhysX/Physics
+	${PROJECT_SOURCE_DIR}/../Include/Curl
+	${PROJECT_SOURCE_DIR}/../ZEFoundation)
 link_directories(
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/Debug" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 

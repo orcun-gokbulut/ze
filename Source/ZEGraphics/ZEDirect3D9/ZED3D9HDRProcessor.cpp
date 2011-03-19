@@ -461,7 +461,7 @@ void ZED3D9HDRProcessor::SetKey(float Key)
 {
 	Parameters.Key = Key;
 }
-float ZED3D9HDRProcessor::GetKey()
+float ZED3D9HDRProcessor::GetKey() const
 {
 	return Parameters.Key;
 }
@@ -471,7 +471,7 @@ void ZED3D9HDRProcessor::SetBrightPassTreshold(float Treshold)
 	Parameters.BrightPassTreshold = Treshold;
 }
 
-float ZED3D9HDRProcessor::GetBrightPassTreshold()
+float ZED3D9HDRProcessor::GetBrightPassTreshold() const
 {
 	return Parameters.BrightPassTreshold;
 }
@@ -481,7 +481,7 @@ void ZED3D9HDRProcessor::SetMaxLuminanceChangePerSecond(float LuminanceChange)
 {
 	Parameters.MaxLuminanceChange = LuminanceChange;
 }
-float ZED3D9HDRProcessor::GetMaxLuminanceChangePerSecond()
+float ZED3D9HDRProcessor::GetMaxLuminanceChangePerSecond() const
 {
 	return Parameters.MaxLuminanceChange;
 }
@@ -491,7 +491,7 @@ void ZED3D9HDRProcessor::SetBloomFactor(float Factor)
 	Parameters.BloomFactor = Factor;
 }
 
-float ZED3D9HDRProcessor::GetBloomFactor()
+float ZED3D9HDRProcessor::GetBloomFactor() const
 {
 	return Parameters.BloomFactor;
 }
@@ -501,7 +501,7 @@ void ZED3D9HDRProcessor::SetBloomStandardDeviation(float Deviation)
 	Parameters.BloomStandardDeviation = Deviation;
 }
 
-float ZED3D9HDRProcessor::GetBloomStandardDeviation()
+float ZED3D9HDRProcessor::GetBloomStandardDeviation() const
 {
 	return Parameters.BloomStandardDeviation;
 }
@@ -514,7 +514,7 @@ void ZED3D9HDRProcessor::SetBloomSampleCount(unsigned int Count)
 	IntParameters.BloomSampleCount = Count;
 }
 
-unsigned int ZED3D9HDRProcessor::GetBloomSampleCount()
+unsigned int ZED3D9HDRProcessor::GetBloomSampleCount() const
 {
 	return IntParameters.BloomSampleCount;
 }
@@ -527,7 +527,7 @@ void ZED3D9HDRProcessor::SetBloomPassCount(unsigned int Count)
 	IntParameters.BloomPassCount = Count;
 }
 
-unsigned int ZED3D9HDRProcessor::GetBloomPassCount()
+unsigned int ZED3D9HDRProcessor::GetBloomPassCount() const
 {
 	return IntParameters.BloomPassCount;
 }
@@ -595,8 +595,8 @@ ZED3D9HDRProcessor::ZED3D9HDRProcessor()
 	memset(&Textures, 0, sizeof(Textures));
 	memset(&Shaders, 0, sizeof(Shaders));
 
-	Parameters.Key = 0.68f;
-	Parameters.BrightPassTreshold = 0.8f;
+	Parameters.Key = 0.8f;
+	Parameters.BrightPassTreshold = 0.7f;
 	Parameters.BloomFactor = 1.0f;
 	Parameters.BloomStandardDeviation = 2.0f;
 	Parameters.MaxLuminanceChangePerSecond = 0.0001f;
@@ -608,3 +608,5 @@ ZED3D9HDRProcessor::~ZED3D9HDRProcessor()
 {
 	Deinitialize();
 }
+
+#include "ZED3D9HDRProcessor.h.zpp"

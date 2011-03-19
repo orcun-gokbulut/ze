@@ -39,7 +39,6 @@
 #include "ZELineSegment.h"
 #include "ZEVector.h"
 #include "ZEPlane.h"
-#include <d3dx9.h>
 
 inline void ZELine::Create(ZELine& Line, const ZEVector3& P0, const ZEVector3& P1)
 {
@@ -149,7 +148,3 @@ ZELine::ZELine(const ZEVector3& P0, const ZEVector3& P1)
 {
 	Create(*this, P0, P1);
 }
-
-
-
-

@@ -439,7 +439,6 @@ inline void ZEMatrix4x4::Create(ZEMatrix4x4& Matrix, float M[16])
 	memcpy(Matrix.M, M, sizeof(ZEMatrix4x4));
 }
 
-#include <d3dx9.h>
 void ZEMatrix4x4::CreateRotation(ZEMatrix4x4& Matrix, const ZEQuaternion& Rotation)
 {
 	Matrix.M11 = 1.0f	-	2.0f * Rotation.y * Rotation.y	-	2.0f * Rotation.z * Rotation.z;
@@ -855,8 +854,6 @@ void ZEMatrix4x4::Determinant(float &det,const ZEMatrix4x4 &Matrix)
 	
 	
 }
-
-#include <d3dx9.h>
 
 bool ZEMatrix4x4::Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix)
 {

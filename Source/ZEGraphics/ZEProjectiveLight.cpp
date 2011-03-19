@@ -177,6 +177,8 @@ bool ZEProjectiveLight::Initialize()
 			zeError("PointLight", "Can not load projection texture.");
 	}
 
+	ZEEntity::Initialize();
+
 	return true;
 }
 

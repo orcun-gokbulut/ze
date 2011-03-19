@@ -71,7 +71,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9Texture2D*					SSAOBuffer;
 		ZED3D9Texture2D*					ABuffer;
 
-		ZED3D9HDRProcessor					HDRProcessor;
+		
 		ZED3D9SSAOProcessor					SSAOProcessor;
 
 		ZESmartArray<ZERenderOrder>			RenderList;
@@ -120,6 +120,9 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		virtual								~ZED3D9FrameRenderer();					
 
 	public:
+
+		ZED3D9HDRProcessor					HDRProcessor;
+
 		virtual void						SetViewPort(ZEViewPort* ViewPort);
 		virtual ZEViewPort*					GetViewPort();
 
