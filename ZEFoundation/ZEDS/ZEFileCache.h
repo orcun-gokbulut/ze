@@ -39,43 +39,32 @@
 
 #include "ZEArray.h"
 #include "ZETypes.h"
-//#include "ZECore/ZEResourceFile.h"
+#include <stdio.h>
+class ZEResourceFile;
 
-class ZECachePartialResourceFile;
-
-struct ZEFileCacheItem
+class ZECacheChunkIdentifier
 {
-	ZEDWORD Hash;
-	ZEDWORD FilePosition;
-	ZEDWORD Size;
-};
-
-struct ZEFileCacheScan
-{
-	ZEDWORD Hash;
-	ZEDWORD Cursor;
+	public:
+		virtual ZEDWORD GetHash() const = 0;
+		virtual size_t Write(void* File) const = 0;
+		virtual bool Equal(void* File) const = 0;
 };
 
 class ZEFileCache
 {
 	private:
-		void*							File;
-
-		bool							OnlineMode;
-		ZESmartArray<ZEFileCacheItem>	Items;
-
-		void							ReadItemList();
-		void							DumpItemList();
-
+		FILE*							File;
+		
 	public:
-		bool							OpenCache(const char* FileName, bool OnlineMode = true);
+		bool							OpenCache(const char* FileName);
 		void							CloseCache();
 
-		void							Add(ZEDWORD Hash, void* Data, size_t Size);
-		ZEFileCacheScan					StartScan(ZEDWORD Hash);
-		bool							GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan);
+		void							AddChunk(const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size);
 
-		void							Clear();
+		bool							GetChunkData(const ZECacheChunkIdentifier* Identifier, void* Buffer, size_t Offset, size_t Size);
+		ZEResourceFile&					GetChunkAsFile(const ZECacheChunkIdentifier* Identifier);
+
+		void							ClearCache();
 
 										ZEFileCache();
 										~ZEFileCache();

@@ -47,7 +47,7 @@ class ZED3D9ShaderManager
 	friend ZED3D9Module;
 	private:
 		ZESmartArray<ZED3D9Shader*>		Shaders;
-		ZEFileCache						ShaderFileCache;
+		//ZEFileCache						ShaderFileCache;
 
 		ZEDWORD							CalculateHash(const char* FileName, const char* FunctionName, ZEDWORD Components);
 		void							ReleaseShader(ZED3D9Shader* Shader);

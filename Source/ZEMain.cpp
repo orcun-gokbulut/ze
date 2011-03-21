@@ -53,8 +53,78 @@
 
 extern HINSTANCE ApplicationInstance;
 
+#include "ZEDS/ZEFileCache.h"
+#include <stdio.h>
+
+class ZEStringCacheIdentifier : public ZECacheChunkIdentifier
+{
+	public:
+		const char* String;
+		ZEDWORD GetHash() const
+		{
+			int Hash = 0;
+			int I = 0;
+			while (String[I] != NULL)
+			{
+				Hash += String[I];
+				I++;
+			}
+
+			return Hash;
+		}
+
+		size_t Write(void* File) const
+		{
+			ZEDWORD Count = strlen(String) + 1;
+			fwrite(&Count, sizeof(ZEDWORD), 1, (FILE*)File);
+			fwrite(String, sizeof(const char), strlen(String) + 1, (FILE*)File);
+			return Count;
+		}
+
+		bool Equal(void* File) const
+		{
+			const size_t BufferSize = 1024;
+			char Buffer[BufferSize];
+			
+			ZEDWORD TotalBytes;
+			fwrite(&TotalBytes, sizeof(ZEDWORD), 1, (FILE*)File);
+			
+			size_t ReadBytes = 0;
+			while (ReadBytes < TotalBytes)
+			{
+				size_t BytesToRead = (TotalBytes - ReadBytes < BufferSize ? TotalBytes - ReadBytes : BufferSize);
+				fread(Buffer, sizeof(const char), BytesToRead, (FILE*)File);
+				for (size_t I = 0; I < BytesToRead; I++)
+					if (Buffer[I] != String[ReadBytes + I])
+						return false;
+
+				ReadBytes += BytesToRead;
+			}
+			
+			return true;
+		}
+
+		ZEStringCacheIdentifier(const char* String)
+		{
+			this->String = String;
+		}
+};
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
+	char CacheItem1[] = "This is a cache item 1. So Blabalbalsfedw fewwerewrew End Of File";
+	char CacheItem2[] = "ard bla bldfaskfjşl sad şlaksfj aşskldf sşalkjf şaslkdjf şsldakj dra";
+	
+	ZEFileCache Cache;
+
+	Cache.OpenCache("c:\\test.zeCache");
+	Cache.AddChunk(&ZEStringCacheIdentifier("Orcun"), CacheItem1, sizeof(CacheItem1));
+//	Cache.AddChunk(&ZEStringCacheIdentifier("Cengiz"), CacheItem1, sizeof(CacheItem2));
+
+	char Buffer[1024];
+	Cache.GetChunkData(&ZEStringCacheIdentifier("Orcun"), NULL, 0, 0);
+	Cache.CloseCache();
+	/*
 	//MessageBox(NULL, "Attach it while you can !", "Zinek Engine", MB_OK); 
 	_set_SSE2_enable(1); 
 	ApplicationInstance = hInstance;
@@ -86,7 +156,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	zeCore->GetWindow()->SetWindowSize(zeCore->GetOptions()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger(), zeCore->GetOptions()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger());
 
  	if (zeCore->StartUp())
-		zeCore->Run(); 
+		zeCore->Run(); */
 }
 
 

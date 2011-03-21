@@ -34,44 +34,24 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEFileCache.h"
+#include "ZETypes.h"
 #include <stdio.h>
-//#include "ZECore/ZEError.h"
 
-/*void ZECachePartialResourceFile::Initialize(void* File, size_t StartPosition, size_t EndPosition)
-{
-	this->File = File;
-	this->StartPosition = StartPosition;
-	this->EndPosition = EndPosition;
-}*/
 
-void ZEFileCache::ReadItemList()
+struct ZEChunkHeader
 {
-	fseek((FILE*)File, 0, SEEK_END);
-	ZEDWORD ItemCount;
-	fread(&ItemCount, sizeof(ZEDWORD), 1, (FILE*)File);
-	fseek((FILE*)File, -sizeof(ZEFileCacheItem) * ItemCount, SEEK_CUR);
-	Items.Resize(ItemCount);
-	fread(Items.GetCArray(), sizeof(ZEFileCacheItem), ItemCount, (FILE*)File);
-}
+	ZEDWORD				Header;
+	ZEDWORD				ChunkHash;
+	ZEDWORD				ChunkPosition;
+	ZEDWORD				ChunkSize;
+	ZEDWORD				IdentifierSize;
+};
 
-void ZEFileCache::DumpItemList()
+bool ZEFileCache::OpenCache(const char* FileName)
 {
-	fseek((FILE*)File, 0, SEEK_END);
-	fwrite(Items.GetConstCArray(), sizeof(ZEFileCacheItem), Items.GetCount(), (FILE*)File);
-	ZEDWORD ItemCount = Items.GetCount();
-	fwrite(&ItemCount, sizeof(ZEDWORD), 1, (FILE*)File);
-}
-
-bool ZEFileCache::OpenCache(const char* FileName, bool OnlineMode)
-{
-	File = fopen(FileName, "rwb");
+	File = fopen(FileName, "a+");
 	if (File == NULL)
-	{
-		//zeError("File Cache", "Can not open file cache. (File Name : \"%s\")", FileName);
 		return false;
-	}
-	this->OnlineMode = OnlineMode;
-	ReadItemList();
 
 	return true;
 }
@@ -80,48 +60,113 @@ void ZEFileCache::CloseCache()
 {
 	if (File != NULL)
 	{
-		fclose((FILE*)File);
+		fclose(File);
 		File = NULL;
 	}
 }
 
-void ZEFileCache::Add(ZEDWORD Hash, void* Data, size_t Size)
+void CopyData(FILE* File, size_t From, size_t Size, size_t To)
 {
-	fseek((FILE*)File, sizeof(ZEFileCacheItem) * Items.GetCount() + sizeof(ZEDWORD), SEEK_END);
-	ZEDWORD Position = ftell((FILE*)File);
+	const size_t BufferSize = 65536;
+	char Buffer[BufferSize];
 
-	fwrite(Data, Size, 1, (FILE*)File);
+	int Count = Size / BufferSize;
+	int LeftOver = Size % BufferSize;
+	for (size_t I = 0; I < Count; I++)
+	{
+		fseek(File, From + I * BufferSize, SEEK_SET);
+		fread(Buffer, BufferSize, 1, File);
+		fseek(File, To + I * BufferSize, SEEK_SET);
+		fwrite(Buffer, BufferSize, 1, File);
+	}
 
-	ZEFileCacheItem* Item = Items.Add();
-	Item->FilePosition = Position;
-	Item->Hash = Hash;
-	Item->Size = Size;
-
-	DumpItemList();
-	fflush((FILE*)File);
+	if (LeftOver != 0)
+	{
+		fseek(File, From + Count * BufferSize, SEEK_SET);
+		fread(Buffer, LeftOver, 1, File);
+		fseek(File, To + Count * BufferSize, SEEK_SET);
+		fwrite(Buffer, LeftOver, 1, File);
+	}
 }
 
-ZEFileCacheScan ZEFileCache::StartScan(ZEDWORD Hash)
+void ZEFileCache::AddChunk(const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size)
 {
-	ZEFileCacheScan Scan;
-	Scan.Cursor = 0;
-	Scan.Hash = Hash;
-	return Scan;
+	// Find Chunk Count
+	ZEDWORD EndOfFile = 0;
+	fseek(File, -sizeof(ZEDWORD), SEEK_END);
+	EndOfFile = ftell(File);
+
+	ZEDWORD DataCursor = 0;
+	fread(&DataCursor, sizeof(ZEDWORD), 1, File);
+
+	// Copy headers to further location
+	ZEDWORD HeadersCursor = DataCursor + Size;
+	if (EndOfFile != 0)
+		CopyData(File, HeadersCursor, EndOfFile - DataCursor - sizeof(ZEDWORD), DataCursor);
+
+	// Copy Chunk Data
+	fseek(File, DataCursor, SEEK_SET);
+	fwrite(Data, Size, 1, File);
+
+	// Add new header
+	//   Write Identifier
+	fseek(File, 0, SEEK_END);
+	fseek(File, sizeof(ZEChunkHeader), SEEK_CUR);
+	size_t IdentifierSize = Identifier->Write(File);
+
+	//   Write Header
+	ZEChunkHeader NewHeader;
+	NewHeader.Header = 'ZECH';
+	NewHeader.ChunkPosition = DataCursor;
+	NewHeader.ChunkHash = Identifier->GetHash();
+	NewHeader.ChunkSize = Size;
+	NewHeader.IdentifierSize = IdentifierSize;
+
+	fseek(File, -IdentifierSize - sizeof(ZEChunkHeader), SEEK_END);
+	fwrite(&NewHeader, sizeof(ZEChunkHeader), 1, File);
+
+	// Set headers start position
+	fseek(File, 0, SEEK_END);
+	fwrite(&HeadersCursor, sizeof(ZEDWORD), 1, File);
+
+	// Flush stream
+	fflush(File);
 }
 
-bool ZEFileCache::GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCacheScan& Scan)
+bool ZEFileCache::GetChunkData(const ZECacheChunkIdentifier* Identifier, void* Buffer, size_t Offset, size_t Size)
 {
-	for (size_t I = Scan.Cursor; I < Items.GetCount(); I++)
-		if (Items[I].Hash == Scan.Hash)
+	fseek(File, -sizeof(ZEDWORD), SEEK_END);
+	ZEDWORD EndOfFile = ftell(File);
+
+	ZEDWORD FirstHeaderCursor = 0;
+	fread(&FirstHeaderCursor, sizeof(ZEDWORD), 1, File);
+	fseek(File, FirstHeaderCursor, SEEK_SET);
+	
+	ZEDWORD Hash = Identifier->GetHash();
+
+	while (true)
+	{
+		ZEChunkHeader CurrentHeader;
+		if (fread(&CurrentHeader, sizeof(ZEChunkHeader), 1, File) != sizeof(ZEChunkHeader))
+			return false;
+
+		if (CurrentHeader.Header != 'ZECH')
+			return false;
+
+		ZEDWORD CurrentCursor = ftell(File);
+		if (CurrentHeader.ChunkHash == Hash)
 		{
-//			ResourceFile.Initialize((FILE*)File, Items[I].FilePosition, Items[I].Size);
-			return true;
+			if (Identifier->Equal(File))
+			{
+				return false;
+			}
 		}
 
-		return false;
+		fseek(File, CurrentCursor + CurrentHeader.IdentifierSize, SEEK_SET);
+	}
 }
 
-void ZEFileCache::Clear()
+void ZEFileCache::ClearCache()
 {
 	CloseCache();
 }
