@@ -104,7 +104,7 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* Event)
 		else
 		{
 			ZEEntity* PickedEntity = NULL;
-			PickedEntity = RayCaster.PickEntity(Event->pos().x(), Event->pos().y());
+//			PickedEntity = RayCaster.PickEntity(Event->pos().x(), Event->pos().y());
 
 			for (int I = 0; I < SelectedItems->GetCount(); I++)
 				delete SelectedItems->GetItem(I);

@@ -51,25 +51,24 @@
 #include "ZEGame\ZEScene.h"
 #include "ZECore\ZEModuleManager.h"
 #include "ZECore\ZEWindow.h"
-#include "../ZEDScreenAxis/ZEDScreenAxisHelper.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
-#include "..\ZEDSelectionPlugins\ZEDEntitySelectionItemPlugIn.h"
+#include "ZEDCommonEntities/ZEDScreenAxis.h"
 
-#include "..\ZEDSelectionPlugins\ZEDSkyBrushSelectionItemPlugIn.h"
+#include "ZEDEntitySelectionItemPlugIn.h"
 
-#include "..\ZEDSelectionPlugins\ZEDPlayerSelectionItemPlugIn.h"
-#include "..\ZEDSelectionPlugins\ZEDTriggerSelectionItemPlugIn.h"
-#include "..\ZEDAssertBrowserPlugIns\ZEDAssertBrowserFontFilePlugIn.h"
-#include "..\ZEDAssertBrowserPlugIns\ZEDModelFilePlugIn.h"
-#include "..\ZEDAssertBrowserPlugIns\ZEDMapFilePlugIn.h"
-#include "..\ZEDAssertBrowserPlugIns\ZEDSceneFilePlugIn.h"
-#include "..\ZEDAssertBrowserPlugIns\ZEDImageFilePlugIn.h"
+#include "ZEDBrowser/ZEDAssertBrowserFontFilePlugIn.h"
+#include "ZEDBrowser/ZEDModelFilePlugIn.h"
+#include "ZEDBrowser/ZEDMapFilePlugIn.h"
+#include "ZEDBrowser/ZEDSceneFilePlugIn.h"
+#include "ZEDBrowser/ZEDImageFilePlugIn.h"
 #include <ZEGame\ZEEntityProvider.h>
 #include <ZEGraphics\ZEDirectionalLight.h>
 #include <ZECore\ZEOptionManager.h>
 #include <ZEModel\ZEModel.h>
 #include <ZEGame\ZESkyBrush.h>
-#include "CSS.h"
+#include "ZEDCommonControls\CSS.h"
 
 
 
@@ -352,7 +351,7 @@ void MapEditor::StartEngine()
 	zeCore->GetWindow()->SetWindowType(ZE_WT_COMPONENT);
 	zeCore->GetWindow()->SetComponentWindowHandle(ui.ViewPort->winId());
 	zeInitialize(GetModuleHandle(NULL), ui.ViewPort->winId());
-	zeCore->GetGame()->GetScene()->SetVisualDebugElements(ZE_VDE_NONE);
+	//zeCore->GetGame()->GetScene()->SetVisualDebugElements(ZE_VDE_NONE);
 }
 
 MapEditor::~MapEditor()
@@ -383,7 +382,7 @@ void MapEditor::NewMapActionTriggered()
 	if(SelectedFilePath.count() != 0)
 	{
 		SelectedFilePath = SelectedFilePath.remove(this->WorkingDirectory);
-		zeCore->GetGame()->GetScene()->LoadMap((const char*)SelectedFilePath.toLatin1());
+		//zeCore->GetGame()->GetScene()->LoadMap((const char*)SelectedFilePath.toLatin1());
 	}
 }
 
@@ -395,7 +394,7 @@ void MapEditor::LoadMapActionTriggered()
 	if(SelectedFilePath.count() != 0)
 	{
 		SelectedFilePath = SelectedFilePath.remove(this->WorkingDirectory);
-		zeCore->GetGame()->GetScene()->LoadMap((const char*)SelectedFilePath.toLatin1());
+		//zeCore->GetGame()->GetScene()->LoadMap((const char*)SelectedFilePath.toLatin1());
 	}
 }
 
@@ -818,7 +817,7 @@ void MapEditor::InitializeAdditionalToolBarItems()
 
 void MapEditor::InitializePlugIns()
 {
-	FileTypePlugIns.Add(new ZEDFontFilePlugIn());
+	//FileTypePlugIns.Add(new ZEDFontFilePlugIn());
 	FileTypePlugIns.Add(new ZEDModelFilePlugIn());
 	FileTypePlugIns.Add(new ZEDMapFilePlugIn());
 	FileTypePlugIns.Add(new ZEDSceneFilePlugIn());
@@ -829,9 +828,6 @@ void MapEditor::InitializePlugIns()
 		AssertBrowser->RegisterPlugIn(FileTypePlugIns[I]);
 	}*/
 
-	SelectionItemPlugIns.Add(new ZEDSkyBrushSelectionItemPlugin());
-	SelectionItemPlugIns.Add(new ZEDPlayerSelectionItemPlugin());
-	SelectionItemPlugIns.Add(new ZEDTriggerSelectionItemPlugin());
 	SelectionItemPlugIns.Add(new ZEDEntitySelectionItemPlugin());
 
 	for (int I = 0; I < SelectionItemPlugIns.GetCount(); I++)
