@@ -38,6 +38,8 @@
 #include <QWidget>
 #include <QPixmap>
 #include <QPainter>
+
+#define FREEIMAGE_LIB
 #include <FreeImage.h>
 
 #include "ZEDImageFilePlugIn.h"

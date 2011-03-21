@@ -38,6 +38,7 @@
 #include "ZETypes.h"
 #include <memory.h>
 
+#define FREEIMAGE_LIB
 #include <FreeImage.h>
 
 bool ZEBitmap::Create(unsigned int Width, unsigned int Height, unsigned int PixelSize)

@@ -38,6 +38,8 @@
 #include "ZECore\ZEResourceManager.h"
 #include "ZEGraphicsModule.h"
 #include "ZETexture3D.h"
+
+#define FREEIMAGE_LIB
 #include <freeimage.h>
 
 const char* ZETexture3DResource::GetResourceType() const

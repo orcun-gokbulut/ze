@@ -39,7 +39,9 @@
 
 #include "ZEArray.h"
 #include "ZETypes.h"
-#include "ZECore/ZEResourceFile.h"
+//#include "ZECore/ZEResourceFile.h"
+
+class ZECachePartialResourceFile;
 
 struct ZEFileCacheItem
 {
@@ -52,13 +54,6 @@ struct ZEFileCacheScan
 {
 	ZEDWORD Hash;
 	ZEDWORD Cursor;
-};
-
-class ZECachePartialResourceFile : public ZEPartialResourceFile
-{
-	friend class ZEFileCache;
-	protected:
-		void							Initialize(void* File, size_t StartPosition, size_t EndPosition);
 };
 
 class ZEFileCache

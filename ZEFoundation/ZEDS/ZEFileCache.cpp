@@ -35,14 +35,14 @@
 
 #include "ZEFileCache.h"
 #include <stdio.h>
-#include "ZECore/ZEError.h"
+//#include "ZECore/ZEError.h"
 
-void ZECachePartialResourceFile::Initialize(void* File, size_t StartPosition, size_t EndPosition)
+/*void ZECachePartialResourceFile::Initialize(void* File, size_t StartPosition, size_t EndPosition)
 {
 	this->File = File;
 	this->StartPosition = StartPosition;
 	this->EndPosition = EndPosition;
-}
+}*/
 
 void ZEFileCache::ReadItemList()
 {
@@ -67,7 +67,7 @@ bool ZEFileCache::OpenCache(const char* FileName, bool OnlineMode)
 	File = fopen(FileName, "rwb");
 	if (File == NULL)
 	{
-		zeError("File Cache", "Can not open file cache. (File Name : \"%s\")", FileName);
+		//zeError("File Cache", "Can not open file cache. (File Name : \"%s\")", FileName);
 		return false;
 	}
 	this->OnlineMode = OnlineMode;
@@ -114,7 +114,7 @@ bool ZEFileCache::GetNextFile(ZECachePartialResourceFile& ResourceFile, ZEFileCa
 	for (size_t I = Scan.Cursor; I < Items.GetCount(); I++)
 		if (Items[I].Hash == Scan.Hash)
 		{
-			ResourceFile.Initialize((FILE*)File, Items[I].FilePosition, Items[I].Size);
+//			ResourceFile.Initialize((FILE*)File, Items[I].FilePosition, Items[I].Size);
 			return true;
 		}
 

@@ -62,5 +62,6 @@ qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_automoc (QtMocFiles  ${QtMocs})
 
 add_library (ZEDBrowser ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
+target_link_libraries (ZEDBrowser freeimage.lib)
 
 set_property(TARGET ZEDBrowser PROPERTY FOLDER "ZEditor")

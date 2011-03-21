@@ -40,6 +40,7 @@
 #include "ZECore\ZEResourceFile.h"
 #include "ZETexture2D.h"
 
+#define FREEIMAGE_LIB
 #include <freeimage.h>
 
 static unsigned DLL_CALLCONV FreeImageFile_Read_2D(void *buffer, unsigned size, unsigned count, fi_handle handle) 

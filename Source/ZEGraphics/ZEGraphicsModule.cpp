@@ -37,6 +37,8 @@
 #include "ZEGraphicsModule.h"
 #include "ZECore\ZEOptionManager.h"
 #include "ZECore\ZECore.h"
+
+#define FREEIMAGE_LIB
 #include <freeimage.h>
 
 ZEOptionSection ZEGraphicsModule::GraphicsOptions;
