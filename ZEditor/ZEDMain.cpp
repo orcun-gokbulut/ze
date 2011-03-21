@@ -34,11 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+
+#define WINDOWS_LEAN_AND_MEAN
+#include <windows.h>
+
 #include <QtGui/QApplication>
 #include "ZEDSceneEditor\ZEDSceneEditor.h"
 
-int main(int argc, char *argv[])
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	int argc = 0;
+	char** argv = NULL;
+
 	QApplication a(argc, argv);
 	MapEditor w;
 	w.show();
