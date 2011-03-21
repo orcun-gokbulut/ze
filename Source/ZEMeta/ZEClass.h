@@ -123,6 +123,9 @@ struct ZEMethodDescription;
 class ZEClassProvider;
 class ZEClass;
 class ZEAnimationController;
+class ZESerializer;
+class ZEUnserializer;
+
 class ZEClassDescription
 {
 	public:

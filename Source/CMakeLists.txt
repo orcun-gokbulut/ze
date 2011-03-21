@@ -39,6 +39,8 @@ project (ZinekEngine)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS "ORCUN")
+
 #add_definitions (-DZE_DEBUG_ENABLED)
 #add_definitions (-DZE_DEBUG_BREAK_ON_ERROR)
 #add_definitions (-DZE_DEBUG_BREAK_ON_WARNING)
@@ -57,7 +59,7 @@ include_directories (
 	${PROJECT_SOURCE_DIR}/../Include/Curl
 	${PROJECT_SOURCE_DIR}/../ZEFoundation)
 link_directories(
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/$(ConfigurationName)" 
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/Release" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX")
@@ -93,12 +95,12 @@ add_source (ZECore/ZEWindowResources.rc	Sources)
 
 add_executable (ZE WIN32 ${Sources})
 set_property(TARGET ZE PROPERTY FOLDER "Zinek Engine")
-target_link_libraries (ZE ZECore ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
+target_link_libraries (ZE ZECore ZEDS ZESerialization ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
 target_link_libraries (ZE ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
 
 add_library(ZESDK ${Sources})
 set_property(TARGET ZESDK PROPERTY FOLDER "Zinek Engine")
-target_link_libraries (ZESDK ZECore ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
+target_link_libraries (ZESDK ZECore ZEDS ZESerialization ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
 target_link_libraries (ZESDK ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
 
 get_property(TargetPath TARGET ZE PROPERTY LOCATION)

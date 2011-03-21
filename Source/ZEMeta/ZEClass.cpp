@@ -38,6 +38,8 @@
 #include "ZECore\ZEError.h"
 #include "ZEAnimation.h"
 #include "ZECore\ZEConsole.h"
+#include "ZESerialization\ZESerializer.h"
+#include "ZESerialization\ZEUnserializer.h"
 
 #define ZE_CLSF_CLASS_CHUNKID ((ZEDWORD)'CLAS')
 

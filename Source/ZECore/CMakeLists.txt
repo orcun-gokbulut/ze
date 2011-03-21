@@ -76,5 +76,7 @@ add_library (ZECore ${Sources})
 
 set_property (TARGET ZECore PROPERTY FOLDER "Zinek Engine")
 
+get_property (Def DIRECTORY PROPERTY COMPILE_DEFINITIONS)
+message (${Def})
 install (TARGETS ZECore COMPONENT "Libraries" CONFIGURATIONS Release ARCHIVE DESTINATION Lib)
 install (FILES ${ZESDK} COMPONENT "Includes" DESTINATION Include/ZECore)

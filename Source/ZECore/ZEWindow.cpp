@@ -110,7 +110,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 			Style = WS_SIZEBOX | WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION | WS_MINIMIZE;
 			break;
 		case ZE_WT_FULLSCREEN:
-			Style = WS_POPUP;
+			Style = WS_EX_TOPMOST | WS_POPUP;
 			break;
 		case ZE_WT_COMPONENT:
 			zeError("Window", "Wrong Window Type you can not create window with component type. Component windows are provided from the out size of Zinek Engine. Use SetComponentWindow function.");
@@ -347,42 +347,38 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 		case WM_CREATE:
-			break;
+			return 0;
 
 		case WM_SIZE:
 			if (!WindowInitialization)
 				Window->WindowResized(LOWORD(lParam), HIWORD(lParam));
-			break;
+			return 0;
 
 		case WM_PAINT:
 			ValidateRect(hWnd, NULL);
-			break;
+			return 0;
 
 		case WM_ACTIVATE:
 			if (wParam == WA_INACTIVE)
 				Window->WindowLostFocus();
 			else
 				Window->WindowGainedFocus();
-			return DefWindowProc(hWnd, msg, wParam, lParam);
-			break;
+			return 0;
 
 		case WM_CLOSE:
 			if (MessageBox(hWnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
 				Window->WindowDestroyed();
-			break;
+			return 0;
 
 		case WM_DESTROY:
 			Window->WindowDestroyed();
-			break;
+			return 0;
 
 		case WM_INPUT:
-		{
 			OnWMRawInputRecived((HRAWINPUT)lParam);
 			return 0;
-		}
 
 		default:
 			return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
-	return 0;
 }

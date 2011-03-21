@@ -215,14 +215,14 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&WorldViewMatrix, 4);
 
-	if (GetAlphaCullEnabled())
+	/*if (GetAlphaCullEnabled())
 	{
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 		GetDevice()->SetRenderState(D3DRS_ALPHAREF, (int)(256.0f * AlphaCullLimit));
 		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 		//GetDevice()->SetRenderState(D3DRS_ADAPTIVETESS_Y, (D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C'));
 	}
-	else
+	else*/
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 

@@ -123,7 +123,6 @@ void ZEComponent::SetScale(const ZEVector3& NewScale)
 	ZEEntity::SetScale(NewScale);
 }
 
-
 const ZEVector3 ZEComponent::GetWorldPosition() const
 {
 	if (Owner != NULL)

@@ -307,7 +307,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	ZEFixedMaterial_ForwardPass_PSOutput Output;
 	Output.Color = float4(0.0f, 0.0f, 0.0f, 1.0f);
 	
-	#ifdef ZE_SHADER_OPACITY
+	/*#ifdef ZE_SHADER_OPACITY
 		#ifdef ZE_SHADER_OPACITY_MAP
 				Output.Color.a = MaterialOpacity * tex2D(OpacityMap, Input.Texcoord).r;
 		#elif defined(ZE_SHADER_OPACITY_BASE_ALPHA)
@@ -317,7 +317,7 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		#endif
 	#endif
 	
-/*	#ifdef ZE_SHADER_ALPHA_CULL
+	#ifdef ZE_SHADER_ALPHA_CULL
 		if (Output.Color.a <= MaterialAlphaCullLimit)
 		{
 			discard;

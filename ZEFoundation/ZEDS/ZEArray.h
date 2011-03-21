@@ -402,9 +402,9 @@ class ZEArray
 			Count = 0;
 		}
 
-		inline void Sort(int (*CompareFunction)(Type*, Type*))
+		inline void Sort(int (*CompareFunction)(const void*, const void*))
 		{
-			qsort(Buffer, Count, sizeof(Type), CompareFunction);
+			qsort(Items, Count, sizeof(Type), CompareFunction);
 		}
 
 		inline void BinarySearch(const Type& Element, int (*CompareFunction)(Type*, Type*))
