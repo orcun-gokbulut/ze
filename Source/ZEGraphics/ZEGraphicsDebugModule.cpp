@@ -71,8 +71,9 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->SetActiveCamera(Player->GetCamera());
 	Scene->AddEntity(Player);
 
+	//Scene->Load("deneme.ZESCENE");
 
-	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
+	/*const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
 	for (size_t I = 0; I < Scene->GetEntities().GetCount(); I++)
 	{
 		if (Entities[I]->GetClassDescription() == ZEModel::ClassDescription())
@@ -85,26 +86,26 @@ bool ZEGraphicsDebugModule::Initialize()
 			Track->SetEndFrame(100);
 			Track->SetCurrentFrame(rand() % Track->GetEndFrame());
 			Track->SetLooping(true);
-			Track->SetSpeed(30.0f);
+			Track->SetSpeed(10.0f);
 			Track->Resume();
 		}
 	}
 
-	/*ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
+	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
 	Sky->SetSkyTexture("cubetest.tga");
 	Scene->AddEntity(Sky);*/
 
 	ZEPortalMap* Map1 = ZEPortalMap::CreateInstance();
-	Map1->SetMapFile("terrain2.zemap");
+	Map1->SetMapFile("deneme.zemap");
 	Map1->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Scene->AddEntity(Map1);
 
-	Map2 = ZEPortalMap::CreateInstance();
+	/*Map2 = ZEPortalMap::CreateInstance();
 	Map2->SetMapFile("terrain2.zemap");
 	Map2->SetPosition(ZEVector3(0.0f, 0.0f, -200.0f));
-	Scene->AddEntity(Map2);
+	Scene->AddEntity(Map2);*/
 
-	/*PointLight1 = ZEPointLight::CreateInstance();
+	PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
 	PointLight1->SetColor(ZEVector3::One);
 	PointLight1->SetAttenuation(0.01f, 0.0f, 1.0f);
@@ -172,9 +173,8 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetProjectionTexture(ZETexture2DResource::LoadResource("test\\pavyon.png")->GetTexture());
 	ProjectiveLight0->SetCastsShadow(false);
 	Scene->AddEntity(ProjectiveLight0);
-	
 
-	Model = ZEModel::CreateInstance();		
+	/*Model = ZEModel::CreateInstance();		
 	Model->SetModelResource(ZEModelResource::LoadResource("Bench.zemodel"));
 	Scene->AddEntity(Model);
 
@@ -189,7 +189,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
 	DirectionalLight0->SetIntensity(3.0f);
 	DirectionalLight0->SetCastsShadow(false);
-	Scene->AddEntity(DirectionalLight0);
+	Scene->AddEntity(DirectionalLight0);*/
 
 	PointLight1->SetEnabled(true);
 	PointLight2->SetEnabled(true);
@@ -198,7 +198,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight5->SetEnabled(true);
 	OmniProjectiveLight0->SetEnabled(true);
 	ProjectiveLight0->SetEnabled(false);
-//	DirectionalLight0->SetEnabled(false);*/
+//	DirectionalLight0->SetEnabled(false);
 
 	return true;
 }

@@ -78,7 +78,7 @@ class ZEStringCacheIdentifier : public ZECacheChunkIdentifier
 			ZEDWORD Count = strlen(String) + 1;
 			fwrite(&Count, sizeof(ZEDWORD), 1, (FILE*)File);
 			fwrite(String, sizeof(const char), strlen(String) + 1, (FILE*)File);
-			return Count;
+			return Count + sizeof(ZEDWORD);
 		}
 
 		bool Equal(void* File) const
@@ -112,7 +112,7 @@ class ZEStringCacheIdentifier : public ZECacheChunkIdentifier
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-	char CacheItem1[] = "This is a cache item 1. So Blabalbalsfedw fewwerewrew End Of File";
+/*	char CacheItem1[] = "This is a cache item 1. So Blabalbalsfedw fewwerewrew End Of File";
 	char CacheItem2[] = "ard bla bldfaskfjşl sad şlaksfj aşskldf sşalkjf şaslkdjf şsldakj dra";
 	
 	ZEFileCache Cache;
@@ -123,8 +123,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	char Buffer[1024];
 	Cache.GetChunkData(&ZEStringCacheIdentifier("Orcun"), NULL, 0, 0);
-	Cache.CloseCache();
-	/*
+	Cache.CloseCache();*/
+	
 	//MessageBox(NULL, "Attach it while you can !", "Zinek Engine", MB_OK); 
 	_set_SSE2_enable(1); 
 	ApplicationInstance = hInstance;
@@ -156,7 +156,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	zeCore->GetWindow()->SetWindowSize(zeCore->GetOptions()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger(), zeCore->GetOptions()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger());
 
  	if (zeCore->StartUp())
-		zeCore->Run(); */
+		zeCore->Run(); 
 }
 
 

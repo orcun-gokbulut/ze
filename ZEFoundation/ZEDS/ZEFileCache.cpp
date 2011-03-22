@@ -49,7 +49,7 @@ struct ZEChunkHeader
 
 bool ZEFileCache::OpenCache(const char* FileName)
 {
-	File = fopen(FileName, "a+");
+	File = fopen(FileName, "a+b");
 	if (File == NULL)
 		return false;
 
@@ -91,9 +91,11 @@ void CopyData(FILE* File, size_t From, size_t Size, size_t To)
 
 void ZEFileCache::AddChunk(const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size)
 {
+	fseek(File, -sizeof(ZEDWORD), SEEK_END);
+	size_t HeaderStart;
+
 	// Find Chunk Count
 	ZEDWORD EndOfFile = 0;
-	fseek(File, -sizeof(ZEDWORD), SEEK_END);
 	EndOfFile = ftell(File);
 
 	ZEDWORD DataCursor = 0;
@@ -111,8 +113,7 @@ void ZEFileCache::AddChunk(const ZECacheChunkIdentifier* Identifier, const void*
 	// Add new header
 	//   Write Identifier
 	fseek(File, 0, SEEK_END);
-	fseek(File, sizeof(ZEChunkHeader), SEEK_CUR);
-	size_t IdentifierSize = Identifier->Write(File);
+	//fseek(File, sizeof(ZEChunkHeader), SEEK_CUR);
 
 	//   Write Header
 	ZEChunkHeader NewHeader;
@@ -120,9 +121,11 @@ void ZEFileCache::AddChunk(const ZECacheChunkIdentifier* Identifier, const void*
 	NewHeader.ChunkPosition = DataCursor;
 	NewHeader.ChunkHash = Identifier->GetHash();
 	NewHeader.ChunkSize = Size;
-	NewHeader.IdentifierSize = IdentifierSize;
+//	NewHeader.IdentifierSize = IdentifierSize;
 
-	fseek(File, -IdentifierSize - sizeof(ZEChunkHeader), SEEK_END);
+//	size_t IdentifierSize = Identifier->Write(File);
+
+	//fseek(File, -IdentifierSize - sizeof(ZEChunkHeader), SEEK_END);
 	fwrite(&NewHeader, sizeof(ZEChunkHeader), 1, File);
 
 	// Set headers start position
@@ -140,7 +143,7 @@ bool ZEFileCache::GetChunkData(const ZECacheChunkIdentifier* Identifier, void* B
 
 	ZEDWORD FirstHeaderCursor = 0;
 	fread(&FirstHeaderCursor, sizeof(ZEDWORD), 1, File);
-	fseek(File, FirstHeaderCursor, SEEK_SET);
+	fseek(File, FirstHeaderCursor - 1, SEEK_SET);
 	
 	ZEDWORD Hash = Identifier->GetHash();
 

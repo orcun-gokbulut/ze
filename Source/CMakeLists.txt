@@ -59,7 +59,7 @@ include_directories (
 	${PROJECT_SOURCE_DIR}/../Include/Curl
 	${PROJECT_SOURCE_DIR}/../ZEFoundation)
 link_directories(
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/Release" 
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/$(Configuration)" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX")

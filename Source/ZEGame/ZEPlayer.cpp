@@ -250,7 +250,7 @@ ZEPlayer::ZEPlayer()
 
 	Listener = ZEListener::CreateInstance();
 	RegisterComponent(Listener);
-	/*
+
 	Light = ZEProjectiveLight::CreateInstance();
 	Light->SetProjectionTextureFile("flashlight.jpg");
 	Light->SetAttenuation(0.01f, 0.0f, 1.0f);
@@ -261,7 +261,6 @@ ZEPlayer::ZEPlayer()
 	Light->SetCastsShadow(true);
 	Light->SetPosition(ZEVector3(0.0f, -2.0f, 0.0f));
 	RegisterComponent(Light);
-	*/
 }
 
 ZEPlayer::~ZEPlayer()
