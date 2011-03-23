@@ -355,7 +355,7 @@ bool ZEScene::Load(const char* FileName)
 	}
 	else
 	{
-		zeError("Scene", "Unserialization failed.");
+		zeError("Scene", "Can not open scene file. Unserialization failed. FileName : \"%s\"", FileName);
 		return false;
 	}
 }
@@ -382,8 +382,3 @@ ZEScene* ZEScene::GetInstance()
 {
 	return zeGame->GetScene();
 }
-
-
-
-
-

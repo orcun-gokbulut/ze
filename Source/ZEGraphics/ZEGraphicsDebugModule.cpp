@@ -54,10 +54,7 @@
 #include "ZEMath/ZEMathDefinitions.h"
 #include "ZEGame\ZESkyBrush.h"
 #include "ZEMap\ZEPortalMap\ZEPortalMap.h"
-
 #include <stdlib.h>
-
-ZEPortalMap* Map2;
 
 bool ZEGraphicsDebugModule::Initialize()
 {
@@ -71,39 +68,10 @@ bool ZEGraphicsDebugModule::Initialize()
 	Scene->SetActiveCamera(Player->GetCamera());
 	Scene->AddEntity(Player);
 
-	//Scene->Load("deneme.ZESCENE");
-
-	/*const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
-	for (size_t I = 0; I < Scene->GetEntities().GetCount(); I++)
-	{
-		if (Entities[I]->GetClassDescription() == ZEModel::ClassDescription())
-		{
-			ZEModel* Model = (ZEModel*)Entities[I];
-			ZEModelAnimationTrack* Track = Model->GetAnimationTracks().Add();
-			Track->SetOwner(Model);
-			Track->SetAnimationByName("All");
-			Track->SetStartFrame(0);
-			Track->SetEndFrame(100);
-			Track->SetCurrentFrame(rand() % Track->GetEndFrame());
-			Track->SetLooping(true);
-			Track->SetSpeed(10.0f);
-			Track->Resume();
-		}
-	}
-
-	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
-	Sky->SetSkyTexture("cubetest.tga");
-	Scene->AddEntity(Sky);*/
-
-	ZEPortalMap* Map1 = ZEPortalMap::CreateInstance();
-	Map1->SetMapFile("deneme.zemap");
-	Map1->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Scene->AddEntity(Map1);
-
-	/*Map2 = ZEPortalMap::CreateInstance();
-	Map2->SetMapFile("terrain2.zemap");
-	Map2->SetPosition(ZEVector3(0.0f, 0.0f, -200.0f));
-	Scene->AddEntity(Map2);*/
+	ZEPortalMap* Map = ZEPortalMap::CreateInstance();
+	Map->SetMapFile("deneme.zemap");
+	Map->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	Scene->AddEntity(Map);
 
 	PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
@@ -174,22 +142,13 @@ bool ZEGraphicsDebugModule::Initialize()
 	ProjectiveLight0->SetCastsShadow(false);
 	Scene->AddEntity(ProjectiveLight0);
 
-	/*Model = ZEModel::CreateInstance();		
-	Model->SetModelResource(ZEModelResource::LoadResource("Bench.zemodel"));
-	Scene->AddEntity(Model);
-
-	Model = ZEModel::CreateInstance();		
-	Model->SetModelResource(ZEModelResource::LoadResource("Light.zemodel"));
-	Model->SetPosition(ZEVector3(-100.0f, 0.0f, 0.0f));
-	Scene->AddEntity(Model);
-
 	DirectionalLight0 = ZEDirectionalLight::CreateInstance();
 	DirectionalLight0->SetEnabled(true);
 	DirectionalLight0->SetRotation(ZEQuaternion(-ZE_PI_2, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
 	DirectionalLight0->SetIntensity(3.0f);
 	DirectionalLight0->SetCastsShadow(false);
-	Scene->AddEntity(DirectionalLight0);*/
+	Scene->AddEntity(DirectionalLight0);
 
 	PointLight1->SetEnabled(true);
 	PointLight2->SetEnabled(true);
@@ -198,13 +157,15 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight5->SetEnabled(true);
 	OmniProjectiveLight0->SetEnabled(true);
 	ProjectiveLight0->SetEnabled(false);
-//	DirectionalLight0->SetEnabled(false);
+	DirectionalLight0->SetEnabled(false);
 
 	return true;
 }
 
 void ZEGraphicsDebugModule::Deinitialize()
 {
+	zeScene->SetActiveCamera(NULL);
+
 	Player->Destroy();
 
 	PointLight1->Destroy();
@@ -212,22 +173,15 @@ void ZEGraphicsDebugModule::Deinitialize()
 	PointLight3->Destroy();
 	PointLight4->Destroy();
 	PointLight5->Destroy();
-
 	OmniProjectiveLight0->Destroy();
 	ProjectiveLight0->Destroy();
 	DirectionalLight0->Destroy();
+	Map->Destroy();
 }
 
 void ZEGraphicsDebugModule::Process(float ElapsedTime)
 {
 	static ZEQuaternion Rotation = ZEQuaternion::Identity;
-	
-//	Rotation = Rotation * ZEQuaternion(ZE_PIx2 * ElapsedTime, ZEVector3::UnitY);
-//	OmniProjectiveLight0->SetRotation(Rotation);
-	
-	//Player->SetRotation(Rotation);
-	//ProjectiveLight0->SetRotation(Rotation);
-//	Model->SetPosition(Model->GetPosition() + ZEVector3(0.1f, 0.0f, 0.0f) * ElapsedTime);
 }
 
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDefinitions.h
+ Zinek Engine - ZEDSDefinitions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -45,7 +45,7 @@
 
 #ifdef ZEDS_DEBUG_MODE
 	#ifdef ZE_ZINEK_ENGINE
-#include "ZECore\ZEError.h"
+		#include "ZECore\ZEError.h"
 		#define zedsAssert(Condition, ...) zeAssert(Condition, __VA_ARGS__) 
 		#define zedsWarningAssert(Condition, ...) zeWarningAssert(Condition, __VA_ARGS__)
 	#else	

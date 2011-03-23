@@ -167,7 +167,7 @@ bool ZED3D9Module::Initialize()
 	D3DDEVTYPE DeviceType = D3DDEVTYPE_HAL;
 	
 	// If perfhud debugging enabled (by defining ZE_DEBUG_D3D9_PERFHUD) replace default adapter with perfhud adapter
-	//#ifdef ZE_DEBUG_D3D9_PERFHUD
+	#ifdef ZE_DEBUG_D3D9_ENABLE_PERFHUD
 	for (UINT Adapter=0; Adapter < D3D->GetAdapterCount(); Adapter++)
 	{
 		D3DADAPTER_IDENTIFIER9 Identifier;
@@ -180,7 +180,7 @@ bool ZED3D9Module::Initialize()
 			break;
 		}
 	}	
-	//#endif
+	#endif
 	
 	// Create Device
 	Result = D3D->CreateDevice(AdapterToUse, DeviceType, (HWND)zeWindow->GetHandle(), D3DCREATE_HARDWARE_VERTEXPROCESSING, &D3DPP, &Device);

@@ -46,6 +46,7 @@ class ZEProjectiveLight;
 class ZEDirectionalLight;
 class ZECanvasBrush;
 class ZEModel;
+class ZEPortalMap;
 
 class ZEGraphicsDebugModule : public ZEDebugModule
 {
@@ -56,14 +57,13 @@ class ZEGraphicsDebugModule : public ZEDebugModule
 		ZEPointLight*			PointLight3;
 		ZEPointLight*			PointLight4;
 		ZEPointLight*			PointLight5;
-
 		ZEProjectiveLight*		ProjectiveLight0;
-
 		ZEOmniProjectiveLight*	OmniProjectiveLight0;
-
 		ZEDirectionalLight*		DirectionalLight0;
-		ZECanvasBrush*			Brush;
+
+		ZEPortalMap*			Map;
 		ZEModel*				Model;
+
 	public:
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
