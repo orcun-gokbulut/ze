@@ -122,9 +122,6 @@ void ZEScene::Deinitialize()
 	if (PhysicalWorld != NULL)
 		PhysicalWorld->Deinitialize();
 
-	if (Map != NULL)
-		Map->Deinitialize();
-
 	if (Renderer != NULL)
 		Renderer->Deinitialize();
 
@@ -139,17 +136,7 @@ void ZEScene::Destroy()
 {
 	Deinitialize();
 
-	if (Map != NULL)
-	{
-		Map->Destroy();
-		Map = NULL;
-	}
-
-	if (MapResource != NULL)
-	{
-		MapResource->Release();
-		MapResource = NULL;
-	}
+	ClearEntities();
 
 	if (PhysicalWorld != NULL)
 	{
@@ -169,10 +156,6 @@ void ZEScene::Destroy()
 		ShadowRenderer = NULL;
 	}
 
-	for (size_t I = 0; I < Entities.GetCount(); I++)
- 		Entities[I]->Destroy();
-	Entities.Clear();
-
 	delete this;
 }
 
@@ -185,8 +168,16 @@ void ZEScene::AddEntity(ZEEntity* Entity)
 
 void ZEScene::RemoveEntity(ZEEntity* Entity)
 {
-	Entity->Deinitialize();
+	Entity->Destroy();
 	Entities.DeleteValue(Entity);
+}
+
+void ZEScene::ClearEntities()
+{
+	for (size_t I = 0; I < Entities.GetCount(); I++)
+		Entities[I]->Destroy();
+
+	Entities.Clear();
 }
 
 const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()
@@ -262,21 +253,13 @@ bool ZEScene::Save(const char* FileName)
 		Serializer.Write(&EntityCount, sizeof(ZEDWORD), 1);
 		
 		Serializer.Write(&LastEntityId, sizeof(int), 1);
-		if (MapResource != NULL)
-		{
-			char NameBuffer[ZE_MAX_NAME_SIZE];
-			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
-			strcpy(NameBuffer, MapResource->GetFileName());
 
-			Serializer.Write(NameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
-		}
-		else
-		{
-			char NameBuffer[ZE_MAX_NAME_SIZE];
-			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
 
-			Serializer.Write(&NameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
-		}
+		// Will be removed
+		char NameBuffer[ZE_MAX_NAME_SIZE];
+		memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
+		Serializer.Write(&NameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+
 
 		for (size_t I = 0; I < Entities.GetCount(); I++)
 		{
@@ -322,32 +305,28 @@ bool ZEScene::Load(const char* FileName)
 		char MapFile[ZE_MAX_FILE_NAME_SIZE];
 		Unserializer.Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
 
-		Entities.Clear();
-		Entities.SetCount(EntityCount);
+		ClearEntities();
 
 		for (size_t I = 0; I < Entities.GetCount(); I++)
 		{
+			ZEEntity* NewEntity;
 			Unserializer.Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
-			Entities[I] = (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(EntityTypeName);
-			if (Entities[I] == NULL)
+			NewEntity = (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(EntityTypeName);
+			if (NewEntity == NULL)
 			{
 				zeError("Scene", "Unserialization can not create entity type \"%s\".", EntityTypeName);
 				zeError("Scene", "Unserialization failed.");
 				return false;
 			}
-			
-			if (Initialized)
-				Entities[I]->Initialize();
 
-			if (!Entities[I]->Unserialize((ZEUnserializer*)&Unserializer))
+			if (!NewEntity->Unserialize((ZEUnserializer*)&Unserializer))
 			{
 				zeError("Scene", "Unserialization of entity \"%s\" has failed.", Entities[I]->GetName());
 				zeError("Scene", "Unserialization failed.");
 				return false;
 			}
-			
-			if (Initialized)
-				Entities[I]->Initialize();
+
+			AddEntity(NewEntity);
 		}
 
 		zeLog("Scene", "Scene file \"%s\" has been loaded.", FileName);
@@ -369,8 +348,6 @@ ZEScene::ZEScene()
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
 	PhysicalWorld = NULL;
-	MapResource = NULL;
-	Map = NULL;
 }
 
 ZEScene::~ZEScene()

@@ -151,7 +151,7 @@ void ZEGame::Tick(float ElapsedTime)
 		ZERAD2DEG(Pitch), ZERAD2DEG(Yaw), ZERAD2DEG(Roll), 
 		AverageFPS, 1.0f / ElapsedTime);
 	
-	((ZEUITextControl*)UIManager->GetControls()[0])->SetText(Buffer);
+//	((ZEUITextControl*)UIManager->GetControls()[0])->SetText(Buffer);
 	Scene->Tick(ElapsedTime);
 }
 

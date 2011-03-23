@@ -78,9 +78,6 @@ class ZEScene
 
 		ZESceneCuller							Culler;
 
-		ZEPortalMap*							Map;
-		ZEPortalMapResource*					MapResource;
-
 		ZESmartArray<ZEEntity*>					Entities;
 
 		ZEPhysicalWorld*						PhysicalWorld;
@@ -95,6 +92,7 @@ class ZEScene
 		void									AddEntity(ZEEntity* Entity);
 		void									RemoveEntity(ZEEntity* Entity);
 		const ZESmartArray<ZEEntity*>&			GetEntities();
+		void									ClearEntities();
 
 		ZERenderer*								GetRenderer();
 		ZEPhysicalWorld*						GetPhysicalWorld();
