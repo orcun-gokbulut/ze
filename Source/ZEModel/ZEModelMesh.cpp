@@ -293,9 +293,9 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 
 	if (DistanceSquare > 40 * 40) 
 		Lod = -1;
-	else if (DistanceSquare > 20 * 20)
+	else if (DistanceSquare > 30 * 30)
 		Lod = 2;
-	else if (DistanceSquare > 10 * 10)
+	else if (DistanceSquare > 20 * 20)
 		Lod = 1;
 	else
 		Lod = 0;
