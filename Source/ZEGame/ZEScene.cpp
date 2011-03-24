@@ -307,7 +307,7 @@ bool ZEScene::Load(const char* FileName)
 
 		ClearEntities();
 
-		for (size_t I = 0; I < Entities.GetCount(); I++)
+		for (size_t I = 0; I < EntityCount; I++)
 		{
 			ZEEntity* NewEntity;
 			Unserializer.Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);
