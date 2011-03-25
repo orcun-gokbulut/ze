@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEUIRadioButtonControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,56 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#ifndef __ZE_UI_RADIO_BUTTON_CONTROL__
+#define __ZE_UI_RADIO_BUTTON_CONTROL__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
-#include "ZEUIEvents.h"
-#include "ZEInput/ZEInputMap.h"
+#include "ZEUIControl.h"
+#include "ZEUITextControl.h"
+#include "ZEUIButtonControl.h"
 
-class ZEUIControl;
-class ZEUICursorControl;
-
-class ZEUIManager
+enum ZEUIRadioButtonState
 {
+	ZE_UI_RBS_UNCHECKED		= 0,
+	ZE_UI_RBS_CHECKED		= 1
+};
+
+class ZEString;
+
+class ZEUIRadioButtonControl : public ZEUIControl
+{
+	friend class ZEUIManager;
+
 	private:
-		
-		ZEInputMap					InputMap;
 
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
+		ZEUIRadioButtonState				State;
 
-		ZEUIMouseKey				PressedButton;
-		ZEUIMouseKey				PreviousPressedButton;
+		ZEUIButtonControl					Box;
+		ZEUITextControl						Label;
 
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
+		ZEArray<ZEUIRadioButtonControl*>	InteractingRadioButtons;
 
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
+	protected:
 
-									ZEUIManager();
-									~ZEUIManager();
+		virtual void 						MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 
 	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+		void								AddInteractingRadioButton(ZEUIRadioButtonControl* RadioButton);
+		void								RemoveInteractingRadioButton(ZEUIRadioButtonControl* RadioButton);
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+		void								SetState(ZEUIRadioButtonState State);
+		ZEUIRadioButtonState				GetState() const;	
 
-		void						Destroy();
+		void								SetText(ZEString Text);
+		ZEString							GetText();
 
-		static ZEUIManager*			CreateInstance();
+		virtual ZEMaterial*					GetMaterial() const;
+		virtual void						SetMaterial(ZEMaterial* Material);
+
+
+											ZEUIRadioButtonControl();
+											~ZEUIRadioButtonControl();
+
 };
 
 #endif
-
-
-
-

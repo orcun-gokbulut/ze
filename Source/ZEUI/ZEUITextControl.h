@@ -53,6 +53,9 @@ class ZEUITextControl : public ZEUIControl
 		ZEVector2						FontSize;
 
 	public:
+
+		ZEUIRectangle					Output;
+
 		void							SetText(const ZEString& Value);
 		const ZEString&					GetText();
 
@@ -67,6 +70,9 @@ class ZEUITextControl : public ZEUIControl
 
 		void							SetFontSize(const ZEVector2& FontSize);
 		const ZEVector2&				GetFontSize();
+
+		virtual	void					SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial*				GetMaterial() const;
 
 		virtual void					Draw(ZEUIRenderer* Renderer);
 

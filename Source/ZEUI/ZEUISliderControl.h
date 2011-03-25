@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEUISliderControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,58 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#ifndef __ZE_UI_SLIDER_CONTROL__
+#define __ZE_UI_SLIDER_CONTROL__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
-#include "ZEUIEvents.h"
-#include "ZEInput/ZEInputMap.h"
+#include "ZEUIControl.h"
+#include "ZEUIButtonControl.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
 
-class ZEUIControl;
-class ZEUICursorControl;
-
-class ZEUIManager
+enum ZESliderControlState
 {
-	private:
-		
-		ZEInputMap					InputMap;
+	ZE_SCS_SLIDING,
+	ZE_SCS_NONSLIDING
+};
 
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
+class ZEUISliderControl : public ZEUIControl
+{
 
-		ZEUIMouseKey				PressedButton;
-		ZEUIMouseKey				PreviousPressedButton;
+	protected:
 
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
+		ZEUIButtonControl		SliderButton;
+		ZEUIRectangle			SliderLine;
 
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
+								ZEUISliderControl();
 
-									ZEUIManager();
-									~ZEUIManager();
+		ZESliderControlState	SliderState;
+
+		ZEFixedMaterial*		SliderButtonMaterial;
+		ZEFixedMaterial*		SliderLineMaterial;
+
+		float					CurrentValue;
+
+		float					MaximumValue;
+		float					MinimumValue;
+		float					StepSize;
+
+		float					SliderLineThickness;
 
 	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+		virtual void			SetCurretnValue(float NewValue) = 0;
+		float					GetCurrentValue() const;
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+		void					SetMaximumValue(float MaximumValue);
+		float					GetMaximumValue() const;
 
-		void						Destroy();
+		void					SetMinimumValue(float MinimumValue);
+		float					GetMinimumValue() const;
 
-		static ZEUIManager*			CreateInstance();
+		void					SetStepSize(float StepSize);
+		float					GetStepSize();
+
+		virtual void			SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial*		GetMaterial() const;
 };
 
 #endif
-
-
-
-

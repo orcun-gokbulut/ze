@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEIUCheckBoxControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,57 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#ifndef __ZE_UI_CHECK_BOX_CONTROL__
+#define __ZE_UI_CHECK_BOX_CONTROL__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
-#include "ZEUIEvents.h"
-#include "ZEInput/ZEInputMap.h"
+#include "ZEUIControl.h"
+#include "ZEUITextControl.h"
+#include "ZEUIButtonControl.h"
 
-class ZEUIControl;
-class ZEUICursorControl;
-
-class ZEUIManager
+enum ZEUICheckBoxState
 {
+	ZE_UI_CBS_UNCHECKED		= 0,
+	ZE_UI_CBS_CHECKED		= 1,
+	ZE_UI_CBS_SEMICHECKED	= 2
+};
+
+class ZEString;
+
+class ZEUICheckBoxControl : public ZEUIControl
+{
+	friend class ZEUIManager;
+
 	private:
-		
-		ZEInputMap					InputMap;
 
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
+		ZEUICheckBoxState	State;
 
-		ZEUIMouseKey				PressedButton;
-		ZEUIMouseKey				PreviousPressedButton;
+		bool				IsTriState;
 
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
+		ZEUIButtonControl	Box;
+		ZEUITextControl		Label;
 
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
+	protected:
 
-									ZEUIManager();
-									~ZEUIManager();
+		virtual void 		MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 
 	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+		void				SetTriState(bool Tristate);
+		bool				GetTristate() const;
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+		void				SetState(ZEUICheckBoxState State);
+		ZEUICheckBoxState	GetState() const;	
 
-		void						Destroy();
+		void				SetText(ZEString Text);
+		ZEString			GetText();
 
-		static ZEUIManager*			CreateInstance();
+		virtual ZEMaterial*	GetMaterial() const;
+		virtual void		SetMaterial(ZEMaterial* Material);
+
+
+							ZEUICheckBoxControl();
+							~ZEUICheckBoxControl();
+
 };
 
 #endif
-
-
-
-

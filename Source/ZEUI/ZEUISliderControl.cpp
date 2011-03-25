@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEUISliderControl.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,65 +33,65 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#include "ZEUISliderControl.h"
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
-#include "ZEUIEvents.h"
-#include "ZEInput/ZEInputMap.h"
-
-class ZEUIControl;
-class ZEUICursorControl;
-
-class ZEUIManager
+void ZEUISliderControl::SetMaximumValue(float MaximumValue)
 {
-	private:
-		
-		ZEInputMap					InputMap;
+	this->MaximumValue = MaximumValue;
+}
 
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
+float ZEUISliderControl::GetMaximumValue() const
+{
+	return MaximumValue;
+}
 
-		ZEUIMouseKey				PressedButton;
-		ZEUIMouseKey				PreviousPressedButton;
+void ZEUISliderControl::SetMinimumValue(float MinimumValue)
+{
+	this->MinimumValue = MinimumValue;
+}
 
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
+float ZEUISliderControl::GetMinimumValue() const
+{
+	return MinimumValue;
+}
 
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
+void ZEUISliderControl::SetStepSize(float StepSize)
+{
+	this->StepSize = StepSize;
+}
 
-									ZEUIManager();
-									~ZEUIManager();
+float ZEUISliderControl::GetStepSize()
+{
+	return StepSize;
+}
 
-	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
+float ZEUISliderControl::GetCurrentValue() const
+{
+	return CurrentValue;
+}
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+void ZEUISliderControl::SetMaterial(ZEMaterial* Material)
+{
+	SliderButtonMaterial = (ZEFixedMaterial*)Material;
+	SliderButton.SetMaterial(SliderButtonMaterial);
+}
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+ZEMaterial* ZEUISliderControl::GetMaterial() const
+{
+	return SliderButtonMaterial;
+}
 
-		void						Destroy();
+ZEUISliderControl::ZEUISliderControl()
+{
+	SliderButtonMaterial = ZEFixedMaterial::CreateInstance();
+	SliderButtonMaterial->SetZero();
 
-		static ZEUIManager*			CreateInstance();
-};
+	SliderLineMaterial = ZEFixedMaterial::CreateInstance();
+	SliderLineMaterial->SetZero();
+	SliderLine.Material = SliderLineMaterial;
 
-#endif
+	SetMoveable(false);
+	SliderButton.SetMoveable(true);
 
-
-
-
+	StepSize = 10;
+}

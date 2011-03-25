@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEUIMultiLineTextEdit.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,41 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#ifndef __ZE_UI_MULTI_LINE_TEXT_EDIT_CONTROL__
+#define __ZE_UI_MULTI_LINE_TEXT_EDIT_CONTROL__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
-#include "ZEUIEvents.h"
-#include "ZEInput/ZEInputMap.h"
+#include "zeui/ZEUIFrameControl.h"
+#include "ZEUITextControl.h"
 
-class ZEUIControl;
-class ZEUICursorControl;
+class ZEMaterial;
 
-class ZEUIManager
+class ZEUIMultiLineTextEdit : public ZEUIFrameControl
 {
 	private:
-		
-		ZEInputMap					InputMap;
 
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
+		ZEUITextControl		TextDisplayer;
 
-		ZEUIMouseKey				PressedButton;
-		ZEUIMouseKey				PreviousPressedButton;
+		float				CursorBlinkTime;
+		float				TotalTime;
+		ZEUIRectangle		Cursor;
+		bool				CursorVisible;
 
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
+	protected:
 
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
-
-									ZEUIManager();
-									~ZEUIManager();
+		virtual void		KeyPressed(unsigned char Key);
 
 	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+		virtual void		SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial* GetMaterial() const;
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+		virtual void		Tick(float ElapsedTime);
+		virtual void		Draw(ZEUIRenderer* Renderer);
 
-		void						Destroy();
+		virtual void		SetWidth(float Width);
+		virtual void		SetHeight(float Height);
 
-		static ZEUIManager*			CreateInstance();
+							ZEUIMultiLineTextEdit();
 };
 
 #endif
-
-
-
-

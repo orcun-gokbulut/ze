@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEUICursorControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#ifndef __ZE_UI_CURSOR_CONTROL__
+#define __ZE_UI_CURSOR_CONTROL__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
-#include "ZEUIEvents.h"
+#include "zeui/ZEUIControl.h"
+#include "zeui/ZEUIRectangle.h"
 #include "ZEInput/ZEInputMap.h"
+#include "ZEGraphics/ZEUIMaterial.h"
 
-class ZEUIControl;
-class ZEUICursorControl;
+class ZEVector3;
 
-class ZEUIManager
+class ZEUICursorControl : public ZEUIControl
 {
 	private:
-		
-		ZEInputMap					InputMap;
 
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
+		ZEUIMaterial*		CursorMaterial;
+		ZEUIRectangle		Cursor;
+		ZEInputMap			InputMap;
 
-		ZEUIMouseKey				PressedButton;
-		ZEUIMouseKey				PreviousPressedButton;
-
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
-
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
-
-									ZEUIManager();
-									~ZEUIManager();
+		ZEUIMouseKey		CurentButton;
 
 	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+		virtual void		Draw(ZEUIRenderer* Renderer);
+		virtual void		Tick(float ElapsedTime);
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+		virtual ZEMaterial* GetMaterial() const;
+		virtual void		SetMaterial(ZEMaterial* Material);
 
-		void						Destroy();
+		ZEUIMouseKey		GetCurrentButton();
 
-		static ZEUIManager*			CreateInstance();
+							ZEUICursorControl();
+							~ZEUICursorControl();
 };
 
 #endif
-
-
-
-

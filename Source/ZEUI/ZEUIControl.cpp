@@ -36,71 +36,6 @@
 #include "ZEUIControl.h"
 #include "ZEUIRenderer.h"
 
-void ZEUIControl::KeyPressed(unsigned char Key)
-{
-	if (KeyPressedEvent != NULL)
-		KeyPressedEvent(Key);
-}
-
-void ZEUIControl::KeyReleased(unsigned char Key)
-{
-	if (KeyReleasedEvent != NULL)
-		KeyReleasedEvent(Key);
-}
-
-void ZEUIControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
-{
-	if (MouseButtonPressedEvent != NULL)
-		MouseButtonPressedEvent(Button, MousePosition);
-}
-
-void ZEUIControl::MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition)
-{
-	if (MouseButtonReleasedEvent != NULL)
-		MouseButtonReleasedEvent(Button, MousePosition);
-}
-
-void ZEUIControl::MouseHovered(const ZEVector2& MousePosition)
-{
-	if (HoverState)
-	{
-		if (MouseMovedEvent != NULL)
-			MouseMovedEvent(MousePosition);
-	}
-	else
-		if (MouseEnteredEvent != NULL)
-			MouseEnteredEvent(MousePosition);
-}
-
-void ZEUIControl::FocusLost()
-{
-	FocusState = false;
-	if (FocusLostEvent != NULL)
-		FocusLostEvent();
-}
-
-void ZEUIControl::FocusGained()
-{
-	FocusState = true;
-	if (FocusGainedEvent != NULL)
-		FocusGainedEvent();
-}
-
-void ZEUIControl::SetParent(ZEUIControl* Parent)
-{
-	this->ParentControl = Parent; 
-}
-
-ZEUIControl* ZEUIControl::GetParentControl()
-{
-	return ParentControl;
-}
-
-bool ZEUIControl::IsInactive()
-{
-	return false;
-}
-
 void ZEUIControl::SetName(const ZEString& Name)
 {
 	this->Name = Name;
@@ -111,56 +46,235 @@ const ZEString& ZEUIControl::GetName()
 	return Name;
 }
 
+void ZEUIControl::SetToolTip(const ZEString& ToolTip)
+{
+	this->ToolTip = ToolTip;
+}
+
+const ZEString& ZEUIControl::GetToolTip()
+{
+	return ToolTip;
+}
+
+void ZEUIControl::SetVisiblity(bool Visiblity)
+{
+	IsVisible = Visiblity;
+}
+
+bool ZEUIControl::GetVisiblity() const
+{
+	return IsVisible;
+}
+
+void ZEUIControl::SetEnabled(bool Enabled)
+{
+	IsEnabled = Enabled;
+}
+
+bool ZEUIControl::GetEnabled() const
+{
+	return IsEnabled;
+}
+
+void ZEUIControl::SetModal(bool Modal)
+{
+	IsModal = Modal;
+}
+
+bool ZEUIControl::GetModal() const
+{
+	return IsModal;
+}
+
+void ZEUIControl::SetFocusable(bool Focusable)
+{
+	IsFocusable = Focusable;
+}
+
+bool ZEUIControl::GetFocusable()
+{
+	return IsFocusable;
+}
+
+void ZEUIControl::SetMoveable(bool Moveable)
+{
+	IsMoveable = Moveable;
+}
+
+bool ZEUIControl::GetMoveable() const
+{
+	return IsMoveable;
+}
+
+void ZEUIControl::SetFixedSized(bool FixedSized)
+{
+	IsFixedSized = FixedSized;
+}
+
+bool ZEUIControl::GetFixedSized() const
+{
+	return IsFixedSized;
+}
+
+void ZEUIControl::SetHovered(bool Hovered)
+{
+	IsHovered = Hovered;
+}
+
+bool ZEUIControl::GetHovered() const
+{
+	return IsHovered;
+}
+
+void ZEUIControl::SetFocused(bool Focused)
+{
+	IsFocused = Focused;
+}
+
+bool ZEUIControl::GetFocused() const
+{
+	return IsFocused;
+}
+
+void ZEUIControl::SetPressed(bool Pressed)
+{
+	IsPressed = Pressed;
+}
+
+bool ZEUIControl::GetPressed() const
+{
+	return IsPressed;
+}
+
+void ZEUIControl::SetZOrder(int Z)
+{
+	ZOrder = Z;
+}
+
+int ZEUIControl::GetZOrder() const
+{
+	return ZOrder;
+}
+
+void ZEUIControl::SetParent(ZEUIControl* Parent)
+{
+	if (ParentControl != NULL)
+		ParentControl->RemoveChildControl(this);
+	
+	this->ParentControl = Parent; 
+	//ParentControl->AddChildControl(this); !!! REVISION
+}
+
+const ZEArray<ZEUIControl*>& ZEUIControl::GetChildControls()
+{
+	return ChildControls;
+}
+
+void ZEUIControl::AddChildControl(ZEUIControl* Control)
+{
+	ChildControls.Add(Control);
+	Control->SetParent(this);
+}
+
+void ZEUIControl::RemoveChildControl(ZEUIControl* Control)
+{
+	ChildControls.DeleteValue(Control);
+	Control->SetParent(NULL);
+}
+
+ZEUIControl* ZEUIControl::GetParentControl() const
+{
+	return ParentControl;
+}
+
 void ZEUIControl::SetPosition(const ZEVector2& Position)
 {
 	DirtyVisibleRectangle = true;
-	Rectangle.LeftUp = Position;
+
+	ZEVector2 PositionDifference = GetPosition() - Position;
+
+	for (int I = 0; I < GetChildControls().GetCount(); I++)
+		GetChildControls()[I]->SetPosition(GetChildControls()[I]->GetPosition() + PositionDifference);
+
+	Rectangle.SetPosition(Position);
 }
 
 const ZEVector2& ZEUIControl::GetPosition()
 {
-	return Rectangle.LeftUp;
+	return Rectangle.GetPosition();
 }
 
 void ZEUIControl::SetSize(const ZEVector2& Size)
 {
+	if (IsFixedSized)
+		return;
+
 	DirtyVisibleRectangle = true;
-	ZEVector2::Add(Rectangle.RightDown, Rectangle.LeftUp, Size);
+
+	if (Size.x <= MaximumSize.x && Size.x >= MinimumSize.x)
+		SetWidth(Size.x);
+
+	if (Size.y <= MaximumSize.y && Size.y >= MinimumSize.y)
+		SetHeight(Size.y);
+
 }
 
 ZEVector2 ZEUIControl::GetSize()
 {
-	return Rectangle.RightDown - Rectangle.LeftUp;
+	return Rectangle.GetSize();
+}
+
+void ZEUIControl::SetMinimumSize(ZEVector2 MinimumSize)
+{
+	this->MinimumSize = MinimumSize;
+}
+
+ZEVector2 ZEUIControl::GetMinimumSize() const
+{
+	return MinimumSize;
+}
+
+void ZEUIControl::SetMaximumSize(ZEVector2 MaximumSize)
+{
+	this->MaximumSize = MaximumSize;
+}
+
+ZEVector2 ZEUIControl::GetMaximumSize() const
+{
+	return MaximumSize;
 }
 
 void ZEUIControl::SetWidth(float Width)
 {
+	if (IsFixedSized)
+		return;
+
 	DirtyVisibleRectangle = true;
-	Rectangle.RightDown.x = Rectangle.LeftUp.x + Width;
+	
+	if (Width <= MaximumSize.x && Width >= MinimumSize.x)
+		Rectangle.SetWidth(Width);
+
 }
 
 float ZEUIControl::GetWidth()
 {
-	return Rectangle.RightDown.x - Rectangle.LeftUp.x;
+	return Rectangle.GetWidth();
 }
 
 void ZEUIControl::SetHeight(float Height)
 {
+	if (IsFixedSized)
+		return;
+
 	DirtyVisibleRectangle = true;
-	Rectangle.RightDown.y = Rectangle.LeftUp.y + Height;
+
+	if (Height <= MaximumSize.x && Height >= MinimumSize.x)
+		Rectangle.SetHeight(Height);
 }
 
 float ZEUIControl::GetHeight()
 {
-	return Rectangle.RightDown.y - Rectangle.LeftUp.y;
-}
-
-bool ZEUIControl::IsVisible()
-{
-	if (ParentControl != NULL)
-		return Visibility && ParentControl->IsVisible() && ZERectangle::IntersectionTest(Rectangle, ParentControl->GetVisibleRectangle());
-	else
-		return Visibility;
+	return Rectangle.GetHeight();
 }
 
 const ZERectangle& ZEUIControl::GetRectangle()
@@ -173,64 +287,13 @@ const ZERectangle& ZEUIControl::GetVisibleRectangle()
 	if (ParentControl == NULL)
 		return Rectangle;
 
-	if(DirtyVisibleRectangle)
-	{
+	//if(DirtyVisibleRectangle)
+	//{
 		ZERectangle::Intersection(VisibleRectangle, Rectangle, ParentControl->GetVisibleRectangle());
 		DirtyVisibleRectangle = false;
-	}
+	//}
 
 	return VisibleRectangle;
-}
-
-
-void ZEUIControl::SetZOrder(int ZOrder)
-{
-	this->ZOrder = ZOrder;
-}
-
-int ZEUIControl::GetZOrder()
-{
-	return ZOrder;
-}
-
-void ZEUIControl::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-bool ZEUIControl::GetEnabled()
-{
-	return Enabled;
-}
-
-void ZEUIControl::SetVisiblity(bool Visibility)
-{
-	this->Visibility = Visibility;
-}
-
-bool ZEUIControl::GetVisibilty()
-{
-	return Visibility;
-}
-
-bool ZEUIControl::HasFocus()
-{
-	return FocusState;
-}
-
-void ZEUIControl::GainFocus()
-{
-	// IMPLAMENT !!!!!
-}
-
-void ZEUIControl::SetBackgroundColor(const ZEVector4& Color)
-{
-	BackgroundColor = Color;
-}
-
-const ZEVector4& ZEUIControl::GetBackgroundColor()
-{
-	return BackgroundColor;
 }
 
 void ZEUIControl::SetBackgroundType(ZEUIBackgroundType Type)
@@ -241,6 +304,16 @@ void ZEUIControl::SetBackgroundType(ZEUIBackgroundType Type)
 ZEUIBackgroundType ZEUIControl::GetBackgroundType()
 {
 	return BackgroundType;
+}
+
+void ZEUIControl::SetBackgroundColor(const ZEVector4& Color)
+{
+	BackgroundColor = Color;
+}
+
+const ZEVector4& ZEUIControl::GetBackgroundColor()
+{
+	return BackgroundColor;
 }
 
 void ZEUIControl::SetMouseClickedEvent(const ZEUIEventMouseClicked& Event)
@@ -298,57 +371,144 @@ void ZEUIControl::SetFocusLostEvent(const ZEUIEventFocusLost& Event)
 	FocusLostEvent = Event;
 }
 
-void ZEUIControl::Draw(ZEUIRenderer* Renderer)
+void ZEUIControl::KeyPressed(unsigned char Key)
 {
-	if (!IsVisible())
+	if (KeyPressedEvent != NULL)
+		KeyPressedEvent(Key);
+}
+
+void ZEUIControl::KeyReleased(unsigned char Key)
+{
+	if (KeyReleasedEvent != NULL)
+		KeyReleasedEvent(Key);
+}
+
+void ZEUIControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+{
+	IsPressed = true;
+
+	if (MouseButtonPressedEvent != NULL)
+		MouseButtonPressedEvent(Button, MousePosition);
+}
+
+void ZEUIControl::MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+{
+	if (IsPressed)
+		MouseClickEvent(Button, MousePosition);
+
+	IsPressed = false;
+
+	if (MouseButtonReleasedEvent != NULL)
+		MouseButtonReleasedEvent(Button, MousePosition);
+}
+
+void ZEUIControl::MouseClickEvent(ZEUIMouseKey Button, const ZEVector2& MousePosition)
+{
+	if (!IsHovered)
 		return;
 
-	if (BackgroundType == ZE_UI_BT_SOLID)
-		if (ParentControl != NULL)
-		{
-			ZEUIRectangle UIRectangle, Output;
-			UIRectangle.Positions = Rectangle;
-			UIRectangle.Texcoords = ZERectangle(ZEVector2(0.0f, 0.0f), ZEVector2(1.0f, 1.0f));
+	if (MouseClickedEvent != NULL)
+		MouseClickedEvent(Button, MousePosition);
+}
 
-			if (ZEUIRectangle::Clip(Output, UIRectangle, ParentControl->GetVisibleRectangle()))
-			{
-				Output.Material = NULL;
-				Output.ZOrder = ZOrder;
-				Output.Color = BackgroundColor;
-				Renderer->AddRectangle(Output);
-			}
-		}
-		else
-		{
-			ZEUIRectangle Output;
-			Output.Material = NULL;
-			Output.Positions = Rectangle;
-			Output.Texcoords = ZERectangle(ZEVector2(0.0f, 0.0f), ZEVector2(1.0f, 1.0f));
-			Output.ZOrder = ZOrder;
-			Output.Color = BackgroundColor;
-			Renderer->AddRectangle(Output);
-		}
+void ZEUIControl::MouseHovered(const ZEVector2& MousePosition)
+{
+	if (MouseHoveredEvent != NULL)
+		MouseHoveredEvent(MousePosition);
+}
 
-	// Draw Self
+void ZEUIControl::MouseEnterEvent(const ZEVector2& MousePosition)
+{
+	IsHovered = true;
+
+	if (MouseEnteredEvent != NULL)
+		MouseEnteredEvent(MousePosition);
+}
+
+void ZEUIControl::MouseLeaveEvent(const ZEVector2& MousePosition)
+{
+	IsHovered = false;
+
+	if (MouseLeftEvent != NULL)
+		MouseLeftEvent(MousePosition);
+}
+
+void ZEUIControl::MouseMoveEvent(const ZEVector2& MoveAmount)
+{
+	if (MouseMovedEvent != NULL)
+		MouseMovedEvent(MoveAmount);
+}
+
+void ZEUIControl::FocusLost()
+{
+	if (!IsFocusable)
+		return;
+
+	IsFocused = false;
+
+	if (FocusLostEvent != NULL)
+		FocusLostEvent();
+}
+
+void ZEUIControl::FocusGained()
+{
+	if (!IsFocusable)
+		return;
+
+	IsFocused = true;
+
+	if (FocusGainedEvent != NULL)
+		FocusGainedEvent();
+}
+
+void ZEUIControl::Draw(ZEUIRenderer* Renderer)
+{
+	if (!IsVisible)
+		return;
+
 	for (size_t I = 0; I < ChildControls.GetCount(); I++)
-		if (ChildControls[I]->IsVisible())
-			ChildControls[I]->Draw(Renderer);
+		ChildControls[I]->Draw(Renderer);
+}
+
+void ZEUIControl::Tick(float ElapsedTime)
+{
+	if (!IsEnabled)
+		return;
+
+	for (int I = 0; I < ChildControls.GetCount(); I++)
+			ChildControls[I]->Tick(ElapsedTime);
 }
 
 ZEUIControl::ZEUIControl()
 {
-	ParentControl = NULL;
-	BackgroundType = ZE_UI_BT_SOLID;
-	BackgroundColor = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
+	ParentControl	= NULL;
+	BackgroundType	= ZE_UI_BT_SOLID;
+
+	BackgroundColor = ZEVector4::One;
+	HoverColor		= ZEVector4::UnitX;
+	PressedColor	= ZEVector4::UnitY;
+	DisabledColor	= ZEVector4(0.2f, 0.2f, 0.2f, 1.0f);
+
 	BackgroundTexture = NULL;
-	HoverState = false;
-	FocusState = false;
+
+	Rectangle.LeftUp	= ZEVector2::Zero;
+	Rectangle.RightDown = ZEVector2::One;
+
+	IsFocusable		= false;
+	IsMoveable		= false;
+	IsFixedSized	= false;
+	IsModal			= false;
+	IsVisible		= true;
+	IsEnabled		= true;
+	IsHovered		= false;
+	IsFocused		= false;
+	IsPressed		= false; 
+
+	MinimumSize = ZEVector2::Zero;
+	MaximumSize = ZEVector2(1000000, 1000000);
 }
 
 ZEUIControl::~ZEUIControl()
 {
+
 }
-
-
-
-

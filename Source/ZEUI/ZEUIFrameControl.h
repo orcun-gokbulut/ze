@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEUIFrameControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,37 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#ifndef __ZE_UI_FRAME_CONTROL__
+#define __ZE_UI_FRAME_CONTROL__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
-#include "ZEUIEvents.h"
-#include "ZEInput/ZEInputMap.h"
+#include "zeui/ZEUIControl.h"
+#include "zeui/ZEUIRectangle.h"
+#include "ZEGraphics/ZEUIMaterial.h"
 
-class ZEUIControl;
-class ZEUICursorControl;
-
-class ZEUIManager
+class ZEUIFrameControl : public ZEUIControl
 {
-	private:
-		
-		ZEInputMap					InputMap;
+	friend class ZEUIBorderedFrameControl;
 
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
+	protected:
 
-		ZEUIMouseKey				PressedButton;
-		ZEUIMouseKey				PreviousPressedButton;
+		ZEUIRectangle		Frame;
+		ZEUIMaterial*		FrameMaterial;
 
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
-
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
-
-									ZEUIManager();
-									~ZEUIManager();
+		virtual void		MouseMoveEvent(const ZEVector2& MoveAmount);
 
 	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+		virtual void		Draw(ZEUIRenderer* Renderer);
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+		virtual void		SetWidth(float Width);
+		virtual void		SetHeight(float Height);
 
-		void						Destroy();
+		virtual ZEMaterial*	GetMaterial() const;
+		virtual void		SetMaterial(ZEMaterial* Material);
 
-		static ZEUIManager*			CreateInstance();
+		virtual void		SetPosition(const ZEVector2& Position);
+
+							ZEUIFrameControl();
 };
 
 #endif
-
-
-
-

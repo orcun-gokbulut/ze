@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEUIWindowControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,63 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#ifndef __ZE_UI_WINDOW_CONTROL__
+#define __ZE_UI_WINDOW_CONTROL__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
-#include "ZEUIEvents.h"
-#include "ZEInput/ZEInputMap.h"
+#include "zeui/ZEUIControl.h"
+#include "zeui/ZEUIRectangle.h"
+#include "ZEUIFrameControl.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZEUITextControl.h"
+#include "ZEUIButtonControl.h"
 
-class ZEUIControl;
-class ZEUICursorControl;
-
-class ZEUIManager
+class ZEUIWindowTitleBarControl : public ZEUIFrameControl
 {
-	private:
-		
-		ZEInputMap					InputMap;
+	friend class ZEUIWindowControl;
 
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
+	protected:
+	
+		ZEUITextControl				Title;
+		ZEUIButtonControl			CloseButton;
+		ZEUIButtonControl			MinimizeButton;
 
-		ZEUIMouseKey				PressedButton;
-		ZEUIMouseKey				PreviousPressedButton;
-
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
-
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
-
-									ZEUIManager();
-									~ZEUIManager();
+		virtual void				MouseMoveEvent(const ZEVector2& MoveAmount);
 
 	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+		void						SetTitleText(const char* TitleText);
+		const char*					GetTitleText();
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+		virtual void				SetWidth(float Width);
 
-		void						Destroy();
+									ZEUIWindowTitleBarControl();
+};
 
-		static ZEUIManager*			CreateInstance();
+class ZEUIWindowControl : public ZEUIControl
+{
+	friend class ZEUIWindowTitleBarControl;
+
+	private:
+
+		ZEUIWindowTitleBarControl	TitleBar;
+		ZEUIButtonControl			ResizeButton;
+		ZEUIFrameControl			ContentArea;
+
+		virtual void				ResizeWindow(const ZEVector2& ResizeAmount);
+		virtual void				HideContentArea(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		virtual void				CloseWindow(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+
+	public:
+
+		virtual void				SetMoveable(bool Moveable);
+		virtual void				SetWidth(float Width);
+		virtual void				SetHeight(float Height);
+		virtual void				AddChildControl(ZEUIControl* Control);
+
+		virtual void				SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial*			GetMaterial() const;
+
+									ZEUIWindowControl();
 };
 
 #endif
-
-
-
-

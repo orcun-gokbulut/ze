@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEUIFrameControl.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,65 +33,78 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
-
-#include "ZEDS\ZEArray.h"
+#include "ZEUIFrameControl.h"
 #include "ZEUIRenderer.h"
-#include "ZEUIEvents.h"
-#include "ZEInput/ZEInputMap.h"
+#include "ZEIUCheckBoxControl.h"
+#include "ZEUIHorizontalSliderControl.h"
 
-class ZEUIControl;
-class ZEUICursorControl;
-
-class ZEUIManager
+void ZEUIFrameControl::MouseMoveEvent(const ZEVector2& MoveAmount)
 {
-	private:
-		
-		ZEInputMap					InputMap;
+	ZEUIControl::MouseMoveEvent(MoveAmount);
 
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
+	if (!GetMoveable())
+		return;
 
-		ZEUIMouseKey				PressedButton;
-		ZEUIMouseKey				PreviousPressedButton;
+	else
+		SetPosition(GetPosition() + MoveAmount);
+}
 
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
+void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
+{
+	if (GetVisiblity() == false)
+		return;
 
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
+	ZEUIRectangle Output;
 
-									ZEUIManager();
-									~ZEUIManager();
+	if(!ZEUIRectangle::Clip(Output, Frame, GetVisibleRectangle()))
+		Renderer->AddRectangle(Output);
 
-	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
+	ZEUIControl::Draw(Renderer);
+}
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+void ZEUIFrameControl::SetWidth(float Width)
+{
+	ZEUIControl::SetWidth(Width);
+	Frame.Positions.LeftUp = GetRectangle().LeftUp;
+	Frame.Positions.RightDown = GetRectangle().RightDown;
+}
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+void ZEUIFrameControl::SetHeight(float Height)
+{
+	ZEUIControl::SetHeight(Height);
+	Frame.Positions.LeftUp = GetRectangle().LeftUp;
+	Frame.Positions.RightDown = GetRectangle().RightDown;
+}
 
-		void						Destroy();
+void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
+{
+	ZEUIControl::SetPosition(Position);
+	Frame.Positions.LeftUp = GetRectangle().LeftUp;
+	Frame.Positions.RightDown = GetRectangle().RightDown;
+}
 
-		static ZEUIManager*			CreateInstance();
-};
+ZEMaterial* ZEUIFrameControl::GetMaterial() const
+{
+	return FrameMaterial;
+}
 
-#endif
+void ZEUIFrameControl::SetMaterial(ZEMaterial* Material)
+{
+	FrameMaterial = (ZEUIMaterial*)Material;
+	Frame.Material = FrameMaterial;
+}
 
+ZEUIFrameControl::ZEUIFrameControl()
+{
+	FrameMaterial = ZEUIMaterial::CreateInstance();
+	FrameMaterial->SetZero();
+	Frame.Material = FrameMaterial;
+	Frame.Color = GetBackgroundColor();
+	Frame.Texcoords.LeftUp = ZEVector2::Zero;
+	Frame.Texcoords.RightDown = ZEVector2::One;
 
+	SetWidth(200);
+	SetHeight(200);
 
-
+	SetMoveable(true);
+}

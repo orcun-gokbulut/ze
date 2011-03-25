@@ -76,9 +76,13 @@ bool ZED3D9UIMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder
 	else
 		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 	
-	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, true);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
+	GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 	/*GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ALPHAREF, 0x0);

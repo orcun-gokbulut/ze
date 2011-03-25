@@ -341,11 +341,11 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 		#endif
 		Output.Color.rgb = AmbientColor;
 	#endif
-	const float3 GroundColor = float3(153, 125, 80) / 255.0f;
-	const float3 SkyColor = float3(64, 135, 178) / 255.0f;
+	const float3 SkyColor = float3(193.0f, 255.0f, 255.0f) / 255.0f;
+	const float3 GroundColor = float3(222.0f, 226.0f, 164.0f) / 255.0f;
 	
 	float3 Normal = ZEGBuffer_GetViewNormal(ScreenPosition);
-	Output.Color.rgb = lerp(GroundColor, SkyColor, 0.5 + 0.5 * dot(CameraUp, Normal));
+	Output.Color.rgb = tex2D(BaseMap, Input.Texcoord).rgb * lerp(GroundColor, SkyColor, 0.5 + 0.5 * dot(CameraUp, Normal));
 	
 	#ifdef ZE_SHADER_BASE_MAP
 		Output.Color.rgb *= tex2D(BaseMap, Input.Texcoord).rgb;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEUIHorizontalSliderControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,30 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#ifndef __ZE_UI_HORIZONTAL_SLIDER_CONTROL__
+#define __ZE_UI_HORIZONTAL_SLIDER_CONTROL__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
-#include "ZEUIEvents.h"
-#include "ZEInput/ZEInputMap.h"
+#include "ZEUISliderControl.h"
 
-class ZEUIControl;
-class ZEUICursorControl;
-
-class ZEUIManager
+class ZEUIHorizontalSliderControl : public ZEUISliderControl
 {
-	private:
-		
-		ZEInputMap					InputMap;
+	protected:
 
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
-
-		ZEUIMouseKey				PressedButton;
-		ZEUIMouseKey				PreviousPressedButton;
-
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
-
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
-
-									ZEUIManager();
-									~ZEUIManager();
+		virtual void	SetSliderValueByButton(const ZEVector2& MoveAmount);
+		virtual void	MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 
 	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+		virtual void	Draw(ZEUIRenderer* Renderer);
 
-		bool						Initialize();
-		void						Deinitialize();
+		virtual void	SetCurretnValue(float NewValue);
+
+		virtual	void	SetPosition(const ZEVector2& Position);
+		virtual void	SetWidth(float Width);
+
 		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
 
-		void						Destroy();
-
-		static ZEUIManager*			CreateInstance();
+						ZEUIHorizontalSliderControl();
 };
 
 #endif
-
-
-
-

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIManager.h
+ Zinek Engine - ZEGUIDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,31 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_UI_MANAGER_H__
-#define __ZE_UI_MANAGER_H__
+#ifndef __ZE_GUI_DEBUG_MODULE_H__
+#define __ZE_GUI_DEBUG_MODULE_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEUIRenderer.h"
-#include "ZEUIEvents.h"
-#include "ZEInput/ZEInputMap.h"
+#include "ZECore/ZEDebugModule.h"
 
-class ZEUIControl;
-class ZEUICursorControl;
+class ZEGrid;
+class ZEPlayer;
+class ZEScene;
 
-class ZEUIManager
+class ZEGUIDebugModule : public ZEDebugModule
 {
 	private:
-		
-		ZEInputMap					InputMap;
-
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
-		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
-
-		ZEUIMouseKey				PressedButton;
-		ZEUIMouseKey				PreviousPressedButton;
-
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
-
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
-
-									ZEUIManager();
-									~ZEUIManager();
+		ZEPlayer*				Player;
+		ZEGrid*					Grid;
+		ZEScene*				Scene;
 
 	public:
-	
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+		virtual bool			Initialize();
+		virtual void			Deinitialize();
 
-		bool						Initialize();
-		void						Deinitialize();
-		
-		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
-		void						Tick(float ElapsedTime);
+		virtual void			Process(float ElapsedTime);
 
-		void						Destroy();
-
-		static ZEUIManager*			CreateInstance();
+								ZEGUIDebugModule();
+		virtual					~ZEGUIDebugModule();
 };
 
 #endif
-
-
-
-
