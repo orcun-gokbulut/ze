@@ -52,42 +52,30 @@
 class ZEComponent;
 struct ZEDrawParameters;
 
-enum ZEBoundingVolumeMechnism
-{
-	ZE_BVM_NO_BOUNDING_VOLUME	= 0,
-	ZE_BVM_USE_LOCAL_ONLY		= 1,
-	ZE_BVM_USE_COMPONENTS		= 2,
-	ZE_BVM_USE_BOTH				= 3
-};
-
 ZE_META_ENTITY_DESCRIPTION(ZECompoundEntity);
 
 class ZECompoundEntity : public ZEEntity
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZECompoundEntity)
 	private:
-		ZEDrawFlags								DrawFlags;
 		ZERayCastFlags							RayCastFlags;
-		ZEBoundingVolumeMechnism				BoundingVolumeMechanism;
 
 	protected:
-		ZEArray<ZEComponent*>				Components;
+		ZEArray<ZEComponent*>					Components;
+
+		void									UpdateComponentTransforms();
 
 		void									RegisterComponent(ZEComponent* Component);
 		void									UnregisterComponent(ZEComponent* Component);	
-
-		void									SetBoundingVolumeMechanism(ZEBoundingVolumeMechnism Mechanism);
-
-		void									UpdateComponents();
+		
+												ZECompoundEntity();
+		virtual									~ZECompoundEntity();
 
 	public:
 		virtual ZEEntityType					GetEntityType();
 
-		const ZEArray<ZEComponent *>&		GetComponents();
+		const ZEArray<ZEComponent *>&			GetComponents() const;
 
-		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
-
-		virtual ZEDWORD							GetDrawFlags() const;
 		virtual ZEDWORD							GetRayCastFlags() const;
 
 		virtual void							SetPosition(const ZEVector3& NewPosition);
@@ -99,19 +87,21 @@ class ZECompoundEntity : public ZEEntity
 		virtual void							Deinitialize();
 		
 		virtual void							Tick(float Time);
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-		
-		void									UpdateBoundingVolumes();
-
-												ZECompoundEntity();
-		virtual									~ZECompoundEntity();
 };
 
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZECompoundEntity" parent="ZEEntity"/>
+		<class name="ZECompoundEntity" parent="ZEEntity">
+			<noinstance>true</noinstance>
+			<container name="Components" baseclass="ZEComponent" allowderived="true"
+				addfunction="RegisterComponent"
+				removefunction="UnregisterComponent"
+				getfunction="GetComponents().GetConstCArray"
+				getcountfunction="GetComponents().GetCount"
+				description="This container contains components that entity includes"/>
+		</class>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()

@@ -42,7 +42,7 @@ extern HINSTANCE ApplicationInstance;
 
 bool zeInitialize(void* Instance, void* WindowHandle)
 {
-	_set_SSE2_enable(1);
+	//_set_SSE2_enable(1);
 	ApplicationInstance = *((HINSTANCE*)Instance);
 	return zeCore->StartUp(WindowHandle);
 }

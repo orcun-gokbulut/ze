@@ -47,6 +47,11 @@ ZEUIMaterial::~ZEUIMaterial()
 	
 }
 
+ZEMaterialFlags ZEUIMaterial::GetMaterialFlags() const
+{
+	return ZE_MTF_NONE;
+}
+
 void ZEUIMaterial::SetZero()
 {
 	WireFrame = false;

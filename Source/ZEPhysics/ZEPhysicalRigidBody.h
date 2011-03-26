@@ -44,80 +44,94 @@ class ZEPhysicalShape;
 
 enum ZEPhysicalBodyType
 {
-	ZE_PBT_DYNAMIC,
-	ZE_PBT_KINEMATIC,
-	ZE_PBT_STATIC,
+	ZE_PBT_DYNAMIC		= 0,
+	ZE_PBT_KINEMATIC	= 1,
+	ZE_PBT_STATIC		= 2
+};
+
+enum ZEPhysicalForceMode
+{
+	ZE_PFM_FORCE					= 0,                 
+	ZE_PFM_IMPULSE					= 1,               
+	ZE_PFM_VELOCITY_CHANGE			= 2,			
+	ZE_PFM_SMOOTH_IMPULSE			= 3,        
+	ZE_PFM_SMOOTH_VELOCITY_CHANGE	= 4,
+	ZE_PFM_ACCELERATION				= 5				
 };
 
 class ZEPhysicalRigidBody : public ZEPhysicalObject
 {
-	protected:
-		ZEPhysicalTransformChangeCallback		TransformChangeCallback;
+protected:
+	ZEPhysicalBodyType					PhysicalBodyType;
 
-												ZEPhysicalRigidBody(){}
-		virtual									~ZEPhysicalRigidBody(){}
-								
-	public:							
-		virtual ZEPhysicalObjectType			GetPhysicalObjectType();
+	ZEPhysicalRigidBody(){}
+	virtual								~ZEPhysicalRigidBody(){}
 
-		virtual const				
-		ZEArray<ZEPhysicalShape*>&				GetPhysicalShapes() = 0;
-		virtual void							AddPhysicalShape(ZEPhysicalShape* Shape) = 0;
-		virtual void							RemovePhysicalShape(ZEPhysicalShape* Shape) = 0;
-								
-		virtual void							SetKinematic(bool Enabled) = 0;
-		virtual bool							GetKinematic() = 0;
-									
-		virtual void							SetMass(float NewMass) = 0;
-		virtual float							GetMass() = 0;
+public:							
+	virtual ZEPhysicalObjectType		GetPhysicalObjectType();
 
-		virtual	void							SetGravityEnabled(bool Enabled) = 0;
-		virtual bool							GetGravityEnabled() = 0;
+	virtual const				
+		ZEArray<ZEPhysicalShape*>&		GetPhysicalShapes() = 0;
+	virtual void						AddPhysicalShape(ZEPhysicalShape* Shape) = 0;
+	virtual void						RemovePhysicalShape(ZEPhysicalShape* Shape) = 0;
 
-		virtual void							SetLockPositon(bool Enabled) =0 ;
-		virtual bool							GetLockPosition() = 0;
+	virtual void						SetPhysicalBodyType(ZEPhysicalBodyType Type) = 0;
+	virtual ZEPhysicalBodyType			GetPhysicalBodyType() const = 0;
 
-		virtual void							SetLockRotation(bool Enabled) = 0;
-		virtual bool							GetLockRotation() = 0;
+	virtual void						SetMass(float NewMass) = 0;
+	virtual float						GetMass() = 0;
 
-		virtual void							SetMassCenterPosition(const ZEVector3& NewPosition) = 0;
-		virtual ZEVector3						GetMassCenterPosition() = 0;
+	virtual	void						SetGravityEnabled(bool Enabled) = 0;
+	virtual bool						GetGravityEnabled() = 0;
 
-		virtual void							SetMassCenterRotation(const ZEQuaternion& Rotation) = 0;
-		virtual ZEQuaternion					GetMassCenterRotation() = 0;
-								
-		virtual void							SetLinearVelocity(const ZEVector3& NewVelocity)  = 0;
-		virtual ZEVector3						GetLinearVelocity() = 0;
-								
-		virtual void							SetAngularVelocity(const ZEVector3& NewVelocity) = 0;
-		virtual ZEVector3						GetAngularVelocity() = 0;
-									
-		virtual void							SetLinearDamping(float NewLinearDamping) = 0;
-		virtual float							GetLinearDamping() = 0;
-									
-		virtual void							SetAngularDamping(float NewAngularDamping) = 0;
-		virtual float							GetAngularDamping() = 0;
-									
-		virtual void							SetLinearMomentum(const ZEVector3& NewLinearMomentum) = 0;
-		virtual ZEVector3						GetLinearMomentum() = 0;
-								
-		virtual void							SetAngularMomentum(const ZEVector3& NewAngularMomentum) = 0;
-		virtual ZEVector3						GetAngularMomentum() = 0;
-								
-		virtual void							ApplyForce(const ZEVector3& Force) = 0;
-		virtual void							ApplyTorque(const ZEVector3& Torque) = 0;
-								
-		virtual void							ApplyLocalForce(const ZEVector3& Force) = 0;
-		virtual void							ApplyLocalTorque(const ZEVector3& Torque) = 0;
+	virtual void						SetLockPositon(bool Enabled) =0 ;
+	virtual bool						GetLockPosition() = 0;
 
-		virtual void							SetTransformChangeCallback(const ZEPhysicalTransformChangeCallback& TransfromChangeCallback);
-		virtual const
-		ZEPhysicalTransformChangeCallback&		GetTransformChangeCallback();
-	
-		virtual bool							Initialize() = 0;
-		virtual void							Deinitialize() = 0;
+	virtual void						SetLockRotation(bool Enabled) = 0;
+	virtual bool						GetLockRotation() = 0;
 
-		static ZEPhysicalRigidBody*				CreateInstance();
+	virtual void						SetMassCenterPosition(const ZEVector3& NewPosition) = 0;
+	virtual ZEVector3					GetMassCenterPosition() = 0;
+
+	virtual void						SetMassCenterRotation(const ZEQuaternion& Rotation) = 0;
+	virtual ZEQuaternion				GetMassCenterRotation() = 0;
+
+	virtual void						SetLinearVelocity(const ZEVector3& NewVelocity)  = 0;
+	virtual ZEVector3					GetLinearVelocity() = 0;
+
+	virtual void						SetAngularVelocity(const ZEVector3& NewVelocity) = 0;
+	virtual ZEVector3					GetAngularVelocity() = 0;
+
+	virtual void						SetLinearDamping(float NewLinearDamping) = 0;
+	virtual float						GetLinearDamping() = 0;
+
+	virtual void						SetAngularDamping(float NewAngularDamping) = 0;
+	virtual float						GetAngularDamping() = 0;
+
+	virtual void						SetLinearMomentum(const ZEVector3& NewLinearMomentum) = 0;
+	virtual ZEVector3					GetLinearMomentum() = 0;
+
+	virtual void						SetAngularMomentum(const ZEVector3& NewAngularMomentum) = 0;
+	virtual ZEVector3					GetAngularMomentum() = 0;
+
+	virtual void						ApplyForce(const ZEVector3& Force, ZEPhysicalForceMode ForceMode, bool IsWakeUp) = 0;
+	virtual void						ApplyTorque(const ZEVector3& Torque, ZEPhysicalForceMode ForceMode, bool IsWakeUp) = 0;
+
+	virtual void						ApplyLocalForce(const ZEVector3& Force, ZEPhysicalForceMode ForceMode, bool IsWakeUp) = 0;
+	virtual void						ApplyLocalTorque(const ZEVector3& Torque, ZEPhysicalForceMode ForceMode, bool IsWakeUp) = 0;
+
+	virtual void						ApplyForceAtPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp) = 0;
+	virtual void						ApplyForceAtLocalPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp) = 0;
+
+	virtual void						ApplyLocalForceAtPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp) = 0;
+	virtual void						ApplyLocalForceAtLocalPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp) = 0;
+
+	virtual float						GetComputedKineticEnergy() const = 0;
+
+	virtual bool						Initialize() = 0;
+	virtual void						Deinitialize() = 0;
+
+	static ZEPhysicalRigidBody*			CreateInstance();
 };
 
 #endif

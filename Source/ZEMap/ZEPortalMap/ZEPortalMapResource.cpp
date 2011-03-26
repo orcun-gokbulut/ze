@@ -35,7 +35,6 @@
 
 #include "ZEPortalMapResource.h"
 #include "ZEPortalMapFileFormat.h"
-#include "ZEPortalMapPortalOctree.h"
 
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEConsole.h"
@@ -44,22 +43,22 @@
 #include "ZECore\ZEResourceManager.h"
 #include "ZEGraphics\ZETexture2DResource.h"
 #include "ZEGraphics\ZEFixedMaterial.h"
-#include "ZEPhysics\ZEPhysicalStaticMesh.h"
+#include "ZEPhysics\ZEPhysicalMesh.h"
 #include <string.h>
 
 // Reading
-#define ZESHADER_SKINTRANSFORM				1
-#define ZESHADER_DIFFUSEMAP					2
-#define ZESHADER_NORMALMAP					4
-#define ZESHADER_SPECULARMAP				8
-#define ZESHADER_EMMISIVEMAP				16
-#define ZESHADER_OCAPASITYMAP				32
-#define ZESHADER_DETAILDIFFUSEMAP			64
-#define ZESHADER_DETAILNORMALMAP			128
-#define ZESHADER_REFLECTION					256
-#define ZESHADER_REFRACTION					512
-#define ZESHADER_LIGHTMAP					1024
-#define ZESHADER_DISTORTIONMAP				2048
+#define ZE_SHADER_SKINTRANSFORM				1
+#define ZE_SHADER_BASE_MAP					2
+#define ZE_SHADER_NORMAL_MAP					4
+#define ZE_SHADER_SPECULAR_MAP				8
+#define ZE_SHADER_EMMISIVE_MAP				16
+#define ZE_SHADER_OPACITY_MAP				32
+#define ZE_SHADER_DETAIL_BASE_MAP			64
+#define ZE_SHADER_DETAIL_NORMAL_MAP			128
+#define ZE_SHADER_REFLECTION					256
+#define ZE_SHADER_REFRACTION					512
+#define ZE_SHADER_LIGHT_MAP					1024
+#define ZE_SHADER_DISTORTION_MAP				2048
 
 const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(char* FileName)
 {
@@ -103,123 +102,50 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetZero();
 		CurrentMaterial->SetTwoSided(false);
 		CurrentMaterial->SetDiffuseEnabled(true);
-		CurrentMaterial->SetAmbientEnabled(true);
+		CurrentMaterial->SetAmbientEnabled(false);
 		CurrentMaterial->SetSpecularEnabled(true);
 		CurrentMaterial->SetEmmisiveEnabled(true);
 		
 		CurrentMaterial->SetTwoSided(MaterialChunk.TwoSided);
 		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
-		CurrentMaterial->SetTransparancyMode(MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE : ZE_MTM_NOTRANSPARACY);
+		CurrentMaterial->SetTransparancyMode(MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE : ZE_MTM_NONE);
 
 		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor);
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);
 		CurrentMaterial->SetSpecularColor(MaterialChunk.SpecularColor);
 		CurrentMaterial->SetEmmisiveColor(MaterialChunk.EmmisiveColor);
 		CurrentMaterial->SetEmmisiveFactor(MaterialChunk.EmmisiveFactor);
+		CurrentMaterial->SetSpecularEnabled(false);
 		CurrentMaterial->SetSpecularFactor(1.0f);
-		CurrentMaterial->SetSpecularShininess((1.25f - MaterialChunk.SpecularFactor) * 128.0f);
+		CurrentMaterial->SetSpecularShininess(MaterialChunk.SpecularFactor);
 		CurrentMaterial->SetOpacity(MaterialChunk.Transparancy);
 		CurrentMaterial->SetReflectionFactor(MaterialChunk.ReflectionFactor);
 		CurrentMaterial->SetRefractionFactor(MaterialChunk.RefractionFactor);
 		CurrentMaterial->SetDetailMapTiling(MaterialChunk.DetailMapTiling);
 
-		CurrentMaterial->SetDiffuseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap));
+		CurrentMaterial->SetBaseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap));
 		
-		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_NORMALMAP);
+		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_NORMAL_MAP);
 		CurrentMaterial->SetNormalMap(ManageMapMaterialTextures(MaterialChunk.NormalMap));
 		CurrentMaterial->SetSpecularMap(ManageMapMaterialTextures(MaterialChunk.SpecularMap));
 		CurrentMaterial->SetEmmisiveMap(ManageMapMaterialTextures(MaterialChunk.EmmisiveMap));
 		CurrentMaterial->SetOpacityMap(ManageMapMaterialTextures(MaterialChunk.OpacityMap));
 		
-		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_DETAILNORMALMAP);
-		CurrentMaterial->SetDetailDiffuseMap(ManageMapMaterialTextures(MaterialChunk.DetailMap));
+		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_DETAIL_NORMAL_MAP);
+		CurrentMaterial->SetDetailBaseMap(ManageMapMaterialTextures(MaterialChunk.DetailMap));
 		CurrentMaterial->SetDetailNormalMap(ManageMapMaterialTextures(MaterialChunk.DetailNormalMap));
-		CurrentMaterial->SetReflectionEnabled(false);
-		CurrentMaterial->SetRefractionMap(NULL);//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap);
-		CurrentMaterial->SetRefractionEnabled(false);
-		CurrentMaterial->SetRefractionMap(NULL);
 
-		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZESHADER_LIGHTMAP);
+		CurrentMaterial->SetReflectionEnabled(false);
+		CurrentMaterial->SetRefractionEnabled(false);
+
+		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_LIGHT_MAP);
 		CurrentMaterial->SetLightMap(ManageMapMaterialTextures(MaterialChunk.LightMap));
 
 		CurrentMaterial->UpdateMaterial();
 	}
 	return true;
 }
-
-/*static bool ReadOctreeNodeFromFile(ZEResourceFile* ResourceFile, ZEOctree* Octree, ZEArray<ZEMaterial*>& Materials)
-{
-	ZEMapFileOctreeChunk	FileOctree;
-	
-	// Read octree header
-	ResourceFile->Read(&FileOctree, sizeof(ZEMapFileOctreeChunk), 1);
-
-	// Check chunk id
-	if (FileOctree.ChunkIdentifier != ZE_MAP_OCTREE_CHUNK)
-	{
-		zeError("Map Resource", "Octree chunk's id does not match.");
-		return false;
-	}
-
-	// Map octree attributes
-	Octree->BoundingBox = FileOctree.BoundingBox;
-	Octree->IsLeaf = FileOctree.IsLeaf;
-	
-	if (FileOctree.PolygonCount != 0)
-	{
-		// if node is leaf node then read polygon ids.
-		ZEDWORD ChunkIndentifier;
-		ResourceFile->Read(&ChunkIndentifier, sizeof(ZEDWORD), 1);
-
-		// Check chunk indentifier
-		if (ChunkIndentifier != ZE_MAP_OCTREE_POLYGONIDS_CHUNK)
-		{
-			zeError("Map Resource", "Octree Polygons' chunk id does not match.");
-			return false;
-		}
-
-		// Read ids of polygons that is included in this octree node
-		ZEArray<ZEMapFilePolygonChunk> MapPolygons;
-		MapPolygons.SetCount(FileOctree.PolygonCount);
-		ResourceFile->Read(MapPolygons.GetCArray(), sizeof(ZEMapFilePolygonChunk), MapPolygons.GetCount());
-		if (!SortVertices((ZEStaticVertexBuffer**)&Octree->VertexBuffer, Octree->RenderOrders, MapPolygons, Materials))
-			return false;
-
-	}
-
-	if(!FileOctree.IsLeaf)
-	{
-		// if node is not leaf recursively create and load sub nodes
-		for(int I = 0; I < 8; I++)
-			if(FileOctree.SubSpaces[I])
-			{
-				// if sub note is available create it and load it
-				Octree->SubTrees[I] = new ZEOctree();
-				Octree->SubTrees[I]->Depth = Octree->Depth + 1;
-				if (!ReadOctreeNodeFromFile(ResourceFile, Octree->SubTrees[I], Materials))
-					return false;
-			}
-			else
-				Octree->SubTrees[I] = NULL;
-	}
-
-	return true;
-}
-
-static bool ReadOctreeFromFile(ZEResourceFile* ResourceFile, ZEOctree** Octree, ZEArray<ZEMaterial*>& Materials)
-{
-	// Create octree
-	*Octree = new ZEOctree();
-	(*Octree)->Depth = 0;
-
-	// Load it
-	if (!ReadOctreeNodeFromFile(ResourceFile, *Octree, Materials))
-		return false;
-
-	return true;
-}*/
-
 
 bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourcePortal* Portal)
 {
@@ -259,7 +185,14 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile,
 
 	// Read physical mesh polygons
 	Portal->PhysicalMesh.Polygons.SetCount(FilePhysicalMesh.PolygonCount);
-	ResourceFile->Read(Portal->PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygonChunk), Portal->PhysicalMesh.Polygons.GetCount());
+	for (size_t I = 0; I < FilePhysicalMesh.PolygonCount; I++)
+	{
+		ZEMapFilePhysicalMeshPolygonChunk Chunk;
+		ResourceFile->Read(&Chunk, sizeof(ZEMapFilePhysicalMeshPolygonChunk), 1);
+		Portal->PhysicalMesh.Polygons[I].Indices[0] = Chunk.Indices[0];
+		Portal->PhysicalMesh.Polygons[I].Indices[1] = Chunk.Indices[1];
+		Portal->PhysicalMesh.Polygons[I].Indices[2] = Chunk.Indices[2];
+	}
 
 	return true;
 }
@@ -434,7 +367,7 @@ const ZEArray<ZEPortalMapResourceDoor>& ZEPortalMapResource::GetDoors()
 	return Doors;
 }
 
-const ZEPortalMapResource* ZEPortalMapResource::LoadSharedResource(const char* FileName)
+ZEPortalMapResource* ZEPortalMapResource::LoadSharedResource(const char* FileName)
 {
 	// Try to get instance of shared ZEMap file from resource manager
 	ZEPortalMapResource* Resource = (ZEPortalMapResource*)zeResources->GetResource(FileName);

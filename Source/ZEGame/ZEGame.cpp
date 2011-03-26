@@ -38,6 +38,7 @@
 #include "ZECore\ZEError.h"
 #include "ZEUI\ZEUIManager.h"
 #include "ZEGraphics\ZECamera.h"
+#include "ZEMath/ZEMathDefinitions.h"
 #include <string.h>
 
 ZEGameDescription* ZEGame::GetGameDescription()
@@ -48,85 +49,6 @@ ZEGameDescription* ZEGame::GetGameDescription()
 ZEScene* ZEGame::GetScene()
 {
 	return Scene;
-}
-
-bool ZEGame::RegisterEntityDescription(ZEEntityDescription* EntityDescription)
-{
-	for (size_t I = 0; I < EntityDescriptions.GetCount(); I++)
-		if (stricmp(EntityDescriptions[I]->GetName(), EntityDescription->GetName()) == 0)
-		{
-			zeError("Entity Provider", "Entity declaration already registered. (Entity Description Name : \"%s\")", EntityDescription->GetName());
-			return false;
-		}
-
-	EntityDescriptions.Add(EntityDescription);
-	return true;
-}
-
-void ZEGame::UnregisterEntityDescription(ZEEntityDescription* EntityDescription)
-{
-	EntityDescriptions.DeleteValue(EntityDescription);
-}
-
-const ZEArray<ZEEntityDescription*> ZEGame::GetEntityDescriptions()
-{
-	return EntityDescriptions;
-}
-
-ZEEntityDescription* ZEGame::GetEntityDescription(size_t Index)
-{
-	return EntityDescriptions[Index];
-}
-
-ZEEntityDescription* ZEGame::GetEntityDescription(const char* EntityTypeName)
-{
-	for (size_t I = 0; I < EntityDescriptions.GetCount(); I++)
-		if (stricmp(EntityTypeName, EntityDescriptions[I]->GetName()) == 0)
-			return EntityDescriptions[I];
-	return NULL;
-}
-
-
-ZEEntity* ZEGame::CreateEntityInstance(size_t Index)
-{
-	ZEEntityDescription* Description = GetEntityDescription(Index);
-	if (Description == NULL)
-	{
-		zeError("Game", "Game can not create entity becouse it is not registered. (Entity Index : %d).", Index);
-		return NULL;
-	}
-	else
-	{
-		ZEEntity* Entity = (ZEEntity*)Description->CreateInstance();
-		if (Entity == NULL)
-		{
-			zeError("Game", "Game can not create instance of entity.  (Entity Index : %d).",  Description->GetName());
-			return NULL;
-		}
-		else
-			return Entity;
-	}
-}
-
-ZEEntity* ZEGame::CreateEntityInstance(const char* EntityTypeName)
-{
-	ZEEntityDescription* Description = GetEntityDescription(EntityTypeName);
-	if (Description == NULL)
-	{
-		zeError("Game", "Game can not create entity becouse it is not registered. (Entity Index : %d).",  Description->GetName());
-		return NULL;
-	}
-	else
-	{
-		ZEEntity* Entity = (ZEEntity*)Description->CreateInstance();
-		if (Entity == NULL)
-		{
-			zeError("Game", "Game can not create instance of entity. (Entity Type Name : \"%s\").",  Description->GetName());
-			return NULL;
-		}
-		else
-			return Entity;
-	}
 }
 
 #include "ZEUI\ZEFontResource.h"
@@ -182,9 +104,9 @@ void ZEGame::Destroy()
 void ZEGame::Render(float ElapsedTime)
 {
 	Scene->Render(ElapsedTime);
-	UIManager->Render(Scene->GetRenderer());
+	//UIManager->Render(Scene->GetRenderer());
 	Scene->GetRenderer()->Render(ElapsedTime);
-	Scene->GetRenderer()->ClearList();
+	Scene->GetRenderer()->ClearLists();
 }
 
 #include "ZEDS\ZEString.h"
@@ -193,18 +115,18 @@ void ZEGame::Render(float ElapsedTime)
 #include <stdio.h>
 void ZEGame::Tick(float ElapsedTime)
 {
-	static float FPSSamples[3000];
-	static size_t FPSSampleIndex;
+	static float TotalElapsedTime = 0;
+	static unsigned int AverageFPS = 0;
+	static unsigned int FrameCount = 0;
 
-	FPSSamples[FPSSampleIndex] = 1 /ElapsedTime;
-	FPSSampleIndex = (FPSSampleIndex == 2999 ? 0 : FPSSampleIndex + 1);
-
-	float AverageFPS = 0.0f;
-	for (size_t I = 0; I < 3000; I++)
-		AverageFPS += FPSSamples[I];
-
-	AverageFPS /= 3000.0f;
-
+	FrameCount++;
+	TotalElapsedTime += ElapsedTime;
+	if (TotalElapsedTime > 1.0f)
+	{
+		TotalElapsedTime = 0.0f;
+		AverageFPS = FrameCount;
+		FrameCount = 0;
+	}
 
 	ZEVector3 Position;
 	ZEQuaternion Rotation;
@@ -224,29 +146,19 @@ void ZEGame::Tick(float ElapsedTime)
 	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, Rotation);
 	
 	char Buffer[400];
-	sprintf(Buffer, "Current FPS: %.0f, Average FPS: %.0f, Position : [%f, %f, %f], Rotation : [%f, %f, %f]", 
-		1.0f / ElapsedTime, AverageFPS, Position.x, Position.y, Position.z,
-		Pitch, Yaw, Roll);
+	sprintf(Buffer, "Position : [%.2f, %.2f, %.2f], Rotation : [%.2f, %.2f, %.2f], Average FPS: %d, Current FPS: %.0f", 
+		Position.x, Position.y, Position.z,
+		ZERAD2DEG(Pitch), ZERAD2DEG(Yaw), ZERAD2DEG(Roll), 
+		AverageFPS, 1.0f / ElapsedTime);
 	
-	((ZEUITextControl*)UIManager->GetControls()[0])->SetText(Buffer);
+//	((ZEUITextControl*)UIManager->GetControls()[0])->SetText(Buffer);
 	Scene->Tick(ElapsedTime);
 }
- 
-#include "ZEPlayer.h"
-#include "ZELightBrush.h"
-#include "ZEModelBrush.h"
-#include "ZESkyBrush.h"
-#include "..\ZEParticle\ZEParticleEffectBrush.h"
 
 ZEGame::ZEGame()
 {
 	Scene = NULL;
 	UIManager = NULL;
-	RegisterEntityDescription((ZEEntityDescription*)ZEPlayer::ClassDescription());
-	RegisterEntityDescription((ZEEntityDescription*)ZELightBrush::ClassDescription());
-	RegisterEntityDescription((ZEEntityDescription*)ZEModelBrush::ClassDescription());
-	RegisterEntityDescription((ZEEntityDescription*)ZESkyBrush::ClassDescription());
-	RegisterEntityDescription((ZEEntityDescription*)ZEParticleEffectBrush::ClassDescription());
 }
 
 ZEGame::~ZEGame()

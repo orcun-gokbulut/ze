@@ -39,8 +39,11 @@
 
 #include "ZEGame\ZEComponent.h"
 
+ZE_META_ENTITY_DESCRIPTION(ZEListener);
+
 class ZEListener: public ZEComponent
-{	
+{
+	ZE_META_ENTITY(ZEListener)
 	protected:
 		float					DistanceFactor;
 		float					DopplerFactor;
@@ -53,13 +56,13 @@ class ZEListener: public ZEComponent
 		bool					IsActiveListener();
 		void					SetActiveListener();
 
-		float					GetDistanceFactor();
+		float					GetDistanceFactor() const;
 		virtual void			SetDistanceFactor(float NewDistanceFactor);
 		
-		float					GetDopplerFactor();
+		float					GetDopplerFactor() const;
 		virtual void			SetDopplerFactor(float NewDopplerFactor);
 		
-		float					GetRollOffFactor();
+		float					GetRollOffFactor() const;
 		virtual void			SetRollOffFactor(float NewRollOffFactor);
 
 		static ZEListener*		CreateInstance();
@@ -67,6 +70,17 @@ class ZEListener: public ZEComponent
 
 #endif
 
-
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEListener" parent="ZEComponent">
+			<description>Listener</description>
+			<property name="DistanceFactor" type="float" autogetset="yes"/>
+			<property name="DopplerFactor" type="float" autogetset="yes"/>
+			<property name="RollOffFactor" type="float" autogetset="yes"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/

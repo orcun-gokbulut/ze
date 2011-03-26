@@ -36,12 +36,14 @@
 #include "ZECore\ZECore.h"
 #include "ZEPortalMapPortal.h"
 #include "ZEPortalMapResource.h"
-#include "ZEPhysics\ZEPhysicalStaticMesh.h"
+#include "ZEPhysics\ZEPhysicalMesh.h"
 #include "ZEGraphics\ZELight.h"
 #include "ZEGraphics\ZEVertexBuffer.h"
 #include "ZEGraphics\ZERenderer.h"
 #include "ZEGame\ZEDrawParameters.h"
-
+#include "ZEGame\ZEScene.h"
+#include "ZEPhysics\ZEPhysicalWorld.h"
+#include "ZEMap\ZEPortalMap\ZEPortalMap.h"
 ZEPortalMap* ZEPortalMapPortal::GetOwner()
 {
 	return Owner;
@@ -65,7 +67,7 @@ const ZEAABoundingBox& ZEPortalMapPortal::GetBoundingBox()
 	return Resource->BoundingBox;
 }
 
-ZEPhysicalStaticMesh* ZEPortalMapPortal::GetPhysicalMesh()
+ZEPhysicalMesh* ZEPortalMapPortal::GetPhysicalMesh()
 {
 	return PhysicalMesh;
 }
@@ -74,6 +76,7 @@ void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 {
 	for(size_t I = 0; I < RenderOrders.GetCount(); I++)
 	{
+		RenderOrders[I].WorldMatrix = Owner->GetWorldTransform();
 		RenderOrders[I].Lights.Clear();
 		RenderOrders[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
 
@@ -81,57 +84,91 @@ void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 	}
 }
 
-#include "ZECore\ZEConsole.h"
 bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource)
 {	
-	//int LastIteration = zeCore->GetFrameId() + 1;
-	RenderOrders.Clear();
+	// Initialize Render Components
 	if (VertexBuffer == NULL)
-		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
-
-	if (!VertexBuffer->Create(Resource->Polygons.GetCount() * 3 * sizeof(ZEMapVertex)))
-		return false;
-	
-	ZEArray<bool> Processed;
-	Processed.SetCount(Resource->Polygons.GetCount());
-	Processed.FillWith(false);
-
-	size_t VertexIndex = 0;
-	ZEMapVertex* Buffer = (ZEMapVertex*)VertexBuffer->Lock();	
-	for (size_t N = 0; N < Resource->Polygons.GetCount(); N++)
 	{
-		//if (Resource->Polygons[N].LastIteration != LastIteration)
-		if (!Processed[N])
+		RenderOrders.Clear();
+		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
+		if (!VertexBuffer->Create(Resource->Polygons.GetCount() * 3 * sizeof(ZEMapVertex)))
+			return false;
+
+		ZEArray<bool> Processed;
+		Processed.SetCount(Resource->Polygons.GetCount());
+		Processed.FillWith(false);
+
+		size_t VertexIndex = 0;
+		ZEMapVertex* Buffer = (ZEMapVertex*)VertexBuffer->Lock();	
+		for (size_t N = 0; N < Resource->Polygons.GetCount(); N++)
 		{
-			zeLog("Portal", "New render order.");
-			ZEMaterial* Material = Resource->Polygons[N].Material;
-			ZERenderOrder* RenderOrder = RenderOrders.Add();
-
-			RenderOrder->SetZero();
-			RenderOrder->Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-			RenderOrder->Material = Material;
-			RenderOrder->PrimitiveType = ZE_ROPT_TRIANGLE;
-			RenderOrder->VertexBufferOffset = VertexIndex;
-			RenderOrder->VertexBuffer = VertexBuffer;
-			RenderOrder->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();
-			ZEMatrix4x4::CreateIdentity(RenderOrder->WorldMatrix);
-			
-			RenderOrder->PrimitiveCount = 0;
-			for (size_t I = N; I < Resource->Polygons.GetCount(); I++)
+			if (!Processed[N])
 			{
-				if (Resource->Polygons[I].Material != Material)
-					continue;
+				ZEMaterial* Material = Resource->Polygons[N].Material;
+				ZERenderOrder* RenderOrder = RenderOrders.Add();
 
-				memcpy(Buffer + VertexIndex, Resource->Polygons[I].Vertices, sizeof(ZEMapVertex) * 3);
-				VertexIndex += 3;
-				RenderOrder->PrimitiveCount++;
-				//Resource->Polygons[I].LastIteration = LastIteration;
-				Processed[I] = true;
+				RenderOrder->SetZero();
+				RenderOrder->Priority = 2;
+				RenderOrder->Order = 1;
+				RenderOrder->Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
+				RenderOrder->Material = Material;
+				RenderOrder->PrimitiveType = ZE_ROPT_TRIANGLE;
+				RenderOrder->VertexBufferOffset = VertexIndex;
+				RenderOrder->VertexBuffer = VertexBuffer;
+				RenderOrder->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();
+				ZEMatrix4x4::CreateIdentity(RenderOrder->WorldMatrix);
+
+				RenderOrder->PrimitiveCount = 0;
+				for (size_t I = N; I < Resource->Polygons.GetCount(); I++)
+				{
+					if (Resource->Polygons[I].Material != Material)
+						continue;
+
+					memcpy(Buffer + VertexIndex, Resource->Polygons[I].Vertices, sizeof(ZEMapVertex) * 3);
+					VertexIndex += 3;
+					RenderOrder->PrimitiveCount++;
+					Processed[I] = true;
+				}
+
 			}
-
 		}
+		VertexBuffer->Unlock();
 	}
-	VertexBuffer->Unlock();
+
+	ZEArray<ZEVector3> PhysicalVertices;
+	ZEArray<ZEPhysicalTriangle> PhysicalTriangles;
+
+	PhysicalVertices.SetCount(Resource->Polygons.GetCount() * 3);
+	PhysicalTriangles.SetCount(Resource->Polygons.GetCount());
+
+	for (size_t I = 0; I < PhysicalTriangles.GetCount(); I++)
+	{
+		PhysicalVertices[3 * I] = Resource->Polygons[I].Vertices[0].Position;
+		PhysicalVertices[3 * I + 1] = Resource->Polygons[I].Vertices[1].Position;
+		PhysicalVertices[3 * I + 2] = Resource->Polygons[I].Vertices[2].Position;
+	}
+	for (size_t I = 0; I < PhysicalTriangles.GetCount(); I++)
+	{
+		PhysicalTriangles[I].MaterialIndex = 0;
+		PhysicalTriangles[I].Indices[0] =  3 * I;
+		PhysicalTriangles[I].Indices[1] =  3 * I + 1;
+		PhysicalTriangles[I].Indices[2] =  3 * I + 2;
+	}
+
+	if (PhysicalMesh == NULL && Resource->HasPhysicalMesh)
+	{
+		PhysicalMesh = ZEPhysicalMesh::CreateInstance();
+		PhysicalMesh->SetData(PhysicalVertices.GetConstCArray(), 
+							  PhysicalVertices.GetCount(),
+							  PhysicalTriangles.GetConstCArray(), 
+							  PhysicalTriangles.GetCount(),
+							  NULL, 0);
+		PhysicalMesh->Initialize();
+		zeScene->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
+	}
+
+	this->Owner = Owner;
+
 	return true;
 }
 
@@ -139,6 +176,7 @@ void ZEPortalMapPortal::Deinitialize()
 {
 	Owner = NULL;
 	Resource = NULL;
+	RenderOrders.Clear();
 	if (VertexBuffer != NULL)
 	{
 		VertexBuffer->Destroy();
@@ -164,6 +202,3 @@ ZEPortalMapPortal::~ZEPortalMapPortal()
 {
 	Deinitialize();
 }
-
-
-

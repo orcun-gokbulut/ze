@@ -316,6 +316,12 @@ ZEParticleSystem::~ZEParticleSystem()
 		VertexBuffer->Destroy();
 }
 
+ZEParticleSystem* ZEParticleSystem::CreateInstance()
+{
+	return new ZEParticleSystem();
+}
+
+
 #include "ZEParticleSystem.h.zpp"
 
 

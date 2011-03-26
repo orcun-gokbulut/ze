@@ -39,26 +39,58 @@
 
 #include "ZEMaterial.h"
 
+class ZETexture2D;
+
 class ZESimpleMaterial : public ZEMaterial
 {
 	friend class ZED3D9Module;
 	protected:
-		bool						WireFrame;
-		float						WireSize;
+		bool							TwoSided;
+		bool							Wireframe;
+		bool							VertexColorEnabled;
 
-									ZESimpleMaterial();
-		virtual						~ZESimpleMaterial();
+		ZEMaterialTransparancyMode		TransparancyMode;
+		unsigned int					TransparancyCullLimit;
+		ZEVector4						MaterialColor;
+
+		const ZETexture2D*				Texture;
+		ZETextureAddressMode			TextureAddressModeU;
+		ZETextureAddressMode			TextureAddressModeV;
+
+										ZESimpleMaterial();
+		virtual							~ZESimpleMaterial();
 
 	public:
-		void						SetZero();
+		ZEMaterialFlags					GetMaterialFlags() const;
 
-		void						SetWireFrame(bool Enabled);
-		bool						GetWireFrame() const;
+		void							SetZero();
 
-		void						SetWireSize(float Size);
-		float						GetWireSize() const;
+		void							SetTwoSided(bool Enable);
+		bool							GetTwoSided() const;
 
-		static ZESimpleMaterial*	CreateInstance();
+		void							SetWireframe(bool Enable);
+		bool							GetWireframe() const;
+
+		void							SetVertexColor(bool Enable);
+		bool							GetVertexColor();
+
+		void							SetMaterialColor(const ZEVector4& Color);
+		const ZEVector4&				GetMaterialColor() const;
+
+		void							SetTransparancyMode(ZEMaterialTransparancyMode Mode);
+		ZEMaterialTransparancyMode		GetTransparancyMode() const;
+
+		void							SetTransparancyCullLimit(unsigned int Limit);
+		unsigned int					GetTransparancyCullLimit() const;
+
+		void							SetTexture(const ZETexture2D* Texture);
+		const ZETexture2D*				GetTexture() const;
+		void							SetTextureAddressModeU(ZETextureAddressMode Mode);
+		ZETextureAddressMode			GetTextureAddressModeU() const;
+		void							SetTextureAddressModeV(ZETextureAddressMode Mode);
+		ZETextureAddressMode			GetTextureAddressModeV() const;
+
+		static ZESimpleMaterial*		CreateInstance();
 };
 
 #endif

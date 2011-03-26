@@ -41,39 +41,69 @@
 #include "ZEViewVolume.h"
 
 class ZETexture2D;
+class ZETexture2DResource;
+
+ZE_META_CLASS_DESCRIPTION(ZEProjectiveLight);
 
 class ZEProjectiveLight : public ZELight
 {
+	ZE_META_ENTITY(ZEProjectiveLight)
 	private:
 		float							FOV;
 		float							AspectRatio;
 		ZEViewFrustum					ViewVolume;
-		const ZETexture2D*				ProjectionMap;
+		const ZETexture2D*				ProjectionTexture;
 		ZETexture2D*					ShadowMap;
+		
+		ZETexture2DResource*			ProjectionTextureResource;
+		char							ProjectionTextureFile[ZE_MAX_FILE_NAME_SIZE];
+
+										ZEProjectiveLight();
+		virtual							~ZEProjectiveLight();
 
 	public:
 		ZELightType						GetLightType();
 
 		void							SetFOV(float FOV);
-		float							GetFOV();
+		float							GetFOV() const;
 
 		void							SetAspectRatio(float AspectRatio);
-		float							GetAspectRatio();
- 
-		const ZETexture2D*				GetShadowMap();
-		void							SetShadowMap(int Width, int Height);
+		float							GetAspectRatio() const;
+
+		void							SetProjectionTextureFile(const char* Filename);
+		const char*						GetProjectionTextureFile() const;
 
 		void							SetProjectionTexture(const ZETexture2D* Texture);
-		const ZETexture2D*				GetProjectionTexture();
+		const ZETexture2D*				GetProjectionTexture() const;
 
 		const ZEMatrix4x4&				GetProjectionMatrix();
 
-		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
 		virtual const ZEViewVolume&		GetViewVolume();
 
-										ZEProjectiveLight();
-										~ZEProjectiveLight();
+		virtual void					SetCastsShadow(bool NewValue);
+
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
+
+		ZETexture2D*					GetShadowMap();
+		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
+
+		static ZEProjectiveLight*		CreateInstance();
 };
+
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEProjectiveLight" parent="ZELight" description="Point Light">
+			<property name="FOV" groupname="Light" type="float" autogetset="yes"/>
+			<property name="AspectRatio" groupname="Light" type="float" autogetset="yes"/>
+			<property name="ProjectionTextureFile" groupname="Light" type="string" autogetset="yes"/>
+		</class>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 
 #endif
 

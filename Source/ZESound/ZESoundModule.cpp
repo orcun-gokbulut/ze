@@ -37,6 +37,7 @@
 #include "ZESoundResourceMP3.h"
 #include "ZESoundSource.h"
 #include "ZECore\ZECore.h"
+#include "ZECore\ZEOptionManager.h"
 
 ZEOptionSection  ZESoundModule::SoundOptions;
 
@@ -51,17 +52,17 @@ void ZESoundModule::BaseInitialize()
 	SoundOptions.SetName("Sound");
 	SoundOptions.SetEventHandler(&OnOptionsChanged);
 
-	SoundOptions.AddOption(new ZEOption("DeviceId", 0, ZEOPTIONATTRIBUTE_NORMAL));
-	SoundOptions.AddOption(new ZEOption("StreamingDisabled", false, ZEOPTIONATTRIBUTE_NORMAL));
-	SoundOptions.AddOption(new ZEOption("MaxBufferSize", 2000, ZEOPTIONATTRIBUTE_NORMAL));
-	SoundOptions.AddOption(new ZEOption("MasterVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
-	SoundOptions.AddOption(new ZEOption("SpeakerLayout", 1, ZEOPTIONATTRIBUTE_NORMAL));
-	SoundOptions.AddOption(new ZEOption("EffectVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
-	SoundOptions.AddOption(new ZEOption("DialogVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
-	SoundOptions.AddOption(new ZEOption("MusicVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
-	SoundOptions.AddOption(new ZEOption("VideoVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
-	SoundOptions.AddOption(new ZEOption("PlayerCommVolume", 100, ZEOPTIONATTRIBUTE_NORMAL));
-	zeOptions->RegisterSection(&SoundOptions);
+	SoundOptions.AddOption(new ZEOption("DeviceId", 0, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("StreamingDisabled", false, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("MaxBufferSize", 2000, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("MasterVolume", 100, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("SpeakerLayout", 1, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("EffectVolume", 100, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("DialogVolume", 100, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("MusicVolume", 100, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("VideoVolume", 100, ZE_OA_NORMAL));
+	SoundOptions.AddOption(new ZEOption("PlayerCommVolume", 100, ZE_OA_NORMAL));
+	ZEOptionManager::GetInstance()->RegisterSection(&SoundOptions);
 
 	ZESoundResourceMP3::BaseInitialize();
 }
@@ -69,7 +70,7 @@ void ZESoundModule::BaseInitialize()
 void ZESoundModule::BaseDeinitialize()
 {
 	ZESoundResourceMP3::BaseDeinitialize();
-	zeOptions->UnregisterSection(&SoundOptions);
+	ZEOptionManager::GetInstance()->UnregisterSection(&SoundOptions);
 }
 
 void ZESoundModule::OptionsChanged()

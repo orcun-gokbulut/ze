@@ -88,21 +88,29 @@ void ZESceneDebugDraw::Clean()
 
 bool ZESceneDebugDraw::Initialize()
 {
+	if (Initialized)
+		return false;
+
 	if (Material == NULL)
 		Material = ZESimpleMaterial::CreateInstance();
 
 	RenderOrder.SetZero();
 	RenderOrder.Material = Material;
-	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_Z_CULLING;
+	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 	RenderOrder.PrimitiveType = ZE_ROPT_LINE;
 	RenderOrder.VertexBuffer = &VertexBuffer;
 	
+	Initialized = true;
+
 	return true;
 }
 
 void ZESceneDebugDraw::Deinitialize()
 {
+	if (!Initialized)
+		return;
+
 	VertexBuffer.Clean();
 	RenderOrder.SetZero();
 	if (Material != NULL)
@@ -110,10 +118,15 @@ void ZESceneDebugDraw::Deinitialize()
 		Material->Release();
 		Material = NULL;
 	}
+
+	Initialized = false;
 }
 
 void ZESceneDebugDraw::Draw(ZERenderer* Renderer)
 {
+	if (VertexBuffer.Vertices.GetCount() == 0)
+		return;
+
 	RenderOrder.PrimitiveCount = VertexBuffer.Vertices.GetCount() / 2;
 	Renderer->AddToRenderList(&RenderOrder);
 }
@@ -121,6 +134,7 @@ void ZESceneDebugDraw::Draw(ZERenderer* Renderer)
 ZESceneDebugDraw::ZESceneDebugDraw()
 {
 	Material = NULL;
+	Initialized = false;
 }
 
 ZESceneDebugDraw::~ZESceneDebugDraw()

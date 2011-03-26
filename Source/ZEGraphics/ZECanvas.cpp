@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath\ZEDefinitions.h"
+#include "ZEMath\ZEMathDefinitions.h"
 #include "ZECanvas.h"
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEResourceFile.h"

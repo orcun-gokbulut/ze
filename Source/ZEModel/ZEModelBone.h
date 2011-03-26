@@ -37,17 +37,15 @@
 #ifndef	__ZE_MODEL_BONE_H__
 #define __ZE_MODEL_BONE_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEMatrix.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
 #include "ZEModelAnimation.h"
 
 class ZEModel;
-class ZEPhysicalRigidBody;
-class ZEPhysicalJoint;
-
 class ZEModelBone
 {
+	friend class ZEModel;
 	private:
 		ZEModel*							Owner;
 		const ZEModelResourceBone*			BoneResource;
@@ -67,21 +65,14 @@ class ZEModelBone
 		ZEAABoundingBox						ModelBoundingBox;
 		ZEAABoundingBox						WorldBoundingBox;
 
-		ZEDWORD								DirtyFlags;
-
-		bool								UpdateModelBoundingBox;
-		bool								UpdateWorldBoundingBox;
-		bool								UpdateRelativeTransform;
-
-		bool								UpdateLocalTransform;
-		bool								UpdateVertexTransform;
-		bool								UpdateModelTransform;
-		bool								UpdateWorldTransform;
-
 		ZEPhysicalRigidBody*				PhysicalBody;
+		ZEPhysicalJoint*					PhysicalJoint;
+
 		bool								PhysicsEnabled;
 
 		ZEModelAnimationType				AnimationType;
+
+		void								OnTransformChanged();
 
 	public:
 		ZEModelBone*						GetParentBone();
@@ -125,17 +116,11 @@ class ZEModelBone
 		bool								GetPhysicsEnabled();
 
 		void								Initialize(ZEModel* Model, const ZEModelResourceBone* BoneResource);
-		void								Deinitialize();
 
-		void								ModelTransformChanged();
-		void								ModelWorldTransformChanged();
+		void								Deinitialize();
 
 											ZEModelBone();
 											~ZEModelBone();
 };
 #endif
-
-
-
-
 

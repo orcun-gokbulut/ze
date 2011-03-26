@@ -41,21 +41,10 @@ ZEPhysicalObjectType ZEPhysicalRigidBody::GetPhysicalObjectType()
 	return ZE_POT_RIGID_BODY;
 }
 
-void ZEPhysicalRigidBody::SetTransformChangeCallback(const ZEPhysicalTransformChangeCallback& Callback)
-{
-	TransformChangeCallback = Callback;
-}
-
-const ZEPhysicalTransformChangeCallback& ZEPhysicalRigidBody::GetTransformChangeCallback()
-{
-	return TransformChangeCallback;	
-}
-
 ZEPhysicalRigidBody* ZEPhysicalRigidBody::CreateInstance()
 {
 	return zePhysics->CreatePhysicalRigidBody();
 }
-
 
 
 

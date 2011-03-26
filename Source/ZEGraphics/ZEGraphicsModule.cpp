@@ -35,7 +35,10 @@
 
 #pragma once
 #include "ZEGraphicsModule.h"
+#include "ZECore\ZEOptionManager.h"
 #include "ZECore\ZECore.h"
+
+#define FREEIMAGE_LIB
 #include <freeimage.h>
 #include "ZETexture2DResource.h"
 
@@ -108,7 +111,7 @@ void ZEGraphicsModule::BaseInitialize()
 void ZEGraphicsModule::BaseDeinitialize()
 {
 	FreeImage_DeInitialise();
-	zeOptions->UnregisterSection(&GraphicsOptions);
+	ZEOptionManager::GetInstance()->UnregisterSection(&GraphicsOptions);
 }
 
 void ZEGraphicsModule::SetScreenSize(int Width, int Height)

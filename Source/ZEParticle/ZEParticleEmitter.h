@@ -64,7 +64,7 @@ enum ZEParticleEmitterCollisionType
 
 class ZEParticleEmitter : public ZEClass
 {
-	ZE_META_CLASS()
+	ZE_META_CLASS(ZEMaterial)
 	friend class ZEParticleSystem;
 
 	private:
@@ -214,6 +214,8 @@ class ZEParticleEmitter : public ZEClass
 
 										ZEParticleEmitter();
 										~ZEParticleEmitter();
+
+		static ZEParticleEmitter*		CreateInstance();
 };
 
 /*

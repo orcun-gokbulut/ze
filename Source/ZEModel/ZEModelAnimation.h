@@ -57,7 +57,3 @@ enum ZEModelAnimationType
 typedef ZEModelResourceAnimation ZEModelAnimation;
 
 #endif
-
-
-
-

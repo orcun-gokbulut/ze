@@ -91,6 +91,9 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		const ZEVector4&				GetColor();
 
 		// Transformations
+		void							ApplyTransformationBefore(const ZEMatrix4x4& Matrix);
+		void							ApplyTransformationAfter(const ZEMatrix4x4& Matrix);
+
 		void							ApplyTranslation(const ZEVector3& Translation);
 		void							ApplyRotation(const ZEQuaternion& Rotation);
 		void							ApplyScale(const ZEVector3& Scale);

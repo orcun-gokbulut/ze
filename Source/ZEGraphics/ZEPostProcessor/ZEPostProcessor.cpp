@@ -59,7 +59,7 @@ ZEArray<ZEPostProcessorNode*>& ZEPostProcessor::GetNodes()
 
 ZEPostProcessorNode* ZEPostProcessor::CreateNode(const char* Name)
 {
-	if (strcmp(Name, "ColorInput") == 0)
+	/*if (strcmp(Name, "ColorInput") == 0)
 		return new ZEPPColorInputNode();
 	else if (strcmp(Name, "DepthInput") == 0)
 		return new ZEPPDepthInputNode();
@@ -67,7 +67,7 @@ ZEPostProcessorNode* ZEPostProcessor::CreateNode(const char* Name)
 		return new ZEPPVelocityInputNode();
 	else if (strcmp(Name, "TextureInput") == 0)
 		return new ZEPPTextureInputNode();
-	else
+	else*/
 		return NULL;
 }
 

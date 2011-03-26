@@ -36,6 +36,7 @@
 #include "ZEParticleEffect.h"
 #include "ZEParticleSystem.h"
 #include "ZEParticleEmitter.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
 #define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max - Min) * ((float)rand() / RAND_MAX)) + Min)
 
@@ -525,8 +526,9 @@ ZEParticleEmitter::~ZEParticleEmitter()
 {
 }
 
+ZEParticleEmitter* ZEParticleEmitter::CreateInstance()
+{
+	return new ZEParticleEmitter();
+}
+
 #include "ZEParticleEmitter.h.zpp"
-
-
-
-

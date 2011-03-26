@@ -43,8 +43,8 @@
 class ZED3D9ViewPort : public ZEViewPort
 {
 	public:
-		LPDIRECT3DSURFACE9		ColorBuffer;
-		LPDIRECT3DSURFACE9		DepthBuffer;
+		LPDIRECT3DSURFACE9		FrameBuffer;
+		LPDIRECT3DSURFACE9		ZBuffer;
 
 		virtual float			GetAspectRatio();
 		virtual unsigned int	GetWidth();

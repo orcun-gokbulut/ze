@@ -37,8 +37,8 @@
 #ifndef	__ZE_MODULE_MANAGER_H__
 #define __ZE_MODULE_MANAGER_H__
 
-#include "ZEOption.h"
 #include "ZEDS\ZEArray.h"
+#include "ZEOptionSection.h"
 #include "ZEModule.h"
 
 class ZEModuleManager

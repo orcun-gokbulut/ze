@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DIRECT_INPUT_H__
-#define __ZE_DIRECT_INPUT_H__
+#ifndef	__ZE_DIRECT_INPUT_MODULE_H__
+#define __ZE_DIRECT_INPUT_MODULE_H__
 
 #include "ZEInput\ZEInputModule.h"
 
@@ -43,29 +43,27 @@ class ZEDirectInputModule : public ZEInputModule
 {
 	friend class ZEDirectInputModuleDescription;
 	private:
-		bool						Enabled;
+		bool								Enabled;
 
 	protected:
-									ZEDirectInputModule();
-        virtual						~ZEDirectInputModule();
+											ZEDirectInputModule();
+        virtual								~ZEDirectInputModule();
 
 	public:
-		ZEModuleDescription*		GetModuleDescription();
+		virtual ZEModuleDescription*		GetModuleDescription();
 
-		bool						IsEnabled();
-		void						SetEnabled(bool Enabled);
+		virtual bool						IsEnabled();
+		virtual void						SetEnabled(bool Enabled);
 
-		bool						Initialize();
-		void						Deinitialize();
+		virtual bool						Initialize();
+		virtual void						Deinitialize();
 
-		void						ProcessInputs();
+		virtual void						ProcessInputs();
+		virtual void						ProcessInputMap(ZEInputMap* InputMap);
+		virtual bool						GetRawInputEvent(ZEInputEvent& InputEvent);
 
-		void						ProcessInputMap(ZEInputMap* InputMap);
-
-		virtual bool				GetRawInputEvent(ZEInputEvent& InputEvent);
-
-		void						Acquire();
-		void						UnAcquire();
+		virtual void						Acquire();
+		virtual void						UnAcquire();
 };
 #endif
 

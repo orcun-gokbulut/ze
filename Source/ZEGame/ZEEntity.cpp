@@ -38,13 +38,24 @@
 #include "ZEMath\ZERay.h"
 #include "ZECore\ZEError.h"
 #include "ZEComponent.h"
+#include "ZEEntityProvider.h"
 #include <string.h>
 
 void ZEEntity::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 {
 	LocalBoundingBox = BoundingBox;
-	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE;
 }
+		
+ZEDWORD ZEEntity::GetDrawFlags() const
+{
+	return ZE_DF_NONE;
+}
+
+ZEDWORD ZEEntity::GetRayCastFlags() const
+{
+	return ZE_RCF_BOUNDING_BOX;
+}
+
 
 ZEEntityType ZEEntity::GetEntityType()
 {
@@ -55,10 +66,17 @@ const ZEAABoundingBox& ZEEntity::GetLocalBoundingBox() const
 {
 	return LocalBoundingBox;
 }
-		
-ZEDWORD ZEEntity::GetRayCastFlags() const
+
+const ZEAABoundingBox& ZEEntity::GetWorldBoundingBox()
 {
-	return 0;
+	ZEAABoundingBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+	return WorldBoundingBox;
+}
+
+const ZEMatrix4x4& ZEEntity::GetWorldTransform()
+{
+	ZEMatrix4x4::CreateOrientation(WorldTransform, Position, Rotation, Scale);
+	return WorldTransform;
 }
 
 void ZEEntity::SetEntityId(int EntityId)
@@ -69,49 +87,6 @@ void ZEEntity::SetEntityId(int EntityId)
 int ZEEntity::GetEntityId() const
 {
 	return EntityId;
-}
-
-const ZEAABoundingBox &	 ZEEntity::GetWorldBoundingBox()
-{
-	if (DirtyFlags & ZE_EDF_WORLD_BOUNDING_BOX)
-	{
-		ZEVector3 Point;
-		const ZEMatrix4x4& WorldTransform = GetWorldTransform();
-		const ZEAABoundingBox& LocalBoundingBox = GetLocalBoundingBox();
-		ZEMatrix4x4::Transform(Point, WorldTransform, LocalBoundingBox.GetVertex(0));
-		WorldBoundingBox.Min = WorldBoundingBox.Max = Point;
-		for (int I = 1; I < 8; I++)
-		{
-			ZEMatrix4x4::Transform(Point, WorldTransform, LocalBoundingBox.GetVertex(I));
-			if (Point.x < WorldBoundingBox.Min.x) WorldBoundingBox.Min.x = Point.x;
-			if (Point.y < WorldBoundingBox.Min.y) WorldBoundingBox.Min.y = Point.y;
-			if (Point.z < WorldBoundingBox.Min.z) WorldBoundingBox.Min.z = Point.z;
-
-			if (Point.x > WorldBoundingBox.Max.x) WorldBoundingBox.Max.x = Point.x;
-			if (Point.y > WorldBoundingBox.Max.y) WorldBoundingBox.Max.y = Point.y;
-			if (Point.z > WorldBoundingBox.Max.z) WorldBoundingBox.Max.z = Point.z;
-		}
-
-		DirtyFlags &= ~ZE_EDF_WORLD_BOUNDING_BOX;
-	}
-
-	return WorldBoundingBox;
-}
-
-const ZEBoundingSphere&	ZEEntity::GetWorldBoundingSphere()
-{
-	if (DirtyFlags & ZE_EDF_WORLD_BOUNDING_SPHERE)
-	{
-		GetWorldBoundingBox().GenerateBoundingSphere(WorldBoundingSphere);
-		DirtyFlags &= ~ZE_EDF_WORLD_BOUNDING_SPHERE;
-	}
-
-	return WorldBoundingSphere;
-}
-
-ZEDWORD ZEEntity::GetDrawFlags() const
-{
-	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
 void ZEEntity::SetName(const char* NewName)
@@ -146,7 +121,6 @@ bool ZEEntity::GetEnabled() const
 
 void ZEEntity::SetPosition(const ZEVector3& NewPosition) 
 {
-	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE | ZE_EDF_WORLD_TRANSFORM;
 	Position = NewPosition;
 }
 
@@ -157,7 +131,6 @@ const ZEVector3& ZEEntity::GetPosition() const
 
 void ZEEntity::SetRotation(const ZEQuaternion& NewRotation) 
 {
-	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE | ZE_EDF_WORLD_TRANSFORM;
 	Rotation = NewRotation;
 }
 
@@ -168,7 +141,6 @@ const ZEQuaternion& ZEEntity::GetRotation() const
 
 void ZEEntity::SetScale(const ZEVector3& NewScale)
 {
-	DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE | ZE_EDF_WORLD_TRANSFORM;
 	Scale = NewScale;
 }
 
@@ -192,17 +164,6 @@ ZEVector3 ZEEntity::GetUp()
 	return Rotation * ZEVector3::UnitY;
 }
 
-const ZEMatrix4x4& ZEEntity::GetWorldTransform()
-{
-	if (DirtyFlags & ZE_EDF_WORLD_TRANSFORM)
-	{
-		ZEMatrix4x4::CreateOrientation(WorldTransform, Position, Rotation, Scale);
-		DirtyFlags &= ~ZE_EDF_WORLD_TRANSFORM;
-	}
-
-	return WorldTransform;
-}
-
 void ZEEntity::SetVelocity(const ZEVector3& NewVelocity)
 {
 	Velocity = NewVelocity;
@@ -213,17 +174,31 @@ const ZEVector3& ZEEntity::GetVelocity() const
 	return Velocity;
 }
 
+bool ZEEntity::CastRay(const ZERay& Ray, float& TRay, ZEVector3& Position, ZEVector3& Normal)
+{
+	return false;
+}
+
+
+bool ZEEntity::GetInitialized()
+{
+	return Initialized;
+}
+
 bool ZEEntity::Initialize()
 {
+	Initialized = true;
 	return true;
 }
 
 void ZEEntity::Deinitialize()
 {
+	Initialized = false;
 }
 
 void ZEEntity::Destroy()
 {
+	Deinitialize();
 	delete this;
 }
 
@@ -253,13 +228,17 @@ ZEEntity::ZEEntity()
 	Scale = ZEVector3::One;
 	Enabled = true;
 	Visible = true;
-
-	DirtyFlags = ZE_EDF_ALL;
+	Initialized = false;
 	Visible = true;
 }
 
 ZEEntity::~ZEEntity()
 {
+}
+
+ZEEntity* ZEEntity::CreateInstance(const char* Name)
+{
+	return (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(Name);
 }
 
 #include "ZEEntity.h.zpp"
@@ -268,8 +247,3 @@ ZEEntityRunAt ZEEntityDescription::GetRunAt() const
 {
 	return ZE_ERA_NONE;
 }
-
-
-
-
-

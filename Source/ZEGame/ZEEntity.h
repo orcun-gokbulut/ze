@@ -64,7 +64,7 @@ enum ZEEntityRunAt
 		virtual ZEEntityRunAt GetRunAt() const;
 
 #define ZE_META_ENTITY_DESCRIPTION(ClassName) ZE_META_EXTENDED_CLASS_DESCRIPTION(ClassName, ZEEntityDescription, ZE_META_ENTITY_CLASS_EXTENSION)
-#define ZE_META_ENTITY() ZE_META_EXTENDED_CLASS(ZEEntityDescription, )
+#define ZE_META_ENTITY(Class) ZE_META_EXTENDED_CLASS(ZEEntityDescription, ,Class)
 
 class ZEEntityDescription : public ZEClassDescription
 {
@@ -77,6 +77,9 @@ class ZEEntityDescription : public ZEClassDescription
 		virtual const ZEPropertyDescription*	GetProperties() const;
 		virtual size_t							GetPropertyCount() const;
 		virtual size_t							GetPropertyOffset() const;
+		virtual const ZEContainerDescription*	GetContainers() const;
+		virtual size_t							GetContainerCount() const;
+		virtual size_t							GetContainerOffset() const;
 		virtual const ZEMethodDescription*		GetMethods() const;
 		virtual size_t							GetMethodCount() const;
 		virtual size_t							GetMethodOffset() const;
@@ -105,9 +108,9 @@ typedef ZEDWORD ZEDrawFlags;
 
 // ZERayCastFlags
 typedef ZEDWORD ZERayCastFlags;
-#define ZE_RC_NONE								0
-#define ZE_RC_CAST_TO_ENTITY					1
-#define ZE_RC_CAST_TO_COMPONENTS				2
+#define ZE_RCF_INTERNAL							0
+#define ZE_RCF_BOUNDING_BOX						1
+#define ZE_RCF_INTERNAL							2
 
 // Entity Dirty Flags
 typedef ZEDWORD ZEEntityDirtyFlags;
@@ -117,9 +120,10 @@ typedef ZEDWORD ZEEntityDirtyFlags;
 #define ZE_EDF_WORLD_BOUNDING_SPHERE			4
 #define ZE_EDF_WORLD_BOUNDING_BOX				8
 
+
 class ZEEntity : public ZEClass
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZEEntity)
 	friend class ZECompoundEntity;
 	private: 
 		char									Name[ZE_MAX_NAME_SIZE];
@@ -131,27 +135,30 @@ class ZEEntity : public ZEClass
 		ZEVector3								Velocity;
 		ZEVector3								OldPosition;
 
+		bool									Initialized;
 		bool									Enabled;
 		bool									Visible;
 
-		ZEAABoundingBox							LocalBoundingBox;
 		ZEAABoundingBox							WorldBoundingBox;
-		ZEBoundingSphere						WorldBoundingSphere;
+		ZEAABoundingBox							LocalBoundingBox;
 
 	protected:
-		ZEEntityDirtyFlags						DirtyFlags;	
-
 		void									SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
-	
+
+												ZEEntity();
+		virtual									~ZEEntity();
+
 	public:
+		virtual ZEDWORD							GetDrawFlags() const;
+		virtual ZEDWORD							GetRayCastFlags() const;
+
 		virtual ZEEntityType					GetEntityType();
 
 		virtual const ZEAABoundingBox&			GetLocalBoundingBox() const;
 		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
-		const ZEBoundingSphere&					GetWorldBoundingSphere();
+		virtual const ZEMatrix4x4&				GetWorldTransform();
 
-		virtual ZEDWORD							GetDrawFlags() const;
-		virtual ZEDWORD							GetRayCastFlags() const;
+		bool									GetInitialized();
 
 		void									SetEntityId(int EntityId);
 		int										GetEntityId() const;
@@ -181,8 +188,6 @@ class ZEEntity : public ZEClass
 		ZEVector3								GetRight();
 		ZEVector3								GetUp();
 
-		const ZEMatrix4x4&						GetWorldTransform();
-
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
 		virtual void							Destroy();
@@ -191,17 +196,19 @@ class ZEEntity : public ZEClass
 		virtual void							Tick(float Time);
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
 
-												ZEEntity();
-		virtual									~ZEEntity();
+		virtual bool							CastRay(const ZERay& Ray, float& TRay, ZEVector3& Position, ZEVector3& Normal);
+
+		ZEEntity*								CreateInstance(const char* Name);
 };
 
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta> 
-		<class name="ZEEntity">
+		<class name="ZEEntity">		
+			<noinstance>true</noinstance>
 			<description>Base Entity Type</description>
-			<property name="EntityId" type="integer" autogetset="yes" description="Unique number that indentifes entity"/>
+			<property name="EntityId" type="integer" autogetset="yes" description="Unique number that indentifes entity"/>	
 			<property name="Name" type="string" autogetset="yes" description="Name of the entity"/>
 			<property name="Position" type="ZEVector3" autogetset="yes" description="World position of the entity"/>
 			<property name="Rotation" type="ZEQuaternion" autogetset="yes" description="World rotation of the entity"/>
@@ -214,8 +221,3 @@ ZE_POST_PROCESSOR_START(Meta)
 ZE_POST_PROCESSOR_END()
 */
 #endif
-
-
-
-
-

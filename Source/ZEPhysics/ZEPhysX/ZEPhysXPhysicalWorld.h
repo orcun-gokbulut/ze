@@ -39,6 +39,7 @@
 
 #include <NxScene.h>
 #include <NxSceneDesc.h>
+#include <NxMaterial.h>
 
 #include "ZEPhysics\ZEPhysicalWorld.h"
 #include "ZEPhysXComponentBase.h"

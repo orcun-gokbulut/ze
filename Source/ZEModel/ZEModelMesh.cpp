@@ -36,33 +36,10 @@
 #include "ZEModelMesh.h"
 #include "ZEModel.h"
 #include "ZEModelFileFormat.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEPhysics\ZEPhysicalRigidBody.h"
-#include "ZEGame\ZEDrawParameters.h"
-/*
-void ZEModelMesh::UpdatePhysicalBody()
-{
-	PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
-
-	PhysicalBody->SetEnabled(MeshResource->PhysicalBody.Enabled);
-	PhysicalBody.Mass;
-	PhysicalBody->SetLinearDamping(MeshResource->PhysicalBody.LinearDamping);
-	PhysicalBody->SetAngularDamping(MeshResource->PhysicalBody.AngularDamping);
-	PhysicalBody->SetPosition(GetWorldTransform() * MeshResource->PhysicalBody.Position);
-	PhysicalBody->SetRotation(Owner->GetWorldRotation() * Rotation * MeshResource->PhysicalBody.Orientation);
-	
-	PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenter);
-	
-	//PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenterPosition);
-	//PhysicalBody->SetMassCenterRotation(MeshResource->PhysicalBody.MassCenterRotation);
-
-	for (size_t I = 0; I < MeshResource->PhysicalBody.Shapes.GetCount(); I++)
-	{
-		ZE
-	}
-
-}*/
+#include "ZEGraphics/ZECamera.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEDrawParameters.h"
 
 void ZEModelMesh::SetActiveLOD(size_t LOD)
 {
@@ -107,68 +84,42 @@ const ZEAABoundingBox& ZEModelMesh::GetLocalBoundingBox()
 
 const ZEAABoundingBox& ZEModelMesh::GetModelBoundingBox()
 {
-	if (UpdateModelBoundingBox)
-	{
-		ZEAABoundingBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
-		UpdateModelBoundingBox = false;
-	}
-	
+	ZEAABoundingBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
+
 	return ModelBoundingBox;
 }
 
-
 const ZEAABoundingBox& ZEModelMesh::GetWorldBoundingBox()
 {
-	if (UpdateWorldBoundingBox)
-	{
-		ZEAABoundingBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
-		UpdateWorldBoundingBox = false;
-	}
+
+	ZEAABoundingBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+
 	return WorldBoundingBox;
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetLocalTransform()
 {
-	if (UpdateLocalTransform)
-	{
-		ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
-		UpdateLocalTransform = false;
-	}
-	
+	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
+
 	return LocalTransform;
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
 {
-	if (UpdateModelTransform)
-	{
-		ZEMatrix4x4::Multiply(ModelTransform, GetLocalTransform(), Owner->GetLocalTransform());
-		UpdateModelTransform = false;
-	}
+	ZEMatrix4x4::Multiply(ModelTransform, GetLocalTransform(), Owner->GetLocalTransform());
+
 	return ModelTransform;	
-	
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
 {
-	if (UpdateWorldTransform)
-	{
-		ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
-		UpdateWorldTransform = false;
-	}
+	ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
+
 	return WorldTransform;	
 }
 	
 void ZEModelMesh::SetLocalPosition(const ZEVector3& LocalPosition)
 {
-	UpdateWorldBoundingBox = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateWorldTransform = true;
-	UpdateModelTransform = true;
-	UpdateLocalTransform = true;
-	Owner->UpdateBoundingBox();
-
 	Position = LocalPosition;
 }
 
@@ -179,13 +130,6 @@ const ZEVector3& ZEModelMesh::GetLocalPostion()
 
 void ZEModelMesh::SetLocalRotation(const ZEQuaternion& LocalRotation)
 {
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateLocalTransform = true;
-	Owner->UpdateBoundingBox();
-
 	Rotation = LocalRotation;
 }
 
@@ -196,13 +140,6 @@ const ZEQuaternion& ZEModelMesh::GetLocalRotation()
 
 void ZEModelMesh::SetLocalScale(const ZEVector3& LocalScale)
 {
-	UpdateWorldBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateModelTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateLocalTransform = true;
-	Owner->UpdateBoundingBox();
-
 	Scale = LocalScale;
 }
 
@@ -221,10 +158,6 @@ ZEModelAnimationType ZEModelMesh::GetAnimationType()
 	return AnimationType;
 }
 
-ZEPhysicalRigidBody* ZEModelMesh::GetPhysicalBody()
-{
-	return PhysicalBody;
-}
 
 void ZEModelMesh::SetPhysicsEnabled(bool Enabled)
 {
@@ -242,22 +175,96 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	this->MeshResource = MeshResource;
 	ActiveLOD = 0;
 	AutoLOD = true;
-	PhysicsEnabled = false;
 	AnimationType = ZE_MAT_PREDEFINED;
 	Position = MeshResource->Position;
 	Rotation = MeshResource->Rotation;
 	Scale = MeshResource->Scale;
 	LocalBoundingBox = MeshResource->BoundingBox;
+	PhysicsEnabled = false;
 
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
-	UpdateLocalTransform = true;
+	ZEArray<ZEPhysicalShape*> ShapeList;
+
+	if(PhysicalBody == NULL)
+	{
+		if (MeshResource->PhysicalBody.Type == ZE_MRPBT_RIGID)
+		{
+			PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
+
+			PhysicalBody->SetEnabled(MeshResource->PhysicalBody.Enabled);
+			PhysicalBody->SetMass(MeshResource->PhysicalBody.Mass);
+			PhysicalBody->SetLinearDamping(MeshResource->PhysicalBody.LinearDamping);
+			PhysicalBody->SetAngularDamping(MeshResource->PhysicalBody.AngularDamping);
+			PhysicalBody->SetPosition(Owner->GetWorldPosition());
+			PhysicalBody->SetRotation(Owner->GetWorldRotation());
+			PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenter);
+			PhysicalBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this->Owner, &ZEModel::TransformChangeEvent));
+
+			for (size_t I = 0; I < MeshResource->PhysicalBody.Shapes.GetCount(); I++)
+			{
+				const ZEModelResourcePhysicalShape* Shape = &MeshResource->PhysicalBody.Shapes[I];
+				switch(Shape->Type)
+				{
+					case ZE_PST_BOX:
+					{
+						ZEPhysicalBoxShape* BoxShape = new ZEPhysicalBoxShape();
+						BoxShape->SetWidth(Shape->Box.Width);
+						BoxShape->SetHeight(Shape->Box.Height);
+						BoxShape->SetLength(Shape->Box.Length);
+						BoxShape->SetPosition(Shape->Position);
+						BoxShape->SetRotation(Shape->Rotation);
+						ShapeList.Add(BoxShape);
+						PhysicalBody->AddPhysicalShape(BoxShape);
+						break;
+					}
+
+					case ZE_PST_SPHERE:
+					{
+						ZEPhysicalSphereShape* SphereShape = new ZEPhysicalSphereShape();
+						SphereShape->SetRadius(Shape->Sphere.Radius);
+						SphereShape->SetPosition(Shape->Position);
+						SphereShape->SetRotation(Shape->Rotation);
+						ShapeList.Add(SphereShape);
+						PhysicalBody->AddPhysicalShape(SphereShape);
+						break;
+					}
+					case ZE_PST_CYLINDER:
+					{
+						// Problematic
+						break;
+					}
+
+					case ZE_PST_CAPSULE:
+					{
+						ZEPhysicalCapsuleShape* CapsuleShape = new ZEPhysicalCapsuleShape();
+						CapsuleShape->SetRadius(Shape->Capsule.Radius);
+						CapsuleShape->SetHeight(Shape->Capsule.Height);
+						CapsuleShape->SetPosition(Shape->Position);
+						CapsuleShape->SetRotation(Shape->Rotation);
+						ShapeList.Add(CapsuleShape);
+						PhysicalBody->AddPhysicalShape(CapsuleShape);
+						break;
+					}
+
+					case ZE_PST_CONVEX:
+						// Problematic
+						break;
+				}
+			}
+
+			PhysicalBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+			PhysicalBody->Initialize();
+		}
+	}
 
 	LODs.SetCount(MeshResource->LODs.GetCount());
 	for (size_t I = 0; I < MeshResource->LODs.GetCount(); I++)
 		LODs[I].Initialize(Owner, this, &MeshResource->LODs[I]);
+
+	for (size_t I = 0; I < ShapeList.GetCount(); I++)
+		delete ShapeList[I];
+	ShapeList.Clear();
+
+
 }
 
 void ZEModelMesh::Deinitialize()
@@ -266,23 +273,40 @@ void ZEModelMesh::Deinitialize()
 	LODs.Clear();
 }
 
-void ZEModelMesh::ModelTransformChanged()
+void ZEModelMesh::OnTransformChanged()
 {
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
-	UpdateModelBoundingBox = true;
-	UpdateModelTransform = true;
-}
-
-void ZEModelMesh::ModelWorldTransformChanged()
-{
-	UpdateWorldBoundingBox = true;
-	UpdateWorldTransform = true;
+	if (PhysicalBody != NULL)
+	{
+		PhysicalBody->SetPosition(Owner->GetWorldPosition());
+		PhysicalBody->SetRotation(Owner->GetWorldRotation());
+	}
 }
 
 void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 {
-	LODs[0].Draw(DrawParameters);	
+	ZEVector3 WorldPosition;
+	ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), ZEVector3::Zero);
+	float DistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->Camera->GetWorldPosition(), WorldPosition);
+
+	int Lod = 0;
+	int LastLod = LODs.GetCount() - 1;
+
+	if (DistanceSquare > 40 * 40) 
+		Lod = -1;
+	else if (DistanceSquare > 30 * 30)
+		Lod = 2;
+	else if (DistanceSquare > 20 * 20)
+		Lod = 1;
+	else
+		Lod = 0;
+
+	if (Lod == -1)
+		return;
+
+	if (Lod > LastLod)
+		Lod = LastLod;
+
+	LODs[Lod].Draw(DrawParameters, DistanceSquare);
 }
 
 
@@ -290,13 +314,10 @@ ZEModelMesh::ZEModelMesh()
 {
 	Owner = NULL;
 	MeshResource = NULL;
+	PhysicalBody = NULL;
 }
 
 ZEModelMesh::~ZEModelMesh()
 {
 	Deinitialize();
 }
-
-
-
-

@@ -60,7 +60,8 @@ class ZEPhysicalWorld;
 class ZEPhysicalObject
 {
 	protected:
-		ZEPhysicalCollisionCallback				CollisionCallback;
+		ZEPhysicalCollisionEvent				CollisionEvent;
+		ZEPhysicalTransformChangeEvent			TransformChangeEvent;
 
 												ZEPhysicalObject(){}
 		virtual									~ZEPhysicalObject(){}
@@ -83,18 +84,23 @@ class ZEPhysicalObject
 		virtual void							SetScale(const ZEVector3& NewScale) = 0;
 		virtual ZEVector3						GetScale() = 0;
 
-		virtual void							SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags) = 0;
-		virtual ZEDWORD							GetCollisionCallbackFlags() = 0;
+		//virtual void							SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags) = 0;
+		//virtual ZEDWORD						GetCollisionCallbackFlags() = 0;
 
-		virtual void							SetCollisionCallback(const ZEPhysicalCollisionCallback& CollisionCallback);
+		virtual void							SetCollisionEvent(const ZEPhysicalCollisionEvent& Event);
 		virtual const
-		ZEPhysicalCollisionCallback&			GetCollisionCallback();
+		ZEPhysicalCollisionEvent&				GetCollisionEvent();
+
+		virtual void							SetTransformChangeEvent(const ZEPhysicalTransformChangeEvent& Event);
+		virtual const
+		ZEPhysicalTransformChangeEvent&			GetTransformChangeEvent();
 
 		virtual bool							Initialize() = 0;
 		virtual void							Deinitialize() = 0;
 
 		void									Destroy();
 };
+
 #endif
 
 

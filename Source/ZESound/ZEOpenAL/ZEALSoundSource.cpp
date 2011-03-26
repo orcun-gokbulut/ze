@@ -211,7 +211,10 @@ void ZEALSoundSource::DestroyBufferSource()
 		alDeleteSources(1, &ALSource);
 	
 	if (InnerStreamBuffer != NULL)
+	{
 		delete[] InnerStreamBuffer;
+		InnerStreamBuffer = NULL;
+	}
 
 	Allocated = false;
 }
@@ -331,7 +334,10 @@ void ZEALSoundSource::SetCurrentPosition(unsigned int SampleIndex)
 			SampleIndex = SoundResource->GetSampleCount();
 
 		if (Streaming)
+		{
 			CurrentPosition = SampleIndex;
+			ResetStream();
+		}
 		else
 			alSourcei(ALSource, AL_SAMPLE_OFFSET, SampleIndex);
 	}
@@ -361,6 +367,8 @@ void ZEALSoundSource::SetPan(int NewPan)
 	else
 		Pan = NewPan;
 
+	zeLog("OpenAL","Panning is not supported with OpenAL");
+
 	// No panning support in OpenAL!
 }
 
@@ -374,8 +382,10 @@ void ZEALSoundSource::SetPlaybackSpeed(float Speed)
 
 void ZEALSoundSource::SetVolume(unsigned int NewVolume)
 {
-	if (Volume > ZE_SS_VOLUME_MAX)
+	if (NewVolume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;
+	else
+		Volume = NewVolume;
 
 	float EffectiveVolume = (float)Volume * ((float)GetModule()->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
 	
@@ -516,7 +526,7 @@ void ZEALSoundSource::SetSoundResource(ZESoundResource* Resource)
 			SoundResource = NULL;
 			return;
 		}
-		SoundSourceState = ZE_SSS_STOPPED;		
+
 		SoundResource->AddReferance();
 	}
 	else

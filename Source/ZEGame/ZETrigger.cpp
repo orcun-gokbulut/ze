@@ -35,6 +35,9 @@
 
 #include "ZETrigger.h"
 #include "ZEScene.h"
+#include "ZEGame/ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZETrigger);
 
 ZEDWORD ZETrigger::GetDrawFlags()
 {
@@ -56,7 +59,7 @@ void ZETrigger::SetCallback(ZETriggerCallback Callback)
 
 ZETriggerCallback ZETrigger::GetCallback()
 {
-	return Callback;
+	return this->Callback;
 }
 
 void ZETrigger::SetTriggerShape(ZETriggerShape TriggerShape)
@@ -160,4 +163,15 @@ ZETrigger::ZETrigger()
 	IsTriggerFired		= false;
 }
 
+ZETrigger* ZETrigger::CreateInstance()
+{
+	return new ZETrigger();
+}
+
 #include "ZETrigger.h.zpp"
+
+ZEEntityRunAt ZETriggerDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}
+

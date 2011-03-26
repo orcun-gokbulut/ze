@@ -37,7 +37,6 @@
 #ifndef __ZE_PROPERTY_H__
 #define __ZE_PROPERTY_H__
 
-#include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEVariant.h"
 #include "ZEDefinitions.h"
 
@@ -52,49 +51,48 @@ enum ZEPropertySemantic
 	ZE_PS_COLOR,
 };
 
-enum ZEPropertyAccess
-{
-	ZE_PA_NOACCESS		= 0,
-	ZE_PA_READONLY		= 1,
-	ZE_PA_WRITEONLY		= 2,
-	ZE_PA_READWRITE		= 3,
-};
+typedef unsigned int ZEPropertyAccess;
+#define	ZE_PA_NO_ACCESS		0
+#define	ZE_PA_READ			1
+#define	ZE_PA_WRITE			2
 
 struct ZEPropertyEnumuratorItem
 {
-	const char*									Name;
-	int											Value;
+	const char*						Name;
+	int								Value;
 };
 
 struct ZEPropertyEnumurator
 {
-	const char*									Name;
-	ZEPropertyEnumuratorItem*					Items;
-	size_t										ItemCount;
+	const char*						Name;
+	ZEPropertyEnumuratorItem*		Items;
+	size_t							ItemCount;
 };
 
 
 
 struct ZEPropertyDescription
 {
-	const char*									Name;
-	ZEVariantType								Type;
-	ZEPropertyAccess							Access;
-	bool										Visibility;
-	bool										Animatable;
-	const char*									Description;
-	const char*									GroupName;
-	ZEPropertySemantic							Semantic;
-	void*										SemanticProperties;
-	ZEPropertyEnumurator*						Enumurators;
+	const char*						Name;
+	const char*						Description;
+	const char*						GroupName;
+	ZEPropertyAccess				Access;
+	bool							Visibility;
+
+	ZEVariantType					Type;
+	bool							Animatable;
+	ZEPropertySemantic				Semantic;
+	void*							SemanticProperties;
+	ZEPropertyEnumurator*			Enumurators;
 };
 
-struct ZEMethodDescription
+struct ZERunTimeProperty
 {
-	const char*									Name;
-	size_t										ParameterCount;
-	const ZEVariantType* const					Parameters;
-	ZEVariantType								ReturnType;
+	const char*						Name;
+	ZEVariantType					Type;
+	ZEVariant						Value;
+	unsigned int					Hash;
+	ZEPropertySemantic				Semantic;
 };
 
 #endif

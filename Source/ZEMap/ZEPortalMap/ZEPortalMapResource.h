@@ -45,7 +45,6 @@
 #include "ZEDefinitions.h"
 #include "ZECore\ZEResource.h"
 #include "ZEGraphics\ZEVertexTypes.h"
-#include "ZEPortalMapPortalOctree.h"
 
 class ZEMaterial;
 class ZETexture2D;
@@ -118,7 +117,7 @@ class ZEPortalMapResource : public ZEMapResource
 		const ZEArray<ZEPortalMapResourceDoor>&		GetDoors();
 
 		static ZEPortalMapResource*					LoadResource(const char* FileName);
-		static const ZEPortalMapResource*			LoadSharedResource(const char* FileName);
+		static ZEPortalMapResource*					LoadSharedResource(const char* FileName);
 		static void									CacheResource(const char* FileName);
 };
 #endif

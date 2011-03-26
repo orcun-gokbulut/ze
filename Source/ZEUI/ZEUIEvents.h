@@ -42,24 +42,25 @@
 
 enum ZEUIMouseKey
 {
-	ZE_UI_MOUSE_BUTTON_NONE	= 0,
-	ZE_UI_MOUSE_BUTTON_LEFT	= 1,
+	ZE_UI_MOUSE_BUTTON_NONE		= 0,
+	ZE_UI_MOUSE_BUTTON_LEFT		= 1,
 	ZE_UI_MOUSE_BUTTON_RIGHT	= 2,
 	ZE_UI_MOUSE_BUTTON_MIDDLE	= 3,
 };
 
 // Mouse Events
-typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseClicked;
+typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseClicked;
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseDoubleClicked;
 typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseButtonPressed;
 typedef fastdelegate::FastDelegate2<ZEUIMouseKey, const ZEVector2&, void>	ZEUIEventMouseButtonReleased;
+typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseHovered;
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseEntered;
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseLeft;
 typedef fastdelegate::FastDelegate1<const ZEVector2&, void>					ZEUIEventMouseMoved;
 
 // Keyboard Events
-typedef fastdelegate::FastDelegate1<char, void>								ZEUIEventKeyPressed;
-typedef fastdelegate::FastDelegate1<char, void>								ZEUIEventKeyReleased;
+typedef fastdelegate::FastDelegate1<unsigned char, void>								ZEUIEventKeyPressed;
+typedef fastdelegate::FastDelegate1<unsigned char, void>								ZEUIEventKeyReleased;
 
 // Component Event
 typedef fastdelegate::FastDelegate0<void>									ZEUIEventDestroyed;

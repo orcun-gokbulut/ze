@@ -44,6 +44,8 @@
 class ZETexture2D;
 class ZETextureCube;
 class ZERenderOrder;
+class ZEViewPort;
+class ZED3D9ViewPort;
 enum ZETextureCubeFace;
 
 class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
@@ -58,7 +60,20 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 
 		ZEArray<ZEPostProcessor*>				PostProcessors;
 
-		ZECamera*								Camera;
+		ZELight*								Light;
+		
+		bool									Face;
+
+		bool									InitializeShaders();
+		void									DeinitializeShaders();
+
+		void									RenderProjectiveLight();
+		void									RenderPointLight();
+		void									RenderOmniProjectiveLight();
+		void									RenderDirectionalLight();
+
+		LPDIRECT3DSURFACE9						ShadowMapFrameBuffer;
+		LPDIRECT3DSURFACE9						ShadowMapZBuffer;
 
 	protected:
 												ZED3D9ShadowRenderer();
@@ -67,9 +82,6 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		void									DrawRenderOrder(ZERenderOrder* RenderOrder);
 
 	public:	
-		static bool								BaseInitialize();
-		static void								BaseDeinitialize();
-
 		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors();
 		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor);
 		virtual void							RemovePostProcessor(ZEPostProcessor* PostProcessor);
@@ -81,14 +93,17 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		virtual void							DeviceLost();
 		virtual bool							DeviceRestored();
 
-		virtual void							SetCamera(ZECamera* Camera);
-		virtual ZECamera*						GetCamera();
+		virtual void							SetLight(ZELight* Light);
+		virtual ZELight*						GetLight();
+
+		virtual	void							SetFace(bool Front);
+		virtual bool							GetFace();
 
 		virtual void							SetViewPort(ZEViewPort* ViewPort);
 		virtual ZEViewPort*						GetViewPort();
 
 		virtual void							AddToRenderList(ZERenderOrder* RenderOrder);
-		virtual void							ClearList();
+		virtual void							ClearRenderList();
 
 		virtual void							Render(float ElaspedTime);
 };

@@ -49,6 +49,7 @@ class ZED3D9ComponentBase
 	private:
 		static ZED3D9Module*			Module;
 		static LPDIRECT3DDEVICE9		Device;
+		static LPDIRECT3D9				Direct3D;
 
 	protected:
 		static inline ZED3D9Module*		GetModule()
@@ -61,12 +62,16 @@ class ZED3D9ComponentBase
 			return Device;
 		}
 
+		static inline LPDIRECT3D9 GetDirect3D()
+		{
+			return Direct3D;
+		}
+
 	public:
 		static bool						BaseInitialize(ZED3D9Module* D3DModule);
 
+/*		virtual	void					OnDeviceLost();
+		virtual bool					OnDeviceRestored();*/
 };
+
 #endif
-
-
-
-

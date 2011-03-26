@@ -38,6 +38,7 @@
 #define __ZE_SOUND_DEBUG_MODULE_H__
 
 #include "ZEDebugModule.h"
+#include "ZEGame/ZEGrid.h"
 
 class ZEPlayer;
 class ZESoundSource;
@@ -46,12 +47,22 @@ class ZESoundSource3D;
 class ZESoundDebugModule : public ZEDebugModule
 {
 	private:
+
 		ZEPlayer*				Player;
 		ZESoundSource3D*		SoundSource;
-		
+
+		float					TotalTime;
+
+		bool					EnterFlag;
+
+		ZESoundSource*			SoundBrush2D;
+	//	ZESoundBrush3D*			SoundBrush3D;
+	
 	public:
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
+
+		virtual void			Process(float ElapsedTime);
 
 								ZESoundDebugModule();
 		virtual					~ZESoundDebugModule();

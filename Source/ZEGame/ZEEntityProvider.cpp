@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEEntityProvider.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEEntityProvider.h"
+
+ZEEntityProvider::ZEEntityProvider()
+{
+	SetBaseClass(ZEEntity::ClassDescription());
+}
+
+ZEEntityProvider::~ZEEntityProvider()
+{
+
+}
+
+ZEEntityProvider* ZEEntityProvider::GetInstance()
+{
+	static ZEEntityProvider* Provider = new ZEEntityProvider();
+
+	return Provider;
+}

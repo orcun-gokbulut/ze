@@ -70,7 +70,7 @@ class ZETextureCube : public ZETexture
 		virtual ZEViewPort*				GetViewPort(ZETextureCubeFace Face) = 0;
 
 		virtual	bool					Create(int EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual void					Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch) = 0;
+		virtual bool					Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch) = 0;
 		virtual void					Unlock(ZETextureCubeFace Face) = 0;
 
 		static ZETextureCube*			CreateInstance();

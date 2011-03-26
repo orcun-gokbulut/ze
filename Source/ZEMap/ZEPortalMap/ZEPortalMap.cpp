@@ -40,6 +40,51 @@
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEConsole.h"
 #include "ZEGame\ZEDrawParameters.h"
+#include "ZEMath\ZETriangle.h"
+#include "ZEMath\ZERay.h"
+#include <string.h>
+
+ZEDrawFlags ZEPortalMap::GetDrawFlags() const
+{
+	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
+}
+
+ZERayCastFlags ZEPortalMap::GetRayCastFlags() const
+{
+	return ZE_RCF_INTERNAL;
+}
+
+void ZEPortalMap::LoadPortalResource(ZEPortalMapResource* NewResource)
+{
+	if (Resource != NULL)
+	{
+		Resource->Release();
+		Resource = NULL;
+	}
+
+	if (NewResource == NULL)
+	{
+		for (size_t I = 0; I < Portals.GetCount(); I++)
+			Portals[I].Deinitialize();
+
+		Portals.SetCount(0);
+
+		for (size_t I = 0; I < Doors.GetCount(); I++)
+			Doors[I].Deinitialize();
+
+		Doors.SetCount(0);
+	}
+
+	this->Resource = NewResource;
+
+	Portals.SetCount(Resource->GetPortals().GetCount());
+	for (size_t I = 0; I < Portals.GetCount(); I++)
+		Portals[I].Initialize(this, (ZEPortalMapResourcePortal*)&Resource->GetPortals()[I]);
+
+	Doors.SetCount(Resource->GetDoors().GetCount());
+	for (size_t I = 0; I < Doors.GetCount(); I++)
+		Doors[I].Initialize(this, &Resource->GetDoors()[I]);
+}
 
 ZEPortalMap::ZEPortalMap()
 {
@@ -63,19 +108,22 @@ const ZEArray<ZEPortalMapDoor>& ZEPortalMap::GetDoors()
 
 bool ZEPortalMap::Initialize()
 {
-	if (Resource != NULL)
+	if (GetInitialized())
+		return false;
+
+	if (!PortalMapFile.IsEmpty())
 	{
-		Portals.SetCount(Resource->GetPortals().GetCount());
-		
-		for (size_t I = 0; I < Portals.GetCount(); I++)
-			Portals[I].Initialize(this, (ZEPortalMapResourcePortal*)&Resource->GetPortals()[I]);
-		
-		Doors.SetCount(Resource->GetDoors().GetCount());
-		for (size_t I = 0; I < Doors.GetCount(); I++)
-			Doors[I].Initialize(this, &Resource->GetDoors()[I]);
+		ZEPortalMapResource* NewResource = ZEPortalMapResource::LoadSharedResource(PortalMapFile);
+		if (NewResource != NULL)
+			LoadPortalResource(NewResource);
+		else
+		{
+			zeError("ZEPortalMap", "Can not load ZEPortalMap file.");
+			return false;
+		}
 	}
 
-	return true;
+	return ZEEntity::Initialize();
 }
 
 void ZEPortalMap::Deinitialize()
@@ -87,24 +135,31 @@ void ZEPortalMap::Deinitialize()
 	}
 }
 
-ZEMapResource* ZEPortalMap::GetResource()
+bool ZEPortalMap::SetMapFile(const ZEString& FileName)
 {
-	return Resource;
-}
+	PortalMapFile = FileName;
 
-bool ZEPortalMap::SetResource(ZEMapResource* Resource)
-{
-	if (strcmp(Resource->GetResourceType(), "Portal Map Resource") == 0)
+	if (!GetInitialized())
+		return false;
+
+	const ZEPortalMapResource* NewResource = ZEPortalMapResource::LoadSharedResource(PortalMapFile);
+	if (NewResource != NULL)
+		LoadPortalResource(Resource);
+	else
 	{
-		this->Resource = (ZEPortalMapResource*)Resource;
-		Initialize();
-		return true;
+		zeError("ZEPortalMap", "Can not load ZEPortalMap file.");
+		return false;
 	}
 
 	return false;
 }
 
-void ZEPortalMap::Render(ZEDrawParameters* DrawParameters)
+const ZEString& ZEPortalMap::GetMapFile() const
+{
+	return PortalMapFile;
+}
+
+void ZEPortalMap::Draw(ZEDrawParameters* DrawParameters)
 {
 	for (size_t I = 0; I < Portals.GetCount(); I++)
 		Portals[I].Draw(DrawParameters);
@@ -112,7 +167,30 @@ void ZEPortalMap::Render(ZEDrawParameters* DrawParameters)
 
 bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT)
 {
-	return false;
+	if (Resource == NULL)
+		return false;
+
+	float T, CurMinT = 100000000000000.0f;
+	bool Found = false;
+	for (size_t I = 0; I < Resource->GetPortals().GetCount(); I++)
+	{
+		const ZEPortalMapResourcePortal* CurrentPortal = &Resource->GetPortals()[I];
+		//if (ZEAABoundingBox::IntersectionTest(CurrentPortal->BoundingBox,Ray))
+		for (size_t N = 0; N < CurrentPortal->Polygons.GetCount(); N++)
+		{
+			const ZEPortalMapPolygon& MapPolygon = CurrentPortal->Polygons[N];
+			ZETriangle Triangle(MapPolygon.Vertices[0].Position, MapPolygon.Vertices[1].Position, MapPolygon.Vertices[2].Position);
+			if (ZETriangle::IntersectionTest(Triangle, Ray, T) && (!Found || MinT > T))
+			{
+				MinT = T;
+				Ray.GetPointOn(Position, T);
+				ZETriangle::GetNormal(Triangle, Normal);
+				Found = true;
+			}
+		}
+	}
+
+	return Found;
 }
 
 ZEPortalMap* ZEPortalMap::CreateInstance()
@@ -120,6 +198,9 @@ ZEPortalMap* ZEPortalMap::CreateInstance()
 	return new ZEPortalMap();
 }
 
+ZEEntityRunAt ZEPortalMapDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}
 
-
-
+#include "ZEPortalMap.h.zpp"

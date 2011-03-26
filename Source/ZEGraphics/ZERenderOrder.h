@@ -42,6 +42,12 @@
 #include "ZEMath\ZEMatrix.h"
 #include "ZEMath\ZEAABoundingBox.h"
 
+enum ZERenderPipeline
+{
+	ZE_RORP_2D,
+	ZE_RORP_3D
+};
+
 // ZERenderOrderFlags
 typedef ZEDWORD ZERenderOrderFlags;
 #define	ZE_ROF_NONE									0
@@ -74,13 +80,16 @@ class ZEVertexBuffer;
 class ZERenderOrder
 {
 	public:
+		ZERenderPipeline				Pipeline;
 		int								Priority;
+		float							Order;
 		ZERenderOrderFlags				Flags;
 		ZEROPrimitiveType				PrimitiveType;
 		ZEVertexDeclaration*			VertexDeclaration;
 		size_t							VertexBufferOffset;
 		size_t							PrimitiveCount;
 
+		//const ZECamera*					Camera;
 		const ZEMaterial*				Material;
 
 		void*							IndexBuffer;

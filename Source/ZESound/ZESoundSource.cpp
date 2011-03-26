@@ -35,6 +35,9 @@
 
 #include "ZESoundSource.h"
 #include "ZESoundModule.h"
+#include "ZEGame\ZEEntityProvider.h"
+
+ZE_META_REGISTER_CLASS(ZEEntityProvider, ZESoundSource);
 
 ZESoundSource::ZESoundSource()
 {
@@ -96,8 +99,8 @@ void ZESoundSource::SetCurrentPositionTime(float Seconds)
 	if (SoundResource != NULL)
 	{
 		unsigned int SampleIndex = (float)SoundResource->GetSamplesPerSecond() * Seconds;
-		if (SampleIndex > SoundResource->GetSampleCount())
-			SetStartPosition(SoundResource->GetSampleCount());
+		if (SampleIndex < SoundResource->GetSampleCount())
+			SetCurrentPosition(SampleIndex);
 	}
 }
 
@@ -207,7 +210,7 @@ float ZESoundSource::GetStartPositionTime() const
 float ZESoundSource::GetStartPositionPersentage() const
 {
 	if (SoundResource != NULL)
-		return (StartPosition / SoundResource->GetSampleCount()) * 100.0f;
+		return ((float)StartPosition / SoundResource->GetSampleCount()) * 100.0f;
 	else
 		return 0.0f;
 }
@@ -261,7 +264,7 @@ float ZESoundSource::GetEndPositionTime() const
 float ZESoundSource::GetEndPositionPersentage() const
 {
 	if (SoundResource != NULL)
-		return (EndPosition / SoundResource->GetSampleCount()) * 100.0f;
+		return ((float)EndPosition / SoundResource->GetSampleCount()) * 100.0f;
 	else
 		return 0.0f;
 }
@@ -362,9 +365,9 @@ ZESoundSource* ZESoundSource::CreateInstance()
 	return zeSound->CreateSoundSource();
 }
 
-
 #include "ZESoundSource.h.zpp"
 
-
-
-
+ZEEntityRunAt ZESoundSourceDescription::GetRunAt() const
+{
+	return ZE_ERA_BOTH;
+}

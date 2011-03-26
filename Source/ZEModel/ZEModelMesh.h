@@ -40,16 +40,18 @@
 #include "ZEModelAnimation.h"
 #include "ZEModelMeshLod.h"
 
-#include "ZEGame\ZEComponent.h"
-#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGame/ZEComponent.h"
+#include "ZEGraphics/ZERenderOrder.h"
 
 class ZEModel;
 class ZEModelResourceMesh;
-class ZEPhysicalRigidBody;
+class ZEPhysicsBody;
 class ZEModelMesh
 {
+	friend class ZEModel;
 	private:
 		ZEModel*							Owner;
+
 		const ZEModelResourceMesh*			MeshResource;
 		ZEAABoundingBox						LocalBoundingBox;
 		ZEAABoundingBox						ModelBoundingBox;
@@ -69,21 +71,16 @@ class ZEModelMesh
 		bool								AutoLOD;
 		size_t								ActiveLOD;
 
-		bool								UpdateLocalTransform;
-		bool								UpdateModelTransform;
-		bool								UpdateWorldTransform;
-		bool								UpdateModelBoundingBox;
-		bool								UpdateWorldBoundingBox;
-
 		ZEModelAnimationType				AnimationType;
 		bool								Visible;		
 
 		ZEArray<ZEModelMeshLOD>				LODs;
 
-		void								UpdatePhysicalBody();
+		void								OnTransformChanged();
 
 	public:
 		const char*							GetName();
+		ZEPhysicalRigidBody*				GetPhysicalBody() { return PhysicalBody; }
 
 		const ZEAABoundingBox&				GetLocalBoundingBox();
 		const ZEAABoundingBox&				GetModelBoundingBox();
@@ -105,9 +102,6 @@ class ZEModelMesh
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
 
-		void								ModelTransformChanged();
-		void								ModelWorldTransformChanged();
-
 		void								SetActiveLOD(size_t LOD);
 		size_t								GetActiveLOD();
 
@@ -116,8 +110,6 @@ class ZEModelMesh
 
 		void								SetVisible(bool Visible);
 		bool								GetVisible();
-
-		ZEPhysicalRigidBody*				GetPhysicalBody();
 
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();
@@ -131,8 +123,4 @@ class ZEModelMesh
 											~ZEModelMesh();
 };
 #endif
-
-
-
-
 

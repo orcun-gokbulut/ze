@@ -46,12 +46,16 @@ class ZEPhysicalShape;
 class ZEPhysXPhysicalWorld;
 class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 {
+	friend class ZEPhysXPhysicalJoint;
 	friend class ZEPhysXModule;
+
 	private:
 		ZEPhysXPhysicalWorld*			PhysicalWorld;
 		ZEArray<ZEPhysicalShape*>		Shapes;
 		ZEVector3						Scale;
+		
 		bool							Enabled;
+		bool							IsWakeUp;
 
 		NxActor*						Actor;
 		NxActorDesc						ActorDesc;
@@ -63,9 +67,6 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 		virtual							~ZEPhysXPhysicalRigidBody();
 								
 	public:
-		virtual void					SetKinematic(bool Enabled);
-		virtual bool					GetKinematic();
-
 		virtual void					SetPhysicalWorld(ZEPhysicalWorld* World);
 		virtual ZEPhysicalWorld*		GetPhysicalWorld();
 
@@ -85,6 +86,9 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 		ZEArray<ZEPhysicalShape*>&		GetPhysicalShapes();
 		virtual void					AddPhysicalShape(ZEPhysicalShape* Shape);
 		virtual void					RemovePhysicalShape(ZEPhysicalShape* Shape);
+
+		virtual void					SetPhysicalBodyType(ZEPhysicalBodyType Type);
+		virtual ZEPhysicalBodyType		GetPhysicalBodyType() const;
 
 		virtual void					SetMass(float NewMass);
 		virtual float					GetMass();
@@ -122,14 +126,22 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 		virtual void					SetAngularMomentum(const ZEVector3& NewAngularMomentum);
 		virtual ZEVector3				GetAngularMomentum();
 
-		virtual void					SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags);
-		virtual ZEDWORD					GetCollisionCallbackFlags();
+		virtual void					SetCollisionEventFlags(ZEDWORD CollisionEventFlags);
+		virtual ZEDWORD					GetCollisionEventFlags();
 
-		virtual void					ApplyForce(const ZEVector3& Force);
-		virtual void					ApplyTorque(const ZEVector3& Torque);
+		virtual void					ApplyForce(const ZEVector3& Force, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
+		virtual void					ApplyTorque(const ZEVector3& Torque, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
 								
-		virtual void					ApplyLocalForce(const ZEVector3& Force);
-		virtual void					ApplyLocalTorque(const ZEVector3& Torque);
+		virtual void					ApplyLocalForce(const ZEVector3& Force, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
+		virtual void					ApplyLocalTorque(const ZEVector3& Torque, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
+
+		virtual void					ApplyForceAtPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
+		virtual void					ApplyForceAtLocalPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
+
+		virtual void					ApplyLocalForceAtPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
+		virtual void					ApplyLocalForceAtLocalPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
+
+		virtual float					GetComputedKineticEnergy() const;
 								
 		virtual bool					Initialize();
 		virtual void					Deinitialize();

@@ -36,28 +36,33 @@
 #pragma once
 #ifndef	__ZE_MATERIAL_COMPONENTS_H__
 #define __ZE_MATERIAL_COMPONENTS_H__
+// Vertex Transform Properties
+#define ZE_SHADER_MORPHING
+#define ZE_SHADER_SKINNING
 
-#define ZESHADER_AMBIENT					(1 << 1)
-#define ZESHADER_DIFFUSE					(1 << 2)
-#define ZESHADER_DIFFUSEMAP					(1 << 3)
-#define ZESHADER_NORMALMAP					(1 << 4)
-#define ZESHADER_PARALLAXMAP				(1 << 5)
-#define ZESHADER_SPECULAR					(1 << 6)
-#define ZESHADER_SPECULARMAP				(1 << 7)
-#define ZESHADER_EMMISIVE					(1 << 8)
-#define ZESHADER_EMMISIVEMAP				(1 << 9)
-#define ZESHADER_OPACITY					(1 << 10)
-#define ZESHADER_OPACITY_DIFFUSEALPHA		(1 << 11)
-#define ZESHADER_OPACITY_CONSTANT			(1 << 12)
-#define ZESHADER_OCAPASITYMAP				(1 << 13)
-#define ZESHADER_DETAILMAP					(1 << 14)
-#define ZESHADER_DETAILDIFFUSEMAP			(1 << 15)
-#define ZESHADER_DETAILNORMALMAP			(1 << 16)
-#define ZESHADER_REFLECTION					(1 << 17)
-#define ZESHADER_REFRACTION					(1 << 18)
-#define ZESHADER_LIGHTMAP					(1 << 19)
-#define ZESHADER_DISTORTIONMAP				(1 << 20)
-
+// Material Properties
+#define ZE_SHADER_AMBIENT					(1 << 1)
+#define ZE_SHADER_DIFFUSE					(1 << 2)
+#define ZE_SHADER_BASE_MAP					(1 << 3)
+#define ZE_SHADER_BUMP_MAPPING
+#define ZE_SHADER_NORMAL_MAP				(1 << 4)
+#define ZE_SHADER_PARALLAX_MAP				(1 << 5)
+#define ZE_SHADER_SPECULAR					(1 << 6)
+#define ZE_SHADER_SPECULAR_MAP				(1 << 7)
+#define ZE_SHADER_EMMISIVE					(1 << 8)
+#define ZE_SHADER_EMMISIVE_MAP				(1 << 9)
+#define ZE_SHADER_OPACITY					(1 << 10)
+#define ZE_SHADER_OPACITY_BASE_ALPHA		(1 << 11)
+#define ZE_SHADER_OPACITY_CONSTANT			(1 << 12)
+#define ZE_SHADER_OPACITY_MAP				(1 << 13)
+#define ZE_SHADER_DETAIL_MAP				(1 << 14)
+#define ZE_SHADER_DETAIL_BASE_MAP			(1 << 15)
+#define ZE_SHADER_DETAIL_NORMAL_MAP			(1 << 16)
+#define ZE_SHADER_REFLECTION				(1 << 17)
+#define ZE_SHADER_REFRACTION				(1 << 18)
+#define ZE_SHADER_LIGHT_MAP					(1 << 19)
+#define ZE_SHADER_DISTORTION_MAP			(1 << 20)
+#define ZE_SHADER_ALPHA_CULL				(1 << 22)
 #endif
 
 

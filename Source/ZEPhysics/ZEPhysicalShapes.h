@@ -45,14 +45,12 @@
 
 enum  ZEPhysicalShapeType
 {
-	ZE_PST_BOX,
-	ZE_PST_SPHERE,
-	ZE_PST_CYLINDER,
-	ZE_PST_CAPSULE,
-	ZE_PST_CONVEX,
+	ZE_PST_BOX			= 0,
+	ZE_PST_SPHERE		= 1,
+	ZE_PST_CAPSULE		= 2,
+	ZE_PST_CYLINDER		= 3,
+	ZE_PST_CONVEX		= 4,
 };
-
-#define ZE_PST_TRIMESH -1 // Will be removes
 
 class ZEPhysicalObject;
 
@@ -63,7 +61,7 @@ class ZEPhysicalShape
 		ZEVector3						Position;
 		ZEQuaternion					Rotation;
 		bool							Trigger;
-		ZEPhysicalMaterial				Material;
+		ZEPhysicalMaterial*				Material;
 
 	public:
 		virtual ZEPhysicalShapeType		GetPhysicalShapeType() = 0;
@@ -77,8 +75,8 @@ class ZEPhysicalShape
 		void							SetRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion&				GetRotation();
 
-		void							SetMaterial(const ZEPhysicalMaterial& NewMaterial);
-		const ZEPhysicalMaterial&		GetMaterial();
+		void							SetMaterial(ZEPhysicalMaterial* NewMaterial);
+		ZEPhysicalMaterial*				GetMaterial();
 
 										ZEPhysicalShape();
 };

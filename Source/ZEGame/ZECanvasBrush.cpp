@@ -72,8 +72,6 @@ void ZECanvasBrush::UpdateCanvas()
 		Canvas.CalculateBoundingBox(BoundingBox);
 		SetLocalBoundingBox(BoundingBox);
 		RenderOrder.VertexBuffer = Canvas.CreateStaticVertexBuffer();
-
-		DirtyFlags |= ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_BOUNDING_SPHERE;
 	}
 }
 
@@ -129,7 +127,6 @@ ZECanvasBrush::ZECanvasBrush()
 {
 	VertexBuffer = NULL;
 	OldVertexCount = 0;
-	SetBoundingVolumeMechanism(ZE_BVM_USE_LOCAL_ONLY);
 	RenderOrder.SetZero();
 	Material = NULL;
 	PrimitiveType = ZE_ROPT_TRIANGLE;
@@ -144,6 +141,11 @@ ZECanvasBrush::~ZECanvasBrush()
 		Material->Release();
 	if (RenderOrder.VertexBuffer != NULL)
 		((ZEStaticVertexBuffer*)RenderOrder.VertexBuffer)->Release();
+}
+
+ZECanvasBrush* ZECanvasBrush::CreateInstance()
+{
+	return new ZECanvasBrush();
 }
 
 #include "ZECanvasBrush.h.zpp"

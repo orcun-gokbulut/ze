@@ -57,6 +57,13 @@ class ZECamera;
 class ZERenderOrder;
 class ZETexture2D;
 class ZEViewPort;
+class ZELight;
+
+enum ZERendererType
+{
+	ZE_RT_FRAME,
+	ZE_RT_SHADOW
+};
 
 class ZERenderer
 {
@@ -65,21 +72,7 @@ class ZERenderer
 		virtual								~ZERenderer();
 
 	public:
-		virtual void						SetRenderColorTexture(bool Enable);
-		virtual bool						GetRenderColorTexture();
-		virtual void						SetRenderDepthTexture(bool Enable);
-		virtual bool						GetRenderDepthTexture();
-
-		virtual void						SetRenderVelocityTexture(bool Enable);
-		virtual bool						GetRenderVelocityTexture();
-
-		virtual void						SetRenderObjectTexture(bool Enable);
-		virtual bool						GetRenderObjectTexture();
-
-		virtual ZETexture2D*				GetColorTexture();
-		virtual ZETexture2D*				GetDepthTexture();
-		virtual ZETexture2D*				GetVelocityTexture();
-		virtual ZETexture2D*				GetObjectTexture();
+		virtual ZERendererType				GetRendererType() = 0;
 
 		virtual ZEArray<ZEPostProcessor*>&	GetPostProcessors() = 0;
 		virtual void						AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;
@@ -88,25 +81,20 @@ class ZERenderer
 		virtual void						SetViewPort(ZEViewPort* ViewPort) = 0;
 		virtual ZEViewPort*					GetViewPort() = 0;
 
-		virtual void						SetCamera(ZECamera* Camera) = 0;
-		virtual ZECamera*					GetCamera() = 0;
-
 		virtual bool						Initialize() = 0;
 		virtual void						Deinitialize() = 0;
 
 		virtual void						Destroy();
 
+		virtual void						AddToLightList(ZELight* Light);
+		virtual void						ClearLightList();
+
 		virtual void						AddToRenderList(ZERenderOrder* RenderOrder) = 0;
-		virtual void						ClearList() = 0;
+		virtual void						ClearRenderList() = 0;
 
+		void								ClearLists();
+		
 		virtual void						Render(float ElaspedTime = 0) = 0;
-
-
-		static ZERenderer*					CreateInstance();
 };
 
 #endif
-
-
-
-

@@ -42,11 +42,16 @@
 
 class ZETexture2D; 
 
+ZE_META_CLASS_DESCRIPTION(ZEDirectionalLight);
+
 class ZEDirectionalLight : public ZELight
 {
+	ZE_META_ENTITY(ZEDirectionalLight)
 	private:
 		ZETexture2D*					ShadowMap;
 		ZEViewPlane						ViewVolume;
+
+										ZEDirectionalLight();
 
 	public:
 		ZELightType						GetLightType();
@@ -56,11 +61,17 @@ class ZEDirectionalLight : public ZELight
 		virtual void					RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* ShadowRenderer);
 		virtual const ZEViewVolume&		GetViewVolume();
 
-										ZEDirectionalLight();
+		static ZEDirectionalLight*		CreateInstance();
 };
 
 #endif
 
-
-
-
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta> 
+		<class name="ZEDirectionalLight" parent="ZELight" description="Directional Light"/>
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/

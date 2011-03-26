@@ -39,18 +39,41 @@
 
 #include "ZEDS\ZEArray.h"
 #include "ZEUIRenderer.h"
+#include "ZEUIEvents.h"
+#include "ZEInput/ZEInputMap.h"
 
 class ZEUIControl;
+class ZEUICursorControl;
+
 class ZEUIManager
 {
 	private:
+		
+		ZEInputMap					InputMap;
+
 		ZEArray<ZEUIControl*>		Controls;
 		ZEUIRenderer*				UIRenderer;
+		ZEUICursorControl*			Cursor;
+		
+		ZEUIControl*				LastHoveredControl;
+		ZEUIControl*				LastPressedControl;
+		ZEUIControl*				LastFocusedControl;
+
+		ZEUIMouseKey				PressedButton;
+		ZEUIMouseKey				PreviousPressedButton;
+
+		ZEVector2					OldMousePosition;
+		bool						MouseMoveEventFlag;
+
+		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
 
 									ZEUIManager();
 									~ZEUIManager();
 
 	public:
+	
+		void						SetActiveCursor(ZEUICursorControl* Cursor);
+
 		void						AddControl(ZEUIControl* Control);
 		void						RemoveControl(ZEUIControl* Control);
 		ZEArray<ZEUIControl*>&		GetControls();
@@ -60,6 +83,7 @@ class ZEUIManager
 		
 		void						ProcessEvents();
 		void						Render(ZERenderer* Render);
+		void						Tick(float ElapsedTime);
 
 		void						Destroy();
 

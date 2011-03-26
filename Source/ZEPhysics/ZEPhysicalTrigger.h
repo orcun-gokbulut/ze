@@ -37,16 +37,70 @@
 #ifndef	__ZE_PHYSICAL_TRIGGER_H__
 #define __ZE_PHYSICAL_TRIGGER_H__
 
-#include "ZEFastDelegate.h"
+#include "ZEPhysicsModule.h"
+#include "ZEPhysicalObject.h"
 
-class ZEPhysicsBody;
-struct ZEPhysicsTrigger
+class	ZEPhysicalWorld;
+class	ZEPhysicalObject;
+class	ZEPhysicalShape;
+
+enum ZEPhysicalTriggerType
 {
-	ZEPhysicsBody*		TriggerBody;
-	ZEPhysicsBody*		OtherObject;
+	ZE_PTT_DYNAMIC			= 0,
+	ZE_PTT_KINEMATIC		= 1
 };
 
-typedef fastdelegate::FastDelegate1<ZEPhysicsTrigger*>   ZETriggerCallback;
+enum ZEPhysicalTriggerActivationType
+{
+	ZE_PTAT_ON_ENTER		= 0,
+	ZE_PTAT_ON_LEAVE		= 1,
+	ZE_PTAT_ON_INSIDE		= 2
+};
+
+class ZEPhysicalTrigger: public ZEPhysicalObject
+{
+	protected:
+		ZEPhysicalTriggerEvent				TriggerEvent;
+											ZEPhysicalTrigger();
+		virtual								~ZEPhysicalTrigger();
+
+	public:
+		virtual	void						SetTriggerShape(ZEPhysicalShape* TriggerShape) = 0;
+		virtual const ZEPhysicalShape*		GetTriggerShape() const = 0;
+
+		virtual void						SetTriggerType(ZEPhysicalTriggerType TriggerType) = 0;
+		virtual ZEPhysicalTriggerType		GetTriggerType() const = 0;
+
+		virtual void						SetIsTriggerActive(bool IsTriggerActive) = 0;
+		virtual bool						GetIsTriggerActive() const = 0;
+
+		virtual void						SetIsTriggerFired(bool IsTriggerFired) = 0;
+		virtual bool						GetIsTriggerFired() const = 0;
+
+		virtual void						SetTriggerActivationType(ZEPhysicalTriggerActivationType ActivationType) = 0;
+		virtual 
+		ZEPhysicalTriggerActivationType		GetTriggerActivationType() const = 0;
+
+		virtual void						SetPosition(ZEVector3 TriggerPosition) = 0;
+		virtual ZEVector3					GetPosition() const = 0;
+
+		virtual void						SetRotation(ZEQuaternion TriggerRotation) = 0;
+		virtual ZEQuaternion				GetRotation() const = 0;
+
+		virtual void						SetCollisionEnabled(bool IsCollisionEnabled) = 0;
+		virtual bool						GetCollisionEnabled() const = 0;
+
+		virtual void						SetTriggerEvent(const ZEPhysicalTriggerEvent& Event);
+		virtual const 
+		ZEPhysicalTriggerEvent&				GetTriggerEvent();
+
+		virtual bool						Initialize() = 0;
+		virtual void						Deinitialize() = 0;
+
+		virtual void						Destroy();
+
+		static ZEPhysicalTrigger*			CreateInstance();
+};
 
 #endif
 

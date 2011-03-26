@@ -35,8 +35,8 @@
 
 #include "ZEModelMeshLOD.h"
 #include "ZEModel.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGame/ZEDrawParameters.h"
 
 void ZEModelMeshLOD::ResetMaterial()
 {
@@ -58,7 +58,7 @@ bool ZEModelMeshLOD::IsSkinned()
 	return Skinned;
 }
 
-void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters)
+void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DistanceSquare)
 {
 	if (VertexBuffer == NULL)
 		return;
@@ -74,15 +74,11 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters)
 	else
 		RenderOrder.WorldMatrix = OwnerMesh->GetWorldTransform();
 
-	RenderOrder.Lights.Clear();
-	RenderOrder.Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
-	DrawParameters->Renderer->AddToRenderList(&RenderOrder);
+	RenderOrder.Order = DistanceSquare;
 
-	/*NormalRenderOrder.WorldMatrix = OwnerMesh->GetWorldTransform();
-	DrawParameters->Renderer->AddToRenderList(&NormalRenderOrder);*/
+	DrawParameters->Renderer->AddToRenderList(&RenderOrder);
 }
 
-#include "ZEGraphics\ZESimpleMaterial.h"
 void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)
 {
 	Owner = Model;
@@ -92,88 +88,17 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	Skinned = LODResource->Vertices.GetCount() == 0 ? true : false;
 
 	RenderOrder.SetZero();
+	RenderOrder.Priority = 3;
 	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | (Skinned ? ZE_ROF_SKINNED : 0);
 	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderOrder.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
 	RenderOrder.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;
 	RenderOrder.VertexDeclaration = Skinned ? ZESkinnedModelVertex::GetVertexDeclaration() : ZEModelVertex::GetVertexDeclaration();
 	RenderOrder.Material = Owner->GetModelResource()->Materials[LODResource->MaterialId];
-
-	/*
-	if (NormalMaterial == NULL)
-		NormalMaterial = ZESimpleMaterial::CreateInstance();
-
-	float NormalSize = 0.025f;
-	bool ShowNormal = true;
-	bool ShowTangent = true;
-	bool ShowBinormal = true;
-
-	if (Skinned)
-		for (size_t I = 0; I < LODResource->SkinnedVertices.GetCount(); I++)
-		{
-			// Normal
-			if (ShowNormal)
-			{
-				NormalCanvas.SetColor(ZEVector4(0.0f, 1.0f, 0.0f, 0.0f));
-				NormalCanvas.AddLine(LODResource->SkinnedVertices[I].Position, LODResource->SkinnedVertices[I].Position + LODResource->SkinnedVertices[I].Normal * NormalSize);
-			}
-
-			//Binormal
-			if (ShowBinormal)
-			{
-				NormalCanvas.SetColor(ZEVector4(1.0f, 0.0f, 0.0f, 0.0f));
-				NormalCanvas.AddLine(LODResource->SkinnedVertices[I].Position, LODResource->SkinnedVertices[I].Position + LODResource->SkinnedVertices[I].Binormal * NormalSize);
-			}
-
-			//Tangent
-			if (ShowTangent)
-			{
-				NormalCanvas.SetColor(ZEVector4(0.0f, 0.0f, 1.0f, 0.0f));
-				NormalCanvas.AddLine(LODResource->SkinnedVertices[I].Position, LODResource->SkinnedVertices[I].Position + LODResource->SkinnedVertices[I].Tangent * NormalSize);
-			}
-		}
-	else
-		for (size_t I = 0; I < LODResource->Vertices.GetCount(); I++)
-		{
-			// Normal
-			if (ShowNormal)
-			{
-				NormalCanvas.SetColor(ZEVector4(0.0f, 1.0f, 0.0f, 0.0f));
-				NormalCanvas.AddLine(LODResource->Vertices[I].Position, LODResource->Vertices[I].Position + LODResource->Vertices[I].Normal * NormalSize);
-			}
-
-			//Binormal
-			if (ShowBinormal)
-			{
-				NormalCanvas.SetColor(ZEVector4(1.0f, 0.0f, 0.0f, 0.0f));
-				NormalCanvas.AddLine(LODResource->Vertices[I].Position, LODResource->Vertices[I].Position + LODResource->Vertices[I].Binormal * NormalSize);
-			}
-
-			//Tangent
-			if (ShowTangent)
-			{
-				NormalCanvas.SetColor(ZEVector4(0.0f, 0.0f, 1.0f, 0.0f));
-				NormalCanvas.AddLine(LODResource->Vertices[I].Position, LODResource->Vertices[I].Position + LODResource->Vertices[I].Tangent * NormalSize);
-			}
-		}
-
-		NormalRenderOrder.SetZero();
-		NormalRenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | (Skinned ? ZE_ROF_SKINNED : 0);
-		NormalRenderOrder.PrimitiveType = ZE_ROPT_LINE;
-		NormalRenderOrder.VertexBuffer = &NormalCanvas;
-		NormalRenderOrder.PrimitiveCount = NormalCanvas.Vertices.GetCount() / 2;
-		NormalRenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-		NormalRenderOrder.Material = NormalMaterial;*/
 }
 
 void ZEModelMeshLOD::Deinitialize()
 {
-	if (NormalMaterial != NULL)
-	{
-		NormalMaterial->Destroy();
-		NormalMaterial = NULL;
-	}
-
 	Owner = NULL;
 	OwnerMesh = NULL;
 	RenderOrder.SetZero();
@@ -192,14 +117,9 @@ ZEModelMeshLOD::ZEModelMeshLOD()
 	VertexBuffer = NULL;
 	LODResource = NULL;
 	Material = NULL;
-	NormalMaterial = NULL;
 }
 
 ZEModelMeshLOD::~ZEModelMeshLOD()
 {
 	Deinitialize();
 }
-
-
-
-

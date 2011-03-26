@@ -48,12 +48,17 @@ class ZERenderer;
 class ZEMaterial;
 class ZECanvasBrush : public ZECompoundEntity
 {
-	ZE_META_ENTITY()
+	ZE_META_ENTITY(ZECanvasBrush)
 	
 	private:
 		ZERenderOrder						RenderOrder;
 		ZEStaticVertexBuffer*				VertexBuffer;
 		size_t								OldVertexCount;
+	
+	protected:
+											ZECanvasBrush();
+		virtual								~ZECanvasBrush();
+
 	public:
 		virtual ZEDWORD						GetDrawFlags() const;
 
@@ -68,8 +73,7 @@ class ZECanvasBrush : public ZECompoundEntity
 		virtual void						Draw(ZEDrawParameters* DrawParameters);
 		virtual void						Tick(float ElapsedTime);
 
-											ZECanvasBrush();
-											~ZECanvasBrush();
+		static ZECanvasBrush*				CreateInstance();
 };
 
 /*

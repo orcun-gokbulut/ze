@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ZEDAssertBrowserUI</class>
+ <widget class="QMainWindow" name="ZEDAssertBrowserUI">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>890</width>
+    <height>683</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Assert Browser</string>
+  </property>
+  <property name="styleSheet">
+   <string/>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="verticalLayout">
+    <property name="spacing">
+     <number>4</number>
+    </property>
+    <property name="margin">
+     <number>4</number>
+    </property>
+    <item>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QTreeView" name="DirectoryBrowser">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="headerHidden">
+        <bool>false</bool>
+       </property>
+      </widget>
+      <widget class="QScrollArea" name="PreviewsViewport">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="widgetResizable">
+        <bool>true</bool>
+       </property>
+       <widget class="QWidget" name="scrollAreaWidgetContents">
+        <property name="geometry">
+         <rect>
+          <x>0</x>
+          <y>0</y>
+          <width>69</width>
+          <height>594</height>
+         </rect>
+        </property>
+       </widget>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>890</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuPreviews">
+    <property name="title">
+     <string>Previews</string>
+    </property>
+    <addaction name="SmallAction"/>
+    <addaction name="MediumAction"/>
+    <addaction name="LargeAction"/>
+   </widget>
+   <widget class="QMenu" name="menuOperations">
+    <property name="title">
+     <string>Operations</string>
+    </property>
+    <addaction name="NewResourceActon"/>
+    <addaction name="EditAction"/>
+    <addaction name="CopyAction"/>
+    <addaction name="PasteAction"/>
+    <addaction name="CutAction"/>
+    <addaction name="DeleteAction"/>
+   </widget>
+   <widget class="QMenu" name="menuSelection">
+    <property name="title">
+     <string>Selection</string>
+    </property>
+    <addaction name="SelectAllAciton"/>
+    <addaction name="DesellectAction"/>
+   </widget>
+   <addaction name="menuOperations"/>
+   <addaction name="menuPreviews"/>
+   <addaction name="menuSelection"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="OperationsToolbar">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="windowTitle">
+    <string>OperationsToolbar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="NewResourceActon"/>
+   <addaction name="EditAction"/>
+   <addaction name="CutAction"/>
+   <addaction name="CopyAction"/>
+   <addaction name="PasteAction"/>
+   <addaction name="DeleteAction"/>
+  </widget>
+  <widget class="QToolBar" name="PreviewsToolBar">
+   <property name="windowTitle">
+    <string>PrewievsToolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="SmallAction"/>
+   <addaction name="MediumAction"/>
+   <addaction name="LargeAction"/>
+   <addaction name="separator"/>
+   <addaction name="SelectAllAciton"/>
+   <addaction name="DesellectAction"/>
+  </widget>
+  <widget class="QToolBar" name="SearchToolBar">
+   <property name="windowTitle">
+    <string>SearchToolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>true</bool>
+   </attribute>
+  </widget>
+  <action name="SmallAction">
+   <property name="text">
+    <string>Small</string>
+   </property>
+  </action>
+  <action name="MediumAction">
+   <property name="text">
+    <string>Medium</string>
+   </property>
+  </action>
+  <action name="LargeAction">
+   <property name="text">
+    <string>Large</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="CopyAction">
+   <property name="text">
+    <string>Copy</string>
+   </property>
+  </action>
+  <action name="PasteAction">
+   <property name="text">
+    <string>Paste</string>
+   </property>
+  </action>
+  <action name="CutAction">
+   <property name="text">
+    <string>Cut</string>
+   </property>
+  </action>
+  <action name="DeleteAction">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="EditAction">
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="NewResourceActon">
+   <property name="text">
+    <string>New Resource</string>
+   </property>
+  </action>
+  <action name="SelectAllAciton">
+   <property name="text">
+    <string>Select All</string>
+   </property>
+  </action>
+  <action name="DesellectAction">
+   <property name="text">
+    <string>Desellect</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

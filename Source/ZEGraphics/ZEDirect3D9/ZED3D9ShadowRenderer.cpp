@@ -33,66 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED3D9Module.h"
 #include "ZED3D9ShadowRenderer.h"
-#include "ZED3D9Renderer.h"
+#include "ZED3D9FrameRenderer.h"
+#include "ZED3D9Module.h"
 #include "ZED3D9CommonTools.h"
-#include "ZECore\ZEResourceFile.h"
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9Texture2D.h"
-#include "ZECore\ZEError.h"
-#include "ZEGraphics\ZERenderOrder.h"
+#include "ZED3D9Shader.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZEGraphics/ZEPointLight.h"
+#include "ZEGraphics/ZEOmniProjectiveLight.h"
+#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZECore/ZEError.h"
+#include "ZECore/ZEResourceFile.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
-#define ZE_MAX_SHADER_SOURCE_SIZE 32768
-
-LPDIRECT3DVERTEXSHADER9 ShadowMapVS = NULL;
-LPDIRECT3DVERTEXSHADER9 ShadowMapTextVS = NULL;
-LPDIRECT3DPIXELSHADER9 ShadowMapPS = NULL;
-LPDIRECT3DPIXELSHADER9 ShadowMapOpasityPS = NULL;
-LPDIRECT3DPIXELSHADER9 ShadowMapDiffuseAlphaPS = NULL;
-	
-bool ZED3D9ShadowRenderer::BaseInitialize()
-{
-/*	char SourceVS[ZE_MAX_SHADER_SOURCE_SIZE], SourcePS[ZE_MAX_SHADER_SOURCE_SIZE];
-	ZEArray<D3DXMACRO> Macros;
-
-	ZEResourceFile::ReadTextFile("Shaders\\ShadowPass.vs", SourceVS, ZE_MAX_SHADER_SOURCE_SIZE);
-	ZEResourceFile::ReadTextFile("Shaders\\ShadowPass.ps", SourcePS, ZE_MAX_SHADER_SOURCE_SIZE);
-	
-	ZED3D9CommonTools::CompileVertexShader(&ShadowMapVS, SourceVS, "Shadow Renderer Shadow Pass", "vs_2_0", Macros.GetCArray());
-	ZED3D9CommonTools::CompilePixelShader(&ShadowMapPS, SourcePS, "Shadow Renderer Shadow Pass", "ps_2_0", Macros.GetCArray());
-
-	Macros.Add();
-	Macros[0].Name = "ZESHADER_TRANSPARANT";
-	Macros[0].Definition = "";
-	Macros.Add();
-	Macros[1].Name = NULL;
-	Macros[1].Definition = NULL;
-	ZED3D9CommonTools::CompileVertexShader(&ShadowMapTextVS, SourceVS, "Transparant Shadow Pass", "vs_2_0", Macros.GetCArray());
-
-	Macros[1].Name = "ZESHADER_OPASITYMAP";
-	Macros[1].Definition = "";
-	Macros.Add();
-	Macros[2].Name = NULL;
-	Macros[2].Definition = NULL;
-	ZED3D9CommonTools::CompilePixelShader(&ShadowMapOpasityPS, SourcePS, "Opasity Map Transparant Shadow Pass", "ps_2_0", Macros.GetCArray());
-
-	Macros.Add();
-	Macros[1].Name = "ZESHADER_DIFFUSEMAP";
-	Macros[1].Definition = "";
-	ZED3D9CommonTools::CompilePixelShader(&ShadowMapDiffuseAlphaPS, SourcePS, "Diffuse Map Alpha Transparant Shadow Pass", "ps_2_0", Macros.GetCArray());
-*/
-	return true;
-}
-
-void ZED3D9ShadowRenderer::BaseDeinitialize()
-{
-	ZED3D_RELEASE(ShadowMapVS);
-	ZED3D_RELEASE(ShadowMapTextVS);
-	ZED3D_RELEASE(ShadowMapPS);
-	ZED3D_RELEASE(ShadowMapOpasityPS);
-	ZED3D_RELEASE(ShadowMapDiffuseAlphaPS);
-}
+ZED3D9VertexShader* OmniLightVS = NULL;
+ZED3D9PixelShader* OmniLightPS = NULL;
+ZED3D9VertexShader* DirectionalLightVS = NULL;
+ZED3D9PixelShader* DirectionalLightPS = NULL;
+ZED3D9VertexShader* ProjectiveLightVS = NULL;
+ZED3D9PixelShader* ProjectiveLightPS = NULL;
 
 void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
 {
@@ -142,16 +104,6 @@ void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
 	//PumpStreams(RenderOrder);
 }
 
-void ZED3D9ShadowRenderer::SetCamera(ZECamera* Camera)
-{
-	this->Camera = Camera;
-}
-
-ZECamera* ZED3D9ShadowRenderer::GetCamera()
-{
-	return Camera;
-}
-
 void ZED3D9ShadowRenderer::SetViewPort(ZEViewPort* ViewPort)
 {
 	this->ViewPort = (ZED3D9ViewPort*)ViewPort;
@@ -160,6 +112,26 @@ void ZED3D9ShadowRenderer::SetViewPort(ZEViewPort* ViewPort)
 ZEViewPort* ZED3D9ShadowRenderer::GetViewPort()
 {
 	return ViewPort;
+}
+
+void ZED3D9ShadowRenderer::SetFace(bool Front)
+{
+	Face = Front;
+}
+
+bool ZED3D9ShadowRenderer::GetFace()
+{
+	return Face;
+}
+
+void ZED3D9ShadowRenderer::SetLight(ZELight* Light)
+{
+	this->Light = Light;
+}
+
+ZELight* ZED3D9ShadowRenderer::GetLight()
+{
+	return Light;
 }
 
 ZEArray<ZEPostProcessor*>& ZED3D9ShadowRenderer::GetPostProcessors()
@@ -185,17 +157,57 @@ void ZED3D9ShadowRenderer::DeviceLost()
 
 bool ZED3D9ShadowRenderer::DeviceRestored()
 {
+	Initialize();
 	return true;
 }
 
 bool ZED3D9ShadowRenderer::Initialize()
 {
+	Deinitialize();
+
+	OmniLightVS = ZED3D9VertexShader::CreateShader("ShadowMaterial.hlsl", "OmniSMVSMain", 0, "vs_3_0");
+	OmniLightPS = ZED3D9PixelShader::CreateShader("ShadowMaterial.hlsl", "OmniSMPSMain", 0, "ps_3_0");
+
+	//DirectionalLightVS = ZED3D9VertexShader::CreateShader("ShadowMaterial.hlsl", "DirectionalVSMain", 0, "vs_3_0");
+	//DirectionalLightPS = ZED3D9PixelShader::CreateShader("ShadowMaterial.hlsl", "DirectionalPSMain", 0, "ps_3_0");
+
+	ProjectiveLightVS = ZED3D9VertexShader::CreateShader("ShadowMaterial.hlsl", "ProjectiveSMVSMain", 0, "vs_3_0");
+	ProjectiveLightPS = ZED3D9PixelShader::CreateShader("ShadowMaterial.hlsl", "ProjectiveSMPSMain", 0, "ps_3_0");
+
+	if (ShadowMapFrameBuffer == NULL)
+	{
+		HRESULT hr = GetDevice()->CreateRenderTarget(512, 512, D3DFMT_R32F, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapFrameBuffer, NULL);
+		if (hr != S_OK)
+		{
+			zeError("D3D9 Shadow Renderer", "Can not create shadow map frame buffer.");
+			return false;
+		}
+	}
+
+	if (ShadowMapZBuffer == NULL)
+	{
+		HRESULT hr = GetDevice()->CreateDepthStencilSurface(512, 512, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapZBuffer, NULL);
+		if (hr != S_OK)
+		{
+			zeError("D3D9 Shadow Renderer", "Can not create shadow map z buffer.");
+			return false;
+		}
+	}
+
 	return true;
 }
 
 void ZED3D9ShadowRenderer::Deinitialize()
 {
+	ZED3D_RELEASE(OmniLightVS);
+	ZED3D_RELEASE(OmniLightVS);
+	ZED3D_RELEASE(DirectionalLightVS);
+	ZED3D_RELEASE(DirectionalLightPS);
+	ZED3D_RELEASE(ProjectiveLightVS);
+	ZED3D_RELEASE(ProjectiveLightVS);
 
+	ZED3D_RELEASE(ShadowMapFrameBuffer);
+	ZED3D_RELEASE(ShadowMapZBuffer);
 }
 
 void ZED3D9ShadowRenderer::Destroy()
@@ -206,7 +218,7 @@ void ZED3D9ShadowRenderer::Destroy()
 }
 
 
-void ZED3D9ShadowRenderer::ClearList()
+void ZED3D9ShadowRenderer::ClearRenderList()
 {
 	//Clear render lists
 	Imposter.Clear(true);
@@ -218,7 +230,7 @@ void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 {
 	#ifdef ZE_DEBUG_ENABLED
 		// Check render order is valid
-		if (!ZED3D9Renderer::CheckRenderOrder(RenderOrder))
+		if (!ZED3D9FrameRenderer::CheckRenderOrder(RenderOrder))
 			return;
 	#endif
 
@@ -231,63 +243,179 @@ void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
 		NonTransparent.Add(*RenderOrder);
 }
 
+void ZED3D9ShadowRenderer::RenderProjectiveLight()
+{
+	ZEProjectiveLight* Light = (ZEProjectiveLight*)this->Light;
+	GetDevice()->SetRenderTarget(0, ShadowMapFrameBuffer);
+	GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)Light->GetShadowMap()->GetViewPort())->FrameBuffer);
+	float MaxFloat = 1.0f;
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, *(int*)&MaxFloat, 1.0f, 0x00);
+
+	GetDevice()->SetVertexShader(ProjectiveLightVS->GetVertexShader());
+	GetDevice()->SetPixelShader(ProjectiveLightPS->GetPixelShader());
+	
+	ZEMatrix4x4 ViewTransform, ProjectionTransform, ViewProjectionTransform;
+	ZEMatrix4x4::CreateViewTransform(ViewTransform, Light->GetPosition(), Light->GetRotation());
+	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, Light->GetFOV(), Light->GetAspectRatio(), zeGraphics->GetNearZ(), Light->GetRange());
+
+	ZEMatrix4x4::Multiply(ViewProjectionTransform, ViewTransform, ProjectionTransform);
+	GetDevice()->BeginScene();
+	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
+	{
+		ZERenderOrder* RenderOrder = &NonTransparent[I];
+
+		ZEMatrix4x4 ViewProjMatrix;
+		if ((RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+			ViewProjMatrix = ViewProjectionTransform;
+		else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+			ViewProjMatrix = ViewTransform;
+		else if (RenderOrder->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+			ViewProjMatrix = ProjectionTransform;
+		else
+			ViewProjMatrix = ZEMatrix4x4::Identity;
+
+		ZEMatrix4x4 WorldViewProjMatrix;
+		if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+			ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewProjMatrix);
+		else
+			WorldViewProjMatrix = ViewProjectionTransform;
+
+		GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
+
+		// Setup ZCulling
+		if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
+		{
+			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+			GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+			if (RenderOrder->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
+				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+			else
+				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+		}
+		else
+			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+
+		// Setup Bone Transforms
+		if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
+			GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+
+		ZED3D9FrameRenderer::PumpStreams(RenderOrder);
+	}
+	GetDevice()->EndScene();
+}
+
+void ZED3D9ShadowRenderer::RenderDirectionalLight()
+{
+
+}
+
+void ZED3D9ShadowRenderer::RenderPointLight()
+{
+	ZEPointLight* Light = (ZEPointLight*)this->Light;
+
+	GetDevice()->SetDepthStencilSurface(ShadowMapZBuffer);
+	if (Face)
+		GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)Light->GetFrontShadowMap()->GetViewPort())->FrameBuffer);
+	else
+		GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)Light->GetBackShadowMap()->GetViewPort())->FrameBuffer);
+
+	float MaxFloat = FLT_MAX;
+	GetDevice()->Clear(0, NULL, D3DCLEAR_ZBUFFER, *(int*)&MaxFloat, 1.0f, 0x00);
+
+	GetDevice()->SetVertexShader(OmniLightVS->GetVertexShader());
+	GetDevice()->SetPixelShader(OmniLightPS->GetPixelShader());
+	
+	ZEMatrix4x4 ViewTransform, ProjectionTransform, ViewProjectionTransform;
+	ZEMatrix4x4::CreateViewTransform(ViewTransform, Light->GetPosition(), (Face ? Light->GetRotation() : Light->GetRotation() * ZEQuaternion(ZE_PI, ZEVector3(0.0f, 1.0f, 0.0f))));
+//	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, Light->GetFOV(), Light->GetAspectRatio(), zeGraphics->GetNearZ(), Light->GetRange());
+	ProjectionTransform = ZEMatrix4x4::Identity;
+
+	ZEMatrix4x4::Multiply(ViewProjectionTransform, ViewTransform, ProjectionTransform);
+
+	ZEVector4 Options = ZEVector4(Light->GetRange(), 0.0f, 0.0f, 0.0f);
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&Options, 1);
+
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFF);
+	GetDevice()->BeginScene();
+	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
+	{
+		ZERenderOrder* RenderOrder = &NonTransparent[I];
+
+		ZEMatrix4x4 ViewProjMatrix;
+		if ((RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+			ViewProjMatrix = ViewProjectionTransform;
+		else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+			ViewProjMatrix = ViewTransform;
+		else if (RenderOrder->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+			ViewProjMatrix = ProjectionTransform;
+		else
+			ViewProjMatrix = ZEMatrix4x4::Identity;
+
+		ZEMatrix4x4 WorldViewProjMatrix;
+		if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+			ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewProjMatrix);
+		else
+			WorldViewProjMatrix = ViewProjectionTransform;
+
+		GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
+
+		// Setup ZCulling
+		if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
+		{
+			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
+			GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+			if (RenderOrder->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
+				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+			else
+				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+		}
+		else
+			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+
+		// Setup Bone Transforms
+		if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
+			GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+
+		ZED3D9FrameRenderer::PumpStreams(RenderOrder);
+	}
+	GetDevice()->EndScene();
+}
+
+
 void ZED3D9ShadowRenderer::Render(float ElaspedTime)
 {
-/*	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost)
-		return;
-
-	GetDevice()->SetRenderTarget(0, ColorRenderTarget);
-	GetDevice()->SetDepthStencilSurface(DepthRenderTarget);
-	
-	GetDevice()->Clear(0, NULL, D3DCLEAR_ZBUFFER, 0xFFFFFFFF, 1.0f, 0x00000000);
-
-	float BiasValue;
-	BiasValue = 0.0001f;//2.0f / 16777215.0f;;
-	GetDevice()->SetRenderState(D3DRS_SLOPESCALEDEPTHBIAS, *(DWORD*)&BiasValue);
-
-	BiasValue = 0.002f;//2.0f / 16777215.0f;;
-	GetDevice()->SetRenderState(D3DRS_DEPTHBIAS, *(DWORD*)&BiasValue);
-
+	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0x00);
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 	
-	GetDevice()->SetVertexShader(ShadowMapVS);
-	GetDevice()->SetPixelShader(ShadowMapPS);
+	switch(Light->GetLightType())
+	{
+		case ZE_LT_POINT:
+			RenderPointLight();
+			return;
+		case ZE_LT_OMNIPROJECTIVE:
+			//RenderOmniProjectiveLight();
+			return;
+		case ZE_LT_DIRECTIONAL:
+			return;
 
-	GetDevice()->BeginScene();
-		for (size_t I = 0; I < NonTransparent.GetCount(); I++)
-			DrawSM2(&NonTransparent[I]);
+		case ZE_LT_PROJECTIVE:
 
-		if (Transparent.GetCount() != 0)
-		{
-			GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-			GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
-			GetDevice()->SetRenderState(D3DRS_ALPHAREF, 0x01);
-
-			GetDevice()->SetVertexShader(ShadowMapTextVS);
-			GetDevice()->SetPixelShader(ShadowMapOpasityPS);
-			for (size_t I = 0; I < Transparent.GetCount(); I++)
-				if (((ZEFixedMaterial*)Transparent[I].Material)->OpacityMap != NULL)
-					DrawRenderOrder(&Transparent[I]);
-
-
-			GetDevice()->SetPixelShader(ShadowMapDiffuseAlphaPS);
-			for (size_t I = 0; I < Transparent.GetCount(); I++)
-				if (((ZEFixedMaterial*)Transparent[I].Material)->OpacityMap == NULL)
-					DrawRenderOrder(&Transparent[I]);
-		}
-	GetDevice()->EndScene();
-//	GetModule()->CurrentFrameId++;*/
+			RenderProjectiveLight();
+			break;
+	}
+	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFF);
 }
-
 
 ZED3D9ShadowRenderer::ZED3D9ShadowRenderer()
 {
-
+	ShadowMapFrameBuffer = NULL;
+	ShadowMapZBuffer = NULL;
 }
 
 ZED3D9ShadowRenderer::~ZED3D9ShadowRenderer()

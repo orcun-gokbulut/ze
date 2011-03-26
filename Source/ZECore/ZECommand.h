@@ -42,9 +42,7 @@
 #include "ZEDS\ZEVariant.h"
 #include "ZEFastDelegate.h"
 
-#define zeCommands ZECommandManager::GetInstance()
 class ZECommand;
-
 typedef ZEArray<ZEVariant> ZECommandParameterList;
 typedef fastdelegate::FastDelegate2<ZECommand*, const ZECommandParameterList*, bool> ZECommandCallback;
 
@@ -55,67 +53,15 @@ class ZECommand: public ZENamed
 		ZECommandCallback			Callback;
 
 	public:
-
 		int							GetAccessLevel();
 		void						SetAccessLevel(int AccessLevel);
 		
 		void						SetCallback(ZECommandCallback Callback);
-
 		bool						Execute(ZECommandParameterList* ParamList);
 
 									ZECommand(const char* Name, ZECommandCallback Callback, int AccessLevel = 0);
 };
 
-
-
-class ZECommandSection : public ZENamed
-{
-	private:
-		ZEArray<ZECommand*>			Commands;
-
-	public:
-		size_t						GetNumberOfCommands();
-		
-		bool						AddCommand(ZECommand* Command);
-		void						DeleteCommand(size_t Index);
-
-		ZECommand*					GetCommand(const char* Name);
-		ZECommand*					GetCommand(size_t Index);
-
-		bool						ExecuteCommand(const char* Name, ZEArray<ZEVariant>* Paramlist);
-
-									ZECommandSection();
-									ZECommandSection(const char* Name);
-									~ZECommandSection();
-};
-
-
-
-class ZECommandManager 
-{
-	private:
-		ZEArray<ZECommandSection*>	Sections;
-		
-		bool						Callback_ListSections(ZECommand* Command, const ZECommandParameterList* Params);
-		bool						Callback_ListCommands(ZECommand* Command, const ZECommandParameterList* Params);
-
-		ZECommandSection			Commands;
-	public:
-		size_t						GetNumberOfSections();
-
-		ZECommandSection*			GetCommandSection(const char* Name);
-		ZECommand*					GetCommand(const char* Section, const char* Name);
-
-		bool						ExecuteCommand(const char* Section, const char* Name, ZEArray<ZEVariant>* ParamList);
-				
-		bool						RegisterSection(ZECommandSection* Section);
-		bool						UnregisterSection(ZECommandSection* Section);
-		
-		static ZECommandManager*	GetInstance();
-
-									ZECommandManager();
-									~ZECommandManager();
-};
 #endif
 
 

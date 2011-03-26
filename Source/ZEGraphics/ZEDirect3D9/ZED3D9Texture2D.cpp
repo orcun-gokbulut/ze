@@ -41,6 +41,8 @@
 ZED3D9Texture2D::ZED3D9Texture2D()
 {
 	Texture = NULL;
+	ViewPort.FrameBuffer = NULL;
+	ViewPort.ZBuffer = NULL;
 }
 
 ZED3D9Texture2D::~ZED3D9Texture2D()
@@ -57,8 +59,8 @@ void ZED3D9Texture2D::DeviceLost()
 {
 	if (RenderTarget)
 	{
+		ZED3D_RELEASE(ViewPort.FrameBuffer);
 		ZED3D_RELEASE(Texture);
-		ZED3D_RELEASE(ViewPort.ColorBuffer);
 	}
 }
 
@@ -66,9 +68,7 @@ bool ZED3D9Texture2D::DeviceRestored()
 {
 	if (RenderTarget)
 	{
-		return Create(Width, Height, PixelFormat, true);
-		Texture->GetSurfaceLevel(0, &ViewPort.ColorBuffer);
-		ViewPort.DepthBuffer = NULL;
+		Create(Width, Height, PixelFormat, true);
 	}
 
 	return true;
@@ -82,26 +82,40 @@ ZEViewPort* ZED3D9Texture2D::GetViewPort()
 bool ZED3D9Texture2D::Create(unsigned int Width, unsigned int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget, unsigned int MipLevel)
 {
 	if (Texture != NULL)
-	{
-		if (this->Width == Width || this->Height == Height || this->PixelFormat == PixelFormat || this->RenderTarget == RenderTarget)
+		if (this->Width == Width && this->Height == Height && this->PixelFormat == PixelFormat && this->RenderTarget == RenderTarget)
 			return true;
 		else
+		{
 			Texture->Release();
+			Texture = NULL;
+		}
+
+	DWORD Usage;
+	DWORD MipMap;
+	D3DPOOL Pool;
+	D3DFORMAT Format;
+
+	if (PixelFormat == ZE_TPF_SHADOW_MAP)
+	{
+		Usage = D3DUSAGE_DEPTHSTENCIL;
+		MipMap = 1;
+		Pool = D3DPOOL_DEFAULT;
+		Format = D3DFMT_D24X8;
+		RenderTarget = true;
 	}
-
-	if (MipLevel == 0)
-		MipLevel = 1;
-
-	DWORD Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : 0);
-	DWORD MipMap = (RenderTarget ? 1 : MipLevel);
-	D3DPOOL Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
-	D3DFORMAT Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
+	else
+	{
+		Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP);
+		MipMap = (RenderTarget ? 1 : 0);
+		Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
+		Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
+	}
 
 	HRESULT Hr;
 	Hr = GetDevice()->CreateTexture(Width, Height, MipMap, Usage, Format, Pool, &Texture, NULL); 
 	if (Hr != D3D_OK)
 	{
-		zeError("D3D9 GetModule()", "Can not create texture resource.");
+		zeError("D3D9 Texture 2D", "Can not create 2D texture.");
 		return false;
 	}
 
@@ -113,8 +127,9 @@ bool ZED3D9Texture2D::Create(unsigned int Width, unsigned int Height, ZETextureP
 
 	if (RenderTarget)
 	{
-		Texture->GetSurfaceLevel(0, &ViewPort.ColorBuffer);
-		ViewPort.DepthBuffer = NULL;
+		ZED3D_RELEASE(ViewPort.FrameBuffer);	
+		Texture->GetSurfaceLevel(0, &ViewPort.FrameBuffer);
+		ViewPort.ZBuffer = NULL;
 	}
 
 	return true;
@@ -142,7 +157,7 @@ void ZED3D9Texture2D::Release()
 	RenderTarget = false;
 
 	ZED3D_RELEASE(Texture);
-	ZED3D_RELEASE(ViewPort.ColorBuffer);
+	ZED3D_RELEASE(ViewPort.FrameBuffer);
 }
 
 void ZED3D9Texture2D::Destroy()
@@ -150,7 +165,3 @@ void ZED3D9Texture2D::Destroy()
 	GetModule()->Texture2Ds.DeleteValue((ZED3D9Texture2D*)this);
 	delete this;
 }
-
-
-
-

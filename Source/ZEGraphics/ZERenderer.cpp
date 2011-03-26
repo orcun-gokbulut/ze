@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERenderer.h"
-#include "ZEGraphicsModule.h"
 
 ZERenderer::ZERenderer()
 {
@@ -45,70 +44,25 @@ ZERenderer::~ZERenderer()
 
 }
 
-void ZERenderer::SetRenderColorTexture(bool Enable)
+void ZERenderer::AddToLightList(ZELight* Light)
 {
+
 }
 
-bool ZERenderer::GetRenderColorTexture()
+void ZERenderer::ClearLightList()
 {
-	return false;
+
 }
 
-void ZERenderer::SetRenderDepthTexture(bool Enable)
+void ZERenderer::ClearLists()
 {
-}
-
-bool ZERenderer::GetRenderDepthTexture()
-{
-	return false;
-}
-
-void ZERenderer::SetRenderVelocityTexture(bool Enable)
-{
-}
-
-bool ZERenderer::GetRenderVelocityTexture()
-{
-	return false;
-}
-
-void ZERenderer::SetRenderObjectTexture(bool Enable)
-{
-}
-
-bool ZERenderer::GetRenderObjectTexture()
-{
-	return false;
-}
-
-ZETexture2D* ZERenderer::GetColorTexture()
-{
-	return NULL;
-}
-
-ZETexture2D* ZERenderer::GetDepthTexture()
-{
-	return NULL;
-}
-
-ZETexture2D* ZERenderer::GetVelocityTexture()
-{
-	return NULL;
-}
-
-ZETexture2D* ZERenderer::GetObjectTexture()
-{
-	return NULL;
+	ClearLightList();
+	ClearRenderList();
 }
 
 void ZERenderer::Destroy()
 {
 	delete this;
-}
-
-ZERenderer*  ZERenderer::CreateInstance()
-{
-	return ZEGraphicsModule::GetInstance()->CreateRenderer();
 }
 
 

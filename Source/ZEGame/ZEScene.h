@@ -39,11 +39,13 @@
 
 #include "ZEDS\ZEArray.h"
 #include "ZESceneDebugDraw.h"
+#include "ZESceneCuller.h"
 
 class ZEViewVolume;
 class ZEBoundingBox;
 class ZECamera;
 class ZEListener;
+class ZEFrameRenderer;
 class ZEShadowRenderer;
 class ZEPostProcessor;
 class ZEFixedMaterial;
@@ -52,49 +54,19 @@ class ZEPhysicalWorld;
 class ZEPortalMap;
 class ZEPortalMapResource;
 
-#define ZE_RCF_ENTITY								1
-#define ZE_RCF_COMPONENT							2
-#define ZE_RCF_MAP									4
-#define ZE_RCF_POSITON								8
-#define ZE_RCF_NORMAL								16
-
-#define ZE_VDE_NONE									0
-#define ZE_VDE_ENTITY_ORIENTED_BOUNDINGBOX			1
-#define ZE_VDE_ENTITY_AXISALIGNED_BOUNDINGBOX		2
-#define ZE_VDE_ENTITY_BOUNDINGSPHERE				8
-#define ZE_VDE_ENTITY_DEBUGDRAW						16
-#define ZE_VDE_COMPONENT_ORIENTED_BOUNDINGBOX		32
-#define ZE_VDE_COMPONENT_AXISALIGNED_BOUNDINGBOX	64
-#define ZE_VDE_COMPONENT_BOUNDINGSPHERE				128
-#define ZE_VDE_COMPONENT_DEBUGDRAW					256
-#define ZE_VDE_LIGHT_RANGE							512
-#define ZE_VDE_ALL									1023
+#define ZE_RCF_ENTITY							1
+#define ZE_RCF_COMPONENT						2
+#define ZE_RCF_MAP								4
+#define ZE_RCF_POSITON							8
+#define ZE_RCF_NORMAL							16
 
 #define zeScene ZEScene::GetInstance()
 
 class ZESceneBridge
 {
-	virtual void*								GetScene() = 0;
-	virtual void*								OnEntityChanged(ZEEntity* Entity) = 0;
-};
-
-
-
-struct ZECullStatistics
-{
-	size_t								TotalEntityCount;
-	size_t								TotalComponentCount;
-	size_t								TotalLightCount;
-	size_t								DrawableEntityCount;
-	size_t								DrawableComponentCount;
-	size_t								VisibleEntityCount;
-	size_t								VisibleComponentCount;
-	size_t								VisibleLightCount;
-	size_t								CulledEntityCount;
-	size_t								CulledComponentCount;
-	size_t								CulledLightCount;
-	size_t								MaxLightPerEntity;
-	size_t								MaxLightPerComponent;
+	public:
+		virtual void*							GetScene() = 0;
+		virtual void*							OnEntityChanged(ZEEntity* Entity) = 0;
 };
 
 class ZEScene
@@ -104,28 +76,23 @@ class ZEScene
 
 		unsigned int							LastEntityId;
 
-		ZEPortalMap*							Map;
-		ZEPortalMapResource*					MapResource;
+		ZESceneCuller							Culler;
 
 		ZESmartArray<ZEEntity*>					Entities;
 
 		ZEPhysicalWorld*						PhysicalWorld;
 
-		ZERenderer*								Renderer;
-		ZEPostProcessor*						PostProcessor;
+		ZEFrameRenderer*						Renderer;
 		ZEShadowRenderer*						ShadowRenderer;
+		ZEPostProcessor*						PostProcessor;
 		ZECamera*								ActiveCamera;
 		ZEListener*								ActiveListener;
-
-		ZEDWORD									VisualDebugElements;
-		ZESceneDebugDraw						DebugDraw;
-
-		ZECullStatistics						CullStatistics;
 
 	public:
 		void									AddEntity(ZEEntity* Entity);
 		void									RemoveEntity(ZEEntity* Entity);
 		const ZESmartArray<ZEEntity*>&			GetEntities();
+		void									ClearEntities();
 
 		ZERenderer*								GetRenderer();
 		ZEPhysicalWorld*						GetPhysicalWorld();
@@ -136,24 +103,12 @@ class ZEScene
 		void									SetActiveListener(ZEListener* Listener);
 		ZEListener*								GetActiveListener();
 
-		void									SetVisualDebugElements(ZEDWORD VisualDebugElements);
-		ZEDWORD									GetVisualDebugElements();
-
-		virtual ZEEntity*						CastRay(const ZERay& Ray, float Range);
-		virtual bool							CastRay(const ZERay& Ray, float Range, ZEEntity** IntersectedEntity, ZEVector3& Position, ZEVector3& Normal);
-
-		const ZECullStatistics&					GetCullStatistics();
-
-		virtual void							CullScene(ZERenderer* Renderer, const ZEViewVolume& ViewVolume, bool LightsEnabled = true);
-		bool									LoadMap(const char* FileName);
-
 		bool									Save(const char* FileName);
 		bool									Load(const char* FileName);
 
 		bool									Initialize();
 		void									Deinitialize();
 		void									Destroy();
-
 
 		void									Tick(float ElapsedTime);
 		void									Render(float ElapsedTime);

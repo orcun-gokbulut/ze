@@ -36,6 +36,7 @@
 #include "ZEModuleManager.h"
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEConsole.h"
+#include "ZEOptionManager.h"
 
 ZEOptionSection ZEModuleManager::ModuleManagerOptions;
 
@@ -215,7 +216,7 @@ bool ZEModuleManager::LoadInternalModule(ZEModuleDescription* ModuleDesc)
 	if (ModuleDesc->GetOptions() != NULL)
 	{
 		bool Result;
-		Result = zeOptions->RegisterSection(ModuleDesc->GetOptions());
+		Result = ZEOptionManager::GetInstance()->RegisterSection(ModuleDesc->GetOptions());
 		if (!Result)
 		{
 			zeError("Module Manager", "Can not register module's option section.  (Module Name : \"%s\", Module Version : %d.%d)", ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
@@ -244,6 +245,7 @@ void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
 #include "ZESound\ZEDirectSound\ZEDSModuleDescription.h"
 #include "ZEInput\ZEDirectInput\ZEDirectInputModuleDescription.h"
 #include "ZEInput\ZEDummyInput\ZEDummyInputModuleDescription.h"
+#include "ZEInput\ZEWindowsInput\ZEWindowsInputModuleDescription.h"
 #include "ZEInput\ZEVirtualInput\ZEVirtualInputModuleDescription.h"
 #include "ZESound\ZEOpenAL\ZEALModuleDescription.h"
 #include "ZEPhysics\ZEPhysX\ZEPhysXModuleDescription.h"
@@ -257,15 +259,16 @@ ZEModuleManager::ZEModuleManager()
 	LoadInternalModule(new ZEDirectInputModuleDescription());
 	LoadInternalModule(new ZEALModuleDescription());
 	LoadInternalModule(new ZEPhysXModuleDescription());
+	LoadInternalModule(new ZEWindowsInputModuleDescription());
 
 	ModuleManagerOptions.SetName("ModuleManager");
-	ModuleManagerOptions.AddOption(new ZEOption("GraphicsModule", "Direct3D9", ZEOPTIONATTRIBUTE_NORMAL));
-	ModuleManagerOptions.AddOption(new ZEOption("InputModule", "DirectInput", ZEOPTIONATTRIBUTE_NORMAL));
-	ModuleManagerOptions.AddOption(new ZEOption("SoundModule", "DirectSound", ZEOPTIONATTRIBUTE_NORMAL));
-	ModuleManagerOptions.AddOption(new ZEOption("NetworkModule", "WinNetwork", ZEOPTIONATTRIBUTE_NORMAL));
-	ModuleManagerOptions.AddOption(new ZEOption("PhysicsModule", "PhysX", ZEOPTIONATTRIBUTE_NORMAL));
-	ModuleManagerOptions.AddOption(new ZEOption("GameModule", "TestGame", ZEOPTIONATTRIBUTE_NORMAL));
-	zeOptions->RegisterSection(&ModuleManagerOptions);
+	ModuleManagerOptions.AddOption(new ZEOption("GraphicsModule", "Direct3D9", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("InputModule", "DirectInput", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("SoundModule", "DirectSound", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("NetworkModule", "WinNetwork", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("PhysicsModule", "PhysX", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("GameModule", "TestGame", ZE_OA_NORMAL));
+	ZEOptionManager::GetInstance()->RegisterSection(&ModuleManagerOptions);
 }
 
 ZEModuleManager::~ZEModuleManager()

@@ -33,33 +33,67 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
 #ifndef __ZE_META_CONTAINER_H__
 #define __ZE_META_CONTAINER_H__
 
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
+
+typedef unsigned int ZEContainerAccess;
+#define ZE_CA_NO_ACCESS		0
+#define ZE_CA_ADD			1
+#define ZE_CA_REMOVE		2
+#define ZE_CA_GET			4
 
 class ZEClass;
+class ZEClassProvider;
 class ZEClassDescription;
+
+struct ZEContainerDescription
+{
+	const char*				Name;
+	const char*				Description;
+	const char*				GroupName;
+	ZEContainerAccess		Access;
+	bool					Visibility;
+
+	ZEClassDescription*		BaseClass;
+	bool					AllowDerived;
+};
+
+enum ZEContainerMode
+{
+	ZE_CM_OWNER,
+	ZE_CM_REFERANCE
+};
 
 class ZEContainer
 {
 	private:
-		ZEClassDescription*					BaseClassDescription;
-		ZEArray<ZEClass*>					Items;
+		ZEContainerMode				Mode;
+		ZEClassDescription*			Type;
+		bool						AllowDerivedTypes;
+
+		ZEArray<ZEClass*>			Instances;
 
 	public:
-		ZEClassDescription*					GetBaseClassDescription();
+		void						SetContainerMode(ZEContainerMode Mode);
+		ZEContainerMode				GetContainerMode();
 
-		bool								Add(ZEClass* Item);
-		void								Remove(ZEClass* Item);
-		const ZEArray<ZEClass*>&			GetItems();
-		size_t								GetCount();
+		void						SetBaseClass(ZEClassDescription* Type);
+		ZEClassDescription*			GetBaseClass();
 
-											ZEContainer(ZEClassDescription* BaseClassDescription);
+		void						SetAllowDerivedClasses(bool Allow);
+		bool						GetAllowDerivedClasses();
+
+		const ZEArray<ZEClass*>&	GetInstances();
+		bool						AddInstance(ZEClass* Instance);
+		bool						RemoveInstance(ZEClass* Instance);
+
+									ZEContainer();
+									ZEContainer(ZEContainerMode Mode, ZEClassDescription* Type, bool AllowDerived);
+									~ZEContainer();
 };
 
 #endif
-
-
-
 

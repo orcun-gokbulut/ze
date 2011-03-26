@@ -43,8 +43,8 @@ ZED3D9TextureCube::ZED3D9TextureCube()
 	CubeTexture = NULL;
 	for (size_t I = 0; I < 6; I++)
 	{
-		ViewPorts[I].ColorBuffer = NULL;
-		ViewPorts[I].DepthBuffer = NULL;
+		ViewPorts[I].FrameBuffer = NULL;
+		ViewPorts[I].ZBuffer = NULL;
 	}
 }
 
@@ -63,7 +63,7 @@ void ZED3D9TextureCube::DeviceLost()
 	if (RenderTarget)
 	{
 		for (size_t I = 0; I < 8; I++)
-			ZED3D_RELEASE(ViewPorts[I].ColorBuffer);
+			ZED3D_RELEASE(ViewPorts[I].FrameBuffer);
 
 		ZED3D_RELEASE(CubeTexture);
 	}
@@ -78,8 +78,8 @@ bool ZED3D9TextureCube::DeviceRestored()
 
 		for (size_t I = 0; I < 6; I++)
 		{
-			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].ColorBuffer);
-			ViewPorts[I].DepthBuffer = NULL;
+			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].FrameBuffer);
+			ViewPorts[I].ZBuffer = NULL;
 		}
 
 	}
@@ -98,15 +98,24 @@ ZEViewPort* ZED3D9TextureCube::GetViewPort(ZETextureCubeFace Face)
 bool ZED3D9TextureCube::Create(int EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget)
 {
 	if (CubeTexture != NULL)
-		CubeTexture->Release();
+		if (this->EdgeLength == EdgeLength)
+			return true;
+		else
+		{
+			CubeTexture->Release();
+			CubeTexture = NULL;
+		}
+
+	DWORD Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP);
+	DWORD MipMap = (RenderTarget ? 1 : 0);
+	D3DPOOL Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
+	D3DFORMAT Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
 
 	HRESULT Hr;
-	Hr = GetDevice()->CreateCubeTexture(EdgeLength, 0, 
-		(RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP), ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), 
-		(RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED), &CubeTexture, NULL);  
+	Hr = GetDevice()->CreateCubeTexture(EdgeLength, MipMap, Usage, Format, Pool, &CubeTexture, NULL);  
 	if (Hr != D3D_OK)
 	{
-		zeError("D3D9 GetModule()", "Can not create volume texture resource.");
+		zeError("D3D9 Texture Cube", "Can not create cube texture.");
 		return false;
 	}
 
@@ -117,19 +126,24 @@ bool ZED3D9TextureCube::Create(int EdgeLength, ZETexturePixelFormat PixelFormat,
 	if (RenderTarget)
 		for (size_t I = 0; I < 6; I++)
 		{
-			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].ColorBuffer);
-			ViewPorts[I].DepthBuffer = NULL;
+			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].FrameBuffer);
+			ViewPorts[I].ZBuffer = NULL;
 		}
 
 	return true;
 }
 
-void ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch)
+bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch)
 {
 	D3DLOCKED_RECT Rect;
-	CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, 0, &Rect, NULL, D3DLOCK_DISCARD);
+	HRESULT hr = CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, 0, &Rect, NULL, 0);
+	if (hr != D3D_OK)
+		return false;
+	
 	*Buffer = Rect.pBits;
 	*Pitch = Rect.Pitch;
+
+	return true;
 }
 
 void ZED3D9TextureCube::Unlock(ZETextureCubeFace Face)
@@ -148,8 +162,8 @@ void ZED3D9TextureCube::Release()
 	if (RenderTarget)
 		for (size_t I = 0; I < 6; I++)
 		{
-			ZED3D_RELEASE(ViewPorts[I].ColorBuffer);
-			ViewPorts[I].DepthBuffer = NULL;
+			ZED3D_RELEASE(ViewPorts[I].FrameBuffer);
+			ViewPorts[I].ZBuffer = NULL;
 		}
 }
 

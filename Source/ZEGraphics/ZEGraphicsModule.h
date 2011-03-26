@@ -38,7 +38,7 @@
 #define __ZE_GRAPHICS_MODULE_H__
 
 #include "ZECore\ZEModule.h"
-#include "ZECore\ZEOption.h"
+#include "ZECore\ZEOptionSection.h"
 
 #define zeGraphics ZEGraphicsModule::GetInstance()
 
@@ -50,14 +50,16 @@ class ZEFixedMaterial;
 class ZEStaticVertexBuffer;
 class ZEVertexDeclaration;
 class ZERenderOrder;
-class ZERenderer;
+class ZEFrameRenderer;
 class ZEShadowRenderer;
 class ZEViewPort;
 class ZEPostProcessor;
 class ZEUIMaterial;
 class ZESimpleMaterial;
+class ZESkyBoxMaterial;
 enum ZETextureQuality;
 struct ZETextureOptions;
+
 
 class ZEGraphicsModule : public ZEModule
 {	
@@ -76,6 +78,7 @@ class ZEGraphicsModule : public ZEModule
 		int									AntiAliasing;
 		bool								ToneMappingEnabled;
 		int									AnisotropicFilter;
+
 
 	public:
 		static ZEOptionSection				GraphicsOptions;
@@ -126,7 +129,7 @@ class ZEGraphicsModule : public ZEModule
 
 		virtual ZEPostProcessor*			CreatePostProcessor() = 0;
 
-		virtual ZERenderer*					CreateRenderer() = 0;
+		virtual ZEFrameRenderer*			CreateFrameRenderer() = 0;
 		virtual ZEShadowRenderer*			CreateShadowRenderer() = 0;
 
 		virtual ZEStaticVertexBuffer*		CreateStaticVertexBuffer() = 0;
@@ -139,6 +142,7 @@ class ZEGraphicsModule : public ZEModule
 		virtual ZEUIMaterial*				CreateUIMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateFixedMaterial() = 0;
 		virtual ZESimpleMaterial*			CreateSimpleMaterial() = 0;
+		virtual ZESkyBoxMaterial*			CreateSkyBoxMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCustomMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCGFXMaterial() = 0;
 
