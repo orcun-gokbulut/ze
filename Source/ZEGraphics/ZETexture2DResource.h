@@ -46,12 +46,6 @@ class ZEResourceFile;
 
 class ZETexture2DResource : public ZETextureResource
 {
-	friend static ZETexture2DResource*		LoadFromFileCache(const char *FileName);
-	friend static ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
-	friend static void						CreateMipmaps(ZETexture2DResource* TextureResource, unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable, const ZETextureOptions* LoadingOptions = NULL);
-	friend static void						Compress(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int SourceWidth, unsigned int SourceHeight, unsigned int SourcePitch, const ZETextureOptions* Options = NULL);
-	
-
 	private:
 		ZETexture2D*						Texture;
 
@@ -70,7 +64,6 @@ class ZETexture2DResource : public ZETextureResource
 		static ZETexture2DResource*			LoadResource(const char* FileName, const ZETextureOptions* UserOptions = NULL);
 		static ZETexture2DResource*			LoadResource(ZEResourceFile* ResourceFile, bool EmbededResource = true, const ZETextureOptions* UserOptions = NULL);
 
-		
 };
 
 #endif

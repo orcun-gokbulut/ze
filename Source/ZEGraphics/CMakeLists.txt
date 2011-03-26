@@ -107,6 +107,9 @@ add_source (ZEViewPort.cpp 					Sources)
 add_source (ZEViewPort.h 					Sources ZESDK)
 add_source (ZEViewVolume.cpp 				Sources)
 add_source (ZEViewVolume.h 					Sources ZESDK)
+add_source (ZETextureTools.cpp				Sources)
+add_source (ZETextureTools.h				Sources)
+
 
 add_library (ZEGraphics ${Sources})
 target_link_libraries (ZEGraphics freeimage.lib)

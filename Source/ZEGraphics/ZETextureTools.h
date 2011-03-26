@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZETextureTools.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 YiÄŸit OrÃ§un GÃ–KBULUT. All rights reserved.
 
@@ -33,3 +33,77 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#ifndef __ZETEXTURETOOLS_H__
+#define __ZETEXTURETOOLS_H__
+#pragma once
+
+
+#include "ZETextureOptions.h"
+#include "ZEGraphicsModule.h"
+#include "ZETextureResource.h"
+
+
+class ZETexture2D;
+class ZEResourceFile;
+
+/* fonksyon parametre yazýmý deiþecek!! */
+class ZETextureTools
+{
+	protected:
+		/* Empty */
+
+	private:
+		static bool			CheckInFileCache(const char			*FileName);
+
+		static unsigned int	GetMaxMipmapCount(unsigned int		Width, 
+											  unsigned int		Height);
+
+
+
+		/* For now only works for texture2d resources */
+		/* ilgili texture resource un içine taþýnacak */
+		bool			CreateMipmaps(ZETexture2DResource*		TextureResource,
+									  unsigned char*			Image, 
+									  unsigned int				Width, 
+									  unsigned int				Height, 
+									  unsigned int				BPP, 
+									  unsigned int				Pitch, 
+									  bool						IsResizeable, 
+									  const ZETextureOptions*	MipmapOptions = NULL);
+
+		static bool		CompressTexture(void*					DestinationAdress, 
+										unsigned int			DestinationPitch, 
+										void*					SourceData, 
+										unsigned int			SourcePitch, 
+										unsigned int			SourceWidth, 
+										unsigned int			SourceHeight, 
+										const ZETextureOptions* CompressionOptions = NULL);
+
+		static bool		DownSample2x(void*					DestinationData,
+								     unsigned int			DestinationPitch,
+								     void*					SourceData,
+								     unsigned int			SourcePitch,
+								     unsigned int			SourceWidth,
+								     unsigned int			SourceHeight);
+
+	public:
+						ZETextureTools(void);
+		virtual			~ZETextureTools(void);
+		
+		/* For now only works for texture2d resources */
+		ZETexture2DResource*		LoadFromFileCache(const char	*FileName);
+
+		ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile*			ResourceFile, 
+														 const ZETextureOptions*	UserOptions = NULL);
+
+		bool						SaveToFileCache(const char*			DestinationFile,
+													const ZEBYTE*		SourceData, 
+													unsigned int		SourceWidth, 
+													unsigned int		SourceHeight, 
+													unsigned int		SourceBPP, 
+													unsigned int		SourcePitch);
+		
+
+};/* class ZETextureTools */
+
+#endif /* __ZETEXTURETOOLS_H__ */
