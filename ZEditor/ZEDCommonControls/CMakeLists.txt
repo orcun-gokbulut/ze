@@ -45,8 +45,8 @@ add_source (ZEDConsoleInterface.h		Sources)
 add_source (ZEDConsoleInterface.cpp		Sources)
 add_source (ZEDLoadingScreen.h			Sources)
 add_source (ZEDLoadingScreen.cpp		Sources)
-add_source (ZEDViewport.h				Sources QtMocs)
-add_source (ZEDViewport.cpp				Sources)
+add_source (ZEDViewPort.h				Sources QtMocs)
+add_source (ZEDViewPort.cpp				Sources)
 
 include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
