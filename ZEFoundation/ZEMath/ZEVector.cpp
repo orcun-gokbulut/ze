@@ -155,21 +155,21 @@ float ZEVector2::LengthSquare() const
 ZEVector2 ZEVector2::operator +(const ZEVector2 &RightOperand) const
 {
 	ZEVector2 Temp;
-	ZEVector2::Add(Temp, RightOperand, *this);
+	ZEVector2::Add(Temp, *this, RightOperand);
 	return Temp;
 }
 
 ZEVector2 ZEVector2::operator -(const ZEVector2 &RightOperand) const
 {
 	ZEVector2 Temp;
-	ZEVector2::Substution(Temp, RightOperand, *this);
+	ZEVector2::Substution(Temp, *this, RightOperand);
 	return Temp;
 }
 
 ZEVector2 ZEVector2::operator *(const ZEVector2 &RightOperand) const
 {
 	ZEVector2 Temp;
-	ZEVector2::Multiply(Temp, RightOperand, *this);
+	ZEVector2::Multiply(Temp, *this, RightOperand);
 	return Temp;
 }
 
@@ -189,19 +189,19 @@ ZEVector2 ZEVector2::operator-() const
 ZEVector2& ZEVector2::operator +=(const ZEVector2 &RightOperand)
 {
 
-	ZEVector2::Add(*this, RightOperand, *this);
+	ZEVector2::Add(*this, *this, RightOperand);
 	return *this;
 }
 
 ZEVector2& ZEVector2::operator -=(const ZEVector2 &RightOperand)
 {
-	ZEVector2::Substution(*this, RightOperand, *this);
+	ZEVector2::Substution(*this, *this, RightOperand);
 	return *this;
 }
 
 ZEVector2& ZEVector2::operator *=(const ZEVector2 &RightOperand)
 {
-	ZEVector2::Multiply(*this, RightOperand, *this);
+	ZEVector2::Multiply(*this, *this, RightOperand);
 	return *this;
 }
 

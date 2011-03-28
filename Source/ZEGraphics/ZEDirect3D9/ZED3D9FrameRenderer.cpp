@@ -510,6 +510,9 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	{
 		ZERenderOrder* RenderOrder = &RenderList[I];
 
+		if (RenderOrder->Pipeline != ZE_RORP_3D)
+			continue;
+
 		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS) == 0)
 			continue;
 
@@ -617,10 +620,12 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	
 	for (size_t I = 0; I < RenderList.GetCount(); I++)
-	{
-		zeProfilerStart("Object Pass");
-		
+	{		
 		ZERenderOrder* RenderOrder = &RenderList[I];
+		if (RenderOrder->Pipeline != ZE_RORP_3D)
+			continue;
+
+		zeProfilerStart("Object Pass");
 		
 		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
 			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
@@ -634,6 +639,37 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetTexture(2, NULL);
 	GetDevice()->SetTexture(3, NULL);
 	GetDevice()->SetTexture(4, NULL);
+
+	zeProfilerEnd();
+}
+
+
+void ZED3D9FrameRenderer::Do2DPass()
+{
+	zeProfilerStart("Forward Pass");
+
+	// GBuffers
+	ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
+
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	GetDevice()->SetRenderState(D3DRS_ZENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+
+	for (size_t I = 0; I < RenderList.GetCount(); I++)
+	{		
+		ZERenderOrder* RenderOrder = &RenderList[I];
+		if (RenderOrder->Pipeline != ZE_RORP_2D)
+			continue;
+
+		zeProfilerStart("Object Pass");
+
+		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
+			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
+		PumpStreams(RenderOrder);
+
+		zeProfilerEnd();
+	}
 
 	zeProfilerEnd();
 }
@@ -854,6 +890,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		HDRProcessor.SetOutput(ViewPort);
 		HDRProcessor.Process(ElaspedTime);
 
+		Do2DPass();
 	GetDevice()->EndScene();
 	
 	zeProfilerEnd();

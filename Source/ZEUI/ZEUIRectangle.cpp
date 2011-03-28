@@ -130,7 +130,3 @@ bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, 
 		return false;
 	}
 }
-
-
-
-

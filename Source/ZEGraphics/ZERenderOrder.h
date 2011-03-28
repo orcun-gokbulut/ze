@@ -44,8 +44,8 @@
 
 enum ZERenderPipeline
 {
-	ZE_RORP_2D,
-	ZE_RORP_3D
+	ZE_RORP_3D = 0,
+	ZE_RORP_2D = 1
 };
 
 // ZERenderOrderFlags
@@ -89,7 +89,7 @@ class ZERenderOrder
 		size_t							VertexBufferOffset;
 		size_t							PrimitiveCount;
 
-		//const ZECamera*					Camera;
+		//const ZECamera*				Camera;
 		const ZEMaterial*				Material;
 
 		void*							IndexBuffer;

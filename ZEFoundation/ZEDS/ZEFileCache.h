@@ -45,9 +45,9 @@ class ZEResourceFile;
 class ZECacheChunkIdentifier
 {
 	public:
-		virtual ZEDWORD GetHash() const = 0;
-		virtual size_t Write(void* File) const = 0;
-		virtual bool Equal(void* File) const = 0;
+		virtual ZEDWORD					GetHash() const = 0;
+		virtual size_t					Write(void* File) const = 0;
+		virtual bool					Equal(void* File) const = 0;
 };
 
 class ZEFileCache

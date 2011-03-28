@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGUIDebugModule.h
+ Zinek Engine - ZEUIDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -43,7 +43,7 @@ class ZEGrid;
 class ZEPlayer;
 class ZEScene;
 
-class ZEGUIDebugModule : public ZEDebugModule
+class ZEUIDebugModule : public ZEDebugModule
 {
 	private:
 		ZEPlayer*				Player;
@@ -57,8 +57,8 @@ class ZEGUIDebugModule : public ZEDebugModule
 
 		virtual void			Process(float ElapsedTime);
 
-								ZEGUIDebugModule();
-		virtual					~ZEGUIDebugModule();
+								ZEUIDebugModule();
+		virtual					~ZEUIDebugModule();
 };
 
 #endif

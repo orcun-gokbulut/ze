@@ -49,7 +49,11 @@ struct ZEChunkHeader
 
 bool ZEFileCache::OpenCache(const char* FileName)
 {
-	File = fopen(FileName, "a+b");
+	File = fopen(FileName, "r+b");
+	
+	if (File == NULL)
+		File = fopen(FileName, "w+b");
+
 	if (File == NULL)
 		return false;
 
@@ -92,81 +96,70 @@ void CopyData(FILE* File, size_t From, size_t Size, size_t To)
 void ZEFileCache::AddChunk(const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size)
 {
 	fseek(File, -sizeof(ZEDWORD), SEEK_END);
-	size_t HeaderStart;
+	size_t OldRecordsEndPosition = ftell(File);
+	
+	size_t OldRecordsStartPosition = 0;
+	fread(&OldRecordsStartPosition, sizeof(ZEDWORD), 1, File);
+	
+	size_t OldRecordsSize = OldRecordsEndPosition - OldRecordsStartPosition;
+	size_t NewRecordStartPosition = OldRecordsStartPosition + Size;
 
-	// Find Chunk Count
-	ZEDWORD EndOfFile = 0;
-	EndOfFile = ftell(File);
+	if (OldRecordsSize != 0)
+		CopyData(File, OldRecordsStartPosition, OldRecordsSize, NewRecordStartPosition);
+	
+	size_t NewChunkPosition = OldRecordsStartPosition;
 
-	ZEDWORD DataCursor = 0;
-	fread(&DataCursor, sizeof(ZEDWORD), 1, File);
-
-	// Copy headers to further location
-	ZEDWORD HeadersCursor = DataCursor + Size;
-	if (EndOfFile != 0)
-		CopyData(File, HeadersCursor, EndOfFile - DataCursor - sizeof(ZEDWORD), DataCursor);
-
-	// Copy Chunk Data
-	fseek(File, DataCursor, SEEK_SET);
+	fseek(File, NewChunkPosition, SEEK_SET);
 	fwrite(Data, Size, 1, File);
+	
+	fseek(File, NewRecordStartPosition + OldRecordsSize, SEEK_SET);
+	ZEChunkHeader Header;
+	fwrite(&Header, sizeof(ZEChunkHeader), 1, File);
+	size_t IdentifierSize = Identifier->Write(File);
 
-	// Add new header
-	//   Write Identifier
+	fseek(File, NewRecordStartPosition + OldRecordsSize, SEEK_SET);
+	Header.Header = 'ZECH';
+	Header.ChunkPosition = NewChunkPosition;
+	Header.ChunkHash = Identifier->GetHash();
+	Header.ChunkSize = Size;
+	Header.IdentifierSize = IdentifierSize;
+	fwrite(&Header, sizeof(ZEChunkHeader), 1, File);
+
 	fseek(File, 0, SEEK_END);
-	//fseek(File, sizeof(ZEChunkHeader), SEEK_CUR);
+	fwrite(&NewRecordStartPosition, sizeof(ZEDWORD), 1, File);
 
-	//   Write Header
-	ZEChunkHeader NewHeader;
-	NewHeader.Header = 'ZECH';
-	NewHeader.ChunkPosition = DataCursor;
-	NewHeader.ChunkHash = Identifier->GetHash();
-	NewHeader.ChunkSize = Size;
-//	NewHeader.IdentifierSize = IdentifierSize;
-
-//	size_t IdentifierSize = Identifier->Write(File);
-
-	//fseek(File, -IdentifierSize - sizeof(ZEChunkHeader), SEEK_END);
-	fwrite(&NewHeader, sizeof(ZEChunkHeader), 1, File);
-
-	// Set headers start position
-	fseek(File, 0, SEEK_END);
-	fwrite(&HeadersCursor, sizeof(ZEDWORD), 1, File);
-
-	// Flush stream
 	fflush(File);
 }
 
 bool ZEFileCache::GetChunkData(const ZECacheChunkIdentifier* Identifier, void* Buffer, size_t Offset, size_t Size)
 {
-	fseek(File, -sizeof(ZEDWORD), SEEK_END);
-	ZEDWORD EndOfFile = ftell(File);
-
-	ZEDWORD FirstHeaderCursor = 0;
-	fread(&FirstHeaderCursor, sizeof(ZEDWORD), 1, File);
-	fseek(File, FirstHeaderCursor - 1, SEEK_SET);
-	
 	ZEDWORD Hash = Identifier->GetHash();
+	fseek(File, -sizeof(ZEDWORD), SEEK_END);
+	size_t RecordsEndPosition = ftell(File);
 
+	size_t RecordStartPosition = 0;
+	fread(&RecordStartPosition, sizeof(ZEDWORD), 1, File);
+
+	size_t CurrentHeaderPosition = RecordStartPosition;
 	while (true)
 	{
-		ZEChunkHeader CurrentHeader;
-		if (fread(&CurrentHeader, sizeof(ZEChunkHeader), 1, File) != sizeof(ZEChunkHeader))
+		fseek(File, CurrentHeaderPosition, SEEK_SET);
+
+		ZEChunkHeader Header;
+		if (fread(&Header, sizeof(ZEChunkHeader), 1, File) != 1)
 			return false;
 
-		if (CurrentHeader.Header != 'ZECH')
+		if (Header.Header != 'ZECH')
 			return false;
 
 		ZEDWORD CurrentCursor = ftell(File);
-		if (CurrentHeader.ChunkHash == Hash)
-		{
-			if (Identifier->Equal(File))
-			{
-				return false;
-			}
-		}
+		if (Header.ChunkHash == Hash && Identifier->Equal(File))
+			return true;
 
-		fseek(File, CurrentCursor + CurrentHeader.IdentifierSize, SEEK_SET);
+		CurrentHeaderPosition += Header.IdentifierSize + sizeof(ZEChunkHeader);
 	}
+
+	return false;
 }
 
 void ZEFileCache::ClearCache()
