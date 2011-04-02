@@ -105,8 +105,8 @@ bool ZED3D9Texture2D::Create(unsigned int Width, unsigned int Height, ZETextureP
 	}
 	else
 	{
-		Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : D3DUSAGE_AUTOGENMIPMAP);
-		MipMap = (RenderTarget ? 1 : 0);
+		Usage = (RenderTarget ? D3DUSAGE_RENDERTARGET : 0);
+		MipMap = (RenderTarget ? 1 : MipLevel);
 		Pool = (RenderTarget ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED);
 		Format = ZED3D9CommonTools::ConvertPixelFormat(PixelFormat);
 	}

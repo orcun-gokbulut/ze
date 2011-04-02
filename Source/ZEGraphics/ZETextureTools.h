@@ -41,67 +41,35 @@
 #include "ZETextureOptions.h"
 #include "ZEGraphicsModule.h"
 #include "ZETextureResource.h"
+#include "ZEGraphics/ZETexture2DResource.h"
 
 
 class ZETexture2D;
 class ZEResourceFile;
 
-/* fonksyon parametre yazýmý deiþecek!! */
+
 class ZETextureTools
 {
+	//friend ZETexture2DResource;
+
 	protected:
 		/* Empty */
 
 	private:
-		static bool			CheckInFileCache(const char			*FileName);
-
-		static unsigned int	GetMaxMipmapCount(unsigned int		Width, 
-											  unsigned int		Height);
-
-
-
-		/* For now only works for texture2d resources */
-		/* ilgili texture resource un içine taþýnacak */
-		bool			CreateMipmaps(ZETexture2DResource*		TextureResource,
-									  unsigned char*			Image, 
-									  unsigned int				Width, 
-									  unsigned int				Height, 
-									  unsigned int				BPP, 
-									  unsigned int				Pitch, 
-									  bool						IsResizeable, 
-									  const ZETextureOptions*	MipmapOptions = NULL);
-
-		static bool		CompressTexture(void*					DestinationAdress, 
-										unsigned int			DestinationPitch, 
-										void*					SourceData, 
-										unsigned int			SourcePitch, 
-										unsigned int			SourceWidth, 
-										unsigned int			SourceHeight, 
-										const ZETextureOptions* CompressionOptions = NULL);
-
-		static bool		DownSample2x(void*					DestinationData,
-								     unsigned int			DestinationPitch,
-								     void*					SourceData,
-								     unsigned int			SourcePitch,
-								     unsigned int			SourceWidth,
-								     unsigned int			SourceHeight);
+		
 
 	public:
-						ZETextureTools(void);
-		virtual			~ZETextureTools(void);
+									ZETextureTools(void);
+		virtual						~ZETextureTools(void);
+
 		
-		/* For now only works for texture2d resources */
-		ZETexture2DResource*		LoadFromFileCache(const char	*FileName);
-
-		ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile*			ResourceFile, 
-														 const ZETextureOptions*	UserOptions = NULL);
-
-		bool						SaveToFileCache(const char*			DestinationFile,
-													const ZEBYTE*		SourceData, 
-													unsigned int		SourceWidth, 
-													unsigned int		SourceHeight, 
-													unsigned int		SourceBPP, 
-													unsigned int		SourcePitch);
+		static unsigned int			GetMaxMipmapCount(unsigned int Width, unsigned int Height);
+		static void					CompressTexture(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int SourcePitch, unsigned int SourceWidth, unsigned int SourceHeight, const ZETextureOptions* CompressionOptions = NULL);
+		static void					DownSample2x(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int SourcePitch, unsigned int SourceWidth, unsigned int SourceHeight);
+		
+		/* buda silinecek */
+		//ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
+		
 		
 
 };/* class ZETextureTools */

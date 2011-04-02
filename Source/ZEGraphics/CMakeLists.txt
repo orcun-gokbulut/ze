@@ -112,7 +112,9 @@ add_source (ZETextureTools.h				Sources)
 
 
 add_library (ZEGraphics ${Sources})
+target_link_libraries (ZEGraphics ATI_Compress_MT_VC8.lib)
 target_link_libraries (ZEGraphics freeimage.lib)
+
 
 set_property(TARGET ZEGraphics PROPERTY FOLDER "Zinek Engine")
 

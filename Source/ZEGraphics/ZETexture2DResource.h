@@ -46,8 +46,16 @@ class ZEResourceFile;
 
 class ZETexture2DResource : public ZETextureResource
 {
+	friend class ZETextureTools;
+
 	private:
 		ZETexture2D*						Texture;
+
+		static bool							CheckInFileCache(const char *FileName);
+		static ZETexture2DResource*			LoadFromFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
+		static ZETexture2DResource*			LoadFromFileCache(const char *FileName);
+		static bool							SaveToFileCache();
+		bool								CreateMipmaps(ZETexture2DResource* TextureResource, unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable, const ZETextureOptions*	MipmapOptions = NULL);
 
 	protected:
 											ZETexture2DResource();
