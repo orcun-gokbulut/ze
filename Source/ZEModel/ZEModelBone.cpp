@@ -174,9 +174,17 @@ const ZEQuaternion ZEModelBone::GetLocalRotation()
 	else
 	{
 		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, RelativeRotation, ParentBone->GetLocalRotation());
+		ZEQuaternion::Product(Temp, ParentBone->GetLocalRotation(), RelativeRotation);
 		return Temp;
 	}
+}
+
+void ZEModelBone::SetLocalRotation(const ZEQuaternion& Rotation)
+{
+	if (ParentBone == NULL)
+		RelativeRotation = Rotation;
+	else
+		ZEQuaternion::Product(RelativeRotation, ParentBone->GetLocalRotation().Conjugate(), Rotation);
 }
 
 const ZEVector3 ZEModelBone::GetModelPosition()

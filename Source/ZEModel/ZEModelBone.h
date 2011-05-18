@@ -106,6 +106,8 @@ class ZEModelBone
 		const ZEVector3						GetLocalPosition();
 		const ZEQuaternion					GetLocalRotation();
 
+		void								SetLocalRotation(const ZEQuaternion& Rotation);
+
 		const ZEVector3						GetWorldPosition();
 		const ZEQuaternion					GetWorldRotation();
 
