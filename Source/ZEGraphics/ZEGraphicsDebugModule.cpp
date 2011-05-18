@@ -156,8 +156,8 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight4->SetEnabled(true);
 	PointLight5->SetEnabled(true);
 	OmniProjectiveLight0->SetEnabled(true);
-	ProjectiveLight0->SetEnabled(false);
-	DirectionalLight0->SetEnabled(false);
+	ProjectiveLight0->SetVisible(false);
+	DirectionalLight0->SetVisible(false);
 
 	return true;
 }

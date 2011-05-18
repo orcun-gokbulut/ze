@@ -289,7 +289,7 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 	float DistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->Camera->GetWorldPosition(), WorldPosition);
 
 	int Lod = 0;
-	int LastLod = LODs.GetCount() - 1;
+	/*int LastLod = LODs.GetCount() - 1;
 
 	if (DistanceSquare > 40 * 40) 
 		Lod = -1;
@@ -304,7 +304,7 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	if (Lod > LastLod)
-		Lod = LastLod;
+		Lod = LastLod;*/
 
 	LODs[Lod].Draw(DrawParameters, DistanceSquare);
 }

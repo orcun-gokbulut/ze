@@ -51,7 +51,7 @@ class ZEResource
 		bool					Cached;
 		bool					Shared;
 		bool					Internal;
-		size_t					ReferenceCount;
+		mutable size_t			ReferenceCount;
 
 								ZEResource();
 		virtual					~ZEResource();
@@ -65,7 +65,7 @@ class ZEResource
 
 		const char*				GetFileName() const;
 
-		void					AddReferance();
+		void					AddReferance() const;
 
 		size_t					GetReferanceCount() const;
 

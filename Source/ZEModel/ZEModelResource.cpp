@@ -168,7 +168,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
 		CurrentMaterial->SetTransparancyMode(ZE_MTM_NONE);//MaterialChunk.Transparant ? ZE_MTM_ADDAPTIVE: ZE_MTM_NOTRANSPARACY);
-		CurrentMaterial->SetAlphaCullEnabled(true);
+		CurrentMaterial->SetAlphaCullEnabled(false);
 		CurrentMaterial->SetAlphaCullLimit(0.1f);
 		CurrentMaterial->SetOpacity(1.0f);
 		CurrentMaterial->SetDiffuseSubSurfaceScatteringFactor(0.6f);

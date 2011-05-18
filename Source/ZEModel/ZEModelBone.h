@@ -89,10 +89,10 @@ class ZEModelBone
 		const ZEMatrix4x4&					GetWorldTransform();		
 		const ZEMatrix4x4&					GetModelTransform();
 
-		const ZEMatrix4x4&					GetVertexTransform();
-		const ZEMatrix4x4&					GetRelativeTransform();
 		const ZEMatrix4x4&					GetInverseTransform();
+		const ZEMatrix4x4&					GetRelativeTransform();
 		const ZEMatrix4x4&					GetForwardTransform();
+		const ZEMatrix4x4&					GetVertexTransform();
 
 		const ZEVector3&					GetRelativePosition();
 		void								SetRelativePosition(const ZEVector3& Position);
@@ -102,6 +102,9 @@ class ZEModelBone
 
 		const ZEVector3						GetModelPosition();
 		const ZEQuaternion					GetModelRotation();
+
+		const ZEVector3						GetLocalPosition();
+		const ZEQuaternion					GetLocalRotation();
 
 		const ZEVector3						GetWorldPosition();
 		const ZEQuaternion					GetWorldRotation();

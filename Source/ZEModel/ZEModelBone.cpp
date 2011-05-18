@@ -155,6 +155,30 @@ void ZEModelBone::SetRelativeRotation(const ZEQuaternion& Rotation)
 	RelativeRotation = Rotation;
 }
 
+const ZEVector3 ZEModelBone::GetLocalPosition()
+{
+	if (ParentBone == NULL)
+		return RelativePosition;
+	else
+	{
+		ZEVector3 Temp;
+		ZEMatrix4x4::Transform(Temp, ParentBone->GetLocalTransform(), RelativePosition);
+		return Temp;
+	}
+}
+
+const ZEQuaternion ZEModelBone::GetLocalRotation()
+{
+	if (ParentBone == NULL)
+		return RelativeRotation;
+	else
+	{
+		ZEQuaternion Temp;
+		ZEQuaternion::Product(Temp, RelativeRotation, ParentBone->GetLocalRotation());
+		return Temp;
+	}
+}
+
 const ZEVector3 ZEModelBone::GetModelPosition()
 {
 	if (ParentBone == NULL)

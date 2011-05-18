@@ -155,36 +155,8 @@ ZEDWORD ZEModel::GetDrawFlags() const
 	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
-void ZEModel::SetModelFile(const char* ModelFile)
+void ZEModel::LoadModelResource()
 {
-	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource(ModelFile);
-
-
-	if (ModelResource == NULL)
-	{
-//		zeError("Model", "Can not load model file.");
-		return;
-	}
-
-	SetModelResource(ModelResource);
-
-}
-
-const char* ZEModel::GetModelFile() const
-{
-	if (ModelResource != NULL)
-		return ModelResource->GetFileName();
-	else
-		return "";
-}
-
-void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
-{
-	if (this->ModelResource != NULL)
-		((ZEModelResource*)this->ModelResource)->Release();
-	
-	this->ModelResource = ModelResource;
-
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Deinitialize();
 	Meshes.SetCount(0);
@@ -252,6 +224,40 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 	}
 }
 
+void ZEModel::SetModelFile(const char* ModelFile)
+{
+	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource(ModelFile);
+
+	if (ModelResource == NULL)
+	{
+		zeError("Model", "Can not load model file. File Name : \"%s\"", ModelFile);
+		return;
+	}
+
+	SetModelResource(ModelResource);
+}
+
+const char* ZEModel::GetModelFile() const
+{
+	if (ModelResource != NULL)
+		return ModelResource->GetFileName();
+	else
+		return "";
+}
+
+void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
+{
+	if (this->ModelResource != NULL)
+		((ZEModelResource*)this->ModelResource)->Release();
+
+	ModelResource->AddReferance();
+
+	this->ModelResource = ModelResource;
+
+	if (GetInitialized())
+		LoadModelResource();
+}
+
 const ZEModelResource* ZEModel::GetModelResource()
 {
 	return ModelResource;
@@ -307,6 +313,23 @@ bool ZEModel::GetPhysicsEnabled()
 	return PhysicsEnabled;
 }
 
+ZEModelBone* ZEModel::GetBoneByName(const char* Name)
+{
+	for (size_t I = 0; I < Bones.GetCount(); I++)
+		if (strcmp(Bones[I].GetName(), Name) == 0)
+			return &Bones[I];
+
+	return NULL;
+}
+
+ZEModelMesh* ZEModel::GetMeshByName(const char* Name)
+{
+	for (size_t I = 0; I < Meshes.GetCount(); I++)
+		if (strcmp(Meshes[I].GetName(), Name) == 0)
+			return &Meshes[I];
+
+	return NULL;
+}
 
 void ZEModel::SetAnimationType(ZEModelAnimationType AnimationType)
 {
@@ -321,7 +344,6 @@ ZEModelAnimationType ZEModel::GetAnimationType()
 {
 	return AnimationType;
 }
-
 
 ZEArray<ZEModelAnimationTrack>& ZEModel::GetAnimationTracks()
 {
@@ -460,13 +482,24 @@ ZEModel::ZEModel()
 ZEModel::~ZEModel()
 {
 	if (DebugDrawComponents.Material != NULL)
-	{
 		DebugDrawComponents.Material->Release();
-	}
 
 	if (ModelResource != NULL)
 		((ZEModelResource*)ModelResource)->Release();
 }
+
+bool ZEModel::Initialize()
+{
+	LoadModelResource();
+
+	return ZEComponent::Initialize();
+}
+
+void ZEModel::Deinitialize()
+{
+
+}
+
 
 ZEModel* ZEModel::CreateInstance()
 {

@@ -110,7 +110,7 @@ void ZECompoundEntity::SetVelocity(const ZEVector3& NewVelocity)
 
 bool ZECompoundEntity::Initialize()
 {
-	if (!GetInitialized())
+	if (GetInitialized())
 		return false;
 
 	for (size_t I = 0; I < Components.GetCount(); I++)

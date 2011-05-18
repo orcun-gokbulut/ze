@@ -103,7 +103,7 @@ void ZEPlayer::Tick(float Time)
 	ZEInputAction* Current;
 	zeInput->ProcessInputMap(&InputMap);
 	
-	float MetersPerSecond = 50.0f;
+	float MetersPerSecond = 10.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 	ZEComponent* HitComponent;
@@ -220,6 +220,7 @@ void ZEPlayer::Deinitialize()
 	ZECompoundEntity::Deinitialize();
 }
 
+#include "ZEGraphics/ZETexture2DResource.h"
 ZEPlayer::ZEPlayer()
 {
 
@@ -252,14 +253,15 @@ ZEPlayer::ZEPlayer()
 	RegisterComponent(Listener);
 
 	Light = ZEProjectiveLight::CreateInstance();
-	Light->SetProjectionTextureFile("flashlight.jpg");
+	Light->SetProjectionTexture(ZETexture2DResource::LoadSharedResource("flashlight.jpg")->GetTexture());
 	Light->SetAttenuation(0.01f, 0.0f, 1.0f);
 	Light->SetIntensity(3.0f);
 	Light->SetRange(55.0f);
 	Light->SetFOV(ZE_PI_2);
 	Light->SetAspectRatio(1.0f);
-	Light->SetCastsShadow(true);
+	Light->SetCastsShadow(false);
 	Light->SetPosition(ZEVector3(0.0f, -2.0f, 0.0f));
+	Light->SetVisible(true);
 	RegisterComponent(Light);
 }
 

@@ -88,15 +88,19 @@ void ZEQuaternion::CreateIdentity(ZEQuaternion& Output)
 
 void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Up)
 {
-	ZEVector3 Right, NewUp;
+	ZEVector3 Right, NewUp, NewDirection;
 
 	ZEVector3::CrossProduct(Right, Up, Direction);
 	ZEVector3::CrossProduct(NewUp, Direction, Right);
+
+	ZEVector3::Normalize(Right, Right);
+	ZEVector3::Normalize(NewUp, NewUp);
+	ZEVector3::Normalize(NewDirection, Direction);
 	
 	ZEMatrix3x3 Basis(
-	Right.x, NewUp.x, Direction.x,                                        
-	Right.y, NewUp.y, Direction.y,                          
-	Right.z, NewUp.z, Direction.z);
+	Right.x, NewUp.x, NewDirection.x,                                        
+	Right.y, NewUp.y, NewDirection.y,                          
+	Right.z, NewUp.z, NewDirection.z);
 
 	Output.w = sqrtf(1.0f + Basis.M11 + Basis.M22 + Basis.M33) / 2.0f;
 	double Scale = Output.w * 4.0f;

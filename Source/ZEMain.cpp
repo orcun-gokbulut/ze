@@ -134,7 +134,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	//zeCore->SetDebugComponent(&DebugModule);
 
 	ZEGraphicsDebugModule GraphicsDebugModule;
-	//zeCore->SetDebugComponent(&GraphicsDebugModule);
+	zeCore->SetDebugComponent(&GraphicsDebugModule);
 
 	ZEPhysicsDebugModule PhysicsDebugModule;
 	//zeCore->SetDebugComponent(&PhysicsDebugModule);
@@ -146,7 +146,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	//zeCore->SetDebugComponent(&MetaDebugComponent);
 
 	ZEUIDebugModule UIDebugModule;
-	zeCore->SetDebugComponent(&UIDebugModule);
+	//zeCore->SetDebugComponent(&UIDebugModule);
 
 
 	zeCore->GetOptions()->Load("options.ini");

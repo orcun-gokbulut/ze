@@ -105,6 +105,8 @@ class ZEModel : public ZEComponent
 		} DebugDrawComponents;
 
 		void								DebugDraw(ZERenderer* Renderer);
+		
+		void								LoadModelResource();
 
 											ZEModel();
 		virtual								~ZEModel();
@@ -126,6 +128,9 @@ class ZEModel : public ZEComponent
 		const ZEArray<ZEMatrix4x4>&			GetBoneTransforms();
 		const ZEArray<ZEModelMesh>&			GetMeshes();
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
+
+		ZEModelBone*						GetBoneByName(const char* Name);
+		ZEModelMesh*						GetMeshByName(const char* Name);
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
@@ -163,6 +168,9 @@ class ZEModel : public ZEComponent
 
 		void								SetDrawPhysicalJoints(bool Enabled);
 		bool								GetDrawPhysicalJoints();
+
+		bool								Initialize();
+		void								Deinitialize();
 
 		static ZEModel*						CreateInstance();
 };
