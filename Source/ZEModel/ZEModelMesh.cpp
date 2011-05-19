@@ -123,7 +123,7 @@ void ZEModelMesh::SetLocalPosition(const ZEVector3& LocalPosition)
 	Position = LocalPosition;
 }
 
-const ZEVector3& ZEModelMesh::GetLocalPostion()
+const ZEVector3& ZEModelMesh::GetLocalPosition()
 {
 	return Position;
 }

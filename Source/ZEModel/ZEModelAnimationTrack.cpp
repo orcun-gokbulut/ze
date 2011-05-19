@@ -371,13 +371,13 @@ void ZEModelAnimationTrack::AdvanceAnimation(float ElapsedTime)
 				switch(BlendMode)
 				{
 					case ZE_MABM_INTERPOLATE:
-						ZEVector3::Lerp(PositionBlend, Owner->Meshes[Key->ItemId].GetLocalPostion(), Position, BlendFactor);
+						ZEVector3::Lerp(PositionBlend, Owner->Meshes[Key->ItemId].GetLocalPosition(), Position, BlendFactor);
 						ZEQuaternion::Slerp(RotationBlend, Owner->Meshes[Key->ItemId].GetLocalRotation(), Rotation, BlendFactor);
 						ZEVector3::Lerp(ScaleBlend, Owner->Meshes[Key->ItemId].GetLocalScale(), Scale, BlendFactor);
 						break;
 				
 					case ZE_MABM_ADDAPTIVE:
-						PositionBlend = Owner->Meshes[Key->ItemId].GetLocalPostion() + Position * BlendFactor;
+						PositionBlend = Owner->Meshes[Key->ItemId].GetLocalPosition() + Position * BlendFactor;
 						RotationBlend = Owner->Meshes[Key->ItemId].GetLocalRotation() * Rotation;
 						ScaleBlend = Owner->Meshes[Key->ItemId].GetLocalScale() + Scale * BlendFactor;
 						break;

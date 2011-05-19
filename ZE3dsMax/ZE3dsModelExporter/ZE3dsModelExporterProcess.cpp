@@ -614,6 +614,7 @@ bool ZEModelExporter::ProcessPhysicalJoint(IGameNode* Node, ZEModelFilePhysicalJ
 	}
 
 	GetProperty(Object, IGAME_INT_PROP,		"Joint_Type",						Joint->JointType);
+	Joint->JointType--;
 	GetProperty(Object, IGAME_INT_PROP,		"Joint_CollideBodies",				Joint->CollideBodies);					
 	GetProperty(Object, IGAME_INT_PROP,		"Joint_Breakable",					Joint->Breakable);	
 	GetProperty(Object, IGAME_FLOAT_PROP,	"Joint_Break_Force",				Joint->BreakForce);					
@@ -834,7 +835,7 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 	zepdLog("Processing vertices of mesh \"%s\". Polygon Count : %d, Vertex Count : %d.", Node->GetName(), Mesh->GetNumberOfFaces(), Mesh->GetNumberOfFaces() * 3);
 	Mesh->InitializeBinormalData();
 
-	GMatrix WorldTransform = Node->GetObjectTM() * Node->GetWorldTM().Inverse();
+	GMatrix WorldTransform = Node->GetWorldTM().Inverse() * Node->GetObjectTM();
 	GMatrix InvWorldTransform = WorldTransform;
 
 	InvWorldTransform[3][0] = 0.0f;
@@ -1020,15 +1021,6 @@ bool ZEModelExporter::ProcessMesh(IGameNode* Node)
 				CurrentMesh->Position = MAX_TO_ZE(Node->GetWorldTM().Translation());
 				CurrentMesh->Rotation = MAX_TO_ZE(Node->GetWorldTM().Rotation());
 				CurrentMesh->Scale = MAX_TO_ZE(Node->GetWorldTM().Scaling());
-
-				/*Point3 LocalTranslation = Node->GetLocalTM().Translation();
-				Quat LocalRotation = Node->GetLocalTM().Rotation();
-
-				Point3 ObjectTranslation = Node->GetObjectTM().Translation();
-				Quat ObjectRotation = Node->GetObjectTM().Rotation();
-
-				Point3 WorldTranslation = Node->GetWorldTM().Translation();
-				Quat WorldRotation = Node->GetWorldTM().Rotation();*/
 
 				ZEModelFileMeshLOD* CurrentLod = CurrentMesh->LODs.Add();
 				CurrentLod->LODLevel = MeshLOD;
