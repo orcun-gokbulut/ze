@@ -88,19 +88,36 @@ void ZEQuaternion::CreateIdentity(ZEQuaternion& Output)
 
 void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Up)
 {
-	ZEVector3 Right, NewUp, NewDirection;
+	ZEVector3 NewRight, NewUp, NewDirection;
 
-	ZEVector3::CrossProduct(Right, Up, Direction);
-	ZEVector3::CrossProduct(NewUp, Direction, Right);
-
-	ZEVector3::Normalize(Right, Right);
-	ZEVector3::Normalize(NewUp, NewUp);
 	ZEVector3::Normalize(NewDirection, Direction);
-	
+	float Dot = ZEVector3::DotProduct(NewDirection, ZEVector3::UnitY);
+	if (Dot < 0.99f)
+	{
+		//if (Dot > 0.0f)		
+			ZEVector3::CrossProduct(NewRight, ZEVector3::UnitY, NewDirection);
+		/*else
+			ZEVector3::CrossProduct(NewRight, -ZEVector3::UnitY, NewDirection);*/
+
+		ZEVector3::CrossProduct(NewUp, NewDirection, NewRight);
+	}
+	else
+	{
+//		if (ZEVector3::DotProduct(NewDirection, ZEVector3::UnitX) > 0.0f)
+			ZEVector3::CrossProduct(NewUp, ZEVector3::UnitX, NewDirection);
+//		else
+//			ZEVector3::CrossProduct(NewUp, -ZEVector3::UnitX, NewDirection);
+
+		ZEVector3::CrossProduct(NewRight, NewUp, NewDirection);
+	}
+
+	ZEVector3::Normalize(NewRight, NewRight);
+	ZEVector3::Normalize(NewUp, NewUp);
+
 	ZEMatrix3x3 Basis(
-	Right.x, NewUp.x, NewDirection.x,                                        
-	Right.y, NewUp.y, NewDirection.y,                          
-	Right.z, NewUp.z, NewDirection.z);
+	NewRight.x, NewUp.x, NewDirection.x,                                        
+	NewRight.y, NewUp.y, NewDirection.y,                          
+	NewRight.z, NewUp.z, NewDirection.z);
 
 	Output.w = sqrtf(1.0f + Basis.M11 + Basis.M22 + Basis.M33) / 2.0f;
 	double Scale = Output.w * 4.0f;

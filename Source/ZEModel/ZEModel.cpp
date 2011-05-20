@@ -475,7 +475,7 @@ ZEModel::ZEModel()
 	AutoLOD = true;
 	ActiveLOD = 0;
 	DebugDrawComponents.Material = NULL;
-	DrawSkeleton = true;
+	DrawSkeleton = false;
 	ParentlessBoneBody = NULL;
 }
 
