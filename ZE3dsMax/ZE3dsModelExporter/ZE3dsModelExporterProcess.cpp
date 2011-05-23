@@ -835,7 +835,7 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 	zepdLog("Processing vertices of mesh \"%s\". Polygon Count : %d, Vertex Count : %d.", Node->GetName(), Mesh->GetNumberOfFaces(), Mesh->GetNumberOfFaces() * 3);
 	Mesh->InitializeBinormalData();
 
-	GMatrix WorldTransform = Node->GetWorldTM().Inverse() * Node->GetObjectTM();
+	GMatrix WorldTransform = Node->GetObjectTM() * Node->GetWorldTM().Inverse();
 	GMatrix InvWorldTransform = WorldTransform;
 
 	InvWorldTransform[3][0] = 0.0f;
