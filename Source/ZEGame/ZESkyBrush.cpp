@@ -138,7 +138,7 @@ void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
 		ZEMatrix4x4 CameraRotation, SkyRotation;
 		ZEMatrix4x4::CreateRotation(CameraRotation, Camera->GetWorldRotation().Conjugate());
 		ZEMatrix4x4::CreateRotation(SkyRotation, GetRotation());
-		ZEMatrix4x4::Multiply(SkyRenderOrder.WorldMatrix, SkyRotation, CameraRotation);
+		ZEMatrix4x4::Multiply(SkyRenderOrder.WorldMatrix, CameraRotation, SkyRotation);
 		DrawParameters->Renderer->AddToRenderList(&SkyRenderOrder);
 	}
 }

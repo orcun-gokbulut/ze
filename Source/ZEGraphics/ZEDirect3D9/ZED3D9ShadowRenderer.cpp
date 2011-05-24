@@ -70,7 +70,7 @@ void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
 	//if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 	//{
 	//	ZEMatrix4x4 WorldViewProjMatrix;
-	//	ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewPoint.ViewProjMatrix);
+	//	ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewPoint.ViewProjMatrix, RenderOrder->WorldMatrix);
 	//	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
 	//}
 	//else
@@ -258,7 +258,7 @@ void ZED3D9ShadowRenderer::RenderProjectiveLight()
 	ZEMatrix4x4::CreateViewTransform(ViewTransform, Light->GetPosition(), Light->GetRotation());
 	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, Light->GetFOV(), Light->GetAspectRatio(), zeGraphics->GetNearZ(), Light->GetRange());
 
-	ZEMatrix4x4::Multiply(ViewProjectionTransform, ViewTransform, ProjectionTransform);
+	ZEMatrix4x4::Multiply(ViewProjectionTransform, ProjectionTransform, ViewTransform);
 	GetDevice()->BeginScene();
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
@@ -276,7 +276,7 @@ void ZED3D9ShadowRenderer::RenderProjectiveLight()
 
 		ZEMatrix4x4 WorldViewProjMatrix;
 		if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
-			ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewProjMatrix);
+			ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderOrder->WorldMatrix);
 		else
 			WorldViewProjMatrix = ViewProjectionTransform;
 
@@ -330,7 +330,7 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 //	ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, Light->GetFOV(), Light->GetAspectRatio(), zeGraphics->GetNearZ(), Light->GetRange());
 	ProjectionTransform = ZEMatrix4x4::Identity;
 
-	ZEMatrix4x4::Multiply(ViewProjectionTransform, ViewTransform, ProjectionTransform);
+	ZEMatrix4x4::Multiply(ViewProjectionTransform, ProjectionTransform, ViewTransform);
 
 	ZEVector4 Options = ZEVector4(Light->GetRange(), 0.0f, 0.0f, 0.0f);
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&Options, 1);
@@ -353,7 +353,7 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 
 		ZEMatrix4x4 WorldViewProjMatrix;
 		if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
-			ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewProjMatrix);
+			ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderOrder->WorldMatrix);
 		else
 			WorldViewProjMatrix = ViewProjectionTransform;
 

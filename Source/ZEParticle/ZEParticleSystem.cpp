@@ -63,7 +63,7 @@ void ZEParticleSystem::UpdateVertexBuffer(ZEDrawParameters* DrawParameters) //Bi
 		ZEMatrix4x4 InverseWorld;
 		ZEMatrix4x4::Inverse(InverseWorld, Owner->GetWorldTransform());
 		ZEMatrix4x4 Transform;
-		ZEMatrix4x4::Multiply(Transform, DrawParameters->View->ViewTransform, InverseWorld);
+		ZEMatrix4x4::Multiply(Transform, InverseWorld, DrawParameters->View->ViewTransform);
 		ZEVector3 CamDir;
 		ZEMatrix4x4::Transform3x3(CamDir, Transform, ZEVector3(0.0f, 0.0f, 1.0f));
 

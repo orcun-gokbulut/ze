@@ -106,14 +106,14 @@ const ZEMatrix4x4& ZEModelMesh::GetLocalTransform()
 
 const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
 {
-	ZEMatrix4x4::Multiply(ModelTransform, GetLocalTransform(), Owner->GetLocalTransform());
+	ZEMatrix4x4::Multiply(ModelTransform, Owner->GetLocalTransform(), GetLocalTransform());
 
 	return ModelTransform;	
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
 {
-	ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
+	ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetLocalTransform());
 
 	return WorldTransform;	
 }

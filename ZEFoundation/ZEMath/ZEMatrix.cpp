@@ -196,7 +196,7 @@ inline void ZEMatrix3x3::Multiply(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const 
 		{
 			Out.M[J][I] = 0.0f;
 			for (int R = 0; R <3; R++)
-				Out.M[J][I] += A.M[R][I] * B.M[J][R];
+				Out.M[J][I] += B.M[R][I] * A.M[J][R];
 		}
 }
 
@@ -575,8 +575,8 @@ void ZEMatrix4x4::CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Positi
 	ZEMatrix4x4::CreateScale(A, Scale);
 	ZEMatrix4x4::CreateRotation(B, Rotation);
 	ZEMatrix4x4::CreateTranslation(C, Position);
-	ZEMatrix4x4::Multiply(D, A, B);
-	ZEMatrix4x4::Multiply(Matrix, D, C);
+	ZEMatrix4x4::Multiply(D, B, A);
+	ZEMatrix4x4::Multiply(Matrix, C, D);
 }
 
 void ZEMatrix4x4::CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation)
@@ -585,7 +585,7 @@ void ZEMatrix4x4::CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Positi
 
 	ZEMatrix4x4::CreateRotation(A, Rotation);
 	ZEMatrix4x4::CreateTranslation(B, Position);
-	ZEMatrix4x4::Multiply(Matrix, A, B);
+	ZEMatrix4x4::Multiply(Matrix, B, A);
 }
 
 void ZEMatrix4x4::CreateTranslation(ZEMatrix4x4& Matrix, const ZEVector3& Position)
@@ -645,7 +645,7 @@ void ZEMatrix4x4::CreateViewTransform(ZEMatrix4x4& Matrix, const ZEVector3& Posi
 	ZEQuaternion::Conjugate(ViewRotation, Rotation);
 	ZEMatrix4x4::CreateTranslation(ViewPositionTransform, -Position.x, -Position.y, -Position.z);
 	ZEMatrix4x4::CreateRotation(ViewRotationTransform, ViewRotation);
-	ZEMatrix4x4::Multiply(Matrix, ViewPositionTransform, ViewRotationTransform);
+	ZEMatrix4x4::Multiply(Matrix, ViewRotationTransform, ViewPositionTransform);
 	
 }
 
@@ -764,7 +764,7 @@ inline void ZEMatrix4x4::Multiply(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const 
 		{
 			Out.M[J][I] = 0.0f;
 			for (int R = 0; R <4; R++)
-				Out.M[J][I] += A.M[R][I] * B.M[J][R];
+				Out.M[J][I] += B.M[R][I] * A.M[J][R];
 		}
 }
 

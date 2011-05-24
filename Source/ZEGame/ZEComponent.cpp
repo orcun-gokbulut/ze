@@ -84,7 +84,7 @@ const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 {
 	if (Owner != NULL)
 	{
-		ZEMatrix4x4::Multiply(((ZEComponent*)this)->WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
+		ZEMatrix4x4::Multiply(((ZEComponent*)this)->WorldTransform, Owner->GetWorldTransform(), GetLocalTransform());
 		return WorldTransform;
 	}
 	else

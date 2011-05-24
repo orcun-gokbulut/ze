@@ -541,7 +541,7 @@ static void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, int 
 	if (Bone->ParentBone != -1)
 	{
 
-		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Bone->RelativeTransform, Model->Bones[Bone->ParentBone].ForwardTransform);
+		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Model->Bones[Bone->ParentBone].ForwardTransform, Bone->RelativeTransform);
 		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
 	}
 	else
