@@ -39,26 +39,6 @@
 
 //#include "CompileOptions.h"
 
-#ifdef ZE_DEBUG_ENABLED
-	#define ZEDS_DEBUG_MODE
-#endif
-
-#ifdef ZEDS_DEBUG_MODE
-	#ifdef ZE_ZINEK_ENGINE
-		#include "ZECore\ZEError.h"
-		#define zedsAssert(Condition, ...) zeAssert(Condition, __VA_ARGS__) 
-		#define zedsWarningAssert(Condition, ...) zeWarningAssert(Condition, __VA_ARGS__)
-	#else	
-		void stdAssert(const char* Function, const char* File, int Line, const char* Message, ...);
-		void stdWarningAssert(const char* Function, const char* File, int Line, const char* Message, ...);
-		#define zedsAssert(Condition, ...) if (Condition) stdAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
-		#define zedsWarningAssert(Condition, ...) if (Condition) stdWarningAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
-	#endif
-#else
-	#define zedsAssert(Condition, Message)
-	#define zedsWarningAssert(Condition, Message)
-#endif
-
 #include <memory.h>
 
 #ifndef NULL

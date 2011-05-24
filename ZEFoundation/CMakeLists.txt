@@ -44,6 +44,8 @@ add_subdirectory (ZESerialization)
 
 add_source (ZETypes.h 				Sources ZESDK)
 add_source (ZETypes.cpp 			Sources)
+add_source (ZEAssert.h 				Sources ZESDK)
+add_source (ZEAssert.cpp 			Sources)
 
 add_library(ZEFoundation ${Sources})
 target_link_libraries (ZEFoundation ZEMath ZEDS ZESerialization)

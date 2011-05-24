@@ -134,15 +134,15 @@ int	ZEModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, 
 	ZEModelExporterOptionsDialog OptionsDialog;
 
 	IGameConversionManager * cm = GetConversionManager();
-	/*UserCoord UserCoord = {
-					0,	//Left Handed
-					1,	//X axis goes right
-					2,	//Y Axis goes up
-					5,	//Z Axis goes out.
-					1,	//U Tex axis is right
-					1,  //V Tex axis is down
-					};*/
 	cm->SetCoordSystem(IGameConversionManager::IGAME_D3D);
+	/*UserCoord UserCoord = {
+		0,	//Left Handed
+		1,	//X axis goes right
+		2,	//Y Axis goes up
+		5,	//Z Axis goes out.
+		1,	//U Tex axis is right
+		1,  //V Tex axis is down
+	};*/
 	//cm->SetUserCoordSystem(UserCoord);
 
 

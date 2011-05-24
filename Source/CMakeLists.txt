@@ -93,7 +93,7 @@ add_source (ZECore/ZEWindowResources.rc	Sources)
 
 add_executable (ZE WIN32 ${Sources})
 set_property(TARGET ZE PROPERTY FOLDER "Zinek Engine")
-target_link_libraries (ZE ZECore ZEDS ZESerialization ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
+target_link_libraries (ZE ZECore ZEDS ZEFoundation ZESerialization ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
 target_link_libraries (ZE ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
 
 add_library(ZESDK ${Sources})

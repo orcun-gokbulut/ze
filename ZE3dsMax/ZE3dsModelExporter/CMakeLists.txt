@@ -51,7 +51,7 @@ add_source (../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc				Sources)
 
 add_library (ZE3dsModelExporter SHARED ${Sources})
 
-target_link_libraries (ZE3dsModelExporter ZETModelFile ZEToolSDK ZE3dsProgressDialog ZEDS ZEMath)
+target_link_libraries (ZE3dsModelExporter ZETModelFile ZEToolSDK ZE3dsProgressDialog ZEDS ZEMath ZEFoundation)
 target_link_libraries (ZE3dsModelExporter core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib igame.lib)
 
 set (LOCAL_WARNING_FLAGS /W3)

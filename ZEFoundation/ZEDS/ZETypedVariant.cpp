@@ -43,13 +43,14 @@
 #include "ZEtypedvariant.h"
 #include <string.h>
 #include "ZEDSDefinitions.h"
+#include "ZEAssert.h"
 #include <string.h>
 #pragma warning(push)
 #pragma warning(disable:4482 4996)
 
 void ZETypedVariant::SetString(char *NewValue)
 {
-	zedsAssert(Type != ZE_VRT_STRING && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetString operation failed. Types does not match.");
+	zefAssert(Type != ZE_VRT_STRING && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetString operation failed. Types does not match.");
 	if(Type == ZE_VRT_STRING || Type == ZE_VRT_MATRIX3X3 || Type == ZE_VRT_MATRIX4X4)
 	{
 		if (Value.String != NULL || Type == ZE_VRT_UNDEFINED)
@@ -68,7 +69,7 @@ void ZETypedVariant::SetString(char *NewValue)
 
 void ZETypedVariant::SetInteger(int NewValue)
 {
-	zedsAssert(Type != ZE_VRT_INTEGER && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetInteger operation failed. Types does not match.");
+	zefAssert(Type != ZE_VRT_INTEGER && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetInteger operation failed. Types does not match.");
 	if (Type == ZE_VRT_INTEGER)
 	{
 		Value.Integer = NewValue;
@@ -85,7 +86,7 @@ void ZETypedVariant::SetInteger(int NewValue)
 
 void ZETypedVariant::SetFloat(float NewValue)
 {
-	zedsAssert(Type != ZE_VRT_FLOAT && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetFloat operation failed. Types does not match.");
+	zefAssert(Type != ZE_VRT_FLOAT && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetFloat operation failed. Types does not match.");
 	if(Type == ZE_VRT_FLOAT)
 	{
 		Value.Float = NewValue;
@@ -101,7 +102,7 @@ void ZETypedVariant::SetFloat(float NewValue)
 
 void ZETypedVariant::SetBoolean(bool NewValue)
 {
-	zedsAssert(Type != ZE_VRT_BOOLEAN && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetBoolean operation failed. Types does not match.");
+	zefAssert(Type != ZE_VRT_BOOLEAN && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetBoolean operation failed. Types does not match.");
 	if(Type == ZE_VRT_BOOLEAN)
 	{
 		Value.Boolean = NewValue;
@@ -118,7 +119,7 @@ void ZETypedVariant::SetBoolean(bool NewValue)
 
 void ZETypedVariant::SetVariant(const ZEVariant &NewValue)
 {
-	zedsAssert(Type != NewValue.GetType() && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetVariant operation failed. Types does not match.");
+	zefAssert(Type != NewValue.GetType() && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetVariant operation failed. Types does not match.");
 	if(Type == NewValue.GetType())
 	{
 		if(Type == ZE_VRT_STRING)
@@ -137,7 +138,7 @@ void ZETypedVariant::SetVariant(const ZEVariant &NewValue)
 
 void ZETypedVariant::SetTypedVariant(const ZETypedVariant &NewValue)
 {
-	zedsAssert(Type != NewValue.GetType() && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetTypedVariant operation failed. Types does not match.");
+	zefAssert(Type != NewValue.GetType() && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetTypedVariant operation failed. Types does not match.");
 	if(Type == NewValue.GetType())
 	{
 		if(Type == ZE_VRT_STRING)
