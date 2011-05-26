@@ -835,16 +835,19 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 	zepdLog("Processing vertices of mesh \"%s\". Polygon Count : %d, Vertex Count : %d.", Node->GetName(), Mesh->GetNumberOfFaces(), Mesh->GetNumberOfFaces() * 3);
 	Mesh->InitializeBinormalData();
 
-	GMatrix WorldTransform = Node->GetObjectTM() * Node->GetWorldTM().Inverse();
-	GMatrix InvWorldTransform = WorldTransform;
+	ZEMatrix4x4 ObjectTM;
+	ZEMatrix4x4::CreateOrientation(ObjectTM, 
+		MAX_TO_ZE(Node->GetObjectTM().Translation()), 
+		MAX_TO_ZE(Node->GetObjectTM().Rotation()), 
+		MAX_TO_ZE(Node->GetObjectTM().Scaling()));
 
-	InvWorldTransform[3][0] = 0.0f;
-	InvWorldTransform[3][1] = 0.0f;
-	InvWorldTransform[3][2] = 0.0f;
-	InvWorldTransform[3][3] = 1.0f;
-	InvWorldTransform[2][3] = 0.0f;
-	InvWorldTransform[1][3] = 0.0f;
-	InvWorldTransform[0][3] = 0.0f;
+	ZEMatrix4x4 WorldTM;
+	ZEMatrix4x4::CreateOrientation(WorldTM, 
+		MAX_TO_ZE(Node->GetWorldTM().Translation()), 
+		MAX_TO_ZE(Node->GetWorldTM().Rotation()), 
+		MAX_TO_ZE(Node->GetWorldTM().Scaling()));
+
+	ZEMatrix4x4 WorldTransform = WorldTM.Inverse() * ObjectTM;
 
 	bool GotError = false;
 	bool BoneCountWarning = false; 
@@ -859,22 +862,12 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 			{	
 				ZEModelFileVertex* Vertex = &ZEMeshLod->Vertices[3*I + N];
 
-				Point3 Temp;
-
-				Temp = Mesh->GetVertex(Face->vert[N], true) * WorldTransform;
-				Vertex->Position = MAX_TO_ZE(Temp); 
-
-				Temp = Mesh->GetNormal(Face->norm[N], true) * InvWorldTransform;
-
-				Vertex->Normal = MAX_TO_ZE(Temp.Normalize());
+				Vertex->Position = WorldTransform * MAX_TO_ZE(Mesh->GetVertex(Face->vert[N], true)); 
+				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, MAX_TO_ZE(Mesh->GetNormal(Face->norm[N], true)));
 
 				int BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal(I, N);
-
-				Temp = Mesh->GetTangent(BinormalTangentIndex) * InvWorldTransform;
-				Vertex->Tangent = MAX_TO_ZE(Temp.Normalize());
-
-				Temp = Mesh->GetBinormal(BinormalTangentIndex) * InvWorldTransform;
-				Vertex->Binormal = MAX_TO_ZE(Temp.Normalize());
+				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, MAX_TO_ZE(Mesh->GetTangent(BinormalTangentIndex).Normalize()));
+				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, MAX_TO_ZE(Mesh->GetBinormal(BinormalTangentIndex)));
 
 				Vertex->Texcoord = MAX_TO_ZE(Mesh->GetTexVertex(Face->texCoord[N]));
 				Vertex++;
@@ -886,21 +879,12 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 			{
 				ZEModelFileSkinnedVertex* Vertex = &ZEMeshLod->SkinnedVertices[3*I + N];
 
-				Point3 Temp;
-
-				Temp = Mesh->GetVertex(Face->vert[N], true) * WorldTransform;
-				Vertex->Position = MAX_TO_ZE(Temp); 
-
-				Temp = Mesh->GetNormal(Face->norm[N], true) * InvWorldTransform;
-				Vertex->Normal = MAX_TO_ZE(Temp.Normalize());
+				Vertex->Position = WorldTransform * MAX_TO_ZE(Mesh->GetVertex(Face->vert[N], true)); 
+				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, MAX_TO_ZE(Mesh->GetNormal(Face->norm[N], true)));
 
 				int BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal(I, N);
-
-				Temp = Mesh->GetTangent(BinormalTangentIndex) * InvWorldTransform;
-				Vertex->Tangent = MAX_TO_ZE(Temp.Normalize());
-
-				Temp = Mesh->GetBinormal(BinormalTangentIndex) * InvWorldTransform;
-				Vertex->Binormal = MAX_TO_ZE(Temp.Normalize());
+				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, MAX_TO_ZE(Mesh->GetTangent(BinormalTangentIndex).Normalize()));
+				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, MAX_TO_ZE(Mesh->GetBinormal(BinormalTangentIndex)));
 
 				Vertex->Texcoord = MAX_TO_ZE(Mesh->GetTexVertex(Face->texCoord[N]));
 
