@@ -83,13 +83,13 @@ class ZEPartialResourceFile : public ZEResourceFile
 		size_t				EndPosition;
 		bool				IsEof;
 
-							ZEPartialResourceFile();
-
 	public:
 		virtual bool		Seek(size_t Offset, ZESeekFrom Origin);
 		virtual size_t		Read(void* Buffer, size_t Size, size_t Count);
 		virtual bool		Eof();
 		virtual size_t		Tell();
+
+							ZEPartialResourceFile();
 };
 
 #endif

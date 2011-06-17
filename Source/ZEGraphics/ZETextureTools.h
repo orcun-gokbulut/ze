@@ -37,38 +37,44 @@
 #define __ZETEXTURETOOLS_H__
 #pragma once
 
-
 #include "ZETextureOptions.h"
 #include "ZEGraphicsModule.h"
 #include "ZETextureResource.h"
 #include "ZEGraphics/ZETexture2DResource.h"
-
+#include "ZEGraphics/ZETextureLoader.h"
 
 class ZETexture2D;
 class ZEResourceFile;
 
-
 class ZETextureTools
 {
-	//friend ZETexture2DResource;
-
-	protected:
-		/* Empty */
-
 	private:
-		
+									ZETextureTools();
+									~ZETextureTools();
 
 	public:
-									ZETextureTools(void);
-		virtual						~ZETextureTools(void);
 
-		
-		static unsigned int			GetMaxMipmapCount(unsigned int Width, unsigned int Height);
-		static void					CompressTexture(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int SourcePitch, unsigned int SourceWidth, unsigned int SourceHeight, const ZETextureOptions* CompressionOptions = NULL);
-		static void					DownSample2x(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int SourcePitch, unsigned int SourceWidth, unsigned int SourceHeight);
-		
-		/* buda silinecek */
-		//ZETexture2DResource*		LoadFromOriginalFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
+									// IS texture resizeable by 2
+		static bool					IsResizeable(ZETextureLoaderInfo &TextureInfo);
+									// IS texture compressible by DXT3/BC2
+		static bool					IsCompressible(ZETextureLoaderInfo &TextureInfo);
+									// Get maximum possible mipmap count
+		static unsigned int			GetMaxMipmapCount(ZETextureLoaderInfo &TextureInfo);
+
+		static void					CopyTextureRegion(void *DestData, unsigned int DestPitch,
+													  unsigned int DestX, unsigned int DestY,
+													  void *SourceData, unsigned int SourcePitch, unsigned int SourceBitsPP,
+													  unsigned int SourceX, unsigned int SourceY, 
+													  unsigned int CopyWidth, unsigned int CopyHeight);
+
+		static void					CompressTexture(void* DestinationData, unsigned int DestinationPitch, 
+													void* SourceData, unsigned int SourcePitch, 
+													unsigned int SourceWidth, unsigned int SourceHeight, 
+													const ZETextureOptions* CompressionOptions = NULL);
+
+		static void					DownSample2x(void* DestinationData, unsigned int DestinationPitch, 
+												 void* SourceData, unsigned int SourcePitch, /*unsigned int SourceBitsPP,*/
+												 unsigned int SourceWidth, unsigned int SourceHeight);
 		
 		
 

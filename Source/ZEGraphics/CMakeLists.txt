@@ -107,6 +107,8 @@ add_source (ZEViewPort.cpp 					Sources)
 add_source (ZEViewPort.h 					Sources ZESDK)
 add_source (ZEViewVolume.cpp 				Sources)
 add_source (ZEViewVolume.h 					Sources ZESDK)
+add_source (ZETextureLoader.h				Sources)
+add_source (ZETextureLoader.cpp				Sources)				
 add_source (ZETextureTools.cpp				Sources)
 add_source (ZETextureTools.h				Sources)
 

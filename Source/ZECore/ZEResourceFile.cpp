@@ -227,7 +227,7 @@ size_t ZEPartialResourceFile::Read(void* Buffer, size_t Size, size_t Count)
 	size_t ReadLastPos = ftell((FILE*)File) + Size * Count;
 	if (ReadLastPos > EndPosition)
 	{
-		Count -= (ReadLastPos - EndPosition) / Size;
+		Count -= (ReadLastPos - EndPosition) / Size + (((ReadLastPos - EndPosition) % Size) == 0 ? 0 : 1);
 		IsEof = true;
 	}
 

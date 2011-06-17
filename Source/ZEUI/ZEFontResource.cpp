@@ -94,7 +94,10 @@ ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 		
 		FileCursor = ResourceFile->Tell();
 
-		ZETexture2DResource* CurrentTexture = ZETexture2DResource::LoadResource(ResourceFile, false, &Option);
+		ZEPartialResourceFile TextureResourceFile;
+		ResourceFile->GetPartialResourceFile(TextureResourceFile, FileCursor, TextureFileSize);
+
+		ZETexture2DResource* CurrentTexture = ZETexture2DResource::LoadResource(&TextureResourceFile, false, &Option);
 		if (CurrentTexture == NULL)
 		{
 			zeError("Font Resource", "Can not read texture from the file. (FileName : \"%s\", Texture Index : %d)",  ResourceFile->GetFileName(), I);
