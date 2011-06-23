@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZETEXTURETOOLS_H__
-#define __ZETEXTURETOOLS_H__
 #pragma once
+#ifndef __ZE_TEXTURETOOLS_H__
+#define __ZE_TEXTURETOOLS_H__
 
 #include "ZETextureOptions.h"
 #include "ZEGraphicsModule.h"

@@ -39,19 +39,13 @@
 #include "ZECore\ZEConsole.h"
 #include "ZECore\ZEResourceManager.h"
 #include "ZECore\ZEResourceFile.h"
-#include "ZETextureLoader.h"
+#include "ZEGraphics\ZETextureLoader.h"
 #include "ZEGraphics\ZETextureTools.h"
+#include "ZEGraphics\ZETextureCacheChunkIdentifier.h"
+#include "ZEDS\ZEFileCache.h"
 
-
-#define FREEIMAGE_LIB
-#include <freeimage.h>
 #include <sys/stat.h>
 #include <stdio.h>
-#include <math.h>
-
-static unsigned DLL_CALLCONV	FreeImageFile_Read_2D(void *buffer, unsigned size, unsigned count, fi_handle handle);
-static int DLL_CALLCONV			FreeImageFile_Seek_2D(fi_handle handle, long offset, int origin);
-static long DLL_CALLCONV		FreeImageFile_Tell_2D(fi_handle handle);
 
 
 const char* ZETexture2DResource::GetResourceType() const
@@ -229,7 +223,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 	if (Options.MipMapping != ZE_TMM_DISABLED)
 		Options.MaximumMipmapLevel = UserOptions->MaximumMipmapLevel > PossibleMaxMipmapNumber ? PossibleMaxMipmapNumber : UserOptions->MaximumMipmapLevel;
 	else
-		Options.MaximumMipmapLevel = 0;
+		Options.MaximumMipmapLevel = 1;
 
 	//Decide Pixel Format
 	ZETexturePixelFormat	PixelFormat;
@@ -390,7 +384,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 
 	/* Yazılacak */
 	if(Options.FileCaching != ZE_TFC_DISABLED)
-		SaveToFileCache();
+		//SaveToFileCache(ResourceFile);
 
 	free(RawTexture);
 
@@ -398,6 +392,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 }
 ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(const char *FileName)
 {
+
 	/* YAZILACAK */
 	/* YAZILACAK */
 	/* YAZILACAK */
@@ -406,52 +401,19 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(const char *FileName
 
 	return false;
 }
-bool ZETexture2DResource::SaveToFileCache()
+bool ZETexture2DResource::SaveToFileCache(ZEResourceFile* ResourceFile)
 {
-	/* YAZILACAK */
-	/* YAZILACAK */
-	/* YAZILACAK */
-	/* YAZILACAK */
-	/* YAZILACAK */
+	ZETextureLoaderInfo	TextureInfo;
+	ZETextureLoader::GetTextureInfo(TextureInfo, ResourceFile);
+
+
+	
+	//ZETextureCacheChunkIdentifier Identifier();
+	
+
+	ZEFileCache FileCache;
+	FileCache.OpenCache(ResourceFile->GetFileName());
+	
 
 	return false;
-}
-bool ZETexture2DResource::CreateMipmaps(ZETexture2DResource* TextureResource, unsigned char* Image, unsigned int Width, unsigned int Height, unsigned int BPP, unsigned int Pitch, bool IsResizeable, const ZETextureOptions* MipmapOptions)
-{
-	/* YAZILACAK */
-	/* YAZILACAK */
-	/* YAZILACAK */
-	/* YAZILACAK */
-	/* YAZILACAK */
-
-	return false;
-}
-
-static unsigned DLL_CALLCONV FreeImageFile_Read_2D(void *buffer, unsigned size, unsigned count, fi_handle handle) 
-{
-	return (unsigned int)((ZEResourceFile*)handle)->Read(buffer, size, count);
-}
-
-static int DLL_CALLCONV FreeImageFile_Seek_2D(fi_handle handle, long offset, int origin) 
-{
-	ZESeekFrom OriginNorm;
-	switch(origin)
-	{
-	case SEEK_SET:
-		OriginNorm = ZE_SF_BEGINING;
-		break;
-	case SEEK_CUR:
-		OriginNorm = ZE_SF_CURRENT;
-		break;
-	case SEEK_END:
-		OriginNorm = ZE_SF_END;
-		break;
-	}
-
-	return ((ZEResourceFile*)handle)->Seek(offset, OriginNorm);
-}
-
-static long DLL_CALLCONV FreeImageFile_Tell_2D(fi_handle handle) 
-{
-	return (long)((ZEResourceFile*)handle)->Tell();
 }

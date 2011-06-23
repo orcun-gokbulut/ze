@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETexture2DResource.h
+ Zinek Engine - ZETextureLoader.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,45 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_2D_RESOURCE_H__
-#define __ZE_TEXTURE_2D_RESOURCE_H__
-
-#include "ZETextureResource.h"
-#include "ZEGraphicsModule.h"
-#include "ZETypes.h"
-
-class ZETexture2D;
-class ZEResourceFile;
+#ifndef __ZE_TEXTURE_LOADER_H__
+#define __ZE_TEXTURE_LOADER_H__
 
 
-class ZETexture2DResource : public ZETextureResource
+#include "ZEGraphics\ZETexture.h"
+#include "ZEGraphics\ZETexture2DResource.h"
+#include "ZEGraphics\ZETexture3DResource.h"
+#include "ZEGraphics\ZETextureCubeResource.h"
+
+
+struct ZETextureLoaderInfo
 {
-	friend class ZETextureTools;
+	unsigned int			TextureWidth;
+	unsigned int			TextureHeight;
+	unsigned int			TexturePitch;
+	unsigned int			BitsPerPixel;
+	ZETextureType			TextureType;
+	ZETexturePixelFormat	PixelFormat;
 
+	ZETextureLoaderInfo		operator= (const ZETextureLoaderInfo &Info);
+	bool					operator!=(const ZETextureLoaderInfo &Info);
+};
+
+
+class ZETextureLoader
+{
 	private:
-		ZETexture2D*						Texture;
-
-		static bool							CheckInFileCache(const char *FileName);
-		static ZETexture2DResource*			LoadFromFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadFromFileCache(const char *FileName);
-		static bool							SaveToFileCache(ZEResourceFile* ResourceFile);
-
-	protected:
-											ZETexture2DResource();
-		virtual 							~ZETexture2DResource();
+							ZETextureLoader();
+							~ZETextureLoader();
 
 	public:
-		virtual const char*					GetResourceType() const;
-		virtual ZETextureType				GetTextureType() const;
-
-		const ZETexture2D*					GetTexture() const;
-
-		static void							CacheResource(const char* FileName);
-		static ZETexture2DResource*			LoadSharedResource(const char* FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadResource(const char* FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadResource(ZEResourceFile* ResourceFile, bool EmbededResource = true, const ZETextureOptions* UserOptions = NULL);
-
+		static bool			GetTextureInfo(ZETextureLoaderInfo& TextureInfo, ZEResourceFile* ResourceFile);
+		static bool			LoadTexture(void* DestBuffer, ZEResourceFile* ResourceFile, ZETextureLoaderInfo& TextureInfo);
+		
 };
 
 #endif
-

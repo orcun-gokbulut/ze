@@ -97,6 +97,9 @@ struct ZETextureOptions
 	ZETextureFileCaching			FileCaching;
 	ZETextureMipMapping				MipMapping;
 	unsigned int					MaximumMipmapLevel;
+
+	ZETextureOptions	operator= (const ZETextureOptions &Options);
+	bool				operator!=( const ZETextureOptions &Options);
 };
 
 #endif

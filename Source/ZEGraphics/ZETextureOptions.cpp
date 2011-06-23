@@ -34,3 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETextureOptions.h"
+
+ZETextureOptions ZETextureOptions::operator= ( const ZETextureOptions &Options)
+{
+	CompressionType = Options.CompressionType;
+	CompressionQuality = Options.CompressionQuality;
+	DownSample = Options.DownSample;
+	FileCaching = Options.FileCaching;
+	MipMapping = Options.MipMapping;
+	MaximumMipmapLevel = Options.MaximumMipmapLevel;
+
+	ZETextureOptions ReturnOptions = {CompressionType, CompressionQuality, DownSample, FileCaching, MipMapping, MaximumMipmapLevel};
+	return ReturnOptions;
+}
+
+bool ZETextureOptions::operator!=( const ZETextureOptions &Options)
+{
+	return (CompressionType != Options.CompressionType &&
+			CompressionQuality != Options.CompressionQuality &&
+			DownSample != Options.DownSample &&
+			FileCaching != Options.FileCaching &&
+			MipMapping != Options.MipMapping &&
+			MaximumMipmapLevel != Options.MaximumMipmapLevel) ? true : false;
+}

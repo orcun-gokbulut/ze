@@ -65,6 +65,7 @@ void ZEFileCache::CloseCache()
 	}
 }
 
+// Copy a portion of data from one position to another in the file
 void CopyData(FILE* File, size_t From, size_t Size, size_t To)
 {
 	const size_t BufferSize = 65536;
@@ -89,10 +90,11 @@ void CopyData(FILE* File, size_t From, size_t Size, size_t To)
 	}
 }
 
+
 void ZEFileCache::AddChunk(const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size)
 {
 	fseek(File, -sizeof(ZEDWORD), SEEK_END);
-	size_t HeaderStart;
+	
 
 	// Find Chunk Count
 	ZEDWORD EndOfFile = 0;
@@ -167,6 +169,38 @@ bool ZEFileCache::GetChunkData(const ZECacheChunkIdentifier* Identifier, void* B
 
 		fseek(File, CurrentCursor + CurrentHeader.IdentifierSize, SEEK_SET);
 	}
+}
+
+// Opens chunk for arbitrary writing
+bool ZEFileCache::OpenChunk(const ZECacheChunkIdentifier* Identifier)
+{
+	// Go back by one ZEDWORD from end to read the chunk count
+	fseek(File, -sizeof(ZEDWORD), SEEK_END);
+
+	// Get the end of file pointer
+	ZEDWORD EndOfFile = ftell(File);
+	
+	// Read the chuck count
+	ZEDWORD DataCursor = 0;
+	fread(&DataCursor, sizeof(ZEDWORD), 1, File);
+
+	ZEDWORD NewHeaderStartPosition = 
+
+
+
+
+
+	return false;
+}
+
+void ZEFileCache::AddToChunk(void* Data, size_t Size)
+{
+
+}
+
+void ZEFileCache::CloseChunk()
+{
+
 }
 
 void ZEFileCache::ClearCache()

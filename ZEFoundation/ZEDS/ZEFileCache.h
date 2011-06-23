@@ -45,6 +45,7 @@ class ZEResourceFile;
 class ZECacheChunkIdentifier
 {
 	public:
+
 		virtual ZEDWORD GetHash() const = 0;
 		virtual size_t Write(void* File) const = 0;
 		virtual bool Equal(void* File) const = 0;
@@ -59,8 +60,12 @@ class ZEFileCache
 		bool							OpenCache(const char* FileName);
 		void							CloseCache();
 
+		bool							OpenChunk(const ZECacheChunkIdentifier* Identifier);
+		void							AddToChunk(void* Data, size_t Size);
+		void							CloseChunk();
+		
+		
 		void							AddChunk(const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size);
-
 		bool							GetChunkData(const ZECacheChunkIdentifier* Identifier, void* Buffer, size_t Offset, size_t Size);
 		ZEResourceFile&					GetChunkAsFile(const ZECacheChunkIdentifier* Identifier);
 
