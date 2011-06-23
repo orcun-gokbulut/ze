@@ -197,8 +197,8 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 	ZEMatrix4x4 WorldViewMatrix;
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
 	{
-		ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewProjMatrix);
-		ZEMatrix4x4::Multiply(WorldViewMatrix, RenderOrder->WorldMatrix, Camera->GetViewTransform());
+		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderOrder->WorldMatrix);
+		ZEMatrix4x4::Multiply(WorldViewMatrix, Camera->GetViewTransform(), RenderOrder->WorldMatrix);
 	}
 	else
 	{
@@ -326,8 +326,8 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 	ZEMatrix4x4 WorldViewMatrix;
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
 	{
-		ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewProjMatrix);
-		ZEMatrix4x4::Multiply(WorldViewMatrix, RenderOrder->WorldMatrix, Camera->GetViewTransform());
+		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderOrder->WorldMatrix);
+		ZEMatrix4x4::Multiply(WorldViewMatrix, Camera->GetViewTransform(), RenderOrder->WorldMatrix);
 	}
 	else
 	{

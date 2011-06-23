@@ -106,14 +106,14 @@ const ZEMatrix4x4& ZEModelMesh::GetLocalTransform()
 
 const ZEMatrix4x4& ZEModelMesh::GetModelTransform()
 {
-	ZEMatrix4x4::Multiply(ModelTransform, GetLocalTransform(), Owner->GetLocalTransform());
+	ZEMatrix4x4::Multiply(ModelTransform, Owner->GetLocalTransform(), GetLocalTransform());
 
 	return ModelTransform;	
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetWorldTransform()
 {
-	ZEMatrix4x4::Multiply(WorldTransform, GetLocalTransform(), Owner->GetWorldTransform());
+	ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetLocalTransform());
 
 	return WorldTransform;	
 }
@@ -123,7 +123,7 @@ void ZEModelMesh::SetLocalPosition(const ZEVector3& LocalPosition)
 	Position = LocalPosition;
 }
 
-const ZEVector3& ZEModelMesh::GetLocalPostion()
+const ZEVector3& ZEModelMesh::GetLocalPosition()
 {
 	return Position;
 }
@@ -289,7 +289,7 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 	float DistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->Camera->GetWorldPosition(), WorldPosition);
 
 	int Lod = 0;
-	int LastLod = LODs.GetCount() - 1;
+	/*int LastLod = LODs.GetCount() - 1;
 
 	if (DistanceSquare > 40 * 40) 
 		Lod = -1;
@@ -304,7 +304,7 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	if (Lod > LastLod)
-		Lod = LastLod;
+		Lod = LastLod;*/
 
 	LODs[Lod].Draw(DrawParameters, DistanceSquare);
 }

@@ -104,7 +104,7 @@ void ZEGame::Destroy()
 void ZEGame::Render(float ElapsedTime)
 {
 	Scene->Render(ElapsedTime);
-	//UIManager->Render(Scene->GetRenderer());
+	UIManager->Render(Scene->GetRenderer());
 	Scene->GetRenderer()->Render(ElapsedTime);
 	Scene->GetRenderer()->ClearLists();
 }
@@ -151,8 +151,8 @@ void ZEGame::Tick(float ElapsedTime)
 		ZERAD2DEG(Pitch), ZERAD2DEG(Yaw), ZERAD2DEG(Roll), 
 		AverageFPS, 1.0f / ElapsedTime);
 	
-//	((ZEUITextControl*)UIManager->GetControls()[0])->SetText(Buffer);
 	Scene->Tick(ElapsedTime);
+	UIManager->Tick(ElapsedTime);
 }
 
 ZEGame::ZEGame()

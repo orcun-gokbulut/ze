@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGUIDebugModule.cpp
+ Zinek Engine - ZEUIDebugModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -56,7 +56,7 @@
 
 #include <Windows.h>
 
-bool ZEGUIDebugModule::Initialize()
+bool ZEUIDebugModule::Initialize()
 {
 	ShowCursor(false);
 
@@ -165,23 +165,23 @@ bool ZEGUIDebugModule::Initialize()
 	return true;
 }
 
-void ZEGUIDebugModule::Deinitialize()
+void ZEUIDebugModule::Deinitialize()
 {
 
 }
 
-void ZEGUIDebugModule::Process(float ElapsedTime)
+void ZEUIDebugModule::Process(float ElapsedTime)
 {
 
 }
 
-ZEGUIDebugModule::ZEGUIDebugModule()
+ZEUIDebugModule::ZEUIDebugModule()
 {
 	Player = NULL;
 	Grid = NULL;
 }
 
-ZEGUIDebugModule::~ZEGUIDebugModule()
+ZEUIDebugModule::~ZEUIDebugModule()
 {
 
 }

@@ -66,17 +66,21 @@ class ZEQuaternion
 		static void						Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B);
 		static void						VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaternion, const ZEVector3& Vector);
 
-		ZEQuaternion					Conjugate() const;
-		static void						Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
-
 		static void						Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor);
-
-		ZEQuaternion					Normalize() const;
+		static void						Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
 		static void						Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
 
 		static void						ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaternion& Quaternion);
 		static void						ConvertToEulerAngles(float &Yaw, float &Pitch, float &Roll, const ZEQuaternion& Quaternion);
 		static void						ConvertToLookAndUp(ZEVector3& Look, ZEVector3& Up, const ZEQuaternion& Quaternion);
+
+		bool							IsValid() const;
+
+		ZEQuaternion					Conjugate() const;
+		ZEQuaternion					Normalize() const;
+
+		void							ConjugateSelf();
+		void							NormalizeSelf();
 
 		ZEVector3						operator*(const ZEVector3& Vector) const;
 		ZEQuaternion					operator*(const ZEQuaternion& Other) const;

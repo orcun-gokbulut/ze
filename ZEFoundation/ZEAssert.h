@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSDefinitions.cpp
+ Zinek Engine - ZEAssert.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,3 +32,28 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
+#ifndef __ZE_ASSERT_H__
+#define __ZE_ASSERT_H__
+
+#ifdef ZE_DEBUG_ENABLED
+	#define ZEDS_DEBUG_MODE
+#endif
+
+#ifdef ZEDS_DEBUG_MODE
+	#ifdef ZE_ZINEK_ENGINE
+		#include "ZECore\ZEError.h"
+		#define zefAssert(Condition, ...) zeAssert(Condition, __VA_ARGS__) 
+		#define zedsWarningAssert(Condition, ...) zeWarningAssert(Condition, __VA_ARGS__)
+	#else	
+		void stdAssert(const char* Function, const char* File, int Line, const char* Message, ...);
+		void stdWarningAssert(const char* Function, const char* File, int Line, const char* Message, ...);
+		#define zefAssert(Condition, ...) if (Condition) stdAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+		#define zefWarningAssert(Condition, ...) if (Condition) stdWarningAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
+	#endif
+#else
+	#define zefAssert(Condition, Message)
+	#define zedsWarningAssert(Condition, Message)
+#endif
+
+#endif

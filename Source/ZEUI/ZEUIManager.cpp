@@ -82,6 +82,7 @@ ZEUIManager::ZEUIManager()
 	LastPressedControl = NULL;
 	LastFocusedControl = NULL;
 	MouseMoveEventFlag = false;
+	Cursor = NULL;
 
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_Q,		"Q",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_Q, ZE_IBS_PRESSED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_W,		"W",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_PRESSED)));
@@ -158,25 +159,6 @@ bool ZEUIManager::Initialize()
 
 	UIRenderer->Initialize();
 
-
-	// Test Routines
-
-	ZEUITextControl* TestControl = new ZEUITextControl();
-
-	TestControl->SetPosition(ZEVector2(20, 20));
-	TestControl->SetSize(ZEVector2(780.0f, 100.0f));
-	TestControl->SetBackgroundColor(ZEVector4(1.0f, 0.0f, 0.0f, 1.0f));
-	TestControl->SetTextColor(ZEVector4(1.0f, 1.0f, 1.0f, 1.0f));
-	TestControl->SetText("Kan kokuyorum ulan !");
-	TestControl->SetTextWrap(true);
-	TestControl->SetFontSize(ZEVector2::One);
-	TestControl->SetFont(ZEFontResource::LoadResource("OldEnglish.zeFont"));
-
-	PressedButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
-	PreviousPressedButton = ZE_UI_MOUSE_BUTTON_NONE;
-
-	AddControl(TestControl);
-
 	return true;
 }
 
@@ -188,120 +170,123 @@ void ZEUIManager::Deinitialize()
 
 void ZEUIManager::ProcessEvents()
 {
-	ZEVector2 CursorPosition = Cursor->GetPosition();
-
-	/************************************************************************/
-	/*                          HOVER ENTER AND LEAVE                       */
-	/************************************************************************/
-	if (OldMousePosition != CursorPosition)
+	if (Cursor)
 	{
-		for (int I = 0; I < Controls.GetCount(); I++)
+		ZEVector2 CursorPosition = Cursor->GetPosition();
+
+		/************************************************************************/
+		/*                          HOVER ENTER AND LEAVE                       */
+		/************************************************************************/
+		if (OldMousePosition != CursorPosition)
 		{
-			if (Controls[I] == Cursor)
-			{
-				continue;
-			}
-
-			if (Controls[I]->GetVisiblity() == false)
-				continue;
-
-			if (LastHoveredControl != NULL && ZERectangle::BoundingTest(LastHoveredControl->GetVisibleRectangle(), CursorPosition) == false)
-			{
-				LastHoveredControl->MouseLeaveEvent(CursorPosition);
-				LastHoveredControl = NULL;
-			}
-
-			ZEUIControl* Reciever = NULL;
-
 			for (int I = 0; I < Controls.GetCount(); I++)
 			{
+				if (Controls[I] == Cursor)
+				{
+					continue;
+				}
+
 				if (Controls[I]->GetVisiblity() == false)
 					continue;
 
-				if (ZERectangle::BoundingTest(Controls[I]->GetVisibleRectangle(), CursorPosition))
+				if (LastHoveredControl != NULL && ZERectangle::BoundingTest(LastHoveredControl->GetVisibleRectangle(), CursorPosition) == false)
 				{
+					LastHoveredControl->MouseLeaveEvent(CursorPosition);
+					LastHoveredControl = NULL;
+				}
 
-					if(Controls[I] == Cursor)
+				ZEUIControl* Reciever = NULL;
+
+				for (int I = 0; I < Controls.GetCount(); I++)
+				{
+					if (Controls[I]->GetVisiblity() == false)
 						continue;
 
-					if (Controls[I]->GetChildControls().GetCount() == 0)
+					if (ZERectangle::BoundingTest(Controls[I]->GetVisibleRectangle(), CursorPosition))
 					{
-						Reciever = Controls[I];
-					}
 
-					else
-					{
-						Reciever = FindEventReciever(Controls[I]);
+						if(Controls[I] == Cursor)
+							continue;
+
+						if (Controls[I]->GetChildControls().GetCount() == 0)
+						{
+							Reciever = Controls[I];
+						}
+
+						else
+						{
+							Reciever = FindEventReciever(Controls[I]);
+						}
 					}
 				}
-			}
 
-			if (Reciever != NULL && Reciever != LastHoveredControl && MouseMoveEventFlag == false && !Reciever->GetHovered())
+				if (Reciever != NULL && Reciever != LastHoveredControl && MouseMoveEventFlag == false && !Reciever->GetHovered())
+				{
+					Reciever->MouseEnterEvent(CursorPosition);
+
+					if (LastHoveredControl != NULL)
+						LastHoveredControl->SetHovered(false);
+
+					LastHoveredControl = Reciever;
+				}
+			}
+		}
+		/************************************************************************/
+		/*                          HOVER ENTER AND LEAVE                       */
+		/************************************************************************/
+
+		/************************************************************************/
+		/*        MOUSE PRESS, RELEASE EVENT AND FOCUSGAIN, FOCUSLOST           */
+		/************************************************************************/
+
+		if (Cursor->GetCurrentButton() != ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE && PreviousPressedButton == ZE_UI_MOUSE_BUTTON_NONE && LastHoveredControl != NULL)
+		{
+			LastHoveredControl->MouseButtonPressed(Cursor->GetCurrentButton(), CursorPosition);
+			LastPressedControl = LastHoveredControl;
+			PreviousPressedButton = Cursor->GetCurrentButton();
+
+			if (LastFocusedControl != NULL && LastFocusedControl != LastPressedControl && LastPressedControl->GetFocusable())
 			{
-				Reciever->MouseEnterEvent(CursorPosition);
+				LastFocusedControl->FocusLost();
+				LastFocusedControl = NULL;
+			}
 
-				if (LastHoveredControl != NULL)
-					LastHoveredControl->SetHovered(false);
-
-				LastHoveredControl = Reciever;
+			if (LastPressedControl->GetFocusable() && !LastPressedControl->GetFocused() && LastFocusedControl == NULL)
+			{
+				LastPressedControl->FocusGained();
+				LastFocusedControl = LastPressedControl;
 			}
 		}
-	}
-	/************************************************************************/
-	/*                          HOVER ENTER AND LEAVE                       */
-	/************************************************************************/
 
-	/************************************************************************/
-	/*        MOUSE PRESS, RELEASE EVENT AND FOCUSGAIN, FOCUSLOST           */
-	/************************************************************************/
-
-	if (Cursor->GetCurrentButton() != ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE && PreviousPressedButton == ZE_UI_MOUSE_BUTTON_NONE && LastHoveredControl != NULL)
-	{
-		LastHoveredControl->MouseButtonPressed(Cursor->GetCurrentButton(), CursorPosition);
-		LastPressedControl = LastHoveredControl;
-		PreviousPressedButton = Cursor->GetCurrentButton();
-
-		if (LastFocusedControl != NULL && LastFocusedControl != LastPressedControl && LastPressedControl->GetFocusable())
+		if (LastPressedControl != NULL && Cursor->GetCurrentButton() == ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE)
 		{
-			LastFocusedControl->FocusLost();
-			LastFocusedControl = NULL;
+			LastPressedControl->MouseButtonReleased(PressedButton, CursorPosition);
+			MouseMoveEventFlag = false;
+
+			if (ZERectangle::BoundingTest(LastPressedControl->GetVisibleRectangle(), CursorPosition))
+			{
+				LastHoveredControl = LastPressedControl;
+			}
+
+			LastPressedControl = NULL;
+			PreviousPressedButton = ZE_UI_MOUSE_BUTTON_NONE;
 		}
 
-		if (LastPressedControl->GetFocusable() && !LastPressedControl->GetFocused() && LastFocusedControl == NULL)
-		{
-			LastPressedControl->FocusGained();
-			LastFocusedControl = LastPressedControl;
-		}
-	}
+		if (LastPressedControl != NULL)
+			MouseMoveEventFlag = true;
 
-	if (LastPressedControl != NULL && Cursor->GetCurrentButton() == ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE)
-	{
-		LastPressedControl->MouseButtonReleased(PressedButton, CursorPosition);
-		MouseMoveEventFlag = false;
-
-		if (ZERectangle::BoundingTest(LastPressedControl->GetVisibleRectangle(), CursorPosition))
+		if (MouseMoveEventFlag == true && LastPressedControl != NULL)
 		{
-			LastHoveredControl = LastPressedControl;
+			if (LastPressedControl != Cursor && OldMousePosition != CursorPosition)
+				LastPressedControl->MouseMoveEvent(OldMousePosition - CursorPosition);
 		}
 
-		LastPressedControl = NULL;
-		PreviousPressedButton = ZE_UI_MOUSE_BUTTON_NONE;
+		/************************************************************************/
+		/*        MOUSE PRESS, RELEASE EVENT AND FOCUSGAIN, FOCUSLOST           */
+		/************************************************************************/
+
+		OldMousePosition = CursorPosition;
 	}
-
-	if (LastPressedControl != NULL)
-		MouseMoveEventFlag = true;
-
-	if (MouseMoveEventFlag == true && LastPressedControl != NULL)
-	{
-		if (LastPressedControl != Cursor && OldMousePosition != CursorPosition)
-			LastPressedControl->MouseMoveEvent(OldMousePosition - CursorPosition);
-	}
-
-	/************************************************************************/
-	/*        MOUSE PRESS, RELEASE EVENT AND FOCUSGAIN, FOCUSLOST           */
-	/************************************************************************/
-
-	OldMousePosition = CursorPosition;
 
 	/************************************************************************/
 	/*                          KEYPRESS EVENTS                             */

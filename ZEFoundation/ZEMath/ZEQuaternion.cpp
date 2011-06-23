@@ -35,6 +35,8 @@
 
 #include "ZEQuaternion.h"
 #include "ZEMathDefinitions.h"
+#include "ZEAssert.h"
+
 #include <math.h>
 #include <float.h>
 #include <stdlib.h>
@@ -76,6 +78,8 @@ void ZEQuaternion::CreateFromEuler(ZEQuaternion& Output, float Pitch, float Yawn
    Output.x = CosRoll * SinPitch * CosYaw + SinRoll * CosPitch * SinYaw;
    Output.y = CosRoll * CosPitch * SinYaw - SinRoll * SinPitch * CosYaw;
    Output.z = SinRoll * CosPitchCosYaw - CosRoll * SinPitchSinYaw;
+
+   zefAssert(!Output.IsValid(), "ZEQuaternion::CreateFromEuler. Quaternion is not valid.");
 }
 
 void ZEQuaternion::CreateIdentity(ZEQuaternion& Output)
@@ -88,15 +92,32 @@ void ZEQuaternion::CreateIdentity(ZEQuaternion& Output)
 
 void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Direction, const ZEVector3& Up)
 {
-	ZEVector3 Right, NewUp;
+	ZEVector3 NewRight, NewUp, NewDirection;
 
-	ZEVector3::CrossProduct(Right, Up, Direction);
-	ZEVector3::CrossProduct(NewUp, Direction, Right);
-	
+	ZEVector3::Normalize(NewDirection, Direction);
+	float Dot = ZEVector3::DotProduct(NewDirection, ZEVector3::UnitY);
+
+	ZEVector3::CrossProduct(NewRight, Up, NewDirection);
+	ZEVector3::CrossProduct(NewUp, NewDirection, NewRight);
+
+	/*	if (Dot < 0.99f)
+	{	
+		ZEVector3::CrossProduct(NewRight, Up, NewDirection);
+		ZEVector3::CrossProduct(NewUp, NewDirection, NewRight);
+	}
+	else
+	{
+		ZEVector3::CrossProduct(NewUp, ZEVector3::UnitX, NewDirection);
+		ZEVector3::CrossProduct(NewRight, NewUp, NewDirection);
+	}*/
+
+	ZEVector3::Normalize(NewRight, NewRight);
+	ZEVector3::Normalize(NewUp, NewUp);
+
 	ZEMatrix3x3 Basis(
-	Right.x, NewUp.x, Direction.x,                                        
-	Right.y, NewUp.y, Direction.y,                          
-	Right.z, NewUp.z, Direction.z);
+	NewRight.x, NewUp.x, NewDirection.x,                                        
+	NewRight.y, NewUp.y, NewDirection.y,                          
+	NewRight.z, NewUp.z, NewDirection.z);
 
 	Output.w = sqrtf(1.0f + Basis.M11 + Basis.M22 + Basis.M33) / 2.0f;
 	double Scale = Output.w * 4.0f;
@@ -113,6 +134,8 @@ void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Di
 	Quat.z = (NewUp.x - Right.y) / Scale;*/
 
 	ZEQuaternion::Normalize(Output, Output);
+
+	zefAssert(!Output.IsValid(), "ZEQuaternion::CreateFromDirection. Quaternion is not valid.");
 }
 
 void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Matrix)
@@ -127,6 +150,8 @@ void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Mat
 	Quat.z = _copysign(Quat.z, Matrix.M21 - Matrix.M12);
 
 	ZEQuaternion::Normalize(Quat, Quat);
+
+	zefAssert(!Output.IsValid(), "ZEQuaternion::CreateFromMatrix. Quaternion is not valid.");
 }
 
 void ZEQuaternion::Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B)
@@ -135,6 +160,8 @@ void ZEQuaternion::Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZE
 	Output.x = A.w * B.x + A.x * B.w + A.y * B.z - A.z * B.y;
 	Output.y = A.w * B.y - A.x * B.z + A.y * B.w + A.z * B.x;
 	Output.z = A.w * B.z + A.x * B.y - A.y * B.x + A.z * B.w;
+
+	zefAssert(!Output.IsValid(), "ZEQuaternion::Product. Quaternion is not valid.");
 }
 
 void ZEQuaternion::VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaternion, const ZEVector3& Vector)
@@ -183,19 +210,6 @@ void ZEQuaternion::ConvertToLookAndUp(ZEVector3& Look, ZEVector3& Up, const ZEQu
 {
 	ZEQuaternion::VectorProduct(Look, Quaternion, ZEVector3::UnitZ);
 	ZEQuaternion::VectorProduct(Up, Quaternion, ZEVector3::UnitY);
-}
-
-
-ZEQuaternion ZEQuaternion::Conjugate() const
-{
-	ZEQuaternion Temp;
-	
-	Temp.x = -x;
-	Temp.y = -y;
-	Temp.z = -z;
-	Temp.w = w;
-
-	return Temp;
 }
 
 void ZEQuaternion::Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternion)
@@ -261,6 +275,8 @@ void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQu
 	Output.x = (A.x * RatioA + BTemp.x * RatioB);
 	Output.y = (A.y * RatioA + BTemp.y * RatioB);
 	Output.z = (A.z * RatioA + BTemp.z * RatioB);
+
+	zefAssert(!Output.IsValid(), "ZEQuaternion::Slerp. Quaternion is not valid.");
 }
 
 void ZEQuaternion::ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaternion& Quaternion)
@@ -287,20 +303,6 @@ void ZEQuaternion::ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaterni
 
 }
 
-ZEQuaternion ZEQuaternion::Normalize() const
-{
-	ZEQuaternion Temp;
-	
-	float L = sqrt(x*x + y*y + z*z + w*w);
-	
-	Temp.x = x / L;
-	Temp.y = y / L;
-	Temp.z = z / L;
-	Temp.w = w / L;
-	
-	return Temp;
-}
-
 void ZEQuaternion::Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion)
 {
 	float L = sqrt(Quaternion.x*Quaternion.x + Quaternion.y*Quaternion.y + Quaternion.z*Quaternion.z + Quaternion.w*Quaternion.w);
@@ -308,6 +310,51 @@ void ZEQuaternion::Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternio
 	Output.y = Quaternion.y / L;
 	Output.z = Quaternion.z / L;
 	Output.w = Quaternion.w / L;	
+
+	zefAssert(!Output.IsValid(), "ZEQuaternion::Product. Quaternion is not valid.");
+}
+
+bool ZEQuaternion::IsValid() const
+{
+	if (w != w || x != x || y != y || z != z)
+		return false;
+
+	if ((w * w) < 0.0f)
+		return false;
+	if ((x * x) < 0.0f)
+		return false;
+	if ((y * y) < 0.0f)
+		return false;
+	if ((z * z) < 0.0f)
+		return false;
+
+	return true;
+}
+
+ZEQuaternion ZEQuaternion::Conjugate() const
+{
+	ZEQuaternion Temp;
+	ZEQuaternion::Conjugate(Temp, *this);
+
+	return Temp;
+}
+
+ZEQuaternion ZEQuaternion::Normalize() const
+{
+	ZEQuaternion Temp;
+	ZEQuaternion::Normalize(Temp, *this);
+
+	return Temp;
+}
+
+void ZEQuaternion::ConjugateSelf()
+{
+	ZEQuaternion::Conjugate(*this, *this);
+}
+
+void ZEQuaternion::NormalizeSelf()
+{
+	ZEQuaternion::Normalize(*this, *this);
 }
 
 ZEQuaternion ZEQuaternion::operator*(const ZEQuaternion& Other) const

@@ -248,7 +248,7 @@ void ZED3D9FrameRenderer::DrawPointLight(ZEPointLight* Light)
 	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), 
 		ZEQuaternion::Identity, 
 		ZEVector3(LightParameters.Range, LightParameters.Range, LightParameters.Range));
-	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
+	ZEMatrix4x4::Multiply(WorldViewProjTransform, Camera->GetViewProjectionTransform(), WorldTransform);
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
 	
 	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
@@ -291,7 +291,7 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), 
 		ZEQuaternion::Identity, 
 		ZEVector3(LightParameters.Range, LightParameters.Range, LightParameters.Range));
-	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
+	ZEMatrix4x4::Multiply(WorldViewProjTransform, Camera->GetViewProjectionTransform(), WorldTransform);
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);*/
 	
 	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
@@ -337,7 +337,7 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	ZEMatrix4x4 WorldViewProjTransform, WorldTransform;
 	float TanFovRange = tanf(Light->GetFOV() * 0.5f) * Light->GetRange();
 	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), Light->GetWorldRotation(), ZEVector3(TanFovRange * Light->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, Light->GetRange()));
-	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
+	ZEMatrix4x4::Multiply(WorldViewProjTransform, Camera->GetViewProjectionTransform(), WorldTransform);
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
 
 	// Projection Transformation
@@ -346,7 +346,7 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	ZEMatrix4x4::CreateViewTransform(LightViewMatrix, Light->GetWorldPosition(), Light->GetWorldRotation());
 	ZEMatrix4x4 LightProjectionMatrix;
 	ZEMatrix4x4::CreatePerspectiveProjection(LightProjectionMatrix, Light->GetFOV(), Light->GetAspectRatio(), zeGraphics->GetNearZ(), Light->GetRange());
-	ZEMatrix4x4::Multiply(LightViewProjectionMatrix, LightViewMatrix, LightProjectionMatrix);
+	ZEMatrix4x4::Multiply(LightViewProjectionMatrix, LightProjectionMatrix, LightViewMatrix);
 
 	ZEMatrix4x4 TextureMatrix;
 	ZEMatrix4x4::Create(TextureMatrix, 
@@ -358,8 +358,8 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	ZEMatrix4x4 InvCameraViewMatrix;
 	ZEMatrix4x4::Inverse(InvCameraViewMatrix, Camera->GetViewTransform());
 	ZEMatrix4x4 ProjectionMatrix, Temp;
-	ZEMatrix4x4::Multiply(Temp, InvCameraViewMatrix, LightViewProjectionMatrix);
-	ZEMatrix4x4::Multiply(ProjectionMatrix, Temp, TextureMatrix);
+	ZEMatrix4x4::Multiply(Temp, LightViewProjectionMatrix, InvCameraViewMatrix);
+	ZEMatrix4x4::Multiply(ProjectionMatrix, TextureMatrix, Temp);
 
 	GetDevice()->SetPixelShaderConstantF(16, (float*)&ProjectionMatrix, 4);
 
@@ -433,7 +433,7 @@ void ZED3D9FrameRenderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), 
 		ZEQuaternion::Identity, 
 		ZEVector3(LightParameters.Range, LightParameters.Range, LightParameters.Range));
-	ZEMatrix4x4::Multiply(WorldViewProjTransform, WorldTransform, Camera->GetViewProjectionTransform());
+	ZEMatrix4x4::Multiply(WorldViewProjTransform, Camera->GetViewProjectionTransform(), WorldTransform);
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
 
 	// Projection Transform
@@ -509,6 +509,9 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	for (size_t I = 0; I < RenderList.GetCount(); I++)
 	{
 		ZERenderOrder* RenderOrder = &RenderList[I];
+
+		if (RenderOrder->Pipeline != ZE_RORP_3D)
+			continue;
 
 		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS) == 0)
 			continue;
@@ -617,10 +620,12 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	
 	for (size_t I = 0; I < RenderList.GetCount(); I++)
-	{
-		zeProfilerStart("Object Pass");
-		
+	{		
 		ZERenderOrder* RenderOrder = &RenderList[I];
+		if (RenderOrder->Pipeline != ZE_RORP_3D)
+			continue;
+
+		zeProfilerStart("Object Pass");
 		
 		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
 			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
@@ -634,6 +639,37 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetTexture(2, NULL);
 	GetDevice()->SetTexture(3, NULL);
 	GetDevice()->SetTexture(4, NULL);
+
+	zeProfilerEnd();
+}
+
+
+void ZED3D9FrameRenderer::Do2DPass()
+{
+	zeProfilerStart("Forward Pass");
+
+	// GBuffers
+	ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
+
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	GetDevice()->SetRenderState(D3DRS_ZENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+
+	for (size_t I = 0; I < RenderList.GetCount(); I++)
+	{		
+		ZERenderOrder* RenderOrder = &RenderList[I];
+		if (RenderOrder->Pipeline != ZE_RORP_2D)
+			continue;
+
+		zeProfilerStart("Object Pass");
+
+		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
+			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
+		PumpStreams(RenderOrder);
+
+		zeProfilerEnd();
+	}
 
 	zeProfilerEnd();
 }
@@ -854,6 +890,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		HDRProcessor.SetOutput(ViewPort);
 		HDRProcessor.Process(ElaspedTime);
 
+		Do2DPass();
 	GetDevice()->EndScene();
 	
 	zeProfilerEnd();

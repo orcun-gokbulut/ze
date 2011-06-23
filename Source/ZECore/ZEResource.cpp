@@ -52,7 +52,7 @@ void ZEResource::SetFileName(const char* Value)
 	strcpy_s(FileName, ZE_MAX_FILE_NAME_SIZE, Value);
 }
 
-void ZEResource::AddReferance()
+void ZEResource::AddReferance() const
 {
 	if (Shared)
 		ReferenceCount++;

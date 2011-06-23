@@ -51,7 +51,7 @@ void ZESceneDebugDraw::DrawOrientedBoundingBox(const ZEAABoundingBox& BoundingBo
 			(BoundingBox.Max.y - BoundingBox.Min.y), 
 			(BoundingBox.Max.z - BoundingBox.Min.z))
 			);
-	ZEMatrix4x4::Multiply(WorldMatrix, LocalPivot, Transform);
+	ZEMatrix4x4::Multiply(WorldMatrix, Transform, LocalPivot);
 
 	VertexBuffer.SetTransfomation(WorldMatrix);
 	VertexBuffer.SetColor(Color);

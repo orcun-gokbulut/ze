@@ -87,13 +87,21 @@ class ZEMatrix3x3
 		static void						Multiply(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B);
 		static void						Scale(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, float s);
 		static void						Transpose(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix);
-		static void						Determinant(float &det, const ZEMatrix3x3 &Matrix);
+		static float					Determinant(const ZEMatrix3x3 &Matrix);
 		static bool						Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix);
 
 		static void						Transform(ZEVector2& Out, const ZEMatrix3x3 &Matrix, const ZEVector2& Vector); // Doldur metin doldur acıma doldur
 		static void						Transform(ZEVector3& Out, const ZEMatrix3x3 &Matrix, const ZEVector3& Vector);
 		static void						Transform(ZEVector4& Out, const ZEMatrix3x3 &Matrix, const ZEVector4& Vector); // Doldur metin doldur
-				   						
+
+		float							Determinant() const;
+
+		ZEMatrix3x3						Inverse() const;
+		ZEMatrix3x3						Transpose() const;
+
+		void							InverseSelf();
+		void							TransposeSelf();
+
 		ZEMatrix3x3						operator+(const ZEMatrix3x3 &RightOperand) const;
 		ZEMatrix3x3						operator-(const ZEMatrix3x3 &RightOperand) const;
 		ZEMatrix3x3						operator*(const ZEMatrix3x3 &RightOperand) const;
@@ -103,6 +111,10 @@ class ZEMatrix3x3
 		ZEMatrix3x3&					operator -= (const ZEMatrix3x3 &RightOperand);
 		ZEMatrix3x3&					operator *= (const ZEMatrix3x3 &RightOperand);
 		ZEMatrix3x3&					operator *= (float S);
+
+		ZEVector2						operator*(const ZEVector2 &RightOperand) const;
+		ZEVector3						operator*(const ZEVector3 &RightOperand) const;
+		ZEVector4						operator*(const ZEVector4 &RightOperand) const;
 
 		bool							operator == (const ZEMatrix3x3 &M) const;
 		bool							operator != (const ZEMatrix3x3 &M) const;
@@ -173,11 +185,19 @@ class ZEMatrix4x4
 		static void						Scale(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, float s);
 		static void						Transpose(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix);
 		static bool						Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix);
-		static void						Determinant(float &det,const ZEMatrix4x4 &Matrix);
+		static float					Determinant(const ZEMatrix4x4 &Matrix);
 
 		static void						Transform(ZEVector3 &Out, const ZEMatrix4x4 &Matrix, const ZEVector3& Vector);
 		static void						Transform3x3(ZEVector3 &Out, const ZEMatrix4x4 &Matrix, const ZEVector3& Vector);
 		static void						Transform(ZEVector4 &Out, const ZEMatrix4x4 &Matrix, const ZEVector4& Vector);
+
+		float							Determinant() const;
+		
+		ZEMatrix4x4						Inverse() const;
+		ZEMatrix4x4						Transpose() const;
+		
+		void							InverseSelf();
+		void							TransposeSelf();
 
 		ZEMatrix4x4						operator+(const ZEMatrix4x4& RightOperand) const;
 		ZEMatrix4x4						operator-(const ZEMatrix4x4& RightOperand) const;

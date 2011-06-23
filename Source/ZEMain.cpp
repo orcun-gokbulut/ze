@@ -50,6 +50,7 @@
 #include "ZEGraphics\ZEGraphicsDebugModule.h"
 #include "ZESound\ZESoundDebugModule.h"
 #include "ZEMeta\ZEMetaDebugModule.h"
+#include "ZEUI\ZEUIDebugModule.h"
 
 extern HINSTANCE ApplicationInstance;
 
@@ -60,7 +61,7 @@ class ZEStringCacheIdentifier : public ZECacheChunkIdentifier
 {
 	public:
 		const char* String;
-		ZEDWORD GetHash() const
+		virtual ZEDWORD GetHash() const
 		{
 			int Hash = 0;
 			int I = 0;
@@ -73,7 +74,7 @@ class ZEStringCacheIdentifier : public ZECacheChunkIdentifier
 			return Hash;
 		}
 
-		size_t Write(void* File) const
+		virtual size_t Write(void* File) const
 		{
 			ZEDWORD Count = strlen(String) + 1;
 			fwrite(&Count, sizeof(ZEDWORD), 1, (FILE*)File);
@@ -81,13 +82,13 @@ class ZEStringCacheIdentifier : public ZECacheChunkIdentifier
 			return Count + sizeof(ZEDWORD);
 		}
 
-		bool Equal(void* File) const
+		virtual bool Equal(void* File) const
 		{
 			const size_t BufferSize = 1024;
 			char Buffer[BufferSize];
 			
 			ZEDWORD TotalBytes;
-			fwrite(&TotalBytes, sizeof(ZEDWORD), 1, (FILE*)File);
+			fread(&TotalBytes, sizeof(ZEDWORD), 1, (FILE*)File);
 			
 			size_t ReadBytes = 0;
 			while (ReadBytes < TotalBytes)
@@ -118,11 +119,11 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	ZEFileCache Cache;
 
 	Cache.OpenCache("c:\\test.zeCache");
-	Cache.AddChunk(&ZEStringCacheIdentifier("Orcun"), CacheItem1, sizeof(CacheItem1));
+//	Cache.AddChunk(&ZEStringCacheIdentifier("Orcun"), CacheItem1, sizeof(CacheItem1));
 //	Cache.AddChunk(&ZEStringCacheIdentifier("Cengiz"), CacheItem1, sizeof(CacheItem2));
 
 	char Buffer[1024];
-	Cache.GetChunkData(&ZEStringCacheIdentifier("Orcun"), NULL, 0, 0);
+	Cache.GetChunkData(&ZEStringCacheIdentifier("dfg"), NULL, 0, 0);
 	Cache.CloseCache();*/
 	
 	//MessageBox(NULL, "Attach it while you can !", "Zinek Engine", MB_OK); 
@@ -144,6 +145,10 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	ZEMetaDebugModule MetaDebugComponent;
 	//zeCore->SetDebugComponent(&MetaDebugComponent);
 
+	ZEUIDebugModule UIDebugModule;
+	//zeCore->SetDebugComponent(&UIDebugModule);
+
+
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();
 	zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_GRAPHICS));
@@ -156,7 +161,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	zeCore->GetWindow()->SetWindowSize(zeCore->GetOptions()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger(), zeCore->GetOptions()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger());
 
  	if (zeCore->StartUp())
-		zeCore->Run(); 
+		zeCore->Run();
 }
 
 

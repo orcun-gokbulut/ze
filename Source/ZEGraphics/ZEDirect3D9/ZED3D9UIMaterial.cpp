@@ -56,19 +56,9 @@ ZED3D9UIMaterial::~ZED3D9UIMaterial()
 
 bool ZED3D9UIMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const 
 {
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
-	{
-		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-		if (RenderOrder->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
-			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-		else
-			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+	((ZED3D9UIMaterial*)this)->UpdateMaterial();
 
-	}
-	else
-		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
-	
+	GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
 	if (WireFrame)
@@ -83,14 +73,6 @@ bool ZED3D9UIMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder
 	GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-
-	/*GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-	GetDevice()->SetRenderState(D3DRS_ALPHAREF, 0x0);
-	GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER);
-	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	GetDevice()->SetRenderState(D3DRS_BLENDOP, D3DBLENDOP_ADD);
-	GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
-	GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);*/
 
 	GetDevice()->SetVertexShader(VertexShader);
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&RenderOrder->WorldMatrix, 4);

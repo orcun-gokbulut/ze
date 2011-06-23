@@ -50,7 +50,7 @@ add_source (ZE3dsMapExporter.def				Sources)
 add_source (../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc				Sources)
 
 add_library (ZE3dsMapExporter SHARED ${Sources})
-target_link_libraries (ZE3dsMapExporter ZETMapFile ZEToolSDK ZE3dsProgressDialog ZEDS ZEMath)
+target_link_libraries (ZE3dsMapExporter ZETMapFile ZEToolSDK ZE3dsProgressDialog ZEDS ZEMath ZEFoundation)
 target_link_libraries (ZE3dsMapExporter core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib igame.lib)
 
 set_property (TARGET ZE3dsMapExporter PROPERTY FOLDER "ZE3dsMax")

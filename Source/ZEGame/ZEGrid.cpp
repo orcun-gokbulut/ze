@@ -110,6 +110,7 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 	
 	if (MinorGridEnabled)
 	{
+		RenderOrder.Order = 0.0f;
 		ZEVector3 MinorGridPosition(
 			CameraPosition.x - fmod(CameraPosition.x, MajorGridUnitSize.x),
 			0.0f,
@@ -123,6 +124,7 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 
 	if (MajorGridEnabled)
 	{
+		RenderOrder.Order = 1.0f;
 		ZEVector3 MajorGridPosition(
 			CameraPosition.x - fmod(CameraPosition.x, MajorGridUnitSize.x),
 			0.0f,
@@ -136,6 +138,7 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 
 	if (AxisEnabled)
 	{
+		RenderOrder.Order = 2.0f;
 		ZEVector3 AxisXGridPosition(CameraPosition.x - fmod(CameraPosition.x, MajorGridUnitSize.x), 0.0f, 0.0f);
 		ZEVector3 AxisYGridPosition(0.0f, 0.0f, CameraPosition.z - fmod(CameraPosition.z, MajorGridUnitSize.y));
 

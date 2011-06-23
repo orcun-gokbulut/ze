@@ -91,7 +91,7 @@ class ZEModelMesh
 		const ZEMatrix4x4&					GetWorldTransform();
 				
 		void								SetLocalPosition(const ZEVector3& LocalPosition);
-		const ZEVector3&					GetLocalPostion();
+		const ZEVector3&					GetLocalPosition();
 
 		void								SetLocalRotation(const ZEQuaternion& LocalRotation);
 		const ZEQuaternion&					GetLocalRotation();

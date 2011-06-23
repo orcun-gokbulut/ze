@@ -110,6 +110,7 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 	ZERenderOrder* NewRenderOrder = RenderOrders.Add();
 	NewRenderOrder->WorldMatrix = ScreenTransform;
 	NewRenderOrder->Material = Rectangle.Material;
+	NewRenderOrder->Pipeline = ZE_RORP_2D;
 	NewRenderOrder->VertexBuffer = new ZEArrayVertexBuffer<ZEUIVertex>();
 	NewRenderOrder->Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM;
 	NewRenderOrder->PrimitiveType = ZE_ROPT_TRIANGLE;

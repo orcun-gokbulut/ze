@@ -90,7 +90,7 @@ bool ZED3D9SimpleMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderO
 	ZEMatrix4x4 WorldViewProjMatrix;
 	ZEMatrix4x4 WorldViewMatrix;
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
-		ZEMatrix4x4::Multiply(WorldViewProjMatrix, RenderOrder->WorldMatrix, ViewProjMatrix);
+		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderOrder->WorldMatrix);
 	else
 		WorldViewProjMatrix = ViewProjMatrix;
 

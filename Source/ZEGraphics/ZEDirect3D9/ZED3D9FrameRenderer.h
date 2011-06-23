@@ -113,6 +113,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		void								DoGBufferPass();
 		void								DoLightningPass();
 		void								DoForwardPass();
+		void								Do2DPass();
 		void								DoPostProcess();
 
 	protected:

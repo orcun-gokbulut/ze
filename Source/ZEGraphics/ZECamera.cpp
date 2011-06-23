@@ -73,7 +73,7 @@ const ZEMatrix4x4& ZECamera::GetViewProjectionTransform()
 	/*if (!UpdateViewProjectionTransform)
 		return ViewProjectionTransform;*/
 
-	ZEMatrix4x4::Multiply(ViewProjectionTransform, GetViewTransform(), GetProjectionTransform());
+	ZEMatrix4x4::Multiply(ViewProjectionTransform, GetProjectionTransform(), GetViewTransform());
 	
 	//UpdateViewTransform = false;
 	
