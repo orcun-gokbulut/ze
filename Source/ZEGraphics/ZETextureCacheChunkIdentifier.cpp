@@ -72,6 +72,7 @@ ZEDWORD ZETextureCacheChunkIdentifier::GetHash()
 	return (ZEDWORD)Hash;
 }
 
+// Returns total bytes written
 size_t ZETextureCacheChunkIdentifier::Write(void* File) const
 {
 	size_t FileNameSize = sizeof(char) * ZE_MAX_FILE_NAME_SIZE;
@@ -99,6 +100,7 @@ bool ZETextureCacheChunkIdentifier::Equal(void* File) const
 	{
 		if(FileNameBuffer[I] != FileName[I])
 			return false;
+		I++;
 	}
 
 	ZETextureLoaderInfo TextureInfoRead;

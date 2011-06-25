@@ -39,7 +39,9 @@
 
 #include "ZEArray.h"
 #include "ZETypes.h"
+
 #include <stdio.h>
+
 class ZEResourceFile;
 
 class ZECacheChunkIdentifier
@@ -53,22 +55,27 @@ class ZECacheChunkIdentifier
 class ZEFileCache
 {
 	private:
+
 		FILE*							File;
-		
-	public:
 		bool							OpenCache(const char* FileName);
 		void							CloseCache();
+		
+	public:
 
-		bool							OpenChunk(const ZECacheChunkIdentifier* Identifier);
+		// Read
+		// Write
+		bool							OpenChunk(const char* FileName, const ZECacheChunkIdentifier* Identifier, size_t TotalChunkSize);
 		void							AddToChunk(void* Data, size_t Size);
 		void							CloseChunk();
 		
+		bool							CheckIdentifierExists(const char* FileName, const ZECacheChunkIdentifier* Identifier);
 		
-		void							AddChunk(const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size);
-		bool							GetChunkData(const ZECacheChunkIdentifier* Identifier, void* Buffer, size_t Offset, size_t Size);
-		ZEResourceFile&					GetChunkAsFile(const ZECacheChunkIdentifier* Identifier);
+		void							AddChunk(const char* FileName, const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size);
+		bool							GetChunkData(const char* FileName, const ZECacheChunkIdentifier* Identifier, void* Buffer, size_t Offset, size_t Size);
 
-		void							ClearCache();
+										// Will be implemented
+		void							GetChunkAsFile(ZEResourceFile* ResourceFile, const char* FileName, const ZECacheChunkIdentifier* Identifier);
+		bool							ClearCache(const char* FileName);
 
 										ZEFileCache();
 										~ZEFileCache();

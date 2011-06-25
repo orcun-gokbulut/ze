@@ -115,12 +115,12 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceF
 {
 	if ((zeGraphics->GetTextureQuality() != ZE_TQ_VERY_HIGH) && (!EmbededResource))
 	{
-		if (CheckInFileCache(ResourceFile->GetFileName()))
+		if (UserOptions->FileCaching != ZE_TFC_DISABLED && CheckInFileCache(ResourceFile->GetFileName()))
 		{
 			return LoadFromFileCache(ResourceFile->GetFileName());
 		}
 		else
-		{			
+		{
 			return LoadFromFile(ResourceFile, UserOptions);
 		}
 	}
@@ -384,14 +384,29 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 
 	/* Yazılacak */
 	if(Options.FileCaching != ZE_TFC_DISABLED)
-		//SaveToFileCache(ResourceFile);
+		SaveToFileCache(ResourceFile);
 
 	free(RawTexture);
 
 	return TextureResource;
 }
-ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(const char *FileName)
+
+ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(const char *CacheFileName, const char* TextureFileName, ZETextureOptions &Options)
 {
+	// Create TextureResource
+	ZETexture2DResource* TextureResource = new ZETexture2DResource();
+	ZETexture2D* Texture = TextureResource->Texture = ZETexture2D::CreateInstance();
+
+	// Set Other Variables
+	TextureResource->SetFileName(TextureFileName);
+	TextureResource->Cached = false;
+	TextureResource->Shared = false;
+
+	
+	if(Options.)
+	
+	ZEFileCache FileCache;
+	FileCache.GetChunkData();
 
 	/* YAZILACAK */
 	/* YAZILACAK */
@@ -401,19 +416,23 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(const char *FileName
 
 	return false;
 }
-bool ZETexture2DResource::SaveToFileCache(ZEResourceFile* ResourceFile)
-{
-	ZETextureLoaderInfo	TextureInfo;
-	ZETextureLoader::GetTextureInfo(TextureInfo, ResourceFile);
 
+bool ZETexture2DResource::SaveToFileCache(const char* CacheFileName, const char* TextureFileName, ZETextureLoaderInfo &TextureInfo, ZETextureOptions &Options, void* Data, size_t Size)
+{	
+	ZETextureCacheChunkIdentifier	Identifier;
 
-	
-	//ZETextureCacheChunkIdentifier Identifier();
-	
+	sprintf(Identifier.FileName, "%s", TextureFileName);
+	Identifier.TextureInfo = TextureInfo;
+	Identifier.TextureOptions = Options;
+	Identifier.Offset = 0;
 
 	ZEFileCache FileCache;
-	FileCache.OpenCache(ResourceFile->GetFileName());
-	
+	bool Exists = FileCache.CheckIdentifierExists(CacheFileName, &Identifier);
+	if(!Exists)
+	{
+		FileCache.AddChunk(CacheFileName, (ZECacheChunkIdentifier*)&Identifier, Data, Size);
+		return true;
+	}
 
 	return false;
 }

@@ -61,11 +61,10 @@ ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 			return &VeryHigh;
 			break;
 		
-		
+		default:
 		case ZE_TQ_HIGH:
 			return &High;
 			break;
-			
 		
 		case ZE_TQ_NORMAL:
 			return &Normal;
@@ -79,7 +78,6 @@ ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 			return &VeryLow;
 			break;
 			
-		default:
 		case ZE_TQ_ULTRA_LOW:
 			return &UltraLow;
 			break;

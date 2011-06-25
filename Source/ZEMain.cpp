@@ -127,6 +127,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	Cache.CloseCache();*/
 	
 	//MessageBox(NULL, "Attach it while you can !", "Zinek Engine", MB_OK); 
+
 	_set_SSE2_enable(1); 
 	ApplicationInstance = hInstance;
 	
