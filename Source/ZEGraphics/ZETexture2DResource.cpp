@@ -73,30 +73,15 @@ ZETexture2DResource::~ZETexture2DResource()
 	if (Texture != NULL)
 		Texture->Release();
 };
-
-ZETexture2DResource* ZETexture2DResource::LoadResource(const char* FileName, const ZETextureOptions *UserOptions)
-{
-	ZETexture2DResource* TextureResource;
-	ZEResourceFile File;
-
-	if (File.Open(FileName))
-	{
-		TextureResource = LoadResource(&File, false, UserOptions);
-		File.Close();
-		return TextureResource;
-	}
-	else
-	{
-		zeError("TextureResource", "Texture file not found. FileName : \"%s\"", FileName);
-		return NULL;
-	}
-}
 	
-ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const char* FileName, const ZETextureOptions *UserOptions)
+ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const char* FileName, const ZETextureOptions* UserOptions)
 {	
 	ZETexture2DResource* NewResource =(ZETexture2DResource*)zeResources->GetResource(FileName);
 	if (NewResource == NULL)
 	{		
+		if(!UserOptions)
+			UserOptions = zeGraphics->GetTextureOptions();
+
 		NewResource = LoadResource(FileName, UserOptions);
 		if (NewResource != NULL)
 		{
@@ -107,77 +92,69 @@ ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const char* FileNam
 			return NewResource;
 		}
 		else
+		{
+			zeError("TextureResource", "Texture file not found. FileName : \"%s\"", FileName);
 			return NULL;
-	}
-}
-
-ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceFile, bool EmbededResource, const ZETextureOptions *UserOptions)
-{
-	if ((zeGraphics->GetTextureQuality() != ZE_TQ_VERY_HIGH) && (!EmbededResource))
-	{
-		if (UserOptions->FileCaching != ZE_TFC_DISABLED && CheckInFileCache(ResourceFile->GetFileName()))
-		{
-			return LoadFromFileCache(ResourceFile->GetFileName());
-		}
-		else
-		{
-			return LoadFromFile(ResourceFile, UserOptions);
 		}
 	}
-	else // If Texture Quality Is Max Or It Is EmbededResource Load With Special Options
+	else
+		return NewResource;
+}
+
+ZETexture2DResource* ZETexture2DResource::LoadResource(const char* FileName, const ZETextureOptions* UserOptions)
+{
+	ZETexture2DResource* TextureResource;
+	ZEResourceFile File;
+
+	if (File.Open(FileName))
 	{
-		//ZETextureLoadOptions AutoTextureQuality = {UserOptions->MinimumQuality, UserOptions->MaximumQuality, false, {ZE_TCT_NONE, ZE_TCQ_NORMAL, ZE_TDS_NONE, true, true, 0}};
-		return LoadFromFile(ResourceFile, UserOptions);
+		if(!UserOptions)
+			UserOptions = zeGraphics->GetTextureOptions();
+
+		TextureResource = LoadResource(&File, false, UserOptions);
+		File.Close();
+		return TextureResource;
+	}
+	else
+	{
+		zeError("TextureResource", "Texture file not found. FileName : \"%s\"", FileName);
+		return NULL;
 	}
 }
 
-bool ZETexture2DResource::CheckInFileCache(const char *FileName)
+ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceFile, bool EmbededResource, const ZETextureOptions* UserOptions)
 {
-	char CompletePath[ZE_MAX_FILE_NAME_SIZE];
-	sprintf(CompletePath, "resources\\%s.cache", FileName);
-
-	int Stat;
-	struct stat FileInfo;
-
-	Stat = stat(CompletePath, &FileInfo);
-
-	if (Stat == 0)
-		return true;
-
-	return false;
-}
-
-ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions)
-{
-	zeLog("Texture2D Resource", "LOADING texture from ORIGINAL FILE  \"%s\".", ResourceFile->GetFileName());	
-
-	ZETextureOptions *DefaultOptions = zeGraphics->GetTextureOptions();
-
-	if (UserOptions == NULL)
+	if(!UserOptions)
 		UserOptions = zeGraphics->GetTextureOptions();
 
-	// Combining engine options with user options. 
-	// User options that are other than auto overrides engine options.
-	ZETextureOptions		Options;
-	Options.CompressionType		= UserOptions->CompressionType == ZE_TCT_AUTO ? DefaultOptions->CompressionType : UserOptions->CompressionType;
-	Options.CompressionQuality	= UserOptions->CompressionQuality == ZE_TCQ_AUTO ? DefaultOptions->CompressionQuality : UserOptions->CompressionQuality;
-	Options.DownSample			= UserOptions->DownSample == ZE_TDS_AUTO ? DefaultOptions->DownSample : Options.DownSample = UserOptions->DownSample;
-	Options.MipMapping			= UserOptions->MipMapping == ZE_TMM_AUTO ? DefaultOptions->MipMapping : UserOptions->MipMapping;
-	Options.FileCaching			= UserOptions->FileCaching == ZE_TFC_AUTO ? DefaultOptions->FileCaching : UserOptions->FileCaching;
+	ZETexture2DResource* TextureResource = NULL;
+	if(UserOptions->FileCaching != ZE_TFC_DISABLED && zeGraphics->GetTextureQuality() != ZE_TQ_VERY_HIGH && !EmbededResource)
+	{
+		TextureResource = LoadFromFileCache(ResourceFile, ResourceFile->GetFileName(), UserOptions);
+		if(TextureResource == NULL)
+			zeLog("Texture 2D Resource", "Coudnt laod the texture from cache. \"%s\". Trying to load it from original file.", ResourceFile->GetFileName());
+	}
+	if(TextureResource == NULL)
+		TextureResource = LoadFromFile(ResourceFile, UserOptions);
+
+	return TextureResource;
+}
+
+void ZETexture2DResource::GetFinalTextureOptions(ZETextureOptions& FinalOptions, ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions)
+{
+	ZETextureOptions *DefaultOptions = zeGraphics->GetTextureOptions();
+
+	if(UserOptions == NULL)
+		UserOptions = zeGraphics->GetTextureOptions();
+
+	FinalOptions.CompressionType		= UserOptions->CompressionType == ZE_TCT_AUTO		? DefaultOptions->CompressionType : UserOptions->CompressionType;
+	FinalOptions.CompressionQuality		= UserOptions->CompressionQuality == ZE_TCQ_AUTO	? DefaultOptions->CompressionQuality : UserOptions->CompressionQuality;
+	FinalOptions.DownSample				= UserOptions->DownSample == ZE_TDS_AUTO			? DefaultOptions->DownSample :  UserOptions->DownSample;
+	FinalOptions.MipMapping				= UserOptions->MipMapping == ZE_TMM_AUTO			? DefaultOptions->MipMapping : UserOptions->MipMapping;
+	FinalOptions.FileCaching			= UserOptions->FileCaching == ZE_TFC_AUTO			? DefaultOptions->FileCaching : UserOptions->FileCaching;
 
 	ZETextureLoaderInfo	TextureInfo;
 	ZETextureLoader::GetTextureInfo(TextureInfo, ResourceFile);
-
-	unsigned char	*RawTexture;
-	RawTexture = (unsigned char*)malloc(TextureInfo.TextureHeight * TextureInfo.TextureWidth * 4);
-	if (RawTexture == NULL)
-	{
-		zeError("Texture Resource","Cannot Allocate Memmory for the Texture. FileName : \"%s\"", ResourceFile->GetFileName());
-		return NULL;
-	}
-
-	ZETextureLoader::LoadTexture((void*)RawTexture, ResourceFile, TextureInfo);
-	
 
 	bool	IsResizeable = true;
 	bool	IsCompressible = true;
@@ -187,23 +164,23 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 	if (!ZETextureTools::IsResizeable(TextureInfo))
 	{
 		IsResizeable = false;
-		Options.DownSample = ZE_TDS_NONE;
-		Options.MipMapping = ZE_TMM_DISABLED;
-		Options.MaximumMipmapLevel = 0;
+		FinalOptions.DownSample = ZE_TDS_NONE;
+		FinalOptions.MipMapping = ZE_TMM_DISABLED;
+		FinalOptions.MaximumMipmapLevel = 0;
 	}
 
 	// Check if it is Compressible (divisible by 4)
 	if (!ZETextureTools::IsCompressible(TextureInfo))
 	{
 		IsCompressible = false;
-		Options.CompressionType = ZE_TCT_NONE;
+		FinalOptions.CompressionType = ZE_TCT_NONE;
 	}
 
 	// MipMapping
 	unsigned int	PossibleMaxMipmapNumber;
 	unsigned int	MipMapCount = ZETextureTools::GetMaxMipmapCount(TextureInfo);
 
-	switch (Options.DownSample)
+	switch (FinalOptions.DownSample)
 	{
 		case ZE_TDS_8X:
 			PossibleMaxMipmapNumber = MipMapCount - 3; // With 4x down sample MaxMipmapNumber have to be 2 less than its normal value
@@ -220,10 +197,33 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 	}
 
 	// If Users MipMapping Level is Valid Use It
-	if (Options.MipMapping != ZE_TMM_DISABLED)
-		Options.MaximumMipmapLevel = UserOptions->MaximumMipmapLevel > PossibleMaxMipmapNumber ? PossibleMaxMipmapNumber : UserOptions->MaximumMipmapLevel;
+	if (FinalOptions.MipMapping != ZE_TMM_DISABLED)
+		FinalOptions.MaximumMipmapLevel = UserOptions->MaximumMipmapLevel > PossibleMaxMipmapNumber ? PossibleMaxMipmapNumber : UserOptions->MaximumMipmapLevel;
 	else
-		Options.MaximumMipmapLevel = 1;
+		FinalOptions.MaximumMipmapLevel = 1;
+
+}
+
+ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions)
+{
+	zeLog("Texture2D Resource", "LOADING texture from ORIGINAL FILE  \"%s\".", ResourceFile->GetFileName());	
+
+	ZETextureLoaderInfo	TextureInfo;
+	ZETextureLoader::GetTextureInfo(TextureInfo, ResourceFile);
+
+	ZETextureOptions Options;
+	GetFinalTextureOptions(Options, ResourceFile, UserOptions);
+
+	unsigned char	*RawTexture;
+	RawTexture = (unsigned char*)malloc(TextureInfo.TextureHeight * TextureInfo.TextureWidth * 4);
+	if (RawTexture == NULL)
+	{
+		zeError("Texture Resource","Cannot Allocate Memmory for the Texture. FileName : \"%s\"", ResourceFile->GetFileName());
+		return NULL;
+	}
+
+	ZETextureLoader::LoadTexture((void*)RawTexture, ResourceFile, TextureInfo);
+	
 
 	//Decide Pixel Format
 	ZETexturePixelFormat	PixelFormat;
@@ -302,6 +302,73 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 		return NULL;
 	}
 
+	// If caching is on
+	bool			CacheIt = false;
+	ZEPartialFile	PartialFile;
+	ZEFileCache		TextureFileCache;
+	unsigned int	TextureSizeMultiplier = 1;
+
+	if(Options.FileCaching != ZE_TFC_DISABLED)
+	{
+		// Open the cache
+		TextureFileCache.OpenCache("resources\\TextureFileCache.ZEFileCache");
+		// Create the identifier
+		ZETextureCacheChunkIdentifier Identifier(ResourceFile->GetFileName(), Options, 0);
+		//Check if texture is already in cache
+		if(!TextureFileCache.ChunkExists(&Identifier))
+		{	
+			// If chunk does not exists we will cache it
+			CacheIt = true;
+
+			// If there is resizing
+			switch(Options.DownSample)
+			{
+				case ZE_TDS_2X:
+					TextureSizeMultiplier *= 2;
+					break;
+				case ZE_TDS_4X:
+					TextureSizeMultiplier *= 4;
+					break;
+				case ZE_TDS_8X:
+					TextureSizeMultiplier *= 8;
+					break;
+				case ZE_TDS_NONE:
+				default:
+					break;
+			}
+			// If there is compression
+			switch(Options.CompressionType)
+			{
+				case ZE_TCT_DXT1:
+					zeAssert(true, "dxt1 not supported");
+					break;
+				case ZE_TCT_DXT3:
+					TextureSizeMultiplier *= 2;
+					break;
+				case ZE_TCT_DXT5:
+					TextureSizeMultiplier *= 2;
+					break;
+				case ZE_TCT_NONE:
+				default:
+					break;
+			}
+
+			unsigned int TotalTextureSize = (TextureInfo.TextureWidth * TextureInfo.TextureHeight * TextureInfo.BitsPerPixel/8) / (TextureSizeMultiplier*TextureSizeMultiplier);
+			// If there is mipmapping
+			if(Options.MipMapping == ZE_TMM_ENABLED)
+			{
+				unsigned int NextMipmapLevel = TotalTextureSize / 4;
+				for(unsigned int I = 0; I < Options.MaximumMipmapLevel; I++)
+				{
+					TotalTextureSize += NextMipmapLevel;
+					NextMipmapLevel /= 4;
+				}
+			}
+
+			// Create a new chunk as a partial resource file
+			TextureFileCache.CreateChunk(PartialFile, &Identifier, TotalTextureSize);
+		}
+	}
 
 	// Decide the Case for MipMap Creation
 	unsigned int Case;
@@ -322,6 +389,13 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 	void* Buffer = NULL;
 	unsigned int DestinationPitch;
 	unsigned int Levels = Options.MaximumMipmapLevel;
+
+	// For test purpose
+	unsigned int WriteCount = 0;
+	unsigned int WriteSize = 0;
+	unsigned int SizeToWrite = 0;
+	unsigned int TotalWriteSize = 0;
+
 	switch(Case)
 	{
 		case 1://Compression && Mipmapping case
@@ -330,6 +404,25 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			{
 				TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
 				ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);
+				
+
+				WriteSize = 0;
+				SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
+
+				if (CacheIt)
+					for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
+					{
+						WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
+						if(WriteCount)
+						{
+							WriteSize += SizeToWrite;
+							WriteCount = 0;
+						}
+						
+					}
+				TotalWriteSize += WriteSize;
+
+
 				TextureResource->Texture->Unlock();
 				ZETextureTools::DownSample2x(RawTexture, TextureInfo.TexturePitch , RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
 				TextureInfo.TextureWidth /= 2;
@@ -340,24 +433,80 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, Levels - 2);
 			for (size_t I = 0; I < TextureInfo.TextureHeight; I++)
 				memcpy((unsigned char*)Buffer + (I * DestinationPitch), RawTexture + (I * TextureInfo.TexturePitch), TextureInfo.TextureWidth * TextureInfo.BitsPerPixel/8);
+			
+			WriteSize = 0;
+			SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
+
+			if (CacheIt)
+				for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
+				{
+					WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
+					if(WriteCount)
+					{
+						WriteSize += SizeToWrite;
+						WriteCount = 0;
+					}
+
+				}
+			TotalWriteSize += WriteSize;
+
+			TextureInfo.TextureWidth /= 2;
+			TextureInfo.TextureHeight /= 2;
+				
+			TotalWriteSize += WriteSize;
+
 			TextureResource->Texture->Unlock();
 
 			// 1x1 Mipmap
 			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, Levels - 1);
 			ZETextureTools::DownSample2x(Buffer, DestinationPitch , RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
+			
+			WriteSize = 0;
+			SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
+
+			if (CacheIt)
+				for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
+				{
+					WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
+					if(WriteCount)
+					{
+						WriteSize += SizeToWrite;
+						WriteCount = 0;
+					}
+
+				}
+			TotalWriteSize += WriteSize;
+
 			TextureResource->Texture->Unlock();
 			break;
 
 		case 2://No Compression && Mipmapping
+			
 			for (size_t I = 0; I < Levels; I++)
 			{
 				// Write Mipmap to Device Level I
-				ZETextureType Type;
-				Type = TextureResource->GetTextureType();
-
 				TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
 				for (size_t K = 0; K < TextureInfo.TextureHeight; K++)
 					memcpy((unsigned char*)Buffer + (K * DestinationPitch), RawTexture + (K * TextureInfo.TexturePitch), TextureInfo.TextureWidth * TextureInfo.BitsPerPixel / 8);
+				
+
+				WriteSize = 0;
+				SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
+
+				if (CacheIt)
+					for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
+					{
+						WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
+						if(WriteCount)
+						{
+							WriteSize += SizeToWrite;
+							WriteCount = 0;
+						}
+
+					}
+				TotalWriteSize += WriteSize;
+
+
 				TextureResource->Texture->Unlock();
 				ZETextureTools::DownSample2x(RawTexture, TextureInfo.TexturePitch , RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
 				TextureInfo.TextureWidth /= 2;
@@ -368,6 +517,25 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 		case 3://Compression && No Mipmapping case
 			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, 0);
 			ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);
+			
+
+			WriteSize = 0;
+			SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
+
+			if (CacheIt)
+				for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
+				{
+					WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
+					if(WriteCount)
+					{
+						WriteSize += SizeToWrite;
+						WriteCount = 0;
+					}
+
+				}
+			TotalWriteSize += WriteSize;
+
+
 			TextureResource->Texture->Unlock();
 			break;
 
@@ -375,6 +543,25 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, 0);
 			for (size_t I = 0; I < TextureInfo.TextureHeight; I++)
 				memcpy((unsigned char*)Buffer + (I * DestinationPitch), RawTexture + I * (TextureInfo.TextureWidth * TextureInfo.BitsPerPixel/8), TextureInfo.TextureWidth * TextureInfo.BitsPerPixel/8);
+			
+			WriteSize = 0;
+			SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
+
+			if (CacheIt)
+				for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
+				{
+					WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
+					if(WriteCount)
+					{
+						WriteSize += SizeToWrite;
+						WriteCount = 0;
+					}
+
+				}
+			TotalWriteSize += WriteSize;
+
+
+
 			TextureResource->Texture->Unlock();
 			break;
 
@@ -382,57 +569,145 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			break;
 	}
 
-	/* Yazılacak */
-	if(Options.FileCaching != ZE_TFC_DISABLED)
-		SaveToFileCache(ResourceFile);
+	if(CacheIt)
+	{
+		PartialFile.Close();
+		TextureFileCache.CloseCache();
+	}
 
 	free(RawTexture);
 
 	return TextureResource;
 }
 
-ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(const char *CacheFileName, const char* TextureFileName, ZETextureOptions &Options)
+ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* ResourceFile, const char* TextureFileName, const ZETextureOptions *Options)
 {
-	// Create TextureResource
+	// Create the chunk identifier
+	ZETextureCacheChunkIdentifier TextureCacheIdentifier(TextureFileName, *Options, 0);
+
+	// Create and open the file cache
+	ZEFileCache FileCache;
+	FileCache.OpenCache("resources\\TextureFileCache.ZEFileCache");
+
+	// Check if the requested texture is in the file cache
+	bool ChunkExists = FileCache.ChunkExists(&TextureCacheIdentifier);
+	if (!ChunkExists) // LoadFrom Cache
+	{
+		zeLog("Texture 2D Resource", "Item not found in file cache with the name:  \"%s\".", ResourceFile->GetFileName());
+		//zeError("Texture 2D Resource", "The chunk specified by the identifier is not found in file cache: \"%s\".", FileCache.GetCacheFileName());
+		FileCache.CloseCache();
+		return NULL;
+	}
+		
+	// Create the Texture info
+	ZETextureLoaderInfo TextureInfo;
+	memset(&TextureInfo, 0, sizeof(ZETextureLoaderInfo));
+	//ZeroMemory(&TextureInfo, sizeof(ZETextureLoaderInfo));
+
+	unsigned int TextureWidth	= 0;
+	unsigned int TextureHeight	= 0;
+	unsigned int MipMapCount	= 0;
+	unsigned int TextureSize	= 0;
+	unsigned int Multiplier		= 1;
+	ZETexturePixelFormat PixelFormat;
+
+	// Get the original texture's options
+	if(!ZETextureLoader::GetTextureInfo(TextureInfo, ResourceFile))
+	{
+		zeLog("Texture 2D Resource", "Cannot get texture info from the file: \"%s\".", TextureFileName);
+		FileCache.CloseCache();
+		return NULL;
+	}
+	
+	// Calculate the multiplier if there is resizing
+	if(ZETextureTools::IsResizeable(TextureInfo))
+	{
+		switch(Options->DownSample)
+		{
+		case ZE_TDS_2X:
+			Multiplier *= 4;
+			break;
+		case ZE_TDS_4X:
+			Multiplier *= 16;
+			break;
+		case ZE_TDS_8X:
+			Multiplier *= 64;
+			break;
+		case ZE_TDS_NONE:
+		default:
+			break;
+		}
+	}
+		
+	// Calculate the multiplier if there is compression
+	if(ZETextureTools::IsCompressible(TextureInfo))
+	{
+		switch (Options->CompressionType)
+		{
+		case ZE_TCT_DXT1:
+			Multiplier *= 8;
+			PixelFormat = ZE_TPF_RGBA_DXT1;
+			break;
+
+		case ZE_TCT_AUTO:
+		case ZE_TCT_DXT3:
+			Multiplier *= 4;
+			PixelFormat = ZE_TPF_RGBA_DXT3;
+			break;
+		case ZE_TCT_DXT5:
+			Multiplier *= 4;
+			PixelFormat = ZE_TPF_RGBA_DXT5;
+			break;
+		case ZE_TCT_NONE:
+		default:
+			break;
+		}
+	}		
+
+	TextureWidth = TextureInfo.TextureWidth / Multiplier;
+	TextureHeight = TextureInfo.TextureHeight / Multiplier;
+	MipMapCount = (Options->MipMapping) ? Options->MaximumMipmapLevel : 1;
+	TextureSize = TextureWidth * TextureHeight * TextureInfo.BitsPerPixel / 8;
+
+	// Open chunk for reading
+	ZEPartialResourceFile PartialResourceFile;
+	FileCache.OpenChunk(PartialResourceFile, &TextureCacheIdentifier);
+
+	// Create TextureResource and texture
 	ZETexture2DResource* TextureResource = new ZETexture2DResource();
 	ZETexture2D* Texture = TextureResource->Texture = ZETexture2D::CreateInstance();
-
-	// Set Other Variables
 	TextureResource->SetFileName(TextureFileName);
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
 
-	
-	if(Options.)
-	
-	ZEFileCache FileCache;
-	FileCache.GetChunkData();
-
-	/* YAZILACAK */
-	/* YAZILACAK */
-	/* YAZILACAK */
-	/* YAZILACAK */
-	/* YAZILACAK */
-
-	return false;
-}
-
-bool ZETexture2DResource::SaveToFileCache(const char* CacheFileName, const char* TextureFileName, ZETextureLoaderInfo &TextureInfo, ZETextureOptions &Options, void* Data, size_t Size)
-{	
-	ZETextureCacheChunkIdentifier	Identifier;
-
-	sprintf(Identifier.FileName, "%s", TextureFileName);
-	Identifier.TextureInfo = TextureInfo;
-	Identifier.TextureOptions = Options;
-	Identifier.Offset = 0;
-
-	ZEFileCache FileCache;
-	bool Exists = FileCache.CheckIdentifierExists(CacheFileName, &Identifier);
-	if(!Exists)
+	if(Texture->Create(TextureWidth, TextureHeight, PixelFormat, false, MipMapCount))
 	{
-		FileCache.AddChunk(CacheFileName, (ZECacheChunkIdentifier*)&Identifier, Data, Size);
-		return true;
+		zeLog("Texture 2D Resource", "Can not create texture");
+		return NULL;
+	}
+		
+	void* Buffer = NULL;
+	unsigned int DestinationPitch;
+	for(unsigned int I = 0; I < MipMapCount; I++)
+	{
+		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
+		for (size_t K = 0; K < TextureInfo.TextureHeight; K++)
+			PartialResourceFile.Read((unsigned char*)Buffer + (K * DestinationPitch), TextureWidth * TextureInfo.BitsPerPixel / 8, 1);
+		TextureResource->Texture->Unlock();
+
+		TextureWidth /= 2;
+		TextureHeight /= 2;
 	}
 
-	return false;
+	PartialResourceFile.Close();
+	FileCache.CloseCache();
+
+	return TextureResource;
+}
+
+bool ZETexture2DResource::SaveToFileCache(ZEPartialFile* PartialFile, ZETextureLoaderInfo* TextureInfo, void* Buffer, unsigned int DestinationPitch)
+{	
+	
+
+	return true;
 }

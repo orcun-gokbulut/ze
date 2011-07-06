@@ -39,46 +39,69 @@
 
 #include "ZEArray.h"
 #include "ZETypes.h"
+#include "..\Source\ZECore\ZEFile.h"
 
 #include <stdio.h>
 
 class ZEResourceFile;
+class ZEPartialResourceFile;
+
 
 class ZECacheChunkIdentifier
 {
 	public:
 		virtual ZEDWORD					GetHash() const = 0;
-		virtual size_t					Write(void* File) const = 0;
-		virtual bool					Equal(void* File) const = 0;
+		virtual size_t					Write(ZEFile* File) const = 0;
+		virtual bool					Equal(ZEFile* File) const = 0;
 };
+
 
 class ZEFileCache
 {
 	private:
 
-		FILE*							File;
-		bool							OpenCache(const char* FileName);
-		void							CloseCache();
-		
+		ZEFile*							File;
+		char							CacheFileName[256];
+		//const char*						CacheFileName;
+
 	public:
 
-		// Read
-		// Write
-		bool							OpenChunk(const char* FileName, const ZECacheChunkIdentifier* Identifier, size_t TotalChunkSize);
-		void							AddToChunk(void* Data, size_t Size);
-		void							CloseChunk();
-		
-		bool							CheckIdentifierExists(const char* FileName, const ZECacheChunkIdentifier* Identifier);
-		
-		void							AddChunk(const char* FileName, const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size);
-		bool							GetChunkData(const char* FileName, const ZECacheChunkIdentifier* Identifier, void* Buffer, size_t Offset, size_t Size);
-
-										// Will be implemented
-		void							GetChunkAsFile(ZEResourceFile* ResourceFile, const char* FileName, const ZECacheChunkIdentifier* Identifier);
-		bool							ClearCache(const char* FileName);
-
+										// Constructor
 										ZEFileCache();
-										~ZEFileCache();
+										// Destructor
+										~ZEFileCache();										
+										// Opens the cache file
+		bool							OpenCache(const char* CacheFileName);
+										// Closes the cache file
+		void							CloseCache();
+										// Empty the cache file
+		bool							ClearCache();
+										// Returns the cache file name
+		const char*						GetCacheFileName();
+										// Checks if the chunk exists
+		bool							ChunkExists(const ZECacheChunkIdentifier* Identifier);
+										// Create new chunk from Buffer
+		bool							AddChunk(const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size);
+										// Create new chunk from PartialFile
+		bool							CreateChunk(ZEPartialFile& PartialFile, const ZECacheChunkIdentifier* Identifier, size_t ChunkSize);
+										// Create new chunk from ResourceFile
+		bool							CreateChunk(ZEPartialResourceFile& ResourceFile, const ZECacheChunkIdentifier* Identifier, size_t ChunkSize);
+										// Returns the data in a buffer
+		bool							GetChunk(const ZECacheChunkIdentifier* Identifier, void* Buffer, size_t Offset, size_t Size);
+										// Returns the data as PartialFile
+		bool							OpenChunk(ZEPartialFile& PartialFile, const ZECacheChunkIdentifier* Identifier);
+										// Returns the data as ResourceFile
+		bool							OpenChunk(ZEPartialResourceFile& ResourceFile, const ZECacheChunkIdentifier* Identifier);
+
+
+
+										// KALKACAK
+// 		bool							OpenChunk(const ZECacheChunkIdentifier* Identifier, size_t TotalChunkSize);
+// 		size_t							AddToChunk(void* Data, size_t Size, size_t Count);
+// 		size_t							GetFromChunk(void* Data, size_t Size, size_t Count);
+// 		void							CloseChunk();
+
+										
 };
 
 #endif

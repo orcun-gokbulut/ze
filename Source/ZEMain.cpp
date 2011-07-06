@@ -52,10 +52,17 @@
 #include "ZEMeta\ZEMetaDebugModule.h"
 #include "ZEUI\ZEUIDebugModule.h"
 
-extern HINSTANCE ApplicationInstance;
+// Test
+#include "ZEGraphics\ZETextureCacheChunkIdentifier.h"
+#include "ZEDS\ZEFileCache.h"
+#include "ZECore\ZEFile.h"
 
-#include "ZEDS/ZEFileCache.h"
 #include <stdio.h>
+#include <string>
+#include <string.h>
+
+
+extern HINSTANCE ApplicationInstance;
 
 class ZEStringCacheIdentifier : public ZECacheChunkIdentifier
 {
@@ -128,7 +135,15 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	
 	//MessageBox(NULL, "Attach it while you can !", "Zinek Engine", MB_OK); 
 
-	_set_SSE2_enable(1); 
+	/*bool IsOpen		 = false;
+	bool SeekSuccess = false;
+	size_t ReadCount	= 0;
+	size_t WriteCount	= 0;
+	size_t FileSize		= 0;
+	size_t FileCursor	= 0;*/
+
+
+	_set_SSE2_enable(1);
 	ApplicationInstance = hInstance;
 	
 	ZEModelAnimationDebugModule DebugModule;

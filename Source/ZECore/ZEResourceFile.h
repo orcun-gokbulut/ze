@@ -37,15 +37,12 @@
 #ifndef	__ZE_RESOURCE_FILE_H__
 #define __ZE_RESOURCE_FILE_H__
 
+#include "..\ZEDefinitions.h"
 #include "ZESerialization/ZEUnserializer.h"
-#include "ZEDefinitions.h"
+#include "ZEFile.h"
 
-enum ZESeekFrom
-{
-	ZE_SF_BEGINING	= 0,
-	ZE_SF_END		= 1,
-	ZE_SF_CURRENT	= 2,
-};
+
+
 
 class ZEPartialResourceFile;
 class ZEResourceFile : public ZEUnserializer
@@ -53,8 +50,11 @@ class ZEResourceFile : public ZEUnserializer
 	protected:
 		void*				File;
 		char				FileName[256];
+		size_t				FileCursor;
 
 	public:
+
+		virtual bool		IsOpen();
 		const char*			GetFileName();
 		void*				GetFileHandle();
 
@@ -84,6 +84,10 @@ class ZEPartialResourceFile : public ZEResourceFile
 		bool				IsEof;
 
 	public:
+
+		virtual bool		Open(const char* FileName, size_t Offset, size_t Size);
+		virtual bool		Open(ZEFile* File, size_t Offset, size_t Size);
+		virtual void		Close();
 		virtual bool		Seek(size_t Offset, ZESeekFrom Origin);
 		virtual size_t		Read(void* Buffer, size_t Size, size_t Count);
 		virtual bool		Eof();

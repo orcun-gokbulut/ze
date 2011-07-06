@@ -42,21 +42,25 @@ ZETextureCacheChunkIdentifier::ZETextureCacheChunkIdentifier( )
 	/* Empty */
 }
 
-ZETextureCacheChunkIdentifier::ZETextureCacheChunkIdentifier( char* FileName, const ZETextureOptions &TextureOptions, const ZETextureLoaderInfo &TextureInfo, unsigned int Offset )
+ZETextureCacheChunkIdentifier::ZETextureCacheChunkIdentifier( const char* ItemName, const ZETextureOptions &TextureOptions, unsigned int Offset )
 {
-	sprintf(this->FileName, "\\resources\\%s", FileName);
+	sprintf(this->ItemName, "%s", ItemName);
 
 	this->TextureOptions = TextureOptions;
-	this->TextureInfo = TextureInfo;
 	this->Offset = Offset;
 }
 
-ZETextureCacheChunkIdentifier::~ZETextureCacheChunkIdentifier( )
+ZETextureCacheChunkIdentifier::~ZETextureCacheChunkIdentifier()
 {
 	// Empty
 }
 
-ZEDWORD ZETextureCacheChunkIdentifier::GetHash()
+size_t ZETextureCacheChunkIdentifier::GetDataSize()const
+{
+	return 284;
+}
+
+ZEDWORD ZETextureCacheChunkIdentifier::GetHash() const
 {
 	unsigned int Hash = 0;
 	unsigned int I = 0;	
@@ -64,7 +68,7 @@ ZEDWORD ZETextureCacheChunkIdentifier::GetHash()
 
 	while(I < ZE_MAX_FILE_NAME_SIZE)
 	{
-		Char = FileName[I];
+		Char = ItemName[I];
 		Hash = Char + (Hash << 6) + (Hash << 16) - Hash;
 		I++;
 	}
@@ -73,26 +77,71 @@ ZEDWORD ZETextureCacheChunkIdentifier::GetHash()
 }
 
 // Returns total bytes written
-size_t ZETextureCacheChunkIdentifier::Write(void* File) const
+size_t ZETextureCacheChunkIdentifier::Write(ZEFile* File) const
 {
 	size_t FileNameSize = sizeof(char) * ZE_MAX_FILE_NAME_SIZE;
+	File->Write(ItemName, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+	
+	size_t TextureOptionsSize = sizeof(ZETextureOptions);
+	File->Write(&TextureOptions, sizeof(ZETextureOptions), 1);
+
+	size_t OffsetSize = sizeof(unsigned int);
+	File->Write(&Offset, sizeof(unsigned int), 1);
+
+	return FileNameSize + TextureOptionsSize + OffsetSize ;
+
+
+	//////////////////// OLD CODE ////////////////////
+
+	/*size_t FileNameSize = sizeof(char) * ZE_MAX_FILE_NAME_SIZE;
 	fwrite(FileName, sizeof(char), ZE_MAX_FILE_NAME_SIZE, (FILE*)File);
 
-	size_t TextureInfoSize = sizeof(ZETextureLoaderInfo) * 1;
-	fwrite(&TextureInfo, sizeof(ZETextureLoaderInfo), 1, (FILE*)File);
-
-	size_t TextureOptionsSize = sizeof(ZETextureOptions) * 1;
+	size_t TextureOptionsSize = sizeof(ZETextureOptions);
 	fwrite(&TextureOptions, sizeof(ZETextureOptions), 1, (FILE*)File);
 
-	size_t OffsetSize = sizeof(unsigned int) * 1;
+	size_t OffsetSize = sizeof(unsigned int);
 	fwrite(&Offset, sizeof(unsigned int), 1, (FILE*)File);
 
-	return FileNameSize + TextureInfoSize + TextureOptionsSize + OffsetSize ;
+	return FileNameSize + TextureOptionsSize + OffsetSize ;*/
 }
 
-bool ZETextureCacheChunkIdentifier::Equal(void* File) const
+bool ZETextureCacheChunkIdentifier::Equal(ZEFile* File) const
 {
-	char FileNameBuffer[ZE_MAX_FILE_NAME_SIZE];
+	
+	char ItemNameBuffer[ZE_MAX_FILE_NAME_SIZE];
+	File->Read(ItemNameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
+
+	unsigned int I = 0;
+	while(I < ZE_MAX_FILE_NAME_SIZE)
+	{
+		if(ItemNameBuffer[I] != ItemName[I])
+			return false;
+		I++;
+	}
+
+	ZETextureOptions TextureOptionsRead;
+	File->Read(&TextureOptionsRead, sizeof(ZETextureOptions), 1);
+
+	if(TextureOptionsRead.CompressionQuality != TextureOptions.CompressionQuality ||
+		TextureOptionsRead.CompressionType != TextureOptions.CompressionType ||
+		TextureOptionsRead.DownSample != TextureOptions.DownSample ||
+		TextureOptionsRead.FileCaching != TextureOptions.FileCaching ||
+		TextureOptionsRead.MaximumMipmapLevel != TextureOptions.MaximumMipmapLevel ||
+		TextureOptionsRead.MipMapping != TextureOptions.MipMapping)
+		return false;
+
+	unsigned int OffsetRead;
+	File->Read(&OffsetRead, sizeof(unsigned int), 1);
+	if(OffsetRead != Offset)
+		return false;
+
+	return true;
+
+
+
+	//////////////////// OLD CODE ////////////////////
+
+	/*char FileNameBuffer[ZE_MAX_FILE_NAME_SIZE];
 	fread(FileNameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE, (FILE*)File);
 
 	unsigned int I = 0;
@@ -103,14 +152,15 @@ bool ZETextureCacheChunkIdentifier::Equal(void* File) const
 		I++;
 	}
 
-	ZETextureLoaderInfo TextureInfoRead;
-	fread(&TextureInfoRead, sizeof(ZETextureLoaderInfo), 1, (FILE*)File);
-	if(TextureInfoRead != TextureInfo)
-		return false;
-
 	ZETextureOptions	TextureOptionsRead;
-	fread(&TextureOptionsRead, sizeof(ZETextureOptions), 1, (FILE*)File);
-	if(TextureOptionsRead != TextureOptions)
+	fread((void*)&TextureOptionsRead, sizeof(ZETextureOptions), 1, (FILE*)File);
+
+	if(TextureOptionsRead.CompressionQuality != TextureOptions.CompressionQuality ||
+		TextureOptionsRead.CompressionType != TextureOptions.CompressionType ||
+		TextureOptionsRead.DownSample != TextureOptions.DownSample ||
+		TextureOptionsRead.FileCaching != TextureOptions.FileCaching ||
+		TextureOptionsRead.MaximumMipmapLevel != TextureOptions.MaximumMipmapLevel ||
+		TextureOptionsRead.MipMapping != TextureOptions.MipMapping)
 		return false;
 
 	unsigned int OffsetRead;
@@ -118,5 +168,5 @@ bool ZETextureCacheChunkIdentifier::Equal(void* File) const
 	if(OffsetRead != Offset)
 		return false;
 
-	return true;
+	return true;*/
 }

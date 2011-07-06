@@ -107,7 +107,7 @@ bool ZETextureLoader::GetTextureInfo(ZETextureLoaderInfo& TextureInfo, ZEResourc
 	
 	/* Get Texture information */
 	FREE_IMAGE_FORMAT ImageFormat = FreeImage_GetFileTypeFromHandle(&Callbacks, ResourceFile);
-	if (ImageFormat == FIF_UNKNOWN) 
+	if (ImageFormat == FIF_UNKNOWN)
 	{
 		zeError("Texture Loader","Unsupported image format. FileName : \"%s\"", ResourceFile->GetFileName());
 		return false;

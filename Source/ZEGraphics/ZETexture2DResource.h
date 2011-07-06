@@ -37,12 +37,14 @@
 #ifndef	__ZE_TEXTURE_2D_RESOURCE_H__
 #define __ZE_TEXTURE_2D_RESOURCE_H__
 
+#include "ZETextureLoader.h"
 #include "ZETextureResource.h"
 #include "ZEGraphicsModule.h"
 #include "ZETypes.h"
 
 class ZETexture2D;
 class ZEResourceFile;
+struct ZETextureLoaderInfo;
 
 
 class ZETexture2DResource : public ZETextureResource
@@ -52,10 +54,11 @@ class ZETexture2DResource : public ZETextureResource
 	private:
 		ZETexture2D*						Texture;
 
-		static bool							CheckInFileCache(const char *FileName);
 		static ZETexture2DResource*			LoadFromFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadFromFileCache(const char *CacheFileName, const char* TextureFileName, ZETextureOptions &Options);
-		static bool							SaveToFileCache(const char* CacheFileName, const char* TextureFileName, ZETextureLoaderInfo &TextureInfo, ZETextureOptions &Options, void* Data, size_t Size);
+		static ZETexture2DResource*			LoadFromFileCache(ZEResourceFile* ResourceFile, const char* TextureFileName, const ZETextureOptions *Options);
+		static bool							SaveToFileCache(ZEPartialFile* PartialFile, ZETextureLoaderInfo* TextureInfo, void* Buffer, unsigned int DestinationPitch);
+
+		static void							GetFinalTextureOptions(ZETextureOptions& FinalOptions, ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions);
 
 	protected:
 											ZETexture2DResource();

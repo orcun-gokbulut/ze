@@ -39,7 +39,7 @@
 #define __ZE_TEXTURE_CACHE_CHUNK_IDENTIFIER_H__
 
 #include "ZEGraphics/ZETextureOptions.h"
-#include "ZEGraphics/ZETextureLoader.h"
+#include "ZECore/ZEFile.h"
 #include "ZEDS/ZEFileCache.h"
 #include "ZEDefinitions.h"
 
@@ -49,22 +49,22 @@
 
 class ZETextureCacheChunkIdentifier : public ZECacheChunkIdentifier
 {
-	private:
+	public:
 
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
-		ZETextureLoaderInfo		TextureInfo;
+		char					ItemName[ZE_MAX_FILE_NAME_SIZE];
+		
 		ZETextureOptions		TextureOptions;
 		unsigned int			Offset;
 
-	public:
+								ZETextureCacheChunkIdentifier();
+								ZETextureCacheChunkIdentifier( const char* ItemName, const ZETextureOptions &TextureOptions, unsigned int Offset = 0);
+		virtual					~ZETextureCacheChunkIdentifier();
 
-					ZETextureCacheChunkIdentifier();
-					ZETextureCacheChunkIdentifier(char* FileName, const ZETextureOptions &TextureOptions, const ZETextureLoaderInfo &TextureInfo, unsigned int Offset = 0);
-		virtual		~ZETextureCacheChunkIdentifier();
 
-		virtual ZEDWORD		GetHash();
-		virtual size_t		Write(void* File) const;
-		virtual bool		Equal(void* File) const;
+		virtual	size_t			GetDataSize()const;
+		virtual ZEDWORD			GetHash() const;
+		virtual size_t			Write(ZEFile* File) const;
+		virtual bool			Equal(ZEFile* File) const;
 };
 
 
