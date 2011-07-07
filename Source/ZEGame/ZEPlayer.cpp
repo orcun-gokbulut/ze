@@ -114,25 +114,25 @@ void ZEPlayer::Tick(float Time)
 		switch(Current->Id)
 		{
 			case ACTIONID_FORWARD:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, 1));
+				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, 3));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
 			case ACTIONID_BACKWARD:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, -1));
+				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, -3));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
 			case ACTIONID_STRAFELEFT:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(-1, 0, 0));
+				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(-3, 0, 0));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
 			case ACTIONID_STRAFERIGHT:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(1, 0, 0));
+				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(3, 0, 0));
 				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);

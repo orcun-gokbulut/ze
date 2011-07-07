@@ -229,7 +229,6 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 	ZETexturePixelFormat	PixelFormat;
 	switch(Options.CompressionType)
 	{
-		case ZE_TCT_AUTO:
 		case ZE_TCT_DXT3:
 			PixelFormat = ZE_TPF_RGBA_DXT3;
 			break;
@@ -306,7 +305,11 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 	bool			CacheIt = false;
 	ZEPartialFile	PartialFile;
 	ZEFileCache		TextureFileCache;
-	unsigned int	TextureSizeMultiplier = 1;
+	unsigned int	TotalTextureSize = 0;
+	unsigned int	DownsampleMultiplier = 1;
+	unsigned int	CompressionMultiplier = 1;
+	unsigned int	CompressionBlockSize = 1;
+	
 
 	if(Options.FileCaching != ZE_TFC_DISABLED)
 	{
@@ -316,7 +319,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 		ZETextureCacheChunkIdentifier Identifier(ResourceFile->GetFileName(), Options, 0);
 		//Check if texture is already in cache
 		if(!TextureFileCache.ChunkExists(&Identifier))
-		{	
+		{
 			// If chunk does not exists we will cache it
 			CacheIt = true;
 
@@ -324,44 +327,69 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			switch(Options.DownSample)
 			{
 				case ZE_TDS_2X:
-					TextureSizeMultiplier *= 2;
+					DownsampleMultiplier *= 2;
 					break;
 				case ZE_TDS_4X:
-					TextureSizeMultiplier *= 4;
+					DownsampleMultiplier *= 4;
 					break;
 				case ZE_TDS_8X:
-					TextureSizeMultiplier *= 8;
+					DownsampleMultiplier *= 8;
 					break;
 				case ZE_TDS_NONE:
 				default:
 					break;
 			}
+
 			// If there is compression
 			switch(Options.CompressionType)
 			{
 				case ZE_TCT_DXT1:
-					zeAssert(true, "dxt1 not supported");
+					CompressionMultiplier *= 8;
+					CompressionBlockSize *= 8;
 					break;
-				case ZE_TCT_DXT3:
-					TextureSizeMultiplier *= 2;
-					break;
+
 				case ZE_TCT_DXT5:
-					TextureSizeMultiplier *= 2;
+				case ZE_TCT_DXT3:
+					CompressionMultiplier *= 4;
+					CompressionBlockSize *= 16;
 					break;
+
 				case ZE_TCT_NONE:
 				default:
 					break;
 			}
 
-			unsigned int TotalTextureSize = (TextureInfo.TextureWidth * TextureInfo.TextureHeight * TextureInfo.BitsPerPixel/8) / (TextureSizeMultiplier*TextureSizeMultiplier);
+			//Calculate the total texture size for caching
+			unsigned int LevelZeroSize = (TextureInfo.TextureWidth * TextureInfo.TextureHeight * (TextureInfo.BitsPerPixel / 8)) / (CompressionMultiplier * DownsampleMultiplier);
+			TotalTextureSize += LevelZeroSize;
+
 			// If there is mipmapping
 			if(Options.MipMapping == ZE_TMM_ENABLED)
 			{
-				unsigned int NextMipmapLevel = TotalTextureSize / 4;
-				for(unsigned int I = 0; I < Options.MaximumMipmapLevel; I++)
+				
+
+				unsigned int Levels = Options.MaximumMipmapLevel - 3;
+				while(Levels > 0)
 				{
-					TotalTextureSize += NextMipmapLevel;
-					NextMipmapLevel /= 4;
+					TotalTextureSize += LevelZeroSize /= 4;
+					Levels--;
+				}
+				
+				/*for(unsigned int I = 0; I < Options.MaximumMipmapLevel-3; I++)
+				{
+					TotalTextureSize += NextMipmapLevelSize;
+					NextMipmapLevelSize /= 4;
+				}*/
+
+				// if there is compression the 2x2 and 1x1 mipmap levels will be the same with 4x4 level
+				if(Options.CompressionType != ZE_TCT_NONE)
+				{
+					TotalTextureSize += 32;
+				}
+				else // if there is no compression there wont be any exceptions about last 2 mipmap levels
+				{
+					TotalTextureSize += LevelZeroSize /= 4;
+					TotalTextureSize += LevelZeroSize /= 4;
 				}
 			}
 
@@ -370,22 +398,6 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 		}
 	}
 
-	// Decide the Case for MipMap Creation
-	unsigned int Case;
-
-	//Compression && Mipmapping
-	if (Options.CompressionType != ZE_TCT_NONE && Options.MipMapping != ZE_TMM_DISABLED)
-		Case = 1;
-	//No Compression && Mipmapping
-	else if (Options.CompressionType == ZE_TCT_NONE && Options.MipMapping != ZE_TMM_DISABLED)
-		Case = 2;
-	//Compression && No Mipmapping case
-	else if (Options.CompressionType != ZE_TCT_NONE && Options.MipMapping == ZE_TMM_DISABLED)
-		Case = 3;
-	//No Compression && No Mipmapping
-	else 
-		Case = 4;
-
 	void* Buffer = NULL;
 	unsigned int DestinationPitch;
 	unsigned int Levels = Options.MaximumMipmapLevel;
@@ -393,181 +405,192 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 	// For test purpose
 	unsigned int WriteCount = 0;
 	unsigned int WriteSize = 0;
-	unsigned int SizeToWrite = 0;
+	unsigned int RowSizeToWrite = 0;
 	unsigned int TotalWriteSize = 0;
 
-	switch(Case)
+	//Compression && Mipmapping Case
+	if (Options.CompressionType != ZE_TCT_NONE && Options.MipMapping != ZE_TMM_DISABLED)
 	{
-		case 1://Compression && Mipmapping case
-			// Create Mipmaps for level-2 (2x2 and 1x1 not compressible)
-			for (size_t I = 0; I < Levels - 2; I++)
-			{
-				TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
-				ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);
-				
+		// Create Mipmaps for level-2 (2x2 and 1x1 not compressible use the same data of 4x4 compressed texture)
+		for (size_t I = 0; I < Levels - 2; I++)
+		{
+			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
+			ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);		
 
-				WriteSize = 0;
-				SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
-
-				if (CacheIt)
-					for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
-					{
-						WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
-						if(WriteCount)
-						{
-							WriteSize += SizeToWrite;
-							WriteCount = 0;
-						}
-						
-					}
-				TotalWriteSize += WriteSize;
-
-
-				TextureResource->Texture->Unlock();
-				ZETextureTools::DownSample2x(RawTexture, TextureInfo.TexturePitch , RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
-				TextureInfo.TextureWidth /= 2;
-				TextureInfo.TextureHeight /= 2;
-			}
-
-			// 2x2 Mipmap
-			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, Levels - 2);
-			for (size_t I = 0; I < TextureInfo.TextureHeight; I++)
-				memcpy((unsigned char*)Buffer + (I * DestinationPitch), RawTexture + (I * TextureInfo.TexturePitch), TextureInfo.TextureWidth * TextureInfo.BitsPerPixel/8);
-			
-			WriteSize = 0;
-			SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
 
 			if (CacheIt)
-				for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
+			{
+				WriteSize = 0;
+				RowSizeToWrite = (TextureInfo.TextureWidth / 4) * CompressionBlockSize;
+
+				for(size_t J = 0; J < TextureInfo.TextureHeight / 4; J++)
 				{
-					WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
+					WriteCount = PartialFile.Write((unsigned char*)Buffer + J * DestinationPitch, RowSizeToWrite, 1);
 					if(WriteCount)
 					{
-						WriteSize += SizeToWrite;
+						WriteSize += RowSizeToWrite;
 						WriteCount = 0;
 					}
 
 				}
+			}
 			TotalWriteSize += WriteSize;
 
+			TextureResource->Texture->Unlock();
+
+			// Do not downsample when 4x4 size reached
+			if(TextureInfo.TextureWidth > 4 && TextureInfo.TextureHeight > 4)
+			{
+				ZETextureTools::DownSample2x(RawTexture, TextureInfo.TexturePitch , RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
+				TextureInfo.TextureWidth /= 2;
+				TextureInfo.TextureHeight /= 2;
+			}
+		}
+
+		// 2x2 Mipmap
+		// Compress the last 4x4 texture and put it to 2x2 mipmap level
+		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, Levels - 2);
+		ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);
+		
+		
+		//2x2 mipmap will be just one block
+		if (CacheIt)
+		{
+			WriteSize = 0;
+			RowSizeToWrite = CompressionBlockSize;
+
+			WriteCount = PartialFile.Write((unsigned char*)Buffer, RowSizeToWrite, 1);
+			if(WriteCount)
+			{
+				WriteSize += RowSizeToWrite;
+				WriteCount = 0;
+			}
+		}
+		TotalWriteSize += WriteSize;
+
+
+		TextureResource->Texture->Unlock();
+
+		// 1x1 Mipmap
+		// Compress the last 4x4 texture and put it to 1x1 mipmap level
+		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, Levels - 1);
+		ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);
+		
+
+		//1x1 mipmap will be just one block
+		if (CacheIt)
+		{
+			WriteSize = 0;
+			RowSizeToWrite = CompressionBlockSize;
+
+			WriteCount = PartialFile.Write((unsigned char*)Buffer, RowSizeToWrite, 1);
+			if(WriteCount)
+			{
+				WriteSize += RowSizeToWrite;
+				WriteCount = 0;
+			}
+		}
+		TotalWriteSize += WriteSize;
+		
+		TextureResource->Texture->Unlock();
+
+	}
+	//No Compression && Mipmapping  Case
+	else if (Options.CompressionType == ZE_TCT_NONE && Options.MipMapping != ZE_TMM_DISABLED)	
+	{
+		for (size_t I = 0; I < Levels; I++)
+		{
+			// Write Mipmap to Device Level I
+			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
+			for (size_t K = 0; K < TextureInfo.TextureHeight; K++)
+				memcpy((unsigned char*)Buffer + (K * DestinationPitch), RawTexture + (K * TextureInfo.TexturePitch), TextureInfo.TextureWidth * TextureInfo.BitsPerPixel / 8);
+
+
+			if (CacheIt)
+			{
+				WriteSize = 0;
+				RowSizeToWrite = TextureInfo.TextureWidth * TextureInfo.BitsPerPixel / 8;
+
+				for(size_t J = 0; J < TextureInfo.TextureHeight; J++)
+				{
+					// Read it from the raw texture, not from d3d pointer
+					WriteCount = PartialFile.Write(RawTexture + (J * TextureInfo.TexturePitch), RowSizeToWrite, 1);
+					if(WriteCount)
+					{
+						WriteSize += RowSizeToWrite;
+						WriteCount = 0;
+					}
+
+				}
+			}
+			TotalWriteSize += WriteSize;
+
+
+			TextureResource->Texture->Unlock();
+			ZETextureTools::DownSample2x(RawTexture, TextureInfo.TexturePitch , RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
 			TextureInfo.TextureWidth /= 2;
 			TextureInfo.TextureHeight /= 2;
-				
-			TotalWriteSize += WriteSize;
-
-			TextureResource->Texture->Unlock();
-
-			// 1x1 Mipmap
-			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, Levels - 1);
-			ZETextureTools::DownSample2x(Buffer, DestinationPitch , RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
-			
-			WriteSize = 0;
-			SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
-
-			if (CacheIt)
-				for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
-				{
-					WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
-					if(WriteCount)
-					{
-						WriteSize += SizeToWrite;
-						WriteCount = 0;
-					}
-
-				}
-			TotalWriteSize += WriteSize;
-
-			TextureResource->Texture->Unlock();
-			break;
-
-		case 2://No Compression && Mipmapping
-			
-			for (size_t I = 0; I < Levels; I++)
-			{
-				// Write Mipmap to Device Level I
-				TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
-				for (size_t K = 0; K < TextureInfo.TextureHeight; K++)
-					memcpy((unsigned char*)Buffer + (K * DestinationPitch), RawTexture + (K * TextureInfo.TexturePitch), TextureInfo.TextureWidth * TextureInfo.BitsPerPixel / 8);
-				
-
-				WriteSize = 0;
-				SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
-
-				if (CacheIt)
-					for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
-					{
-						WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
-						if(WriteCount)
-						{
-							WriteSize += SizeToWrite;
-							WriteCount = 0;
-						}
-
-					}
-				TotalWriteSize += WriteSize;
-
-
-				TextureResource->Texture->Unlock();
-				ZETextureTools::DownSample2x(RawTexture, TextureInfo.TexturePitch , RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
-				TextureInfo.TextureWidth /= 2;
-				TextureInfo.TextureHeight /= 2;
-			}
-			break;
-
-		case 3://Compression && No Mipmapping case
-			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, 0);
-			ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);
-			
-
-			WriteSize = 0;
-			SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
-
-			if (CacheIt)
-				for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
-				{
-					WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
-					if(WriteCount)
-					{
-						WriteSize += SizeToWrite;
-						WriteCount = 0;
-					}
-
-				}
-			TotalWriteSize += WriteSize;
-
-
-			TextureResource->Texture->Unlock();
-			break;
-
-		case 4://No Compression && No Mipmapping
-			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, 0);
-			for (size_t I = 0; I < TextureInfo.TextureHeight; I++)
-				memcpy((unsigned char*)Buffer + (I * DestinationPitch), RawTexture + I * (TextureInfo.TextureWidth * TextureInfo.BitsPerPixel/8), TextureInfo.TextureWidth * TextureInfo.BitsPerPixel/8);
-			
-			WriteSize = 0;
-			SizeToWrite = ((TextureInfo.TextureWidth) * 4) / TextureSizeMultiplier;
-
-			if (CacheIt)
-				for(size_t J = 0; J < TextureInfo.TextureHeight / TextureSizeMultiplier; J++)
-				{
-					WriteCount = PartialFile.Write((unsigned char*)Buffer + J*DestinationPitch, SizeToWrite, 1);
-					if(WriteCount)
-					{
-						WriteSize += SizeToWrite;
-						WriteCount = 0;
-					}
-
-				}
-			TotalWriteSize += WriteSize;
-
-
-
-			TextureResource->Texture->Unlock();
-			break;
-
-		default:
-			break;
+		}
 	}
+	//Compression && No Mipmapping case  Case
+	else if (Options.CompressionType != ZE_TCT_NONE && Options.MipMapping == ZE_TMM_DISABLED)
+	{
+		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, 0);
+		ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);
+
+
+		if (CacheIt)
+		{
+			WriteSize = 0;
+			RowSizeToWrite = (TextureInfo.TextureWidth / 4) * CompressionBlockSize;
+
+			for(size_t J = 0; J < TextureInfo.TextureHeight / 4; J++)
+			{
+				WriteCount = PartialFile.Write((unsigned char*)Buffer + J * DestinationPitch, RowSizeToWrite, 1);
+				if(WriteCount)
+				{
+					WriteSize += RowSizeToWrite;
+					WriteCount = 0;
+				}
+
+			}
+		}
+		TotalWriteSize += WriteSize;
+
+
+		TextureResource->Texture->Unlock();
+	}
+	//No Compression && No Mipmapping  Case
+	else 
+	{
+		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, 0);
+		for (size_t I = 0; I < TextureInfo.TextureHeight; I++)
+			memcpy((unsigned char*)Buffer + (I * DestinationPitch), RawTexture + I * (TextureInfo.TextureWidth * TextureInfo.BitsPerPixel/8), TextureInfo.TextureWidth * TextureInfo.BitsPerPixel/8);
+
+
+		if (CacheIt)
+		{
+			WriteSize = 0;
+			RowSizeToWrite = TextureInfo.TextureWidth * TextureInfo.BitsPerPixel / 8;
+
+			for(size_t J = 0; J < TextureInfo.TextureHeight; J++)
+			{
+				// Read it from the raw texture, not from d3d pointer
+				WriteCount = PartialFile.Write(RawTexture + (J * TextureInfo.TexturePitch), RowSizeToWrite, 1);
+				if(WriteCount)
+				{
+					WriteSize += RowSizeToWrite;
+					WriteCount = 0;
+				}
+
+			}
+		}
+		TotalWriteSize += WriteSize;
+
+
+		TextureResource->Texture->Unlock();
+	}
+
 
 	if(CacheIt)
 	{

@@ -149,7 +149,7 @@ void ZETextureTools::DownSample2x(void* DestinationData, unsigned int Destinatio
 		ZEBYTE Green;
 	};
 
-	if(SourceWidth < 2 || SourceHeight < 2)
+	if(SourceWidth < 1 || SourceHeight < 1)
 		return;
 
 	int DestinationHeight = SourceHeight / 2;
