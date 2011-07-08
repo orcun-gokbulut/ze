@@ -46,6 +46,10 @@
 
 #include <sys/stat.h>
 #include <stdio.h>
+#include <math.h>
+
+#define	ZE_TC_BLOCK_WIDTH	4
+#define ZE_TC_BLOCK_HEIGHT	4
 
 
 const char* ZETexture2DResource::GetResourceType() const
@@ -327,13 +331,13 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			switch(Options.DownSample)
 			{
 				case ZE_TDS_2X:
-					DownsampleMultiplier *= 2;
-					break;
-				case ZE_TDS_4X:
 					DownsampleMultiplier *= 4;
 					break;
+				case ZE_TDS_4X:
+					DownsampleMultiplier *= 16;
+					break;
 				case ZE_TDS_8X:
-					DownsampleMultiplier *= 8;
+					DownsampleMultiplier *= 64;
 					break;
 				case ZE_TDS_NONE:
 				default:
@@ -360,7 +364,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			}
 
 			//Calculate the total texture size for caching
-			unsigned int LevelZeroSize = (TextureInfo.TextureWidth * TextureInfo.TextureHeight * (TextureInfo.BitsPerPixel / 8)) / (CompressionMultiplier * DownsampleMultiplier);
+			unsigned int LevelZeroSize = (TextureInfo.TextureWidth * TextureInfo.TextureHeight * (TextureInfo.BitsPerPixel / 8)) / (CompressionMultiplier);
 			TotalTextureSize += LevelZeroSize;
 
 			// If there is mipmapping
@@ -374,12 +378,6 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 					TotalTextureSize += LevelZeroSize /= 4;
 					Levels--;
 				}
-				
-				/*for(unsigned int I = 0; I < Options.MaximumMipmapLevel-3; I++)
-				{
-					TotalTextureSize += NextMipmapLevelSize;
-					NextMipmapLevelSize /= 4;
-				}*/
 
 				// if there is compression the 2x2 and 1x1 mipmap levels will be the same with 4x4 level
 				if(Options.CompressionType != ZE_TCT_NONE)
@@ -400,7 +398,6 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 
 	void* Buffer = NULL;
 	unsigned int DestinationPitch;
-	unsigned int Levels = Options.MaximumMipmapLevel;
 
 	// For test purpose
 	unsigned int WriteCount = 0;
@@ -412,7 +409,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 	if (Options.CompressionType != ZE_TCT_NONE && Options.MipMapping != ZE_TMM_DISABLED)
 	{
 		// Create Mipmaps for level-2 (2x2 and 1x1 not compressible use the same data of 4x4 compressed texture)
-		for (size_t I = 0; I < Levels - 2; I++)
+		for (size_t I = 0; I < Options.MaximumMipmapLevel - 2; I++)
 		{
 			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
 			ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);		
@@ -421,9 +418,9 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			if (CacheIt)
 			{
 				WriteSize = 0;
-				RowSizeToWrite = (TextureInfo.TextureWidth / 4) * CompressionBlockSize;
+				RowSizeToWrite = (TextureInfo.TextureWidth / ZE_TC_BLOCK_WIDTH) * CompressionBlockSize;
 
-				for(size_t J = 0; J < TextureInfo.TextureHeight / 4; J++)
+				for(size_t J = 0; J < TextureInfo.TextureHeight / ZE_TC_BLOCK_HEIGHT; J++)
 				{
 					WriteCount = PartialFile.Write((unsigned char*)Buffer + J * DestinationPitch, RowSizeToWrite, 1);
 					if(WriteCount)
@@ -439,7 +436,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			TextureResource->Texture->Unlock();
 
 			// Do not downsample when 4x4 size reached
-			if(TextureInfo.TextureWidth > 4 && TextureInfo.TextureHeight > 4)
+			if(TextureInfo.TextureWidth > ZE_TC_BLOCK_WIDTH && TextureInfo.TextureHeight > ZE_TC_BLOCK_HEIGHT)
 			{
 				ZETextureTools::DownSample2x(RawTexture, TextureInfo.TexturePitch , RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
 				TextureInfo.TextureWidth /= 2;
@@ -449,7 +446,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 
 		// 2x2 Mipmap
 		// Compress the last 4x4 texture and put it to 2x2 mipmap level
-		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, Levels - 2);
+		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, Options.MaximumMipmapLevel - 2);
 		ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);
 		
 		
@@ -473,7 +470,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 
 		// 1x1 Mipmap
 		// Compress the last 4x4 texture and put it to 1x1 mipmap level
-		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, Levels - 1);
+		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, Options.MaximumMipmapLevel - 1);
 		ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);
 		
 
@@ -498,7 +495,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 	//No Compression && Mipmapping  Case
 	else if (Options.CompressionType == ZE_TCT_NONE && Options.MipMapping != ZE_TMM_DISABLED)	
 	{
-		for (size_t I = 0; I < Levels; I++)
+		for (size_t I = 0; I < Options.MaximumMipmapLevel; I++)
 		{
 			// Write Mipmap to Device Level I
 			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
@@ -542,9 +539,9 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 		if (CacheIt)
 		{
 			WriteSize = 0;
-			RowSizeToWrite = (TextureInfo.TextureWidth / 4) * CompressionBlockSize;
+			RowSizeToWrite = (TextureInfo.TextureWidth / ZE_TC_BLOCK_WIDTH) * CompressionBlockSize;
 
-			for(size_t J = 0; J < TextureInfo.TextureHeight / 4; J++)
+			for(size_t J = 0; J < TextureInfo.TextureHeight / ZE_TC_BLOCK_HEIGHT; J++)
 			{
 				WriteCount = PartialFile.Write((unsigned char*)Buffer + J * DestinationPitch, RowSizeToWrite, 1);
 				if(WriteCount)
@@ -605,16 +602,18 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 
 ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* ResourceFile, const char* TextureFileName, const ZETextureOptions *Options)
 {
+	ZETextureOptions FinalTextureOptions;
+	GetFinalTextureOptions(FinalTextureOptions, ResourceFile, Options);
+
 	// Create the chunk identifier
-	ZETextureCacheChunkIdentifier TextureCacheIdentifier(TextureFileName, *Options, 0);
+	ZETextureCacheChunkIdentifier TextureCacheIdentifier(TextureFileName, FinalTextureOptions, 0);
 
 	// Create and open the file cache
 	ZEFileCache FileCache;
 	FileCache.OpenCache("resources\\TextureFileCache.ZEFileCache");
 
 	// Check if the requested texture is in the file cache
-	bool ChunkExists = FileCache.ChunkExists(&TextureCacheIdentifier);
-	if (!ChunkExists) // LoadFrom Cache
+	if (!FileCache.ChunkExists(&TextureCacheIdentifier)) // LoadFrom Cache
 	{
 		zeLog("Texture 2D Resource", "Item not found in file cache with the name:  \"%s\".", ResourceFile->GetFileName());
 		//zeError("Texture 2D Resource", "The chunk specified by the identifier is not found in file cache: \"%s\".", FileCache.GetCacheFileName());
@@ -625,7 +624,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 	// Create the Texture info
 	ZETextureLoaderInfo TextureInfo;
 	memset(&TextureInfo, 0, sizeof(ZETextureLoaderInfo));
-	//ZeroMemory(&TextureInfo, sizeof(ZETextureLoaderInfo));
+
 
 	unsigned int TextureWidth	= 0;
 	unsigned int TextureHeight	= 0;
@@ -641,24 +640,36 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 		FileCache.CloseCache();
 		return NULL;
 	}
+
+	// Little hack here
+	TextureInfo.BitsPerPixel = 32;
+	TextureInfo.TexturePitch = TextureInfo.TextureWidth * TextureInfo.BitsPerPixel / 8;
+
+	unsigned int	TotalTextureSize = 0;
+	unsigned int	DownsampleMultiplier = 1;
+	unsigned int	CompressionMultiplier = 1;
+	unsigned int	CompressionBlockSize = 1;
 	
 	// Calculate the multiplier if there is resizing
 	if(ZETextureTools::IsResizeable(TextureInfo))
 	{
 		switch(Options->DownSample)
 		{
-		case ZE_TDS_2X:
-			Multiplier *= 4;
-			break;
-		case ZE_TDS_4X:
-			Multiplier *= 16;
-			break;
-		case ZE_TDS_8X:
-			Multiplier *= 64;
-			break;
-		case ZE_TDS_NONE:
-		default:
-			break;
+			case ZE_TDS_2X:
+				DownsampleMultiplier *= 4;
+				break;
+
+			case ZE_TDS_4X:
+				DownsampleMultiplier *= 16;
+				break;
+
+			case ZE_TDS_8X:
+				DownsampleMultiplier *= 64;
+				break;
+
+			case ZE_TDS_NONE:
+			default:
+				break;
 		}
 	}
 		
@@ -667,30 +678,36 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 	{
 		switch (Options->CompressionType)
 		{
-		case ZE_TCT_DXT1:
-			Multiplier *= 8;
-			PixelFormat = ZE_TPF_RGBA_DXT1;
-			break;
+			case ZE_TCT_DXT1:
+				CompressionMultiplier *= 8;
+				CompressionBlockSize *= 8;
+				PixelFormat = ZE_TPF_RGBA_DXT1;
+				break;
 
-		case ZE_TCT_AUTO:
-		case ZE_TCT_DXT3:
-			Multiplier *= 4;
-			PixelFormat = ZE_TPF_RGBA_DXT3;
-			break;
-		case ZE_TCT_DXT5:
-			Multiplier *= 4;
-			PixelFormat = ZE_TPF_RGBA_DXT5;
-			break;
-		case ZE_TCT_NONE:
-		default:
-			break;
+			case ZE_TCT_AUTO:
+			case ZE_TCT_DXT3:
+				CompressionMultiplier *= 4;
+				CompressionBlockSize *= 16;
+				PixelFormat = ZE_TPF_RGBA_DXT3;
+				break;
+
+			case ZE_TCT_DXT5:
+				CompressionMultiplier *= 4;
+				CompressionBlockSize *= 16;
+				PixelFormat = ZE_TPF_RGBA_DXT5;
+				break;
+
+			case ZE_TCT_NONE:
+			default:
+				PixelFormat = ZE_TPF_RGBA_INT32;
+				break;
 		}
 	}		
 
-	TextureWidth = TextureInfo.TextureWidth / Multiplier;
-	TextureHeight = TextureInfo.TextureHeight / Multiplier;
-	MipMapCount = (Options->MipMapping) ? Options->MaximumMipmapLevel : 1;
-	TextureSize = TextureWidth * TextureHeight * TextureInfo.BitsPerPixel / 8;
+	TextureWidth = TextureInfo.TextureWidth / (unsigned int)sqrt((double)DownsampleMultiplier);
+	TextureHeight = TextureInfo.TextureHeight / (unsigned int)sqrt((double)DownsampleMultiplier);
+	MipMapCount = (FinalTextureOptions.MipMapping != ZE_TMM_DISABLED) ? FinalTextureOptions.MaximumMipmapLevel : 1;
+	TextureSize = (TextureInfo.TextureWidth * TextureInfo.TextureHeight * (TextureInfo.BitsPerPixel / 8)) / (CompressionMultiplier * DownsampleMultiplier);
 
 	// Open chunk for reading
 	ZEPartialResourceFile PartialResourceFile;
@@ -703,7 +720,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
 
-	if(Texture->Create(TextureWidth, TextureHeight, PixelFormat, false, MipMapCount))
+	if(!Texture->Create(TextureWidth, TextureHeight, PixelFormat, false, MipMapCount))
 	{
 		zeLog("Texture 2D Resource", "Can not create texture");
 		return NULL;
@@ -711,26 +728,170 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 		
 	void* Buffer = NULL;
 	unsigned int DestinationPitch;
-	for(unsigned int I = 0; I < MipMapCount; I++)
+	unsigned int RowSizeToRead = 0;
+	unsigned int ReadSize = 0;
+	unsigned int TotalReadSize = 0;
+	unsigned int ReadCount = 0;
+
+	
+
+	//Compression && Mipmapping Case
+	if (FinalTextureOptions.CompressionType != ZE_TCT_NONE && FinalTextureOptions.MipMapping != ZE_TMM_DISABLED)
 	{
-		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
-		for (size_t K = 0; K < TextureInfo.TextureHeight; K++)
-			PartialResourceFile.Read((unsigned char*)Buffer + (K * DestinationPitch), TextureWidth * TextureInfo.BitsPerPixel / 8, 1);
+		// Create Mipmaps for level-2 (2x2 and 1x1 not compressible use the same data of 4x4 compressed texture)
+		for (size_t I = 0; I < FinalTextureOptions.MaximumMipmapLevel - 2; I++)
+		{
+			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
+			
+			RowSizeToRead = (TextureWidth / ZE_TC_BLOCK_WIDTH) * CompressionBlockSize;
+
+			for(size_t J = 0; J < TextureHeight / ZE_TC_BLOCK_HEIGHT; J++)
+			{
+				ReadCount = PartialResourceFile.Read((unsigned char*)Buffer + J * DestinationPitch, RowSizeToRead, 1);
+				if(ReadCount)
+				{
+					ReadSize += RowSizeToRead;
+					ReadCount = 0;
+				}
+
+			}
+			
+			TotalReadSize += ReadSize;
+			TextureResource->Texture->Unlock();
+
+			// Prepare to read for the next mipmap
+			TextureWidth /= 2;
+			TextureHeight /= 2;
+		}
+
+		// 2x2 Mipmap
+		// Compress the last 4x4 texture and put it to 2x2 mipmap level
+		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, FinalTextureOptions.MaximumMipmapLevel - 2);
+		
+		ReadSize = 0;
+		RowSizeToRead = CompressionBlockSize;
+
+		ReadCount = PartialResourceFile.Read((unsigned char*)Buffer, RowSizeToRead, 1);
+		if(ReadCount)
+		{
+			ReadSize += RowSizeToRead;
+			ReadCount = 0;
+		}
+
+		TotalReadSize += ReadSize;
+
+
 		TextureResource->Texture->Unlock();
 
-		TextureWidth /= 2;
-		TextureHeight /= 2;
+		// 1x1 Mipmap
+		// Compress the last 4x4 texture and put it to 1x1 mipmap level
+		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, FinalTextureOptions.MaximumMipmapLevel - 1);
+		
+		//1x1 mipmap will be just one block
+		ReadSize = 0;
+		RowSizeToRead = CompressionBlockSize;
+
+		ReadCount = PartialResourceFile.Read((unsigned char*)Buffer, RowSizeToRead, 1);
+		if(ReadCount)
+		{
+			ReadSize += RowSizeToRead;
+			ReadCount = 0;
+		}
+		
+		TotalReadSize += ReadSize;
+
+		TextureResource->Texture->Unlock();
+
 	}
+
+	//No Compression && Mipmapping  Case
+	else if (FinalTextureOptions.CompressionType == ZE_TCT_NONE && FinalTextureOptions.MipMapping != ZE_TMM_DISABLED)	
+	{
+		for (size_t I = 0; I < FinalTextureOptions.MaximumMipmapLevel; I++)
+		{
+			// Write Mipmap to Device Level I
+			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
+			
+			ReadSize = 0;
+			RowSizeToRead = TextureWidth * TextureInfo.BitsPerPixel / 8;
+
+			for(size_t J = 0; J < TextureHeight; J++)
+			{
+				// Read it from the raw texture, not from d3d pointer
+				ReadCount = PartialResourceFile.Read((unsigned char*)Buffer + J * DestinationPitch, RowSizeToRead, 1);
+				if(ReadCount)
+				{
+					ReadSize += RowSizeToRead;
+					ReadCount = 0;
+				}
+
+			}
+			
+			TotalReadSize += ReadSize;
+
+			TextureResource->Texture->Unlock();
+			
+			TextureWidth /= 2;
+			TextureHeight /= 2;
+		}
+	}
+	//Compression && No Mipmapping case  Case
+	else if (FinalTextureOptions.CompressionType != ZE_TCT_NONE && FinalTextureOptions.MipMapping == ZE_TMM_DISABLED)
+	{
+		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, 0);
+		
+		ReadSize = 0;
+		RowSizeToRead = (TextureWidth / ZE_TC_BLOCK_WIDTH) * CompressionBlockSize;
+
+		for(size_t J = 0; J < TextureHeight / ZE_TC_BLOCK_HEIGHT; J++)
+		{
+			ReadCount = PartialResourceFile.Read((unsigned char*)Buffer + J * DestinationPitch, RowSizeToRead, 1);
+			if(ReadCount)
+			{
+				ReadSize += RowSizeToRead;
+				ReadCount = 0;
+			}
+
+		}
+		
+		TotalReadSize += ReadSize;
+
+
+		TextureResource->Texture->Unlock();
+	}
+
+	//No Compression && No Mipmapping  Case
+	else 
+	{
+		TextureResource->Texture->Lock(&Buffer, &DestinationPitch, 0);
+		
+		ReadSize = 0;
+		RowSizeToRead = TextureWidth * TextureInfo.BitsPerPixel / 8;
+
+		for(size_t J = 0; J < TextureHeight; J++)
+		{
+			// Read it from the raw texture, not from d3d pointer
+			ReadCount = PartialResourceFile.Read((unsigned char*)Buffer + J * DestinationPitch, RowSizeToRead, 1);
+			if(ReadCount)
+			{
+				ReadSize += RowSizeToRead;
+				ReadCount = 0;
+			}
+		}
+		
+		TotalReadSize += ReadSize;
+
+
+		TextureResource->Texture->Unlock();
+	}
+
+
+
+
+
 
 	PartialResourceFile.Close();
 	FileCache.CloseCache();
 
 	return TextureResource;
-}
-
-bool ZETexture2DResource::SaveToFileCache(ZEPartialFile* PartialFile, ZETextureLoaderInfo* TextureInfo, void* Buffer, unsigned int DestinationPitch)
-{	
-	
-
-	return true;
 }

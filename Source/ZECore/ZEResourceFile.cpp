@@ -260,9 +260,9 @@ bool ZEPartialResourceFile::Open(const char* FileName, size_t Offset, size_t Siz
 
 bool ZEPartialResourceFile::Open(ZEFile* File, size_t Offset, size_t Size)
 {
-	if(File)
+	if(!File->IsOpen())
 	{
-		zeError("Partial Resource File", "A file is already open with the file name: \"%s\".", this->FileName);
+		zeError("Partial Resource File", "The ZEFile passed to this function must be opened: \"%s\".", this->FileName);
 		return false;
 	}
 

@@ -56,7 +56,6 @@ class ZETexture2DResource : public ZETextureResource
 
 		static ZETexture2DResource*			LoadFromFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
 		static ZETexture2DResource*			LoadFromFileCache(ZEResourceFile* ResourceFile, const char* TextureFileName, const ZETextureOptions *Options);
-		static bool							SaveToFileCache(ZEPartialFile* PartialFile, ZETextureLoaderInfo* TextureInfo, void* Buffer, unsigned int DestinationPitch);
 
 		static void							GetFinalTextureOptions(ZETextureOptions& FinalOptions, ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions);
 
