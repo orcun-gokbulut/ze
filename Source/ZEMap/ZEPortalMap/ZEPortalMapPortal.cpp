@@ -155,7 +155,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 		PhysicalTriangles[I].Indices[2] =  3 * I + 2;
 	}
 
-	if (PhysicalMesh == NULL && Resource->HasPhysicalMesh)
+	if (false)//(PhysicalMesh == NULL && Resource->HasPhysicalMesh)
 	{
 		PhysicalMesh = ZEPhysicalMesh::CreateInstance();
 		PhysicalMesh->SetData(PhysicalVertices.GetConstCArray(), 

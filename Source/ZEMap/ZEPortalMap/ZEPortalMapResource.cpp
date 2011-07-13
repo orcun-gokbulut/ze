@@ -106,6 +106,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetSpecularEnabled(true);
 		CurrentMaterial->SetEmmisiveEnabled(true);
 		
+		CurrentMaterial->SetDiffuseSubSurfaceScatteringFactor(0.0f);
 		CurrentMaterial->SetTwoSided(MaterialChunk.TwoSided);
 		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
