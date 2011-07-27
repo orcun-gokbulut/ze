@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAssertBrowser.h
+ Zinek Engine - NewZEDAssertBrowser.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,90 +35,78 @@
 
 #pragma once
 
-#ifndef __ZED_ASSERT_BROWSER_H__
-#define __ZED_ASSERT_BROWSER_H__
+#ifndef __NEW_ZED_ASSERT_BROWSER_H__
+#define __NEW_ZED_ASSERT_BROWSER_H__
 
-#include <QWidget>
-#include <QDir>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QTreeWidget>
-#include <QMenuBar>
-#include <QMenu>
-#include <QFrame>
-#include <QtGui>
+#include <ui_ZEDAssertBrowser.h>
+
+#include <QLabel>
+#include <QLineEdit>
+#include <QComboBox>
+#include <QDirModel>
 #include <QGridLayout>
-#include <QScrollArea>
-#include <QToolBar>
-#include <QPixmap>
+#include <QFile>
 
-#include "ZEDAssertBrowserViewPortItem.h"
-#include "ZEDCore\ZEDPlugIn.h"
+#include <zeds/ZEArray.h>
+
 #include "ZEDAssertBrowserPlugIn.h"
+#include "NewZEDAssertBrowserItem.h"
 
-class ZEDAssertBrowser : public QWidget
+class NewZEDAssertBrowser : public QMainWindow
 {
 	Q_OBJECT
 
-	friend class ZEDAssertBrowserViewPortItem;
+	friend class NewZEDAssertBrowserItem;
 
 	private:
 
-		QHBoxLayout*									HMainLayout;
-		QVBoxLayout*									VMainLayout;
-		QGridLayout*									GViewPortLayout;
-		QTreeView*										DirectoryBrowser;
-		QMenuBar*										MainMenu;
-		QFrame*											CentralFrame;
-		QScrollArea*									BrowserViewPort;
-		QMenu*											CreateResourceMenu;
-		QMenu*											PreviewOptionsMenu;
-		QMenu*											OperationsMenu;
-		QDirModel*										MainModel;
-		QDir*											MainDir;
-		QWidget*										BrowserViewPortIn;
-		QVBoxLayout*									VBoxLayout;
-		QWidget*										ToolWidgetArea;
-		QLineEdit*										SearchLineEdit;
-		QComboBox*										FilterComboBox;
-		QLabel*											SearchLabel;
-		QLabel*											FilterLabel;
-		QPushButton*									RefreshButton;
-		QPushButton*									BackButton;
-		QHBoxLayout*									ToolBarLayout;
-		QString											WorkingDirectory;
+		Ui::ZEDAssertBrowserUI				AssertBrowserUI;
 
-		
-		int												PreviewSize;
+		ZEArray<ZEDFilePlugIn*>				PlugIns;
+		ZEArray<NewZEDAssertBrowserItem*>	ViewportContents;
+		ZEArray<NewZEDAssertBrowserItem*>	SelectedViewportItems;
+		QList<QFile*>						FilesToManipulate;
 
-		QList<ZEDAssertBrowserViewPortItem*>			CurrentViewPortContents;
-		ZEArray<QString>								ItemsToCopy;
-		QList<ZEDFilePlugIn*>							PlugIns;
+		bool								CutOperationFlag;
+
+		QLabel*								FilterLabel;
+		QLabel*								SearchLabel;
+		QLineEdit*							SearchLineEdit;
+		QComboBox*							FilterComboBox;
+		QGridLayout*						PreviewsLayout;
+
+		QDirModel*							DirectoryModel;	
+
+		int									PreviewSize;
+		bool								MutipleSelectionEnabled;
+
+
+		void								InitializeSearchToolBar();
+		void								AddSelectedItem(NewZEDAssertBrowserItem* SelectedItem);
+		void								RemoveSelectedItem(NewZEDAssertBrowserItem* SelectedItem);
+
+	public slots:
+
+		void								GeneratePreviewItems();
+		void								SmallClicked();
+		void								MediumClicked();
+		void								LargeClicked();
+
+		void								CutActionTriggered();
+		void								CopyActionTriggered();
+		void								PasteActionTriggered();
+		void								DeleteActionTriggered();
+		void								EditActionTriggered();
+
+		void								SelectAllActionTriggered();
+		void								DesellectActionTriggered();
 
 	public:
 
-		ZEDFilePlugIn*									RegisterFilePlugIn(ZEDFilePlugIn* PlugIn);
-														ZEDAssertBrowser(QString WorkingDirectory);
+		void								RegisterPlugIn(ZEDFilePlugIn* PlugIn);
+		void								SetMultipleSelection(bool Enabled);
 
-		public slots:
-
-		void											GenerateBrowserViewPortItems();
-		void											LargeSelected();
-		void											MediumSelected();
-		void											SmallSelected();
-		void											SelectAll();
-		void											DeselectAll();
-		void											MassDelete();
-		void											MassCopy();
-		void											CopyFile(QString Source, QString DestinationFolder);
-		void											Paste();
-		void											RefreshDirectories();
-		void											BackButtonClicked();
-
-	protected:
-
-		void											resizeEvent(QResizeEvent* Event);
-
+											NewZEDAssertBrowser(QString WorkingDirectory, QWidget *Parent = 0, Qt::WFlags Flags = 0);
 };
 
 #endif

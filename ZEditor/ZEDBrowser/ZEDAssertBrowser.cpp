@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAssertBrowser.cpp
+ Zinek Engine - NewZEDAssertBrowser.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,388 +33,359 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QFile>
-#include "ZEDAssertBrowser.h"
-#include <FreeImage.h>
-#include "ZEDAssertBrowserFontFilePlugIn.h"
+#include "NewZEDAssertBrowser.h"
+#include <stdlib.h>
 
-ZEDAssertBrowser::ZEDAssertBrowser(QString WorkingDirectory)
+#define SmallPreviewSize	128
+#define MediumPreviewSize	256
+#define LargePreviewSize	512
+
+#define PreviewSpacing		1
+
+#define ALL					"All	"
+NewZEDAssertBrowser::NewZEDAssertBrowser(QString WorkingDirectory, QWidget *Parent, Qt::WFlags Flags) : QMainWindow(Parent, Flags)
 {
-	FreeImage_Initialise(true);
-	
-	this->WorkingDirectory = WorkingDirectory;
+	AssertBrowserUI.setupUi(this);
+	InitializeSearchToolBar();
+	DirectoryModel = new QDirModel(AssertBrowserUI.DirectoryBrowser);
+	DirectoryModel->setFilter(QDir::NoDotAndDotDot | QDir::Dirs);
+	AssertBrowserUI.DirectoryBrowser->setModel(DirectoryModel);
+	AssertBrowserUI.DirectoryBrowser->setRootIndex(DirectoryModel->index(QString(WorkingDirectory)));
+	PreviewsLayout = new QGridLayout(AssertBrowserUI.PreviewsViewport->widget());
+	PreviewsLayout->setContentsMargins(PreviewSpacing,PreviewSpacing,PreviewSpacing,PreviewSpacing);
+	AssertBrowserUI.PreviewsViewport->setMinimumWidth(600);
+	PreviewSize = MediumPreviewSize;
+	PreviewsLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
+	SelectedViewportItems.Clear();
+	MutipleSelectionEnabled = false;
+	CutOperationFlag = false;
 
-	this->CentralFrame = new QFrame(this);
-	this->MainMenu = new QMenuBar(this);
-	this->BrowserViewPort = new QScrollArea(this->CentralFrame);
-	this->DirectoryBrowser = new QTreeView(this->CentralFrame);
-	this->VMainLayout = new QVBoxLayout(this);
-	this->HMainLayout = new QHBoxLayout(this->CentralFrame);
+	QObject::connect(AssertBrowserUI.DirectoryBrowser,	SIGNAL(clicked(const QModelIndex &)),	this, SLOT(GeneratePreviewItems()));
+	QObject::connect(FilterComboBox,					SIGNAL(currentIndexChanged(int)),		this, SLOT(GeneratePreviewItems()));
+	QObject::connect(SearchLineEdit,					SIGNAL(textChanged(const QString&)),	this, SLOT(GeneratePreviewItems()));
+	QObject::connect(AssertBrowserUI.SmallAction,		SIGNAL(triggered(bool)),				this, SLOT(SmallClicked()));
+	QObject::connect(AssertBrowserUI.MediumAction,		SIGNAL(triggered(bool)),				this, SLOT(MediumClicked()));
+	QObject::connect(AssertBrowserUI.LargeAction,		SIGNAL(triggered(bool)),				this, SLOT(LargeClicked()));
+	QObject::connect(AssertBrowserUI.SelectAllAciton,	SIGNAL(triggered(bool)),				this, SLOT(SelectAllActionTriggered()));
+	QObject::connect(AssertBrowserUI.DesellectAction,	SIGNAL(triggered(bool)),				this, SLOT(DesellectActionTriggered()));
 
-	this->CreateResourceMenu = new QMenu(QString("CreateResource"), this->MainMenu);
-	this->PreviewOptionsMenu = new QMenu(QString("Preview Options"), this->MainMenu);
-	this->OperationsMenu = new QMenu(QString("Operations"), this->MainMenu);
-
-	this->PreviewOptionsMenu->addAction(QString("Large"));
-	this->PreviewOptionsMenu->addAction(QString("Medium"));
-	this->PreviewOptionsMenu->addAction(QString("Small"));
-
-	this->OperationsMenu->addAction(QString("Copy"));
-	this->OperationsMenu->addAction(QString("Paste"));
-	this->OperationsMenu->addAction(QString("Edit"));
-	this->OperationsMenu->addAction(QString("Delete"));
-	this->OperationsMenu->addSeparator();
-	this->OperationsMenu->addAction(QString("Select All"));
-	this->OperationsMenu->addAction(QString("Deselect All"));
-
-
-	this->MainModel = new QDirModel(QStringList(), QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name, 0);
-	this->MainDir = new QDir(WorkingDirectory);
-	GViewPortLayout = new QGridLayout();
-	BrowserViewPortIn = new QWidget(this->BrowserViewPort);
-	VBoxLayout = new QVBoxLayout(this->BrowserViewPort);
-	this->ToolWidgetArea = new QWidget(this);
-	this->PreviewSize = 150;
-
-	this->VMainLayout->setMenuBar(this->MainMenu);
-	this->setLayout(this->VMainLayout);
-	this->VMainLayout->addWidget(this->ToolWidgetArea);
-	this->ToolWidgetArea->setMinimumHeight(20);
-	this->CentralFrame->setLayout(this->HMainLayout);
-	this->VMainLayout->addWidget(this->CentralFrame);
-	this->HMainLayout->addWidget(this->DirectoryBrowser);
-	this->HMainLayout->addWidget(this->BrowserViewPort);
-	this->MainMenu->addMenu(this->CreateResourceMenu);
-	this->MainMenu->addMenu(this->PreviewOptionsMenu);
-	this->MainMenu->addMenu(this->OperationsMenu);
-	this->BrowserViewPortIn->setLayout(GViewPortLayout);
-	this->BrowserViewPort->setLayout(VBoxLayout);
-	this->HMainLayout->setMargin(1);
-	this->VMainLayout->setMargin(1);
-	this->GViewPortLayout->setContentsMargins(1,1,1,1);	
-
-	this->resize(800,600);
-
-	this->DirectoryBrowser->setMaximumWidth(300);
-
-	this->DirectoryBrowser->setModel(MainModel);
-
-	this->DirectoryBrowser->setRootIndex(MainModel->index(MainDir->currentPath()));
-
-	this->BrowserViewPort->setWidget(this->BrowserViewPortIn);
-
-	this->BrowserViewPort->setWidgetResizable(false);
-
-	this->GViewPortLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
-
-	this->HMainLayout->setDirection(QBoxLayout::LeftToRight);
-
-	QObject::connect(this->DirectoryBrowser, SIGNAL(clicked(const QModelIndex &)), this, SLOT(GenerateBrowserViewPortItems()));
-
-	QObject::connect(this->PreviewOptionsMenu->actions()[0], SIGNAL(triggered(bool)), this, SLOT(LargeSelected()));
-	QObject::connect(this->PreviewOptionsMenu->actions()[1], SIGNAL(triggered(bool)), this, SLOT(MediumSelected()));
-	QObject::connect(this->PreviewOptionsMenu->actions()[2], SIGNAL(triggered(bool)), this, SLOT(SmallSelected()));
-
-	QObject::connect(this->OperationsMenu->actions()[0], SIGNAL(triggered(bool)), this, SLOT(MassCopy()));
-	QObject::connect(this->OperationsMenu->actions()[1], SIGNAL(triggered(bool)), this, SLOT(Paste()));
-	QObject::connect(this->OperationsMenu->actions()[3], SIGNAL(triggered(bool)), this, SLOT(MassDelete()));
-	QObject::connect(this->OperationsMenu->actions()[5], SIGNAL(triggered(bool)), this, SLOT(SelectAll()));
-	QObject::connect(this->OperationsMenu->actions()[6], SIGNAL(triggered(bool)), this, SLOT(DeselectAll()));
-
-	this->BrowserViewPort->setContextMenuPolicy(Qt::ActionsContextMenu);
-	this->BrowserViewPort->addAction(this->OperationsMenu->actions().at(0));
-	this->BrowserViewPort->addAction(this->OperationsMenu->actions().at(1));
-
-	//Tree view context menu implementation.
-	//this->DirectoryBrowser->setContextMenuPolicy(Qt::ActionsContextMenu);
-	//this->addAction(new QAction(QString("New Folder")));
-
-	SearchLineEdit = new QLineEdit(this->ToolWidgetArea);
-	SearchLabel = new QLabel(QString("Search"),this->ToolWidgetArea);
-	FilterLabel = new QLabel(QString("Filter"),this->ToolWidgetArea);
-	FilterComboBox = new QComboBox(this->ToolWidgetArea);
-	RefreshButton = new QPushButton(QString("Refresh"),this->ToolWidgetArea);
-	BackButton = new QPushButton(QString("Back"), this->ToolWidgetArea);
-	ToolBarLayout = new QHBoxLayout(this->ToolWidgetArea);
-	ToolBarLayout->setContentsMargins(1,1,1,1);
-
-	this->ToolWidgetArea->setLayout(this->ToolBarLayout);
-	this->ToolBarLayout->addWidget(this->BackButton);
-	this->ToolBarLayout->addWidget(this->RefreshButton);
-	this->ToolBarLayout->addWidget(this->SearchLabel);
-	this->ToolBarLayout->addWidget(this->SearchLineEdit);
-	this->ToolBarLayout->addWidget(this->FilterLabel);
-	this->ToolBarLayout->addWidget(this->FilterComboBox);
-
-	this->FilterComboBox->addItem(QString("All"));
-
-	QObject::connect(this->SearchLineEdit, SIGNAL(textChanged(QString)), this, SLOT(GenerateBrowserViewPortItems()));
-	QObject::connect(this->FilterComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(GenerateBrowserViewPortItems()));
-	QObject::connect(this->RefreshButton, SIGNAL(clicked(bool)), this, SLOT(RefreshDirectories()));
-	QObject::connect(this->BackButton, SIGNAL(clicked(bool)), this, SLOT(BackButtonClicked()));
+	QObject::connect(AssertBrowserUI.CopyAction,		SIGNAL(triggered(bool)),				this, SLOT(CopyActionTriggered()));
+	QObject::connect(AssertBrowserUI.CutAction,			SIGNAL(triggered(bool)),				this, SLOT(CutActionTriggered()));
+	QObject::connect(AssertBrowserUI.PasteAction,		SIGNAL(triggered(bool)),				this, SLOT(PasteActionTriggered()));
+	QObject::connect(AssertBrowserUI.DeleteAction,		SIGNAL(triggered(bool)),				this, SLOT(DeleteActionTriggered()));
+	QObject::connect(AssertBrowserUI.EditAction,		SIGNAL(triggered(bool)),				this, SLOT(EditActionTriggered()));
 }
 
-void ZEDAssertBrowser::GenerateBrowserViewPortItems()
+void NewZEDAssertBrowser::InitializeSearchToolBar()
 {
-	QString CurrentDir;
+	SearchLabel		 = new QLabel(QString(" Search "), AssertBrowserUI.SearchToolBar);
+	SearchLineEdit	 = new QLineEdit(AssertBrowserUI.SearchToolBar);
+	SearchLineEdit->setMinimumHeight(20);
+	FilterLabel		 = new QLabel(QString(" Filter "), AssertBrowserUI.SearchToolBar);
+	FilterComboBox	 = new QComboBox(AssertBrowserUI.SearchToolBar);
 
-	ZEDAssertBrowserViewPortItem* CurrentLabel;
+	AssertBrowserUI.SearchToolBar->addWidget(SearchLabel);
+	AssertBrowserUI.SearchToolBar->addWidget(SearchLineEdit);
+	AssertBrowserUI.SearchToolBar->addSeparator();
+	AssertBrowserUI.SearchToolBar->addWidget(FilterLabel);
+	AssertBrowserUI.SearchToolBar->addWidget(FilterComboBox);
 
-	QDirModel* CurrentModel = (QDirModel*)this->DirectoryBrowser->currentIndex().model();
+	FilterComboBox->addItem(QString(ALL));
+}
 
-	if(CurrentModel == NULL)
-		return;
-
-	CurrentDir = CurrentModel->filePath(this->DirectoryBrowser->currentIndex());
-
-	QDir NewDir(CurrentDir);
-
-	QFileInfoList NewList = NewDir.entryInfoList(QDir::Files);
-
-	for(int I = 0; I < CurrentViewPortContents.count(); I++)
-	{
-		CurrentViewPortContents[I]->close();
-		delete CurrentViewPortContents[I];
-	}
-
-	CurrentViewPortContents.clear();
-
-	QString Filter = this->FilterComboBox->currentText();
+void NewZEDAssertBrowser::RegisterPlugIn(ZEDFilePlugIn* PlugIn)
+{
+	this->PlugIns.Add(PlugIn);
 	int ExtensionCount = 0;
 
-	if(Filter == QString("All"))
-	{
-		for(int I = 0; I < NewList.count(); I++)
-		{
-			if(NewList[I].fileName().contains(this->SearchLineEdit->text(),Qt::CaseInsensitive))
-			{
-				CurrentLabel = new ZEDAssertBrowserViewPortItem(NewList[I].filePath(), NewList[I].fileName(), new QLabel(), this);
-				for (int I = 0; I < PlugIns.count(); I++)
-				{
-					QString*	Extensions;
-					Extensions = PlugIns[I]->GetSupportedFileExtension(ExtensionCount);
+	QString* Extensions = PlugIn->GetSupportedFileExtension(ExtensionCount);
 
-					for(int J = 0; J < ExtensionCount; J++)
-					{
-						if (Extensions[J] == CurrentLabel->FileExtension)
-						{
-							CurrentLabel->PreviewWidget->setPixmap(PlugIns[I]->GetPreview(CurrentLabel->FilePath, PreviewSize));
-							break;
-						}
-					}						
-				}
-				
-				CurrentLabel->setFixedSize(this->PreviewSize, this->PreviewSize);
-				CurrentViewPortContents.append(CurrentLabel);
+	for (int I = 0; I < ExtensionCount; I++)
+		FilterComboBox->addItem(Extensions[I]);
+}
+
+void NewZEDAssertBrowser::GeneratePreviewItems()
+{
+	for (int I = 0; I < ViewportContents.GetCount(); I++)
+	{
+		if(ViewportContents[I] != NULL)
+		{
+			ViewportContents[I]->close();
+			delete ViewportContents[I];
+		}
+	}
+
+	ViewportContents.Clear();
+	SelectedViewportItems.Clear();
+
+	int ViewportWidth = AssertBrowserUI.PreviewsViewport->width();
+
+	QDirModel* SelectedDirectoryModel = NULL;
+	SelectedDirectoryModel = ((QDirModel*)(AssertBrowserUI.DirectoryBrowser->currentIndex().model()));
+
+	if(SelectedDirectoryModel == NULL)
+		return;
+
+	QString SelectedPath = SelectedDirectoryModel->filePath(AssertBrowserUI.DirectoryBrowser->currentIndex());
+	QDir SelectedDirectory = QDir(SelectedPath);
+
+	QFileInfoList SelectedDirectoryFileList = SelectedDirectory.entryInfoList(QDir::Files);
+
+	int ExpansionRow = 0;
+	int ExpansionColumn = 0;
+
+	int RowItemCapacity = floor((float)ViewportWidth / (float)PreviewSize);
+	int SpacePixexls = 6 * RowItemCapacity;
+	
+	if(SpacePixexls + PreviewSize * RowItemCapacity > ViewportWidth)
+		RowItemCapacity--;
+
+	NewZEDAssertBrowserItem* CurrentItem = NULL;
+
+	for (int I = 0; I < SelectedDirectoryFileList.count(); I++)
+	{
+		CurrentItem = new NewZEDAssertBrowserItem(SelectedDirectoryFileList[I].filePath(), this, AssertBrowserUI.PreviewsViewport->widget());
+		
+		if(FilterComboBox->currentText() != ALL)
+		{
+			if(CurrentItem->GetExtension() != FilterComboBox->currentText())
+			{
+				CurrentItem->close();
+				delete CurrentItem;
+				continue;
 			}
 		}
+
+		if(SearchLineEdit->text().length() != 0)
+		{
+			if(!CurrentItem->GetFileName().contains(SearchLineEdit->text(), Qt::CaseInsensitive))
+			{
+				CurrentItem->close();
+				delete CurrentItem;
+				continue;
+			}
+		}
+
+		ViewportContents.Add(CurrentItem);
+		CurrentItem->setFixedHeight(PreviewSize);
+		CurrentItem->setFixedWidth(PreviewSize);
+
+		for (int I = 0; I < PlugIns.GetCount(); I++)
+		{
+			int		 ExtensionCount = 0;
+			QString* Extensions = PlugIns[I]->GetSupportedFileExtension(ExtensionCount);
+
+			for (int J = 0; J < ExtensionCount; J++)
+			{
+				if(Extensions[J] == CurrentItem->GetExtension())
+					CurrentItem->setPixmap(PlugIns[I]->GetPreview(CurrentItem->GetPath(), PreviewSize));
+			}
+		}
+
+		PreviewsLayout->addWidget(CurrentItem,ExpansionRow,ExpansionColumn);
+		ExpansionColumn++;
+
+		if(ExpansionColumn == RowItemCapacity)
+		{
+			ExpansionRow++;
+			ExpansionColumn = 0;
+		}
+	}
+
+	AssertBrowserUI.statusbar->showMessage(QString().setNum(ViewportContents.GetCount()) + QString(" File(s)"));
+}
+
+void NewZEDAssertBrowser::SmallClicked()
+{
+	PreviewSize = SmallPreviewSize;
+	GeneratePreviewItems();
+}
+
+void NewZEDAssertBrowser::MediumClicked()
+{
+	PreviewSize = MediumPreviewSize;
+	GeneratePreviewItems();
+}
+
+void NewZEDAssertBrowser::LargeClicked()
+{
+	PreviewSize = LargePreviewSize;
+	GeneratePreviewItems();
+}
+
+void NewZEDAssertBrowser::AddSelectedItem(NewZEDAssertBrowserItem* SelectedItem)
+{
+	for (int I = 0; I < SelectedViewportItems.GetCount(); I++)
+	{
+		if(SelectedViewportItems[I] == SelectedItem)
+			return;
+	}
+
+	if(MutipleSelectionEnabled)
+	{
+		SelectedItem->SetIsSelected(true);
+		SelectedViewportItems.Add(SelectedItem);
 	}
 
 	else
 	{
-		for(int I = 0; I < NewList.count(); I++)
+		for (int I = 0; I < SelectedViewportItems.GetCount(); I++)
 		{
-			if(NewList[I].fileName().contains(this->SearchLineEdit->text(),Qt::CaseInsensitive) && NewList[I].fileName().contains(this->FilterComboBox->currentText(), Qt::CaseInsensitive))
-			{
-				CurrentLabel = new ZEDAssertBrowserViewPortItem(NewList[I].filePath(), NewList[I].fileName(), new QLabel(), this);
-				for (int I = 0; I < PlugIns.count(); I++)
-				{
-					QString*	Extensions;
-					Extensions = PlugIns[I]->GetSupportedFileExtension(ExtensionCount);
+			SelectedViewportItems[I]->SetIsSelected(false);
+		}
+		SelectedViewportItems.Clear();
+		SelectedItem->SetIsSelected(true);
+		//SelectedViewportItems.Add(SelectedItem);
+	}
+}
 
-					for(int J = 0; J < ExtensionCount; J++)
-					{
-						if (Extensions[J] == CurrentLabel->FileExtension)
-						{
-							CurrentLabel->PreviewWidget->setPixmap(PlugIns[I]->GetPreview(CurrentLabel->FilePath, PreviewSize));
-							break;
-						}
-					}	
-				}
-				CurrentLabel->setFixedSize(this->PreviewSize, this->PreviewSize);
-				CurrentViewPortContents.append(CurrentLabel);
-			}
+void NewZEDAssertBrowser::RemoveSelectedItem(NewZEDAssertBrowserItem* SelectedItem)
+{
+	SelectedItem->SetIsSelected(false);
+	SelectedViewportItems.DeleteValue(SelectedItem);
+
+	if (SelectedViewportItems.GetCount() == 0)
+	{
+		MutipleSelectionEnabled = false;
+	}
+}
+
+void NewZEDAssertBrowser::SetMultipleSelection(bool Enabled)
+{
+	if (Enabled == false)
+	{
+		if(SelectedViewportItems.GetCount() == 0)
+		{
+			this->MutipleSelectionEnabled = Enabled;
+			return;
 		}
 	}
 
-	int ContentCount = CurrentViewPortContents.count();
+	else
+		MutipleSelectionEnabled = Enabled;
 
-	QSize CurrentViewPortSize = this->BrowserViewPort->size();
+}
 
-	int ColumnCount = (CurrentViewPortSize.width() / PreviewSize);
-	int ColumnIndex = 0;
-	int RowIndex = 0;
+void NewZEDAssertBrowser::SelectAllActionTriggered()
+{
+	SelectedViewportItems.Clear();
 
-	for(int I = 0; I < CurrentViewPortContents.count() ; I++)
+	MutipleSelectionEnabled = true;
+
+	for (int I = 0; I < ViewportContents.GetCount(); I++)
 	{
-		GViewPortLayout->addWidget(CurrentViewPortContents[I], RowIndex, ColumnIndex);
-		ColumnIndex++;
+		ViewportContents[I]->SetIsSelected(true);
+	}
 
-		if(ColumnIndex == ColumnCount)
-		{
-			ColumnIndex = 0;
-			RowIndex++;
-		}
+	MutipleSelectionEnabled = false;
+}
+
+void NewZEDAssertBrowser::DesellectActionTriggered()
+{
+	QList<NewZEDAssertBrowserItem*> TestList;
+
+	for (int I = 0; I < SelectedViewportItems.GetCount(); I++)
+	{
+		TestList.append(SelectedViewportItems[I]);
+	}
+
+	for (int I = 0; I < TestList.count(); I++)
+	{
+		TestList[I]->SetIsSelected(false);
+	}
+
+	SelectedViewportItems.Clear();
+}
+
+void NewZEDAssertBrowser::CutActionTriggered()
+{
+	for (int I = 0; I < FilesToManipulate.count(); I++)
+	{
+		FilesToManipulate[I]->close();
+		delete FilesToManipulate[I];
+	}
+
+	FilesToManipulate.clear();
+
+	for (int I = 0; I < SelectedViewportItems.GetCount(); I++)
+	{
+		FilesToManipulate.append(new QFile(SelectedViewportItems[I]->GetPath()));
+	}
+
+	CutOperationFlag = true;
+}
+
+void NewZEDAssertBrowser::CopyActionTriggered()
+{
+	for (int I = 0; I < FilesToManipulate.count(); I++)
+	{
+		FilesToManipulate[I]->close();
+		delete FilesToManipulate[I];
+	}
+
+	FilesToManipulate.clear();
+
+	for (int I = 0; I < SelectedViewportItems.GetCount(); I++)
+	{
+		FilesToManipulate.append(new QFile(SelectedViewportItems[I]->GetPath()));
 	}
 }
 
-void ZEDAssertBrowser::LargeSelected()
+void NewZEDAssertBrowser::PasteActionTriggered()
 {
-	this->PreviewSize = 512;
-	this->GenerateBrowserViewPortItems();
-}
+	QDirModel* SelectedDirectoryModel = NULL;
+	SelectedDirectoryModel = ((QDirModel*)(AssertBrowserUI.DirectoryBrowser->currentIndex().model()));
 
-void ZEDAssertBrowser::MediumSelected()
-{
-	this->PreviewSize = 256;
-	this->GenerateBrowserViewPortItems();
-}
-
-void ZEDAssertBrowser::SmallSelected()
-{
-	this->PreviewSize = 128;
-	this->GenerateBrowserViewPortItems();
-}
-
-void ZEDAssertBrowser::BackButtonClicked()
-{
-	/*for (int I = 0; I < AssertBrowserPlugIns.count(); I++)
-	{
-		AssertBrowserPlugIns[I]->CloseEditor();
-	}
-
-	BrowserViewPort->show();*/
-}
-	
-void ZEDAssertBrowser::SelectAll()
-{
-	for(int I = 0; I  < this->CurrentViewPortContents.count(); I++)
-	{
-		this->CurrentViewPortContents[I]->SetSelected(true);
-	}
-}
-
-void ZEDAssertBrowser::DeselectAll()
-{
-	for(int I = 0; I  < this->CurrentViewPortContents.count(); I++)
-	{
-		this->CurrentViewPortContents[I]->SetSelected(true);
-	}
-}
-
-void ZEDAssertBrowser::CopyFile(QString Source, QString DestinationFolder)
-{
-	QFile	FileToCopy;
-	QString FileName;
-	DestinationFolder.append(QString("/"));
-
-	for(int I = Source.count() - 1; I >= 0; I--)
-	{
-		if(Source.at(I).toLatin1() == '/')
-			break;
-		
-		FileName.prepend(Source.at(I));
-	}
-
-
-	FileToCopy.copy(Source, DestinationFolder + FileName);
-}
-
-void ZEDAssertBrowser::MassDelete()
-{
-	QMessageBox		DeleteMessageBox;
-	QString			CountString;
-	int				SelectedItemCount = 0;
-
-
-	for(int I = 0; I < this->CurrentViewPortContents.count(); I++)
-	{
-		if(this->CurrentViewPortContents[I]->GetSelected())
-			SelectedItemCount++;
-	}
-
-	CountString.setNum(SelectedItemCount);
-
-	DeleteMessageBox.setText(QString("Are you sure you want to delete ") + CountString + QString(" items ?"));
-	DeleteMessageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-	DeleteMessageBox.setWindowTitle(QString("Mass Delete"));
-	DeleteMessageBox.exec();
-	
-	QDir DirToDelete;
-	QString Temp;
-
-	if(DeleteMessageBox.buttonRole(DeleteMessageBox.clickedButton()) == QMessageBox::YesRole)
-	{
-		for(int I = 0; I < this->CurrentViewPortContents.count(); I++)
-		{
-			if(CurrentViewPortContents[I]->GetSelected())
-			{
-				Temp = this->CurrentViewPortContents[I]->FilePath;
-				DirToDelete.setPath(Temp.remove(this->CurrentViewPortContents[I]->FileName));
-				DirToDelete.remove(CurrentViewPortContents[I]->FileName);
-				this->CurrentViewPortContents[I]->hide();
-				this->CurrentViewPortContents.removeAt(I);	
-				I--;
-			}
-		}
-
-		this->GenerateBrowserViewPortItems();
-	}
-}
-
-void ZEDAssertBrowser::MassCopy()
-{
-	this->ItemsToCopy.SetCount(0);
-
-	for(int I  = 0; I < this->CurrentViewPortContents.count(); I++)
-	{
-		if(this->CurrentViewPortContents.at(I)->GetSelected())
-		{
-			this->ItemsToCopy.Add(this->CurrentViewPortContents.at(I)->FilePath);
-		}
-	}
-}
-
-void ZEDAssertBrowser::Paste()
-{
-	QDirModel*	CurrentModel = (QDirModel*)this->DirectoryBrowser->currentIndex().model();
-
-	if(CurrentModel == NULL)
+	if(SelectedDirectoryModel == NULL)
 		return;
 
-	QString ModelFilePath = CurrentModel->filePath(this->DirectoryBrowser->currentIndex());
+	QString SelectedPath = SelectedDirectoryModel->filePath(AssertBrowserUI.DirectoryBrowser->currentIndex());
 
-	for(int I = 0; I < this->ItemsToCopy.GetCount(); I++)
-	{ 
-		this->CopyFile(this->ItemsToCopy.GetItem(I), ModelFilePath);
-	}
-
-	this->GenerateBrowserViewPortItems();
-}
-
-void ZEDAssertBrowser::resizeEvent(QResizeEvent* Event)
-{
-	this->GenerateBrowserViewPortItems();
-}
-
-void ZEDAssertBrowser::RefreshDirectories()
-{
-	((QDirModel*)(this->DirectoryBrowser->model()))->refresh();
-	this->GenerateBrowserViewPortItems();
-}
-
-ZEDFilePlugIn* ZEDAssertBrowser::RegisterFilePlugIn(ZEDFilePlugIn* PlugIn)
-{
-	this->PlugIns.append(PlugIn);
-
-	int ExtensionCount = 0;
-	QString* Extensions;
-	Extensions = PlugIn->GetSupportedFileExtension(ExtensionCount);
-
-	for (int I = 0; I < ExtensionCount; I++)
+	for (int I = 0; I < FilesToManipulate.count(); I++)
 	{
-		this->FilterComboBox->addItem(Extensions[I]);
+		QFileInfo CurrentFileInfo = QFileInfo(FilesToManipulate[I]->fileName());
+		FilesToManipulate[I]->copy(SelectedPath + QString("/") +CurrentFileInfo.fileName());
+
+		if(CutOperationFlag == true)
+		{
+			FilesToManipulate[I]->remove();
+			CutOperationFlag = false;
+		}
 	}
 
-	return PlugIn;
+	GeneratePreviewItems();
+}
+
+void NewZEDAssertBrowser::DeleteActionTriggered()
+{
+	for (int I = 0; I < SelectedViewportItems.GetCount(); I++)
+	{
+		QFile* File = new QFile(SelectedViewportItems[I]->GetPath());
+		File->remove();
+		delete File;
+	}
+
+	SelectedViewportItems.Clear();
+	GeneratePreviewItems();
+}
+
+void NewZEDAssertBrowser::EditActionTriggered()
+{
+	for (int I = 0; I < SelectedViewportItems.GetCount(); I++)
+	{
+		for (int J = 0; J < PlugIns.GetCount(); J++)
+		{
+			int ExtensionCount = 0;
+			QString* Extensions = NULL;
+			Extensions = PlugIns[J]->GetSupportedFileExtension(ExtensionCount);
+
+			for (int K = 0; K < ExtensionCount; K++)
+			{
+				if(Extensions[K] == SelectedViewportItems[I]->GetExtension())
+				{
+					PlugIns[J]->GetEditor(SelectedViewportItems[I]->GetPath(), QDir::currentPath());
+				}
+			}
+		}
+	}
 }
