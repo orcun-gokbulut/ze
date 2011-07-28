@@ -39,6 +39,7 @@ add_subdirectory (ZEDirectInput)
 add_subdirectory (ZEDummyInput)
 add_subdirectory (ZEVirtualInput)
 add_subdirectory (ZEWindowsInput)
+add_subdirectory (ZEFreespaceInput)
 
 add_source (ZEInputDefinitions.cpp	Sources)
 add_source (ZEInputDefinitions.h	Sources ZESDK)

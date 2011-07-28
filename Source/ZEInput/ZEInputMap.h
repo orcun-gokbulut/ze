@@ -38,6 +38,8 @@
 #define __ZE_INPUT_MAP_H__
 
 #include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
 
 enum ZEInputButtonState
 {
@@ -55,7 +57,11 @@ enum ZEInputAxisSign
 enum ZEInputType
 {
 	ZE_IT_AXIS, 
-	ZE_IT_BUTTON
+	ZE_IT_BUTTON,
+	ZE_IT_VECTOR2,
+	ZE_IT_VECTOR3,
+	ZE_IT_VECTOR4,
+	ZE_IT_QUATERNION
 };
 
 enum ZEInputDeviceType
@@ -63,7 +69,8 @@ enum ZEInputDeviceType
 	ZE_IDT_NONE,
 	ZE_IDT_MOUSE,
 	ZE_IDT_KEYBOARD,
-	ZE_IDT_JOYSTICK
+	ZE_IDT_JOYSTICK,
+	ZE_IDT_OTHER
 };
 
 class ZEInputEvent
@@ -72,6 +79,7 @@ class ZEInputEvent
 		ZEInputType					InputType;
 		ZEInputDeviceType			DeviceType;
 		ZEDWORD						DeviceIndex;
+
 		union 
 		{
 			struct
@@ -88,7 +96,7 @@ class ZEInputEvent
 
 		void						GetEventName(char* Buffer, size_t MaxSize);
 		void						GetEventShortName(char* Buffer, size_t MaxSize);
-									
+
 									ZEInputEvent();
 									ZEInputEvent(const char* ShortName);
 									ZEInputEvent(ZEInputDeviceType Device, 
@@ -100,8 +108,11 @@ class ZEInputEvent
 										ZEDWORD DeviceIndex, 
 										unsigned char AxisId,
 										ZEInputAxisSign AxisSign);
-};
 
+									ZEInputEvent(ZEInputDeviceType Device,
+										ZEInputType Type);
+
+};
 
 class ZEInputBinding
 {
@@ -125,6 +136,9 @@ class ZEInputAction
 			ZEInputButtonState		ButtonState;
 			int						AxisValue;
 		};
+
+		ZEVector3					Vector;
+		ZEQuaternion				Orientation;
 };
 
 

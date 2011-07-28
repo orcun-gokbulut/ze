@@ -224,7 +224,7 @@ void ZEPlayer::Deinitialize()
 ZEPlayer::ZEPlayer()
 {
 
-	FOV = ZE_PI_2;
+	FOV = ZE_PI_4;
 	Yawn = Pitch = Roll = 0;
 
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,		"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_ALL)));

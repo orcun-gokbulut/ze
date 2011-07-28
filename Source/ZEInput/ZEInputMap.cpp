@@ -167,6 +167,11 @@ ZEInputEvent::ZEInputEvent(ZEInputDeviceType DeviceType, ZEDWORD DeviceIndex, un
 	this->AxisSign = AxisSign;
 }
 
+ZEInputEvent::ZEInputEvent(ZEInputDeviceType Device, ZEInputType Type)
+{
+	this->InputType = Type;
+}
+
 size_t ZEInputMap::GetInputActionCount()
 {
 	return InputActionCount;

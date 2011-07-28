@@ -60,7 +60,8 @@ link_directories(
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/$(Configuration)" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX")
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX"
+	"${PROJECT_SOURCE_DIR}/../Lib/Win x86")
 
 SET (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
 
@@ -94,12 +95,12 @@ add_source (ZECore/ZEWindowResources.rc	Sources)
 add_executable (ZE WIN32 ${Sources})
 set_property(TARGET ZE PROPERTY FOLDER "Zinek Engine")
 target_link_libraries (ZE ZECore ZEDS ZEFoundation ZESerialization ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
-target_link_libraries (ZE ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
+target_link_libraries (ZE ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEFreespaceInput ZEVirtualInput ZEPortalMap)
 
 add_library(ZESDK ${Sources})
 set_property(TARGET ZESDK PROPERTY FOLDER "Zinek Engine")
 target_link_libraries (ZESDK ZECore ZEDS ZESerialization ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
-target_link_libraries (ZESDK ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
+target_link_libraries (ZESDK ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEFreespaceInput ZEVirtualInput ZEPortalMap)
 
 get_property(TargetPath TARGET ZE PROPERTY LOCATION)
 file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)

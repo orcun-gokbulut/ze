@@ -86,7 +86,3 @@ bool ZEDummyInputModuleDescription::CheckCompatible()
 {
 	return true;
 }
-
-
-
-
