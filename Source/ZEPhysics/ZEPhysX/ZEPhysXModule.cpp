@@ -46,6 +46,17 @@
 #include <NxPhysics.h>
 #include <NxCooking.h>
 
+ZEModuleDescription* ZEPhysXModule::GetModuleDescription()
+{
+	return ZEPhysXModule::ModuleDescription();
+}
+
+ZEModuleDescription* ZEPhysXModule::ModuleDescription()
+{
+	static ZEPhysXModuleDescription Desc;
+	return &Desc;
+}
+
 ZEPhysXModule::ZEPhysXModule()
 {
 	CookingInterface = NULL;
@@ -66,12 +77,6 @@ NxPhysicsSDK* ZEPhysXModule::GetPhysicsSDK()
 NxCookingInterface* ZEPhysXModule::GetCookingInterface()
 {
 	return CookingInterface;
-}
-
-ZEModuleDescription* ZEPhysXModule::GetModuleDescription()
-{
-	static ZEPhysXModuleDescription Desc;
-	return &Desc;
 }
 
 bool ZEPhysXModule::IsEnabled()

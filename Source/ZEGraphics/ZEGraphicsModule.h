@@ -79,6 +79,9 @@ class ZEGraphicsModule : public ZEModule
 
 
 	public:
+		virtual ZEModuleDescription*		GetModuleDescription();
+		static ZEModuleDescription*			ModuleDescription();
+
 		static ZEOptionSection				GraphicsOptions;
 		static void							BaseInitialize();
 		static void							BaseDeinitialize();

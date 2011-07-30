@@ -37,6 +37,8 @@
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEConsole.h"
 #include "ZEOptionManager.h"
+#include "ZEModule.h"
+#include "ZEModuleDescription.h"
 
 ZEOptionSection ZEModuleManager::ModuleManagerOptions;
 
@@ -95,31 +97,12 @@ ZEModuleDescription* ZEModuleManager::GetModuleDescription(const char* Name)
 	return NULL;
 }
 
-ZEModuleDescription* ZEModuleManager::GetModuleDescription(ZEModuleType Type)
+ZEModuleDescription* ZEModuleManager::GetModuleDescription(ZEModuleDescription* BaseModuleDescription)
 {
-	char* ModuleTypeName;
-	switch(Type)
-	{
-		case ZE_MT_GRAPHICS:
-			ModuleTypeName = "GraphicsModule";
-			break;
-		case ZE_MT_INPUT:
-			ModuleTypeName = "InputModule";
-			break;
-		case ZE_MT_SOUND:
-			ModuleTypeName = "SoundModule";
-			break;
-		case ZE_MT_PHYSICS:
-			ModuleTypeName = "PhysicsModule";
-			break;
-		case ZE_MT_NETWORK:
-			ModuleTypeName = "NetworkModule";
-			break;
-		default:
-			return NULL;
-	}
+	if (BaseModuleDescription->GetBaseModuleDescription() != ZEModule::ModuleDescription())
+		return NULL;
 
-	return GetModuleDescription(ModuleManagerOptions.GetOption(ModuleTypeName)->GetValue());
+	return GetModuleDescription(ModuleManagerOptions.GetOption(BaseModuleDescription->GetName())->GetValue());
 }
 
 ZEModule* ZEModuleManager::CreateModule(size_t Index)
@@ -170,9 +153,9 @@ ZEModule* ZEModuleManager::CreateModule(const char* Name)
 }
 
 
-ZEModule* ZEModuleManager::CreateModule(ZEModuleType ModuleType)
+ZEModule* ZEModuleManager::CreateModule(ZEModuleDescription* BaseModuleDescription)
 {
-	ZEModuleDescription* ModuleDesc = GetModuleDescription(ModuleType);
+	ZEModuleDescription* ModuleDesc = GetModuleDescription(BaseModuleDescription);
 	if (ModuleDesc == NULL)
 	{
 		zeError("Module Manager", "Can not find module. Please check your options.ini.");

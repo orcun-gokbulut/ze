@@ -36,9 +36,9 @@
 #include "ZEDummyInputModuleDescription.h"
 #include "ZEDummyInputModule.h"
 
-ZEModuleType ZEDummyInputModuleDescription::GetType()
+ZEModuleDescription* ZEDummyInputModuleDescription::GetBaseModuleDescription()
 {
-	return ZE_MT_INPUT;
+	return ZEInputModule::ModuleDescription();
 }
 
 ZEModuleAttribute ZEDummyInputModuleDescription::GetAttributes()

@@ -124,6 +124,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		ZEChunkArray<ZED3D9PostProcessor*, 50>			PostProcessors;
 		ZEChunkArray<ZED3D9VertexDeclaration*, 50>		VertexDeclaration;
 		
+		static ZEModuleDescription*						ModuleDescription();
 		ZEModuleDescription*							GetModuleDescription();
 
 		LPDIRECT3D9										GetDirect3D();

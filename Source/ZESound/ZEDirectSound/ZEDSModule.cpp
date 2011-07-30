@@ -111,10 +111,15 @@ ZEDSModule::~ZEDSModule()
 {
 }
 
-ZEModuleDescription* ZEDSModule::GetModuleDescription()
+ZEModuleDescription* ZEDSModule::ModuleDescription()
 {
 	static ZEDSModuleDescription Desc;
 	return &Desc;
+}
+
+ZEModuleDescription* ZEDSModule::GetModuleDescription()
+{
+	return ZEDSModule::ModuleDescription();
 }
 
 LPDIRECTSOUND8 ZEDSModule::GetDevice()

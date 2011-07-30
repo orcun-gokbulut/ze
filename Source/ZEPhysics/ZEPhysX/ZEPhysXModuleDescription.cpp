@@ -36,9 +36,9 @@
 #include "ZEPhysXModuleDescription.h"
 #include "ZEPhysXModule.h"
 
-ZEModuleType ZEPhysXModuleDescription::GetType()
+ZEModuleDescription* ZEPhysXModuleDescription::GetBaseModuleDescription()
 {
-	return ZE_MT_PHYSICS;
+	return ZEPhysicsModule::ModuleDescription();
 }
 
 ZEModuleAttribute ZEPhysXModuleDescription::GetAttributes()

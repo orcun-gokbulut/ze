@@ -37,6 +37,7 @@
 #include "ZECore.h"
 #include "ZEError.h"
 #include "ZEModule.h"
+#include "ZEModuleDescription.h"
 #include "ZEModuleManager.h"
 #include "ZEConsole.h"
 #include "ZEConsoleWindow.h"
@@ -101,7 +102,7 @@ bool ZECore::SetGraphicsModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetModuleDescription()->GetType() != ZE_MT_GRAPHICS)
+		if (Module->GetModuleDescription()->GetBaseModuleDescription() != ZEGraphicsModule::ModuleDescription())
 		{
 			zeError("Core", "Module type mismatch. This module is not a sound module. (Module Name : \"%s\")", Module->GetModuleDescription()->GetName());
 			return false;
@@ -123,7 +124,7 @@ bool ZECore::SetSoundModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetModuleDescription()->GetType() != ZE_MT_SOUND)
+		if (Module->GetModuleDescription()->GetBaseModuleDescription() != ZESoundModule::ModuleDescription())
 		{
 			zeError("Core", "Module type mismatch. This module is not a sound module. (Module Name : \"%s\")", Module->GetModuleDescription()->GetName());
 			return false;
@@ -145,7 +146,7 @@ bool ZECore::SetInputModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetModuleDescription()->GetType() != ZE_MT_INPUT)
+		if (Module->GetModuleDescription()->GetBaseModuleDescription() != ZEInputModule::ModuleDescription())
 		{
 			zeError("Core", "Module type mismatch. This module is not a sound module. (Module Name : \"%s\")", Module->GetModuleDescription()->GetName());
 			return false;
@@ -168,7 +169,7 @@ bool ZECore::SetPhysicsModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetModuleDescription()->GetType() != ZE_MT_PHYSICS)
+		if (Module->GetModuleDescription()->GetBaseModuleDescription() != ZEPhysicsModule::ModuleDescription())
 		{
 			zeError("Core", "Module type mismatch. This module is not a sound module. (Module Name : \"%s\")", Module->GetModuleDescription()->GetName());
 			return false;
@@ -381,6 +382,20 @@ void ZECore::DeInitializeModule(ZEModule** Module)
 
 bool ZECore::InitializeModules()
 {
+	zeLog("Core", "Initializing modules.");
+
+	if (Graphics == NULL)
+		zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZEGraphicsModule::ModuleDescription()));
+	
+	if (Sound == NULL)
+		zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModule(ZESoundModule::ModuleDescription()));
+
+	if (Input == NULL)
+		zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModule(ZEInputModule::ModuleDescription()));
+
+	if (Physics == NULL)
+		zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModule(ZEPhysicsModule::ModuleDescription()));
+
 	// Graphics module !
 	zeLog("Core", "Initializing graphics module.");	
 	if (!InitializeModule(Graphics))
@@ -414,6 +429,9 @@ bool ZECore::InitializeModules()
 	}
 
 	QueryPerformanceFrequency(&PerformanceCounterFreq);
+
+	zeLog("Core", "Modules initialized.");
+
 	return true;
 }
 

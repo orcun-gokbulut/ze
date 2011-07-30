@@ -37,12 +37,12 @@
 #ifndef	__ZE_DUMMY_INPUT_MODULE_DESCRIPTION_H__
 #define __ZE_DUMMY_INPUT_MODULE_DESCRIPTION_H__
 
-#include "ZECore\ZEModule.h"
+#include "ZECore\ZEModuleDescription.h"
 
 class ZEDummyInputModuleDescription : public ZEModuleDescription
 {
 	public:
-		virtual ZEModuleType			GetType();
+		virtual ZEModuleDescription*	GetBaseModuleDescription();
 		virtual ZEModuleAttribute		GetAttributes();
 		virtual int						GetRequiredZinekEngineVersion();
 		virtual int						GetMajorVersion();

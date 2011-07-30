@@ -36,9 +36,9 @@
 #include "ZEDirectInputModuleDescription.h"
 #include "ZEDirectInputModule.h"
 
-ZEModuleType ZEDirectInputModuleDescription::GetType()
+ZEModuleDescription* ZEDirectInputModuleDescription::GetBaseModuleDescription()
 {
-	return ZE_MT_INPUT;
+	return ZEInputModule::ModuleDescription();
 }
 
 ZEModuleAttribute ZEDirectInputModuleDescription::GetAttributes()

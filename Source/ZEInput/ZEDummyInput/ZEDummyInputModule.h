@@ -48,6 +48,7 @@ class ZEDummyInputModule: public ZEInputModule
 
 	public:
 		virtual ZEModuleDescription*	GetModuleDescription();
+		static ZEModuleDescription*		ModuleDescription();
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();

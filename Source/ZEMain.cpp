@@ -151,10 +151,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();
-	zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_GRAPHICS));
-	zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_SOUND));
-	zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_INPUT));
-	zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_PHYSICS));
 	ZEConsoleWindow ConsoleWindow;
 	zeCore->GetConsole()->SetConsoleInterface(&ConsoleWindow);
 	zeCore->GetWindow()->SetWindowType(zeCore->GetOptions()->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean() ? ZE_WT_FULLSCREEN : ZE_WT_RESIZABLE);

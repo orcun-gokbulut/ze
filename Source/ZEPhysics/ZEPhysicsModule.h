@@ -57,12 +57,15 @@ class ZEPhysicalMaterial;
 class ZEPhysicsModule : public ZEModule
 {
 	public:
+		virtual ZEModuleDescription*			GetModuleDescription();
+		static ZEModuleDescription*				ModuleDescription();
+
 		virtual ZEPhysicalWorld*				CreatePhysicalWorld() = 0;
 
 		virtual ZEPhysicalRigidBody*			CreatePhysicalRigidBody() = 0;
 		virtual ZEPhysicalSoftBody*				CreatePhysicalSoftBody() = 0;
 		virtual ZEPhysicalCloth*				CreatePhysicalCloth() = 0;
-		virtual ZEPhysicalMesh*			CreatePhysicalStaticMesh() = 0;
+		virtual ZEPhysicalMesh*					CreatePhysicalStaticMesh() = 0;
 		virtual ZEPhysicalStaticHeightField*	CreatePhysicalStaticHeightField() = 0;
 
 		virtual ZEPhysicalForceField*			CreatePhysicalForceField() = 0;

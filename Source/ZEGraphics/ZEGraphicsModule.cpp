@@ -35,6 +35,7 @@
 
 #pragma once
 #include "ZEGraphicsModule.h"
+#include "ZEGraphicsModuleDescription.h"
 #include "ZECore\ZEOptionManager.h"
 #include "ZECore\ZECore.h"
 
@@ -42,6 +43,17 @@
 #include <freeimage.h>
 
 ZEOptionSection ZEGraphicsModule::GraphicsOptions;
+
+ZEModuleDescription* ZEGraphicsModule::ModuleDescription()
+{
+	static ZEGraphicsModuleDescription Desc;
+	return &Desc;
+}
+
+ZEModuleDescription* ZEGraphicsModule::GetModuleDescription()
+{
+	return ZEGraphicsModule::GetModuleDescription();
+}
 
 size_t ZEGraphicsModule::GetCurrentFrameId()
 {

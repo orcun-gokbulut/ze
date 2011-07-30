@@ -37,13 +37,13 @@
 #ifndef __ZE_DS_MODULE_DESCRIPTION_H__
 #define __ZE_DS_MODULE_DESCRIPTION_H__
 
-#include "ZECore\ZEModule.h"
+#include "ZECore\ZEModuleDescription.h"
 
 class ZEOptionSection;
 class ZEDSModuleDescription : public ZEModuleDescription
 {
 	public:
-		virtual ZEModuleType			GetType();
+		virtual ZEModuleDescription*	GetBaseModuleDescription();
 		virtual ZEModuleAttribute		GetAttributes();
 		virtual int						GetRequiredZinekEngineVersion();
 		virtual int						GetMajorVersion();
@@ -57,6 +57,3 @@ class ZEDSModuleDescription : public ZEModuleDescription
 };
 
 #endif
-
-
-

@@ -38,9 +38,10 @@
 #include <d3dx9.h>
 
 #define NULL 0
-ZEModuleType ZED3D9ModuleDescription::GetType()
+
+ZEModuleDescription* ZED3D9ModuleDescription::GetBaseModuleDescription()
 {
-	return ZE_MT_GRAPHICS;
+	return ZEGraphicsModule::ModuleDescription();
 }
 
 ZEModuleAttribute ZED3D9ModuleDescription::GetAttributes()

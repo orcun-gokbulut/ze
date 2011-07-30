@@ -187,7 +187,3 @@ ZEVirtualInputModule::ZEVirtualInputModule()
 {
 	VirtualInputEventCount = 0;
 }
-
-
-
-

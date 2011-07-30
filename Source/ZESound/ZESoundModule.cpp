@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESoundModule.h"
+#include "ZESoundModuleDescription.h"
 #include "ZESoundResourceMP3.h"
 #include "ZESoundSource.h"
 #include "ZECore\ZECore.h"
@@ -71,6 +72,17 @@ void ZESoundModule::BaseDeinitialize()
 {
 	ZESoundResourceMP3::BaseDeinitialize();
 	ZEOptionManager::GetInstance()->UnregisterSection(&SoundOptions);
+}
+
+ZEModuleDescription* ZESoundModule::GetModuleDescription()
+{
+	return ZESoundModule::ModuleDescription();
+}
+
+ZEModuleDescription* ZESoundModule::ModuleDescription()
+{
+	static ZESoundModuleDescription Desc;
+	return &Desc;
 }
 
 void ZESoundModule::OptionsChanged()

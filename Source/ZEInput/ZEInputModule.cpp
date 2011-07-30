@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInputModule.h"
+#include "ZEInputModuleDescription.h"
 #include "ZECore\ZECore.h"
 
 void ZEInputModule::BaseInitialize()
@@ -42,6 +43,17 @@ void ZEInputModule::BaseInitialize()
 
 void ZEInputModule::BaseDeinitialize()
 {
+}
+
+ZEModuleDescription* ZEInputModule::GetModuleDescription()
+{
+	return ZEInputModule::ModuleDescription();
+}
+
+ZEModuleDescription* ZEInputModule::ModuleDescription()
+{
+	static ZEInputModuleDescription Desc;
+	return &Desc;
 }
 
 ZEInputModule* ZEInputModule::GetInstance()

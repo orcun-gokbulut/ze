@@ -39,26 +39,11 @@
 
 #include "ZECore\ZEModule.h"
 
-class ZEDebugModuleDescription : public ZEModuleDescription
-{
-	public:
-		virtual ZEModuleAttribute		GetAttributes();
-		virtual ZEModuleType			GetType();
-		virtual int						GetRequiredZinekEngineVersion();
-		virtual int						GetMajorVersion();
-		virtual int						GetMinorVersion();
-		virtual const char*				GetCopyright();
-		virtual const char*				GetName();
-
-		virtual ZEOptionSection*		GetOptions();
-		virtual	ZEModule*				CreateModuleInstance();
-		virtual	bool					CheckCompatible();
-};
-
 class ZEDebugModule : public ZEModule
 {
 	public:
 		virtual ZEModuleDescription*	GetModuleDescription();
+		static ZEModuleDescription*		ModuleDescription();
 
 		virtual	bool					IsEnabled();
 		virtual void					SetEnabled(bool Enabled);
@@ -79,8 +64,3 @@ class ZEDebugModule : public ZEModule
 };
 
 #endif
-
-
-
-
-

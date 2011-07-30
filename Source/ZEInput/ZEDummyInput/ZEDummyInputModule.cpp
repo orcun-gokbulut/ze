@@ -50,6 +50,11 @@ void ZEDummyInputModule::SetEnabled(bool Enabled)
 
 ZEModuleDescription* ZEDummyInputModule::GetModuleDescription()
 {
+	return ZEDummyInputModule::ModuleDescription();
+}
+
+ZEModuleDescription* ZEDummyInputModule::ModuleDescription()
+{
 	static ZEDummyInputModuleDescription Desc;
 	return &Desc;
 }

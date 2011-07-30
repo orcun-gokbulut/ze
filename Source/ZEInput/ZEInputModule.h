@@ -71,18 +71,21 @@ struct ZEInputKeyState
 class ZEInputModule : public ZEModule 
 {	
 	public:
-		static void					BaseInitialize();
-		static void					BaseDeinitialize();
+		static void						BaseInitialize();
+		static void						BaseDeinitialize();
 
-		virtual void				ProcessInputs() = 0;
-		virtual void				ProcessInputMap(ZEInputMap* InputMap) = 0;
+		virtual ZEModuleDescription*	GetModuleDescription();
+		static ZEModuleDescription*		ModuleDescription();
 
-		virtual bool				GetRawInputEvent(ZEInputEvent& InputEvent) = 0;
+		virtual void					ProcessInputs() = 0;
+		virtual void					ProcessInputMap(ZEInputMap* InputMap) = 0;
+
+		virtual bool					GetRawInputEvent(ZEInputEvent& InputEvent) = 0;
 		
-		virtual void				Acquire() = 0;
-		virtual void				UnAcquire() = 0;
+		virtual void					Acquire() = 0;
+		virtual void					UnAcquire() = 0;
 
-		static ZEInputModule*		GetInstance();
+		static ZEInputModule*			GetInstance();
 };
 #endif
    

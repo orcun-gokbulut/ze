@@ -167,9 +167,21 @@ ZEInputEvent::ZEInputEvent(ZEInputDeviceType DeviceType, ZEDWORD DeviceIndex, un
 	this->AxisSign = AxisSign;
 }
 
-ZEInputEvent::ZEInputEvent(ZEInputDeviceType Device, ZEInputType Type)
+ZEInputEvent::ZEInputEvent(ZEInputDeviceType DeviceType, ZEDWORD DeviceIndex, ZEInputType InputType, unsigned int InputId)
 {
-	this->InputType = Type;
+	this->InputType = InputType;
+	this->DeviceIndex = DeviceIndex;
+	this->DeviceType = DeviceType;
+
+	if (InputType == ZE_IT_QUATERNION)
+		this->OrientationId = InputId;
+	else if (InputType == ZE_IT_VECTOR3)
+		this->VectorId = InputId;
+	else
+		this->InputType = ZE_IT_NONE;
+	
+
+	
 }
 
 size_t ZEInputMap::GetInputActionCount()

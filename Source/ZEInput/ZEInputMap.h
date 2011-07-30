@@ -56,6 +56,7 @@ enum ZEInputAxisSign
 
 enum ZEInputType
 {
+	ZE_IT_NONE,
 	ZE_IT_AXIS, 
 	ZE_IT_BUTTON,
 	ZE_IT_VECTOR2,
@@ -72,6 +73,68 @@ enum ZEInputDeviceType
 	ZE_IDT_JOYSTICK,
 	ZE_IDT_OTHER
 };
+/*
+struct ZEInput
+{
+	unsigned int			InputId;
+
+	const char*				Name[50];
+	const char*				Code[50];
+
+	union
+	{
+		struct 
+		{
+			float			LimitMinimum;
+			float			LimitMaximum;
+		} Axis;
+
+		struct 
+		{
+
+		} Button;
+
+		struct 
+		{
+
+		} Orientation;
+
+		struct 
+		{
+			unsigned int	VectorDimensions;
+			ZEVector4		LimitMinimum;
+			ZEVector4		LimitMaximum;
+		} Vector;
+	};
+};
+
+class ZEInputDevice
+{
+	public:
+		unsigned int				GetDeviceId();
+		const char*					GetDeviceName();
+
+		const ZEArray<ZEInput>&		GetInputs();
+};
+
+class ZEExtension
+{
+	virtual ZEModuleDescription*		GetOwnerModuleDescription();
+	virtual ZEExtensionDescription*		GetExtensionDescription()
+
+	virtual const char*					GetExtensionName();
+
+};
+
+class ZEInputExtension
+{
+	const char*						GetExtensionName();
+
+	ZEArray<ZEInputDevice>&			GetInputDevices();
+	Z
+
+
+};*/
 
 class ZEInputEvent
 {
@@ -91,7 +154,10 @@ class ZEInputEvent
 			{
 				unsigned char		AxisId;
 				ZEInputAxisSign		AxisSign;
-			};		
+			};	
+
+			unsigned char			VectorId;
+			unsigned char			OrientationId;
 		};
 
 		void						GetEventName(char* Buffer, size_t MaxSize);
@@ -110,7 +176,9 @@ class ZEInputEvent
 										ZEInputAxisSign AxisSign);
 
 									ZEInputEvent(ZEInputDeviceType Device,
-										ZEInputType Type);
+										ZEDWORD DeviceIndex, 
+										ZEInputType Type,
+										unsigned int InputId);
 
 };
 

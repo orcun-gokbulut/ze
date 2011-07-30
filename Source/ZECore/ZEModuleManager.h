@@ -39,8 +39,9 @@
 
 #include "ZEDS\ZEArray.h"
 #include "ZEOptionSection.h"
-#include "ZEModule.h"
 
+class ZEModule;
+class ZEModuleDescription;
 class ZEModuleManager
 {
 	private:
@@ -53,11 +54,11 @@ class ZEModuleManager
 		size_t							GetModuleCount();
 		ZEModuleDescription*			GetModuleDescription(size_t Index);
 		ZEModuleDescription*			GetModuleDescription(const char* Name);
-		ZEModuleDescription*			GetModuleDescription(ZEModuleType ModuleType);
+		ZEModuleDescription*			GetModuleDescription(ZEModuleDescription* BaseModuleDescription);
 
 		ZEModule*						CreateModule(size_t Index);
 		ZEModule*						CreateModule(const char* Name);
-		ZEModule*						CreateModule(ZEModuleType ModuleType);
+		ZEModule*						CreateModule(ZEModuleDescription* BaseModuleDescription);
 
 		bool							LoadInternalModule(ZEModuleDescription* ModuleDesc);		
 		bool							LoadExternalModule(const char* FileName);

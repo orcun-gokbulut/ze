@@ -65,6 +65,7 @@ class ZEPhysXModule : public ZEPhysicsModule
 		NxCookingInterface*						GetCookingInterface();
 
 		virtual ZEModuleDescription*			GetModuleDescription();
+		static ZEModuleDescription*				ModuleDescription();
 
 		virtual bool							IsEnabled();
 		virtual void							SetEnabled(bool Enabled);

@@ -86,7 +86,8 @@ class ZEDSModule : public ZESoundModule
 		virtual								~ZEDSModule();
 
 	public:
-		ZEModuleDescription*				GetModuleDescription();		
+		virtual ZEModuleDescription*		GetModuleDescription();		
+		static ZEModuleDescription*		    ModuleDescription();		
 
 		LPDIRECTSOUND8						GetDevice();
 		LPDIRECTSOUND3DLISTENER8			GetListener();

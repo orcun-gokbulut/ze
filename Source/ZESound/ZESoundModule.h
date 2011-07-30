@@ -79,43 +79,46 @@ struct ZESoundDevice
 class ZESoundModule : public ZEModule
 {
 	protected:
-		static ZEOptionSection		SoundOptions;
+		static ZEOptionSection			SoundOptions;
 
 	public:
-		static void					BaseInitialize();
-		static void					BaseDeinitialize();
+		static void						BaseInitialize();
+		static void						BaseDeinitialize();
+
+		virtual ZEModuleDescription*	GetModuleDescription();
+		static ZEModuleDescription*		ModuleDescription();
 
 		virtual const ZEArray<ZESoundDevice>&	GetDeviceList() = 0;
 
-		virtual void				SetSpeakerLayout(ZESpeakerLayout Layout) = 0;
-		virtual ZESpeakerLayout		GetSpeakerLayout() = 0;
+		virtual void					SetSpeakerLayout(ZESpeakerLayout Layout) = 0;
+		virtual ZESpeakerLayout			GetSpeakerLayout() = 0;
 
-		virtual void				SetMasterVolume(unsigned int Volume) = 0;
-		virtual unsigned int 		GetMasterVolume() = 0;
+		virtual void					SetMasterVolume(unsigned int Volume) = 0;
+		virtual unsigned int 			GetMasterVolume() = 0;
 
-		virtual void				ProcessSound(float ElapsedTime) = 0;
+		virtual void					ProcessSound(float ElapsedTime) = 0;
 
-		virtual void				PlaySound(ZESoundResource* SoundResource) = 0;
+		virtual void					PlaySound(ZESoundResource* SoundResource) = 0;
 
-		virtual void				SetStreamingDisabled(bool Disabled) = 0;
-		virtual bool				GetStreamingDisabled() = 0;
+		virtual void					SetStreamingDisabled(bool Disabled) = 0;
+		virtual bool					GetStreamingDisabled() = 0;
 
-		virtual void				SetMaxBufferSize(size_t BufferSize) = 0; 
-		virtual size_t				GetMaxBufferSize() = 0;
+		virtual void					SetMaxBufferSize(size_t BufferSize) = 0; 
+		virtual size_t					GetMaxBufferSize() = 0;
 
-		virtual void				SetTypeVolume(ZESoundSourceType Type, unsigned int Volume) = 0;
-		virtual unsigned int		GetTypeVolume(ZESoundSourceType Type) = 0;
+		virtual void					SetTypeVolume(ZESoundSourceType Type, unsigned int Volume) = 0;
+		virtual unsigned int			GetTypeVolume(ZESoundSourceType Type) = 0;
 
-		virtual	void				SetActiveListener(ZEListener* NewListener) = 0;
-		virtual ZEListener*			GetActiveListener() = 0;
+		virtual	void					SetActiveListener(ZEListener* NewListener) = 0;
+		virtual ZEListener*				GetActiveListener() = 0;
 
-		virtual void				OptionsChanged();
+		virtual void					OptionsChanged();
 
-		virtual ZESoundSource*		CreateSoundSource() = 0;
-		virtual ZESoundSource3D*	CreateSoundSource3D() = 0;
-		virtual ZEListener*			CreateListener() = 0;
+		virtual ZESoundSource*			CreateSoundSource() = 0;
+		virtual ZESoundSource3D*		CreateSoundSource3D() = 0;
+		virtual ZEListener*				CreateListener() = 0;
 
-		static ZESoundModule*		GetInstance();
+		static ZESoundModule*			GetInstance();
 };
 
 #endif

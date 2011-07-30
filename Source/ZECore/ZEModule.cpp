@@ -34,6 +34,80 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModule.h"
+#include "ZEModuleDescription.h"
+
+class ZEBaseModuleDescription : public ZEModuleDescription
+{
+	public:
+		virtual ZEModuleDescription*	GetBaseModuleDescription();
+		virtual ZEModuleAttribute		GetAttributes();
+		virtual int						GetRequiredZinekEngineVersion();
+		virtual int						GetMajorVersion();
+		virtual int						GetMinorVersion();
+		virtual const char*				GetCopyright();
+		virtual const char*				GetName();
+
+		virtual ZEOptionSection*		GetOptions();
+		virtual	ZEModule*				CreateModuleInstance();
+		virtual	bool					CheckCompatible();
+};
+
+
+ZEModuleDescription* ZEBaseModuleDescription::GetBaseModuleDescription()
+{
+	return 0;
+}
+
+ZEModuleAttribute ZEBaseModuleDescription::GetAttributes()
+{
+	return 0;
+}
+
+int ZEBaseModuleDescription::GetRequiredZinekEngineVersion()
+{
+	return 0;
+}
+
+int ZEBaseModuleDescription::GetMajorVersion()
+{
+	return 1;
+}
+
+int ZEBaseModuleDescription::GetMinorVersion()
+{
+	return 0;
+}
+
+const char* ZEBaseModuleDescription::GetCopyright()
+{
+	return "Copyright (c) 2011, Zinek Code House.";
+}
+
+const char* ZEBaseModuleDescription::GetName()
+{
+	return "Base Module";
+}
+
+ZEOptionSection* ZEBaseModuleDescription::GetOptions()
+{
+	return 0;
+}
+
+ZEModule* ZEBaseModuleDescription::CreateModuleInstance()
+{
+	return 0;
+}
+
+bool ZEBaseModuleDescription::CheckCompatible()
+{
+	return false;
+}
+
+ZEModuleDescription* ZEModule::ModuleDescription()
+{
+	static ZEBaseModuleDescription Desc;
+	return &Desc;
+}
 
 ZEModule::ZEModule()
 {
@@ -48,8 +122,3 @@ void ZEModule::Destroy()
 	this->Deinitialize();
 	delete this;
 }
-
-
-
-
-
