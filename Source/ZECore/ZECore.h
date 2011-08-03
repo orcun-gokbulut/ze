@@ -75,7 +75,7 @@ class ZEPhysicsModule;
 class ZEGame;
 class ZEModule;
 class ZENetworkModule;
-class ZEDebugModule;
+class ZEApplicationModule;
 
 class ZECore
 {
@@ -90,6 +90,8 @@ class ZECore
 		char							ResourceDirectory;
 
 		ZEModuleManager*				ModuleManager;
+
+		ZEApplicationModule*			Application;
 		ZEError*						Error;
 		ZEOptionManager*				Options;
 		ZEResourceManager*				Resources;
@@ -103,7 +105,6 @@ class ZECore
 		ZEGame*							Game;
 		ZENetworkModule*				Network;
 
-		ZEDebugModule*					DebugComponent;
 
 		bool							InitializeModule(ZEModule* Module);
 		void							DeInitializeModule(ZEModule** Module);
@@ -143,8 +144,8 @@ class ZECore
 		bool							SetGame(ZEGame* Game);
 		ZEGame*							GetGame();
 
-		void							SetDebugComponent(ZEDebugModule* Component);
-		ZEDebugModule*					GetDebugComponent();
+		void							SetApplicationModule(ZEApplicationModule* Module);
+		ZEApplicationModule*			GetApplicationModule();
 
 		float							GetFrameTime();
 		float							GetRuningTime();

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDebugModule.cpp
+ Zinek Engine - ZEApplicationModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,67 +33,67 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDebugModule.h"
-#include "ZEDebugModuleDescription.h"
+#include "ZEApplicationModule.h"
+#include "ZEApplicationModuleDescription.h"
 
-ZEModuleDescription* ZEDebugModule::GetModuleDescription()
+ZEModuleDescription* ZEApplicationModule::GetModuleDescription()
 {
-	return ZEDebugModule::ModuleDescription();
+	return ZEApplicationModule::ModuleDescription();
 }
 
-ZEModuleDescription* ZEDebugModule::ModuleDescription()
+ZEModuleDescription* ZEApplicationModule::ModuleDescription()
 {
-	static ZEDebugModuleDescription Desc;
+	static ZEApplicationModuleDescription Desc;
 	return &Desc;
 }
 
-bool ZEDebugModule::IsEnabled()
+bool ZEApplicationModule::IsEnabled()
 {
 	return true;
 }
 
-void ZEDebugModule::SetEnabled(bool Enabled)
+void ZEApplicationModule::SetEnabled(bool Enabled)
 {
 	
 }
 
-bool ZEDebugModule::Initialize()
+bool ZEApplicationModule::Initialize()
 {
 	return true;
 }
 
-void ZEDebugModule::Deinitialize()
+void ZEApplicationModule::Deinitialize()
 {
 }
 
-void ZEDebugModule::Destroy()
+void ZEApplicationModule::Destroy()
 {
 }
 
-void ZEDebugModule::PreProcess()
+void ZEApplicationModule::PreProcess()
 {
 }
 
-void ZEDebugModule::Process(float ElapsedTime)
+void ZEApplicationModule::Process(float ElapsedTime)
 {
 }
 
-void ZEDebugModule::PostProcess()
+void ZEApplicationModule::PostProcess()
 {
 }
 
-void ZEDebugModule::StartUp()
+void ZEApplicationModule::StartUp()
 {
 }
 
-void ZEDebugModule::ShutDown()
+void ZEApplicationModule::ShutDown()
 {
 }
 
-void ZEDebugModule::Tick(float ElapsedTime)
+void ZEApplicationModule::Tick(float ElapsedTime)
 {
 }
 
-void ZEDebugModule::Render(float ElapsedTime)
+void ZEApplicationModule::Render(float ElapsedTime)
 {
 }

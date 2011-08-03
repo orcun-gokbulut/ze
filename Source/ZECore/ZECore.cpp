@@ -48,7 +48,7 @@
 #include "ZEPhysics\ZEPhysicsModule.h"
 #include "ZESound\ZESoundModule.h"
 #include "ZEGame\ZEGame.h"
-#include "ZEDebugModule.h"
+#include "ZEApplicationModule.h"
 #include "ZEOptionManager.h"
 #include "ZECommandManager.h"
 
@@ -220,14 +220,14 @@ ZEGame* ZECore::GetGame()
 	return Game;
 }
 
-void ZECore::SetDebugComponent(ZEDebugModule* Component)
+void ZECore::SetApplicationModule(ZEApplicationModule* Component)
 {
-	DebugComponent = Component;
+	Application = Component;
 }
 
-ZEDebugModule* ZECore::GetDebugComponent()
+ZEApplicationModule* ZECore::GetApplicationModule()
 {
-	return DebugComponent;
+	return Application;
 }
 
 size_t ZECore::GetFrameId()
@@ -498,8 +498,8 @@ bool ZECore::StartUp(void* WindowHandle)
 	QueryPerformanceFrequency(&PerformanceCounterFreq);
 	zeLog("Core", "Core initialized.");
 
-	if (DebugComponent != NULL)
-		DebugComponent->StartUp();
+	if (Application != NULL)
+		Application->StartUp();
 
 	return true;
 }
@@ -509,8 +509,8 @@ void ZECore::ShutDown()
 	zeLog("Core", "Deinitializing Core.");
 	SetCoreState(ZE_CS_SHUTDOWN);
 
-	if (DebugComponent != NULL)
-		DebugComponent->ShutDown();
+	if (Application != NULL)
+		Application->ShutDown();
 
 	// Destroy game
 	zeLog("Core", "Deinitializing Running Games.");
@@ -564,8 +564,8 @@ void ZECore::ShutDown()
 #include "ZEPhysics\ZEPhysicalWorld.h"
 void ZECore::MainLoop()
 {
-	if (DebugComponent != NULL)
-		DebugComponent->PreProcess();
+	if (Application != NULL)
+		Application->PreProcess();
 
 	FrameId++;
 
@@ -590,8 +590,8 @@ void ZECore::MainLoop()
 	if (Game != NULL)
 		Game->Tick(FrameTime);
 	
-	if (DebugComponent != NULL)
-		DebugComponent->Process(FrameTime);
+	if (Application != NULL)
+		Application->Process(FrameTime);
 	Game->GetScene()->GetPhysicalWorld()->Draw(Game->GetScene()->GetRenderer());
 
 	// Engine Logic
@@ -603,22 +603,22 @@ void ZECore::MainLoop()
 	Graphics->UpdateScreen();
 	Physics->UpdateWorlds();
 
-	if (DebugComponent != NULL)
-		DebugComponent->PostProcess();
+	if (Application != NULL)
+		Application->PostProcess();
 }
 
 void ZECore::Run()
 {
 	SetCoreState(ZE_CS_RUNNING);
 	
-	if (DebugComponent != NULL)
-		DebugComponent->Initialize();
+	if (Application != NULL)
+		Application->Initialize();
 
 	while(CoreState != ZE_CS_TERMINATE && CoreState != ZE_CS_SHUTDOWN)
 		MainLoop();
 
-	if (DebugComponent != NULL)
-		DebugComponent->Deinitialize();
+	if (Application != NULL)
+		Application->Deinitialize();
 
 	ShutDown();
 }
@@ -635,7 +635,7 @@ ZECore::ZECore()
 	PerformanceCount.QuadPart = 0;
 	OldPerformanceCount.QuadPart = 0;
 
-	DebugComponent	= NULL;
+	Application	= NULL;
 	Console			= new ZEConsole();
 	Commands		= new ZECommandManager();
 	Options			= new ZEOptionManager();

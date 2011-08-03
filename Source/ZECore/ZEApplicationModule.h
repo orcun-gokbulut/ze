@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDebugModuleDescription.h
+ Zinek Engine - ZEApplicationModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,25 +34,33 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_DEBUG_DESCRIPTION_MODULE_H__
-#define __ZE_DEBUG_DESCRIPTION_MODULE_H__
+#ifndef __ZE_APPLICATION_MODULE_H__
+#define __ZE_APPLICATION_MODULE_H__
 
-#include "ZECore\ZEModuleDescription.h"
+#include "ZECore\ZEModule.h"
 
-class ZEDebugModuleDescription : public ZEModuleDescription
+class ZEApplicationModule : public ZEModule
 {
 	public:
-		virtual ZEModuleDescription*	GetBaseModuleDescription();
-		virtual ZEModuleAttribute		GetAttributes();
-		virtual int						GetRequiredZinekEngineVersion();
-		virtual int						GetMajorVersion();
-		virtual int						GetMinorVersion();
-		virtual const char*				GetCopyright();
-		virtual const char*				GetName();
+		virtual ZEModuleDescription*	GetModuleDescription();
+		static ZEModuleDescription*		ModuleDescription();
 
-		virtual ZEOptionSection*		GetOptions();
-		virtual	ZEModule*				CreateModuleInstance();
-		virtual	bool					CheckCompatible();
+		virtual	bool					IsEnabled();
+		virtual void					SetEnabled(bool Enabled);
+
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
+		virtual void					Destroy();
+		
+		virtual void					PreProcess();
+		virtual void					Process(float ElapsedTime);
+		virtual void					PostProcess();
+		
+		virtual void					StartUp();
+		virtual void					ShutDown();
+
+		virtual void					Tick(float ElapsedTime);
+		virtual void					Render(float ElapsedTime);
 };
 
 #endif

@@ -37,7 +37,7 @@
 #ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
 #define __ZE_GRAPHICS_DEBUG_MODULE_H__
 
-#include "ZECore\ZEDebugModule.h"
+#include "ZECore\ZEApplicationModule.h"
 
 class ZEPlayer;
 class ZEPointLight;
@@ -48,7 +48,7 @@ class ZECanvasBrush;
 class ZEModel;
 class ZEPortalMap;
 
-class ZEGraphicsDebugModule : public ZEDebugModule
+class ZEGraphicsDebugModule : public ZEApplicationModule
 {
 	private:
 		ZEPlayer*				Player;

@@ -71,11 +71,15 @@ enum ZEInputDeviceType
 	ZE_IDT_MOUSE,
 	ZE_IDT_KEYBOARD,
 	ZE_IDT_JOYSTICK,
+	ZE_IDT_SENSOR,
 	ZE_IDT_OTHER
 };
-/*
-struct ZEInput
+
+class ZEInputDevice;
+
+struct ZEInputDescription
 {
+	ZEInputDevice*			OwnerDevice;
 	unsigned int			InputId;
 
 	const char*				Name[50];
@@ -91,50 +95,21 @@ struct ZEInput
 
 		struct 
 		{
-
 		} Button;
 
 		struct 
 		{
-
 		} Orientation;
-
-		struct 
-		{
-			unsigned int	VectorDimensions;
-			ZEVector4		LimitMinimum;
-			ZEVector4		LimitMaximum;
-		} Vector;
 	};
+
+	struct 
+	{
+		unsigned int	VectorDimensions;
+		ZEVector4		LimitMinimum;
+		ZEVector4		LimitMaximum;
+	} Vector;
 };
 
-class ZEInputDevice
-{
-	public:
-		unsigned int				GetDeviceId();
-		const char*					GetDeviceName();
-
-		const ZEArray<ZEInput>&		GetInputs();
-};
-
-class ZEExtension
-{
-	virtual ZEModuleDescription*		GetOwnerModuleDescription();
-	virtual ZEExtensionDescription*		GetExtensionDescription()
-
-	virtual const char*					GetExtensionName();
-
-};
-
-class ZEInputExtension
-{
-	const char*						GetExtensionName();
-
-	ZEArray<ZEInputDevice>&			GetInputDevices();
-	Z
-
-
-};*/
 
 class ZEInputEvent
 {
@@ -179,7 +154,6 @@ class ZEInputEvent
 										ZEDWORD DeviceIndex, 
 										ZEInputType Type,
 										unsigned int InputId);
-
 };
 
 class ZEInputBinding
@@ -209,7 +183,6 @@ class ZEInputAction
 		ZEQuaternion				Orientation;
 };
 
-
 class ZEInputMap
 {
 	public:
@@ -229,15 +202,21 @@ class ZEInputMap
 									ZEInputMap();
 };
 
+
+class ZEInputDevice
+{
+	public:
+		unsigned int					GetDeviceId();
+		const char*						GetDeviceName();
+
+		const 
+			ZEArray<ZEInputDescription>&	GetInputDescriptions();
+
+		virtual ZEInputEvent			GetCurrentInputEvents();
+
+		virtual void					ProcessInputBinding(ZEInputBinding* InputBinding);
+		virtual void					ProcessInputMap(ZEInputMap* InputMap);
+		virtual void					ProcessInputs();
+};
+
 #endif
-   
-
-
-
-  
-
-
-
-
-
-

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMetaDebugModule.h
+ Zinek Engine - ZEGUIDebugModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,39 +34,31 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_META_DEBUG_MODULE_H__
-#define __ZE_META_DEBUG_MODULE_H__
+#ifndef __ZE_GUI_DEBUG_MODULE_H__
+#define __ZE_GUI_DEBUG_MODULE_H__
 
-#include "ZECore\ZEApplicationModule.h"
+#include "ZEDebugModule.h"
 
+class ZEDGrid;
 class ZEPlayer;
-class ZECanvasBrush;
-class ZELightBrush;
-class ZEPointLight;
+class ZEScene;
 
-class ZEMetaDebugModule : public ZEApplicationModule
+class ZEGUIDebugModule : public ZEDebugModule
 {
 	private:
 		ZEPlayer*				Player;
-		ZEPointLight*			Light;
-		ZECanvasBrush*			Canvas;
-
-		bool					IfEnteredFlag;
-		float					TotalTime;
+		ZEDGrid*				Grid;
+		ZEScene*				Scene;
 
 	public:
+
 		virtual bool			Initialize();
 		virtual void			Deinitialize();
 
 		virtual void			Process(float ElapsedTime);
 
-								ZEMetaDebugModule();
-		virtual					~ZEMetaDebugModule();
+								ZEGUIDebugModule();
+		virtual					~ZEGUIDebugModule();
 };
 
 #endif
-
-
-
-
-

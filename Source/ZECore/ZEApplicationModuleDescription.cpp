@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDebugModuleDescription.cpp
+ Zinek Engine - ZEApplicationModuleDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,55 +33,55 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDebugModuleDescription.h"
+#include "ZEApplicationModuleDescription.h"
 #include "ZEModule.h"
 
-ZEModuleDescription* ZEDebugModuleDescription::GetBaseModuleDescription()
+ZEModuleDescription* ZEApplicationModuleDescription::GetBaseModuleDescription()
 {
 	return ZEModule::ModuleDescription();
 }
 
-ZEModuleAttribute ZEDebugModuleDescription::GetAttributes()
+ZEModuleAttribute ZEApplicationModuleDescription::GetAttributes()
 {
 	return ZE_MA_NONE;
 }
 
-int ZEDebugModuleDescription::GetRequiredZinekEngineVersion()
+int ZEApplicationModuleDescription::GetRequiredZinekEngineVersion()
 {
 	return 5;
 }
 
-int ZEDebugModuleDescription::GetMajorVersion()
+int ZEApplicationModuleDescription::GetMajorVersion()
 {
 	return 5;
 }
 
-int ZEDebugModuleDescription::GetMinorVersion()
+int ZEApplicationModuleDescription::GetMinorVersion()
 {
 	return 0;
 }
 
-const char* ZEDebugModuleDescription::GetCopyright()
+const char* ZEApplicationModuleDescription::GetCopyright()
 {
 	return "Copyright (C) 2010, Zinek Code House and Game Studio";
 }
 
-const char* ZEDebugModuleDescription::GetName()
+const char* ZEApplicationModuleDescription::GetName()
 {
 	return "Debug Module";
 }
 
-ZEOptionSection* ZEDebugModuleDescription::GetOptions()
+ZEOptionSection* ZEApplicationModuleDescription::GetOptions()
 {
 	return 0;
 }
 
-ZEModule* ZEDebugModuleDescription::CreateModuleInstance()
+ZEModule* ZEApplicationModuleDescription::CreateModuleInstance()
 {
 	return 0;
 }
 
-bool ZEDebugModuleDescription::CheckCompatible()
+bool ZEApplicationModuleDescription::CheckCompatible()
 {
 	return true;
 }
