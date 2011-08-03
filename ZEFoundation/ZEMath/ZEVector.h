@@ -84,11 +84,20 @@ class ZEVector2
 		static float				DistanceSquare(const ZEVector2 &A, const ZEVector2 &B);
 		static void					Normalize(ZEVector2 &Out, const ZEVector2 &A);
 		static void					Lerp(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B, float Factor);	
+		static void					Max(ZEVector2& Out, const ZEVector2& A, const ZEVector2& B);
+		static void					Min(ZEVector2& Out, const ZEVector2& A, const ZEVector2& B);
+		static void					Clamp(ZEVector2& Out, const ZEVector2& Vector, float MinValue, float MaxValue);
+		static void					Saturate(ZEVector2& Out, const ZEVector2& Vector);
 		
 		float						Length() const;
 		float						LengthSquare() const;
 		ZEVector2					Normalize() const;
-		
+		void						NormalizeSelf();
+		ZEVector2					Clamp(float MinValue, float MaxValue) const;
+		void						ClampSelf(float MinValue, float MaxValue);
+		ZEVector2					Saturate() const;
+		void						SaturateSelf();
+
 		ZEVector2					operator +(const ZEVector2 &RightOperand) const;
 		ZEVector2					operator -(const ZEVector2 &RightOperand) const;
 		ZEVector2					operator *(const ZEVector2 &RightOperand) const;
@@ -155,11 +164,20 @@ class ZEVector3
 		static void					Normalize(ZEVector3& Out, const ZEVector3& Vector);	
 		static float				Distance(const ZEVector3& A, const ZEVector3& B);
 		static float				DistanceSquare(const ZEVector3& A, const ZEVector3& B);	
-		static void					Lerp(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B, float Factor);
+		static void					Lerp(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B, float Factor);	
+		static void					Max(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B);
+		static void					Min(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B);
+		static void					Clamp(ZEVector3& Out, const ZEVector3& Vector, float MinValue, float MaxValue);
+		static void					Saturate(ZEVector3& Out, const ZEVector3& Vector);
 
 		float						Length() const;
 		float						LengthSquare() const;
 		ZEVector3					Normalize() const;
+		void						NormalizeSelf();
+		ZEVector3					Clamp(float MinValue, float MaxValue) const;
+		void						ClampSelf(float MinValue, float MaxValue);
+		ZEVector3					Saturate() const;
+		void						SaturateSelf();
 
 		ZEVector3					operator+(const ZEVector3 &RightOperand) const;
 		ZEVector3					operator-(const ZEVector3 &RightOperand) const;
@@ -226,10 +244,19 @@ class ZEVector4
 		static float				Distance(const ZEVector4& A, const ZEVector4& B);
 		static float				DistanceSquare(const ZEVector4& A, const ZEVector4& B);	
 		static void					Lerp(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B, float Factor);
+		static void					Max(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B);
+		static void					Min(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B);
+		static void					Clamp(ZEVector4& Out, const ZEVector4& Vector, float MinValue, float MaxValue);
+		static void					Saturate(ZEVector4& Out, const ZEVector4& Vector);
 
 		float						Length() const;
 		float						LengthSquare() const;
 		ZEVector4					Normalize() const;
+		void						NormalizeSelf();
+		ZEVector4					Clamp(float MinValue, float MaxValue) const;
+		void						ClampSelf(float MinValue, float MaxValue);
+		ZEVector4					Saturate() const;
+		void						SaturateSelf();
 
 		ZEVector4					operator+(const ZEVector4 &RightOperand) const;
 		ZEVector4					operator-(const ZEVector4 &RightOperand) const;
