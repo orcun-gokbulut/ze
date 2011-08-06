@@ -700,6 +700,10 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 		SSAOBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	SSAOBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
 
+	if(SSAAInputBuffer == NULL)
+		SSAAInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	SSAAInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_INT32, true);
+
 	if (ABuffer == NULL)
 		ABuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	ABuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
@@ -713,6 +717,7 @@ void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 	ZED3D_DESTROY(LBuffer1);
 	ZED3D_DESTROY(LBuffer2);
 	ZED3D_DESTROY(SSAOBuffer);
+	ZED3D_DESTROY(SSAAInputBuffer);
 	ZED3D_DESTROY(ABuffer);
 }
 
@@ -725,6 +730,7 @@ ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 	LBuffer2 = NULL;
 	ABuffer = NULL;
 	SSAOBuffer = NULL;
+	SSAAInputBuffer = NULL;
 
 	LightningComponents.LightMeshVB = NULL;
 	LightningComponents.PointLightVS = NULL;
@@ -758,9 +764,12 @@ bool ZED3D9FrameRenderer::Initialize()
 { 
 	InitializeRenderTargets();
 	SSAOProcessor.SetRenderer(this);
-	HDRProcessor.Initialize();
 	SSAOProcessor.Initialize();
-	
+	HDRProcessor.Initialize();
+
+	SSAAProcessor.SetRenderer(this);
+	SSAAProcessor.Initialize();
+
 	InitializeLightning();
 
 	return true; 
@@ -770,6 +779,8 @@ void ZED3D9FrameRenderer::Deinitialize()
 {
 	HDRProcessor.Deinitialize();
 	SSAOProcessor.Deinitialize();
+	SSAAProcessor.Deinitialize();
+	
 	DeinitializeLightning();
 	DeinitializeRenderTargets();
 }
@@ -887,10 +898,20 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DoForwardPass();
 
 		HDRProcessor.SetInput(ABuffer);
-		HDRProcessor.SetOutput(ViewPort);
+		HDRProcessor.SetOutput((ZED3D9ViewPort*)SSAAInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
 
+		
+
 		Do2DPass();
+
+		// Anti aliasing pass
+		SSAAProcessor.SetInputDepth(GBuffer1);
+		SSAAProcessor.SetInputNormal(GBuffer2);
+		SSAAProcessor.SetInputColor(SSAAInputBuffer);
+		SSAAProcessor.SetOutput(ViewPort);
+		SSAAProcessor.Process();
+
 	GetDevice()->EndScene();
 	
 	zeProfilerEnd();

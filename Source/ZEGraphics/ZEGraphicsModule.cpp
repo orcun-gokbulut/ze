@@ -38,6 +38,7 @@
 #include "ZECore\ZEOptionManager.h"
 #include "ZECore\ZEOption.h"
 #include "ZECore\ZECore.h"
+#include "ZERealTimeTextureCompressor.h"
 
 #define FREEIMAGE_LIB
 #include <freeimage.h>
@@ -55,13 +56,13 @@ ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 	static ZETextureOptions UltraLow	= {ZE_TCT_DXT3, ZE_TCQ_LOW,	   ZE_TDS_8X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
 
 	switch(TextureQuality)
-	{	
-		default:
+	{
+		
 		case ZE_TQ_VERY_HIGH:
 			return &VeryHigh;
 			break;
 		
-		
+		default:
 		case ZE_TQ_HIGH:
 			return &High;
 			break;
@@ -95,6 +96,7 @@ size_t ZEGraphicsModule::GetCurrentFrameId()
 void ZEGraphicsModule::BaseInitialize()
 {
 	FreeImage_Initialise();
+	ZERealTimeTextureCompressor::Initialize("bu argumanlar onemli deil", "bu argumanlar onemli deil");
 	GraphicsOptions.SetName("Graphics");
 	GraphicsOptions.AddOption(new ZEOption("ScreenWidth", 640, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ScreenHeight", 480, ZE_OA_NORMAL));
@@ -119,6 +121,7 @@ void ZEGraphicsModule::BaseInitialize()
 void ZEGraphicsModule::BaseDeinitialize()
 {
 	FreeImage_DeInitialise();
+	ZERealTimeTextureCompressor::Deinitialize();
 	ZEOptionManager::GetInstance()->UnregisterSection(&GraphicsOptions);
 }
 

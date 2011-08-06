@@ -42,6 +42,7 @@
 #include "ZEGraphics\ZETextureLoader.h"
 #include "ZEGraphics\ZETextureTools.h"
 #include "ZEGraphics\ZETextureCacheChunkIdentifier.h"
+#include "ZERealTimeTextureCompressor.h"
 #include "ZEDS\ZEFileCache.h"
 
 #include <sys/stat.h>
@@ -396,6 +397,8 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 		}
 	}
 
+	
+
 	void* Buffer = NULL;
 	unsigned int DestinationPitch;
 
@@ -412,7 +415,8 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 		for (size_t I = 0; I < Options.MaximumMipmapLevel - 2; I++)
 		{
 			TextureResource->Texture->Lock(&Buffer, &DestinationPitch, I);
-			ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);		
+			ZETextureTools::CompressTexture(Buffer, DestinationPitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight, &Options);
+			//ZERealTimeTextureCompressor::Compress(Buffer, DestinationPitch, );
 
 
 			if (CacheIt)
@@ -642,6 +646,8 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 	}
 
 	// Little hack here
+	// Get texture info function returns texture's real BPP
+	// Since all textures are loaded as 32bits just set it to 32 bit
 	TextureInfo.BitsPerPixel = 32;
 	TextureInfo.TexturePitch = TextureInfo.TextureWidth * TextureInfo.BitsPerPixel / 8;
 
@@ -887,7 +893,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 
 
 
-
+	zeLog("ZE Texture 2D", "Texture loaded from cache file: \"%s\".", ResourceFile->GetFileName());
 
 
 	PartialResourceFile.Close();
