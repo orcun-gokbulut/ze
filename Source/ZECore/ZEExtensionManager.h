@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModule.cpp
+ Zinek Engine - ZEExtensionManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,36 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModule.h"
+#pragma once
+#ifndef	__ZE_EXTENSION_MANAGER_H__
+#define __ZE_EXTENSION_MANAGER_H__
 
-ZEModuleDescription* ZEModule::ModuleDescription()
-{
-	return 0;
-}
+#include "ZEDS\ZEArray.h"
+#include "ZEOptionSection.h"
 
-ZEModule::ZEModule()
-{
-}
+class ZEExtensionDescription;
+class ZEModuleDescription;
 
-ZEModule::~ZEModule()
+class ZEExtensionManager
 {
-}
+	private:
+		ZEArray<ZEExtensionDescription*>		ExtensionList;
+		static ZEOptionSection					ExtensionManagerOptions;
 
-void ZEModule::Destroy()
-{
-	this->Deinitialize();
-	delete this;
-}
+	public:
+		ZEExtensionDescription*					GetExtensionDescription(const char* Name);
+		const ZEArray<ZEExtensionDescription*>&	GetExtensionDescriptions();
+		ZEArray<ZEExtensionDescription*>		GetExtensionDescriptions(ZEModuleDescription* OwnerModuleDescription);
+
+		bool									RegisterExtension(ZEExtensionDescription* ModuleDesc);
+		void									UnregisterExtension(ZEExtensionDescription* ModuleDesc);
+									
+												ZEExtensionManager();
+												~ZEExtensionManager();
+};
+#endif
+
+
+
+
+

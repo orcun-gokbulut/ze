@@ -51,6 +51,8 @@
 #include "ZEApplicationModule.h"
 #include "ZEOptionManager.h"
 #include "ZECommandManager.h"
+#include "ZEPluginManager.h"
+#include "ZEExtensionManager.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
@@ -96,6 +98,16 @@ ZEWindow* ZECore::GetWindow()
 ZEModuleManager* ZECore::GetModuleManager()
 {
 	return ModuleManager;
+}
+
+ZEExtensionManager* ZECore::GetExtensionManager()
+{
+	return ExtensionManager;
+}
+
+ZEPluginManager* ZECore::GetPluginManager()
+{
+	return PluginManager;
 }
 		
 bool ZECore::SetGraphicsModule(ZEModule* Module)
@@ -385,16 +397,16 @@ bool ZECore::InitializeModules()
 	zeLog("Core", "Initializing modules.");
 
 	if (Graphics == NULL)
-		zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZEGraphicsModule::ModuleDescription()));
+		zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEGraphicsModule::ModuleDescription()));
 	
 	if (Sound == NULL)
-		zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModule(ZESoundModule::ModuleDescription()));
+		zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModuleInstance(ZESoundModule::ModuleDescription()));
 
 	if (Input == NULL)
-		zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModule(ZEInputModule::ModuleDescription()));
+		zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEInputModule::ModuleDescription()));
 
 	if (Physics == NULL)
-		zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModule(ZEPhysicsModule::ModuleDescription()));
+		zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEPhysicsModule::ModuleDescription()));
 
 	// Graphics module !
 	zeLog("Core", "Initializing graphics module.");	
@@ -642,8 +654,11 @@ ZECore::ZECore()
 	Error			= new ZEError();
 	Resources		= new ZEResourceManager();
 	ModuleManager	= new ZEModuleManager();
+	ExtensionManager = new ZEExtensionManager();
+	PluginManager	= new ZEPluginManager();
 	Window			= new ZEWindow();
 	Game			= new ZEGame();
+
 
 	ZEGraphicsModule::BaseInitialize();
 	ZESoundModule::BaseInitialize();
@@ -660,6 +675,8 @@ ZECore::~ZECore()
 
 	delete Game;
 	delete Window;
+	delete PluginManager;
+	delete ExtensionManager;
 	delete ModuleManager;
 	delete Resources;
 	delete Error;

@@ -34,11 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGraphicsModuleDescription.h"
-#include "ZECore/ZEModule.h"
 
 ZEModuleDescription* ZEGraphicsModuleDescription::GetBaseModuleDescription()
 {
-	return ZEModule::ModuleDescription();
+	return 0;
 }
 
 ZEModuleAttribute ZEGraphicsModuleDescription::GetAttributes()

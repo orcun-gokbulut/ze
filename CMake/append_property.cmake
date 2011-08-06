@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEModule.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - append_property.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,26 +30,10 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModule.h"
-
-ZEModuleDescription* ZEModule::ModuleDescription()
-{
-	return 0;
-}
-
-ZEModule::ZEModule()
-{
-}
-
-ZEModule::~ZEModule()
-{
-}
-
-void ZEModule::Destroy()
-{
-	this->Deinitialize();
-	delete this;
-}
+macro(append_property SCOPE PROPERTY_IDEN PROPERTY_NAME)
+	get_property(OLD_VALUES ${SCOPE} PROPERTY ${PROPERTY_NAME})
+	set_property(${SCOPE} PROPERTY ${PROPERTY_NAME} ${OLD_VALUES} ${ARGN})
+endmacro(append_property)

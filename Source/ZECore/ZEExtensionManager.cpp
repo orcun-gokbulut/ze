@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModule.cpp
+ Zinek Engine - ZEExtensionManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,73 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModule.h"
+#include "ZEExtensionManager.h"
+#include "ZECore\ZEError.h"
+#include "ZEOptionManager.h"
+#include "ZEExtensionDescription.h"
+#include "ZEModuleDescription.h"
 
-ZEModuleDescription* ZEModule::ModuleDescription()
+#include <string.h>
+
+ZEOptionSection ZEExtensionManager::ExtensionManagerOptions;
+
+ZEExtensionDescription* ZEExtensionManager::GetExtensionDescription(const char* Name)
 {
-	return 0;
+	for (size_t I = 0; I < ExtensionList.GetCount(); I++)
+		if (_stricmp(ExtensionList[I]->GetName(), Name) == 0)
+			return ExtensionList[I];
+
+	return NULL;
 }
 
-ZEModule::ZEModule()
+const ZEArray<ZEExtensionDescription*>& ZEExtensionManager::GetExtensionDescriptions()
 {
+	return ExtensionList;
 }
 
-ZEModule::~ZEModule()
+ZEArray<ZEExtensionDescription*> ZEExtensionManager::GetExtensionDescriptions(ZEModuleDescription* OwnerModuleDescription)
 {
+	if (OwnerModuleDescription == NULL)
+		return ExtensionList;
+
+	ZEArray<ZEExtensionDescription*> List;
+	for (size_t I = 0; I < ExtensionList.GetCount(); I++)
+		if (strcmp(OwnerModuleDescription->GetName(), ExtensionList[I]->GetName()) == 0)
+			List.Add(ExtensionList[I]);
+
+	return List;
 }
 
-void ZEModule::Destroy()
+
+bool ZEExtensionManager::RegisterExtension(ZEExtensionDescription* ExtensionDescription)
 {
-	this->Deinitialize();
-	delete this;
+	if (ExtensionDescription->GetOptions() != NULL)
+	{
+		bool Result;
+		Result = ZEOptionManager::GetInstance()->RegisterSection(ExtensionDescription->GetOptions());
+		if (!Result)
+		{
+			zeError("Module Manager", "Can not register extensions's option section. Extension Name : \"%s\", Extension Version : %d.%d)", 
+				ExtensionDescription->GetName(), ExtensionDescription->GetMajorVersion(), ExtensionDescription->GetMinorVersion());
+		}
+	}
+
+	ExtensionList.Add(ExtensionDescription);
+	return true;
+}
+
+void ZEExtensionManager::UnregisterExtension(ZEExtensionDescription* ExtensionDescription)
+{
+	ExtensionList.DeleteValue(ExtensionDescription);
+}
+
+
+ZEExtensionManager::ZEExtensionManager()
+{
+
+}
+
+ZEExtensionManager::~ZEExtensionManager()
+{
+
 }

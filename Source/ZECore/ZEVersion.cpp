@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESoundModuleDescription.cpp
+ Zinek Engine - ZEVersion.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,55 +33,95 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESoundModuleDescription.h"
+#include "ZEVersion.h"
 
-ZEModuleDescription* ZESoundModuleDescription::GetBaseModuleDescription()
+#include <stdio.h>
+
+void ZEVersion::GetShortString(char* Buffer) 
 {
-	return 0;
+	sprintf(Buffer, "%02d.%02d.%02d", Major, Minor, Internal);
 }
 
-ZEModuleAttribute ZESoundModuleDescription::GetAttributes()
+void ZEVersion::GetLongString(char* Buffer)	
 {
-	return ZE_MA_DEBUG;
+	char* PlatformString;
+	switch(Platform)
+	{
+		case ZE_VP_WIN32:
+			PlatformString = "WIN32";
+			break;
+
+		default:
+			PlatformString = "UNKNOWN";
+			break;
+
+	}
+	sprintf(Buffer, "%02d.%02d.%02d (%s) - Build %06d", Major, Minor, Internal, PlatformString, Build);
 }
 
-int ZESoundModuleDescription::GetRequiredZinekEngineVersion()
+ZEVersion ZEVersion::GetZinekVersion()
 {
-	return 0;
+	ZEVersion Temp;
+	
+	Temp.Major = ZE_ZINEK_VERSION_MAJOR;
+	Temp.Minor = ZE_ZINEK_VERSION_MINOR;
+	Temp.Internal = ZE_ZINEK_VERSION_INTERNAL;
+	Temp.Build = ZE_ZINEK_VERSION_BUILD;
+	Temp.Platform = ZE_ZINEK_VERSION_PLATFORM;
+
+	return Temp;
 }
 
-int ZESoundModuleDescription::GetMajorVersion()
+bool ZEVersion::Check(const ZEVersion& A, const ZEVersion& B, ZEVersionCheckLevel Level)
 {
-	return 0;
+	switch(Level)
+	{
+		case ZE_VCL_MAJOR:
+			return A.Major == B.Major;
+
+		case ZE_VCL_MINOR:
+			return A.Major == B.Major && A.Minor >= B.Minor;
+
+		case ZE_VCL_INTERNAL:
+			return A.Major == B.Major && A.Minor >= B.Minor && A.Internal >= B.Internal;
+		
+		default:
+			return false;
+	}
 }
 
-int ZESoundModuleDescription::GetMinorVersion()
+ZEVersion::ZEVersion()
 {
-	return 1;
+	this->Major = 0;
+	this->Minor = 0;
+	this->Internal = 0;
+	this->Build = 0;
+	this->Platform = ZE_ZINEK_VERSION_PLATFORM;
 }
 
-const char* ZESoundModuleDescription::GetCopyright()
+ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal)
 {
-	return "Copyright (c) 2007-2009, Zinek Engine Group. All rights reserved.";
+	this->Major = Major;
+	this->Minor = Minor;
+	this->Internal = Internal;
+	this->Build = 0;
+	this->Platform = ZE_ZINEK_VERSION_PLATFORM;
 }
 
-const char* ZESoundModuleDescription::GetName()
+ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build)
 {
-	return "SoundModule";
+	this->Major = Major;
+	this->Minor = Minor;
+	this->Internal = Internal;
+	this->Build = 0;
+	this->Platform = ZE_ZINEK_VERSION_PLATFORM;
 }
 
-ZEOptionSection* ZESoundModuleDescription::GetOptions()
+ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build, ZEVersionPlatform Platform)
 {
-	return 0;
-}
-
-
-ZEModule* ZESoundModuleDescription::CreateModuleInstance()
-{
-	return 0;
-}
-
-bool ZESoundModuleDescription::CheckCompatible()
-{
-	return false;
+	this->Major = Major;
+	this->Minor = Minor;
+	this->Internal = Internal;
+	this->Build = Build;
+	this->Platform = ZE_ZINEK_VERSION_PLATFORM;
 }

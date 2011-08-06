@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModule.cpp
+ Zinek Engine - ZEPluginManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,36 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModule.h"
+#pragma once
+#ifndef	__ZE_PLUGIN_MANAGER_H__
+#define __ZE_PLUGIN_MANAGER_H__
 
-ZEModuleDescription* ZEModule::ModuleDescription()
-{
-	return 0;
-}
+#include "ZEDS\ZEArray.h"
+#include "ZEOptionSection.h"
 
-ZEModule::ZEModule()
+class ZEPlugin;
+class ZEPluginManager
 {
-}
+	private:
+		ZEArray<ZEPlugin*>					PluginList;
+		void 								RegisterModules(ZEPlugin* Plugin);
+		void 								RegisterExtensions(ZEPlugin* Plugin);
 
-ZEModule::~ZEModule()
-{
-}
+	public:
+		ZEPlugin*							GetPlugin(const char* Name);
+		const ZEArray<ZEPlugin*>&			GetPlugins();
 
-void ZEModule::Destroy()
-{
-	this->Deinitialize();
-	delete this;
-}
+		bool								RegisterPlugin(ZEPlugin* Plugin);
+		void								UnregisterPlugin(ZEPlugin* Plugin);
+
+		void								LoadExternalPlugins();
+
+											ZEPluginManager();
+											~ZEPluginManager();
+};
+#endif
+
+
+
+
+

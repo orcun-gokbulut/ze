@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModule.cpp
+ Zinek Engine - ZEPlugin.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModule.h"
+#pragma once
+#ifndef	__ZE_PLUGIN_H__
+#define __ZE_PLUGIN_H__
 
-ZEModuleDescription* ZEModule::ModuleDescription()
-{
-	return 0;
-}
+#include "ZEVersion.h"
 
-ZEModule::ZEModule()
-{
-}
+class ZEExtensionDescription;
+class ZEModuleDescription;
 
-ZEModule::~ZEModule()
+class ZEPlugin
 {
-}
+	public:
+		virtual const char*					GetName() = 0;
+		virtual	ZEVersion					GetVersion() = 0;
+		virtual ZEVersion					GetRequiredZinekVersion() = 0;
+		virtual const char*					GetCopyright() = 0;
 
-void ZEModule::Destroy()
-{
-	this->Deinitialize();
-	delete this;
-}
+		virtual size_t						GetModuleDescriptionCount() = 0;
+		virtual ZEModuleDescription**		GetModuleDescriptions() = 0;
+
+		virtual size_t						GetExtensionDescriptionCount() = 0;
+		virtual ZEExtensionDescription**	GetExtensionDescriptions() = 0;
+};
+
+#endif

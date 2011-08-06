@@ -78,9 +78,9 @@ bool ZEModuleManager::CheckModule(ZEModuleDescription* ModuleDesc)
 	return true;
 }
 
-size_t ZEModuleManager::GetModuleCount()
+const ZEArray<ZEModuleDescription*>& ZEModuleManager::GetModuleDescriptions()
 {
-	return ModuleList.GetCount();
+	return ModuleList;
 }
 
 ZEModuleDescription* ZEModuleManager::GetModuleDescription(size_t Index)
@@ -99,13 +99,13 @@ ZEModuleDescription* ZEModuleManager::GetModuleDescription(const char* Name)
 
 ZEModuleDescription* ZEModuleManager::GetModuleDescription(ZEModuleDescription* BaseModuleDescription)
 {
-	if (BaseModuleDescription->GetBaseModuleDescription() != ZEModule::ModuleDescription())
+	if (BaseModuleDescription->GetBaseModuleDescription() != NULL)
 		return NULL;
 
 	return GetModuleDescription(ModuleManagerOptions.GetOption(BaseModuleDescription->GetName())->GetValue());
 }
 
-ZEModule* ZEModuleManager::CreateModule(size_t Index)
+ZEModule* ZEModuleManager::CreateModuleInstance(size_t Index)
 {
 	ZEModuleDescription* ModuleDesc = GetModuleDescription(Index);
 
@@ -129,7 +129,7 @@ ZEModule* ZEModuleManager::CreateModule(size_t Index)
 	return Module;
 }
 
-ZEModule* ZEModuleManager::CreateModule(const char* Name)
+ZEModule* ZEModuleManager::CreateModuleInstance(const char* Name)
 {
 	ZEModuleDescription* ModuleDesc = GetModuleDescription(Name);
 	if (ModuleDesc == NULL)
@@ -153,7 +153,7 @@ ZEModule* ZEModuleManager::CreateModule(const char* Name)
 }
 
 
-ZEModule* ZEModuleManager::CreateModule(ZEModuleDescription* BaseModuleDescription)
+ZEModule* ZEModuleManager::CreateModuleInstance(ZEModuleDescription* BaseModuleDescription)
 {
 	ZEModuleDescription* ModuleDesc = GetModuleDescription(BaseModuleDescription);
 	if (ModuleDesc == NULL)
@@ -175,7 +175,7 @@ ZEModule* ZEModuleManager::CreateModule(ZEModuleDescription* BaseModuleDescripti
 	return Module;
 }
 
-bool ZEModuleManager::LoadInternalModule(ZEModuleDescription* ModuleDesc)
+bool ZEModuleManager::RegisterModule(ZEModuleDescription* ModuleDesc)
 {
 	zeLog("Module Manager", "Loading Internal Module \"%s\". Version : %d.%d, Type : UNKNOWN, Attributes : %c%c%c%c%c%c, Option Section : %s",
 		ModuleDesc->GetName(),
@@ -210,16 +210,7 @@ bool ZEModuleManager::LoadInternalModule(ZEModuleDescription* ModuleDesc)
 	return true;
 }
 
-bool ZEModuleManager::LoadExternalModule(const char* FileName)
-{
-	return false;
-}
-
-void ZEModuleManager::SeekAndLoadExternalModules(const char* Directory)
-{
-}
-
-void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
+void ZEModuleManager::UnregisterModule(ZEModuleDescription* ModuleDesc)
 {
 	ModuleList.DeleteValue(ModuleDesc);
 }
@@ -236,15 +227,15 @@ void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
 
 ZEModuleManager::ZEModuleManager()
 {
-	LoadInternalModule(new ZED3D9ModuleDescription());
-	LoadInternalModule(new ZEDSModuleDescription());
-	LoadInternalModule(new ZEDummyInputModuleDescription());
-	LoadInternalModule(new ZEVirtualInputModuleDescription());
-	LoadInternalModule(new ZEDirectInputModuleDescription());
-	LoadInternalModule(new ZEALModuleDescription());
-	LoadInternalModule(new ZEPhysXModuleDescription());
-	LoadInternalModule(new ZEWindowsInputModuleDescription());
-	LoadInternalModule(new ZEFreespaceInputModuleDescription());
+	RegisterModule(new ZED3D9ModuleDescription());
+	RegisterModule(new ZEDSModuleDescription());
+	RegisterModule(new ZEDummyInputModuleDescription());
+	RegisterModule(new ZEVirtualInputModuleDescription());
+	RegisterModule(new ZEDirectInputModuleDescription());
+	RegisterModule(new ZEALModuleDescription());
+	RegisterModule(new ZEPhysXModuleDescription());
+	RegisterModule(new ZEWindowsInputModuleDescription());
+	RegisterModule(new ZEFreespaceInputModuleDescription());
 
 	ModuleManagerOptions.SetName("ModuleManager");
 	ModuleManagerOptions.AddOption(new ZEOption("GraphicsModule", "Direct3D9", ZE_OA_NORMAL));

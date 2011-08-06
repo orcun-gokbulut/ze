@@ -39,11 +39,6 @@ project (ZinekEngine)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS_DEBUG} 
-	ZE_ZINEK_ENGINE
-	"ZE_ZINEK_ENGINE_MAJOR_VERSION=0"
-	"ZE_ZINEK_ENGINE_MINOR_VERSION=5")
-
 include_directories (
 	${PROJECT_SOURCE_DIR} 
 	${PROJECT_SOURCE_DIR}/../Include 
@@ -63,8 +58,11 @@ link_directories(
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX"
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86")
 
-SET (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
+set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
 
+append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
+	ZE_ZINEK_ENGINE)
+	
 add_subdirectory (ZECore)
 add_subdirectory (ZEDebug)
 add_subdirectory (ZEGame)
@@ -92,7 +90,7 @@ add_source (ZETypes.h				Sources ZESDK)
 
 add_source (ZECore/ZEWindowResources.rc	Sources)
 
-add_executable (ZE WIN32 ${Sources})
+add_executable(ZE WIN32 ${Sources})
 set_property(TARGET ZE PROPERTY FOLDER "Zinek Engine")
 target_link_libraries (ZE ZECore ZEDS ZEFoundation ZESerialization ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
 target_link_libraries (ZE ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEFreespaceInput ZEVirtualInput ZEPortalMap)

@@ -33,40 +33,46 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-project (ZinekPlatform)
+project(Zinek)
  
-set (ZinekEngine_VERSION_MAJOR 0)
-set (ZinekEngine_VERSION_MINOR 5)
+set(ZINEK_VERSION_MAJOR 0)
+set(ZINEK_VERSION_MINOR 5)
+set(ZINEK_VERSION_INTERNAL 0)
+set(ZINEK_VERSION_BUILD 5)
+set(ZINEK_VERSION_PLATFORM "WIN32")
 
 ## Configuration
 #########################################################################################
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
  
-include(MacroOutOfSourceBuild)
-include(ParseArguments)
-include(AddSource)
+include(build_dir_check)
+include(parse_arguments)
+include(add_source)
+include(append_property)
 
 macro_ensure_out_of_source_build ("${PROJECT_NAME} requires an out of source build.")
 
-SET (CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
 
-set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS_DEBUG} 
-	ZE_ZINEK_PLATFORM)
+append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
+	ZE_ZINEK
+	ZE_ZINEK_VERSION_PLATFORM=ZE_VP_WIN32
+	ZE_ZINEK_VERSION_MAJOR=0
+	ZE_ZINEK_VERSION_MINOR=5
+	ZE_ZINEK_VERSION_INTERNAL=0
+	ZE_ZINEK_VERSION_BUILD=5000)
 
-set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG ${COMPILE_DEFINITIONS_DEBUG} 
+append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG 
 	ZE_DEBUG_ENABLED 
 	ZE_DEBUG_BREAK_ON_ERROR 
 	_ZE_DEBUG_BREAK_ON_WARNING
 	_ZE_DEBUG_ENABLE_MEMORY_CHECKS)
 
-set (LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
-set (EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
-set_property (GLOBAL PROPERTY USE_FOLDERS ON)
-
-
-set_property(GLOBAL PROPERTY USE_FOLDERS OFF)
+set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 
 ## Files
@@ -83,10 +89,10 @@ include(InstallRequiredSystemLibraries)
 
 set(CPACK_PACKAGE_NAME "Zinek Engine")
 set(CPACK_PACKAGE_VENDOR "Zinek Code House and Game Studio")
-set(CPACK_PACKAGE_VERSION_MAJOR ${ZinekEngine_VERSION_MAJOR})
-set(CPACK_PACKAGE_VERSION_MINOR ${ZinekEngine_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_MAJOR ${ZINEK_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${ZINEK_VERSION_MINOR})
 set(CPACK_PACKAGE_VERSION_PATCH "0")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Zinek Engine")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Zinek")
 set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/Installation/Description.txt")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY ${CPACK_PACKAGE_NAME})
 set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\Installation\\\\InstallIcon.bmp")
@@ -96,7 +102,7 @@ set(CPACK_NSIS_PACKAGE_NAME ${CPACK_PACKAGE_NAME})
 set(CPACK_NSIS_INSTALLED_ICON_NAME "ZE.exe")
 set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.zinekengine.com\\\\en\\\\docs\\\\install")
 set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.zinekengine.com")
-set(CPACK_NSIS_CONTACT "contact@zin ekengine.com")
+set(CPACK_NSIS_CONTACT "contact@zinekengine.com")
 set(CPACK_NSIS_MODIFY_PATH 0)
 
 set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/Installation/License.txt")

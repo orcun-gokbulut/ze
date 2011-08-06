@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModule.cpp
+ Zinek Engine - ZEVersion.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModule.h"
+#pragma once
+#ifndef	__ZE_VERSION_H__
+#define __ZE_VERSION_H__
 
-ZEModuleDescription* ZEModule::ModuleDescription()
+enum ZEVersionPlatform
 {
-	return 0;
-}
+	ZE_VP_WIN32
+};
 
-ZEModule::ZEModule()
+enum ZEVersionCheckLevel
 {
-}
+	ZE_VCL_MAJOR,
+	ZE_VCL_MINOR,
+	ZE_VCL_INTERNAL
+};
 
-ZEModule::~ZEModule()
+class ZEVersion
 {
-}
+	public:
+		unsigned int			Major;
+		unsigned int			Minor;
+		unsigned int			Internal;
+		unsigned int			Build;		
+		ZEVersionPlatform		Platform;
 
-void ZEModule::Destroy()
-{
-	this->Deinitialize();
-	delete this;
-}
+		void					GetShortString(char* Buffer);
+		void 					GetLongString(char* Buffer);
+
+		static ZEVersion		GetZinekVersion();
+		static bool				Check(const ZEVersion& A, const ZEVersion& B, ZEVersionCheckLevel Level);
+
+								ZEVersion();
+								ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal);
+								ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build);
+								ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build, ZEVersionPlatform Platform);
+};
+
+#endif

@@ -76,6 +76,8 @@ class ZEGame;
 class ZEModule;
 class ZENetworkModule;
 class ZEApplicationModule;
+class ZEExtensionManager;
+class ZEPluginManager;
 
 class ZECore
 {
@@ -90,6 +92,8 @@ class ZECore
 		char							ResourceDirectory;
 
 		ZEModuleManager*				ModuleManager;
+		ZEExtensionManager*				ExtensionManager;
+		ZEPluginManager*				PluginManager;
 
 		ZEApplicationModule*			Application;
 		ZEError*						Error;
@@ -122,7 +126,9 @@ class ZECore
 		ZEConsole*						GetConsole();
 		ZEWindow*						GetWindow();
 		ZEModuleManager*				GetModuleManager();
-		
+		ZEExtensionManager*				GetExtensionManager();
+		ZEPluginManager*				GetPluginManager();
+
 		void							SetResourceDirector(const char* Directory);
 		const char*						GetResourceDirectory();
 

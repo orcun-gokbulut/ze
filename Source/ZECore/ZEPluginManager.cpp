@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModule.cpp
+ Zinek Engine - ZEPluginManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,82 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModule.h"
+#include "ZEPluginManager.h"
+#include "ZEPlugin.h"
+#include "ZEConsole.h"
+#include "ZECore.h"
+#include "ZEModuleManager.h"
+#include "ZEExtensionManager.h"
 
-ZEModuleDescription* ZEModule::ModuleDescription()
+#include <string.h>
+
+ZEPlugin* ZEPluginManager::GetPlugin(const char* Name)
 {
-	return 0;
+	for (size_t I = 0; I < PluginList.GetCount(); I++)
+		if (_stricmp(PluginList[I]->GetName(), Name) == 0)
+			return PluginList[I];
+
+	return NULL;
 }
 
-ZEModule::ZEModule()
+const ZEArray<ZEPlugin*>& ZEPluginManager::GetPlugins()
 {
+	return PluginList;
 }
 
-ZEModule::~ZEModule()
+void ZEPluginManager::RegisterModules(ZEPlugin* Plugin)
 {
+	zeLog("Plugin Manager", "Registering plugin's extensions. Plugin Name : \"%s\", Total Modules : %d.", 
+		Plugin->GetName(), Plugin->GetModuleDescriptionCount());
+
+	for (size_t I = 0; I < Plugin->GetModuleDescriptionCount(); I++)
+		ZECore::GetInstance()->GetModuleManager()->RegisterModule(Plugin->GetModuleDescriptions()[I]);
 }
 
-void ZEModule::Destroy()
+void ZEPluginManager::RegisterExtensions(ZEPlugin* Plugin)
 {
-	this->Deinitialize();
-	delete this;
+	zeLog("Plugin Manager", "Registering plugin's extensions. Plugin Name : \"%s\".", 
+		Plugin->GetName(), Plugin->GetExtensionDescriptionCount());
+
+	for (size_t I = 0; I < Plugin->GetModuleDescriptionCount(); I++)
+		ZECore::GetInstance()->GetExtensionManager()->RegisterExtension(Plugin->GetExtensionDescriptions()[I]);
+}
+
+bool ZEPluginManager::RegisterPlugin(ZEPlugin* Plugin)
+{
+	if (Plugin == NULL)
+		return false;
+
+	zeLog("Plugin Manager", "Registering plugin. Plugin Name : \"%s\".", 
+		Plugin->GetName());
+
+	if (PluginList.Exists(Plugin))
+	{
+		zeError("Plugin Manager", "Pluging already registered. Plugin Name : \"%s\".", 
+			Plugin->GetName());
+		return false;
+	}
+
+	zeLog("Plugin Manager", "Plugin registered. Plugin Name : \"%s\".", Plugin->GetName());
+}
+
+void ZEPluginManager::UnregisterPlugin(ZEPlugin* Plugin)
+{
+
+}
+
+void ZEPluginManager::LoadExternalPlugins()
+{
+
+}
+
+
+ZEPluginManager::ZEPluginManager()
+{
+
+}
+
+ZEPluginManager::~ZEPluginManager()
+{
+
 }
