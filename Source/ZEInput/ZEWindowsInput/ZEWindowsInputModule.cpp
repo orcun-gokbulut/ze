@@ -35,9 +35,15 @@
 
 #include "ZEWindowsInputModule.h"
 #include "ZEWindowsInputModuleDescription.h"
+#include "ZEInput\ZEInputDeviceExtension.h"
+#include "ZEInput\ZEInputDeviceExtensionDescription.h"
+#include "ZEInput\ZEInputDevice.h"
+#include "ZECore\ZEExtensionManager.h"
+
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEError.h"
+
 
 #define WINDIWS_LEAN_AND_MEAN
 #include <windows.h>
@@ -228,6 +234,9 @@ bool ZEWindowsInputModule::Initialize()
 
 	memset(&KeyboardState, 0, sizeof(KeyboardState));
 	memset(&MouseState, 0, sizeof(MouseState));
+
+	ZEArray<ZEExtensionDescription*> DeviceExtensions = ZEExtensionManager::GetInstance()->GetExtensionDescriptions(
+		ZEInputDeviceExtension::ExtensionDescription());
 
 	return true;
 }

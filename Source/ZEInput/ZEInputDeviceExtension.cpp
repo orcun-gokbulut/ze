@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFreespaceInputModuleDescription.cpp
+ Zinek Engine - ZEInputDeviceExtension.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,56 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEFreespaceInputModuleDescription.h"
-#include "ZEFreespaceInputModule.h"
+#include "ZEInputDeviceExtension.h"
+#include "ZEInputDeviceExtensionDescription.h"
 
-ZEModuleDescription* ZEFreespaceInputModuleDescription::GetBaseModuleDescription()
+ZEExtensionDescription* ZEInputDeviceExtension::ExtensionDescription()
 {
-	return ZEInputModule::ModuleDescription();
-}
-
-ZEModuleAttribute ZEFreespaceInputModuleDescription::GetAttributes()
-{
-	return ZE_MA_DEBUG;
-}
-
-int ZEFreespaceInputModuleDescription::GetRequiredZinekEngineVersion()
-{
-	return 0;
-}
-
-int ZEFreespaceInputModuleDescription::GetMajorVersion()
-{
-	return 0;
-}
-
-int ZEFreespaceInputModuleDescription::GetMinorVersion()
-{
-	return 1;
-}
-
-const char* ZEFreespaceInputModuleDescription::GetCopyright()
-{
-	return "Copyright (c) 2007-2009, Zinek Engine Group. All rights reserved.";
-}
-
-const char* ZEFreespaceInputModuleDescription::GetName()
-{
-	return "FreespaceInput";
-}
-
-ZEOptionSection* ZEFreespaceInputModuleDescription::GetOptions()
-{
-	return NULL;
-}
-
-
-ZEModule* ZEFreespaceInputModuleDescription::CreateModuleInstance()
-{
-	return new ZEFreespaceInputModule;
-}
-
-bool ZEFreespaceInputModuleDescription::CheckCompatible()
-{
-	return true;
+	static ZEInputDeviceExtensionDescription Desc;
+	return &Desc;
 }

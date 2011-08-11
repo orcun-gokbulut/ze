@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEExtensionManager.h
+ Zinek Engine - ZEInputEvent.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,39 +34,90 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_EXTENSION_MANAGER_H__
-#define __ZE_EXTENSION_MANAGER_H__
+#ifndef	__ZE_INPUT_EVENT_H__
+#define __ZE_INPUT_EVENT_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEOptionSection.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZETypes.h"
 
-class ZEExtensionDescription;
-class ZEModuleDescription;
-
-class ZEExtensionManager
+enum ZEInputButtonState
 {
-	friend class ZECore;
-	private:
-		ZEArray<ZEExtensionDescription*>		ExtensionList;
-		static ZEOptionSection					ExtensionManagerOptions;
+	ZE_IBS_ALL,
+	ZE_IBS_PRESSED,
+	ZE_IBS_RELEASED
+};
 
-												ZEExtensionManager();
-												~ZEExtensionManager();
+enum ZEInputAxisSign
+{
+	ZE_IAS_POSITIVE,
+	ZE_IAS_NEGATIVE
+};
 
+enum ZEInputType
+{
+	ZE_IT_NONE,
+	ZE_IT_AXIS, 
+	ZE_IT_BUTTON,
+	ZE_IT_VECTOR2,
+	ZE_IT_VECTOR3,
+	ZE_IT_VECTOR4,
+	ZE_IT_QUATERNION
+};
+
+enum ZEInputDeviceType
+{
+	ZE_IDT_NONE,
+	ZE_IDT_MOUSE,
+	ZE_IDT_KEYBOARD,
+	ZE_IDT_JOYSTICK,
+	ZE_IDT_SENSOR,
+	ZE_IDT_OTHER
+};
+
+class ZEInputEvent
+{
 	public:
-		ZEExtensionDescription*					GetExtensionDescription(const char* Name);
-		const ZEArray<ZEExtensionDescription*>&	GetExtensionDescriptions();
-		ZEArray<ZEExtensionDescription*>		GetExtensionDescriptions(ZEExtensionDescription* ParentExtension);
+		ZEInputType					InputType;
+		ZEInputDeviceType			DeviceType;
+		ZEDWORD						DeviceIndex;
 
-		bool									RegisterExtension(ZEExtensionDescription* ModuleDesc);
-		void									UnregisterExtension(ZEExtensionDescription* ModuleDesc);
+		union 
+		{
+			struct
+			{
+				unsigned char		ButtonId;
+				ZEInputButtonState	ButtonState;
+			};
+			struct
+			{
+				unsigned char		AxisId;
+				ZEInputAxisSign		AxisSign;
+			};	
 
-		static ZEExtensionManager*				GetInstance();							
+			unsigned char			VectorId;
+			unsigned char			OrientationId;
+		};
+
+		void						GetEventName(char* Buffer, size_t MaxSize);
+		void						GetEventShortName(char* Buffer, size_t MaxSize);
+
+									ZEInputEvent();
+									ZEInputEvent(const char* ShortName);
+									ZEInputEvent(ZEInputDeviceType Device, 
+										ZEDWORD DeviceIndex, 
+										unsigned char ButtonId, 
+										ZEInputButtonState ButtonState);
+
+									ZEInputEvent(ZEInputDeviceType Device, 
+										ZEDWORD DeviceIndex, 
+										unsigned char AxisId,
+										ZEInputAxisSign AxisSign);
+
+									ZEInputEvent(ZEInputDeviceType Device,
+										ZEDWORD DeviceIndex, 
+										ZEInputType Type,
+										unsigned int InputId);
 };
 
 #endif
-
-
-
-
-

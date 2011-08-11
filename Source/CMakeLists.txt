@@ -33,13 +33,13 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-project (ZinekEngine)
+project(ZinekEngine)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-include_directories (
+include_directories(
 	${PROJECT_SOURCE_DIR} 
 	${PROJECT_SOURCE_DIR}/../Include 
 	${PROJECT_SOURCE_DIR}/../Include/DirectX
@@ -63,37 +63,37 @@ set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
 append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
 	ZE_ZINEK_ENGINE)
 	
-add_subdirectory (ZECore)
-add_subdirectory (ZEDebug)
-add_subdirectory (ZEGame)
-add_subdirectory (ZEGraphics)
-add_subdirectory (ZEInput)
-add_subdirectory (ZEMap)
-add_subdirectory (ZEMeta)
-add_subdirectory (ZEModel)
-add_subdirectory (ZENetwork)
-add_subdirectory (ZEParticle)
-add_subdirectory (ZEPhysics)
-add_subdirectory (ZEScript)
-add_subdirectory (ZESound)
-add_subdirectory (ZEUI)
+add_subdirectory(ZECore)
+add_subdirectory(ZEDebug)
+add_subdirectory(ZEGame)
+add_subdirectory(ZEGraphics)
+add_subdirectory(ZEInput)
+add_subdirectory(ZEMap)
+add_subdirectory(ZEMeta)
+add_subdirectory(ZEModel)
+add_subdirectory(ZENetwork)
+add_subdirectory(ZEParticle)
+add_subdirectory(ZEPhysics)
+add_subdirectory(ZEScript)
+add_subdirectory(ZESound)
+add_subdirectory(ZEUI)
 
-add_source (ZEAPI.h 				Sources ZESDK)
-add_source (ZECompileOptions.h 		Sources ZESDK)
-add_source (ZEDefinitions.h 		Sources ZESDK)
-add_source (ZEFastDelegate.h 		Sources ZESDK)
-add_source (ZEFastDelegateBind.h	Sources ZESDK)
-add_source (ZEMain.cpp 				Sources)
-add_source (ZESDK.cpp 				Sources)
-add_source (ZESDK.h 				Sources ZESDK)
-add_source (ZETypes.h				Sources ZESDK)
+add_source(ZEAPI.h 				Sources ZESDK)
+add_source(ZECompileOptions.h 		Sources ZESDK)
+add_source(ZEDefinitions.h 		Sources ZESDK)
+add_source(ZEFastDelegate.h 		Sources ZESDK)
+add_source(ZEFastDelegateBind.h	Sources ZESDK)
+add_source(ZEMain.cpp 				Sources)
+add_source(ZESDK.cpp 				Sources)
+add_source(ZESDK.h 				Sources ZESDK)
+add_source(ZETypes.h				Sources ZESDK)
 
-add_source (ZECore/ZEWindowResources.rc	Sources)
+add_source(ZECore/ZEWindowResources.rc	Sources)
 
 add_executable(ZE WIN32 ${Sources})
 set_property(TARGET ZE PROPERTY FOLDER "Zinek Engine")
-target_link_libraries (ZE ZECore ZEDS ZEFoundation ZESerialization ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
-target_link_libraries (ZE ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEFreespaceInput ZEVirtualInput ZEPortalMap)
+target_link_libraries(ZE ZECore ZEDS ZEFoundation ZESerialization ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
+target_link_libraries(ZE ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEFreespaceInput ZEVirtualInput ZEPortalMap)
 
 add_library(ZESDK ${Sources})
 set_property(TARGET ZESDK PROPERTY FOLDER "Zinek Engine")
@@ -102,10 +102,10 @@ target_link_libraries (ZESDK ZEDirect3D9 ZEWindowsInput ZEDirectInput ZEDirectSo
 
 get_property(TargetPath TARGET ZE PROPERTY LOCATION)
 file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)
-add_custom_command (TARGET ZE CONFIGURATIONS Release RelWithDebInfo POST_BUILD COMMAND copy "${NativeTargetPath}" "${CMAKE_SOURCE_DIR}\\RunDir\\ZE.release.exe")
-add_custom_command (TARGET ZE CONFIGURATIONS Debug POST_BUILD COMMAND copy "${NativeTargetPath}" "${CMAKE_SOURCE_DIR}\\RunDir\\ZE.debug.exe")
+add_custom_command(TARGET ZE CONFIGURATIONS Release RelWithDebInfo POST_BUILD COMMAND copy "${NativeTargetPath}" "${CMAKE_SOURCE_DIR}\\RunDir\\ZE.release.exe")
+add_custom_command(TARGET ZE CONFIGURATIONS Debug POST_BUILD COMMAND copy "${NativeTargetPath}" "${CMAKE_SOURCE_DIR}\\RunDir\\ZE.debug.exe")
 
 
-install (TARGETS ZE DESTINATION bin COMPONENT "Runtime")
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include)
-install (DIRECTORY ${CMAKE_SOURCE_DIR}/Dll/ CONFIGURATIONS Release DESTINATION bin COMPONENT "Runtime" PATTERN .svn EXCLUDE)
+install(TARGETS ZE DESTINATION bin COMPONENT "Runtime")
+install(FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include)
+install(DIRECTORY ${CMAKE_SOURCE_DIR}/Dll/ CONFIGURATIONS Release DESTINATION bin COMPONENT "Runtime" PATTERN .svn EXCLUDE)

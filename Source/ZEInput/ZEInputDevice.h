@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFreespaceInputModule.h
+ Zinek Engine - ZEInputDevice.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,46 +34,37 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_FREESPACE_INPUT_MODULE_H__
-#define __ZE_FREESPACE_INPUT_MODULE_H__
+#ifndef	__ZE_INPUT_DEVICE_H__
+#define __ZE_INPUT_DEVICE_H__
 
-#include "ZEInput\ZEInputModule.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEInputDescription.h"
+#include "ZEInputEvent.h"
+#include "ZEInputAction.h"
 
-#include <Freespace/freespace.h>
+class ZEInputBinding;
+class ZEInputMap;
 
-class ZEFreespaceInputModule: public ZEInputModule 
-{	
-	friend class ZEFreespaceInputModuleDescription;
-
-	private:
-		bool							Enabled;
-		FreespaceDeviceId				Device;
-
-		float							Axises[3];
-		bool							Buttons[5], OldButtons[5];
-		ZEVector3						LinearPosition;
-		ZEQuaternion					Orientation;
-
+class ZEInputDevice
+{
 	public:
-		virtual ZEModuleDescription*	GetModuleDescription();
-		static ZEModuleDescription*		ModuleDescription();
+		virtual unsigned int			GetDeviceId() = 0;
+		virtual const char*				GetDeviceName() = 0;
+
+		virtual const 
+		ZEArray<ZEInputDescription>&	GetInputDescriptions() = 0;
+
+		virtual ZEInputEvent			GetCurrentInputEvents() = 0;
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
 
-		virtual bool					IsEnabled();
-		virtual void					SetEnabled(bool Enabled);
-
-		virtual void					ProcessInputs();
-		virtual void					ProcessInputMap(ZEInputMap* InputMap);
-
 		virtual void					Acquire();
-		virtual void					UnAcquire();
+		virtual void					UnAcuire();
 
-		virtual void					GetInputEventName(char* Name, size_t MaxSize);
-		virtual void					GetInputEventShortName(char* ShortName, size_t MaxSize);
+		virtual void					ProcessInputs() = 0;
 
-		virtual bool					GetRawInputEvent(ZEInputEvent& InputEvent);
-
+		virtual bool					ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* Action) = 0;
 };
+
 #endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFreespaceInputModule.cpp
+ Zinek Engine - ZEFreespaceInputDevice.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,36 +35,17 @@
 
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEConsole.h"
-#include "ZEFreespaceInputModule.h"
-#include "ZEFreespaceInputModuleDescription.h"
+
+#include "ZEInput\ZEInputMapBinding.h"
+#include "ZEInput\ZEInputEvent.h"
+#include "ZEInput\ZEInputAction.h"
+
+#include "ZEFreespaceInputDevice.h"
 
 #include <freespace/freespace.h>
 
-bool ZEFreespaceInputModule::IsEnabled()
+bool ZEFreespaceInputDevice::Initialize()
 {
-	return Enabled;
-}
-
-void ZEFreespaceInputModule::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-ZEModuleDescription* ZEFreespaceInputModule::GetModuleDescription()
-{
-	return ZEFreespaceInputModule::ModuleDescription();
-}
-
-ZEModuleDescription* ZEFreespaceInputModule::ModuleDescription()
-{
-	static ZEFreespaceInputModuleDescription Desc;
-	return &Desc;
-}
-
-bool ZEFreespaceInputModule::Initialize()
-{
-	Enabled = true;
-
 	zeLog("Freespace Input Module", "Initializing module.");
 
 	int Result;
@@ -129,7 +110,7 @@ bool ZEFreespaceInputModule::Initialize()
 	return true;
 }
 
-void ZEFreespaceInputModule::Deinitialize()
+void ZEFreespaceInputDevice::Deinitialize()
 {
 	zeLog("Freespace Input Module", "Deinitializing module.");
 
@@ -150,8 +131,7 @@ void ZEFreespaceInputModule::Deinitialize()
 	zeLog("Freespace Input Module", "Module deinitialized.");
 }
 
-
-void ZEFreespaceInputModule::ProcessInputs()
+void ZEFreespaceInputDevice::ProcessInputs()
 {
 	memset(Axises, 0, sizeof(Axises));
 	memset(Buttons, 0, sizeof(Buttons));
@@ -169,9 +149,6 @@ void ZEFreespaceInputModule::ProcessInputs()
 			return;
 		}
 
-		/*if (Message.messageType == FREESPACE_MESSAGE_BODYUSERFRAME || 
-			Message.messageType == FREESPACE_MESSAGE_USERFRAME ||
-			Message.messageType == FREESPACE_MESSAGE_BODYFRAME)*/
 		if (Message.messageType == FREESPACE_MESSAGE_USERFRAME)
 		{
 			Buttons[0] = Message.userFrame.button1 & 0x80;
@@ -202,105 +179,69 @@ void ZEFreespaceInputModule::ProcessInputs()
 	OldButtons[2] = Buttons[2];
 	OldButtons[3] = Buttons[3];
 	OldButtons[4] = Buttons[4];
-
 }
 
-void ZEFreespaceInputModule::ProcessInputMap(ZEInputMap* InputMap)
+bool ZEFreespaceInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* Action)
 {
-	InputMap->InputActionCount = 0;
-
-	for (size_t I = 0; I < InputMap->InputBindings.GetCount(); I++)
+	ZEInputEvent* InputEvent = &InputBinding->Event;
+	if (InputEvent->DeviceType == ZE_IDT_OTHER && InputEvent->DeviceIndex == 0)
 	{
-		ZEInputBinding* CurrInputBinding = &InputMap->InputBindings[I];
-		ZEInputEvent* CurrInputEvent = &CurrInputBinding->Event;
-		if (CurrInputBinding->Event.DeviceType == ZE_IDT_OTHER && CurrInputBinding->Event.DeviceIndex == 0)
+		switch(InputEvent->InputType)
 		{
-			switch(CurrInputEvent->InputType)
-			{
-				case ZE_IT_AXIS:
-					if (CurrInputEvent->AxisId < 3)
+			case ZE_IT_AXIS:
+				if (InputEvent->AxisId < 3)
+				{
+					if (InputEvent->AxisSign == ZE_IAS_POSITIVE)
 					{
-						if (CurrInputEvent->AxisSign == ZE_IAS_POSITIVE)
+						if (Axises[InputEvent->AxisId] > 0)
 						{
-							if (Axises[CurrInputEvent->AxisId] > 0)
-							{
-								InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
-								InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
-								InputMap->InputActions[InputMap->InputActionCount].AxisValue = Axises[CurrInputEvent->AxisId];
-								InputMap->InputActionCount++;
-							}
-						}
-						else
-						{
-							if (Axises[CurrInputEvent->AxisId] < 0)
-							{
-								InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
-								InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
-								InputMap->InputActions[InputMap->InputActionCount].AxisValue = abs(Axises[CurrInputEvent->AxisId]);
-								InputMap->InputActionCount++;
-							}
+							Action->Id = InputBinding->ActionId;
+							Action->From =  InputBinding;
+							Action->AxisValue = Axises[InputEvent->AxisId];
 						}
 					}
-					break;
-
-				case ZE_IT_BUTTON:
-					for (int I = 0; I < 5; I++)
-						if ((CurrInputEvent->ButtonState == ZE_IBS_ALL && (Buttons[CurrInputEvent->ButtonId] & 0x80)) ||
-							(CurrInputEvent->ButtonState == ZE_IBS_PRESSED && (Buttons[CurrInputEvent->ButtonId] & 0x80) && !(OldButtons[CurrInputEvent->ButtonId] & 0x80)) || 
-							(CurrInputEvent->ButtonState == ZE_IBS_RELEASED && !(Buttons[CurrInputEvent->ButtonId] & 0x80) && (OldButtons[CurrInputEvent->ButtonId] & 0x80)))
+					else
+					{
+						if (Axises[InputEvent->AxisId] < 0)
 						{
-							InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
-							InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
-							InputMap->InputActionCount++;
+							Action->Id = InputBinding->ActionId;
+							Action->From =  InputBinding;
+							Action->AxisValue = abs(Axises[InputEvent->AxisId]);
 						}
-					break;
-
-				case ZE_IT_QUATERNION:
-					if (CurrInputEvent->OrientationId == 0)
-					{
-						InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
-						InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
-						InputMap->InputActions[InputMap->InputActionCount].Orientation = Orientation;
-						InputMap->InputActionCount++;
 					}
-					break;
+				}
+				break;
 
-				case ZE_IT_VECTOR3:
-					if (CurrInputEvent->VectorId == 0)
+			case ZE_IT_BUTTON:
+				for (int I = 0; I < 5; I++)
+					if ((InputEvent->ButtonState == ZE_IBS_ALL && (Buttons[InputEvent->ButtonId] & 0x80)) ||
+						(InputEvent->ButtonState == ZE_IBS_PRESSED && (Buttons[InputEvent->ButtonId] & 0x80) && !(OldButtons[InputEvent->ButtonId] & 0x80)) || 
+						(InputEvent->ButtonState == ZE_IBS_RELEASED && !(Buttons[InputEvent->ButtonId] & 0x80) && (OldButtons[InputEvent->ButtonId] & 0x80)))
 					{
-						InputMap->InputActions[InputMap->InputActionCount].Id = CurrInputBinding->ActionId;
-						InputMap->InputActions[InputMap->InputActionCount].From =  CurrInputBinding;
-						InputMap->InputActions[InputMap->InputActionCount].Vector = LinearPosition;
-						InputMap->InputActionCount++;
+						Action->Id = InputBinding->ActionId;
+						Action->From =  InputBinding;					
 					}
-					break;
-			}
+				break;
+
+			case ZE_IT_QUATERNION:
+				if (InputEvent->OrientationId == 0)
+				{
+					Action->Id = InputBinding->ActionId;
+					Action->From =  InputBinding;
+					Action->Orientation = Orientation;
+				}
+				break;
+
+			case ZE_IT_VECTOR3:
+				if (InputEvent->VectorId == 0)
+				{
+					Action->Id = InputBinding->ActionId;
+					Action->From =  InputBinding;
+					Action->Vector = LinearPosition;
+				}
+				break;
 		}
 	}
 
-}
-
-void ZEFreespaceInputModule::Acquire()
-{
-	zeNotice("Freespace Input Module", "Freespace Input acquired.");
-}
-
-void ZEFreespaceInputModule::UnAcquire()
-{
-	zeNotice("Freespace Input Module", "Freespace Input unacquired.");
-}
-
-void ZEFreespaceInputModule::GetInputEventName(char* Name, size_t MaxSize)
-{
-	strncpy(Name, "FREESPACE", MaxSize);
-}
-
-void ZEFreespaceInputModule::GetInputEventShortName(char* ShortName, size_t MaxSize)
-{
-	strncpy(ShortName, "DUM", MaxSize);
-}
-
-bool ZEFreespaceInputModule::GetRawInputEvent(ZEInputEvent& InputEvent)
-{
-	return false;
+	return true;
 }

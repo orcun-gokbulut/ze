@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFreespaceInputModuleDescription.h
+ Zinek Engine - ZEInputAction.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,25 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_FREESPACE_INPUT_MODULE_DESCRIPTION_H__
-#define __ZE_FREESPACE_INPUT_MODULE_DESCRIPTION_H__
+#ifndef	__ZE_ACTION_H__
+#define __ZE_ACTION_H__
 
-#include "ZECore\ZEModuleDescription.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
 
-class ZEFreespaceInputModuleDescription : public ZEModuleDescription
+enum ZEInputButtonState;
+class ZEInputBinding;
+
+class ZEInputAction
 {
 	public:
-		virtual ZEModuleDescription*	GetBaseModuleDescription();
-		virtual ZEModuleAttribute		GetAttributes();
-		virtual int						GetRequiredZinekEngineVersion();
-		virtual int						GetMajorVersion();
-		virtual int						GetMinorVersion();
-		virtual const char*				GetCopyright();
-		virtual const char*				GetName();
-		virtual ZEOptionSection*		GetOptions();
+		int							Id;
+		ZEInputBinding*				From;
 
-		virtual ZEModule*				CreateModuleInstance();
-		virtual bool					CheckCompatible();
+		union
+		{
+			ZEInputButtonState		ButtonState;
+			int						AxisValue;
+		};
+
+		ZEVector3					Vector;
+		ZEQuaternion				Orientation;
 };
 
 #endif

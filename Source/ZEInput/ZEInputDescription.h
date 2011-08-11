@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEInputDescription.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,19 +30,52 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef	__ZE_INPUT_DESCRIPTION_H__
+#define __ZE_INPUT_DESCRIPTION_H__
 
-add_source (ZEFreespaceInputDevice.cpp							Sources)
-add_source (ZEFreespaceInputDevice.h							Sources)
-add_source (ZEFreespaceInputDeviceExtension.cpp					Sources)
-add_source (ZEFreespaceInputDeviceExtension.h					Sources)
-add_source (ZEFreespaceInputDeviceExtensionDescription.cpp		Sources)
-add_source (ZEFreespaceInputDeviceExtensionDescription.h		Sources)
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 
-add_library (ZEFreespaceInput ${Sources})
-target_link_libraries (ZEFreespaceInput libfreespace.lib)
+class ZEInputDevice;
 
-set_property(TARGET ZEFreespaceInput PROPERTY FOLDER "Zinek Engine")
+struct ZEInputDescription
+{
+	ZEInputDevice*			OwnerDevice;
+	unsigned int			InputId;
+
+	const char*				Name[50];
+	const char*				Code[50];
+
+	union
+	{
+		struct 
+		{
+			int				AxisId;
+			float			LimitMinimum;
+			float			LimitMaximum;
+		} Axis;
+
+		struct 
+		{
+			int				ButtonId;
+		} Button;
+
+		struct 
+		{
+			int				QuaternionId;
+		} Orientation;
+	};
+
+	struct 
+	{
+		unsigned int	VectorDimension;
+		ZEVector4		LimitMinimum;
+		ZEVector4		LimitMaximum;
+	} Vector;
+};
+
+#endif

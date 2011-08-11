@@ -38,6 +38,7 @@
 #include "ZEOptionManager.h"
 #include "ZEExtensionDescription.h"
 #include "ZEModuleDescription.h"
+#include "ZECore/ZECore.h"
 
 #include <string.h>
 
@@ -57,15 +58,23 @@ const ZEArray<ZEExtensionDescription*>& ZEExtensionManager::GetExtensionDescript
 	return ExtensionList;
 }
 
-ZEArray<ZEExtensionDescription*> ZEExtensionManager::GetExtensionDescriptions(ZEModuleDescription* OwnerModuleDescription)
+ZEArray<ZEExtensionDescription*> ZEExtensionManager::GetExtensionDescriptions(ZEExtensionDescription* ParentExtension)
 {
-	if (OwnerModuleDescription == NULL)
+	if (ParentExtension == NULL)
 		return ExtensionList;
 
 	ZEArray<ZEExtensionDescription*> List;
 	for (size_t I = 0; I < ExtensionList.GetCount(); I++)
-		if (strcmp(OwnerModuleDescription->GetName(), ExtensionList[I]->GetName()) == 0)
-			List.Add(ExtensionList[I]);
+	{
+		ZEExtensionDescription* Parent = ExtensionList[I]->GetParent();
+		
+		while(Parent != NULL)
+			if (strcmp(ParentExtension->GetName(), ExtensionList[I]->GetName()) == 0)
+			{
+				List.Add(ExtensionList[I]);
+				break;
+			}
+	}
 
 	return List;
 }
@@ -73,14 +82,16 @@ ZEArray<ZEExtensionDescription*> ZEExtensionManager::GetExtensionDescriptions(ZE
 
 bool ZEExtensionManager::RegisterExtension(ZEExtensionDescription* ExtensionDescription)
 {
+	char ExtensionVersion[255];
 	if (ExtensionDescription->GetOptions() != NULL)
 	{
 		bool Result;
 		Result = ZEOptionManager::GetInstance()->RegisterSection(ExtensionDescription->GetOptions());
 		if (!Result)
 		{
-			zeError("Module Manager", "Can not register extensions's option section. Extension Name : \"%s\", Extension Version : %d.%d)", 
-				ExtensionDescription->GetName(), ExtensionDescription->GetMajorVersion(), ExtensionDescription->GetMinorVersion());
+			ExtensionDescription->GetVersion().GetShortString(ExtensionVersion);
+			zeError("Module Manager", "Can not register extensions's option section. Extension Name : \"%s\", Extension Version : %s)", 
+				ExtensionDescription->GetName(), ExtensionVersion);
 		}
 	}
 
@@ -93,6 +104,10 @@ void ZEExtensionManager::UnregisterExtension(ZEExtensionDescription* ExtensionDe
 	ExtensionList.DeleteValue(ExtensionDescription);
 }
 
+class ZEExtensionManager* ZEExtensionManager::GetInstance()
+{
+	return ZECore::GetInstance()->GetExtensionManager();
+}
 
 ZEExtensionManager::ZEExtensionManager()
 {

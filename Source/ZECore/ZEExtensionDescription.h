@@ -38,6 +38,7 @@
 #define __ZE_EXTENSION_DESCRIPTION_H__
 
 #include "ZETypes.h"
+#include "ZEVersion.h"
 
 class ZEModuleDescription;
 class ZEOptionSection;
@@ -46,16 +47,18 @@ class ZEExtension;
 class ZEExtensionDescription
 {
 	public:
-		virtual ZEModuleDescription*	GetOwnerModuleDescription() = 0;
-		virtual int						GetRequiredZinekEngineVersion() = 0;
-		virtual int						GetMajorVersion() = 0;
-		virtual int						GetMinorVersion() = 0;
-		virtual const char*				GetCopyright() = 0;
-		virtual const char*				GetName() = 0;
+		virtual ZEExtensionDescription*		GetParent() = 0;
 
-		virtual ZEOptionSection*		GetOptions() = 0;
-		virtual	bool					CheckCompatible() = 0;
-		virtual	ZEExtension*			CreateExtensionInstance() = 0;
+		virtual ZEVersion					GetVersion() = 0;
+		virtual ZEVersion					GetRequiredZinekVersion() = 0;
+
+		virtual const char*					GetCopyright() = 0;
+		virtual const char*					GetName() = 0;
+
+		virtual ZEOptionSection*			GetOptions() = 0;
+		virtual	bool						CheckCompatible() = 0;
+
+		virtual	ZEExtension*				CreateInstance() = 0;
 };
 
 #endif
