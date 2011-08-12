@@ -48,13 +48,54 @@
 #define ZEWINDOW_WINDOWNAME		"Zinek Engine"
 #define ZEWINDOW_CLASSNAME		"ZINEKENGINE"
 
-LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 char*  Parameters;
 
 ZEWindow* Window = NULL;
 bool WindowInitialization;
 
-void OnWMRawInputRecived(HRAWINPUT Handle);
+class ZEWindowSystemMessageHandler : public ZESystemMessageHandler
+{
+	virtual bool Callback(MSG* Message)
+	{
+		switch (Message->message)
+		{
+			case WM_CREATE:
+				return true;
+
+			case WM_SIZE:
+				if (!WindowInitialization)
+					Window->WindowResized(LOWORD(Message->lParam), HIWORD(Message->lParam));
+				return true;
+
+			case WM_PAINT:
+				ValidateRect(Message->hwnd, NULL);
+				return true;
+
+			case WM_ACTIVATE:
+				if (Message->wParam == WA_INACTIVE)
+					Window->WindowLostFocus();
+				else
+					Window->WindowGainedFocus();
+				return true;
+
+			case WM_CLOSE:
+				if (MessageBox(Message->hwnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
+					Window->WindowDestroyed();
+				return true;
+
+			case WM_DESTROY:
+				Window->WindowDestroyed();
+				return true;
+
+			case WM_INPUT:
+				//OnWMRawInputRecived((HRAWINPUT)Message->lParam);
+				return true;
+
+			default:
+				return false;
+		}
+	}
+};
 
 void ShowWindowError()
 {
@@ -120,7 +161,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 	WNDCLASSEX wc;
 	wc.cbSize			= sizeof(WNDCLASSEX);
 	wc.style			= CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc		= Callback;
+	wc.lpfnWndProc		= NULL;
     wc.cbClsExtra		= 0;
     wc.cbWndExtra		= 0;
 	wc.hInstance		= (HINSTANCE)zeCore->GetApplicationInstance();
@@ -139,6 +180,10 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 		return false;
 	}
 
+	static ZEWindowSystemMessageHandler Handler;
+
+	ZECore->GetInstance()->GetSystemMessageManager()->RegisterMessageHandler(&Handler);
+
 	WindowHandle = CreateWindowEx(WS_EX_APPWINDOW, 
                "ZINEK ENGINE WINDOW", 
                WindowTitle, 
@@ -151,6 +196,9 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
                NULL, 
 			   (HINSTANCE)zeCore->GetApplicationInstance(), 
                NULL);
+	
+	Handler->TargetWindow = WindowHandle;
+
 	if (!WindowHandle)
 	{
 		zeError("Win32Window Module", "Could not create window.");
@@ -166,6 +214,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 
 bool ZEWindow::DestroyMainWindow()
 {
+	ZECore->GetInstance()->GetSystemMessageManager()->RegisterMessageHandler(&Handler);
 	if (DestroyWindow((HWND)WindowHandle) == 0)
 	{
 		zeError("Window", "Can not destroy window.");
@@ -285,23 +334,6 @@ void ZEWindow::HideWindow()
 	UpdateWindow((HWND)WindowHandle);
 }
 
-void ZEWindow::ProcessMessages()
-{
-	if (WindowType != ZE_WT_COMPONENT)
-	{
-		MSG Msg;
-		ZeroMemory(&Msg, sizeof(Msg));
-		while(PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE))
-		{	
-			if (Msg.message == WM_QUIT)
-				WindowDestroyed();
-
-			TranslateMessage(&Msg);
-			DispatchMessage(&Msg);
-		}
-	}
-} 
-
 bool ZEWindow::Initialize()
 {
 	WindowInitialization = true;
@@ -339,46 +371,4 @@ ZEWindow::ZEWindow()
 ZEWindow::~ZEWindow()
 {
 	Window = NULL;
-}
-
-
-LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-		case WM_CREATE:
-			return 0;
-
-		case WM_SIZE:
-			if (!WindowInitialization)
-				Window->WindowResized(LOWORD(lParam), HIWORD(lParam));
-			return 0;
-
-		case WM_PAINT:
-			ValidateRect(hWnd, NULL);
-			return 0;
-
-		case WM_ACTIVATE:
-			if (wParam == WA_INACTIVE)
-				Window->WindowLostFocus();
-			else
-				Window->WindowGainedFocus();
-			return 0;
-
-		case WM_CLOSE:
-			if (MessageBox(hWnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
-				Window->WindowDestroyed();
-			return 0;
-
-		case WM_DESTROY:
-			Window->WindowDestroyed();
-			return 0;
-
-		case WM_INPUT:
-			OnWMRawInputRecived((HRAWINPUT)lParam);
-			return 0;
-
-		default:
-			return DefWindowProc(hWnd, msg, wParam, lParam);
-	}
 }

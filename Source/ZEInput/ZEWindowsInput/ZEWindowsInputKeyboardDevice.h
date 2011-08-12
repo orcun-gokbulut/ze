@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEInputModule.h
+ Zinek Engine - ZEWindowsInputModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,44 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_INPUT_MODULE_H__
-#define __ZE_INPUT_MODULE_H__
+#ifndef	__ZE_WINDOWS_INPUT_MODULE_H__
+#define __ZE_WINDOWS_INPUT_MODULE_H__
 
-#define zeInput ZEInputModule::GetInstance()
+#include "ZEInput/ZEInputModule.h"
 
-#include "ZEDS\ZEArray.h"
-#include "ZECore\ZEModule.h"
-#include "ZEInputMap.h"
+class ZEWindowsInputModule : public ZEInputModule
+{
+	private:
+		bool							Acquired;
+		bool							Enabled;
 
-class ZEInputModule : public ZEModule 
-{	
+										~ZEWindowsInputModule();
+
 	public:
-		static void						BaseInitialize();
-		static void						BaseDeinitialize();
-
 		virtual ZEModuleDescription*	GetModuleDescription();
-		static ZEModuleDescription*		ModuleDescription();
 
-		virtual const
-		ZEArray<ZEInputDevice*>&		GetInputDevices() = 0;
+		virtual bool					IsEnabled();
+		virtual void					SetEnabled(bool Enabled);
 
-		virtual void					ProcessInputs() = 0;
-		virtual void					ProcessInputMap(ZEInputMap* InputMap) = 0;
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
 
-		virtual void					Acquire() = 0;
-		virtual void					UnAcquire() = 0;
+		virtual void					Destroy();
 
-		static ZEInputModule*			GetInstance();
+		virtual void					ProcessInputs();
+		virtual void					ProcessInputMap(ZEInputMap* InputMap);
+		virtual bool					GetRawInputEvent(ZEInputEvent& InputEvent);
+
+		virtual void					Acquire();
+		virtual void					UnAcquire();
 };
 #endif
-   
-
-
-
-  
-
-
-
-
-
-

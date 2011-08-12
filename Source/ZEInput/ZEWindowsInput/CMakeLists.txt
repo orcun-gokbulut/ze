@@ -35,6 +35,10 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+add_source (ZEWindowsInputKeyboardDevice.cpp		Sources)
+add_source (ZEWindowsInputKeyboardDevice.h		    Sources)
+add_source (ZEWindowsInputMouseDevice.cpp			Sources)
+add_source (ZEWindowsInputMouseDevice.h			    Sources)
 add_source (ZEWindowsInputModule.cpp				Sources)
 add_source (ZEWindowsInputModule.h				    Sources)
 add_source (ZEWindowsInputModuleDescription.cpp	    Sources)

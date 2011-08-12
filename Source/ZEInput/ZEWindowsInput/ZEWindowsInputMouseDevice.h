@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEInputModule.h
+ Zinek Engine - ZEWindowsInputMouseDevice.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,44 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_INPUT_MODULE_H__
-#define __ZE_INPUT_MODULE_H__
+#ifndef	__ZE_WINDOWS_INPUT_MODULE_H__
+#define __ZE_WINDOWS_INPUT_MODULE_H__
 
-#define zeInput ZEInputModule::GetInstance()
+#include "ZEInput/ZEInputModule.h"
 
-#include "ZEDS\ZEArray.h"
-#include "ZECore\ZEModule.h"
-#include "ZEInputMap.h"
+class ZEWindowsInputMouseDevice : public ZEInputModule
+{
+	private:
+		bool							Acquired;
 
-class ZEInputModule : public ZEModule 
-{	
 	public:
-		static void						BaseInitialize();
-		static void						BaseDeinitialize();
+		virtual unsigned int			GetDeviceId();
+		virtual const char*				GetDeviceName();
+		virtual unsigned int			GetDeviceIndex();
 
-		virtual ZEModuleDescription*	GetModuleDescription();
-		static ZEModuleDescription*		ModuleDescription();
+		virtual void					Acquire();
+		virtual void					UnAcuire();
 
-		virtual const
-		ZEArray<ZEInputDevice*>&		GetInputDevices() = 0;
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
 
-		virtual void					ProcessInputs() = 0;
-		virtual void					ProcessInputMap(ZEInputMap* InputMap) = 0;
+		virtual void					ProcessInputs();
 
-		virtual void					Acquire() = 0;
-		virtual void					UnAcquire() = 0;
-
-		static ZEInputModule*			GetInstance();
+		virtual bool					ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction);
 };
 #endif
-   
-
-
-
-  
-
-
-
-
-
-

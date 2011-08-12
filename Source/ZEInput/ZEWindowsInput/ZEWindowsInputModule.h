@@ -44,6 +44,7 @@ class ZEWindowsInputModule : public ZEInputModule
 	private:
 		bool							Acquired;
 		bool							Enabled;
+		ZEArray<ZEInputDevice*>			Devices;
 
 										~ZEWindowsInputModule();
 
@@ -60,7 +61,6 @@ class ZEWindowsInputModule : public ZEInputModule
 
 		virtual void					ProcessInputs();
 		virtual void					ProcessInputMap(ZEInputMap* InputMap);
-		virtual bool					GetRawInputEvent(ZEInputEvent& InputEvent);
 
 		virtual void					Acquire();
 		virtual void					UnAcquire();

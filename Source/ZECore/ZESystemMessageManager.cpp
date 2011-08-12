@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEInputModule.h
+ Zinek Engine - ZESystemMessageManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,46 +32,62 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#include "ZESystemMessageManager.h"
 
-#pragma once
-#ifndef	__ZE_INPUT_MODULE_H__
-#define __ZE_INPUT_MODULE_H__
+ZESystemMessageManager::ZESystemMessageManager()
+{
 
-#define zeInput ZEInputModule::GetInstance()
+}
 
-#include "ZEDS\ZEArray.h"
-#include "ZECore\ZEModule.h"
-#include "ZEInputMap.h"
+ZESystemMessageManager::~ZESystemMessageManager()
+{
 
-class ZEInputModule : public ZEModule 
-{	
-	public:
-		static void						BaseInitialize();
-		static void						BaseDeinitialize();
+}
 
-		virtual ZEModuleDescription*	GetModuleDescription();
-		static ZEModuleDescription*		ModuleDescription();
+const ZEArray<ZESystemMessageManager*>& ZESystemMessageManager::GetMessageHandlers()
+{
+	return Handlers;
+}
 
-		virtual const
-		ZEArray<ZEInputDevice*>&		GetInputDevices() = 0;
+void ZESystemMessageManager::RegisterMessageHandler(ZESystemMessageManager* Handler)
+{
+	if (Handlers.Exists(Handler))
+	{
+		zeError("System Message Manager", "Handler is already added.");
+		return;
+	}
 
-		virtual void					ProcessInputs() = 0;
-		virtual void					ProcessInputMap(ZEInputMap* InputMap) = 0;
+	Handlers.Add(Handler);
+}
 
-		virtual void					Acquire() = 0;
-		virtual void					UnAcquire() = 0;
+void ZESystemMessageManager::UnregisterMessageHandler(ZESystemMessageManager* Handler)
+{
+	Handlers.DeleteValue(Handler);
+}
 
-		static ZEInputModule*			GetInstance();
-};
-#endif
-   
+void ZESystemMessageManager::ProcessMessages()
+{
+	MSG Msg;
+	ZeroMemory(&Msg, sizeof(Msg));
+	while(PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE))
+	{	
+		TranslateMessage(&Msg);
 
+		for(size_t I = 0; I < Handlers.GetCount(); I++)
+		{
+			bool Handled = false;;
 
+			if (Msg.message < Handlers[I].MinVal && Msg.message > Handlers[I].MaxMessage &&
+				(Handlers[I]->Window == NULL || Handlers[I]->Window == Msg.hwnd))
+			{
+				if (Handlers[I]->Callback(Msg))
+					Handled = true;
+			}
 
-  
+			if (!Handled)
+				DefWindowProc(Msg.hwnd, Msg, Msg.wParam, Msg.lParam);
+		}
 
-
-
-
-
-
+		DispatchMessage(&Msg);
+	}
+}

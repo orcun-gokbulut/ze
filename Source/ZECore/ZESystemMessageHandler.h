@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEInputModule.h
+ Zinek Engine - ZESystemMessageHandler.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,44 +34,22 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_INPUT_MODULE_H__
-#define __ZE_INPUT_MODULE_H__
+#ifndef __ZE_SYSTEM_MESSAGE_HANDLER__
+#define __ZE_SYSTEM_MESSAGE_HANDLER__
 
-#define zeInput ZEInputModule::GetInstance()
+#define WINDOWS_LEAN_AND_MEAN
+#include <windows.h>
 
-#include "ZEDS\ZEArray.h"
-#include "ZECore\ZEModule.h"
-#include "ZEInputMap.h"
-
-class ZEInputModule : public ZEModule 
-{	
+class ZESystemMessageHandler
+{
 	public:
-		static void						BaseInitialize();
-		static void						BaseDeinitialize();
+		HWND					TargetWindow;
+		int						MinMessage;
+		int						MaxMessage;
 
-		virtual ZEModuleDescription*	GetModuleDescription();
-		static ZEModuleDescription*		ModuleDescription();
+		virtual bool			Callback(MSG* Message) = 0;
 
-		virtual const
-		ZEArray<ZEInputDevice*>&		GetInputDevices() = 0;
-
-		virtual void					ProcessInputs() = 0;
-		virtual void					ProcessInputMap(ZEInputMap* InputMap) = 0;
-
-		virtual void					Acquire() = 0;
-		virtual void					UnAcquire() = 0;
-
-		static ZEInputModule*			GetInstance();
+								ZESystemMessageHandler();
 };
+
 #endif
-   
-
-
-
-  
-
-
-
-
-
-
