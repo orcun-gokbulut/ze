@@ -37,6 +37,11 @@
 #include "ZEInputModuleDescription.h"
 #include "ZECore\ZECore.h"
 
+ZEInputModule::ZEInputModule()
+{
+	Acquired = false;
+}
+
 void ZEInputModule::BaseInitialize()
 {
 }
@@ -54,6 +59,26 @@ ZEModuleDescription* ZEInputModule::ModuleDescription()
 {
 	static ZEInputModuleDescription Desc;
 	return &Desc;
+}
+
+bool ZEInputModule::IsAcquired()
+{
+	if (!IsInitialized())
+		return false;
+
+	return Acquired;
+}
+
+void ZEInputModule::Acquire()
+{
+	if (IsInitialized())
+		Acquired = true;
+}
+
+void ZEInputModule::UnAcquire()
+{
+	if (IsInitialized())
+		Acquired = false;
 }
 
 ZEInputModule* ZEInputModule::GetInstance()

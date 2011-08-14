@@ -35,12 +35,61 @@
 
 #include "ZEInputDevice.h"
 
-void ZEInputDevice::Acquire()
+void ZEInputDevice::SetEnabled(bool Enabled)
 {
-
+	this->Enabled = Enabled;
 }
 
-void ZEInputDevice::UnAcuire()
+bool ZEInputDevice::GetEnabled()
 {
+	return Enabled;
+}
 
+bool ZEInputDevice::IsAcquired()
+{
+	return Acquired;
+}
+
+void ZEInputDevice::Acquire()
+{
+	Acquired = true;
+}
+
+void ZEInputDevice::UnAcquire()
+{
+	Acquired = false;
+}
+
+bool ZEInputDevice::IsInitialized()
+{
+	return Initialized;
+}
+
+bool ZEInputDevice::Initialize()
+{
+	Initialized = true;
+
+	return true;
+}
+
+void ZEInputDevice::Deinitialize()
+{
+	Initialized = false;
+}
+
+void ZEInputDevice::Destroy()
+{
+	delete this;
+}
+
+ZEInputDevice::ZEInputDevice()
+{
+	Enabled = true;
+	Initialized = false;
+	Acquired = false;
+}
+
+ZEInputDevice::~ZEInputDevice()
+{
+	Deinitialize();
 }

@@ -37,8 +37,6 @@
 #ifndef	__ZE_WINDOW_H__
 #define __ZE_WINDOW_H__
 
-#include "ZESystemMessageHandler.h"
-
 #define zeWindow ZEWindow::GetInstance()
 
 enum ZEWindowType
@@ -50,11 +48,7 @@ enum ZEWindowType
 	ZE_WT_FULLSCREEN		= 4,
 };
 
-class ZEWindowSystemMessageHandler : public ZESystemMessageHandler
-{
-	public:
-		virtual bool			Callback(MSG* Message);
-};
+class ZESystemMessageHandler;
 
 class ZEWindow
 {
@@ -63,7 +57,7 @@ class ZEWindow
 		int						WindowWidth, WindowHeight;
 		ZEWindowType			WindowType;
 		void*					WindowHandle;
-		ZEWindowSystemMessageHandler SystemMessageHandler;
+		ZESystemMessageHandler* SystemMessageHandler;
 
 		bool					CreateMainWindow(const char* WindowTitle);
 		bool					DestroyMainWindow();
@@ -89,7 +83,6 @@ class ZEWindow
 		void					HideWindow();
 
 		void*					GetHandle();
-		void					ProcessMessages();
 
 		bool					Initialize();
 		void					Deinitialize();

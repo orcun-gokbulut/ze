@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputModule.h
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,36 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_WINDOWS_INPUT_MODULE_H__
-#define __ZE_WINDOWS_INPUT_MODULE_H__
-
-#include "ZEInput/ZEInputModule.h"
-
-class ZEWindowsInputModule : public ZEInputModule
-{
-	private:
-		bool							Acquired;
-		bool							Enabled;
-
-										~ZEWindowsInputModule();
-
-	public:
-		virtual ZEModuleDescription*	GetModuleDescription();
-
-		virtual bool					IsEnabled();
-		virtual void					SetEnabled(bool Enabled);
-
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
-
-		virtual void					Destroy();
-
-		virtual void					ProcessInputs();
-		virtual void					ProcessInputMap(ZEInputMap* InputMap);
-		virtual bool					GetRawInputEvent(ZEInputEvent& InputEvent);
-
-		virtual void					Acquire();
-		virtual void					UnAcquire();
-};
-#endif

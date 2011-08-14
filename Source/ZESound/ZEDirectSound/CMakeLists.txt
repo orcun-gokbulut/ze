@@ -49,6 +49,6 @@ add_source (ZEDSSoundSource3D.cpp		Sources)
 add_source (ZEDSSoundSource3D.h			Sources)
 
 add_library (ZEDirectSound ${Sources})
-target_link_libraries (ZEDirectSound dsound.lib)
+target_link_libraries (ZEDirectSound dsound.lib dxguid.lib)
 
 set_property(TARGET ZEDirectSound PROPERTY FOLDER "Zinek Engine")

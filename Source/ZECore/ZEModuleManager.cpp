@@ -228,9 +228,9 @@ ZEModuleManager::ZEModuleManager()
 {
 	RegisterModule(new ZED3D9ModuleDescription());
 	RegisterModule(new ZEDSModuleDescription());
-	RegisterModule(new ZEDummyInputModuleDescription());
+	/*RegisterModule(new ZEDummyInputModuleDescription());
 	RegisterModule(new ZEVirtualInputModuleDescription());
-	RegisterModule(new ZEDirectInputModuleDescription());
+	RegisterModule(new ZEDirectInputModuleDescription());*/
 	RegisterModule(new ZEALModuleDescription());
 	RegisterModule(new ZEPhysXModuleDescription());
 	RegisterModule(new ZEWindowsInputModuleDescription());

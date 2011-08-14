@@ -40,6 +40,7 @@
 #include "ZEInput\ZEInputModule.h"
 #include "ZEGraphics\ZEGraphicsModule.h"
 #include "ZESystemMessageManager.h"
+#include "ZESystemMessageHandler.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #define NOMINMAX
@@ -53,6 +54,13 @@ char*  Parameters;
 
 ZEWindow* Window = NULL;
 bool WindowInitialization;
+
+
+class ZEWindowSystemMessageHandler : public ZESystemMessageHandler
+{
+	public:
+		virtual bool Callback(MSG* Message);
+};
 
 bool ZEWindowSystemMessageHandler::Callback(MSG* Message)
 {
@@ -178,7 +186,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 		return false;
 	}
 
-	ZECore::GetInstance()->GetSystemMessageManager()->RegisterMessageHandler(&SystemMessageHandler);
+	ZECore::GetInstance()->GetSystemMessageManager()->RegisterMessageHandler(SystemMessageHandler);
 
 	WindowHandle = CreateWindowEx(WS_EX_APPWINDOW, 
                "ZINEK ENGINE WINDOW", 
@@ -193,7 +201,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 			   (HINSTANCE)zeCore->GetApplicationInstance(), 
                NULL);
 	
-	SystemMessageHandler.TargetWindow = (HWND)WindowHandle;
+	SystemMessageHandler->TargetWindow = (HWND)WindowHandle;
 
 	if (!WindowHandle)
 	{
@@ -205,6 +213,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 
 	if (WindowType != ZE_WT_FULLSCREEN)
 		SetWindowSize(WindowWidth, WindowHeight);
+
 	return true;
 }
 
@@ -217,7 +226,8 @@ bool ZEWindow::DestroyMainWindow()
 		return false;
 	}
 
-	ZECore::GetInstance()->GetSystemMessageManager()->RegisterMessageHandler(&SystemMessageHandler);
+	ZECore::GetInstance()->GetSystemMessageManager()->RegisterMessageHandler(SystemMessageHandler);
+	 
 	return true;
 }
 
@@ -337,7 +347,6 @@ bool ZEWindow::Initialize()
 		if (!CreateMainWindow("Zinek Engine"))
 			return false;
 
-	ProcessMessages();
 	WindowInitialization = false;
 	return true;
 }
@@ -355,6 +364,7 @@ ZEWindow* ZEWindow::GetInstance()
 
 ZEWindow::ZEWindow()
 {
+	SystemMessageHandler = new ZEWindowSystemMessageHandler();
 	WindowType = ZE_WT_DEFAULT;
 	WindowPositionLeft = CW_USEDEFAULT;
 	WindowPositionTop = 0;
@@ -366,5 +376,6 @@ ZEWindow::ZEWindow()
 
 ZEWindow::~ZEWindow()
 {
+	delete SystemMessageHandler;
 	Window = NULL;
 }

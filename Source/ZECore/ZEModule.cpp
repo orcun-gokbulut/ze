@@ -40,12 +40,41 @@ ZEModuleDescription* ZEModule::ModuleDescription()
 	return 0;
 }
 
+bool ZEModule::GetEnabled()
+{
+	return Enabled;
+}
+void ZEModule::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+}
+
+bool ZEModule::IsInitialized()
+{
+	return Initialized;
+}
+
+bool ZEModule::Initialize()
+{
+	Initialized = true;
+
+	return true;
+}
+
+void ZEModule::Deinitialize()
+{
+	Initialized = false;
+}
+
 ZEModule::ZEModule()
 {
+	Enabled = false;
+	Initialized = false;
 }
 
 ZEModule::~ZEModule()
 {
+	Deinitialize();
 }
 
 void ZEModule::Destroy()

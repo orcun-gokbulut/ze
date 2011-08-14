@@ -38,7 +38,7 @@
 #include "ZEDummyInputModule.h"
 #include "ZEDummyInputModuleDescription.h"
 
-bool ZEDummyInputModule::IsEnabled()
+bool ZEDummyInputModule::GetEnabled()
 {
 	return Enabled;
 }

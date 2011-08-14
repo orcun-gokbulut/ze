@@ -607,7 +607,7 @@ void ZECore::MainLoop()
 
 	// Game Logic
 	Input->ProcessInputs();
-	Window->ProcessMessages();
+
 	if (Game != NULL)
 		Game->Tick(FrameTime);
 	

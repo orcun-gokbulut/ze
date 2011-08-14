@@ -42,27 +42,20 @@
 class ZEWindowsInputModule : public ZEInputModule
 {
 	private:
-		bool							Acquired;
-		bool							Enabled;
 		ZEArray<ZEInputDevice*>			Devices;
 
-										~ZEWindowsInputModule();
-
 	public:
+		static ZEModuleDescription*		ModuleDescription();
 		virtual ZEModuleDescription*	GetModuleDescription();
 
-		virtual bool					IsEnabled();
-		virtual void					SetEnabled(bool Enabled);
+		virtual const
+		ZEArray<ZEInputDevice*>&		GetInputDevices();
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
 
-		virtual void					Destroy();
-
 		virtual void					ProcessInputs();
 		virtual void					ProcessInputMap(ZEInputMap* InputMap);
-
-		virtual void					Acquire();
-		virtual void					UnAcquire();
 };
+
 #endif

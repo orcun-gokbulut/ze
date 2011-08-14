@@ -53,7 +53,7 @@ class ZEDummyInputModule: public ZEInputModule
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
 
-		virtual bool					IsEnabled();
+		virtual bool					GetEnabled();
 		virtual void					SetEnabled(bool Enabled);
 
 		virtual void					ProcessInputs();

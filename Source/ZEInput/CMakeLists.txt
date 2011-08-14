@@ -35,9 +35,9 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_subdirectory (ZEDirectInput)
-add_subdirectory (ZEDummyInput)
-add_subdirectory (ZEVirtualInput)
+#add_subdirectory (ZEDirectInput)
+#add_subdirectory (ZEDummyInput)
+#add_subdirectory (ZEVirtualInput)
 add_subdirectory (ZEWindowsInput)
 add_subdirectory (ZEFreespaceInput)
 

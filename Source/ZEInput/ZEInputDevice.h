@@ -47,6 +47,11 @@ class ZEInputMap;
 
 class ZEInputDevice
 {
+	private:
+		bool							Enabled;
+		bool							Acquired;
+		bool							Initialized;
+
 	public:
 		virtual unsigned int			GetDeviceId() = 0;
 		virtual const char*				GetDeviceName() = 0;
@@ -54,17 +59,26 @@ class ZEInputDevice
 		virtual const 
 		ZEArray<ZEInputDescription>&	GetInputDescriptions() = 0;
 
-		virtual ZEInputEvent			GetCurrentInputEvents() = 0;
+		virtual void					SetEnabled(bool Enabled);
+		virtual bool					GetEnabled();
 
+		virtual bool					IsAcquired();
+		virtual void					Acquire();
+		virtual void					UnAcquire();
+
+		virtual bool					IsInitialized();
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
 
-		virtual void					Acquire();
-		virtual void					UnAcuire();
 
 		virtual void					ProcessInputs() = 0;
 
 		virtual bool					ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* Action) = 0;
+
+		virtual void					Destroy();
+
+										ZEInputDevice();
+		virtual							~ZEInputDevice();
 };
 
 #endif

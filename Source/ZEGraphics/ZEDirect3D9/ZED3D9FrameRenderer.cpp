@@ -866,7 +866,7 @@ static int RenderOrderCompare(const void* A, const void* B)
 
 void ZED3D9FrameRenderer::Render(float ElaspedTime)
 {
-	if (!GetModule()->IsEnabled() || GetModule()->IsDeviceLost())
+	if (!GetModule()->GetEnabled() || GetModule()->IsDeviceLost())
 		return;
 
 	RenderList.Sort(RenderOrderCompare);

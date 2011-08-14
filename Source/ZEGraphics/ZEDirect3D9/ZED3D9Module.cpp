@@ -105,7 +105,7 @@ ZED3D9PipelineType ZED3D9Module::GetPipelineType()
 	return PipelineType;
 }
 
-bool ZED3D9Module::IsEnabled()
+bool ZED3D9Module::GetEnabled()
 {
 	return Enabled;
 }

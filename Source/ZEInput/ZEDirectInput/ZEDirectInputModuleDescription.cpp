@@ -76,7 +76,6 @@ ZEOptionSection* ZEDirectInputModuleDescription::GetOptions()
 	return NULL;
 }
 
-
 ZEModule* ZEDirectInputModuleDescription::CreateModuleInstance()
 {
 	return new ZEDirectInputModule;
@@ -86,7 +85,3 @@ bool ZEDirectInputModuleDescription::CheckCompatible()
 {
 	return true;
 }
-
-
-
-

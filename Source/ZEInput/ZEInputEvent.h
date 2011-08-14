@@ -51,7 +51,8 @@ enum ZEInputButtonState
 enum ZEInputAxisSign
 {
 	ZE_IAS_POSITIVE,
-	ZE_IAS_NEGATIVE
+	ZE_IAS_NEGATIVE,
+	ZE_IAS_ALL
 };
 
 enum ZEInputType

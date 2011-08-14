@@ -33,27 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEInput\ZEInputDevice.h"
+#include "ZEWindowsInputMouseDevice.h"
 
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEError.h"
 
+#include "ZEInput/ZEInputEvent.h"
+#include "ZEInput/ZEInputMapBinding.h"
+#include "ZEInput/ZEInputAction.h"
+
+#include "ZECore/ZESystemMessageHandler.h"
+#include "ZECore/ZESystemMessageManager.h"
 
 #define WINDIWS_LEAN_AND_MEAN
 #include <windows.h>
 
-bool ZEWMISystemMessageHandler::Callback(MSG Message)
+class ZEWMISystemMessageHandler : public ZESystemMessageHandler
 {
-	switch(Message.message)
+	ZEWindowsInputMouseDevice* Device;
+	virtual bool Callback(MSG* Message);
+};
+
+bool ZEWMISystemMessageHandler::Callback(MSG* Message)
+{
+	switch(Message->message)
 	{
 		case WM_INPUT:
 		{
+			if ((HRAWINPUT)Message->lParam != Device->DeviceHandle)
+				return false;
+
 			BYTE Buffer[1024];
 			UINT BufferSize = 1024;
 			memset(Buffer, 0xfd, sizeof(Buffer));
 
-			if (GetRawInputData(Handle, RID_INPUT, Buffer, &BufferSize, sizeof(RAWINPUTHEADER)) == (UINT)-1)
+			if (GetRawInputData((HRAWINPUT)Message->lParam, RID_INPUT, Buffer, &BufferSize, sizeof(RAWINPUTHEADER)) == (UINT)-1)
 			{
 				zeError("WindowsInput", "Can not read raw input data.");
 				return;
@@ -64,75 +79,17 @@ bool ZEWMISystemMessageHandler::Callback(MSG Message)
 			if (Input->header.dwType != RIM_TYPEMOUSE)
 				return false;
 
-			MouseState.Axis[0] += Input->data.mouse.lLastX;
-			MouseState.Axis[1] += Input->data.mouse.lLastY;
+			Device->AxisState[0] += Input->data.mouse.lLastX;
+			Device->AxisState[1] += Input->data.mouse.lLastY;
 
-			if (Input->data.mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN)
-			{
-				if (MouseState.Buttons[0] == ZE_WIKS_NONE)
-					MouseState.Buttons[0] = ZE_WIKS_PRESSED;
-			}
-			else if (Input->data.mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP)
-				MouseState.Buttons[0] = ZE_WIKS_RELEASED;
-
-			if (Input->data.mouse.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_DOWN)
-			{
-				if (MouseState.Buttons[1] == ZE_WIKS_NONE)
-					MouseState.Buttons[1] = ZE_WIKS_PRESSED;
-			}
-			else if (Input->data.mouse.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_UP)
-				MouseState.Buttons[1] = ZE_WIKS_RELEASED;
-
-			if (Input->data.mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN)
-			{
-				if (MouseState.Buttons[2] == ZE_WIKS_NONE)
-					MouseState.Buttons[2] = ZE_WIKS_PRESSED;
-			}
-			else if (Input->data.mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP)
-				MouseState.Buttons[2] = ZE_WIKS_RELEASED;
-
-			if (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN)
-			{
-				if (MouseState.Buttons[3] == ZE_WIKS_NONE)
-					MouseState.Buttons[3] = ZE_WIKS_PRESSED;
-			}
-			else if (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_UP)
-				MouseState.Buttons[3] = ZE_WIKS_RELEASED;
-
-			if (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN)
-			{
-				if (MouseState.Buttons[4] == ZE_WIKS_NONE)
-					MouseState.Buttons[4] = ZE_WIKS_PRESSED;
-			}
-			else if (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_UP)
-				MouseState.Buttons[4] = ZE_WIKS_RELEASED;
-
-			if (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN)
-			{
-				if (MouseState.Buttons[5] == ZE_WIKS_NONE)
-					MouseState.Buttons[5] = ZE_WIKS_PRESSED;
-			}
-			else if (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_UP)
-				MouseState.Buttons[5] = ZE_WIKS_RELEASED;
-
-			if (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN)
-			{
-				if (MouseState.Buttons[6] == ZE_WIKS_NONE)
-					MouseState.Buttons[6] = ZE_WIKS_PRESSED;
-			}
-			else if (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP)
-				MouseState.Buttons[6] = ZE_WIKS_RELEASED;
-
-			if (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) 
-			{
-				if (MouseState.Buttons[7] == ZE_WIKS_NONE)
-					MouseState.Buttons[7] = ZE_WIKS_PRESSED;
-			}
-			else if (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP)
-				MouseState.Buttons[7] = ZE_WIKS_RELEASED;
-
+			Device->ButtonState[0] |= (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN);
+			Device->ButtonState[1] |= (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN);
+			Device->ButtonState[2] |= (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN);
+			Device->ButtonState[3] |= (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN);
+			Device->ButtonState[4] |= (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN);
+			
 			if (Input->data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				MouseState.Axis[3] += *((SHORT*)&Input->data.mouse.usButtonData);
+				Device->AxisState[2] += *((SHORT*)&Input->data.mouse.usButtonData);
 
 			return true;
 		}
@@ -142,185 +99,128 @@ bool ZEWMISystemMessageHandler::Callback(MSG Message)
 	}
 }
 
-		virtual unsigned int			GetDeviceId();
-		virtual const char*				GetDeviceName();
-		virtual unsigned int			GetDeviceIndex();
+ZEWindowsInputMouseDevice::ZEWindowsInputMouseDevice()
+{
+	MessageHandler = new ZEWMISystemMessageHandler();
+}
 
-		virtual void					Acquire();
-		virtual void					UnAcuire();
+ZEWindowsInputMouseDevice::~ZEWindowsInputMouseDevice()
+{
+	delete MessageHandler;
+}
 
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+unsigned int ZEWindowsInputMouseDevice::GetDeviceId()
+{
+	return 1;
+}
 
-		virtual void					ProcessInputs();
+const char* ZEWindowsInputMouseDevice::GetDeviceName()
+{
+	return "Mouse";
+}
 
-		virtual bool					ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction);
+unsigned int ZEWindowsInputMouseDevice::GetDeviceIndex()
+{
+	return 1;
+
+}
+
+const ZEArray<ZEInputDescription>& ZEWindowsInputMouseDevice::GetInputDescriptions()
+{
+	ZEArray<ZEInputDescription> Descriptions;
+	return Descriptions;
+}
 
 bool ZEWindowsInputMouseDevice::Initialize()
 {	
-	zeLog("WindowInput", "Initializing Windows Input.\r\n");
 
-	UINT NumberOfDevices;
-	ZEArray<RAWINPUTDEVICELIST> DeviceList;
+	memset(&ButtonState, 0, sizeof(ButtonState));
+	memset(&AxisState, 0, sizeof(AxisState));
 
-	if (GetRawInputDeviceList(NULL, &NumberOfDevices, sizeof(RAWINPUTDEVICELIST)) != 0) 
-	{ 
-		zeError("WindowsInput", "Can not load input device list.");
-		return false;
-	}
-
-	DeviceList.SetCount(NumberOfDevices);
-	if (GetRawInputDeviceList(DeviceList.GetCArray(), &NumberOfDevices, sizeof(RAWINPUTDEVICELIST)) == (UINT) -1)
-	{
-		zeError("WindowsInput", "Can not load input device list.");
-		return false;
-	}
-
-	RAWINPUTDEVICE Rid[2];
-    
-	// Mouse
-	Rid[0].usUsagePage = 0x01; 
-	Rid[0].usUsage = 0x02; 
-	Rid[0].dwFlags = 0;
-	Rid[0].hwndTarget = NULL;
-
-	if (RegisterRawInputDevices(Rid, 1, sizeof(RAWINPUTDEVICE)) == FALSE) 
-	{
-		zeError("WindowsInput", "Can not register input devices.");
-		return false;
-	}
-
-	memset(&KeyboardState, 0, sizeof(KeyboardState));
-	memset(&MouseState, 0, sizeof(MouseState));
-
-	ZEArray<ZEExtensionDescription*> DeviceExtensions = ZEExtensionManager::GetInstance()->GetExtensionDescriptions(
-		ZEInputDeviceExtension::ExtensionDescription());
-
-	return true;
-}
-
-void ZEWindowsInputMouseDevice::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-bool ZEWindowsInputMouseDevice::IsEnabled()
-{
-	return Enabled;
+	return ZEInputDevice::Initialize();
 }
 
 void ZEWindowsInputMouseDevice::Deinitialize()
 {
-
+	return ZEInputDevice::Deinitialize();
 }
 
 void ZEWindowsInputMouseDevice::ProcessInputs()
 {   
-	MouseState.Axis[0] = 0;
-	MouseState.Axis[1] = 0;
-	MouseState.Axis[2] = 0;
+	AxisStateOld[0] = AxisState[0];
+	AxisStateOld[1] = AxisState[1];
+	AxisStateOld[2] = AxisState[2];
 
-	for (size_t I = 0; I < 256; I++)
-		if (KeyboardState.Buttons[I] == ZE_WIKS_RELEASED)
-			KeyboardState.Buttons[I] = ZE_WIKS_NONE;
-		else if (KeyboardState.Buttons[I] == ZE_WIKS_PRESSED)
-			KeyboardState.Buttons[I] = ZE_WIKS_PRESSING;
+	AxisState[0] = 0;
+	AxisState[1] = 0;
+	AxisState[2] = 0;
 
 	for (size_t I = 0; I < 8; I++)
-		if (MouseState.Buttons[I] == ZE_WIKS_RELEASED)
-			MouseState.Buttons[I] = ZE_WIKS_NONE;
-		else if (MouseState.Buttons[I] == ZE_WIKS_PRESSED)
-			MouseState.Buttons[I] = ZE_WIKS_PRESSING;
-}
-
-void ZEWindowsInputMouseDevice::ProcessInputMap(ZEInputMap* InputMap)
-{
-	ZEInputBinding* CurrInputBinding;
-	InputMap->InputActionCount = 0;
-
-	for (size_t I = 0; I < InputMap->InputBindings.GetCount(); I++)
 	{
-		ZEInputBinding* CurrentBinding = &InputMap->InputBindings[I];
-		if (CurrentBinding->Event.DeviceType == ZE_IDT_KEYBOARD && CurrentBinding->Event.InputType == ZE_IT_BUTTON)
-		{
-			if ((CurrentBinding->Event.ButtonState == ZE_IBS_ALL && (KeyboardState.Buttons[CurrentBinding->Event.ButtonId] == ZE_WIKS_PRESSED || KeyboardState.Buttons[CurrentBinding->Event.ButtonId] == ZE_WIKS_PRESSING)) ||
-				(CurrentBinding->Event.ButtonState == ZE_IBS_PRESSED && KeyboardState.Buttons[CurrentBinding->Event.ButtonId] == ZE_WIKS_PRESSED))
-			{
-				InputMap->InputActions[InputMap->InputActionCount].Id = CurrentBinding->ActionId;
-				InputMap->InputActions[InputMap->InputActionCount].ButtonState = ZE_IBS_PRESSED;
-				InputMap->InputActions[InputMap->InputActionCount].From = CurrentBinding;
-				InputMap->InputActionCount++;
-			}
-			else if (CurrentBinding->Event.ButtonState == ZE_IBS_RELEASED && KeyboardState.Buttons[CurrentBinding->Event.ButtonId] == ZE_WIKS_RELEASED)
-			{
-				InputMap->InputActions[InputMap->InputActionCount].Id = CurrentBinding->ActionId;
-				InputMap->InputActions[InputMap->InputActionCount].ButtonState = ZE_IBS_RELEASED;
-				InputMap->InputActions[InputMap->InputActionCount].From = CurrentBinding;
-				InputMap->InputActionCount++;
-			}
-		}
-		else if (CurrentBinding->Event.DeviceType == ZE_IDT_MOUSE)
-		{
-			if (CurrentBinding->Event.InputType == ZE_IT_BUTTON)
-			{
-				if ((CurrentBinding->Event.ButtonState == ZE_IBS_ALL || CurrentBinding->Event.ButtonState == ZE_IBS_PRESSED) && 
-					(MouseState.Buttons[CurrentBinding->Event.ButtonId] == ZE_WIKS_PRESSED || MouseState.Buttons[CurrentBinding->Event.ButtonId] == ZE_WIKS_PRESSING))
-				{
-					InputMap->InputActions[InputMap->InputActionCount].Id = CurrentBinding->ActionId;
-					InputMap->InputActions[InputMap->InputActionCount].ButtonState = ZE_IBS_PRESSED;
-					InputMap->InputActions[InputMap->InputActionCount].From = CurrentBinding;
-					InputMap->InputActionCount++;
-				}
-				else if (CurrentBinding->Event.ButtonState == ZE_IBS_RELEASED && MouseState.Buttons[CurrentBinding->Event.ButtonId] == ZE_WIKS_RELEASED)
-				{
-					InputMap->InputActions[InputMap->InputActionCount].Id = CurrentBinding->ActionId;
-					InputMap->InputActions[InputMap->InputActionCount].ButtonState = ZE_IBS_RELEASED;
-					InputMap->InputActions[InputMap->InputActionCount].From = CurrentBinding;
-					InputMap->InputActionCount++;
-				}
-			}
-			else if (CurrentBinding->Event.InputType == ZE_IT_AXIS)
-			{
-				if (CurrentBinding->Event.AxisSign == ZE_IAS_POSITIVE && MouseState.Axis[CurrentBinding->Event.AxisId] > 0)
-				{
-					InputMap->InputActions[InputMap->InputActionCount].Id = CurrentBinding->ActionId;
-					InputMap->InputActions[InputMap->InputActionCount].AxisValue = MouseState.Axis[CurrentBinding->Event.AxisId];
-					InputMap->InputActions[InputMap->InputActionCount].From = CurrentBinding;
-					InputMap->InputActionCount++;
-				}
-				else if (CurrentBinding->Event.AxisSign == ZE_IAS_NEGATIVE && MouseState.Axis[CurrentBinding->Event.AxisId] < 0)
-				{
-					InputMap->InputActions[InputMap->InputActionCount].Id = CurrentBinding->ActionId;
-					InputMap->InputActions[InputMap->InputActionCount].AxisValue = -MouseState.Axis[CurrentBinding->Event.AxisId];
-					InputMap->InputActions[InputMap->InputActionCount].From = CurrentBinding;
-					InputMap->InputActionCount++;
-				}
-			}
-		}
+		ButtonStateOld[I] = ButtonStateOld[I];
+		ButtonState[I] = false;
 	}
 }
 
-void ZEWindowsInputMouseDevice::Acquire()
+bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction)
 {
-	Acquired = true;
-}
+	if (InputBinding->Event.DeviceType == ZE_IDT_MOUSE)
+	{
+		if (InputBinding->Event.InputType == ZE_IT_BUTTON)
+		{
+			int ButtonIndex = InputBinding->Event.ButtonId;
 
-void ZEWindowsInputMouseDevice::UnAcquire()
-{
-	Acquired = false;
-}
+			if (ButtonIndex > 5)
+				return false;
 
-void ZEWindowsInputMouseDevice::Destroy()
-{
-	
-}
+			if ((InputBinding->Event.ButtonState == ZE_IBS_PRESSED && ButtonStateOld[ButtonIndex] == false && ButtonState[ButtonIndex] == true) ||
+				(InputBinding->Event.ButtonState == ZE_IBS_ALL && ButtonState[ButtonIndex] == true))
+			{
+				InputAction->Id = InputBinding->ActionId;
+				InputAction->ButtonState = ZE_IBS_PRESSED;
+				InputAction->From = InputBinding;
 
-ZEWindowsInputMouseDevice::~ZEWindowsInputMouseDevice()
-{
+				return true;
+			}
+			else if (InputBinding->Event.ButtonState == ZE_IBS_RELEASED && ButtonStateOld[ButtonIndex] == false && ButtonState[ButtonIndex] == false)
+			{
+				InputAction->Id = InputBinding->ActionId;
+				InputAction->ButtonState = ZE_IBS_RELEASED;
+				InputAction->From = InputBinding;
 
-}
+				return true;
+			}
+		}
+		else if (InputBinding->Event.InputType == ZE_IT_AXIS)
+		{
+			int AxisIndex = InputBinding->Event.AxisId;
+			
+			if (AxisIndex > 2)
+				return false;
 
-ZEWindowsInputMouseDevice::~ZEWindowsInputMouseDevice()
-{
+			if (InputBinding->Event.AxisSign == ZE_IAS_POSITIVE && AxisState[AxisIndex] > 0)
+			{
+				InputAction->Id = InputBinding->ActionId;
+				InputAction->AxisValue = AxisState[AxisIndex];
+				InputAction->From = InputBinding;
+				return true;
+			}
+			else if (InputBinding->Event.AxisSign == ZE_IAS_NEGATIVE && AxisState[AxisIndex] < 0)
+			{
+				InputAction->Id = InputBinding->ActionId;
+				InputAction->AxisValue = -AxisState[InputBinding->Event.AxisId];
+				InputAction->From = InputBinding;
+				return true;
+			}
+			else if (InputBinding->Event.AxisSign == ZE_IAS_ALL)
+			{
+				InputAction->Id = InputBinding->ActionId;
+				InputAction->AxisValue = AxisState[InputBinding->Event.AxisId];
+				InputAction->From = InputBinding;
+				return true;
+			}
+		}
+	}
 
+	return false;
 }

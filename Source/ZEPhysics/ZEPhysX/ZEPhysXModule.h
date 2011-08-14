@@ -55,7 +55,6 @@ class ZEPhysXModule : public ZEPhysicsModule
 		NxPhysicsSDK*							PhysicsSDK;
 		NxCookingInterface*						CookingInterface;
 		ZEArray<ZEPhysXPhysicalWorld*>			PhysicalWorlds;
-		bool									Enabled;
 
 												ZEPhysXModule();
 		virtual									~ZEPhysXModule();
@@ -66,9 +65,6 @@ class ZEPhysXModule : public ZEPhysicsModule
 
 		virtual ZEModuleDescription*			GetModuleDescription();
 		static ZEModuleDescription*				ModuleDescription();
-
-		virtual bool							IsEnabled();
-		virtual void							SetEnabled(bool Enabled);
 
 		virtual bool							Initialize();
 		virtual void							Deinitialize();

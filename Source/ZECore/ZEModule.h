@@ -41,6 +41,10 @@ class ZEModuleDescription;
 
 class ZEModule
 {
+	private:
+		bool							Enabled;
+		bool							Initialized;
+
 	protected:
 										ZEModule();
 		virtual							~ZEModule();
@@ -49,11 +53,12 @@ class ZEModule
 		static ZEModuleDescription*		ModuleDescription();
 		virtual ZEModuleDescription*	GetModuleDescription() = 0;
 
-		virtual bool					IsEnabled() = 0;
-		virtual void					SetEnabled(bool Enabled) = 0;
+		virtual bool					GetEnabled();
+		virtual void					SetEnabled(bool Enabled);
 
-		virtual bool					Initialize() = 0;
-		virtual void					Deinitialize() = 0;
+		virtual bool					IsInitialized();
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
 
 		virtual void					Destroy();
 };

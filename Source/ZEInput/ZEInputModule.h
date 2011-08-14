@@ -47,6 +47,12 @@ class ZEInputDevice;
 
 class ZEInputModule : public ZEModule 
 {	
+	private:
+		bool							Acquired;
+
+	protected:
+										ZEInputModule();
+
 	public:
 		static void						BaseInitialize();
 		static void						BaseDeinitialize();
@@ -60,8 +66,9 @@ class ZEInputModule : public ZEModule
 		virtual void					ProcessInputs() = 0;
 		virtual void					ProcessInputMap(ZEInputMap* InputMap) = 0;
 
-		virtual void					Acquire() = 0;
-		virtual void					UnAcquire() = 0;
+		virtual bool					IsAcquired();
+		virtual void					Acquire();
+		virtual void					UnAcquire();
 
 		static ZEInputModule*			GetInstance();
 };

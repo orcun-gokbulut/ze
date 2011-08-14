@@ -34,38 +34,47 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_WINDOWS_INPUT_MODULE_H__
-#define __ZE_WINDOWS_INPUT_MODULE_H__
+#ifndef	__ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
+#define __ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
 
-#include "ZEInput/ZEInputModule.h"
+#include "ZEInput/ZEInputDevice.h"
 
-enum ZEWIKeyState
+#define WINDOWS_LEAN_AND_MEAN
+#include <windows.h>
+
+class ZESystemMessageHandler;
+
+class ZEWindowsInputMouseDevice : public ZEInputDevice
 {
-	ZE_WIKS_NONE = 0,
-	ZE_WIKS_PRESSED = 1,
-	ZE_WIKS_PRESSING = 3,
-	ZE_WIKS_RELEASED = 2,
-};
+	friend class ZEWindowsInputModule;
+	friend class ZEWMISystemMessageHandler;
+	private:
+		char							DeviceName[256];
+		char							DeviceType[256];
+		int								DeviceIndex;
 
+		RAWINPUTDEVICE					Device;
+		RAWINPUTDEVICELIST				DeviceListItem;
+		RID_DEVICE_INFO					DeviceInfo;
+		HRAWINPUT						DeviceHandle;
 
-class ZEWindowsInputMouseDevice : public ZEInputModule
-{
-	private:		
-		struct 
-		{
-			int Axis[3];
-			int Buttons[8];
-		} MouseState;
+		int								AxisState[3];
+		int								AxisStateOld[3];
+		bool							ButtonState[5];
+		bool							ButtonStateOld[5];
 
-		bool							Acquired;
+		ZESystemMessageHandler*			MessageHandler;
+
+										ZEWindowsInputMouseDevice();
+										~ZEWindowsInputMouseDevice();
 
 	public:
 		virtual unsigned int			GetDeviceId();
 		virtual const char*				GetDeviceName();
 		virtual unsigned int			GetDeviceIndex();
 
-		virtual void					Acquire();
-		virtual void					UnAcuire();
+		virtual const 
+		ZEArray<ZEInputDescription>&	GetInputDescriptions();
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();

@@ -135,7 +135,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		ZED3D9VertexShaderVersion						GetVertexShaderVersion();
 		ZED3D9PipelineType								GetPipelineType();
 
-		virtual bool									IsEnabled();
+		virtual bool									GetEnabled();
 		virtual void									SetEnabled(bool Enabled);
 
 		virtual bool									Initialize();

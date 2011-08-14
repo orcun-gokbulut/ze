@@ -126,7 +126,7 @@ HWND GetTopMostWindow(HWND Handle)
 	return GetWindow(Handle, GW_OWNER);
 }
 
-bool ZEDirectInputModule::IsEnabled()
+bool ZEDirectInputModule::GetEnabled()
 {
 	return Enabled;
 }
