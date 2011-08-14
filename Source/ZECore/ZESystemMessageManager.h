@@ -37,15 +37,18 @@
 #ifndef __ZE_SYSTEM_MESSAGE_MANAGER__
 #define __ZE_SYSTEM_MESSAGE_MANAGER__
 
+#include <ZEDS\ZEArray.h>
+
 class ZESystemMessageHandler;
 
 class ZESystemMessageManager
 {
+	friend class ZECore;
 	private:
 		ZEArray<ZESystemMessageHandler*>	Handlers;
 
-											ZESystemMessageHandler();
-											~ZESystemMessageHandler();
+											ZESystemMessageManager();
+											~ZESystemMessageManager();
 
 	public:
 		const 

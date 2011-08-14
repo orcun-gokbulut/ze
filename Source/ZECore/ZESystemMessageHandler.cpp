@@ -34,3 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESystemMessageHandler.h"
+
+ZESystemMessageHandler::ZESystemMessageHandler()
+{
+	TargetWindow = NULL;
+	MinMessage = 0xFFFFFFFF;
+	MinMessage = 0;
+}

@@ -53,6 +53,7 @@
 #include "ZECommandManager.h"
 #include "ZEPluginManager.h"
 #include "ZEExtensionManager.h"
+#include "ZESystemMessageManager.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
@@ -109,6 +110,12 @@ ZEPluginManager* ZECore::GetPluginManager()
 {
 	return PluginManager;
 }
+
+ZESystemMessageManager* ZECore::GetSystemMessageManager()
+{
+	return SystemMessageManager;
+}
+
 		
 bool ZECore::SetGraphicsModule(ZEModule* Module)
 {
@@ -596,6 +603,8 @@ void ZECore::MainLoop()
 
 	srand(PerformanceCount.LowPart);
 
+	SystemMessageManager->ProcessMessages();
+
 	// Game Logic
 	Input->ProcessInputs();
 	Window->ProcessMessages();
@@ -648,16 +657,17 @@ ZECore::ZECore()
 	OldPerformanceCount.QuadPart = 0;
 
 	Application	= NULL;
-	Console			= new ZEConsole();
-	Commands		= new ZECommandManager();
-	Options			= new ZEOptionManager();
-	Error			= new ZEError();
-	Resources		= new ZEResourceManager();
-	ModuleManager	= new ZEModuleManager();
-	ExtensionManager = new ZEExtensionManager();
-	PluginManager	= new ZEPluginManager();
-	Window			= new ZEWindow();
-	Game			= new ZEGame();
+	SystemMessageManager	= new ZESystemMessageManager();
+	Console					= new ZEConsole();
+	Commands				= new ZECommandManager();
+	Options					= new ZEOptionManager();
+	Error					= new ZEError();
+	Resources				= new ZEResourceManager();
+	ModuleManager			= new ZEModuleManager();
+	ExtensionManager		= new ZEExtensionManager();
+	PluginManager			= new ZEPluginManager();
+	Window					= new ZEWindow();
+	Game					= new ZEGame();
 
 
 	ZEGraphicsModule::BaseInitialize();
@@ -683,6 +693,7 @@ ZECore::~ZECore()
 	delete Options;
 	delete Commands;
 	delete Console;
+	delete SystemMessageManager;
 }
 
 

@@ -79,7 +79,7 @@ ZEOptionSection* ZEDummyInputModuleDescription::GetOptions()
 
 ZEModule* ZEDummyInputModuleDescription::CreateModuleInstance()
 {
-	return new ZEDummyInputModule;
+	return NULL;
 }
 
 bool ZEDummyInputModuleDescription::CheckCompatible()

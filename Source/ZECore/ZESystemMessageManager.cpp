@@ -33,6 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 #include "ZESystemMessageManager.h"
+#include "ZESystemMessageHandler.h"
+
+#define WINDOWS_MEAN_AND_LEAN
+#include <Windows.h>
 
 ZESystemMessageManager::ZESystemMessageManager()
 {
@@ -44,12 +48,12 @@ ZESystemMessageManager::~ZESystemMessageManager()
 
 }
 
-const ZEArray<ZESystemMessageManager*>& ZESystemMessageManager::GetMessageHandlers()
+const ZEArray<ZESystemMessageHandler*>& ZESystemMessageManager::GetMessageHandlers()
 {
 	return Handlers;
 }
 
-void ZESystemMessageManager::RegisterMessageHandler(ZESystemMessageManager* Handler)
+void ZESystemMessageManager::RegisterMessageHandler(ZESystemMessageHandler* Handler)
 {
 	if (Handlers.Exists(Handler))
 	{
@@ -60,7 +64,7 @@ void ZESystemMessageManager::RegisterMessageHandler(ZESystemMessageManager* Hand
 	Handlers.Add(Handler);
 }
 
-void ZESystemMessageManager::UnregisterMessageHandler(ZESystemMessageManager* Handler)
+void ZESystemMessageManager::UnregisterMessageHandler(ZESystemMessageHandler* Handler)
 {
 	Handlers.DeleteValue(Handler);
 }
@@ -77,15 +81,15 @@ void ZESystemMessageManager::ProcessMessages()
 		{
 			bool Handled = false;;
 
-			if (Msg.message < Handlers[I].MinVal && Msg.message > Handlers[I].MaxMessage &&
-				(Handlers[I]->Window == NULL || Handlers[I]->Window == Msg.hwnd))
+			if (Msg.message < Handlers[I]->MinMessage && Msg.message > Handlers[I]->MaxMessage &&
+				(Handlers[I]->TargetWindow == NULL || Handlers[I]->TargetWindow == Msg.hwnd))
 			{
-				if (Handlers[I]->Callback(Msg))
+				if (Handlers[I]->Callback(&Msg))
 					Handled = true;
 			}
 
 			if (!Handled)
-				DefWindowProc(Msg.hwnd, Msg, Msg.wParam, Msg.lParam);
+				DefWindowProc(Msg.hwnd, Msg.message, Msg.wParam, Msg.lParam);
 		}
 
 		DispatchMessage(&Msg);

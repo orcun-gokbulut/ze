@@ -39,9 +39,24 @@
 
 #include "ZEInput/ZEInputModule.h"
 
+enum ZEWIKeyState
+{
+	ZE_WIKS_NONE = 0,
+	ZE_WIKS_PRESSED = 1,
+	ZE_WIKS_PRESSING = 3,
+	ZE_WIKS_RELEASED = 2,
+};
+
+
 class ZEWindowsInputMouseDevice : public ZEInputModule
 {
-	private:
+	private:		
+		struct 
+		{
+			int Axis[3];
+			int Buttons[8];
+		} MouseState;
+
 		bool							Acquired;
 
 	public:

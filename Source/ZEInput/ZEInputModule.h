@@ -43,6 +43,8 @@
 #include "ZECore\ZEModule.h"
 #include "ZEInputMap.h"
 
+class ZEInputDevice;
+
 class ZEInputModule : public ZEModule 
 {	
 	public:

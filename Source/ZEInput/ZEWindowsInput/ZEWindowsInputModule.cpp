@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEWindowsInputModule.cpp
+ Zinek Engine - ZEWindowsInputKeyboardDevice.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -341,11 +341,6 @@ void ZEWindowsInputModule::ProcessInputMap(ZEInputMap* InputMap)
 			}
 		}
 	}
-}
-
-bool ZEWindowsInputModule::GetRawInputEvent(ZEInputEvent& InputEvent)
-{
-	return false;
 }
 
 void ZEWindowsInputModule::Acquire()
