@@ -53,10 +53,8 @@ class ZEWindowsInputMouseDevice : public ZEInputDevice
 		char							DeviceType[256];
 		int								DeviceIndex;
 
-		RAWINPUTDEVICE					Device;
-		RAWINPUTDEVICELIST				DeviceListItem;
+		HANDLE							DeviceHandle;
 		RID_DEVICE_INFO					DeviceInfo;
-		HRAWINPUT						DeviceHandle;
 
 		int								AxisState[3];
 		int								AxisStateOld[3];

@@ -42,6 +42,8 @@ class ZEExtensionDescription;
 class ZEExtension
 {
 	protected:
+		bool							Initialized;
+
 										ZEExtension();
 		virtual							~ZEExtension();
 
@@ -49,8 +51,9 @@ class ZEExtension
 		static ZEExtensionDescription*	ExtensionDescription();
 		virtual ZEExtensionDescription*	GetExtensionDescription() = 0;
 
-		virtual bool					Initialize() = 0;
-		virtual void					Deinitialize() = 0;
+		bool							IsInitialized();
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
 
 		virtual void					Destroy();
 };

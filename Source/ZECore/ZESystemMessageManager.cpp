@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 #include "ZESystemMessageManager.h"
 #include "ZESystemMessageHandler.h"
+#include "ZECore.h"
 
 #define WINDOWS_MEAN_AND_LEAN
 #include <Windows.h>
@@ -81,7 +82,7 @@ void ZESystemMessageManager::ProcessMessages()
 		{
 			bool Handled = false;;
 
-			if (Msg.message < Handlers[I]->MinMessage && Msg.message > Handlers[I]->MaxMessage &&
+			if (Msg.message > Handlers[I]->MinMessage && Msg.message < Handlers[I]->MaxMessage &&
 				(Handlers[I]->TargetWindow == NULL || Handlers[I]->TargetWindow == Msg.hwnd))
 			{
 				if (Handlers[I]->Callback(&Msg))
@@ -94,4 +95,9 @@ void ZESystemMessageManager::ProcessMessages()
 
 		DispatchMessage(&Msg);
 	}
+}
+
+ZESystemMessageManager* ZESystemMessageManager::GetInstance()
+{
+	return ZECore::GetInstance()->GetSystemMessageManager();
 }

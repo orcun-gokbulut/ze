@@ -39,23 +39,27 @@
 
 #include "ZEInput/ZEInputModule.h"
 
+class ZEInputDevice;
+class ZEInputDeviceExtension;
+
 class ZEWindowsInputModule : public ZEInputModule
 {
 	private:
-		ZEArray<ZEInputDevice*>			Devices;
+		ZEArray<ZEInputDeviceExtension*>	DeviceExtensions;
+		ZEArray<ZEInputDevice*>				Devices;
 
 	public:
-		static ZEModuleDescription*		ModuleDescription();
-		virtual ZEModuleDescription*	GetModuleDescription();
+		static ZEModuleDescription*			ModuleDescription();
+		virtual ZEModuleDescription*		GetModuleDescription();
 
 		virtual const
-		ZEArray<ZEInputDevice*>&		GetInputDevices();
+		ZEArray<ZEInputDevice*>&			GetInputDevices();
 
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+		virtual bool						Initialize();
+		virtual void						Deinitialize();
 
-		virtual void					ProcessInputs();
-		virtual void					ProcessInputMap(ZEInputMap* InputMap);
+		virtual void						ProcessInputs();
+		virtual void						ProcessInputMap(ZEInputMap* InputMap);
 };
 
 #endif

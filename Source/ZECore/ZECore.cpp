@@ -603,10 +603,10 @@ void ZECore::MainLoop()
 
 	srand(PerformanceCount.LowPart);
 
-	SystemMessageManager->ProcessMessages();
-
 	// Game Logic
 	Input->ProcessInputs();
+
+	SystemMessageManager->ProcessMessages();
 
 	if (Game != NULL)
 		Game->Tick(FrameTime);

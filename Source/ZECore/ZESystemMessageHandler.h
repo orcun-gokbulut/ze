@@ -44,8 +44,8 @@ class ZESystemMessageHandler
 {
 	public:
 		HWND					TargetWindow;
-		int						MinMessage;
-		int						MaxMessage;
+		UINT					MinMessage;
+		UINT					MaxMessage;
 
 		virtual bool			Callback(MSG* Message) = 0;
 

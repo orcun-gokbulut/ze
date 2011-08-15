@@ -51,8 +51,10 @@
 
 class ZEWMISystemMessageHandler : public ZESystemMessageHandler
 {
-	ZEWindowsInputMouseDevice* Device;
-	virtual bool Callback(MSG* Message);
+	public:	
+		ZEWindowsInputMouseDevice* Device;
+		virtual bool Callback(MSG* Message);
+		ZEWMISystemMessageHandler(ZEWindowsInputMouseDevice* Device);
 };
 
 bool ZEWMISystemMessageHandler::Callback(MSG* Message)
@@ -61,9 +63,6 @@ bool ZEWMISystemMessageHandler::Callback(MSG* Message)
 	{
 		case WM_INPUT:
 		{
-			if ((HRAWINPUT)Message->lParam != Device->DeviceHandle)
-				return false;
-
 			BYTE Buffer[1024];
 			UINT BufferSize = 1024;
 			memset(Buffer, 0xfd, sizeof(Buffer));
@@ -76,7 +75,7 @@ bool ZEWMISystemMessageHandler::Callback(MSG* Message)
 			
 			RAWINPUT* Input = (RAWINPUT*)Buffer;
 
-			if (Input->header.dwType != RIM_TYPEMOUSE)
+			if (Input->header.dwType != RIM_TYPEMOUSE && Input->header.hDevice != Device->DeviceHandle)
 				return false;
 
 			Device->AxisState[0] += Input->data.mouse.lLastX;
@@ -99,9 +98,15 @@ bool ZEWMISystemMessageHandler::Callback(MSG* Message)
 	}
 }
 
+ZEWMISystemMessageHandler::ZEWMISystemMessageHandler(ZEWindowsInputMouseDevice* Device)
+{
+	this->Device = Device;
+}
+
+
 ZEWindowsInputMouseDevice::ZEWindowsInputMouseDevice()
 {
-	MessageHandler = new ZEWMISystemMessageHandler();
+	MessageHandler = new ZEWMISystemMessageHandler(this);
 }
 
 ZEWindowsInputMouseDevice::~ZEWindowsInputMouseDevice()
@@ -134,6 +139,8 @@ const ZEArray<ZEInputDescription>& ZEWindowsInputMouseDevice::GetInputDescriptio
 bool ZEWindowsInputMouseDevice::Initialize()
 {	
 
+	ZESystemMessageManager::GetInstance()->RegisterMessageHandler(MessageHandler);
+
 	memset(&ButtonState, 0, sizeof(ButtonState));
 	memset(&AxisState, 0, sizeof(AxisState));
 
@@ -142,6 +149,8 @@ bool ZEWindowsInputMouseDevice::Initialize()
 
 void ZEWindowsInputMouseDevice::Deinitialize()
 {
+	ZESystemMessageManager::GetInstance()->UnregisterMessageHandler(MessageHandler);
+
 	return ZEInputDevice::Deinitialize();
 }
 
@@ -179,7 +188,6 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 				InputAction->Id = InputBinding->ActionId;
 				InputAction->ButtonState = ZE_IBS_PRESSED;
 				InputAction->From = InputBinding;
-
 				return true;
 			}
 			else if (InputBinding->Event.ButtonState == ZE_IBS_RELEASED && ButtonStateOld[ButtonIndex] == false && ButtonState[ButtonIndex] == false)
@@ -187,7 +195,6 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 				InputAction->Id = InputBinding->ActionId;
 				InputAction->ButtonState = ZE_IBS_RELEASED;
 				InputAction->From = InputBinding;
-
 				return true;
 			}
 		}

@@ -66,14 +66,18 @@ ZEArray<ZEExtensionDescription*> ZEExtensionManager::GetExtensionDescriptions(ZE
 	ZEArray<ZEExtensionDescription*> List;
 	for (size_t I = 0; I < ExtensionList.GetCount(); I++)
 	{
-		ZEExtensionDescription* Parent = ExtensionList[I]->GetParent();
+		ZEExtensionDescription* Current = ExtensionList[I]->GetParent();
 		
-		while(Parent != NULL)
-			if (strcmp(ParentExtension->GetName(), ExtensionList[I]->GetName()) == 0)
+		while(Current != NULL)
+		{
+			if (ParentExtension == Current)
 			{
 				List.Add(ExtensionList[I]);
 				break;
 			}
+
+			Current = Current->GetParent();
+		}
 	}
 
 	return List;
@@ -109,9 +113,10 @@ class ZEExtensionManager* ZEExtensionManager::GetInstance()
 	return ZECore::GetInstance()->GetExtensionManager();
 }
 
+#include "ZEInput\ZEVRPNInput\ZEVRPNInputDeviceExtensionDescription.h"
 ZEExtensionManager::ZEExtensionManager()
 {
-
+	RegisterExtension(new ZEVRPNInputDeviceExtensionDescription());
 }
 
 ZEExtensionManager::~ZEExtensionManager()

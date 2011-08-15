@@ -58,6 +58,8 @@ class ZESystemMessageManager
 		void								UnregisterMessageHandler(ZESystemMessageHandler* Handler);
 
 		void								ProcessMessages();
+
+		static ZESystemMessageManager*		GetInstance();
 };
 
 #endif

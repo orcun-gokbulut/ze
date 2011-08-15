@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEExtension.cpp
+ Zinek Engine - ZEVRPNInputDeviceExtension.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEExtension.h"
-#include "ZEExtensionDescription.h"
+#pragma once
+#ifndef	__ZE_VRPN_INPUT_MODULE_H__
+#define __ZE_VRPN_INPUT_MODULE_H__
 
+#include "ZEInput\ZEInputDeviceExtension.h"
+#include "ZEVRPNInputDevice.h"
 
-ZEExtensionDescription* ZEExtension::ExtensionDescription()
-{
-	return 0;
-}
+class ZEInputDevice;
 
-ZEExtension::ZEExtension()
+class ZEVRPNInputDeviceExtension : public ZEInputDeviceExtension
 {
-	Initialized =false;
-}
+	private:
+		ZEArray<ZEVRPNInputDevice>	Devices;
 
-ZEExtension::~ZEExtension()
-{
-	Deinitialize();
-}
+	public:
+		ZEExtensionDescription*			ExtensionDescription();
+		virtual ZEExtensionDescription* GetExtensionDescription();
 
-bool ZEExtension::IsInitialized()
-{
-	return Initialized;
-}
-bool ZEExtension::Initialize()
-{
-	Initialized = true;
-	return true;
-}
+		ZEArray<ZEInputDevice*>			GetDevices();
 
-void ZEExtension::Deinitialize()
-{
-	Initialized = false;
-}
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
+};
 
-void ZEExtension::Destroy()
-{
-	delete this;
-}
+#endif

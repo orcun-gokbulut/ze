@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEExtension.cpp
+ Zinek Engine - ZEVRPNInputDevice.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEExtension.h"
-#include "ZEExtensionDescription.h"
+#pragma once
+#ifndef	__ZE_VRPN_INPUT_DEVICE_H__
+#define __ZE_VRPN_INPUT_DEVICE_H__
 
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEInput\ZEInputDevice.h"
 
-ZEExtensionDescription* ZEExtension::ExtensionDescription()
-{
-	return 0;
-}
+#include <VRPN\vrpn_Tracker.h>
+#include <VRPN\vrpn_Button.h>
+#include <VRPN\vrpn_Analog.h>
 
-ZEExtension::ZEExtension()
+class ZEVRPNInputDevice : public ZEInputDevice
 {
-	Initialized =false;
-}
+	friend class ZEVRPNInputDeviceExtension;
 
-ZEExtension::~ZEExtension()
-{
-	Deinitialize();
-}
+	public:
+		vrpn_Tracker_Remote*			TrackerRemote;
+		vrpn_Button_Remote*				ButtonRemote;
+		vrpn_Analog_Remote*				AxisRemote;
 
-bool ZEExtension::IsInitialized()
-{
-	return Initialized;
-}
-bool ZEExtension::Initialize()
-{
-	Initialized = true;
-	return true;
-}
+		float							Axises[3];
+		bool							Buttons[5], OldButtons[5];
+		ZEVector3						Vector;
+		ZEQuaternion					Quaternion;
 
-void ZEExtension::Deinitialize()
-{
-	Initialized = false;
-}
+		virtual unsigned int			GetDeviceId();
+		virtual const char*				GetDeviceName();
+		virtual unsigned int			GetDeviceIndex();
 
-void ZEExtension::Destroy()
-{
-	delete this;
-}
+		virtual const 
+		ZEArray<ZEInputDescription>&	GetInputDescriptions();
+
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
+
+		virtual void					ProcessInputs();
+
+		virtual bool					ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction);
+};
+
+#endif

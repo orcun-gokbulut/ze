@@ -49,9 +49,6 @@ class ZEInputDeviceExtension : public ZEExtension
 
 		virtual
 		ZEArray<ZEInputDevice*>					GetDevices() = 0;
-
-		virtual bool							Initialize() = 0;
-		virtual void							Deinitialize() = 0;
 };
 
 #endif

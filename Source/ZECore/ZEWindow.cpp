@@ -55,7 +55,6 @@ char*  Parameters;
 ZEWindow* Window = NULL;
 bool WindowInitialization;
 
-
 class ZEWindowSystemMessageHandler : public ZESystemMessageHandler
 {
 	public:
@@ -94,12 +93,20 @@ bool ZEWindowSystemMessageHandler::Callback(MSG* Message)
 			Window->WindowDestroyed();
 			return true;
 
-		case WM_INPUT:
-			//OnWMRawInputRecived((HRAWINPUT)Message->lParam);
-			return true;
-
 		default:
 			return false;
+	}
+}
+
+LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+		case WM_CREATE:
+			return 0;
+
+		default:
+			return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 }
 
@@ -167,7 +174,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 	WNDCLASSEX wc;
 	wc.cbSize			= sizeof(WNDCLASSEX);
 	wc.style			= CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc		= NULL;
+	wc.lpfnWndProc		= Callback;
     wc.cbClsExtra		= 0;
     wc.cbWndExtra		= 0;
 	wc.hInstance		= (HINSTANCE)zeCore->GetApplicationInstance();
@@ -186,7 +193,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 		return false;
 	}
 
-	ZECore::GetInstance()->GetSystemMessageManager()->RegisterMessageHandler(SystemMessageHandler);
+	ZESystemMessageManager::GetInstance()->RegisterMessageHandler(SystemMessageHandler);
 
 	WindowHandle = CreateWindowEx(WS_EX_APPWINDOW, 
                "ZINEK ENGINE WINDOW", 
@@ -205,8 +212,8 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 
 	if (!WindowHandle)
 	{
-		zeError("Win32Window Module", "Could not create window.");
 		ShowWindowError();
+		zeError("Win32Window Module", "Could not create window.");
 		return false;
 	}
 	ShowWindow();
@@ -226,7 +233,7 @@ bool ZEWindow::DestroyMainWindow()
 		return false;
 	}
 
-	ZECore::GetInstance()->GetSystemMessageManager()->RegisterMessageHandler(SystemMessageHandler);
+	ZESystemMessageManager::GetInstance()->RegisterMessageHandler(SystemMessageHandler);
 	 
 	return true;
 }

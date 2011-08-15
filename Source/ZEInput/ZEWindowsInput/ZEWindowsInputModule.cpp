@@ -47,6 +47,9 @@
 
 #define WINDIWS_LEAN_AND_MEAN
 #include <windows.h>
+#include <string.h>
+#include <memory.h>
+#include <stdio.h>
 
 ZEModuleDescription* ZEWindowsInputModule::ModuleDescription()
 {
@@ -103,40 +106,65 @@ bool ZEWindowsInputModule::Initialize()
 		return false;
 	}
 
+	int MouseIndex = 0;
+	int KeyboardIndex = 0;
 	for (int I = 0; I < DeviceList.GetCount(); I++)
 	{
 		if (DeviceList[I].dwType == RIM_TYPEMOUSE)
-			Devices.Add(new ZEWindowsInputMouseDevice());
+		{
+			ZEWindowsInputMouseDevice* Device = new ZEWindowsInputMouseDevice();
+			Device->DeviceIndex = MouseIndex;
+			
+			sprintf(Device->DeviceName, "Mouse%02d", MouseIndex);
+			strcpy(Device->DeviceType, "Mouse");
+			Device->DeviceHandle = DeviceList[I].hDevice;
+
+			UINT Size = sizeof(RID_DEVICE_INFO);
+			GetRawInputDeviceInfo(Device->DeviceHandle, RIDI_DEVICEINFO, &Device->DeviceInfo, &Size);
+
+			Devices.Add(Device);
+
+			MouseIndex++;
+		}
 		/*else if (DeviceList[I].dwType == RIM_TYPEKEYBOARD)
 			DeviceList.Add(new ZEWindowsInputKeyboardDevice);*/
 	}
 
-	for (int I = 0; I < DeviceList.GetCount(); I++)
-		Devices[I]->Initialize();
+	ZEArray<ZEExtensionDescription*> ExtensionDescriptions = ZEExtensionManager::GetInstance()->GetExtensionDescriptions(ZEInputDeviceExtension::ExtensionDescription());
 
-	/*ZEArray<ZEExtensionDescription*> DeviceExtensions = ZEExtensionManager::GetInstance()->GetExtensionDescriptions(
-		ZEInputDeviceExtension::ExtensionDescription());
-
-	for (size_t I = 0; I < DeviceExtensions.GetCount(); I++)
+	for (size_t I = 0; I < ExtensionDescriptions.GetCount(); I++)
 	{
-		ZEInputDeviceExtension Extension = DeviceExtensions[I]->CreateInstance();
-		ZEArray<ZEInputDeviceExtension*> Extension->GetDevices();
-		for (int N = 0; N < Extension->GetDevices(); N++)
+		ZEInputDeviceExtension* Extension = (ZEInputDeviceExtension*)ExtensionDescriptions[I]->CreateInstance();
+		if (!Extension->Initialize())
 		{
-			
-			DeviceList.Add()
-		
+			Extension->Destroy();
+			continue;
+		}
+
+		DeviceExtensions.Add(Extension);
+
+		ZEArray<ZEInputDevice*> ExtensionDevices = Extension->GetDevices();
+		for (int N = 0; N < ExtensionDevices.GetCount(); N++)
+			Devices.Add(ExtensionDevices[I]);
 	}
 
-	return true;*/
+	for (int I = 0; I < Devices.GetCount(); I++)
+		Devices[I]->Initialize();
+
+	return ZEInputModule::Initialize();
 }
 
 void ZEWindowsInputModule::Deinitialize()
 {
 	for (size_t I = 0; I < Devices.GetCount(); I++)
 		Devices[I]->Destroy();
-	
 	Devices.Clear();
+
+	for (size_t I = 0; I < DeviceExtensions.GetCount(); I++)
+		DeviceExtensions[I]->Destroy();
+	DeviceExtensions.Clear();
+
+	ZEInputModule::Deinitialize();
 }
 
 void ZEWindowsInputModule::ProcessInputs()
@@ -151,7 +179,7 @@ void ZEWindowsInputModule::ProcessInputMap(ZEInputMap* InputMap)
 	InputMap->InputActionCount = 0;
 
 	for (size_t I = 0; I < InputMap->InputBindings.GetCount(); I++)
-		for (int I = 0; I < Devices.GetCount(); I++)
-			if (Devices[I]->ProcessInputBinding(&InputMap->InputBindings[I], &InputMap->InputActions[InputMap->InputActionCount]))
+		for (int N = 0; N < Devices.GetCount(); N++)
+			if (Devices[N]->ProcessInputBinding(&InputMap->InputBindings[I], &InputMap->InputActions[InputMap->InputActionCount]))
 				InputMap->InputActionCount++;
 }

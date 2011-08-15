@@ -40,6 +40,7 @@ cmake_minimum_required (VERSION 2.8)
 #add_subdirectory (ZEVirtualInput)
 add_subdirectory (ZEWindowsInput)
 add_subdirectory (ZEFreespaceInput)
+add_subdirectory (ZEVRPNInput)
 
 add_source (ZEInputAction.cpp						Sources)
 add_source (ZEInputAction.h							Sources ZESDK)

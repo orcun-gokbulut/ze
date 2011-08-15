@@ -86,6 +86,18 @@ void ZEVector2::Multiply(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
 	Out.y = A.y * B.y;
 }
 
+void ZEVector2::Divide(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
+{
+	Out.x = A.x / B.x;
+	Out.y = A.y / B.y;
+}
+
+void ZEVector2::Divide(ZEVector2 &Out, const ZEVector2 &A, float s)
+{
+	Out.x = A.x / s;
+	Out.y = A.y / s;
+}
+
 float ZEVector2::DotProduction(const ZEVector2 &A, const ZEVector2 &B)
 {
 	return A.x * B.x + A.y * B.y ;
@@ -256,6 +268,20 @@ ZEVector2 ZEVector2::operator *(float s) const
 	return Temp;
 }
 
+ZEVector2 ZEVector2::operator /(const ZEVector2 &RightOperand) const
+{
+	ZEVector2 Temp;
+	ZEVector2::Divide(Temp, *this, RightOperand);
+	return Temp;
+}
+
+ZEVector2 ZEVector2::operator /(float s) const
+{
+	ZEVector2 Temp;
+	ZEVector2::Divide(Temp, *this, s);
+	return Temp;
+}
+
 ZEVector2 ZEVector2::operator-() const
 {
 	ZEVector2 Temp(-x, -y);
@@ -287,17 +313,28 @@ ZEVector2& ZEVector2::operator *=(float s)
 	return *this;
 }
 
+ZEVector2& ZEVector2::operator /=(const ZEVector2 &RightOperand)
+{
+	ZEVector2::Divide(*this, *this, RightOperand);
+	return *this;
+}
+
+ZEVector2& ZEVector2::operator /=(float s)
+{
+	ZEVector2::Divide(*this, *this, s);
+	return *this;
+}
+
 bool ZEVector2::operator ==(const ZEVector2 &RightOperand) const
 {
 	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_TRESHOLD) && 
-			(fabs(this->y - RightOperand.y) < ZE_ZERO_TRESHOLD));
+		(fabs(this->y - RightOperand.y) < ZE_ZERO_TRESHOLD));
 }
 
 bool ZEVector2::operator !=(const ZEVector2 &RightOperand) const
 {
-		return ((fabs(this->x - RightOperand.x) > ZE_ZERO_TRESHOLD) || 
-			(fabs(this->y - RightOperand.y) > ZE_ZERO_TRESHOLD));
-
+	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_TRESHOLD) || 
+		(fabs(this->y - RightOperand.y) > ZE_ZERO_TRESHOLD));
 }
 
 float ZEVector2::operator[](size_t Index) const
@@ -404,6 +441,20 @@ void ZEVector3::Multiply(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
 	Out.x = A.x * B.x;
 	Out.y = A.y * B.y;
 	Out.z = A.z * B.z;
+}
+
+void ZEVector3::Divide(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
+{
+	Out.x = A.x / B.x;
+	Out.y = A.y / B.y;
+	Out.z = A.z / B.z;
+}
+
+void ZEVector3::Divide(ZEVector3& Out, const ZEVector3& A, float s)
+{
+	Out.x = A.x / s;
+	Out.y = A.y / s;
+	Out.z = A.z / s;
 }
 
 float ZEVector3::DotProduct(const ZEVector3& A, const ZEVector3& B) 
@@ -599,6 +650,20 @@ ZEVector3 ZEVector3::operator*(float s) const
 	return Temp;
 }
 
+ZEVector3 ZEVector3::operator/(const ZEVector3 &RightOperand) const
+{
+	ZEVector3 Temp;
+	ZEVector3::Divide(Temp, *this, RightOperand);
+	return Temp;
+}
+
+ZEVector3 ZEVector3::operator/(float s) const
+{
+	ZEVector3 Temp;
+	ZEVector3::Divide(Temp, *this, s);
+	return Temp;
+}
+
 ZEVector3 ZEVector3::operator-() const
 {
 	ZEVector3 Temp(-x, -y, -z);
@@ -626,6 +691,18 @@ ZEVector3& ZEVector3::operator *= (const ZEVector3 &RightOperand)
 ZEVector3& ZEVector3::operator *= (float s)
 {
 	ZEVector3::Scale(*this, *this, s);
+	return *this;
+}
+
+ZEVector3& ZEVector3::operator /= (const ZEVector3 &RightOperand)
+{
+	ZEVector3::Divide(*this, *this, RightOperand);
+	return *this;
+}
+
+ZEVector3& ZEVector3::operator /= (float s)
+{
+	ZEVector3::Divide(*this, *this, s);
 	return *this;
 }
 
@@ -737,6 +814,22 @@ void ZEVector4::Multiply(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
 	Out.y = A.y * B.y;
 	Out.z = A.z * B.z;
 	Out.w = A.w * B.w;
+}
+
+void ZEVector4::Divide(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
+{
+	Out.x = A.x / B.x;
+	Out.y = A.y / B.y;
+	Out.z = A.z / B.z;
+	Out.w = A.w / B.w;
+}
+
+void ZEVector4::Divide(ZEVector4& Out, const ZEVector4& A, float s)
+{
+	Out.x = A.x / s;
+	Out.y = A.y / s;
+	Out.z = A.z / s;
+	Out.w = A.w / s;
 }
 
 float ZEVector4::DotProduct(const ZEVector4& A, const ZEVector4& B) 
@@ -944,7 +1037,19 @@ ZEVector4 ZEVector4::operator*(float s) const
 	ZEVector4::Scale(Temp, *this, s);
 	return Temp;
 }
+ZEVector4 ZEVector4::operator/(const ZEVector4 &RightOperand) const
+{
+	ZEVector4 Temp;
+	ZEVector4::Divide(Temp, *this, RightOperand);
+	return Temp;
+}
 
+ZEVector4 ZEVector4::operator/(float s) const
+{
+	ZEVector4 Temp;
+	ZEVector4::Divide(Temp, *this, s);
+	return Temp;
+}
 
 ZEVector4& ZEVector4::operator += (const ZEVector4 &RightOperand)
 {
@@ -970,6 +1075,17 @@ ZEVector4& ZEVector4::operator *= (float s)
 	return *this;
 }
 
+ZEVector4& ZEVector4::operator /= (const ZEVector4 &RightOperand)
+{
+	ZEVector4::Divide(*this, *this, RightOperand);
+	return *this;
+}
+
+ZEVector4& ZEVector4::operator /= (float s)
+{
+	ZEVector4::Divide(*this, *this, s);
+	return *this;
+}
 
 ZEVector4 ZEVector4::operator-() const
 {

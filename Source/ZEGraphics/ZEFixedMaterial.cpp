@@ -90,7 +90,7 @@ void ZEFixedMaterial::SetZero()
 	DiffuseColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	SpecularColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	EmmisiveColor = ZEVector3(0.0f, 0.0f, 0.0f);
-	SubSurfaceScatteringFactor = 0.3f;
+	SubSurfaceScatteringFactor = 0.0f;
 }
 
 ZEFixedMaterial::ZEFixedMaterial()

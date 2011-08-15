@@ -56,7 +56,7 @@ class ZEInputAction
 		};
 
 		ZEVector3					Vector;
-		ZEQuaternion				Orientation;
+		ZEQuaternion				Quaternion;
 };
 
 #endif

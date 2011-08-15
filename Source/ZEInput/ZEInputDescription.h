@@ -67,7 +67,7 @@ struct ZEInputDescription
 		struct 
 		{
 			int				QuaternionId;
-		} Orientation;
+		} Quaternion;
 	};
 
 	struct 

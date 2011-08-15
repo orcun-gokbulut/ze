@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEExtension.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,44 +30,19 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEExtension.h"
-#include "ZEExtensionDescription.h"
+cmake_minimum_required (VERSION 2.8)
 
+add_source (ZEVRPNInputDevice.cpp							Sources)
+add_source (ZEVRPNInputDevice.h							Sources)
+add_source (ZEVRPNInputDeviceExtension.cpp					Sources)
+add_source (ZEVRPNInputDeviceExtension.h					Sources)
+add_source (ZEVRPNInputDeviceExtensionDescription.cpp		Sources)
+add_source (ZEVRPNInputDeviceExtensionDescription.h		Sources)
 
-ZEExtensionDescription* ZEExtension::ExtensionDescription()
-{
-	return 0;
-}
+add_library (ZEVRPNInput ${Sources})
+target_link_libraries (ZEVRPNInput vrpn.lib)
 
-ZEExtension::ZEExtension()
-{
-	Initialized =false;
-}
-
-ZEExtension::~ZEExtension()
-{
-	Deinitialize();
-}
-
-bool ZEExtension::IsInitialized()
-{
-	return Initialized;
-}
-bool ZEExtension::Initialize()
-{
-	Initialized = true;
-	return true;
-}
-
-void ZEExtension::Deinitialize()
-{
-	Initialized = false;
-}
-
-void ZEExtension::Destroy()
-{
-	delete this;
-}
+set_property(TARGET ZEVRPNInput PROPERTY FOLDER "Zinek Engine")

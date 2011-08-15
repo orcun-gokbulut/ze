@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEExtension.cpp
+ Zinek Engine - ZEVRPNInputDeviceExtensionDescription.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEExtension.h"
-#include "ZEExtensionDescription.h"
+#include "ZEVRPNInputDeviceExtensionDescription.h"
+#include "ZEVRPNInputDeviceExtension.h"
 
-
-ZEExtensionDescription* ZEExtension::ExtensionDescription()
+ZEExtensionDescription* ZEVRPNInputDeviceExtensionDescription::GetParent()
 {
-	return 0;
+	return ZEInputDeviceExtension::ExtensionDescription();
 }
 
-ZEExtension::ZEExtension()
+ZEVersion ZEVRPNInputDeviceExtensionDescription::GetRequiredZinekVersion()
 {
-	Initialized =false;
+	return ZEVersion::GetZinekVersion();
 }
 
-ZEExtension::~ZEExtension()
+ZEVersion ZEVRPNInputDeviceExtensionDescription::GetVersion()
 {
-	Deinitialize();
+	return ZEVersion::GetZinekVersion();
 }
 
-bool ZEExtension::IsInitialized()
+const char* ZEVRPNInputDeviceExtensionDescription::GetCopyright()
 {
-	return Initialized;
+	return "Copyright (c) 2008-2011, Zinek Code House.";
 }
-bool ZEExtension::Initialize()
+
+const char* ZEVRPNInputDeviceExtensionDescription::GetName()
 {
-	Initialized = true;
+	return "VRPNInput";
+}
+
+ZEOptionSection* ZEVRPNInputDeviceExtensionDescription::GetOptions()
+{
+	return NULL;
+}
+
+ZEExtension* ZEVRPNInputDeviceExtensionDescription::CreateInstance()
+{
+	return new ZEVRPNInputDeviceExtension();
+}
+
+bool ZEVRPNInputDeviceExtensionDescription::CheckCompatible()
+{
 	return true;
-}
-
-void ZEExtension::Deinitialize()
-{
-	Initialized = false;
-}
-
-void ZEExtension::Destroy()
-{
-	delete this;
 }

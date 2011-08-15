@@ -228,7 +228,7 @@ bool ZEFreespaceInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, Z
 				{
 					Action->Id = InputBinding->ActionId;
 					Action->From =  InputBinding;
-					Action->Orientation = Orientation;
+					Action->Quaternion = Orientation;
 				}
 				break;
 

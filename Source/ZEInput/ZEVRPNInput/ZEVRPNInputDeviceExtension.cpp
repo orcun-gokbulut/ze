@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEExtension.cpp
+ Zinek Engine - ZEVRPNInputDeviceExtension.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,43 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEExtension.h"
-#include "ZEExtensionDescription.h"
+#include "ZECore\ZEError.h"
+#include "ZECore\ZEConsole.h"
+#include "ZEVRPNInputDeviceExtension.h"
+#include "ZEVRPNInputDeviceExtensionDescription.h"
+
+#include <freespace/freespace.h>
 
 
-ZEExtensionDescription* ZEExtension::ExtensionDescription()
+ZEExtensionDescription* ZEVRPNInputDeviceExtension::GetExtensionDescription()
 {
-	return 0;
+	return ZEVRPNInputDeviceExtension::ExtensionDescription();
 }
 
-ZEExtension::ZEExtension()
+ZEExtensionDescription* ZEVRPNInputDeviceExtension::ExtensionDescription()
 {
-	Initialized =false;
+	static ZEVRPNInputDeviceExtensionDescription Desc;
+	return &Desc;
 }
 
-ZEExtension::~ZEExtension()
+ZEArray<ZEInputDevice*> ZEVRPNInputDeviceExtension::GetDevices()
 {
-	Deinitialize();
+	ZEArray<ZEInputDevice*> Devices;
+	Devices.Add(new ZEVRPNInputDevice());
+
+	return Devices;
 }
 
-bool ZEExtension::IsInitialized()
+bool ZEVRPNInputDeviceExtension::Initialize()
 {
-	return Initialized;
-}
-bool ZEExtension::Initialize()
-{
-	Initialized = true;
-	return true;
+	return ZEInputDeviceExtension::Initialize();
 }
 
-void ZEExtension::Deinitialize()
+void ZEVRPNInputDeviceExtension::Deinitialize()
 {
-	Initialized = false;
-}
+	for (size_t I = 0; I < Devices.GetCount(); I++)
+		Devices[I].Deinitialize();
+	Devices.Clear();
 
-void ZEExtension::Destroy()
-{
-	delete this;
+	ZEInputDeviceExtension::Deinitialize();
 }
