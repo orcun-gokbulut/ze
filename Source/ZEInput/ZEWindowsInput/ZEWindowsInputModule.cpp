@@ -40,6 +40,7 @@
 #include "ZEInput\ZEInputDevice.h"
 #include "ZECore\ZEExtensionManager.h"
 #include "ZEWindowsInputMouseDevice.h"
+#include "ZEWindowsInputKeyboardDevice.h"
 
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
@@ -126,8 +127,22 @@ bool ZEWindowsInputModule::Initialize()
 
 			MouseIndex++;
 		}
-		/*else if (DeviceList[I].dwType == RIM_TYPEKEYBOARD)
-			DeviceList.Add(new ZEWindowsInputKeyboardDevice);*/
+		else if (DeviceList[I].dwType == RIM_TYPEKEYBOARD)
+		{
+			ZEWindowsInputKeyboardDevice* Device = new ZEWindowsInputKeyboardDevice();
+			Device->DeviceIndex = KeyboardIndex;
+
+			sprintf(Device->DeviceName, "Keyboard%02d", KeyboardIndex);
+			strcpy(Device->DeviceType, "Keyboard");
+			Device->DeviceHandle = DeviceList[I].hDevice;
+
+			UINT Size = sizeof(RID_DEVICE_INFO);
+			GetRawInputDeviceInfo(Device->DeviceHandle, RIDI_DEVICEINFO, &Device->DeviceInfo, &Size);
+
+			Devices.Add(Device);
+
+			KeyboardIndex++;
+		}
 	}
 
 	ZEArray<ZEExtensionDescription*> ExtensionDescriptions = ZEExtensionManager::GetInstance()->GetExtensionDescriptions(ZEInputDeviceExtension::ExtensionDescription());

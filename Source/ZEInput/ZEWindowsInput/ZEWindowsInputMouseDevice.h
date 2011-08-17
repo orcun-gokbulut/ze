@@ -47,7 +47,7 @@ class ZESystemMessageHandler;
 class ZEWindowsInputMouseDevice : public ZEInputDevice
 {
 	friend class ZEWindowsInputModule;
-	friend class ZEWMISystemMessageHandler;
+	friend class ZEWMIKSH;
 	private:
 		char							DeviceName[256];
 		char							DeviceType[256];

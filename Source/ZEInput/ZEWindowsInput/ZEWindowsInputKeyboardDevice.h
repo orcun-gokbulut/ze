@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEWindowsInputKeyboardDevice.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,50 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef	__ZE_WINDOWS_KEYBOARD_INPUT_DEVICE_H__
+#define __ZE_WINDOWS_KEYBOARD_INPUT_DEVICE_H__
+
+#include "ZEInput/ZEInputDevice.h"
+
+#define WINDOWS_LEAN_AND_MEAN
+#include <windows.h>
+
+class ZESystemMessageHandler;
+
+class ZEWindowsInputKeyboardDevice : public ZEInputDevice
+{
+	friend class ZEWindowsInputModule;
+	friend class ZEWMIKSMH;
+	private:
+		char								DeviceName[256];
+		char								DeviceType[256];
+		int									DeviceIndex;
+
+		HANDLE								DeviceHandle;
+		RID_DEVICE_INFO						DeviceInfo;
+
+		bool								ButtonState[256];
+		bool								ButtonStateOld[256];
+
+		ZESystemMessageHandler*				MessageHandler;
+
+		ZEWindowsInputKeyboardDevice();
+		~ZEWindowsInputKeyboardDevice();
+
+	public:
+		virtual unsigned int				GetDeviceId();
+		virtual const char*					GetDeviceName();
+		virtual unsigned int				GetDeviceIndex();
+
+		virtual const 
+			ZEArray<ZEInputDescription>&	GetInputDescriptions();
+
+		virtual bool						Initialize();
+		virtual void						Deinitialize();
+
+		virtual void						ProcessInputs();
+
+		virtual bool						ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction);
+	};
+#endif

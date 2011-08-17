@@ -49,46 +49,42 @@
 #define WINDIWS_LEAN_AND_MEAN
 #include <windows.h>
 
-class ZEWMISystemMessageHandler : public ZESystemMessageHandler
+class ZEWMIKSH : public ZESystemMessageHandler
 {
 	public:	
 		ZEWindowsInputMouseDevice* Device;
 		virtual bool Callback(MSG* Message);
-		ZEWMISystemMessageHandler(ZEWindowsInputMouseDevice* Device);
+		ZEWMIKSH(ZEWindowsInputMouseDevice* Device);
 };
 
-bool ZEWMISystemMessageHandler::Callback(MSG* Message)
+bool ZEWMIKSH::Callback(MSG* Message)
 {
 	switch(Message->message)
 	{
 		case WM_INPUT:
 		{
-			BYTE Buffer[1024];
-			UINT BufferSize = 1024;
-			memset(Buffer, 0xfd, sizeof(Buffer));
-
-			if (GetRawInputData((HRAWINPUT)Message->lParam, RID_INPUT, Buffer, &BufferSize, sizeof(RAWINPUTHEADER)) == (UINT)-1)
+			RAWINPUT Input;
+			UINT InputSize = sizeof(RAWINPUT);
+			if (GetRawInputData((HRAWINPUT)Message->lParam, RID_INPUT, &Input, &InputSize, sizeof(RAWINPUTHEADER)) == (UINT)-1)
 			{
 				zeError("WindowsInput", "Can not read raw input data.");
 				return;
 			}
 			
-			RAWINPUT* Input = (RAWINPUT*)Buffer;
-
-			if (Input->header.dwType != RIM_TYPEMOUSE && Input->header.hDevice != Device->DeviceHandle)
+			if (Input.header.dwType != RIM_TYPEMOUSE && Input.header.hDevice != Device->DeviceHandle)
 				return false;
 
-			Device->AxisState[0] += Input->data.mouse.lLastX;
-			Device->AxisState[1] += Input->data.mouse.lLastY;
+			Device->AxisState[0] += Input.data.mouse.lLastX;
+			Device->AxisState[1] += Input.data.mouse.lLastY;
 
-			Device->ButtonState[0] |= (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN);
-			Device->ButtonState[1] |= (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN);
-			Device->ButtonState[2] |= (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN);
-			Device->ButtonState[3] |= (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN);
-			Device->ButtonState[4] |= (Input->data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN);
+			Device->ButtonState[0] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN);
+			Device->ButtonState[1] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN);
+			Device->ButtonState[2] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN);
+			Device->ButtonState[3] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN);
+			Device->ButtonState[4] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN);
 			
-			if (Input->data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
-				Device->AxisState[2] += *((SHORT*)&Input->data.mouse.usButtonData);
+			if (Input.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
+				Device->AxisState[2] += *((SHORT*)&Input.data.mouse.usButtonData);
 
 			return true;
 		}
@@ -98,7 +94,7 @@ bool ZEWMISystemMessageHandler::Callback(MSG* Message)
 	}
 }
 
-ZEWMISystemMessageHandler::ZEWMISystemMessageHandler(ZEWindowsInputMouseDevice* Device)
+ZEWMIKSH::ZEWMIKSH(ZEWindowsInputMouseDevice* Device)
 {
 	this->Device = Device;
 }
@@ -106,7 +102,7 @@ ZEWMISystemMessageHandler::ZEWMISystemMessageHandler(ZEWindowsInputMouseDevice* 
 
 ZEWindowsInputMouseDevice::ZEWindowsInputMouseDevice()
 {
-	MessageHandler = new ZEWMISystemMessageHandler(this);
+	MessageHandler = new ZEWMIKSH(this);
 }
 
 ZEWindowsInputMouseDevice::~ZEWindowsInputMouseDevice()
@@ -142,7 +138,6 @@ bool ZEWindowsInputMouseDevice::Initialize()
 	ZESystemMessageManager::GetInstance()->RegisterMessageHandler(MessageHandler);
 
 	memset(&ButtonState, 0, sizeof(ButtonState));
-	memset(&AxisState, 0, sizeof(AxisState));
 
 	return ZEInputDevice::Initialize();
 }
@@ -164,11 +159,8 @@ void ZEWindowsInputMouseDevice::ProcessInputs()
 	AxisState[1] = 0;
 	AxisState[2] = 0;
 
-	for (size_t I = 0; I < 8; I++)
-	{
-		ButtonStateOld[I] = ButtonStateOld[I];
-		ButtonState[I] = false;
-	}
+	memcpy(ButtonStateOld, ButtonState, sizeof(ButtonState));
+	memset(&ButtonState, 0, sizeof(ButtonState));
 }
 
 bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction)
@@ -201,7 +193,7 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 		else if (InputBinding->Event.InputType == ZE_IT_AXIS)
 		{
 			int AxisIndex = InputBinding->Event.AxisId;
-			
+
 			if (AxisIndex > 2)
 				return false;
 
