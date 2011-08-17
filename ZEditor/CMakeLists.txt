@@ -90,7 +90,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEditor PROPERTY FOLDER "ZEditor")
 
 target_link_libraries (ZEditor ZECore ZEFoundation ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZESDK)
-target_link_libraries (ZEditor ZEDirect3D9 ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
+target_link_libraries (ZEditor ZEDirect3D9 ZEDirectSound ZEOpenAL ZEPhysX ZEPortalMap)
 target_link_libraries (ZEditor ZEDCommonControls ZEDCommonEntities ZEDCore ZEDPropertyWindowManager ZEDSceneEditor ZEDMaterialEditor ZEDScriptEditor ZEDUndoRedo ZEDBrowser ZEDSoundExtensionsPlugIn ZEDImageExtensionsPlugIn)
 target_link_libraries (ZEditor QtCore4.lib QtGui4.lib)
 
