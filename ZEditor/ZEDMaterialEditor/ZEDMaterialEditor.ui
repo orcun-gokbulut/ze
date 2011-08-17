@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ZEDMaterialEditorClass</class>
+ <widget class="QMainWindow" name="ZEDMaterialEditorClass">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1161</width>
+    <height>821</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>ZEDMaterialEditor</string>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QVBoxLayout" name="CentralLayout"/>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1161</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionClose"/>
+   </widget>
+   <widget class="QMenu" name="menuPreview">
+    <property name="title">
+     <string>Preview</string>
+    </property>
+    <addaction name="actionCube"/>
+    <addaction name="actionSphere"/>
+    <addaction name="actionPlane"/>
+    <addaction name="actionCylinder"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuPreview"/>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionCube"/>
+   <addaction name="actionSphere"/>
+   <addaction name="actionPlane"/>
+   <addaction name="actionCylinder"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QDockWidget" name="PropertyDockWidget">
+   <property name="minimumSize">
+    <size>
+     <width>400</width>
+     <height>88</height>
+    </size>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="windowTitle">
+    <string>Properties</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents">
+    <layout class="QVBoxLayout" name="DockWidgetLayout">
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="QTabWidget" name="PropertyTabWidget">
+       <property name="currentIndex">
+        <number>3</number>
+       </property>
+       <widget class="QWidget" name="MaterialTab">
+        <attribute name="title">
+         <string>Material</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="MaterialTabLayout">
+         <property name="margin">
+          <number>0</number>
+         </property>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="DirectLight1Tab">
+        <attribute name="title">
+         <string>DirectLight1</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="DirectLight1TabLayout">
+         <property name="margin">
+          <number>0</number>
+         </property>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="DirectLight2Tab">
+        <attribute name="title">
+         <string>DirectLight2</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="DirectLight2TabLayout">
+         <property name="margin">
+          <number>0</number>
+         </property>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="DirectLight3Tab">
+        <attribute name="title">
+         <string>DirectLight3</string>
+        </attribute>
+        <layout class="QVBoxLayout" name="DirectLight3TabLayout">
+         <property name="margin">
+          <number>0</number>
+         </property>
+        </layout>
+       </widget>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
+  <action name="actionCube">
+   <property name="text">
+    <string>Cube</string>
+   </property>
+  </action>
+  <action name="actionSphere">
+   <property name="text">
+    <string>Sphere</string>
+   </property>
+  </action>
+  <action name="actionPlane">
+   <property name="text">
+    <string>Plane</string>
+   </property>
+  </action>
+  <action name="actionCylinder">
+   <property name="text">
+    <string>Cylinder</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources>
+  <include location="ZEDMaterialEditor.qrc"/>
+ </resources>
+ <connections/>
+</ui>

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDSoundFileExtension.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,45 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-include(${QT_USE_FILE})
+#ifndef __ZED_SOUND_FILE_EXTENSION_H__
+#define __ZED_SOUND_FILE_EXTENSION_H__
 
-add_source (ZEDPlugIn.cpp		              Sources)
-add_source (ZEDPlugIn.h			              Sources)
+#include "ZEDCore/ZEDFileExtension.h"
 
-add_source (ZEDExtension.cpp		          Sources)
-add_source (ZEDExtension.h			          Sources)
+class ZEDSoundFileExtensionDescription : public ZEDExtensionDescription
+{
+	public:
 
-add_source (ZEDFileExtension.cpp		      Sources)
-add_source (ZEDFileExtension.h			      Sources)
+		virtual const char*					GetName();
+		virtual const char*					GetAuthor();
+		virtual const char*					GetVersion();
+		virtual ZEDExtensionType			GetType();
+		virtual ZEDExtension*				CreateInstance();
 
-add_source (ZEDPreviewWidget.cpp		      Sources)
-add_source (ZEDPreviewWidget.h			      Sources)
+											ZEDSoundFileExtensionDescription();
+};
 
-add_source (ZEDPlugInManager.cpp		      Sources)
-add_source (ZEDPlugInManager.h			      Sources)
+class ZEDSoundFileExtension : public ZEDFileExtension
+{
+	friend class ZEDSoundFileExtensionDescription;
 
+	private:
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+			QList<QString>					FileFormats;
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+											ZEDSoundFileExtension();
 
-add_library (ZEDCore ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
+	public:
 
-set_property(TARGET ZEDCore PROPERTY FOLDER "ZEditor")
+		virtual QWidget*					GetEditor(QString FileName);
+		virtual ZEDPreviewWidget*			GetPreviewWidget(QWidget* Parent, QString FileName);
+		virtual QList<QString>				GetSupportedFileFormats();
+		virtual ZEDExtensionDescription*	GetDescription();
+};
+
+#endif

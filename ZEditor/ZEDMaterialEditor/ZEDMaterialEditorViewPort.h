@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDBrowser.h
+ Zinek Engine - ZEDMaterialEditorViewPort.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,67 +34,68 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+#ifndef __ZED_MATERIAL_EDITOR_VIEWPORT_H__
+#define __ZED_MATERIAL_EDITOR_VIEWPORT_H__
 
-#ifndef __ZED_BROWSER_H__
-#define __ZED_BROWSER_H__
+#include <QFrame>
+#include <ZEGame/ZEPlayer.h>
+#include <ZEGame/ZEGrid.h>
+#include <ZEModel/ZEModel.h>
+#include <ZEGraphics/ZEDirectionalLight.h>
+#include <QPoint>
 
-#include <ui_ZEDBrowser.h>
-#include <QDir>
-#include <QGridLayout>
-#include <QList>
+class ZEDMaterialEditor;
 
-#include "ZEDDirectoryTreeWidget.h"
-
-class ZEDFileExtension;
-class ZEDBrowserItem;
-class ZEDDirectoryTreeWidgetItem;
-
-class ZEDBrowser : public QMainWindow
+class ZEDMaterialEditorViewPort : public QFrame
 {
-	Q_OBJECT
-
-	friend class ZEDBrowserItem;
-
 	private:
 
-		bool					MultipleSelectionEnabled;
+		ZEPlayer*			Camera;
+		ZEGrid*				Grid;
+		ZEModel*			Model;
+		ZEDirectionalLight* DirectLight1;
+		ZEDirectionalLight* DirectLight2;
+		ZEDirectionalLight* DirectLight3;
 
-		Ui::ZEDBrowserUI		AssertBrowserUI;
-		QDir					SelectedDir;
-		ZEDDirectoryTreeWidget*	DirectoryTree;
-		QGridLayout*			BrowserItemsLayout;
+		ZEDMaterialEditor*	ParentEditor;
 
-		QList<ZEDBrowserItem*>	BrowserItems;
-		QList<ZEDBrowserItem*>	SelectedBrowserItems;
-		QList<QAction*>			ContextMenuActions;
+		QPoint				OldMousePosition;
 
-		QAction*				SeperatorAction;
+		float				Pitch;
+		float				Yawn;
+		float				Roll;
+
+		float				YawnLight1;
+		float				PitchLight1;
+
+		float				YawnLight2;
+		float				PitchLight2;
+
+		float				YawnLight3;
+		float				PitchLight3;
+		
 
 	protected:
 
-		void					GenerateBrowserItems(ZEDDirectoryTreeWidgetItem* Current);
-		void					ClearBrowserItems();
+		virtual void		resizeEvent(QResizeEvent* ResizeEvent);
+		virtual void		mouseMoveEvent(QMouseEvent * Event);
+		virtual void		mousePressEvent(QMouseEvent * Event);
+		virtual void		wheelEvent(QWheelEvent * Event);
 
-		void					ItemSelected(ZEDBrowserItem* SelectedItem);
-		void					ItemDeselected(ZEDBrowserItem* SelectedItem);
-		void					ClearSelectedItems();
+		virtual void		RotateModel(QPoint PositionDifference);
+		virtual void		RotateLights(QPoint PositionDifference);
+		virtual void		MoveLeftRight(QPoint PositionDifference);
 
 	public:
 
-	QList<QAction*>				GetBrowserContextMenuActions();
-
-								ZEDBrowser(QWidget *Parent = 0, Qt::WFlags Flags = 0);
-
-	private slots:
-
-		void					CopyActionTriggered();
-		void					CutActionTriggered();
-		void					PasteActionTriggered();
-		void					DeleteActionTriggered();
-
-	public slots:
-
-		void					DirectorySelected(QTreeWidgetItem* Current, QTreeWidgetItem* Previous);
+		void				Initialize();
+		ZEFixedMaterial*	GetModelMaterial();
+		void				SetModelFile(const char* FileName);
+		ZEDirectionalLight*	GetDirectLight1();
+		ZEDirectionalLight*	GetDirectLight2();
+		ZEDirectionalLight*	GetDirectLight3();
+							ZEDMaterialEditorViewPort(ZEDMaterialEditor* ParentEditor, QWidget* parent = 0, Qt::WindowFlags f = 0);
 };
+
 
 #endif

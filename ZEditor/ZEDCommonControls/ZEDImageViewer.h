@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDEntitySelectionItemPlugIn.cpp
+ Zinek Engine - ZEDImageViewer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,43 +33,76 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDEntitySelectionItemPlugIn.h"
-#include "ZEDEntitySelectionItem.h"
-#include "ZEGame\ZEEntity.h"
-#include "ZEMeta\ZEClass.h"
+#pragma once
 
-ZEDSelectionItem*	ZEDEntitySelectionItemPlugin::CreateSelectionItem(ZEClass* Class, ZEDGizmoMode Mode, ZEScene* Scene)
+#ifndef __H_ZED_IMAGE_VIEWER_H__
+#define __H_ZED_IMAGE_VIEWER_H__
+
+#include <QGraphicsView>
+#include <QMainWindow>
+#include <QPoint>
+#include <QGraphicsScene>
+#include <QVBoxLayout>
+#include <QGraphicsPixmapItem>
+#include <QLabel>
+
+using namespace Qt;
+
+class ZEDImageViewer;
+
+class ZEDImageViewerViewPort : public QGraphicsView
 {
-	ZEEntity* Entity = ((ZEEntity*)(Class));
-	return new ZEDEntitySelectionItem(Entity, Mode, Scene); 
-}
+	private:
 
-const char* ZEDEntitySelectionItemPlugin::GetVersion()
+		QPoint						OldPos;
+		QGraphicsScene				ViewportScene;
+		ZEDImageViewer*				ParentViewer;
+		int							ZoomCount;
+
+		void						ResetZoom();
+
+	protected:
+
+		virtual void				mousePressEvent(QMouseEvent* Event);
+		virtual void				mouseReleaseEvent(QMouseEvent* Event);
+		virtual void				mouseMoveEvent(QMouseEvent* Event);
+		virtual void				wheelEvent(QWheelEvent* Event);
+
+	public:
+
+									ZEDImageViewerViewPort(ZEDImageViewer* ParentViewer, QWidget* Parent);
+									~ZEDImageViewerViewPort();
+
+};
+
+class ZEDImageViewer : public QMainWindow
 {
-	return "0.5";
-}
+	friend class ZEDImageViewerViewPort;
 
-const char* ZEDEntitySelectionItemPlugin::GetName()
-{
-	return "EntitySelectionItemPlugIn";
-}
+	private:
 
-const char* ZEDEntitySelectionItemPlugin::GetAuthor()
-{
-	return "Zinek Code House & Game Studio";
-}
+		ZEDImageViewerViewPort*		ViewerViewport;
+		QVBoxLayout					ViewerLayout;
+		QGraphicsPixmapItem			PixmapItem;
 
-const char* ZEDEntitySelectionItemPlugin::GetSupportedClassName()
-{
-	return "ZEEntity";
-}
+		QHBoxLayout					InfoLayout;		
+		QLabel*						ULabel;
+		QLabel*						VLabel;
+		QLabel*						ColorInfoLabel;
+		QLabel*						ColorLabel;
+		QLabel*						ResolutionLabel;
 
-ZEDPlugInType ZEDEntitySelectionItemPlugin::GetType()
-{
-	return ZED_SELECTION_ITEM_PLUG_IN;
-}
+	protected:
 
-ZEDEntitySelectionItemPlugin::ZEDEntitySelectionItemPlugin()
-{
+		void						SetInfoNotifications(float U, float V, int X, int Y, QColor PixelColor, int Width, int Height);		
 
-}
+	public:
+
+		void						SetImage(QString FileName);
+
+									ZEDImageViewer();
+									~ZEDImageViewer();
+
+};
+
+#endif

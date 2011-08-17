@@ -37,12 +37,15 @@ cmake_minimum_required (VERSION 2.8)
 
 include(${QT_USE_FILE})
 
-add_source (ZEDBrowser.cpp				Sources)
-add_source (ZEDBrowser.h				Sources QtMocs)
-add_source (ZEDBrowser.ui					Sources QtUI)
+add_source (ZEDBrowser.cpp						Sources)
+add_source (ZEDBrowser.h						Sources QtMocs)
+add_source (ZEDBrowser.ui						Sources QtUI)
 
 add_source (ZEDBrowserItem.cpp					Sources)
 add_source (ZEDBrowserItem.h					Sources)
+
+add_source (ZEDDirectoryTreeWidget.cpp			Sources)
+add_source (ZEDDirectoryTreeWidget.h			Sources)
 
 include_directories (${CMAKE_CURRENT_BINARY_DIR})
 

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDMaterialEditor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,55 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#ifndef ZEDMATERIALEDITOR_H
+#define ZEDMATERIALEDITOR_H
 
-include(${QT_USE_FILE})
+#include <QtGui/QMainWindow>
+#include <QTimer>
+#include "ui_ZEDMaterialEditor.h"
+#include "ZEDMaterialEditorViewPort.h"
 
-add_source (ZEDPlugIn.cpp		              Sources)
-add_source (ZEDPlugIn.h			              Sources)
+class ZEDPropertyWindowManager;
 
-add_source (ZEDExtension.cpp		          Sources)
-add_source (ZEDExtension.h			          Sources)
+class ZEDMaterialEditor : public QMainWindow
+{
+	Q_OBJECT
 
-add_source (ZEDFileExtension.cpp		      Sources)
-add_source (ZEDFileExtension.h			      Sources)
+	private:
 
-add_source (ZEDPreviewWidget.cpp		      Sources)
-add_source (ZEDPreviewWidget.h			      Sources)
+		Ui::ZEDMaterialEditorClass ui;
 
-add_source (ZEDPlugInManager.cpp		      Sources)
-add_source (ZEDPlugInManager.h			      Sources)
+		QTimer						EngineMainLoopTimer;
+		ZEDMaterialEditorViewPort*	ViewPort;
+		ZEDPropertyWindowManager*	MaterialPropertyWindowManager;
+		ZEDPropertyWindowManager*	DirectLight1PropertyWindowManager;
+		ZEDPropertyWindowManager*	DirectLight2PropertyWindowManager;
+		ZEDPropertyWindowManager*	DirectLight3PropertyWindowManager;
+
+	public:
+
+		void						InitializeEngine();
+		void						UpdateLightPropertyWidgets();
+
+									ZEDMaterialEditor(QWidget *parent = 0, Qt::WFlags flags = 0);
+									~ZEDMaterialEditor();
+
+	public slots:
+
+		void						EngineMainLoop();
+
+	private slots:
+
+		void						SphereSelected();
+		void						CubeSelected();
+		void						PlaneSelected();
+		void						CylinderSelected();
 
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+};
 
-add_library (ZEDCore ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
-
-set_property(TARGET ZEDCore PROPERTY FOLDER "ZEditor")
+#endif // ZEDMATERIALEDITOR_H

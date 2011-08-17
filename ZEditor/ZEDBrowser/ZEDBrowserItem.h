@@ -40,14 +40,16 @@
 
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QMenu>
 
 using namespace Qt;
 
 class QMouseEvent;
 class ZEDPreviewWidget;
 class ZEDFileExtension;
+class ZEDBrowser;
 
-// If you inherit this class, do not forget to call events of this class in your new class events.
+// If you inherit this class, do not forget to call events of this class in your new class' events.
 
 class ZEDBrowserItem : public QLabel
 {
@@ -55,33 +57,34 @@ class ZEDBrowserItem : public QLabel
 	
 	private:
 
+		ZEDBrowser*			ParentBrowser;
 		ZEDPreviewWidget*	PreviewWidget;
+		QMenu				ContextMenu;
 
 		QString				FileType;
 		QString				FileName;
-
 		bool				IsSelected;
+
 		QLabel*				Header;
 		QLabel*				Footer;
 		QVBoxLayout*		Layout;
 
 		void				Clicked(QMouseEvent* Event);
-		void				DoubleClicked(QMouseEvent* Event);
 		void				ContextMenuRequested(QContextMenuEvent* Event);
-		ZEDFileExtension*	GetRelatedExtension();
 
 	protected:
 
 		void 				mousePressEvent(QMouseEvent* Event);
-		void 				mouseDoubleClickEvent(QMouseEvent* Event);
 		void				contextMenuEvent(QContextMenuEvent* Event);
+
+		ZEDFileExtension*	GetRelatedExtension();
 
 	public:
 
 		void				SetSelected(bool IsSelected);
 		bool				GetSelected() const;
 
-							ZEDBrowserItem(QString FileName);
+							ZEDBrowserItem(ZEDBrowser* ParentBrowser, QWidget* Parent, QString FileName);
 							~ZEDBrowserItem();
 };
 

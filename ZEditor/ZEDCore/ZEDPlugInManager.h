@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDEntitySelectionItemPlugIn.h
+ Zinek Engine - ZEDPlugInManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,22 +35,36 @@
 
 #pragma once
 
-#ifndef __ZED_ENTITY_SELECTION_ITEM_PLUG_IN_H__
-#define __ZED_ENTITY_SELECTION_ITEM_PLUG_IN_H__
+#ifndef __ZED_PLUG_IN_MANAGER_H__
+#define __ZED_PLUG_IN_MANAGER_H__
 
-#include "ZEDSelectionItemPlugin.h"
+#include <QList>
+#include "ZEDPlugIn.h"
+#include "ZEDExtension.h"
 
-class ZEDEntitySelectionItemPlugin : public ZEDSelectionItemPlugin
+#define zedPlugInManager ZEDPlugInManager::GetInstance()
+
+class ZEDPlugInManager
 {
-public:
+	private:
 
-	virtual ZEDSelectionItem*	CreateSelectionItem(ZEClass* Class, ZEDGizmoMode Mode, ZEScene* Scene);
-	virtual const char*			GetSupportedClassName();
-	virtual const char*			GetVersion();
-	virtual const char*			GetName();
-	virtual const char*			GetAuthor();
-	virtual ZEDPlugInType		GetType();
+		static QList<ZEDPlugIn*>	PlugIns;
+		static QList<ZEDExtension*>	Extensions;
 
-								ZEDEntitySelectionItemPlugin();
+									ZEDPlugInManager();
+									~ZEDPlugInManager();
+
+	protected:
+
+		void						LoadInternalPlugIns();
+
+	public:
+
+		static void					ReadPlugInsFromFile();
+		static QList<ZEDExtension*>	GetExtensions();
+		static bool					RegisterPlugIn(ZEDPlugIn* NewPlugIn);
+
+		static ZEDPlugInManager*	GetInstance();
 };
+
 #endif

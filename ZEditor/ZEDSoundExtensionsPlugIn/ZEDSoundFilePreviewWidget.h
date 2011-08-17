@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDSoundFilePreviewWidget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,52 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-include(${QT_USE_FILE})
+#ifndef __ZED_SOUND_FILE_PREVIEW_WIDGET_H__
+#define __ZED_SOUND_FILE_PREVIEW_WIDGET_H__
 
-add_source (ZEDPlugIn.cpp		              Sources)
-add_source (ZEDPlugIn.h			              Sources)
+#include <QHBoxLayout>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QObject>
+#include <QCheckBox>
+#include <QSound>
+#include <QList>
+#include <QAction>
+#include "ZEDCore/ZEDPreviewWidget.h"
 
-add_source (ZEDExtension.cpp		          Sources)
-add_source (ZEDExtension.h			          Sources)
+using namespace Qt;
 
-add_source (ZEDFileExtension.cpp		      Sources)
-add_source (ZEDFileExtension.h			      Sources)
+class ZEDSoundFilePreviewWidget : public ZEDPreviewWidget, public QObject
+{
+	Q_OBJECT
 
-add_source (ZEDPreviewWidget.cpp		      Sources)
-add_source (ZEDPreviewWidget.h			      Sources)
+	private:
 
-add_source (ZEDPlugInManager.cpp		      Sources)
-add_source (ZEDPlugInManager.h			      Sources)
+		QVBoxLayout		VerticalLayout;
+		QHBoxLayout		HorizontalLayout;
+		QPushButton		PlayButton;
+		QPushButton		StopButton;
+		QCheckBox		LoopCheckBox;
 
+		QSound*			Player;
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+	public slots:
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+		void			PlaySound();
+		void			StopSound();
+		void			EnableLoop(int State);
 
-add_library (ZEDCore ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
+	public:
 
-set_property(TARGET ZEDCore PROPERTY FOLDER "ZEditor")
+		virtual			QList<QAction*>		GetContextMenuItems();
+
+						ZEDSoundFilePreviewWidget(QWidget* Parent, QString FileName, WindowFlags F = 0);
+						~ZEDSoundFilePreviewWidget();
+};
+
+#endif

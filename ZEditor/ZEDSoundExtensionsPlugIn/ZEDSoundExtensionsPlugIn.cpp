@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDSoundExtensionsPlugIn.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,44 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEDSoundExtensionsPlugIn.h"
+#include "ZEDSoundFileExtension.h"
+#include <stdlib.h>
 
-include(${QT_USE_FILE})
+ZEArray<ZEDExtensionDescription*> ZEDSoundExtensionsPlugIn::Descs = ZEArray<ZEDExtensionDescription*>();
 
-add_source (ZEDPlugIn.cpp		              Sources)
-add_source (ZEDPlugIn.h			              Sources)
+const char* ZEDSoundExtensionsPlugIn::GetName()
+{
+	return "Sound Extensions Plug-In";
+}
 
-add_source (ZEDExtension.cpp		          Sources)
-add_source (ZEDExtension.h			          Sources)
+const char* ZEDSoundExtensionsPlugIn::GetVersion()
+{
+	return "0.1";
+}
 
-add_source (ZEDFileExtension.cpp		      Sources)
-add_source (ZEDFileExtension.h			      Sources)
+const char* ZEDSoundExtensionsPlugIn::GetAuthor()
+{
+	return "Zinek Code House & Game Studio";
+}
 
-add_source (ZEDPreviewWidget.cpp		      Sources)
-add_source (ZEDPreviewWidget.h			      Sources)
+unsigned int ZEDSoundExtensionsPlugIn::GetExtensionCount()
+{
+	return 1;
+}
 
-add_source (ZEDPlugInManager.cpp		      Sources)
-add_source (ZEDPlugInManager.h			      Sources)
+ZEDExtensionDescription** ZEDSoundExtensionsPlugIn::GetExtensionDescriptions()
+{
+	static ZEDSoundFileExtensionDescription SoundFileExtensionDesc;
+	Descs.Add(&SoundFileExtensionDesc);
 
+	return Descs.GetCArray();
+}
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+ZEDSoundExtensionsPlugIn::ZEDSoundExtensionsPlugIn()
+{
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
-
-add_library (ZEDCore ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
-
-set_property(TARGET ZEDCore PROPERTY FOLDER "ZEditor")
+}

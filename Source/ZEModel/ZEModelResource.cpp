@@ -171,7 +171,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetAlphaCullEnabled(false);
 		CurrentMaterial->SetAlphaCullLimit(0.1f);
 		CurrentMaterial->SetOpacity(1.0f);
-		CurrentMaterial->SetDiffuseSubSurfaceScatteringFactor(0.6f);
+		CurrentMaterial->SetDiffuseSubSurfaceScatteringFactor(0.0f);
 		CurrentMaterial->SetOpacityEnabled(true);
 		CurrentMaterial->SetOpacityComponent(ZE_MOC_BASE_MAP_ALPHA);
 
@@ -194,9 +194,9 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetEmmisiveMap(ManageModelMaterialTextures(MaterialChunk.EmmisiveMap, Model->TextureResources));
 		CurrentMaterial->SetOpacityMap(ManageModelMaterialTextures(MaterialChunk.OpasityMap, Model->TextureResources));
 		
-		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_DETAILNORMALMAP);
-		CurrentMaterial->SetDetailBaseMap(ManageModelMaterialTextures(MaterialChunk.DetailMap, Model->TextureResources));
-		CurrentMaterial->SetDetailNormalMap(ManageModelMaterialTextures(MaterialChunk.DetailNormalMap, Model->TextureResources));
+		//CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_DETAILNORMALMAP);
+		//CurrentMaterial->SetDetailBaseMap(ManageModelMaterialTextures(MaterialChunk.DetailMap, Model->TextureResources));
+		//CurrentMaterial->SetDetailNormalMap(ManageModelMaterialTextures(MaterialChunk.DetailNormalMap, Model->TextureResources));
 		CurrentMaterial->SetReflectionEnabled(false);
 		CurrentMaterial->SetRefractionEnabled(false);
 		CurrentMaterial->SetEnvironmentMap(NULL);//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap, TextureResources));

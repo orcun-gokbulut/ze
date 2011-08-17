@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDBrowser.h
+ Zinek Engine - ZEDImageFileExtension.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,72 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDImageFileExtension.h"
+#include "ZEDImageFilePreviewWidget.h"
 
-#ifndef __ZED_BROWSER_H__
-#define __ZED_BROWSER_H__
-
-#include <ui_ZEDBrowser.h>
-#include <QDir>
-#include <QGridLayout>
-#include <QList>
-
-#include "ZEDDirectoryTreeWidget.h"
-
-class ZEDFileExtension;
-class ZEDBrowserItem;
-class ZEDDirectoryTreeWidgetItem;
-
-class ZEDBrowser : public QMainWindow
+const char* ZEDImageFileExtensionDescription::GetName()
 {
-	Q_OBJECT
+	return "Image File Extension";
+}
 
-	friend class ZEDBrowserItem;
+const char* ZEDImageFileExtensionDescription::GetAuthor()
+{
+	return "Zinek Code House & Game Studio";
+}
 
-	private:
+const char* ZEDImageFileExtensionDescription::GetVersion()
+{
+	return "0.1";
+}
 
-		bool					MultipleSelectionEnabled;
+ZEDExtensionType ZEDImageFileExtensionDescription::GetType()
+{
+	return ZED_FILE_EXTENSION;
+}
 
-		Ui::ZEDBrowserUI		AssertBrowserUI;
-		QDir					SelectedDir;
-		ZEDDirectoryTreeWidget*	DirectoryTree;
-		QGridLayout*			BrowserItemsLayout;
+ZEDExtension* ZEDImageFileExtensionDescription::CreateInstance()
+{
+	return new ZEDImageFileExtension();
+}
 
-		QList<ZEDBrowserItem*>	BrowserItems;
-		QList<ZEDBrowserItem*>	SelectedBrowserItems;
-		QList<QAction*>			ContextMenuActions;
+ZEDImageFileExtensionDescription::ZEDImageFileExtensionDescription()
+{
 
-		QAction*				SeperatorAction;
+}
 
-	protected:
+/************************************************************************/
+/*                       ZEDSoundFileExtension                          */
+/************************************************************************/
 
-		void					GenerateBrowserItems(ZEDDirectoryTreeWidgetItem* Current);
-		void					ClearBrowserItems();
+QWidget* ZEDImageFileExtension::GetEditor(QString FileName)
+{
+	ZEDImageViewer* Editor = new ZEDImageViewer();
+	Editor->SetImage(FileName);
+	return Editor;
+}
 
-		void					ItemSelected(ZEDBrowserItem* SelectedItem);
-		void					ItemDeselected(ZEDBrowserItem* SelectedItem);
-		void					ClearSelectedItems();
+ZEDPreviewWidget* ZEDImageFileExtension::GetPreviewWidget(QWidget* Parent, QString FileName)
+{
+	return new ZEDImageFilePreviewWidget(Parent, FileName);
+}
 
-	public:
+QList<QString> ZEDImageFileExtension::GetSupportedFileFormats()
+{	
+	return FileFormats;
+}
 
-	QList<QAction*>				GetBrowserContextMenuActions();
+ZEDExtensionDescription* ZEDImageFileExtension::GetDescription()
+{
+	static ZEDImageFileExtensionDescription Description;
+	return &Description;
+}
 
-								ZEDBrowser(QWidget *Parent = 0, Qt::WFlags Flags = 0);
-
-	private slots:
-
-		void					CopyActionTriggered();
-		void					CutActionTriggered();
-		void					PasteActionTriggered();
-		void					DeleteActionTriggered();
-
-	public slots:
-
-		void					DirectorySelected(QTreeWidgetItem* Current, QTreeWidgetItem* Previous);
-};
-
-#endif
+ZEDImageFileExtension::ZEDImageFileExtension()
+{
+	FileFormats.append(QString("JPG"));
+	FileFormats.append(QString("JPEG"));
+	FileFormats.append(QString("TGA"));
+	FileFormats.append(QString("BMP"));
+	FileFormats.append(QString("PNG"));
+	FileFormats.append(QString("DDS"));
+}

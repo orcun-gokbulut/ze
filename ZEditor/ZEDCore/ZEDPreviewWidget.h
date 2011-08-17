@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDPreviewWidget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,38 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-include(${QT_USE_FILE})
+#ifndef __ZED_PREVIEW_WIDGET_H__
+#define __ZED_PREVIEW_WIDGET_H__
 
-add_source (ZEDPlugIn.cpp		              Sources)
-add_source (ZEDPlugIn.h			              Sources)
+#include <QLabel>
+#include <QList>
+#include <QAction>
 
-add_source (ZEDExtension.cpp		          Sources)
-add_source (ZEDExtension.h			          Sources)
+using namespace Qt;
 
-add_source (ZEDFileExtension.cpp		      Sources)
-add_source (ZEDFileExtension.h			      Sources)
+class ZEDPreviewWidget : public QLabel
+{
+	private:
 
-add_source (ZEDPreviewWidget.cpp		      Sources)
-add_source (ZEDPreviewWidget.h			      Sources)
+		QWidget*					Owner;
+		QString						FileName;
 
-add_source (ZEDPlugInManager.cpp		      Sources)
-add_source (ZEDPlugInManager.h			      Sources)
+	protected:
 
+		virtual void				mousePressEvent(QMouseEvent* Event);
+		virtual void				contextMenuEvent(QContextMenuEvent* Event);
+		QString						GetFileName() const;
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+	public:
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+		virtual QList<QAction*>		GetContextMenuItems() = 0;
 
-add_library (ZEDCore ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
+									ZEDPreviewWidget(QWidget* Parent, QString FileName, WindowFlags F = 0);
+};
 
-set_property(TARGET ZEDCore PROPERTY FOLDER "ZEditor")
+#endif

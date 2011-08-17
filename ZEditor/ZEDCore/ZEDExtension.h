@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDExtension.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,39 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-include(${QT_USE_FILE})
+#ifndef __ZED_EXTENSION_H__
+#define __ZED_EXTENSION_H__
 
-add_source (ZEDPlugIn.cpp		              Sources)
-add_source (ZEDPlugIn.h			              Sources)
+enum ZEDExtensionType
+{
+	ZED_FILE_EXTENSION,
+	ZED_CLASS_EXTENSION,
+	ZED_EDITOR_EXTENSION
+};
 
-add_source (ZEDExtension.cpp		          Sources)
-add_source (ZEDExtension.h			          Sources)
+class ZEDExtension;
 
-add_source (ZEDFileExtension.cpp		      Sources)
-add_source (ZEDFileExtension.h			      Sources)
+class ZEDExtensionDescription
+{
+	public:
 
-add_source (ZEDPreviewWidget.cpp		      Sources)
-add_source (ZEDPreviewWidget.h			      Sources)
+		virtual const char*			GetName() = 0;
+		virtual const char*			GetAuthor() = 0;
+		virtual const char*			GetVersion() = 0;
+		virtual ZEDExtensionType	GetType() = 0;
+		virtual ZEDExtension*		CreateInstance() = 0;
+};
 
-add_source (ZEDPlugInManager.cpp		      Sources)
-add_source (ZEDPlugInManager.h			      Sources)
+class ZEDExtension
+{
+	public:
 
+		virtual ZEDExtensionDescription* GetDescription() = 0;
+};
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
-
-add_library (ZEDCore ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
-
-set_property(TARGET ZEDCore PROPERTY FOLDER "ZEditor")
+#endif

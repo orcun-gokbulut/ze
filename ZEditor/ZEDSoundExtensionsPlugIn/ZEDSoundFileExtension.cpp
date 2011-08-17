@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDBrowser.h
+ Zinek Engine - ZEDSoundFileExtension.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,67 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDSoundFileExtension.h"
+#include "ZEDSoundFilePreviewWidget.h"
 
-#ifndef __ZED_BROWSER_H__
-#define __ZED_BROWSER_H__
-
-#include <ui_ZEDBrowser.h>
-#include <QDir>
-#include <QGridLayout>
-#include <QList>
-
-#include "ZEDDirectoryTreeWidget.h"
-
-class ZEDFileExtension;
-class ZEDBrowserItem;
-class ZEDDirectoryTreeWidgetItem;
-
-class ZEDBrowser : public QMainWindow
+const char* ZEDSoundFileExtensionDescription::GetName()
 {
-	Q_OBJECT
+	return "Sound File Extension";
+}
 
-	friend class ZEDBrowserItem;
+const char* ZEDSoundFileExtensionDescription::GetAuthor()
+{
+	return "Zinek Code House & Game Studio";
+}
 
-	private:
+const char* ZEDSoundFileExtensionDescription::GetVersion()
+{
+	return "0.1";
+}
 
-		bool					MultipleSelectionEnabled;
+ZEDExtensionType ZEDSoundFileExtensionDescription::GetType()
+{
+	return ZED_FILE_EXTENSION;
+}
 
-		Ui::ZEDBrowserUI		AssertBrowserUI;
-		QDir					SelectedDir;
-		ZEDDirectoryTreeWidget*	DirectoryTree;
-		QGridLayout*			BrowserItemsLayout;
+ZEDExtension* ZEDSoundFileExtensionDescription::CreateInstance()
+{
+	return new ZEDSoundFileExtension();
+}
 
-		QList<ZEDBrowserItem*>	BrowserItems;
-		QList<ZEDBrowserItem*>	SelectedBrowserItems;
-		QList<QAction*>			ContextMenuActions;
+ZEDSoundFileExtensionDescription::ZEDSoundFileExtensionDescription()
+{
 
-		QAction*				SeperatorAction;
+}
 
-	protected:
+/************************************************************************/
+/*                       ZEDSoundFileExtension                          */
+/************************************************************************/
 
-		void					GenerateBrowserItems(ZEDDirectoryTreeWidgetItem* Current);
-		void					ClearBrowserItems();
+QWidget* ZEDSoundFileExtension::GetEditor(QString FileName)
+{
+	return NULL;
+}
 
-		void					ItemSelected(ZEDBrowserItem* SelectedItem);
-		void					ItemDeselected(ZEDBrowserItem* SelectedItem);
-		void					ClearSelectedItems();
+ZEDPreviewWidget* ZEDSoundFileExtension::GetPreviewWidget(QWidget* Parent, QString FileName)
+{
+	return new ZEDSoundFilePreviewWidget(Parent, FileName);
+}
 
-	public:
+QList<QString> ZEDSoundFileExtension::GetSupportedFileFormats()
+{	
+	return FileFormats;
+}
 
-	QList<QAction*>				GetBrowserContextMenuActions();
+ZEDExtensionDescription* ZEDSoundFileExtension::GetDescription()
+{
+	static ZEDSoundFileExtensionDescription Description;
+	return &Description;
+}
 
-								ZEDBrowser(QWidget *Parent = 0, Qt::WFlags Flags = 0);
-
-	private slots:
-
-		void					CopyActionTriggered();
-		void					CutActionTriggered();
-		void					PasteActionTriggered();
-		void					DeleteActionTriggered();
-
-	public slots:
-
-		void					DirectorySelected(QTreeWidgetItem* Current, QTreeWidgetItem* Previous);
-};
-
-#endif
+ZEDSoundFileExtension::ZEDSoundFileExtension()
+{
+	FileFormats.append(QString("WAV"));
+	FileFormats.append(QString("MP3"));
+	FileFormats.append(QString("OGG"));
+}

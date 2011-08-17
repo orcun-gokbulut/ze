@@ -56,13 +56,7 @@
 
 #include "ZEDCommonEntities/ZEDScreenAxis.h"
 
-#include "ZEDEntitySelectionItemPlugIn.h"
 
-#include "ZEDBrowser/ZEDAssertBrowserFontFilePlugIn.h"
-#include "ZEDBrowser/ZEDModelFilePlugIn.h"
-#include "ZEDBrowser/ZEDMapFilePlugIn.h"
-#include "ZEDBrowser/ZEDSceneFilePlugIn.h"
-#include "ZEDBrowser/ZEDImageFilePlugIn.h"
 #include <ZEGame\ZEEntityProvider.h>
 #include <ZEGraphics\ZEDirectionalLight.h>
 #include <ZECore\ZEOptionManager.h>
@@ -356,9 +350,6 @@ void MapEditor::StartEngine()
 
 MapEditor::~MapEditor()
 {
-	if(this->AssertBrowser->isVisible())
-		this->AssertBrowser->close();
-
 	ZEConsole::GetInstance()->SetConsoleInterface(NULL);
 }
 
@@ -817,30 +808,7 @@ void MapEditor::InitializeAdditionalToolBarItems()
 
 void MapEditor::InitializePlugIns()
 {
-	//FileTypePlugIns.Add(new ZEDFontFilePlugIn());
-	FileTypePlugIns.Add(new ZEDModelFilePlugIn());
-	FileTypePlugIns.Add(new ZEDMapFilePlugIn());
-	FileTypePlugIns.Add(new ZEDSceneFilePlugIn());
-	FileTypePlugIns.Add(new ZEDImageFilePlugIn());
 
-	/*for (int I = 0; I < FileTypePlugIns.GetCount(); I++)
-	{
-		AssertBrowser->RegisterPlugIn(FileTypePlugIns[I]);
-	}*/
-
-	SelectionItemPlugIns.Add(new ZEDEntitySelectionItemPlugin());
-
-	for (int I = 0; I < SelectionItemPlugIns.GetCount(); I++)
-	{
-		if (QString(SelectionItemPlugIns[I]->GetVersion()) != QString("0.5"))
-			ui.ConsoleOutput->append(QString("[ZEditor] Warning : Selection plugin version mismatched, plugin name : ") + SelectionItemPlugIns[I]->GetName());
-	}
-
-	for (int I = 0; I < FileTypePlugIns.GetCount(); I++)
-	{
-		if (QString(FileTypePlugIns[I]->GetVersion()) != QString("0.5"))
-			ui.ConsoleOutput->append(QString("[ZEditor] Warning : File plugin version mismatched, plugin name : ") +  FileTypePlugIns[I]->GetName());
-	}
 }
 
 void MapEditor::ChangeGizmoWorkingSpace(QString Text)

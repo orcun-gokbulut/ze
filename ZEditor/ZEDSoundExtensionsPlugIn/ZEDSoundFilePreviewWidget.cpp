@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDBrowser.h
+ Zinek Engine - ZEDSoundFilePreviewWidget.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDSoundFilePreviewWidget.h"
+#include <QPixmap>
 
-#ifndef __ZED_BROWSER_H__
-#define __ZED_BROWSER_H__
-
-#include <ui_ZEDBrowser.h>
-#include <QDir>
-#include <QGridLayout>
-#include <QList>
-
-#include "ZEDDirectoryTreeWidget.h"
-
-class ZEDFileExtension;
-class ZEDBrowserItem;
-class ZEDDirectoryTreeWidgetItem;
-
-class ZEDBrowser : public QMainWindow
+ZEDSoundFilePreviewWidget::ZEDSoundFilePreviewWidget(QWidget* Parent, QString FileName, WindowFlags F) : ZEDPreviewWidget(Parent, FileName, F)
 {
-	Q_OBJECT
+	setFixedSize(256, 256);
+	setPixmap(QPixmap("sound.png"));
 
-	friend class ZEDBrowserItem;
+	setLayout(&VerticalLayout);
+	VerticalLayout.setDirection(QBoxLayout.BottomToTop);
+	VerticalLayout.addLayout(&HorizontalLayout);
+	PlayButton.setText("Play");
+	StopButton.setText("Stop");
+	LoopCheckBox.setText("Loop");
+	LoopCheckBox.setChecked(false);
 
-	private:
+	VerticalLayout.addSpacerItem(new QSpacerItem(20,20, QSizePolicy.Minimum, QSizePolicy.Expanding));
+	HorizontalLayout.addWidget(&PlayButton);
+	HorizontalLayout.addWidget(&StopButton);
+	HorizontalLayout.addWidget(&LoopCheckBox);
 
-		bool					MultipleSelectionEnabled;
+	QObject::connect(&PlayButton, SIGNAL(pressed()), this, SLOT(PlaySound()));
+	QObject::connect(&StopButton, SIGNAL(pressed()), this, SLOT(StopSound()));
+	QObject::connect(&LoopCheckBox, SIGNAL(stateChanged(int)), this, SLOT(EnableLoop(int)));
 
-		Ui::ZEDBrowserUI		AssertBrowserUI;
-		QDir					SelectedDir;
-		ZEDDirectoryTreeWidget*	DirectoryTree;
-		QGridLayout*			BrowserItemsLayout;
+	Player = new QSound(FileName, this);
+}
 
-		QList<ZEDBrowserItem*>	BrowserItems;
-		QList<ZEDBrowserItem*>	SelectedBrowserItems;
-		QList<QAction*>			ContextMenuActions;
+ZEDSoundFilePreviewWidget::~ZEDSoundFilePreviewWidget()
+{
+	Player->stop();
+	delete Player;
+	Player = NULL;
+}
 
-		QAction*				SeperatorAction;
+QList<QAction*> ZEDSoundFilePreviewWidget::GetContextMenuItems()
+{
+	return QList<QAction*>();
+}
 
-	protected:
+void ZEDSoundFilePreviewWidget::PlaySound()
+{
+	Player->play();
+}
 
-		void					GenerateBrowserItems(ZEDDirectoryTreeWidgetItem* Current);
-		void					ClearBrowserItems();
+void ZEDSoundFilePreviewWidget::StopSound()
+{
+	Player->stop();
+}
 
-		void					ItemSelected(ZEDBrowserItem* SelectedItem);
-		void					ItemDeselected(ZEDBrowserItem* SelectedItem);
-		void					ClearSelectedItems();
+void ZEDSoundFilePreviewWidget::EnableLoop(int State)
+{	
+	Player->stop();
 
-	public:
-
-	QList<QAction*>				GetBrowserContextMenuActions();
-
-								ZEDBrowser(QWidget *Parent = 0, Qt::WFlags Flags = 0);
-
-	private slots:
-
-		void					CopyActionTriggered();
-		void					CutActionTriggered();
-		void					PasteActionTriggered();
-		void					DeleteActionTriggered();
-
-	public slots:
-
-		void					DirectorySelected(QTreeWidgetItem* Current, QTreeWidgetItem* Previous);
-};
-
-#endif
+	if(State == Unchecked)
+		Player->setLoops(1);
+	else if(State == Checked)
+		Player->setLoops(-1);
+}

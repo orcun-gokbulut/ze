@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDBrowser.h
+ Zinek Engine - ZEDDirectoryTreeWidget.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,67 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
-#ifndef __ZED_BROWSER_H__
-#define __ZED_BROWSER_H__
-
-#include <ui_ZEDBrowser.h>
-#include <QDir>
-#include <QGridLayout>
-#include <QList>
-
 #include "ZEDDirectoryTreeWidget.h"
 
-class ZEDFileExtension;
-class ZEDBrowserItem;
-class ZEDDirectoryTreeWidgetItem;
-
-class ZEDBrowser : public QMainWindow
+ZEDDirectoryTreeWidgetItem::ZEDDirectoryTreeWidgetItem(QTreeWidgetItem* Parent, QStringList ColumnValues, QDir Directory) : QTreeWidgetItem(Parent, ColumnValues)
 {
-	Q_OBJECT
+	this->Directory = Directory;
+	GenerateChildItems();
+}
 
-	friend class ZEDBrowserItem;
+ZEDDirectoryTreeWidgetItem::ZEDDirectoryTreeWidgetItem(QTreeWidget* Parent, QStringList ColumnValues, QDir Directory) : QTreeWidgetItem(Parent, ColumnValues)
+{
+	this->Directory = Directory;
+	GenerateChildItems();
+}
 
-	private:
+QDir ZEDDirectoryTreeWidgetItem::GetDirectory() const
+{
+	return Directory;
+}
 
-		bool					MultipleSelectionEnabled;
+void ZEDDirectoryTreeWidgetItem::GenerateChildItems()
+{
+	QStringList Folders = Directory.entryList(QStringList(), QDir.Dirs | QDir.NoDotAndDotDot, QDir.Name);
 
-		Ui::ZEDBrowserUI		AssertBrowserUI;
-		QDir					SelectedDir;
-		ZEDDirectoryTreeWidget*	DirectoryTree;
-		QGridLayout*			BrowserItemsLayout;
+	for (int I = 0; I < Folders.count(); I++)
+	{
+		QStringList ColumnValues;
+		ColumnValues.append(QString(Folders.at(I)));
 
-		QList<ZEDBrowserItem*>	BrowserItems;
-		QList<ZEDBrowserItem*>	SelectedBrowserItems;
-		QList<QAction*>			ContextMenuActions;
+		ZEDDirectoryTreeWidgetItem* NewItem = new ZEDDirectoryTreeWidgetItem(this ,ColumnValues, QDir(Directory.path() + "/" +ColumnValues.at(0)));
+		addChild(NewItem);
+	}
+}
 
-		QAction*				SeperatorAction;
+/************************************************************************/
+/*                        ZEDDirectoryTreeWidget		                */
+/************************************************************************/
 
-	protected:
+ZEDDirectoryTreeWidget::ZEDDirectoryTreeWidget(QDir WorkingDirectory, QWidget* Parent) : QTreeWidget(Parent)
+{
+	WorkingDirectory = WorkingDirectory;
+	GenerateItems();
+	QStringList HeaderLabels;
+	HeaderLabels.append(QString("Name"));
+	setHeaderLabels(HeaderLabels);
+}
 
-		void					GenerateBrowserItems(ZEDDirectoryTreeWidgetItem* Current);
-		void					ClearBrowserItems();
+ZEDDirectoryTreeWidget::~ZEDDirectoryTreeWidget()
+{
 
-		void					ItemSelected(ZEDBrowserItem* SelectedItem);
-		void					ItemDeselected(ZEDBrowserItem* SelectedItem);
-		void					ClearSelectedItems();
+}
 
-	public:
+void ZEDDirectoryTreeWidget::GenerateItems()
+{
+	QStringList Folders = WorkingDirectory.entryList(QStringList(), QDir.Dirs | QDir.NoDotAndDotDot, QDir.Name);
 
-	QList<QAction*>				GetBrowserContextMenuActions();
+	for (int I = 0; I < Folders.count(); I++)
+	{
+		QStringList ColumnValues;
+		ColumnValues.append(QString(Folders.at(I)));
 
-								ZEDBrowser(QWidget *Parent = 0, Qt::WFlags Flags = 0);
-
-	private slots:
-
-		void					CopyActionTriggered();
-		void					CutActionTriggered();
-		void					PasteActionTriggered();
-		void					DeleteActionTriggered();
-
-	public slots:
-
-		void					DirectorySelected(QTreeWidgetItem* Current, QTreeWidgetItem* Previous);
-};
-
-#endif
+		ZEDDirectoryTreeWidgetItem* NewItem = new ZEDDirectoryTreeWidgetItem(this, ColumnValues, QDir(WorkingDirectory.path() + "/" +ColumnValues.at(0)));
+		addTopLevelItem(NewItem);
+	}
+}

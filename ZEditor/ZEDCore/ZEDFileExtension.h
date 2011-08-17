@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDFileExtension.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,41 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-include(${QT_USE_FILE})
+#ifndef __ZED_FILE_EXTENSION_H__
+#define __ZED_FILE_EXTENSION_H__
 
-add_source (ZEDPlugIn.cpp		              Sources)
-add_source (ZEDPlugIn.h			              Sources)
+#include "ZEDExtension.h"
+#include "ZEDPreviewWidget.h"
+#include <QWidget>
+#include <QList>
+#include <ZEGame/ZEEntity.h>
 
-add_source (ZEDExtension.cpp		          Sources)
-add_source (ZEDExtension.h			          Sources)
+/*
+#define ZEMAP	"ZEMAP"
+#define ZEMODEL "ZEMODEL"
+#define ZESCENE "ZESCENE"
+#define	ZEFONT	"ZEFONT"
+#define ZEMTL	"ZEMTL"
 
-add_source (ZEDFileExtension.cpp		      Sources)
-add_source (ZEDFileExtension.h			      Sources)
+#define DDS		"DDS"
+#define PNG		"PNG"
+#define TGA		"TGA"
+#define JPG		"JPG"
+#define JPEG	"JPEG"
+#define BMP		"BMP"*/
 
-add_source (ZEDPreviewWidget.cpp		      Sources)
-add_source (ZEDPreviewWidget.h			      Sources)
+class ZEDFileExtension : public ZEDExtension
+{
+	public:
 
-add_source (ZEDPlugInManager.cpp		      Sources)
-add_source (ZEDPlugInManager.h			      Sources)
+		virtual QWidget*			GetEditor(QString FileName) = 0;
+		virtual ZEDPreviewWidget*	GetPreviewWidget(QWidget* Parent, QString FileName) = 0;
+		virtual QList<QString>		GetSupportedFileFormats() = 0;
+};
 
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
-
-add_library (ZEDCore ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
-
-set_property(TARGET ZEDCore PROPERTY FOLDER "ZEditor")
+#endif

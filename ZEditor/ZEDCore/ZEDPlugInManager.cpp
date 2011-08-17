@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDPlugInManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,75 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEDPlugInManager.h"
+#include "ZEDSoundExtensionsPlugIn/ZEDSoundExtensionsPlugIn.h"
+#include "ZEDImageExtensionsPlugIn/ZEDImageExtensionsPlugIn.h"
 
-include(${QT_USE_FILE})
+QList<ZEDPlugIn*> ZEDPlugInManager::PlugIns = QList<ZEDPlugIn*>();
+QList<ZEDExtension*> ZEDPlugInManager::Extensions = QList<ZEDExtension*>();
 
-add_source (ZEDPlugIn.cpp		              Sources)
-add_source (ZEDPlugIn.h			              Sources)
+void ZEDPlugInManager::ReadPlugInsFromFile()
+{
+	//Implement DLL Reading
+}
 
-add_source (ZEDExtension.cpp		          Sources)
-add_source (ZEDExtension.h			          Sources)
+QList<ZEDExtension*> ZEDPlugInManager::GetExtensions()
+{
+	return Extensions;
+}
 
-add_source (ZEDFileExtension.cpp		      Sources)
-add_source (ZEDFileExtension.h			      Sources)
+bool ZEDPlugInManager::RegisterPlugIn(ZEDPlugIn* NewPlugIn)
+{
+	bool Exists = false;
 
-add_source (ZEDPreviewWidget.cpp		      Sources)
-add_source (ZEDPreviewWidget.h			      Sources)
+	for (int I = 0; I < PlugIns.count(); I++)
+	{
+		if (strcmp(NewPlugIn->GetName(), PlugIns[I]->GetName()) == 0)
+			Exists = true;
+	}
 
-add_source (ZEDPlugInManager.cpp		      Sources)
-add_source (ZEDPlugInManager.h			      Sources)
+	if(!Exists)
+	{
+		PlugIns.append(NewPlugIn);
 
+		for (int I = 0; I < NewPlugIn->GetExtensionCount(); I++)
+		{
+			ZEDExtensionDescription* Desc = NewPlugIn->GetExtensionDescriptions()[I];
+			Extensions.append(Desc->CreateInstance());
+		}
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+		return true;
+	}
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+	else
+		return false;
+}
 
-add_library (ZEDCore ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
+void ZEDPlugInManager::LoadInternalPlugIns()
+{
+	RegisterPlugIn(new ZEDSoundExtensionsPlugIn());
+	RegisterPlugIn(new ZEDImageExtensionsPlugIn());
+}
 
-set_property(TARGET ZEDCore PROPERTY FOLDER "ZEditor")
+ZEDPlugInManager::ZEDPlugInManager()
+{
+	PlugIns.clear();
+	Extensions.clear();
+
+	LoadInternalPlugIns();
+	ReadPlugInsFromFile();
+}
+
+ZEDPlugInManager::~ZEDPlugInManager()
+{
+
+}
+
+ZEDPlugInManager* ZEDPlugInManager::GetInstance()
+{
+	static ZEDPlugInManager Manager;
+	return &Manager;
+}

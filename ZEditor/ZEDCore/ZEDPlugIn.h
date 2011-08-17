@@ -38,21 +38,17 @@
 #ifndef __ZED_PLUG_IN_H__
 #define __ZED_PLUG_IN_H__
 
-enum ZEDPlugInType
-{
-	ZED_FILE_TYPE_PLUG_IN,
-	ZED_SELECTION_ITEM_PLUG_IN
-};
+#include "ZEDExtension.h"
 
 class ZEDPlugIn
 {
 	public:
 
-		virtual ZEDPlugInType	GetType()		= 0;
-		virtual const char*		GetVersion()	= 0;
-		virtual const char*		GetName()		= 0;
-		virtual const char*		GetAuthor()		= 0;
-
+		virtual const char*					GetName() = 0;
+		virtual const char*					GetVersion() = 0;
+		virtual const char*					GetAuthor() = 0;
+		virtual unsigned int				GetExtensionCount() = 0;
+		virtual ZEDExtensionDescription**	GetExtensionDescriptions() = 0;
 };
 
 #endif

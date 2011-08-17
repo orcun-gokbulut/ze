@@ -56,10 +56,6 @@
 #include "ZEDCommonEntities/ZEDGrid.h"
 #include <ZEModel/ZEModel.h>
 
-//test
-#include "ZEDBrowser/NewZEDAssertBrowser.h"
-//test
-
 using namespace Qt;
 
 class MapEditor : public QMainWindow
@@ -95,7 +91,7 @@ class MapEditor : public QMainWindow
 		void						InitializePlugIns();
 
 		//Test
-		NewZEDAssertBrowser*		AssertBrowser;
+		//NewZEDAssertBrowser*		AssertBrowser;
 		//test
 
 
@@ -166,7 +162,7 @@ class MapEditor : public QMainWindow
 		QLabel*								OperationSpaceLabel;
 
 		ZEArray<ZEDSelectionItemPlugin*>	SelectionItemPlugIns;
-		ZEArray<ZEDFilePlugIn*>				FileTypePlugIns;
+//		ZEArray<ZEDFilePlugIn*>				FileTypePlugIns;
 
 		ZEArray<ZEDSelectionItem*>			SelectedItems;
 //		ZEArray<ZEDPlugin*>					PlugIns;

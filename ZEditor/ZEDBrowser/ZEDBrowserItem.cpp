@@ -39,38 +39,37 @@
 #include "ZEDCore/ZEDPlugInManager.h"
 #include <QMouseEvent>
 #include <QFileInfo>
+#include <QMenu>
+#include "ZEDBrowser.h"
 
 void ZEDBrowserItem::Clicked(QMouseEvent* Event)
 {
-	if(Event->button() == LeftButton)
-		SetSelected(true);
-}
-
-void ZEDBrowserItem::DoubleClicked(QMouseEvent* Event)
-{
-	if(Event->button() == LeftButton)
-	{
-		ZEDFileExtension* Extension = GetRelatedExtension();
-
-		if(Extension != NULL)
-			Extension->GetEditor(FileName);
+	if(Event->button() == LeftButton || Event->button() == RightButton)
+	{	
+		if(IsSelected)
+		{
+			SetSelected(false);
+			ParentBrowser->ItemDeselected(this);
+		}
+		else
+		{
+			SetSelected(true);
+			ParentBrowser->ItemSelected(this);
+		}
 	}
 }
 
-void ZEDBrowserItem::ContextMenuRequested(QContextMenuEvent *Event)
-{
-	//Get Additional Menu Actions From PlugIn
+void ZEDBrowserItem::ContextMenuRequested(QContextMenuEvent* Event)
+{	
+	if(ContextMenu.actions().count() == 0)
+		return;
+
+	ContextMenu.exec(Event->globalPos());
 }
 
 void ZEDBrowserItem::mousePressEvent(QMouseEvent* Event)
 {
 	Clicked(Event);
-}
-
-void ZEDBrowserItem::mouseDoubleClickEvent(QMouseEvent* Event)
-{
-	if(Event->button() == LeftButton)
-		DoubleClicked(Event);
 }
 
 void ZEDBrowserItem::contextMenuEvent(QContextMenuEvent *Event)
@@ -99,8 +98,11 @@ bool ZEDBrowserItem::GetSelected() const
 	return IsSelected;
 }
 
-ZEDBrowserItem::ZEDBrowserItem(QString FileName)
+ZEDBrowserItem::ZEDBrowserItem(ZEDBrowser* ParentBrowser, QWidget* Parent, QString FileName) : QLabel(Parent)
 {
+
+	this->ParentBrowser = ParentBrowser;
+
 	if(!QFile::exists(FileName))
 		return;
 
@@ -115,16 +117,25 @@ ZEDBrowserItem::ZEDBrowserItem(QString FileName)
 
 	Layout = new QVBoxLayout();
 	Layout->setSpacing(0);
-	Layout->setContentsMargins(0, 0, 0, 0);
+	Layout->setContentsMargins(1, 0, 1, 0);
 
 	Header = new QLabel(this);
 	Footer = new QLabel(this);
+
+	Header->setMaximumHeight(20);
+	Footer->setMaximumHeight(20);
 
 	this->FileName = FileName;
 	QFileInfo FileInfo(FileName);
 	FileType = FileInfo.suffix().toUpper();
 	Header->setText(FileInfo.fileName());
-	Footer->setText(QString::number(FileInfo.size()));
+
+	int FileSizeKB = FileInfo.size() / 1024;
+
+	if(FileSizeKB < 1)
+		Footer->setText(QString::number(FileInfo.size()) + " B");
+	else
+		Footer->setText(QString::number(FileSizeKB) + " KB");
 
 	setLayout(Layout);
 
@@ -133,17 +144,40 @@ ZEDBrowserItem::ZEDBrowserItem(QString FileName)
 	ZEDFileExtension* Extension = GetRelatedExtension();
 
 	if(Extension != NULL)
-		Extension->GetPreviewWidget(FileName);
+	{
+		PreviewWidget = Extension->GetPreviewWidget(this, FileName);
+	}
 
 	if(PreviewWidget != NULL)
+	{
 		Layout->addWidget(PreviewWidget);
+		ContextMenu.addActions(PreviewWidget->GetContextMenuItems());
+	}	
+
+	ContextMenu.addActions(ParentBrowser->GetBrowserContextMenuActions());
 
 	Layout->addWidget(Footer);
 }
 
 ZEDBrowserItem::~ZEDBrowserItem()
 {
+	if(PreviewWidget != NULL)
+	{
+		PreviewWidget->close();
+		delete PreviewWidget;
+		PreviewWidget = NULL;
+	}
 
+	Header->close();
+	Footer->close();
+
+	delete Header;
+	delete Footer;
+
+	Header = NULL;
+	Footer = NULL;
+
+	close();
 }
 
 ZEDFileExtension* ZEDBrowserItem::GetRelatedExtension()
@@ -160,7 +194,7 @@ ZEDFileExtension* ZEDBrowserItem::GetRelatedExtension()
 
 			for (int J = 0; J < SupportedFileFormatCount; J++)
 			{
-				if(((ZEDFileExtension*)(CurrentExtension))->GetSupportedFileFormats().at(I) == FileType)
+				if(QString::compare(((ZEDFileExtension*)(CurrentExtension))->GetSupportedFileFormats().at(J), FileType.toUpper(), CaseInsensitive) == 0)
 					return ((ZEDFileExtension*)(CurrentExtension));
 			}
 		}

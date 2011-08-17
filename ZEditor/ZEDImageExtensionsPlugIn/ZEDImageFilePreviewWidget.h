@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDImageFilePreviewWidget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,51 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-include(${QT_USE_FILE})
+#ifndef __ZED_IMAGE_FILE_PREVIEW_WIDGET_H__
+#define __ZED_IMAGE_FILE_PREVIEW_WIDGET_H__
 
-add_source (ZEDPlugIn.cpp		              Sources)
-add_source (ZEDPlugIn.h			              Sources)
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QPushButton>
+#include <QList>
 
-add_source (ZEDExtension.cpp		          Sources)
-add_source (ZEDExtension.h			          Sources)
+#include "ZEDCore/ZEDPreviewWidget.h"
+#include "ZEDCommonControls/ZEDImageViewer.h"
 
-add_source (ZEDFileExtension.cpp		      Sources)
-add_source (ZEDFileExtension.h			      Sources)
+using namespace Qt;
 
-add_source (ZEDPreviewWidget.cpp		      Sources)
-add_source (ZEDPreviewWidget.h			      Sources)
+class ZEDImageFilePreviewWidget : public ZEDPreviewWidget, public QObject
+{
+	Q_OBJECT
 
-add_source (ZEDPlugInManager.cpp		      Sources)
-add_source (ZEDPlugInManager.h			      Sources)
+	private:
 
+		QList<QAction*>				Actions;
 
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
+		QVBoxLayout					VerticalLayout;
+		QHBoxLayout					HorizontalLayout;
+		QPushButton					ViewButton;
+		ZEDImageViewer*				ImageViewer;		
+		
+		QAction*					ViewAction;	
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+		QPixmap						CreatePixmap(QString FileName);
 
-add_library (ZEDCore ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
+	private slots:
 
-set_property(TARGET ZEDCore PROPERTY FOLDER "ZEditor")
+		void						ShowViewer();
+
+	public:
+
+		virtual QList<QAction*>		GetContextMenuItems();
+
+									ZEDImageFilePreviewWidget(QWidget* Parent, QString FileName, WindowFlags F = 0);
+									~ZEDImageFilePreviewWidget();
+};
+
+#endif
