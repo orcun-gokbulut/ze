@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPFilter2DNode.h
+ Zinek Engine - ZETextureOptions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,5 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_POST_EFFECTS_H__
-#define __ZE_POST_EFFECTS_H__
-
-#include "ZEDS\ZEArray.h"
-#include "ZEPostProcessorNode.h"
-#include "ZEMath\ZEVector.h"
-
-class ZETexture2D;
-
-struct ZEKernel2DElement
-{
-	float										SampleMultiplier;
-	ZEVector2									SampleLocation;
-	float										Reserved;
-};
-
-class ZEPPFilter2DNode : public ZEPostProcessorNode
-{
-	protected:		
-		ZEPostProcessorNode*					Input;
-		ZETexture2D*							Internal;
-		ZETexture2D*							Output;
-
-		ZEArray<ZEKernel2DElement>				Kernel;
-	
-												ZEPPFilter2DNode();
-		virtual									~ZEPPFilter2DNode();
-
-	public:	
-		virtual size_t							GetDependencyCount();
-		virtual ZEPostProcessorNode**			GetDependencies();
-
-		void									SetKernelElements(const ZEArray<ZEKernel2DElement>& Values);
-		const ZEArray<ZEKernel2DElement>&		GetKernelElements();
-
-		virtual void							SetInput(ZEPostProcessorNode* Node);
-		virtual ZEPostProcessorNode*			GetInput();
-
-		virtual ZETexture2D*					GetOutput();
-};
-#endif
-
-
-
+#include "ZETextureOptions.h"
 

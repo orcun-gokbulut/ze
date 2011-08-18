@@ -40,7 +40,7 @@
 class ZESerializer
 {
 	public:
-		virtual size_t				Write(const void* Data, size_t Size, size_t Count) = 0;
+		virtual size_t				Write(const void* Buffer, size_t Size, size_t Count) = 0;
 };
 
 #endif

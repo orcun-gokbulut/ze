@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPFilter2DNode.h
+ Zinek Engine - ZETextureLoader.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,48 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_POST_EFFECTS_H__
-#define __ZE_POST_EFFECTS_H__
+#ifndef __ZE_TEXTURE_LOADER_H__
+#define __ZE_TEXTURE_LOADER_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEPostProcessorNode.h"
-#include "ZEMath\ZEVector.h"
 
-class ZETexture2D;
+#include "ZEGraphics\ZETexture.h"
+#include "ZEGraphics\ZETexture2DResource.h"
+#include "ZEGraphics\ZETexture3DResource.h"
+#include "ZEGraphics\ZETextureCubeResource.h"
 
-struct ZEKernel2DElement
+
+struct ZETextureLoaderInfo
 {
-	float										SampleMultiplier;
-	ZEVector2									SampleLocation;
-	float										Reserved;
+	unsigned int			TextureWidth;
+	unsigned int			TextureHeight;
+	unsigned int			TexturePitch;
+	unsigned int			BitsPerPixel;
+	ZETextureType			TextureType;
+	ZETexturePixelFormat	PixelFormat;
+
+	ZETextureLoaderInfo		operator= (const ZETextureLoaderInfo &Info);
+	bool					operator!=(const ZETextureLoaderInfo &Info);
 };
 
-class ZEPPFilter2DNode : public ZEPostProcessorNode
+
+class ZETextureLoader
 {
-	protected:		
-		ZEPostProcessorNode*					Input;
-		ZETexture2D*							Internal;
-		ZETexture2D*							Output;
+	private:
+							ZETextureLoader();
+							~ZETextureLoader();
 
-		ZEArray<ZEKernel2DElement>				Kernel;
-	
-												ZEPPFilter2DNode();
-		virtual									~ZEPPFilter2DNode();
-
-	public:	
-		virtual size_t							GetDependencyCount();
-		virtual ZEPostProcessorNode**			GetDependencies();
-
-		void									SetKernelElements(const ZEArray<ZEKernel2DElement>& Values);
-		const ZEArray<ZEKernel2DElement>&		GetKernelElements();
-
-		virtual void							SetInput(ZEPostProcessorNode* Node);
-		virtual ZEPostProcessorNode*			GetInput();
-
-		virtual ZETexture2D*					GetOutput();
+	public:
+		static bool			GetTextureInfo(ZETextureLoaderInfo& TextureInfo, ZEResourceFile* ResourceFile);
+		static bool			LoadTexture(void* DestBuffer, ZEResourceFile* ResourceFile, ZETextureLoaderInfo& TextureInfo);
+		
 };
+
 #endif
-
-
-
-

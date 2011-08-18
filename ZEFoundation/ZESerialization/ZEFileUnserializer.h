@@ -43,7 +43,7 @@ private:
 	void*						File;
 
 public:
-	virtual size_t				Read(void* data, size_t Size, size_t Count);	
+	virtual size_t				Read(void* Buffer, size_t Size, size_t Count);	
 	bool						OpenFile(const char* FileName);
 	void						CloseFile();
 

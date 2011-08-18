@@ -41,14 +41,19 @@ ZETextureType ZETexture2D::GetTextureType() const
 	return ZE_TT_2D;
 }
 
-int ZETexture2D::GetWidth() const
+unsigned int ZETexture2D::GetWidth() const
 {
 	return Width;
 }
 
-int ZETexture2D::GetHeight() const
+unsigned int ZETexture2D::GetHeight() const
 {
 	return Height;
+}
+
+unsigned int ZETexture2D::GetMipLevel() const
+{
+	return MipLevel;
 }
 
 ZETexturePixelFormat ZETexture2D::GetPixelFormat() const

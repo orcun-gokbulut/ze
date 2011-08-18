@@ -36,6 +36,7 @@
 #include "ZEFontResource.h"
 #include "ZEGraphics\ZEUIMaterial.h"
 #include "ZEGraphics\ZETexture2DResource.h"
+#include "ZEGraphics\ZETextureOptions.h"
 #include "ZECore\ZEResourceManager.h"
 #include "ZECore\ZEConsole.h"
 #include "ZECore\ZEError.h"
@@ -70,6 +71,8 @@ ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 {
 	zeLog("Font Resource", "Loading font file \"%s\".", ResourceFile->GetFileName());
 
+	ZETextureOptions Option = {ZE_TCT_AUTO, ZE_TCQ_AUTO, ZE_TDS_NONE, ZE_TFC_AUTO, ZE_TMM_AUTO, 25};
+	
 	ZEFontFileHeader FileHeader;
 
 	ResourceFile->Read(&FileHeader, sizeof(ZEFontFileHeader), 1);
@@ -91,7 +94,10 @@ ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 		
 		FileCursor = ResourceFile->Tell();
 
-		ZETexture2DResource* CurrentTexture = ZETexture2DResource::LoadResource(ResourceFile);
+		ZEPartialResourceFile TextureResourceFile;
+		ResourceFile->GetPartialResourceFile(TextureResourceFile, FileCursor, TextureFileSize);
+
+		ZETexture2DResource* CurrentTexture = ZETexture2DResource::LoadResource(&TextureResourceFile, false, &Option);
 		if (CurrentTexture == NULL)
 		{
 			zeError("Font Resource", "Can not read texture from the file. (FileName : \"%s\", Texture Index : %d)",  ResourceFile->GetFileName(), I);
@@ -122,13 +128,15 @@ ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 
 ZEFontResource* ZEFontResource::LoadResource(const char* FileName)
 {
-	ZEFontResource* TextureResource;
+	ZEFontResource* FontResource;
 	ZEResourceFile File;
 	if (File.Open(FileName))
 	{
-		TextureResource = LoadResource(&File);
+		
+		
+		FontResource = LoadResource(&File);
 		File.Close();
-		return TextureResource;
+		return FontResource;
 	}
 	else
 	{

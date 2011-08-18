@@ -109,9 +109,18 @@ add_source (ZEViewPort.cpp 					Sources)
 add_source (ZEViewPort.h 					Sources ZESDK)
 add_source (ZEViewVolume.cpp 				Sources)
 add_source (ZEViewVolume.h 					Sources ZESDK)
+add_source (ZETextureLoader.h						Sources)
+add_source (ZETextureLoader.cpp						Sources)				
+add_source (ZETextureTools.h						Sources)
+add_source (ZETextureTools.cpp						Sources)
+add_source (ZETextureCacheChunkIdentifier.h			Sources)
+add_source (ZETextureCacheChunkIdentifier.cpp		Sources)
+
 
 add_library (ZEGraphics ${Sources})
+target_link_libraries (ZEGraphics ATI_Compress_MT_VC8.lib)
 target_link_libraries (ZEGraphics freeimage.lib)
+
 
 set_property(TARGET ZEGraphics PROPERTY FOLDER "Zinek Engine")
 

@@ -45,7 +45,7 @@ class ZEFileSerializer : public ZESerializer
 		void*						File;
 
 	public:
-		virtual size_t				Write(const void* Data, size_t Size, size_t Count);
+		virtual size_t				Write(const void* Buffer, size_t Size, size_t Count);
 		bool						OpenFile(const char* FileName);
 		void						CloseFile();
 									

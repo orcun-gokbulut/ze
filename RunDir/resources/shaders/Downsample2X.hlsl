@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPFilter2DNode.h
+ Zinek Engine - Downsample2X.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,77 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_POST_EFFECTS_H__
-#define __ZE_POST_EFFECTS_H__
+const float2	PixelSize;
 
-#include "ZEDS\ZEArray.h"
-#include "ZEPostProcessorNode.h"
-#include "ZEMath\ZEVector.h"
+sampler2D 		RenderTarget;
 
-class ZETexture2D;
-
-struct ZEKernel2DElement
+struct VS_INPUT
 {
-	float										SampleMultiplier;
-	ZEVector2									SampleLocation;
-	float										Reserved;
+   float4 Position  : POSITION;
 };
 
-class ZEPPFilter2DNode : public ZEPostProcessorNode
+// Texture Coordinates
+// [0] [1]
+// [2] [3]
+
+struct VS_OUTPUT 
 {
-	protected:		
-		ZEPostProcessorNode*					Input;
-		ZETexture2D*							Internal;
-		ZETexture2D*							Output;
-
-		ZEArray<ZEKernel2DElement>				Kernel;
-	
-												ZEPPFilter2DNode();
-		virtual									~ZEPPFilter2DNode();
-
-	public:	
-		virtual size_t							GetDependencyCount();
-		virtual ZEPostProcessorNode**			GetDependencies();
-
-		void									SetKernelElements(const ZEArray<ZEKernel2DElement>& Values);
-		const ZEArray<ZEKernel2DElement>&		GetKernelElements();
-
-		virtual void							SetInput(ZEPostProcessorNode* Node);
-		virtual ZEPostProcessorNode*			GetInput();
-
-		virtual ZETexture2D*					GetOutput();
+   float4 Position   : POSITION0;
+   float2 TexCoord0  : TEXCOORD0;
+   float2 TexCoord1  : TEXCOORD1;
+   float2 TexCoord2  : TEXCOORD2;
+   float2 TexCoord3  : TEXCOORD3;
 };
-#endif
+
+struct PS_INPUT
+{
+   float2 TexCoord0  : TEXCOORD0;
+   float2 TexCoord1  : TEXCOORD1;
+   float2 TexCoord2  : TEXCOORD2;
+   float2 TexCoord3  : TEXCOORD3;
+};
+
+struct PS_OUTPUT
+{
+   float4 PixelColor : COLOR0;
+};
 
 
+VS_OUTPUT vs_main( VS_INPUT Input )
+{
+   VS_OUTPUT Output;
 
+   Output.Position = float4(sign(Input.Position).xy, 0.0f, 1.0f);
+   
+   Output.TexCoord0.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
+   Output.TexCoord0.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
+   
+   Output.TexCoord1.x = Output.TexCoord0.x + PixelSize.x;
+   Output.TexCoord1.y = Output.TexCoord0.y - 0.0f;
+   
+   Output.TexCoord2.x = Output.TexCoord0.x + 0.0f;
+   Output.TexCoord2.y = Output.TexCoord0.y - PixelSize.y;
+   
+   Output.TexCoord3.x = Output.TexCoord0.x + PixelSize.x;
+   Output.TexCoord3.y = Output.TexCoord0.y - PixelSize.y;
+   
+   return Output;
+}
+
+
+PS_OUTPUT ps_main( PS_INPUT Input )
+{
+   PS_OUTPUT Output;
+   
+   float4 PixelColorSum = (float4)0.0f;
+   
+   PixelColorSum += tex2D(RenderTarget, Input.TexCoord0);
+   PixelColorSum += tex2D(RenderTarget, Input.TexCoord1);
+   PixelColorSum += tex2D(RenderTarget, Input.TexCoord2);
+   PixelColorSum += tex2D(RenderTarget, Input.TexCoord3);
+   
+   Output.PixelColor = PixelColorSum * 0.25f;
+   
+   return Output;
+}
 

@@ -55,10 +55,14 @@
 extern HINSTANCE ApplicationInstance;
 
 #include <stdio.h>
+#include <string>
+#include <string.h>
 
 #include "ZEGraphics/ZEBitmap.h"
-#define FREEIMAGE_LIB
 #include "FreeImage.h"
+
+extern HINSTANCE ApplicationInstance;
+
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	FreeImage_Initialise();
@@ -70,7 +74,8 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	Options.AddressingY = ZE_BAM_MIRROR;
 	Options.BorderColor = ZEPixelColor(0xFFFFFFFF);
 
-	_set_SSE2_enable(1); 
+
+	_set_SSE2_enable(1);
 	ApplicationInstance = hInstance;
 	
 	ZEModelAnimationDebugModule DebugModule;
@@ -102,8 +107,3 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
  	if (zeCore->StartUp())
 		zeCore->Run();
 }
-
-
-
-
-

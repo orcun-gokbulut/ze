@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPFilter2DNode.h
+ Zinek Engine - ZERealTimeTextureCompressor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
 #pragma once
-#ifndef __ZE_POST_EFFECTS_H__
-#define __ZE_POST_EFFECTS_H__
+#ifndef __ZE_REAL_TIME_TEXTURE_COMPRESSOR__
+#define __ZE_REAL_TIME_TEXTURE_COMPRESSOR__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEPostProcessorNode.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEDirect3D9\ZED3D9ComponentBase.h"
 
-class ZETexture2D;
-
-struct ZEKernel2DElement
+class ZERealTimeTextureCompressor : public ZED3D9ComponentBase
 {
-	float										SampleMultiplier;
-	ZEVector2									SampleLocation;
-	float										Reserved;
+	private:		
+										ZERealTimeTextureCompressor();
+										~ZERealTimeTextureCompressor();
+
+	public:
+		static bool						Compress(void* DestBuffer, unsigned int DestPitch, D3DFORMAT DestFormat, void* SrcBuffer, unsigned int SrcWidth, unsigned int SrcHeight, unsigned int SrcPitch, unsigned int SrcBitsPP, D3DFORMAT SrcFormat);
+		void							Downsample();
+
+		static bool						Initialize(const char* CompressionShaderPath = NULL, const char* DownSampleShaderPath = NULL);
+		static bool						Deinitialize();
 };
 
-class ZEPPFilter2DNode : public ZEPostProcessorNode
-{
-	protected:		
-		ZEPostProcessorNode*					Input;
-		ZETexture2D*							Internal;
-		ZETexture2D*							Output;
-
-		ZEArray<ZEKernel2DElement>				Kernel;
-	
-												ZEPPFilter2DNode();
-		virtual									~ZEPPFilter2DNode();
-
-	public:	
-		virtual size_t							GetDependencyCount();
-		virtual ZEPostProcessorNode**			GetDependencies();
-
-		void									SetKernelElements(const ZEArray<ZEKernel2DElement>& Values);
-		const ZEArray<ZEKernel2DElement>&		GetKernelElements();
-
-		virtual void							SetInput(ZEPostProcessorNode* Node);
-		virtual ZEPostProcessorNode*			GetInput();
-
-		virtual ZETexture2D*					GetOutput();
-};
-#endif
-
-
-
-
+#endif // __ZE_REAL_TIME_TEXTURE_COMPRESSOR__

@@ -45,6 +45,25 @@
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
 
+
+ZEResourceFile::ZEResourceFile() : File(NULL), FileCursor(0)
+{
+	// Empty
+}
+
+ZEResourceFile::~ZEResourceFile()
+{
+	Close();
+}
+
+bool ZEResourceFile::IsOpen()
+{
+	if(File && FileName[0])
+		return true;
+
+	return false;
+}
+
 const char* ZEResourceFile::GetFileName()
 {
 	return FileName;
@@ -66,6 +85,8 @@ void ZEResourceFile::GetPartialResourceFile(ZEPartialResourceFile& PartialResour
 
 bool ZEResourceFile::Open(const char* FileName)
 {
+	zeAssert(File, "Close the previous ZEResourceFile first.")
+
 	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
 	strncpy(this->FileName, FileName, ZE_MAX_FILE_NAME_SIZE);
 
@@ -83,6 +104,8 @@ bool ZEResourceFile::Open(const char* FileName)
 
 bool ZEResourceFile::Seek(size_t Offset, ZESeekFrom Origin)
 {
+	if(!File)
+		return false;
 
 	int OriginNorm;
 	switch(Origin)
@@ -91,6 +114,7 @@ bool ZEResourceFile::Seek(size_t Offset, ZESeekFrom Origin)
 			OriginNorm = SEEK_SET;
 			break;
 		case ZE_SF_CURRENT:
+			fseek((FILE*)File, FileCursor, SEEK_SET);
 			OriginNorm = SEEK_CUR;
 			break;
 		case ZE_SF_END:
@@ -99,36 +123,56 @@ bool ZEResourceFile::Seek(size_t Offset, ZESeekFrom Origin)
 	}
 
 	if (fseek((FILE*)File, Offset, OriginNorm) == 0)
+	{
+		FileCursor = ftell((FILE*)File);
 		return true;
+	}
 	else
 		return false;
 }
 
 size_t ZEResourceFile::Read(void* Buffer, size_t Size, size_t Count)
 {
-	return fread(Buffer, Size, Count, (FILE*)File);
+	if(!File)
+		return 0;
+
+	fseek((FILE*)File, FileCursor, SEEK_SET);
+	size_t ReadCount = fread(Buffer, Size, Count, (FILE*)File);
+	FileCursor += ReadCount * Size;
+
+	return ReadCount;
 }
 
 size_t ZEResourceFile::FormatedRead(void* Buffer, size_t BufferSize, void* Format, ...)
 {
+	if(!File)
+		return 0;
+
 	zeAssert(true, "NOT IMPLAMENTED !!!");
 	return 0;
 }
 
 size_t ZEResourceFile::Tell()
 {
-	return ftell((FILE*)File);
+	return FileCursor;
 }
 
 bool ZEResourceFile::Eof()
 {
+	if(!File)
+		return false;
+
 	return (bool)feof((FILE*)File);
 }
 
 void ZEResourceFile::Close()
 {
-	if (File != NULL)
+	if (File)
+	{
 		fclose((FILE*)File);
+		File = NULL;
+		FileCursor = 0;
+	}
 }
 
 bool ZEResourceFile::ReadFile(const char* FileName, void* Buffer, size_t BufferSize)
@@ -185,63 +229,163 @@ bool ZEResourceFile::ReadTextFile(const char* FileName, char* Buffer, size_t Buf
 	return true;
 }
 
-ZEResourceFile::ZEResourceFile()
+bool ZEPartialResourceFile::Open(const char* FileName, size_t Offset, size_t Size)
 {
-	File = NULL;
+	if(File)
+	{
+		zeError("Partial Resource File", "A file is already open with the file name: \"%s\".", this->FileName);
+		return false;
+	}
+
+	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
+	strncpy(this->FileName, FileName, ZE_MAX_FILE_NAME_SIZE);
+
+	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", FileName);
+
+	File = fopen(RelativeFileName, "rb");
+	if(File != NULL)
+	{
+		IsEof			= false;
+		StartPosition	= Offset;
+		FileCursor		= StartPosition;
+		EndPosition		= Offset + Size;
+		return true;
+	}
+	else
+	{
+		zeError("Resource File", "Could not open resource file \"%s\".", FileName);
+		return false;
+	}
 }
 
-ZEResourceFile::~ZEResourceFile()
+bool ZEPartialResourceFile::Open(ZEFile* File, size_t Offset, size_t Size)
 {
-	Close();
+	if(!File->IsOpen())
+	{
+		zeError("Partial Resource File", "The ZEFile passed to this function must be opened: \"%s\".", this->FileName);
+		return false;
+	}
+
+	strncpy(this->FileName, File->GetFileName(), ZE_MAX_FILE_NAME_SIZE);
+
+	this->File = File->GetFileHandle();
+	if(File)
+	{
+		IsEof			= false;
+		StartPosition	= Offset;
+		FileCursor		= StartPosition;
+		EndPosition		= Offset + Size;
+		return true;
+	}	
+	else
+	{
+		zeError("Partial Resource File", "Could not open resource file using given ZEFile\"%s\".", File->GetFileName());
+		return false;
+	}
+}
+
+void ZEPartialResourceFile::Close()
+{
+	if(File)
+	{		
+		StartPosition	= 0;
+		EndPosition		= 0;
+		File			= NULL;
+		IsEof			= false;
+	}
 }
 
 bool ZEPartialResourceFile::Seek(size_t Offset, ZESeekFrom Origin)
 {
+	if(!File)
+		return 0;
+
 	switch(Origin)
 	{
 		case ZE_SF_BEGINING:
-			if (fseek((FILE*)File, StartPosition + Offset, SEEK_SET) != 0)
+		{
+			if(Offset < 0 || EndPosition < StartPosition + Offset)
 				return false;
+
+			if(fseek((FILE*)File, StartPosition + Offset, SEEK_SET) != 0)
+				return false;
+
 			break;
+		}
+
 		case ZE_SF_CURRENT:
-			if (fseek((FILE*)File, Offset, SEEK_CUR) != 0)
+		{
+			fseek((FILE*)File, FileCursor, SEEK_SET);
+
+			size_t CurrentPosition = 0;
+			CurrentPosition = ftell((FILE*)File);
+
+			if(CurrentPosition + Offset < StartPosition || EndPosition < CurrentPosition + Offset)
 				return false;
+
+			if(fseek((FILE*)File, Offset, SEEK_CUR) != 0)
+				return false;
+
 			break;
+		}
+
 		case ZE_SF_END:
-			if (fseek((FILE*)File, EndPosition + Offset, SEEK_END) != 0)
+		{
+			if(EndPosition + Offset < StartPosition || Offset > 0)
 				return false;
+
+			if(fseek((FILE*)File, EndPosition + Offset, SEEK_SET) != 0)
+				return false;
+
+			break;
+		}
+
+		default:
+			return false;
 			break;
 	}
 
-	if (ftell((FILE*)File) < (long)StartPosition || ftell((FILE*)File) > (long)EndPosition)
-		return false;
-	else
-	{
-		IsEof = false;	
-		return true;
-	}
+	FileCursor = ftell((FILE*)File);
+
+	if(IsEof == true && FileCursor >= StartPosition && FileCursor < EndPosition)
+		IsEof = false;
+
+	return true;
 }
 
 size_t ZEPartialResourceFile::Read(void* Buffer, size_t Size, size_t Count)
 {
+	if(!File)
+		return 0;
+
+	// Goto this File's cursor position
+	fseek((FILE*)File, FileCursor, SEEK_SET);
+
+	if(FileCursor < StartPosition || EndPosition < FileCursor)
+		return 0;
+
 	size_t ReadLastPos = ftell((FILE*)File) + Size * Count;
 	if (ReadLastPos > EndPosition)
 	{
-		Count -= (ReadLastPos - EndPosition) / Size;
+		Count -= (ReadLastPos - EndPosition) / Size + (((ReadLastPos - EndPosition) % Size) == 0 ? 0 : 1);
 		IsEof = true;
 	}
 
-	return fread(Buffer, Size, Count, (FILE*)File);
+	// Read
+	size_t ReadCount = fread(Buffer, Size, Count, (FILE*)File);
+	FileCursor += ReadCount * Size;
+
+	return ReadCount;
 }
 
 size_t ZEPartialResourceFile::Tell()
 {
-	return ftell((FILE*)File) - StartPosition;
+	return FileCursor - StartPosition;
 }
 
-ZEPartialResourceFile::ZEPartialResourceFile()
+ZEPartialResourceFile::ZEPartialResourceFile() : IsEof(false), StartPosition(0), EndPosition(0)
 {
-	IsEof = false;
+	// Empty
 }
 
 bool ZEPartialResourceFile::Eof()

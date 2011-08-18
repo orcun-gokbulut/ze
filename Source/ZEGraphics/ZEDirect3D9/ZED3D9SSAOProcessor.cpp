@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9SSAOProcessor.h"
+
 #include "ZEMath\ZEMathDefinitions.h"
 #include "ZED3D9Common.h"
 #include "ZED3D9CommonTools.h"
@@ -236,26 +237,11 @@ void ZED3D9SSAOProcessor::Process()
 	GetDevice()->SetVertexShaderConstantF(2, (const float*)&ViewVector, 1);
 
 	GetDevice()->SetPixelShaderConstantF(5, (float*)&KernelDisc, 4);
-	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-	GetDevice()->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-	GetDevice()->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-	GetDevice()->SetTexture(0, InputDepth->Texture);
+	
 
-	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
-	GetDevice()->SetSamplerState(1, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
-	GetDevice()->SetSamplerState(1, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-	GetDevice()->SetSamplerState(1, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-	GetDevice()->SetSamplerState(1, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-	GetDevice()->SetTexture(1, InputNormal->Texture);
-
-	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSU, D3DTADDRESS_MIRROR);
-	GetDevice()->SetSamplerState(2, D3DSAMP_ADDRESSV, D3DTADDRESS_MIRROR);
-	GetDevice()->SetSamplerState(2, D3DSAMP_MINFILTER, D3DTEXF_POINT);
-	GetDevice()->SetSamplerState(2, D3DSAMP_MAGFILTER, D3DTEXF_POINT);
-	GetDevice()->SetSamplerState(2, D3DSAMP_MIPFILTER, D3DTEXF_NONE);
-	GetDevice()->SetTexture(2, ((ZED3D9Texture2D*)RandomTextureResource->GetTexture())->Texture);
+	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputDepth, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetTexture(1, (ZETexture2D*)InputNormal, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetTexture(4, (ZETexture2DResource*)RandomTextureResource, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_MIRROR);
 	
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 	

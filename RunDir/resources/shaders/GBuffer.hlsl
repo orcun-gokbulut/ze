@@ -49,6 +49,12 @@ struct ZEGBuffer
 	float4 VelocitySubSurfaceScatteringFactor : COLOR2;
 };
 
+// Depth
+float ZEGBuffer_GetDepth(float2 TexCoord)
+{
+	return tex2D(GBuffer1, TexCoord).r;
+}
+
 // View Vector
 float3 ZEGBuffer_GetViewVector(float4 ClipPosition)
 {

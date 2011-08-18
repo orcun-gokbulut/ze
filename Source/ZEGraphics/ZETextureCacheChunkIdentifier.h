@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPFilter2DNode.h
+ Zinek Engine - ZETextureCacheChunkIdentifier.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
 #pragma once
-#ifndef __ZE_POST_EFFECTS_H__
-#define __ZE_POST_EFFECTS_H__
+#ifndef __ZE_TEXTURE_CACHE_CHUNK_IDENTIFIER_H__
+#define __ZE_TEXTURE_CACHE_CHUNK_IDENTIFIER_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEPostProcessorNode.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEGraphics/ZETextureOptions.h"
+#include "ZECore/ZEFile.h"
+#include "ZEDS/ZEFileCache.h"
+#include "ZEDefinitions.h"
 
-class ZETexture2D;
+#include <stdio.h>
 
-struct ZEKernel2DElement
+
+
+class ZETextureCacheChunkIdentifier : public ZECacheChunkIdentifier
 {
-	float										SampleMultiplier;
-	ZEVector2									SampleLocation;
-	float										Reserved;
+	public:
+
+		char					ItemName[ZE_MAX_FILE_NAME_SIZE];
+		
+		ZETextureOptions		TextureOptions;
+		unsigned int			Offset;
+
+								ZETextureCacheChunkIdentifier();
+								ZETextureCacheChunkIdentifier( const char* ItemName, const ZETextureOptions &TextureOptions, unsigned int Offset = 0);
+		virtual					~ZETextureCacheChunkIdentifier();
+
+
+		virtual	size_t			GetDataSize()const;
+		virtual ZEDWORD			GetHash() const;
+		virtual size_t			Write(ZEFile* File) const;
+		virtual bool			Equal(ZEFile* File) const;
 };
 
-class ZEPPFilter2DNode : public ZEPostProcessorNode
-{
-	protected:		
-		ZEPostProcessorNode*					Input;
-		ZETexture2D*							Internal;
-		ZETexture2D*							Output;
 
-		ZEArray<ZEKernel2DElement>				Kernel;
-	
-												ZEPPFilter2DNode();
-		virtual									~ZEPPFilter2DNode();
-
-	public:	
-		virtual size_t							GetDependencyCount();
-		virtual ZEPostProcessorNode**			GetDependencies();
-
-		void									SetKernelElements(const ZEArray<ZEKernel2DElement>& Values);
-		const ZEArray<ZEKernel2DElement>&		GetKernelElements();
-
-		virtual void							SetInput(ZEPostProcessorNode* Node);
-		virtual ZEPostProcessorNode*			GetInput();
-
-		virtual ZETexture2D*					GetOutput();
-};
 #endif
-
-
-
-

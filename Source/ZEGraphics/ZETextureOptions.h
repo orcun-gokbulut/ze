@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPFilter2DNode.h
+ Zinek Engine - ZETextureOptions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,48 +34,70 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_POST_EFFECTS_H__
-#define __ZE_POST_EFFECTS_H__
+#ifndef	__ZE_TEXTURE_OPTIONS_H__
+#define __ZE_TEXTURE_OPTIONS_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEPostProcessorNode.h"
-#include "ZEMath\ZEVector.h"
-
-class ZETexture2D;
-
-struct ZEKernel2DElement
+enum ZETextureQuality
 {
-	float										SampleMultiplier;
-	ZEVector2									SampleLocation;
-	float										Reserved;
+	ZE_TQ_ULTRA_LOW = 0,
+	ZE_TQ_VERY_LOW	= 1,
+	ZE_TQ_LOW		= 2,
+	ZE_TQ_NORMAL	= 3,
+	ZE_TQ_HIGH		= 4,
+	ZE_TQ_VERY_HIGH	= 5,
+	ZE_TQ_AUTO		= 6
 };
 
-class ZEPPFilter2DNode : public ZEPostProcessorNode
+enum ZETextureCompressionType
 {
-	protected:		
-		ZEPostProcessorNode*					Input;
-		ZETexture2D*							Internal;
-		ZETexture2D*							Output;
-
-		ZEArray<ZEKernel2DElement>				Kernel;
-	
-												ZEPPFilter2DNode();
-		virtual									~ZEPPFilter2DNode();
-
-	public:	
-		virtual size_t							GetDependencyCount();
-		virtual ZEPostProcessorNode**			GetDependencies();
-
-		void									SetKernelElements(const ZEArray<ZEKernel2DElement>& Values);
-		const ZEArray<ZEKernel2DElement>&		GetKernelElements();
-
-		virtual void							SetInput(ZEPostProcessorNode* Node);
-		virtual ZEPostProcessorNode*			GetInput();
-
-		virtual ZETexture2D*					GetOutput();
+	ZE_TCT_NONE		= 0,
+	ZE_TCT_DXT1		= 1,	//BC1
+	ZE_TCT_DXT3		= 2,	//BC2
+	ZE_TCT_DXT5		= 3,	//BC3
+	ZE_TCT_3DC		= 4,
+	ZE_TCT_AUTO		= 5
 };
+
+enum ZETextureCompressionQuality
+{
+	ZE_TCQ_LOW		= 1,
+	ZE_TCQ_NORMAL	= 2,
+	ZE_TCQ_HIGH		= 3,
+	ZE_TCQ_AUTO		= 4
+};
+
+enum ZETextureDownSampling
+{
+	ZE_TDS_NONE		= 0,
+	ZE_TDS_2X		= 1,
+	ZE_TDS_4X		= 2,
+	ZE_TDS_8X		= 3,
+	ZE_TDS_AUTO		= 4
+};
+
+enum ZETextureFileCaching
+{
+	ZE_TFC_DISABLED = 0,
+	ZE_TFC_ENABLED	= 1,
+	ZE_TFC_AUTO		= 3
+};
+
+enum ZETextureMipMapping
+{
+	ZE_TMM_DISABLED = 0,
+	ZE_TMM_ENABLED	= 1,
+	ZE_TMM_AUTO		= 2
+};
+
+struct ZETextureOptions
+{
+	ZETextureCompressionType		CompressionType;
+	ZETextureCompressionQuality		CompressionQuality;
+	ZETextureDownSampling			DownSample;
+	ZETextureFileCaching			FileCaching;
+	ZETextureMipMapping				MipMapping;
+	unsigned int					MaximumMipmapLevel;
+};
+
+
 #endif
-
-
-
-

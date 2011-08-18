@@ -37,10 +37,13 @@
 #include "ZEGraphicsModule.h"
 #include "ZEGraphicsModuleDescription.h"
 #include "ZECore\ZEOptionManager.h"
+#include "ZECore\ZEOption.h"
 #include "ZECore\ZECore.h"
+#include "ZERealTimeTextureCompressor.h"
 
 #define FREEIMAGE_LIB
 #include <freeimage.h>
+#include "ZETexture2DResource.h"
 
 ZEOptionSection ZEGraphicsModule::GraphicsOptions;
 
@@ -55,6 +58,48 @@ ZEModuleDescription* ZEGraphicsModule::GetModuleDescription()
 	return ZEGraphicsModule::GetModuleDescription();
 }
 
+ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
+{
+	static ZETextureOptions VeryHigh	= {ZE_TCT_NONE, ZE_TCQ_LOW,    ZE_TDS_NONE, ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
+	static ZETextureOptions High		= {ZE_TCT_DXT3, ZE_TCQ_NORMAL, ZE_TDS_NONE, ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
+	static ZETextureOptions Normal		= {ZE_TCT_NONE, ZE_TCQ_NORMAL, ZE_TDS_2X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
+	static ZETextureOptions Low			= {ZE_TCT_DXT3, ZE_TCQ_LOW,    ZE_TDS_2X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
+	static ZETextureOptions VeryLow		= {ZE_TCT_DXT3, ZE_TCQ_LOW,	   ZE_TDS_4X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
+	static ZETextureOptions UltraLow	= {ZE_TCT_DXT3, ZE_TCQ_LOW,	   ZE_TDS_8X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
+
+	switch(TextureQuality)
+	{
+		
+		case ZE_TQ_VERY_HIGH:
+			return &VeryHigh;
+			break;
+		
+		default:
+		case ZE_TQ_HIGH:
+			return &High;
+			break;
+		
+		
+		case ZE_TQ_NORMAL:
+			return &Normal;
+			break;
+		
+		
+		case ZE_TQ_LOW:
+			return &Low;
+			break;
+
+		
+		case ZE_TQ_VERY_LOW:
+			return &VeryLow;
+			break;
+			
+		case ZE_TQ_ULTRA_LOW:
+			return &UltraLow;
+			break;
+	}
+}
+
 size_t ZEGraphicsModule::GetCurrentFrameId()
 {
 	return CurrentFrameId;
@@ -63,6 +108,7 @@ size_t ZEGraphicsModule::GetCurrentFrameId()
 void ZEGraphicsModule::BaseInitialize()
 {
 	FreeImage_Initialise();
+	ZERealTimeTextureCompressor::Initialize("bu argumanlar onemli deil", "bu argumanlar onemli deil");
 	GraphicsOptions.SetName("Graphics");
 	GraphicsOptions.AddOption(new ZEOption("ScreenWidth", 640, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ScreenHeight", 480, ZE_OA_NORMAL));
@@ -72,7 +118,7 @@ void ZEGraphicsModule::BaseInitialize()
 	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilter", 0, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilterLevel", 8, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ShaderQuality", 5, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("TextureQuality", 5, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("TextureQuality", ZE_TQ_LOW, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ModelQuality", 5, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("PostEffectQuality", 5, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZE_OA_NORMAL));
@@ -86,6 +132,7 @@ void ZEGraphicsModule::BaseInitialize()
 void ZEGraphicsModule::BaseDeinitialize()
 {
 	FreeImage_DeInitialise();
+	ZERealTimeTextureCompressor::Deinitialize();
 	ZEOptionManager::GetInstance()->UnregisterSection(&GraphicsOptions);
 }
 
@@ -156,12 +203,12 @@ int ZEGraphicsModule::GetShaderQuality()
 	return ShaderQuality;
 }
 
-void ZEGraphicsModule::SetTextureQuality(int Quality)
+void ZEGraphicsModule::SetTextureQuality(ZETextureQuality Quality)
 {
-	ShaderQuality = Quality;
+	TextureQuality = Quality;
 }
 
-int ZEGraphicsModule::GetTextureQuality()
+ZETextureQuality ZEGraphicsModule::GetTextureQuality()
 {
 	return TextureQuality;
 }

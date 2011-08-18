@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPFilter2DNode.h
+ Zinek Engine - ZED3D9SSAAProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,63 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
 #pragma once
-#ifndef __ZE_POST_EFFECTS_H__
-#define __ZE_POST_EFFECTS_H__
+#ifndef __ZE_D3D9_SSAA_PROCESSOR_H__
+#define __ZE_D3D9_SSAA_PROCESSOR_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEPostProcessorNode.h"
-#include "ZEMath\ZEVector.h"
+#include "ZED3D9ComponentBase.h"
 
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
+class ZED3D9Texture2D;
 class ZETexture2D;
+class ZED3D9ViewPort;
+class ZEFrameRenderer;
+class ZED3D9FrameRenderer;
+class ZETexture2DResource;
 
-struct ZEKernel2DElement
+class ZED3D9SSAAProcessor : public ZED3D9ComponentBase
 {
-	float										SampleMultiplier;
-	ZEVector2									SampleLocation;
-	float										Reserved;
+	private:
+		ZED3D9FrameRenderer*			Renderer;
+
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+		ZED3D9VertexShader*				VertexShader;
+		ZED3D9PixelShader*				PixelShader;
+
+		ZED3D9Texture2D*				InputColorBuffer;
+		ZED3D9Texture2D*				InputDepthBuffer;
+		ZED3D9Texture2D*				InputNormalBuffer;
+		ZED3D9ViewPort*					Output;
+
+
+	public:
+		void							SetRenderer(ZEFrameRenderer* Renderer);
+		ZEFrameRenderer*				GetRenderer();
+
+		void							SetInputColor(ZETexture2D* Texture);
+		ZETexture2D*					GetInputColor();
+
+		void							SetInputDepth(ZETexture2D* Texture);
+		ZETexture2D*					GetInputDepth();
+
+		void							SetInputNormal(ZETexture2D* Texture);
+		ZETexture2D*					GetInputNormal();
+
+		void							SetOutput(ZED3D9ViewPort* Texture);
+		ZED3D9ViewPort*					GetOutput();
+
+		void							Initialize();
+		void							Deinitialize();
+
+		void							OnDeviceLost();
+		void							OnDeviceRestored();
+
+		void							Process();
+
+										ZED3D9SSAAProcessor();
+										~ZED3D9SSAAProcessor();
 };
 
-class ZEPPFilter2DNode : public ZEPostProcessorNode
-{
-	protected:		
-		ZEPostProcessorNode*					Input;
-		ZETexture2D*							Internal;
-		ZETexture2D*							Output;
-
-		ZEArray<ZEKernel2DElement>				Kernel;
-	
-												ZEPPFilter2DNode();
-		virtual									~ZEPPFilter2DNode();
-
-	public:	
-		virtual size_t							GetDependencyCount();
-		virtual ZEPostProcessorNode**			GetDependencies();
-
-		void									SetKernelElements(const ZEArray<ZEKernel2DElement>& Values);
-		const ZEArray<ZEKernel2DElement>&		GetKernelElements();
-
-		virtual void							SetInput(ZEPostProcessorNode* Node);
-		virtual ZEPostProcessorNode*			GetInput();
-
-		virtual ZETexture2D*					GetOutput();
-};
-#endif
-
-
-
-
+#endif	/* __ZE_D3D9_SSAA_PROCESSOR_H__ */

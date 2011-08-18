@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPFilter2DNode.h
+ Zinek Engine - ZETextureTools.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,48 +34,50 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_POST_EFFECTS_H__
-#define __ZE_POST_EFFECTS_H__
+#ifndef __ZE_TEXTURETOOLS_H__
+#define __ZE_TEXTURETOOLS_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEPostProcessorNode.h"
-#include "ZEMath\ZEVector.h"
+#include "ZETextureOptions.h"
+#include "ZEGraphicsModule.h"
+#include "ZETextureResource.h"
+#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEGraphics/ZETextureLoader.h"
 
 class ZETexture2D;
+class ZEResourceFile;
 
-struct ZEKernel2DElement
+class ZETextureTools
 {
-	float										SampleMultiplier;
-	ZEVector2									SampleLocation;
-	float										Reserved;
-};
+	private:
+									ZETextureTools();
+									~ZETextureTools();
 
-class ZEPPFilter2DNode : public ZEPostProcessorNode
-{
-	protected:		
-		ZEPostProcessorNode*					Input;
-		ZETexture2D*							Internal;
-		ZETexture2D*							Output;
+	public:
 
-		ZEArray<ZEKernel2DElement>				Kernel;
-	
-												ZEPPFilter2DNode();
-		virtual									~ZEPPFilter2DNode();
+									// IS texture resizeable by 2
+		static bool					IsResizeable(ZETextureLoaderInfo &TextureInfo);
+									// IS texture compressible by DXT3/BC2
+		static bool					IsCompressible(ZETextureLoaderInfo &TextureInfo);
+									// Get maximum possible mipmap count
+		static unsigned int			GetMaxMipmapCount(ZETextureLoaderInfo &TextureInfo);
 
-	public:	
-		virtual size_t							GetDependencyCount();
-		virtual ZEPostProcessorNode**			GetDependencies();
+		static void					CopyTextureRegion(void *DestData, unsigned int DestPitch,
+													  unsigned int DestX, unsigned int DestY,
+													  void *SourceData, unsigned int SourcePitch, unsigned int SourceBitsPP,
+													  unsigned int SourceX, unsigned int SourceY, 
+													  unsigned int CopyWidth, unsigned int CopyHeight);
 
-		void									SetKernelElements(const ZEArray<ZEKernel2DElement>& Values);
-		const ZEArray<ZEKernel2DElement>&		GetKernelElements();
+		static void					CompressTexture(void* DestinationData, unsigned int DestinationPitch, 
+													void* SourceData, unsigned int SourcePitch, 
+													unsigned int SourceWidth, unsigned int SourceHeight, 
+													const ZETextureOptions* CompressionOptions = NULL);
 
-		virtual void							SetInput(ZEPostProcessorNode* Node);
-		virtual ZEPostProcessorNode*			GetInput();
+		static void					DownSample2x(void* DestinationData, unsigned int DestinationPitch, 
+												 void* SourceData, unsigned int SourcePitch, /*unsigned int SourceBitsPP,*/
+												 unsigned int SourceWidth, unsigned int SourceHeight);
+		
+		
 
-		virtual ZETexture2D*					GetOutput();
-};
-#endif
+};/* class ZETextureTools */
 
-
-
-
+#endif /* __ZETEXTURETOOLS_H__ */

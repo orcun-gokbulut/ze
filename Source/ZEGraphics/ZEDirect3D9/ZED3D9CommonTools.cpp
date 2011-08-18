@@ -37,7 +37,11 @@
 #include "ZECore\ZEError.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9TextureCube.h"
+#include "ZEGraphics\ZETexture2DResource.h"
+#include "ZEGraphics\ZETextureCubeResource.h"
 #include "ZED3D9ViewPort.h"
+#include "ZED3D9ViewPort.h"
+
 #include <d3dx9.h>
 #include <stdio.h>
 
@@ -103,6 +107,15 @@ void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture2D* Texture, DWORD Filt
 	GetDevice()->SetTexture(Stage, ((ZED3D9Texture2D*)Texture)->Texture);
 }
 
+void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture2DResource* TextureResource, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
+{
+	ZETexture2D* Texture = (ZETexture2D*)TextureResource->GetTexture();
+	if (Texture == NULL)
+		GetDevice()->SetTexture(Stage, NULL);
+
+	ZED3D9CommonTools::SetTexture(Stage, Texture, Filter, MipMappingFilter, Addressing);
+}
+
 void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCube* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
 {
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
@@ -112,6 +125,15 @@ void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCube* Texture, DWORD Fi
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
 	GetDevice()->SetTexture(Stage, ((ZED3D9Texture2D*)Texture)->Texture);
+}
+
+void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCubeResource* TextureResource, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
+{
+	ZETextureCube* Texture = (ZETextureCube*)TextureResource->GetTexture();
+	if (Texture == NULL)
+		GetDevice()->SetTexture(Stage, NULL);
+
+	ZED3D9CommonTools::SetTexture(Stage, Texture, Filter, MipMappingFilter, Addressing);
 }
 
 D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
@@ -128,6 +150,15 @@ D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 			return D3DFMT_A32B32G32R32F;
 		case ZE_TPF_SHADOW_MAP:
 			return D3DFMT_D24X8;
+		case ZE_TPF_RGBA_DXT1:
+			return D3DFMT_DXT1;
+		case ZE_TPF_RGBA_DXT3:
+			return D3DFMT_DXT3;
+		case ZE_TPF_RGBA_DXT5:
+			return D3DFMT_DXT5;
+		case ZE_TPF_NORM_3DC:
+			return (D3DFORMAT)MAKEFOURCC('A', 'T', 'I', '2');
+
 		default:
 			return (D3DFORMAT)0;
 	}
