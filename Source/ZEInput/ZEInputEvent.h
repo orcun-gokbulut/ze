@@ -43,7 +43,7 @@
 
 enum ZEInputButtonState
 {
-	ZE_IBS_ALL,
+	ZE_IBS_PRESSING,
 	ZE_IBS_PRESSED,
 	ZE_IBS_RELEASED
 };

@@ -106,9 +106,8 @@ void ZEPlayer::Tick(float Time)
 	ZEInputAction* Current;
 	zeInput->ProcessInputMap(&InputMap);
 
-//	float MetersPerSecond = 0.0550f;
-	
-	float MetersPerSecond = 0.00150f;
+	//float MetersPerSecond = 0.00150f;
+	float MetersPerSecond = 10.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 	ZEComponent* HitComponent;
@@ -118,30 +117,27 @@ void ZEPlayer::Tick(float Time)
 		Current = &InputMap.InputActions[I];
 		switch(Current->Id)
 		{
-			case ACTIONID_FORWARD_BUTTON:
 			case ACTIONID_FORWARD:
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, 1));
-				ZEVector3::Scale(PositionChange, ZEVector3(0, 0, 1), MetersPerSecond * Current->AxisValue);
+				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
-			case ACTIONID_BACKWARD_BUTTON:
 			case ACTIONID_BACKWARD:
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, -1));
-				ZEVector3::Scale(PositionChange, ZEVector3(0, 0, -1), MetersPerSecond * Current->AxisValue);
+				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
-
 			case ACTIONID_STRAFELEFT:
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(-1, 0, 0));
-				ZEVector3::Scale(PositionChange, ZEVector3(-1, 0, 0), MetersPerSecond * Current->AxisValue);
+				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
 			case ACTIONID_STRAFERIGHT:
 				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(1, 0, 0));
-				ZEVector3::Scale(PositionChange, ZEVector3(1, 0, 0), MetersPerSecond * Current->AxisValue);
+				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
@@ -182,10 +178,10 @@ void ZEPlayer::Tick(float Time)
 				break;
 
 			case ACTIONID_HEAD_ORIENTATION:
-				Camera->SetRotation(Current->Quaternion);
+				//Camera->SetRotation(Current->Quaternion);
 				break;
 		}
-		/*
+		
 		if (Yawn < -ZE_PI)
 			Yawn = ZE_PI;
 		else if (Yawn > ZE_PI)
@@ -201,11 +197,11 @@ void ZEPlayer::Tick(float Time)
 		else if (Roll > ZE_PI)
 			Roll = ZE_PI;
 
-		ZEQuaternion::CreateFromEuler(Rotation, Pitch, Yawn, Roll);
+		ZEQuaternion::CreateFromEuler(Rotation, Yawn, Pitch, Roll);
 		ZEQuaternion Temp;
 		ZEQuaternion::Normalize(Temp,Rotation);
 		Rotation = Temp;
-		SetRotation(Rotation);*/
+		SetRotation(Rotation);
 	}
 
 	ZEEntity::Tick(Time);
@@ -239,19 +235,17 @@ ZEPlayer::ZEPlayer()
 	FOV = ZE_PI_4;
 	Yawn = Pitch = Roll = 0;
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD_BUTTON,		"Ray Cast",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_RELEASED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD_BUTTON,		"Ray Cast",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_RELEASED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,				"Move Forward",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,			"Move Backward",	ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT,			"Strafe Right",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFELEFT,			"Strafe Left",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));
-/*	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNUP,				"Turn Up",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,				"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_RELEASED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,			"Move Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_PRESSING)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT,			"Strafe Right",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_D, ZE_IBS_PRESSING)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFELEFT,			"Strafe Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_A, ZE_IBS_PRESSING)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNUP,				"Turn Up",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_POSITIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNDOWN,			"Turn Down",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNRIGHT,			"Turn Right",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNLEFT,			"Turn Left",		ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_ZOOMIN,				"Zoom In",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_SCROLL_AXIS, ZE_IAS_POSITIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_ZOOMOUT,				"Zoom Out",			ZEInputEvent(ZE_IDT_MOUSE, ZE_IDK_DEFAULT_MOUSE, ZE_IMA_SCROLL_AXIS, ZE_IAS_NEGATIVE)));
-*/	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RAYCAST,				"Ray Cast",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_R, ZE_IBS_RELEASED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RAYCAST,				"Ray Cast",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_R, ZE_IBS_RELEASED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_CONSOLE,				"Console",			ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_GRAVE, ZE_IBS_PRESSED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_HEAD_ORIENTATION,	"POS",				ZEInputEvent(ZE_IDT_OTHER, 0, ZE_IT_QUATERNION, 0)));
 

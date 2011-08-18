@@ -182,7 +182,7 @@ bool ZEVRPNInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInpu
 
 			case ZE_IT_BUTTON:
 				for (int I = 0; I < 5; I++)
-					if ((InputEvent->ButtonState == ZE_IBS_ALL && (Buttons[InputEvent->ButtonId] == true)) ||
+					if ((InputEvent->ButtonState == ZE_IBS_PRESSING && (Buttons[InputEvent->ButtonId] == true)) ||
 						(InputEvent->ButtonState == ZE_IBS_PRESSED && (Buttons[InputEvent->ButtonId] == true) && !(OldButtons[InputEvent->ButtonId] == true)) || 
 						(InputEvent->ButtonState == ZE_IBS_RELEASED && !(Buttons[InputEvent->ButtonId] == true) && (OldButtons[InputEvent->ButtonId] == true)))
 					{

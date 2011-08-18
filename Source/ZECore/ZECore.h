@@ -79,6 +79,7 @@ class ZEApplicationModule;
 class ZEExtensionManager;
 class ZESystemMessageManager;
 class ZEPluginManager;
+class ZESystemMessageHandler;
 
 class ZECore
 {
@@ -96,6 +97,7 @@ class ZECore
 		ZEExtensionManager*				ExtensionManager;
 		ZEPluginManager*				PluginManager;
 		ZESystemMessageManager*			SystemMessageManager;
+		ZESystemMessageHandler*			SystemMessageHandler;
 
 		ZEApplicationModule*			Application;
 		ZEError*						Error;

@@ -54,6 +54,7 @@
 #include "ZEPluginManager.h"
 #include "ZEExtensionManager.h"
 #include "ZESystemMessageManager.h"
+#include "ZESystemMessageHandler.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
@@ -65,6 +66,25 @@ ZEOptionSection ZECore::CoreOptions;
 HINSTANCE ApplicationInstance;
 LARGE_INTEGER PerformanceCounterFreq;
 LARGE_INTEGER PerformanceCount, OldPerformanceCount, StartPerformanceCount;
+
+class ZECoreSystemMessageHandler : public ZESystemMessageHandler
+{
+	public:
+		bool Callback(MSG* Message);
+};
+
+bool ZECoreSystemMessageHandler::Callback(MSG* Message)
+{
+	switch (Message->message)
+	{
+		case WM_QUIT:
+			ZECore::GetInstance()->ShutDown();
+			return true;
+
+		default:
+			return false;
+	}
+}
 
 ZEError* ZECore::GetError()
 {
@@ -658,6 +678,8 @@ ZECore::ZECore()
 
 	Application	= NULL;
 	SystemMessageManager	= new ZESystemMessageManager();
+	SystemMessageHandler	= new ZECoreSystemMessageHandler();
+	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
 	Console					= new ZEConsole();
 	Commands				= new ZECommandManager();
 	Options					= new ZEOptionManager();
@@ -693,6 +715,8 @@ ZECore::~ZECore()
 	delete Options;
 	delete Commands;
 	delete Console;
+	SystemMessageManager->UnregisterMessageHandler(SystemMessageHandler);
+	delete SystemMessageHandler;
 	delete SystemMessageManager;
 }
 

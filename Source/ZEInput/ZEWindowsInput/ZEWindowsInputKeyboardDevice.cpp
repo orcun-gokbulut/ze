@@ -61,7 +61,7 @@ bool ZEWMIKSMH::Callback(MSG* Message)
 {
 	switch(Message->message)
 	{
-	case WM_INPUT:
+		case WM_INPUT:
 		{			
 			RAWINPUT Input;
 			UINT InputSize = sizeof(RAWINPUT);
@@ -82,8 +82,8 @@ bool ZEWMIKSMH::Callback(MSG* Message)
 			return true;
 		}
 
-	default:
-		return false;
+		default:
+			return false;
 	}
 }
 
@@ -145,7 +145,7 @@ void ZEWindowsInputKeyboardDevice::Deinitialize()
 void ZEWindowsInputKeyboardDevice::ProcessInputs()
 {   
 	memcpy(ButtonStateOld, ButtonState, sizeof(ButtonState));
-	memset(&ButtonState, 0, sizeof(ButtonState));
+//	memset(&ButtonState, 0, sizeof(ButtonState));
 }
 
 bool ZEWindowsInputKeyboardDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction)
@@ -159,15 +159,21 @@ bool ZEWindowsInputKeyboardDevice::ProcessInputBinding(ZEInputBinding* InputBind
 			if (ButtonIndex > 255)
 				return false;
 
-			if ((InputBinding->Event.ButtonState == ZE_IBS_PRESSED && ButtonStateOld[ButtonIndex] == false && ButtonState[ButtonIndex] == true) ||
-				(InputBinding->Event.ButtonState == ZE_IBS_ALL && ButtonState[ButtonIndex] == true))
+			if (InputBinding->Event.ButtonState == ZE_IBS_PRESSING && ButtonState[ButtonIndex] == true)
 			{
 				InputAction->Id = InputBinding->ActionId;
 				InputAction->ButtonState = ZE_IBS_PRESSED;
 				InputAction->From = InputBinding;
 				return true;
 			}
-			else if (InputBinding->Event.ButtonState == ZE_IBS_RELEASED && ButtonStateOld[ButtonIndex] == false && ButtonState[ButtonIndex] == false)
+			else if (InputBinding->Event.ButtonState == ZE_IBS_PRESSED && ButtonStateOld[ButtonIndex] == false && ButtonState[ButtonIndex] == true)
+			{
+				InputAction->Id = InputBinding->ActionId;
+				InputAction->ButtonState = ZE_IBS_PRESSED;
+				InputAction->From = InputBinding;
+				return true;
+			}
+			else if (InputBinding->Event.ButtonState == ZE_IBS_RELEASED && ButtonStateOld[ButtonIndex] == true && ButtonState[ButtonIndex] == false)
 			{
 				InputAction->Id = InputBinding->ActionId;
 				InputAction->ButtonState = ZE_IBS_RELEASED;

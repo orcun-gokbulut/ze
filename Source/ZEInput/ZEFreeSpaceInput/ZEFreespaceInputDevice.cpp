@@ -214,7 +214,7 @@ bool ZEFreespaceInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, Z
 
 			case ZE_IT_BUTTON:
 				for (int I = 0; I < 5; I++)
-					if ((InputEvent->ButtonState == ZE_IBS_ALL && (Buttons[InputEvent->ButtonId] & 0x80)) ||
+					if ((InputEvent->ButtonState == ZE_IBS_PRESSING && (Buttons[InputEvent->ButtonId] & 0x80)) ||
 						(InputEvent->ButtonState == ZE_IBS_PRESSED && (Buttons[InputEvent->ButtonId] & 0x80) && !(OldButtons[InputEvent->ButtonId] & 0x80)) || 
 						(InputEvent->ButtonState == ZE_IBS_RELEASED && !(Buttons[InputEvent->ButtonId] & 0x80) && (OldButtons[InputEvent->ButtonId] & 0x80)))
 					{

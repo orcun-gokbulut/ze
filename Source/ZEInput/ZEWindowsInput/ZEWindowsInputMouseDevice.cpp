@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEWindowsInputMouseDevice.h"
-
+#include "ZEInput\ZEInputDefinitions.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEError.h"
@@ -74,8 +74,8 @@ bool ZEWMIKSH::Callback(MSG* Message)
 			if (Input.header.dwType != RIM_TYPEMOUSE && Input.header.hDevice != Device->DeviceHandle)
 				return false;
 
-			Device->AxisState[0] += Input.data.mouse.lLastX;
-			Device->AxisState[1] += Input.data.mouse.lLastY;
+			Device->AxisState[ZE_IMA_HORIZANTAL_AXIS] += Input.data.mouse.lLastX;
+			Device->AxisState[ZE_IMA_VERTICAL_AXIS] += Input.data.mouse.lLastY;
 
 			Device->ButtonState[0] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN);
 			Device->ButtonState[1] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN);
@@ -175,7 +175,7 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 				return false;
 
 			if ((InputBinding->Event.ButtonState == ZE_IBS_PRESSED && ButtonStateOld[ButtonIndex] == false && ButtonState[ButtonIndex] == true) ||
-				(InputBinding->Event.ButtonState == ZE_IBS_ALL && ButtonState[ButtonIndex] == true))
+				(InputBinding->Event.ButtonState == ZE_IBS_PRESSING && ButtonState[ButtonIndex] == true))
 			{
 				InputAction->Id = InputBinding->ActionId;
 				InputAction->ButtonState = ZE_IBS_PRESSED;
