@@ -99,18 +99,6 @@ ALCcontext* ZEALModule::GetContext()
 	return Context;
 }
 
-
-bool ZEALModule::IsEnabled()
-{
-	return Enabled;
-}
-
-void ZEALModule::SetEnabled(bool Enabled)
-{
-	this->Enabled = true;
-}
-
-
 bool ZEALModule::Initialize()
 {	
 	zeLog("OpenAL Module", "Initializing OpenAL module.");
@@ -190,7 +178,8 @@ bool ZEALModule::Initialize()
 	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetInteger());
 
 	zeLog("OpenAL Module", "OpenAL module initialized.");
-	return true;
+
+	return ZESoundModule::Initialize();
 }
 
 void ZEALModule::Deinitialize()
@@ -200,6 +189,8 @@ void ZEALModule::Deinitialize()
 	alcMakeContextCurrent(NULL);
 	alcDestroyContext(Context);
 	alcCloseDevice(Device);
+
+	ZESoundModule::Deinitialize();
 }
 
 void ZEALModule::SetSpeakerLayout(ZESpeakerLayout Layout)

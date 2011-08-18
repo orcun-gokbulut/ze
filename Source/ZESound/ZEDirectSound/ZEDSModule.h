@@ -60,8 +60,6 @@ class ZEDSModule : public ZESoundModule
 		ZEArray<ZESoundDevice>				DeviceList;
 		ZEArray<GUID>						DeviceGUIDList;
 
-		bool								Enabled;
-
 		float								UpdateTime;
 
 		LPDIRECTSOUND8						DS;
@@ -86,15 +84,13 @@ class ZEDSModule : public ZESoundModule
 		virtual								~ZEDSModule();
 
 	public:
-		ZEModuleDescription*				GetModuleDescription();		
+		virtual ZEModuleDescription*		GetModuleDescription();		
+		static ZEModuleDescription*		    ModuleDescription();		
 
 		LPDIRECTSOUND8						GetDevice();
 		LPDIRECTSOUND3DLISTENER8			GetListener();
 		LPDIRECTSOUNDBUFFER					GetPrimaryBuffer();
 		virtual const ZEArray<ZESoundDevice>&	GetDeviceList();
-
-		virtual bool						IsEnabled();
-		virtual void						SetEnabled(bool Enabled);
 
 		virtual bool						Initialize();
 		virtual void						Deinitialize();

@@ -57,7 +57,7 @@ void ZEVirtualInputModule::Deinitialize()
 	zeLog("Virtual Input Module", "Virtual Input module destroyed.");
 }
 
-bool ZEVirtualInputModule::IsEnabled()
+bool ZEVirtualInputModule::GetEnabled()
 {
 	return Enabled;
 }
@@ -187,7 +187,3 @@ ZEVirtualInputModule::ZEVirtualInputModule()
 {
 	VirtualInputEventCount = 0;
 }
-
-
-
-

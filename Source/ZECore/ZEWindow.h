@@ -48,6 +48,8 @@ enum ZEWindowType
 	ZE_WT_FULLSCREEN		= 4,
 };
 
+class ZESystemMessageHandler;
+
 class ZEWindow
 {
 	protected:
@@ -55,6 +57,7 @@ class ZEWindow
 		int						WindowWidth, WindowHeight;
 		ZEWindowType			WindowType;
 		void*					WindowHandle;
+		ZESystemMessageHandler* SystemMessageHandler;
 
 		bool					CreateMainWindow(const char* WindowTitle);
 		bool					DestroyMainWindow();
@@ -80,7 +83,6 @@ class ZEWindow
 		void					HideWindow();
 
 		void*					GetHandle();
-		void					ProcessMessages();
 
 		bool					Initialize();
 		void					Deinitialize();

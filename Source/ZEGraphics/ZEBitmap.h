@@ -37,6 +37,8 @@
 #ifndef __ZE_BITMAP_H__
 #define __ZE_BITMAP_H__
 
+#include <ZEMath\ZEVector.h>
+
 enum ZEBitmapFileFormat
 {
 	ZE_BFF_BMP,
@@ -46,48 +48,85 @@ enum ZEBitmapFileFormat
 	ZE_BFF_TIFF
 };
 
+enum ZEBitmapAddressingMode
+{
+	ZE_BAM_WRAP,
+	ZE_BAM_CLAMP,
+	ZE_BAM_MIRROR,
+	ZE_BAM_BORDER,
+};
+
+enum ZEBitmapFilteringMode
+{
+	ZE_BFM_POINT,
+	ZE_BFM_BILINEAR
+};
+
+struct ZEPixelColor
+{
+	unsigned char b, g, r, a;
+
+	static ZEPixelColor	Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T);
+
+	ZEPixelColor::ZEPixelColor();
+	ZEPixelColor(unsigned int Color);
+	ZEPixelColor(unsigned char a, unsigned char r, unsigned char g, unsigned char b);
+};
+
+struct ZEBitmapSamplingOptions
+{
+	ZEBitmapFilteringMode		Filter;
+	ZEBitmapAddressingMode		AddressingX;
+	ZEBitmapAddressingMode		AddressingY;
+	ZEPixelColor				BorderColor;
+};
+
 class ZEBitmap
 {
 	private:
-		unsigned int		Width;
-		unsigned int		Height;
-		unsigned int		Pitch;
-		unsigned int		PixelSize;
-		void*				Pixels;
+		unsigned int			Width;
+		unsigned int			Height;
+		unsigned int			Pitch;
+		unsigned int			PixelSize;
+		void*					Pixels;
 
 	public:
-		bool				Create(unsigned int Width, unsigned int Height, unsigned int PixelSize);
+		bool					Create(unsigned int Width, unsigned int Height, unsigned int PixelSize);
 
-		unsigned int		GetWidth();
-		unsigned int		GetHeight();
-		unsigned int		GetPitch();
-		unsigned int		GetPixelSize();
-		unsigned int		GetBPP();
+		unsigned int			GetWidth();
+		unsigned int			GetHeight();
+		unsigned int			GetPitch();
+		unsigned int			GetPixelSize();
+		unsigned int			GetBPP();
 
-		void*				GetPixels();
-		void*				GetPixel(unsigned int x, unsigned int y);
-		void*				GetRow(unsigned int Index);
+		ZEPixelColor*			GetPixels();
+		ZEPixelColor&			GetPixel(unsigned int x, unsigned int y);
 
-		void				CopyFrom(void* SourceBuffer, unsigned int SourcePitch, 
-								unsigned int Width, unsigned int Height, 
-								unsigned int SourceOffsetX = 0, unsigned int SourceOffsetY = 0,
-								unsigned int DestinationOffsetX = 0, unsigned int DestinationOffsetY = 0);
+		ZEPixelColor&			SamplePixel(int x, int y, ZEBitmapSamplingOptions* Options = 0);
+		ZEPixelColor			SamplePixel(const ZEVector2& TextureCoordinate, ZEBitmapSamplingOptions* Options = 0);
+		
+		ZEPixelColor*			GetRow(unsigned int Index);
 
-		void				CopyTo(void* DestinationBuffer, unsigned int DestinationPitch, 
-								unsigned int Width, unsigned int Height, 
-								unsigned int DestinationOffsetX = 0, unsigned int DestinationOffsetY = 0,
-								unsigned int SourceOffsetX = 0, unsigned int SourceOffsetY = 0);
+		void					CopyFrom(void* SourceBuffer, unsigned int SourcePitch, 
+									unsigned int Width, unsigned int Height, 
+									unsigned int SourceOffsetX = 0, unsigned int SourceOffsetY = 0,
+									unsigned int DestinationOffsetX = 0, unsigned int DestinationOffsetY = 0);
 
-		void				Fill(unsigned int Color);
-		void				Clear();
+		void					CopyTo(void* DestinationBuffer, unsigned int DestinationPitch, 
+									unsigned int Width, unsigned int Height, 
+									unsigned int DestinationOffsetX = 0, unsigned int DestinationOffsetY = 0,
+									unsigned int SourceOffsetX = 0, unsigned int SourceOffsetY = 0);
 
-		bool				Load(const char* Filename);
-		void				Save(const char* FileName, ZEBitmapFileFormat Format);
+		void					Fill(unsigned int Color);
+		void					Clear();
 
-		void				Release();
-							
-							ZEBitmap();
-							~ZEBitmap();
+		bool					Load(const char* Filename);
+		void					Save(const char* FileName, ZEBitmapFileFormat Format);
+
+		void					Release();
+
+								ZEBitmap();
+								~ZEBitmap();
 };
 
 #endif

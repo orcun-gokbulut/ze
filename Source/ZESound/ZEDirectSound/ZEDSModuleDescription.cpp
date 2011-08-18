@@ -36,9 +36,9 @@
 #include "ZEDSModuleDescription.h"
 #include "ZEDSModule.h"
 
-ZEModuleType ZEDSModuleDescription::GetType()
+ZEModuleDescription* ZEDSModuleDescription::GetBaseModuleDescription()
 {
-	return ZE_MT_SOUND;
+	return ZESoundModule::ModuleDescription();
 }
 
 ZEModuleAttribute ZEDSModuleDescription::GetAttributes()
@@ -85,6 +85,3 @@ bool ZEDSModuleDescription::CheckCompatible()
 {
 	return true;
 }
-
-
-

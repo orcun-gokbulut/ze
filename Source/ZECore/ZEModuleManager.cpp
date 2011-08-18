@@ -37,6 +37,8 @@
 #include "ZECore\ZEError.h"
 #include "ZECore\ZEConsole.h"
 #include "ZEOptionManager.h"
+#include "ZEModule.h"
+#include "ZEModuleDescription.h"
 
 ZEOptionSection ZEModuleManager::ModuleManagerOptions;
 
@@ -76,9 +78,9 @@ bool ZEModuleManager::CheckModule(ZEModuleDescription* ModuleDesc)
 	return true;
 }
 
-size_t ZEModuleManager::GetModuleCount()
+const ZEArray<ZEModuleDescription*>& ZEModuleManager::GetModuleDescriptions()
 {
-	return ModuleList.GetCount();
+	return ModuleList;
 }
 
 ZEModuleDescription* ZEModuleManager::GetModuleDescription(size_t Index)
@@ -95,34 +97,15 @@ ZEModuleDescription* ZEModuleManager::GetModuleDescription(const char* Name)
 	return NULL;
 }
 
-ZEModuleDescription* ZEModuleManager::GetModuleDescription(ZEModuleType Type)
+ZEModuleDescription* ZEModuleManager::GetModuleDescription(ZEModuleDescription* BaseModuleDescription)
 {
-	char* ModuleTypeName;
-	switch(Type)
-	{
-		case ZE_MT_GRAPHICS:
-			ModuleTypeName = "GraphicsModule";
-			break;
-		case ZE_MT_INPUT:
-			ModuleTypeName = "InputModule";
-			break;
-		case ZE_MT_SOUND:
-			ModuleTypeName = "SoundModule";
-			break;
-		case ZE_MT_PHYSICS:
-			ModuleTypeName = "PhysicsModule";
-			break;
-		case ZE_MT_NETWORK:
-			ModuleTypeName = "NetworkModule";
-			break;
-		default:
-			return NULL;
-	}
+	if (BaseModuleDescription->GetBaseModuleDescription() != NULL)
+		return NULL;
 
-	return GetModuleDescription(ModuleManagerOptions.GetOption(ModuleTypeName)->GetValue());
+	return GetModuleDescription(ModuleManagerOptions.GetOption(BaseModuleDescription->GetName())->GetValue());
 }
 
-ZEModule* ZEModuleManager::CreateModule(size_t Index)
+ZEModule* ZEModuleManager::CreateModuleInstance(size_t Index)
 {
 	ZEModuleDescription* ModuleDesc = GetModuleDescription(Index);
 
@@ -146,7 +129,7 @@ ZEModule* ZEModuleManager::CreateModule(size_t Index)
 	return Module;
 }
 
-ZEModule* ZEModuleManager::CreateModule(const char* Name)
+ZEModule* ZEModuleManager::CreateModuleInstance(const char* Name)
 {
 	ZEModuleDescription* ModuleDesc = GetModuleDescription(Name);
 	if (ModuleDesc == NULL)
@@ -170,9 +153,9 @@ ZEModule* ZEModuleManager::CreateModule(const char* Name)
 }
 
 
-ZEModule* ZEModuleManager::CreateModule(ZEModuleType ModuleType)
+ZEModule* ZEModuleManager::CreateModuleInstance(ZEModuleDescription* BaseModuleDescription)
 {
-	ZEModuleDescription* ModuleDesc = GetModuleDescription(ModuleType);
+	ZEModuleDescription* ModuleDesc = GetModuleDescription(BaseModuleDescription);
 	if (ModuleDesc == NULL)
 	{
 		zeError("Module Manager", "Can not find module. Please check your options.ini.");
@@ -192,7 +175,7 @@ ZEModule* ZEModuleManager::CreateModule(ZEModuleType ModuleType)
 	return Module;
 }
 
-bool ZEModuleManager::LoadInternalModule(ZEModuleDescription* ModuleDesc)
+bool ZEModuleManager::RegisterModule(ZEModuleDescription* ModuleDesc)
 {
 	zeLog("Module Manager", "Loading Internal Module \"%s\". Version : %d.%d, Type : UNKNOWN, Attributes : %c%c%c%c%c%c, Option Section : %s",
 		ModuleDesc->GetName(),
@@ -227,16 +210,7 @@ bool ZEModuleManager::LoadInternalModule(ZEModuleDescription* ModuleDesc)
 	return true;
 }
 
-bool ZEModuleManager::LoadExternalModule(const char* FileName)
-{
-	return false;
-}
-
-void ZEModuleManager::SeekAndLoadExternalModules(const char* Directory)
-{
-}
-
-void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
+void ZEModuleManager::UnregisterModule(ZEModuleDescription* ModuleDesc)
 {
 	ModuleList.DeleteValue(ModuleDesc);
 }
@@ -252,14 +226,14 @@ void ZEModuleManager::UnloadModule(ZEModuleDescription* ModuleDesc)
 
 ZEModuleManager::ZEModuleManager()
 {
-	LoadInternalModule(new ZED3D9ModuleDescription());
-	LoadInternalModule(new ZEDSModuleDescription());
-	LoadInternalModule(new ZEDummyInputModuleDescription());
-	LoadInternalModule(new ZEVirtualInputModuleDescription());
-	LoadInternalModule(new ZEDirectInputModuleDescription());
-	LoadInternalModule(new ZEALModuleDescription());
-	LoadInternalModule(new ZEPhysXModuleDescription());
-	LoadInternalModule(new ZEWindowsInputModuleDescription());
+	RegisterModule(new ZED3D9ModuleDescription());
+	RegisterModule(new ZEDSModuleDescription());
+	/*RegisterModule(new ZEDummyInputModuleDescription());
+	RegisterModule(new ZEVirtualInputModuleDescription());
+	RegisterModule(new ZEDirectInputModuleDescription());*/
+	RegisterModule(new ZEALModuleDescription());
+	RegisterModule(new ZEPhysXModuleDescription());
+	RegisterModule(new ZEWindowsInputModuleDescription());
 
 	ModuleManagerOptions.SetName("ModuleManager");
 	ModuleManagerOptions.AddOption(new ZEOption("GraphicsModule", "Direct3D9", ZE_OA_NORMAL));

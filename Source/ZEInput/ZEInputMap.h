@@ -39,94 +39,8 @@
 
 #include "ZEDS\ZEArray.h"
 
-enum ZEInputButtonState
-{
-	ZE_IBS_ALL,
-	ZE_IBS_PRESSED,
-	ZE_IBS_RELEASED
-};
-
-enum ZEInputAxisSign
-{
-	ZE_IAS_POSITIVE,
-	ZE_IAS_NEGATIVE
-};
-
-enum ZEInputType
-{
-	ZE_IT_AXIS, 
-	ZE_IT_BUTTON
-};
-
-enum ZEInputDeviceType
-{
-	ZE_IDT_NONE,
-	ZE_IDT_MOUSE,
-	ZE_IDT_KEYBOARD,
-	ZE_IDT_JOYSTICK
-};
-
-class ZEInputEvent
-{
-	public:
-		ZEInputType					InputType;
-		ZEInputDeviceType			DeviceType;
-		ZEDWORD						DeviceIndex;
-		union 
-		{
-			struct
-			{
-				unsigned char		ButtonId;
-				ZEInputButtonState	ButtonState;
-			};
-			struct
-			{
-				unsigned char		AxisId;
-				ZEInputAxisSign		AxisSign;
-			};		
-		};
-
-		void						GetEventName(char* Buffer, size_t MaxSize);
-		void						GetEventShortName(char* Buffer, size_t MaxSize);
-									
-									ZEInputEvent();
-									ZEInputEvent(const char* ShortName);
-									ZEInputEvent(ZEInputDeviceType Device, 
-										ZEDWORD DeviceIndex, 
-										unsigned char ButtonId, 
-										ZEInputButtonState ButtonState);
-
-									ZEInputEvent(ZEInputDeviceType Device, 
-										ZEDWORD DeviceIndex, 
-										unsigned char AxisId,
-										ZEInputAxisSign AxisSign);
-};
-
-
-class ZEInputBinding
-{
-	public: 
-		char						Name[50];
-		int							ActionId;
-		ZEInputEvent				Event;
-
-									ZEInputBinding(int ActionId, const char* Name, ZEInputEvent& Event);
-									ZEInputBinding();
-};
-
-class ZEInputAction
-{
-	public:
-		int							Id;
-		ZEInputBinding*				From;
-
-		union
-		{
-			ZEInputButtonState		ButtonState;
-			int						AxisValue;
-		};
-};
-
+#include "ZEInputAction.h"
+#include "ZEInputMapBinding.h"
 
 class ZEInputMap
 {
@@ -148,14 +62,3 @@ class ZEInputMap
 };
 
 #endif
-   
-
-
-
-  
-
-
-
-
-
-

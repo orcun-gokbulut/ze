@@ -75,7 +75,10 @@ class ZEPhysicsModule;
 class ZEGame;
 class ZEModule;
 class ZENetworkModule;
-class ZEDebugModule;
+class ZEApplicationModule;
+class ZEExtensionManager;
+class ZESystemMessageManager;
+class ZEPluginManager;
 
 class ZECore
 {
@@ -90,6 +93,11 @@ class ZECore
 		char							ResourceDirectory;
 
 		ZEModuleManager*				ModuleManager;
+		ZEExtensionManager*				ExtensionManager;
+		ZEPluginManager*				PluginManager;
+		ZESystemMessageManager*			SystemMessageManager;
+
+		ZEApplicationModule*			Application;
 		ZEError*						Error;
 		ZEOptionManager*				Options;
 		ZEResourceManager*				Resources;
@@ -103,7 +111,6 @@ class ZECore
 		ZEGame*							Game;
 		ZENetworkModule*				Network;
 
-		ZEDebugModule*					DebugComponent;
 
 		bool							InitializeModule(ZEModule* Module);
 		void							DeInitializeModule(ZEModule** Module);
@@ -121,7 +128,10 @@ class ZECore
 		ZEConsole*						GetConsole();
 		ZEWindow*						GetWindow();
 		ZEModuleManager*				GetModuleManager();
-		
+		ZEExtensionManager*				GetExtensionManager();
+		ZEPluginManager*				GetPluginManager();
+		ZESystemMessageManager*			GetSystemMessageManager();
+
 		void							SetResourceDirector(const char* Directory);
 		const char*						GetResourceDirectory();
 
@@ -143,8 +153,8 @@ class ZECore
 		bool							SetGame(ZEGame* Game);
 		ZEGame*							GetGame();
 
-		void							SetDebugComponent(ZEDebugModule* Component);
-		ZEDebugModule*					GetDebugComponent();
+		void							SetApplicationModule(ZEApplicationModule* Module);
+		ZEApplicationModule*			GetApplicationModule();
 
 		float							GetFrameTime();
 		float							GetRuningTime();

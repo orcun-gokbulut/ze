@@ -37,76 +37,29 @@
 #ifndef	__ZE_MODULE_H__
 #define __ZE_MODULE_H__
 
-enum ZEModuleAttribute
-{
-	ZE_MA_NONE				= 0,
-	ZE_MA_INTERNAL			= 1,
-	ZE_MA_EXTERNAL			= 2,
-	ZE_MA_SAFE				= 4,
-	ZE_MA_DEBUG				= 8,
-	ZE_MA_COMPATIBLE		= 16,
-	ZE_MA_VALIDATED			= 32
-};
-
-enum ZEModuleType
-{
-	ZE_MT_UNKNOWN				= 0,
-	ZE_MT_GRAPHICS				= 1,
-	ZE_MT_SOUND					= 2,
-	ZE_MT_INPUT					= 3,
-	ZE_MT_PHYSICS				= 4,	
-	ZE_MT_NETWORK				= 5,
-	ZE_MT_GAME					= 6,
-	ZE_MT_CONSOLEINTERFACE		= 7,
-	ZE_MT_COMPONENT				= 8,
-	ZE_MT_DEBUG					= 9,
-	ZE_MT_OTHER
-};
-
-class ZEModule;
-class ZEModuleManager;
-class ZEOptionSection;
-class ZEModuleDescription
-{
-	public:
-		virtual ZEModuleAttribute		GetAttributes() = 0;
-		virtual ZEModuleType			GetType() = 0;
-		virtual int						GetRequiredZinekEngineVersion() = 0;
-		virtual int						GetMajorVersion() = 0;
-		virtual int						GetMinorVersion() = 0;
-		virtual const char*				GetCopyright() = 0;
-		virtual const char*				GetName() = 0;
-
-		virtual ZEOptionSection*		GetOptions() = 0;
-		virtual	ZEModule*				CreateModuleInstance() = 0;
-		virtual	bool					CheckCompatible() = 0;
-};
+class ZEModuleDescription;
 
 class ZEModule
 {
+	private:
+		bool							Enabled;
+		bool							Initialized;
+
 	protected:
 										ZEModule();
 		virtual							~ZEModule();
 
 	public:
+		static ZEModuleDescription*		ModuleDescription();
 		virtual ZEModuleDescription*	GetModuleDescription() = 0;
 
-		virtual bool					IsEnabled() = 0;
-		virtual void					SetEnabled(bool Enabled) = 0;
+		virtual bool					GetEnabled();
+		virtual void					SetEnabled(bool Enabled);
 
-		virtual bool					Initialize() = 0;
-		virtual void					Deinitialize() = 0;
+		virtual bool					IsInitialized();
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
 
 		virtual void					Destroy();
 };
 #endif
-
-// Initialize -- Initializes component
-// Deinitialize -- Deinitializes component
-// Release -- Releases internal resources
-// Destroy -- Delete component
-
-
-
-
-

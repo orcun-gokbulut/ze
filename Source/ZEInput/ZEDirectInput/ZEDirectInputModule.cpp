@@ -105,10 +105,15 @@ BOOL CALLBACK CheckDirectInputDevices(const LPCDIDEVICEINSTANCE DeviceInstance, 
 	return true;
 }
 
-ZEModuleDescription* ZEDirectInputModule::GetModuleDescription()
+ZEModuleDescription* ZEDirectInputModule::ModuleDescription()
 {
 	static ZEDirectInputModuleDescription Desc;
 	return &Desc;
+}
+
+ZEModuleDescription* ZEDirectInputModule::GetModuleDescription()
+{
+	return ZEDirectInputModule::ModuleDescription();
 }
 
 HWND GetTopMostWindow(HWND Handle)
@@ -121,7 +126,7 @@ HWND GetTopMostWindow(HWND Handle)
 	return GetWindow(Handle, GW_OWNER);
 }
 
-bool ZEDirectInputModule::IsEnabled()
+bool ZEDirectInputModule::GetEnabled()
 {
 	return Enabled;
 }

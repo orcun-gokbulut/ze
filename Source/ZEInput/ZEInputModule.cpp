@@ -34,7 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInputModule.h"
+#include "ZEInputModuleDescription.h"
 #include "ZECore\ZECore.h"
+
+ZEInputModule::ZEInputModule()
+{
+	Acquired = false;
+}
 
 void ZEInputModule::BaseInitialize()
 {
@@ -42,6 +48,37 @@ void ZEInputModule::BaseInitialize()
 
 void ZEInputModule::BaseDeinitialize()
 {
+}
+
+ZEModuleDescription* ZEInputModule::GetModuleDescription()
+{
+	return ZEInputModule::ModuleDescription();
+}
+
+ZEModuleDescription* ZEInputModule::ModuleDescription()
+{
+	static ZEInputModuleDescription Desc;
+	return &Desc;
+}
+
+bool ZEInputModule::IsAcquired()
+{
+	if (!IsInitialized())
+		return false;
+
+	return Acquired;
+}
+
+void ZEInputModule::Acquire()
+{
+	if (IsInitialized())
+		Acquired = true;
+}
+
+void ZEInputModule::UnAcquire()
+{
+	if (IsInitialized())
+		Acquired = false;
 }
 
 ZEInputModule* ZEInputModule::GetInstance()

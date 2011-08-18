@@ -106,6 +106,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetSpecularEnabled(true);
 		CurrentMaterial->SetEmmisiveEnabled(true);
 		
+		CurrentMaterial->SetDiffuseSubSurfaceScatteringFactor(0.0f);
 		CurrentMaterial->SetTwoSided(MaterialChunk.TwoSided);
 		CurrentMaterial->SetLightningEnabled(MaterialChunk.LightningEnabled);
 		CurrentMaterial->SetWireframe(MaterialChunk.Wireframe);
@@ -133,9 +134,9 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetEmmisiveMap(ManageMapMaterialTextures(MaterialChunk.EmmisiveMap));
 		CurrentMaterial->SetOpacityMap(ManageMapMaterialTextures(MaterialChunk.OpacityMap));
 		
-		CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_DETAIL_NORMAL_MAP);
-		CurrentMaterial->SetDetailBaseMap(ManageMapMaterialTextures(MaterialChunk.DetailMap));
-		CurrentMaterial->SetDetailNormalMap(ManageMapMaterialTextures(MaterialChunk.DetailNormalMap));
+		//CurrentMaterial->SetDetailMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_DETAIL_NORMAL_MAP);
+		//CurrentMaterial->SetDetailBaseMap(ManageMapMaterialTextures(MaterialChunk.DetailMap));
+		//CurrentMaterial->SetDetailNormalMap(ManageMapMaterialTextures(MaterialChunk.DetailNormalMap));
 
 		CurrentMaterial->SetReflectionEnabled(false);
 		CurrentMaterial->SetRefractionEnabled(false);

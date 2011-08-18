@@ -37,22 +37,22 @@
 #ifndef	__ZE_D3D9_MODULE_DESCRIPTION_H__
 #define __ZE_D3D9_MODULE_DESCRIPTION_H__
 
-#include "ZECore\ZEModule.h"
+#include "ZECore\ZEModuleDescription.h"
 
 class ZED3D9ModuleDescription : public ZEModuleDescription
 {
 	public:
-		ZEModuleType			GetType();
-		ZEModuleAttribute		GetAttributes();
-		int						GetRequiredZinekEngineVersion();
-		int						GetMajorVersion();
-		int						GetMinorVersion();
-		const char*				GetCopyright();
-		const char*				GetName();
-		ZEOptionSection*		GetOptions();
+		virtual ZEModuleDescription*	GetBaseModuleDescription();
+		virtual ZEModuleAttribute		GetAttributes();
+		virtual int						GetRequiredZinekEngineVersion();
+		virtual int						GetMajorVersion();
+		virtual int						GetMinorVersion();
+		virtual const char*				GetCopyright();
+		virtual const char*				GetName();
+		virtual ZEOptionSection*		GetOptions();
 
-		ZEModule*				CreateModuleInstance();
-		bool					CheckCompatible();
+		virtual ZEModule*				CreateModuleInstance();
+		virtual bool					CheckCompatible();
 };
 #endif
 

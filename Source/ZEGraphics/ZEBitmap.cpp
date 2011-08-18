@@ -37,9 +37,41 @@
 #include "ZECore/ZEError.h"
 #include "ZETypes.h"
 #include <memory.h>
+#include <math.h>
 
 #define FREEIMAGE_LIB
 #include <FreeImage.h>
+
+ZEPixelColor ZEPixelColor::Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T)
+{
+	ZEPixelColor Temp;
+	Temp.a = A.a * (1.0f - T) + B.a * T;
+	Temp.r = A.r * (1.0f - T) + B.r * T;
+	Temp.g = A.g * (1.0f - T) + B.g * T;
+	Temp.b = A.b * (1.0f - T) + B.b * T;
+
+	return Temp;
+}
+
+ZEPixelColor::ZEPixelColor()
+{
+}
+
+ZEPixelColor::ZEPixelColor(unsigned int Color)
+{
+	this->a = (Color & 0xFF000000) >> 24;
+	this->r = (Color & 0x00FF0000) >> 16;
+	this->g = (Color & 0x0000FF00) >> 8;
+	this->b = (Color & 0x000000FF);
+}
+
+ZEPixelColor::ZEPixelColor(unsigned char a, unsigned char r, unsigned char g, unsigned char b)
+{
+	this->a = a;
+	this->r = r;
+	this->g = g;
+	this->b = b;
+}
 
 bool ZEBitmap::Create(unsigned int Width, unsigned int Height, unsigned int PixelSize)
 {
@@ -84,19 +116,159 @@ unsigned int ZEBitmap::GetBPP()
 	return PixelSize * 8;
 }
 
-void* ZEBitmap::GetPixels()
+ZEPixelColor* ZEBitmap::GetPixels()
 {
-	return Pixels;
+	return (ZEPixelColor*)Pixels;
 }
 
-void* ZEBitmap::GetPixel(unsigned int x, unsigned int y)
+ZEPixelColor& ZEBitmap::GetPixel(unsigned int x, unsigned int y)
 {
-	return (ZEBYTE*)Pixels + y * Pitch + x;
+	return *(ZEPixelColor*)((ZEBYTE*)Pixels + y * Pitch + x * 4);
 }
 
-void* ZEBitmap::GetRow(unsigned int Index)
+ZEPixelColor* ZEBitmap::GetRow(unsigned int Index)
 {
-	return (ZEBYTE*)Pixels + Index * Pitch;
+	return (ZEPixelColor*)((ZEBYTE*)Pixels + Index * Pitch);
+}
+
+ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserOptions)
+{
+	static ZEBitmapSamplingOptions DefaultOptions = {ZE_BFM_BILINEAR, ZE_BAM_WRAP, ZE_BAM_WRAP, ZEPixelColor(0, 0, 0 ,0)};
+
+	ZEBitmapSamplingOptions* Options;
+	if (UserOptions == NULL)
+		Options = &DefaultOptions;
+	else
+		Options = UserOptions;
+
+	switch(Options->AddressingX)
+	{
+		case ZE_BAM_WRAP:
+		{
+			x = x % GetWidth();
+			break;
+		}
+
+		case ZE_BAM_CLAMP:
+		{
+			if (x >= (int)Width)
+				x = Width -1;
+			else if (x < 0)
+				x = 0;
+			break;
+		}
+
+		case ZE_BAM_MIRROR:
+		{
+			bool Odd = (x / Width) % 2;
+			if (Odd)
+			{
+				if (x >= (int)Width)
+					x = Width - 1;
+				else if (x < 0)
+					x = 0;
+			}
+			else
+			{
+				if (x >= (int)Width)
+					x = Width - x - 1;
+				else if (x < 0)
+					x = Width - 1;
+			}
+			break;
+		}
+
+		case ZE_BAM_BORDER:
+		{
+			if (x >= (int)Width)
+				return Options->BorderColor;
+			else if (x < 0)
+				return Options->BorderColor;
+		}
+	}
+
+	switch(Options->AddressingY)
+	{
+		case ZE_BAM_WRAP:
+		{
+			y = y % GetHeight();
+			break;
+		}
+
+		case ZE_BAM_CLAMP:
+		{
+			if (y >= (int)Height)
+				y = Height - 1;
+			else if (y < 0)
+				y = 0;
+			break;
+		}
+
+		case ZE_BAM_MIRROR:
+		{
+			bool Odd = (y / Height) % 2;
+			if (Odd)
+			{
+				if (y >= (int)Height)
+					y = Height - 1;
+				else if (y < 0)
+					y = 0;
+			}
+			else
+			{
+				if (y >= (int)Height)
+					y = Height - y - 1;
+				else if (y < 0)	
+					y = Height - 1;
+			}
+			break;
+		}
+
+		case ZE_BAM_BORDER:
+		{
+			if (y >= (int)Height)
+				return Options->BorderColor;
+			else if (y < 0)
+				return Options->BorderColor;
+			break;
+		}
+	}
+
+	return GetPixel(x, y);
+}
+
+ZEPixelColor ZEBitmap::SamplePixel(const ZEVector2& TextureCoordinate, ZEBitmapSamplingOptions* UserOptions)
+{
+	static ZEBitmapSamplingOptions DefaultOptions = {ZE_BFM_BILINEAR, ZE_BAM_WRAP, ZE_BAM_WRAP, ZEPixelColor(0, 0, 0 ,0)};
+
+	ZEBitmapSamplingOptions* Options;
+	if (UserOptions == NULL)
+		Options = &DefaultOptions;
+	else
+		Options = UserOptions;
+
+	if (Options->Filter == ZE_BFM_POINT)
+	{
+		return SamplePixel(floorf(TextureCoordinate.x), floorf(TextureCoordinate.y), Options);
+	}
+	if (Options->Filter == ZE_BFM_BILINEAR)
+	{
+		int x = floorf(TextureCoordinate.x);
+		int y = floorf(TextureCoordinate.y);
+
+		float RatioU = TextureCoordinate.x - x;
+		float RatioV = TextureCoordinate.y - y;
+
+		ZEPixelColor A = SamplePixel(x, y, Options);
+		ZEPixelColor B = SamplePixel(x + 1, y, Options);
+		ZEPixelColor C = SamplePixel(x, y + 1, Options);
+		ZEPixelColor D = SamplePixel(x + 1, y + 1, Options);
+
+		ZEPixelColor Row0 = ZEPixelColor::Lerp(A, B, RatioU);
+		ZEPixelColor Row1 = ZEPixelColor::Lerp(C, D, RatioU);
+		
+		return ZEPixelColor::Lerp(Row0, Row1, RatioV);
+	}
 }
 
 void ZEBitmap::CopyFrom(void* SourceBuffer, unsigned int SourcePitch, 
@@ -172,16 +344,16 @@ bool ZEBitmap::Load(const char* FileName)
 	PixelSize = 4;
 	Create(Width, Height, PixelSize);
 
-	FreeImage_ConvertToRawBits((BYTE*)Pixels, FIConvertedBitmap, Pitch, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, FALSE);
+	FreeImage_ConvertToRawBits((BYTE*)Pixels, FIConvertedBitmap, Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
 
-	FreeImage_Unload(FIBitmap);
+	FreeImage_Unload(FIConvertedBitmap);
 
 	return true;
 }
 
 void ZEBitmap::Save(const char* FileName, ZEBitmapFileFormat Format)
 {
-	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits((BYTE*)Pixels, Width, Height, Pitch, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, FALSE);
+	FIBITMAP* FIBitmap = FreeImage_ConvertFromRawBits((BYTE*)Pixels, Width, Height, Pitch, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
 	FREE_IMAGE_FORMAT FIFormat;
 	switch(Format)
 	{

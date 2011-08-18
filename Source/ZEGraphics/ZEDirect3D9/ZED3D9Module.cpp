@@ -64,10 +64,15 @@ D3DPRESENT_PARAMETERS D3DPP;
 
 #pragma warning(disable:4267)
 
-ZEModuleDescription* ZED3D9Module::GetModuleDescription()
+ZEModuleDescription* ZED3D9Module::ModuleDescription()
 {
 	static ZED3D9ModuleDescription Desc;
 	return &Desc;
+}
+
+ZEModuleDescription* ZED3D9Module::GetModuleDescription()
+{
+	return ZED3D9Module::ModuleDescription();
 }
 
 LPDIRECT3D9 ZED3D9Module::GetDirect3D()
@@ -100,7 +105,7 @@ ZED3D9PipelineType ZED3D9Module::GetPipelineType()
 	return PipelineType;
 }
 
-bool ZED3D9Module::IsEnabled()
+bool ZED3D9Module::GetEnabled()
 {
 	return Enabled;
 }

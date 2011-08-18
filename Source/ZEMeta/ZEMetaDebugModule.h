@@ -37,14 +37,14 @@
 #ifndef __ZE_META_DEBUG_MODULE_H__
 #define __ZE_META_DEBUG_MODULE_H__
 
-#include "ZECore\ZEDebugModule.h"
+#include "ZECore\ZEApplicationModule.h"
 
 class ZEPlayer;
 class ZECanvasBrush;
 class ZELightBrush;
 class ZEPointLight;
 
-class ZEMetaDebugModule : public ZEDebugModule
+class ZEMetaDebugModule : public ZEApplicationModule
 {
 	private:
 		ZEPlayer*				Player;

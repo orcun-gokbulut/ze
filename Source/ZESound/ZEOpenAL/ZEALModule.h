@@ -59,8 +59,6 @@ class ZEALModule : public ZESoundModule
 	private:
 		ZEArray<ZESoundDevice>				DeviceList;
 
-		bool								Enabled;
-
 		float								UpdateTime;
 
 		ALCdevice*							Device;
@@ -90,9 +88,6 @@ class ZEALModule : public ZESoundModule
 
 		ALCdevice*							GetDevice();
 		ALCcontext*							GetContext();
-
-		virtual bool						IsEnabled();
-		virtual void						SetEnabled(bool Enabled);
 
 		virtual bool						Initialize();
 		virtual void						Deinitialize();

@@ -46,11 +46,21 @@
 #include <NxPhysics.h>
 #include <NxCooking.h>
 
+ZEModuleDescription* ZEPhysXModule::GetModuleDescription()
+{
+	return ZEPhysXModule::ModuleDescription();
+}
+
+ZEModuleDescription* ZEPhysXModule::ModuleDescription()
+{
+	static ZEPhysXModuleDescription Desc;
+	return &Desc;
+}
+
 ZEPhysXModule::ZEPhysXModule()
 {
 	CookingInterface = NULL;
 	PhysicsSDK = NULL;
-	Enabled = true;
 }
 
 ZEPhysXModule::~ZEPhysXModule()
@@ -66,22 +76,6 @@ NxPhysicsSDK* ZEPhysXModule::GetPhysicsSDK()
 NxCookingInterface* ZEPhysXModule::GetCookingInterface()
 {
 	return CookingInterface;
-}
-
-ZEModuleDescription* ZEPhysXModule::GetModuleDescription()
-{
-	static ZEPhysXModuleDescription Desc;
-	return &Desc;
-}
-
-bool ZEPhysXModule::IsEnabled()
-{
-	return Enabled;
-}
-
-void ZEPhysXModule::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
 }
 
 bool ZEPhysXModule::Initialize()
@@ -115,7 +109,7 @@ bool ZEPhysXModule::Initialize()
 
 	zeLog("PhysX Module", "PhysX intialized.");
 
-	return true;
+	return ZEPhysicsModule::Initialize();
 }
 
 void ZEPhysXModule::Deinitialize()
@@ -136,11 +130,13 @@ void ZEPhysXModule::Deinitialize()
 		CookingInterface->NxCloseCooking();
 		CookingInterface = NULL;
 	}
+
+	ZEPhysicsModule::Deinitialize();
 }
 
 void ZEPhysXModule::Process(float ElapsedTime)
 {
-	if (!Enabled)
+	if (!GetEnabled())
 		return;
 
 	for (size_t I = 0; I < PhysicalWorlds.GetCount(); I++)
@@ -150,7 +146,7 @@ void ZEPhysXModule::Process(float ElapsedTime)
 
 void ZEPhysXModule::UpdateWorlds()
 {
-	if (!Enabled)
+	if (!GetEnabled())
 		return;
 
 	for (size_t I = 0; I < PhysicalWorlds.GetCount(); I++)

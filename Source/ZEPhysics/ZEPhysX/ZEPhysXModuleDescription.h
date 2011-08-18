@@ -37,21 +37,21 @@
 #ifndef	__ZE_PHYSX_MODULE_DESCRIPTION_H__
 #define __ZE_PHYSX_MODULE_DESCRIPTION_H__
 
-#include "ZECore\ZEModule.h"
+#include "ZECore\ZEModuleDescription.h"
 
 class ZEPhysXModuleDescription : public ZEModuleDescription
 {
 	public:
-		ZEModuleType			GetType();
-		ZEModuleAttribute		GetAttributes();
-		int						GetRequiredZinekEngineVersion();
-		int						GetMajorVersion();
-		int						GetMinorVersion();
-		const char*				GetCopyright();
-		const char*				GetName();
-		ZEOptionSection*		GetOptions();
-		ZEModule*				CreateModuleInstance();
-		bool					CheckCompatible();
+		virtual ZEModuleDescription*	GetBaseModuleDescription();
+		virtual ZEModuleAttribute		GetAttributes();
+		virtual int						GetRequiredZinekEngineVersion();
+		virtual int						GetMajorVersion();
+		virtual int						GetMinorVersion();
+		virtual const char*				GetCopyright();
+		virtual const char*				GetName();
+		virtual ZEOptionSection*		GetOptions();
+		virtual ZEModule*				CreateModuleInstance();
+		virtual bool					CheckCompatible();
 };
 
 #endif

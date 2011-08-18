@@ -46,12 +46,12 @@ ZE_META_REGISTER_CLASS(ZEEntityProvider, ZECamera)
 
 const ZEMatrix4x4& ZECamera::GetViewTransform()
 {
-	if (!UpdateViewTransform)
-		return ViewTransform;
+	/*if (!UpdateViewTransform)
+		return ViewTransform;*/
 	
 	ZEMatrix4x4::CreateViewTransform(ViewTransform, GetWorldPosition(), GetWorldRotation())	;
 
-	UpdateViewTransform = false;
+	//UpdateViewTransform = false;
 	
 	return ViewTransform;
 }
@@ -162,8 +162,8 @@ float ZECamera::GetAspectRatio() const
 
 const ZEView& ZECamera::GetView()
 {
-	if (!UpdateView)
-		return View;
+	/*if (!UpdateView)
+		return View;*/
 
 	View.Type = ZE_VPT_CAMERA;
 	View.Camera = this;
@@ -180,8 +180,8 @@ const ZEView& ZECamera::GetView()
 
 const ZEViewVolume& ZECamera::GetViewVolume()
 {
-	if (!UpdateViewFrustum)
-		return ViewFrustum;
+	/*if (!UpdateViewFrustum)
+		return ViewFrustum;*/
 
 	ViewFrustum.Create(GetWorldPosition(), GetWorldRotation(), FOV, AspectRatio, NearZ, FarZ);
 

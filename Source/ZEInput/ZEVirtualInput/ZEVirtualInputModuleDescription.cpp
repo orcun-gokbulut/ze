@@ -36,9 +36,9 @@
 #include "ZEVirtualInputModuleDescription.h"
 #include "ZEVirtualInputModule.h"
 
-ZEModuleType ZEVirtualInputModuleDescription::GetType()
+ZEModuleDescription* ZEVirtualInputModuleDescription::GetBaseModuleDescription()
 {
-	return ZE_MT_INPUT;
+	return ZEInputModule::ModuleDescription();
 }
 
 ZEModuleAttribute ZEVirtualInputModuleDescription::GetAttributes()
@@ -72,7 +72,7 @@ const char* ZEVirtualInputModuleDescription::GetName()
 }
 
 ZEOptionSection* ZEVirtualInputModuleDescription::GetOptions()
-{
+ {
 	return NULL;
 }
 
@@ -86,7 +86,3 @@ bool ZEVirtualInputModuleDescription::CheckCompatible()
 {
 	return true;
 }
-
-
-
-

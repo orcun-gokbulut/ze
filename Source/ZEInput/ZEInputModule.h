@@ -43,46 +43,34 @@
 #include "ZECore\ZEModule.h"
 #include "ZEInputMap.h"
 
-
-struct ZEInputMouseState
-{
-	int						MousePositionX;
-	int						MousePositionY;
-	
-	bool					Click;
-	bool					DoubleClick;
-
-	ZEInputButtonState		LeftButtonDown;
-	ZEInputButtonState		RightButtonDown;
-	ZEInputButtonState		MiddleButtonDown;
-	ZEInputButtonState		CtrlDown;
-	ZEInputButtonState		ShiftDown;
-};
-
-struct ZEInputKeyState
-{
-	char					Character;
-
-	int						VirtualKey;
-	int						RepeatCount;
-	int						ScanCode;
-};
+class ZEInputDevice;
 
 class ZEInputModule : public ZEModule 
 {	
+	private:
+		bool							Acquired;
+
+	protected:
+										ZEInputModule();
+
 	public:
-		static void					BaseInitialize();
-		static void					BaseDeinitialize();
+		static void						BaseInitialize();
+		static void						BaseDeinitialize();
 
-		virtual void				ProcessInputs() = 0;
-		virtual void				ProcessInputMap(ZEInputMap* InputMap) = 0;
+		virtual ZEModuleDescription*	GetModuleDescription();
+		static ZEModuleDescription*		ModuleDescription();
 
-		virtual bool				GetRawInputEvent(ZEInputEvent& InputEvent) = 0;
-		
-		virtual void				Acquire() = 0;
-		virtual void				UnAcquire() = 0;
+		virtual const
+		ZEArray<ZEInputDevice*>&		GetInputDevices() = 0;
 
-		static ZEInputModule*		GetInstance();
+		virtual void					ProcessInputs() = 0;
+		virtual void					ProcessInputMap(ZEInputMap* InputMap) = 0;
+
+		virtual bool					IsAcquired();
+		virtual void					Acquire();
+		virtual void					UnAcquire();
+
+		static ZEInputModule*			GetInstance();
 };
 #endif
    

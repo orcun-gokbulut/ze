@@ -38,7 +38,7 @@
 #include "ZEDummyInputModule.h"
 #include "ZEDummyInputModuleDescription.h"
 
-bool ZEDummyInputModule::IsEnabled()
+bool ZEDummyInputModule::GetEnabled()
 {
 	return Enabled;
 }
@@ -49,6 +49,11 @@ void ZEDummyInputModule::SetEnabled(bool Enabled)
 }
 
 ZEModuleDescription* ZEDummyInputModule::GetModuleDescription()
+{
+	return ZEDummyInputModule::ModuleDescription();
+}
+
+ZEModuleDescription* ZEDummyInputModule::ModuleDescription()
 {
 	static ZEDummyInputModuleDescription Desc;
 	return &Desc;
@@ -101,7 +106,3 @@ bool ZEDummyInputModule::GetRawInputEvent(ZEInputEvent& InputEvent)
 {
 	return false;
 }
-
-
-
-

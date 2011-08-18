@@ -111,10 +111,15 @@ ZEDSModule::~ZEDSModule()
 {
 }
 
-ZEModuleDescription* ZEDSModule::GetModuleDescription()
+ZEModuleDescription* ZEDSModule::ModuleDescription()
 {
 	static ZEDSModuleDescription Desc;
 	return &Desc;
+}
+
+ZEModuleDescription* ZEDSModule::GetModuleDescription()
+{
+	return ZEDSModule::ModuleDescription();
 }
 
 LPDIRECTSOUND8 ZEDSModule::GetDevice()
@@ -135,16 +140,6 @@ LPDIRECTSOUNDBUFFER ZEDSModule::GetPrimaryBuffer()
 const ZEArray<ZESoundDevice>& ZEDSModule::GetDeviceList()
 {
 	return DeviceList;
-}
-
-bool ZEDSModule::IsEnabled()
-{
-	return Enabled;
-}
-
-void ZEDSModule::SetEnabled(bool Enabled)
-{
-	this->Enabled = true;
 }
 
 bool ZEDSModule::Initialize()
@@ -234,7 +229,8 @@ bool ZEDSModule::Initialize()
 	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetInteger());
 
 	zeLog("DirectSound", "DirectSound Initialized.");
-	return true;
+
+	return ZESoundModule::Initialize();
 }
 
 void ZEDSModule::Deinitialize()
@@ -257,6 +253,8 @@ void ZEDSModule::Deinitialize()
 		DS->Release();
 		DS = NULL;
 	}
+
+	ZESoundModule::Deinitialize();
 }
 
 void ZEDSModule::SetSpeakerLayout(ZESpeakerLayout Layout)

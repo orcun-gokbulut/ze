@@ -37,13 +37,13 @@
 #ifndef __ZE_GUI_DEBUG_MODULE_H__
 #define __ZE_GUI_DEBUG_MODULE_H__
 
-#include "ZECore/ZEDebugModule.h"
+#include "ZECore/ZEApplicationModule.h"
 
 class ZEGrid;
 class ZEPlayer;
 class ZEScene;
 
-class ZEUIDebugModule : public ZEDebugModule
+class ZEUIDebugModule : public ZEApplicationModule
 {
 	private:
 		ZEPlayer*				Player;

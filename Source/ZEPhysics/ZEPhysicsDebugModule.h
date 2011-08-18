@@ -37,7 +37,7 @@
 #ifndef __ZE_PHYSICS_DEBUG_MODULE_H__
 #define __ZE_PHYSICS_DEBUG_MODULE_H__
 
-#include "ZECore\ZEDebugModule.h"
+#include "ZECore\ZEApplicationModule.h"
 #include "ZEPhysics\ZEPhysicalCallbacks.h"
 
 class ZEPlayer;
@@ -46,7 +46,7 @@ class ZEModel;
 
 #include "ZEPhysics\ZEPhysicalShapes.h"
 
-class ZEPhysicsDebugModule : public ZEDebugModule
+class ZEPhysicsDebugModule : public ZEApplicationModule
 {
 	private:
 		ZEPlayer*				Player;

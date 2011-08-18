@@ -33,8 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPhysics\ZEPhysicsModule.h"
+#include "ZEPhysicsModule.h"
+#include "ZEPhysicsModuleDescription.h"
 #include "ZECore\ZECore.h"
+
+ZEModuleDescription* ZEPhysicsModule::GetModuleDescription()
+{
+	return ZEPhysicsModule::ModuleDescription();
+}
+
+ZEModuleDescription* ZEPhysicsModule::ModuleDescription()
+{
+
+	static ZEPhysicsModuleDescription Desc;
+	return &Desc;
+}
 
 ZEPhysicsModule* ZEPhysicsModule::GetInstance()
 {

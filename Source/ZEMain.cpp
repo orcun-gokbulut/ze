@@ -52,95 +52,27 @@
 #include "ZEMeta\ZEMetaDebugModule.h"
 #include "ZEUI\ZEUIDebugModule.h"
 
-// Test
-#include "ZEGraphics\ZETextureCacheChunkIdentifier.h"
-#include "ZEDS\ZEFileCache.h"
-#include "ZECore\ZEFile.h"
+extern HINSTANCE ApplicationInstance;
 
 #include <stdio.h>
 #include <string>
 #include <string.h>
 
+#include "ZEGraphics/ZEBitmap.h"
+#include "FreeImage.h"
 
 extern HINSTANCE ApplicationInstance;
 
-class ZEStringCacheIdentifier : public ZECacheChunkIdentifier
-{
-	public:
-		const char* String;
-		virtual ZEDWORD GetHash() const
-		{
-			int Hash = 0;
-			int I = 0;
-			while (String[I] != NULL)
-			{
-				Hash += String[I];
-				I++;
-			}
-
-			return Hash;
-		}
-
-		virtual size_t Write(void* File) const
-		{
-			ZEDWORD Count = strlen(String) + 1;
-			fwrite(&Count, sizeof(ZEDWORD), 1, (FILE*)File);
-			fwrite(String, sizeof(const char), strlen(String) + 1, (FILE*)File);
-			return Count + sizeof(ZEDWORD);
-		}
-
-		virtual bool Equal(void* File) const
-		{
-			const size_t BufferSize = 1024;
-			char Buffer[BufferSize];
-			
-			ZEDWORD TotalBytes;
-			fread(&TotalBytes, sizeof(ZEDWORD), 1, (FILE*)File);
-			
-			size_t ReadBytes = 0;
-			while (ReadBytes < TotalBytes)
-			{
-				size_t BytesToRead = (TotalBytes - ReadBytes < BufferSize ? TotalBytes - ReadBytes : BufferSize);
-				fread(Buffer, sizeof(const char), BytesToRead, (FILE*)File);
-				for (size_t I = 0; I < BytesToRead; I++)
-					if (Buffer[I] != String[ReadBytes + I])
-						return false;
-
-				ReadBytes += BytesToRead;
-			}
-			
-			return true;
-		}
-
-		ZEStringCacheIdentifier(const char* String)
-		{
-			this->String = String;
-		}
-};
-
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-/*	char CacheItem1[] = "This is a cache item 1. So Blabalbalsfedw fewwerewrew End Of File";
-	char CacheItem2[] = "ard bla bldfaskfjşl sad şlaksfj aşskldf sşalkjf şaslkdjf şsldakj dra";
-	
-	ZEFileCache Cache;
-
-	Cache.OpenCache("c:\\test.zeCache");
-//	Cache.AddChunk(&ZEStringCacheIdentifier("Orcun"), CacheItem1, sizeof(CacheItem1));
-//	Cache.AddChunk(&ZEStringCacheIdentifier("Cengiz"), CacheItem1, sizeof(CacheItem2));
-
-	char Buffer[1024];
-	Cache.GetChunkData(&ZEStringCacheIdentifier("dfg"), NULL, 0, 0);
-	Cache.CloseCache();*/
-	
-	//MessageBox(NULL, "Attach it while you can !", "Zinek Engine", MB_OK); 
-
-	/*bool IsOpen		 = false;
-	bool SeekSuccess = false;
-	size_t ReadCount	= 0;
-	size_t WriteCount	= 0;
-	size_t FileSize		= 0;
-	size_t FileCursor	= 0;*/
+	FreeImage_Initialise();
+	ZEBitmap Test; 
+	Test.Load("BitmapTest.bmp");
+	ZEBitmapSamplingOptions Options;
+	Options.Filter = ZE_BFM_BILINEAR;
+	Options.AddressingX = ZE_BAM_MIRROR;
+	Options.AddressingY = ZE_BAM_MIRROR;
+	Options.BorderColor = ZEPixelColor(0xFFFFFFFF);
 
 
 	_set_SSE2_enable(1);
@@ -150,7 +82,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	//zeCore->SetDebugComponent(&DebugModule);
 
 	ZEGraphicsDebugModule GraphicsDebugModule;
-	zeCore->SetDebugComponent(&GraphicsDebugModule);
+	zeCore->SetApplicationModule(&GraphicsDebugModule);
 
 	ZEPhysicsDebugModule PhysicsDebugModule;
 	//zeCore->SetDebugComponent(&PhysicsDebugModule);
@@ -167,10 +99,6 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();
-	zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_GRAPHICS));
-	zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_SOUND));
-	zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_INPUT));
-	zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_PHYSICS));
 	ZEConsoleWindow ConsoleWindow;
 	zeCore->GetConsole()->SetConsoleInterface(&ConsoleWindow);
 	zeCore->GetWindow()->SetWindowType(zeCore->GetOptions()->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean() ? ZE_WT_FULLSCREEN : ZE_WT_RESIZABLE);
@@ -179,8 +107,3 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
  	if (zeCore->StartUp())
 		zeCore->Run();
 }
-
-
-
-
-

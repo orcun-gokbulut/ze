@@ -55,7 +55,9 @@ include_directories (
 	${PROJECT_SOURCE_DIR}/../Include/Curl
 	${PROJECT_SOURCE_DIR}/../ZEFoundation
 	${PROJECT_BINARY_DIR}/ZEDSceneEditor
+	${PROJECT_BINARY_DIR}/ZEDMaterialEditor
 	${PROJECT_BINARY_DIR}/ZEDBrowser
+	${PROJECT_BINARY_DIR}/ZEDSoundExtensionsPlugIn
 	${QT_INCLUDE_DIR}
 	${QT_INCLUDE_DIR}/QtGui
 	${QT_INCLUDE_DIR}/QtCore)
@@ -74,8 +76,11 @@ add_subdirectory (ZEDCommonControls)
 add_subdirectory (ZEDCommonEntities)
 add_subdirectory (ZEDCore)
 add_subdirectory (ZEDSceneEditor)
+add_subdirectory (ZEDMaterialEditor)
 add_subdirectory (ZEDScriptEditor)
 add_subdirectory (ZEDUndoRedo)
+add_subdirectory (ZEDSoundExtensionsPlugIn)
+add_subdirectory (ZEDImageExtensionsPlugIn)
 
 add_source (ZEDMain.cpp		Sources)
 
@@ -84,9 +89,9 @@ add_executable (ZEditor WIN32 ${Sources})
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(TARGET ZEditor PROPERTY FOLDER "ZEditor")
 
-target_link_libraries (ZEditor ZECore ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZESDK)
-target_link_libraries (ZEditor ZEDirect3D9 ZEDirectInput ZEDirectSound ZEOpenAL ZEPhysX ZEDummyInput ZEVirtualInput ZEPortalMap)
-target_link_libraries (ZEditor ZEDCommonControls ZEDCommonEntities ZEDCore ZEDPropertyWindowManager ZEDSceneEditor ZEDScriptEditor ZEDUndoRedo ZEDBrowser)
+target_link_libraries (ZEditor ZECore ZEFoundation ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZESDK)
+target_link_libraries (ZEditor ZEDirect3D9 ZEDirectSound ZEOpenAL ZEPhysX ZEPortalMap)
+target_link_libraries (ZEditor ZEDCommonControls ZEDCommonEntities ZEDCore ZEDPropertyWindowManager ZEDSceneEditor ZEDMaterialEditor ZEDScriptEditor ZEDUndoRedo ZEDBrowser ZEDSoundExtensionsPlugIn ZEDImageExtensionsPlugIn)
 target_link_libraries (ZEditor QtCore4.lib QtGui4.lib)
 
 install (TARGETS ZEditor RUNTIME DESTINATION bin COMPONENT "Runtime")

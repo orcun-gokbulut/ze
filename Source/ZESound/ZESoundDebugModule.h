@@ -37,14 +37,14 @@
 #ifndef __ZE_SOUND_DEBUG_MODULE_H__
 #define __ZE_SOUND_DEBUG_MODULE_H__
 
-#include "ZECore\ZEDebugModule.h"
+#include "ZECore\ZEApplicationModule.h"
 #include "ZEGame/ZEGrid.h"
 
 class ZEPlayer;
 class ZESoundSource;
 class ZESoundSource3D;
 
-class ZESoundDebugModule : public ZEDebugModule
+class ZESoundDebugModule : public ZEApplicationModule
 {
 	private:
 

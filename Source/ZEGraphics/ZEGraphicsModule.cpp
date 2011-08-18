@@ -35,6 +35,7 @@
 
 #pragma once
 #include "ZEGraphicsModule.h"
+#include "ZEGraphicsModuleDescription.h"
 #include "ZECore\ZEOptionManager.h"
 #include "ZECore\ZEOption.h"
 #include "ZECore\ZECore.h"
@@ -45,6 +46,17 @@
 #include "ZETexture2DResource.h"
 
 ZEOptionSection ZEGraphicsModule::GraphicsOptions;
+
+ZEModuleDescription* ZEGraphicsModule::ModuleDescription()
+{
+	static ZEGraphicsModuleDescription Desc;
+	return &Desc;
+}
+
+ZEModuleDescription* ZEGraphicsModule::GetModuleDescription()
+{
+	return ZEGraphicsModule::GetModuleDescription();
+}
 
 ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 {
@@ -112,9 +124,8 @@ void ZEGraphicsModule::BaseInitialize()
 	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ShadowQuality", 1, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("LightQuantity", 1, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("NearZ", 1.0f, ZE_OA_INTERNAL));
-	GraphicsOptions.AddOption(new ZEOption("FarZ", 160000.0f, ZE_OA_INTERNAL));
-
+	GraphicsOptions.AddOption(new ZEOption("NearZ", 0.1f, ZE_OA_INTERNAL));
+	GraphicsOptions.AddOption(new ZEOption("FarZ", 1000000.0f, ZE_OA_INTERNAL));
 	ZEOptionManager::GetInstance()->RegisterSection(&GraphicsOptions);
 }
 

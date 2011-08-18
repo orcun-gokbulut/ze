@@ -39,7 +39,9 @@
 #include <windows.h>
 
 #include <QtGui/QApplication>
-#include "ZEDSceneEditor\ZEDSceneEditor.h"
+#include "ZEDSceneEditor/ZEDSceneEditor.h"
+#include "ZEDMaterialEditor/ZEDMaterialEditor.h"
+#include "ZEDBrowser/ZEDBrowser.h"
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -47,7 +49,10 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int n
 	char** argv = NULL;
 
 	QApplication a(argc, argv);
-	MapEditor w;
+//	MapEditor w;
+//	ZEDMaterialEditor w;
+	ZEDBrowser w;
+
 	w.show();
 	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
 	return a.exec();

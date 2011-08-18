@@ -36,9 +36,9 @@
 #include "ZEALModuleDescription.h"
 #include "ZEALModule.h"
 
-ZEModuleType ZEALModuleDescription::GetType()
+ZEModuleDescription* ZEALModuleDescription::GetBaseModuleDescription()
 {
-	return ZE_MT_SOUND;
+	return ZESoundModule::ModuleDescription();
 }
 
 ZEModuleAttribute ZEALModuleDescription::GetAttributes()
@@ -85,6 +85,3 @@ bool ZEALModuleDescription::CheckCompatible()
 {
 	return true;
 }
-
-
-

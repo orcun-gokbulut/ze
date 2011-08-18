@@ -39,33 +39,32 @@
 
 #include "ZEDS\ZEArray.h"
 #include "ZEOptionSection.h"
-#include "ZEModule.h"
 
+class ZEModule;
+class ZEModuleDescription;
 class ZEModuleManager
 {
 	private:
-		ZEArray<ZEModuleDescription*>	ModuleList;
-		bool							CheckModule(ZEModuleDescription* ModuleDesc);
+		ZEArray<ZEModuleDescription*>			ModuleList;
+		bool									CheckModule(ZEModuleDescription* ModuleDesc);
 
 	public:
-		static ZEOptionSection			ModuleManagerOptions;
+		static ZEOptionSection					ModuleManagerOptions;
 
-		size_t							GetModuleCount();
-		ZEModuleDescription*			GetModuleDescription(size_t Index);
-		ZEModuleDescription*			GetModuleDescription(const char* Name);
-		ZEModuleDescription*			GetModuleDescription(ZEModuleType ModuleType);
+		const ZEArray<ZEModuleDescription*>&	GetModuleDescriptions();
+		ZEModuleDescription*					GetModuleDescription(size_t Index);
+		ZEModuleDescription*					GetModuleDescription(const char* Name);
+		ZEModuleDescription*					GetModuleDescription(ZEModuleDescription* BaseModuleDescription);
 
-		ZEModule*						CreateModule(size_t Index);
-		ZEModule*						CreateModule(const char* Name);
-		ZEModule*						CreateModule(ZEModuleType ModuleType);
+		ZEModule*								CreateModuleInstance(size_t Index);
+		ZEModule*								CreateModuleInstance(const char* Name);
+		ZEModule*								CreateModuleInstance(ZEModuleDescription* BaseModuleDescription);
 
-		bool							LoadInternalModule(ZEModuleDescription* ModuleDesc);		
-		bool							LoadExternalModule(const char* FileName);
-		void							SeekAndLoadExternalModules(const char* Directory);
-		void							UnloadModule(ZEModuleDescription* ModuleDesc);
-										
-										ZEModuleManager();
-										~ZEModuleManager();
+		bool									RegisterModule(ZEModuleDescription* ModuleDesc);
+		void									UnregisterModule(ZEModuleDescription* ModuleDesc);
+									
+												ZEModuleManager();
+												~ZEModuleManager();
 };
 #endif
 

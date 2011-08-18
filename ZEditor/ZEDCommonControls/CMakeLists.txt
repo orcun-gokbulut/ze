@@ -48,6 +48,9 @@ add_source (ZEDLoadingScreen.cpp		Sources)
 add_source (ZEDViewPort.h				Sources QtMocs)
 add_source (ZEDViewPort.cpp				Sources)
 
+add_source (ZEDImageViewer.h			Sources)
+add_source (ZEDImageViewer.cpp			Sources)
+
 include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
 qt4_add_resources (QtResourceFiles ${QtResources})
@@ -55,5 +58,6 @@ qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
 add_library (ZEDCommonControls ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
+target_link_libraries (ZEDCommonControls freeimage.lib)
 
 set_property(TARGET ZEDCommonControls PROPERTY FOLDER "ZEditor")

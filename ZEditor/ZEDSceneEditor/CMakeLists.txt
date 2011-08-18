@@ -39,8 +39,6 @@ include(${QT_USE_FILE})
 
 add_source (ZEDEntitySelectionItem.cpp			Sources)
 add_source (ZEDEntitySelectionItem.h			Sources)
-add_source (ZEDEntitySelectionItemPlugIn.cpp	Sources)
-add_source (ZEDEntitySelectionItemPlugIn.h		Sources)
 add_source (ZEDEntitySelector.cpp				Sources)
 add_source (ZEDEntitySelector.h					Sources QtMocs)
 add_source (ZEDSceneEditor.cpp					Sources)

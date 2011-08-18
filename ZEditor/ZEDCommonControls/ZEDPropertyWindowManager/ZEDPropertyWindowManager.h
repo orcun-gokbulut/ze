@@ -89,6 +89,7 @@ class ZEDPropertyWindowManager : public QTreeWidget
 	protected:
 
 		void									drawRow(QPainter* Painter, const QStyleOptionViewItem &Option, const QModelIndex &Index) const;
+		void									UpdateCustomPropertyWidgets();
 
 	public:
 

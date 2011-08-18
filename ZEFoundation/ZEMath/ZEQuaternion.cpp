@@ -63,7 +63,7 @@ void ZEQuaternion::Create(ZEQuaternion& Output, float Angle, const ZEVector3& Ax
 	
 }
 
-void ZEQuaternion::CreateFromEuler(ZEQuaternion& Output, float Pitch, float Yawn, float Roll)
+void ZEQuaternion::CreateFromEuler(ZEQuaternion& Output, float Yawn, float Pitch, float Roll)
 {
    float SinPitch		= sinf(Pitch * 0.5f);
    float CosPitch		= cosf(Pitch * 0.5f);
@@ -177,7 +177,7 @@ void ZEQuaternion::VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaterni
 	Output.z = Vect.z;
 }
 
-void ZEQuaternion::ConvertToEulerAngles(float &Yaw, float &Pitch, float &Roll, const ZEQuaternion& Quaternion)
+void ZEQuaternion::ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, const ZEQuaternion& Quaternion)
 {
 	float test = Quaternion.x * Quaternion.y + Quaternion.z * Quaternion.w;
 	if (test > 0.499) 

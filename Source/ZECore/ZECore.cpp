@@ -37,6 +37,7 @@
 #include "ZECore.h"
 #include "ZEError.h"
 #include "ZEModule.h"
+#include "ZEModuleDescription.h"
 #include "ZEModuleManager.h"
 #include "ZEConsole.h"
 #include "ZEConsoleWindow.h"
@@ -47,9 +48,12 @@
 #include "ZEPhysics\ZEPhysicsModule.h"
 #include "ZESound\ZESoundModule.h"
 #include "ZEGame\ZEGame.h"
-#include "ZEDebugModule.h"
+#include "ZEApplicationModule.h"
 #include "ZEOptionManager.h"
 #include "ZECommandManager.h"
+#include "ZEPluginManager.h"
+#include "ZEExtensionManager.h"
+#include "ZESystemMessageManager.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
@@ -96,12 +100,28 @@ ZEModuleManager* ZECore::GetModuleManager()
 {
 	return ModuleManager;
 }
+
+ZEExtensionManager* ZECore::GetExtensionManager()
+{
+	return ExtensionManager;
+}
+
+ZEPluginManager* ZECore::GetPluginManager()
+{
+	return PluginManager;
+}
+
+ZESystemMessageManager* ZECore::GetSystemMessageManager()
+{
+	return SystemMessageManager;
+}
+
 		
 bool ZECore::SetGraphicsModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetModuleDescription()->GetType() != ZE_MT_GRAPHICS)
+		if (Module->GetModuleDescription()->GetBaseModuleDescription() != ZEGraphicsModule::ModuleDescription())
 		{
 			zeError("Core", "Module type mismatch. This module is not a sound module. (Module Name : \"%s\")", Module->GetModuleDescription()->GetName());
 			return false;
@@ -123,7 +143,7 @@ bool ZECore::SetSoundModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetModuleDescription()->GetType() != ZE_MT_SOUND)
+		if (Module->GetModuleDescription()->GetBaseModuleDescription() != ZESoundModule::ModuleDescription())
 		{
 			zeError("Core", "Module type mismatch. This module is not a sound module. (Module Name : \"%s\")", Module->GetModuleDescription()->GetName());
 			return false;
@@ -145,7 +165,7 @@ bool ZECore::SetInputModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetModuleDescription()->GetType() != ZE_MT_INPUT)
+		if (Module->GetModuleDescription()->GetBaseModuleDescription() != ZEInputModule::ModuleDescription())
 		{
 			zeError("Core", "Module type mismatch. This module is not a sound module. (Module Name : \"%s\")", Module->GetModuleDescription()->GetName());
 			return false;
@@ -168,7 +188,7 @@ bool ZECore::SetPhysicsModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetModuleDescription()->GetType() != ZE_MT_PHYSICS)
+		if (Module->GetModuleDescription()->GetBaseModuleDescription() != ZEPhysicsModule::ModuleDescription())
 		{
 			zeError("Core", "Module type mismatch. This module is not a sound module. (Module Name : \"%s\")", Module->GetModuleDescription()->GetName());
 			return false;
@@ -219,14 +239,14 @@ ZEGame* ZECore::GetGame()
 	return Game;
 }
 
-void ZECore::SetDebugComponent(ZEDebugModule* Component)
+void ZECore::SetApplicationModule(ZEApplicationModule* Component)
 {
-	DebugComponent = Component;
+	Application = Component;
 }
 
-ZEDebugModule* ZECore::GetDebugComponent()
+ZEApplicationModule* ZECore::GetApplicationModule()
 {
-	return DebugComponent;
+	return Application;
 }
 
 size_t ZECore::GetFrameId()
@@ -381,6 +401,20 @@ void ZECore::DeInitializeModule(ZEModule** Module)
 
 bool ZECore::InitializeModules()
 {
+	zeLog("Core", "Initializing modules.");
+
+	if (Graphics == NULL)
+		zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEGraphicsModule::ModuleDescription()));
+	
+	if (Sound == NULL)
+		zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModuleInstance(ZESoundModule::ModuleDescription()));
+
+	if (Input == NULL)
+		zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEInputModule::ModuleDescription()));
+
+	if (Physics == NULL)
+		zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEPhysicsModule::ModuleDescription()));
+
 	// Graphics module !
 	zeLog("Core", "Initializing graphics module.");	
 	if (!InitializeModule(Graphics))
@@ -414,6 +448,9 @@ bool ZECore::InitializeModules()
 	}
 
 	QueryPerformanceFrequency(&PerformanceCounterFreq);
+
+	zeLog("Core", "Modules initialized.");
+
 	return true;
 }
 
@@ -480,8 +517,8 @@ bool ZECore::StartUp(void* WindowHandle)
 	QueryPerformanceFrequency(&PerformanceCounterFreq);
 	zeLog("Core", "Core initialized.");
 
-	if (DebugComponent != NULL)
-		DebugComponent->StartUp();
+	if (Application != NULL)
+		Application->StartUp();
 
 	return true;
 }
@@ -491,8 +528,8 @@ void ZECore::ShutDown()
 	zeLog("Core", "Deinitializing Core.");
 	SetCoreState(ZE_CS_SHUTDOWN);
 
-	if (DebugComponent != NULL)
-		DebugComponent->ShutDown();
+	if (Application != NULL)
+		Application->ShutDown();
 
 	// Destroy game
 	zeLog("Core", "Deinitializing Running Games.");
@@ -546,8 +583,8 @@ void ZECore::ShutDown()
 #include "ZEPhysics\ZEPhysicalWorld.h"
 void ZECore::MainLoop()
 {
-	if (DebugComponent != NULL)
-		DebugComponent->PreProcess();
+	if (Application != NULL)
+		Application->PreProcess();
 
 	FrameId++;
 
@@ -568,12 +605,14 @@ void ZECore::MainLoop()
 
 	// Game Logic
 	Input->ProcessInputs();
-	Window->ProcessMessages();
+
+	SystemMessageManager->ProcessMessages();
+
 	if (Game != NULL)
 		Game->Tick(FrameTime);
 	
-	if (DebugComponent != NULL)
-		DebugComponent->Process(FrameTime);
+	if (Application != NULL)
+		Application->Process(FrameTime);
 	Game->GetScene()->GetPhysicalWorld()->Draw(Game->GetScene()->GetRenderer());
 
 	// Engine Logic
@@ -585,22 +624,22 @@ void ZECore::MainLoop()
 	Graphics->UpdateScreen();
 	Physics->UpdateWorlds();
 
-	if (DebugComponent != NULL)
-		DebugComponent->PostProcess();
+	if (Application != NULL)
+		Application->PostProcess();
 }
 
 void ZECore::Run()
 {
 	SetCoreState(ZE_CS_RUNNING);
 	
-	if (DebugComponent != NULL)
-		DebugComponent->Initialize();
+	if (Application != NULL)
+		Application->Initialize();
 
 	while(CoreState != ZE_CS_TERMINATE && CoreState != ZE_CS_SHUTDOWN)
 		MainLoop();
 
-	if (DebugComponent != NULL)
-		DebugComponent->Deinitialize();
+	if (Application != NULL)
+		Application->Deinitialize();
 
 	ShutDown();
 }
@@ -617,15 +656,19 @@ ZECore::ZECore()
 	PerformanceCount.QuadPart = 0;
 	OldPerformanceCount.QuadPart = 0;
 
-	DebugComponent	= NULL;
-	Console			= new ZEConsole();
-	Commands		= new ZECommandManager();
-	Options			= new ZEOptionManager();
-	Error			= new ZEError();
-	Resources		= new ZEResourceManager();
-	ModuleManager	= new ZEModuleManager();
-	Window			= new ZEWindow();
-	Game			= new ZEGame();
+	Application	= NULL;
+	SystemMessageManager	= new ZESystemMessageManager();
+	Console					= new ZEConsole();
+	Commands				= new ZECommandManager();
+	Options					= new ZEOptionManager();
+	Error					= new ZEError();
+	Resources				= new ZEResourceManager();
+	ModuleManager			= new ZEModuleManager();
+	ExtensionManager		= new ZEExtensionManager();
+	PluginManager			= new ZEPluginManager();
+	Window					= new ZEWindow();
+	Game					= new ZEGame();
+
 
 	ZEGraphicsModule::BaseInitialize();
 	ZESoundModule::BaseInitialize();
@@ -642,12 +685,15 @@ ZECore::~ZECore()
 
 	delete Game;
 	delete Window;
+	delete PluginManager;
+	delete ExtensionManager;
 	delete ModuleManager;
 	delete Resources;
 	delete Error;
 	delete Options;
 	delete Commands;
 	delete Console;
+	delete SystemMessageManager;
 }
 
 

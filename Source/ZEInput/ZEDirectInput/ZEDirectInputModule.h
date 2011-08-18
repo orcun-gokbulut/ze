@@ -51,8 +51,9 @@ class ZEDirectInputModule : public ZEInputModule
 
 	public:
 		virtual ZEModuleDescription*		GetModuleDescription();
+		static ZEModuleDescription*			ModuleDescription();
 
-		virtual bool						IsEnabled();
+		virtual bool						GetEnabled();
 		virtual void						SetEnabled(bool Enabled);
 
 		virtual bool						Initialize();
