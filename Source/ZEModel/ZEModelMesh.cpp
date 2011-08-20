@@ -284,6 +284,9 @@ void ZEModelMesh::OnTransformChanged()
 
 void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 {
+	if (!Visible)
+		return;
+
 	ZEVector3 WorldPosition;
 	ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), ZEVector3::Zero);
 	float DistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->Camera->GetWorldPosition(), WorldPosition);
