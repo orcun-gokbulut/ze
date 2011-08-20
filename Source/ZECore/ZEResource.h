@@ -44,10 +44,10 @@ class ZEResource
 {
 	friend class ZEResourceManager;
 	private:
-		char					FileName[ZE_MAX_FILE_NAME_SIZE];
+		ZEString				FileName;
 
 	protected:
-		void					SetFileName(const char* Value);
+		void					SetFileName(const ZEString Value);
 		bool					Cached;
 		bool					Shared;
 		bool					Internal;
@@ -63,7 +63,7 @@ class ZEResource
 		bool					IsCached() const;
 		bool					IsInternal() const;
 
-		const char*				GetFileName() const;
+		const ZEString&			GetFileName() const;
 
 		void					AddReferance() const;
 

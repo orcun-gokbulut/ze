@@ -99,7 +99,7 @@ class ZEPortalMapResource : public ZEMapResource
 		ZEArray<ZEPortalMapResourceDoor>			Doors;
 		ZEArray<ZEPortalMapResourcePortal>			Portals;
 
-		const ZETexture2D*							ManageMapMaterialTextures(char* FileName);
+		const ZETexture2D*							ManageMapMaterialTextures(const ZEString FileName);
 		bool  										ReadMaterialsFromFile(ZEResourceFile* ResourceFile);
 		bool  										ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourcePortal* Portal);
 		bool  										ReadPortalsFromFile(ZEResourceFile* ResourceFile);

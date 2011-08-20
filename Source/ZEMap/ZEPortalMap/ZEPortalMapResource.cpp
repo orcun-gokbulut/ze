@@ -49,27 +49,27 @@
 // Reading
 #define ZE_SHADER_SKINTRANSFORM				1
 #define ZE_SHADER_BASE_MAP					2
-#define ZE_SHADER_NORMAL_MAP					4
+#define ZE_SHADER_NORMAL_MAP				4
 #define ZE_SHADER_SPECULAR_MAP				8
 #define ZE_SHADER_EMMISIVE_MAP				16
 #define ZE_SHADER_OPACITY_MAP				32
 #define ZE_SHADER_DETAIL_BASE_MAP			64
 #define ZE_SHADER_DETAIL_NORMAL_MAP			128
-#define ZE_SHADER_REFLECTION					256
-#define ZE_SHADER_REFRACTION					512
+#define ZE_SHADER_REFLECTION				256
+#define ZE_SHADER_REFRACTION				512
 #define ZE_SHADER_LIGHT_MAP					1024
-#define ZE_SHADER_DISTORTION_MAP				2048
+#define ZE_SHADER_DISTORTION_MAP			2048
 
-const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(char* FileName)
+const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(const ZEString FileName)
 {
-	if (strncmp(FileName, "", ZE_MAP_MAX_FILENAME_SIZE) == 0)
+	if (FileName == "")
 		return NULL;
 
 	for (size_t I = 0; I < TextureResources.GetCount(); I++)
-		if (strnicmp(TextureResources[I]->GetFileName(), FileName, ZE_MAP_MAX_FILENAME_SIZE) == 0)
+		if (TextureResources[I]->GetFileName() == FileName)
 			return TextureResources[I]->GetTexture();
 
-	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(FileName);
+	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(ZEFile::GetParentDirectory(this->GetFileName()) + "\\" + FileName);
 	if (NewTextureResource == NULL)
 	{
 		zeError("Map Resource", "Can not load texture file. (FileName : \"%s\")", FileName);

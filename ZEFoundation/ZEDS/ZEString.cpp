@@ -630,6 +630,7 @@ ZEString& ZEString::operator+=(const char* String)
 
 const char& ZEString::operator[](int Index) const
 {
+	zefAssert(Buffer == NULL, "Empty string can not be indexed.");
 	zefAssert(Index < 0, "Index parameter is negative.");
 	zefAssert(Index > strlen(Buffer), "Index parameter value exceed length of the string.");
 	return Buffer[Index];
@@ -637,6 +638,7 @@ const char& ZEString::operator[](int Index) const
 
 char& ZEString::operator[](int Index)
 {
+	zefAssert(Buffer == NULL, "Empty string can not be indexed.");
 	zefAssert(Index < 0, "Index parameter is negative.");
 	zefAssert(Index > strlen(Buffer), "Index parameter value exceed length of the string.");
 	return Buffer[Index];

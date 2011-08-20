@@ -42,14 +42,14 @@
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
 
-const char* ZEResource::GetFileName() const
+const ZEString& ZEResource::GetFileName() const
 {
 	return this->FileName;
 }
 
-void ZEResource::SetFileName(const char* Value)
+void ZEResource::SetFileName(const ZEString FileName)
 {
-	strcpy_s(FileName, ZE_MAX_FILE_NAME_SIZE, Value);
+	this->FileName = FileName;
 }
 
 void ZEResource::AddReferance() const
@@ -99,7 +99,6 @@ void ZEResource::Release()
 
 ZEResource::ZEResource()
 {
-	this->FileName[0] = L'\0';
 	this->Cached = false;
 	this->Shared = false;
 	this->Internal = false;
