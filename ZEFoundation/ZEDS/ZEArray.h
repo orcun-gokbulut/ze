@@ -419,13 +419,6 @@ class ZEArray
 			return Items[Index];
 		}
 
-		
-		inline const Type& operator[](size_t Index) const
-		{
-			zefAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
-			return Items[Index];
-		}
-
 		inline Type& GetItem(size_t Index)
 		{
 			zefAssert(Index < 0 || Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
@@ -443,6 +436,12 @@ class ZEArray
 		}
 
 		inline Type& operator[](size_t Index)
+		{
+			zefAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
+			return Items[Index];
+		}
+		
+		inline const Type& operator[](size_t Index) const
 		{
 			zefAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];

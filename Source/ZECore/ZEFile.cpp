@@ -62,7 +62,7 @@ ZEFile::~ZEFile()
 	Close();
 }
 
-const char* ZEFile::GetFileName() const
+const ZEString& ZEFile::GetFileName() const
 {
 	return FileName;
 }
@@ -143,11 +143,11 @@ bool ZEFile::IsOpen()
 	return false;
 }
 
-bool ZEFile::Open(const char* FileName, ZEFileMode Mode, bool Binary)
+bool ZEFile::Open(const ZEString FileName, ZEFileMode Mode, bool Binary)
 {
 	zeAssert(File, "Close the previous file first");
 
-	strncpy(this->FileName, FileName, ZE_MAX_FILE_NAME_SIZE);
+	this->FileName = FileName;
 
 	const char* StrMode = NULL;
 	const char*	AltStrMode = NULL;
@@ -232,13 +232,13 @@ bool ZEFile::Open(const char* FileName, ZEFileMode Mode, bool Binary)
 			}
 			else
 			{
-				zeError("ZEFile", "Could not open file \"%s\".", FileName);
+				zeError("ZEFile", "Could not open file \"%s\".", (const char*)FileName);
 				return false;
 			}
 		}
 		else
 		{
-			zeError("ZEFile", "Could not open file \"%s\".", FileName);
+			zeError("ZEFile", "Could not open file \"%s\".", (const char*)FileName);
 			return false;
 		}
 	}
@@ -331,15 +331,15 @@ size_t ZEFile::GetFileSize()
 	return EndCursor;
 }
 
-bool ZEFile::ReadFile(const char* FileName, void* Buffer, size_t BufferSize)
+bool ZEFile::ReadFile(const ZEString FileName, void* Buffer, size_t BufferSize)
 {
 	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
-	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", FileName);
+	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", (const char*)FileName);
 
 	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
 	{
-		zeError("ZEFile", "Could not open file in binary read mode \"%s\".", FileName);
+		zeError("ZEFile", "Could not open file in binary read mode \"%s\".", (const char*)FileName);
 		return false;
 	}
 
@@ -356,16 +356,16 @@ bool ZEFile::ReadFile(const char* FileName, void* Buffer, size_t BufferSize)
 	return true;
 }
 
-bool ZEFile::ReadTextFile(const char* FileName, char* Buffer, size_t BufferSize)
+bool ZEFile::ReadTextFile(const ZEString FileName, char* Buffer, size_t BufferSize)
 {
 	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
 
-	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", FileName);
+	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", (const char*)FileName);
 
 	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
 	{
-		zeError("ZEFile", "Could not open file in binary read mode \"%s\".", FileName);
+		zeError("ZEFile", "Could not open file in binary read mode \"%s\".", (const char*)FileName);
 		return false;
 	}
 
@@ -385,6 +385,88 @@ bool ZEFile::ReadTextFile(const char* FileName, char* Buffer, size_t BufferSize)
 	return true;
 }
 
+#define WINDOWS_LEAN_AND_MEAN
+#include <Windows.h>
+
+ZEString ZEFile::GetAbsolutePath(const ZEString Path)
+{
+	return "";
+}
+
+bool ZEFile::IsDirectoryExists(const ZEString Path)
+{
+	WIN32_FIND_DATA Info;
+	HANDLE Handle = FindFirstFile(Path, &Info);
+
+	BOOL Result = Handle != INVALID_HANDLE_VALUE;
+	while(Result)
+	{
+		if (Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY != 0)
+			return true;
+		
+		Result = FindNextFile(Handle, &Info);
+	}
+
+	FindClose(Handle);
+
+	return false;
+}
+
+ZEString ZEFile::GetParentDirectory(const ZEString Path)
+{
+	size_t Length = Path.GetLength();
+	
+	if (Length == 0)
+		return "";
+
+	for (int I = Length - 1; I >= 0; I--)
+	{
+		if (Path[I] == '\\')
+			return Path.Left(I);
+	}
+	
+	return "";
+}
+
+bool ZEFile::IsFileExists(const ZEString Path)
+{
+	WIN32_FIND_DATA Info;
+	HANDLE Handle = FindFirstFile(Path, &Info);
+
+	BOOL Result = Handle != INVALID_HANDLE_VALUE;
+	while(Result)
+	{
+		if (Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY == 0)
+			return true;
+
+		Result = FindNextFile(Handle, &Info);
+	}
+
+	FindClose(Handle);
+
+	return false;
+}
+
+ZEString ZEFile::GetFileName(const ZEString Path)
+{
+	size_t Length = Path.GetLength();
+
+	if (Length == 0)
+		return "";
+
+	for (int I = Length - 1; I >= 0; I--)
+	{
+		if (Path[I] == '\\')
+			return Path.Right(Length - 1 - I);
+	}
+
+	return Path;
+}
+
+ZEString ZEFile::GetFileExtension(const ZEString Path)
+{
+	return "";
+}
 
 /////////////////////////////////////////////////////////////////////////
 //////////////////		ZEPartialFile		/////////////////////////////
@@ -401,7 +483,7 @@ ZEPartialFile::~ZEPartialFile()
 }
 
 // Should not be used
-bool ZEPartialFile::Open(const char* FileName, ZEFileMode Mode, bool Binary)
+bool ZEPartialFile::Open(const ZEString FileName, ZEFileMode Mode, bool Binary)
 {
 	return false;
 }
@@ -416,7 +498,7 @@ bool ZEPartialFile::Open(ZEFile* ParentFile, size_t Offset, size_t Size)
 	EndPosition		= Offset + Size;
 	this->File		= ParentFile->GetFileHandle();
 
-	strncpy(this->FileName, ParentFile->GetFileName(), ZE_MAX_FILE_NAME_SIZE);
+	this->FileName = ParentFile->GetFileName();
 	
 	fseek((FILE*)this->File, StartPosition, SEEK_SET);
 	return true;

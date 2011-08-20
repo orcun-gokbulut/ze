@@ -628,11 +628,20 @@ ZEString& ZEString::operator+=(const char* String)
 	return *this;
 }
 
-char& ZEString::operator[](size_t Index)
+const char& ZEString::operator[](int Index) const
 {
+	zefAssert(Index < 0, "Index parameter is negative.");
 	zefAssert(Index > strlen(Buffer), "Index parameter value exceed length of the string.");
 	return Buffer[Index];
 }
+
+char& ZEString::operator[](int Index)
+{
+	zefAssert(Index < 0, "Index parameter is negative.");
+	zefAssert(Index > strlen(Buffer), "Index parameter value exceed length of the string.");
+	return Buffer[Index];
+}
+
 
 bool ZEString::operator!=(const ZEString& String) const
 {

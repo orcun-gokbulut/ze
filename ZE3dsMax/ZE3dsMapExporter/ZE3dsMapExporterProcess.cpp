@@ -92,11 +92,8 @@ bool GetProperty<const char*>(IExportEntity * Object, PropType Type, const char*
 	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
 	if (Prop != NULL && Prop->GetType() == Type)
 	{
-		TCHAR* Bla;
-
 		if (Prop->GetPropertyValue(Value))
 		{
-			Value = Bla;
 			return true;
 		}
 		else
@@ -433,48 +430,48 @@ bool ZE3dsMapExporter::ProcessMaterials()
 				case ID_AM: // Ambient
 					break;
 				case ID_DI: // Diffuse
-					if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
+					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
 						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Diffuse Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Diffuse Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
-					}
+					}*/
 					CurrentMaterial->ShaderComponents |= ZESHADER_DIFFUSEMAP;
-					strncpy(CurrentMaterial->DiffuseMap, RelativePath , ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(CurrentMaterial->DiffuseMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
 					break;
 				case ID_SP: // Specular
-					if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
+					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
 						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Specular Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Specular Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
-					}
+					}*/
 					CurrentMaterial->ShaderComponents |= ZESHADER_SPECULARMAP;
-					strncpy(CurrentMaterial->SpecularMap, RelativePath, ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(CurrentMaterial->SpecularMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
 					break;
 				case ID_SI:	// Emmisive
-					if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
+					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
 						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Emmisive Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Self Ilimunation Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
-					}
+					}*/
 					CurrentMaterial->ShaderComponents |= ZESHADER_EMMISIVEMAP;
-					strncpy(CurrentMaterial->EmmisiveMap, RelativePath, ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(CurrentMaterial->EmmisiveMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
 					break;
 				case ID_OP:	// Opacity 
-					if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
+					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
 						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Opacity Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Opacity Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
-					}
+					}*/
 					CurrentMaterial->ShaderComponents |= ZESHADER_OCAPASITYMAP;
-					strncpy(CurrentMaterial->OpasityMap, RelativePath, ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(CurrentMaterial->OpasityMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
 					break;
 				case ID_FI:	// Filter color 
 					/*
@@ -491,40 +488,37 @@ bool ZE3dsMapExporter::ProcessMaterials()
 					*/
 					break;
 				case ID_BU: // Bump 
-					if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
+					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
 						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Bump Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Bump Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
-					}
+					}*/
 					CurrentMaterial->ShaderComponents |= ZESHADER_NORMALMAP;
-					GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath);
-					strncpy(CurrentMaterial->NormalMap, RelativePath, ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(CurrentMaterial->NormalMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
 					break;
 				case ID_RL: // Reflection 
-					if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
+					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
 						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Reflection Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Reflection Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
-					}
+					}*/
 					CurrentMaterial->ShaderComponents |= ZESHADER_REFLECTION;
-					GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath);
-					strncpy(CurrentMaterial->ReflectionMap, RelativePath, ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(CurrentMaterial->ReflectionMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
 					break; 
 				case ID_RR: // Refraction 
-					if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
+					/*if (!GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath))
 					{
 						zepdError("Material texture's relative path does not matches with Zinek Engine Resource directory. Please check your Zinek Engine resource directory. disabling Refraction Map.\r\n"
 						"\tMaterial Name : \"%s\", Texture Slot : Refraction Map, File path : \"%s\" (Path is not in Zinek Engine resource directory)",
 						NodeMaterial->GetMaterialName(), CurrentTexture->GetBitmapFileName());
 						continue;
-					}
+					}*/
 					CurrentMaterial->ShaderComponents |= ZESHADER_REFRACTION;
-					GetRelativePath(CurrentTexture->GetBitmapFileName(), RelativePath);
-					strncpy(CurrentMaterial->RefractionMap, RelativePath, ZE_MPFL_MAX_FILENAME_SIZE);
+					strncpy(CurrentMaterial->RefractionMap, CurrentTexture->GetBitmapFileName(), ZE_MPFL_MAX_FILENAME_SIZE);
 					break;
 			}
 

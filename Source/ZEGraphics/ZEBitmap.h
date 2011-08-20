@@ -67,6 +67,7 @@ struct ZEPixelColor
 	unsigned char b, g, r, a;
 
 	static ZEPixelColor	Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T);
+	static ZEVector4 LerpFloat(const ZEPixelColor& A, const ZEPixelColor& B, float T);
 
 	ZEPixelColor::ZEPixelColor();
 	ZEPixelColor(unsigned int Color);
@@ -101,10 +102,12 @@ class ZEBitmap
 
 		ZEPixelColor*			GetPixels();
 		ZEPixelColor&			GetPixel(unsigned int x, unsigned int y);
+		ZEVector4				GetPixelFloat(unsigned int x, unsigned int y);
 
 		ZEPixelColor&			SamplePixel(int x, int y, ZEBitmapSamplingOptions* Options = 0);
-		ZEPixelColor			SamplePixel(const ZEVector2& TextureCoordinate, ZEBitmapSamplingOptions* Options = 0);
-		
+		ZEVector4				SamplePixelFloat(int x, int y, ZEBitmapSamplingOptions* Options = 0);		
+		ZEVector4				SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitmapSamplingOptions* Options = 0);
+	
 		ZEPixelColor*			GetRow(unsigned int Index);
 
 		void					CopyFrom(void* SourceBuffer, unsigned int SourcePitch, 

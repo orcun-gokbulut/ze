@@ -108,7 +108,6 @@ size_t ZEGraphicsModule::GetCurrentFrameId()
 void ZEGraphicsModule::BaseInitialize()
 {
 	FreeImage_Initialise();
-	ZERealTimeTextureCompressor::Initialize("bu argumanlar onemli deil", "bu argumanlar onemli deil");
 	GraphicsOptions.SetName("Graphics");
 	GraphicsOptions.AddOption(new ZEOption("ScreenWidth", 640, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ScreenHeight", 480, ZE_OA_NORMAL));
@@ -132,7 +131,6 @@ void ZEGraphicsModule::BaseInitialize()
 void ZEGraphicsModule::BaseDeinitialize()
 {
 	FreeImage_DeInitialise();
-	ZERealTimeTextureCompressor::Deinitialize();
 	ZEOptionManager::GetInstance()->UnregisterSection(&GraphicsOptions);
 }
 

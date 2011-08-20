@@ -179,8 +179,8 @@ class ZEString
 		ZEString&					operator+=(const ZEString& String);
 		ZEString&					operator+=(const char* String);
 
-		char&						operator[](size_t Index);
-		char						operator[](size_t Index) const;
+		char&						operator[](int Index);
+		const char&					operator[](int Index) const;
 
 		bool						operator!=(const ZEString& String) const;
 		bool						operator!=(const char* String) const;

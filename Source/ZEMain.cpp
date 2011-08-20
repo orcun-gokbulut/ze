@@ -59,12 +59,36 @@ extern HINSTANCE ApplicationInstance;
 #include <string.h>
 
 #include "ZEGraphics/ZEBitmap.h"
+#define FREEIMAGE_LIB
 #include "FreeImage.h"
 
 extern HINSTANCE ApplicationInstance;
 
+#include "ZEDS\ZEString.h"
+#include "ZECore\ZEFile.h"
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
+/*	ZEString Result5 = ZEFile::GetParentDirectory("");
+	ZEString Result15 = ZEFile::GetParentDirectory("\\\\");
+	ZEString Result6 = ZEFile::GetParentDirectory("c:\\");
+	ZEString Result7 = ZEFile::GetParentDirectory("c:\\remedy");
+	ZEString Result1 = ZEFile::GetParentDirectory("c:\\remedy\\");
+	ZEString Result2 = ZEFile::GetParentDirectory("c:\\remedy\\Blabla");
+	ZEString Result3 = ZEFile::GetParentDirectory("c:\\remedy\\bla\\sadsa.sasda");
+	ZEString Result4 = ZEFile::GetParentDirectory("c:\\remedy\\bla\\sssa.sasf\\fds");
+	ZEString Result8 = ZEFile::GetParentDirectory("c:\\remedy\\bla\\sssa.sasf\\fds\\");
+
+	ZEString esult5 = ZEFile::GetFileName("");
+	ZEString esult55 = ZEFile::GetFileName("cupling.sadd");
+	ZEString esult15 = ZEFile::GetFileName("\\\\");
+	ZEString esult6 = ZEFile::GetFileName("c:\\");
+	ZEString esult7 = ZEFile::GetFileName("c:\\remedy");
+	ZEString esult1 = ZEFile::GetFileName("c:\\remedy\\");
+	ZEString esult2 = ZEFile::GetFileName("c:\\remedy\\Blabla");
+	ZEString esult3 = ZEFile::GetFileName("c:\\remedy\\bla\\sadsa.sasda");
+	ZEString esult4 = ZEFile::GetFileName("c:\\remedy\\bla\\sssa.sasf\\fds");
+	ZEString esult8 = ZEFile::GetFileName("c:\\remedy\\bla\\sssa.sasf\\fds\\");
+
 	FreeImage_Initialise();
 	ZEBitmap Test; 
 	Test.Load("BitmapTest.bmp");
@@ -74,6 +98,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	Options.AddressingY = ZE_BAM_MIRROR;
 	Options.BorderColor = ZEPixelColor(0xFFFFFFFF);
 
+	ZEVector4 T = Test.SamplePixelFloat(ZEVector2(2.5, 2.5), &Options);*/
 
 	_set_SSE2_enable(1);
 	ApplicationInstance = hInstance;

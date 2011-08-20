@@ -709,6 +709,8 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 				break;
 		}
 	}		
+	else
+		PixelFormat = ZE_TPF_RGBA_INT32;
 
 	TextureWidth = TextureInfo.TextureWidth / (unsigned int)sqrt((double)DownsampleMultiplier);
 	TextureHeight = TextureInfo.TextureHeight / (unsigned int)sqrt((double)DownsampleMultiplier);

@@ -899,9 +899,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 
 		HDRProcessor.SetInput(ABuffer);
 		HDRProcessor.SetOutput((ZED3D9ViewPort*)SSAAInputBuffer->GetViewPort());
-		HDRProcessor.Process(ElaspedTime);
-
-		
+		HDRProcessor.Process(ElaspedTime);	
 
 		Do2DPass();
 

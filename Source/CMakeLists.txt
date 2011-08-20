@@ -98,7 +98,7 @@ target_link_libraries(ZE ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhy
 add_library(ZESDK ${Sources})
 set_property(TARGET ZESDK PROPERTY FOLDER "Zinek Engine")
 target_link_libraries (ZESDK ZECore ZEDS ZESerialization ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
-target_link_libraries (ZESDK ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEFreespaceInput ZEPortalMap)
+target_link_libraries (ZESDK ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEFreespaceInput ZEPortalMap freeimage.lib)
 
 get_property(TargetPath TARGET ZE PROPERTY LOCATION)
 file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)

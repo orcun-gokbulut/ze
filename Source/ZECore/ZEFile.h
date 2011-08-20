@@ -37,6 +37,7 @@
 #ifndef	__ZE_FILE_H__
 #define __ZE_FILE_H__
 
+#include "ZEDS\ZEString.h"
 #include "ZESerialization/ZESerializer.h"
 #include "ZESerialization/ZEUnserializer.h"
 //#include "ZEDefinitions.h"
@@ -78,7 +79,7 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 	protected:
 
 		void*				File;
-		char				FileName[256];
+		ZEString			FileName;
 		size_t				FileCursor;
 
 	public:
@@ -86,10 +87,10 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 							ZEFile();
 		virtual				~ZEFile();
 
-		const char*			GetFileName() const;
+		const ZEString&		GetFileName() const;
 		void*				GetFileHandle() const;
 
-		virtual bool		Open(const char* FileName, ZEFileMode Mode = ZE_FM_READ_WRITE, bool Binary = true);
+		virtual bool		Open(const ZEString FileName, ZEFileMode Mode = ZE_FM_READ_WRITE, bool Binary = true);
 		virtual bool		Seek(int Offset, ZESeekFrom Origin);
 		virtual size_t		Tell();
 
@@ -108,9 +109,17 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 		virtual void		Flush();
 		virtual bool		IsOpen();
 		
-		static bool			ReadFile(const char* FileName, void* Buffer, size_t BufferSize);
-		static bool			ReadTextFile(const char* FileName, char* Buffer, size_t BufferSize);
+		static bool			ReadFile(const ZEString FileName, void* Buffer, size_t BufferSize);
+		static bool			ReadTextFile(const ZEString FileName, char* Buffer, size_t BufferSize);
 
+		static ZEString		GetAbsolutePath(const ZEString Path);
+
+		static bool			IsDirectoryExists(const ZEString Path);
+		static ZEString		GetParentDirectory(const ZEString Path);
+
+		static bool			IsFileExists(const ZEString Path);
+		static ZEString		GetFileName(const ZEString Path);
+		static ZEString		GetFileExtension(const ZEString Path);
 };
 
 
@@ -129,7 +138,7 @@ class ZEPartialFile : public ZEFile
 
 							
 		virtual bool		Open(ZEFile* ParentFile, size_t Offset, size_t Size);
-		virtual bool		Open(const char* FileName, ZEFileMode Mode, bool Binary);
+		virtual bool		Open(const ZEString FileName, ZEFileMode Mode, bool Binary);
 		virtual void		Close();
 
 		virtual size_t		Read(void* Buffer, size_t Size, size_t Count);

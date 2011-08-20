@@ -55,6 +55,7 @@ include(append_property)
 macro_ensure_out_of_source_build ("${PROJECT_NAME} requires an out of source build.")
 
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI" )
 
 append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
 	ZE_ZINEK

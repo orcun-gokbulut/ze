@@ -53,6 +53,18 @@ ZEPixelColor ZEPixelColor::Lerp(const ZEPixelColor& A, const ZEPixelColor& B, fl
 	return Temp;
 }
 
+ZEVector4 ZEPixelColor::LerpFloat(const ZEPixelColor& A, const ZEPixelColor& B, float T)
+{
+	ZEVector4 Temp;
+	Temp.w = (float)A.a * (1.0f - T) + (float)B.a * T;
+	Temp.x = (float)A.r * (1.0f - T) + (float)B.r * T;
+	Temp.y = (float)A.g * (1.0f - T) + (float)B.g * T;
+	Temp.z = (float)A.b * (1.0f - T) + (float)B.b * T;
+
+	return Temp;
+}
+
+
 ZEPixelColor::ZEPixelColor()
 {
 }
@@ -124,6 +136,19 @@ ZEPixelColor* ZEBitmap::GetPixels()
 ZEPixelColor& ZEBitmap::GetPixel(unsigned int x, unsigned int y)
 {
 	return *(ZEPixelColor*)((ZEBYTE*)Pixels + y * Pitch + x * 4);
+}
+
+ZEVector4 ZEBitmap::GetPixelFloat(unsigned int x, unsigned int y)
+{
+	ZEPixelColor& Color = GetPixel(x, y);
+	ZEVector4 FloatColor;
+
+	FloatColor.x = (float)Color.r / 255.0f;
+	FloatColor.y = (float)Color.g / 255.0f;
+	FloatColor.z = (float)Color.b / 255.0f;
+	FloatColor.w = (float)Color.a / 255.0f;
+
+	return FloatColor;
 }
 
 ZEPixelColor* ZEBitmap::GetRow(unsigned int Index)
@@ -237,7 +262,20 @@ ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserO
 	return GetPixel(x, y);
 }
 
-ZEPixelColor ZEBitmap::SamplePixel(const ZEVector2& TextureCoordinate, ZEBitmapSamplingOptions* UserOptions)
+ZEVector4 ZEBitmap::SamplePixelFloat(int x, int y, ZEBitmapSamplingOptions* UserOptions)
+{
+	ZEPixelColor Color = SamplePixel(x, y, UserOptions);
+	ZEVector4 FloatColor;
+
+	FloatColor.x = (float)Color.r / 255.0f;
+	FloatColor.y = (float)Color.g / 255.0f;
+	FloatColor.z = (float)Color.b / 255.0f;
+	FloatColor.w = (float)Color.a / 255.0f;
+
+	return FloatColor;
+}
+
+ZEVector4 ZEBitmap::SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitmapSamplingOptions* UserOptions)
 {
 	static ZEBitmapSamplingOptions DefaultOptions = {ZE_BFM_BILINEAR, ZE_BAM_WRAP, ZE_BAM_WRAP, ZEPixelColor(0, 0, 0 ,0)};
 
@@ -249,7 +287,7 @@ ZEPixelColor ZEBitmap::SamplePixel(const ZEVector2& TextureCoordinate, ZEBitmapS
 
 	if (Options->Filter == ZE_BFM_POINT)
 	{
-		return SamplePixel(floorf(TextureCoordinate.x), floorf(TextureCoordinate.y), Options);
+		return SamplePixelFloat(floorf(TextureCoordinate.x), floorf(TextureCoordinate.y), Options);
 	}
 	if (Options->Filter == ZE_BFM_BILINEAR)
 	{
@@ -259,15 +297,18 @@ ZEPixelColor ZEBitmap::SamplePixel(const ZEVector2& TextureCoordinate, ZEBitmapS
 		float RatioU = TextureCoordinate.x - x;
 		float RatioV = TextureCoordinate.y - y;
 
-		ZEPixelColor A = SamplePixel(x, y, Options);
-		ZEPixelColor B = SamplePixel(x + 1, y, Options);
-		ZEPixelColor C = SamplePixel(x, y + 1, Options);
-		ZEPixelColor D = SamplePixel(x + 1, y + 1, Options);
+		ZEVector4 A = SamplePixelFloat(x, y, Options);
+		ZEVector4 B = SamplePixelFloat(x + 1, y, Options);
+		ZEVector4 C = SamplePixelFloat(x, y + 1, Options);
+		ZEVector4 D = SamplePixelFloat(x + 1, y + 1, Options);
 
-		ZEPixelColor Row0 = ZEPixelColor::Lerp(A, B, RatioU);
-		ZEPixelColor Row1 = ZEPixelColor::Lerp(C, D, RatioU);
+		ZEVector4 Row0, Row1, Output;
+		ZEVector4::Lerp(Row0, A, B, RatioU);
+		ZEVector4::Lerp(Row1, C, D, RatioU);
 		
-		return ZEPixelColor::Lerp(Row0, Row1, RatioV);
+		ZEVector4::Lerp(Output, Row0, Row1, RatioV);
+
+		return Output;
 	}
 }
 

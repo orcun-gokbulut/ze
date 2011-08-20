@@ -107,7 +107,7 @@ void ZEPlayer::Tick(float Time)
 	zeInput->ProcessInputMap(&InputMap);
 
 	//float MetersPerSecond = 0.00150f;
-	float MetersPerSecond = 10.0f;
+	float MetersPerSecond = 1.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 	ZEComponent* HitComponent;
@@ -235,7 +235,7 @@ ZEPlayer::ZEPlayer()
 	FOV = ZE_PI_4;
 	Yawn = Pitch = Roll = 0;
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,				"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_RELEASED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,				"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_PRESSING)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,			"Move Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_PRESSING)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFERIGHT,			"Strafe Right",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_D, ZE_IBS_PRESSING)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_STRAFELEFT,			"Strafe Left",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_A, ZE_IBS_PRESSING)));
@@ -261,7 +261,7 @@ ZEPlayer::ZEPlayer()
 	Listener = ZEListener::CreateInstance();
 	RegisterComponent(Listener);
 
-	/*Light = ZEProjectiveLight::CreateInstance();
+	Light = ZEProjectiveLight::CreateInstance();
 	Light->SetProjectionTexture(ZETexture2DResource::LoadSharedResource("flashlight.jpg")->GetTexture());
 	Light->SetAttenuation(0.01f, 0.0f, 1.0f);
 	Light->SetIntensity(3.0f);
@@ -271,7 +271,7 @@ ZEPlayer::ZEPlayer()
 	Light->SetCastsShadow(false);
 	Light->SetPosition(ZEVector3(0.0f, -2.0f, 0.0f));
 	Light->SetVisible(true);
-	RegisterComponent(Light);*/
+	RegisterComponent(Light);
 }
 
 ZEPlayer::~ZEPlayer()
