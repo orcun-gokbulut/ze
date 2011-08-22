@@ -82,6 +82,11 @@ void ZEQuaternion::CreateFromEuler(ZEQuaternion& Output, float Yawn, float Pitch
    zefAssert(!Output.IsValid(), "ZEQuaternion::CreateFromEuler. Quaternion is not valid.");
 }
 
+void ZEQuaternion::CreateFromEuler(ZEQuaternion& Output, const ZEVector3& Rotation)
+{
+	CreateFromEuler(Output, Rotation.x, Rotation.y, Rotation.z);
+}
+
 void ZEQuaternion::CreateIdentity(ZEQuaternion& Output)
 {
 	Output.w = 1.0f;
@@ -204,6 +209,11 @@ void ZEQuaternion::ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, c
     Yaw = atan2(2 * Quaternion.y * Quaternion.w - 2 * Quaternion.x * Quaternion.z , 1 - 2 * sqy - 2 * sqz);
 	Pitch = asin(2 * test);
 	Roll = atan2(2 * Quaternion.x * Quaternion.w - 2 * Quaternion.y * Quaternion.z , 1 - 2 * sqx - 2 * sqz);
+}
+
+void ZEQuaternion::ConvertToEulerAngles(ZEVector3& Rotation, const ZEQuaternion& Quaternion)
+{
+	ConvertToEulerAngles(Rotation.x, Rotation.y, Rotation.z, Quaternion);
 }
 
 void ZEQuaternion::ConvertToLookAndUp(ZEVector3& Look, ZEVector3& Up, const ZEQuaternion& Quaternion)

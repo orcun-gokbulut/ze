@@ -171,6 +171,23 @@ void ZEVector2::Clamp(ZEVector2& Out, const ZEVector2& Vector, float MinValue, f
 		Out.y = Vector.y;
 }
 
+void ZEVector2::Clamp(ZEVector2& Out, const ZEVector2& Vector, const ZEVector2& MinValue, const ZEVector2& MaxValue)
+{
+	if (Vector.x > MaxValue.x)
+		Out.x = MaxValue.x;
+	else if (Vector.x < MinValue.x)
+		Out.x = MinValue.x;
+	else
+		Out.x = Vector.x;
+
+	if (Vector.y > MaxValue.y)
+		Out.y = MaxValue.y;
+	else if (Vector.y < MinValue.y)
+		Out.y = MinValue.y;
+	else
+		Out.y = Vector.y;
+}
+
 void ZEVector2::Saturate(ZEVector2& Out, const ZEVector2& Vector)
 {
 	if (Vector.x > 1.0f)
@@ -223,7 +240,19 @@ ZEVector2 ZEVector2::Clamp(float MinValue, float MaxValue) const
 	return Temp;
 }
 
+ZEVector2 ZEVector2::Clamp(const ZEVector2& MinValue, const ZEVector2& MaxValue) const
+{
+	ZEVector2 Temp;
+	ZEVector2::Clamp(Temp, *this, MinValue, MaxValue);
+	return Temp;
+}
+
 void ZEVector2::ClampSelf(float MinValue, float MaxValue) 
+{
+	ZEVector2::Clamp(*this, *this, MinValue, MaxValue);
+}
+
+void ZEVector2::ClampSelf(const ZEVector2& MinValue, const ZEVector2& MaxValue) 
 {
 	ZEVector2::Clamp(*this, *this, MinValue, MaxValue);
 }
@@ -542,6 +571,30 @@ void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, float MinValue, f
 		Out.z = Vector.z;
 }
 
+void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MinValue, const ZEVector3& MaxValue)
+{
+	if (Vector.x > MaxValue.x)
+		Out.x = MaxValue.x;
+	else if (Vector.x < MinValue.x)
+		Out.x = MinValue.x;
+	else
+		Out.x = Vector.x;
+
+	if (Vector.y > MaxValue.y)
+		Out.y = MaxValue.y;
+	else if (Vector.y < MinValue.y)
+		Out.y = MinValue.y;
+	else
+		Out.y = Vector.y;
+
+	if (Vector.z > MaxValue.z)
+		Out.z = MaxValue.z;
+	else if (Vector.z < MinValue.z)
+		Out.z = MinValue.z;
+	else
+		Out.z = Vector.z;
+}
+
 void ZEVector3::Saturate(ZEVector3& Out, const ZEVector3& Vector)
 {
 	if (Vector.x > 1.0f)
@@ -605,7 +658,19 @@ ZEVector3 ZEVector3::Clamp(float MinValue, float MaxValue) const
 	return Temp;
 }
 
+ZEVector3 ZEVector3::Clamp(const ZEVector3& MinValue, const ZEVector3& MaxValue) const
+{
+	ZEVector3 Temp;
+	ZEVector3::Clamp(Temp, *this, MinValue, MaxValue);
+	return Temp;
+}
+
 void ZEVector3::ClampSelf(float MinValue, float MaxValue)
+{
+	ZEVector3::Clamp(*this, *this, MinValue, MaxValue);
+}
+
+void ZEVector3::ClampSelf(const ZEVector3& MinValue, const ZEVector3& MaxValue)
 {
 	ZEVector3::Clamp(*this, *this, MinValue, MaxValue);
 }
@@ -921,6 +986,37 @@ void ZEVector4::Clamp(ZEVector4& Out, const ZEVector4& Vector, float MinValue, f
 		Out.w = Vector.w;
 }
 
+void ZEVector4::Clamp(ZEVector4& Out, const ZEVector4& Vector, const ZEVector4& MinValue, const ZEVector4& MaxValue)
+{
+	if (Vector.x > MaxValue.x)
+		Out.x = MaxValue.x;
+	else if (Vector.x < MinValue.x)
+		Out.x = MinValue.x;
+	else
+		Out.x = Vector.x;
+
+	if (Vector.y > MaxValue.y)
+		Out.y = MaxValue.y;
+	else if (Vector.y < MinValue.y)
+		Out.y = MinValue.y;
+	else
+		Out.y = Vector.y;
+
+	if (Vector.z > MaxValue.z)
+		Out.z = MaxValue.z;
+	else if (Vector.z < MinValue.z)
+		Out.z = MinValue.z;
+	else
+		Out.z = Vector.z;
+
+	if (Vector.w > MaxValue.w)
+		Out.w = MaxValue.w;
+	else if (Vector.w < MinValue.w)
+		Out.w = MinValue.w;
+	else
+		Out.w = Vector.w;
+}
+
 void ZEVector4::Saturate(ZEVector4& Out, const ZEVector4& Vector)
 {
 	if (Vector.x > 1.0f)
@@ -993,7 +1089,19 @@ ZEVector4 ZEVector4::Clamp(float MinValue, float MaxValue) const
 	return Temp;
 }
 
+ZEVector4 ZEVector4::Clamp(const ZEVector4& MinValue, const ZEVector4& MaxValue) const
+{
+	ZEVector4 Temp;
+	ZEVector4::Clamp(Temp, *this, MinValue, MaxValue);
+	return Temp;
+}
+
 void ZEVector4::ClampSelf(float MinValue, float MaxValue)
+{
+	ZEVector4::Clamp(*this, *this, MinValue, MaxValue);
+}
+
+void ZEVector4::ClampSelf(const ZEVector4& MinValue, const ZEVector4& MaxValue)
 {
 	ZEVector4::Clamp(*this, *this, MinValue, MaxValue);
 }
