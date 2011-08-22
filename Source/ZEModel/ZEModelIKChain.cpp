@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEModelIKChain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,37 +30,85 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEModelIKChain.h"
+#include "ZEModelBone.h"
+#include "ZEModel.h"
 
-add_source (ZEModel.cpp					Sources)
-add_source (ZEModel.h					Sources ZESDK ZEPP)
-add_source (ZEModelAnimation.cpp		Sources)
-add_source (ZEModelAnimation.h			Sources ZESDK)
-add_source (ZEModelAnimationTrack.cpp	Sources)
-add_source (ZEModelAnimationTrack.h		Sources ZESDK)
-add_source (ZEModelBone.cpp				Sources)
-add_source (ZEModelBone.h				Sources ZESDK)
-add_source (ZEModelDebugModule.cpp      Sources)
-add_source (ZEModelDebugModule.h        Sources)
-add_source (ZEModelFileFormat.cpp		Sources)
-add_source (ZEModelFileFormat.h			Sources)
-add_source (ZEModelIKChain.cpp			Sources)
-add_source (ZEModelIKChain.h			Sources ZESDK)
-add_source (ZEModelIKChainNode.cpp		Sources)
-add_source (ZEModelIKChainNode.h		Sources ZESDK)
-add_source (ZEModelMesh.cpp				Sources)
-add_source (ZEModelMesh.h				Sources ZESDK)
-add_source (ZEModelMeshLOD.cpp			Sources)
-add_source (ZEModelMeshLOD.h			Sources ZESDK)
-add_source (ZEModelResource.cpp			Sources)
-add_source (ZEModelResource.h			Sources ZESDK)
+const ZEString& ZEModelIKChain::GetName()
+{
+	return Name;
+}
+void ZEModelIKChain::SetName(ZEString Name)
+{
+	this->Name = Name;
+}
 
-add_library (ZEModel ${Sources})
+const ZEArray<ZEModelIKChainNode>& ZEModelIKChain::GetNodes()
+{
+	return Nodes;
+}
 
-set_property(TARGET ZEModel PROPERTY FOLDER "Zinek Engine")
+bool ZEModelIKChain::AddNode(ZEModelIKChainNode& Node)
+{
+	Nodes.Add(Node);
+	return false;
+}
 
-install (TARGETS ZEModel COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEModel)
+bool ZEModelIKChain::RemoveNode(ZEModelIKChainNode& Node)
+{
+//	Nodes.DeleteValue(Nodes);
+	return true;
+}
+
+const ZEVector3& ZEModelIKChain::GetEffectorPosition()
+{
+	return EffectorPosition;
+}
+
+void ZEModelIKChain::SetEffectorPosition(const ZEVector3& Position)
+{
+	EffectorPosition = Position;
+}
+
+const ZEQuaternion& ZEModelIKChain::GetEffectorRotation()
+{
+	return EffectorRotation;
+}
+
+void ZEModelIKChain::SetEffectorRotation(const ZEQuaternion& Rotation)
+{
+	EffectorRotation = Rotation;
+}
+
+void ZEModelIKChain::SetMaxIterationCount(unsigned int Value)
+{
+	MaxIterationCount = Value;
+}
+
+unsigned int ZEModelIKChain::GetMaxIterationCount()
+{
+	return MaxIterationCount;
+}
+
+void ZEModelIKChain::SetErrorThreshold(float Value)
+{
+	ErrorThreshold = Value;
+}
+
+float ZEModelIKChain::GetErrorThreshold()
+{
+	return ErrorThreshold;
+}
+
+void ZEModelIKChain::Process()
+{
+
+}
+ZEModelIKChain::ZEModelIKChain()
+{
+	ErrorThreshold = 0.1;
+	MaxIterationCount = 10;
+}

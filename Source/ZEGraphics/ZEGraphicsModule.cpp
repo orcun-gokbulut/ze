@@ -60,7 +60,7 @@ ZEModuleDescription* ZEGraphicsModule::GetModuleDescription()
 
 ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 {
-	static ZETextureOptions VeryHigh	= {ZE_TCT_NONE, ZE_TCQ_LOW,    ZE_TDS_NONE, ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
+	static ZETextureOptions VeryHigh	= {ZE_TCT_NONE, ZE_TCQ_LOW,    ZE_TDS_NONE, ZE_TFC_DISABLED,  ZE_TMM_ENABLED, 25};
 	static ZETextureOptions High		= {ZE_TCT_DXT3, ZE_TCQ_NORMAL, ZE_TDS_NONE, ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
 	static ZETextureOptions Normal		= {ZE_TCT_NONE, ZE_TCQ_NORMAL, ZE_TDS_2X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};
 	static ZETextureOptions Low			= {ZE_TCT_DXT3, ZE_TCQ_LOW,    ZE_TDS_2X,   ZE_TFC_ENABLED,  ZE_TMM_ENABLED, 25};

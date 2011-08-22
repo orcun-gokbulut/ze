@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEModelIKChainNode.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,37 +30,7 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
-
-add_source (ZEModel.cpp					Sources)
-add_source (ZEModel.h					Sources ZESDK ZEPP)
-add_source (ZEModelAnimation.cpp		Sources)
-add_source (ZEModelAnimation.h			Sources ZESDK)
-add_source (ZEModelAnimationTrack.cpp	Sources)
-add_source (ZEModelAnimationTrack.h		Sources ZESDK)
-add_source (ZEModelBone.cpp				Sources)
-add_source (ZEModelBone.h				Sources ZESDK)
-add_source (ZEModelDebugModule.cpp      Sources)
-add_source (ZEModelDebugModule.h        Sources)
-add_source (ZEModelFileFormat.cpp		Sources)
-add_source (ZEModelFileFormat.h			Sources)
-add_source (ZEModelIKChain.cpp			Sources)
-add_source (ZEModelIKChain.h			Sources ZESDK)
-add_source (ZEModelIKChainNode.cpp		Sources)
-add_source (ZEModelIKChainNode.h		Sources ZESDK)
-add_source (ZEModelMesh.cpp				Sources)
-add_source (ZEModelMesh.h				Sources ZESDK)
-add_source (ZEModelMeshLOD.cpp			Sources)
-add_source (ZEModelMeshLOD.h			Sources ZESDK)
-add_source (ZEModelResource.cpp			Sources)
-add_source (ZEModelResource.h			Sources ZESDK)
-
-add_library (ZEModel ${Sources})
-
-set_property(TARGET ZEModel PROPERTY FOLDER "Zinek Engine")
-
-install (TARGETS ZEModel COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEModel)
+#include "ZEModelIKChainNode.h"
