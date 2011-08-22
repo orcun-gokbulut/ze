@@ -39,20 +39,24 @@
 
 #include "ZEMath/ZEVector.h"
 
-class ZEBone;
+class ZEModelBone;
 
 class ZEModelIKChainNode
 {
 	public:
-		ZEBone*								Bone;
+		ZEModelBone*						Bone;
 
 		bool								EnabledRotation;
+		bool								LimitRotation;
 		ZEVector3							MinRotationAngle;
 		ZEVector3							MaxRotationAngle;
 
+		bool								LimitTranslation;
 		bool								EnableTranslation;
 		ZEVector3							MinTranslation;
 		ZEVector3							MaxTranslation;
+
+											ZEModelIKChainNode();
 };
 
 #endif

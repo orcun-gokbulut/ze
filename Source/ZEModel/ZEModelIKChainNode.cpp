@@ -33,4 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEMath\ZEMathDefinitions.h"
 #include "ZEModelIKChainNode.h"
+
+ZEModelIKChainNode::ZEModelIKChainNode()
+{
+	Bone = 0;
+
+	EnabledRotation = true;
+	LimitRotation = false;
+	MinRotationAngle = ZEVector3::Zero;
+	MaxRotationAngle = ZEVector3(ZE_PI, ZE_PI, ZE_PI);
+
+	LimitRotation = false;
+	EnableTranslation = false;
+	MinTranslation = ZEVector3::Zero;
+	MaxTranslation = ZEVector3::Zero;
+}

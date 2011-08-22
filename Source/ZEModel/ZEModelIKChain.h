@@ -57,6 +57,8 @@ class ZEModelIKChain
 		float								ErrorThreshold;
 		unsigned int						MaxIterationCount;
 
+		void								Iterate();
+
 	public:
 		const ZEString&						GetName();
 		void								SetName(ZEString Name);
