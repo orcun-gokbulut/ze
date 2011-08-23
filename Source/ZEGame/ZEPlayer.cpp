@@ -152,16 +152,16 @@ void ZEPlayer::Tick(float Time)
 				Camera->SetFOV(FOV);
 				break;
 			case ACTIONID_TURNLEFT:
-				Yawn = Yawn - 0.005f * Current->AxisValue;
+				Rx = Rx - 0.005f * Current->AxisValue;
 				break;
 			case ACTIONID_TURNRIGHT:
-				Yawn = Yawn + 0.005f * Current->AxisValue;
+				Rx = Rx + 0.005f * Current->AxisValue;
 				break;
 			case ACTIONID_TURNUP:
-				Pitch = Pitch + 0.005f * Current->AxisValue;
+				Ry = Ry + 0.005f * Current->AxisValue;
 				break;
 			case ACTIONID_TURNDOWN:
-				Pitch = Pitch - 0.005f * Current->AxisValue;
+				Ry = Ry - 0.005f * Current->AxisValue;
 				break;
 			case ACTIONID_CONSOLE:
 				if (ZEConsole::GetInstance()->IsVisible())
@@ -182,24 +182,24 @@ void ZEPlayer::Tick(float Time)
 				break;
 		}
 		
-		if (Yawn < -ZE_PI)
-			Yawn = ZE_PI;
-		else if (Yawn > ZE_PI)
-			Yawn = -ZE_PI;
+		if (Rx < -ZE_PI)
+			Rx = ZE_PI;
+		else if (Rx > ZE_PI)
+			Rx = -ZE_PI;
 
-		if (Pitch < -ZE_PI_2)
-			Pitch = -ZE_PI_2;
-		else if (Pitch > ZE_PI_2)
-			Pitch = ZE_PI_2;
+		if (Ry < -ZE_PI_2)
+			Ry = -ZE_PI_2;
+		else if (Ry > ZE_PI_2)
+			Ry = ZE_PI_2;
 
-		if (Roll < -ZE_PI)
-			Roll = ZE_PI_2;
-		else if (Roll > ZE_PI)
-			Roll = ZE_PI;
+		if (Rz < -ZE_PI_2)
+			Rz = -ZE_PI_2;
+		else if (Rz > ZE_PI_2)
+			Rz = ZE_PI_2;
 
-		ZEQuaternion::CreateFromEuler(Rotation, Yawn, Pitch, Roll);
+		ZEQuaternion::CreateFromEuler(Rotation, Rx, Ry, Rz);
 		ZEQuaternion Temp;
-		ZEQuaternion::Normalize(Temp,Rotation);
+		ZEQuaternion::Normalize(Temp, Rotation);
 		Rotation = Temp;
 		SetRotation(Rotation);
 	}
@@ -233,7 +233,7 @@ ZEPlayer::ZEPlayer()
 {
 
 	FOV = ZE_PI_4;
-	Yawn = Pitch = Roll = 0;
+	Rx = Ry = Rz = 0;
 
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,				"Move Forward",		ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_W, ZE_IBS_PRESSING)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,			"Move Backward",	ZEInputEvent(ZE_IDT_KEYBOARD, ZE_IDK_DEFAULT_KEYBOARD, ZE_IKB_S, ZE_IBS_PRESSING)));

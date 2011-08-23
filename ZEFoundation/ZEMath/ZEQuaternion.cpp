@@ -63,14 +63,14 @@ void ZEQuaternion::Create(ZEQuaternion& Output, float Angle, const ZEVector3& Ax
 	
 }
 
-void ZEQuaternion::CreateFromEuler(ZEQuaternion& Output, float Yawn, float Pitch, float Roll)
+void ZEQuaternion::CreateFromEuler(ZEQuaternion& Output, float x, float y, float z)
 {
-   float SinPitch		= sinf(Pitch * 0.5f);
-   float CosPitch		= cosf(Pitch * 0.5f);
-   float SinYaw			= sinf(Yawn * 0.5f);
-   float CosYaw			= cosf(Yawn * 0.5f);
-   float SinRoll		= sinf(Roll * 0.5f);
-   float CosRoll		= cosf(Roll * 0.5f);
+   float SinPitch		= sinf(y * 0.5f);
+   float CosPitch		= cosf(y * 0.5f);
+   float SinYaw			= sinf(x * 0.5f);
+   float CosYaw			= cosf(x * 0.5f);
+   float SinRoll		= sinf(z * 0.5f);
+   float CosRoll		= cosf(z * 0.5f);
    float CosPitchCosYaw	= CosPitch * CosYaw;
    float SinPitchSinYaw	= SinPitch * SinYaw;
   
@@ -182,33 +182,33 @@ void ZEQuaternion::VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaterni
 	Output.z = Vect.z;
 }
 
-void ZEQuaternion::ConvertToEulerAngles(float &Pitch, float &Yaw, float &Roll, const ZEQuaternion& Quaternion)
+void ZEQuaternion::ConvertToEulerAngles(float &x, float &y, float &z, const ZEQuaternion& Quaternion)
 {
 	float test = Quaternion.x * Quaternion.y + Quaternion.z * Quaternion.w;
 	if (test > 0.499) 
 	{ 
 		// singularity at north pole
-		Yaw = 2 * atan2(Quaternion.x, Quaternion.w);
-		Pitch = ZE_PI_2;
-		Roll = 0;
+		y = 2.0f * atan2(Quaternion.x, Quaternion.w);
+		z = ZE_PI_2;
+		x = 0.0f;
 		return;
 	}	
 
 	if (test < -0.499) 
 	{ 
 		// singularity at south pole
-		Yaw = -2 * atan2(Quaternion.x, Quaternion.w);
-		Pitch = - ZE_PI_2;
-		Roll = 0;
+		y = -2.0f * atan2(Quaternion.x, Quaternion.w);
+		z = - ZE_PI_2;
+		x = 0.0f;
 		return;
 	}  
 
 	float sqx = Quaternion.x * Quaternion.x;    
 	float sqy = Quaternion.y * Quaternion.y;    
 	float sqz = Quaternion.z * Quaternion.z;
-    Yaw = atan2(2 * Quaternion.y * Quaternion.w - 2 * Quaternion.x * Quaternion.z , 1 - 2 * sqy - 2 * sqz);
-	Pitch = asin(2 * test);
-	Roll = atan2(2 * Quaternion.x * Quaternion.w - 2 * Quaternion.y * Quaternion.z , 1 - 2 * sqx - 2 * sqz);
+    y = atan2(2.0f * Quaternion.y * Quaternion.w - 2.0f * Quaternion.x * Quaternion.z, 1.0f - 2.0f * sqy - 2.0f * sqz);
+	z = asin(2.0f * test);
+	x = atan2(2.0f * Quaternion.x * Quaternion.w - 2.0f * Quaternion.y * Quaternion.z, 1.0f - 2.0f * sqx - 2.0f * sqz);
 }
 
 void ZEQuaternion::ConvertToEulerAngles(ZEVector3& Rotation, const ZEQuaternion& Quaternion)

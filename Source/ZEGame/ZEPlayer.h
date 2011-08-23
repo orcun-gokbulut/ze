@@ -55,7 +55,7 @@ class ZEPlayer : public ZECompoundEntity
 		ZEListener*				Listener;
 		ZEProjectiveLight*		Light;
 
-		float					Pitch, Yawn, Roll, FOV;
+		float					Ry, Rx, Rz, FOV;
 
 								ZEPlayer();
 		virtual					~ZEPlayer();

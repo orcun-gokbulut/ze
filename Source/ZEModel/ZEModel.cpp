@@ -418,6 +418,9 @@ void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
 
 void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 {
+	if (!GetVisible())
+		return;
+
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Draw(DrawParameters);
 	
@@ -428,6 +431,10 @@ void ZEModel::Tick(float ElapsedTime)
 {
 	for(size_t I = 0; I < AnimationTracks.GetCount(); I++)
 		AnimationTracks[I].AdvanceAnimation(ElapsedTime);
+
+	for(size_t I = 0; I < IKChains.GetCount(); I++)
+		IKChains[I].Process();
+	
 }
 
 void ZEModel::TransformChangeEvent(const ZEPhysicalTransformChangeEventArgument& TransformChange)

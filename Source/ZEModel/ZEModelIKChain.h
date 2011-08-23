@@ -50,12 +50,16 @@ class ZEModelIKChain
 	friend class ZEModel;
 	private:
 		ZEString							Name;
+
+		bool								Enabled;
+
 		ZEVector3							EffectorPosition;
 		ZEQuaternion						EffectorRotation;
-		ZEArray<ZEModelIKChainNode>			Nodes;
 
 		float								ErrorThreshold;
 		unsigned int						MaxIterationCount;
+
+		float								RotationLimit;
 
 		void								Iterate();
 
@@ -63,10 +67,10 @@ class ZEModelIKChain
 		const ZEString&						GetName();
 		void								SetName(ZEString Name);
 
-		const ZEArray<ZEModelIKChainNode>&	GetNodes();
+		ZEArray<ZEModelIKChainNode>			Nodes;
 
-		bool								AddNode(ZEModelIKChainNode& Node);
-		bool								RemoveNode(ZEModelIKChainNode& Node);
+		void								SetEnabled(bool Enabled);
+		bool								GetEnabled();
 
 		const ZEVector3&					GetEffectorPosition();
 		void								SetEffectorPosition(const ZEVector3& Position);
@@ -86,7 +90,6 @@ class ZEModelIKChain
 		void								Deinitialize();
 
 											ZEModelIKChain();
-											~ZEModelIKChain();
 };
 #endif
 

@@ -46,6 +46,7 @@
 #include "ZEModelMesh.h"
 #include "ZEModelAnimation.h"
 #include "ZEModelAnimationTrack.h"
+#include "ZEModelIKChain.h"
 
 class ZEQuaternion;
 class ZEMatrix4x4;
@@ -112,6 +113,8 @@ class ZEModel : public ZEComponent
 		virtual								~ZEModel();
 
 	public:
+		ZEArray<ZEModelIKChain>				IKChains;
+
 		virtual	ZEDWORD						GetDrawFlags() const;
 
 		virtual const ZEAABoundingBox&		GetLocalBoundingBox() const;
