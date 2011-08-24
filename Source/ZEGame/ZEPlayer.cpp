@@ -152,16 +152,16 @@ void ZEPlayer::Tick(float Time)
 				Camera->SetFOV(FOV);
 				break;
 			case ACTIONID_TURNLEFT:
-				Rx = Rx - 0.005f * Current->AxisValue;
+				Ry = Ry - 0.005f * Current->AxisValue;
 				break;
 			case ACTIONID_TURNRIGHT:
-				Rx = Rx + 0.005f * Current->AxisValue;
-				break;
-			case ACTIONID_TURNUP:
 				Ry = Ry + 0.005f * Current->AxisValue;
 				break;
+			case ACTIONID_TURNUP:
+				Rx = Rx + 0.005f * Current->AxisValue;
+				break;
 			case ACTIONID_TURNDOWN:
-				Ry = Ry - 0.005f * Current->AxisValue;
+				Rx = Rx - 0.005f * Current->AxisValue;
 				break;
 			case ACTIONID_CONSOLE:
 				if (ZEConsole::GetInstance()->IsVisible())
@@ -182,15 +182,15 @@ void ZEPlayer::Tick(float Time)
 				break;
 		}
 		
-		if (Rx < -ZE_PI)
-			Rx = ZE_PI;
-		else if (Rx > ZE_PI)
-			Rx = -ZE_PI;
+		if (Ry < -ZE_PI)
+			Ry = ZE_PI;
+		else if (Ry > ZE_PI)
+			Ry = -ZE_PI;
 
-		if (Ry < -ZE_PI_2)
-			Ry = -ZE_PI_2;
-		else if (Ry > ZE_PI_2)
-			Ry = ZE_PI_2;
+		if (Rx < -ZE_PI_2)
+			Rx = -ZE_PI_2;
+		else if (Rx > ZE_PI_2)
+			Rx = ZE_PI_2;
 
 		if (Rz < -ZE_PI_2)
 			Rz = -ZE_PI_2;

@@ -65,10 +65,10 @@ void ZEQuaternion::Create(ZEQuaternion& Output, float Angle, const ZEVector3& Ax
 
 void ZEQuaternion::CreateFromEuler(ZEQuaternion& Output, float x, float y, float z)
 {
-   float SinPitch		= sinf(y * 0.5f);
-   float CosPitch		= cosf(y * 0.5f);
-   float SinYaw			= sinf(x * 0.5f);
-   float CosYaw			= cosf(x * 0.5f);
+   float SinPitch		= sinf(x * 0.5f);
+   float CosPitch		= cosf(x * 0.5f);
+   float SinYaw			= sinf(y * 0.5f);
+   float CosYaw			= cosf(y * 0.5f);
    float SinRoll		= sinf(z * 0.5f);
    float CosRoll		= cosf(z * 0.5f);
    float CosPitchCosYaw	= CosPitch * CosYaw;
