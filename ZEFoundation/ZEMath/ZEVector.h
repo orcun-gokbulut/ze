@@ -91,7 +91,10 @@ class ZEVector2
 		static void					Clamp(ZEVector2& Out, const ZEVector2& Vector, float MinValue, float MaxValue);
 		static void					Clamp(ZEVector2& Out, const ZEVector2& Vector, const ZEVector2& MinValue, const ZEVector2& MaxValue);
 		static void					Saturate(ZEVector2& Out, const ZEVector2& Vector);
-		
+
+		bool						IsValid() const;
+		bool						IsNormalized() const;
+
 		float						Length() const;
 		float						LengthSquare() const;
 		ZEVector2					Normalize() const;
@@ -181,6 +184,9 @@ class ZEVector3
 		static void					Clamp(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MinValue, const ZEVector3& MaxValue);
 		static void					Saturate(ZEVector3& Out, const ZEVector3& Vector);
 
+		bool						IsValid() const;
+		bool						IsNormalized() const;
+
 		float						Length() const;
 		float						LengthSquare() const;
 		ZEVector3					Normalize() const;
@@ -191,6 +197,7 @@ class ZEVector3
 		void						ClampSelf(const ZEVector3& MinValue, const ZEVector3& MaxValue);
 		ZEVector3					Saturate() const;
 		void						SaturateSelf();
+
 
 		ZEVector3					operator+(const ZEVector3& RightOperand) const;
 		ZEVector3					operator-(const ZEVector3& RightOperand) const;
@@ -267,6 +274,9 @@ class ZEVector4
 		static void					Clamp(ZEVector4& Out, const ZEVector4& Vector, float MinValue, float MaxValue);
 		static void					Clamp(ZEVector4& Out, const ZEVector4& Vector, const ZEVector4& MinValue, const ZEVector4& MaxValue);
 		static void					Saturate(ZEVector4& Out, const ZEVector4& Vector);
+		
+		bool						IsValid() const;
+		bool						IsNormalized() const;
 
 		float						Length() const;
 		float						LengthSquare() const;

@@ -109,6 +109,19 @@ void ZEVector2::Scale(ZEVector2 &Out, const ZEVector2 &A, float s)
 	Out.y = A.y * s;
 }
 
+bool ZEVector2::IsValid() const
+{
+	if (x != x || y != y)
+		return false;
+	else
+		return true;
+}
+
+bool ZEVector2::IsNormalized() const
+{
+	return fabs(Length() - 1.0f) < 0.001;
+}
+
 float ZEVector2::Length(const ZEVector2 &A)
 {
 	return sqrt(A.x * A.x + A.y * A.y);
@@ -496,6 +509,19 @@ inline void ZEVector3::CrossProduct(ZEVector3& Out, const ZEVector3& A, const ZE
 	Out.x = A.y * B.z - A.z * B.y;
 	Out.y = A.z * B.x - A.x * B.z;
 	Out.z = A.x * B.y - A.y * B.x;
+}
+
+bool ZEVector3::IsValid() const
+{
+	if (x != x || y != y || z != z)
+		return false;
+	else
+		return true;
+}
+
+bool ZEVector3::IsNormalized() const
+{
+	return fabs(Length() - 1.0f) < 0.001;
 }
 
 float ZEVector3::Length(const ZEVector3& Vector)
@@ -922,6 +948,19 @@ float ZEVector4::DistanceSquare(const ZEVector4& A, const ZEVector4& B)
 	return (A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) + (A.z - B.z) * (A.z - B.z) + (A.w - B.w) * (A.w - B.w);
 }
 
+bool ZEVector4::IsValid() const
+{
+	if (w != w || x != x || y != y || z != z)
+		return false;
+	else
+		return true;
+}
+
+bool ZEVector4::IsNormalized() const
+{
+	return fabs(Length() - 1.0f) < 0.001;
+}
+
 void ZEVector4::Normalize(ZEVector4& Out, const ZEVector4& Vector)
 {
 	float L = Vector.Length();
@@ -1251,7 +1290,3 @@ ZEVector4::ZEVector4()
 {
 
 }
-
-
-
-

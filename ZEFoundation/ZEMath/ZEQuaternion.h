@@ -71,6 +71,8 @@ class ZEQuaternion
 		static void						Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B, float Factor);
 		static void						Conjugate(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
 		static void						Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion);
+		static float					Length(const ZEQuaternion& Quaternion);
+		static float					LengthSquare(const ZEQuaternion& Quaternion);
 
 		static void						ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaternion& Quaternion);
 		static void						ConvertToEulerAngles(float& x, float& y, float& z, const ZEQuaternion& Quaternion);
@@ -78,7 +80,10 @@ class ZEQuaternion
 		static void						ConvertToLookAndUp(ZEVector3& Look, ZEVector3& Up, const ZEQuaternion& Quaternion);
 
 		bool							IsValid() const;
+		bool							IsNormalized() const;
 
+		float							Length() const;
+		float							LengthSquare() const;
 		ZEQuaternion					Conjugate() const;
 		ZEQuaternion					Normalize() const;
 
