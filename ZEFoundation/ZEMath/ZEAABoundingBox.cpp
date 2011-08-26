@@ -120,70 +120,28 @@ ZEAABoundingBox::ZEAABoundingBox(const ZEVector3 Min, const ZEVector3 Max)
 	this->Max = Max;
 }
 
-void ZEAABoundingBox::GenerateBoundingSphere(ZEBoundingSphere& BoundingSphere) const
+void ZEAABoundingBox::GenerateBoundingSphere(ZEBoundingSphere& BoundingSphere, const ZEAABoundingBox& BoundingBox)
 {
-	BoundingSphere.Radius = 0.0f;
-	BoundingSphere.Position = GetCenter();
-
-	float Length;
-	for (unsigned int I = 0; I < 8; I++)
-	{
-		Length = ZEVector3::DistanceSquare(BoundingSphere.Position, GetVertex(I));
-		if (Length > BoundingSphere.Radius)
-			BoundingSphere.Radius = Length;
-	}
-
-	BoundingSphere.Radius = sqrtf(BoundingSphere.Radius);
-
-/*	MaxLength = ZEVector3::Length(Max);
-	MinLength = ZEVector3::Length(Min);
-
-	if (MaxLength > MinLength)
-		BoundingSphere.Radius = MaxLength;
-	else
-		BoundingSphere.Radius = MinLength;*/
+	BoundingSphere.Radius = (BoundingBox.Max - BoundingBox.Min).Length() * 0.5f;
+	BoundingSphere.Position = BoundingBox.GetCenter();
 }
 
-
-void ZEAABoundingBox::GenerateBoundingSphere(ZEBoundingSphere& BoundingSphere, const ZEMatrix4x4& Transform) const
+void ZEAABoundingBox::GenerateOBoundingBox(ZEOBoundingBox& OrientedBoundingBox, const ZEAABoundingBox& BoundingBox)
 {
-	float MaxLength,MinLength;
+	OrientedBoundingBox.Center = (BoundingBox.Min + BoundingBox.Max) * 0.5f;
 
-	MaxLength = ZEVector3::Length(Max);
-	MinLength = ZEVector3::Length(Min);
+	OrientedBoundingBox.HalfSize = BoundingBox.Max - BoundingBox.Min * 0.5f;
+	OrientedBoundingBox.Right.x = 1.0f;
+	OrientedBoundingBox.Right.y = 0;
+	OrientedBoundingBox.Right.z = 0;
 
-	if (MaxLength > MinLength)
-		BoundingSphere.Radius = MaxLength;
-	else
-		BoundingSphere.Radius = MinLength;
+	OrientedBoundingBox.Up.x = 0;
+	OrientedBoundingBox.Up.y = 1.0f;
+	OrientedBoundingBox.Up.z = 0;
 
-	ZEVector3::Add(BoundingSphere.Position, BoundingSphere.Position, *((const ZEVector3*)Transform.M[4]));
-}
-
-void ZEAABoundingBox::GenerateOBoundingBox(ZEOBoundingBox& BoundingBox) const
-{
-	BoundingBox.Position = Min;
-
-	BoundingBox.U.x = Max.x - Min.x;
-	BoundingBox.U.y = 0;
-	BoundingBox.U.z = 0;
-
-	BoundingBox.V.x = 0;
-	BoundingBox.V.y = Max.y - Min.y;
-	BoundingBox.V.z = 0;
-
-	BoundingBox.N.x = 0;
-	BoundingBox.N.y = 0;
-	BoundingBox.N.z = Max.z - Min.z;
-}
-
-void ZEAABoundingBox::GenerateOBoundingBox(ZEOBoundingBox& BoundingBox, const ZEMatrix4x4& Transform) const
-{
-	ZEVector3::Add(BoundingBox.Position, Min, *((const ZEVector3*)Transform.M[4]));
-
-	ZEMatrix4x4::Transform3x3(BoundingBox.U, Transform, ZEVector3(Max.x - Min.x, 0.0f, 0.0f));
-	ZEMatrix4x4::Transform3x3(BoundingBox.V, Transform, ZEVector3(0.0f, Max.y - Min.y, 0.0f));
-	ZEMatrix4x4::Transform3x3(BoundingBox.N, Transform, ZEVector3(0.0f, 0.0f, Max.z - Min.z));
+	OrientedBoundingBox.Front.x = 0;
+	OrientedBoundingBox.Front.y = 0;
+	OrientedBoundingBox.Front.z = 1.0f;
 }
 
 bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZEVector3& Point)

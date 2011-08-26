@@ -322,16 +322,16 @@ ZEDoorViewTest ZEViewCuboid::CullTest(const ZERectangle3D& PortalDoor) const
 
 void ZEViewCuboid::Create(const ZEVector3& Position, const ZEQuaternion& Rotation, float Width, float Height, float NearZ, float FarZ)
 {
-	ZEQuaternion::VectorProduct(BoundingBox.U, Rotation, ZEVector3(0.0f, Height, 0.0f));
-	ZEQuaternion::VectorProduct(BoundingBox.V, Rotation, ZEVector3(Width, 0.0f, 0.0f));
-	ZEQuaternion::VectorProduct(BoundingBox.N, Rotation, ZEVector3(0.0f, 0.0f, FarZ - NearZ));
+	ZEQuaternion::VectorProduct(BoundingBox.Right, Rotation, ZEVector3::UnitX);
+	ZEQuaternion::VectorProduct(BoundingBox.Up, Rotation, ZEVector3::UnitY);
+	ZEQuaternion::VectorProduct(BoundingBox.Front, Rotation, ZEVector3::UnitZ);
 	
-	ZEVector3 Near;
-	ZEQuaternion::VectorProduct(Near, Rotation, ZEVector3(0.0f, 0.0f, NearZ));
+	BoundingBox.HalfSize = ZEVector3(Width * 0.5f, Height * 0.5f, (FarZ - NearZ) * 0.5f);
+
+	ZEVector3 Center;
+	ZEQuaternion::VectorProduct(Center, Rotation, ZEVector3(0.0f, 0.0f, FarZ - NearZ));
 	
-	BoundingBox.Position.x = Position.x - (BoundingBox.U.x + BoundingBox.V.x) * 0.5f + Near.x;
-	BoundingBox.Position.y = Position.y - (BoundingBox.U.y + BoundingBox.V.y) * 0.5f + Near.y;
-	BoundingBox.Position.z = Position.z - (BoundingBox.U.z + BoundingBox.V.z) * 0.5f + Near.z;
+	ZEVector3::Multiply(BoundingBox.Center, Position, Center);
 }
 
 // ZEViewPlane

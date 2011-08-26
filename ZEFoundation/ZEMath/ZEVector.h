@@ -105,6 +105,8 @@ class ZEVector2
 		void						ClampSelf(const ZEVector2& MinValue, const ZEVector2& MaxValue);
 		ZEVector2					Saturate() const;
 		void						SaturateSelf();
+		float						Min() const;
+		float						Max() const;
 
 		ZEVector2					operator +(const ZEVector2 &RightOperand) const;
 		ZEVector2					operator -(const ZEVector2 &RightOperand) const;
@@ -197,6 +199,8 @@ class ZEVector3
 		void						ClampSelf(const ZEVector3& MinValue, const ZEVector3& MaxValue);
 		ZEVector3					Saturate() const;
 		void						SaturateSelf();
+		float						Min() const;
+		float						Max() const;
 
 
 		ZEVector3					operator+(const ZEVector3& RightOperand) const;
@@ -288,6 +292,8 @@ class ZEVector4
 		void						ClampSelf(const ZEVector4& MinValue, const ZEVector4& MaxValue);
 		ZEVector4					Saturate() const;
 		void						SaturateSelf();
+		float						Min() const;
+		float						Max() const;
 
 		ZEVector4					operator+(const ZEVector4 &RightOperand) const;
 		ZEVector4					operator-(const ZEVector4 &RightOperand) const;

@@ -34,29 +34,36 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_BOUNDINGVOLUME_H__
-#define __ZE_MATH_BOUNDINGVOLUME_H__
+#ifndef __ZE_MATH_O_BOUNDING_BOX_H__
+#define __ZE_MATH_O_BOUNDING_BOX_H__
+
 #include "ZEVector.h"
 #include "ZEMatrix.h"
 #include "ZEPlane.h"
 
 class ZEBoundingSphere;
 class ZEAABoundingBox;
+
 class ZEOBoundingBox
 {
 	public:
-		ZEVector3				Position;
-		ZEVector3				U, V, N;
+		ZEVector3				Center;
+		ZEVector3				Right, Up, Front;
+		ZEVector3				HalfSize;
 
-		ZEVector3				GetCenter()	const;
 		ZEVector3				GetVertex(unsigned char Index) const;
+		ZEVector3				GetEdge(unsigned char Index) const;
 
 		static ZEHalfSpace		PlaneHalfSpaceTest(const ZEOBoundingBox& BoundingBox, const ZEPlane& Plane);
 
+		static void				Transform(ZEOBoundingBox& Output, const ZEMatrix4x4& Matrix, const ZEOBoundingBox& Input);
+		static void				ConvertToSphere(ZEBoundingSphere& Sphere, const ZEOBoundingBox& Input);
+
+
 		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZEVector3 Point);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray);
-		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment);
+		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax);
+		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray, float& TMin, float& TMax);
+		static bool				IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax);
 
 								ZEOBoundingBox();
 								ZEOBoundingBox(const ZEVector3 Position, const ZEVector3 U, const ZEVector3 V,const ZEVector3 N);

@@ -37,6 +37,8 @@
 #include "ZEAABoundingBox.h"
 #include "ZEOBoundingBox.h"
 
+#include <float.h>
+
 #include <math.h>
 
 
@@ -45,22 +47,56 @@ ZEVector3 ZEOBoundingBox::GetVertex(unsigned char Index) const
 	switch(Index)
 	{
 		case 0:
-			return Position;
+			return Center + Up * HalfSize.x;
 		case 1:
-			return Position + U;
+			return Center - Up * HalfSize.x ;
 		case 2:
-			return Position + V;
+			return Center + Right * HalfSize.y;
 		case 3:
-			return Position + U + V;
+			return Center - Right * HalfSize.y;
 		case 4:
-			return Position + N;
+			return Center + Front * HalfSize.z;
 		case 5:
-			return Position + N + U;
-		case 6:
-			return Position + N + V;
-		case 7:
-			return Position + N + U + V;
+			return Center + Front * HalfSize.z;
 	}
+}
+
+ZEVector3 ZEOBoundingBox::GetEdge(unsigned char Index) const
+{
+	switch(Index)
+	{
+		case 0:
+			return Center - Up * HalfSize.x - Right * HalfSize.y - Front * HalfSize.z;
+		case 1:
+			return Center + Up * HalfSize.x - Right * HalfSize.y - Front * HalfSize.z;
+		case 2:
+			return Center - Up * HalfSize.x + Right * HalfSize.y - Front * HalfSize.z;
+		case 3:
+			return Center + Up * HalfSize.x + Right * HalfSize.y - Front * HalfSize.z;
+		case 4:
+			return Center - Up * HalfSize.x - Right * HalfSize.y + Front * HalfSize.z;
+		case 5:
+			return Center + Up * HalfSize.x - Right * HalfSize.y + Front * HalfSize.z;
+		case 6:
+			return Center - Up * HalfSize.x + Right * HalfSize.y + Front * HalfSize.z;
+		case 7:
+			return Center + Up * HalfSize.x + Right * HalfSize.y + Front * HalfSize.z;
+	}
+}
+
+void ZEOBoundingBox::Transform(ZEOBoundingBox& Output, const ZEMatrix4x4& Matrix, const ZEOBoundingBox& Input)
+{
+	ZEVector3 NewCenter, NewU, NewV, NewN;
+	ZEMatrix4x4::Transform(NewCenter, Matrix, Input.Center);
+	ZEMatrix4x4::Transform3x3(NewU, Matrix, Input.Right);
+	ZEMatrix4x4::Transform3x3(NewU, Matrix, Input.Up);
+	ZEMatrix4x4::Transform3x3(NewU, Matrix, Input.Front);
+}
+
+void ZEOBoundingBox::ConvertToSphere(ZEBoundingSphere& Sphere, const ZEOBoundingBox& Input)
+{
+	Sphere.Position = Input.Center;
+	Sphere.Radius = Input.HalfSize.Max();
 }
 
 ZEHalfSpace ZEOBoundingBox::PlaneHalfSpaceTest(const ZEOBoundingBox& BoundingBox, const ZEPlane& Plane)
@@ -77,51 +113,124 @@ ZEHalfSpace ZEOBoundingBox::PlaneHalfSpaceTest(const ZEOBoundingBox& BoundingBox
 
 bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZEVector3 Point)
 {
-	float factor;
+	float Factor;
 
-	factor = (ZEVector3::DotProduct(BoundingBox.U,Point) - ZEVector3::DotProduct(BoundingBox.Position,BoundingBox.U)) / ZEVector3::DotProduct(BoundingBox.U,BoundingBox.U);
-	if (factor < 0.0f || factor > 1.0f) 
+	ZEVector3 Position = BoundingBox.Center - 
+		BoundingBox.Right * BoundingBox.HalfSize.x - 
+		BoundingBox.Up * BoundingBox.HalfSize.y - 
+		BoundingBox.Front * BoundingBox.HalfSize.z;
+
+	ZEVector3 Right = BoundingBox.Right * (BoundingBox.HalfSize.x * 2.0f);
+	ZEVector3 Up = BoundingBox.Up * (BoundingBox.HalfSize.y * 2.0f);
+	ZEVector3 Front = BoundingBox.Front * (BoundingBox.HalfSize.z * 2.0f);
+
+	Factor = (ZEVector3::DotProduct(Right, Point) - ZEVector3::DotProduct(Position, Right)) / ZEVector3::DotProduct(Right, Right);
+	if (Factor < 0.0f || Factor > 1.0f) 
 		return false;
 
-	factor = (ZEVector3::DotProduct(BoundingBox.V,Point) - ZEVector3::DotProduct(BoundingBox.Position,BoundingBox.V)) / ZEVector3::DotProduct(BoundingBox.V,BoundingBox.V);
-	if (factor < 0.0f || factor > 1.0f) 
+	Factor = (ZEVector3::DotProduct(Up, Point) - ZEVector3::DotProduct(Position, Up)) / ZEVector3::DotProduct(Up, Up);
+	if (Factor < 0.0f || Factor > 1.0f) 
 		return false;
 
-	factor = (ZEVector3::DotProduct(BoundingBox.N,Point) - ZEVector3::DotProduct(BoundingBox.Position,BoundingBox.N)) / ZEVector3::DotProduct(BoundingBox.N,BoundingBox.N);
-	if (factor < 0.0f || factor > 1.0f) 
+	Factor = (ZEVector3::DotProduct(Front, Point) - ZEVector3::DotProduct(Position, Front)) / ZEVector3::DotProduct(Front, Front);
+	if (Factor < 0.0f || Factor > 1.0f) 
 		return false;
 
 	return true;
 }
 
-bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line)
+static inline void CheckGreaterSwap(float& a, float& b) 
 {
-//	ZEASSERT(true, "Not implamented");
+	if (b > a)
+	{
+		float Temp;
+		Temp = a;
+		a = b;
+		b = Temp;
+	}
+}
+
+static inline void CheckLesserSwap(float& a, float& b) 
+{
+	if (b < a)
+	{
+		float Temp;
+		Temp = a;
+		a = b;
+		b = Temp;
+	}
+}
+
+bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax)
+{
+	float T1, T2;
+	float TMinI = FLT_MAX , TMaxI = FLT_MIN;
+
+	ZEPlane XN(BoundingBox.GetEdge(0), -BoundingBox.Right);	
+	if (!ZEPlane::IntersectionTest(XN, Line, T1))
+		return false;
+
+	ZEPlane XP(BoundingBox.GetEdge(1), BoundingBox.Right);
+	ZEPlane::IntersectionTest(XP, Line, T2);
+	
+	CheckGreaterSwap(T1, T2);
+	CheckGreaterSwap(TMinI, T1);
+	CheckLesserSwap(TMaxI, T2);
+	if (TMinI > TMaxI)
+		return false;
+
+	ZEPlane YN(BoundingBox.GetEdge(3), -BoundingBox.Up);
+	if (!ZEPlane::IntersectionTest(YN, Line, T1))
+		return false;
+	
+	ZEPlane YP(BoundingBox.GetEdge(4), BoundingBox.Up);
+	ZEPlane::IntersectionTest(YP, Line, T2);
+
+	CheckGreaterSwap(T1, T2);
+	CheckGreaterSwap(TMinI, T1);
+	CheckLesserSwap(TMaxI, T2);
+	if (TMinI > TMaxI)
+		return false;
+
+	ZEPlane ZN(BoundingBox.GetEdge(5), -BoundingBox.Front);
+	if (!ZEPlane::IntersectionTest(ZN, Line, T2));
+		return false;
+
+	ZEPlane ZP(BoundingBox.GetEdge(6), BoundingBox.Front);
+	ZEPlane::IntersectionTest(ZP, Line, T2);
+
+	CheckGreaterSwap(T1, T2);
+	CheckGreaterSwap(TMinI, T1);
+	CheckLesserSwap(TMaxI, T2);
+	if (TMinI > TMaxI)
+		return false;
+
+	TMin = TMin;
+	TMax = TMax;
+	return true;
+}
+
+bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray, float& TMin, float& TMax)
+{
 	return false;
 }
 
-bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray)
+bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax)
 {
-//	ZEASSERT(true, "Not implamented");
 	return false;
-}
 
-bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZELineSegment& LineSegment)
-{
-//	ZEASSERT(true, "Not implamented");
-	return false;
 }
 
 ZEOBoundingBox::ZEOBoundingBox()
 {
 }
 
-ZEOBoundingBox::ZEOBoundingBox(const ZEVector3 Position, const ZEVector3 U, const ZEVector3 V,const ZEVector3 N)
+ZEOBoundingBox::ZEOBoundingBox(const ZEVector3 Center, const ZEVector3 Right, const ZEVector3 Up, const ZEVector3 Front)
 {
-	this->Position = Position;
-	this->U = U;
-	this->V = V;
-	this->N = N;
+	this->Center = Center;
+	this->Right = Right;
+	this->Up = Up;
+	this->Front = Front;
 }
 
 

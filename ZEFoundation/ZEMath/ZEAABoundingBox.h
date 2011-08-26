@@ -34,14 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_AABOUNDINGBOX_H__
-#define __ZE_MATH_AABOUNDINGBOX_H__
+#ifndef __ZE_MATH_AA_BOUNDING_BOX_H__
+#define __ZE_MATH_AA_BOUNDING_BOX_H__
 #include "ZEVector.h"
 #include "ZEMatrix.h"
 #include "ZEPlane.h"
 
 class ZEBoundingSphere;
 class ZEOBoundingBox;
+
 class ZEAABoundingBox
 {
 public:
@@ -51,11 +52,8 @@ public:
 	ZEVector3					GetVertex(unsigned char Index) const;
 	float						GetLenght() const;
 
-
-	void						GenerateBoundingSphere(ZEBoundingSphere& BoundingSphere) const;
-	void						GenerateBoundingSphere(ZEBoundingSphere& BoundingSphere, const ZEMatrix4x4& Transform) const;
-	void						GenerateOBoundingBox(ZEOBoundingBox& BoundingBox) const;
-	void						GenerateOBoundingBox(ZEOBoundingBox& BoundingBox, const ZEMatrix4x4& Transform) const;
+	static void					GenerateBoundingSphere(ZEBoundingSphere& BoundingSphere, const ZEAABoundingBox& BoundingBox);
+	static void					GenerateOBoundingBox(ZEOBoundingBox& OrientedBoundingBox, const ZEAABoundingBox& BoundingBox);
 
 	static void					Transform(ZEAABoundingBox& Output, const ZEAABoundingBox& Input, const ZEMatrix4x4& TransformMatrix);
 

@@ -282,6 +282,22 @@ void ZEVector2::SaturateSelf()
 	ZEVector2::Saturate(*this, *this);
 }
 
+float ZEVector2::Min() const
+{
+	if (x < y)
+		return x;
+	else
+		return y;
+}
+
+float ZEVector2::Max() const
+{
+	if (x > y)
+		return x;
+	else
+		return y;
+}
+
 ZEVector2 ZEVector2::operator +(const ZEVector2 &RightOperand) const
 {
 	ZEVector2 Temp;
@@ -711,6 +727,34 @@ ZEVector3 ZEVector3::Saturate() const
 void ZEVector3::SaturateSelf()
 {
 	ZEVector3::Saturate(*this, *this);
+}
+
+float ZEVector3::Min() const
+{
+	if (x < y)
+		if (x < z)
+			return x;
+		else
+			return z;
+	else
+		if (y < z)
+			return y;
+		else
+			return x;
+}
+
+float ZEVector3::Max() const
+{
+	if (x > y)
+		if (x > z)
+			return x;
+		else
+			return z;
+	else
+		if (y > z)
+			return y;
+		else
+			return x;
 }
 
 ZEVector3 ZEVector3::operator+(const ZEVector3 &RightOperand) const
@@ -1155,6 +1199,26 @@ ZEVector4 ZEVector4::Saturate() const
 void ZEVector4::SaturateSelf()
 {
 	ZEVector4::Saturate(*this, *this);
+}
+
+float ZEVector4::Min() const
+{
+	float Min = x;
+	for (int I = 1; I < 4; I++)
+		if (M[I] < Min)
+			Min = M[I];
+
+	return Min;
+}
+
+float ZEVector4::Max() const
+{
+	float Max = x;
+	for (int I = 1; I < 4; I++)
+		if (M[I] > Max)
+			Max = M[I];
+
+	return Max;
 }
 
 ZEVector4 ZEVector4::operator+(const ZEVector4 &RightOperand) const
