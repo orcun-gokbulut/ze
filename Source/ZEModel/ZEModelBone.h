@@ -46,6 +46,7 @@ class ZEModel;
 class ZEModelBone
 {
 	friend class ZEModel;
+	friend class ZEModelIKChain;
 	private:
 		ZEModel*							Owner;
 		const ZEModelResourceBone*			BoneResource;
@@ -54,10 +55,6 @@ class ZEModelBone
 
 		ZEVector3							RelativePosition;
 		ZEQuaternion						RelativeRotation;
-
-		ZEVector3							InitialRelativePosition;
-		ZEQuaternion						InitialRelativeRotation;
-
 
 		ZEMatrix4x4							ModelTransform;
 		ZEMatrix4x4							WorldTransform;
@@ -93,6 +90,12 @@ class ZEModelBone
 		const ZEMatrix4x4&					GetLocalTransform();
 		const ZEMatrix4x4&					GetWorldTransform();		
 		const ZEMatrix4x4&					GetModelTransform();
+
+		const ZEVector3&					GetInitialRelativePosition();
+		const ZEQuaternion&					GetInitialRelativeRotation();
+		
+		const ZEVector3&					GetInitialLocalPosition();
+		const ZEQuaternion&					GetInitialLocalRotation();
 
 		const ZEMatrix4x4&					GetInitialRelativeTransform();
 		const ZEMatrix4x4&					GetInitialLocalTransform();

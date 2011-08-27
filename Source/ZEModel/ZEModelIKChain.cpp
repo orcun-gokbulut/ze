@@ -150,7 +150,11 @@ void ZEModelIKChain::Iterate()
 			else if (Angle < -RotationLimit)
 				Angle = -RotationLimit;
 
+			if (!Normal.IsValid())
+				return;
+
 			ZEQuaternion Rotation = ZEQuaternion(Angle, Normal); //Local Space
+
 			Rotation *= CurrentNode.Bone->GetLocalRotation();
 			Rotation.NormalizeSelf();
 			CurrentNode.Bone->SetLocalRotation(Rotation);
@@ -158,16 +162,9 @@ void ZEModelIKChain::Iterate()
 			// Limit Angles
 			if (CurrentNode.LimitRotation)
 			{
-				ZEVector3 Angles;
-				ZEQuaternion TT = CurrentNode.Bone->GetRelativeRotation();
+				ZEVector3 Angles;			
 				ZEQuaternion::ConvertToEulerAngles(Angles, CurrentNode.Bone->GetRelativeRotation());
-				ZEQuaternion TD;
-				ZEQuaternion::CreateFromEuler(TD, Angles);
-
-
-				ZEQuaternion::ConvertToEulerAngles(Angles, CurrentNode.Bone->GetRelativeRotation());
-				Angles.ClampSelf(CurrentNode.MinRotationAngle, CurrentNode.MaxRotationAngle);
-				ZEQuaternion::CreateFromEuler(Rotation, Angles);
+				ZEQuaternion::CreateFromEuler(Rotation, Angles.Clamp(CurrentNode.MinRotationAngle, CurrentNode.MaxRotationAngle));
 				CurrentNode.Bone->SetRelativeRotation(Rotation);
 			}
 		}

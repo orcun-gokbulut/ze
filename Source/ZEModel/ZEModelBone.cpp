@@ -119,6 +119,26 @@ const ZEMatrix4x4& ZEModelBone::GetModelTransform()
 	return WorldTransform;
 }
 
+const ZEVector3& ZEModelBone::GetInitialRelativePosition()
+{
+	return BoneResource->RelativePosition;
+}
+
+const ZEQuaternion& ZEModelBone::GetInitialRelativeRotation()
+{
+	return BoneResource->RelativeRotation;
+}
+
+const ZEMatrix4x4& ZEModelBone::GetInitialRelativeTransform()
+{
+	return BoneResource->RelativeTransform;
+}
+
+const ZEMatrix4x4& ZEModelBone::GetInitialLocalTransform()
+{
+	return BoneResource->ForwardTransform;
+}
+
 const ZEMatrix4x4& ZEModelBone::GetVertexTransform()
 {
 	ZEMatrix4x4::Multiply(VertexTransform, GetLocalTransform(), BoneResource->InverseTransform);
