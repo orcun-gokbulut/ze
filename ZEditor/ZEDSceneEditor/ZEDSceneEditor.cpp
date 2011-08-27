@@ -338,10 +338,6 @@ void MapEditor::StartEngine()
 {
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();
-	zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_GRAPHICS));
-	zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_SOUND));
-	zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModule("VirtualInput"));
-	zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModule("PhysX"));
 	zeCore->GetWindow()->SetWindowType(ZE_WT_COMPONENT);
 	zeCore->GetWindow()->SetComponentWindowHandle(ui.ViewPort->winId());
 	zeInitialize(GetModuleHandle(NULL), ui.ViewPort->winId());

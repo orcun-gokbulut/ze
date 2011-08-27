@@ -59,6 +59,9 @@ class ZEApplicationModule : public ZEModule
 		virtual void					StartUp();
 		virtual void					ShutDown();
 
+		virtual void					Start();
+		virtual void					Stop();
+
 		virtual void					Tick(float ElapsedTime);
 		virtual void					Render(float ElapsedTime);
 };

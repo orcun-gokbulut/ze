@@ -112,6 +112,8 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 
 bool ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
 {
+	return true;
+
 	Statistics.TotalEntityCount++;
 
 	ZEDWORD EntityDrawFlags = Entity->GetDrawFlags();

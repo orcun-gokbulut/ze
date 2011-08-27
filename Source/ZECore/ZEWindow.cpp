@@ -213,7 +213,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 	if (!WindowHandle)
 	{
 		ShowWindowError();
-		zeError("Win32Window Module", "Could not create window.");
+		zeError("Win32Window Module", "Can not create window.");
 		return false;
 	}
 	ShowWindow();

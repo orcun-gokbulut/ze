@@ -58,6 +58,7 @@ bool ZEClassDescription::CheckParent(ZEClassDescription* Parent, ZEClassDescript
 	{
 		if (Current == Parent)
 			return true;
+
 		Current = Current->GetParent();
 	}
 	return false;

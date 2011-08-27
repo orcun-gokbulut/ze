@@ -193,6 +193,11 @@ bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norm
 	return Found;
 }
 
+ZEPortalMapResource* ZEPortalMap::GetResource() const
+{
+	return Resource;
+}
+
 ZEPortalMap* ZEPortalMap::CreateInstance()
 {
 	return new ZEPortalMap();

@@ -191,7 +191,7 @@ void ZEModel::LoadModelResource()
 			Skeleton.Add(&Bones[I]);
 	}
 
-	if(Skeleton.GetCount() > 1)
+	if(false/*Skeleton.GetCount() > 1*/)
 	{
 		ZEVector3 AveragePosition = ZEVector3::Zero;
 
@@ -418,13 +418,13 @@ void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
 
 void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 {
-	if (!GetVisible())
+	if(!GetVisible())
 		return;
 
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Draw(DrawParameters);
 	
-	DebugDraw(DrawParameters->Renderer);
+	//DebugDraw(DrawParameters->Renderer);
 }
 
 void ZEModel::Tick(float ElapsedTime)

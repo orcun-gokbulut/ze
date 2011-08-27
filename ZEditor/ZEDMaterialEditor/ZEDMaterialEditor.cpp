@@ -40,6 +40,7 @@
 #include <ZESDK.h>
 #include <ZECore/ZECore.h>
 #include <ZECore/ZEWindow.h>
+#include <ZECore/ZEConsole.h>
 #include <ZECore/ZEOptionManager.h>
 #include <ZECore/ZEModuleManager.h>
 
@@ -87,13 +88,11 @@ void ZEDMaterialEditor::InitializeEngine()
 {
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();
-	zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_GRAPHICS));
-	zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModule(ZE_MT_SOUND));
-	zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModule("VirtualInput"));
-	zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModule("PhysX"));
 	zeCore->GetWindow()->SetWindowType(ZE_WT_COMPONENT);
 	zeCore->GetWindow()->SetComponentWindowHandle(ViewPort->winId());
+	
 	zeInitialize(GetModuleHandle(NULL), ViewPort->winId());
+	zeCore->GetConsole()->SetConsoleInterface(NULL);
 	//zeCore->GetGame()->GetScene()->SetVisualDebugElements(ZE_VDE_NONE);
 }
 

@@ -158,10 +158,10 @@ void ZEError::RaiseError(const char* From, ZEErrorType Level, const char* ErrorF
 	if (Level == ZE_EL_CRITICAL)
 	{
 		zeCore->SetCoreState(ZE_CS_CRITICALERROR);
-		ZEConsoleWindow ConsoleWindow;
-		ZECore::GetInstance()->GetConsole()->SetConsoleInterface(&ConsoleWindow);
-		ConsoleWindow.TermiantionState();
-		ZECore::GetInstance()->GetConsole()->SetConsoleInterface(NULL);
+		//ZEConsoleWindow ConsoleWindow;
+		//ZECore::GetInstance()->GetConsole()->SetConsoleInterface(&ConsoleWindow);
+		//ConsoleWindow.TermiantionState();
+		//ZECore::GetInstance()->GetConsole()->SetConsoleInterface(NULL);
 		exit(0);
 	}
 }

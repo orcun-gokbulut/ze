@@ -90,6 +90,12 @@ void ZEApplicationModule::ShutDown()
 {
 }
 
+void ZEApplicationModule::Start()
+{
+}
+void ZEApplicationModule::Stop()
+{
+}
 void ZEApplicationModule::Tick(float ElapsedTime)
 {
 }

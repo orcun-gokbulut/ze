@@ -184,6 +184,44 @@ const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()
 {
 	return Entities;
 }
+/*
+ZEArray<ZEEntity*> ZEScene::GetEntities(const char* ClassName)
+{
+	ZEArray<ZEEntity*> ProperEntities;
+	ZEEntity* CurrentEntity = NULL;
+	ZEClassDescription* CurrentDesc = NULL;
+	ProperEntities.Clear();
+
+	for (int I = 0; I < Entities.GetCount(); I++)
+	{
+		CurrentDesc = CurrentEntity->GetClassDescription();
+
+		while(CurrentDesc != NULL)
+		{
+			if( strcmp(CurrentDesc->GetName(), ClassName) == 0 )
+
+		}
+	}
+	
+	return ProperEntities;
+}*/
+
+ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClassDescription* Desc)
+{
+	ZEArray<ZEEntity*> ProperEntities;
+	ZEEntity* CurrentEntity = NULL;
+	ProperEntities.Clear();
+
+	for (int I = 0; I < Entities.GetCount(); I++)
+	{
+		CurrentEntity = Entities[I];
+
+		if (ZEClassDescription::CheckParent(Desc, CurrentEntity->GetClassDescription()))
+			ProperEntities.Add(CurrentEntity);
+	}
+
+	return ProperEntities;
+}
 
 ZERenderer* ZEScene::GetRenderer()
 {

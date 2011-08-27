@@ -901,14 +901,14 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		HDRProcessor.SetOutput((ZED3D9ViewPort*)SSAAInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);	
 
-		Do2DPass();
-
-		// Anti aliasing pass
+		//Anti aliasing pass
 		SSAAProcessor.SetInputDepth(GBuffer1);
 		SSAAProcessor.SetInputNormal(GBuffer2);
 		SSAAProcessor.SetInputColor(SSAAInputBuffer);
 		SSAAProcessor.SetOutput(ViewPort);
 		SSAAProcessor.Process();
+
+		Do2DPass();
 
 	GetDevice()->EndScene();
 	

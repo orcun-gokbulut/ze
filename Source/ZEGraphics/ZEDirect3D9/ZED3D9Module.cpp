@@ -189,7 +189,7 @@ bool ZED3D9Module::Initialize()
 	
 	// Create Device
 	Result = D3D->CreateDevice(AdapterToUse, DeviceType, (HWND)zeWindow->GetHandle(), D3DCREATE_HARDWARE_VERTEXPROCESSING, &D3DPP, &Device);
-	if(FAILED(Result)) 
+	if(FAILED(Result))
 	{
 		zeCriticalError("Direct3D9", "Can not create Direct3D Device.");
 		Destroy();

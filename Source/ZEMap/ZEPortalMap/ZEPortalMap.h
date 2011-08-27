@@ -75,6 +75,8 @@ class ZEPortalMap : public ZEEntity
 		virtual bool							Initialize();
 		virtual void							Deinitialize();
 
+		ZEPortalMapResource*					GetResource() const;
+
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
 		virtual bool							CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& MinT);
 

@@ -149,10 +149,10 @@ class ZEUIControl
 		void							SetToolTip(const ZEString& ToolTip);
 		const ZEString&					GetToolTip();
 
-		void							SetVisiblity(bool Visiblity);
+		virtual void					SetVisiblity(bool Visiblity);
 		bool							GetVisiblity() const;
 
-		void							SetEnabled(bool Enabled);
+		virtual void					SetEnabled(bool Enabled);
 		bool							GetEnabled() const;
 
 		void							SetModal(bool Modal);
