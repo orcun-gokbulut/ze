@@ -78,10 +78,9 @@ void ZESystemMessageManager::ProcessMessages()
 	{	
 		TranslateMessage(&Msg);
 
-		for(size_t I = 0; I < Handlers.GetCount(); I++)
-		{
-			bool Handled = false;;
+		bool Handled = false;
 
+		for(size_t I = 0; I < Handlers.GetCount(); I++)
 			if (Msg.message > Handlers[I]->MinMessage && Msg.message < Handlers[I]->MaxMessage &&
 				(Handlers[I]->TargetWindow == NULL || Handlers[I]->TargetWindow == Msg.hwnd))
 			{
@@ -89,9 +88,8 @@ void ZESystemMessageManager::ProcessMessages()
 					Handled = true;
 			}
 
-			if (!Handled)
-				DefWindowProc(Msg.hwnd, Msg.message, Msg.wParam, Msg.lParam);
-		}
+		/*if (!Handled)
+			DefWindowProc(Msg.hwnd, Msg.message, Msg.wParam, Msg.lParam);*/
 
 		DispatchMessage(&Msg);
 	}

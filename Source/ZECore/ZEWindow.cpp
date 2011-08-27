@@ -103,7 +103,32 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 		case WM_CREATE:
-			return 0;
+			return true;
+
+		case WM_SIZE:
+			if (!WindowInitialization)
+				Window->WindowResized(LOWORD(lParam), HIWORD(lParam));
+			return true;
+
+		case WM_PAINT:
+			ValidateRect(hWnd, NULL);
+			return true;
+
+		case WM_ACTIVATE:
+			if (wParam == WA_INACTIVE)
+				Window->WindowLostFocus();
+			else
+				Window->WindowGainedFocus();
+			return true;
+
+		case WM_CLOSE:
+			if (MessageBox(hWnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
+				Window->WindowDestroyed();
+			return true;
+
+		case WM_DESTROY:
+			Window->WindowDestroyed();
+			return true;
 
 		default:
 			return DefWindowProc(hWnd, msg, wParam, lParam);
@@ -193,7 +218,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 		return false;
 	}
 
-	ZESystemMessageManager::GetInstance()->RegisterMessageHandler(SystemMessageHandler);
+	//ZESystemMessageManager::GetInstance()->RegisterMessageHandler(SystemMessageHandler);
 
 	WindowHandle = CreateWindowEx(WS_EX_APPWINDOW, 
                "ZINEK ENGINE WINDOW", 
