@@ -51,8 +51,8 @@ void ZEQuaternion::Create(ZEQuaternion& Output, float w, float x, float y, float
 	Output.y = y;
 	Output.z = z;
 
-	zefAssert(!Output.IsValid(), "");
-	zefAssert(!Output.IsNormalized(), "");
+	/*zefAssert(!Output.IsValid(), "");
+	zefAssert(!Output.IsNormalized(), "");*/
 }
 
 
@@ -166,6 +166,15 @@ void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Mat
 	zefAssert(!Output.IsValid(), "Output quaternion is not valid.");
 }
 
+static void Product_NOCHECK(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B)
+{
+	Output.w = A.w * B.w - A.x * B.x - A.y * B.y - A.z * B.z;
+	Output.x = A.w * B.x + A.x * B.w + A.y * B.z - A.z * B.y;
+	Output.y = A.w * B.y - A.x * B.z + A.y * B.w + A.z * B.x;
+	Output.z = A.w * B.z + A.x * B.y - A.y * B.x + A.z * B.w;
+}
+
+
 void ZEQuaternion::Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQuaternion& B)
 {
 	zefAssert(!A.IsValid(), "");
@@ -174,10 +183,7 @@ void ZEQuaternion::Product(ZEQuaternion& Output, const ZEQuaternion& A, const ZE
 	zefAssert(!B.IsValid(), "");
 	zefAssert(!B.IsNormalized(), "");
 
-	Output.w = A.w * B.w - A.x * B.x - A.y * B.y - A.z * B.z;
-	Output.x = A.w * B.x + A.x * B.w + A.y * B.z - A.z * B.y;
-	Output.y = A.w * B.y - A.x * B.z + A.y * B.w + A.z * B.x;
-	Output.z = A.w * B.z + A.x * B.y - A.y * B.x + A.z * B.w;
+	Product_NOCHECK(Output, A, B);
 
 	zefAssert(!Output.IsValid(), "Output quaternion is not valid.");
 	zefAssert(!Output.IsNormalized(), "Output quaternion is not normalized.");
@@ -190,10 +196,10 @@ void ZEQuaternion::VectorProduct(ZEVector3& Output, const ZEQuaternion& Quaterni
 
 	ZEQuaternion Vect(0, Vector.x, Vector.y, Vector.z), Temp, InvQ;
 	
-	Product(Temp, Quaternion, Vect);
-	
+	Product_NOCHECK(Temp, Quaternion, Vect);	
 	Conjugate(InvQ, Quaternion);
-	Product(Vect, Temp, InvQ);
+	Product_NOCHECK(Vect, Temp, InvQ);
+
 	Output.x = Vect.x;
 	Output.y = Vect.y;
 	Output.z = Vect.z;
