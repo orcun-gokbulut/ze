@@ -228,7 +228,7 @@ bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const Z
 
 bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const ZERay& Ray, float& TMin, float& TMax)
 {
-	float TempTMin = FLT_MIN;
+	float TempTMin = -FLT_MAX;
 	float TempTMax = FLT_MAX;
 
 	int Result = SlabTest(BoundingBox.Center, BoundingBox.Right, BoundingBox.HalfSize.x, &Ray, TempTMin, TempTMax);
@@ -239,7 +239,7 @@ bool ZEOBoundingBox::IntersectionTest(const ZEOBoundingBox& BoundingBox, const Z
 		return false;
 
 	Result = SlabTest(BoundingBox.Center, BoundingBox.Up, BoundingBox.HalfSize.y, &Ray, TempTMin, TempTMax);
-	if (Result != 0)
+	if (Result == 0)
 		return false;
 
 	if (Result == 1 && TempTMax < 0.0f)
