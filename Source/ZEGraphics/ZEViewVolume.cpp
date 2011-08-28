@@ -60,27 +60,27 @@ bool ZEViewFrustum::ConeCullTest(const ZEBoundingSphere& BoundingSphere) const
 	return TotalLength > BoundingSphere.Radius + ExtensionLength;
 }
 
-bool ZEViewFrustum::CullTest(const ZEAABoundingBox& BoundingBox) const
+bool ZEViewFrustum::CullTest(const ZEOBBox& BoundingBox) const
 {
-	if ((ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE) ||
-		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
-		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE) ||
-		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE) ||
-		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
-		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE))
+	if ((ZEOBBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEOBBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEOBBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEOBBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEOBBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEOBBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
 		return true;
 
 	return false;
 }
 
-bool ZEViewFrustum::CullTest(const ZEOBoundingBox& BoundingBox) const 
+bool ZEViewFrustum::CullTest(const ZEAABoundingBox& BoundingBox) const
 {
-	if ((ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
-		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
-		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
-		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE) ||
-		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)		== ZEHALFSPACE_NEGATIVESIDE) ||
-		(ZEOBoundingBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)	== ZEHALFSPACE_NEGATIVESIDE))
+	if ((ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
 		return true;
 
 	return false;
@@ -265,7 +265,7 @@ bool ZEViewHemiSphere::LightCullTest(ZELight* Light) const
 
 bool ZEViewHemiSphere::CullTest(const ZEAABoundingBox& BoundingBox) const
 {
-	return ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, HalfPlane) == ZEHALFSPACE_NEGATIVESIDE 
+	return ZEAABoundingBox::PlaneHalfSpaceTest(BoundingBox, HalfPlane) == ZE_HS_NEGATIVE_SIDE 
 		|| !ZEBoundingSphere::CollisionTest(BoundingSphere, BoundingBox);
 }
 
@@ -274,7 +274,7 @@ bool ZEViewHemiSphere::CullTest(ZEEntity* Entity) const
 	return 
 //		ZEBoundingSphere::PlaneHalfSpaceTest(Entity->GetWorldBoundingSphere(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
 //		!ZEBoundingSphere::CollisionTest(BoundingSphere, Entity->GetWorldBoundingSphere()) ||
-		ZEAABoundingBox::PlaneHalfSpaceTest(Entity->GetWorldBoundingBox(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
+		ZEAABoundingBox::PlaneHalfSpaceTest(Entity->GetWorldBoundingBox(), HalfPlane) == ZE_HS_NEGATIVE_SIDE ||
 		!ZEAABoundingBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere);
 }
 
@@ -370,7 +370,7 @@ ZEDoorViewTest ZEViewPlane::CullTest(const ZERectangle3D& PortalDoor) const
 	for (int I = 0; I < 4; I++)
 	{
 		const ZEVector3& Point = PortalDoor.GetPoint(I);
-		if (ZEPlane::TestHalfSpace(Plane, Point) == ZEHALFSPACE_NEGATIVESIDE || ZEPlane::Distance(Plane, Point) > MaxDistance)
+		if (ZEPlane::TestHalfSpace(Plane, Point) == ZE_HS_NEGATIVE_SIDE || ZEPlane::Distance(Plane, Point) > MaxDistance)
 			Visible = true;
 		else
 			if (Visible)

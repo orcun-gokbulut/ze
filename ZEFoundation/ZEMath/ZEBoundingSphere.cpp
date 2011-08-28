@@ -44,11 +44,11 @@
 
 ZEHalfSpace ZEBoundingSphere::PlaneHalfSpaceTest(const ZEBoundingSphere& BoundingSphere, const ZEPlane& Plane)
 {
-	if (ZEPlane::Distance(Plane, BoundingSphere.Position) <= BoundingSphere.Radius) return ZEHALFSPACE_INTERSECTS;
+	if (ZEPlane::Distance(Plane, BoundingSphere.Position) <= BoundingSphere.Radius) return ZE_HS_INTERSECTS;
 
 	ZEVector3 temp;
 	ZEVector3::Sub(temp,BoundingSphere.Position,Plane.p);
-	return ((ZEVector3::DotProduct(temp,Plane.n) < 0) ? ZEHALFSPACE_NEGATIVESIDE : ZEHALFSPACE_POSITIVESIDE);
+	return ((ZEVector3::DotProduct(temp,Plane.n) < 0) ? ZE_HS_NEGATIVE_SIDE : ZE_HS_POSITIVE_SIDE);
 }
 
 
@@ -117,7 +117,7 @@ bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, 
  	return ZELineSegment::MinimumDistance(LineSegment, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
 }
 
-bool ZEBoundingSphere::CollisionTest(const ZEBoundingSphere& BoundingSphere, const ZEOBoundingBox& BoundingBox)
+bool ZEBoundingSphere::CollisionTest(const ZEBoundingSphere& BoundingSphere, const ZEOBBox& BoundingBox)
 {
 	return 0;
 }

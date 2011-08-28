@@ -41,7 +41,7 @@
 #include "ZEPlane.h"
 
 class ZEBoundingSphere;
-class ZEOBoundingBox;
+class ZEOBBox;
 
 class ZEAABoundingBox
 {
@@ -53,7 +53,7 @@ public:
 	float						GetLenght() const;
 
 	static void					GenerateBoundingSphere(ZEBoundingSphere& BoundingSphere, const ZEAABoundingBox& BoundingBox);
-	static void					GenerateOBoundingBox(ZEOBoundingBox& OrientedBoundingBox, const ZEAABoundingBox& BoundingBox);
+	static void					GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABoundingBox& BoundingBox);
 
 	static void					Transform(ZEAABoundingBox& Output, const ZEAABoundingBox& Input, const ZEMatrix4x4& TransformMatrix);
 
@@ -67,7 +67,7 @@ public:
 	static bool					IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZELineSegment& LineSegment);
 	static bool					IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZELineSegment& LineSegment, float& MinT, float& MaxT);
 	
-	static bool					CollisionTest(const ZEAABoundingBox& BoundingBox1, const ZEOBoundingBox& BoundingBox2);
+	static bool					CollisionTest(const ZEAABoundingBox& BoundingBox1, const ZEOBBox& BoundingBox2);
 	static bool					CollisionTest(const ZEAABoundingBox& BoundingBox1, const ZEAABoundingBox& BoundingBox2);
 	static bool					CollisionTest(const ZEAABoundingBox& BoundingBox, const ZEBoundingSphere& BoundingSphere);
 

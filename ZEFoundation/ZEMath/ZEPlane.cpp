@@ -140,21 +140,19 @@ ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane Plane, const ZEVector3 Point)
 	if (fabs(D) < ZE_ZERO_TRESHOLD)
 		return ZEHALFSPACE_ONPLANE;
 	else if (D > ZE_ZERO_TRESHOLD)
-		return ZEHALFSPACE_POSITIVESIDE;
+		return ZE_HS_POSITIVE_SIDE;
 	else
-		return ZEHALFSPACE_NEGATIVESIDE;
+		return ZE_HS_NEGATIVE_SIDE;
+}
+
+float ZEPlane::DistanceSigned(const ZEPlane& Plane, const ZEVector3& Point)
+{
+	return fabs(ZEVector3::DotProduct(Plane.p - Point, Plane.n));
 }
 
 float ZEPlane::Distance(const ZEPlane& Plane, const ZEVector3& Point)
 {
-	ZEVector3 Temp;
-	ZEVector3::Sub(Temp, Point , Plane.p);
-
-	float t = -ZEVector3::DotProduct(Plane.n, Temp) / ZEVector3::DotProduct(Plane.n, Plane.n);
-
-	ZEVector3::Scale(Temp, Plane.n, t);
-	ZEVector3::Add(Temp, Temp, Point);
-	return fabs(ZEVector3::Distance(Point, Temp));
+	return ZEVector3::DotProduct(Plane.p - Point, Plane.n);
 }
 
 inline void ZEPlane::Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p)

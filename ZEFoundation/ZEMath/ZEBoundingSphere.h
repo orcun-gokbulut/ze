@@ -40,7 +40,7 @@
 #include "ZEMatrix.h"
 #include "ZEPlane.h"
 
-class ZEOBoundingBox;
+class ZEOBBox;
 class ZEAABoundingBox;
 class ZEBoundingSphere
 {
@@ -61,7 +61,7 @@ class ZEBoundingSphere
 		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZERay& Ray);
 		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZERay& Ray, float& MinT, float& MaxT);
 
-		static bool				CollisionTest(const ZEBoundingSphere& BoundingSphere, const ZEOBoundingBox& BoundingBox);
+		static bool				CollisionTest(const ZEBoundingSphere& BoundingSphere, const ZEOBBox& BoundingBox);
 		static bool				CollisionTest(const ZEBoundingSphere& BoundingSphere, const ZEAABoundingBox& BoundingBox);
 		static bool				CollisionTest(const ZEBoundingSphere& BoundingSphere1, const ZEBoundingSphere& BoundingSphere2);
 

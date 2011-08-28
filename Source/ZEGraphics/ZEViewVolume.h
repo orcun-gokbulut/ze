@@ -94,13 +94,14 @@ class ZEViewFrustum : public ZEViewVolume
 
 
 		bool								ConeCullTest(const ZEBoundingSphere& BoundingSphere) const;
-		virtual bool						CullTest(const ZEOBoundingBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
 		virtual bool						CullTest(const ZEBoundingSphere& BoundingSphere) const;
 
 	public:
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 
 		virtual bool						LightCullTest(ZELight* Light) const;
+		virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
 		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
@@ -146,7 +147,7 @@ class ZEViewHemiSphere : public ZEViewVolume
 class ZEViewCuboid: public ZEViewVolume
 {
 	private:
-		ZEOBoundingBox						BoundingBox;
+		ZEOBBox								BoundingBox;
 
 	public:
 		virtual ZEViewVolumeType			GetViewVolumeType() const;

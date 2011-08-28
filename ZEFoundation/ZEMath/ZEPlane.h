@@ -49,10 +49,10 @@ enum ZEPlaneIntersect
 };
 enum ZEHalfSpace
 {
-	ZEHALFSPACE_NEGATIVESIDE = -1,
+	ZE_HS_NEGATIVE_SIDE = -1,
 	ZEHALFSPACE_ONPLANE		 =  0,
-	ZEHALFSPACE_POSITIVESIDE =  1,
-	ZEHALFSPACE_INTERSECTS	 =  2,
+	ZE_HS_POSITIVE_SIDE =  1,
+	ZE_HS_INTERSECTS	 =  2,
 };
 class ZELine;
 class ZELineSegment;
@@ -69,6 +69,7 @@ class ZEPlane
 		static bool					IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, ZELine & Line);
 
 		static ZEHalfSpace			TestHalfSpace(const ZEPlane Plane, const ZEVector3 Point);
+		static float				DistanceSigned(const ZEPlane& Plane, const ZEVector3& Point);
 		static float				Distance(const ZEPlane& Plane, const ZEVector3& Point);
 
 		static void					Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p);

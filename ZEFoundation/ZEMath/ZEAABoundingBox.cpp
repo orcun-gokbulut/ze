@@ -105,7 +105,7 @@ ZEHalfSpace ZEAABoundingBox::PlaneHalfSpaceTest(const ZEAABoundingBox& BoundingB
 	{
 		ZEHalfSpace HS2 = ZEPlane::TestHalfSpace(Plane, BoundingBox.GetVertex(I));
 		if (HS1 != HS2)
-			return ZEHALFSPACE_INTERSECTS;
+			return ZE_HS_INTERSECTS;
 	}
 	return HS1;
 }
@@ -126,7 +126,7 @@ void ZEAABoundingBox::GenerateBoundingSphere(ZEBoundingSphere& BoundingSphere, c
 	BoundingSphere.Position = BoundingBox.GetCenter();
 }
 
-void ZEAABoundingBox::GenerateOBoundingBox(ZEOBoundingBox& OrientedBoundingBox, const ZEAABoundingBox& BoundingBox)
+void ZEAABoundingBox::GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABoundingBox& BoundingBox)
 {
 	OrientedBoundingBox.Center = (BoundingBox.Min + BoundingBox.Max) * 0.5f;
 
@@ -335,7 +335,7 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 		return false;
 }
 
-bool ZEAABoundingBox::CollisionTest(const ZEAABoundingBox& BoundingBox1, const ZEOBoundingBox& BoundingBox2)
+bool ZEAABoundingBox::CollisionTest(const ZEAABoundingBox& BoundingBox1, const ZEOBBox& BoundingBox2)
 {
 //	ZEASSERT(true "Not implamented");
 	return false;	
