@@ -37,6 +37,10 @@ cmake_minimum_required (VERSION 2.8)
 
 project (ZEFoundation)
 
+include_directories(
+	${PROJECT_SOURCE_DIR} 
+	${PROJECT_SOURCE_DIR}/../Include)
+
 include_directories (${PROJECT_SOURCE_DIR})
 add_subdirectory (ZEDS)
 add_subdirectory (ZEMath)

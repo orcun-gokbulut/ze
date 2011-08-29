@@ -64,7 +64,7 @@ class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 
 		virtual bool					Create(unsigned int Width, unsigned int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, unsigned int MipLevel = 0);
 		virtual void					Lock(void** Buffer, unsigned int* Pitch, unsigned int MipLevel = 0);
-		virtual void					Unlock();
+		virtual void					Unlock(unsigned int MipLevel);
 		virtual void					Release();
 
 		virtual void					Destroy();

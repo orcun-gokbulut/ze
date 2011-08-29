@@ -437,7 +437,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			}
 			TotalWriteSize += WriteSize;
 
-			TextureResource->Texture->Unlock();
+			TextureResource->Texture->Unlock(I);
 
 			// Do not downsample when 4x4 size reached
 			if(TextureInfo.TextureWidth > ZE_TC_BLOCK_WIDTH && TextureInfo.TextureHeight > ZE_TC_BLOCK_HEIGHT)
@@ -470,7 +470,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 		TotalWriteSize += WriteSize;
 
 
-		TextureResource->Texture->Unlock();
+		TextureResource->Texture->Unlock(Options.MaximumMipmapLevel - 2);
 
 		// 1x1 Mipmap
 		// Compress the last 4x4 texture and put it to 1x1 mipmap level
@@ -493,7 +493,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 		}
 		TotalWriteSize += WriteSize;
 		
-		TextureResource->Texture->Unlock();
+		TextureResource->Texture->Unlock(Options.MaximumMipmapLevel - 1);
 
 	}
 	//No Compression && Mipmapping  Case
@@ -527,7 +527,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			TotalWriteSize += WriteSize;
 
 
-			TextureResource->Texture->Unlock();
+			TextureResource->Texture->Unlock(I);
 			ZETextureTools::DownSample2x(RawTexture, TextureInfo.TexturePitch , RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
 			TextureInfo.TextureWidth /= 2;
 			TextureInfo.TextureHeight /= 2;
@@ -559,7 +559,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 		TotalWriteSize += WriteSize;
 
 
-		TextureResource->Texture->Unlock();
+		TextureResource->Texture->Unlock(0);
 	}
 	//No Compression && No Mipmapping  Case
 	else 
@@ -589,7 +589,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 		TotalWriteSize += WriteSize;
 
 
-		TextureResource->Texture->Unlock();
+		TextureResource->Texture->Unlock(0);
 	}
 
 
@@ -635,7 +635,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 	unsigned int MipMapCount	= 0;
 	unsigned int TextureSize	= 0;
 	unsigned int Multiplier		= 1;
-	ZETexturePixelFormat PixelFormat;
+	ZETexturePixelFormat PixelFormat = ZE_TPF_RGBA_INT32;
 
 	// Get the original texture's options
 	if(!ZETextureLoader::GetTextureInfo(TextureInfo, ResourceFile))
@@ -690,7 +690,6 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 				PixelFormat = ZE_TPF_RGBA_DXT1;
 				break;
 
-			case ZE_TCT_AUTO:
 			case ZE_TCT_DXT3:
 				CompressionMultiplier *= 4;
 				CompressionBlockSize *= 16;
@@ -708,7 +707,8 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 				PixelFormat = ZE_TPF_RGBA_INT32;
 				break;
 		}
-	}		
+	}
+	
 	else
 		PixelFormat = ZE_TPF_RGBA_INT32;
 
@@ -765,7 +765,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 			}
 			
 			TotalReadSize += ReadSize;
-			TextureResource->Texture->Unlock();
+			TextureResource->Texture->Unlock(I);
 
 			// Prepare to read for the next mipmap
 			TextureWidth /= 2;
@@ -789,7 +789,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 		TotalReadSize += ReadSize;
 
 
-		TextureResource->Texture->Unlock();
+		TextureResource->Texture->Unlock(FinalTextureOptions.MaximumMipmapLevel - 2);
 
 		// 1x1 Mipmap
 		// Compress the last 4x4 texture and put it to 1x1 mipmap level
@@ -808,7 +808,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 		
 		TotalReadSize += ReadSize;
 
-		TextureResource->Texture->Unlock();
+		TextureResource->Texture->Unlock(FinalTextureOptions.MaximumMipmapLevel - 1);
 
 	}
 
@@ -837,7 +837,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 			
 			TotalReadSize += ReadSize;
 
-			TextureResource->Texture->Unlock();
+			TextureResource->Texture->Unlock(I);
 			
 			TextureWidth /= 2;
 			TextureHeight /= 2;
@@ -865,7 +865,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 		TotalReadSize += ReadSize;
 
 
-		TextureResource->Texture->Unlock();
+		TextureResource->Texture->Unlock(0);
 	}
 
 	//No Compression && No Mipmapping  Case
@@ -890,7 +890,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 		TotalReadSize += ReadSize;
 
 
-		TextureResource->Texture->Unlock();
+		TextureResource->Texture->Unlock(0);
 	}
 
 

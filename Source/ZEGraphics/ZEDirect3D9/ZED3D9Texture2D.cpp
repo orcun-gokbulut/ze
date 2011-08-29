@@ -143,9 +143,9 @@ void ZED3D9Texture2D::Lock(void** Buffer, unsigned int* Pitch, unsigned int MipL
 	*Pitch = Rect.Pitch;
 }
 
-void ZED3D9Texture2D::Unlock()
+void ZED3D9Texture2D::Unlock(unsigned int MipLevel)
 {
-	Texture->UnlockRect(0);
+	Texture->UnlockRect(MipLevel);
 }
 
 void ZED3D9Texture2D::Release()
