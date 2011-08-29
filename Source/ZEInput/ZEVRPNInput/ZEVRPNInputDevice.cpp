@@ -80,14 +80,20 @@ static void VRPN_CALLBACK Axis_ChangeHandler(void* UserData, const vrpn_ANALOGCB
 		Device->Axises[I] = Data.channel[I];
 }
 
+
+ZEVRPNInputDevice::ZEVRPNInputDevice()
+{
+	DeviceName = "VRPN";
+}
+
 unsigned int ZEVRPNInputDevice::GetDeviceId()
 {
 	return 1;
 }
 
-const char* ZEVRPNInputDevice::GetDeviceName()
+const ZEString& ZEVRPNInputDevice::GetDeviceName()
 {
-	return "VRPN";
+	return DeviceName;
 }
 
 unsigned int ZEVRPNInputDevice::GetDeviceIndex()
@@ -150,30 +156,30 @@ void ZEVRPNInputDevice::ProcessInputs()
 bool ZEVRPNInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* Action)
 {
 	ZEInputEvent* InputEvent = &InputBinding->Event;
-	if (InputEvent->DeviceType == ZE_IDT_OTHER && InputEvent->DeviceIndex == 0)
+	if (InputEvent->Device == this)
 	{
-		switch(InputEvent->InputType)
+		switch(InputEvent->Type)
 		{
 			case ZE_IT_AXIS:
-				if (InputEvent->AxisId < 3)
+				if (InputEvent->Index < 3)
 				{
 					if (InputEvent->AxisSign == ZE_IAS_POSITIVE)
 					{
-						if (Axises[InputEvent->AxisId] > 0)
+						if (Axises[InputEvent->Index] > 0)
 						{
 							Action->Id = InputBinding->ActionId;
 							Action->From =  InputBinding;
-							Action->AxisValue = Axises[InputEvent->AxisId];
+							Action->AxisValue = Axises[InputEvent->Index];
 							return true;
 						}
 					}
 					else
 					{
-						if (Axises[InputEvent->AxisId] < 0)
+						if (Axises[InputEvent->Index] < 0)
 						{
 							Action->Id = InputBinding->ActionId;
 							Action->From =  InputBinding;
-							Action->AxisValue = -Axises[InputEvent->AxisId];
+							Action->AxisValue = -Axises[InputEvent->Index];
 							return true;
 						}
 					}
@@ -182,9 +188,9 @@ bool ZEVRPNInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInpu
 
 			case ZE_IT_BUTTON:
 				for (int I = 0; I < 5; I++)
-					if ((InputEvent->ButtonState == ZE_IBS_PRESSING && (Buttons[InputEvent->ButtonId] == true)) ||
-						(InputEvent->ButtonState == ZE_IBS_PRESSED && (Buttons[InputEvent->ButtonId] == true) && !(OldButtons[InputEvent->ButtonId] == true)) || 
-						(InputEvent->ButtonState == ZE_IBS_RELEASED && !(Buttons[InputEvent->ButtonId] == true) && (OldButtons[InputEvent->ButtonId] == true)))
+					if ((InputEvent->ButtonState == ZE_IBS_PRESSING && (Buttons[InputEvent->Index] == true)) ||
+						(InputEvent->ButtonState == ZE_IBS_PRESSED && (Buttons[InputEvent->Index] == true) && !(OldButtons[InputEvent->Index] == true)) || 
+						(InputEvent->ButtonState == ZE_IBS_RELEASED && !(Buttons[InputEvent->Index] == true) && (OldButtons[InputEvent->Index] == true)))
 					{
 						Action->Id = InputBinding->ActionId;
 						Action->From =  InputBinding;					
@@ -193,7 +199,7 @@ bool ZEVRPNInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInpu
 				break;
 
 			case ZE_IT_QUATERNION:
-				if (InputEvent->OrientationId == 0)
+				if (InputEvent->Index == 0)
 				{
 					Action->Id = InputBinding->ActionId;
 					Action->From =  InputBinding;
@@ -203,7 +209,7 @@ bool ZEVRPNInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInpu
 				break;
 
 			case ZE_IT_VECTOR3:
-				if (InputEvent->VectorId == 0)
+				if (InputEvent->Index == 0)
 				{
 					Action->Id = InputBinding->ActionId;
 					Action->From =  InputBinding;

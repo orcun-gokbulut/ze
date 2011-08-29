@@ -36,10 +36,15 @@
 #include "ZEInputMapBinding.h"
 #include <string.h>
 
-ZEInputBinding::ZEInputBinding(int ActionId, const char* Name, ZEInputEvent& Event)
+ZEInputBinding::ZEInputBinding(int ActionId, ZEString InputString)
 {
 	this->ActionId = ActionId;
-	strcpy_s(this->Name, 50, Name);
+	this->Event.Create(InputString);
+}
+
+ZEInputBinding::ZEInputBinding(int ActionId, ZEInputEvent& Event)
+{
+	this->ActionId = ActionId;
 	this->Event = Event;
 }
 

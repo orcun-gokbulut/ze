@@ -120,6 +120,8 @@ bool ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameter
 	if ((EntityDrawFlags & ZE_DF_DRAW) != ZE_DF_DRAW)
 		return false;
 
+	return true;
+
 	Statistics.DrawableEntityCount++;
 
 	if (EntityDrawFlags & ZE_DF_CULL && DrawParameters->ViewVolume->CullTest(Entity))

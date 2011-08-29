@@ -108,7 +108,7 @@ unsigned int ZEWindowsInputKeyboardDevice::GetDeviceId()
 	return 1;
 }
 
-const char* ZEWindowsInputKeyboardDevice::GetDeviceName()
+const ZEString& ZEWindowsInputKeyboardDevice::GetDeviceName()
 {
 	return "Keyboard";
 }
@@ -150,11 +150,11 @@ void ZEWindowsInputKeyboardDevice::ProcessInputs()
 
 bool ZEWindowsInputKeyboardDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction)
 {
-	if (InputBinding->Event.DeviceType == ZE_IDT_KEYBOARD)
+	if (InputBinding->Event.Device == this)
 	{
-		if (InputBinding->Event.InputType == ZE_IT_BUTTON)
+		if (InputBinding->Event.Type == ZE_IT_BUTTON)
 		{
-			int ButtonIndex = InputBinding->Event.ButtonId;
+			int ButtonIndex = InputBinding->Event.Index;
 
 			if (ButtonIndex > 255)
 				return false;

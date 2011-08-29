@@ -37,45 +37,30 @@
 #ifndef	__ZE_INPUT_DESCRIPTION_H__
 #define __ZE_INPUT_DESCRIPTION_H__
 
+#include "ZEDS\ZEString.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZETypes.h"
+
+enum ZEInputType
+{
+	ZE_IT_NONE,
+	ZE_IT_AXIS, 
+	ZE_IT_BUTTON,
+	ZE_IT_VECTOR2,
+	ZE_IT_VECTOR3,
+	ZE_IT_VECTOR4,
+	ZE_IT_QUATERNION
+};
 
 class ZEInputDevice;
 
 struct ZEInputDescription
 {
-	ZEInputDevice*			OwnerDevice;
-	unsigned int			InputId;
-
-	const char*				Name[50];
-	const char*				Code[50];
-
-	union
-	{
-		struct 
-		{
-			int				AxisId;
-			float			LimitMinimum;
-			float			LimitMaximum;
-		} Axis;
-
-		struct 
-		{
-			int				ButtonId;
-		} Button;
-
-		struct 
-		{
-			int				QuaternionId;
-		} Quaternion;
-	};
-
-	struct 
-	{
-		unsigned int	VectorDimension;
-		ZEVector4		LimitMinimum;
-		ZEVector4		LimitMaximum;
-	} Vector;
+	ZEInputDevice*			Device;
+	ZEString				Name;
+	ZEDWORD					Index;
+	ZEInputType				Type;
 };
 
 #endif

@@ -37,9 +37,12 @@
 #ifndef	__ZE_INPUT_EVENT_H__
 #define __ZE_INPUT_EVENT_H__
 
+#include "ZEDS\ZEString.h"
 #include "ZEMath\ZEVector.h"
 #include "ZEMath\ZEQuaternion.h"
 #include "ZETypes.h"
+
+#include "ZEInputDescription.h"
 
 enum ZEInputButtonState
 {
@@ -55,16 +58,18 @@ enum ZEInputAxisSign
 	ZE_IAS_ALL
 };
 
-enum ZEInputType
+enum ZEInputVectorState
 {
-	ZE_IT_NONE,
-	ZE_IT_AXIS, 
-	ZE_IT_BUTTON,
-	ZE_IT_VECTOR2,
-	ZE_IT_VECTOR3,
-	ZE_IT_VECTOR4,
-	ZE_IT_QUATERNION
+	ZE_IVS_CHANGED,
+	ZE_IVS_ALWAYS
 };
+
+enum ZEInputQuaternionState
+{
+	ZE_IQS_CHANGED,
+	ZE_IQS_ALWAYS
+};
+
 
 enum ZEInputDeviceType
 {
@@ -76,49 +81,44 @@ enum ZEInputDeviceType
 	ZE_IDT_OTHER
 };
 
+class ZEInputDevice;
+
 class ZEInputEvent
 {
 	public:
-		ZEInputType					InputType;
-		ZEInputDeviceType			DeviceType;
-		ZEDWORD						DeviceIndex;
+		ZEInputDevice*				Device;		
+		ZEInputType					Type;
+		ZEDWORD						Index;
 
 		union 
 		{
-			struct
-			{
-				unsigned char		ButtonId;
-				ZEInputButtonState	ButtonState;
-			};
-			struct
-			{
-				unsigned char		AxisId;
-				ZEInputAxisSign		AxisSign;
-			};	
-
-			unsigned char			VectorId;
-			unsigned char			OrientationId;
+			ZEInputButtonState		ButtonState;
+			ZEInputAxisSign			AxisSign;
+			ZEInputVectorState		VectorState;
+			ZEInputQuaternionState	QuaternionState;
 		};
 
-		void						GetEventName(char* Buffer, size_t MaxSize);
-		void						GetEventShortName(char* Buffer, size_t MaxSize);
+		void						Create(ZEString InputString);
+		ZEString					GetInputString();
 
 									ZEInputEvent();
-									ZEInputEvent(const char* ShortName);
-									ZEInputEvent(ZEInputDeviceType Device, 
-										ZEDWORD DeviceIndex, 
-										unsigned char ButtonId, 
+									ZEInputEvent(const ZEString InputString);
+									ZEInputEvent(const ZEString DeviceName,
+										ZEDWORD Index, 
 										ZEInputButtonState ButtonState);
 
-									ZEInputEvent(ZEInputDeviceType Device, 
-										ZEDWORD DeviceIndex, 
-										unsigned char AxisId,
+									ZEInputEvent(const ZEString DeviceName, 
+										ZEDWORD Index,
 										ZEInputAxisSign AxisSign);
 
-									ZEInputEvent(ZEInputDeviceType Device,
-										ZEDWORD DeviceIndex, 
+									ZEInputEvent(const ZEString DeviceName,
 										ZEInputType Type,
-										unsigned int InputId);
+										ZEDWORD Index,
+										ZEInputVectorState State);
+
+									ZEInputEvent(const ZEString DeviceName,
+										ZEDWORD Index,
+										ZEInputQuaternionState State);
 };
 
 #endif

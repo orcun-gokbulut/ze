@@ -42,11 +42,11 @@
 class ZEInputBinding
 {
 	public: 
-		char						Name[50];
 		int							ActionId;
 		ZEInputEvent				Event;
 
-									ZEInputBinding(int ActionId, const char* Name, ZEInputEvent& Event);
+									ZEInputBinding(int ActionId, ZEInputEvent& Event);
+									ZEInputBinding(int ActionId, const ZEString InputDescription);
 									ZEInputBinding();
 };
 

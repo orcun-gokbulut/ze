@@ -101,7 +101,6 @@ class ZEViewFrustum : public ZEViewVolume
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 
 		virtual bool						LightCullTest(ZELight* Light) const;
-		virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
 		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;

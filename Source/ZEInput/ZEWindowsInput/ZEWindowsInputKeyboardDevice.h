@@ -49,8 +49,8 @@ class ZEWindowsInputKeyboardDevice : public ZEInputDevice
 	friend class ZEWindowsInputModule;
 	friend class ZEWMIKSMH;
 	private:
-		char								DeviceName[256];
-		char								DeviceType[256];
+		ZEString							DeviceName;
+		char								DeviceType;
 		int									DeviceIndex;
 
 		HANDLE								DeviceHandle;
@@ -66,7 +66,7 @@ class ZEWindowsInputKeyboardDevice : public ZEInputDevice
 
 	public:
 		virtual unsigned int				GetDeviceId();
-		virtual const char*					GetDeviceName();
+		virtual const ZEString&				GetDeviceName();
 		virtual unsigned int				GetDeviceIndex();
 
 		virtual const 

@@ -102,6 +102,7 @@ ZEWMIKSH::ZEWMIKSH(ZEWindowsInputMouseDevice* Device)
 
 ZEWindowsInputMouseDevice::ZEWindowsInputMouseDevice()
 {
+	DeviceName = "Mouse";
 	MessageHandler = new ZEWMIKSH(this);
 }
 
@@ -115,9 +116,9 @@ unsigned int ZEWindowsInputMouseDevice::GetDeviceId()
 	return 1;
 }
 
-const char* ZEWindowsInputMouseDevice::GetDeviceName()
+const ZEString& ZEWindowsInputMouseDevice::GetDeviceName()
 {
-	return "Mouse";
+	return DeviceName;
 }
 
 unsigned int ZEWindowsInputMouseDevice::GetDeviceIndex()
@@ -165,11 +166,11 @@ void ZEWindowsInputMouseDevice::ProcessInputs()
 
 bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction)
 {
-	if (InputBinding->Event.DeviceType == ZE_IDT_MOUSE)
+	if (InputBinding->Event.Device == this)
 	{
-		if (InputBinding->Event.InputType == ZE_IT_BUTTON)
+		if (InputBinding->Event.Type == ZE_IT_BUTTON)
 		{
-			int ButtonIndex = InputBinding->Event.ButtonId;
+			int ButtonIndex = InputBinding->Event.Index;
 
 			if (ButtonIndex > 5)
 				return false;
@@ -190,9 +191,9 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 				return true;
 			}
 		}
-		else if (InputBinding->Event.InputType == ZE_IT_AXIS)
+		else if (InputBinding->Event.Type == ZE_IT_AXIS)
 		{
-			int AxisIndex = InputBinding->Event.AxisId;
+			int AxisIndex = InputBinding->Event.Index;
 
 			if (AxisIndex > 2)
 				return false;
@@ -207,14 +208,14 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 			else if (InputBinding->Event.AxisSign == ZE_IAS_NEGATIVE && AxisState[AxisIndex] < 0)
 			{
 				InputAction->Id = InputBinding->ActionId;
-				InputAction->AxisValue = -AxisState[InputBinding->Event.AxisId];
+				InputAction->AxisValue = -AxisState[InputBinding->Event.Index];
 				InputAction->From = InputBinding;
 				return true;
 			}
 			else if (InputBinding->Event.AxisSign == ZE_IAS_ALL)
 			{
 				InputAction->Id = InputBinding->ActionId;
-				InputAction->AxisValue = AxisState[InputBinding->Event.AxisId];
+				InputAction->AxisValue = AxisState[InputBinding->Event.Index];
 				InputAction->From = InputBinding;
 				return true;
 			}

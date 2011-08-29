@@ -58,7 +58,7 @@ class ZEFreespaceInputDevice : public ZEInputDevice
 
 	public:
 		virtual unsigned int			GetDeviceId();
-		virtual const char*				GetDeviceName();
+		virtual ZEString&				GetDeviceName();
 		virtual unsigned int			GetDeviceIndex();
 
 		virtual const 

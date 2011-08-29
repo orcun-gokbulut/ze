@@ -50,6 +50,7 @@ class ZEVRPNInputDevice : public ZEInputDevice
 	friend class ZEVRPNInputDeviceExtension;
 
 	public:
+		ZEString						DeviceName;
 		vrpn_Tracker_Remote*			TrackerRemote;
 		vrpn_Button_Remote*				ButtonRemote;
 		vrpn_Analog_Remote*				AxisRemote;
@@ -59,8 +60,10 @@ class ZEVRPNInputDevice : public ZEInputDevice
 		ZEVector3						Vector;
 		ZEQuaternion					Quaternion;
 
+										ZEVRPNInputDevice();
+
 		virtual unsigned int			GetDeviceId();
-		virtual const char*				GetDeviceName();
+		virtual const ZEString&			GetDeviceName();
 		virtual unsigned int			GetDeviceIndex();
 
 		virtual const 

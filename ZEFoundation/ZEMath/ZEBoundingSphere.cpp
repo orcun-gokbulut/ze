@@ -80,8 +80,8 @@ bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, 
 	ZEVector3 Dest;
 	ZEVector3::Sub(Dest, Ray.p, BoundingSphere.Position);
 	float B = ZEVector3::DotProduct(Dest, Ray.v);
-	float C = ZEVector3::DotProduct(Dest, Dest) - BoundingSphere.Radius*BoundingSphere.Radius;
-	float D = B*B - C;
+	float C = ZEVector3::DotProduct(Dest, Dest) - BoundingSphere.Radius * BoundingSphere.Radius;
+	float D = B * B - C;
 	if (D > 0)
 	{
 		MaxT = MinT = -B - sqrtf(D);

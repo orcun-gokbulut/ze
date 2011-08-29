@@ -41,6 +41,7 @@
 #include "ZEInputDescription.h"
 #include "ZEInputEvent.h"
 #include "ZEInputAction.h"
+#include "ZEDS\ZEString.h"
 
 class ZEInputBinding;
 class ZEInputMap;
@@ -54,7 +55,7 @@ class ZEInputDevice
 
 	public:
 		virtual unsigned int			GetDeviceId() = 0;
-		virtual const char*				GetDeviceName() = 0;
+		virtual const ZEString&			GetDeviceName() = 0;
 
 		virtual const 
 		ZEArray<ZEInputDescription>&	GetInputDescriptions() = 0;
@@ -69,7 +70,6 @@ class ZEInputDevice
 		virtual bool					IsInitialized();
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
-
 
 		virtual void					ProcessInputs() = 0;
 

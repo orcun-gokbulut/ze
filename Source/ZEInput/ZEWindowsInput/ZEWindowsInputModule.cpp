@@ -116,8 +116,7 @@ bool ZEWindowsInputModule::Initialize()
 			ZEWindowsInputMouseDevice* Device = new ZEWindowsInputMouseDevice();
 			Device->DeviceIndex = MouseIndex;
 			
-			sprintf(Device->DeviceName, "Mouse%02d", MouseIndex);
-			strcpy(Device->DeviceType, "Mouse");
+			Device->DeviceName = "Mouse";
 			Device->DeviceHandle = DeviceList[I].hDevice;
 
 			UINT Size = sizeof(RID_DEVICE_INFO);
@@ -132,8 +131,7 @@ bool ZEWindowsInputModule::Initialize()
 			ZEWindowsInputKeyboardDevice* Device = new ZEWindowsInputKeyboardDevice();
 			Device->DeviceIndex = KeyboardIndex;
 
-			sprintf(Device->DeviceName, "Keyboard%02d", KeyboardIndex);
-			strcpy(Device->DeviceType, "Keyboard");
+			Device->DeviceName = "Keyboard";
 			Device->DeviceHandle = DeviceList[I].hDevice;
 
 			UINT Size = sizeof(RID_DEVICE_INFO);
