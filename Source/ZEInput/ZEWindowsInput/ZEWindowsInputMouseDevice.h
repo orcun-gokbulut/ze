@@ -50,7 +50,6 @@ class ZEWindowsInputMouseDevice : public ZEInputDevice
 	friend class ZEWMIKSH;
 	private:
 		ZEString						DeviceName;
-		int								DeviceIndex;
 
 		HANDLE							DeviceHandle;
 		RID_DEVICE_INFO					DeviceInfo;
@@ -66,12 +65,10 @@ class ZEWindowsInputMouseDevice : public ZEInputDevice
 										~ZEWindowsInputMouseDevice();
 
 	public:
-		virtual unsigned int			GetDeviceId();
 		virtual const ZEString&			GetDeviceName();
-		virtual unsigned int			GetDeviceIndex();
 
-		virtual const 
-		ZEArray<ZEInputDescription>&	GetInputDescriptions();
+		virtual ZEDWORD					GetButtonCount();
+		virtual ZEDWORD					GetAxisCount();
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();

@@ -57,9 +57,8 @@ class ZEInputDevice;
 
 struct ZEInputDescription
 {
-	ZEInputDevice*			Device;
-	ZEString				Name;
 	ZEDWORD					Index;
+	char*					Name;
 	ZEInputType				Type;
 };
 

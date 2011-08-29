@@ -114,8 +114,6 @@ bool ZEWindowsInputModule::Initialize()
 		if (DeviceList[I].dwType == RIM_TYPEMOUSE)
 		{
 			ZEWindowsInputMouseDevice* Device = new ZEWindowsInputMouseDevice();
-			Device->DeviceIndex = MouseIndex;
-			
 			Device->DeviceName = "Mouse";
 			Device->DeviceHandle = DeviceList[I].hDevice;
 
@@ -129,7 +127,6 @@ bool ZEWindowsInputModule::Initialize()
 		else if (DeviceList[I].dwType == RIM_TYPEKEYBOARD)
 		{
 			ZEWindowsInputKeyboardDevice* Device = new ZEWindowsInputKeyboardDevice();
-			Device->DeviceIndex = KeyboardIndex;
 
 			Device->DeviceName = "Keyboard";
 			Device->DeviceHandle = DeviceList[I].hDevice;

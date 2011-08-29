@@ -54,11 +54,14 @@ class ZEInputDevice
 		bool							Initialized;
 
 	public:
-		virtual unsigned int			GetDeviceId() = 0;
 		virtual const ZEString&			GetDeviceName() = 0;
 
-		virtual const 
-		ZEArray<ZEInputDescription>&	GetInputDescriptions() = 0;
+		virtual ZEDWORD					GetButtonCount();
+		virtual ZEDWORD					GetAxisCount();
+		virtual ZEDWORD					GetVector2Count();
+		virtual ZEDWORD					GetVector3Count();
+		virtual ZEDWORD					GetVector4Count();
+		virtual ZEDWORD					GetQuaternionCount();
 
 		virtual void					SetEnabled(bool Enabled);
 		virtual bool					GetEnabled();

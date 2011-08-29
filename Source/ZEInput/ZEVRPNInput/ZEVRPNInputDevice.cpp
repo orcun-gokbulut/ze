@@ -86,25 +86,29 @@ ZEVRPNInputDevice::ZEVRPNInputDevice()
 	DeviceName = "VRPN";
 }
 
-unsigned int ZEVRPNInputDevice::GetDeviceId()
-{
-	return 1;
-}
-
 const ZEString& ZEVRPNInputDevice::GetDeviceName()
 {
 	return DeviceName;
 }
 
-unsigned int ZEVRPNInputDevice::GetDeviceIndex()
+ZEDWORD ZEVRPNInputDevice::GetAxisCount()
+{
+	return 3;
+}
+
+ZEDWORD ZEVRPNInputDevice::GetButtonCount()
+{
+	return 5;
+}
+
+ZEDWORD ZEVRPNInputDevice::GetVector3Count()
 {
 	return 1;
 }
 
-const ZEArray<ZEInputDescription>& ZEVRPNInputDevice::GetInputDescriptions()
+ZEDWORD ZEVRPNInputDevice::GetQuaternionCount()
 {
-	ZEArray<ZEInputDescription> Temp;
-	return Temp;
+	return 1;
 }
 
 bool ZEVRPNInputDevice::Initialize()

@@ -43,7 +43,7 @@
 
 static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 {
-	ZEString DeviceName, DeviceAddress, InputType, InputIndex, InputName, InputModifier;
+	ZEString DeviceName, DeviceAddress, InputType, InputIndex, InputModifier;
 
 	enum ZEParserState
 	{
@@ -52,8 +52,6 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 		ZE_PS_INPUT_TYPE,
 		ZE_PS_INPUT_IDENTIFIER_START,
 		ZE_PS_INPUT_INDEX,
-		ZE_PS_INPUT_NAME_START,
-		ZE_PS_INPUT_NAME_END,
 		ZE_PS_INPUT_IDENTIFIER_END,
 		ZE_PS_INPUT_MODIFIER
 	};
@@ -105,25 +103,8 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 			ParserState = ZE_PS_INPUT_IDENTIFIER_START;
 			break;
 
-		case '\'':
-		case '\"':
-			if (ParserState == ZE_PS_INPUT_IDENTIFIER_START)
-				ParserState = ZE_PS_INPUT_NAME_START;
-			else if (ParserState == ZE_PS_INPUT_NAME_START)
-			{
-				ParserState = ZE_PS_INPUT_NAME_END;
-				InputName = InputString.SubString(IdentifierStart, I - 1).Trim();
-			}
-			else
-				return false;
-
-			IdentifierStart = I + 1;
-			break;
-
 		case ']':
-			if (ParserState == ZE_PS_INPUT_NAME_END)
-				ParserState = ZE_PS_INPUT_IDENTIFIER_END;
-			else if (ParserState == ZE_PS_INPUT_INDEX)
+			if (ParserState == ZE_PS_INPUT_INDEX)
 			{
 				InputIndex = InputString.SubString(IdentifierStart, I - 1).Trim();
 				ParserState = ZE_PS_INPUT_IDENTIFIER_END;
@@ -256,20 +237,6 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 	if (!InputIndex.IsEmpty())
 	{
 		Event.Index = InputIndex.ToInteger();
-	}
-	else if (!InputName.IsEmpty())
-	{
-		const ZEArray<ZEInputDescription>& Inputs = Event.Device->GetInputDescriptions();
-
-		for (int I = 0; I < Inputs.GetCount(); I++)
-			if (Inputs[I].Name == DeviceName)
-			{
-				Event.Index = Inputs[I].Index;
-				break;
-			}
-
-		if (Event.Device == NULL)
-			return false;
 	}
 }
 

@@ -35,6 +35,37 @@
 
 #include "ZEInputDevice.h"
 
+ZEDWORD ZEInputDevice::GetButtonCount()
+{
+	return 0;
+}
+
+ZEDWORD ZEInputDevice::GetAxisCount()
+{
+	return 0;
+}
+
+ZEDWORD ZEInputDevice::GetVector2Count()
+{
+	return 0;
+}
+
+ZEDWORD ZEInputDevice::GetVector3Count()
+{
+	return 0;
+}
+
+ZEDWORD ZEInputDevice::GetVector4Count()
+{
+	return 0;
+}
+
+ZEDWORD ZEInputDevice::GetQuaternionCount()
+{
+	return 0;
+}
+
+
 void ZEInputDevice::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;

@@ -111,26 +111,19 @@ ZEWindowsInputMouseDevice::~ZEWindowsInputMouseDevice()
 	delete MessageHandler;
 }
 
-unsigned int ZEWindowsInputMouseDevice::GetDeviceId()
-{
-	return 1;
-}
-
 const ZEString& ZEWindowsInputMouseDevice::GetDeviceName()
 {
 	return DeviceName;
 }
 
-unsigned int ZEWindowsInputMouseDevice::GetDeviceIndex()
+ZEDWORD ZEWindowsInputMouseDevice::GetButtonCount()
 {
-	return 1;
-
+	return 5;
 }
 
-const ZEArray<ZEInputDescription>& ZEWindowsInputMouseDevice::GetInputDescriptions()
+ZEDWORD ZEWindowsInputMouseDevice::GetAxisCount()
 {
-	ZEArray<ZEInputDescription> Descriptions;
-	return Descriptions;
+	return 3;
 }
 
 bool ZEWindowsInputMouseDevice::Initialize()

@@ -61,13 +61,13 @@ class ZEVRPNInputDevice : public ZEInputDevice
 		ZEQuaternion					Quaternion;
 
 										ZEVRPNInputDevice();
-
-		virtual unsigned int			GetDeviceId();
+		
 		virtual const ZEString&			GetDeviceName();
-		virtual unsigned int			GetDeviceIndex();
 
-		virtual const 
-		ZEArray<ZEInputDescription>&	GetInputDescriptions();
+		virtual ZEDWORD					GetAxisCount();
+		virtual ZEDWORD					GetButtonCount();
+		virtual ZEDWORD					GetVector3Count();
+		virtual ZEDWORD					GetQuaternionCount();
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
