@@ -350,6 +350,7 @@ ZEInputEvent::ZEInputEvent(const ZEString InputString)
 
 ZEInputEvent::ZEInputEvent(const ZEString DeviceName, ZEDWORD Index, ZEInputButtonState ButtonState)
 {
+	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
 	for (int I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
@@ -365,6 +366,7 @@ ZEInputEvent::ZEInputEvent(const ZEString DeviceName, ZEDWORD Index, ZEInputButt
 
 ZEInputEvent::ZEInputEvent(const ZEString DeviceName, ZEDWORD Index, ZEInputAxisSign AxisSign)
 {
+	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
 	for (int I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
@@ -380,6 +382,7 @@ ZEInputEvent::ZEInputEvent(const ZEString DeviceName, ZEDWORD Index, ZEInputAxis
 
 ZEInputEvent::ZEInputEvent(const ZEString DeviceName, ZEInputType InputType, ZEDWORD Index, ZEInputVectorState State)
 {
+	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
 	for (int I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)

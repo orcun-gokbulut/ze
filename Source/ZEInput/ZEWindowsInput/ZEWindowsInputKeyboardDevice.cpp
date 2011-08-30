@@ -107,7 +107,7 @@ ZEWindowsInputKeyboardDevice::~ZEWindowsInputKeyboardDevice()
 
 const ZEString& ZEWindowsInputKeyboardDevice::GetDeviceName()
 {
-	return "Keyboard";
+	return DeviceName;
 }
 
 ZEDWORD ZEWindowsInputKeyboardDevice::GetButtonCount()
