@@ -52,54 +52,21 @@
 #include "ZEMeta\ZEMetaDebugModule.h"
 #include "ZEUI\ZEUIDebugModule.h"
 
+#include "ZEGraphics\ZEDirect3D9\ZED3D9TextureResizer.h"
+
 extern HINSTANCE ApplicationInstance;
 
 #include <stdio.h>
 #include <string>
 #include <string.h>
 
-#include "ZEGraphics/ZEBitmap.h"
 #define FREEIMAGE_LIB
+#include "ZEGraphics\ZEBitmap.h"
 #include "FreeImage.h"
 
-extern HINSTANCE ApplicationInstance;
 
-#include "ZEDS\ZEString.h"
-#include "ZECore\ZEFile.h"
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-/*	ZEString Result5 = ZEFile::GetParentDirectory("");
-	ZEString Result15 = ZEFile::GetParentDirectory("\\\\");
-	ZEString Result6 = ZEFile::GetParentDirectory("c:\\");
-	ZEString Result7 = ZEFile::GetParentDirectory("c:\\remedy");
-	ZEString Result1 = ZEFile::GetParentDirectory("c:\\remedy\\");
-	ZEString Result2 = ZEFile::GetParentDirectory("c:\\remedy\\Blabla");
-	ZEString Result3 = ZEFile::GetParentDirectory("c:\\remedy\\bla\\sadsa.sasda");
-	ZEString Result4 = ZEFile::GetParentDirectory("c:\\remedy\\bla\\sssa.sasf\\fds");
-	ZEString Result8 = ZEFile::GetParentDirectory("c:\\remedy\\bla\\sssa.sasf\\fds\\");
-
-	ZEString esult5 = ZEFile::GetFileName("");
-	ZEString esult55 = ZEFile::GetFileName("cupling.sadd");
-	ZEString esult15 = ZEFile::GetFileName("\\\\");
-	ZEString esult6 = ZEFile::GetFileName("c:\\");
-	ZEString esult7 = ZEFile::GetFileName("c:\\remedy");
-	ZEString esult1 = ZEFile::GetFileName("c:\\remedy\\");
-	ZEString esult2 = ZEFile::GetFileName("c:\\remedy\\Blabla");
-	ZEString esult3 = ZEFile::GetFileName("c:\\remedy\\bla\\sadsa.sasda");
-	ZEString esult4 = ZEFile::GetFileName("c:\\remedy\\bla\\sssa.sasf\\fds");
-	ZEString esult8 = ZEFile::GetFileName("c:\\remedy\\bla\\sssa.sasf\\fds\\");
-
-	FreeImage_Initialise();
-	ZEBitmap Test; 
-	Test.Load("BitmapTest.bmp");
-	ZEBitmapSamplingOptions Options;
-	Options.Filter = ZE_BFM_BILINEAR;
-	Options.AddressingX = ZE_BAM_MIRROR;
-	Options.AddressingY = ZE_BAM_MIRROR;
-	Options.BorderColor = ZEPixelColor(0xFFFFFFFF);
-
-	ZEVector4 T = Test.SamplePixelFloat(ZEVector2(2.5, 2.5), &Options);*/
-
 	_set_SSE2_enable(1);
 	ApplicationInstance = hInstance;
 	
@@ -129,6 +96,48 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	zeCore->GetWindow()->SetWindowType(zeCore->GetOptions()->GetOption("Graphics", "Fullscreen")->GetValue().GetBoolean() ? ZE_WT_FULLSCREEN : ZE_WT_RESIZABLE);
 	zeCore->GetWindow()->SetWindowSize(zeCore->GetOptions()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger(), zeCore->GetOptions()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger());
 
- 	if (zeCore->StartUp())
-		zeCore->Run();
+ 	zeCore->StartUp();
+	
+	//////////////////////////////////////////
+	///// ZED3D9TextureResizer TEST Start ////
+	//////////////////////////////////////////
+
+	ZEBitmap Input; 
+	Input.Load("TextureResizeTest\\Inputs\\CarterDiffuse.tga");
+	ZEBitmapSamplingOptions Options;
+	
+	unsigned int SrcWidth = Input.GetWidth();
+	unsigned int SrcHeight = Input.GetHeight();
+	unsigned int SrcPitch = Input.GetPitch();
+
+	unsigned char* InputBuffer =  new unsigned char[SrcHeight * SrcPitch];
+	Input.CopyTo(InputBuffer, SrcPitch, SrcWidth, SrcHeight);
+	Input.Release();
+
+	unsigned int DestWidth = SrcWidth / 2;
+	unsigned int DestHeight = SrcHeight /*/ 2*/;
+	unsigned int DestPitch = SrcPitch / 2;
+
+	unsigned char* OutputBuffer = new unsigned char[SrcHeight * DestPitch];
+
+	ZED3D9TextureResizer	Resizer;
+	Resizer.Initialize(OutputBuffer, DestPitch, DestWidth, DestHeight, 
+						InputBuffer, SrcPitch, SrcWidth, SrcHeight);
+	Resizer.SetAutoFitMode(ZE_D3D9_FPO2_AUTO);
+	Resizer.SetResizeFilter(ZE_D3D9_RF_KAISER);
+	Resizer.Process();
+
+	Resizer.Deinitialize();
+
+	ZEBitmap Output;
+	Output.Create(DestWidth, SrcHeight, 4);
+	Output.CopyFrom(OutputBuffer, DestPitch, DestWidth, SrcHeight);
+	Output.Save("TextureResizeTest\\2xDownsampled\\CarterDiffuse.tga", ZE_BFF_TGA);
+	Output.Release();
+
+	//////////////////////////////////////////
+	////// ZED3D9TextureResizer TEST End /////
+	//////////////////////////////////////////
+
+	zeCore->Run();
 }

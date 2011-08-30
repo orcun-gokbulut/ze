@@ -184,7 +184,7 @@ bool ZED3D9Module::Initialize()
 			DeviceType=D3DDEVTYPE_REF;
 			break;
 		}
-	}	
+	}
 	#endif
 	
 	// Create Device
@@ -282,7 +282,7 @@ bool ZED3D9Module::Initialize()
 
 	// Get screen's z buffer
 	Result = Device->GetDepthStencilSurface(&FrameBufferViewPort.ZBuffer);
-	if(FAILED(Result)) 
+	if(FAILED(Result))
 	{
 		zeCriticalError("Direct3D9", "Can not create Direct3D Backbuffer.");
 		Destroy();
@@ -569,6 +569,7 @@ void ZED3D9Module::ClearFrameBuffer()
 	if (Device->TestCooperativeLevel() != D3D_OK)
 		RestoreDevice();
 
+	Device->SetDepthStencilSurface(FrameBufferViewPort.ZBuffer);
 	Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00555555, 1, 0);
 }
 

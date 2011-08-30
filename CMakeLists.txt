@@ -81,8 +81,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 add_subdirectory (Source)
 add_subdirectory (ZEToolSDK)
 add_subdirectory (ZEFoundation)
-add_subdirectory (ZE3dsMax)
+#add_subdirectory (ZE3dsMax)
 #add_subdirectory (ZEditor)
+#add_subdirectory (Applications)
 
 ## PACKING
 #########################################################################################
