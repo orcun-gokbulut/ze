@@ -42,8 +42,6 @@
 #include "ZEMath\ZEQuaternion.h"
 #include "ZETypes.h"
 
-#include "ZEInputDescription.h"
-
 enum ZEInputButtonState
 {
 	ZE_IBS_PRESSING,
@@ -79,6 +77,17 @@ enum ZEInputDeviceType
 	ZE_IDT_JOYSTICK,
 	ZE_IDT_SENSOR,
 	ZE_IDT_OTHER
+};
+
+enum ZEInputType
+{
+	ZE_IT_NONE,
+	ZE_IT_AXIS, 
+	ZE_IT_BUTTON,
+	ZE_IT_VECTOR2,
+	ZE_IT_VECTOR3,
+	ZE_IT_VECTOR4,
+	ZE_IT_QUATERNION
 };
 
 class ZEInputDevice;

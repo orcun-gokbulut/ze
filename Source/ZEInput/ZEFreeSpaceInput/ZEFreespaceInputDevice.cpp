@@ -44,6 +44,26 @@
 
 #include <freespace/freespace.h>
 
+ZEDWORD ZEFreespaceInputDevice::GetAxisCount()
+{
+	return 3;
+}
+
+ZEDWORD ZEFreespaceInputDevice::GetButtonCount()
+{
+	return 5;
+}
+
+ZEDWORD ZEFreespaceInputDevice::GetVector3Count()
+{
+	return 1;
+}
+
+ZEDWORD ZEFreespaceInputDevice::GetQuaternionCount()
+{
+	return 1;
+}
+
 bool ZEFreespaceInputDevice::Initialize()
 {
 	zeLog("Freespace Input Module", "Initializing module.");

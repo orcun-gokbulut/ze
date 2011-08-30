@@ -57,15 +57,13 @@ class ZEFreespaceInputDevice : public ZEInputDevice
 		ZEQuaternion					Orientation;
 
 	public:
-		virtual unsigned int			GetDeviceId();
 		virtual ZEString&				GetDeviceName();
-		virtual unsigned int			GetDeviceIndex();
 
-		virtual const 
-		ZEArray<ZEInputDescription>&	GetInputDescriptions();
-
-		virtual ZEInputEvent			GetCurrentInputEvents();
-
+		virtual ZEDWORD					GetAxisCount();
+		virtual ZEDWORD					GetButtonCount();
+		virtual ZEDWORD					GetVector3Count();
+		virtual ZEDWORD					GetQuaternionCount();
+		
 		virtual void					Acquire();
 		virtual void					UnAcuire();
 

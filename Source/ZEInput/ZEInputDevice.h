@@ -38,7 +38,6 @@
 #define __ZE_INPUT_DEVICE_H__
 
 #include "ZEDS\ZEArray.h"
-#include "ZEInputDescription.h"
 #include "ZEInputEvent.h"
 #include "ZEInputAction.h"
 #include "ZEDS\ZEString.h"
