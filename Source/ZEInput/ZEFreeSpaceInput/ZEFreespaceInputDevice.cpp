@@ -44,6 +44,11 @@
 
 #include <freespace/freespace.h>
 
+ZEString& ZEFreespaceInputDevice::GetDeviceName()
+{
+	return DeviceName;
+}
+
 ZEDWORD ZEFreespaceInputDevice::GetAxisCount()
 {
 	return 3;
@@ -66,29 +71,12 @@ ZEDWORD ZEFreespaceInputDevice::GetQuaternionCount()
 
 bool ZEFreespaceInputDevice::Initialize()
 {
-	zeLog("Freespace Input Module", "Initializing module.");
+	if (IsInitialized())
+		return false;
+
+	zeLog("Freespace Input Device", "Initializing device.");
 
 	int Result;
-	Result = freespace_init();
-	if (Result != FREESPACE_SUCCESS) 
-	{
-		zeError("Freespace Input Module", "Can not initialize Freespace. Error Code : %d.", Result);
-		return false;
-	}
-
-	FreespaceDeviceId Devices[50];
-	int NumberOfDevices;
-
-	Result = freespace_getDeviceList(Devices, 50, &NumberOfDevices);
-	if (NumberOfDevices == 0) 
-	{
-		zeError("Freespace Input Module", "Can not aquire number of freespace devices. Error Code : %d.", Result);
-		return false;
-	}
-	zeLog("Freespace Input Module", "Found %d number of devices.", NumberOfDevices);
-
-	zeLog("Freespace Input Module", "Opening first device.");
-	Device = Devices[0];
 	Result = freespace_openDevice(Device);
 	if (Result != FREESPACE_SUCCESS) 
 	{
@@ -110,6 +98,7 @@ bool ZEFreespaceInputDevice::Initialize()
 	Message.dataModeRequest.enableUserPosition = 1;
 	Message.dataModeRequest.aggregate = 1;
 	Message.dataModeRequest.inhibitPowerManager = 1;
+	Message.dataModeRequest.enableMouseMovement = 0;
 
 
 	Result = freespace_sendMessage(Device, &Message);
@@ -132,6 +121,9 @@ bool ZEFreespaceInputDevice::Initialize()
 
 void ZEFreespaceInputDevice::Deinitialize()
 {
+	if (!IsInitialized())
+		return;
+
 	zeLog("Freespace Input Module", "Deinitializing module.");
 
 	freespace_message Message;
@@ -218,6 +210,7 @@ bool ZEFreespaceInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, Z
 							Action->Id = InputBinding->ActionId;
 							Action->From =  InputBinding;
 							Action->AxisValue = Axises[InputEvent->Index];
+							return true;
 						}
 					}
 					else
@@ -227,20 +220,21 @@ bool ZEFreespaceInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, Z
 							Action->Id = InputBinding->ActionId;
 							Action->From =  InputBinding;
 							Action->AxisValue = abs(Axises[InputEvent->Index]);
+							return true;
 						}
 					}
 				}
 				break;
 
 			case ZE_IT_BUTTON:
-				for (int I = 0; I < 5; I++)
-					if ((InputEvent->ButtonState == ZE_IBS_PRESSING && (Buttons[InputEvent->Index] & 0x80)) ||
-						(InputEvent->ButtonState == ZE_IBS_PRESSED && (Buttons[InputEvent->Index] & 0x80) && !(OldButtons[InputEvent->Index] & 0x80)) || 
-						(InputEvent->ButtonState == ZE_IBS_RELEASED && !(Buttons[InputEvent->Index] & 0x80) && (OldButtons[InputEvent->Index] & 0x80)))
-					{
-						Action->Id = InputBinding->ActionId;
-						Action->From =  InputBinding;					
-					}
+				if ((InputEvent->ButtonState == ZE_IBS_PRESSING && (Buttons[InputEvent->Index] & 0x80)) ||
+					(InputEvent->ButtonState == ZE_IBS_PRESSED && (Buttons[InputEvent->Index] & 0x80) && !(OldButtons[InputEvent->Index] & 0x80)) || 
+					(InputEvent->ButtonState == ZE_IBS_RELEASED && !(Buttons[InputEvent->Index] & 0x80) && (OldButtons[InputEvent->Index] & 0x80)))
+				{
+					Action->Id = InputBinding->ActionId;
+					Action->From =  InputBinding;		
+					return true;
+				}
 				break;
 
 			case ZE_IT_QUATERNION:
@@ -249,6 +243,7 @@ bool ZEFreespaceInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, Z
 					Action->Id = InputBinding->ActionId;
 					Action->From =  InputBinding;
 					Action->Quaternion = Orientation;
+					return true;
 				}
 				break;
 
@@ -258,10 +253,16 @@ bool ZEFreespaceInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, Z
 					Action->Id = InputBinding->ActionId;
 					Action->From =  InputBinding;
 					Action->Vector = LinearPosition;
+					return true;
 				}
 				break;
 		}
 	}
 
-	return true;
+	return false;
+}
+
+ZEFreespaceInputDevice::ZEFreespaceInputDevice()
+{
+	DeviceName = "Freespace";
 }

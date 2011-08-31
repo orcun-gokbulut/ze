@@ -406,6 +406,7 @@ ZEInputEvent::ZEInputEvent(const ZEString DeviceName, ZEDWORD Index, ZEInputQuat
 			break;
 		}
 
+	this->Type = ZE_IT_QUATERNION;
 	this->Index = Index;
 	this->QuaternionState = State;
 }

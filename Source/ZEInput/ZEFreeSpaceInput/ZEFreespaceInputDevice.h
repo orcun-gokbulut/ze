@@ -47,9 +47,9 @@ class ZEFreespaceInputDevice : public ZEInputDevice
 {
 	friend class ZEFreespaceInputDeviceExtension;
 	private:
+		ZEString						DeviceName;
 		FreespaceDeviceId				Device;
 		FreespaceDeviceInfo				DeviceInfo;
-		unsigned int					DeviceIndex;
 
 		float							Axises[3];
 		bool							Buttons[5], OldButtons[5];
@@ -63,9 +63,6 @@ class ZEFreespaceInputDevice : public ZEInputDevice
 		virtual ZEDWORD					GetButtonCount();
 		virtual ZEDWORD					GetVector3Count();
 		virtual ZEDWORD					GetQuaternionCount();
-		
-		virtual void					Acquire();
-		virtual void					UnAcuire();
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
@@ -73,6 +70,8 @@ class ZEFreespaceInputDevice : public ZEInputDevice
 		virtual void					ProcessInputs();
 
 		virtual bool					ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction);
+
+										ZEFreespaceInputDevice();
 };
 
 #endif

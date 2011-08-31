@@ -52,6 +52,17 @@ ZEExtensionDescription* ZEFreespaceInputDeviceExtension::ExtensionDescription()
 	return &Desc;
 }
 
+ZEArray<ZEInputDevice*> ZEFreespaceInputDeviceExtension::GetDevices()
+{
+	ZEArray<ZEInputDevice*> DevicePointers;
+	DevicePointers.MassAdd(Devices.GetCount());
+	
+	for (size_t I = 0; I < Devices.GetCount(); I++)
+		DevicePointers[I] = &Devices[I];
+	
+	return DevicePointers;
+}
+
 bool ZEFreespaceInputDeviceExtension::Initialize()
 {
 	zeLog("Freespace Input Module", "Initializing module.");
@@ -64,18 +75,9 @@ bool ZEFreespaceInputDeviceExtension::Initialize()
 		return false;
 	}
 
-
+	FreespaceDeviceId DeviceIds[256];
 	int NumberOfDevices = 0;
-	Result = freespace_getDeviceList(NULL, 0, &NumberOfDevices);
-	if (NumberOfDevices == 0) 
-	{
-		zeWarning("Freespace Input Device Extension", "Can not aquire number of freespace devices. Error Code : %d.", Result);
-		return false;
-	}
-
-	ZEArray<FreespaceDeviceId> DeviceIds;
-	DeviceIds.SetCount(NumberOfDevices);
-	Result = freespace_getDeviceList(DeviceIds.GetCArray(), 0, &NumberOfDevices);
+	Result = freespace_getDeviceList(DeviceIds, 256, &NumberOfDevices);
 	if (NumberOfDevices == 0) 
 	{
 		zeWarning("Freespace Input Device Extension", "Can not aquire number of freespace devices. Error Code : %d.", Result);

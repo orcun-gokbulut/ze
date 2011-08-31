@@ -155,7 +155,7 @@ bool ZEWindowsInputModule::Initialize()
 
 		ZEArray<ZEInputDevice*> ExtensionDevices = Extension->GetDevices();
 		for (int N = 0; N < ExtensionDevices.GetCount(); N++)
-			Devices.Add(ExtensionDevices[I]);
+			Devices.Add(ExtensionDevices[N]);
 	}
 
 	for (int I = 0; I < Devices.GetCount(); I++)

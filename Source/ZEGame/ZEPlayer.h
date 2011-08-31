@@ -45,6 +45,7 @@ ZE_META_ENTITY_DESCRIPTION(ZEPlayer);
 class ZEListener;
 class ZEProjectiveLight;
 class ZECamera;
+class ZEModelIKChain;
 
 class ZEPlayer : public ZECompoundEntity
 {

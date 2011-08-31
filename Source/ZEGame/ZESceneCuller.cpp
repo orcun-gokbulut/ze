@@ -90,6 +90,7 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 			{
 				DrawParameters->Renderer->AddToLightList((ZELight*)Entities[I]);	
 				DebugDrawLight((ZELight*)Entities[I], DrawParameters);
+				((ZELight*)Entities[I])->RenderShadowMap(this*, ShadowRenderer);
 			}
 		}
 
