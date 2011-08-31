@@ -43,6 +43,7 @@ bool ZEBase::IsInitialized()
 bool ZEBase::Initialize()
 {
 	Initialized = true;
+	return true;
 }
 
 void ZEBase::Deinitialize()

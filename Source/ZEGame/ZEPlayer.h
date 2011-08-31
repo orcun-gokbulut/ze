@@ -85,14 +85,6 @@ ZE_POST_PROCESSOR_START(Meta)
 <zinek>
 	<meta>
 		<class name="ZEPlayer" parent="ZECompoundEntity" description="Player spawn point">
-
-			<method name="SetFOV">
-			<parameter name="NewId" type="float"/>
-			</method>
-
-			<method name="GetFOV" returntype="float">
-			</method>
-
 		</class>
 	</meta>
 </zinek>
