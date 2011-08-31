@@ -68,7 +68,6 @@ struct ZECullStatistics
 class ZESceneCuller
 {
 	private:
-		ZEShadowRenderer*				ShadowRenderer;
 		ZECullStatistics				Statistics;
 
 		ZESceneDebugDraw				DebugDraw;

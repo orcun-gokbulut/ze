@@ -35,6 +35,8 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+add_source (ZEBase.cpp						Sources)
+add_source (ZEBase.h						Sources ZESDK)
 add_source (ZECommand.cpp					Sources)
 add_source (ZECommand.h						Sources ZESDK)
 add_source (ZECommandManager.cpp			Sources)

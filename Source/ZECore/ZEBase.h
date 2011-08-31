@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESystemMessageManager.cpp
+ Zinek Engine - ZEBase.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,71 +32,30 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "ZESystemMessageManager.h"
-#include "ZESystemMessageHandler.h"
-#include "ZECore.h"
-#include "ZEError.h"
 
-#define WINDOWS_MEAN_AND_LEAN
-#include <Windows.h>
+#pragma once
+#ifndef	__ZE_BASE_H__
+#define __ZE_BASE_H__
 
-ZESystemMessageManager::ZESystemMessageManager()
+class ZEBase
 {
+	private:
+		bool				Initialized;
 
-}
+	public:
+		bool				IsInitialized();
+		virtual bool		Initialize();
+		virtual void		Deinitialize();
 
-ZESystemMessageManager::~ZESystemMessageManager()
-{
+		virtual void		Destroy();
 
-}
+							ZEBase();
+		virtual				~ZEBase();
+};
 
-const ZEArray<ZESystemMessageHandler*>& ZESystemMessageManager::GetMessageHandlers()
-{
-	return Handlers;
-}
+#endif
 
-void ZESystemMessageManager::RegisterMessageHandler(ZESystemMessageHandler* Handler)
-{
-	if (Handlers.Exists(Handler))
-	{
-		zeError("System Message Manager", "Handler is already added.");
-		return;
-	}
 
-	Handlers.Add(Handler);
-}
 
-void ZESystemMessageManager::UnregisterMessageHandler(ZESystemMessageHandler* Handler)
-{
-	Handlers.DeleteValue(Handler);
-}
 
-void ZESystemMessageManager::ProcessMessages()
-{
-	MSG Msg;
-	ZeroMemory(&Msg, sizeof(Msg));
-	while(PeekMessage(&Msg, NULL, 0, 0, PM_REMOVE))
-	{	
-		TranslateMessage(&Msg);
 
-		bool Handled = false;
-
-		for(size_t I = 0; I < Handlers.GetCount(); I++)
-			if (Msg.message > Handlers[I]->MinMessage && Msg.message < Handlers[I]->MaxMessage &&
-				(Handlers[I]->TargetWindow == NULL || Handlers[I]->TargetWindow == Msg.hwnd))
-			{
-				if (Handlers[I]->Callback(&Msg))
-					Handled = true;
-			}
-
-		/*if (!Handled)
-			DefWindowProc(Msg.hwnd, Msg.message, Msg.wParam, Msg.lParam);*/
-
-		DispatchMessage(&Msg);
-	}
-}
-
-ZESystemMessageManager* ZESystemMessageManager::GetInstance()
-{
-	return ZECore::GetInstance()->GetSystemMessageManager();
-}

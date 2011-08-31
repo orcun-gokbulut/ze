@@ -68,7 +68,7 @@ bool ZEWMIKSH::Callback(MSG* Message)
 			if (GetRawInputData((HRAWINPUT)Message->lParam, RID_INPUT, &Input, &InputSize, sizeof(RAWINPUTHEADER)) == (UINT)-1)
 			{
 				zeError("WindowsInput", "Can not read raw input data.");
-				return;
+				return false;
 			}
 			
 			if (Input.header.dwType != RIM_TYPEMOUSE && Input.header.hDevice != Device->DeviceHandle)

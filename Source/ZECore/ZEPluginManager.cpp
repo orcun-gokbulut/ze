@@ -39,6 +39,7 @@
 #include "ZECore.h"
 #include "ZEModuleManager.h"
 #include "ZEExtensionManager.h"
+#include "ZEError.h"
 
 #include <string.h>
 
