@@ -36,11 +36,11 @@
 #include <UnitTest/UnitTest++.h>
 #include <d3dx9.h>
 #include <math.h>
-#include "ZEIOStreamMapping.h"
+#include "ZETestsCommon/ZEIOStreamMapping.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEDefinitions.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
 SUITE(Quaternion)
 {
@@ -65,14 +65,8 @@ SUITE(Quaternion)
 	TEST(QTRN_Create3)
 	{
 		ZEQuaternion Q;
-		ZEQuaternion::Create(Q, ZE_PI, ZE_PI_2, ZE_PI_2);
+		ZEQuaternion::CreateFromEuler(Q, ZE_PI, ZE_PI_2, ZE_PI_2);
 		CHECK_EQUAL(Q, ZEQuaternion(0.49999997f, 0.49999997f, -0.5f, -0.5f));
-	}
-
-	TEST(QTRN_Create4)
-	{
-		ZEQuaternion Q;
-		ZEQuaternion::Create(Q, ZEVector3(1.0f, 2.0f, 3.0f), ZEVector3(2.0f, 3.0f, 5.0f));
 	}
 
 	TEST(QTRN_CreateIdentity)

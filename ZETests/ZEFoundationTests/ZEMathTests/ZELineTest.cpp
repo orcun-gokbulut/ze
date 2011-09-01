@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERectangle3DTest.cpp
+ Zinek Engine - ZELineTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,64 +33,106 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "UnitTest/UnitTest++.h"
-#include "ZEIOStreamMapping.h"
-#include "ZEMath/ZERectangle3D.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEPlane.h"
+#include <UnitTest/UnitTest++.h>
+#include <d3dx9.h>
 #include <math.h>
+#include "ZETestsCommon/ZEIOStreamMapping.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZELine.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
-
-SUITE(Rectangle3D)
+SUITE(ZELine)
 {
-	TEST(RECT3D_Constructor)
+	TEST(LN_Constructor)
 	{
-		ZEVector3 A(1.0f, 2.0f, 3.0f);
-		ZEVector3 B(4.0f, 5.0f, 6.0f);
-		ZEVector3 C(7.0f, 8.0f, 9.0f);
-		ZEVector3 D(10.0f, 11.0f, 12.0f);
-		
-		ZERectangle3D R(A, B, C, D);
-
-		CHECK_EQUAL(R.P1, A);
-		CHECK_EQUAL(R.P2, B);
-		CHECK_EQUAL(R.P3, C);
-		CHECK_EQUAL(R.P4, D);
+		ZEVector3 P0(0.0f, 1.0f, 0.0f);
+		ZEVector3 P1(1.0f, 2.0f, 3.0f);
+		ZELine L(P0, P1);
+		CHECK_EQUAL(L.p, P0);
+		CHECK_EQUAL(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
 	}
 
-	TEST(RECT3D_GetPlane)
+	TEST(LN_Create)
 	{
-		ZEVector3 A(1.0f, 4.0f, 6.0f);
-		ZEVector3 B(3.0f, 4.0f, 6.0f);
-		ZEVector3 C(1.0f, 2.0f, 6.0f);
-		ZEVector3 D(3.0f, 2.0f, 6.0f);
-		
-		ZERectangle3D R(A, B, C, D);
-
-		ZEPlane P ;
-		R.GetPlane(P);
-
-		CHECK_EQUAL(P.n , ZEVector3(0.0f, 0.0f, -4.0f));
-		CHECK_EQUAL(P.p , ZEVector3(1.0f, 2.0f, 6.0f));
+		ZELine L;
+		ZEVector3 P0(0.0f, 1.0f, 0.0f);
+		ZEVector3 P1(1.0f, 2.0f, 3.0f);
+		ZELine::Create(L, P0, P1);
+		CHECK_EQUAL(L.p, P0);
+		CHECK_EQUAL(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
 	}
 
-	TEST(RECT3D_GetPoint)
+	TEST(LN_CreateParamatric)
 	{
-		ZEVector3 A(1.0f, 4.0f, 6.0f);
-		ZEVector3 B(3.0f, 4.0f, 6.0f);
-		ZEVector3 C(1.0f, 2.0f, 6.0f);
-		ZEVector3 D(3.0f, 2.0f, 6.0f);
+		ZELine L;
+		ZEVector3 V(1.0, 4.0f, 9.0f);
+		ZEVector3 P (1.0, 0.0f, 0.0f);
+		ZELine::CreateParametric(L, V, P);
+		CHECK_EQUAL(L.p, P);
+		CHECK_EQUAL(L.v, V);
+	}
+
+	TEST(LN_MinimumDistance1)
+	{
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
+		ZEVector3 P3(5,8,2);
+		ZEVector3 P4(8,15,1);
 		
-		ZERectangle3D R(A, B, C, D);
+		ZELine L1(P1,P2);
+		ZELine L2(P3,P4);
+		
+		float d = ZELine::MinimumDistance(L1, L2);
 
-		ZEVector3 P1 = R.GetPoint(0);
-		ZEVector3 P2 = R.GetPoint(1);
-		ZEVector3 P3 = R.GetPoint(2);
-		ZEVector3 P4 = R.GetPoint(3);
+		CHECK_EQUAL(d, sqrtf(14.0f));
+	}
 
-		CHECK_EQUAL(A, P1);
-		CHECK_EQUAL(B, P2);
-		CHECK_EQUAL(C, P3);
-		CHECK_EQUAL(D, P4);
+	TEST(LN_MinimumDistance2)
+	{
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
+		ZEVector3 P3(5,8,2);
+		ZEVector3 P4(8,15,1);
+		
+		ZELine L1(P1,P2);
+		ZELine L2(P3,P4);
+		
+		float tA, tB;
+		float d = ZELine::MinimumDistance(L1, L2, tA, tB);
+
+		CHECK_EQUAL(d, sqrtf(14.0f));
+	}
+
+	TEST(LN_DistanceToPoint)
+	{
+		ZEVector3 P(5,8,2);
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
+		ZELine L(P1,P2);
+		float t;
+		float d;
+
+		d = ZELine::MinimumDistance(L,P,t);
+
+		CHECK_CLOSE(d, 4.61880215, 0.000001);
+	}
+
+	TEST(LN_GetPointOn)
+	{
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
+		ZEVector3 A;
+		ZEVector3 B;
+		const ZELine L=ZELine::ZELine(P1,P2);
+		ZEVector3 P;
+		ZEVector3 P3;
+		L.GetPointOn(P,3);
+		A=P;
+		
+		ZEVector3::Scale(P,L.v,3);
+		ZEVector3::Add(P,P,L.p);
+		B = P;
+
+		CHECK_EQUAL(A, B);
 	}
 }

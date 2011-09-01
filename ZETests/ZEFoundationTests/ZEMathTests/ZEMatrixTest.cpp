@@ -36,11 +36,11 @@
 #include <UnitTest/UnitTest++.h>
 #include <d3dx9.h>
 #include <math.h>
-#include "ZEIOStreamMapping.h"
+#include "ZETestsCommon/ZEIOStreamMapping.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEDefinitions.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
        
 SUITE(ZEMatrix3x3)
@@ -191,19 +191,16 @@ SUITE(ZEMatrix3x3)
 	TEST(MTRX3Determinant)
 	{
 		ZEMatrix3x3 A(1.2f, 3.6f, 15.6f, 1.2f, 6.0f, 25.2f, 2.4f, 9.6f, 40.8f);
-		float d;
-		ZEMatrix3x3::Determinant(d, A);
+		float d = ZEMatrix3x3::Determinant(A);
 		CHECK_EQUAL(d, 0.0f);
 
 		ZEMatrix3x3 B(1.0f, 2.0f, -5.0f, 4.0f, 2.0f, 1.0f, 3.0f, 2.0f, 9.0f);
-		float dd;
-		ZEMatrix3x3::Determinant(dd, B);
+		float dd = ZEMatrix3x3::Determinant(B);
 		CHECK_EQUAL(dd, -60.0f);
 		
 		ZEMatrix3x3 I;
 		ZEMatrix3x3::CreateIdentity(I);
-		float i;
-		ZEMatrix3x3::Determinant(i, I);
+		float i = ZEMatrix3x3::Determinant(I);
 		CHECK_EQUAL(i, 1.0f);
 	}
 
@@ -481,8 +478,7 @@ SUITE(ZEMatrix4x4)
 			          1.2f, 6.0f, 25.2f, 0.0f, 
 					  2.4f, 9.6f, 40.8f, 0.0f, 
 					  0.0f, 0.0f,  0.0f, 1.0f);
-		float d;
-		ZEMatrix4x4::Determinant(d, A);
+		float d = ZEMatrix4x4::Determinant(A);
 		
 		CHECK_CLOSE(d, 0.0f, 0.00004);
 		
@@ -491,16 +487,14 @@ SUITE(ZEMatrix4x4)
 					   10.0f,  1.0f,  2.0f,  3.0f, 
 					    4.0f,  5.0f,  6.0f,  7.0f);
 
-		float dd;
-		ZEMatrix4x4::Determinant(dd, B);
+		float dd = ZEMatrix4x4::Determinant(B);
 		
 		CHECK_EQUAL(dd, 282.0f);
 
 		ZEMatrix4x4 I;
 		
 		ZEMatrix4x4::CreateIdentity(I);
-		float i;
-		ZEMatrix4x4::Determinant(i, I);
+		float i = ZEMatrix4x4::Determinant(I);
 		
 		CHECK_EQUAL(i, 1.0f);
 

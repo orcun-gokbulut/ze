@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEBoundingSphereTest.cpp
+ Zinek Engine - ZEBSphereTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,25 +34,25 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "UnitTest/UnitTest++.h"
-#include "ZEIOStreamMapping.h"
-#include "ZEMath/ZEAABoundingBox.h"
+#include "ZETestsCommon/ZEIOStreamMapping.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZELineSegment.h"
-#include "ZEMath/ZEBoundingSphere.h"
-#include "ZEMath/ZEOBoundingBox.h"
+#include "ZEMath/ZEBSphere.h"
+#include "ZEMath/ZEOBBox.h"
 #include <math.h>
 
 
-SUITE(ZEBoundingSphere)
+SUITE(ZEBSphere)
 {
 	TEST(BS_Constructor)
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
-		ZEBoundingSphere BS(Position, R);
+		ZEBSphere BS(Position, R);
 
 		CHECK_EQUAL(BS.Position, ZEVector3(1.0f, 2.0f, 3.0f));
 		CHECK_EQUAL(BS.Radius, 3.0f);
@@ -63,13 +63,13 @@ SUITE(ZEBoundingSphere)
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
-		ZEBoundingSphere BS(Position, R);
+		ZEBSphere BS(Position, R);
 		
 		ZEVector3 n1(1.0f, 2.0f, 3.0f);
 		ZEVector3 p1(100.0f, 100.0f, 100.0f);
 		ZEPlane P1(n1, p1);
 
-		ZEHalfSpace result1 = ZEBoundingSphere::PlaneHalfSpaceTest(BS, P1);
+		ZEHalfSpace result1 = ZEBSphere::PlaneHalfSpaceTest(BS, P1);
 
 		CHECK_EQUAL(result1,-1);
 
@@ -79,7 +79,7 @@ SUITE(ZEBoundingSphere)
 		ZEPlane P2(n2, p2);
 
 
-		ZEHalfSpace result2 = ZEBoundingSphere::PlaneHalfSpaceTest(BS, P2);
+		ZEHalfSpace result2 = ZEBSphere::PlaneHalfSpaceTest(BS, P2);
 
 		CHECK_EQUAL(result2, 1);
 
@@ -89,9 +89,9 @@ SUITE(ZEBoundingSphere)
 		ZEPlane P3(n3, p3);
 
 
-		ZEHalfSpace result3 = ZEBoundingSphere::PlaneHalfSpaceTest(BS, P3);
+		ZEHalfSpace result3 = ZEBSphere::PlaneHalfSpaceTest(BS, P3);
 
-		CHECK_EQUAL(result3, ZEHALFSPACE_INTERSECTS);
+		CHECK_EQUAL(result3, ZE_HS_INTERSECTS);
 		
 
 		
@@ -101,7 +101,7 @@ SUITE(ZEBoundingSphere)
 		ZEPlane P4(n4, p4);
 
 
-		ZEHalfSpace result4 = ZEBoundingSphere::PlaneHalfSpaceTest(BS, P4);
+		ZEHalfSpace result4 = ZEBSphere::PlaneHalfSpaceTest(BS, P4);
 
 		CHECK_EQUAL(result4, 1);
 	}
@@ -111,29 +111,29 @@ SUITE(ZEBoundingSphere)
 	{	
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
-		ZEBoundingSphere BS(Position, R);
+		ZEBSphere BS(Position, R);
 
 		ZEVector3 Point(1.0f, 2.0f, 10.0f);
 		ZEVector3 Normal;
 
-		ZEBoundingSphere::GetSurfaceNormal(Normal, BS, Point);
+		ZEBSphere::GetSurfaceNormal(Normal, BS, Point);
 
 		CHECK_EQUAL(Normal, ZEVector3(0.0f, 0.0f, 1.0f));
 
 		
 		ZEVector3 Position2(0.0f, 0.0f, 0.0f);
 		float R2 = 6.0f; 
-		ZEBoundingSphere BS2(Position2, R2);
+		ZEBSphere BS2(Position2, R2);
 		ZEVector3 Point2(1.0f, 1.0f, 1.0f);
 
-		ZEBoundingSphere::GetSurfaceNormal(Normal, BS2, Point2);
+		ZEBSphere::GetSurfaceNormal(Normal, BS2, Point2);
 
 		CHECK_EQUAL(Normal, ZEVector3(1.0f/sqrt(3.0f), 1.0f/sqrt(3.0f), 1.0f/sqrt(3.0f)));
 
 		
 		ZEVector3 Position3(1.0f, 2.0f, 3.0f);
 		float R3 = 5.0f; 
-		ZEBoundingSphere BS3(Position3, R3);
+		ZEBSphere BS3(Position3, R3);
 
 		ZEVector3 Point3(1.0f, 1.0f, 1.0f);
 		ZEVector3 Normal1;
@@ -142,7 +142,7 @@ SUITE(ZEBoundingSphere)
 
 		ZEVector3::Normalize(Normal1, Sub);
 
-		ZEBoundingSphere::GetSurfaceNormal(Normal, BS3, Point3);
+		ZEBSphere::GetSurfaceNormal(Normal, BS3, Point3);
 
 		CHECK_EQUAL(Normal, Normal1);
 
@@ -151,21 +151,21 @@ SUITE(ZEBoundingSphere)
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
-		ZEBoundingSphere BS(Position, R);
+		ZEBSphere BS(Position, R);
 		
 		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		
-		bool result1 = ZEBoundingSphere::IntersectionTest(BS, P1);
+		bool result1 = ZEBSphere::IntersectionTest(BS, P1);
 		CHECK_EQUAL(result1, true);
 
 		ZEVector3 P2(10.0f, 20.0f, 30.0f);
 		
-		bool result2 = ZEBoundingSphere::IntersectionTest(BS, P2);
+		bool result2 = ZEBSphere::IntersectionTest(BS, P2);
 		CHECK_EQUAL(result2, false);
 
 		ZEVector3 P3(1.0f, 2.0f, 6.0f);
 		
-		bool result3 = ZEBoundingSphere::IntersectionTest(BS, P3);
+		bool result3 = ZEBSphere::IntersectionTest(BS, P3);
 		CHECK_EQUAL(result3, true);
 	}
 
@@ -173,27 +173,27 @@ SUITE(ZEBoundingSphere)
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
-		ZEBoundingSphere BS(Position, R);
+		ZEBSphere BS(Position, R);
 
 		ZEVector3 P0(1.0f, 2.0f, 3.0f);
 		ZEVector3 P1(2.0f, 5.0f, 6.0f);
 		ZELine L(P0, P1);
 
-		bool result = ZEBoundingSphere::IntersectionTest(BS, L);
+		bool result = ZEBSphere::IntersectionTest(BS, L);
 		CHECK_EQUAL(result, true);
 
 		ZEVector3 P2(0.0f, 0.0f,  6.8f);
 		ZEVector3 P3(0.0f, 0.0f, 12.6f);
 		ZELine L2(P2, P3);
 
-		bool result2 = ZEBoundingSphere::IntersectionTest(BS, L2);
+		bool result2 = ZEBSphere::IntersectionTest(BS, L2);
 		CHECK_EQUAL(result2, false);
 
 		ZEVector3 P4(1.0f, 2.0f, 6.0f);
 		ZEVector3 P5(2.0f, 4.0f, 6.0f);
 		ZELine L3(P4, P5);
 
-		bool result3 = ZEBoundingSphere::IntersectionTest(BS, L3);
+		bool result3 = ZEBSphere::IntersectionTest(BS, L3);
 		CHECK_EQUAL(result3, true);
 	}
 
@@ -201,14 +201,14 @@ SUITE(ZEBoundingSphere)
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
-		ZEBoundingSphere BS(Position, R);
+		ZEBSphere BS(Position, R);
 
 		ZEVector3 P0(1.0f, 2.0f, 3.0f);
 		ZEVector3 P1(2.0f, 5.0f, 6.0f);
 		ZERay R1;
 		ZERay::Create(R1, P0, P1);
 
-		bool result = ZEBoundingSphere::IntersectionTest(BS, R1);
+		bool result = ZEBSphere::IntersectionTest(BS, R1);
 		CHECK_EQUAL(result, true);
 
 		ZEVector3 P2(0.0f, 0.0f,  6.8f);
@@ -216,7 +216,7 @@ SUITE(ZEBoundingSphere)
 		ZERay R2;
 		ZERay::Create(R2, P2, P3);
 
-		bool result2 = ZEBoundingSphere::IntersectionTest(BS, R2);
+		bool result2 = ZEBSphere::IntersectionTest(BS, R2);
 		CHECK_EQUAL(result2, false);
 
 		ZEVector3 P4(1.0f, 2.0f, 6.0f);
@@ -224,7 +224,7 @@ SUITE(ZEBoundingSphere)
 		ZERay R3;
 		ZERay::Create(R3, P4, P5);
 
-		bool result3 = ZEBoundingSphere::IntersectionTest(BS, R3);
+		bool result3 = ZEBSphere::IntersectionTest(BS, R3);
 		CHECK_EQUAL(result3, true);
 
 		ZEVector3 P6(1.0f, 2.0f, 3.0f);
@@ -232,7 +232,7 @@ SUITE(ZEBoundingSphere)
 		ZERay R4;
 		ZERay::Create(R4, P6, P7);
 
-		bool result4 = ZEBoundingSphere::IntersectionTest(BS, R4);
+		bool result4 = ZEBSphere::IntersectionTest(BS, R4);
 		CHECK_EQUAL(result4, true);
 
 	}
@@ -244,14 +244,14 @@ SUITE(ZEBoundingSphere)
 
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
-		ZEBoundingSphere BS(Position, R);
+		ZEBSphere BS(Position, R);
 
 		ZEVector3 P0(1.0f, 2.0f, 3.0f);
 		ZEVector3 P1(2.0f, 5.0f, 6.0f);
 		ZERay R1;
 		ZERay::Create(R1, P0, P1);
 
-		bool result = ZEBoundingSphere::IntersectionTest(BS, R1, MinT, MaxT);
+		bool result = ZEBSphere::IntersectionTest(BS, R1, MinT, MaxT);
 		CHECK_EQUAL(result, true);
 
 		ZEVector3 P2(0.0f, 0.0f,  6.8f);
@@ -259,7 +259,7 @@ SUITE(ZEBoundingSphere)
 		ZERay R2;
 		ZERay::Create(R2, P2, P3);
 
-		bool result2 = ZEBoundingSphere::IntersectionTest(BS, R2, MinT, MaxT);
+		bool result2 = ZEBSphere::IntersectionTest(BS, R2, MinT, MaxT);
 		CHECK_EQUAL(result2, false);
 
 		ZEVector3 P4(1.0f, 2.0f, 6.0f);
@@ -267,7 +267,7 @@ SUITE(ZEBoundingSphere)
 		ZERay R3;
 		ZERay::Create(R3, P4, P5);
 
-		bool result3 = ZEBoundingSphere::IntersectionTest(BS, R3, MinT, MaxT);
+		bool result3 = ZEBSphere::IntersectionTest(BS, R3, MinT, MaxT);
 		CHECK_EQUAL(result3, true);
 
 		ZEVector3 P6(1.0f, 2.0f, 3.0f);
@@ -275,42 +275,42 @@ SUITE(ZEBoundingSphere)
 		ZERay R4;
 		ZERay::Create(R4, P6, P7);
 
-		bool result4 = ZEBoundingSphere::IntersectionTest(BS, R4, MinT, MaxT);
+		bool result4 = ZEBSphere::IntersectionTest(BS, R4, MinT, MaxT);
 		CHECK_EQUAL(result4, true);	}
 //
 	TEST(BS_IntersectionTest5)
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
-		ZEBoundingSphere BS(Position, R);
+		ZEBSphere BS(Position, R);
 
 		ZEVector3 P0(1.0f, 2.0f, 3.0f);
 		ZEVector3 P1(2.0f, 5.0f, 6.0f);
 		ZELineSegment LS1(P0, P1);
 		
 
-		bool result = ZEBoundingSphere::IntersectionTest(BS, LS1);
+		bool result = ZEBSphere::IntersectionTest(BS, LS1);
 		CHECK_EQUAL(result, true);
 
 		ZEVector3 P2(0.0f, 0.0f,  6.8f);
 		ZEVector3 P3(0.0f, 0.0f, 12.6f);
 		ZELineSegment LS2(P2, P3);
 
-		bool result2 = ZEBoundingSphere::IntersectionTest(BS, LS2);
+		bool result2 = ZEBSphere::IntersectionTest(BS, LS2);
 		CHECK_EQUAL(result2, false);
 
 		ZEVector3 P4(1.0f, 2.0f, 6.0f);
 		ZEVector3 P5(2.0f, 4.0f, 6.0f);
 		ZELineSegment LS3(P4, P5);
 
-		bool result3 = ZEBoundingSphere::IntersectionTest(BS, LS3);
+		bool result3 = ZEBSphere::IntersectionTest(BS, LS3);
 		CHECK_EQUAL(result3, true);
 
 		ZEVector3 P6(1.0f, 2.0f, 3.0f);
 		ZEVector3 P7(1.5f, 2.5f, 2.5f);
 		ZELineSegment LS4(P6, P7);
 
-		bool result4 = ZEBoundingSphere::IntersectionTest(BS, LS4);
+		bool result4 = ZEBSphere::IntersectionTest(BS, LS4);
 		CHECK_EQUAL(result4, true);
 
 	}
@@ -319,27 +319,27 @@ SUITE(ZEBoundingSphere)
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
-		ZEBoundingSphere BS(Position, R);
+		ZEBSphere BS(Position, R);
 
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB(Min, Max);
+		ZEAABBox AABB(Min, Max);
 
-		bool result = ZEBoundingSphere::CollisionTest(BS, AABB);
+		bool result = ZEBSphere::IntersectionTest(BS, AABB);
 		CHECK_EQUAL(result, true);
 		
 		ZEVector3 Max2( 1.0f, 100.0f,  3.0f);
 		ZEVector3 Min2(-1.0f,  98.0f, -3.0f);
-		ZEAABoundingBox AABB2(Min2, Max2);
+		ZEAABBox AABB2(Min2, Max2);
 
-		bool result2 = ZEBoundingSphere::CollisionTest(BS, AABB2);
+		bool result2 = ZEBSphere::IntersectionTest(BS, AABB2);
 		CHECK_EQUAL(result2, false);
 		
 		ZEVector3 Max3( 1.0f, 7.0f,  3.0f);
 		ZEVector3 Min3(-1.0f, 5.0f, -3.0f);
-		ZEAABoundingBox AABB3(Min3, Max3);
+		ZEAABBox AABB3(Min3, Max3);
 
-		bool result3 = ZEBoundingSphere::CollisionTest(BS, AABB3);
+		bool result3 = ZEBSphere::IntersectionTest(BS, AABB3);
 		CHECK_EQUAL(result3, true);
 
 	}
@@ -348,34 +348,34 @@ SUITE(ZEBoundingSphere)
 	{
 		ZEVector3 Position1(1.0f, 2.0f, 3.0f);
 		float R1 = 3.0f; 
-		ZEBoundingSphere BS1(Position1, R1);
+		ZEBSphere BS1(Position1, R1);
 		
 		ZEVector3 Position2(1.0f, 2.0f, 3.0f);
 		float R2 = 1.0f; 
-		ZEBoundingSphere BS2(Position2, R2);
+		ZEBSphere BS2(Position2, R2);
 
-		bool result = ZEBoundingSphere::CollisionTest(BS1, BS2);
+		bool result = ZEBSphere::IntersectionTest(BS1, BS2);
 		CHECK_EQUAL(result, true);
 
 		ZEVector3 Position3(1.0f, 5.0f, 3.0f);
 		float R3 = 5.0f; 
-		ZEBoundingSphere BS3(Position3, R3);
+		ZEBSphere BS3(Position3, R3);
 
-		bool result2 = ZEBoundingSphere::CollisionTest(BS1, BS3);
+		bool result2 = ZEBSphere::IntersectionTest(BS1, BS3);
 		CHECK_EQUAL(result, true);
 		
 		ZEVector3 Position4(1.0f, 2.0f, 7.0f);
 		float R4 = 1.0f; 
-		ZEBoundingSphere BS4(Position4, R4);
+		ZEBSphere BS4(Position4, R4);
 
-		bool result3 = ZEBoundingSphere::CollisionTest(BS1, BS4);
+		bool result3 = ZEBSphere::IntersectionTest(BS1, BS4);
 		CHECK_EQUAL(result3, true);
 
 		ZEVector3 Position5(0.0f, 0.0f, 15.0f);
 		float R5 = 1.0f; 
-		ZEBoundingSphere BS5(Position5, R5);
+		ZEBSphere BS5(Position5, R5);
 
-		bool result4 = ZEBoundingSphere::CollisionTest(BS1, BS5);
+		bool result4 = ZEBSphere::IntersectionTest(BS1, BS5);
 		CHECK_EQUAL(result4, false);
 	}
 

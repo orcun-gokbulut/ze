@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEOBoundingBoxTest.cpp
+ Zinek Engine - ZEOBBoxTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,18 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "UnitTest/UnitTest++.h"
-#include "ZEIOStreamMapping.h"
-#include "ZEMath/ZEAABoundingBox.h"
+#include "ZETestsCommon/ZEIOStreamMapping.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZERay.h"
+
+#include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZELineSegment.h"
-#include "ZEMath/ZEBoundingSphere.h"
-#include "ZEMath/ZEOBoundingBox.h"
+#include "ZEMath/ZEBSphere.h"
+#include "ZEMath/ZEOBBox.h"
 #include <math.h>
 
-SUITE(ZEOBoundingBox)
+SUITE(ZEOBBox)
 {
 	TEST(OBB_Constructor)
 	{
@@ -54,12 +55,12 @@ SUITE(ZEOBoundingBox)
 		ZEVector3 V(0.0f, 1.0f, 0.0f);
 		ZEVector3 N(0.0f, 0.0f, 1.0f);
 
-		ZEOBoundingBox OBB(Position, U, V, N);
+		ZEOBBox OBB(Position, U, V, N, ZEVector3(0.5f, 0.5f, 0.5f));
 
-		CHECK_EQUAL(OBB.Position,ZEVector3(1.0f, 2.0f, 3.0f));
-		CHECK_EQUAL(OBB.U,ZEVector3(1.0f, 0.0f, 0.0f));
-		CHECK_EQUAL(OBB.V,ZEVector3(0.0f, 1.0f, 0.0f));
-		CHECK_EQUAL(OBB.N,ZEVector3(0.0f, 0.0f, 1.0f));
+		CHECK_EQUAL(OBB.Center, ZEVector3(1.0f, 2.0f, 3.0f));
+		CHECK_EQUAL(OBB.Right, ZEVector3(1.0f, 0.0f, 0.0f));
+		CHECK_EQUAL(OBB.Up, ZEVector3(0.0f, 1.0f, 0.0f));
+		CHECK_EQUAL(OBB.Front, ZEVector3(0.0f, 0.0f, 1.0f));
 
 	}
 
@@ -75,7 +76,7 @@ SUITE(ZEOBoundingBox)
 		ZEVector3 V(0.0f, 1.0f, 0.0f);
 		ZEVector3 N(0.0f, 0.0f, 1.0f);
 
-		ZEOBoundingBox OBB(Position, U, V, N);
+		ZEOBBox OBB(Position, U, V, N, ZEVector3(0.5f, 0.5f, 0.5f));
 
 		ZEVector3 V0 = OBB.GetVertex(0);
 		ZEVector3 V1 = OBB.GetVertex(1);
@@ -104,13 +105,13 @@ SUITE(ZEOBoundingBox)
 		ZEVector3 V(0.0f, 1.0f, 0.0f);
 		ZEVector3 N(0.0f, 0.0f, 1.0f);
 
-		ZEOBoundingBox OBB(Position, U, V, N);
+		ZEOBBox OBB(Position, U, V, N, ZEVector3(0.5f, 0.5f, 0.5f));
 
 		ZEVector3 n1(1.0f, 2.0f, 3.0f);
 		ZEVector3 p1(100.0f, 100.0f, 100.0f);
 		ZEPlane P1(n1, p1);
 
-		ZEHalfSpace result1 = ZEOBoundingBox::PlaneHalfSpaceTest(OBB, P1);
+		ZEHalfSpace result1 = ZEOBBox::PlaneHalfSpaceTest(OBB, P1);
 
 		CHECK_EQUAL(result1,-1);
 
@@ -118,7 +119,7 @@ SUITE(ZEOBoundingBox)
 		ZEVector3 p2(0.0f, -6.0f, 0.0f);
 		ZEPlane P2(n2, p2);
 
-		ZEHalfSpace result2 = ZEOBoundingBox::PlaneHalfSpaceTest(OBB, P2);
+		ZEHalfSpace result2 = ZEOBBox::PlaneHalfSpaceTest(OBB, P2);
 
 		CHECK_EQUAL(result2, 1);
 
@@ -127,7 +128,7 @@ SUITE(ZEOBoundingBox)
 		ZEVector3 p3(0.0f, 0.0f, 0.0f);
 		ZEPlane P3(n3, p3);
 
-		ZEHalfSpace result3 = ZEOBoundingBox::PlaneHalfSpaceTest(OBB, P3);
+		ZEHalfSpace result3 = ZEOBBox::PlaneHalfSpaceTest(OBB, P3);
 
 		CHECK_EQUAL(result3, 1);
 
@@ -136,7 +137,7 @@ SUITE(ZEOBoundingBox)
 		ZEPlane P4(n4, p4);
 
 
-		ZEHalfSpace result4 = ZEOBoundingBox::PlaneHalfSpaceTest(OBB, P4);
+		ZEHalfSpace result4 = ZEOBBox::PlaneHalfSpaceTest(OBB, P4);
 
 		CHECK_EQUAL(result4, 1);
 	}
@@ -148,20 +149,20 @@ SUITE(ZEOBoundingBox)
 		ZEVector3 V(0.0f, 1.0f, 0.0f);
 		ZEVector3 N(0.0f, 0.0f, 1.0f);
 
-		ZEOBoundingBox OBB(Position, U, V, N);
+		ZEOBBox OBB(Position, U, V, N, ZEVector3(0.5f, 0.5f, 0.5f));
 
 		
-		bool result = ZEOBoundingBox::IntersectionTest(OBB, ZEVector3(1.0f, 2.0f, 3.0f));
+		bool result = ZEOBBox::IntersectionTest(OBB, ZEVector3(1.0f, 2.0f, 3.0f));
 
 		CHECK_EQUAL(result, true);
 
 		ZEVector3 P(-1.0f, -2.0f, -3.0f);
 
-		bool result2 = ZEOBoundingBox::IntersectionTest(OBB, P);
+		bool result2 = ZEOBBox::IntersectionTest(OBB, P);
 
 		CHECK_EQUAL(result2, false);
 
-		bool result3 = ZEOBoundingBox::IntersectionTest(OBB, ZEVector3(1.5f, 2.5f, 3.5f));
+		bool result3 = ZEOBBox::IntersectionTest(OBB, ZEVector3(1.5f, 2.5f, 3.5f));
 
 		CHECK_EQUAL(result3, true);
 

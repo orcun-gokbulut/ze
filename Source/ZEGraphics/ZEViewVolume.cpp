@@ -271,8 +271,8 @@ bool ZEViewHemiSphere::CullTest(const ZEAABBox& BoundingBox) const
 bool ZEViewHemiSphere::CullTest(ZEEntity* Entity) const
 {
 	return 
-//		ZEBoundingSphere::PlaneHalfSpaceTest(Entity->GetWorldBoundingSphere(), HalfPlane) == ZEHALFSPACE_NEGATIVESIDE ||
-//		!ZEBoundingSphere::CollisionTest(BoundingSphere, Entity->GetWorldBoundingSphere()) ||
+//		ZEBSphere::PlaneHalfSpaceTest(Entity->GetWorldBoundingSphere(), HalfPlane) == ZE_HS_NEGATIVESIDE ||
+//		!ZEBSphere::CollisionTest(BoundingSphere, Entity->GetWorldBoundingSphere()) ||
 		ZEAABBox::PlaneHalfSpaceTest(Entity->GetWorldBoundingBox(), HalfPlane) == ZE_HS_NEGATIVE_SIDE ||
 		!ZEAABBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere);
 }
@@ -302,14 +302,14 @@ ZEViewVolumeType ZEViewCuboid::GetViewVolumeType() const
 bool ZEViewCuboid::CullTest(const ZEAABBox& BoundingBox) const
 {
 	zeWarningAssert(true, "NOT IMPLAMENTED");
-	//return ZEBoundingSphere::CollisionTest(Entity->GetWorldBoundingSphere(), BoundingBox);
+	//return ZEBSphere::CollisionTest(Entity->GetWorldBoundingSphere(), BoundingBox);
 	return true;
 }
 
 bool ZEViewCuboid::CullTest(ZEEntity* Entity) const
 {
 	zeWarningAssert(true, "NOT IMPLAMENTED");
-	//return ZEBoundingSphere::CollisionTest(Entity->GetWorldBoundingSphere(), BoundingBox);
+	//return ZEBSphere::CollisionTest(Entity->GetWorldBoundingSphere(), BoundingBox);
 	return true;
 }
 
@@ -355,8 +355,8 @@ bool ZEViewPlane::CullTest(const ZEAABBox& BoundingBox) const
 
 bool ZEViewPlane::CullTest(ZEEntity* Entity) const
 {
-/*	const ZEBoundingSphere& BoundingSphere = Entity->GetWorldBoundingSphere();
-	if (ZEBoundingSphere::PlaneHalfSpaceTest(BoundingSphere, Plane) == ZEHALFSPACE_NEGATIVESIDE ||
+/*	const ZEBSphere& BoundingSphere = Entity->GetWorldBoundingSphere();
+	if (ZEBSphere::PlaneHalfSpaceTest(BoundingSphere, Plane) == ZE_HS_NEGATIVESIDE ||
 		ZEPlane::Distance(Plane, BoundingSphere.Position) - BoundingSphere.Radius > MaxDistance)
 		return true;*/
 
@@ -419,9 +419,9 @@ ZEDoorViewTest ZECamera::ViewFrustumCullTest(const ZERectangle3D& PortalDoor)
 	{
 		if (i == 6) break;
 		
-		if ((pretests[i] = DoorAgainstPlanePreTest(PortalDoor,GetClippingPlane(i))) == ZEHALFSPACE_NEGATIVESIDE)
+		if ((pretests[i] = DoorAgainstPlanePreTest(PortalDoor,GetClippingPlane(i))) == ZE_HS_NEGATIVESIDE)
 			return ZE_DVT_OUTSIDE;
-		if (pretests[i] == ZEHALFSPACE_INTERSECTS)
+		if (pretests[i] == ZE_HS_INTERSECTS)
 			status = ZE_DVT_DOORCOVERS;
 		else
 			Coverable = 0;
@@ -434,7 +434,7 @@ ZEDoorViewTest ZECamera::ViewFrustumCullTest(const ZERectangle3D& PortalDoor)
 	ZECullTestResult Result1 = ZE_COVERABLE,Result2;
 	ZELine Intersection;
 
-	if (pretests[0] = ZEHALFSPACE_INTERSECTS)
+	if (pretests[0] = ZE_HS_INTERSECTS)
 	{
 		ZEGeometryUtils::IntersectPlane_Plane(Intersection,DoorPlane,RightClippingPlane);
 
@@ -452,7 +452,7 @@ ZEDoorViewTest ZECamera::ViewFrustumCullTest(const ZERectangle3D& PortalDoor)
 			Coverable = 0;
 	}
 
-	if (pretests[1] = ZEHALFSPACE_INTERSECTS)
+	if (pretests[1] = ZE_HS_INTERSECTS)
 	{
 		ZEGeometryUtils::IntersectPlane_Plane(Intersection,DoorPlane,LeftClippingPlane);
 
@@ -470,7 +470,7 @@ ZEDoorViewTest ZECamera::ViewFrustumCullTest(const ZERectangle3D& PortalDoor)
 			return ZE_DVT_INTERSECTS;
 	}
 
-	if (pretests[2] = ZEHALFSPACE_INTERSECTS)
+	if (pretests[2] = ZE_HS_INTERSECTS)
 	{
 		ZEGeometryUtils::IntersectPlane_Plane(Intersection,DoorPlane,TopClippingPlane);
 
@@ -486,7 +486,7 @@ ZEDoorViewTest ZECamera::ViewFrustumCullTest(const ZERectangle3D& PortalDoor)
 			return ZE_DVT_INTERSECTS;
 	}
 
-	if (pretests[3] = ZEHALFSPACE_INTERSECTS)
+	if (pretests[3] = ZE_HS_INTERSECTS)
 	{
 		ZEGeometryUtils::IntersectPlane_Plane(Intersection,DoorPlane,BottomClippingPlane);
 
@@ -548,24 +548,24 @@ void ZECamera::GenerateCameraFromDoor(ZEViewCone & Cone,ZECamera & Camera,const 
 
 ZECullTestResult LineSegmentAgainstBordersTest(const ZEVector3 &P1,const ZEVector3 &P2,const ZEPlane & Border1,const ZEPlane & Border2)
 {
-	if (ZEPlane::TestHalfSpace(Border1,P1) == ZEHALFSPACE_NEGATIVESIDE)
+	if (ZEPlane::TestHalfSpace(Border1,P1) == ZE_HS_NEGATIVESIDE)
 	{
-		if (ZEPlane::TestHalfSpace(Border2,P2) == ZEHALFSPACE_NEGATIVESIDE)
+		if (ZEPlane::TestHalfSpace(Border2,P2) == ZE_HS_NEGATIVESIDE)
 			return ZE_COVERABLE;
-		else if (ZEPlane::TestHalfSpace(Border1,P2) == ZEHALFSPACE_NEGATIVESIDE)
+		else if (ZEPlane::TestHalfSpace(Border1,P2) == ZE_HS_NEGATIVESIDE)
 			return ZE_OUTSIDE_BY_FIRST_PLANE;
 		else 
 			return ZE_INTERSECTION;
 	}
-	else if (ZEPlane::TestHalfSpace(Border1,P2) == ZEHALFSPACE_NEGATIVESIDE)
+	else if (ZEPlane::TestHalfSpace(Border1,P2) == ZE_HS_NEGATIVESIDE)
 	{
-		if (ZEPlane::TestHalfSpace(Border2,P1) == ZEHALFSPACE_NEGATIVESIDE)
+		if (ZEPlane::TestHalfSpace(Border2,P1) == ZE_HS_NEGATIVESIDE)
 			return ZE_COVERABLE;
 		else
 			return ZE_INTERSECTION;
 	}
-	else if (ZEPlane::TestHalfSpace(Border2,P1) == ZEHALFSPACE_POSITIVESIDE ||
-			 ZEPlane::TestHalfSpace(Border2,P2) == ZEHALFSPACE_POSITIVESIDE)
+	else if (ZEPlane::TestHalfSpace(Border2,P1) == ZE_HS_POSITIVESIDE ||
+			 ZEPlane::TestHalfSpace(Border2,P2) == ZE_HS_POSITIVESIDE)
 		return ZE_INTERSECTION;
 	return ZE_OUTSIDE_BY_SECOND_PLANE;
 }
@@ -579,7 +579,7 @@ ZEHalfSpace DoorAgainstPlanePreTest(const ZERectangle3D & Door,const ZEPlane & P
 			if (test == ZEPlane::TestHalfSpace(Plane,Door.P4))
 				return test;
 
-	return ZEHALFSPACE_INTERSECTS;
+	return ZE_HS_INTERSECTS;
 }
 
 bool CutLineWithLine(ZEVector3 & Out,const ZELine & Line1,const ZELine & Line2) // Line 2 is PortalDoor Line

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMathTest.h
+ Zinek Engine - ZEIOStreamMapping.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,5 +33,60 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETestsCommon/ZEIOStreamMapping.h"
+#include <iostream>
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEMatrix.h"
 
-bool TestMath();
+using namespace std;
+
+ostream& operator<<(ostream& Out, const ZEString& Input)
+{
+	return Out;// << (char)Input;
+}
+
+ostream& operator<<(ostream& Out, const ZEVector2& Input)
+{
+	return Out << "[x:" << Input.x << ", y:" << Input.y << "]";
+}
+
+ostream& operator<<(ostream& Out, const ZEVector3& Input)
+{
+	return Out << "[x:" << Input.x << ", y:" << Input.y << ", z:" << Input.z << "]";
+}
+
+ostream& operator<<(ostream& Out, const ZEVector4& Input)
+{
+	return Out << "[x:" << Input.x << ", y:" << Input.y << ", z:" << Input.z << "w:" << Input.w;
+}
+
+ostream& operator<<(ostream& Out, const ZEQuaternion& Input)
+{
+	return Out << "[w:" << Input.w << ", x:" << Input.x << ", y:" << Input.y << ", z:" << Input.z << "]";
+}
+
+ostream& operator<<(ostream& Out, const ZEMatrix3x3& Input)
+{
+	 Out << "[";
+	for (size_t I = 0; I < 9; I++)
+		if (I != 8)
+			Out << Input.M[I] << ", ";
+		else
+			Out << Input.M[I] << "]";
+
+	return Out;
+}
+
+ostream& operator<<(ostream& Out, const ZEMatrix4x4& Input)
+{
+	Out << "[";
+	for (size_t I = 0; I < 16; I++)
+		if (I != 15)
+			Out << Input.M[I] << ", ";
+		else
+			Out << Input.M[I] << "]";
+
+	return Out;
+}

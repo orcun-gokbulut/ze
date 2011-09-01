@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAABoundingBoxTest.cpp
+ Zinek Engine - ZEAABBoxTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,25 +34,25 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "UnitTest/UnitTest++.h"
-#include "ZEIOStreamMapping.h"
-#include "ZEMath/ZEAABoundingBox.h"
+#include "ZETestsCommon/ZEIOStreamMapping.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZELineSegment.h"
-#include "ZEMath/ZEBoundingSphere.h"
-#include "ZEMath/ZEOBoundingBox.h"
+#include "ZEMath/ZEBSphere.h"
+#include "ZEMath/ZEOBBox.h"
 #include <math.h>
 
 
-SUITE(ZEAABoundingBox)
+SUITE(ZEAABBox)
 {
 	TEST(AABB_Contructor)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB(Min, Max);
+		ZEAABBox AABB(Min, Max);
 
 		CHECK_EQUAL(AABB.Max, ZEVector3(1.0f, 2.0f, 3.0f));
 		CHECK_EQUAL(AABB.Min, ZEVector3(-1.0f, -2.0f, -3.0f));
@@ -62,7 +62,7 @@ SUITE(ZEAABoundingBox)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB(Min, Max);
+		ZEAABBox AABB(Min, Max);
 
 		ZEVector3 Center = AABB.GetCenter();
 
@@ -73,7 +73,7 @@ SUITE(ZEAABoundingBox)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB(Min, Max);
+		ZEAABBox AABB(Min, Max);
 		ZEVector3 Vertex1  = AABB.GetVertex(0);
 		ZEVector3 Vertex2  = AABB.GetVertex(1);
 		ZEVector3 Vertex3  = AABB.GetVertex(2);
@@ -97,7 +97,7 @@ SUITE(ZEAABoundingBox)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB(Min, Max);
+		ZEAABBox AABB(Min, Max);
 
 		float Length = AABB.GetLenght();
 
@@ -108,25 +108,25 @@ SUITE(ZEAABoundingBox)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB1(Min, Max);
+		ZEAABBox AABB1(Min, Max);
 
-		ZEAABoundingBox AABB;
+		ZEAABBox AABB;
 
 		ZEMatrix4x4 M( 1.0f,  1.0f,  2.0f,  3.0f, 
 					   5.0f,  8.0f, 13.0f, 21.0f, 
 					  34.0f, 55.0f,  1.0f,  1.0f, 
 					   3.0f,  5.0f,  8.0f, 13.0f);
-		ZEAABoundingBox::Transform(AABB, AABB1, M);
+		ZEAABBox::Transform(AABB, AABB1, M);
 
 		CHECK_EQUAL(AABB.Max, ZEVector3(116.0f, 187.0f, 39.0f));
 		CHECK_EQUAL(AABB.Min, ZEVector3(-110.0f, -177.0f, -23.0f));
 
 		ZEVector3 Max2( 1.0f,  2.0f,  5.0f);
 		ZEVector3 Min2(-1.0f, -2.0f, -1.0f);
-		ZEAABoundingBox AABB2(Min2, Max2);
-		ZEAABoundingBox AABB3;
+		ZEAABBox AABB2(Min2, Max2);
+		ZEAABBox AABB3;
 
-		ZEAABoundingBox::Transform(AABB3, AABB2, ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f, 
+		ZEAABBox::Transform(AABB3, AABB2, ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f, 
 															  0.0f, 1.0f, 0.0f, 0.0f, 
 															  0.0f, 0.0f, 1.0f, 0.0f, 
 															  0.0f, 0.0f, 0.0f, 1.0f));
@@ -142,13 +142,13 @@ SUITE(ZEAABoundingBox)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB(Min, Max);
+		ZEAABBox AABB(Min, Max);
 
 		ZEVector3 n1(1.0f, 2.0f, 3.0f);
 		ZEVector3 p1(100.0f, 100.0f, 100.0f);
 		ZEPlane P1(n1, p1);
 
-		ZEHalfSpace result1 = ZEAABoundingBox::PlaneHalfSpaceTest(AABB, P1);
+		ZEHalfSpace result1 = ZEAABBox::PlaneHalfSpaceTest(AABB, P1);
 
 		CHECK_EQUAL(result1,-1);
 
@@ -156,25 +156,25 @@ SUITE(ZEAABoundingBox)
 		ZEVector3 p2(0.0f, -6.0f, 0.0f);
 		ZEPlane P2(n2, p2);
 
-		ZEHalfSpace result2 = ZEAABoundingBox::PlaneHalfSpaceTest(AABB, P2);
+		ZEHalfSpace result2 = ZEAABBox::PlaneHalfSpaceTest(AABB, P2);
 
-		CHECK_EQUAL(result2, ZEHALFSPACE_INTERSECTS);
+		CHECK_EQUAL(result2, ZE_HS_INTERSECTS);
 
 		
 		ZEVector3 n3(1.0f, 0.0f, 0.0f);
 		ZEVector3 p3(0.0f, 0.0f, 0.0f);
 		ZEPlane P3(n3, p3);
 
-		ZEHalfSpace result3 = ZEAABoundingBox::PlaneHalfSpaceTest(AABB, P3);
+		ZEHalfSpace result3 = ZEAABBox::PlaneHalfSpaceTest(AABB, P3);
 
-		CHECK_EQUAL(result3, ZEHALFSPACE_INTERSECTS);
+		CHECK_EQUAL(result3, ZE_HS_INTERSECTS);
 
 		ZEVector3 n4(0.0f, 0.0f, 1.0f);
 		ZEVector3 p4(-200.0f, -1000.0f, -100.0f);
 		ZEPlane P4(n4, p4);
 
 
-		ZEHalfSpace result4 = ZEAABoundingBox::PlaneHalfSpaceTest(AABB, P4);
+		ZEHalfSpace result4 = ZEAABBox::PlaneHalfSpaceTest(AABB, P4);
 
 		CHECK_EQUAL(result4, 1);
 
@@ -185,16 +185,16 @@ SUITE(ZEAABoundingBox)
 		
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB(Min, Max);
+		ZEAABBox AABB(Min, Max);
 
 
-		bool result = ZEAABoundingBox::IntersectionTest(AABB, ZEVector3(1.0f, 2.0f, 3.0f));
+		bool result = ZEAABBox::IntersectionTest(AABB, ZEVector3(1.0f, 2.0f, 3.0f));
 
 		CHECK_EQUAL(result, true);
 
 		ZEVector3 P(-1.0f, -2.0f, -3.0f);
 
-		bool result2 = ZEAABoundingBox::IntersectionTest(AABB, P);
+		bool result2 = ZEAABBox::IntersectionTest(AABB, P);
 
 		CHECK_EQUAL(result2, true);
 
@@ -203,7 +203,7 @@ SUITE(ZEAABoundingBox)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB1(Min, Max);
+		ZEAABBox AABB1(Min, Max);
 
 
 		ZEVector3 P0( 1.0f,  2.0f,  3.0f);
@@ -212,7 +212,7 @@ SUITE(ZEAABoundingBox)
 		ZELine L1(P0, P1);
 
 
-		bool result1 = ZEAABoundingBox::IntersectionTest(AABB1, L1);
+		bool result1 = ZEAABBox::IntersectionTest(AABB1, L1);
 
 
 		CHECK_EQUAL(result1, false);
@@ -223,7 +223,7 @@ SUITE(ZEAABoundingBox)
 
 		ZELine L2(P2, P3);
 
-		bool result2 = ZEAABoundingBox::IntersectionTest(AABB1, L2);
+		bool result2 = ZEAABBox::IntersectionTest(AABB1, L2);
 
 		CHECK_EQUAL(result2, false);
 		
@@ -232,7 +232,7 @@ SUITE(ZEAABoundingBox)
 
 		ZELine L3(P4, P5);
 
-		bool result3 = ZEAABoundingBox::IntersectionTest(AABB1, L3);
+		bool result3 = ZEAABBox::IntersectionTest(AABB1, L3);
 
 		CHECK_EQUAL(result3, false);
 
@@ -243,7 +243,7 @@ SUITE(ZEAABoundingBox)
 		ZELine L4(P6, P7);
 
 
-		bool result4 = ZEAABoundingBox::IntersectionTest(AABB1, L4);
+		bool result4 = ZEAABBox::IntersectionTest(AABB1, L4);
 
 
 		CHECK_EQUAL(result4, true);
@@ -253,34 +253,34 @@ SUITE(ZEAABoundingBox)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB1(Min, Max);
+		ZEAABBox AABB1(Min, Max);
 
 		ZEVector3 p1(0.9f, 1.9f, 2.9f);
 		ZEVector3 v1(0.0f, 0.0f, 1.0f);
 		ZERay R1(v1,p1);
 
-		bool result1 = ZEAABoundingBox::IntersectionTest(AABB1, R1);
+		bool result1 = ZEAABBox::IntersectionTest(AABB1, R1);
 		CHECK_EQUAL(result1, true);
 
 		ZEVector3 p2(100.0f, 100.0f, 100.0f);
 		ZEVector3 v2(0.0f, 0.0f, 1.0f);
 		ZERay R2(v2, p2);
 
-		bool result2 = ZEAABoundingBox::IntersectionTest(AABB1, R2);
+		bool result2 = ZEAABBox::IntersectionTest(AABB1, R2);
 		CHECK_EQUAL(result2, false);
 
 		ZEVector3 p3(0.0f, 0.0f, 0.0f);
 		ZEVector3 v3(1.0f, 0.0f, 0.0f);
 		ZERay R3(v3, p3);
 
-		bool result3 = ZEAABoundingBox::IntersectionTest(AABB1, R3);
+		bool result3 = ZEAABBox::IntersectionTest(AABB1, R3);
 		CHECK_EQUAL(result3, true);
 
 		ZEVector3 p4(-1.0f, -2.0f, -3.0f);
 		ZEVector3 v4(2.0f,  4.0f,  6.0f);
 		ZERay R4(v4, p4);
 		
-		bool result4 = ZEAABoundingBox::IntersectionTest(AABB1, R4);
+		bool result4 = ZEAABBox::IntersectionTest(AABB1, R4);
 		CHECK_EQUAL(result4, true);
 		
 
@@ -288,7 +288,7 @@ SUITE(ZEAABoundingBox)
 		ZEVector3 v5(1.0, 0.0f, 0.0f);
 		ZERay R5(v5, p5);
 
-		bool result5 = ZEAABoundingBox::IntersectionTest(AABB1, R5);
+		bool result5 = ZEAABBox::IntersectionTest(AABB1, R5);
 		CHECK_EQUAL(result5, true);
 	}
 
@@ -296,7 +296,7 @@ SUITE(ZEAABoundingBox)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB1(Min, Max);
+		ZEAABBox AABB1(Min, Max);
 
 
 		ZEVector3 P0( 1.0f,  2.0f,  3.0f);
@@ -305,7 +305,7 @@ SUITE(ZEAABoundingBox)
 		ZELineSegment LS1(P0, P1);
 
 
-		bool result1 = ZEAABoundingBox::IntersectionTest(AABB1, LS1);
+		bool result1 = ZEAABBox::IntersectionTest(AABB1, LS1);
 
 
 		CHECK_EQUAL(result1, true);
@@ -317,7 +317,7 @@ SUITE(ZEAABoundingBox)
 		ZELineSegment LS2(P2, P3);
 
 
-		bool result2 = ZEAABoundingBox::IntersectionTest(AABB1, LS2);
+		bool result2 = ZEAABBox::IntersectionTest(AABB1, LS2);
 
 
 		CHECK_EQUAL(result2, false);
@@ -329,7 +329,7 @@ SUITE(ZEAABoundingBox)
 		ZELineSegment LS3(P4, P5);
 
 
-		bool result3 = ZEAABoundingBox::IntersectionTest(AABB1,LS3);
+		bool result3 = ZEAABBox::IntersectionTest(AABB1,LS3);
 	}
 
 	TEST(AABB_GenerateBoundingSphere1)
@@ -337,12 +337,12 @@ SUITE(ZEAABoundingBox)
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
 		
-		ZEAABoundingBox AABB(Min, Max);
+		ZEAABBox AABB(Min, Max);
 		ZEVector3 center = AABB.GetCenter();
 		
-		ZEBoundingSphere BS;
+		ZEBSphere BS;
 
-		AABB.GenerateBoundingSphere(BS);
+		//AABB.GenerateBoundingSphere(BS);
 
 		CHECK_EQUAL(center, BS.Position);
 
@@ -356,7 +356,7 @@ SUITE(ZEAABoundingBox)
 		/*ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
 		
-		ZEAABoundingBox AABB(Min, Max);
+		ZEAABBox AABB(Min, Max);
 		ZEVector3 center = AABB.GetCenter();
 
 		ZEMatrix4x4 M(1.0f, 0.0f, 0.0f, 0.0f, 
@@ -364,7 +364,7 @@ SUITE(ZEAABoundingBox)
 					  0.0f, 0.0f, 1.0f, 0.0f, 
 					  0.0f, 0.0f, 0.0f, 1.0f);
 		
-		ZEBoundingSphere BS;
+		ZEBSphere BS;
 
 		AABB.GenerateBoundingSphere(BS, M);
 
@@ -381,16 +381,16 @@ SUITE(ZEAABoundingBox)
 		ZEVector3 Max( 1.0f,  2.0f,  5.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -1.0f);
 		
-		ZEAABoundingBox AABB(Min, Max);
+		ZEAABBox AABB(Min, Max);
 		ZEVector3 center = AABB.GetCenter();
 		
-		ZEOBoundingBox OBB;
+		ZEOBBox OBB;
 
-		AABB.GenerateOBoundingBox(OBB);
+//		AABB.GenerateOBoundingBox(OBB);
 
-		CHECK_EQUAL(OBB.U, ZEVector3(2.0f, 0.0f, 0.0f));
-		CHECK_EQUAL(OBB.V, ZEVector3(0.0f, 4.0f, 0.0f));
-		CHECK_EQUAL(OBB.N, ZEVector3(0.0f, 0.0f, 6.0f));
+		CHECK_EQUAL(OBB.Right, ZEVector3(2.0f, 0.0f, 0.0f));
+		CHECK_EQUAL(OBB.Up, ZEVector3(0.0f, 4.0f, 0.0f));
+		CHECK_EQUAL(OBB.Front, ZEVector3(0.0f, 0.0f, 6.0f));
 	}
 	
 	TEST(AABB_CollisionTest1)
@@ -398,47 +398,47 @@ SUITE(ZEAABoundingBox)
 		ZEVector3 Max1( 1.0f,  2.0f,  5.0f);
 		ZEVector3 Min1(-1.0f, -2.0f, -1.0f);
 		
-		ZEAABoundingBox AABB1(Min1, Max1);
+		ZEAABBox AABB1(Min1, Max1);
 
 		ZEVector3 Max2( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min2(-1.0f, -2.0f, -3.0f);
 		
-		ZEAABoundingBox AABB2(Min2, Max2);
+		ZEAABBox AABB2(Min2, Max2);
 
-		bool result = ZEAABoundingBox::CollisionTest(AABB1, AABB2);
+		bool result = ZEAABBox::CollisionTest(AABB1, AABB2);
 		CHECK_EQUAL(result, true);
 	
-		bool result2 = ZEAABoundingBox::CollisionTest(AABB2, AABB2);
+		bool result2 = ZEAABBox::CollisionTest(AABB2, AABB2);
 		CHECK_EQUAL(result2, true);
 
 		ZEVector3 Max3(0.0f, 0.0f, 0.0f);
 		ZEVector3 Min3(-10.0f, -10.0f, -10.0f);
-		ZEAABoundingBox AABB3(Min3, Max3);
+		ZEAABBox AABB3(Min3, Max3);
 
-		bool result3 = ZEAABoundingBox::CollisionTest(AABB1, AABB3);
+		bool result3 = ZEAABBox::CollisionTest(AABB1, AABB3);
 		CHECK_EQUAL(result3, true);
 		
 		ZEVector3 Max4(0.0f,  2.0f,  3.0f);
 		ZEVector3 Min4(0.0f, -2.0f, -3.0f);
-		ZEAABoundingBox AABB4(Min4, Max4);
+		ZEAABBox AABB4(Min4, Max4);
 
-		bool result4 = ZEAABoundingBox::CollisionTest(AABB1, AABB4);
+		bool result4 = ZEAABBox::CollisionTest(AABB1, AABB4);
 		CHECK_EQUAL(result4, true);
 
 
 		ZEVector3 Max5(20.0f,  20.0f,  30.0f);
 		ZEVector3 Min5(10.0f, 6.0f, 23.0f);
-		ZEAABoundingBox AABB5(Min5, Max5);
+		ZEAABBox AABB5(Min5, Max5);
 
-		bool result5 = ZEAABoundingBox::CollisionTest(AABB1, AABB5);
+		bool result5 = ZEAABBox::CollisionTest(AABB1, AABB5);
 		CHECK_EQUAL(result5, false);
 
 		ZEVector3 Max6( 1.0f,  2.0f, 10.0f);
 		ZEVector3 Min6(-1.0f, -2.0f, 6.0f);
 		
-		ZEAABoundingBox AABB6(Min6, Max6);
+		ZEAABBox AABB6(Min6, Max6);
 
-		bool result6 = ZEAABoundingBox::CollisionTest(AABB1, AABB6);
+		bool result6 = ZEAABBox::CollisionTest(AABB1, AABB6);
 		CHECK_EQUAL(result6, false);
 
 	}
@@ -448,26 +448,26 @@ SUITE(ZEAABoundingBox)
 		ZEVector3 Max1( 1.0f,  2.0f,  5.0f);
 		ZEVector3 Min1(-1.0f, -2.0f, -1.0f);
 		
-		ZEAABoundingBox AABB1(Min1, Max1);
+		ZEAABBox AABB1(Min1, Max1);
 
-		ZEBoundingSphere BS1(Max1, 3.0f);
-		bool result1 = ZEAABoundingBox::CollisionTest(AABB1, BS1);
+		ZEBSphere BS1(Max1, 3.0f);
+		bool result1 = ZEAABBox::CollisionTest(AABB1, BS1);
 		CHECK_EQUAL(result1, true);
 		
-		ZEBoundingSphere BS2(ZEVector3(-10.0f, 0.0f, 0.0f), 0.1f);
-		bool result2 = ZEAABoundingBox::CollisionTest(AABB1, BS2);
+		ZEBSphere BS2(ZEVector3(-10.0f, 0.0f, 0.0f), 0.1f);
+		bool result2 = ZEAABBox::CollisionTest(AABB1, BS2);
 		CHECK_EQUAL(result2, false);
 
-		AABB1.GenerateBoundingSphere(BS1);
-		bool result3 = ZEAABoundingBox::CollisionTest(AABB1, BS1);
+//		AABB1.GenerateBoundingSphere(BS1);
+		bool result3 = ZEAABBox::CollisionTest(AABB1, BS1);
 		CHECK_EQUAL(result3, true);
 		
-		ZEBoundingSphere BS3(ZEVector3(1.0f, 2.0f, 6.0f), 1.0f);
-		bool result4 = ZEAABoundingBox::CollisionTest(AABB1, BS3);
+		ZEBSphere BS3(ZEVector3(1.0f, 2.0f, 6.0f), 1.0f);
+		bool result4 = ZEAABBox::CollisionTest(AABB1, BS3);
 		CHECK_EQUAL(result4, true);
 
-		ZEBoundingSphere BS4(ZEVector3(0.0f, 0.0f, 3.0f), 0.01f);
-		bool result5 = ZEAABoundingBox::CollisionTest(AABB1, BS4);
+		ZEBSphere BS4(ZEVector3(0.0f, 0.0f, 3.0f), 0.01f);
+		bool result5 = ZEAABBox::CollisionTest(AABB1, BS4);
 		CHECK_EQUAL(result5, true);
 	}
 

@@ -175,7 +175,7 @@ bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norm
 	for (size_t I = 0; I < Resource->GetPortals().GetCount(); I++)
 	{
 		const ZEPortalMapResourcePortal* CurrentPortal = &Resource->GetPortals()[I];
-		//if (ZEAABoundingBox::IntersectionTest(CurrentPortal->BoundingBox,Ray))
+		//if (ZEAABBox::IntersectionTest(CurrentPortal->BoundingBox,Ray))
 		for (size_t N = 0; N < CurrentPortal->Polygons.GetCount(); N++)
 		{
 			const ZEPortalMapPolygon& MapPolygon = CurrentPortal->Polygons[N];

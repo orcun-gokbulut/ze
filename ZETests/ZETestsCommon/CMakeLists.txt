@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEPlane.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,58 +30,19 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_MATH_PLANE_H__
-#define __ZE_MATH_PLANE_H__
+cmake_minimum_required(VERSION 2.8)
 
-#include "ZEVector.h"
-#include "ZELine.h"
+project(ZETestsCommon)
 
-enum ZEPlaneIntersect
-{
-	ZE_PI_NO_INTERSECT	= 0,
-	ZE_PI_PARALLEL		= 1,
-	ZE_PI_ON_PLANE		= 2,
-	ZE_PI_INTERSECTS		= 3,
-};
-enum ZEHalfSpace
-{
-	ZE_HS_NEGATIVE_SIDE = -1,
-	ZE_HS_ON_PLANE		 =  0,
-	ZE_HS_POSITIVE_SIDE =  1,
-	ZE_HS_INTERSECTS	 =  2,
-};
-class ZELine;
-class ZELineSegment;
-class ZERay;
-class ZEPlane
-{
-	public:
-		ZEVector3 p;
-		ZEVector3 n;
+append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ZE_ZINEK_ENGINE)
+	
+add_source(ZEIOStreamMapping.cpp	Sources)
+add_source(ZEIOStreamMapping.h		Sources)
 
-		static bool					IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &t);
-		static bool					IntersectionTest(const ZEPlane& Plane, const ZELineSegment& LineSegment, float &t);
-		static bool					IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t);
-		static bool					IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, ZELine & Line);
+add_library(ZETestsCommon ${Sources})
 
-		static ZEHalfSpace			TestHalfSpace(const ZEPlane Plane, const ZEVector3 Point);
-		static float				DistanceSigned(const ZEPlane& Plane, const ZEVector3& Point);
-		static float				Distance(const ZEPlane& Plane, const ZEVector3& Point);
-
-		static void					Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p);
-		static void					Create(ZEPlane& Plane,float a, float b, float c, float d);
-		static void					Create(ZEPlane& Plane,const ZEVector3 &P1,const ZEVector3 &P2,const ZEVector3 &P3);
-
-		ZEPlane();
-		ZEPlane(const ZEVector3& n, const ZEVector3& p);
-};
-
-#endif
-
-
-
-
+set_property(TARGET ZETestsCommon PROPERTY FOLDER "ZETests")
+target_link_libraries (ZETestsCommon ZEMath ZEDS libunittest++.lib)

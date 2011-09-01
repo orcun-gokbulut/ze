@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERectangleTest.cpp
+ Zinek Engine - ZERayTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,94 +33,78 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "UnitTest/UnitTest++.h"
-#include "ZEIOStreamMapping.h"
-#include "ZEMath/ZERectangle.h"
-#include "ZEMath/ZEVector.h"
+#include <UnitTest/UnitTest++.h>
+#include <d3dx9.h>
 #include <math.h>
 
-SUITE(Rectangle)
+#include "ZETestsCommon/ZEIOStreamMapping.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZERay.h"
+#include "ZEMath/ZEMathDefinitions.h"
+
+SUITE(ZERay)
 {
-
-	TEST(RECT_Constructor)
+	TEST(Constructor)
 	{
-		ZEVector2 LU(1.0f, 4.0f);
-		ZEVector2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-		CHECK_EQUAL(R.LeftUp, ZEVector2(1.0f, 4.0f));
-		CHECK_EQUAL(R.RightDown, ZEVector2(3.0f, 2.0f));
+		ZEVector3 P0(0.0f, 1.0f, 0.0f);
+		ZEVector3 V(1.0f, 2.0f, 3.0f);
+		ZERay R(V, P0);
 
-		ZERectangle R2(LU, 2.0f, 2.0f);
-		CHECK_EQUAL(R2.LeftUp, ZEVector2(1.0f, 4.0f));
-		CHECK_EQUAL(R2.RightDown, ZEVector2(3.0f, 2.0f));
+		CHECK_EQUAL(R.p, P0);
+		CHECK_EQUAL(R.v, V);
+	}
+	
+	TEST(Create)
+	{
+		ZERay R;
+		ZEVector3 P0(0.0f, 1.0f, 0.0f);
+		ZEVector3 P1(1.0f, 2.0f, 3.0f);
+		ZERay::Create(R, P0, P1);
 
-
-
+		CHECK_EQUAL(R.p, P0);
+		CHECK_EQUAL(R.v, ZEVector3(1.0f, 1.0f, 3.0f));
 	}
 
-	TEST(RECT_BoundingTest)
+	TEST(CreateParametric)
 	{
+		ZERay R;
+		ZEVector3 V(1.0, 4.0f, 9.0f);
+		ZEVector3 P (1.0, 0.0f, 0.0f);
+		ZERay::CreateParametric(R, V, P);
+		CHECK_EQUAL(R.p, P);
+		CHECK_EQUAL(R.v, V);
+	}
+
+	TEST(GetPointOn)
+	{
+		ZEVector3 P0(0,3,0);
+		ZEVector3 V(1,4,-1);
+		ZEVector3 A;
+		ZEVector3 B;
+		const ZERay L = ZERay::ZERay(V,P0);
+		ZEVector3 P;
+		ZEVector3 P3;
+		L.GetPointOn(P,3);
+		A=P;
 		
+		ZEVector3::Scale(P,L.v,3);
+		ZEVector3::Add(P,P,L.p);
+		B = P;
 
-		ZEVector2 LU(1.0f, 4.0f);
-		ZEVector2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-
-		ZEVector2 P(2.0f, 3.0f);
-		bool result = R.BoundingTest(P);
-		CHECK_EQUAL(result, true);
-
-		ZEVector2 P2(0.0f, 0.0f);
-		bool result2 = R.BoundingTest(P2);
-		CHECK_EQUAL(result2, false);
-
-		ZEVector2 P3(2.0f, 2.0f);
-		bool result3 = R.BoundingTest(P3);
-		CHECK_EQUAL(result3, true);
+		CHECK_EQUAL(A, B);
 	}
 
-	TEST(RECT_GetCorner)
+	TEST(DistanceToPoint)
 	{
-		ZEVector2 LU(1.0f, 4.0f);
-		ZEVector2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
+		ZEVector3 P(5,8,2);
+		ZEVector3 P1(0,3,0);
+		ZEVector3 P2(1,4,-1);
+		ZELine L(P1,P2);
+		float t;
+		float d;
 
-		ZEVector2 C1 = R.GetCorner(ZE_RC_LEFTDOWN);
-		ZEVector2 C2 = R.GetCorner(ZE_RC_LEFTUP);
-		ZEVector2 C3 = R.GetCorner(ZE_RC_RIGHTDOWN);
-		ZEVector2 C4 = R.GetCorner(ZE_RC_RIGHTUP);
+		d = ZELine::MinimumDistance(L,P,t);
 
-		CHECK_EQUAL(C1, ZEVector2(1.0f, 2.0f));
-		CHECK_EQUAL(C2, ZEVector2(1.0f, 4.0f));
-		CHECK_EQUAL(C3, ZEVector2(3.0f, 2.0f));
-		CHECK_EQUAL(C4, ZEVector2(3.0f, 4.0f));
-
+		CHECK_CLOSE(d, 4.61880215, 0.000001);
 	}
-
-	TEST(RECT_GetWidth)
-	{
-		ZEVector2 LU(1.0f, 4.0f);
-		ZEVector2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-
-		float w = R.GetWidth();
-
-		CHECK_EQUAL(w, 2.0f);
-
-	}
-
-	TEST(RECT_GetHeight)
-	{
-		ZEVector2 LU(1.0f, 4.0f);
-		ZEVector2 RD(3.0f, 2.0f);
-		ZERectangle R(LU, RD);
-
-		float h = R.GetHeight();
-
-		CHECK_EQUAL(h, 2.0f);
-
-	}
-
-
-
 }

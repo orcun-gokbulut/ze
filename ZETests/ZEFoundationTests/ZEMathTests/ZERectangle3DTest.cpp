@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPlane.h
+ Zinek Engine - ZERectangle3DTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,55 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_MATH_PLANE_H__
-#define __ZE_MATH_PLANE_H__
+#include "UnitTest/UnitTest++.h"
+#include "ZETestsCommon/ZEIOStreamMapping.h"
+#include "ZEMath/ZERectangle3D.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEPlane.h"
+#include <math.h>
 
-#include "ZEVector.h"
-#include "ZELine.h"
 
-enum ZEPlaneIntersect
+SUITE(Rectangle3D)
 {
-	ZE_PI_NO_INTERSECT	= 0,
-	ZE_PI_PARALLEL		= 1,
-	ZE_PI_ON_PLANE		= 2,
-	ZE_PI_INTERSECTS		= 3,
-};
-enum ZEHalfSpace
-{
-	ZE_HS_NEGATIVE_SIDE = -1,
-	ZE_HS_ON_PLANE		 =  0,
-	ZE_HS_POSITIVE_SIDE =  1,
-	ZE_HS_INTERSECTS	 =  2,
-};
-class ZELine;
-class ZELineSegment;
-class ZERay;
-class ZEPlane
-{
-	public:
-		ZEVector3 p;
-		ZEVector3 n;
+	TEST(RECT3D_Constructor)
+	{
+		ZEVector3 A(1.0f, 2.0f, 3.0f);
+		ZEVector3 B(4.0f, 5.0f, 6.0f);
+		ZEVector3 C(7.0f, 8.0f, 9.0f);
+		ZEVector3 D(10.0f, 11.0f, 12.0f);
+		
+		ZERectangle3D R(A, B, C, D);
 
-		static bool					IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &t);
-		static bool					IntersectionTest(const ZEPlane& Plane, const ZELineSegment& LineSegment, float &t);
-		static bool					IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t);
-		static bool					IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, ZELine & Line);
+		CHECK_EQUAL(R.P1, A);
+		CHECK_EQUAL(R.P2, B);
+		CHECK_EQUAL(R.P3, C);
+		CHECK_EQUAL(R.P4, D);
+	}
 
-		static ZEHalfSpace			TestHalfSpace(const ZEPlane Plane, const ZEVector3 Point);
-		static float				DistanceSigned(const ZEPlane& Plane, const ZEVector3& Point);
-		static float				Distance(const ZEPlane& Plane, const ZEVector3& Point);
+	TEST(RECT3D_GetPlane)
+	{
+		ZEVector3 A(1.0f, 4.0f, 6.0f);
+		ZEVector3 B(3.0f, 4.0f, 6.0f);
+		ZEVector3 C(1.0f, 2.0f, 6.0f);
+		ZEVector3 D(3.0f, 2.0f, 6.0f);
+		
+		ZERectangle3D R(A, B, C, D);
 
-		static void					Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p);
-		static void					Create(ZEPlane& Plane,float a, float b, float c, float d);
-		static void					Create(ZEPlane& Plane,const ZEVector3 &P1,const ZEVector3 &P2,const ZEVector3 &P3);
+		ZEPlane P ;
+		R.GetPlane(P);
 
-		ZEPlane();
-		ZEPlane(const ZEVector3& n, const ZEVector3& p);
-};
+		CHECK_EQUAL(P.n , ZEVector3(0.0f, 0.0f, -4.0f));
+		CHECK_EQUAL(P.p , ZEVector3(1.0f, 2.0f, 6.0f));
+	}
 
-#endif
+	TEST(RECT3D_GetPoint)
+	{
+		ZEVector3 A(1.0f, 4.0f, 6.0f);
+		ZEVector3 B(3.0f, 4.0f, 6.0f);
+		ZEVector3 C(1.0f, 2.0f, 6.0f);
+		ZEVector3 D(3.0f, 2.0f, 6.0f);
+		
+		ZERectangle3D R(A, B, C, D);
 
+		ZEVector3 P1 = R.GetPoint(0);
+		ZEVector3 P2 = R.GetPoint(1);
+		ZEVector3 P3 = R.GetPoint(2);
+		ZEVector3 P4 = R.GetPoint(3);
 
-
-
+		CHECK_EQUAL(A, P1);
+		CHECK_EQUAL(B, P2);
+		CHECK_EQUAL(C, P3);
+		CHECK_EQUAL(D, P4);
+	}
+}

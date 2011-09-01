@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERayTest.cpp
+ Zinek Engine - ZETrigonometryTest.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,77 +34,24 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include <UnitTest/UnitTest++.h>
-#include <d3dx9.h>
 #include <math.h>
+#include "ZETestsCommon/ZEIOStreamMapping.h"
+#include "ZEMath/ZETrigonometry.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
-#include "ZEIOStreamMapping.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZERay.h"
-#include "ZEMath/ZEDefinitions.h"
-
-SUITE(ZERay)
+SUITE(ZETrigonometry)
 {
-	TEST(Constructor)
+	TEST(FastSin)
 	{
-		ZEVector3 P0(0.0f, 1.0f, 0.0f);
-		ZEVector3 V(1.0f, 2.0f, 3.0f);
-		ZERay R(V, P0);
+		CHECK_EQUAL(FastSin(360), 0);
 
-		CHECK_EQUAL(R.p, P0);
-		CHECK_EQUAL(R.v, V);
 	}
-	
-	TEST(Create)
+	TEST(FastCos)
 	{
-		ZERay R;
-		ZEVector3 P0(0.0f, 1.0f, 0.0f);
-		ZEVector3 P1(1.0f, 2.0f, 3.0f);
-		ZERay::Create(R, P0, P1);
-
-		CHECK_EQUAL(R.p, P0);
-		CHECK_EQUAL(R.v, ZEVector3(1.0f, 1.0f, 3.0f));
+		CHECK_EQUAL(FastCos(360), 1);
 	}
-
-	TEST(CreateParametric)
+	TEST(FastTan)
 	{
-		ZERay R;
-		ZEVector3 V(1.0, 4.0f, 9.0f);
-		ZEVector3 P (1.0, 0.0f, 0.0f);
-		ZERay::CreateParametric(R, V, P);
-		CHECK_EQUAL(R.p, P);
-		CHECK_EQUAL(R.v, V);
-	}
-
-	TEST(GetPointOn)
-	{
-		ZEVector3 P0(0,3,0);
-		ZEVector3 V(1,4,-1);
-		ZEVector3 A;
-		ZEVector3 B;
-		const ZERay L = ZERay::ZERay(V,P0);
-		ZEVector3 P;
-		ZEVector3 P3;
-		L.GetPointOn(P,3);
-		A=P;
-		
-		ZEVector3::Scale(P,L.v,3);
-		ZEVector3::Add(P,P,L.p);
-		B = P;
-
-		CHECK_EQUAL(A, B);
-	}
-
-	TEST(DistanceToPoint)
-	{
-		ZEVector3 P(5,8,2);
-		ZEVector3 P1(0,3,0);
-		ZEVector3 P2(1,4,-1);
-		ZELine L(P1,P2);
-		float t;
-		float d;
-
-		d = ZELine::MinimumDistance(L,P,t);
-
-		CHECK_CLOSE(d, 4.61880215, 0.000001);
+		CHECK_EQUAL(FastTan(360), 0);
 	}
 }

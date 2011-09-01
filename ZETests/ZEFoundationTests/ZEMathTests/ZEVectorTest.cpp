@@ -35,9 +35,9 @@
 
 #include <UnitTest/UnitTest++.h>
 #include <math.h>
-#include "ZEIOStreamMapping.h"
+#include "ZETestsCommon/ZEIOStreamMapping.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEDefinitions.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
 bool operator>=(const ZEVector2& A, const ZEVector2& B)
 {

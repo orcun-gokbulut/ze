@@ -39,8 +39,8 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZELineSegment.h"
 #include "ZEMath/ZERay.h"
-#include "ZEMath/ZEDefinitions.h"
-#include "ZEIOStreamMapping.h"
+#include "ZEMath/ZEMathDefinitions.h"
+#include "ZETestsCommon/ZEIOStreamMapping.h"
 
 
 SUITE(ZETriangle)

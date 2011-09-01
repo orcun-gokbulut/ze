@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - Test.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,9 +30,34 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
+cmake_minimum_required(VERSION 2.8)
 
-void TestAll();
-void TestOutput(char* Format, ...);
+project(ZEMathTests)
+
+append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS ZE_ZINEK_ENGINE)
+	
+add_source(ZEAABBoxTest.cpp				Sources)
+add_source(ZEBSphereTest.cpp			Sources)
+add_source(ZELineSegmentTest.cpp		Sources)
+add_source(ZELineTest.cpp				Sources)
+add_source(ZEMathTests.cpp				Sources)
+add_source(ZEMathTests.h				Sources)
+add_source(ZEMatrixTest.cpp				Sources)
+add_source(ZEOBBoxTest.cpp				Sources)
+add_source(ZEPlaneTest.cpp				Sources)
+add_source(ZEQuaternionTest.cpp			Sources)
+add_source(ZERayTest.cpp				Sources)
+add_source(ZERectangle3DTest.cpp		Sources)
+add_source(ZERectangleTest.cpp			Sources)
+add_source(ZETriangleTest.cpp			Sources)
+add_source(ZETrigonometryTest.cpp		Sources)
+add_source(ZEVectorTest.cpp				Sources)
+
+add_executable(ZEMathTests ${Sources})
+
+set_property(TARGET ZEMathTests PROPERTY FOLDER "ZETests")
+target_link_libraries (ZEMathTests ZETestsCommon ZEMath libunittest++.lib)
+

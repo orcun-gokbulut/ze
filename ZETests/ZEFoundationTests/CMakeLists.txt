@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZETrigonometryTest.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,28 +30,10 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include <UnitTest/UnitTest++.h>
-#include <math.h>
-#include "ZEIOStreamMapping.h"
-#include "ZEMath/ZETrigonometry.h"
-#include "ZEMath/ZEDefinitions.h"
+cmake_minimum_required (VERSION 2.8)
 
-SUITE(ZETrigonometry)
-{
-	TEST(FastSin)
-	{
-		CHECK_EQUAL(FastSin(360), 0);
-
-	}
-	TEST(FastCos)
-	{
-		CHECK_EQUAL(FastCos(360), 1);
-	}
-	TEST(FastTan)
-	{
-		CHECK_EQUAL(FastTan(360), 0);
-	}
-}
+add_subdirectory (ZEDSTests)
+add_subdirectory (ZEMathTests)

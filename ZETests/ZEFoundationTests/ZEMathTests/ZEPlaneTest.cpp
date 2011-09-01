@@ -36,13 +36,13 @@
 #include <UnitTest/UnitTest++.h>
 #include <d3dx9.h>
 #include <math.h>
-#include "ZEIOStreamMapping.h"
+#include "ZETestsCommon/ZEIOStreamMapping.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZELine.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZELineSegment.h"
-#include "ZEMath/ZEDefinitions.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
 SUITE(ZEPlane)
 {

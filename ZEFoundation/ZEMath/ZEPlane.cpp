@@ -52,9 +52,9 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &
 	{
 		return false;
        /* if (N == 0)
-            return ZEPLANEINTERSECT_ONPLANE;
+            return ZE_PI_ON_PLANE;
         else
-            return ZEPLANEINTERSECT_PARALEL;*/
+            return ZE_PI_PARALLEL;*/
     }
 
     t = N / D;
@@ -73,9 +73,9 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELineSegment& LineSe
 	if (fabs(D) < ZE_ZERO_TRESHOLD) 
 	{
        /* if (N == 0)
-            return ZEPLANEINTERSECT_ONPLANE;
+            return ZE_PI_ON_PLANE;
         else
-            return ZEPLANEINTERSECT_PARALEL;*/
+            return ZE_PI_PARALLEL;*/
 		return false;
     }
 
@@ -98,9 +98,9 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t)
 	if (fabs(D) < ZE_ZERO_TRESHOLD) 
 	{
        /* if (N == 0)
-            return ZEPLANEINTERSECT_ONPLANE;
+            return ZE_PI_ON_PLANE;
         else
-            return ZEPLANEINTERSECT_PARALEL;*/
+            return ZE_PI_PARALLEL;*/
 		return false;
     }
 
@@ -138,7 +138,7 @@ ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane Plane, const ZEVector3 Point)
 	float D = Temp.x + Temp.y + Temp.z;
 
 	if (fabs(D) < ZE_ZERO_TRESHOLD)
-		return ZEHALFSPACE_ONPLANE;
+		return ZE_HS_ON_PLANE;
 	else if (D > ZE_ZERO_TRESHOLD)
 		return ZE_HS_POSITIVE_SIDE;
 	else
