@@ -41,7 +41,7 @@
 #include "ZEEntityProvider.h"
 #include <string.h>
 
-void ZEEntity::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
+void ZEEntity::SetLocalBoundingBox(const ZEAABBox& BoundingBox)
 {
 	LocalBoundingBox = BoundingBox;
 }
@@ -62,14 +62,14 @@ ZEEntityType ZEEntity::GetEntityType()
 	return ZE_ET_REGULAR;
 }
 
-const ZEAABoundingBox& ZEEntity::GetLocalBoundingBox() const
+const ZEAABBox& ZEEntity::GetLocalBoundingBox() const
 {
 	return LocalBoundingBox;
 }
 
-const ZEAABoundingBox& ZEEntity::GetWorldBoundingBox()
+const ZEAABBox& ZEEntity::GetWorldBoundingBox()
 {
-	ZEAABoundingBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+	ZEAABBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
 	return WorldBoundingBox;
 }
 

@@ -54,7 +54,7 @@ void ZESceneCuller::DebugDrawEntity(ZEEntity* Entity, ZEDrawParameters* DrawPara
 void ZESceneCuller::DebugDrawLight(ZELight* Light, ZEDrawParameters* DrawParameters)
 {
 	if (DebugDrawElements & ZE_VDE_LIGHT_RANGE)
-		DebugDraw.DrawBoundingSphere(ZEBoundingSphere(Light->GetWorldPosition(), Light->GetRange()), DrawParameters->Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
+		DebugDraw.DrawBoundingSphere(ZEBSphere(Light->GetWorldPosition(), Light->GetRange()), DrawParameters->Renderer, ZEVector4(0.25f, 0.25f, 1.0f, 1.0f));
 }
 
 bool ZESceneCuller::CullLight(ZELight* Light, ZEDrawParameters* DrawParameters)

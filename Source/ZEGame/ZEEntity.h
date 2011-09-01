@@ -42,9 +42,9 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEAABoundingBox.h"
-#include "ZEMath/ZEOBoundingBox.h"
-#include "ZEMath/ZEBoundingSphere.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEBSphere.h"
 #include "ZEDefinitions.h"
 #include "ZEMeta/ZEClass.h"
 
@@ -139,11 +139,11 @@ class ZEEntity : public ZEClass
 		bool									Enabled;
 		bool									Visible;
 
-		ZEAABoundingBox							WorldBoundingBox;
-		ZEAABoundingBox							LocalBoundingBox;
+		ZEAABBox							WorldBoundingBox;
+		ZEAABBox							LocalBoundingBox;
 
 	protected:
-		void									SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
+		void									SetLocalBoundingBox(const ZEAABBox& BoundingBox);
 
 												ZEEntity();
 		virtual									~ZEEntity();
@@ -154,8 +154,8 @@ class ZEEntity : public ZEClass
 
 		virtual ZEEntityType					GetEntityType();
 
-		virtual const ZEAABoundingBox&			GetLocalBoundingBox() const;
-		virtual const ZEAABoundingBox&			GetWorldBoundingBox();
+		virtual const ZEAABBox&			GetLocalBoundingBox() const;
+		virtual const ZEAABBox&			GetWorldBoundingBox();
 		virtual const ZEMatrix4x4&				GetWorldTransform();
 
 		bool									GetInitialized();

@@ -55,7 +55,7 @@ void ZEModel::CalculateBoundingBox()
 {
 	if (Meshes.GetCount() == 0 && Bones.GetCount() == 0)
 	{
-		BoundingBox = ZEAABoundingBox(ZEVector3::Zero, ZEVector3::Zero);
+		BoundingBox = ZEAABBox(ZEVector3::Zero, ZEVector3::Zero);
 		return;
 	}
 
@@ -64,8 +64,8 @@ void ZEModel::CalculateBoundingBox()
 
 	for (size_t I = 0; I < Meshes.GetCount(); I++)
 	{
-		ZEAABoundingBox CurrentBoundingBox;
-		ZEAABoundingBox::Transform(CurrentBoundingBox, Meshes[I].GetLocalBoundingBox(), Meshes[I].GetLocalTransform());
+		ZEAABBox CurrentBoundingBox;
+		ZEAABBox::Transform(CurrentBoundingBox, Meshes[I].GetLocalBoundingBox(), Meshes[I].GetLocalTransform());
 
 		for (int N = 0; N < 8; N++)
 		{
@@ -363,7 +363,7 @@ bool ZEModel::GetAutoLOD()
 	return AutoLOD;
 }
 
-const ZEAABoundingBox& ZEModel::GetLocalBoundingBox() const
+const ZEAABBox& ZEModel::GetLocalBoundingBox() const
 {
 
 	((ZEModel*)this)->CalculateBoundingBox();

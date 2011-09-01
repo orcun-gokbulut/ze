@@ -39,7 +39,7 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDefinitions.h"
 #include "ZETypes.h"
@@ -297,7 +297,7 @@ struct ZEModelFileMeshChunk
 {
 	ZEDWORD								ChunkId;
 	char								Name[ZE_MDLF_MAX_NAME_SIZE];
-	ZEAABoundingBox						BoundingBox;
+	ZEAABBox						BoundingBox;
 	ZEVector3							Position;
 	ZEQuaternion						Rotation;
 	ZEVector3							Scale;
@@ -314,7 +314,7 @@ struct ZEModelFileBoneChunk
 	ZEVector3							RelativePosition;
 	ZEQuaternion						RelativeRotation;
 	ZEVector3							RelativeScale;
-	ZEAABoundingBox						BoundingBox;
+	ZEAABBox						BoundingBox;
 	bool								HasPhysicalBody;
 	bool								HasPhysicalJoint;
 };

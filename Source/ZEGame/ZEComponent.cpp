@@ -36,7 +36,7 @@
 #include "ZEComponent.h"
 #include "ZEGame/ZECompoundEntity.h"
 
-void ZEComponent::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
+void ZEComponent::SetLocalBoundingBox(const ZEAABBox& BoundingBox)
 {
 	LocalBoundingBox = BoundingBox;
 }
@@ -97,14 +97,14 @@ const ZEMatrix4x4& ZEComponent::GetLocalTransform() const
 	return LocalTransform;
 }
 
-const ZEAABoundingBox& ZEComponent::GetLocalBoundingBox() const
+const ZEAABBox& ZEComponent::GetLocalBoundingBox() const
 {
 	return LocalBoundingBox;
 }
 
-const ZEAABoundingBox& ZEComponent::GetWorldBoundingBox()
+const ZEAABBox& ZEComponent::GetWorldBoundingBox()
 {
-	ZEAABoundingBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+	ZEAABBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
 	return WorldBoundingBox;
 }
 

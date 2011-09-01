@@ -65,7 +65,7 @@ class ZESkyBrush : public ZEEntity
 		virtual								~ZESkyBrush();
 
 	public:
-		virtual const ZEAABoundingBox&		GetWorldBoundingBox();
+		virtual const ZEAABBox&		GetWorldBoundingBox();
 
 		virtual ZEDWORD						GetDrawFlags() const;
 

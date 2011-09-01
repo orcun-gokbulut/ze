@@ -63,7 +63,7 @@ class ZEPortalMapPortal
 		const char*							GetName();
 
 		const ZEArray<ZEPortalMapDoor*>&	GetDoors();
-		const ZEAABoundingBox&				GetBoundingBox();
+		const ZEAABBox&				GetBoundingBox();
 		ZEPhysicalMesh*						GetPhysicalMesh();
 
 		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);

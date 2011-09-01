@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEBoundingSphere.cpp
+ Zinek Engine - ZEBSphere.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEBoundingSphere.h"
-#include "ZEAABoundingBox.h"
-#include "ZEOBoundingBox.h"
+#include "ZEBSphere.h"
+#include "ZEAABBox.h"
+#include "ZEOBBox.h"
 #include "ZERay.h"
 #include "ZELineSegment.h"
 #include "ZELine.h"
 
 #include <math.h>
 
-ZEHalfSpace ZEBoundingSphere::PlaneHalfSpaceTest(const ZEBoundingSphere& BoundingSphere, const ZEPlane& Plane)
+ZEHalfSpace ZEBSphere::PlaneHalfSpaceTest(const ZEBSphere& BoundingSphere, const ZEPlane& Plane)
 {
 	if (ZEPlane::Distance(Plane, BoundingSphere.Position) <= BoundingSphere.Radius) return ZE_HS_INTERSECTS;
 
@@ -52,30 +52,30 @@ ZEHalfSpace ZEBoundingSphere::PlaneHalfSpaceTest(const ZEBoundingSphere& Boundin
 }
 
 
-void ZEBoundingSphere::GetSurfaceNormal(ZEVector3& Normal, const ZEBoundingSphere& BoundingSphere, const ZEVector3& Point)
+void ZEBSphere::GetSurfaceNormal(ZEVector3& Normal, const ZEBSphere& BoundingSphere, const ZEVector3& Point)
 {
 	ZEVector3::Create(Normal, BoundingSphere.Position, Point);
 	ZEVector3::Normalize(Normal, Normal);
 }
 
-bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZEVector3 Point)
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEVector3 Point)
 {
 	return ZEVector3::Distance(BoundingSphere.Position, Point) <= BoundingSphere.Radius;
 }
 
-bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZELine& Line)
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line)
 {
 	float temp;
 	return ZELine::MinimumDistance(Line, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
 }
 
-bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZERay& Ray)
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray)
 {
 	float temp;
 	return ZERay::MinimumDistance(Ray, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
 }
 
-bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZERay& Ray, float& MinT, float& MaxT)
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray, float& MinT, float& MaxT)
 {
 	ZEVector3 Dest;
 	ZEVector3::Sub(Dest, Ray.p, BoundingSphere.Position);
@@ -111,19 +111,19 @@ bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, 
 	return true;*/
 }
 
-bool ZEBoundingSphere::IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZELineSegment& LineSegment)
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment)
 {
 	float temp;
  	return ZELineSegment::MinimumDistance(LineSegment, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
 }
 
-bool ZEBoundingSphere::CollisionTest(const ZEBoundingSphere& BoundingSphere, const ZEOBBox& BoundingBox)
+bool ZEBSphere::CollisionTest(const ZEBSphere& BoundingSphere, const ZEOBBox& BoundingBox)
 {
 	return 0;
 }
 
 
-bool ZEBoundingSphere::CollisionTest(const ZEBoundingSphere& BoundingSphere, const ZEAABoundingBox& BoundingBox)
+bool ZEBSphere::CollisionTest(const ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)
 {
 	float totalDistance = 0;
 
@@ -145,20 +145,20 @@ bool ZEBoundingSphere::CollisionTest(const ZEBoundingSphere& BoundingSphere, con
 	return sqrt(totalDistance) <= BoundingSphere.Radius;
 }
 
-bool ZEBoundingSphere::CollisionTest(const ZEBoundingSphere& BoundingSphere1, const ZEBoundingSphere& BoundingSphere2)
+bool ZEBSphere::CollisionTest(const ZEBSphere& BoundingSphere1, const ZEBSphere& BoundingSphere2)
 {
 	return ZEVector3::Distance(BoundingSphere1.Position, BoundingSphere2.Position) <= BoundingSphere1.Radius + BoundingSphere2.Radius;
 }
 
 
-ZEBoundingSphere::ZEBoundingSphere()
+ZEBSphere::ZEBSphere()
 {
 }
 
-ZEBoundingSphere::ZEBoundingSphere(const ZEVector3& Position, float Radius)
+ZEBSphere::ZEBSphere(const ZEVector3& Position, float Radius)
 {
-	ZEBoundingSphere::Position = Position;
-	ZEBoundingSphere::Radius = Radius;
+	ZEBSphere::Position = Position;
+	ZEBSphere::Radius = Radius;
 }
 
 

@@ -39,7 +39,7 @@
 
 #include "ZETDefinitions.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZETMapFile.h"
 
 enum ZEOctreeSubspace
@@ -61,7 +61,7 @@ class ZEMapFileOctree
 		int							Depth;
 		ZEMapFileOctree*			SubTrees[8];
 
-		ZEAABoundingBox				BoundingBox;
+		ZEAABBox				BoundingBox;
 		ZESmartArray<ZEDWORD>		PolygonIds;
 
 		static ZEMapFileOctree*		GenerateOctree(ZEArray<ZEMapFilePolygon>& Polygons, unsigned int MaxDepth);

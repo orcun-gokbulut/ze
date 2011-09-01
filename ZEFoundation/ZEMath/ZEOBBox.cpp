@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEOBoundingBox.cpp
+ Zinek Engine - ZEOBBox.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEBoundingSphere.h"
-#include "ZEAABoundingBox.h"
-#include "ZEOBoundingBox.h"
+#include "ZEBSphere.h"
+#include "ZEAABBox.h"
+#include "ZEOBBox.h"
 #include "ZEQuaternion.h"
 #include "ZELine.h"
 #include "ZERay.h"
@@ -105,7 +105,7 @@ void ZEOBBox::Transform(ZEOBBox& Output, const ZEMatrix4x4& Matrix, const ZEOBBo
 	ZEMatrix4x4::Transform3x3(NewU, Matrix, Input.Front);
 }
 
-void ZEOBBox::ConvertToSphere(ZEBoundingSphere& Sphere, const ZEOBBox& Input)
+void ZEOBBox::ConvertToSphere(ZEBSphere& Sphere, const ZEOBBox& Input)
 {
 	Sphere.Position = Input.Center;
 	Sphere.Radius = Input.HalfSize.Max();

@@ -39,9 +39,9 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEAABoundingBox.h"
-#include "ZEMath/ZEOBoundingBox.h"
-#include "ZEMath/ZEBoundingSphere.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZERectangle3D.h"
 
 enum ZEViewVolumeType
@@ -72,7 +72,7 @@ class ZEViewVolume
 		virtual ZEViewVolumeType			GetViewVolumeType() const = 0;
 
 		virtual bool						LightCullTest(ZELight* Light) const = 0;
-		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const = 0;
+		virtual bool						CullTest(const ZEAABBox& BoundingBox) const = 0;
 		virtual bool						CullTest(ZEEntity* Entity) const = 0;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const = 0;
 };
@@ -93,15 +93,15 @@ class ZEViewFrustum : public ZEViewVolume
 		ZEPlane								NearClippingPlane;
 
 
-		bool								ConeCullTest(const ZEBoundingSphere& BoundingSphere) const;
+		bool								ConeCullTest(const ZEBSphere& BoundingSphere) const;
 		virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
-		virtual bool						CullTest(const ZEBoundingSphere& BoundingSphere) const;
+		virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
 
 	public:
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 
 		virtual bool						LightCullTest(ZELight* Light) const;
-		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
@@ -112,14 +112,14 @@ class ZEViewFrustum : public ZEViewVolume
 class ZEViewSphere : public ZEViewVolume
 {
 	private:
-		ZEBoundingSphere					BoundingSphere;
+		ZEBSphere					BoundingSphere;
 		float								NearZ;
 
 	public:
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 
 		virtual bool						LightCullTest(ZELight* Light) const;
-		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
@@ -130,13 +130,13 @@ class ZEViewHemiSphere : public ZEViewVolume
 {
 	private:
 		ZEPlane								HalfPlane;
-		ZEBoundingSphere					BoundingSphere;
+		ZEBSphere					BoundingSphere;
 
 	public:
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 
 		virtual bool						LightCullTest(ZELight* Light) const;
-		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
@@ -152,7 +152,7 @@ class ZEViewCuboid: public ZEViewVolume
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 
 		virtual bool						LightCullTest(ZELight* Light) const;
-		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
@@ -171,7 +171,7 @@ class ZEViewPlane : public ZEViewVolume
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 		
 		virtual bool						LightCullTest(ZELight* Light) const;
-		virtual bool						CullTest(const ZEAABoundingBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;				
 

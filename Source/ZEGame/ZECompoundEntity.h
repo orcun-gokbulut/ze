@@ -43,9 +43,9 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEAABoundingBox.h"
-#include "ZEMath/ZEOBoundingBox.h"
-#include "ZEMath/ZEBoundingSphere.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEBSphere.h"
 #include "ZEDefinitions.h"
 #include "ZEMeta/ZEClass.h"
 

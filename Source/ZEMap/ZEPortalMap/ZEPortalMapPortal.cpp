@@ -62,7 +62,7 @@ const ZEArray<ZEPortalMapDoor*>& ZEPortalMapPortal::GetDoors()
 	return Doors;
 }
 
-const ZEAABoundingBox& ZEPortalMapPortal::GetBoundingBox()
+const ZEAABBox& ZEPortalMapPortal::GetBoundingBox()
 {
 	return Resource->BoundingBox;
 }

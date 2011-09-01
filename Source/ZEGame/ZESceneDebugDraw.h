@@ -40,7 +40,7 @@
 #include "ZEGraphics/ZERenderOrder.h"
 #include "ZEGraphics/ZECanvas.h"
 
-class ZEAABoundingBox;
+class ZEAABBox;
 class ZEMatrix4x4;
 class ZEVector4;
 class ZEMaterial;
@@ -60,9 +60,9 @@ class ZESceneDebugDraw
 		void						Deinitialize();
 		void						Destroy();
 
-		void						DrawOrientedBoundingBox(const ZEAABoundingBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, const ZEVector4& Color);
-		void						DrawAxisAlignedBoundingBox(const ZEAABoundingBox& BoundingBox, ZERenderer* Renderer, const ZEVector4& Color);
-		void						DrawBoundingSphere(const ZEBoundingSphere& BoundingSphere, ZERenderer* Renderer, const ZEVector4& Color);
+		void						DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, const ZEVector4& Color);
+		void						DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, ZERenderer* Renderer, const ZEVector4& Color);
+		void						DrawBoundingSphere(const ZEBSphere& BoundingSphere, ZERenderer* Renderer, const ZEVector4& Color);
 
 		void						Clean();
 

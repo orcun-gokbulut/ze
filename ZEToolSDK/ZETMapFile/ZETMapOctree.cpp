@@ -62,8 +62,8 @@ void AddPolygonToSubSpace(ZEMapFileOctree* Node, ZEOctreeSubspace SubSpace, int 
 		Node->SubTrees[SubSpace] = new ZEMapFileOctree();
 		Node->SubTrees[SubSpace]->Depth = Node->Depth + 1;
 		
-		ZEAABoundingBox& Box = Node->BoundingBox;
-		ZEAABoundingBox& SubBox = Node->SubTrees[SubSpace]->BoundingBox;
+		ZEAABBox& Box = Node->BoundingBox;
+		ZEAABBox& SubBox = Node->SubTrees[SubSpace]->BoundingBox;
 
 		ZEVector3 Center = Box.GetCenter();
 
@@ -175,9 +175,9 @@ void GenerateOctreeNode(ZEMapFileOctree* Node, int MaxDepth, ZEArray<ZEMapFilePo
 	}
 }
 
-ZEAABoundingBox CalculateBoundingBox(ZEArray<ZEMapFilePolygon>& Polygons)
+ZEAABBox CalculateBoundingBox(ZEArray<ZEMapFilePolygon>& Polygons)
 {
-	ZEAABoundingBox MapBoundingBox;
+	ZEAABBox MapBoundingBox;
 	MapBoundingBox.Min = Polygons[0].Vertices[0].Position;
 	MapBoundingBox.Max = Polygons[0].Vertices[0].Position;
 

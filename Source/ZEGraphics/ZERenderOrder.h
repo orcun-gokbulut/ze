@@ -40,7 +40,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZEAABBox.h"
 
 enum ZERenderPipeline
 {

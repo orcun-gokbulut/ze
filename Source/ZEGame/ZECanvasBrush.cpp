@@ -68,7 +68,7 @@ void ZECanvasBrush::UpdateCanvas()
 		memcpy(Buffer, Canvas.GetVertexBuffer(), Canvas.GetBufferSize());
 		VertexBuffer->Unlock();
 	
-		ZEAABoundingBox BoundingBox;
+		ZEAABBox BoundingBox;
 		Canvas.CalculateBoundingBox(BoundingBox);
 		SetLocalBoundingBox(BoundingBox);
 		RenderOrder.VertexBuffer = Canvas.CreateStaticVertexBuffer();

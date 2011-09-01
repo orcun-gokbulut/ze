@@ -48,7 +48,7 @@ void ZETrigger::SetScale(const ZEVector3& Scale)
 {
 	// Scale bounding box
 
-	SetLocalBoundingBox(ZEAABoundingBox(ZEVector3(-0.5f * Scale.x, -0.5f * Scale.y, -0.5f * Scale.z), ZEVector3(0.5f * Scale.x, 0.5f * Scale.y, 0.5f * Scale.z)));
+	SetLocalBoundingBox(ZEAABBox(ZEVector3(-0.5f * Scale.x, -0.5f * Scale.y, -0.5f * Scale.z), ZEVector3(0.5f * Scale.x, 0.5f * Scale.y, 0.5f * Scale.z)));
 	ZEEntity::SetScale(Scale);
 }
 
@@ -112,7 +112,7 @@ void ZETrigger::Tick(float ElapsedTime)
 			if (CurrentEntity == this)
 				continue;
 
-			if (ZEAABoundingBox::IntersectionTest(GetWorldBoundingBox(), CurrentEntity->GetPosition()) && IsTriggerActive)
+			if (ZEAABBox::IntersectionTest(GetWorldBoundingBox(), CurrentEntity->GetPosition()) && IsTriggerActive)
 			{
 				switch (ActivateTriggerOn)
 				{
@@ -138,7 +138,7 @@ void ZETrigger::Tick(float ElapsedTime)
 				}
 			}
 
-			if(!ZEAABoundingBox::IntersectionTest(GetWorldBoundingBox(), CurrentEntity->GetPosition()))
+			if(!ZEAABBox::IntersectionTest(GetWorldBoundingBox(), CurrentEntity->GetPosition()))
 				if (InsideEntityIds.GetCount() != 0 && ActivateTriggerOn == ZE_ATO_LEAVE)
 				{
 					for(size_t N = 0; N < InsideEntityIds.GetCount(); N++)

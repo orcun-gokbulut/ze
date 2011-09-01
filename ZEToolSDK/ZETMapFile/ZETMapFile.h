@@ -41,7 +41,7 @@
 #include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERectangle3D.h"
-#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZETTypes.h"
 #include "ZETDefinitions.h"
 
@@ -138,7 +138,7 @@ class ZEMapFilePortal
 {
 public:
 	char									Name[ZE_MPFL_MAX_NAME_SIZE];
-	ZEAABoundingBox							BoundingBox;
+	ZEAABBox							BoundingBox;
 	bool									GenerateOctree;
 	unsigned int							MaxOctreeDepth;
 
@@ -154,7 +154,7 @@ public:
 class ZEMapFile
 {
 	public:
-		ZEAABoundingBox						MapBoundingBox;
+		ZEAABBox						MapBoundingBox;
 
 		ZEArray<ZEMapFileMaterial>			Materials;
 		ZEArray<ZEMapFilePortal>			Portals;

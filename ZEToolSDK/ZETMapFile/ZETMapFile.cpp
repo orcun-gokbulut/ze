@@ -56,7 +56,7 @@ ZEMapFilePortal::~ZEMapFilePortal()
 		delete Octree;
 }
 
-void CalculateBoundingBox(ZEAABoundingBox& BoundingBox, ZEArray<ZEMapFilePolygon>& Polygons)
+void CalculateBoundingBox(ZEAABBox& BoundingBox, ZEArray<ZEMapFilePolygon>& Polygons)
 {
 	if (Polygons.GetCount() == 0)
 		BoundingBox.Max = BoundingBox.Min = ZEVector3(0.0f, 0.0f ,0.0f);

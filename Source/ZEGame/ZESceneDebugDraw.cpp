@@ -38,11 +38,11 @@
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEBoundingSphere.h"
-#include "ZEMath/ZEAABoundingBox.h"
-#include "ZEMath/ZEOBoundingBox.h"
+#include "ZEMath/ZEBSphere.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEOBBox.h"
 
-void ZESceneDebugDraw::DrawOrientedBoundingBox(const ZEAABoundingBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, const ZEVector4& Color)
+void ZESceneDebugDraw::DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, const ZEVector4& Color)
 {
 	ZEMatrix4x4 LocalPivot, WorldMatrix;
 	ZEMatrix4x4::CreateOrientation(LocalPivot, BoundingBox.GetCenter(), 
@@ -58,7 +58,7 @@ void ZESceneDebugDraw::DrawOrientedBoundingBox(const ZEAABoundingBox& BoundingBo
 	VertexBuffer.AddWireframeBox(1.0f, 1.0f, 1.0f);
 }
 
-void ZESceneDebugDraw::DrawAxisAlignedBoundingBox(const ZEAABoundingBox& BoundingBox, ZERenderer* Renderer, const ZEVector4& Color)
+void ZESceneDebugDraw::DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, ZERenderer* Renderer, const ZEVector4& Color)
 {
 	ZEMatrix4x4 WorldMatrix;
 	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingBox.GetCenter(), 
@@ -70,7 +70,7 @@ void ZESceneDebugDraw::DrawAxisAlignedBoundingBox(const ZEAABoundingBox& Boundin
 	VertexBuffer.AddWireframeBox(1.0f, 1.0f, 1.0f);
 }
 
-void ZESceneDebugDraw::DrawBoundingSphere(const ZEBoundingSphere& BoundingSphere, ZERenderer* Renderer, const ZEVector4& Color)
+void ZESceneDebugDraw::DrawBoundingSphere(const ZEBSphere& BoundingSphere, ZERenderer* Renderer, const ZEVector4& Color)
 {
 	ZEMatrix4x4 WorldMatrix;
 	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingSphere.Position, 

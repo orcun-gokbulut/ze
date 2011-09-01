@@ -40,7 +40,7 @@
 #include "ZEDefinitions.h"
 #include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZERectangle3D.h"
 
 #define ZE_MAP_MAX_NAME_SIZE ZE_MAX_NAME_SIZE
@@ -124,7 +124,7 @@ struct ZEMapFilePhysicalMeshPolygonChunk
 struct ZEMapFileOctreeChunk
 {
 	ZEDWORD							ChunkIdentifier;
-	ZEAABoundingBox					BoundingBox;
+	ZEAABBox					BoundingBox;
 	ZEDWORD							Depth;
 	bool							SubSpaces[8];
 	bool							IsLeaf;
@@ -144,7 +144,7 @@ struct ZEMapFilePortalChunk
 {
 	ZEDWORD							ChunkIdentifier;
 	char							Name[ZE_MAP_MAX_NAME_SIZE];
-	ZEAABoundingBox					BoundingBox;
+	ZEAABBox					BoundingBox;
 	ZEDWORD							PolygonCount;
 	bool							HasOctree;
 	bool							HasPhysicalMesh;

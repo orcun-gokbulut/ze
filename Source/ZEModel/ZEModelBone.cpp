@@ -67,21 +67,21 @@ bool ZEModelBone::IsRootBone()
 	return ParentBone == NULL;
 }
 
-const ZEAABoundingBox& ZEModelBone::GetLocalBoundingBox()
+const ZEAABBox& ZEModelBone::GetLocalBoundingBox()
 {
 	return BoneResource->BoundingBox;
 }
 
-const ZEAABoundingBox& ZEModelBone::GetModelBoundingBox()
+const ZEAABBox& ZEModelBone::GetModelBoundingBox()
 {
-	ZEAABoundingBox::Transform(ModelBoundingBox, BoneResource->BoundingBox, GetModelTransform());
+	ZEAABBox::Transform(ModelBoundingBox, BoneResource->BoundingBox, GetModelTransform());
 
 	return ModelBoundingBox;
 }
 
-const ZEAABoundingBox& ZEModelBone::GetWorldBoundingBox()
+const ZEAABBox& ZEModelBone::GetWorldBoundingBox()
 {
-	ZEAABoundingBox::Transform(WorldBoundingBox, BoneResource->BoundingBox, GetWorldTransform());
+	ZEAABBox::Transform(WorldBoundingBox, BoneResource->BoundingBox, GetWorldTransform());
 
 	return WorldBoundingBox;
 }

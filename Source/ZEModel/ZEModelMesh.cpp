@@ -77,22 +77,22 @@ const char* ZEModelMesh::GetName()
 	return MeshResource->Name;
 }
 
-const ZEAABoundingBox& ZEModelMesh::GetLocalBoundingBox()
+const ZEAABBox& ZEModelMesh::GetLocalBoundingBox()
 {
 	return LocalBoundingBox;
 }
 
-const ZEAABoundingBox& ZEModelMesh::GetModelBoundingBox()
+const ZEAABBox& ZEModelMesh::GetModelBoundingBox()
 {
-	ZEAABoundingBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
+	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
 
 	return ModelBoundingBox;
 }
 
-const ZEAABoundingBox& ZEModelMesh::GetWorldBoundingBox()
+const ZEAABBox& ZEModelMesh::GetWorldBoundingBox()
 {
 
-	ZEAABoundingBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+	ZEAABBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
 
 	return WorldBoundingBox;
 }

@@ -689,7 +689,7 @@ void ZECanvas::AddVertices(const ZECanvasVertex* Vertices, size_t Count)
 	this->Vertices.MassAdd(Vertices, Count);
 }
 
-void ZECanvas::CalculateBoundingBox(ZEAABoundingBox& BoundingBox)
+void ZECanvas::CalculateBoundingBox(ZEAABBox& BoundingBox)
 {
 	if (Vertices.GetCount() == 0)
 	{

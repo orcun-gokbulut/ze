@@ -45,9 +45,9 @@
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZESkyBrush);
 
-const ZEAABoundingBox& ZESkyBrush::GetWorldBoundingBox()
+const ZEAABBox& ZESkyBrush::GetWorldBoundingBox()
 {
-	return ZEAABoundingBox();
+	return ZEAABBox();
 }
 
 ZEDWORD ZESkyBrush::GetDrawFlags() const

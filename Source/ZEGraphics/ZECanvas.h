@@ -43,7 +43,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZEAABBox.h"
 
 class ZECanvasVertex
 {
@@ -127,7 +127,7 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		void							AddVertex(const ZECanvasVertex& Vertex);
 		void							AddVertices(const ZECanvasVertex* Vertices, size_t Count);
 		
-		void							CalculateBoundingBox(ZEAABoundingBox& BoundingBox);
+		void							CalculateBoundingBox(ZEAABBox& BoundingBox);
 
 		bool							IsEmpty();
 		void							Clean();

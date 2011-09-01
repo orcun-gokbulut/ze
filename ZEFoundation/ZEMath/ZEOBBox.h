@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEBoundingSphere.h
+ Zinek Engine - ZEOBBox.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,39 +34,50 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_BOUNDINGSPHERE_H__
-#define __ZE_MATH_BOUNDINGSPHERE_H__
+#ifndef __ZE_MATH_O_BOUNDING_BOX_H__
+#define __ZE_MATH_O_BOUNDING_BOX_H__
+
 #include "ZEVector.h"
 #include "ZEMatrix.h"
 #include "ZEPlane.h"
 
-class ZEOBBox;
-class ZEAABoundingBox;
-class ZEBoundingSphere
+class ZEBSphere;
+class ZEAABBox;
+
+class ZEOBBox
 {
 	public:
-		ZEVector3				Position;
-		float					Radius;
+		ZEVector3				Center;
+		ZEVector3				Right, Up, Front;
+		ZEVector3				HalfSize;
 
-		static ZEHalfSpace		PlaneHalfSpaceTest(const ZEBoundingSphere& BoundingSphere, const ZEPlane& Plane);
+		ZEVector3				GetVertex(unsigned char Index) const;
+		ZEVector3				GetEdge(unsigned char Index) const;
 
-		static void				GetSurfaceNormal(ZEVector3& Normal, const ZEBoundingSphere& BoundingSphere, const ZEVector3& Point);
+		static void				CreateFromOrientation(ZEOBBox& BoundingBox, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale);
+		static void				ConvertToSphere(ZEBSphere& Sphere, const ZEOBBox& Input);
 
-		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZEVector3 Point);
+		static void				Transform(ZEOBBox& Output, const ZEMatrix4x4& Matrix, const ZEOBBox& Input);
 
-		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZELine& Line);
-		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZELine& Line, float& MinT, float& MaxT);
-		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZELineSegment& LineSegment);
-		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT, float& MaxT);
-		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZERay& Ray);
-		static bool				IntersectionTest(const ZEBoundingSphere& BoundingSphere, const ZERay& Ray, float& MinT, float& MaxT);
+		static ZEHalfSpace		PlaneHalfSpaceTest(const ZEOBBox& BoundingBox, const ZEPlane& Plane);
 
-		static bool				CollisionTest(const ZEBoundingSphere& BoundingSphere, const ZEOBBox& BoundingBox);
-		static bool				CollisionTest(const ZEBoundingSphere& BoundingSphere, const ZEAABoundingBox& BoundingBox);
-		static bool				CollisionTest(const ZEBoundingSphere& BoundingSphere1, const ZEBoundingSphere& BoundingSphere2);
+		static bool				IntersectionTest(const ZEOBBox& BoundingBox, const ZEVector3 Point);
 
-								ZEBoundingSphere();
-								ZEBoundingSphere(const ZEVector3& Position, float Radius);
+		static bool				IntersectionTest(const ZEOBBox& BoundingBox, const ZELine& Line);
+		static bool				IntersectionTest(const ZEOBBox& BoundingBox, const ZELine& Line, float& TMin);
+		static bool				IntersectionTest(const ZEOBBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax);
+
+		static bool				IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray);
+		static bool				IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray, float& TMin);
+		static bool				IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray, float& TMin, float& TMax);
+
+		static bool				IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& LineSegment);
+		static bool				IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin);
+		static bool				IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax);
+							
+								ZEOBBox();
+								ZEOBBox(const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale);
+								ZEOBBox(const ZEVector3& Center, const ZEVector3& Right, const ZEVector3& Up,const ZEVector3& Direction, const ZEVector3& HalfSize);
 };
 #endif
 

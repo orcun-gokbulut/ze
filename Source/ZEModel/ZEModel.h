@@ -87,7 +87,7 @@ class ZEModel : public ZEComponent
 
 		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
-		ZEAABoundingBox						BoundingBox;
+		ZEAABBox						BoundingBox;
 
 		void								CalculateBoundingBox();		
 		void								UpdateTransforms();
@@ -117,7 +117,7 @@ class ZEModel : public ZEComponent
 
 		virtual	ZEDWORD						GetDrawFlags() const;
 
-		virtual const ZEAABoundingBox&		GetLocalBoundingBox() const;
+		virtual const ZEAABBox&		GetLocalBoundingBox() const;
 
 		void								SetModelFile(const char* ModelFile);
 		const char*							GetModelFile() const;

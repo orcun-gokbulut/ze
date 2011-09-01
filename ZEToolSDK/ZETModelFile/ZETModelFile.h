@@ -39,7 +39,7 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZEDS/ZEArray.h"
 #include "ZETTypes.h"
 #include "ZETDefinitions.h"
@@ -220,7 +220,7 @@ struct ZEModelFilePhysicalBody
 struct ZEModelFileMesh
 {
 	char										Name[ZE_MDLF_MAX_NAME_SIZE]; 
-	ZEAABoundingBox								BoundingBox;
+	ZEAABBox								BoundingBox;
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;
 	ZEVector3									Scale;
@@ -333,7 +333,7 @@ struct ZEModelFileBone
 	ZEVector3									RelativePosition;
 	ZEQuaternion								RelativeRotation;
 	ZEVector3									RelativeScale;
-	ZEAABoundingBox								BoundingBox;
+	ZEAABBox								BoundingBox;
 	ZEModelFilePhysicalBody						PhysicalBody;
 	ZEModelFilePhysicalJoint					PhysicalJoint;
 };
@@ -362,7 +362,7 @@ struct ZEModelFileAnimation
 class ZEModelFile
 {
 	public:
-		ZEAABoundingBox							BoundingBox;
+		ZEAABBox							BoundingBox;
 		ZEArray<ZEModelFileMaterial>			Materials;
 		ZEArray<ZEModelFileMesh>				Meshes;
 		ZEArray<ZEModelFileBone>				Bones;

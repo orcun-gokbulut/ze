@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAABoundingBox.cpp
+ Zinek Engine - ZEAABBox.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,15 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEBoundingSphere.h"
-#include "ZEAABoundingBox.h"
-#include "ZEOBoundingBox.h"
+#include "ZEBSphere.h"
+#include "ZEAABBox.h"
+#include "ZEOBBox.h"
 #include "ZERay.h"
 #include "ZELineSegment.h"
 #include "ZELine.h"
 #include <math.h>
 
-ZEVector3 ZEAABoundingBox::GetCenter() const
+ZEVector3 ZEAABBox::GetCenter() const
 {
 	ZEVector3 Center;
 	ZEVector3::Sub(Center, Max, Min);
@@ -50,7 +50,7 @@ ZEVector3 ZEAABoundingBox::GetCenter() const
 	return Center;
 }
 
-ZEVector3 ZEAABoundingBox::GetVertex(unsigned char Index) const
+ZEVector3 ZEAABBox::GetVertex(unsigned char Index) const
 {
 	ZEVector3 Vertex;
 
@@ -72,7 +72,7 @@ ZEVector3 ZEAABoundingBox::GetVertex(unsigned char Index) const
 	return Vertex;
 }
 
-float ZEAABoundingBox::GetLenght() const
+float ZEAABBox::GetLenght() const
 {
 	ZEVector3 Temp;
 	ZEVector3::Sub(Temp, Max, Min);
@@ -80,7 +80,7 @@ float ZEAABoundingBox::GetLenght() const
 	return ZEVector3::Length(Temp);
 }
 
-void ZEAABoundingBox::Transform(ZEAABoundingBox& Output, const ZEAABoundingBox& Input, const ZEMatrix4x4& TransformMatrix)
+void ZEAABBox::Transform(ZEAABBox& Output, const ZEAABBox& Input, const ZEMatrix4x4& TransformMatrix)
 {
 	ZEVector3 Point;
 	ZEMatrix4x4::Transform(Point, TransformMatrix, Input.GetVertex(0));
@@ -98,7 +98,7 @@ void ZEAABoundingBox::Transform(ZEAABoundingBox& Output, const ZEAABoundingBox& 
 	}
 }
 
-ZEHalfSpace ZEAABoundingBox::PlaneHalfSpaceTest(const ZEAABoundingBox& BoundingBox, const ZEPlane& Plane)
+ZEHalfSpace ZEAABBox::PlaneHalfSpaceTest(const ZEAABBox& BoundingBox, const ZEPlane& Plane)
 {
 	ZEHalfSpace HS1 = ZEPlane::TestHalfSpace(Plane, BoundingBox.GetVertex(0));
 	for (int I = 1; I < 8; I++)
@@ -110,23 +110,23 @@ ZEHalfSpace ZEAABoundingBox::PlaneHalfSpaceTest(const ZEAABoundingBox& BoundingB
 	return HS1;
 }
 
-ZEAABoundingBox::ZEAABoundingBox()
+ZEAABBox::ZEAABBox()
 {
 }
 
-ZEAABoundingBox::ZEAABoundingBox(const ZEVector3 Min, const ZEVector3 Max)
+ZEAABBox::ZEAABBox(const ZEVector3 Min, const ZEVector3 Max)
 {
 	this->Min = Min;
 	this->Max = Max;
 }
 
-void ZEAABoundingBox::GenerateBoundingSphere(ZEBoundingSphere& BoundingSphere, const ZEAABoundingBox& BoundingBox)
+void ZEAABBox::GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)
 {
 	BoundingSphere.Radius = (BoundingBox.Max - BoundingBox.Min).Length() * 0.5f;
 	BoundingSphere.Position = BoundingBox.GetCenter();
 }
 
-void ZEAABoundingBox::GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABoundingBox& BoundingBox)
+void ZEAABBox::GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABBox& BoundingBox)
 {
 	OrientedBoundingBox.Center = (BoundingBox.Min + BoundingBox.Max) * 0.5f;
 
@@ -144,32 +144,32 @@ void ZEAABoundingBox::GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const Z
 	OrientedBoundingBox.Front.z = 1.0f;
 }
 
-bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZEVector3& Point)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEVector3& Point)
 {
 	return (BoundingBox.Min.x <= Point.x) && (BoundingBox.Max.x >= Point.x) &&
 		(BoundingBox.Min.y <= Point.y) && (BoundingBox.Max.y >= Point.y) && 
 		(BoundingBox.Min.z <= Point.z) && (BoundingBox.Max.z >= Point.z);
 }
 
-bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZELine& Line)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line)
 {
 	float MinT, MaxT;
 	return IntersectionTest(BoundingBox, Line, MinT, MaxT);
 }
 
-bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZERay& Ray)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray)
 {
 	float MinT, MaxT;
 	return IntersectionTest(BoundingBox, Ray, MinT, MaxT);
 }
 
-bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZELineSegment& LineSegment)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment)
 {
 	float MinT, MaxT;
 	return IntersectionTest(BoundingBox, LineSegment, MinT, MaxT);
 }
 
-bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZELine& Line, float& MinT, float& MaxT)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& MinT, float& MaxT)
 {
 	bool TValid = false;
 
@@ -296,7 +296,7 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 	}
 }
 
-bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZERay& Ray, float & MinT, float& MaxT)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray, float & MinT, float& MaxT)
 {
 	if (IntersectionTest(BoundingBox, (ZELine)Ray, MinT, MaxT))
 	{
@@ -317,9 +317,9 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 		return false;
 }
 
-bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const ZELineSegment& LineSegment, float& MinT, float& MaxT)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& MinT, float& MaxT)
 {
-	if (ZEAABoundingBox::IntersectionTest(BoundingBox, (ZELine)LineSegment, MinT, MaxT))
+	if (ZEAABBox::IntersectionTest(BoundingBox, (ZELine)LineSegment, MinT, MaxT))
 	{
 		if (MinT < 0.0f)
 			MinT = 0.0f;
@@ -335,13 +335,13 @@ bool ZEAABoundingBox::IntersectionTest(const ZEAABoundingBox& BoundingBox, const
 		return false;
 }
 
-bool ZEAABoundingBox::CollisionTest(const ZEAABoundingBox& BoundingBox1, const ZEOBBox& BoundingBox2)
+bool ZEAABBox::CollisionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& BoundingBox2)
 {
 //	ZEASSERT(true "Not implamented");
 	return false;	
 }
 
-bool ZEAABoundingBox::CollisionTest(const ZEAABoundingBox& BoundingBox1, const ZEAABoundingBox& BoundingBox2)
+bool ZEAABBox::CollisionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& BoundingBox2)
 {
 	return (BoundingBox1.Max.x <= BoundingBox2.Max.x && BoundingBox1.Max.y <= BoundingBox2.Max.y && BoundingBox1.Max.z <= BoundingBox2.Max.z
 		&& BoundingBox1.Max.x >= BoundingBox2.Min.x && BoundingBox1.Max.y >= BoundingBox2.Min.y && BoundingBox1.Max.z >= BoundingBox2.Min.z)
@@ -350,7 +350,7 @@ bool ZEAABoundingBox::CollisionTest(const ZEAABoundingBox& BoundingBox1, const Z
 		&& BoundingBox2.Max.x >= BoundingBox1.Min.x && BoundingBox2.Max.y >= BoundingBox1.Min.y && BoundingBox2.Max.z >= BoundingBox1.Min.z);
 }
 
-bool ZEAABoundingBox::CollisionTest(const ZEAABoundingBox& BoundingBox, const ZEBoundingSphere& BoundingSphere)
+bool ZEAABBox::CollisionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere)
 {
 	float totalDistance = 0;
 

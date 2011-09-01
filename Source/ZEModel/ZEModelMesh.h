@@ -53,9 +53,9 @@ class ZEModelMesh
 		ZEModel*							Owner;
 
 		const ZEModelResourceMesh*			MeshResource;
-		ZEAABoundingBox						LocalBoundingBox;
-		ZEAABoundingBox						ModelBoundingBox;
-		ZEAABoundingBox						WorldBoundingBox;
+		ZEAABBox						LocalBoundingBox;
+		ZEAABBox						ModelBoundingBox;
+		ZEAABBox						WorldBoundingBox;
 
 		ZEVector3							Position;
 		ZEVector3							Scale;
@@ -82,9 +82,9 @@ class ZEModelMesh
 		const char*							GetName();
 		ZEPhysicalRigidBody*				GetPhysicalBody() { return PhysicalBody; }
 
-		const ZEAABoundingBox&				GetLocalBoundingBox();
-		const ZEAABoundingBox&				GetModelBoundingBox();
-		const ZEAABoundingBox&				GetWorldBoundingBox();
+		const ZEAABBox&				GetLocalBoundingBox();
+		const ZEAABBox&				GetModelBoundingBox();
+		const ZEAABBox&				GetWorldBoundingBox();
 
 		const ZEMatrix4x4&					GetLocalTransform();
 		const ZEMatrix4x4&					GetModelTransform();

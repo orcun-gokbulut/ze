@@ -42,9 +42,9 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEAABoundingBox.h"
-#include "ZEMath/ZEOBoundingBox.h"
-#include "ZEMath/ZEBoundingSphere.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEBSphere.h"
 
 class ZERenderer;
 class ZECompoundEntity;
@@ -64,14 +64,14 @@ class ZEComponent : public ZEEntity
 		ZEMatrix4x4						LocalTransform;
 		ZEMatrix4x4						WorldTransform;
 
-		ZEAABoundingBox					LocalBoundingBox;
-		ZEAABoundingBox					WorldBoundingBox;
+		ZEAABBox					LocalBoundingBox;
+		ZEAABBox					WorldBoundingBox;
 
 		bool							Enabled;
 		bool							Visible;
 
 	protected: 
-		void							SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox);
+		void							SetLocalBoundingBox(const ZEAABBox& BoundingBox);
 		virtual	void					OnTransformChanged();
 
 	public:
@@ -83,8 +83,8 @@ class ZEComponent : public ZEEntity
 		const ZEMatrix4x4&				GetWorldTransform() const;
 		const ZEMatrix4x4&				GetLocalTransform() const;
 
-		virtual const ZEAABoundingBox&	GetLocalBoundingBox() const;
-		virtual const ZEAABoundingBox&	GetWorldBoundingBox();
+		virtual const ZEAABBox&	GetLocalBoundingBox() const;
+		virtual const ZEAABBox&	GetWorldBoundingBox();
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);

@@ -41,7 +41,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERectangle3D.h"
-#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZEDefinitions.h"
 #include "ZECore/ZEResource.h"
 #include "ZEGraphics/ZEVertexTypes.h"
@@ -72,7 +72,7 @@ struct ZEPortalMapResourcePhysicalMesh
 struct ZEPortalMapResourcePortal
 {
 	char										Name[ZE_MAX_NAME_SIZE];
-	ZEAABoundingBox								BoundingBox;
+	ZEAABBox								BoundingBox;
 	ZEArray<ZEPortalMapResourceDoor*>			Doors;
 	ZEArray<size_t>								DoorIds;
 	ZEArray<ZEPortalMapPolygon>					Polygons;
