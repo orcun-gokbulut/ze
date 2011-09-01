@@ -191,7 +191,7 @@ void ZEUIControl::SetPosition(const ZEVector2& Position)
 {
 	DirtyVisibleRectangle = true;
 
-	ZEVector2 PositionDifference = GetPosition() - Position;
+	ZEVector2 PositionDifference = Position - GetPosition();
 
 	for (int I = 0; I < GetChildControls().GetCount(); I++)
 		GetChildControls()[I]->SetPosition(GetChildControls()[I]->GetPosition() + PositionDifference);
