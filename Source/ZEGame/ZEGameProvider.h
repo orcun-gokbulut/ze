@@ -37,7 +37,7 @@
 #ifndef	__ZE_GAMEPROVIDER_H__
 #define __ZE_GAMEPROVIDER_H__
 
-#include "ZEDS\ZEDS.h"
+#include "ZEDS/ZEDS.h"
 #include "ZEGame.h"
 
 class ZEGameProvider

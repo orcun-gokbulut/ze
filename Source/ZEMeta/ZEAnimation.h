@@ -38,8 +38,8 @@
 #define __ZE_ANIMATION_H__
 
 #include "ZEDefinitions.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEVariant.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEVariant.h"
 
 enum ZEAnimationState
 {

@@ -35,11 +35,11 @@
 
 #include "ZEAnimation.h"
 #include "ZEClass.h"
-#include "ZECore\ZEResourceFile.h"
+#include "ZECore/ZEResourceFile.h"
 #include "ZETypes.h"
-#include "ZECore\ZEError.h"
-#include "ZESerialization\ZESerializer.h"
-#include "ZESerialization\ZEUnserializer.h"
+#include "ZECore/ZEError.h"
+#include "ZESerialization/ZESerializer.h"
+#include "ZESerialization/ZEUnserializer.h"
 
 #include <string.h>
 

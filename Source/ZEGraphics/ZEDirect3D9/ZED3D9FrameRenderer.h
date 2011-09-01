@@ -37,7 +37,7 @@
 #ifndef __ZE_D3D9_FRAME_RENDERER_H__
 #define __ZE_D3D9_FRAME_RENDERER_H__
 
-#include "ZEGraphics\ZEFrameRenderer.h"
+#include "ZEGraphics/ZEFrameRenderer.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZED3D9HDRProcessor.h"
 #include "ZED3D9SSAOProcessor.h"

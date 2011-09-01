@@ -38,9 +38,9 @@
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9Shader.h"
 #include "ZED3D9CommonTools.h"
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEGraphics\ZECamera.h"
-#include "ZECore\ZEResourceFile.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZECore/ZEResourceFile.h"
 #include <D3D9.h>
 
 ZED3D9SkyBoxMaterial::ZED3D9SkyBoxMaterial()

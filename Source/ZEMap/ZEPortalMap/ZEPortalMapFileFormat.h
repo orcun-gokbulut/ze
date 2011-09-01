@@ -39,9 +39,9 @@
 
 #include "ZEDefinitions.h"
 #include "ZETypes.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEAABoundingBox.h"
-#include "ZEMath\ZERectangle3D.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZERectangle3D.h"
 
 #define ZE_MAP_MAX_NAME_SIZE ZE_MAX_NAME_SIZE
 #define ZE_MAP_MAX_FILENAME_SIZE ZE_MAX_FILE_NAME_SIZE

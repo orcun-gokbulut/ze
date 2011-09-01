@@ -39,11 +39,11 @@
 
 #include "ZEVertexTypes.h"
 #include "ZEVertexBuffer.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEAABoundingBox.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEAABoundingBox.h"
 
 class ZECanvasVertex
 {

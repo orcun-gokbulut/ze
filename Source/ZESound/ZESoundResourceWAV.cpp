@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESoundResourceWAV.h"
-#include "ZECore\ZEError.h"
+#include "ZECore/ZEError.h"
 #include <memory.h>
 
 ZESoundResourceWAV::ZESoundResourceWAV()

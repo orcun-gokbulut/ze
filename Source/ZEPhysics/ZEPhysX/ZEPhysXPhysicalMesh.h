@@ -37,7 +37,7 @@
 #ifndef __ZE_PHYSX_PHYSICAL_STATIC_MESH_H__
 #define __ZE_PHYSX_PHYSICAL_STATIC_MESH_H__
 
-#include "ZEPhysics\ZEPhysicalMesh.h"
+#include "ZEPhysics/ZEPhysicalMesh.h"
 #include "ZEPhysXComponentBase.h"
 
 #include <NxActor.h>

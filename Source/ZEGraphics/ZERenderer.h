@@ -37,9 +37,9 @@
 #ifndef __ZE_RENDERER_H__
 #define __ZE_RENDERER_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEMatrix.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
 
 struct ZEViewPoint
 {

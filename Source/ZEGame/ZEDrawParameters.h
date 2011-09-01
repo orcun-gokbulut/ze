@@ -38,10 +38,10 @@
 #define __ZE_DRAW_PARAMETERS_H__
 
 #include "ZETypes.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEDS/ZEArray.h"
 
 class ZELight;
 class ZECamera;

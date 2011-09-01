@@ -38,8 +38,8 @@
 #define __ZE_CANVASBRUSH_H__
 
 #include "ZECompoundEntity.h"
-#include "ZEGraphics\ZECanvas.h"
-#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEGraphics/ZECanvas.h"
+#include "ZEGraphics/ZERenderOrder.h"
 
 
 ZE_META_ENTITY_DESCRIPTION(ZEPresentationSlide);

@@ -36,9 +36,9 @@
 #pragma once
 #include "ZEGraphicsModule.h"
 #include "ZEGraphicsModuleDescription.h"
-#include "ZECore\ZEOptionManager.h"
-#include "ZECore\ZEOption.h"
-#include "ZECore\ZECore.h"
+#include "ZECore/ZEOptionManager.h"
+#include "ZECore/ZEOption.h"
+#include "ZECore/ZECore.h"
 #include "ZERealTimeTextureCompressor.h"
 
 #define FREEIMAGE_LIB
@@ -70,9 +70,9 @@ ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 	switch(TextureQuality)
 	{
 		default:		
-		/*case ZE_TQ_VERY_HIGH:
+		case ZE_TQ_VERY_HIGH:
 			return &VeryHigh;
-			break;*/
+			break;
 		
 		case ZE_TQ_HIGH:
 			return &High;

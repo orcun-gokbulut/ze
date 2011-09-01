@@ -37,7 +37,7 @@
 #ifndef	__ZE_VERTEX_TYPES_H__
 #define __ZE_VERTEX_TYPES_H__
 
-#include "ZEMath\ZEVector.h"
+#include "ZEMath/ZEVector.h"
 class ZEVertexDeclaration;
 class ZESimpleVertex
 {

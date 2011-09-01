@@ -37,7 +37,7 @@
 #ifndef __ZE_BITMAP_H__
 #define __ZE_BITMAP_H__
 
-#include <ZEMath\ZEVector.h>
+#include <ZEMath/ZEVector.h>
 
 enum ZEBitmapFileFormat
 {

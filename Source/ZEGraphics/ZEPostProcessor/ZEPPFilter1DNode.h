@@ -37,7 +37,7 @@
 #ifndef __ZE_PP_LINEAR_KERNEL_FILTER_NODE_H__
 #define __ZE_PP_LINEAR_KERNEL_FILTER_NODE_H__
 
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 #include "ZEPostProcessorNode.h"
 
 class ZETexture2D;

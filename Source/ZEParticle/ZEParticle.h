@@ -37,7 +37,7 @@
 #ifndef __ZE_PARTICLE_H__
 #define __ZE_PARTICLE_H__
 
-#include "ZEMath\ZEVector.h"
+#include "ZEMath/ZEVector.h"
 
 class ZEParticle
 {

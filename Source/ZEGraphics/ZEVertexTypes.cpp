@@ -35,7 +35,7 @@
 
 #include "ZEVertexTypes.h"
 #include "ZEVertexDeclaration.h"
-#include "ZECore\ZEError.h"
+#include "ZECore/ZEError.h"
 
 ZEVertexDeclaration* ZESimpleVertex::VertexDeclaration;
 ZEVertexDeclaration* ZESimpleVertex::GetVertexDeclaration()

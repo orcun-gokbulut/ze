@@ -37,8 +37,8 @@
 #ifndef __ZE_MODEL_ANIMATION_DEBUG_MODULE_H__
 #define __ZE_MODEL_ANIMATION_DEBUG_MODULE_H__
 
-#include "ZECore\ZEApplicationModule.h"
-#include "ZEInput\ZEInputMap.h"
+#include "ZECore/ZEApplicationModule.h"
+#include "ZEInput/ZEInputMap.h"
 #include "ZEMath/ZEVector.h"
 
 class ZECharacter;

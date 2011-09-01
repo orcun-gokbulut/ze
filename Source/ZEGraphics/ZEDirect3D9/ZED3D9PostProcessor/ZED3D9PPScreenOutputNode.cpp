@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9PPScreenOutputNode.h"
-#include "ZECore\ZEError.h"
-#include "ZEGraphics\ZETexture2D.h"
-#include "..\ZED3D9CommonTools.h"
-#include "..\ZED3D9Module.h"
+#include "ZECore/ZEError.h"
+#include "ZEGraphics/ZETexture2D.h"
+#include "../ZED3D9CommonTools.h"
+#include "../ZED3D9Module.h"
 
 LPDIRECT3DPIXELSHADER9 ZED3D9PPScreenOutputNode::PixelShader = NULL;
 LPDIRECT3DVERTEXSHADER9 ZED3D9PPScreenOutputNode::VertexShader = NULL;

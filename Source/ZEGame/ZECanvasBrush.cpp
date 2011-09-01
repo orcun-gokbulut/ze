@@ -34,12 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECanvasBrush.h"
-#include "ZECore\ZEError.h"
-#include "ZEGame\ZEDrawParameters.h"
-#include "ZEGraphics\ZEGraphicsModule.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEGraphics\ZEVertexBuffer.h"
+#include "ZECore/ZEError.h"
+#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
 
 ZEDWORD ZECanvasBrush::GetDrawFlags() const
 {

@@ -34,11 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9CommonTools.h"
-#include "ZECore\ZEError.h"
+#include "ZECore/ZEError.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9TextureCube.h"
-#include "ZEGraphics\ZETexture2DResource.h"
-#include "ZEGraphics\ZETextureCubeResource.h"
+#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEGraphics/ZETextureCubeResource.h"
 #include "ZED3D9ViewPort.h"
 #include "ZED3D9ViewPort.h"
 

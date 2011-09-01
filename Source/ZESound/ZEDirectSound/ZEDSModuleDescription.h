@@ -37,7 +37,7 @@
 #ifndef __ZE_DS_MODULE_DESCRIPTION_H__
 #define __ZE_DS_MODULE_DESCRIPTION_H__
 
-#include "ZECore\ZEModuleDescription.h"
+#include "ZECore/ZEModuleDescription.h"
 
 class ZEOptionSection;
 class ZEDSModuleDescription : public ZEModuleDescription

@@ -37,10 +37,10 @@
 #ifndef __ZE_MATERIAL_RESOURCE_H__ 
 #define __ZE_MATERIAL_RESOURCE_H__
 
-#include "ZECore\ZEResource.h"
+#include "ZECore/ZEResource.h"
 #include "ZEFixedMaterial.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEMeta\ZEAnimation.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMeta/ZEAnimation.h"
 
 class ZETextureResource;
 class ZEResourceFile;

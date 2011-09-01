@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMapResource.h"
-#include "ZEPortalMap\ZEPortalMapResource.h"
+#include "ZEPortalMap/ZEPortalMapResource.h"
 
 ZEMapResource* ZEMapResource::LoadResource(const char* FileName)
 {

@@ -37,8 +37,8 @@
 #ifndef __ZE_PARTICLE_EFFECT_H__
 #define __ZE_PARTICLE_EFFECT_H__
 
-#include "ZEGame\ZEComponent.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEGame/ZEComponent.h"
+#include "ZEDS/ZEArray.h"
 #include "ZEParticleSystem.h"
 
 struct ZEDrawParameters;

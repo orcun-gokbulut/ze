@@ -34,14 +34,14 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPresentationSlide.h"
-#include "ZECore\ZEError.h"
-#include "ZEGame\ZEDrawParameters.h"
-#include "ZEGraphics\ZEGraphicsModule.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEGraphics\ZEVertexBuffer.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
-#include "ZEGraphics\ZETexture2DResource.h"
+#include "ZECore/ZEError.h"
+#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZEGraphics/ZETexture2DResource.h"
 #include <string.h>
 
 #include "ZEMath/ZEMathDefinitions.h"

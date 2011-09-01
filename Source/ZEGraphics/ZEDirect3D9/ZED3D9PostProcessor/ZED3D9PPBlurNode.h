@@ -37,8 +37,8 @@
 #ifndef __ZE_D3D9_BLUR_NODE_H__
 #define __ZE_D3D9_BLUR_NODE_H__
 
-#include "ZEGraphics\ZEPostProcessor\ZEPPBlurNode.h"
-#include "..\ZED3D9ComponentBase.h"
+#include "ZEGraphics/ZEPostProcessor/ZEPPBlurNode.h"
+#include "../ZED3D9ComponentBase.h"
 #include <d3d9.h>
 
 class ZETexture2D;

@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEExtensionManager.h"
-#include "ZECore\ZEError.h"
+#include "ZECore/ZEError.h"
 #include "ZEOptionManager.h"
 #include "ZEExtensionDescription.h"
 #include "ZEModuleDescription.h"
@@ -113,8 +113,8 @@ class ZEExtensionManager* ZEExtensionManager::GetInstance()
 	return ZECore::GetInstance()->GetExtensionManager();
 }
 
-#include "ZEInput\ZEVRPNInput\ZEVRPNInputDeviceExtensionDescription.h"
-#include "ZEInput\ZEFreeSpaceInput\ZEFreespaceInputDeviceExtensionDescription.h"
+#include "ZEInput/ZEVRPNInput/ZEVRPNInputDeviceExtensionDescription.h"
+#include "ZEInput/ZEFreeSpaceInput/ZEFreespaceInputDeviceExtensionDescription.h"
 ZEExtensionManager::ZEExtensionManager()
 {
 	RegisterExtension(new ZEVRPNInputDeviceExtensionDescription());

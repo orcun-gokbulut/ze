@@ -37,8 +37,8 @@
 #ifndef	__ZE_PHYSX_CONVERSION_H__
 #define __ZE_PHYSX_CONVERSION_H__
 
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 #include <NxVec3.h>
 #include <NxQuat.h>
 

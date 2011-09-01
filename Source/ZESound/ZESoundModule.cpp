@@ -37,8 +37,8 @@
 #include "ZESoundModuleDescription.h"
 #include "ZESoundResourceMP3.h"
 #include "ZESoundSource.h"
-#include "ZECore\ZECore.h"
-#include "ZECore\ZEOptionManager.h"
+#include "ZECore/ZECore.h"
+#include "ZECore/ZEOptionManager.h"
 
 ZEOptionSection  ZESoundModule::SoundOptions;
 

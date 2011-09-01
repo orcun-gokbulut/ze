@@ -37,7 +37,7 @@
 #ifndef __ZE_SYSTEM_MESSAGE_MANAGER__
 #define __ZE_SYSTEM_MESSAGE_MANAGER__
 
-#include <ZEDS\ZEArray.h>
+#include <ZEDS/ZEArray.h>
 
 class ZESystemMessageHandler;
 

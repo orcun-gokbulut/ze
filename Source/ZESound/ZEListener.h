@@ -37,7 +37,7 @@
 #ifndef	__ZE_LISTENER_H__
 #define __ZE_LISTENER_H__
 
-#include "ZEGame\ZEComponent.h"
+#include "ZEGame/ZEComponent.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEListener);
 

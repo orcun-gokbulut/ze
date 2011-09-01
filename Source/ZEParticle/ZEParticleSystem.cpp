@@ -33,15 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGraphics\ZEVertexBuffer.h"
-#include "ZEGraphics\ZEVertexTypes.h"
-#include "ZEGraphics\ZECamera.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEVertexTypes.h"
+#include "ZEGraphics/ZECamera.h"
 #include "ZEParticleEmitter.h"
 #include "ZEParticleEffect.h"
 #include "ZEParticleSystem.h"
-#include "ZEGame\ZEDrawParameters.h"
-#include "ZEGraphics\ZESimpleMaterial.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
 
 void ZEParticleSystem::UpdateVertexBuffer(ZEDrawParameters* DrawParameters) //Bitmedi
 {

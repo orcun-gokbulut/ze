@@ -37,8 +37,8 @@
 #ifndef	__ZE_PHYSICAL_CALLBACKS_H__
 #define __ZE_PHYSICAL_CALLBACKS_H__
 
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 #include "ZEFastDelegate.h"
 
 #define ZE_PCCF_ON_TOUCH			1

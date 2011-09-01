@@ -37,9 +37,9 @@
 #ifndef	__ZE_OPTION_SECTION_H__
 #define __ZE_OPTION_SECTION_H__
 
-#include "ZEDS\ZENamed.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZETypedVariant.h"
+#include "ZEDS/ZENamed.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZETypedVariant.h"
 #include "ZEFastDelegate.h"
 #include "ZECommand.h"
 #include "ZECommandSection.h"

@@ -37,7 +37,7 @@
 #ifndef __ZE_META_DEBUG_MODULE_H__
 #define __ZE_META_DEBUG_MODULE_H__
 
-#include "ZECore\ZEApplicationModule.h"
+#include "ZECore/ZEApplicationModule.h"
 
 class ZEPlayer;
 class ZECanvasBrush;

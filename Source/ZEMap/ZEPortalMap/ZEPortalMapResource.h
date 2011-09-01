@@ -37,14 +37,14 @@
 #ifndef __ZE_PORTAL_MAP_RESOURCE_H__
 #define __ZE_PORTAL_MAP_RESOURCE_H__
 
-#include "..\ZEMapResource.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZERectangle3D.h"
-#include "ZEMath\ZEAABoundingBox.h"
+#include "../ZEMapResource.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZERectangle3D.h"
+#include "ZEMath/ZEAABoundingBox.h"
 #include "ZEDefinitions.h"
-#include "ZECore\ZEResource.h"
-#include "ZEGraphics\ZEVertexTypes.h"
+#include "ZECore/ZEResource.h"
+#include "ZEGraphics/ZEVertexTypes.h"
 
 class ZEMaterial;
 class ZETexture2D;

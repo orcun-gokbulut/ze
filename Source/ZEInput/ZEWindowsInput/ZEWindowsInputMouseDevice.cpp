@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEWindowsInputMouseDevice.h"
-#include "ZEInput\ZEInputDefinitions.h"
+#include "ZEInput/ZEInputDefinitions.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEError.h"

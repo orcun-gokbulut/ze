@@ -42,7 +42,7 @@
 
 #ifdef ZEDS_DEBUG_MODE
 	#ifdef ZE_ZINEK_ENGINE
-		#include "ZECore\ZEError.h"
+		#include "ZECore/ZEError.h"
 		#define zefAssert(Condition, ...) zeAssert(Condition, __VA_ARGS__) 
 		#define zedsWarningAssert(Condition, ...) zeWarningAssert(Condition, __VA_ARGS__)
 	#else	

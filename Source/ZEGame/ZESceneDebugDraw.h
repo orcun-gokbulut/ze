@@ -37,8 +37,8 @@
 #ifndef __ZE_SCENE_DEBUG_DRAW_H__
 #define __ZE_SCENE_DEBUH_DRAW_H__
 
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEGraphics\ZECanvas.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZECanvas.h"
 
 class ZEAABoundingBox;
 class ZEMatrix4x4;

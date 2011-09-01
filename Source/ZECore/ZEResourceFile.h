@@ -37,7 +37,7 @@
 #ifndef	__ZE_RESOURCE_FILE_H__
 #define __ZE_RESOURCE_FILE_H__
 
-#include "..\ZEDefinitions.h"
+#include "../ZEDefinitions.h"
 #include "ZESerialization/ZEUnserializer.h"
 #include "ZEFile.h"
 

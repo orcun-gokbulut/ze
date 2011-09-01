@@ -38,9 +38,9 @@
 #ifndef	__ZE_PHYSICAL_SHAPES_H__
 #define __ZE_PHYSICAL_SHAPES_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 #include "ZEPhysicalMaterial.h"
 
 enum  ZEPhysicalShapeType

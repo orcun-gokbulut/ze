@@ -38,7 +38,7 @@
 #define __ZE_PLAYER_H__
  
 #include "ZECompoundEntity.h"
-#include "ZEInput\ZEInputMap.h"
+#include "ZEInput/ZEInputMap.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEPlayer);
 

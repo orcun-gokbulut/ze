@@ -38,12 +38,12 @@
 #define __ZE_PARTICLE_EMITTER_H__
 
 #include "ZEDefinitions.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEParticleSystem.h"
 #include "ZEParticle.h"
 #include "ZEParticleController.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta/ZEClass.h"
 
 ZE_META_CLASS_DESCRIPTION(ZEParticleEmitter);
 

@@ -38,8 +38,8 @@
 #define __ZE_SKYBRUSH_H__
 
 #include "ZEEntity.h"
-#include "ZEGraphics\ZEDirectionalLight.h"
-#include "ZEGraphics\ZECanvas.h"
+#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZEGraphics/ZECanvas.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZESkyBrush);
 

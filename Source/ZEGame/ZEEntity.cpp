@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEEntity.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEMath\ZERay.h"
-#include "ZECore\ZEError.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZERay.h"
+#include "ZECore/ZEError.h"
 #include "ZEComponent.h"
 #include "ZEEntityProvider.h"
 #include <string.h>

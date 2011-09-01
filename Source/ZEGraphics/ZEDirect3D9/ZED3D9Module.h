@@ -37,9 +37,9 @@
 #ifndef	__ZE_D3D9_MODULE_H__
 #define __ZE_D3D9_MODULE_H__
 
-#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZED3D9ViewPort.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 
 #ifdef ZE_DEBUG_ENABLED
 #define D3D_DEBUG_INFO

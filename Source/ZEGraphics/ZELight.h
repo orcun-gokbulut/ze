@@ -37,7 +37,7 @@
 #ifndef	__ZE_LIGHT_H__
 #define __ZE_LIGHT_H__
 
-#include "ZEGame\ZEComponent.h"
+#include "ZEGame/ZEComponent.h"
 #include "ZEViewVolume.h"
 
 enum ZELightType

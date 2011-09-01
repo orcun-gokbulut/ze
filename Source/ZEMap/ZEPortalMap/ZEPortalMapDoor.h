@@ -37,7 +37,7 @@
 #ifndef __ZE_PORTAL_MAP_DOOR_H__
 #define __ZE_PORTAL_MAP_DOOR_H__
 
-#include "ZEMath\ZERectangle3D.h"
+#include "ZEMath/ZERectangle3D.h"
 
 class ZEPortalMap;
 class ZEPortalMapPortal;

@@ -40,10 +40,10 @@
 #pragma warning(push)
 #pragma warning(disable:4482)
 
-#include "ZESerialization\ZESerializable.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
+#include "ZESerialization/ZESerializable.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 
 class ZESerializer;
 class ZEUnserializer;

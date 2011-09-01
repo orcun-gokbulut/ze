@@ -37,9 +37,9 @@
 #ifndef	__ZE_FREESPACE_INPUT_DEVICE_H__
 #define __ZE_FREESPACE_INPUT_DEVICE_H__
 
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEInput\ZEInputDevice.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEInput/ZEInputDevice.h"
 
 #include <Freespace\freespace.h>
 

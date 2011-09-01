@@ -37,10 +37,10 @@
 #ifndef	__ZE_SOUND_MODULE_H__
 #define __ZE_SOUND_MODULE_H__
 
-#include "ZECore\ZEModule.h"
-#include "ZECore\ZEOptionSection.h"
-#include "ZEDS\ZEString.h"
-#include "ZEDS\ZEArray.h"
+#include "ZECore/ZEModule.h"
+#include "ZECore/ZEOptionSection.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 
 class ZESoundSource;
 class ZESoundSource3D;

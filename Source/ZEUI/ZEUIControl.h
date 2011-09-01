@@ -37,9 +37,9 @@
 #ifndef __ZE_UI_COMPONENT__
 #define __ZE_UI_COMPONENT__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEString.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEUIRectangle.h"
 #include "ZEUIEvents.h"
 #include "ZEFastDelegate.h"

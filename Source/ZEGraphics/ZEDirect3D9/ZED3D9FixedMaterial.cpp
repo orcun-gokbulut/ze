@@ -39,9 +39,9 @@
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9Shader.h"
 #include "ZED3D9CommonTools.h"
-#include "ZEGraphics\ZECamera.h"
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEGraphics\ZEMaterialComponents.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZEMaterialComponents.h"
 
 void ZED3D9FixedMaterial::CreateShaders()
 {

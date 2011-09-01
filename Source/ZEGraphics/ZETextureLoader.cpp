@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGraphics\ZETextureLoader.h"
-#include "ZECore\ZEError.h"
-#include "ZECore\ZEConsole.h"
+#include "ZEGraphics/ZETextureLoader.h"
+#include "ZECore/ZEError.h"
+#include "ZECore/ZEConsole.h"
 
 #define FREEIMAGE_LIB
 #include <freeimage.h>

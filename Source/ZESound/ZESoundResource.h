@@ -37,7 +37,7 @@
 #ifndef	__ZE_SOUNDRESOURCE_H__
 #define __ZE_SOUNDRESOURCE_H__
 
-#include "ZECore\ZEResource.h"
+#include "ZECore/ZEResource.h"
 
 enum ZESoundFileFormat
 {

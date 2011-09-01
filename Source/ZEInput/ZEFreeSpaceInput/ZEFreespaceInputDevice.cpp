@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore\ZEError.h"
-#include "ZECore\ZEConsole.h"
+#include "ZECore/ZEError.h"
+#include "ZECore/ZEConsole.h"
 
-#include "ZEInput\ZEInputMapBinding.h"
-#include "ZEInput\ZEInputEvent.h"
-#include "ZEInput\ZEInputAction.h"
+#include "ZEInput/ZEInputMapBinding.h"
+#include "ZEInput/ZEInputEvent.h"
+#include "ZEInput/ZEInputAction.h"
 
 #include "ZEFreespaceInputDevice.h"
 

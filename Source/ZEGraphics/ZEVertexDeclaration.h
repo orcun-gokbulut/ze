@@ -37,7 +37,7 @@
 #ifndef	__ZE_VERTEX_DECLARATION_H__
 #define __ZE_VERTEX_DECLARATION_H__
 
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 #include "ZETypes.h"
 
 #define ZE_VE_POSITION				0x00000008

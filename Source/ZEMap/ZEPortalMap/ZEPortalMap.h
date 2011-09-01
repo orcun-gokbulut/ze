@@ -37,9 +37,9 @@
 #ifndef __ZE_PORTAL_MAP_H__
 #define __ZE_PORTAL_MAP_H__
 
-#include "ZEGame\ZEEntity.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEString.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEPortalMap)
 

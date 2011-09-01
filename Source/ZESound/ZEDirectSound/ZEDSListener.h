@@ -37,7 +37,7 @@
 #ifndef	__ZE_DS_LISTENER_H__
 #define __ZE_DS_LISTENER_H__
 
-#include "..\ZEListener.h"
+#include "../ZEListener.h"
 #include "ZEDSComponentBase.h"
 
 class ZEDSListener : public ZEListener, public ZEDSComponentBase

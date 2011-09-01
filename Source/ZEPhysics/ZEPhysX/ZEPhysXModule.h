@@ -38,9 +38,9 @@
 #ifndef	__ZE_PHYSX_PHYSICS_MODULE_H__
 #define __ZE_PHYSX_PHYSICS_MODULE_H__
 
-#include "ZEPhysics\ZEPhysicsModule.h"
+#include "ZEPhysics/ZEPhysicsModule.h"
 #include "ZEPhysXUserOutputStream.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 
 class NxPhysicsSDK;
 class NxCookingInterface;

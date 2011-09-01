@@ -37,11 +37,11 @@
 #ifndef __ZE_PARTICLE_SYSTEM_H__
 #define __ZE_PARTICLE_SYSTEM_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEString.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEMeta/ZEClass.h"
 
 ZE_META_CLASS_DESCRIPTION(ZEParticleSystem);
 

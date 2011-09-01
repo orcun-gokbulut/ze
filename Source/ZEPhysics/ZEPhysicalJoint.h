@@ -40,10 +40,10 @@
 #include "ZEPhysicsModule.h"
 #include "ZEPhysicalObject.h"
 
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEPlane.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEPlane.h"
 
 class	ZEPhysicalWorld;
 class	ZEPhysicalObject;		

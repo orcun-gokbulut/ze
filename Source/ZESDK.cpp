@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESDK.h"
-#include "ZECore\ZECore.h"
+#include "ZECore/ZECore.h"
 #define WINDOWS_MEAN_AND_LEAN
 #include <windows.h>
 

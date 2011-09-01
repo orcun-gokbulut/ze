@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9VertexDeclaration.h"
-#include "ZECore\ZEError.h"
+#include "ZECore/ZEError.h"
 #include <D3D9.h>
 
 const ZEArray<ZEVertexElement>& ZED3D9VertexDeclaration::GetVertexElements()

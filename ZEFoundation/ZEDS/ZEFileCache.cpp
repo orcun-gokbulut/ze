@@ -35,11 +35,11 @@
 
 #include "ZETypes.h"
 #include "ZEFileCache.h"
-#include "..\Source\ZECore\ZEResourceFile.h"
+#include "..\Source/ZECore/ZEResourceFile.h"
 
-//#include "..\ZEAssert.h"
-//#include "..\Source\ZECore\ZEError.h"
-//#include "..\Source\ZEDefinitions.h"
+//#include "../ZEAssert.h"
+//#include "..\Source/ZECore/ZEError.h"
+//#include "..\Source/ZEDefinitions.h"
 
 #include <string.h>
 

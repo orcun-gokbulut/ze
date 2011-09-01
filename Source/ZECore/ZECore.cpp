@@ -43,11 +43,11 @@
 #include "ZEConsoleWindow.h"
 #include "ZEResourceManager.h"
 #include "ZEWindow.h"
-#include "ZEGraphics\ZEGraphicsModule.h"
-#include "ZEInput\ZEInputModule.h"
-#include "ZEPhysics\ZEPhysicsModule.h"
-#include "ZESound\ZESoundModule.h"
-#include "ZEGame\ZEGame.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEInput/ZEInputModule.h"
+#include "ZEPhysics/ZEPhysicsModule.h"
+#include "ZESound/ZESoundModule.h"
+#include "ZEGame/ZEGame.h"
 #include "ZEApplicationModule.h"
 #include "ZEOptionManager.h"
 #include "ZECommandManager.h"
@@ -600,7 +600,7 @@ void ZECore::ShutDown()
 	exit(0);
 }
 
-#include "ZEPhysics\ZEPhysicalWorld.h"
+#include "ZEPhysics/ZEPhysicalWorld.h"
 void ZECore::MainLoop()
 {
 	if (Application != NULL)

@@ -37,7 +37,7 @@
 #ifndef	__ZE_FILE_H__
 #define __ZE_FILE_H__
 
-#include "ZEDS\ZEString.h"
+#include "ZEDS/ZEString.h"
 #include "ZESerialization/ZESerializer.h"
 #include "ZESerialization/ZEUnserializer.h"
 //#include "ZEDefinitions.h"

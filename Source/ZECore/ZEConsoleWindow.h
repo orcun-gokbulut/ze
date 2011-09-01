@@ -37,7 +37,7 @@
 #ifndef	__ZE_WIN32_CONSOLE_H__
 #define __ZE_WIN32_CONSOLE_H__
 
-#include "ZECore\ZEConsole.h"
+#include "ZECore/ZEConsole.h"
 
 class ZEConsoleWindow : public ZEConsoleInterface
 {

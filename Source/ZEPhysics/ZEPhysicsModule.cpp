@@ -35,7 +35,7 @@
 
 #include "ZEPhysicsModule.h"
 #include "ZEPhysicsModuleDescription.h"
-#include "ZECore\ZECore.h"
+#include "ZECore/ZECore.h"
 
 ZEModuleDescription* ZEPhysicsModule::GetModuleDescription()
 {

@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9PPBlurNode.h"
-#include "ZECore\ZEError.h"
-#include "..\ZED3D9CommonTools.h"
-#include "..\ZED3D9Texture2D.h"
-#include "..\ZED3D9Module.h"
+#include "ZECore/ZEError.h"
+#include "../ZED3D9CommonTools.h"
+#include "../ZED3D9Texture2D.h"
+#include "../ZED3D9Module.h"
 
 LPDIRECT3DVERTEXSHADER9 ZED3D9PPBlurNode::VertexShader = NULL;
 LPDIRECT3DPIXELSHADER9 ZED3D9PPBlurNode::VerticalPassPixelShader = NULL;

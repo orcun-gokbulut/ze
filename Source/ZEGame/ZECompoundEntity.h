@@ -38,16 +38,16 @@
 #define __ZE_COMPOUND_ENTITY_H__
 
 #include "ZEEntity.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEVariant.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEAABoundingBox.h"
-#include "ZEMath\ZEOBoundingBox.h"
-#include "ZEMath\ZEBoundingSphere.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEVariant.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZEOBoundingBox.h"
+#include "ZEMath/ZEBoundingSphere.h"
 #include "ZEDefinitions.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta/ZEClass.h"
 
 class ZEComponent;
 struct ZEDrawParameters;

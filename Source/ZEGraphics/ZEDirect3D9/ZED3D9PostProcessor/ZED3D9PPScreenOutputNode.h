@@ -37,8 +37,8 @@
 #ifndef __ZE_D3D9_PP_SCREEN_OUTPUT_NODE_H__
 #define __ZE_D3D9_PP_SCREEN_OUTPUT_NODE_H__
 
-#include "ZEGraphics\ZEPostProcessor\ZEPPScreenOutputNode.h"
-#include "..\ZED3D9ComponentBase.h"
+#include "ZEGraphics/ZEPostProcessor/ZEPPScreenOutputNode.h"
+#include "../ZED3D9ComponentBase.h"
 #include <d3d9.h>
 
 class ZETexture2D;

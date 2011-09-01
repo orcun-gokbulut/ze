@@ -37,7 +37,7 @@
 #ifndef __ZE_SCENE_H__
 #define __ZE_SCENE_H__
 
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 #include "ZESceneDebugDraw.h"
 #include "ZESceneCuller.h"
 

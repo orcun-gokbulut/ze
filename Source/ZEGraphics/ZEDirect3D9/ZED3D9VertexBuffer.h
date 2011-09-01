@@ -37,7 +37,7 @@
 #ifndef __ZE_D3D9_VERTEX_BUFFER_H__
 #define __ZE_D3D9_VERTEX_BUFFER_H__
 
-#include "ZEGraphics\ZEVertexBuffer.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZED3D9ComponentBase.h"
 #include <d3d9.h>
 

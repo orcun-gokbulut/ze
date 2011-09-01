@@ -37,9 +37,9 @@
 #ifndef	__ZE_AL_MODULE_H__
 #define __ZE_AL_MODULE_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZESound\ZESoundModule.h"
-#include "ZESound\ZESoundSource.h"
+#include "ZEDS/ZEArray.h"
+#include "ZESound/ZESoundModule.h"
+#include "ZESound/ZESoundSource.h"
 #include <al.h>
 #include <alc.h>
 

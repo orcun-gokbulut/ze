@@ -37,10 +37,10 @@
 #ifndef	__ZE_INPUT_DEVICE_H__
 #define __ZE_INPUT_DEVICE_H__
 
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 #include "ZEInputEvent.h"
 #include "ZEInputAction.h"
-#include "ZEDS\ZEString.h"
+#include "ZEDS/ZEString.h"
 
 class ZEInputBinding;
 class ZEInputMap;

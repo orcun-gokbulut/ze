@@ -38,8 +38,8 @@
 #define __ZE_UI_TEXT_CONTROL__
 
 #include "ZEUIControl.h"
-#include "ZEDS\ZEString.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
 
 class ZEUIRenderer;
 class ZEFontResource;

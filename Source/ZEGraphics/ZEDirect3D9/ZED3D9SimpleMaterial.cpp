@@ -38,9 +38,9 @@
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9Shader.h"
 #include "ZED3D9CommonTools.h"
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEGraphics\ZECamera.h"
-#include "ZECore\ZEResourceFile.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZECore/ZEResourceFile.h"
 #include <D3D9.h>
 
 ZED3D9SimpleMaterial::ZED3D9SimpleMaterial()

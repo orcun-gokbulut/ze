@@ -38,11 +38,11 @@
 #define __ZE_FIXED_MATERIAL_H__
 
 #include "ZEMaterial.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEDefinitions.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEVariant.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEVariant.h"
+#include "ZEMeta/ZEClass.h"
 
 ZE_META_CLASS_DESCRIPTION(ZEFixedMaterial)
 

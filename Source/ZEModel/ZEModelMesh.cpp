@@ -318,6 +318,7 @@ ZEModelMesh::ZEModelMesh()
 	Owner = NULL;
 	MeshResource = NULL;
 	PhysicalBody = NULL;
+	Visible = true;
 }
 
 ZEModelMesh::~ZEModelMesh()

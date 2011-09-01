@@ -38,10 +38,10 @@
 #define __ZE_TEXTURE_LOADER_H__
 
 
-#include "ZEGraphics\ZETexture.h"
-#include "ZEGraphics\ZETexture2DResource.h"
-#include "ZEGraphics\ZETexture3DResource.h"
-#include "ZEGraphics\ZETextureCubeResource.h"
+#include "ZEGraphics/ZETexture.h"
+#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEGraphics/ZETexture3DResource.h"
+#include "ZEGraphics/ZETextureCubeResource.h"
 
 
 struct ZETextureLoaderInfo

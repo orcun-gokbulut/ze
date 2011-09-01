@@ -38,7 +38,7 @@
 #define __ZE_D3D9_SHADER_H__
 
 #include "ZED3D9ComponentBase.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 #include <d3d9.h>
 
 enum ZED3D9ShaderType

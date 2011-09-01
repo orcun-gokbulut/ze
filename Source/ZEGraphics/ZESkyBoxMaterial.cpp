@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZESkyBoxMaterial.h"
 
 ZESkyBoxMaterial::ZESkyBoxMaterial()

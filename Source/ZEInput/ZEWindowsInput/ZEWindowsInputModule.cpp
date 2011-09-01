@@ -35,10 +35,10 @@
 
 #include "ZEWindowsInputModule.h"
 #include "ZEWindowsInputModuleDescription.h"
-#include "ZEInput\ZEInputDeviceExtension.h"
-#include "ZEInput\ZEInputDeviceExtensionDescription.h"
-#include "ZEInput\ZEInputDevice.h"
-#include "ZECore\ZEExtensionManager.h"
+#include "ZEInput/ZEInputDeviceExtension.h"
+#include "ZEInput/ZEInputDeviceExtensionDescription.h"
+#include "ZEInput/ZEInputDevice.h"
+#include "ZECore/ZEExtensionManager.h"
 #include "ZEWindowsInputMouseDevice.h"
 #include "ZEWindowsInputKeyboardDevice.h"
 

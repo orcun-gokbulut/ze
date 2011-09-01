@@ -37,7 +37,7 @@
 #ifndef __ZE_MATERIAL_H__ 
 #define __ZE_MATERIAL_H__
 
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta/ZEClass.h"
 
 typedef ZEDWORD ZEMaterialFlags;
 #define ZE_MTF_NONE						0

@@ -38,7 +38,7 @@
 #define __ZE_DS_SOUND_SOURCE_H__
 
 #include "ZEDSComponentBase.h"
-#include "..\ZESoundSource.h"
+#include "../ZESoundSource.h"
 #include <dsound.h>
 
 class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase

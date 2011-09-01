@@ -37,7 +37,7 @@
 #ifndef __ZE_SOUND_DEBUG_MODULE_H__
 #define __ZE_SOUND_DEBUG_MODULE_H__
 
-#include "ZECore\ZEApplicationModule.h"
+#include "ZECore/ZEApplicationModule.h"
 #include "ZEGame/ZEGrid.h"
 
 class ZEPlayer;

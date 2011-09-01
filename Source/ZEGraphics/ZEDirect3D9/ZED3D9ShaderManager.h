@@ -38,8 +38,8 @@
 #define __ZE_D3D9_SHADER_MANAGER_H__
 
 #include "ZED3D9Shader.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEFileCache.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEFileCache.h"
 
 class ZED3D9ShaderManager
 {

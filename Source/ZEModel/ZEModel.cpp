@@ -40,7 +40,7 @@
 #include "ZEGraphics/ZESimpleMaterial.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZECompoundEntity.h"
-#include "ZEGame\ZEScene.h"
+#include "ZEGame/ZEScene.h"
 #include "ZECore/ZEError.h"
 
 #include <stdio.h>

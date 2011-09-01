@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPhysXCollisionManager.h"
-#include "ZEPhysics\ZEPhysicalCallbacks.h"
-#include "ZEPhysics\ZEPhysicalRigidBody.h"
+#include "ZEPhysics/ZEPhysicalCallbacks.h"
+#include "ZEPhysics/ZEPhysicalRigidBody.h"
 #include <NxActor.h>
 
 void ZEPhysXCollisionManager::onContactNotify(NxContactPair& pair, NxU32 events)

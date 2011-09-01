@@ -35,7 +35,7 @@
 
 #include "ZEInputModule.h"
 #include "ZEInputModuleDescription.h"
-#include "ZECore\ZECore.h"
+#include "ZECore/ZECore.h"
 
 ZEInputModule::ZEInputModule()
 {

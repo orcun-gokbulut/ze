@@ -34,13 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEFontResource.h"
-#include "ZEGraphics\ZEUIMaterial.h"
-#include "ZEGraphics\ZETexture2DResource.h"
-#include "ZEGraphics\ZETextureOptions.h"
-#include "ZECore\ZEResourceManager.h"
-#include "ZECore\ZEConsole.h"
-#include "ZECore\ZEError.h"
-#include "ZECore\ZEResourceFile.h"
+#include "ZEGraphics/ZEUIMaterial.h"
+#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEGraphics/ZETextureOptions.h"
+#include "ZECore/ZEResourceManager.h"
+#include "ZECore/ZEConsole.h"
+#include "ZECore/ZEError.h"
+#include "ZECore/ZEResourceFile.h"
 #include "ZEFontFile.h"
 
 ZEFontResource::ZEFontResource()

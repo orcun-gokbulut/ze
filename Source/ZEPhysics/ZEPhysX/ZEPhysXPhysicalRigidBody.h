@@ -37,7 +37,7 @@
 #ifndef	__ZE_PHYSX_PHYSICS_RIGID_BODY_H__
 #define __ZE_PHYSX_PHYSICS_RIGID_BODY_H__
 
-#include "ZEPhysics\ZEPhysicalRigidBody.h"
+#include "ZEPhysics/ZEPhysicalRigidBody.h"
 
 #include <NxActor.h>
 #include <NxBodyDesc.h>

@@ -37,7 +37,7 @@
 #ifndef __ZE_APPLICATION_MODULE_H__
 #define __ZE_APPLICATION_MODULE_H__
 
-#include "ZECore\ZEModule.h"
+#include "ZECore/ZEModule.h"
 
 class ZEApplicationModule : public ZEModule
 {

@@ -35,7 +35,7 @@
 
 #include "ZEFile.h"
 #include "ZEDefinitions.h"
-#include "ZECore\ZEError.h"
+#include "ZECore/ZEError.h"
 
 #include <stdarg.h>
 #include <stdio.h>

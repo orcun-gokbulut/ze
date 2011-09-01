@@ -37,8 +37,8 @@
 #ifndef __ZE_UI_RECTANGLE_H__
 #define __ZE_UI_RECTANGLE_H__
 
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZERectangle.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZERectangle.h"
 
 struct ZEUIVertex;
 class ZEMaterial;

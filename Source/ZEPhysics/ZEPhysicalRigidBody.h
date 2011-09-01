@@ -38,7 +38,7 @@
 #define __ZE_PHYSICAL_RIGID_BODY_H__
 
 #include "ZEPhysicalObject.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 
 class ZEPhysicalShape;
 

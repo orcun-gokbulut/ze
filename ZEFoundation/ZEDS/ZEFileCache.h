@@ -39,7 +39,7 @@
 
 #include "ZEArray.h"
 #include "ZETypes.h"
-#include "..\Source\ZECore\ZEFile.h"
+#include "..\Source/ZECore/ZEFile.h"
 
 #include <stdio.h>
 

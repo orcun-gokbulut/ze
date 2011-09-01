@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModuleManager.h"
-#include "ZECore\ZEError.h"
-#include "ZECore\ZEConsole.h"
+#include "ZECore/ZEError.h"
+#include "ZECore/ZEConsole.h"
 #include "ZEOptionManager.h"
 #include "ZEModule.h"
 #include "ZEModuleDescription.h"
@@ -215,14 +215,14 @@ void ZEModuleManager::UnregisterModule(ZEModuleDescription* ModuleDesc)
 	ModuleList.DeleteValue(ModuleDesc);
 }
 
-#include "ZEGraphics\ZEDirect3D9\ZED3D9ModuleDescription.h"
-#include "ZESound\ZEDirectSound\ZEDSModuleDescription.h"
-#include "ZEInput\ZEDirectInput\ZEDirectInputModuleDescription.h"
-#include "ZEInput\ZEDummyInput\ZEDummyInputModuleDescription.h"
-#include "ZEInput\ZEWindowsInput\ZEWindowsInputModuleDescription.h"
-#include "ZEInput\ZEVirtualInput\ZEVirtualInputModuleDescription.h"
-#include "ZESound\ZEOpenAL\ZEALModuleDescription.h"
-#include "ZEPhysics\ZEPhysX\ZEPhysXModuleDescription.h"
+#include "ZEGraphics/ZEDirect3D9/ZED3D9ModuleDescription.h"
+#include "ZESound/ZEDirectSound/ZEDSModuleDescription.h"
+#include "ZEInput/ZEDirectInput/ZEDirectInputModuleDescription.h"
+#include "ZEInput/ZEDummyInput/ZEDummyInputModuleDescription.h"
+#include "ZEInput/ZEWindowsInput/ZEWindowsInputModuleDescription.h"
+#include "ZEInput/ZEVirtualInput/ZEVirtualInputModuleDescription.h"
+#include "ZESound/ZEOpenAL/ZEALModuleDescription.h"
+#include "ZEPhysics/ZEPhysX/ZEPhysXModuleDescription.h"
 
 ZEModuleManager::ZEModuleManager()
 {

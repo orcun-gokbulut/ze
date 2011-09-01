@@ -63,7 +63,7 @@ ZEArray<*>{
 
 #include <stdlib.h>
 #include "ZEDSDefinitions.h"
-#include "..\ZETypes.h"
+#include "../ZETypes.h"
 #include "ZEAllocator.h"
 #include "ZEAssert.h"
 

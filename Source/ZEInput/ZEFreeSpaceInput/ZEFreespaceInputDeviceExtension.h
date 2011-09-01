@@ -37,7 +37,7 @@
 #ifndef	__ZE_FREESPACE_INPUT_MODULE_H__
 #define __ZE_FREESPACE_INPUT_MODULE_H__
 
-#include "ZEInput\ZEInputDeviceExtension.h"
+#include "ZEInput/ZEInputDeviceExtension.h"
 #include "ZEFreespaceInputDevice.h"
 
 class ZEInputDevice;

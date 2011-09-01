@@ -37,9 +37,9 @@
 #include "ZEMaterialFileFormat.h"
 #include "ZETextureCubeResource.h"
 #include "ZETexture2DResource.h"
-#include "ZECore\ZEResourceFile.h"
-#include "ZECore\ZEError.h"
-#include "ZECore\ZEResourceManager.h"
+#include "ZECore/ZEResourceFile.h"
+#include "ZECore/ZEError.h"
+#include "ZECore/ZEResourceManager.h"
 #include <string.h>
 
 ZEMaterialResource::ZEMaterialResource()

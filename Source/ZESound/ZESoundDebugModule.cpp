@@ -35,13 +35,13 @@
 
 #include "ZESoundDebugModule.h"
 
-#include "ZEGraphics\ZEGraphicsModule.h"
-#include "ZEGame\ZEGame.h"
-#include "ZEGame\ZEPlayer.h"
-#include "ZEGraphics\ZECamera.h"
-#include "ZEGame\ZEScene.h"
-#include "ZESound\ZESoundSource3D.h"
-#include "ZEGame\ZEEntityProvider.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGame/ZEGame.h"
+#include "ZEGame/ZEPlayer.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEGame/ZEScene.h"
+#include "ZESound/ZESoundSource3D.h"
+#include "ZEGame/ZEEntityProvider.h"
 #include "../ZEGraphics/ZECamera.h"
 	
 

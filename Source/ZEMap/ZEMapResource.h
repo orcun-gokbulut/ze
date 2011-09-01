@@ -37,8 +37,8 @@
 #ifndef __ZE_MAP_RESOURCE_H__
 #define __ZE_MAP_RESOURCE_H__
 
-#include "ZECore\ZEResource.h"
-#include "ZEDS\ZEArray.h"
+#include "ZECore/ZEResource.h"
+#include "ZEDS/ZEArray.h"
 
 class ZEMapResource : public ZEResource
 {

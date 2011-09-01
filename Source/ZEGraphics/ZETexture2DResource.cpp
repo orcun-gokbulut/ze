@@ -35,15 +35,15 @@
 
 #include "ZETexture2D.h"
 #include "ZETexture2DResource.h"
-#include "ZECore\ZEError.h"
-#include "ZECore\ZEConsole.h"
-#include "ZECore\ZEResourceManager.h"
-#include "ZECore\ZEResourceFile.h"
-#include "ZEGraphics\ZETextureLoader.h"
-#include "ZEGraphics\ZETextureTools.h"
-#include "ZEGraphics\ZETextureCacheChunkIdentifier.h"
+#include "ZECore/ZEError.h"
+#include "ZECore/ZEConsole.h"
+#include "ZECore/ZEResourceManager.h"
+#include "ZECore/ZEResourceFile.h"
+#include "ZEGraphics/ZETextureLoader.h"
+#include "ZEGraphics/ZETextureTools.h"
+#include "ZEGraphics/ZETextureCacheChunkIdentifier.h"
 #include "ZERealTimeTextureCompressor.h"
-#include "ZEDS\ZEFileCache.h"
+#include "ZEDS/ZEFileCache.h"
 
 #include <sys/stat.h>
 #include <stdio.h>

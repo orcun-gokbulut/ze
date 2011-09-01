@@ -38,7 +38,7 @@
 #define ZE_FONT_FILE_HEADER						((ZEDWORD)((ZEDWORD)'ZEFF' + (ZEDWORD)'FONT'))
 #define ZE_FONT_FILE_CHARACTER_COUNT			256
 
-#include "ZEMath\ZERectangle.h"
+#include "ZEMath/ZERectangle.h"
 
 struct ZEFontFileCharacter
 {

@@ -37,8 +37,8 @@
 #include "ZECore.h"
 #include "ZEError.h"
 #include "ZEConsole.h"
-#include "ZEInput\ZEInputModule.h"
-#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEInput/ZEInputModule.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZESystemMessageManager.h"
 #include "ZESystemMessageHandler.h"
 

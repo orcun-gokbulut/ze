@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPPFilter2DNode.h"
-#include "ZECore\ZEError.h"
-#include "ZEGraphics\ZETexture2D.h"
+#include "ZECore/ZEError.h"
+#include "ZEGraphics/ZETexture2D.h"
 
 ZEPPFilter2DNode::ZEPPFilter2DNode()
 {

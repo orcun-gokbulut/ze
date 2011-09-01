@@ -35,9 +35,9 @@
 
 #include "ZEVertexDeclaration.h"
 #include "ZEDefinitions.h"
-#include "ZECore\ZEError.h"
-#include "ZECore\ZEResourceFile.h"
-#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZECore/ZEError.h"
+#include "ZECore/ZEResourceFile.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
 #define ZE_FILE_FORMAT_MAKEVERSION(Major, Minor)		((ZEDWORD)((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor)))
 #define ZE_FILE_FORMAT_GETMINORVERSION(x)				((ZEDWORD)((x) & 0x0000FFFF))

@@ -37,8 +37,8 @@
 #ifndef __ZE_PORTAL_MAP_PORTAL_H__
 #define __ZE_PORTAL_MAP_PORTAL_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEGraphics/ZERenderOrder.h"
 
 class ZEPortalMap;
 class ZEPortalMapDoor;

@@ -54,9 +54,9 @@ class ZEPhysicalJoint;
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256
 
-#include "ZEPhysics\ZEPhysicalRigidBody.h"
-#include "ZEPhysics\ZEPhysicalJoint.h"
-#include "ZEPhysics\ZEPhysicalShapes.h"
+#include "ZEPhysics/ZEPhysicalRigidBody.h"
+#include "ZEPhysics/ZEPhysicalJoint.h"
+#include "ZEPhysics/ZEPhysicalShapes.h"
 
 /*
 enum ZEPhysicalShapeType

@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGame.h"
-#include "ZECore\ZECore.h"
-#include "ZECore\ZEError.h"
-#include "ZEUI\ZEUIManager.h"
-#include "ZEGraphics\ZECamera.h"
+#include "ZECore/ZECore.h"
+#include "ZECore/ZEError.h"
+#include "ZEUI/ZEUIManager.h"
+#include "ZEGraphics/ZECamera.h"
 #include "ZEMath/ZEMathDefinitions.h"
 #include <string.h>
 
@@ -51,7 +51,7 @@ ZEScene* ZEGame::GetScene()
 	return Scene;
 }
 
-#include "ZEUI\ZEFontResource.h"
+#include "ZEUI/ZEFontResource.h"
 
 bool ZEGame::Initialize()
 {
@@ -109,8 +109,8 @@ void ZEGame::Render(float ElapsedTime)
 	Scene->GetRenderer()->ClearLists();
 }
 
-#include "ZEDS\ZEString.h"
-#include "ZEUI\ZEUITextControl.h"
+#include "ZEDS/ZEString.h"
+#include "ZEUI/ZEUITextControl.h"
 
 #include <stdio.h>
 void ZEGame::Tick(float ElapsedTime)

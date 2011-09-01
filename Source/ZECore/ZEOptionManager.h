@@ -39,9 +39,9 @@
 
 #include "ZEOption.h"
 #include "ZEOptionSection.h"
-#include "ZEDS\ZENamed.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZETypedVariant.h"
+#include "ZEDS/ZENamed.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZETypedVariant.h"
 #include "ZEFastDelegate.h"
 #include "ZECommand.h"
 #include "ZECommandSection.h"

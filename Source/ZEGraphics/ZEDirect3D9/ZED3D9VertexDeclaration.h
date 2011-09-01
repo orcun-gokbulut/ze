@@ -39,8 +39,8 @@
 #define __ZE_D3D9_VERTEX_DECLARATION_H__
 
 #include "ZED3D9ComponentBase.h"
-#include "ZEGraphics\ZEVertexDeclaration.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEGraphics/ZEVertexDeclaration.h"
+#include "ZEDS/ZEArray.h"
 
 class ZED3D9VertexDeclaration : public ZEVertexDeclaration, private ZED3D9ComponentBase
 {

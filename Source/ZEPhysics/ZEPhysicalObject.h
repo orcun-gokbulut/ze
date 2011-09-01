@@ -37,8 +37,8 @@
 #ifndef __ZE_PHYSICAL_OBJECT_H__
 #define __ZE_PHYSICAL_OBJECT_H__
 
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 #include "ZETypes.h"
 
 #include "ZEPhysicalCallbacks.h"

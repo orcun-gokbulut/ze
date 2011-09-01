@@ -36,7 +36,7 @@
 #include "ZEUITextControl.h"
 #include "ZEUIRenderer.h"
 #include "ZEFontResource.h"
-#include "ZEGraphics\ZETexture2D.h"
+#include "ZEGraphics/ZETexture2D.h"
 
 void ZEUITextControl::SetText(const ZEString& Value)
 {

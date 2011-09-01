@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPhysicsModule.h"
-#include "ZEPhysics\ZEPhysicalWorld.h"
+#include "ZEPhysics/ZEPhysicalWorld.h"
 
 void ZEPhysicalWorld::Destroy()
 {

@@ -38,9 +38,9 @@
 #define __ZE_UI_RENDERER_H__
 
 #include "ZEUIRectangle.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEGraphics\ZERenderer.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEGraphics/ZERenderer.h"
 
 class ZEVertexDeclaration;
 class ZEUIRenderer

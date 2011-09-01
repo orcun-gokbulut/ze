@@ -37,7 +37,7 @@
 #ifndef __ZE_ZESDK_H__
 #define __ZE_ZESDK_H__
 
-#include "ZECore\ZECore.h"
+#include "ZECore/ZECore.h"
 
 bool			zeInitialize(void* Instance, void* WindowHandle);
 void			zeTerminate();

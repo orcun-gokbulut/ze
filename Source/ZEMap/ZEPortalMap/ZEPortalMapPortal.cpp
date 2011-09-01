@@ -33,17 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore\ZECore.h"
+#include "ZECore/ZECore.h"
 #include "ZEPortalMapPortal.h"
 #include "ZEPortalMapResource.h"
-#include "ZEPhysics\ZEPhysicalMesh.h"
-#include "ZEGraphics\ZELight.h"
-#include "ZEGraphics\ZEVertexBuffer.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZEGame\ZEDrawParameters.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEPhysics\ZEPhysicalWorld.h"
-#include "ZEMap\ZEPortalMap\ZEPortalMap.h"
+#include "ZEPhysics/ZEPhysicalMesh.h"
+#include "ZEGraphics/ZELight.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEPhysics/ZEPhysicalWorld.h"
+#include "ZEMap/ZEPortalMap/ZEPortalMap.h"
 ZEPortalMap* ZEPortalMapPortal::GetOwner()
 {
 	return Owner;

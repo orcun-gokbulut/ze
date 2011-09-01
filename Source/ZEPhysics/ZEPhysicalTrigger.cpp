@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPhysics\ZEPhysicalTrigger.h"
+#include "ZEPhysics/ZEPhysicalTrigger.h"
 
 void ZEPhysicalTrigger::SetTriggerEvent(const ZEPhysicalTriggerEvent& Event)
 {

@@ -36,10 +36,10 @@
 #include "ZEUIManager.h"
 #include "ZEUIRenderer.h"
 #include "ZEUIControl.h"
-#include "ZECore\ZEError.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
-#include "ZEInput\ZEInputDefinitions.h"
-#include "ZEInput\ZEInputModule.h"
+#include "ZECore/ZEError.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZEInput/ZEInputDefinitions.h"
+#include "ZEInput/ZEInputModule.h"
 
 #define ACTIONID_Q 0
 #define	ACTIONID_W 1

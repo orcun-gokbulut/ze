@@ -37,7 +37,7 @@
 #ifndef	__ZE_AL_LISTENER_H__
 #define __ZE_AL_LISTENER_H__
 
-#include "..\ZEListener.h"
+#include "../ZEListener.h"
 #include "ZEALComponentBase.h"
 
 class ZEALListener : public ZEListener, public ZEALComponentBase

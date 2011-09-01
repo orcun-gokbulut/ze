@@ -42,7 +42,7 @@ class ZEPhysicsCollision;
 class ZEPhysicsTrigger;
 class ZEVector3;
 
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 
 class ZEPhysicalObject;
 class ZERenderer;

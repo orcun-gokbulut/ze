@@ -37,7 +37,7 @@
 #ifndef	__ZE_DS_SOUND_SOURCE_3D_H__
 #define __ZE_DS_SOUND_SOURCE_3D_H__
 
-#include "..\ZESoundSource3D.h"
+#include "../ZESoundSource3D.h"
 #include "ZEDSSoundSource.h"
 #include <dsound.h>
 

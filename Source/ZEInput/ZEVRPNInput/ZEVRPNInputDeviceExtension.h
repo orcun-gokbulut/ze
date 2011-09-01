@@ -37,7 +37,7 @@
 #ifndef	__ZE_VRPN_INPUT_MODULE_H__
 #define __ZE_VRPN_INPUT_MODULE_H__
 
-#include "ZEInput\ZEInputDeviceExtension.h"
+#include "ZEInput/ZEInputDeviceExtension.h"
 #include "ZEVRPNInputDevice.h"
 
 class ZEInputDevice;

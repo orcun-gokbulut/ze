@@ -39,7 +39,7 @@
 
 #include <d3d9.h>
 #include "ZED3D9ComponentBase.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
 
 class ZED3D9VertexShader;
 class ZED3D9PixelShader;

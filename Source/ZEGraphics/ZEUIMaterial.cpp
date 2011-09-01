@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEUIMaterial.h"
 #include "ZETexture2D.h"
 

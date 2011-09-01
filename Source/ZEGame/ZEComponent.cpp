@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEComponent.h"
-#include "ZEGame\ZECompoundEntity.h"
+#include "ZEGame/ZECompoundEntity.h"
 
 void ZEComponent::SetLocalBoundingBox(const ZEAABoundingBox& BoundingBox)
 {

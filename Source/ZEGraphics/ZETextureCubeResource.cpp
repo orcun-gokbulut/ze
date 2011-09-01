@@ -35,9 +35,9 @@
 
 #include "ZETextureCubeResource.h"
 #include "ZETextureCube.h"
-#include "ZECore\ZEError.h"
-#include "ZECore\ZEConsole.h"
-#include "ZECore\ZEResourceManager.h"
+#include "ZECore/ZEError.h"
+#include "ZECore/ZEConsole.h"
+#include "ZECore/ZEResourceManager.h"
 
 #define FREEIMAGE_LIB
 #include <freeimage.h>

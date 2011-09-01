@@ -37,9 +37,9 @@
 #ifndef __ZE_GIZMO_H__
 #define __ZE_GIZMO_H__
 
-#include "ZEGame\ZEEntity.h"
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEGraphics\ZECanvas.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZECanvas.h"
 
 class ZESimpleMaterial;
 class ZERenderer;

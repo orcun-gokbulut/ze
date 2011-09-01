@@ -37,9 +37,9 @@
 #ifndef	__ZE_FONT_RESOURCE_H__
 #define __ZE_FONT_RESOURCE_H__
 
-#include "ZECore\ZEResource.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZERectangle.h"
+#include "ZECore/ZEResource.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZERectangle.h"
 
 #define ZE_FONT_CHARACTER_COUNT				256
 

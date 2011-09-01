@@ -37,9 +37,9 @@
 #ifndef	__ZE_COMMAND_SECTION_H__
 #define __ZE_COMMAND_SECTION_H__
 
-#include "ZEDS\ZENamed.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEVariant.h"
+#include "ZEDS/ZENamed.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEVariant.h"
 
 class ZECommand;
 class ZECommandSection : public ZENamed

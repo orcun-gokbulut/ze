@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath\ZEMathDefinitions.h"
+#include "ZEMath/ZEMathDefinitions.h"
 #include "ZEModelIKChainNode.h"
 
 ZEModelIKChainNode::ZEModelIKChainNode()

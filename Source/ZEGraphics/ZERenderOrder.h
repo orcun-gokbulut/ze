@@ -37,10 +37,10 @@
 #ifndef	__ZE_RENDERLIST_H__
 #define __ZE_RENDERLIST_H__
 
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEMath\ZEAABoundingBox.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEAABoundingBox.h"
 
 enum ZERenderPipeline
 {

@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPPTextureOutputNode.h"
-#include "ZEGraphics\ZETexture2D.h"
-#include "ZECore\ZEError.h"
+#include "ZEGraphics/ZETexture2D.h"
+#include "ZECore/ZEError.h"
 #include "ZEDefinitions.h"
 
 ZEPPTextureOutputNode::ZEPPTextureOutputNode()

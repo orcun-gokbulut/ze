@@ -37,7 +37,7 @@
 #ifndef	__ZE_VRPN_INPUT_DEVICE_EXTENSION_DESCRIPTION_H__
 #define __ZE_VRPN_INPUT_DEVICE_EXTENSION_DESCRIPTION_H__
 
-#include "ZECore\ZEExtensionDescription.h"
+#include "ZECore/ZEExtensionDescription.h"
 
 class ZEVRPNInputDeviceExtensionDescription : public ZEExtensionDescription
 {

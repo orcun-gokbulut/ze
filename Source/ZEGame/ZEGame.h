@@ -37,7 +37,7 @@
 #ifndef	__ZE_GAME_H__
 #define __ZE_GAME_H__
 
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 #include "ZEEntity.h"
 #include "ZEScene.h"
 

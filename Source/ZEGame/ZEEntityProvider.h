@@ -37,8 +37,8 @@
 #ifndef	__ZE_ENTITY_PROVIDER_H__
 #define __ZE_ENTITY_PROVIDER_H__
 
-#include "ZEGame\ZEEntity.h"
-#include "ZEMeta\ZEProvider.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEMeta/ZEProvider.h"
 
 class ZEEntityProvider : public ZEProvider
 {

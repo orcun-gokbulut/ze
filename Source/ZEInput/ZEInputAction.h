@@ -37,8 +37,8 @@
 #ifndef	__ZE_ACTION_H__
 #define __ZE_ACTION_H__
 
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 
 enum ZEInputButtonState;
 class ZEInputBinding;

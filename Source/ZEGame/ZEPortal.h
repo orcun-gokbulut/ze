@@ -36,7 +36,7 @@
 #ifndef __ZE_PORTAL_H__
 #define __ZE_PORTAL_H__
 
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 
 class ZECamera;
 class ZEViewCone;

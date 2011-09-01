@@ -37,7 +37,7 @@
 #ifndef	__ZE_D3D9_MODULE_DESCRIPTION_H__
 #define __ZE_D3D9_MODULE_DESCRIPTION_H__
 
-#include "ZECore\ZEModuleDescription.h"
+#include "ZECore/ZEModuleDescription.h"
 
 class ZED3D9ModuleDescription : public ZEModuleDescription
 {

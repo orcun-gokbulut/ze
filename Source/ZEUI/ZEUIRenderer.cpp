@@ -34,12 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIRenderer.h"
-#include "ZEGraphics\ZEGraphicsModule.h"
-#include "ZEGraphics\ZEVertexDeclaration.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
-#include "ZEGraphics\ZEVertexTypes.h"
-#include "ZEGraphics\ZERenderOrder.h"
-#include "ZEGraphics\ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEVertexDeclaration.h"
+#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZEGraphics/ZEVertexTypes.h"
+#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
 
 ZEUIRenderer::ZEUIRenderer()
 {

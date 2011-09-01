@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESoundResourceOGG.h"
-#include "ZECore\ZEError.h"
+#include "ZECore/ZEError.h"
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>
 #include <Memory.h>

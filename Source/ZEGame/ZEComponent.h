@@ -38,13 +38,13 @@
 #define __ZE_COMPONENT_H__
 
 #include "ZEEntity.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEAABoundingBox.h"
-#include "ZEMath\ZEOBoundingBox.h"
-#include "ZEMath\ZEBoundingSphere.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZEOBoundingBox.h"
+#include "ZEMath/ZEBoundingSphere.h"
 
 class ZERenderer;
 class ZECompoundEntity;

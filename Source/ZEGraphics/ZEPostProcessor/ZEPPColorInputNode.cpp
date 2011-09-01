@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPPColorInputNode.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZECore\ZEError.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZECore/ZEError.h"
 #include "ZEDefinitions.h"
 /*
 ZEPPColorInputNode::ZEPPColorInputNode()

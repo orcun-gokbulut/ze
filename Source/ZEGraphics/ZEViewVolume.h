@@ -37,12 +37,12 @@
 #ifndef __ZE_VIEWVOLUME_H__
 #define __ZE_VIEWVOLUME_H__
 
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEMath\ZEAABoundingBox.h"
-#include "ZEMath\ZEOBoundingBox.h"
-#include "ZEMath\ZEBoundingSphere.h"
-#include "ZEMath\ZERectangle3D.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEMath/ZEOBoundingBox.h"
+#include "ZEMath/ZEBoundingSphere.h"
+#include "ZEMath/ZERectangle3D.h"
 
 enum ZEViewVolumeType
 {

@@ -33,26 +33,26 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore\ZECore.h"
+#include "ZECore/ZECore.h"
 
 #define NOMINMAX
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 
-#include "ZECore\ZECore.h"
-#include "ZECore\ZEConsoleWindow.h"
-#include "ZECore\ZEModuleManager.h"
-#include "ZECore\ZEOptionManager.h"
-#include "ZECore\ZEWindow.h"
+#include "ZECore/ZECore.h"
+#include "ZECore/ZEConsoleWindow.h"
+#include "ZECore/ZEModuleManager.h"
+#include "ZECore/ZEOptionManager.h"
+#include "ZECore/ZEWindow.h"
 
-#include "ZEPhysics\ZEPhysicsDebugModule.h"
-#include "ZEModel\ZEModelDebugModule.h"
-#include "ZEGraphics\ZEGraphicsDebugModule.h"
-#include "ZESound\ZESoundDebugModule.h"
-#include "ZEMeta\ZEMetaDebugModule.h"
-#include "ZEUI\ZEUIDebugModule.h"
+#include "ZEPhysics/ZEPhysicsDebugModule.h"
+#include "ZEModel/ZEModelDebugModule.h"
+#include "ZEGraphics/ZEGraphicsDebugModule.h"
+#include "ZESound/ZESoundDebugModule.h"
+#include "ZEMeta/ZEMetaDebugModule.h"
+#include "ZEUI/ZEUIDebugModule.h"
 
-#include "ZEGraphics\ZEDirect3D9\ZED3D9TextureResizer.h"
+#include "ZEGraphics/ZEDirect3D9/ZED3D9TextureResizer.h"
 
 extern HINSTANCE ApplicationInstance;
 
@@ -61,7 +61,7 @@ extern HINSTANCE ApplicationInstance;
 #include <string.h>
 
 #define FREEIMAGE_LIB
-#include "ZEGraphics\ZEBitmap.h"
+#include "ZEGraphics/ZEBitmap.h"
 #include "FreeImage.h"
 
 

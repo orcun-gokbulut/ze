@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore\ZEError.h"
+#include "ZECore/ZEError.h"
 #include "ZEPhysXPhysicalRigidBody.h"
 #include "ZEPhysXPhysicalWorld.h"
-#include "ZEPhysics\ZEPhysicalShapes.h"
+#include "ZEPhysics/ZEPhysicalShapes.h"
 #include "ZEPhysXConversion.h"
 
 #include <NxShapeDesc.h>

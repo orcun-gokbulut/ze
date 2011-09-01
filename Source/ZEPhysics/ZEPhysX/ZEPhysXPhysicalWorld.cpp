@@ -35,11 +35,11 @@
 
 #include "ZEPhysXPhysicalWorld.h"
 #include "ZEPhysXConversion.h"
-#include "ZEPhysics\ZEPhysicalObject.h"
-#include "ZEPhysics\ZEPhysicalRigidBody.h"
-#include "ZECore\ZEError.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZEGraphics\ZESimpleMaterial.h"
+#include "ZEPhysics/ZEPhysicalObject.h"
+#include "ZEPhysics/ZEPhysicalRigidBody.h"
+#include "ZECore/ZEError.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGraphics/ZESimpleMaterial.h"
 #include <NxDebugRenderable.h>
 
 static ZEVector4 NX_TO_ZE(NxU32 color)

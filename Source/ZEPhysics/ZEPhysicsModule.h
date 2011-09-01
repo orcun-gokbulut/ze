@@ -37,7 +37,7 @@
 #ifndef	__ZE_PHYSICS_MODULE_H__
 #define __ZE_PHYSICS_MODULE_H__
 
-#include "ZECore\ZEModule.h"
+#include "ZECore/ZEModule.h"
 
 class ZEPhysicalWorld;
 class ZEPhysicalRigidBody;

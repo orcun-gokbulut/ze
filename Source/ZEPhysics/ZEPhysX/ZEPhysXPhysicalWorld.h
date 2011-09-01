@@ -41,14 +41,14 @@
 #include <NxSceneDesc.h>
 #include <NxMaterial.h>
 
-#include "ZEPhysics\ZEPhysicalWorld.h"
+#include "ZEPhysics/ZEPhysicalWorld.h"
 #include "ZEPhysXComponentBase.h"
 #include "ZEPhysXCollisionManager.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEGraphics\ZEVertexBuffer.h"
-#include "ZEGraphics\ZEVertexTypes.h"
-#include "ZEGraphics\ZERenderOrder.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEVertexTypes.h"
+#include "ZEGraphics/ZERenderOrder.h"
 
 class ZEMaterial;
 class ZEPhysicalObject;

@@ -37,10 +37,10 @@
 #ifndef __ZET_MODEL_FILE_FORMAT_H__
 #define __ZET_MODEL_FILE_FORMAT_H__
 
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEAABoundingBox.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEAABoundingBox.h"
+#include "ZEDS/ZEArray.h"
 #include "ZETDefinitions.h"
 #include "ZETTypes.h"
 

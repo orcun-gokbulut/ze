@@ -39,8 +39,8 @@
 
 #define zeInput ZEInputModule::GetInstance()
 
-#include "ZEDS\ZEArray.h"
-#include "ZECore\ZEModule.h"
+#include "ZEDS/ZEArray.h"
+#include "ZECore/ZEModule.h"
 #include "ZEInputMap.h"
 
 class ZEInputDevice;

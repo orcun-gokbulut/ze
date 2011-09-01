@@ -34,17 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGizmo.h"
-#include "ZEGraphics\ZECanvas.h"
-#include "ZEGraphics\ZECamera.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZEGraphics\ZESimpleMaterial.h"
-#include "ZECore\ZEConsole.h"
-#include "ZEMath\ZELineSegment.h"
-#include "ZEMath\ZERay.h"
-#include "ZEMath\ZEPlane.h"
-#include "ZEMath\ZETriangle.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGraphics/ZECanvas.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZECore/ZEConsole.h"
+#include "ZEMath/ZELineSegment.h"
+#include "ZEMath/ZERay.h"
+#include "ZEMath/ZEPlane.h"
+#include "ZEMath/ZETriangle.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEDrawParameters.h"
 
 #include "ZEMath/ZEMathDefinitions.h"
 

@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 #include "ZEVertexBuffer.h"
-#include "ZEGraphics\ZEGraphicsModule.h"
-#include "ZECore\ZECore.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZECore/ZECore.h"
 
 ZEVertexBuffer::ZEVertexBuffer()
 {

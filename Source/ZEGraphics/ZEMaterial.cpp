@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMaterial.h"
-#include "ZECore\ZECore.h"
+#include "ZECore/ZECore.h"
 #include "ZEGraphicsModule.h"
-#include "ZEMeta\ZEAnimation.h"
+#include "ZEMeta/ZEAnimation.h"
 #include <memory.h>
 
 ZEMaterial::ZEMaterial()

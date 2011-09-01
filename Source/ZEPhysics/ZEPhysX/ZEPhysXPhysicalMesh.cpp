@@ -37,7 +37,7 @@
 #include "ZEPhysXPhysicalWorld.h"
 #include "ZEPhysXStream.h"
 #include "ZEPhysXConversion.h"
-#include "ZECore\ZEError.h"
+#include "ZECore/ZEError.h"
 
 #include <NxShapeDesc.h>
 #include <NxTriangleMeshShapeDesc.h>
