@@ -86,7 +86,10 @@ bool ZEWindowSystemMessageHandler::Callback(MSG* Message)
 
 		case WM_CLOSE:
 			if (MessageBox(Message->hwnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
+			{
+				exit(0);
 				Window->WindowDestroyed();
+			}
 			return true;
 
 		case WM_DESTROY:
@@ -123,7 +126,10 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
 		case WM_CLOSE:
 			if (MessageBox(hWnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
+			{
+				exit(0);
 				Window->WindowDestroyed();
+			}
 			return true;
 
 		case WM_DESTROY:

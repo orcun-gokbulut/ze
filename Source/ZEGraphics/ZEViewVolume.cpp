@@ -226,9 +226,8 @@ bool ZEViewSphere::LightCullTest(ZELight* Light) const
 
 bool ZEViewSphere::CullTest(const ZEAABBox& BoundingBox) const
 {
-	return !ZEBSphere::CollisionTest(BoundingSphere, BoundingBox);
+	return false; //!ZEBSphere::CollisionTest(BoundingSphere, BoundingBox);
 }
-
 
 bool ZEViewSphere::CullTest(ZEEntity* Entity) const
 {
@@ -265,8 +264,8 @@ bool ZEViewHemiSphere::LightCullTest(ZELight* Light) const
 
 bool ZEViewHemiSphere::CullTest(const ZEAABBox& BoundingBox) const
 {
-	return ZEAABBox::PlaneHalfSpaceTest(BoundingBox, HalfPlane) == ZE_HS_NEGATIVE_SIDE 
-		|| !ZEBSphere::CollisionTest(BoundingSphere, BoundingBox);
+	return false; /*ZEAABBox::PlaneHalfSpaceTest(BoundingBox, HalfPlane) == ZE_HS_NEGATIVE_SIDE 
+		|| !ZEBSphere::CollisionTest(BoundingSphere, BoundingBox);*/
 }
 
 bool ZEViewHemiSphere::CullTest(ZEEntity* Entity) const

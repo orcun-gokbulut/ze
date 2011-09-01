@@ -56,15 +56,20 @@ class ZEBSphere
 		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZEVector3 Point);
 
 		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line);
+		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT);
 		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT, float& MaxT);
+
 		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment);
+		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT);
 		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT, float& MaxT);
+
 		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray);
+		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray, float& MinT);
 		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray, float& MinT, float& MaxT);
 
-		static bool				CollisionTest(const ZEBSphere& BoundingSphere, const ZEOBBox& BoundingBox);
-		static bool				CollisionTest(const ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox);
-		static bool				CollisionTest(const ZEBSphere& BoundingSphere1, const ZEBSphere& BoundingSphere2);
+		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox);
+		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZEOBBox& BoundingBox);
+		static bool				IntersectionTest(const ZEBSphere& BoundingSphere1, const ZEBSphere& BoundingSphere2);
 
 								ZEBSphere();
 								ZEBSphere(const ZEVector3& Position, float Radius);

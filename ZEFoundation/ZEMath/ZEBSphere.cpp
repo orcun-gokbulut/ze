@@ -42,6 +42,20 @@
 
 #include <math.h>
 
+static inline void SWAP(float a, float b)
+{
+	float t;
+	t = a;
+	a = b;
+	b = t;
+}
+
+void ZEBSphere::GetSurfaceNormal(ZEVector3& Normal, const ZEBSphere& BoundingSphere, const ZEVector3& Point)
+{
+	ZEVector3::Create(Normal, BoundingSphere.Position, Point);
+	ZEVector3::Normalize(Normal, Normal);
+}
+
 ZEHalfSpace ZEBSphere::PlaneHalfSpaceTest(const ZEBSphere& BoundingSphere, const ZEPlane& Plane)
 {
 	if (ZEPlane::Distance(Plane, BoundingSphere.Position) <= BoundingSphere.Radius) return ZE_HS_INTERSECTS;
@@ -51,105 +65,197 @@ ZEHalfSpace ZEBSphere::PlaneHalfSpaceTest(const ZEBSphere& BoundingSphere, const
 	return ((ZEVector3::DotProduct(temp,Plane.n) < 0) ? ZE_HS_NEGATIVE_SIDE : ZE_HS_POSITIVE_SIDE);
 }
 
-
-void ZEBSphere::GetSurfaceNormal(ZEVector3& Normal, const ZEBSphere& BoundingSphere, const ZEVector3& Point)
-{
-	ZEVector3::Create(Normal, BoundingSphere.Position, Point);
-	ZEVector3::Normalize(Normal, Normal);
-}
-
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEVector3 Point)
 {
-	return ZEVector3::Distance(BoundingSphere.Position, Point) <= BoundingSphere.Radius;
+	return ZEVector3::DistanceSquare(BoundingSphere.Position, Point) <= BoundingSphere.Radius * BoundingSphere.Radius;
 }
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line)
 {
-	float temp;
-	return ZELine::MinimumDistance(Line, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
+	ZEVector3 a = Line.p - BoundingSphere.Position;
+	float b = ZEVector3::DotProduct(Line.v, a);
+	float c = ZEVector3::DotProduct(a, a) - BoundingSphere.Radius * BoundingSphere.Radius;
+	float d = b * b - c;
+	
+	return (b * b > 0);
+}
+
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT)
+{
+	ZEVector3 a = Line.p - BoundingSphere.Position;
+	float b = ZEVector3::DotProduct(Line.v, a);
+	float c = ZEVector3::DotProduct(a, a) - BoundingSphere.Radius * BoundingSphere.Radius;
+	float d = b * b - c;
+	float sqrtd = sqrtf(d);
+
+	if (b * b > 0)
+	{
+		MinT = b + sqrtd;
+		float MaxT = -b + sqrtd;
+
+		if (MinT > MaxT) MinT = MaxT;
+
+		return true;
+	}
+}
+
+
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT, float& MaxT)
+{
+	ZEVector3 a = Line.p - BoundingSphere.Position;
+	float b = ZEVector3::DotProduct(Line.v, a);
+	float c = ZEVector3::DotProduct(a, a) - BoundingSphere.Radius * BoundingSphere.Radius;
+	float d = b * b - c;
+	float sqrtd = sqrtf(d);
+
+	if (b * b > 0)
+	{
+		MinT = b + sqrtd;
+		MaxT = -b + sqrtd;
+
+		if (MinT > MaxT) SWAP(MinT, MaxT);
+
+		return true;
+	}
 }
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray)
 {
-	float temp;
-	return ZERay::MinimumDistance(Ray, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
+	ZEVector3 l =  BoundingSphere.Position - Ray.p;
+	float s = ZEVector3::DotProduct(l, Ray.v);
+	float ll = ZEVector3::DotProduct(l, l);
+	float rr = BoundingSphere.Radius * BoundingSphere.Radius;
+
+	if (s < 0 && ll > rr)
+		return false;
+
+	float mm = ll - s * s;
+	if (mm > rr)
+		return false;
+
+	return true;
+}
+
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray, float& MinT)
+{
+	ZEVector3 l =  BoundingSphere.Position - Ray.p;
+	float s = ZEVector3::DotProduct(l, Ray.v);
+	float ll = ZEVector3::DotProduct(l, l);
+	float rr = BoundingSphere.Radius * BoundingSphere.Radius;
+
+	if (s < 0 && ll > rr)
+		return false;
+
+	float mm = ll - s * s;
+	if (mm > rr)
+		return false;
+
+	float q = sqrt(rr - mm);
+	if (ll > rr)
+		MinT = s - q;
+	else
+		MinT = s + q;
+
+	return true;
 }
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray, float& MinT, float& MaxT)
 {
-	ZEVector3 Dest;
-	ZEVector3::Sub(Dest, Ray.p, BoundingSphere.Position);
-	float B = ZEVector3::DotProduct(Dest, Ray.v);
-	float C = ZEVector3::DotProduct(Dest, Dest) - BoundingSphere.Radius * BoundingSphere.Radius;
-	float D = B * B - C;
-	if (D > 0)
-	{
-		MaxT = MinT = -B - sqrtf(D);
-		return true;
-	}
-	
-	return false;
-
-	/*ZEVector3 L;
-
-	ZEVector3::Sub(L, BoundingSphere.Position, Ray.p);
-
-	float tca =	ZEVector3::DotProduct(L, Ray.v);
-	if (tca < 0)
-		return false;
-
-	float LdotL =	ZEVector3::DotProduct(L, L);
-	float dd = LdotL - tca * tca;
+	ZEVector3 l =  BoundingSphere.Position - Ray.p;
+	float s = ZEVector3::DotProduct(l, Ray.v);
+	float ll = ZEVector3::DotProduct(l, l);
 	float rr = BoundingSphere.Radius * BoundingSphere.Radius;
-	if (dd > rr)
+
+	if (s < 0 && ll > rr)
 		return false;
 
-	float thc = sqrtf(rr - dd);
-	MinT = tca  - thc;
-	MaxT = tca + thc;
+	float mm = ll - s * s;
+	if (mm > rr)
+		return false;
 
-	return true;*/
+	float q = sqrt(rr - mm);
+	if (ll > rr)
+	{
+		MinT = s - q;
+		MaxT = s + q;
+	}
+	else
+	{
+		MinT = s + q;
+		MaxT = s - q;
+	}
+
+	return true;
 }
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment)
 {
-	float temp;
- 	return ZELineSegment::MinimumDistance(LineSegment, BoundingSphere.Position, temp) <= BoundingSphere.Radius;
+	float MinT, MaxT;
+	bool Result = IntersectionTest(BoundingSphere, (ZELine)LineSegment, MinT, MaxT);
+	if (!Result)
+		return false;
+
+	if (MinT < 0.0f)
+		return false;
+	
+	if (MaxT > 1.0f)
+		return false;
+
+	return true;
 }
 
-bool ZEBSphere::CollisionTest(const ZEBSphere& BoundingSphere, const ZEOBBox& BoundingBox)
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT)
 {
-	return 0;
+	float Min, MaxT;
+	bool Result = IntersectionTest(BoundingSphere, (ZELine)LineSegment, Min, MaxT);
+	if (!Result)
+		return false;
+
+	if (Min < 0.0f)
+		return false;
+
+	if (MaxT > 1.0f)
+		return false;
+
+	MinT = Min;
+
+	return true;
 }
 
-
-bool ZEBSphere::CollisionTest(const ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT, float& MaxT)
 {
-	float totalDistance = 0;
+	float Min, Max;
+	bool Result = IntersectionTest(BoundingSphere, (ZELine)LineSegment, Min, Max);
+	if (!Result)
+		return false;
 
-	if (BoundingSphere.Position.x > BoundingBox.Max.x)
-		totalDistance += (BoundingSphere.Position.x - BoundingBox.Max.x) * (BoundingSphere.Position.x - BoundingBox.Max.x);
-	else if (BoundingSphere.Position.x < BoundingBox.Min.x)
-		totalDistance += (BoundingSphere.Position.x - BoundingBox.Min.x) * (BoundingSphere.Position.x - BoundingBox.Min.x);
+	if (Min < 0.0f)
+		return false;
 
-	if (BoundingSphere.Position.y > BoundingBox.Max.y)
-		totalDistance += (BoundingSphere.Position.y - BoundingBox.Max.y) * (BoundingSphere.Position.y - BoundingBox.Max.y);
-	else if (BoundingSphere.Position.y < BoundingBox.Min.y)
-		totalDistance += (BoundingSphere.Position.y - BoundingBox.Min.y) * (BoundingSphere.Position.y - BoundingBox.Min.y);
+	if (MaxT > 1.0f)
+		return false;
 
-	if (BoundingSphere.Position.z > BoundingBox.Max.z)
-		totalDistance += (BoundingSphere.Position.z - BoundingBox.Max.z) * (BoundingSphere.Position.z - BoundingBox.Max.z);
-	else if (BoundingSphere.Position.z < BoundingBox.Min.z)
-		totalDistance += (BoundingSphere.Position.z - BoundingBox.Min.z) * (BoundingSphere.Position.z - BoundingBox.Min.z);
+	MinT = Min;
+	MaxT = Max;
 
-	return sqrt(totalDistance) <= BoundingSphere.Radius;
+	return true;
 }
 
-bool ZEBSphere::CollisionTest(const ZEBSphere& BoundingSphere1, const ZEBSphere& BoundingSphere2)
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere1, const ZEBSphere& BoundingSphere2)
 {
-	return ZEVector3::Distance(BoundingSphere1.Position, BoundingSphere2.Position) <= BoundingSphere1.Radius + BoundingSphere2.Radius;
+	ZEVector3 Displacement = BoundingSphere1.Position - BoundingSphere2.Position;
+	float Distance = ZEVector3::DotProduct(Displacement, Displacement);
+	float r = (BoundingSphere1.Radius + BoundingSphere2.Radius);
+	
+	if (Distance * Distance > r * r)
+		return false;
+	return true;
 }
 
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)
+{
+	return false;
+}
 
 ZEBSphere::ZEBSphere()
 {
