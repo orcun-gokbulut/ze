@@ -36,6 +36,7 @@
 #pragma once
 #ifndef __ZE_MATH_AA_BOUNDING_BOX_H__
 #define __ZE_MATH_AA_BOUNDING_BOX_H__
+
 #include "ZEVector.h"
 #include "ZEMatrix.h"
 #include "ZEPlane.h"
@@ -45,34 +46,34 @@ class ZEOBBox;
 
 class ZEAABBox
 {
-public:
-	ZEVector3					Min, Max;
+	public:
+		ZEVector3					Min, Max;
 
-	ZEVector3					GetCenter() const;
-	ZEVector3					GetVertex(unsigned char Index) const;
-	float						GetLenght() const;
+		ZEVector3					GetCenter() const;
+		ZEVector3					GetVertex(unsigned char Index) const;
+		float						GetLenght() const;
 
-	static void					GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox);
-	static void					GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABBox& BoundingBox);
+		static void					GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox);
+		static void					GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABBox& BoundingBox);
 
-	static void					Transform(ZEAABBox& Output, const ZEAABBox& Input, const ZEMatrix4x4& TransformMatrix);
+		static void					Transform(ZEAABBox& Output, const ZEAABBox& Input, const ZEMatrix4x4& TransformMatrix);
 
-	static ZEHalfSpace			PlaneHalfSpaceTest(const ZEAABBox& BoundingBox, const ZEPlane& Plane);
+		static ZEHalfSpace			IntersectionTest(const ZEAABBox& BoundingBox, const ZEPlane& Plane);
 
-	static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZEVector3& Point);
-	static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line);
-	static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& MinT, float& MaxT);
-	static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray);
-	static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZERay & Ray, float& MinT, float& MaxT);
-	static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment);
-	static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& MinT, float& MaxT);
-	
-	static bool					CollisionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& BoundingBox2);
-	static bool					CollisionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& BoundingBox2);
-	static bool					CollisionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZEVector3& Point);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& MinT, float& MaxT);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZERay & Ray, float& MinT, float& MaxT);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& MinT, float& MaxT);
+		
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& BoundingBox2);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& BoundingBox2);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere);
 
-								ZEAABBox();
-								ZEAABBox(const ZEVector3 Min, const ZEVector3 Max);
+									ZEAABBox();
+									ZEAABBox(const ZEVector3 Min, const ZEVector3 Max);
 
 								
 };

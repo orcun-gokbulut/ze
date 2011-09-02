@@ -56,7 +56,7 @@ void ZEBSphere::GetSurfaceNormal(ZEVector3& Normal, const ZEBSphere& BoundingSph
 	ZEVector3::Normalize(Normal, Normal);
 }
 
-ZEHalfSpace ZEBSphere::PlaneHalfSpaceTest(const ZEBSphere& BoundingSphere, const ZEPlane& Plane)
+ZEHalfSpace ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEPlane& Plane)
 {
 	if (ZEPlane::Distance(Plane, BoundingSphere.Position) <= BoundingSphere.Radius) return ZE_HS_INTERSECTS;
 
@@ -65,7 +65,7 @@ ZEHalfSpace ZEBSphere::PlaneHalfSpaceTest(const ZEBSphere& BoundingSphere, const
 	return ((ZEVector3::DotProduct(temp,Plane.n) < 0) ? ZE_HS_NEGATIVE_SIDE : ZE_HS_POSITIVE_SIDE);
 }
 
-bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEVector3 Point)
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEVector3& Point)
 {
 	return ZEVector3::DistanceSquare(BoundingSphere.Position, Point) <= BoundingSphere.Radius * BoundingSphere.Radius;
 }
@@ -249,16 +249,40 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere1, const ZEBSphe
 	
 	if (Distance * Distance > r * r)
 		return false;
+
 	return true;
 }
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)
 {
+	ZEVector3 e = (BoundingBox.Min - BoundingSphere.Position).ClampLower(0.0f) + 
+		(BoundingSphere.Position - BoundingBox.Max).ClampLower(0.0f);
+	float d = ZEVector3::DotProduct(e, e);
+	if (d > BoundingSphere.Radius * BoundingSphere.Radius)
+		return false;
+
+	return true;
+}
+
+bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEOBBox& BoundingBox)
+{
+	ZEVector3 NewPoint;
+	NewPoint.x = ZEVector3::DotProduct(BoundingSphere.Position, BoundingBox.Right);
+	NewPoint.y = ZEVector3::DotProduct(BoundingSphere.Position, BoundingBox.Up);
+	NewPoint.z = ZEVector3::DotProduct(BoundingSphere.Position, BoundingBox.Front);
+
+	ZEVector3 e = (BoundingBox.Center - BoundingBox.HalfSize - NewPoint).ClampLower(0.0f) + 
+		(NewPoint - BoundingBox.Center + BoundingBox.HalfSize).ClampLower(0.0f);
+	float d = ZEVector3::DotProduct(e, e);
+	if (d > BoundingSphere.Radius * BoundingSphere.Radius)
+		return false;
+
 	return false;
 }
 
 ZEBSphere::ZEBSphere()
 {
+
 }
 
 ZEBSphere::ZEBSphere(const ZEVector3& Position, float Radius)

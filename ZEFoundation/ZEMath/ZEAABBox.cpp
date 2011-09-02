@@ -98,26 +98,21 @@ void ZEAABBox::Transform(ZEAABBox& Output, const ZEAABBox& Input, const ZEMatrix
 	}
 }
 
-ZEHalfSpace ZEAABBox::PlaneHalfSpaceTest(const ZEAABBox& BoundingBox, const ZEPlane& Plane)
+ZEHalfSpace ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEPlane& Plane)
 {
-	ZEHalfSpace HS1 = ZEPlane::TestHalfSpace(Plane, BoundingBox.GetVertex(0));
-	for (int I = 1; I < 8; I++)
-	{
-		ZEHalfSpace HS2 = ZEPlane::TestHalfSpace(Plane, BoundingBox.GetVertex(I));
-		if (HS1 != HS2)
-			return ZE_HS_INTERSECTS;
-	}
-	return HS1;
-}
+	ZEVector3 Center = (BoundingBox.Max + BoundingBox.Min) * 0.5f;
+	ZEVector3 HalfDiameter = (BoundingBox.Max - BoundingBox.Min) * 0.5f;
 
-ZEAABBox::ZEAABBox()
-{
-}
+	float Extent = HalfDiameter.x * fabs(Plane.n.x) + HalfDiameter.y * fabs(Plane.n.y) + HalfDiameter.z * fabs(Plane.n.z);
 
-ZEAABBox::ZEAABBox(const ZEVector3 Min, const ZEVector3 Max)
-{
-	this->Min = Min;
-	this->Max = Max;
+	float Distance = ZEVector3::DotProduct(Plane.p - Center, Plane.n);
+
+	if (Distance - Extent > 0)
+		return ZE_HS_POSITIVE_SIDE;
+	else if (Distance + Extent < 0)
+		return ZE_HS_NEGATIVE_SIDE;
+	else
+		ZE_HS_INTERSECTS;
 }
 
 void ZEAABBox::GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)
@@ -335,43 +330,36 @@ bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment
 		return false;
 }
 
-bool ZEAABBox::CollisionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& BoundingBox2)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere)
 {
-//	ZEASSERT(true "Not implamented");
-	return false;	
+	return ZEBSphere::IntersectionTest(BoundingSphere, BoundingBox);
 }
 
-bool ZEAABBox::CollisionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& BoundingBox2)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& BoundingBox2)
 {
-	return (BoundingBox1.Max.x <= BoundingBox2.Max.x && BoundingBox1.Max.y <= BoundingBox2.Max.y && BoundingBox1.Max.z <= BoundingBox2.Max.z
-		&& BoundingBox1.Max.x >= BoundingBox2.Min.x && BoundingBox1.Max.y >= BoundingBox2.Min.y && BoundingBox1.Max.z >= BoundingBox2.Min.z)
-		|| 
-		(BoundingBox2.Max.x <= BoundingBox1.Max.x && BoundingBox2.Max.y <= BoundingBox1.Max.y && BoundingBox2.Max.z <= BoundingBox1.Max.z
-		&& BoundingBox2.Max.x >= BoundingBox1.Min.x && BoundingBox2.Max.y >= BoundingBox1.Min.y && BoundingBox2.Max.z >= BoundingBox1.Min.z);
+	if (BoundingBox1.Min.x > BoundingBox2.Max.x || BoundingBox2.Min.x > BoundingBox1.Max.x)
+		return false;
+
+	if (BoundingBox1.Min.y > BoundingBox2.Max.y || BoundingBox2.Min.y > BoundingBox1.Max.y)
+		return false;
+
+	if (BoundingBox1.Min.z > BoundingBox2.Max.z || BoundingBox2.Min.z > BoundingBox1.Max.z)
+		return false;
+
+	return false;
 }
 
-bool ZEAABBox::CollisionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& BoundingBox2)
 {
-	float totalDistance = 0;
-
-	if (BoundingSphere.Position.x > BoundingBox.Max.x)
-		totalDistance += (BoundingSphere.Position.x - BoundingBox.Max.x) * (BoundingSphere.Position.x - BoundingBox.Max.x);
-	else if (BoundingSphere.Position.x < BoundingBox.Min.x)
-		totalDistance += (BoundingSphere.Position.x - BoundingBox.Min.x) * (BoundingSphere.Position.x - BoundingBox.Min.x);
-
-	if (BoundingSphere.Position.y > BoundingBox.Max.y)
-		totalDistance += (BoundingSphere.Position.y - BoundingBox.Max.y) * (BoundingSphere.Position.y - BoundingBox.Max.y);
-	else if (BoundingSphere.Position.y < BoundingBox.Min.y)
-		totalDistance += (BoundingSphere.Position.y - BoundingBox.Min.y) * (BoundingSphere.Position.y - BoundingBox.Min.y);
-
-	if (BoundingSphere.Position.z > BoundingBox.Max.z)
-		totalDistance += (BoundingSphere.Position.z - BoundingBox.Max.z) * (BoundingSphere.Position.z - BoundingBox.Max.z);
-	else if (BoundingSphere.Position.z < BoundingBox.Min.z)
-		totalDistance += (BoundingSphere.Position.z - BoundingBox.Min.z) * (BoundingSphere.Position.z - BoundingBox.Min.z);
-
-	return sqrt(totalDistance) <= BoundingSphere.Radius;
+	return false;
 }
 
+ZEAABBox::ZEAABBox()
+{
+}
 
-
-
+ZEAABBox::ZEAABBox(const ZEVector3 Min, const ZEVector3 Max)
+{
+	this->Min = Min;
+	this->Max = Max;
+}

@@ -62,12 +62,12 @@ bool ZEViewFrustum::ConeCullTest(const ZEBSphere& BoundingSphere) const
 
 bool ZEViewFrustum::CullTest(const ZEOBBox& BoundingBox) const
 {
-	if ((ZEOBBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEOBBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEOBBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEOBBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEOBBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEOBBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
+	if ((ZEOBBox::IntersectionTest(BoundingBox, NearClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEOBBox::IntersectionTest(BoundingBox, FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEOBBox::IntersectionTest(BoundingBox, LeftClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEOBBox::IntersectionTest(BoundingBox, RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEOBBox::IntersectionTest(BoundingBox, TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEOBBox::IntersectionTest(BoundingBox, BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
 		return true;
 
 	return false;
@@ -75,12 +75,12 @@ bool ZEViewFrustum::CullTest(const ZEOBBox& BoundingBox) const
 
 bool ZEViewFrustum::CullTest(const ZEAABBox& BoundingBox) const
 {
-	if ((ZEAABBox::PlaneHalfSpaceTest(BoundingBox, NearClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEAABBox::PlaneHalfSpaceTest(BoundingBox, FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEAABBox::PlaneHalfSpaceTest(BoundingBox, LeftClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEAABBox::PlaneHalfSpaceTest(BoundingBox, RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEAABBox::PlaneHalfSpaceTest(BoundingBox, TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEAABBox::PlaneHalfSpaceTest(BoundingBox, BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
+	if ((ZEAABBox::IntersectionTest(BoundingBox, NearClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEAABBox::IntersectionTest(BoundingBox, FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEAABBox::IntersectionTest(BoundingBox, LeftClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEAABBox::IntersectionTest(BoundingBox, RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEAABBox::IntersectionTest(BoundingBox, TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEAABBox::IntersectionTest(BoundingBox, BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
 		return true;
 
 	return false;
@@ -231,7 +231,7 @@ bool ZEViewSphere::CullTest(const ZEAABBox& BoundingBox) const
 
 bool ZEViewSphere::CullTest(ZEEntity* Entity) const
 {
-	if (!ZEAABBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere))
+	if (!ZEAABBox::IntersectionTest(Entity->GetWorldBoundingBox(), BoundingSphere))
 			return true;
 	return false;
 }
@@ -273,8 +273,8 @@ bool ZEViewHemiSphere::CullTest(ZEEntity* Entity) const
 	return 
 //		ZEBSphere::PlaneHalfSpaceTest(Entity->GetWorldBoundingSphere(), HalfPlane) == ZE_HS_NEGATIVESIDE ||
 //		!ZEBSphere::CollisionTest(BoundingSphere, Entity->GetWorldBoundingSphere()) ||
-		ZEAABBox::PlaneHalfSpaceTest(Entity->GetWorldBoundingBox(), HalfPlane) == ZE_HS_NEGATIVE_SIDE ||
-		!ZEAABBox::CollisionTest(Entity->GetWorldBoundingBox(), BoundingSphere);
+		ZEAABBox::IntersectionTest(Entity->GetWorldBoundingBox(), HalfPlane) == ZE_HS_NEGATIVE_SIDE ||
+		!ZEAABBox::IntersectionTest(Entity->GetWorldBoundingBox(), BoundingSphere);
 }
 
 ZEDoorViewTest ZEViewHemiSphere::CullTest(const ZERectangle3D& PortalDoor) const

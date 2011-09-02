@@ -111,7 +111,7 @@ SUITE(ZEOBBox)
 		ZEVector3 p1(100.0f, 100.0f, 100.0f);
 		ZEPlane P1(n1, p1);
 
-		ZEHalfSpace result1 = ZEOBBox::PlaneHalfSpaceTest(OBB, P1);
+		ZEHalfSpace result1 = ZEOBBox::IntersectionTest(OBB, P1);
 
 		CHECK_EQUAL(result1,-1);
 
@@ -119,7 +119,7 @@ SUITE(ZEOBBox)
 		ZEVector3 p2(0.0f, -6.0f, 0.0f);
 		ZEPlane P2(n2, p2);
 
-		ZEHalfSpace result2 = ZEOBBox::PlaneHalfSpaceTest(OBB, P2);
+		ZEHalfSpace result2 = ZEOBBox::IntersectionTest(OBB, P2);
 
 		CHECK_EQUAL(result2, 1);
 
@@ -128,7 +128,7 @@ SUITE(ZEOBBox)
 		ZEVector3 p3(0.0f, 0.0f, 0.0f);
 		ZEPlane P3(n3, p3);
 
-		ZEHalfSpace result3 = ZEOBBox::PlaneHalfSpaceTest(OBB, P3);
+		ZEHalfSpace result3 = ZEOBBox::IntersectionTest(OBB, P3);
 
 		CHECK_EQUAL(result3, 1);
 
@@ -137,7 +137,7 @@ SUITE(ZEOBBox)
 		ZEPlane P4(n4, p4);
 
 
-		ZEHalfSpace result4 = ZEOBBox::PlaneHalfSpaceTest(OBB, P4);
+		ZEHalfSpace result4 = ZEOBBox::IntersectionTest(OBB, P4);
 
 		CHECK_EQUAL(result4, 1);
 	}

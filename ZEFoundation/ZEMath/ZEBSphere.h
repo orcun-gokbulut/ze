@@ -49,11 +49,10 @@ class ZEBSphere
 		ZEVector3				Position;
 		float					Radius;
 
-		static ZEHalfSpace		PlaneHalfSpaceTest(const ZEBSphere& BoundingSphere, const ZEPlane& Plane);
-
 		static void				GetSurfaceNormal(ZEVector3& Normal, const ZEBSphere& BoundingSphere, const ZEVector3& Point);
 
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZEVector3 Point);
+		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZEVector3& Point);
+		static ZEHalfSpace		IntersectionTest(const ZEBSphere& BoundingSphere, const ZEPlane& Plane);
 
 		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line);
 		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT);

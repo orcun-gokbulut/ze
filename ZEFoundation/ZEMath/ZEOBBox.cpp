@@ -111,12 +111,12 @@ void ZEOBBox::ConvertToSphere(ZEBSphere& Sphere, const ZEOBBox& Input)
 	Sphere.Radius = Input.HalfSize.Max();
 }
 
-ZEHalfSpace ZEOBBox::PlaneHalfSpaceTest(const ZEOBBox& BoundingBox, const ZEPlane& Plane)
+ZEHalfSpace ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEPlane& Plane)
 {
 	float Extent = 
-		BoundingBox.HalfSize.x * ZEVector3::DotProduct(Plane.n, BoundingBox.Right) +
-		BoundingBox.HalfSize.y * ZEVector3::DotProduct(Plane.n, BoundingBox.Up) +
-		BoundingBox.HalfSize.z * ZEVector3::DotProduct(Plane.n, BoundingBox.Front);
+		BoundingBox.HalfSize.x * fabs(ZEVector3::DotProduct(Plane.n, BoundingBox.Right)) +
+		BoundingBox.HalfSize.y * fabs(ZEVector3::DotProduct(Plane.n, BoundingBox.Up)) +
+		BoundingBox.HalfSize.z * fabs(ZEVector3::DotProduct(Plane.n, BoundingBox.Front));
 	float Distance = ZEVector3::DotProduct(Plane.p - BoundingBox.Center, Plane.n);
 
 	if (Distance - Extent > 0)
@@ -318,6 +318,21 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& 
 	}
 
 	return true;
+
+}
+
+bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEBSphere& BoundingSphere)
+{
+	return ZEBSphere::IntersectionTest(BoundingSphere, BoundingBox);
+}
+
+bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox1, const ZEAABBox& BoundingBox2)
+{
+
+}
+
+bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox1, const ZEOBBox& BoundingBox2)
+{
 
 }
 

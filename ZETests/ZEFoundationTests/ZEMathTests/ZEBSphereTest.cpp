@@ -69,7 +69,7 @@ SUITE(ZEBSphere)
 		ZEVector3 p1(100.0f, 100.0f, 100.0f);
 		ZEPlane P1(n1, p1);
 
-		ZEHalfSpace result1 = ZEBSphere::PlaneHalfSpaceTest(BS, P1);
+		ZEHalfSpace result1 = ZEBSphere::IntersectionTest(BS, P1);
 
 		CHECK_EQUAL(result1,-1);
 
@@ -79,7 +79,7 @@ SUITE(ZEBSphere)
 		ZEPlane P2(n2, p2);
 
 
-		ZEHalfSpace result2 = ZEBSphere::PlaneHalfSpaceTest(BS, P2);
+		ZEHalfSpace result2 = ZEBSphere::IntersectionTest(BS, P2);
 
 		CHECK_EQUAL(result2, 1);
 
@@ -89,7 +89,7 @@ SUITE(ZEBSphere)
 		ZEPlane P3(n3, p3);
 
 
-		ZEHalfSpace result3 = ZEBSphere::PlaneHalfSpaceTest(BS, P3);
+		ZEHalfSpace result3 = ZEBSphere::IntersectionTest(BS, P3);
 
 		CHECK_EQUAL(result3, ZE_HS_INTERSECTS);
 		
@@ -101,7 +101,7 @@ SUITE(ZEBSphere)
 		ZEPlane P4(n4, p4);
 
 
-		ZEHalfSpace result4 = ZEBSphere::PlaneHalfSpaceTest(BS, P4);
+		ZEHalfSpace result4 = ZEBSphere::IntersectionTest(BS, P4);
 
 		CHECK_EQUAL(result4, 1);
 	}
