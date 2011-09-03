@@ -328,12 +328,12 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEBSphere& Boun
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox1, const ZEAABBox& BoundingBox2)
 {
-
+	return false;
 }
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox1, const ZEOBBox& BoundingBox2)
 {
-
+	return false;
 }
 
 ZEOBBox::ZEOBBox()

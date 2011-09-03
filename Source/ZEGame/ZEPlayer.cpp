@@ -262,7 +262,7 @@ ZEPlayer::ZEPlayer()
 	RegisterComponent(Listener);
 
 	Light = ZEProjectiveLight::CreateInstance();
-	Light->SetProjectionTexture(ZETexture2DResource::LoadSharedResource("flashlight.jpg")->GetTexture());
+	Light->SetProjectionTexture(ZETexture2DResource::LoadSharedResource("flashlight.tga")->GetTexture());
 	Light->SetAttenuation(0.01f, 0.0f, 1.0f);
 	Light->SetIntensity(3.0f);
 	Light->SetRange(55.0f);
