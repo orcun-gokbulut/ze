@@ -169,22 +169,22 @@ void ZEUICursorControl::SetMaterial(ZEMaterial* Material)
 
 ZEUICursorControl::ZEUICursorControl()
 {
-	/*InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_UP,				"Move Up",			ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS,		ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_DOWN,			"Move Down",		ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS,		ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_LEFT,			"Move Left",		ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS,	ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHT,			"Move Right",		ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS,	ZE_IAS_POSITIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_UP,					ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS,		ZE_IAS_NEGATIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_DOWN,				ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS,		ZE_IAS_POSITIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_LEFT,				ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS,	ZE_IAS_NEGATIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHT,				ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS,	ZE_IAS_POSITIVE)));
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_LEFT_PRESS,		"Left Press",		ZEInputEvent("Mouse", ZE_IMB_BUTTON0,			ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHT_PRESS,		"Right Press",		ZEInputEvent("Mouse", ZE_IMB_BUTTON1,			ZE_IBS_PRESSED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_MIDDLE_PRESS,	"Middle Press",		ZEInputEvent("Mouse", ZE_IMB_BUTTON2,			ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_LEFT_PRESS,			ZEInputEvent("Mouse", ZE_IMB_BUTTON0,			ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHT_PRESS,			ZEInputEvent("Mouse", ZE_IMB_BUTTON1,			ZE_IBS_PRESSED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_MIDDLE_PRESS,		ZEInputEvent("Mouse", ZE_IMB_BUTTON2,			ZE_IBS_PRESSED)));
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_LEFT_RELEASE,	"Left Release",		ZEInputEvent("Mouse", ZE_IMB_BUTTON0,			ZE_IBS_RELEASED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHT_RELEASE,	"Right Release",	ZEInputEvent("Mouse", ZE_IMB_BUTTON1,			ZE_IBS_RELEASED)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_MIDDLE_RELEASE,	"Middle Release",	ZEInputEvent("Mouse", ZE_IMB_BUTTON2,			ZE_IBS_RELEASED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_LEFT_RELEASE,		ZEInputEvent("Mouse", ZE_IMB_BUTTON0,			ZE_IBS_RELEASED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHT_RELEASE,		ZEInputEvent("Mouse", ZE_IMB_BUTTON1,			ZE_IBS_RELEASED)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_MIDDLE_RELEASE,		ZEInputEvent("Mouse", ZE_IMB_BUTTON2,			ZE_IBS_RELEASED)));
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_UP,		"Scroll Up",		ZEInputEvent("Mouse", ZE_IMA_SCROLL_AXIS,		ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_DOWN,		"Scroll Down",		ZEInputEvent("Mouse", ZE_IMA_SCROLL_AXIS,		ZE_IAS_NEGATIVE)));
-*/
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_UP,			ZEInputEvent("Mouse", ZE_IMA_SCROLL_AXIS,		ZE_IAS_POSITIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_DOWN,			ZEInputEvent("Mouse", ZE_IMA_SCROLL_AXIS,		ZE_IAS_NEGATIVE)));
+
 	SetHeight(24);
 	SetWidth(24);	
 
@@ -199,7 +199,7 @@ ZEUICursorControl::ZEUICursorControl()
 	Cursor.Texcoords.RightDown = ZEVector2::One;
 
 	CursorMaterial = ZEUIMaterial::CreateInstance();
-	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("Cursor.png")->GetTexture());
+	//CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("Cursor.png")->GetTexture());
 	CursorMaterial->SetZero();
 	Cursor.Material = CursorMaterial;
 	Cursor.Color = GetBackgroundColor();

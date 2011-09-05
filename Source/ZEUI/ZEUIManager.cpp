@@ -83,6 +83,7 @@ ZEUIManager::ZEUIManager()
 	LastFocusedControl = NULL;
 	MouseMoveEventFlag = false;
 	Cursor = NULL;
+	PreviousPressedButton = ZE_UI_MOUSE_BUTTON_NONE;
 
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_Q, 			ZEInputEvent("Keyboard", ZE_IKB_Q, ZE_IBS_PRESSED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_W, 			ZEInputEvent("Keyboard", ZE_IKB_W, ZE_IBS_PRESSED)));
@@ -238,7 +239,7 @@ void ZEUIManager::ProcessEvents()
 		/*        MOUSE PRESS, RELEASE EVENT AND FOCUSGAIN, FOCUSLOST           */
 		/************************************************************************/
 
-		if (Cursor->GetCurrentButton() != ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE && PreviousPressedButton == ZE_UI_MOUSE_BUTTON_NONE && LastHoveredControl != NULL)
+		if (Cursor->GetCurrentButton() != ZE_UI_MOUSE_BUTTON_NONE && PreviousPressedButton == ZE_UI_MOUSE_BUTTON_NONE && LastHoveredControl != NULL)
 		{
 			LastHoveredControl->MouseButtonPressed(Cursor->GetCurrentButton(), CursorPosition);
 			LastPressedControl = LastHoveredControl;
@@ -291,7 +292,7 @@ void ZEUIManager::ProcessEvents()
 	/*                          KEYPRESS EVENTS                             */
 	/************************************************************************/
 
-	if (LastFocusedControl != NULL)
+	/*if (LastFocusedControl != NULL)
 	{
 		zeInput->ProcessInputMap(&InputMap);
 
@@ -411,7 +412,7 @@ void ZEUIManager::ProcessEvents()
 					LastFocusedControl->KeyPressed('\b');
 					break;
 
-				/*case ACTIONID_LEFTARROW:
+				case ACTIONID_LEFTARROW:
 					LastFocusedControl->KeyPressed('');
 					break;
 
@@ -425,10 +426,10 @@ void ZEUIManager::ProcessEvents()
 
 				case ACTIONID_DOWNARROW:
 					LastFocusedControl->KeyPressed('');
-					break;*/
+					break;
 			}
 		}
-	}
+	}*/
 
 	/************************************************************************/
 	/*                          KEYPRESS EVENTS                             */
