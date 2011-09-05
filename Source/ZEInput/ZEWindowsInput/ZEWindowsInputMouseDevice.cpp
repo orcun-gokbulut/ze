@@ -176,7 +176,7 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 				InputAction->From = InputBinding;
 				return true;
 			}
-			else if (InputBinding->Event.ButtonState == ZE_IBS_RELEASED && ButtonStateOld[ButtonIndex] == false && ButtonState[ButtonIndex] == false)
+			else if (InputBinding->Event.ButtonState == ZE_IBS_RELEASED && ButtonStateOld[ButtonIndex] == true && ButtonState[ButtonIndex] == false)
 			{
 				InputAction->Id = InputBinding->ActionId;
 				InputAction->ButtonState = ZE_IBS_RELEASED;
