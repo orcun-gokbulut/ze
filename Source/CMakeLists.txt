@@ -37,32 +37,14 @@ cmake_minimum_required(VERSION 2.8)
 
 project(ZinekEngine)
 
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-
-include_directories(
-	${PROJECT_SOURCE_DIR} 
-	${PROJECT_SOURCE_DIR}/../Include 
-	${PROJECT_SOURCE_DIR}/../Include/DirectX
-	${PROJECT_SOURCE_DIR}/../Include/OpenAL
-	${PROJECT_SOURCE_DIR}/../Include/DirectX
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/Cooking
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/Foundation
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/NxCharacter
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/Physics
-	${PROJECT_SOURCE_DIR}/../Include/Curl
-	${PROJECT_SOURCE_DIR}/../ZEFoundation)
-link_directories(
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/$(Configuration)" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX"
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86")
-
 set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
 
 append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
 	ZE_ZINEK_ENGINE)
-	
+
+include_directories(${PROJECT_SOURCE_DIR}
+					${CMAKE_SOURCE_DIR}/ZEFoundation)
+				
 add_subdirectory(ZECore)
 add_subdirectory(ZEDebug)
 add_subdirectory(ZEGame)

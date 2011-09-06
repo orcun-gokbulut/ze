@@ -39,35 +39,16 @@ project (ZEditior)
 
 find_package(Qt4 REQUIRED)
 
-include_directories (
+include_directories(
 	${PROJECT_SOURCE_DIR}
-	${PROJECT_SOURCE_DIR}/../Source
-	${PROJECT_SOURCE_DIR}/../ZEFoundation
-	${PROJECT_SOURCE_DIR}/../ZEToolSDK
-	${PROJECT_SOURCE_DIR}/../Include 
-	${PROJECT_SOURCE_DIR}/../Include/DirectX
-	${PROJECT_SOURCE_DIR}/../Include/OpenAL
-	${PROJECT_SOURCE_DIR}/../Include/DirectX
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/Cooking
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/Foundation
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/NxCharacter
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/Physics
-	${PROJECT_SOURCE_DIR}/../Include/Curl
-	${PROJECT_SOURCE_DIR}/../ZEFoundation
-	${PROJECT_BINARY_DIR}/ZEDSceneEditor
-	${PROJECT_BINARY_DIR}/ZEDMaterialEditor
-	${PROJECT_BINARY_DIR}/ZEDBrowser
-	${PROJECT_BINARY_DIR}/ZEDSoundExtensionsPlugIn
+	${CMAKE_SOURCE_DIR}/Source
+	${CMAKE_SOURCE_DIR}/ZEFoundation
+	${CMAKE_SOURCE_DIR}/ZEToolSDK
 	${QT_INCLUDE_DIR}
 	${QT_INCLUDE_DIR}/QtGui
 	${QT_INCLUDE_DIR}/QtCore)
 	
-link_directories(
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/$(Configuration)" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX"
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/Qt")
+link_directories("${CMAKE_SOURCE_DIR}/Lib/Win x86/Qt")
 
 add_definitions(${QT_DEFINITIONS})
 

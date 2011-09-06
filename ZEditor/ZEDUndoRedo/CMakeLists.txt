@@ -40,9 +40,7 @@ include(${QT_USE_FILE})
 add_source (ZEDUndoRedo.cpp		Sources)
 add_source (ZEDUndoRedo.h		Sources)
 
-include_directories(
-   ${CMAKE_CURRENT_BINARY_DIR}
-)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})

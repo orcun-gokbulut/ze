@@ -76,6 +76,26 @@ set(LIBRARY_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR})
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+include_directories(
+	${PROJECT_SOURCE_DIR} 
+	${PROJECT_SOURCE_DIR}/Include 
+	${PROJECT_SOURCE_DIR}/Include/DirectX
+	${PROJECT_SOURCE_DIR}/Include/OpenAL
+	${PROJECT_SOURCE_DIR}/Include/DirectX
+	${PROJECT_SOURCE_DIR}/Include/PhysX/Cooking
+	${PROJECT_SOURCE_DIR}/Include/PhysX/Foundation
+	${PROJECT_SOURCE_DIR}/Include/PhysX/NxCharacter
+	${PROJECT_SOURCE_DIR}/Include/PhysX/Physics
+	${PROJECT_SOURCE_DIR}/Include/Curl
+	${PROJECT_SOURCE_DIR}/Include/3dsMax/2010)
+	
+link_directories(
+	"${PROJECT_SOURCE_DIR}/Lib/Win x86"
+	"${PROJECT_SOURCE_DIR}/Lib/Win x86/$(Configuration)" 
+	"${PROJECT_SOURCE_DIR}/Lib/Win x86/DirectX" 
+	"${PROJECT_SOURCE_DIR}/Lib/Win x86/OpenAL" 
+	"${PROJECT_SOURCE_DIR}/Lib/Win x86/PhysX"
+	"${PROJECT_SOURCE_DIR}/Lib/Win x86/3dsMax/2010")
 
 ## Files
 #########################################################################################

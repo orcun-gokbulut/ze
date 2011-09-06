@@ -237,7 +237,7 @@ int ZEModelExporter::GetBoneId(IGameNode* Node)
 }
 
 
-void CalculateLocalBoundingBox(ZEAABoundingBox& BoundingBox, IGameMesh* Mesh)
+void CalculateLocalBoundingBox(ZEAABBox& BoundingBox, IGameMesh* Mesh)
 {
 	if (Mesh->GetNumberOfFaces() == 0)
 	{

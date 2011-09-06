@@ -42,8 +42,8 @@ add_source (ZEDEntitySelectionItem.h			Sources)
 add_source (ZEDEntitySelector.cpp				Sources)
 add_source (ZEDEntitySelector.h					Sources QtMocs)
 add_source (ZEDSceneEditor.cpp					Sources)
-add_source (ZEDSceneEditor.h					Sources QtMocs)
 add_source (ZEDSceneEditor.ui					Sources QtUI)
+add_source (ZEDSceneEditor.h					Sources QtMocs)
 add_source (ZEDSceneList.cpp					Sources)
 add_source (ZEDSceneList.h						Sources)
 add_source (ZEDSelectionItem.cpp				Sources)
@@ -51,12 +51,11 @@ add_source (ZEDSelectionItem.h					Sources)
 add_source (ZEDSelectionItemPlugin.cpp			Sources)
 add_source (ZEDSelectionItemPlugin.h			Sources)
 
-include_directories (${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
-
 add_library (ZEDSceneEditor ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
 
 set_property(TARGET ZEDSceneEditor PROPERTY FOLDER "ZEditor")
