@@ -68,6 +68,8 @@ add_source (ZEVector.h				Sources ZESDK)
 
 add_library (ZEMath ${Sources})
 
+target_link_libraries(ZEMath ZEFoundation)
+
 set_property(TARGET ZEMath PROPERTY FOLDER "ZEFoundation")
 
 install (TARGETS ZEMath COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)

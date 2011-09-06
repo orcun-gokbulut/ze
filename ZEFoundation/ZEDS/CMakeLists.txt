@@ -58,7 +58,7 @@ add_source (ZEVariant.h				Sources ZESDK)
 
 add_library (ZEDS ${Sources})
 
-target_link_libraries(ZEDS zlib.lib)
+target_link_libraries(ZEDS ZEFoundation zlib.lib)
 
 set_property(TARGET ZEDS PROPERTY FOLDER "ZEFoundation")
 
