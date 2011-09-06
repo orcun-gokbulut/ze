@@ -39,6 +39,7 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEString.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
@@ -126,7 +127,7 @@ class ZEEntity : public ZEClass
 	ZE_META_ENTITY(ZEEntity)
 	friend class ZECompoundEntity;
 	private: 
-		char									Name[ZE_MAX_NAME_SIZE];
+		ZEString								Name;
 		int										EntityId;
 		ZEVector3								Position;
 		ZEQuaternion							Rotation;
@@ -139,8 +140,8 @@ class ZEEntity : public ZEClass
 		bool									Enabled;
 		bool									Visible;
 
-		ZEAABBox							WorldBoundingBox;
-		ZEAABBox							LocalBoundingBox;
+		ZEAABBox								WorldBoundingBox;
+		ZEAABBox								LocalBoundingBox;
 
 	protected:
 		void									SetLocalBoundingBox(const ZEAABBox& BoundingBox);
@@ -154,8 +155,8 @@ class ZEEntity : public ZEClass
 
 		virtual ZEEntityType					GetEntityType();
 
-		virtual const ZEAABBox&			GetLocalBoundingBox() const;
-		virtual const ZEAABBox&			GetWorldBoundingBox();
+		virtual const ZEAABBox&					GetLocalBoundingBox() const;
+		virtual const ZEAABBox&					GetWorldBoundingBox();
 		virtual const ZEMatrix4x4&				GetWorldTransform();
 
 		bool									GetInitialized();

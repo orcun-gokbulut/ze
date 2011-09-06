@@ -91,7 +91,7 @@ int ZEEntity::GetEntityId() const
 
 void ZEEntity::SetName(const char* NewName)
 {
-	strncpy(Name, NewName, ZE_MAX_NAME_SIZE);
+	Name = NewName;
 }
 
 const char* ZEEntity::GetName() const
@@ -221,15 +221,12 @@ void ZEEntity::Draw(ZEDrawParameters* DrawParameters)
 
 ZEEntity::ZEEntity()
 {
-	Name[0] = '\0';
-
 	OldPosition = Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
 	Enabled = true;
 	Visible = true;
 	Initialized = false;
-	Visible = true;
 }
 
 ZEEntity::~ZEEntity()

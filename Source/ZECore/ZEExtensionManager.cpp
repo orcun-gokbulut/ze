@@ -117,7 +117,7 @@ class ZEExtensionManager* ZEExtensionManager::GetInstance()
 #include "ZEInput/ZEFreeSpaceInput/ZEFreespaceInputDeviceExtensionDescription.h"
 ZEExtensionManager::ZEExtensionManager()
 {
-	//RegisterExtension(new ZEVRPNInputDeviceExtensionDescription());
+	RegisterExtension(new ZEVRPNInputDeviceExtensionDescription());
 	//RegisterExtension(new ZEFreespaceInputDeviceExtensionDescription());
 }
 
