@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #define WINDOWS_LEAN_AND_MEAN
+#include "ui_ZEDMaterialEditor.h"
 #include "ZEDMaterialEditor.h"
-
 #include <Windows.h>
 #include <ZESDK.h>
 #include <ZECore/ZECore.h>
@@ -50,33 +50,34 @@
 
 ZEDMaterialEditor::ZEDMaterialEditor(QWidget *parent, Qt::WFlags flags) : QMainWindow(parent, flags)
 {
-	ui.setupUi(this);
+	ui = new Ui::ZEDMaterialEditorClass();
+	ui->setupUi(this);
 	showMaximized();
 
-	QObject::connect(ui.actionClose, SIGNAL(triggered()), this, SLOT(close()));
+	QObject::connect(ui->actionClose, SIGNAL(triggered()), this, SLOT(close()));
 
-	ViewPort = new ZEDMaterialEditorViewPort(this ,ui.centralWidget);
-	ui.CentralLayout->addWidget(ViewPort);
+	ViewPort = new ZEDMaterialEditorViewPort(this ,ui->centralWidget);
+	ui->CentralLayout->addWidget(ViewPort);
 	InitializeEngine();
 	ViewPort->Initialize();
 	QObject::connect(&EngineMainLoopTimer, SIGNAL(timeout()), this, SLOT(EngineMainLoop()));
-	QObject::connect(ui.actionCube, SIGNAL(triggered()), this, SLOT(CubeSelected()));
-	QObject::connect(ui.actionPlane, SIGNAL(triggered()), this, SLOT(PlaneSelected()));
-	QObject::connect(ui.actionSphere, SIGNAL(triggered()), this, SLOT(SphereSelected()));
-	QObject::connect(ui.actionCylinder, SIGNAL(triggered()), this, SLOT(CylinderSelected()));
+	QObject::connect(ui->actionCube, SIGNAL(triggered()), this, SLOT(CubeSelected()));
+	QObject::connect(ui->actionPlane, SIGNAL(triggered()), this, SLOT(PlaneSelected()));
+	QObject::connect(ui->actionSphere, SIGNAL(triggered()), this, SLOT(SphereSelected()));
+	QObject::connect(ui->actionCylinder, SIGNAL(triggered()), this, SLOT(CylinderSelected()));
 	EngineMainLoopTimer.start(0);
 
-	MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui.PropertyTabWidget, ViewPort->GetModelMaterial(), WorkingDir);
-	ui.MaterialTabLayout->addWidget(MaterialPropertyWindowManager);
+	MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ViewPort->GetModelMaterial(), WorkingDir);
+	ui->MaterialTabLayout->addWidget(MaterialPropertyWindowManager);
 
-	DirectLight1PropertyWindowManager = new ZEDPropertyWindowManager(ui.PropertyTabWidget, ViewPort->GetDirectLight1(), WorkingDir);
-	ui.DirectLight1TabLayout->addWidget(DirectLight1PropertyWindowManager);
+	DirectLight1PropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ViewPort->GetDirectLight1(), WorkingDir);
+	ui->DirectLight1TabLayout->addWidget(DirectLight1PropertyWindowManager);
 
-	DirectLight2PropertyWindowManager = new ZEDPropertyWindowManager(ui.PropertyTabWidget, ViewPort->GetDirectLight2(), WorkingDir);
-	ui.DirectLight2TabLayout->addWidget(DirectLight2PropertyWindowManager);
+	DirectLight2PropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ViewPort->GetDirectLight2(), WorkingDir);
+	ui->DirectLight2TabLayout->addWidget(DirectLight2PropertyWindowManager);
 
-	DirectLight3PropertyWindowManager = new ZEDPropertyWindowManager(ui.PropertyTabWidget, ViewPort->GetDirectLight3(), WorkingDir);
-	ui.DirectLight3TabLayout->addWidget(DirectLight3PropertyWindowManager);
+	DirectLight3PropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ViewPort->GetDirectLight3(), WorkingDir);
+	ui->DirectLight3TabLayout->addWidget(DirectLight3PropertyWindowManager);
 }
 
 ZEDMaterialEditor::~ZEDMaterialEditor()
@@ -107,8 +108,8 @@ void ZEDMaterialEditor::SphereSelected()
 	delete MaterialPropertyWindowManager;
 	MaterialPropertyWindowManager = NULL;
 	ViewPort->SetModelFile("Sphere.ZEMODEL");
-	MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui.PropertyTabWidget, ViewPort->GetModelMaterial(), "C:/Users/Can/Desktop/ZE/trunk/RunDir/resources/");
-	ui.MaterialTabLayout->addWidget(MaterialPropertyWindowManager);
+	MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ViewPort->GetModelMaterial(), "C:/Users/Can/Desktop/ZE/trunk/RunDir/resources/");
+	ui->MaterialTabLayout->addWidget(MaterialPropertyWindowManager);
 }
 
 void ZEDMaterialEditor::CubeSelected()
@@ -117,8 +118,8 @@ void ZEDMaterialEditor::CubeSelected()
 	delete MaterialPropertyWindowManager;
 	MaterialPropertyWindowManager = NULL;
 	ViewPort->SetModelFile("Cube.ZEMODEL");
-	MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui.PropertyTabWidget, ViewPort->GetModelMaterial(), "C:/Users/Can/Desktop/ZE/trunk/RunDir/resources/");
-	ui.MaterialTabLayout->addWidget(MaterialPropertyWindowManager);
+	MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ViewPort->GetModelMaterial(), "C:/Users/Can/Desktop/ZE/trunk/RunDir/resources/");
+	ui->MaterialTabLayout->addWidget(MaterialPropertyWindowManager);
 }
 
 void ZEDMaterialEditor::PlaneSelected()
@@ -127,8 +128,8 @@ void ZEDMaterialEditor::PlaneSelected()
 	delete MaterialPropertyWindowManager;
 	MaterialPropertyWindowManager = NULL;
 	ViewPort->SetModelFile("Plane.ZEMODEL");
-	MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui.PropertyTabWidget, ViewPort->GetModelMaterial(), "C:/Users/Can/Desktop/ZE/trunk/RunDir/resources/");
-	ui.MaterialTabLayout->addWidget(MaterialPropertyWindowManager);
+	MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ViewPort->GetModelMaterial(), "C:/Users/Can/Desktop/ZE/trunk/RunDir/resources/");
+	ui->MaterialTabLayout->addWidget(MaterialPropertyWindowManager);
 }
 
 void ZEDMaterialEditor::CylinderSelected()
@@ -137,8 +138,8 @@ void ZEDMaterialEditor::CylinderSelected()
 	delete MaterialPropertyWindowManager;
 	MaterialPropertyWindowManager = NULL;
 	ViewPort->SetModelFile("Cylinder.ZEMODEL");
-	MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui.PropertyTabWidget, ViewPort->GetModelMaterial(), "C:/Users/Can/Desktop/ZE/trunk/RunDir/resources/");
-	ui.MaterialTabLayout->addWidget(MaterialPropertyWindowManager);
+	MaterialPropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertyTabWidget, ViewPort->GetModelMaterial(), "C:/Users/Can/Desktop/ZE/trunk/RunDir/resources/");
+	ui->MaterialTabLayout->addWidget(MaterialPropertyWindowManager);
 }
 
 void ZEDMaterialEditor::UpdateLightPropertyWidgets()

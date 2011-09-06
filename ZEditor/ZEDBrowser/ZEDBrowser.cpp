@@ -33,6 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include <ui_ZEDBrowser.h>
 #include "ZEDBrowser.h"
 #include "ZEDCore/ZEDFileExtension.h"
 #include "ZEDBrowserItem.h"
@@ -41,18 +42,19 @@
 
 ZEDBrowser::ZEDBrowser(QWidget *Parent, Qt::WFlags Flags) : QMainWindow(Parent, Flags)
 {
-	AssertBrowserUI.setupUi(this);
+	AssertBrowserUI = new Ui::ZEDBrowserUI();
+	AssertBrowserUI->setupUi(this);
 	MultipleSelectionEnabled = false;
 	DirectoryTree = new ZEDDirectoryTreeWidget(QDir(WorkingDir), this);
-	AssertBrowserUI.LeftLayout->addWidget(DirectoryTree);	
-	BrowserItemsLayout = new QGridLayout(AssertBrowserUI.BrowserScrollArea->widget());
+	AssertBrowserUI->LeftLayout->addWidget(DirectoryTree);	
+	BrowserItemsLayout = new QGridLayout(AssertBrowserUI->BrowserScrollArea->widget());
 	BrowserItemsLayout->setContentsMargins(1, 1, 1, 1);
 	BrowserItemsLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
 	showMaximized();
 	QList<int> WidgetSizes;
 	WidgetSizes.append(300);
 	WidgetSizes.append(1600);
-	AssertBrowserUI.splitter->setSizes(WidgetSizes);
+	AssertBrowserUI->splitter->setSizes(WidgetSizes);
 
 	SeperatorAction = new QAction(this);
 	SeperatorAction->setSeparator(true);
@@ -82,17 +84,17 @@ void ZEDBrowser::GenerateBrowserItems(ZEDDirectoryTreeWidgetItem* Current)
 	int ExpansionRow = 0;
 	int ExpansionColumn = 0;
 
-	int RowItemCapacity = floor((float)AssertBrowserUI.BrowserScrollArea->width() / 256.0f);
+	int RowItemCapacity = floor((float)AssertBrowserUI->BrowserScrollArea->width() / 256.0f);
 	int SpacePixexls = 6 * RowItemCapacity;
 
-	if(SpacePixexls + 256 * RowItemCapacity > AssertBrowserUI.BrowserScrollArea->width())
+	if(SpacePixexls + 256 * RowItemCapacity > AssertBrowserUI->BrowserScrollArea->width())
 		RowItemCapacity--;
 
 	QStringList Files = Current->GetDirectory().entryList(QStringList(), QDir.Files | QDir.NoDotAndDotDot, QDir.Name);
 
 	for (int I = 0; I < Files.count(); I++)
 	{
-		ZEDBrowserItem* NewItem = new ZEDBrowserItem(this, AssertBrowserUI.BrowserScrollArea->widget() ,WorkingDir + Current->GetDirectory().path().remove(0,1) + "/" + Files[I]);
+		ZEDBrowserItem* NewItem = new ZEDBrowserItem(this, AssertBrowserUI->BrowserScrollArea->widget() ,WorkingDir + Current->GetDirectory().path().remove(0,1) + "/" + Files[I]);
 		BrowserItems.append(NewItem);
 		BrowserItemsLayout->addWidget(NewItem, ExpansionRow, ExpansionColumn);
 
@@ -105,7 +107,7 @@ void ZEDBrowser::GenerateBrowserItems(ZEDDirectoryTreeWidgetItem* Current)
 		}
 	}
 	
-	AssertBrowserUI.StatusBar->showMessage(QString::number(Files.count()) + " File(s)");
+	AssertBrowserUI->StatusBar->showMessage(QString::number(Files.count()) + " File(s)");
 }
 
 QList<QAction*> ZEDBrowser::GetBrowserContextMenuActions()

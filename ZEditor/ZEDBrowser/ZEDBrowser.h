@@ -38,16 +38,21 @@
 #ifndef __ZED_BROWSER_H__
 #define __ZED_BROWSER_H__
 
-#include <ui_ZEDBrowser.h>
 #include <QDir>
 #include <QGridLayout>
 #include <QList>
+#include <QMainWindow>
 
 #include "ZEDDirectoryTreeWidget.h"
 
 class ZEDFileExtension;
 class ZEDBrowserItem;
 class ZEDDirectoryTreeWidgetItem;
+
+namespace Ui
+{
+	class ZEDBrowserUI;
+}
 
 class ZEDBrowser : public QMainWindow
 {
@@ -59,7 +64,7 @@ class ZEDBrowser : public QMainWindow
 
 		bool					MultipleSelectionEnabled;
 
-		Ui::ZEDBrowserUI		AssertBrowserUI;
+		Ui::ZEDBrowserUI*		AssertBrowserUI;
 		QDir					SelectedDir;
 		ZEDDirectoryTreeWidget*	DirectoryTree;
 		QGridLayout*			BrowserItemsLayout;

@@ -38,10 +38,14 @@
 
 #include <QtGui/QMainWindow>
 #include <QTimer>
-#include "ui_ZEDMaterialEditor.h"
 #include "ZEDMaterialEditorViewPort.h"
 
 class ZEDPropertyWindowManager;
+
+namespace Ui
+{
+	class ZEDMaterialEditorClass;
+}
 
 class ZEDMaterialEditor : public QMainWindow
 {
@@ -49,7 +53,7 @@ class ZEDMaterialEditor : public QMainWindow
 
 	private:
 
-		Ui::ZEDMaterialEditorClass ui;
+		Ui::ZEDMaterialEditorClass* ui;
 
 		QTimer						EngineMainLoopTimer;
 		ZEDMaterialEditorViewPort*	ViewPort;

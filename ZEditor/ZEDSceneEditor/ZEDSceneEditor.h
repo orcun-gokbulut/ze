@@ -41,7 +41,6 @@
 #include <QtCore/QPoint.h>
 #include <QtCore/QTimer.h>
 #include <QtCore/QString.h>
-#include "ui_ZEDSceneEditor.h"
 #include "ZEDCommonControls\ZEDViewPort.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEDEntitySelector.h"
@@ -57,6 +56,11 @@
 #include <ZEModel/ZEModel.h>
 
 using namespace Qt;
+
+namespace Ui
+{
+	class MapEditorClass;
+}
 
 class MapEditor : public QMainWindow
 {
@@ -166,7 +170,7 @@ class MapEditor : public QMainWindow
 
 		ZEArray<ZEDSelectionItem*>			SelectedItems;
 //		ZEArray<ZEDPlugin*>					PlugIns;
-		Ui::MapEditorClass					ui;
+		Ui::MapEditorClass*					ui;
 
 		void								LoadTrees();
 		void								LoadBushes();
