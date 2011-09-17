@@ -44,10 +44,11 @@ class ZEPlane;
 class ZELineSegment : public ZELine
 {
 	public:
-		static void			Create(ZELine& Line, const ZEVector3& Start, const ZEVector3& End);
-		static void			CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p);
 
-		static float		Length(const ZELineSegment& LineSegment);
+		float				Length;
+
+		static void			Create(ZELineSegment& LineSegment, const ZEVector3& Start, const ZEVector3& End);
+		static void			CreateParametric(ZELineSegment& LineSegment, const ZEVector3& v, const ZEVector3& p);
 
 		static float		MinimumDistance(const ZELineSegment& LineSegment, const ZEVector3& Point);
 		static float		MinimumDistance(const ZELineSegment& LineSegment, const ZEVector3& Point, float &TLine);
@@ -61,7 +62,6 @@ class ZELineSegment : public ZELine
 		void				GetPointOn(ZEVector3& Point, float TLineSegment) const;
 		ZEVector3			GetPointOn(float TLineSegment) const;
 
-		float				GetLenght() const;
 		void				GetSegmentStartPoint(ZEVector3& StartPoint) const;
 		void				GetSegmentEndPoint(ZEVector3& EndPoint) const;
 

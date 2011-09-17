@@ -76,8 +76,8 @@ class ZEPlane
 		static void					Create(ZEPlane& Plane,float a, float b, float c, float d);
 		static void					Create(ZEPlane& Plane,const ZEVector3 &P1,const ZEVector3 &P2,const ZEVector3 &P3);
 
-		ZEPlane();
-		ZEPlane(const ZEVector3& n, const ZEVector3& p);
+									ZEPlane();
+									ZEPlane(const ZEVector3& n, const ZEVector3& p);
 };
 
 #endif

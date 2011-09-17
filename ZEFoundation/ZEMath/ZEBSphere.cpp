@@ -58,7 +58,8 @@ void ZEBSphere::GetSurfaceNormal(ZEVector3& Normal, const ZEBSphere& BoundingSph
 
 ZEHalfSpace ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEPlane& Plane)
 {
-	if (ZEPlane::Distance(Plane, BoundingSphere.Position) <= BoundingSphere.Radius) return ZE_HS_INTERSECTS;
+	if (ZEPlane::Distance(Plane, BoundingSphere.Position) <= BoundingSphere.Radius) 
+		return ZE_HS_INTERSECTS;
 
 	ZEVector3 temp;
 	ZEVector3::Sub(temp,BoundingSphere.Position,Plane.p);
@@ -77,7 +78,7 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& 
 	float c = ZEVector3::DotProduct(a, a) - BoundingSphere.Radius * BoundingSphere.Radius;
 	float d = b * b - c;
 	
-	return (b * b > 0);
+	return (d > 0);
 }
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT)
@@ -86,17 +87,21 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& 
 	float b = ZEVector3::DotProduct(Line.v, a);
 	float c = ZEVector3::DotProduct(a, a) - BoundingSphere.Radius * BoundingSphere.Radius;
 	float d = b * b - c;
-	float sqrtd = sqrtf(d);
-
-	if (b * b > 0)
+	
+	if (d > 0)
 	{
-		MinT = b + sqrtd;
-		float MaxT = -b + sqrtd;
+		float sqrtd = sqrtf(d);
 
-		if (MinT > MaxT) MinT = MaxT;
+		float MaxT = -b + sqrtd;
+		MinT = -b - sqrtd;
+		
+		if (MinT > MaxT) 
+			MinT = MaxT;
 
 		return true;
 	}
+
+	return false;
 }
 
 
@@ -106,17 +111,21 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& 
 	float b = ZEVector3::DotProduct(Line.v, a);
 	float c = ZEVector3::DotProduct(a, a) - BoundingSphere.Radius * BoundingSphere.Radius;
 	float d = b * b - c;
-	float sqrtd = sqrtf(d);
 
-	if (b * b > 0)
+	if (d > 0)
 	{
-		MinT = b + sqrtd;
+		float sqrtd = sqrtf(d);
+
+		MinT = -b - sqrtd;
 		MaxT = -b + sqrtd;
 
-		if (MinT > MaxT) SWAP(MinT, MaxT);
+		if (MinT > MaxT) 
+			SWAP(MinT, MaxT);
 
 		return true;
 	}
+
+	return false;
 }
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray)
@@ -190,36 +199,16 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& R
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment)
 {
-	float MinT, MaxT;
-	bool Result = IntersectionTest(BoundingSphere, (ZELine)LineSegment, MinT, MaxT);
-	if (!Result)
-		return false;
-
-	if (MinT < 0.0f)
-		return false;
-	
-	if (MaxT > 1.0f)
-		return false;
-
-	return true;
+	float Mint, Maxt;
+	return IntersectionTest(BoundingSphere, LineSegment, Mint, Maxt);	 
 }
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT)
 {
-	float Min, MaxT;
-	bool Result = IntersectionTest(BoundingSphere, (ZELine)LineSegment, Min, MaxT);
-	if (!Result)
-		return false;
-
-	if (Min < 0.0f)
-		return false;
-
-	if (MaxT > 1.0f)
-		return false;
-
-	MinT = Min;
-
-	return true;
+	float Mint, Maxt;
+	bool Result = IntersectionTest(BoundingSphere, LineSegment, Mint, Maxt);
+	MinT = Mint;
+	return Result;
 }
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT, float& MaxT)
@@ -229,11 +218,17 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSe
 	if (!Result)
 		return false;
 
-	if (Min < 0.0f)
+	if (Max > 0.0f && Min < 0.0f)
+		Min = Max;
+
+	if(Max < 0.0f)
 		return false;
 
-	if (MaxT > 1.0f)
+	if (Min > LineSegment.Length)
 		return false;
+
+	if(Max > LineSegment.Length)
+		Max = Min;
 
 	MinT = Min;
 	MaxT = Max;
@@ -244,10 +239,10 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSe
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere1, const ZEBSphere& BoundingSphere2)
 {
 	ZEVector3 Displacement = BoundingSphere1.Position - BoundingSphere2.Position;
-	float Distance = ZEVector3::DotProduct(Displacement, Displacement);
+	float DistanceSquare = ZEVector3::DotProduct(Displacement, Displacement);
 	float r = (BoundingSphere1.Radius + BoundingSphere2.Radius);
 	
-	if (Distance * Distance > r * r)
+	if (DistanceSquare > r * r)
 		return false;
 
 	return true;

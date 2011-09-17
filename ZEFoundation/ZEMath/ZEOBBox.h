@@ -54,7 +54,7 @@ class ZEOBBox
 		ZEVector3				GetVertex(unsigned char Index) const;
 		ZEVector3				GetEdge(unsigned char Index) const;
 
-		static void				CreateFromOrientation(ZEOBBox& BoundingBox, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale);
+		static void				CreateFromOrientation(ZEOBBox& BoundingBox, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Size);
 		static void				ConvertToSphere(ZEBSphere& Sphere, const ZEOBBox& Input);
 
 		static void				Transform(ZEOBBox& Output, const ZEMatrix4x4& Matrix, const ZEOBBox& Input);
@@ -80,7 +80,7 @@ class ZEOBBox
 		static bool				IntersectionTest(const ZEOBBox& BoundingBox1, const ZEOBBox& BoundingBox2);
 
 								ZEOBBox();
-								ZEOBBox(const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale);
+								ZEOBBox(const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Size);
 								ZEOBBox(const ZEVector3& Center, const ZEVector3& Right, const ZEVector3& Up,const ZEVector3& Direction, const ZEVector3& HalfSize);
 };
 #endif

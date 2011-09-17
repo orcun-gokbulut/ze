@@ -105,14 +105,14 @@ ZEHalfSpace ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEPlan
 
 	float Extent = HalfDiameter.x * fabs(Plane.n.x) + HalfDiameter.y * fabs(Plane.n.y) + HalfDiameter.z * fabs(Plane.n.z);
 
-	float Distance = ZEVector3::DotProduct(Plane.p - Center, Plane.n);
+	float Distance = ZEVector3::DotProduct(Center - Plane.p, Plane.n);
 
 	if (Distance - Extent > 0)
 		return ZE_HS_POSITIVE_SIDE;
 	else if (Distance + Extent < 0)
 		return ZE_HS_NEGATIVE_SIDE;
 	else
-		ZE_HS_INTERSECTS;
+		return ZE_HS_INTERSECTS;
 }
 
 void ZEAABBox::GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)
@@ -346,7 +346,7 @@ bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& Bo
 	if (BoundingBox1.Min.z > BoundingBox2.Max.z || BoundingBox2.Min.z > BoundingBox1.Max.z)
 		return false;
 
-	return false;
+	return true;
 }
 
 bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& BoundingBox2)

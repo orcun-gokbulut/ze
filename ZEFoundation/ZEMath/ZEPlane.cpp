@@ -51,10 +51,6 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &
 	if (fabs(D) < ZE_ZERO_TRESHOLD) 
 	{
 		return false;
-       /* if (N == 0)
-            return ZE_PI_ON_PLANE;
-        else
-            return ZE_PI_PARALLEL;*/
     }
 
     t = N / D;
@@ -71,19 +67,13 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELineSegment& LineSe
 	float N = -ZEVector3::DotProduct(Plane.n, w);
 
 	if (fabs(D) < ZE_ZERO_TRESHOLD) 
-	{
-       /* if (N == 0)
-            return ZE_PI_ON_PLANE;
-        else
-            return ZE_PI_PARALLEL;*/
 		return false;
-    }
 
     t = N / D;
-    if (t < 0 || t >= 1)
-        return true;
+    if (t < 0.0f || t >= LineSegment.Length)
+        return false;
 
-	return false;
+	return true;
 }
 
 bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t)
@@ -96,13 +86,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t)
 	float N = -ZEVector3::DotProduct(Plane.n, w);
 
 	if (fabs(D) < ZE_ZERO_TRESHOLD) 
-	{
-       /* if (N == 0)
-            return ZE_PI_ON_PLANE;
-        else
-            return ZE_PI_PARALLEL;*/
 		return false;
-    }
 
     t = N / D;
     if (t >=0)
@@ -147,12 +131,12 @@ ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane Plane, const ZEVector3 Point)
 
 float ZEPlane::DistanceSigned(const ZEPlane& Plane, const ZEVector3& Point)
 {
-	return fabs(ZEVector3::DotProduct(Plane.p - Point, Plane.n));
+	return ZEVector3::DotProduct(Point - Plane.p, Plane.n);
 }
 
 float ZEPlane::Distance(const ZEPlane& Plane, const ZEVector3& Point)
 {
-	return ZEVector3::DotProduct(Plane.p - Point, Plane.n);
+	return  fabs(ZEVector3::DotProduct(Point - Plane.p, Plane.n));
 }
 
 inline void ZEPlane::Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p)

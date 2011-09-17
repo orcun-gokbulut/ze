@@ -87,13 +87,13 @@ ZEVector3 ZEOBBox::GetEdge(unsigned char Index) const
 	}
 }
 
-void ZEOBBox::CreateFromOrientation(ZEOBBox& BoundingBox, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale)
+void ZEOBBox::CreateFromOrientation(ZEOBBox& BoundingBox, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Size)
 {
 	BoundingBox.Center = Position;
 	ZEQuaternion::VectorProduct(BoundingBox.Right, Rotation, ZEVector3::UnitX);
 	ZEQuaternion::VectorProduct(BoundingBox.Up, Rotation, ZEVector3::UnitY);
 	ZEQuaternion::VectorProduct(BoundingBox.Front, Rotation, ZEVector3::UnitZ);
-	BoundingBox.HalfSize = Scale;
+	BoundingBox.HalfSize = Size * 0.5f;
 }
 
 void ZEOBBox::Transform(ZEOBBox& Output, const ZEMatrix4x4& Matrix, const ZEOBBox& Input)
@@ -117,14 +117,14 @@ ZEHalfSpace ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEPlane&
 		BoundingBox.HalfSize.x * fabs(ZEVector3::DotProduct(Plane.n, BoundingBox.Right)) +
 		BoundingBox.HalfSize.y * fabs(ZEVector3::DotProduct(Plane.n, BoundingBox.Up)) +
 		BoundingBox.HalfSize.z * fabs(ZEVector3::DotProduct(Plane.n, BoundingBox.Front));
-	float Distance = ZEVector3::DotProduct(Plane.p - BoundingBox.Center, Plane.n);
+	float Distance = ZEVector3::DotProduct(BoundingBox.Center - Plane.p, Plane.n);
 
 	if (Distance - Extent > 0)
 		return ZE_HS_POSITIVE_SIDE;
 	else if (Distance + Extent < 0)
 		return ZE_HS_NEGATIVE_SIDE;
 	else
-		ZE_HS_INTERSECTS;
+		return ZE_HS_INTERSECTS;
 }
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEVector3 Point)
@@ -172,9 +172,15 @@ static inline int SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal
 	{
 		float t1 = (e + HalfSize) / f;
 		float t2 = (e - HalfSize) / f;
-		if (t1 > t2) CheckSwap(t1, t2);
-		if (t1 > TMin) TMin = t1;
-		if (t2 < TMax) TMax = t2;
+		if (t1 > t2) 
+			CheckSwap(t1, t2);
+
+		if (t1 > TMin) 
+			TMin = t1;
+
+		if (t2 < TMax) 
+			TMax = t2;
+
 		if (TMin > TMax)
 			return 0;
 
@@ -200,16 +206,16 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELine& Line, f
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax)
 {
-	float TempTMin = FLT_MAX;
-	float TempTMax = FLT_MIN;
+	float TempTMin = -FLT_MAX;
+	float TempTMax = FLT_MAX;
 
-	if (!SlabTest(BoundingBox.Center, BoundingBox.Right, BoundingBox.HalfSize.x, &Line, TempTMin, TempTMax))
+	if (SlabTest(BoundingBox.Center, BoundingBox.Right, BoundingBox.HalfSize.x, &Line, TempTMin, TempTMax) == 0)
 		return false;
 
-	if (!SlabTest(BoundingBox.Center, BoundingBox.Up, BoundingBox.HalfSize.y, &Line, TempTMin, TempTMax))
+	if (SlabTest(BoundingBox.Center, BoundingBox.Up, BoundingBox.HalfSize.y, &Line, TempTMin, TempTMax) == 0)
 		return false;
 
-	if (!SlabTest(BoundingBox.Center, BoundingBox.Front, BoundingBox.HalfSize.z, &Line, TempTMin, TempTMax))
+	if (SlabTest(BoundingBox.Center, BoundingBox.Front, BoundingBox.HalfSize.z, &Line, TempTMin, TempTMax) == 0)
 		return false;
 
 	TMin = TempTMin;
@@ -218,16 +224,16 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELine& Line, f
 	return true;
 }
 
-bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Line)
+bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray)
 {
 	float Temp;
-	return IntersectionTest(BoundingBox, Line, Temp, Temp);
+	return IntersectionTest(BoundingBox, Ray, Temp, Temp);
 }
 
-bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Line, float& TMin)
+bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray, float& TMin)
 {
 	float Temp;
-	return IntersectionTest(BoundingBox, Line, TMin, Temp);
+	return IntersectionTest(BoundingBox, Ray, TMin, Temp);
 }
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray, float& TMin, float& TMax)
@@ -256,7 +262,7 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray, flo
 	if (Result == 1 && TempTMax < 0.0f)
 		return false;
 
-	if (TMin > 0.0f)
+	if (TempTMin > 0.0f)
 	{
 		TMin = TempTMin;
 		TMax = TempTMax;
@@ -269,24 +275,26 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray, flo
 	return true;
 }
 
-bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& Line)
+bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& LineSegment)
 {
 	float Temp;
-	return IntersectionTest(BoundingBox, Line, Temp, Temp);
+	return IntersectionTest(BoundingBox, LineSegment, Temp, Temp);
 }
 
-bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& Line, float& TMin)
+bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin)
 {
 	float Temp;
-	return IntersectionTest(BoundingBox, Line, TMin, Temp);
+	return IntersectionTest(BoundingBox, LineSegment, TMin, Temp);
 }
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax)
 {
-	float TempTMin = FLT_MAX;
-	float TempTMax = FLT_MIN;
+	float TempTMin = -FLT_MAX;
+	float TempTMax = FLT_MAX;
 
 	int Result = SlabTest(BoundingBox.Center, BoundingBox.Right, BoundingBox.HalfSize.x, &LineSegment, TempTMin, TempTMax);
+
+	if(Result == 0)
 		return false;
 	
 	if (Result == 2)
@@ -294,6 +302,8 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& 
 			return false;
 
 	Result = SlabTest(BoundingBox.Center, BoundingBox.Up, BoundingBox.HalfSize.y, &LineSegment, TempTMin, TempTMax);
+
+	if(Result == 0)
 		return false;
 
 	if (Result == 2)
@@ -301,13 +311,15 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& 
 			return false;
 
 	Result = SlabTest(BoundingBox.Center, BoundingBox.Front, BoundingBox.HalfSize.z, &LineSegment, TempTMin, TempTMax);
+
+	if(Result == 0)
 		return false;
 
 	if (Result == 2)
 		if (TempTMax < 0.0f || TempTMax > 1.0f)
 			return false;
 
-	if (TMin > 0.0f)
+	if (TempTMin > 0.0f)
 	{
 		TMin = TempTMin;
 		TMax = TempTMax;
@@ -317,8 +329,22 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& 
 		TMin = TMax = TempTMax;
 	}
 
-	return true;
+	if(TMax > LineSegment.Length)
+		TMax = TMin;
 
+	if(TMin > LineSegment.Length)
+	{
+		TMin = TMax;
+		return false;
+	}
+
+	if(TMax < 0.0f)
+	{
+		TMax = TMin;
+		return false;
+	}
+
+	return true;
 }
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEBSphere& BoundingSphere)
@@ -350,7 +376,7 @@ ZEOBBox::ZEOBBox(const ZEVector3& Center, const ZEVector3& Right, const ZEVector
 	this->HalfSize = HalfSize;
 }
 
-ZEOBBox::ZEOBBox(const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale)
+ZEOBBox::ZEOBBox(const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Size)
 {
-	CreateFromOrientation(*this, Position, Rotation, Scale);
+	CreateFromOrientation(*this, Position, Rotation, Size);
 }

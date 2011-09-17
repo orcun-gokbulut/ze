@@ -41,26 +41,19 @@
 
 #include <math.h>
 
-inline void ZELineSegment::Create(ZELine& Line, const ZEVector3& Start, const ZEVector3& End)
+inline void ZELineSegment::Create(ZELineSegment& LineSegment, const ZEVector3& Start, const ZEVector3& End)
 {
-	ZEVector3::Sub(Line.v, End, Start);
-	Line.p = Start;
+	ZEVector3::Sub(LineSegment.v, End, Start);
+	LineSegment.Length = LineSegment.v.Length();
+	LineSegment.v = LineSegment.v.Normalize();
+	LineSegment.p = Start;
 }
 
-void ZELineSegment::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p)
+void ZELineSegment::CreateParametric(ZELineSegment& LineSegment, const ZEVector3& v, const ZEVector3& p)
 {
-	Line.v = v;
-	Line.p = p;
-}
-
-float ZELineSegment::Length(const ZELineSegment& LineSegment)
-{
-	return ZEVector3::Length(LineSegment.v);
-}
-
-float ZELineSegment::GetLenght() const
-{
-	return ZEVector3::Length(this->v);
+	LineSegment.Length = v.Length();
+	LineSegment.v = v.Normalize();
+	LineSegment.p = p;
 }
 
 void ZELineSegment::GetSegmentStartPoint(ZEVector3& StartPoint) const
@@ -317,7 +310,7 @@ ZEVector3 ZELineSegment::GetPointOn(float TLineSegment) const
 	ZEVector3 Temp;
 	if (TLineSegment < 0.0f)
 		Temp = p;
-	else if (TLineSegment > 1.0f)
+	else if (TLineSegment > Length)
 		ZEVector3::Add(Temp, p, v);
 	else
 	{
