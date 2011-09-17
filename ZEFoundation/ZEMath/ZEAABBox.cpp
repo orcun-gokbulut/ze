@@ -39,6 +39,9 @@
 #include "ZERay.h"
 #include "ZELineSegment.h"
 #include "ZELine.h"
+#include "ZEMathDefinitions.h"
+
+#include <float.h>
 #include <math.h>
 
 ZEVector3 ZEAABBox::GetCenter() const
@@ -139,6 +142,44 @@ void ZEAABBox::GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABBox
 	OrientedBoundingBox.Front.z = 1.0f;
 }
 
+static inline void CheckSwap(float& a, float& b) 
+{
+	float Temp;
+	Temp = a;
+	a = b;
+	b = Temp;
+}
+
+static inline int SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal, float HalfSize, const ZELine* Line, float& TMin, float& TMax)
+{
+	float e = ZEVector3::DotProduct(PlaneNormal, Center - Line->p);
+	float f = ZEVector3::DotProduct(PlaneNormal, Line->v);
+
+	if (fabs(f) > ZE_ZERO_TRESHOLD)
+	{
+		float t1 = (e + HalfSize) / f;
+		float t2 = (e - HalfSize) / f;
+		if (t1 > t2) 
+			CheckSwap(t1, t2);
+
+		if (t1 > TMin) 
+			TMin = t1;
+
+		if (t2 < TMax) 
+			TMax = t2;
+
+		if (TMin > TMax)
+			return 0;
+
+		return 1;
+	}
+	else if (-e - HalfSize > 0 || -e + HalfSize < 0) // Ray is parallel but test whether line lies between planes.
+		return 0;
+
+	return 2;
+}
+
+
 bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEVector3& Point)
 {
 	return (BoundingBox.Min.x <= Point.x) && (BoundingBox.Max.x >= Point.x) &&
@@ -148,186 +189,153 @@ bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEVector3& Po
 
 bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line)
 {
-	float MinT, MaxT;
-	return IntersectionTest(BoundingBox, Line, MinT, MaxT);
+	float Temp;
+	return IntersectionTest(BoundingBox, Line, Temp, Temp);
 }
 
-bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& TMin)
 {
-	float MinT, MaxT;
-	return IntersectionTest(BoundingBox, Ray, MinT, MaxT);
+	float Temp;
+	return IntersectionTest(BoundingBox, Line, TMin, Temp);
 }
 
-bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax)
 {
-	float MinT, MaxT;
-	return IntersectionTest(BoundingBox, LineSegment, MinT, MaxT);
-}
+	float TempTMin = -FLT_MAX;
+	float TempTMax = FLT_MAX;
 
-bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& MinT, float& MaxT)
-{
-	bool TValid = false;
-
-	if (Line.v.x == 0)
-	{
-		if(Line.p.x < BoundingBox.Min.x || Line.p.x > BoundingBox.Max.x)
-			return false;
-	}
-	else
-	{
-		TValid = true;
-
-		MinT = (BoundingBox.Min.x - Line.p.x) / Line.v.x;
-		MaxT = (BoundingBox.Max.x - Line.p.x) / Line.v.x;
-
-		if (MinT > MaxT)
-		{
-			float TempT = MinT;
-			MinT = MaxT;
-			MaxT = TempT;
-		}
-	}
-
-	if (Line.v.y == 0)
-	{
-		if (Line.p.y < BoundingBox.Min.y || Line.p.y > BoundingBox.Max.y)
-			return false;
-	}
-	else
-	{
-		if (TValid)
-		{
-			float tMinT,tMaxT;
-
-			tMinT = (BoundingBox.Min.y - Line.p.y) / Line.v.y;
-			tMaxT = (BoundingBox.Max.y - Line.p.y) / Line.v.y;
-
-			if (tMinT > tMaxT)
-			{
-				float TempT = tMinT;
-				tMinT = tMaxT;
-				tMaxT = TempT;
-			}
-
-			if (MinT < tMinT)
-				MinT = tMinT;
-
-			if (MaxT > tMaxT)
-				MaxT = tMaxT;
-
-			if (MaxT > MinT)
-				return false;
-		}
-		else
-		{
-			TValid = true;
-
-			MinT = (BoundingBox.Min.y - Line.p.y) / Line.v.y;
-			MaxT = (BoundingBox.Max.y - Line.p.y) / Line.v.y;
-
-			if (MinT > MaxT)
-			{
-				float TempT = MinT;
-				MinT = MaxT;
-				MaxT = TempT;
-			}
-		}
-	}
-
-	if (Line.v.z == 0)
-	{
-		if (Line.p.y < BoundingBox.Min.y || Line.p.y > BoundingBox.Max.y)
-			return false;
-
-		if (TValid == false)
-		{
-			MinT = 0.0f;
-			MaxT = 0.0f;
-		}
-
-		return true;
-	}
-	else
-	{
-		if (TValid)
-		{
-			float tMinT,tMaxT;
-
-			tMinT = (BoundingBox.Min.z - Line.p.z) / Line.v.z;
-			tMaxT = (BoundingBox.Max.z - Line.p.z) / Line.v.z;
-
-			if (tMinT > tMaxT)
-			{
-				float TempT = tMinT;
-				tMinT = tMaxT;
-				tMaxT = TempT;
-			}
-
-			if (MinT < tMinT)
-				MinT = tMinT;
-
-			if (MaxT > tMaxT)
-				MaxT = tMaxT;
-
-			if (MaxT > MinT)
-				return false;
-			else
-				return true;
-		}
-		else
-		{
-			MinT = (BoundingBox.Min.y - Line.p.y) / Line.v.y;
-			MaxT = (BoundingBox.Max.y - Line.p.y) / Line.v.y;
-
-			if (MinT > MaxT)
-			{
-				float TempT = MinT;
-				MinT = MaxT;
-				MaxT = TempT;
-			}
-
-			return true;
-		}
-	}
-}
-
-bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray, float & MinT, float& MaxT)
-{
-	if (IntersectionTest(BoundingBox, (ZELine)Ray, MinT, MaxT))
-	{
-		if (MinT < 0.0f)
-		{
-			if (MaxT >= 0.0f)
-			{
-				MinT = 0;
-				return true;
-			}
-			else
-				return false;
-		}
-		else
-			return true;
-	}
-	else
+	ZEVector3 Center = BoundingBox.GetCenter();
+	if (SlabTest(Center, ZEVector3::UnitX, (BoundingBox.Max.x - BoundingBox.Min.x) * 0.5f, &Line, TempTMin, TempTMax) == 0)
 		return false;
+
+	if (SlabTest(Center, ZEVector3::UnitY, (BoundingBox.Max.y - BoundingBox.Min.y) * 0.5f, &Line, TempTMin, TempTMax) == 0)
+		return false;
+
+	if (SlabTest(Center, ZEVector3::UnitZ, (BoundingBox.Max.z - BoundingBox.Min.z) * 0.5f, &Line, TempTMin, TempTMax) == 0)
+		return false;
+
+	TMin = TempTMin;
+	TMax = TempTMax;
+
+	return true;
 }
 
-bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& MinT, float& MaxT)
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Line)
 {
-	if (ZEAABBox::IntersectionTest(BoundingBox, (ZELine)LineSegment, MinT, MaxT))
+	float Temp;
+	return IntersectionTest(BoundingBox, Line, Temp, Temp);
+}
+
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Line, float& TMin)
+{
+	float Temp;
+	return IntersectionTest(BoundingBox, Line, TMin, Temp);
+}
+
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray, float & TMin, float& TMax)
+{
+	float TempTMin = -FLT_MAX;
+	float TempTMax = FLT_MAX;
+
+	ZEVector3 Center = BoundingBox.GetCenter();
+	int Result = SlabTest(Center, ZEVector3::UnitX, (BoundingBox.Max.x - BoundingBox.Min.x) * 0.5f, &Ray, TempTMin, TempTMax);
+	if (Result == 0)
+		return false;
+
+	if (Result == 1 && TempTMax < 0.0f)
+		return false;
+
+	Result = SlabTest(Center, ZEVector3::UnitY, (BoundingBox.Max.y - BoundingBox.Min.y) * 0.5f, &Ray, TempTMin, TempTMax);
+	if (Result == 0)
+		return false;
+
+	if (Result == 1 && TempTMax < 0.0f)
+		return false;
+
+	Result = SlabTest(Center, ZEVector3::UnitZ, (BoundingBox.Max.z - BoundingBox.Min.z) * 0.5f, &Ray, TempTMin, TempTMax);
+	if (Result == 0)
+		return false;
+
+	if (Result == 1 && TempTMax < 0.0f)
+		return false;
+
+	if (TMin > 0.0f)
 	{
-		if (MinT < 0.0f)
-			MinT = 0.0f;
-		if (MaxT > 1.0f)
-			MaxT = 1.0f;
-
-		if (MinT > MaxT)
-			return false;
-
-		return true;
+		TMin = TempTMin;
+		TMax = TempTMax;
 	}
 	else
+	{
+		TMin = TMax = TempTMax;
+	}
+}
+
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& Line)
+{
+	float Temp;
+	return IntersectionTest(BoundingBox, Line, Temp, Temp);
+}
+
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& Line, float& TMin)
+{
+	float Temp;
+	return IntersectionTest(BoundingBox, Line, TMin, Temp);
+}
+
+bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax)
+{
+	float TempTMin = -FLT_MAX;
+	float TempTMax = FLT_MAX;
+
+	ZEVector3 Center = BoundingBox.GetCenter();
+	int Result = SlabTest(Center, ZEVector3::UnitX, (BoundingBox.Max.x - BoundingBox.Min.x) * 0.5f, &LineSegment, TempTMin, TempTMax);
+	if (Result == 0)
 		return false;
+
+	if (Result == 1 && TempTMax < 0.0f)
+		return false;
+
+	Result = SlabTest(Center, ZEVector3::UnitY, (BoundingBox.Max.y - BoundingBox.Min.y) * 0.5f, &LineSegment, TempTMin, TempTMax);
+	if (Result == 0)
+		return false;
+
+	if (Result == 1 && TempTMax < 0.0f)
+		return false;
+
+	Result = SlabTest(Center, ZEVector3::UnitZ, (BoundingBox.Max.z - BoundingBox.Min.z) * 0.5f, &LineSegment, TempTMin, TempTMax);
+	if (Result == 0)
+		return false;
+
+	if (Result == 2)
+		if (TempTMax < 0.0f && TempTMax > LineSegment.Length)
+			return false;
+
+	if (TempTMin > 0.0f)
+	{
+		TMin = TempTMin;
+		TMax = TempTMax;
+	}
+	else
+	{
+		TMin = TMax = TempTMax;
+	}
+
+	if(TMax > LineSegment.Length)
+		TMax = TMin;
+
+	if(TMin > LineSegment.Length)
+	{
+		TMin = TMax;
+		return false;
+	}
+
+	if(TMax < 0.0f)
+	{
+		TMax = TMin;
+		return false;
+	}
+
+	return true;
 }
 
 bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere)

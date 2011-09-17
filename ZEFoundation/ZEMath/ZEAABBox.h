@@ -62,11 +62,14 @@ class ZEAABBox
 
 		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZEVector3& Point);
 		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line);
-		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& MinT, float& MaxT);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& TMin);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELine& Line, float& TMin, float& TMax);
 		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray);
-		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZERay & Ray, float& MinT, float& MaxT);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZERay & Ray, float& TMin);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZERay & Ray, float& TMin, float& TMax);
 		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment);
-		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& MinT, float& MaxT);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin);
+		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& LineSegment, float& TMin, float& TMax);
 		
 		static bool					IntersectionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& BoundingBox2);
 		static bool					IntersectionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& BoundingBox2);
