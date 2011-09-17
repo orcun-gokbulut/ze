@@ -71,7 +71,7 @@ bool ZEWMIKSH::Callback(MSG* Message)
 				return false;
 			}
 			
-			if (Input.header.dwType != RIM_TYPEMOUSE && Input.header.hDevice != Device->DeviceHandle)
+			if (Input.header.dwType != RIM_TYPEMOUSE/* && Input.header.hDevice != Device->DeviceHandle*/)
 				return false;
 
 			Device->AxisState[ZE_IMA_HORIZANTAL_AXIS] += Input.data.mouse.lLastX;
@@ -128,7 +128,6 @@ ZEDWORD ZEWindowsInputMouseDevice::GetAxisCount()
 
 bool ZEWindowsInputMouseDevice::Initialize()
 {	
-
 	ZESystemMessageManager::GetInstance()->RegisterMessageHandler(MessageHandler);
 
 	memset(&ButtonState, 0, sizeof(ButtonState));

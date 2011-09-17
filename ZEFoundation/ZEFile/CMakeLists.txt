@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZETextureResource.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,31 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_TEXTURE_RESOURCE_H__
-#define __ZE_TEXTURE_RESOURCE_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZECore/ZEResource.h"
-#include "ZEFile/ZEResourceFile.h"
-#include "ZETexture.h"
-#include "ZETextureOptions.h"
+include_directories(
+	${PROJECT_SOURCE_DIR}
+	${CMAKE_SOURCE_DIR}/Source)
+	
+add_source (ZECompressedFile.cpp	Sources)
+add_source (ZECompressedFile.h		Sources ZESDK)
+add_source (ZEFile.cpp				Sources)
+add_source (ZEFile.h				Sources ZESDK)
+add_source (ZEFileCache.cpp			Sources)
+add_source (ZEFileCache.h			Sources ZESDK)
+add_source (ZEPack.cpp				Sources)
+add_source (ZEPack.h				Sources ZESDK)
+add_source (ZEResourceFile.cpp		Sources)
+add_source (ZEResourceFile.h		Sources ZESDK)
 
-class ZEFileCacheManager
-{
-	private:
-		//ZEArray<
-	public:
-		virtual void*						AddToCache();
-		virtual void*						GetFromCache();
-};
+add_library (ZEFile ${Sources})
 
-class ZETextureResource : public ZEResource
-{
-	public:
-		virtual ZETextureType				GetTextureType() const = 0;
-};
+target_link_libraries(ZEFile ZEFoundation ZECore)
 
-#endif
+set_property(TARGET ZEFile PROPERTY FOLDER "ZEFoundation")
 
-
-
-
+install (TARGETS ZEFile COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEFile)

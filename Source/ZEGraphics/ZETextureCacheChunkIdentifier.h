@@ -39,8 +39,8 @@
 #define __ZE_TEXTURE_CACHE_CHUNK_IDENTIFIER_H__
 
 #include "ZEGraphics/ZETextureOptions.h"
-#include "ZECore/ZEFile.h"
-#include "ZEDS/ZEFileCache.h"
+#include "ZEFile/ZEFile.h"
+#include "ZEFile/ZEFileCache.h"
 #include "ZEDefinitions.h"
 
 #include <stdio.h>

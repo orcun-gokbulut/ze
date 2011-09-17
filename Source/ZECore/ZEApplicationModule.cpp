@@ -47,16 +47,6 @@ ZEModuleDescription* ZEApplicationModule::ModuleDescription()
 	return &Desc;
 }
 
-bool ZEApplicationModule::GetEnabled()
-{
-	return true;
-}
-
-void ZEApplicationModule::SetEnabled(bool Enabled)
-{
-	
-}
-
 bool ZEApplicationModule::Initialize()
 {
 	return true;

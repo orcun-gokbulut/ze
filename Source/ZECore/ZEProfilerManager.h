@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureResource.h
+ Zinek Engine - ZEProfilerManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,31 +34,30 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_RESOURCE_H__
-#define __ZE_TEXTURE_RESOURCE_H__
+#ifndef __ZE_PROFILER_MANAGER__
+#define __ZE_PROFILER_MANAGER__
 
-#include "ZECore/ZEResource.h"
-#include "ZEFile/ZEResourceFile.h"
-#include "ZETexture.h"
-#include "ZETextureOptions.h"
+#include "ZEProfiler.h"
+#include "ZEDS/ZEArray.h"
 
-class ZEFileCacheManager
+class ZEProfilerManager
 {
-	private:
-		//ZEArray<
-	public:
-		virtual void*						AddToCache();
-		virtual void*						GetFromCache();
-};
+	friend class ZECore;
 
-class ZETextureResource : public ZEResource
-{
-	public:
-		virtual ZETextureType				GetTextureType() const = 0;
-};
+	friend class ZEProfiler;
 
+	protected:
+		ZEArray<ZEProfiler*>		Profilers;
+		ZEArray<ZEProfiler*>		Stack;
+
+									ZEProfilerManager(void);
+									~ZEProfilerManager(void);
+
+	public:
+		ZEProfiler*					GetProfiler(const ZEString& Name);
+		ZEProfiler*					GetProfilerForData(const ZEString& Name);
+		const ZEArray<ZEProfiler*>&	GetProfilers();
+
+		static ZEProfilerManager*	GetInstance();
+};
 #endif
-
-
-
-

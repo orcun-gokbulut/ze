@@ -37,9 +37,9 @@
 #ifndef __ZE_FILE_CACHE_H__
 #define __ZE_FILE_CACHE_H__
 
-#include "ZEArray.h"
 #include "ZETypes.h"
-#include "..\Source/ZECore/ZEFile.h"
+#include "ZEFile.h"
+#include "ZEDS/ZEArray.h"
 
 #include <stdio.h>
 

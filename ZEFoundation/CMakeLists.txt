@@ -42,9 +42,12 @@ include_directories(
 	${PROJECT_SOURCE_DIR}/../Include)
 
 include_directories (${PROJECT_SOURCE_DIR})
+
 add_subdirectory (ZEDS)
 add_subdirectory (ZEMath)
 add_subdirectory (ZESerialization)
+add_subdirectory (ZEStateMachine)
+add_subdirectory (ZEFile)
 
 add_source (ZETypes.h 				Sources ZESDK)
 add_source (ZETypes.cpp 			Sources)

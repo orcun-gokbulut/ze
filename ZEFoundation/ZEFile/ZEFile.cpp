@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEFile.h"
-#include "ZEDefinitions.h"
 #include "ZECore/ZEError.h"
 
 #include <stdarg.h>
@@ -46,15 +45,10 @@
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
 
-
-/////////////////////////////////////////////////////////////////////////
-////////////////////////		ZEFile		/////////////////////////////
-/////////////////////////////////////////////////////////////////////////
-
-
-ZEFile::ZEFile() : File(NULL), FileCursor(0)
+ZEFile::ZEFile()
 {
-	// Empty
+	File = NULL;
+	FileCursor = 0;
 }
 
 ZEFile::~ZEFile()

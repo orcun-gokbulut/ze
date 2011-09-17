@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureResource.h
+ Zinek Engine - ZEProfilerManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,50 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_TEXTURE_RESOURCE_H__
-#define __ZE_TEXTURE_RESOURCE_H__
+#include	"ZEProfilerManager.h"
+#include	<memory.h>
 
-#include "ZECore/ZEResource.h"
-#include "ZEFile/ZEResourceFile.h"
-#include "ZETexture.h"
-#include "ZETextureOptions.h"
-
-class ZEFileCacheManager
+ZEProfilerManager::ZEProfilerManager(void)
 {
-	private:
-		//ZEArray<
-	public:
-		virtual void*						AddToCache();
-		virtual void*						GetFromCache();
-};
+}
 
-class ZETextureResource : public ZEResource
+ZEProfilerManager::~ZEProfilerManager(void)
 {
-	public:
-		virtual ZETextureType				GetTextureType() const = 0;
-};
+}
 
-#endif
+ZEProfiler* ZEProfilerManager::GetProfiler(const ZEString& Name)
+{
+	if(Stack.GetSize() > 0)
+	{
+		for (size_t I = 0; I < Profilers.GetCount(); I++)
+			if (Stack.GetLastItem() == Profilers[I]->GetParent() && Profilers[I]->GetName() == Name)
+				return Profilers[I];
+	}
 
+	ZEProfiler* NewProfiler = new ZEProfiler();
+	Profilers.Add(NewProfiler);
+	Stack.Add(NewProfiler);
+	NewProfiler->SetName(Name);
+	NewProfiler->SetManager(this);
+	NewProfiler->SetParent(Stack.GetLastItem());
+	return NewProfiler;
+}
 
+const ZEArray<ZEProfiler*>& ZEProfilerManager::GetProfilers()
+{
+	return Profilers;
+}
 
+ZEProfilerManager* ZEProfilerManager::GetInstance()
+{
+	static ZEProfilerManager Manager;
+	return &Manager;
+}
+
+ZEProfiler* ZEProfilerManager::GetProfilerForData(const ZEString& Name)
+{
+	for (size_t I = 0; I < Profilers.GetCount(); I++)
+		if (Profilers[I]->GetName() == Name)
+			return Profilers[I];
+}
 

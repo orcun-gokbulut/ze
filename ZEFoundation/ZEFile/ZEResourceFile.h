@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureResource.h
+ Zinek Engine - ZEResourceFile.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,31 +34,62 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_RESOURCE_H__
-#define __ZE_TEXTURE_RESOURCE_H__
+#ifndef	__ZE_RESOURCE_FILE_H__
+#define __ZE_RESOURCE_FILE_H__
 
-#include "ZECore/ZEResource.h"
-#include "ZEFile/ZEResourceFile.h"
-#include "ZETexture.h"
-#include "ZETextureOptions.h"
+#include "ZESerialization/ZEUnserializer.h"
+#include "ZEFile.h"
 
-class ZEFileCacheManager
+class ZEPartialResourceFile;
+class ZEResourceFile : public ZEUnserializer
 {
-	private:
-		//ZEArray<
+	protected:
+		void*				File;
+		char				FileName[256];
+		size_t				FileCursor;
+
 	public:
-		virtual void*						AddToCache();
-		virtual void*						GetFromCache();
+
+		virtual bool		IsOpen();
+		const char*			GetFileName();
+		void*				GetFileHandle();
+
+		virtual bool		Open(const char* FileName);
+		virtual bool		Seek(size_t Offset, ZESeekFrom Origin);
+		virtual size_t		Read(void* Buffer, size_t Size, size_t Count);
+		virtual size_t		FormatedRead(void* Buffer, size_t BufferSize, void* Format, ...);
+		virtual size_t		Tell();
+		virtual void		Close();
+		virtual bool		Eof();
+
+		void				GetPartialResourceFile(ZEPartialResourceFile& PartialResourceFile, size_t StartPosition, size_t EndPosition);
+		
+		static bool			ReadFile(const char* FileName, void* Buffer, size_t BufferSize);
+		static bool			ReadTextFile(const char* FileName, char* Buffer, size_t BufferSize);
+
+							ZEResourceFile();
+							~ZEResourceFile();
 };
 
-class ZETextureResource : public ZEResource
+class ZEPartialResourceFile : public ZEResourceFile
 {
+	friend class ZEResourceFile;
+	protected:
+		size_t				StartPosition;
+		size_t				EndPosition;
+		bool				IsEof;
+
 	public:
-		virtual ZETextureType				GetTextureType() const = 0;
+
+		virtual bool		Open(const char* FileName, size_t Offset, size_t Size);
+		virtual bool		Open(ZEFile* File, size_t Offset, size_t Size);
+		virtual void		Close();
+		virtual bool		Seek(size_t Offset, ZESeekFrom Origin);
+		virtual size_t		Read(void* Buffer, size_t Size, size_t Count);
+		virtual bool		Eof();
+		virtual size_t		Tell();
+
+							ZEPartialResourceFile();
 };
 
 #endif
-
-
-
-

@@ -58,22 +58,6 @@ enum ZEFileMode
 	ZE_FM_READ_APPEND		= 4,
 };
 
-
-////For formatted read however it does not work on CRT DLL
-//#ifdef _DLL
-//#error "In order to compile this code, /MT(d) instead of /MD(d) must be used.
-//#endif
-//
-//#ifdef _UNICODE
-//#define _tinput_l _winput_l
-//#else
-//#define _tinput_l _input_l
-//#endif 
-//
-//extern "C"
-//int __cdecl _tinput_l(FILE*, const TCHAR*, _locale_t, va_list);
-
-
 class ZEFile : public ZESerializer, public ZEUnserializer
 {
 	protected:
@@ -131,12 +115,7 @@ class ZEPartialFile : public ZEFile
 		size_t				EndPosition;
 		bool				IsEof;
 
-	public:
-
-							ZEPartialFile();
-		virtual				~ZEPartialFile();
-
-							
+	public:					
 		virtual bool		Open(ZEFile* ParentFile, size_t Offset, size_t Size);
 		virtual bool		Open(const ZEString FileName, ZEFileMode Mode, bool Binary);
 		virtual void		Close();
@@ -147,16 +126,14 @@ class ZEPartialFile : public ZEFile
 		virtual size_t		Write(void* Buffer, size_t Size, size_t Count);
 		virtual size_t		WriteFormated(const char* Format, ...);
 
-
-		/* If the seek operation tends to go beyond end position or below start position
-		the file cursor remains as it is and the return will be false */
 		virtual bool		Seek(int Offset, ZESeekFrom Origin);
 		virtual size_t		Tell();
 
 		virtual size_t		GetFileSize();
 		virtual bool		Eof();
 
-							
+							ZEPartialFile();
+		virtual				~ZEPartialFile();						
 };
 
 #endif

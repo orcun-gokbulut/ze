@@ -39,7 +39,7 @@
 
 #include "ZED3D9Shader.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEFileCache.h"
+#include "ZEFile/ZEFileCache.h"
 
 class ZED3D9ShaderManager
 {

@@ -68,7 +68,7 @@ void ZEModule::Deinitialize()
 
 ZEModule::ZEModule()
 {
-	Enabled = false;
+	Enabled = true;
 	Initialized = false;
 }
 

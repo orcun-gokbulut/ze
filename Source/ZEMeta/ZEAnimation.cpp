@@ -35,7 +35,7 @@
 
 #include "ZEAnimation.h"
 #include "ZEClass.h"
-#include "ZECore/ZEResourceFile.h"
+#include "ZEFile/ZEResourceFile.h"
 #include "ZETypes.h"
 #include "ZECore/ZEError.h"
 #include "ZESerialization/ZESerializer.h"

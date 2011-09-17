@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureResource.h
+ Zinek Engine - ZETransaction.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_TEXTURE_RESOURCE_H__
-#define __ZE_TEXTURE_RESOURCE_H__
+#include "ZETransaction.h"
+#include "ZEState.h"
 
-#include "ZECore/ZEResource.h"
-#include "ZEFile/ZEResourceFile.h"
-#include "ZETexture.h"
-#include "ZETextureOptions.h"
 
-class ZEFileCacheManager
+ZETransaction::ZETransaction()
 {
-	private:
-		//ZEArray<
-	public:
-		virtual void*						AddToCache();
-		virtual void*						GetFromCache();
-};
+}
 
-class ZETextureResource : public ZEResource
+ZETransaction::~ZETransaction()
 {
-	public:
-		virtual ZETextureType				GetTextureType() const = 0;
-};
+}
 
-#endif
+bool ZETransaction::Evaluates()
+{
+	return true;
+}
 
+ZEState* ZETransaction::GetFromState()
+{
+	return ZETransaction::FromState;
+}
 
+ZEState* ZETransaction::GetToState()
+{
+	return ZETransaction::ToState;
+}
 
+bool ZETransaction::Initialize(ZEState* From, ZEState* To)
+{
+	ZETransaction::FromState = From;
+	ZETransaction::ToState = To;
+	return true;
+}
 
+void ZETransaction::SetPriority(int Priority)
+{
+	ZETransaction::Priority = Priority;
+}
+
+int ZETransaction::GetPriority()
+{
+	return ZETransaction::Priority;
+}

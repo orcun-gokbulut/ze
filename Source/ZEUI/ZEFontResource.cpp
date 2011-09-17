@@ -40,7 +40,7 @@
 #include "ZECore/ZEResourceManager.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEError.h"
-#include "ZECore/ZEResourceFile.h"
+#include "ZEFile/ZEResourceFile.h"
 #include "ZEFontFile.h"
 
 ZEFontResource::ZEFontResource()

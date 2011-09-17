@@ -157,9 +157,6 @@ bool ZEComponent::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norm
 ZEComponent::ZEComponent()
 {
 	Owner = NULL;
-
-	Visible = true;
-	Enabled = true;
 }
 
 #include "ZEComponent.h.zpp"

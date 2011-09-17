@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureResource.h
+ Zinek Engine - ZECompressedFile.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,31 +34,88 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_RESOURCE_H__
-#define __ZE_TEXTURE_RESOURCE_H__
+#ifndef	__ZE_COMPRESSED_FILE_H__
+#define __ZE_COMPRESSED_FILE_H__
 
-#include "ZECore/ZEResource.h"
-#include "ZEFile/ZEResourceFile.h"
-#include "ZETexture.h"
-#include "ZETextureOptions.h"
+#include "ZETypes.h"
+#include "../Source/ZEDefinitions.h"
 
-class ZEFileCacheManager
+enum ZESeekFrom
 {
-	private:
-		//ZEArray<
-	public:
-		virtual void*						AddToCache();
-		virtual void*						GetFromCache();
+	ZE_SF_BEGINING	= 0,
+	ZE_SF_END		= 1,
+	ZE_SF_CURRENT	= 2,
 };
 
-class ZETextureResource : public ZEResource
+enum ZEFileMode
 {
+	ZE_FM_READ_ONLY			= 0,
+	ZE_FM_WRITE_ONLY		= 1,
+	ZE_FM_APPEND_ONLY		= 2,
+	ZE_FM_READ_WRITE		= 3,
+	ZE_FM_READ_APPEND		= 4,
+};
+
+
+class ZECompressedFile
+{
+	friend class ZEPartialCompressedFile;
+	protected:
+		void*				File;
+		char				FileName[256];
+		ZEQWORD				FileCursor;
+		
 	public:
-		virtual ZETextureType				GetTextureType() const = 0;
+		const char*			GetFileName() const;
+		void*				GetFileHandle() const;
+
+		virtual bool		Open(const char* FileName, ZEFileMode Mode = ZE_FM_READ_WRITE, bool Binary = true); 
+
+		virtual bool		Seek(ZEINT64 Offset, ZESeekFrom Origin);		
+
+		virtual ZEQWORD		Tell();										
+
+		virtual ZEQWORD		Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);				
+		virtual ZEQWORD		Write(const void* Buffer, ZEQWORD Size, ZEQWORD Count);	
+		
+		static ZEQWORD		GetFileSize(const char* FileName);
+		virtual ZEQWORD		GetFileSize();
+		
+		virtual void		Close();
+		virtual bool		Eof();
+
+		virtual void		Flush();
+		virtual bool		IsOpen();
+
+							ZECompressedFile();
+		virtual				~ZECompressedFile();
+};
+
+
+class ZEPartialCompressedFile : public ZECompressedFile
+{
+	protected:
+		ZEQWORD				StartPosition;
+		ZEQWORD				EndPosition;
+		bool				IsEof;
+		ZECompressedFile*	BaseFile;
+
+	public:
+		virtual bool		Open(ZECompressedFile* ParentFile, ZEQWORD Offset, ZEQWORD Size);
+		virtual bool		Open(const char* FileName, ZEFileMode Mode, bool Binary);
+		virtual void		Close();
+
+		virtual ZEQWORD		Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);
+		virtual ZEQWORD		Write(void* Buffer, ZEQWORD Size, ZEQWORD Count);
+
+		virtual bool		Seek(ZEINT64 Offset, ZESeekFrom Origin);
+		virtual ZEQWORD		Tell();
+
+		virtual ZEQWORD		GetFileSize();
+		virtual bool		Eof();				
+
+							ZEPartialCompressedFile();
+		virtual				~ZEPartialCompressedFile();
 };
 
 #endif
-
-
-
-

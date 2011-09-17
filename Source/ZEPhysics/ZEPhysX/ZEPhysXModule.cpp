@@ -80,8 +80,10 @@ NxCookingInterface* ZEPhysXModule::GetCookingInterface()
 
 bool ZEPhysXModule::Initialize()
 {
+	if (IsInitialized())
+		return false;
+
 	zeLog("PhysX Module", "Initializing PhysX module.");
-	Deinitialize();
 
 	PhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION, NULL, &OutputStream);
 	if(!PhysicsSDK)
@@ -114,6 +116,9 @@ bool ZEPhysXModule::Initialize()
 
 void ZEPhysXModule::Deinitialize()
 {
+	if (!IsInitialized())
+		return;
+
 	for (size_t I = 0; I < PhysicalWorlds.GetCount(); I++)
 		PhysicalWorlds[I]->Destroy();
 

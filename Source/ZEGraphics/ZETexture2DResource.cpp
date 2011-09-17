@@ -38,12 +38,12 @@
 #include "ZECore/ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEResourceManager.h"
-#include "ZECore/ZEResourceFile.h"
+#include "ZEFile/ZEResourceFile.h"
 #include "ZEGraphics/ZETextureLoader.h"
 #include "ZEGraphics/ZETextureTools.h"
 #include "ZEGraphics/ZETextureCacheChunkIdentifier.h"
 #include "ZERealTimeTextureCompressor.h"
-#include "ZEDS/ZEFileCache.h"
+#include "ZEFile/ZEFileCache.h"
 
 #include <sys/stat.h>
 #include <stdio.h>

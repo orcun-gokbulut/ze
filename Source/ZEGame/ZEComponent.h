@@ -64,11 +64,8 @@ class ZEComponent : public ZEEntity
 		ZEMatrix4x4						LocalTransform;
 		ZEMatrix4x4						WorldTransform;
 
-		ZEAABBox					LocalBoundingBox;
-		ZEAABBox					WorldBoundingBox;
-
-		bool							Enabled;
-		bool							Visible;
+		ZEAABBox						LocalBoundingBox;
+		ZEAABBox						WorldBoundingBox;
 
 	protected: 
 		void							SetLocalBoundingBox(const ZEAABBox& BoundingBox);

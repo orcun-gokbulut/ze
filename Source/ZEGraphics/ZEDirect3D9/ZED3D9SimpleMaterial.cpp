@@ -40,7 +40,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZEGraphics/ZERenderOrder.h"
 #include "ZEGraphics/ZECamera.h"
-#include "ZECore/ZEResourceFile.h"
+#include "ZEFile/ZEResourceFile.h"
 #include <D3D9.h>
 
 ZED3D9SimpleMaterial::ZED3D9SimpleMaterial()

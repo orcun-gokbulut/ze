@@ -118,8 +118,7 @@ add_source (ZETextureCacheChunkIdentifier.cpp		Sources)
 
 
 add_library (ZEGraphics ${Sources})
-target_link_libraries (ZEGraphics ATI_Compress_MT_VC8.lib)
-target_link_libraries (ZEGraphics freeimage.lib)
+target_link_libraries (ZEGraphics ZEFile ATI_Compress_MT_VC8.lib freeimage.lib)
 
 
 set_property(TARGET ZEGraphics PROPERTY FOLDER "Zinek Engine")

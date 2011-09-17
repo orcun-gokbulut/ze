@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureResource.h
+ Zinek Engine - ZEProfiler.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,31 +34,66 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_RESOURCE_H__
-#define __ZE_TEXTURE_RESOURCE_H__
+#ifndef __ZE_PROFILER_H__
+#define __ZE_PROFILER_H__
 
-#include "ZECore/ZEResource.h"
-#include "ZEFile/ZEResourceFile.h"
-#include "ZETexture.h"
-#include "ZETextureOptions.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 
-class ZEFileCacheManager
+class ZEProfilerManager;
+
+class ZEProfiler
 {
-	private:
-		//ZEArray<
-	public:
-		virtual void*						AddToCache();
-		virtual void*						GetFromCache();
-};
+	protected:
+		ZEString					Name;
+		ZEProfiler*					ParentProfiler;
+		ZEProfilerManager*			Manager;
 
-class ZETextureResource : public ZEResource
-{
+		ZEQWORD						StartTime;
+		ZEQWORD						EndTime;
+		ZEQWORD						PassedTime;
+
+		int 						TotalCount;
+		int							FrameCount;
+		int							TotalMinimumTime;
+		int							FrameMinimumTime;
+		int							TotalMaximumTime;
+		int							FrameMaximumTime;
+		int							TotalTime;
+		int							FrameTotalTime;
+		bool						ProfilerActive;
+
+
 	public:
-		virtual ZETextureType				GetTextureType() const = 0;
+		void						SetName(const ZEString& Name);
+		const ZEString&				GetName();
+
+		void						SetManager(ZEProfilerManager* Manager);
+
+		ZEProfiler*					GetParent();
+		void						SetParent(ZEProfiler* ParentProfiler);
+
+		void						Start();
+		void						Stop();
+
+		int							GetFrameCount();
+		int							GetFrameMinimumTime();
+		int							GetFrameMaximumTime();
+		int							GetFrameTotalTime();
+		int							GetFrameAverageTime();
+
+		int							GetTotalCount();
+		int							GetTotalMinimumTime();
+		int							GetTotalTime();
+		int							GetTotalAverageTime();
+		int							GetTotalMaximumTime();
+
+		void						ResetFrame();
+		void						ResetTotal();	
+
+									ZEProfiler(void);
+									~ZEProfiler(void);
 };
 
 #endif
-
-
-
-

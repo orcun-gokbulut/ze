@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZETextureResource.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,23 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_TEXTURE_RESOURCE_H__
-#define __ZE_TEXTURE_RESOURCE_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZECore/ZEResource.h"
-#include "ZEFile/ZEResourceFile.h"
-#include "ZETexture.h"
-#include "ZETextureOptions.h"
+add_source (ZEState.cpp				Sources)
+add_source (ZEState.h				Sources ZESDK)
+add_source (ZEStateMachine.cpp		Sources)
+add_source (ZEStateMachine.h		Sources ZESDK)
+add_source (ZETransaction.cpp		Sources)
+add_source (ZETransaction.h			Sources ZESDK)
 
-class ZEFileCacheManager
-{
-	private:
-		//ZEArray<
-	public:
-		virtual void*						AddToCache();
-		virtual void*						GetFromCache();
-};
+add_library (ZEState ${Sources})
 
-class ZETextureResource : public ZEResource
-{
-	public:
-		virtual ZETextureType				GetTextureType() const = 0;
-};
+target_link_libraries(ZEState ZEFoundation)
 
-#endif
+set_property(TARGET ZEState PROPERTY FOLDER "ZEFoundation")
 
-
-
-
+install (TARGETS ZEState COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
+install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEState)

@@ -45,9 +45,6 @@ class ZEApplicationModule : public ZEModule
 		virtual ZEModuleDescription*	GetModuleDescription();
 		static ZEModuleDescription*		ModuleDescription();
 
-		virtual	bool					GetEnabled();
-		virtual void					SetEnabled(bool Enabled);
-
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
 		virtual void					Destroy();

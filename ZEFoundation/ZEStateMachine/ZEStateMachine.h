@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECompressedFile.h
+ Zinek Engine - ZEStateMachine.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,100 +34,33 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_COMPRESSED_FILE_H__
-#define __ZE_COMPRESSED_FILE_H__
+#ifndef __ZE_STATE_MACHINE_H__
+#define	__ZE_STATE_MACHINE_H__
 
-#include "ZETypes.h"
-#include "../Source/ZEDefinitions.h"
+#include "ZETransaction.h"
+#include "ZEState.h"
+#include "ZEDS/ZEArray.h"
 
-enum ZESeekFrom
-{
-	ZE_SF_BEGINING	= 0,
-	ZE_SF_END		= 1,
-	ZE_SF_CURRENT	= 2,
-};
-
-enum ZEFileMode
-{
-	ZE_FM_READ_ONLY			= 0,
-	ZE_FM_WRITE_ONLY		= 1,
-	ZE_FM_APPEND_ONLY		= 2,
-	ZE_FM_READ_WRITE		= 3,
-	ZE_FM_READ_APPEND		= 4,
-};
-
-
-class ZECompressedFile
+class ZEStateMachine
 {
 	protected:
+		ZEArray<ZEState>			StateArray;
+		ZEArray<ZETransaction>		TransactionArray;
 
-		void*				File;
-		char				FileName[256];
-		
-	public:
-
-							ZECompressedFile();
-		virtual				~ZECompressedFile();
-
-		ZEQWORD				FileCursor;
-
-
-		const char*			GetFileName() const;
-		void*				GetFileHandle() const;
-
-		virtual bool		Open(const char* FileName, ZEFileMode Mode = ZE_FM_READ_WRITE, bool Binary = true); 
-
-		virtual bool		Seek(ZEINT64 Offset, ZESeekFrom Origin);		
-
-		virtual ZEQWORD		Tell();										
-
-		virtual ZEQWORD		Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);		
-		
-		virtual ZEQWORD		Write(const void* Buffer, ZEQWORD Size, ZEQWORD Count);	
-		
-		static ZEQWORD		GetFileSize(const char* FileName);
-		virtual ZEQWORD		GetFileSize();
-		
-		virtual void		Close();
-		virtual bool		Eof();
-
-		virtual void		Flush();
-		virtual bool		IsOpen();
-
-};
-
-
-class ZEPartialCompressedFile : public ZECompressedFile
-{
-	protected:
-
-		ZEQWORD				StartPosition;
-		ZEQWORD				EndPosition;
-		bool				IsEof;
-		ZECompressedFile*	BaseFile;
+		ZEState*					CurrentState;
 
 	public:
+		bool						AddTransaction(ZEState* From, ZEState* To, int Priority);
+		bool						AddState(ZEState* State);
+		bool						SetCurrentState(const ZEString& Name);
+		bool						Process();
 
-		ZEPartialCompressedFile();
-		virtual				~ZEPartialCompressedFile();
+		ZEState*					GetCurrentState();
+		ZEState*					GetState(ZEString Name);
 
-
-		virtual bool		Open(ZECompressedFile* ParentFile, ZEQWORD Offset, ZEQWORD Size);
-		virtual bool		Open(const char* FileName, ZEFileMode Mode, bool Binary);
-		virtual void		Close();
-
-		virtual ZEQWORD		Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);
-
-		virtual ZEQWORD		Write(void* Buffer, ZEQWORD Size, ZEQWORD Count);
-
-
-		/* If the seek operation tends to go beyond end position or below start position
-		the file cursor remains as it is and the return will be false */
-		virtual bool		Seek(ZEINT64 Offset, ZESeekFrom Origin);
-		virtual ZEQWORD		Tell();
-
-		virtual ZEQWORD		GetFileSize();
-		virtual bool		Eof();				
+		
+									ZEStateMachine(void);
+									~ZEStateMachine(void);
 };
 
 #endif
