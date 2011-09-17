@@ -298,7 +298,7 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& 
 		return false;
 	
 	if (Result == 2)
-		if (TempTMax < 0.0f || TempTMax > 1.0f)
+		if (TempTMax < 0.0f && TempTMax > LineSegment.Length)
 			return false;
 
 	Result = SlabTest(BoundingBox.Center, BoundingBox.Up, BoundingBox.HalfSize.y, &LineSegment, TempTMin, TempTMax);
@@ -307,7 +307,7 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& 
 		return false;
 
 	if (Result == 2)
-		if (TempTMax < 0.0f || TempTMax > 1.0f)
+		if (TempTMax < 0.0f && TempTMax > LineSegment.Length)
 			return false;
 
 	Result = SlabTest(BoundingBox.Center, BoundingBox.Front, BoundingBox.HalfSize.z, &LineSegment, TempTMin, TempTMax);
@@ -316,7 +316,7 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& 
 		return false;
 
 	if (Result == 2)
-		if (TempTMax < 0.0f || TempTMax > 1.0f)
+		if (TempTMax < 0.0f && TempTMax > LineSegment.Length)
 			return false;
 
 	if (TempTMin > 0.0f)
