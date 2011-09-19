@@ -261,10 +261,15 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEAABBox
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEOBBox& BoundingBox)
 {
+	ZEVector3 Translation = BoundingSphere.Position - BoundingBox.Center;
+	ZEVector3 LocalPosition = BoundingSphere.Position - Translation;
+	
 	ZEVector3 NewPoint;
-	NewPoint.x = ZEVector3::DotProduct(BoundingSphere.Position, BoundingBox.Right);
-	NewPoint.y = ZEVector3::DotProduct(BoundingSphere.Position, BoundingBox.Up);
-	NewPoint.z = ZEVector3::DotProduct(BoundingSphere.Position, BoundingBox.Front);
+	NewPoint.x = ZEVector3::DotProduct(LocalPosition, BoundingBox.Right);
+	NewPoint.y = ZEVector3::DotProduct(LocalPosition, BoundingBox.Up);
+	NewPoint.z = ZEVector3::DotProduct(LocalPosition, BoundingBox.Front);
+
+	NewPoint += Translation;
 
 	ZEVector3 e = (BoundingBox.Center - BoundingBox.HalfSize - NewPoint).ClampLower(0.0f) + 
 		(NewPoint - BoundingBox.Center + BoundingBox.HalfSize).ClampLower(0.0f);

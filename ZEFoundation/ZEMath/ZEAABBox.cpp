@@ -292,15 +292,17 @@ bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment
 	if (Result == 0)
 		return false;
 
-	if (Result == 1 && TempTMax < 0.0f)
-		return false;
+	if (Result == 2)
+		if (TempTMax < 0.0f && TempTMax > LineSegment.Length)
+			return false;
 
 	Result = SlabTest(Center, ZEVector3::UnitY, (BoundingBox.Max.y - BoundingBox.Min.y) * 0.5f, &LineSegment, TempTMin, TempTMax);
 	if (Result == 0)
 		return false;
 
-	if (Result == 1 && TempTMax < 0.0f)
-		return false;
+	if (Result == 2)
+		if (TempTMax < 0.0f && TempTMax > LineSegment.Length)
+			return false;
 
 	Result = SlabTest(Center, ZEVector3::UnitZ, (BoundingBox.Max.z - BoundingBox.Min.z) * 0.5f, &LineSegment, TempTMin, TempTMax);
 	if (Result == 0)
