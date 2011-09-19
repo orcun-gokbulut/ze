@@ -727,6 +727,7 @@ void ZECanvas::Clean()
 	Scale = ZEVector3::One;
 	TransformationStack.Clear();
 	Transformation = ZEMatrix4x4::Identity;
+	Rotation = ZEQuaternion::Identity;
 
 	Vertices.Clear();
 }
