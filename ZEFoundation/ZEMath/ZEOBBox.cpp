@@ -329,7 +329,7 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& 
 		TMin = TMax = TempTMax;
 	}
 
-	if(TMax > LineSegment.Length)
+	if(TMax > LineSegment.Length) // Fazlalıkları çıkart
 		TMax = TMin;
 
 	if(TMin > LineSegment.Length)

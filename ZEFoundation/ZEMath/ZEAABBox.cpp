@@ -259,7 +259,7 @@ bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray, f
 	if (Result == 1 && TempTMax < 0.0f)
 		return false;
 
-	if (TMin > 0.0f)
+	if (TempTMin > 0.0f)
 	{
 		TMin = TempTMin;
 		TMax = TempTMax;

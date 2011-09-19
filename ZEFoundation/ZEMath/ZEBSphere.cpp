@@ -194,6 +194,9 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& R
 		MaxT = s - q;
 	}
 
+	if(MaxT < 0.0f)
+		MaxT = MinT;
+
 	return true;
 }
 
@@ -261,23 +264,22 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEAABBox
 
 bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEOBBox& BoundingBox)
 {
-	ZEVector3 Translation = BoundingSphere.Position - BoundingBox.Center;
-	ZEVector3 LocalPosition = BoundingSphere.Position - Translation;
+	ZEVector3 LocalPosition = BoundingSphere.Position - BoundingBox.Center;
 	
 	ZEVector3 NewPoint;
 	NewPoint.x = ZEVector3::DotProduct(LocalPosition, BoundingBox.Right);
 	NewPoint.y = ZEVector3::DotProduct(LocalPosition, BoundingBox.Up);
 	NewPoint.z = ZEVector3::DotProduct(LocalPosition, BoundingBox.Front);
 
-	NewPoint += Translation;
+	//NewPoint += Translation;
 
-	ZEVector3 e = (BoundingBox.Center - BoundingBox.HalfSize - NewPoint).ClampLower(0.0f) + 
-		(NewPoint - BoundingBox.Center + BoundingBox.HalfSize).ClampLower(0.0f);
+	ZEVector3 e = (-BoundingBox.HalfSize - NewPoint).ClampLower(0.0f) + 
+		(NewPoint - BoundingBox.HalfSize).ClampLower(0.0f);
 	float d = ZEVector3::DotProduct(e, e);
 	if (d > BoundingSphere.Radius * BoundingSphere.Radius)
 		return false;
 
-	return false;
+	return true;
 }
 
 ZEBSphere::ZEBSphere()
