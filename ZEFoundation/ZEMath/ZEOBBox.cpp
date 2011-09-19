@@ -357,9 +357,107 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox1, const ZEAABBox& Boun
 	return false;
 }
 
-bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox1, const ZEOBBox& BoundingBox2)
+static inline bool SperatingAxisTest(const ZEVector3& Axis, const ZEOBBox& A, const ZEOBBox& B)
 {
-	return false;
+	float dA = A.HalfSize.x *  fabs(ZEVector3::DotProduct(A.Right, Axis)) +
+		A.HalfSize.y *  fabs(ZEVector3::DotProduct(A.Up, Axis)) +
+		A.HalfSize.z *  fabs(ZEVector3::DotProduct(A.Front, Axis));
+
+	float dB = B.HalfSize.x *  fabs(ZEVector3::DotProduct(B.Right, Axis)) +
+		B.HalfSize.y *  fabs(ZEVector3::DotProduct(B.Up, Axis)) +
+		B.HalfSize.z *  fabs(ZEVector3::DotProduct(B.Front, Axis));
+
+	return fabs(ZEVector3::DotProduct(ZEVector3(A.Center, B.Center), Axis)) > (dA + dB); 
+}
+
+bool ZEOBBox::IntersectionTest(const ZEOBBox& A, const ZEOBBox& B)
+{
+	ZEVector3 BRelCenter;
+	BRelCenter.x = fabs(ZEVector3::DotProduct(A.Right, B.Center));
+	BRelCenter.y = fabs(ZEVector3::DotProduct(A.Up, B.Center));
+	BRelCenter.z = fabs(ZEVector3::DotProduct(A.Front, B.Center));
+
+	ZEVector3 BRelRight;
+	BRelRight.x = fabs(ZEVector3::DotProduct(A.Right, B.Right));
+	BRelRight.y = fabs(ZEVector3::DotProduct(A.Up, B.Right));
+	BRelRight.z = fabs(ZEVector3::DotProduct(A.Front, B.Right));
+
+	ZEVector3 BRelUp;
+	BRelUp.x = fabs(ZEVector3::DotProduct(A.Right, B.Up));
+	BRelUp.y = fabs(ZEVector3::DotProduct(A.Up, B.Up));
+	BRelUp.z = fabs(ZEVector3::DotProduct(A.Front, B.Up));
+
+	ZEVector3 BRelFront;
+	BRelFront.x = fabs(ZEVector3::DotProduct(A.Right, B.Front));
+	BRelFront.y = fabs(ZEVector3::DotProduct(A.Up, B.Front));
+	BRelFront.z = fabs(ZEVector3::DotProduct(A.Front, B.Front));
+
+	ZEVector3 t(A.Center, BRelCenter);
+
+	// A vs B
+	float dA, dB;
+	dB = B.HalfSize.x * BRelRight.x +
+		B.HalfSize.y * BRelUp.x +
+		B.HalfSize.z * BRelFront.x;
+
+	if (fabs(t.x) <= A.HalfSize.x + dB)
+		return false;
+
+	dB = B.HalfSize.x * BRelRight.y +
+		B.HalfSize.y * BRelUp.y +
+		B.HalfSize.z * BRelFront.y;
+
+	if (fabs(t.y) <= A.HalfSize.y + dB)
+		return false;
+
+	dB = B.HalfSize.x * BRelRight.z +
+		B.HalfSize.y * BRelUp.z +
+		B.HalfSize.z * BRelFront.z;
+
+	if (fabs(t.z) <= A.HalfSize.z + dB)
+		return false;
+
+	// B vs A
+	dA = A.HalfSize.x * BRelRight.x +
+		B.HalfSize.y * BRelRight.y +
+		B.HalfSize.z * BRelRight.z;
+
+	if (fabs(ZEVector3::DotProduct(t, BRelRight)) <= B.HalfSize.x + dA)
+		return false;
+
+	dA = A.HalfSize.x *  BRelUp.x +
+		B.HalfSize.y *  BRelUp.y +
+		B.HalfSize.z *  BRelUp.z;
+
+	if (fabs(ZEVector3::DotProduct(t, BRelUp)) <= B.HalfSize.y + dA)
+		return false;
+
+	dA = A.HalfSize.x *  BRelFront.x +
+		B.HalfSize.y * BRelFront.y +
+		B.HalfSize.z * BRelFront.z;
+
+	if (fabs(ZEVector3::DotProduct(t, BRelFront)) <= B.HalfSize.z + dA)
+		return false;
+
+	if (!SperatingAxisTest(A.Right, A, B))
+		return false;
+
+	if (!SperatingAxisTest(A.Up, A, B))
+		return false;
+
+	if (!SperatingAxisTest(A.Front, A, B))
+		return false;
+
+	if (!SperatingAxisTest(B.Right, A, B))
+		return false;
+
+	if (!SperatingAxisTest(B.Up, A, B))
+		return false;
+
+	if (!SperatingAxisTest(B.Front, A, B))
+		return false;
+
+	return true;
 }
 
 ZEOBBox::ZEOBBox()
