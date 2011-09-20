@@ -50,7 +50,8 @@ const ZETexture2D* ZEDirectionalLight::GetShadowMap()
 
 const ZEViewVolume& ZEDirectionalLight::GetViewVolume()
 {
-	ViewVolume.Create(GetWorldPosition(), GetDirection(), GetRange());
+	//ViewVolume.Create(GetWorldPosition(), GetDirection(), GetRange());
+	ZEViewCuboid ViewVolume;
 	return ViewVolume;
 }
 

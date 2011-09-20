@@ -71,8 +71,11 @@ class ZEViewVolume
 	public:
 		virtual ZEViewVolumeType			GetViewVolumeType() const = 0;
 
-		virtual bool						LightCullTest(ZELight* Light) const = 0;
+		virtual bool						CullTest(const ZEBSphere& BoundingBox) const = 0;
 		virtual bool						CullTest(const ZEAABBox& BoundingBox) const = 0;
+		virtual bool						CullTest(const ZEOBBox& BoundingBox) const = 0;
+
+		virtual bool						CullTest(ZELight* Light) const = 0;
 		virtual bool						CullTest(ZEEntity* Entity) const = 0;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const = 0;
 };
@@ -92,16 +95,14 @@ class ZEViewFrustum : public ZEViewVolume
 		ZEPlane								FarClippingPlane;
 		ZEPlane								NearClippingPlane;
 
-
-		bool								ConeCullTest(const ZEBSphere& BoundingSphere) const;
-		virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
-		virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
-
 	public:
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 
-		virtual bool						LightCullTest(ZELight* Light) const;
 		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
+
+		virtual bool						CullTest(ZELight* Light) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
@@ -112,14 +113,17 @@ class ZEViewFrustum : public ZEViewVolume
 class ZEViewSphere : public ZEViewVolume
 {
 	private:
-		ZEBSphere					BoundingSphere;
+		ZEBSphere							Sphere;
 		float								NearZ;
 
 	public:
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 
-		virtual bool						LightCullTest(ZELight* Light) const;
+		virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
 		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
+
+		virtual bool						CullTest(ZELight* Light) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
@@ -130,13 +134,16 @@ class ZEViewHemiSphere : public ZEViewVolume
 {
 	private:
 		ZEPlane								HalfPlane;
-		ZEBSphere					BoundingSphere;
+		ZEBSphere							Sphere;
 
 	public:
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 
-		virtual bool						LightCullTest(ZELight* Light) const;
+		virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
 		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
+
+		virtual bool						CullTest(ZELight* Light) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
@@ -146,13 +153,16 @@ class ZEViewHemiSphere : public ZEViewVolume
 class ZEViewCuboid: public ZEViewVolume
 {
 	private:
-		ZEOBBox								BoundingBox;
+		ZEOBBox								Box;
 
 	public:
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 
-		virtual bool						LightCullTest(ZELight* Light) const;
+		virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
 		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
+		virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
+
+		virtual bool						CullTest(ZELight* Light) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
 
@@ -161,23 +171,6 @@ class ZEViewCuboid: public ZEViewVolume
 
 };
 
-class ZEViewPlane : public ZEViewVolume
-{
-	public:
-		ZEPlane								Plane;
-		float								MaxDistance;
-
-	public:
-		virtual ZEViewVolumeType			GetViewVolumeType() const;
-		
-		virtual bool						LightCullTest(ZELight* Light) const;
-		virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
-		virtual bool						CullTest(ZEEntity* Entity) const;
-		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;				
-
-		void								Create(const ZEVector3& Position, const ZEVector3& Direction, float MaxDistance);
-
-};
 #endif
 
 
