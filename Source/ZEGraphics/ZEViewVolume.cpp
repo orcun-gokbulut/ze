@@ -126,11 +126,69 @@ ZEDoorViewTest ZEViewFrustum::CullTest(const ZERectangle3D& PortalDoor) const
 	return ZE_DVT_INSIDE;
 }
 
+ZEArray<ZELineSegment> ZEViewFrustum::GetFrustumLineSegments()
+{
+	ZEArray<ZELineSegment> LineSegments;
+	float Fov_2 = Fov / 2;
+
+	ZEVector3 NearPlaneCenter = Position + (Look * NearZ);
+	ZEVector3 FarPlaneCenter = Position + (Look * FarZ);
+
+	float NearPlaneHeight = NearZ * tan(Fov_2);
+	float FarPlaneHeight = FarZ * tan(Fov_2);
+
+	float NearPlaneWidth = NearPlaneHeight * AspectRatio;
+	float FarPlaneWidth = FarPlaneHeight * AspectRatio;
+
+	ZEVector3 PN1, PN2, PN3, PN4, PF1, PF2, PF3, PF4;
+
+	PN1 = NearPlaneCenter - (Up * NearPlaneHeight) + (Right * NearPlaneWidth);
+	PN2 = NearPlaneCenter + (Up * NearPlaneHeight) + (Right * NearPlaneWidth);
+	PN3 = NearPlaneCenter + (Up * NearPlaneHeight) - (Right * NearPlaneWidth);
+	PN4 = NearPlaneCenter - (Up * NearPlaneHeight) - (Right * NearPlaneWidth);
+
+	PF1 = FarPlaneCenter - (Up * FarPlaneHeight) + (Right * FarPlaneWidth);
+	PF2 = FarPlaneCenter + (Up * FarPlaneHeight) + (Right * FarPlaneWidth);
+	PF3 = FarPlaneCenter + (Up * FarPlaneHeight) - (Right * FarPlaneWidth);
+	PF4 = FarPlaneCenter - (Up * FarPlaneHeight) - (Right * FarPlaneWidth);
+
+	LineSegments.Add(ZELineSegment(PN1, PN2));
+	LineSegments.Add(ZELineSegment(PN2, PN3));
+	LineSegments.Add(ZELineSegment(PN3, PN4));
+	LineSegments.Add(ZELineSegment(PN4, PN1));
+
+	LineSegments.Add(ZELineSegment(PF1, PF2));
+	LineSegments.Add(ZELineSegment(PF2, PF3));
+	LineSegments.Add(ZELineSegment(PF3, PF4));
+	LineSegments.Add(ZELineSegment(PF4, PF1));
+
+	LineSegments.Add(ZELineSegment(PN1, PF1));
+	LineSegments.Add(ZELineSegment(PN2, PF2));
+	LineSegments.Add(ZELineSegment(PN3, PF3));
+	LineSegments.Add(ZELineSegment(PN4, PF4));
+
+	LineSegments.Add(ZELineSegment(Position, PN2));
+	LineSegments.Add(ZELineSegment(Position, PN3));
+	LineSegments.Add(ZELineSegment(Position, PN4));
+	LineSegments.Add(ZELineSegment(Position, PN1));
+
+	return LineSegments;
+}
+
 void ZEViewFrustum::Create(const ZEVector3& Position, const ZEQuaternion& Rotation, float FOV, float AspectRatio, float NearZ, float FarZ)
 {
 	float SinFov = sinf(FOV/2);
 	float SinFovAT = SinFov * AspectRatio;
 	float CosFov = cosf(FOV/2);
+
+	Look = Rotation * ZEVector3::UnitZ;
+	Up = Rotation * ZEVector3::UnitY;
+	Right = Rotation * ZEVector3::UnitX;
+
+	this->NearZ = NearZ;
+	this->FarZ = FarZ;
+	this->Fov = FOV;
+	this->AspectRatio = AspectRatio;
 
 	ZEQuaternion::VectorProduct(TopClippingPlane.n, Rotation, ZEVector3(0.0f, -CosFov, SinFov));
 	ZEQuaternion::VectorProduct(BottomClippingPlane.n, Rotation, ZEVector3(0.0f, CosFov, SinFov));

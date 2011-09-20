@@ -43,6 +43,8 @@
 #include "ZEMath/ZEOBBox.h"
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZERectangle3D.h"
+#include "zeds/ZEArray.h"
+#include "ZEMath/ZELineSegment.h"
 
 enum ZEViewVolumeType
 {
@@ -88,6 +90,16 @@ class ZEViewFrustum : public ZEViewVolume
 		float								SinRatio;
 		float								TanRatio;
 
+		ZEVector3							Look;
+		ZEVector3							Right;
+		ZEVector3							Up;
+
+		float								NearZ;
+		float								FarZ;
+
+		float								Fov;
+		float								AspectRatio;
+
 		ZEPlane								LeftClippingPlane;
 		ZEPlane								RightClippingPlane;
 		ZEPlane								TopClippingPlane;
@@ -105,6 +117,8 @@ class ZEViewFrustum : public ZEViewVolume
 		virtual bool						CullTest(ZELight* Light) const;
 		virtual bool						CullTest(ZEEntity* Entity) const;
 		virtual ZEDoorViewTest				CullTest(const ZERectangle3D& PortalDoor) const;
+
+		ZEArray<ZELineSegment>				GetFrustumLineSegments();
 
 		void								Create(const ZEVector3& Position, const ZEQuaternion& Rotation, 
 												   float FOV, float AspectRatio, float NearZ, float FarZ);
