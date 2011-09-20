@@ -66,7 +66,7 @@ bool ZESceneCuller::CullLight(ZELight* Light, ZEDrawParameters* DrawParameters)
 
 	Statistics.VisibleLightCount++;
 
-	if (DrawParameters->ViewVolume->LightCullTest(Light))
+	if (DrawParameters->ViewVolume->CullTest(Light))
 	{
 		Statistics.CulledLightCount++;
 		return false;
