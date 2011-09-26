@@ -97,47 +97,5 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	zeCore->GetWindow()->SetWindowSize(zeCore->GetOptions()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger(), zeCore->GetOptions()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInteger());
 
  	zeCore->StartUp();
-	
-	//////////////////////////////////////////
-	///// ZED3D9TextureResizer TEST Start ////
-	//////////////////////////////////////////
-
-	ZEBitmap Input; 
-	Input.Load("TextureResizeTest\\Inputs\\CarterDiffuse.tga");
-	ZEBitmapSamplingOptions Options;
-	
-	unsigned int SrcWidth = Input.GetWidth();
-	unsigned int SrcHeight = Input.GetHeight();
-	unsigned int SrcPitch = Input.GetPitch();
-
-	unsigned char* InputBuffer =  new unsigned char[SrcHeight * SrcPitch];
-	Input.CopyTo(InputBuffer, SrcPitch, SrcWidth, SrcHeight);
-	Input.Release();
-
-	unsigned int DestWidth = SrcWidth / 2;
-	unsigned int DestHeight = SrcHeight /*/ 2*/;
-	unsigned int DestPitch = SrcPitch / 2;
-
-	unsigned char* OutputBuffer = new unsigned char[SrcHeight * DestPitch];
-
-	ZED3D9TextureResizer	Resizer;
-	Resizer.Initialize(OutputBuffer, DestPitch, DestWidth, DestHeight, 
-						InputBuffer, SrcPitch, SrcWidth, SrcHeight);
-	Resizer.SetAutoFitMode(ZE_D3D9_FPO2_AUTO);
-	Resizer.SetResizeFilter(ZE_D3D9_RF_KAISER);
-	Resizer.Process();
-
-	Resizer.Deinitialize();
-
-	ZEBitmap Output;
-	Output.Create(DestWidth, SrcHeight, 4);
-	Output.CopyFrom(OutputBuffer, DestPitch, DestWidth, SrcHeight);
-	Output.Save("TextureResizeTest\\2xDownsampled\\CarterDiffuse.tga", ZE_BFF_TGA);
-	Output.Release();
-
-	//////////////////////////////////////////
-	////// ZED3D9TextureResizer TEST End /////
-	//////////////////////////////////////////
-
 	zeCore->Run();
 }
