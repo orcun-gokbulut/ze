@@ -52,7 +52,7 @@ class ZETexture2D;
 class ZETexture2DResource;
 class ZEFixedMaterial : public ZEMaterial
 {
-	ZE_META_CLASS()
+	ZE_META_CLASS(ZEFixedMaterial)
 	protected:
 		unsigned int					OldMaterialComponents;
 		unsigned int					MaterialComponents;
