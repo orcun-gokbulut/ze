@@ -49,7 +49,7 @@
 class ZEMaterial;
 class ZETexture2D;
 class ZETexture2DResource;
-class ZEPortalMapResourceDoor;
+struct ZEPortalMapResourceDoor;
 
 struct ZEPortalMapPolygon
 {

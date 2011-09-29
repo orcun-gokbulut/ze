@@ -128,7 +128,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 
 		CurrentMaterial->SetBaseMap(ManageMapMaterialTextures(MaterialChunk.DiffuseMap));
 		
-		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_NORMAL_MAP);
+		CurrentMaterial->SetNormalMapEnabled((MaterialChunk.ShaderComponents & ZE_SHADER_NORMAL_MAP) != 0);
 		CurrentMaterial->SetNormalMap(ManageMapMaterialTextures(MaterialChunk.NormalMap));
 		CurrentMaterial->SetSpecularMap(ManageMapMaterialTextures(MaterialChunk.SpecularMap));
 		CurrentMaterial->SetEmmisiveMap(ManageMapMaterialTextures(MaterialChunk.EmmisiveMap));
@@ -141,7 +141,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEResourceFile* ResourceFile)
 		CurrentMaterial->SetReflectionEnabled(false);
 		CurrentMaterial->SetRefractionEnabled(false);
 
-		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZE_SHADER_LIGHT_MAP);
+		CurrentMaterial->SetLightMapEnabled((MaterialChunk.ShaderComponents & ZE_SHADER_LIGHT_MAP) != 0);
 		CurrentMaterial->SetLightMap(ManageMapMaterialTextures(MaterialChunk.LightMap));
 
 		CurrentMaterial->UpdateMaterial();
@@ -201,7 +201,6 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile,
 
 bool ZEPortalMapResource::ReadPortalsFromFile(ZEResourceFile* ResourceFile)
 {
-	ZEDWORD ChunkIdentifier;
 	ZEMapFilePortalChunk FilePortal;
 
 	for (size_t I = 0; I < Portals.GetCount(); I++)

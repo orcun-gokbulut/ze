@@ -42,7 +42,7 @@
 
 class ZEPortalMap;
 class ZEPortalMapDoor;
-class ZEPortalMapResourcePortal;
+struct ZEPortalMapResourcePortal;
 class ZEStaticVertexBuffer;
 class ZEPhysicalMesh;
 struct ZEDrawParameters;

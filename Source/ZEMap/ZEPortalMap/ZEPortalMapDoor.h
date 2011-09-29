@@ -41,7 +41,7 @@
 
 class ZEPortalMap;
 class ZEPortalMapPortal;
-class ZEPortalMapResourceDoor;
+struct ZEPortalMapResourceDoor;
 
 class ZEPortalMapDoor
 {
