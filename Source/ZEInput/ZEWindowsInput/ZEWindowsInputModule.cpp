@@ -109,7 +109,7 @@ bool ZEWindowsInputModule::Initialize()
 
 	int MouseIndex = 0;
 	int KeyboardIndex = 0;
-	for (int I = 0; I < DeviceList.GetCount(); I++)
+	for (size_t I = 0; I < DeviceList.GetCount(); I++)
 	{
 		if (DeviceList[I].dwType == RIM_TYPEMOUSE)
 		{
@@ -154,11 +154,11 @@ bool ZEWindowsInputModule::Initialize()
 		DeviceExtensions.Add(Extension);
 
 		ZEArray<ZEInputDevice*> ExtensionDevices = Extension->GetDevices();
-		for (int N = 0; N < ExtensionDevices.GetCount(); N++)
+		for (size_t N = 0; N < ExtensionDevices.GetCount(); N++)
 			Devices.Add(ExtensionDevices[N]);
 	}
 
-	for (int I = 0; I < Devices.GetCount(); I++)
+	for (size_t I = 0; I < Devices.GetCount(); I++)
 		Devices[I]->Initialize();
 
 	return ZEInputModule::Initialize();
@@ -185,11 +185,10 @@ void ZEWindowsInputModule::ProcessInputs()
 
 void ZEWindowsInputModule::ProcessInputMap(ZEInputMap* InputMap)
 {
-	ZEInputBinding* CurrInputBinding;
 	InputMap->InputActionCount = 0;
 
 	for (size_t I = 0; I < InputMap->InputBindings.GetCount(); I++)
-		for (int N = 0; N < Devices.GetCount(); N++)
+		for (size_t N = 0; N < Devices.GetCount(); N++)
 			if (Devices[N]->ProcessInputBinding(&InputMap->InputBindings[I], &InputMap->InputActions[InputMap->InputActionCount]))
 				InputMap->InputActionCount++;
 }

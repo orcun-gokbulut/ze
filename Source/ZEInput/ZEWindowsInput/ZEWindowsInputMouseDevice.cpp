@@ -77,11 +77,11 @@ bool ZEWMIKSH::Callback(MSG* Message)
 			Device->AxisState[ZE_IMA_HORIZANTAL_AXIS] += Input.data.mouse.lLastX;
 			Device->AxisState[ZE_IMA_VERTICAL_AXIS] += Input.data.mouse.lLastY;
 
-			Device->ButtonState[0] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN);
-			Device->ButtonState[1] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN);
-			Device->ButtonState[2] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN);
-			Device->ButtonState[3] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN);
-			Device->ButtonState[4] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN);
+			Device->ButtonState[0] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) != 0;
+			Device->ButtonState[1] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) != 0;
+			Device->ButtonState[2] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) != 0;
+			Device->ButtonState[3] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) != 0;
+			Device->ButtonState[4] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) != 0;
 			
 			if (Input.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
 				Device->AxisState[2] += *((SHORT*)&Input.data.mouse.usButtonData);
