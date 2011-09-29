@@ -128,6 +128,7 @@ class ZEViewSphere : public ZEViewVolume
 {
 	private:
 		ZEBSphere							Sphere;
+	public: //Change to private
 		float								NearZ;
 
 	public:

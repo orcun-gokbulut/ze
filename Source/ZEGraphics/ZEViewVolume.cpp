@@ -231,7 +231,7 @@ ZEViewVolumeType ZEViewSphere::GetViewVolumeType() const
 
 bool ZEViewSphere::CullTest(const ZEBSphere& BoundingSphere) const
 {
-	return !ZEBSphere::IntersectionTest(BoundingSphere, BoundingSphere);
+	return !ZEBSphere::IntersectionTest(Sphere, BoundingSphere);
 }
 
 bool ZEViewSphere::CullTest(const ZEAABBox& BoundingBox) const
@@ -283,17 +283,26 @@ ZEViewVolumeType ZEViewHemiSphere::GetViewVolumeType() const
 
 bool ZEViewHemiSphere::CullTest(const ZEBSphere& BoundingSphere) const
 {
-	return !ZEBSphere::IntersectionTest(BoundingSphere, HalfPlane) || !ZEBSphere::IntersectionTest(Sphere, BoundingSphere);
+	if(ZEBSphere::IntersectionTest(BoundingSphere, HalfPlane) != ZE_HS_NEGATIVE_SIDE)
+		return !ZEBSphere::IntersectionTest(Sphere, BoundingSphere);
+
+	return true;
 }
 
 bool ZEViewHemiSphere::CullTest(const ZEAABBox& BoundingBox) const
 {
-	return !ZEAABBox::IntersectionTest(BoundingBox, HalfPlane) || !ZEBSphere::IntersectionTest(Sphere, BoundingBox);
+	if(ZEAABBox::IntersectionTest(BoundingBox, HalfPlane) != ZE_HS_NEGATIVE_SIDE)
+		return !ZEBSphere::IntersectionTest(Sphere, BoundingBox);
+
+	return true;
 }
 
 bool ZEViewHemiSphere::CullTest(const ZEOBBox& BoundingBox) const
 {
-	return !ZEOBBox::IntersectionTest(BoundingBox, HalfPlane) || !ZEBSphere::IntersectionTest(Sphere, BoundingBox);
+	if (ZEOBBox::IntersectionTest(BoundingBox, HalfPlane) != ZE_HS_NEGATIVE_SIDE)
+		return !ZEBSphere::IntersectionTest(Sphere, BoundingBox);
+
+	return true;
 }
 
 bool ZEViewHemiSphere::CullTest(ZEEntity* Entity) const
