@@ -305,7 +305,7 @@ ZEParticleSystem::ZEParticleSystem()
 	RenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();
 	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	IsVertexBufferUpdated = false;
-	BillboardType = ZEParticleBillboardType::ZE_PBT_VIEWPLANE_ORIENTED;
+	BillboardType = ZE_PBT_VIEWPLANE_ORIENTED;
 	ParticleMaterial = ZEFixedMaterial::CreateInstance();
 	ParticleMaterial->SetZero();
 }

@@ -493,7 +493,7 @@ ZEParticleEmitter::ZEParticleEmitter()
 	Acceleration = ZEVector3(0.0f, 0.0f, 0.0f);					
 	ParticlesPerSecond = 0;				
 	Position = ZEVector3(0.0f, 0.0f, 0.0f);						
-	Type = ZEParticleEmitterType::ZE_PET_POINT;	
+	Type = ZE_PET_POINT;	
 	MinAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);			
 	MaxAcceleration = ZEVector3(0.0f, 0.0f, 0.0f);			
 	MinVelocity = ZEVector3(0.0f, 0.0f, 0.0f);				
