@@ -167,7 +167,7 @@ SUITE(ZELineSegment)
 
 		ZELineSegment LS(P1, P2);
 
-		float l = LS.GetLenght();
+		float l = LS.Length;
 		float d = ZEVector3::Length(ZEVector3(P1, P2));
 		CHECK_EQUAL(d, l);
 	}*/
