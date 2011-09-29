@@ -117,6 +117,9 @@ ZEPhysicalJointState ZEPhysXPhysicalJoint::GetJointState() const
 {
 	switch (Joint->getState())
 	{
+	default:
+		zeError("ZEPhysX", "ZEPhysicalJointState is not valid");
+
 		case NX_JS_UNBOUND:
 			return ZE_PJS_UNBOUND;
 			break;
@@ -1143,7 +1146,7 @@ void ZEPhysXPhysicalJoint::SetScale(const ZEVector3& NewScale)
 
 ZEVector3 ZEPhysXPhysicalJoint::GetScale()
 {
-	return ZEVector3.Zero;
+	return ZEVector3::Zero;
 }
 
 void ZEPhysXPhysicalJoint::SetCollisionEventFlags(ZEDWORD CollisionEventFlags)
