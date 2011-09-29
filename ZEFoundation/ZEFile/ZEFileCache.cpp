@@ -33,847 +33,594 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETypes.h"
 #include "ZEFileCache.h"
-#include "ZEFile/ZEResourceFile.h"
+#include "ZECore/ZEError.h"
+#include "ZECore/ZEConsole.h"
 
-//#include "../ZEAssert.h"
-//#include "..\Source/ZECore/ZEError.h"
-//#include "..\Source/ZEDefinitions.h"
 
-#include <string.h>
-
-struct ZEChunkHeader
+// OK
+bool ZEFileCache::CheckCompleteness()
 {
-	ZEDWORD				Header;
-	ZEDWORD				ChunkHash;
-	ZEDWORD				ChunkPosition;
-	ZEDWORD				ChunkSize;
-	ZEDWORD				IdentifierSize;
-};
+	size_t ZEQuadWordSize = sizeof(ZEQWORD);
 
+	ZEQWORD Cursor = File.Tell();
+	// Go to end of the file and read cache completeness flag
+	ZEQWORD Complete = 0;
+
+	File.Seek(-1 * (ZEINT64)ZEQuadWordSize, ZE_SF_END);
+	File.Read(&Complete, ZEQuadWordSize, 1);
+	File.Seek(Cursor, ZE_SF_BEGINING);
+
+	if (Complete == ZE_CACHE_COMPLETENESS)
+		return true;
+	
+	zeLog("File Cache", "Cannot verify completeness of cache file: \"%s\".", File.GetFileName().GetValue());
+	return false;
+}
+
+// OK
+void ZEFileCache::PrepareCacheForFirstUse()
+{
+	// Write file header
+	ZECacheFileHeader Header;
+	Header.ChunkId = ZE_CACHE_HEADER;
+	Header.Version = ZE_CACHE_VERSION;
+
+	if (File.Write(&Header, sizeof(ZECacheFileHeader), 1) != 1)
+		zeError("File Cache", "Can not write file header to file: \"%s\".", File.GetFileName().GetValue());
+
+	// Write records start position
+	// Since there is no records just write cursor position
+	ZEQWORD Cursor = File.Tell();
+	if (File.Write(&Cursor, sizeof(ZEQWORD), 1) != 1)
+		zeError("File Cache", "Can not write records start position to file: \"%s\".", File.GetFileName().GetValue());
+
+	// Write the completeness flag
+	ZEQWORD Complete = ZE_CACHE_COMPLETENESS;
+	if (File.Write(&Complete, sizeof(ZEQWORD), 1) != 1)
+		zeError("File Cache", "Can not write completeness flag to file: \"%s\".", File.GetFileName().GetValue());
+
+	File.Flush();
+}
+
+// OK
 // Helper function for copying Records
-void CopyData(ZEFile* File, size_t From, size_t Size, size_t To)
+void ZEFileCache::CopyData(ZEFile* File, ZEQWORD From, ZEQWORD Size, ZEQWORD To)
 {
 	const size_t BufferSize = 65536;
 	char Buffer[BufferSize];
 
-	int Count = Size / BufferSize;
-	int LeftOver = Size % BufferSize;
+	size_t Count = (size_t)Size / BufferSize;
+	size_t LeftOver = (size_t)Size % BufferSize;
+
 	for (size_t I = 0; I < Count; I++)
 	{
-		File->Seek(From + I * BufferSize, ZE_SF_BEGINING);
+		File->Seek((ZEINT64)(From + I * BufferSize), ZE_SF_BEGINING);
 		File->Read(Buffer, BufferSize, 1);
-		File->Seek(To + I * BufferSize, ZE_SF_BEGINING);
+		File->Seek((ZEINT64)(To + I * BufferSize), ZE_SF_BEGINING);
 		File->Write(Buffer, BufferSize, 1);
-
-		/*fseek(File, From + I * BufferSize, SEEK_SET);
-		fread(Buffer, BufferSize, 1, File);
-		fseek(File, To + I * BufferSize, SEEK_SET);
-		fwrite(Buffer, BufferSize, 1, File);*/
 	}
 
 	if (LeftOver != 0)
 	{
-		File->Seek(From + Count * BufferSize, ZE_SF_BEGINING);
+		File->Seek((ZEINT64)(From + Count * BufferSize), ZE_SF_BEGINING);
 		File->Read(Buffer, LeftOver, 1);
-		File->Seek(To + Count * BufferSize, ZE_SF_BEGINING);
+		File->Seek((ZEINT64)(To + Count * BufferSize), ZE_SF_BEGINING);
 		File->Write(Buffer, LeftOver, 1);
-
-		/*fseek(File, From + Count * BufferSize, SEEK_SET);
-		fread(Buffer, LeftOver, 1, File);
-		fseek(File, To + Count * BufferSize, SEEK_SET);
-		fwrite(Buffer, LeftOver, 1, File);*/
 	}
 }
 
-// Constructor
-ZEFileCache::ZEFileCache() : File(NULL)
+// OK
+bool ZEFileCache::IsFileCache(ZEString FileName)
 {
-	File = new ZEFile();
-}
+	ZEFile Check;
 
-// Destructor
-ZEFileCache::~ZEFileCache()
-{
-	if(File)
+	if(!Check.Open(FileName, ZE_FM_READ_WRITE, true))
 	{
-		if(File->IsOpen())
-			File->Close();
-
-		delete File;
-		File = NULL;
+		Check.Close();
+		zeError("File Cache", "Cannot open file to check the format");
+		return false;
 	}
-}
 
-// Opens the cache file
-bool ZEFileCache::OpenCache(const char* CacheFileName)
-{
-	//zeAssert(File && File->IsOpen(), "Cache is already open...");
-	
-	File->Open(CacheFileName, ZE_FM_READ_WRITE, true);
-	
-	if (File->IsOpen())
+	if (Check.GetFileSize() == 0)
 	{
-		strncpy(this->CacheFileName, CacheFileName, 256);
+		Check.Close();
+		return true;
+	}
+
+	ZECacheFileHeader Header;
+	// if file is empty we wont read anything
+	if (Check.Read(&Header, sizeof(ZECacheFileHeader) ,1) != 1)
+	{
+		zeError("File Cache", "Cannot read header from file");
+		Check.Close();
+		return false;
+	}
+
+	if(Header.ChunkId == ZE_CACHE_HEADER)
+	{
+		Check.Close();
 		return true;
 	}
 
 	return false;
 }
 
+// OK
+ZEFileCache::ZEFileCache()
+{
+	 // Empty
+}
+
+// OK
+ZEFileCache::~ZEFileCache()
+{
+	CloseCache();
+}
+
+// OK
+// Opens the cache file
+bool ZEFileCache::OpenCache(ZEString FileName)
+{
+	if (IsOpen())
+		return false;
+
+	// Check if it is a File cache
+	if (!IsFileCache(FileName))
+		return false;
+
+	// Open
+	if (!File.Open(FileName.GetValue(), ZE_FM_READ_WRITE, true))
+		return false;
+
+	// If it is a new file
+	if (File.GetFileSize() == 0)
+	{
+		PrepareCacheForFirstUse();
+		return true;
+	}
+	else // Check format and completeness
+	{
+		ZECacheFileHeader Header;
+		File.Read(&Header, sizeof(ZECacheFileHeader), 1);
+
+		// If format is correct
+		if(Header.ChunkId == ZE_CACHE_HEADER)
+		{
+			// If cache is not complete
+			if(!CheckCompleteness())
+			{
+				zeLog("File Cache", "Previous data cannot be trusted, cleaning cache.");
+				ClearCache();
+			}
+				
+
+			return true;
+		}
+	}
+
+	return false;
+}
+
+// OK
 // Closes the cache file
 void ZEFileCache::CloseCache()
 {
-	if (File && File->IsOpen())
-		File->Close();
+	if (IsOpen())
+		File.Close();
 }
 
+// OK
 // Empty the cache file
 bool ZEFileCache::ClearCache()
 {
-	// If cache file is open close it
+	if (!IsOpen())
+		return false;
+
+
+	ZEString FileName;
+
+	FileName = File.GetFileName();
 	CloseCache();
 
 	// Remove the file
-	if(remove(CacheFileName) == -1)
-	{
+	if(remove(FileName.GetValue()) == -1)
 		return false;
-	}
 
 	// ReOpen the cache	
-	if(OpenCache(CacheFileName))
+	if(OpenCache(FileName))
 		return true;
 
 	return false;
 }
 
+// OK
 // Returns the cache file name
-const char*	ZEFileCache::GetCacheFileName()
+const ZEString ZEFileCache::GetCacheFileName()
 {
-	return CacheFileName;
+	return File.GetFileName();
 }
 
-// Checks if the chunk exists
-bool ZEFileCache::ChunkExists(const ZECacheChunkIdentifier* Identifier)
+bool ZEFileCache::IsOpen()
 {
-	if(!File || !File->IsOpen())
+	if(File.IsOpen())
+		return true;
+
+	return false;
+}
+
+// OK
+// Checks if the chunk exists
+bool ZEFileCache::ChunkExists(const ZECacheDataIdentifier* Identifier)
+{
+	if(!IsOpen())
 		return false;
+	if(!CheckCompleteness())
+	{
+		zeLog("File Cache", "Previous data cannot be trusted, cleaning cache.");
+		ClearCache();
+		return false;
+	}
+
+	size_t ZEQuadWordSize = sizeof(ZEQWORD);
+	size_t ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
+	// This is the size of Completeness flag + Record start position data size
+	// They are both always stored at the end of the cache file
+	size_t ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Get end of file
-	File->Seek(0, ZE_SF_END);
-	size_t EndOfFile = 0;
-	EndOfFile = File->Tell();
+	File.Seek((ZEINT64)0, ZE_SF_END);
+	ZEQWORD EndOfFile = File.Tell();
 
-	// Get records start position
-	File->Seek(-sizeof(ZEDWORD), ZE_SF_END);
-	size_t RecordsStartPosition = 0;
-	File->Read(&RecordsStartPosition, sizeof(ZEDWORD), 1);
+	// Get records start and end position
+	File.Seek(-1 * (ZEINT64)ZECacheExtraDataSize, ZE_SF_END);
+	ZEQWORD RecordsEndPosition = File.Tell();
+	ZEQWORD RecordsStartPosition = 0;
+	File.Read(&RecordsStartPosition, ZEQuadWordSize, 1);
 
-	size_t NextHeaderPosition = RecordsStartPosition;
-	size_t IdentifierSize = 0;
+	// If there is no record
+	if((RecordsStartPosition + ZECacheExtraDataSize) == EndOfFile)
+		return false;
+
+	ZEQWORD NextHeaderPosition = RecordsStartPosition;
 
 	// Search for the identifier between CurrentPosition && EndOfFile
-	while(NextHeaderPosition < EndOfFile)
+	while(NextHeaderPosition < RecordsEndPosition)
 	{
-		File->Seek(NextHeaderPosition, ZE_SF_BEGINING);
+		File.Seek((ZEINT64)NextHeaderPosition, ZE_SF_BEGINING);
 
 		// Get the header
-		ZEChunkHeader Header;
-		if (File->Read(&Header, sizeof(ZEChunkHeader), 1) != 1)
-		{
+		ZECacheIdentifierChunk Header;
+		if (File.Read(&Header, ZEIdentifierChunkSize, 1) != 1)
 			return false;
+
+		if (Header.ChunkId != ZE_CACHE_IDENT_CHUNKID)
+		{
+			zeLog("File Cache", "Identifier Chunk Id does not match! Possible Corruption");
+			zeLog("File Cache", "Cleaning cache: \"%s\".", File.GetFileName().GetValue());
+			ClearCache();
 		}
 
-		if (Header.Header != 'ZECH')
-		{
-			return false;
-		}
-
-		if(Identifier->Equal(File))
-		{
+		if(Identifier->Equal(&File))
 			return true;
-		}
 
-		NextHeaderPosition += sizeof(ZEChunkHeader) + Header.IdentifierSize;
+		NextHeaderPosition += ZEIdentifierChunkSize + Header.IdentifierSize;
 	}
 
 	return false;
-
-	/////////// OLD CODE /////////////////
-
-	/*OpenCache();
-
-	// Get end of file
-	size_t EndOfFile = 0;
-	fseek(File, 0, SEEK_END);
-	EndOfFile = ftell(File);
-
-	// Get records start position
-	fseek(File, -sizeof(ZEDWORD), SEEK_END);
-	size_t RecordsStartPosition = 0;
-	fread(&RecordsStartPosition, sizeof(ZEDWORD), 1, File);
-
-	size_t NextHeaderPosition = RecordsStartPosition;
-	size_t IdentifierSize = 0;
-
-	// Search for the identifier between CurrentPosition && EndOfFile
-	while(NextHeaderPosition < EndOfFile)
-	{
-	fseek(File, NextHeaderPosition, SEEK_SET);
-
-	// Get the header
-	ZEChunkHeader Header;
-	if (fread(&Header, sizeof(ZEChunkHeader), 1, File) != 1)
-	{
-	CloseCache();
-	return false;
-	}
-
-	if (Header.Header != 'ZECH')
-	{
-	CloseCache();
-	return false;
-	}
-
-	if(Identifier->Equal((void*)File))
-	{
-	CloseCache();
-	return true;
-	}
-
-	NextHeaderPosition += sizeof(ZEChunkHeader) + Header.IdentifierSize;
-	}
-
-	CloseCache();
-	return false;*/
 }
 
+// OK
 // Create new chunk from Buffer
-bool ZEFileCache::AddChunk(const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size)
+bool ZEFileCache::AddChunk(const ZECacheDataIdentifier* Identifier, const void* Data, ZEQWORD Size)
 {
 	// If file is not open return
-	if(!File || !File->IsOpen())
+	if(!IsOpen())
 		return false;
+	if(!CheckCompleteness())
+	{
+		zeLog("File Cache", "Previous data cannot be trusted, cleaning cache.");
+		ClearCache();
+		return false;
+	}
+
+	size_t ZEQuadWordSize = sizeof(ZEQWORD);
+	size_t ZEDataChunkSize = sizeof(ZECacheDataChunk);
+	size_t ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
+	// This is the size of Completeness flag + Record start position data size
+	// They are both always stored at the end of the cache file
+	size_t ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Go to the end of records
-	File->Seek(-sizeof(ZEDWORD), ZE_SF_END);
+	File.Seek(-1 * (ZEINT64)ZECacheExtraDataSize, ZE_SF_END);
 	// Get the old record's end position
-	size_t OldRecordsEndPosition = File->Tell();
+	ZEQWORD OldRecordsEndPosition = File.Tell();
 
 	// Read the old record's start position
-	size_t OldRecordsStartPosition = 0;
-	File->Read(&OldRecordsStartPosition, sizeof(ZEDWORD), 1);
+	ZEQWORD OldRecordsStartPosition = 0;
+	File.Read(&OldRecordsStartPosition, ZEQuadWordSize, 1);
 
 	// Calculate the total record size
-	size_t OldRecordsSize = OldRecordsEndPosition - OldRecordsStartPosition;
-	// Calculate the new records start position
-	size_t NewRecordStartPosition = OldRecordsStartPosition + Size;
+	ZEQWORD OldRecordsSize = OldRecordsEndPosition - OldRecordsStartPosition;
+	// Calculate the new records start position including
+	ZEQWORD NewRecordStartPosition = OldRecordsStartPosition + Size + ZEDataChunkSize;
 
-	// If there exists old records, copy them to their new position
+	// Copy previous records to new position
 	if (OldRecordsSize != 0)
-		CopyData(File, OldRecordsStartPosition, OldRecordsSize, NewRecordStartPosition);
+		CopyData(&File, OldRecordsStartPosition, OldRecordsSize, NewRecordStartPosition);
 
 	// Set the new chunk position
-	size_t NewChunkPosition = OldRecordsStartPosition;
+	ZEQWORD NewChunkPosition = OldRecordsStartPosition;
+
 	
-	// Goto new chunk position and write the data
-	File->Seek(NewChunkPosition, ZE_SF_BEGINING);
-	File->Write(Data, Size, 1);
+
+	// Goto new chunk position
+	File.Seek((ZEINT64)NewChunkPosition, ZE_SF_BEGINING);
+	// Write data header
+	ZECacheDataChunk DataChunk = {ZE_CACHE_DATA_CHUNKID};
+	File.Write(&DataChunk, ZEDataChunkSize, 1);
+	// Write data
+	File.Write(Data, Size, 1);
 
 	// Goto the new records end position
-	File->Seek(NewRecordStartPosition + OldRecordsSize, ZE_SF_BEGINING);
+	File.Seek((ZEINT64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING);
 
-	ZEChunkHeader Header;
+	ZECacheIdentifierChunk IdentifierChunk;
 	// Write the dummy header and the identifier parameter
-	File->Write(&Header, sizeof(ZEChunkHeader), 1);
-	size_t IdentifierSize = Identifier->Write(File);
+	File.Write(&IdentifierChunk, ZEIdentifierChunkSize, 1);
+	ZEQWORD IdentifierSize = Identifier->Write(&File);
 
 	// Goto the header start position
-	File->Seek(NewRecordStartPosition + OldRecordsSize, ZE_SF_BEGINING);
-	Header.Header = 'ZECH';
-	Header.ChunkPosition = NewChunkPosition;
-	Header.ChunkHash = Identifier->GetHash();
-	Header.ChunkSize = Size;
-	Header.IdentifierSize = IdentifierSize;
+	File.Seek((ZEINT64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING);
+	IdentifierChunk.ChunkId = ZE_CACHE_IDENT_CHUNKID;
+	IdentifierChunk.ChunkPosition = NewChunkPosition;
+	IdentifierChunk.ChunkHash = Identifier->GetHash();
+	IdentifierChunk.ChunkSize = Size;
+	IdentifierChunk.IdentifierSize = IdentifierSize;
 	// Write the real header
-	File->Write(&Header, sizeof(ZEChunkHeader), 1);
+	File.Write(&IdentifierChunk, ZEIdentifierChunkSize, 1);
 
 	// Go to the end of the records
-	File->Seek(0, ZE_SF_END);
+	File.Seek((ZEINT64)0, ZE_SF_END);
 	// Write the records start position
-	File->Write(&NewRecordStartPosition, sizeof(ZEDWORD), 1);
-	// Flush
-	File->Flush();
+	File.Write(&NewRecordStartPosition, ZEQuadWordSize, 1);
+	// Write completeness flag
+	ZEQWORD Complete = ZE_CACHE_COMPLETENESS;
+	File.Write(&Complete, ZEQuadWordSize, 1);
 
+	File.Flush();
 	return true;
-
-	/////////// OLD CODE /////////////////
-
-	/*fseek(File, -sizeof(ZEDWORD), SEEK_END);
-	size_t OldRecordsEndPosition = ftell(File);
-
-	size_t OldRecordsStartPosition = 0;
-	fread(&OldRecordsStartPosition, sizeof(ZEDWORD), 1, File);
-
-	size_t OldRecordsSize = OldRecordsEndPosition - OldRecordsStartPosition;
-	size_t NewRecordStartPosition = OldRecordsStartPosition + Size;
-
-	if (OldRecordsSize != 0)
-		CopyData(File, OldRecordsStartPosition, OldRecordsSize, NewRecordStartPosition);
-
-	size_t NewChunkPosition = OldRecordsStartPosition;
-
-	fseek(File, NewChunkPosition, SEEK_SET);
-	fwrite(Data, Size, 1, File);
-
-	fseek(File, NewRecordStartPosition + OldRecordsSize, SEEK_SET);
-	ZEChunkHeader Header;
-	fwrite(&Header, sizeof(ZEChunkHeader), 1, File);
-	size_t IdentifierSize = Identifier->Write(File);
-
-	fseek(File, NewRecordStartPosition + OldRecordsSize, SEEK_SET);
-	Header.Header = 'ZECH';
-	Header.ChunkPosition = NewChunkPosition;
-	Header.ChunkHash = Identifier->GetHash();
-	Header.ChunkSize = Size;
-	Header.IdentifierSize = IdentifierSize;
-	fwrite(&Header, sizeof(ZEChunkHeader), 1, File);
-
-	fseek(File, 0, SEEK_END);
-	fwrite(&NewRecordStartPosition, sizeof(ZEDWORD), 1, File);
-
-	fflush(File);
-
-	CloseCache();*/
 }
 
+// OK
 // Create new chunk from PartialFile
-bool ZEFileCache::CreateChunk(ZEPartialFile& PartialFile, const ZECacheChunkIdentifier* Identifier, size_t ChunkSize)
+bool ZEFileCache::CreateChunk(ZEPartialFile& PartialFile, const ZECacheDataIdentifier* Identifier, ZEQWORD ChunkSize)
 {
 	// If file is not open return
-	if(!File || !File->IsOpen())
+	if(!IsOpen())
 		return false;
+	if(!CheckCompleteness())
+	{
+		zeLog("File Cache", "Previous data cannot be trusted, cleaning cache.");
+		ClearCache();
+		return false;
+	}
+
+	size_t ZEQuadWordSize = sizeof(ZEQWORD);
+	size_t ZEDataChunkSize = sizeof(ZECacheDataChunk);
+	size_t ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
+	// This is the size of Completeness flag + Record start position data size
+	// They are both always stored at the end of the cache file
+	size_t ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Go to the end of records
-	File->Seek(-sizeof(ZEDWORD), ZE_SF_END);
+	File.Seek(-1 * (ZEINT64)ZECacheExtraDataSize, ZE_SF_END);
 	// Get the old record's end position
-	size_t OldRecordsEndPosition = File->Tell();
+	ZEQWORD OldRecordsEndPosition = File.Tell();
 
 	// Read the old record's start position
-	size_t OldRecordsStartPosition = 0;
-	File->Read(&OldRecordsStartPosition, sizeof(ZEDWORD), 1);
+	ZEQWORD OldRecordsStartPosition = 0;
+	File.Read(&OldRecordsStartPosition, ZEQuadWordSize, 1);
 
 	// Calculate the total record size
-	size_t OldRecordsSize = OldRecordsEndPosition - OldRecordsStartPosition;
+	ZEQWORD OldRecordsSize = OldRecordsEndPosition - OldRecordsStartPosition;
 	// Calculate the new records start position
-	size_t NewRecordStartPosition = OldRecordsStartPosition + ChunkSize;
+	ZEQWORD NewRecordStartPosition = OldRecordsStartPosition + ChunkSize + ZEDataChunkSize;
 
 	// If there exists old records, copy them to their new position
 	if (OldRecordsSize != 0)
-		CopyData(File, OldRecordsStartPosition, OldRecordsSize, NewRecordStartPosition);
+		CopyData(&File, OldRecordsStartPosition, OldRecordsSize, NewRecordStartPosition);
 
 	// Set the new chunk position
-	size_t NewChunkPosition = OldRecordsStartPosition;
+	ZEQWORD NewChunkPosition = OldRecordsStartPosition;
+
+	// Go to chunk start pos and write data header
+	File.Seek((ZEINT64)NewChunkPosition, ZE_SF_BEGINING);
+	ZECacheDataChunk DataChunk = {ZE_CACHE_DATA_CHUNKID};
+	File.Write(&DataChunk, ZEDataChunkSize, 1);
 
 	// Set the partial file
-	PartialFile.Open(File, NewChunkPosition, ChunkSize);
+	PartialFile.Open(&File, NewChunkPosition + ZEDataChunkSize, ChunkSize);
 
 	// Goto the new records end position
-	File->Seek(NewRecordStartPosition + OldRecordsSize, ZE_SF_BEGINING);
+	File.Seek((ZEINT64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING);
 
-	ZEChunkHeader Header;
+	ZECacheIdentifierChunk IdentifierChunk;
 	// Write the dummy header and the identifier parameter
-	File->Write(&Header, sizeof(ZEChunkHeader), 1);
-	size_t IdentifierSize = Identifier->Write(File);
+	File.Write(&IdentifierChunk, ZEIdentifierChunkSize, 1);
+	ZEQWORD IdentifierSize = Identifier->Write(&File);
 
 	// Goto the header start position
-	File->Seek(NewRecordStartPosition + OldRecordsSize, ZE_SF_BEGINING);
-	Header.Header = 'ZECH';
-	Header.ChunkPosition = NewChunkPosition;
-	Header.ChunkHash = Identifier->GetHash();
-	Header.ChunkSize = ChunkSize;
-	Header.IdentifierSize = IdentifierSize;
+	File.Seek((ZEINT64)(NewRecordStartPosition + OldRecordsSize), ZE_SF_BEGINING);
+	IdentifierChunk.ChunkId = ZE_CACHE_IDENT_CHUNKID;
+	IdentifierChunk.ChunkPosition = NewChunkPosition;
+	IdentifierChunk.ChunkHash = Identifier->GetHash();
+	IdentifierChunk.ChunkSize = ChunkSize;
+	IdentifierChunk.IdentifierSize = IdentifierSize;
 	// Write the real header
-	File->Write(&Header, sizeof(ZEChunkHeader), 1);
+	File.Write(&IdentifierChunk, ZEIdentifierChunkSize, 1);
 
 	// Go to the end of the records
-	File->Seek(0, ZE_SF_END);
+	File.Seek((ZEINT64)0, ZE_SF_END);
 	// Write the records start position
-	File->Write(&NewRecordStartPosition, sizeof(ZEDWORD), 1);
-	// Flush
-	File->Flush();
+	File.Write(&NewRecordStartPosition, ZEQuadWordSize, 1);
+	// Write the completeness flag
+	ZEQWORD Complete = ZE_CACHE_COMPLETENESS;
+	File.Write(&Complete, ZEQuadWordSize, 1);
 
+	File.Flush();
 	return true;
 }
 
-// Create new chunk from ResourceFile
-bool ZEFileCache::CreateChunk(ZEPartialResourceFile& ResourceFile, const ZECacheChunkIdentifier* Identifier, size_t ChunkSize)
-{
-	// If file is not open return
-	if(!File || !File->IsOpen())
-		return false;
-
-	// Go to the end of records
-	File->Seek(-sizeof(ZEDWORD), ZE_SF_END);
-	// Get the old record's end position
-	size_t OldRecordsEndPosition = File->Tell();
-
-	// Read the old record's start position
-	size_t OldRecordsStartPosition = 0;
-	File->Read(&OldRecordsStartPosition, sizeof(ZEDWORD), 1);
-
-	// Calculate the total record size
-	size_t OldRecordsSize = OldRecordsEndPosition - OldRecordsStartPosition;
-	// Calculate the new records start position
-	size_t NewRecordStartPosition = OldRecordsStartPosition + ChunkSize;
-
-	// If there exists old records, copy them to their new position
-	if (OldRecordsSize != 0)
-		CopyData(File, OldRecordsStartPosition, OldRecordsSize, NewRecordStartPosition);
-
-	// Set the new chunk position
-	size_t NewChunkPosition = OldRecordsStartPosition;
-
-	// Set the partial resource file
-	ResourceFile.Open(File, NewChunkPosition, ChunkSize);
-
-	// Goto the new records end position
-	File->Seek(NewRecordStartPosition + OldRecordsSize, ZE_SF_BEGINING);
-
-	ZEChunkHeader Header;
-	// Write the dummy header and the identifier parameter
-	File->Write(&Header, sizeof(ZEChunkHeader), 1);
-	size_t IdentifierSize = Identifier->Write(File);
-
-	// Goto the header start position
-	File->Seek(NewRecordStartPosition + OldRecordsSize, ZE_SF_BEGINING);
-	Header.Header = 'ZECH';
-	Header.ChunkPosition = NewChunkPosition;
-	Header.ChunkHash = Identifier->GetHash();
-	Header.ChunkSize = ChunkSize;
-	Header.IdentifierSize = IdentifierSize;
-	// Write the real header
-	File->Write(&Header, sizeof(ZEChunkHeader), 1);
-
-	// Go to the end of the records
-	File->Seek(0, ZE_SF_END);
-	// Write the records start position
-	File->Write(&NewRecordStartPosition, sizeof(ZEDWORD), 1);
-	// Flush
-	File->Flush();
-
-	return true;
-}
-
+// OK
 // Returns the data in a buffer
-bool ZEFileCache::GetChunk(const ZECacheChunkIdentifier* Identifier, void* Buffer, size_t Offset, size_t Size)
+bool ZEFileCache::GetChunk(const ZECacheDataIdentifier* Identifier, void* Buffer, ZEQWORD Offset, ZEQWORD Size)
 {
 	// If file is not open return
-	if(!File || !File->IsOpen())
+	if(!IsOpen())
 		return false;
+	if(!CheckCompleteness())
+	{
+		zeLog("File Cache", "Previous data cannot be trusted, cleaning cache.");
+		ClearCache();
+		return false;
+	}
+
+	size_t ZEQuadWordSize = sizeof(ZEQWORD);
+	size_t ZEDataChunkSize = sizeof(ZECacheDataChunk);
+	size_t ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
+	// This is the size of Completeness flag + Record start position data size
+	// They are both always stored at the end of the cache file
+	size_t ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Get hash from identifier
-	ZEDWORD Hash = Identifier->GetHash();
-	// Go to end of the file
-	File->Seek(-sizeof(ZEDWORD), ZE_SF_END);
+	ZEQWORD Hash = Identifier->GetHash();
+	// Go to end of records
+	File.Seek(-1 * (ZEINT64)ZECacheExtraDataSize, ZE_SF_END);
 
 	// Get the records end position
-	size_t RecordsEndPosition = File->Tell();
+	ZEQWORD RecordsEndPosition = File.Tell();
 
 	// Read records start position from the end of the file
-	size_t RecordStartPosition = 0;
-	File->Read(&RecordStartPosition, sizeof(ZEDWORD), 1);
+	ZEQWORD RecordStartPosition = 0;
+	File.Read(&RecordStartPosition, ZEQuadWordSize, 1);
 
 	// Set the beginning address for linear search
-	size_t CurrentHeaderPosition = RecordStartPosition;
-	while (true)
+	ZEQWORD CurrentHeaderPosition = RecordStartPosition;
+	while (CurrentHeaderPosition < RecordsEndPosition)
 	{
 		// Go to the next header position
-		File->Seek(CurrentHeaderPosition, ZE_SF_BEGINING);
+		File.Seek((ZEINT64)CurrentHeaderPosition, ZE_SF_BEGINING);
 
 		// Read header
-		ZEChunkHeader Header;
-		if (File->Read(&Header, sizeof(ZEChunkHeader), 1) != 1)
-		{
+		ZECacheIdentifierChunk IdentifierChunk;
+		if (File.Read(&IdentifierChunk, ZEIdentifierChunkSize, 1) != 1)
 			return false;
-		}
 
 		// Check if the header readable
-		if (Header.Header != 'ZECH')
+		if (IdentifierChunk.ChunkId != ZE_CACHE_IDENT_CHUNKID)
 		{
+			zeLog("File Cache", "Identifier Chunk Id does not match! Possible Corruption. File Name: \"%s\".", (File.GetFileName()).GetValue());
 			return false;
 		}
 
 		// Check if hash, size and identifier matches 
-		if (Header.ChunkHash == Hash && Header.ChunkSize == Size && Identifier->Equal(File))
+		if (IdentifierChunk.ChunkHash == Hash && IdentifierChunk.ChunkSize == Size && Identifier->Equal(&File))
 		{
 			// Goto the chunk data position
-			File->Seek(Header.ChunkPosition, ZE_SF_BEGINING);
+			File.Seek((ZEINT64)IdentifierChunk.ChunkPosition, ZE_SF_BEGINING);
+
+			// Check if data readable
+			ZECacheDataChunk DataChunk;
+			File.Read(&DataChunk, ZEDataChunkSize, 1);
+			if(DataChunk.ChunkId != ZE_CACHE_DATA_CHUNKID)
+			{
+				zeLog("File Cache", "Data Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFileName().GetValue());
+				return false;
+			}
 
 			// Read into buffer
-			if (File->Read(Buffer, Size, 1) != 1)
-			{
-				return false;
-			}
-			else
-			{
+			if (File.Read(Buffer, Size, 1) == 1)
 				return true;
-			}
 		}
 
-		CurrentHeaderPosition += Header.IdentifierSize + sizeof(ZEChunkHeader);
+		CurrentHeaderPosition += IdentifierChunk.IdentifierSize + ZEIdentifierChunkSize;
 	}
 
 	return false;
+}
 
-	/////////// OLD CODE /////////////////
-
-	/*OpenCache();
-
-	ZEDWORD Hash = Identifier->GetHash();
-	fseek(File, -sizeof(ZEDWORD), SEEK_END);
-	size_t RecordsEndPosition = ftell(File);
-
-	size_t RecordStartPosition = 0;
-	fread(&RecordStartPosition, sizeof(ZEDWORD), 1, File);
-
-	size_t CurrentHeaderPosition = RecordStartPosition;
-	while (true)
+// OK
+// Returns the data as PartialFile
+bool ZEFileCache::OpenChunk(ZEPartialFile& PartialFile, const ZECacheDataIdentifier* Identifier)
+{
+	// If file is not open return
+	if(!IsOpen())
+		return false;
+	if(!CheckCompleteness())
 	{
-		fseek(File, CurrentHeaderPosition, SEEK_SET);
-
-		ZEChunkHeader Header;
-		if (fread(&Header, sizeof(ZEChunkHeader), 1, File) != 1)
-		{
-			CloseCache();
-			return false;
-		}
-
-		if (Header.Header != 'ZECH')
-		{
-			CloseCache();
-			return false;
-		}
-
-		ZEDWORD CurrentCursor = ftell(File);
-
-		if (Header.ChunkHash == Hash && Header.ChunkSize == Size && Identifier->Equal(File))
-		{
-			fseek(File, Header.ChunkPosition, SEEK_SET);
-
-			size_t Cursor = ftell(File);
-
-			if (fread(Buffer, Size, 1, File) != 1)
-			{
-				CloseCache();
-				return false;
-			}
-			else
-			{
-				CloseCache();
-				return true;
-			}
-		}
-
-		CurrentHeaderPosition += Header.IdentifierSize + sizeof(ZEChunkHeader);
+		zeLog("File Cache", "Previous data cannot be trusted, cleaning cache.");
+		ClearCache();
+		return false;
 	}
 
-	CloseCache();
-	return false;*/
-}
+	size_t ZEQuadWordSize = sizeof(ZEQWORD);
+	size_t ZEDataChunkSize = sizeof(ZECacheDataChunk);
+	size_t ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
+	// This is the size of Completeness flag + Record start position data size
+	// They are both always stored at the end of the cache file
+	size_t ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
-// Returns the data as PartialFile
-bool ZEFileCache::OpenChunk(ZEPartialFile& PartialFile, const ZECacheChunkIdentifier* Identifier)
-{
-	// If file is not open return
-	if(!File || !File->IsOpen())
+	// Get records start and end position
+	File.Seek(-1 * (ZEINT64)ZECacheExtraDataSize, ZE_SF_END);
+	ZEQWORD RecordEndPosition = File.Tell();
+
+	ZEQWORD RecordsStartPosition = 0;
+	if(File.Read(&RecordsStartPosition, ZEQuadWordSize, 1) != 1)
 		return false;
 
- 	// Go to the end of the file and save the position
- 	File->Seek(0, ZE_SF_END);
- 	size_t EndOfFile = File->Tell();
- 	
- 	// Get records start position
- 	File->Seek(-sizeof(ZEDWORD), ZE_SF_END);
- 	size_t RecordsStartPosition = 0;
- 	File->Read(&RecordsStartPosition, sizeof(ZEDWORD), 1);
- 
 	// Set the next header start position
- 	size_t NextHeaderPosition = RecordsStartPosition;
- 
- 	// Search for the identifier between RecordsStartPosition & EndOfFile
- 	while(NextHeaderPosition < EndOfFile)
- 	{
-		// Goto next header position
- 		File->Seek(NextHeaderPosition, ZE_SF_BEGINING);
- 
- 		// Read the header
- 		ZEChunkHeader Header;
- 		if (File->Read(&Header, sizeof(ZEChunkHeader), 1) != 1)
- 		{
- 			return false;
- 		}
- 
-		// If header is not corrupted
- 		if (Header.Header != 'ZECH')
- 		{
- 			return false;
- 		}
-	
-		// If identifier matches
- 		if(Identifier->Equal(File))
- 		{
-			// Open the PartialFile
-			PartialFile.Open(File, Header.ChunkPosition, Header.ChunkSize);
-			return true;
- 		}
- 
- 		NextHeaderPosition += sizeof(ZEChunkHeader) + Header.IdentifierSize;
- 	}
- 
- 	return false;
-}
-
-// Returns the data as ResourceFile
-bool ZEFileCache::OpenChunk(ZEPartialResourceFile& ResourceFile, const ZECacheChunkIdentifier* Identifier)
-{
-	// If file is not open return
-	if(!File || !File->IsOpen())
-		return false;
-
-	// Go to the end of the file and save the position
-	File->Seek(0, ZE_SF_END);
-	size_t EndOfFile = File->Tell();
-
-	// Get records start position
-	File->Seek(-sizeof(ZEDWORD), ZE_SF_END);
-	size_t RecordsStartPosition = 0;
-	File->Read(&RecordsStartPosition, sizeof(ZEDWORD), 1);
-
-	// Set the next header start position
-	size_t NextHeaderPosition = RecordsStartPosition;
+	ZEQWORD NextHeaderPosition = RecordsStartPosition;
 
 	// Search for the identifier between RecordsStartPosition & EndOfFile
-	while(NextHeaderPosition < EndOfFile)
+	while(NextHeaderPosition < RecordEndPosition)
 	{
 		// Goto next header position
-		File->Seek(NextHeaderPosition, ZE_SF_BEGINING);
+		File.Seek((ZEINT64)NextHeaderPosition, ZE_SF_BEGINING);
 
 		// Read the header
-		ZEChunkHeader Header;
-		if (File->Read(&Header, sizeof(ZEChunkHeader), 1) != 1)
-		{
+		ZECacheIdentifierChunk IdentifierChunk;
+		if (File.Read(&IdentifierChunk, ZEIdentifierChunkSize, 1) != 1)
 			return false;
-		}
 
 		// If header is not corrupted
-		if (Header.Header != 'ZECH')
+		if (IdentifierChunk.ChunkId != ZE_CACHE_IDENT_CHUNKID)
 		{
+			zeLog("File Cache", "Identifier Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFileName().GetValue());
 			return false;
 		}
 
 		// If identifier matches
-		if(Identifier->Equal(File))
+		if(Identifier->Equal(&File))
 		{
-			// Set the partial resource file
-			ResourceFile.Open(File, Header.ChunkPosition, Header.ChunkSize);
+			// Read data chunk id
+			File.Seek(IdentifierChunk.ChunkPosition, ZE_SF_BEGINING);
+			ZECacheDataChunk	DataChunk;
+			File.Read(&DataChunk, ZEDataChunkSize, 1);
+
+			if(DataChunk.ChunkId != ZE_CACHE_DATA_CHUNKID)
+			{
+				zeLog("File Cache", "Data Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFileName().GetValue());
+				return false;
+			}
+
+			// Open the PartialFile
+			PartialFile.Open(&File, IdentifierChunk.ChunkPosition + ZEDataChunkSize, IdentifierChunk.ChunkSize);
 			return true;
 		}
 
-		NextHeaderPosition += sizeof(ZEChunkHeader) + Header.IdentifierSize;
+		NextHeaderPosition += ZEIdentifierChunkSize + IdentifierChunk.IdentifierSize;
 	}
 
 	return false;
 }
-
-
-// ZEPartialFile* ZEFileCache::CreateChunk(const char* FileName, const ZECacheChunkIdentifier* Identifier, size_t TotalChunkSize)
-// {
-// 
-// 	/* Find the size and the offset of the chunk data defined by the identifier */
-// 	OpenCache();
-// 
-// 	// Get end of file
-// 	File->Seek(0, ZE_SF_END);
-// 	size_t EndOfFile = 0;
-// 	EndOfFile = File->Tell();
-// 
-// 	// Get records start position
-// 	File->Seek(-sizeof(ZEDWORD), ZE_SF_END);
-// 	size_t RecordsStartPosition = 0;
-// 	File->Read(&RecordsStartPosition, sizeof(ZEDWORD), 1);
-// 
-// 	size_t NextHeaderPosition = RecordsStartPosition;
-// 	//size_t IdentifierSize = 0;
-// 
-// 	// Search for the identifier between CurrentPosition && EndOfFile
-// 	while(NextHeaderPosition < EndOfFile)
-// 	{
-// 		File->Seek(NextHeaderPosition, ZE_SF_BEGINING);
-// 
-// 		// Get the header
-// 		ZEChunkHeader Header;
-// 		if (File->Read(&Header, sizeof(ZEChunkHeader), 1) != 1)
-// 		{
-// 			CloseCache();
-// 			return false;
-// 		}
-// 
-// 		if (Header.Header != 'ZECH')
-// 		{
-// 			CloseCache();
-// 			return false;
-// 		}
-// 
-// 		if(Identifier->Equal(File))
-// 		{
-// 			// Create the partial file
-// 			return new ZEPartialFile(File, Header.ChunkPosition, Header.ChunkSize);
-// 		}
-// 
-// 		NextHeaderPosition += sizeof(ZEChunkHeader) + Header.IdentifierSize;
-// 	}
-// 
-// 	return NULL;
-// }
-// 
-// bool ZEFileCache::OpenChunk( const ZECacheChunkIdentifier* Identifier, size_t TotalChunkSize)
-// {
-// 	OpenCache();
-// 
-// 	File->Seek(-sizeof(ZEDWORD), ZE_SF_END);
-// 
-// 	// Get old record end position
-// 	size_t OldRecordsEndPosition = 0;
-// 	OldRecordsEndPosition = File->Tell();
-// 
-// 	// Get old record start position
-// 	size_t OldRecordsStartPosition = 0;
-// 	File->Read(&OldRecordsStartPosition, sizeof(ZEDWORD), 1);
-// 
-// 	// Calculate the old record's total size and the new record start position
-// 	size_t OldRecordsSize = OldRecordsEndPosition - OldRecordsStartPosition;
-// 	size_t NewRecordStartPosition = OldRecordsStartPosition + TotalChunkSize;
-// 
-// 	// Copy all the records to their new position
-// 	if(OldRecordsSize != 0)
-// 		CopyData(File, OldRecordsStartPosition, OldRecordsSize, NewRecordStartPosition);
-// 
-// 	// Goto last record en position and write the empty header
-// 	File->Seek(NewRecordStartPosition + OldRecordsSize, ZE_SF_BEGINING);
-// 	ZEChunkHeader Header;
-// 	File->Write(&Header, sizeof(ZEChunkHeader), 1);
-// 	// Write the identifier
-// 	size_t IdentifierSize = Identifier->Write(File);
-// 
-// 	// Go back to new header start position
-// 	File->Seek(NewRecordStartPosition + OldRecordsSize, ZE_SF_BEGINING);
-// 
-// 	// Fill the header data
-// 	Header.Header = 'ZECH';
-// 	Header.ChunkPosition = OldRecordsStartPosition;
-// 	Header.ChunkHash = Identifier->GetHash();
-// 	Header.ChunkSize = TotalChunkSize;
-// 	Header.IdentifierSize = IdentifierSize;
-// 
-// 	// Write the actual header data
-// 	File->Write(&Header, sizeof(ZEChunkHeader), 1);
-// 
-// 	// Goto end of the file
-// 	File->Seek(0, ZE_SF_END);
-// 
-// 	// Write the new record start position
-// 	File->Write(&NewRecordStartPosition, sizeof(ZEDWORD), 1);
-// 
-// 	// Goto the beginning of the chunk data so that user can start adding data
-// 	File->Seek(OldRecordsStartPosition, ZE_SF_BEGINING);
-// 
-// 	File->Flush();
-// 
-// 	return true;
-// 
-// 	/////////// OLD CODE /////////////////
-// 
-// 
-// 
-// 	/*OpenCache();
-// 
-// 	// Read the last element which is first record's start position
-// 	fseek(File, -sizeof(ZEDWORD), SEEK_END);
-// 
-// 	// Get old record end position
-// 	size_t OldRecordsEndPosition = 0;
-// 	OldRecordsEndPosition = ftell(File);
-// 
-// 	// Get old record start position
-// 	size_t OldRecordsStartPosition = 0;
-// 	fread(&OldRecordsStartPosition, sizeof(ZEDWORD), 1, File);
-// 
-// 	// Calculate the old record's total size and the new record start position
-// 	size_t OldRecordsSize = OldRecordsEndPosition - OldRecordsStartPosition;
-// 	size_t NewRecordStartPosition = OldRecordsStartPosition + TotalChunkSize;
-// 
-// 	// Copy all the records to their new position
-// 	if(OldRecordsSize != 0)
-// 	CopyData(File, OldRecordsStartPosition, OldRecordsSize, NewRecordStartPosition);
-// 
-// 
-// 	// Goto last record en position and write the empty header
-// 	fseek(File, NewRecordStartPosition + OldRecordsSize, SEEK_SET);
-// 	ZEChunkHeader Header;
-// 	fwrite(&Header, sizeof(ZEChunkHeader), 1, File);
-// 	// Write the identifier
-// 	size_t IdentifierSize = Identifier->Write(File);
-// 
-// 	// Go back to new header start position
-// 	fseek(File, NewRecordStartPosition + OldRecordsSize, SEEK_SET);
-// 	// Fill the header data
-// 	Header.Header = 'ZECH';
-// 	Header.ChunkPosition = OldRecordsStartPosition;
-// 	Header.ChunkHash = Identifier->GetHash();
-// 	Header.ChunkSize = TotalChunkSize;
-// 	Header.IdentifierSize = IdentifierSize;
-// 
-// 	// Write the actual header data
-// 	fwrite(&Header, sizeof(ZEChunkHeader), 1, File);
-// 
-// 	// Goto end of the file
-// 	fseek(File, 0, SEEK_END);
-// 
-// 	// Write the new record start position
-// 	fwrite(&NewRecordStartPosition, sizeof(ZEDWORD), 1, File);
-// 
-// 	// Goto the beginning of the chunk data so that user can start adding data
-// 	fseek(File, OldRecordsStartPosition, SEEK_SET);
-// 
-// 	// Flush
-// 	fflush(File);
-// 
-// 	return true;*/
-// }
-// 
-// // WARNING: this function may corrupt the cache if it writes more data than the empty space.
-// size_t ZEFileCache::AddToChunk(void* Data, size_t Size, size_t Count)
-// {
-// 	// Directly write the data
-// 	return File->Write(Data, Size, Count);
-// 
-// 	/////////// OLD CODE /////////////////
-// 	// fwrite(Data, Size, 1, File);
-// }
-// 
-// size_t ZEFileCache::GetFromChunk(void* Data, size_t Size, size_t Count)
-// {
-// 	// Directly read the data
-// 	File->Read(Data, Size, Count);
-// 
-// 	/////////// OLD CODE /////////////////
-// 	//fread(Data, Size, 1, File);
-// }
-// 
-// // OK
-// void ZEFileCache::CloseChunk()
-// {
-// 	CloseCache();
-// }
