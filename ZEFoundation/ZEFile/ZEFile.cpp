@@ -33,33 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#define WINDOWS_LEAN_AND_MEAN
-
 #include "ZEFile.h"
-#include "ZEDefinitions.h"
 #include "ZECore/ZEError.h"
 
-#include <Windows.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#include <string.h>
 #include <fstream>
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
 
-
-ZEFile* ZEFile::Open(ZEString FilePath)
+ZEFile::ZEFile()
 {
-	// will resolve the path and return an ZECache or ZEPack or ZEFile
-	// WILL BE WRITTEN
-	zeAssert(true, "NOT IMPLEMENTED!!!");
-	return NULL;
-}
-
-ZEFile::ZEFile() : File(NULL), FileCursor(0)
-{
-	// Empty
+	File = NULL;
+	FileCursor = 0;
 }
 
 ZEFile::~ZEFile()
@@ -79,15 +68,15 @@ void* ZEFile::GetFileHandle() const
 
 bool ZEFile::Eof()
 {
-	if (!IsOpen())
+	if(!File)
 		return false;
 
-	return (feof((FILE*)File) == 0) ? false : true;
+	return (bool)feof((FILE*)File);
 }
 
-bool ZEFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
+bool ZEFile::Seek(int Offset, ZESeekFrom Origin)
 {
-	if (!IsOpen())
+	if(!File)
 		return false;
 
 	int OriginNorm;
@@ -97,26 +86,26 @@ bool ZEFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
 			OriginNorm = SEEK_SET;
 			break;
 		case ZE_SF_CURRENT:
-			_fseeki64((FILE*)File, FileCursor, SEEK_SET);
+			fseek((FILE*)File, FileCursor, SEEK_SET);
 			OriginNorm = SEEK_CUR;
 			break;
 		case ZE_SF_END:
 			OriginNorm = SEEK_END;
 			break;
 	}
-
-	if (_fseeki64((FILE*)File, Offset, OriginNorm) == 0)
+	
+	if (fseek((FILE*)File, Offset, OriginNorm) == 0)
 	{	
-		FileCursor = _ftelli64((FILE*)File);
+		FileCursor = ftell((FILE*)File);
 		return true;
 	}
 	else
 		return false;
 }
 
-ZEQWORD ZEFile::Tell()
+size_t ZEFile::Tell()
 {
-	if (!IsOpen())
+	if(!File)
 		return 0;
 
 	return FileCursor;
@@ -124,18 +113,17 @@ ZEQWORD ZEFile::Tell()
 
 void ZEFile::Close()
 {
-	if (IsOpen())
-	{
+	if (File != NULL)
+	{	
 		fclose((FILE*)File);
 		File = NULL;
 		FileCursor = 0;
-		FileName.Clear();
 	}
 }
 
 void ZEFile::Flush()
 {
-	if(!IsOpen())
+	if(!File)
 		return;
 
 	fflush((FILE*)File);
@@ -143,7 +131,7 @@ void ZEFile::Flush()
 
 bool ZEFile::IsOpen()
 {
-	if(File != NULL && !FileName.IsEmpty())
+	if(File && FileName[0])
 		return true;
 
 	return false;
@@ -151,7 +139,9 @@ bool ZEFile::IsOpen()
 
 bool ZEFile::Open(const ZEString FileName, ZEFileMode Mode, bool Binary)
 {
-	zeAssert(IsOpen(), "Close the previous file first");
+	zeAssert(File, "Close the previous file first");
+
+	this->FileName = FileName;
 
 	const char* StrMode = NULL;
 	const char*	AltStrMode = NULL;
@@ -166,7 +156,7 @@ bool ZEFile::Open(const ZEString FileName, ZEFileMode Mode, bool Binary)
 				StrMode = "r";
 			break;
 		}
-
+			
 		case ZE_FM_WRITE_ONLY:
 		{
 			if (Binary)
@@ -181,7 +171,7 @@ bool ZEFile::Open(const ZEString FileName, ZEFileMode Mode, bool Binary)
 			}
 			break;
 		}
-
+			
 		case ZE_FM_APPEND_ONLY:
 		{
 			if (Binary)
@@ -199,7 +189,7 @@ bool ZEFile::Open(const ZEString FileName, ZEFileMode Mode, bool Binary)
 				StrMode = "a+";
 			break;
 		}
-
+			
 		case ZE_FM_READ_WRITE:
 		{
 			if(Binary)
@@ -214,25 +204,24 @@ bool ZEFile::Open(const ZEString FileName, ZEFileMode Mode, bool Binary)
 			}
 			break;
 		}
-
+			
 		default:
 			return false;
 			break;	
 	}
 
 	// Try to open file
-	File = fopen(FileName, StrMode);
+	File = fopen(this->FileName, StrMode);
 
 	if(File == NULL) // If cant open
 	{
 		if(AltStrMode) // If there is an alternative opening mode
 		{
 			// Try to open with alternative mode
-			File = fopen(FileName, AltStrMode);
-
+			File = fopen(this->FileName, AltStrMode);
+			
 			if(File != NULL) // If opened
 			{
-				this->FileName = FileName;
 				return true;
 			}
 			else
@@ -249,66 +238,65 @@ bool ZEFile::Open(const ZEString FileName, ZEFileMode Mode, bool Binary)
 	}
 	else
 	{
-		this->FileName = FileName;
 		return true;
 	}
 
 	return false;
 }
 
-ZEQWORD ZEFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)
+size_t ZEFile::Read(void* Buffer, size_t Size, size_t Count)
 {
-	if(!IsOpen())
+	if(!File)
 		return 0;
 
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-	ZEQWORD ReadCount = fread(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	fseek((FILE*)File, FileCursor, SEEK_SET);
+	size_t ReadCount = fread(Buffer, Size, Count, (FILE*)File);
 	FileCursor += ReadCount * Size;
 
 	return ReadCount;
 }
 
-ZEQWORD ZEFile::ReadFormated(const char* Format, ...)
+size_t ZEFile::ReadFormated(const char* Format, ...)
 {
-	if(!IsOpen())
+	if(!File)
 		return 0;
 
 	zeAssert(true, "Not Implemented Yet.");
 
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
+//	fseek((FILE*)File, FileCursor, SEEK_SET);
 
-	va_list ArgList;
-
-	va_start(ArgList, Format);
-	ZEQWORD ReadCount = 0;
-	// 	ReadCount = _tinput_l((FILE*)File, Format, 0, ArgList);
-	va_end(ArgList);
-	FileCursor += ReadCount;
-	return ReadCount;
+// 	va_list ArgList;
+// 
+// 	va_start(ArgList, Format);
+// 	size_t ReadCount = _tinput_l((FILE*)File, Format, 0, ArgList);
+// 	va_end(ArgList);
+//	FileCursor += ReadCount;
+//	return ReadCount;
+	return 0;
 }
 
-ZEQWORD ZEFile::Write( const void* Buffer, ZEQWORD Size, ZEQWORD Count)
+size_t ZEFile::Write( const void* Buffer, size_t Size, size_t Count)
 {
-	if(!IsOpen())
+	if(!File)
 		return 0;
 
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-	ZEQWORD WriteCount = fwrite(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	fseek((FILE*)File, FileCursor, SEEK_SET);
+	size_t WriteCount = fwrite(Buffer, Size, Count, (FILE*)File);
 	FileCursor += WriteCount * Size;
 
 	return WriteCount;
 }
 
-ZEQWORD ZEFile::WriteFormated(const char* Format, ...)
+size_t ZEFile::WriteFormated(const char* Format, ...)
 {
-	if(!IsOpen())
+	if(!File)
 		return 0;
 
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
+	fseek((FILE*)File, FileCursor, SEEK_SET);
 
 	va_list ArgList;
 	va_start(ArgList, Format);
-	ZEQWORD WriteSize = vfprintf((FILE*)File, Format, ArgList);
+	size_t WriteSize = vfprintf((FILE*)File, Format, ArgList);
 	va_end(ArgList);
 
 	FileCursor += WriteSize;
@@ -316,29 +304,28 @@ ZEQWORD ZEFile::WriteFormated(const char* Format, ...)
 	return WriteSize;
 }
 
-ZEQWORD ZEFile::GetFileSize(const ZEString FileName)
+size_t ZEFile::GetFileSize(const char* FileName)
 {
 	struct stat FileStatus;
 
-	if (stat(FileName.GetValue(), &FileStatus) != 0)
+	if(stat( FileName, &FileStatus ) != 0)
 		return 0;
 
 	return FileStatus.st_size;
 }
-
-ZEQWORD ZEFile::GetFileSize()
+size_t ZEFile::GetFileSize()
 {
-	if(!IsOpen())
+	if (!File)
 		return 0;
 
-	_fseeki64((FILE*)File, 0, SEEK_END);
-	ZEQWORD EndCursor = _ftelli64((FILE*)File);
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
+	fseek((FILE*)File, 0, SEEK_END);
+	size_t EndCursor = ftell((FILE*)File);
+	fseek((FILE*)File, FileCursor, SEEK_SET);
 
 	return EndCursor;
 }
 
-bool ZEFile::ReadFile(const ZEString FileName, void* Buffer, ZEQWORD BufferSize)
+bool ZEFile::ReadFile(const ZEString FileName, void* Buffer, size_t BufferSize)
 {
 	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
 	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", (const char*)FileName);
@@ -350,19 +337,20 @@ bool ZEFile::ReadFile(const ZEString FileName, void* Buffer, ZEQWORD BufferSize)
 		return false;
 	}
 
-	_fseeki64((FILE*)File, 0, SEEK_END);
-	ZEQWORD FileSize = _ftelli64(File);
-	_fseeki64((FILE*)File, 0, SEEK_SET);
+	fseek((FILE*)File, 0, SEEK_END);
+	size_t FileSize = ftell(File);
+	fseek((FILE*)File, 0, SEEK_SET);
 
 	zeAssert(BufferSize < FileSize, "File size exceed buffer size.");
 
-	fread(Buffer, sizeof(char), (BufferSize > FileSize ? (size_t)FileSize : (size_t)BufferSize), File);
+	fread(Buffer, sizeof(char), (BufferSize > FileSize ? FileSize : BufferSize), File);
 
 	fclose(File);
+
 	return true;
 }
 
-bool ZEFile::ReadTextFile(const ZEString FileName, char* Buffer, ZEQWORD BufferSize)
+bool ZEFile::ReadTextFile(const ZEString FileName, char* Buffer, size_t BufferSize)
 {
 	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
 
@@ -375,18 +363,24 @@ bool ZEFile::ReadTextFile(const ZEString FileName, char* Buffer, ZEQWORD BufferS
 		return false;
 	}
 
-	_fseeki64((FILE*)File, 0, SEEK_END);
-	ZEQWORD FileSize = _ftelli64(File);
-	_fseeki64((FILE*)File, 0, SEEK_SET);
+	fseek(File, 0, SEEK_END);
+	size_t FileSize = ftell(File);
+	fseek(File, 0, SEEK_SET);
 
 	zeAssert(BufferSize < FileSize + 1, "File size exceed buffer size.");
 
-	fread(Buffer, sizeof(char), (size_t)FileSize, File);
+	if (BufferSize < FileSize + 1)
+		return false;
+
+	fread(Buffer, sizeof(char), FileSize, File);
 	Buffer[FileSize] = '\0';
 
 	fclose(File);
 	return true;
 }
+
+#define WINDOWS_LEAN_AND_MEAN
+#include <Windows.h>
 
 ZEString ZEFile::GetAbsolutePath(const ZEString Path)
 {
@@ -401,9 +395,9 @@ bool ZEFile::IsDirectoryExists(const ZEString Path)
 	BOOL Result = Handle != INVALID_HANDLE_VALUE;
 	while(Result)
 	{
-		if ((Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
+		if (Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY != 0)
 			return true;
-
+		
 		Result = FindNextFile(Handle, &Info);
 	}
 
@@ -415,7 +409,7 @@ bool ZEFile::IsDirectoryExists(const ZEString Path)
 ZEString ZEFile::GetParentDirectory(const ZEString Path)
 {
 	size_t Length = Path.GetLength();
-
+	
 	if (Length == 0)
 		return "";
 
@@ -424,7 +418,7 @@ ZEString ZEFile::GetParentDirectory(const ZEString Path)
 		if (Path[I] == '\\')
 			return Path.Left(I);
 	}
-
+	
 	return "";
 }
 
@@ -436,7 +430,7 @@ bool ZEFile::IsFileExists(const ZEString Path)
 	BOOL Result = Handle != INVALID_HANDLE_VALUE;
 	while(Result)
 	{
-		if ((Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
+		if (Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY == 0)
 			return true;
 
 		Result = FindNextFile(Handle, &Info);
@@ -468,24 +462,27 @@ ZEString ZEFile::GetFileExtension(const ZEString Path)
 	return "";
 }
 
+/////////////////////////////////////////////////////////////////////////
+//////////////////		ZEPartialFile		/////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
 ZEPartialFile::ZEPartialFile() : StartPosition(0), EndPosition(0), IsEof(false)
 {
-	/* Empty */
+	// Empty
 }
 
 ZEPartialFile::~ZEPartialFile()
 {
-	Close();
+	File = NULL;
 }
 
+// Should not be used
 bool ZEPartialFile::Open(const ZEString FileName, ZEFileMode Mode, bool Binary)
 {
-	// Partial File should only be opened by a parent ZEFile
 	return false;
 }
 
-bool ZEPartialFile::Open(ZEFile* ParentFile, ZEQWORD Offset, ZEQWORD Size)
+bool ZEPartialFile::Open(ZEFile* ParentFile, size_t Offset, size_t Size)
 {
 	zeAssert(Size == 0, "Cannot open a PartialFile with 0 size");
 
@@ -496,40 +493,37 @@ bool ZEPartialFile::Open(ZEFile* ParentFile, ZEQWORD Offset, ZEQWORD Size)
 	this->File		= ParentFile->GetFileHandle();
 
 	this->FileName = ParentFile->GetFileName();
-
-	_fseeki64((FILE*)this->File, StartPosition, SEEK_SET);
+	
+	fseek((FILE*)this->File, StartPosition, SEEK_SET);
 	return true;
 }
 
 void ZEPartialFile::Close()
 {
-	// Do not close the parent file
 	StartPosition	= 0;
 	EndPosition		= 0;
 	File			= NULL;
 	IsEof			= false;
-
-	FileName.Clear();
 }
 
-ZEQWORD ZEPartialFile::GetFileSize()
+size_t ZEPartialFile::GetFileSize()
 {
 	return EndPosition - StartPosition;	
 }
 
-ZEQWORD ZEPartialFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)
+size_t ZEPartialFile::Read(void* Buffer, size_t Size, size_t Count)
 {
-	if(!IsOpen())
+	if(!File)
 		return 0;
 
 	// Goto this File's cursor position
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
+	fseek((FILE*)File, FileCursor, SEEK_SET);
 
 	if(FileCursor < StartPosition || EndPosition < FileCursor)
 		return 0;
 
 	// Calculate the maximum possible read count
-	ZEQWORD ReadEndPos = _ftelli64((FILE*)File) + Size * Count;
+	size_t ReadEndPos = ftell((FILE*)File) + Size * Count;
 	if (ReadEndPos > EndPosition)
 	{
 		Count -= (ReadEndPos - EndPosition) / Size + (((ReadEndPos - EndPosition) % Size) == 0 ? 0 : 1);
@@ -537,131 +531,133 @@ ZEQWORD ZEPartialFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)
 	}
 
 	// Read
-	ZEQWORD ReadCount = fread(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	size_t ReadCount = fread(Buffer, Size, Count, (FILE*)File);
 	FileCursor += ReadCount * Size;
 
 	return ReadCount;
 }
 
 
-ZEQWORD ZEPartialFile::ReadFormated(const char* Format, ...)
+size_t ZEPartialFile::ReadFormated(const char* Format, ...)
 {
-	if(!IsOpen())
+	if(!File)
 		return 0;
 
 	// Goto this File's cursor position
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
+	fseek((FILE*)File, FileCursor, SEEK_SET);
 
 	// Check if the cursor is in the file boundary
 	if(FileCursor < StartPosition || EndPosition < FileCursor)
 		return 0;
 
 	zeAssert(true, "Not Implemented Yet.");
-	// 	va_list ArgList;
-	// 
-	// 	va_start(ArgList, Format);
-	// 	size_t CharCount = _tinput_l(File, Format, 0, ArgList);
-	// 	va_end(ArgList);
+// 	va_list ArgList;
+// 
+// 	va_start(ArgList, Format);
+// 	size_t CharCount = _tinput_l(File, Format, 0, ArgList);
+// 	va_end(ArgList);
 
 	return 0;
 }
 
-ZEQWORD ZEPartialFile::Write(void* Buffer, ZEQWORD Size, ZEQWORD Count)
+size_t ZEPartialFile::Write(void* Buffer, size_t Size, size_t Count)
 {
-	if(!IsOpen())
+	if(!File)
 		return 0;
 
 	// Goto this File's cursor position
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
+	fseek((FILE*)File, FileCursor, SEEK_SET);
 
 	// Check if the cursor is in the file boundary
 	if(FileCursor < StartPosition || EndPosition < FileCursor)
 		return 0;
 
 	// Calculate the maximum possible write count
-	ZEQWORD WriteEndPos = _ftelli64((FILE*)File) + Size * Count;
+	size_t WriteEndPos = ftell((FILE*)File) + Size * Count;
 	if (WriteEndPos > EndPosition)
 	{
 		Count -= (WriteEndPos - EndPosition) / Size + (((WriteEndPos - EndPosition) % Size) == 0 ? 0 : 1);
 		IsEof = true;
 	}
 
-	ZEQWORD WriteCount = fwrite(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	size_t WriteCount = fwrite(Buffer, Size, Count, (FILE*)File);
 	FileCursor += WriteCount * Size;
 
 	return WriteCount;
 }
 
-ZEQWORD ZEPartialFile::WriteFormated(const char* Format, ...)
+size_t ZEPartialFile::WriteFormated(const char* Format, ...)
 {
-	if(!IsOpen())
+	if(!File)
 		return 0;
 
-	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
+	fseek((FILE*)File, FileCursor, SEEK_SET);
 	if(FileCursor < StartPosition || EndPosition < FileCursor)
 		return 0;
 
 	va_list ArgList;
 
 	va_start(ArgList, Format);
-	ZEQWORD WriteSize = vfprintf((FILE*)File, Format, ArgList);
+	size_t WriteSize = vfprintf((FILE*)File, Format, ArgList);
 	FileCursor += WriteSize;
 	va_end(ArgList);
 
 	return WriteSize;
 }
 
-bool ZEPartialFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
+
+
+bool ZEPartialFile::Seek(int Offset, ZESeekFrom Origin)
 {
-	if(!IsOpen())
+	if(!File)
 		return 0;
 
 	switch(Origin)
 	{
-	case ZE_SF_BEGINING:
+		case ZE_SF_BEGINING:
 		{
 			if(Offset < 0 || EndPosition < StartPosition + Offset)
 				return false;
 
-			if(_fseeki64((FILE*)File, StartPosition + Offset, SEEK_SET) != 0)
+			if(fseek((FILE*)File, StartPosition + Offset, SEEK_SET) != 0)
 				return false;
 
 			break;
 		}
 
-	case ZE_SF_CURRENT:
+		case ZE_SF_CURRENT:
 		{
-			_fseeki64((FILE*)File, FileCursor, SEEK_SET);
+			fseek((FILE*)File, FileCursor, SEEK_SET);
 
-			ZEQWORD CurrentPosition = 0;
-			CurrentPosition = _ftelli64((FILE*)File);
+			size_t CurrentPosition = 0;
+			CurrentPosition = ftell((FILE*)File);
 
 			if(CurrentPosition + Offset < StartPosition || EndPosition < CurrentPosition + Offset)
 				return false;
 
-			if(_fseeki64((FILE*)File, Offset, SEEK_CUR) != 0)
+			if(fseek((FILE*)File, Offset, SEEK_CUR) != 0)
 				return false;
 
 			break;
 		}
 
-	case ZE_SF_END:
+		case ZE_SF_END:
 		{
 			if(EndPosition + Offset < StartPosition || Offset > 0)
 				return false;
 
-			if(_fseeki64((FILE*)File, EndPosition + Offset, SEEK_SET) != 0)
+			if(fseek((FILE*)File, EndPosition + Offset, SEEK_SET) != 0)
 				return false;
 
 			break;
 		}
 
-	default:
-		return false;
-		break;
+		default:
+			return false;
+			break;
 	}
 
-	FileCursor = _ftelli64((FILE*)File);
+	FileCursor = ftell((FILE*)File);
 
 	if(IsEof == true && FileCursor >= StartPosition && FileCursor < EndPosition)
 		IsEof = false;
@@ -669,7 +665,7 @@ bool ZEPartialFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
 	return true;
 }
 
-ZEQWORD ZEPartialFile::Tell()
+size_t ZEPartialFile::Tell()
 {
 	return FileCursor - StartPosition;
 }
@@ -680,3 +676,8 @@ bool ZEPartialFile::Eof()
 }
 
 #pragma warning(pop)
+
+
+
+
+

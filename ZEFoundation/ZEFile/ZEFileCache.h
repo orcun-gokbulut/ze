@@ -39,75 +39,69 @@
 
 #include "ZETypes.h"
 #include "ZEFile.h"
+#include "ZEDS/ZEArray.h"
+
+#include <stdio.h>
+
+class ZEResourceFile;
+class ZEPartialResourceFile;
 
 
-#define ZE_FILE_MAKEVERSION(Major, Minor)			((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor))
-#define ZE_CACHE_VERSION							ZE_FILE_MAKEVERSION(0,1)
-
-#define ZE_CACHE_HEADER								((ZEDWORD)((ZEDWORD)'CCH ' + (ZEDWORD)'HDR '))
-#define	ZE_CACHE_IDENT_CHUNKID						((ZEDWORD)(ZE_CACHE_HEADER + (ZEDWORD)'IDEN'))
-#define	ZE_CACHE_DATA_CHUNKID						((ZEDWORD)(ZE_CACHE_HEADER + (ZEDWORD)'DATA'))
-
-#define ZE_CACHE_COMPLETENESS						((ZEQWORD)((((ZEQWORD)('FCCH')) << 32) + (ZEQWORD)('CMPT')))
-
-struct ZECacheFileHeader
-{
-	ZEDWORD		ChunkId;
-	ZEDWORD		Version;
-};
-
-struct ZECacheDataChunk
-{
-	ZEDWORD		ChunkId;
-};
-
-struct ZECacheIdentifierChunk
-{
-	ZEDWORD		ChunkId;
-	ZEQWORD		ChunkHash;
-	ZEQWORD		ChunkSize;
-	ZEQWORD		ChunkPosition;
-	ZEQWORD		IdentifierSize;
-};
-
-class ZECacheDataIdentifier
+class ZECacheChunkIdentifier
 {
 	public:
-		virtual ZEQWORD			GetHash() const = 0;
-		virtual ZEQWORD			Write(ZEFile* File) const = 0;
-		virtual bool			Equal(ZEFile* File) const = 0;
+		virtual ZEDWORD					GetHash() const = 0;
+		virtual size_t					Write(ZEFile* File) const = 0;
+		virtual bool					Equal(ZEFile* File) const = 0;
 };
 
 
 class ZEFileCache
 {
-	protected:
-		ZEFile					File;
+	private:
 
-		bool					CheckCompleteness();
-		void					PrepareCacheForFirstUse();
-		void					CopyData(ZEFile* File, ZEQWORD From, ZEQWORD Size, ZEQWORD To);
+		ZEFile*							File;
+		char							CacheFileName[256];
+		//const char*						CacheFileName;
 
 	public:
-		ZEFileCache();
-		~ZEFileCache();										
 
-		bool					OpenCache(const ZEString FileName);
-		const ZEString			GetCacheFileName();
-		void					CloseCache();
-		bool					ClearCache();
-		bool					IsOpen();
+										// Constructor
+										ZEFileCache();
+										// Destructor
+										~ZEFileCache();										
+										// Opens the cache file
+		bool							OpenCache(const char* CacheFileName);
+										// Closes the cache file
+		void							CloseCache();
+										// Empty the cache file
+		bool							ClearCache();
+										// Returns the cache file name
+		const char*						GetCacheFileName();
+										// Checks if the chunk exists
+		bool							ChunkExists(const ZECacheChunkIdentifier* Identifier);
+										// Create new chunk from Buffer
+		bool							AddChunk(const ZECacheChunkIdentifier* Identifier, const void* Data, size_t Size);
+										// Create new chunk from PartialFile
+		bool							CreateChunk(ZEPartialFile& PartialFile, const ZECacheChunkIdentifier* Identifier, size_t ChunkSize);
+										// Create new chunk from ResourceFile
+		bool							CreateChunk(ZEPartialResourceFile& ResourceFile, const ZECacheChunkIdentifier* Identifier, size_t ChunkSize);
+										// Returns the data in a buffer
+		bool							GetChunk(const ZECacheChunkIdentifier* Identifier, void* Buffer, size_t Offset, size_t Size);
+										// Returns the data as PartialFile
+		bool							OpenChunk(ZEPartialFile& PartialFile, const ZECacheChunkIdentifier* Identifier);
+										// Returns the data as ResourceFile
+		bool							OpenChunk(ZEPartialResourceFile& ResourceFile, const ZECacheChunkIdentifier* Identifier);
 
-		bool					ChunkExists(const ZECacheDataIdentifier* Identifier);
 
-		bool					AddChunk(const ZECacheDataIdentifier* Identifier, const void* Data, ZEQWORD Size);
-		bool					CreateChunk(ZEPartialFile& PartialFile, const ZECacheDataIdentifier* Identifier, ZEQWORD ChunkSize);
 
-		bool					GetChunk(const ZECacheDataIdentifier* Identifier, void* Buffer, ZEQWORD Offset, ZEQWORD Size);
-		bool					OpenChunk(ZEPartialFile& PartialFile, const ZECacheDataIdentifier* Identifier);
+										// KALKACAK
+// 		bool							OpenChunk(const ZECacheChunkIdentifier* Identifier, size_t TotalChunkSize);
+// 		size_t							AddToChunk(void* Data, size_t Size, size_t Count);
+// 		size_t							GetFromChunk(void* Data, size_t Size, size_t Count);
+// 		void							CloseChunk();
 
-		static bool				IsFileCache(ZEString FileName);
-
+										
 };
 
 #endif
