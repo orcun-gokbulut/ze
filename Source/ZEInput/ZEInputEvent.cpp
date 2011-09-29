@@ -224,7 +224,7 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 	}
 
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (int I = 0; I < Devices.GetCount(); I++)
+	for (size_t I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
 		{
 			Event.Device = Devices[I];
@@ -238,6 +238,8 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 	{
 		Event.Index = InputIndex.ToInteger();
 	}
+
+	return false;
 }
 
 
@@ -352,7 +354,7 @@ ZEInputEvent::ZEInputEvent(const ZEString DeviceName, ZEDWORD Index, ZEInputButt
 {
 	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (int I = 0; I < Devices.GetCount(); I++)
+	for (size_t I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
 		{
 			this->Device = Devices[I];
@@ -368,7 +370,7 @@ ZEInputEvent::ZEInputEvent(const ZEString DeviceName, ZEDWORD Index, ZEInputAxis
 {
 	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (int I = 0; I < Devices.GetCount(); I++)
+	for (size_t I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
 		{
 			this->Device = Devices[I];
@@ -384,7 +386,7 @@ ZEInputEvent::ZEInputEvent(const ZEString DeviceName, ZEInputType InputType, ZED
 {
 	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (int I = 0; I < Devices.GetCount(); I++)
+	for (size_t I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
 		{
 			this->Device = Devices[I];
@@ -399,7 +401,7 @@ ZEInputEvent::ZEInputEvent(const ZEString DeviceName, ZEInputType InputType, ZED
 ZEInputEvent::ZEInputEvent(const ZEString DeviceName, ZEDWORD Index, ZEInputQuaternionState State)
 {
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (int I = 0; I < Devices.GetCount(); I++)
+	for (size_t I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
 		{
 			this->Device = Devices[I];

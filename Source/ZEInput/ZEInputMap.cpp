@@ -48,7 +48,7 @@ const ZEInputAction* ZEInputMap::GetInputActions()
 
 const ZEInputAction* ZEInputMap::CheckInputAction(int Id)
 {
-	for (size_t I = 0; I < InputActionCount; I++)
+	for (int I = 0; I < InputActionCount; I++)
 		if (InputActions[I].Id == Id)
 			return &InputActions[I];
 	
