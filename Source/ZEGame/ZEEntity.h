@@ -111,7 +111,6 @@ typedef ZEDWORD ZEDrawFlags;
 typedef ZEDWORD ZERayCastFlags;
 #define ZE_RCF_INTERNAL							0
 #define ZE_RCF_BOUNDING_BOX						1
-#define ZE_RCF_INTERNAL							2
 
 // Entity Dirty Flags
 typedef ZEDWORD ZEEntityDirtyFlags;

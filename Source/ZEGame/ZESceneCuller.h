@@ -43,7 +43,7 @@
 class ZEScene;
 class ZEEntity;
 class ZELight;
-class ZEDrawParameters;
+struct ZEDrawParameters;
 
 struct ZECullStatistics
 {
