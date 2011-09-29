@@ -179,7 +179,7 @@ void ZEUIManager::ProcessEvents()
 		/************************************************************************/
 		if (OldMousePosition != CursorPosition)
 		{
-			for (int I = 0; I < Controls.GetCount(); I++)
+			for (size_t I = 0; I < Controls.GetCount(); I++)
 			{
 				if (Controls[I] == Cursor)
 				{
@@ -197,7 +197,7 @@ void ZEUIManager::ProcessEvents()
 
 				ZEUIControl* Reciever = NULL;
 
-				for (int I = 0; I < Controls.GetCount(); I++)
+				for (size_t I = 0; I < Controls.GetCount(); I++)
 				{
 					if (Controls[I]->GetVisiblity() == false)
 						continue;
@@ -258,7 +258,7 @@ void ZEUIManager::ProcessEvents()
 			}
 		}
 
-		if (LastPressedControl != NULL && Cursor->GetCurrentButton() == ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE)
+		if (LastPressedControl != NULL && Cursor->GetCurrentButton() == ZE_UI_MOUSE_BUTTON_NONE)
 		{
 			LastPressedControl->MouseButtonReleased(PressedButton, CursorPosition);
 			MouseMoveEventFlag = false;
@@ -438,7 +438,7 @@ void ZEUIManager::ProcessEvents()
 
 ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 {
-	for (int I = 0; I < ParentControl->GetChildControls().GetCount(); I++)
+	for (size_t I = 0; I < ParentControl->GetChildControls().GetCount(); I++)
 	{
 		ZEUIControl* CurrentControl = ParentControl->GetChildControls()[I];
 		if (ZERectangle::BoundingTest(CurrentControl->GetVisibleRectangle(), Cursor->GetPosition()))
@@ -468,7 +468,7 @@ void ZEUIManager::Render(ZERenderer* Renderer)
 
 void ZEUIManager::Tick(float ElapsedTime)
 {
-	for (int I = 0; I < Controls.GetCount(); I++)
+	for (size_t I = 0; I < Controls.GetCount(); I++)
 		if (Controls[I]->GetEnabled())
 			Controls[I]->Tick(ElapsedTime);
 

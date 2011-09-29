@@ -193,7 +193,7 @@ void ZEUIControl::SetPosition(const ZEVector2& Position)
 
 	ZEVector2 PositionDifference = Position - GetPosition();
 
-	for (int I = 0; I < GetChildControls().GetCount(); I++)
+	for (size_t I = 0; I < GetChildControls().GetCount(); I++)
 		GetChildControls()[I]->SetPosition(GetChildControls()[I]->GetPosition() + PositionDifference);
 
 	Rectangle.SetPosition(Position);
@@ -475,7 +475,7 @@ void ZEUIControl::Tick(float ElapsedTime)
 	if (!IsEnabled)
 		return;
 
-	for (int I = 0; I < ChildControls.GetCount(); I++)
+	for (size_t I = 0; I < ChildControls.GetCount(); I++)
 			ChildControls[I]->Tick(ElapsedTime);
 }
 

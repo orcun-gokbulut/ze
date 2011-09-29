@@ -49,10 +49,10 @@ ZEFontResource::ZEFontResource()
 
 ZEFontResource::~ZEFontResource()
 {
-	for (int I = 0; I < Materials.GetCount(); I++)
+	for (size_t I = 0; I < Materials.GetCount(); I++)
 		Materials[I]->Destroy();
 
-	for (int I = 0; I < TextureResources.GetCount(); I++)
+	for (size_t I = 0; I < TextureResources.GetCount(); I++)
 		TextureResources[I]->Release();
 }
 

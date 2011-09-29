@@ -49,7 +49,7 @@ class ZEUIRectangle
 		ZERectangle			Texcoords;
 		const ZEMaterial*	Material;
 		ZEVector4			Color;
-		float				ZOrder;
+		int					ZOrder;
 
 		static bool			Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, const ZERectangle& ClipRectangle);
 		void				ConvertToVertices(ZEUIVertex* Buffer) const;

@@ -103,7 +103,7 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 	size_t Size = Text.GetLength();
 
 	const ZERectangle& ControlRectangle = GetVisibleRectangle();
-	float ZOrder = GetZOrder();
+	int ZOrder = GetZOrder();
 
 	ZEUIRectangle Temporary;
 	Temporary.Material = NULL;
@@ -120,7 +120,7 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 
 		ZEVector2::Substution(CharacterSize, CurrCharacter.CoordinateRectangle.RightDown, CurrCharacter.CoordinateRectangle.LeftUp);
 		ZEVector2::Multiply(CharacterSize, CharacterSize, FontSize);
-		ZEVector2::Multiply(CharacterSize, CharacterSize, ZEVector2(CurrCharacter.Texture->GetWidth(), CurrCharacter.Texture->GetHeight()));
+		ZEVector2::Multiply(CharacterSize, CharacterSize, ZEVector2((float)CurrCharacter.Texture->GetWidth(), (float)CurrCharacter.Texture->GetHeight()));
 
 		if (TextWrap)
 		{

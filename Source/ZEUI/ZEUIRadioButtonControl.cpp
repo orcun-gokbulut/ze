@@ -50,7 +50,7 @@ void ZEUIRadioButtonControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVec
 	{
 		SetState(ZE_UI_RBS_CHECKED);
 
-		for (int I = 0; I < InteractingRadioButtons.GetCount(); I++)
+		for (size_t I = 0; I < InteractingRadioButtons.GetCount(); I++)
 			InteractingRadioButtons[I]->SetState(ZE_UI_RBS_UNCHECKED);
 	}
 }

@@ -68,7 +68,7 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 {
 	zeInput->ProcessInputMap(&InputMap);
 
-	for (size_t I = 0; I < InputMap.InputActionCount; I++)
+	for (int I = 0; I < InputMap.InputActionCount; I++)
 	{
 		switch (InputMap.InputActions[I].Id)
 		{
@@ -97,27 +97,27 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 				break;
 
 			case ACTIONID_LEFT_PRESS:
-				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_LEFT;
+				CurentButton = ZE_UI_MOUSE_BUTTON_LEFT;
 				break;
 
 			case ACTIONID_RIGHT_PRESS:
-				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_RIGHT;
+				CurentButton = ZE_UI_MOUSE_BUTTON_RIGHT;
 				break;
 
 			case ACTIONID_MIDDLE_PRESS:
-				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_MIDDLE;
+				CurentButton = ZE_UI_MOUSE_BUTTON_MIDDLE;
 				break;
 
 			case ACTIONID_LEFT_RELEASE:
-				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
+				CurentButton = ZE_UI_MOUSE_BUTTON_NONE;
 				break;
 
 			case ACTIONID_RIGHT_RELEASE:
-				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
+				CurentButton = ZE_UI_MOUSE_BUTTON_NONE;
 				break;
 
 			case ACTIONID_MIDDLE_RELEASE:
-				CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
+				CurentButton = ZE_UI_MOUSE_BUTTON_NONE;
 				break;
 
 			case ACTIONID_SCROLL_UP:
@@ -133,17 +133,17 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 
 	if (GetPosition().x > WindowWidth)
 	{
-		SetPosition(ZEVector2(WindowWidth, GetPosition().y));
+		SetPosition(ZEVector2((float)WindowWidth, GetPosition().y));
 	}
 
 	else if (GetPosition().x < 0)
 	{
-		SetPosition(ZEVector2(0, GetPosition().y));
+		SetPosition(ZEVector2(0.0f, GetPosition().y));
 	}
 
 	if (GetPosition().y > WindowHeight)
 	{
-		SetPosition(ZEVector2(GetPosition().x, WindowHeight));
+		SetPosition(ZEVector2(GetPosition().x, (float)WindowHeight));
 	}
 
 	else if (GetPosition().y < 0)
@@ -190,7 +190,7 @@ ZEUICursorControl::ZEUICursorControl()
 
 	int Width, Height;
 	zeCore->GetWindow()->GetWindowSize(Width, Height);
-	SetPosition(ZEVector2((Width / 2) , (Height / 2)));
+	SetPosition(ZEVector2((Width / 2.0f) , (Height / 2.0f)));
 
 	Cursor.Positions.LeftUp = GetVisibleRectangle().LeftUp;
 	Cursor.Positions.RightDown = GetVisibleRectangle().RightDown;
@@ -207,7 +207,7 @@ ZEUICursorControl::ZEUICursorControl()
 	SetEnabled(true);
 	SetFocusable(false);
 
-	CurentButton = ZEUIMouseKey::ZE_UI_MOUSE_BUTTON_NONE;
+	CurentButton = ZE_UI_MOUSE_BUTTON_NONE;
 	
 }
 
