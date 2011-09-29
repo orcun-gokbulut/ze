@@ -797,7 +797,7 @@ ZECharacter::ZECharacter()
 	StrafeStatus = ZE_CSS_NO_STRAFE;
 	StrafeTransitionTime = 0.3f;
 
-	WalkBackwardTransitionTime = 0.3;
+	WalkBackwardTransitionTime = 0.3f;
 	WalkBackwardSpeed = 0.7f;
 }
 

@@ -41,7 +41,7 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEDS/ZEArray.h"
-#include "ZETTypes.h"
+#include "ZETypes.h"
 #include "ZETDefinitions.h"
 
 #define ZE_MDLF_MAX_NAME_SIZE					ZE_MAX_NAME_SIZE

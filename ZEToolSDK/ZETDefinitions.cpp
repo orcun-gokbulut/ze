@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETTypes.h
+ Zinek Engine - ZETDefinitions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZET_DATA_TYPES_H__
-#define __ZET_DATA_TYPES_H__
-
-#define ZEINT8		__int8
-#define ZEINT16		__int16
-#define ZEINT32		__int32
-#define ZEINT64		__int64
-
-#define ZEQWORD		unsigned __int64
-#define ZEDWORD		unsigned __int32
-#define ZEWORD		unsigned __int16
-#define ZEBYTE		unsigned __int8
-#endif
+#include "ZETDefinitions.h"

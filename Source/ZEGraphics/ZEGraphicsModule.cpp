@@ -55,7 +55,7 @@ ZEModuleDescription* ZEGraphicsModule::ModuleDescription()
 
 ZEModuleDescription* ZEGraphicsModule::GetModuleDescription()
 {
-	return ZEGraphicsModule::GetModuleDescription();
+	return ZEGraphicsModule::ModuleDescription();
 }
 
 ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
@@ -265,7 +265,7 @@ void ZEGraphicsModule::SetAnisotropicFilter(int Level)
 	AnisotropicFilter = Level;
 }
 
-bool ZEGraphicsModule::GetAnisotropicFilter()
+int ZEGraphicsModule::GetAnisotropicFilter()
 {
 	return AnisotropicFilter;
 }

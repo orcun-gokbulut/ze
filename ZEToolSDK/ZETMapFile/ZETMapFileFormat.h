@@ -38,7 +38,7 @@
 #define __ZET_MAP_FILE_FORMAT_H__
 
 #include "ZETDefinitions.h"
-#include "ZETTypes.h"
+#include "ZETypes.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEAABBox.h"

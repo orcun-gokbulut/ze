@@ -282,7 +282,7 @@ float ZECore::GetFrameTime()
 float ZECore::GetRuningTime()
 {
 	QueryPerformanceCounter(&PerformanceCount);
-	return (PerformanceCount.QuadPart - StartPerformanceCount.QuadPart) / PerformanceCounterFreq.QuadPart;
+	return (float)((PerformanceCount.QuadPart - StartPerformanceCount.QuadPart) / PerformanceCounterFreq.QuadPart);
 }
 
 
@@ -617,7 +617,7 @@ void ZECore::MainLoop()
 	{
 		QueryPerformanceCounter(&PerformanceCount);
 
-		FrameTime = (double)(PerformanceCount.QuadPart - OldPerformanceCount.QuadPart) / (double)PerformanceCounterFreq.QuadPart;
+		FrameTime = (float)((PerformanceCount.QuadPart - OldPerformanceCount.QuadPart) / PerformanceCounterFreq.QuadPart);
 		OldPerformanceCount = PerformanceCount;
 	}
 

@@ -78,5 +78,7 @@ ZEProfiler* ZEProfilerManager::GetProfilerForData(const ZEString& Name)
 	for (size_t I = 0; I < Profilers.GetCount(); I++)
 		if (Profilers[I]->GetName() == Name)
 			return Profilers[I];
+
+	return NULL;
 }
 

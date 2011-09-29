@@ -37,7 +37,7 @@
 #ifndef __ZET_MATERIAL_FILE_FORMAT_H__
 #define __ZET_MATERIAL_FILE_FORMAT_H__
 
-#include "ZETTypes.h"
+#include "ZETypes.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZEVector.h"
 

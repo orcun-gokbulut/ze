@@ -66,9 +66,8 @@ add_source(ZEDefinitions.h 			Sources ZESDK)
 add_source(ZEFastDelegate.h 		Sources ZESDK)
 add_source(ZEFastDelegateBind.h		Sources ZESDK)
 add_source(ZEMain.cpp 				Sources)
-add_source(ZESDK.cpp 				Sources)
 add_source(ZESDK.h 					Sources ZESDK)
-add_source(ZETypes.h				Sources ZESDK)
+add_source(ZESDK.cpp 				Sources)
 
 add_source(ZECore/ZEWindowResources.rc	Sources)
 

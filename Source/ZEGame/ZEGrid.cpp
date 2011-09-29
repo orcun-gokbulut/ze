@@ -64,12 +64,12 @@ void ZEGrid::GenerateGrid()
 
 	MinorGrid.SetColor(ZEVector4(MinorGridColor, 1.0f));
 
-	int MinorGridLineCountX = GridSize.x / MinorGridUnitSize.x;
+	int MinorGridLineCountX = (int)(GridSize.x / MinorGridUnitSize.x);
 	if (MinorGridLineCountX % 2 == 1)
 		MinorGridLineCountX--;
 	MinorGridLineCountX /= 2;
 
-	int MinorGridLineCountY = GridSize.y / MinorGridUnitSize.y;
+	int MinorGridLineCountY = (int)(GridSize.y / MinorGridUnitSize.y);
 	if (MinorGridLineCountY % 2 == 1)
 		MinorGridLineCountY--;
 	MinorGridLineCountY /= 2;
@@ -86,12 +86,12 @@ void ZEGrid::GenerateGrid()
 
 	MajorGrid.SetColor(ZEVector4(MajorGridColor, 1.0f));
 
-	int MajorGridLineCountX = GridSize.x / MajorGridUnitSize.x;
+	int MajorGridLineCountX = (int)(GridSize.x / MajorGridUnitSize.x);
 	if (MajorGridLineCountX % 2 == 1)
 		MajorGridLineCountX--;
 	MajorGridLineCountX /= 2;
 
-	int MajorGridLineCountY = GridSize.y / MajorGridUnitSize.y;
+	int MajorGridLineCountY = (int)(GridSize.y / MajorGridUnitSize.y);
 	if (MajorGridLineCountY % 2 == 1)
 		MajorGridLineCountY--;
 	MajorGridLineCountY /= 2;

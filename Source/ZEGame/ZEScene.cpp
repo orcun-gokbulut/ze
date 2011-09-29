@@ -212,7 +212,7 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClassDescription* Desc)
 	ZEEntity* CurrentEntity = NULL;
 	ProperEntities.Clear();
 
-	for (int I = 0; I < Entities.GetCount(); I++)
+	for (size_t I = 0; I < Entities.GetCount(); I++)
 	{
 		CurrentEntity = Entities[I];
 

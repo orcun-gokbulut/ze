@@ -42,7 +42,7 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZEDS/ZEArray.h"
 #include "ZETDefinitions.h"
-#include "ZETTypes.h"
+#include "ZETypes.h"
 
 #define ZE_MDLF_MAX_NAME_SIZE						128
 #define ZE_MDLF_MAX_FILENAME_SIZE					256

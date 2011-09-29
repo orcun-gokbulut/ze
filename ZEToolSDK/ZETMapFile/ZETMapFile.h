@@ -42,7 +42,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERectangle3D.h"
 #include "ZEMath/ZEAABBox.h"
-#include "ZETTypes.h"
+#include "ZETypes.h"
 #include "ZETDefinitions.h"
 
 #define ZE_MPFL_MAX_NAME_SIZE				ZE_MAX_NAME_SIZE

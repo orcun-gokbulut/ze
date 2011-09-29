@@ -163,7 +163,7 @@ void ZEFixedMaterial::SetAlphaCullEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetAlphaCullEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_ALPHA_CULL;
+	return (MaterialComponents & ZE_SHADER_ALPHA_CULL) != 0;
 }
 
 void ZEFixedMaterial::SetAlphaCullLimit(float Limit)
@@ -187,7 +187,7 @@ void ZEFixedMaterial::SetAmbientEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetAmbientEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_AMBIENT;
+	return (MaterialComponents & ZE_SHADER_AMBIENT) != 0;
 }
 
 void ZEFixedMaterial::SetAmbientColor(const ZEVector3& Color)
@@ -222,7 +222,7 @@ void ZEFixedMaterial::SetDiffuseEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetDiffuseEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_DIFFUSE;
+	return (MaterialComponents & ZE_SHADER_DIFFUSE) != 0;
 }
 
 void ZEFixedMaterial::SetDiffuseColor(const ZEVector3& Color)
@@ -338,7 +338,7 @@ void ZEFixedMaterial::SetSpecularEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetSpecularEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_SPECULAR;
+	return (MaterialComponents & ZE_SHADER_SPECULAR) != 0;
 }
 
 void ZEFixedMaterial::SetSpecularColor(const ZEVector3& Color)
@@ -445,7 +445,7 @@ void ZEFixedMaterial::SetEmmisiveEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetEmmisiveEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_EMMISIVE;
+	return (MaterialComponents & ZE_SHADER_EMMISIVE) != 0;
 }
 
 void ZEFixedMaterial::SetEmmisiveFactor(float Factor)
@@ -540,7 +540,7 @@ void ZEFixedMaterial::SetNormalMapEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetNormalMapEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_NORMAL_MAP;
+	return (MaterialComponents & ZE_SHADER_NORMAL_MAP) != 0;
 }
 
 void ZEFixedMaterial::SetNormalMap(const ZETexture2D* Texture)
@@ -613,7 +613,7 @@ void ZEFixedMaterial::SetParallaxMapEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetParallaxMapEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_PARALLAX_MAP;
+	return (MaterialComponents & ZE_SHADER_PARALLAX_MAP) != 0;
 }
 
 void ZEFixedMaterial::SetParallaxMap(const ZETexture2D* Texture)
@@ -686,7 +686,7 @@ void ZEFixedMaterial::SetOpacityEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetOpacityEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_OPACITY;
+	return (MaterialComponents & ZE_SHADER_OPACITY) != 0;
 }
 
 void ZEFixedMaterial::SetOpacity(float Value)
@@ -868,7 +868,7 @@ void ZEFixedMaterial::SetReflectionEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetReflectionEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_REFLECTION;
+	return (MaterialComponents & ZE_SHADER_REFLECTION) != 0;
 }
 
 void ZEFixedMaterial::SetReflectionFactor(float Factor)
@@ -891,7 +891,7 @@ void ZEFixedMaterial::SetRefractionEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetRefractionEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_REFRACTION;
+	return (MaterialComponents & ZE_SHADER_REFRACTION) != 0;
 }
 
 void ZEFixedMaterial::SetRefractionIndex(float Index)
@@ -934,7 +934,7 @@ void ZEFixedMaterial::SetDetailBaseMapEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetDetailBaseMapEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_DETAIL_BASE_MAP;
+	return (MaterialComponents & ZE_SHADER_DETAIL_BASE_MAP) != 0;
 }
 
 void ZEFixedMaterial::SetDetailBaseMap(const ZETexture2D* Texture)
@@ -1007,7 +1007,7 @@ void ZEFixedMaterial::SetDetailNormalMapEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetDetailNormalMapEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_DETAIL_NORMAL_MAP;
+	return (MaterialComponents & ZE_SHADER_DETAIL_NORMAL_MAP) != 0;
 }
 
 void ZEFixedMaterial::SetDetailNormalMap(const ZETexture2D* Texture)
@@ -1080,7 +1080,7 @@ void ZEFixedMaterial::SetLightMapEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetLightMapEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_LIGHT_MAP;
+	return (MaterialComponents & ZE_SHADER_LIGHT_MAP) != 0;
 }
 
 void ZEFixedMaterial::SetLightMapFactor(float Factor)
@@ -1157,7 +1157,7 @@ void ZEFixedMaterial::SetDistortionEnabled(bool Enabled)
 
 bool ZEFixedMaterial::GetDistortionEnabled() const
 {
-	return MaterialComponents & ZE_SHADER_DISTORTION_MAP;
+	return (MaterialComponents & ZE_SHADER_DISTORTION_MAP) != 0;
 }
 
 void ZEFixedMaterial::SetDistortionFactor(float Factor)

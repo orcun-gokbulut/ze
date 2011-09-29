@@ -619,7 +619,7 @@ void ZECanvas::AddDisc(float Radius, unsigned int Segments)
 	float HAngle = (2.0f * ZE_PI) / Segments;
 	float UVDif = 1.0f / Segments;
 	int N = 0;
-	for (int X = 0; X < Segments; X++)
+	for (unsigned int X = 0; X < Segments; X++)
 	{
 		float sinfHAngle = sinf(X * HAngle);
 		float sinfHAnglePP = sinf((X + 1) * HAngle);

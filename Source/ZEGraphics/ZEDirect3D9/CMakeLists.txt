@@ -41,8 +41,6 @@ append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG
 
 add_subdirectory (ZED3D9PostProcessor)
 
-add_source (ZED3D9Common.cpp				Sources)
-add_source (ZED3D9Common.h					Sources)
 add_source (ZED3D9CommonTools.cpp			Sources)
 add_source (ZED3D9CommonTools.h				Sources)
 add_source (ZED3D9ComponentBase.cpp			Sources)

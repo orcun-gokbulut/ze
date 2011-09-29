@@ -110,8 +110,7 @@ void ZEPlayer::Tick(float Time)
 	float MetersPerSecond = 1.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
-	ZEComponent* HitComponent;
-	ZEEntity* HitEntity;
+
 	for (size_t I = 0; I < InputMap.InputActionCount; I++)
 	{
 		Current = &InputMap.InputActions[I];

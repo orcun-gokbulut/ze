@@ -36,7 +36,7 @@
 #ifndef __ZET_RESOURCE_INTERNAL_FILE__
 #define __ZET_RESOURCE_INTERNAL_FILE__
 
-#include "ZETTypes.h"
+#include "ZETypes.h"
 #include <stdio.h>
 
 class ZEResourceInternalFile

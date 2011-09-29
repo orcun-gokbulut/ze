@@ -543,9 +543,9 @@ ZEString ZEString::ToLower() const
 	Temp.Allocator.Allocate(&Temp.Buffer, (Length + 1) * sizeof(char));
 
 	for (size_t I = 0; I < Length; I++)
-		Temp.Buffer[I] = towlower(Buffer[I]);
+		Temp.Buffer[I] = tolower(Buffer[I]);
 
-	Temp.Buffer[Length] = L'\0';
+	Temp.Buffer[Length] = '\0';
 	
 	return Temp;
 }
@@ -561,9 +561,9 @@ ZEString ZEString::ToUpper() const
 	Temp.Allocator.Allocate(&Temp.Buffer, (Length + 1) * sizeof(char));
 
 	for (size_t I = 0; I < Length; I++)
-		Temp.Buffer[I] = towupper(Buffer[I]);
+		Temp.Buffer[I] = toupper(Buffer[I]);
 	
-	Temp.Buffer[Length] = L'\0';
+	Temp.Buffer[Length] = '\0';
 
 	return Temp;
 
@@ -581,13 +581,12 @@ int ZEString::ToInteger()
 
 float ZEString::ToFloat()
 {
-	return atof(Buffer);
+	return (float)atof(Buffer);
 }
 
 double ZEString::ToDouble()
 {
-	char* Temp;
-	return strtod(Buffer, &Temp);
+	return atof(Buffer);
 }
 
 ZEString& ZEString::operator=(const ZEString& String)

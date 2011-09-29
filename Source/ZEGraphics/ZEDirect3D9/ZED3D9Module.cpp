@@ -53,7 +53,7 @@
 #include "ZED3D9UIMaterial.h"
 #include "ZED3D9SimpleMaterial.h"
 #include "ZED3D9SkyBoxMaterial.h"
-#include "ZED3D9Common.h"
+#include "ZED3D9CommonTools.h"
 #include "ZED3D9ShaderManager.h"
 
 #include <d3dx9.h>
@@ -394,7 +394,7 @@ void ZED3D9Module::DeviceRestored()
 void ZED3D9Module::RestoreDevice(bool ForceReset)
 {
 	DeviceLost();
-	HRESULT DeviceState, Hr;
+	HRESULT DeviceState;
 	do
 	{
 		DeviceState = Device->TestCooperativeLevel();
@@ -488,7 +488,7 @@ void ZED3D9Module::SetAnisotropicFilter(int Level)
 		Device->SetSamplerState(I, D3DSAMP_MINFILTER, (AnisotropicFilter != 1 ? D3DTEXF_ANISOTROPIC : D3DTEXF_LINEAR));
 		Device->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 		if (AnisotropicFilter != 0)
-			Device->SetSamplerState(I, D3DSAMP_MAXANISOTROPY, (AnisotropicFilter * 2 > DeviceCaps.MaxAnisotropy ? DeviceCaps.MaxAnisotropy : 2 * AnisotropicFilter));
+			Device->SetSamplerState(I, D3DSAMP_MAXANISOTROPY, ((ZEDWORD)AnisotropicFilter * 2 > DeviceCaps.MaxAnisotropy ? DeviceCaps.MaxAnisotropy : 2 * (ZEDWORD)AnisotropicFilter));
 	}
 }
 

@@ -163,11 +163,11 @@ void ZEFreespaceInputDevice::ProcessInputs()
 
 		if (Message.messageType == FREESPACE_MESSAGE_USERFRAME)
 		{
-			Buttons[0] = Message.userFrame.button1 & 0x80;
-			Buttons[1] = Message.userFrame.button2 & 0x80;
-			Buttons[2] = Message.userFrame.button3 & 0x80;
-			Buttons[3] = Message.userFrame.button4 & 0x80;
-			Buttons[4] = Message.userFrame.button5 & 0x80;
+			Buttons[0] = (Message.userFrame.button1 & 0x80) != 0;
+			Buttons[1] = (Message.userFrame.button2 & 0x80) != 0;
+			Buttons[2] = (Message.userFrame.button3 & 0x80) != 0;
+			Buttons[3] = (Message.userFrame.button4 & 0x80) != 0;
+			Buttons[4] = (Message.userFrame.button5 & 0x80) != 0;
 
 			LinearPosition.x = Message.userFrame.linearPosX;
 			LinearPosition.y = Message.userFrame.linearPosY;
@@ -209,7 +209,7 @@ bool ZEFreespaceInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, Z
 						{
 							Action->Id = InputBinding->ActionId;
 							Action->From =  InputBinding;
-							Action->AxisValue = Axises[InputEvent->Index];
+							Action->AxisValue = (int)Axises[InputEvent->Index];
 							return true;
 						}
 					}
@@ -219,7 +219,7 @@ bool ZEFreespaceInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, Z
 						{
 							Action->Id = InputBinding->ActionId;
 							Action->From =  InputBinding;
-							Action->AxisValue = abs(Axises[InputEvent->Index]);
+							Action->AxisValue = abs((int)Axises[InputEvent->Index]);
 							return true;
 						}
 					}
@@ -227,9 +227,9 @@ bool ZEFreespaceInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, Z
 				break;
 
 			case ZE_IT_BUTTON:
-				if ((InputEvent->ButtonState == ZE_IBS_PRESSING && (Buttons[InputEvent->Index] & 0x80)) ||
-					(InputEvent->ButtonState == ZE_IBS_PRESSED && (Buttons[InputEvent->Index] & 0x80) && !(OldButtons[InputEvent->Index] & 0x80)) || 
-					(InputEvent->ButtonState == ZE_IBS_RELEASED && !(Buttons[InputEvent->Index] & 0x80) && (OldButtons[InputEvent->Index] & 0x80)))
+				if ((InputEvent->ButtonState == ZE_IBS_PRESSING && Buttons[InputEvent->Index]) ||
+					(InputEvent->ButtonState == ZE_IBS_PRESSED && Buttons[InputEvent->Index] && OldButtons[InputEvent->Index]) || 
+					(InputEvent->ButtonState == ZE_IBS_RELEASED && !Buttons[InputEvent->Index] && OldButtons[InputEvent->Index]))
 				{
 					Action->Id = InputBinding->ActionId;
 					Action->From =  InputBinding;		

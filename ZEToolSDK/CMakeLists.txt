@@ -54,11 +54,12 @@ add_subdirectory (ZETModelFile)
 
 add_source (ZETCompileOptions.h			Sources)
 add_source (ZETDefinitions.h			Sources ZEToolSDK)
+add_source (ZETDefinitions.cpp			Sources)
 add_source (ZETMain.cpp					Sources)
 add_source (ZEToolSDK.h					Sources ZEToolSDK)
+add_source (ZEToolSDK.cpp				Sources)
 add_source (ZETOutput.h					Sources ZEToolSDK)
 add_source (ZETOutput.cpp				Sources)
-add_source (ZETTypes.h					Sources ZEToolSDK)
 
 add_library (ZEToolSDK ${Sources})
 target_link_libraries (ZEToolSDK ZETMapFile ZETModelFile ZETMaterialFile ZETFontFile)

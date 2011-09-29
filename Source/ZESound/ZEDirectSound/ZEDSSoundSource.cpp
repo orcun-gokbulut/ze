@@ -108,9 +108,9 @@ bool ZEDSSoundSource::CreateBuffer(bool Is3D)
 void ZEDSSoundSource::ResetParameters()
 {
 	float EffectiveVolume = (float)Volume * ((float)GetModule()->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
-	DSBuffer->SetVolume(log10f((float)EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f);
+	DSBuffer->SetVolume((DWORD)(log10f((float)EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f));
 	DSBuffer->SetPan((((Pan + 100)*(DSBPAN_RIGHT - DSBPAN_LEFT))/200) + DSBPAN_LEFT);
-	DSBuffer->SetFrequency(PlaybackSpeed * SoundResource->GetSamplesPerSecond());
+	DSBuffer->SetFrequency((DWORD)(PlaybackSpeed * SoundResource->GetSamplesPerSecond()));
 }
 
 void ZEDSSoundSource::ResetStream()
@@ -276,7 +276,7 @@ void ZEDSSoundSource::SetPlaybackSpeed(float Speed)
 	PlaybackSpeed = Speed;
 
 	if (SoundResource != NULL)
-		DSBuffer->SetFrequency(Speed * SoundResource->GetSamplesPerSecond());
+		DSBuffer->SetFrequency((DWORD)(Speed * SoundResource->GetSamplesPerSecond()));
 }
 
 void ZEDSSoundSource::SetVolume(unsigned int NewVolume)
@@ -289,7 +289,7 @@ void ZEDSSoundSource::SetVolume(unsigned int NewVolume)
 	float EffectiveVolume = (float)Volume * ((float)GetModule()->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
 	
 	if (DSBuffer != NULL)
-		DSBuffer->SetVolume(log10f((float)EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f);
+		DSBuffer->SetVolume((LONG)(log10f(EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f));
 }
 
 void ZEDSSoundSource::SetLooping(bool Enabled)

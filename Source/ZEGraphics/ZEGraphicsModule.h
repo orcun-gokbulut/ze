@@ -116,7 +116,7 @@ class ZEGraphicsModule : public ZEModule
 		virtual void						SetAntiAliasing(int Level);
 		int									GetAntiAliasing();
 		virtual void						SetAnisotropicFilter(int Level);
-		bool								GetAnisotropicFilter();
+		int								GetAnisotropicFilter();
 
 		virtual ZETextureOptions*			GetTextureOptions();
 

@@ -45,10 +45,10 @@
 ZEPixelColor ZEPixelColor::Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T)
 {
 	ZEPixelColor Temp;
-	Temp.a = A.a * (1.0f - T) + B.a * T;
-	Temp.r = A.r * (1.0f - T) + B.r * T;
-	Temp.g = A.g * (1.0f - T) + B.g * T;
-	Temp.b = A.b * (1.0f - T) + B.b * T;
+	Temp.a = (unsigned char)((float)A.a * (1.0f - T) + (float)B.a * T);
+	Temp.r = (unsigned char)((float)A.r * (1.0f - T) + (float)B.r * T);
+	Temp.g = (unsigned char)((float)A.g * (1.0f - T) + (float)B.g * T);
+	Temp.b = (unsigned char)((float)A.b * (1.0f - T) + (float)B.b * T);
 
 	return Temp;
 }
@@ -56,10 +56,10 @@ ZEPixelColor ZEPixelColor::Lerp(const ZEPixelColor& A, const ZEPixelColor& B, fl
 ZEVector4 ZEPixelColor::LerpFloat(const ZEPixelColor& A, const ZEPixelColor& B, float T)
 {
 	ZEVector4 Temp;
-	Temp.w = (float)A.a * (1.0f - T) + (float)B.a * T;
-	Temp.x = (float)A.r * (1.0f - T) + (float)B.r * T;
-	Temp.y = (float)A.g * (1.0f - T) + (float)B.g * T;
-	Temp.z = (float)A.b * (1.0f - T) + (float)B.b * T;
+	Temp.w = (unsigned char)((float)A.a * (1.0f - T) + (float)B.a * T);
+	Temp.x = (unsigned char)((float)A.r * (1.0f - T) + (float)B.r * T);
+	Temp.y = (unsigned char)((float)A.g * (1.0f - T) + (float)B.g * T);
+	Temp.z = (unsigned char)((float)A.b * (1.0f - T) + (float)B.b * T);
 
 	return Temp;
 }
@@ -101,6 +101,8 @@ bool ZEBitmap::Create(unsigned int Width, unsigned int Height, unsigned int Pixe
 	this->Height = Height;
 	this->PixelSize = PixelSize;
 	this->Pixels = new ZEBYTE[Width * Height * PixelSize];
+
+	return true;
 }
 
 unsigned int ZEBitmap::GetWidth()
@@ -185,7 +187,7 @@ ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserO
 
 		case ZE_BAM_MIRROR:
 		{
-			bool Odd = (x / Width) % 2;
+			bool Odd = ((x / Width) % 2) == 1;
 			if (Odd)
 			{
 				if (x >= (int)Width)
@@ -231,7 +233,7 @@ ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserO
 
 		case ZE_BAM_MIRROR:
 		{
-			bool Odd = (y / Height) % 2;
+			bool Odd = ((y / Height) % 2) == 1;
 			if (Odd)
 			{
 				if (y >= (int)Height)
@@ -287,15 +289,16 @@ ZEVector4 ZEBitmap::SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitma
 
 	if (Options->Filter == ZE_BFM_POINT)
 	{
-		return SamplePixelFloat(floorf(TextureCoordinate.x), floorf(TextureCoordinate.y), Options);
+		return SamplePixelFloat((int)floorf(TextureCoordinate.x), (int)floorf(TextureCoordinate.y), Options);
 	}
+
 	if (Options->Filter == ZE_BFM_BILINEAR)
 	{
-		int x = floorf(TextureCoordinate.x);
-		int y = floorf(TextureCoordinate.y);
+		int x = (int)floorf(TextureCoordinate.x);
+		int y = (int)floorf(TextureCoordinate.y);
 
-		float RatioU = TextureCoordinate.x - x;
-		float RatioV = TextureCoordinate.y - y;
+		float RatioU = TextureCoordinate.x - (float)x;
+		float RatioV = TextureCoordinate.y - (float)y;
 
 		ZEVector4 A = SamplePixelFloat(x, y, Options);
 		ZEVector4 B = SamplePixelFloat(x + 1, y, Options);
@@ -310,6 +313,8 @@ ZEVector4 ZEBitmap::SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitma
 
 		return Output;
 	}
+
+	return ZEVector4::Zero;
 }
 
 void ZEBitmap::CopyFrom(void* SourceBuffer, unsigned int SourcePitch, 

@@ -49,20 +49,20 @@ class ZEProfiler
 		ZEString					Name;
 		ZEProfiler*					ParentProfiler;
 		ZEProfilerManager*			Manager;
-
-		ZEQWORD						StartTime;
-		ZEQWORD						EndTime;
-		ZEQWORD						PassedTime;
-
-		int 						TotalCount;
-		int							FrameCount;
-		int							TotalMinimumTime;
-		int							FrameMinimumTime;
-		int							TotalMaximumTime;
-		int							FrameMaximumTime;
-		int							TotalTime;
-		int							FrameTotalTime;
 		bool						ProfilerActive;
+
+		ZEINT64						StartTime;
+		ZEINT64						EndTime;
+		ZEINT64						PassedTime;
+
+		ZEINT64 					TotalCount;
+		ZEINT64						FrameCount;
+		ZEINT64						TotalMinimumTime;
+		ZEINT64						FrameMinimumTime;
+		ZEINT64						TotalMaximumTime;
+		ZEINT64						FrameMaximumTime;
+		ZEINT64						TotalTime;
+		ZEINT64						FrameTotalTime;
 
 
 	public:
@@ -77,23 +77,23 @@ class ZEProfiler
 		void						Start();
 		void						Stop();
 
-		int							GetFrameCount();
-		int							GetFrameMinimumTime();
-		int							GetFrameMaximumTime();
-		int							GetFrameTotalTime();
-		int							GetFrameAverageTime();
+		ZEINT64						GetFrameCount();
+		ZEINT64						GetFrameMinimumTime();
+		ZEINT64						GetFrameMaximumTime();
+		ZEINT64						GetFrameTotalTime();
+		ZEINT64						GetFrameAverageTime();
 
-		int							GetTotalCount();
-		int							GetTotalMinimumTime();
-		int							GetTotalTime();
-		int							GetTotalAverageTime();
-		int							GetTotalMaximumTime();
+		ZEINT64						GetTotalCount();
+		ZEINT64						GetTotalMinimumTime();
+		ZEINT64						GetTotalTime();
+		ZEINT64						GetTotalAverageTime();
+		ZEINT64						GetTotalMaximumTime();
 
 		void						ResetFrame();
 		void						ResetTotal();	
 
-									ZEProfiler(void);
-									~ZEProfiler(void);
+									ZEProfiler();
+									~ZEProfiler();
 };
 
 #endif

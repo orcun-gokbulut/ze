@@ -46,7 +46,7 @@ class ZEInputMap
 {
 	public:
 		ZEInputAction				InputActions[50];
-		int							InputActionCount;
+		size_t						InputActionCount;
 
 	public:
 		ZEArray<ZEInputBinding>		InputBindings;

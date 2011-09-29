@@ -85,7 +85,7 @@ bool ZEFreespaceInputDeviceExtension::Initialize()
 	}
 
 	Devices.SetCount(NumberOfDevices);
-	for(size_t I = 0; I < NumberOfDevices; I++)
+	for (int I = 0; I < NumberOfDevices; I++)
 	{
 		Devices[I].Device = DeviceIds[I];
 		freespace_getDeviceInfo(I, &Devices[I].DeviceInfo);

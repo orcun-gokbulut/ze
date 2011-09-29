@@ -70,9 +70,9 @@ const ZEString& ZEProfiler::GetName()
 
 void ZEProfiler::Start()
 {
+	ProfilerActive = true;
 	StartTime = 0;
 	EndTime = 0;
-	ProfilerActive = true;
 	StartTime = GetTickCount64();
 }
 
@@ -116,54 +116,54 @@ void ZEProfiler::Stop()
 	
 }
 
-int ZEProfiler::GetFrameCount()
+ZEINT64 ZEProfiler::GetFrameCount()
 {
 	return FrameCount;
 }
 
-int ZEProfiler::GetTotalCount()
+ZEINT64 ZEProfiler::GetTotalCount()
 {
 	return TotalCount;
 }
 
-int ZEProfiler::GetFrameMaximumTime()
+ZEINT64 ZEProfiler::GetFrameMaximumTime()
 {
 	return FrameMaximumTime;
 }
 
-int ZEProfiler::GetTotalMaximumTime()
+ZEINT64 ZEProfiler::GetTotalMaximumTime()
 {
 	return TotalMaximumTime;
 }
 
-int ZEProfiler::GetFrameMinimumTime()
+ZEINT64 ZEProfiler::GetFrameMinimumTime()
 {
 	return FrameMinimumTime;
 }
 
-int ZEProfiler::GetTotalMinimumTime()
+ZEINT64 ZEProfiler::GetTotalMinimumTime()
 {
 	return TotalMinimumTime;
 }
 
-int ZEProfiler::GetTotalTime()
+ZEINT64 ZEProfiler::GetTotalTime()
 {
 	return TotalTime;
 }
 
-int ZEProfiler::GetFrameTotalTime()
+ZEINT64 ZEProfiler::GetFrameTotalTime()
 {
 	return FrameTotalTime;
 }
 
-int ZEProfiler::GetTotalAverageTime()
+ZEINT64 ZEProfiler::GetTotalAverageTime()
 {
 	if(TotalCount == 0)
 		return 0;
 	return (int)(TotalTime / TotalCount);
 }
 
-int ZEProfiler::GetFrameAverageTime()
+ZEINT64 ZEProfiler::GetFrameAverageTime()
 {
 	if(FrameCount == 0)
 		return 0;

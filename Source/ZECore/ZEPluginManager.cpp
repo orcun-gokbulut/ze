@@ -91,6 +91,8 @@ bool ZEPluginManager::RegisterPlugin(ZEPlugin* Plugin)
 	}
 
 	zeLog("Plugin Manager", "Plugin registered. Plugin Name : \"%s\".", Plugin->GetName());
+
+	return true;
 }
 
 void ZEPluginManager::UnregisterPlugin(ZEPlugin* Plugin)

@@ -33,18 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DATATYPES_H__
-#define __ZE_DATATYPES_H__
+#ifndef __ZE_TYPES_H__
+#define __ZE_TYPES_H__
 
-#define ZEINT8		__int8
-#define ZEINT16		__int16
-#define ZEINT32		__int32
-#define ZEINT64		__int64
+typedef char				ZEINT8;
+typedef short				ZEINT16;
+typedef int					ZEINT32;
+typedef long long			ZEINT64;
+typedef signed int			ZEInt;
 
-#define ZEQWORD		unsigned __int64
-#define ZEDWORD		unsigned __int32
-#define ZEWORD		unsigned __int16
-#define ZEBYTE		unsigned __int8
+typedef unsigned char		ZEUINT8;
+typedef unsigned short int	ZEUINT16;
+typedef unsigned int		ZEUINT32;
+typedef unsigned long long	ZEUINT64;
+typedef unsigned int		ZEUInt;
+
+typedef float				ZEFloat32;
+typedef double				ZEFloat64;
+typedef unsigned char		ZEChar;
+
+#define ZEBYTE				ZEUINT8
+#define ZEWORD				ZEUINT16
+#define ZEDWORD				ZEUINT32
+#define ZEQWORD				ZEUINT64
 #endif
 
 

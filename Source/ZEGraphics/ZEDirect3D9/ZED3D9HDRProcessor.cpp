@@ -57,28 +57,26 @@ static float GausianFunction(float x, float y, float StandartDeviation)
 
 void FillGaussianKernel1D(float* Kernel, size_t KernelSize, float StandartDeviation)
 {
-	int HalfKernelSize = (KernelSize - 1) / 2;
-	for (int x = 0; x < KernelSize; x++)
+	size_t HalfKernelSize = (KernelSize - 1) / 2;
+	for (size_t x = 0; x < KernelSize; x++)
 	{
-		Kernel[4 * x] = x - HalfKernelSize;
-		Kernel[4 * x + 1] = GausianFunction(x - HalfKernelSize, StandartDeviation);
+		Kernel[4 * x] = (float)(x - HalfKernelSize);
+		Kernel[4 * x + 1] = GausianFunction((float)(x - HalfKernelSize), StandartDeviation);
 	}
 }
 
 static void FillGaussianKernel2D(float* Kernel, size_t KernelSize, float StandartDeviation)
 {
-	int HalfKernelSize = (KernelSize - 1) / 2;
-	for (int y = 0; y < KernelSize; y++)
+	size_t HalfKernelSize = (KernelSize - 1) / 2;
+	for (size_t y = 0; y < KernelSize; y++)
 	{
-		for (int x = 0; x < KernelSize; x++)
+		for (size_t x = 0; x < KernelSize; x++)
 		{
 			float* CurrentSample = &Kernel[4 * KernelSize * y + x];
-			CurrentSample[0] = x - HalfKernelSize;
-			CurrentSample[1] = y - HalfKernelSize;
-			CurrentSample[2] = GausianFunction(x - HalfKernelSize, y - HalfKernelSize, StandartDeviation);
-			zeOutput("%lf ", CurrentSample[2]);
+			CurrentSample[0] = (float)(x - HalfKernelSize);
+			CurrentSample[1] = (float)(y - HalfKernelSize);
+			CurrentSample[2] = GausianFunction((float)(x - HalfKernelSize), (float)(y - HalfKernelSize), StandartDeviation);
 		}
-		zeOutput("\r\n");
 	}
 }
 
@@ -554,7 +552,6 @@ ZED3D9ViewPort* ZED3D9HDRProcessor::GetOutput()
 
 void ZED3D9HDRProcessor::Initialize()
 {
-	size_t ScreenWidth, ScreenHeight;
 	D3DVERTEXELEMENT9 Declaration[] = 
 	{
 		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
