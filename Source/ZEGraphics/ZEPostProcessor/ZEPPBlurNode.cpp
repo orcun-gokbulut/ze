@@ -58,7 +58,7 @@ ZEPPBlurNode::ZEPPBlurNode()
 	StandartDeviation = 0.84089642f;		
 	KernelDirtyFlag = true;
 	PassCount = 1;
-	DownSample = 1.0f;
+	DownSample = 1;
 }
 
 ZEPPBlurNode::~ZEPPBlurNode()
