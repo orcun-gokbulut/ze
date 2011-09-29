@@ -46,12 +46,12 @@
 
 inline ZEVector3 VRPN_TO_ZE_VEC(const vrpn_float64* Position)
 {
-	return ZEVector3(Position[0], Position[1], Position[2]);
+	return ZEVector3((float)Position[0], (float)Position[1], (float)Position[2]);
 }
 
 inline ZEQuaternion VRPN_TO_ZE_QUAD(const vrpn_float64* Quaternion)
 {
-	return ZEQuaternion(Quaternion[3], -Quaternion[1], Quaternion[2], -Quaternion[0]).Normalize();	
+	return ZEQuaternion((float)Quaternion[3], -(float)Quaternion[1], (float)Quaternion[2], -(float)Quaternion[0]).Normalize();	
 }
 
 static void VRPN_CALLBACK Tracker_ChangeHandler(void* UserData, const vrpn_TRACKERCB Data)
@@ -76,8 +76,8 @@ static void VRPN_CALLBACK Axis_ChangeHandler(void* UserData, const vrpn_ANALOGCB
 	ZEVRPNInputDevice* Device = (ZEVRPNInputDevice*)UserData;
 
 	int AxisCount = Data.num_channel > 3 ? 3 : Data.num_channel;
-	for (size_t I = 0; I < AxisCount; I++)
-		Device->Axises[I] = Data.channel[I];
+	for (int I = 0; I < AxisCount; I++)
+		Device->Axises[I] = (float)(Data.channel[I]);
 }
 
 
@@ -173,7 +173,7 @@ bool ZEVRPNInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInpu
 						{
 							Action->Id = InputBinding->ActionId;
 							Action->From =  InputBinding;
-							Action->AxisValue = Axises[InputEvent->Index];
+							Action->AxisValue = (int)(Axises[InputEvent->Index]);
 							return true;
 						}
 					}
@@ -183,7 +183,7 @@ bool ZEVRPNInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInpu
 						{
 							Action->Id = InputBinding->ActionId;
 							Action->From =  InputBinding;
-							Action->AxisValue = -Axises[InputEvent->Index];
+							Action->AxisValue = (int)(-Axises[InputEvent->Index]);
 							return true;
 						}
 					}
