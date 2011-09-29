@@ -44,7 +44,7 @@
 #include "ZEGraphics/ZERenderOrder.h"
 
 class ZEModel;
-class ZEModelResourceMesh;
+struct ZEModelResourceMesh;
 class ZEPhysicsBody;
 class ZEModelMesh
 {
