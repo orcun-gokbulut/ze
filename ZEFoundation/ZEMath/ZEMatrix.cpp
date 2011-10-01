@@ -461,7 +461,7 @@ bool ZEMatrix3x3::operator != (const ZEMatrix3x3 &M) const
 		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_TRESHOLD)
 			return true;
 
-	return true;
+	return false;
 }
 
 ZEMatrix3x3::ZEMatrix3x3(float M00, float M01, float M02,
