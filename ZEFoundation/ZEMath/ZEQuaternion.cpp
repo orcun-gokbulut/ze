@@ -157,9 +157,9 @@ void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Mat
 	Quat.x = sqrt(__max(0.0f, 1.0f + Matrix.M11 - Matrix.M22 - Matrix.M33)) / 2.0f;
 	Quat.y = sqrt(__max(0.0f, 1.0f - Matrix.M11 + Matrix.M22 - Matrix.M33)) / 2.0f;
 	Quat.z = sqrt(__max(0.0f, 1.0f - Matrix.M11 - Matrix.M22 + Matrix.M33)) / 2.0f;
-	Quat.x = _copysign(Quat.x, Matrix.M32 - Matrix.M23);
-	Quat.y = _copysign(Quat.y, Matrix.M13 - Matrix.M31);
-	Quat.z = _copysign(Quat.z, Matrix.M21 - Matrix.M12);
+	Quat.x = (float)_copysign(Quat.x, Matrix.M32 - Matrix.M23);
+	Quat.y = (float)_copysign(Quat.y, Matrix.M13 - Matrix.M31);
+	Quat.z = (float)_copysign(Quat.z, Matrix.M21 - Matrix.M12);
 
 	ZEQuaternion::Normalize(Quat, Quat);
 
