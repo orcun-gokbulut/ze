@@ -617,7 +617,7 @@ void ZECore::MainLoop()
 	{
 		QueryPerformanceCounter(&PerformanceCount);
 
-		FrameTime = (float)((PerformanceCount.QuadPart - OldPerformanceCount.QuadPart) / PerformanceCounterFreq.QuadPart);
+		FrameTime = (float)((double)(PerformanceCount.QuadPart - OldPerformanceCount.QuadPart) / (double)PerformanceCounterFreq.QuadPart);
 		OldPerformanceCount = PerformanceCount;
 	}
 

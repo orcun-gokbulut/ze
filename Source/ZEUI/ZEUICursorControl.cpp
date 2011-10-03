@@ -68,7 +68,7 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 {
 	zeInput->ProcessInputMap(&InputMap);
 
-	for (int I = 0; I < InputMap.InputActionCount; I++)
+	for (size_t I = 0; I < InputMap.InputActionCount; I++)
 	{
 		switch (InputMap.InputActions[I].Id)
 		{

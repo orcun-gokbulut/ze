@@ -440,7 +440,7 @@ void ZEModel::Tick(float ElapsedTime)
 
 void ZEModel::TransformChangeEvent(const ZEPhysicalTransformChangeEventArgument& TransformChange)
 {
-	for (int I = 0; I < Bones.GetCount(); I++)
+	for (size_t I = 0; I < Bones.GetCount(); I++)
 	{
 		if(Bones[I].GetParentBone() != NULL)
 		{
@@ -464,7 +464,7 @@ void ZEModel::TransformChangeEvent(const ZEPhysicalTransformChangeEventArgument&
 		}
 	}
 
-	for (int I = 0; I < Meshes.GetCount(); I++)
+	for (size_t I = 0; I < Meshes.GetCount(); I++)
 	{
 		if (Meshes[I].GetPhysicalBody() != NULL)
 		{

@@ -406,7 +406,7 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="TwoSided" groupname="Shading" type="boolean" autogetset="yes"/>
 			<property name="Wireframe" groupname="Shading" type="boolean" autogetset="yes"/>
 			<property name="AlphaCullEnabled" groupname="Transparancy" type="boolean" autogetset="yes"/>
-			<property name="AlphaCullLimit" groupname="Transparancy" type="integer" autogetset="yes"/>
+			<property name="AlphaCullLimit" groupname="Transparancy" type="float" autogetset="yes"/>
 			<property name="TransparancyMode" groupname="Transparancy" type="integer" autogetset="yes">
 				<enumurator name="ZEMaterialTransparancyMode">
 					<item name="No Transparancy" value="ZE_MTM_NONE"/>

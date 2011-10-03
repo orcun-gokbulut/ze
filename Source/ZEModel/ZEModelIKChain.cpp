@@ -174,7 +174,7 @@ void ZEModelIKChain::Iterate()
 ZEModelIKChain::ZEModelIKChain()
 {
 	Enabled = true;
-	ErrorThreshold = 0.1;
+	ErrorThreshold = 0.1f;
 	MaxIterationCount = 10;
 	RotationLimit = 15.0f;
 }

@@ -188,7 +188,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 
 		CurrentMaterial->SetBaseMap(ManageModelMaterialTextures(MaterialChunk.DiffuseMap, Model->TextureResources));
 		
-		CurrentMaterial->SetNormalMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_NORMALMAP);
+		CurrentMaterial->SetNormalMapEnabled((MaterialChunk.ShaderComponents & ZE_MFSC_NORMALMAP) != 0);
 		CurrentMaterial->SetNormalMap(ManageModelMaterialTextures(MaterialChunk.NormalMap, Model->TextureResources));
 		CurrentMaterial->SetSpecularMap(ManageModelMaterialTextures(MaterialChunk.SpecularMap, Model->TextureResources));
 		CurrentMaterial->SetEmmisiveMap(ManageModelMaterialTextures(MaterialChunk.EmmisiveMap, Model->TextureResources));
@@ -201,7 +201,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetRefractionEnabled(false);
 		CurrentMaterial->SetEnvironmentMap(NULL);//ManageMapMaterialTextures(MaterialChunk.EnvironmentMap, TextureResources));
 
-		CurrentMaterial->SetLightMapEnabled(MaterialChunk.ShaderComponents & ZE_MFSC_LIGHTMAP);
+		CurrentMaterial->SetLightMapEnabled((MaterialChunk.ShaderComponents & ZE_MFSC_LIGHTMAP) != 0);
 		CurrentMaterial->SetLightMap(ManageModelMaterialTextures(MaterialChunk.LightMap, Model->TextureResources));
 
  		CurrentMaterial->UpdateMaterial();
@@ -762,6 +762,6 @@ ZEModelResource* ZEModelResource::LoadResource(const char* FileName)
 
 ZEModelResource::~ZEModelResource()
 {
-	for (int I = 0; I < TextureResources.GetCount(); I++)
+	for (size_t I = 0; I < TextureResources.GetCount(); I++)
 		TextureResources[I]->Release();
 }

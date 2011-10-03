@@ -327,7 +327,7 @@ size_t ZESoundSource::GetLoopingLength()
 
 float ZESoundSource::GetLoopingLenghtTime()
 {
-	return GetLoopingLength() / SoundResource->GetSamplesPerSecond();
+	return (float)(GetLoopingLength() / SoundResource->GetSamplesPerSecond());
 }
 
 float ZESoundSource::GetLoopingLenghtPercent()

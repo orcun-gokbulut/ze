@@ -71,7 +71,6 @@ void ZETextureTools::CompressTexture(void* DestinationData, unsigned int Destina
 {
 	ATI_TC_FORMAT	Format;
 	ATI_TC_Speed	Speed;
-	int				CompressedPitch;	
 
 	// Decide Compression Type
 	switch(CompressionOptions->CompressionType)
@@ -152,8 +151,8 @@ void ZETextureTools::DownSample2x(void* DestinationData, unsigned int Destinatio
 	if(SourceWidth < 1 || SourceHeight < 1)
 		return;
 
-	int DestinationHeight = SourceHeight / 2;
-	int DestinationWidth = SourceWidth / 2;
+	unsigned int DestinationHeight = SourceHeight / 2;
+	unsigned int DestinationWidth = SourceWidth / 2;
 
 	for (size_t y = 0; y < DestinationHeight; y++)
 	{

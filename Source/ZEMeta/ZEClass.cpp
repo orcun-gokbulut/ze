@@ -91,7 +91,7 @@ bool ZEClass::SetProperty(const char* PropertyName, const ZEVariant& Value)
 			Hash += PropertyName[I];
 		}
 
-		for (int I = 0; I < CustomProperties.GetCount(); I++)
+		for (size_t I = 0; I < CustomProperties.GetCount(); I++)
 		{
 			if (CustomProperties[I].Hash == Hash && Value.GetType() == CustomProperties[I].Type)
 			{
@@ -121,7 +121,7 @@ bool ZEClass::GetProperty(const char* PropertyName, ZEVariant& Value) const
 			Hash += PropertyName[I];
 		}
 
-		for (int I = 0; I < CustomProperties.GetCount(); I++)
+		for (size_t I = 0; I < CustomProperties.GetCount(); I++)
 		{
 			if (CustomProperties[I].Hash == Hash)
 			{
@@ -136,7 +136,7 @@ bool ZEClass::GetProperty(const char* PropertyName, ZEVariant& Value) const
 
 bool ZEClass::AddCustomProperty(ZERunTimeProperty Property)
 {
-	for (int I = 0; I < CustomProperties.GetCount(); I++)
+	for (size_t I = 0; I < CustomProperties.GetCount(); I++)
 	{
 		if (GetProperty(Property.Name, ZEVariant()))
 		{
@@ -166,7 +166,7 @@ bool ZEClass::RemoveCustomProperty(const char* PropertyName)
 		Hash += PropertyName[I];
 	}
 
-	for (int I = 0; I < CustomProperties.GetCount(); I++)
+	for (size_t I = 0; I < CustomProperties.GetCount(); I++)
 	{
 		if (CustomProperties[I].Hash == Hash)
 		{
@@ -279,7 +279,7 @@ bool ZEClass::Serialize(ZESerializer* Serializer)
 			strcpy(NameBuffer, Properties[I].Name);
 
 			Serializer->Write((void*)NameBuffer, sizeof(char), ZE_MAX_NAME_SIZE);
-			if (Properties[I].Access == ZE_PA_READ | ZE_PA_WRITE)
+			if (Properties[I].Access == (ZE_PA_READ | ZE_PA_WRITE))
 				if (!GetProperty(PropertyOffset + I, Value))
 				{
 					zeError("Class Serialize", "Class does not have specified property. (Class Type Name : \"%s\", Property Name : \"%s\")", GetClassDescription()->GetName(), Properties[I].Name);
