@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERectangle.h"
-//#include "Core/Error.h"
 
 bool ZERectangle::IsEmpty()
 {
@@ -54,7 +53,7 @@ ZEVector2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
 		case ZE_RC_RIGHTUP:
 			return ZEVector2(RightDown.x, LeftUp.y);
 		default:
-			//ZEASSERT(true, "Wrong enum value ZERectangleCorner. Value : %d", Corner);
+			//zeError("ZEMath", "Wrong enum value ZERectangleCorner. Value : %d", Corner);
 			break;
 	}
 }

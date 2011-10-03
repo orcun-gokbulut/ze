@@ -268,6 +268,8 @@ bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray, f
 	{
 		TMin = TMax = TempTMax;
 	}
+
+	return true;
 }
 
 bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment& Line)

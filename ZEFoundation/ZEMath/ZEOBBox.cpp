@@ -61,6 +61,9 @@ ZEVector3 ZEOBBox::GetVertex(unsigned char Index) const
 			return Center + Front * HalfSize.z;
 		case 5:
 			return Center + Front * HalfSize.z;
+		default:
+			//zeError("ZEMath", "Wrong Index ZEOBBox vertex. Index : %d", Index);
+			break;
 	}
 }
 

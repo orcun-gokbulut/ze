@@ -1035,7 +1035,6 @@ bool ZEMatrix4x4::Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix)
 		0.0f, Matrix.M42, Matrix.M43, Matrix.M44);
 	Out.M13 = O.Determinant() / Determinant;
 
-	float detp;
 	ZEMatrix4x4 P;
 	ZEMatrix4x4::Create(P,
 		Matrix.M11, 0, Matrix.M13, Matrix.M14,
@@ -1044,7 +1043,6 @@ bool ZEMatrix4x4::Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix)
 		Matrix.M41, 0, Matrix.M43, Matrix.M44);
 	Out.M23 = P.Determinant() / Determinant;
 
-	float detq;
 	ZEMatrix4x4 Q;
 	ZEMatrix4x4::Create(Q,
 		Matrix.M11, Matrix.M12, 0.0f, Matrix.M14,
