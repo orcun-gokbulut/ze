@@ -174,7 +174,7 @@ void ZEDEntitySelector::GenerateList()
 	QTreeWidgetItem*	CurrentItem;
 	QString				TempString;
 
-	for(int I = 0; I < Scene->GetEntities().GetCount(); I++)
+	for(size_t I = 0; I < Scene->GetEntities().GetCount(); I++)
 	{
 			CurrentEntity = Scene->GetEntities()[I];
 
@@ -195,7 +195,7 @@ void ZEDEntitySelector::GenerateList()
 
 	this->FilterComboBox->addItem(QString("All"));
 
-	for(int I = 0; I < ZEEntityProvider::GetInstance()->GetClasses().GetCount(); I++)
+	for(size_t I = 0; I < ZEEntityProvider::GetInstance()->GetClasses().GetCount(); I++)
 	{
 		this->FilterComboBox->addItem(QString(ZEEntityProvider::GetInstance()->GetClasses().GetItem(I)->GetName()));
 	}

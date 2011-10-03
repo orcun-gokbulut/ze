@@ -93,6 +93,8 @@ QTreeWidgetItem* ZEDPropertyWindowManager::FindGroup(QString GroupName)
 	for(int I = 0; I < Groups.count(); I++)
 		if(GroupName == Groups[I]->GroupName)
 			return Groups[I]->Item;
+
+	return NULL;
 }
 
 void ZEDPropertyWindowManager::UpdatePropertyWidgets()
@@ -103,9 +105,7 @@ void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 	QSize							RowSize;
 	QStringList						GroupNames;
 	QString							CurrentGroupName;
-	QTreeWidgetItem*				WidgetItem;
 	QFont							TopLevelFont;
-	QLabel*							CurrentLabel;
 
 	const ZEPropertyDescription*		Properties;
 	size_t								PropertyCount;
@@ -121,7 +121,7 @@ void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 	
 		Properties = ClassDescription->GetProperties();
 
-		for(int I = 0; I < PropertyCount; I++)
+		for(size_t I = 0; I < PropertyCount; I++)
 		{
 			ZEPropertyDescription Property = Properties[I];
 
@@ -148,7 +148,7 @@ void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 
 			bool GroupExists = false;
 
-			for(int I = 0; I < PropertyCount; I++)
+			for(size_t I = 0; I < PropertyCount; I++)
 			{
 				GroupExists = false;
 
@@ -454,10 +454,12 @@ void ZEDPropertyWindowManager::UpdateCustomPropertyWidgets()
 
 	ZERunTimeProperty RuntimeProperty;
 
-	for (int I = 0; I < Class->GetCustomProperties()->GetCount(); I++)
+	for (size_t I = 0; I < Class->GetCustomProperties()->GetCount(); I++)
 	{
 		RuntimeProperty = Class->GetCustomProperties()->GetItem(I);
 		ZEPropertyDescription Property;
+
+		memset(&Property, 0, sizeof(ZEPropertyDescription));
 
 		Property.Name = RuntimeProperty.Name;
 		Property.Semantic = RuntimeProperty.Semantic;

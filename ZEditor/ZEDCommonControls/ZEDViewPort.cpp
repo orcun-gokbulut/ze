@@ -68,7 +68,7 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* Event)
 		float TRay = FLT_MAX;
 		SelectedAxis = ZED_GA_NONE;
 
-		for(int I = 0; I < this->SelectedItems->GetCount(); I++)
+		for(size_t I = 0; I < this->SelectedItems->GetCount(); I++)
 		{
 			if(this->SelectedItems->GetItem(I)->GetGizmo() != NULL)
 				this->SelectedAxis = this->SelectedItems->GetItem(I)->GetGizmo()->PickAxis(Ray, TRay);
@@ -78,7 +78,7 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* Event)
 		}
 
 		ZEDGizmo* SelectedGizmo = NULL;
-		for(int I = 0; I < this->SelectedItems->GetCount(); I++)
+		for(size_t I = 0; I < this->SelectedItems->GetCount(); I++)
 		{
 			if(this->SelectedItems->GetItem(I)->GetGizmo() != NULL)
 			{
@@ -106,7 +106,7 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* Event)
 			ZEEntity* PickedEntity = NULL;
 //			PickedEntity = RayCaster.PickEntity(Event->pos().x(), Event->pos().y());
 
-			for (int I = 0; I < SelectedItems->GetCount(); I++)
+			for (size_t I = 0; I < SelectedItems->GetCount(); I++)
 				delete SelectedItems->GetItem(I);
 
 			SelectedItems->Clear();
@@ -151,7 +151,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* Event)
 		else if(Event->buttons() & LeftButton && !(Event->buttons() & RightButton))
 		{	
 			ZEDGizmo* SelectedGizmo = NULL;
-			for(int I = 0; I < this->SelectedItems->GetCount(); I++)
+			for(size_t I = 0; I < this->SelectedItems->GetCount(); I++)
 			{
 				if(this->SelectedItems->GetItem(I)->GetGizmo() != NULL)
 				{
@@ -176,7 +176,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* Event)
 						ZEArray<ZEClass*> SelectedItemClasses;
 						ZEArray<ZEVariant> SelectedItemOldValues;
 
-						for(int I = 0; I < SelectedItems->GetCount(); I++)
+						for(size_t I = 0; I < SelectedItems->GetCount(); I++)
 						{
 							SelectedItemClasses.Add(SelectedItems->GetItem(I)->GetClass());
 							SelectedItemOldValues.Add(SelectedItems->GetItem(I)->GetPosition());
@@ -204,7 +204,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* Event)
 						ZEArray<ZEClass*> SelectedItemClasses;
 						ZEArray<ZEVariant> SelectedItemOldValues;
 
-						for(int I = 0; I < SelectedItems->GetCount(); I++)
+						for(size_t I = 0; I < SelectedItems->GetCount(); I++)
 						{
 							SelectedItemClasses.Add(SelectedItems->GetItem(I)->GetClass());
 							SelectedItemOldValues.Add(SelectedItems->GetItem(I)->GetScale());
@@ -231,7 +231,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* Event)
 		float TRay = FLT_MAX;
 		ZEDGizmo* CurrentGizmo = NULL;
 
-		for(int I = 0; I < SelectedItems->GetCount(); I++)
+		for(size_t I = 0; I < SelectedItems->GetCount(); I++)
 		{
 			CurrentGizmo = this->SelectedItems->GetItem(I)->GetGizmo();
 			
@@ -279,7 +279,7 @@ void ZEDViewPort::mouseReleaseEvent(QMouseEvent* Event)
 		{
 			ZEArray<ZEVariant> SelectedItemNewValues;
 
-			for(int I = 0; I < SelectedItems->GetCount(); I++)
+			for(size_t I = 0; I < SelectedItems->GetCount(); I++)
 			{
 				if (GizmoUndoRedo->GetGizmoMode() == ZED_GM_MOVE)
 					SelectedItemNewValues.Add(SelectedItems->GetItem(I)->GetPosition());
@@ -403,7 +403,7 @@ void ZEDViewPort::RotatePlayer(QPoint MousePosition)
 
 void ZEDViewPort::MoveSelections(ZEVector3 MoveAmount)
 {
-	for(int I = 0; I < this->SelectedItems->GetCount(); I++)
+	for(size_t I = 0; I < this->SelectedItems->GetCount(); I++)
 		SelectedItems->GetItem(I)->MoveUsingGizmo(MoveAmount);
 }
 
@@ -411,13 +411,13 @@ void ZEDViewPort::ScaleSelections(ZEVector3 ScaleAmount)
 {
 	ZEVector3::Scale(ScaleAmount, ScaleAmount, 1.0f/3.0f);//Fix
 
-	for(int I = 0; I < this->SelectedItems->GetCount(); I++)
+	for(size_t I = 0; I < this->SelectedItems->GetCount(); I++)
 		SelectedItems->GetItem(I)->ScaleUsingGizmo(ScaleAmount);
 }
 
 void ZEDViewPort::RotateSelections(ZEQuaternion RotateAmount)
 {
-	for(int I = 0; I < this->SelectedItems->GetCount(); I++)
+	for(size_t I = 0; I < this->SelectedItems->GetCount(); I++)
 		SelectedItems->GetItem(I)->RotateUsingGizmo(RotateAmount);
 }
 

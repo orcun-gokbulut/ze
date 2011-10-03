@@ -58,7 +58,7 @@ ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZECla
 
 	ParentTree->setItemWidget(this, 1, XValue);
 
-	if(this->ClassAttribute.Access & ZE_PA_WRITE != ZE_PA_WRITE)
+	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
 		XValue->setEnabled(false);
 
 	connect(this->XValue, SIGNAL(returnPressed()), this, SLOT(Changed()));

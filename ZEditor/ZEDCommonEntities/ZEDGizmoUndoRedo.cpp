@@ -65,7 +65,7 @@ bool ZEDGizmoUndoRedoOperation::Undo()
 {	
 	if (GizmoMode == ZED_GM_MOVE)
 	{	
-		for(int I = 0; I < SelectedClasses.GetCount(); I++)
+		for(size_t I = 0; I < SelectedClasses.GetCount(); I++)
 		{
 			if(SelectedClasses[I] != NULL)
 			{
@@ -75,7 +75,7 @@ bool ZEDGizmoUndoRedoOperation::Undo()
 	}
 	if (GizmoMode == ZED_GM_SCALE)
 	{	
-		for(int I = 0; I < SelectedClasses.GetCount(); I++)
+		for(size_t I = 0; I < SelectedClasses.GetCount(); I++)
 		{
 			if(SelectedClasses[I] != NULL)
 			{
@@ -85,7 +85,7 @@ bool ZEDGizmoUndoRedoOperation::Undo()
 	}
 	if (GizmoMode == ZED_GM_ROTATE)
 	{	
-		for(int I = 0; I < SelectedClasses.GetCount(); I++)
+		for(size_t I = 0; I < SelectedClasses.GetCount(); I++)
 		{
 			if(SelectedClasses[I] != NULL)
 			{
@@ -101,7 +101,7 @@ bool ZEDGizmoUndoRedoOperation::Redo()
 {
 	if (GizmoMode == ZED_GM_MOVE)
 	{	
-		for(int I = 0; I < SelectedClasses.GetCount(); I++)
+		for(size_t I = 0; I < SelectedClasses.GetCount(); I++)
 		{
 			if(SelectedClasses[I] != NULL)
 			{
@@ -111,7 +111,7 @@ bool ZEDGizmoUndoRedoOperation::Redo()
 	}
 	if (GizmoMode == ZED_GM_SCALE)
 	{	
-		for(int I = 0; I < SelectedClasses.GetCount(); I++)
+		for(size_t I = 0; I < SelectedClasses.GetCount(); I++)
 		{
 			if(SelectedClasses[I] != NULL)
 			{
@@ -121,7 +121,7 @@ bool ZEDGizmoUndoRedoOperation::Redo()
 	}
 	if (GizmoMode == ZED_GM_ROTATE)
 	{	
-		for(int I = 0; I < SelectedClasses.GetCount(); I++)
+		for(size_t I = 0; I < SelectedClasses.GetCount(); I++)
 		{
 			if(SelectedClasses[I] != NULL)
 			{

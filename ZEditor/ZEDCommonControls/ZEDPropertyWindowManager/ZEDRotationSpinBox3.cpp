@@ -104,7 +104,7 @@ ZEDRotationSpinBox3::ZEDRotationSpinBox3(QTreeWidget* ParentTree, QTreeWidgetIte
 
 	ValueCollectionLine->setText("[" + XValue->text() + " ;  " + YValue->text() + " ;  " + ZValue->text() + "]");
 
-	if(this->ClassAttribute.Access & ZE_PA_WRITE != ZE_PA_WRITE)
+	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
 	{
 		this->XValue->setEnabled(false);
 		this->YValue->setEnabled(false);

@@ -50,7 +50,7 @@
 
 using namespace Qt;
 
-class ZEDSoundFilePreviewWidget : public ZEDPreviewWidget, public QObject
+class ZEDSoundFilePreviewWidget : public ZEDPreviewWidget
 {
 	Q_OBJECT
 

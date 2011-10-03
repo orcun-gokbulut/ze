@@ -40,9 +40,9 @@ void ZEDEntitySelectionItem::Update()
 {
 	Gizmo->SetPosition(Entity->GetPosition());
 
-	if (GizmoSpace == ZEDGizmoSpace::ZED_GS_LOCAL)
+	if (GizmoSpace == ZED_GS_LOCAL)
 		Gizmo->SetRotation(Entity->GetRotation());
-	else if (GizmoSpace == ZEDGizmoSpace::ZED_GS_VIEW)
+	else if (GizmoSpace == ZED_GS_VIEW)
 		Gizmo->SetRotation(Scene->GetActiveCamera()->GetWorldRotation());
 	else 
 		Gizmo->SetRotation(ZEQuaternion::Identity);

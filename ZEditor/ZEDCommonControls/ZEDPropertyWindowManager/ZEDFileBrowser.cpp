@@ -73,7 +73,7 @@ ZEDFileBrowser::ZEDFileBrowser(QTreeWidget* ParentTree, QTreeWidgetItem *parent,
 
 	ParentTree->setItemWidget(this, 1, LayoutWidget);
 
-	if(this->ClassAttribute.Access & ZE_PA_WRITE != ZE_PA_WRITE)
+	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
 	{
 		this->LineEdit->setEnabled(false);
 		this->FileButton->setEnabled(false);

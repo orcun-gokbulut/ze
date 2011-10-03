@@ -98,12 +98,12 @@ ZEDEnumComboBox::ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *paren
 	for(size_t I = 0; I < this->ClassAttribute.Enumurators->ItemCount; I++)
 		this->XValue->addItem(QString(ClassAttribute.Enumurators->Items[I].Name));
 
-	if(this->ClassAttribute.Access & ZE_PA_WRITE != ZE_PA_WRITE)
+	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
 		this->XValue->setEnabled(false);
 
 	this->XValue->setMaxCount(this->ClassAttribute.Enumurators->ItemCount);
 
-	for (int I = 0; I < ClassAttribute.Enumurators->ItemCount; I++)
+	for (size_t I = 0; I < ClassAttribute.Enumurators->ItemCount; I++)
 	{
 		ValueIndexTable.append(ClassAttribute.Enumurators->Items[I].Value);
 	}

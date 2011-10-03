@@ -54,7 +54,7 @@ QDir ZEDDirectoryTreeWidgetItem::GetDirectory() const
 
 void ZEDDirectoryTreeWidgetItem::GenerateChildItems()
 {
-	QStringList Folders = Directory.entryList(QStringList(), QDir.Dirs | QDir.NoDotAndDotDot, QDir.Name);
+	QStringList Folders = Directory.entryList(QStringList(), QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 
 	for (int I = 0; I < Folders.count(); I++)
 	{
@@ -86,7 +86,7 @@ ZEDDirectoryTreeWidget::~ZEDDirectoryTreeWidget()
 
 void ZEDDirectoryTreeWidget::GenerateItems()
 {
-	QStringList Folders = WorkingDirectory.entryList(QStringList(), QDir.Dirs | QDir.NoDotAndDotDot, QDir.Name);
+	QStringList Folders = WorkingDirectory.entryList(QStringList(), QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
 
 	for (int I = 0; I < Folders.count(); I++)
 	{

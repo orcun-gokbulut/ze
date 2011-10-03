@@ -75,7 +75,7 @@ void ZEDMaterialEditorViewPort::Initialize()
 	DirectLight1 = ZEDirectionalLight::CreateInstance();
 	zeCore->GetGame()->GetScene()->AddEntity(DirectLight1);
 	DirectLight1->SetIntensity(1.0f);
-	DirectLight1->SetColor(ZEVector3(1, 0.596078, 0.596078));
+	DirectLight1->SetColor(ZEVector3(1.0f, 0.596078f, 0.596078f));
 	ZEQuaternion Rotation;
 	ZEQuaternion::CreateFromEuler(Rotation,0, ZE_PI, 0);
 	DirectLight1->SetRotation(Rotation);
@@ -83,7 +83,7 @@ void ZEDMaterialEditorViewPort::Initialize()
 	DirectLight2 = ZEDirectionalLight::CreateInstance();
 	zeCore->GetGame()->GetScene()->AddEntity(DirectLight2);
 	DirectLight2->SetIntensity(1.0f);
-	DirectLight2->SetColor(ZEVector3(0.823529, 1.0, 0.988235));
+	DirectLight2->SetColor(ZEVector3(0.823529f, 1.0f, 0.988235f));
 	ZEQuaternion::CreateFromEuler(Rotation, -ZE_PI_2, 0, 0);
 	DirectLight2->SetRotation(Rotation);
 
@@ -91,7 +91,7 @@ void ZEDMaterialEditorViewPort::Initialize()
 	zeCore->GetGame()->GetScene()->AddEntity(DirectLight3);
 	DirectLight3->SetIntensity(1.0f);
 	//DirectLight3->SetColor(ZEVector3(0.988235f; 1.0f; 0.827451f));
-	DirectLight3->SetColor(ZEVector3(0.666667,  0.333333,  0));
+	DirectLight3->SetColor(ZEVector3(0.666667f,  0.333333f,  0.0f));
 	ZEQuaternion::CreateFromEuler(Rotation, ZE_PI_2, 0, 0);
 	DirectLight3->SetRotation(Rotation);
 
@@ -168,7 +168,7 @@ void ZEDMaterialEditorViewPort::SetModelFile(const char* FileName)
 {
 	ZEModelResource* TempResource = ZEModelResource::LoadSharedResource(FileName);
 
-	for (int I = 0; I < Model->GetModelResource()->Materials[0]->GetClassDescription()->GetPropertyCount(); I++)
+	for (size_t I = 0; I < Model->GetModelResource()->Materials[0]->GetClassDescription()->GetPropertyCount(); I++)
 	{
 		ZEVariant TempVariant;
 		Model->GetModelResource()->Materials[0]->GetProperty(I, TempVariant);

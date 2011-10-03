@@ -55,8 +55,8 @@ void ZEDGrid::GenerateGrid()
 		if( I == GridSize / GridSpacing / 2)
 			Grid->Canvas.SetColor(ZEVector4(0.0f, 0.0f, 0.0f, 1.0f));
 
-		Grid->Canvas.AddLine(ZEVector3(DrawStartPoint, 0, DrawStartPoint + GridSpacing * I), ZEVector3(-DrawStartPoint, 0, DrawStartPoint + GridSpacing * I));
-		Grid->Canvas.AddLine(ZEVector3(DrawStartPoint + GridSpacing * I, 0, -DrawStartPoint), ZEVector3(DrawStartPoint + GridSpacing * I, 0, DrawStartPoint));
+		Grid->Canvas.AddLine(ZEVector3((float)DrawStartPoint, 0.0f, (float)(DrawStartPoint + GridSpacing * I)), ZEVector3(-(float)DrawStartPoint, 0.0f, (float)(DrawStartPoint + GridSpacing * I)));
+		Grid->Canvas.AddLine(ZEVector3((float)(DrawStartPoint + GridSpacing * I), 0.0f, -(float)DrawStartPoint), ZEVector3((float)(DrawStartPoint + GridSpacing * I), 0.0f, (float)DrawStartPoint));
 	}
 
 	Grid->UpdateCanvas();

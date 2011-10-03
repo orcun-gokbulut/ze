@@ -48,7 +48,7 @@
 
 using namespace Qt;
 
-class ZEDImageFilePreviewWidget : public ZEDPreviewWidget, public QObject
+class ZEDImageFilePreviewWidget : public ZEDPreviewWidget
 {
 	Q_OBJECT
 

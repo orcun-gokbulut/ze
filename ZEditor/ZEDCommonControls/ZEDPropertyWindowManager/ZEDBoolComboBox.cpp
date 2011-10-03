@@ -69,7 +69,7 @@ ZEDBoolComboBox::ZEDBoolComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *paren
 		XValue->setText(QString("False"));
 	}
 
-	if(this->ClassAttribute.Access & ZE_PA_WRITE != ZE_PA_WRITE)
+	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
 		this->XValue->setEnabled(false);
 	
 	XValue->setFixedHeight(20);

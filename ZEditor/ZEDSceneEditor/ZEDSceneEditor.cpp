@@ -353,7 +353,7 @@ MapEditor::~MapEditor()
 
 void MapEditor::BackupSave()
 {	
-	for (int I = 0; I < SelectedItems.GetCount(); I++)
+	for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 	{
 		delete SelectedItems[I];
 	}
@@ -399,7 +399,7 @@ void MapEditor::LoadSceneActionTriggered()
 
 	SceneList->Update();
 
-	for (int I = 0; I < Scene->GetEntities().GetCount(); I++)
+	for (size_t I = 0; I < Scene->GetEntities().GetCount(); I++)
 	{
 		if(QString(Scene->GetEntities()[I]->GetClassDescription()->GetName()) == QString("ZEPlayer"))
 			ViewPort->SetPlayerHandle((ZEPlayer*)(Scene->GetEntities()[I]));
@@ -466,7 +466,7 @@ void MapEditor::SelectionChangedEvent()
 		delete PropertyWindowManager;
 		PropertyWindowManager = NULL;
 
-		for (int I = 0; I < CustomPropertyWidgets.GetCount(); I++)
+		for (size_t I = 0; I < CustomPropertyWidgets.GetCount(); I++)
 		{
 			CustomPropertyWidgets[I]->close();
 			delete CustomPropertyWidgets[I];
@@ -491,7 +491,7 @@ void MapEditor::SelectionChangedEvent()
 
 void MapEditor::SelectionsLoop()
 {
-	for (int I = 0; I < SelectedItems.GetCount(); I++)
+	for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 	{
 		SelectedItems[I]->Update();
 	}
@@ -510,12 +510,12 @@ void MapEditor::ShowEntitySelector()
 	
 	ZEEntity* CurrentEntity;
 
-	for(int I = 0; I < SelectedItems.GetCount(); I++)
+	for(size_t I = 0; I < SelectedItems.GetCount(); I++)
 		delete SelectedItems[I];
 
 	SelectedItems.Clear();
 
-	for(int I = 0;  I < SelectedEntites.GetCount(); I++)
+	for(size_t I = 0;  I < SelectedEntites.GetCount(); I++)
 	{
 		CurrentEntity = SelectedEntites[I];
 		SelectedItems.Add(CreateSelectionItem(CurrentEntity));
@@ -537,7 +537,7 @@ void MapEditor::DisplaySelectedEntityProperties()
 	ZEArray<QWidget*> CPropertyWidgets = SelectedItems[0]->GetCustomPropertyWidgets(ui->PropertiesTabWidget);
 	if (CPropertyWidgets.GetCount() != 0)
 	{
-		for(int I = 0; I < CPropertyWidgets.GetCount(); I++)
+		for(size_t I = 0; I < CPropertyWidgets.GetCount(); I++)
 		{
 			ui->PropertiesTabWidget->addTab(CPropertyWidgets[I], CPropertyWidgets[I]->objectName());
 			CustomPropertyWidgets.Add(CPropertyWidgets[I]);
@@ -557,7 +557,7 @@ void MapEditor::UpdatePropertyWidgetValues()
 
 void MapEditor::GenerateAssertList()
 {	
-	for(int I = 0; I < ZEEntityProvider::GetInstance()->GetClasses().GetCount(); I++)
+	for(size_t I = 0; I < ZEEntityProvider::GetInstance()->GetClasses().GetCount(); I++)
 	{
 		QString Temp = ZEEntityProvider::GetInstance()->GetClasses().GetItem(I)->GetName();
 		ui->AssertsList->addItem(QString(ZEEntityProvider::GetInstance()->GetClasses().GetItem(I)->GetName()));
@@ -575,7 +575,7 @@ void MapEditor::NewEntityToScene()
 	QString EntityName = TempString + QString(" ") + QString().setNum(Entity->GetEntityId());
 	Entity->SetName((const char*)EntityName.toLatin1());
 
-	for(int I = 0; I < SelectedItems.GetCount(); I++)
+	for(size_t I = 0; I < SelectedItems.GetCount(); I++)
 		delete SelectedItems[I];
 
 	SelectedItems.Clear();
@@ -596,7 +596,7 @@ void MapEditor::SelectActionTriggered()
 	
 	GizmoMode = ZED_GM_NONE;
 
-	for(int I = 0; I < SelectedItems.GetCount(); I++)
+	for(size_t I = 0; I < SelectedItems.GetCount(); I++)
 		SelectedItems[I]->SetGizmoMode(GizmoMode);
 }
 
@@ -611,7 +611,7 @@ void MapEditor::MoveActionTriggered()
 	
 	GizmoMode = ZED_GM_MOVE;
 
-	for(int I = 0; I < SelectedItems.GetCount(); I++)
+	for(size_t I = 0; I < SelectedItems.GetCount(); I++)
 		SelectedItems[I]->SetGizmoMode(GizmoMode);
 }
 void MapEditor::RotateActionTriggered()
@@ -625,7 +625,7 @@ void MapEditor::RotateActionTriggered()
 	
 	GizmoMode = ZED_GM_ROTATE;
 
-	for(int I = 0; I < SelectedItems.GetCount(); I++)
+	for(size_t I = 0; I < SelectedItems.GetCount(); I++)
 		SelectedItems[I]->SetGizmoMode(GizmoMode);
 }
 
@@ -640,7 +640,7 @@ void MapEditor::ScaleActionTriggered()
 	
 	GizmoMode = ZED_GM_SCALE;
 
-	for(int I = 0; I < SelectedItems.GetCount(); I++)
+	for(size_t I = 0; I < SelectedItems.GetCount(); I++)
 		SelectedItems[I]->SetGizmoMode(GizmoMode);
 }
 
@@ -651,7 +651,7 @@ void MapEditor::StepSizeChanged()
 
 void MapEditor::DeleteActionTriggered()
 {
-	for (int I = 0; I < SelectedItems.GetCount(); I++)
+	for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 	{
 		QObject::disconnect(this->SceneList->SceneTree, SIGNAL(itemSelectionChanged()), this, SLOT(UpdateSelectedEntitiesBySceneList()));
 		SceneList->RemoveItem(((ZEEntity*)SelectedItems[I]->GetClass()));
@@ -659,7 +659,7 @@ void MapEditor::DeleteActionTriggered()
 		Scene->RemoveEntity((ZEEntity*)SelectedItems[I]->GetClass());
 	}
 
-	for (int I = 0; I < SelectedItems.GetCount(); I++)
+	for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 	{
 		delete SelectedItems[I];
 	}
@@ -681,7 +681,7 @@ void MapEditor::CopyActionTriggered()
 
 	ZEArray<ZEEntity*> CreatedEntities;
 
-	for (int I = 0; I < SelectedItems.GetCount(); I++)
+	for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 	{
 		EntityToCopy = ((ZEEntity*)(SelectedItems[I]->GetClass()));
 		ClassDescription = EntityToCopy->GetClassDescription();
@@ -711,12 +711,12 @@ void MapEditor::CopyActionTriggered()
 		CreatedEntities.Add(NewEntity);
 	}
 
-	for(int I = 0; I < SelectedItems.GetCount(); I++)
+	for(size_t I = 0; I < SelectedItems.GetCount(); I++)
 		delete SelectedItems[I];
 
 	SelectedItems.Clear();
 
-	for (int I = 0; I < CreatedEntities.GetCount(); I++)
+	for (size_t I = 0; I < CreatedEntities.GetCount(); I++)
 	{
 		SelectedItems.Add(CreateSelectionItem(CreatedEntities[I]));
 		SceneList->AddItem(CreatedEntities[I]);
@@ -730,7 +730,7 @@ void MapEditor::GoToEntityActionTriggered()
 	ZEVector3	FocusPosition;
 	size_t		SelectedItemCount = SelectedItems.GetCount();
 
-	for (int I = 0; I < SelectedItemCount; I++)
+	for (size_t I = 0; I < SelectedItemCount; I++)
 		FocusPosition = FocusPosition + SelectedItems[I]->GetPosition();
 
 	FocusPosition.x = FocusPosition.x / SelectedItemCount;
@@ -778,12 +778,12 @@ void MapEditor::UpdateSelectedEntitiesBySceneList()
 		}
 	}
 
-	for (int I = 0; I < SelectedItems.GetCount(); I++)
+	for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 		delete SelectedItems[I];
 
 	SelectedItems.Clear();
 
-	for (int I = 0; I < SelectedListEntities.GetCount(); I++)
+	for (size_t I = 0; I < SelectedListEntities.GetCount(); I++)
 		SelectedItems.Add(CreateSelectionItem(SelectedListEntities[I]));
 
 	SelectionDirtyFlag = true;
@@ -813,17 +813,17 @@ void MapEditor::ChangeGizmoWorkingSpace(QString Text)
 {
 	if (Text == QString(" Local   "))
 	{
-		for (int I = 0; I < SelectedItems.GetCount(); I++)
+		for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 			SelectedItems[I]->SetGizmoSpace(ZED_GS_LOCAL);
 	}
 	else if (Text == QString(" World   "))
 	{
-		for (int I = 0; I < SelectedItems.GetCount(); I++)
+		for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 			SelectedItems[I]->SetGizmoSpace(ZED_GS_WORLD);
 	}
 	else if (Text == QString(" View   "))
 	{
-		for (int I = 0; I < SelectedItems.GetCount(); I++)
+		for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 			SelectedItems[I]->SetGizmoSpace(ZED_GS_VIEW);
 	}
 }
@@ -848,7 +848,7 @@ ZEDSelectionItem* MapEditor::CreateSelectionItem(ZEEntity* Entity)
 	if(Entity == NULL)
 		return NULL;
 
-	for (int I = 0; I < SelectionItemPlugIns.GetCount(); I++)
+	for (size_t I = 0; I < SelectionItemPlugIns.GetCount(); I++)
 	{
 		if (QString(Entity->GetClassDescription()->GetName()) == SelectionItemPlugIns[I]->GetSupportedClassName())
 			return SelectionItemPlugIns[I]->CreateSelectionItem(((ZEClass*)(Entity)), GizmoMode, Scene);
@@ -861,7 +861,7 @@ ZEDSelectionItem* MapEditor::CreateSelectionItem(ZEEntity* Entity)
 
 void MapEditor::HideActionTriggered()
 {
-	for (int I = 0; I < SelectedItems.GetCount(); I++)
+	for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 	{
 		SelectedItems[I]->SetVisiblity(false);
 	}
@@ -869,7 +869,7 @@ void MapEditor::HideActionTriggered()
 
 void MapEditor::UnHideActionTriggered()
 {
-	for (int I = 0; I < SelectedItems.GetCount(); I++)
+	for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 	{
 		SelectedItems[I]->SetVisiblity(true);
 	}

@@ -94,8 +94,8 @@ void ZEDImageViewerViewPort::mouseMoveEvent(QMouseEvent* Event)
 	Image = ImagePixmap.toImage();
 	QRgb PixelColor = Image.pixel(XCoordinate, YCoordinate);
 
-	if(ParentViewer != NULL);
-	ParentViewer->SetInfoNotifications(UVCoordinates.x() / ImageWidth, UVCoordinates.y() / ImageHeight, XCoordinate, YCoordinate, QColor(PixelColor), ImageWidth, ImageHeight);
+	if(ParentViewer != NULL)
+		ParentViewer->SetInfoNotifications(UVCoordinates.x() / ImageWidth, UVCoordinates.y() / ImageHeight, XCoordinate, YCoordinate, QColor(PixelColor), ImageWidth, ImageHeight);
 }
 
 void ZEDImageViewerViewPort::wheelEvent(QWheelEvent* Event)
@@ -174,7 +174,7 @@ ZEDImageViewer::ZEDImageViewer()
 	InfoLayout.addWidget(ResolutionLabel);
 	InfoLayout.addWidget(ColorLabel);
 	InfoLayout.addWidget(ColorInfoLabel);
-	InfoLayout.addSpacerItem(new QSpacerItem(20,20, QSizePolicy.Expanding, QSizePolicy.Minimum));
+	InfoLayout.addSpacerItem(new QSpacerItem(20,20, QSizePolicy::Expanding, QSizePolicy::Minimum));
 }
 
 ZEDImageViewer::~ZEDImageViewer()

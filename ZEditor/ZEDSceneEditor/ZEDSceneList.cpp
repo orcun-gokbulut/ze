@@ -102,7 +102,7 @@ void ZEDSceneListTreeWidget::GenerateTree()
 
 	bool GroupExists = false;
 
-	for (int I = 0; I < Scene->GetEntities().GetCount(); I++)
+	for (size_t I = 0; I < Scene->GetEntities().GetCount(); I++)
 	{
 		CurrentEntity = Scene->GetEntities().GetItem(I);
 		GroupExists = false;
@@ -129,7 +129,7 @@ void ZEDSceneListTreeWidget::GenerateTree()
 		addTopLevelItem(Groups[I]->TreeWidgetItem);
 	}
 
-	for(int I = 0 ; I < Scene->GetEntities().GetCount(); I++)
+	for(size_t I = 0 ; I < Scene->GetEntities().GetCount(); I++)
 	{
 		CurrentEntity = Scene->GetEntities().GetItem(I);
 

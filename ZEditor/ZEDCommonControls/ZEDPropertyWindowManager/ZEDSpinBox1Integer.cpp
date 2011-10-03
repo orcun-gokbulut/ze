@@ -59,7 +59,7 @@ ZEDSpinBox1Integer::ZEDSpinBox1Integer(QTreeWidget* ParentTree, QTreeWidgetItem 
 	ParentTree->setItemWidget(this, 1, XValue);
 	this->XValue->SetInteger(Value.GetInteger());
 
-	if(this->ClassAttribute.Access & ZE_PA_WRITE != ZE_PA_WRITE)
+	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
 	{
 		this->XValue->setEnabled(false);
 	}

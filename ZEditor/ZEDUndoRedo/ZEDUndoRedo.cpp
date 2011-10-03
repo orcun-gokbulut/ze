@@ -71,7 +71,7 @@ void ZEDUndoRedoManager::RegisterOperation(ZEDUndoRedoOperation* Operation)
 		CurrentIndex = UndoRedoStack.GetCount();
 	}*/
 
-	int TotalCount = UndoRedoStack.GetCount() + 1;
+	unsigned int TotalCount = UndoRedoStack.GetCount() + 1;
 
 	if(TotalCount < MaxOperationCount)
 	{

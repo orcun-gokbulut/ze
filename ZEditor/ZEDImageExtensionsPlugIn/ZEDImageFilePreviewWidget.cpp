@@ -53,8 +53,8 @@
 ZEDImageFilePreviewWidget::ZEDImageFilePreviewWidget(QWidget* Parent, QString FileName, WindowFlags F) : ZEDPreviewWidget(Parent, FileName, F)
 {
 	setLayout(&VerticalLayout);
-	VerticalLayout.setDirection(QBoxLayout.TopToBottom);
-	VerticalLayout.addSpacerItem(new QSpacerItem(20,20, QSizePolicy.Minimum, QSizePolicy.Expanding));
+	VerticalLayout.setDirection(QBoxLayout::TopToBottom);
+	VerticalLayout.addSpacerItem(new QSpacerItem(20,20, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	VerticalLayout.addLayout(&HorizontalLayout);
 	ViewButton.setText("View");
 	HorizontalLayout.addWidget(&ViewButton);	

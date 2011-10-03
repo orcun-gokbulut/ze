@@ -42,14 +42,14 @@ ZEDSoundFilePreviewWidget::ZEDSoundFilePreviewWidget(QWidget* Parent, QString Fi
 	setPixmap(QPixmap("sound.png"));
 
 	setLayout(&VerticalLayout);
-	VerticalLayout.setDirection(QBoxLayout.BottomToTop);
+	VerticalLayout.setDirection(QBoxLayout::BottomToTop);
 	VerticalLayout.addLayout(&HorizontalLayout);
 	PlayButton.setText("Play");
 	StopButton.setText("Stop");
 	LoopCheckBox.setText("Loop");
 	LoopCheckBox.setChecked(false);
 
-	VerticalLayout.addSpacerItem(new QSpacerItem(20,20, QSizePolicy.Minimum, QSizePolicy.Expanding));
+	VerticalLayout.addSpacerItem(new QSpacerItem(20,20, QSizePolicy::Minimum, QSizePolicy::Expanding));
 	HorizontalLayout.addWidget(&PlayButton);
 	HorizontalLayout.addWidget(&StopButton);
 	HorizontalLayout.addWidget(&LoopCheckBox);

@@ -64,7 +64,7 @@ bool ZEDPlugInManager::RegisterPlugIn(ZEDPlugIn* NewPlugIn)
 	{
 		PlugIns.append(NewPlugIn);
 
-		for (int I = 0; I < NewPlugIn->GetExtensionCount(); I++)
+		for (size_t I = 0; I < NewPlugIn->GetExtensionCount(); I++)
 		{
 			ZEDExtensionDescription* Desc = NewPlugIn->GetExtensionDescriptions()[I];
 			Extensions.append(Desc->CreateInstance());

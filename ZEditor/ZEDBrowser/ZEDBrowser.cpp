@@ -90,7 +90,7 @@ void ZEDBrowser::GenerateBrowserItems(ZEDDirectoryTreeWidgetItem* Current)
 	if(SpacePixexls + 256 * RowItemCapacity > AssertBrowserUI->BrowserScrollArea->width())
 		RowItemCapacity--;
 
-	QStringList Files = Current->GetDirectory().entryList(QStringList(), QDir.Files | QDir.NoDotAndDotDot, QDir.Name);
+	QStringList Files = Current->GetDirectory().entryList(QStringList(), QDir::Files | QDir::NoDotAndDotDot, QDir::Name);
 
 	for (int I = 0; I < Files.count(); I++)
 	{

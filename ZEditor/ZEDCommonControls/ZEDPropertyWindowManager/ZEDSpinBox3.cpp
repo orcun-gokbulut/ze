@@ -94,7 +94,7 @@ ZEDSpinBox3::ZEDSpinBox3(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZECla
 
 	ValueCollectionLine->setText("[" + XValue->text() + " ;  " + YValue->text() + " ;  " + ZValue->text() + "]");
 
-	if(this->ClassAttribute.Access & ZE_PA_WRITE != ZE_PA_WRITE)
+	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
 	{
 		this->ValueCollectionLine->setEnabled(false);
 		this->XValue->setEnabled(false);

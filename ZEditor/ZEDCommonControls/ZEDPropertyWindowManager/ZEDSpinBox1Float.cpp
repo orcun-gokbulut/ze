@@ -59,7 +59,7 @@ ZEDSpinBox1Float::ZEDSpinBox1Float(QTreeWidget* ParentTree, QTreeWidgetItem *par
 	ParentTree->setItemWidget(this, 1, XValue);
 	this->XValue->SetFloat(Value.GetFloat());
 
-	if(this->ClassAttribute.Access & ZE_PA_WRITE != ZE_PA_WRITE)
+	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
 	{
 		this->XValue->setEnabled(false);
 	}

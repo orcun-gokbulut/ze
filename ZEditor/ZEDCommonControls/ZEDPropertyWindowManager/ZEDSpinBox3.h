@@ -46,7 +46,7 @@
 #include "ZEDFloatIntLineEdit.h"
 
 class ZEClass;
-class ZEPropertyDescription;
+struct ZEPropertyDescription;
 
 class ZEDSpinBox3 : public QObject, public QTreeWidgetItem, public ZEDPropertyWidget
 {
