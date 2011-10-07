@@ -71,7 +71,7 @@ bool ZEFile::Eof()
 	if(!File)
 		return false;
 
-	return (bool)feof((FILE*)File);
+	return (feof((FILE*)File) == 0) ? false : true;
 }
 
 bool ZEFile::Seek(int Offset, ZESeekFrom Origin)
@@ -395,7 +395,7 @@ bool ZEFile::IsDirectoryExists(const ZEString Path)
 	BOOL Result = Handle != INVALID_HANDLE_VALUE;
 	while(Result)
 	{
-		if (Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY != 0)
+		if ((Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
 			return true;
 		
 		Result = FindNextFile(Handle, &Info);

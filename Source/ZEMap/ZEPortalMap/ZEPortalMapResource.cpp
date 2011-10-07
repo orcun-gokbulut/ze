@@ -60,7 +60,7 @@
 #define ZE_SHADER_LIGHT_MAP					1024
 #define ZE_SHADER_DISTORTION_MAP			2048
 
-const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(const ZEString FileName)
+const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(const ZEString& FileName)
 {
 	if (FileName == "")
 		return NULL;

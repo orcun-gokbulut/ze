@@ -439,23 +439,23 @@ void ZEPhysXPhysicalRigidBody::ApplyLocalTorque(const ZEVector3& Torque, ZEPhysi
 		Actor->addLocalTorque(ZE_TO_NX(Torque), (NxForceMode)ForceMode, IsWakeUp);
 }
 
-void ZEPhysXPhysicalRigidBody::ApplyForceAtPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
+void ZEPhysXPhysicalRigidBody::ApplyForceAtPosition(const ZEVector3& Force, const ZEVector3& Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
 {
 	if (Actor != NULL)
 		Actor->addForceAtPos(ZE_TO_NX(Force), ZE_TO_NX(Position), (NxForceMode)ForceMode, IsWakeUp);
 }
-void ZEPhysXPhysicalRigidBody::ApplyForceAtLocalPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
+void ZEPhysXPhysicalRigidBody::ApplyForceAtLocalPosition(const ZEVector3& Force, const ZEVector3& Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
 {
 	if (Actor != NULL)
 		Actor->addForceAtLocalPos(ZE_TO_NX(Force), ZE_TO_NX(Position), (NxForceMode)ForceMode, IsWakeUp);
 }
 
-void ZEPhysXPhysicalRigidBody::ApplyLocalForceAtPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
+void ZEPhysXPhysicalRigidBody::ApplyLocalForceAtPosition(const ZEVector3& Force, const ZEVector3& Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
 {
 	if (Actor != NULL)
 		Actor->addLocalForceAtPos(ZE_TO_NX(Force), ZE_TO_NX(Position), (NxForceMode)ForceMode, IsWakeUp);
 }
-void ZEPhysXPhysicalRigidBody::ApplyLocalForceAtLocalPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
+void ZEPhysXPhysicalRigidBody::ApplyLocalForceAtLocalPosition(const ZEVector3& Force, const ZEVector3& Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp)
 {
 	if (Actor != NULL)
 		Actor->addLocalForceAtLocalPos(ZE_TO_NX(Force), ZE_TO_NX(Position), (NxForceMode)ForceMode, IsWakeUp);

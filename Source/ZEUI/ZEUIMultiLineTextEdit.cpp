@@ -78,8 +78,6 @@ void ZEUIMultiLineTextEdit::Tick(float ElapsedTime)
 
 void ZEUIMultiLineTextEdit::Draw(ZEUIRenderer* Renderer)
 {
-	ZEUIRectangle Output;
-
 	ZEUIFrameControl::Draw(Renderer);
 
 	if (CursorVisible && TextDisplayer.GetFocused())

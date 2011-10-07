@@ -69,7 +69,7 @@ struct ZEPixelColor
 	static ZEPixelColor	Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T);
 	static ZEVector4 LerpFloat(const ZEPixelColor& A, const ZEPixelColor& B, float T);
 
-	ZEPixelColor::ZEPixelColor();
+	ZEPixelColor();
 	ZEPixelColor(unsigned int Color);
 	ZEPixelColor(unsigned char a, unsigned char r, unsigned char g, unsigned char b);
 };

@@ -57,7 +57,7 @@ void ZENamed::SetName(const char* NewName)
 	strcpy(Name, NewName);
 }
 
-const char* ZENamed::GetName()
+const char* ZENamed::GetName() const
 {
 	if (Name == NULL)
 		return "";

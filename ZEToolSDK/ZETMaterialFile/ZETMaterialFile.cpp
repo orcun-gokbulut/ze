@@ -55,7 +55,7 @@ void ZEFixedMaterialFile::SetZero()
 	AmbientColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	AmbientFactor = 1.0f;
 
-	DiffuseEnabled;
+	DiffuseEnabled = false;
 	DiffuseColor = ZEVector3(1.0f, 1.0f, 1.0f);
 	DiffuseFactor = 1.0f;
 	DiffuseMap.FileName[0] = '\0';
@@ -63,7 +63,7 @@ void ZEFixedMaterialFile::SetZero()
 	DiffuseMapAddressModeU = ZE_TAM_WRAP;
 	DiffuseMapAddressModeV = ZE_TAM_WRAP;
 
-	NormalMapEnabled;
+	NormalMapEnabled = false;
 	NormalMap.FileName[0] = '\0';
 	NormalMap.Internal = false;
 	NormalMapAddressModeU = ZE_TAM_WRAP;
@@ -527,7 +527,7 @@ void ZEFixedMaterialFile::SetOpacityEnabled(bool Enabled)
 
 bool ZEFixedMaterialFile::GetOpacityEnabled()
 {
-	return Opacity;
+	return OpacityEnabled;
 }
 
 void ZEFixedMaterialFile::SetOpacity(float Value)

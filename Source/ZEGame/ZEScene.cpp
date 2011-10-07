@@ -381,6 +381,7 @@ ZEScene::ZEScene()
 {
 	Initialized = false;
 	LastEntityId = 0;
+	PostProcessor = NULL;
 	ShadowRenderer = NULL;
 	Renderer = NULL;
 	ActiveCamera = NULL;

@@ -76,7 +76,7 @@ class ZEAABBox
 		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere);
 
 									ZEAABBox();
-									ZEAABBox(const ZEVector3 Min, const ZEVector3 Max);
+									ZEAABBox(const ZEVector3& Min, const ZEVector3& Max);
 
 								
 };

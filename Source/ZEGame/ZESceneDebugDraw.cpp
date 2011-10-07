@@ -135,6 +135,7 @@ ZESceneDebugDraw::ZESceneDebugDraw()
 {
 	Material = NULL;
 	Initialized = false;
+	RenderOrder.SetZero();
 }
 
 ZESceneDebugDraw::~ZESceneDebugDraw()

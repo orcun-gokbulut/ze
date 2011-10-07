@@ -232,9 +232,6 @@ void ZEDImageViewer::SetImage(QString FileName)
 		return;
 	}
 
-	int Height = FreeImage_GetHeight(BitMap);
-	int	Width = FreeImage_GetWidth(BitMap);
-
 	Pixmap.loadFromData(Buffer, BufferSize, "bitmap");
 
 	FreeImage_CloseMemory(Stream);

@@ -409,6 +409,7 @@ ZEAnimationController::ZEAnimationController()
 	CurrentFrame = 0.0f;
 	State = ZE_AS_NONE;
 	Speed = 1.0f;
+	Looping = false;
 }
 
 ZEAnimationController::~ZEAnimationController()

@@ -362,7 +362,7 @@ SUITE(ZEBSphere)
 		ZEBSphere BS3(Position3, R3);
 
 		bool result2 = ZEBSphere::IntersectionTest(BS1, BS3);
-		CHECK_EQUAL(result, true);
+		CHECK_EQUAL(result2, true);
 		
 		ZEVector3 Position4(1.0f, 2.0f, 7.0f);
 		float R4 = 1.0f; 

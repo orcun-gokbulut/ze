@@ -68,7 +68,7 @@ class ZEPlane
 		static bool					IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t);
 		static bool					IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, ZELine & Line);
 
-		static ZEHalfSpace			TestHalfSpace(const ZEPlane Plane, const ZEVector3 Point);
+		static ZEHalfSpace			TestHalfSpace(const ZEPlane& Plane, const ZEVector3& Point);
 		static float				DistanceSigned(const ZEPlane& Plane, const ZEVector3& Point);
 		static float				Distance(const ZEPlane& Plane, const ZEVector3& Point);
 

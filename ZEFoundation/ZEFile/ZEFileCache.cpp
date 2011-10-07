@@ -58,8 +58,8 @@ void CopyData(ZEFile* File, size_t From, size_t Size, size_t To)
 	const size_t BufferSize = 65536;
 	char Buffer[BufferSize];
 
-	int Count = Size / BufferSize;
-	int LeftOver = Size % BufferSize;
+	unsigned int Count = Size / BufferSize;
+	unsigned int LeftOver = Size % BufferSize;
 	for (size_t I = 0; I < Count; I++)
 	{
 		File->Seek(From + I * BufferSize, ZE_SF_BEGINING);

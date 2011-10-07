@@ -423,6 +423,10 @@ ZEDFloatIntLineEdit::ZEDFloatIntLineEdit(FloatIntLineEditMode Mode, QWidget* Par
 	setFixedHeight(20);
 	QObject::blockSignals(true);	
 	//this->setStyleSheet(GetCSSFromFile(":/CSS/PropertyWindowLineEdit.qss"));
+
+	ParsedInt = 0;
+	ParsedFloat = 0.0f;
+	OldMousePositionY = 0;
 }
 
 ZEDFloatIntLineEdit::~ZEDFloatIntLineEdit()

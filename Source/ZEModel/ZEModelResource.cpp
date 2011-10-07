@@ -98,6 +98,8 @@ ZEStaticVertexBuffer* ZEModelResourceMeshLOD::CreatePrivateVertexBuffer() const
 ZEModelResourceMeshLOD::ZEModelResourceMeshLOD()
 {
 	SharedVertexBuffer = NULL;
+	LODLevel = 0;
+	MaterialId = -1;
 }
 
 ZEModelResourceMeshLOD::~ZEModelResourceMeshLOD()
@@ -145,7 +147,6 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 {
 	for (size_t I = 0; I < Model->Materials.GetCount(); I++)
 	{
-		ZEMaterial* Material = Model->Materials[I]; 
 		ZEModelFileMaterialChunk MaterialChunk;
 
 		ResourceFile->Read(&MaterialChunk, sizeof(ZEModelFileMaterialChunk), 1);

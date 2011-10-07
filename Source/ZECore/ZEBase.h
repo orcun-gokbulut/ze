@@ -43,7 +43,7 @@ class ZEBase
 		bool				Initialized;
 
 	public:
-		bool				IsInitialized();
+		bool				IsInitialized() const;
 		virtual bool		Initialize();
 		virtual void		Deinitialize();
 

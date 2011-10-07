@@ -265,4 +265,19 @@ bool ZEFreespaceInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, Z
 ZEFreespaceInputDevice::ZEFreespaceInputDevice()
 {
 	DeviceName = "Freespace";
+	Axises[0] = 0.0f;
+	Axises[1] = 0.0f;
+	Axises[2] = 0.0f;
+
+	Buttons[0] = false;
+	Buttons[1] = false;
+	Buttons[2] = false;
+	Buttons[3] = false;
+	Buttons[4] = false;
+
+	OldButtons[0] = false;
+	OldButtons[1] = false;
+	OldButtons[2] = false;
+	OldButtons[3] = false;
+	OldButtons[4] = false;
 }

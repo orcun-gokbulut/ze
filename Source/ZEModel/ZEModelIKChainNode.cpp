@@ -45,8 +45,9 @@ ZEModelIKChainNode::ZEModelIKChainNode()
 	MinRotationAngle = ZEVector3(-ZE_PI, -ZE_PI, -ZE_PI);
 	MaxRotationAngle = ZEVector3(ZE_PI, ZE_PI, ZE_PI);
 
-	LimitRotation = false;
 	EnableTranslation = false;
 	MinTranslation = ZEVector3::Zero;
 	MaxTranslation = ZEVector3::Zero;
+
+	LimitTranslation = false;
 }

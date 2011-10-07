@@ -300,6 +300,7 @@ ZEParticleSystem::ZEParticleSystem()
 	Owner = NULL;
 	VertexBuffer = NULL;
 	ParticleMaterial = NULL;
+	IsParticlePoolGenerated = false;
 	RenderOrder.SetZero();
 	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_TRANSPARENT | ZE_ROF_ENABLE_Z_CULLING;
 	RenderOrder.VertexDeclaration = ZESimpleVertex::GetVertexDeclaration();

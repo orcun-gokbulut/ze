@@ -35,7 +35,7 @@
 
 #include "ZEBase.h"
 
-bool ZEBase::IsInitialized()
+bool ZEBase::IsInitialized() const
 {
 	return Initialized;
 }

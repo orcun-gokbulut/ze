@@ -319,6 +319,10 @@ ZEModelMesh::ZEModelMesh()
 	MeshResource = NULL;
 	PhysicalBody = NULL;
 	Visible = true;
+	PhysicsEnabled = false;
+	AutoLOD = false;
+	ActiveLOD = 0;
+	AnimationType = ZE_MAT_NOANIMATION;
 }
 
 ZEModelMesh::~ZEModelMesh()

@@ -266,7 +266,6 @@ void ZEDSSoundSource::SetPan(int NewPan)
 
 	if (DSBuffer != NULL)
 	{
-		int A = (((Pan + 100)*(DSBPAN_RIGHT - DSBPAN_LEFT))/200) + DSBPAN_LEFT;
 		DSBuffer->SetPan((((Pan + 100)*(DSBPAN_RIGHT - DSBPAN_LEFT))/200) + DSBPAN_LEFT);
 	}
 }

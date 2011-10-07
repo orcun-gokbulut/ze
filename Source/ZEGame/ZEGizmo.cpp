@@ -65,7 +65,6 @@ void ZEGizmo::UpdateMoveGizmo()
 	float AxisLenght_2 = AxisLenght * 0.5f;
 	float AxisLenght_10 = AxisLenght * 0.1f;
 	float AxisLenght_5 = AxisLenght * 0.2f;
-	float AxisLenght_4 = AxisLenght * 0.25f;
 
 	GizmoLines.Clean();
 	GizmoTriangles.Clean();
@@ -195,7 +194,6 @@ void ZEGizmo::UpdateRotateGizmo()
 	float AxisLenght = this->AxisLenght * ZEVector3::Distance(CameraPosition, GetPosition()) * zeScene->GetActiveCamera()->GetProjectionTransform().M11;
 	float AxisLenght_2 = AxisLenght * 0.5f;
 	float AxisLenght_10 = AxisLenght * 0.1f;
-	float AxisLenght_5 = AxisLenght * 0.2f;
 	float AxisLenght_4 = AxisLenght * 0.25f;
 
 	OldCameraPosition = CameraPosition;

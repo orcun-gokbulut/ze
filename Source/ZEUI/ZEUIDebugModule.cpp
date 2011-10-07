@@ -179,6 +179,7 @@ ZEUIDebugModule::ZEUIDebugModule()
 {
 	Player = NULL;
 	Grid = NULL;
+	Scene = NULL;
 }
 
 ZEUIDebugModule::~ZEUIDebugModule()

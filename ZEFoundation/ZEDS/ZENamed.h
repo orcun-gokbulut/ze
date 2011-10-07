@@ -44,7 +44,7 @@ class ZENamed
 
 	public:
 		void			SetName(const char* NewName);
-		const char*		GetName();
+		const char*		GetName() const;
 
 						ZENamed();
 						~ZENamed();

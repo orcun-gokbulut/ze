@@ -213,6 +213,8 @@ ZEPhysicsDebugModule::ZEPhysicsDebugModule()
 {
 	PhysicalRigidBody = NULL;
 	Player = NULL;
+	Model = NULL;
+	TestBody = NULL;
 }
 
 ZEPhysicsDebugModule::~ZEPhysicsDebugModule()

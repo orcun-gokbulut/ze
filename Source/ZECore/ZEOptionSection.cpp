@@ -115,12 +115,14 @@ void ZEOptionSection::ResetChanges()
 
 ZEOptionSection::ZEOptionSection()
 {
-
+	SetName("");
+	Changed = false;
 }
 
 ZEOptionSection::ZEOptionSection(const char* Name)
 {
 	SetName(Name);
+	Changed = false;
 }
 
 ZEOptionSection::~ZEOptionSection()

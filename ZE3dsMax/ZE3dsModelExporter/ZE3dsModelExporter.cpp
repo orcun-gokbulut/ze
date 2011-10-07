@@ -38,7 +38,9 @@
 
 ZEModelExporter::ZEModelExporter()
 {
-
+	Scene = NULL;
+	FrameCount = 0;
+	TicksPerFrame = 0;
 }
 
 ZEModelExporter::~ZEModelExporter() 

@@ -77,8 +77,6 @@ void ZEUITextEditControl::Tick(float ElapsedTime)
 
 void ZEUITextEditControl::Draw(ZEUIRenderer* Renderer)
 {
-	ZEUIRectangle Output;
-
 	ZEUIFrameControl::Draw(Renderer);
 
 	if (CursorVisible && TextDisplayer.GetFocused())

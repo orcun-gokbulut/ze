@@ -314,6 +314,11 @@ ZEModelAnimationDebugModule::ZEModelAnimationDebugModule()
 	Grid = NULL;
 	Light = NULL;
 	Character = NULL;
+	PointLight0 = NULL;
+	PointLight1 = NULL;
+	PointLight2 = NULL;
+	DirectionalLight = NULL;
+	ProjectiveLight = NULL;
 }
 
 ZEModelAnimationDebugModule::~ZEModelAnimationDebugModule()

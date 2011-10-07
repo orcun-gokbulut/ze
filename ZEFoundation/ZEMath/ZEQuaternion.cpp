@@ -107,7 +107,7 @@ void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Di
 	ZEVector3 NewRight, NewUp, NewDirection;
 
 	ZEVector3::Normalize(NewDirection, Direction);
-	float Dot = ZEVector3::DotProduct(NewDirection, ZEVector3::UnitY);
+	//float Dot = ZEVector3::DotProduct(NewDirection, ZEVector3::UnitY);
 
 	ZEVector3::CrossProduct(NewRight, Up, NewDirection);
 	ZEVector3::CrossProduct(NewUp, NewDirection, NewRight);

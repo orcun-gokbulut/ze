@@ -37,6 +37,7 @@
 
 ZEStateMachine::ZEStateMachine(void)
 {
+	CurrentState = NULL;
 }
 
 ZEStateMachine::~ZEStateMachine(void)

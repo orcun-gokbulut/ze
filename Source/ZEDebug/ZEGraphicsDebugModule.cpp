@@ -207,7 +207,18 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 
 ZEGraphicsDebugModule::ZEGraphicsDebugModule()
 {
+	Player = NULL;
+	PointLight1 = NULL;
+	PointLight2 = NULL;
+	PointLight3 = NULL;
+	PointLight4 = NULL;
+	PointLight5 = NULL;
 
+	ProjectiveLight0 = NULL;
+	OmniProjectiveLight0 = NULL;
+	DirectionalLight0 = NULL;
+	Brush = NULL;
+	Model = NULL;
 }
 
 ZEGraphicsDebugModule::~ZEGraphicsDebugModule()

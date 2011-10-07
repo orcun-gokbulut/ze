@@ -71,6 +71,7 @@ ZETexture2D::ZETexture2D()
 	Width = Height = 0;
 	PixelFormat = ZE_TPF_NOTSET;
 	RenderTarget = false;
+	MipLevel = 0;
 };
 
 ZETexture2D::~ZETexture2D()

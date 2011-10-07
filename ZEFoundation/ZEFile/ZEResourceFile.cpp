@@ -162,7 +162,7 @@ bool ZEResourceFile::Eof()
 	if(!File)
 		return false;
 
-	return (bool)feof((FILE*)File);
+	return (feof((FILE*)File) == 0) ? false : true;
 }
 
 void ZEResourceFile::Close()

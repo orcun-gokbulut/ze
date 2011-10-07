@@ -299,9 +299,7 @@ void ZEDSModule::SetTypeVolume(ZESoundSourceType Type, unsigned int Volume)
 	if (Volume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;
 	else
-		Volume = Volume;
-
-	TypeVolumes[Type] = Volume;
+		TypeVolumes[Type] = Volume;
 
 	UpdateVolumes(Type);
 }

@@ -55,7 +55,7 @@ void ZEModelAnimationTrack::SetState(ZEModelAnimationState State)
 	if (Animation == NULL)
 		State = ZE_MAS_STOPPED;
 	else
-		State = State;
+		this->State = State;
 }
 
 ZEModelAnimationState ZEModelAnimationTrack::GetState()
@@ -405,4 +405,5 @@ ZEModelAnimationTrack::ZEModelAnimationTrack()
 	BlendFactor = 0.5f;
 	Looping = false;
 	BlendMode = ZE_MABM_INTERPOLATE;
+	LOD = 0;
 }

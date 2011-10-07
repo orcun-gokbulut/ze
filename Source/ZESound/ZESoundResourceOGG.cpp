@@ -169,7 +169,7 @@ ZESoundResource* ZESoundResourceOGG::LoadResource(const char* FileName)
 	NewResource->SamplesPerSecond = VorbisInfo->rate;
 	NewResource->BlockAlign = 2 * VorbisInfo->channels;
 	NewResource->SampleCount = ov_pcm_total(&NewResource->OggFile, -1);
-	bool Seekable = ov_seekable(&NewResource->OggFile);
+	ov_seekable(&NewResource->OggFile);
 	return NewResource;
 }
 

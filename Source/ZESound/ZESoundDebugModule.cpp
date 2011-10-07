@@ -186,6 +186,7 @@ ZESoundDebugModule::ZESoundDebugModule()
 	Player = NULL;
 	TotalTime = 0;
 	EnterFlag = false;
+	SoundBrush2D = NULL;
 }
 
 ZESoundDebugModule::~ZESoundDebugModule()

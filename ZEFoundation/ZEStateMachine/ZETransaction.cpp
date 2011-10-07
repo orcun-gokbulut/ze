@@ -39,6 +39,9 @@
 
 ZETransaction::ZETransaction()
 {
+	FromState = NULL;
+	ToState = NULL;
+	Priority = -1;
 }
 
 ZETransaction::~ZETransaction()

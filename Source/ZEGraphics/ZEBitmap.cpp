@@ -67,6 +67,10 @@ ZEVector4 ZEPixelColor::LerpFloat(const ZEPixelColor& A, const ZEPixelColor& B, 
 
 ZEPixelColor::ZEPixelColor()
 {
+	r = 0x00;
+	g = 0x00;
+	b = 0x00;
+	a = 0xFF;
 }
 
 ZEPixelColor::ZEPixelColor(unsigned int Color)

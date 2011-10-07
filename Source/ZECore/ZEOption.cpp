@@ -114,5 +114,8 @@ ZEOption::ZEOption(const char *InitialName, ZETypedVariant InitialDefaultValue, 
 
 ZEOption::ZEOption()
 {
-
+	SetName("");
+	SetValueType(ZE_VRT_UNDEFINED);
+	Attribute = ZE_OA_NORMAL;
+	Changed = false;
 }

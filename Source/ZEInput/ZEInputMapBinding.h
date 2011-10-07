@@ -46,7 +46,7 @@ class ZEInputBinding
 		ZEInputEvent				Event;
 
 									ZEInputBinding(int ActionId, ZEInputEvent& Event);
-									ZEInputBinding(int ActionId, const ZEString InputDescription);
+									ZEInputBinding(int ActionId, const ZEString& InputDescription);
 									ZEInputBinding();
 };
 

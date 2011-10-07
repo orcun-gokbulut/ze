@@ -247,6 +247,7 @@ ZE3dsProgressDialog::ZE3dsProgressDialog()
 {
 	Instance = this;
 	LogFile = NULL;
+	handle = NULL;
 }
 
 ZE3dsProgressDialog::~ZE3dsProgressDialog()

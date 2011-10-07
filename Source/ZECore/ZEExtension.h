@@ -51,7 +51,7 @@ class ZEExtension
 		static ZEExtensionDescription*	ExtensionDescription();
 		virtual ZEExtensionDescription*	GetExtensionDescription() = 0;
 
-		bool							IsInitialized();
+		bool							IsInitialized() const;
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
 

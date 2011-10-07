@@ -140,7 +140,7 @@ void ZECompoundEntity::Tick(float Time)
 
 ZECompoundEntity::ZECompoundEntity()
 {
-
+	RayCastFlags = ZE_RCF_BOUNDING_BOX;
 }
 
 ZECompoundEntity::~ZECompoundEntity()

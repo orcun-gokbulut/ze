@@ -370,7 +370,7 @@ ZEAABBox::ZEAABBox()
 {
 }
 
-ZEAABBox::ZEAABBox(const ZEVector3 Min, const ZEVector3 Max)
+ZEAABBox::ZEAABBox(const ZEVector3& Min, const ZEVector3& Max)
 {
 	this->Min = Min;
 	this->Max = Max;

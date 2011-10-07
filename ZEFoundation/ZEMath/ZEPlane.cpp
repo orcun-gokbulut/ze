@@ -113,7 +113,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, Z
 	return true;
 }
 
-ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane Plane, const ZEVector3 Point)
+ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane& Plane, const ZEVector3& Point)
 {
 	ZEVector3 Temp;
 	ZEVector3::Sub(Temp, Point, Plane.p);

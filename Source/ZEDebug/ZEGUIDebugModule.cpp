@@ -178,6 +178,7 @@ void ZEGUIDebugModule::Process(float ElapsedTime)
 
 ZEGUIDebugModule::ZEGUIDebugModule()
 {
+	Scene = NULL;
 	Player = NULL;
 	Grid = NULL;
 }

@@ -40,7 +40,7 @@
 
 ZE3dsMapExporter::ZE3dsMapExporter()
 {
-
+	Scene = NULL;
 }
 
 ZE3dsMapExporter::~ZE3dsMapExporter() 

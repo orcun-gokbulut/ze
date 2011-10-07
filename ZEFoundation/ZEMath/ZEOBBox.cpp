@@ -130,7 +130,7 @@ ZEHalfSpace ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEPlane&
 		return ZE_HS_INTERSECTS;
 }
 
-bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEVector3 Point)
+bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEVector3& Point)
 {
 	float Factor;
 

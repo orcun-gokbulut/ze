@@ -36,7 +36,7 @@
 #include "ZEInputMapBinding.h"
 #include <string.h>
 
-ZEInputBinding::ZEInputBinding(int ActionId, ZEString InputString)
+ZEInputBinding::ZEInputBinding(int ActionId, const ZEString& InputString)
 {
 	this->ActionId = ActionId;
 	this->Event.Create(InputString);
@@ -50,5 +50,6 @@ ZEInputBinding::ZEInputBinding(int ActionId, ZEInputEvent& Event)
 
 ZEInputBinding::ZEInputBinding()
 {
+	ActionId = -1;
 }
 

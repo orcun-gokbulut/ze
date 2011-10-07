@@ -532,6 +532,9 @@ ZEModelBone::ZEModelBone()
 	ParentBone = NULL;
 	PhysicalJoint = NULL;
 	PhysicalBody = NULL;
+	BoneResource = NULL;
+	PhysicsEnabled = false;
+	AnimationType = ZE_MAT_NOANIMATION;
 }
 
 ZEModelBone::~ZEModelBone()

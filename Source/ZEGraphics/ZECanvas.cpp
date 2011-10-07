@@ -490,7 +490,6 @@ void ZECanvas::AddSphere(float Radius, unsigned int HSegments, unsigned int VSeg
 	float YPos;
 	float PrevRadius = Radius * sinf(VAngle);
 	float PrevYPos = Radius * cosf(VAngle);
-	float PrevcosfVAngle = cosf(VAngle);
 	float cosfVAngle;
 	float cosfHAngle;
 	float CurrentRadius;
@@ -534,7 +533,6 @@ void ZECanvas::AddSphere(float Radius, unsigned int HSegments, unsigned int VSeg
 		}
 		PrevYPos = YPos;
 		PrevRadius = CurrentRadius;
-		PrevcosfVAngle = cosfVAngle;
 	}
 	
 	cosfVAngle = cosf(VAngle);

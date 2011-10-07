@@ -167,7 +167,12 @@ void ZESoundResource::CacheResource(const char *FileName)
 
 ZESoundResource::ZESoundResource()
 {
-
+	FileFormat = ZE_SFF_NONE;
+	SampleCount = 0;
+	SamplesPerSecond = 0;
+	ChannelCount = 0;
+	BitsPerSample = 0;
+	BlockAlign = 0;
 }
 
 ZESoundResource::~ZESoundResource()

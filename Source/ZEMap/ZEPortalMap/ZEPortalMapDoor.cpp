@@ -95,6 +95,9 @@ ZEPortalMapDoor::ZEPortalMapDoor()
 {
 	Owner = NULL;
 	Resource = NULL;
+	Portals[0] = NULL;
+	Portals[1] = NULL;
+	Open = true;
 }
 
 

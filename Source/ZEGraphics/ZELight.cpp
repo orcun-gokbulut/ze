@@ -126,6 +126,7 @@ ZELight::ZELight()
 	Range = 100.0f;
 	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
 	CastsShadows = false;
+	Enabled = true;
 }
 
 #include "ZELight.h.zpp"

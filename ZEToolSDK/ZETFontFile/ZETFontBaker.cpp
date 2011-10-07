@@ -135,7 +135,7 @@ void DumpTexture(ZEResourceInternalFile* TextureFile, HBITMAP Bitmap, HDC DC)
 
 	hp = lpBits; 
 	
-	for (int I = 0; I < cb / 4; I++)
+	for (size_t I = 0; I < cb / 4; I++)
 	{
 		color = ((ARGB*)hp) + I;
 		color->r = color->g = color->b = color->a = (color->r + color->g + color->b) / 3;
@@ -144,7 +144,6 @@ void DumpTexture(ZEResourceInternalFile* TextureFile, HBITMAP Bitmap, HDC DC)
  	
 	memcpy(Data, hp, cb);
 	Data += cb;
-	int D = Data - TextureFile->GetFileBuffer();
 
     GlobalFree((HGLOBAL)lpBits);
 }

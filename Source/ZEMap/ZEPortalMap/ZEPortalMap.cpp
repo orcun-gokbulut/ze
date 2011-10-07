@@ -170,7 +170,7 @@ bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norm
 	if (Resource == NULL)
 		return false;
 
-	float T, CurMinT = 100000000000000.0f;
+	float T;
 	bool Found = false;
 	for (size_t I = 0; I < Resource->GetPortals().GetCount(); I++)
 	{

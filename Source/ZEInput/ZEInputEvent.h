@@ -111,21 +111,21 @@ class ZEInputEvent
 		ZEString					GetInputString();
 
 									ZEInputEvent();
-									ZEInputEvent(const ZEString InputString);
-									ZEInputEvent(const ZEString DeviceName,
+									ZEInputEvent(const ZEString& InputString);
+									ZEInputEvent(const ZEString& DeviceName,
 										ZEDWORD Index, 
 										ZEInputButtonState ButtonState);
 
-									ZEInputEvent(const ZEString DeviceName, 
+									ZEInputEvent(const ZEString& DeviceName, 
 										ZEDWORD Index,
 										ZEInputAxisSign AxisSign);
 
-									ZEInputEvent(const ZEString DeviceName,
+									ZEInputEvent(const ZEString& DeviceName,
 										ZEInputType Type,
 										ZEDWORD Index,
 										ZEInputVectorState State);
 
-									ZEInputEvent(const ZEString DeviceName,
+									ZEInputEvent(const ZEString& DeviceName,
 										ZEDWORD Index,
 										ZEInputQuaternionState State);
 };

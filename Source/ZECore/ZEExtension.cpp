@@ -52,7 +52,7 @@ ZEExtension::~ZEExtension()
 	Deinitialize();
 }
 
-bool ZEExtension::IsInitialized()
+bool ZEExtension::IsInitialized() const
 {
 	return Initialized;
 }

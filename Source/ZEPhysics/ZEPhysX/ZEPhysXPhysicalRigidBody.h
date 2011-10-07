@@ -135,11 +135,11 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 		virtual void					ApplyLocalForce(const ZEVector3& Force, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
 		virtual void					ApplyLocalTorque(const ZEVector3& Torque, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
 
-		virtual void					ApplyForceAtPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
-		virtual void					ApplyForceAtLocalPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
+		virtual void					ApplyForceAtPosition(const ZEVector3& Force, const ZEVector3& Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
+		virtual void					ApplyForceAtLocalPosition(const ZEVector3& Force, const ZEVector3& Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
 
-		virtual void					ApplyLocalForceAtPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
-		virtual void					ApplyLocalForceAtLocalPosition(const ZEVector3& Force, const ZEVector3 Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
+		virtual void					ApplyLocalForceAtPosition(const ZEVector3& Force, const ZEVector3& Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
+		virtual void					ApplyLocalForceAtLocalPosition(const ZEVector3& Force, const ZEVector3& Position, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
 
 		virtual float					GetComputedKineticEnergy() const;
 								

@@ -345,6 +345,7 @@ ZEClass::ZEClass()
 {
 	AnimationController = NULL;
 	CustomProperties.SetCount(0);
+	Owner = NULL;
 }
 
 ZEClass::~ZEClass()

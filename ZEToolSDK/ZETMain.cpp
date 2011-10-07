@@ -65,52 +65,52 @@ int main()
 	Joint.Body2Id					= 1;
 
 	Joint.Breakable					= true;
-	Joint.BreakForce				= 300;
-	Joint.BreakTorque				= 300;
+	Joint.BreakForce				= 300.0f;
+	Joint.BreakTorque				= 300.0f;
 
 	Joint.CollideBodies				= true;
 
 	Joint.UseGlobalAnchorAxis		= true;
 
-	Joint.GlobalAnchor				= ZEVector3.Zero;
-	Joint.GlobalAxis				= ZEQuaternion.Zero;
+	Joint.GlobalAnchor				= ZEVector3::Zero;
+	Joint.GlobalAxis				= ZEQuaternion::Zero;
 
-	Joint.LocalAnchor1				= ZEVector3.Zero;
-	Joint.LocalAxis1				= ZEQuaternion.Zero;
+	Joint.LocalAnchor1				= ZEVector3::Zero;
+	Joint.LocalAxis1				= ZEQuaternion::Zero;
 
-	Joint.LocalAnchor2				= ZEVector3.Zero;
-	Joint.LocalAxis2				= ZEQuaternion.Zero;
+	Joint.LocalAnchor2				= ZEVector3::Zero;
+	Joint.LocalAxis2				= ZEQuaternion::Zero;
 
 	Joint.XMotion					= 3;
 	Joint.YMotion					= 3;
 	Joint.ZMotion					= 3;
 
-	Joint.LinearLimitValue			= 1.34;
-	Joint.LinearLimitRestitution	= 1.34;
-	Joint.LinearLimitSpring			= 1.34;
-	Joint.LinearLimitDamping		= 1.34;
+	Joint.LinearLimitValue			= 1.34f;
+	Joint.LinearLimitRestitution	= 1.34f;
+	Joint.LinearLimitSpring			= 1.34f;
+	Joint.LinearLimitDamping		= 1.34f;
 
 	Joint.TwistMotion				= 1;
-	Joint.TwistLowLimitValue		= 1.34;
-	Joint.TwistLowLimitRestitution	= 1.34;
-	Joint.TwistLowLimitSpring		= 1.34;
-	Joint.TwistLowLimitDamping		= 1.34;
-	Joint.TwistHighLimitValue		= 1.34;
-	Joint.TwistHighLimitRestitution = 1.34;
-	Joint.TwistHighLimitSpring		= 1.34;
-	Joint.TwistHighLimitDamping		= 1.34;
+	Joint.TwistLowLimitValue		= 1.34f;
+	Joint.TwistLowLimitRestitution	= 1.34f;
+	Joint.TwistLowLimitSpring		= 1.34f;
+	Joint.TwistLowLimitDamping		= 1.34f;
+	Joint.TwistHighLimitValue		= 1.34f;
+	Joint.TwistHighLimitRestitution = 1.34f;
+	Joint.TwistHighLimitSpring		= 1.34f;
+	Joint.TwistHighLimitDamping		= 1.34f;
 
 	Joint.Swing1Motion				= 1;
-	Joint.Swing1LimitValue			= 1.34;
-	Joint.Swing1LimitRestitution	= 1.34;
-	Joint.Swing1LimitSpring			= 1.34;
-	Joint.Swing1LimitDamping		= 1.34;
+	Joint.Swing1LimitValue			= 1.34f;
+	Joint.Swing1LimitRestitution	= 1.34f;
+	Joint.Swing1LimitSpring			= 1.34f;
+	Joint.Swing1LimitDamping		= 1.34f;
 
 	Joint.Swing2Motion				= 1;
-	Joint.Swing2LimitValue			= 1.34;
-	Joint.Swing2LimitRestitution	= 1.34;
-	Joint.Swing2LimitSpring			= 1.34;
-	Joint.Swing2LimitDamping		= 1.34;
+	Joint.Swing2LimitValue			= 1.34f;
+	Joint.Swing2LimitRestitution	= 1.34f;
+	Joint.Swing2LimitSpring			= 1.34f;
+	Joint.Swing2LimitDamping		= 1.34f;
 
 	FILE* File = fopen("test", "wb");
 	WritePhysicalJointToFile(&Joint, File);

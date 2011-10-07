@@ -53,6 +53,9 @@ ZESoundSource::ZESoundSource()
 	StartPosition = 0;
 	EndPosition = 0;
 	SoundResource = NULL;
+	LocalOldPosition = 0;
+	EffectiveStartPosition = 0;
+	EffectiveEndPosition = 0;
 }
 
 ZESoundSource::~ZESoundSource()

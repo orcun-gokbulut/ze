@@ -40,6 +40,8 @@
 ZEUIMaterial::ZEUIMaterial()
 {
 	Texture = NULL;
+	WireFrame = false;
+	WireSize = 1.0f;
 }
 
 ZEUIMaterial::~ZEUIMaterial()

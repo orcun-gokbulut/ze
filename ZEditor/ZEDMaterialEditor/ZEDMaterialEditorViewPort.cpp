@@ -54,6 +54,12 @@ ZEDMaterialEditorViewPort::ZEDMaterialEditorViewPort(ZEDMaterialEditor*	ParentEd
 	PitchLight3 = ZE_PI_2;
 	YawnLight3 = 0;
 	this->ParentEditor = ParentEditor;
+	Camera = NULL;
+	Grid = NULL;
+	Model = NULL;
+	DirectLight1 = NULL;
+	DirectLight2 = NULL;
+	DirectLight3 = NULL;
 }
 
 void ZEDMaterialEditorViewPort::Initialize()

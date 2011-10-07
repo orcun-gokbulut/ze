@@ -52,6 +52,9 @@ ZEProfiler::ZEProfiler(void)
 	StartTime = 0;
 	EndTime = 0;
 	ProfilerActive = false;
+	ParentProfiler = NULL;
+	Manager = NULL;
+	PassedTime = 0;
 }
 
 ZEProfiler::~ZEProfiler(void)

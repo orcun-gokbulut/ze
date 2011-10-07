@@ -61,9 +61,6 @@ class ZEDColorLabel : public QLabel
 		QTreeWidgetItem*	ParentItem;
 		QColor				Color;
 
-		ZEDColorPickerRGBA*	ParentRGBAItem;
-		ZEDColorPickerRGB*	ParentRGBItem;
-
 		bool				ExternalEventCall;
 
 	protected:
