@@ -220,6 +220,8 @@ bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, size_t VertexCount,
 		zeError("PhysX Physical Static Mesh", "Can not create triangle mesh.");
 		return false;
 	}
+
+	return true;
 }
 
 void ZEPhysXPhysicalMesh::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags)

@@ -280,7 +280,7 @@ void ZEPhysXPhysicalRigidBody::SetLockPositon(bool Enabled)
 
 bool ZEPhysXPhysicalRigidBody::GetLockPosition()
 {
-	return BodyDesc.flags & NX_BF_FROZEN_POS;
+	return (BodyDesc.flags & NX_BF_FROZEN_POS) != 0;
 }
 
 void ZEPhysXPhysicalRigidBody::SetLockRotation(bool Enabled)
@@ -301,7 +301,7 @@ void ZEPhysXPhysicalRigidBody::SetLockRotation(bool Enabled)
 
 bool ZEPhysXPhysicalRigidBody::GetLockRotation()
 {
-	return BodyDesc.flags & NX_BF_FROZEN_ROT;
+	return (BodyDesc.flags & NX_BF_FROZEN_ROT) != 0;
 }
 
 void ZEPhysXPhysicalRigidBody::SetLinearVelocity(const ZEVector3& NewVelocity) 

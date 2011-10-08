@@ -52,6 +52,9 @@ static inline NxD6JointMotion ConvertZEMotionToNXMotion(ZEPhysicalJointMotion Mo
 		case ZE_PJMOTION_LOCKED:
 			return NX_D6JOINT_MOTION_LOCKED;
 			break;
+		default:
+			return NX_D6JOINT_MOTION_FREE;
+			break;
 	}
 }
 
@@ -70,6 +73,9 @@ static inline ZEPhysicalJointMotion ConvertNXMotionToZEMotion(NxD6JointMotion Mo
 		case NX_D6JOINT_MOTION_LOCKED:
 			return ZE_PJMOTION_LOCKED;
 			break;
+		default:
+			return ZE_PJMOTION_FREE;
+			break;
 	}
 }
 
@@ -84,6 +90,9 @@ static inline ZEPhysicalJointMotorType ConvertNxMotorToZEMotor(NxBitField32 Moto
 	case NX_D6JOINT_DRIVE_VELOCITY:
 		return ZE_PJMT_VELOCITY;
 		break;
+	default:
+		return ZE_PJMT_NONE;
+		break;
 	}
 }
 
@@ -91,13 +100,16 @@ static inline NxBitField32 ConvertZEMotorToNxMotor(ZEPhysicalJointMotorType Moto
 {
 	switch(MotorType)
 	{
-	case ZE_PJMT_POSITION:
-		return NX_D6JOINT_DRIVE_POSITION;
-		break;
+		case ZE_PJMT_POSITION:
+			return NX_D6JOINT_DRIVE_POSITION;
+			break;
 
-	case ZE_PJMT_VELOCITY:
-		return NX_D6JOINT_DRIVE_VELOCITY;
-		break;
+		case ZE_PJMT_VELOCITY:
+			return NX_D6JOINT_DRIVE_VELOCITY;
+			break;
+		default:
+			return 0;
+			break;
 	}
 }
 
@@ -151,6 +163,8 @@ ZEVector3 ZEPhysXPhysicalJoint::GetPosition()
 {
 	if (Joint != NULL)
 		return NX_TO_ZE(Joint->getGlobalAnchor());
+	else
+		return ZEVector3::Zero;
 }
 
 void ZEPhysXPhysicalJoint::SetRotation(const ZEQuaternion &NewRotation)
@@ -169,6 +183,8 @@ ZEQuaternion ZEPhysXPhysicalJoint::GetRotation()
 {
 	if (Joint != NULL)
 		return GlobalOrientation;
+	else
+		return ZEQuaternion::Zero;
 }
 
 void ZEPhysXPhysicalJoint::SetBodyA(ZEPhysicalRigidBody* Object)
