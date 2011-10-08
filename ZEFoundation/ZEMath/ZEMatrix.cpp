@@ -464,6 +464,16 @@ bool ZEMatrix3x3::operator != (const ZEMatrix3x3 &M) const
 	return false;
 }
 
+float ZEMatrix3x3::operator[](size_t Index) const
+{
+	return MA[Index];
+}
+
+float& ZEMatrix3x3::operator[](size_t Index)
+{
+	return MA[Index];
+}
+
 ZEMatrix3x3::ZEMatrix3x3(float M00, float M01, float M02,
 			float M10, float M11, float M12,
 			float M20, float M21, float M22)
