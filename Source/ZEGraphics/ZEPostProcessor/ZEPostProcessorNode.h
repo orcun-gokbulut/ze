@@ -77,7 +77,7 @@ class ZEPostProcessorNode
 		virtual ZEPostProcessorNode**		GetDependencies();
 
 		void								SetState(ZEPostProcessorNodeState State);
-		ZEPostProcessorNodeState			GetState();
+		ZEPostProcessorNodeState			GetState() const;
 
 		virtual bool						Initialize();
 		virtual void						Deinitialize();

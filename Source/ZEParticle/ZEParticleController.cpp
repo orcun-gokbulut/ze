@@ -38,6 +38,7 @@
 
 ZEParticleControllerNode::ZEParticleControllerNode()
 {
+
 }
 
 void ZEParticleControllerNode::SetTime(float Time)
@@ -65,9 +66,6 @@ ZEParticleControllerNode::ZEParticleControllerNode(float Time, float Value)
 	this->Time = Time;
 	this->Value = Value;
 }
-
-
-
 
 void ZEParticleController::SetName(const ZEString& ControllerName)
 {

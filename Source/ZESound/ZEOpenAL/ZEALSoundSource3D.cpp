@@ -284,7 +284,7 @@ void ZEALSoundSource3D::Stream()
 	ALint BufferCount;
 	ALuint Buffer;
 	alGetSourcei(ALSource, AL_BUFFERS_PROCESSED, &BufferCount);
-	for (size_t I = 0; I < BufferCount; I++)
+	for (int I = 0; I < BufferCount; I++)
 	{
 		alSourceUnqueueBuffers(ALSource, 1, &Buffer);
 		alDeleteBuffers(1, &Buffer);

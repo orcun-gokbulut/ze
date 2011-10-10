@@ -54,8 +54,8 @@ class ZEParticle
 		float								BounceFactor;				// Used in repeller
 		bool								IsAlive;					// If a particle is dead, it won't drawn to the screen
 
-											ZEParticle() {};
-											~ZEParticle() {};
+											ZEParticle();
+											~ZEParticle();
 };
 
 #endif

@@ -280,4 +280,6 @@ ZEFreespaceInputDevice::ZEFreespaceInputDevice()
 	OldButtons[2] = false;
 	OldButtons[3] = false;
 	OldButtons[4] = false;
+
+	Device = -1;
 }

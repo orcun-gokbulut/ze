@@ -538,7 +538,7 @@ bool ZE3dsMapExporter::ProcessScene()
 	size_t EntityNodeCount = 0;
 	Tab<IGameNode*> Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
 
-	for (size_t I = 0; I < Nodes.Count(); I++)
+	for (int I = 0; I < Nodes.Count(); I++)
 	{
 		IGameNode* CurrentNode = Nodes[I];;
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();

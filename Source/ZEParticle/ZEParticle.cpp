@@ -35,6 +35,12 @@
 
 #include "ZEParticle.h"
 
+ZEParticle::ZEParticle()
+{
 
+}
 
+ZEParticle::~ZEParticle()
+{
 
+}

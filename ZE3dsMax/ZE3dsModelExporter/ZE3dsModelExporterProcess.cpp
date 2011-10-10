@@ -247,7 +247,7 @@ void CalculateLocalBoundingBox(ZEAABBox& BoundingBox, IGameMesh* Mesh)
 	else
 		BoundingBox.Min = BoundingBox.Max = *(ZEVector3*)&Mesh->GetVertex(Mesh->GetFace(0)->vert[0], true);
 
-	for (size_t I = 0; I < Mesh->GetNumberOfFaces(); I++)
+	for (int I = 0; I < Mesh->GetNumberOfFaces(); I++)
 	{
 		FaceEx* Face = Mesh->GetFace(I);
 		for (size_t N = 0; N < 3; N++)

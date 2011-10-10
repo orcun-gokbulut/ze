@@ -60,7 +60,7 @@ public:
 	ZEState*							GetToState();
 
 	void								SetPriority(int Priority);
-	int									GetPriority();
+	int									GetPriority() const;
 
 };
 

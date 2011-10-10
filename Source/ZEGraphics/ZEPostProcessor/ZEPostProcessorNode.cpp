@@ -73,7 +73,7 @@ void ZEPostProcessorNode::SetState(ZEPostProcessorNodeState State)
 	this->State = State;
 }
 
-ZEPostProcessorNodeState ZEPostProcessorNode::GetState()
+ZEPostProcessorNodeState ZEPostProcessorNode::GetState() const
 {
 	return State;
 }

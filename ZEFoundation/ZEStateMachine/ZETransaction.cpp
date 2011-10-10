@@ -65,17 +65,17 @@ ZEState* ZETransaction::GetToState()
 
 bool ZETransaction::Initialize(ZEState* From, ZEState* To)
 {
-	ZETransaction::FromState = From;
-	ZETransaction::ToState = To;
+	FromState = From;
+	ToState = To;
 	return true;
 }
 
 void ZETransaction::SetPriority(int Priority)
 {
-	ZETransaction::Priority = Priority;
+	Priority = Priority;
 }
 
-int ZETransaction::GetPriority()
+int ZETransaction::GetPriority() const
 {
-	return ZETransaction::Priority;
+	return Priority;
 }
