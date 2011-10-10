@@ -39,22 +39,20 @@ include_directories(
 	${PROJECT_SOURCE_DIR}
 	${CMAKE_SOURCE_DIR}/Source)
 	
-add_source (ZECompressedFile.cpp	Sources)
-add_source (ZECompressedFile.h		Sources ZESDK)
-add_source (ZEFile.cpp				Sources)
-add_source (ZEFile.h				Sources ZESDK)
-add_source (ZEFileCache.cpp			Sources)
-add_source (ZEFileCache.h			Sources ZESDK)
-add_source (ZEPack.cpp				Sources)
-add_source (ZEPack.h				Sources ZESDK)
-add_source (ZEResourceFile.cpp		Sources)
-add_source (ZEResourceFile.h		Sources ZESDK)
+ze_add_source(ZECompressedFile.cpp	Sources)
+ze_add_source(ZECompressedFile.h	Sources Headers)
+ze_add_source(ZEFile.cpp			Sources)
+ze_add_source(ZEFile.h				Sources Headers)
+ze_add_source(ZEFileCache.cpp		Sources)
+ze_add_source(ZEFileCache.h			Sources Headers)
+ze_add_source(ZEPack.cpp			Sources)
+ze_add_source(ZEPack.h				Sources Headers)
+ze_add_source(ZEResourceFile.cpp	Sources)
+ze_add_source(ZEResourceFile.h		Sources Headers)
 
-add_library (ZEFile ${Sources})
-
-target_link_libraries(ZEFile ZEFoundation ZECore)
-
-set_property(TARGET ZEFile PROPERTY FOLDER "ZEFoundation")
-
-install (TARGETS ZEFile COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEFile)
+ze_add_library(ZEFile 
+	SOURCES ${Sources} 
+	HEADERS ${Headers} 
+	INSTALL
+	INSTALL_DESTINATION ZEFoundation/ZEFile
+	INSTALL_COMPONENT SDK)

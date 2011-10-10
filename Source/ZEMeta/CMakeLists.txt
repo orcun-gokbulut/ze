@@ -35,28 +35,28 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZEAnimation.cpp		    Sources)
-add_source (ZEAnimation.h		    Sources ZESDK)
-add_source (ZEClass.cpp			    Sources)
-add_source (ZEClass.h			    Sources ZESDK)
-add_source (ZEContainer.cpp		    Sources)
-add_source (ZEContainer.h		    Sources ZESDK)
-add_source (ZEEvent.cpp			    Sources)
-add_source (ZEEvent.h			    Sources ZESDK)
-add_source (ZEMetaDebugModule.cpp   Sources)
-add_source (ZEMetaDebugModule.h     Sources)
-add_source (ZEMethod.cpp			Sources)
-add_source (ZEMethod.h			    Sources ZESDK)
-add_source (ZEPostProcessor.cpp	    Sources)
-add_source (ZEPostProcessor.h	    Sources ZESDK)
-add_source (ZEProperty.cpp		    Sources)
-add_source (ZEProperty.h			Sources ZESDK)
-add_source (ZEProvider.cpp		    Sources)
-add_source (ZEProvider.h			Sources ZESDK)
+ze_add_source(ZEAnimation.cpp		    Sources)
+ze_add_source(ZEAnimation.h				Sources Headers)
+ze_add_source(ZEClass.cpp			    Sources)
+ze_add_source(ZEClass.h					Sources Headers)
+ze_add_source(ZEContainer.cpp		    Sources)
+ze_add_source(ZEContainer.h				Sources Headers)
+ze_add_source(ZEEvent.cpp			    Sources)
+ze_add_source(ZEEvent.h					Sources Headers)
+ze_add_source(ZEMetaDebugModule.cpp		Sources)
+ze_add_source(ZEMetaDebugModule.h		Sources)
+ze_add_source(ZEMethod.cpp				Sources)
+ze_add_source(ZEMethod.h			    Sources Headers)
+ze_add_source(ZEPostProcessor.cpp	    Sources)
+ze_add_source(ZEPostProcessor.h			Sources Headers)
+ze_add_source(ZEProperty.cpp		    Sources)
+ze_add_source(ZEProperty.h				Sources Headers)
+ze_add_source(ZEProvider.cpp		    Sources)
+ze_add_source(ZEProvider.h				Sources Headers)
 
-add_library (ZEMeta ${Sources})
-
-set_property (TARGET ZEMeta PROPERTY FOLDER "Zinek Engine")
-
-install (TARGETS ZEMeta COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEMeta)
+ze_add_library(ZEMeta 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	INSTALL
+	INSTALL_DESTINATION "ZEMeta"
+	INSTALL_COMPONENT ZESDK)

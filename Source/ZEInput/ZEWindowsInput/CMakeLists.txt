@@ -35,15 +35,14 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZEWindowsInputKeyboardDevice.cpp		Sources)
-add_source (ZEWindowsInputKeyboardDevice.h		    Sources)
-add_source (ZEWindowsInputMouseDevice.cpp			Sources)
-add_source (ZEWindowsInputMouseDevice.h			    Sources)
-add_source (ZEWindowsInputModule.cpp				Sources)
-add_source (ZEWindowsInputModule.h				    Sources)
-add_source (ZEWindowsInputModuleDescription.cpp	    Sources)
-add_source (ZEWindowsInputModuleDescription.h		Sources)
+ze_add_source(ZEWindowsInputKeyboardDevice.cpp		Sources)
+ze_add_source(ZEWindowsInputKeyboardDevice.h		Sources)
+ze_add_source(ZEWindowsInputMouseDevice.cpp			Sources)
+ze_add_source(ZEWindowsInputMouseDevice.h			Sources)
+ze_add_source(ZEWindowsInputModule.cpp				Sources)
+ze_add_source(ZEWindowsInputModule.h				Sources)
+ze_add_source(ZEWindowsInputModuleDescription.cpp	Sources)
+ze_add_source(ZEWindowsInputModuleDescription.h		Sources)
 
-add_library (ZEWindowsInput ${Sources})
-
-set_property(TARGET ZEWindowsInput PROPERTY FOLDER "Zinek Engine")
+ze_add_library(ZEWindowsInput 
+	SOURCES ${Sources})

@@ -35,14 +35,14 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZETModelFile.cpp			Sources)
-add_source (ZETModelFile.h				Sources ZEToolSDK)
-add_source (ZETModelFileFormat.h		Sources)
-add_source (ZETModelFileFormat.cpp		Sources)
+ze_add_source(ZETModelFile.cpp			Sources)
+ze_add_source(ZETModelFile.h			Sources Headers)
+ze_add_source(ZETModelFileFormat.h		Sources)
+ze_add_source(ZETModelFileFormat.cpp	Sources)
 
-add_library (ZETModelFile ${Sources})
-
-set_property(TARGET ZETModelFile PROPERTY FOLDER "ZEToolSDK")
-
-install (TARGETS ZETModelFile COMPONENT "ZEToolSDK Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZEToolSDK}  COMPONENT "ZEToolSDK Includes" CONFIGURATIONS Release DESTINATION Include/ZEToolSDK/ZETModelFile)
+ze_add_library(ZETModelFile 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	INSTALL
+	INSTALL_DESTINATION "ZEToolAPI/ZETModelFile"
+	INSTALL_COMPONENT ZESDK)

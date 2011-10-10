@@ -35,25 +35,18 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-include(${QT_USE_FILE})
+ze_add_source(ZEDBrowser.cpp				Sources)
+ze_add_source(ZEDBrowser.h					Sources QtMocs)
+ze_add_source(ZEDBrowser.ui					Sources QtUI)
+ze_add_source(ZEDBrowserItem.cpp			Sources)
+ze_add_source(ZEDBrowserItem.h				Sources)
+ze_add_source(ZEDDirectoryTreeWidget.cpp	Sources)
+ze_add_source(ZEDDirectoryTreeWidget.h		Sources)
 
-add_source (ZEDBrowser.cpp						Sources)
-add_source (ZEDBrowser.h						Sources QtMocs)
-add_source (ZEDBrowser.ui						Sources QtUI)
-
-add_source (ZEDBrowserItem.cpp					Sources)
-add_source (ZEDBrowserItem.h					Sources)
-
-add_source (ZEDDirectoryTreeWidget.cpp			Sources)
-add_source (ZEDDirectoryTreeWidget.h			Sources)
-
-include_directories (${CMAKE_CURRENT_BINARY_DIR})
-
-qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-add_library (ZEDBrowser ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
-target_link_libraries (ZEDBrowser freeimage.lib)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-set_property(TARGET ZEDBrowser PROPERTY FOLDER "ZEditor")
+ze_add_library(ZEDBrowser 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles})

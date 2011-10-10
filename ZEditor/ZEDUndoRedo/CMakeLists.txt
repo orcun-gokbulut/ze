@@ -37,8 +37,8 @@ cmake_minimum_required (VERSION 2.8)
 
 include(${QT_USE_FILE})
 
-add_source (ZEDUndoRedo.cpp		Sources)
-add_source (ZEDUndoRedo.h		Sources)
+ze_add_source(ZEDUndoRedo.cpp		Sources)
+ze_add_source(ZEDUndoRedo.h		Sources)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

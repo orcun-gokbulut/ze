@@ -35,20 +35,19 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZEDSComponentBase.cpp		Sources)
-add_source (ZEDSComponentBase.h			Sources)
-add_source (ZEDSListener.cpp			Sources)
-add_source (ZEDSListener.h				Sources)
-add_source (ZEDSModule.cpp				Sources)
-add_source (ZEDSModule.h				Sources)
-add_source (ZEDSModuleDescription.cpp	Sources)
-add_source (ZEDSModuleDescription.h		Sources)
-add_source (ZEDSSoundSource.cpp			Sources)
-add_source (ZEDSSoundSource.h			Sources)
-add_source (ZEDSSoundSource3D.cpp		Sources)
-add_source (ZEDSSoundSource3D.h			Sources)
+ze_add_source(ZEDSComponentBase.cpp			Sources)
+ze_add_source(ZEDSComponentBase.h			Sources)
+ze_add_source(ZEDSListener.cpp				Sources)
+ze_add_source(ZEDSListener.h				Sources)
+ze_add_source(ZEDSModule.cpp				Sources)
+ze_add_source(ZEDSModule.h					Sources)
+ze_add_source(ZEDSModuleDescription.cpp		Sources)
+ze_add_source(ZEDSModuleDescription.h		Sources)
+ze_add_source(ZEDSSoundSource.cpp			Sources)
+ze_add_source(ZEDSSoundSource.h				Sources)
+ze_add_source(ZEDSSoundSource3D.cpp			Sources)
+ze_add_source(ZEDSSoundSource3D.h			Sources)
 
-add_library (ZEDirectSound ${Sources})
-target_link_libraries (ZEDirectSound dsound.lib dxguid.lib)
-
-set_property(TARGET ZEDirectSound PROPERTY FOLDER "Zinek Engine")
+ze_add_library(ZEDirectSound 
+	SOURCES ${Sources}
+	LIBS dsound.lib dxguid.lib)

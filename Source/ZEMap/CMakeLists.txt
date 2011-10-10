@@ -37,14 +37,14 @@ cmake_minimum_required (VERSION 2.8)
 
 add_subdirectory (ZEPortalMap)
 
-add_source (ZEMap.cpp			Source)
-add_source (ZEMap.h				Source ZESDK)
-add_source (ZEMapResource.cpp	Source)
-add_source (ZEMapResource.h		Source ZESDK)
+ze_add_source(ZEMap.cpp				Sources)
+ze_add_source(ZEMap.h				Sources Headers)
+ze_add_source(ZEMapResource.cpp		Sources)
+ze_add_source(ZEMapResource.h		Sources Headers)
 
-add_library(ZEMap ${Source})
-
-set_property(TARGET ZEMap PROPERTY FOLDER "Zinek Engine")
-
-install (TARGETS ZEMap COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEMap)
+ze_add_library(ZEMap 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	INSTALL
+	INSTALL_DESTINATION "ZEMap"
+	INSTALL_COMPONENT ZESDK)

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - AddSource.cmake
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZETrigonometryTests.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,42 +30,28 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-MACRO(ADD_SOURCE)
-	PARSE_ARGUMENTS(SOURCE "" "ZEPP" ${ARGN})
-	LIST(GET SOURCE_DEFAULT_ARGS 0 SOURCE_FILE)
-	
-	SET (SOURCE_LISTS ${SOURCE_DEFAULT_ARGS})
-	LIST (REMOVE_AT SOURCE_LISTS 0)
-	LIST (GET SOURCE_LISTS 0 SOURCE_FILE_LIST)
+#include <UnitTest/UnitTest++.h>
+#include <math.h>
+#include "ZEMathIOStreamMapping.h"
+#include "ZEMath/ZETrigonometry.h"
+#include "ZEMath/ZEMathDefinitions.h"
 
-	IF (SOURCE_ZEPP)
-		ADD_CUSTOM_COMMAND (
-			COMMAND "${CMAKE_SOURCE_DIR}/ZEPP/zepp.exe" 
-			ARGS ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_FILE}
-			DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_FILE}
-			OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_FILE}.zpp)
-		list (APPEND ${SOURCE_FILE_LIST} ${SOURCE_FILE}.zpp)
-		SOURCE_GROUP("ZPP" FILES ${SOURCE_FILE}.zpp)
-		SET_PROPERTY(SOURCE ${SOURCE_FILE}.zpp PROPERTY LANGUAGE CXX )
-		list (APPEND ZEPP ${SOURCE_FILE}.zpp)
-	ENDIF (SOURCE_ZEPP)
-	
-	LIST(APPEND ${SOURCE_FILE_LIST} ${SOURCE_FILE})
-	SOURCE_GROUP("" FILES ${SOURCE_FILE})
-	LIST (REMOVE_AT SOURCE_LISTS 0)
+SUITE(ZETrigonometry)
+{
+	TEST(FastSin)
+	{
+		CHECK_EQUAL(FastSin(360), 0);
 
-	FOREACH (SDKList ${SOURCE_LISTS})
-		LIST (APPEND ${SDKList} ${SOURCE_FILE})
-	ENDFOREACH (SDKList)
-	
-	#MESSAGE("File : " ${SOURCE_FILE})
-	#MESSAGE("- Arguments : " ${ARGN})
-	#MESSAGE("- Default Arguments : " ${SOURCE_DEFAULT_ARGS})
-	#MESSAGE("- Source List Name : " ${SOURCE_FILE_LIST})
-	#MESSAGE("- Additional List Names : " ${SOURCE_LISTS})
-	#MESSAGE("- ZEPP : " ${SOURCE_ZEPP})
-	#MESSAGE("- ZEPP : " ${ZEPP})
-ENDMACRO(ADD_SOURCE)
+	}
+	TEST(FastCos)
+	{
+		CHECK_EQUAL(FastCos(360), 1);
+	}
+	TEST(FastTan)
+	{
+		CHECK_EQUAL(FastTan(360), 0);
+	}
+}

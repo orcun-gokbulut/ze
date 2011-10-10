@@ -36,8 +36,11 @@
 cmake_minimum_required (VERSION 2.8)
 
 project (ZEditior)
+ze_set_project_folder("ZEditor")
 
 find_package(Qt4 REQUIRED)
+add_definitions(${QT_DEFINITIONS})
+include(${QT_USE_FILE})
 
 include_directories(
 	${PROJECT_SOURCE_DIR}
@@ -48,31 +51,24 @@ include_directories(
 	${QT_INCLUDE_DIR}/QtGui
 	${QT_INCLUDE_DIR}/QtCore)
 	
-link_directories("${CMAKE_SOURCE_DIR}/Lib/Win x86/Qt")
+link_directories(
+	"${CMAKE_SOURCE_DIR}/Lib/Win x86/Qt")
 
-add_definitions(${QT_DEFINITIONS})
+add_subdirectory(ZEDBrowser)
+add_subdirectory(ZEDCommonControls)
+add_subdirectory(ZEDCommonEntities)
+add_subdirectory(ZEDCore)
+add_subdirectory(ZEDSceneEditor)
+add_subdirectory(ZEDMaterialEditor)
+add_subdirectory(ZEDScriptEditor)
+add_subdirectory(ZEDUndoRedo)
+add_subdirectory(ZEDSoundExtensionsPlugIn)
+add_subdirectory(ZEDImageExtensionsPlugIn)
 
-add_subdirectory (ZEDBrowser)
-add_subdirectory (ZEDCommonControls)
-add_subdirectory (ZEDCommonEntities)
-add_subdirectory (ZEDCore)
-add_subdirectory (ZEDSceneEditor)
-add_subdirectory (ZEDMaterialEditor)
-add_subdirectory (ZEDScriptEditor)
-add_subdirectory (ZEDUndoRedo)
-add_subdirectory (ZEDSoundExtensionsPlugIn)
-add_subdirectory (ZEDImageExtensionsPlugIn)
+ze_add_source(ZEDMain.cpp		Sources)
 
-add_source (ZEDMain.cpp		Sources)
-
-add_executable (ZEditor WIN32 ${Sources})
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set_property(TARGET ZEditor PROPERTY FOLDER "ZEditor")
-
-target_link_libraries (ZEditor ZECore ZEFoundation ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZESDK)
-target_link_libraries (ZEditor ZEDirect3D9 ZEDirectSound ZEOpenAL ZEPhysX ZEPortalMap)
-target_link_libraries (ZEditor ZEDCommonControls ZEDCommonEntities ZEDCore ZEDPropertyWindowManager ZEDSceneEditor ZEDMaterialEditor ZEDScriptEditor ZEDUndoRedo ZEDBrowser ZEDSoundExtensionsPlugIn ZEDImageExtensionsPlugIn)
-target_link_libraries (ZEditor QtCore4.lib QtGui4.lib)
-
-install (TARGETS ZEditor RUNTIME DESTINATION bin COMPONENT "Runtime")
+ze_add_executable(ZEditor 
+	SOURCES ${Sources}
+	LIBS ZECore ZEFoundation ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZESDK ZEDirect3D9 ZEDirectSound ZEOpenAL ZEPhysX ZEPortalMap
+		ZEDCommonControls ZEDCommonEntities ZEDCore ZEDPropertyWindowManager ZEDSceneEditor ZEDMaterialEditor ZEDScriptEditor ZEDUndoRedo ZEDBrowser ZEDSoundExtensionsPlugIn ZEDImageExtensionsPlugIn
+		QtCore4.lib QtGui4.lib)

@@ -35,20 +35,20 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZESerializable.cpp		Sources)
-add_source (ZESerializable.h		Sources ZESDK)
-add_source (ZESerializer.cpp		Sources)
-add_source (ZESerializer.h			Sources ZESDK)
-add_source (ZEUnserializer.cpp		Sources)
-add_source (ZEUnserializer.h		Sources ZESDK)
-add_source (ZEFileSerializer.cpp	Sources)
-add_source (ZEFileSerializer.h		Sources ZESDK)
-add_source (ZEFileUnserializer.cpp	Sources)
-add_source (ZEFileUnserializer.h	Sources ZESDK)
+ze_add_source(ZESerializable.cpp		Sources)
+ze_add_source(ZESerializable.h			Sources Headers)
+ze_add_source(ZESerializer.cpp			Sources)
+ze_add_source(ZESerializer.h			Sources Headers)
+ze_add_source(ZEUnserializer.cpp		Sources)
+ze_add_source(ZEUnserializer.h			Sources Headers)
+ze_add_source(ZEFileSerializer.cpp		Sources)
+ze_add_source(ZEFileSerializer.h		Sources Headers)
+ze_add_source(ZEFileUnserializer.cpp	Sources)
+ze_add_source(ZEFileUnserializer.h		Sources Headers)
 
-add_library (ZESerialization ${Sources})
-
-set_property(TARGET ZESerialization PROPERTY FOLDER "ZEFoundation")
-
-install (TARGETS ZESerialization COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZESerialization)
+ze_add_library(ZESerialization 
+	SOURCES ${Sources} 
+	HEADERS ${Headers} 
+	INSTALL
+	INSTALL_DESTINATION ZEFoundation/ZESerialization
+	INSTALL_COMPONENT SDK)

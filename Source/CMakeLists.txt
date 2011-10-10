@@ -37,6 +37,8 @@ cmake_minimum_required(VERSION 2.8)
 
 project(ZinekEngine)
 
+ze_set_project_folder("Zinek Engine")
+
 set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
 
 append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
@@ -44,7 +46,7 @@ append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS
 
 include_directories(${PROJECT_SOURCE_DIR}
 					${CMAKE_SOURCE_DIR}/ZEFoundation)
-				
+
 add_subdirectory(ZECore)
 add_subdirectory(ZEDebug)
 add_subdirectory(ZEGame)
@@ -60,33 +62,28 @@ add_subdirectory(ZEScript)
 add_subdirectory(ZESound)
 add_subdirectory(ZEUI)
 
-add_source(ZEAPI.h 					Sources ZESDK)
-add_source(ZECompileOptions.h 		Sources ZESDK)
-add_source(ZEDefinitions.h 			Sources ZESDK)
-add_source(ZEFastDelegate.h 		Sources ZESDK)
-add_source(ZEFastDelegateBind.h		Sources ZESDK)
-add_source(ZEMain.cpp 				Sources)
-add_source(ZESDK.h 					Sources ZESDK)
-add_source(ZESDK.cpp 				Sources)
+ze_add_source(ZEAPI.h 						Sources Headers)
+ze_add_source(ZECompileOptions.h 			Sources Headers)
+ze_add_source(ZEDefinitions.h 				Sources Headers)
+ze_add_source(ZEFastDelegate.h 				Sources Headers)
+ze_add_source(ZEFastDelegateBind.h			Sources Headers)
+ze_add_source(ZEMain.cpp 					Sources)
+ze_add_source(ZESDK.h 						Sources Headers)
+ze_add_source(ZESDK.cpp 					Sources)
+ze_add_source(ZECore/ZEWindowResources.rc	Sources)
 
-add_source(ZECore/ZEWindowResources.rc	Sources)
-
-add_executable(ZE WIN32 ${Sources})
-set_property(TARGET ZE PROPERTY FOLDER "Zinek Engine")
-target_link_libraries(ZE ZECore ZEDS ZEFoundation ZESerialization ZEFile ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
-target_link_libraries(ZE ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEFreespaceInput ZEPortalMap freeimage.lib)
-
-add_library(ZESDK ${Sources})
-set_property(TARGET ZESDK PROPERTY FOLDER "Zinek Engine")
-target_link_libraries (ZESDK ZECore ZEDS ZESerialization ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI)
-target_link_libraries (ZESDK ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEFreespaceInput ZEPortalMap freeimage.lib)
-
-get_property(TargetPath TARGET ZE PROPERTY LOCATION)
-file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)
-add_custom_command(TARGET ZE CONFIGURATIONS Release RelWithDebInfo POST_BUILD COMMAND copy "${NativeTargetPath}" "${CMAKE_SOURCE_DIR}\\RunDir\\ZE.release.exe")
-add_custom_command(TARGET ZE CONFIGURATIONS Debug POST_BUILD COMMAND copy "${NativeTargetPath}" "${CMAKE_SOURCE_DIR}\\RunDir\\ZE.debug.exe")
-
-
-install(TARGETS ZE DESTINATION bin COMPONENT "Runtime")
-install(FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include)
-install(DIRECTORY ${CMAKE_SOURCE_DIR}/Dll/ CONFIGURATIONS Release DESTINATION bin COMPONENT "Runtime" PATTERN .svn EXCLUDE)
+ze_add_executable(ZE 
+	SOURCES ${Sources}
+	LIBS ZECore ZEDS ZEFoundation ZESerialization ZEFile ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI
+		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEFreespaceInput ZEPortalMap
+	INSTALL
+	INSTALL_DESTINATION Bin
+	INSTALL_COMPONENT Runtime)
+		
+ze_add_library(ZESDK 
+	SOURCES ${Sources}
+	LIBS ZECore ZEDS ZEFoundation ZESerialization ZEFile ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI
+		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEFreespaceInput ZEPortalMap
+	INSTALL
+	INSTALL_DESTINATION ""
+	INSTALL_COMPONENT ZESDK)

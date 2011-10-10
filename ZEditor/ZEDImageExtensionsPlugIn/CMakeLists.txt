@@ -35,24 +35,15 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-include(${QT_USE_FILE})
+ze_add_source(ZEDImageExtensionsPlugIn.h		Sources)
+ze_add_source(ZEDImageExtensionsPlugIn.cpp		Sources)
+ze_add_source(ZEDImageFileExtension.h			Sources)
+ze_add_source(ZEDImageFileExtension.cpp			Sources)
+ze_add_source(ZEDImageFilePreviewWidget.h		Sources QtMocs)
+ze_add_source(ZEDImageFilePreviewWidget.cpp		Sources)
 
-add_source (ZEDImageExtensionsPlugIn.h				Sources)
-add_source (ZEDImageExtensionsPlugIn.cpp			Sources)
-
-add_source (ZEDImageFileExtension.h					Sources)
-add_source (ZEDImageFileExtension.cpp				Sources)
-
-add_source (ZEDImageFilePreviewWidget.h				Sources QtMocs)
-add_source (ZEDImageFilePreviewWidget.cpp			Sources)
-
-include_directories (${CMAKE_CURRENT_BINARY_DIR})
-
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-add_library (ZEDImageExtensionsPlugIn ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
-target_link_libraries (ZEDImageExtensionsPlugIn freeimage.lib)
-
-set_property(TARGET ZEDImageExtensionsPlugIn PROPERTY FOLDER "ZEditor")
+ze_add_library(ZEDImageExtensionsPlugIn 
+	SOURCES ${Sources} ${QtMocFiles}
+	LIBS freeimage.lib)

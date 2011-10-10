@@ -35,14 +35,14 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZETFontBaker.cpp		Sources)
-add_source (ZETFontBaker.h			Sources ZEToolSDK)
-add_source (ZETFontFile.cpp			Sources)
-add_source (ZETFontFile.h			Sources ZEToolSDK)
+ze_add_source(ZETFontBaker.cpp		Sources)
+ze_add_source(ZETFontBaker.h		Sources Headers)
+ze_add_source(ZETFontFile.cpp		Sources)
+ze_add_source(ZETFontFile.h			Sources Headers)
 
-add_library (ZETFontFile ${Sources})
-
-set_property(TARGET ZETFontFile PROPERTY FOLDER "ZEToolSDK")
-
-install (TARGETS ZETFontFile COMPONENT "ZEToolSDK Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZEToolSDK}  COMPONENT "ZEToolSDK Includes" CONFIGURATIONS Release DESTINATION Include/ZEToolSDK/ZETFontFile)
+ze_add_library(ZETFontFile 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	INSTALL
+	INSTALL_DESTINATION "ZEToolAPI/ZETFontFile"
+	INSTALL_COMPONENT ZESDK)

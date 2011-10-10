@@ -35,14 +35,13 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZEVRPNInputDevice.cpp							Sources)
-add_source (ZEVRPNInputDevice.h							Sources)
-add_source (ZEVRPNInputDeviceExtension.cpp					Sources)
-add_source (ZEVRPNInputDeviceExtension.h					Sources)
-add_source (ZEVRPNInputDeviceExtensionDescription.cpp		Sources)
-add_source (ZEVRPNInputDeviceExtensionDescription.h		Sources)
+ze_add_source(ZEVRPNInputDevice.cpp							Sources)
+ze_add_source(ZEVRPNInputDevice.h							Sources)
+ze_add_source(ZEVRPNInputDeviceExtension.cpp				Sources)
+ze_add_source(ZEVRPNInputDeviceExtension.h					Sources)
+ze_add_source(ZEVRPNInputDeviceExtensionDescription.cpp		Sources)
+ze_add_source(ZEVRPNInputDeviceExtensionDescription.h		Sources)
 
-add_library (ZEVRPNInput ${Sources})
-target_link_libraries (ZEVRPNInput vrpn.lib)
-
-set_property(TARGET ZEVRPNInput PROPERTY FOLDER "Zinek Engine")
+ze_add_library(ZEVRPNInput 
+	SOURCES ${Sources}
+	LIBS vrpn.lib)

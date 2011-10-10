@@ -37,6 +37,8 @@ cmake_minimum_required (VERSION 2.8)
 
 project (ZEFoundation)
 
+ze_set_project_folder("ZEFoundation")
+
 include_directories(
 	${PROJECT_SOURCE_DIR} 
 	${PROJECT_SOURCE_DIR}/../Include)
@@ -49,15 +51,14 @@ add_subdirectory (ZESerialization)
 add_subdirectory (ZEStateMachine)
 add_subdirectory (ZEFile)
 
-add_source (ZETypes.h 				Sources ZESDK)
-add_source (ZETypes.cpp 			Sources)
-add_source (ZEAssert.h 				Sources ZESDK)
-add_source (ZEAssert.cpp 			Sources)
+ze_add_source(ZETypes.h 			Sources Headers)
+ze_add_source(ZETypes.cpp 			Sources)
+ze_add_source(ZEAssert.h 			Sources Headers)
+ze_add_source(ZEAssert.cpp 			Sources)
 
-add_library(ZEFoundation ${Sources})
-target_link_libraries (ZEFoundation ZEMath ZEDS ZESerialization)
-
-set_property(TARGET ZEFoundation PROPERTY FOLDER "ZEFoundation")
-
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include)
-install (DIRECTORY ${CMAKE_SOURCE_DIR}/Dll/ CONFIGURATIONS Release ARCHIVE DESTINATION bin COMPONENT "Runtime")
+ze_add_library(ZEFoundation 
+	SOURCES ${Sources} 
+	HEADERS ${Headers} 
+	INSTALL
+	INSTALL_DESTINATION ZEFoundation
+	INSTALL_COMPONENT SDK)

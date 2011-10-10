@@ -35,12 +35,14 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZED3D9PostProcessor.cpp			Sources)
-add_source (ZED3D9PostProcessor.h			Sources)
-add_source (ZED3D9PPBlurNode.cpp			Sources)
-add_source (ZED3D9PPBlurNode.h				Sources)
-add_source (ZED3D9PPScreenOutputNode.cpp	Sources)
-add_source (ZED3D9PPScreenOutputNode.h		Sources)
+ze_add_source(ZED3D9PostProcessor.cpp		Sources)
+ze_add_source(ZED3D9PostProcessor.h			Sources)
+ze_add_source(ZED3D9PPBlurNode.cpp			Sources)
+ze_add_source(ZED3D9PPBlurNode.h			Sources)
+ze_add_source(ZED3D9PPScreenOutputNode.cpp	Sources)
+ze_add_source(ZED3D9PPScreenOutputNode.h	Sources)
 
-add_library (ZED3D9PostProcessor ${Sources})
-set_property(TARGET ZED3D9PostProcessor PROPERTY FOLDER "Zinek Engine")
+ze_add_library(ZED3D9PostProcessor 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	LIBS ZEDirect3D9)

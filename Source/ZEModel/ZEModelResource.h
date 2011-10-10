@@ -277,7 +277,7 @@ class ZEModelResourceMeshLOD
 struct ZEModelResourceMesh
 {
 	char										Name[ZE_MDLF_MAX_NAME_SIZE]; 
-	ZEAABBox								BoundingBox;
+	ZEAABBox									BoundingBox;
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;
 	ZEVector3									Scale;
@@ -289,7 +289,7 @@ struct ZEModelResourceMesh
 struct ZEModelResourceBone
 {
 	char										Name[ZE_MDLF_MAX_NAME_SIZE];
-	ZEAABBox								BoundingBox;
+	ZEAABBox									BoundingBox;
 	ZEINT32										ParentBone;
 	ZEVector3									RelativePosition;
 	ZEQuaternion								RelativeRotation;

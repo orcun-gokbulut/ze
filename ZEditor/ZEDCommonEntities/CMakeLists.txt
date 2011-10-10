@@ -35,23 +35,14 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-include(${QT_USE_FILE})
+ze_add_source(ZEDGizmo.cpp			Sources)
+ze_add_source(ZEDGizmo.h			Sources)
+ze_add_source(ZEDGizmoUndoRedo.cpp	Sources)
+ze_add_source(ZEDGizmoUndoRedo.h	Sources)
+ze_add_source(ZEDGrid.cpp			Sources)
+ze_add_source(ZEDGrid.h				Sources)
+ze_add_source(ZEDScreenAxis.cpp		Sources)
+ze_add_source(ZEDScreenAxis.h		Sources)
 
-add_source (ZEDGizmo.cpp		Sources)
-add_source (ZEDGizmo.h			Sources)
-add_source (ZEDGizmoUndoRedo.cpp	Sources)
-add_source (ZEDGizmoUndoRedo.h		Sources)
-add_source (ZEDGrid.cpp			Sources)
-add_source (ZEDGrid.h			Sources)
-add_source (ZEDScreenAxis.cpp		Sources)
-add_source (ZEDScreenAxis.h		Sources)
-
-include_directories(${CMAKE_CURRENT_BINARY_DIR})
-
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
-
-add_library (ZEDCommonEntities ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
-
-set_property(TARGET ZEDCommonEntities PROPERTY FOLDER "ZEditor")
+ze_add_library(ZEDCommonEntities 
+	SOURCES ${Sources})

@@ -35,21 +35,19 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZEALComponentBase.cpp		Sources)
-add_source (ZEALComponentBase.h			Sources)
-add_source (ZEALListener.cpp			Sources)
-add_source (ZEALListener.h				Sources)
-add_source (ZEALModule.cpp				Sources)
-add_source (ZEALModule.h				Sources)
-add_source (ZEALModuleDescription.cpp	Sources)
-add_source (ZEALModuleDescription.h		Sources)
-add_source (ZEALSoundSource.cpp			Sources)
-add_source (ZEALSoundSource.h			Sources)
-add_source (ZEALSoundSource3D.cpp		Sources)
-add_source (ZEALSoundSource3D.h			Sources)
+ze_add_source(ZEALComponentBase.cpp			Sources)
+ze_add_source(ZEALComponentBase.h			Sources)
+ze_add_source(ZEALListener.cpp				Sources)
+ze_add_source(ZEALListener.h				Sources)
+ze_add_source(ZEALModule.cpp				Sources)
+ze_add_source(ZEALModule.h					Sources)
+ze_add_source(ZEALModuleDescription.cpp		Sources)
+ze_add_source(ZEALModuleDescription.h		Sources)
+ze_add_source(ZEALSoundSource.cpp			Sources)
+ze_add_source(ZEALSoundSource.h				Sources)
+ze_add_source(ZEALSoundSource3D.cpp			Sources)
+ze_add_source(ZEALSoundSource3D.h			Sources)
 
-add_library (ZEOpenAL ${Sources})
-target_link_libraries (ZEOpenAL OpenAL32.lib)
-include_directories(${PROJECT_SOURCE_DIR}/../Include/OpenAL)
-
-set_property(TARGET ZEOpenAL PROPERTY FOLDER "Zinek Engine")
+ze_add_library(ZEOpenAL 
+	SOURCES ${Sources}
+	LIBS OpenAL32.lib)

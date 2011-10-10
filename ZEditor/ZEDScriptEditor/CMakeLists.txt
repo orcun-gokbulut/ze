@@ -35,21 +35,12 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-include(${QT_USE_FILE})
+ze_add_source(ZEDScriptEditor.cpp			Sources)
+ze_add_source(ZEDScriptEditor.h				Sources QtMocs)
+ze_add_source(ZEDNumberedTextEditor.cpp		Sources)
+ze_add_source(ZEDNumberedTextEditor.h		Sources QtMocs)
 
-add_source (ZEDScriptEditor.cpp				Sources)
-add_source (ZEDScriptEditor.h				Sources QtMocs)
-add_source (ZEDNumberedTextEditor.cpp			Sources)
-add_source (ZEDNumberedTextEditor.h			Sources QtMocs)
-
-include_directories(
-   ${CMAKE_CURRENT_BINARY_DIR}
-)
-
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-add_library (ZEDScriptEditor ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
-
-set_property(TARGET ZEDScriptEditor PROPERTY FOLDER "ZEditor")
+ze_add_library(ZEDScriptEditor 
+	SOURCES ${Sources} ${QtMocFiles})

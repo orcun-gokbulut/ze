@@ -35,16 +35,16 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZETMapFile.cpp				Sources)
-add_source (ZETMapFile.h				Sources ZEToolSDK)
-add_source (ZETMapFileFormat.cpp		Sources)
-add_source (ZETMapFileFormat.h			Sources)
-add_source (ZETMapOctree.cpp			Sources)
-add_source (ZETMapOctree.h				Sources)
+ze_add_source(ZETMapFile.cpp				Sources)
+ze_add_source(ZETMapFile.h					Sources Headers)
+ze_add_source(ZETMapFileFormat.cpp			Sources)
+ze_add_source(ZETMapFileFormat.h			Sources)
+ze_add_source(ZETMapOctree.cpp				Sources)
+ze_add_source(ZETMapOctree.h				Sources)
 
-add_library (ZETMapFile ${Sources})
-
-set_property(TARGET ZETMapFile PROPERTY FOLDER "ZEToolSDK")
-
-install (TARGETS ZETMapFile COMPONENT "ZEToolSDK Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZEToolSDK}  COMPONENT "ZEToolSDK Includes" CONFIGURATIONS Release DESTINATION Include/ZEToolSDK/ZETMapFile)
+ze_add_library(ZETMapFile 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	INSTALL
+	INSTALL_DESTINATION "ZEToolAPI/ZETMapFile"
+	INSTALL_COMPONENT ZESDK)

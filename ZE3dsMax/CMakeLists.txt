@@ -37,14 +37,32 @@ cmake_minimum_required (VERSION 2.8)
 
 project (ZE3dsMax)
 
+ze_set_project_folder("ZE3dsMax")
+
+set (ZEBUILD_3DS_MAX_BINARY_DIRECTORY 		"C:\\Program Files (x86)\\Autodesk\\3ds Max 2010" CACHE STRING "Directory of 3ds max.")
+set (ZEBUILD_BUILD_3DS_MAX_MODEL_EXPORTER	TRUE CACHE BOOL "Build 3ds max model exporter plugin.")
+set (ZEBUILD_BUILD_3DS_MAX_MAP_EXPORTER		TRUE CACHE BOOL "Build 3ds max map exporter plugin.")
+
 include_directories(
 	${PROJECT_SOURCE_DIR}
 	${CMAKE_SOURCE_DIR}/Source	
 	${CMAKE_SOURCE_DIR}/ZEFoundation
 	${CMAKE_SOURCE_DIR}/ZEToolSDK)
 	
-add_subdirectory (ZE3dsProgressDialog)
-add_subdirectory (ZE3dsMapExporter)
-add_subdirectory (ZE3dsModelExporter)
+if (ZEBUILD_BUILD_3DS_MAX_MODEL_EXPORTER OR ZEBUILD_BUILD_3DS_MAX_MAP_EXPORTER)
+	add_subdirectory (ZE3dsProgressDialog)
+endif()
 
-install (DIRECTORY ZE3dsMaxScript CONFIGURATIONS Release DESTINATION "Exporters/3dsMax/MaxScript" COMPONENT "3ds Max Exporters" PATTERN .svn EXCLUDE)
+if (ZEBUILD_BUILD_3DS_MAX_MAP_EXPORTER)
+	add_subdirectory (ZE3dsMapExporter)
+endif()
+
+if (ZEBUILD_BUILD_3DS_MAX_MODEL_EXPORTER)
+	add_subdirectory (ZE3dsModelExporter)
+endif()
+
+install(DIRECTORY ZE3dsMaxScript 
+	CONFIGURATIONS Release 
+	DESTINATION "Tools/Exporters/ZE3dsMax/MaxScript" 
+	COMPONENT Tools 
+	PATTERN .svn EXCLUDE)

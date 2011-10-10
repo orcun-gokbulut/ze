@@ -35,28 +35,32 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZEAllocator.cpp			Sources)
-add_source (ZEAllocator.h			Sources ZESDK)
-add_source (ZEArray.cpp				Sources)
-add_source (ZEArray.h				Sources ZESDK)
-add_source (ZEDSDefinitions.cpp		Sources)
-add_source (ZEDSDefinitions.h		Sources ZESDK)
-add_source (ZEFlags.cpp				Sources)
-add_source (ZEFlags.h				Sources ZESDK)
-add_source (ZENamed.cpp				Sources)
-add_source (ZENamed.h				Sources ZESDK)
-add_source (ZEString.cpp			Sources)
-add_source (ZEString.h				Sources ZESDK)
-add_source (ZETypedVariant.cpp		Sources)
-add_source (ZETypedVariant.h		Sources ZESDK)
-add_source (ZEVariant.cpp			Sources)
-add_source (ZEVariant.h				Sources ZESDK)
+ze_add_source(ZEAllocator.cpp			Sources)
+ze_add_source(ZEAllocator.h				Sources Headers)
+ze_add_source(ZEArray.cpp				Sources)
+ze_add_source(ZEArray.h					Sources Headers)
+ze_add_source(ZEDSDefinitions.cpp		Sources)
+ze_add_source(ZEDSDefinitions.h			Sources Headers)
+ze_add_source(ZEFlags.cpp				Sources)
+ze_add_source(ZEFlags.h					Sources Headers)
+ze_add_source(ZENamed.cpp				Sources)
+ze_add_source(ZENamed.h					Sources Headers)
+ze_add_source(ZEString.cpp				Sources)
+ze_add_source(ZEString.h				Sources Headers)
+ze_add_source(ZETypedVariant.cpp		Sources)
+ze_add_source(ZETypedVariant.h			Sources Headers)
+ze_add_source(ZEVariant.cpp				Sources)
+ze_add_source(ZEVariant.h				Sources Headers)
 
-add_library (ZEDS ${Sources})
-
-target_link_libraries(ZEDS ZEFoundation zlib.lib)
-
-set_property(TARGET ZEDS PROPERTY FOLDER "ZEFoundation")
-
-install (TARGETS ZEDS COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEDS)
+ze_add_library(ZEDS 
+	SOURCES ${Sources} 
+	HEADERS ${Headers}
+	LIBS ZEFoundation
+	INSTALL
+	INSTALL_DESTINATION ZEFoundation/ZEDS
+	INSTALL_COMPONENT SDK)
+	
+	
+ze_add_unit_tests(ZEStringTests 
+	SOURCES ZEStringTests.cpp 
+	TEST_TARGET ZEDS)

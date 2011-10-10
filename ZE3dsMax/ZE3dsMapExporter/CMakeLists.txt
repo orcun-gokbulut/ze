@@ -35,34 +35,36 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZE3dsMapExporterDLLEntry.cpp		Sources)
-add_source (ZE3dsMapExporterDLLEntry.h			Sources)
-add_source (ZE3dsMapExporter.h					Sources)
-add_source (ZE3dsMapExporter.cpp				Sources)
-add_source (ZE3dsMapExporterDescription.h		Sources)
-add_source (ZE3dsMapExporterDescription.cpp		Sources)
-add_source (ZE3dsMapExporterProcess.cpp			Sources)
-add_source (ZE3dsMapExporterOptions.h			Sources)
-add_source (ZE3dsMapExporterOptions.cpp			Sources)
-add_source (ZE3dsMapExporterResources.rc		Sources)
-add_source (ZE3dsMapExporterResources.h			Sources)
-add_source (ZE3dsMapExporter.def				Sources)
-add_source (../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc				Sources)
+ze_add_source(ZE3dsMapExporterDLLEntry.cpp		Sources)
+ze_add_source(ZE3dsMapExporterDLLEntry.h		Sources)
+ze_add_source(ZE3dsMapExporter.h				Sources)
+ze_add_source(ZE3dsMapExporter.cpp				Sources)
+ze_add_source(ZE3dsMapExporterDescription.h		Sources)
+ze_add_source(ZE3dsMapExporterDescription.cpp	Sources)
+ze_add_source(ZE3dsMapExporterProcess.cpp		Sources)
+ze_add_source(ZE3dsMapExporterOptions.h			Sources)
+ze_add_source(ZE3dsMapExporterOptions.cpp		Sources)
+ze_add_source(ZE3dsMapExporterResources.rc		Sources)
+ze_add_source(ZE3dsMapExporterResources.h		Sources)
+ze_add_source(ZE3dsMapExporter.def				Sources)
+#ze_add_source(../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc	Sources)
 
-add_library (ZE3dsMapExporter SHARED ${Sources})
-target_link_libraries (ZE3dsMapExporter ZETMapFile ZEToolSDK ZE3dsProgressDialog ZEDS ZEMath ZEFoundation)
-target_link_libraries (ZE3dsMapExporter core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib igame.lib)
-
-set_property (TARGET ZE3dsMapExporter PROPERTY FOLDER "ZE3dsMax")
-set_property (TARGET ZE3dsMapExporter PROPERTY SUFFIX ".dle")
-set_property (TARGET ZE3dsMapExporter PROPERTY CLEAN_DIRECT_OUTPUT 1)
-
-set (LOCAL_WARNING_FLAGS /W3)
-set (LOCAL_RTTI_FLAGS /GR)
+ze_add_library(ZE3dsMapExporter 
+	SOURCES ${Sources}
+	LIBS ZEFoundation ZETModelFile ZEToolAPI ZE3dsProgressDialog ZEDS ZEMath ZEFoundation
+		core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib igame.lib
+	INSTALL
+	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
+	INSTALL_COMPONENT Tools)
 	
-set (MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max 2010")
+set_property(TARGET ZE3dsMapExporter PROPERTY FOLDER "ZE3dsMax")
+set_property(TARGET ZE3dsMapExporter PROPERTY SUFFIX ".dle")
+set_property(TARGET ZE3dsMapExporter PROPERTY CLEAN_DIRECT_OUTPUT 1)
+
+set(LOCAL_WARNING_FLAGS /W3)
+set(LOCAL_RTTI_FLAGS /GR)
+	
+set(MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max 2010")
 get_property(TargetPath TARGET ZE3dsMapExporter PROPERTY LOCATION)
 file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)
 add_custom_command (TARGET ZE3dsMapExporter POST_BUILD COMMAND copy "${NativeTargetPath}" "${MAX_BINARY_DIRECTORY}\\plugins")
-
-install (TARGETS ZE3dsMapExporter CONFIGURATIONS Release COMPONENT "3ds Max Exporters" DESTINATION "Exporters/3dsMax")

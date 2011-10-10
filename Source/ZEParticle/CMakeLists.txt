@@ -35,20 +35,20 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-add_source (ZEParticle.cpp				Sources)
-add_source (ZEParticle.h				Sources ZESDK ZEPP)
-add_source (ZEParticleController.cpp	Sources)
-add_source (ZEParticleController.h		Sources ZESDK ZEPP)
-add_source (ZEParticleEffect.cpp		Sources)
-add_source (ZEParticleEffect.h			Sources ZESDK ZEPP)
-add_source (ZEParticleEmitter.cpp		Sources)
-add_source (ZEParticleEmitter.h			Sources ZESDK ZEPP)
-add_source (ZEParticleSystem.cpp		Sources)
-add_source (ZEParticleSystem.h			Sources ZESDK ZEPP)
+ze_add_source(ZEParticle.cpp				Sources)
+ze_add_source(ZEParticle.h					Sources Headers ZEPP)
+ze_add_source(ZEParticleController.cpp		Sources)
+ze_add_source(ZEParticleController.h		Sources Headers ZEPP)
+ze_add_source(ZEParticleEffect.cpp			Sources)
+ze_add_source(ZEParticleEffect.h			Sources Headers ZEPP)
+ze_add_source(ZEParticleEmitter.cpp			Sources)
+ze_add_source(ZEParticleEmitter.h			Sources Headers ZEPP)
+ze_add_source(ZEParticleSystem.cpp			Sources)
+ze_add_source(ZEParticleSystem.h			Sources Headers ZEPP)
 
-add_library (ZEParticle ${Sources})
-
-install (TARGETS ZEParticle COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEParticle)
-
-set_property(TARGET ZEParticle PROPERTY FOLDER "Zinek Engine")
+ze_add_library(ZEParticle 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	INSTALL
+	INSTALL_DESTINATION "ZEParticle"
+	INSTALL_COMPONENT ZESDK)

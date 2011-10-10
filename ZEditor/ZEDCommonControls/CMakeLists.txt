@@ -35,29 +35,21 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-include(${QT_USE_FILE})
+add_subdirectory(ZEDPropertyWindowManager)
 
-add_subdirectory (ZEDPropertyWindowManager)
+ze_add_source(CSS.h 					Sources)
+ze_add_source(CSS.cpp					Sources)
+ze_add_source(ZEDConsoleInterface.h		Sources)
+ze_add_source(ZEDConsoleInterface.cpp	Sources)
+ze_add_source(ZEDLoadingScreen.h		Sources)
+ze_add_source(ZEDLoadingScreen.cpp		Sources)
+ze_add_source(ZEDViewPort.h				Sources QtMocs)
+ze_add_source(ZEDViewPort.cpp			Sources)
+ze_add_source(ZEDImageViewer.h			Sources)
+ze_add_source(ZEDImageViewer.cpp		Sources)
 
-add_source (CSS.h 						Sources)
-add_source (CSS.cpp						Sources)
-add_source (ZEDConsoleInterface.h		Sources)
-add_source (ZEDConsoleInterface.cpp		Sources)
-add_source (ZEDLoadingScreen.h			Sources)
-add_source (ZEDLoadingScreen.cpp		Sources)
-add_source (ZEDViewPort.h				Sources QtMocs)
-add_source (ZEDViewPort.cpp				Sources)
+qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
-add_source (ZEDImageViewer.h			Sources)
-add_source (ZEDImageViewer.cpp			Sources)
-
-include_directories (${CMAKE_CURRENT_BINARY_DIR})
-
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
-
-add_library (ZEDCommonControls ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
-target_link_libraries (ZEDCommonControls freeimage.lib)
-
-set_property(TARGET ZEDCommonControls PROPERTY FOLDER "ZEditor")
+ze_add_library(ZEDCommonControls 
+	SOURCES ${Sources} ${QtMocFiles}
+	LIBS freeimage.lib)

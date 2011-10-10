@@ -35,22 +35,19 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-include(${QT_USE_FILE})
-
-# add_source (main.cpp							Sources)
-add_source (ZEDMaterialEditor.h					Sources QtMocs)
-add_source (ZEDMaterialEditor.ui				Sources QtUI)
-add_source (ZEDMaterialEditor.cpp				Sources)
-add_source (ZEDMaterialEditor.qrc				Sources QtResources)
-add_source (ZEDMaterialEditorViewPort.h			Sources)
-add_source (ZEDMaterialEditorViewPort.cpp		Sources)
-
-include_directories (${CMAKE_CURRENT_BINARY_DIR})
+ze_add_source(ZEDMaterialEditor.h				Sources QtMocs)
+ze_add_source(ZEDMaterialEditor.ui				Sources QtUI)
+ze_add_source(ZEDMaterialEditor.cpp				Sources)
+ze_add_source(ZEDMaterialEditor.qrc				Sources QtResources)
+ze_add_source(ZEDMaterialEditorViewPort.h		Sources)
+ze_add_source(ZEDMaterialEditorViewPort.cpp		Sources)
 
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
 qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-add_library (ZEDMaterialEditor ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-set_property(TARGET ZEDMaterialEditor PROPERTY FOLDER "ZEditor")
+ze_add_library(ZEDMaterialEditor 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	LIBS freeimage.lib)

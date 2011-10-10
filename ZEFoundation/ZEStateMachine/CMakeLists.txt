@@ -35,18 +35,16 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZEState.cpp				Sources)
-add_source (ZEState.h				Sources ZESDK)
-add_source (ZEStateMachine.cpp		Sources)
-add_source (ZEStateMachine.h		Sources ZESDK)
-add_source (ZETransaction.cpp		Sources)
-add_source (ZETransaction.h			Sources ZESDK)
+ze_add_source(ZEState.cpp				Sources)
+ze_add_source(ZEState.h					Sources Headers)
+ze_add_source(ZEStateMachine.cpp		Sources)
+ze_add_source(ZEStateMachine.h			Sources Headers)
+ze_add_source(ZETransaction.cpp			Sources)
+ze_add_source(ZETransaction.h			Sources Headers)
 
-add_library (ZEState ${Sources})
-
-target_link_libraries(ZEState ZEFoundation)
-
-set_property(TARGET ZEState PROPERTY FOLDER "ZEFoundation")
-
-install (TARGETS ZEState COMPONENT "Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZESDK}  COMPONENT "Includes" CONFIGURATIONS Release DESTINATION Include/ZEState)
+ze_add_library(ZEStateMachine
+	SOURCES ${Sources} 
+	HEADERS ${Headers} 
+	INSTALL
+	INSTALL_DESTINATION ZEFoundation/ZEState
+	INSTALL_COMPONENT SDK)

@@ -35,36 +35,35 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZE3dsModelExporterDLLEntry.h		Sources)
-add_source (ZE3dsModelExporterDLLEntry.cpp		Sources)
-add_source (ZE3dsModelExporter.h				Sources)
-add_source (ZE3dsModelExporter.cpp				Sources)
-add_source (ZE3dsModelExporterDescription.h		Sources)
-add_source (ZE3dsModelExporterDescription.cpp	Sources)
-add_source (ZE3dsModelExporterProcess.cpp		Sources)
-add_source (ZE3dsModelExporterOptions.h			Sources)
-add_source (ZE3dsModelExporterOptions.cpp		Sources)
-add_source (ZE3dsModelExporterResources.rc		Sources)
-add_source (ZE3dsModelExporterResources.h		Sources)
-add_source (ZE3dsModelExporter.def				Sources)
-add_source (../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc				Sources)
+ze_add_source(ZE3dsModelExporterDLLEntry.h			Sources)
+ze_add_source(ZE3dsModelExporterDLLEntry.cpp		Sources)
+ze_add_source(ZE3dsModelExporter.h					Sources)
+ze_add_source(ZE3dsModelExporter.cpp				Sources)
+ze_add_source(ZE3dsModelExporterDescription.h		Sources)
+ze_add_source(ZE3dsModelExporterDescription.cpp		Sources)
+ze_add_source(ZE3dsModelExporterProcess.cpp			Sources)
+ze_add_source(ZE3dsModelExporterOptions.h			Sources)
+ze_add_source(ZE3dsModelExporterOptions.cpp			Sources)
+ze_add_source(ZE3dsModelExporterResources.rc		Sources)
+ze_add_source(ZE3dsModelExporterResources.h			Sources)
+ze_add_source(ZE3dsModelExporter.def				Sources)
+#ze_add_source(../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc	Sources)
 
-add_library (ZE3dsModelExporter SHARED ${Sources})
+ze_add_library(ZE3dsModelExporter 
+	SOURCES ${Sources}
+	LIBS ZEFoundation ZETModelFile ZEToolAPI ZE3dsProgressDialog ZEDS ZEMath ZEFoundation
+		core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib igame.lib
+	INSTALL
+	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
+	INSTALL_COMPONENT Tools)
+	
+set(LOCAL_WARNING_FLAGS /W3)
+set(LOCAL_RTTI_FLAGS /GR)
 
-target_link_libraries (ZE3dsModelExporter ZEFoundation ZETModelFile ZEToolSDK ZE3dsProgressDialog ZEDS ZEMath ZEFoundation)
-target_link_libraries (ZE3dsModelExporter core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib igame.lib)
-
-set (LOCAL_WARNING_FLAGS /W3)
-set (LOCAL_RTTI_FLAGS /GR)
-
-set_property (TARGET ZE3dsModelExporter PROPERTY FOLDER "ZE3dsMax")
-set_property (TARGET ZE3dsModelExporter PROPERTY SUFFIX ".dle")
-set_property (TARGET ZE3dsModelExporter PROPERTY CLEAN_DIRECT_OUTPUT 1)
-
-set (MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max 2010")
+set_property(TARGET ZE3dsModelExporter PROPERTY FOLDER "ZE3dsMax")
+set_property(TARGET ZE3dsModelExporter PROPERTY SUFFIX ".dle")
+set_property(TARGET ZE3dsModelExporter PROPERTY CLEAN_DIRECT_OUTPUT 1)
 
 get_property(TargetPath TARGET ZE3dsModelExporter PROPERTY LOCATION)
 file(TO_NATIVE_PATH ${TargetPath} NativeTargetPath)
-add_custom_command (TARGET ZE3dsModelExporter POST_BUILD COMMAND copy "${NativeTargetPath}" "${MAX_BINARY_DIRECTORY}\\plugins")
-
-install (TARGETS ZE3dsModelExporter CONFIGURATIONS Release COMPONENT "3ds Max Exporters" DESTINATION "Exporters/3dsMax")
+add_custom_command(TARGET ZE3dsModelExporter POST_BUILD COMMAND copy "${NativeTargetPath}" "${MAX_BINARY_DIRECTORY}\\plugins")

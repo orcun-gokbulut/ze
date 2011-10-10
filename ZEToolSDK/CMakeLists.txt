@@ -35,38 +35,38 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-project (ZEToolSDK)
+project (ZEToolAPI)
 
-include_directories (${PROJECT_SOURCE_DIR} ${PROJECT_SOURCE_DIR}/../Include ${PROJECT_SOURCE_DIR}/../ZEFoundation)
+ze_set_project_folder("ZEToolAPI")
+
+include_directories(
+	${PROJECT_SOURCE_DIR} 
+	${PROJECT_SOURCE_DIR}/../Include 
+	${PROJECT_SOURCE_DIR}/../ZEFoundation)
+	
 link_directories(
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/Debug" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
 	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX")
 	
-include_directories(.)
-include_directories(ZEFoundation)
-
 add_subdirectory (ZETFontFile)
 add_subdirectory (ZETMapFile)
 add_subdirectory (ZETMaterialFile)
 add_subdirectory (ZETModelFile)
 
-add_source (ZETCompileOptions.h			Sources)
-add_source (ZETDefinitions.h			Sources ZEToolSDK)
-add_source (ZETDefinitions.cpp			Sources)
-add_source (ZETMain.cpp					Sources)
-add_source (ZEToolSDK.h					Sources ZEToolSDK)
-add_source (ZEToolSDK.cpp				Sources)
-add_source (ZETOutput.h					Sources ZEToolSDK)
-add_source (ZETOutput.cpp				Sources)
+ze_add_source(ZETCompileOptions.h	Sources)
+ze_add_source(ZETDefinitions.h		ources Headers)
+ze_add_source(ZETDefinitions.cpp	Sources)
+ze_add_source(ZETMain.cpp			Sources)
+ze_add_source(ZEToolSDK.h			Sources Headers)
+ze_add_source(ZEToolSDK.cpp			Sources)
+ze_add_source(ZETOutput.h			Sources Headers)
+ze_add_source(ZETOutput.cpp			Sources)
 
-add_library (ZEToolSDK ${Sources})
-target_link_libraries (ZEToolSDK ZETMapFile ZETModelFile ZETMaterialFile ZETFontFile)
-
-set_property(GLOBAL PROPERTY USE_FOLDERS ON)
-set_property(TARGET ZEToolSDK PROPERTY FOLDER "ZEToolSDK")
-
-
-install (TARGETS ZEToolSDK COMPONENT "ZEToolSDK Libraries" CONFIGURATIONS Release DESTINATION Lib)
-install (FILES ${ZEToolSDK}  COMPONENT "ZEToolSDK Includes" CONFIGURATIONS Release DESTINATION Include/ZEToolSDK)
+ze_add_library(ZEToolAPI 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	INSTALL
+	INSTALL_DESTINATION "ZEToolAPI"
+	INSTALL_COMPONENT ZESDK)

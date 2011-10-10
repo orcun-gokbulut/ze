@@ -35,11 +35,10 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZE3dsProgressDialog.cpp				Sources)
-add_source (ZE3dsProgressDialog.h				Sources)
-add_source (ZE3dsProgressDialogResources.rc		Sources)
-add_source (ZE3dsProgressDialogResources.h		Sources)
+ze_add_source(ZE3dsProgressDialog.cpp				Sources)
+ze_add_source(ZE3dsProgressDialog.h					Sources)
+ze_add_source(ZE3dsProgressDialogResources.rc		Sources)
+ze_add_source(ZE3dsProgressDialogResources.h		Sources)
 
-add_library (ZE3dsProgressDialog ${Sources})
-
-set_property(TARGET ZE3dsProgressDialog PROPERTY FOLDER "ZE3dsMax")
+ze_add_library(ZE3dsProgressDialog 
+	SOURCES ${Sources})

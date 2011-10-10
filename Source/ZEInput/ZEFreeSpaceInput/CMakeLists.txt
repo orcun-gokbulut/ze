@@ -35,14 +35,13 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZEFreespaceInputDevice.cpp							Sources)
-add_source (ZEFreespaceInputDevice.h							Sources)
-add_source (ZEFreespaceInputDeviceExtension.cpp					Sources)
-add_source (ZEFreespaceInputDeviceExtension.h					Sources)
-add_source (ZEFreespaceInputDeviceExtensionDescription.cpp		Sources)
-add_source (ZEFreespaceInputDeviceExtensionDescription.h		Sources)
+ze_add_source(ZEFreespaceInputDevice.cpp						Sources)
+ze_add_source(ZEFreespaceInputDevice.h							Sources)
+ze_add_source(ZEFreespaceInputDeviceExtension.cpp				Sources)
+ze_add_source(ZEFreespaceInputDeviceExtension.h					Sources)
+ze_add_source(ZEFreespaceInputDeviceExtensionDescription.cpp	Sources)
+ze_add_source(ZEFreespaceInputDeviceExtensionDescription.h		Sources)
 
-add_library (ZEFreespaceInput ${Sources})
-target_link_libraries (ZEFreespaceInput libfreespace.lib)
-
-set_property(TARGET ZEFreespaceInput PROPERTY FOLDER "Zinek Engine")
+ze_add_library(ZEFreespaceInput 
+	SOURCES ${Sources}
+	LIBS libfreespace.lib)

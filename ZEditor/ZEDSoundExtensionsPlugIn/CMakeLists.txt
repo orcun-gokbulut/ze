@@ -37,14 +37,14 @@ cmake_minimum_required (VERSION 2.8)
 
 include(${QT_USE_FILE})
 
-add_source (ZEDSoundExtensionsPlugIn.h			Sources)
-add_source (ZEDSoundExtensionsPlugIn.cpp		Sources)
+ze_add_source(ZEDSoundExtensionsPlugIn.h			Sources)
+ze_add_source(ZEDSoundExtensionsPlugIn.cpp		Sources)
 
-add_source (ZEDSoundFileExtension.h				Sources)
-add_source (ZEDSoundFileExtension.cpp			Sources)
+ze_add_source(ZEDSoundFileExtension.h				Sources)
+ze_add_source(ZEDSoundFileExtension.cpp			Sources)
 
-add_source (ZEDSoundFilePreviewWidget.h			Sources QtMocs)
-add_source (ZEDSoundFilePreviewWidget.cpp		Sources)
+ze_add_source(ZEDSoundFilePreviewWidget.h			Sources QtMocs)
+ze_add_source(ZEDSoundFilePreviewWidget.cpp		Sources)
 
 include_directories (${CMAKE_CURRENT_BINARY_DIR})
 
