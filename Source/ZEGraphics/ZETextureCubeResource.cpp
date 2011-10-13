@@ -39,7 +39,6 @@
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEResourceManager.h"
 
-#define FREEIMAGE_LIB
 #include <freeimage.h>
 
 unsigned DLL_CALLCONV FreeImageFile_Read_Cube(void *buffer, unsigned size, unsigned count, fi_handle handle) 

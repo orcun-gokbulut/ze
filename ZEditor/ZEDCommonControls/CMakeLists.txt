@@ -52,4 +52,4 @@ qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
 ze_add_library(ZEDCommonControls 
 	SOURCES ${Sources} ${QtMocFiles}
-	LIBS freeimage.lib)
+	LIBS libfreeimage)

@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <UnitTest/UnitTest++.h>
+#include <UnitTestCpp/UnitTest++.h>
 #include <math.h>
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZETrigonometry.h"

@@ -42,8 +42,6 @@
 
 #include "ZEVRPNInputDevice.h"
 
-#include <freespace/freespace.h>
-
 inline ZEVector3 VRPN_TO_ZE_VEC(const vrpn_float64* Position)
 {
 	return ZEVector3((float)Position[0], (float)Position[1], (float)Position[2]);

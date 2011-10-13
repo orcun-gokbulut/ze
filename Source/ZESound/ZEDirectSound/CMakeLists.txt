@@ -50,4 +50,4 @@ ze_add_source(ZEDSSoundSource3D.h			Sources)
 
 ze_add_library(ZEDirectSound 
 	SOURCES ${Sources}
-	LIBS dsound.lib dxguid.lib)
+	LIBS dsound dxguid)

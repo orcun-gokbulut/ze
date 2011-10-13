@@ -50,5 +50,5 @@ ze_add_library(ZESerialization
 	SOURCES ${Sources} 
 	HEADERS ${Headers} 
 	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZESerialization
-	INSTALL_COMPONENT SDK)
+	INSTALL_DESTINATION ZEFoundationAPI/ZESerialization
+	INSTALL_COMPONENT ZESDK)

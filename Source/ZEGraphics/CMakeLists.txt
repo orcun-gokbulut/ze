@@ -35,7 +35,8 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-add_subdirectory(ZEDirect3D9)
+ze_add_conditional_build(ZEGraphics ZEDirect3D9		TRUE TITLE "Build ZEDirect3D9 Graphics Module.")
+
 add_subdirectory(ZEPostProcessor)
 
 ze_add_source(ZEBitmap.cpp							Sources)
@@ -119,7 +120,7 @@ ze_add_source(ZETextureCacheChunkIdentifier.cpp		Sources)
 ze_add_library(ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ATI_Compress_MT_VC8.lib freeimage.lib
+	LIBS libATICompress libfreeimage
 	INSTALL
-	INSTALL_DESTINATION "ZEGraphics"
+	INSTALL_DESTINATION "ZEEngineAPI/ZEGraphics"
 	INSTALL_COMPONENT Header)

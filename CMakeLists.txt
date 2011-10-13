@@ -99,7 +99,6 @@ endif()
 
 set (ZE_BUILD_COMPILER ${CMAKE_CXX_COMPILER})
 set (ZE_BUILD_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
-set (ZE_BUILD_PLATFORM "Win x86")
 
 message(STATUS "[ZEBuild] Platform Class  : " ${ZE_BUILD_PLATFORM_CLASS})
 message(STATUS "[ZEBuild] Platform        : " ${ZE_BUILD_PLATFORM})
@@ -145,26 +144,26 @@ set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll wil
 ## Directories
 #########################################################################################
 include_directories(
-	${PROJECT_SOURCE_DIR} 
-	${PROJECT_SOURCE_DIR}/Include 
-	${PROJECT_SOURCE_DIR}/Include/DirectX
-	${PROJECT_SOURCE_DIR}/Include/OpenAL
-	${PROJECT_SOURCE_DIR}/Include/DirectX
-	${PROJECT_SOURCE_DIR}/Include/PhysX/Cooking
-	${PROJECT_SOURCE_DIR}/Include/PhysX/Foundation
-	${PROJECT_SOURCE_DIR}/Include/PhysX/NxCharacter
-	${PROJECT_SOURCE_DIR}/Include/PhysX/Physics
-	${PROJECT_SOURCE_DIR}/Include/Curl
-	${PROJECT_SOURCE_DIR}/Include/3dsMax/2010)
+	${CMAKE_SOURCE_DIR}/Source
+	${CMAKE_SOURCE_DIR}/ZEFoundation
+	${CMAKE_SOURCE_DIR}/ZEToolSDK
+	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM}
+	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM}/DirectX
+	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM}/PhysX2/Cooking 
+	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM}/PhysX2/Foundation 
+	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM}/PhysX2/PhysXLoader
+	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM}/PhysX2/Physics
+	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM}/3dsMax/2010)
 	
 link_directories(
-	"${PROJECT_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}"
-	"${PROJECT_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Release" 
-	"${PROJECT_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/DirectX" 
-	"${PROJECT_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/OpenAL" 
-	"${PROJECT_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/PhysX"
-	"${PROJECT_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/3dsMax/2010")
-
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/vrpn
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/Bullet
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/DirectX
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/PhysX2
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/PhysX3
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/3dsMax/2010)
 
 ## Definitions
 #########################################################################################
@@ -185,52 +184,16 @@ append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG
 	
 ## Projects
 #########################################################################################
-set(ZEBUILD_BUILD_ZE			TRUE CACHE BOOL "Build Zinek Engine.")
-set(ZEBUILD_BUILD_ZEDITOR		TRUE CACHE BOOL "Build ZEditor.")
-set(ZEBUILD_BUILD_ZE3DSMAX		TRUE CACHE BOOL "Build ZE3dsMax Exporters.")
-set(ZEBUILD_BUILD_ZEFOUNDATION	TRUE CACHE BOOL "Build ZEFoundation.")
-set(ZEBUILD_BUILD_ZETOOLAPI		TRUE CACHE BOOL "Build ZEToolAPI.")
-set(ZEBUILD_BUILD_ZETESTS		TRUE CACHE BOOL "Build Unit Tests.")
-set(ZEBUILD_BUILD_APPLICATIONS	TRUE CACHE BOOL "Build Applications.")
-set(ZEBUILD_BUILD_DEMOS			TRUE CACHE BOOL "Build Demos.")
-set(ZEBUILD_BUILD_SAMPLES		TRUE CACHE BOOL "Build Samples.")
-set(ZEBUILD_BUILD_BUILD_TESTS	FALSE CACHE BOOL "Build system test.")
+add_subdirectory(CMake)
 
-if (ZEBUILD_BUILD_APPLICATIONS)
-	add_subdirectory(Applications)
-endif()
-
-if (ZEBUILD_BUILD_ZE)
-	add_subdirectory(Source)
-endif()
-
-if (ZEBUILD_BUILD_ZE)
-	add_subdirectory(ZEToolSDK)
-endif()
-
-if (ZEBUILD_BUILD_ZEFOUNDATION)
-	add_subdirectory(ZEFoundation)
-endif()
-
-if (ZEBUILD_BUILD_ZE3DSMAX)
-	add_subdirectory(ZE3dsMax)
-endif()
-
-if (ZEBUILD_BUILD_ZEDITOR)
-	add_subdirectory(ZEditor)
-endif()
-
-if (ZEBUILD_BUILD_ZETESTS)
-	#add_subdirectory(ZETests)
-endif()
-
-if (ZEBUILD_BUILD_SAMPLES)
-	#add_subdirectory(Samples)
-endif()
-
-if (ZEBUILD_BUILD_DEMOS)
-	#add_subdirectory(Demos)
-endif()
+ze_add_conditional_build(Source				TRUE TITLE "Build ZEEngineAPI.")
+ze_add_conditional_build(ZEditor			TRUE TITLE "Build ZEditor.")
+ze_add_conditional_build(ZE3dsMax			TRUE TITLE "Build ZE3dsMax Exporters.")
+ze_add_conditional_build(ZEFoundation		TRUE TITLE "Build ZEFoundationAPI.")
+ze_add_conditional_build(ZEToolSDK			TRUE TITLE "Build ZEToolAPI.")
+ze_add_conditional_build(Applications		TRUE TITLE "Build Applications.")
+ze_add_conditional_build(Demos				FALSE TITLE "Build Demos.")
+ze_add_conditional_build(Samples			FALSE TITLE "Build Samples.")
 
 if (ZEBUILD_UNIT_TESTS_ENABLE)
 	add_subdirectory (ZETest)
@@ -268,18 +231,49 @@ if (ZEBUILD_BUILD_INSTALLER)
 	set(CPACK_COMPONENTS_ALL_GROUPS_IN_ONE_PACKAGE 1)
 
 	set(CPACK_COMPONENT_RUNTIME_DISPLAY_NAME "Runtime")
-	set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "")
+	set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime Required to Run Zinek Engine base Projects")
+	set(CPACK_COMPONENT_RUNTIME_GROUP "Zinek Engine")
 	set(CPACK_COMPONENT_RUNTIME_REQUIRED 1)
 
-	set(CPACK_COMPONENT_LIBRARIES_DISPLAY_NAME "Libraries")
-	set(CPACK_COMPONENT_LIBRARIES_DESCRIPTION "Static libraries that are required to build Zinek Engine based projects.")
+	set(CPACK_COMPONENT_DEMOS_DISPLAY_NAME "Demos")
+	set(CPACK_COMPONENT_DEMOS_DESCRIPTION "Demos that are developed by Zinek Engine")
+	set(CPACK_COMPONENT_DEMOS_GROUP "Zinek Engine")
 
-	set(CPACK_COMPONENT_INCLUDES_DISPLAY_NAME "Headers")
-	set(CPACK_COMPONENT_INCLUDES_DESCRIPTION  "C/C++ header files for use with Zinek Engine")
+	set(CPACK_COMPONENT_ZEEDITOR_DISPLAY_NAME "ZEEditor")
+	set(CPACK_COMPONENT_ZEEDITOR_DESCRIPTION "Zinek Engine Editor")
+	set(CPACK_COMPONENT_ZEEDITOR_GROUP "Content Creation")
+		
+	set(CPACK_COMPONENT_ZE3DSMAX_EXPORTERS_DISPLAY_NAME "Autodesk 3ds Max Exporters")
+	set(CPACK_COMPONENT_ZE3DSMAX_DESCRIPTION "3ds Max plugins for exporting ZEModel and ZEMap files.")
+	set(CPACK_COMPONENT_ZE3DSMAX_GROUP "Content Creation")
 
-	set(CPACK_COMPONENT_RUNTIME_GROUP "Zinek Engine")
-	set(CPACK_COMPONENT_LIBRARIES_GROUP "C++ Development")
-	set(CPACK_COMPONENT_INCLUDES_GROUP "C++ Development")
+	set(CPACK_COMPONENT_ZEMAYA_EXPORTERS_DISPLAY_NAME "Autodesk Maya Exporters")
+	set(CPACK_COMPONENT_ZEMAYA_DESCRIPTION "Autodesk Maya Exporters plugins for exporting ZEModel and ZEMap files.")
+	set(CPACK_COMPONENT_ZEMAYA_GROUP "Content Creation")
+
+	set(CPACK_COMPONENT_ZESOFTIMAGE_EXPORTERS_DISPLAY_NAME "Autodesk Softimage XSI Exporters")
+	set(CPACK_COMPONENT_ZESOFTIMAGE_DESCRIPTION "Autodesk Softimage XSI plugins for exporting ZEModel and ZEMap files.")
+	set(CPACK_COMPONENT_ZESOFTIMAGE_GROUP "Content Creation")
+
+	set(CPACK_COMPONENT_ZEBLENDER_EXPORTERS_DISPLAY_NAME "Blender Exporters")
+	set(CPACK_COMPONENT_ZEBLENDER_DESCRIPTION "Blender plugins for exporting ZEModel and ZEMap files.")
+	set(CPACK_COMPONENT_ZEBLENDER_GROUP "Content Creation")
+	
+	set(CPACK_COMPONENT_ZECONENTSAMPLES_EXPORTERS_DISPLAY_NAME "Sample and Base Contents")
+	set(CPACK_COMPONENT_ZECONENTSAMPLES_DESCRIPTION "Sample and base conent files for creating and deriving new content.")
+	set(CPACK_COMPONENT_ZECONENTSAMPLES_GROUP "Content Creation")
+	
+	set(CPACK_COMPONENT_ZESDK_DISPLAY_NAME "ZESDK")
+	set(CPACK_COMPONENT_ZESDK_DESCRIPTION "Zinek Engine C++ Software Development Kit.")
+	set(CPACK_COMPONENT_ZESDK_GROUP "C++ Development")
+
+	set(CPACK_COMPONENT_ZESDKSAMPLES_DISPLAY_NAME "Samples")
+	set(CPACK_COMPONENT_ZESDKSAMPLES_DESCRIPTION "Sample applications that are developed by ZESDK.")
+	set(CPACK_COMPONENT_ZESDKSAMPLES_GROUP "C++ Development")
+
+	set(CPACK_COMPONENT_ZESDKDOCUMENTS_DISPLAY_NAME "Documentation")
+	set(CPACK_COMPONENT_ZESDKDOCUMENTS_DESCRIPTION "Developers Guide and referance documentations.")
+	set(CPACK_COMPONENT_ZESDKDOCUMENTS_GROUP "C++ Development")
 
 	include(CPack)
 endif()

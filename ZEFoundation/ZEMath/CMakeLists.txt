@@ -79,14 +79,14 @@ ze_add_source(ZETrigonometryTests.cpp	Tests)
 ze_add_source(ZEVector.cpp				Sources)
 ze_add_source(ZEVector.h				Sources Headers)
 ze_add_source(ZEVectorTests.cpp			Tests)
-
+	
 ze_add_library(ZEMath 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation 
+	LIBS ZEFoundationAPI
 	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEMath
-	INSTALL_COMPONENT SDK)
+	INSTALL_DESTINATION ZEFoundationAPI/ZEMath
+	INSTALL_COMPONENT ZESDK)
 	
 ze_add_bulk_unit_tests(
 	SOURCES ${Tests}

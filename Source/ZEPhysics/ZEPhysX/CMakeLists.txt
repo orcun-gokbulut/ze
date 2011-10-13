@@ -58,15 +58,8 @@ ze_add_source(ZEPhysXStream.h					Sources)
 ze_add_source(ZEPhysXUserOutputStream.cpp		Sources)
 ze_add_source(ZEPhysXUserOutputStream.h			Sources)
 
-#add_definitions (-DNX_USER_DEBUG_MODE)
-
-include_directories (${PROJECT_SOURCE_DIR}
-	${PROJECT_SOURCE_DIR}/../Include/physx/Cooking 
-	${PROJECT_SOURCE_DIR}/../Include/physx/Foundation 
-	${PROJECT_SOURCE_DIR}/../Include/physx/NxCharacter 
-	${PROJECT_SOURCE_DIR}/../Include/physx/PhysXLoader
-	${PROJECT_SOURCE_DIR}/../Include/physx/Physics)
+#add_definitions(-DNX_USER_DEBUG_MODE)
 
 ze_add_library(ZEPhysX 
 	SOURCES ${Sources}
-	LIBS PhysXLoader.lib NxCooking.lib)
+	LIBS PhysXLoader PhysXCooking PhysXCore)

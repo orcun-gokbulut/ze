@@ -35,9 +35,9 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-project (ZEFoundation)
+project (ZEFoundationAPI)
 
-ze_set_project_folder("ZEFoundation")
+ze_set_project_folder("ZEFoundationAPI")
 
 include_directories(
 	${PROJECT_SOURCE_DIR} 
@@ -56,9 +56,10 @@ ze_add_source(ZETypes.cpp 			Sources)
 ze_add_source(ZEAssert.h 			Sources Headers)
 ze_add_source(ZEAssert.cpp 			Sources)
 
-ze_add_library(ZEFoundation 
+ze_add_library(ZEFoundationAPI 
 	SOURCES ${Sources} 
-	HEADERS ${Headers} 
+	HEADERS ${Headers}
+	LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine
 	INSTALL
-	INSTALL_DESTINATION ZEFoundation
-	INSTALL_COMPONENT SDK)
+	INSTALL_DESTINATION ZEFoundationAPI
+	INSTALL_COMPONENT ZESDK)

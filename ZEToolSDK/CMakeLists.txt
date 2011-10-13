@@ -38,17 +38,6 @@ cmake_minimum_required (VERSION 2.8)
 project (ZEToolAPI)
 
 ze_set_project_folder("ZEToolAPI")
-
-include_directories(
-	${PROJECT_SOURCE_DIR} 
-	${PROJECT_SOURCE_DIR}/../Include 
-	${PROJECT_SOURCE_DIR}/../ZEFoundation)
-	
-link_directories(
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/Debug" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX")
 	
 add_subdirectory (ZETFontFile)
 add_subdirectory (ZETMapFile)
@@ -67,6 +56,7 @@ ze_add_source(ZETOutput.cpp			Sources)
 ze_add_library(ZEToolAPI 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
+	LIBS ZETFontFile ZETMapFile ZETModelFile ZETMaterialFile
 	INSTALL
 	INSTALL_DESTINATION "ZEToolAPI"
 	INSTALL_COMPONENT ZESDK)

@@ -97,13 +97,22 @@ function(ze_add_source)
 endfunction()
 
 function(ze_add_executable)
-	parse_arguments(PARAMETER "SOURCES;LIBS;INSTALL_DESTINATION;INSTALL_COMPONENT" "INSTALL" ${ARGV})
+	parse_arguments(PARAMETER "SOURCES;LIBS;INSTALL_DESTINATION;INSTALL_COMPONENT" "INSTALL;PLUGIN;WIN32" ${ARGV})
 
 	# Get Target Name
 	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
 	
 	# Compile
-	add_executable(${PARAMETER_TARGET} WIN32 ${PARAMETER_SOURCES})
+	if (PARAMETER_PLUGIN)
+			add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
+	else()
+		if (PARAMETER_WIN32)
+			add_executable(${PARAMETER_TARGET} WIN32 ${PARAMETER_SOURCES})
+		else()
+			add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
+		endif()
+	endif()
+	
 	target_link_libraries(${PARAMETER_TARGET} ${PARAMETER_LIBS})
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZE_BUILD_LIBS ${PARAMETER_LIBS})
@@ -143,13 +152,14 @@ function(ze_add_executable)
 endfunction()
 
 function (ze_add_library)
-	parse_arguments(PARAMETER "SOURCES;LIBS;HEADERS;INSTALL_DESTINATION;INSTALL_COMPONENT" "INSTALL" ${ARGV})
+	parse_arguments(PARAMETER "SOURCES;LIBS;HEADERS;INSTALL_DESTINATION;INSTALL_COMPONENT" "INSTALL;SHARED" ${ARGV})
 
 	# Get Target Name
 	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
 	
 	# Compile
 	add_library(${PARAMETER_TARGET} ${PARAMETER_SOURCES})
+
 	target_link_libraries(${PARAMETER_TARGET} ${PARAMETER_LIBS})
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZE_BUILD_LIBS ${PARAMETER_LIBS})
@@ -238,5 +248,38 @@ function (ze_add_bulk_unit_tests)
 		message("\tPARAMETER_SOURCES = ${PARAMETER_SOURCES}")	
 		message("\tPARAMETER_TEST_TARGET = ${PARAMETER_TEST_TARGET}")	
 		message("\tPARAMETER_LIBS = ${PARAMETER_LIBS}")	
+	endif()
+endfunction()
+
+function(ze_add_conditional_build)
+	parse_arguments(PARAMETER "TITLE" "TRUE;FALSE" ${ARGV})
+
+	set (PARAMETER_NAME "ZEBUILD_BUILD")
+	foreach(ARG ${PARAMETER_DEFAULT_ARGS})
+		set(PARAMETER_DIRECTORY ${ARG})
+		string(TOUPPER ${ARG} ARG)
+		set(PARAMETER_NAME "${PARAMETER_NAME}_${ARG}")
+	endforeach()
+
+	if (PARAMETER_TRUE)
+		set(DEFAULT TRUE)
+	else()
+		set(DEFAULT FALSE)
+	endif()
+	
+	set(${PARAMETER_NAME} ${DEFAULT} CACHE BOOL "${PARAMETER_TITLE}")
+	if (${PARAMETER_NAME})
+		add_subdirectory(${PARAMETER_DIRECTORY})
+	endif()
+
+	# Debug	
+	if (ZEBUILD_DEBUG_MODE)	
+		message("ze_add_conditional_build") 
+		message("\tPARAMETER_TITLE = ${PARAMETER_TITLE}")
+		message("\tPARAMETER_TRUE = ${PARAMETER_TRUE}")
+		message("\tPARAMETER_FALSE = ${PARAMETER_FALSE}")
+		message("\tPARAMETER_NAME = ${PARAMETER_NAME}")
+		message("\tPARAMETER_DIRECTORY = ${PARAMETER_DIRECTORY}")
+		message("\t${PARAMETER_NAME} ${DEFAULT} CAHCHE BOOL \"${PARAMETER_TITLE}\"")
 	endif()
 endfunction()

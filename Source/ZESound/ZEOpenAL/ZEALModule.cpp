@@ -43,7 +43,6 @@
 #include "ZEALListener.h"
 #include "ZEALSoundSource.h"
 #include "ZEALSoundSource3D.h"
-#include <dsound.h>
 
 #define MAX_SOUNDBUFFER_COUNT	256
 #define MapVector3(A, B)		(A).x = (B).x; (A).y = (B).y; (A).z = (B).z

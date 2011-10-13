@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDImageFilePreviewWidget.h"
-#define FREEIMAGE_LIB
+
 #include <FreeImage.h>
 #include <QPen>
 #include <QFileInfo>

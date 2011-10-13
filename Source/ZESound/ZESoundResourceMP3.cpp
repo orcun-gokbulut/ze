@@ -35,7 +35,7 @@
 
 #include "ZESoundResourceMP3.h"
 #include "ZECore/ZEError.h"
-#include <mpg123/mpg123.h>
+#include <mpg123.h>
 #include <stdio.h>
 
 static ssize_t Memory_Read(int fd, void *buffer, size_t nbyte)

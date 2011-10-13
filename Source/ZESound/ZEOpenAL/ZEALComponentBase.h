@@ -38,8 +38,8 @@
 #define __ZE_AL_COMPONENT_BASE_H__
 
 #include "ZEALModule.h"
-#include <al.h>
-#include <alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 
 class ZEALComponentBase
 {

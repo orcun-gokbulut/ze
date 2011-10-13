@@ -38,8 +38,8 @@
 #define __ZE_AL_SOUND_SOURCE_3D_H__
 
 #include "ZEALComponentBase.h"
-#include "../ZESoundSource3D.h"
-#include <al.h>
+#include "ZESound/ZESoundSource3D.h"
+#include <AL/al.h>
 
 class ZEALSoundSource3D : public ZESoundSource3D, public ZEALComponentBase
 {

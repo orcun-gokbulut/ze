@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include <math.h>
-#include <UnitTest/UnitTest++.h>
+#include <UnitTestCpp/UnitTest++.h>
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZELineSegment.h"

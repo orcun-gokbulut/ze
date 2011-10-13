@@ -37,7 +37,6 @@
 #include "ZECore/ZEError.h"
 #include "ZECore/ZEConsole.h"
 
-#define FREEIMAGE_LIB
 #include <freeimage.h>
 #include <sys/stat.h>
 #include <stdio.h>

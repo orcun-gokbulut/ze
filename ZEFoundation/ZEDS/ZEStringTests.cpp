@@ -36,7 +36,7 @@
  
 #include "ZEDS/ZEString.h"
 
-#include <UnitTest/UnitTest++.h>
+#include <UnitTestCpp/UnitTest++.h>
 
 SUITE(ZEString)
 {

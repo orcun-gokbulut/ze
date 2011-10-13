@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDImageViewer.h"
-#define FREEIMAGE_LIB
+
 #include <FreeImage.h>
 #include <QMouseEvent>
 #include <math.h>

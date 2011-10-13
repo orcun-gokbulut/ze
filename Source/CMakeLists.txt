@@ -37,7 +37,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(ZinekEngine)
 
-ze_set_project_folder("Zinek Engine")
+ze_set_project_folder("ZEEngineAPI")
 
 set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
 
@@ -45,7 +45,7 @@ append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS
 	ZE_ZINEK_ENGINE)
 
 include_directories(${PROJECT_SOURCE_DIR}
-					${CMAKE_SOURCE_DIR}/ZEFoundation)
+	${CMAKE_SOURCE_DIR}/ZEFoundation)
 
 add_subdirectory(ZECore)
 add_subdirectory(ZEDebug)
@@ -74,16 +74,18 @@ ze_add_source(ZECore/ZEWindowResources.rc	Sources)
 
 ze_add_executable(ZE 
 	SOURCES ${Sources}
-	LIBS ZECore ZEDS ZEFoundation ZESerialization ZEFile ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI
-		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEFreespaceInput ZEPortalMap
+	LIBS ZEEngineAPI
+	WIN32
 	INSTALL
 	INSTALL_DESTINATION Bin
 	INSTALL_COMPONENT Runtime)
-		
-ze_add_library(ZESDK 
+
+ze_add_library(ZEEngineAPI 
 	SOURCES ${Sources}
-	LIBS ZECore ZEDS ZEFoundation ZESerialization ZEFile ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI
-		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEFreespaceInput ZEPortalMap
+	HEADERS ${Headers}
+	LIBS ZEFoundationAPI
+		ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEMap ZEPortalMap ZEModel ZEParticle
+		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput
 	INSTALL
-	INSTALL_DESTINATION ""
+	INSTALL_DESTINATION "ZEEngineAPI"
 	INSTALL_COMPONENT ZESDK)

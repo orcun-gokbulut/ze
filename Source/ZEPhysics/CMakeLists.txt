@@ -35,7 +35,7 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_subdirectory (ZEPhysX)
+ze_add_conditional_build(ZEPhysics ZEPhysX		TRUE TITLE "Build ZEPhysX Physics Module.")
 
 ze_add_source(ZEPhysicalCallbacks.cpp			Sources)
 ze_add_source(ZEPhysicalCallbacks.h				Sources Headers)
@@ -66,5 +66,5 @@ ze_add_library(ZEPhysics
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	INSTALL
-	INSTALL_DESTINATION "ZEPhysics"
+	INSTALL_DESTINATION "ZEEngineAPI/ZEPhysics"
 	INSTALL_COMPONENT ZESDK)

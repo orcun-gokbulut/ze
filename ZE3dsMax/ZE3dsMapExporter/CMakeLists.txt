@@ -49,13 +49,14 @@ ze_add_source(ZE3dsMapExporterResources.h		Sources)
 ze_add_source(ZE3dsMapExporter.def				Sources)
 #ze_add_source(../ZE3dsProgressDialog/ZE3dsProgressDialogResources.rc	Sources)
 
-ze_add_library(ZE3dsMapExporter 
+ze_add_executable(ZE3dsMapExporter 
 	SOURCES ${Sources}
-	LIBS ZEFoundation ZETModelFile ZEToolAPI ZE3dsProgressDialog ZEDS ZEMath ZEFoundation
-		core.lib geom.lib gfx.lib mesh.lib maxutil.lib maxscrpt.lib paramblk2.lib igame.lib
+	LIBS ZEFoundationAPI ZEToolAPI ZE3dsProgressDialog
+		core geom gfx mesh maxutil maxscrpt paramblk2 igame
 	INSTALL
 	INSTALL_DESTINATION "Tools/Exporters/ZE3dsMax"
-	INSTALL_COMPONENT Tools)
+	INSTALL_COMPONENT Tools
+	PLUGIN)
 	
 set_property(TARGET ZE3dsMapExporter PROPERTY FOLDER "ZE3dsMax")
 set_property(TARGET ZE3dsMapExporter PROPERTY SUFFIX ".dle")

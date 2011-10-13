@@ -38,9 +38,6 @@
 #include "ZEVRPNInputDeviceExtension.h"
 #include "ZEVRPNInputDeviceExtensionDescription.h"
 
-#include <freespace/freespace.h>
-
-
 ZEExtensionDescription* ZEVRPNInputDeviceExtension::GetExtensionDescription()
 {
 	return ZEVRPNInputDeviceExtension::ExtensionDescription();

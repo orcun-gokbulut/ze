@@ -41,7 +41,6 @@
 #include "ZECore/ZECore.h"
 #include "ZERealTimeTextureCompressor.h"
 
-#define FREEIMAGE_LIB
 #include <freeimage.h>
 #include "ZETexture2DResource.h"
 

@@ -50,4 +50,4 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ze_add_library(ZEDMaterialEditor 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS freeimage.lib)
+	LIBS libfreeimage)

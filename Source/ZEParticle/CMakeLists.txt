@@ -50,5 +50,5 @@ ze_add_library(ZEParticle
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	INSTALL
-	INSTALL_DESTINATION "ZEParticle"
+	INSTALL_DESTINATION "ZEEngineAPI/ZEParticle"
 	INSTALL_COMPONENT ZESDK)

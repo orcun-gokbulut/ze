@@ -39,7 +39,6 @@
 #include <memory.h>
 #include <math.h>
 
-#define FREEIMAGE_LIB
 #include <FreeImage.h>
 
 ZEPixelColor ZEPixelColor::Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T)

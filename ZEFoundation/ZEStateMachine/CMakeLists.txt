@@ -46,5 +46,5 @@ ze_add_library(ZEStateMachine
 	SOURCES ${Sources} 
 	HEADERS ${Headers} 
 	INSTALL
-	INSTALL_DESTINATION ZEFoundation/ZEState
-	INSTALL_COMPONENT SDK)
+	INSTALL_DESTINATION ZEFoundationAPI/ZEStateMachine
+	INSTALL_COMPONENT ZESDK)

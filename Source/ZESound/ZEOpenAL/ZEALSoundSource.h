@@ -38,8 +38,8 @@
 #define __ZE_AL_SOUND_SOURCE_H__
 
 #include "ZEALComponentBase.h"
-#include "../ZESoundSource.h"
-#include <al.h>
+#include "ZESound/ZESoundSource.h"
+#include <AL/al.h>
 
 class ZEALSoundSource : public ZESoundSource, public ZEALComponentBase
 {

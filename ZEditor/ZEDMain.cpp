@@ -43,7 +43,7 @@
 #include "ZEDMaterialEditor/ZEDMaterialEditor.h"
 #include "ZEDBrowser/ZEDBrowser.h"
 
-int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	int argc = 0;
 	char** argv = NULL;

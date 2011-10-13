@@ -44,4 +44,4 @@ ze_add_source(ZEVRPNInputDeviceExtensionDescription.h		Sources)
 
 ze_add_library(ZEVRPNInput 
 	SOURCES ${Sources}
-	LIBS vrpn.lib)
+	LIBS libvrpn)

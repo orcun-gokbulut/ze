@@ -40,8 +40,8 @@
 #include "ZEDS/ZEArray.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZESound/ZESoundSource.h"
-#include <al.h>
-#include <alc.h>
+#include <AL/al.h>
+#include <AL/alc.h>
 
 class ZEALSoundSource;
 class ZEALSoundSource3D;

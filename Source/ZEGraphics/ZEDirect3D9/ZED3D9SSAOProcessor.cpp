@@ -49,10 +49,7 @@
 #include <d3d9.h>
 #include <stdlib.h>
 #include <math.h>
-
-#define FREEIMAGE_LIB
 #include <freeimage.h>
-
 
 void ZED3D9SSAOProcessor::SetRenderer(ZEFrameRenderer* Renderer)
 {

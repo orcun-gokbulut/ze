@@ -44,15 +44,12 @@ include(${QT_USE_FILE})
 
 include_directories(
 	${PROJECT_SOURCE_DIR}
-	${CMAKE_SOURCE_DIR}/Source
-	${CMAKE_SOURCE_DIR}/ZEFoundation
-	${CMAKE_SOURCE_DIR}/ZEToolSDK
 	${QT_INCLUDE_DIR}
 	${QT_INCLUDE_DIR}/QtGui
 	${QT_INCLUDE_DIR}/QtCore)
 	
 link_directories(
-	"${CMAKE_SOURCE_DIR}/Lib/Win x86/Qt")
+	${QT_LIBRARY_DIR})
 
 add_subdirectory(ZEDBrowser)
 add_subdirectory(ZEDCommonControls)
@@ -69,6 +66,8 @@ ze_add_source(ZEDMain.cpp		Sources)
 
 ze_add_executable(ZEditor 
 	SOURCES ${Sources}
-	LIBS ZECore ZEFoundation ZEDS ZEGame ZEGraphics ZEInput ZEMap ZEMath ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZESDK ZEDirect3D9 ZEDirectSound ZEOpenAL ZEPhysX ZEPortalMap
-		ZEDCommonControls ZEDCommonEntities ZEDCore ZEDPropertyWindowManager ZEDSceneEditor ZEDMaterialEditor ZEDScriptEditor ZEDUndoRedo ZEDBrowser ZEDSoundExtensionsPlugIn ZEDImageExtensionsPlugIn
-		QtCore4.lib QtGui4.lib)
+	LIBS ZEEngineAPI
+		ZEDCommonControls ZEDCommonEntities ZEDCore ZEDImageExtensionsPlugIn ZEDMaterialEditor ZEDPropertyWindowManager
+		ZEDSceneEditor ZEDScriptEditor ZEDSoundExtensionsPlugIn ZEDUndoRedo ZEDBrowser
+		QtCore4 QtGui4
+	WIN32)

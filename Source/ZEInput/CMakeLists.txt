@@ -35,12 +35,12 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-#add_subdirectory (ZEDirectInput)
-#add_subdirectory (ZEDummyInput)
-#add_subdirectory (ZEVirtualInput)
-add_subdirectory (ZEWindowsInput)
-add_subdirectory (ZEFreespaceInput)
-add_subdirectory (ZEVRPNInput)
+ze_add_conditional_build(ZEInput ZEDirectInput		FALSE TITLE "Build ZEDirectInput Input Module.")
+ze_add_conditional_build(ZEInput ZEDummyInput		FALSE TITLE "Build ZEDummyInput Input Module.")
+ze_add_conditional_build(ZEInput ZEVirtualInput		FALSE TITLE "Build ZEVirtualInput Input Module.")
+ze_add_conditional_build(ZEInput ZEWindowsInput		TRUE TITLE "Build ZEWindowsInput Input Module.")
+ze_add_conditional_build(ZEInput ZEFreespaceInput	FALSE TITLE "Build ZEFreespaceInput Input Module.")
+ze_add_conditional_build(ZEInput ZEVRPNInput		TRUE TITLE "Build ZEVRPNInput Input Module.")
 
 ze_add_source(ZEInputAction.cpp							Sources)
 ze_add_source(ZEInputAction.h							Sources Headers)
@@ -67,5 +67,5 @@ ze_add_library(ZEInput
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	INSTALL
-	INSTALL_DESTINATION "ZEInput"
+	INSTALL_DESTINATION "ZEEngineAPI/ZEInput"
 	INSTALL_COMPONENT ZESDK)

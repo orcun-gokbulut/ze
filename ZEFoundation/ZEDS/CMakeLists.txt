@@ -55,10 +55,10 @@ ze_add_source(ZEVariant.h				Sources Headers)
 ze_add_library(ZEDS 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation
+	LIBS ZEFoundationAPI
 	INSTALL
 	INSTALL_DESTINATION ZEFoundation/ZEDS
-	INSTALL_COMPONENT SDK)
+	INSTALL_COMPONENT ZESDK)
 	
 	
 ze_add_unit_tests(ZEStringTests 

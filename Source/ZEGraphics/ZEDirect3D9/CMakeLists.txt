@@ -92,4 +92,4 @@ ze_add_source(ZED3D9ViewPort.h					Sources)
 
 ze_add_library(ZEDirect3D9 
 	SOURCES ${Sources}
-	LIBS d3d9.lib d3dx9.lib)
+	LIBS d3d9 d3dx9)

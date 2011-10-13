@@ -59,10 +59,9 @@ extern HINSTANCE ApplicationInstance;
 #include <stdio.h>
 #include <string>
 #include <string.h>
+#include <FreeImage.h>
 
-#define FREEIMAGE_LIB
 #include "ZEGraphics/ZEBitmap.h"
-#include "FreeImage.h"
 
 void Name(const ZEString& Name)
 {
