@@ -90,6 +90,9 @@ ze_add_source(ZED3D9VertexDeclaration.h			Sources)
 ze_add_source(ZED3D9ViewPort.cpp				Sources)
 ze_add_source(ZED3D9ViewPort.h					Sources)
 
+ze_add_source(ZED3D9EDProcessor.cpp				Sources)
+ze_add_source(ZED3D9EDProcessor.h					Sources)
+
 ze_add_library(ZEDirect3D9 
 	SOURCES ${Sources}
 	LIBS d3d9 d3dx9)

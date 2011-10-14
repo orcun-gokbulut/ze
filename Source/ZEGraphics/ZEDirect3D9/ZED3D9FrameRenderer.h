@@ -42,6 +42,7 @@
 #include "ZED3D9HDRProcessor.h"
 #include "ZED3D9SSAOProcessor.h"
 #include "ZED3D9SSAAProcessor.h"
+#include "ZED3D9EDProcessor.h"
 
 class ZED3D9ViewPort;
 class ZELight;
@@ -70,12 +71,14 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9Texture2D*					LBuffer1;
 		ZED3D9Texture2D*					LBuffer2;
 		ZED3D9Texture2D*					SSAOBuffer;
+		ZED3D9Texture2D*					EDInputBuffer;
 		ZED3D9Texture2D*					SSAAInputBuffer;
 		ZED3D9Texture2D*					ABuffer;
 
 		
 		ZED3D9SSAOProcessor					SSAOProcessor;
 		ZED3D9SSAAProcessor					SSAAProcessor;
+		ZED3D9EDProcessor					EDProcessor; // Edge detection
 
 		ZESmartArray<ZERenderOrder>			RenderList;
 

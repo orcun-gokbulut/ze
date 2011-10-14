@@ -176,7 +176,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 		CurrentMaterial->SetOpacityEnabled(true);
 		CurrentMaterial->SetOpacityComponent(ZE_MOC_BASE_MAP_ALPHA);
 
-		CurrentMaterial->SetAmbientColor(ZEVector3(0.5, 0.5, 0.5));
+		CurrentMaterial->SetAmbientColor(MaterialChunk.AmbientColor/* ZEVector3(0.5, 0.5, 0.5)*/);
 		CurrentMaterial->SetDiffuseColor(MaterialChunk.DiffuseColor);
 		CurrentMaterial->SetSpecularColor(MaterialChunk.SpecularColor);
 		CurrentMaterial->SetEmmisiveColor(MaterialChunk.EmmisiveColor);

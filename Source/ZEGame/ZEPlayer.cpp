@@ -107,7 +107,7 @@ void ZEPlayer::Tick(float Time)
 	zeInput->ProcessInputMap(&InputMap);
 
 	//float MetersPerSecond = 0.00150f;
-	float MetersPerSecond = 1.0f;
+	float MetersPerSecond = 5.0f;
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 
