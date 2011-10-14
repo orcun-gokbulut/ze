@@ -149,7 +149,7 @@ SUITE(ZEMatrix3x3)
 
 		ZEMatrix3x3::Multiply(C, A, B);
 
-		CHECK_EQUAL(C, ZEMatrix3x3(312.0f, 486.0f, 798.0f, 159.0f, 251.0f, 410.0f, 166.0f, 264.0f, 430.f));
+		CHECK_EQUAL(C, ZEMatrix3x3(312.0f, 486.0f, 798.0f, 159.0f, 251.0f, 410.0f, 166.0f, 264.0f, 430.0f));
 
 		ZEMatrix3x3::Multiply(D, A, I);
 
