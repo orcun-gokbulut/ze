@@ -33,29 +33,14 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-project (ZE3dsMax)
-
-ze_set_project_folder("ZE3dsMax")
-
-set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY 		"C:\\Program Files (x86)\\Autodesk\\3ds Max 2010" CACHE STRING "Directory of 3ds max.")
-
-include_directories(${PROJECT_SOURCE_DIR})
-
-ze_add_conditional_build(ZE3dsMax ZE3dsModelExporter	TRUE TITLE "Build ZE3dsMax Model Exporter.")
-ze_add_conditional_build(ZE3dsMax ZE3dsMapExporter		TRUE TITLE "Build ZE3dsMax Map Exporter.")
-
-if (ZEBUILD_BUILD_ZE3DSMAX_ZE3DSMODELEXPORTER OR ZEBUILD_BUILD_ZE3DSMAX_ZE3DSMAPEXPORTER)
-	add_subdirectory (ZE3dsProgressDialog)
-endif()
-
-add_custom_target(ZE3dsMax
-	SOURCES CMakeLists.txt)
-
-install(DIRECTORY ZE3dsMaxScript 
-	CONFIGURATIONS Release 
-	DESTINATION "Tools/Exporters/ZE3dsMax/MaxScript" 
-	COMPONENT Tools 
-	PATTERN .svn EXCLUDE)
-set_property(TARGET ZE3dsMax PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
+add_custom_target(CMakeScripts
+	SOURCES append_property.cmake
+		build_dir_check.cmake
+		CMakeLists.txt
+		cppcheck.cmake
+		parse_arguments.cmake
+		pclint.cmake
+		test_cocoon.cmake
+		ze_functions.cmake)

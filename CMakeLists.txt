@@ -113,10 +113,12 @@ set(ZEBUILD_STATIC_CHECKS_ENABLE			FALSE	CACHE BOOL "Enable static checks.")
 set(ZEBUILD_STATIC_CHECKS_ENABLE_CPPCHECK	FALSE	CACHE BOOL "Enable cppcheck static checker.")
 set(ZEBUILD_STATIC_CHECKS_ENABLE_PCLINT		FALSE	CACHE BOOL "Enable pc-lint static checker.")
 set(ZEBUILD_UNIT_TESTS_ENABLE				TRUE	CACHE BOOL "Enable unit tests.")
+set(ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE		TRUE	CACHE BOOL "Enables code coverage instrumentation.")
 set(ZEBUILD_DEBUG_MODE						FALSE	CACHE BOOL "Enable ZEBuild debug mode.")
 
 if (ZEBUILD_UNIT_TESTS_ENABLE)
 	ENABLE_TESTING()
+	include(test_cocoon)
 endif()
 
 if (ZEBUILD_STATIC_CHECKS_ENABLE)

@@ -1,6 +1,6 @@
 #ZE_SOURCE_PROCESSOR_START(License, 1.0)
 #[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+ Zinek Engine - test_cocoon.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,29 +33,49 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+set(ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE_TESTCOCOON TRUE CACHE BOOL "Enables test cocoon code coverage instrumentation.")
 
-project (ZE3dsMax)
+if(ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE AND ZEBUILD_UNIT_TESTS_COVERAGE_ENABLE_TESTCOCOON)
+	set(COVERAGE_FLAGS "--cs-on --cs-count")
+	set(CMAKE_CXX_FLAGS_COVERAGE 
+		 "${CMAKE_C_FLAGS_RELEASE} ${COVERAGE_FLAGS}" CACHE STRING
+		"Flags used by the C++ compiler during coverage builds."
+		FORCE)
+	set(CMAKE_C_FLAGS_COVERAGE 
+		 "${CMAKE_CXX_FLAGS_RELEASE} ${COVERAGE_FLAGS}" CACHE STRING
+		"Flags used by the C compiler during coverage builds."
+		FORCE)
+	set(CMAKE_EXE_LINKER_FLAGS_COVERAGE
+		"${CMAKE_EXE_LINKER_FLAGS_RELEASE} ${COVERAGE_FLAGS}" CACHE STRING
+		"Flags used for linking binaries during coverage builds."
+		FORCE)
+	set(CMAKE_SHARED_LINKER_FLAGS_COVERAGE
+		"${CMAKE_SHARED_LINKER_FLAGS_RELEASE} ${COVERAGE_FLAGS}" CACHE STRING
+		"Flags used by the shared libraries linker during coverage builds."
+		FORCE)
+	set(CMAKE_STATIC_LINKER_FLAGS_COVERAGE
+		"${CMAKE_STATIC_LINKER_FLAGS_RELEASE} ${COVERAGE_FLAGS}" CACHE STRING
+		"Flags used by the static libraries linker during coverage builds."
+		FORCE)
+	mark_as_advanced(
+		CMAKE_CXX_FLAGS_COVERAGE
+		CMAKE_C_FLAGS_COVERAGE
+		CMAKE_EXE_LINKER_FLAGS_COVERAGE
+		CMAKE_SHARED_LINKER_FLAGS_COVERAGE 
+		CMAKE_STATIC_LINKER_FLAGS_COVERAGE 
+		COMPILE_DEFINITIONS_COVERAGE)
+		
+	set(CMAKE_CONFIGURATION_TYPES ${CMAKE_CONFIGURATION_TYPES} ";COVERAGE")
+	
+	# this one is important
+	set(CMAKE_SYSTEM_NAME Windows)
 
-ze_set_project_folder("ZE3dsMax")
-
-set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY 		"C:\\Program Files (x86)\\Autodesk\\3ds Max 2010" CACHE STRING "Directory of 3ds max.")
-
-include_directories(${PROJECT_SOURCE_DIR})
-
-ze_add_conditional_build(ZE3dsMax ZE3dsModelExporter	TRUE TITLE "Build ZE3dsMax Model Exporter.")
-ze_add_conditional_build(ZE3dsMax ZE3dsMapExporter		TRUE TITLE "Build ZE3dsMax Map Exporter.")
-
-if (ZEBUILD_BUILD_ZE3DSMAX_ZE3DSMODELEXPORTER OR ZEBUILD_BUILD_ZE3DSMAX_ZE3DSMAPEXPORTER)
-	add_subdirectory (ZE3dsProgressDialog)
+	# specify the cross compiler
+	file(TO_CMAKE_PATH "$ENV{TESTCOCOON}/visualstudio" TESTCOCOON)
+	set(CMAKE_C_COMPILER ${TESTCOCOON}/cl.exe 
+		CACHE FILEPATH "CoverageScanner wrapper" FORCE)
+	set(CMAKE_CXX_COMPILER ${TESTCOCOON}/cl.exe 
+		CACHE FILEPATH "CoverageScanner wrapper" FORCE)
+	set(CMAKE_LINKER ${TESTCOCOON}/link.exe 
+		CACHE FILEPATH "CoverageScanner wrapper" FORCE)
 endif()
-
-add_custom_target(ZE3dsMax
-	SOURCES CMakeLists.txt)
-
-install(DIRECTORY ZE3dsMaxScript 
-	CONFIGURATIONS Release 
-	DESTINATION "Tools/Exporters/ZE3dsMax/MaxScript" 
-	COMPONENT Tools 
-	PATTERN .svn EXCLUDE)
-set_property(TARGET ZE3dsMax PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
