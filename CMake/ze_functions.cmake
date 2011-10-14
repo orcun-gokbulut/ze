@@ -137,7 +137,23 @@ function(ze_add_executable)
 			COMPONENT ${PARAMETER_INSTALL_COMPONENT} 
 			CONFIGURATIONS Release)
 	endif()
-	
+
+	# Copy dependecies
+	if (PARAMETER_PLUGIN)
+	else()
+		FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Dll/${ZE_BUILD_PLATFORM}/*.dll" A)
+		FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Dll/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/*.dll" B)
+		FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)" C)
+		add_custom_command(
+			TARGET ${PARAMETER_TARGET}
+			COMMAND "copy" 
+			ARGS "${A}" "${C}")
+		add_custom_command(
+			TARGET ${PARAMETER_TARGET}
+			COMMAND "copy" 
+			ARGS "${B}" "${C}")
+	endif()
+		
 	# Debug
 	if (ZEBUILD_DEBUG_MODE)
 		message("ze_add_executable") 
