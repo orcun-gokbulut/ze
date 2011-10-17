@@ -38,7 +38,7 @@
 
 
 
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZEFile/ZEResourceFile.h"

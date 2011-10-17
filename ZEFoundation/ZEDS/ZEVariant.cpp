@@ -43,7 +43,7 @@
 #include "ZEVariant.h"
 #include "ZEDSDefinitions.h"
 #include "ZETypes.h"
-#include "ZEAssert.h"
+#include "ZEError.h"
 #include "ZESerialization/ZESerializer.h"
 #include "ZESerialization/ZEUnserializer.h"
 
@@ -138,7 +138,7 @@ void ZEVariant::SetVariant(const ZEVariant& NewValue)
 			SetPointer(NewValue.GetPointer());
 			break;
 		default:
-			zefAssert(true, "ZEVariant::SetVariant operation failed. Error in variant type.");
+			zeAssert(true, "ZEVariant::SetVariant operation failed. Error in variant type.");
 	}
 }
 
@@ -173,7 +173,7 @@ size_t ZEVariant::SizeOf() const
 		case ZE_VRT_POINTER:
 			return sizeof(void*);
 		default:
-			zefAssert(true, "ZEVariant::SizeOf is wrong type.");
+			zeAssert(true, "ZEVariant::SizeOf is wrong type.");
 			return 0;
 	}
 }
@@ -231,10 +231,10 @@ bool ZEVariant::Serialize(ZESerializer* Serializer)
 			Serializer->Write(Value.Matrix4x4, sizeof(ZEMatrix4x4), 1);
 			break;
 		case ZE_VRT_POINTER:
-			zefAssert(true, "Can not serialize pointer type.");
+			zeAssert(true, "Can not serialize pointer type.");
 			return false;
 		default:
-			zefAssert(true, "Wrong variant type.");
+			zeAssert(true, "Wrong variant type.");
 			return false;
 	}
 	return true;
@@ -298,11 +298,11 @@ bool ZEVariant::Unserialize(ZEUnserializer* Unserializer)
 			break;
 		case ZE_VRT_POINTER:
 			SetType(ZE_VRT_UNDEFINED);
-			zefAssert(true, "Can not unserialize pointer type.");
+			zeAssert(true, "Can not unserialize pointer type.");
 			return false;
 		default:
 			SetType(ZE_VRT_UNDEFINED);
-			zefAssert(true, "Wrong variant type.");
+			zeAssert(true, "Wrong variant type.");
 			return false;
 	}
 	return true;
@@ -384,66 +384,66 @@ void ZEVariant::SetNull()
 
 char* ZEVariant::GetString() const
 {
-	zefAssert(this->Type != ZE_VRT_STRING, "ZEVariant::GetString operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_STRING, "ZEVariant::GetString operation failed. Variant type mismatched.");
 	return Value.String;
 }
 
 int ZEVariant::GetInteger() const
 {
-	zefAssert(this->Type != ZE_VRT_INTEGER, "ZEVariant::GetInteger operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_INTEGER, "ZEVariant::GetInteger operation failed. Variant type mismatched.");
 	return Value.Integer;
 }
 
 float ZEVariant::GetFloat() const
 {
-	zefAssert(this->Type != ZE_VRT_FLOAT, "ZEVariant::GetFloat operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_FLOAT, "ZEVariant::GetFloat operation failed. Variant type mismatched.");
 	return Value.Float;
 }
 
 bool ZEVariant::GetBoolean() const
 {
-	zefAssert(this->Type != ZE_VRT_BOOLEAN, "ZEVariant::GetBoolean operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_BOOLEAN, "ZEVariant::GetBoolean operation failed. Variant type mismatched.");
 	return Value.Boolean;
 }
 ZEVector2& ZEVariant::GetVector2() const
 {
-	zefAssert(this->Type != ZE_VRT_VECTOR2, "ZEVariant::GetVector2 operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_VECTOR2, "ZEVariant::GetVector2 operation failed. Variant type mismatched.");
 	return *((ZEVector2*)&Value.Vectors);
 }
 
 ZEVector3& ZEVariant::GetVector3() const
 {
-	zefAssert(this->Type != ZE_VRT_VECTOR3, "ZEVariant::GetVector3 operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_VECTOR3, "ZEVariant::GetVector3 operation failed. Variant type mismatched.");
 	return *((ZEVector3*)&Value.Vectors);
 }
 
 ZEVector4& ZEVariant::GetVector4() const
 {
-	zefAssert(this->Type != ZE_VRT_VECTOR4, "ZEVariant::GetVector4 operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_VECTOR4, "ZEVariant::GetVector4 operation failed. Variant type mismatched.");
 	return *((ZEVector4*)&Value.Vectors);
 }
 
 ZEQuaternion& ZEVariant::GetQuaternion() const
 {
-	zefAssert(this->Type != ZE_VRT_QUATERNION, "ZEVariant::Quaternion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_QUATERNION, "ZEVariant::Quaternion operation failed. Variant type mismatched.");
 	return *((ZEQuaternion*)&Value.Vectors);
 }
 
 ZEMatrix3x3& ZEVariant::GetMatrix3x3() const
 {
-	zefAssert(this->Type != ZE_VRT_MATRIX3X3, "ZEVariant::GetMatrix3x3 operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_MATRIX3X3, "ZEVariant::GetMatrix3x3 operation failed. Variant type mismatched.");
 	return *Value.Matrix3x3;
 }
 
 ZEMatrix4x4& ZEVariant::GetMatrix4x4() const
 {
-	zefAssert(this->Type != ZE_VRT_MATRIX4X4, "ZEVariant::GetMatrix4x4 operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_MATRIX4X4, "ZEVariant::GetMatrix4x4 operation failed. Variant type mismatched.");
 	return *Value.Matrix4x4;
 }
 
 void* ZEVariant::GetPointer() const
 {
-	zefAssert(this->Type != ZE_VRT_POINTER, "ZEVariant::GetPointer operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_POINTER, "ZEVariant::GetPointer operation failed. Variant type mismatched.");
 	return Value.Pointer;
 }
 
@@ -508,13 +508,13 @@ void ZEVariant::operator= (const ZEMatrix4x4& Matrix)
 
 ZEVariant::operator const char*()
 {
-	zefAssert(this->Type != ZE_VRT_STRING, "String conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_STRING, "String conversion operation failed. Variant type mismatched.");
 	return Value.String;
 }
 
 ZEVariant::operator int()
 {
-	zefAssert(this->Type != ZE_VRT_INTEGER || this->Type != ZE_VRT_FLOAT, "Integer conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_INTEGER || this->Type != ZE_VRT_FLOAT, "Integer conversion operation failed. Variant type mismatched.");
 	if (this->Type == ZE_VRT_FLOAT)
 		return (int)Value.Float;
 	else
@@ -523,7 +523,7 @@ ZEVariant::operator int()
 
 ZEVariant::operator float()
 {
-	zefAssert(this->Type != ZE_VRT_INTEGER || this->Type != ZE_VRT_FLOAT, "Float conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_INTEGER || this->Type != ZE_VRT_FLOAT, "Float conversion operation failed. Variant type mismatched.");
 	if (this->Type == ZE_VRT_INTEGER)
 		return (float)Value.Integer;
 	else
@@ -532,51 +532,51 @@ ZEVariant::operator float()
 
 ZEVariant::operator bool()
 {
-	zefAssert(this->Type != ZE_VRT_BOOLEAN, "Boolean conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_BOOLEAN, "Boolean conversion operation failed. Variant type mismatched.");
 	return Value.Boolean;
 }
 
 ZEVariant::operator ZEVector2()
 {
-	zefAssert(this->Type != ZE_VRT_VECTOR2, "ZEVector2 conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_VECTOR2, "ZEVector2 conversion operation failed. Variant type mismatched.");
 	return *((ZEVector2*)(&Value.Vectors));
 }
 
 ZEVariant::operator ZEVector3()
 {
-	zefAssert(this->Type != ZE_VRT_VECTOR3, "ZEVector3 conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_VECTOR3, "ZEVector3 conversion operation failed. Variant type mismatched.");
 	return *((ZEVector3*)(&Value.Vectors));
 }
 
 ZEVariant::operator ZEVector4()
 {
-	zefAssert(this->Type != ZE_VRT_VECTOR4, "ZEVector4 conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_VECTOR4, "ZEVector4 conversion operation failed. Variant type mismatched.");
 	return *((ZEVector4*)(&Value.Vectors));
 }
 
 ZEVariant::operator ZEQuaternion()
 {
-	zefAssert(this->Type != ZE_VRT_QUATERNION, "ZEQuaternion conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_QUATERNION, "ZEQuaternion conversion operation failed. Variant type mismatched.");
 	return *((ZEQuaternion*)(&Value.Vectors));
 }
 
 
 ZEVariant::operator ZEMatrix3x3()
 {
-	zefAssert(this->Type != ZE_VRT_MATRIX3X3, "ZEMatrix3x3 conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_MATRIX3X3, "ZEMatrix3x3 conversion operation failed. Variant type mismatched.");
 	return *Value.Matrix3x3;
 }
 
 ZEVariant::operator ZEMatrix4x4()
 {
-	zefAssert(this->Type != ZE_VRT_MATRIX4X4, "ZEMatrix3x3 conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_MATRIX4X4, "ZEMatrix3x3 conversion operation failed. Variant type mismatched.");
 	return *Value.Matrix4x4;
 
 }
 
 ZEVariant::operator void*()
 {
-	zefAssert(this->Type != ZE_VRT_POINTER, "Pointer conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_POINTER, "Pointer conversion operation failed. Variant type mismatched.");
 	return Value.Pointer;
 }
 

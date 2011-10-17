@@ -53,8 +53,8 @@ add_subdirectory (ZEFile)
 
 ze_add_source(ZETypes.h 			Sources Headers)
 ze_add_source(ZETypes.cpp 			Sources)
-ze_add_source(ZEAssert.h 			Sources Headers)
-ze_add_source(ZEAssert.cpp 			Sources)
+ze_add_source(ZEError.h 			Sources Headers)
+ze_add_source(ZEError.cpp 			Sources)
 
 ze_add_library(ZEFoundationAPI 
 	SOURCES ${Sources} 

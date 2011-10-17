@@ -39,11 +39,10 @@ project(Zinek)
 
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
-set(ZINEK_VERSION_MAJOR 0)
-set(ZINEK_VERSION_MINOR 5)
-set(ZINEK_VERSION_INTERNAL 0)
-set(ZINEK_VERSION_BUILD 5)
-set(ZINEK_VERSION_PLATFORM "WIN32")
+set(ZE_ZINEK_VERSION_MAJOR 0)
+set(ZE_ZINEK_VERSION_MINOR 5)
+set(ZE_ZINEK_VERSION_INTERNAL 0)
+set(ZE_ZINEK_VERSION_BUILD 5)
 
 ## Configuration
 #########################################################################################
@@ -56,9 +55,11 @@ include(ze_functions)
 
 macro_ensure_out_of_source_build ("${PROJECT_NAME} requires an out of source build.")
 
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
+
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG")
 
 
 ## Platform Detection
@@ -97,15 +98,47 @@ else()
 	message(SEND_ERROR "[ZEBuild] Platform is not supported. Operating System : ${CMAKE_SYSTEM_NAME}, Achitecture : ${CMAKE_SYSTEM_PROCESSOR}, Compiler : ${CMAKE_CXX_COMPILER}")
 endif()
 
-set (ZE_BUILD_COMPILER ${CMAKE_CXX_COMPILER})
-set (ZE_BUILD_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
+set(ZE_BUILD_COMPILER ${CMAKE_CXX_COMPILER})
+set(ZE_BUILD_LINKER ${CMAKE_LINKER})
+set(ZE_BUILD_LIBRARIAN ${CMAKE_LINKER})
+set(ZE_BUILD_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
 
-message(STATUS "[ZEBuild] Platform Class  : " ${ZE_BUILD_PLATFORM_CLASS})
-message(STATUS "[ZEBuild] Platform        : " ${ZE_BUILD_PLATFORM})
-message(STATUS "[ZEBuild] Architecture    : " ${ZE_BUILD_ARCHITECTURE})
-message(STATUS "[ZEBuild] Compiler        : " ${ZE_BUILD_COMPILER})
+message(STATUS "[ZEBuild] Major Version    : " ${ZE_ZINEK_VERSION_MAJOR})
+message(STATUS "[ZEBuild] Minor Version    : " ${ZE_ZINEK_VERSION_MINOR})
+message(STATUS "[ZEBuild] Internal Version : " ${ZE_ZINEK_VERSION_INTERNAL})
+message(STATUS "[ZEBuild] Build            : " ${ZE_ZINEK_VERSION_BUILD})
+message(STATUS "[ZEBuild] Platform Class   : " ${ZE_BUILD_PLATFORM_CLASS})
+message(STATUS "[ZEBuild] Platform         : " ${ZE_BUILD_PLATFORM})
+message(STATUS "[ZEBuild] Architecture     : " ${ZE_BUILD_ARCHITECTURE})
+message(STATUS "[ZEBuild] Compiler         : " ${ZE_BUILD_COMPILER})
+message(STATUS "[ZEBuild] Linker           : " ${ZE_BUILD_LINKER})
+message(STATUS "[ZEBuild] Librarian        : " ${ZE_BUILD_LIBRARIAN})
 message(STATUS "[ZEBuild] Platform detected.")
 
+
+## Definitions
+#########################################################################################
+string(TOUPPER ${ZE_BUILD_PLATFORM_CLASS} ZE_BUILD_PLATFORM_CLASS_UPPER_CASE)
+string(TOUPPER ${ZE_BUILD_PLATFORM} ZE_BUILD_PLATFORM_UPPER_CASE)
+
+append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
+	ZE_ZINEK
+	ZE_ZINEK_VERSION_PLATFORM=${ZE_BUILD_PLATFORM}
+	"ZE_ZINEK_VERSION_PLATFORM_${ZE_BUILD_PLATFORM_CLASS_UPPER_CASE}"
+	ZE_ZINEK_VERSION_PLATFORM_CLASS=${ZE_BUILD_PLATFORM_CLASS}
+	"ZE_ZINEK_VERSION_PLATFORM_${ZE_BUILD_PLATFORM_UPPER_CASE}"
+	ZE_ZINEK_VERSION_MAJOR=${ZE_ZINEK_VERSION_MAJOR}
+	ZE_ZINEK_VERSION_MINOR=${ZE_ZINEK_VERSION_MINOR}
+	ZE_ZINEK_VERSION_INTERNAL=${ZE_ZINEK_VERSION_INTERNAL}
+	ZE_ZINEK_VERSION_BUILD=${ZE_ZINEK_VERSION_BUILD}
+	ZE_ZINEK_VERSION_PLATFORM)
+
+append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG 
+	ZE_DEBUG_ENABLED 
+	ZE_DEBUG_BREAK_ON_ERROR 
+	_ZE_DEBUG_BREAK_ON_WARNING
+	_ZE_DEBUG_ENABLE_MEMORY_CHECKS)
+	
 
 ## Static Checking & Testing Options
 #########################################################################################
@@ -167,23 +200,7 @@ link_directories(
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/PhysX3
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/3dsMax/2010)
 
-## Definitions
-#########################################################################################
-append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
-	ZE_ZINEK
-	ZE_ZINEK_VERSION_PLATFORM=ZE_VP_WIN32
-	ZE_ZINEK_VERSION_MAJOR=${ZINEK_VERSION_MAJOR}
-	ZE_ZINEK_VERSION_MINOR=${ZINEK_VERSION_MINOR}
-	ZE_ZINEK_VERSION_INTERNAL=${ZINEK_VERSION_INTERNAL}
-	ZE_ZINEK_VERSION_BUILD=${ZINEK_VERSION_BUILD})
 
-append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG 
-	ZE_DEBUG_ENABLED 
-	ZE_DEBUG_BREAK_ON_ERROR 
-	_ZE_DEBUG_BREAK_ON_WARNING
-	_ZE_DEBUG_ENABLE_MEMORY_CHECKS)
-	
-	
 ## Projects
 #########################################################################################
 add_subdirectory(CMake)

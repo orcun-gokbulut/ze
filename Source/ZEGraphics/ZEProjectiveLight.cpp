@@ -37,7 +37,7 @@
 #include "ZETexture2D.h"
 #include "ZETexture2DResource.h"
 #include "ZETextureCube.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEShadowRenderer.h"
 #include "ZEGraphicsModule.h"

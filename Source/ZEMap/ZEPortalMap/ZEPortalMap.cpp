@@ -37,7 +37,7 @@
 #include "ZEPortalMapResource.h"
 #include "ZEPortalMapPortal.h"
 #include "ZEPortalMapDoor.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZETriangle.h"

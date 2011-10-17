@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEBitmap.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZETypes.h"
 #include <memory.h>
 #include <math.h>

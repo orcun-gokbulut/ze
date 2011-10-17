@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPPBlurNode.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEMath/ZEMathDefinitions.h"
 
 void ZEPPBlurNode::UpdateKernel()

@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECanvasBrush.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZERenderer.h"

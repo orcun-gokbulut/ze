@@ -52,7 +52,8 @@ ze_add_source(ZEResourceFile.h		Sources Headers)
 
 ze_add_library(ZEFile 
 	SOURCES ${Sources} 
-	HEADERS ${Headers} 
+	HEADERS ${Headers}
+	LIBS libzlib
 	INSTALL
 	INSTALL_DESTINATION ZEFoundationAPI/ZEFile
 	INSTALL_COMPONENT ZESDK)

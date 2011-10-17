@@ -42,7 +42,7 @@
 // OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
 
 #include "ZEALSoundSource3d.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZESound/ZEListener.h"
 

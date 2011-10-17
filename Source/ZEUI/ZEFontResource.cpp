@@ -39,7 +39,7 @@
 #include "ZEGraphics/ZETextureOptions.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZECore/ZEConsole.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEFile/ZEResourceFile.h"
 #include "ZEFontFile.h"
 

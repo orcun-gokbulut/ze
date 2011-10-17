@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESoundResourceMP3.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include <mpg123.h>
 #include <stdio.h>
 

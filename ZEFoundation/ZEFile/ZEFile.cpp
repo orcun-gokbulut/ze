@@ -34,7 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEFile.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
+#include "ZEDefinitions.h"
 
 #include <stdarg.h>
 #include <stdio.h>

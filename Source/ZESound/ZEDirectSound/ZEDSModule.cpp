@@ -37,7 +37,7 @@
 #include "ZEDSModuleDescription.h"
 #include "ZEMath/ZEVector.h"
 #include "ZECore/ZECore.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEWindow.h"
 #include "ZEDSListener.h"
@@ -167,13 +167,17 @@ bool ZEDSModule::Initialize()
 		zeWarning("DirectSound Module", "Wrong device id. Using default sound device.");
 	}
 	else
+	{
 		if (DeviceId == 0)
+		{
 			zeLog("DirectSound Module", "Using default sound device.");
+		}
 		else
 		{
 			zeLog("DirectSound Module", "Using \"%s\" (Driver : \"%s\") sound device.", DeviceList[DeviceId].DeviceName, DeviceList[DeviceId].DeviceName);
 			DeviceGUID = &DeviceGUIDList[DeviceId];
 		}
+	}
 
 	hr = DirectSoundCreate8(DeviceGUID, &DS, NULL);
 	if (FAILED(hr))

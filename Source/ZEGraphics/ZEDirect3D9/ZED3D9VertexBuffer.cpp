@@ -35,7 +35,7 @@
 
 #include "ZED3D9VertexBuffer.h"
 #include "ZED3D9Module.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 
 unsigned int ZED3D9StaticVertexBuffer::GetBufferSize()
 {

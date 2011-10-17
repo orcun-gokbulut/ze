@@ -43,6 +43,7 @@ add_subdirectory (ZETFontFile)
 add_subdirectory (ZETMapFile)
 add_subdirectory (ZETMaterialFile)
 add_subdirectory (ZETModelFile)
+add_subdirectory (ZETCommon)
 
 ze_add_source(ZETCompileOptions.h	Sources)
 ze_add_source(ZETDefinitions.h		ources Headers)
@@ -56,7 +57,7 @@ ze_add_source(ZETOutput.cpp			Sources)
 ze_add_library(ZEToolAPI 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZETFontFile ZETMapFile ZETModelFile ZETMaterialFile
+	LIBS ZETFontFile ZETMapFile ZETModelFile ZETMaterialFile ZETCommon
 	INSTALL
 	INSTALL_DESTINATION "ZEToolAPI"
 	INSTALL_COMPONENT ZESDK)

@@ -35,7 +35,7 @@
 
 #include "ZEViewVolume.h"
 #include "ZEGame/ZEComponent.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZELight.h"
 

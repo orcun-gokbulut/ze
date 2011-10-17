@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAssert.h
+ Zinek Engine - ZEError.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,27 +33,76 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_ASSERT_H__
-#define __ZE_ASSERT_H__
+#include "ZEError.h"
 
-#ifdef ZE_DEBUG_ENABLED
-	#define ZEDS_DEBUG_MODE
-#endif
+#include <stdio.h>
+#include <stdarg.h>
 
-#ifdef ZEDS_DEBUG_MODE
-	#ifdef ZE_ZINEK_ENGINE
-		#include "ZECore/ZEError.h"
-		#define zefAssert(Condition, ...) zeAssert(Condition, __VA_ARGS__) 
-		#define zedsWarningAssert(Condition, ...) zeWarningAssert(Condition, __VA_ARGS__)
-	#else	
-		void stdAssert(const char* Function, const char* File, int Line, const char* Message, ...);
-		void stdWarningAssert(const char* Function, const char* File, int Line, const char* Message, ...);
-		#define zefAssert(Condition, ...) if (Condition) stdAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
-		#define zefWarningAssert(Condition, ...) if (Condition) stdWarningAssert(__FUNCTION__, __FILE__, __LINE__, __VA_ARGS__)
-	#endif
-#else
-	#define zefAssert(Condition, Message)
-	#define zedsWarningAssert(Condition, Message)
-#endif
+static void DefaultErrorCallback(const char* Module, ZEErrorType Type, const char* Error, void* Args)
+{
+	const char* TypeString = "Unknown";
+	switch(Type)
+	{
+		case ZE_ET_CRITICAL_ERROR:
+			TypeString = "Critical Error";
+			break;
+		case ZE_ET_ERROR:
+			TypeString = "Error";
+			break;
+		case ZE_ET_WARNING:
+			TypeString = "Warning";
+			break;
+		case ZE_ET_NOTICE:
+			TypeString = "Notice";
+			break;
+		case ZE_ET_LOG:
+			TypeString = "Log";
+			break;
+	}
 
-#endif
+	printf("[%s] %s : ", Module, TypeString);
+	vprintf(Error, *(va_list*)Args);
+	printf("\r\n");
+}
+
+static void DefaultAssertCallback(ZEAssertType Type, const char* Function, const char* File, int Line, const char* Error, void* Args)
+{
+	printf("[%sAssert] : ", (Type == ZE_AT_WARNING_ASSERT ? "Warning " : ""));
+	vprintf(Error, *(va_list*)Args);
+	printf(" (Function : \"%s\", File : \"%s\", Line : %d)\r\n", Error, Function, File, Line);
+}
+
+static ZEErrorCallback ErrorCallback = &DefaultErrorCallback;
+static ZEAssertCallback AssertCallback = &DefaultAssertCallback;
+
+void zeSetErrorCallback(ZEErrorCallback Callback)
+{
+	ErrorCallback = Callback;
+}
+
+void zeSetAssertCallback(ZEAssertCallback Callback)
+{
+	AssertCallback = Callback;
+}
+
+void zeRaiseError(const char* Module, ZEErrorType Type, const char* Error, ...)
+{
+	va_list Args;
+	va_start(Args, Error);
+
+	if (ErrorCallback != NULL)
+		ErrorCallback(Module, Type, Error, &Args);
+
+	va_end(Args);
+}
+
+void zeRaiseAssert(ZEAssertType Type, const char* Function, const char* File, int Line, const char* Error, ...)
+{
+	va_list Args;
+	va_start(Args, Error);
+
+	if (AssertCallback != NULL)
+		AssertCallback(Type, Function, File, Line, Error, &Args);
+
+	va_end(Args);
+}

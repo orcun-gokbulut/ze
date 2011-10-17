@@ -36,7 +36,7 @@
 #include "ZEProvider.h"
 #include "ZEClass.h"
 #include <string.h>
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 void ZEProvider::SetBaseClass(ZEClassDescription* ClassType)
 {
 	BaseClass = ClassType;

@@ -63,14 +63,13 @@ ZEArray<*>{
 
 #include <stdlib.h>
 #include "ZEDSDefinitions.h"
-#include "../ZETypes.h"
+#include "ZETypes.h"
 #include "ZEAllocator.h"
-#include "ZEAssert.h"
+#include "ZEError.h"
 
 #ifdef ZE_DEBUG_CHECK_MEMORY
 #include <crtdbg.h>
 #endif
-
 
 template<typename Type, typename Allocator_= ZEAllocatorBase<Type> >
 class ZEArray
@@ -87,7 +86,7 @@ class ZEArray
 
 		inline Type Dequeue()
 		{
-			zefAssert(Count == 0, "ZEArray::Dequeue operaion failed. There is no item in the queue.");
+			zeAssert(Count == 0, "ZEArray::Dequeue operaion failed. There is no item in the queue.");
 			Type Temp = Items[0];
 			DeleteAt(0);
 			return Temp;			
@@ -100,7 +99,7 @@ class ZEArray
 
 		inline Type Pop()
 		{
-			zefAssert(Count == 0, "ZEArray::Pop operaion failed. There is no item in the stack.");
+			zeAssert(Count == 0, "ZEArray::Pop operaion failed. There is no item in the stack.");
 			Type Temp = Items[0];
 			DeleteAt(0);
 			return Temp;
@@ -108,7 +107,7 @@ class ZEArray
 
 		inline void SetItem(size_t Index, Type Value)
 		{
-			zefAssert(Index < 0 || Index >= Count, "ZEArray::SetItem operaion failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index < 0 || Index >= Count, "ZEArray::SetItem operaion failed. Index is out of range. (0 <= Index < Count)");
 			this->Items[Index] = Value;
 		}
 
@@ -172,7 +171,7 @@ class ZEArray
 			Allocator.Reallocate(&Items, Count); 
 
 			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zefAssert(!_CrtCheckMemory(), "Heap problem");
+				zeAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
 			
 			return &Items[Count - 1];		
@@ -192,7 +191,7 @@ class ZEArray
 			Count += ItemCount;
 
 			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zefAssert(!_CrtCheckMemory(), "Heap problem");
+				zeAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
 
 			return &Items[Count - ItemCount];
@@ -205,7 +204,7 @@ class ZEArray
 			Items[Count - 1] = NewItem;
 
 			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zefAssert(!_CrtCheckMemory(), "Heap problem");
+				zeAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
 
 			return &Items[Count - 1];
@@ -218,7 +217,7 @@ class ZEArray
 			Items[Count - 1] = NewItem;
 
 			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zefAssert(!_CrtCheckMemory(), "Heap problem");
+				zeAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
 
 			return &Items[Count - 1];
@@ -235,7 +234,7 @@ class ZEArray
 
 		inline Type* Insert(size_t Index)
 		{
-			zefAssert(Index < 0 || Index > Count, "ZEArray::Insert operation failed. Index is out of range. (0 <= Index <= Count)");
+			zeAssert(Index < 0 || Index > Count, "ZEArray::Insert operation failed. Index is out of range. (0 <= Index <= Count)");
 			size_t N = 0;
 			Type* TempPointer = this->Items;
 			bool Changed = Allocator.Allocate(&Items, Count + 1);
@@ -253,7 +252,7 @@ class ZEArray
 			}
 
 			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zefAssert(!_CrtCheckMemory(), "Heap problem");
+				zeAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
 
 			return &Items[Index];
@@ -266,7 +265,7 @@ class ZEArray
 			Items[Index] = NewItem;
 
 			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zefAssert(!_CrtCheckMemory(), "Heap problem");
+				zeAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
 
 			return &Items[Index];
@@ -274,7 +273,7 @@ class ZEArray
 
 		inline void DeleteAt(size_t Index)
 		{
-			zefAssert(Index < 0 || Index >= Count, "ZEArray::DeleteAt operation failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index < 0 || Index >= Count, "ZEArray::DeleteAt operation failed. Index is out of range. (0 <= Index < Count)");
 			size_t NewCount = Count, N = 0;
 			Type* TempPointer = this->Items;
 			bool Changed;
@@ -301,7 +300,7 @@ class ZEArray
 			Count--;
 
 			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zefAssert(!_CrtCheckMemory(), "Heap problem");
+				zeAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
 		}
 
@@ -320,13 +319,13 @@ class ZEArray
 			Allocator.Reallocate(&Items, Count);
 
 			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zefAssert(!_CrtCheckMemory(), "Heap problem");
+				zeAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
 		}
 		
 		inline void SetCount(size_t Count)
 		{
-			zefAssert(Count < 0, "ZEArray::SetCount operation failed. Wrong Count value. (Count >= 0)");
+			zeAssert(Count < 0, "ZEArray::SetCount operation failed. Wrong Count value. (Count >= 0)");
 
 			if (Count == this->Count)
 				return;
@@ -339,13 +338,13 @@ class ZEArray
 					delete[] OldItems;
 
 			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zefAssert(!_CrtCheckMemory(), "Heap problem");
+				zeAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
 		}
 
 		inline void Resize(size_t Count)
 		{
-			zefAssert(Count < 0, "ZEArray::Resize operation failed. Wrong Count value. (Count >= 0)");
+			zeAssert(Count < 0, "ZEArray::Resize operation failed. Wrong Count value. (Count >= 0)");
 			
 			if (Count == this->Count)
 				return;
@@ -361,7 +360,7 @@ class ZEArray
 			this->Count = Count;
 
 			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zefAssert(!_CrtCheckMemory(), "Heap problem");
+				zeAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
 		}
 		
@@ -388,7 +387,7 @@ class ZEArray
 		inline void Clear()
 		{
 			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zefAssert(!_CrtCheckMemory(), "Heap problem");
+				zeAssert(!_CrtCheckMemory(), "Heap problem");
 			#endif
 
 			Allocator.Deallocate(&Items);
@@ -415,13 +414,13 @@ class ZEArray
 
 		inline const Type& GetItem(size_t Index) const
 		{
-			zefAssert(Index < 0 || Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index < 0 || Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
 		}
 
 		inline Type& GetItem(size_t Index)
 		{
-			zefAssert(Index < 0 || Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index < 0 || Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
 		}
 		
@@ -437,13 +436,13 @@ class ZEArray
 
 		inline Type& operator[](size_t Index)
 		{
-			zefAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
 		}
 		
 		inline const Type& operator[](size_t Index) const
 		{
-			zefAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
 		}
 

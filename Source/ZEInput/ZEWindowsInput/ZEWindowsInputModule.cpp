@@ -44,7 +44,7 @@
 
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 
 #define WINDIWS_LEAN_AND_MEAN
 #include <windows.h>

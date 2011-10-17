@@ -45,7 +45,7 @@
 #include "ZEGraphics/ZEPointLight.h"
 #include "ZEGraphics/ZEOmniProjectiveLight.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEFile/ZEResourceFile.h"
 #include "ZEMath/ZEMathDefinitions.h"
 

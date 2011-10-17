@@ -35,7 +35,7 @@
 /*
 #include "ZEPPVelocityInputNode.h"
 #include "ZEGraphics/ZERenderer.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEDefinitions.h"
 
 ZEPPVelocityInputNode::ZEPPVelocityInputNode()

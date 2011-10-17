@@ -35,7 +35,7 @@
 
 #include "ZETextureCubeResource.h"
 #include "ZETextureCube.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEResourceManager.h"
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEVersion.cpp
+ Zinek Engine - ZEErrorManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,96 +32,48 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#pragma once
+#ifndef	__ZE_ERROR_MANAGER_H__
+#define __ZE_ERROR_MANAGER_H__
 
-#include "ZEVersion.h"
+#include "ZEError.h"
+#include "ZEDS/ZEString.h"
 
-#include <stdio.h>
+class ZEOptionSection;
+class ZEOption;
+class ZETypedVariant;
 
-void ZEVersion::GetShortString(char* Buffer) 
+class ZEErrorManager
 {
-	sprintf(Buffer, "%02d.%02d.%02d", Major, Minor, Internal);
-}
+	friend class					ZECore;
+	private:
+		bool						FileLogging;
+		ZEString					LogFileName;
 
-void ZEVersion::GetLongString(char* Buffer)	
-{
-	char* PlatformString;
-	switch(Platform)
-	{
-		case ZE_VP_WIN32:
-			PlatformString = "WIN32";
-			break;
+		static char*				ErrorLevelToString(ZEErrorType ErrorLevel);
+		void						LogToFile(const char* Module, ZEErrorType ErrorType, const char* Error);
+		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
 
-		default:
-			PlatformString = "UNKNOWN";
-			break;
+									ZEErrorManager();
+									~ZEErrorManager();
+	public:
+		void						EnableFileLogging();
+		void						DisableFileLogging();
 
-	}
-	sprintf(Buffer, "%02d.%02d.%02d (%s) - Build %06d", Major, Minor, Internal, PlatformString, Build);
-}
+		void						SetLogFileName(const ZEString& NewLogFile);
+		const ZEString&				GetLogFileName();
 
-ZEVersion ZEVersion::GetZinekVersion()
-{
-	ZEVersion Temp;
-	
-	Temp.Major = ZE_ZINEK_VERSION_MAJOR;
-	Temp.Minor = ZE_ZINEK_VERSION_MINOR;
-	Temp.Internal = ZE_ZINEK_VERSION_INTERNAL;
-	Temp.Build = ZE_ZINEK_VERSION_BUILD;
-	Temp.Platform = ZE_VP_WIN32;
+		void						RaiseError(const char* Module, ZEErrorType ErrorType, const char* ErrorFormat, ...);
+		void						RaiseErrorInternal(const char* Module, ZEErrorType ErrorType, const char* ErrorFormat, void* Args);
+		void						RaiseAssert(ZEAssertType AssertType, const char* Function, const char* File, int Line, const char* Message, ...);
+		void						RaiseAssertInternal(ZEAssertType AssertType, const char* Function, const char* File, int Line, const char* Message, void* Args);
 
-	return Temp;
-}
+		static ZEErrorManager*		GetInstance();
+};
 
-bool ZEVersion::Check(const ZEVersion& A, const ZEVersion& B, ZEVersionCheckLevel Level)
-{
-	switch(Level)
-	{
-		case ZE_VCL_MAJOR:
-			return A.Major == B.Major;
+#endif
 
-		case ZE_VCL_MINOR:
-			return A.Major == B.Major && A.Minor >= B.Minor;
 
-		case ZE_VCL_INTERNAL:
-			return A.Major == B.Major && A.Minor >= B.Minor && A.Internal >= B.Internal;
-		
-		default:
-			return false;
-	}
-}
 
-ZEVersion::ZEVersion()
-{
-	this->Major = 0;
-	this->Minor = 0;
-	this->Internal = 0;
-	this->Build = 0;
-	this->Platform = ZE_VP_WIN32;
-}
 
-ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal)
-{
-	this->Major = Major;
-	this->Minor = Minor;
-	this->Internal = Internal;
-	this->Build = 0;
-	this->Platform = ZE_VP_WIN32;
-}
 
-ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build)
-{
-	this->Major = Major;
-	this->Minor = Minor;
-	this->Internal = Internal;
-	this->Build = 0;
-	this->Platform = ZE_VP_WIN32;
-}
-
-ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build, ZEVersionPlatform Platform)
-{
-	this->Major = Major;
-	this->Minor = Minor;
-	this->Internal = Internal;
-	this->Build = Build;
-	this->Platform = ZE_VP_WIN32;
-}

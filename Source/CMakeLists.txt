@@ -67,18 +67,9 @@ ze_add_source(ZECompileOptions.h 			Sources Headers)
 ze_add_source(ZEDefinitions.h 				Sources Headers)
 ze_add_source(ZEFastDelegate.h 				Sources Headers)
 ze_add_source(ZEFastDelegateBind.h			Sources Headers)
-ze_add_source(ZEMain.cpp 					Sources)
 ze_add_source(ZESDK.h 						Sources Headers)
 ze_add_source(ZESDK.cpp 					Sources)
 ze_add_source(ZECore/ZEWindowResources.rc	Sources)
-
-ze_add_executable(ZE 
-	SOURCES ${Sources}
-	LIBS ZEEngineAPI
-	WIN32
-	INSTALL
-	INSTALL_DESTINATION Bin
-	INSTALL_COMPONENT Runtime)
 
 ze_add_library(ZEEngineAPI 
 	SOURCES ${Sources}
@@ -89,3 +80,12 @@ ze_add_library(ZEEngineAPI
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI"
 	INSTALL_COMPONENT ZESDK)
+	
+ze_add_executable(ZE 
+	SOURCES ${Sources} ZEMain.cpp 
+	LIBS ZEEngineAPI
+	WIN32
+	INSTALL
+	INSTALL_DESTINATION Bin
+	INSTALL_COMPONENT Runtime)
+

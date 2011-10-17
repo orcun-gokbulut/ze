@@ -34,11 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModuleManager.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEOptionManager.h"
 #include "ZEModule.h"
 #include "ZEModuleDescription.h"
+#include "ZEDefinitions.h"
+#include "ZECompileOptions.h"
 
 ZEOptionSection ZEModuleManager::ModuleManagerOptions;
 

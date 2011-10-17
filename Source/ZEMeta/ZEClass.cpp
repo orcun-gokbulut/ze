@@ -35,7 +35,7 @@
 
 #include "ZEClass.h"
 #include <string.h>
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEAnimation.h"
 #include "ZECore/ZEConsole.h"
 #include "ZESerialization/ZESerializer.h"

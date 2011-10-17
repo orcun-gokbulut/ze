@@ -58,11 +58,11 @@ enum ZECoreState
 	ZE_CS_STARTUP,
 	ZE_CS_SHUTDOWN,
 	ZE_CS_TERMINATE,
-	ZE_CS_CRITICALERROR
+	ZE_CS_CRITICAL_ERROR
 };
 
 class ZEModuleManager;
-class ZEError;
+class ZEErrorManager;
 class ZEOptionManager;
 class ZEResourceManager;
 class ZECommandManager;
@@ -96,22 +96,23 @@ class ZECore
 		ZEModuleManager*				ModuleManager;
 		ZEExtensionManager*				ExtensionManager;
 		ZEPluginManager*				PluginManager;
-		ZESystemMessageManager*			SystemMessageManager;
-		ZESystemMessageHandler*			SystemMessageHandler;
-
 		ZEApplicationModule*			Application;
-		ZEError*						Error;
-		ZEOptionManager*				Options;
-		ZEResourceManager*				Resources;
-		ZECommandManager*				Commands;
+		ZEErrorManager*					ErrorManager;
+		ZEOptionManager*				OptionManager;
+		ZEResourceManager*				ResourceManager;
+		ZECommandManager*				CommandManager;
 		ZEConsole*						Console;
 		ZEWindow*						Window;
-		ZEGraphicsModule*				Graphics;
-		ZESoundModule*					Sound;
-		ZEInputModule*					Input;
-		ZEPhysicsModule*				Physics;
+		
+		ZEGraphicsModule*				GraphicsModule;
+		ZESoundModule*					SoundModule;
+		ZEInputModule*					InputModule;
+		ZEPhysicsModule*				PhysicsModule;
+		ZENetworkModule*				NetworkModule;
 		ZEGame*							Game;
-		ZENetworkModule*				Network;
+
+		ZESystemMessageManager*			SystemMessageManager;
+		ZESystemMessageHandler*			SystemMessageHandler;
 
 
 		bool							InitializeModule(ZEModule* Module);
@@ -123,7 +124,7 @@ class ZECore
 	public:
 		static ZEOptionSection			CoreOptions;
 
-		ZEError*						GetError();
+		ZEErrorManager*					GetError();
 		ZEOptionManager*				GetOptions();
 		ZEResourceManager*				GetResourceManager();
 		ZECommandManager*				GetCommands();

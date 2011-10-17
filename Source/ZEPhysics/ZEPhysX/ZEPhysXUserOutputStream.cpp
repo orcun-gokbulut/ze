@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPhysXUserOutputStream.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 
 void ZEPhysXUserOutputStream::reportError(NxErrorCode Code, const char* Message, const char* File, int Line)

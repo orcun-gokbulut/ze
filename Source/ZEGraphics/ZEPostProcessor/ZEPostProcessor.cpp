@@ -36,7 +36,7 @@
 #include "ZEPostProcessor.h"
 #include "ZEPostProcessorNode.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include <string.h>
 
 ZEPostProcessor::ZEPostProcessor()

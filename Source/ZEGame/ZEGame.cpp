@@ -35,7 +35,7 @@
 
 #include "ZEGame.h"
 #include "ZECore/ZECore.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEUI/ZEUIManager.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZEMath/ZEMathDefinitions.h"

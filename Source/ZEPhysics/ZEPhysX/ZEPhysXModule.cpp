@@ -40,7 +40,7 @@
 #include "ZEPhysXPhysicalMesh.h"
 #include "ZEPhysXPhysicalJoint.h"
 //#include "ZEPhysXPhysicalMaterial.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 
 #include <NxPhysics.h>

@@ -35,7 +35,7 @@
 
 #include "ZEMath/ZEMathDefinitions.h"
 #include "ZECanvas.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEFile/ZEResourceFile.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
 

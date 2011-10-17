@@ -37,7 +37,7 @@
 #include "ZEALModuleDescription.h"
 #include "ZEMath/ZEVector.h"
 #include "ZECore/ZECore.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEWindow.h"
 #include "ZEALListener.h"
@@ -143,7 +143,9 @@ bool ZEALModule::Initialize()
 	}
 	else
 		if (DeviceId == 0)
+		{
 			zeLog("OpenAL Module", "Using default sound device");
+		}
 		else
 		{
 			DeviceName = (ALchar*)(const char*)DeviceList[DeviceId].DeviceName;

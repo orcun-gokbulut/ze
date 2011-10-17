@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEVRPNInputDeviceExtension.h"
 #include "ZEVRPNInputDeviceExtensionDescription.h"

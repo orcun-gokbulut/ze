@@ -36,7 +36,7 @@
 #include "ZEEntity.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZERay.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEComponent.h"
 #include "ZEEntityProvider.h"
 #include <string.h>

@@ -35,7 +35,7 @@
 
 #include "ZEPPTextureOutputNode.h"
 #include "ZEGraphics/ZETexture2D.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEDefinitions.h"
 
 ZEPPTextureOutputNode::ZEPPTextureOutputNode()

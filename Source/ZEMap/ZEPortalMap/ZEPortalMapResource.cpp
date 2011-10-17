@@ -36,7 +36,7 @@
 #include "ZEPortalMapResource.h"
 #include "ZEPortalMapFileFormat.h"
 
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEResource.h"
 #include "ZEFile/ZEResourceFile.h"

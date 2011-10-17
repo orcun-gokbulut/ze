@@ -41,7 +41,7 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZECompoundEntity.h"
 #include "ZEGame/ZEScene.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 
 #include <stdio.h>
 #include <string.h>

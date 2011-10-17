@@ -36,7 +36,7 @@
 #include "ZERayCaster.h"
 #include "ZEEntity.h"
 #include "ZEScene.h"
-
+/*
 ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float Range)
 {
 	float T;
@@ -54,7 +54,6 @@ ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Posi
 {
 	ZEVector3 Normal;
 	return ZERayCaster::CastRay(Scene, Ray, Position, Normal, Range);
-
 }
 
 ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float Range)
@@ -110,3 +109,7 @@ ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Posi
 	return IntersectedEntity;
 }
 
+ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float& T, ZEVector3& Position, ZEVector3& Normal, float Range = 100000000.0f)
+{
+	return NULL;
+}*/

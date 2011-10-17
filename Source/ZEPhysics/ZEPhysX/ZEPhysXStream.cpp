@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPhysXStream.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include <stdio.h>
 
 // ZEPhysXFileStream

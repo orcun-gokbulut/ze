@@ -35,7 +35,7 @@
 
 #include "ZEPhysXPhysicalJoint.h"
 #include "ZEPhysXPhysicalWorld.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 
 static inline NxD6JointMotion ConvertZEMotionToNXMotion(ZEPhysicalJointMotion Motion)
 {

@@ -36,7 +36,7 @@
 #include "ZEUIManager.h"
 #include "ZEUIRenderer.h"
 #include "ZEUIControl.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputModule.h"

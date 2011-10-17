@@ -178,7 +178,7 @@ void ZEWindow::WindowLostFocus()
 
 void ZEWindow::WindowDestroyed()
 {
-	if (zeCore->GetCoreState() != ZE_CS_SHUTDOWN && zeCore->GetCoreState() != ZE_CS_CRITICALERROR)
+	if (zeCore->GetCoreState() != ZE_CS_SHUTDOWN && zeCore->GetCoreState() != ZE_CS_CRITICAL_ERROR)
 		zeCore->ShutDown();
 }
 

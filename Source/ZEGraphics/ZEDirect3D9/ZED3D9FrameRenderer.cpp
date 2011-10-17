@@ -57,7 +57,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZEMath/ZEMathDefinitions.h"
 
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 
 #pragma warning(disable:4267)
 

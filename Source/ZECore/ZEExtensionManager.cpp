@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEExtensionManager.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEOptionManager.h"
 #include "ZEExtensionDescription.h"
 #include "ZEModuleDescription.h"

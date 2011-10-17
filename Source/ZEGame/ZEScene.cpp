@@ -38,7 +38,7 @@
 #include "ZEEntity.h"
 #include "ZECompoundEntity.h"
 #include "ZECore/ZEConsole.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZECore.h"
 #include "ZEGraphics/ZEFrameRenderer.h"
 #include "ZEGraphics/ZEShadowRenderer.h"

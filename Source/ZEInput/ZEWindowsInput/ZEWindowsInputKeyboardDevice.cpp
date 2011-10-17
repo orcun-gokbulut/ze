@@ -37,7 +37,7 @@
 
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 
 #include "ZEInput/ZEInputEvent.h"
 #include "ZEInput/ZEInputMapBinding.h"

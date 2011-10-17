@@ -37,7 +37,7 @@
 #include "ZEClass.h"
 #include "ZEFile/ZEResourceFile.h"
 #include "ZETypes.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZESerialization/ZESerializer.h"
 #include "ZESerialization/ZEUnserializer.h"
 
@@ -415,8 +415,3 @@ ZEAnimationController::ZEAnimationController()
 ZEAnimationController::~ZEAnimationController()
 {
 }
-
-
-
-
-

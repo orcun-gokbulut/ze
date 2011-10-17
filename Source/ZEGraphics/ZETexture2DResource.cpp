@@ -35,7 +35,7 @@
 
 #include "ZETexture2D.h"
 #include "ZETexture2DResource.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZEFile/ZEResourceFile.h"

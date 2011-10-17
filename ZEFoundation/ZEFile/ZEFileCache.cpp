@@ -37,8 +37,8 @@
 #include "ZEFileCache.h"
 #include "ZEFile/ZEResourceFile.h"
 
-//#include "../ZEAssert.h"
-//#include "..\Source/ZECore/ZEError.h"
+//#include "../ZEError.h"
+//#include "..\Source/ZEError.h"
 //#include "..\Source/ZEDefinitions.h"
 
 #include <string.h>

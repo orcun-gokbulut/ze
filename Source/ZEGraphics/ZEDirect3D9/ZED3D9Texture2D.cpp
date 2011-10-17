@@ -36,7 +36,7 @@
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9Module.h"
 #include "ZED3D9CommonTools.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 
 ZED3D9Texture2D::ZED3D9Texture2D()
 {

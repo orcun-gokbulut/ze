@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEAssert.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,31 +30,17 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEAssert.h"
+cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZETResourceFilePart.cpp	Sources)
+ze_add_source(ZETResourceFilePart.h		Sources Headers)
 
-#include <stdio.h>
-#include <stdarg.h>
-
-void stdAssert(const char* Function, const char* File, int Line, const char* Message, ...)
-{	
-	va_list Args;
-	va_start(Args, Message);
-	printf("[ASSERT] ");
-	vprintf(Message, Args);
-	printf(" (Function : \"%s\", File : \"%s\", Line : %d)\n", Message, Function, File, Line);
-	va_end(Args);
-}
-
-void stdWarningAssert(const char* Function, const char* File, int Line, const char* Message, ...)
-{
-	va_list Args;
-	va_start(Args, Message);
-	printf("[Warning Assert] ");
-	vprintf(Message, Args);
-	printf(" (Function : \"%s\", File : \"%s\", Line : %d)\n", Message, Function, File, Line);
-	va_end(Args);
-}
+ze_add_library(ZETCommon 
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	INSTALL
+	INSTALL_DESTINATION "ZEToolAPI/ZETCommon"
+	INSTALL_COMPONENT ZESDK)

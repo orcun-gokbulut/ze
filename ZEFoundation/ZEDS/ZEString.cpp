@@ -42,7 +42,7 @@
 #include <wchar.h>
 #include <stdlib.h>
 #include <string>
-#include "ZEAssert.h"
+#include "ZEError.h"
 
 #ifdef ZE_DEBUG_CHECK_MEMORY
 #include <crtdbg.h>
@@ -71,7 +71,7 @@ void ZEString::Clear()
 
 void ZEString::SetValue(const char* String)
 {
-	zefAssert(String == NULL, "Null char array pointer are not valid parameters.");
+	zeAssert(String == NULL, "Null char array pointer are not valid parameters.");
 	
 	size_t StringSize = strlen(String);
 	if (StringSize == 0)
@@ -89,7 +89,7 @@ void ZEString::SetValue(const char* String)
 	memcpy(Buffer, String, Size);
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
 
@@ -180,13 +180,13 @@ const char* ZEString::GetValue() const
 
 char ZEString::GetCharacter(size_t Position) const
 {
-	zefAssert(Position > strlen(Buffer), "Position parameter value exceed length of the string.");
+	zeAssert(Position > strlen(Buffer), "Position parameter value exceed length of the string.");
 	return Buffer[Position];
 }
 
 void ZEString::SetCharacter(size_t Position, char Value)
 {
-	zefAssert(Position > strlen(Buffer), "Position parameter value exceed length of the string.");
+	zeAssert(Position > strlen(Buffer), "Position parameter value exceed length of the string.");
 	Buffer[Position] = Value;
 }
 
@@ -200,7 +200,7 @@ size_t ZEString::GetLength() const
 
 void ZEString::Append(const char* String)
 {
-	zefAssert(String == NULL, "String parameter is ilvalid.");
+	zeAssert(String == NULL, "String parameter is ilvalid.");
 	
 	if (Buffer == NULL)
 		SetValue(String);
@@ -213,7 +213,7 @@ void ZEString::Append(const char* String)
 	}
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
 
@@ -224,7 +224,7 @@ void ZEString::Append(const ZEString& String)
 
 void ZEString::Insert(const char* String)
 {
-	zefAssert(String == NULL, "String parameter is ilvalid.");
+	zeAssert(String == NULL, "String parameter is ilvalid.");
 	
 	if (Buffer == NULL)
 		SetValue(String);
@@ -247,7 +247,7 @@ void ZEString::Insert(const char* String)
 	}
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
 
@@ -263,8 +263,8 @@ void ZEString::Insert(size_t Position, const ZEString& String)
 
 void ZEString::Insert(size_t Position, const char* String)
 {
-	zefAssert(String == NULL, "Inserting string is not valid.");
-	zefAssert(Buffer == NULL && Position != 0, "A string can only be inserted in to empty string at position 0.");
+	zeAssert(String == NULL, "Inserting string is not valid.");
+	zeAssert(Buffer == NULL && Position != 0, "A string can only be inserted in to empty string at position 0.");
 
 	size_t StringLength = strlen(String);
 	if (StringLength == 0)
@@ -277,7 +277,7 @@ void ZEString::Insert(size_t Position, const char* String)
 	}
 
 	size_t Length = strlen(Buffer);
-	zefAssert(Position > Length, "Position parameter is more than string length.");
+	zeAssert(Position > Length, "Position parameter is more than string length.");
 	Length += StringLength;
 
 	char* OldBuffer = Buffer;
@@ -299,7 +299,7 @@ void ZEString::Insert(size_t Position, const char* String)
 	}
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
 
@@ -310,8 +310,8 @@ void ZEString::Remove(size_t Position, size_t Count)
 		return;
 
 	size_t Length = strlen(Buffer);
-	zefAssert(Position > Length, "Position parameter is more than string length.");
-	zefAssert(Position + Count > Length, "Remove operation range (Position + Count) exceeds length of the string.");
+	zeAssert(Position > Length, "Position parameter is more than string length.");
+	zeAssert(Position + Count > Length, "Remove operation range (Position + Count) exceeds length of the string.");
 
 	if (Length - Count == 0)
 	{
@@ -332,7 +332,7 @@ void ZEString::Remove(size_t Position, size_t Count)
 	}
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 }
 		
@@ -364,8 +364,8 @@ ZEString ZEString::Left(size_t Count) const
 	if (Count == 0)
 		return ZEString();
 
-	zefAssert(Buffer == NULL, "Buffer is empty.");
-	zefAssert(Count >  strlen(Buffer), "Position is bigger than string length.");
+	zeAssert(Buffer == NULL, "Buffer is empty.");
+	zeAssert(Count >  strlen(Buffer), "Position is bigger than string length.");
 
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (Count + 1) * sizeof(char));
@@ -373,7 +373,7 @@ ZEString ZEString::Left(size_t Count) const
 	Temp.Buffer[Count] = L'\0';
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
 	return Temp;
@@ -384,17 +384,17 @@ ZEString ZEString::Right(size_t Count) const
 	if (Count == 0)
 		return ZEString();
 
-	zefAssert(Buffer == NULL, "Buffer is empty.");
+	zeAssert(Buffer == NULL, "Buffer is empty.");
 
 	size_t Length = strlen(Buffer);
-	zefAssert(Count > strlen(Buffer), "Position is bigger than string length.");
+	zeAssert(Count > strlen(Buffer), "Position is bigger than string length.");
 
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (Count + 1) * sizeof(char));
 	memcpy(Temp.Buffer, Buffer + Length - Count, (Count + 1) * sizeof(char)); 
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
 	return Temp;
@@ -405,8 +405,8 @@ ZEString ZEString::Middle(size_t Position, size_t Count) const
 	if (Count == 0)
 		return ZEString();
 
-	zefAssert(Buffer == NULL, "Buffer is empty.");
-	zefAssert(Position + Count > strlen(Buffer), "Sub string range (Position and count) is exceed string length.");
+	zeAssert(Buffer == NULL, "Buffer is empty.");
+	zeAssert(Position + Count > strlen(Buffer), "Sub string range (Position and count) is exceed string length.");
 
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (Count + 1) * sizeof(char));
@@ -414,7 +414,7 @@ ZEString ZEString::Middle(size_t Position, size_t Count) const
 	Temp.Buffer[Count] = L'\0';
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
 	return Temp;
@@ -425,9 +425,9 @@ ZEString ZEString::SubString(size_t StartPosition, size_t EndPosition) const
 	if (Buffer == NULL && StartPosition == 0 && EndPosition == 0)
 		return ZEString();
 
-	zefAssert(Buffer == NULL, "Buffer is empty.");
-	zefAssert(StartPosition > strlen(Buffer) || EndPosition > strlen(Buffer), "Sub string range (Position and count) is exceed string length.");
-	zefAssert(EndPosition < StartPosition, "EndPosition parameter can not be smaller than StartPosition parameter.");
+	zeAssert(Buffer == NULL, "Buffer is empty.");
+	zeAssert(StartPosition > strlen(Buffer) || EndPosition > strlen(Buffer), "Sub string range (Position and count) is exceed string length.");
+	zeAssert(EndPosition < StartPosition, "EndPosition parameter can not be smaller than StartPosition parameter.");
 	
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (EndPosition - StartPosition + 2) * sizeof(char));
@@ -435,7 +435,7 @@ ZEString ZEString::SubString(size_t StartPosition, size_t EndPosition) const
 	Temp.Buffer[EndPosition - StartPosition + 1] = '\0';
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
 	return Temp;
@@ -461,7 +461,7 @@ ZEString ZEString::TrimLeft() const
 	memcpy(Temp.Buffer, Buffer + Count, (Length - Count + 1) * sizeof(char)); 
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
 	return Temp;
@@ -488,7 +488,7 @@ ZEString ZEString::TrimRight() const
 	Temp.Buffer[Length - Count] = L'\0';
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
 	return Temp;
@@ -526,7 +526,7 @@ ZEString ZEString::Trim() const
 	Temp.Buffer[Length - LeftCount - RightCount] = L'\0';
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
 	return Temp;
@@ -629,17 +629,17 @@ ZEString& ZEString::operator+=(const char* String)
 
 const char& ZEString::operator[](int Index) const
 {
-	zefAssert(Buffer == NULL, "Empty string can not be indexed.");
-	zefAssert(Index < 0, "Index parameter is negative.");
-	zefAssert(Index > strlen(Buffer), "Index parameter value exceed length of the string.");
+	zeAssert(Buffer == NULL, "Empty string can not be indexed.");
+	zeAssert(Index < 0, "Index parameter is negative.");
+	zeAssert(Index > strlen(Buffer), "Index parameter value exceed length of the string.");
 	return Buffer[Index];
 }
 
 char& ZEString::operator[](int Index)
 {
-	zefAssert(Buffer == NULL, "Empty string can not be indexed.");
-	zefAssert(Index < 0, "Index parameter is negative.");
-	zefAssert(Index > strlen(Buffer), "Index parameter value exceed length of the string.");
+	zeAssert(Buffer == NULL, "Empty string can not be indexed.");
+	zeAssert(Index < 0, "Index parameter is negative.");
+	zeAssert(Index > strlen(Buffer), "Index parameter value exceed length of the string.");
 	return Buffer[Index];
 }
 
@@ -697,7 +697,7 @@ ZEString::~ZEString()
 		Allocator.Deallocate(&Buffer);
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zefAssert(!_CrtCheckMemory(), "Heap problem");
+		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
 
 }

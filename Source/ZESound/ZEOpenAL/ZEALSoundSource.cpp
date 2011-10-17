@@ -42,7 +42,7 @@
 // OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS ! OPENAL SUCKS !
 
 #include "ZEALSoundSource.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 
 static const char* ConvertErrorToString(ALenum Error)

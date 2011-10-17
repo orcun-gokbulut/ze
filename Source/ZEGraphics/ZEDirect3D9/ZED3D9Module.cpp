@@ -39,7 +39,7 @@
 #include "ZED3D9Module.h"
 #include "ZED3D9ModuleDescription.h"
 #include "ZECore/ZEWindow.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEOptionManager.h"
 #include "ZED3D9FixedMaterial.h"

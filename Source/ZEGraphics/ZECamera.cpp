@@ -36,7 +36,7 @@
 #include "ZECamera.h"
 #include <math.h>
 #include "ZEGraphicsModule.h"
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZEMath/ZERay.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
