@@ -74,10 +74,11 @@ ZEArray<*>{
 template<typename Type, typename Allocator_= ZEAllocatorBase<Type> >
 class ZEArray
 {
-	protected:
+	private:
 		size_t		Count;
 		Allocator_	Allocator;
 		Type		*Items;
+
 	public:
 		inline void Enqueue(Type Value)
 		{
@@ -111,12 +112,32 @@ class ZEArray
 			this->Items[Index] = Value;
 		}
 
-		void MassInsert(Type *OtherArray, size_t Offset, size_t Count)
+		void MassAdd(Type* OtherArray, size_t Count)
 		{
-			OSD_ASSERT(this->Count < Count + Offset, "ZEArray::MassInsert operaion failed. Array is not large enought.")
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items, OtherArray + Offset, Count);
+			Resize(this->Count + Count);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count, OtherArray, Count);
+		}
+
+		void MassAdd(Type* OtherArray, size_t Offset, size_t Count)
+		{
+			Resize(this->Count + Count);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count, OtherArray + Offset, Count);
 		}
 		
+		void MassInsert(size_t Index, Type* OtherArray, size_t Count)
+		{
+			Resize(this->Count + Count);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, this->Items + Index + Count, Count);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, OtherArray, Count);
+		}
+
+		void MassInsert(size_t Index, Type* OtherArray, size_t Offset, size_t Count)
+		{
+			Resize(this->Count + Count);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, this->Items + Index + Count, Count);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, OtherArray + Offset, Count);
+		}
+
 		inline void FillWith(Type Value)
 		{
 			for (size_t I =0 ; I < Count; I++)
@@ -157,6 +178,9 @@ class ZEArray
 			if (this->Count != OtherArray.Count)
 				this->SetCount(OtherArray.Count);
 			ZEAllocatorBase<Type>::ObjectCopy(this->Items, OtherArray.Items, Count);	
+			#ifdef ZE_DEBUG_CHECK_MEMORY
+					zeAssert(!_CrtCheckMemory(), "Heap problem");
+			#endif
 		}
 		
 		void Combine(const ZEArray<Type, Allocator_>& OtherArray)
@@ -479,8 +503,3 @@ class ZEChunkArray : public ZEArray<Type, ZEChunkAllocator<Type, ChunkSize> >
 {};
 
 #endif
-
-
-
-
-
