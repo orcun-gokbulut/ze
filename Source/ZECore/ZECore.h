@@ -80,6 +80,8 @@ class ZEExtensionManager;
 class ZESystemMessageManager;
 class ZEPluginManager;
 class ZESystemMessageHandler;
+class ZERealTimeClock;
+class ZEProfiler;
 
 class ZECore
 {
@@ -87,11 +89,13 @@ class ZECore
 		ZECoreState						CoreState;
 		ZEUserLevel						UserLevel;
 		size_t							FrameId;
-		float							FrameTime;
 		float							RunningTime;
 		bool							DebugMode;
 
 		char							ResourceDirectory;
+
+		ZERealTimeClock*				RealTimeClock;
+		ZEProfiler*						Profiler;
 
 		ZEModuleManager*				ModuleManager;
 		ZEExtensionManager*				ExtensionManager;
@@ -134,6 +138,8 @@ class ZECore
 		ZEExtensionManager*				GetExtensionManager();
 		ZEPluginManager*				GetPluginManager();
 		ZESystemMessageManager*			GetSystemMessageManager();
+		ZERealTimeClock*				GetRealTimeClock();
+		ZEProfiler*						GetProfiler();
 
 		void							SetResourceDirector(const char* Directory);
 		const char*						GetResourceDirectory();
@@ -159,7 +165,6 @@ class ZECore
 		void							SetApplicationModule(ZEApplicationModule* Module);
 		ZEApplicationModule*			GetApplicationModule();
 
-		float							GetFrameTime();
 		float							GetRuningTime();
 		size_t							GetFrameId();
 		

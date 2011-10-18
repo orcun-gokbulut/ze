@@ -269,7 +269,7 @@ void ZEScene::Render(float ElapsedTime)
 	Renderer->SetCamera(ActiveCamera);
 	
 	ZEDrawParameters DrawParameters;
-	DrawParameters.ElapsedTime = zeCore->GetFrameTime();
+	DrawParameters.ElapsedTime = ElapsedTime;
 	DrawParameters.FrameId = zeCore->GetFrameId();
 	DrawParameters.Pass = ZE_RP_COLOR;
 	DrawParameters.Renderer = Renderer;

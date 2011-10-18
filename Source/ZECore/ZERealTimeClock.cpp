@@ -35,6 +35,8 @@
 
 #include "ZERealTimeClock.h"
 
+#include "ZECore.h"
+
 #define WINDOWS_LEAN_AND_MEAN
 #include <Windows.h>
 
@@ -42,79 +44,65 @@
 #undef GetCurrentTime
 #endif
 
-ZEUINT64 ZERealTimeClock::GetCurrentTime()
-{
-	LARGE_INTEGER CurrentTick;
-	QueryPerformanceCounter(&CurrentTick);
-	return (CurrentTick.QuadPart - StartTick) / Frequency;
-}
-
-ZEUINT64 ZERealTimeClock::GetCurrentTimeMicrosecond()
-{
-	LARGE_INTEGER CurrentTick;
-	QueryPerformanceCounter(&CurrentTick);
-	return (FrameTick - StartTick) / (Frequency / 1000);
-}
-
-ZEUINT64 ZERealTimeClock::GetFrameTime()
-{
-	return FrameTime;
-}
-
-ZEUINT64 ZERealTimeClock::GetFrameTimeMicrosecond()
-{
-	return (FrameTick - StartTick) / (Frequency / 1000);
-}
-
-ZEUINT64 ZERealTimeClock::GetFrameDeltaTime()
-{
-	return FrameDeltaTime;
-}
-
-void ZERealTimeClock::Process()
-{
-	LARGE_INTEGER CurrentTick;
-	QueryPerformanceCounter(&CurrentTick);
-	FrameDeltaTime = (CurrentTick.QuadPart - FrameTick) / Frequency;
-	FrameTick = CurrentTick.QuadPart;
-	FrameTime = FrameTick / Frequency;
-}
-
-void ZERealTimeClock::Reset()
-{
-	LARGE_INTEGER Freq;
-	QueryPerformanceFrequency(&Freq);
-	Frequency = Freq.QuadPart / 1000;
-
-	LARGE_INTEGER CurrentTick;
-	QueryPerformanceCounter(&CurrentTick);
-	FrameTime = 0;
-	FrameTick = CurrentTick.QuadPart;
-	StartTick = CurrentTick.QuadPart;
-	FrameDeltaTime = 0;
-}
-
-bool ZERealTimeClock::Initialize()
-{
-	Reset();
-	return true;
-}
-
-void ZERealTimeClock::Deinitialize()
-{
-
-}
 
 ZERealTimeClock::ZERealTimeClock()
 {
-	StartTick = 0;
-	FrameTick = 0;
-	FrameTime = 0;
-	Frequency = 1000;
-	FrameDeltaTime = 0;
+	ResetTime();
 }
 
 ZERealTimeClock::~ZERealTimeClock()
 {
 
+}
+
+ZEUINT64 ZERealTimeClock::GetCurrentTime()
+{
+	LARGE_INTEGER CurrentTick;
+	QueryPerformanceCounter(&CurrentTick);
+	return ((FrameTick - StartTick) * 1000000) / Frequency;
+}
+
+ZEUINT64 ZERealTimeClock::GetFrameTime()
+{
+	return ((FrameTick - StartTick) * 1000000) / Frequency;
+}
+
+ZEUINT64 ZERealTimeClock::GetFrameDeltaTime()
+{
+	return ((FrameTick - OldFrameTick) * 1000000) / Frequency;
+}
+
+void ZERealTimeClock::ResetFrameTime()
+{
+	LARGE_INTEGER CurrentTick;
+	QueryPerformanceCounter(&CurrentTick);
+	FrameTick = CurrentTick.QuadPart;
+	OldFrameTick = CurrentTick.QuadPart;
+}
+
+void ZERealTimeClock::ResetTime()
+{
+	LARGE_INTEGER Freq;
+	QueryPerformanceFrequency(&Freq);
+	Frequency = Freq.QuadPart;
+
+	LARGE_INTEGER CurrentTick;
+	QueryPerformanceCounter(&CurrentTick);
+
+	OldFrameTick = CurrentTick.QuadPart;
+	FrameTick = CurrentTick.QuadPart;
+	StartTick = CurrentTick.QuadPart;
+}
+
+void ZERealTimeClock::UpdateFrameTime()
+{
+	LARGE_INTEGER CurrentTick;
+	QueryPerformanceCounter(&CurrentTick);
+	OldFrameTick = FrameTick;
+	FrameTick = CurrentTick.QuadPart;
+}
+
+ZERealTimeClock* ZERealTimeClock::GetInstance()
+{
+	return ZECore::GetInstance()->GetRealTimeClock();
 }

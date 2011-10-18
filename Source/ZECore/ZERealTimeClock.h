@@ -41,28 +41,27 @@
 
 class ZERealTimeClock
 {
-	protected:
+	friend class ZECore;
+	private:
 		ZEUINT64					StartTick;
 		ZEUINT64					FrameTick;
-		ZEUINT64					FrameTime;
-		ZEUINT64					FrameDeltaTime;
+		ZEUINT64					OldFrameTick;
 		ZEUINT64					Frequency;
 
-	public:
-		ZEUINT64					GetCurrentTime();
-		ZEUINT64					GetCurrentTimeMicrosecond();
-		ZEUINT64					GetFrameTime();
-		ZEUINT64					GetFrameTimeMicrosecond();
-		ZEUINT64					GetFrameDeltaTime();
-
-		void						Process();
-		void						Reset();
-		
-		bool						Initialize();
-		void						Deinitialize();
+		void						ResetFrameTime();
+		void						ResetTime();
 
 									ZERealTimeClock();
 									~ZERealTimeClock();
+
+	public:
+		ZEUINT64					GetCurrentTime();
+		ZEUINT64					GetFrameTime();
+		ZEUINT64					GetFrameDeltaTime();
+
+		void						UpdateFrameTime();
+
+		static ZERealTimeClock*		GetInstance();
 };
 
 #endif

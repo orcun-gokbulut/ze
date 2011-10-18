@@ -43,11 +43,6 @@
 #include "ZEConsoleWindow.h"
 #include "ZEResourceManager.h"
 #include "ZEWindow.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEInput/ZEInputModule.h"
-#include "ZEPhysics/ZEPhysicsModule.h"
-#include "ZESound/ZESoundModule.h"
-#include "ZEGame/ZEGame.h"
 #include "ZEApplicationModule.h"
 #include "ZEOptionManager.h"
 #include "ZECommandManager.h"
@@ -55,6 +50,14 @@
 #include "ZEExtensionManager.h"
 #include "ZESystemMessageManager.h"
 #include "ZESystemMessageHandler.h"
+#include "ZERealTimeClock.h"
+#include "ZEProfiler.h"
+
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEInput/ZEInputModule.h"
+#include "ZEPhysics/ZEPhysicsModule.h"
+#include "ZESound/ZESoundModule.h"
+#include "ZEGame/ZEGame.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
@@ -136,6 +139,15 @@ ZESystemMessageManager* ZECore::GetSystemMessageManager()
 	return SystemMessageManager;
 }
 
+ZERealTimeClock* ZECore::GetRealTimeClock()
+{
+	return RealTimeClock;
+}
+
+ZEProfiler* ZECore::GetProfiler()
+{
+	return Profiler;
+}
 		
 bool ZECore::SetGraphicsModule(ZEModule* Module)
 {
@@ -272,11 +284,6 @@ ZEApplicationModule* ZECore::GetApplicationModule()
 size_t ZECore::GetFrameId()
 {
 	return FrameId;
-}
-
-float ZECore::GetFrameTime()
-{
-	return FrameTime;
 }
 
 float ZECore::GetRuningTime()
@@ -607,21 +614,10 @@ void ZECore::MainLoop()
 		Application->PreProcess();
 
 	FrameId++;
+	
+	RealTimeClock->UpdateFrameTime();
 
-	if (OldPerformanceCount.QuadPart == 0)
-	{
-		FrameTime = 0;
-		QueryPerformanceCounter(&OldPerformanceCount);
-	}
-	else
-	{
-		QueryPerformanceCounter(&PerformanceCount);
-
-		FrameTime = (float)((double)(PerformanceCount.QuadPart - OldPerformanceCount.QuadPart) / (double)PerformanceCounterFreq.QuadPart);
-		OldPerformanceCount = PerformanceCount;
-	}
-
-	srand(PerformanceCount.LowPart);
+	float FrameTime = (float)RealTimeClock->GetFrameDeltaTime() / 1000000.0f;
 
 	// Game Logic
 	InputModule->ProcessInputs();
@@ -655,6 +651,7 @@ void ZECore::Run()
 	if (Application != NULL)
 		Application->Initialize();
 
+	RealTimeClock->ResetFrameTime();
 	while(CoreState != ZE_CS_TERMINATE && CoreState != ZE_CS_SHUTDOWN)
 		MainLoop();
 
@@ -677,20 +674,22 @@ ZECore::ZECore()
 	OldPerformanceCount.QuadPart = 0;
 
 	Application	= NULL;
+	RealTimeClock			= new ZERealTimeClock();
+	Profiler				= new ZEProfiler();
 	SystemMessageManager	= new ZESystemMessageManager();
 	SystemMessageHandler	= new ZECoreSystemMessageHandler();
-	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
 	Console					= new ZEConsole();
-	CommandManager				= new ZECommandManager();
-	OptionManager					= new ZEOptionManager();
+	CommandManager			= new ZECommandManager();
+	OptionManager			= new ZEOptionManager();
 	ErrorManager			= new ZEErrorManager();
-	ResourceManager				= new ZEResourceManager();
+	ResourceManager			= new ZEResourceManager();
 	ModuleManager			= new ZEModuleManager();
 	ExtensionManager		= new ZEExtensionManager();
 	PluginManager			= new ZEPluginManager();
 	Window					= new ZEWindow();
 	Game					= new ZEGame();
 
+	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
 
 	ZEGraphicsModule::BaseInitialize();
 	ZESoundModule::BaseInitialize();
@@ -715,6 +714,7 @@ ZECore::~ZECore()
 	delete OptionManager;
 	delete CommandManager;
 	delete Console;
+	delete RealTimeClock;
 	SystemMessageManager->UnregisterMessageHandler(SystemMessageHandler);
 	delete SystemMessageHandler;
 	delete SystemMessageManager;

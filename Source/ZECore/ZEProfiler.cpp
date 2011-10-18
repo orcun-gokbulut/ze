@@ -34,180 +34,52 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEProfiler.h"
-#include "ZEProfilerManager.h"
+#include "ZEProfilerCounter.h"
 
-#include <time.h>
-#include <Windows.h>
+#include <memory.h>
 
 ZEProfiler::ZEProfiler(void)
 {
-	FrameCount = 0;
-	TotalCount = 0;
-	FrameMaximumTime = -1;
-	TotalMaximumTime = -1;
-	FrameMinimumTime = -1;
-	TotalMinimumTime = -1;
-	TotalTime = 0;
-	FrameTotalTime = 0;
-	StartTime = 0;
-	EndTime = 0;
-	ProfilerActive = false;
-	ParentProfiler = NULL;
-	Manager = NULL;
-	PassedTime = 0;
 }
 
 ZEProfiler::~ZEProfiler(void)
 {
 }
 
-void ZEProfiler::SetName(const ZEString& Name)
+ZEProfilerCounter* ZEProfiler::GetCounter(const ZEString& Name)
 {
-	ZEProfiler::Name.SetValue(Name);
-}
-
-const ZEString& ZEProfiler::GetName()
-{
-	return ZEProfiler::Name;
-}
-
-void ZEProfiler::Start()
-{
-	ProfilerActive = true;
-	StartTime = 0;
-	EndTime = 0;
-	StartTime = GetTickCount64();
-}
-
-void ZEProfiler::Stop()
-{
-	EndTime = GetTickCount64();
-	if(Manager->GetInstance()->Stack.GetLastItem()->Name == ZEProfiler::Name)
+	if(Stack.GetSize() > 0)
 	{
-		PassedTime = EndTime - StartTime;
-
-		if(FrameMaximumTime < 0)
-			FrameMaximumTime = PassedTime;
-		else if(PassedTime > FrameMaximumTime)
-			FrameMaximumTime = PassedTime;
-
-		if(FrameMinimumTime < 0)
-			FrameMinimumTime = PassedTime;
-		else if(FrameMinimumTime > PassedTime)
-			FrameMinimumTime = PassedTime;
-
-		if(TotalMaximumTime < 0)
-			TotalMaximumTime = PassedTime;
-		else if(TotalMaximumTime < PassedTime)
-			TotalMaximumTime = PassedTime;
-
-		if(TotalMinimumTime < 0)
-			TotalMinimumTime = PassedTime;
-		else if(TotalMinimumTime > PassedTime)
-			TotalMinimumTime = PassedTime;
-
-		FrameTotalTime += PassedTime;
-		TotalTime += PassedTime;
-		TotalCount++;
-		FrameCount++;
-
-		ProfilerActive = false;
-		StartTime = 0;
-		EndTime = 0;
-		Manager->GetInstance()->Stack.DeleteAt(Manager->GetInstance()->Stack.GetSize()-1);
+		for (size_t I = 0; I < Counters.GetCount(); I++)
+			if (Stack.GetLastItem() == Counters[I]->GetParent() && Counters[I]->GetName() == Name)
+				return Counters[I];
 	}
-	
+
+	ZEProfilerCounter* NewProfiler = new ZEProfilerCounter();
+	Counters.Add(NewProfiler);
+	Stack.Add(NewProfiler);
+	NewProfiler->SetName(Name);
+	NewProfiler->SetManager(this);
+	NewProfiler->SetParent(Stack.GetLastItem());
+	return NewProfiler;
 }
 
-ZEINT64 ZEProfiler::GetFrameCount()
+ZEProfilerCounter* ZEProfiler::GetCounterForData(const ZEString& Name)
 {
-	return FrameCount;
+	for (size_t I = 0; I < Counters.GetCount(); I++)
+		if (Counters[I]->GetName() == Name)
+			return Counters[I];
+
+	return NULL;
 }
 
-ZEINT64 ZEProfiler::GetTotalCount()
+const ZEArray<ZEProfilerCounter*>& ZEProfiler::GetCounters()
 {
-	return TotalCount;
+	return Counters;
 }
 
-ZEINT64 ZEProfiler::GetFrameMaximumTime()
+ZEProfiler* ZEProfiler::GetInstance()
 {
-	return FrameMaximumTime;
-}
-
-ZEINT64 ZEProfiler::GetTotalMaximumTime()
-{
-	return TotalMaximumTime;
-}
-
-ZEINT64 ZEProfiler::GetFrameMinimumTime()
-{
-	return FrameMinimumTime;
-}
-
-ZEINT64 ZEProfiler::GetTotalMinimumTime()
-{
-	return TotalMinimumTime;
-}
-
-ZEINT64 ZEProfiler::GetTotalTime()
-{
-	return TotalTime;
-}
-
-ZEINT64 ZEProfiler::GetFrameTotalTime()
-{
-	return FrameTotalTime;
-}
-
-ZEINT64 ZEProfiler::GetTotalAverageTime()
-{
-	if(TotalCount == 0)
-		return 0;
-	return (int)(TotalTime / TotalCount);
-}
-
-ZEINT64 ZEProfiler::GetFrameAverageTime()
-{
-	if(FrameCount == 0)
-		return 0;
-	return (int)(FrameTotalTime / FrameCount);
-}
-
-void ZEProfiler::ResetFrame()
-{
-	FrameCount = 0;
-	FrameMaximumTime = -1;
-	FrameMinimumTime = -1;
-	FrameTotalTime = 0;
-	StartTime = 0;
-	EndTime = 0;
-}
-
-void ZEProfiler::ResetTotal()
-{
-	FrameCount = 0;
-	TotalCount = 0;
-	FrameMaximumTime = -1;
-	TotalMaximumTime = -1;
-	FrameMinimumTime = -1;
-	TotalMinimumTime = -1;
-	TotalTime = 0;
-	FrameTotalTime = 0;
-	StartTime = 0;
-	EndTime = 0;
-}
-
-ZEProfiler* ZEProfiler::GetParent()
-{
-	return ParentProfiler;
-}
-
-void ZEProfiler::SetParent(ZEProfiler *ParentProfiler)
-{
-	ZEProfiler::ParentProfiler = ParentProfiler;
-}
-
-void ZEProfiler::SetManager(ZEProfilerManager *Manager)
-{
-	ZEProfiler::Manager = Manager;
+	static ZEProfiler Manager;
+	return &Manager;
 }

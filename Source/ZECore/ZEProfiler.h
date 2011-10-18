@@ -34,66 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PROFILER_H__
-#define __ZE_PROFILER_H__
+#ifndef __ZE_PROFILER___
+#define __ZE_PROFILER___
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
 
-class ZEProfilerManager;
+class ZEProfilerCounter;
 
 class ZEProfiler
 {
-	protected:
-		ZEString					Name;
-		ZEProfiler*					ParentProfiler;
-		ZEProfilerManager*			Manager;
-		bool						ProfilerActive;
+	friend class ZECore;
+	friend class ZEProfilerCounter;
 
-		ZEINT64						StartTime;
-		ZEINT64						EndTime;
-		ZEINT64						PassedTime;
+	private:
+		ZEArray<ZEProfilerCounter*>			Counters;
+		ZEArray<ZEProfilerCounter*>			Stack;
 
-		ZEINT64 					TotalCount;
-		ZEINT64						FrameCount;
-		ZEINT64						TotalMinimumTime;
-		ZEINT64						FrameMinimumTime;
-		ZEINT64						TotalMaximumTime;
-		ZEINT64						FrameMaximumTime;
-		ZEINT64						TotalTime;
-		ZEINT64						FrameTotalTime;
-
+											ZEProfiler(void);
+											~ZEProfiler(void);
 
 	public:
-		void						SetName(const ZEString& Name);
-		const ZEString&				GetName();
+		ZEProfilerCounter*					GetCounter(const ZEString& Name);
+		ZEProfilerCounter*					GetCounterForData(const ZEString& Name);
+		const ZEArray<ZEProfilerCounter*>&	GetCounters();
 
-		void						SetManager(ZEProfilerManager* Manager);
+		void								FrameStarted();
+		void								FrameEnded();
 
-		ZEProfiler*					GetParent();
-		void						SetParent(ZEProfiler* ParentProfiler);
-
-		void						Start();
-		void						Stop();
-
-		ZEINT64						GetFrameCount();
-		ZEINT64						GetFrameMinimumTime();
-		ZEINT64						GetFrameMaximumTime();
-		ZEINT64						GetFrameTotalTime();
-		ZEINT64						GetFrameAverageTime();
-
-		ZEINT64						GetTotalCount();
-		ZEINT64						GetTotalMinimumTime();
-		ZEINT64						GetTotalTime();
-		ZEINT64						GetTotalAverageTime();
-		ZEINT64						GetTotalMaximumTime();
-
-		void						ResetFrame();
-		void						ResetTotal();	
-
-									ZEProfiler();
-									~ZEProfiler();
+		static ZEProfiler*					GetInstance();
 };
 
 #endif

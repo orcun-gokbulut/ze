@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProfilerManager.h
+ Zinek Engine - ZEProfilerCounter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,30 +34,66 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PROFILER_MANAGER__
-#define __ZE_PROFILER_MANAGER__
+#ifndef __ZE_PROFILER_COUNTER_H__
+#define __ZE_PROFILER_COUNTER_H__
 
-#include "ZEProfiler.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 
-class ZEProfilerManager
+class ZEProfiler;
+
+class ZEProfilerCounter
 {
-	friend class ZECore;
-
-	friend class ZEProfiler;
-
 	protected:
-		ZEArray<ZEProfiler*>		Profilers;
-		ZEArray<ZEProfiler*>		Stack;
+		ZEString					Name;
+		ZEProfiler*					Owner;
+		ZEProfilerCounter*			ParentCounter;
+		bool						CounterActive;
 
-									ZEProfilerManager(void);
-									~ZEProfilerManager(void);
+		ZEINT64						StartTime;
+		ZEINT64						EndTime;
+		ZEINT64						PassedTime;
+
+		ZEINT64 					TotalCount;
+		ZEINT64						FrameCount;
+		ZEINT64						TotalMinimumTime;
+		ZEINT64						FrameMinimumTime;
+		ZEINT64						TotalMaximumTime;
+		ZEINT64						FrameMaximumTime;
+		ZEINT64						TotalTime;
+		ZEINT64						FrameTotalTime;
+
 
 	public:
-		ZEProfiler*					GetProfiler(const ZEString& Name);
-		ZEProfiler*					GetProfilerForData(const ZEString& Name);
-		const ZEArray<ZEProfiler*>&	GetProfilers();
+		void						SetName(const ZEString& Name);
+		const ZEString&				GetName();
 
-		static ZEProfilerManager*	GetInstance();
+		void						SetManager(ZEProfiler* Manager);
+
+		ZEProfilerCounter*			GetParent();
+		void						SetParent(ZEProfilerCounter* ParentProfiler);
+
+		void						Start();
+		void						Stop();
+
+		ZEINT64						GetFrameCount();
+		ZEINT64						GetFrameMinimumTime();
+		ZEINT64						GetFrameMaximumTime();
+		ZEINT64						GetFrameTotalTime();
+		ZEINT64						GetFrameAverageTime();
+
+		ZEINT64						GetTotalCount();
+		ZEINT64						GetTotalMinimumTime();
+		ZEINT64						GetTotalTime();
+		ZEINT64						GetTotalAverageTime();
+		ZEINT64						GetTotalMaximumTime();
+
+		void						ResetFrame();
+		void						ResetTotal();	
+
+									ZEProfilerCounter();
+									~ZEProfilerCounter();
 };
+
 #endif
