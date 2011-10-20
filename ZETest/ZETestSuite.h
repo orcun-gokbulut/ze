@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZETestSuite.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,25 +30,51 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
+#ifndef __ZE_TEST_SUITE_H__
+#define __ZE_TEST_SUITE_H__
 
-project(Test)
-ze_set_project_folder("ZETest")
+class ZETestItem;
+enum ZETestResult;
 
-ze_add_source(ZETestMain.cpp		Source)
-ze_add_source(ZETest.cpp			Source)
-ze_add_source(ZETest.h				Source)
-ze_add_source(ZETestCheck.cpp		Source)
-ze_add_source(ZETestCheck.h			Source)
-ze_add_source(ZETestItem.cpp		Source)
-ze_add_source(ZETestItem.h			Source)
-ze_add_source(ZETestSuite.cpp		Source)
-ze_add_source(ZETestSuite.h			Source)
-ze_add_source(ZETestManager.cpp		Source)
-ze_add_source(ZETestManager.h		Source)
+class ZETestSuite
+{
+	private:
+		char				Name[255];
+		ZETestItem*				Tests[65536];
+		size_t				TestCount;
+		ZETestResult		Result;
 
-ze_add_library(ZETest SOURCES ${Source} LIBS libUnitTestCpp)
+	public:
+		const char*			GetName();
 
+		void				RegisterTest(ZETestItem* Test);
+
+		bool				RunTests();
+		void				Reset();
+		ZETestResult		GetResult();
+
+							ZETestSuite(const char* SuiteName);
+};
+
+class ZETestSuiteRegister
+{
+	public:
+		ZETestSuiteRegister(ZETestSuite* Suite);
+};
+
+#define ZETestSuiteAdd(Name)\
+	namespace ZETestSuite_##Name\
+	{\
+		ZETestSuite Suite(#Name);\
+		ZETestSuiteRegister Registerer(&Suite);\
+	}\
+	namespace ZETestSuite_##Name
+
+#endif
+
+#define ZETestSuiteEnd
+	

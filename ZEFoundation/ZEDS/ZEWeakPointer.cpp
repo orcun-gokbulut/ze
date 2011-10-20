@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEWeakPointer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,25 +30,7 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
-
-project(Test)
-ze_set_project_folder("ZETest")
-
-ze_add_source(ZETestMain.cpp		Source)
-ze_add_source(ZETest.cpp			Source)
-ze_add_source(ZETest.h				Source)
-ze_add_source(ZETestCheck.cpp		Source)
-ze_add_source(ZETestCheck.h			Source)
-ze_add_source(ZETestItem.cpp		Source)
-ze_add_source(ZETestItem.h			Source)
-ze_add_source(ZETestSuite.cpp		Source)
-ze_add_source(ZETestSuite.h			Source)
-ze_add_source(ZETestManager.cpp		Source)
-ze_add_source(ZETestManager.h		Source)
-
-ze_add_library(ZETest SOURCES ${Source} LIBS libUnitTestCpp)
-
+#include "ZEWeakPointer.h"

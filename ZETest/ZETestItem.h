@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZETestItem.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,25 +30,52 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
+#ifndef __ZE_TEST_ITEM_H__
+#define __ZE_TEST_ITEM_H__
 
-project(Test)
-ze_set_project_folder("ZETest")
+class ZETestSuite;
 
-ze_add_source(ZETestMain.cpp		Source)
-ze_add_source(ZETest.cpp			Source)
-ze_add_source(ZETest.h				Source)
-ze_add_source(ZETestCheck.cpp		Source)
-ze_add_source(ZETestCheck.h			Source)
-ze_add_source(ZETestItem.cpp		Source)
-ze_add_source(ZETestItem.h			Source)
-ze_add_source(ZETestSuite.cpp		Source)
-ze_add_source(ZETestSuite.h			Source)
-ze_add_source(ZETestManager.cpp		Source)
-ze_add_source(ZETestManager.h		Source)
+enum ZETestResult
+{
+	ZE_TR_NOT_RUN,
+	ZE_TR_PASSED,
+	ZE_TR_FAILED
+};
 
-ze_add_library(ZETest SOURCES ${Source} LIBS libUnitTestCpp)
+class ZETestItem
+{
+	private:
+		char					Name[256];
+		ZETestSuite*			Owner;
+		ZETestResult			Result;
 
+	protected:
+		void					ReportProblem(const char* Problem, const char* File, int Line);
+
+	public:
+		const char*				GetName();
+		ZETestSuite*			GetOwner();
+
+		virtual void			TestImpl() = 0;
+
+		bool					RunTest();
+		void					Reset();
+		ZETestResult			GetResult();
+
+								ZETestItem(const char* Name, ZETestSuite* Owner);
+};
+
+#define ZETestItemAdd(Name)\
+	class ZETest_##Name : public ZETestItem\
+	{\
+		public:\
+			virtual void TestImpl();\
+			ZETest_##Name(const char* Name1, ZETestSuite* Owner1) : ZETestItem(Name1, Owner1) {}\
+	} Test_##Name(#Name, &Suite);\
+	void ZETest_##Name::TestImpl()
+
+#endif

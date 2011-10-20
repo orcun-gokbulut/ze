@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZETestManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,25 +30,29 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
+#ifndef __ZE_TEST_MANAGER_H__
+#define __ZE_TEST_MANAGER_H__
 
-project(Test)
-ze_set_project_folder("ZETest")
+class ZETestSuite;
+class ZETestItem;
 
-ze_add_source(ZETestMain.cpp		Source)
-ze_add_source(ZETest.cpp			Source)
-ze_add_source(ZETest.h				Source)
-ze_add_source(ZETestCheck.cpp		Source)
-ze_add_source(ZETestCheck.h			Source)
-ze_add_source(ZETestItem.cpp		Source)
-ze_add_source(ZETestItem.h			Source)
-ze_add_source(ZETestSuite.cpp		Source)
-ze_add_source(ZETestSuite.h			Source)
-ze_add_source(ZETestManager.cpp		Source)
-ze_add_source(ZETestManager.h		Source)
+class ZETestManager
+{
+	private:
+		ZETestSuite*			TestSuites[65536];
+		size_t					TestSuiteCount;
 
-ze_add_library(ZETest SOURCES ${Source} LIBS libUnitTestCpp)
+	public:
+		void					RegisterTestSuite(ZETestSuite* Suite);
 
+		bool					RunTests();
+		void					ReportProblem(ZETestSuite* Suite, ZETestItem* Test, const char* Problem, const char* File, int Line);
+
+		static ZETestManager*	GetInstance();
+};
+
+#endif

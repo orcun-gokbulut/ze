@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZETestManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,25 +30,62 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZETestManager.h"
+#include "ZETestSuite.h"
+#include "ZETestItem.h"
 
-project(Test)
-ze_set_project_folder("ZETest")
+#include <stdio.h>
 
-ze_add_source(ZETestMain.cpp		Source)
-ze_add_source(ZETest.cpp			Source)
-ze_add_source(ZETest.h				Source)
-ze_add_source(ZETestCheck.cpp		Source)
-ze_add_source(ZETestCheck.h			Source)
-ze_add_source(ZETestItem.cpp		Source)
-ze_add_source(ZETestItem.h			Source)
-ze_add_source(ZETestSuite.cpp		Source)
-ze_add_source(ZETestSuite.h			Source)
-ze_add_source(ZETestManager.cpp		Source)
-ze_add_source(ZETestManager.h		Source)
+#ifndef NULL
+#define NULL 0
+#endif
 
-ze_add_library(ZETest SOURCES ${Source} LIBS libUnitTestCpp)
+void ZETestManager::RegisterTestSuite(ZETestSuite* Suite)
+{
+	TestSuites[TestSuiteCount] = Suite;
+	TestSuiteCount++;
+}
 
+bool ZETestManager::RunTests()
+{
+	printf("ZETest running tests. \r\n");
+	bool Result = true;
+	for (size_t I = 0; I < TestSuiteCount; I++)
+	{
+		printf("  Test Suite #%d - %s.\n", I, TestSuites[I]->GetName());
+		if (!TestSuites[I]->RunTests())
+		{
+			Result = false;
+			printf("  PASSED.\n", I);
+		}
+		else
+		{
+			printf("  FAILED.\n", I);
+		}
+	}
+
+	if (Result)
+		printf("All of the tests has PASSED. \r\n");
+	else
+		printf("Some or all of the tests has FAILED. \r\n");
+
+
+	return Result;
+}
+
+void ZETestManager::ReportProblem(ZETestSuite* Suite, ZETestItem* Test, const char* Problem, const char* File, int Line)
+{
+	printf("    %s(%d) : error T0001: Test %s::%s failed. %s \r\n", File, Line, Suite->GetName(), Test->GetName(), Problem);
+}
+
+ZETestManager* ZETestManager::GetInstance()
+{
+	static ZETestManager* Instance = NULL;
+	if (Instance == NULL)
+		Instance = new ZETestManager();
+
+	return Instance;
+}

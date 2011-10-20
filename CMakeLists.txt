@@ -182,6 +182,7 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/Source
 	${CMAKE_SOURCE_DIR}/ZEFoundation
 	${CMAKE_SOURCE_DIR}/ZEToolSDK
+	${CMAKE_SOURCE_DIR}/ZETest
 	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM}
 	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM}/DirectX
 	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM}/PhysX2/Cooking 
@@ -192,9 +193,10 @@ include_directories(
 	
 link_directories(
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}
-	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)
-	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/vrpn
-	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/Bullet
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Release
+	#${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)
+	#${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/vrpn
+	#${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/Bullet
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/DirectX
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/PhysX2
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/PhysX3

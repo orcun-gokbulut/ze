@@ -45,7 +45,6 @@
 #include "ZEMath/ZEOBBox.h"
 #include <math.h>
 
-
 SUITE(ZEBSphere)
 {
 	TEST(BS_Constructor)

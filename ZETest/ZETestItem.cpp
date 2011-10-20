@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZETestItem.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,25 +30,75 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZETestItem.h"
+#include "ZETestSuite.h"
+#include "ZETestManager.h"
 
-project(Test)
-ze_set_project_folder("ZETest")
+#ifdef __COVERAGESCANNER__ 
+#include <stdio.h>
+#endif
 
-ze_add_source(ZETestMain.cpp		Source)
-ze_add_source(ZETest.cpp			Source)
-ze_add_source(ZETest.h				Source)
-ze_add_source(ZETestCheck.cpp		Source)
-ze_add_source(ZETestCheck.h			Source)
-ze_add_source(ZETestItem.cpp		Source)
-ze_add_source(ZETestItem.h			Source)
-ze_add_source(ZETestSuite.cpp		Source)
-ze_add_source(ZETestSuite.h			Source)
-ze_add_source(ZETestManager.cpp		Source)
-ze_add_source(ZETestManager.h		Source)
+#include <string.h>
 
-ze_add_library(ZETest SOURCES ${Source} LIBS libUnitTestCpp)
+void ZETestItem::ReportProblem(const char* Problem, const char* File, int Line)
+{
+	Result = ZE_TR_FAILED;
+	ZETestManager::GetInstance()->ReportProblem(Owner, this, Problem, File, Line);
+}
 
+const char* ZETestItem::GetName()
+{
+	return Name;
+}
+
+ZETestSuite* ZETestItem::GetOwner()
+{
+	return Owner;
+}
+
+ZETestResult ZETestItem::GetResult()
+{
+	return Result;
+}
+
+void ZETestItem::Reset()
+{
+	Result = ZE_TR_NOT_RUN;
+}
+
+bool ZETestItem::RunTest()
+{
+	#ifdef __COVERAGESCANNER__ 
+	char Buffer[1024];
+	sprintf(Buffer, "%s::%s", Owner->GetName(), GetName());
+	__coveragescanner_testname(Buffer);
+	#endif
+
+	try
+	{
+		TestImpl();
+		if (Result == ZE_TR_NOT_RUN)
+			Result = ZE_TR_PASSED;
+		
+		#ifdef __COVERAGESCANNER__  
+		__coveragescanner_teststate(Result == ZE_TR_PASSED ? "PASSED" : "FAILED");
+		#endif
+		return (Result == ZE_TR_PASSED ? true : false);
+	}
+	catch (...)
+	{
+		Result = ZE_TR_FAILED;
+		return false;
+	}
+}
+
+ZETestItem::ZETestItem(const char* Name, ZETestSuite* Owner)
+{
+	strncpy(this->Name, Name, 255);
+	this->Owner = Owner;
+	Owner->RegisterTest(this);
+	this->Result = ZE_TR_NOT_RUN;
+}

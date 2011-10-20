@@ -33,7 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
- 
 #include "ZEDS/ZEString.h"
 
 #include <UnitTestCpp/UnitTest++.h>

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZETestSuite.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,25 +30,71 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZETestSuite.h"
+#include "ZETestItem.h"
+#include "ZETestManager.h"
 
-project(Test)
-ze_set_project_folder("ZETest")
+#include <string.h>
+#include <stdio.h>
 
-ze_add_source(ZETestMain.cpp		Source)
-ze_add_source(ZETest.cpp			Source)
-ze_add_source(ZETest.h				Source)
-ze_add_source(ZETestCheck.cpp		Source)
-ze_add_source(ZETestCheck.h			Source)
-ze_add_source(ZETestItem.cpp		Source)
-ze_add_source(ZETestItem.h			Source)
-ze_add_source(ZETestSuite.cpp		Source)
-ze_add_source(ZETestSuite.h			Source)
-ze_add_source(ZETestManager.cpp		Source)
-ze_add_source(ZETestManager.h		Source)
+const char* ZETestSuite::GetName()
+{
+	return Name;
+}
 
-ze_add_library(ZETest SOURCES ${Source} LIBS libUnitTestCpp)
+void ZETestSuite::RegisterTest(ZETestItem* Test)
+{
+	Tests[TestCount] = Test;
+	TestCount++;
+}
 
+bool ZETestSuite::RunTests()
+{
+	Reset();
+
+	bool CurrentResult = true;
+	for (size_t I = 0; I < TestCount; I++)
+	{
+		printf("    Test #%d - %s.\n", I, Tests[I]->GetName());
+
+		if (!Tests[I]->RunTest())
+		{
+			printf("    FAILED. \n", I, Tests[I]->GetName());
+			CurrentResult = false;
+		}
+		else
+		{
+			printf("    PASSED. \n", I, Tests[I]->GetName());
+		}
+	}
+
+	Result = CurrentResult ? ZE_TR_PASSED : ZE_TR_FAILED;
+
+	return CurrentResult;
+}
+
+void ZETestSuite::Reset()
+{
+	Result = ZE_TR_NOT_RUN;
+	for (size_t I = 0; I < TestCount; I++)
+		Tests[I]->Reset();
+}
+
+ZETestResult ZETestSuite::GetResult()
+{
+	return Result;
+}
+
+ZETestSuite::ZETestSuite(const char* Name)
+{
+	Result = ZE_TR_NOT_RUN;
+	strncpy(this->Name, Name, 255);
+}
+
+ZETestSuiteRegister::ZETestSuiteRegister(ZETestSuite* Suite)
+{
+	ZETestManager::GetInstance()->RegisterTestSuite(Suite);
+}

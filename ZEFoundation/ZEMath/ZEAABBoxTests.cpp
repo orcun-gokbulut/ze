@@ -475,8 +475,5 @@ SUITE(ZEAABBox)
 	{
 		//No function
 	}
-
-
-
 }
 

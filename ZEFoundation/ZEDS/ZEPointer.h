@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEPointer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,25 +30,108 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
+#ifndef __ZE_POINTER_H__
+#define __ZE_POINTER_H__
 
-project(Test)
-ze_set_project_folder("ZETest")
+#include "ZEError.h"
+template<typename Type>
+class ZEPointer
+{
+	private:
+		Type* Pointer;
 
-ze_add_source(ZETestMain.cpp		Source)
-ze_add_source(ZETest.cpp			Source)
-ze_add_source(ZETest.h				Source)
-ze_add_source(ZETestCheck.cpp		Source)
-ze_add_source(ZETestCheck.h			Source)
-ze_add_source(ZETestItem.cpp		Source)
-ze_add_source(ZETestItem.h			Source)
-ze_add_source(ZETestSuite.cpp		Source)
-ze_add_source(ZETestSuite.h			Source)
-ze_add_source(ZETestManager.cpp		Source)
-ze_add_source(ZETestManager.h		Source)
+	public:
+		void Create(Type* RawPointer)
+		{
+			if (RawPointer == Pointer)
+				return;
 
-ze_add_library(ZETest SOURCES ${Source} LIBS libUnitTestCpp)
+			Release();
 
+			if (RawPointer == NULL)
+				return;
+
+			Pointer = RawPointer;
+		}
+
+		void Copy(ZEPointer<Type>& OtherPointer)
+		{
+			if (OtherPointer.Pointer == NULL)
+				Release();
+			else
+			{
+				Pointer = OtherPointer.Pointer;
+				OtherPointer.Pointer = NULL;
+			}
+		}
+
+		bool IsNull() const
+		{
+			return Pointer == NULL;
+		}
+
+		void Release()
+		{
+			if (Pointer != NULL)
+				delete Pointer;
+
+			Pointer = NULL;
+		}
+
+		Type* GetPointer() const
+		{
+			return Pointer;
+		}
+
+		Type& operator*()
+		{
+			zeAssert(Pointer == NULL, "ZEPointer does not points any data structure.");
+			return *Pointer;
+		}
+
+		Type* operator->()
+		{
+			zeAssert(Pointer == NULL, "ZEPointer does not points any data structure.");
+			return Pointer;
+		}
+
+		ZEPointer<Type>& operator=(Type* RawPointer)
+		{
+			Create(RawPointer);
+			return *this;
+		}
+
+		ZEPointer<Type>& operator=(ZEPointer<Type>& OtherPointer)
+		{
+			Copy(OtherPointer);
+			return *this;
+		}
+
+		ZEPointer()
+		{
+			Pointer = NULL;
+		}
+
+		ZEPointer(Type* RawPointer)
+		{
+			Pointer = NULL;
+			Create(RawPointer);
+		}
+
+		explicit ZEPointer(ZEPointer<Type>& OtherPointer)
+		{
+			Pointer = NULL;
+			Copy(OtherPointer);
+		}
+
+		~ZEPointer()
+		{
+			Release();
+		}
+};
+
+#endif
