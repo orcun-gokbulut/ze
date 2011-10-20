@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <UnitTestCpp/UnitTest++.h>
+#include "ZETest.h"
 #include <d3dx9.h>
 #include <math.h>
 #include "ZEMathIOStreamMapping.h"
@@ -42,51 +42,51 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMathDefinitions.h"
 
-SUITE(Quaternion)
+ZETestSuiteAdd(Quaternion)
 {
-	TEST(QTRN_Constructor)
+	ZETestItemAdd(QTRN_Constructor)
 	{
 
 	}
-	TEST(QTRN_Create1)
+	ZETestItemAdd(QTRN_Create1)
 	{
 		ZEQuaternion Q;
 		ZEQuaternion::Create(Q, 1.0f, 2.0f, 3.0f, 4.0f);
-		CHECK_EQUAL(Q, ZEQuaternion(1.0f, 2.0f, 3.0f, 4.0f));
+		ZETestCheckEqual(Q, ZEQuaternion(1.0f, 2.0f, 3.0f, 4.0f));
 	}
 
-	TEST(QTRN_Create2)
+	ZETestItemAdd(QTRN_Create2)
 	{
 		ZEQuaternion Q;
 		ZEQuaternion::Create(Q, ZE_PI, ZEVector3(1.0f, 2.0f, 3.0));
-		CHECK_EQUAL(Q, ZEQuaternion(cos(ZE_PI_2), 1.0f, 2.0f, 3.0f));
+		ZETestCheckEqual(Q, ZEQuaternion(cos(ZE_PI_2), 1.0f, 2.0f, 3.0f));
 	}
 
-	TEST(QTRN_Create3)
+	ZETestItemAdd(QTRN_Create3)
 	{
 		ZEQuaternion Q;
 		ZEQuaternion::CreateFromEuler(Q, ZE_PI, ZE_PI_2, ZE_PI_2);
-		CHECK_EQUAL(Q, ZEQuaternion(0.49999997f, 0.49999997f, -0.5f, -0.5f));
+		ZETestCheckEqual(Q, ZEQuaternion(0.49999997f, 0.49999997f, -0.5f, -0.5f));
 	}
 
-	TEST(QTRN_CreateIdentity)
+	ZETestItemAdd(QTRN_CreateIdentity)
 	{
 		ZEQuaternion Q;
 		ZEQuaternion::CreateIdentity(Q);
-		CHECK_EQUAL(Q, ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
+		ZETestCheckEqual(Q, ZEQuaternion(1.0f, 0.0f, 0.0f, 0.0f));
 	}
 
-	TEST(QTRN_Product)
+	ZETestItemAdd(QTRN_Product)
 	{
 		ZEQuaternion Q;
 		ZEQuaternion A(3.0f, 5.0f, 8.0f, 11.0f);
 		ZEQuaternion B(1.0f, 1.0f, 2.0f,  3.0f);
 		ZEQuaternion::Product(Q, A, B);
 
-		CHECK_EQUAL(Q, ZEQuaternion(-51.0f, 10.0f, 10.0f, 22.0f));
+		ZETestCheckEqual(Q, ZEQuaternion(-51.0f, 10.0f, 10.0f, 22.0f));
 	}
 
-	TEST(QTRN_VectorProduct)
+	ZETestItemAdd(QTRN_VectorProduct)
 	{
 		ZEVector3 Q;
 		ZEQuaternion A(1.0f, 2.0f, 3.0f, 4.0f);
@@ -94,33 +94,33 @@ SUITE(Quaternion)
 		ZEQuaternion::VectorProduct(Q, A, V);
 	}
 
-	TEST(QTRN_ConvertToEulerAngles)
+	ZETestItemAdd(QTRN_ConvertToEulerAngles)
 	{
 		float yaw, pitch, roll;
 		ZEQuaternion Q(0.5f, 0.5f, 0.5f, 0.5f);
 		ZEQuaternion::ConvertToEulerAngles(yaw, pitch, roll, Q);
 		
 
-     	CHECK_EQUAL(yaw, ZE_PI_2);
-		CHECK_EQUAL(pitch, ZE_PI_2);
-		CHECK_EQUAL(roll, 0.0f);
+     	ZETestCheckEqual(yaw, ZE_PI_2);
+		ZETestCheckEqual(pitch, ZE_PI_2);
+		ZETestCheckEqual(roll, 0.0f);
 	}
 
-	TEST(QTRN_Conjugate1)
+	ZETestItemAdd(QTRN_Conjugate1)
 	{
 		ZEQuaternion C, Q(1.0f, 2.0f, 3.0f, 4.0f);
 		ZEQuaternion::Conjugate(C, Q);
-		CHECK_EQUAL(C, ZEQuaternion(1.0f, -2.0f, -3.0f, -4.0f));
+		ZETestCheckEqual(C, ZEQuaternion(1.0f, -2.0f, -3.0f, -4.0f));
 	}
 
-	TEST(QTRN_Conjugate2)
+	ZETestItemAdd(QTRN_Conjugate2)
 	{
 		ZEQuaternion A, C(1.0f, 2.0f, 3.0f, 4.0f);
 		A = C.Conjugate();
-		CHECK_EQUAL(A, ZEQuaternion(1.0f, -2.0f, -3.0f, -4.0f));
+		ZETestCheckEqual(A, ZEQuaternion(1.0f, -2.0f, -3.0f, -4.0f));
 	}
 	
-	TEST(QTRN_Slerp)
+	ZETestItemAdd(QTRN_Slerp)
 	{
 		ZEQuaternion P(0.1f, 0.2f, 0.3f, 0.4f);
 		ZEQuaternion Q(0.1f, 0.0f, 0.0f, 0.3f);
@@ -128,7 +128,7 @@ SUITE(Quaternion)
 		float t = 0.3;
 		ZEQuaternion::Slerp(QOut, P, Q, t);
 
-		CHECK_EQUAL(QOut, ZEQuaternion(0.12755547f, 0.17063320f, 0.25594980f, 0.46798304f));
+		ZETestCheckEqual(QOut, ZEQuaternion(0.12755547f, 0.17063320f, 0.25594980f, 0.46798304f));
 
 		ZEQuaternion A(0.3f, 0.0f, 0.0f, 0.0f);
 		ZEQuaternion B(0.1f, 0.1f, 0.0f, 0.3f);
@@ -136,37 +136,37 @@ SUITE(Quaternion)
 		ZEQuaternion QOut2;
 		ZEQuaternion::Slerp(QOut2, A, B, t);
 
-		CHECK_EQUAL(QOut2, ZEQuaternion(0.30911696f, 0.044615276f, 0.0f, 0.13384584f));
+		ZETestCheckEqual(QOut2, ZEQuaternion(0.30911696f, 0.044615276f, 0.0f, 0.13384584f));
 	}
 
-	TEST(QTRN_ConvertToRotationMatrix)
+	ZETestItemAdd(QTRN_ConvertToRotationMatrix)
 	{
 		ZEQuaternion A(0.5f, 0.5f, 0.5f, 0.5f);
 		ZEMatrix4x4 M;
 		ZEQuaternion::ConvertToRotationMatrix(M, A);
 		
-		CHECK_EQUAL(M, ZEMatrix4x4( 0.0f, 1.0f,  0.0f, 0.0f, 
+		ZETestCheckEqual(M, ZEMatrix4x4( 0.0f, 1.0f,  0.0f, 0.0f, 
 								    0.0f, 0.0f,  1.0f, 0.0f, 
 								    1.0f, 0.0f,  0.0f, 0.0f, 
 								    0.0f, 0.0f,  0.0f, 1.0f));
 	}
 	
-	TEST(QTRN_Normalize1)
+	ZETestItemAdd(QTRN_Normalize1)
 	{
 		ZEQuaternion A, Q(0.1f, 0.2f, 0.3f, 0.4f);
 		A = Q.Normalize();
 
-		CHECK_EQUAL(A, ZEQuaternion(0.1f/sqrt(0.3f), 0.2f/sqrt(0.3f), 0.3f/sqrt(0.3f), 0.4f/sqrt(0.3f)));
+		ZETestCheckEqual(A, ZEQuaternion(0.1f/sqrt(0.3f), 0.2f/sqrt(0.3f), 0.3f/sqrt(0.3f), 0.4f/sqrt(0.3f)));
 
 	}
 
-	TEST(QTRN_Normalize2)
+	ZETestItemAdd(QTRN_Normalize2)
 	{
 		ZEQuaternion P;
 		ZEQuaternion Q(0.1f, 0.2f, 0.3f, 0.4f);
 		ZEQuaternion::Normalize(P, Q);
 
-		CHECK_EQUAL(P, ZEQuaternion(0.1f/sqrt(0.3f), 0.2f/sqrt(0.3f), 0.3f/sqrt(0.3f), 0.4f/sqrt(0.3f)));
+		ZETestCheckEqual(P, ZEQuaternion(0.1f/sqrt(0.3f), 0.2f/sqrt(0.3f), 0.3f/sqrt(0.3f), 0.4f/sqrt(0.3f)));
 	}
 
  }

@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "UnitTestCpp/UnitTest++.h"
+#include "ZETest.h"
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEPlane.h"
@@ -46,9 +46,9 @@
 #include "ZEMath/ZEOBBox.h"
 #include <math.h>
 
-SUITE(ZEOBBox)
+ZETestSuiteAdd(ZEOBBox)
 {
-	TEST(OBB_Constructor)
+	ZETestItemAdd(OBB_Constructor)
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		ZEVector3 U(1.0f, 0.0f, 0.0f);
@@ -57,19 +57,19 @@ SUITE(ZEOBBox)
 
 		ZEOBBox OBB(Position, U, V, N, ZEVector3(0.5f, 0.5f, 0.5f));
 
-		CHECK_EQUAL(OBB.Center, ZEVector3(1.0f, 2.0f, 3.0f));
-		CHECK_EQUAL(OBB.Right, ZEVector3(1.0f, 0.0f, 0.0f));
-		CHECK_EQUAL(OBB.Up, ZEVector3(0.0f, 1.0f, 0.0f));
-		CHECK_EQUAL(OBB.Front, ZEVector3(0.0f, 0.0f, 1.0f));
+		ZETestCheckEqual(OBB.Center, ZEVector3(1.0f, 2.0f, 3.0f));
+		ZETestCheckEqual(OBB.Right, ZEVector3(1.0f, 0.0f, 0.0f));
+		ZETestCheckEqual(OBB.Up, ZEVector3(0.0f, 1.0f, 0.0f));
+		ZETestCheckEqual(OBB.Front, ZEVector3(0.0f, 0.0f, 1.0f));
 
 	}
 
-	TEST(OBB_GetCenter)
+	ZETestItemAdd(OBB_GetCenter)
 	{
 		//No funtion
 	}
 
-	TEST(OBB_GetVertex)
+	ZETestItemAdd(OBB_GetVertex)
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		ZEVector3 U(1.0f, 0.0f, 0.0f);
@@ -87,17 +87,17 @@ SUITE(ZEOBBox)
 		ZEVector3 V6 = OBB.GetVertex(6);
 		ZEVector3 V7 = OBB.GetVertex(7);
 
-		CHECK_EQUAL(V0, ZEVector3(1.0f, 2.0f, 3.0f));
-		CHECK_EQUAL(V1, ZEVector3(2.0f, 2.0f, 3.0f));
-		CHECK_EQUAL(V2, ZEVector3(1.0f, 3.0f, 3.0f));
-		CHECK_EQUAL(V3, ZEVector3(2.0f, 3.0f, 3.0f));
-		CHECK_EQUAL(V4, ZEVector3(1.0f, 2.0f, 4.0f));
-		CHECK_EQUAL(V5, ZEVector3(2.0f, 2.0f, 4.0f));
-		CHECK_EQUAL(V6, ZEVector3(1.0f, 3.0f, 4.0f));
-		CHECK_EQUAL(V7, ZEVector3(2.0f, 3.0f, 4.0f));
+		ZETestCheckEqual(V0, ZEVector3(1.0f, 2.0f, 3.0f));
+		ZETestCheckEqual(V1, ZEVector3(2.0f, 2.0f, 3.0f));
+		ZETestCheckEqual(V2, ZEVector3(1.0f, 3.0f, 3.0f));
+		ZETestCheckEqual(V3, ZEVector3(2.0f, 3.0f, 3.0f));
+		ZETestCheckEqual(V4, ZEVector3(1.0f, 2.0f, 4.0f));
+		ZETestCheckEqual(V5, ZEVector3(2.0f, 2.0f, 4.0f));
+		ZETestCheckEqual(V6, ZEVector3(1.0f, 3.0f, 4.0f));
+		ZETestCheckEqual(V7, ZEVector3(2.0f, 3.0f, 4.0f));
 	}
 
-	TEST(OBB_PlaneHalfSpaceTest)
+	ZETestItemAdd(OBB_PlaneHalfSpaceTest)
 	{
 		
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
@@ -113,7 +113,7 @@ SUITE(ZEOBBox)
 
 		ZEHalfSpace result1 = ZEOBBox::IntersectionTest(OBB, P1);
 
-		CHECK_EQUAL(result1,-1);
+		ZETestCheckEqual(result1,-1);
 
 		ZEVector3 n2(1.0f, 2.0f, 3.0f);
 		ZEVector3 p2(0.0f, -6.0f, 0.0f);
@@ -121,7 +121,7 @@ SUITE(ZEOBBox)
 
 		ZEHalfSpace result2 = ZEOBBox::IntersectionTest(OBB, P2);
 
-		CHECK_EQUAL(result2, 1);
+		ZETestCheckEqual(result2, 1);
 
 		
 		ZEVector3 n3(1.0f, 0.0f, 0.0f);
@@ -130,7 +130,7 @@ SUITE(ZEOBBox)
 
 		ZEHalfSpace result3 = ZEOBBox::IntersectionTest(OBB, P3);
 
-		CHECK_EQUAL(result3, 1);
+		ZETestCheckEqual(result3, 1);
 
 		ZEVector3 n4(0.0f, 0.0f, 1.0f);
 		ZEVector3 p4(-200.0f, -1000.0f, -100.0f);
@@ -139,10 +139,10 @@ SUITE(ZEOBBox)
 
 		ZEHalfSpace result4 = ZEOBBox::IntersectionTest(OBB, P4);
 
-		CHECK_EQUAL(result4, 1);
+		ZETestCheckEqual(result4, 1);
 	}
 
-	TEST(OBB_IntersectionTest1)
+	ZETestItemAdd(OBB_IntersectionTest1)
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		ZEVector3 U(1.0f, 0.0f, 0.0f);
@@ -154,31 +154,31 @@ SUITE(ZEOBBox)
 		
 		bool result = ZEOBBox::IntersectionTest(OBB, ZEVector3(1.0f, 2.0f, 3.0f));
 
-		CHECK_EQUAL(result, true);
+		ZETestCheckEqual(result, true);
 
 		ZEVector3 P(-1.0f, -2.0f, -3.0f);
 
 		bool result2 = ZEOBBox::IntersectionTest(OBB, P);
 
-		CHECK_EQUAL(result2, false);
+		ZETestCheckEqual(result2, false);
 
 		bool result3 = ZEOBBox::IntersectionTest(OBB, ZEVector3(1.5f, 2.5f, 3.5f));
 
-		CHECK_EQUAL(result3, true);
+		ZETestCheckEqual(result3, true);
 
 	}
 
-	TEST(OBB_IntersectionTest2)
+	ZETestItemAdd(OBB_IntersectionTest2)
 	{
 	
 	}
 
-	TEST(OBB_IntersectionTest3)
+	ZETestItemAdd(OBB_IntersectionTest3)
 	{
 	
 	}
 
-	TEST(OBB_IntersectionTest4)
+	ZETestItemAdd(OBB_IntersectionTest4)
 	{
 
 	}

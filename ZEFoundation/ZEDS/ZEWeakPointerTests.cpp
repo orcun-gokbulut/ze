@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <UnitTestCpp/UnitTest++.h>
+#include "ZETest.h"
 #include "ZEWeakPointer.h"
 
 enum ZETestClassStatus
@@ -69,7 +69,7 @@ class ZETestClass
 };
 
 
-SUITE(ZEWeakPointerTest)
+ZETestSuiteAdd(ZEWeakPointerTest)
 {
 
 }

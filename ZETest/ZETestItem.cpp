@@ -74,6 +74,7 @@ bool ZETestItem::RunTest()
 	#ifdef __COVERAGESCANNER__ 
 	char Buffer[1024];
 	sprintf(Buffer, "%s::%s", Owner->GetName(), GetName());
+	__coveragescanner_clear();
 	__coveragescanner_testname(Buffer);
 	#endif
 
@@ -85,6 +86,8 @@ bool ZETestItem::RunTest()
 		
 		#ifdef __COVERAGESCANNER__  
 		__coveragescanner_teststate(Result == ZE_TR_PASSED ? "PASSED" : "FAILED");
+		__coveragescanner_save();
+		__coveragescanner_testname("");
 		#endif
 		return (Result == ZE_TR_PASSED ? true : false);
 	}

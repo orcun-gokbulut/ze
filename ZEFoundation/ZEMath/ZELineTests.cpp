@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <UnitTestCpp/UnitTest++.h>
+#include "ZETest.h"
 #include <d3dx9.h>
 #include <math.h>
 #include "ZEMathIOStreamMapping.h"
@@ -41,38 +41,38 @@
 #include "ZEMath/ZELine.h"
 #include "ZEMath/ZEMathDefinitions.h"
 
-SUITE(ZELine)
+ZETestSuiteAdd(ZELine)
 {
-	TEST(LN_Constructor)
+	ZETestItemAdd(LN_Constructor)
 	{
 		ZEVector3 P0(0.0f, 1.0f, 0.0f);
 		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZELine L(P0, P1);
-		CHECK_EQUAL(L.p, P0);
-		CHECK_EQUAL(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
+		ZETestCheckEqual(L.p, P0);
+		ZETestCheckEqual(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
 	}
 
-	TEST(LN_Create)
+	ZETestItemAdd(LN_Create)
 	{
 		ZELine L;
 		ZEVector3 P0(0.0f, 1.0f, 0.0f);
 		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZELine::Create(L, P0, P1);
-		CHECK_EQUAL(L.p, P0);
-		CHECK_EQUAL(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
+		ZETestCheckEqual(L.p, P0);
+		ZETestCheckEqual(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
 	}
 
-	TEST(LN_CreateParamatric)
+	ZETestItemAdd(LN_CreateParamatric)
 	{
 		ZELine L;
 		ZEVector3 V(1.0, 4.0f, 9.0f);
 		ZEVector3 P (1.0, 0.0f, 0.0f);
 		ZELine::CreateParametric(L, V, P);
-		CHECK_EQUAL(L.p, P);
-		CHECK_EQUAL(L.v, V);
+		ZETestCheckEqual(L.p, P);
+		ZETestCheckEqual(L.v, V);
 	}
 
-	TEST(LN_MinimumDistance1)
+	ZETestItemAdd(LN_MinimumDistance1)
 	{
 		ZEVector3 P1(0,3,0);
 		ZEVector3 P2(1,4,-1);
@@ -84,10 +84,10 @@ SUITE(ZELine)
 		
 		float d = ZELine::MinimumDistance(L1, L2);
 
-		CHECK_EQUAL(d, sqrtf(14.0f));
+		ZETestCheckEqual(d, sqrtf(14.0f));
 	}
 
-	TEST(LN_MinimumDistance2)
+	ZETestItemAdd(LN_MinimumDistance2)
 	{
 		ZEVector3 P1(0,3,0);
 		ZEVector3 P2(1,4,-1);
@@ -100,10 +100,10 @@ SUITE(ZELine)
 		float tA, tB;
 		float d = ZELine::MinimumDistance(L1, L2, tA, tB);
 
-		CHECK_EQUAL(d, sqrtf(14.0f));
+		ZETestCheckEqual(d, sqrtf(14.0f));
 	}
 
-	TEST(LN_DistanceToPoint)
+	ZETestItemAdd(LN_DistanceToPoint)
 	{
 		ZEVector3 P(5,8,2);
 		ZEVector3 P1(0,3,0);
@@ -114,10 +114,10 @@ SUITE(ZELine)
 
 		d = ZELine::MinimumDistance(L,P,t);
 
-		CHECK_CLOSE(d, 4.61880215, 0.000001);
+		ZETestCheckClose(d, 4.61880215, 0.000001);
 	}
 
-	TEST(LN_GetPointOn)
+	ZETestItemAdd(LN_GetPointOn)
 	{
 		ZEVector3 P1(0,3,0);
 		ZEVector3 P2(1,4,-1);
@@ -133,6 +133,6 @@ SUITE(ZELine)
 		ZEVector3::Add(P,P,L.p);
 		B = P;
 
-		CHECK_EQUAL(A, B);
+		ZETestCheckEqual(A, B);
 	}
 }

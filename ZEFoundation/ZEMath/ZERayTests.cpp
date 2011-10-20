@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <UnitTestCpp/UnitTest++.h>
+#include "ZETest.h"
 #include <d3dx9.h>
 #include <math.h>
 
@@ -42,40 +42,40 @@
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEMathDefinitions.h"
 
-SUITE(ZERay)
+ZETestSuiteAdd(ZERay)
 {
-	TEST(Constructor)
+	ZETestItemAdd(Constructor)
 	{
 		ZEVector3 P0(0.0f, 1.0f, 0.0f);
 		ZEVector3 V(1.0f, 2.0f, 3.0f);
 		ZERay R(V, P0);
 
-		CHECK_EQUAL(R.p, P0);
-		CHECK_EQUAL(R.v, V);
+		ZETestCheckEqual(R.p, P0);
+		ZETestCheckEqual(R.v, V);
 	}
 	
-	TEST(Create)
+	ZETestItemAdd(Create)
 	{
 		ZERay R;
 		ZEVector3 P0(0.0f, 1.0f, 0.0f);
 		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZERay::Create(R, P0, P1);
 
-		CHECK_EQUAL(R.p, P0);
-		CHECK_EQUAL(R.v, ZEVector3(1.0f, 1.0f, 3.0f));
+		ZETestCheckEqual(R.p, P0);
+		ZETestCheckEqual(R.v, ZEVector3(1.0f, 1.0f, 3.0f));
 	}
 
-	TEST(CreateParametric)
+	ZETestItemAdd(CreateParametric)
 	{
 		ZERay R;
 		ZEVector3 V(1.0, 4.0f, 9.0f);
 		ZEVector3 P (1.0, 0.0f, 0.0f);
 		ZERay::CreateParametric(R, V, P);
-		CHECK_EQUAL(R.p, P);
-		CHECK_EQUAL(R.v, V);
+		ZETestCheckEqual(R.p, P);
+		ZETestCheckEqual(R.v, V);
 	}
 
-	TEST(GetPointOn)
+	ZETestItemAdd(GetPointOn)
 	{
 		ZEVector3 P0(0,3,0);
 		ZEVector3 V(1,4,-1);
@@ -91,10 +91,10 @@ SUITE(ZERay)
 		ZEVector3::Add(P,P,L.p);
 		B = P;
 
-		CHECK_EQUAL(A, B);
+		ZETestCheckEqual(A, B);
 	}
 
-	TEST(DistanceToPoint)
+	ZETestItemAdd(DistanceToPoint)
 	{
 		ZEVector3 P(5,8,2);
 		ZEVector3 P1(0,3,0);
@@ -105,6 +105,6 @@ SUITE(ZERay)
 
 		d = ZELine::MinimumDistance(L,P,t);
 
-		CHECK_CLOSE(d, 4.61880215, 0.000001);
+		ZETestCheckClose(d, 4.61880215, 0.000001);
 	}
 }

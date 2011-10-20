@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "UnitTestCpp/UnitTest++.h"
+#include "ZETest.h"
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEVector.h"
@@ -46,19 +46,19 @@
 #include <math.h>
 
 
-SUITE(ZEAABBox)
+ZETestSuiteAdd(ZEAABBox)
 {
-	TEST(AABB_Contructor)
+	ZETestItemAdd(AABB_Contructor)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
 		ZEAABBox AABB(Min, Max);
 
-		CHECK_EQUAL(AABB.Max, ZEVector3(1.0f, 2.0f, 3.0f));
-		CHECK_EQUAL(AABB.Min, ZEVector3(-1.0f, -2.0f, -3.0f));
+		ZETestCheckEqual(AABB.Max, ZEVector3(1.0f, 2.0f, 3.0f));
+		ZETestCheckEqual(AABB.Min, ZEVector3(-1.0f, -2.0f, -3.0f));
 	}
 
-	TEST(AABB_GetCenter)
+	ZETestItemAdd(AABB_GetCenter)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
@@ -66,10 +66,10 @@ SUITE(ZEAABBox)
 
 		ZEVector3 Center = AABB.GetCenter();
 
-		CHECK_EQUAL(Center, ZEVector3(0.0f, 0.0f, 0.0f));
+		ZETestCheckEqual(Center, ZEVector3(0.0f, 0.0f, 0.0f));
 	}
 
-	TEST(AABB_GetVertex)
+	ZETestItemAdd(AABB_GetVertex)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
@@ -83,17 +83,17 @@ SUITE(ZEAABBox)
 		ZEVector3 Vertex7  = AABB.GetVertex(6);
 		ZEVector3 Vertex8  = AABB.GetVertex(7);
 
-		CHECK_EQUAL(Vertex1, ZEVector3(-1.0f, -2.0f, -3.0f));
-		CHECK_EQUAL(Vertex2, ZEVector3(-1.0f, -2.0f,  3.0f));
-		CHECK_EQUAL(Vertex3, ZEVector3(-1.0f,  2.0f, -3.0f));
-		CHECK_EQUAL(Vertex4, ZEVector3(-1.0f,  2.0f,  3.0f));
-		CHECK_EQUAL(Vertex5, ZEVector3( 1.0f, -2.0f, -3.0f));
-		CHECK_EQUAL(Vertex6, ZEVector3( 1.0f, -2.0f,  3.0f));
-		CHECK_EQUAL(Vertex7, ZEVector3( 1.0f,  2.0f, -3.0f));
-		CHECK_EQUAL(Vertex8, ZEVector3( 1.0f,  2.0f,  3.0f));
+		ZETestCheckEqual(Vertex1, ZEVector3(-1.0f, -2.0f, -3.0f));
+		ZETestCheckEqual(Vertex2, ZEVector3(-1.0f, -2.0f,  3.0f));
+		ZETestCheckEqual(Vertex3, ZEVector3(-1.0f,  2.0f, -3.0f));
+		ZETestCheckEqual(Vertex4, ZEVector3(-1.0f,  2.0f,  3.0f));
+		ZETestCheckEqual(Vertex5, ZEVector3( 1.0f, -2.0f, -3.0f));
+		ZETestCheckEqual(Vertex6, ZEVector3( 1.0f, -2.0f,  3.0f));
+		ZETestCheckEqual(Vertex7, ZEVector3( 1.0f,  2.0f, -3.0f));
+		ZETestCheckEqual(Vertex8, ZEVector3( 1.0f,  2.0f,  3.0f));
 	}
 
-	TEST(AABB_GetLength)
+	ZETestItemAdd(AABB_GetLength)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
@@ -101,10 +101,10 @@ SUITE(ZEAABBox)
 
 		float Length = AABB.GetLenght();
 
-		CHECK_EQUAL(Length, sqrt(56.0f));
+		ZETestCheckEqual(Length, sqrt(56.0f));
 	}
 
-	TEST(AABB_Transform)
+	ZETestItemAdd(AABB_Transform)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
@@ -118,8 +118,8 @@ SUITE(ZEAABBox)
 					   3.0f,  5.0f,  8.0f, 13.0f);
 		ZEAABBox::Transform(AABB, AABB1, M);
 
-		CHECK_EQUAL(AABB.Max, ZEVector3(116.0f, 187.0f, 39.0f));
-		CHECK_EQUAL(AABB.Min, ZEVector3(-110.0f, -177.0f, -23.0f));
+		ZETestCheckEqual(AABB.Max, ZEVector3(116.0f, 187.0f, 39.0f));
+		ZETestCheckEqual(AABB.Min, ZEVector3(-110.0f, -177.0f, -23.0f));
 
 		ZEVector3 Max2( 1.0f,  2.0f,  5.0f);
 		ZEVector3 Min2(-1.0f, -2.0f, -1.0f);
@@ -131,14 +131,14 @@ SUITE(ZEAABBox)
 															  0.0f, 0.0f, 1.0f, 0.0f, 
 															  0.0f, 0.0f, 0.0f, 1.0f));
 
-		CHECK_EQUAL(AABB3.Max, AABB2.Max);
-		CHECK_EQUAL(AABB3.Min, AABB2.Min);
+		ZETestCheckEqual(AABB3.Max, AABB2.Max);
+		ZETestCheckEqual(AABB3.Min, AABB2.Min);
 
 
 
 	}
 
-	TEST(AABB_PlaneHalfSpaceTest)
+	ZETestItemAdd(AABB_PlaneHalfSpaceTest)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
@@ -150,7 +150,7 @@ SUITE(ZEAABBox)
 
 		ZEHalfSpace result1 = ZEAABBox::IntersectionTest(AABB, P1);
 
-		CHECK_EQUAL(result1,-1);
+		ZETestCheckEqual(result1,-1);
 
 		ZEVector3 n2(1.0f, 2.0f, 3.0f);
 		ZEVector3 p2(0.0f, -6.0f, 0.0f);
@@ -158,7 +158,7 @@ SUITE(ZEAABBox)
 
 		ZEHalfSpace result2 = ZEAABBox::IntersectionTest(AABB, P2);
 
-		CHECK_EQUAL(result2, ZE_HS_INTERSECTS);
+		ZETestCheckEqual(result2, ZE_HS_INTERSECTS);
 
 		
 		ZEVector3 n3(1.0f, 0.0f, 0.0f);
@@ -167,7 +167,7 @@ SUITE(ZEAABBox)
 
 		ZEHalfSpace result3 = ZEAABBox::IntersectionTest(AABB, P3);
 
-		CHECK_EQUAL(result3, ZE_HS_INTERSECTS);
+		ZETestCheckEqual(result3, ZE_HS_INTERSECTS);
 
 		ZEVector3 n4(0.0f, 0.0f, 1.0f);
 		ZEVector3 p4(-200.0f, -1000.0f, -100.0f);
@@ -176,11 +176,11 @@ SUITE(ZEAABBox)
 
 		ZEHalfSpace result4 = ZEAABBox::IntersectionTest(AABB, P4);
 
-		CHECK_EQUAL(result4, 1);
+		ZETestCheckEqual(result4, 1);
 
 	}
 
-	TEST(AABB_IntersectionTest1)
+	ZETestItemAdd(AABB_IntersectionTest1)
 	{
 		
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
@@ -190,16 +190,16 @@ SUITE(ZEAABBox)
 
 		bool result = ZEAABBox::IntersectionTest(AABB, ZEVector3(1.0f, 2.0f, 3.0f));
 
-		CHECK_EQUAL(result, true);
+		ZETestCheckEqual(result, true);
 
 		ZEVector3 P(-1.0f, -2.0f, -3.0f);
 
 		bool result2 = ZEAABBox::IntersectionTest(AABB, P);
 
-		CHECK_EQUAL(result2, true);
+		ZETestCheckEqual(result2, true);
 
 	}
-	TEST(AABB_IntersectionTest2)
+	ZETestItemAdd(AABB_IntersectionTest2)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
@@ -215,7 +215,7 @@ SUITE(ZEAABBox)
 		bool result1 = ZEAABBox::IntersectionTest(AABB1, L1);
 
 
-		CHECK_EQUAL(result1, false);
+		ZETestCheckEqual(result1, false);
 
 
 		ZEVector3 P2( 0.0f,  0.0f,  0.0f);
@@ -225,7 +225,7 @@ SUITE(ZEAABBox)
 
 		bool result2 = ZEAABBox::IntersectionTest(AABB1, L2);
 
-		CHECK_EQUAL(result2, false);
+		ZETestCheckEqual(result2, false);
 		
 		ZEVector3 P4(0.0f, 100.0f, 0.0f);
 		ZEVector3 P5(0.0f, 100.0f, 6.0f);
@@ -234,7 +234,7 @@ SUITE(ZEAABBox)
 
 		bool result3 = ZEAABBox::IntersectionTest(AABB1, L3);
 
-		CHECK_EQUAL(result3, false);
+		ZETestCheckEqual(result3, false);
 
 
 		ZEVector3 P6(0.0f, 0.0f,  0.0f);
@@ -246,10 +246,10 @@ SUITE(ZEAABBox)
 		bool result4 = ZEAABBox::IntersectionTest(AABB1, L4);
 
 
-		CHECK_EQUAL(result4, true);
+		ZETestCheckEqual(result4, true);
 	}
 	
-	TEST(AABB_IntersectionTest3)
+	ZETestItemAdd(AABB_IntersectionTest3)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
@@ -260,28 +260,28 @@ SUITE(ZEAABBox)
 		ZERay R1(v1,p1);
 
 		bool result1 = ZEAABBox::IntersectionTest(AABB1, R1);
-		CHECK_EQUAL(result1, true);
+		ZETestCheckEqual(result1, true);
 
 		ZEVector3 p2(100.0f, 100.0f, 100.0f);
 		ZEVector3 v2(0.0f, 0.0f, 1.0f);
 		ZERay R2(v2, p2);
 
 		bool result2 = ZEAABBox::IntersectionTest(AABB1, R2);
-		CHECK_EQUAL(result2, false);
+		ZETestCheckEqual(result2, false);
 
 		ZEVector3 p3(0.0f, 0.0f, 0.0f);
 		ZEVector3 v3(1.0f, 0.0f, 0.0f);
 		ZERay R3(v3, p3);
 
 		bool result3 = ZEAABBox::IntersectionTest(AABB1, R3);
-		CHECK_EQUAL(result3, true);
+		ZETestCheckEqual(result3, true);
 
 		ZEVector3 p4(-1.0f, -2.0f, -3.0f);
 		ZEVector3 v4(2.0f,  4.0f,  6.0f);
 		ZERay R4(v4, p4);
 		
 		bool result4 = ZEAABBox::IntersectionTest(AABB1, R4);
-		CHECK_EQUAL(result4, true);
+		ZETestCheckEqual(result4, true);
 		
 
 		ZEVector3  p5(1.0, 2.0f, 3.0f);
@@ -289,10 +289,10 @@ SUITE(ZEAABBox)
 		ZERay R5(v5, p5);
 
 		bool result5 = ZEAABBox::IntersectionTest(AABB1, R5);
-		CHECK_EQUAL(result5, true);
+		ZETestCheckEqual(result5, true);
 	}
 
-	TEST(AABB_IntersectionTest4)
+	ZETestItemAdd(AABB_IntersectionTest4)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
@@ -308,7 +308,7 @@ SUITE(ZEAABBox)
 		bool result1 = ZEAABBox::IntersectionTest(AABB1, LS1);
 
 
-		CHECK_EQUAL(result1, true);
+		ZETestCheckEqual(result1, true);
 
 
 		ZEVector3 P2( 0.0f,  0.0f,  0.0f);
@@ -320,7 +320,7 @@ SUITE(ZEAABBox)
 		bool result2 = ZEAABBox::IntersectionTest(AABB1, LS2);
 
 
-		CHECK_EQUAL(result2, false);
+		ZETestCheckEqual(result2, false);
 
 		
 		ZEVector3 P4(0.0f, 100.0f, 0.0f);
@@ -332,7 +332,7 @@ SUITE(ZEAABBox)
 		bool result3 = ZEAABBox::IntersectionTest(AABB1,LS3);
 	}
 
-	TEST(AABB_GenerateBoundingSphere1)
+	ZETestItemAdd(AABB_GenerateBoundingSphere1)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
@@ -344,14 +344,14 @@ SUITE(ZEAABBox)
 
 		//AABB.GenerateBoundingSphere(BS);
 
-		CHECK_EQUAL(center, BS.Position);
+		ZETestCheckEqual(center, BS.Position);
 
 		float radius = ZEVector3::Distance(Max, center);
 		
-		CHECK_EQUAL(radius, BS.Radius);
+		ZETestCheckEqual(radius, BS.Radius);
 	}
 
-	TEST(AABB_GenerateBoundingSphere2)
+	ZETestItemAdd(AABB_GenerateBoundingSphere2)
 	{
 		/*ZEVector3 Max( 1.0f,  2.0f,  3.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
@@ -368,15 +368,15 @@ SUITE(ZEAABBox)
 
 		AABB.GenerateBoundingSphere(BS, M);
 
-		CHECK_EQUAL(center, BS.Position);
+		ZETestCheckEqual(center, BS.Position);
 
 		float radius = ZEVector3::Distance(Max, center);
 		
-		CHECK_EQUAL(radius, BS.Radius);*/
+		ZETestCheckEqual(radius, BS.Radius);*/
 
 	}
 
-	TEST(AABB_GenerateOBoundingBox1)
+	ZETestItemAdd(AABB_GenerateOBoundingBox1)
 	{
 		ZEVector3 Max( 1.0f,  2.0f,  5.0f);
 		ZEVector3 Min(-1.0f, -2.0f, -1.0f);
@@ -388,12 +388,12 @@ SUITE(ZEAABBox)
 
 //		AABB.GenerateOBoundingBox(OBB);
 
-		CHECK_EQUAL(OBB.Right, ZEVector3(2.0f, 0.0f, 0.0f));
-		CHECK_EQUAL(OBB.Up, ZEVector3(0.0f, 4.0f, 0.0f));
-		CHECK_EQUAL(OBB.Front, ZEVector3(0.0f, 0.0f, 6.0f));
+		ZETestCheckEqual(OBB.Right, ZEVector3(2.0f, 0.0f, 0.0f));
+		ZETestCheckEqual(OBB.Up, ZEVector3(0.0f, 4.0f, 0.0f));
+		ZETestCheckEqual(OBB.Front, ZEVector3(0.0f, 0.0f, 6.0f));
 	}
 	
-	TEST(AABB_CollisionTest1)
+	ZETestItemAdd(AABB_CollisionTest1)
 	{
 		ZEVector3 Max1( 1.0f,  2.0f,  5.0f);
 		ZEVector3 Min1(-1.0f, -2.0f, -1.0f);
@@ -406,24 +406,24 @@ SUITE(ZEAABBox)
 		ZEAABBox AABB2(Min2, Max2);
 
 		bool result = ZEAABBox::IntersectionTest(AABB1, AABB2);
-		CHECK_EQUAL(result, true);
+		ZETestCheckEqual(result, true);
 	
 		bool result2 = ZEAABBox::IntersectionTest(AABB2, AABB2);
-		CHECK_EQUAL(result2, true);
+		ZETestCheckEqual(result2, true);
 
 		ZEVector3 Max3(0.0f, 0.0f, 0.0f);
 		ZEVector3 Min3(-10.0f, -10.0f, -10.0f);
 		ZEAABBox AABB3(Min3, Max3);
 
 		bool result3 = ZEAABBox::IntersectionTest(AABB1, AABB3);
-		CHECK_EQUAL(result3, true);
+		ZETestCheckEqual(result3, true);
 		
 		ZEVector3 Max4(0.0f,  2.0f,  3.0f);
 		ZEVector3 Min4(0.0f, -2.0f, -3.0f);
 		ZEAABBox AABB4(Min4, Max4);
 
 		bool result4 = ZEAABBox::IntersectionTest(AABB1, AABB4);
-		CHECK_EQUAL(result4, true);
+		ZETestCheckEqual(result4, true);
 
 
 		ZEVector3 Max5(20.0f,  20.0f,  30.0f);
@@ -431,7 +431,7 @@ SUITE(ZEAABBox)
 		ZEAABBox AABB5(Min5, Max5);
 
 		bool result5 = ZEAABBox::IntersectionTest(AABB1, AABB5);
-		CHECK_EQUAL(result5, false);
+		ZETestCheckEqual(result5, false);
 
 		ZEVector3 Max6( 1.0f,  2.0f, 10.0f);
 		ZEVector3 Min6(-1.0f, -2.0f, 6.0f);
@@ -439,11 +439,11 @@ SUITE(ZEAABBox)
 		ZEAABBox AABB6(Min6, Max6);
 
 		bool result6 = ZEAABBox::IntersectionTest(AABB1, AABB6);
-		CHECK_EQUAL(result6, false);
+		ZETestCheckEqual(result6, false);
 
 	}
 
-	TEST(AABB_CollisionTest2)
+	ZETestItemAdd(AABB_CollisionTest2)
 	{
 		ZEVector3 Max1( 1.0f,  2.0f,  5.0f);
 		ZEVector3 Min1(-1.0f, -2.0f, -1.0f);
@@ -452,26 +452,26 @@ SUITE(ZEAABBox)
 
 		ZEBSphere BS1(Max1, 3.0f);
 		bool result1 = ZEAABBox::IntersectionTest(AABB1, BS1);
-		CHECK_EQUAL(result1, true);
+		ZETestCheckEqual(result1, true);
 		
 		ZEBSphere BS2(ZEVector3(-10.0f, 0.0f, 0.0f), 0.1f);
 		bool result2 = ZEAABBox::IntersectionTest(AABB1, BS2);
-		CHECK_EQUAL(result2, false);
+		ZETestCheckEqual(result2, false);
 
 //		AABB1.GenerateBoundingSphere(BS1);
 		bool result3 = ZEAABBox::IntersectionTest(AABB1, BS1);
-		CHECK_EQUAL(result3, true);
+		ZETestCheckEqual(result3, true);
 		
 		ZEBSphere BS3(ZEVector3(1.0f, 2.0f, 6.0f), 1.0f);
 		bool result4 = ZEAABBox::IntersectionTest(AABB1, BS3);
-		CHECK_EQUAL(result4, true);
+		ZETestCheckEqual(result4, true);
 
 		ZEBSphere BS4(ZEVector3(0.0f, 0.0f, 3.0f), 0.01f);
 		bool result5 = ZEAABBox::IntersectionTest(AABB1, BS4);
-		CHECK_EQUAL(result5, true);
+		ZETestCheckEqual(result5, true);
 	}
 
-	TEST(AABB_CollisionTest3)
+	ZETestItemAdd(AABB_CollisionTest3)
 	{
 		//No function
 	}

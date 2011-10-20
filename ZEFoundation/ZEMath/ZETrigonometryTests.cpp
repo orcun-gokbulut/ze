@@ -33,25 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <UnitTestCpp/UnitTest++.h>
+#include "ZETest.h"
 #include <math.h>
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZETrigonometry.h"
 #include "ZEMath/ZEMathDefinitions.h"
 
-SUITE(ZETrigonometry)
+ZETestSuiteAdd(ZETrigonometry)
 {
-	TEST(FastSin)
+	ZETestItemAdd(FastSin)
 	{
-		CHECK_EQUAL(FastSin(360), 0);
+		ZETestCheckEqual(FastSin(360), 0);
 
 	}
-	TEST(FastCos)
+	ZETestItemAdd(FastCos)
 	{
-		CHECK_EQUAL(FastCos(360), 1);
+		ZETestCheckEqual(FastCos(360), 1);
 	}
-	TEST(FastTan)
+	ZETestItemAdd(FastTan)
 	{
-		CHECK_EQUAL(FastTan(360), 0);
+		ZETestCheckEqual(FastTan(360), 0);
 	}
 }

@@ -49,8 +49,40 @@
 		} \
 		catch (...)\
 		{\
-			this->ReportProblem(("Exception occured at check condition \"" #Condition "\"."), __FILE__, __LINE__);\
+			this->ReportProblem(("Exception occured at check condition. Condition : \"" #Condition "\"."), __FILE__, __LINE__);\
 		} } \
 	while(0)
 
+#define ZETestCheckEqual(Actual, Expected)\
+	do\
+	{\
+		try\
+		{\
+			if ((Actual) != (Expected))\
+			{\
+				this->ReportProblem(("Actual \"" #Actual " is not equal to expected \"" #Expected "\"."), __FILE__, __LINE__);\
+			} \
+		} \
+		catch (...)\
+		{\
+			this->ReportProblem(("Exception occured at equality check. Actual value \"" #Actual "\", Expected value : \"" #Expected "\"."), __FILE__, __LINE__);\
+		} } \
+	while(0)
+
+
+#define ZETestCheckClose(Actual, Expected, Tolerance)\
+	do\
+	{\
+		try\
+		{\
+			if (((Actual) >= ((Expected) - (Tolerance))) && ((Actual) <= ((Expected) + (Tolerance))))\
+			{\
+				this->ReportProblem(("Actual value \"" #Actual " is not close (with tolerance \"" #Tolerance "\") to expected value \"" #Expected "\"."), __FILE__, __LINE__);\
+			} \
+		} \
+		catch (...)\
+		{\
+			this->ReportProblem(("Exception occured at close check. Actual value \"" #Actual "\", Expected value : \"" #Expected "\", Tolerance : \"" #Tolerance "\"."), __FILE__, __LINE__);\
+		} } \
+	while(0)
 #endif

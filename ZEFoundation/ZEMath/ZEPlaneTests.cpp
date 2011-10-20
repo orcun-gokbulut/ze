@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <UnitTestCpp/UnitTest++.h>
+#include "ZETest.h"
 #include <d3dx9.h>
 #include <math.h>
 #include "ZEMathIOStreamMapping.h"
@@ -44,31 +44,31 @@
 #include "ZEMath/ZELineSegment.h"
 #include "ZEMath/ZEMathDefinitions.h"
 
-SUITE(ZEPlane)
+ZETestSuiteAdd(ZEPlane)
 {
-	TEST(Constructor)
+	ZETestItemAdd(Constructor)
 	{
 		ZEVector3 n(1.0f, 2.0f, 3.0f);
 		ZEVector3 p(0.0f, 6.0f, 0.0f);
 		ZEPlane P(n, p);
 
-		CHECK_EQUAL(P.n, n);
-		CHECK_EQUAL(P.p, p);
+		ZETestCheckEqual(P.n, n);
+		ZETestCheckEqual(P.p, p);
 	}
 
-	TEST(Create1)
+	ZETestItemAdd(Create1)
 	{
 		ZEVector3 n(1.0f, 2.0f, 3.0f);
 		ZEVector3 p(0.0f, 6.0f, 0.0f);
 		ZEPlane P;
 		ZEPlane::Create(P, n, p);
 		
-		CHECK_EQUAL(P.n, n);
-		CHECK_EQUAL(P.p, p);
+		ZETestCheckEqual(P.n, n);
+		ZETestCheckEqual(P.p, p);
 
 	}
 
-	TEST(Create2)
+	ZETestItemAdd(Create2)
 	{
 		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZEVector3 P2(0.0f, 3.0f, 1.0f);
@@ -77,11 +77,11 @@ SUITE(ZEPlane)
 
 		ZEPlane::Create(P, P1, P2, P3);
 
-		CHECK_EQUAL(P.p, P3);
-		CHECK_EQUAL(P.n, ZEVector3(11.0f, 3.0f, -4.0f));
+		ZETestCheckEqual(P.p, P3);
+		ZETestCheckEqual(P.n, ZEVector3(11.0f, 3.0f, -4.0f));
 	}
 
-	TEST(Distance)
+	ZETestItemAdd(Distance)
 	{
 		ZEVector3 p(-4.0f, 0.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);
@@ -89,10 +89,10 @@ SUITE(ZEPlane)
 		ZEPlane P;
 		ZEPlane::Create(P, n, p);
 		float d = ZEPlane::Distance(P, X);
-		CHECK_CLOSE(d, 39.0f/sqrt(33.0f), 0.000001);
+		ZETestCheckClose(d, 39.0f/sqrt(33.0f), 0.000001);
 	}
 
-	TEST(TestHalfSpace)
+	ZETestItemAdd(TestHalfSpace)
 	{
 		ZEVector3 p(-4.0f, 0.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);
@@ -102,12 +102,12 @@ SUITE(ZEPlane)
 		ZEVector3 Y(-5.0f,  0.0f, 0.0f);
 		ZEVector3 Z( 0.0f,  4.0f, 0.0f);
 		ZEHalfSpace a = ZEPlane::TestHalfSpace(P, X);
-		CHECK_EQUAL(a, 1);
-		CHECK_EQUAL(ZEPlane::TestHalfSpace(P, Y), -1);
-		CHECK_EQUAL(ZEPlane::TestHalfSpace(P, Z), 0);
+		ZETestCheckEqual(a, 1);
+		ZETestCheckEqual(ZEPlane::TestHalfSpace(P, Y), -1);
+		ZETestCheckEqual(ZEPlane::TestHalfSpace(P, Z), 0);
 	}
 
-	TEST(IntersectionTest1)
+	ZETestItemAdd(IntersectionTest1)
 	{
 		ZEVector3 P0( 1.0f, 2.0f, 3.0f);
 		ZEVector3 P1(-4.0f, 0.0f, 0.0f);
@@ -121,7 +121,7 @@ SUITE(ZEPlane)
 		float t;
 		bool result1 = ZEPlane::IntersectionTest(P, L1, t);
 
-		CHECK_EQUAL(result1, true);
+		ZETestCheckEqual(result1, true);
 		
 		ZEVector3 P2( 1.0f,  2.0f,  3.0f);
 		ZEVector3 P3( 5.0f,  6.0f , 3.0f);
@@ -130,11 +130,11 @@ SUITE(ZEPlane)
 
 		bool result2 = ZEPlane::IntersectionTest(P, L2, t);
 		
-		CHECK_EQUAL(result2, false);
+		ZETestCheckEqual(result2, false);
 
 	}
 
-	TEST(IntersectionTest2)
+	ZETestItemAdd(IntersectionTest2)
 	{
 		ZEVector3 P0( 1.0f, 2.0f, 3.0f);
 		ZEVector3 P1(-4.0f, 0.0f, 0.0f);
@@ -148,7 +148,7 @@ SUITE(ZEPlane)
 		float t;
 		bool result1 = ZEPlane::IntersectionTest(P, LS1, t);
 
-		CHECK_EQUAL(result1, true);
+		ZETestCheckEqual(result1, true);
 		
 		ZEVector3 P2( 1.0f,  2.0f,  3.0f);
 		ZEVector3 P3( 5.0f,  6.0f , 3.0f);
@@ -157,10 +157,10 @@ SUITE(ZEPlane)
 
 		bool result2 = ZEPlane::IntersectionTest(P, LS2, t);
 		
-		CHECK_EQUAL(result2, false);
+		ZETestCheckEqual(result2, false);
 	}
 	
-	TEST(IntersectionTest3)
+	ZETestItemAdd(IntersectionTest3)
 	{
 		
 		ZEVector3 P0( 1.0f, 2.0f, 3.0f);
@@ -175,7 +175,7 @@ SUITE(ZEPlane)
 		float t;
 		bool result1 = ZEPlane::IntersectionTest(P, R1, t);
 
-		CHECK_EQUAL(result1, true);
+		ZETestCheckEqual(result1, true);
 		
 		ZEVector3 P2( 1.0f,  2.0f,  3.0f);
 		ZEVector3 P3( 5.0f,  6.0f , 3.0f);
@@ -184,10 +184,10 @@ SUITE(ZEPlane)
 
 		bool result2 = ZEPlane::IntersectionTest(P, R2, t);
 		
-		CHECK_EQUAL(result2, false);
+		ZETestCheckEqual(result2, false);
 	}
 	
-	TEST(IntersectionTest4)
+	ZETestItemAdd(IntersectionTest4)
 	{
 		ZEVector3  p(0.0f,  4.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);
@@ -208,8 +208,8 @@ SUITE(ZEPlane)
 		bool result2 = ZEPlane::IntersectionTest(P, P,  L);
 		bool result3 = ZEPlane::IntersectionTest(P, P0, L);
 		
-		CHECK_EQUAL(result1, true);
-		CHECK_EQUAL(result2, true);
-		CHECK_EQUAL(result3, false);
+		ZETestCheckEqual(result1, true);
+		ZETestCheckEqual(result2, true);
+		ZETestCheckEqual(result3, false);
 	}
 }

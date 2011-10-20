@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <UnitTestCpp/UnitTest++.h>
+#include "ZETest.h"
 #include "ZETestManager.h"
 
 int main(int Argc, char** Argv)
@@ -45,12 +45,5 @@ int main(int Argc, char** Argv)
 
 	ZETestManager* Manager = ZETestManager::GetInstance();
 
-	bool Result = Manager->RunTests();
-	Result &= UnitTest::RunAllTests();
-
-	#ifdef __COVERAGESCANNER__ 
-		__coveragescanner_save();
-	#endif
-
-	return Result;
+	return Manager->RunTests();
 }
