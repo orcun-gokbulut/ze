@@ -37,6 +37,8 @@
 #ifndef __ZE_TEST_ITEM_H__
 #define __ZE_TEST_ITEM_H__
 
+#include "ZETypes.h"
+
 class ZETestSuite;
 
 enum ZETestResult
@@ -46,25 +48,33 @@ enum ZETestResult
 	ZE_TR_FAILED
 };
 
+enum ZETestProblemType
+{
+	ZE_TPT_ERROR,
+	ZE_TPT_WARNING,
+	ZE_TPT_NOTICE
+};
+
 class ZETestItem
 {
 	private:
 		char					Name[256];
 		ZETestSuite*			Owner;
 		ZETestResult			Result;
-
-	protected:
-		void					ReportProblem(const char* Problem, const char* File, int Line);
+		float					ElapsedTime;
 
 	public:
 		const char*				GetName();
 		ZETestSuite*			GetOwner();
+
+		void					ReportProblem(ZETestProblemType Type, const char* Problem, const char* File, int Line);
 
 		virtual void			TestImpl() = 0;
 
 		bool					RunTest();
 		void					Reset();
 		ZETestResult			GetResult();
+		float					GetEleapsedTime();
 
 								ZETestItem(const char* Name, ZETestSuite* Owner);
 };

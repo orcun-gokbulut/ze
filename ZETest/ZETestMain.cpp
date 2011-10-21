@@ -35,6 +35,9 @@
 
 #include "ZETest.h"
 #include "ZETestManager.h"
+#include "ZEError.h"
+
+#include <stdlib.h>
 
 int main(int Argc, char** Argv)
 {
@@ -45,5 +48,6 @@ int main(int Argc, char** Argv)
 
 	ZETestManager* Manager = ZETestManager::GetInstance();
 
-	return Manager->RunTests();
+	
+	return Manager->RunTests() ? EXIT_SUCCESS : EXIT_FAILURE;
 }

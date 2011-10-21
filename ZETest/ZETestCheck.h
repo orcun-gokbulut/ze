@@ -44,12 +44,12 @@
 		{\
 			if (!(Condition))\
 			{\
-				this->ReportProblem(("Check condition \"" #Condition "\" has failed."), __FILE__, __LINE__);\
+				this->ReportProblem(ZE_TPT_ERROR, ("Check condition \"" #Condition "\" has failed."), __FILE__, __LINE__);\
 			} \
 		} \
 		catch (...)\
 		{\
-			this->ReportProblem(("Exception occured at check condition. Condition : \"" #Condition "\"."), __FILE__, __LINE__);\
+			this->ReportProblem(ZE_TPT_ERROR, ("Exception occured at check condition. Condition : \"" #Condition "\"."), __FILE__, __LINE__);\
 		} } \
 	while(0)
 
@@ -60,12 +60,12 @@
 		{\
 			if ((Actual) != (Expected))\
 			{\
-				this->ReportProblem(("Actual \"" #Actual " is not equal to expected \"" #Expected "\"."), __FILE__, __LINE__);\
+				this->ReportProblem(ZE_TPT_ERROR, ("Actual \"" #Actual "\" is not equal to expected \"" #Expected "\"."), __FILE__, __LINE__);\
 			} \
 		} \
 		catch (...)\
 		{\
-			this->ReportProblem(("Exception occured at equality check. Actual value \"" #Actual "\", Expected value : \"" #Expected "\"."), __FILE__, __LINE__);\
+			this->ReportProblem(ZE_TPT_ERROR, ("Exception occured at equality check. Actual value \"" #Actual "\", Expected value : \"" #Expected "\"."), __FILE__, __LINE__);\
 		} } \
 	while(0)
 
@@ -77,12 +77,12 @@
 		{\
 			if (((Actual) >= ((Expected) - (Tolerance))) && ((Actual) <= ((Expected) + (Tolerance))))\
 			{\
-				this->ReportProblem(("Actual value \"" #Actual " is not close (with tolerance \"" #Tolerance "\") to expected value \"" #Expected "\"."), __FILE__, __LINE__);\
+				this->ReportProblem(ZE_TPT_ERROR, ("Actual value \"" #Actual "\" is not close  to expected value \"" #Expected "\". Tolerance \"" #Tolerance "\"."), __FILE__, __LINE__);\
 			} \
 		} \
 		catch (...)\
 		{\
-			this->ReportProblem(("Exception occured at close check. Actual value \"" #Actual "\", Expected value : \"" #Expected "\", Tolerance : \"" #Tolerance "\"."), __FILE__, __LINE__);\
+			this->ReportProblem(ZE_TPT_ERROR, ("Exception occured at close check. Actual value \"" #Actual "\", Expected value : \"" #Expected "\", Tolerance : \"" #Tolerance "\"."), __FILE__, __LINE__);\
 		} } \
 	while(0)
 #endif

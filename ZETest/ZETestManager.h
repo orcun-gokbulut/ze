@@ -39,6 +39,7 @@
 
 class ZETestSuite;
 class ZETestItem;
+enum ZETestProblemType;
 
 class ZETestManager
 {
@@ -50,7 +51,7 @@ class ZETestManager
 		void					RegisterTestSuite(ZETestSuite* Suite);
 
 		bool					RunTests();
-		void					ReportProblem(ZETestSuite* Suite, ZETestItem* Test, const char* Problem, const char* File, int Line);
+		void					ReportProblem(ZETestSuite* Suite, ZETestItem* Test, ZETestProblemType Type, const char* Problem, const char* File, int Line);
 
 		static ZETestManager*	GetInstance();
 };

@@ -36,17 +36,67 @@
 #include "ZETestItem.h"
 #include "ZETestSuite.h"
 #include "ZETestManager.h"
+#include "ZETestTimer.h"
+#include "ZEError.h"
 
-#ifdef __COVERAGESCANNER__ 
 #include <stdio.h>
-#endif
-
 #include <string.h>
 
-void ZETestItem::ReportProblem(const char* Problem, const char* File, int Line)
+static ZETestItem* CurrentTestItem = NULL;
+static void ZEErrorManagerErrorCallback(const char* Module, ZEErrorType Type, const char* ErrorText)
 {
-	Result = ZE_TR_FAILED;
-	ZETestManager::GetInstance()->ReportProblem(Owner, this, Problem, File, Line);
+	if (CurrentTestItem != NULL)
+	{
+		ZETestProblemType ProblemType;
+
+		switch(Type)
+		{
+			default:
+			case ZE_ET_CRITICAL_ERROR:
+			case ZE_ET_ERROR:
+				ProblemType = ZE_TPT_ERROR;
+				break;
+
+			case ZE_ET_WARNING:
+				ProblemType = ZE_TPT_WARNING;
+				break;
+
+			case ZE_ET_NOTICE:
+			case ZE_ET_LOG:
+				ProblemType = ZE_TPT_NOTICE;
+				break;
+		}
+
+		char Buffer[4096];
+		sprintf(Buffer, "ZEError::RaiseError redirected. Error type : %s. Error text : \"%s\".", ZEError::GetErrorTypeString(Type), ErrorText);
+
+		CurrentTestItem->ReportProblem(ProblemType, Buffer, CurrentTestItem->GetName(), 1);
+	}
+}
+
+static void ZEErrorManagerAssertCallback(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, int Line)
+{
+	if (CurrentTestItem != NULL)
+	{
+		ZETestProblemType ProblemType;
+
+		if (Type == ZE_AT_WARNING_ASSERT)
+			ProblemType = ZE_TPT_WARNING;
+		else
+			ProblemType = ZE_TPT_ERROR;
+
+		char Buffer[4096];
+		sprintf(Buffer, "ZEError::RaiseAssert redirected. Assert Type : \"%s\", Assert text : \"%s\"", ZEError::GetAssertTypeString(Type), AssertText);
+
+		CurrentTestItem->ReportProblem(ProblemType, Buffer, File, Line);
+	}
+}
+
+void ZETestItem::ReportProblem(ZETestProblemType Type, const char* Problem, const char* File, int Line)
+{
+	if (Type == ZE_TPT_ERROR)
+		Result = ZE_TR_FAILED;
+	ZETestManager::GetInstance()->ReportProblem(Owner, this, Type, Problem, File, Line);
 }
 
 const char* ZETestItem::GetName()
@@ -64,9 +114,15 @@ ZETestResult ZETestItem::GetResult()
 	return Result;
 }
 
+float ZETestItem::GetEleapsedTime()
+{
+	return ElapsedTime;
+}
+
 void ZETestItem::Reset()
 {
 	Result = ZE_TR_NOT_RUN;
+	ElapsedTime = 0;
 }
 
 bool ZETestItem::RunTest()
@@ -78,9 +134,15 @@ bool ZETestItem::RunTest()
 	__coveragescanner_testname(Buffer);
 	#endif
 
+	ZETestTimer Timer;
 	try
 	{
+		Timer.Start();
 		TestImpl();
+		Timer.Stop();
+
+		ElapsedTime = Timer.GetElapsedTime();
+
 		if (Result == ZE_TR_NOT_RUN)
 			Result = ZE_TR_PASSED;
 		
@@ -89,10 +151,14 @@ bool ZETestItem::RunTest()
 		__coveragescanner_save();
 		__coveragescanner_testname("");
 		#endif
+
 		return (Result == ZE_TR_PASSED ? true : false);
 	}
 	catch (...)
 	{
+		Timer.Stop();
+		ElapsedTime = Timer.GetElapsedTime();
+
 		Result = ZE_TR_FAILED;
 		return false;
 	}
@@ -102,6 +168,7 @@ ZETestItem::ZETestItem(const char* Name, ZETestSuite* Owner)
 {
 	strncpy(this->Name, Name, 255);
 	this->Owner = Owner;
+	ElapsedTime = 0;
 	Owner->RegisterTest(this);
 	this->Result = ZE_TR_NOT_RUN;
 }

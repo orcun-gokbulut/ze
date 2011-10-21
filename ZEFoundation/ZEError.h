@@ -63,11 +63,11 @@ enum ZEAssertType
 
 #ifdef ZE_DEBUG_ENABLED
 	#ifdef ZE_ZINEK_VERSION_PLATFORM_WINDOWS
-		#define zeAssert(Condition, ...) {if (Condition) {zeRaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); if (_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true);}}
-		#define zeWarningAssert(Condition, ...) {if (Condition) {zeRaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);}}
+		#define zeAssert(Condition, ...) {if (Condition) {ZEError::RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); if (_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true);}}
+		#define zeWarningAssert(Condition, ...) {if (Condition) {ZEError::RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);}}
 	#else
-		#define zeAssert(Condition, ...) {if (Condition){zeRaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); abort();}}
-		#define zeWarningAssert(Condition, ...) {if (Condition) {zeRaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);}}
+		#define zeAssert(Condition, ...) {if (Condition){ZEError::RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); abort();}}
+		#define zeWarningAssert(Condition, ...) {if (Condition) {ZEError::RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);}}
 	#endif
 #else
 	#ifdef ZE_DEBUG_FORCE_VERIFY
@@ -81,44 +81,53 @@ enum ZEAssertType
 
 #if defined(ZE_DEBUG_ENABLED) && defined(ZE_DEBUG_BREAK_ON_ERROR)
 	#ifdef ZE_ZINEK_VERSION_PLATFORM_WINDOWS
-		#define zeCriticalError(Module, ...) {if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true); zeRaiseError(Module, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);}
+		#define zeCriticalError(Module, ...) {if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true); ZEError::RaiseError(Module, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);}
 	#else
-		#define zeCriticalError(Module, ...) {abort(); zeRaiseError(Module, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);}
+		#define zeCriticalError(Module, ...) {abort(); ZEError::RaiseError(Module, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);}
 	#endif
 #else
-	#define zeCriticalError(Module, ...) {zeRaiseError(Module, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);}
+	#define zeCriticalError(Module, ...) {ZEError::RaiseError(Module, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);}
 #endif
 
 #if defined(ZE_DEBUG_ENABLED) && defined(ZE_DEBUG_BREAK_ON_ERROR)
-	#ifdef ZE_ZINEK_VERSION_PLATFORM_WINDOWS
-		#define zeError(Module, ...) {if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true); zeRaiseError(Module, ZE_ET_ERROR, __VA_ARGS__);}
+	#ifdef ZE_ZINEK_VERSION_PLATFORM_WINDOWS 
+		#define zeError(Module, ...) {if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true); ZEError::RaiseError(Module, ZE_ET_ERROR, __VA_ARGS__);}
 	#else
-		#define zeError(Module, ...) {abort(); zeRaiseError(Module, ZE_ET_ERROR, __VA_ARGS__);}
+		#define zeError(Module, ...) {abort(); ZEError::RaiseError(Module, ZE_ET_ERROR, __VA_ARGS__);}
 	#endif
 #else
-	#define zeError(Module, ...) {zeRaiseError(Module, ZE_ET_ERROR, __VA_ARGS__);}
+	#define zeError(Module, ...) {ZEError::RaiseError(Module, ZE_ET_ERROR, __VA_ARGS__);}
 #endif
 
 #if defined(ZE_DEBUG_ENABLED) && defined(ZE_DEBUG_BREAK_ON_WARNING)
 	#ifdef ZE_ZINEK_VERSION_PLATFORM_WINDOWS
-		#define zeWarning(Module, ...) {if(_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) ==  1) zeBreak(true); zeRaiseError(Module, ZE_ET_WARNING, __VA_ARGS__);}
+		#define zeWarning(Module, ...) {if(_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) ==  1) zeBreak(true); ZEError::RaiseError(Module, ZE_ET_WARNING, __VA_ARGS__);}
 	#else
-		#define zeWarning(Module, ...) {abort(); zeRaiseError(Module, ZE_ET_WARNING, __VA_ARGS__);}
+		#define zeWarning(Module, ...) {abort(); ZEError::RaiseError(Module, ZE_ET_WARNING, __VA_ARGS__);}
 	#endif
 #else
-#define zeWarning(Module, ...) {zeRaiseError(Module, ZE_ET_WARNING, __VA_ARGS__);}
+	#define zeWarning(Module, ...) {ZEError::RaiseError(Module, ZE_ET_WARNING, __VA_ARGS__);}
 #endif
 
-#define zeNotice(Module, ...) {zeRaiseError(Module, ZE_ET_NOTICE, __VA_ARGS__);}
-#define zeLog(Module, ...) {zeRaiseError(Module, ZE_ET_LOG, __VA_ARGS__);}
+#define zeNotice(Module, ...) {ZEError::RaiseError(Module, ZE_ET_NOTICE, __VA_ARGS__);}
+#define zeLog(Module, ...) {ZEError::RaiseError(Module, ZE_ET_LOG, __VA_ARGS__);}
 
 
-typedef void (*ZEErrorCallback)(const char* Module, ZEErrorType Type, const char* Error, void* Args);
-typedef void (*ZEAssertCallback)(ZEAssertType Type, const char* Function, const char* File, int Line, const char* Error, void* Args);
+typedef void (*ZEErrorCallback)(const char* Module, ZEErrorType Type, const char* ErrorText);
+typedef void (*ZEAssertCallback)(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, int Line);
 
-void zeSetErrorCallback(ZEErrorCallback Callback);
-void zeSetAssertCallback(ZEAssertCallback Callback);
-void zeRaiseError(const char* Module, ZEErrorType Type, const char* Error, ...);
-void zeRaiseAssert(ZEAssertType Type, const char* Function, const char* File, int Line, const char* Error, ...);
+class ZEError
+{
+	public:
+		static const char*	GetErrorTypeString(ZEErrorType Type);
+		static const char*	GetAssertTypeString(ZEAssertType Type);
+
+		static void			SetErrorCallback(ZEErrorCallback Callback);
+		static void			SetAssertCallback(ZEAssertCallback Callback);
+
+		static void			RaiseError(const char* Module, ZEErrorType Type, const char* ErrorText, ...);
+		static void			RaiseAssert(ZEAssertType Type, const char* Function, const char* File, int Line, const char* AssertText, ...);
+};
+
 
 #endif

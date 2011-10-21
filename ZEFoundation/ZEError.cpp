@@ -38,42 +38,57 @@
 #include <stdio.h>
 #include <stdarg.h>
 
-static void DefaultErrorCallback(const char* Module, ZEErrorType Type, const char* Error, void* Args)
+static void DefaultErrorCallback(const char* Module, ZEErrorType Type, const char* ErrorText)
 {
-	const char* TypeString = "Unknown";
-	switch(Type)
-	{
-		case ZE_ET_CRITICAL_ERROR:
-			TypeString = "Critical Error";
-			break;
-		case ZE_ET_ERROR:
-			TypeString = "Error";
-			break;
-		case ZE_ET_WARNING:
-			TypeString = "Warning";
-			break;
-		case ZE_ET_NOTICE:
-			TypeString = "Notice";
-			break;
-		case ZE_ET_LOG:
-			TypeString = "Log";
-			break;
-	}
-
-	printf("[%s] %s : ", Module, TypeString);
-	vprintf(Error, *(va_list*)Args);
-	printf("\r\n");
+	printf("[%s] %s : %s \r\n", Module, ZEError::GetErrorTypeString(Type), ErrorText);
 }
 
-static void DefaultAssertCallback(ZEAssertType Type, const char* Function, const char* File, int Line, const char* Error, void* Args)
+static void DefaultAssertCallback(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, int Line)
 {
-	printf("[%sAssert] : ", (Type == ZE_AT_WARNING_ASSERT ? "Warning " : ""));
-	vprintf(Error, *(va_list*)Args);
-	printf(" (Function : \"%s\", File : \"%s\", Line : %d)\r\n", Error, Function, File, Line);
+	printf("[%s] : %s (Function : \"%s\", File : \"%s\", Line : %d)\r\n", ZEError::GetAssertTypeString(Type), AssertText, Function, File, Line);
 }
 
 static ZEErrorCallback ErrorCallback = &DefaultErrorCallback;
 static ZEAssertCallback AssertCallback = &DefaultAssertCallback;
+
+const char* ZEError::GetErrorTypeString(ZEErrorType Type)
+{
+	switch(Type)
+	{
+		case ZE_ET_CRITICAL_ERROR:
+			return "Critical Error";
+
+		case ZE_ET_ERROR:
+			return "Error";
+
+		case ZE_ET_WARNING:
+			return "Warning";
+
+		case ZE_ET_NOTICE:
+			return "Notice";
+
+		case ZE_ET_LOG:
+			return "Log";
+
+		default:
+			return "Unknown";
+	}
+}
+
+const char* ZEError::GetAssertTypeString(ZEAssertType Type)
+{
+	switch(Type)
+	{
+		case ZE_AT_ASSERT:
+			return "Assert";
+
+		case ZE_AT_WARNING_ASSERT:
+			return "Warning Assert";
+
+		default:
+			return "Unknown";
+	}
+}
 
 void zeSetErrorCallback(ZEErrorCallback Callback)
 {
@@ -85,24 +100,34 @@ void zeSetAssertCallback(ZEAssertCallback Callback)
 	AssertCallback = Callback;
 }
 
-void zeRaiseError(const char* Module, ZEErrorType Type, const char* Error, ...)
+void ZEError::RaiseError(const char* Module, ZEErrorType Type, const char* ErrorText, ...)
 {
-	va_list Args;
-	va_start(Args, Error);
-
 	if (ErrorCallback != NULL)
-		ErrorCallback(Module, Type, Error, &Args);
+	{
+		va_list Args;
+		va_start(Args, ErrorText);
 
-	va_end(Args);
+		char Buffer[4096];
+		vsprintf(Buffer, ErrorText, Args);
+		
+		va_end(Args);
+
+		ErrorCallback(Module, Type, Buffer);
+	}
 }
 
-void zeRaiseAssert(ZEAssertType Type, const char* Function, const char* File, int Line, const char* Error, ...)
+void ZEError::RaiseAssert(ZEAssertType Type, const char* Function, const char* File, int Line, const char* AssertText, ...)
 {
-	va_list Args;
-	va_start(Args, Error);
-
 	if (AssertCallback != NULL)
-		AssertCallback(Type, Function, File, Line, Error, &Args);
-
-	va_end(Args);
+	{
+		va_list Args;
+		va_start(Args, AssertText);
+		
+		char Buffer[4096];
+		vsprintf(Buffer, AssertText, Args);
+		
+		va_end(Args);
+		
+		AssertCallback(Type, Buffer, Function, File, Line);
+	}
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETestManager.cpp
+ Zinek Engine - ZETestTimer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,66 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETestManager.h"
-#include "ZETestSuite.h"
-#include "ZETestItem.h"
-#include "ZEError.h"
+#include "ZETestTimer.h"
 
-#include <stdio.h>
+#define WINDOWS_MEAN_AND_LEAN
+#include <windows.h>
 
-#ifndef NULL
-#define NULL 0
-#endif
-
-void ZETestManager::RegisterTestSuite(ZETestSuite* Suite)
+float ZETestTimer::GetElapsedTime()
 {
-	TestSuites[TestSuiteCount] = Suite;
-	TestSuiteCount++;
+	return (float)((EndTime - StartTime) * 1000) / (float)Frequency;
 }
 
-bool ZETestManager::RunTests()
+void ZETestTimer::Reset()
 {
-	bool Result = true;
-	for (size_t I = 0; I < TestSuiteCount; I++)
-	{
-		if (!TestSuites[I]->RunTests())
-			Result = false;
-	}
-
-	return Result;
+	StartTime = 0;
+	EndTime = 0;
+	Frequency = 1;
 }
 
-void ZETestManager::ReportProblem(ZETestSuite* Suite, ZETestItem* Test, ZETestProblemType Type, const char* ProblemText, const char* File, int Line)
+void ZETestTimer::Start()
 {
-	const char* TypeString;
+	LARGE_INTEGER Temp;
+	QueryPerformanceFrequency(&Temp);
+	Frequency = Temp.QuadPart;
 
-	switch(Type)
-	{
-		default:
-		case ZE_TPT_ERROR:
-			TypeString = "error";
-			break;
-
-		case ZE_TPT_WARNING:
-			TypeString = "warning";
-			break;
-
-		case ZE_TPT_NOTICE:
-			TypeString = "info";
-			break;
-	}
-
-	if (Type == ZE_TPT_ERROR)
-		printf("  %s(%d) : %s T0001: Test \"%s::%s\" failed. %s \r\n", File, Line, TypeString, Suite->GetName(), Test->GetName(), ProblemText);
-	else
-		printf("  %s(%d) : %s T0002: Test \"%s::%s\" . %s \r\n", File, Line, TypeString, Suite->GetName(), Test->GetName(), ProblemText);
+	QueryPerformanceCounter(&Temp);
+	StartTime = Temp.QuadPart;
 }
 
-ZETestManager* ZETestManager::GetInstance()
+void ZETestTimer::Stop()
 {
-	static ZETestManager* Instance = NULL;
-	if (Instance == NULL)
-		Instance = new ZETestManager();
+	LARGE_INTEGER Temp;
+	QueryPerformanceCounter(&Temp);
+	EndTime = Temp.QuadPart;
+}
 
-	return Instance;
+ZETestTimer::ZETestTimer()
+{
+	Reset();
 }

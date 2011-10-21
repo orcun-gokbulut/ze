@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETestManager.cpp
+ Zinek Engine - ZETestTimer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,66 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETestManager.h"
-#include "ZETestSuite.h"
-#include "ZETestItem.h"
-#include "ZEError.h"
+#pragma once
+#ifndef __ZE_TEST_TIMER_H__
+#define __ZE_TEST_TIMER_H__
 
-#include <stdio.h>
+#include "ZETypes.h"
 
-#ifndef NULL
-#define NULL 0
+class ZETestTimer
+{
+	private:
+		ZEUINT64		StartTime;
+		ZEUINT64		EndTime;
+		ZEUINT64		Frequency;
+
+	public:
+		float			GetElapsedTime();
+		
+		void			Reset();
+
+		void			Start();
+		void			Stop();
+
+						ZETestTimer();
+};
+
 #endif
-
-void ZETestManager::RegisterTestSuite(ZETestSuite* Suite)
-{
-	TestSuites[TestSuiteCount] = Suite;
-	TestSuiteCount++;
-}
-
-bool ZETestManager::RunTests()
-{
-	bool Result = true;
-	for (size_t I = 0; I < TestSuiteCount; I++)
-	{
-		if (!TestSuites[I]->RunTests())
-			Result = false;
-	}
-
-	return Result;
-}
-
-void ZETestManager::ReportProblem(ZETestSuite* Suite, ZETestItem* Test, ZETestProblemType Type, const char* ProblemText, const char* File, int Line)
-{
-	const char* TypeString;
-
-	switch(Type)
-	{
-		default:
-		case ZE_TPT_ERROR:
-			TypeString = "error";
-			break;
-
-		case ZE_TPT_WARNING:
-			TypeString = "warning";
-			break;
-
-		case ZE_TPT_NOTICE:
-			TypeString = "info";
-			break;
-	}
-
-	if (Type == ZE_TPT_ERROR)
-		printf("  %s(%d) : %s T0001: Test \"%s::%s\" failed. %s \r\n", File, Line, TypeString, Suite->GetName(), Test->GetName(), ProblemText);
-	else
-		printf("  %s(%d) : %s T0002: Test \"%s::%s\" . %s \r\n", File, Line, TypeString, Suite->GetName(), Test->GetName(), ProblemText);
-}
-
-ZETestManager* ZETestManager::GetInstance()
-{
-	static ZETestManager* Instance = NULL;
-	if (Instance == NULL)
-		Instance = new ZETestManager();
-
-	return Instance;
-}

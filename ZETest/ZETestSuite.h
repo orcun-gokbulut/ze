@@ -37,6 +37,7 @@
 #ifndef __ZE_TEST_SUITE_H__
 #define __ZE_TEST_SUITE_H__
 
+#include "ZETypes.h"
 class ZETestItem;
 enum ZETestResult;
 
@@ -44,9 +45,11 @@ class ZETestSuite
 {
 	private:
 		char				Name[255];
-		ZETestItem*				Tests[65536];
-		size_t				TestCount;
+		ZETestItem*			Tests[65536];
+		size_t				TotalTestCount;
 		ZETestResult		Result;
+		float				ElapsedTime;
+		int					PassedTestCount;
 
 	public:
 		const char*			GetName();
@@ -56,6 +59,11 @@ class ZETestSuite
 		bool				RunTests();
 		void				Reset();
 		ZETestResult		GetResult();
+		float				GetElapsedTime();
+
+		int					GetTotalTestCount();
+		int					GetFailedTestCount();
+		int					GetPassedTestCount();
 
 							ZETestSuite(const char* SuiteName);
 };

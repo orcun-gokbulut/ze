@@ -47,31 +47,41 @@ const char* ZETestSuite::GetName()
 
 void ZETestSuite::RegisterTest(ZETestItem* Test)
 {
-	Tests[TestCount] = Test;
-	TestCount++;
+	Tests[TotalTestCount] = Test;
+	TotalTestCount++;
 }
 
 bool ZETestSuite::RunTests()
 {
 	Reset();
 
+	printf("Running Test Suite \"%s\".\n", GetName());
+
 	bool CurrentResult = true;
-	for (size_t I = 0; I < TestCount; I++)
+	for (size_t I = 0; I < TotalTestCount; I++)
 	{
-		printf("    Test #%d - %s.\n", I, Tests[I]->GetName());
+		printf("  Test #%d/%d - %s.\n", I + 1, TotalTestCount, Tests[I]->GetName());
 
 		if (!Tests[I]->RunTest())
 		{
-			printf("    FAILED. \n", I, Tests[I]->GetName());
+			printf("  Test #%d/%d  - \"%s\"FAILED !!! Elapsed time : %f ms. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
 			CurrentResult = false;
 		}
 		else
 		{
-			printf("    PASSED. \n", I, Tests[I]->GetName());
+			PassedTestCount++;
+			printf("  Test #%d/%d - \"%s\" passed. Elapsed time : %f ms. \n", I + 1, TotalTestCount, Tests[I]->GetName(), Tests[I]->GetEleapsedTime());
 		}
+
+		ElapsedTime += Tests[I]->GetEleapsedTime();
 	}
 
 	Result = CurrentResult ? ZE_TR_PASSED : ZE_TR_FAILED;
+
+	if (!CurrentResult)
+		printf("Test suite \"%s\" has passed. Total Time : %d ms \n", GetName(), ElapsedTime);
+	else
+		printf("Test suite \"%s\" has FAILED !!! Elapsed time : %d, Passed test count : %d, Failed test count : %d.\n", GetName(), ElapsedTime, PassedTestCount, TotalTestCount - PassedTestCount);
 
 	return CurrentResult;
 }
@@ -79,7 +89,9 @@ bool ZETestSuite::RunTests()
 void ZETestSuite::Reset()
 {
 	Result = ZE_TR_NOT_RUN;
-	for (size_t I = 0; I < TestCount; I++)
+	ElapsedTime = 0;
+	PassedTestCount = 0;
+	for (size_t I = 0; I < TotalTestCount; I++)
 		Tests[I]->Reset();
 }
 
@@ -88,9 +100,34 @@ ZETestResult ZETestSuite::GetResult()
 	return Result;
 }
 
+float ZETestSuite::GetElapsedTime()
+{
+	return ElapsedTime;
+}
+
+int ZETestSuite::GetTotalTestCount()
+{
+	return TotalTestCount;
+}
+
+int ZETestSuite::GetFailedTestCount()
+{
+	if (Result == ZE_TR_NOT_RUN)
+		return 0;
+
+	return TotalTestCount - PassedTestCount;
+}
+
+int ZETestSuite::GetPassedTestCount()
+{
+	return PassedTestCount;
+}
+
 ZETestSuite::ZETestSuite(const char* Name)
 {
 	Result = ZE_TR_NOT_RUN;
+	ElapsedTime = 0;
+	PassedTestCount = 0;
 	strncpy(this->Name, Name, 255);
 }
 

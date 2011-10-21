@@ -71,30 +71,19 @@ ZETestSuiteAdd(ZEOBBox)
 
 	ZETestItemAdd(OBB_GetVertex)
 	{
-		ZEVector3 Position(1.0f, 2.0f, 3.0f);
-		ZEVector3 U(1.0f, 0.0f, 0.0f);
-		ZEVector3 V(0.0f, 1.0f, 0.0f);
-		ZEVector3 N(0.0f, 0.0f, 1.0f);
+		ZEOBBox OBB(ZEVector3(1.0f, 2.0f, 3.0f), 
+			ZEVector3::UnitX, ZEVector3::UnitY, ZEVector3::UnitZ, 
+			ZEVector3(1.0f, 1.0f, 1.0f));
 
-		ZEOBBox OBB(Position, U, V, N, ZEVector3(0.5f, 0.5f, 0.5f));
 
-		ZEVector3 V0 = OBB.GetVertex(0);
-		ZEVector3 V1 = OBB.GetVertex(1);
-		ZEVector3 V2 = OBB.GetVertex(2);
-		ZEVector3 V3 = OBB.GetVertex(3);
-		ZEVector3 V4 = OBB.GetVertex(4);
-		ZEVector3 V5 = OBB.GetVertex(5);
-		ZEVector3 V6 = OBB.GetVertex(6);
-		ZEVector3 V7 = OBB.GetVertex(7);
-
-		ZETestCheckEqual(V0, ZEVector3(1.0f, 2.0f, 3.0f));
-		ZETestCheckEqual(V1, ZEVector3(2.0f, 2.0f, 3.0f));
-		ZETestCheckEqual(V2, ZEVector3(1.0f, 3.0f, 3.0f));
-		ZETestCheckEqual(V3, ZEVector3(2.0f, 3.0f, 3.0f));
-		ZETestCheckEqual(V4, ZEVector3(1.0f, 2.0f, 4.0f));
-		ZETestCheckEqual(V5, ZEVector3(2.0f, 2.0f, 4.0f));
-		ZETestCheckEqual(V6, ZEVector3(1.0f, 3.0f, 4.0f));
-		ZETestCheckEqual(V7, ZEVector3(2.0f, 3.0f, 4.0f));
+		ZETestCheckEqual(OBB.GetVertex(0), ZEVector3(1.0f, 2.0f, 3.0f));
+		ZETestCheckEqual(OBB.GetVertex(1), ZEVector3(2.0f, 2.0f, 3.0f));
+		ZETestCheckEqual(OBB.GetVertex(2), ZEVector3(1.0f, 3.0f, 3.0f));
+		ZETestCheckEqual(OBB.GetVertex(3), ZEVector3(2.0f, 3.0f, 3.0f));
+		ZETestCheckEqual(OBB.GetVertex(4), ZEVector3(1.0f, 2.0f, 4.0f));
+		ZETestCheckEqual(OBB.GetVertex(5), ZEVector3(2.0f, 2.0f, 4.0f));
+		ZETestCheckEqual(OBB.GetVertex(6), ZEVector3(1.0f, 3.0f, 4.0f));
+		ZETestCheckEqual(OBB.GetVertex(7), ZEVector3(2.0f, 3.0f, 4.0f));
 	}
 
 	ZETestItemAdd(OBB_PlaneHalfSpaceTest)

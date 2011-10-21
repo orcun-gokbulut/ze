@@ -58,8 +58,8 @@ ZETestSuiteAdd(Quaternion)
 	ZETestItemAdd(QTRN_Create2)
 	{
 		ZEQuaternion Q;
-		ZEQuaternion::Create(Q, ZE_PI, ZEVector3(1.0f, 2.0f, 3.0));
-		ZETestCheckEqual(Q, ZEQuaternion(cos(ZE_PI_2), 1.0f, 2.0f, 3.0f));
+		ZEQuaternion::Create(Q, ZE_PI, ZEVector3(1.0f, 2.0f, 3.0).Normalize());
+		ZETestCheckEqual(Q, ZEQuaternion(ZE_PI, ZEVector3(1.0f, 2.0f, 3.0).Normalize()));
 	}
 
 	ZETestItemAdd(QTRN_Create3)
@@ -80,18 +80,22 @@ ZETestSuiteAdd(Quaternion)
 	{
 		ZEQuaternion Q;
 		ZEQuaternion A(3.0f, 5.0f, 8.0f, 11.0f);
+		A.NormalizeSelf();
 		ZEQuaternion B(1.0f, 1.0f, 2.0f,  3.0f);
+		B.NormalizeSelf();
 		ZEQuaternion::Product(Q, A, B);
 
-		ZETestCheckEqual(Q, ZEQuaternion(-51.0f, 10.0f, 10.0f, 22.0f));
+		ZETestCheckEqual(Q, ZEQuaternion(-0.88982064f, 0.17447460f, 0.17447464f, 0.38384420f));
 	}
 
 	ZETestItemAdd(QTRN_VectorProduct)
 	{
-		ZEVector3 Q;
+		ZETestCheck(false);
+
+		/*ZEVector3 Q;
 		ZEQuaternion A(1.0f, 2.0f, 3.0f, 4.0f);
 		ZEVector3 V(1.0f, 2.0f, 3.0f);
-		ZEQuaternion::VectorProduct(Q, A, V);
+		ZEQuaternion::VectorProduct(Q, A, V);*/
 	}
 
 	ZETestItemAdd(QTRN_ConvertToEulerAngles)
@@ -124,6 +128,8 @@ ZETestSuiteAdd(Quaternion)
 	{
 		ZEQuaternion P(0.1f, 0.2f, 0.3f, 0.4f);
 		ZEQuaternion Q(0.1f, 0.0f, 0.0f, 0.3f);
+		P.NormalizeSelf();
+
 		ZEQuaternion QOut;
 		float t = 0.3;
 		ZEQuaternion::Slerp(QOut, P, Q, t);

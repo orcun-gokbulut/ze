@@ -105,8 +105,6 @@ ZETestSuiteAdd(ZEPointerTests1)
 			ZETestClass::DestructorRunCount == 0 &&
 			ZETestClass::FunctionRunCount == 0);
 
-		ZETestCheck(false);
-
 		ZETestClass* A = new ZETestClass();
 		ZETestCheck(ZETestClass::Status == ZE_TCS_CONSTRUCTED &&
 			ZETestClass::ConstructorRunCount == 1 &&
