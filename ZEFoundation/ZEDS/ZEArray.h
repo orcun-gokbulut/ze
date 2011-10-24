@@ -62,7 +62,6 @@ ZEArray<*>{
 #define __ZEDS_ARRAY_H__
 
 #include <stdlib.h>
-#include "ZEDSDefinitions.h"
 #include "ZETypes.h"
 #include "ZEAllocator.h"
 #include "ZEError.h"
@@ -77,7 +76,7 @@ class ZEArray
 	private:
 		size_t		Count;
 		Allocator_	Allocator;
-		Type		*Items;
+		Type*		Items;
 
 	public:
 		inline void Enqueue(Type Value)
@@ -433,7 +432,7 @@ class ZEArray
 
 		inline void BinarySearch(const Type& Element, int (*CompareFunction)(Type*, Type*))
 		{
-			bsearch(&Element, Buffer, Count, sizeof(Type), CompareFunction);
+			bsearch(&Element, &Element, Count, sizeof(Type), CompareFunction);
 		}
 
 		inline const Type& GetItem(size_t Index) const
