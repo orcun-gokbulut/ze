@@ -432,7 +432,7 @@ class ZEArray
 
 		inline void BinarySearch(const Type& Element, int (*CompareFunction)(Type*, Type*))
 		{
-			bsearch(&Element, &Element, Count, sizeof(Type), CompareFunction);
+			bsearch(&Element, &Items, Count, sizeof(Type), CompareFunction);
 		}
 
 		inline const Type& GetItem(size_t Index) const
