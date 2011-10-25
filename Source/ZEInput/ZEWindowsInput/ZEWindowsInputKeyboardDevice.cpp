@@ -343,7 +343,6 @@ void ZEWindowsInputKeyboardDevice::Deinitialize()
 void ZEWindowsInputKeyboardDevice::ProcessInputs()
 {   
 	memcpy(ButtonStateOld, ButtonState, sizeof(ButtonState));
-//	memset(&ButtonState, 0, sizeof(ButtonState));
 }
 
 bool ZEWindowsInputKeyboardDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction)
