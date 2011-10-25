@@ -67,6 +67,8 @@ class ZEWindowsInputKeyboardDevice : public ZEInputDevice
 
 		virtual ZEDWORD						GetButtonCount();
 
+		virtual void						UnAcquire();
+
 		virtual bool						Initialize();
 		virtual void						Deinitialize();
 

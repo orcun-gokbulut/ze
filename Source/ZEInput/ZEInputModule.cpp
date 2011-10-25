@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInputModule.h"
+#include "ZEInputDevice.h"
 #include "ZEInputModuleDescription.h"
 #include "ZECore/ZECore.h"
 
@@ -72,13 +73,25 @@ bool ZEInputModule::IsAcquired()
 void ZEInputModule::Acquire()
 {
 	if (IsInitialized())
+	{
 		Acquired = true;
+
+		const ZEArray<ZEInputDevice*>& Devices = GetInputDevices();
+		for (int I = 0; I < Devices.GetCount(); I++)
+			Devices[I]->Acquire();
+	}
 }
 
 void ZEInputModule::UnAcquire()
 {
 	if (IsInitialized())
+	{
 		Acquired = false;
+
+		const ZEArray<ZEInputDevice*>& Devices = GetInputDevices();
+		for (int I = 0; I < Devices.GetCount(); I++)
+			Devices[I]->UnAcquire();
+	}
 }
 
 ZEInputModule* ZEInputModule::GetInstance()

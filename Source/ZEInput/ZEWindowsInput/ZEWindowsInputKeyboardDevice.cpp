@@ -115,6 +115,11 @@ ZEDWORD ZEWindowsInputKeyboardDevice::GetButtonCount()
 	return 256;
 }
 
+void ZEWindowsInputKeyboardDevice::UnAcquire()
+{
+	memset(&ButtonState, 0, sizeof(ButtonState));
+}
+
 /*#define DEFAULT(Num) {Num, #Num, ZE_IT_BUTTON}
 ZEInputDescription* ZEWindowsInputKeyboardDevice::GetInputDescriptions()
 {

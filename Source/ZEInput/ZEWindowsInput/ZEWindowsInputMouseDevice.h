@@ -69,6 +69,8 @@ class ZEWindowsInputMouseDevice : public ZEInputDevice
 
 		virtual ZEDWORD					GetButtonCount();
 		virtual ZEDWORD					GetAxisCount();
+		
+		virtual void					UnAcquire();
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();

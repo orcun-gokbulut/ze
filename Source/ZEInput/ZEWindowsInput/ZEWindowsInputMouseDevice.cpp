@@ -77,12 +77,31 @@ bool ZEWMIKSH::Callback(MSG* Message)
 			Device->AxisState[ZE_IMA_HORIZANTAL_AXIS] += Input.data.mouse.lLastX;
 			Device->AxisState[ZE_IMA_VERTICAL_AXIS] += Input.data.mouse.lLastY;
 
-			Device->ButtonState[0] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) != 0;
-			Device->ButtonState[1] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) != 0;
-			Device->ButtonState[2] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) != 0;
-			Device->ButtonState[3] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) != 0;
-			Device->ButtonState[4] |= (Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) != 0;
-			
+			if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_DOWN) == RI_MOUSE_BUTTON_1_DOWN)
+				Device->ButtonState[Input.data.keyboard.MakeCode] = true;
+			else if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_1_UP) == RI_MOUSE_BUTTON_1_UP)
+				Device->ButtonState[Input.data.keyboard.MakeCode] = false;
+
+			if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_DOWN) == RI_MOUSE_BUTTON_2_DOWN)
+				Device->ButtonState[Input.data.keyboard.MakeCode] = true;
+			else if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_2_UP) == RI_MOUSE_BUTTON_2_UP)
+				Device->ButtonState[Input.data.keyboard.MakeCode] = false;
+
+			if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_DOWN) == RI_MOUSE_BUTTON_3_DOWN)
+				Device->ButtonState[Input.data.keyboard.MakeCode] = true;
+			else if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_3_UP) == RI_MOUSE_BUTTON_3_UP)
+				Device->ButtonState[Input.data.keyboard.MakeCode] = false;
+
+			if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) == RI_MOUSE_BUTTON_4_DOWN)
+				Device->ButtonState[Input.data.keyboard.MakeCode] = true;
+			else if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP) == RI_MOUSE_BUTTON_4_UP)
+				Device->ButtonState[Input.data.keyboard.MakeCode] = false;
+
+			if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) == RI_MOUSE_BUTTON_5_DOWN)
+				Device->ButtonState[Input.data.keyboard.MakeCode] = true;
+			else if ((Input.data.mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP) == RI_MOUSE_BUTTON_5_UP)
+				Device->ButtonState[Input.data.keyboard.MakeCode] = false;
+
 			if (Input.data.mouse.usButtonFlags & RI_MOUSE_WHEEL)
 				Device->AxisState[2] += *((SHORT*)&Input.data.mouse.usButtonData);
 
@@ -126,6 +145,11 @@ ZEDWORD ZEWindowsInputMouseDevice::GetAxisCount()
 	return 3;
 }
 
+void ZEWindowsInputMouseDevice::UnAcquire()
+{
+	memset(&ButtonState, 0, sizeof(ButtonState));
+}
+
 bool ZEWindowsInputMouseDevice::Initialize()
 {	
 	ZESystemMessageManager::GetInstance()->RegisterMessageHandler(MessageHandler);
@@ -153,7 +177,7 @@ void ZEWindowsInputMouseDevice::ProcessInputs()
 	AxisState[2] = 0;
 
 	memcpy(ButtonStateOld, ButtonState, sizeof(ButtonState));
-	memset(&ButtonState, 0, sizeof(ButtonState));
+	//memset(&ButtonState, 0, sizeof(ButtonState));
 }
 
 bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInputAction* InputAction)
@@ -170,6 +194,7 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 			if ((InputBinding->Event.ButtonState == ZE_IBS_PRESSED && ButtonStateOld[ButtonIndex] == false && ButtonState[ButtonIndex] == true) ||
 				(InputBinding->Event.ButtonState == ZE_IBS_PRESSING && ButtonState[ButtonIndex] == true))
 			{
+				zeLog("xxx", "bla");
 				InputAction->Id = InputBinding->ActionId;
 				InputAction->ButtonState = ZE_IBS_PRESSED;
 				InputAction->From = InputBinding;
@@ -177,6 +202,7 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 			}
 			else if (InputBinding->Event.ButtonState == ZE_IBS_RELEASED && ButtonStateOld[ButtonIndex] == true && ButtonState[ButtonIndex] == false)
 			{
+				zeLog("xxx", "blb");
 				InputAction->Id = InputBinding->ActionId;
 				InputAction->ButtonState = ZE_IBS_RELEASED;
 				InputAction->From = InputBinding;
