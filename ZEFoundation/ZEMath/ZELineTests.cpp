@@ -48,8 +48,8 @@ ZETestSuiteAdd(ZELine)
 		ZEVector3 P0(0.0f, 1.0f, 0.0f);
 		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZELine L(P0, P1);
-		ZETestCheckEqual(L.p, P0);
-		ZETestCheckEqual(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
+		CHECK_EQUAL(L.p, P0);
+		CHECK_EQUAL(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
 	}
 
 	ZETestItemAdd(LN_Create)
@@ -58,8 +58,8 @@ ZETestSuiteAdd(ZELine)
 		ZEVector3 P0(0.0f, 1.0f, 0.0f);
 		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZELine::Create(L, P0, P1);
-		ZETestCheckEqual(L.p, P0);
-		ZETestCheckEqual(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
+		CHECK_EQUAL(L.p, P0);
+		CHECK_EQUAL(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
 	}
 
 	ZETestItemAdd(LN_CreateParamatric)
@@ -68,8 +68,8 @@ ZETestSuiteAdd(ZELine)
 		ZEVector3 V(1.0, 4.0f, 9.0f);
 		ZEVector3 P (1.0, 0.0f, 0.0f);
 		ZELine::CreateParametric(L, V, P);
-		ZETestCheckEqual(L.p, P);
-		ZETestCheckEqual(L.v, V);
+		CHECK_EQUAL(L.p, P);
+		CHECK_EQUAL(L.v, V);
 	}
 
 	ZETestItemAdd(LN_MinimumDistance1)
@@ -84,7 +84,7 @@ ZETestSuiteAdd(ZELine)
 		
 		float d = ZELine::MinimumDistance(L1, L2);
 
-		ZETestCheckEqual(d, sqrtf(14.0f));
+		CHECK_EQUAL(d, sqrtf(14.0f));
 	}
 
 	ZETestItemAdd(LN_MinimumDistance2)
@@ -100,7 +100,7 @@ ZETestSuiteAdd(ZELine)
 		float tA, tB;
 		float d = ZELine::MinimumDistance(L1, L2, tA, tB);
 
-		ZETestCheckEqual(d, sqrtf(14.0f));
+		CHECK_EQUAL(d, sqrtf(14.0f));
 	}
 
 	ZETestItemAdd(LN_DistanceToPoint)
@@ -114,7 +114,7 @@ ZETestSuiteAdd(ZELine)
 
 		d = ZELine::MinimumDistance(L,P,t);
 
-		ZETestCheckClose(d, 4.61880215, 0.000001);
+		CHECK_CLOSE(d, 4.61880215, 0.000001);
 	}
 
 	ZETestItemAdd(LN_GetPointOn)
@@ -133,6 +133,6 @@ ZETestSuiteAdd(ZELine)
 		ZEVector3::Add(P,P,L.p);
 		B = P;
 
-		ZETestCheckEqual(A, B);
+		CHECK_EQUAL(A, B);
 	}
 }

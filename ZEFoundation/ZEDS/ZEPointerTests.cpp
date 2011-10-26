@@ -100,36 +100,36 @@ ZETestSuiteAdd(ZEPointerTests1)
 	ZETestItemAdd(TestClassTest)
 	{
 		ZETestClass::Reset();
-		ZETestCheck(ZETestClass::Status == ZE_TCS_NOT_CONSTRUCTED &&
+		CHECK(ZETestClass::Status == ZE_TCS_NOT_CONSTRUCTED &&
 			ZETestClass::ConstructorRunCount == 0 &&
 			ZETestClass::DestructorRunCount == 0 &&
 			ZETestClass::FunctionRunCount == 0);
 
 		ZETestClass* A = new ZETestClass();
-		ZETestCheck(ZETestClass::Status == ZE_TCS_CONSTRUCTED &&
+		CHECK(ZETestClass::Status == ZE_TCS_CONSTRUCTED &&
 			ZETestClass::ConstructorRunCount == 1 &&
 			ZETestClass::DestructorRunCount == 0);
 
-		ZETestCheck(A->Variable == 0xABCD1234);
+		CHECK(A->Variable == 0xABCD1234);
 		
 		A->Function();
-		ZETestCheck(ZETestClass::FunctionRunCount == 1);
+		CHECK(ZETestClass::FunctionRunCount == 1);
 
 		delete A;
-		ZETestCheck(ZETestClass::Status == ZE_TCS_DESTRUCTED &&
+		CHECK(ZETestClass::Status == ZE_TCS_DESTRUCTED &&
 			ZETestClass::ConstructorRunCount == 1 &&
 			ZETestClass::DestructorRunCount == 1);
 
 		A = new ZETestClass();
-		ZETestCheck(ZETestClass::Status == ZE_TCS_CONSTRUCTED &&
+		CHECK(ZETestClass::Status == ZE_TCS_CONSTRUCTED &&
 			ZETestClass::ConstructorRunCount == 2 &&
 			ZETestClass::DestructorRunCount == 1);
 
 		A->Function();
-		ZETestCheck(ZETestClass::FunctionRunCount == 2);
+		CHECK(ZETestClass::FunctionRunCount == 2);
 
 		delete A;
-		ZETestCheck(ZETestClass::Status == ZE_TCS_DESTRUCTED &&
+		CHECK(ZETestClass::Status == ZE_TCS_DESTRUCTED &&
 			ZETestClass::ConstructorRunCount == 2 &&
 			ZETestClass::DestructorRunCount == 2);
 
@@ -141,10 +141,10 @@ ZETestSuiteAdd(ZEPointerTests1)
 
 		ZEPointer<ZETestClass> T;
 
-		ZETestCheck(ZETestClass::ConstructorRunCount == 0 && 
+		CHECK(ZETestClass::ConstructorRunCount == 0 && 
 			ZETestClass::DestructorRunCount == 0 && 
 			ZETestClass::Status == ZE_TCS_NOT_CONSTRUCTED);
-		ZETestCheck(T.IsNull());
+		CHECK(T.IsNull());
 	}
 
 	ZETestItemAdd(Create)
@@ -153,12 +153,12 @@ ZETestSuiteAdd(ZEPointerTests1)
 		{
 			ZEPointer<ZETestClass> T;
 			T.Create(new ZETestClass());
-			ZETestCheck(!T.IsNull());
-			ZETestCheck(ZETestClass::ConstructorRunCount == 1 && 
+			CHECK(!T.IsNull());
+			CHECK(ZETestClass::ConstructorRunCount == 1 && 
 				ZETestClass::DestructorRunCount == 0 && 
 				ZETestClass::Status == ZE_TCS_CONSTRUCTED);
 		}
-		ZETestCheck(ZETestClass::ConstructorRunCount == 1 && 
+		CHECK(ZETestClass::ConstructorRunCount == 1 && 
 			ZETestClass::DestructorRunCount == 1 && 
 			ZETestClass::Status == ZE_TCS_DESTRUCTED);
 
@@ -167,7 +167,7 @@ ZETestSuiteAdd(ZEPointerTests1)
 			ZEPointer<ZETestClass> T;
 			T.Create(new ZETestClass());
 		}
-		ZETestCheck(ZETestClass::ConstructorRunCount == 1 && 
+		CHECK(ZETestClass::ConstructorRunCount == 1 && 
 			ZETestClass::DestructorRunCount == 1 && 
 			ZETestClass::Status == ZE_TCS_DESTRUCTED);
 	}
@@ -179,8 +179,8 @@ ZETestSuiteAdd(ZEPointerTests1)
 		T.Create(new ZETestClass());
 		T.Release();
 
-		ZETestCheck(T.IsNull());
-		ZETestCheck(ZETestClass::ConstructorRunCount == 1 && 
+		CHECK(T.IsNull());
+		CHECK(ZETestClass::ConstructorRunCount == 1 && 
 			ZETestClass::DestructorRunCount == 1 && 
 			ZETestClass::Status == ZE_TCS_DESTRUCTED);
 	}
@@ -191,17 +191,17 @@ ZETestSuiteAdd(ZEPointerTests1)
 		{
 			ZETestClass* Test1 = new ZETestClass();
 			ZEPointer<ZETestClass> T1(Test1);
-			ZETestCheck(!T1.IsNull());
-			ZETestCheck(T1.GetPointer() == Test1);
+			CHECK(!T1.IsNull());
+			CHECK(T1.GetPointer() == Test1);
 
 			ZETestClass* Test2 = new ZETestClass();
 			ZEPointer<ZETestClass> T2;
 			T2 = Test2;
-			ZETestCheck(!T2.IsNull());
-			ZETestCheck(T2.GetPointer() == Test2);
+			CHECK(!T2.IsNull());
+			CHECK(T2.GetPointer() == Test2);
 		}
 
-		ZETestCheck(ZETestClass::ConstructorRunCount == 2 && 
+		CHECK(ZETestClass::ConstructorRunCount == 2 && 
 			ZETestClass::DestructorRunCount == 2 && 
 			ZETestClass::Status == ZE_TCS_DESTRUCTED);
 	}
@@ -216,24 +216,24 @@ ZETestSuiteAdd(ZEPointerTests1)
 			T1 = Test;
 			
 			T2.Copy(T1);
-			ZETestCheck(T1.IsNull());
-			ZETestCheck(ZETestClass::ConstructorRunCount == 1 && 
+			CHECK(T1.IsNull());
+			CHECK(ZETestClass::ConstructorRunCount == 1 && 
 				ZETestClass::DestructorRunCount == 0 && 
 				ZETestClass::Status == ZE_TCS_CONSTRUCTED);
-			ZETestCheck(!T2.IsNull());
-			ZETestCheck(T2.GetPointer() == Test);
+			CHECK(!T2.IsNull());
+			CHECK(T2.GetPointer() == Test);
 
 			ZEPointer<ZETestClass> T3;
 			T2.Copy(T3);
-			ZETestCheck(T2.IsNull());
-			ZETestCheck(ZETestClass::ConstructorRunCount == 1 && 
+			CHECK(T2.IsNull());
+			CHECK(ZETestClass::ConstructorRunCount == 1 && 
 				ZETestClass::DestructorRunCount == 1 && 
 				ZETestClass::Status == ZE_TCS_DESTRUCTED);
 
 			ZEPointer<ZETestClass> T4(new ZETestClass());
 			T4 = NULL;
-			ZETestCheck(T4.IsNull());
-			ZETestCheck(ZETestClass::ConstructorRunCount == 2 && 
+			CHECK(T4.IsNull());
+			CHECK(ZETestClass::ConstructorRunCount == 2 && 
 				ZETestClass::DestructorRunCount == 2 && 
 				ZETestClass::Status == ZE_TCS_DESTRUCTED);
 		}
@@ -244,15 +244,15 @@ ZETestSuiteAdd(ZEPointerTests1)
 		ZETestClass::Reset();
 		{
 			ZEPointer<ZETestClass> T1 = new ZETestClass();
-			ZETestCheck(T1->Variable == 0xABCD1234);
+			CHECK(T1->Variable == 0xABCD1234);
 
 			T1->Function();
-			ZETestCheck(ZETestClass::FunctionRunCount == 1);
+			CHECK(ZETestClass::FunctionRunCount == 1);
 
 			(*T1).Function();
-			ZETestCheck(ZETestClass::FunctionRunCount == 2);
+			CHECK(ZETestClass::FunctionRunCount == 2);
 		}
-		ZETestCheck(ZETestClass::ConstructorRunCount == 1 && 
+		CHECK(ZETestClass::ConstructorRunCount == 1 && 
 			ZETestClass::DestructorRunCount == 1 && 
 			ZETestClass::Status == ZE_TCS_DESTRUCTED);
 	}
@@ -263,14 +263,14 @@ ZETestSuiteAdd(ZEPointerTests1)
 			ZETestClass::Reset();
 			ZEPointer<ZETestClass> T1 = new ZETestClass();
 			FunctionCallByData(T1);
-			ZETestCheck(ZETestClass::Status == ZE_TCS_DESTRUCTED);
+			CHECK(ZETestClass::Status == ZE_TCS_DESTRUCTED);
 
 			ZETestClass::Reset();
 			ZEPointer<ZETestClass> T2 = new ZETestClass();
 			FunctionCallByRef(T2);
-			ZETestCheck(ZETestClass::Status == ZE_TCS_CONSTRUCTED);
+			CHECK(ZETestClass::Status == ZE_TCS_CONSTRUCTED);
 		}
-		ZETestCheck(ZETestClass::Status == ZE_TCS_DESTRUCTED);
+		CHECK(ZETestClass::Status == ZE_TCS_DESTRUCTED);
 	}
 
 	ZETestItemAdd(EmptyPointer)
@@ -278,22 +278,22 @@ ZETestSuiteAdd(ZEPointerTests1)
 		ZETestClass::Reset();
 		{
 			ZEPointer<ZETestClass> T1 = NULL;
-			ZETestCheck(T1.IsNull());
+			CHECK(T1.IsNull());
 			T1.Release();
-			ZETestCheck(ZETestClass::Status == ZE_TCS_NOT_CONSTRUCTED &&
+			CHECK(ZETestClass::Status == ZE_TCS_NOT_CONSTRUCTED &&
 				ZETestClass::ConstructorRunCount == 0 &&
 				ZETestClass::DestructorRunCount == 0);
 
 			ZEPointer<ZETestClass> T2(NULL);
-			ZETestCheck(T2.IsNull());
+			CHECK(T2.IsNull());
 			T2.Release();
-			ZETestCheck(ZETestClass::Status == ZE_TCS_NOT_CONSTRUCTED &&
+			CHECK(ZETestClass::Status == ZE_TCS_NOT_CONSTRUCTED &&
 				ZETestClass::ConstructorRunCount == 0 &&
 				ZETestClass::DestructorRunCount == 0);
 
 			ZEPointer<ZETestClass> T3;
 			T3.Create(NULL);
-			ZETestCheck(ZETestClass::Status == ZE_TCS_NOT_CONSTRUCTED &&
+			CHECK(ZETestClass::Status == ZE_TCS_NOT_CONSTRUCTED &&
 				ZETestClass::ConstructorRunCount == 0 &&
 				ZETestClass::DestructorRunCount == 0);
 		}

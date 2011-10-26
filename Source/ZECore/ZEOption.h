@@ -37,9 +37,9 @@
 #ifndef	__ZE_OPTION_H__
 #define __ZE_OPTION_H__
 
-#include "ZEDS/ZENamed.h"
+#include "ZEDS/ZEString.h"
 #include "ZEDS/ZETypedVariant.h"
-#include "ZEFastDelegate.h"
+#include "ZEDS/ZEFastDelegate.h"
 
 enum ZEOptionAttribute
 {
@@ -57,43 +57,56 @@ enum ZEOptionType
 
 class ZEOption;
 
-typedef fastdelegate::FastDelegate0<void> ZEOptionsChangedEventCallback;
+typedef fastdelegate::FastDelegate2<ZEOption*, bool&, void> ZEOptionsChangingEvent;
+typedef fastdelegate::FastDelegate1<ZEOption*, void> ZEOptionsChangedEvent;
 
 class ZEOptionSection;
-class ZEOption : public ZENamed
+class ZEOption
 {
 	friend ZEOptionSection;
 	protected:
-		ZEOptionSection*		Section;
-		ZETypedVariant			DefaultValue;
-		ZETypedVariant			Value;
-		ZEOptionAttribute		Attribute;
-		bool					Changed;
+		ZEString						Name;
+		ZEOptionSection*				Section;
+		ZETypedVariant					DefaultValue;
+		ZETypedVariant					Value;
+		ZEOptionAttribute				Attribute;
+		bool							Changed;
+		
+		ZEOptionsChangingEvent			OnChanging;
+		ZEOptionsChangedEvent			OnChanged;
 
 	public:
+		const ZEString&					GetName();
+		void							SetName(const ZEString& Name);
 
-		virtual void			SetValueType(ZEVariantType NewType);
-		ZEVariantType			GetValueType();
+		virtual void					SetValueType(ZEVariantType NewType);
+		ZEVariantType					GetValueType();
 
-		virtual void			SetDefaultValue(ZETypedVariant NewDefaultValue);
-		ZETypedVariant			GetDefaultValue();
+		virtual void					SetDefaultValue(ZETypedVariant NewDefaultValue);
+		ZETypedVariant					GetDefaultValue();
 		
-		void					SetToDefault();
+		void							SetToDefault();
 
-		virtual void			SetValue(ZETypedVariant NewValue);
-		ZETypedVariant			GetValue();
+		virtual void					SetValue(ZETypedVariant NewValue);
+		ZETypedVariant					GetValue();
 
-		ZEOptionAttribute 		GetAttribute();
-		void					SetAttribute(ZEOptionAttribute NewAttribute);
+		ZEOptionAttribute 				GetAttribute();
+		void							SetAttribute(ZEOptionAttribute NewAttribute);
 
-		virtual ZEOptionType	GetType(); 
+		virtual ZEOptionType			GetType(); 
+		
+		const ZEOptionsChangingEvent&	GetOnChanging();		
+		void							SetOnChanging(ZEOptionsChangingEvent EventHandler);
 
-		bool					IsChanged();
-		void					ChangeCommitted();
+		const ZEOptionsChangedEvent&	GetOnChanged();
+		void							SetOnChanged(ZEOptionsChangedEvent EventHandler);
 
-								ZEOption();
-								ZEOption(const char *InitialName, ZETypedVariant InitialDefaultValue, 
-										 ZEOptionAttribute InitialAttribute);
+		bool							IsChanged();
+		void							ChangeCommitted();
+
+										ZEOption();
+										ZEOption(const char *InitialName, ZETypedVariant InitialDefaultValue, 
+											ZEOptionAttribute InitialAttribute);
 };
 
 #endif

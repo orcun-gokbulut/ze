@@ -42,7 +42,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEUIRectangle.h"
 #include "ZEUIEvents.h"
-#include "ZEFastDelegate.h"
+#include "ZEDS/ZEFastDelegate.h"
 
 enum ZEUIControlVisibility
 {

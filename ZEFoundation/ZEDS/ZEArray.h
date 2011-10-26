@@ -66,10 +66,6 @@ ZEArray<*>{
 #include "ZEAllocator.h"
 #include "ZEError.h"
 
-#ifdef ZE_DEBUG_CHECK_MEMORY
-#include <crtdbg.h>
-#endif
-
 template<typename Type, typename Allocator_= ZEAllocatorBase<Type> >
 class ZEArray
 {
@@ -121,11 +117,9 @@ class ZEArray
 		inline Type* MassAdd(const Type* NewItems, size_t ItemCount)
 		{
 			Resize(Count + ItemCount);
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count, NewItems, ItemCount);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count - ItemCount, NewItems, ItemCount);
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-			zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 
 			return &Items[Count - ItemCount];
 		}
@@ -133,11 +127,9 @@ class ZEArray
 		inline Type* MassAdd(const Type* NewItems, size_t ItemOffset, size_t ItemCount)
 		{
 			Resize(Count + ItemCount);
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count, NewItems + ItemOffset, ItemCount);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count - ItemCount, NewItems + ItemOffset, ItemCount);
 			
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-			zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 
 			return &Items[Count - ItemCount];
 		}
@@ -156,9 +148,7 @@ class ZEArray
 
 			Count += ItemCount;
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-			zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 
 			return &Items[Count - ItemCount];
 		}
@@ -178,9 +168,7 @@ class ZEArray
 
 			Count += ItemCount;
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-			zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 
 			return &Items[Count - ItemCount];
 		}
@@ -200,9 +188,7 @@ class ZEArray
 
 			Count += ItemCount;
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-			zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 
 			return &Items[Count - ItemCount];
 		}
@@ -241,9 +227,8 @@ class ZEArray
 			if (this->Count != OtherArray.Count)
 				this->SetCount(OtherArray.Count);
 			ZEAllocatorBase<Type>::ObjectCopy(this->Items, OtherArray.Items, Count);	
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-					zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+
+			ZEDebugCheckMemory();
 		}
 		
 		void Combine(const ZEArray<Type, Allocator_>& OtherArray)
@@ -257,9 +242,7 @@ class ZEArray
 			Count++;
 			Allocator.Reallocate(&Items, Count); 
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 			
 			return &Items[Count - 1];		
 		}
@@ -270,9 +253,7 @@ class ZEArray
 			Allocator.Reallocate(&Items, Count);
 			Items[Count - 1] = NewItem;
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 
 			return &Items[Count - 1];
 		}
@@ -283,9 +264,7 @@ class ZEArray
 			Allocator.Reallocate(&Items, Count);
 			Items[Count - 1] = NewItem;
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 
 			return &Items[Count - 1];
 		}
@@ -318,9 +297,7 @@ class ZEArray
 				delete[] TempPointer;
 			}
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 
 			return &Items[Index];
 		}
@@ -331,9 +308,7 @@ class ZEArray
 			Insert(Index);
 			Items[Index] = NewItem;
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 
 			return &Items[Index];
 		}
@@ -366,9 +341,7 @@ class ZEArray
 
 			Count--;
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 		}
 
 		inline void DeleteValue(Type Value)
@@ -385,9 +358,7 @@ class ZEArray
 
 			Allocator.Reallocate(&Items, Count);
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 		}
 		
 		inline void SetCount(size_t Count)
@@ -404,9 +375,7 @@ class ZEArray
 				if (OldItems != NULL)
 					delete[] OldItems;
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 		}
 
 		inline void Resize(size_t Count)
@@ -426,9 +395,7 @@ class ZEArray
 
 			this->Count = Count;
 
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
+			ZEDebugCheckMemory();
 		}
 		
 		inline Type* GetCArray()
@@ -453,10 +420,6 @@ class ZEArray
 
 		inline void Clear()
 		{
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
-
 			Allocator.Deallocate(&Items);
 			Count = 0;
 		}

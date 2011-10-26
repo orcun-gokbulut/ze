@@ -43,10 +43,6 @@
 #include <string>
 #include "ZEError.h"
 
-#ifdef ZE_DEBUG_CHECK_MEMORY
-#include <crtdbg.h>
-#endif
-
 bool ZEString::IsEmpty() const
 {
 	return (Buffer == NULL || (Buffer[0] == '\0')); 
@@ -94,9 +90,7 @@ void ZEString::SetValue(const char* String)
 
 	memcpy(Buffer, String, Size);
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 }
 
 void ZEString::SetNumbericValue(char Value, unsigned int Base)
@@ -218,9 +212,7 @@ void ZEString::Append(const char* String)
 		memcpy(Buffer + Length, String, (StringLength + 1) * sizeof(char));
 	}
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 }
 
 void ZEString::Append(const ZEString& String)
@@ -252,9 +244,7 @@ void ZEString::Insert(const char* String)
 			delete[] OldBuffer;
 	}
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 }
 
 void ZEString::Insert(const ZEString& String)
@@ -304,9 +294,7 @@ void ZEString::Insert(size_t Position, const char* String)
 		memcpy(Buffer + Position + StringLength, Buffer + Position, (Length - Position - StringLength + 1) * sizeof(char));
 	}
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 }
 
 void ZEString::Remove(size_t Position, size_t Count)
@@ -337,9 +325,7 @@ void ZEString::Remove(size_t Position, size_t Count)
 		memcpy(Buffer + Position, Buffer + Position + Count, (Length - Position - Count + 1) * sizeof(char));	
 	}
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 }
 		
 bool ZEString::Equals(const ZEString& String) const
@@ -378,9 +364,7 @@ ZEString ZEString::Left(size_t Count) const
 	memcpy(Temp.Buffer, Buffer, Count * sizeof(char)); 
 	Temp.Buffer[Count] = L'\0';
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 
 	return Temp;
 }
@@ -399,9 +383,7 @@ ZEString ZEString::Right(size_t Count) const
 	Temp.Allocator.Allocate(&Temp.Buffer, (Count + 1) * sizeof(char));
 	memcpy(Temp.Buffer, Buffer + Length - Count, (Count + 1) * sizeof(char)); 
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 
 	return Temp;
 }
@@ -419,9 +401,7 @@ ZEString ZEString::Middle(size_t Position, size_t Count) const
 	memcpy(Temp.Buffer, Buffer + Position, Count * sizeof(char));
 	Temp.Buffer[Count] = L'\0';
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 
 	return Temp;
 }
@@ -440,9 +420,7 @@ ZEString ZEString::SubString(size_t StartPosition, size_t EndPosition) const
 	memcpy(Temp.Buffer, Buffer + StartPosition, (EndPosition - StartPosition + 1) * sizeof(char));
 	Temp.Buffer[EndPosition - StartPosition + 1] = '\0';
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 
 	return Temp;
 }
@@ -466,9 +444,7 @@ ZEString ZEString::TrimLeft() const
 	Temp.Allocator.Allocate(&Temp.Buffer, (Length - Count + 1) * sizeof(char));
 	memcpy(Temp.Buffer, Buffer + Count, (Length - Count + 1) * sizeof(char)); 
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 
 	return Temp;
 }
@@ -493,9 +469,7 @@ ZEString ZEString::TrimRight() const
 	memcpy(Temp.Buffer, Buffer, (Length - Count) * sizeof(char)); 
 	Temp.Buffer[Length - Count] = L'\0';
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 
 	return Temp;
 
@@ -531,9 +505,7 @@ ZEString ZEString::Trim() const
 	memcpy(Temp.Buffer, Buffer + LeftCount, (Length - LeftCount - RightCount) * sizeof(char)); 
 	Temp.Buffer[Length - LeftCount - RightCount] = L'\0';
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 
 	return Temp;
 }
@@ -701,7 +673,5 @@ ZEString::~ZEString()
 {
 	Clear();
 
-	#ifdef ZE_DEBUG_CHECK_MEMORY
-		zeAssert(!_CrtCheckMemory(), "Heap problem");
-	#endif
+	ZEDebugCheckMemory();
 }

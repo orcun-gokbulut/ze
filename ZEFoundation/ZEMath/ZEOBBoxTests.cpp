@@ -57,10 +57,10 @@ ZETestSuiteAdd(ZEOBBox)
 
 		ZEOBBox OBB(Position, U, V, N, ZEVector3(0.5f, 0.5f, 0.5f));
 
-		ZETestCheckEqual(OBB.Center, ZEVector3(1.0f, 2.0f, 3.0f));
-		ZETestCheckEqual(OBB.Right, ZEVector3(1.0f, 0.0f, 0.0f));
-		ZETestCheckEqual(OBB.Up, ZEVector3(0.0f, 1.0f, 0.0f));
-		ZETestCheckEqual(OBB.Front, ZEVector3(0.0f, 0.0f, 1.0f));
+		CHECK_EQUAL(OBB.Center, ZEVector3(1.0f, 2.0f, 3.0f));
+		CHECK_EQUAL(OBB.Right, ZEVector3(1.0f, 0.0f, 0.0f));
+		CHECK_EQUAL(OBB.Up, ZEVector3(0.0f, 1.0f, 0.0f));
+		CHECK_EQUAL(OBB.Front, ZEVector3(0.0f, 0.0f, 1.0f));
 
 	}
 
@@ -76,14 +76,14 @@ ZETestSuiteAdd(ZEOBBox)
 			ZEVector3(1.0f, 1.0f, 1.0f));
 
 
-		ZETestCheckEqual(OBB.GetVertex(0), ZEVector3(1.0f, 2.0f, 3.0f));
-		ZETestCheckEqual(OBB.GetVertex(1), ZEVector3(2.0f, 2.0f, 3.0f));
-		ZETestCheckEqual(OBB.GetVertex(2), ZEVector3(1.0f, 3.0f, 3.0f));
-		ZETestCheckEqual(OBB.GetVertex(3), ZEVector3(2.0f, 3.0f, 3.0f));
-		ZETestCheckEqual(OBB.GetVertex(4), ZEVector3(1.0f, 2.0f, 4.0f));
-		ZETestCheckEqual(OBB.GetVertex(5), ZEVector3(2.0f, 2.0f, 4.0f));
-		ZETestCheckEqual(OBB.GetVertex(6), ZEVector3(1.0f, 3.0f, 4.0f));
-		ZETestCheckEqual(OBB.GetVertex(7), ZEVector3(2.0f, 3.0f, 4.0f));
+		CHECK_EQUAL(OBB.GetVertex(0), ZEVector3(1.0f, 2.0f, 3.0f));
+		CHECK_EQUAL(OBB.GetVertex(1), ZEVector3(2.0f, 2.0f, 3.0f));
+		CHECK_EQUAL(OBB.GetVertex(2), ZEVector3(1.0f, 3.0f, 3.0f));
+		CHECK_EQUAL(OBB.GetVertex(3), ZEVector3(2.0f, 3.0f, 3.0f));
+		CHECK_EQUAL(OBB.GetVertex(4), ZEVector3(1.0f, 2.0f, 4.0f));
+		CHECK_EQUAL(OBB.GetVertex(5), ZEVector3(2.0f, 2.0f, 4.0f));
+		CHECK_EQUAL(OBB.GetVertex(6), ZEVector3(1.0f, 3.0f, 4.0f));
+		CHECK_EQUAL(OBB.GetVertex(7), ZEVector3(2.0f, 3.0f, 4.0f));
 	}
 
 	ZETestItemAdd(OBB_PlaneHalfSpaceTest)
@@ -102,7 +102,7 @@ ZETestSuiteAdd(ZEOBBox)
 
 		ZEHalfSpace result1 = ZEOBBox::IntersectionTest(OBB, P1);
 
-		ZETestCheckEqual(result1,-1);
+		CHECK_EQUAL(result1,-1);
 
 		ZEVector3 n2(1.0f, 2.0f, 3.0f);
 		ZEVector3 p2(0.0f, -6.0f, 0.0f);
@@ -110,7 +110,7 @@ ZETestSuiteAdd(ZEOBBox)
 
 		ZEHalfSpace result2 = ZEOBBox::IntersectionTest(OBB, P2);
 
-		ZETestCheckEqual(result2, 1);
+		CHECK_EQUAL(result2, 1);
 
 		
 		ZEVector3 n3(1.0f, 0.0f, 0.0f);
@@ -119,7 +119,7 @@ ZETestSuiteAdd(ZEOBBox)
 
 		ZEHalfSpace result3 = ZEOBBox::IntersectionTest(OBB, P3);
 
-		ZETestCheckEqual(result3, 1);
+		CHECK_EQUAL(result3, 1);
 
 		ZEVector3 n4(0.0f, 0.0f, 1.0f);
 		ZEVector3 p4(-200.0f, -1000.0f, -100.0f);
@@ -128,7 +128,7 @@ ZETestSuiteAdd(ZEOBBox)
 
 		ZEHalfSpace result4 = ZEOBBox::IntersectionTest(OBB, P4);
 
-		ZETestCheckEqual(result4, 1);
+		CHECK_EQUAL(result4, 1);
 	}
 
 	ZETestItemAdd(OBB_IntersectionTest1)
@@ -143,17 +143,17 @@ ZETestSuiteAdd(ZEOBBox)
 		
 		bool result = ZEOBBox::IntersectionTest(OBB, ZEVector3(1.0f, 2.0f, 3.0f));
 
-		ZETestCheckEqual(result, true);
+		CHECK_EQUAL(result, true);
 
 		ZEVector3 P(-1.0f, -2.0f, -3.0f);
 
 		bool result2 = ZEOBBox::IntersectionTest(OBB, P);
 
-		ZETestCheckEqual(result2, false);
+		CHECK_EQUAL(result2, false);
 
 		bool result3 = ZEOBBox::IntersectionTest(OBB, ZEVector3(1.5f, 2.5f, 3.5f));
 
-		ZETestCheckEqual(result3, true);
+		CHECK_EQUAL(result3, true);
 
 	}
 

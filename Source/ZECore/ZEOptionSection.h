@@ -37,39 +37,49 @@
 #ifndef	__ZE_OPTION_SECTION_H__
 #define __ZE_OPTION_SECTION_H__
 
-#include "ZEDS/ZENamed.h"
+#include "ZEOption.h"
+
+#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZETypedVariant.h"
-#include "ZEFastDelegate.h"
+#include "ZEDS/ZEFastDelegate.h"
 #include "ZECommand.h"
 #include "ZECommandSection.h"
 
-typedef fastdelegate::FastDelegate0<void> ZEOptionsChangedEventCallback;
-
-class ZEOptionSection : public ZENamed
+class ZEOptionSection
 {
 	friend class ZEOption;
 	private:
+		ZEString						Name;
 		ZEArray<ZEOption*>				Options;
 		bool							Changed;
-		ZEOptionsChangedEventCallback	EventHandler;
+
+		ZEOptionsChangedEvent			OnChanged;
+		ZEOptionsChangingEvent			OnChanging;
 
 	public:
+		void							SetName(const ZEString& NewName);
+		const ZEString&					GetName();
+
 		bool							AddOption(ZEOption* Option);
 		void							DeleteOption(size_t Index);
 		size_t							GetNumberOfOptions();
 
-		ZEOption*						GetOption(const char* OptionName);
+		ZEOption*						GetOption(const ZEString& OptionName);
 		ZEOption*						GetOption(size_t Index);
 
-		void							SetEventHandler (ZEOptionsChangedEventCallback NewEventHandler);
+		const ZEOptionsChangingEvent&	GetOnChanging();		
+		void							SetOnChanging(ZEOptionsChangingEvent EventHandler);
+
+		const ZEOptionsChangedEvent&	GetOnChanged();
+		void							SetOnChanged(ZEOptionsChangedEvent EventHandler);
 
 		bool							HasChanges();
 		void							CommitChanges();
 		void							ResetChanges();
 
 										ZEOptionSection();
-										ZEOptionSection(const char* Name);
+										ZEOptionSection(const ZEString& Name);
 										~ZEOptionSection();
 };
 

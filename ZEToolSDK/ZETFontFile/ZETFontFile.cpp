@@ -35,6 +35,7 @@
 
 #include "ZETFontFile.h"
 #include <stdio.h>
+#include <memory.h>
 
 #define ZEFONTFILE_HEADER									((ZEDWORD)((ZEDWORD)'ZEFF' + (ZEDWORD)'FONT'))
 

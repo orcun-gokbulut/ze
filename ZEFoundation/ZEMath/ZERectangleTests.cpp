@@ -47,12 +47,12 @@ ZETestSuiteAdd(Rectangle)
 		ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);
 		ZERectangle R(LU, RD);
-		ZETestCheckEqual(R.LeftUp, ZEVector2(1.0f, 4.0f));
-		ZETestCheckEqual(R.RightDown, ZEVector2(3.0f, 2.0f));
+		CHECK_EQUAL(R.LeftUp, ZEVector2(1.0f, 4.0f));
+		CHECK_EQUAL(R.RightDown, ZEVector2(3.0f, 2.0f));
 
 		ZERectangle R2(LU, 2.0f, 2.0f);
-		ZETestCheckEqual(R2.LeftUp, ZEVector2(1.0f, 4.0f));
-		ZETestCheckEqual(R2.RightDown, ZEVector2(3.0f, 2.0f));
+		CHECK_EQUAL(R2.LeftUp, ZEVector2(1.0f, 4.0f));
+		CHECK_EQUAL(R2.RightDown, ZEVector2(3.0f, 2.0f));
 
 
 
@@ -66,15 +66,15 @@ ZETestSuiteAdd(Rectangle)
 
 		ZEVector2 P(2.0f, 3.0f);
 		bool result = R.BoundingTest(P);
-		ZETestCheckEqual(result, true);
+		CHECK_EQUAL(result, true);
 
 		ZEVector2 P2(0.0f, 0.0f);
 		bool result2 = R.BoundingTest(P2);
-		ZETestCheckEqual(result2, false);
+		CHECK_EQUAL(result2, false);
 
 		ZEVector2 P3(2.0f, 2.0f);
 		bool result3 = R.BoundingTest(P3);
-		ZETestCheckEqual(result3, true);*/
+		CHECK_EQUAL(result3, true);*/
 	}
 
 	ZETestItemAdd(RECT_GetCorner)
@@ -88,10 +88,10 @@ ZETestSuiteAdd(Rectangle)
 		ZEVector2 C3 = R.GetCorner(ZE_RC_RIGHTDOWN);
 		ZEVector2 C4 = R.GetCorner(ZE_RC_RIGHTUP);
 
-		ZETestCheckEqual(C1, ZEVector2(1.0f, 2.0f));
-		ZETestCheckEqual(C2, ZEVector2(1.0f, 4.0f));
-		ZETestCheckEqual(C3, ZEVector2(3.0f, 2.0f));
-		ZETestCheckEqual(C4, ZEVector2(3.0f, 4.0f));
+		CHECK_EQUAL(C1, ZEVector2(1.0f, 2.0f));
+		CHECK_EQUAL(C2, ZEVector2(1.0f, 4.0f));
+		CHECK_EQUAL(C3, ZEVector2(3.0f, 2.0f));
+		CHECK_EQUAL(C4, ZEVector2(3.0f, 4.0f));
 
 	}
 
@@ -103,7 +103,7 @@ ZETestSuiteAdd(Rectangle)
 
 		float w = R.GetWidth();
 
-		ZETestCheckEqual(w, 2.0f);
+		CHECK_EQUAL(w, 2.0f);
 
 	}
 
@@ -115,7 +115,7 @@ ZETestSuiteAdd(Rectangle)
 
 		float h = R.GetHeight();
 
-		ZETestCheckEqual(h, 2.0f);
+		CHECK_EQUAL(h, 2.0f);
 
 	}
 

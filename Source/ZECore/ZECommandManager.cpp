@@ -145,16 +145,16 @@ size_t ZECommandManager::GetNumberOfSections()
 	return Sections.GetCount();
 }
 
-ZECommandSection* ZECommandManager::GetCommandSection(const char* Name)
+ZECommandSection* ZECommandManager::GetCommandSection(const ZEString& Name)
 {
 	for (size_t I = 0 ; I < Sections.GetCount(); I++)
-		if (_stricmp(Sections[I]->GetName(), Name) == 0)
+		if (Sections[I]->GetName() == Name)
 			return Sections[I];
 	return NULL;
 }
 
 
-ZECommand* ZECommandManager::GetCommand(const char* Section, const char* Name)
+ZECommand* ZECommandManager::GetCommand(const ZEString& Section, const ZEString& Name)
 {
 	ZECommandSection* Sec = GetCommandSection(Section);
 	ZECommand* Cmd;
@@ -164,7 +164,7 @@ ZECommand* ZECommandManager::GetCommand(const char* Section, const char* Name)
 		return NULL;
 }
 
-bool ZECommandManager::ExecuteCommand(const char* Section, const char* Name, ZEArray<ZEVariant>* Paramslist)
+bool ZECommandManager::ExecuteCommand(const ZEString& Section, const ZEString& Name, ZEArray<ZEVariant>* Paramslist)
 {
 	ZECommandSection* Temp = GetCommandSection(Section);
 	if (Temp != NULL)

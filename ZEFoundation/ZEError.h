@@ -61,6 +61,16 @@ enum ZEAssertType
 
 #define zeBreak(Condition) if (Condition) { __asm{ int 3 }}
 
+#include "ZEAPI.h"
+
+#ifdef ZE_DEBUG_MEMORY_CHECKS_ENABLE
+	#include <crtdbg.h>
+	#define ZEDebugCheckMemory() zeAssert(!_CrtCheckMemory(), "Heap problem")
+#else
+	#define ZEDebugCheckMemory()
+#endif
+
+
 #ifdef ZE_DEBUG_ENABLED
 	#ifdef ZE_ZINEK_VERSION_PLATFORM_WINDOWS
 		#define zeAssert(Condition, ...) {if (Condition) {ZEError::RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); if (_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true);}}

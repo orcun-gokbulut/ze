@@ -39,6 +39,16 @@
 #include "ZEError.h"
 #include <string.h>
 
+const ZEString& ZECommandSection::GetName()
+{
+	return Name;
+}
+
+void ZECommandSection::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
+
 size_t ZECommandSection::GetNumberOfCommands()
 {
 	return Commands.GetCount();
@@ -58,10 +68,10 @@ bool ZECommandSection::AddCommand(ZECommand* Command)
 	return true;
 }
 
-ZECommand* ZECommandSection::GetCommand(const char* Name)
+ZECommand* ZECommandSection::GetCommand(const ZEString& Name)
 {
 	for(size_t I=0; I < Commands.GetCount(); I++)
-		if (_stricmp(Commands[I]->GetName(), Name) == 0)
+		if (Commands[I]->GetName() == Name)
 			return Commands[I];
 	return NULL;
 }
@@ -76,7 +86,7 @@ void ZECommandSection::DeleteCommand(size_t Index)
 	Commands.DeleteAt(Index);
 }
 
-bool ZECommandSection::ExecuteCommand(const char* Name, ZEArray<ZEVariant>* Paramlist)
+bool ZECommandSection::ExecuteCommand(const ZEString& Name, ZEArray<ZEVariant>* Paramlist)
 {
 	ZECommand* Temp = GetCommand(Name);
 	if (Temp != NULL)
@@ -90,12 +100,12 @@ bool ZECommandSection::ExecuteCommand(const char* Name, ZEArray<ZEVariant>* Para
 
 ZECommandSection::ZECommandSection()
 {
-	SetName("");
+
 }
 
-ZECommandSection::ZECommandSection(const char* Name)
+ZECommandSection::ZECommandSection(const ZEString& Name)
 {
-	SetName(Name);
+	this->Name = Name;
 }
 
 ZECommandSection::~ZECommandSection()

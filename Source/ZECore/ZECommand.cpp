@@ -39,6 +39,16 @@
 #include "ZEConsole.h"
 #include <stdarg.h>
 
+const ZEString& ZECommand::GetName()
+{
+	return Name;
+}
+
+void ZECommand::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
+
 void ZECommand::SetAccessLevel(int Access)
 {
 	this->AccessLevel = Access;
@@ -65,9 +75,9 @@ void ZECommand::SetCallback(ZECommandCallback NewCallback)
 	this->Callback = NewCallback;
 }
 
-ZECommand::ZECommand(const char* Name, ZECommandCallback Callback, int AccessLevel)
+ZECommand::ZECommand(const ZEString& Name, ZECommandCallback Callback, int AccessLevel)
 {
 	this->AccessLevel = AccessLevel;
-	this->SetName(Name);
+	this->Name = Name;
 	this->Callback = Callback;
 }

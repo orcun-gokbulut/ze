@@ -37,29 +37,33 @@
 #ifndef	__ZE_COMMAND_SECTION_H__
 #define __ZE_COMMAND_SECTION_H__
 
-#include "ZEDS/ZENamed.h"
+#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
 
 class ZECommand;
-class ZECommandSection : public ZENamed
+class ZECommandSection
 {
 	private:
+		ZEString					Name;
 		ZEArray<ZECommand*>			Commands;
 
 	public:
+		const ZEString&				GetName();
+		void						SetName(const ZEString& Name);
+
 		size_t						GetNumberOfCommands();
 		
 		bool						AddCommand(ZECommand* Command);
 		void						DeleteCommand(size_t Index);
 
-		ZECommand*					GetCommand(const char* Name);
+		ZECommand*					GetCommand(const ZEString& Name);
 		ZECommand*					GetCommand(size_t Index);
 
-		bool						ExecuteCommand(const char* Name, ZEArray<ZEVariant>* Paramlist);
+		bool						ExecuteCommand(const ZEString& Name, ZEArray<ZEVariant>* Paramlist);
 
 									ZECommandSection();
-									ZECommandSection(const char* Name);
+									ZECommandSection(const ZEString& Name);
 									~ZECommandSection();
 };
 

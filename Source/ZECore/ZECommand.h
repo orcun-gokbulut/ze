@@ -37,29 +37,33 @@
 #ifndef	__ZE_COMMAND_H__
 #define __ZE_COMMAND_H__
 
-#include "ZEDS/ZENamed.h"
+#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
-#include "ZEFastDelegate.h"
+#include "ZEDS/ZEFastDelegate.h"
 
 class ZECommand;
 typedef ZEArray<ZEVariant> ZECommandParameterList;
 typedef fastdelegate::FastDelegate2<ZECommand*, const ZECommandParameterList*, bool> ZECommandCallback;
 
-class ZECommand: public ZENamed
+class ZECommand
 {
 	private:
+		ZEString					Name;
 		int							AccessLevel;
 		ZECommandCallback			Callback;
 
 	public:
+		const ZEString&				GetName();
+		void						SetName(const ZEString& Name);
+
 		int							GetAccessLevel();
 		void						SetAccessLevel(int AccessLevel);
 		
 		void						SetCallback(ZECommandCallback Callback);
 		bool						Execute(ZECommandParameterList* ParamList);
 
-									ZECommand(const char* Name, ZECommandCallback Callback, int AccessLevel = 0);
+									ZECommand(const ZEString& Name, ZECommandCallback Callback, int AccessLevel = 0);
 };
 
 #endif

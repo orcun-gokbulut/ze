@@ -39,10 +39,9 @@
 
 #include "ZEOption.h"
 #include "ZEOptionSection.h"
-#include "ZEDS/ZENamed.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZETypedVariant.h"
-#include "ZEFastDelegate.h"
+#include "ZEDS/ZEFastDelegate.h"
 #include "ZECommand.h"
 #include "ZECommandSection.h"
 
@@ -67,19 +66,19 @@ class ZEOptionManager
 									~ZEOptionManager();
 
 	public:
-		bool						RegisterSection (ZEOptionSection* Ref);
-		bool						UnregisterSection (ZEOptionSection* Ref);
+		bool						RegisterSection(ZEOptionSection* Ref);
+		bool						UnregisterSection(ZEOptionSection* Ref);
 		
 		size_t						GetNumberOfSections();
 		
-		ZEOptionSection*			GetSection(const char* Name);
+		ZEOptionSection*			GetSection(const ZEString& Name);
 		ZEOptionSection*			GetSection(size_t Index);
 
-		ZEOption*					GetOption(const char* SectionName, const char* Name);
+		ZEOption*					GetOption(const ZEString& SectionName, const ZEString& Name);
 
-		void						Save(const char *FileName);
-		void						Load(const char *FileName);
-		void						ParseParameters(const char *Parameters);
+		void						Save(const ZEString& FileName);
+		void						Load(const ZEString& FileName);
+		void						ParseParameters(const ZEString& Parameters);
 		
 		void						CommitChanges();
 		void						ResetChanges();

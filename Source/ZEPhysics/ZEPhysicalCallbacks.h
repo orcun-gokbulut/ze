@@ -39,7 +39,7 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEFastDelegate.h"
+#include "ZEDS/ZEFastDelegate.h"
 
 #define ZE_PCCF_ON_TOUCH			1
 #define ZE_PCCF_ON_START_TOUCH		2

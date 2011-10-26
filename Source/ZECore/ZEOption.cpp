@@ -39,6 +39,16 @@
 
 using namespace fastdelegate;
 
+const ZEString& ZEOption::GetName()
+{
+	return Name;
+}
+
+void ZEOption::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
+
 bool ZEOption::IsChanged()
 {
 	return Changed;
@@ -56,9 +66,27 @@ void ZEOption::SetAttribute(ZEOptionAttribute NewAttribute)
 
 void ZEOption::SetValue(ZETypedVariant NewValue)
 {	
-	Value = NewValue;
-	Changed = true;
-	Section->Changed = true;
+	bool Cancel = false;
+	if (!OnChanging.empty())
+		OnChanging(this, Cancel);
+
+	bool SectionCancel = false;
+	if (!Section->GetOnChanging().empty())
+		Section->GetOnChanging()(this, Cancel);
+
+
+	if (!Cancel)
+	{
+		Value = NewValue;
+		Changed = true;
+		Section->Changed = true;
+
+		if (!OnChanged.empty())
+			OnChanged(this);
+		if (!Section->GetOnChanged().empty())
+			Section->GetOnChanged()(this);
+	}
+
 }
 
 void ZEOption::SetValueType(ZEVariantType NewType)
@@ -92,11 +120,30 @@ ZEOptionType ZEOption::GetType()
 	return ZE_OT_NORMAL;
 }
 
+const ZEOptionsChangingEvent& ZEOption::GetOnChanging()
+{
+	return OnChanging;
+}
+
+void ZEOption::SetOnChanging(ZEOptionsChangingEvent EventHandler)
+{
+	OnChanging = EventHandler;
+}
+
+const ZEOptionsChangedEvent& ZEOption::GetOnChanged()
+{
+	return OnChanged;
+}
+void ZEOption::SetOnChanged(ZEOptionsChangedEvent EventHandler)
+{
+	OnChanged = EventHandler;
+}
+
 void ZEOption::ChangeCommitted()
 {
 	if (!Changed)
 	{
-		zeWarning("Option",	"Wrong change commit made on option. Options was not changed. (Option Name : \"%s\")", this->GetName());
+		zeWarning("Option",	"Wrong change commit made on option. Options was not changed. (Option Name : \"%s\")", (const char*)this->GetName());
 	}
 	else
 		Changed = false;
@@ -104,7 +151,7 @@ void ZEOption::ChangeCommitted()
 
 ZEOption::ZEOption(const char *InitialName, ZETypedVariant InitialDefaultValue, ZEOptionAttribute InitialAttribute)
 {
-	SetName(InitialName);
+	Name = InitialName;
 	SetValueType(InitialDefaultValue.GetType());
 	DefaultValue = InitialDefaultValue;
 	Value=InitialDefaultValue;
@@ -114,7 +161,7 @@ ZEOption::ZEOption(const char *InitialName, ZETypedVariant InitialDefaultValue, 
 
 ZEOption::ZEOption()
 {
-	SetName("");
+	Name = "";
 	SetValueType(ZE_VRT_UNDEFINED);
 	Attribute = ZE_OA_NORMAL;
 	Changed = false;

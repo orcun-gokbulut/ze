@@ -38,7 +38,7 @@
 #define __ZE_UI_EVENTS_H__
 
 #include "ZEMath/ZEVector.h"
-#include "ZEFastDelegate.h"
+#include "ZEDS/ZEFastDelegate.h"
 
 enum ZEUIMouseKey
 {

@@ -37,6 +37,7 @@
 #ifndef __ZE_SHARED_POINTER_H__
 #define __ZE_SHARED_POINTER_H__
 
+#include "ZEError.h"
 struct ZEReferanceCount
 {
 	size_t Strong;
@@ -51,10 +52,9 @@ class ZESharedPointer
 		ZEReferanceCount* ReferanceCount;
 
 	public:
-		void IsEmpty()
+		bool IsNull()
 		{
-			if (ReferanceCount == NULL || ReferanceCount->Strong == 0)
-				return true;
+			return (ReferanceCount == NULL);
 		}
 
 		void Create(Type* RawPointer)
@@ -108,13 +108,13 @@ class ZESharedPointer
 
 		Type& operator*()
 		{
-			zeAssert(Pointer == NULL, "ZEPointer does not points any data structure.");
+			zeAssert(Pointer == 0, "ZEPointer does not points any data structure.");
 			return *Pointer;
 		}
 
 		Type* operator->()
 		{
-			zeAssert(Pointer == NULL, "ZEPointer does not points any data structure.");
+			zeAssert(Pointer == 0, "ZEPointer does not points any data structure.");
 			return Pointer;
 		}
 
@@ -150,7 +150,6 @@ class ZESharedPointer
 		{
 			Release();
 		}
-
 
 		static void Swap(const ZESharedPointer<Type>& A, const ZESharedPointer<Type>& B)
 		{

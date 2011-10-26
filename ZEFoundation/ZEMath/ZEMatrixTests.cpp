@@ -48,22 +48,22 @@ ZETestSuiteAdd(ZEMatrix3x3)
 	ZETestItemAdd(MTRX3Constructor)
 	{
 		ZEMatrix3x3 A(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f);
-		ZETestCheckEqual(A, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
+		CHECK_EQUAL(A, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
 
 		float M[9]={1.0f, 3.0f, 13.0f, 1.0f, 5.0f, 21.0f, 2.0f,  8.0f,  34.0f};
 		ZEMatrix3x3 B(M);
-		ZETestCheckEqual(B, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
+		CHECK_EQUAL(B, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
 	}
 
 	ZETestItemAdd(MTRX3Create)
 	{
 		ZEMatrix3x3 A, B;
 		ZEMatrix3x3::Create(A, 1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f);
-		ZETestCheckEqual(A, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
+		CHECK_EQUAL(A, ZEMatrix3x3(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f));
 
 		float M[9]={34.0f, 21.0f, 13.0f, 8.0f, 5.0f, 3.0f, 2.0f, 1.0f, 1.0f};
 		ZEMatrix3x3::Create(B, M);
-		ZETestCheckEqual(B, ZEMatrix3x3(34.0f, 8.0f, 2.0f ,21.0f, 5.0f, 1.0f ,13.0f, 3.0f, 1.0f));
+		CHECK_EQUAL(B, ZEMatrix3x3(34.0f, 8.0f, 2.0f ,21.0f, 5.0f, 1.0f ,13.0f, 3.0f, 1.0f));
 	}
 
 	ZETestItemAdd(MTRX3CreateIdentity)
@@ -71,7 +71,7 @@ ZETestSuiteAdd(ZEMatrix3x3)
 		ZEMatrix3x3 A;
 		ZEMatrix3x3::CreateIdentity(A);
 
-		ZETestCheckEqual(A, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f));
+		CHECK_EQUAL(A, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f));
 	}
 
 	ZETestItemAdd(MTRX3CreateRotation)
@@ -104,7 +104,7 @@ ZETestSuiteAdd(ZEMatrix3x3)
 	{
 		ZEMatrix3x3 A;
 		ZEMatrix3x3::CreateScale(A, 1.0f, 2.0f, 3.0f);
-		ZETestCheckEqual(A, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 3.0f));
+		CHECK_EQUAL(A, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 0.0f, 3.0f));
 	}
 
 	ZETestItemAdd(MTRX3CreateZero)
@@ -112,7 +112,7 @@ ZETestSuiteAdd(ZEMatrix3x3)
 		ZEMatrix3x3 A;
 		ZEMatrix3x3::CreateZero(A);
 
-		ZETestCheckEqual(A, ZEMatrix3x3(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
+		CHECK_EQUAL(A, ZEMatrix3x3(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f));
 	}
 
 	ZETestItemAdd(MTRX3Add)
@@ -123,7 +123,7 @@ ZETestSuiteAdd(ZEMatrix3x3)
 
 		ZEMatrix3x3::Add(C, A, B);
 
-		ZETestCheckEqual(C, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f, 9.0f, 9.0f, 10.0f));
+		CHECK_EQUAL(C, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f, 9.0f, 9.0f, 10.0f));
 	}
 
 	ZETestItemAdd(MTRX3Sub)
@@ -134,7 +134,7 @@ ZETestSuiteAdd(ZEMatrix3x3)
 
 		ZEMatrix3x3::Sub(C, A, B);
 
-		ZETestCheckEqual(C, ZEMatrix3x3(33.0f, 19.0f, 10.0f, 4.0f, 0.0f, -3.0f, -5.0f, -7.0f, -8.0f));
+		CHECK_EQUAL(C, ZEMatrix3x3(33.0f, 19.0f, 10.0f, 4.0f, 0.0f, -3.0f, -5.0f, -7.0f, -8.0f));
 	}
 
 	ZETestItemAdd(MTRX3Multiply)
@@ -149,11 +149,11 @@ ZETestSuiteAdd(ZEMatrix3x3)
 
 		ZEMatrix3x3::Multiply(C, A, B);
 
-		ZETestCheckEqual(C, ZEMatrix3x3(312.0f, 486.0f, 798.0f, 159.0f, 251.0f, 410.0f, 166.0f, 264.0f, 430.f));
+		CHECK_EQUAL(C, ZEMatrix3x3(312.0f, 486.0f, 798.0f, 159.0f, 251.0f, 410.0f, 166.0f, 264.0f, 430.f));
 
 		ZEMatrix3x3::Multiply(D, A, I);
 
-		ZETestCheckEqual(D, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f,  9.0f,  9.0f, 10.0f));
+		CHECK_EQUAL(D, ZEMatrix3x3(35.0f, 23.0f, 16.0f, 12.0f, 10.0f, 9.0f,  9.0f,  9.0f, 10.0f));
 	}
 
 	ZETestItemAdd(MTRX3Scale)
@@ -164,7 +164,7 @@ ZETestSuiteAdd(ZEMatrix3x3)
 
 		ZEMatrix3x3::Scale(B, A, c);
 
-		ZETestCheckEqual(B, ZEMatrix3x3(2.0f, 2.0f, 4.0f, 6.0f, 10.0f, 16.0f, 26.0f, 42.0f, 68.0f ));
+		CHECK_EQUAL(B, ZEMatrix3x3(2.0f, 2.0f, 4.0f, 6.0f, 10.0f, 16.0f, 26.0f, 42.0f, 68.0f ));
 		
 	}
 
@@ -175,7 +175,7 @@ ZETestSuiteAdd(ZEMatrix3x3)
 
 		ZEMatrix3x3::Transpose(B, A);
 
-		ZETestCheckEqual(B, ZEMatrix3x3(1.2f, 3.6f, 15.6f, 1.2f, 6.0f, 25.2f, 2.4f, 9.6f, 40.8f));
+		CHECK_EQUAL(B, ZEMatrix3x3(1.2f, 3.6f, 15.6f, 1.2f, 6.0f, 25.2f, 2.4f, 9.6f, 40.8f));
 	}
 
 	ZETestItemAdd(MTRX3Transform)
@@ -186,22 +186,22 @@ ZETestSuiteAdd(ZEMatrix3x3)
 
 		ZEMatrix3x3::Transform(U, A, V);
 
-		ZETestCheckEqual(U, ZEVector3(86.0f, 70.0f, 64.0f));
+		CHECK_EQUAL(U, ZEVector3(86.0f, 70.0f, 64.0f));
 	}
 	ZETestItemAdd(MTRX3Determinant)
 	{
 		ZEMatrix3x3 A(1.2f, 3.6f, 15.6f, 1.2f, 6.0f, 25.2f, 2.4f, 9.6f, 40.8f);
 		float d = ZEMatrix3x3::Determinant(A);
-		ZETestCheckEqual(d, 0.0f);
+		CHECK_EQUAL(d, 0.0f);
 
 		ZEMatrix3x3 B(1.0f, 2.0f, -5.0f, 4.0f, 2.0f, 1.0f, 3.0f, 2.0f, 9.0f);
 		float dd = ZEMatrix3x3::Determinant(B);
-		ZETestCheckEqual(dd, -60.0f);
+		CHECK_EQUAL(dd, -60.0f);
 		
 		ZEMatrix3x3 I;
 		ZEMatrix3x3::CreateIdentity(I);
 		float i = ZEMatrix3x3::Determinant(I);
-		ZETestCheckEqual(i, 1.0f);
+		CHECK_EQUAL(i, 1.0f);
 	}
 
 	ZETestItemAdd(MTRX3Inverse)
@@ -211,13 +211,13 @@ ZETestSuiteAdd(ZEMatrix3x3)
 		ZEMatrix3x3::Inverse(B, A);
 
 		ZEMatrix3x3 C(-6.5f,  4.0f, 0.5f, 5.5f, -3.0f, -0.5f, 8.5f, -5.0f, -0.5f);
-		ZETestCheckEqual(B, C);
+		CHECK_EQUAL(B, C);
 
 		ZEMatrix3x3 I;
 		ZEMatrix3x3::CreateIdentity(I);
 		ZEMatrix3x3 II;
 		ZEMatrix3x3::Inverse(II, I);
-		ZETestCheckEqual(II, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f));
+		CHECK_EQUAL(II, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f));
 	}
 }
 ZETestSuiteAdd(ZEMatrix4x4)
@@ -227,7 +227,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 	{
 		ZEMatrix4x4 A(1.0f, 1.0f, 2.0f, 3.0f, 5.0f, 8.0f, 13.0f, 21.0f, 34.0f, 55.0f, 1.0f, 1.0f, 3.0f, 5.0f, 8.0f, 13.0f);
 
-		ZETestCheckEqual(A, ZEMatrix4x4( 1.0f, 1.0f,  2.0f,  3.0f,
+		CHECK_EQUAL(A, ZEMatrix4x4( 1.0f, 1.0f,  2.0f,  3.0f,
 								    5.0f, 8.0f, 13.0f, 21.0f, 
 								   34.0f, 55.0f, 1.0f,  1.0f, 
 								    3.0f,  5.0f, 8.0f, 13.0f));
@@ -235,7 +235,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 		float M[16] = {1.0f, 5.0f, 34.0f, 3.0f, 1.0f, 8.0f, 55.0f, 5.0f, 2.0f, 13.0f, 1.0f, 8.0f, 3.0f, 21.0f, 1.0f, 13.0f};
 		ZEMatrix4x4 B(M);
 
-		ZETestCheckEqual(B, ZEMatrix4x4( 1.0f,  1.0f,  2.0f,  3.0f, 
+		CHECK_EQUAL(B, ZEMatrix4x4( 1.0f,  1.0f,  2.0f,  3.0f, 
 								    5.0f,  8.0f, 13.0f, 21.0f, 
 								   34.0f, 55.0f,  1.0f,  1.0f, 
 								    3.0f,  5.0f,  8.0f, 13.0f));
@@ -249,14 +249,14 @@ ZETestSuiteAdd(ZEMatrix4x4)
 							  34.0f, 55.0f,  1.0f,  1.0f, 
 							   3.0f,  5.0f,  8.0f, 13.0f);
 		
-		ZETestCheckEqual(A, ZEMatrix4x4(1.0f,  1.0f,  2.0f,  3.0f,
+		CHECK_EQUAL(A, ZEMatrix4x4(1.0f,  1.0f,  2.0f,  3.0f,
 								   5.0f,  8.0f, 13.0f, 21.0f, 
 								  34.0f, 55.0f,  1.0f,  1.0f,
 								   3.0f,  5.0f,  8.0f, 13.0f));
 
 		float M[16]={13.0f, 8.0f, 5.0f, 3.0f, 2.0f, 1.0f, 1.0f, 34.0f, 21.0f, 13.0f, 8.0f, 5.0f, 3.0f, 2.0f, 1.0f, 1.0f};
 		ZEMatrix4x4::Create(B, M);
-		ZETestCheckEqual(B, ZEMatrix4x4(13.0f,  2.0f, 21.0f, 3.0f, 
+		CHECK_EQUAL(B, ZEMatrix4x4(13.0f,  2.0f, 21.0f, 3.0f, 
 									8.0f,  1.0f, 13.0f, 2.0f, 
 									5.0f,  1.0f,  8.0f, 1.0f, 
 									3.0f, 34.0f,  5.0f, 1.0f));
@@ -267,7 +267,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 		ZEMatrix4x4 A;
 		ZEMatrix4x4::CreateIdentity(A);
 
-		ZETestCheckEqual(A, ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f, 
+		CHECK_EQUAL(A, ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f, 
 								   0.0f, 1.0f, 0.0f, 0.0f, 
 								   0.0f, 0.0f, 1.0f, 0.0f, 
 								   0.0f, 0.0f, 0.0f, 1.0f));
@@ -290,7 +290,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 		
 		ZEMatrix4x4::CreateRotationX(M, 90);
 
-		ZETestCheckEqual(M, A);
+		CHECK_EQUAL(M, A);
 		
 	}
 
@@ -304,7 +304,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 
 		ZEMatrix4x4::CreateRotationY(M, 90);
 
-		ZETestCheckEqual(M, A);
+		CHECK_EQUAL(M, A);
 	}
 	ZETestItemAdd(MTRX4CreateRotationZ)
 	{
@@ -316,7 +316,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 
 		ZEMatrix4x4::CreateRotationZ(M, 90);
 
-		ZETestCheckEqual(M, A);
+		CHECK_EQUAL(M, A);
 	}
 
 	ZETestItemAdd(MTRX4CreateRotationXYZ)
@@ -334,7 +334,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 	{
 		ZEMatrix4x4 A;
 		ZEMatrix4x4::CreateScale(A, 1.0f, 2.0f, 3.0f);
-		ZETestCheckEqual(A, ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f, 
+		CHECK_EQUAL(A, ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f, 
 								   0.0f, 2.0f, 0.0f, 0.0f, 
 								   0.0f, 0.0f, 3.0f, 0.0f, 
 								   0.0f, 0.0f, 0.0f, 1.0f));
@@ -345,7 +345,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 		ZEMatrix4x4 A;
 		ZEMatrix4x4::CreateZero(A);
 
-		ZETestCheckEqual(A, ZEMatrix4x4(0.0f, 0.0f, 0.0f, 0.0f,
+		CHECK_EQUAL(A, ZEMatrix4x4(0.0f, 0.0f, 0.0f, 0.0f,
 								   0.0f, 0.0f, 0.0f, 0.0f, 
 								   0.0f, 0.0f, 0.0f, 0.0f, 
 								   0.0f, 0.0f, 0.0f, 0.0f));
@@ -366,7 +366,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 
 		ZEMatrix4x4::Add(C, A, B);
 
-		ZETestCheckEqual(C, ZEMatrix4x4(14.0f, 10.0f,  8.0f,  7.0f,
+		CHECK_EQUAL(C, ZEMatrix4x4(14.0f, 10.0f,  8.0f,  7.0f,
 									7.0f,  7.0f,  8.0f, 42.0f, 
 								   30.0f, 23.0f, 19.0f, 17.0f, 
 								   16.0f, 16.0f, 16.0f, 17.0f));
@@ -387,7 +387,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 
 		ZEMatrix4x4::Sub(C, A, B);
 
-		ZETestCheckEqual(C, ZEMatrix4x4( 12.0f,   6.0f,   2.0f,  -1.0f,
+		CHECK_EQUAL(C, ZEMatrix4x4( 12.0f,   6.0f,   2.0f,  -1.0f,
 								    -3.0f,  -5.0f,  -6.0f,  26.0f, 
 								    12.0f,   3.0f,  -3.0f,  -7.0f, 
 								   -10.0f, -12.0f, -14.0f, -15.0f));
@@ -412,14 +412,14 @@ ZETestSuiteAdd(ZEMatrix4x4)
 
 		ZEMatrix4x4::Multiply(C, A, B);
 
-		ZETestCheckEqual(C, ZEMatrix4x4(718.0f, 1135.0f,  445.0f,  700.0f,
+		CHECK_EQUAL(C, ZEMatrix4x4(718.0f, 1135.0f,  445.0f,  700.0f,
 						           379.0f,  604.0f,  191.0f,  300.0f,
 						            89.0f,  137.0f,   50.0f,   77.0f,
 						           247.0f,  395.0f,  114.0f,  179.0f));
 
 		ZEMatrix4x4::Multiply(D, A, I);
 
-		ZETestCheckEqual(D, ZEMatrix4x4( 35.0f, 23.0f, 16.0f, 12.0f,
+		CHECK_EQUAL(D, ZEMatrix4x4( 35.0f, 23.0f, 16.0f, 12.0f,
 									10.0f,  9.0f,  9.0f,  9.0f, 
 									10.0f,  1.0f,  2.0f,  3.0f, 
 									 4.0f,  5.0f,  6.0f,  7.0f));
@@ -436,7 +436,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 
 		ZEMatrix4x4::Scale(B, A, c);
 
-		ZETestCheckEqual(B, ZEMatrix4x4( 2.0f,   2.0f,  4.0f,  6.0f,
+		CHECK_EQUAL(B, ZEMatrix4x4( 2.0f,   2.0f,  4.0f,  6.0f,
 								   10.0f,  16.0f, 26.0f, 42.0f,
 								   68.0f, 110.0f,  2.0f,  2.0f, 
 								    4.0f,   6.0f, 10.0f, 16.0f));
@@ -453,7 +453,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 
 		ZEMatrix4x4::Transpose(B, A);
 
-		ZETestCheckEqual(B, ZEMatrix4x4(	1.2f,  6.0f, 40.8f,  4.0f,
+		CHECK_EQUAL(B, ZEMatrix4x4(	1.2f,  6.0f, 40.8f,  4.0f,
 									1.2f,  9.6f,  1.0f,  5.0f,
 									2.4f, 15.6f,  2.0f,  6.0f,
 									3.6f, 25.2f,  3.0f,  7.0f));
@@ -470,7 +470,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 
 		ZEMatrix4x4::Transform(U, A, V);
 
-		ZETestCheckEqual(U, ZEVector3(89.0f, 49.0f, 46.0f));
+		CHECK_EQUAL(U, ZEVector3(89.0f, 49.0f, 46.0f));
 	}
 	ZETestItemAdd(MTRX4Determinant)
 	{
@@ -480,7 +480,7 @@ ZETestSuiteAdd(ZEMatrix4x4)
 					  0.0f, 0.0f,  0.0f, 1.0f);
 		float d = ZEMatrix4x4::Determinant(A);
 		
-		ZETestCheckClose(d, 0.0f, 0.00004);
+		CHECK_CLOSE(d, 0.0f, 0.00004);
 		
 		ZEMatrix4x4 B( 35.0f, 23.0f, 16.0f, 12.0f,
 					   10.0f,  9.0f,  9.0f,  9.0f, 
@@ -489,14 +489,14 @@ ZETestSuiteAdd(ZEMatrix4x4)
 
 		float dd = ZEMatrix4x4::Determinant(B);
 		
-		ZETestCheckEqual(dd, 282.0f);
+		CHECK_EQUAL(dd, 282.0f);
 
 		ZEMatrix4x4 I;
 		
 		ZEMatrix4x4::CreateIdentity(I);
 		float i = ZEMatrix4x4::Determinant(I);
 		
-		ZETestCheckEqual(i, 1.0f);
+		CHECK_EQUAL(i, 1.0f);
 
 	}
 
@@ -513,13 +513,13 @@ ZETestSuiteAdd(ZEMatrix4x4)
 					   0.333333333, -1.574468085, -0.209219858,  1.542553191,
 					  -0.666666667,  3.765957447,  0.056737589, -3.723404255,
 					   0.333333333, -2.127659574,  0.046099291,  2.287234043);
-		ZETestCheckEqual(B, C);
+		CHECK_EQUAL(B, C);
 
 		ZEMatrix4x4 I;
 		ZEMatrix4x4::CreateIdentity(I);
 		ZEMatrix4x4 II;
 		ZEMatrix4x4::Inverse(II, I);
-		ZETestCheckEqual(II, ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f,
+		CHECK_EQUAL(II, ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f,
 									0.0f, 1.0f, 0.0f, 0.0f,
 									0.0f, 0.0f, 1.0f, 0.0f, 
 									0.0f, 0.0f, 0.0f, 1.0f));

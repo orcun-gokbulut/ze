@@ -37,7 +37,9 @@
 #ifndef __ZE_TEST_CHECK_H__
 #define __ZE_TEST_CHECK_H__
 
-#define ZETestCheck(Condition)\
+#include <stdio.h>
+
+#define CHECK(Condition)\
 	do\
 	{\
 		try\
@@ -53,7 +55,18 @@
 		} } \
 	while(0)
 
-#define ZETestCheckEqual(Actual, Expected)\
+#define CHECK_STRING(Value, Expected) \
+	do {\
+		CHECK(strcmp(Value, Expected) == 0);\
+		if (strcmp(Value, Expected) != 0)\
+		{\
+			printf("    Value : \"%s\"\n", Value);\
+			printf("    Expected : \"%s\"\n", Expected);\
+		}\
+	}while(0)
+
+
+#define CHECK_EQUAL(Actual, Expected)\
 	do\
 	{\
 		try\
@@ -70,7 +83,7 @@
 	while(0)
 
 
-#define ZETestCheckClose(Actual, Expected, Tolerance)\
+#define CHECK_CLOSE(Actual, Expected, Tolerance)\
 	do\
 	{\
 		try\

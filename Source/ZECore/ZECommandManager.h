@@ -58,10 +58,10 @@ class ZECommandManager
 	public:
 		size_t						GetNumberOfSections();
 
-		ZECommandSection*			GetCommandSection(const char* Name);
-		ZECommand*					GetCommand(const char* Section, const char* Name);
+		ZECommandSection*			GetCommandSection(const ZEString& Name);
+		ZECommand*					GetCommand(const ZEString& Section, const ZEString& Name);
 
-		bool						ExecuteCommand(const char* Section, const char* Name, ZEArray<ZEVariant>* ParamList);
+		bool						ExecuteCommand(const ZEString& Section, const ZEString& Name, ZEArray<ZEVariant>* ParamList);
 				
 		bool						RegisterSection(ZECommandSection* Section);
 		bool						UnregisterSection(ZECommandSection* Section);

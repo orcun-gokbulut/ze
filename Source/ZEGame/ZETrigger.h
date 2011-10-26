@@ -39,7 +39,7 @@
 
 #include "ZEMeta/ZEClass.h"
 #include "ZEEntity.h"
-#include "ZEFastDelegate.h"
+#include "ZEDS/ZEFastDelegate.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZETrigger);
 

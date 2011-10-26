@@ -39,14 +39,25 @@
 #include <ctype.h>
 #include <string.h>
 
+void ZEOptionSection::SetName(const ZEString& NewName)
+{
+	Name = NewName;
+}
+
+const ZEString& ZEOptionSection::GetName()
+{
+	return Name;
+}
+
 bool ZEOptionSection::AddOption(ZEOption* Option)
 {
 	if (GetOption(Option->GetName()) != NULL)
 	{
 		zeError("Options Section", 
-			"Can not add option to option section. An option with same name is already exist in the option section. (Option Section Name : \"%s\", Option Name : \"%s\")", 
-			this->GetName(),
-			Option->GetName());
+			"Can not add option to option section. An option with same name is already exist in the option section. "
+			"(Option Section Name : \"%s\", Option Name : \"%s\")", 
+			(const char*)this->GetName(),
+			(const char*)Option->GetName());
 		return false;
 	}
 	Option->Section = this;
@@ -64,10 +75,10 @@ size_t ZEOptionSection::GetNumberOfOptions()
 	return Options.GetCount();
 }
 
-ZEOption* ZEOptionSection::GetOption(const char* OptionName)
+ZEOption* ZEOptionSection::GetOption(const ZEString& OptionName)
 {
 	for(size_t I=0; I < Options.GetCount(); I++)
-		if (_stricmp(Options[I]->GetName(), OptionName) == 0)
+		if (Options[I]->GetName() == OptionName)
 			return Options[I];
 	return NULL;
 }
@@ -80,9 +91,23 @@ ZEOption* ZEOptionSection::GetOption(size_t Index)
 		return NULL;
 }
 
-void ZEOptionSection::SetEventHandler(ZEOptionsChangedEventCallback NewEventHandler)
+const ZEOptionsChangingEvent& ZEOptionSection::GetOnChanging()
 {
-	EventHandler = NewEventHandler;
+	return OnChanging;
+}
+
+void ZEOptionSection::SetOnChanging(ZEOptionsChangingEvent EventHandler)
+{
+	OnChanging = EventHandler;
+}
+
+const ZEOptionsChangedEvent& ZEOptionSection::GetOnChanged()
+{
+	return OnChanged;
+}
+void ZEOptionSection::SetOnChanged(ZEOptionsChangedEvent EventHandler)
+{
+	OnChanged = EventHandler;
 }
 
 bool ZEOptionSection::HasChanges()
@@ -94,11 +119,13 @@ void ZEOptionSection::CommitChanges()
 {
 	if (!Changed)
 	{
-		zeWarning("Option Section",  "Wrong change commit made on option section. Options in option section was not changed. (Option Section Name : \"%s\")", this->GetName());
+		zeWarning("Option Section",  
+			"Wrong change commit made on option section. Options in option section was not changed. (Option Section Name : \"%s\")", 
+			(const char*)this->GetName());
 	}
 	else
-		if (EventHandler != NULL)
-			EventHandler();
+		if (!OnChanged.empty())
+			OnChanged(NULL);
 }
 
 void ZEOptionSection::ResetChanges()
@@ -115,13 +142,12 @@ void ZEOptionSection::ResetChanges()
 
 ZEOptionSection::ZEOptionSection()
 {
-	SetName("");
 	Changed = false;
 }
 
-ZEOptionSection::ZEOptionSection(const char* Name)
+ZEOptionSection::ZEOptionSection(const ZEString& Name)
 {
-	SetName(Name);
+	this->Name = Name;
 	Changed = false;
 }
 

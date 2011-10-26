@@ -74,21 +74,21 @@ ZETestSuiteAdd(ZEVector2)
 	ZETestItemAdd(Constructor2)
 	{
 		ZEVector2 A(1.0f, 2.0f);
-		ZETestCheckEqual(A, ZEVector2(1.0f, 2.0f));	
+		CHECK_EQUAL(A, ZEVector2(1.0f, 2.0f));	
 		
 		ZEVector2 B(3.0f, 2.0f);
 		ZEVector2 C(A,B);
-		ZETestCheckEqual(C, ZEVector2(2.0f, 0.0f));
+		CHECK_EQUAL(C, ZEVector2(2.0f, 0.0f));
 	}
 	ZETestItemAdd(Create2)
 	{
 		ZEVector2 A;
 		A.Create(1.0f,2.0f);
-		ZETestCheckEqual(A, ZEVector2(1.0f, 2.0f));
+		CHECK_EQUAL(A, ZEVector2(1.0f, 2.0f));
 
 		ZEVector2 X;
 		X.Create(ZEVector2(1.0f, 2.0f), ZEVector2(4.0f, 6.0f));
-		ZETestCheckEqual(X, ZEVector2(3.0f, 4.0f));
+		CHECK_EQUAL(X, ZEVector2(3.0f, 4.0f));
 	}
 
 	ZETestItemAdd(Add2)
@@ -98,7 +98,7 @@ ZETestSuiteAdd(ZEVector2)
 		ZEVector2 C;
 
 		ZEVector2::Add(C,A,B);
-		ZETestCheckEqual(C, ZEVector2(3.0f, 6.0f));
+		CHECK_EQUAL(C, ZEVector2(3.0f, 6.0f));
 
 	}
 	
@@ -109,7 +109,7 @@ ZETestSuiteAdd(ZEVector2)
 		ZEVector2 C;
 		
 		ZEVector2::Substution(C,A,B);
-		ZETestCheckEqual(C,ZEVector2(-1.0f, -1.0f));
+		CHECK_EQUAL(C,ZEVector2(-1.0f, -1.0f));
 	}
 	
 	ZETestItemAdd(Scale2)
@@ -118,7 +118,7 @@ ZETestSuiteAdd(ZEVector2)
 		ZEVector2 B;
 
 		ZEVector2::Scale(B, A, 10.5f);
-		ZETestCheckEqual(B, ZEVector2(10.5f, 21.0f));
+		CHECK_EQUAL(B, ZEVector2(10.5f, 21.0f));
 	}
 	ZETestItemAdd(Multiply2)
 	{
@@ -127,7 +127,7 @@ ZETestSuiteAdd(ZEVector2)
 		ZEVector2 C;
 
 		ZEVector2::Multiply(C, A, B);
-		ZETestCheckEqual(C, ZEVector2(2.0f, 8.0f));
+		CHECK_EQUAL(C, ZEVector2(2.0f, 8.0f));
 	}
 	
 	ZETestItemAdd(DotProduction2)
@@ -135,7 +135,7 @@ ZETestSuiteAdd(ZEVector2)
 		ZEVector2 A(1.0f, 2.0f);
 		ZEVector2 B(2.0f, 3.0f);
 
-		ZETestCheckEqual(8.0f, ZEVector2::DotProduction(A,B));
+		CHECK_EQUAL(8.0f, ZEVector2::DotProduction(A,B));
 		
 	}
 	
@@ -145,14 +145,14 @@ ZETestSuiteAdd(ZEVector2)
 		ZEVector2 N;
 		ZEVector2::Normalize(N, A);
 
-		ZETestCheckEqual(N, ZEVector2(1.0f/sqrt(5.0f), 2.0f/sqrt(5.0f)));		
+		CHECK_EQUAL(N, ZEVector2(1.0f/sqrt(5.0f), 2.0f/sqrt(5.0f)));		
 	}
 	ZETestItemAdd(Length2)
 	{
 		ZEVector2 A(1.0f, 2.0f);
 		float l = ZEVector2::Length(A);
 
-		ZETestCheckEqual(l, sqrt(5.0f));
+		CHECK_EQUAL(l, sqrt(5.0f));
 	}
 
 	ZETestItemAdd(LengthSquare2)
@@ -160,7 +160,7 @@ ZETestSuiteAdd(ZEVector2)
 		ZEVector2 A(1.0f, 2.0f);
 		float l = ZEVector2::LengthSquare(A);
 
-		ZETestCheckEqual(l, 5.0f);
+		CHECK_EQUAL(l, 5.0f);
 	}
 	ZETestItemAdd(Distance2)
 	{
@@ -168,7 +168,7 @@ ZETestSuiteAdd(ZEVector2)
 		ZEVector2 B(4.0f, 5.0f);
 
 		float d = ZEVector2::Distance(A, B);
-		ZETestCheckEqual(d, sqrt(18.0f));
+		CHECK_EQUAL(d, sqrt(18.0f));
 	}
 	ZETestItemAdd(DistanceSquare2)
 	{
@@ -177,7 +177,7 @@ ZETestSuiteAdd(ZEVector2)
 
 		float ds = ZEVector2::DistanceSquare(A, B);
 
-		ZETestCheckEqual(ds, 18.0f);
+		CHECK_EQUAL(ds, 18.0f);
 	}
 	ZETestItemAdd(Lerp2)
 	{
@@ -188,7 +188,7 @@ ZETestSuiteAdd(ZEVector2)
 
 		ZEVector2::Lerp(C, A, B, t);
 
-		ZETestCheckClose(C, ZEVector2(4.25f, 6.55f), ZEVector2(0.0001f, 0.0001f));
+		CHECK_CLOSE(C, ZEVector2(4.25f, 6.55f), ZEVector2(0.0001f, 0.0001f));
 	}
 }
 ZETestSuiteAdd(ZEVector3)
@@ -196,23 +196,23 @@ ZETestSuiteAdd(ZEVector3)
 	ZETestItemAdd(Constructor3)
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
-		ZETestCheckEqual(A, ZEVector3(1.0f, 2.0f, 3.0f));	
+		CHECK_EQUAL(A, ZEVector3(1.0f, 2.0f, 3.0f));	
 		
 		ZEVector3 B(3.0f, 2.0f, 4.0f);
 		ZEVector3 C(A,B);
-		ZETestCheckEqual(C, ZEVector3(2.0f, 0.0f, 1.0f));
+		CHECK_EQUAL(C, ZEVector3(2.0f, 0.0f, 1.0f));
 
 		ZEVector3 D(ZEVector2(2.1f, 3.4f), 5.3f);
-		ZETestCheckEqual(D, ZEVector3(2.1f, 3.4f, 5.3f));
+		CHECK_EQUAL(D, ZEVector3(2.1f, 3.4f, 5.3f));
 	}
 	ZETestItemAdd(Create3)
 	{
 		ZEVector3 A;
 		ZEVector3::Create(A,1.0f,2.0f,3.0f);
-		ZETestCheckEqual(A, ZEVector3(1.0f, 2.0f, 3.0f));
+		CHECK_EQUAL(A, ZEVector3(1.0f, 2.0f, 3.0f));
 
 		ZEVector3 X(ZEVector3(1.0f, 2.0f, 3.0f), ZEVector3(4.0f, 6.0f, 8.0f));
-		ZETestCheckEqual(X, ZEVector3(3.0f, 4.0f, 5.0f));
+		CHECK_EQUAL(X, ZEVector3(3.0f, 4.0f, 5.0f));
 	}
 
 	ZETestItemAdd(Add3)
@@ -222,7 +222,7 @@ ZETestSuiteAdd(ZEVector3)
 		ZEVector3 C;
 
 		ZEVector3::Add(C,A,B);
-		ZETestCheckEqual(C, ZEVector3(3.0f, 6.0f, 9.0f));
+		CHECK_EQUAL(C, ZEVector3(3.0f, 6.0f, 9.0f));
 
 	}
 	
@@ -233,7 +233,7 @@ ZETestSuiteAdd(ZEVector3)
 		ZEVector3 C;
 		
 		ZEVector3::Sub(C,A,B);
-		ZETestCheckEqual(C,ZEVector3(-1.0f, -1.0f, -1.0f));
+		CHECK_EQUAL(C,ZEVector3(-1.0f, -1.0f, -1.0f));
 	}
 	
 	ZETestItemAdd(Scale3)
@@ -242,7 +242,7 @@ ZETestSuiteAdd(ZEVector3)
 		ZEVector3 B;
 
 		ZEVector3::Scale(B, A, 10.5f);
-		ZETestCheckEqual(B, ZEVector3(10.5f, 21.0f, 31.5f));
+		CHECK_EQUAL(B, ZEVector3(10.5f, 21.0f, 31.5f));
 	}
 	ZETestItemAdd(Multiply3)
 	{
@@ -251,7 +251,7 @@ ZETestSuiteAdd(ZEVector3)
 		ZEVector3 C;
 
 		ZEVector3::Multiply(C, A, B);
-		ZETestCheckEqual(C, ZEVector3(2.0f, 8.0f, 18.0f));
+		CHECK_EQUAL(C, ZEVector3(2.0f, 8.0f, 18.0f));
 	}
 	
 	ZETestItemAdd(DotProduct3)
@@ -259,7 +259,7 @@ ZETestSuiteAdd(ZEVector3)
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(2.0f, 3.0f, 4.0f);
 
-		ZETestCheckEqual(20.0f, ZEVector3::DotProduct(A,B));
+		CHECK_EQUAL(20.0f, ZEVector3::DotProduct(A,B));
 		
 	}
 	
@@ -270,7 +270,7 @@ ZETestSuiteAdd(ZEVector3)
 		ZEVector3 C;
 		ZEVector3::CrossProduct(C, A ,B);
 
-		ZETestCheckEqual(C, ZEVector3(-1.0f, 2.0f, -1.0f));
+		CHECK_EQUAL(C, ZEVector3(-1.0f, 2.0f, -1.0f));
 		
 	}
 
@@ -280,21 +280,21 @@ ZETestSuiteAdd(ZEVector3)
 		ZEVector3 N;
 		ZEVector3::Normalize(N, A);
 
-		ZETestCheckEqual(N, ZEVector3(1.0f/sqrt(14.0f), 2.0f/sqrt(14.0f), 3.0f/sqrt(14.0f)));		
+		CHECK_EQUAL(N, ZEVector3(1.0f/sqrt(14.0f), 2.0f/sqrt(14.0f), 3.0f/sqrt(14.0f)));		
 	}
 	ZETestItemAdd(Length3)
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		float l = ZEVector3::Length(A);
 
-		ZETestCheckEqual(l, sqrt(14.0f));
+		CHECK_EQUAL(l, sqrt(14.0f));
 	}
 	ZETestItemAdd(LengthSquare3)
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		float l = ZEVector3::LengthSquare(A);
 
-		ZETestCheckEqual(l, 14.0f);
+		CHECK_EQUAL(l, 14.0f);
 	}
 	ZETestItemAdd(Distance3)
 	{
@@ -302,7 +302,7 @@ ZETestSuiteAdd(ZEVector3)
 		ZEVector3 B(4.0f, 5.0f, 6.0f);
 
 		float d = ZEVector3::Distance(A, B);
-		ZETestCheckEqual(d, sqrt(27.0f));
+		CHECK_EQUAL(d, sqrt(27.0f));
 	}
 	ZETestItemAdd(DistanceSquare3)
 	{
@@ -311,7 +311,7 @@ ZETestSuiteAdd(ZEVector3)
 
 		float ds = ZEVector3::DistanceSquare(A, B);
 
-		ZETestCheckEqual(ds, 27.0f);
+		CHECK_EQUAL(ds, 27.0f);
 	}
 	ZETestItemAdd(Lerp3)
 	{
@@ -322,7 +322,7 @@ ZETestSuiteAdd(ZEVector3)
 
 		ZEVector3::Lerp(C, A, B, t);
 
-		ZETestCheckClose(C, ZEVector3(4.25f, 6.55f, 4.30), ZEVector3(0.001f, 0.001f, 0.001f));
+		CHECK_CLOSE(C, ZEVector3(4.25f, 6.55f, 4.30), ZEVector3(0.001f, 0.001f, 0.001f));
 	}
 }
 ZETestSuiteAdd(ZEVector4)
@@ -330,27 +330,27 @@ ZETestSuiteAdd(ZEVector4)
 	ZETestItemAdd(Constructor4)
 	{
 		ZEVector4 A(1.0f, 2.0f, 3.0f, 4.0f);
-		ZETestCheckEqual(A, ZEVector4(1.0f, 2.0f, 3.0f, 4.0f));	
+		CHECK_EQUAL(A, ZEVector4(1.0f, 2.0f, 3.0f, 4.0f));	
 		
 		ZEVector4 B(3.0f, 2.0f, 4.0f, 5.0f);
 		ZEVector4 C(A,B);
-		ZETestCheckEqual(C, ZEVector4(2.0f, 0.0f, 1.0f, 1.0f));
+		CHECK_EQUAL(C, ZEVector4(2.0f, 0.0f, 1.0f, 1.0f));
 
 		ZEVector4 D(ZEVector2(2.1f, 3.4f), 5.3f, 6.7f);
-		ZETestCheckEqual(D, ZEVector4(2.1f, 3.4f, 5.3f, 6.7f));
+		CHECK_EQUAL(D, ZEVector4(2.1f, 3.4f, 5.3f, 6.7f));
 
 		ZEVector4 E(ZEVector3(21.11f, 3.54f, 8.01f), 4.9f);
-		ZETestCheckEqual(E, ZEVector4(21.11f, 3.54f, 8.01f, 4.9f));
+		CHECK_EQUAL(E, ZEVector4(21.11f, 3.54f, 8.01f, 4.9f));
 	}
 	ZETestItemAdd(Create4)
 	{
 		ZEVector4 A;
 		A.Create(1.0f, 2.0f, 3.0f, 4.0f);
-		ZETestCheckEqual(A, ZEVector4(1.0f, 2.0f, 3.0f, 4.0f));
+		CHECK_EQUAL(A, ZEVector4(1.0f, 2.0f, 3.0f, 4.0f));
 
 		ZEVector4 X;
 		X.Create(ZEVector4(1.0f, 2.0f, 3.0f, 4.0f), ZEVector4(4.0f, 6.0f, 8.0f, 10.0f));
-		ZETestCheckEqual(X, ZEVector4(3.0f, 4.0f, 5.0f, 6.0f));
+		CHECK_EQUAL(X, ZEVector4(3.0f, 4.0f, 5.0f, 6.0f));
 	}
 
 	ZETestItemAdd(Add4)
@@ -360,7 +360,7 @@ ZETestSuiteAdd(ZEVector4)
 		ZEVector4 C;
 
 		ZEVector4::Add(C,A,B);
-		ZETestCheckEqual(C, ZEVector4(3.0f, 6.0f, 9.0f, 12.0f));
+		CHECK_EQUAL(C, ZEVector4(3.0f, 6.0f, 9.0f, 12.0f));
 
 	}
 	
@@ -371,7 +371,7 @@ ZETestSuiteAdd(ZEVector4)
 		ZEVector4 C;
 		
 		ZEVector4::Sub(C,A,B);
-		ZETestCheckEqual(C,ZEVector4(-1.0f, -2.0f, -3.0f, -4.0f));
+		CHECK_EQUAL(C,ZEVector4(-1.0f, -2.0f, -3.0f, -4.0f));
 	}
 	
 	ZETestItemAdd(Scale4)
@@ -380,7 +380,7 @@ ZETestSuiteAdd(ZEVector4)
 		ZEVector4 B;
 
 		ZEVector4::Scale(B, A, 10.5f);
-		ZETestCheckEqual(B, ZEVector4(10.5f, 21.0f, 31.5f, 42.0f));
+		CHECK_EQUAL(B, ZEVector4(10.5f, 21.0f, 31.5f, 42.0f));
 	}
 	ZETestItemAdd(Multiply4)
 	{
@@ -389,7 +389,7 @@ ZETestSuiteAdd(ZEVector4)
 		ZEVector4 C;
 
 		ZEVector4::Multiply(C, A, B);
-		ZETestCheckEqual(C, ZEVector4(2.0f, 8.0f, 18.0f, 110.f));
+		CHECK_EQUAL(C, ZEVector4(2.0f, 8.0f, 18.0f, 110.f));
 	}
 	
 	ZETestItemAdd(DotProduct4)
@@ -397,7 +397,7 @@ ZETestSuiteAdd(ZEVector4)
 		ZEVector4 A(1.0f, 2.0f, 3.0f, 13.0f);
 		ZEVector4 B(2.0f, 3.0f, 4.0f, 10.0f);
 
-		ZETestCheckEqual(150.0f, ZEVector4::DotProduct(A,B));
+		CHECK_EQUAL(150.0f, ZEVector4::DotProduct(A,B));
 		
 	}
 
@@ -407,21 +407,21 @@ ZETestSuiteAdd(ZEVector4)
 		ZEVector4 N;
 		ZEVector4::Normalize(N, A);
 
-		ZETestCheckEqual(N, ZEVector4(1.0f/sqrt(30.0f), 2.0f/sqrt(30.0f), 3.0f/sqrt(30.0f), 4.0f/sqrt(30.0f)));		
+		CHECK_EQUAL(N, ZEVector4(1.0f/sqrt(30.0f), 2.0f/sqrt(30.0f), 3.0f/sqrt(30.0f), 4.0f/sqrt(30.0f)));		
 	}
 	ZETestItemAdd(Length4)
 	{
 		ZEVector4 A(1.0f, 2.0f, 4.0f, 7.0f);
 		float l = ZEVector4::Length(A);
 
-		ZETestCheckEqual(l, sqrt(70.0f));
+		CHECK_EQUAL(l, sqrt(70.0f));
 	}
 	ZETestItemAdd(LengthSquare4)
 	{
 		ZEVector4 A(1.0f, 2.0f, 3.0f, 5.0f);
 		float l = ZEVector4::LengthSquare(A);
 
-		ZETestCheckEqual(l, 39.0f);
+		CHECK_EQUAL(l, 39.0f);
 	}
 	ZETestItemAdd(Distance4)
 	{
@@ -429,7 +429,7 @@ ZETestSuiteAdd(ZEVector4)
 		ZEVector4 B(4.0f, 5.0f, 6.0f, 7.0f);
 
 		float d = ZEVector4::Distance(A, B);
-		ZETestCheckEqual(d, sqrt(31.0f));
+		CHECK_EQUAL(d, sqrt(31.0f));
 	}
 	ZETestItemAdd(DistanceSquare4)
 	{
@@ -438,7 +438,7 @@ ZETestSuiteAdd(ZEVector4)
 
 		float ds = ZEVector4::DistanceSquare(A, B);
 
-		ZETestCheckEqual(ds, 52.0f);
+		CHECK_EQUAL(ds, 52.0f);
 	}
 	ZETestItemAdd(Lerp4)
 	{
@@ -449,6 +449,6 @@ ZETestSuiteAdd(ZEVector4)
 
 		ZEVector4::Lerp(C, A, B, t);
 
-		ZETestCheckClose(C, ZEVector4(4.25f, 6.55f, 4.30, 4.05), ZEVector4(0.0001f, 0.0001f, 0.0001f, 0.0001f));
+		CHECK_CLOSE(C, ZEVector4(4.25f, 6.55f, 4.30, 4.05), ZEVector4(0.0001f, 0.0001f, 0.0001f, 0.0001f));
 	}
 }

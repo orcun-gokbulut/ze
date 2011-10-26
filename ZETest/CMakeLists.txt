@@ -52,5 +52,5 @@ ze_add_source(ZETestManager.h		Source)
 ze_add_source(ZETestTimer.cpp		Source)
 ze_add_source(ZETestTimer.h			Source)
 
-ze_add_library(ZETest SOURCES ${Source} LIBS libUnitTestCpp)
+ze_add_library(ZETest SOURCES ${Source})
 

@@ -43,15 +43,15 @@ ZETestSuiteAdd(ZETrigonometry)
 {
 	ZETestItemAdd(FastSin)
 	{
-		ZETestCheckEqual(FastSin(360), 0);
+		CHECK_EQUAL(FastSin(360), 0);
 
 	}
 	ZETestItemAdd(FastCos)
 	{
-		ZETestCheckEqual(FastCos(360), 1);
+		CHECK_EQUAL(FastCos(360), 1);
 	}
 	ZETestItemAdd(FastTan)
 	{
-		ZETestCheckEqual(FastTan(360), 0);
+		CHECK_EQUAL(FastTan(360), 0);
 	}
 }

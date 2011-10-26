@@ -54,9 +54,9 @@ ZETestSuiteAdd(ZETriangle)
 
 		ZETriangle T(V0, V1, V2);
 
-		ZETestCheckEqual(T.V0, ZEVector3(1.0f, 2.0f, 3.0f));
-		ZETestCheckEqual(T.V1, ZEVector3(0.0f, 0.0f, 3.0f));
-		ZETestCheckEqual(T.V2, ZEVector3(4.0f, 5.0f, 6.0f));
+		CHECK_EQUAL(T.V0, ZEVector3(1.0f, 2.0f, 3.0f));
+		CHECK_EQUAL(T.V1, ZEVector3(0.0f, 0.0f, 3.0f));
+		CHECK_EQUAL(T.V2, ZEVector3(4.0f, 5.0f, 6.0f));
 	}
 
 	ZETestItemAdd(TRI_Create)
@@ -68,9 +68,9 @@ ZETestSuiteAdd(ZETriangle)
 		ZETriangle T;
 		ZETriangle::Create(T, V0, V1, V2);
 
-		ZETestCheckEqual(T.V0, ZEVector3(1.0f, 2.0f, 3.0f));
-		ZETestCheckEqual(T.V1, ZEVector3(0.0f, 0.0f, 3.0f));
-		ZETestCheckEqual(T.V2, ZEVector3(4.0f, 5.0f, 6.0f));
+		CHECK_EQUAL(T.V0, ZEVector3(1.0f, 2.0f, 3.0f));
+		CHECK_EQUAL(T.V1, ZEVector3(0.0f, 0.0f, 3.0f));
+		CHECK_EQUAL(T.V2, ZEVector3(4.0f, 5.0f, 6.0f));
 	}
 	ZETestItemAdd(TRI_GetNormal)
 	{
@@ -84,7 +84,7 @@ ZETestSuiteAdd(ZETriangle)
 
 		ZETriangle::GetNormal(T, N);
 
-		ZETestCheckEqual(N, ZEVector3((-6.0f/sqrt(54.0f)), (3.0f/sqrt(54.0f)), (3.0f/sqrt(54.0f))));
+		CHECK_EQUAL(N, ZEVector3((-6.0f/sqrt(54.0f)), (3.0f/sqrt(54.0f)), (3.0f/sqrt(54.0f))));
 	}
 
 	ZETestItemAdd(TRI_GetSurfacePlane)
@@ -102,8 +102,8 @@ ZETestSuiteAdd(ZETriangle)
 
 		ZETriangle::GetNormal(T, N);
 
-		ZETestCheckEqual(P.n, N);
-		ZETestCheckEqual(P.p, T.V1);
+		CHECK_EQUAL(P.n, N);
+		CHECK_EQUAL(P.p, T.V1);
 	}
 
 	ZETestItemAdd(TRI_InsideTest)
@@ -118,7 +118,7 @@ ZETestSuiteAdd(ZETriangle)
 
 		bool result = ZETriangle::InsideTest(T, P);
 
-		ZETestCheckEqual(result, true);
+		CHECK_EQUAL(result, true);
 	}
 
 	ZETestItemAdd(TRI_IntersectionTest1)
@@ -139,7 +139,7 @@ ZETestSuiteAdd(ZETriangle)
 
 		bool result = ZETriangle::IntersectionTest(T, L, t);
 		
-		ZETestCheckEqual(result, true);
+		CHECK_EQUAL(result, true);
 	}
 
 	ZETestItemAdd(TRI_IntersectionTest2)
@@ -160,7 +160,7 @@ ZETestSuiteAdd(ZETriangle)
 
 		bool result = ZETriangle::IntersectionTest(T, LS, t);
 		
-		ZETestCheckEqual(result, false);
+		CHECK_EQUAL(result, false);
 	}
 
 	ZETestItemAdd(TRI_IntersectionTest3)
@@ -181,7 +181,7 @@ ZETestSuiteAdd(ZETriangle)
 
 		bool result = ZETriangle::IntersectionTest(T, R, t);
 		
-		ZETestCheckEqual(result, true);
+		CHECK_EQUAL(result, true);
 	}
 
 	ZETestItemAdd(TRI_IntersectionTest4)
@@ -204,7 +204,7 @@ ZETestSuiteAdd(ZETriangle)
 
 		bool result = ZETriangle::IntersectionTest(T, P, L);
 		
-		ZETestCheckEqual(result, false);
+		CHECK_EQUAL(result, false);
 	}
 
 

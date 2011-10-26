@@ -63,13 +63,13 @@ bool ZEOptionManager::LoadCommand(ZECommand* Command, const ZECommandParameterLi
 	}
 	else
 	{
-			zeOutput("Incorrect parameters. \r\n"
-							 "Usage :\r\n"
-							 "  Options.Load() - Loads options from options.ini\r\n"
-							 "  Options.Load(String FileName) - Load options from a file named 'FileName'\r\n"
-							 "Example :\r\n"
-							 "  Options.Load(\"c:\\backup.ini\") - Load options from f:\\backup.ini file\r\n");
-			return false;
+		zeOutput("Incorrect parameters. \r\n"
+			"Usage :\r\n"
+			"  Options.Load() - Loads options from options.ini\r\n"
+			"  Options.Load(String FileName) - Load options from a file named 'FileName'\r\n"
+			"Example :\r\n"
+			"  Options.Load(\"c:\\backup.ini\") - Load options from f:\\backup.ini file\r\n");
+		return false;
 	 }
 }
 
@@ -90,11 +90,11 @@ bool ZEOptionManager::SaveCommand(ZECommand* Command, const ZECommandParameterLi
 			}
 		default:
 			zeOutput("Incorrect parameters\r\n"
-							 "Usage :\r\n"
-							 "  Options.SaveOptions() - Saves current options to options.ini\r\n"
-							 "  Options.SaveOptions(String FileName) - Saves current options to a file named 'FileName'\r\n"
-							 "Example :\r\n"
-							 "  Options.SaveOptions(\"f:\\myoptions.ini\") - Save current options to f:\\myoptions.ini file\r\n");
+				"Usage :\r\n"
+				"  Options.SaveOptions() - Saves current options to options.ini\r\n"
+				"  Options.SaveOptions(String FileName) - Saves current options to a file named 'FileName'\r\n"
+				"Example :\r\n"
+				"  Options.SaveOptions(\"f:\\myoptions.ini\") - Save current options to f:\\myoptions.ini file\r\n");
 			return false;
 	 }
 }
@@ -118,16 +118,16 @@ bool ZEOptionManager::ListSectionsCommand(ZECommand* Command, const ZECommandPar
 	else
 	{
 		zeOutput("Incorrect parameters\r\n"
-						 "Usage :\r\n"
-						 "  Options.ListSections() - Lists all of the option sections\r\n"
-						 "  Options.ListSection(Integer From, Integer Count) - Lists 'Count' number of option sections starting from index 'From'\r\n"
-						 "Example :\r\n"
-						 "  Options.ListSections(10, 50) - List sections from 10 to 60\r\n");
+			"Usage :\r\n"
+			"  Options.ListSections() - Lists all of the option sections\r\n"
+			"  Options.ListSection(Integer From, Integer Count) - Lists 'Count' number of option sections starting from index 'From'\r\n"
+			"Example :\r\n"
+			"  Options.ListSections(10, 50) - List sections from 10 to 60\r\n");
 		return false;
 	}
 
 	zeOutput(" Name                           Has Changes   Number Of Options \r\n"
-					 "----------------------------------------------------------------\r\n");
+		"----------------------------------------------------------------\r\n");
 
 	ZEOptionSection* CurrSection;
 	for (size_t I = Index; I < Sections.GetCount() && I <= Count; I++)
@@ -163,18 +163,18 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 	else
 	{
 		zeOutput("Incorrect parameters. \r\n"
-						 "Usage :\r\n"
-						 " Options.ListOptions(String Section) - Lists all of the options in the section named 'Section'\r\n"
-						 " Options.ListOptions(String Section, Integer Index, Integer Count) - Lists 'Count' number of options in the option section named 'Section' starting from index 'Index'\r\n"
-						 "Example :\r\n"
-						 "  Options.ListOptions(\"Core\", 1, 5) - List options in the Core option section from 1 to 5\r\n");
+			"Usage :\r\n"
+			" Options.ListOptions(String Section) - Lists all of the options in the section named 'Section'\r\n"
+			" Options.ListOptions(String Section, Integer Index, Integer Count) - Lists 'Count' number of options in the option section named 'Section' starting from index 'Index'\r\n"
+			"Example :\r\n"
+			"  Options.ListOptions(\"Core\", 1, 5) - List options in the Core option section from 1 to 5\r\n");
 		return false;
 	}
 
 	if (Sec != NULL)
 	{
 		zeOutput(" Name                            Type           Changed    Value           \r\n"
-						 "---------------------------------------------------------------------------\r\n");
+			"---------------------------------------------------------------------------\r\n");
 		
 		ZEOption* Opt;
 		for (size_t I = 0; I < Sec->GetNumberOfOptions() && I <= Count; I++)
@@ -260,7 +260,7 @@ bool ZEOptionManager::RegisterSection(ZEOptionSection* Ref)
 	{
 		zeError("Options Manager",
 			"Can not register option section. An option section with same name is already registered. (Option Section Name : \"%s\")", 
-			Ref->GetName());
+			(const char*)Ref->GetName());
 		return false;
 	}
 	Sections.Add(Ref);
@@ -273,17 +273,17 @@ bool ZEOptionManager::UnregisterSection(ZEOptionSection* Ref)
 	{
 		zeError("Options Manager",
 			"Can not unregister option section. There is no such a registered option section. (Option Section Name : \"%s\")", 
-			Ref->GetName());
+			(const char*)Ref->GetName());
 		return false;
 	}
 	Sections.DeleteValue(Ref);
 	return true;
 }
 
-ZEOptionSection* ZEOptionManager::GetSection(const char* Name)
+ZEOptionSection* ZEOptionManager::GetSection(const ZEString& Name)
 {
 	for(size_t I = 0; I < Sections.GetCount(); I++)
-		if (_stricmp(Sections[I]->GetName(), Name) == 0)
+		if (Sections[I]->GetName() == Name)
 			return Sections[I];
 	return NULL;
 }
@@ -301,7 +301,7 @@ size_t ZEOptionManager::GetNumberOfSections()
 	return Sections.GetCount();
 }
 
-void ZEOptionManager::Save(const char *FileName)
+void ZEOptionManager::Save(const ZEString& FileName)
 {
 	FILE* File = fopen(FileName, "w");
 	ZEOptionSection*	CurrentSet;
@@ -433,7 +433,7 @@ bool ZEOptionManager::MatchSet(char* Line, char* Match)
 	return false;
 }
 
-ZEOption* ZEOptionManager::GetOption(const char* SectionName, const char* Name)
+ZEOption* ZEOptionManager::GetOption(const ZEString& SectionName, const ZEString& Name)
 {
 	ZEOptionSection* Sec = GetSection(SectionName);
 	if (Sec != NULL)
@@ -442,7 +442,7 @@ ZEOption* ZEOptionManager::GetOption(const char* SectionName, const char* Name)
 		return NULL;
 }
 
-void ZEOptionManager::Load(const char *FileName)
+void ZEOptionManager::Load(const ZEString& FileName)
 {
 	FILE* File = fopen(FileName, "r");
 	
