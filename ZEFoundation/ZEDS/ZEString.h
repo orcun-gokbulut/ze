@@ -99,8 +99,8 @@ class ZEChar
 class ZEString
 {
 	public:
-		ZEAllocatorBase<char>		Allocator;
 		char*						Buffer;
+		ZEAllocatorBase<char>		Allocator;
 
 	protected:
 		void						SetSize();

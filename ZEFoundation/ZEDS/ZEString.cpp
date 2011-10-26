@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEString.h"
-#include "ZEDSDefinitions.h"
 
 #include <string.h>
 #include <memory.h>
@@ -67,12 +66,19 @@ void ZEString::Compact()
 void ZEString::Clear()
 {
 	Allocator.Deallocate(&Buffer);
+	Buffer = NULL;
 }
 
 void ZEString::SetValue(const char* String)
 {
 	zeAssert(String == NULL, "Null char array pointer are not valid parameters.");
 	
+	if (String == NULL)
+	{
+		Clear();
+		return;
+	}
+
 	size_t StringSize = strlen(String);
 	if (StringSize == 0)
 	{
@@ -693,16 +699,9 @@ ZEString::ZEString(const ZEString& String)
 
 ZEString::~ZEString()
 {
-	if (Buffer != NULL)
-		Allocator.Deallocate(&Buffer);
+	Clear();
 
 	#ifdef ZE_DEBUG_CHECK_MEMORY
 		zeAssert(!_CrtCheckMemory(), "Heap problem");
 	#endif
-
 }
-
-
-
-
-

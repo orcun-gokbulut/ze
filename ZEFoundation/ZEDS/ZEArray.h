@@ -100,8 +100,8 @@ class ZEArray
 		inline Type Pop()
 		{
 			zeAssert(Count == 0, "ZEArray::Pop operaion failed. There is no item in the stack.");
-			Type Temp = Items[0];
-			DeleteAt(0);
+			Type Temp = Items[Count - 1];
+			DeleteAt(Count - 1);
 			return Temp;
 		}
 
@@ -111,30 +111,100 @@ class ZEArray
 			this->Items[Index] = Value;
 		}
 
-		void MassAdd(Type* OtherArray, size_t Count)
+		inline Type* MassAdd(size_t ItemCount)
 		{
-			Resize(this->Count + Count);
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count, OtherArray, Count);
+			Resize(Count + ItemCount);
+
+			return &Items[Count - ItemCount];
 		}
 
-		void MassAdd(Type* OtherArray, size_t Offset, size_t Count)
+		inline Type* MassAdd(const Type* NewItems, size_t ItemCount)
 		{
-			Resize(this->Count + Count);
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count, OtherArray + Offset, Count);
+			Resize(Count + ItemCount);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count, NewItems, ItemCount);
+
+			#ifdef ZE_DEBUG_CHECK_MEMORY
+			zeAssert(!_CrtCheckMemory(), "Heap problem");
+			#endif
+
+			return &Items[Count - ItemCount];
+		}
+
+		inline Type* MassAdd(const Type* NewItems, size_t ItemOffset, size_t ItemCount)
+		{
+			Resize(Count + ItemCount);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count, NewItems + ItemOffset, ItemCount);
+			
+			#ifdef ZE_DEBUG_CHECK_MEMORY
+			zeAssert(!_CrtCheckMemory(), "Heap problem");
+			#endif
+
+			return &Items[Count - ItemCount];
 		}
 		
-		void MassInsert(size_t Index, Type* OtherArray, size_t Count)
+		inline Type* MassInsert(size_t Index, size_t ItemCount)
 		{
-			Resize(this->Count + Count);
+			Type* NewBuffer;
+			if (Allocator.Allocate(&NewBuffer, Count + ItemCount))
+			{
+				ZEAllocatorBase<Type>::ObjectCopy(this->Items, NewBuffer, Index);
+				delete[] Items;
+				Items = NewBuffer;
+			}
+
 			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, this->Items + Index + Count, Count);
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, OtherArray, Count);
+
+			Count += ItemCount;
+
+			#ifdef ZE_DEBUG_CHECK_MEMORY
+			zeAssert(!_CrtCheckMemory(), "Heap problem");
+			#endif
+
+			return &Items[Count - ItemCount];
 		}
 
-		void MassInsert(size_t Index, Type* OtherArray, size_t Offset, size_t Count)
+		inline Type* MassInsert(size_t Index, Type* NewItems, size_t ItemCount)
 		{
-			Resize(this->Count + Count);
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, this->Items + Index + Count, Count);
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, OtherArray + Offset, Count);
+			Type* NewBuffer;
+			if (Allocator.Allocate(&NewBuffer, Count + ItemCount))
+			{
+				ZEAllocatorBase<Type>::ObjectCopy(this->Items, NewBuffer, Index);
+				delete[] Items;
+				Items = NewBuffer;
+			}
+
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, this->Items + Index + Count, ItemCount);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, NewItems, ItemCount);
+
+			Count += ItemCount;
+
+			#ifdef ZE_DEBUG_CHECK_MEMORY
+			zeAssert(!_CrtCheckMemory(), "Heap problem");
+			#endif
+
+			return &Items[Count - ItemCount];
+		}
+
+		inline Type* MassInsert(size_t Index, Type* NewItems, size_t ItemOffset, size_t ItemCount)
+		{
+			Type* NewBuffer;
+			if (Allocator.Allocate(&NewBuffer, Count + ItemCount))
+			{
+				ZEAllocatorBase<Type>::ObjectCopy(this->Items, NewBuffer, Index);
+				delete[] Items;
+				Items = NewBuffer;
+			}
+
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, this->Items + Index + Count, ItemCount);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, NewItems + ItemOffset, ItemCount);
+
+			Count += ItemCount;
+
+			#ifdef ZE_DEBUG_CHECK_MEMORY
+			zeAssert(!_CrtCheckMemory(), "Heap problem");
+			#endif
+
+			return &Items[Count - ItemCount];
 		}
 
 		inline void FillWith(Type Value)
@@ -150,18 +220,12 @@ class ZEArray
 			ZEAllocatorBase<Type>::ObjectCopy(this->Items, OtherArray, Count);
 		}
 
-		inline int FindIndex(Type Item, int Index = 0)
+		inline int FindIndex(Type Item, int StartIndex = 0)
 		{
-			for(size_t I = 0; I < Count; I++)
-			{
+			for(size_t I = StartIndex; I < Count; I++)
 				if (Items[I] == Item)
-				{
-					Index--;
+					return I;
 
-					if (Index < 0)
-						return I;
-				}
-			}
 			return -1;	
 		}
 
@@ -198,26 +262,6 @@ class ZEArray
 			#endif
 			
 			return &Items[Count - 1];		
-		}
-
-		inline Type* MassAdd(size_t ItemCount)
-		{
-			Allocator.Reallocate(&Items, Count + ItemCount);
-			Count += ItemCount;
-			return &Items[Count - ItemCount];
-		}
-
-		inline Type* MassAdd(const Type* NewItems, size_t ItemCount)
-		{
-			Allocator.Reallocate(&Items, Count + ItemCount);
-			ZEAllocatorBase<Type>::ObjectCopy(Items + Count, NewItems, ItemCount);
-			Count += ItemCount;
-
-			#ifdef ZE_DEBUG_CHECK_MEMORY
-				zeAssert(!_CrtCheckMemory(), "Heap problem");
-			#endif
-
-			return &Items[Count - ItemCount];
 		}
 
 		inline Type* AddByRef(const Type& NewItem)
@@ -430,9 +474,13 @@ class ZEArray
 			qsort(Items, Count, sizeof(Type), CompareFunction);
 		}
 
-		inline void BinarySearch(const Type& Element, int (*CompareFunction)(Type*, Type*))
+		inline int BinarySearch(const Type& Element, int (*CompareFunction)(Type*, Type*))
 		{
-			bsearch(&Element, &Items, Count, sizeof(Type), CompareFunction);
+			void* Result = bsearch(&Element, &Items, Count, sizeof(Type), CompareFunction);
+			if (Result == NULL)
+				return NULL;
+			else
+				return ((Type*)Result - Items);
 		}
 
 		inline const Type& GetItem(size_t Index) const
@@ -480,7 +528,7 @@ class ZEArray
 			Count = 0;
 		}
 
-		ZEArray(const ZEArray<Type, Allocator_>& C) //Assingment Constructor
+		ZEArray(const ZEArray<Type, Allocator_>& C)
 		{
 			Items = NULL;
 			Count = 0;
