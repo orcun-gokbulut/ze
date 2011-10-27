@@ -233,8 +233,7 @@ class ZEArray
 		
 		void Combine(const ZEArray<Type, Allocator_>& OtherArray)
 		{
-			Resize(Count + OtherArray.Count);
-			MassInsert(Count, OtherArray.Items, OtherArray.Count);
+			MassAdd(Count, OtherArray.Items, OtherArray.Count);
 		}
 
 		inline Type* Add()
@@ -478,6 +477,20 @@ class ZEArray
 		{
 			zeAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
+		}
+
+		ZEArray operator+(const ZEArray<Type, Allocator_>& OtherArray)
+		{
+			ZEArray Temp;
+			Temp.MassAdd(Items, Count);
+			Temp.MassAdd(OtherArray.Items, OtherArray.Count);
+			return Temp;
+		}
+
+		ZEArray& operator+=(const ZEArray<Type, Allocator_>& OtherArray)
+		{
+			ZEArray.MassAdd(OtherArray.Items, OtherArray.Count);
+			return *this;
 		}
 
 		inline void operator=(const ZEArray<Type, Allocator_>& Other)
