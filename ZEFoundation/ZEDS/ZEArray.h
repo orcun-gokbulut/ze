@@ -233,7 +233,7 @@ class ZEArray
 		
 		void Combine(const ZEArray<Type, Allocator_>& OtherArray)
 		{
-			MassAdd(Count, OtherArray.Items, OtherArray.Count);
+			MassAdd(OtherArray.Items, OtherArray.Count);
 		}
 
 		inline Type* Add()
