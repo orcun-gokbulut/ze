@@ -123,16 +123,6 @@ class ZEArray
 
 			return &Items[Count - ItemCount];
 		}
-
-		inline Type* MassAdd(const Type* NewItems, size_t ItemOffset, size_t ItemCount)
-		{
-			Resize(Count + ItemCount);
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count - ItemCount, NewItems + ItemOffset, ItemCount);
-			
-			ZEDebugCheckMemory();
-
-			return &Items[Count - ItemCount];
-		}
 		
 		inline Type* MassInsert(size_t Index, size_t ItemCount)
 		{
@@ -173,37 +163,10 @@ class ZEArray
 			return &Items[Count - ItemCount];
 		}
 
-		inline Type* MassInsert(size_t Index, Type* NewItems, size_t ItemOffset, size_t ItemCount)
+		inline void Fill(Type Value)
 		{
-			Type* NewBuffer;
-			if (Allocator.Allocate(&NewBuffer, Count + ItemCount))
-			{
-				ZEAllocatorBase<Type>::ObjectCopy(this->Items, NewBuffer, Index);
-				delete[] Items;
-				Items = NewBuffer;
-			}
-
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, this->Items + Index + Count, ItemCount);
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, NewItems + ItemOffset, ItemCount);
-
-			Count += ItemCount;
-
-			ZEDebugCheckMemory();
-
-			return &Items[Count - ItemCount];
-		}
-
-		inline void FillWith(Type Value)
-		{
-			for (size_t I =0 ; I < Count; I++)
+			for (size_t I = 0; I < Count; I++)
 				Items[I] = Value;
-		}
-
-		inline void Fill(Type* OtherArray, size_t Count)
-		{
-			if (this->Count != Count)
-				this->SetCount(Count);
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items, OtherArray, Count);
 		}
 
 		inline int FindIndex(Type Item, int StartIndex = 0)

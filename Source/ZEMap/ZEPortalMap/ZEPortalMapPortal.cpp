@@ -96,7 +96,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 
 		ZEArray<bool> Processed;
 		Processed.SetCount(Resource->Polygons.GetCount());
-		Processed.FillWith(false);
+		Processed.Fill(false);
 
 		size_t VertexIndex = 0;
 		ZEMapVertex* Buffer = (ZEMapVertex*)VertexBuffer->Lock();	

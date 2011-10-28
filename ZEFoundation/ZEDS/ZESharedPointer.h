@@ -38,7 +38,7 @@
 #define __ZE_SHARED_POINTER_H__
 
 #include "ZEError.h"
-struct ZEReferanceCount
+struct ZEReferenceCount
 {
 	size_t Strong;
 	size_t Weak;
@@ -47,14 +47,15 @@ struct ZEReferanceCount
 template<typename Type>
 class ZESharedPointer
 {
+	template<typename TypeFriend> friend class ZEWeakPointer;
 	private:
 		Type* Pointer;
-		ZEReferanceCount* ReferanceCount;
+		ZEReferenceCount* ReferanceCount;
 
 	public:
 		bool IsNull()
 		{
-			return (ReferanceCount == NULL);
+			return (ReferanceCount == NULL || Pointer == NULL);
 		}
 
 		void Create(Type* RawPointer)
@@ -65,7 +66,7 @@ class ZESharedPointer
 			Release();
 
 			Pointer = RawPointer;
-			ReferanceCount = new ZEReferanceCount;
+			ReferanceCount = new ZEReferenceCount;
 			ReferanceCount->Weak = 0;
 			ReferanceCount->Strong = 1;
 		}
@@ -85,39 +86,69 @@ class ZESharedPointer
 			}
 		}
 
-		size_t GetReferanceCount()
+		size_t GetReferenceCount()
 		{
-			return ReferanceCount->Strong;
+			if (ReferanceCount != NULL)
+				return ReferanceCount->Strong;
+
+			return 0;
+		}
+
+
+		size_t GetWeakReferenceCount()
+		{
+			if (ReferanceCount != NULL)
+				return ReferanceCount->Weak;
+
+			return 0;
+		}
+
+		Type* GetPointer()
+		{
+			return Pointer;
 		}
 
 		void Release()
 		{
 			if (ReferanceCount == NULL)
-				return NULL;
+				return;
 
 			ReferanceCount->Strong--;
 			if (ReferanceCount->Strong == 0)
 			{
 				delete Pointer;
+				Pointer = NULL;
 				if (ReferanceCount->Weak == 0)
 				{
 					delete ReferanceCount;
+					ReferanceCount = NULL;
 				}
 			}
 		}
 
 		Type& operator*()
 		{
-			zeAssert(Pointer == 0, "ZEPointer does not points any data structure.");
+			zeAssert(Pointer == 0, "ZESharedPointer does not points to any data structure.");
 			return *Pointer;
 		}
 
 		Type* operator->()
 		{
-			zeAssert(Pointer == 0, "ZEPointer does not points any data structure.");
+			zeAssert(Pointer == 0, "ZESharedPointer does not points to any data structure.");
 			return Pointer;
 		}
 
+		Type* operator->()
+		{
+			zeAssert(Pointer == 0, "ZESharedPointer does not points to any data structure.");
+			return Pointer;
+		}
+
+		Type* operator->()
+		{
+			zeAssert(Pointer == 0, "ZESharedPointer does not points to any data structure.");
+			return Pointer;
+		}
 		ZESharedPointer<Type>& operator=(Type* RawPointer)
 		{
 			Create(RawPointer);
@@ -138,11 +169,15 @@ class ZESharedPointer
 
 		explicit ZESharedPointer(Type* RawPointer)
 		{
+			Pointer = NULL;
+			ReferanceCount = NULL;
 			Create(RawPointer);
 		}
 
 		ZESharedPointer(const ZESharedPointer<Type>& OtherPointer)
 		{
+			Pointer = NULL;
+			ReferanceCount = NULL;
 			Copy(OtherPointer);
 		}
 

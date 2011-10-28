@@ -44,13 +44,15 @@ class ZEWeakPointer
 {
 	private:
 		Type* Pointer;
-		ZEReferanceCount* ReferanceCount;
+		ZEReferenceCount* ReferenceCount;
 
 	public:
-		void IsEmpty()
+		bool IsNull()
 		{
-			if (ReferanceCount == NULL || ReferanceCount->Strong == 0)
+			if (Pointer == NULL || ReferenceCount == NULL || ReferenceCount->Strong == 0)
 				return true;
+			else
+				return false;
 		}
 
 		void Copy(const ZEWeakPointer<Type>& OtherPointer)
@@ -63,8 +65,8 @@ class ZEWeakPointer
 			if (OtherPointer.Pointer != NULL)
 			{
 				Pointer = OtherPointer.Pointer;
-				ReferanceCount = OtherPointer.ReferanceCount;
-				ReferanceCount->Weak++;			
+				ReferenceCount = OtherPointer.ReferenceCount;
+				ReferenceCount->Weak++;			
 			}
 		}
 
@@ -78,54 +80,71 @@ class ZEWeakPointer
 			if (OtherPointer.Pointer != NULL)
 			{
 				Pointer = OtherPointer.Pointer;
-				ReferanceCount = OtherPointer.ReferanceCount;
-				ReferanceCount->Weak++;			
+				ReferenceCount = OtherPointer.ReferanceCount;
+				ReferenceCount->Weak++;			
 			}
 		}
 
-		size_t GetReferanceCount()
+		size_t GetReferenceCount()
 		{
-			return ReferanceCount->Strong;
+			if (ReferenceCount != NULL)
+				return ReferenceCount->Strong;
+			else
+				return 0;
+		}
+
+		size_t GetWeakReferenceCount()
+		{
+			if (ReferenceCount != NULL)
+				return ReferenceCount->Weak;
+			else
+				return 0;
+		}
+
+		Type* GetPointer()
+		{
+			return Pointer;
 		}
 
 		ZESharedPointer<Type> GetInstance()
 		{
-			if (ReferanceCount->)
 			ZESharedPointer<Type> SharedPointer;
-			SharedPointer.Pointer = Pointer;
-			SharedPointer.ReferanceCount = ReferanceCount;
 
+			if (!IsNull())
+			{
+				SharedPointer.Pointer = Pointer;
+				SharedPointer.ReferanceCount = ReferenceCount;
+				SharedPointer.ReferanceCount->Strong++;
+			}
+
+			return SharedPointer;
 		}
 
 		void Release()
 		{
-			if (ReferanceCount != NULL)
+			if (ReferenceCount != NULL)
 			{
 				Pointer = NULL;
-				ReferanceCount->Weak--;
-				if (ReferanceCount->Strong == 0 && ReferanceCount->Weak == 0)
-				{
-					delete ReferanceCount;
-				}
-				ReferanceCount = NULL;
+				ReferenceCount->Weak--;
+				if (ReferenceCount->Strong == 0 && ReferenceCount->Weak == 0)
+					delete ReferenceCount;
+
+				ReferenceCount = NULL;
 			}
 		}
 
 		Type& operator*()
 		{
-			if (ReferanceCount->Strong == 0)
-				Pointer = NULL;
+			zeAssert(Pointer == NULL, "ZEWeakPointer does not points any data structure.");
+			zeAssert(ReferenceCount == 0 || ReferenceCount->Strong == 0, "ZEWeakPointer is ilvalid. Pointer is deleted.");
 
-			zeAssert(Pointer == NULL, "ZEPointer does not points any data structure.");
 			return *Pointer;
 		}
 
 		Type* operator->()
 		{
-			if (ReferanceCount->Strong == 0)
-				Pointer = NULL;
-
-			zeAssert(Pointer == NULL, "ZEPointer does not points any data structure.");
+			zeAssert(Pointer == NULL, "ZEWeakPointer does not points any data structure.");
+			zeAssert(ReferenceCount == 0 || ReferenceCount->Strong == 0, "ZEWeakPointer is ilvalid. Pointer is deleted.");
 
 			return Pointer;
 		}
@@ -145,16 +164,20 @@ class ZEWeakPointer
 		ZEWeakPointer()
 		{
 			Pointer = NULL;
-			ReferanceCount = NULL;
+			ReferenceCount = NULL;
 		}
 
 		ZEWeakPointer(const ZESharedPointer<Type>& OtherPointer)
 		{
+			Pointer = NULL;
+			ReferenceCount = NULL;
 			Copy(OtherPointer);
 		}
 
 		ZEWeakPointer(const ZEWeakPointer<Type>& OtherPointer)
 		{
+			Pointer = NULL;
+			ReferenceCount = NULL;
 			Copy(OtherPointer);
 		}
 
@@ -166,13 +189,13 @@ class ZEWeakPointer
 		static void Swap(const ZEWeakPointer<Type>& A, const ZEWeakPointer<Type>& B)
 		{
 			Type* TempP = A.Pointer;
-			size_t TempRC = A.ReferanceCount;
+			size_t TempRC = A.ReferenceCount;
 
 			A.Pointer = B.Pointer;
-			A.ReferanceCount = B.ReferanceCount;
+			A.ReferenceCount = B.ReferenceCount;
 
 			B.Pointer = TempP;
-			B.ReferanceCount = TempRC;
+			B.ReferenceCount = TempRC;
 		}
 };
 
