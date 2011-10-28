@@ -62,9 +62,6 @@ class ZERectangle
 	public:
 		ZEVector2				LeftUp, RightDown;
 
-		bool					IsEmpty();
-		bool					BoundingTest(const ZEVector2& Point) const;
-
 		void					SetPosition(const ZEVector2& Position);
 		const ZEVector2&		GetPosition() const;
 
@@ -85,9 +82,9 @@ class ZERectangle
 
 		ZEVector2				GetCorner(ZERectangleCorner Corner) const;
 
+		static bool				IntersectionTest(const ZERectangle& Rectangle, const ZEVector2& Point);
 		static bool				IntersectionTest(const ZERectangle& RectangleA, const ZERectangle& RectangleB);
-		static bool				Intersection(ZERectangle& Intersection, const ZERectangle& RectangleA, const ZERectangle& RectangleB);
-		static bool				BoundingTest(const ZERectangle& Rectangle, const ZEVector2& Point);
+		static bool				IntersectionTest(const ZERectangle& RectangleA, const ZERectangle& RectangleB, ZERectangle& Intersection);
 
 								ZERectangle();
 								ZERectangle(const ZEVector2& LeftUp, const ZEVector2& RightDown);

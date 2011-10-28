@@ -223,7 +223,6 @@ class ZEVector3
 		ZEVector3					operator+(const ZEVector3& RightOperand) const;
 		ZEVector3					operator-(const ZEVector3& RightOperand) const;
 		ZEVector3					operator*(const ZEVector3& RightOperand) const;
-		ZEVector3					operator*(const ZEMatrix4x4& RightOperand) const;
 		ZEVector3					operator*(float s) const;
 		ZEVector3					operator/(const ZEVector3& RightOperand) const;
 		ZEVector3					operator/(float s) const;
@@ -334,8 +333,8 @@ class ZEVector4
 		float&						operator[](size_t Index);
 
 									ZEVector4(float x, float y, float z, float w);
-									ZEVector4(const ZEVector2& Base, float z, float w); // Doldur metin doldur.
-									ZEVector4(const ZEVector3& Base, float w); // Doldur metin doldur.
+									ZEVector4(const ZEVector2& Base, float z, float w);
+									ZEVector4(const ZEVector3& Base, float w);
 									ZEVector4(const ZEVector4& Start, const ZEVector4& End);
 									ZEVector4();
 };

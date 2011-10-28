@@ -41,34 +41,14 @@
 #include "ZERay.h"
 #include "ZELineSegment.h"
 #include "ZEMathDefinitions.h"
+#include "ZEError.h"
 
 #include <float.h>
 #include <math.h>
 
 ZEVector3 ZEOBBox::GetVertex(unsigned char Index) const
 {
-	switch(Index)
-	{
-		case 0:
-			return Center + Up * HalfSize.x;
-		case 1:
-			return Center - Up * HalfSize.x ;
-		case 2:
-			return Center + Right * HalfSize.y;
-		case 3:
-			return Center - Right * HalfSize.y;
-		case 4:
-			return Center + Front * HalfSize.z;
-		case 5:
-			return Center + Front * HalfSize.z;
-		default:
-			//zeError("ZEMath", "Wrong Index ZEOBBox vertex. Index : %d", Index);
-			break;
-	}
-}
-
-ZEVector3 ZEOBBox::GetEdge(unsigned char Index) const
-{
+	zeAssert(Index > 7, "There is only 8 vertex in OBB box.");
 	switch(Index)
 	{
 		case 0:
@@ -101,11 +81,10 @@ void ZEOBBox::CreateFromOrientation(ZEOBBox& BoundingBox, const ZEVector3& Posit
 
 void ZEOBBox::Transform(ZEOBBox& Output, const ZEMatrix4x4& Matrix, const ZEOBBox& Input)
 {
-	ZEVector3 NewCenter, NewU, NewV, NewN;
-	ZEMatrix4x4::Transform(NewCenter, Matrix, Input.Center);
-	ZEMatrix4x4::Transform3x3(NewU, Matrix, Input.Right);
-	ZEMatrix4x4::Transform3x3(NewU, Matrix, Input.Up);
-	ZEMatrix4x4::Transform3x3(NewU, Matrix, Input.Front);
+	ZEMatrix4x4::Transform(Output.Center, Matrix, Input.Center);
+	ZEMatrix4x4::Transform3x3(Output.Right, Matrix, Input.Right);
+	ZEMatrix4x4::Transform3x3(Output.Up, Matrix, Input.Up);
+	ZEMatrix4x4::Transform3x3(Output.Front, Matrix, Input.Front);
 }
 
 void ZEOBBox::ConvertToSphere(ZEBSphere& Sphere, const ZEOBBox& Input)

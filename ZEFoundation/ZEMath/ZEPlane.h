@@ -45,7 +45,7 @@ enum ZEPlaneIntersect
 	ZE_PI_NO_INTERSECT	= 0,
 	ZE_PI_PARALLEL		= 1,
 	ZE_PI_ON_PLANE		= 2,
-	ZE_PI_INTERSECTS		= 3,
+	ZE_PI_INTERSECTS	= 3,
 };
 enum ZEHalfSpace
 {
@@ -73,7 +73,7 @@ class ZEPlane
 		static float				Distance(const ZEPlane& Plane, const ZEVector3& Point);
 
 		static void					Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p);
-		static void					Create(ZEPlane& Plane,float a, float b, float c, float d);
+		static void					Create(ZEPlane& Plane, float a, float b, float c, float d);
 		static void					Create(ZEPlane& Plane,const ZEVector3 &P1,const ZEVector3 &P2,const ZEVector3 &P3);
 
 									ZEPlane();

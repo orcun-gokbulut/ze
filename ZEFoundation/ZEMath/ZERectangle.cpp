@@ -34,14 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERectangle.h"
-
-bool ZERectangle::IsEmpty()
-{
-	return (LeftUp == ZEVector2::Zero && RightDown == ZEVector2::Zero);
-}
+#include "ZEError.h"
 
 ZEVector2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
 {
+
 	switch(Corner)
 	{
 		case ZE_RC_LEFTDOWN:
@@ -53,8 +50,7 @@ ZEVector2 ZERectangle::GetCorner(ZERectangleCorner Corner) const
 		case ZE_RC_RIGHTUP:
 			return ZEVector2(RightDown.x, LeftUp.y);
 		default:
-			//zeError("ZEMath", "Wrong enum value ZERectangleCorner. Value : %d", Corner);
-			break;
+			zeAssert(true, "Wrong ZERectangleCorner enum value.");
 	}
 }
 
@@ -121,6 +117,15 @@ float ZERectangle::GetHeight() const
 	return LeftUp.y - RightDown.y;
 }
 
+bool ZERectangle::IntersectionTest(const ZERectangle& Rectangle, const ZEVector2& Point)
+{
+	if ((Point.x >= Rectangle.LeftUp.x && Point.x <= Rectangle.RightDown.x) && 
+		(Point.y >= Rectangle.LeftUp.y && Point.y <= Rectangle.RightDown.y))
+		return true;
+	else
+		return false;
+}
+
 bool ZERectangle::IntersectionTest(const ZERectangle& RectangleA, const ZERectangle& RectangleB)
 {
 	if ((RectangleA.LeftUp.x > RectangleB.RightDown.x) || 
@@ -132,7 +137,7 @@ bool ZERectangle::IntersectionTest(const ZERectangle& RectangleA, const ZERectan
 	return true;
 }
 
-bool ZERectangle::Intersection(ZERectangle& Intersection, const ZERectangle& RectangleA, const ZERectangle& RectangleB)
+bool ZERectangle::IntersectionTest(const ZERectangle& RectangleA, const ZERectangle& RectangleB, ZERectangle& Intersection)
 {
 	if (!ZERectangle::IntersectionTest(RectangleA, RectangleB))
 		return false;
@@ -143,15 +148,6 @@ bool ZERectangle::Intersection(ZERectangle& Intersection, const ZERectangle& Rec
 	Intersection.RightDown.y = (RectangleA.RightDown.y < RectangleB.RightDown.y ? RectangleA.RightDown.y : RectangleB.RightDown.y);
 
 	return true;
-}
-
-bool ZERectangle::BoundingTest(const ZERectangle& Rectangle, const ZEVector2& Point)
-{
-	if ((Point.x >= Rectangle.LeftUp.x && Point.x <= Rectangle.RightDown.x) && 
-		(Point.y >= Rectangle.LeftUp.y && Point.y <= Rectangle.RightDown.y))
-		return true;
-	else
-		return false;
 }
 
 ZERectangle::ZERectangle()

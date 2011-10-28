@@ -78,7 +78,8 @@ float ZERay::MinimumDistance(const ZERay& Ray, const ZEVector3& Point, float& TR
 
 float ZERay::MinimumDistance(const ZERay& Ray, const ZELine& Line)
 {
-	return ZELine::MinimumDistance(Line, Ray);
+	float TRay, TLine;
+	return ZERay::MinimumDistance(Ray, Line, TRay, TLine);
 }
 
 float ZERay::MinimumDistance(const ZERay& Ray, const ZELine& Line, float& TRay, float& TLine)

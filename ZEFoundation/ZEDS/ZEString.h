@@ -109,16 +109,16 @@ class ZEString
 		void						SetValue(const char* String);
 		const char*					GetValue() const;
 
-		void						SetNumbericValue(char Value, unsigned int Base = 10);
-		void						SetNumbericValue(unsigned char Value, unsigned int Base = 10);
-		void						SetNumbericValue(short Value, unsigned int Base = 10);
-		void						SetNumbericValue(unsigned short Value, unsigned int Base = 10);
-		void						SetNumbericValue(int Value, unsigned int Base = 10);
-		void						SetNumbericValue(unsigned int Value, unsigned int Base = 10);
-		void						SetNumbericValue(long Value, unsigned int Base = 10);
-		void						SetNumbericValue(unsigned long Value, unsigned int Base = 10);
-		void						SetNumbericValue(float Value, unsigned int NumberOfDigits = 6);
-		void						SetNumbericValue(double Value, unsigned int NumberOfDigits = 6);
+		void						SetNumericValue(char Value, unsigned int Base = 10);
+		void						SetNumericValue(unsigned char Value, unsigned int Base = 10);
+		void						SetNumericValue(short Value, unsigned int Base = 10);
+		void						SetNumericValue(unsigned short Value, unsigned int Base = 10);
+		void						SetNumericValue(int Value, unsigned int Base = 10);
+		void						SetNumericValue(unsigned int Value, unsigned int Base = 10);
+		void						SetNumericValue(long Value, unsigned int Base = 10);
+		void						SetNumericValue(unsigned long Value, unsigned int Base = 10);
+		void						SetNumericValue(float Value, unsigned int NumberOfDigits = 6);
+		void						SetNumericValue(double Value, unsigned int NumberOfDigits = 6);
 		void						SetBooleanValue(bool Value);
 
 		char						GetCharacter(size_t Position) const;
@@ -137,7 +137,6 @@ class ZEString
 		void						Insert(const char* String);
 		void						Insert(size_t Position, const ZEString& String);
 		void						Insert(size_t Position, const char* String);
-		void						Insert(size_t Position, char Character);
 		void						Remove(size_t Position, unsigned int Count = 1);
 
 		size_t						Contains(const char* String) const;	

@@ -129,12 +129,13 @@ class ZEArray
 			Type* NewBuffer;
 			if (Allocator.Allocate(&NewBuffer, Count + ItemCount))
 			{
-				ZEAllocatorBase<Type>::ObjectCopy(this->Items, NewBuffer, Index);
+				ZEAllocatorBase<Type>::ObjectCopy(NewBuffer, this->Items, Index);
+				ZEAllocatorBase<Type>::ObjectCopy(NewBuffer + Index + ItemCount, this->Items + Index, Count - Index);
 				delete[] Items;
 				Items = NewBuffer;
 			}
-
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, this->Items + Index + Count, Count);
+			else
+				ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index + ItemCount, this->Items + Index, Count - Index);
 
 			Count += ItemCount;
 
@@ -148,12 +149,14 @@ class ZEArray
 			Type* NewBuffer;
 			if (Allocator.Allocate(&NewBuffer, Count + ItemCount))
 			{
-				ZEAllocatorBase<Type>::ObjectCopy(this->Items, NewBuffer, Index);
+				ZEAllocatorBase<Type>::ObjectCopy(NewBuffer, this->Items, Index);
+				ZEAllocatorBase<Type>::ObjectCopy(NewBuffer + Index + ItemCount, this->Items + Index, Count - Index);
 				delete[] Items;
 				Items = NewBuffer;
 			}
+			else
+				ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index + ItemCount, this->Items + Index, Count - Index);
 
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, this->Items + Index + Count, ItemCount);
 			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Index, NewItems, ItemCount);
 
 			Count += ItemCount;

@@ -93,56 +93,56 @@ void ZEString::SetValue(const char* String)
 	ZEDebugCheckMemory();
 }
 
-void ZEString::SetNumbericValue(char Value, unsigned int Base)
+void ZEString::SetNumericValue(char Value, unsigned int Base)
 {
 	char Buffer[10];
 	_itoa(Value, Buffer, Base);
 	SetValue(Buffer);
 }
 
-void ZEString::SetNumbericValue(unsigned char Value, unsigned int Base)
+void ZEString::SetNumericValue(unsigned char Value, unsigned int Base)
 {
 	char Buffer[10];
 	_ultoa(Value, Buffer, Base);
 	SetValue(Buffer);
 }
 
-void ZEString::SetNumbericValue(short Value, unsigned int Base)
+void ZEString::SetNumericValue(short Value, unsigned int Base)
 {
 	char Buffer[35];
 	_ultoa(Value, Buffer, Base);
 	SetValue(Buffer);
 }
 
-void ZEString::SetNumbericValue(unsigned short Value, unsigned int Base)
+void ZEString::SetNumericValue(unsigned short Value, unsigned int Base)
 {
 	char Buffer[35];
 	_ultoa(Value, Buffer, Base);
 	SetValue(Buffer);
 }
 
-void ZEString::SetNumbericValue(int Value, unsigned int Base)
+void ZEString::SetNumericValue(int Value, unsigned int Base)
 {
 	char Buffer[35];
 	_itoa(Value, Buffer, Base);
 	SetValue(Buffer);
 }
 
-void ZEString::SetNumbericValue(unsigned int Value, unsigned int Base)
+void ZEString::SetNumericValue(unsigned int Value, unsigned int Base)
 {
 	char Buffer[35];
 	_ultoa(Value, Buffer, Base);
 	SetValue(Buffer);
 }
 
-void ZEString::SetNumbericValue(long Value, unsigned int Base)
+void ZEString::SetNumericValue(long Value, unsigned int Base)
 {
 	char Buffer[35];
 	_ltoa(Value, Buffer, Base);
 	SetValue(Buffer);
 }
 
-void ZEString::SetNumbericValue(unsigned long Value, unsigned int Base)
+void ZEString::SetNumericValue(unsigned long Value, unsigned int Base)
 {
 	char Buffer[35];
 	_ultoa(Value, Buffer, Base);
@@ -150,14 +150,14 @@ void ZEString::SetNumbericValue(unsigned long Value, unsigned int Base)
 
 }
 
-void ZEString::SetNumbericValue(float Value, unsigned int NumberOfDigits)
+void ZEString::SetNumericValue(float Value, unsigned int NumberOfDigits)
 {
 	char Buffer[_CVTBUFSIZE];
 	gcvt(Value, NumberOfDigits, Buffer);
 	SetValue(Buffer);
 }
 
-void ZEString::SetNumbericValue(double Value, unsigned int NumberOfDigits)
+void ZEString::SetNumericValue(double Value, unsigned int NumberOfDigits)
 {
 	char Buffer[_CVTBUFSIZE];
 	gcvt(Value, NumberOfDigits, Buffer);
@@ -327,7 +327,7 @@ void ZEString::Remove(size_t Position, size_t Count)
 
 	ZEDebugCheckMemory();
 }
-		
+
 bool ZEString::Equals(const ZEString& String) const
 {
 	return strcmp(String.GetValue(), GetValue()) == 0;

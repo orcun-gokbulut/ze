@@ -73,9 +73,10 @@ class ZETestClass
 
 int ZETestClass::Status;
 int ZETestClass::Instances;
+int ZETestClass::DestroyedInstances;
 
 #define CHECK_STATUS(Status1) CHECK(ZETestClass::Status == Status1)
-#define CHECK_INSTANCE_COUNT(Count) CHECK(ZETestClass::InstanceCount == Count)
+#define CHECK_INSTANCE_COUNT(Count) CHECK(ZETestClass::Instances == Count)
 #define CHECK_DESTROYED_INSTANCE_COUNT(Count) CHECK(ZETestClass::DestroyedInstances == Count)
 
 #define RESET() ZETestClass::Reset()
@@ -134,20 +135,16 @@ ZETestSuiteAdd(ZEPointerTests)
 	{
 		RESET();
 
-		ZETestClass TestClass = new ZETestClass();
+		ZETestClass* TestClass = new ZETestClass();
 		ZEPointer<ZETestClass> Pointer;
 			
 		Pointer.Create(TestClass);
 		CHECK(!Pointer.IsNull());
 		CHECK(Pointer.GetPointer() == TestClass);
-		CHECK(Pointer == true);
-		CHECK(!Pointer == false);
 
 		Pointer.Release();
 		CHECK(Pointer.IsNull());
 		CHECK(Pointer.GetPointer() == NULL);
-		CHECK(Pointer == false);
-		CHECK(!Pointer == true);
 		CHECK_STATUS(ZE_TCS_DESTRUCTED);
 		CHECK_INSTANCE_COUNT(0);
 		CHECK_DESTROYED_INSTANCE_COUNT(1);
@@ -158,15 +155,16 @@ ZETestSuiteAdd(ZEPointerTests)
 		RESET();
 		SCOPE()
 		{
-			ZETestClass* TestClass = new ZETestClass();
-			ZEPointer<ZETestClass> Pointer1(TestClass);
+			ZETestClass* TestClass1 = new ZETestClass();
+			ZEPointer<ZETestClass> Pointer1(TestClass1);
 			CHECK(!Pointer1.IsNull());
-			CHECK(Pointer1.GetPointer() == TestClass);
+			CHECK(Pointer1.GetPointer() == TestClass1);
 
-			ZEPointer<ZETestClass> Pointer2();
-			Pointer2 = TestClass;
+			ZETestClass* TestClass2 = new ZETestClass();
+			ZEPointer<ZETestClass> Pointer2;
+			Pointer2 = TestClass2;
 			CHECK(!Pointer2.IsNull());
-			CHECK(Pointer2.GetPointer() == TestClass);
+			CHECK(Pointer2.GetPointer() == TestClass2);
 		}
 	}
 
@@ -189,15 +187,15 @@ ZETestSuiteAdd(ZEPointerTests)
 		RESET();
 		SCOPE()
 		{
-			ZETestClass TestClass = new ZETestClass();
-			ZEPointer<ZEPointer> Pointer1(TestClass);
+			ZETestClass* TestClass = new ZETestClass();
+			ZEPointer<ZETestClass> Pointer1(TestClass);
 			
-			ZEPointer<ZEPointer> Pointer2(Pointer1);
+			ZEPointer<ZETestClass> Pointer2(Pointer1);
 			CHECK(Pointer1.IsNull());
 			CHECK(!Pointer2.IsNull());
 			CHECK(Pointer2.GetPointer() == TestClass);
 		
-			ZEPointer<ZEPointer> Pointer3;
+			ZEPointer<ZETestClass> Pointer3;
 			Pointer3 = Pointer2;
 			CHECK(Pointer2.IsNull());
 			CHECK(!Pointer3.IsNull());

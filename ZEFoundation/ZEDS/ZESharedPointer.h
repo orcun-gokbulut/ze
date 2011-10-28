@@ -138,17 +138,6 @@ class ZESharedPointer
 			return Pointer;
 		}
 
-		Type* operator->()
-		{
-			zeAssert(Pointer == 0, "ZESharedPointer does not points to any data structure.");
-			return Pointer;
-		}
-
-		Type* operator->()
-		{
-			zeAssert(Pointer == 0, "ZESharedPointer does not points to any data structure.");
-			return Pointer;
-		}
 		ZESharedPointer<Type>& operator=(Type* RawPointer)
 		{
 			Create(RawPointer);

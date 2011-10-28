@@ -1181,26 +1181,30 @@ ZEMatrix4x4 ZEMatrix4x4::operator*(float S)
 }
 
 
-void ZEMatrix4x4::operator += (const ZEMatrix4x4 &RightOperand)
+ZEMatrix4x4& ZEMatrix4x4::operator += (const ZEMatrix4x4 &RightOperand)
 {
 	ZEMatrix4x4 Temp;
 	ZEMatrix4x4::Add(Temp, *this, RightOperand);
 	*this = Temp;
+	return *this;
 }
 
-void ZEMatrix4x4::operator -= (const ZEMatrix4x4 &RightOperand)
+ZEMatrix4x4& ZEMatrix4x4::operator -= (const ZEMatrix4x4 &RightOperand)
 {
 	Sub(*this, *this, RightOperand);
+	return *this;
 }
 
-void ZEMatrix4x4::operator *= (const ZEMatrix4x4 &RightOperand)
+ZEMatrix4x4& ZEMatrix4x4::operator *= (const ZEMatrix4x4 &RightOperand)
 {
 	ZEMatrix4x4::Multiply(*this, *this, RightOperand);
+	return *this;
 }
 
-void ZEMatrix4x4::operator *= (float S)
+ZEMatrix4x4& ZEMatrix4x4::operator *= (float S)
 {
 	ZEMatrix4x4::Scale(*this, *this, S);
+	return *this;
 }
 
 bool ZEMatrix4x4::operator == (const ZEMatrix4x4 &M) const 

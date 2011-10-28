@@ -1183,11 +1183,11 @@ void ZEVector4::Clamp(ZEVector4& Out, const ZEVector4& Vector, float MinValue, f
 	else if (Vector.z < MinValue)
 		Out.z = MinValue;
 	else
-		Out.z = Vector.x;
+		Out.z = Vector.z;
 
 	if (Vector.w > MaxValue)
 		Out.w = MaxValue;
-	else if (Vector.z < MinValue)
+	else if (Vector.w < MinValue)
 		Out.w = MinValue;
 	else
 		Out.w = Vector.w;
@@ -1249,7 +1249,7 @@ void ZEVector4::Saturate(ZEVector4& Out, const ZEVector4& Vector)
 
 	if (Vector.w > 1.0f)
 		Out.w = 1.0f;
-	else if (Vector.z < 0.0f)
+	else if (Vector.w < 0.0f)
 		Out.w = 0.0f;
 	else
 		Out.w = Vector.w;

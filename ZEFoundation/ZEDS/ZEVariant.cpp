@@ -58,8 +58,11 @@ void ZEVariant::SetType(ZEVariantType NewType)
 		delete[] Value.String;
 		Value.String = NULL;
 	}
-	else if (Type == ZE_VRT_MATRIX3X3 || Type == ZE_VRT_MATRIX4X4)
+	else if ((Type == ZE_VRT_MATRIX3X3 || Type == ZE_VRT_MATRIX4X4) && Value.Pointer != NULL)
+	{
 		delete Value.Pointer;
+		Value.Pointer = NULL;
+	}
 
 	switch(NewType)
 	{

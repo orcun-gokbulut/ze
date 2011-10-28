@@ -189,7 +189,7 @@ void ZEUIManager::ProcessEvents()
 				if (Controls[I]->GetVisiblity() == false)
 					continue;
 
-				if (LastHoveredControl != NULL && ZERectangle::BoundingTest(LastHoveredControl->GetVisibleRectangle(), CursorPosition) == false)
+				if (LastHoveredControl != NULL && ZERectangle::IntersectionTest(LastHoveredControl->GetVisibleRectangle(), CursorPosition) == false)
 				{
 					LastHoveredControl->MouseLeaveEvent(CursorPosition);
 					LastHoveredControl = NULL;
@@ -202,7 +202,7 @@ void ZEUIManager::ProcessEvents()
 					if (Controls[I]->GetVisiblity() == false)
 						continue;
 
-					if (ZERectangle::BoundingTest(Controls[I]->GetVisibleRectangle(), CursorPosition))
+					if (ZERectangle::IntersectionTest(Controls[I]->GetVisibleRectangle(), CursorPosition))
 					{
 
 						if(Controls[I] == Cursor)
@@ -263,7 +263,7 @@ void ZEUIManager::ProcessEvents()
 			LastPressedControl->MouseButtonReleased(PressedButton, CursorPosition);
 			MouseMoveEventFlag = false;
 
-			if (ZERectangle::BoundingTest(LastPressedControl->GetVisibleRectangle(), CursorPosition))
+			if (ZERectangle::IntersectionTest(LastPressedControl->GetVisibleRectangle(), CursorPosition))
 			{
 				LastHoveredControl = LastPressedControl;
 			}
@@ -441,7 +441,7 @@ ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 	for (size_t I = 0; I < ParentControl->GetChildControls().GetCount(); I++)
 	{
 		ZEUIControl* CurrentControl = ParentControl->GetChildControls()[I];
-		if (ZERectangle::BoundingTest(CurrentControl->GetVisibleRectangle(), Cursor->GetPosition()))
+		if (ZERectangle::IntersectionTest(CurrentControl->GetVisibleRectangle(), Cursor->GetPosition()))
 		{
 			if (CurrentControl->GetChildControls().GetCount() != 0)
 			{

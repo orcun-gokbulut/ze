@@ -289,7 +289,7 @@ const ZERectangle& ZEUIControl::GetVisibleRectangle()
 
 	//if(DirtyVisibleRectangle)
 	//{
-		ZERectangle::Intersection(VisibleRectangle, Rectangle, ParentControl->GetVisibleRectangle());
+		ZERectangle::IntersectionTest(Rectangle, ParentControl->GetVisibleRectangle(), VisibleRectangle);
 		DirtyVisibleRectangle = false;
 	//}
 
