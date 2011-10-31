@@ -119,7 +119,7 @@ ZELBuffer ZEPointLight_PixelShader(ZEPointLight_PSInput Input) : COLOR0
 		Output.a = pow(dot(Normal, HalfVector), SpecularPower);
 		Output *= AngularAttenuation;
 		Output *= DistanceAttenuation;
-		Output *= LightIntensityParam
+		Output *= LightIntensityParam;
 	}
 	else
 	{
