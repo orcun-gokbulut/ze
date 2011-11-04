@@ -69,7 +69,7 @@ bool ZEWMIKSMH::Callback(MSG* Message)
 			UINT InputSize = sizeof(RAWINPUT);
 			if (GetRawInputData((HRAWINPUT)Message->lParam, RID_INPUT, &Input, &InputSize, sizeof(RAWINPUTHEADER)) == (UINT)-1)
 			{
-				zeError("WindowsInput", "Can not read raw input data.");
+				zeError("Can not read raw input data.");
 				return false;
 			}
 

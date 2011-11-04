@@ -278,13 +278,13 @@ bool ZECompressedFile::Open(const char* FileName, ZEFileMode Mode, bool Binary)
 			}
 			else
 			{
-				//zeError("ZEFile", "Could not open file \"%s\".", FileName);
+				//zeError("Could not open file \"%s\".", FileName);
 				return false;
 			}
 		}
 		else
 		{
-			//zeError("ZEFile", "Could not open file \"%s\".", FileName);
+			//zeError("Could not open file \"%s\".", FileName);
 			return false;
 		}
 	}

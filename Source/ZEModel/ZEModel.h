@@ -39,7 +39,7 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEGame/ZEComponent.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEModelResource.h"
 #include "ZEModelBone.h"
@@ -69,7 +69,7 @@ class ZEModel : public ZEComponent
 	private:
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
-		ZEArray<ZERenderOrder>				LODRenderOrders;
+		ZEArray<ZERenderCommand>				LODRenderOrders;
 		
 		ZEArray<ZEModelMesh>				Meshes;
 		ZEArray<ZEModelBone>				Bones;
@@ -101,8 +101,8 @@ class ZEModel : public ZEComponent
 			ZESimpleMaterial*				Material;
 			ZECanvas						BonesCanvas;
 			ZECanvas						BonePositionsCanvas;
-			ZERenderOrder					BonesRenderOrder;
-			ZERenderOrder					BonePositionsRenderOrder;
+			ZERenderCommand					BonesRenderOrder;
+			ZERenderCommand					BonePositionsRenderOrder;
 		} DebugDrawComponents;
 
 		void								DebugDraw(ZERenderer* Renderer);

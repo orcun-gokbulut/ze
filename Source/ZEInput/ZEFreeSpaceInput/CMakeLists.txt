@@ -39,8 +39,6 @@ ze_add_source(ZEFreespaceInputDevice.cpp						Sources)
 ze_add_source(ZEFreespaceInputDevice.h							Sources)
 ze_add_source(ZEFreespaceInputDeviceExtension.cpp				Sources)
 ze_add_source(ZEFreespaceInputDeviceExtension.h					Sources)
-ze_add_source(ZEFreespaceInputDeviceExtensionDescription.cpp	Sources)
-ze_add_source(ZEFreespaceInputDeviceExtensionDescription.h		Sources)
 
 ze_add_library(ZEFreespaceInput 
 	SOURCES ${Sources}

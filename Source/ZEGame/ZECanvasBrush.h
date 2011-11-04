@@ -39,7 +39,7 @@
 
 #include "ZECompoundEntity.h"
 #include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZECanvasBrush);
@@ -51,7 +51,7 @@ class ZECanvasBrush : public ZECompoundEntity
 	ZE_META_ENTITY(ZECanvasBrush)
 	
 	private:
-		ZERenderOrder						RenderOrder;
+		ZERenderCommand						RenderOrder;
 		ZEStaticVertexBuffer*				VertexBuffer;
 		size_t								OldVertexCount;
 	

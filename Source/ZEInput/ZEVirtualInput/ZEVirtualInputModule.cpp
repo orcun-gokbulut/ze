@@ -33,10 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore\ZEError.h"
+#include "ZEError.h"
 #include "ZECore\ZEConsole.h"
 #include "ZEVirtualInputModule.h"
-#include "ZEVirtualInputModuleDescription.h"
+
+ZE_MODULE_DESCRIPTION(ZEVirtualInputModule, ZEInputModule, NULL)
 
 ZEModuleDescription* ZEVirtualInputModule::GetModuleDescription()
 {
@@ -46,15 +47,15 @@ ZEModuleDescription* ZEVirtualInputModule::GetModuleDescription()
 
 bool ZEVirtualInputModule::Initialize()
 {
-	zeLog("Virtual Input Module", "Initializing Virtual Input module.");
+	zeLog("Initializing Virtual Input module.");
 	Enabled = true;
-	zeLog("Virtual Input Module", "Virtual Input module initialized.");
+	zeLog("Virtual Input module initialized.");
 	return true;
 }
 
 void ZEVirtualInputModule::Deinitialize()
 {
-	zeLog("Virtual Input Module", "Virtual Input module destroyed.");
+	zeLog("Virtual Input module destroyed.");
 }
 
 bool ZEVirtualInputModule::GetEnabled()
@@ -112,12 +113,12 @@ void ZEVirtualInputModule::ProcessInputMap(ZEInputMap* InputMap)
 
 void ZEVirtualInputModule::Acquire()
 {
-	zeNotice("Virtual Input Module", "Virtual input acquired.");
+	zeNotice("Virtual input acquired.");
 }
 
 void ZEVirtualInputModule::UnAcquire()
 {
-	zeNotice("Virtual Input Module", "Virtual input unacquired.");
+	zeNotice("Virtual input unacquired.");
 }
 
 void ZEVirtualInputModule::GetInputEventName(char* Name, size_t MaxSize)

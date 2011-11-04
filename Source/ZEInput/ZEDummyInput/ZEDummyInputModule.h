@@ -40,16 +40,13 @@
 #include "ZEInput\ZEInputModule.h"
 
 class ZEDummyInputModule: public ZEInputModule 
-{	
-	friend class ZEDummyInputModuleDescription;
+{
+	ZE_MODULE(ZEDummyInputModule)
 
 	private:
 		bool							Enabled;
 
 	public:
-		virtual ZEModuleDescription*	GetModuleDescription();
-		static ZEModuleDescription*		ModuleDescription();
-
 		virtual bool					Initialize();
 		virtual void					Deinitialize();
 

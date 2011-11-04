@@ -225,7 +225,7 @@ bool ZEPhysXPhysicalWorld::Initialize()
 	Scene = GetPhysicsSDK()->createScene(SceneDesc);
 	if (Scene == NULL) 
 	{
-		zeError("PhysX Physical World", "Can not create scene.");
+		zeError("Can not create scene.");
 		return false;
 	}
 

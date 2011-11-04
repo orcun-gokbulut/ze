@@ -121,7 +121,7 @@ void ZESoundResourceOGG::Decode(void* Buffer, size_t SampleIndex, size_t Count)
 		BytesRead = ov_read(&OggFile, ((char*)(Buffer)) + Position, (Count * BlockAlign) - Position, 0, 2, 1, &Section);
 		if(BytesRead < 0)
 		{
-			zeError("Sound Resource OGG", "Error decoding ogg. (FileName : \"%s\")", GetFileName());
+			zeError("Error decoding ogg. (FileName : \"%s\")", GetFileName());
 			return;
 		}
 		Position += BytesRead;
@@ -133,7 +133,7 @@ ZESoundResource* ZESoundResourceOGG::LoadResource(const char* FileName)
 	ZEResourceFile File;
 	if(!File.Open(FileName))
 	{
-		zeError("Sound Resource OGG", "Can not open ogg file. (FileName : \"%s\")", FileName);
+		zeError("Can not open ogg file. (FileName : \"%s\")", FileName);
 		return NULL;
 	}
 
@@ -158,7 +158,7 @@ ZESoundResource* ZESoundResourceOGG::LoadResource(const char* FileName)
 
 	if(!ov_open_callbacks(NewResource, &NewResource->OggFile, NULL, 0, Callbacks)==0)
 	{
-		zeError("Sound Resource OGG", "Can not read ogg. (FileName : \"%s\")", FileName);
+		zeError("Can not read ogg. (FileName : \"%s\")", FileName);
 		delete NewResource;
 		return NULL;
 	}

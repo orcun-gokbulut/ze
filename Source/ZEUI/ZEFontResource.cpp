@@ -69,7 +69,7 @@ const ZEFontCharacter& ZEFontResource::GetCharacter(char Character)
 
 ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 {
-	zeLog("Font Resource", "Loading font file \"%s\".", ResourceFile->GetFileName());
+	zeLog("Loading font file \"%s\".", ResourceFile->GetFileName());
 
 	ZETextureOptions Option = {ZE_TCT_AUTO, ZE_TCQ_AUTO, ZE_TDS_NONE, ZE_TFC_AUTO, ZE_TMM_AUTO, 25};
 	
@@ -78,7 +78,7 @@ ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 	ResourceFile->Read(&FileHeader, sizeof(ZEFontFileHeader), 1);
 	if (FileHeader.Header != ZE_FONT_FILE_HEADER)
 	{
-		zeError("Font Resource", "Unknown ZEFont file format. (FileName : \"%s\")", ResourceFile->GetFileName());
+		zeError("Unknown ZEFont file format. (FileName : \"%s\")", ResourceFile->GetFileName());
 		return NULL;
 	}
 
@@ -100,7 +100,7 @@ ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 		ZETexture2DResource* CurrentTexture = ZETexture2DResource::LoadResource(&TextureResourceFile, false, &Option);
 		if (CurrentTexture == NULL)
 		{
-			zeError("Font Resource", "Can not read texture from the file. (FileName : \"%s\", Texture Index : %d)",  ResourceFile->GetFileName(), I);
+			zeError("Can not read texture from the file. (FileName : \"%s\", Texture Index : %d)",  ResourceFile->GetFileName(), I);
 			delete NewResource;
 			return NULL;
 		}
@@ -121,7 +121,7 @@ ZEFontResource* ZEFontResource::LoadResource(ZEResourceFile* ResourceFile)
 		NewResource->Characters[I].Material = NewResource->Materials[FileHeader.Characters[I].TextureId];
 	}
 
-	zeLog("Font Resource", "Font file \"%s\" has been loaded.", ResourceFile->GetFileName());
+	zeLog("Font file \"%s\" has been loaded.", ResourceFile->GetFileName());
 
 	return NewResource;
 }
@@ -140,7 +140,7 @@ ZEFontResource* ZEFontResource::LoadResource(const char* FileName)
 	}
 	else
 	{
-		zeError("TextureResource", "Texture file not found. FileName : \"%s\"", FileName);
+		zeError("Texture file not found. FileName : \"%s\"", FileName);
 		return NULL;
 	}
 }

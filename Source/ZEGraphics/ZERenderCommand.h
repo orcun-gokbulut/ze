@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSModuleDescription.cpp
+ Zinek Engine - ZERenderCommand.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,55 +33,78 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDSModuleDescription.h"
-#include "ZEDSModule.h"
+#pragma once
+#ifndef	__ZE_RENDERLIST_H__
+#define __ZE_RENDERLIST_H__
 
-ZEModuleDescription* ZEDSModuleDescription::GetBaseModuleDescription()
-{
-	return ZESoundModule::ModuleDescription();
-}
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEAABBox.h"
 
-ZEModuleAttribute ZEDSModuleDescription::GetAttributes()
+enum ZERenderPipeline
 {
-	return ZE_MA_DEBUG;
-}
+	ZE_RORP_3D = 0,
+	ZE_RORP_2D = 1
+};
 
-int ZEDSModuleDescription::GetRequiredZinekEngineVersion()
-{
-	return 0;
-}
+// ZERenderOrderFlags
+typedef ZEDWORD ZERenderOrderFlags;
+#define	ZE_ROF_NONE									0
+#define	ZE_ROF_TRANSPARENT							1
+#define	ZE_ROF_IMPOSTER								2
+#define	ZE_ROF_ENABLE_Z_CULLING						4
+#define	ZE_ROF_ENABLE_NO_Z_WRITE					8
+#define	ZE_ROF_ENABLE_WORLD_TRANSFORM				16
+#define ZE_ROF_ENABLE_VIEW_TRANSFORM				32
+#define ZE_ROF_ENABLE_PROJECTION_TRANSFORM			64
+#define	ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM		(ZE_ROF_ENABLE_VIEW_TRANSFORM | ZE_ROF_ENABLE_PROJECTION_TRANSFORM) 
+#define ZE_ROF_INSTANCED							128
+#define ZE_ROF_SKINNED								256
+#define ZE_ROF_INDEXED								512
 
-int ZEDSModuleDescription::GetMajorVersion()
-{
-	return 0;
-}
 
-int ZEDSModuleDescription::GetMinorVersion()
+enum ZEROPrimitiveType
 {
-	return 4;
-}
+	ZE_ROPT_POINT,
+	ZE_ROPT_LINE,
+	ZE_ROPT_TRIANGLE,
+	ZE_ROPT_TRIANGLESTRIPT
+};
 
-const char* ZEDSModuleDescription::GetCopyright()
-{
-	return "Copyright(c) 2007-2008, Zinek Engine Group. All rights reserved.";
-}
+class ZELight;
+class ZEMaterial;
+class ZEVertexDeclaration;
+class ZEVertexBuffer;
 
-const char* ZEDSModuleDescription::GetName()
+class ZERenderCommand
 {
-	return "DirectSound";
-}
+	public:
+		ZERenderPipeline				Pipeline;
+		int								Priority;
+		float							Order;
+		ZERenderOrderFlags				Flags;
+		ZEROPrimitiveType				PrimitiveType;
+		ZEVertexDeclaration*			VertexDeclaration;
+		size_t							VertexBufferOffset;
+		size_t							PrimitiveCount;
 
-ZEOptionSection* ZEDSModuleDescription::GetOptions()
-{
-	return NULL;
-}
+		const ZEMaterial*				Material;
 
-ZEModule* ZEDSModuleDescription::CreateModuleInstance()
-{
-	return new ZEDSModule();
-}
+		void*							IndexBuffer;
+		ZEVertexBuffer*					VertexBuffer;
 
-bool ZEDSModuleDescription::CheckCompatible()
-{
-	return true;
-}
+		ZEMatrix4x4						WorldMatrix;
+
+		ZEArray<ZERenderCommand*>		Instances;
+		ZEArray<ZEMatrix4x4>			BoneTransforms;
+
+		ZEArray<ZELight*>				Lights;		
+
+		void							SetZero();
+};
+#endif
+
+
+
+

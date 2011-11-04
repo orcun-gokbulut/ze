@@ -81,7 +81,7 @@ enum ZEMaterialOpacityComponent
 };
 
 class ZEFrameRenderer;
-class ZERenderOrder;
+class ZERenderCommand;
 
 ZE_META_CLASS_DESCRIPTION(ZEMaterial)
 
@@ -113,9 +113,9 @@ class ZEMaterial : public ZEClass
 		bool							GetLightningEnabled() const;
 
 		// Render Pass
-		virtual bool					SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
-		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
-		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderOrder) const;
+		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderOrder) const;
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderOrder) const;
 		virtual bool					SetupShadowPass() const;	
 
 		virtual void					UpdateMaterial();

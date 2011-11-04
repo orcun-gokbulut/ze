@@ -95,7 +95,7 @@ size_t ZESoundResource::GetPCMDataSize() const
 
 ZESoundResource* ZESoundResource::LoadResource(const char* FileName)
 {
-	zeLog("Sound Resource", "Loading sound file \"%s\"", FileName);
+	zeLog("Loading sound file \"%s\"", FileName);
 
 	ZESoundResource* Temp = NULL;
 	switch(GetFileFormat(FileName))
@@ -114,18 +114,18 @@ ZESoundResource* ZESoundResource::LoadResource(const char* FileName)
 
 		default:	
 		case ZE_SFF_NONE:			
-			zeError("Sound Resource", "Unknown sound file format. (FileName : \"%s\")" , FileName);
+			zeError("Unknown sound file format. (FileName : \"%s\")" , FileName);
 			return NULL;
 			break;
 	}
 
 	if (Temp == NULL)
 	{
-		zeError("Sound Resource", "Could not load sound file. (FileName : \"%s\")" , FileName);
+		zeError("Could not load sound file. (FileName : \"%s\")" , FileName);
 		return NULL;
 	}
 
-	zeLog("Sound Resource", "Sound file \"%s\" has been loaded.", FileName);
+	zeLog("Sound file \"%s\" has been loaded.", FileName);
 
 	return Temp;
 }

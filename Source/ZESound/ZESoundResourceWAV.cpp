@@ -69,7 +69,7 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const char* FileName)
 	ZEResourceFile File;
 	if (!File.Open(FileName))
 	{
-		zeError("Sound Resource WAV", "Can not load WAV resource. Can not open file. (Filename : \"%s\")");
+		zeError("Can not load WAV resource. Can not open file. (Filename : \"%s\")");
 		return NULL;
 	}
 
@@ -101,33 +101,33 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const char* FileName)
 	File.Read(&Riff, sizeof(Riff), 1);
 	if (Riff.Header != 'FFIR')
 	{
-		zeError("Sound Resource", "Wrong wave file. (FileName : \"%s\")", FileName);
+		zeError("Wrong wave file. (FileName : \"%s\")", FileName);
 		return NULL;
 	}
 
 	if (Riff.Format != 'EVAW')
 	{
-		zeError("Sound Resource", "Wave file format it not supported. (FileName : \"%s\")", FileName);
+		zeError("Wave file format it not supported. (FileName : \"%s\")", FileName);
 		return NULL;
 	}
 
 	File.Read(&Fmt, sizeof(Fmt), 1);
 	if (Fmt.Header != ' tmf')
 	{
-		zeError("Sound Resource", "Wrong wave file. (FileName : \"%s\")", FileName);
+		zeError("Wrong wave file. (FileName : \"%s\")", FileName);
 		return NULL;
 	}
 	
 	if (Fmt.AudioFormat != 1)
 	{
-		zeError("Sound Resource", "Wave file audio format it not supported. (FileName : \"%s\")", FileName);
+		zeError("Wave file audio format it not supported. (FileName : \"%s\")", FileName);
 		return NULL;
 	}
 
 	File.Read(&Data, sizeof(Data), 1);
 	if (Data.Header != 'atad')
 	{
-		zeError("Sound Resource", "Wrong wave file. (FileName : \"%s\")", FileName);
+		zeError("Wrong wave file. (FileName : \"%s\")", FileName);
 		return NULL;
 	}
 

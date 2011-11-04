@@ -37,7 +37,7 @@
 #ifndef	__ZE_MODEL_MESH_LOD_H__
 #define __ZE_MODEL_MESH_LOD_H__
 
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 
 struct ZEDrawParameters;
 class ZEModel;
@@ -53,7 +53,7 @@ class ZEModelMeshLOD
 		ZEModelMesh*						OwnerMesh;
 		const ZEModelResourceMeshLOD*		LODResource;
 		ZEVertexBuffer*						VertexBuffer;
-		ZERenderOrder						RenderOrder;
+		ZERenderCommand						RenderOrder;
 		const ZEMaterial*					Material;
 		bool								Skinned;
 

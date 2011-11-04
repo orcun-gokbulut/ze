@@ -115,7 +115,7 @@ bool ZED3D9TextureCube::Create(int EdgeLength, ZETexturePixelFormat PixelFormat,
 	Hr = GetDevice()->CreateCubeTexture(EdgeLength, MipMap, Usage, Format, Pool, &CubeTexture, NULL);  
 	if (Hr != D3D_OK)
 	{
-		zeError("D3D9 Texture Cube", "Can not create cube texture.");
+		zeError("Can not create cube texture.");
 		return false;
 	}
 

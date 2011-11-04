@@ -39,7 +39,7 @@
 
 #include "ZECompoundEntity.h"
 #include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 
 
 ZE_META_ENTITY_DESCRIPTION(ZEPresentationSlide);
@@ -54,7 +54,7 @@ class ZEPresentationSlide : public ZECompoundEntity
 
 	private:
 		bool								Initialized;
-		ZERenderOrder						RenderOrder;
+		ZERenderCommand						RenderOrder;
 		ZEStaticVertexBuffer*				VertexBuffer;
 		ZEFixedMaterial*					Material;
 		ZETexture2DResource*				Texture;

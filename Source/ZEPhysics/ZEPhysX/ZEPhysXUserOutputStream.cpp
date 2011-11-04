@@ -46,13 +46,13 @@ void ZEPhysXUserOutputStream::reportError(NxErrorCode Code, const char* Message,
 		default:
 		case NXE_OUT_OF_MEMORY:
 		case NXE_INTERNAL_ERROR:
-			zeCriticalError("PhysX", "Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
+			zeCriticalError("Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
 			break;
 
 		case NXE_INVALID_PARAMETER:
 		case NXE_INVALID_OPERATION:
 		case NXE_ASSERTION:
-			zeError("PhysX", "Assert ! Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
+			zeError("Assert ! Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
 			break;
 
 		case NXE_DB_PRINT:
@@ -60,18 +60,18 @@ void ZEPhysXUserOutputStream::reportError(NxErrorCode Code, const char* Message,
 			break;
 
 		case NXE_DB_INFO:
-			zeNotice("PhysX", "Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
+			zeNotice("Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
 			break;
 
 		case NXE_DB_WARNING:
-			zeWarning("PhysX", "Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
+			zeWarning("Error Code: %d, Message: \"%s\", File: \"%s\", Line: %d.", Code, Message, File, Line);
 			break;
 	}
 }
 
 NxAssertResponse ZEPhysXUserOutputStream::reportAssertViolation(const char* Message, const char* File, int Line)
 {
-	zeCriticalError("PhysX", "Message: \"%s\", File: \"%s\", Line: %d.", Message, File, Line);
+	zeCriticalError("Message: \"%s\", File: \"%s\", Line: %d.", Message, File, Line);
 	return NX_AR_CONTINUE;
 }
 

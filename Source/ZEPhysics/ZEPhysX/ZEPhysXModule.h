@@ -48,7 +48,8 @@ class ZEPhysXPhysicalWorld;
 
 class ZEPhysXModule : public ZEPhysicsModule
 {
-	friend class ZEPhysXModuleDescription;
+	ZE_MODULE(ZEPhysXModule)
+
 	friend class ZEPhysXPhysicalWorld;
 	private:
 		ZEPhysXUserOutputStream					OutputStream;
@@ -62,9 +63,6 @@ class ZEPhysXModule : public ZEPhysicsModule
 	public:
 		NxPhysicsSDK*							GetPhysicsSDK();
 		NxCookingInterface*						GetCookingInterface();
-
-		virtual ZEModuleDescription*			GetModuleDescription();
-		static ZEModuleDescription*				ModuleDescription();
 
 		virtual bool							Initialize();
 		virtual void							Deinitialize();

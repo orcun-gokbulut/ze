@@ -114,7 +114,7 @@ bool ZEAnimation::ReadFromFile(ZEUnserializer* Unserializer, ZEAnimation* Animat
 	Unserializer->Read(&AnimationChunk, sizeof(ZEAnimationChunk), 1);
 	if (AnimationChunk.ChunkId != ZE_ANIF_ANIMATION_CHUNKID)
 	{
-		zeError("Animation System", "Corrupted file. Animation chunk id does not match.");
+		zeError("Corrupted file. Animation chunk id does not match.");
 		return false;
 	}
 
@@ -130,7 +130,7 @@ bool ZEAnimation::ReadFromFile(ZEUnserializer* Unserializer, ZEAnimation* Animat
 		
 		if (PropertyAnimationChunk.ChunkId != ZE_ANIF_PROPERTY_ANIMATION_CHUNKID)
 		{
-			zeError("Animation System", "Corrupted file. Property animation chunk id does not match.");
+			zeError("Corrupted file. Property animation chunk id does not match.");
 			return false;
 		}
 		
@@ -146,7 +146,7 @@ bool ZEAnimation::ReadFromFile(ZEUnserializer* Unserializer, ZEAnimation* Animat
 			
 			if (PropertyAnimationKeyChunk.ChunkId != ZE_ANIF_PROPERTY_ANIMATION_KEY_CHUNKID)
 			{
-				zeError("Animation System", "Corrupted file. Property animation key chunk id does not match.");
+				zeError("Corrupted file. Property animation key chunk id does not match.");
 				return false;
 			}
 			PropertyAnimation->Keys[I].Time = PropertyAnimationKeyChunk.Time;

@@ -227,13 +227,13 @@ bool ZEFile::Open(const ZEString FileName, ZEFileMode Mode, bool Binary)
 			}
 			else
 			{
-				zeError("ZEFile", "Could not open file \"%s\".", (const char*)FileName);
+				zeError("Could not open file \"%s\".", (const char*)FileName);
 				return false;
 			}
 		}
 		else
 		{
-			zeError("ZEFile", "Could not open file \"%s\".", (const char*)FileName);
+			zeError("Could not open file \"%s\".", (const char*)FileName);
 			return false;
 		}
 	}
@@ -334,7 +334,7 @@ bool ZEFile::ReadFile(const ZEString FileName, void* Buffer, size_t BufferSize)
 	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
 	{
-		zeError("ZEFile", "Could not open file in binary read mode \"%s\".", (const char*)FileName);
+		zeError("Could not open file in binary read mode \"%s\".", (const char*)FileName);
 		return false;
 	}
 
@@ -360,7 +360,7 @@ bool ZEFile::ReadTextFile(const ZEString FileName, char* Buffer, size_t BufferSi
 	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
 	{
-		zeError("ZEFile", "Could not open file in binary read mode \"%s\".", (const char*)FileName);
+		zeError("Could not open file in binary read mode \"%s\".", (const char*)FileName);
 		return false;
 	}
 

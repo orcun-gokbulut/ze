@@ -95,7 +95,7 @@ bool ZETextureLoader::GetTextureInfo(ZETextureLoaderInfo& TextureInfo, ZEResourc
 
 	if (Stat != 0)
 	{
-		zeLog("Texture Loader", "File Does Not Exists. FileName: \"%s\".", ResourceFile->GetFileName());
+		zeLog("File Does Not Exists. FileName: \"%s\".", ResourceFile->GetFileName());
 		return false;
 	}*/
 
@@ -187,7 +187,7 @@ bool ZETextureLoader::LoadTexture(void* DestBuffer, ZEResourceFile* ResourceFile
 	Callbacks.seek_proc = &FreeImageFile_Seek_2D;
 	Callbacks.tell_proc = &FreeImageFile_Tell_2D;
 
-	zeLog("Texture Loader", "LOADING texture from file  \"%s\".", ResourceFile->GetFileName());
+	zeLog("LOADING texture from file  \"%s\".", ResourceFile->GetFileName());
 	
 	
 	FREE_IMAGE_FORMAT FileFormat = FreeImage_GetFileTypeFromHandle(&Callbacks, ResourceFile);

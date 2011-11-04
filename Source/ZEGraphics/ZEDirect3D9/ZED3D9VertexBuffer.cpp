@@ -48,7 +48,7 @@ bool ZED3D9StaticVertexBuffer::Create(unsigned int BufferSize)
 	this->BufferSize = BufferSize;
 	if (GetDevice()->CreateVertexBuffer(BufferSize, D3DUSAGE_WRITEONLY, NULL, D3DPOOL_MANAGED, &StaticBuffer, NULL) != D3D_OK)
 	{
-		zeCriticalError("Direct3D9", "Can not create static vertex buffer.");
+		zeCriticalError("Can not create static vertex buffer.");
 		return false;
 	}
 	return true;
@@ -61,7 +61,7 @@ void* ZED3D9StaticVertexBuffer::Lock()
 		char* LockedBuffer;
 		HRESULT Result = StaticBuffer->Lock(0, 0, (void**)&LockedBuffer, 0);
 		if (Result != D3D_OK)
-			zeCriticalError("Direct3D9", "Can not lock static vertex buffer.");
+			zeCriticalError("Can not lock static vertex buffer.");
 		return LockedBuffer;
 	}
 	return NULL;
@@ -74,7 +74,7 @@ void ZED3D9StaticVertexBuffer::Unlock()
 		HRESULT Result;
 		Result = StaticBuffer->Unlock();
 		if (Result != D3D_OK)
-			zeError("Direct3D9", "Can not lock static vertex buffer.");
+			zeError("Can not lock static vertex buffer.");
 	}
 }
 

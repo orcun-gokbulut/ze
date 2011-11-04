@@ -58,14 +58,14 @@ bool ZEProvider::RegisterClass(ZEClassDescription* Description)
 
 	if (Classes.Exists(Description))
 	{
-		zeError("Class Provider", "Can not add class type to provider. Class type is already exists.");
+		zeError("Can not add class type to provider. Class type is already exists.");
 		return false;
 	}
 
 
 	if (BaseClass != NULL && !ZEClassDescription::CheckParent(BaseClass, Description))
 	{
-		zeError("Class Provider", "Can not add class type to provider. Class type is not derived from base class.");
+		zeError("Can not add class type to provider. Class type is not derived from base class.");
 		return false;
 	}
 
@@ -95,12 +95,12 @@ ZEClass* ZEProvider::CreateInstance(const char* Name) const
 			ZEClass* Instance = Classes[I]->CreateInstance();
 			if (Instance == NULL)
 			{
-				zeError("Class Provider", "Can not create instance of a class. NULL instance returned. Class Name : \"%s\".", Name);
+				zeError("Can not create instance of a class. NULL instance returned. Class Name : \"%s\".", Name);
 			}
 			return Instance;
 		}
 
-	zeError("Class Provider", "Can not create instance of a class. Class does not exists. Class Name : \"%s\".", Name);
+	zeError("Can not create instance of a class. Class does not exists. Class Name : \"%s\".", Name);
 	return NULL;
 }
 

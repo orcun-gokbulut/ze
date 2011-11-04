@@ -40,7 +40,7 @@
 #include "ZED3D9Shader.h"
 #include "ZED3D9CommonTools.h"
 #include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEMaterialComponents.h"
 
 void ZED3D9FixedMaterial::CreateShaders()
@@ -175,7 +175,7 @@ void ZED3D9FixedMaterial::SetTextureStage(unsigned int Id, ZETextureAddressMode 
 
 }
 
-bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderOrder) const
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9FixedMaterial*)this)->UpdateMaterial();
@@ -304,7 +304,7 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 	return true;
 }
 
-bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderOrder) const
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9FixedMaterial*)this)->UpdateMaterial();

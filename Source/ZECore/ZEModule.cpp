@@ -35,10 +35,7 @@
 
 #include "ZEModule.h"
 
-ZEModuleDescription* ZEModule::ModuleDescription()
-{
-	return 0;
-}
+ZE_MODULE_DESCRIPTION_ABSTRACT(ZEModule, ZEExtension, NULL)
 
 bool ZEModule::GetEnabled()
 {

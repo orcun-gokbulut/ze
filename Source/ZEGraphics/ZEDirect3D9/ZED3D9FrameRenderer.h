@@ -80,7 +80,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9SSAAProcessor					SSAAProcessor;
 		ZED3D9EDProcessor					EDProcessor; // Edge detection
 
-		ZESmartArray<ZERenderOrder>			RenderList;
+		ZESmartArray<ZERenderCommand>			RenderList;
 
 		ZECamera*							Camera;
 
@@ -101,8 +101,8 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		} LightningComponents;
 
 
-		static bool							CheckRenderOrder(ZERenderOrder* RenderOrder);
-		static void							PumpStreams(ZERenderOrder* RenderOrder);
+		static bool							CheckRenderOrder(ZERenderCommand* RenderOrder);
+		static void							PumpStreams(ZERenderCommand* RenderOrder);
 
 		void								InitializeLightning();
 		void								DeinitializeLightning();
@@ -152,7 +152,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		virtual void						AddToLightList(ZELight* Light);
 		virtual void						ClearLightList();
 
-		virtual void						AddToRenderList(ZERenderOrder* RenderOrder);
+		virtual void						AddToRenderList(ZERenderCommand* RenderOrder);
 		virtual void						ClearRenderList();
 
 		virtual void						Render(float ElaspedTime);

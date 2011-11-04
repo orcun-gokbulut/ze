@@ -48,7 +48,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 
 class ZEMaterial;
 class ZEPhysicalObject;
@@ -65,9 +65,9 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 			ZEArrayVertexBuffer<ZEColoredVertex>	LinesVertexBuffer;
 			ZEArrayVertexBuffer<ZEColoredVertex>	TrianglesVertexBuffer;
 
-			ZERenderOrder							PointsRenderOrder;
-			ZERenderOrder							LinesRenderOrder;
-			ZERenderOrder							TrianglesRenderOrder;
+			ZERenderCommand							PointsRenderOrder;
+			ZERenderCommand							LinesRenderOrder;
+			ZERenderCommand							TrianglesRenderOrder;
 
 		} DebugDraw;
 

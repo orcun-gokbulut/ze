@@ -39,7 +39,7 @@
 
 #include "ZED3D9ComponentBase.h"
 #include "ZEGraphics/ZESkyBoxMaterial.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 
 class ZECamera;
 class ZED3D9VertexShader;
@@ -62,7 +62,7 @@ class ZED3D9SkyBoxMaterial : public ZESkyBoxMaterial, public ZED3D9ComponentBase
 										~ZED3D9SkyBoxMaterial();
 
 	public:
-		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderOrder) const;
 
 		virtual void					UpdateMaterial();
 

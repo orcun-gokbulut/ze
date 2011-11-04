@@ -41,7 +41,8 @@
 
 class ZEDirectInputModule : public ZEInputModule
 {
-	friend class ZEDirectInputModuleDescription;
+	ZE_MODULE(ZEDirectInputModule)
+
 	private:
 		bool								Enabled;
 

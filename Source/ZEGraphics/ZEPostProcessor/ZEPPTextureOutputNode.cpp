@@ -53,7 +53,7 @@ void ZEPPTextureOutputNode::SetTexture(ZETexture2D* Texture)
 	// Check that texture is a render target or not (If it is not a render target than you can not render directly to the texture)
 	if (Texture != NULL && !Texture->IsRenderTarget())
 	{
-		zeError("Post Processor - Texture Output Node", "Output texture is not a render target. Texture output node only accpets textures that are render targets.");
+		zeError("Output texture is not a render target. Texture output node only accpets textures that are render targets.");
 		this->Texture = NULL;	
 		return;
 	}
@@ -76,7 +76,7 @@ bool ZEPPTextureOutputNode::Process()
 	// Check output texture available
 	if (Texture == NULL)
 	{
-		zeError("Post Processor - Texture Output Node", "Output texture is not available.");
+		zeError("Output texture is not available.");
 		return false;
 	}
 

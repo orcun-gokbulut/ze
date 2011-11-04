@@ -98,7 +98,7 @@ ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const char* FileNam
 		}
 		else
 		{
-			zeError("TextureResource", "Texture file not found. FileName : \"%s\"", FileName);
+			zeError("Texture file not found. FileName : \"%s\"", FileName);
 			return NULL;
 		}
 	}
@@ -122,7 +122,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const char* FileName, con
 	}
 	else
 	{
-		zeError("TextureResource", "Texture file not found. FileName : \"%s\"", FileName);
+		zeError("Texture file not found. FileName : \"%s\"", FileName);
 		return NULL;
 	}
 }
@@ -137,7 +137,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEResourceFile* ResourceF
 	{
 		TextureResource = LoadFromFileCache(ResourceFile, ResourceFile->GetFileName(), UserOptions);
 		if(TextureResource == NULL)
-			zeLog("Texture 2D Resource", "Coudnt laod the texture from cache. \"%s\". Trying to load it from original file.", ResourceFile->GetFileName());
+			zeLog("Coudnt laod the texture from cache. \"%s\". Trying to load it from original file.", ResourceFile->GetFileName());
 	}
 	if(TextureResource == NULL)
 		TextureResource = LoadFromFile(ResourceFile, UserOptions);
@@ -211,7 +211,7 @@ void ZETexture2DResource::GetFinalTextureOptions(ZETextureOptions& FinalOptions,
 
 ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions)
 {
-	zeLog("Texture2D Resource", "LOADING texture from ORIGINAL FILE  \"%s\".", ResourceFile->GetFileName());	
+	zeLog("LOADING texture from ORIGINAL FILE  \"%s\".", ResourceFile->GetFileName());	
 
 	ZETextureLoaderInfo	TextureInfo;
 	ZETextureLoader::GetTextureInfo(TextureInfo, ResourceFile);
@@ -255,7 +255,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 	switch (Options.DownSample)
 	{
 		case ZE_TDS_8X:
-			zeLog("Texture2D Resource", "RESIZING texture by 8X:  \"%s\".", ResourceFile->GetFileName());
+			zeLog("RESIZING texture by 8X:  \"%s\".", ResourceFile->GetFileName());
 			ZETextureTools::DownSample2x(RawTexture, TextureInfo.TexturePitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
 			TextureInfo.TextureWidth /= 2;
 			TextureInfo.TextureHeight /= 2;
@@ -268,7 +268,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			break;
 
 		case ZE_TDS_4X:
-			zeLog("Texture2D Resource", "RESIZING texture by 4X:  \"%s\".", ResourceFile->GetFileName());
+			zeLog("RESIZING texture by 4X:  \"%s\".", ResourceFile->GetFileName());
 			ZETextureTools::DownSample2x(RawTexture, TextureInfo.TexturePitch, RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
 			TextureInfo.TextureWidth /= 2;
 			TextureInfo.TextureHeight /= 2;
@@ -278,7 +278,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 			break;
 
 		case ZE_TDS_2X:
-			zeLog("Texture2D Resource", "RESIZING texture by 2X:  \"%s\".", ResourceFile->GetFileName());
+			zeLog("RESIZING texture by 2X:  \"%s\".", ResourceFile->GetFileName());
 			ZETextureTools::DownSample2x(RawTexture, TextureInfo.TexturePitch , RawTexture, TextureInfo.TexturePitch, TextureInfo.TextureWidth, TextureInfo.TextureHeight);
 			TextureInfo.TextureWidth /= 2;
 			TextureInfo.TextureHeight /= 2;
@@ -301,7 +301,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFile(ZEResourceFile* ResourceF
 	// Create the Texture
 	if (!Texture->Create(TextureInfo.TextureWidth, TextureInfo.TextureHeight, PixelFormat, false, Options.MaximumMipmapLevel))
 	{
-		zeError("Texture Resource", "Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFileName());
+		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFileName());
 		delete TextureResource;
 		return NULL;
 	}
@@ -619,8 +619,8 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 	// Check if the requested texture is in the file cache
 	if (!FileCache.ChunkExists(&TextureCacheIdentifier)) // LoadFrom Cache
 	{
-		zeLog("Texture 2D Resource", "Item not found in file cache with the name:  \"%s\".", ResourceFile->GetFileName());
-		//zeError("Texture 2D Resource", "The chunk specified by the identifier is not found in file cache: \"%s\".", FileCache.GetCacheFileName());
+		zeLog("Item not found in file cache with the name:  \"%s\".", ResourceFile->GetFileName());
+		//zeError("The chunk specified by the identifier is not found in file cache: \"%s\".", FileCache.GetCacheFileName());
 		FileCache.CloseCache();
 		return NULL;
 	}
@@ -640,7 +640,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 	// Get the original texture's options
 	if(!ZETextureLoader::GetTextureInfo(TextureInfo, ResourceFile))
 	{
-		zeLog("Texture 2D Resource", "Cannot get texture info from the file: \"%s\".", TextureFileName);
+		zeLog("Cannot get texture info from the file: \"%s\".", TextureFileName);
 		FileCache.CloseCache();
 		return NULL;
 	}
@@ -730,7 +730,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 
 	if(!Texture->Create(TextureWidth, TextureHeight, PixelFormat, false, MipMapCount))
 	{
-		zeLog("Texture 2D Resource", "Can not create texture");
+		zeLog("Can not create texture");
 		return NULL;
 	}
 		
@@ -895,7 +895,7 @@ ZETexture2DResource* ZETexture2DResource::LoadFromFileCache(ZEResourceFile* Reso
 
 
 
-	zeLog("ZE Texture 2D", "Texture loaded from cache file: \"%s\".", ResourceFile->GetFileName());
+	zeLog("Texture loaded from cache file: \"%s\".", ResourceFile->GetFileName());
 
 
 	PartialResourceFile.Close();

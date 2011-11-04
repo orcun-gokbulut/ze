@@ -105,7 +105,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 			if (!Processed[N])
 			{
 				ZEMaterial* Material = Resource->Polygons[N].Material;
-				ZERenderOrder* RenderOrder = RenderOrders.Add();
+				ZERenderCommand* RenderOrder = RenderOrders.Add();
 
 				RenderOrder->SetZero();
 				RenderOrder->Priority = 2;

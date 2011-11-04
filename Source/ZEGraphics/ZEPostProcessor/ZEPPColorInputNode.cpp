@@ -72,19 +72,19 @@ bool ZEPPColorInputNode::Process()
 
 	if (Renderer == NULL)
 	{
-		zeError("Post Processor - Color Input Node", "There is no renderer available.");
+		zeError("There is no renderer available.");
 		return false;
 	}
 
 	if (Renderer->GetRenderColorTexture() == false)
 	{
-		zeError("Post Processor - Color Input Node", "Current renderer does not enabled to provide color texture.");
+		zeError("Current renderer does not enabled to provide color texture.");
 		return false;
 	}
 
 	if (Renderer->GetColorTexture() == NULL)
 	{
-		zeError("Post Processor - Color Input Node", "Current renderer does provide color texture.");
+		zeError("Current renderer does provide color texture.");
 		return false;
 	}
 

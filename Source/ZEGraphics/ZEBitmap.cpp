@@ -95,7 +95,7 @@ bool ZEBitmap::Create(unsigned int Width, unsigned int Height, unsigned int Pixe
 
 	if (Width == 0 || Height == 0 || PixelSize == 0)
 	{
-		zeError("ZEBitmap", "Can not create bitmap with zero dimension.");
+		zeError("Can not create bitmap with zero dimension.");
 		return false;
 	}
 	
@@ -372,7 +372,7 @@ bool ZEBitmap::Load(const char* FileName)
 	FIBITMAP* FIBitmap = FreeImage_Load (fif, FileName, 0);
 	if (FIBitmap == NULL)
 	{
-		zeError("ZEBitmap", "Can not open bitmap file.");
+		zeError("Can not open bitmap file.");
 		return false;
 	}
 

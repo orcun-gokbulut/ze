@@ -118,7 +118,7 @@ bool ZEPortalMap::Initialize()
 			LoadPortalResource(NewResource);
 		else
 		{
-			zeError("ZEPortalMap", "Can not load ZEPortalMap file.");
+			zeError("Can not load ZEPortalMap file.");
 			return false;
 		}
 	}
@@ -147,7 +147,7 @@ bool ZEPortalMap::SetMapFile(const ZEString& FileName)
 		LoadPortalResource(Resource);
 	else
 	{
-		zeError("ZEPortalMap", "Can not load ZEPortalMap file.");
+		zeError("Can not load ZEPortalMap file.");
 		return false;
 	}
 

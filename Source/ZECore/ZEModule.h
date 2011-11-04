@@ -37,10 +37,16 @@
 #ifndef	__ZE_MODULE_H__
 #define __ZE_MODULE_H__
 
-class ZEModuleDescription;
+#include "ZEExtension.h"
 
-class ZEModule
+#define ZE_MODULE ZE_EXTENSION
+#define ZE_MODULE_DESCRIPTION ZE_EXTENSION_DESCRIPTION
+#define ZE_MODULE_DESCRIPTION_ABSTRACT ZE_EXTENSION_DESCRIPTION_ABSTRACT
+
+class ZEModule : public ZEExtension
 {
+	ZE_MODULE(ZEModule)
+
 	private:
 		bool							Enabled;
 		bool							Initialized;
@@ -50,9 +56,6 @@ class ZEModule
 		virtual							~ZEModule();
 
 	public:
-		static ZEModuleDescription*		ModuleDescription();
-		virtual ZEModuleDescription*	GetModuleDescription() = 0;
-
 		virtual bool					GetEnabled();
 		virtual void					SetEnabled(bool Enabled);
 
@@ -62,4 +65,5 @@ class ZEModule
 
 		virtual void					Destroy();
 };
+
 #endif

@@ -482,7 +482,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 {
 	if (Actor != NULL || PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
 	{
-		zeError("PhysX Physical Body", "Can not create actor. Physical world is not initialized.");
+		zeError("Can not create actor. Physical world is not initialized.");
 		return false;
 	}
 
@@ -597,7 +597,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 	Actor = Scene->createActor(ActorDesc);
 	if (Actor == NULL)
 	{
-		zeError("PhysX Physical Body", "Can not create actor.");
+		zeError("Can not create actor.");
 
 		for (size_t I = 0; I < ShapeDescList.GetCount(); I++)
 			delete ShapeDescList[I];

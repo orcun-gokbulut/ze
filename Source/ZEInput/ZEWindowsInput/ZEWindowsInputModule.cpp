@@ -34,9 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEWindowsInputModule.h"
-#include "ZEWindowsInputModuleDescription.h"
 #include "ZEInput/ZEInputDeviceExtension.h"
-#include "ZEInput/ZEInputDeviceExtensionDescription.h"
 #include "ZEInput/ZEInputDevice.h"
 #include "ZECore/ZEExtensionManager.h"
 #include "ZEWindowsInputMouseDevice.h"
@@ -52,16 +50,7 @@
 #include <memory.h>
 #include <stdio.h>
 
-ZEModuleDescription* ZEWindowsInputModule::ModuleDescription()
-{
-	static ZEWindowsInputModuleDescription Desc;
-	return &Desc;
-}
-
-ZEModuleDescription* ZEWindowsInputModule::GetModuleDescription()
-{
-	return ZEWindowsInputModule::ModuleDescription();
-}
+ZE_MODULE_DESCRIPTION(ZEWindowsInputModule, ZEInputModule, NULL)
 
 const ZEArray<ZEInputDevice*>& ZEWindowsInputModule::GetInputDevices()
 {
@@ -70,7 +59,7 @@ const ZEArray<ZEInputDevice*>& ZEWindowsInputModule::GetInputDevices()
 
 bool ZEWindowsInputModule::Initialize()
 {	
-	zeLog("WindowInput", "Initializing Windows Input.\r\n");
+	zeLog("Initializing Windows Input.\r\n");
 
 	RAWINPUTDEVICE Rid[2];    
 	// Mouse
@@ -87,7 +76,7 @@ bool ZEWindowsInputModule::Initialize()
 
 	if (RegisterRawInputDevices(Rid, 2, sizeof(RAWINPUTDEVICE)) == FALSE) 
 	{
-		zeError("WindowsInput", "Can not register input devices.");
+		zeError("Can not register input devices.");
 		return false;
 	}
 
@@ -96,14 +85,14 @@ bool ZEWindowsInputModule::Initialize()
 
 	if (GetRawInputDeviceList(NULL, &NumberOfDevices, sizeof(RAWINPUTDEVICELIST)) != 0) 
 	{ 
-		zeError("WindowsInput", "Can not load input device list.");
+		zeError("Can not load input device list.");
 		return false;
 	}
 
 	DeviceList.SetCount(NumberOfDevices);
 	if (GetRawInputDeviceList(DeviceList.GetCArray(), &NumberOfDevices, sizeof(RAWINPUTDEVICELIST)) == (UINT)-1)
 	{
-		zeError("WindowsInput", "Can not load input device list.");
+		zeError("Can not load input device list.");
 		return false;
 	}
 
@@ -140,18 +129,11 @@ bool ZEWindowsInputModule::Initialize()
 		}
 	}
 
-	ZEArray<ZEExtensionDescription*> ExtensionDescriptions = ZEExtensionManager::GetInstance()->GetExtensionDescriptions(ZEInputDeviceExtension::ExtensionDescription());
+	ZEArray<ZEExtensionDescription*> ExtensionDescriptions = ZEExtensionManager::GetInstance()->GetExtensionDescriptions(ZEInputDeviceExtension::Description());
 
 	for (size_t I = 0; I < ExtensionDescriptions.GetCount(); I++)
 	{
 		ZEInputDeviceExtension* Extension = (ZEInputDeviceExtension*)ExtensionDescriptions[I]->CreateInstance();
-		if (!Extension->Initialize())
-		{
-			Extension->Destroy();
-			continue;
-		}
-
-		DeviceExtensions.Add(Extension);
 
 		ZEArray<ZEInputDevice*> ExtensionDevices = Extension->GetDevices();
 		for (size_t N = 0; N < ExtensionDevices.GetCount(); N++)
@@ -159,7 +141,10 @@ bool ZEWindowsInputModule::Initialize()
 	}
 
 	for (size_t I = 0; I < Devices.GetCount(); I++)
-		Devices[I]->Initialize();
+		if (!Devices[I]->Initialize())
+		{
+			zeError("Can not initialize input device. Name : \"\"", Devices[I]->GetDeviceName());
+		}
 
 	return ZEInputModule::Initialize();
 }
@@ -169,10 +154,6 @@ void ZEWindowsInputModule::Deinitialize()
 	for (size_t I = 0; I < Devices.GetCount(); I++)
 		Devices[I]->Destroy();
 	Devices.Clear();
-
-	for (size_t I = 0; I < DeviceExtensions.GetCount(); I++)
-		DeviceExtensions[I]->Destroy();
-	DeviceExtensions.Clear();
 
 	ZEInputModule::Deinitialize();
 }

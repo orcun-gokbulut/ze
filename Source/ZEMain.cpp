@@ -63,15 +63,8 @@ extern HINSTANCE ApplicationInstance;
 
 #include "ZEGraphics/ZEBitmap.h"
 
-void Name(const ZEString& Name)
-{
-	ZEString Name1 = Name;
-}
-
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-	Name("jl234");
-
 	_set_SSE2_enable(1);
 	ApplicationInstance = hInstance;
 	

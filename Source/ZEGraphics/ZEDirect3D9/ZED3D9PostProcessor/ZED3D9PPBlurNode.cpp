@@ -78,13 +78,13 @@ bool ZED3D9PPBlurNode::Initialize()
 	}
 	else
 	{
-		zeError("D3D9 Post Processor - Blur Node", "Vertex shader is not supported.");
+		zeError("Vertex shader is not supported.");
 		return false;
 	}
 
 	if (GetModule()->GetPixelShaderVersion() == ZE_D3D9_PSV_NONE)
 	{
-		zeError("D3D9 Post Processor - Blur Node", "Pixel shader is not supported.");
+		zeError("Pixel shader is not supported.");
 		return false;
 	}
 
@@ -146,21 +146,21 @@ bool ZED3D9PPBlurNode::Process()
 	// Check shaders
 	if (VertexShader == NULL || (HorizontalPass == NULL && VerticalPassPixelShader == NULL))
 	{
-		zeError("D3D9 Post Processor - Blur Node", "Vertex or/and Pixel shaders are not available");
+		zeError("Vertex or/and Pixel shaders are not available");
 		return false;
 	}
 
 	// Check input post processor is available
 	if (Input == NULL)
 	{
-		zeError("D3D9 Post Processor - Blur Node", "Post processor node does not have any input.");
+		zeError("Post processor node does not have any input.");
 		return false;
 	}
 
 	// Check input node provides valid texture or not
 	if (Input->GetOutput() == NULL || Input->GetOutput()->IsEmpty())
 	{
-		zeError("D3D9 Post Processor - Blur Node", "Post processor input node output texture is not available.");
+		zeError("Post processor input node output texture is not available.");
 		return false;
 	}
 
@@ -170,7 +170,7 @@ bool ZED3D9PPBlurNode::Process()
 		Output = ZETexture2D::CreateInstance();
 		if (!Output->Create(Input->GetOutput()->GetWidth(), Input->GetOutput()->GetHeight(), Input->GetOutput()->GetPixelFormat(), true))
 		{
-			zeError("D3D9 Post Processor - Blur Node", "Can not create output texture.");
+			zeError("Can not create output texture.");
 			return false;
 		}
 	}
@@ -178,7 +178,7 @@ bool ZED3D9PPBlurNode::Process()
 	{
 		if (!Output->Create(Input->GetOutput()->GetWidth(), Input->GetOutput()->GetHeight(), Input->GetOutput()->GetPixelFormat(), true))
 		{
-			zeError("D3D9 Post Processor - Blur Node", "Can not create output texture.");
+			zeError("Can not create output texture.");
 			return false;
 		}
 	}
@@ -229,7 +229,7 @@ bool ZED3D9PPBlurNode::Process()
 		// ZED3D9CommonTools::CreateRenderTarget will check previous render target is available or has correct dimensions. If not it will create one or modify current one.
 		if (!ZED3D9CommonTools::CreateRenderTarget(&Internal, Input->GetOutput()->GetWidth() * DownSample, Input->GetOutput()->GetHeight() * DownSample, Input->GetOutput()->GetPixelFormat()))
 		{
-			zeError("D3D9 Post Processor - Blur Node", "Can not create internal texture.");
+			zeError("Can not create internal texture.");
 			return false;
 		}
 		Internal->GetSurfaceLevel(0, &InternalSurface);

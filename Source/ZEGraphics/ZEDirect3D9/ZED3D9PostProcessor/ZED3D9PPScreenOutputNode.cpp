@@ -48,7 +48,7 @@ bool ZED3D9PPScreenOutputNode::Initialize()
 	{
 		if (GetModule()->GetVertexShaderVersion() < ZE_D3D9_VSV_2_0_0)
 		{
-			zeError("D3D9 Post Processor - Screen Output Node", "Vertex shader is not supported.");
+			zeError("Vertex shader is not supported.");
 			return false;
 		}
 
@@ -67,7 +67,7 @@ bool ZED3D9PPScreenOutputNode::Initialize()
 			"}", "Screen copy", "vs_2_0", NULL)
 			)
 		{
-			zeError("D3D9 Post Processor - Screen Output Node", "Can not compile vertex shader.");
+			zeError("Can not compile vertex shader.");
 			return false;
 		}
 	}
@@ -76,7 +76,7 @@ bool ZED3D9PPScreenOutputNode::Initialize()
 	{
 		if (GetModule()->GetVertexShaderVersion() < ZE_D3D9_PSV_2_0_0)
 		{
-			zeError("D3D9 Post Processor - Screen Output Node", "Pixel shader is not supported.");
+			zeError("Pixel shader is not supported.");
 			return false;
 		}
 
@@ -103,14 +103,14 @@ bool ZED3D9PPScreenOutputNode::Proces()
 {
 	if (PixelShader == NULL || VertexShader == NULL)
 	{
-		zeError("D3D9 Post Processor - Screen Output Node", "Pixel or/and vertex shader is not available.");
+		zeError("Pixel or/and vertex shader is not available.");
 		return false;
 	}
 
 	// Check input post processor is available
 	if (Input == NULL)
 	{
-		zeError("D3D9 Post Processor - Screen Output Node", "Post processor node does not have any input.");
+		zeError("Post processor node does not have any input.");
 		return false;
 	}
 	
@@ -119,7 +119,7 @@ bool ZED3D9PPScreenOutputNode::Proces()
 	// Check input node provides valid texture or not
 	if (InputTexture == NULL || InputTexture->IsEmpty())
 	{
-		zeError("D3D9 Post Processor - Screen Output Node", "Post processor input node output texture is not available.");
+		zeError("Post processor input node output texture is not available.");
 		return false;
 	}
 

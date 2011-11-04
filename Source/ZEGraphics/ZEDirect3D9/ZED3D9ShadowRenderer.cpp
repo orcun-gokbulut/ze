@@ -40,7 +40,7 @@
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9Shader.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEDirectionalLight.h"
 #include "ZEGraphics/ZEPointLight.h"
 #include "ZEGraphics/ZEOmniProjectiveLight.h"
@@ -56,7 +56,7 @@ ZED3D9PixelShader* DirectionalLightPS = NULL;
 ZED3D9VertexShader* ProjectiveLightVS = NULL;
 ZED3D9PixelShader* ProjectiveLightPS = NULL;
 
-void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
+void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderCommand* RenderOrder)
 {
 	//const ZEMaterial* Material = RenderOrder->Material;
 
@@ -179,7 +179,7 @@ bool ZED3D9ShadowRenderer::Initialize()
 		HRESULT hr = GetDevice()->CreateRenderTarget(512, 512, D3DFMT_R32F, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapFrameBuffer, NULL);
 		if (hr != S_OK)
 		{
-			zeError("D3D9 Shadow Renderer", "Can not create shadow map frame buffer.");
+			zeError("Can not create shadow map frame buffer.");
 			return false;
 		}
 	}
@@ -189,7 +189,7 @@ bool ZED3D9ShadowRenderer::Initialize()
 		HRESULT hr = GetDevice()->CreateDepthStencilSurface(512, 512, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapZBuffer, NULL);
 		if (hr != S_OK)
 		{
-			zeError("D3D9 Shadow Renderer", "Can not create shadow map z buffer.");
+			zeError("Can not create shadow map z buffer.");
 			return false;
 		}
 	}
@@ -226,9 +226,9 @@ void ZED3D9ShadowRenderer::ClearRenderList()
 	NonTransparent.Clear(true);
 }
 
-void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
+void ZED3D9ShadowRenderer::AddToRenderList(ZERenderCommand* RenderOrder)
 {
-	#ifdef ZE_DEBUG_ENABLED
+	#ifdef ZE_DEBUG_ENABLE
 		// Check render order is valid
 		if (!ZED3D9FrameRenderer::CheckRenderOrder(RenderOrder))
 			return;
@@ -262,7 +262,7 @@ void ZED3D9ShadowRenderer::RenderProjectiveLight()
 	GetDevice()->BeginScene();
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
-		ZERenderOrder* RenderOrder = &NonTransparent[I];
+		ZERenderCommand* RenderOrder = &NonTransparent[I];
 
 		ZEMatrix4x4 ViewProjMatrix;
 		if ((RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
@@ -339,7 +339,7 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 	GetDevice()->BeginScene();
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
-		ZERenderOrder* RenderOrder = &NonTransparent[I];
+		ZERenderCommand* RenderOrder = &NonTransparent[I];
 
 		ZEMatrix4x4 ViewProjMatrix;
 		if ((RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)

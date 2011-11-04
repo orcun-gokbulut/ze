@@ -39,14 +39,16 @@
 
 #define zeInput ZEInputModule::GetInstance()
 
-#include "ZEDS/ZEArray.h"
 #include "ZECore/ZEModule.h"
+#include "ZEDS/ZEArray.h"
 #include "ZEInputMap.h"
 
 class ZEInputDevice;
 
 class ZEInputModule : public ZEModule 
-{	
+{
+	ZE_MODULE(ZEInputModule)
+
 	private:
 		bool							Acquired;
 
@@ -56,9 +58,6 @@ class ZEInputModule : public ZEModule
 	public:
 		static void						BaseInitialize();
 		static void						BaseDeinitialize();
-
-		virtual ZEModuleDescription*	GetModuleDescription();
-		static ZEModuleDescription*		ModuleDescription();
 
 		virtual const
 		ZEArray<ZEInputDevice*>&		GetInputDevices() = 0;

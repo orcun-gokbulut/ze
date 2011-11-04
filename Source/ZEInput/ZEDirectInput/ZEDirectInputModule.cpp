@@ -34,12 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDirectInputModule.h"
-#include "ZEDirectInputModuleDescription.h"
-#include "ZECore\ZEError.h"
+#include "ZEError.h"
 #include "ZECore\ZEWindow.h"
-#include "ZECore\ZEConsole.h"
 #include "ZECore\ZECore.h"
 #include <dinput.h>
+
+ZE_MODULE_DESCRIPTION(ZEDirectInputModule, ZEInputModule, NULL)
 
 #define WINDOWS_MEAN_AND_LEAN
 #include <windows.h>
@@ -139,7 +139,7 @@ void ZEDirectInputModule::SetEnabled(bool Enabled)
 
 bool ZEDirectInputModule::Initialize()
 {	
-	zeLog("DirectInput Module", "Initializing Direct Input module.");
+	zeLog("Initializing Direct Input module.");
 
 	ZeroMemory(&KeyboardStateA, sizeof(ZEDIKeyboardState));
 	ZeroMemory(&KeyboardStateB, sizeof(ZEDIKeyboardState));
@@ -155,7 +155,7 @@ bool ZEDirectInputModule::Initialize()
 	if (FAILED(hr))
 	{	
 		Destroy();
-		zeError("DirectInput Module", "No DirectInput.");
+		zeError("No DirectInput.");
 		return false;
 	}
 
@@ -163,7 +163,7 @@ bool ZEDirectInputModule::Initialize()
 	if (FAILED(hr))
 	{
 		Destroy();
-		zeError("DirectInput Module", "Can not enumurate devices.");
+		zeError("Can not enumurate devices.");
 		return false;
 	}  
 
@@ -175,7 +175,7 @@ bool ZEDirectInputModule::Initialize()
 		if (FAILED(hr))
 		{	
 			Destroy();
-			zeError("DirectInput Module", "Can not create DirectInput keyboard device.");
+			zeError("Can not create DirectInput keyboard device.");
 			return false;
 		}
 
@@ -183,7 +183,7 @@ bool ZEDirectInputModule::Initialize()
 		if (FAILED(hr))
 		{	
 			Destroy();
-			zeError("DirectInput Module", "Can not set DirectInput keyboard device data format.");
+			zeError("Can not set DirectInput keyboard device data format.");
 			return false;
 		}
 
@@ -191,7 +191,7 @@ bool ZEDirectInputModule::Initialize()
 		if (FAILED(hr))
 		{	
 			Destroy();
-			zeError("DirectInput Module", "Can not set DirectInput keyboard device cooperative level.");
+			zeError("Can not set DirectInput keyboard device cooperative level.");
 			return false;
 		}
 		DIKeyboard->Acquire();
@@ -206,7 +206,7 @@ bool ZEDirectInputModule::Initialize()
 			if (FAILED(hr))
 			{	
 				Destroy();
-				zeError("DirectInput Module", "Can not create DirectInput mouse device.");
+				zeError("Can not create DirectInput mouse device.");
 				return false;
 			}
 			
@@ -214,7 +214,7 @@ bool ZEDirectInputModule::Initialize()
 			if (FAILED(hr))
 			{	
 				Destroy();
-				zeError("DirectInput Module", "Can not set DirectInput mouse device data format.");
+				zeError("Can not set DirectInput mouse device data format.");
 				return false;
 			}
 
@@ -222,13 +222,13 @@ bool ZEDirectInputModule::Initialize()
 			if FAILED(hr)
 			{	
 				Destroy();
-				zeError("DirectInput Module", "Can not set DirectInput mouse device cooperative level.");
+				zeError("Can not set DirectInput mouse device cooperative level.");
 				return false;
 			}
 			DIMouse->Acquire();
 		}
 		else
-			zeNotice("DirectInput Module", "No mouse available.");
+			zeNotice("No mouse available.");
 	}
 
 	if (DIJoystick == NULL)
@@ -238,7 +238,7 @@ bool ZEDirectInputModule::Initialize()
 			hr = DI->CreateDevice(GUID_Joystick, &DIJoystick, NULL);
 			if (FAILED(hr))
 			{				
-				zeError("DirectInput Module", "Can not create DirectInput joystick device.");
+				zeError("Can not create DirectInput joystick device.");
 				Destroy();
 				return false;
 			}
@@ -247,7 +247,7 @@ bool ZEDirectInputModule::Initialize()
 			if (FAILED(hr))
 			{   
 				Destroy();
-				zeError("DirectInput Module", "Can not set DirectInput joystick device data format.");
+				zeError("Can not set DirectInput joystick device data format.");
 				return false;
 			}
 
@@ -255,14 +255,14 @@ bool ZEDirectInputModule::Initialize()
 			if (FAILED(hr))
 			{   
 				Destroy();
-				zeError("DirectInput Module", "Can not set DirectInput joystick device cooperative level.");
+				zeError("Can not set DirectInput joystick device cooperative level.");
 				return false;
 			}
 
 			DIJoystick->Acquire();
 		}
 		else
-			zeNotice("DirectInput Module", "No joystick available.");
+			zeNotice("No joystick available.");
 
 	}
 	return true;
@@ -271,7 +271,7 @@ bool ZEDirectInputModule::Initialize()
 
 void ZEDirectInputModule::Deinitialize()
 {
-	zeLog("DirectInput Module", "Destroying Direct Input module.\r\n");
+	zeLog("Destroying Direct Input module.\r\n");
 	if (DIMouse != NULL)
 	{
 		DIMouse->Unacquire();
@@ -298,7 +298,7 @@ void ZEDirectInputModule::Deinitialize()
 		DI->Release();
 		DI = NULL;
 	}
-	zeLog("DirectInput Module", "Direct Input module destroyed.");
+	zeLog("Direct Input module destroyed.");
 }
 
 
@@ -332,7 +332,7 @@ void ZEDirectInputModule::ProcessInputs()
 			ZeroMemory(&KeyboardStateB, sizeof(ZEDIKeyboardState));
 			hr = DIKeyboard->Acquire();
 			/*if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
-				zeError("DirectInput Module", "Could not accuire keyboard.");*/
+				zeError("Could not accuire keyboard.");*/
 		}
 	}
 
@@ -346,7 +346,7 @@ void ZEDirectInputModule::ProcessInputs()
 			ZeroMemory(&MouseStateB, sizeof(ZEDIMouseState));
 			hr = DIKeyboard->Acquire();
 			/*if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK && hr != S_FALSE))
-				zeError("DirectInput Module", "Could not accuire keyboard.");*/
+				zeError("Could not accuire keyboard.");*/
 		}
 	}
 	if (DIJoystick != NULL)
@@ -358,7 +358,7 @@ void ZEDirectInputModule::ProcessInputs()
 			ZeroMemory(&JoystickStateB, sizeof(ZEDIJoystickState));
 			hr = DIKeyboard->Acquire();
 			/*if (hr != DIERR_OTHERAPPHASPRIO && hr != DI_OK)
-				zeError("DirectInput Module", "Could not accuire keyboard.");*/
+				zeError("Could not accuire keyboard.");*/
 		}
 	}
 
@@ -489,7 +489,7 @@ void ZEDirectInputModule::ProcessInputMap(ZEInputMap* InputMap)
 
 void ZEDirectInputModule::Acquire()
 {
-	zeLog("DirectInput Module", "Acquire Direct Input.");
+	zeLog("Acquire Direct Input.");
 	if (DIKeyboard != NULL)
 		DIKeyboard->Acquire();
 

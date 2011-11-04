@@ -95,7 +95,7 @@ void ZEProjectiveLight::SetProjectionTextureFile(const char* Filename)
 		if (ProjectionTextureResource != NULL)
 			ProjectionTexture = ProjectionTextureResource->GetTexture();
 		else
-			zeError("PointLight", "Can not load projection texture.");
+			zeError("Can not load projection texture.");
 	}
 }
 
@@ -174,7 +174,7 @@ bool ZEProjectiveLight::Initialize()
 		if (ProjectionTextureResource != NULL)
 			ProjectionTexture = ProjectionTextureResource->GetTexture();
 		else
-			zeError("PointLight", "Can not load projection texture.");
+			zeError("Can not load projection texture.");
 	}
 
 	ZEEntity::Initialize();

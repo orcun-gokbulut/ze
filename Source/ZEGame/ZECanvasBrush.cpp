@@ -38,7 +38,7 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 
 ZEDWORD ZECanvasBrush::GetDrawFlags() const
@@ -61,7 +61,7 @@ void ZECanvasBrush::UpdateCanvas()
 			OldVertexCount = Canvas.Vertices.GetCount();
 			VertexBuffer->Release();
 			if (!VertexBuffer->Create(Canvas.GetBufferSize()))
-				zeCriticalError("Canvas Brush", "Can not create Static Vertex Buffer.");
+				zeCriticalError("Can not create Static Vertex Buffer.");
 		}
 		
 		void* Buffer = VertexBuffer->Lock();

@@ -38,7 +38,7 @@
 #include "ZEGraphics/ZEVertexDeclaration.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 
 ZEUIRenderer::ZEUIRenderer()
@@ -107,7 +107,7 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 			return;
 		}
 
-	ZERenderOrder* NewRenderOrder = RenderOrders.Add();
+	ZERenderCommand* NewRenderOrder = RenderOrders.Add();
 	NewRenderOrder->WorldMatrix = ScreenTransform;
 	NewRenderOrder->Material = Rectangle.Material;
 	NewRenderOrder->Pipeline = ZE_RORP_2D;

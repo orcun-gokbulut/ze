@@ -38,7 +38,7 @@
 #define __ZE_PORTAL_MAP_PORTAL_H__
 
 #include "ZEDS/ZEArray.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 
 class ZEPortalMap;
 class ZEPortalMapDoor;
@@ -54,7 +54,7 @@ class ZEPortalMapPortal
 		ZEPortalMap*						Owner;
 		const ZEPortalMapResourcePortal*	Resource;
 		ZEStaticVertexBuffer*				VertexBuffer;
-		ZEArray<ZERenderOrder>				RenderOrders;
+		ZEArray<ZERenderCommand>				RenderOrders;
 		ZEArray<ZEPortalMapDoor*>			Doors;
 		ZEPhysicalMesh*						PhysicalMesh;
 

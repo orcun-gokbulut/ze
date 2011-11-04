@@ -38,7 +38,7 @@
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9Shader.h"
 #include "ZED3D9CommonTools.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZEFile/ZEResourceFile.h"
 #include <D3D9.h>
@@ -69,7 +69,7 @@ void ZED3D9SkyBoxMaterial::ReleaseShaders()
 	ZED3D_RELEASE(PixelShader);
 }
 
-bool ZED3D9SkyBoxMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const 
+bool ZED3D9SkyBoxMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderOrder) const 
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9SkyBoxMaterial*)this)->UpdateMaterial();

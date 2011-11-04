@@ -36,7 +36,7 @@
 #ifndef __ZE_FLAGS_H__
 #define __ZE_FLAGS_H__
 
-template <typename Type>
+template <typename Type = unsigned int>
 class ZEFlags
 {
 	public:

@@ -44,11 +44,10 @@ class  ZEExtensionDescription;
 
 class ZEInputDeviceExtension : public ZEExtension
 {
-	public:
-		static ZEExtensionDescription*			ExtensionDescription();
+	ZE_EXTENSION(ZEInputDeviceExtension)
 
-		virtual
-		ZEArray<ZEInputDevice*>					GetDevices() = 0;
+	public:
+		virtual ZEArray<ZEInputDevice*>		GetDevices() = 0;
 };
 
 #endif

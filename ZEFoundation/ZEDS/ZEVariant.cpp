@@ -369,7 +369,7 @@ void ZEVariant::SetMatrix3x3(const ZEMatrix3x3& Matrix)
 
 void ZEVariant::SetMatrix4x4(const ZEMatrix4x4& Matrix)
 {
-	SetType(ZE_VRT_MATRIX3X3);
+	SetType(ZE_VRT_MATRIX4X4);
 	*this->Value.Matrix4x4 = Matrix;
 }
 

@@ -85,7 +85,7 @@ void ZEResourceFile::GetPartialResourceFile(ZEPartialResourceFile& PartialResour
 
 bool ZEResourceFile::Open(const char* FileName)
 {
-	zeAssert(File, "Close the previous ZEResourceFile first.")
+	zeAssert(File, "Close the previous ZEResourceFile first.");
 
 	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
 	strncpy(this->FileName, FileName, ZE_MAX_FILE_NAME_SIZE);
@@ -97,7 +97,7 @@ bool ZEResourceFile::Open(const char* FileName)
 		return true;
 	else
 	{
-		zeError("Resource File", "Could not open resource file \"%s\".", FileName);
+		zeError("Could not open resource file \"%s\".", FileName);
 		return false;
 	}
 }
@@ -183,7 +183,7 @@ bool ZEResourceFile::ReadFile(const char* FileName, void* Buffer, size_t BufferS
 	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
 	{
-		zeError("Resource File", "Could not open resource file \"%s\".", FileName);
+		zeError("Could not open resource file \"%s\".", FileName);
 		return false;
 	}
 
@@ -209,7 +209,7 @@ bool ZEResourceFile::ReadTextFile(const char* FileName, char* Buffer, size_t Buf
 	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
 	{
-		zeError("Resource File", "Could not open resource file \"%s\".", FileName);
+		zeError("Could not open resource file \"%s\".", FileName);
 		return false;
 	}
 
@@ -233,7 +233,7 @@ bool ZEPartialResourceFile::Open(const char* FileName, size_t Offset, size_t Siz
 {
 	if(File)
 	{
-		zeError("Partial Resource File", "A file is already open with the file name: \"%s\".", this->FileName);
+		zeError("A file is already open with the file name: \"%s\".", this->FileName);
 		return false;
 	}
 
@@ -253,7 +253,7 @@ bool ZEPartialResourceFile::Open(const char* FileName, size_t Offset, size_t Siz
 	}
 	else
 	{
-		zeError("Resource File", "Could not open resource file \"%s\".", FileName);
+		zeError("Could not open resource file \"%s\".", FileName);
 		return false;
 	}
 }
@@ -262,7 +262,7 @@ bool ZEPartialResourceFile::Open(ZEFile* File, size_t Offset, size_t Size)
 {
 	if(!File->IsOpen())
 	{
-		zeError("Partial Resource File", "The ZEFile passed to this function must be opened: \"%s\".", this->FileName);
+		zeError("The ZEFile passed to this function must be opened: \"%s\".", this->FileName);
 		return false;
 	}
 
@@ -279,7 +279,7 @@ bool ZEPartialResourceFile::Open(ZEFile* File, size_t Offset, size_t Size)
 	}	
 	else
 	{
-		zeError("Partial Resource File", "Could not open resource file using given ZEFile\"%s\".", File->GetFileName());
+		zeError("Could not open resource file using given ZEFile\"%s\".", File->GetFileName());
 		return false;
 	}
 }

@@ -115,7 +115,7 @@ static bool CopyCubeFace(ZETextureCube* Texture, ZETextureCubeFace Face, unsigne
 	
 	if (!Texture->Lock(Face, &DestinationBuffer, &DestinationPitch))
 	{
-		zeError("Cube Texture Resource", "Can not lock texture resource. (Face : %d)", Face);
+		zeError("Can not lock texture resource. (Face : %d)", Face);
 		return false;
 	}
 
@@ -140,14 +140,14 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(const char* FileName)
 	}
 	else
 	{
-		zeError("Cube Texture Resource", "Texture file not found. FileName : \"%s\"", FileName);
+		zeError("Texture file not found. FileName : \"%s\"", FileName);
 		return NULL;
 	}
 }
 
 ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* ResourceFile)
 {
-	zeLog("TextureCube Resource", "Loading texture file \"%s\".", ResourceFile->GetFileName());
+	zeLog("Loading texture file \"%s\".", ResourceFile->GetFileName());
 
 	FreeImageIO Callbacks;
 	Callbacks.read_proc = &FreeImageFile_Read_Cube;
@@ -164,7 +164,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 	FIBITMAP* Data = FreeImage_LoadFromHandle(TextureFormat, &Callbacks, ResourceFile);
 	if (Data == NULL)
 	{
-		zeError("Texture 2D Resource", "Can not load texture file. File Name : %s.", ResourceFile->GetFileName());
+		zeError("Can not load texture file. File Name : %s.", ResourceFile->GetFileName());
 		return NULL;
 	}
 
@@ -173,7 +173,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 
 	if (Width / 3 != Height / 2)
 	{
-		zeError("Cube Texture Resource", "File does not have correct dimensions. (FileName : \"%s\")", ResourceFile->GetFileName());
+		zeError("File does not have correct dimensions. (FileName : \"%s\")", ResourceFile->GetFileName());
 		return NULL;
 	}
 	
@@ -188,13 +188,13 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 			switch (FreeImage_GetBPP(Data))
 			{
 				case 8:
-					zeWarning("Texture Resource", "There is performance hit converting 8 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
+					zeWarning("There is performance hit converting 8 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
 					Format = ZE_TPF_RGBA_INT32;
 					ConvertedData = FreeImage_ConvertTo32Bits(Data);
 					FreeImage_Unload(Data);
 					Data = ConvertedData;
 				break;				case 16:
-					zeWarning("Texture Resource", "There is performance hit converting 16 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
+					zeWarning("There is performance hit converting 16 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
 					Format = ZE_TPF_RGBA_INT32; 
 					ConvertedData = FreeImage_ConvertTo32Bits(Data);
 					FreeImage_Unload(Data);
@@ -202,7 +202,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 					break;
 
 				case 24:
-					zeWarning("Texture Resource", "There is performance hit converting 24 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
+					zeWarning("There is performance hit converting 24 bit image to 32 bit image. Use 16 bit or 32 bit images. FileName : \"%s\"", ResourceFile->GetFileName());
 					Format = ZE_TPF_RGBA_INT32;
 					ConvertedData = FreeImage_ConvertTo32Bits(Data);
 					FreeImage_Unload(Data);
@@ -212,13 +212,13 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 					Format = ZE_TPF_RGBA_INT32;
 					break;
 				default:
-					zeError("Texture Resource", "Image pixel format is not supported. FileName : \"%s\"", ResourceFile->GetFileName());
+					zeError("Image pixel format is not supported. FileName : \"%s\"", ResourceFile->GetFileName());
 					return NULL;
 					break;			
 			}
 			break;
 		default:
-			zeError("Texture Resource", "Image pixel format is not supported. FileName : \"%s\"", ResourceFile->GetFileName());
+			zeError("Image pixel format is not supported. FileName : \"%s\"", ResourceFile->GetFileName());
 			return NULL;
 			break;			
 	}
@@ -233,7 +233,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 
 	if (!Texture->Create(EdgeLenght, Format))
 	{
-		zeError("Cube Texture Resource", "Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFileName());
+		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFileName());
 		delete TextureResource;
 		return NULL;
 	}
@@ -249,7 +249,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 		!CopyCubeFace(Texture, ZE_CTF_NEGATIVEY, Bits, Pitch, EdgeLenght, EdgeLenght,		0,			BytesPerPixel) ||
 		!CopyCubeFace(Texture, ZE_CTF_POSITIVEY, Bits, Pitch, EdgeLenght, EdgeLenght * 2,	0,			BytesPerPixel))
 	{
-		zeError("Cube Texture Resource", "Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFileName());
+		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFileName());
 		delete TextureResource;
 		return NULL;		
 	}
@@ -259,7 +259,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEResourceFile* Resou
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
 
-	zeLog("TextureCube Resource", "Texture file \"%s\" has been loaded.", ResourceFile->GetFileName());
+	zeLog("Texture file \"%s\" has been loaded.", ResourceFile->GetFileName());
 
 	return TextureResource;	
 }

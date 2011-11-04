@@ -39,7 +39,7 @@ ze_add_conditional_build(ZEInput ZEDirectInput		FALSE TITLE "Build ZEDirectInput
 ze_add_conditional_build(ZEInput ZEDummyInput		FALSE TITLE "Build ZEDummyInput Input Module.")
 ze_add_conditional_build(ZEInput ZEVirtualInput		FALSE TITLE "Build ZEVirtualInput Input Module.")
 ze_add_conditional_build(ZEInput ZEWindowsInput		TRUE TITLE "Build ZEWindowsInput Input Module.")
-ze_add_conditional_build(ZEInput ZEFreespaceInput	FALSE TITLE "Build ZEFreespaceInput Input Module.")
+ze_add_conditional_build(ZEInput ZEFreespaceInput	TRUE TITLE "Build ZEFreespaceInput Input Module.")
 ze_add_conditional_build(ZEInput ZEVRPNInput		TRUE TITLE "Build ZEVRPNInput Input Module.")
 
 ze_add_source(ZEInputAction.cpp							Sources)
@@ -50,8 +50,6 @@ ze_add_source(ZEInputDevice.cpp							Sources)
 ze_add_source(ZEInputDevice.h							Sources Headers)
 ze_add_source(ZEInputDeviceExtension.cpp				Sources)
 ze_add_source(ZEInputDeviceExtension.h					Sources Headers)
-ze_add_source(ZEInputDeviceExtensionDescription.cpp		Sources)
-ze_add_source(ZEInputDeviceExtensionDescription.h		Sources Headers)
 ze_add_source(ZEInputEvent.cpp							Sources)
 ze_add_source(ZEInputEvent.h							Sources Headers)
 ze_add_source(ZEInputMap.cpp							Sources)
@@ -60,8 +58,6 @@ ze_add_source(ZEInputMapBinding.cpp						Sources)
 ze_add_source(ZEInputMapBinding.h						Sources Headers)
 ze_add_source(ZEInputModule.cpp							Sources)
 ze_add_source(ZEInputModule.h							Sources Headers)
-ze_add_source(ZEInputModuleDescription.cpp				Sources)
-ze_add_source(ZEInputModuleDescription.h				Sources Headers)
 
 ze_add_library(ZEInput 
 	SOURCES ${Sources}

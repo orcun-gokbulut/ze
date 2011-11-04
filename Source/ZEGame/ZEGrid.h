@@ -39,7 +39,7 @@
 
 #include "ZEGame/ZEEntity.h"
 #include "ZECanvasBrush.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEGrid);
 
@@ -57,7 +57,7 @@ class ZEGrid : public ZEEntity
 		ZECanvas					AxisZ;
 
 		ZESimpleMaterial*			Material;
-		ZERenderOrder				RenderOrder;
+		ZERenderCommand				RenderOrder;
 
 		ZEVector2					GridSize;
 		bool						FollowerGrid;
