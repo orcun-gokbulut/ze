@@ -64,7 +64,7 @@ class ZESoundResourceMP3 : public ZESoundResource
 		static void						BaseInitialize();
 		static void						BaseDeinitialize();
 
-		static ZESoundResource*			LoadResource(const char* FileName);
+		static ZESoundResource*			LoadResource(const ZEString& FileName);
 };
 
 #endif

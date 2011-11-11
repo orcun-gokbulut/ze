@@ -36,6 +36,9 @@
 #include "ZED3D9TextureResizer.h"
 
 #include "ZEGraphics/ZEDirect3D9/ZED3D9ComponentBase.h"
+#include "ZEGraphics/ZEDirect3D9/ZED3D9Module.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+
 #include "ZED3D9Common.h"
 #include "ZED3D9CommonTools.h"
 #include "ZEGraphics/ZETexture2DResource.h"
@@ -49,6 +52,9 @@
 
 #include <d3d9.h>
 #include <stdlib.h>
+
+
+#include "ZECore/ZEConsole.h"
 
 
 bool ZED3D9TextureResizer::IsPowerOfTwo(unsigned int Value)
@@ -116,17 +122,6 @@ unsigned int ZED3D9TextureResizer::GetPowerOfTwo(unsigned int Value)
 	}
 }
 
-
-void ZED3D9TextureResizer::SetRenderer(ZEFrameRenderer* Renderer)
-{
-	this->Renderer = (ZED3D9FrameRenderer*)Renderer;
-}
-
-ZEFrameRenderer* ZED3D9TextureResizer::GetRenderer()
-{
-	return Renderer;
-}
-
 void ZED3D9TextureResizer::SetResizeFilter(ZED3D9TextureResizeFilter ResizeFilter)
 {
 	this->ResizeFilter = ResizeFilter;
@@ -147,23 +142,9 @@ ZED3D9FittingPowerof2Mode ZED3D9TextureResizer::GetAutoFitMode()
 	return AutoFitMode;
 }
 
-void ZED3D9TextureResizer::Initialize(unsigned char* DestData, unsigned int DestPitch, unsigned int DestWidth, unsigned int DestHegiht,
-									  unsigned char* SrcData, unsigned int SrcPitch, unsigned int SrcWidth, unsigned int SrcHeight)
+void ZED3D9TextureResizer::Initialize(void* DestData, unsigned int DestPitch, unsigned int DestWidth, unsigned int DestHegiht,
+									  void* SrcData, unsigned int SrcPitch, unsigned int SrcWidth, unsigned int SrcHeight)
 {
-	// Vertex declaration for screen aligned quad
-	D3DVERTEXELEMENT9 Declaration[] = 
-	{
-		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-		D3DDECL_END()
-	};
-
-	GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
-
-	// Create and compile shaders
-	this->VertexShader = ZED3D9VertexShader::CreateShader("TextureResize.hlsl", "vs_main", 0, "vs_3_0");
-	this->PixelShaderHorizontal = ZED3D9PixelShader::CreateShader("TextureResize.hlsl", "ps_main_horizontal", 0, "ps_3_0");
-	this->PixelShaderVertical = ZED3D9PixelShader::CreateShader("TextureResize.hlsl", "ps_main_vertical", 0, "ps_3_0");
-
 	// Set the parameters
 	this->SrcInfo.Buffer = SrcData;
 	this->SrcInfo.Pitch = SrcPitch;
@@ -175,8 +156,7 @@ void ZED3D9TextureResizer::Initialize(unsigned char* DestData, unsigned int Dest
 	this->DestInfo.Width = DestWidth;
 	this->DestInfo.Height = DestHegiht;
 
-	this->AutoFitMode = ZE_D3D9_FPO2_AUTO;
-	this->ResizeFilter = ZE_D3D9_RF_KAISER;
+	
 }
 
 void ZED3D9TextureResizer::Deinitialize()
@@ -185,12 +165,6 @@ void ZED3D9TextureResizer::Deinitialize()
 	memset(&SrcInfo, 0, sizeof(TextureInfo));
 	memset(&DestInfo, 0, sizeof(TextureInfo));
 
-	ZED3D_RELEASE(VertexShader);
-	ZED3D_RELEASE(PixelShaderVertical);
-	ZED3D_RELEASE(PixelShaderHorizontal);
-	ZED3D_RELEASE(VertexDeclaration);
-
-	Renderer = NULL;
 }
 
 void ZED3D9TextureResizer::OnDeviceLost()
@@ -202,14 +176,17 @@ void ZED3D9TextureResizer::OnDeviceRestored()
 	// Empty
 }
 
+
+
 bool ZED3D9TextureResizer::Process()
 {
 	HRESULT Result;
 
-	Filter*	Filt =  NULL;
+	ZEFilter*	Filt =  NULL;
 	ZED3D9Texture2D* Input	= NULL;
 	ZED3D9Texture2D* Output = NULL;
 	IDirect3DSurface9* ReadBack = NULL;
+	IDirect3DSurface9* DepthStencil = NULL;	
 
 	void* Dest = NULL;
 	const unsigned int Bpp = 4;
@@ -218,276 +195,148 @@ bool ZED3D9TextureResizer::Process()
 	static struct Vert  
 	{
 		float Position[3];
-	} Vertices[] =
+		float Texcoord[2];
+	} 
+	Vertices[] =
 	{
-		{-1.0f,  1.0f, 0.0f},
-		{ 1.0f,  1.0f, 0.0f},
-		{-1.0f, -1.0f, 0.0f},
-		{ 1.0f, -1.0f, 0.0f}
+		{{-1.0f,  1.0f, 0.0f}, {0.0f, 0.0f}},
+		{{ 1.0f,  1.0f, 0.0f}, {1.0f, 0.0f}},
+		{{-1.0f, -1.0f, 0.0f}, {0.0f, 1.0f}},
+		{{ 1.0f, -1.0f, 0.0f}, {1.0f, 1.0f}}
 	};
 
 
-	switch(ResizeFilter)
+	// There is only one filter for now
+	/*switch(ResizeFilter)
 	{
 		default:
 		case ZE_D3D9_RF_BOX:
 		{
-			Filt = (Filter*)new BoxFilter;
+			Filt = (ZEFilter*)new BoxFilter;
 			break;
 		}
 		
 		case ZE_D3D9_RF_TRIANGLE:
 		{
-			Filt = (Filter*)new TriangleFilter;
+			Filt = (ZEFilter*)new TriangleFilter;
 			break;
 		}
 		
 		case ZE_D3D9_RF_CUBIC:
 		{
-			Filt = (Filter*)new CubicFilter;
+			Filt = (ZEFilter*)new CubicFilter;
 			break;
 		}
 		
 		case ZE_D3D9_RF_GAUSSIAN:
 		{
-			Filt = (Filter*)new GaussianFilter;
+			Filt = (ZEFilter*)new GaussianFilter;
 			break;
 		}
 		
 		case ZE_D3D9_RF_QUADRATIC:
 		{
-			Filt = (Filter*)new QuadraticFilter;
+			Filt = (ZEFilter*)new QuadraticFilter;
 			break;
 		}
 		
 		case ZE_D3D9_RF_KAISER:
 		{
-			Filt = (Filter*)new KaiserFilter(5.0f);
+			Filt = (ZEFilter*)new KaiserFilter(5.0f);
 			break;
 		}
 		
 		case ZE_D3D9_RF_MITCHELL:
 		{
-			Filt = (Filter*)new MitchellFilter(1.0f / 3.0f, 1.0f / 3.0f);
+			Filt = (ZEFilter*)new MitchellFilter(1.0f / 3.0f, 1.0f / 3.0f);
 			break;
 		}
-	}
+	}*/
 
-	// Set common render states, vertex shader etc once
-	Result = GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
-	Result = GetDevice()->SetVertexDeclaration(VertexDeclaration);
-	Result = GetDevice()->SetDepthStencilSurface(NULL);
-
-	Result = GetDevice()->SetRenderState(D3DRS_ZENABLE, FALSE);
-	Result = GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-	Result = GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-	Result = GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
-	Result = GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-	Result = GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+	// There is only one resize filter for now
+	KaiserFilter Filter(5.0f);
+	Filt = (ZEFilter*)&Filter;
 
 
-	// If it is not power or two resize its width to NewWidth(power of two)
-	if(!IsPowerOfTwo(SrcInfo.Width))
+	if(SrcInfo.Width != DestInfo.Width)
 	{
-		unsigned int NewWidth = GetPowerOfTwo(SrcInfo.Width);
-		PolyPhaseKernel	KernHorizResize(Filt, SrcInfo.Width, NewWidth, 32);
-		
+		// Calculate Pixel size of the source texture
+		const float SourcePixelWidth = 1.0f / (float)SrcInfo.Width;
+		const float SourcePixelHeight = 1.0f / (float)SrcInfo.Height;
+
+		const float DestPixelWidth = 1.0f / (float)DestInfo.Width;
+		const float DestPixelHeight = 1.0f / (float)SrcInfo.Height;
+
+		ZEKernel	HorizontalPassKernel(Filt, SrcInfo.Width, DestInfo.Width, 32, SourcePixelWidth);
+
+		// Create the input texture and copy the image data into it
 		Input = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Input->Create(SrcInfo.Width, SrcInfo.Height, ZE_TPF_RGBA_INT32, false);
-		Output = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Output->Create(NewWidth, SrcInfo.Height, ZE_TPF_RGBA_INT32, true);
+		Input->Create(SrcInfo.Width, SrcInfo.Height, ZE_TPF_A8R8G8B8, false, 1);
 
 		// Fill the input texture
 		Input->Lock(&Dest, &DestPitch, 0);
-		// Copy source data to input texture
 		for(size_t I = 0; I < SrcInfo.Height; I++)
-			memcpy((unsigned char*)Dest + I * DestPitch, SrcInfo.Buffer + I * SrcInfo.Pitch, SrcInfo.Width * Bpp);
+			memcpy((unsigned char*)Dest + I * DestPitch, (unsigned char*)SrcInfo.Buffer + I * SrcInfo.Pitch, SrcInfo.Width * Bpp);
 		Input->Unlock(0);
+
 		Dest = NULL;
 		DestPitch = 0;
-
 		
-		// Set Output Texture
-		ZED3D9CommonTools::SetRenderTarget(0, Output);
-		// Set Input Texture
-		ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)Input, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
-
-		// Set pixel size = (1 / new width, 1 / source height)
-		Result = GetDevice()->SetVertexShaderConstantF(8, (const float*)&ZEVector4(1.0f / SrcInfo.Width, 1.0f / SrcInfo.Height, 0.0f, 0.0f), 1);
-		Result = GetDevice()->SetPixelShaderConstantF(8, (const float*)&ZEVector4(1.0f / SrcInfo.Width, 1.0f / SrcInfo.Height, 0.0f, 0.0f), 1);
-
-		// Pass the kernel and other variables to shaders
-		unsigned int Vector4Count = (unsigned int)ceilf(KernHorizResize.GetKernelWindowSize() / 4.0f); 
-		Result = GetDevice()->SetPixelShaderConstantF(9, (const float*)&ZEVector4((float)KernHorizResize.GetKernelWindowSize(), KernHorizResize.GetKernelWidth(), KernHorizResize.GetKernelCenter(), 0.0f),1);
-		Result = GetDevice()->SetPixelShaderConstantF(100, (const float*)KernHorizResize.GetKernel(),Vector4Count);
-
-		// Resize
-		GetDevice()->BeginScene();
-		Result = GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
-		GetDevice()->EndScene();
-		
-		// Set new width
-		SrcInfo.Width = NewWidth;
-
-		ZED3D_RELEASE(Input);
-	}
-
-	// if it is not power of two, resize its Height to NewHeight(power of two)
-	if(!IsPowerOfTwo(SrcInfo.Height))
-	{
-		// Create a new Texture which have Height of NewHeight
-		unsigned int NewHeight = GetPowerOfTwo(SrcInfo.Height);
-		PolyPhaseKernel	KernVertResize(Filt, SrcInfo.Height, NewHeight, 32);
-		
-		// Create input and output textures
-		if(Output && Input == NULL) // if it is already resized horizontally
-		{
-			Input = Output;
-			Output = NULL;
-		}
-		else
-		{
-			Input = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-			Input->Create(SrcInfo.Width, SrcInfo.Height, ZE_TPF_RGBA_INT32, false);
-			
-			// Fill the input texture
-			Input->Lock(&Dest, &DestPitch, 0);
-			for(size_t I = 0; I < SrcInfo.Height; I++)
-				memcpy((unsigned char*)Dest + I * DestPitch, SrcInfo.Buffer + I * SrcInfo.Pitch, SrcInfo.Width * Bpp);
-			Input->Unlock(0);
-			Dest = NULL;
-			DestPitch = 0;
-
-		}
-		Output = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Output->Create(SrcInfo.Width, NewHeight, ZE_TPF_RGBA_INT32, true);
-
-		// Set Pixel shader
-		Result = GetDevice()->SetPixelShader(PixelShaderVertical->GetPixelShader());
-
-		// Set Output Texture
-		ZED3D9CommonTools::SetRenderTarget(0, Output);
-		// Set Input Texture
-		ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)Input, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
-
-		// Set pixel size = (1 / new width, 1 / source height)
-		Result = GetDevice()->SetVertexShaderConstantF(8, (const float*)&ZEVector4(1.0f / SrcInfo.Width, 1.0f / SrcInfo.Height, 0.0f, 0.0f), 1);
-		Result = GetDevice()->SetPixelShaderConstantF(8, (const float*)&ZEVector4(1.0f / SrcInfo.Width, 1.0f / SrcInfo.Height, 0.0f, 0.0f), 1);
-
-		// Pass the kernel and other variables to shaders
-		unsigned int Vector4Count = (unsigned int)ceilf(KernVertResize.GetKernelWindowSize() / 4.0f); 
-		Result = GetDevice()->SetPixelShaderConstantF(9, (const float*)&ZEVector4((float)KernVertResize.GetKernelWindowSize(), KernVertResize.GetKernelWidth(), KernVertResize.GetKernelCenter(), 0.0f),1);
-		Result = GetDevice()->SetPixelShaderConstantF(100, (const float*)KernVertResize.GetKernel(),Vector4Count);
-
-		// Resize
-		GetDevice()->BeginScene();
-		Result = GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
-		GetDevice()->EndScene();
-
-		// Set new height
-		SrcInfo.Height = NewHeight;
-
-		// Release the unnecessary texture
-		ZED3D_RELEASE(Input);
-	}
-
-	
-	// Create kernels for final resize
-	PolyPhaseKernel*	HorizontalPassKernel = NULL;
-	PolyPhaseKernel*	VerticalPassKernel = NULL;
-
-	if(SrcInfo.Width != DestInfo.Width)
-		HorizontalPassKernel = new PolyPhaseKernel(Filt, SrcInfo.Width, DestInfo.Width, 32);
-	
-
-	if(SrcInfo.Height != DestInfo.Height)
-		VerticalPassKernel = new PolyPhaseKernel(Filt, SrcInfo.Height, DestInfo.Height, 32);
-
-
-	if(HorizontalPassKernel)
-	{
-		// If temp is set(resized previously)
-		if(Output && Input == NULL)
-		{
-			Input = Output;
-			Output = NULL;
-		}
-		// if none happened create the input texture
-		else
-		{
-			// Create the input texture and copy the image data into it
-			Input = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-			Input->Create(SrcInfo.Width, SrcInfo.Height, ZE_TPF_RGBA_INT32, false);
-
-			// Fill the input texture
-			Input->Lock(&Dest, &DestPitch, 0);
-			for(size_t I = 0; I < SrcInfo.Height; I++)
-				memcpy((unsigned char*)Dest + I * DestPitch, SrcInfo.Buffer + I * SrcInfo.Pitch, SrcInfo.Width * Bpp);
-			Input->Unlock(0);
-			Dest = NULL;
-			DestPitch = 0;
-		}
-	
 		// Create output texture
 		Output = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Output->Create(DestInfo.Width, SrcInfo.Height, ZE_TPF_RGBA_INT32, true);
+		Output->Create(DestInfo.Width, SrcInfo.Height, ZE_TPF_A8R8G8B8, true, 1);
 
+		// Create depth stencil buffer with the same size of the render target
+		GetDevice()->CreateDepthStencilSurface(DestInfo.Width, SrcInfo.Height, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, TRUE, &DepthStencil, NULL);
+		GetDevice()->SetDepthStencilSurface(DepthStencil);
 
-		// Set render states, vs, ps
-		Result = GetDevice()->SetPixelShader(PixelShaderHorizontal->GetPixelShader());
+		// Set vs, ps
+		GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
+		GetDevice()->SetPixelShader(PixelShaderHorizontal->GetPixelShader());
 
-		// Set Output Texture
-		ZED3D9CommonTools::SetRenderTarget(0, Output);
-		// Set Input Texture
+		// Set Input Output textures
+		ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)Output);
 		ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)Input, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 
-		// Set pixel size
-		Result = GetDevice()->SetVertexShaderConstantF(8, (const float*)&ZEVector4(1.0f / SrcInfo.Width, 1.0f / SrcInfo.Height, 0.0f, 0.0f), 1);
-		Result = GetDevice()->SetPixelShaderConstantF(8, (const float*)&ZEVector4(1.0f / SrcInfo.Width, 1.0f / SrcInfo.Height, 0.0f, 0.0f), 1);
+		// Set render states
+		GetDevice()->SetVertexDeclaration(VertexDeclaration);
+		GetDevice()->SetRenderState(D3DRS_ZENABLE,			FALSE);
+		GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE,		FALSE);
+		GetDevice()->SetRenderState(D3DRS_STENCILENABLE,	FALSE);
+		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE,	FALSE);
+		GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+		GetDevice()->SetRenderState(D3DRS_CULLMODE,			D3DCULL_NONE);
 
-		// Pass the kernel and other variables to shaders
-		unsigned int Vector4Count = (unsigned int)ceilf(HorizontalPassKernel->GetKernelWindowSize() / 4.0f); 
-		Result = GetDevice()->SetPixelShaderConstantF(9, (const float*)&ZEVector4((float)HorizontalPassKernel->GetKernelWindowSize(), HorizontalPassKernel->GetKernelWidth(), HorizontalPassKernel->GetKernelCenter(), 0.0f),1);
-		Result = GetDevice()->SetPixelShaderConstantF(100, (const float*)HorizontalPassKernel->GetKernel(),Vector4Count);
+		const int WindowSize = HorizontalPassKernel.GetKernelWindowSize();
+		const ZEVector4* Kernel = HorizontalPassKernel.GetKernel();
 
+		// pass the parameters to graphics device
+		GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(DestPixelWidth, DestPixelHeight, 0.0f, 0.0f), 1);
+		GetDevice()->SetPixelShaderConstantF(0, (const float*)Kernel, WindowSize);
+		
 		// Resize Horizontally
 		GetDevice()->BeginScene();
-		Result = GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+		GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
 		GetDevice()->EndScene();
 		
-
-		///////////////////////////  TEST  ////////////////////////////////
-
-		if(Output)
-		{
-			// Create a temp texture to read the render target data from graphics device
-			Result = GetDevice()->CreateOffscreenPlainSurface(DestInfo.Width, SrcInfo.Height, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &ReadBack, NULL);
-			Result = GetDevice()->GetRenderTargetData(((ZED3D9ViewPort*)Output->GetViewPort())->FrameBuffer, ReadBack);
-
-			// Copy resized Texture back to destination buffer
-			D3DLOCKED_RECT Rect;
-			Result = ReadBack->LockRect(&Rect, NULL, NULL);
-
-			for(size_t I = 0; I < SrcInfo.Height; I++)
-				memcpy(DestInfo.Buffer + I * DestInfo.Pitch, (unsigned char*)Rect.pBits + I * Rect.Pitch, DestInfo.Width * Bpp);
-
-			Result = ReadBack->UnlockRect();
-		}
-
-		return true;
-
-		/////////////////////////////////////////////////////////////////////
-
-	
 		// Clean up the unnecessary textures
 		ZED3D_RELEASE(Input);
+		ZED3D_RELEASE(DepthStencil);
+		GetDevice()->SetDepthStencilSurface(NULL);
 	}
-	
-	
-	
+
 	// Vertical resize pass
-	if(VerticalPassKernel)
+	if(SrcInfo.Height != DestInfo.Height)
 	{
+		// calculate pixel size
+		float SourcePixelWidth = 1.0f / (float)DestInfo.Width;
+		float SourcePixelHeight = 1.0f / (float)SrcInfo.Height;
+
+		float DestPixelWidth = 1.0f / (float)DestInfo.Width;
+		float DestPixelHeight = 1.0f / (float)DestInfo.Height;
+
+		ZEKernel	VerticalPassKernel(Filt, SrcInfo.Height, DestInfo.Height, 32, SourcePixelHeight);
+
 		if(Output && Input == NULL)
 		{
 			Input = Output;
@@ -497,47 +346,59 @@ bool ZED3D9TextureResizer::Process()
 		{
 			// Create the input texture and copy the image data into it
 			Input = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-			Input->Create(SrcInfo.Width, SrcInfo.Height, ZE_TPF_RGBA_INT32, false);
+			Input->Create(SrcInfo.Width, SrcInfo.Height, ZE_TPF_A8R8G8B8, false, 1);
 
 			// Fill the input texture
 			Input->Lock(&Dest, &DestPitch, 0);
 			for(size_t I = 0; I < SrcInfo.Height; I++)
-				memcpy((unsigned char*)Dest + I * DestPitch, SrcInfo.Buffer + I * SrcInfo.Pitch, SrcInfo.Width * Bpp);
+				memcpy((unsigned char*)Dest + I * DestPitch, (unsigned char*)SrcInfo.Buffer + I * SrcInfo.Pitch, SrcInfo.Width * Bpp);
 			Input->Unlock(0);
+			
 			Dest = NULL;
 			DestPitch = 0;
 		}
 
-		
 		// Create output texture
 		Output = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Output->Create(DestInfo.Width, DestInfo.Height, ZE_TPF_RGBA_INT32, true);
+		Output->Create(DestInfo.Width, DestInfo.Height, ZE_TPF_A8R8G8B8, true, 1);
 
 		// Set pixel shader
+		Result = GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
 		Result = GetDevice()->SetPixelShader(PixelShaderVertical->GetPixelShader());
 
-		// Set Output Texture
-		ZED3D9CommonTools::SetRenderTarget(0, Output);
-		// Set Input Texture
+		// Create depth stencil buffer with the same size of the render target
+		Result = GetDevice()->CreateDepthStencilSurface(DestInfo.Width, DestInfo.Height, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, TRUE, &DepthStencil, NULL);
+		Result = GetDevice()->SetDepthStencilSurface(DepthStencil);
+
+		// Set Input Output textures
+		ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)Output);
 		ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)Input, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 
-		// Set pixel size = (1 / new width, 1 / source height)
-		Result = GetDevice()->SetVertexShaderConstantF(8, (const float*)&ZEVector4(1.0f / DestInfo.Width, 1.0f / SrcInfo.Height, 0.0f, 0.0f), 1);
-		Result = GetDevice()->SetPixelShaderConstantF(8, (const float*)&ZEVector4(1.0f / DestInfo.Width, 1.0f / SrcInfo.Height, 0.0f, 0.0f), 1);
+		// Set render states
+		Result = GetDevice()->SetVertexDeclaration(VertexDeclaration);
+		Result = GetDevice()->SetRenderState(D3DRS_ZENABLE,				FALSE);
+		Result = GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE,		FALSE);
+		Result = GetDevice()->SetRenderState(D3DRS_STENCILENABLE,		FALSE);
+		Result = GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE,		FALSE);
+		Result = GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE,	FALSE);
+		Result = GetDevice()->SetRenderState(D3DRS_CULLMODE,			D3DCULL_NONE);
 
-		// Pass the kernel and other variables to shaders
-		unsigned int Vector4Count = (unsigned int)ceilf(VerticalPassKernel->GetKernelWindowSize() / 4.0f); 
-		Result = GetDevice()->SetPixelShaderConstantF(9, (const float*)&ZEVector4((float)VerticalPassKernel->GetKernelWindowSize(), VerticalPassKernel->GetKernelWidth(), VerticalPassKernel->GetKernelCenter(), 0.0f),1);
-		Result = GetDevice()->SetPixelShaderConstantF(100, (const float*)VerticalPassKernel->GetKernel(),Vector4Count);
+		const int WindowSize = VerticalPassKernel.GetKernelWindowSize();
+		const ZEVector4* Kernel = VerticalPassKernel.GetKernel();
 
-		// Resize Vertically
-		GetDevice()->BeginScene();
-		Result = GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
-		GetDevice()->EndScene();
-
+		// pass the parameters to graphics device
+		GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(DestPixelWidth, DestPixelHeight, 0.0f, 0.0f), 1);
+		GetDevice()->SetPixelShaderConstantF(0, (const float*)Kernel, WindowSize);
 		
+		// Resize Vertically
+		Result = GetDevice()->BeginScene();
+		Result = GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+		Result = GetDevice()->EndScene();
+
 		// Clean up the unnecessary textures
 		ZED3D_RELEASE(Input);
+		ZED3D_RELEASE(DepthStencil);
+		GetDevice()->SetDepthStencilSurface(NULL);
 	}
 
 	
@@ -552,38 +413,21 @@ bool ZED3D9TextureResizer::Process()
 		Result = ReadBack->LockRect(&Rect, NULL, NULL);
 
 		for(size_t I = 0; I < DestInfo.Height; I++)
-			memcpy(DestInfo.Buffer + I * DestInfo.Pitch, (unsigned char*)Rect.pBits + I * Rect.Pitch, DestInfo.Width * Bpp);
+			memcpy((unsigned char*)DestInfo.Buffer + I * DestInfo.Pitch, (unsigned char*)Rect.pBits + I * Rect.Pitch, DestInfo.Width * Bpp);
 
 		Result = ReadBack->UnlockRect();
+
+		ZED3D_RELEASE(Output);
+		ZED3D_RELEASE(ReadBack);
 	}
 
-	// Final Cleanup
-	ZED3D_RELEASE(Input);
-	ZED3D_RELEASE(Output);
-	ZED3D_RELEASE(ReadBack);
-	
-	if(Filt)
-	{
-		delete Filt;
-		Filt = NULL;
-	}
-	if(HorizontalPassKernel)
-	{
-		delete HorizontalPassKernel;
-		HorizontalPassKernel = NULL;
-	}
-	if(VerticalPassKernel)
-	{
-		delete VerticalPassKernel;
-		VerticalPassKernel = NULL;
-	}
-	
+	// Restore the original depth stencil surface
+	GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)(GetModule()->GetFrameBufferViewPort()))->ZBuffer);
 	return true;
 }
 
 ZED3D9TextureResizer::ZED3D9TextureResizer()
 {
-	Renderer				= NULL;
 	VertexDeclaration		= NULL;
 	VertexShader			= NULL;
 	PixelShaderHorizontal	= NULL;
@@ -591,8 +435,29 @@ ZED3D9TextureResizer::ZED3D9TextureResizer()
 
 	memset(&SrcInfo, 0, sizeof(TextureInfo));
 	memset(&DestInfo, 0, sizeof(TextureInfo));
+
+	// Vertex declaration for screen aligned quad
+	D3DVERTEXELEMENT9 Declaration[] = 
+	{
+		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
+		{0,  12, D3DDECLTYPE_FLOAT2, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_TEXCOORD, 0},
+		D3DDECL_END()
+	};
+
+	GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
+
+	// Create and compile shaders
+	this->VertexShader = ZED3D9VertexShader::CreateShader("TextureResizeProcessor.hlsl", "vs_main_generic", 0, "vs_3_0");
+	this->PixelShaderHorizontal = ZED3D9PixelShader::CreateShader("TextureResizeProcessor.hlsl", "ps_main_horizontal", 0, "ps_3_0");
+	this->PixelShaderVertical = ZED3D9PixelShader::CreateShader("TextureResizeProcessor.hlsl", "ps_main_vertical", 0, "ps_3_0");
+
+	this->AutoFitMode = ZE_D3D9_FPO2_AUTO;
+	this->ResizeFilter = ZE_D3D9_RF_KAISER;
 }
 ZED3D9TextureResizer::~ZED3D9TextureResizer()
 {
-	Deinitialize();
+	ZED3D_RELEASE(VertexShader);
+	ZED3D_RELEASE(PixelShaderVertical);
+	ZED3D_RELEASE(PixelShaderHorizontal);
+	ZED3D_RELEASE(VertexDeclaration);
 }

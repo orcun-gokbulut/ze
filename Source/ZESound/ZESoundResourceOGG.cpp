@@ -39,6 +39,22 @@
 #include <vorbis/vorbisfile.h>
 #include <Memory.h>
 
+static ZEString ConstructResourcePath(const ZEString& Path)
+{
+	ZEString NewString = Path;
+
+	if (Path[0] == '\\' || Path[0] == '/')
+		NewString = NewString.SubString(1, Path.GetLength() - 1);
+
+	if (_stricmp("resources\\", Path.SubString(0, strlen("Resources\\") - 1)) != 0)
+	{
+		NewString.Insert(0, "resources\\");
+		return NewString;
+	}
+
+	return Path;
+}
+
 // MEMORY SEEK
 static size_t OggMemory_Read(void *ptr, size_t size, size_t nmemb, void *datasource)
 {
@@ -128,25 +144,28 @@ void ZESoundResourceOGG::Decode(void* Buffer, size_t SampleIndex, size_t Count)
 	}
 }
 
-ZESoundResource* ZESoundResourceOGG::LoadResource(const char* FileName)
+ZESoundResource* ZESoundResourceOGG::LoadResource(const ZEString& FileName)
 {
-	ZEResourceFile File;
-	if(!File.Open(FileName))
+	ZEString NewPath = ConstructResourcePath(FileName);
+
+	ZEFile* File = ZEFile::Open(NewPath);
+	if(File == NULL || !File->IsOpen())
 	{
-		zeError("Sound Resource OGG", "Can not open ogg file. (FileName : \"%s\")", FileName);
+		zeError("Sound Resource OGG", "Can not open ogg file. (FileName : \"%s\")", NewPath);
 		return NULL;
 	}
 
 	ZESoundResourceOGG* NewResource = new ZESoundResourceOGG();
 
-	File.Seek(0, ZE_SF_END);
-	NewResource->DataSize = File.Tell();
+	File->Seek(0, ZE_SF_END);
+	NewResource->DataSize = File->Tell();
 	NewResource->Data = new unsigned char[NewResource->DataSize];
-	File.Seek(0, ZE_SF_BEGINING);
-	File.Read(NewResource->Data, 1, NewResource->DataSize);
-	File.Close();
+	File->Seek(0, ZE_SF_BEGINING);
+	File->Read(NewResource->Data, 1, NewResource->DataSize);
+	File->Close();
+	delete File;
 
-	NewResource->SetFileName(FileName);	
+	NewResource->SetFileName(NewPath);	
 	
 	NewResource->MemoryCursor = 0;
 	
@@ -158,7 +177,7 @@ ZESoundResource* ZESoundResourceOGG::LoadResource(const char* FileName)
 
 	if(!ov_open_callbacks(NewResource, &NewResource->OggFile, NULL, 0, Callbacks)==0)
 	{
-		zeError("Sound Resource OGG", "Can not read ogg. (FileName : \"%s\")", FileName);
+		zeError("Sound Resource OGG", "Can not read ogg. (FileName : \"%s\")", NewPath);
 		delete NewResource;
 		return NULL;
 	}

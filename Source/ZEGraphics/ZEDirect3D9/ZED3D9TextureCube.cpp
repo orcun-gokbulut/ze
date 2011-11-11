@@ -33,10 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED3D9TextureCube.h"
-#include "ZED3D9Module.h"
-#include "ZED3D9CommonTools.h"
 #include "ZEError.h"
+#include "ZED3D9Module.h"
+#include "ZED3D9TextureCube.h"
+#include "ZED3D9CommonTools.h"
+
 
 ZED3D9TextureCube::ZED3D9TextureCube()
 {
@@ -133,7 +134,7 @@ bool ZED3D9TextureCube::Create(int EdgeLength, ZETexturePixelFormat PixelFormat,
 	return true;
 }
 
-bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch)
+bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, unsigned int* Pitch)
 {
 	D3DLOCKED_RECT Rect;
 	HRESULT hr = CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, 0, &Rect, NULL, 0);

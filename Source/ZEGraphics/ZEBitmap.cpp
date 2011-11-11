@@ -133,6 +133,11 @@ unsigned int ZEBitmap::GetBPP()
 	return PixelSize * 8;
 }
 
+unsigned int ZEBitmap::GetSize()
+{
+	return Height * Width * PixelSize; 
+}
+
 ZEPixelColor* ZEBitmap::GetPixels()
 {
 	return (ZEPixelColor*)Pixels;

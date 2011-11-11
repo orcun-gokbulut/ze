@@ -37,13 +37,16 @@
 #ifndef __ZE_CANVAS_H__
 #define __ZE_CANVAS_H__
 
-#include "ZEVertexTypes.h"
-#include "ZEVertexBuffer.h"
+
 #include "ZEDS/ZEArray.h"
+#include "ZEVertexTypes.h"
+#include "ZEDS/ZEString.h"
+#include "ZEVertexBuffer.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEQuaternion.h"
+
 
 class ZECanvasVertex
 {
@@ -134,8 +137,8 @@ class ZECanvas : public ZEDynamicVertexBuffer
 
 		ZEStaticVertexBuffer*			CreateStaticVertexBuffer();
 
-		bool							LoadFromFile(const char* FileName);
-		void							SaveToFile(const char* Filename);
+		bool							LoadFromFile(const ZEString& FileName);
+		void							SaveToFile(const ZEString& FileName);
 
 		virtual unsigned int			GetBufferSize();
 		virtual void*					GetVertexBuffer();

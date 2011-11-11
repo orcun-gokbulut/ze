@@ -71,6 +71,13 @@ unsigned int ZED3D9ViewPort::GetHeight()
 	return 0;
 }
 
+ZED3D9ViewPort::ZED3D9ViewPort()
+{
+	FrameBuffer = NULL;
+	ZBuffer = NULL;
+}
 
-
-
+ZED3D9ViewPort::~ZED3D9ViewPort()
+{
+	
+}

@@ -95,7 +95,7 @@ ZEPack::~ZEPack()
 }
 
 // Opens the cache file
-bool ZEPack::OpenPack(const char* PackFileName)
+bool ZEPack::Open(const char* PackFileName)
 {
 	//zeAssert(File && File->IsOpen(), "Cache is already open...");
 	
@@ -130,7 +130,7 @@ bool ZEPack::ClearPack()
 	}
 
 	// ReOpen the cache	
-	if(OpenPack(PackFileName))
+	if(Open(PackFileName))
 		return true;
 
 	return false;
@@ -670,3 +670,10 @@ bool ZEPack::OpenChunk(ZEPartialCompressedFile& PartialFile, const char* Identif
 	return true;
 }
 
+
+bool ZEPack::IsPack(ZEString& Path)
+{
+	// NOT IMPLEMENTED !!!!
+	return false;
+	//zeAssert(true, "NOT IMPLEMENTED !!!");
+}

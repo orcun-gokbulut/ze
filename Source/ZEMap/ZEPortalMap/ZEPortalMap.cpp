@@ -111,9 +111,9 @@ bool ZEPortalMap::Initialize()
 	if (GetInitialized())
 		return false;
 
-	if (!PortalMapFile.IsEmpty())
+	if (PortalMapFile != "")
 	{
-		ZEPortalMapResource* NewResource = ZEPortalMapResource::LoadSharedResource(PortalMapFile);
+		ZEPortalMapResource* NewResource = ZEPortalMapResource::LoadSharedResource(ZEString("Resources\\") + PortalMapFile);
 		if (NewResource != NULL)
 			LoadPortalResource(NewResource);
 		else
@@ -140,11 +140,17 @@ bool ZEPortalMap::SetMapFile(const ZEString& FileName)
 	PortalMapFile = FileName;
 
 	if (!GetInitialized())
-		return false;
+	{
+		PortalMapFile = FileName;
+		return true;
+	}
 
 	const ZEPortalMapResource* NewResource = ZEPortalMapResource::LoadSharedResource(PortalMapFile);
 	if (NewResource != NULL)
+	{
+		PortalMapFile = FileName;
 		LoadPortalResource(Resource);
+	}
 	else
 	{
 		zeError("ZEPortalMap", "Can not load ZEPortalMap file.");

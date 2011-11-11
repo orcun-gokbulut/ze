@@ -33,13 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETexture3DResource.h"
 #include "ZEError.h"
-#include "ZECore/ZEResourceManager.h"
-#include "ZEGraphicsModule.h"
 #include "ZETexture3D.h"
+#include "ZEGraphicsModule.h"
+#include "ZETexture3DResource.h"
+#include "ZECore/ZEResourceManager.h"
 
-#include <freeimage.h>
+
+static ZEString ConstructResourcePath(const ZEString& Path)
+{
+	ZEString NewString = Path;
+
+	if (Path[0] == '\\' || Path[0] == '/')
+		NewString = NewString.SubString(1, Path.GetLength() - 1);
+
+	if (_stricmp("resources\\", Path.SubString(0, strlen("Resources\\") - 1)) != 0)
+	{
+		NewString.Insert(0, "resources\\");
+		return NewString;
+	}
+
+	return Path;
+}
 
 const char* ZETexture3DResource::GetResourceType() const
 {
@@ -59,13 +74,33 @@ const ZETexture3D* ZETexture3DResource::GetTexture() const
 ZETexture3DResource::ZETexture3DResource()
 {
 	Texture = NULL;
-};
+}
 
 ZETexture3DResource::~ZETexture3DResource()
 {
 	if (Texture != NULL)
 		Texture->Destroy();
-};
+}
+
+void ZETexture3DResource::CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
+{
+	zeAssert(true, "NOT IMPLEMENTED YET");
+}
+
+ZETexture3DResource* ZETexture3DResource::LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
+{
+	zeAssert(true, "NOT IMPLEMENTED YET");
+
+	return NULL;
+}
+
+ZETexture3DResource* ZETexture3DResource::LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
+{
+	zeAssert(true, "NOT IMPLEMENTED YET");
+
+	return NULL;
+}
+
 
 
 

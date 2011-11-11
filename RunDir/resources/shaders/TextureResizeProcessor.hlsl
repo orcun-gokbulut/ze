@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureCacheChunkIdentifier.h
+ Zinek Engine - TextureResizeProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,39 +33,77 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+sampler2D 	TextureInput	 : register(s0);
+float2		PixelSize 		 : register(vs, c0);
+float2		Weights[21] 	 : register(ps, c0);
 
-#pragma once
-#ifndef __ZE_TEXTURE_CACHE_CHUNK_IDENTIFIER_H__
-#define __ZE_TEXTURE_CACHE_CHUNK_IDENTIFIER_H__
-
-#include "ZEGraphics/ZETextureOptions.h"
-#include "ZEFile/ZEFile.h"
-#include "ZEFile/ZEFileCache.h"
-#include "ZEDefinitions.h"
-
-#include <stdio.h>
-
-
-
-class ZETextureCacheChunkIdentifier : public ZECacheChunkIdentifier
+// Vertex Shader Input Struct
+struct VS_INPUT
 {
-	public:
+	float4 Position  : POSITION0;
+	float2 Texcoord  : TEXCOORD0;
 
-		char					ItemName[ZE_MAX_FILE_NAME_SIZE];
-		
-		ZETextureOptions		TextureOptions;
-		unsigned int			Offset;
-
-								ZETextureCacheChunkIdentifier();
-								ZETextureCacheChunkIdentifier( const char* ItemName, const ZETextureOptions &TextureOptions, unsigned int Offset = 0);
-		virtual					~ZETextureCacheChunkIdentifier();
-
-
-		virtual	size_t			GetDataSize()const;
-		virtual ZEDWORD			GetHash() const;
-		virtual size_t			Write(ZEFile* File) const;
-		virtual bool			Equal(ZEFile* File) const;
 };
 
+// Vertex Shader Output Struct
+struct VS_OUTPUT 
+{
+	float4 	Position   : POSITION0;
+	float2 	Texcoord   : TEXCOORD0;
+};
 
-#endif
+// Pixel Shader Input Struct
+struct PS_INPUT
+{
+	float2 	TexCoord  : TEXCOORD0;   
+};
+
+// Pixel Shader Output Struct
+struct PS_OUTPUT
+{
+	float4 PixelColor : COLOR0;
+};
+
+// Vertex Shader Main
+VS_OUTPUT vs_main_generic( VS_INPUT Input )
+{
+	VS_OUTPUT Output;
+
+	Output.Position = Input.Position;
+	Output.Texcoord = Input.Texcoord + 0.5f * PixelSize;
+
+	return Output;
+}
+
+// Pixel Shader Main horizontal
+// Samples in x axis
+PS_OUTPUT ps_main_horizontal( PS_INPUT Input )
+{
+	PS_OUTPUT Output;
+	
+	Output.PixelColor = (float4)0.0f;
+
+	for(int I = 0; I < 21; I++)
+	{
+		Output.PixelColor += Weights[I].x * tex2D(TextureInput, Input.TexCoord + float2(Weights[I].y, 0.0f));
+	}
+
+	return Output;
+}
+
+
+// Pixel Shader Main vertical
+// Samples in y axis
+PS_OUTPUT ps_main_vertical( PS_INPUT Input )
+{
+	PS_OUTPUT Output;
+	
+	Output.PixelColor = (float4)0.0f;
+   
+	for(int I = 0; I < 21; I++)
+	{
+		Output.PixelColor += Weights[I].x * tex2D(TextureInput, Input.TexCoord + float2(0.0f, Weights[I].y));
+	}
+
+	return Output;
+}

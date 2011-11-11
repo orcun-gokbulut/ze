@@ -33,17 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModelResource.h"
-#include "ZECore/ZEResourceManager.h"
 #include "ZEError.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEModelResource.h"
+#include "ZEModelFileFormat.h"
+#include "ZECore/ZEResourceManager.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
-#include "ZEModelFileFormat.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZETexture2DResource.h"
+
 #include <memory.h>
 #include <string.h>
 #include <float.h>
+
+static ZEString ConstructResourcePath(const ZEString& Path)
+{
+	ZEString NewString = Path;
+
+	if (Path[0] == '\\' || Path[0] == '/')
+		NewString = NewString.SubString(1, Path.GetLength() - 1);
+
+	if (_stricmp("resources\\", Path.SubString(0, strlen("Resources\\") - 1)) != 0)
+	{
+		NewString.Insert(0, "resources\\");
+		return NewString;
+	}
+
+	return Path;
+}
 
 ZEStaticVertexBuffer* ZEModelResourceMeshLOD::GetSharedVertexBuffer() const
 {
@@ -117,8 +134,11 @@ static const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArr
 		return NULL;
 
 	for (size_t I = 0; I < TextureResources.GetCount(); I++)
-		if (strnicmp(TextureResources[I]->GetFileName(), FileName, ZE_MDLF_MAX_FILENAME_SIZE) == 0)
+	{
+		//if (strnicmp(TextureResources[I]->GetFileName(), FileName, ZE_MDLF_MAX_FILENAME_SIZE) == 0)
+		if (TextureResources[I]->GetFileName() == ZEString(FileName))
 			return TextureResources[I]->GetTexture();
+	}
 
 	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(FileName);
 	if (NewTextureResource == NULL)
@@ -143,7 +163,7 @@ static const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArr
 #define ZE_MFSC_LIGHTMAP					1024
 #define ZE_MFSC_DISTORTIONMAP				2048
 
-static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
+static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 {
 	for (size_t I = 0; I < Model->Materials.GetCount(); I++)
 	{
@@ -210,7 +230,7 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEResourceFile* Resour
 	return true;
 }
 
-static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEResourceFile* ResourceFile)
+static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEFile* ResourceFile)
 {
 	ZEModelFilePhysicalBodyChunk BodyChunk;
 	ResourceFile->Read(&BodyChunk, sizeof(ZEModelFilePhysicalBodyChunk), 1);
@@ -365,7 +385,7 @@ static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 	}
 }
 
-static bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
+static bool ReadMeshesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 {
 	for (size_t I = 0; I < Model->Meshes.GetCount(); I++)
 	{
@@ -437,7 +457,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceF
 	return true;
 }
 
-static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEResourceFile* ResourceFile)
+static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEFile* ResourceFile)
 {
 	ZEModelFilePhysicalJointChunk JointChunk;
 	ResourceFile->Read(&JointChunk, sizeof(ZEModelFilePhysicalJointChunk), 1);
@@ -556,7 +576,7 @@ static void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, int 
 			ProcessBones(Model, &Model->Bones[I], I);
 }
 
-static bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
+static bool ReadBonesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 {
 	for (size_t I = 0; I < Model->Bones.GetCount(); I++)
 	{
@@ -601,7 +621,7 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFi
 	return true;
 }
 
-static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
+static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 {
 	for (size_t I = 0; I < Model->Animations.GetCount(); I++)
 	{
@@ -642,7 +662,7 @@ static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEResourceFile* Resou
 	return true;
 }
 
-static bool ReadModelFromFile(ZEModelResource* Model, ZEResourceFile* ResourceFile)
+static bool ReadModelFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 {
 	ZEModelFileHeaderChunk HeaderChunk;
 	ResourceFile->Read(&HeaderChunk, sizeof(ZEModelFileHeaderChunk), 1);
@@ -696,15 +716,17 @@ const char* ZEModelResource::GetResourceType() const
 }
 
 
-ZEModelResource* ZEModelResource::LoadSharedResource(const char* FileName)
+ZEModelResource* ZEModelResource::LoadSharedResource(const ZEString& FileName)
 {
-	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(FileName);
+	ZEString NewPath = ConstructResourcePath(FileName);
+
+	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(NewPath);
 	
 	if (Resource != NULL)
 		return Resource;
 	else
 	{
-		Resource = LoadResource(FileName);
+		Resource = LoadResource(NewPath);
 		if (Resource != NULL)
 		{
 			Resource->Shared = true;
@@ -718,39 +740,45 @@ ZEModelResource* ZEModelResource::LoadSharedResource(const char* FileName)
 	}
 }
 
-void ZEModelResource::CacheResource(const char* FileName)
+void ZEModelResource::CacheResource(const ZEString& FileName)
 {
-	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(FileName);
+	ZEString NewPath = ConstructResourcePath(FileName);
+
+	ZEModelResource* Resource = (ZEModelResource*)zeResources->GetResource(NewPath);
 	if (Resource != NULL)
 		Resource->Cached = true;
 	else
 	{
-		Resource = LoadResource(FileName);
+		Resource = LoadResource(NewPath);
 		Resource->Cached = true;
 		Resource->ReferenceCount = 0;
 		zeResources->AddResource(Resource);
 	}
 }
 
-ZEModelResource* ZEModelResource::LoadResource(const char* FileName)
+ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 {
-	ZEResourceFile ResourceFile;
-	if (ResourceFile.Open(FileName))
+	ZEString NewPath = ConstructResourcePath(FileName);
+
+	ZEFile* ResourceFile = ZEFile::Open(NewPath);
+	if (ResourceFile != NULL && ResourceFile->IsOpen())
 	{
 		ZEModelResource* NewResource = new ZEModelResource();
-		NewResource->SetFileName(FileName);
+		NewResource->SetFileName(NewPath);
 		NewResource->Cached = false;
 		NewResource->ReferenceCount = 0;
-		if (!ReadModelFromFile(NewResource, &ResourceFile))
+		if (!ReadModelFromFile(NewResource, ResourceFile))
 		{
 			zeError("Model Resource", "Can not load model file. (FileName : \"%s\")", FileName);
-			ResourceFile.Close();
+			ResourceFile->Close();
+			delete ResourceFile;
 			delete NewResource;
 			return NULL;
 		}
 		else
 		{
-			ResourceFile.Close();
+			ResourceFile->Close();
+			delete ResourceFile;
 			return NewResource;
 		}
 	}

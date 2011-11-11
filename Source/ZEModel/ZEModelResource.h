@@ -315,9 +315,9 @@ class ZEModelResource : public ZEResource
 
 		const char*								GetResourceType() const;
 		
-		static ZEModelResource*					LoadResource(const char* FileName);
-		static ZEModelResource*					LoadSharedResource(const char* FileName);
-		static void								CacheResource(const char* FileName);
+		static ZEModelResource*					LoadResource(const ZEString& FileName);
+		static ZEModelResource*					LoadSharedResource(const ZEString& FileName);
+		static void								CacheResource(const ZEString& FileName);
 };
 
 #endif

@@ -264,7 +264,7 @@ ZEPlayer::ZEPlayer()
 	Light->SetProjectionTexture(ZETexture2DResource::LoadSharedResource("flashlight.tga")->GetTexture());
 	Light->SetAttenuation(0.01f, 0.0f, 1.0f);
 	Light->SetIntensity(3.0f);
-	Light->SetRange(55.0f);
+	Light->SetRange(1000.0f);
 	Light->SetFOV(ZE_PI_2);
 	Light->SetAspectRatio(1.0f);
 	Light->SetCastsShadow(false);

@@ -33,29 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEScene.h"
 #include "ZEGame.h"
+#include "ZEScene.h"
+#include "ZEError.h"
 #include "ZEEntity.h"
+#include "ZEMath/ZERay.h"
+#include "ZEFile/ZEFile.h"
+#include "ZECore/ZECore.h"
+#include "ZESceneCuller.h"
+#include "ZEDrawParameters.h"
 #include "ZECompoundEntity.h"
 #include "ZECore/ZEConsole.h"
-#include "ZEError.h"
-#include "ZECore/ZECore.h"
+#include "ZEEntityProvider.h"
+#include "ZEGraphics/ZELight.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZESound/ZESoundModule.h"
+#include "ZEPhysics/ZEPhysicalWorld.h"
 #include "ZEGraphics/ZEFrameRenderer.h"
 #include "ZEGraphics/ZEShadowRenderer.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZELight.h"
-#include "ZEDrawParameters.h"
+#include "ZEMap/ZEPortalMap/ZEPortalMap.h"
 #include "ZESerialization/ZEFileSerializer.h"
 #include "ZESerialization/ZEFileUnserializer.h"
-#include "ZEMath/ZERay.h"
-#include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZESound/ZESoundModule.h"
-#include "ZEMap/ZEPortalMap/ZEPortalMap.h"
 #include "ZEMap/ZEPortalMap/ZEPortalMapResource.h"
-#include "ZEEntityProvider.h"
-#include "ZESceneCuller.h"
 
 #include <memory.h>
+
+static ZEString ConstructResourcePath(const ZEString& Path)
+{
+	ZEString NewString = Path;
+
+	if (Path[0] == '\\' || Path[0] == '/')
+		NewString = NewString.SubString(1, Path.GetLength() - 1);
+
+	if (_stricmp("resources\\", Path.SubString(0, strlen("Resources\\") - 1)) != 0)
+	{
+		NewString.Insert(0, "resources\\");
+		return NewString;
+	}
+
+	return Path;
+}
 
 bool ZEScene::Initialize()
 {
@@ -280,24 +297,24 @@ void ZEScene::Render(float ElapsedTime)
 	Culler.CullScene(this, &DrawParameters);
 }
 
-bool ZEScene::Save(const char* FileName)
+bool ZEScene::Save(const ZEString& FileName)
 {
-	zeLog("Scene", "Saving scene file \"%s\".", FileName);
+	zeLog("Scene", "Saving scene file \"%s\".", FileName.GetValue());
 
-	ZEFileSerializer Serializer;
-	if (Serializer.OpenFile(FileName))
+	ZEString NewPath = ConstructResourcePath(FileName);
+
+	ZEFile Serializer;
+	if (Serializer.Open(NewPath, ZE_FM_WRITE_ONLY, true))
 	{
 		ZEDWORD EntityCount = Entities.GetCount();
 		Serializer.Write(&EntityCount, sizeof(ZEDWORD), 1);
 		
 		Serializer.Write(&LastEntityId, sizeof(int), 1);
 
-
 		// Will be removed
 		char NameBuffer[ZE_MAX_NAME_SIZE];
 		memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
 		Serializer.Write(&NameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
-
 
 		for (size_t I = 0; I < Entities.GetCount(); I++)
 		{
@@ -310,15 +327,15 @@ bool ZEScene::Save(const char* FileName)
 			{
 				zeError("Scene", "Serialization of entity \"%s\" has failed.", Entities[I]->GetName());
 				zeError("Scene", "Serialization failed.");
-				Serializer.CloseFile();
+				Serializer.Close();
 				return false;
 			}
 		}
 
-		Serializer.CloseFile();
+		Serializer.Close();
 		
-		zeLog("Scene", "Scene file \"%s\" saved.", FileName);
-
+		zeLog("Scene", "Scene file \"%s\" saved.", NewPath.GetValue());
+		Serializer.Close();
 		return true;
 	}
 	else
@@ -328,13 +345,16 @@ bool ZEScene::Save(const char* FileName)
 	}
 }
 
-bool ZEScene::Load(const char* FileName)
+bool ZEScene::Load(const ZEString& FileName)
 {
-	zeLog("Scene", "Loading scene file \"%s\".", FileName);
+	zeLog("Scene", "Loading scene file \"%s\".", FileName.GetValue());
 
-	ZEFileUnserializer Unserializer;
+	ZEString NewPath = ConstructResourcePath(FileName);
+
+	ZEFile Unserializer;
 	char EntityTypeName[ZE_MAX_NAME_SIZE];
-	if (Unserializer.OpenFile(FileName))
+
+	if (Unserializer.Open(NewPath, ZE_FM_READ_ONLY, true))
 	{
 		ZEDWORD EntityCount;
 		Unserializer.Read(&EntityCount, sizeof(ZEDWORD), 1);
@@ -361,18 +381,20 @@ bool ZEScene::Load(const char* FileName)
 			{
 				zeError("Scene", "Unserialization of entity \"%s\" has failed.", Entities[I]->GetName());
 				zeError("Scene", "Unserialization failed.");
+				Unserializer.Close();
 				return false;
 			}
 
 			AddEntity(NewEntity);
 		}
 
-		zeLog("Scene", "Scene file \"%s\" has been loaded.", FileName);
+		zeLog("Scene", "Scene file \"%s\" has been loaded.", NewPath.GetValue());
+		Unserializer.Close();
 		return true;
 	}
 	else
 	{
-		zeError("Scene", "Can not open scene file. Unserialization failed. FileName : \"%s\"", FileName);
+		zeError("Scene", "Can not open scene file. Unserialization failed. FileName : \"%s\"", NewPath.GetValue());
 		return false;
 	}
 }

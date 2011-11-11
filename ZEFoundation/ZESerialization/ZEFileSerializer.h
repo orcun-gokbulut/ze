@@ -38,6 +38,7 @@
 #define __ZE_FILE_SERIALIZER_H__
 
 #include "ZESerializer.h"
+#include "ZETypes.h"
 
 class ZEFileSerializer : public ZESerializer
 {
@@ -45,7 +46,7 @@ class ZEFileSerializer : public ZESerializer
 		void*						File;
 
 	public:
-		virtual size_t				Write(const void* Buffer, size_t Size, size_t Count);
+		virtual ZEQWORD				Write(const void* Buffer, ZEQWORD Size, ZEQWORD Count);
 		bool						OpenFile(const char* FileName);
 		void						CloseFile();
 									

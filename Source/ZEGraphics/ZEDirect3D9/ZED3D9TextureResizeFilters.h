@@ -42,23 +42,23 @@
 float Sincf(float x);	// Sinc Function
 float Bessel0(float x);  // Bessel Function
 
-// Filter Base Class
-class Filter
+// ZEFilter Base Class
+class ZEFilter
 {
 	private:
 		const float		FilterWidth;
 
 	public:
-						Filter(float Width);
-		virtual			~Filter();
+						ZEFilter(float Width);
+		virtual			~ZEFilter();
 
 		float			GetFilterWidth() const;
 		float			SampleBox(float x, float Scale, int Samples) const;
 		virtual float	Process(float x) const = 0;
 };
 
-// Box(Mean) Filter
-class BoxFilter : public Filter
+// Box(Mean) ZEFilter
+class BoxFilter : public ZEFilter
 {
 	public:
 				BoxFilter();
@@ -68,8 +68,8 @@ class BoxFilter : public Filter
 		float	Process(float x) const;
 };
 
-// Triangle(Bilinear) Filter
-class TriangleFilter : public Filter
+// Triangle(Bilinear) ZEFilter
+class TriangleFilter : public ZEFilter
 {
 	public:
 				TriangleFilter();
@@ -79,8 +79,8 @@ class TriangleFilter : public Filter
 		float	Process(float x) const;
 };
 
-// Cubic(Hermite) Filter
-class CubicFilter : public Filter
+// Cubic(Hermite) ZEFilter
+class CubicFilter : public ZEFilter
 {
 	public:
 				CubicFilter();
@@ -90,8 +90,8 @@ class CubicFilter : public Filter
 		float	Process(float x) const;
 };
 
-// Gaussian Filter
-class GaussianFilter : public Filter
+// Gaussian ZEFilter
+class GaussianFilter : public ZEFilter
 {
 	private:
 		float Alpha;
@@ -104,8 +104,8 @@ class GaussianFilter : public Filter
 		float	Process(float x) const;
 };
 
-// Quadratic Filter
-class QuadraticFilter : public Filter
+// Quadratic ZEFilter
+class QuadraticFilter : public ZEFilter
 {
 	public:
 				QuadraticFilter();
@@ -115,8 +115,8 @@ class QuadraticFilter : public Filter
 		float	Process(float x) const;
 };
 
-// Kaiser Filter
-class KaiserFilter : public Filter
+// Kaiser ZEFilter
+class KaiserFilter : public ZEFilter
 {
 	private:
 		float Alpha;
@@ -129,8 +129,8 @@ class KaiserFilter : public Filter
 		virtual float	Process(float x) const;
 };
 
-// Mitchell Filter
-class MitchellFilter : public Filter
+// Mitchell ZEFilter
+class MitchellFilter : public ZEFilter
 {
 	private:
 		float P0, P2, P3;
@@ -143,41 +143,28 @@ class MitchellFilter : public Filter
 		float	Process(float x) const;
 };
 
-// 1D kernel which is used to precompute filter weights
-class Kernel1D
-{
-	private:
-		int		KernelWindowSize;
-		float	KernelWidth;
-		float*	KernelWeights;
 
-	public:
-		// Construct the kernel
-				Kernel1D(Filter& Filt, int InverseScale, int Samples = 32);
-				~Kernel1D();
+class ZEVector4;
 
-		float	GetValue(unsigned int Column) const;
-};
-
-// 1D Polyphase kernel
-class PolyPhaseKernel
+// 1D Kernel
+class ZEKernel
 {
 	private:
 		int				KernelWindowSize;
 		float			KernelWidth;
-		float*			KernelWeights;
+		ZEVector4*		KernelWeights;
 		float			Center;
 
 	public:
-		// Construct the kernel
-				PolyPhaseKernel(const Filter* Filt, unsigned int SrcLength, unsigned int DestLength, int Samples = 32);
-				~PolyPhaseKernel();
+					ZEKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int DestLength, int Samples, float PixelSize);
+					~ZEKernel();
 
-		float*	GetKernel();
-		int		GetKernelWindowSize();
-		float	GetKernelWidth();
-		float	GetKernelCenter();
-		float	GetValue(unsigned int x) const;
+		ZEVector4*	GetKernel() const;
+		int			GetKernelWindowSize() const;
+		float		GetKernelWidth() const;
+		float		GetKernelCenter() const;
+	
+		// Also add precalculated filters
 };
 
 #endif /* __ZE_D3D9_FILTERS_H__ */

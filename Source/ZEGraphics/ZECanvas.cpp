@@ -33,13 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath/ZEMathDefinitions.h"
-#include "ZECanvas.h"
 #include "ZEError.h"
-#include "ZEFile/ZEResourceFile.h"
+#include "ZECanvas.h"
+#include "ZEFile/ZEFile.h"
+#include "ZEMath/ZEMathDefinitions.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
 
 #include <stdio.h>
+
 
 #define ZECANVAS_ADDVERTEX(Vertex, Matrix, Pos, Nor, Texcrd)\
 	ZEMatrix4x4::Transform((Vertex).Position, (Matrix), (Pos));\
@@ -52,6 +53,23 @@
 	(Vertex).Normal = ZEVector3(0.0f, 0.0f, 0.0f);\
 	(Vertex).Texcoord = ZEVector2(0.0f, 0.0f);\
 	(Vertex).Color = Color
+
+
+static ZEString ConstructResourcePath(const ZEString& Path)
+{
+	ZEString NewString = Path;
+
+	if (Path[0] == '\\' || Path[0] == '/')
+		NewString = NewString.SubString(1, Path.GetLength() - 1);
+
+	if (_stricmp("resources\\", Path.SubString(0, strlen("Resources\\") - 1)) != 0)
+	{
+		NewString.Insert(0, "resources\\");
+		return NewString;
+	}
+
+	return Path;
+}
 
 ZEVertexDeclaration* ZECanvasVertex::VertexDeclaration = NULL;
 ZEVertexDeclaration* ZECanvasVertex::GetVertexDeclaration()
@@ -730,24 +748,26 @@ void ZECanvas::Clean()
 	Vertices.Clear();
 }
 
-bool ZECanvas::LoadFromFile(const char* FileName)
+bool ZECanvas::LoadFromFile(const ZEString& FileName)
 {
-	ZEResourceFile File;
-	if (!File.Open(FileName))
+	ZEString NewPath = ConstructResourcePath(FileName);
+
+	ZEFile* File = ZEFile::Open(NewPath);
+	if (File == NULL || !File->IsOpen())
 	{
-		zeError("Canvas", "Can not load canvas file. (FileName : \"%s\")", FileName);
+		zeError("Canvas", "Can not load canvas file. (FileName : \"%s\")", NewPath);
 		return false;
 	}
 	
 	
 	int VertexCount;
-	fscanf((FILE*)File.GetFileHandle(), "%d", &VertexCount);
+	fscanf((FILE*)File->GetFileHandle(), "%d", &VertexCount);
 
 	ZECanvasVertex* Vertices = this->Vertices.MassAdd(VertexCount);
 	size_t Index = 0;
-	while (!File.Eof())
+	while (!File->Eof())
 	{
-		fscanf((FILE*)File.GetFileHandle(), "%f %f %f %f %f %f %f %f", 
+		fscanf((FILE*)File->GetFileHandle(), "%f %f %f %f %f %f %f %f", 
 			 &Vertices[Index].Position.x,  &Vertices[Index].Position.y, &Vertices[Index].Position.z,
 			 &Vertices[Index].Normal.x, &Vertices[Index].Normal.y, &Vertices[Index].Normal.z,
 			 &Vertices[Index].Texcoord.x, &Vertices[Index].Texcoord.y);
@@ -761,7 +781,7 @@ bool ZECanvas::LoadFromFile(const char* FileName)
 	}
 
 	if (Index != VertexCount + 1 )
-		zeWarning("Canvas", "Corrupted canvas file. Vertex count is less than verties in the file. (FileName : \"%s\")", FileName);
+		zeWarning("Canvas", "Corrupted canvas file. Vertex count is less than verties in the file. (FileName : \"%s\")", NewPath);
 
 	return true;
 }

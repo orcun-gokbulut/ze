@@ -41,10 +41,14 @@ append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG
 
 add_subdirectory (ZED3D9PostProcessor)
 
+ze_add_source(ZED3D9ColorTransformProcessor.cpp	Sources)
+ze_add_source(ZED3D9ColorTransformProcessor.h	Sources)
 ze_add_source(ZED3D9CommonTools.cpp				Sources)
 ze_add_source(ZED3D9CommonTools.h				Sources)
 ze_add_source(ZED3D9ComponentBase.cpp			Sources)
 ze_add_source(ZED3D9ComponentBase.h				Sources)
+ze_add_source(ZED3D9EDProcessor.cpp				Sources)
+ze_add_source(ZED3D9EDProcessor.h				Sources)
 ze_add_source(ZED3D9FixedMaterial.cpp			Sources)
 ze_add_source(ZED3D9FixedMaterial.h				Sources)
 ze_add_source(ZED3D9FrameRenderer.cpp			Sources)
@@ -90,8 +94,6 @@ ze_add_source(ZED3D9VertexDeclaration.h			Sources)
 ze_add_source(ZED3D9ViewPort.cpp				Sources)
 ze_add_source(ZED3D9ViewPort.h					Sources)
 
-ze_add_source(ZED3D9EDProcessor.cpp				Sources)
-ze_add_source(ZED3D9EDProcessor.h					Sources)
 
 ze_add_library(ZEDirect3D9 
 	SOURCES ${Sources}

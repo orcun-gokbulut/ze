@@ -73,15 +73,13 @@ class ZED3D9TextureResizer : public ZED3D9ComponentBase
 {
 	struct TextureInfo
 	{
-		unsigned char*	Buffer;
+		void*			Buffer;
 		unsigned int	Pitch;
 		unsigned int	Width;
 		unsigned int	Height;
 	};
 
 	private:
-
-		ZED3D9FrameRenderer*			Renderer;
 
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 		ZED3D9VertexShader*				VertexShader;
@@ -102,9 +100,6 @@ class ZED3D9TextureResizer : public ZED3D9ComponentBase
 
 	public:
 
-		void							SetRenderer(ZEFrameRenderer* Renderer);
-		ZEFrameRenderer*				GetRenderer();
-
 		void							SetResizeFilter(ZED3D9TextureResizeFilter ResizeFilter);
 		ZED3D9TextureResizeFilter		GetResizeFilter();
 
@@ -114,8 +109,8 @@ class ZED3D9TextureResizer : public ZED3D9ComponentBase
 		void							OnDeviceLost();
 		void							OnDeviceRestored();
 
-		void							Initialize(unsigned char* DestData, unsigned int DestPitch, unsigned int DestWidth, unsigned int DestHegiht,
-													unsigned char* SrcData, unsigned int SrcPitch, unsigned int SrcWidth, unsigned int SrcHeight);
+		void							Initialize(void* DestData, unsigned int DestPitch, unsigned int DestWidth, unsigned int DestHegiht,
+													void* SrcData, unsigned int SrcPitch, unsigned int SrcWidth, unsigned int SrcHeight);
 		void							Deinitialize();
 
 		bool							Process();

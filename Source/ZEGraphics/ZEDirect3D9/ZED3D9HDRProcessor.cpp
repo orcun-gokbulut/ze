@@ -57,26 +57,28 @@ static float GausianFunction(float x, float y, float StandartDeviation)
 
 void FillGaussianKernel1D(float* Kernel, size_t KernelSize, float StandartDeviation)
 {
-	size_t HalfKernelSize = (KernelSize - 1) / 2;
-	for (size_t x = 0; x < KernelSize; x++)
+	int HalfKernelSize = (KernelSize - 1) / 2;
+	for (int x = 0; x < KernelSize; x++)
 	{
-		Kernel[4 * x] = (float)(x - HalfKernelSize);
-		Kernel[4 * x + 1] = GausianFunction((float)(x - HalfKernelSize), StandartDeviation);
+		Kernel[4 * x] = x - HalfKernelSize;
+		Kernel[4 * x + 1] = GausianFunction(x - HalfKernelSize, StandartDeviation);
 	}
 }
 
 static void FillGaussianKernel2D(float* Kernel, size_t KernelSize, float StandartDeviation)
 {
-	size_t HalfKernelSize = (KernelSize - 1) / 2;
-	for (size_t y = 0; y < KernelSize; y++)
+	int HalfKernelSize = (KernelSize - 1) / 2;
+	for (int y = 0; y < KernelSize; y++)
 	{
-		for (size_t x = 0; x < KernelSize; x++)
+		for (int x = 0; x < KernelSize; x++)
 		{
 			float* CurrentSample = &Kernel[4 * KernelSize * y + x];
-			CurrentSample[0] = (float)(x - HalfKernelSize);
-			CurrentSample[1] = (float)(y - HalfKernelSize);
-			CurrentSample[2] = GausianFunction((float)(x - HalfKernelSize), (float)(y - HalfKernelSize), StandartDeviation);
+			CurrentSample[0] = x - HalfKernelSize;
+			CurrentSample[1] = y - HalfKernelSize;
+			CurrentSample[2] = GausianFunction(x - HalfKernelSize, y - HalfKernelSize, StandartDeviation);
+			zeOutput("%lf ", CurrentSample[2]);
 		}
+		zeOutput("\r\n");
 	}
 }
 
@@ -112,46 +114,46 @@ void ZED3D9HDRProcessor::CreateRenderTargets()
 
 	if (Textures.DownSampled2xA == NULL)
 		Textures.DownSampled2xA = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	Textures.DownSampled2xA->Create(Input->GetWidth() / 2, Input->GetHeight() / 2, ZE_TPF_RGBA_INT32, true);
+	Textures.DownSampled2xA->Create(Input->GetWidth() / 2, Input->GetHeight() / 2, ZE_TPF_A8R8G8B8, true);
 
 	if (IntParameters.BloomPassCount > 0)
 	{	
 		if (Textures.DownSampled2xB == NULL)
 			Textures.DownSampled2xB = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled2xB->Create(Input->GetWidth() / 2, Input->GetHeight() / 2, ZE_TPF_RGBA_INT32, true);
+		Textures.DownSampled2xB->Create(Input->GetWidth() / 2, Input->GetHeight() / 2, ZE_TPF_A8R8G8B8, true);
 	}
 
 	if (IntParameters.BloomPassCount > 1)
 	{
 		if (Textures.DownSampled4xA == NULL)
 			Textures.DownSampled4xA = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled4xA->Create(Input->GetWidth() / 4, Input->GetHeight() / 4, ZE_TPF_RGBA_INT32, true);
+		Textures.DownSampled4xA->Create(Input->GetWidth() / 4, Input->GetHeight() / 4, ZE_TPF_A8R8G8B8, true);
 
 		if (Textures.DownSampled4xB == NULL)
 			Textures.DownSampled4xB = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled4xB->Create(Input->GetWidth() / 4, Input->GetHeight() / 4, ZE_TPF_RGBA_INT32, true);
+		Textures.DownSampled4xB->Create(Input->GetWidth() / 4, Input->GetHeight() / 4, ZE_TPF_A8R8G8B8, true);
 	}
 
 	if (IntParameters.BloomPassCount > 2)
 	{
 		if (Textures.DownSampled8xA == NULL)
 			Textures.DownSampled8xA = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled8xA->Create(Input->GetWidth() / 8, Input->GetHeight() / 8, ZE_TPF_RGBA_INT32, true);
+		Textures.DownSampled8xA->Create(Input->GetWidth() / 8, Input->GetHeight() / 8, ZE_TPF_A8R8G8B8, true);
 
 		if (Textures.DownSampled8xB == NULL)
 			Textures.DownSampled8xB = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled8xB->Create(Input->GetWidth() / 8, Input->GetHeight() / 8, ZE_TPF_RGBA_INT32, true);
+		Textures.DownSampled8xB->Create(Input->GetWidth() / 8, Input->GetHeight() / 8, ZE_TPF_A8R8G8B8, true);
 	}
 
 	if (IntParameters.BloomPassCount > 3)
 	{
 		if (Textures.DownSampled16xA == NULL)
 			Textures.DownSampled16xA = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled16xA->Create(Input->GetWidth() / 16, Input->GetHeight() / 16, ZE_TPF_RGBA_INT32, true);
+		Textures.DownSampled16xA->Create(Input->GetWidth() / 16, Input->GetHeight() / 16, ZE_TPF_A8R8G8B8, true);
 
 		if (Textures.DownSampled16xB == NULL)
 			Textures.DownSampled16xB = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Textures.DownSampled16xB->Create(Input->GetWidth() / 16, Input->GetHeight() / 16, ZE_TPF_RGBA_INT32, true);
+		Textures.DownSampled16xB->Create(Input->GetWidth() / 16, Input->GetHeight() / 16, ZE_TPF_A8R8G8B8, true);
 	}
 }
 
@@ -552,6 +554,7 @@ ZED3D9ViewPort* ZED3D9HDRProcessor::GetOutput()
 
 void ZED3D9HDRProcessor::Initialize()
 {
+	size_t ScreenWidth, ScreenHeight;
 	D3DVERTEXELEMENT9 Declaration[] = 
 	{
 		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},

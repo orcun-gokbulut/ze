@@ -33,21 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED3D9ShadowRenderer.h"
-#include "ZED3D9FrameRenderer.h"
+
+#include "ZEError.h"
+#include "ZED3D9Shader.h"
 #include "ZED3D9Module.h"
+#include "ZED3D9Texture2D.h"
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9TextureCube.h"
-#include "ZED3D9Texture2D.h"
-#include "ZED3D9Shader.h"
-#include "ZEGraphics/ZERenderOrder.h"
-#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZED3D9FrameRenderer.h"
+#include "ZED3D9ShadowRenderer.h"
 #include "ZEGraphics/ZEPointLight.h"
-#include "ZEGraphics/ZEOmniProjectiveLight.h"
-#include "ZEGraphics/ZEProjectiveLight.h"
-#include "ZEError.h"
-#include "ZEFile/ZEResourceFile.h"
+#include "ZEGraphics/ZERenderOrder.h"
 #include "ZEMath/ZEMathDefinitions.h"
+#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZEGraphics/ZEOmniProjectiveLight.h"
+
 
 ZED3D9VertexShader* OmniLightVS = NULL;
 ZED3D9PixelShader* OmniLightPS = NULL;

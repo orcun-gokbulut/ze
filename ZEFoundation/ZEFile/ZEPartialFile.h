@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEResourceFile.h
+ Zinek Engine - ZEPartialFile.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,62 +34,49 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_RESOURCE_FILE_H__
-#define __ZE_RESOURCE_FILE_H__
+#ifndef __ZE_PARTIAL_FILE_H__
+#define __ZE_PARTIAL_FILE_H__
 
-#include "ZESerialization/ZEUnserializer.h"
 #include "ZEFile.h"
 
-class ZEPartialResourceFile;
-class ZEResourceFile : public ZEUnserializer
+class ZEPartialFile : public ZEFile
 {
 	protected:
-		void*				File;
-		char				FileName[256];
-		size_t				FileCursor;
+		ZEQWORD					StartPosition;
+		ZEQWORD					EndPosition;
+		bool					IsEof;
+
+		ZEFile*					ParentFile;
 
 	public:
+		virtual bool			Open(const ZEString FilePath, ZEFileMode Mode, bool Binary);
+		virtual bool			Open(ZEFile* ParentFile, ZEQWORD Offset, ZEQWORD Size);
+		virtual void			Close();
 
-		virtual bool		IsOpen();
-		const char*			GetFileName();
-		void*				GetFileHandle();
+		virtual ZEQWORD			Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);
+		virtual ZEQWORD			ReadFormated(const char* Format, ...);
 
-		virtual bool		Open(const char* FileName);
-		virtual bool		Seek(size_t Offset, ZESeekFrom Origin);
-		virtual size_t		Read(void* Buffer, size_t Size, size_t Count);
-		virtual size_t		FormatedRead(void* Buffer, size_t BufferSize, void* Format, ...);
-		virtual size_t		Tell();
-		virtual void		Close();
-		virtual bool		Eof();
+		virtual ZEQWORD			Write(void* Buffer, ZEQWORD Size, ZEQWORD Count);
+		virtual ZEQWORD			WriteFormated(const char* Format, ...);
 
-		void				GetPartialResourceFile(ZEPartialResourceFile& PartialResourceFile, size_t StartPosition, size_t EndPosition);
-		
-		static bool			ReadFile(const char* FileName, void* Buffer, size_t BufferSize);
-		static bool			ReadTextFile(const char* FileName, char* Buffer, size_t BufferSize);
 
-							ZEResourceFile();
-							~ZEResourceFile();
+		/* If the seek operation tends to go beyond end position or below start position
+		the file cursor remains as it is and the return will be false */
+		virtual bool			Seek(ZEINT64 Offset, ZESeekFrom Origin);
+		virtual ZEQWORD			Tell();
+
+		virtual ZEQWORD			GetStartPosition();
+		virtual ZEQWORD			GetEndPosition();
+
+		virtual ZEQWORD			GetFileSize() const;
+		virtual bool			Eof();
+
+		virtual unsigned int	IncreaseReferanceCount();
+		virtual unsigned int	DecreaseReferanceCount();
+
+								ZEPartialFile();
+		virtual					~ZEPartialFile();
 };
 
-class ZEPartialResourceFile : public ZEResourceFile
-{
-	friend class ZEResourceFile;
-	protected:
-		size_t				StartPosition;
-		size_t				EndPosition;
-		bool				IsEof;
-
-	public:
-
-		virtual bool		Open(const char* FileName, size_t Offset, size_t Size);
-		virtual bool		Open(ZEFile* File, size_t Offset, size_t Size);
-		virtual void		Close();
-		virtual bool		Seek(size_t Offset, ZESeekFrom Origin);
-		virtual size_t		Read(void* Buffer, size_t Size, size_t Count);
-		virtual bool		Eof();
-		virtual size_t		Tell();
-
-							ZEPartialResourceFile();
-};
 
 #endif

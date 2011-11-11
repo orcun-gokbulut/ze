@@ -37,10 +37,12 @@
 #ifndef __ZE_UNSERIALIZER_H__
 #define __ZE_UNSERIALIZER_H__
 
+#include "ZETypes.h"
+
 class ZEUnserializer
 {
 	public:
-		virtual size_t				Read(void* Buffer, size_t Size, size_t Count) = 0;	
+		virtual ZEQWORD			Read(void* Buffer, ZEQWORD Size, ZEQWORD Count) = 0;	
 };
 
 #endif
