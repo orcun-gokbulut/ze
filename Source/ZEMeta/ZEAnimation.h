@@ -63,7 +63,6 @@ struct ZEPropertyAnimation
 	ZEArray<ZEPropertyAnimationKey>		Keys;
 };
 
-class ZEResourceFile;
 class ZEAnimation
 {
 	public:

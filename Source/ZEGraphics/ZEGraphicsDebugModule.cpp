@@ -60,8 +60,6 @@ bool ZEGraphicsDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
 	
-	
-
 	Player = ZEPlayer::CreateInstance();
 	Player->SetName("TestPlayer1");
 	Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));
@@ -77,6 +75,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	Map->SetName("TestMap1");
 	Scene->AddEntity(Map);
 
+	/*
 	ZEModel* Model = ZEModel::CreateInstance();
 	Model->SetModelFile("Zombies.ZEMODEL");
 	Model->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
@@ -84,10 +83,11 @@ bool ZEGraphicsDebugModule::Initialize()
 	Model->SetVisible(true);
 	Model->SetScale(ZEVector3(3.0f, 3.0f, 3.0f));
 	Scene->AddEntity(Model);
+	*/
 
 	PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
-	PointLight1->SetColor(ZEVector3(0.0f, 0.0f, 1.0f));
+	PointLight1->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	PointLight1->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight1->SetIntensity(4.0f);
 	PointLight1->SetRange(55.0f);
@@ -99,7 +99,7 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	PointLight2 = ZEPointLight::CreateInstance();
 	PointLight2->SetPosition(ZEVector3(-15.0f, 3.0f, -15.0f));
-	PointLight2->SetColor(ZEVector3(0.0f, 0.0f, 1.0f));
+	PointLight2->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	PointLight2->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight2->SetIntensity(4.0f);
 	PointLight2->SetRange(55.0f);
@@ -111,7 +111,7 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	PointLight3 = ZEPointLight::CreateInstance();
 	PointLight3->SetPosition(ZEVector3(-33.0f, 3.0f, -1.0f));
-	PointLight3->SetColor(ZEVector3(0.0f, 0.0f, 1.0f));
+	PointLight3->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	PointLight3->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight3->SetIntensity(4.0f);
 	PointLight3->SetRange(55.0f);
@@ -123,7 +123,7 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	PointLight4 = ZEPointLight::CreateInstance();
 	PointLight4->SetPosition(ZEVector3(-17.0f, 4.0f, 37.0f));
-	PointLight4->SetColor(ZEVector3(0.0f, 0.0f, 1.0f));
+	PointLight4->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	PointLight4->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight4->SetIntensity(4.0f);
 	PointLight4->SetRange(55.0f);
@@ -135,7 +135,7 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	PointLight5 = ZEPointLight::CreateInstance();
 	PointLight5->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
-	PointLight5->SetColor(ZEVector3(0.0f, 0.0f, 1.0f));
+	PointLight5->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	PointLight5->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight5->SetIntensity(4.0f);
 	PointLight5->SetRange(55.0f);
@@ -147,7 +147,7 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	PointLight6 = ZEPointLight::CreateInstance();
 	PointLight6->SetPosition(ZEVector3(-50.0f, 15.0f, -10.0f));
-	PointLight6->SetColor(ZEVector3(0.0f, 0.0f, 1.0f));
+	PointLight6->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	PointLight6->SetAttenuation(0.01f, 0.0f, 1.0f);
 	PointLight6->SetIntensity(7.0f);
 	PointLight6->SetRange(55.0f);
@@ -159,7 +159,7 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	OmniProjectiveLight0 = ZEOmniProjectiveLight::CreateInstance();
 	OmniProjectiveLight0->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
-	OmniProjectiveLight0->SetColor(ZEVector3(1.0f, 0.0f, 0.0f));
+	OmniProjectiveLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	OmniProjectiveLight0->SetAttenuation(0.01f, 0.0f, 1.0f);
 	OmniProjectiveLight0->SetIntensity(5.0f);
 	OmniProjectiveLight0->SetRange(40.0f);
@@ -188,7 +188,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	DirectionalLight0 = ZEDirectionalLight::CreateInstance();
 	DirectionalLight0->SetEnabled(true);
 	DirectionalLight0->SetRotation(ZEQuaternion(-ZE_PI_2, ZEVector3::UnitX));
-	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 0.8f));
+	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	DirectionalLight0->SetIntensity(3.0f);
 	DirectionalLight0->SetCastsShadow(false);
 	DirectionalLight0->SetVisible(false);

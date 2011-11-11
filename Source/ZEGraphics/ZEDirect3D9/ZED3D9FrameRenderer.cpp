@@ -932,12 +932,12 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		SSAAProcessor.SetInputDepth(GBuffer1);
 		SSAAProcessor.SetInputNormal(GBuffer2);
 		SSAAProcessor.SetInputColor(SSAAInputBuffer);
-		SSAAProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
+		SSAAProcessor.SetOutput(ViewPort);
 		SSAAProcessor.Process();
 
-		CTProcessor.SetInput(CTInputBuffer);
+	/*	CTProcessor.SetInput(CTInputBuffer);
 		CTProcessor.SetOutput(ViewPort);
-		CTProcessor.Process();
+		CTProcessor.Process();*/
 
 		Do2DPass();
 

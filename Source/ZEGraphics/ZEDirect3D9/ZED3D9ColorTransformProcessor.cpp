@@ -159,9 +159,11 @@ void ZED3D9ColorTransformProcessor::Process()
 	ZED3D9CommonTools::SetRenderTarget(0, OutputBuffer);
 	
 	// Send the color matrix
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ColorMatrix, 4);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / InputBuffer->GetWidth(), 1.0f / InputBuffer->GetHeight(), 0.0f, 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(1, (const float*)&ColorMatrix, 4);
 	
 	// Set input
+
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputBuffer, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 
 	// Draw

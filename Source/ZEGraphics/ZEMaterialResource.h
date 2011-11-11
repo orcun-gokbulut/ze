@@ -46,7 +46,6 @@
 
 struct ZETextureOptions;
 class ZETextureResource;
-class ZEResourceFile;
 
 class ZEMaterialResource : public ZEResource
 {

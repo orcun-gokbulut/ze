@@ -34,7 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 sampler2D 	TextureInput	 		: register(s0);
-float4x4	ColorTransformMatrix 	: register(ps, c0);
+float2 		PixelSize				: register(c0);
+float4x4	ColorTransformMatrix 	: register(ps, c1);
 
 // Vertex Shader Input Struct
 struct VS_INPUT
