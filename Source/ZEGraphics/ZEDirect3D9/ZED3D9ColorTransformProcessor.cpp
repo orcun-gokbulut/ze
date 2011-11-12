@@ -144,7 +144,7 @@ void ZED3D9ColorTransformProcessor::Initialize()
 	this->VertexShader = ZED3D9VertexShader::CreateShader("ColorTransformProcessor.hlsl", "vs_main", 0, "vs_3_0");
 	this->PixelShader = ZED3D9PixelShader::CreateShader("ColorTransformProcessor.hlsl", "ps_main", 0, "ps_3_0");
 
-	this->SetColorMatrix(&ZEColorMatrix::Sepia, 1.0f);
+	this->SetColorMatrix(&ZEColorMatrix::Identity, 1.0f);
 }
 
 void ZED3D9ColorTransformProcessor::Deinitialize()
