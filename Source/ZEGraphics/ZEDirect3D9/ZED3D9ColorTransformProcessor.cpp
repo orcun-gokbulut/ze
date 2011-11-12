@@ -48,6 +48,40 @@
 #include <d3d9.h>
 #include <stdlib.h>
 
+const ZEMatrix4x4 ZEColorMatrix::Sepia = ZEMatrix4x4(	0.1495f, 0.2935f, 0.057f, 0.5f,
+														0.1495f, 0.2935f, 0.057f, 0.25f,
+														0.1495f, 0.2935f, 0.057f, 0.0f,
+														0.0f,	 0.0f,	  0.0f,	  1.0f	);
+
+const ZEMatrix4x4 ZEColorMatrix::BlackWhite = ZEMatrix4x4(	0.299f, 0.587f, 0.184f, 0.0f,
+															0.299f, 0.587f, 0.184f, 0.0f,
+															0.299f, 0.587f, 0.184f, 0.0f,
+															0.0f,	0.0f,	0.0f,	1.0f	);
+
+const ZEMatrix4x4 ZEColorMatrix::Red = ZEMatrix4x4(	1.0f, 0.0f, 0.0f, 0.0f,
+													0.0f, 0.0f, 0.0f, 0.0f,
+													0.0f, 0.0f, 0.0f, 0.0f,
+													0.0f, 0.0f, 0.0f, 1.0f	);
+
+const ZEMatrix4x4 ZEColorMatrix::Green = ZEMatrix4x4(	0.0f, 0.0f, 0.0f, 0.0f,
+														0.0f, 1.0f, 0.0f, 0.0f,
+														0.0f, 0.0f, 0.0f, 0.0f,
+														0.0f, 0.0f, 0.0f, 1.0f	);
+
+const ZEMatrix4x4 ZEColorMatrix::Blue = ZEMatrix4x4(	0.0f, 0.0f, 0.0f, 0.0f,
+														0.0f, 0.0f, 0.0f, 0.0f,
+														0.0f, 0.0f, 1.0f, 0.0f,
+														0.0f, 0.0f, 0.0f, 1.0f	);
+
+const ZEMatrix4x4 ZEColorMatrix::Black = ZEMatrix4x4(	0.0f, 0.0f, 0.0f, 0.0f,
+														0.0f, 0.0f, 0.0f, 0.0f,
+														0.0f, 0.0f, 0.0f, 0.0f,
+														0.0f, 0.0f, 0.0f, 1.0f	);
+
+const ZEMatrix4x4 ZEColorMatrix::White = ZEMatrix4x4(	5.0f, 5.0f, 5.0f, 5.0f,
+														5.0f, 5.0f, 5.0f, 5.0f,
+														5.0f, 5.0f, 5.0f, 5.0f,
+														0.0f, 0.0f, 0.0f, 1.0f	);
 
 void ZED3D9ColorTransformProcessor::SetRenderer(ZEFrameRenderer* Renderer)
 {
@@ -79,14 +113,20 @@ ZED3D9ViewPort* ZED3D9ColorTransformProcessor::GetOutput()
 	return OutputBuffer;
 }
 
-void ZED3D9ColorTransformProcessor::SetColorMatrix(ZEMatrix4x4 Matrix)
+void ZED3D9ColorTransformProcessor::SetColorMatrix(const ZEMatrix4x4* Matrix, float BlendFactor)
 {
-	ColorMatrix = Matrix;
+	this->Matrix = (ZEMatrix4x4*)Matrix;
+	this->BlendFactor = BlendFactor;
 }
 
-ZEMatrix4x4& ZED3D9ColorTransformProcessor::GetColorMatrix()
+float ZED3D9ColorTransformProcessor::GetBlendFactor()
 {
-	return ColorMatrix;
+	return BlendFactor;
+}
+
+ZEMatrix4x4* ZED3D9ColorTransformProcessor::GetColorMatrix()
+{
+	return Matrix;
 }
 
 void ZED3D9ColorTransformProcessor::Initialize()
@@ -104,8 +144,7 @@ void ZED3D9ColorTransformProcessor::Initialize()
 	this->VertexShader = ZED3D9VertexShader::CreateShader("ColorTransformProcessor.hlsl", "vs_main", 0, "vs_3_0");
 	this->PixelShader = ZED3D9PixelShader::CreateShader("ColorTransformProcessor.hlsl", "ps_main", 0, "ps_3_0");
 
-	// Set the color matrix
-	SetColorMatrix(ZEMatrix4x4::Identity);
+	this->SetColorMatrix(&ZEColorMatrix::Sepia, 1.0f);
 }
 
 void ZED3D9ColorTransformProcessor::Deinitialize()
@@ -113,6 +152,9 @@ void ZED3D9ColorTransformProcessor::Deinitialize()
 	Renderer		= NULL;
 	InputBuffer		= NULL;
 	OutputBuffer	= NULL;
+
+	BlendFactor		= 0;
+	this->SetColorMatrix(&ZEColorMatrix::Identity, 1.0f);
 
 	ZED3D_RELEASE(PixelShader);
 	ZED3D_RELEASE(VertexShader);
@@ -156,15 +198,16 @@ void ZED3D9ColorTransformProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
-	ZED3D9CommonTools::SetRenderTarget(0, OutputBuffer);
 	
-	// Send the color matrix
+	
+	// Send the color matrix and pixel size
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(BlendFactor, 0.0f, 0.0f, 0.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(1, (const float*)Matrix, 4);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / InputBuffer->GetWidth(), 1.0f / InputBuffer->GetHeight(), 0.0f, 0.0f), 1);
-	GetDevice()->SetPixelShaderConstantF(1, (const float*)&ColorMatrix, 4);
-	
-	// Set input
 
-	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputBuffer, D3DTEXF_LINEAR, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
+	// Set input and output
+	ZED3D9CommonTools::SetRenderTarget(0, OutputBuffer);
+	ZED3D9CommonTools::SetTexture(6, (ZETexture2D*)InputBuffer, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 
 	// Draw
 	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
@@ -181,6 +224,8 @@ ZED3D9ColorTransformProcessor::ZED3D9ColorTransformProcessor()
 
 	InputBuffer			= NULL;
 	OutputBuffer		= NULL;
+
+	BlendFactor			= 0;
 	
 }
 

@@ -33,8 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-sampler2D 	TextureInput	 		: register(s0);
-float2 		PixelSize				: register(c0);
+sampler2D 	TextureInput	 		: register(s6);
+float2 		PixelSize				: register(vs, c0);
+float		BlendFactor			 	: register(ps, c0);
 float4x4	ColorTransformMatrix 	: register(ps, c1);
 
 // Vertex Shader Input Struct
@@ -68,9 +69,10 @@ struct PS_OUTPUT
 VS_OUTPUT vs_main( VS_INPUT Input )
 {
 	VS_OUTPUT Output;
-
-	Output.Position = Input.Position;
-	Output.Texcoord = Input.Texcoord + 0.5f * PixelSize;
+	
+	Output.Position = float4(sign(Input.Position).xy, 0.0f, 1.0f);
+	Output.Texcoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
+	Output.Texcoord.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
 
 	return Output;
 }
@@ -78,9 +80,11 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 PS_OUTPUT ps_main( PS_INPUT Input )
 {
 	PS_OUTPUT Output;
+	Output.PixelColor = (float4)0;
 	
-	Output.PixelColor = tex2D(TextureInput, Input.TexCoord);
-	Output.PixelColor = mul(ColorTransformMatrix, Output.PixelColor);
+	float4 SampleColor = tex2D(TextureInput, Input.TexCoord);
+	float4 TransformedColor = mul(ColorTransformMatrix, SampleColor);
+	Output.PixelColor = lerp(SampleColor, TransformedColor, BlendFactor);
 	
 	return Output;
 }

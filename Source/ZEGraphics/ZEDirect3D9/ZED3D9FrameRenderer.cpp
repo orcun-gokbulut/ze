@@ -921,23 +921,24 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		HDRProcessor.Process(ElaspedTime);	
 
 		// Edge detection pass
-		//EDProcessor.SetInputDepth(GBuffer1);
-		//EDProcessor.SetInputNormal(GBuffer2);
-		//EDProcessor.SetInputColor(EDInputBuffer);
-		//EDProcessor.SetOutput(ViewPort);
-		//EDProcessor.Process();
-		
+		/*
+		EDProcessor.SetInputDepth(GBuffer1);
+		EDProcessor.SetInputNormal(GBuffer2);
+		EDProcessor.SetInputColor(EDInputBuffer);
+		EDProcessor.SetOutput(ViewPort);
+		EDProcessor.Process();
+		*/
 		
 		//Anti aliasing pass
 		SSAAProcessor.SetInputDepth(GBuffer1);
 		SSAAProcessor.SetInputNormal(GBuffer2);
 		SSAAProcessor.SetInputColor(SSAAInputBuffer);
-		SSAAProcessor.SetOutput(ViewPort);
+		SSAAProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
 		SSAAProcessor.Process();
 
-	/*	CTProcessor.SetInput(CTInputBuffer);
+		CTProcessor.SetInput(CTInputBuffer);
 		CTProcessor.SetOutput(ViewPort);
-		CTProcessor.Process();*/
+		CTProcessor.Process();
 
 		Do2DPass();
 
