@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEAngle.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,38 +30,47 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEAngle.h"
 
-project (ZEFoundationAPI)
+#include <math.h>
 
-ze_set_project_folder("ZEFoundationAPI")
+float ZEAngle::ConvertToDegree(float Radian)
+{
+	return (Radian * 180/ZE_PI);
+}
 
-include_directories(
-	${PROJECT_SOURCE_DIR} 
-	${PROJECT_SOURCE_DIR}/../Include)
+float ZEAngle::ConvertToRadian(float Degree)
+{
+	return (Degree * ZE_PI/180);
+}
 
-include_directories (${PROJECT_SOURCE_DIR})
+float ZEAngle::RangeDegree(float Angle)
+{
+	Angle = fmod(Angle, 180);
+	if (Angle < 0.0)
+		Angle = 360 - Angle;
 
-add_subdirectory (ZEDS)
-add_subdirectory (ZEMath)
-add_subdirectory (ZESerialization)
-add_subdirectory (ZEStateMachine)
-add_subdirectory (ZEFile)
+	return Angle;
+}
 
-ze_add_source(ZETypes.h 			Sources Headers)
-ze_add_source(ZETypes.cpp 			Sources)
-ze_add_source(ZEError.h 			Sources Headers)
-ze_add_source(ZEError.cpp 			Sources)
-ze_add_source(ZESerialPort.h 		Sources Headers)
-ze_add_source(ZESerialPort.cpp 		Sources)
+float ZEAngle::RangeRadian(float Angle)
+{
+	Angle = fmod(Angle, ZE_PI);
+	if (Angle < 0.0)
+		Angle = ZE_PIx2 - Angle;
 
-ze_add_library(ZEFoundationAPI 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine
-	INSTALL
-	INSTALL_DESTINATION ZEFoundationAPI
-	INSTALL_COMPONENT ZESDK)
+	return Angle;
+}
+
+float ZEAngle::DistanceDegree(float Angle1, float Angle2)
+{
+	return RangeDegree(fabs(Angle1 - Angle2));
+}
+
+float ZEAngle::DistanceRadian(float Angle1, float Angle2)
+{
+	return RangeRadian(fabs(Angle1 - Angle2));
+}

@@ -385,16 +385,16 @@ ZETestSuiteAdd(ZEString)
 	ZETestItemAdd(UpperLower)
 	{
 		ZEString A = "LOWERCASE";
-		CHECK_EQUAL(A.ToLower(), "lowercase");
+		CHECK_EQUAL(A.Lower(), "lowercase");
 		
 		A = ">>*loWeR <<%12CaSe\t";
-		CHECK_EQUAL(A.ToLower(), ">>*lower <<%12case\t");
+		CHECK_EQUAL(A.Lower(), ">>*lower <<%12case\t");
 
 		A = "uppercase";
-		CHECK_EQUAL(A.ToUpper(), "UPPERCASE");
+		CHECK_EQUAL(A.Upper(), "UPPERCASE");
 
 		A = ">>*UpPeR <<%12CaSe\t";
-		CHECK_EQUAL(A.ToUpper(), ">>*UPPER <<%12CASE\t");
+		CHECK_EQUAL(A.Upper(), ">>*UPPER <<%12CASE\t");
 	}
 
 	ZETestItemAdd(Trim)

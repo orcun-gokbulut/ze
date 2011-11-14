@@ -37,6 +37,8 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEAABBox.cpp				Sources)
 ze_add_source(ZEAABBox.h				Sources Headers)
+ze_add_source(ZEAngle.cpp				Sources)
+ze_add_source(ZEAngle.h					Sources Headers)
 ze_add_source(ZEAABBoxTests.cpp			Tests)
 ze_add_source(ZEBSphere.cpp				Sources)
 ze_add_source(ZEBSphere.h				Sources Headers)

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEAngle.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,38 +30,46 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZE_MATH_DEFINITIONS_H__
+#define __ZE_MATH_DEFINITIONS_H__
 
-project (ZEFoundationAPI)
+#define ZE_ZERO_TRESHOLD		0.00000001 
 
-ze_set_project_folder("ZEFoundationAPI")
+#define ZE_PIx2				6.28318530717958647692f
+#define ZE_E				2.71828182845904523536f
+#define ZE_LOG2E			1.44269504088896340736f
+#define ZE_LOG10E			0.434294481903251827651f
+#define ZE_LN2				0.693147180559945309417f
+#define ZE_LN10				2.30258509299404568402f
+#define ZE_PI				3.14159265358979323846f		// 180  Degree
+#define ZE_PI_2				1.57079632679489661923f		// 90   Degree
+#define ZE_PI_4				0.78539816339744830962f		// 45   Degree 
+#define ZE_PI_8				0.39269908169872415481f		// 22.5 Degree 
+#define ZE_PI_12			0.26179938779914943654f		// 15	Degree 
+#define ZE_1_PI				0.318309886183790671538f
+#define ZE_2_PI				0.636619772367581343076f
+#define ZE_2_SQRTPI			1.12837916709551257390f
+#define ZE_SQRT2			1.41421356237309504880f
+#define ZE_SQRT1_2			0.707106781186547524401f
 
-include_directories(
-	${PROJECT_SOURCE_DIR} 
-	${PROJECT_SOURCE_DIR}/../Include)
+class ZEAngle
+{
+	public:
+		static float ConvertToDegree(float Radian);
+		static float ConvertToRadian(float Degree);
+		static float RangeDegree(float Angle);
+		static float RangeRadian(float Angle);
+		static float DistanceDegree(float Angle1, float Angle2);
+		static float DistanceRadian(float Angle1, float Angle2);
+};
 
-include_directories (${PROJECT_SOURCE_DIR})
 
-add_subdirectory (ZEDS)
-add_subdirectory (ZEMath)
-add_subdirectory (ZESerialization)
-add_subdirectory (ZEStateMachine)
-add_subdirectory (ZEFile)
+#endif
 
-ze_add_source(ZETypes.h 			Sources Headers)
-ze_add_source(ZETypes.cpp 			Sources)
-ze_add_source(ZEError.h 			Sources Headers)
-ze_add_source(ZEError.cpp 			Sources)
-ze_add_source(ZESerialPort.h 		Sources Headers)
-ze_add_source(ZESerialPort.cpp 		Sources)
 
-ze_add_library(ZEFoundationAPI 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine
-	INSTALL
-	INSTALL_DESTINATION ZEFoundationAPI
-	INSTALL_COMPONENT ZESDK)
+
+

@@ -229,7 +229,7 @@ ze_add_conditional_build(ZEToolSDK			TRUE TITLE "Build ZEToolAPI.")
 ze_add_conditional_build(Applications		TRUE TITLE "Build Applications.")
 ze_add_conditional_build(Demos				FALSE TITLE "Build Demos.")
 ze_add_conditional_build(Samples			FALSE TITLE "Build Samples.")
-
+add_subdirectory(ZEAIPrototype)
 if (ZEBUILD_UNIT_TESTS_ENABLE)
 	add_subdirectory (ZETest)
 endif()

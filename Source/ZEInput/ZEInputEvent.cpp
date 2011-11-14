@@ -145,7 +145,7 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 	if (ParserState != ZE_PS_INPUT_IDENTIFIER_END)
 		return false;
 
-	ZEString InputTypeLower = InputType.ToLower();
+	ZEString InputTypeLower = InputType.Lower();
 	if (InputTypeLower == "button")
 		Event.Type = ZE_IT_AXIS;
 	else if (InputTypeLower == "axis")
@@ -176,7 +176,7 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 	{
 		if (Event.Type == ZE_IT_AXIS)
 		{
-			ZEString InputModifierLower = InputModifier.ToLower();
+			ZEString InputModifierLower = InputModifier.Lower();
 			if (InputModifierLower == "negative")
 				Event.AxisSign = ZE_IAS_NEGATIVE;
 			else if (InputModifierLower == "positive")
@@ -189,7 +189,7 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 
 		if (Event.Type == ZE_IT_BUTTON)
 		{
-			ZEString InputModifierLower = InputModifier.ToLower();
+			ZEString InputModifierLower = InputModifier.Lower();
 			if (InputModifierLower == "pressed")
 				Event.ButtonState = ZE_IBS_PRESSED;
 			else if (InputModifierLower == "released")
@@ -202,7 +202,7 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 
 		if (Event.Type == ZE_IT_VECTOR2 || Event.Type == ZE_IT_VECTOR3 || Event.Type == ZE_IT_VECTOR4)
 		{
-			ZEString InputModifierLower = InputModifier.ToLower();
+			ZEString InputModifierLower = InputModifier.Lower();
 			if (InputModifierLower == "changed")
 				Event.VectorState = ZE_IVS_CHANGED;
 			else if (InputModifierLower == "always")
@@ -213,7 +213,7 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 
 		if (Event.Type == ZE_IT_QUATERNION)
 		{
-			ZEString InputModifierLower = InputModifier.ToLower();
+			ZEString InputModifierLower = InputModifier.Lower();
 			if (InputModifierLower == "changed")
 				Event.QuaternionState = ZE_IQS_CHANGED;
 			else if (InputModifierLower == "always")
@@ -236,7 +236,7 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 	
 	if (!InputIndex.IsEmpty())
 	{
-		Event.Index = InputIndex.ToInteger();
+		Event.Index = InputIndex.ToInt();
 	}
 
 	return false;

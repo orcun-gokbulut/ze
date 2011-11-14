@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZESerialPort.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,38 +30,46 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#ifndef __ZE_SERIAL_PORT__
+#define __ZE_SERIAL_PORT__
 
-project (ZEFoundationAPI)
+#include "ZETypes.h"
+#include "ZEDS/ZEString.h"
 
-ze_set_project_folder("ZEFoundationAPI")
+class ZESerialPort
+{
+	private:
+		void*				Handle;
+		bool				Opened;
+		ZEString			PortName;
+		ZEUINT32			BaudRate;
+		ZEUINT32			TimeOut;
+	
+	public:
+		bool				IsOpen();
+		bool				Open(const ZEString& PortName, ZEUINT32 BaudRate);
+		void				Close();
 
-include_directories(
-	${PROJECT_SOURCE_DIR} 
-	${PROJECT_SOURCE_DIR}/../Include)
+		const ZEString&		GetPortName();
+		ZEUINT32			GetBaudRate();
+		
+		void				SetTimeOut(ZEUINT32 Milliseconds);
+		ZEUINT32			GetTimeOut();
 
-include_directories (${PROJECT_SOURCE_DIR})
+		bool				Read(void* Buffer, size_t BufferSize, size_t &BytesRead);
+		bool				Write(const void* Data, size_t DataSize, size_t &BytesWritten);
 
-add_subdirectory (ZEDS)
-add_subdirectory (ZEMath)
-add_subdirectory (ZESerialization)
-add_subdirectory (ZEStateMachine)
-add_subdirectory (ZEFile)
+		bool				ReadPackage(void* Packet, size_t PackageSize);
+		bool				WritePackage(const void* Packet, size_t PackageSize);
 
-ze_add_source(ZETypes.h 			Sources Headers)
-ze_add_source(ZETypes.cpp 			Sources)
-ze_add_source(ZEError.h 			Sources Headers)
-ze_add_source(ZEError.cpp 			Sources)
-ze_add_source(ZESerialPort.h 		Sources Headers)
-ze_add_source(ZESerialPort.cpp 		Sources)
+		void				Clear();
 
-ze_add_library(ZEFoundationAPI 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS ZEMath ZEFile ZESerialization ZEStateMachine
-	INSTALL
-	INSTALL_DESTINATION ZEFoundationAPI
-	INSTALL_COMPONENT ZESDK)
+							ZESerialPort();
+							~ZESerialPort();
+};
+
+#endif
