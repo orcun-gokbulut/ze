@@ -36,8 +36,8 @@
 #ifndef __ZE_FLAGS_H__
 #define __ZE_FLAGS_H__
 
-template <typename Type>
-class ZEFlags
+template <typename Type = int>
+class ZEFlagsBase
 {
 	public:
 		Type Value;
@@ -84,7 +84,7 @@ class ZEFlags
 
 		}
 
-		inline void GetFlags(int Flags)
+		inline bool GetFlags(int Flags)
 		{
 			return (Value & Flags) == Flags;
 		}
@@ -99,26 +99,101 @@ class ZEFlags
 			return Value;
 		}
 
-		inline const Type& operator=(const Type& Value)
+		inline ZEFlagsBase<int> operator&(const Type& Other)
 		{
-			this->Value = Value;
+			return ZEFlagsBase<int>(this->Value & Other);		
+		}
+
+		inline ZEFlagsBase<int> operator&(const ZEFlagsBase<Type>& Other)
+		{
+			return ZEFlagsBase<int>(this->Value & Other->Value);
+		}
+
+		inline ZEFlagsBase<int>& operator&=(const Type& Other)
+		{
+			return this->Value &= Other;
+		}
+
+		inline ZEFlagsBase<int>& operator&=(const ZEFlagsBase<Type>& Other)
+		{
+			return this->Value &= Other->Value;
+		}
+
+		inline ZEFlagsBase<int> operator|(const Type& Other)
+		{
+			return ZEFlagsBase<int>(this->Value | Other);
+		}
+
+		inline ZEFlagsBase<int> operator|(const ZEFlagsBase<Type>& Other)
+		{
+			return ZEFlagsBase<int>(this->Value | Other->Value);
+		}
+
+		inline ZEFlagsBase<int>& operator|=(const Type& Other)
+		{
+			return this->Value |= Other;
+		}
+
+		inline ZEFlagsBase<int>& operator|=(const ZEFlagsBase<Type>& Other)
+		{
+			return this->Value |= Other->Value;
+		}
+
+		inline ZEFlagsBase<int> operator^(const Type& Other)
+		{
+			return ZEFlagsBase<int>(this->Value ^ Other);
+		}
+
+		inline ZEFlagsBase<int> operator^(const ZEFlagsBase<Type>& Other)
+		{
+			return ZEFlagsBase<int>(this->Value ^ Other->Value);
+		}
+
+		inline ZEFlagsBase<int>& operator^=(const Type& Other)
+		{
+			return this->Value ^= Other;
+		}
+
+		inline ZEFlagsBase<int>& operator^=(const ZEFlagsBase<Type>& Other)
+		{
+			return this->Value ^= Other->Value;
+		}
+
+		inline ZEFlagsBase<Type>& operator~()
+		{
+			return ZEFlagsBase<int>(~this->Value);
+		}
+
+		inline ZEFlagsBase<Type>& operator=(const Type& Other)
+		{
+			this->Value = Other;
+			return *this;
+		}
+		
+		inline ZEFlagsBase<Type>& operator=(const ZEFlagsBase<Type>& Other)
+		{
+			this->Value = Other->Value;
 			return *this;
 		}
 
-		inline ZEFlags()
+		inline ZEFlagsBase()
 		{
 			Value = 0;
 		}
 
-		inline ZEFlags(const Type& Value)
+		inline ZEFlagsBase(const Type& Value)
 		{
 			this->Value = Value;
 		}
 
-		inline ZEFlags(const ZEFlags& Value)
+		inline ZEFlagsBase(const ZEFlagsBase<Type>& Value)
 		{
 			this->Value = Value;
 		}
+};
+
+class ZEFlags : ZEFlagsBase<int>
+{
 };
 
 #endif
