@@ -36,7 +36,7 @@
 #include "ZEAISteering.h"
 #include "ZEAIActor.h"
 
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEAngle.h"
 
 void ZEAISteeringOutput::SetZero()
 {
@@ -131,21 +131,13 @@ ZEAIArriveSteering::ZEAIArriveSteering()
 	TimeToTarget = 0.1f;
 	SlowRadius = 10.0f;
 }
-float ClipRotation(float Rotation);
-/*{
-	Rotation = fmod(Rotation, ZE_PI);
-	if (Rotation < 0.0)
-		Rotation += ZE_PI;
-
-	return Rotation;
-}*/
 
 ZEAISteeringOutput ZEAIAlignSteering::Process(float ElapsedTime)
 {
 	ZEAISteeringOutput Output;
 	Output.SetZero();
 
-	float Rotation = ClipRotation(GetTarget()->GetRotation() - GetOwner()->GetRotation());
+	float Rotation = ZEAngle::RangeRadian(GetTarget()->GetRotation() - GetOwner()->GetRotation());
 	float RotationSize = abs(Rotation);
 
 	if (Rotation < TargetRadius)
@@ -157,7 +149,7 @@ ZEAISteeringOutput ZEAIAlignSteering::Process(float ElapsedTime)
 	else
 		TargetRotation = GetOwner()->GetMaxAngularAcceleration() * Rotation / RotationSize;
 
-	Output.AngularAcceleration = ClipRotation(GetTarget()->GetRotation() - GetOwner()->GetRotation());
+	Output.AngularAcceleration = ZEAngle::RangeRadian(GetTarget()->GetRotation() - GetOwner()->GetRotation());
 	Output.AngularAcceleration /= TimeToTarget;
 
 	if (Output.AngularAcceleration > GetOwner()->GetMaxAngularAcceleration())

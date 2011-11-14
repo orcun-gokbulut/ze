@@ -42,12 +42,8 @@
 #include "ZEAIMainWindow.h"
 
 #include "ZEMath/ZEMathDefinitions.h"
-float ClipRotation(float Rotation)
-{
-
-}
-
 #include <stdio.h>
+
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	int argc = 0;

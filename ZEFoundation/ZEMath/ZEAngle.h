@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_DEFINITIONS_H__
-#define __ZE_MATH_DEFINITIONS_H__
+#ifndef __ZE_ANGLE_H__
+#define __ZE_ANGLE_H__
 
 #define ZE_ZERO_TRESHOLD		0.00000001 
 

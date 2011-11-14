@@ -70,5 +70,5 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ze_add_executable(ZEAIProto 
 	SOURCES ${Sources} ${QtResourceFiles} ${QtUIFiles} ${QtMocFiles}
-	LIBS ZEEngineAPI QtCore4 QtGui4
+	LIBS ZEFoundationAPI QtCore4 QtGui4
 	WIN32)

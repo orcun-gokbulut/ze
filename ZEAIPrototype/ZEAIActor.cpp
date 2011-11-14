@@ -40,6 +40,7 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEAngle.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsEllipseItem>
@@ -47,8 +48,6 @@
 #include <QGraphicsItemGroup>
 
 using namespace Ui;
-
-float ClipRotation(float Rotation);
 
 void ZEAIActor::UpdateVisual()
 {
@@ -105,7 +104,7 @@ const ZEVector3& ZEAIActor::GetPosition()
 
 void ZEAIActor::SetRotation(float Rotation)
 {
-	this->Rotation = ClipRotation(Rotation);
+	this->Rotation = ZEAngle::RangeRadian(Rotation);
 }
 
 float ZEAIActor::GetRotation()
@@ -219,7 +218,7 @@ void ZEAIActor::Tick(float ElapsedTime)
 	Position += LinearVelocity * ElapsedTime;
 	Rotation += AngularVelocity * ElapsedTime;
 	
-	Rotation = ClipRotation(Rotation);
+	Rotation = ZEAngle::RangeRadian(Rotation);
 
 	LinearAcceleration = ZEVector3::Zero;
 	for (size_t I = 0; I < Steerings.GetCount(); I++)

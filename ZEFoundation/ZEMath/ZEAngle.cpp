@@ -58,9 +58,9 @@ float ZEAngle::RangeDegree(float Angle)
 
 float ZEAngle::RangeRadian(float Angle)
 {
-	Angle = fmod(Angle, ZE_PI);
-	if (Angle < 0.0)
-		Angle = ZE_PIx2 - Angle;
+	Angle = fmod(Angle, ZE_PIx2);
+	if (Angle > ZE_PI)
+		Angle = -(Angle - ZE_PI);
 
 	return Angle;
 }

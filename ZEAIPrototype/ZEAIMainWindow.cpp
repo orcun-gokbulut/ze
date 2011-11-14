@@ -39,10 +39,10 @@
 #include "ZEAIActor.h"
 #include "ZEAISteering.h"
 #include "ZEDNodeEditorMinimap.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEAngle.h"
+
 #include <QGraphicsItem>
 #include <QTimer>
-
 
 float frand(float Range)
 {
@@ -55,6 +55,7 @@ void ZEAIMainWindow::Update()
 	Frame++;
 	Time += Timer->interval();
 	
+	Actors[0]->SetRotation(Frame / 100.0f);
 	Form->lblFrame->setText(QString().setNum(Frame));
 	Form->lblTime->setText(QString().setNum(Time));
 	for (size_t I = 0; I < Actors.GetCount(); I++)
