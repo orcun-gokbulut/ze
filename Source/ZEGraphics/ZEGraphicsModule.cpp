@@ -68,15 +68,16 @@ ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 
 	switch(TextureQuality)
 	{
+		default:
 		case ZE_TQ_VERY_HIGH:
 			return &VeryHigh;
 			break;
+		
 		
 		case ZE_TQ_HIGH:
 			return &High;
 			break;
 		
-		default:
 		case ZE_TQ_NORMAL:
 			return &Normal;
 			break;

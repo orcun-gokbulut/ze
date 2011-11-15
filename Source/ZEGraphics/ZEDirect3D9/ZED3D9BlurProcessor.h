@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDebugModule.h
+ Zinek Engine - ZED3D9BlurProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,54 +33,69 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
 #pragma once
-#ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
-#define __ZE_GRAPHICS_DEBUG_MODULE_H__
+#ifndef __ZE_D3D9_BLUR_PROCESSOR_H__
+#define __ZE_D3D9_BLUR_PROCESSOR_H__
 
-#include "ZECore/ZEApplicationModule.h"
+#include "ZED3D9ComponentBase.h"
 
-class ZEPlayer;
-class ZEPointLight;
-class ZEOmniProjectiveLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZECanvasBrush;
-class ZEModel;
-class ZEPortalMap;
-class ZESkyBrush;
+class ZEKernel;
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
+class ZED3D9Texture2D;
+class ZETexture2D;
+class ZED3D9ViewPort;
+class ZEFrameRenderer;
+class ZED3D9FrameRenderer;
+class ZETexture2DResource;
 
-class ZEGraphicsDebugModule : public ZEApplicationModule
+class ZED3D9BlurProcessor : public ZED3D9ComponentBase
 {
 	private:
-		ZEPlayer*				Player;
-		ZEPointLight*			PointLight1;
-		ZEPointLight*			PointLight2;
-		ZEPointLight*			PointLight3;
-		ZEPointLight*			PointLight4;
-		ZEPointLight*			PointLight5;
-		ZEPointLight*			PointLight6;
-		ZEProjectiveLight*		ProjectiveLight0;
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
-		ZEDirectionalLight*		DirectionalLight0;
+		float							BlurFactor;
+		ZEKernel*						KernelVertical;
+		ZEKernel*						KernelHorizontal;
+		
+		ZED3D9Texture2D*				TempTexture;
 
-		ZESkyBrush*				SkyBrush;
+		ZED3D9FrameRenderer*			Renderer;
+		ZED3D9Texture2D*				InputBuffer;
+		ZED3D9ViewPort*					OutputBuffer;
 
-		ZEPortalMap*			Map;
-		ZEModel*				Model;
+		ZED3D9PixelShader*				PixelShaderHorizontal;
+		ZED3D9PixelShader*				PixelShaderVertical;
+		ZED3D9VertexShader*				VertexShader;
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
+		void							CreateTempTexture();
+		void							CreateKernels();
+		
 	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Process(float ElapsedTime);
+		void							SetBlurFactor(float BlurFactor);
+		float							GetBlurFactor();
+		ZEKernel*						GetKernelVertical();
+		ZEKernel*						GetKernelHorizontal();
+		
+		void							SetRenderer(ZEFrameRenderer* Renderer);
+		ZEFrameRenderer*				GetRenderer();
 
+		void							SetInput(ZETexture2D* Texture);
+		ZETexture2D*					GetInput();
 
-								ZEGraphicsDebugModule();
-		virtual					~ZEGraphicsDebugModule();
+		void							SetOutput(ZED3D9ViewPort* Texture);
+		ZED3D9ViewPort*					GetOutput();
+		
+		void							Initialize();
+		void							Deinitialize();
+
+		void							OnDeviceLost();
+		void							OnDeviceRestored();
+
+		void							Process();
+
+										ZED3D9BlurProcessor();
+										~ZED3D9BlurProcessor();
 };
 
-#endif
-
-
-
-
-
+#endif	/* __ZE_D3D9_BLUR_PROCESSOR_H__ */

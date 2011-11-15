@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDebugModule.h
+ Zinek Engine - BlurProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,54 +33,71 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
-#define __ZE_GRAPHICS_DEBUG_MODULE_H__
+sampler2D 	TextureInput	: register(s6);
+float2 		PixelSize		: register(vs, c0);
+float2		Weights[7] 		: register(ps, c0);
 
-#include "ZECore/ZEApplicationModule.h"
-
-class ZEPlayer;
-class ZEPointLight;
-class ZEOmniProjectiveLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZECanvasBrush;
-class ZEModel;
-class ZEPortalMap;
-class ZESkyBrush;
-
-class ZEGraphicsDebugModule : public ZEApplicationModule
+// Vertex Shader Input Struct
+struct VS_INPUT
 {
-	private:
-		ZEPlayer*				Player;
-		ZEPointLight*			PointLight1;
-		ZEPointLight*			PointLight2;
-		ZEPointLight*			PointLight3;
-		ZEPointLight*			PointLight4;
-		ZEPointLight*			PointLight5;
-		ZEPointLight*			PointLight6;
-		ZEProjectiveLight*		ProjectiveLight0;
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
-		ZEDirectionalLight*		DirectionalLight0;
+	float4 Position  : POSITION0;
+	float2 Texcoord  : TEXCOORD0;
 
-		ZESkyBrush*				SkyBrush;
-
-		ZEPortalMap*			Map;
-		ZEModel*				Model;
-
-	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Process(float ElapsedTime);
-
-
-								ZEGraphicsDebugModule();
-		virtual					~ZEGraphicsDebugModule();
 };
 
-#endif
+// Vertex Shader Output Struct
+struct VS_OUTPUT 
+{
+	float4 	Position   : POSITION0;
+	float2 	Texcoord   : TEXCOORD0;
+};
 
+// Pixel Shader Input Struct
+struct PS_INPUT
+{
+	float2 	TexCoord  : TEXCOORD0;   
+};
 
+// Pixel Shader Output Struct
+struct PS_OUTPUT
+{
+	float4 PixelColor : COLOR0;
+};
 
+// Vertex Shader Main
+VS_OUTPUT vs_main( VS_INPUT Input )
+{
+	VS_OUTPUT Output;
+	
+	Output.Position = float4(sign(Input.Position).xy, 0.0f, 1.0f);
+	Output.Texcoord.x = 0.5f * (1.0f + Output.Position.x + PixelSize.x);
+	Output.Texcoord.y = 0.5f * (1.0f - Output.Position.y + PixelSize.y);
 
+	return Output;
+}
 
+PS_OUTPUT ps_main_horizontal( PS_INPUT Input )
+{
+	PS_OUTPUT Output;
+	Output.PixelColor = (float4)0.0f;
+
+	for (int I = 0; I < 7; I++)
+	{
+		Output.PixelColor += Weights[I].x * tex2D(TextureInput, Input.TexCoord + float2(Weights[I].y, 0.0f));
+	}
+	
+	return Output;
+}
+
+PS_OUTPUT ps_main_vertical( PS_INPUT Input )
+{
+	PS_OUTPUT Output;
+	Output.PixelColor = (float4)0.0f;
+   
+	for(int I = 0; I < 7; I++)
+	{
+		Output.PixelColor += Weights[I].x * tex2D(TextureInput, Input.TexCoord + float2(0.0f, Weights[I].y));
+	}
+
+	return Output;
+}

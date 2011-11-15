@@ -176,8 +176,6 @@ void ZED3D9TextureResizer::OnDeviceRestored()
 	// Empty
 }
 
-
-
 bool ZED3D9TextureResizer::Process()
 {
 	HRESULT Result;
@@ -256,7 +254,6 @@ bool ZED3D9TextureResizer::Process()
 	// There is only one resize filter for now
 	KaiserFilter Filter(5.0f);
 	Filt = (ZEFilter*)&Filter;
-
 
 	if(SrcInfo.Width != DestInfo.Width)
 	{

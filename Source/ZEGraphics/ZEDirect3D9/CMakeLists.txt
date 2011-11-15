@@ -41,6 +41,8 @@ append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG
 
 add_subdirectory (ZED3D9PostProcessor)
 
+ze_add_source(ZED3D9BlurProcessor.cpp			Sources)
+ze_add_source(ZED3D9BlurProcessor.h				Sources)
 ze_add_source(ZED3D9ColorTransformProcessor.cpp	Sources)
 ze_add_source(ZED3D9ColorTransformProcessor.h	Sources)
 ze_add_source(ZED3D9CommonTools.cpp				Sources)

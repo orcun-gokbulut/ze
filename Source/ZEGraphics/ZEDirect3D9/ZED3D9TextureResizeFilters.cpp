@@ -209,6 +209,11 @@ GaussianFilter::GaussianFilter(float Width) : ZEFilter(Width)
 
 }
 
+GaussianFilter::GaussianFilter(float Width, float Alpha) : ZEFilter(Width)
+{
+	this->Alpha = Alpha;
+}
+
 GaussianFilter::~GaussianFilter()
 {
 

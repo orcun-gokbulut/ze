@@ -222,12 +222,6 @@ bool ZEPartialFile::Open(ZEFile* ParentFile, ZEQWORD Offset, ZEQWORD Size)
 
 	this->StartPosition = ParentFile->GetStartPosition() + Offset;
 	this->EndPosition	= StartPosition + Size;
-
-	if (StartPosition < ParentFile->GetStartPosition())
-		zeWarning("Partial File", "Possible Error : Start position is smaller than the parent file's: \"%s\".", ParentFile->GetFilePath().GetValue());
-	if (EndPosition > ParentFile->GetEndPosition())
-		zeWarning("Partial File", "Possible Error : End position is Greater than the parent file's: \"%s\".", ParentFile->GetFilePath().GetValue());
-
 		
 	this->FileType			= ZE_FT_PARTIAL;
 	this->File				= ParentFile->GetFileHandle();

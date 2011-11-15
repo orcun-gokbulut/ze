@@ -37,24 +37,28 @@
 #ifndef __ZE_D3D9_FRAME_RENDERER_H__
 #define __ZE_D3D9_FRAME_RENDERER_H__
 
-#include "ZEGraphics/ZEFrameRenderer.h"
-#include "ZED3D9ComponentBase.h"
+
+#include "ZED3D9EDProcessor.h"
 #include "ZED3D9HDRProcessor.h"
+#include "ZED3D9ComponentBase.h"
+#include "ZED3D9BlurProcessor.h"
 #include "ZED3D9SSAOProcessor.h"
 #include "ZED3D9SSAAProcessor.h"
-#include "ZED3D9EDProcessor.h"
+#include "ZEGraphics/ZEFrameRenderer.h"
 #include "ZED3D9ColorTransformProcessor.h"
 
-class ZED3D9ViewPort;
+
 class ZELight;
 class ZEPointLight;
-class ZEDirectionalLight;
+class ZED3D9ViewPort;
+class ZED3D9Texture2D;
+class ZED3D9PixelShader;
 class ZEProjectiveLight;
+class ZEDirectionalLight;
+class ZED3D9VertexShader;
 class ZEOmniProjectiveLight;
 class ZED3D9StaticVertexBuffer;
-class ZED3D9PixelShader;
-class ZED3D9VertexShader;
-class ZED3D9Texture2D;
+
 
 class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 {
@@ -66,23 +70,22 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 
 		ZED3D9ViewPort*						ViewPort;
 
+		ZED3D9Texture2D*					ABuffer;
 		ZED3D9Texture2D* 					GBuffer1;
 		ZED3D9Texture2D*					GBuffer2;
 		ZED3D9Texture2D*					GBuffer3;
 		ZED3D9Texture2D*					LBuffer1;
 		ZED3D9Texture2D*					LBuffer2;
 		ZED3D9Texture2D*					SSAOBuffer;
+		ZED3D9Texture2D*					CTInputBuffer;
 		ZED3D9Texture2D*					EDInputBuffer;
 		ZED3D9Texture2D*					SSAAInputBuffer;
-		ZED3D9Texture2D*					CTInputBuffer;
-		ZED3D9Texture2D*					ABuffer;
-
+		ZED3D9Texture2D*					BlurInputBuffer;
 		
 		ZED3D9SSAOProcessor					SSAOProcessor;
 		ZED3D9SSAAProcessor					SSAAProcessor;
 		
 		//ZED3D9EDProcessor					EDProcessor;
-
 		ZESmartArray<ZERenderOrder>			RenderList;
 
 		ZECamera*							Camera;
@@ -132,7 +135,9 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 	public:
 
 		ZED3D9HDRProcessor					HDRProcessor;
+		ZED3D9BlurProcessor					BlurProcessor;
 		ZED3D9ColorTransformProcessor		CTProcessor;
+		
 
 		virtual void						SetViewPort(ZEViewPort* ViewPort);
 		virtual ZEViewPort*					GetViewPort();

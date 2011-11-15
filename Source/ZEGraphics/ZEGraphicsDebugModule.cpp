@@ -33,33 +33,44 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGraphicsDebugModule.h"
-
 #include "ZEGame/ZEGame.h"
-#include "ZEGame/ZEPlayer.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZEPointLight.h"
-#include "ZEGraphics/ZEDirectionalLight.h"
-#include "ZEGraphics/ZEOmniProjectiveLight.h"
-#include "ZEGraphics/ZEProjectiveLight.h"
-#include "ZEGraphics/ZETextureCubeResource.h"
-#include "ZEGraphics/ZETexture2DResource.h"
-#include "ZEGame/ZECanvasBrush.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
-#include "ZEGame/ZEEntityProvider.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZEGame/ZEPlayer.h"
 #include "ZEModel/ZEModel.h"
-#include "ZEMath/ZEMathDefinitions.h"
 #include "ZEGame/ZESkyBrush.h"
+#include "ZEGraphics/ZECamera.h"
+#include "ZEGame/ZECanvasBrush.h"
+#include "ZEGraphicsDebugModule.h"
+#include "ZEGraphics/ZEPointLight.h"
+#include "ZEGame/ZEEntityProvider.h"
+#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZEGraphics/ZEDirectionalLight.h"
 #include "ZEMap/ZEPortalMap/ZEPortalMap.h"
+#include "ZEGraphics/ZETexture2DResource.h"
+#include "ZEGraphics/ZEOmniProjectiveLight.h"
+#include "ZEGraphics/ZETextureCubeResource.h"
+
 #include <stdlib.h>
 
 bool ZEGraphicsDebugModule::Initialize()
 {
 	ZEScene* Scene = zeGame->GetScene();
 	
+	SkyBrush = ZESkyBrush::CreateInstance();
+	SkyBrush->SetVelocity(ZEVector3(3.0f, 3.0f, 3.0f));
+	SkyBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	SkyBrush->SetSkyBrightness(1.0f);
+	SkyBrush->SetSkyColor(ZEVector3(5.0f, 0.0f, 0.0f));
+	SkyBrush->SetSkyTexture("c.tga");
+	SkyBrush->SetName("TheSky");
+	SkyBrush->SetVisible(true);
+	SkyBrush->SetEnabled(true);
+	Scene->AddEntity(SkyBrush);
+
 	Player = ZEPlayer::CreateInstance();
 	Player->SetName("TestPlayer1");
 	Player->SetPosition(ZEVector3(0.0f, 0.0f, -1.0f));

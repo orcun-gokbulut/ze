@@ -72,7 +72,7 @@ class ZETextureLoader
 		static bool			IsZETextureFile(ZEFile* File);
 
 		static bool			LoadFromImageFile(ZEFile* File, ZETextureData* TextureData);
-		static bool			SaveAsImageFile(ZEFile* File, ZETextureData* TextureData);
+		static bool			SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, unsigned int Surface = 0, unsigned int Mipmap = 0);
 								
 		static bool			Read(ZEFile* File, ZETextureData* TextureData);
 		static bool			Write(ZEFile* File, ZETextureData* TextureData);

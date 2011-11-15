@@ -156,7 +156,7 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 
 // Saves a ZETexture data to specified file in ".tga" format
 // Only saves mipmap level 0 of surface 0
-bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData)
+bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, unsigned int Surface, unsigned int Mipmap)
 {
 	if(TextureData->GetPixelFormat() != ZE_TPF_A8R8G8B8)
 	{
@@ -177,14 +177,14 @@ bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData)
 
 	unsigned int PixelSize	= 4;
 	unsigned int BPP		= PixelSize * 8;
-	unsigned int RowSize	= TextureData->GetMipmapRowSize(0, 0);
-	unsigned int RowCount	= TextureData->GetMipmapRowCount(0, 0);
+	unsigned int RowSize	= TextureData->GetMipmapRowSize(Surface, Mipmap);
+	unsigned int RowCount	= TextureData->GetMipmapRowCount(Surface, Mipmap);
 	unsigned int Width		= RowSize / PixelSize;
 	unsigned int Height		= RowCount;
 	unsigned int Pitch		= RowSize;
 
 	FIBITMAP* Bitmap;
-	Bitmap = FreeImage_ConvertFromRawBits((BYTE*)TextureData->GetMipmapData(0, 0), Width, Height, Pitch, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	Bitmap = FreeImage_ConvertFromRawBits((BYTE*)TextureData->GetMipmapData(Surface, Mipmap), Width, Height, Pitch, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
 	if(Bitmap == NULL)
 	{
 		zeError("Texture Loader", "Error during conversion, cannot save image to \"%s\".", File->GetFilePath().GetValue());

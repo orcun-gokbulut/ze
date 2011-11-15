@@ -712,6 +712,11 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 		CTInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	CTInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_A8R8G8B8, true);
 
+	if(BlurInputBuffer == NULL)
+		BlurInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	BlurInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_A8R8G8B8, true);
+
+
 	if (ABuffer == NULL)
 		ABuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	ABuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
@@ -728,6 +733,7 @@ void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 	ZED3D_DESTROY(EDInputBuffer);
 	ZED3D_DESTROY(SSAAInputBuffer);
 	ZED3D_DESTROY(CTInputBuffer);
+	ZED3D_DESTROY(BlurInputBuffer);
 	ZED3D_DESTROY(ABuffer);
 }
 
@@ -742,6 +748,7 @@ ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 	SSAOBuffer		= NULL;
 	EDInputBuffer	= NULL;
 	CTInputBuffer	= NULL;
+	BlurInputBuffer	= NULL;
 	SSAAInputBuffer = NULL;
 
 	LightningComponents.LightMeshVB		= NULL;
@@ -785,8 +792,12 @@ bool ZED3D9FrameRenderer::Initialize()
 	CTProcessor.SetRenderer(this);
 	CTProcessor.Initialize();
 
+	BlurProcessor.SetRenderer(this);
+	BlurProcessor.Initialize();
+
 	//EDProcessor.SetRenderer(this);
 	//EDProcessor.Initialize();
+
 	InitializeLightning();
 
 	return true; 
@@ -799,6 +810,7 @@ void ZED3D9FrameRenderer::Deinitialize()
 	SSAAProcessor.Deinitialize();
 	//EDProcessor.Deinitialize();
 	CTProcessor.Deinitialize();
+	BlurProcessor.Deinitialize();
 	
 	DeinitializeLightning();
 	DeinitializeRenderTargets();
@@ -920,8 +932,8 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		HDRProcessor.SetOutput((ZED3D9ViewPort*)SSAAInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);	
 
-		// Edge detection pass
 		/*
+		// Edge detection pass
 		EDProcessor.SetInputDepth(GBuffer1);
 		EDProcessor.SetInputNormal(GBuffer2);
 		EDProcessor.SetInputColor(EDInputBuffer);
@@ -929,16 +941,24 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		EDProcessor.Process();
 		*/
 		
-		//Anti aliasing pass
+		//Anti Aliasing pass
 		SSAAProcessor.SetInputDepth(GBuffer1);
 		SSAAProcessor.SetInputNormal(GBuffer2);
 		SSAAProcessor.SetInputColor(SSAAInputBuffer);
 		SSAAProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
 		SSAAProcessor.Process();
 
+		// Color Transform Pass
 		CTProcessor.SetInput(CTInputBuffer);
 		CTProcessor.SetOutput(ViewPort);
 		CTProcessor.Process();
+
+		/*
+		// Blur Pass
+		BlurProcessor.SetInput(BlurInputBuffer);
+		BlurProcessor.SetOutput(ViewPort);
+		BlurProcessor.Process();
+		*/
 
 		Do2DPass();
 

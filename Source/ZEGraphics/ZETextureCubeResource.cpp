@@ -49,25 +49,31 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
+	unsigned int ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
 
-	if (_stricmp("resources\\", Path.SubString(0, strlen("Resources\\") - 1)) != 0)
+	// If it is guaranteed that there is no "resources\\" string in beginning
+	if (NewString.GetLength() - 1 < ConstLength)
+	{
+		NewString.Insert(0, "resources\\");
+		return NewString;
+	}
+	// Else check if there is "resources\\" in the beginning
+	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
 	{
 		NewString.Insert(0, "resources\\");
 		return NewString;
 	}
 
-	return Path;
+	return NewString;
 }
 
 static void CopyCubeFaceTo(void* Destination, unsigned int DestPitch, void* SourceBuffer, unsigned int SourcePitch, unsigned int EdgeLenght, unsigned int OffsetX, unsigned int OffsetY)
 {
 	for (unsigned int I = 0; I < EdgeLenght; I++)
-		memcpy((unsigned char*)Destination + (I * DestPitch), 
-		(unsigned char*)SourceBuffer + SourcePitch * (OffsetY + EdgeLenght - I - 1) + OffsetX * 4,
-		EdgeLenght * 4);
+		memcpy((unsigned char*)Destination + (I * DestPitch), (unsigned char*)SourceBuffer + SourcePitch * (OffsetY + I) + OffsetX * 4, EdgeLenght * 4);
 
 }
 
@@ -223,17 +229,29 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 
 		unsigned int Offset = Width;
 
-		for(unsigned int I = 0; I < 3; I++)
-		{
-			TextureData.AllocateMipmap(I, 0, RowSize, RowCount);
-			CopyCubeFaceTo(TextureData.GetMipmapData(I, 0), RowSize, Buffer, BufferPitch, Width, I * Width, 0);
-		}
+		// Surf0 Mip0 = +X
+		TextureData.AllocateMipmap(0, 0, RowSize, RowCount);
+		CopyCubeFaceTo(TextureData.GetMipmapData(0, 0), RowSize, Buffer, BufferPitch, Width, 2 * Width, 0);
 
-		for(unsigned int I = 0; I < 3; I++)
-		{
-			TextureData.AllocateMipmap(I + 3, 0, RowSize, RowCount);
-			CopyCubeFaceTo(TextureData.GetMipmapData(I + 3, 0), RowSize, Buffer, BufferPitch, Width, I * Width, Width);
-		}
+		// Surf1 Mip0 = -X
+		TextureData.AllocateMipmap(1, 0, RowSize, RowCount);
+		CopyCubeFaceTo(TextureData.GetMipmapData(1, 0), RowSize, Buffer, BufferPitch, Width, 0 * Width, 0);
+
+		// Surf2 Mip0 = +Y
+		TextureData.AllocateMipmap(2, 0, RowSize, RowCount);
+		CopyCubeFaceTo(TextureData.GetMipmapData(2, 0), RowSize, Buffer, BufferPitch, Width, 2 * Width, Width);
+
+		// Surf3 Mip0 = -Y
+		TextureData.AllocateMipmap(3, 0, RowSize, RowCount);
+		CopyCubeFaceTo(TextureData.GetMipmapData(3, 0), RowSize, Buffer, BufferPitch, Width, 1 * Width, Width);
+
+		// Surf4 Mip0 = +Z
+		TextureData.AllocateMipmap(4, 0, RowSize, RowCount);
+		CopyCubeFaceTo(TextureData.GetMipmapData(4, 0), RowSize, Buffer, BufferPitch, Width, 1 * Width, 0);
+
+		// Surf5 Mip0 = -Z
+		TextureData.AllocateMipmap(5, 0, RowSize, RowCount);
+		CopyCubeFaceTo(TextureData.GetMipmapData(5, 0), RowSize, Buffer, BufferPitch, Width, 0 * Width, Width);
 
 		free(Buffer);
 	}
@@ -291,9 +309,9 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	{
 		for(unsigned int J = 0; J < MipCount; J++)
 		{
-			Texture->Lock((ZETextureCubeFace)J, &TargetBuffer, &TargetPitch);
+			Texture->Lock((ZETextureCubeFace)I, &TargetBuffer, &TargetPitch);
 			TextureData.CopyMipmapDataTo(I, J, (unsigned char*)TargetBuffer, TargetPitch);
-			Texture->Unlock((ZETextureCubeFace)J);
+			Texture->Unlock((ZETextureCubeFace)I);
 		}
 	}
 
