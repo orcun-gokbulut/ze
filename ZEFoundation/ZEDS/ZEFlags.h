@@ -36,7 +36,9 @@
 #ifndef __ZE_FLAGS_H__
 #define __ZE_FLAGS_H__
 
-template <typename Type = int>
+#include "ZETypes.h"
+
+template <typename Type = ZEUInt>
 class ZEFlagsBase
 {
 	public:
@@ -60,7 +62,7 @@ class ZEFlagsBase
 				UnraiseBit(Index);
 		}
 
-		inline bool GetBit(size_t Index)
+		inline bool GetBit(size_t Index) const
 		{
 			return (Value & (0x1 << Index)) != 0;
 		}
@@ -84,7 +86,7 @@ class ZEFlagsBase
 
 		}
 
-		inline bool GetFlags(int Flags)
+		inline bool GetFlags(int Flags) const
 		{
 			return (Value & Flags) == Flags;
 		}
@@ -99,12 +101,12 @@ class ZEFlagsBase
 			return Value;
 		}
 
-		inline ZEFlagsBase<int> operator&(const Type& Other)
+		inline ZEFlagsBase<int> operator&(const Type& Other) const
 		{
 			return ZEFlagsBase<int>(this->Value & Other);		
 		}
 
-		inline ZEFlagsBase<int> operator&(const ZEFlagsBase<Type>& Other)
+		inline ZEFlagsBase<int> operator&(const ZEFlagsBase<Type>& Other) const
 		{
 			return ZEFlagsBase<int>(this->Value & Other->Value);
 		}
@@ -119,12 +121,12 @@ class ZEFlagsBase
 			return this->Value &= Other->Value;
 		}
 
-		inline ZEFlagsBase<int> operator|(const Type& Other)
+		inline ZEFlagsBase<int> operator|(const Type& Other) const
 		{
 			return ZEFlagsBase<int>(this->Value | Other);
 		}
 
-		inline ZEFlagsBase<int> operator|(const ZEFlagsBase<Type>& Other)
+		inline ZEFlagsBase<int> operator|(const ZEFlagsBase<Type>& Other) const
 		{
 			return ZEFlagsBase<int>(this->Value | Other->Value);
 		}
@@ -139,12 +141,12 @@ class ZEFlagsBase
 			return this->Value |= Other->Value;
 		}
 
-		inline ZEFlagsBase<int> operator^(const Type& Other)
+		inline ZEFlagsBase<int> operator^(const Type& Other) const
 		{
 			return ZEFlagsBase<int>(this->Value ^ Other);
 		}
 
-		inline ZEFlagsBase<int> operator^(const ZEFlagsBase<Type>& Other)
+		inline ZEFlagsBase<int> operator^(const ZEFlagsBase<Type>& Other) const
 		{
 			return ZEFlagsBase<int>(this->Value ^ Other->Value);
 		}
@@ -159,7 +161,7 @@ class ZEFlagsBase
 			return this->Value ^= Other->Value;
 		}
 
-		inline ZEFlagsBase<Type>& operator~()
+		inline ZEFlagsBase<Type>& operator~() const
 		{
 			return ZEFlagsBase<int>(~this->Value);
 		}
@@ -192,8 +194,6 @@ class ZEFlagsBase
 		}
 };
 
-class ZEFlags : ZEFlagsBase<int>
-{
-};
+typedef ZEFlagsBase<ZEUInt> ZEFlags;
 
 #endif
