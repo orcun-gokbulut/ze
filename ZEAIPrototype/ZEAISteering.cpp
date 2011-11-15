@@ -140,28 +140,32 @@ ZEAISteeringOutput ZEAIAlignSteering::Process(float ElapsedTime)
 	float Rotation = ZEAngle::RangeRadian(GetTarget()->GetRotation() - GetOwner()->GetRotation());
 	float RotationSize = abs(Rotation);
 
-	if (Rotation < TargetRadius)
-		return Output;
+	/*if (RotationSize < TargetRadius)
+		return Output;*/
 
 	float TargetRotation;
 	if (RotationSize > SlowRadius)
 		TargetRotation = GetOwner()->GetMaxAngularAcceleration();
 	else
-		TargetRotation = GetOwner()->GetMaxAngularAcceleration() * Rotation / RotationSize;
+		TargetRotation = GetOwner()->GetMaxAngularAcceleration() * RotationSize / SlowRadius;
+	TargetRotation *= Rotation / RotationSize;
 
-	Output.AngularAcceleration = ZEAngle::RangeRadian(GetTarget()->GetRotation() - GetOwner()->GetRotation());
+	Output.AngularAcceleration = TargetRotation - GetOwner()->GetAngularVelocity();
 	Output.AngularAcceleration /= TimeToTarget;
 
-	if (Output.AngularAcceleration > GetOwner()->GetMaxAngularAcceleration())
-		Output.AngularAcceleration = GetOwner()->GetMaxAngularAcceleration();
-	
+	if (abs(Output.AngularAcceleration) > GetOwner()->GetMaxAngularAcceleration())
+	{
+		Output.AngularAcceleration /= abs(Output.AngularAcceleration);
+		Output.AngularAcceleration *= GetOwner()->GetMaxAngularAcceleration();
+	}
+
 	return Output;
 }
 
 ZEAIAlignSteering::ZEAIAlignSteering()
 {
-	TargetRadius = ZE_PI_8;
-	SlowRadius = ZE_PI_4;
+	TargetRadius = ZE_PI_12;
+	SlowRadius = ZE_PI_8;
 	TimeToTarget = 0.1f;
 }
 

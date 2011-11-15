@@ -55,7 +55,6 @@ void ZEAIMainWindow::Update()
 	Frame++;
 	Time += Timer->interval();
 	
-	Actors[0]->SetRotation(Frame / 100.0f);
 	Form->lblFrame->setText(QString().setNum(Frame));
 	Form->lblTime->setText(QString().setNum(Time));
 	for (size_t I = 0; I < Actors.GetCount(); I++)
@@ -125,16 +124,15 @@ void ZEAIMainWindow::UpdateActorProperties(bool Partial)
 		else
 			Form->txtActorName->setText("");
 
-		Form->txtMaxLinearAcceleration->setValue(Item->Actor->GetMaxLinearAcceleration());
-		Form->txtMaxAngularAcceleration->setValue(Item->Actor->GetMaxAngularAcceleration());
-		Form->txtMaxLinearVelocity->setValue(Item->Actor->GetMaxLinearSpeed());
-		Form->txtMaxAngularVelocity->setValue(Item->Actor->GetMaxAngularVelocity());
 		Form->txtRadius->setValue(Item->Actor->GetRadius());
+		Form->txtMaxLinearVelocity->setValue(Item->Actor->GetMaxLinearSpeed());
+		Form->txtMaxLinearAcceleration->setValue(Item->Actor->GetMaxLinearAcceleration());
+		Form->txtMaxAngularVelocity->setValue(ZEAngle::ConvertToDegree(Item->Actor->GetMaxAngularVelocity()));
+		Form->txtMaxAngularAcceleration->setValue(ZEAngle::ConvertToDegree(Item->Actor->GetMaxAngularAcceleration()));
 	}
 
 	if (Scene->selectedItems().count() == 1)
 	{
-		Form->txtActorAngularVelocity->setText(QString().setNum(Item->Actor->GetAngularVelocity()));
 		Form->txtActorLinearVelocity->setText(
 			QString().sprintf("<%.2f, %.2f, %.2f>", 
 			Item->Actor->GetLinearVelocity().x, Item->Actor->GetLinearVelocity().y, Item->Actor->GetLinearVelocity().z));
@@ -143,6 +141,15 @@ void ZEAIMainWindow::UpdateActorProperties(bool Partial)
 			QString().sprintf("<%.2f, %.2f, %.2f>", 
 			Item->Actor->GetPosition().x, Item->Actor->GetPosition().y, Item->Actor->GetPosition().z));
 		Form->txtActorRotation->setText(QString().setNum(Item->Actor->GetRotation()));
+
+		Form->txtActorLinearAcceleration->setText(
+			QString().sprintf("<%.2f, %.2f, %.2f>", 
+			Item->Actor->GetLinearAcceleration().x, Item->Actor->GetLinearAcceleration().y, Item->Actor->GetLinearAcceleration().z));
+
+		Form->txtActorRotation->setText(QString().setNum(ZEAngle::ConvertToDegree(Item->Actor->GetRotation())));
+		Form->txtActorAngularVelocity->setText(QString().setNum(ZEAngle::ConvertToDegree(Item->Actor->GetAngularVelocity())));
+		Form->txtActorAngularAcceleration->setText(QString().setNum(ZEAngle::ConvertToDegree(Item->Actor->GetAngularAcceleration())));
+
 	}
 	else
 	{
@@ -187,6 +194,7 @@ void ZEAIMainWindow::btnStep_Clicked()
 void ZEAIMainWindow::btnReset_Clicked()
 {
 	Actors[0]->SetRotation(frand(ZE_PI));
+	Actors[0]->UpdateVisual();
 
 	/*
 	Frame = 0;
@@ -215,7 +223,7 @@ void ZEAIMainWindow::btnAddActor_Clicked()
 	Form->lstActors->addItem(new QListWidgetItem(New->GetName().ToCString()));
 	Form->btnDeleteActor->setEnabled(true);
 
-	if (Actors.GetCount() != 0)
+	if (Actors.GetCount() != 1)
 	{
 		Actors[Actors.GetCount() - 1]->AddSteering(new ZEAIAlignSteering());
 		Actors[Actors.GetCount() - 1]->GetSteerings()[0]->SetTarget(Actors[0]);
@@ -306,7 +314,7 @@ void ZEAIMainWindow::txtMaxLinearAcceleration_ValueChanged(double Value)
 void ZEAIMainWindow::txtMaxAngularAcceleration_ValueChanged(double Value)
 {
 	for (int I = 0; I < Scene->selectedItems().count(); I++)
-		((QGraphicsActorItem*)Scene->selectedItems()[I])->Actor->SetMaxAngularAcceleration(Value);
+		((QGraphicsActorItem*)Scene->selectedItems()[I])->Actor->SetMaxAngularAcceleration(ZEAngle::ConvertToRadian(Value));
 }
 
 void ZEAIMainWindow::txtMaxLinearVelocity_ValueChanged(double Value)
@@ -317,5 +325,5 @@ void ZEAIMainWindow::txtMaxLinearVelocity_ValueChanged(double Value)
 void ZEAIMainWindow::txtMaxAngularVelocity_ValueChanged(double Value)
 {
 	for (int I = 0; I < Scene->selectedItems().count(); I++)
-		((QGraphicsActorItem*)Scene->selectedItems()[I])->Actor->SetMaxAngularVelocity(Value);
+		((QGraphicsActorItem*)Scene->selectedItems()[I])->Actor->SetMaxAngularVelocity(ZEAngle::ConvertToRadian(Value));
 }

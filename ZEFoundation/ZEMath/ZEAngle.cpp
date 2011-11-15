@@ -49,20 +49,24 @@ float ZEAngle::ConvertToRadian(float Degree)
 
 float ZEAngle::RangeDegree(float Angle)
 {
-	Angle = fmod(Angle, 180);
-	if (Angle < 0.0)
-		Angle = 360 - Angle;
+	float ModAngle = fmod(Angle, 360);
+	if(ModAngle > 180)
+		return ModAngle - 360;
+	else if(ModAngle < -180)
+		return ModAngle + 360;
 
-	return Angle;
+	return ModAngle;
 }
 
 float ZEAngle::RangeRadian(float Angle)
 {
-	Angle = fmod(Angle, ZE_PIx2);
-	if (Angle > ZE_PI)
-		Angle = -(Angle - ZE_PI);
+	float ModAngle = fmod(Angle, ZE_PIx2);
+	if(ModAngle > ZE_PI)
+		return ModAngle - ZE_PIx2;
+	else if(ModAngle < -ZE_PI)
+		return ModAngle + ZE_PIx2;
 
-	return Angle;
+	return ModAngle;
 }
 
 float ZEAngle::DistanceDegree(float Angle1, float Angle2)

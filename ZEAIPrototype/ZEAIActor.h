@@ -63,8 +63,10 @@ class ZEAIActor
 	public:
 		ZEAIMainWindow*			Window;
 		QGraphicsActorItem*		VisualActor;
-		QGraphicsLineItem*		VisualVelocity;
-		QGraphicsLineItem*		VisualAcceleration;
+		QGraphicsLineItem*		VisualLinearVelocity;
+		QGraphicsLineItem*		VisualLinearAcceleration;
+		QGraphicsLineItem*		VisualAngularVelocity;
+		QGraphicsLineItem*		VisualAngularAcceleration;
 
 	private:
 		ZEString				Name;
