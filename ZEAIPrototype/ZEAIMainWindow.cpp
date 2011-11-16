@@ -193,7 +193,7 @@ void ZEAIMainWindow::btnStep_Clicked()
 
 void ZEAIMainWindow::btnReset_Clicked()
 {
-	Actors[0]->SetRotation(frand(ZE_PI));
+	Actors[0]->SetLinearVelocity(ZEVector3(frand(10), frand(10), frand(10)));
 	Actors[0]->UpdateVisual();
 
 	/*
@@ -225,7 +225,7 @@ void ZEAIMainWindow::btnAddActor_Clicked()
 
 	if (Actors.GetCount() != 1)
 	{
-		Actors[Actors.GetCount() - 1]->AddSteering(new ZEAIAlignSteering());
+		Actors[Actors.GetCount() - 1]->AddSteering(new ZEAIVelocityMatchingSteering());
 		Actors[Actors.GetCount() - 1]->GetSteerings()[0]->SetTarget(Actors[0]);
 	}
 }

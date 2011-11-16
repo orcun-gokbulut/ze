@@ -169,3 +169,25 @@ ZEAIAlignSteering::ZEAIAlignSteering()
 	TimeToTarget = 0.1f;
 }
 
+
+ZEAISteeringOutput ZEAIVelocityMatchingSteering::Process(float ElapsedTime)
+{
+	ZEAISteeringOutput Output;
+	Output.SetZero();
+	
+	Output.LinearAcceleration = GetTarget()->GetLinearVelocity() - GetOwner()->GetLinearVelocity();
+	Output.LinearAcceleration /= TimeToTarget;
+
+	if (Output.LinearAcceleration.LengthSquare() > GetOwner()->GetMaxLinearAcceleration() * GetOwner()->GetMaxLinearAcceleration())
+	{
+		Output.LinearAcceleration.NormalizeSelf();
+		Output.LinearAcceleration *= GetOwner()->GetMaxLinearAcceleration();
+	}
+
+	return Output;
+}
+
+ZEAIVelocityMatchingSteering::ZEAIVelocityMatchingSteering()
+{
+	TimeToTarget = 0.1f;
+}

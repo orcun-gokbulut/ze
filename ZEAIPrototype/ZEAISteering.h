@@ -111,4 +111,13 @@ class ZEAIAlignSteering : public ZEAISteering
 										ZEAIAlignSteering();
 };
 
+class ZEAIVelocityMatchingSteering : public ZEAISteering
+{
+	float TimeToTarget;
+
+	public:
+		virtual ZEAISteeringOutput		Process(float ElapsedTime);
+
+										ZEAIVelocityMatchingSteering();
+};
 #endif
