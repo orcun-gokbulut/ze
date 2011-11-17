@@ -37,28 +37,21 @@
 
 #include <math.h>
 
-float ZEAngle::ConvertToDegree(float Radian)
+float ZEAngle::Radian::ToDegree(float Angle)
 {
-	return (Radian * 180/ZE_PI);
+	return (Angle * 180/ZE_PI);
 }
 
-float ZEAngle::ConvertToRadian(float Degree)
+ZEVector2 ZEAngle::Radian::ToVector(float Angle)
 {
-	return (Degree * ZE_PI/180);
+	ZEVector2 Output;
+	Output.x = sin(Angle);
+	Output.y = cos(Angle);
+
+	return Output;
 }
 
-float ZEAngle::RangeDegree(float Angle)
-{
-	float ModAngle = fmod(Angle, 360);
-	if(ModAngle > 180)
-		return ModAngle - 360;
-	else if(ModAngle < -180)
-		return ModAngle + 360;
-
-	return ModAngle;
-}
-
-float ZEAngle::RangeRadian(float Angle)
+float ZEAngle::Radian::Range(float Angle)
 {
 	float ModAngle = fmod(Angle, ZE_PIx2);
 	if(ModAngle > ZE_PI)
@@ -69,12 +62,36 @@ float ZEAngle::RangeRadian(float Angle)
 	return ModAngle;
 }
 
-float ZEAngle::DistanceDegree(float Angle1, float Angle2)
+float ZEAngle::Radian::Distance(float Angle1, float Angle2)
 {
-	return RangeDegree(fabs(Angle1 - Angle2));
+	return Range(fabs(Angle1 - Angle2));
 }
 
-float ZEAngle::DistanceRadian(float Angle1, float Angle2)
+float ZEAngle::Degree::ToRadian(float Angle)
 {
-	return RangeRadian(fabs(Angle1 - Angle2));
+	return (Angle * ZE_PI/180);
+}
+
+ZEVector2 ZEAngle::Degree::ToVector(float Angle)
+{
+	ZEVector2 Output;
+	Output.x = sin(ToRadian(Angle));
+	Output.y = cos(ToRadian(Angle));
+	return Output;
+}
+
+float ZEAngle::Degree::Distance(float Angle1, float Angle2)
+{
+	return Range(fabs(Angle1 - Angle2));
+}
+
+float ZEAngle::Degree::Range(float Angle)
+{
+	float ModAngle = fmod(Angle, 360);
+	if(ModAngle > 180)
+		return ModAngle - 360;
+	else if(ModAngle < -180)
+		return ModAngle + 360;
+
+	return ModAngle;
 }
