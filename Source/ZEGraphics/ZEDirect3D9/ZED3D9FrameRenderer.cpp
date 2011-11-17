@@ -786,17 +786,17 @@ bool ZED3D9FrameRenderer::Initialize()
 	SSAOProcessor.Initialize();
 	HDRProcessor.Initialize();
 
-	SSAAProcessor.SetRenderer(this);
-	SSAAProcessor.Initialize();
+	//SSAAProcessor.SetRenderer(this);
+	//SSAAProcessor.Initialize();
 
-	CTProcessor.SetRenderer(this);
-	CTProcessor.Initialize();
+	//CTProcessor.SetRenderer(this);
+	//CTProcessor.Initialize();
 
-	BlurProcessor.SetRenderer(this);
-	BlurProcessor.Initialize();
+	//BlurProcessor.SetRenderer(this);
+	//BlurProcessor.Initialize();
 
-	//EDProcessor.SetRenderer(this);
-	//EDProcessor.Initialize();
+	EDProcessor.SetRenderer(this);
+	EDProcessor.Initialize();
 
 	InitializeLightning();
 
@@ -807,10 +807,10 @@ void ZED3D9FrameRenderer::Deinitialize()
 {
 	HDRProcessor.Deinitialize();
 	SSAOProcessor.Deinitialize();
-	SSAAProcessor.Deinitialize();
-	//EDProcessor.Deinitialize();
-	CTProcessor.Deinitialize();
-	BlurProcessor.Deinitialize();
+	//SSAAProcessor.Deinitialize();
+	EDProcessor.Deinitialize();
+	//CTProcessor.Deinitialize();
+	//BlurProcessor.Deinitialize();
 	
 	DeinitializeLightning();
 	DeinitializeRenderTargets();
@@ -932,28 +932,27 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		HDRProcessor.SetOutput((ZED3D9ViewPort*)SSAAInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);	
 
-		/*
+		
 		// Edge detection pass
 		EDProcessor.SetInputDepth(GBuffer1);
 		EDProcessor.SetInputNormal(GBuffer2);
-		EDProcessor.SetInputColor(EDInputBuffer);
+		EDProcessor.SetInputColor(SSAAInputBuffer);
 		EDProcessor.SetOutput(ViewPort);
 		EDProcessor.Process();
-		*/
+		
 		
 		//Anti Aliasing pass
-		SSAAProcessor.SetInputDepth(GBuffer1);
+		/*SSAAProcessor.SetInputDepth(GBuffer1);
 		SSAAProcessor.SetInputNormal(GBuffer2);
 		SSAAProcessor.SetInputColor(SSAAInputBuffer);
 		SSAAProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
-		SSAAProcessor.Process();
+		SSAAProcessor.Process();*/
 
 		// Color Transform Pass
-		CTProcessor.SetInput(CTInputBuffer);
+		/*CTProcessor.SetInput(CTInputBuffer);
 		CTProcessor.SetOutput(ViewPort);
 		CTProcessor.Process();
 
-		/*
 		// Blur Pass
 		BlurProcessor.SetInput(BlurInputBuffer);
 		BlurProcessor.SetOutput(ViewPort);
