@@ -76,9 +76,9 @@ void ZEAIActor::UpdateVisual()
 	Item = (QGraphicsLineItem*)VisualActor->childItems().at(1);
 	Item->setLine(0.0f, 0.0f, Radius * sinf(-ZE_PI_8), Radius * cosf(-ZE_PI_8));
 	Item = (QGraphicsLineItem*)VisualActor->childItems().at(2);
-	Item->setLine(0.0f, Radius, 2 * ZE_PI * Radius * AngularVelocity, Radius);
+	Item->setLine(0.0f, Radius, ZE_PI * Radius * AngularVelocity, Radius);
 	Item = (QGraphicsLineItem*)VisualActor->childItems().at(3);
-	Item->setLine(0.0f, Radius, 2 * ZE_PI * Radius * AngularAcceleration, Radius);
+	Item->setLine(0.0f, Radius, ZE_PI * Radius * AngularAcceleration, Radius);
 
 	QGraphicsTextItem* TextItem = (QGraphicsTextItem*)VisualActor->childItems().at(4);
 	TextItem->setPlainText(GetName().GetValue());
@@ -108,7 +108,7 @@ const ZEVector3& ZEAIActor::GetPosition()
 
 void ZEAIActor::SetRotation(float Rotation)
 {
-	this->Rotation = ZEAngle::RangeRadian(Rotation);
+	this->Rotation = ZEAngle::Radian::Range(Rotation);
 }
 
 float ZEAIActor::GetRotation()
@@ -222,7 +222,7 @@ void ZEAIActor::Tick(float ElapsedTime)
 	Position += LinearVelocity * ElapsedTime;
 	Rotation += AngularVelocity * ElapsedTime;
 	
-	Rotation = ZEAngle::RangeRadian(Rotation);
+	Rotation = ZEAngle::Radian::Range(Rotation);
 
 	LinearAcceleration = ZEVector3::Zero;
 	AngularAcceleration = 0.0f;

@@ -47,10 +47,10 @@ typedef ZEFlags ZEAISteeringElements;
 
 struct ZEAISteeringOutput
 {
-	ZEVector3					LinearAcceleration;
-	float						AngularAcceleration;
+	ZEVector3						LinearAcceleration;
+	float							AngularAcceleration;
 
-	void						SetZero();
+	void							SetZero();
 };
 
 class ZEAIActor;
@@ -59,65 +59,110 @@ class ZEAISteering
 {
 	friend class ZEAIActor;
 	private:
-		ZEAIActor*				Owner;
-		ZEAIActor*				Target;
+		ZEAIActor*					Owner;
+		ZEAIActor*					Target;
 
-		bool					Enabled;
+		bool						Enabled;
 
 	public:
-		ZEAIActor*				GetOwner();
+		ZEAIActor*					GetOwner();
 
-		bool					GetEnabled();
-		void					SetEnabled(bool Enabled);
+		bool						GetEnabled();
+		void						SetEnabled(bool Enabled);
 
-		ZEAIActor*				GetTarget();
-		void					SetTarget(ZEAIActor* Target);
+		ZEAIActor*					GetTarget();
+		void						SetTarget(ZEAIActor* Target);
 
 		virtual 
-		ZEAISteeringOutput		Process(float ElapsedTime) = 0;
+		ZEAISteeringOutput			Process(float ElapsedTime) = 0;
 };
 
 class ZEAISeekSteering : public ZEAISteering
-{
+{	
+	protected:
+		ZEAISteeringOutput			Seek(const ZEVector3& TargetPosition);
+
 	public:
-		virtual ZEAISteeringOutput		Process(float ElapsedTime);
+		virtual ZEAISteeringOutput	Process(float ElapsedTime);
 };
 
 class ZEAIFleeSteering : public ZEAISteering
-{
+{	
+	protected:
+		ZEAISteeringOutput			Flee(const ZEVector3& TargetPosition);
+
 	public:
-		virtual ZEAISteeringOutput		Process(float ElapsedTime);
+		virtual ZEAISteeringOutput	Process(float ElapsedTime);
 };
 
 class ZEAIArriveSteering : public ZEAISteering
 {
+	protected:
+		ZEAISteeringOutput			Arrive(const ZEVector3& TargetPosition);
+
 	public:
 		float SlowRadius;
 		float TimeToTarget;
-		virtual ZEAISteeringOutput		Process(float ElapsedTime);
 
-										ZEAIArriveSteering();
+		virtual ZEAISteeringOutput	Process(float ElapsedTime);
+
+									ZEAIArriveSteering();
 };
 
 class ZEAIAlignSteering : public ZEAISteering
 {
-	float TargetRadius;
-	float SlowRadius;
-	float TimeToTarget;
+	protected:
+		ZEAISteeringOutput			Align(float TargetRotation);
 
 	public:
-		virtual ZEAISteeringOutput		Process(float ElapsedTime);
+		float TargetRadius;
+		float SlowRadius;
+		float TimeToTarget;
 
-										ZEAIAlignSteering();
+		virtual ZEAISteeringOutput	Process(float ElapsedTime);
+
+									ZEAIAlignSteering();
 };
 
 class ZEAIVelocityMatchingSteering : public ZEAISteering
 {
-	float TimeToTarget;
+	protected:
+		ZEAISteeringOutput			MatchVelocity(const ZEVector3& TargetVelocity);
 
 	public:
-		virtual ZEAISteeringOutput		Process(float ElapsedTime);
+		float TimeToTarget;
 
-										ZEAIVelocityMatchingSteering();
+		virtual ZEAISteeringOutput	Process(float ElapsedTime);
+
+									ZEAIVelocityMatchingSteering();
 };
+
+class ZEAIFaceSteering : public ZEAIAlignSteering
+{
+	protected:
+		ZEAISteeringOutput			Face(const ZEVector3& TargetDirection);
+
+	public:
+		virtual ZEAISteeringOutput	Process(float ElapsedTime);
+};
+
+class ZEAIFaceVelocitySteering : public ZEAIFaceSteering
+{
+	public:
+		virtual ZEAISteeringOutput	Process(float ElapsedTime);
+};
+
+class ZEAIWanderSteering : public ZEAIFaceVelocitySteering
+{
+	public:
+		float WanderRate;	
+		float WanderRotation;
+		float WanderRadius;
+		float WanderOffset;
+
+		virtual ZEAISteeringOutput	Process(float ElapsedTime);
+
+		ZEAIWanderSteering();
+};
+
 #endif

@@ -37,6 +37,8 @@
 #ifndef __ZE_ANGLE_H__
 #define __ZE_ANGLE_H__
 
+#include "ZEVector.h"
+
 #define ZE_ZERO_TRESHOLD		0.00000001 
 
 #define ZE_PIx2				6.28318530717958647692f
@@ -59,12 +61,23 @@
 class ZEAngle
 {
 	public:
-		static float ConvertToDegree(float Radian);
-		static float ConvertToRadian(float Degree);
-		static float RangeDegree(float Angle);
-		static float RangeRadian(float Angle);
-		static float DistanceDegree(float Angle1, float Angle2);
-		static float DistanceRadian(float Angle1, float Angle2);
+		struct Radian
+		{
+			static float Range(float Angle);
+			static float Distance(float Angle1, float Angle2);
+
+			static float ToDegree(float Angle);
+			static ZEVector2 ToVector(float Angle);
+		};
+
+		struct Degree
+		{
+			static float Range(float Angle);
+			static float Distance(float Angle1, float Angle2);
+
+			static float ToRadian(float Angle);
+			static ZEVector2 ToVector(float Angle);
+		};
 };
 
 
