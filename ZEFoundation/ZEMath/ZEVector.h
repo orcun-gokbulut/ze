@@ -135,6 +135,8 @@ class ZEVector2
 									ZEVector2();
 };
 
+ZEVector2 operator*(float S, const ZEVector2& RightOperand);
+
 
 // ZEVector3
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -247,6 +249,8 @@ class ZEVector3
 									ZEVector3();
 };
 
+ZEVector3 operator*(float S, const ZEVector3& RightOperand);
+
 
 // ZEVector4
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -338,6 +342,8 @@ class ZEVector4
 									ZEVector4(const ZEVector4& Start, const ZEVector4& End);
 									ZEVector4();
 };
+
+ZEVector4 operator*(float S, const ZEVector4& RightOperand);
 
 #endif
 

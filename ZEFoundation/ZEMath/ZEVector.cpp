@@ -420,6 +420,10 @@ ZEVector2::ZEVector2()
 
 }
 
+ZEVector2 operator*(float S, const ZEVector2& RightOperand)
+{
+	return RightOperand * S;
+}
 
 // ZEVector3
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1012,6 +1016,11 @@ ZEVector3::ZEVector3()
 
 }
 
+ZEVector3 operator*(float S, const ZEVector3& RightOperand)
+{
+	return RightOperand * S;
+}
+
 
 // ZEVector4
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1477,4 +1486,9 @@ ZEVector4::ZEVector4(const ZEVector4& Start, const ZEVector4& End)
 ZEVector4::ZEVector4()
 {
 
+}
+
+ZEVector4 operator*(float S, const ZEVector4& RightOperand)
+{
+	return RightOperand * S;
 }

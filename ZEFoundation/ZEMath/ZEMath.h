@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAngle.cpp
+ Zinek Engine - ZEMath.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,81 +33,44 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEAngle.h"
+#pragma once
+#ifndef __ZE_MATH_H__
+#define __ZE_MATH_H__
 
-#include <math.h>
+#define ZE_ZERO_TRESHOLD	0.00000001 
+#define ZE_INT_MIN			-2147483647
+#define ZE_INT_MAX			2147483647
+#define ZE_UINT_MAX			4294967295
+#define ZE_FLOAT_MAX		3.402823466e+38F 
+#define ZE_FLOAT_MIN		-3.402823466e+38F
 
-float ZEAngle::Range(float Angle)
+class ZEMath
 {
-	float ModAngle = fmod(Angle, ZE_PIx2);
-	if(ModAngle > ZE_PI)
-		return ModAngle - ZE_PIx2;
-	else if(ModAngle < -ZE_PI)
-		return ModAngle + ZE_PIx2;
+	public:
+		static float		Sqrt(float Value);
+		static float		Abs(float Value);
+		static float		Sign(float Value);
 
-	return ModAngle;
-}
+		static float		Min(float A, float B);
+		static float		Max(float A, float B);
+		static int			Min(int A, int B);
+		static int			Max(int A, int B);
 
-float ZEAngle::Distance(float Angle1, float Angle2)
-{
-	return Range(fabs(Angle1 - Angle2));
-}
+		static float		Loge(float Value);
+		static float		Log10(float Value);
+		static float		Power(float Base, float Exponent);
+		static float		Exp(float Value);
 
-float ZEAngle::Cos(float Value)
-{
-	return cos(Value);
-}
+		static float		Lerp(float A, float B, float Factor);
 
-float ZEAngle::Sin(float Value)
-{
-	return sin(Value);
-}
+		static float		Clamp(float A, float MinValue, float MaxValue);
+		static float		ClampLower(float Value, float MinValue);
+		static float		ClampUpper(float Value, float MaxValue);
+		static float		Saturate(float Value);
+};
 
-float ZEAngle::Tan(float Value)
-{
-	return tan(Value);
-}
+#endif
 
-float ZEAngle::Cot(float Value)
-{
-	return 1.0f / tan(Value);
-}
 
-float ZEAngle::ArcSin(float Value)
-{
-	return asin(Value);
-}
 
-float ZEAngle::ArcCos(float Value)
-{
-	return acos(Value);
-}
 
-float ZEAngle::ArcTan(float Value)
-{
-	return atan(Value);
-}
-
-float ZEAngle::ArcTan2(float x, float y)
-{
-	return atan2(x, y);
-}
-
-float ZEAngle::ToRadian(float Angle)
-{
-	return (Angle * ZE_PI/180);
-}
-
-float ZEAngle::ToDegree(float Angle)
-{
-	return (Angle * 180/ZE_PI);
-}
-
-ZEVector2 ZEAngle::ToVector(float Angle)
-{
-	ZEVector2 Output;
-	Output.x = sin(Angle);
-	Output.y = cos(Angle);
-
-	return Output;
-}

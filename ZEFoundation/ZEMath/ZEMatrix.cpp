@@ -490,6 +490,13 @@ ZEMatrix3x3::ZEMatrix3x3()
 {
 }
 
+ZEMatrix3x3 operator*(float S, const ZEMatrix3x3& RightOperand)
+{
+	ZEMatrix3x3 Temp;
+	ZEMatrix3x3::Scale(Temp, RightOperand, S);
+	return Temp;
+}
+
 
 // ZEMatrix4x4
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1251,4 +1258,11 @@ ZEMatrix4x4::ZEMatrix4x4(float M[16])
 ZEMatrix4x4::ZEMatrix4x4()
 {
 
+}
+
+ZEMatrix4x4 operator*(float S, const ZEMatrix4x4& RightOperand)
+{
+	ZEMatrix4x4 Temp;
+	ZEMatrix4x4::Scale(Temp, RightOperand, S);
+	return Temp;
 }
