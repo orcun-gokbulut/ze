@@ -39,8 +39,8 @@
 #define __ZE_D3D9_BLUR_PROCESSOR_H__
 
 #include "ZED3D9ComponentBase.h"
+#include "ZED3D9TextureResizeFilters.h"
 
-class ZEKernel;
 class ZED3D9PixelShader;
 class ZED3D9VertexShader;
 class ZED3D9Texture2D;
@@ -50,32 +50,46 @@ class ZEFrameRenderer;
 class ZED3D9FrameRenderer;
 class ZETexture2DResource;
 
+class ZED3D9BlurKernel : public ZEKernel
+{
+	public:
+		ZED3D9BlurKernel(){};
+		ZED3D9BlurKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int DestLength, int Samples, float PixelSize);
+		~ZED3D9BlurKernel(){};
+};
+
+
 class ZED3D9BlurProcessor : public ZED3D9ComponentBase
 {
 	private:
 		float							BlurFactor;
-		ZEKernel*						KernelVertical;
-		ZEKernel*						KernelHorizontal;
-		
-		ZED3D9Texture2D*				TempTexture;
+
+		ZED3D9Texture2D*				TempTexture1;
+		ZED3D9Texture2D*				TempTexture2;
+
+		ZED3D9BlurKernel*				HorizontalKernel;
+		ZED3D9BlurKernel*				VerticalKernel;
 
 		ZED3D9FrameRenderer*			Renderer;
 		ZED3D9Texture2D*				InputBuffer;
 		ZED3D9ViewPort*					OutputBuffer;
 
-		ZED3D9PixelShader*				PixelShaderHorizontal;
+		ZED3D9VertexShader*				VertexShaderBlur;
+		ZED3D9PixelShader*				PixelShaderBlend;
 		ZED3D9PixelShader*				PixelShaderVertical;
-		ZED3D9VertexShader*				VertexShader;
+		ZED3D9PixelShader*				PixelShaderHorizontal;
+
+		ZED3D9VertexShader*				VertexShaderDownSample;
+		ZED3D9PixelShader*				PixelShaderDownSample;
+		
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
-		void							CreateTempTexture();
+		void							CreateTextures();
 		void							CreateKernels();
 		
 	public:
 		void							SetBlurFactor(float BlurFactor);
 		float							GetBlurFactor();
-		ZEKernel*						GetKernelVertical();
-		ZEKernel*						GetKernelHorizontal();
 		
 		void							SetRenderer(ZEFrameRenderer* Renderer);
 		ZEFrameRenderer*				GetRenderer();

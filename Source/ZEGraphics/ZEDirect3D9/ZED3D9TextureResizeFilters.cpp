@@ -323,8 +323,8 @@ ZEKernel::ZEKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int De
 	KernelWidth = Filt->GetFilterWidth() * InverseScale;
 	KernelWindowSize = (int)ceilf(KernelWidth * 2);
 	// allocation is fixed since we pass it to graphics device
-	KernelWeights = new ZEVector4[21];
-	memset(KernelWeights, 0, sizeof(ZEVector4) * 21);
+	KernelWeights = new ZEVector4[KernelWindowSize];
+	memset(KernelWeights, 0, sizeof(ZEVector4) * KernelWindowSize);
 
 	Center = float(KernelWindowSize) / 2.0f;
 
@@ -347,6 +347,12 @@ ZEKernel::ZEKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int De
 }
 ZEKernel::~ZEKernel()
 {
+	// Delete weights
+	if (KernelWeights)
+	{
+		delete KernelWeights;
+		KernelWeights = NULL;
+	}
 
 }
 

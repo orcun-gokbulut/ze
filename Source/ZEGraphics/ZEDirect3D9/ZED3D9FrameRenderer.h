@@ -78,7 +78,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9Texture2D*					LBuffer2;
 		ZED3D9Texture2D*					SSAOBuffer;
 		ZED3D9Texture2D*					CTInputBuffer;
-		ZED3D9Texture2D*					EDInputBuffer;
+		//ZED3D9Texture2D*					EDInputBuffer;
 		ZED3D9Texture2D*					SSAAInputBuffer;
 		ZED3D9Texture2D*					BlurInputBuffer;
 		

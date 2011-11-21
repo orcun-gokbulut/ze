@@ -63,8 +63,8 @@ bool ZEGraphicsDebugModule::Initialize()
 	SkyBrush = ZESkyBrush::CreateInstance();
 	SkyBrush->SetVelocity(ZEVector3(3.0f, 3.0f, 3.0f));
 	SkyBrush->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	SkyBrush->SetSkyBrightness(1.0f);
-	SkyBrush->SetSkyColor(ZEVector3(5.0f, 0.0f, 0.0f));
+	SkyBrush->SetSkyBrightness(2.0f);
+	SkyBrush->SetSkyColor(ZEVector3(1.0f, 0.0f, 0.0f));
 	SkyBrush->SetSkyTexture("c.tga");
 	SkyBrush->SetName("TheSky");
 	SkyBrush->SetVisible(true);
@@ -77,6 +77,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	Player->SetRotation(ZEQuaternion::Identity);
 	Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 	Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
+	
 	Scene->SetActiveCamera(Player->GetCamera());
 	Scene->AddEntity(Player);
 
