@@ -148,13 +148,17 @@ class MitchellFilter : public ZEFilter
 
 class ZEKernel
 {
-	private:
+	protected:
 		int				KernelWindowSize;
 		float			KernelWidth;
 		ZEVector4*		KernelWeights;
 		float			Center;
 
+	private:
+		// Empty
+
 	public:
+						ZEKernel() {};
 						ZEKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int DestLength, int Samples, float PixelSize);
 		virtual			~ZEKernel();
 

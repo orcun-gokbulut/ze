@@ -48,62 +48,127 @@
 
 #include <d3d9.h>
 #include <stdlib.h>
+#include <math.h>
 
-void ZED3D9BlurProcessor::CreateTempTexture()
+ZED3D9BlurKernel::ZED3D9BlurKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int DestLength, int Samples, float PixelSize)
 {
-	// The function only changes the temp texture size when 
-	// the Input texture size changes. Such as the resize of application window
-	if (TempTexture != NULL)
+	float Scale = (float)DestLength / (float)SrcLength;
+	float InverseScale = 1.0f / Scale;
+
+	// Upsampling Case
+	if (Scale > 1) 
 	{
-		if (InputBuffer->GetWidth() != TempTexture->GetWidth() || InputBuffer->GetHeight() != TempTexture->GetHeight())
-		{
-			TempTexture->Release();
-			TempTexture->Create(InputBuffer->GetWidth(), InputBuffer->GetHeight(), ZE_TPF_A8R8G8B8, true, 1);
-		}
+		Samples = 1;
+		Scale = 1;
 	}
-	else
+
+	KernelWidth = Filt->GetFilterWidth() * InverseScale;
+	KernelWindowSize = (int)ceilf(KernelWidth * 2);
+	// allocation is fixed since we pass it to graphics device
+	KernelWeights = new ZEVector4[KernelWindowSize];
+	memset(KernelWeights, 0, sizeof(ZEVector4) * KernelWindowSize);
+
+	Center = float(KernelWindowSize) / 2.0f;
+
+	float PixelCoord = -1.0f * (Center - 0.5f);
+	float Total = 0.0f;
+	for(int I = 0; I < KernelWindowSize; I++)
 	{
-		TempTexture = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		TempTexture->Create(InputBuffer->GetWidth(), InputBuffer->GetHeight(), ZE_TPF_A8R8G8B8, true, 1);
+		const float Sample = Filt->SampleBox(I - Center, Scale, Samples);
+		KernelWeights[I] = ZEVector4(Sample, PixelCoord * PixelSize, 0.0f, 0.0f);
+		Total += Sample;
+		PixelCoord += 1.0f;
+	}
+
+	float InverseTotal = 1.0f / Total;
+	// Normalize the weight of the WindowSize
+	for(int I = 0; I < KernelWindowSize; I++)
+	{
+		KernelWeights[I].x *= InverseTotal;
 	}
 }
 
 void ZED3D9BlurProcessor::CreateKernels()
 {
-	GaussianFilter GaussFilter(1.5f, BlurFactor);
+	unsigned int TargetWidth;
+	unsigned int TargetHeight;
+	unsigned int SourceWidth;
+	unsigned int SourceHeight;
 
-	if (KernelVertical == NULL)
+	if (HorizontalKernel != NULL)
+		delete HorizontalKernel;
+	if (VerticalKernel != NULL)
+		delete VerticalKernel;
+	
+	TargetWidth = SourceWidth = Renderer->GetViewPort()->GetWidth() / 4;
+	TargetHeight = SourceHeight = Renderer->GetViewPort()->GetHeight() / 4;
+
+	GaussianFilter GaussFilter(3.5f, 1.0f);
+	ZEVector2 SourcePixelSize(1.0f / (float)TargetWidth, 1.0f / (float)TargetHeight);
+
+	HorizontalKernel = new ZED3D9BlurKernel((const ZEFilter*)&GaussFilter, SourceWidth, TargetWidth, 32, SourcePixelSize.x);
+	VerticalKernel = new ZED3D9BlurKernel((const ZEFilter*)&GaussFilter, SourceHeight, TargetHeight, 32, SourcePixelSize.y);
+
+}
+
+void ZED3D9BlurProcessor::CreateTextures()
+{
+	// The function only creates the textures and kernels when
+	// the Input/Output(viewport) texture size changes.
+	// Such as the resize of application window.
+	
+	unsigned int TargetWidth = Renderer->GetViewPort()->GetWidth() / 4;
+	unsigned int TargetHeight = Renderer->GetViewPort()->GetHeight() / 4;
+	
+	// If created before
+	if (TempTexture1 != NULL)
 	{
-		float SourcePixelHeight = 1.0f / InputBuffer->GetHeight();
-		KernelVertical = new ZEKernel((const ZEFilter*)&GaussFilter, InputBuffer->GetHeight(), OutputBuffer->GetHeight(), 32, SourcePixelHeight);
+		// If dimensions needs to change
+		if (TargetWidth != TempTexture1->GetWidth() || TargetHeight != TempTexture1->GetHeight())
+		{
+			TempTexture1->Release();
+			TempTexture1->Create(TargetWidth, TargetHeight, ZE_TPF_A8R8G8B8, true, 1);
+			this->CreateKernels();
+		}
+	}
+	else // If not created before
+	{
+		TempTexture1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+		TempTexture1->Create(TargetWidth, TargetHeight, ZE_TPF_A8R8G8B8, true, 1);
+		this->CreateKernels();
 	}
 
-	if (KernelHorizontal == NULL)
+	// If created before
+	if (TempTexture2 != NULL)
 	{
-		float SourcePixelWidth = 1.0f / InputBuffer->GetWidth();
-		KernelHorizontal = new ZEKernel((const ZEFilter*)&GaussFilter, InputBuffer->GetWidth(), OutputBuffer->GetWidth(), 32, SourcePixelWidth);
-	}	
+		// If dimensions needs to change
+		if (TargetWidth != TempTexture2->GetWidth() || TargetHeight != TempTexture2->GetHeight())
+		{
+			TempTexture2->Release();
+			TempTexture2->Create(TargetWidth, TargetHeight, ZE_TPF_A8R8G8B8, true, 1);
+			this->CreateKernels();
+		}
+	}
+	else // If not created before
+	{
+		TempTexture2 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+		TempTexture2->Create(TargetWidth, TargetHeight, ZE_TPF_A8R8G8B8, true, 1);
+		this->CreateKernels();
+	}
+		
 }
 
 void ZED3D9BlurProcessor::SetBlurFactor(float BlurFactor)
 {
+	if (BlurFactor > 1.0f) BlurFactor = 1.0f;
+	if (BlurFactor < 0.0f) BlurFactor = 0.0f;
+
 	this->BlurFactor = BlurFactor;
-	CreateKernels();
 }
 
 float ZED3D9BlurProcessor::GetBlurFactor()
 {
 	return BlurFactor;
-}
-
-ZEKernel* ZED3D9BlurProcessor::GetKernelVertical()
-{
-	return KernelVertical;
-}
-
-ZEKernel* ZED3D9BlurProcessor::GetKernelHorizontal()
-{
-	return KernelHorizontal;
 }
 
 void ZED3D9BlurProcessor::SetRenderer(ZEFrameRenderer* Renderer)
@@ -118,7 +183,9 @@ ZEFrameRenderer* ZED3D9BlurProcessor::GetRenderer()
 
 void ZED3D9BlurProcessor::SetInput(ZETexture2D* Texture)
 {
-	this->InputBuffer = (ZED3D9Texture2D*)Texture;
+	this->InputBuffer	= (ZED3D9Texture2D*)Texture;
+
+	this->CreateTextures();
 }
 
 ZETexture2D* ZED3D9BlurProcessor::GetInput()
@@ -141,43 +208,60 @@ void ZED3D9BlurProcessor::Initialize()
 	// Vertex declaration for screen aligned quad
 	D3DVERTEXELEMENT9 Declaration[] = 
 	{
-		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},
-		D3DDECL_END()
+		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0}, D3DDECL_END()
 	};
 
 	GetDevice()->CreateVertexDeclaration(Declaration, &VertexDeclaration);
 
 	// Create and compile shaders
-	this->VertexShader = ZED3D9VertexShader::CreateShader("BlurProcessor.hlsl", "vs_main", 0, "vs_3_0");
+	this->VertexShaderDownSample	= ZED3D9VertexShader::CreateShader("DownSample2x.hlsl", "vs_main", 0, "vs_3_0");
+	this->PixelShaderDownSample		= ZED3D9PixelShader::CreateShader("DownSample2x.hlsl", "ps_main", 0, "ps_3_0");
+	
+	this->PixelShaderBlend			= ZED3D9PixelShader::CreateShader("BlurProcessor.hlsl", "ps_main_lerp", 0, "ps_3_0");
+		
+	this->VertexShaderBlur		= ZED3D9VertexShader::CreateShader("BlurProcessor.hlsl", "vs_main", 0, "vs_3_0");
 	this->PixelShaderHorizontal = ZED3D9PixelShader::CreateShader("BlurProcessor.hlsl", "ps_main_horizontal", 0, "ps_3_0");
-	this->PixelShaderVertical = ZED3D9PixelShader::CreateShader("BlurProcessor.hlsl", "ps_main_vertical", 0, "ps_3_0");
-
+	this->PixelShaderVertical	= ZED3D9PixelShader::CreateShader("BlurProcessor.hlsl", "ps_main_vertical", 0, "ps_3_0");
+	
+	CreateTextures();
 }
 
 void ZED3D9BlurProcessor::Deinitialize()
 {
-	if (KernelVertical)
-		delete KernelVertical;
-	if (KernelHorizontal)
-		delete KernelHorizontal;
-	if (TempTexture)
-	{
-		TempTexture->Release();
-		TempTexture->Destroy();
-	}
-
-	BlurFactor			= 0.0f;
 	Renderer			= NULL;
 	InputBuffer			= NULL;
 	OutputBuffer		= NULL;
-	TempTexture			= NULL;
-	KernelVertical		= NULL;
-	KernelHorizontal	= NULL;
 
-	ZED3D_RELEASE(VertexShader);
+	if (TempTexture1)
+	{
+		TempTexture1->Release();
+		TempTexture1->Destroy();
+		TempTexture1 = NULL;
+	}
+	if (TempTexture2)
+	{
+		TempTexture2->Release();
+		TempTexture2->Destroy();
+		TempTexture2 = NULL;
+	}
+	if (HorizontalKernel)
+	{
+		delete HorizontalKernel;
+		HorizontalKernel = NULL;
+	}
+	if (VerticalKernel)
+	{
+		delete VerticalKernel;
+		VerticalKernel = NULL;
+	}
+
+	ZED3D_RELEASE(PixelShaderBlend);
+	ZED3D_RELEASE(VertexShaderBlur);
 	ZED3D_RELEASE(VertexDeclaration);
 	ZED3D_RELEASE(PixelShaderVertical);
 	ZED3D_RELEASE(PixelShaderHorizontal);
+	ZED3D_RELEASE(PixelShaderDownSample);
+	ZED3D_RELEASE(VertexShaderDownSample);
 
 }
 
@@ -195,10 +279,10 @@ void ZED3D9BlurProcessor::Process()
 {
 	zeProfilerStart("Blur Pass");
 
-	int WindowSize		= 0;
-	ZEVector4* Kernel	= NULL;
-
-	static struct Vert
+	ZEVector4* KernelData;
+	unsigned int Vector4Count;
+	
+	static struct Vertex
 	{
 		float Position[3];
 	} 
@@ -209,9 +293,8 @@ void ZED3D9BlurProcessor::Process()
 		{-1.0f, -1.0f, 0.0f},
 		{ 1.0f, -1.0f, 0.0f}
 	};
-	
+
 	// Set shaders and vertex declaration
-	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
 	GetDevice()->SetVertexDeclaration(VertexDeclaration);
 	
 	// Set render states and output
@@ -222,45 +305,127 @@ void ZED3D9BlurProcessor::Process()
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE,	FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	
-	// Create temp texture and kernels
-	this->CreateTempTexture();
-	this->CreateKernels();
+	/************************************************************************/
+	/*                           DownSample 2x Pass                         */
+	/************************************************************************/
+	
+	// Set shaders
+	GetDevice()->SetPixelShader(PixelShaderDownSample->GetPixelShader());
+	GetDevice()->SetVertexShader(VertexShaderDownSample->GetVertexShader());
+	
+	// Send shader data to pipeline
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / TempTexture1->GetWidth(), 1.0f / TempTexture1->GetHeight(), 0.0f, 0.0f), 1);
 
-	// Horizontal Pass
-	//Set pixel shader
+	// Set input and output textures
+	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)TempTexture1);
+	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputBuffer, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
+
+	// Draw
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vertex));
+
+	/************************************************************************/
+	/*                         Horizontal Blur Pass                         */
+	/************************************************************************/
+
+	// Set shaders
+	GetDevice()->SetVertexShader(VertexShaderBlur->GetVertexShader());
 	GetDevice()->SetPixelShader(PixelShaderHorizontal->GetPixelShader());
 
-	// Send kernel, pixel size to pipeline
-	Kernel		= KernelHorizontal->GetKernel();
-	WindowSize	= KernelHorizontal->GetKernelWindowSize();
-
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)Kernel, WindowSize);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / InputBuffer->GetWidth(), 1.0f / InputBuffer->GetHeight(), 0.0f, 0.0f), 1);
-
+	// Send shader data to pipeline
+	KernelData = HorizontalKernel->GetKernel();
+	Vector4Count = HorizontalKernel->GetKernelWindowSize();
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, Vector4Count);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / TempTexture2->GetWidth(), 1.0f / TempTexture2->GetHeight(), 0.0f, 0.0f), 1);
+	
 	// Set input and output textures
-	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)TempTexture);
-	ZED3D9CommonTools::SetTexture(6, (ZETexture2D*)InputBuffer, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)TempTexture2);
+	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)TempTexture1, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 
 	// Draw
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vertex));
 
-	// Vertical Pass
-	//Set pixel shader
+	/************************************************************************/
+	/*                     Vertical Blur Pass		                        */
+	/************************************************************************/
+	
+	// Set shaders
+	GetDevice()->SetVertexShader(VertexShaderBlur->GetVertexShader());
 	GetDevice()->SetPixelShader(PixelShaderVertical->GetPixelShader());
 
-	// Send kernel, pixel size to pipeline
-	Kernel		= KernelVertical->GetKernel();
-	WindowSize	= KernelVertical->GetKernelWindowSize();
+	// Send shader data to pipeline
+	KernelData = VerticalKernel->GetKernel();
+	Vector4Count = VerticalKernel->GetKernelWindowSize();
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, Vector4Count);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / TempTexture1->GetWidth(), 1.0f / TempTexture1->GetHeight(), 0.0f, 0.0f), 1);
+	
+	// Set input and output textures
+	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)TempTexture1);
+	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)TempTexture2, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
+	
+	// Draw
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vertex));
 
-	GetDevice()->SetPixelShaderConstantF(0, (const float*)Kernel, WindowSize);
-	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / InputBuffer->GetWidth(), 1.0f / InputBuffer->GetHeight(), 0.0f, 0.0f), 1);
+	/************************************************************************/
+	/*                         Horizontal Blur Pass                         */
+	/************************************************************************/
+
+	// Set shaders
+	GetDevice()->SetVertexShader(VertexShaderBlur->GetVertexShader());
+	GetDevice()->SetPixelShader(PixelShaderHorizontal->GetPixelShader());
+
+	// Send shader data to pipeline
+	KernelData = HorizontalKernel->GetKernel();
+	Vector4Count = HorizontalKernel->GetKernelWindowSize();
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, Vector4Count);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / TempTexture2->GetWidth(), 1.0f / TempTexture2->GetHeight(), 0.0f, 0.0f), 1);
 
 	// Set input and output textures
-	ZED3D9CommonTools::SetRenderTarget(0, OutputBuffer);
-	ZED3D9CommonTools::SetTexture(6, (ZETexture2D*)TempTexture, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)TempTexture2);
+	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)TempTexture1, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 
 	// Draw
-	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vert));
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vertex));
+
+	/************************************************************************/
+	/*							Vertical Blur Pass			                */
+	/************************************************************************/
+
+	// Set pixel shader
+	GetDevice()->SetVertexShader(VertexShaderBlur->GetVertexShader());
+	GetDevice()->SetPixelShader(PixelShaderVertical->GetPixelShader());
+
+	// Send shader data to pipeline
+	KernelData = VerticalKernel->GetKernel();
+	Vector4Count = VerticalKernel->GetKernelWindowSize();
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)KernelData, Vector4Count);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / TempTexture1->GetWidth(), 1.0f / TempTexture1->GetHeight(), 0.0f, 0.0f), 1);
+
+	// Set input and output textures
+	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)TempTexture1);
+	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)TempTexture2, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
+
+	// Draw
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vertex));
+
+	/************************************************************************/
+	/*                     Color Blend(Lerp) Pass	                        */
+	/************************************************************************/
+
+	// Set pixel shader
+	GetDevice()->SetVertexShader(VertexShaderBlur->GetVertexShader());
+	GetDevice()->SetPixelShader(PixelShaderBlend->GetPixelShader());
+
+	// Send shader data to pipeline
+	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(BlurFactor, 0.0f, 0.0f, 0.0f), 1);
+	GetDevice()->SetVertexShaderConstantF(0, (const float*)&ZEVector4(1.0f / OutputBuffer->GetWidth(), 1.0f / OutputBuffer->GetHeight(), 0.0f, 0.0f), 1);
+
+	// Set input and output textures
+	ZED3D9CommonTools::SetRenderTarget(0, (ZEViewPort*)OutputBuffer);
+	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputBuffer, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetTexture(1, (ZETexture2D*)TempTexture1, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
+
+	// Draw
+	GetDevice()->DrawPrimitiveUP(D3DPT_TRIANGLESTRIP, 2, Vertices, sizeof(Vertex));
 
 	zeProfilerEnd();
 }
@@ -268,19 +433,20 @@ void ZED3D9BlurProcessor::Process()
 ZED3D9BlurProcessor::ZED3D9BlurProcessor()
 {
 	BlurFactor				= 0.0f;
-	KernelVertical			= NULL;
-	KernelHorizontal		= NULL;
-
 	Renderer				= NULL;
-	VertexDeclaration		= NULL;
-	VertexShader			= NULL;
-	PixelShaderHorizontal	= NULL;
-	PixelShaderVertical		= NULL;
-
-	TempTexture				= NULL;
 	InputBuffer				= NULL;
 	OutputBuffer			= NULL;
-
+	TempTexture1			= NULL;
+	TempTexture2			= NULL;
+	VertexDeclaration		= NULL;
+	PixelShaderBlend		= NULL;
+	VertexShaderDownSample	= NULL;
+	PixelShaderDownSample	= NULL;
+	PixelShaderHorizontal	= NULL;
+	PixelShaderVertical		= NULL;
+	VertexShaderBlur		= NULL;
+	HorizontalKernel		= NULL;
+	VerticalKernel			= NULL;
 }
 
 ZED3D9BlurProcessor::~ZED3D9BlurProcessor()

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - BlurProcessor.hlsl
+ Zinek Engine - DownSample2x.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 YiÄŸit OrÃ§un GÃ–KBULUT. All rights reserved.
 
@@ -35,7 +35,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////
 //                                                                                  //
-//  BlurProcessor.hlsl - Zinek Engine v0.05.00 Build 1024 Source Code				//
+//  DownSample2x.hlsl - Zinek Engine v0.05.00 Build 1024 Source Code				//
 // -------------------------------------------------------------------------------- //
 //  Copyright (c) 2007-2009 Y. Orçun GÖKBULUT. All rights reserved.                 //
 //                                                                                  //
@@ -66,12 +66,20 @@
 //*                                                                                *//
 //////////////////////////////////////////////////////////////////////////////////////
 
+// Important Note:
+// This shader uses hardware Texture filters for down sampling 2x
+// Choose texture filter method while setting the texture at application side
+// (e.g. choose point for point sampling, choose linear for bilinear sampling)
+
+sampler2D 		TextureInput 	: register(s0);
+const float2	PixelSize		: register(vs, c0);
+
+
 // Vertex Shader Input Struct
 struct VS_INPUT
 {
 	float4 Position  : POSITION0;
 	float2 Texcoord  : TEXCOORD0;
-
 };
 
 // Vertex Shader Output Struct
@@ -93,15 +101,7 @@ struct PS_OUTPUT
 	float4 PixelColor : COLOR0;
 };
 
-/******************************************/
-/*					Blur				  */
-/******************************************/ 
-
-sampler2D 			TextureInput	:	register(s0);
-const float2 		PixelSize		:	register(vs, c0);
-const float4		BlurKernel[7]	:	register(ps, c0);
-
-
+// Vertex Shader Main
 VS_OUTPUT vs_main( VS_INPUT Input )
 {
 	VS_OUTPUT Output;
@@ -113,53 +113,12 @@ VS_OUTPUT vs_main( VS_INPUT Input )
 	return Output;
 }
 
-PS_OUTPUT ps_main_horizontal( PS_INPUT Input )
+PS_OUTPUT ps_main( PS_INPUT Input )
 {
 	PS_OUTPUT Output;
 	Output.PixelColor = (float4)0.0f;
 
-	for (int I = 0; I < 7; I++)
-	{
-		Output.PixelColor += BlurKernel[I].x * tex2D(TextureInput, Input.TexCoord + float2(BlurKernel[I].y, 0.0f));
-	}
-	
+	Output.PixelColor = tex2D(TextureInput, Input.TexCoord);
 	return Output;
 }
-
-PS_OUTPUT ps_main_vertical( PS_INPUT Input )
-{	
-	PS_OUTPUT Output;
-	Output.PixelColor = (float4)0.0f;
-
-	for (int I = 0; I < 7; I++)
-	{
-		Output.PixelColor += BlurKernel[I].x * tex2D(TextureInput, Input.TexCoord + float2(0.0f, BlurKernel[I].y));
-	}
-	
-	return Output;
-}
-
-/******************************************/
-/*              Color Blend               */
-/******************************************/ 
-// Uses vertex shader of blur pass
-
-sampler2D TextureInputOne : register(s0);
-sampler2D TextureInputTwo : register(s1);
-
-float BlendFactor : register(ps, c0);
-
-PS_OUTPUT ps_main_lerp( PS_INPUT Input )
-{	
-	PS_OUTPUT Output;
-	Output.PixelColor = (float4)0.0f;
-
-	float4 FirstColor = tex2D(TextureInputOne, Input.TexCoord);
-	float4 SecondColor = tex2D(TextureInputTwo, Input.TexCoord);
-	Output.PixelColor = lerp(FirstColor, SecondColor, BlendFactor);
-	
-	return Output;
-}
-
-
 
