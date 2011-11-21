@@ -90,9 +90,9 @@ class ZEMatrix3x3
 		static float					Determinant(const ZEMatrix3x3 &Matrix);
 		static bool						Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix);
 
-		static void						Transform(ZEVector2& Out, const ZEMatrix3x3 &Matrix, const ZEVector2& Vector); // Doldur metin doldur acıma doldur
+		static void						Transform(ZEVector2& Out, const ZEMatrix3x3 &Matrix, const ZEVector2& Vector);
 		static void						Transform(ZEVector3& Out, const ZEMatrix3x3 &Matrix, const ZEVector3& Vector);
-		static void						Transform(ZEVector4& Out, const ZEMatrix3x3 &Matrix, const ZEVector4& Vector); // Doldur metin doldur
+		static void						Transform(ZEVector4& Out, const ZEMatrix3x3 &Matrix, const ZEVector4& Vector);
 
 		float							Determinant() const;
 
@@ -129,6 +129,7 @@ class ZEMatrix3x3
 										ZEMatrix3x3();
 };
 
+ZEMatrix3x3 operator*(float S, const ZEMatrix3x3& RightOperand);
 
 
 // ZEMatrix4x4
@@ -224,6 +225,8 @@ class ZEMatrix4x4
 										ZEMatrix4x4(float* M);
 										ZEMatrix4x4();
 };
+
+ZEMatrix4x4 operator*(float S, const ZEMatrix4x4& RightOperand);
 
 #endif
 

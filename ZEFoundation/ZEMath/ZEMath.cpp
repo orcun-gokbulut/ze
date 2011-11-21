@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAngle.cpp
+ Zinek Engine - ZEMath.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,81 +33,110 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEAngle.h"
+#include "ZEMath.h"
 
 #include <math.h>
 
-float ZEAngle::Range(float Angle)
+float ZEMath::Sqrt(float Value)
 {
-	float ModAngle = fmod(Angle, ZE_PIx2);
-	if(ModAngle > ZE_PI)
-		return ModAngle - ZE_PIx2;
-	else if(ModAngle < -ZE_PI)
-		return ModAngle + ZE_PIx2;
-
-	return ModAngle;
+	return sqrt(Value);
 }
 
-float ZEAngle::Distance(float Angle1, float Angle2)
+float ZEMath::Abs(float Value)
 {
-	return Range(fabs(Angle1 - Angle2));
+	if (Value < 0.0f)
+		return -Value;
+	else
+		return Value;
 }
 
-float ZEAngle::Cos(float Value)
+float ZEMath::Sign(float Value)
 {
-	return cos(Value);
+	if (Value == 0.0f)
+		return 0.0f;
+	else if (Value < 0.0f)
+		return -1.0f;
+	else
+		return 0.0f;
 }
 
-float ZEAngle::Sin(float Value)
+float ZEMath::Min(float A, float B)
 {
-	return sin(Value);
+	return (A < B ? A : B);
 }
 
-float ZEAngle::Tan(float Value)
+float ZEMath::Max(float A, float B)
 {
-	return tan(Value);
+	return (A > B ? A : B);
 }
 
-float ZEAngle::Cot(float Value)
+int ZEMath::Max(int A, int B)
 {
-	return 1.0f / tan(Value);
+	return (A > B ? A : B);
 }
 
-float ZEAngle::ArcSin(float Value)
+int ZEMath::Min(int A, int B)
 {
-	return asin(Value);
+	return (A < B ? A : B);
 }
 
-float ZEAngle::ArcCos(float Value)
+float ZEMath::Loge(float Value)
 {
-	return acos(Value);
+	return logf(Value);
 }
 
-float ZEAngle::ArcTan(float Value)
+float ZEMath::Log10(float Value)
 {
-	return atan(Value);
+	return log10f(Value);
 }
 
-float ZEAngle::ArcTan2(float x, float y)
+float ZEMath::Power(float Base, float Exponent)
 {
-	return atan2(x, y);
+	return powf(Base, Exponent);
 }
 
-float ZEAngle::ToRadian(float Angle)
+float ZEMath::Exp(float Exponent)
 {
-	return (Angle * ZE_PI/180);
+	return expf(Exponent);
 }
 
-float ZEAngle::ToDegree(float Angle)
+float ZEMath::Lerp(float A, float B, float Factor)
 {
-	return (Angle * 180/ZE_PI);
+	return A + (B - A) * Factor;
 }
 
-ZEVector2 ZEAngle::ToVector(float Angle)
+float ZEMath::Clamp(float A, float MinValue, float MaxValue)
 {
-	ZEVector2 Output;
-	Output.x = sin(Angle);
-	Output.y = cos(Angle);
+	if (A > MaxValue)
+		return MaxValue;
+	else if (A < MinValue)
+		return MinValue;
+	else
+		return A;
+}
 
-	return Output;
+float ZEMath::ClampLower(float Value, float MinValue)
+{
+	if (Value < MinValue)
+		return MinValue;
+	else
+		return Value;
+}
+
+float ZEMath::ClampUpper(float Value, float MaxValue)
+{
+	if (Value > MaxValue)
+		return MaxValue;
+	else
+		return Value;
+}
+
+float ZEMath::Saturate(float Value)
+{
+	if (Value > 1.0f)
+		return 1.0f;
+	else if (Value < 0.0f)
+		return 0.0f;
+	else
+		return Value;
 }

@@ -61,25 +61,24 @@
 class ZEAngle
 {
 	public:
-		struct Radian
-		{
-			static float Range(float Angle);
-			static float Distance(float Angle1, float Angle2);
+		static float		Range(float Angle);
+		static float		Distance(float Angle1, float Angle2);
 
-			static float ToDegree(float Angle);
-			static ZEVector2 ToVector(float Angle);
-		};
+		static float		Cos(float Value);
+		static float		Sin(float Value);
+		static float		Tan(float Value);
+		static float		Cot(float Value);
 
-		struct Degree
-		{
-			static float Range(float Angle);
-			static float Distance(float Angle1, float Angle2);
+		static float		ArcSin(float Value);
+		static float		ArcCos(float Value);
+		static float		ArcTan(float Value);
+		static float		ArcTan2(float x, float y);
 
-			static float ToRadian(float Angle);
-			static ZEVector2 ToVector(float Angle);
-		};
+		static float		ToRadian(float Angle);
+		static float		ToDegree(float Angle);
+		static ZEVector2	ToVector(float Angle);
+
 };
-
 
 #endif
 
