@@ -108,7 +108,7 @@ class ZEFlagsBase
 
 		inline ZEFlagsBase<Type> operator&(const ZEFlagsBase<Type>& Other) const
 		{
-			ZEFlagsBase<Type>(this->Value & Other->Value);
+			ZEFlagsBase<Type>(this->Value & Other.Value);
 			return *this;
 		}
 
@@ -120,7 +120,7 @@ class ZEFlagsBase
 
 		inline ZEFlagsBase<Type>& operator&=(const ZEFlagsBase<Type>& Other)
 		{
-			this->Value &= Other->Value;
+			this->Value &= Other.Value;
 			return *this;
 		}
 
@@ -131,7 +131,7 @@ class ZEFlagsBase
 
 		inline ZEFlagsBase<Type> operator|(const ZEFlagsBase<Type>& Other) const
 		{
-			return ZEFlagsBase<Type>(this->Value | Other->Value);
+			return ZEFlagsBase<Type>(this->Value | Other.Value);
 		}
 
 		inline ZEFlagsBase<Type>& operator|=(const Type& Other)
@@ -140,9 +140,9 @@ class ZEFlagsBase
 			return *this;
 		}
 
-		inline ZEFlagsBase<int>& operator|=(const ZEFlagsBase<Type>& Other)
+		inline ZEFlagsBase<Type>& operator|=(const ZEFlagsBase<Type>& Other)
 		{
-			this->Value |= Other->Value;
+			this->Value |= Other.Value;
 			return *this;
 		}
 
@@ -153,24 +153,24 @@ class ZEFlagsBase
 
 		inline ZEFlagsBase<Type> operator^(const ZEFlagsBase<Type>& Other) const
 		{
-			return ZEFlagsBase<Type>(this->Value ^ Other->Value);
+			return ZEFlagsBase<Type>(this->Value ^ Other.Value);
 		}
 
 		inline ZEFlagsBase<Type>& operator^=(const Type& Other)
 		{
-			this->Type ^= Other;
+			this->Value ^= Other;
 			return *this;
 		}
 
 		inline ZEFlagsBase<Type>& operator^=(const ZEFlagsBase<Type>& Other)
 		{
-			this->Value ^= Other->Value;
+			this->Value ^= Other.Value;
 			return *this;
 		}
 
 		inline ZEFlagsBase<Type>& operator~() const
 		{
-			return ZEFlagsBase<int>(~this->Value);
+			return ZEFlagsBase<Type>(~this->Value);
 		}
 
 		inline ZEFlagsBase<Type>& operator=(const Type& Other)
@@ -181,7 +181,7 @@ class ZEFlagsBase
 		
 		inline ZEFlagsBase<Type>& operator=(const ZEFlagsBase<Type>& Other)
 		{
-			this->Value = Other->Value;
+			this->Value = Other.Value;
 			return *this;
 		}
 
@@ -201,6 +201,6 @@ class ZEFlagsBase
 		}
 };
 
-typedef ZEFlagsBase<> ZEFlags;
+typedef ZEFlagsBase<ZEUInt> ZEFlags;
 
 #endif
