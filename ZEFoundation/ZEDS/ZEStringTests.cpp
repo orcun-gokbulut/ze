@@ -39,403 +39,443 @@
 
 ZETestSuiteAdd(ZEString)
 {
-	ZETestItemAdd(ZEString)
+	ZETestItemAdd(ZEString)//Equals, =
 	{
-		ZEString A, B;
+		ZEString TestItem1, TestItem2;
 
-		A.Buffer = "Orcun";
-		B.Buffer = "Orcun";
-		CHECK(A.Equals(B));
-		CHECK(A == B);
-		
-		B.Buffer = "nucrO";
-		CHECK(!A.Equals(B));
-		CHECK(A != B);
+		TestItem1 = "Orcun";
+		TestItem2 = "Orcun";
+		CHECK(TestItem1.Equals(TestItem2));
+		CHECK(TestItem1 == TestItem2);
 
-		CHECK(A == "Orcun");
-		CHECK(B != "Orcun");
-		A.Buffer = NULL;
-		B.Buffer = NULL;
+		TestItem2 = "nucrO";
+		CHECK(!TestItem1.Equals(TestItem2));
+		CHECK(TestItem1 != TestItem2);
 
-		CHECK(A == B);
-		CHECK(A == "");
+		CHECK(TestItem1 == "Orcun");
+		CHECK(TestItem2 == "nucrO");
 	}
 
-	ZETestItemAdd(Assignments)
+	ZETestItemAdd(Assigments)
 	{
-		ZEString String;
-		String.SetValue("Testing Testing");
-		CHECK_EQUAL(String, "Testing Testing");
-		CHECK_EQUAL(String, "Testing Testing");
 
-		String.SetValue("ASCII TEST ascii test");
-		CHECK_EQUAL(String, "ASCII TEST ascii test");
+		ZEString TestItem1;
+		TestItem1.SetValue("Testing Testing");
+		CHECK_EQUAL(TestItem1, "Testing Testing");
 
-		String.SetValue("UTF8 Türkçe karakterler Test");
-		CHECK_EQUAL(String, "UTF8 Türkçe karakterler Test");
+		TestItem1.SetValue("ASCII TEST ascii test");
+		CHECK_EQUAL(TestItem1, "ASCII TEST ascii test");
 
-		String = "Testing Testing";
-		CHECK_EQUAL(String, "Testing Testing");
+		TestItem1.SetValue("UTF8 Türkçe karakterler Test");
+		CHECK_EQUAL(TestItem1, "UTF8 Türkçe karakterler Test");
 
-		String = "String Test 123";
-		CHECK_EQUAL(String, "String Test 123");
+		TestItem1 = "Testing Testing";
+		CHECK_EQUAL(TestItem1, "Testing Testing");
 
-		ZEString A("Constructor");
-		CHECK_EQUAL(A, "Constructor");
+		TestItem1 = "Testing 123";
+		CHECK_EQUAL(TestItem1, "Testing 123");
 
-		ZEString B("Wide Constructor");
-		CHECK_EQUAL(B, "Wide Constructor");
+		ZEString TestItem2("Constructor");
+		CHECK_EQUAL(TestItem2, "Constructor");
 
-		ZEString C("Copy Constructor");
-		ZEString D(C);
+		ZEString TestItem3("Wide Constructor");
+		CHECK_EQUAL(TestItem3, "Wide Constructor");
 
-		CHECK_EQUAL(D, "Copy Constructor");
+		ZEString TestItem4("Copy Constructor");
+		CHECK_EQUAL(TestItem4, "Copy Constructor");
 
-		String = A;
-		CHECK_EQUAL(String, A.GetValue());
+		ZEString TestItem10 = "Operator Assignment";
+		CHECK_EQUAL(TestItem10, "Operator Assignment");
 
-		String = "Operator Assignment";
-		CHECK_EQUAL(String, "Operator Assignment");
-		
-		String = "Char Operator Assignment";
-		CHECK_EQUAL(String, "Char Operator Assignment");
+		ZEString TestItem5;
+		ZEString TestItem6;
+		TestItem5 = TestItem6;
+		CHECK_EQUAL(TestItem5, "");
 
-		ZEString X;
-		ZEString Y;
-		X = Y;
-		CHECK_EQUAL(X, "");
-		
-		ZEString W(X);
-		CHECK_EQUAL(W, "");
+		ZEString TestItem7(TestItem5);
+		CHECK_EQUAL(TestItem7, "");
+
+	}
+	ZETestItemAdd(OneTestArmy)//getlength,getvalue,getsize,setvalue,getcharacter,setcharacter
+	{
+		ZEString TestItem1;
+		ZEString TestItem2;
+		char TestItem3[2000];
+		ZEString TestItem4;
+		ZEString TestItem6;
+		for (size_t I = 0; I < 2000; I++)
+		{
+			TestItem3[I] = 'x';
+			TestItem3[1999] = '\0';
+		}
+		TestItem1 = "vivident";
+		CHECK_EQUAL(TestItem1.GetLength(), 8);
+		CHECK_EQUAL(TestItem1.GetSize(), 9);
+		TestItem1.Clear();
+		CHECK_EQUAL(TestItem1.GetLength(), 0);
+		CHECK_EQUAL(TestItem1.GetSize(), 0);
+
+		ZEString TestItem5("Constructor");
+		TestItem2 = TestItem5;
+		CHECK_EQUAL(TestItem2, TestItem5.GetValue());
+
+		TestItem3[500] = '\0';
+		CHECK(TestItem4 == "");
+
+		TestItem3[500] = '\0';
+		TestItem4.SetValue(TestItem3);
+		CHECK_EQUAL(TestItem4.GetLength(), 500);
+		CHECK(TestItem4.GetSize() >= 500);
+
+		TestItem3[1000] = 'x';
+		TestItem3[1500] = '\0';
+		TestItem6 = TestItem3;
+		CHECK_EQUAL(TestItem6.GetLength(), 500);
+		CHECK(TestItem6.GetSize() >= 500);
+
+		TestItem4.Clear();
+		CHECK_EQUAL(TestItem4.GetSize(), 0);
+		CHECK_EQUAL(TestItem4.GetLength(), 0);
+		CHECK(TestItem4 == "");
+
+		ZEString TestItem7;
+		TestItem7 = "Whazaa";
+		CHECK_EQUAL((TestItem7.GetCharacter(1)), 'h');
+		//TestItem7 = "";
+		//ZETestCheckEqual(TestItem7.GetCharacter(0), '');
+		// If we do this operation to an empty string, we got empty character constant error C2137 
+		TestItem7.SetCharacter(0, 'a');
+		CHECK_EQUAL(TestItem7.GetCharacter(0), 'a');
+		TestItem7.SetCharacter(0, 'C');
+		CHECK_EQUAL(TestItem7.GetCharacter(0), 'C');
+
 	}
 
 	ZETestItemAdd(ClearIsEmpty)
 	{
-		ZEString A;
-		CHECK(A.IsEmpty());
+		ZEString TestItem1;
+		CHECK(TestItem1.IsEmpty());
 
-		A = "Denerenrmenre";
-		A.Clear();
-		CHECK_EQUAL(A.GetLength(), 0);
-		CHECK_EQUAL(A.GetSize(), 0);
-		CHECK(A.IsEmpty());		
+		TestItem1 = "Zaaaa";
+		TestItem1.Clear();
+		CHECK_EQUAL(TestItem1.GetLength(), 0);
+		CHECK_EQUAL(TestItem1.GetSize(), 0);
+		CHECK(TestItem1.IsEmpty());
+
 	}
 
-	ZETestItemAdd(Buffer)
+	ZETestItemAdd(insert)
 	{
-		char TestString[2000];
-		for(size_t I = 0; I < 2000; I++)
-			TestString[I] = 'x';
-		TestString[1999] = '\0';
+		ZEString TestItem1 = "Insertable Text";
+		TestItem1.Insert("Pre");
+		CHECK_EQUAL(TestItem1, "PreInsertable Text");
 
-		ZEString A;
-		CHECK(A.Buffer == NULL);
-		
-		TestString[500] = '\0';
-		A.SetValue(TestString);
-		CHECK_EQUAL(A.GetLength(), 500);
-		CHECK(A.GetSize() >=  500);
+		ZEString TestItem2 = "Insertable Text";
+		TestItem2.Insert(ZEString("Pre"));
+		CHECK_EQUAL(TestItem2, "PreInsertable Text");
 
-		TestString[500] = 'x';
-		TestString[1000] = '\0';
-		A = TestString;
-		CHECK_EQUAL(A.GetLength(), 1000);
-		CHECK(A.GetSize() >= 1000);
-		
-		TestString[1000] = 'x';
-		TestString[1500] = '\0';
-		A = TestString;
-		CHECK_EQUAL(A.GetLength(), 1500);
-		CHECK(A.GetSize() >= 1500);
+		//InsertMiddle
 
-		TestString[250] = '\0';
-		A = TestString;
-		CHECK_EQUAL(A.GetLength(), 250);
-		CHECK(A.GetSize() >= 250);
+		ZEString TestItem3 = "cCccCc";
+		TestItem3.Insert(3, "EGEMENBASKAN");
+		CHECK_EQUAL(TestItem3, "cCcEGEMENBASKANcCc");
 
-		A.Clear();
-		CHECK_EQUAL(A.GetSize(), 0);
-		CHECK_EQUAL(A.GetLength(), 0);
-		CHECK(A.Buffer == NULL);
+		ZEString TestItem4 = "cCccCc";
+		TestItem4.Insert(3, "");
+		CHECK_EQUAL(TestItem4, "cCccCc");
 
-		A = "String SetSize Testing";
-		CHECK_EQUAL(A, "String SetSize Testing");
-		A.Compact();
-		CHECK_EQUAL(A, "String SetSize Testing");
+		//insert end
+
+		ZEString TestItem5 = "EndPoint";
+		TestItem5.Insert(8, "Location");
+		CHECK_EQUAL(TestItem5, "EndPointLocation");
+
 	}
 
-	ZETestItemAdd(Insert)
+	ZETestItemAdd(AppendAndOperators)
 	{
-		ZEString A = "Insertable Text";
-		A.Insert("Pre");
-		CHECK_EQUAL(A, "PreInsertable Text");
+		// void Append(const ZEString& String
+		ZEString TestItem1 = "StringA";
+		TestItem1.Append("StringB");
+		CHECK_EQUAL(TestItem1, "StringAStringB");
 
-		ZEString B = "Insertable Text";
-		B.Insert(ZEString("Pre"));
-		CHECK_EQUAL(B, "PreInsertable Text");
+		TestItem1 = "LayLayLay";
+		TestItem1.Append("LomLomLom");
+		CHECK_EQUAL(TestItem1, "LayLayLayLomLomLom");
+		TestItem1.Append(ZEString(" "));
+		CHECK_EQUAL(TestItem1, "LayLayLayLomLomLom ");
 
-		ZEString C = "Empty String";
-		C.Insert("");
-		CHECK_EQUAL(C, "Empty String");
-		
-		ZEString D;
-		D.Insert("New String");
-		CHECK_EQUAL(D, "New String");
-	}
+		TestItem1 = "";
+		TestItem1.Append("");
+		CHECK_EQUAL(TestItem1, "");
 
-	ZETestItemAdd(InsertStart)
-	{
-		ZEString A = "Insertable Text";
-		A.Insert(0, "Pre");
-		CHECK_EQUAL(A, "PreInsertable Text");
+		TestItem1 = "StringA";
+		TestItem1 += ZEString("StringB");
+		CHECK_EQUAL(TestItem1, "StringAStringB");
 
-		ZEString B = "Empty String";
-		B.Insert(0, "");
-		CHECK_EQUAL(B, "Empty String");
-		
-		ZEString C;
-		C.Insert(0, "New String");
-		CHECK_EQUAL(C, "New String");
+		TestItem1 = "StringA";
+		CHECK_EQUAL(TestItem1 + "StringB", "StringAStringB");
+		CHECK_EQUAL(TestItem1 +ZEString("StringB"), "StringAStringB");
 
-		ZEString D;
-		ZEString E;
-		D.Insert(E);
-	}
+		//[]
+		ZEString TestItem2;
+		TestItem2.Append("012");
+		CHECK_EQUAL(TestItem2[0], '0');
+		CHECK_EQUAL(TestItem2[1], '1');
+		CHECK_EQUAL(TestItem2[2], '2');
 
-	ZETestItemAdd(InsertMiddle)
-	{
-		ZEString A = "$%%$";
-		A.Insert(2, "Testing");
-		CHECK_EQUAL(A, "$%Testing%$");
+		//!=
+		int a;
+		if(TestItem2 != "01")
 
-		ZEString B = "$%%$";
-		B.Insert(2, "");
-		CHECK_EQUAL(B, "$%%$");
-	}
+			a=1;
+		else
+			a=2;
+		CHECK_EQUAL(a, 1);
 
-	ZETestItemAdd(InsertEnd)
-	{
-		ZEString A = "EndPoint";
-		A.Insert(8, "Location");
-		CHECK_EQUAL(A, "EndPointLocation");
+		int b;
 
-		ZEString B = "EndPoint";
-		B.Insert(8, "Location");
-		CHECK_EQUAL(B, "EndPointLocation");
-	}
+		if (TestItem2 != "012")
 
-	ZETestItemAdd(Append)
-	{
-		//void Append(const ZEString& String);
-		ZEString A = "StringA";
-		A.Append("StringB");
-		CHECK_EQUAL(A, "StringAStringB");
+			b = 1;
+		else
+			b = 2;
 
-		A = "Orcun";
-		A.Append("Rulz");
-		CHECK_EQUAL(A, "OrcunRulz");
-		A.Append(ZEString(" "));
-		CHECK_EQUAL(A, "OrcunRulz ");
-		
-		A = "StringA";
-		CHECK_EQUAL(A + "StringB", "StringAStringB");
-		CHECK_EQUAL(A + "StringB", "StringAStringB");
-		CHECK_EQUAL(A + ZEString("StringB"), "StringAStringB");
+		CHECK_EQUAL(b, 2);
 
-		A = "StringA";
-		A += ZEString("StringB");
-		CHECK_EQUAL(A, "StringAStringB");
-
-		A = "";
-		A.Append("");
-		CHECK_EQUAL(A, "");
-
-		A = "StringA";
-		A += "";
-		CHECK_EQUAL(A, "StringA");
-		
-		A = "XYZ";
-		A += ZEString("");
-		CHECK_EQUAL(A, "XYZ");
-	}
+	}	
 
 	ZETestItemAdd(Remove)
 	{
-		ZEString A = "";
-		A.Remove(0, 0);
-		
-		A = "1234567890";
-		A.Remove(0, 0);
-		CHECK_EQUAL(A, "1234567890");
+		ZEString TestItem1 = "";
+		TestItem1.Remove(0, 0);
 
-		A = "1234567890";
-		A.Remove(0, 1);
-		CHECK_EQUAL(A, "234567890");
+		TestItem1 = "1234567890";
+		TestItem1.Remove(0, 0);
+		CHECK_EQUAL(TestItem1, "1234567890");
 
-		A = "1234567890";
-		A.Remove(0, 5);
-		CHECK_EQUAL(A, "67890");
+		TestItem1 = "1234567890";
+		TestItem1.Remove(0, 1);
+		CHECK_EQUAL(TestItem1, "234567890");
 
-		A = "1234567890";
-		A.Remove(1, 1);
-		CHECK_EQUAL(A, "134567890");
+		TestItem1 = "1234567890";
+		TestItem1.Remove(0, 5);
+		CHECK_EQUAL(TestItem1, "67890");
+		char c;
+		c = TestItem1[1];
+		CHECK_EQUAL(c, '7');
+		CHECK_EQUAL(TestItem1.GetSize(), 6);
+		CHECK_EQUAL(TestItem1.GetLength(), 5);
+		TestItem1 = "1234567890";;
+		TestItem1.Remove(1, 1);
+		CHECK_EQUAL(TestItem1, "134567890");
 
-		A = "1234567890";
-		A.Remove(1, 5);
-		CHECK_EQUAL(A, "17890");
+		TestItem1 = "1234567890";
+		TestItem1.Remove(1, 5);
+		CHECK_EQUAL(TestItem1, "17890");
 
-		A = "1234567890";
-		A.Remove(9, 1);
-		CHECK_EQUAL(A, "123456789");
+		TestItem1 = "1234567890";
+		TestItem1.Remove(9, 1);
+		CHECK_EQUAL(TestItem1, "123456789");
 
-		A = "1234567890";
-		A.Remove(8, 2);
-		CHECK_EQUAL(A, "12345678");
-
-		A = "1234567890";
-		A.Remove(3, 4);
-		CHECK_EQUAL(A, "123890");
-	}	
-
-	ZETestItemAdd(Contains)
-	{
-
-	}
-
-	ZETestItemAdd(Replace)
-	{
-
-	}
-
-	ZETestItemAdd(Delete)
-	{
+		TestItem1 = "1234567890";
+		TestItem1.Remove(3, 4);
+		CHECK_EQUAL(TestItem1, "123890");
 
 	}
 
 	ZETestItemAdd(Left)
 	{
-		ZEString A;
-		CHECK_EQUAL(A.Left(0), "");
+		ZEString TestItem1;
+		CHECK_EQUAL(TestItem1.Left(0), "");
 
-		A = "1234Test5678";
-		CHECK_EQUAL(A.Left(0), "");
-		CHECK_EQUAL(A.Left(1), "1");
-		CHECK_EQUAL(A.Left(4), "1234");
-		CHECK_EQUAL(A.Left(12), "1234Test5678");
+		TestItem1 = "1234Test5678";
+		CHECK_EQUAL(TestItem1.Left(0), "");
+		CHECK_EQUAL(TestItem1.Left(1), "1");
+		CHECK_EQUAL(TestItem1.Left(4), "1234");
+		CHECK_EQUAL(TestItem1.Left(12), "1234Test5678");
+
 	}
-	
+
 	ZETestItemAdd(Right)
 	{
-		ZEString A;
-		CHECK_EQUAL(A.Right(0), "");
+		ZEString TestItem1;
+		CHECK_EQUAL(TestItem1.Right(0), "");
 
-		A = "1234Test5678";
-		CHECK_EQUAL(A.Right(0), "");
-		CHECK_EQUAL(A.Right(1), "8");
-		CHECK_EQUAL(A.Right(4), "5678");
-		CHECK_EQUAL(A.Right(12), "1234Test5678");
+		TestItem1 = "1234Test5678";
+		CHECK_EQUAL(TestItem1.Right(0), "");
+		CHECK_EQUAL(TestItem1.Right(1), "8");
+		CHECK_EQUAL(TestItem1.Right(4), "5678");
+		CHECK_EQUAL(TestItem1.Right(12), "1234Test5678");
+
 	}
 
 	ZETestItemAdd(Middle)
 	{
-		ZEString A;
-		CHECK_EQUAL(A.Middle(0,0), "");
-		
-		A = "1234Test5678";
-		CHECK_EQUAL(A.Middle(0, 0), "");
-		CHECK_EQUAL(A.Middle(5, 0), "");
-		CHECK_EQUAL(A.Middle(11, 0), "");
 
-		// Front
-		CHECK_EQUAL(A.Middle(0, 0), "");
-		CHECK_EQUAL(A.Middle(0, 1), "1");
-		CHECK_EQUAL(A.Middle(0, 4), "1234");
-		CHECK_EQUAL(A.Middle(0, 12), "1234Test5678");
+		ZEString TestItem1;
+		CHECK_EQUAL(TestItem1.Middle(0, 0), "");
 
-		// Back
-		CHECK_EQUAL(A.Middle(12, 0), "");
-		CHECK_EQUAL(A.Middle(11, 1), "8");
-		CHECK_EQUAL(A.Middle(8, 4), "5678");
+		TestItem1 = "1234Test5678";
+		CHECK_EQUAL(TestItem1.Middle(0, 0), "");
+		CHECK_EQUAL(TestItem1.Middle(5, 0), "");
+		CHECK_EQUAL(TestItem1.Middle(11, 0), "");
 
-		// Middle
-		CHECK_EQUAL(A.Middle(4, 0), "");
-		CHECK_EQUAL(A.Middle(4, 1), "T");
-		CHECK_EQUAL(A.Middle(4, 4), "Test");
+		//Front
+		CHECK_EQUAL(TestItem1.Middle(0, 0), "");
+		CHECK_EQUAL(TestItem1.Middle(0, 1), "1");
+		CHECK_EQUAL(TestItem1.Middle(0, 4), "1234");
+		CHECK_EQUAL(TestItem1.Middle(0, 12), "1234Test5678");
+
+		//Back
+		CHECK_EQUAL(TestItem1.Middle(12,0), "");
+		CHECK_EQUAL(TestItem1.Middle(11,1), "8");
+		CHECK_EQUAL(TestItem1.Middle(8, 4), "5678");
+
+		//Middle
+		CHECK_EQUAL(TestItem1.Middle(4, 0), "");
+		CHECK_EQUAL(TestItem1.Middle(4, 1), "T");
+		CHECK_EQUAL(TestItem1.Middle(4, 4), "Test");
+
+
 	}
 
 	ZETestItemAdd(SubString)
 	{
-		ZEString A;
-		CHECK_EQUAL(A.SubString(0, 0), "");
 
-		A = "1234Test5678";
-		CHECK_EQUAL(A.SubString(0, 0), "1");
-		CHECK_EQUAL(A.SubString(0, 1), "12");
-		CHECK_EQUAL(A.SubString(0, 3), "1234");
+		ZEString TestItem1;
+		CHECK_EQUAL(TestItem1.SubString(0, 0), "");
 
-		CHECK_EQUAL(A.SubString(4, 4), "T");
-		CHECK_EQUAL(A.SubString(4, 5), "Te");
-		CHECK_EQUAL(A.SubString(4, 7), "Test");
+		TestItem1 = "1234Test5678";
+		CHECK_EQUAL(TestItem1.SubString(0, 0), "1");
+		CHECK_EQUAL(TestItem1.SubString(0, 1), "12");
+		CHECK_EQUAL(TestItem1.SubString(0, 3), "1234");
 
-		CHECK_EQUAL(A.SubString(8, 8), "5");
-		CHECK_EQUAL(A.SubString(8, 9), "56");
-		CHECK_EQUAL(A.SubString(8, 11), "5678");
+		CHECK_EQUAL(TestItem1.SubString(4, 4), "T");
+		CHECK_EQUAL(TestItem1.SubString(4, 5), "Te");
+		CHECK_EQUAL(TestItem1.SubString(4, 7), "Test");
+
+		CHECK_EQUAL(TestItem1.SubString(8, 8), "5");
+		CHECK_EQUAL(TestItem1.SubString(8, 9), "56");
+		CHECK_EQUAL(TestItem1.SubString(8, 11), "5678");
+
 	}
 
-	ZETestItemAdd(UpperLower)
+	ZETestItemAdd(ToLower)
 	{
-		ZEString A = "LOWERCASE";
-		CHECK_EQUAL(A.Lower(), "lowercase");
-		
-		A = ">>*loWeR <<%12CaSe\t";
-		CHECK_EQUAL(A.Lower(), ">>*lower <<%12case\t");
+		ZEString TestItem1;
+		ZEString TestItem2;
+		ZEString TestItem3;
 
-		A = "uppercase";
-		CHECK_EQUAL(A.Upper(), "UPPERCASE");
+		TestItem1 = "name";
+		TestItem2 = "HEALTH";
+		TestItem3 = "WoUnD";
 
-		A = ">>*UpPeR <<%12CaSe\t";
-		CHECK_EQUAL(A.Upper(), ">>*UPPER <<%12CASE\t");
+		CHECK_EQUAL(TestItem1.Lower(), "name");
+		CHECK_EQUAL(TestItem2.Lower(), "health");
+		CHECK_EQUAL(TestItem3.Lower(), "wound");
+
+		TestItem1 = "";
+		CHECK_EQUAL(TestItem1.Lower(), "");
+
 	}
 
-	ZETestItemAdd(Trim)
+	ZETestItemAdd(ToUpper)
 	{
-		ZEString A;
-		CHECK_EQUAL(A.TrimLeft(), "");
-		CHECK_EQUAL(A.TrimRight(), "");
-		CHECK_EQUAL(A.Trim(), "");
+		ZEString TestItem1;
+		ZEString TestItem2;
+		ZEString TestItem3;
+		ZEString TestItem4;
 
-		A = "    ";
-		CHECK_EQUAL(A.TrimLeft(), "");
-		CHECK_EQUAL(A.TrimRight(), "");
-		CHECK_EQUAL(A.Trim(), "");
+		TestItem1 = "Name";
+		TestItem2 = "HEALTH";
+		TestItem3 = "WoUnD";
+		TestItem4 = "";
 
-		A = "Trim Trim";
-		CHECK_EQUAL(A.TrimLeft(), "Trim Trim");
-		CHECK_EQUAL(A.TrimRight(), "Trim Trim");
-		CHECK_EQUAL(A.Trim(), "Trim Trim");
+		CHECK_EQUAL(TestItem1.Upper(), "NAME");
+		CHECK_EQUAL(TestItem2.Upper(), "HEALTH");
+		CHECK_EQUAL(TestItem3.Upper(), "WOUND");
+		CHECK_EQUAL(TestItem4.Upper(), "");
 
-		A = " Trim Trim ";
-		CHECK_EQUAL(A.TrimLeft(), "Trim Trim ");
-		CHECK_EQUAL(A.TrimRight(), " Trim Trim");
-		CHECK_EQUAL(A.Trim(), "Trim Trim");
-
-		A = "    Trim Trim    ";
-		CHECK_EQUAL(A.TrimLeft(), "Trim Trim    ");
-		CHECK_EQUAL(A.TrimRight(), "    Trim Trim");
-		CHECK_EQUAL(A.Trim(), "Trim Trim");
-
-		A = "\t\tTrim Trim\t\t";
-		CHECK_EQUAL(A.TrimLeft(), "Trim Trim\t\t");
-		CHECK_EQUAL(A.TrimRight(), "\t\tTrim Trim");
-		CHECK_EQUAL(A.Trim(), "Trim Trim");
-
-		A = " \t \tTrim Trim \t \t";
-		CHECK_EQUAL(A.TrimLeft(), "Trim Trim \t \t");
-		CHECK_EQUAL(A.TrimRight(), " \t \tTrim Trim");
-		CHECK_EQUAL(A.Trim(), "Trim Trim");
 	}
 
 	ZETestItemAdd(CopyOnWrite)
 	{
+		ZEString TestItem1 = "MADAO";
+		ZEString TestItem2 = "ERZA";
+		ZEString TestItem3 = "NATSU";
+		ZEString TestItem4 = "";
+		TestItem1.CopyFrom(TestItem2);
+		TestItem3.CopyTo(TestItem4);
+
+		CHECK_EQUAL(TestItem1, "ERZA");
+		CHECK_EQUAL(TestItem4, "NATSU");
+
+		TestItem4 = "";
+		TestItem1.CopyFrom(TestItem4);
+		TestItem3.CopyTo(TestItem2);
+
+		CHECK_EQUAL(TestItem4, "");
+		CHECK_EQUAL(TestItem2, "NATSU");
 	}
+
+	ZETestItemAdd(Trim)
+	{
+
+		ZEString TestItem1;
+		CHECK_EQUAL(TestItem1.TrimLeft(), "");
+		CHECK_EQUAL(TestItem1.TrimRight(), "");
+		CHECK_EQUAL(TestItem1.Trim(), "");
+
+		TestItem1 = "    ";
+		CHECK_EQUAL(TestItem1.TrimLeft(), "");
+		CHECK_EQUAL(TestItem1.TrimRight(), "");
+		CHECK_EQUAL(TestItem1.Trim(), "");
+
+		TestItem1 = "Trim Trim";
+		CHECK_EQUAL(TestItem1.TrimLeft(), "Trim Trim");
+		CHECK_EQUAL(TestItem1.TrimRight(), "Trim Trim");
+		CHECK_EQUAL(TestItem1.Trim(), "Trim Trim");
+
+		TestItem1 = "   Trim Trim   ";
+		CHECK_EQUAL(TestItem1.TrimLeft(), "Trim Trim   ");
+		CHECK_EQUAL(TestItem1.TrimRight(), "   Trim Trim");
+		CHECK_EQUAL(TestItem1.Trim(), "Trim Trim");
+
+		TestItem1 = "\t\tTrim Trim\t\t";
+		CHECK_EQUAL(TestItem1.TrimLeft(), "Trim Trim\t\t");
+		CHECK_EQUAL(TestItem1.TrimRight(), "\t\tTrim Trim");
+		CHECK_EQUAL(TestItem1.Trim(), "Trim Trim");
+
+		TestItem1 = " \t \tTrim Trim \t \t";
+		CHECK_EQUAL(TestItem1.TrimLeft(), "Trim Trim \t \t");
+		CHECK_EQUAL(TestItem1.TrimRight(), " \t \tTrim Trim");
+		CHECK_EQUAL(TestItem1.Trim(), "Trim Trim");
+
+	}
+
+	ZETestItemAdd(Castings)
+	{
+		//tointeger
+		ZEString TestItem1;
+		
+			
+	
+		//todobule
+		ZEString TestItem2;
+
+
+
+		//tofloat
+		ZEString TestITem3;
+
+
+
+		//toUnsignedinteger
+		ZEString TestItem4;
+
+		
+
+	}
+		
 }
