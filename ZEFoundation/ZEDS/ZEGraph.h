@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETrigonometryTest.cpp
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,25 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <UnitTest/UnitTest++.h>
-#include <math.h>
-#include "ZETestsCommon/ZEIOStreamMapping.h"
-#include "ZEMath/ZETrigonometry.h"
-#include "ZEMath/ZEMathDefinitions.h"
-
-SUITE(ZETrigonometry)
-{
-	TEST(FastSin)
-	{
-		CHECK_EQUAL(FastSin(360), 0);
-
-	}
-	TEST(FastCos)
-	{
-		CHECK_EQUAL(FastCos(360), 1);
-	}
-	TEST(FastTan)
-	{
-		CHECK_EQUAL(FastTan(360), 0);
-	}
-}

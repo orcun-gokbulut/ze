@@ -42,40 +42,40 @@
 #include "ZEMath/ZELine.h"
 #include "ZEMath/ZEMathDefinitions.h"
 
-ZETestSuiteAdd(ZELineSegment)
+ZETestSuite(ZELineSegment)
 {
-	ZETestItemAdd(Constructor)
+	ZETest(Constructor)
 	{
 		ZEVector3 P0(0.0f, 1.0f, 0.0f);
 		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZELineSegment LS(P0, P1);
 
-		CHECK_EQUAL(LS.p, P0);
-		CHECK_EQUAL(LS.v, ZEVector3(1.0f, 1.0f, 3.0f));
+		ZETestCheckEqual(LS.p, P0);
+		ZETestCheckEqual(LS.v, ZEVector3(1.0f, 1.0f, 3.0f));
 	}
 	
-	ZETestItemAdd(Create)
+	ZETest(Create)
 	{
 		ZELineSegment L;
 		ZEVector3 P0(0.0f, 1.0f, 0.0f);
 		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZELineSegment::Create(L, P0, P1);
 
-		CHECK_EQUAL(L.p, P0);
-		CHECK_EQUAL(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
+		ZETestCheckEqual(L.p, P0);
+		ZETestCheckEqual(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
 	}
 
-	ZETestItemAdd(CreateParametric)
+	ZETest(CreateParametric)
 	{
 		ZELineSegment L;
 		ZEVector3 V(1.0, 4.0f, 9.0f);
 		ZEVector3  P(1.0, 0.0f, 0.0f);
 		ZELineSegment::CreateParametric(L, V, P);
-		CHECK_EQUAL(L.p, P);
-		CHECK_EQUAL(L.v, V);
+		ZETestCheckEqual(L.p, P);
+		ZETestCheckEqual(L.v, V);
 	}
 
-	ZETestItemAdd(GetPointOn)
+	ZETest(GetPointOn)
 	{
 		ZEVector3 P0(0,3,0);
 		ZEVector3 P1(1,4,-1);
@@ -91,20 +91,20 @@ ZETestSuiteAdd(ZELineSegment)
 		ZEVector3::Add(P,P,L.p);
 		B = P;
 
-		CHECK_EQUAL(A, B);
+		ZETestCheckEqual(A, B);
 
 		L.GetPointOn(P,-1.0f);
 		A = P;
 		B = L.p;
 
-		CHECK_EQUAL(A, B);
+		ZETestCheckEqual(A, B);
 
 		L.GetPointOn(P,3.0f);
 		A = P;
 		B = L.p + L.v;
 	}
 
-	ZETestItemAdd(DistanceToPoint)
+	ZETest(DistanceToPoint)
 	{
 		ZEVector3 P(5,8,2);
 		ZEVector3 P1(0,3,0);
@@ -115,10 +115,10 @@ ZETestSuiteAdd(ZELineSegment)
 
 		d = ZELine::MinimumDistance(L,P,t);
 
-		CHECK_CLOSE(d, 4.61880215, 0.000001);
+		ZETestCheckClose(d, 4.61880215, 0.000001);
 	}
 
-	ZETestItemAdd(MinumumDistance)
+	ZETest(MinumumDistance)
 	{
 		ZEVector3 P1(0,3,0);
 		ZEVector3 P2(1,4,-1);
@@ -131,7 +131,7 @@ ZETestSuiteAdd(ZELineSegment)
 		float tA, tB;
 		float d = ZELineSegment::MinimumDistance(L1, L2, tA, tB);
 
-		CHECK_EQUAL(d, sqrt(14.0f));
+		ZETestCheckEqual(d, sqrt(14.0f));
 
 
 		ZEVector3 P5(0,6,0);
@@ -140,7 +140,7 @@ ZETestSuiteAdd(ZELineSegment)
 		ZELineSegment L3(P5, P6);
 		d = ZELineSegment::MinimumDistance(L1, L3, tA, tB);
 
-		CHECK_EQUAL(d,sqrt(6.0f));
+		ZETestCheckEqual(d,sqrt(6.0f));
 
 		ZEVector3 P7(1.0f,  1.0f, 1.0f);
 		ZEVector3 P8(1.0f, -5.0f, 3.0f);
@@ -148,7 +148,7 @@ ZETestSuiteAdd(ZELineSegment)
 		ZELineSegment L4(P7, P8);
 		d = ZELineSegment::MinimumDistance(L1, L4, tA, tB);
 
-		CHECK_EQUAL(d, d);
+		ZETestCheckEqual(d, d);
 
 
 		ZEVector3  P9(-3.0f, -1.0f,  1.0f);
@@ -157,7 +157,7 @@ ZETestSuiteAdd(ZELineSegment)
 		ZELineSegment L5(P9, P10);
 		d = ZELineSegment::MinimumDistance(L1, L5, tA, tB);
 
-		CHECK_EQUAL(d, d);
+		ZETestCheckEqual(d, d);
 	}
 	
 	/*ZETestItemAdd(GetLength)
@@ -172,7 +172,7 @@ ZETestSuiteAdd(ZELineSegment)
 		CHECK_EQUAL(d, l);
 	}*/
 
-	ZETestItemAdd(GetSegmentStartPoint)
+	ZETest(GetSegmentStartPoint)
 	{
 		ZEVector3 P1(-3.0f, -1.0f,  1.0f);
 		ZEVector3 P2( 0.0f,  3.0f, -5.0f);
@@ -182,10 +182,10 @@ ZETestSuiteAdd(ZELineSegment)
 		ZEVector3 Start;
 		LS.GetSegmentStartPoint(Start);
 
-		CHECK_EQUAL(Start, ZEVector3(-3.0f, -1.0f, 1.0f));
+		ZETestCheckEqual(Start, ZEVector3(-3.0f, -1.0f, 1.0f));
 	}
 
-	ZETestItemAdd(GetSegmentEndPoint)
+	ZETest(GetSegmentEndPoint)
 	{
 		ZEVector3 P1(-3.0f, -1.0f,  1.0f);
 		ZEVector3 P2( 0.0f,  3.0f, -5.0f);
@@ -195,7 +195,7 @@ ZETestSuiteAdd(ZELineSegment)
 		ZEVector3 End;
 		LS.GetSegmentEndPoint(End);
 
-		CHECK_EQUAL(End, ZEVector3( 0.0f,  3.0f, -5.0f));
+		ZETestCheckEqual(End, ZEVector3( 0.0f,  3.0f, -5.0f));
 	}
 
 }

@@ -36,9 +36,9 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZETest.h"
 
-ZETestSuiteAdd(ZEFlagS)
+ZETestSuite(ZEFlagS)
 {
-	ZETestItemAdd(RaisebitUnraisebitSetflagSetbit)
+	ZETest(RaisebitUnraisebitSetflagSetbit)
 	
 	{	
 		int a = 0;
@@ -51,23 +51,23 @@ ZETestSuiteAdd(ZEFlagS)
 		TestItem4.SetFlags(b, false);
 		TestItem1.RaiseBit(4);
 		TestItem4.UnraiseBit(4);
-		CHECK(TestItem1 == 16);
-		CHECK(TestItem4 == 0);
+		ZETestCheck(TestItem1 == 16);
+		ZETestCheck(TestItem4 == 0);
 		TestItem1.UnraiseBit(4);
-		CHECK(TestItem1 == 0);
+		ZETestCheck(TestItem1 == 0);
 		//setbit from empty one raise
 		TestItem2.SetBit(4, true);
-		CHECK(TestItem2 == 16);
+		ZETestCheck(TestItem2 == 16);
 		//setbit from empty one unraise
 		TestItem3.SetBit(4, false);
-		CHECK(TestItem3 == 0);
-		CHECK_EQUAL(TestItem1.GetBit(4), 0);
-		CHECK_EQUAL(TestItem4.GetBit(4), 0);
-		CHECK_EQUAL(TestItem1.GetFlags(a), 1);
-		CHECK_EQUAL(TestItem4.GetFlags(b), 0);
+		ZETestCheck(TestItem3 == 0);
+		ZETestCheckEqual(TestItem1.GetBit(4), 0);
+		ZETestCheckEqual(TestItem4.GetBit(4), 0);
+		ZETestCheckEqual(TestItem1.GetFlags(a), 1);
+		ZETestCheckEqual(TestItem4.GetFlags(b), 0);
 	}
 
-	ZETestItemAdd(operators)
+	ZETest(operators)
 	{
 		ZEFlags TestItem1;
 		ZEFlags TestItem2;
@@ -80,7 +80,7 @@ ZETestSuiteAdd(ZEFlagS)
 		ZEFlags TestItem9 = 5;
 		ZEFlags TestItem10 = 3;
 		TestItem9 = TestItem10;
-		CHECK_EQUAL(TestItem9, TestItem10);
+		ZETestCheckEqual(TestItem9, TestItem10);
 		TestItem1.SetBit(4, true);
 		TestItem2.SetBit(4, true);
 		TestItem3.SetBit(4, false);
@@ -88,28 +88,28 @@ ZETestSuiteAdd(ZEFlagS)
 		TestItem7.SetBit(4, false);
 		TestItem8.SetBit(0, false);
 		//[]
-		CHECK_EQUAL(TestItem1[4], 1);
+		ZETestCheckEqual(TestItem1[4], 1);
 		//& 
 		TestItem4 = TestItem1 & TestItem2;
-		CHECK(TestItem4 == 16);
+		ZETestCheck(TestItem4 == 16);
 		//&=
 		TestItem1 &= TestItem2;
-		CHECK(TestItem2 == 16);
+		ZETestCheck(TestItem2 == 16);
 		//|
 		TestItem5 = TestItem1 | TestItem3;
-		CHECK(TestItem5 == 16);
+		ZETestCheck(TestItem5 == 16);
 		//|=
 		TestItem1 |= TestItem3;
-		CHECK(TestItem1 == 16);
+		ZETestCheck(TestItem1 == 16);
 		//^
 		TestItem1 = TestItem6 ^ TestItem7;
-		CHECK(TestItem1 == 16);
+		ZETestCheck(TestItem1 == 16);
 		//^=
 		TestItem6 ^= TestItem7;
-		CHECK(TestItem6 == 16);
+		ZETestCheck(TestItem6 == 16);
 		//~
 		unsigned int z =  ~TestItem8;
-		CHECK_EQUAL(z, 4294967295);
+		ZETestCheckEqual(z, 4294967295);
 		
 
 	}

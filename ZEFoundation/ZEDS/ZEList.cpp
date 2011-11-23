@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,35 +30,6 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
-
-project(ZETests)
-
-include_directories(
-	${PROJECT_SOURCE_DIR} 
-	${PROJECT_SOURCE_DIR}/../Include 
-	${PROJECT_SOURCE_DIR}/../Include/DirectX
-	${PROJECT_SOURCE_DIR}/../Include/OpenAL
-	${PROJECT_SOURCE_DIR}/../Include/DirectX
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/Cooking
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/Foundation
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/NxCharacter
-	${PROJECT_SOURCE_DIR}/../Include/PhysX/Physics
-	${PROJECT_SOURCE_DIR}/../Include/Curl
-	${PROJECT_SOURCE_DIR}/../ZEFoundation)
-	
-link_directories(
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/$(Configuration)" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/DirectX" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/OpenAL" 
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86/PhysX"
-	"${PROJECT_SOURCE_DIR}/../Lib/Win x86")
-	
-include_directories(${PROJECT_SOURCE_DIR})
-append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 	ZE_ZINEK_ENGINE)
-
-add_subdirectory(ZETestsCommon)
-add_subdirectory(ZEFoundationTests)

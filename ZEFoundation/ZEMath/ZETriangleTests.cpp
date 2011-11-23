@@ -43,10 +43,10 @@
 #include "ZEMathIOStreamMapping.h"
 
 
-ZETestSuiteAdd(ZETriangle)
+ZETestSuite(ZETriangle)
 {
 
-	ZETestItemAdd(TRI_Constructor)
+	ZETest(TRI_Constructor)
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -54,12 +54,12 @@ ZETestSuiteAdd(ZETriangle)
 
 		ZETriangle T(V0, V1, V2);
 
-		CHECK_EQUAL(T.V0, ZEVector3(1.0f, 2.0f, 3.0f));
-		CHECK_EQUAL(T.V1, ZEVector3(0.0f, 0.0f, 3.0f));
-		CHECK_EQUAL(T.V2, ZEVector3(4.0f, 5.0f, 6.0f));
+		ZETestCheckEqual(T.V0, ZEVector3(1.0f, 2.0f, 3.0f));
+		ZETestCheckEqual(T.V1, ZEVector3(0.0f, 0.0f, 3.0f));
+		ZETestCheckEqual(T.V2, ZEVector3(4.0f, 5.0f, 6.0f));
 	}
 
-	ZETestItemAdd(TRI_Create)
+	ZETest(TRI_Create)
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -68,11 +68,11 @@ ZETestSuiteAdd(ZETriangle)
 		ZETriangle T;
 		ZETriangle::Create(T, V0, V1, V2);
 
-		CHECK_EQUAL(T.V0, ZEVector3(1.0f, 2.0f, 3.0f));
-		CHECK_EQUAL(T.V1, ZEVector3(0.0f, 0.0f, 3.0f));
-		CHECK_EQUAL(T.V2, ZEVector3(4.0f, 5.0f, 6.0f));
+		ZETestCheckEqual(T.V0, ZEVector3(1.0f, 2.0f, 3.0f));
+		ZETestCheckEqual(T.V1, ZEVector3(0.0f, 0.0f, 3.0f));
+		ZETestCheckEqual(T.V2, ZEVector3(4.0f, 5.0f, 6.0f));
 	}
-	ZETestItemAdd(TRI_GetNormal)
+	ZETest(TRI_GetNormal)
 	{
 		ZEVector3 N;
 
@@ -84,10 +84,10 @@ ZETestSuiteAdd(ZETriangle)
 
 		ZETriangle::GetNormal(T, N);
 
-		CHECK_EQUAL(N, ZEVector3((-6.0f/sqrt(54.0f)), (3.0f/sqrt(54.0f)), (3.0f/sqrt(54.0f))));
+		ZETestCheckEqual(N, ZEVector3((-6.0f/sqrt(54.0f)), (3.0f/sqrt(54.0f)), (3.0f/sqrt(54.0f))));
 	}
 
-	ZETestItemAdd(TRI_GetSurfacePlane)
+	ZETest(TRI_GetSurfacePlane)
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -102,11 +102,11 @@ ZETestSuiteAdd(ZETriangle)
 
 		ZETriangle::GetNormal(T, N);
 
-		CHECK_EQUAL(P.n, N);
-		CHECK_EQUAL(P.p, T.V1);
+		ZETestCheckEqual(P.n, N);
+		ZETestCheckEqual(P.p, T.V1);
 	}
 
-	ZETestItemAdd(TRI_InsideTest)
+	ZETest(TRI_InsideTest)
 	{
 		ZEVector3 P(1.0f, 2.0f, 3.0f);
 
@@ -118,10 +118,10 @@ ZETestSuiteAdd(ZETriangle)
 
 		bool result = ZETriangle::InsideTest(T, P);
 
-		CHECK_EQUAL(result, true);
+		ZETestCheckEqual(result, true);
 	}
 
-	ZETestItemAdd(TRI_IntersectionTest1)
+	ZETest(TRI_IntersectionTest1)
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -139,10 +139,10 @@ ZETestSuiteAdd(ZETriangle)
 
 		bool result = ZETriangle::IntersectionTest(T, L, t);
 		
-		CHECK_EQUAL(result, true);
+		ZETestCheckEqual(result, true);
 	}
 
-	ZETestItemAdd(TRI_IntersectionTest2)
+	ZETest(TRI_IntersectionTest2)
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -160,10 +160,10 @@ ZETestSuiteAdd(ZETriangle)
 
 		bool result = ZETriangle::IntersectionTest(T, LS, t);
 		
-		CHECK_EQUAL(result, false);
+		ZETestCheckEqual(result, false);
 	}
 
-	ZETestItemAdd(TRI_IntersectionTest3)
+	ZETest(TRI_IntersectionTest3)
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -181,10 +181,10 @@ ZETestSuiteAdd(ZETriangle)
 
 		bool result = ZETriangle::IntersectionTest(T, R, t);
 		
-		CHECK_EQUAL(result, true);
+		ZETestCheckEqual(result, true);
 	}
 
-	ZETestItemAdd(TRI_IntersectionTest4)
+	ZETest(TRI_IntersectionTest4)
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -204,7 +204,7 @@ ZETestSuiteAdd(ZETriangle)
 
 		bool result = ZETriangle::IntersectionTest(T, P, L);
 		
-		CHECK_EQUAL(result, false);
+		ZETestCheckEqual(result, false);
 	}
 
 

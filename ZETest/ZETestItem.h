@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 
-class ZETestSuite;
+class ZETestSuiteItem;
 
 enum ZETestResult
 {
@@ -59,13 +59,17 @@ class ZETestItem
 {
 	private:
 		char					Name[256];
-		ZETestSuite*			Owner;
+		char					CaseName[256];
+		ZETestSuiteItem*		Owner;
 		ZETestResult			Result;
 		float					ElapsedTime;
 
 	public:
 		const char*				GetName();
-		ZETestSuite*			GetOwner();
+		ZETestSuiteItem*		GetOwner();
+
+		void					SetCurrentCase(const char* CaseName);
+		const char*				GetCurrentCase();
 
 		void					ReportProblem(ZETestProblemType Type, const char* Problem, const char* File, int Line);
 
@@ -76,15 +80,21 @@ class ZETestItem
 		ZETestResult			GetResult();
 		float					GetEleapsedTime();
 
-								ZETestItem(const char* Name, ZETestSuite* Owner);
+								ZETestItem(const char* Name, ZETestSuiteItem* Owner);
 };
 
-#define ZETestItemAdd(Name)\
+#define ZETestScope() 
+
+#define ZETestCase(CaseName)\
+	SetCaseName(##CaseName)\
+	while(false)
+
+#define ZETest(Name)\
 	class ZETest_##Name : public ZETestItem\
 	{\
 		public:\
 			virtual void TestImpl();\
-			ZETest_##Name(const char* Name1, ZETestSuite* Owner1) : ZETestItem(Name1, Owner1) {}\
+			ZETest_##Name(const char* Name1, ZETestSuiteItem* Owner1) : ZETestItem(Name1, Owner1) {}\
 	} Test_##Name(#Name, &Suite);\
 	void ZETest_##Name::TestImpl()
 

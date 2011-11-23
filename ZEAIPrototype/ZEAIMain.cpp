@@ -44,8 +44,30 @@
 #include "ZEMath/ZEMathDefinitions.h"
 #include <stdio.h>
 
+#include "ZEDS/ZEHeap.h"
+
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	ZEMaxHeap<int> Heap;
+
+	Heap.InsertValue(34);
+	int Min1 = Heap.GetMax();
+
+	Heap.InsertValue(24);
+	Min1 = Heap.GetMax();
+
+	Heap.InsertValue(7);
+	Min1 = Heap.GetMax();
+
+	Heap.InsertValue(64);
+	Min1 = Heap.GetMax();
+
+	Heap.InsertValue(2);
+	Min1 = Heap.GetMax();
+
+	Heap.Remove(0);
+
+	Heap.Remove(3);
 	int argc = 0;
 	char** argv = NULL;
 
