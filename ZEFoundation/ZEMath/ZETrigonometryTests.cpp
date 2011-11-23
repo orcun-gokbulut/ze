@@ -39,19 +39,19 @@
 #include "ZEMath/ZETrigonometry.h"
 #include "ZEMath/ZEMathDefinitions.h"
 
-ZETestSuiteAdd(ZETrigonometry)
+ZETestSuite(ZETrigonometry)
 {
-	ZETestItemAdd(FastSin)
+	ZETest(FastSin)
 	{
-		CHECK_EQUAL(FastSin(360), 0);
+		ZETestCheckEqual(FastSin(360), 0);
 
 	}
-	ZETestItemAdd(FastCos)
+	ZETest(FastCos)
 	{
-		CHECK_EQUAL(FastCos(360), 1);
+		ZETestCheckEqual(FastCos(360), 1);
 	}
-	ZETestItemAdd(FastTan)
+	ZETest(FastTan)
 	{
-		CHECK_EQUAL(FastTan(360), 0);
+		ZETestCheckEqual(FastTan(360), 0);
 	}
 }

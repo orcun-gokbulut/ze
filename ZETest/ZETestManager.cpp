@@ -44,10 +44,22 @@
 #define NULL 0
 #endif
 
-void ZETestManager::RegisterTestSuite(ZETestSuite* Suite)
+#include <string.h>
+
+void ZETestManager::RegisterTestSuite(ZETestSuiteItem* Suite)
 {
 	TestSuites[TestSuiteCount] = Suite;
 	TestSuiteCount++;
+}
+
+void ZETestManager::SetPackageName(const char* Name)
+{
+	strncpy(PackageName, Name, 255);
+}
+
+const char* ZETestManager::GetPackageName()
+{
+	return PackageName;
 }
 
 bool ZETestManager::RunTests()
@@ -58,11 +70,14 @@ bool ZETestManager::RunTests()
 		if (!TestSuites[I]->RunTests())
 			Result = false;
 	}
+	
+	if (!Result)
+		printf("error T0003: Test package \"%s\" has failed. \r\n", GetPackageName());
 
 	return Result;
 }
 
-void ZETestManager::ReportProblem(ZETestSuite* Suite, ZETestItem* Test, ZETestProblemType Type, const char* ProblemText, const char* File, int Line)
+void ZETestManager::ReportProblem(ZETestSuiteItem* Suite, ZETestItem* Test, ZETestProblemType Type, const char* ProblemText, const char* File, int Line)
 {
 	const char* TypeString;
 
@@ -83,9 +98,9 @@ void ZETestManager::ReportProblem(ZETestSuite* Suite, ZETestItem* Test, ZETestPr
 	}
 
 	if (Type == ZE_TPT_ERROR)
-		printf("  %s(%d) : %s T0001: Test \"%s::%s\" failed. %s \r\n", File, Line, TypeString, Suite->GetName(), Test->GetName(), ProblemText);
+		printf("  %s(%d) : info T0001: Test \"%s::%s\" \"%s\" failed. %s \r\n", File, Line, TypeString, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
 	else
-		printf("  %s(%d) : %s T0002: Test \"%s::%s\" . %s \r\n", File, Line, TypeString, Suite->GetName(), Test->GetName(), ProblemText);
+		printf("  %s(%d) : info T0002: Test \"%s::%s\" \"%s\" gives warning. %s \r\n", File, Line, TypeString, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
 }
 
 ZETestManager* ZETestManager::GetInstance()

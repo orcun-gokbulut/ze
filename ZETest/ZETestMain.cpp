@@ -48,6 +48,7 @@ int main(int Argc, char** Argv)
 
 	ZETestManager* Manager = ZETestManager::GetInstance();
 
-	
+	Manager->SetPackageName(Argv[0]);
+
 	return Manager->RunTests() ? EXIT_SUCCESS : EXIT_FAILURE;
 }

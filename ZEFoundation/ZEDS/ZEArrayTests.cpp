@@ -51,9 +51,9 @@ int Compare1 (const void *F, const void *E)
 
 
 
-ZETestSuiteAdd(ZEArray)
+ZETestSuite(ZEArray)
 {
-	ZETestItemAdd(Rambo)//getCount,setcount,getitem,setitem,findIndex
+	ZETest(Rambo)//getCount,setcount,getitem,setitem,findIndex
 	{
 
 		ZEArray<int> TestItem;
@@ -61,33 +61,33 @@ ZETestSuiteAdd(ZEArray)
 		{
 			TestItem.Add(i);
 		}
-		CHECK_EQUAL(TestItem.GetCount(), 8);
+		ZETestCheckEqual(TestItem.GetCount(), 8);
 		TestItem.SetItem(2,3);
-		CHECK_EQUAL(TestItem[2], 3);
+		ZETestCheckEqual(TestItem[2], 3);
 		int x;
 		x = TestItem.GetItem(0);
-		CHECK_EQUAL(x, 0);
+		ZETestCheckEqual(x, 0);
 		TestItem.SetCount(4);
-		CHECK_EQUAL(TestItem.GetCount(), 4);
+		ZETestCheckEqual(TestItem.GetCount(), 4);
 
 		ZEArray<int> TestItem2;
 		TestItem2.Insert(0, 0);
 		TestItem2.Insert(1, 1);
 		TestItem2.Insert(2, 2);
 		//start
-		CHECK_EQUAL(TestItem2.FindIndex(0), 0);
+		ZETestCheckEqual(TestItem2.FindIndex(0), 0);
 		//middle
-		CHECK_EQUAL(TestItem2.FindIndex(1), 1);
+		ZETestCheckEqual(TestItem2.FindIndex(1), 1);
 		//end
-		CHECK_EQUAL(TestItem2.FindIndex(2), 2);
+		ZETestCheckEqual(TestItem2.FindIndex(2), 2);
 
 		ZEArray<int> TestItem3;
 		TestItem3.SetCount(3);
-		CHECK_EQUAL(TestItem3.GetCount(), 3);
+		ZETestCheckEqual(TestItem3.GetCount(), 3);
 
 
 	}
-	ZETestItemAdd(ADD)
+	ZETest(ADD)
 	{
 		ZEArray<int> TestItem1;
 		ZEArray<int> TestItem2;
@@ -96,19 +96,19 @@ ZETestSuiteAdd(ZEArray)
 			TestItem1.Add(i);
 		}
 		TestItem2.Add(1);
-		CHECK_EQUAL(TestItem2[0], 1);
+		ZETestCheckEqual(TestItem2[0], 1);
 		TestItem1.Add(8);
-		CHECK_EQUAL(TestItem1[8], 8);
+		ZETestCheckEqual(TestItem1[8], 8);
 
 		//add by ref
 		int TestItem3 = 5;
 		TestItem2.AddByRef(TestItem3);
-		CHECK_EQUAL(TestItem2[0], 1);
-		CHECK_EQUAL(TestItem2[1], 5);
+		ZETestCheckEqual(TestItem2[0], 1);
+		ZETestCheckEqual(TestItem2[1], 5);
 
 
 	}
-	ZETestItemAdd(MassADD)
+	ZETest(MassADD)
 	{
 		//MassAdd(Type* OtherArray, size_t Count)
 		//TestItem1 filled one, TestItem2 filled one, TestItem3 empty
@@ -123,9 +123,9 @@ ZETestSuiteAdd(ZEArray)
 		TestItem2[1] = 7;
 		ZEArray<int> TestItem3;
 		TestItem1.MassAdd(TestItem2, 2);
-		CHECK_EQUAL(TestItem1.GetCount(), 8);
+		ZETestCheckEqual(TestItem1.GetCount(), 8);
 		TestItem3.MassAdd(TestItem2, 2);
-		CHECK_EQUAL(TestItem3.GetCount(), 2);
+		ZETestCheckEqual(TestItem3.GetCount(), 2);
 
 		/*/MassAdd(Type* OtherArray, size_t Offset, size_t Count)
 		TestItem1.MassAdd(TestItem2,0,2);
@@ -164,34 +164,34 @@ ZETestSuiteAdd(ZEArray)
 		
 	}
 
-	ZETestItemAdd(insert)
+	ZETest(insert)
 	{
 		//insert start
 		ZEArray<int> TestItem1;				
 		TestItem1.Insert(0, 1);
-		CHECK_EQUAL(TestItem1[0], 1);
+		ZETestCheckEqual(TestItem1[0], 1);
 
 		//insert middle
 		ZEArray<int> TestItem2;				
 		TestItem2.Insert(0, 3);
 		TestItem2.Insert(1, 4);
 		TestItem2.Insert(2, 5);
-		CHECK_EQUAL(TestItem2[0], 3);
-		CHECK_EQUAL(TestItem2[1], 4);
-		CHECK_EQUAL(TestItem2[2], 5);
+		ZETestCheckEqual(TestItem2[0], 3);
+		ZETestCheckEqual(TestItem2[1], 4);
+		ZETestCheckEqual(TestItem2[2], 5);
 		TestItem2.Insert(1,0);                 
-		CHECK_EQUAL(TestItem2[0], 3);
-		CHECK_EQUAL(TestItem2[1], 0);
-		CHECK_EQUAL(TestItem2[2], 4);
-		CHECK_EQUAL(TestItem2[3], 5);
+		ZETestCheckEqual(TestItem2[0], 3);
+		ZETestCheckEqual(TestItem2[1], 0);
+		ZETestCheckEqual(TestItem2[2], 4);
+		ZETestCheckEqual(TestItem2[3], 5);
 
 		//insert end
 		ZEArray<int> TestItem3;				
 		TestItem3.Insert(0, 1);
 		TestItem3.Insert(1, 2);             
 
-		CHECK_EQUAL(TestItem3[0], 1);
-		CHECK_EQUAL(TestItem3[1], 2);
+		ZETestCheckEqual(TestItem3[0], 1);
+		ZETestCheckEqual(TestItem3[1], 2);
 
 		//insert with pointer
 		ZEArray<int> TestItem4;				
@@ -200,13 +200,13 @@ ZETestSuiteAdd(ZEArray)
 		TestItem4.Insert(1, 1);
 		p=TestItem4.Insert(1);
 		*p=5;
-		CHECK_EQUAL(TestItem4[0], 0);
-		CHECK_EQUAL(TestItem4[1], 5);
-		CHECK_EQUAL(TestItem4[2], 1);
+		ZETestCheckEqual(TestItem4[0], 0);
+		ZETestCheckEqual(TestItem4[1], 5);
+		ZETestCheckEqual(TestItem4[2], 1);
 
 	}
 
-	ZETestItemAdd(MassInsert)
+	ZETest(MassInsert)
 	{
 		/*MassInsert(size_t Index, Type* OtherArray, size_t Offset, size_t Count)
 		ZEArray<int> TestItem1;
@@ -274,27 +274,27 @@ ZETestSuiteAdd(ZEArray)
 
 	}
 
-	ZETestItemAdd(Enqueue)
+	ZETest(Enqueue)
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.Enqueue(1);
-		CHECK_EQUAL(TestItem1[0], 1);
+		ZETestCheckEqual(TestItem1[0], 1);
 		TestItem1.Add(0);
 		TestItem1.Enqueue(3);
-		CHECK_EQUAL(TestItem1[2], 3);
-		CHECK_EQUAL(TestItem1.GetCount(), 3);
+		ZETestCheckEqual(TestItem1[2], 3);
+		ZETestCheckEqual(TestItem1.GetCount(), 3);
 	}
 
-	ZETestItemAdd(Dequeue)
+	ZETest(Dequeue)
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.Add(1);
 		TestItem1.Add(2);
 		TestItem1.Dequeue();
-		CHECK_EQUAL(TestItem1[0], 2);
+		ZETestCheckEqual(TestItem1[0], 2);
 	}
 
-	ZETestItemAdd(DeleteAt)
+	ZETest(DeleteAt)
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.Add(1);
@@ -305,54 +305,54 @@ ZETestSuiteAdd(ZEArray)
 		TestItem1.Add(6);
 		TestItem1.DeleteAt(0);
 		//delete at the start
-		CHECK_EQUAL(TestItem1[0], 2);
+		ZETestCheckEqual(TestItem1[0], 2);
 		//delete at the end
 		TestItem1.DeleteAt(2);
-		CHECK_EQUAL(TestItem1[2], 5);
+		ZETestCheckEqual(TestItem1[2], 5);
 		//delete at the middle
 		TestItem1.DeleteAt(1);
-		CHECK_EQUAL(TestItem1[1], 5);
+		ZETestCheckEqual(TestItem1[1], 5);
 
 	}
 
-	ZETestItemAdd(PopPush)
+	ZETest(PopPush)
 	{
 		//push item
 		ZEArray<int> TestItem1;
 		TestItem1.Push(0);
 		TestItem1.Push(3);
 		//push to empty one
-		CHECK_EQUAL(TestItem1[0], 0);
+		ZETestCheckEqual(TestItem1[0], 0);
 		//push to filled one
-		CHECK_EQUAL(TestItem1[1], 3);
+		ZETestCheckEqual(TestItem1[1], 3);
 
 		//pop item
 		TestItem1.Pop();
-		CHECK_EQUAL(TestItem1.GetCount(), 1);
-		CHECK_EQUAL(TestItem1[0], 0);
+		ZETestCheckEqual(TestItem1.GetCount(), 1);
+		ZETestCheckEqual(TestItem1[0], 0);
 	}
 
-	ZETestItemAdd(DeleteValue)
+	ZETest(DeleteValue)
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.Add(0);
 		TestItem1.Add(1);
 		//deletevalue at the end
 		TestItem1.DeleteValue(1);
-		CHECK_EQUAL(TestItem1[0], 0);
+		ZETestCheckEqual(TestItem1[0], 0);
 
 		TestItem1.Add(2);
 		TestItem1.Add(3);
 		//after add item then delete value at the middle
 		TestItem1.DeleteValue(2);
-		CHECK_EQUAL(TestItem1[0], 0);
-		CHECK_EQUAL(TestItem1[1], 3);
+		ZETestCheckEqual(TestItem1[0], 0);
+		ZETestCheckEqual(TestItem1[1], 3);
 		//delete at the first one
 		TestItem1.DeleteValue(0);
-		CHECK_EQUAL(TestItem1[0], 3);
+		ZETestCheckEqual(TestItem1[0], 3);
 
 	}
-	ZETestItemAdd(Existence)
+	ZETest(Existence)
 	{
 		ZEArray<int> TestItem1;
 		int x;
@@ -370,7 +370,7 @@ ZETestSuiteAdd(ZEArray)
 		TestItem1.Exists(x);
 	}
 
-	ZETestItemAdd(Operators)
+	ZETest(Operators)
 	{
 		// =
 		ZEArray<int> TestItem1;
@@ -378,14 +378,14 @@ ZETestSuiteAdd(ZEArray)
 		TestItem1.Add(0);
 		TestItem1.Add(1);
 		TestItem2 = TestItem1;
-		CHECK_EQUAL(TestItem1[0], TestItem2[0]);
-		CHECK_EQUAL(TestItem1[1], TestItem2[1]);
+		ZETestCheckEqual(TestItem1[0], TestItem2[0]);
+		ZETestCheckEqual(TestItem1[1], TestItem2[1]);
 		// []
-		CHECK_EQUAL(TestItem1[0], 0);
+		ZETestCheckEqual(TestItem1[0], 0);
 
 	}
 
-	ZETestItemAdd(GetCArray)
+	ZETest(GetCArray)
 	{
 		ZEArray<int> TestItem1;
 		int *TestItem2;
@@ -393,20 +393,20 @@ ZETestSuiteAdd(ZEArray)
 		TestItem1.Add(2);
 		TestItem1.Add(3);
 		TestItem2 = TestItem1.GetCArray();
-		CHECK_EQUAL(TestItem2[0], 1);
-		CHECK_EQUAL(TestItem2[1], 2);
-		CHECK_EQUAL(TestItem2[2], 3);
+		ZETestCheckEqual(TestItem2[0], 1);
+		ZETestCheckEqual(TestItem2[1], 2);
+		ZETestCheckEqual(TestItem2[2], 3);
 
 	}
 
-	ZETestItemAdd(fill)
+	ZETest(fill)
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.SetCount(3);
 		TestItem1.Fill(3);
-		CHECK_EQUAL(TestItem1[0], 3);
-		CHECK_EQUAL(TestItem1[1], 3);
-		CHECK_EQUAL(TestItem1[2], 3);
+		ZETestCheckEqual(TestItem1[0], 3);
+		ZETestCheckEqual(TestItem1[1], 3);
+		ZETestCheckEqual(TestItem1[2], 3);
 
 	}
 
@@ -435,36 +435,36 @@ ZETestSuiteAdd(ZEArray)
 
 	}
 */
-	ZETestItemAdd(Resize)
+	ZETest(Resize)
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.Add(0);
 		TestItem1.Add(1);
 		TestItem1.Add(2);
 		TestItem1.Resize(2);
-		CHECK_EQUAL(TestItem1.GetCount(), 2);
+		ZETestCheckEqual(TestItem1.GetCount(), 2);
 		//after set count
 		TestItem1.SetCount(4);
 		TestItem1.Resize(1);
-		CHECK_EQUAL(TestItem1.GetCount(), 1);
+		ZETestCheckEqual(TestItem1.GetCount(), 1);
 
 	}
 
-	ZETestItemAdd(GetSize)
+	ZETest(GetSize)
 	{
 		//after operation check with getcount
 		ZEArray<int> TestItem1;
 		TestItem1.SetCount(3);
-		CHECK_EQUAL(TestItem1.GetSize(), TestItem1.GetCount());
+		ZETestCheckEqual(TestItem1.GetSize(), TestItem1.GetCount());
 		//after insert operation check size
 		ZEArray<int> TestItem2;
 		TestItem2.Add(0);
 		TestItem2.Add(1);
-		CHECK_EQUAL(TestItem2.GetSize(), 2);
+		ZETestCheckEqual(TestItem2.GetSize(), 2);
 
 	}
 
-	ZETestItemAdd(CopyTo)
+	ZETest(CopyTo)
 	{
 		ZEArray<int> TestItem1;
 		ZEArray<int> TestItem2;
@@ -472,19 +472,19 @@ ZETestSuiteAdd(ZEArray)
 		TestItem1.Add(0);
 		TestItem1.Add(1);
 		TestItem1.CopyTo(TestItem2);
-		CHECK_EQUAL(TestItem2[0], 0);
-		CHECK_EQUAL(TestItem2[1], 1);
+		ZETestCheckEqual(TestItem2[0], 0);
+		ZETestCheckEqual(TestItem2[1], 1);
 		// to !empty
 		ZEArray<int> TestItem3;
 		TestItem3.Add(2);
 		TestItem3.Add(3);
 		TestItem3.CopyTo(TestItem2);
-		CHECK_EQUAL(TestItem2[0], 2);
-		CHECK_EQUAL(TestItem2[1], 3);
-		CHECK_EQUAL(TestItem2.GetCount(), 2);
+		ZETestCheckEqual(TestItem2[0], 2);
+		ZETestCheckEqual(TestItem2[1], 3);
+		ZETestCheckEqual(TestItem2.GetCount(), 2);
 
 	}
-	ZETestItemAdd(CopyFrom)
+	ZETest(CopyFrom)
 	{
 		ZEArray<int> TestItem1;
 		ZEArray<int> TestItem2;
@@ -492,27 +492,27 @@ ZETestSuiteAdd(ZEArray)
 		TestItem1.Insert(0, 0);
 		TestItem1.Insert(1, 1);
 		TestItem2.CopyFrom(TestItem1);
-		CHECK_EQUAL(TestItem2[0], 0);
-		CHECK_EQUAL(TestItem2[1], 1);
-		CHECK_EQUAL(TestItem2.GetCount(), 2);
+		ZETestCheckEqual(TestItem2[0], 0);
+		ZETestCheckEqual(TestItem2[1], 1);
+		ZETestCheckEqual(TestItem2.GetCount(), 2);
 
 		// C[2] from empty
 		ZEArray<int> TestItem3;
 		TestItem3.Insert(0,2);
 		TestItem3.Insert(1,3);
 		TestItem3.CopyFrom(TestItem1);
-		CHECK_EQUAL(TestItem3[0], 0);
-		CHECK_EQUAL(TestItem3[1], 1);
+		ZETestCheckEqual(TestItem3[0], 0);
+		ZETestCheckEqual(TestItem3[1], 1);
 
 		// empty to D[2]
 		ZEArray<int> TestItem4;
 		TestItem4.CopyFrom(TestItem1);
-		CHECK_EQUAL(TestItem4[0], 0);
-		CHECK_EQUAL(TestItem4[1], 1);
-		CHECK_EQUAL(TestItem4.GetCount(), 2);
+		ZETestCheckEqual(TestItem4[0], 0);
+		ZETestCheckEqual(TestItem4[1], 1);
+		ZETestCheckEqual(TestItem4.GetCount(), 2);
 
 	}
-	ZETestItemAdd(Combine)
+	ZETest(Combine)
 	{
 		ZEArray<int> TestItem1;
 		ZEArray<int> TestItem2;
@@ -520,26 +520,26 @@ ZETestSuiteAdd(ZEArray)
 		TestItem1.Add(1);
 		TestItem2.Add(1);
 		TestItem1.Combine(TestItem2);
-		CHECK_EQUAL(TestItem1.GetCount(), 3);
-		CHECK_EQUAL(TestItem1[0], 0);
-		CHECK_EQUAL(TestItem1[1], 1);
-		CHECK_EQUAL(TestItem1[2], 1);
+		ZETestCheckEqual(TestItem1.GetCount(), 3);
+		ZETestCheckEqual(TestItem1[0], 0);
+		ZETestCheckEqual(TestItem1[1], 1);
+		ZETestCheckEqual(TestItem1[2], 1);
 
 	}
 
-	ZETestItemAdd(Clear)
+	ZETest(Clear)
 	{
 
 		ZEArray<int> TestItem1;
 		TestItem1.Add(0);
 		TestItem1.Add(1);
-		CHECK_EQUAL(TestItem1[0], 0);
-		CHECK_EQUAL(TestItem1[1], 1);
+		ZETestCheckEqual(TestItem1[0], 0);
+		ZETestCheckEqual(TestItem1[1], 1);
 		TestItem1.Clear();
-		CHECK_EQUAL(TestItem1.GetCount(), 0);
+		ZETestCheckEqual(TestItem1.GetCount(), 0);
 	}
 
-	ZETestItemAdd(sort)
+	ZETest(sort)
 	{
 		//						return
 		//A[]={0,2,2,1}  0,2	(-1)
@@ -553,13 +553,13 @@ ZETestSuiteAdd(ZEArray)
 		TestItem1.Insert(3, 1);
 		TestItem1.Sort(&Compare1);
 
-		CHECK_EQUAL(TestItem1[0], 0);
-		CHECK_EQUAL(TestItem1[1], 1);
-		CHECK_EQUAL(TestItem1[2], 2);
-		CHECK_EQUAL(TestItem1[3], 2);
+		ZETestCheckEqual(TestItem1[0], 0);
+		ZETestCheckEqual(TestItem1[1], 1);
+		ZETestCheckEqual(TestItem1[2], 2);
+		ZETestCheckEqual(TestItem1[3], 2);
 	}
 
-	ZETestItemAdd(binary_search)
+	ZETest(binary_search)
 	{
 
 		ZEArray<int> TestItem1;

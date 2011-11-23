@@ -183,18 +183,30 @@ class ZEArray
 
 		void CopyTo(ZEArray<Type, Allocator_>& OtherArray) const
 		{
-			if (this->Count != OtherArray.Count)
-				OtherArray.SetCount(Count);
+			OtherArray.SetCount(Count);
 			ZEAllocatorBase<Type>::ObjectCopy(OtherArray.Items, this->Items, Count);	
+
+			ZEDebugCheckMemory();
+		}
+
+		void CopyTo(Type* OtherArray, size_t Count) const
+		{
+			ZEAllocatorBase<Type>::ObjectCopy(OtherArray, this->Items, Count > this->Count ? this->Count ? Count);	
+
+			ZEDebugCheckMemory();
+		}
+
+		void CopyFrom(const Type* OtherArray, size_t Count)
+		{
+			this->SetCount(Count);
+			ZEAllocatorBase<Type>::ObjectCopy(this->Items, OtherArray, Count);	
+
+			ZEDebugCheckMemory();
 		}
 
 		void CopyFrom(const ZEArray<Type, Allocator_>& OtherArray)
 		{
-			if (this->Count != OtherArray.Count)
-				this->SetCount(OtherArray.Count);
-			ZEAllocatorBase<Type>::ObjectCopy(this->Items, OtherArray.Items, Count);	
-
-			ZEDebugCheckMemory();
+			CopyFrom(OtherArray.GetConstCArray(), OtherArray.GetSize());
 		}
 		
 		void Combine(const ZEArray<Type, Allocator_>& OtherArray)

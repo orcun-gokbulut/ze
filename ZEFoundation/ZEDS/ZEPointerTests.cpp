@@ -75,134 +75,133 @@ int ZETestClass::Status;
 int ZETestClass::Instances;
 int ZETestClass::DestroyedInstances;
 
-#define CHECK_STATUS(Status1) CHECK(ZETestClass::Status == Status1)
-#define CHECK_INSTANCE_COUNT(Count) CHECK(ZETestClass::Instances == Count)
-#define CHECK_DESTROYED_INSTANCE_COUNT(Count) CHECK(ZETestClass::DestroyedInstances == Count)
+#define ZETestCheckStatus(Status1) ZETestCheck(ZETestClass::Status == Status1)
+#define ZETestCheckInstanceCount(Count) ZETestCheck(ZETestClass::Instances == Count)
+#define ZETestCheckDestroyedInstaceCount(Count) ZETestCheck(ZETestClass::DestroyedInstances == Count)
 
-#define RESET() ZETestClass::Reset()
-#define SCOPE()
+#define ZETestReset() ZETestClass::Reset()
 
-ZETestSuiteAdd(ZEPointerTests)
+ZETestSuite(ZEPointerTests)
 {
-	ZETestItemAdd(TestClassTest)
+	ZETest(TestClassTest)
 	{
-		RESET();
-		CHECK_STATUS(ZE_TCS_NOT_CONSTRUCTED);
-		CHECK_INSTANCE_COUNT(0);
+		ZETestReset();
+		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
+		ZETestCheckInstanceCount(0);
 
 		ZETestClass* A = new ZETestClass();
-		CHECK_STATUS(ZE_TCS_CONSTRUCTED);
-		CHECK_INSTANCE_COUNT(1);
+		ZETestCheckStatus(ZE_TCS_CONSTRUCTED);
+		ZETestCheckInstanceCount(1);
 
 
 		delete A;
-		CHECK_INSTANCE_COUNT(0);
-		CHECK_STATUS(ZE_TCS_DESTRUCTED);
+		ZETestCheckInstanceCount(0);
+		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
 
 		ZETestClass* B = new ZETestClass();
 		ZETestClass* C = new ZETestClass();
 		ZETestClass* D = new ZETestClass();
-		CHECK_INSTANCE_COUNT(3);
+		ZETestCheckInstanceCount(3);
 
 		delete B;
 		delete C;
 		delete D;
 
-		RESET();
-		CHECK_STATUS(ZE_TCS_NOT_CONSTRUCTED);
-		CHECK_INSTANCE_COUNT(0);
+		ZETestReset();
+		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
+		ZETestCheckInstanceCount(0);
 	}
 
-	ZETestItemAdd(DefaultConstructor)
+	ZETest(DefaultConstructor)
 	{
-		RESET();
+		ZETestReset();
 
 		ZEPointer<ZETestClass> Pointer1;
-		CHECK(Pointer1.IsNull());
-		CHECK(Pointer1.GetPointer() == NULL);
+		ZETestCheck(Pointer1.IsNull());
+		ZETestCheck(Pointer1.GetPointer() == NULL);
 
 		ZEPointer<ZETestClass> Pointer2(NULL);
-		CHECK(Pointer2.IsNull());
-		CHECK(Pointer2.GetPointer() == NULL);
+		ZETestCheck(Pointer2.IsNull());
+		ZETestCheck(Pointer2.GetPointer() == NULL);
 
 		ZEPointer<ZETestClass> Pointer3;
 		Pointer3 = NULL;
-		CHECK(Pointer3.IsNull());
-		CHECK(Pointer3.GetPointer() == NULL);
+		ZETestCheck(Pointer3.IsNull());
+		ZETestCheck(Pointer3.GetPointer() == NULL);
 	}
 
-	ZETestItemAdd(CreateRelease)
+	ZETest(CreateRelease)
 	{
-		RESET();
+		ZETestReset();
 
 		ZETestClass* TestClass = new ZETestClass();
 		ZEPointer<ZETestClass> Pointer;
 			
 		Pointer.Create(TestClass);
-		CHECK(!Pointer.IsNull());
-		CHECK(Pointer.GetPointer() == TestClass);
+		ZETestCheck(!Pointer.IsNull());
+		ZETestCheck(Pointer.GetPointer() == TestClass);
 
 		Pointer.Release();
-		CHECK(Pointer.IsNull());
-		CHECK(Pointer.GetPointer() == NULL);
-		CHECK_STATUS(ZE_TCS_DESTRUCTED);
-		CHECK_INSTANCE_COUNT(0);
-		CHECK_DESTROYED_INSTANCE_COUNT(1);
+		ZETestCheck(Pointer.IsNull());
+		ZETestCheck(Pointer.GetPointer() == NULL);
+		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
+		ZETestCheckInstanceCount(0);
+		ZETestCheckDestroyedInstaceCount(1);
 	}
 
-	ZETestItemAdd(Assignment)
+	ZETest(Assignment)
 	{
-		RESET();
-		SCOPE()
+		ZETestReset();
+		ZETestScope()
 		{
 			ZETestClass* TestClass1 = new ZETestClass();
 			ZEPointer<ZETestClass> Pointer1(TestClass1);
-			CHECK(!Pointer1.IsNull());
-			CHECK(Pointer1.GetPointer() == TestClass1);
+			ZETestCheck(!Pointer1.IsNull());
+			ZETestCheck(Pointer1.GetPointer() == TestClass1);
 
 			ZETestClass* TestClass2 = new ZETestClass();
 			ZEPointer<ZETestClass> Pointer2;
 			Pointer2 = TestClass2;
-			CHECK(!Pointer2.IsNull());
-			CHECK(Pointer2.GetPointer() == TestClass2);
+			ZETestCheck(!Pointer2.IsNull());
+			ZETestCheck(Pointer2.GetPointer() == TestClass2);
 		}
 	}
 
-	ZETestItemAdd(AutoDeletion)
+	ZETest(AutoDeletion)
 	{
-		RESET();
-		SCOPE()
+		ZETestReset();
+		ZETestScope()
 		{
 			ZEPointer<ZETestClass> Pointer(new ZETestClass());
-			CHECK_STATUS(ZE_TCS_CONSTRUCTED);
-			CHECK_INSTANCE_COUNT(1);
+			ZETestCheckStatus(ZE_TCS_CONSTRUCTED);
+			ZETestCheckInstanceCount(1);
 		}
-		CHECK_STATUS(ZE_TCS_DESTRUCTED);
-		CHECK_INSTANCE_COUNT(0);
-		CHECK_DESTROYED_INSTANCE_COUNT(1);
+		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
+		ZETestCheckInstanceCount(0);
+		ZETestCheckDestroyedInstaceCount(1);
 	}
 
-	ZETestItemAdd(ChainAssingments)
+	ZETest(ChainAssingments)
 	{
-		RESET();
-		SCOPE()
+		ZETestReset();
+		ZETestScope()
 		{
 			ZETestClass* TestClass = new ZETestClass();
 			ZEPointer<ZETestClass> Pointer1(TestClass);
 			
 			ZEPointer<ZETestClass> Pointer2(Pointer1);
-			CHECK(Pointer1.IsNull());
-			CHECK(!Pointer2.IsNull());
-			CHECK(Pointer2.GetPointer() == TestClass);
+			ZETestCheck(Pointer1.IsNull());
+			ZETestCheck(!Pointer2.IsNull());
+			ZETestCheck(Pointer2.GetPointer() == TestClass);
 		
 			ZEPointer<ZETestClass> Pointer3;
 			Pointer3 = Pointer2;
-			CHECK(Pointer2.IsNull());
-			CHECK(!Pointer3.IsNull());
-			CHECK(Pointer3.GetPointer() == TestClass);
+			ZETestCheck(Pointer2.IsNull());
+			ZETestCheck(!Pointer3.IsNull());
+			ZETestCheck(Pointer3.GetPointer() == TestClass);
 		}
-		CHECK_STATUS(ZE_TCS_DESTRUCTED);
-		CHECK_INSTANCE_COUNT(0);
-		CHECK_DESTROYED_INSTANCE_COUNT(1);
+		ZETestCheckStatus(ZE_TCS_DESTRUCTED);
+		ZETestCheckInstanceCount(0);
+		ZETestCheckDestroyedInstaceCount(1);
 	}
 }
