@@ -45,7 +45,7 @@
 
 ZETestSuite(ZEVariant)
 {
-	ZETest(SetTypeGetTypeSizeOfGetValue)
+	ZETest("SetTypeGetTypeSizeOfGetValue")
 	{
 		ZEVariant TestItem1;
 		ZEMatrix4x4 Matrix;
@@ -141,7 +141,7 @@ ZETestSuite(ZEVariant)
 
 	}
 
-	ZETest(operators)
+	ZETest("operators")
 	{	//ZEString 
 		/*ZEVariant TestItem1;
 		ZEString String1;
@@ -194,7 +194,7 @@ ZETestSuite(ZEVariant)
 		
 	}
 
-	ZETest(SerializeUnserialize)
+	ZETest("SerializeUnserialize")
 	{	//Matrix3
 		size_t LastItem;
 		ZEFile File;

@@ -109,7 +109,7 @@ const char* SimpleFunction10(int, int, int, int, int, int, int, int, int) { retu
 
 ZETestSuite(ZEDelegate)
 {
-	ZETest(NULLDelegate)
+	ZETest("NULLDelegate")
 	{
 		ZEDelegate<SYNTAX> Delegate;
 		ZETestCheck(Delegate.IsNull());
@@ -117,7 +117,7 @@ ZETestSuite(ZEDelegate)
 		ZETestCheck(!Delegate == true);
 	}
 
-	ZETest(IsNull)
+	ZETest("IsNull")
 	{
 		ZEDelegate<SYNTAX> Delegate = ZEDelegate<SYNTAX>::Create<&GlobalFunction>();
 		ZETestCheck(!Delegate.IsNull());
@@ -125,7 +125,7 @@ ZETestSuite(ZEDelegate)
 		ZETestCheck(!Delegate == false);	
 	}
 
-	ZETest(Clean)
+	ZETest("Clean")
 	{
 		ZEDelegate<SYNTAX> Delegate = ZEDelegate<SYNTAX>::Create<&GlobalFunction>();
 		Delegate.Clear();
@@ -134,13 +134,13 @@ ZETestSuite(ZEDelegate)
 		ZETestCheck(!Delegate == true);
 	}
 
-	ZETest(GlobalFunctions)
+	ZETest("GlobalFunctions")
 	{
 		ZEDelegate<SYNTAX> Delegate = ZEDelegate<SYNTAX>::Create<&GlobalFunction>();
 		ZETestCheckString(Delegate(0x1234ABCD), "GlobalFunction");
 	}
 
-	ZETest(NonInheritedClassFunctions)
+	ZETest("NonInheritedClassFunctions")
 	{
 		ZETestBase1 Test;
 
@@ -164,7 +164,7 @@ ZETestSuite(ZEDelegate)
 		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase1::BaseVirtualFunction");
 	}
 
-	ZETest(InheritedClassFunctions)
+	ZETest("InheritedClassFunctions")
 	{
 		ZETestBase3 Test;
 
@@ -191,7 +191,7 @@ ZETestSuite(ZEDelegate)
 		ZETestCheckString(Delegate(0x1234ABCD), "ZETestBase1::BaseVirtualFunction");
 	}
 
-	ZETest(Versions)
+	ZETest("Versions")
 	{
 		ZEDelegate<void ()> VoidDelegate0 = ZEDelegate<void ()>::Create<&VoidSimpleFunction0>();
 		VoidDelegate0();

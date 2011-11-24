@@ -43,7 +43,7 @@
 
 ZETestSuite(Rectangle3D)
 {
-	ZETest(RECT3D_Constructor)
+	ZETest("RECT3D_Constructor")
 	{
 		ZEVector3 A(1.0f, 2.0f, 3.0f);
 		ZEVector3 B(4.0f, 5.0f, 6.0f);
@@ -58,7 +58,7 @@ ZETestSuite(Rectangle3D)
 		ZETestCheckEqual(R.P4, D);
 	}
 
-	ZETest(RECT3D_GetPlane)
+	ZETest("RECT3D_GetPlane")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 B(3.0f, 4.0f, 6.0f);
@@ -74,7 +74,7 @@ ZETestSuite(Rectangle3D)
 		ZETestCheckEqual(P.p , ZEVector3(1.0f, 2.0f, 6.0f));
 	}
 
-	ZETest(RECT3D_GetPoint)
+	ZETest("RECT3D_GetPoint")
 	{
 		ZEVector3 A(1.0f, 4.0f, 6.0f);
 		ZEVector3 B(3.0f, 4.0f, 6.0f);

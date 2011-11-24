@@ -46,7 +46,7 @@
 
 ZETestSuite(ZEPlane)
 {
-	ZETest(Constructor)
+	ZETest("Constructor")
 	{
 		ZEVector3 n(1.0f, 2.0f, 3.0f);
 		ZEVector3 p(0.0f, 6.0f, 0.0f);
@@ -56,7 +56,7 @@ ZETestSuite(ZEPlane)
 		ZETestCheckEqual(P.p, p);
 	}
 
-	ZETest(Create1)
+	ZETest("Create1")
 	{
 		ZEVector3 n(1.0f, 2.0f, 3.0f);
 		ZEVector3 p(0.0f, 6.0f, 0.0f);
@@ -68,7 +68,7 @@ ZETestSuite(ZEPlane)
 
 	}
 
-	ZETest(Create2)
+	ZETest("Create2")
 	{
 		ZEVector3 P1(1.0f, 2.0f, 3.0f);
 		ZEVector3 P2(0.0f, 3.0f, 1.0f);
@@ -81,7 +81,7 @@ ZETestSuite(ZEPlane)
 		ZETestCheckEqual(P.n, ZEVector3(11.0f, 3.0f, -4.0f));
 	}
 
-	ZETest(Distance)
+	ZETest("Distance")
 	{
 		ZEVector3 p(-4.0f, 0.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);
@@ -92,7 +92,7 @@ ZETestSuite(ZEPlane)
 		ZETestCheckClose(d, 39.0f/sqrt(33.0f), 0.000001);
 	}
 
-	ZETest(TestHalfSpace)
+	ZETest("TestHalfSpace")
 	{
 		ZEVector3 p(-4.0f, 0.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);
@@ -107,7 +107,7 @@ ZETestSuite(ZEPlane)
 		ZETestCheckEqual(ZEPlane::TestHalfSpace(P, Z), 0);
 	}
 
-	ZETest(IntersectionTest1)
+	ZETest("IntersectionTest1")
 	{
 		ZEVector3 P0( 1.0f, 2.0f, 3.0f);
 		ZEVector3 P1(-4.0f, 0.0f, 0.0f);
@@ -134,7 +134,7 @@ ZETestSuite(ZEPlane)
 
 	}
 
-	ZETest(IntersectionTest2)
+	ZETest("IntersectionTest2")
 	{
 		ZEVector3 P0( 1.0f, 2.0f, 3.0f);
 		ZEVector3 P1(-4.0f, 0.0f, 0.0f);
@@ -160,7 +160,7 @@ ZETestSuite(ZEPlane)
 		ZETestCheckEqual(result2, false);
 	}
 	
-	ZETest(IntersectionTest3)
+	ZETest("IntersectionTest3")
 	{
 		
 		ZEVector3 P0( 1.0f, 2.0f, 3.0f);
@@ -187,7 +187,7 @@ ZETestSuite(ZEPlane)
 		ZETestCheckEqual(result2, false);
 	}
 	
-	ZETest(IntersectionTest4)
+	ZETest("IntersectionTest4")
 	{
 		ZEVector3  p(0.0f,  4.0f, 0.0f);
 		ZEVector3 n(2.0f, -2.0f, 5.0f);

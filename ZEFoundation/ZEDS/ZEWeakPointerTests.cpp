@@ -35,50 +35,11 @@
 
 #include "ZETest.h"
 #include "ZEWeakPointer.h"
-
-enum ZETestClassStatus
-{
-	ZE_TCS_NOT_CONSTRUCTED,
-	ZE_TCS_CONSTRUCTED,
-	ZE_TCS_DESTRUCTED
-};
-
-class ZETestClass
-{
-public:
-	static int Status;
-	static int InstanceCount;
-
-	static void Reset()
-	{
-		Status = ZE_TCS_NOT_CONSTRUCTED;
-		InstanceCount = 0;
-	}
-
-	ZETestClass()
-	{
-		InstanceCount++;
-		Status = ZE_TCS_CONSTRUCTED;
-	}
-
-	~ZETestClass()
-	{
-		InstanceCount--;
-		Status = ZE_TCS_DESTRUCTED;
-	}
-};
-
-int ZETestClass::Status;
-int ZETestClass::InstanceCount;
-
-#define ZETestReset() ZETestClass::Reset()
-#define ZETestScope() 
-#define ZETestCheckStatus(Status1) ZETestCheck(ZETestClass::Status == Status1)
-#define ZETestCheckInstanceCount(Count) ZETestCheck(ZETestClass::InstanceCount == Count)
+#include "ZEPointerTestClass.h"
 
 ZETestSuite(ZEWeakPointer)
 {
-	ZETest(TestClassTest)
+	ZETest("TestClassTest")
 	{
 		ZETestReset();
 		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
@@ -105,7 +66,7 @@ ZETestSuite(ZEWeakPointer)
 		ZETestCheckInstanceCount(0);
 	}
 
-	ZETest(DefaultConstructor)
+	ZETest("DefaultConstructor")
 	{
 		ZETestReset();
 
@@ -136,7 +97,7 @@ ZETestSuite(ZEWeakPointer)
 		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
 	}
 
-	ZETest(CopyRelease)
+	ZETest("CopyRelease")
 	{
 		ZETestReset();
 
@@ -161,7 +122,7 @@ ZETestSuite(ZEWeakPointer)
 		ZETestCheck(SharedPointer.GetWeakReferenceCount() == 0);
 	}
 
-	ZETest(Assingments)
+	ZETest("Assingments")
 	{
 		ZETestReset();
 		ZESharedPointer<ZETestClass> SharedPointer(new ZETestClass());
@@ -206,7 +167,7 @@ ZETestSuite(ZEWeakPointer)
 		}
 	}
 
-	ZETest(ReferanceCounting)
+	ZETest("ReferanceCounting")
 	{
 		// Chain Assingment
 		ZETestReset();

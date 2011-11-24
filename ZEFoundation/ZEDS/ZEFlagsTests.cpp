@@ -38,7 +38,7 @@
 
 ZETestSuite(ZEFlagS)
 {
-	ZETest(RaisebitUnraisebitSetflagSetbit)
+	ZETest("RaisebitUnraisebitSetflagSetbit")
 	
 	{	
 		int a = 0;
@@ -67,7 +67,7 @@ ZETestSuite(ZEFlagS)
 		ZETestCheckEqual(TestItem4.GetFlags(b), 0);
 	}
 
-	ZETest(operators)
+	ZETest("operators")
 	{
 		ZEFlags TestItem1;
 		ZEFlags TestItem2;

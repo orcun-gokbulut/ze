@@ -48,7 +48,7 @@
 
 ZETestSuite(ZEOBBox)
 {
-	ZETest(OBB_Constructor)
+	ZETest("OBB_Constructor")
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		ZEVector3 U(1.0f, 0.0f, 0.0f);
@@ -64,12 +64,12 @@ ZETestSuite(ZEOBBox)
 
 	}
 
-	ZETest(OBB_GetCenter)
+	ZETest("OBB_GetCenter")
 	{
 		//No funtion
 	}
 
-	ZETest(OBB_GetVertex)
+	ZETest("OBB_GetVertex")
 	{
 		ZEOBBox OBB(ZEVector3(1.0f, 2.0f, 3.0f), 
 			ZEVector3::UnitX, ZEVector3::UnitY, ZEVector3::UnitZ, 
@@ -86,7 +86,7 @@ ZETestSuite(ZEOBBox)
 		ZETestCheckEqual(OBB.GetVertex(7), ZEVector3(2.0f, 3.0f, 4.0f));
 	}
 
-	ZETest(OBB_PlaneHalfSpaceTest)
+	ZETest("OBB_PlaneHalfSpaceTest")
 	{
 		
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
@@ -131,7 +131,7 @@ ZETestSuite(ZEOBBox)
 		ZETestCheckEqual(result4, 1);
 	}
 
-	ZETest(OBB_IntersectionTest1)
+	ZETest("OBB_IntersectionTest1")
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		ZEVector3 U(1.0f, 0.0f, 0.0f);
@@ -157,17 +157,17 @@ ZETestSuite(ZEOBBox)
 
 	}
 
-	ZETest(OBB_IntersectionTest2)
+	ZETest("OBB_IntersectionTest2")
 	{
 	
 	}
 
-	ZETest(OBB_IntersectionTest3)
+	ZETest("OBB_IntersectionTest3")
 	{
 	
 	}
 
-	ZETest(OBB_IntersectionTest4)
+	ZETest("OBB_IntersectionTest4")
 	{
 
 	}

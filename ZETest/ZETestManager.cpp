@@ -72,7 +72,7 @@ bool ZETestManager::RunTests()
 	}
 	
 	if (!Result)
-		printf("error T0003: Test package \"%s\" has failed. \r\n", GetPackageName());
+		printf("%s : error T0003: Test package failed. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
 
 	return Result;
 }
@@ -98,9 +98,9 @@ void ZETestManager::ReportProblem(ZETestSuiteItem* Suite, ZETestItem* Test, ZETe
 	}
 
 	if (Type == ZE_TPT_ERROR)
-		printf("  %s(%d) : info T0001: Test \"%s::%s\" \"%s\" failed. %s \r\n", File, Line, TypeString, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
+		printf("  %s(%d) : warning T0001: Test failed. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", File, Line, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
 	else
-		printf("  %s(%d) : info T0002: Test \"%s::%s\" \"%s\" gives warning. %s \r\n", File, Line, TypeString, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
+		printf("  %s(%d) : warning T0002: Test gived warning. Suite : \"%s\", Test : \"%s\", Case : \"%s\". %s.\r\n", File, Line, Suite->GetName(), Test->GetName(), Test->GetCurrentCase(), ProblemText);
 }
 
 ZETestManager* ZETestManager::GetInstance()

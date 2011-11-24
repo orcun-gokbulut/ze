@@ -86,16 +86,19 @@ class ZETestItem
 #define ZETestScope() 
 
 #define ZETestCase(CaseName)\
-	SetCaseName(##CaseName)\
+	SetCurrentCase(CaseName);\
 	while(false)
 
+#define ZETestNameCombiner_(x, y) x ## y
+#define ZETestNameCombiner(x, y) ZETestNameCombiner_(x, y)
+
 #define ZETest(Name)\
-	class ZETest_##Name : public ZETestItem\
+	class ZETestNameCombiner(ZETest_, __LINE__) : public ZETestItem\
 	{\
 		public:\
 			virtual void TestImpl();\
-			ZETest_##Name(const char* Name1, ZETestSuiteItem* Owner1) : ZETestItem(Name1, Owner1) {}\
-	} Test_##Name(#Name, &Suite);\
-	void ZETest_##Name::TestImpl()
+			ZETestNameCombiner(ZETest_, __LINE__)(const char* Name1, ZETestSuiteItem* Owner1) : ZETestItem(Name1, Owner1) {}\
+	} ZETestNameCombiner(Test_, __LINE__)(Name, &Suite);\
+	void ZETestNameCombiner(ZETest_, __LINE__)::TestImpl()
 
 #endif

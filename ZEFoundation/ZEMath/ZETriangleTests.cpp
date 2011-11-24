@@ -46,7 +46,7 @@
 ZETestSuite(ZETriangle)
 {
 
-	ZETest(TRI_Constructor)
+	ZETest("TRI_Constructor")
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -59,7 +59,7 @@ ZETestSuite(ZETriangle)
 		ZETestCheckEqual(T.V2, ZEVector3(4.0f, 5.0f, 6.0f));
 	}
 
-	ZETest(TRI_Create)
+	ZETest("TRI_Create")
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -72,7 +72,7 @@ ZETestSuite(ZETriangle)
 		ZETestCheckEqual(T.V1, ZEVector3(0.0f, 0.0f, 3.0f));
 		ZETestCheckEqual(T.V2, ZEVector3(4.0f, 5.0f, 6.0f));
 	}
-	ZETest(TRI_GetNormal)
+	ZETest("TRI_GetNormal")
 	{
 		ZEVector3 N;
 
@@ -87,7 +87,7 @@ ZETestSuite(ZETriangle)
 		ZETestCheckEqual(N, ZEVector3((-6.0f/sqrt(54.0f)), (3.0f/sqrt(54.0f)), (3.0f/sqrt(54.0f))));
 	}
 
-	ZETest(TRI_GetSurfacePlane)
+	ZETest("TRI_GetSurfacePlane")
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -106,7 +106,7 @@ ZETestSuite(ZETriangle)
 		ZETestCheckEqual(P.p, T.V1);
 	}
 
-	ZETest(TRI_InsideTest)
+	ZETest("TRI_InsideTest")
 	{
 		ZEVector3 P(1.0f, 2.0f, 3.0f);
 
@@ -121,7 +121,7 @@ ZETestSuite(ZETriangle)
 		ZETestCheckEqual(result, true);
 	}
 
-	ZETest(TRI_IntersectionTest1)
+	ZETest("TRI_IntersectionTest1")
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -142,7 +142,7 @@ ZETestSuite(ZETriangle)
 		ZETestCheckEqual(result, true);
 	}
 
-	ZETest(TRI_IntersectionTest2)
+	ZETest("TRI_IntersectionTest2")
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -163,7 +163,7 @@ ZETestSuite(ZETriangle)
 		ZETestCheckEqual(result, false);
 	}
 
-	ZETest(TRI_IntersectionTest3)
+	ZETest("TRI_IntersectionTest3")
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);
@@ -184,7 +184,7 @@ ZETestSuite(ZETriangle)
 		ZETestCheckEqual(result, true);
 	}
 
-	ZETest(TRI_IntersectionTest4)
+	ZETest("TRI_IntersectionTest4")
 	{
 		ZEVector3 V0(1.0f, 2.0f, 3.0f);
 		ZEVector3 V1(0.0f, 0.0f, 3.0f);

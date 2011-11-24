@@ -47,7 +47,7 @@
 
 ZETestSuite(ZEBSphere)
 {
-	ZETest(BS_Constructor)
+	ZETest("BS_Constructor")
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
@@ -58,7 +58,7 @@ ZETestSuite(ZEBSphere)
 	}
 
 
-	ZETest(BS_PlaneHalfSpaceTest)
+	ZETest("BS_PlaneHalfSpaceTest")
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
@@ -105,7 +105,7 @@ ZETestSuite(ZEBSphere)
 		ZETestCheckEqual(result4, 1);
 	}
 
-	ZETest(BS_GetSurfaceNormal)
+	ZETest("BS_GetSurfaceNormal")
 	{	
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
@@ -145,7 +145,7 @@ ZETestSuite(ZEBSphere)
 		ZETestCheckEqual(Normal, Normal1);
 
 	}
-	ZETest(BS_IntersectionTest1)
+	ZETest("BS_IntersectionTest1")
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
@@ -167,7 +167,7 @@ ZETestSuite(ZEBSphere)
 		ZETestCheckEqual(result3, true);
 	}
 
-	ZETest(BS_IntersectionTest2)
+	ZETest("BS_IntersectionTest2")
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
@@ -195,7 +195,7 @@ ZETestSuite(ZEBSphere)
 		ZETestCheckEqual(result3, true);
 	}
 
-	ZETest(BS_IntersectionTest3)
+	ZETest("BS_IntersectionTest3")
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
@@ -235,7 +235,7 @@ ZETestSuite(ZEBSphere)
 
 	}
 //
-	ZETest(BS_IntersectionTest4)
+	ZETest("BS_IntersectionTest4")
 	{
 		float MinT;
 		float MaxT;
@@ -276,7 +276,7 @@ ZETestSuite(ZEBSphere)
 		bool result4 = ZEBSphere::IntersectionTest(BS, R4, MinT, MaxT);
 		ZETestCheckEqual(result4, true);	}
 //
-	ZETest(BS_IntersectionTest5)
+	ZETest("BS_IntersectionTest5")
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
@@ -313,7 +313,7 @@ ZETestSuite(ZEBSphere)
 
 	}
 
-	ZETest(BS_CollisionTest1)
+	ZETest("BS_CollisionTest1")
 	{
 		ZEVector3 Position(1.0f, 2.0f, 3.0f);
 		float R = 3.0f; 
@@ -342,7 +342,7 @@ ZETestSuite(ZEBSphere)
 
 	}
 
-	ZETest(BS_CollisionTest2)
+	ZETest("BS_CollisionTest2")
 	{
 		ZEVector3 Position1(1.0f, 2.0f, 3.0f);
 		float R1 = 3.0f; 
@@ -377,7 +377,7 @@ ZETestSuite(ZEBSphere)
 		ZETestCheckEqual(result4, false);
 	}
 
-	ZETest(BS_CollisionTest3)
+	ZETest("BS_CollisionTest3")
 	{
 		//Nofuntion
 	}

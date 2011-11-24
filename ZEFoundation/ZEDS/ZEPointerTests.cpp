@@ -35,55 +35,11 @@
 
 #include "ZETest.h"
 #include "ZEPointer.h"
-
-enum ZETestClassStatus
-{
-	ZE_TCS_NOT_CONSTRUCTED,
-	ZE_TCS_CONSTRUCTED,
-	ZE_TCS_DESTRUCTED
-};
-
-class ZETestClass
-{
-	public:
-		static int Status;
-		static int Instances;
-		static int DestroyedInstances;
-
-		static void Reset()
-		{
-			Status = ZE_TCS_NOT_CONSTRUCTED;
-			Instances = 0;
-			DestroyedInstances = 0;
-		}
-
-		ZETestClass()
-		{
-			Instances++;
-			Status = ZE_TCS_CONSTRUCTED;
-		}
-
-		~ZETestClass()
-		{
-			Instances--;
-			DestroyedInstances++;
-			Status = ZE_TCS_DESTRUCTED;
-		}
-};
-
-int ZETestClass::Status;
-int ZETestClass::Instances;
-int ZETestClass::DestroyedInstances;
-
-#define ZETestCheckStatus(Status1) ZETestCheck(ZETestClass::Status == Status1)
-#define ZETestCheckInstanceCount(Count) ZETestCheck(ZETestClass::Instances == Count)
-#define ZETestCheckDestroyedInstaceCount(Count) ZETestCheck(ZETestClass::DestroyedInstances == Count)
-
-#define ZETestReset() ZETestClass::Reset()
+#include "ZEPointerTestClass.h"
 
 ZETestSuite(ZEPointerTests)
 {
-	ZETest(TestClassTest)
+	ZETest("TestClassTest")
 	{
 		ZETestReset();
 		ZETestCheckStatus(ZE_TCS_NOT_CONSTRUCTED);
@@ -112,7 +68,7 @@ ZETestSuite(ZEPointerTests)
 		ZETestCheckInstanceCount(0);
 	}
 
-	ZETest(DefaultConstructor)
+	ZETest("DefaultConstructor")
 	{
 		ZETestReset();
 
@@ -130,7 +86,7 @@ ZETestSuite(ZEPointerTests)
 		ZETestCheck(Pointer3.GetPointer() == NULL);
 	}
 
-	ZETest(CreateRelease)
+	ZETest("CreateRelease")
 	{
 		ZETestReset();
 
@@ -149,7 +105,7 @@ ZETestSuite(ZEPointerTests)
 		ZETestCheckDestroyedInstaceCount(1);
 	}
 
-	ZETest(Assignment)
+	ZETest("Assignment")
 	{
 		ZETestReset();
 		ZETestScope()
@@ -167,7 +123,7 @@ ZETestSuite(ZEPointerTests)
 		}
 	}
 
-	ZETest(AutoDeletion)
+	ZETest("AutoDeletion")
 	{
 		ZETestReset();
 		ZETestScope()
@@ -181,7 +137,7 @@ ZETestSuite(ZEPointerTests)
 		ZETestCheckDestroyedInstaceCount(1);
 	}
 
-	ZETest(ChainAssingments)
+	ZETest("ChainAssingments")
 	{
 		ZETestReset();
 		ZETestScope()

@@ -44,7 +44,7 @@
 
 ZETestSuite(ZERay)
 {
-	ZETest(Constructor)
+	ZETest("Constructor")
 	{
 		ZEVector3 P0(0.0f, 1.0f, 0.0f);
 		ZEVector3 V(1.0f, 2.0f, 3.0f);
@@ -54,7 +54,7 @@ ZETestSuite(ZERay)
 		ZETestCheckEqual(R.v, V);
 	}
 	
-	ZETest(Create)
+	ZETest("Create")
 	{
 		ZERay R;
 		ZEVector3 P0(0.0f, 1.0f, 0.0f);
@@ -65,7 +65,7 @@ ZETestSuite(ZERay)
 		ZETestCheckEqual(R.v, ZEVector3(1.0f, 1.0f, 3.0f));
 	}
 
-	ZETest(CreateParametric)
+	ZETest("CreateParametric")
 	{
 		ZERay R;
 		ZEVector3 V(1.0, 4.0f, 9.0f);
@@ -75,7 +75,7 @@ ZETestSuite(ZERay)
 		ZETestCheckEqual(R.v, V);
 	}
 
-	ZETest(GetPointOn)
+	ZETest("GetPointOn")
 	{
 		ZEVector3 P0(0,3,0);
 		ZEVector3 V(1,4,-1);
@@ -94,7 +94,7 @@ ZETestSuite(ZERay)
 		ZETestCheckEqual(A, B);
 	}
 
-	ZETest(DistanceToPoint)
+	ZETest("DistanceToPoint")
 	{
 		ZEVector3 P(5,8,2);
 		ZEVector3 P1(0,3,0);

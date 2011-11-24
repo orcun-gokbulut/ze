@@ -39,7 +39,7 @@
 
 ZETestSuite(ZEString)
 {
-	ZETest(ZEString)//Equals, =
+	ZETest("ZEString")//Equals, =
 	{
 		ZEString TestItem1, TestItem2;
 
@@ -56,7 +56,7 @@ ZETestSuite(ZEString)
 		ZETestCheck(TestItem2 == "nucrO");
 	}
 
-	ZETest(Assigments)
+	ZETest("Assigments")
 	{
 
 		ZEString TestItem1;
@@ -96,7 +96,7 @@ ZETestSuite(ZEString)
 		ZETestCheckEqual(TestItem7, "");
 
 	}
-	ZETest(OneTestArmy)//getlength,getvalue,getsize,setvalue,getcharacter,setcharacter
+	ZETest("OneTestArmy")//getlength,getvalue,getsize,setvalue,getcharacter,setcharacter
 	{
 		ZEString TestItem1;
 		ZEString TestItem2;
@@ -151,7 +151,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest(ClearIsEmpty)
+	ZETest("ClearIsEmpty")
 	{
 		ZEString TestItem1;
 		ZETestCheck(TestItem1.IsEmpty());
@@ -164,7 +164,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest(insert)
+	ZETest("insert")
 	{
 		ZEString TestItem1 = "Insertable Text";
 		TestItem1.Insert("Pre");
@@ -192,7 +192,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest(AppendAndOperators)
+	ZETest("AppendAndOperators")
 	{
 		// void Append(const ZEString& String
 		ZEString TestItem1 = "StringA";
@@ -245,7 +245,7 @@ ZETestSuite(ZEString)
 
 	}	
 
-	ZETest(Remove)
+	ZETest("Remove")
 	{
 		ZEString TestItem1 = "";
 		TestItem1.Remove(0, 0);
@@ -284,7 +284,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest(Left)
+	ZETest("Left")
 	{
 		ZEString TestItem1;
 		ZETestCheckEqual(TestItem1.Left(0), "");
@@ -297,7 +297,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest(Right)
+	ZETest("Right")
 	{
 		ZEString TestItem1;
 		ZETestCheckEqual(TestItem1.Right(0), "");
@@ -310,7 +310,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest(Middle)
+	ZETest("Middle")
 	{
 
 		ZEString TestItem1;
@@ -340,7 +340,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest(SubString)
+	ZETest("SubString")
 	{
 
 		ZEString TestItem1;
@@ -361,7 +361,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest(ToLower)
+	ZETest("ToLower")
 	{
 		ZEString TestItem1;
 		ZEString TestItem2;
@@ -380,7 +380,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest(ToUpper)
+	ZETest("ToUpper")
 	{
 		ZEString TestItem1;
 		ZEString TestItem2;
@@ -399,7 +399,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest(CopyOnWrite)
+	ZETest("CopyOnWrite")
 	{
 		ZEString TestItem1 = "MADAO";
 		ZEString TestItem2 = "ERZA";
@@ -419,7 +419,7 @@ ZETestSuite(ZEString)
 		ZETestCheckEqual(TestItem2, "NATSU");
 	}
 
-	ZETest(Trim)
+	ZETest("Trim")
 	{
 
 		ZEString TestItem1;
@@ -454,7 +454,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest(Castings)
+	ZETest("Castings")
 	{
 		//tointeger
 		ZEString TestItem1;
