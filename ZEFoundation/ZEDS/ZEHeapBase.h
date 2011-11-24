@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELineTests.cpp
+ Zinek Engine - ZEHeapBase.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,106 +33,73 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETest.h"
-#include <d3dx9.h>
-#include <math.h>
-#include "ZEMathIOStreamMapping.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZELine.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#pragma once
+#ifndef __ZE_HEAP_BASE_H__
+#define __ZE_HEAP_BASE_H__
 
-ZETestSuite(ZELine)
+#include "ZEArray.h"
+
+template<typename Type, typename Allocator_>
+class ZEHeapBase
 {
-	ZETest("LN_Constructor")
-	{
-		ZEVector3 P0(0.0f, 1.0f, 0.0f);
-		ZEVector3 P1(1.0f, 2.0f, 3.0f);
-		ZELine L(P0, P1);
-		ZETestCheckEqual(L.p, P0);
-		ZETestCheckEqual(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
-	}
+	protected:
+		ZEArray<Type, Allocator_> Heap;
 
-	ZETest("LN_Create")
-	{
-		ZELine L;
-		ZEVector3 P0(0.0f, 1.0f, 0.0f);
-		ZEVector3 P1(1.0f, 2.0f, 3.0f);
-		ZELine::Create(L, P0, P1);
-		ZETestCheckEqual(L.p, P0);
-		ZETestCheckEqual(L.v, ZEVector3(1.0f, 1.0f, 3.0f));
-	}
+	public:
+		size_t GetParentIndex(size_t Index) const
+		{
+			return (Index - 1) / 2;
+		}
 
-	ZETest("LN_CreateParamatric")
-	{
-		ZELine L;
-		ZEVector3 V(1.0, 4.0f, 9.0f);
-		ZEVector3 P (1.0, 0.0f, 0.0f);
-		ZELine::CreateParametric(L, V, P);
-		ZETestCheckEqual(L.p, P);
-		ZETestCheckEqual(L.v, V);
-	}
+		Type& GetParent(size_t Index)
+		{
+			return Heap(GetParentIndex());
+		}
 
-	ZETest("LN_MinimumDistance1")
-	{
-		ZEVector3 P1(0,3,0);
-		ZEVector3 P2(1,4,-1);
-		ZEVector3 P3(5,8,2);
-		ZEVector3 P4(8,15,1);
+		const Type& GetParent(size_t Index) const
+		{
+			return Heap(GetParentIndex());
+		}
 		
-		ZELine L1(P1,P2);
-		ZELine L2(P3,P4);
+		size_t GetFirstChildIndex(size_t Index) const
+		{
+			return 2 * Index + 1;
+		}
 		
-		float d = ZELine::MinimumDistance(L1, L2);
+		Type& GetFirstChild(size_t Index)
+		{
+			return Heap[GetFirstChildIndex(Index)];
+		}
 
-		ZETestCheckEqual(d, sqrtf(14.0f));
-	}
+		const Type& GetFirstChild(size_t Index) const
+		{
+			return Heap[GetFirstChildIndex(Index)];
+		}
 
-	ZETest("LN_MinimumDistance2")
-	{
-		ZEVector3 P1(0,3,0);
-		ZEVector3 P2(1,4,-1);
-		ZEVector3 P3(5,8,2);
-		ZEVector3 P4(8,15,1);
-		
-		ZELine L1(P1,P2);
-		ZELine L2(P3,P4);
-		
-		float tA, tB;
-		float d = ZELine::MinimumDistance(L1, L2, tA, tB);
+		size_t GetSecondChildIndex(size_t Index) const
+		{
+			return 2 * Index + 2;
+		}
 
-		ZETestCheckEqual(d, sqrtf(14.0f));
-	}
+		Type& GetSecondChild(size_t Index) 
+		{
+			return Heap[GetSecondChildIndex(Index)];
+		}
 
-	ZETest("LN_DistanceToPoint")
-	{
-		ZEVector3 P(5,8,2);
-		ZEVector3 P1(0,3,0);
-		ZEVector3 P2(1,4,-1);
-		ZELine L(P1,P2);
-		float t;
-		float d;
+		const Type& GetSecondChild(size_t Index) const
+		{
+			return Heap[GetSecondChildIndex(Index)];
+		}
 
-		d = ZELine::MinimumDistance(L,P,t);
+		size_t GetCount()
+		{
+			return Heap.GetCount();
+		}
 
-		ZETestCheckClose(d, 4.61880215, 0.000001);
-	}
+		const ZEArray<Type, Allocator_>& GetArray() const
+		{
+			return Heap;
+		}
+};
 
-	ZETest("LN_GetPointOn")
-	{
-		ZEVector3 P1(0,3,0);
-		ZEVector3 P2(1,4,-1);
-		ZEVector3 A;
-		ZEVector3 B;
-		const ZELine L=ZELine::ZELine(P1,P2);
-		ZEVector3 P;
-		ZEVector3 P3;
-		L.GetPointOn(P,3);
-		A=P;
-		
-		ZEVector3::Scale(P,L.v,3);
-		ZEVector3::Add(P,P,L.p);
-		B = P;
-
-		ZETestCheckEqual(A, B);
-	}
-}
+#endif

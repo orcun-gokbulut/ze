@@ -53,7 +53,7 @@ int Compare1 (const void *F, const void *E)
 
 ZETestSuite(ZEArray)
 {
-	ZETest(Rambo)//getCount,setcount,getitem,setitem,findIndex
+	ZETest("Rambo")//getCount,setcount,getitem,setitem,findIndex
 	{
 
 		ZEArray<int> TestItem;
@@ -87,7 +87,7 @@ ZETestSuite(ZEArray)
 
 
 	}
-	ZETest(ADD)
+	ZETest("ADD")
 	{
 		ZEArray<int> TestItem1;
 		ZEArray<int> TestItem2;
@@ -108,7 +108,7 @@ ZETestSuite(ZEArray)
 
 
 	}
-	ZETest(MassADD)
+	ZETest("MassADD")
 	{
 		//MassAdd(Type* OtherArray, size_t Count)
 		//TestItem1 filled one, TestItem2 filled one, TestItem3 empty
@@ -164,7 +164,7 @@ ZETestSuite(ZEArray)
 		
 	}
 
-	ZETest(insert)
+	ZETest("insert")
 	{
 		//insert start
 		ZEArray<int> TestItem1;				
@@ -206,7 +206,7 @@ ZETestSuite(ZEArray)
 
 	}
 
-	ZETest(MassInsert)
+	ZETest("MassInsert")
 	{
 		/*MassInsert(size_t Index, Type* OtherArray, size_t Offset, size_t Count)
 		ZEArray<int> TestItem1;
@@ -274,7 +274,7 @@ ZETestSuite(ZEArray)
 
 	}
 
-	ZETest(Enqueue)
+	ZETest("Enqueue")
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.Enqueue(1);
@@ -285,7 +285,7 @@ ZETestSuite(ZEArray)
 		ZETestCheckEqual(TestItem1.GetCount(), 3);
 	}
 
-	ZETest(Dequeue)
+	ZETest("Dequeue")
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.Add(1);
@@ -294,7 +294,7 @@ ZETestSuite(ZEArray)
 		ZETestCheckEqual(TestItem1[0], 2);
 	}
 
-	ZETest(DeleteAt)
+	ZETest("DeleteAt")
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.Add(1);
@@ -315,7 +315,7 @@ ZETestSuite(ZEArray)
 
 	}
 
-	ZETest(PopPush)
+	ZETest("PopPush")
 	{
 		//push item
 		ZEArray<int> TestItem1;
@@ -332,7 +332,7 @@ ZETestSuite(ZEArray)
 		ZETestCheckEqual(TestItem1[0], 0);
 	}
 
-	ZETest(DeleteValue)
+	ZETest("DeleteValue")
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.Add(0);
@@ -352,7 +352,7 @@ ZETestSuite(ZEArray)
 		ZETestCheckEqual(TestItem1[0], 3);
 
 	}
-	ZETest(Existence)
+	ZETest("Existence")
 	{
 		ZEArray<int> TestItem1;
 		int x;
@@ -370,7 +370,7 @@ ZETestSuite(ZEArray)
 		TestItem1.Exists(x);
 	}
 
-	ZETest(Operators)
+	ZETest("Operators")
 	{
 		// =
 		ZEArray<int> TestItem1;
@@ -385,7 +385,7 @@ ZETestSuite(ZEArray)
 
 	}
 
-	ZETest(GetCArray)
+	ZETest("GetCArray")
 	{
 		ZEArray<int> TestItem1;
 		int *TestItem2;
@@ -399,7 +399,7 @@ ZETestSuite(ZEArray)
 
 	}
 
-	ZETest(fill)
+	ZETest("fill")
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.SetCount(3);
@@ -435,7 +435,7 @@ ZETestSuite(ZEArray)
 
 	}
 */
-	ZETest(Resize)
+	ZETest("Resize")
 	{
 		ZEArray<int> TestItem1;
 		TestItem1.Add(0);
@@ -450,7 +450,7 @@ ZETestSuite(ZEArray)
 
 	}
 
-	ZETest(GetSize)
+	ZETest("GetSize")
 	{
 		//after operation check with getcount
 		ZEArray<int> TestItem1;
@@ -464,7 +464,7 @@ ZETestSuite(ZEArray)
 
 	}
 
-	ZETest(CopyTo)
+	ZETest("CopyTo")
 	{
 		ZEArray<int> TestItem1;
 		ZEArray<int> TestItem2;
@@ -484,7 +484,7 @@ ZETestSuite(ZEArray)
 		ZETestCheckEqual(TestItem2.GetCount(), 2);
 
 	}
-	ZETest(CopyFrom)
+	ZETest("CopyFrom")
 	{
 		ZEArray<int> TestItem1;
 		ZEArray<int> TestItem2;
@@ -512,7 +512,7 @@ ZETestSuite(ZEArray)
 		ZETestCheckEqual(TestItem4.GetCount(), 2);
 
 	}
-	ZETest(Combine)
+	ZETest("Combine")
 	{
 		ZEArray<int> TestItem1;
 		ZEArray<int> TestItem2;
@@ -527,7 +527,7 @@ ZETestSuite(ZEArray)
 
 	}
 
-	ZETest(Clear)
+	ZETest("Clear")
 	{
 
 		ZEArray<int> TestItem1;
@@ -539,7 +539,7 @@ ZETestSuite(ZEArray)
 		ZETestCheckEqual(TestItem1.GetCount(), 0);
 	}
 
-	ZETest(sort)
+	ZETest("sort")
 	{
 		//						return
 		//A[]={0,2,2,1}  0,2	(-1)
@@ -559,7 +559,7 @@ ZETestSuite(ZEArray)
 		ZETestCheckEqual(TestItem1[3], 2);
 	}
 
-	ZETest(binary_search)
+	ZETest("binary_search")
 	{
 
 		ZEArray<int> TestItem1;

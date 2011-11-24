@@ -42,7 +42,7 @@
 ZETestSuite(Rectangle)
 {
 
-	ZETest(RECT_Constructor)
+	ZETest("RECT_Constructor")
 	{
 		ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);
@@ -58,7 +58,7 @@ ZETestSuite(Rectangle)
 
 	}
 
-	ZETest(RECT_BoundingTest)
+	ZETest("RECT_BoundingTest")
 	{
 		/*ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);
@@ -77,7 +77,7 @@ ZETestSuite(Rectangle)
 		CHECK_EQUAL(result3, true);*/
 	}
 
-	ZETest(RECT_GetCorner)
+	ZETest("RECT_GetCorner")
 	{
 		ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);
@@ -95,7 +95,7 @@ ZETestSuite(Rectangle)
 
 	}
 
-	ZETest(RECT_GetWidth)
+	ZETest("RECT_GetWidth")
 	{
 		ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);
@@ -107,7 +107,7 @@ ZETestSuite(Rectangle)
 
 	}
 
-	ZETest(RECT_GetHeight)
+	ZETest("RECT_GetHeight")
 	{
 		ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);

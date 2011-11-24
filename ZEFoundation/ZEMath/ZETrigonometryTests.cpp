@@ -41,16 +41,16 @@
 
 ZETestSuite(ZETrigonometry)
 {
-	ZETest(FastSin)
+	ZETest("FastSin")
 	{
 		ZETestCheckEqual(FastSin(360), 0);
 
 	}
-	ZETest(FastCos)
+	ZETest("FastCos")
 	{
 		ZETestCheckEqual(FastCos(360), 1);
 	}
-	ZETest(FastTan)
+	ZETest("FastTan")
 	{
 		ZETestCheckEqual(FastTan(360), 0);
 	}
