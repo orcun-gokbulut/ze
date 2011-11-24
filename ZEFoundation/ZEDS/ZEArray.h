@@ -206,7 +206,7 @@ class ZEArray
 
 		void CopyFrom(const ZEArray<Type, Allocator_>& OtherArray)
 		{
-			CopyFrom(OtherArray.GetConstCArray(), OtherArray.GetSize());
+			CopyFrom(OtherArray.GetConstCArray(), OtherArray.Count);
 		}
 		
 		void Combine(const ZEArray<Type, Allocator_>& OtherArray)
