@@ -350,10 +350,10 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 
 	ZEMatrix4x4 TextureMatrix;
 	ZEMatrix4x4::Create(TextureMatrix, 
-		0.5f, 0.0f, 0.0f, 0.0f,
-		0.0f, -0.5f, 0.0f, 0.0f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.5f, 0.5f, -0.001f, 1.0f);
+		0.5f, 0.0f, 0.0f, 0.5f,
+		0.0f, -0.5f, 0.0f, 0.5f,
+		0.0f, 0.0f, 1.0f, -0.00001f,
+		0.0f, 0.0f, 0.0f, 1.0f);
 
 	ZEMatrix4x4 InvCameraViewMatrix;
 	ZEMatrix4x4::Inverse(InvCameraViewMatrix, Camera->GetViewTransform());

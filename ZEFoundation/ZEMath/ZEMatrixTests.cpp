@@ -323,13 +323,7 @@ ZETestSuite(ZEMatrix4x4)
 	{
 
 	}
-	ZETest("MTRX4CreateOffset")
-	{
-		ZEMatrix4x4 M;
-		ZEVector3 V(1.0f, 2.0f, 3.0f);
-		ZEQuaternion Q(1.0f, 1.0f, 2.0f, 3.0f);
-		ZEMatrix4x4::CreateOffset(M, V, Q);
-	}
+
 	ZETest("MTRX4CreateScale")
 	{
 		ZEMatrix4x4 A;

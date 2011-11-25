@@ -169,7 +169,6 @@ class ZEMatrix4x4
 		static void						CreateTranslation(ZEMatrix4x4& Matrix, const ZEVector3& Position);
 		static void						CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale);
 		static void						CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);
-		static void						CreateOffset(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);
 		static void						CreateIdentity(ZEMatrix4x4& Matrix);
 		static void						CreateZero(ZEMatrix4x4& Matrix);
 		static void						CreateViewTransform(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);
@@ -177,8 +176,6 @@ class ZEMatrix4x4
 		static void						CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width, float Height, float NearZ, float FarZ);
 		static void						CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ);
 		static void						CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ);
-
-		void							CreatePerspectiveProjectionLinearZ(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ);
 
 		static void						Add(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
 		static void						Sub(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
