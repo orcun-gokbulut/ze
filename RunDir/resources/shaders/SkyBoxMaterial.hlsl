@@ -53,7 +53,7 @@ VSOutput VSMain(VSInput Input)
 {
 	VSOutput Output;
 
-	Output.Position = mul(Input.Position, WorldViewProjMatrix).xyzz;
+	Output.Position = mul(WorldViewProjMatrix, Input.Position).xyzz;
 	Output.CubeTexcoord = Input.Position.xyz;
 	return Output;
 }

@@ -148,13 +148,13 @@ ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMat
 		SkinTransform(Input);
 
 	// Pipeline 
-	Output.Position_ = mul(Input.Position, WorldViewProjMatrix);
+	Output.Position_ = mul(WorldViewProjMatrix, Input.Position);
 	
-	Output.Position = mul(Input.Position, WorldViewMatrix).xyz;
-	Output.Normal.xyz = mul(Input.Normal, WorldViewInvTrpsMatrix).xyz;
+	Output.Position = mul(WorldViewMatrix, Input.Position).xyz;
+	Output.Normal.xyz = mul(WorldViewInvTrpsMatrix, Input.Normal).xyz;
 	#if defined(ZE_SHADER_TANGENT_SPACE)
-		Output.Tangent = mul(Input.Tangent, WorldViewInvTrpsMatrix).xyz;
-		Output.Binormal = mul(Input.Binormal, WorldViewInvTrpsMatrix).xyz;
+		Output.Tangent = mul(WorldViewInvTrpsMatrix, Input.Tangent).xyz;
+		Output.Binormal = mul(WorldViewInvTrpsMatrix, Input.Binormal).xyz;
 	#endif
 	
 	Output.Texcoord = Input.Texcoord;
@@ -257,7 +257,7 @@ ZEFixedMaterial_ForwardPass_VSOutput ZEFixedMaterial_ForwardPass_VertexShader(ZE
 		SkinTransform(Input);
 
 	// Pipeline 
-	Output.Position = mul(Input.Position, WorldViewProjMatrix);
+	Output.Position = mul(WorldViewProjMatrix, Input.Position);
 	Output.Texcoord = Input.Texcoord;
 	
 	#ifdef ZE_SHADER_REFLECTION
