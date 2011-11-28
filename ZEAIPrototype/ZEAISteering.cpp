@@ -395,7 +395,7 @@ ZEAISteeringOutput ZEAISeperateSteering::Process(float ElapsedTime)
 			if (Distance < 0.0f)
 				Distance = 0.0001;
 
-			Output.LinearAcceleration = Direction * ZEMath::Min(DecayCoefficient / (Distance * Distance), GetOwner()->GetMaxLinearAcceleration());
+			Output.LinearAcceleration += Direction * ZEMath::Min(DecayCoefficient / (Distance * Distance), GetOwner()->GetMaxLinearAcceleration());
 		}
 	}
 
