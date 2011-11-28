@@ -39,7 +39,8 @@
 /////////////////////////////////////////////////////////////////////////////////////////
 
 // Vertex Transformation
-float4x4 WorldViewProjMatrix : register(vs, c4);
+float4x4 WorldViewMatrix : register(vs, c4);
+float4x4 WorldViewProjMatrix : register(vs, c8);
 
 // Light Parameters
 float4 LightParameters0 : register(ps, c0);
@@ -81,7 +82,7 @@ ZEPointLight_VSOutput ZEPointLight_VertexShader(in float4 Position : POSITION0)
 	
 	Output.Position = mul(Position, WorldViewProjMatrix);
 	
-	Output.ViewVector = ZEGBuffer_GetViewVector(Output.Position);
+	Output.ViewVector = ZEGBuffer_GetViewVector(mul(Position, WorldViewMatrix));
 	
 	return Output;
 }
@@ -152,7 +153,7 @@ ZEDirectionalLight_VSOutput ZEDirectionalLight_VertexShader(float4 Position : PO
 	
 	Output.Position = Position;
 
-	Output.ViewVector = ZEGBuffer_GetViewVector(Output.Position);
+	Output.ViewVector = ZEGBuffer_GetViewVector(mul(Position, WorldViewMatrix));
 	
 	return Output;
 }
@@ -215,8 +216,8 @@ ZEProjectiveLight_VSOutput ZEProjectiveLight_VertexShader(float4 Position : POSI
 	
 	Output.Position = mul(Position, WorldViewProjMatrix);
 	
-	Output.ViewVector = ZEGBuffer_GetViewVector(Output.Position);
-
+	Output.ViewVector = ZEGBuffer_GetViewVector(mul(Position, WorldViewMatrix));
+	
 	return Output;
 }
 
@@ -295,7 +296,7 @@ ZEOmniProjectiveLight_VSOutput ZEOmniProjectiveLight_VertexShader(float4 Positio
 	ZEOmniProjectiveLight_VSOutput Output;
 	
 	Output.Position = mul(Position, WorldViewProjMatrix);
-	Output.ViewVector = ZEGBuffer_GetViewVector(Output.Position);
+	Output.ViewVector = ZEGBuffer_GetViewVector(mul(Position, WorldViewMatrix));
 	
 	return Output;
 }
