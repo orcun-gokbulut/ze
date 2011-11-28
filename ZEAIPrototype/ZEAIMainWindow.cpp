@@ -227,18 +227,27 @@ void ZEAIMainWindow::btnAddActor_Clicked()
 	Actors.Add(New);
 	Form->lstActors->addItem(new QListWidgetItem(New->GetName().ToCString()));
 	Form->btnDeleteActor->setEnabled(true);
-	//New->AddSteering(new ZEAICollisionAvoidanceSteering());
+
 	New->AddSteering(new ZEAISeperateSteering());
-	New->AddSteering(new ZEAIWanderSteering());
-	New->GetSteerings()[1]->SetWeight(0.5f);
+	ZEAIArriveSteering* ARRSTR = new ZEAIArriveSteering();
+	ARRSTR->SetTarget(Actors[0]);
+	New->AddSteering(ARRSTR);
 
-	for (size_t I = 0; I < Actors.GetCount() - 1; I++)
+	for (int I = 0; I < Actors.GetCount(); I++)
 	{
-		//((ZEAICollisionAvoidanceSteering*)New->GetSteerings()[0])->AvoidedActors.Add(Actors[0]);
-		((ZEAISeperateSteering*)New->GetSteerings()[0])->AvoidedActors.Add(Actors[0]);
+		ZEAIActor* CurrentActor = Actors[I];
+		((ZEAISeperateSteering*)CurrentActor->GetSteerings()[0])->AvoidedActors.Clear();
+	}
 
-		//((ZEAICollisionAvoidanceSteering*)Actors[I]->GetSteerings()[0])->AvoidedActors.Add(New);
-		((ZEAISeperateSteering*)Actors[I]->GetSteerings()[0])->AvoidedActors.Add(New);
+	for (int I = 1; I < Actors.GetCount(); I++)
+	{
+		ZEAIActor* CurrentActor = Actors[I];
+
+		for (int J = 0; J < Actors.GetCount(); J++)
+		{
+			if(CurrentActor != Actors[J] /*&& Actors[J] != Actors[0]*/)
+				((ZEAISeperateSteering*)CurrentActor->GetSteerings()[0])->AvoidedActors.Add(Actors[J]);
+		}
 	}
 }
 
