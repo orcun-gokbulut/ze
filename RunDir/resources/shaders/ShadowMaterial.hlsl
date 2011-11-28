@@ -53,7 +53,7 @@ ProjectiveSMVSOutput ProjectiveSMVSMain(float4 Position : POSITION0)
 {
 	ProjectiveSMVSOutput Output;
 	
-	Output.Position = mul(Position, WorldViewProjMatrix);
+	Output.Position = mul(WorldViewProjMatrix, Position);
 	Output.Position.z *= Output.Position.z;
 	Output.Depth = Output.Position.z;
 	
@@ -77,7 +77,7 @@ OmniSMVSOutput OmniSMVSMain(float4 Position : POSITION0)
 {
 	OmniSMVSOutput Output;
 	
-	Output.Position = mul(Position, WorldViewProjMatrix);
+	Output.Position = mul(WorldViewProjMatrix, Position);
 	Output.Position = Output.Position / Output.Position.w;
 	
 	float Distance = length(Output.Position);

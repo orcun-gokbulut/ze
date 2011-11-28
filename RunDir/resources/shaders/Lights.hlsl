@@ -80,9 +80,9 @@ ZEPointLight_VSOutput ZEPointLight_VertexShader(in float4 Position : POSITION0)
 {
 	ZEPointLight_VSOutput Output;
 	
-	Output.Position = mul(Position, WorldViewProjMatrix);
+	Output.Position = mul(WorldViewProjMatrix, Position);
 	
-	Output.ViewVector = ZEGBuffer_GetViewVector(mul(Position, WorldViewMatrix));
+	Output.ViewVector = ZEGBuffer_GetViewVector(mul(WorldViewMatrix, Position));
 	
 	return Output;
 }
@@ -153,7 +153,7 @@ ZEDirectionalLight_VSOutput ZEDirectionalLight_VertexShader(float4 Position : PO
 	
 	Output.Position = Position;
 
-	Output.ViewVector = ZEGBuffer_GetViewVector(mul(Position, WorldViewMatrix));
+	Output.ViewVector = ZEGBuffer_GetViewVector(mul(WorldViewMatrix, Position));
 	
 	return Output;
 }
@@ -214,9 +214,9 @@ ZEProjectiveLight_VSOutput ZEProjectiveLight_VertexShader(float4 Position : POSI
 {
 	ZEProjectiveLight_VSOutput Output;
 	
-	Output.Position = mul(Position, WorldViewProjMatrix);
+	Output.Position = mul(WorldViewProjMatrix, Position);
 	
-	Output.ViewVector = ZEGBuffer_GetViewVector(mul(Position, WorldViewMatrix));
+	Output.ViewVector = ZEGBuffer_GetViewVector(mul(WorldViewMatrix, Position));
 	
 	return Output;
 }
@@ -250,7 +250,7 @@ ZELBuffer ZEProjectiveLight_PixelShader(ZEProjectiveLight_PSInput Input) : COLOR
 
 		float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
 
-		float4 TextureLookup = mul(float4(Position, 1.0f), LightProjectionMatrixParam);
+		float4 TextureLookup = mul(LightProjectionMatrixParam, float4(Position, 1.0f));
 		float3 ProjLightColor = tex2Dproj(ProjectionMap, TextureLookup) * LightColorParam;
 
 		Output.rgb = LightIntensityParam * ProjLightColor;
@@ -268,7 +268,7 @@ ZELBuffer ZEProjectiveLight_PixelShader(ZEProjectiveLight_PSInput Input) : COLOR
 		if (SubSurfaceScatteringFactor > 0.0f)
 		{
 			float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
-			float4 TextureLookup = mul(float4(Position, 1.0f), LightProjectionMatrixParam);
+			float4 TextureLookup = mul(LightProjectionMatrixParam, float4(Position, 1.0f));
 			float3 ProjLightColor = tex2Dproj(ProjectionMap, TextureLookup) * LightColorParam;
 
 			Output.rgb = SubSurfaceScatteringFactor * -AngularAttenuation * DistanceAttenuation * LightIntensityParam * ProjLightColor;
@@ -295,8 +295,8 @@ ZEOmniProjectiveLight_VSOutput ZEOmniProjectiveLight_VertexShader(float4 Positio
 {
 	ZEOmniProjectiveLight_VSOutput Output;
 	
-	Output.Position = mul(Position, WorldViewProjMatrix);
-	Output.ViewVector = ZEGBuffer_GetViewVector(mul(Position, WorldViewMatrix));
+	Output.Position = mul(WorldViewProjMatrix, Position);
+	Output.ViewVector = ZEGBuffer_GetViewVector(mul(WorldViewMatrix, Position));
 	
 	return Output;
 }
@@ -325,7 +325,7 @@ ZELBuffer ZEOmniProjectiveLight_PixelShader(ZEOmniProjectiveLight_PSInput Input)
 	{	
 		float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
 	
-		float3 TextureLookup = mul(LightDirection, (float3x3)LightRotationParam);
+		float3 TextureLookup = mul((float3x3)LightRotationParam, LightDirection);
 		float3 ProjLightColor = texCUBE(OmniProjectionMap, TextureLookup).rgb * LightColorParam;
 		
 		float SpecularPower = ZEGBuffer_GetSpecularPower(ScreenPosition);
@@ -344,7 +344,7 @@ ZELBuffer ZEOmniProjectiveLight_PixelShader(ZEOmniProjectiveLight_PSInput Input)
 		if (SubSurfaceScatteringFactor > 0.0f)
 		{
 			float DistanceAttenuation = 1.0f / dot(LightAttenuationParam, float3(1.0f, LightDistance, LightDistance * LightDistance));
-			float3 TextureLookup = mul(LightDirection, (float3x3)LightRotationParam);
+			float3 TextureLookup = mul((float3x3)LightRotationParam, LightDirection);
 			float3 ProjLightColor = texCUBE(OmniProjectionMap, TextureLookup).rgb * LightColorParam;
 
 			Output.rgb = SubSurfaceScatteringFactor * -AngularAttenuation * DistanceAttenuation * LightIntensityParam * ProjLightColor;

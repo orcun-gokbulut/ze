@@ -39,10 +39,10 @@ void SkinTransform(inout ZE_SHADER_VERTEX_INPUT_TYPE Vertex)
 	for (int I = 1; I < 4; I++)
 		Matrix += BoneMatrices[Vertex.BoneIndices[I]] * Vertex.BoneWeights[I];
 	
-	Vertex.Position = float4(mul(Vertex.Position, Matrix).xyz, 1.0f);
-	Vertex.Normal = mul(Vertex.Normal, Matrix);
+	Vertex.Position = float4(mul(Matrix, Vertex.Position).xyz, 1.0f);
+	Vertex.Normal = mul(Matrix, Vertex.Normal);
 	#if defined(ZE_SHADER_TANGENT_SPACE)
-		Vertex.Tangent = mul(Vertex.Tangent, Matrix);
-		Vertex.Binormal = mul(Vertex.Binormal, Matrix);
+		Vertex.Tangent = mul(Matrix, Vertex.Tangent);
+		Vertex.Binormal = mul(Matrix, Vertex.Binormal);
 	#endif
 }
