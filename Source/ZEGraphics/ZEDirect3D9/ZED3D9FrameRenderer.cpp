@@ -244,12 +244,15 @@ void ZED3D9FrameRenderer::DrawPointLight(ZEPointLight* Light)
 	
 	// Transformation
 	ZEMatrix4x4 WorldTransform;
+	ZEMatrix4x4 WorldViewTransform;
 	ZEMatrix4x4 WorldViewProjTransform;
 	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), 
 		ZEQuaternion::Identity, 
 		ZEVector3(LightParameters.Range, LightParameters.Range, LightParameters.Range));
+	ZEMatrix4x4::Multiply(WorldViewTransform, Camera->GetViewTransform(), WorldTransform);
 	ZEMatrix4x4::Multiply(WorldViewProjTransform, Camera->GetViewProjectionTransform(), WorldTransform);
-	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewTransform, 4);
+	GetDevice()->SetVertexShaderConstantF(8, (float*)&WorldViewProjTransform, 4);
 	
 	//float DistanceToCamera =  ZEVector3::Distance(Light->GetWorldPosition(), Camera->GetWorldPosition());
 
@@ -334,32 +337,41 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	GetDevice()->SetPixelShaderConstantF(0, (float*)&LightParameters, 3);
 
 	// Transformation
-	ZEMatrix4x4 WorldViewProjTransform, WorldTransform;
+	ZEMatrix4x4 WorldTransform;
+	ZEMatrix4x4 WorldViewTransform;
+	ZEMatrix4x4 WorldViewProjTransform;
 	float TanFovRange = tanf(Light->GetFOV() * 0.5f) * Light->GetRange();
 	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), Light->GetWorldRotation(), ZEVector3(TanFovRange * Light->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, Light->GetRange()));
+	ZEMatrix4x4::Multiply(WorldViewTransform, Camera->GetViewTransform(), WorldTransform);
 	ZEMatrix4x4::Multiply(WorldViewProjTransform, Camera->GetViewProjectionTransform(), WorldTransform);
-	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
-
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewTransform, 4);
+	GetDevice()->SetVertexShaderConstantF(8, (float*)&WorldViewProjTransform, 4);
+	
 	// Projection Transformation
-	ZEMatrix4x4 LightViewProjectionMatrix;
 	ZEMatrix4x4 LightViewMatrix;
 	ZEMatrix4x4::CreateViewTransform(LightViewMatrix, Light->GetWorldPosition(), Light->GetWorldRotation());
+
 	ZEMatrix4x4 LightProjectionMatrix;
 	ZEMatrix4x4::CreatePerspectiveProjection(LightProjectionMatrix, Light->GetFOV(), Light->GetAspectRatio(), zeGraphics->GetNearZ(), Light->GetRange());
+
+	ZEMatrix4x4 LightViewProjectionMatrix;
 	ZEMatrix4x4::Multiply(LightViewProjectionMatrix, LightProjectionMatrix, LightViewMatrix);
 
 	ZEMatrix4x4 TextureMatrix;
 	ZEMatrix4x4::Create(TextureMatrix, 
 		0.5f, 0.0f, 0.0f, 0.5f,
 		0.0f, -0.5f, 0.0f, 0.5f,
-		0.0f, 0.0f, 1.0f, -0.00001f,
+		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f);
 
 	ZEMatrix4x4 InvCameraViewMatrix;
 	ZEMatrix4x4::Inverse(InvCameraViewMatrix, Camera->GetViewTransform());
-	ZEMatrix4x4 ProjectionMatrix, Temp;
-	ZEMatrix4x4::Multiply(Temp, LightViewProjectionMatrix, InvCameraViewMatrix);
-	ZEMatrix4x4::Multiply(ProjectionMatrix, TextureMatrix, Temp);
+
+	ZEMatrix4x4 LightSpaceMatrix;
+	ZEMatrix4x4::Multiply(LightSpaceMatrix, LightViewProjectionMatrix, InvCameraViewMatrix);
+	
+	ZEMatrix4x4 ProjectionMatrix;
+	ZEMatrix4x4::Multiply(ProjectionMatrix, TextureMatrix, LightSpaceMatrix);
 
 	GetDevice()->SetPixelShaderConstantF(16, (float*)&ProjectionMatrix, 4);
 
@@ -379,6 +391,7 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	GetDevice()->SetRenderState(D3DRS_STENCILFAIL, D3DSTENCILOP_KEEP);
 	GetDevice()->SetRenderState(D3DRS_STENCILPASS, D3DSTENCILOP_KEEP);
 	LightStencilMaskValue++;
+
 
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 6); // Cone 2
 	
@@ -429,12 +442,15 @@ void ZED3D9FrameRenderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 
 	// Transformation
 	ZEMatrix4x4 WorldTransform;
+	ZEMatrix4x4 WorldViewTransform;
 	ZEMatrix4x4 WorldViewProjTransform;
 	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), 
 		ZEQuaternion::Identity, 
 		ZEVector3(LightParameters.Range, LightParameters.Range, LightParameters.Range));
+	ZEMatrix4x4::Multiply(WorldViewTransform, Camera->GetViewTransform(), WorldTransform);
 	ZEMatrix4x4::Multiply(WorldViewProjTransform, Camera->GetViewProjectionTransform(), WorldTransform);
-	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewProjTransform, 4);
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&WorldViewTransform, 4);
+	GetDevice()->SetVertexShaderConstantF(8, (float*)&WorldViewProjTransform, 4);
 
 	// Projection Transform
 	ZEQuaternion ProjectionRotation;
