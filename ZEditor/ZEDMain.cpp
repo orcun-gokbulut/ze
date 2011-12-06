@@ -50,8 +50,8 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
 	QApplication a(argc, argv);
 //	MapEditor w;
-	//ZEDMaterialEditor w;
-	ZEDBrowser w;
+	ZEDMaterialEditor w;
+	//ZEDBrowser w;
 
 	w.show();
 	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
