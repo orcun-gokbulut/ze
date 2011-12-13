@@ -188,7 +188,7 @@ void ZEDColorPickerRGBA::ChangeByDialog()
 	Class->GetProperty(ClassAttribute.Name, Value);
 	TempOperation->SetNewValue(Value);
 
-	ZEDUndoRedoManager::RegisterOperation(TempOperation);
+	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
 }
 
 void ZEDColorPickerRGBA::Changed()
@@ -217,7 +217,7 @@ void ZEDColorPickerRGBA::Changed()
 	Class->GetProperty(ClassAttribute.Name, Value);
 	TempOperation->SetNewValue(Value);
 
-	ZEDUndoRedoManager::RegisterOperation(TempOperation);
+	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
 }
 
 void ZEDColorPickerRGBA::ChangedAll()

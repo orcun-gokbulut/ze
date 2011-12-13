@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDLineEdit.cpp
+ Zinek Engine - ZEDUndoRedoOperation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDLineEdit.h"
-#include "ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEDPropertyUndoRedo.h"
-ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
-{
-	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
-	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+#include "ZEDUndoRedoOperation.h"
 
-	if (Value.GetType() != ZE_VRT_STRING)
+ZEDUndoRedoOperation* ZEDUndoRedoOperation::CreateInstance()
+{
+	return new ZEDUndoRedoOperation();
+}
+
+void ZEDUndoRedoOperation::Destroy()
+{
+	delete this;
+}
+
+void ZEDUndoRedoOperation::SetInformation(QString Information)
+{
+	this->Information = Information;
+}
+
+QString ZEDUndoRedoOperation::GetInformation()
+{
+	return Information;
+}
+
+void ZEDUndoRedoOperation::AddChildOperation(ZEDUndoRedoOperation* Operation)
+{
+	if(!ChildOperations.contains(Operation))
+		ChildOperations.append(Operation);
+}
+
+void ZEDUndoRedoOperation::Undo()
+{
+	for (int I = ChildOperations.count() - 1; I >= 0; I--)
 	{
-		setText(1, QString("Error String"));
-		return;
+		ChildOperations[I]->Undo();
+	}
+}
+
+void ZEDUndoRedoOperation::Redo()
+{
+	for (int I = 0; I < ChildOperations.count(); I++)
+	{
+		ChildOperations[I]->Redo();
+	}
+}
+
+ZEDUndoRedoOperation::ZEDUndoRedoOperation()
+{
+	Information = "";
+}
+
+ZEDUndoRedoOperation::~ZEDUndoRedoOperation()
+{
+	for (int I = ChildOperations.count() - 1; I >= 0; I--)
+	{
+		ChildOperations[I]->Destroy();
+		ChildOperations[I] = NULL;
 	}
 
-	XValue = new ZEDFloatIntLineEdit(StringMode);
-	XValue->setText(QString(Value.GetString()));
-
-	ParentTree->setItemWidget(this, 1, XValue);
-
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
-		XValue->setEnabled(false);
-
-	connect(this->XValue, SIGNAL(returnPressed()), this, SLOT(Changed()));
-}
-
-ZEDLineEdit::~ZEDLineEdit()
-{
-	//delete XValue;
-}
-
-void ZEDLineEdit::UpdateValues()
-{
-
-}
-
-void ZEDLineEdit::Changed()
-{
-	ZEVariant Value;
-
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetOldValue(Value);
-
-	Value.SetString((const char*)(XValue->text().toLatin1()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
-
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetNewValue(Value);
-
-	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
+	ChildOperations.clear();
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDLineEdit.cpp
+ Zinek Engine - ZEDUndoRedoOperation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,40 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDLineEdit.h"
-#include "ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEDPropertyUndoRedo.h"
-ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+#pragma once
+#ifndef _H_ZED_UNDO_REDO_OPERATION_H_
+#define _H_ZED_UNDO_REDO_OPERATION_H_
+
+#include <QString>
+#include <QList>
+
+class ZEDUndoRedoOperation
 {
-	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
-	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+	friend class ZEDNodeEditorGraphicsView;
 
-	if (Value.GetType() != ZE_VRT_STRING)
-	{
-		setText(1, QString("Error String"));
-		return;
-	}
+	private:
 
-	XValue = new ZEDFloatIntLineEdit(StringMode);
-	XValue->setText(QString(Value.GetString()));
+		QString										Information;
+		QList<ZEDUndoRedoOperation*>				ChildOperations;
 
-	ParentTree->setItemWidget(this, 1, XValue);
+	protected:
 
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
-		XValue->setEnabled(false);
+													ZEDUndoRedoOperation();
+		virtual										~ZEDUndoRedoOperation();
 
-	connect(this->XValue, SIGNAL(returnPressed()), this, SLOT(Changed()));
-}
+	public:
 
-ZEDLineEdit::~ZEDLineEdit()
-{
-	//delete XValue;
-}
+		static ZEDUndoRedoOperation*				CreateInstance();
+		virtual void								Destroy();
 
-void ZEDLineEdit::UpdateValues()
-{
+		void										AddChildOperation(ZEDUndoRedoOperation* Operation);
 
-}
+		void										SetInformation(QString Information);
+		QString										GetInformation();
 
-void ZEDLineEdit::Changed()
-{
-	ZEVariant Value;
+		virtual void								Undo();
+		virtual void								Redo();
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetOldValue(Value);
+};
 
-	Value.SetString((const char*)(XValue->text().toLatin1()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
-
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetNewValue(Value);
-
-	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
-}
+#endif

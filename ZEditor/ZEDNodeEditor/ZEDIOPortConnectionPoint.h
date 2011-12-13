@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDLineEdit.cpp
+ Zinek Engine - ZEDIOPortConnectionPoint.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDLineEdit.h"
-#include "ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEDPropertyUndoRedo.h"
-ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+#pragma once
+#ifndef _H_ZED_IO_PORT_CONNECTION_POINT_H_
+#define _H_ZED_IO_PORT_CONNECTION_POINT_H_
+
+#include <QGraphicsPolygonItem>
+
+class ZEDNodeIOPort;
+
+enum ZEDIOPortConnectionPointAlignment
 {
-	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
-	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+	ZED_IOPCPA_LEFT,
+	ZED_IOPCPA_RIGHT
+};
 
-	if (Value.GetType() != ZE_VRT_STRING)
-	{
-		setText(1, QString("Error String"));
-		return;
-	}
-
-	XValue = new ZEDFloatIntLineEdit(StringMode);
-	XValue->setText(QString(Value.GetString()));
-
-	ParentTree->setItemWidget(this, 1, XValue);
-
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
-		XValue->setEnabled(false);
-
-	connect(this->XValue, SIGNAL(returnPressed()), this, SLOT(Changed()));
-}
-
-ZEDLineEdit::~ZEDLineEdit()
+class ZEDIOPortConnectionPoint : public QGraphicsPolygonItem
 {
-	//delete XValue;
-}
+	private:
+		
+		ZEDNodeIOPort*		ParentIOPort;
 
-void ZEDLineEdit::UpdateValues()
-{
+	public:
 
-}
+							ZEDIOPortConnectionPoint(ZEDNodeIOPort* ParentIOPort, ZEDIOPortConnectionPointAlignment Alignment);	
+};
 
-void ZEDLineEdit::Changed()
-{
-	ZEVariant Value;
-
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetOldValue(Value);
-
-	Value.SetString((const char*)(XValue->text().toLatin1()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
-
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetNewValue(Value);
-
-	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
-}
+#endif

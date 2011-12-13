@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDLineEdit.cpp
+ Zinek Engine - ZEDUndoRedoManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,71 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDLineEdit.h"
-#include "ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEDPropertyUndoRedo.h"
-ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
-{
-	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
-	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+#include <QList>
+#include <QtAlgorithms>
+#include <QDebug>
 
-	if (Value.GetType() != ZE_VRT_STRING)
+#include "ZEDUndoRedoManager.h"
+#include "ZEDUndoRedoOperation.h"
+
+
+void ZEDUndoRedoManager::Undo()
+{
+	if (UndoStack.count() != 0)
 	{
-		setText(1, QString("Error String"));
-		return;
+		RedoStack.append(UndoStack.last());
+		UndoStack.takeLast()->Undo();	
+		emit UndoPerformed();
+	}
+}
+
+void ZEDUndoRedoManager::Redo()
+{
+	if (RedoStack.count() != 0)
+	{
+		UndoStack.append(RedoStack.last());
+		RedoStack.takeLast()->Redo();
+		emit RedoPerformed();
+	}
+}
+
+void ZEDUndoRedoManager::RegisterUndoRedoOperation(ZEDUndoRedoOperation* Operation)
+{
+	UndoStack.append(Operation);
+
+	if (RedoStack.count() != 0)
+	{
+		RedoStack.clear();
 	}
 
-	XValue = new ZEDFloatIntLineEdit(StringMode);
-	XValue->setText(QString(Value.GetString()));
-
-	ParentTree->setItemWidget(this, 1, XValue);
-
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
-		XValue->setEnabled(false);
-
-	connect(this->XValue, SIGNAL(returnPressed()), this, SLOT(Changed()));
+	if (UndoStack.count() > MaximumStackSize)
+	{
+		UndoStack.first()->Destroy();
+		UndoStack.first() = NULL;
+		UndoStack.removeFirst();
+	}
 }
 
-ZEDLineEdit::~ZEDLineEdit()
+void ZEDUndoRedoManager::SetMaximumStackSize(unsigned int Size)
 {
-	//delete XValue;
+	if(Size < MaximumStackSize)
+	{
+		for(int I = 0; I < MaximumStackSize - Size; I++)
+		{
+			if(!UndoStack.isEmpty())
+			{
+				UndoStack.first()->Destroy();
+				UndoStack.first() = NULL;
+				UndoStack.removeFirst();
+			}
+		}
+	}
+
+	MaximumStackSize = Size;
 }
 
-void ZEDLineEdit::UpdateValues()
+ZEDUndoRedoManager::ZEDUndoRedoManager()
 {
-
-}
-
-void ZEDLineEdit::Changed()
-{
-	ZEVariant Value;
-
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetOldValue(Value);
-
-	Value.SetString((const char*)(XValue->text().toLatin1()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
-
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetNewValue(Value);
-
-	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
+	MaximumStackSize = 0;
+	SetMaximumStackSize(50);
 }

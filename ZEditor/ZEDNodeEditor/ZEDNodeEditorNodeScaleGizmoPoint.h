@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDLineEdit.cpp
+ Zinek Engine - ZEDNodeEditorNodeScaleGizmoPoint.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,51 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDLineEdit.h"
-#include "ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEDPropertyUndoRedo.h"
-ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+#pragma once
+#ifndef _H_ZED_NODE_EDITOR_NODE_SCALEGIZMOPOINT_H_
+#define _H_ZED_NODE_EDITOR_NODE_SCALEGIZMOPOINT_H_
+
+#include <QGraphicsPolygonItem>
+#include <QGraphicsEllipseItem>
+#include <QGraphicsRectItem>
+#include <QGraphicsSceneMouseEvent>
+
+class ZEDNodeEditorNodeScaleGizmo;
+class ZEDNodeEditorNode;
+
+enum ZEDNodeEditorNodeScaleGizmoPointPosition
 {
-	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
-	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+	ZED_NENSGPP_TOP_LEFT,
+	ZED_NENSGPP_TOP,
+	ZED_NENSGPP_TOP_RIGHT,
+	ZED_NENSGPP_BOTTOM_LEFT,
+	ZED_NENSGPP_BOTTOM,
+	ZED_NENSGPP_BOTTOM_RIGHT,
+	ZED_NENSGPP_RIGHT,
+	ZED_NENSGPP_LEFT
+};
 
-	if (Value.GetType() != ZE_VRT_STRING)
-	{
-		setText(1, QString("Error String"));
-		return;
-	}
-
-	XValue = new ZEDFloatIntLineEdit(StringMode);
-	XValue->setText(QString(Value.GetString()));
-
-	ParentTree->setItemWidget(this, 1, XValue);
-
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
-		XValue->setEnabled(false);
-
-	connect(this->XValue, SIGNAL(returnPressed()), this, SLOT(Changed()));
-}
-
-ZEDLineEdit::~ZEDLineEdit()
+class ZEDNodeEditorNodeScaleGizmoPoint : public QGraphicsPolygonItem
 {
-	//delete XValue;
-}
+	private:
 
-void ZEDLineEdit::UpdateValues()
-{
+		ZEDNodeEditorNodeScaleGizmo*				ParentGizmo;
+		ZEDNodeEditorNode*							ParentNode;
+		ZEDNodeEditorNodeScaleGizmoPointPosition	GizmoPointPosition;
+		QPointF										OldMousePosition;
+		QPointF										OldMousePositionScaleRect;
 
-}
 
-void ZEDLineEdit::Changed()
-{
-	ZEVariant Value;
+	protected:
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetOldValue(Value);
+		virtual void								mouseMoveEvent(QGraphicsSceneMouseEvent *Event);
+		virtual void								mousePressEvent(QGraphicsSceneMouseEvent *Event);
+		virtual void								mouseReleaseEvent(QGraphicsSceneMouseEvent *Event);
 
-	Value.SetString((const char*)(XValue->text().toLatin1()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+	public:
 
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetNewValue(Value);
+		ZEDNodeEditorNodeScaleGizmoPointPosition	GetGizmoPointPosition(); 
+													ZEDNodeEditorNodeScaleGizmoPoint(ZEDNodeEditorNode* Parent, ZEDNodeEditorNodeScaleGizmo* ParentGizmo, ZEDNodeEditorNodeScaleGizmoPointPosition Position);
+};
 
-	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
-}
+#endif

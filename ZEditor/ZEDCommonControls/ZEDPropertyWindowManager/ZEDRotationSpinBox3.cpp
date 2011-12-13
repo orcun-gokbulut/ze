@@ -203,7 +203,7 @@ void ZEDRotationSpinBox3::Changed()
 	Class->GetProperty(ClassAttribute.Name, Value);
 	TempOperation->SetNewValue(Value);
 
-	ZEDUndoRedoManager::RegisterOperation(TempOperation);
+	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
 }
 
 void ZEDRotationSpinBox3::ChangedAll()

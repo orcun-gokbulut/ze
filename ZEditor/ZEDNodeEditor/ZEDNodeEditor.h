@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDLineEdit.cpp
+ Zinek Engine - ZEDNodeEditor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,58 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDLineEdit.h"
-#include "ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEDPropertyUndoRedo.h"
-ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+#ifndef ZEDNODEEDITOR_H
+#define ZEDNODEEDITOR_H
+
+#include <QWidget>
+#include <QGridLayout>
+
+
+class ZEDNodeEditorGraphicsView;
+class ZEDNodeEditorItem;
+class ZEDIOPortConnection;
+class ZEDNodeEditorNode;
+class ZEDNodeIOPort;
+
+namespace Ui
 {
-	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
-	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
-
-	if (Value.GetType() != ZE_VRT_STRING)
-	{
-		setText(1, QString("Error String"));
-		return;
-	}
-
-	XValue = new ZEDFloatIntLineEdit(StringMode);
-	XValue->setText(QString(Value.GetString()));
-
-	ParentTree->setItemWidget(this, 1, XValue);
-
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
-		XValue->setEnabled(false);
-
-	connect(this->XValue, SIGNAL(returnPressed()), this, SLOT(Changed()));
+	class ZEDNodeEditorClass;
 }
 
-ZEDLineEdit::~ZEDLineEdit()
+class ZEDNodeEditor : public QWidget
 {
-	//delete XValue;
-}
+	Q_OBJECT
 
-void ZEDLineEdit::UpdateValues()
-{
+public:
 
-}
+	ZEDNodeEditor(QWidget *parent = 0, Qt::WFlags flags = 0);
+	~ZEDNodeEditor();
 
-void ZEDLineEdit::Changed()
-{
-	ZEVariant Value;
+	void Test();
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetOldValue(Value);
+private:
 
-	Value.SetString((const char*)(XValue->text().toLatin1()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+	Ui::ZEDNodeEditorClass* ui;
+	ZEDNodeEditorGraphicsView* View;
+	QGridLayout* gridLayout;
 
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetNewValue(Value);
+	public slots:
 
-	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
-}
+
+		void							IOPortSelectionControl(ZEDNodeIOPort* SelectedIOPort);
+
+		void							NodeSelectionControl(QList<ZEDNodeEditorNode*>*	SelectedNodes);
+		void							NodeDeletingControl(QList<ZEDNodeEditorNode*>*	DeletingSelectedNodes, bool& DeletingNodesValidation);
+		void							NodeDeletedControl(QList<ZEDNodeEditorNode*>*	DeletedSelectedNodes);
+
+		void							ConnectionDeletingControl(QList<ZEDIOPortConnection*>* DeletingSelectedConnections, bool& DeletingConnectionsValidation);
+		void							ConnectionDeletedControl(QList<ZEDIOPortConnection*>* DeletedSelectedConnections);
+		void							ConnectionSelectionControl(QList<ZEDIOPortConnection*>* SelectedConnections);
+		void							ConnectionAddingControl(ZEDIOPortConnection* Connection, bool& ConnectionAddingValidation);
+		void							ConnectionAddedControl(ZEDIOPortConnection* ConnectionAdded);
+		
+		void							AddNode();
+
+};
+
+#endif // ZEDNODEEDITOR_H
