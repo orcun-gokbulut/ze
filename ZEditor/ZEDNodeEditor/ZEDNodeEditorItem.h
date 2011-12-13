@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDLineEdit.cpp
+ Zinek Engine - ZEDNodeEditorItem.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,33 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDLineEdit.h"
-#include "ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEDPropertyUndoRedo.h"
-ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+#pragma once
+#ifndef _H_ZED_NODE_EDITOR_ITEM_H_
+#define _H_ZED_NODE_EDITOR_ITEM_H_
+
+enum ZEDNodeEditorItemType
 {
-	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
-	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+	ZED_NEIT_NODE,
+	ZED_NEIT_IOPORT,
+	ZED_NEIT_CONNECTION,
+	ZED_NEIT_SCALEGIZMO,
+	ZED_NEIT_NODE_CONNECTION_POINT
+};
 
-	if (Value.GetType() != ZE_VRT_STRING)
-	{
-		setText(1, QString("Error String"));
-		return;
-	}
-
-	XValue = new ZEDFloatIntLineEdit(StringMode);
-	XValue->setText(QString(Value.GetString()));
-
-	ParentTree->setItemWidget(this, 1, XValue);
-
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
-		XValue->setEnabled(false);
-
-	connect(this->XValue, SIGNAL(returnPressed()), this, SLOT(Changed()));
-}
-
-ZEDLineEdit::~ZEDLineEdit()
+class ZEDNodeEditorItem
 {
-	//delete XValue;
-}
+private:
 
-void ZEDLineEdit::UpdateValues()
-{
+	bool	IsSelected;
 
-}
+public:
 
-void ZEDLineEdit::Changed()
-{
-	ZEVariant Value;
+	virtual ZEDNodeEditorItemType	GetItemType() = 0;
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetOldValue(Value);
+	virtual void					SetSelected(bool IsSelected);
+	virtual bool					GetSelected() const;
 
-	Value.SetString((const char*)(XValue->text().toLatin1()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+									ZEDNodeEditorItem();
+};
 
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetNewValue(Value);
-
-	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
-}
+#endif

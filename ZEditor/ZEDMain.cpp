@@ -42,6 +42,7 @@
 #include "ZEDSceneEditor/ZEDSceneEditor.h"
 #include "ZEDMaterialEditor/ZEDMaterialEditor.h"
 #include "ZEDBrowser/ZEDBrowser.h"
+#include "ZEDNodeEditor/ZEDNodeEditor.h"
 
 int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -49,9 +50,10 @@ int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 	char** argv = NULL;
 
 	QApplication a(argc, argv);
-//	MapEditor w;
-	ZEDMaterialEditor w;
-	//ZEDBrowser w;
+	// MapEditor w;
+	// ZEDMaterialEditor w;
+	// ZEDBrowser w;
+	ZEDNodeEditor w;
 
 	w.show();
 	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));

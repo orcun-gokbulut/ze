@@ -143,7 +143,7 @@ void ZEDSpinBox2::Changed()
 	Class->GetProperty(ClassAttribute.Name, Value);
 	TempOperation->SetNewValue(Value);
 
-	ZEDUndoRedoManager::RegisterOperation(TempOperation);
+	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
 }
 
 void ZEDSpinBox2::ChangedAll()

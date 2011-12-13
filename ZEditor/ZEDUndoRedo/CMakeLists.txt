@@ -37,14 +37,21 @@ cmake_minimum_required (VERSION 2.8)
 
 include(${QT_USE_FILE})
 
-ze_add_source(ZEDUndoRedo.cpp		Sources)
-ze_add_source(ZEDUndoRedo.h		Sources)
+ze_add_source(ZEDUndoRedoManager.h			Sources QtMocs)
+ze_add_source(ZEDUndoRedoManager.cpp		Sources)
+ze_add_source(ZEDUndoRedoOperation.h		Sources)
+ze_add_source(ZEDUndoRedoOperation.cpp		Sources)
+
+ze_add_source(ZEDUndoRedo.h					Sources)
+ze_add_source(ZEDUndoRedo.cpp				Sources)
+
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_automoc (QtMocFiles  ${QtMocs})
+qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+#qt4_automoc (QtMocFiles  ${QtMocs})
 
 add_library (ZEDUndoRedo ${Sources} ${QtUIFiles} ${QtMocFiles} ${QtResourceFiles})
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDLineEdit.cpp
+ Zinek Engine - ZEDNodeConnectionPoint.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDLineEdit.h"
-#include "ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEDPropertyUndoRedo.h"
-ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
-{
-	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
-	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+#include <QBrush>
 
-	if (Value.GetType() != ZE_VRT_STRING)
+#include "ZEDNodeConnectionPoint.h"
+
+#define NODE_CONNECTION_POINT_DIMENSION 30.0f
+
+void ZEDNodeConnectionPoint::SetSelected(bool IsSelected)
+{
+	if (IsSelected)
 	{
-		setText(1, QString("Error String"));
-		return;
+		QBrush YellowBrush(Qt::yellow);
+		setBrush(YellowBrush);
+	}
+	else
+	{
+		QBrush DarkGrayBrush(QColor(150, 150, 150, 255));
+		setBrush(DarkGrayBrush);
 	}
 
-	XValue = new ZEDFloatIntLineEdit(StringMode);
-	XValue->setText(QString(Value.GetString()));
-
-	ParentTree->setItemWidget(this, 1, XValue);
-
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
-		XValue->setEnabled(false);
-
-	connect(this->XValue, SIGNAL(returnPressed()), this, SLOT(Changed()));
+	ZEDNodeEditorItem::SetSelected(IsSelected);
 }
 
-ZEDLineEdit::~ZEDLineEdit()
+ZEDNodeEditorItemType ZEDNodeConnectionPoint::GetItemType()
 {
-	//delete XValue;
+	return ZED_NEIT_NODE_CONNECTION_POINT;
 }
 
-void ZEDLineEdit::UpdateValues()
+ZEDNodeConnectionPoint::ZEDNodeConnectionPoint(ZEDNodeEditorNode* ParentNode) : QGraphicsPolygonItem(ParentNode)
 {
+	this->ParentNode = ParentNode;
 
-}
-
-void ZEDLineEdit::Changed()
-{
-	ZEVariant Value;
-
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetOldValue(Value);
-
-	Value.SetString((const char*)(XValue->text().toLatin1()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
-
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetNewValue(Value);
-
-	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
+	QBrush DarkGrayBrush(QColor(150, 150, 150, 255));
+	setBrush(DarkGrayBrush);
+	setPolygon(QRectF(0,0,NODE_CONNECTION_POINT_DIMENSION, NODE_CONNECTION_POINT_DIMENSION / 2));
 }

@@ -35,40 +35,43 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-project (ZEditior)
-ze_set_project_folder("ZEditor")
 
-find_package(Qt4 REQUIRED)
-add_definitions(${QT_DEFINITIONS})
-include(${QT_USE_FILE})
+ze_add_source(ZEDNodeEditor.h						Sources QtMocs)
+ze_add_source(ZEDNodeEditorGraphicsView.h			Sources QtMocs)
+ze_add_source(ZEDNodeIOPort.h						Sources QtMocs)
+ze_add_source(zednodeeditor.qrc						Sources QtResources)
+ze_add_source(zednodeeditor.ui						Sources QtUI)
+ze_add_source(ZEDNodeEditor.cpp						Sources)
+ze_add_source(ZEDNodeEditorGraphicsView.cpp			Sources)
+ze_add_source(ZEDDefinitions.h						Sources)
+ze_add_source(ZEDIOPortConnection.cpp				Sources)
+ze_add_source(ZEDIOPortConnection.h					Sources)
+ze_add_source(ZEDIOPortConnectionPoint.cpp			Sources)
+ze_add_source(ZEDIOPortConnectionPoint.h			Sources)
+ze_add_source(ZEDNodeConnectionPoint.cpp			Sources)
+ze_add_source(ZEDNodeConnectionPoint.h				Sources)
+ze_add_source(ZEDNodeEditorItem.cpp					Sources)
+ze_add_source(ZEDNodeEditorItem.h					Sources)
+ze_add_source(ZEDNodeEditorMiniMap.cpp				Sources)
+ze_add_source(ZEDNodeEditorMiniMap.h				Sources)
+ze_add_source(ZEDNodeEditorNode.cpp					Sources)
+ze_add_source(ZEDNodeEditorNode.h					Sources)
+ze_add_source(ZEDNodeEditorNodeScaleGizmo.cpp		Sources)
+ze_add_source(ZEDNodeEditorNodeScaleGizmo.h			Sources)
+ze_add_source(ZEDNodeEditorNodeScaleGizmoPoint.cpp	Sources)
+ze_add_source(ZEDNodeEditorNodeScaleGizmoPoint.h	Sources)
+ze_add_source(ZEDNodeEditorUndoRedo.cpp				Sources)
+ze_add_source(ZEDNodeEditorUndoRedo.h				Sources)
+ze_add_source(ZEDNodeIOPort.cpp						Sources)
+ze_add_source(ZEDNodeIOPort.h						Sources)
 
-include_directories(
-	${PROJECT_SOURCE_DIR}
-	${QT_INCLUDE_DIR}
-	${QT_INCLUDE_DIR}/QtGui
-	${QT_INCLUDE_DIR}/QtCore)
-	
-link_directories(
-	${QT_LIBRARY_DIR})
 
-add_subdirectory(ZEDBrowser)
-add_subdirectory(ZEDCommonControls)
-add_subdirectory(ZEDCommonEntities)
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDSceneEditor)
-add_subdirectory(ZEDMaterialEditor)
-add_subdirectory(ZEDNodeEditor)
-add_subdirectory(ZEDScriptEditor)
-add_subdirectory(ZEDUndoRedo)
-add_subdirectory(ZEDSoundExtensionsPlugIn)
-add_subdirectory(ZEDImageExtensionsPlugIn)
+qt4_add_resources (QtResourceFiles ${QtResources})
+qt4_wrap_ui (QtUIFiles ${QtUI})
+qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-ze_add_source(ZEDMain.cpp		Sources)
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
-ze_add_executable(ZEditor 
-	SOURCES ${Sources}
-	LIBS ZEEngineAPI
-		ZEDCommonControls ZEDCommonEntities ZEDCore ZEDImageExtensionsPlugIn ZEDMaterialEditor ZEDPropertyWindowManager
-		ZEDSceneEditor ZEDScriptEditor ZEDSoundExtensionsPlugIn ZEDUndoRedo ZEDBrowser ZEDNodeEditor
-		QtCore4 QtGui4
-	WIN32)
+ze_add_library(ZEDNodeEditor 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	LIBS libfreeimage)

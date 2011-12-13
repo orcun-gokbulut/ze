@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDLineEdit.cpp
+ Zinek Engine - ZEDNodeEditorMiniMap.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,47 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDLineEdit.h"
-#include "ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEDPropertyUndoRedo.h"
-ZEDLineEdit::ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+#pragma once
+#ifndef _H_ZED_NODE_EDITOR_MINIMAP_H_
+#define _H_ZED_NODE_EDITOR_MINIMAP_H_
+
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QGraphicsItem>
+#include <QStyleOptionGraphicsItem>
+
+#include <QList>
+#include <QWidget>
+
+class ZEDNodeEditorMinimap : public QGraphicsView
 {
-	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
-	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	//setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+	private:
+		
+		QGraphicsScene*				ParentScene;
+		QGraphicsView*				ParentView;
+		QWidget*					Parent;
 
-	if (Value.GetType() != ZE_VRT_STRING)
-	{
-		setText(1, QString("Error String"));
-		return;
-	}
+		QGraphicsScene*				NewScene;
 
-	XValue = new ZEDFloatIntLineEdit(StringMode);
-	XValue->setText(QString(Value.GetString()));
+		QPolygonF					SeenRectangleOnParentView;
 
-	ParentTree->setItemWidget(this, 1, XValue);
+		QPointF						MouseInitialPosition;
+		QPointF						MouseLastPosition;
 
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
-		XValue->setEnabled(false);
+		bool						MouseIsMoving;
 
-	connect(this->XValue, SIGNAL(returnPressed()), this, SLOT(Changed()));
-}
+	protected:
+		
+		virtual void				mousePressEvent(QMouseEvent* Event);
+		virtual void				mouseMoveEvent(QMouseEvent* Event);
+		virtual void				mouseReleaseEvent(QMouseEvent* Event);
+		virtual	void				wheelEvent(QWheelEvent* Event);
+		virtual void				drawForeground(QPainter* Painter, const QRectF &Rect);
 
-ZEDLineEdit::~ZEDLineEdit()
-{
-	//delete XValue;
-}
+	public:
+									
+									ZEDNodeEditorMinimap(QGraphicsView* View, QGraphicsScene* Scene, QWidget* Parent = NULL);
 
-void ZEDLineEdit::UpdateValues()
-{
+};
 
-}
-
-void ZEDLineEdit::Changed()
-{
-	ZEVariant Value;
-
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetOldValue(Value);
-
-	Value.SetString((const char*)(XValue->text().toLatin1()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
-
-	Class->GetProperty(ClassAttribute.Name, Value);
-	TempOperation->SetNewValue(Value);
-
-	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
-}
+#endif
