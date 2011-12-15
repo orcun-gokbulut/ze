@@ -75,6 +75,9 @@ class ZEAABBox
 		static bool					IntersectionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& BoundingBox2);
 		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere);
 
+		static void					Generate(ZEAABBox& Output, const ZEVector3* Vertices, size_t Count);
+		static void					Combine(ZEAABBox& Output, const ZEAABBox& A, const ZEAABBox& B);
+
 									ZEAABBox();
 									ZEAABBox(const ZEVector3& Min, const ZEVector3& Max);
 

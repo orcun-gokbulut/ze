@@ -191,14 +191,14 @@ float ZERay::MinimumDistance(const ZERay& RayA, const ZERay& RayB, float& TRayA,
 	return ZEVector3::Length(w);
 }
 
-void ZERay::GetPointOn(ZEVector3& Point, float TRay) const
+void ZERay::GetPointOn(ZEVector3& Point, const ZERay& Ray, float TRay)
 {
 	if (TRay < 0.0f)
-		Point = p;
+		Point = Ray.p;
 	else
 	{
-		ZEVector3::Scale(Point, v, TRay);
-		ZEVector3::Add(Point, Point, p);
+		ZEVector3::Scale(Point, Ray.v, TRay);
+		ZEVector3::Add(Point, Point, Ray.p);
 	}
 }
 
@@ -216,6 +216,13 @@ ZEVector3 ZERay::GetPointOn(float TRay) const
 
 	return Temp;
 }
+
+
+const ZEVector3& ZERay::GetStartPoint() const
+{
+	return p;
+}
+
 
 ZERay::ZERay(const ZEVector3 & v,const ZEVector3 &p)
 {

@@ -75,6 +75,14 @@ class ZEArray
 		Type*		Items;
 
 	public:
+		inline size_t Circular(int Index) const
+		{
+			if (Index < 0)
+				return Count - ((-Index) % Count);
+			else
+				return Index % Count;
+		}
+
 		inline void Enqueue(Type Value)
 		{
 			Add(Value);
@@ -172,7 +180,7 @@ class ZEArray
 				Items[I] = Value;
 		}
 
-		inline int FindIndex(Type Item, int StartIndex = 0)
+		inline int FindIndex(Type Item, int StartIndex = 0) const
 		{
 			for(size_t I = StartIndex; I < Count; I++)
 				if (Items[I] == Item)
@@ -414,6 +422,16 @@ class ZEArray
 			qsort(Items, Count, sizeof(Type), CompareFunction);
 		}
 
+		void Traverse()
+		{
+			for (size_t I = 0; I < Count / 2; I++)
+			{
+				Type Temp = Items[I];
+				Items[I] = Items[Count - I - 1];
+				Items[Count - I - 1] = Temp;
+			}
+		}
+
 		inline int BinarySearch(const Type& Element, int (*CompareFunction)(Type*, Type*))
 		{
 			void* Result = bsearch(&Element, &Items, Count, sizeof(Type), CompareFunction);
@@ -434,13 +452,23 @@ class ZEArray
 			zeAssert(Index < 0 || Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
 		}
-		
+
+		inline const Type& GetFirstItem() const
+		{
+			return Items[0];
+		}
+
 		inline Type& GetFirstItem()
 		{
 			return Items[0];
 		}
 
 		inline Type& GetLastItem()
+		{
+			return Items[Count - 1];
+		}
+
+		inline const Type& GetLastItem() const
 		{
 			return Items[Count - 1];
 		}
@@ -469,6 +497,31 @@ class ZEArray
 		{
 			ZEArray.MassAdd(OtherArray.Items, OtherArray.Count);
 			return *this;
+		}
+
+		bool operator==(const ZEArray<Type>& Other)
+		{
+			if (Count != Other.Count)
+				return false;
+
+			for (size_t I = 0; I < Count I++)
+				if (Items[I] != Other.Items[I])
+					return false;
+
+			return true;
+		}
+
+
+		bool operator!=(const ZEArray<Type>& Other)
+		{
+			if (Count != Other.Count)
+				return true;
+
+			for (size_t I = 0; I < Count I++)
+				if (Items[I] != Other.Items[I])
+					return true;
+
+			return false;
 		}
 
 		inline void operator=(const ZEArray<Type, Allocator_>& Other)

@@ -58,12 +58,14 @@ class ZELineSegment : public ZELine
 		static float		MinimumDistance(const ZELineSegment& LineSegmentA, const ZELineSegment& LineSegmentB, float& TLineSegmentA, float& TLineSegment);
 		static float		MinimumDistance(const ZELineSegment& LineSegment, const ZERay& Ray);
 		static float		MinimumDistance(const ZELineSegment& LineSegment, const ZERay& Ray, float& TLine, float& TRay);
+	
+		static void			GetPointOn(ZEVector3& Point, const ZELineSegment& LineSegment, float TLineSegment);
+		static void			GetStartPoint(ZEVector3& Point, const ZELineSegment& LineSegment);
+		static void			GetEndPoint(ZEVector3& Point, const ZELineSegment& LineSegment);
 
-		void				GetPointOn(ZEVector3& Point, float TLineSegment) const;
 		ZEVector3			GetPointOn(float TLineSegment) const;
-
-		void				GetSegmentStartPoint(ZEVector3& StartPoint) const;
-		void				GetSegmentEndPoint(ZEVector3& EndPoint) const;
+		const ZEVector3&	GetStartPoint() const;
+		ZEVector3			GetEndPoint() const;
 
 							ZELineSegment(const ZEVector3& Start, const ZEVector3& End);
 							ZELineSegment();

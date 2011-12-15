@@ -416,6 +416,21 @@ void ZECanvas::AddWireframeCone(float Radius, unsigned int Segments, float Heigh
 	}
 }
 
+void ZECanvas::AddWireframeConvexPolygon(const ZEVector3* Vertices, size_t VertexCount)
+{
+	ZECanvasVertex* Verts = this->Vertices.MassAdd(2 * VertexCount);
+
+	for (size_t I = 0; I < VertexCount - 1; I++)
+	{
+		ZECANVAS_ADDWIREVERTEX(Verts[2 * I], Transformation, Vertices[I]);
+		ZECANVAS_ADDWIREVERTEX(Verts[2 * I + 1], Transformation, Vertices[I + 1]);
+	}
+
+	ZECANVAS_ADDWIREVERTEX(Verts[2 * (VertexCount - 1)], Transformation, Vertices[VertexCount - 1]);
+	ZECANVAS_ADDWIREVERTEX(Verts[2 * (VertexCount - 1) + 1], Transformation, Vertices[0]);
+}
+
+
 void ZECanvas::AddPoint(const ZEVector3& Point)
 {
 	ZECanvasVertex* Vertex = Vertices.Add();
@@ -700,6 +715,20 @@ void ZECanvas::AddCone(float Radius, unsigned int Segments, float Height)
 		ZECANVAS_ADDWIREVERTEX(Verts[N + 1], Transformation, ZEVector3(Radius * sinf((X + 1) * HAngle), 0.0f, Radius * cosf((X + 1) * HAngle)));
 		ZECANVAS_ADDWIREVERTEX(Verts[N + 2], Transformation, ZEVector3(0.0f, Height, 0.0f));
 		N += 3;
+	}
+}
+void ZECanvas::AddConvexPolygon(const ZEVector3* Vertices, size_t VertexCount)
+{
+	ZECanvasVertex* Verts = this->Vertices.MassAdd((VertexCount - 2) * 3);
+	ZEVector3 Normal;
+	ZEVector3::CrossProduct(Normal, Vertices[1] - Vertices[0], Vertices[1] - Vertices[0]);
+	ZEVector3::Normalize(Normal, Normal);
+
+	for (size_t I = 2; I < VertexCount; I++)
+	{
+		ZECANVAS_ADDVERTEX(Verts[3 * (I - 2)], Transformation, Vertices[0], Normal, ZEVector2(0.0f ,0.0f));
+		ZECANVAS_ADDVERTEX(Verts[3 * (I - 2) + 1], Transformation, Vertices[I - 1], Normal, ZEVector2(0.0f ,0.0f));
+		ZECANVAS_ADDVERTEX(Verts[3 * (I - 2) + 2], Transformation, Vertices[I], Normal, ZEVector2(0.0f, 0.0f));
 	}
 }
 

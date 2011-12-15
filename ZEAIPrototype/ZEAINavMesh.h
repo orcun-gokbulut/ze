@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEHeapBase.h
+ Zinek Engine - ZEAINavMesh.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,87 +34,34 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_HEAP_BASE_H__
-#define __ZE_HEAP_BASE_H__
+#ifndef __ZE_NAVIGATION_MESH_H__
+#define __ZE_NAVIGATION_MESH_H__
 
-#include "ZEArray.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEGraph.h"
+#include "ZEOctree.h"
+#include "ZEPolygon.h"
 
-template<typename Type, typename Allocator_>
-class ZEHeapBase
+class ZENavigationMeshPolygon
 {
-	protected:
-		ZEArray<Type, Allocator_> Heap;
-
 	public:
-		size_t GetParentIndex(size_t Index) const
-		{
-			return (Index - 1) / 2;
-		}
+		bool Deleted;
+		size_t NormalIndex;
+		ZEArray<size_t> VertexIndices;
+};
 
-		Type& GetParent(size_t Index)
-		{
-			return Heap(GetParentIndex());
-		}
+typedef ZEOctree<ZENavigationMeshPolygon> ZENavigationMeshOctree;
 
-		const Type& GetParent(size_t Index) const
-		{
-			return Heap(GetParentIndex());
-		}
-		
-		size_t GetFirstChildIndex(size_t Index) const
-		{
-			return 2 * Index + 1;
-		}
-		
-		Type& GetFirstChild(size_t Index)
-		{
-			return Heap[GetFirstChildIndex(Index)];
-		}
+class ZENavigationMesh
+{
+	public:
+		ZENavigationMeshOctree	Octree;
+		ZEArray<ZEVector3>		Vertices;
+		ZEArray<ZEVector3>		Normals;
 
-		const Type& GetFirstChild(size_t Index) const
-		{
-			return Heap[GetFirstChildIndex(Index)];
-		}
+		void Clear();
 
-		size_t GetSecondChildIndex(size_t Index) const
-		{
-			return 2 * Index + 2;
-		}
-
-		Type& GetSecondChild(size_t Index) 
-		{
-			return Heap[GetSecondChildIndex(Index)];
-		}
-
-		const Type& GetSecondChild(size_t Index) const
-		{
-			return Heap[GetSecondChildIndex(Index)];
-		}
-
-		const Type& GetItem(size_t Index) const
-		{
-			return Heap[Index];
-		}
-
-		Type& GetItem(size_t Index)
-		{
-			return Heap[Index];
-		}
-
-		size_t GetCount()
-		{
-			return Heap.GetCount();
-		}
-
-		void Clear()
-		{
-			Heap.Clear();
-		}
-
-		const ZEArray<Type, Allocator_>& GetArray() const
-		{
-			return Heap;
-		}
+		void Generate(const ZEArray<ZEPolygon>& Input);
 };
 
 #endif

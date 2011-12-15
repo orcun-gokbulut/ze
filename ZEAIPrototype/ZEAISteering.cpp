@@ -376,7 +376,7 @@ ZEAISteeringOutput ZEAISeperateSteering::Process(float ElapsedTime)
 
 			Distance -= GetOwner()->GetRadius() + GetTarget()->GetRadius();
 			if (Distance < 0.0f)
-				Distance = 0.0001;
+				Distance = 0.0001f;
 
 			Output.LinearAcceleration = Direction * ZEMath::Min(DecayCoefficient / (Distance * Distance), GetOwner()->GetMaxLinearAcceleration());
 		}
@@ -393,7 +393,7 @@ ZEAISteeringOutput ZEAISeperateSteering::Process(float ElapsedTime)
 			
 			Distance -= GetOwner()->GetRadius() + AvoidedActors[I]->GetRadius();
 			if (Distance < 0.0f)
-				Distance = 0.0001;
+				Distance = 0.0001f;
 
 			Output.LinearAcceleration += Direction * ZEMath::Min(DecayCoefficient / (Distance * Distance), GetOwner()->GetMaxLinearAcceleration());
 		}
@@ -430,7 +430,7 @@ ZEAISteeringOutput ZEAIFrictionSteering::Process(float ElapsedTime)
 
 ZEAIFrictionSteering::ZEAIFrictionSteering()
 {
-	Friction = 0.1;
+	Friction = 0.1f;
 	SetPriority(4);
 }
 

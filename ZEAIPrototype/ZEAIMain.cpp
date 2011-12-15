@@ -33,8 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 

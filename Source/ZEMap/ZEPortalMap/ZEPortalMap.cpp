@@ -167,6 +167,9 @@ const ZEString& ZEPortalMap::GetMapFile() const
 
 void ZEPortalMap::Draw(ZEDrawParameters* DrawParameters)
 {
+	if (!GetVisible())
+		return;
+
 	for (size_t I = 0; I < Portals.GetCount(); I++)
 		Portals[I].Draw(DrawParameters);
 }
@@ -189,7 +192,7 @@ bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norm
 			if (ZETriangle::IntersectionTest(Triangle, Ray, T) && (!Found || MinT > T))
 			{
 				MinT = T;
-				Ray.GetPointOn(Position, T);
+				ZERay::GetPointOn(Position, Ray, T);
 				ZETriangle::GetNormal(Triangle, Normal);
 				Found = true;
 			}

@@ -43,7 +43,9 @@ add_definitions(${QT_DEFINITIONS})
 include(${QT_USE_FILE})
 
 include_directories(
-	${PROJECT_SOURCE_DIR}
+	${PROJECT_SOURCE_DIR}/.. 
+	${PROJECT_SOURCE_DIR}/../Include
+
 	${QT_INCLUDE_DIR}
 	${QT_INCLUDE_DIR}/QtGui
 	${QT_INCLUDE_DIR}/QtCore)
@@ -51,16 +53,25 @@ include_directories(
 link_directories(
 	${QT_LIBRARY_DIR})
 
-ze_add_source(ZEAIMain.cpp				Sources)
-ze_add_source(ZEAIMainWindow.h			Sources QtMocs)
-ze_add_source(ZEAIMainWindow.cpp		Sources)
-ze_add_source(ZEAIActor.h				Sources)
-ze_add_source(ZEAIActor.cpp				Sources)
-ze_add_source(ZEAISteering.h			Sources)
-ze_add_source(ZEAISteering.cpp			Sources)
-ze_add_source(ZEAIMainWindow.ui			Sources QtUI)
-ze_add_source(ZEDNodeEditorMiniMap.cpp	Sources)
-ze_add_source(ZEDNodeEditorMiniMap.h	Sources)
+ze_add_source(ZEAIMain.cpp				Sources1)
+ze_add_source(ZEAIMainWindow.h			Sources1 QtMocs)
+ze_add_source(ZEAIMainWindow.cpp		Sources1)
+ze_add_source(ZEAIActor.h				Sources1)
+ze_add_source(ZEAIActor.cpp				Sources1)
+ze_add_source(ZEAISteering.h			Sources1)
+ze_add_source(ZEAISteering.cpp			Sources1)
+ze_add_source(ZEAIMainWindow.ui			Sources1 QtUI)
+ze_add_source(ZEDNodeEditorMiniMap.cpp	Sources1)
+ze_add_source(ZEDNodeEditorMiniMap.h	Sources1)
+ze_add_source(ZEAIAStar.h				Sources)
+ze_add_source(ZEAIAStar.cpp				Sources)
+ze_add_source(ZEAIAStarTests.cpp		Tests)
+ze_add_source(ZEAINavMesh.h				Sources)
+ze_add_source(ZEAINavMesh.cpp			Sources)
+ze_add_source(ZEPolygon.h				Sources)
+ze_add_source(ZEPolygon.cpp				Sources)
+ze_add_source(ZEAINavMeshGenerator.h	Sources)
+ze_add_source(ZEAINavMeshGenerator.cpp	Sources)
 
 qt4_add_resources(QtResourceFiles ${QtResources})
 qt4_wrap_ui(QtUIFiles ${QtUI})
@@ -69,6 +80,14 @@ qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 ze_add_executable(ZEAIProto 
-	SOURCES ${Sources} ${QtResourceFiles} ${QtUIFiles} ${QtMocFiles}
+	SOURCES ${Sources} ${Sources1} ${QtResourceFiles} ${QtUIFiles} ${QtMocFiles}
 	LIBS ZEFoundationAPI QtCore4 QtGui4
 	WIN32)
+
+ze_add_library(ZEAIProtoLib
+	SOURCES ${Sources} 
+	LIBS ZEFoundationAPI)
+	
+ze_add_unit_tests(ZEAIProtoTests 
+	SOURCES ${Tests}
+	TEST_TARGET ZEAIProtoLib)
