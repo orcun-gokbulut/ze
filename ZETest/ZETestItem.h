@@ -86,8 +86,7 @@ class ZETestItem
 #define ZETestScope() 
 
 #define ZETestCase(CaseName)\
-	SetCurrentCase(CaseName);\
-	while(false)
+	SetCurrentCase(CaseName);
 
 #define ZETestNameCombiner_(x, y) x ## y
 #define ZETestNameCombiner(x, y) ZETestNameCombiner_(x, y)

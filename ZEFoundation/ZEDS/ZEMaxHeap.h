@@ -123,6 +123,11 @@ class  ZEMaxHeap : public ZEHeapBase<Type, Allocator_>
 			MaxHeapify(Index);
 		}
 
+		void RemoveMax()
+		{
+			Remove(0);
+		}
+
 		ZEMaxHeap<Type, Allocator_>& operator=(const ZEMaxHeap<Type, Allocator_>& Other)
 		{
 			Heap.CopyFrom(Other.Heap);

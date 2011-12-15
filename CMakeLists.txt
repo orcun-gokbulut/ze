@@ -208,6 +208,8 @@ include_directories(
 link_directories(
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}
 	#${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Release
+	#${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Release/vrpn
+
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/vrpn
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/Bullet

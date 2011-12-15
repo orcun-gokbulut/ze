@@ -115,6 +115,7 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		void							AddWireframeCylinder(float Radius, float Height, unsigned int HSegments, unsigned int VSegments, bool Caps);
 		void							AddWireframePyramid(float Width, float Height, float Length);
 		void							AddWireframeCone(float Radius, unsigned int Segments, float Height);
+		void							AddWireframeConvexPolygon(const ZEVector3* Vertices, size_t VertexCount);
 
 		// 3D Primitives
 		void							AddBox(float Width, float Height, float Length);
@@ -125,6 +126,7 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		void							AddPyramid(float Width, float Height, float Length);
 		void							AddPlane(float Width, float Length);
 		void							AddCone(float Radius, unsigned int Segments, float Height);
+		void							AddConvexPolygon(const ZEVector3* Vertices, size_t VertexCount);
 
 		// Custom Vertices
 		void							AddVertex(const ZECanvasVertex& Vertex);

@@ -47,9 +47,8 @@
 ZEVector3 ZEAABBox::GetCenter() const
 {
 	ZEVector3 Center;
-	ZEVector3::Sub(Center, Max, Min);
+	ZEVector3::Add(Center, Max, Min);
 	ZEVector3::Scale(Center, Center, 0.5);
-	ZEVector3::Add(Center, Center, Min);
 	return Center;
 }
 
@@ -365,6 +364,60 @@ bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& Bou
 {
 	return false;
 }
+
+void ZEAABBox::Generate(ZEAABBox& Output, const ZEVector3* Vertices, size_t Count)
+{
+	if (Count == 0)
+		return;
+
+	Output.Min = Output.Max = Vertices[0];
+	
+	for (size_t I = 1; I < Count; I++)
+	{
+		if (Output.Min.x > Vertices[I].x)
+			Output.Min.x = Vertices[I].x;
+		
+		if (Output.Max.x < Vertices[I].x)
+			Output.Max.x = Vertices[I].x;
+
+		if (Output.Min.y > Vertices[I].y)
+			Output.Min.y = Vertices[I].y;
+
+		if (Output.Max.y < Vertices[I].y)
+			Output.Max.y = Vertices[I].y;
+
+		if (Output.Min.z > Vertices[I].z)
+			Output.Min.z = Vertices[I].z;
+
+		if (Output.Max.z < Vertices[I].z)
+			Output.Max.z = Vertices[I].z;
+	}
+}
+
+void ZEAABBox::Combine(ZEAABBox& Output, const ZEAABBox& A, const ZEAABBox& B)
+{
+	Output.Min = A.Min;
+	Output.Max = A.Max;
+
+	if (Output.Min.x > B.Min.x)
+		Output.Min.x = B.Min.x;
+
+	if (Output.Max.x < B.Max.x)
+		Output.Max.x = B.Max.x;
+
+	if (Output.Min.y > B.Min.y)
+		Output.Min.y = B.Min.y;
+
+	if (Output.Max.y < B.Max.y)
+		Output.Max.y = B.Max.y;
+
+	if (Output.Min.z > B.Min.z)
+		Output.Min.z = B.Min.z;
+
+	if (Output.Max.z < B.Max.z)
+		Output.Max.z = B.Max.z;
+}
+
 
 ZEAABBox::ZEAABBox()
 {

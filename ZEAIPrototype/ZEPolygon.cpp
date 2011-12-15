@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEHeapBase.h
+ Zinek Engine - ZEPolygon.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,88 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_HEAP_BASE_H__
-#define __ZE_HEAP_BASE_H__
+#include "ZEPolygon.h"
 
-#include "ZEArray.h"
-
-template<typename Type, typename Allocator_>
-class ZEHeapBase
+bool ZEPolygon::IsValid() const
 {
-	protected:
-		ZEArray<Type, Allocator_> Heap;
+	return Vertices.GetCount() >= 3;
+}
 
-	public:
-		size_t GetParentIndex(size_t Index) const
-		{
-			return (Index - 1) / 2;
-		}
+ZEVector3 ZEPolygon::GetCentroid() const
+{
+	return ZEVector3::Zero;
+}
 
-		Type& GetParent(size_t Index)
-		{
-			return Heap(GetParentIndex());
-		}
+ZEVector3 ZEPolygon::GetNormal() const
+{
+	zeAssert(!IsValid(), "Polygon is not valid.");
 
-		const Type& GetParent(size_t Index) const
-		{
-			return Heap(GetParentIndex());
-		}
-		
-		size_t GetFirstChildIndex(size_t Index) const
-		{
-			return 2 * Index + 1;
-		}
-		
-		Type& GetFirstChild(size_t Index)
-		{
-			return Heap[GetFirstChildIndex(Index)];
-		}
+	ZEVector3 Normal;
+	ZEVector3::CrossProduct(Normal, Vertices[1] - Vertices[0], Vertices.GetLastItem() - Vertices[0]);
+	Normal.NormalizeSelf();
 
-		const Type& GetFirstChild(size_t Index) const
-		{
-			return Heap[GetFirstChildIndex(Index)];
-		}
+	return Normal;
+}
 
-		size_t GetSecondChildIndex(size_t Index) const
-		{
-			return 2 * Index + 2;
-		}
+float ZEPolygon::GetArea() const
+{
+	zeAssert(!IsValid(), "Polygon is not valid.");
 
-		Type& GetSecondChild(size_t Index) 
-		{
-			return Heap[GetSecondChildIndex(Index)];
-		}
+	ZEVector3 Sum;
+	for(int I = 0; I < Vertices.GetCount() - 1; I++)
+	{
+		ZEVector3 Temp;
+		ZEVector3::CrossProduct(Temp, Vertices[I], Vertices[I + 1]);
+		ZEVector3::Add(Sum, Sum, Temp);
+	}
 
-		const Type& GetSecondChild(size_t Index) const
-		{
-			return Heap[GetSecondChildIndex(Index)];
-		}
+	ZEVector3 Temp;
+	ZEVector3::CrossProduct(Temp, Vertices[Vertices.GetCount() - 1], Vertices[0]);
+	ZEVector3::Add(Sum, Sum, Temp);
 
-		const Type& GetItem(size_t Index) const
-		{
-			return Heap[Index];
-		}
+	return Vertices.GetCount() / 2 * ZEVector3::DotProduct(Sum, GetNormal());
+}
 
-		Type& GetItem(size_t Index)
-		{
-			return Heap[Index];
-		}
+ZEArray<ZELineSegment> ZEPolygon::GetEdges() const
+{
+	ZEArray<ZELineSegment> Edges;
+	for (size_t I = 1; I < Vertices.GetCount(); I++)
+		Edges.Add(ZELineSegment(Vertices[I - 1], Vertices[I]));
 
-		size_t GetCount()
-		{
-			return Heap.GetCount();
-		}
-
-		void Clear()
-		{
-			Heap.Clear();
-		}
-
-		const ZEArray<Type, Allocator_>& GetArray() const
-		{
-			return Heap;
-		}
-};
-
-#endif
+	return Edges;
+}

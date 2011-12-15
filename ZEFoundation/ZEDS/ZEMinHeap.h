@@ -40,7 +40,7 @@
 #include "ZEHeapBase.h"
 
 template<typename Type, typename Allocator_ = ZEAllocatorBase<Type> >
-class  ZEMinHeap : public ZEHeapBase<Type, Allocator_>
+class ZEMinHeap : public ZEHeapBase<Type, Allocator_>
 {
 	private:
 		void Swap(Type& One, Type& Two)
@@ -109,7 +109,12 @@ class  ZEMinHeap : public ZEHeapBase<Type, Allocator_>
 			Heap.DeleteAt(Heap.GetCount() - 1);
 
 			MinHeapify(Index);
-		}	
+		}
+
+		void RemoveMin()
+		{
+			Remove(0);
+		}
 };
 
 #endif

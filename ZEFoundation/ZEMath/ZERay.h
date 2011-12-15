@@ -56,8 +56,10 @@ class ZERay : public ZELine
 		static float		MinimumDistance(const ZERay& RayA, const ZERay& RayB);
 		static float		MinimumDistance(const ZERay& RayA, const ZERay& RayB, float& TRayA, float& TRayB);
 
-		void				GetPointOn(ZEVector3& Point, float TRay) const;
+		static void			GetPointOn(ZEVector3& Point, const ZERay& RayA, float TRay);
 		ZEVector3			GetPointOn(float TRay) const;
+
+		const ZEVector3&	GetStartPoint() const;
 
 							ZERay(const ZEVector3 &v, const ZEVector3 &p);
 							ZERay();

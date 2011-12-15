@@ -101,7 +101,7 @@ bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZELine& Line
 	GetSurfacePlane(Triangle, Plane);
 	if (ZEPlane::IntersectionTest(Plane, Line, t))
 	{
-		Line.GetPointOn(Point, t);
+		ZELine::GetPointOn(Point, Line, t);
 		if (InsideTest(Triangle, Point))
 			return true;
 	}
@@ -117,7 +117,7 @@ bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZELineSegmen
 	GetSurfacePlane(Triangle, Plane);
 	if (ZEPlane::IntersectionTest(Plane, LineSegment, t))
 	{
-		LineSegment.GetPointOn(Point, t);
+		ZELineSegment::GetPointOn(Point, LineSegment, t);
 		if (InsideTest(Triangle, Point))
 			return true;
 	}
@@ -133,7 +133,7 @@ bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZERay& Ray, 
 	GetSurfacePlane(Triangle, Plane);
 	if (ZEPlane::IntersectionTest(Plane, Ray, t))
 	{
-		Ray.GetPointOn(Point, t);
+	ZERay::GetPointOn(Point, Ray, t);
 		if (InsideTest(Triangle, Point))
 			return true;
 	}

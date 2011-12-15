@@ -126,10 +126,10 @@ float ZELine::MinimumDistance(const ZELine& Line, const ZERay& Ray, float& TLine
 	return ZERay::MinimumDistance(Ray, Line, TRay, TLine);
 }
 
-void ZELine::GetPointOn(ZEVector3& Point, float TLine) const
+void ZELine::GetPointOn(ZEVector3& Point, const ZELine& Line, float TLine)
 {
-	ZEVector3::Scale(Point, v, TLine);
-	ZEVector3::Add(Point, Point, p);
+	ZEVector3::Scale(Point, Line.v, TLine);
+	ZEVector3::Add(Point, Point, Line.p);
 }
 
 ZEVector3 ZELine::GetPointOn(float TLine) const
