@@ -193,6 +193,7 @@ set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll wil
 ## Directories
 #########################################################################################
 include_directories(
+	${CMAKE_SOURCE_DIR}
 	${CMAKE_SOURCE_DIR}/Source
 	${CMAKE_SOURCE_DIR}/ZEFoundation
 	${CMAKE_SOURCE_DIR}/ZEToolSDK

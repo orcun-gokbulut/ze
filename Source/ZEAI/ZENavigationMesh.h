@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAIAStar.cpp
+ Zinek Engine - ZENavigationMesh.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEAIAStar.h"
+#pragma once
+#ifndef __ZE_NAVIGATION_MESH_H__
+#define __ZE_NAVIGATION_MESH_H__
+
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEGraph.h"
+#include "ZEMath/ZEPolygon.h"
+#include "ZEOctree.h"
+
+class ZENavigationMeshPolygon
+{
+	public:
+		bool Deleted;
+		size_t NormalIndex;
+		ZEArray<size_t> VertexIndices;
+};
+
+typedef ZEOctree<ZENavigationMeshPolygon> ZENavigationMeshOctree;
+
+class ZENavigationMesh
+{
+	public:
+		ZENavigationMeshOctree		Octree;
+		ZEArray<ZEVector3>			Vertices;
+		ZEArray<ZEVector3>			Normals;
+		ZEChunkArray<ZENavigationMeshPolygon, 10000> Polygons;
+
+
+		ZEPolygon					ToPolygon(size_t Index);
+		void						Clear();
+		void						Generate(const ZEArray<ZEPolygon>& Input);
+
+	
+};
+
+#endif

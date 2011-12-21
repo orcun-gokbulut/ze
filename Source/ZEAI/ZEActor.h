@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAIActor.h
+ Zinek Engine - ZEActor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,47 +34,89 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_AI_ACTOR_H__
-#define __ZE_AI_ACTOR_H__
+#ifndef __ZE_ACTOR_H__
+#define __ZE_ACTOR_H__
 
-#include "ZEAI/ZEActor.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEFlags.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEDS/ZEString.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEFlags.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEDS\ZEString.h"
 
 class ZESteering;
-class ZEAIMainWindow;
 
-#include <QGraphicsEllipseItem>
-
-class QGraphicsLineItem;
-
-class ZEAIActor;
-
-class QGraphicsActorItem : public QGraphicsEllipseItem
+class ZEActor
 {
+	private:
+		ZEString				Name;
+
+		ZEVector3				Position;
+		float					Rotation;
+
+		ZEVector3				LinearVelocity;
+		float					AngularVelocity;
+
+		ZEVector3				LinearAcceleration;
+		float					AngularAcceleration;
+
+		float					MaxAngularAcceleration;
+		float					MaxLinearAcceleration;
+
+		float					MaxLinearVelocity;
+		float					MaxAngularVelocity;
+
+		float					Radius;
+
+		ZEArray<ZESteering*>	Steerings;
+
 	public:
-		ZEAIActor*				Actor;
-};
 
-class ZEAIActor : public ZEActor
-{
-	friend class QGraphicsActorItem;
-	public:
-		int						Index;
-		ZEAIMainWindow*			Window;
-		QGraphicsActorItem*		VisualActor;
-		QGraphicsLineItem*		VisualLinearVelocity;
-		QGraphicsLineItem*		VisualLinearAcceleration;
-		QGraphicsLineItem*		VisualAngularVelocity;
-		QGraphicsLineItem*		VisualAngularAcceleration;
+		void					SetName(const ZEString& Name);
+		const ZEString&			GetName();
 
-		void 					Tick(float ElapsedTime);
-		void 					UpdateVisual();
+		void					SetPosition(const ZEVector3& Position);
+		const ZEVector3&		GetPosition();
 
-								ZEAIActor(ZEAIMainWindow* Window);
-								~ZEAIActor();
+		void					SetRotation(float Rotation);
+		float					GetRotation();
+
+		void					SetFaceRotation(float Rotation);
+		float					GetFaceRotation();
+
+		void					SetLinearVelocity(const ZEVector3& Velocity);
+		const ZEVector3&		GetLinearVelocity();
+
+		void					SetAngularVelocity(float Velocity);
+		float					GetAngularVelocity();
+
+		const ZEVector3&		GetLinearAcceleration();
+		float					GetAngularAcceleration();
+
+		void					SetMaxAngularVelocity(float Velocity);
+		float					GetMaxAngularVelocity();
+
+		void					SetMaxLinearVelocity(float Velocity);
+		float					GetMaxLinearSpeed();
+
+		void					SetMaxLinearAcceleration(float Acceleration);
+		float					GetMaxLinearAcceleration();
+
+		void					SetMaxAngularAngular(float Acceleration);
+		float					SetMaxAngularAngular();
+
+		void					SetMaxAngularAcceleration(float Acceleration);
+		float					GetMaxAngularAcceleration();
+	
+		void					SetRadius(float Radius);
+		float					GetRadius();
+
+		const ZEArray<ZESteering*>&	GetSteerings();
+		void					AddSteering(ZESteering* Steering);
+		void					RemoveSteering(ZESteering* Steering);
+
+		virtual void			Tick(float ElapsedTime);
+
+								ZEActor();
+								~ZEActor();
 };
 
 #endif

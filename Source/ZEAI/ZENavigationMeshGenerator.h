@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAINavMeshGenerator.h
+ Zinek Engine - ZENavigationMeshGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,10 +37,10 @@
 #ifndef __ZE_NAVIGATION_MESH_GENERATOR_H__
 #define __ZE_NAVIGATION_MESH_GENERATOR_H__
 
-#include "ZEDS\ZEGraph.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEPolygon.h"
-#include "ZEAINavMesh.h"
+#include "ZEDS/ZEGraph.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEPolygon.h"
+#include "ZENavigationMesh.h"
 
 class ZENavigationMeshGeneratorOptions 
 {
