@@ -50,6 +50,14 @@ class ZEPolygon
 		ZEVector3				GetNormal() const;
 		float					GetArea() const;
 		ZEArray<ZELineSegment>	GetEdges() const;
+
+		static bool				IntersectionTest(const ZEPolygon& Polygon, const ZEVector3& Point);
+		static bool				IntersectionTest(const ZEPolygon& Polygon, const ZELine& Line);
+		static bool				IntersectionTest(const ZEPolygon& Polygon, const ZELine& Line, float& t);
+		static bool				IntersectionTest(const ZEPolygon& Polygon, const ZERay& Ray);
+		static bool				IntersectionTest(const ZEPolygon& Polygon, const ZERay& Ray, float& t);
+		static bool				IntersectionTest(const ZEPolygon& Polygon, const ZELineSegment& LineSegment);
+		static bool				IntersectionTest(const ZEPolygon& Polygon, const ZELineSegment& LineSegment, float& t);
 };
 
 #endif

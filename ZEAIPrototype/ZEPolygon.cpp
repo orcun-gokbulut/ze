@@ -34,6 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPolygon.h"
+#include "ZEMath/ZERay.h"
+#include "ZEMath/ZELineSegment.h"
+#include "ZEMath/ZEPlane.h"
 
 bool ZEPolygon::IsValid() const
 {
@@ -82,4 +85,77 @@ ZEArray<ZELineSegment> ZEPolygon::GetEdges() const
 		Edges.Add(ZELineSegment(Vertices[I - 1], Vertices[I]));
 
 	return Edges;
+}
+
+bool ZEPolygon::IntersectionTest(const ZEPolygon& Polygon, const ZEVector3& Point)
+{
+
+	ZEVector3 Normal = Polygon.GetNormal();
+
+	for (int I = 0; I < Polygon.Vertices.GetCount(); I++)
+	{
+		ZEVector3 EdgeNormal;
+		ZEVector3::CrossProduct(EdgeNormal, Normal, (Polygon.Vertices[Polygon.Vertices.Circular(I + 1)] - Polygon.Vertices[I]));
+		if (ZEVector3::DotProduct(Point - Polygon.Vertices[I], EdgeNormal) < 0)
+			return false;
+	}
+	
+	return true;
+}
+
+bool ZEPolygon::IntersectionTest(const ZEPolygon& Polygon, const ZELine& Line)
+{
+	float Temp;
+	return IntersectionTest(Polygon, Line, Temp);
+}
+
+bool ZEPolygon::IntersectionTest(const ZEPolygon& Polygon, const ZELine& Line, float& t)
+{
+	float tt;
+	if (ZEPlane::IntersectionTest(ZEPlane(Polygon.GetNormal(), Polygon.Vertices[0]), Line, tt))
+		if (IntersectionTest(Polygon, Line.GetPointOn(t)))
+		{
+			t = tt;
+			return true;
+		}
+
+	return false;
+}
+
+bool ZEPolygon::IntersectionTest(const ZEPolygon& Polygon, const ZERay& Ray)
+{
+	float Temp;
+	return IntersectionTest(Polygon, Ray, Temp);
+}
+
+bool ZEPolygon::IntersectionTest(const ZEPolygon& Polygon, const ZERay& Ray, float& t)
+{
+	float tt;
+	if (ZEPlane::IntersectionTest(ZEPlane(Polygon.GetNormal(), Polygon.Vertices[0]), Ray, tt))
+		if (IntersectionTest(Polygon, Ray.GetPointOn(t)))
+		{
+			t = tt;
+			return true;
+		}
+
+	return false;
+}
+
+bool ZEPolygon::IntersectionTest(const ZEPolygon& Polygon, const ZELineSegment& LineSegment)
+{
+	float Temp;
+	return IntersectionTest(Polygon, LineSegment, Temp);
+}
+
+bool ZEPolygon::IntersectionTest(const ZEPolygon& Polygon, const ZELineSegment& LineSegment, float& t)
+{
+	float tt;
+	if (ZEPlane::IntersectionTest(ZEPlane(Polygon.GetNormal(), Polygon.Vertices[0]), LineSegment, tt))
+		if (IntersectionTest(Polygon, LineSegment.GetPointOn(t)))
+		{
+			t = tt;
+			return true;
+		}
+
+	return false;
 }

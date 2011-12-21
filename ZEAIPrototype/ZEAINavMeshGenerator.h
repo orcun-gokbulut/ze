@@ -52,13 +52,58 @@ class ZENavigationMeshGeneratorOptions
 
 };
 
+struct ZECheckAdjacentResult;
 
 class ZENavigationMeshGenerator
 {
 	public:
-		static size_t OptimizePolygons(ZENavigationMeshOctree* CurrentNode, ZENavigationMesh& Mesh);
-		static bool OptimizePolygonsStep(ZENavigationMeshOctree* CurrentNode, ZENavigationMesh& Mesh);
-		static void Generate(ZENavigationMesh& Output, const ZEArray<ZEPolygon>& Input, ZENavigationMeshGeneratorOptions* Options);
+		ZENavigationMesh Mesh;
+
+		// Helpers
+		ZEVector3&			GetVertex(const ZENavigationMeshPolygon& Polygon, int Index);
+		size_t				GetVertexIndex(const ZENavigationMeshPolygon& Polygon, int Index);
+		ZEVector3&			GetNormal(const ZENavigationMeshPolygon& Polygon);
+		void				GetBoundingBox(ZEAABBox& Output, ZENavigationMeshPolygon& Polygon);
+
+		size_t				AddVertex(const ZEVector3& Point);
+		void				RemovePolygonsByOrder(size_t PolygonAIndex, size_t PolygonBIndex);
+		void				RemovePolygonsByOrder(size_t PolygonAIndex, size_t PolygonBIndex, size_t PolygonCIndex);
+
+		void				TraverseOctree(ZENavigationMeshOctree* Octree);
+
+		// Checks
+		bool				CheckStraight(const ZEVector3& A, const ZEVector3& B, const ZEVector3& C);
+		bool				CheckInternalAngle(const ZEVector3& Center, const ZEVector3& Normal, const ZEVector3& A, const ZEVector3& B);
+		bool				CheckParalel(const ZEVector3& A1, const ZEVector3& A2, const ZEVector3& B1, const ZEVector3& B2, float& LengthA, float& LengthB);
+		bool				CheckAdjacent(const ZENavigationMeshPolygon& A, const ZENavigationMeshPolygon& B, ZECheckAdjacentResult* Result);
+		bool				CheckAdjacent(const ZENavigationMeshPolygon& A, const ZENavigationMeshPolygon& B, const ZENavigationMeshPolygon& C);
+
+		// Operations
+		bool				SlicePolygon(ZENavigationMeshPolygon& Output, ZENavigationMeshPolygon& Output2, ZENavigationMeshPolygon& Input, const ZELine& Cut);
+
+		// Mergers
+		static void			RemoveUnwalkable(ZEArray<ZEPolygon>& Output, const ZEArray<ZEPolygon>& Input, const ZEVector3& Up, float MaxDegree);
+		bool				MergePolygons2to1(ZENavigationMeshPolygon& Output, const ZENavigationMeshPolygon& A, const ZENavigationMeshPolygon& B);
+		bool				MergePolygons2to1(size_t PolygonIndex1, size_t PolygonIndex2);
+
+		bool				MergePolygons3to2(size_t PolygonAIndex);
+		bool				MergePolygons3to2(size_t PolygonAIndex, size_t PolygonBIndex);
+		bool				MergePolygons3to2(size_t PolygonAIndex, size_t PolygonBIndex, size_t PolygonCIndex, ZECheckAdjacentResult& Result);
+
+		bool				MergePolygonsNto1(size_t VertexIndex);
+
+		void				FloodFill(const ZEVector3& StartPoint);
+		
+		bool				OptimizePolygons2to1();
+		bool				OptimizePolygons3to2();
+		bool				OptimizePolygonsNto1();
+
+	public:
+		ZENavigationMesh&	GetOutput();
+		void				Optimize(ZENavigationMesh& Mesh, ZENavigationMeshGeneratorOptions* Options);
+		void				Generate(const ZEArray<ZEPolygon>& Input, ZENavigationMeshGeneratorOptions* Options);
+
+							ZENavigationMeshGenerator();
 };
 
 #endif
