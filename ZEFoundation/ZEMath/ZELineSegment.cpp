@@ -92,15 +92,16 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZEL
 
 float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZELine& Line, float& TLineSegment, float& TLine)
 {
-	ZEVector3 w(LineSegment.p, Line.p);
-	float    a = ZEVector3::DotProduct(LineSegment.v, LineSegment.v);
-    float    b = ZEVector3::DotProduct(LineSegment.v, Line.v);
-    float    c = ZEVector3::DotProduct(Line.v, Line.v);
-    float    d = ZEVector3::DotProduct(LineSegment.v, w);
-    float    e = ZEVector3::DotProduct(Line.v, w);
-    float    D = a*c - b*b;
-    float    sN, sD = D;
-    float    tN, tD = D;
+	ZEVector3 w(Line.p, LineSegment.p);
+
+	float a = ZEVector3::DotProduct(LineSegment.v, LineSegment.v);
+    float b = ZEVector3::DotProduct(LineSegment.v, Line.v);
+    float c = ZEVector3::DotProduct(Line.v, Line.v);
+	float d = ZEVector3::DotProduct(LineSegment.v, w);
+    float e = ZEVector3::DotProduct(Line.v, w);
+	float D = a * c - b * b ;
+    float sN, sD = D;
+    float tN, tD = D;
 
 	if (D < ZE_ZERO_TRESHOLD) 
 	{
@@ -119,7 +120,7 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZEL
             tN = e;
             tD = c;
         }
-        else if (sN > sD) 
+        else if (sN > sD * LineSegment.Length) 
 		{
             sN = sD;
             tN = e + b;
@@ -127,13 +128,14 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZEL
         }
     }
 
-    TLineSegment = (fabs(sN) < ZE_ZERO_TRESHOLD ? 0.0f : sN / sD);
+    TLineSegment  = (fabs(sN) < ZE_ZERO_TRESHOLD ? 0.0f : sN / sD);
     TLine = (fabs(tN) < ZE_ZERO_TRESHOLD ? 0.0f : tN / tD);
 
 	ZEVector3 P1, P2;
 	ZEVector3::Scale(P1, LineSegment.v, TLineSegment);
-	ZEVector3::Add(P1, P1, w);
+	ZEVector3::Add(P1, P1, LineSegment.p);
 	ZEVector3::Scale(P2, Line.v, TLine);
+	ZEVector3::Add(P2, P2, Line.p);
 	ZEVector3::Sub(w, P1, P2);
 	return ZEVector3::Length(w);
 }

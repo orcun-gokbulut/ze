@@ -45,7 +45,6 @@ inline void ZELine::Create(ZELine& Line, const ZEVector3& P0, const ZEVector3& P
 	ZEVector3::Sub(Line.v, P1, P0);
 	Line.v = Line.v.Normalize();
 	Line.p = P0;
-
 }
 
 void ZELine::CreateParametric(ZELine& Line, const ZEVector3& v, const ZEVector3& p)
@@ -83,24 +82,22 @@ float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB)
 float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& TLineA,float& TLineB)
 {
 	ZEVector3 w(LineA.p, LineB.p);
-	float    a = ZEVector3::DotProduct(LineA.v, LineA.v);
-    float    b = ZEVector3::DotProduct(LineA.v, LineB.v);
-    float    c = ZEVector3::DotProduct(LineB.v, LineB.v);
-    float    d = ZEVector3::DotProduct(LineA.v, w);
-    float    e = ZEVector3::DotProduct(LineB.v, w);
-    float    det = a*c - b*b;
+	float a = ZEVector3::DotProduct(LineA.v, LineA.v);
+    float b = ZEVector3::DotProduct(LineA.v, LineB.v);
+    float c = ZEVector3::DotProduct(LineB.v, LineB.v);
+    float d = ZEVector3::DotProduct(LineA.v, w);
+    float e = ZEVector3::DotProduct(LineB.v, w);
+    float det = a * c - b * b;
 	
-	if (det<ZE_ZERO_TRESHOLD) //Parallel
+	if (det < ZE_ZERO_TRESHOLD) //Parallel
 	{
         TLineA = 0.0;
-        TLineB = (b>c ? d/b : e/c);
-
+        TLineB = (b > c ? d / b : e / c);
     }
     else //Non-Parallel
 	{
-		
-		TLineA = (b*e - c*d) / det;
-        TLineB = (a*e - b*d) / det; 
+		TLineA = (b * e - c * d) / det;
+        TLineB = (a * e - b * d) / det; 
 	}
 
 	return ZEVector3::Length(ZEVector3(LineA.GetPointOn(TLineA), LineB.GetPointOn(TLineB)));

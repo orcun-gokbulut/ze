@@ -55,13 +55,17 @@ typedef ZEOctree<ZENavigationMeshPolygon> ZENavigationMeshOctree;
 class ZENavigationMesh
 {
 	public:
-		ZENavigationMeshOctree	Octree;
-		ZEArray<ZEVector3>		Vertices;
-		ZEArray<ZEVector3>		Normals;
+		ZENavigationMeshOctree		Octree;
+		ZEArray<ZEVector3>			Vertices;
+		ZEArray<ZEVector3>			Normals;
+		ZEChunkArray<ZENavigationMeshPolygon, 10000> Polygons;
 
-		void Clear();
 
-		void Generate(const ZEArray<ZEPolygon>& Input);
+		ZEPolygon					ToPolygon(size_t Index);
+		void						Clear();
+		void						Generate(const ZEArray<ZEPolygon>& Input);
+
+	
 };
 
 #endif

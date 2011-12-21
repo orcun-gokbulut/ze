@@ -35,6 +35,17 @@
 
 #include "ZEAINavMesh.h"
 
+ZEPolygon ZENavigationMesh::ToPolygon(size_t Index)
+{
+	ZEPolygon Output;
+	Output.Vertices.SetCount(Polygons[Index].VertexIndices.GetCount());
+
+	for (size_t I = 0; I < Output.Vertices.GetCount(); I++)
+		Output.Vertices[I] = Vertices[Polygons[Index].VertexIndices[I]];
+
+	return Output;
+}
+
 static ZEAABBox GetBoundingBox(const ZEArray<ZEPolygon>& Input)
 {
 	ZEAABBox TotalBox;
@@ -126,6 +137,7 @@ static size_t GetVertexIndex(ZENavigationMesh& Mesh, const ZEVector3& Point, ZEN
 	VertexIndex++;
 	return VertexIndex - 1;
 }
+
 void ZENavigationMesh::Clear()
 {
 	Vertices.Clear();
