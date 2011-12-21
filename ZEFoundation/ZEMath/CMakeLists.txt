@@ -83,6 +83,8 @@ ze_add_source(ZETrigonometryTests.cpp	Tests)
 ze_add_source(ZEVector.cpp				Sources)
 ze_add_source(ZEVector.h				Sources Headers)
 ze_add_source(ZEVectorTests.cpp			Tests)
+ze_add_source(ZEPolygon.h				Sources Headers)
+ze_add_source(ZEPolygon.cpp				Sources)
 	
 ze_add_library(ZEMath 
 	SOURCES ${Sources} 

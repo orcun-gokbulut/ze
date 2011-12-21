@@ -37,7 +37,7 @@
 #include "ui_ZEAIMainWindow.h"
 
 #include "ZEAIActor.h"
-#include "ZEAISteering.h"
+#include "ZEAI/ZESteering.h"
 #include "ZEDNodeEditorMinimap.h"
 #include "ZEMath/ZEAngle.h"
 
@@ -228,15 +228,15 @@ void ZEAIMainWindow::btnAddActor_Clicked()
 	Form->lstActors->addItem(new QListWidgetItem(New->GetName().ToCString()));
 	Form->btnDeleteActor->setEnabled(true);
 
-	New->AddSteering(new ZEAISeperateSteering());
-	ZEAIArriveSteering* ARRSTR = new ZEAIArriveSteering();
+	New->AddSteering(new ZESeperateSteering());
+	ZEArriveSteering* ARRSTR = new ZEArriveSteering();
 	ARRSTR->SetTarget(Actors[0]);
 	New->AddSteering(ARRSTR);
 
 	for (int I = 0; I < Actors.GetCount(); I++)
 	{
 		ZEAIActor* CurrentActor = Actors[I];
-		((ZEAISeperateSteering*)CurrentActor->GetSteerings()[0])->AvoidedActors.Clear();
+		((ZESeperateSteering*)CurrentActor->GetSteerings()[0])->AvoidedActors.Clear();
 	}
 
 	for (int I = 1; I < Actors.GetCount(); I++)
@@ -246,7 +246,7 @@ void ZEAIMainWindow::btnAddActor_Clicked()
 		for (int J = 0; J < Actors.GetCount(); J++)
 		{
 			if(CurrentActor != Actors[J] /*&& Actors[J] != Actors[0]*/)
-				((ZEAISeperateSteering*)CurrentActor->GetSteerings()[0])->AvoidedActors.Add(Actors[J]);
+				((ZESeperateSteering*)CurrentActor->GetSteerings()[0])->AvoidedActors.Add(Actors[J]);
 		}
 	}
 }

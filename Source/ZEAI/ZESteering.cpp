@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAISteering.cpp
+ Zinek Engine - ZESteering.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,71 +33,71 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEAISteering.h"
-#include "ZEAIActor.h"
+#include "ZESteering.h"
+#include "ZEActor.h"
 
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
 
 float frand(float Range);
 
-void ZEAISteeringOutput::SetZero()
+void ZESteeringOutput::SetZero()
 {
 	LinearAcceleration = ZEVector3::Zero;
 	AngularAcceleration = 0.0f;
 }
 
-ZEAIActor* ZEAISteering::GetOwner()
+ZEActor* ZESteering::GetOwner()
 {
 	return Owner;
 }
 
-void ZEAISteering::SetOwner(ZEAIActor*	Owner)
+void ZESteering::SetOwner(ZEActor*	Owner)
 {
 	this->Owner = Owner;
 }
 
-unsigned int ZEAISteering::GetPriority()
+unsigned int ZESteering::GetPriority()
 {
 	return Priority;
 }
 
-void ZEAISteering::SetPriority(unsigned int Priority)
+void ZESteering::SetPriority(unsigned int Priority)
 {
 	this->Priority = Priority;
 }
 
-float ZEAISteering::GetWeight()
+float ZESteering::GetWeight()
 {
 	return Weight;
 }
 
-void ZEAISteering::SetWeight(float Weight)
+void ZESteering::SetWeight(float Weight)
 {
 	this->Weight = Weight;
 }
 
-bool ZEAISteering::GetEnabled()
+bool ZESteering::GetEnabled()
 {
 	return Enabled;
 }
 
-void ZEAISteering::SetEnabled(bool Enabled)
+void ZESteering::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
 }
 
-ZEAIActor* ZEAISteering::GetTarget()
+ZEActor* ZESteering::GetTarget()
 {
 	return Target;
 }
 
-void ZEAISteering::SetTarget(ZEAIActor* Target)
+void ZESteering::SetTarget(ZEActor* Target)
 {
 	this->Target = Target;
 }
 
-ZEAISteering::ZEAISteering()
+ZESteering::ZESteering()
 {
 	Target = NULL;
 	Owner = NULL;
@@ -106,9 +106,9 @@ ZEAISteering::ZEAISteering()
 	Priority = 3;
 }
 
-ZEAISteeringOutput ZEAISeekSteering::Seek(const ZEVector3& Target)
+ZESteeringOutput ZESeekSteering::Seek(const ZEVector3& Target)
 {
-	ZEAISteeringOutput Output;
+	ZESteeringOutput Output;
 	Output.SetZero();
 
 	Output.LinearAcceleration = Target - GetOwner()->GetPosition();
@@ -120,20 +120,20 @@ ZEAISteeringOutput ZEAISeekSteering::Seek(const ZEVector3& Target)
 	return Output;
 }
 
-ZEAISteeringOutput ZEAISeekSteering::Process(float ElapsedTime)
+ZESteeringOutput ZESeekSteering::Process(float ElapsedTime)
 {
 	return Seek(GetTarget()->GetPosition());
 }
 
-ZEAISeekSteering::ZEAISeekSteering()
+ZESeekSteering::ZESeekSteering()
 {
 	SetPriority(4);
 }
 
 
-ZEAISteeringOutput ZEAIFleeSteering::Flee(const ZEVector3& Target)
+ZESteeringOutput ZEFleeSteering::Flee(const ZEVector3& Target)
 {
-	ZEAISteeringOutput Output;
+	ZESteeringOutput Output;
 	Output.SetZero();
 
 	Output.LinearAcceleration = GetOwner()->GetPosition() - Target;
@@ -146,19 +146,19 @@ ZEAISteeringOutput ZEAIFleeSteering::Flee(const ZEVector3& Target)
 	return Output;
 }
 
-ZEAISteeringOutput ZEAIFleeSteering::Process(float ElapsedTime)
+ZESteeringOutput ZEFleeSteering::Process(float ElapsedTime)
 {
 	return Flee(GetTarget()->GetPosition());
 }
 
-ZEAIFleeSteering::ZEAIFleeSteering()
+ZEFleeSteering::ZEFleeSteering()
 {
 	SetPriority(3);
 }
 
-ZEAISteeringOutput ZEAIArriveSteering::Arrive(const ZEVector3& Target)
+ZESteeringOutput ZEArriveSteering::Arrive(const ZEVector3& Target)
 {
-	ZEAISteeringOutput Output;
+	ZESteeringOutput Output;
 	Output.SetZero();
 
 	ZEVector3 Direction = Target - GetOwner()->GetPosition();
@@ -188,21 +188,21 @@ ZEAISteeringOutput ZEAIArriveSteering::Arrive(const ZEVector3& Target)
 	return Output;
 }
 
-ZEAISteeringOutput ZEAIArriveSteering::Process(float ElapsedTime)
+ZESteeringOutput ZEArriveSteering::Process(float ElapsedTime)
 {
 	return Arrive(GetTarget()->GetPosition());
 }
 
-ZEAIArriveSteering::ZEAIArriveSteering()
+ZEArriveSteering::ZEArriveSteering()
 {
 	TimeToTarget = 0.1f;
 	SlowRadius = 10.0f;
 	SetPriority(3);
 }
 
-ZEAISteeringOutput ZEAIAlignSteering::Align(float Target_Rotation)
+ZESteeringOutput ZEAlignSteering::Align(float Target_Rotation)
 {
-	ZEAISteeringOutput Output;
+	ZESteeringOutput Output;
 	Output.SetZero();
 
 	float Rotation = ZEAngle::Range(Target_Rotation - GetOwner()->GetRotation());
@@ -230,12 +230,12 @@ ZEAISteeringOutput ZEAIAlignSteering::Align(float Target_Rotation)
 	return Output;
 }
 
-ZEAISteeringOutput ZEAIAlignSteering::Process(float ElapsedTime)
+ZESteeringOutput ZEAlignSteering::Process(float ElapsedTime)
 {
 	return Align(GetTarget()->GetRotation());
 }
 
-ZEAIAlignSteering::ZEAIAlignSteering()
+ZEAlignSteering::ZEAlignSteering()
 {
 	TargetRadius = ZE_PI_12;
 	SlowRadius = ZE_PI_8;
@@ -243,9 +243,9 @@ ZEAIAlignSteering::ZEAIAlignSteering()
 	SetPriority(3);
 }
 
-ZEAISteeringOutput ZEAIVelocityMatchingSteering::MatchVelocity(const ZEVector3& TargetVelocity)
+ZESteeringOutput ZEVelocityMatchingSteering::MatchVelocity(const ZEVector3& TargetVelocity)
 {
-	ZEAISteeringOutput Output;
+	ZESteeringOutput Output;
 	Output.SetZero();
 
 	Output.LinearAcceleration = TargetVelocity - GetOwner()->GetLinearVelocity();
@@ -260,22 +260,22 @@ ZEAISteeringOutput ZEAIVelocityMatchingSteering::MatchVelocity(const ZEVector3& 
 	return Output;
 }
 
-ZEAISteeringOutput ZEAIVelocityMatchingSteering::Process(float ElapsedTime)
+ZESteeringOutput ZEVelocityMatchingSteering::Process(float ElapsedTime)
 {
 	return MatchVelocity(GetTarget()->GetLinearVelocity());
 }
 
-ZEAIVelocityMatchingSteering::ZEAIVelocityMatchingSteering()
+ZEVelocityMatchingSteering::ZEVelocityMatchingSteering()
 {
 	SetPriority(3);
 	TimeToTarget = 0.1f;
 }
 
-ZEAISteeringOutput ZEAIFaceSteering::Face(const ZEVector3& TargetDirection)
+ZESteeringOutput ZEFaceSteering::Face(const ZEVector3& TargetDirection)
 {
 	if (TargetDirection.LengthSquare() == 0)
 	{
-		ZEAISteeringOutput Output;
+		ZESteeringOutput Output;
 		Output.SetZero();
 		return Output;
 	}
@@ -283,29 +283,29 @@ ZEAISteeringOutput ZEAIFaceSteering::Face(const ZEVector3& TargetDirection)
 	return Align(atan2(TargetDirection.x, TargetDirection.y));
 }
 
-ZEAISteeringOutput ZEAIFaceSteering::Process(float ElapsedTime)
+ZESteeringOutput ZEFaceSteering::Process(float ElapsedTime)
 {
 	return Face(GetTarget()->GetPosition() - GetOwner()->GetPosition());
 }
 
-ZEAIFaceSteering::ZEAIFaceSteering()
+ZEFaceSteering::ZEFaceSteering()
 {
 	SetPriority(3);
 }
 
-ZEAISteeringOutput ZEAIFaceVelocitySteering::Process(float ElapsedTime)
+ZESteeringOutput ZEFaceVelocitySteering::Process(float ElapsedTime)
 {
 	return Face(GetOwner()->GetLinearVelocity());
 }
 
-ZEAIFaceVelocitySteering::ZEAIFaceVelocitySteering()
+ZEFaceVelocitySteering::ZEFaceVelocitySteering()
 {
 	SetPriority(3);
 }
 
-ZEAISteeringOutput ZEAIWanderSteering::Process(float ElapsedTime)
+ZESteeringOutput ZEWanderSteering::Process(float ElapsedTime)
 {
-	ZEAISteeringOutput Output;
+	ZESteeringOutput Output;
 
 	WanderRotation += frand(ZE_PI) * WanderRate * ElapsedTime;
 	ZEVector2 WanderDirection = ZEAngle::ToVector(WanderRotation);
@@ -316,22 +316,22 @@ ZEAISteeringOutput ZEAIWanderSteering::Process(float ElapsedTime)
 	return Output;
 }
 
-ZEAIWanderSteering::ZEAIWanderSteering()
+ZEWanderSteering::ZEWanderSteering()
 {
 	SetPriority(4);
 	WanderRate = 0.5f;
 	WanderRotation = 0.0f;
 }
 
-void ZEAIPathFollowingSteering::SetOwner(ZEAIActor* Owner)
+void ZEPathFollowingSteering::SetOwner(ZEActor* Owner)
 {
 	Seek.SetOwner(Owner);
 	Arrive.SetOwner(Owner);
 	Face.SetOwner(Owner);
 
-	ZEAISteering::SetOwner(Owner);
+	ZESteering::SetOwner(Owner);
 }
-ZEAISteeringOutput ZEAIPathFollowingSteering::Process(float ElapsedTime)
+ZESteeringOutput ZEPathFollowingSteering::Process(float ElapsedTime)
 {
 	if ((PathNodes[CurrentPathNode] - GetOwner()->GetPosition()).LengthSquare() < PathNodeRadius * PathNodeRadius)
 	{
@@ -341,28 +341,28 @@ ZEAISteeringOutput ZEAIPathFollowingSteering::Process(float ElapsedTime)
 			CurrentPathNode--;
 	}
 
-	ZEAISteeringOutput Output;
+	ZESteeringOutput Output;
 	if (CurrentPathNode + 1 == PathNodes.GetCount())
 		Output = Arrive.Arrive(PathNodes[CurrentPathNode]);
 	else
 		Output = Seek.Seek(PathNodes[CurrentPathNode]);
 
-	ZEAISteeringOutput FaceOutput = Face.Process(ElapsedTime);
+	ZESteeringOutput FaceOutput = Face.Process(ElapsedTime);
 	Output.AngularAcceleration = FaceOutput.AngularAcceleration;
 
 	return Output;
 }
 
-ZEAIPathFollowingSteering::ZEAIPathFollowingSteering()
+ZEPathFollowingSteering::ZEPathFollowingSteering()
 {
 	CurrentPathNode = 0;
 	PathNodeRadius = 3.0f;
 	SetPriority(3);
 }
 
-ZEAISteeringOutput ZEAISeperateSteering::Process(float ElapsedTime)
+ZESteeringOutput ZESeperateSteering::Process(float ElapsedTime)
 {
-	ZEAISteeringOutput Output;
+	ZESteeringOutput Output;
 	Output.SetZero();
 
 	if (GetTarget() != NULL)
@@ -408,7 +408,7 @@ ZEAISteeringOutput ZEAISeperateSteering::Process(float ElapsedTime)
 	return Output;
 }
 
-ZEAISeperateSteering::ZEAISeperateSteering()
+ZESeperateSteering::ZESeperateSteering()
 {
 	SetPriority(1);
 	Treshold = 4.0f;
@@ -416,9 +416,9 @@ ZEAISeperateSteering::ZEAISeperateSteering()
 	SetPriority(2);
 }
 
-ZEAISteeringOutput ZEAIFrictionSteering::Process(float ElapsedTime)
+ZESteeringOutput ZEFrictionSteering::Process(float ElapsedTime)
 {
-	ZEAISteeringOutput Output;
+	ZESteeringOutput Output;
 
 	if (GetOwner()->GetLinearVelocity().LengthSquare() != 0)
 		Output.LinearAcceleration = -GetOwner()->GetLinearVelocity().Normalize() * Friction * GetOwner()->GetMaxLinearAcceleration();
@@ -428,20 +428,20 @@ ZEAISteeringOutput ZEAIFrictionSteering::Process(float ElapsedTime)
 	return Output;
 }
 
-ZEAIFrictionSteering::ZEAIFrictionSteering()
+ZEFrictionSteering::ZEFrictionSteering()
 {
 	Friction = 0.1f;
 	SetPriority(4);
 }
 
-ZEAISteeringOutput ZEAICollisionAvoidanceSteering::Process(float ElapsedTime)
+ZESteeringOutput ZECollisionAvoidanceSteering::Process(float ElapsedTime)
 {
-	ZEAISteeringOutput Output;
+	ZESteeringOutput Output;
 	Output.SetZero();
 
 	float ShortestTime = ZE_FLOAT_MAX;
 	
-	ZEAIActor* FirstTarget = NULL;
+	ZEActor* FirstTarget = NULL;
 	float FirstMinSeperation;
 	float FirstDistance;
 	ZEVector3 FirstRelativePosition;
@@ -449,7 +449,7 @@ ZEAISteeringOutput ZEAICollisionAvoidanceSteering::Process(float ElapsedTime)
 
 	for (size_t I = 0; I < AvoidedActors.GetCount(); I++)
 	{
-		ZEAIActor* CurrentTarget = AvoidedActors[I];
+		ZEActor* CurrentTarget = AvoidedActors[I];
 
 		ZEVector3 RelativePosition = CurrentTarget->GetPosition() - GetOwner()->GetPosition();
 		ZEVector3 RelativeVelocity = CurrentTarget->GetLinearVelocity() - GetOwner()->GetLinearVelocity();
@@ -488,7 +488,7 @@ ZEAISteeringOutput ZEAICollisionAvoidanceSteering::Process(float ElapsedTime)
 	return Output;
 }
 
-ZEAICollisionAvoidanceSteering::ZEAICollisionAvoidanceSteering()
+ZECollisionAvoidanceSteering::ZECollisionAvoidanceSteering()
 {
 	SetPriority(1);
 }

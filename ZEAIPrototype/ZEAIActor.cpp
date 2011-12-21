@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEAIActor.h"
-#include "ZEAISteering.h"
+#include "ZEAI\ZESteering.h"
 #include "ZEAIMainWindow.h"
 #include "ui_ZEAIMainWindow.h"
 
@@ -52,34 +52,34 @@ using namespace Ui;
 
 void ZEAIActor::UpdateVisual()
 {
-	float Radius = 10 * this->Radius;
+	float Radius = 10 * this->GetRadius();
 	
-	VisualActor->setTransform(QTransform().rotateRadians(-Rotation));
-	VisualActor->setPos(Position.x * 10.0f, Position.y * 10.0f);
+	VisualActor->setTransform(QTransform().rotateRadians(-GetRotation()));
+	VisualActor->setPos(GetPosition().x * 10.0f, GetPosition().y * 10.0f);
 
 	if (fabs(GetLinearVelocity().LengthSquare()) > ZE_ZERO_TRESHOLD)
 	{
-		ZEVector3 Offset = GetLinearVelocity().Normalize() * Radius + Position * 10.0f;
-		VisualLinearVelocity->setLine(Offset.x, Offset.y, Offset.x + LinearVelocity.x * 10.0f, Offset.y + LinearVelocity.y * 10.0f);
+		ZEVector3 Offset = GetLinearVelocity().Normalize() * GetRadius() + GetPosition() * 10.0f;
+		VisualLinearVelocity->setLine(Offset.x, Offset.y, Offset.x + GetLinearVelocity().x * 10.0f, Offset.y + GetLinearVelocity().y * 10.0f);
 	}
 
-	if (fabs(LinearAcceleration.LengthSquare()) > ZE_ZERO_TRESHOLD)
+	if (fabs(GetLinearAcceleration().LengthSquare()) > ZE_ZERO_TRESHOLD)
 	{
-		ZEVector3 Offset = GetLinearAcceleration().Normalize() * Radius + Position * 10.0f;
-		VisualLinearAcceleration->setLine(Offset.x, Offset.y, Offset.x + LinearAcceleration.x * 10.0f, Offset.y + LinearAcceleration.y * 10.0f);
+		ZEVector3 Offset = GetLinearAcceleration().Normalize() * GetRadius() + GetPosition() * 10.0f;
+		VisualLinearAcceleration->setLine(Offset.x, Offset.y, Offset.x + GetLinearAcceleration().x * 10.0f, Offset.y + GetLinearAcceleration().y * 10.0f);
 	}
 
-	VisualActor->setRect(-Radius, -Radius, 2.0f * Radius, 2.0f * Radius);
+	VisualActor->setRect(-GetRadius(), -GetRadius(), 2.0f * GetRadius(), 2.0f * GetRadius());
 	
 	QGraphicsLineItem* Item;
 	Item = (QGraphicsLineItem*)VisualActor->childItems().at(0);
-	Item->setLine(0.0f, 0.0f, Radius * sinf(ZE_PI_8), Radius * cosf(ZE_PI_8));
+	Item->setLine(0.0f, 0.0f, GetRadius() * sinf(ZE_PI_8), GetRadius() * cosf(ZE_PI_8));
 	Item = (QGraphicsLineItem*)VisualActor->childItems().at(1);
-	Item->setLine(0.0f, 0.0f, Radius * sinf(-ZE_PI_8), Radius * cosf(-ZE_PI_8));
+	Item->setLine(0.0f, 0.0f, GetRadius() * sinf(-ZE_PI_8), GetRadius() * cosf(-ZE_PI_8));
 	Item = (QGraphicsLineItem*)VisualActor->childItems().at(2);
-	Item->setLine(0.0f, Radius, ZE_PI * Radius * AngularVelocity, Radius);
+	Item->setLine(0.0f, Radius, ZE_PI * GetRadius() * GetAngularVelocity(), GetRadius());
 	Item = (QGraphicsLineItem*)VisualActor->childItems().at(3);
-	Item->setLine(0.0f, Radius, ZE_PI * Radius * AngularAcceleration, Radius);
+	Item->setLine(0.0f, Radius, ZE_PI * GetRadius() * GetAngularAcceleration(), GetRadius());
 
 	QGraphicsTextItem* TextItem = (QGraphicsTextItem*)VisualActor->childItems().at(4);
 	TextItem->setPlainText(GetName().GetValue());
@@ -87,228 +87,16 @@ void ZEAIActor::UpdateVisual()
 	TextItem->setTransform(QTransform::fromScale(1.0f, -1.0f));
 }
 
-void ZEAIActor::SetName(const ZEString& Name)
-{
-	this->Name = Name;
-}
-
-const ZEString&  ZEAIActor::GetName()
-{
-	return Name;
-}
-
-void ZEAIActor::SetPosition(const ZEVector3& Position)
-{
-	this->Position = Position;
-}
-
-const ZEVector3& ZEAIActor::GetPosition()
-{
-	return Position;
-}
-
-void ZEAIActor::SetRotation(float Rotation)
-{
-	this->Rotation = ZEAngle::Range(Rotation);
-}
-
-float ZEAIActor::GetRotation()
-{
-	return Rotation;
-}
-
-void ZEAIActor::SetLinearVelocity(const ZEVector3& Velocity)
-{
-	LinearVelocity = Velocity;
-}
-
-const ZEVector3& ZEAIActor::GetLinearVelocity()
-{
-	return LinearVelocity;
-}
-
-void ZEAIActor::SetAngularVelocity(float Velocity)
-{
-	AngularVelocity = Velocity;
-}
-
-float ZEAIActor::GetAngularVelocity()
-{
-	return AngularVelocity;
-}
-
-const ZEVector3& ZEAIActor::GetLinearAcceleration()
-{
-	return LinearAcceleration;
-}
-
-float ZEAIActor::GetAngularAcceleration()
-{
-	return AngularAcceleration;
-}
-
-void ZEAIActor::SetMaxAngularVelocity(float Velocity)
-{
-	MaxAngularVelocity = Velocity;
-}
-
-float ZEAIActor::GetMaxAngularVelocity()
-{
-	return MaxLinearVelocity;
-}
-
-void ZEAIActor::SetMaxAngularAcceleration(float Acceleration)
-{
-	MaxAngularAcceleration = Acceleration;
-}
-
-float ZEAIActor::GetMaxAngularAcceleration()
-{
-	return MaxAngularAcceleration;
-}
-
-void ZEAIActor::SetMaxLinearVelocity(float Velocity)
-{
-	MaxLinearVelocity = Velocity;
-}
-
-float ZEAIActor::GetMaxLinearSpeed()
-{
-	return MaxLinearVelocity;
-}
-
-void ZEAIActor::SetMaxLinearAcceleration(float Acceleration)
-{
-	MaxLinearAcceleration = Acceleration;
-}
-
-float ZEAIActor::GetMaxLinearAcceleration()
-{
-	return MaxLinearAcceleration;
-}
-
-void ZEAIActor::SetRadius(float Radius)
-{
-	this->Radius = Radius;
-}
-
-float ZEAIActor::GetRadius()
-{
-	return Radius;
-}
-
-const ZEArray<ZEAISteering*>& ZEAIActor::GetSteerings()
-{
-	return Steerings;
-}
-
-void ZEAIActor::AddSteering(ZEAISteering* Steering)
-{
-	Steering->SetOwner(this);
-	Steerings.Add(Steering);
-}
-
-void ZEAIActor::RemoveSteering(ZEAISteering* Steering)
-{
-	Steerings.DeleteValue(Steering);
-}
-
 void ZEAIActor::Tick(float ElapsedTime)
 {
-	bool PriorityLinearSteeringDone = false;
-	bool PriorityAngularSteeringDone = false;
-
-	for (size_t Priority = 1; Priority <= 5; Priority++)
-	{
-		ZEVector3 PriorityLinearAcceleration = ZEVector3::Zero;
-		float PriorityAngularAcceleration = 0.0f;
-
-		for (size_t I = 0; I < Steerings.GetCount(); I++)
-		{
-			if (Steerings[I]->GetPriority() == Priority && Steerings[I]->GetEnabled() && Steerings[I]->GetWeight() != 0.0f)
-			{
-				ZEAISteeringOutput Output = Steerings[I]->Process(ElapsedTime);
-
-				LinearAcceleration += Steerings[I]->GetWeight() * Output.LinearAcceleration;
-				AngularAcceleration += Steerings[I]->GetWeight() * Output.AngularAcceleration;
-			}
-		}
-
-		if (!PriorityLinearSteeringDone && PriorityLinearAcceleration.LengthSquare() > GetMaxLinearAcceleration() * GetMaxLinearAcceleration() * 0.1f)
-		{
-			LinearAcceleration = PriorityLinearAcceleration;
-			PriorityLinearSteeringDone = true;
-		}
-
-		if (!PriorityAngularSteeringDone && PriorityAngularAcceleration > GetMaxAngularAcceleration() * 0.1f)
-		{
-			AngularAcceleration = PriorityAngularAcceleration;
-			PriorityAngularSteeringDone = true;
-		}
-
-		if (PriorityLinearSteeringDone && PriorityAngularSteeringDone)
-			break;
-	}	
-
-	if (LinearAcceleration.LengthSquare() > GetMaxLinearAcceleration() * GetMaxLinearAcceleration())
-	{
-		LinearAcceleration.NormalizeSelf();
-		LinearAcceleration *= GetMaxLinearAcceleration();
-	}
-
-	if (AngularAcceleration > GetMaxAngularAcceleration())
-		AngularAcceleration = ZEMath::Sign(AngularAcceleration) * GetMaxAngularAcceleration();
-
-	ZEVector3 LinearVelocity = GetLinearVelocity();
-	float AngularVelocity = GetAngularVelocity();
-
-	LinearVelocity += LinearAcceleration * ElapsedTime;
-	AngularVelocity += AngularAcceleration * ElapsedTime;
-
-	if (LinearVelocity.LengthSquare() > MaxLinearVelocity * MaxLinearVelocity)
-	{
-		LinearVelocity.NormalizeSelf();
-		LinearVelocity *= MaxLinearVelocity;
-	}
-	
-	if (AngularVelocity > MaxAngularVelocity)
-		AngularVelocity = MaxAngularVelocity;
-	else if (AngularVelocity < -MaxAngularVelocity)
-		AngularVelocity = -MaxAngularVelocity;
-
-
-	ZEVector3 Position = GetPosition();
-	float Rotation = GetRotation();
-
-	Position += LinearVelocity * ElapsedTime;
-	Rotation += AngularVelocity * ElapsedTime;
-
-	Rotation = ZEAngle::Range(Rotation);
-
-	SetPosition(Position);
-	SetRotation(Rotation);
-	SetLinearVelocity(LinearVelocity);
-	SetAngularVelocity(AngularVelocity);
+	ZEActor::Tick(ElapsedTime);
 
 	UpdateVisual();
 }
 
 ZEAIActor::ZEAIActor(::ZEAIMainWindow* Window)
 {
-	static int Index = 0;
 	this->Window = Window;
-	Position = ZEVector3::Zero;
-	Rotation = 0.0f;
-	MaxAngularVelocity = ZE_PI_2;
-	MaxLinearVelocity = 1.0f;
-	LinearVelocity = ZEVector3::Zero;
-	AngularVelocity = 0.0f;
-	LinearAcceleration = ZEVector3::Zero;
-	AngularAcceleration = 0.0f;
-
-	MaxAngularAcceleration = 1.0f;
-	MaxLinearAcceleration = 1.0f;
-	Radius = 1.0f;
 
 	VisualLinearAcceleration = new QGraphicsLineItem(0.0, 0.0, 0.0f, 0.0);
 	VisualLinearAcceleration->setPen(QPen(QBrush(Qt::red), 1.5f));
@@ -346,7 +134,7 @@ ZEAIActor::ZEAIActor(::ZEAIMainWindow* Window)
 	Window->Form->World->scene()->addItem(VisualActor);
 
 	Index++;
-	Name = ZEString::Format("Actor%2d", Index);
+	SetName(ZEString::Format("Actor%2d", Index));
 	UpdateVisual();
 }
 

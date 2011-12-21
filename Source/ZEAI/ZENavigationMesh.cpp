@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAINavMesh.cpp
+ Zinek Engine - ZENavigationMesh.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEAINavMesh.h"
+#include "ZENavigationMesh.h"
 
 ZEPolygon ZENavigationMesh::ToPolygon(size_t Index)
 {
