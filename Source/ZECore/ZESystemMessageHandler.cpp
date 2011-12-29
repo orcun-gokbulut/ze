@@ -38,6 +38,6 @@
 ZESystemMessageHandler::ZESystemMessageHandler()
 {
 	TargetWindow = NULL;
-	MinMessage = 0xFFFFFFFF;
+	MaxMessage = 0xFFFFFFFF;
 	MinMessage = 0;
 }
