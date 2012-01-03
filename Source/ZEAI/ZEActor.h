@@ -37,6 +37,7 @@
 #ifndef __ZE_ACTOR_H__
 #define __ZE_ACTOR_H__
 
+#include "ZEGame\ZECompoundEntity.h"
 #include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEFlags.h"
 #include "ZEMath\ZEVector.h"
@@ -44,19 +45,19 @@
 
 class ZESteering;
 
-class ZEActor
+class ZEActor : public ZECompoundEntity
 {
 	private:
-		ZEString				Name;
-
-		ZEVector3				Position;
-		float					Rotation;
+		float					Rotation2D;
 
 		ZEVector3				LinearVelocity;
 		float					AngularVelocity;
 
 		ZEVector3				LinearAcceleration;
 		float					AngularAcceleration;
+
+		float					MinLinearAcceleration;
+		float					MinAngularAcceleration;
 
 		float					MaxAngularAcceleration;
 		float					MaxLinearAcceleration;
@@ -69,15 +70,8 @@ class ZEActor
 		ZEArray<ZESteering*>	Steerings;
 
 	public:
-
-		void					SetName(const ZEString& Name);
-		const ZEString&			GetName();
-
-		void					SetPosition(const ZEVector3& Position);
-		const ZEVector3&		GetPosition();
-
-		void					SetRotation(float Rotation);
-		float					GetRotation();
+		void					SetRotation2D(float Rotation);
+		float					GetRotation2D();
 
 		void					SetFaceRotation(float Rotation);
 		float					GetFaceRotation();
@@ -97,11 +91,14 @@ class ZEActor
 		void					SetMaxLinearVelocity(float Velocity);
 		float					GetMaxLinearSpeed();
 
+		void					SetMinLinearAcceleration(float Acceleration);
+		float					GetMinLinearAcceleration();
+
 		void					SetMaxLinearAcceleration(float Acceleration);
 		float					GetMaxLinearAcceleration();
 
-		void					SetMaxAngularAngular(float Acceleration);
-		float					SetMaxAngularAngular();
+		void					SetMinAngularAcceleration(float Acceleration);
+		float					GetMinAngularAcceleration();
 
 		void					SetMaxAngularAcceleration(float Acceleration);
 		float					GetMaxAngularAcceleration();

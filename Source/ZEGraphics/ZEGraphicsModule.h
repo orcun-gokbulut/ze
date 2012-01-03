@@ -47,6 +47,7 @@ class ZETextureCube;
 class ZETexture3D;
 class ZEMaterial;
 class ZEFixedMaterial;
+class ZETerrainMaterial;
 class ZEStaticVertexBuffer;
 class ZEVertexDeclaration;
 class ZERenderOrder;
@@ -144,6 +145,7 @@ class ZEGraphicsModule : public ZEModule
 
 		virtual ZEUIMaterial*				CreateUIMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateFixedMaterial() = 0;
+		virtual ZETerrainMaterial*			CreateTerrainMaterial() = 0;
 		virtual ZESimpleMaterial*			CreateSimpleMaterial() = 0;
 		virtual ZESkyBoxMaterial*			CreateSkyBoxMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCustomMaterial() = 0;

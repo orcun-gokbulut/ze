@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERenderOrder.h
+ Zinek Engine - ZETerrain.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,79 +34,86 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_RENDERLIST_H__
-#define __ZE_RENDERLIST_H__
+#ifndef __ZE_TERRAIN_H__
+#define __ZE_TERRAIN_H__
 
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEAABBox.h"
+#include "ZETypes.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZETerrainVertexBuffer.h"
 
-enum ZERenderPipeline
-{
-	ZE_RORP_3D = 0,
-	ZE_RORP_2D = 1
-};
-
-// ZERenderOrderFlags
-typedef ZEDWORD ZERenderOrderFlags;
-#define	ZE_ROF_NONE									0
-#define	ZE_ROF_TRANSPARENT							1
-#define	ZE_ROF_IMPOSTER								2
-#define	ZE_ROF_ENABLE_Z_CULLING						4
-#define	ZE_ROF_ENABLE_NO_Z_WRITE					8
-#define	ZE_ROF_ENABLE_WORLD_TRANSFORM				16
-#define ZE_ROF_ENABLE_VIEW_TRANSFORM				32
-#define ZE_ROF_ENABLE_PROJECTION_TRANSFORM			64
-#define	ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM		(ZE_ROF_ENABLE_VIEW_TRANSFORM | ZE_ROF_ENABLE_PROJECTION_TRANSFORM) 
-#define ZE_ROF_INSTANCED							128
-#define ZE_ROF_SKINNED								256
-#define ZE_ROF_INDEXED								512
-
-
-enum ZEROPrimitiveType
-{
-	ZE_ROPT_POINT,
-	ZE_ROPT_LINE,
-	ZE_ROPT_TRIANGLE,
-	ZE_ROPT_TRIANGLE_STRIPT,
-	ZE_ROPT_INDEXED_TRIANGLE,
-};
-
-class ZELight;
+class ZETexture2D;
+class ZEStaticVertexBuffer;
 class ZEMaterial;
+class ZETerrainMaterial;
+class ZERenderer;
 class ZEVertexDeclaration;
-class ZEVertexBuffer;
 
-class ZERenderOrder
+ZE_META_ENTITY_DESCRIPTION(ZETerrain)
+class ZETerrain : public ZEEntity
 {
-	public:
-		ZERenderPipeline				Pipeline;
-		int								Priority;
-		float							Order;
-		ZERenderOrderFlags				Flags;
-		ZEROPrimitiveType				PrimitiveType;
-		ZEVertexDeclaration*			VertexDeclaration;
-		size_t							VertexBufferOffset;
-		size_t							PrimitiveCount;
+	ZE_META_ENTITY(ZETerrain)
+	friend class ZEPortalMapDoor;
+	private:
+		ZETerrainMaterial*						Material;
+		ZEStaticVertexBuffer*					VertexBuffer;
+		ZEVertexDeclaration*					VertexDeclaration;
+		ZETerrainPrimitiveIndices				Indices;
+		
+		float									UnitLength;
+		ZEUInt									ChunkSize;
+		ZEUInt									MaxLevel;
 
-		//const ZECamera*				Camera;
-		const ZEMaterial*				Material;
+		float									HeightOffset;
+		float									HeightScale;
+		
+		ZEString								TerrainFileName;
+		ZETexture2D*							HeightTexture;
+		ZETexture2D*							ColorTexture;
 
-		void*							IndexBuffer;
-		ZEVertexBuffer*					VertexBuffer;
+		bool									LoadTerrain();
+		bool									DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVector3& WorldPosition, const ZEVector3& LocalPosition, float Scale, bool Rotate = false);
 
-		ZEMatrix4x4						WorldMatrix;
+												ZETerrain();
+												~ZETerrain();
 
-		ZEArray<ZERenderOrder*>			Instances;
-		ZEArray<ZEMatrix4x4>			BoneTransforms;
+	public:	
+		virtual ZEDrawFlags						GetDrawFlags() const;
+		virtual ZERayCastFlags					GetRayCastFlags() const;
 
-		ZEArray<ZELight*>				Lights;		
+		void									SetUnitLength(float Length);
+		float									GetUnitLength();
 
-		void							SetZero();
+		void									SetChunkSize(ZEUInt Size);
+		ZEUInt									GetChunkSize();
+
+		void									SetMaxLevel(ZEUInt MaxLevel);
+		ZEUInt									GetMaxLevel();
+
+		void									SetHeightOffset(float Offset);
+		float									GetHeightOffset();
+
+		void									SetHeightScale(float Scale);
+		float									GetHeightScale();
+
+		virtual bool							Initialize();
+		virtual void							Deinitialize();
+	
+		virtual void							Draw(ZEDrawParameters* DrawParameters);
+	
+		virtual void							SetTerrainFile(const ZEString& FileName);
+		virtual const ZEString&					GetTerrainFile();
+
+		static ZETerrain*						CreateInstance();
+
 };
+
+/*
+ZE_POST_PROCESSOR_START(Meta)
+<zinek>
+	<meta>
+		<class name="ZETerrain"	parent="ZEEntity"	description="Terrain" />
+	</meta>
+</zinek>
+ZE_POST_PROCESSOR_END()
+*/
 #endif
-
-
-
-

@@ -41,34 +41,15 @@
 #include "ZEMath/ZEMathDefinitions.h"
 #include "ZEMath/ZEAngle.h"
 
-void ZEActor::SetName(const ZEString& Name)
+void ZEActor::SetRotation2D(float Rotation)
 {
-	this->Name = Name;
+	this->Rotation2D = ZEAngle::Range(Rotation);
+	SetRotation(ZEQuaternion(Rotation2D,ZEVector3::UnitY));
 }
 
-const ZEString&  ZEActor::GetName()
+float ZEActor::GetRotation2D()
 {
-	return Name;
-}
-
-void ZEActor::SetPosition(const ZEVector3& Position)
-{
-	this->Position = Position;
-}
-
-const ZEVector3& ZEActor::GetPosition()
-{
-	return Position;
-}
-
-void ZEActor::SetRotation(float Rotation)
-{
-	this->Rotation = ZEAngle::Range(Rotation);
-}
-
-float ZEActor::GetRotation()
-{
-	return Rotation;
+	return Rotation2D;
 }
 
 void ZEActor::SetLinearVelocity(const ZEVector3& Velocity)
@@ -111,6 +92,16 @@ float ZEActor::GetMaxAngularVelocity()
 	return MaxLinearVelocity;
 }
 
+void ZEActor::SetMinAngularAcceleration(float Acceleration)
+{
+MinAngularAcceleration = Acceleration;
+}
+
+float ZEActor::GetMinAngularAcceleration()
+{
+	return MinAngularAcceleration;
+}
+
 void ZEActor::SetMaxAngularAcceleration(float Acceleration)
 {
 	MaxAngularAcceleration = Acceleration;
@@ -129,6 +120,16 @@ void ZEActor::SetMaxLinearVelocity(float Velocity)
 float ZEActor::GetMaxLinearSpeed()
 {
 	return MaxLinearVelocity;
+}
+
+void ZEActor::SetMinLinearAcceleration(float Acceleration)
+{
+	MinLinearAcceleration = Acceleration;
+}
+
+float ZEActor::GetMinLinearAcceleration()
+{
+	return MinLinearAcceleration;
 }
 
 void ZEActor::SetMaxLinearAcceleration(float Acceleration)
@@ -187,6 +188,11 @@ void ZEActor::Tick(float ElapsedTime)
 				AngularAcceleration += Steerings[I]->GetWeight() * Output.AngularAcceleration;
 			}
 		}
+		if (LinearAcceleration.LengthSquare() < MinLinearAcceleration * MinLinearAcceleration)
+			LinearAcceleration = ZEVector3::Zero;
+
+		if (fabs(AngularAcceleration) < MinAngularAcceleration)
+			AngularAcceleration = 0.0f;
 
 		if (!PriorityLinearSteeringDone && PriorityLinearAcceleration.LengthSquare() > GetMaxLinearAcceleration() * GetMaxLinearAcceleration() * 0.1f)
 		{
@@ -232,7 +238,7 @@ void ZEActor::Tick(float ElapsedTime)
 
 
 	ZEVector3 Position = GetPosition();
-	float Rotation = GetRotation();
+	float Rotation = GetRotation2D();
 
 	Position += LinearVelocity * ElapsedTime;
 	Rotation += AngularVelocity * ElapsedTime;
@@ -240,7 +246,7 @@ void ZEActor::Tick(float ElapsedTime)
 	Rotation = ZEAngle::Range(Rotation);
 
 	SetPosition(Position);
-	SetRotation(Rotation);
+	SetRotation2D(Rotation);
 	SetLinearVelocity(LinearVelocity);
 	SetAngularVelocity(AngularVelocity);
 }
@@ -248,8 +254,9 @@ void ZEActor::Tick(float ElapsedTime)
 ZEActor::ZEActor()
 {
 	static int Index = 0;
-	Position = ZEVector3::Zero;
-	Rotation = 0.0f;
+	Rotation2D = 0.0f;
+	MinLinearAcceleration = 0.01;
+	MinAngularAcceleration = 0.01;
 	MaxAngularVelocity = ZE_PI_2;
 	MaxLinearVelocity = 1.0f;
 	LinearVelocity = ZEVector3::Zero;
@@ -257,6 +264,8 @@ ZEActor::ZEActor()
 	LinearAcceleration = ZEVector3::Zero;
 	AngularAcceleration = 0.0f;
 
+	MinAngularAcceleration = 0.0f;
+	MinLinearAcceleration = 0.0f;
 	MaxAngularAcceleration = 1.0f;
 	MaxLinearAcceleration = 1.0f;
 	Radius = 1.0f;
