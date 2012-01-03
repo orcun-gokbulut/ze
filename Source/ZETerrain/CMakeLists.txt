@@ -33,56 +33,16 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-project(ZinekEngine)
+ze_add_source(ZETerrain.cpp					Sources)
+ze_add_source(ZETerrain.h					Sources Headers ZEPP)
+ze_add_source(ZETerrainVertexBuffer.cpp		Sources)
+ze_add_source(ZETerrainVertexBuffer.h		Sources)
 
-ze_set_project_folder("ZEEngineAPI")
-
-set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
-
-append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
-	ZE_ZINEK_ENGINE)
-
-add_subdirectory(ZEAI)
-add_subdirectory(ZECore)
-add_subdirectory(ZEDebug)
-add_subdirectory(ZEGame)
-add_subdirectory(ZEGraphics)
-add_subdirectory(ZEInput)
-add_subdirectory(ZEMap)
-add_subdirectory(ZEMeta)
-add_subdirectory(ZEModel)
-add_subdirectory(ZENetwork)
-add_subdirectory(ZEParticle)
-add_subdirectory(ZEPhysics)
-add_subdirectory(ZEScript)
-add_subdirectory(ZESound)
-add_subdirectory(ZEUI)
-add_subdirectory(ZETerrain)
-
-ze_add_source(ZEAPI.h 						Sources Headers)
-ze_add_source(ZECompileOptions.h 			Sources Headers)
-ze_add_source(ZEDefinitions.h 				Sources Headers)
-ze_add_source(ZESDK.h 						Sources Headers)
-ze_add_source(ZESDK.cpp 					Sources)
-ze_add_source(ZECore/ZEWindowResources.rc	Sources)
-
-ze_add_library(ZEEngineAPI 
+ze_add_library(ZETerrain 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundationAPI
-		ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEMap ZEPortalMap ZEModel ZEParticle
-		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEAI ZETerrain
 	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI"
+	INSTALL_DESTINATION "ZEEngineAPI/ZETerrain"
 	INSTALL_COMPONENT ZESDK)
-	
-ze_add_executable(ZE 
-	SOURCES ${Sources} ZEMain.cpp 
-	LIBS ZEEngineAPI
-	WIN32
-	INSTALL
-	INSTALL_DESTINATION Bin
-	INSTALL_COMPONENT Runtime)
-

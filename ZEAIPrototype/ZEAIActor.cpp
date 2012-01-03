@@ -54,7 +54,7 @@ void ZEAIActor::UpdateVisual()
 {
 	float Radius = 10 * this->GetRadius();
 	
-	VisualActor->setTransform(QTransform().rotateRadians(-GetRotation()));
+	VisualActor->setTransform(QTransform().rotateRadians(-GetRotation2D()));
 	VisualActor->setPos(GetPosition().x * 10.0f, GetPosition().y * 10.0f);
 
 	if (fabs(GetLinearVelocity().LengthSquare()) > ZE_ZERO_TRESHOLD)
@@ -82,7 +82,7 @@ void ZEAIActor::UpdateVisual()
 	Item->setLine(0.0f, Radius, ZE_PI * GetRadius() * GetAngularAcceleration(), GetRadius());
 
 	QGraphicsTextItem* TextItem = (QGraphicsTextItem*)VisualActor->childItems().at(4);
-	TextItem->setPlainText(GetName().GetValue());
+	TextItem->setPlainText(GetName());
 	TextItem->setPos(0, -Radius);
 	TextItem->setTransform(QTransform::fromScale(1.0f, -1.0f));
 }

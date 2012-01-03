@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZED3D9TerrainMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,59 +30,45 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
+#ifndef __ZE_D3D9_TERRAIN_MATERIAL_H__
+#define __ZE_D3D9_TERRAIN_MATERIAL_H__
 
-project(ZinekEngine)
+#include <d3d9.h>
+#include "ZED3D9ComponentBase.h"
+#include "ZEGraphics/ZETerrainMaterial.h"
 
-ze_set_project_folder("ZEEngineAPI")
+class ZED3D9VertexShader;
+class ZED3D9PixelShader;
 
-set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
+class ZED3D9TerrainMaterial : public ZETerrainMaterial, private ZED3D9ComponentBase
+{
+	friend class ZED3D9Module;
+	private:
+		ZED3D9VertexShader*				GBufferPassVertexShader;
+		ZED3D9PixelShader*				GBufferPassPixelShader;
+		ZED3D9VertexShader*				ForwardPassVertexShader;
+		ZED3D9PixelShader*				ForwardPassPixelShader;
+		ZED3D9VertexShader*				ShadowPassVertexShader;
+		ZED3D9PixelShader*				ShadowPassPixelShader;
 
-append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
-	ZE_ZINEK_ENGINE)
+		void							CreateShaders();
+		void							ReleaseShaders();
 
-add_subdirectory(ZEAI)
-add_subdirectory(ZECore)
-add_subdirectory(ZEDebug)
-add_subdirectory(ZEGame)
-add_subdirectory(ZEGraphics)
-add_subdirectory(ZEInput)
-add_subdirectory(ZEMap)
-add_subdirectory(ZEMeta)
-add_subdirectory(ZEModel)
-add_subdirectory(ZENetwork)
-add_subdirectory(ZEParticle)
-add_subdirectory(ZEPhysics)
-add_subdirectory(ZEScript)
-add_subdirectory(ZESound)
-add_subdirectory(ZEUI)
-add_subdirectory(ZETerrain)
+	protected:
+										ZED3D9TerrainMaterial();
+		virtual							~ZED3D9TerrainMaterial();
 
-ze_add_source(ZEAPI.h 						Sources Headers)
-ze_add_source(ZECompileOptions.h 			Sources Headers)
-ze_add_source(ZEDefinitions.h 				Sources Headers)
-ze_add_source(ZESDK.h 						Sources Headers)
-ze_add_source(ZESDK.cpp 					Sources)
-ze_add_source(ZECore/ZEWindowResources.rc	Sources)
+	public:
+		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupShadowPass() const;	
 
-ze_add_library(ZEEngineAPI 
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundationAPI
-		ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEMap ZEPortalMap ZEModel ZEParticle
-		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEAI ZETerrain
-	INSTALL
-	INSTALL_DESTINATION "ZEEngineAPI"
-	INSTALL_COMPONENT ZESDK)
-	
-ze_add_executable(ZE 
-	SOURCES ${Sources} ZEMain.cpp 
-	LIBS ZEEngineAPI
-	WIN32
-	INSTALL
-	INSTALL_DESTINATION Bin
-	INSTALL_COMPONENT Runtime)
+		virtual void					UpdateMaterial();
 
+		virtual void					Release();
+};
+#endif

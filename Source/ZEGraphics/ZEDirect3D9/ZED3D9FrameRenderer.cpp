@@ -132,7 +132,7 @@ bool ZED3D9FrameRenderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
 		if (RenderOrder->PrimitiveType != ZE_ROPT_POINT &&
 			RenderOrder->PrimitiveType != ZE_ROPT_LINE &&
 			RenderOrder->PrimitiveType != ZE_ROPT_TRIANGLE &&
-			RenderOrder->PrimitiveType != ZE_ROPT_TRIANGLESTRIPT)
+			RenderOrder->PrimitiveType != ZE_ROPT_TRIANGLE_STRIPT)
 		{
 			zeError("Direct3D9 Renderer", "RenderOrder's primitive type is not valid.");
 			return false;

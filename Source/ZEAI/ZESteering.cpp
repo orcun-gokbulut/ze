@@ -205,7 +205,7 @@ ZESteeringOutput ZEAlignSteering::Align(float Target_Rotation)
 	ZESteeringOutput Output;
 	Output.SetZero();
 
-	float Rotation = ZEAngle::Range(Target_Rotation - GetOwner()->GetRotation());
+	float Rotation = ZEAngle::Range(Target_Rotation - GetOwner()->GetRotation2D());
 	float RotationSize = abs(Rotation);
 	
 	if (RotationSize == 0)
@@ -232,7 +232,7 @@ ZESteeringOutput ZEAlignSteering::Align(float Target_Rotation)
 
 ZESteeringOutput ZEAlignSteering::Process(float ElapsedTime)
 {
-	return Align(GetTarget()->GetRotation());
+	return Align(GetTarget()->GetRotation2D());
 }
 
 ZEAlignSteering::ZEAlignSteering()

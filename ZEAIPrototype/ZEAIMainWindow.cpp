@@ -120,7 +120,7 @@ void ZEAIMainWindow::UpdateActorProperties(bool Partial)
 	if (!Partial)
 	{
 		if (Scene->selectedItems().count() == 1)
-			Form->txtActorName->setText(Item->Actor->GetName().GetValue());
+			Form->txtActorName->setText(Item->Actor->GetName());
 		else
 			Form->txtActorName->setText("");
 
@@ -140,13 +140,13 @@ void ZEAIMainWindow::UpdateActorProperties(bool Partial)
 		Form->txtActorPosition->setText(
 			QString().sprintf("<%.2f, %.2f, %.2f>", 
 			Item->Actor->GetPosition().x, Item->Actor->GetPosition().y, Item->Actor->GetPosition().z));
-		Form->txtActorRotation->setText(QString().setNum(Item->Actor->GetRotation()));
+		Form->txtActorRotation->setText(QString().setNum(Item->Actor->GetRotation2D()));
 
 		Form->txtActorLinearAcceleration->setText(
 			QString().sprintf("<%.2f, %.2f, %.2f>", 
 			Item->Actor->GetLinearAcceleration().x, Item->Actor->GetLinearAcceleration().y, Item->Actor->GetLinearAcceleration().z));
 
-		Form->txtActorRotation->setText(QString().setNum(ZEAngle::ToDegree(Item->Actor->GetRotation())));
+		Form->txtActorRotation->setText(QString().setNum(ZEAngle::ToDegree(Item->Actor->GetRotation2D())));
 		Form->txtActorAngularVelocity->setText(QString().setNum(ZEAngle::ToDegree(Item->Actor->GetAngularVelocity())));
 		Form->txtActorAngularAcceleration->setText(QString().setNum(ZEAngle::ToDegree(Item->Actor->GetAngularAcceleration())));
 
@@ -225,7 +225,7 @@ void ZEAIMainWindow::btnAddActor_Clicked()
 {
 	ZEAIActor* New = new ZEAIActor(this);
 	Actors.Add(New);
-	Form->lstActors->addItem(new QListWidgetItem(New->GetName().ToCString()));
+	Form->lstActors->addItem(new QListWidgetItem(New->GetName()));
 	Form->btnDeleteActor->setEnabled(true);
 
 	New->AddSteering(new ZESeperateSteering());
