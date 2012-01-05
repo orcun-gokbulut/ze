@@ -90,7 +90,7 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 
 		ZEFileType				FileType;
 
-		unsigned int			ReferanceCount;
+		unsigned int			ReferenceCount;
 
 	public:
 		virtual bool			Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary);
@@ -120,9 +120,9 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 		virtual ZEQWORD			GetStartPosition();
 		virtual ZEQWORD			GetEndPosition();
 
-		unsigned int			GetReferanceCount() const;
-		virtual unsigned int	IncreaseReferanceCount();
-		virtual unsigned int	DecreaseReferanceCount();
+		unsigned int			GetReferenceCount() const;
+		virtual unsigned int	IncreaseReferenceCount();
+		virtual unsigned int	DecreaseReferenceCount();
 
 		static ZEString			GetFileName(const ZEString& FilePath);
 		static ZEString			GetAbsolutePath(const ZEString& FilePath);

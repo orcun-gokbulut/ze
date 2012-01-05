@@ -229,9 +229,9 @@ bool ZEPartialFile::Open(ZEFile* ParentFile, ZEQWORD Offset, ZEQWORD Size)
 	this->ParentFile		= ParentFile;
 	this->IsEof				= false;
 	this->FileCursor		= StartPosition;
-	this->ReferanceCount	= 0;
+	this->ReferenceCount	= 0;
 
-	ParentFile->IncreaseReferanceCount();
+	ParentFile->IncreaseReferenceCount();
 	
 	_fseeki64((FILE*)this->File, StartPosition, SEEK_SET);
 	return true;
@@ -240,11 +240,11 @@ bool ZEPartialFile::Open(ZEFile* ParentFile, ZEQWORD Offset, ZEQWORD Size)
 void ZEPartialFile::Close()
 {
 	// Parent File will close itself if and only if its reference count is zero
-	ParentFile->DecreaseReferanceCount();
+	ParentFile->DecreaseReferenceCount();
 	ParentFile->Close();
 		
 	// Close the partial file
-	ReferanceCount	= 0;
+	ReferenceCount	= 0;
 	StartPosition	= 0;
 	EndPosition		= 0;
 	File			= NULL;
@@ -429,16 +429,16 @@ bool ZEPartialFile::Eof()
 	return IsEof;
 }
 
-unsigned int ZEPartialFile::IncreaseReferanceCount()
+unsigned int ZEPartialFile::IncreaseReferenceCount()
 {
-	ParentFile->IncreaseReferanceCount();
-	return ++ReferanceCount;
+	ParentFile->IncreaseReferenceCount();
+	return ++ReferenceCount;
 }
 
-unsigned int ZEPartialFile::DecreaseReferanceCount()
+unsigned int ZEPartialFile::DecreaseReferenceCount()
 {
-	ParentFile->DecreaseReferanceCount();
-	return --ReferanceCount;
+	ParentFile->DecreaseReferenceCount();
+	return --ReferenceCount;
 }
 
 ZEPartialFile::ZEPartialFile()

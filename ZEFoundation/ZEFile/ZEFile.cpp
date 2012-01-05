@@ -141,7 +141,7 @@ bool ZEFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 			{
 				this->FilePath	= FilePath;
 				FileCursor		= 0;
-				ReferanceCount	= 0;
+				ReferenceCount	= 0;
 				FileType		= ZE_FT_FILE;
 				return true;
 			}
@@ -161,7 +161,7 @@ bool ZEFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 	{
 		this->FilePath	= FilePath;
 		FileCursor		= 0;
-		ReferanceCount	= 0;
+		ReferenceCount	= 0;
 		FileType		= ZE_FT_FILE;
 		return true;
 	}
@@ -208,14 +208,14 @@ ZEQWORD ZEFile::Tell()
 
 void ZEFile::Close()
 {
-	if(IsOpen() && ReferanceCount == 0)
+	if(IsOpen() && ReferenceCount == 0)
 	{
 		fclose((FILE*)File);
 		FilePath.Clear();
 
 		File			= NULL;
 		FileCursor		= 0;
-		ReferanceCount	= 0;
+		ReferenceCount	= 0;
 	}
 }
 
@@ -400,35 +400,35 @@ const ZEString ZEFile::GetFilePath() const
 	return FilePath;
 }
 
-unsigned int ZEFile::GetReferanceCount() const
+unsigned int ZEFile::GetReferenceCount() const
 {
-	return ReferanceCount;
+	return ReferenceCount;
 }
 
-unsigned int ZEFile::IncreaseReferanceCount()
+unsigned int ZEFile::IncreaseReferenceCount()
 {
-	return ++ReferanceCount;
+	return ++ReferenceCount;
 }
 
-unsigned int ZEFile::DecreaseReferanceCount()
+unsigned int ZEFile::DecreaseReferenceCount()
 {
-	return --ReferanceCount;
+	return --ReferenceCount;
 }
 
-ZEString ZEFile::GetFileName(const ZEString& Path)
+ZEString ZEFile::GetFileName(const ZEString& FilePath)
 {
-	size_t Length = Path.GetLength();
+	size_t Length = FilePath.GetLength();
 
 	if (Length == 0)
 		return "";
 
 	for (int I = Length - 1; I >= 0; I--)
 	{
-		if (Path[I] == '\\' || Path[I] == '/')
-			return Path.Right(Length - 1 - I);
+		if (FilePath[I] == '\\' || FilePath[I] == '/')
+			return FilePath.Right(Length - 1 - I);
 	}
 
-	return Path;
+	return FilePath;
 }
 
 ZEString ZEFile::GetAbsolutePath(const ZEString& FilePath)
@@ -645,8 +645,12 @@ ZEFile* ZEFile::Open(const ZEString& FilePath)
 
 ZEFile::ZEFile()
 {
-	File = NULL;
-	FileCursor = 0;
+	File			= NULL;
+	FileType		= ZE_FT_FILE;
+	
+	FilePath		= "";
+	FileCursor		= 0;
+	ReferenceCount	= 0;
 }
 
 ZEFile::~ZEFile()
