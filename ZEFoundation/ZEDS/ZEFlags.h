@@ -37,6 +37,7 @@
 #define __ZE_FLAGS_H__
 
 #include "ZETypes.h"
+#include "ZEError.h"
 
 template <typename Type = ZEUInt>
 class ZEFlagsBase
@@ -64,6 +65,8 @@ class ZEFlagsBase
 
 		inline bool GetBit(size_t Index) const
 		{
+			zeAssert(Index > 31, "ZEFlags::GetBit(size_t Index) index can't be greater than 31.");
+
 			return (Value & (0x1 << Index)) != 0;
 		}
 
@@ -77,7 +80,7 @@ class ZEFlagsBase
 
 		inline void RaiseFlags(int Flags)
 		{
-			Value |= Value;
+			Value |= Flags;
 		}
 
 		inline void UnraiseFlags(Type Flags)
@@ -108,8 +111,7 @@ class ZEFlagsBase
 
 		inline ZEFlagsBase<Type> operator&(const ZEFlagsBase<Type>& Other) const
 		{
-			ZEFlagsBase<Type>(this->Value & Other.Value);
-			return *this;
+			return ZEFlagsBase<Type>(this->Value & Other.Value);			
 		}
 
 		inline ZEFlagsBase<Type>& operator&=(const Type& Other)
