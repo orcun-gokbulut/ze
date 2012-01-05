@@ -190,7 +190,7 @@ ZELBuffer ZEDirectionalLight_PixelShader(ZEDirectionalLight_PSInput Input) : COL
 		float SubSurfaceScatteringFactor = ZEGBuffer_GetSubSurfaceScatteringFactor(ScreenPosition);
 		if (SubSurfaceScatteringFactor > 0.0f)
 		{
-			Output.rgb =  SubSurfaceScatteringFactor * -AngularAttenuation * LightIntensityParam * LightColorParam;
+			Output.rgb = SubSurfaceScatteringFactor * -AngularAttenuation * LightIntensityParam * LightColorParam;
 			Output.a = 0.0f;
 		}
 	}

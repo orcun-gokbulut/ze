@@ -69,6 +69,7 @@ class ZETerrain : public ZEEntity
 		ZEString								TerrainFileName;
 		ZETexture2D*							HeightTexture;
 		ZETexture2D*							ColorTexture;
+		ZETexture2D*							NormalTexture;
 
 		bool									LoadTerrain();
 		bool									DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVector3& WorldPosition, const ZEVector3& LocalPosition, float Scale, bool Rotate = false);

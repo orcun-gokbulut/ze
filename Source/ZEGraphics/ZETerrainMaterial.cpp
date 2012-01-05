@@ -50,26 +50,10 @@
 
 void ZETerrainMaterial::SetZero()
 {
-	memset(PixelShaderConstants, 0, sizeof(PixelShaderConstants));
+}
 
-	if (HeightTexture != NULL)
-	{
-		HeightTexture->Release();
-		HeightTexture = NULL;
-	}
-
-	if (ColorTexture != NULL)
-	{
-		ColorTexture->Release();
-		ColorTexture = NULL;
-	}
-
-	if (NormalTexture != NULL)
-	{
-		NormalTexture->Release();
-		NormalTexture = NULL;
-	}
-
+ZETerrainMaterial::ZETerrainMaterial()
+{
 	HeightTexture = NULL;
 	ColorTexture = NULL;
 	NormalTexture = NULL;
@@ -78,13 +62,14 @@ void ZETerrainMaterial::SetZero()
 	Wireframe = false;
 	HeightScale = 1.0f;
 	HeightOffset = 0.0f;
-}
 
-ZETerrainMaterial::ZETerrainMaterial()
-{
 	HeightTexture = NULL;
 	ColorTexture = NULL;
 	NormalTexture = NULL;
+	SetDiffuseColor(ZEVector3::One);
+	SetDiffuseFactor(1.0f);
+	SetAmbientColor(ZEVector3::One);
+	SetAmbientFactor(0.5f);
 }
 
 ZETerrainMaterial::~ZETerrainMaterial()
