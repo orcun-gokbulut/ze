@@ -94,7 +94,7 @@ float ZERay::MinimumDistance(const ZERay& Ray, const ZELine& Line, float& TRay, 
     float    sN, sD = D;
     float    tN, tD = D;
 
-	if (D < ZE_ZERO_TRESHOLD) 
+	if (D < ZE_ZERO_THRESHOLD) 
 	{
         sN = 0.0; 
         sD = 1.0;      
@@ -113,8 +113,8 @@ float ZERay::MinimumDistance(const ZERay& Ray, const ZELine& Line, float& TRay, 
         }
     }
 
-    TRay = (fabs(sN) < ZE_ZERO_TRESHOLD ? 0.0f : sN / sD);
-    TLine = (fabs(tN) < ZE_ZERO_TRESHOLD ? 0.0f : tN / tD);
+    TRay = (fabs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
+    TLine = (fabs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
 
 	return ZEVector3::Length(ZEVector3(Ray.GetPointOn(TRay), Line.GetPointOn(TLine)));
 }
@@ -147,7 +147,7 @@ float ZERay::MinimumDistance(const ZERay& RayA, const ZERay& RayB, float& TRayA,
     float    sN, sD = D;
     float    tN, tD = D;
 
-	if (D < ZE_ZERO_TRESHOLD) 
+	if (D < ZE_ZERO_THRESHOLD) 
 	{
         sN = 0.0; 
         sD = 1.0;      
@@ -180,8 +180,8 @@ float ZERay::MinimumDistance(const ZERay& RayA, const ZERay& RayB, float& TRayA,
         }
     }
 
-    TRayA = (fabs(sN) < ZE_ZERO_TRESHOLD ? 0.0f : sN / sD);
-    TRayB = (fabs(tN) < ZE_ZERO_TRESHOLD ? 0.0f : tN / tD);
+    TRayA = (fabs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
+    TRayB = (fabs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
 
 	ZEVector3 P1, P2;
 	ZEVector3::Scale(P1, RayA.v, TRayA);

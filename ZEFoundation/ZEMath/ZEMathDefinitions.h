@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDefinitions.h
+ Zinek Engine - ZEMathDefinitions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,7 +37,7 @@
 #ifndef __ZE_MATH_DEFINITIONS_H__
 #define __ZE_MATH_DEFINITIONS_H__
 
-#define ZE_ZERO_TRESHOLD		0.00000001 
+#define ZE_ZERO_THRESHOLD		0.00000001f 
 
 #define ZE_PIx2				6.28318530717958647692f
 #define ZE_E				2.71828182845904523536f

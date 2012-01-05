@@ -37,7 +37,7 @@
 #ifndef __ZE_MATH_H__
 #define __ZE_MATH_H__
 
-#define ZE_ZERO_TRESHOLD	0.00000001 
+#define ZE_ZERO_THRESHOLD	0.00000001 
 #define ZE_INT_MIN			-2147483647
 #define ZE_INT_MAX			2147483647
 #define ZE_UINT_MAX			4294967295

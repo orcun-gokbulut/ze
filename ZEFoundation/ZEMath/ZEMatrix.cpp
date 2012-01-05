@@ -92,6 +92,48 @@ void ZEMatrix3x3::CreateRotation(ZEMatrix3x3& Matrix, const ZEQuaternion& Rotati
 	Matrix.M33 = 1.0f - 2.0f * xx -	2.0f * yy;
 }
 
+void ZEMatrix3x3::CreateRotation(ZEMatrix3x3& Matrix, float Pitch, float Yawn, float Roll, ZERotationOrder RotationOrder)
+{
+	ZEMatrix3x3 XRotation, YRotation, ZRotation, Temp;
+
+	ZEMatrix3x3::CreateRotationX(XRotation, Pitch);
+	ZEMatrix3x3::CreateRotationY(YRotation, Yawn);
+	ZEMatrix3x3::CreateRotationZ(ZRotation, Roll);
+
+	switch(RotationOrder)
+	{
+		case ZE_RO_XYZ:
+			ZEMatrix3x3::Multiply(Temp, XRotation, YRotation);
+			ZEMatrix3x3::Multiply(Matrix, Temp, ZRotation);
+			break;
+
+		case ZE_RO_XZY:
+			ZEMatrix3x3::Multiply(Temp, XRotation, ZRotation);
+			ZEMatrix3x3::Multiply(Matrix, Temp, YRotation);
+			break;
+
+		case ZE_RO_YXZ:
+			ZEMatrix3x3::Multiply(Temp, YRotation, XRotation);
+			ZEMatrix3x3::Multiply(Matrix, Temp, ZRotation);
+			break;
+
+		case ZE_RO_YZX:
+			ZEMatrix3x3::Multiply(Temp, YRotation, ZRotation);
+			ZEMatrix3x3::Multiply(Matrix, Temp, XRotation);
+			break;
+
+		case ZE_RO_ZXY:
+			ZEMatrix3x3::Multiply(Temp, ZRotation, XRotation);
+			ZEMatrix3x3::Multiply(Matrix, Temp, YRotation);
+			break;
+
+		case ZE_RO_ZYX:
+			ZEMatrix3x3::Multiply(Temp, ZRotation, YRotation);
+			ZEMatrix3x3::Multiply(Matrix, Temp, XRotation);
+			break;
+	}
+}
+
 void ZEMatrix3x3::CreateRotationX(ZEMatrix3x3& Matrix, float Pitch)
 {
 	float Cos = cosf(Pitch);
@@ -458,7 +500,7 @@ ZEMatrix3x3& ZEMatrix3x3::operator *= (float S)
 bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const 
 {
 	for (size_t I = 0; I < 9; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_TRESHOLD)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return false;
 
 	return true;
@@ -467,7 +509,7 @@ bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const
 bool ZEMatrix3x3::operator != (const ZEMatrix3x3 &M) const 
 {
 	for (size_t I = 0; I < 9; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_TRESHOLD)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return true;
 
 	return false;
@@ -568,6 +610,48 @@ void ZEMatrix4x4::CreateRotation(ZEMatrix4x4& Matrix, const ZEQuaternion& Rotati
 	Matrix.M42 = 0.0f;
 	Matrix.M43 = 0.0f;
 	Matrix.M44 = 1.0f;
+}
+
+void ZEMatrix4x4::CreateRotation(ZEMatrix4x4& Matrix, float Pitch, float Yawn, float Roll, ZERotationOrder RotationOrder)
+{
+	ZEMatrix4x4 XRotation, YRotation, ZRotation, Temp;
+
+	ZEMatrix4x4::CreateRotationX(XRotation, Pitch);
+	ZEMatrix4x4::CreateRotationY(YRotation, Yawn);
+	ZEMatrix4x4::CreateRotationZ(ZRotation, Roll);
+
+	switch(RotationOrder)
+	{
+	case ZE_RO_XYZ:
+		ZEMatrix4x4::Multiply(Temp, XRotation, YRotation);
+		ZEMatrix4x4::Multiply(Matrix, Temp, ZRotation);
+		break;
+
+	case ZE_RO_XZY:
+		ZEMatrix4x4::Multiply(Temp, XRotation, ZRotation);
+		ZEMatrix4x4::Multiply(Matrix, Temp, YRotation);
+		break;
+
+	case ZE_RO_YXZ:
+		ZEMatrix4x4::Multiply(Temp, YRotation, XRotation);
+		ZEMatrix4x4::Multiply(Matrix, Temp, ZRotation);
+		break;
+
+	case ZE_RO_YZX:
+		ZEMatrix4x4::Multiply(Temp, YRotation, ZRotation);
+		ZEMatrix4x4::Multiply(Matrix, Temp, XRotation);
+		break;
+
+	case ZE_RO_ZXY:
+		ZEMatrix4x4::Multiply(Temp, ZRotation, XRotation);
+		ZEMatrix4x4::Multiply(Matrix, Temp, YRotation);
+		break;
+
+	case ZE_RO_ZYX:
+		ZEMatrix4x4::Multiply(Temp, ZRotation, YRotation);
+		ZEMatrix4x4::Multiply(Matrix, Temp, XRotation);
+		break;
+	}
 }
 
 void ZEMatrix4x4::CreateRotationX(ZEMatrix4x4& Matrix, float Pitch)
@@ -1240,8 +1324,9 @@ ZEMatrix4x4& ZEMatrix4x4::operator -= (const ZEMatrix4x4 &RightOperand)
 
 ZEMatrix4x4& ZEMatrix4x4::operator *= (const ZEMatrix4x4 &RightOperand)
 {
-	ZEMatrix4x4::Multiply(*this, *this, RightOperand);
-	return *this;
+	ZEMatrix4x4 Temp;
+	ZEMatrix4x4::Multiply(Temp, *this, RightOperand);
+	return *this = Temp;
 }
 
 ZEMatrix4x4& ZEMatrix4x4::operator *= (float S)
@@ -1253,7 +1338,7 @@ ZEMatrix4x4& ZEMatrix4x4::operator *= (float S)
 bool ZEMatrix4x4::operator == (const ZEMatrix4x4 &M) const 
 {
 	for (size_t I = 0; I < 16; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_TRESHOLD)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return false;
 
 	return true;
@@ -1262,7 +1347,7 @@ bool ZEMatrix4x4::operator == (const ZEMatrix4x4 &M) const
 bool ZEMatrix4x4::operator != (const ZEMatrix4x4 &M) const 
 {
 	for (size_t I = 0; I < 16; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_TRESHOLD)
+		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return true;
 
 	return false;

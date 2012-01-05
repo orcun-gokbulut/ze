@@ -52,26 +52,9 @@ ZEVector3 ZEAABBox::GetCenter() const
 	return Center;
 }
 
-ZEVector3 ZEAABBox::GetVertex(unsigned char Index) const
+ZEVector3 ZEAABBox::GetVertex(unsigned int Index) const
 {
-	ZEVector3 Vertex;
-
-	if ((Index & 0x04) > 0)
-		Vertex.x = Max.x;
-	else
-		Vertex.x = Min.x;
-
-	if ((Index & 0x02) > 0)
-		Vertex.y = Max.y;
-	else
-		Vertex.y = Min.y;
-
-	if ((Index & 0x01) > 0)
-		Vertex.z = Max.z;
-	else
-		Vertex.z = Min.z;
-
-	return Vertex;
+	return  ZEVector3(Index & 0x01 ? Max.x : Min.x, Index & 0x02 ? Max.y : Min.y, Index & 0x04 ? Max.z : Min.z);
 }
 
 float ZEAABBox::GetLenght() const
@@ -119,6 +102,7 @@ ZEHalfSpace ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEPlan
 
 void ZEAABBox::GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)
 {
+	float a = (BoundingBox.Max - BoundingBox.Min).Length();
 	BoundingSphere.Radius = (BoundingBox.Max - BoundingBox.Min).Length() * 0.5f;
 	BoundingSphere.Position = BoundingBox.GetCenter();
 }
@@ -127,7 +111,7 @@ void ZEAABBox::GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABBox
 {
 	OrientedBoundingBox.Center = (BoundingBox.Min + BoundingBox.Max) * 0.5f;
 
-	OrientedBoundingBox.HalfSize = BoundingBox.Max - BoundingBox.Min * 0.5f;
+	OrientedBoundingBox.HalfSize = (BoundingBox.Max - BoundingBox.Min) * 0.5f;
 	OrientedBoundingBox.Right.x = 1.0f;
 	OrientedBoundingBox.Right.y = 0;
 	OrientedBoundingBox.Right.z = 0;
@@ -154,7 +138,7 @@ static inline int SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal
 	float e = ZEVector3::DotProduct(PlaneNormal, Center - Line->p);
 	float f = ZEVector3::DotProduct(PlaneNormal, Line->v);
 
-	if (fabs(f) > ZE_ZERO_TRESHOLD)
+	if (fabs(f) > ZE_ZERO_THRESHOLD)
 	{
 		float t1 = (e + HalfSize) / f;
 		float t2 = (e - HalfSize) / f;

@@ -48,6 +48,16 @@ class ZEVector3;
 class ZEVector4;
 class ZEQuaternion;
 
+enum ZERotationOrder
+{
+	ZE_RO_XYZ,
+	ZE_RO_XZY,
+	ZE_RO_YXZ,
+	ZE_RO_YZX,
+	ZE_RO_ZXY,
+	ZE_RO_ZYX
+};
+
 
 // ZEMatrix3x3
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,10 +84,10 @@ class ZEMatrix3x3
 											   float M31, float M32, float M33);
 		static void						Create(ZEMatrix3x3& Matrix, float* M);
 		static void						CreateRotation(ZEMatrix3x3& Matrix, const ZEQuaternion& Rotation);
+		static void						CreateRotation(ZEMatrix3x3& Matrix, float Pitch, float Yawn, float Roll, ZERotationOrder RotationOrder = ZE_RO_XYZ);
 		static void						CreateRotationX(ZEMatrix3x3& Matrix, float Pitch);
 		static void						CreateRotationY(ZEMatrix3x3& Matrix, float Yawn);
 		static void						CreateRotationZ(ZEMatrix3x3& Matrix, float Roll);
-		static void						CreateRotationXYZ(ZEMatrix3x3& Matrix, float Pitch, float Yawn, float Roll);
 		static void						CreateScale(ZEMatrix3x3& Matrix, float x, float y, float z);
 		static void						CreateIdentity(ZEMatrix3x3& Matrix);
 		static void						CreateZero(ZEMatrix3x3& Matrix);
@@ -161,8 +171,8 @@ class ZEMatrix4x4
 		static void						CreateRotationX(ZEMatrix4x4& Matrix, float Pitch);
 		static void						CreateRotationY(ZEMatrix4x4& Matrix, float Yawn);
 		static void						CreateRotationZ(ZEMatrix4x4& Matrix, float Roll);
-		static void						CreateRotationXYZ(ZEMatrix4x4& Matrix, float Pitch, float Yawn, float Roll);
 		static void						CreateRotation(ZEMatrix4x4& Matrix, const ZEQuaternion& Rotation);
+		static void						CreateRotation(ZEMatrix4x4& Matrix, float Pitch, float Yawn, float Roll, ZERotationOrder RotationOrder = ZE_RO_XYZ);
 		static void						CreateScale(ZEMatrix4x4& Matrix, float x, float y, float z);
 		static void						CreateScale(ZEMatrix4x4& Matrix, const ZEVector3& Scale);
 		static void						CreateTranslation(ZEMatrix4x4& Matrix, float x, float y, float z);

@@ -66,6 +66,7 @@ void ZEVector2::CreateFromPolar(float Radius, float Theta)
 void ZEVector2::ConvertToPolar(float& Radius, float& Theta)
 {
 	Radius = sqrtf(x * x + y * y);
+	Theta = atan2f(y, x);
 }
 
 inline void ZEVector2::Add(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
@@ -98,7 +99,7 @@ void ZEVector2::Divide(ZEVector2 &Out, const ZEVector2 &A, float s)
 	Out.y = A.y / s;
 }
 
-float ZEVector2::DotProduction(const ZEVector2 &A, const ZEVector2 &B)
+float ZEVector2::DotProduct(const ZEVector2 &A, const ZEVector2 &B)
 {
 	return A.x * B.x + A.y * B.y ;
 }
@@ -385,14 +386,14 @@ ZEVector2& ZEVector2::operator /=(float s)
 
 bool ZEVector2::operator ==(const ZEVector2 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_TRESHOLD) && 
-		(fabs(this->y - RightOperand.y) < ZE_ZERO_TRESHOLD));
+	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
+		(fabs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD));
 }
 
 bool ZEVector2::operator !=(const ZEVector2 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_TRESHOLD) || 
-		(fabs(this->y - RightOperand.y) > ZE_ZERO_TRESHOLD));
+	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
+		(fabs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD));
 }
 
 float ZEVector2::operator[](size_t Index) const
@@ -524,7 +525,7 @@ float ZEVector3::DotProduct(const ZEVector3& A, const ZEVector3& B)
 	return A.x * B.x + A.y * B.y + A.z * B.z;
 }
 
-inline void ZEVector3::CrossProduct(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
+void ZEVector3::CrossProduct(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
 {
 	Out.x = A.y * B.z - A.z * B.y;
 	Out.y = A.z * B.x - A.x * B.z;
@@ -859,30 +860,28 @@ void ZEVector3::SaturateSelf()
 
 float ZEVector3::Min() const
 {
-	if (x < y)
-		if (x < z)
-			return x;
-		else
-			return z;
-	else
-		if (y < z)
-			return y;
-		else
-			return x;
+	float MinComponent = x;
+
+	if(y < MinComponent)
+		MinComponent = y;
+
+	if(z < MinComponent)
+		MinComponent = z;
+
+	return MinComponent;
 }
 
 float ZEVector3::Max() const
 {
-	if (x > y)
-		if (x > z)
-			return x;
-		else
-			return z;
-	else
-		if (y > z)
-			return y;
-		else
-			return x;
+	float MaxComponent = x;
+
+	if(y > MaxComponent)
+		MaxComponent = y;
+
+	if(z > MaxComponent)
+		MaxComponent = z;
+
+	return MaxComponent;
 }
 
 ZEVector3 ZEVector3::operator+(const ZEVector3 &RightOperand) const
@@ -902,7 +901,7 @@ ZEVector3 ZEVector3::operator-(const ZEVector3 &RightOperand) const
 ZEVector3 ZEVector3::operator*(const ZEVector3 &RightOperand) const
 {
 	ZEVector3 Temp;
-	ZEVector3::CrossProduct(Temp, *this, RightOperand);
+	ZEVector3::Multiply(Temp, *this, RightOperand);
 	return Temp;
 }
 
@@ -971,17 +970,17 @@ ZEVector3& ZEVector3::operator /= (float s)
 
 bool ZEVector3::operator == (const ZEVector3 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_TRESHOLD) && 
-			(fabs(this->y - RightOperand.y) < ZE_ZERO_TRESHOLD) &&
-			(fabs(this->z - RightOperand.z) < ZE_ZERO_TRESHOLD));
+	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
+			(fabs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD) &&
+			(fabs(this->z - RightOperand.z) < ZE_ZERO_THRESHOLD));
 
 }
 
 bool ZEVector3::operator != (const ZEVector3 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_TRESHOLD) || 
-			(fabs(this->y - RightOperand.y) > ZE_ZERO_TRESHOLD) ||
-			(fabs(this->z - RightOperand.z) > ZE_ZERO_TRESHOLD));
+	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
+			(fabs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD) ||
+			(fabs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD));
 }
 
 float ZEVector3::operator[](size_t Index) const
@@ -1403,7 +1402,7 @@ ZEVector4& ZEVector4::operator += (const ZEVector4 &RightOperand)
 
 ZEVector4& ZEVector4::operator -= (const ZEVector4 &RightOperand)
 {
-	ZEVector4::Add(*this, *this, RightOperand);
+	ZEVector4::Sub(*this, *this, RightOperand);
 	return *this;
 }
 
@@ -1439,18 +1438,18 @@ ZEVector4 ZEVector4::operator-() const
 
 bool ZEVector4::operator == (const ZEVector4 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_TRESHOLD) && 
-			(fabs(this->y - RightOperand.y) < ZE_ZERO_TRESHOLD) &&
-			(fabs(this->z - RightOperand.z) < ZE_ZERO_TRESHOLD) &&
-			(fabs(this->w - RightOperand.w) < ZE_ZERO_TRESHOLD));
+	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
+			(fabs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD) &&
+			(fabs(this->z - RightOperand.z) < ZE_ZERO_THRESHOLD) &&
+			(fabs(this->w - RightOperand.w) < ZE_ZERO_THRESHOLD));
 }
 
 bool ZEVector4::operator != (const ZEVector4 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_TRESHOLD) || 
-			(fabs(this->y - RightOperand.y) > ZE_ZERO_TRESHOLD) ||
-			(fabs(this->z - RightOperand.z) > ZE_ZERO_TRESHOLD) ||
-			(fabs(this->w - RightOperand.w) > ZE_ZERO_TRESHOLD));
+	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
+			(fabs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD) ||
+			(fabs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD) ||
+			(fabs(this->w - RightOperand.w) > ZE_ZERO_THRESHOLD));
 }
 
 float ZEVector4::operator[](size_t Index) const
