@@ -80,9 +80,12 @@ bool ZED3D9SkyBoxMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderO
 
 	// Setup Transformations
 	ZEMatrix4x4 WorldViewProjMatrix;
-	ZEMatrix4x4 WorldViewMatrix;
 	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Camera->GetViewProjectionTransform(), RenderOrder->WorldMatrix);
-	GetDevice()->SetVertexShaderConstantF(0, (float*)&RenderOrder->WorldMatrix, 4);
+	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
+
+	/*ZEMatrix4x4 WorldViewMatrix;
+	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Camera->GetViewProjectionTransform(), RenderOrder->WorldMatrix);
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);*/
 
 	// ZBuffer
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);

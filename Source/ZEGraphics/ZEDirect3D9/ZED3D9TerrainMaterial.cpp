@@ -94,6 +94,7 @@ bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&Camera->GetViewTransform(), 4);
 	GetDevice()->SetVertexShaderConstantF(13, (float*)&ZEVector4(HeightTexture->GetWidth(), HeightTexture->GetHeight(), HeightOffset, HeightScale), 4);
+	GetDevice()->SetPixelShaderConstantF(13, (float*)&ZEVector4(HeightTexture->GetWidth(), HeightTexture->GetHeight(), HeightOffset, HeightScale), 4);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
@@ -119,7 +120,8 @@ bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetPixelShaderConstantF(10, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
 	
 	// Setup Textures
-	ZED3D9CommonTools::SetTexture(D3DVERTEXTEXTURESAMPLER0, HeightTexture, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
+	ZED3D9CommonTools::SetTexture(D3DVERTEXTEXTURESAMPLER0, HeightTexture, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetTexture(5, HeightTexture, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
 
 	// Setup Shaders
 	GetDevice()->SetPixelShader(GBufferPassPixelShader->GetPixelShader());
@@ -170,8 +172,8 @@ bool ZED3D9TerrainMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)Renderer->GetViewPort()->GetWidth(), 1.0f / (float)Renderer->GetViewPort()->GetHeight(), 0.5f / (float)Renderer->GetViewPort()->GetWidth(), 0.5f / (float)Renderer->GetViewPort()->GetHeight()), 1);
 	GetDevice()->SetPixelShaderConstantF(10, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
 
-	ZED3D9CommonTools::SetTexture(D3DVERTEXTEXTURESAMPLER0, HeightTexture, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
-	ZED3D9CommonTools::SetTexture(4, ColorTexture, D3DTEXF_LINEAR, D3DTEXF_POINT, D3DTADDRESS_BORDER);
+	ZED3D9CommonTools::SetTexture(D3DVERTEXTEXTURESAMPLER0, HeightTexture, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
+	ZED3D9CommonTools::SetTexture(4, ColorTexture, D3DTEXF_LINEAR, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 
 	GetDevice()->SetPixelShader(ForwardPassPixelShader->GetPixelShader());
 	GetDevice()->SetVertexShader(ForwardPassVertexShader->GetVertexShader());

@@ -281,6 +281,7 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 		float			Reserverd2;
 	} LightParameters;
 	ZEMatrix4x4::Transform3x3(LightParameters.Direction, Camera->GetViewTransform(), Light->GetWorldDirection());
+	LightParameters.Direction = -LightParameters.Direction;
 	LightParameters.Color = Light->GetColor();
 	LightParameters.Attenuation = Light->GetAttenuation();
 	LightParameters.Range = Light->GetRange();
@@ -620,7 +621,7 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	zeProfilerStart("Forward Pass");
 
 	// GBuffers
-	ZED3D9CommonTools::SetRenderTarget(0, ABuffer);
+	ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
 
 	ZED3D9CommonTools::SetTexture(0, GBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, GBuffer2, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
@@ -967,7 +968,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		EDProcessor.Process();
 		*/
 		
-		//Anti Aliasing pass
+		/*//Anti Aliasing pass
 		SSAAProcessor.SetInputDepth(GBuffer1);
 		SSAAProcessor.SetInputNormal(GBuffer2);
 		SSAAProcessor.SetInputColor(SSAAInputBuffer);
@@ -982,7 +983,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		// Blur Pass
 		BlurProcessor.SetInput(BlurInputBuffer);
 		BlurProcessor.SetOutput(ViewPort);
-		BlurProcessor.Process();
+		BlurProcessor.Process();*/
 		
 		Do2DPass();
 

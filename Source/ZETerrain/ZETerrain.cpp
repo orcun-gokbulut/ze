@@ -117,6 +117,7 @@ ZETerrain::ZETerrain()
 	HeightScale = 10.0f;
 	HeightOffset = 0.0f;
 	ColorTexture = NULL;
+	NormalTexture = NULL;
 }
 
 ZETerrain::~ZETerrain()
@@ -171,12 +172,15 @@ void ZETerrain::Deinitialize()
 	ColorTexture->Destroy();
 	ColorTexture = NULL;
 
+	NormalTexture->Destroy();
+	NormalTexture = NULL;
+
 	ZEEntity::Deinitialize();
 }
 
 bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVector3& WorldPosition, const ZEVector3& LocalPosition, float Scale, bool Rotate)
 {	
-	float TextureWidth = HeightTexture->GetWidth() * 0.5f - 0.1f;
+	/*float TextureWidth = HeightTexture->GetWidth() * 0.5f - 0.1f;
 	if (WorldPosition.x + (LocalPosition.x - ChunkSize * 0.5f) * Scale >= TextureWidth || 
 		WorldPosition.x + (LocalPosition.x + ChunkSize * 0.5f) * Scale <= -TextureWidth)
 		return false;
@@ -184,7 +188,7 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVe
 	float TextureHeight = HeightTexture->GetHeight() * 0.5f - 0.5f / HeightTexture->GetHeight() - 0.1f;
 	if (WorldPosition.y + (LocalPosition.y - ChunkSize * 0.5f) * Scale >= TextureHeight || 
 		WorldPosition.y + (LocalPosition.y + ChunkSize * 0.5f) * Scale <= -TextureHeight)
-		return false;
+		return false;*/
 
 	ZERenderOrder RenderOrder;
 	RenderOrder.SetZero();
@@ -253,6 +257,13 @@ bool ZETerrain::LoadTerrain()
 		ColorTexture->Destroy();
 		ColorTexture = NULL;
 	}
+
+	if (NormalTexture != NULL)
+	{
+		ColorTexture->Destroy();
+		ColorTexture = NULL;
+	}
+
 
 	if (TerrainFileName.IsEmpty())
 		return true;
@@ -324,6 +335,29 @@ bool ZETerrain::LoadTerrain()
 
 	ColorTexture->Unlock(0);
 
+	/*// ColorTexture
+	NormalTexture = ZETexture2D::CreateInstance();
+	Result = NormalTexture->Create(Header.Width, Header.Heigth, ZE_TPF_A8R8G8B8, false, 1);
+	if (!Result)
+	{
+		zeError("ZETerrain", "Can not create color texture.");
+		File.Close();
+		return false;
+	}
+
+	NormalTexture->Lock(&Buffer, &Pitch, 0);
+	if (Buffer == NULL)
+	{
+		zeError("ZETerrain", "Can not lock height texture.");
+		File.Close();
+		return false;
+	}
+
+	for (int y = 0; y < Header.Heigth; y++)
+		File.Read((ZEUINT32*)((char*)Buffer + y * Pitch), sizeof(ZEUINT32) * Header.Width, 1);
+
+	NormalTexture->Unlock(0);*/
+
 	File.Close();
 	return true;
 }
@@ -351,6 +385,7 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	Material->SetHeightOffset(HeightOffset);
 	Material->SetHeightScale(HeightScale);
 	Material->SetColorTexture(ColorTexture);
+	Material->SetNormalTexture(NormalTexture);
 
 	float QuadSize = ChunkSize;
 
@@ -361,19 +396,22 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	QuadPosition.y = 0.0f;
 	QuadPosition.z = UnitLength * ChunkSize * (int)(CameraPosition.z / ((float)ChunkSize * UnitLength) + 0.5f);
 
+	int MinLevel = 0;
 	for (size_t I = 0; I < MaxLevel; I++)
 	{
 		bool Drawed = false;
 		if (I == 0)
 		{
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3(-QuadSize, 0.0f, QuadSize), UnitLength);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3(0.0f , 0.0f, QuadSize), UnitLength);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3(-QuadSize, 0.0f, 0.0f), UnitLength);
+			float Scale = (float)(1 << MinLevel) * UnitLength;
+
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3(-QuadSize, 0.0f, QuadSize), Scale);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3(0.0f , 0.0f, QuadSize), Scale);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3(-QuadSize, 0.0f, 0.0f), Scale);
 			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3::Zero, UnitLength);
 		}
 		else
 		{
-			float Scale = (float)(1 << (I - 1)) * UnitLength;
+			float Scale = (float)(1 << (I + MinLevel - 1)) * UnitLength;
 			
 			// Top	
 			Drawed |= DrawPrimtive(DrawParameters->Renderer, 1, QuadPosition, ZEVector3(-2.0f * QuadSize,	0.0f,	2.0f * QuadSize), Scale);
