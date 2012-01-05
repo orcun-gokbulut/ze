@@ -111,17 +111,17 @@ bool ZEFileCache::PrepareCacheForFirstUse()
 // Helper function for copying Records
 bool ZEFileCache::CopyData(ZEFile* File, ZEQWORD From, ZEQWORD Size, ZEQWORD To)
 {
-	const size_t BufferSize = 32768; // 32K
+	const ZEINT64 BufferSize = 32768; // 32K
 	char Buffer[BufferSize];
 
-	size_t Count = Size / BufferSize;
-	size_t LeftOver = Size % BufferSize;
+	ZEINT64 Count = Size / BufferSize;
+	ZEINT64 LeftOver = Size % BufferSize;
 
 	// First copy leftover
 	if (LeftOver != 0)
 	{
 		// Go to beginning of leftover
-		if (!File->Seek(From + Size - LeftOver, ZE_SF_BEGINING))
+		if (!File->Seek((ZEINT64)From + (ZEINT64)Size - LeftOver, ZE_SF_BEGINING))
 		{
 			zeAssert(true, "Can not seek. File: \"%s\".", File->GetFilePath().GetValue());
 			return false;
@@ -133,7 +133,7 @@ bool ZEFileCache::CopyData(ZEFile* File, ZEQWORD From, ZEQWORD Size, ZEQWORD To)
 			return false;
 		}
 
-		if (!File->Seek(To + Size - LeftOver, ZE_SF_BEGINING))
+		if (!File->Seek((ZEINT64)To + (ZEINT64)Size - LeftOver, ZE_SF_BEGINING))
 		{
 			zeAssert(true, "Can not seek. File: \"%s\".", File->GetFilePath().GetValue());
 			return false;
@@ -149,7 +149,7 @@ bool ZEFileCache::CopyData(ZEFile* File, ZEQWORD From, ZEQWORD Size, ZEQWORD To)
 	// Copy backward to avoid corruption due to overlap
 	for (size_t I = Count; I > 0; --I)
 	{
-		if (!File->Seek(From + (I - 1) * BufferSize, ZE_SF_BEGINING))
+		if (!File->Seek((ZEINT64)From + (I - 1) * (ZEINT64)BufferSize, ZE_SF_BEGINING))
 		{
 			zeAssert(true, "Can not seek. File: \"%s\".", File->GetFilePath().GetValue());
 			return false;
@@ -161,7 +161,7 @@ bool ZEFileCache::CopyData(ZEFile* File, ZEQWORD From, ZEQWORD Size, ZEQWORD To)
 			return false;
 		}
 		
-		if (!File->Seek(To + (I - 1) * BufferSize, ZE_SF_BEGINING))
+		if (!File->Seek((ZEINT64)To + (I - 1) * (ZEINT64)BufferSize, ZE_SF_BEGINING))
 		{
 			zeAssert(true, "Can not seek. File: \"%s\".", File->GetFilePath().GetValue());
 			return false;
