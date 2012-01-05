@@ -78,7 +78,7 @@ class ZEVector2
 		static void					Multiply(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B);
 		static void					Divide(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B);
 		static void					Divide(ZEVector2 &Out, const ZEVector2 &A, float s);
-		static float				DotProduction(const ZEVector2 &A, const ZEVector2 &B);
+		static float				DotProduct(const ZEVector2 &A, const ZEVector2 &B);
 		static void					Scale(ZEVector2 &Out, const ZEVector2 &A, float s);
 		static float				Length(const ZEVector2 &A);
 		static float				LengthSquare(const ZEVector2 &A);

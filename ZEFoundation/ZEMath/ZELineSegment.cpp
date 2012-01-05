@@ -103,7 +103,7 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZEL
     float sN, sD = D;
     float tN, tD = D;
 
-	if (D < ZE_ZERO_TRESHOLD) 
+	if (D < ZE_ZERO_THRESHOLD) 
 	{
         sN = 0.0; 
         sD = 1.0;      
@@ -128,8 +128,8 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZEL
         }
     }
 
-    TLineSegment  = (fabs(sN) < ZE_ZERO_TRESHOLD ? 0.0f : sN / sD);
-    TLine = (fabs(tN) < ZE_ZERO_TRESHOLD ? 0.0f : tN / tD);
+    TLineSegment  = (fabs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
+    TLine = (fabs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
 
 	ZEVector3 P1, P2;
 	ZEVector3::Scale(P1, LineSegment.v, TLineSegment);
@@ -158,7 +158,7 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegmentA, const ZE
     float    sN, sD = D;
     float    tN, tD = D;
 
-	if (D < ZE_ZERO_TRESHOLD) 
+	if (D < ZE_ZERO_THRESHOLD) 
 	{
         sN = 0.0; 
         sD = 1.0;      
@@ -210,8 +210,8 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegmentA, const ZE
         }
     }
 
-    TLineSegmentA = (fabs(sN) < ZE_ZERO_TRESHOLD ? 0.0f : sN / sD);
-    TLineSegmentB = (fabs(tN) < ZE_ZERO_TRESHOLD ? 0.0f : tN / tD);
+    TLineSegmentA = (fabs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
+    TLineSegmentB = (fabs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
 
 	ZEVector3 P1, P2;
 	ZEVector3::Scale(P1, LineSegmentA.v, TLineSegmentA);
@@ -239,7 +239,7 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZER
     float    sN, sD = D;
     float    tN, tD = D;
 
-	if (D < ZE_ZERO_TRESHOLD) 
+	if (D < ZE_ZERO_THRESHOLD) 
 	{
         sN = 0.0; 
         sD = 1.0;      
@@ -278,8 +278,8 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZER
         }
     }
 
-    TLineSegment = (fabs(sN) < ZE_ZERO_TRESHOLD ? 0.0f : sN / sD);
-    TRay = (fabs(tN) < ZE_ZERO_TRESHOLD ? 0.0f : tN / tD);
+    TLineSegment = (fabs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
+    TRay = (fabs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
 
 	return ZEVector3::Length(ZEVector3(LineSegment.GetPointOn(TLineSegment), Ray.GetPointOn(TRay)));
 }

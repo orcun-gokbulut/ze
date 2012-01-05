@@ -50,7 +50,7 @@ class ZEAABBox
 		ZEVector3					Min, Max;
 
 		ZEVector3					GetCenter() const;
-		ZEVector3					GetVertex(unsigned char Index) const;
+		ZEVector3					GetVertex(unsigned int Index) const;
 		float						GetLenght() const;
 
 		static void					GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox);

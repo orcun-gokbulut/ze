@@ -51,8 +51,8 @@ void ZEQuaternion::Create(ZEQuaternion& Output, float w, float x, float y, float
 	Output.y = y;
 	Output.z = z;
 
-	/*zeAssert(!Output.IsValid(), "");
-	zeAssert(!Output.IsNormalized(), "");*/
+	zeAssert(!Output.IsValid(), "");
+	zeAssert(!Output.IsNormalized(), "");
 }
 
 
@@ -152,16 +152,15 @@ void ZEQuaternion::CreateFromDirection(ZEQuaternion& Output, const ZEVector3& Di
 
 void ZEQuaternion::CreateFromMatrix(ZEQuaternion& Output, const ZEMatrix4x4& Matrix)
 {
-	ZEQuaternion Quat;
-	Quat.w = sqrt(__max(0.0f, 1.0f + Matrix.M11 + Matrix.M22 + Matrix.M33)) / 2.0f;
-	Quat.x = sqrt(__max(0.0f, 1.0f + Matrix.M11 - Matrix.M22 - Matrix.M33)) / 2.0f;
-	Quat.y = sqrt(__max(0.0f, 1.0f - Matrix.M11 + Matrix.M22 - Matrix.M33)) / 2.0f;
-	Quat.z = sqrt(__max(0.0f, 1.0f - Matrix.M11 - Matrix.M22 + Matrix.M33)) / 2.0f;
-	Quat.x = (float)_copysign(Quat.x, Matrix.M32 - Matrix.M23);
-	Quat.y = (float)_copysign(Quat.y, Matrix.M13 - Matrix.M31);
-	Quat.z = (float)_copysign(Quat.z, Matrix.M21 - Matrix.M12);
+	Output.w = sqrt(__max(0.0f, 1.0f + Matrix.M11 + Matrix.M22 + Matrix.M33)) / 2.0f;
+	Output.x = sqrt(__max(0.0f, 1.0f + Matrix.M11 - Matrix.M22 - Matrix.M33)) / 2.0f;
+	Output.y = sqrt(__max(0.0f, 1.0f - Matrix.M11 + Matrix.M22 - Matrix.M33)) / 2.0f;
+	Output.z = sqrt(__max(0.0f, 1.0f - Matrix.M11 - Matrix.M22 + Matrix.M33)) / 2.0f;
+	Output.x = (float)_copysign(Output.x, Matrix.M32 - Matrix.M23);
+	Output.y = (float)_copysign(Output.y, Matrix.M13 - Matrix.M31);
+	Output.z = (float)_copysign(Output.z, Matrix.M21 - Matrix.M12);
 
-	ZEQuaternion::Normalize(Quat, Quat);
+	ZEQuaternion::Normalize(Output, Output);
 
 	zeAssert(!Output.IsValid(), "Output quaternion is not valid.");
 }
@@ -333,33 +332,6 @@ void ZEQuaternion::Slerp(ZEQuaternion& Output, const ZEQuaternion& A, const ZEQu
 	zeAssert(!Output.IsNormalized(), "Output quaternion is not normalized.");
 }
 
-void ZEQuaternion::ConvertToRotationMatrix(ZEMatrix4x4& Output, const ZEQuaternion& Quaternion)
-{
-	zeAssert(!Quaternion.IsValid(), "Operand quaternion is not valid.");
-	zeAssert(!Quaternion.IsNormalized(), "Operand quaternion is not normalized.");
-
-	Output.M11 = 1.0f	-	2.0f * Quaternion.y * Quaternion.y	-	2.0f * Quaternion.z * Quaternion.z;
-	Output.M21 =			2.0f * Quaternion.x * Quaternion.y	-	2.0f * Quaternion.w * Quaternion.z;
-	Output.M31 =			2.0f * Quaternion.x * Quaternion.z	+	2.0f * Quaternion.w * Quaternion.y;
-	Output.M41 = 0.0f;
-
-	Output.M12 =			2.0f * Quaternion.x * Quaternion.y	+	2.0f * Quaternion.w * Quaternion.z;
-	Output.M22 = 1.0f	-	2.0f * Quaternion.x * Quaternion.x	-	2.0f * Quaternion.z * Quaternion.z;
-	Output.M32 =			2.0f * Quaternion.y * Quaternion.z	-	2.0f * Quaternion.w * Quaternion.x;
-	Output.M42 = 0.0f;
-
-	Output.M13 =			2.0f * Quaternion.x * Quaternion.z	-	2.0f * Quaternion.w * Quaternion.y;
-	Output.M23 =			2.0f * Quaternion.y * Quaternion.z	+	2.0f * Quaternion.w * Quaternion.x;
-	Output.M33 = 1.0f	-	2.0f * Quaternion.x * Quaternion.x	-	2.0f * Quaternion.y * Quaternion.y;
-	Output.M43 = 0.0f;
-
-	Output.M14 = 0.0f;
-	Output.M24 = 0.0f;
-	Output.M34 = 0.0f;
-	Output.M44 = 1.0f;
-
-}
-
 void ZEQuaternion::Normalize(ZEQuaternion& Output, const ZEQuaternion& Quaternion)
 {
 	zeAssert(!Quaternion.IsValid(), "Operand quaternion is not valid.");
@@ -455,18 +427,18 @@ ZEVector3 ZEQuaternion::operator*(const ZEVector3& Vector) const
 
 bool ZEQuaternion::operator==(const ZEQuaternion& RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_TRESHOLD) && 
-		(fabs(this->y - RightOperand.y) < ZE_ZERO_TRESHOLD) &&
-		(fabs(this->z - RightOperand.z) < ZE_ZERO_TRESHOLD) &&
-		(fabs(this->w - RightOperand.w) < ZE_ZERO_TRESHOLD));
+	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
+		(fabs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD) &&
+		(fabs(this->z - RightOperand.z) < ZE_ZERO_THRESHOLD) &&
+		(fabs(this->w - RightOperand.w) < ZE_ZERO_THRESHOLD));
 }
 
 bool ZEQuaternion::operator!=(const ZEQuaternion& RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_TRESHOLD) || 
-			(fabs(this->y - RightOperand.y) > ZE_ZERO_TRESHOLD) ||
-			(fabs(this->z - RightOperand.z) > ZE_ZERO_TRESHOLD) ||
-			(fabs(this->w - RightOperand.w) > ZE_ZERO_TRESHOLD));
+	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
+			(fabs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD) ||
+			(fabs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD) ||
+			(fabs(this->w - RightOperand.w) > ZE_ZERO_THRESHOLD));
 }
 
 float ZEQuaternion::operator[](size_t Index) const
@@ -492,8 +464,3 @@ ZEQuaternion::ZEQuaternion(float Angle, const ZEVector3& Axis)
 ZEQuaternion::ZEQuaternion()
 {
 }
-
-
-
-
-

@@ -57,8 +57,19 @@ void ZETriangle::GetNormal(const ZETriangle& Triangle, ZEVector3& Normal)
 	ZEVector3::Normalize(Normal, Normal);
 }
 
-void ZETriangle::GetBarrycentiricCoordinates(const ZETriangle& Triangle, const ZEVector3& Point, ZEVector3& BarryCoords)
+void ZETriangle::GetBarycentricCoordinates(const ZETriangle& Triangle, const ZEVector3& Point, ZEVector3& BaryCoords)
 {
+	float Area = ZETriangle::GetArea(Triangle);
+
+	ZETriangle Triangle1(Triangle.V0, Triangle.V1, Point);
+	ZETriangle Triangle2(Triangle.V1, Triangle.V2, Point);
+	ZETriangle Triangle3(Triangle.V2, Triangle.V0, Point);
+
+	float Area1 = ZETriangle::GetArea(Triangle1);
+	float Area2 = ZETriangle::GetArea(Triangle2);
+	float Area3 = ZETriangle::GetArea(Triangle3);
+
+	BaryCoords = ZEVector3(Area1 / Area, Area2 / Area, Area3 / Area);
 }
 
 void ZETriangle::GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane)
@@ -67,8 +78,18 @@ void ZETriangle::GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane)
 	GetNormal(Triangle, Plane.n);
 }
 
+float ZETriangle::GetArea(const ZETriangle& Triangle)
+{
+	ZEVector3 Temp;
+	ZEVector3 V0V1(Triangle.V1 - Triangle.V0);
+	ZEVector3 V0V2(Triangle.V2 - Triangle.V0);
+	ZEVector3::CrossProduct(Temp, V0V1, V0V2);
+
+	return ZEVector3::Length(Temp) / 2.0f;
+}
+
 bool ZETriangle::InsideTest(const ZETriangle& Triangle, const ZEVector3& Point)
-{//
+{
 	ZEVector3 U, V, N, W;
 	ZEVector3::Sub(U, Triangle.V1, Triangle.V0);
 	ZEVector3::Sub(V, Triangle.V2, Triangle.V0);
