@@ -528,7 +528,7 @@ ZEString ZEString::FromChar(char Value)
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, 2 * sizeof(char));
 	Temp.Buffer[0] = Value;
-	Temp.Buffer[1] = '/0';
+	Temp.Buffer[1] = '\0';
 
 	return Temp;
 }

@@ -66,6 +66,8 @@ ZEArray<*>{
 #include "ZEAllocator.h"
 #include "ZEError.h"
 
+typedef int FunctionPointerCaster(const void*, const void*);
+
 template<typename Type, typename Allocator_= ZEAllocatorBase<Type> >
 class ZEArray
 {
@@ -149,7 +151,7 @@ class ZEArray
 
 			ZEDebugCheckMemory();
 
-			return &Items[Count - ItemCount];
+			return &Items[Index];
 		}
 
 		inline Type* MassInsert(size_t Index, Type* NewItems, size_t ItemCount)
@@ -171,7 +173,7 @@ class ZEArray
 
 			ZEDebugCheckMemory();
 
-			return &Items[Count - ItemCount];
+			return &Items[Index];
 		}
 
 		inline void Fill(Type Value)
@@ -192,15 +194,13 @@ class ZEArray
 		void CopyTo(ZEArray<Type, Allocator_>& OtherArray) const
 		{
 			OtherArray.SetCount(Count);
-			ZEAllocatorBase<Type>::ObjectCopy(OtherArray.Items, this->Items, Count);	
-
+			ZEAllocatorBase<Type>::ObjectCopy(OtherArray.Items, this->Items, Count);
 			ZEDebugCheckMemory();
 		}
 
 		void CopyTo(Type* OtherArray, size_t Count) const
 		{
-			ZEAllocatorBase<Type>::ObjectCopy(OtherArray, this->Items, Count > this->Count ? this->Count ? Count);	
-
+			ZEAllocatorBase<Type>::ObjectCopy(OtherArray, this->Items, Count > this->Count ? this->Count : Count);
 			ZEDebugCheckMemory();
 		}
 
@@ -417,9 +417,9 @@ class ZEArray
 			Count = 0;
 		}
 
-		inline void Sort(int (*CompareFunction)(const void*, const void*))
+		inline void Sort(int (*CompareFunction)(const Type*, const Type*))
 		{
-			qsort(Items, Count, sizeof(Type), CompareFunction);
+			qsort(Items, Count, sizeof(Type), (FunctionPointerCaster*)(CompareFunction));
 		}
 
 		void Traverse()
@@ -432,9 +432,9 @@ class ZEArray
 			}
 		}
 
-		inline int BinarySearch(const Type& Element, int (*CompareFunction)(Type*, Type*))
+		inline int BinarySearch(const Type& Element, int (*CompareFunction)(const Type*, const Type*))
 		{
-			void* Result = bsearch(&Element, &Items, Count, sizeof(Type), CompareFunction);
+			void* Result = bsearch(&Element, &Items, Count, sizeof(Type), (FunctionPointerCaster*)(CompareFunction));
 			if (Result == NULL)
 				return NULL;
 			else
@@ -495,7 +495,7 @@ class ZEArray
 
 		ZEArray& operator+=(const ZEArray<Type, Allocator_>& OtherArray)
 		{
-			ZEArray.MassAdd(OtherArray.Items, OtherArray.Count);
+			this->MassAdd(OtherArray.Items, OtherArray.Count);
 			return *this;
 		}
 

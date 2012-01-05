@@ -516,7 +516,7 @@ ZEVariant::operator const char*()
 
 ZEVariant::operator int()
 {
-	zeAssert(this->Type != ZE_VRT_INTEGER || this->Type != ZE_VRT_FLOAT, "Integer conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_INTEGER && this->Type != ZE_VRT_FLOAT, "Integer conversion operation failed. Variant type mismatched.");
 	if (this->Type == ZE_VRT_FLOAT)
 		return (int)Value.Float;
 	else
@@ -525,7 +525,7 @@ ZEVariant::operator int()
 
 ZEVariant::operator float()
 {
-	zeAssert(this->Type != ZE_VRT_INTEGER || this->Type != ZE_VRT_FLOAT, "Float conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_INTEGER && this->Type != ZE_VRT_FLOAT, "Float conversion operation failed. Variant type mismatched.");
 	if (this->Type == ZE_VRT_INTEGER)
 		return (float)Value.Integer;
 	else
