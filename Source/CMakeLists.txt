@@ -44,7 +44,7 @@ set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
 append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
 	ZE_ZINEK_ENGINE)
 
-add_subdirectory(ZEAI)
+#add_subdirectory(ZEAI)
 add_subdirectory(ZECore)
 add_subdirectory(ZEDebug)
 add_subdirectory(ZEGame)

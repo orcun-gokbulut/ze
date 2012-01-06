@@ -135,8 +135,8 @@ bool ZETextureCacheDataIdentifier::Equal(ZEFile* File) const
 
 	// Burda sorun olabilir
 	unsigned int I = 0;
-	//unsigned int StringLenght = strlen(ItemNameBuffer);
-	while (I < ZE_MAX_FILE_NAME_SIZE)
+	unsigned int StringLenght = strlen(ItemNameBuffer);
+	while (I < StringLenght)
 	{
 		if(ItemNameBuffer[I] != ItemName[I])
 			return false;

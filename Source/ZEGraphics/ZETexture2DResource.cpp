@@ -184,7 +184,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	ZETextureData		TextureData;
 	ZETextureOptions	FinalOptions;
 	ZEFileCache			FileCache;
-	ZEString			CachePath = "resources\\TextureCache.ZECACHE";
+	ZEString			CachePath = "TextureCache.ZECACHE";
 
 	bool Open		= false;
 	bool Result		= false;
