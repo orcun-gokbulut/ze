@@ -57,13 +57,13 @@ void ZEAIActor::UpdateVisual()
 	VisualActor->setTransform(QTransform().rotateRadians(-GetRotation2D()));
 	VisualActor->setPos(GetPosition().x * 10.0f, GetPosition().y * 10.0f);
 
-	if (fabs(GetLinearVelocity().LengthSquare()) > ZE_ZERO_TRESHOLD)
+	if (fabs(GetLinearVelocity().LengthSquare()) > ZE_ZERO_THRESHOLD)
 	{
 		ZEVector3 Offset = GetLinearVelocity().Normalize() * GetRadius() + GetPosition() * 10.0f;
 		VisualLinearVelocity->setLine(Offset.x, Offset.y, Offset.x + GetLinearVelocity().x * 10.0f, Offset.y + GetLinearVelocity().y * 10.0f);
 	}
 
-	if (fabs(GetLinearAcceleration().LengthSquare()) > ZE_ZERO_TRESHOLD)
+	if (fabs(GetLinearAcceleration().LengthSquare()) > ZE_ZERO_THRESHOLD)
 	{
 		ZEVector3 Offset = GetLinearAcceleration().Normalize() * GetRadius() + GetPosition() * 10.0f;
 		VisualLinearAcceleration->setLine(Offset.x, Offset.y, Offset.x + GetLinearAcceleration().x * 10.0f, Offset.y + GetLinearAcceleration().y * 10.0f);
