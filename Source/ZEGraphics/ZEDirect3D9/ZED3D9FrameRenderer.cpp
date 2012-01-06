@@ -916,18 +916,18 @@ void ZED3D9FrameRenderer::ClearRenderList()
 	RenderList.Clear(true);
 }
 
-static int RenderOrderCompare(const void* A, const void* B)
+static int RenderOrderCompare(const ZERenderOrder* A, const ZERenderOrder* B)
 {
-	if (((ZERenderOrder*)A)->Priority == ((ZERenderOrder*)B)->Priority)
+	if (A->Priority == B->Priority)
 	{
-		if (((ZERenderOrder*)A)->Order == ((ZERenderOrder*)B)->Order)
+		if (A->Order == B->Order)
 			return 0;
-		else if (((ZERenderOrder*)A)->Order > ((ZERenderOrder*)B)->Order)
+		else if (A->Order > B->Order)
 			return 1;
 		else
 			return -1;
 	}
-	else if (((ZERenderOrder*)A)->Priority > ((ZERenderOrder*)B)->Priority)
+	else if (A->Priority > B->Priority)
 		return 1;
 	else
 		return -1;
