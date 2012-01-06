@@ -53,10 +53,10 @@ const ZEMatrix4x4 ZEColorMatrix::Sepia = ZEMatrix4x4(	0.1495f, 0.1495f, 0.1495f,
 														0.057f,  0.057f,  0.057f,  0.0f,
 														0.5f,    0.25f,   0.0f,    1.0f );
 
-const ZEMatrix4x4 ZEColorMatrix::BlackWhite = ZEMatrix4x4(	0.299f, 0.299f, 0.299f, 0.0f,
-															0.587f, 0.587f, 0.587f, 0.0f,
-															0.184f, 0.184f, 0.184f, 0.0f,
-															0.0f,   0.0f,   0.0f,   0.1f );
+const ZEMatrix4x4 ZEColorMatrix::BlackWhite = ZEMatrix4x4(	0.299f, 0.587f, 0.184f, 0.0f,     
+														  	0.299f, 0.587f, 0.184f, 0.0f,
+														  	0.299f, 0.587f, 0.184f, 0.0f, 
+														  	0.0f,   0.0f,	0.0f,	0.1f );
 
 const ZEMatrix4x4 ZEColorMatrix::Red = ZEMatrix4x4(	1.0f, 0.0f, 0.0f, 0.0f,
 													0.0f, 0.0f, 0.0f, 0.0f,

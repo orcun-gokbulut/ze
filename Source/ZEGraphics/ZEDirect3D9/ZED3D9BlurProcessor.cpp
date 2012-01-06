@@ -100,8 +100,8 @@ void ZED3D9BlurProcessor::CreateKernels()
 	if (VerticalKernel != NULL)
 		delete VerticalKernel;
 	
-	TargetWidth = SourceWidth = Renderer->GetViewPort()->GetWidth() / 4;
-	TargetHeight = SourceHeight = Renderer->GetViewPort()->GetHeight() / 4;
+	TargetWidth = SourceWidth = Renderer->GetViewPort()->GetWidth() / 8;
+	TargetHeight = SourceHeight = Renderer->GetViewPort()->GetHeight() / 8;
 
 	GaussianFilter GaussFilter(3.5f, 1.0f);
 	ZEVector2 SourcePixelSize(1.0f / (float)TargetWidth, 1.0f / (float)TargetHeight);
@@ -117,8 +117,8 @@ void ZED3D9BlurProcessor::CreateTextures()
 	// the Input/Output(viewport) texture size changes.
 	// Such as the resize of application window.
 	
-	unsigned int TargetWidth = Renderer->GetViewPort()->GetWidth() / 4;
-	unsigned int TargetHeight = Renderer->GetViewPort()->GetHeight() / 4;
+	unsigned int TargetWidth = Renderer->GetViewPort()->GetWidth() / 8;
+	unsigned int TargetHeight = Renderer->GetViewPort()->GetHeight() / 8;
 	
 	// If created before
 	if (TempTexture1 != NULL)
