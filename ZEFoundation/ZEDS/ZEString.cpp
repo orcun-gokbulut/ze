@@ -718,3 +718,13 @@ ZEString operator+(const char* String1, const ZEString& String2)
 	Temp.Append(String2);
 	return Temp;
 }
+
+bool operator==(const char* String1, const ZEString& String2)
+{
+	return String2.Equals(String1);
+}
+
+bool operator!=(const char* String1, const ZEString& String2)
+{
+	return !String2.Equals(String1);
+}

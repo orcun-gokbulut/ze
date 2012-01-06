@@ -147,6 +147,8 @@ class ZEString
 };
 
 ZEString operator+(const char* String1, const ZEString& String2);
+bool operator==(const char* String1, const ZEString& String2);
+bool operator!=(const char* String1, const ZEString& String2);
 
 #endif
 
