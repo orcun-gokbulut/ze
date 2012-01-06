@@ -118,7 +118,6 @@ ZEWMIKSH::ZEWMIKSH(ZEWindowsInputMouseDevice* Device)
 	this->Device = Device;
 }
 
-
 ZEWindowsInputMouseDevice::ZEWindowsInputMouseDevice()
 {
 	DeviceName = "Mouse";
