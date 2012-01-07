@@ -39,7 +39,10 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
 
-float frand(float Range);
+static float frand(float Range)
+{
+	return ((float)rand()/(float)RAND_MAX) * Range - ((float)rand()/(float)RAND_MAX) * Range;
+}
 
 void ZESteeringOutput::SetZero()
 {
