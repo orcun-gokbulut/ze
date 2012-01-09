@@ -37,18 +37,20 @@
 #ifndef __ZE_SERIALIZE_H__
 #define __ZE_SERIALIZE_H__
 
+#include "ZETypes.h"
+
 class ZEFileUnserializer
 {
-private:
-	void*						File;
+	private:
+		void*						File;
 
-public:
-	virtual size_t				Read(void* Buffer, size_t Size, size_t Count);	
-	bool						OpenFile(const char* FileName);
-	void						CloseFile();
+	public:
+		virtual ZEQWORD				Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);	
+		bool						OpenFile(const char* FileName);
+		void						CloseFile();
 
-								ZEFileUnserializer();
-								~ZEFileUnserializer();
+									ZEFileUnserializer();
+									~ZEFileUnserializer();
 };
 
 #endif

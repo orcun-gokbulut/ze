@@ -78,7 +78,7 @@ class ZEVector2
 		static void					Multiply(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B);
 		static void					Divide(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B);
 		static void					Divide(ZEVector2 &Out, const ZEVector2 &A, float s);
-		static float				DotProduction(const ZEVector2 &A, const ZEVector2 &B);
+		static float				DotProduct(const ZEVector2 &A, const ZEVector2 &B);
 		static void					Scale(ZEVector2 &Out, const ZEVector2 &A, float s);
 		static float				Length(const ZEVector2 &A);
 		static float				LengthSquare(const ZEVector2 &A);
@@ -134,6 +134,8 @@ class ZEVector2
 									ZEVector2(const ZEVector2 &Start, const ZEVector2 &End);
 									ZEVector2();
 };
+
+ZEVector2 operator*(float S, const ZEVector2& RightOperand);
 
 
 // ZEVector3
@@ -247,6 +249,8 @@ class ZEVector3
 									ZEVector3();
 };
 
+ZEVector3 operator*(float S, const ZEVector3& RightOperand);
+
 
 // ZEVector4
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -338,6 +342,8 @@ class ZEVector4
 									ZEVector4(const ZEVector4& Start, const ZEVector4& End);
 									ZEVector4();
 };
+
+ZEVector4 operator*(float S, const ZEVector4& RightOperand);
 
 #endif
 

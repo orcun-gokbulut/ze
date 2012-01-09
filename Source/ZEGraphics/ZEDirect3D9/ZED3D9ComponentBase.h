@@ -62,7 +62,7 @@ class ZED3D9ComponentBase
 			return Device;
 		}
 
-		static inline LPDIRECT3D9 GetDirect3D()
+		static inline LPDIRECT3D9		GetDirect3D()
 		{
 			return Direct3D;
 		}

@@ -99,6 +99,7 @@ class ZEBitmap
 		unsigned int			GetPitch();
 		unsigned int			GetPixelSize();
 		unsigned int			GetBPP();
+		unsigned int			GetSize();
 
 		ZEPixelColor*			GetPixels();
 		ZEPixelColor&			GetPixel(unsigned int x, unsigned int y);

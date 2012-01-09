@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-
 #ifndef __ZED_GIZMO_UNDO_REDO_H__
 #define __ZED_GIZMO_UNDO_REDO_H__
 

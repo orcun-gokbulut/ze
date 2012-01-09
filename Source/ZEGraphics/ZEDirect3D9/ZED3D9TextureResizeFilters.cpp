@@ -34,6 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9TextureResizeFilters.h"
+#include "ZECore\ZEConsole.h"
+#include "ZEMath\ZEVector.h"
+
 
 // Includes
 #include <cassert>
@@ -81,28 +84,35 @@ float Bessel0(float x)
 	return Sum;
 }
 
-// Filter Class
-Filter::Filter(float Width) : FilterWidth(Width)
+// ZEFilter Class
+ZEFilter::ZEFilter(float Width) : FilterWidth(Width)
 {
 
 }
-Filter::~Filter()
+
+ZEFilter::~ZEFilter()
 {
 
 }
-float Filter::GetFilterWidth() const 
+
+float ZEFilter::GetFilterWidth() const 
 {
 	return FilterWidth;
 }
 
-float Filter::SampleBox(float x, float Scale, int Samples) const
+float ZEFilter::SampleBox(float x, float Scale, int Samples) const
 {
 	float Sum = 0;
-	float InverseSamples = 1.0f / float(Samples);
+	float InverseSamples = 1.0f / (float)Samples;
+	float Increment = 1.0f / (Samples + 1);
+	
 
 	for(int s = 0; s < Samples; s++)
 	{
-		float p = (x + (float(s) + 0.5f) * InverseSamples) * Scale;
+		// this equation is wrong
+		//float p = (x + (float(s) + 0.5f) * InverseSamples) * Scale;
+		float p = (x + Increment * ((float)s + 1)) * Scale; 
+
 		float Value = this->Process(p);
 		Sum += Value;
 	}
@@ -111,15 +121,17 @@ float Filter::SampleBox(float x, float Scale, int Samples) const
 }
 
 
-// Box(Mean) Filter
-BoxFilter::BoxFilter() : Filter(0.5f)
+// Box(Mean) ZEFilter
+BoxFilter::BoxFilter() : ZEFilter(0.5f)
 {
 
 }
-BoxFilter::BoxFilter(float Width) : Filter(Width)
+
+BoxFilter::BoxFilter(float Width) : ZEFilter(Width)
 {
 
 }
+
 BoxFilter::~BoxFilter()
 {
 
@@ -134,15 +146,17 @@ float BoxFilter::Process(float x) const
 }
 
 
-// Triangle(Bilinear) Filter
-TriangleFilter::TriangleFilter() : Filter(1.0f)
+// Triangle(Bilinear) ZEFilter
+TriangleFilter::TriangleFilter() : ZEFilter(1.0f)
 {
 
 }
-TriangleFilter::TriangleFilter(float Width) : Filter(Width)
+
+TriangleFilter::TriangleFilter(float Width) : ZEFilter(Width)
 {
 
 }
+
 TriangleFilter::~TriangleFilter()
 {
 
@@ -158,19 +172,22 @@ float TriangleFilter::Process(float x) const
 
 
 
-// Cubic(Hermite) Filter
-CubicFilter::CubicFilter() : Filter(1.0f)
+// Cubic(Hermite) ZEFilter
+CubicFilter::CubicFilter() : ZEFilter(1.0f)
 {
 
 }
-CubicFilter::CubicFilter(float Width) : Filter(Width)
+
+CubicFilter::CubicFilter(float Width) : ZEFilter(Width)
 {
 
 }
+
 CubicFilter::~CubicFilter()
 {
 
 }
+
 float CubicFilter::Process(float x) const
 {
 	x = fabs(x);
@@ -181,19 +198,27 @@ float CubicFilter::Process(float x) const
 }
 
 
-// Gaussian Filter
-GaussianFilter::GaussianFilter() : Filter(2.0f)
+// Gaussian ZEFilter
+GaussianFilter::GaussianFilter() : ZEFilter(2.0f)
 {
 	Alpha = 2.0f;
 }
-GaussianFilter::GaussianFilter(float Width) : Filter(Width)
+
+GaussianFilter::GaussianFilter(float Width) : ZEFilter(Width)
 {
 
 }
+
+GaussianFilter::GaussianFilter(float Width, float Alpha) : ZEFilter(Width)
+{
+	this->Alpha = Alpha;
+}
+
 GaussianFilter::~GaussianFilter()
 {
 
 }
+
 float GaussianFilter::Process(float x) const
 {
 	x = fabs(x);
@@ -201,19 +226,21 @@ float GaussianFilter::Process(float x) const
 }
 
 
-// Quadratic Filter
-QuadraticFilter::QuadraticFilter() : Filter(1.5f)
+// Quadratic ZEFilter
+QuadraticFilter::QuadraticFilter() : ZEFilter(1.5f)
 {
 
 }
-QuadraticFilter::QuadraticFilter(float Width) : Filter(Width)
+QuadraticFilter::QuadraticFilter(float Width) : ZEFilter(Width)
 {
 
 }
+
 QuadraticFilter::~QuadraticFilter()
 {
 
 }
+
 float QuadraticFilter::Process(float x) const
 {
 	x = fabs(x);
@@ -228,16 +255,18 @@ float QuadraticFilter::Process(float x) const
 }
 
 
-// Kaiser Filter
-KaiserFilter::KaiserFilter(float Width) : Filter(Width)
+// Kaiser ZEFilter
+KaiserFilter::KaiserFilter(float Width) : ZEFilter(Width)
 {
 	Alpha = 4.0f; 
 	Stretch = 1.0f;
 }
+
 KaiserFilter::~KaiserFilter()
 {
 
 }
+
 float KaiserFilter::Process(float x) const
 {
 	float SincValue = Sincf(PI * x * Stretch);
@@ -251,8 +280,8 @@ float KaiserFilter::Process(float x) const
 }
 
 
-// Mitchell Filter
-MitchellFilter::MitchellFilter(float B, float C) : Filter(2.0f)
+// Mitchell ZEFilter
+MitchellFilter::MitchellFilter(float B, float C) : ZEFilter(2.0f)
 {
 	P0 = (6.0f -  2.0f * B) / 6.0f;
 	P2 = (-18.0f + 12.0f * B + 6.0f * C) / 6.0f;
@@ -262,10 +291,12 @@ MitchellFilter::MitchellFilter(float B, float C) : Filter(2.0f)
 	Q2 = (6.0f * B + 30.0f * C) / 6.0f;
 	Q3 = (-B - 6.0f * C) / 6.0f;
 }
+
 MitchellFilter::~MitchellFilter()
 {
 
 }
+
 float MitchellFilter::Process(float x) const
 {
 	x = fabs(x);
@@ -276,115 +307,72 @@ float MitchellFilter::Process(float x) const
 	return 0.0f;
 }
 
-
-// Kernel1D
-Kernel1D::Kernel1D(Filter& Filt, int InverseScale, int Samples)
-{
-	assert(InverseScale <= 1);
-	assert(Samples <= 0);
-
-	float Scale = 1.0f / InverseScale;
-	KernelWidth = Filt.GetFilterWidth() * InverseScale;
-	KernelWindowSize = (int)ceilf(2 * KernelWidth);
-	KernelWeights = new float[KernelWindowSize];
-
-	float Offset = (float)KernelWindowSize / 2.0f;
-	float Total = 0.0f;
-
-	for (int i = 0; i < KernelWindowSize; i++)
-	{
-		float Sample = Filt.SampleBox(i - Offset, Scale, Samples);
-		KernelWeights[i] = Sample;
-		Total += Sample;
-	}
-
-	// Normalize the weights
-	float InverseTotal = 1.0f / Total;
-	for(int i = 0; i < KernelWindowSize; i++)
-	{
-		KernelWeights[i] *= InverseTotal;
-	}
-}
-Kernel1D::~Kernel1D()
-{
-
-}
-float Kernel1D::GetValue(unsigned int Column) const
-{
-	assert(Column > (unsigned int)KernelWindowSize);
-	return KernelWeights[Column];
-}
-
-
 // 1D Polyphase kernel
-PolyPhaseKernel::PolyPhaseKernel(const Filter* Filt, unsigned int SrcLength, unsigned int DestLength, int Samples)
+ZEKernel::ZEKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int DestLength, int Samples, float PixelSize)
 {
 	float Scale = (float)DestLength / (float)SrcLength;
 	float InverseScale = 1.0f / Scale;
 
-	if (Scale > 1) // Upsampling Case
+	// Upsampling Case
+	if (Scale > 1) 
 	{
 		Samples = 1;
 		Scale = 1;
 	}
 
-	
 	KernelWidth = Filt->GetFilterWidth() * InverseScale;
-	KernelWindowSize = (int)ceilf(KernelWidth * 2) + 1;
-	KernelWeights = new float[KernelWindowSize];
-	memset(KernelWeights, 0, sizeof(float) * KernelWindowSize);
+	KernelWindowSize = (int)ceilf(KernelWidth * 2);
+	// allocation is fixed since we pass it to graphics device
+	KernelWeights = new ZEVector4[KernelWindowSize];
+	memset(KernelWeights, 0, sizeof(ZEVector4) * KernelWindowSize);
 
-	// Calculate the weights of the kernel
-	
-	Center = 0.5f * InverseScale;
+	Center = float(KernelWindowSize) / 2.0f;
 
-	int Left = (int)floorf(Center - KernelWidth);
-	int Right = (int)ceilf(Center + KernelWidth);
-
+	float PixelCoord = -1.0f * (floorf(Center) - 0.5f);
 	float Total = 0.0f;
-	for(int j = 0; j < KernelWindowSize; j++)
+	for(int I = 0; I < KernelWindowSize; I++)
 	{
-		float Sample = Filt->SampleBox(Left + j - Center, Scale, Samples);
-		KernelWeights[j] = Sample;
+		const float Sample = Filt->SampleBox(I - Center, Scale, Samples);
+		KernelWeights[I] = ZEVector4(Sample, PixelCoord * PixelSize, 0.0f, 0.0f);
 		Total += Sample;
+		PixelCoord += 1.0f;
 	}
 
 	float InverseTotal = 1.0f / Total;
-
 	// Normalize the weight of the WindowSize
-	for(int j = 0; j < KernelWindowSize; j++)
+	for(int I = 0; I < KernelWindowSize; I++)
 	{
-		KernelWeights[j] *= InverseTotal;
+		KernelWeights[I].x *= InverseTotal;
 	}
 }
-PolyPhaseKernel::~PolyPhaseKernel()
+ZEKernel::~ZEKernel()
 {
+	// Delete weights
+	if (KernelWeights)
+	{
+		delete KernelWeights;
+		KernelWeights = NULL;
+	}
 
 }
 
-float* PolyPhaseKernel::GetKernel()
+ZEVector4* ZEKernel::GetKernel() const
 {
 	return KernelWeights;
 }
 
-int PolyPhaseKernel::GetKernelWindowSize()
+int ZEKernel::GetKernelWindowSize() const
 {
 	return KernelWindowSize;
 }
 
-float PolyPhaseKernel::GetKernelWidth()
+float ZEKernel::GetKernelWidth() const
 {
 	return KernelWidth;
 }
 
 // Works as the center of the array
-float PolyPhaseKernel::GetKernelCenter()
+float ZEKernel::GetKernelCenter() const
 {
-	return Center + KernelWidth - 1.0f;
-}
-
-float PolyPhaseKernel::GetValue(unsigned int x) const
-{
-	assert(x > (unsigned int)KernelWindowSize);
-	return KernelWeights[x];
+	return KernelWidth;
 }

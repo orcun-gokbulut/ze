@@ -55,9 +55,9 @@ class ZETexture3DResource : public ZETextureResource
 
 		const ZETexture3D*					GetTexture() const;
 
-		static void							CacheResource(const char* FileName);
-		static ZETexture3DResource*			LoadSharedResource(const char* FileName);
-		static ZETexture3DResource*			LoadResource(const char* FileName);
+		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static ZETexture3DResource*			LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static ZETexture3DResource*			LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 };
 
 #endif

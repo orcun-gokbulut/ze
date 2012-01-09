@@ -297,7 +297,7 @@ struct ZEModelFileMeshChunk
 {
 	ZEDWORD								ChunkId;
 	char								Name[ZE_MDLF_MAX_NAME_SIZE];
-	ZEAABBox						BoundingBox;
+	ZEAABBox							BoundingBox;
 	ZEVector3							Position;
 	ZEQuaternion						Rotation;
 	ZEVector3							Scale;
@@ -314,7 +314,7 @@ struct ZEModelFileBoneChunk
 	ZEVector3							RelativePosition;
 	ZEQuaternion						RelativeRotation;
 	ZEVector3							RelativeScale;
-	ZEAABBox						BoundingBox;
+	ZEAABBox							BoundingBox;
 	bool								HasPhysicalBody;
 	bool								HasPhysicalJoint;
 };

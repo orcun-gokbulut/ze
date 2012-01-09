@@ -104,7 +104,6 @@ class ZEVariant : public ZESerializable
 
 		void				SetString(const char *NewValue);
 		void				SetInteger(int Value);
-		void				SetUnsignedInteger(unsigned int Value);
 		void				SetFloat(float Value);
 		void				SetBoolean(bool Value);
 		void				SetVector2(const ZEVector2& Vector);

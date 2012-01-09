@@ -33,14 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZED3D9Shader.h"
+#include "ZEFile/ZEFile.h"
+#include "ZED3D9TextureCube.h"
+#include "ZED3D9CommonTools.h"
+#include "ZEGraphics/ZECamera.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9SkyBoxMaterial.h"
-#include "ZED3D9TextureCube.h"
-#include "ZED3D9Shader.h"
-#include "ZED3D9CommonTools.h"
 #include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEFile/ZEResourceFile.h"
+
+
 #include <D3D9.h>
 
 ZED3D9SkyBoxMaterial::ZED3D9SkyBoxMaterial()
@@ -78,9 +80,12 @@ bool ZED3D9SkyBoxMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderC
 
 	// Setup Transformations
 	ZEMatrix4x4 WorldViewProjMatrix;
-	ZEMatrix4x4 WorldViewMatrix;
 	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Camera->GetViewProjectionTransform(), RenderOrder->WorldMatrix);
-	GetDevice()->SetVertexShaderConstantF(0, (float*)&RenderOrder->WorldMatrix, 4);
+	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
+
+	/*ZEMatrix4x4 WorldViewMatrix;
+	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Camera->GetViewProjectionTransform(), RenderOrder->WorldMatrix);
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);*/
 
 	// ZBuffer
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);

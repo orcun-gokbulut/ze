@@ -54,7 +54,7 @@ class ZESoundResourceWAV : public ZESoundResource
 
 		virtual void					Decode(void* Buffer, size_t SampleIndex, size_t Count);
 
-		static ZESoundResource*			LoadResource(const char* FileName);
+		static ZESoundResource*			LoadResource(const ZEString& FileName);
 };
 
 #endif

@@ -39,87 +39,23 @@
 
 #include "ZEAllocator.h"
 #include <string>
-/*
-class ZEChar
-{
-	private:
-		unsigned short				Character;
 
-	public:
-		bool						IsNull();
-		bool						IsLetter();
-		bool						IsLowerCaseLetter();
-		bool						IsUpperCaseLetter();
-		bool						IsDigit();
-		bool						IsSpace();
+#include "ZETypes.h"
 
-		void						SetInteger(int Value);
-		void						SetASCII(char Value);
-		void						SetUTF8(unsigned char Value);
-		void						SetUTF16(unsigned short Value);
-		void						SetWChar(char Value);
-		
-		char						GetAASCII()
-		unsigned char				GetUTF8();
-		unsigned short				GetUTF16();
-		char						GetWChar();		
-		int							GetInteger();
-		
-		ZEChar						ToUpper();
-		ZEChar						ToLower();
-		
-		bool						operator==(ZEChar Value);
-		bool						operator==(char Value);
-		bool						operator==(char Value);
-		bool						operator==(unsigned char Value);
-
-		bool						operator>(ZEChar Value);
-		bool						operator>(char Value);
-		bool						operator>(char Value);
-		bool						operator>(unsigned char Value);
-
-		bool						operator<(ZEChar Value);
-		bool						operator<(char Value);
-		bool						operator<(char Value);
-		bool						operator<(unsigned char Value);
-
-		bool						operator==(ZEChar Value);
-		bool						operator==(char Value);
-		bool						operator==(char Value);
-
-		ZEChar						operator=(char Value);
-		ZEChar						operator=(char Value);
-		ZEChar						operator=(unsigned char Value);
-		ZEChar						operator=(ZEChar Value);
-
-		boo
-}*/
-
-// Internally UTF8
 class ZEString
 {
-	public:
+	private:
 		char*						Buffer;
 		ZEAllocatorBase<char>		Allocator;
 
-	protected:
-		void						SetSize();
-
 	public:			
 		void						SetValue(const char* String);
-		const char*					GetValue() const;
+		void						SetValue(ZEInt Value, ZEUInt Base = 10);
+		void						SetValue(ZEUInt Value, ZEUInt Base = 10);
+		void						SetValue(float Value, ZEUInt Digits);
+		void						SetValue(bool Value, const char* TrueText = "True", const char* FalseText = "False");
 
-		void						SetNumericValue(char Value, unsigned int Base = 10);
-		void						SetNumericValue(unsigned char Value, unsigned int Base = 10);
-		void						SetNumericValue(short Value, unsigned int Base = 10);
-		void						SetNumericValue(unsigned short Value, unsigned int Base = 10);
-		void						SetNumericValue(int Value, unsigned int Base = 10);
-		void						SetNumericValue(unsigned int Value, unsigned int Base = 10);
-		void						SetNumericValue(long Value, unsigned int Base = 10);
-		void						SetNumericValue(unsigned long Value, unsigned int Base = 10);
-		void						SetNumericValue(float Value, unsigned int NumberOfDigits = 6);
-		void						SetNumericValue(double Value, unsigned int NumberOfDigits = 6);
-		void						SetBooleanValue(bool Value);
+		const char*					GetValue() const;
 
 		char						GetCharacter(size_t Position) const;
 		void						SetCharacter(size_t Position, char Value);
@@ -161,13 +97,22 @@ class ZEString
 		ZEString					TrimRight() const;
 		ZEString					Trim() const;
 
-		ZEString					ToLower() const;
-		ZEString					ToUpper() const;
+		ZEString					Lower() const;
+		ZEString					Upper() const;
 
-		int							ToInteger();
-		unsigned int				ToUnsignedInteger();
-		float						ToFloat();
-		double						ToDouble();
+		ZEInt						ToInt() const;
+		ZEUInt						ToUInt() const;
+		float						ToFloat() const;
+		const char*					ToCString() const;
+		std::string					ToStdString() const;
+
+		static ZEString 			FromChar(char Value);
+		static ZEString 			FromInt(ZEInt Value, ZEUInt Base = 10);
+		static ZEString 			FromUInt(ZEUInt Value, ZEUInt Base = 10);
+		static ZEString 			FromFloat(float Value, ZEUInt Digits);
+		static ZEString 			FromBool(bool Value, const char* TrueText = "True", const char* FalseText = "False");
+		static ZEString 			FromCString(const char* Value);
+		static ZEString 			FromStdString(const std::string& Value);
 
 		ZEString&					operator=(const ZEString& String);
 		ZEString&					operator=(const char* String);
@@ -190,14 +135,20 @@ class ZEString
 									operator std::string() const;
 									operator const char*() const;
 
+		static ZEString				Format(const char* Format, ...);
+
 									ZEString();					
 									ZEString(const char* String);
 									ZEString(const ZEString& String);
-									ZEString(std::string& String);
+									ZEString(const std::string& String);
 									~ZEString();
 
 
 };
+
+ZEString operator+(const char* String1, const ZEString& String2);
+bool operator==(const char* String1, const ZEString& String2);
+bool operator!=(const char* String1, const ZEString& String2);
 
 #endif
 

@@ -129,11 +129,7 @@ void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
 	if (SkyTexture != NULL)
 	{
 		SkyRenderOrder.Material = SkyMaterial;
-		ZECamera* Camera = zeScene->GetActiveCamera();
-		ZEMatrix4x4 CameraRotation, SkyRotation;
-		ZEMatrix4x4::CreateRotation(CameraRotation, Camera->GetWorldRotation().Conjugate());
-		ZEMatrix4x4::CreateRotation(SkyRotation, GetRotation());
-		ZEMatrix4x4::Multiply(SkyRenderOrder.WorldMatrix, CameraRotation, SkyRotation);
+		SkyRenderOrder.WorldMatrix = GetWorldTransform();
 		DrawParameters->Renderer->AddToRenderList(&SkyRenderOrder);
 	}
 }

@@ -36,9 +36,9 @@
 #define D3D_DEBUG_INFO
 #endif
 
+#include "ZEError.h"
 #include "ZED3D9Module.h"
 #include "ZECore/ZEWindow.h"
-#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEOptionManager.h"
 #include "ZED3D9FixedMaterial.h"
@@ -52,10 +52,12 @@
 #include "ZED3D9UIMaterial.h"
 #include "ZED3D9SimpleMaterial.h"
 #include "ZED3D9SkyBoxMaterial.h"
-#include "ZED3D9CommonTools.h"
 #include "ZED3D9ShaderManager.h"
+#include "ZED3D9TerrainMaterial.h"
+#include "ZED3D9CommonTools.h"
 
 #include <d3dx9.h>
+
 
 LPDIRECT3DDEVICE9 D3D9Device;
 ZED3D9Module* D3D9Module;
@@ -384,7 +386,7 @@ void ZED3D9Module::DeviceRestored()
 void ZED3D9Module::RestoreDevice(bool ForceReset)
 {
 	DeviceLost();
-	HRESULT DeviceState;
+	HRESULT DeviceState, Hr;
 	do
 	{
 		DeviceState = Device->TestCooperativeLevel();
@@ -478,7 +480,7 @@ void ZED3D9Module::SetAnisotropicFilter(int Level)
 		Device->SetSamplerState(I, D3DSAMP_MINFILTER, (AnisotropicFilter != 1 ? D3DTEXF_ANISOTROPIC : D3DTEXF_LINEAR));
 		Device->SetSamplerState(I, D3DSAMP_MIPFILTER, D3DTEXF_POINT);
 		if (AnisotropicFilter != 0)
-			Device->SetSamplerState(I, D3DSAMP_MAXANISOTROPY, ((ZEDWORD)AnisotropicFilter * 2 > DeviceCaps.MaxAnisotropy ? DeviceCaps.MaxAnisotropy : 2 * (ZEDWORD)AnisotropicFilter));
+			Device->SetSamplerState(I, D3DSAMP_MAXANISOTROPY, (AnisotropicFilter * 2 > DeviceCaps.MaxAnisotropy ? DeviceCaps.MaxAnisotropy : 2 * AnisotropicFilter));
 	}
 }
 
@@ -559,7 +561,6 @@ void ZED3D9Module::ClearFrameBuffer()
 	if (Device->TestCooperativeLevel() != D3D_OK)
 		RestoreDevice();
 
-	Device->SetDepthStencilSurface(FrameBufferViewPort.ZBuffer);
 	Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00555555, 1, 0);
 }
 
@@ -604,6 +605,11 @@ ZEUIMaterial* ZED3D9Module::CreateUIMaterial()
 ZESimpleMaterial* ZED3D9Module::CreateSimpleMaterial()
 {
 	return new ZED3D9SimpleMaterial();
+}
+
+ZETerrainMaterial* ZED3D9Module::CreateTerrainMaterial()
+{
+	return new ZED3D9TerrainMaterial();
 }
 
 ZESkyBoxMaterial* ZED3D9Module::CreateSkyBoxMaterial()

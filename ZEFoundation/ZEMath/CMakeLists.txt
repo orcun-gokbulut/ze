@@ -37,6 +37,9 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEAABBox.cpp				Sources)
 ze_add_source(ZEAABBox.h				Sources Headers)
+ze_add_source(ZEAngle.cpp				Sources)
+ze_add_source(ZEAngle.h					Sources Headers)
+ze_add_source(ZEAngleTests.cpp			Tests)
 ze_add_source(ZEAABBoxTests.cpp			Tests)
 ze_add_source(ZEBSphere.cpp				Sources)
 ze_add_source(ZEBSphere.h				Sources Headers)
@@ -49,8 +52,11 @@ ze_add_source(ZELineTests.cpp			Tests)
 ze_add_source(ZELineSegment.cpp			Sources)
 ze_add_source(ZELineSegment.h			Sources Headers)
 ze_add_source(ZELineSegmentTests.cpp	Tests)
+ze_add_source(ZEMath.h					Sources Headers)
+ze_add_Source(ZEMath.cpp				Sources)
 ze_add_source(ZEMatrix.cpp				Sources)
-ze_add_source(ZEMatrixTests.cpp			Tests)
+ze_add_source(ZEMatrix3x3Tests.cpp		  Tests)
+ze_add_source(ZEMatrix4x4Tests.cpp			Tests)
 ze_add_source(ZEMatrix.h				Sources Headers)
 ze_add_source(ZEOBBox.cpp				Sources)
 ze_add_source(ZEOBBox.h					Sources Headers)
@@ -60,7 +66,7 @@ ze_add_source(ZEPlane.h					Sources Headers)
 ze_add_source(ZEPlaneTests.cpp			Tests)
 ze_add_source(ZEQuaternion.cpp			Sources)
 ze_add_source(ZEQuaternion.h			Sources Headers)
-#ze_add_source(ZEQuaternionTests.cpp		Tests)
+ze_add_source(ZEQuaternionTests.cpp	Tests)
 ze_add_source(ZERay.cpp					Sources)
 ze_add_source(ZERay.h					Sources Headers)
 ze_add_source(ZERayTests.cpp			Tests)
@@ -78,7 +84,11 @@ ze_add_source(ZETrigonometry.h			Sources Headers)
 ze_add_source(ZETrigonometryTests.cpp	Tests)
 ze_add_source(ZEVector.cpp				Sources)
 ze_add_source(ZEVector.h				Sources Headers)
-ze_add_source(ZEVectorTests.cpp			Tests)
+ze_add_source(ZEVector2Tests.cpp		Tests)
+ze_add_source(ZEVector3Tests.cpp		Tests)
+ze_add_source(ZEVector4Tests.cpp		Tests)
+ze_add_source(ZEPolygon.h				Sources Headers)
+ze_add_source(ZEPolygon.cpp				Sources)
 	
 ze_add_library(ZEMath 
 	SOURCES ${Sources} 
@@ -88,7 +98,7 @@ ze_add_library(ZEMath
 	INSTALL_DESTINATION ZEFoundationAPI/ZEMath
 	INSTALL_COMPONENT ZESDK)
 	
-ze_add_bulk_unit_tests(
+ze_add_unit_tests(ZEMathTests
 	SOURCES ${Tests}
 	EXTRA_SOURCES ZEMathIOStreamMapping.cpp ZEMathIOStreamMapping.h
 	TEST_TARGET ZEMath)

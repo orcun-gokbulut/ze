@@ -48,6 +48,16 @@ class ZEVector3;
 class ZEVector4;
 class ZEQuaternion;
 
+enum ZERotationOrder
+{
+	ZE_RO_XYZ,
+	ZE_RO_XZY,
+	ZE_RO_YXZ,
+	ZE_RO_YZX,
+	ZE_RO_ZXY,
+	ZE_RO_ZYX
+};
+
 
 // ZEMatrix3x3
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,10 +84,10 @@ class ZEMatrix3x3
 											   float M31, float M32, float M33);
 		static void						Create(ZEMatrix3x3& Matrix, float* M);
 		static void						CreateRotation(ZEMatrix3x3& Matrix, const ZEQuaternion& Rotation);
+		static void						CreateRotation(ZEMatrix3x3& Matrix, float Pitch, float Yawn, float Roll, ZERotationOrder RotationOrder = ZE_RO_XYZ);
 		static void						CreateRotationX(ZEMatrix3x3& Matrix, float Pitch);
 		static void						CreateRotationY(ZEMatrix3x3& Matrix, float Yawn);
 		static void						CreateRotationZ(ZEMatrix3x3& Matrix, float Roll);
-		static void						CreateRotationXYZ(ZEMatrix3x3& Matrix, float Pitch, float Yawn, float Roll);
 		static void						CreateScale(ZEMatrix3x3& Matrix, float x, float y, float z);
 		static void						CreateIdentity(ZEMatrix3x3& Matrix);
 		static void						CreateZero(ZEMatrix3x3& Matrix);
@@ -90,9 +100,9 @@ class ZEMatrix3x3
 		static float					Determinant(const ZEMatrix3x3 &Matrix);
 		static bool						Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix);
 
-		static void						Transform(ZEVector2& Out, const ZEMatrix3x3 &Matrix, const ZEVector2& Vector); // Doldur metin doldur acıma doldur
+		static void						Transform(ZEVector2& Out, const ZEMatrix3x3 &Matrix, const ZEVector2& Vector);
 		static void						Transform(ZEVector3& Out, const ZEMatrix3x3 &Matrix, const ZEVector3& Vector);
-		static void						Transform(ZEVector4& Out, const ZEMatrix3x3 &Matrix, const ZEVector4& Vector); // Doldur metin doldur
+		static void						Transform(ZEVector4& Out, const ZEMatrix3x3 &Matrix, const ZEVector4& Vector);
 
 		float							Determinant() const;
 
@@ -129,6 +139,7 @@ class ZEMatrix3x3
 										ZEMatrix3x3();
 };
 
+ZEMatrix3x3 operator*(float S, const ZEMatrix3x3& RightOperand);
 
 
 // ZEMatrix4x4
@@ -160,15 +171,14 @@ class ZEMatrix4x4
 		static void						CreateRotationX(ZEMatrix4x4& Matrix, float Pitch);
 		static void						CreateRotationY(ZEMatrix4x4& Matrix, float Yawn);
 		static void						CreateRotationZ(ZEMatrix4x4& Matrix, float Roll);
-		static void						CreateRotationXYZ(ZEMatrix4x4& Matrix, float Pitch, float Yawn, float Roll);
 		static void						CreateRotation(ZEMatrix4x4& Matrix, const ZEQuaternion& Rotation);
+		static void						CreateRotation(ZEMatrix4x4& Matrix, float Pitch, float Yawn, float Roll, ZERotationOrder RotationOrder = ZE_RO_XYZ);
 		static void						CreateScale(ZEMatrix4x4& Matrix, float x, float y, float z);
 		static void						CreateScale(ZEMatrix4x4& Matrix, const ZEVector3& Scale);
 		static void						CreateTranslation(ZEMatrix4x4& Matrix, float x, float y, float z);
 		static void						CreateTranslation(ZEMatrix4x4& Matrix, const ZEVector3& Position);
 		static void						CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Scale);
 		static void						CreateOrientation(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);
-		static void						CreateOffset(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);
 		static void						CreateIdentity(ZEMatrix4x4& Matrix);
 		static void						CreateZero(ZEMatrix4x4& Matrix);
 		static void						CreateViewTransform(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEQuaternion& Rotation);
@@ -176,8 +186,6 @@ class ZEMatrix4x4
 		static void						CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width, float Height, float NearZ, float FarZ);
 		static void						CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ);
 		static void						CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ);
-
-		void							CreatePerspectiveProjectionLinearZ(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ);
 
 		static void						Add(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
 		static void						Sub(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B);
@@ -224,6 +232,8 @@ class ZEMatrix4x4
 										ZEMatrix4x4(float* M);
 										ZEMatrix4x4();
 };
+
+ZEMatrix4x4 operator*(float S, const ZEMatrix4x4& RightOperand);
 
 #endif
 

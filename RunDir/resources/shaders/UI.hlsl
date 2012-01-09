@@ -62,7 +62,7 @@ VSOutput VSMain(VSInput Input)
 {
 	VSOutput Output;
 
-	Output.Position = mul(Input.Position, TransformMatrix);
+	Output.Position = mul(TransformMatrix, Input.Position);
 	Output.Texcoord = Input.Texcoord + TextureSize;
 	Output.Color = Input.Color;
 	

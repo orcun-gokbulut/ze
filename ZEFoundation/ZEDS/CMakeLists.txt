@@ -39,6 +39,7 @@ ze_add_source(ZEAllocator.cpp			Sources)
 ze_add_source(ZEAllocator.h				Sources Headers)
 ze_add_source(ZEArray.cpp				Sources)
 ze_add_source(ZEArray.h					Sources Headers)
+ze_add_source(ZEArrayTests.cpp	Tests)
 ze_add_source(ZEDelegate.cpp			Sources)
 ze_add_source(ZEDelegate.h				Sources Headers)
 ze_add_source(ZEDelegateImp.h			Sources Headers)
@@ -47,6 +48,21 @@ ze_add_source(ZEFastDelegate.h			Sources Headers)
 ze_add_source(ZEFastDelegateBind.h		Sources Headers)
 ze_add_source(ZEFlags.cpp				Sources)
 ze_add_source(ZEFlags.h					Sources Headers)
+ze_add_source(ZEFlagsTests.cpp			Tests)
+ze_add_source(ZEHeapBase.h				Sources Headers)
+ze_add_source(ZEHeapBase.cpp			Sources)
+ze_add_source(ZEMinHeap.h				Sources Headers)
+ze_add_source(ZEMinHeap.cpp				Sources)
+ze_add_source(ZEMinHeapTests.cpp		Tests)
+ze_add_source(ZEMaxHeap.h				Sources Headers)
+ze_add_source(ZEMaxHeap.cpp				Sources)
+ze_add_source(ZEMaxHeapTests.cpp		Tests)
+ze_add_source(ZEList.h					Sources Headers)
+ze_add_source(ZEList.cpp				Sources)
+ze_add_source(ZETree.h					Sources Headers)
+ze_add_source(ZETree.cpp				Sources Headers)
+ze_add_source(ZEGraph.h					Sources Headers)
+ze_add_source(ZEGraph.cpp				Sources Headers)
 ze_add_source(ZEPointer.cpp				Sources)
 ze_add_source(ZEPointer.h				Sources Headers)
 ze_add_source(ZEPointerTests.cpp		Tests)
@@ -63,6 +79,10 @@ ze_add_source(ZETypedVariant.cpp		Sources)
 ze_add_source(ZETypedVariant.h			Sources Headers)
 ze_add_source(ZEVariant.cpp				Sources)
 ze_add_source(ZEVariant.h				Sources Headers)
+ze_add_source(ZEVariantTests.cpp		Tests)
+
+ze_add_source(ZEPointerTestClass.h		Tests)
+ze_add_source(ZEPointerTestClass.cpp	Tests)
 
 ze_add_library(ZEDS 
 	SOURCES ${Sources} 
@@ -72,7 +92,6 @@ ze_add_library(ZEDS
 	INSTALL_DESTINATION ZEFoundationAPI/ZEDS
 	INSTALL_COMPONENT ZESDK)
 	
-	
-ze_add_bulk_unit_tests(ZEStringTests 
-	SOURCES ${Tests} 
+ze_add_unit_tests(ZEDSTests 
+	SOURCES ${Tests}
 	TEST_TARGET ZEDS)

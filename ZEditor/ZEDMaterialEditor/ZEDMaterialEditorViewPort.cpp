@@ -79,6 +79,7 @@ void ZEDMaterialEditorViewPort::Initialize()
 	zeCore->GetGame()->GetScene()->AddEntity(Model);
 
 	DirectLight1 = ZEDirectionalLight::CreateInstance();
+	DirectLight1->SetName("D1");
 	zeCore->GetGame()->GetScene()->AddEntity(DirectLight1);
 	DirectLight1->SetIntensity(1.0f);
 	DirectLight1->SetColor(ZEVector3(1.0f, 0.596078f, 0.596078f));
@@ -87,6 +88,7 @@ void ZEDMaterialEditorViewPort::Initialize()
 	DirectLight1->SetRotation(Rotation);
 
 	DirectLight2 = ZEDirectionalLight::CreateInstance();
+	DirectLight2->SetName("D2");
 	zeCore->GetGame()->GetScene()->AddEntity(DirectLight2);
 	DirectLight2->SetIntensity(1.0f);
 	DirectLight2->SetColor(ZEVector3(0.823529f, 1.0f, 0.988235f));
@@ -94,27 +96,13 @@ void ZEDMaterialEditorViewPort::Initialize()
 	DirectLight2->SetRotation(Rotation);
 
 	DirectLight3 = ZEDirectionalLight::CreateInstance();
+	DirectLight3->SetName("D3");
 	zeCore->GetGame()->GetScene()->AddEntity(DirectLight3);
 	DirectLight3->SetIntensity(1.0f);
 	//DirectLight3->SetColor(ZEVector3(0.988235f; 1.0f; 0.827451f));
 	DirectLight3->SetColor(ZEVector3(0.666667f,  0.333333f,  0.0f));
 	ZEQuaternion::CreateFromEuler(Rotation, ZE_PI_2, 0, 0);
 	DirectLight3->SetRotation(Rotation);
-
-	ZERunTimeProperty	CProperty1;
-	CProperty1.Name = "CanRocks";
-	CProperty1.Semantic = ZE_PS_COLOR;
-	CProperty1.Type = ZE_VRT_VECTOR3;
-	CProperty1.Value = ZEVariant(ZEVector3::One);
-	DirectLight3->AddCustomProperty(CProperty1);
-
-	CProperty1.Name = "OrcunRocks";
-	CProperty1.Semantic = ZE_PS_FILENAME;
-	CProperty1.Type = ZE_VRT_STRING;
-	CProperty1.Value = ZEVariant("We Ride!!!");
-	DirectLight3->AddCustomProperty(CProperty1);
-
-	//DirectLight3->SetProperty("CanRocks", ZEVariant(ZEVector3::Zero));
 }
 
 void ZEDMaterialEditorViewPort::resizeEvent(QResizeEvent* ResizeEvent)

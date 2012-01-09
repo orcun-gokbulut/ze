@@ -36,8 +36,11 @@
 #ifndef __ZE_FLAGS_H__
 #define __ZE_FLAGS_H__
 
-template <typename Type = unsigned int>
-class ZEFlags
+#include "ZETypes.h"
+#include "ZEError.h"
+
+template <typename Type = ZEUInt>
+class ZEFlagsBase
 {
 	public:
 		Type Value;
@@ -60,8 +63,10 @@ class ZEFlags
 				UnraiseBit(Index);
 		}
 
-		inline bool GetBit(size_t Index)
+		inline bool GetBit(size_t Index) const
 		{
+			zeAssert(Index > 31, "ZEFlags::GetBit(size_t Index) index can't be greater than 31.");
+
 			return (Value & (0x1 << Index)) != 0;
 		}
 
@@ -75,7 +80,7 @@ class ZEFlags
 
 		inline void RaiseFlags(int Flags)
 		{
-			Value |= Value;
+			Value |= Flags;
 		}
 
 		inline void UnraiseFlags(Type Flags)
@@ -84,7 +89,7 @@ class ZEFlags
 
 		}
 
-		inline void GetFlags(int Flags)
+		inline bool GetFlags(int Flags) const
 		{
 			return (Value & Flags) == Flags;
 		}
@@ -99,26 +104,105 @@ class ZEFlags
 			return Value;
 		}
 
-		inline const Type& operator=(const Type& Value)
+		inline ZEFlagsBase<Type> operator&(const Type& Other) const
 		{
-			this->Value = Value;
+			return ZEFlagsBase<Type>(this->Value & Other);		
+		}
+
+		inline ZEFlagsBase<Type> operator&(const ZEFlagsBase<Type>& Other) const
+		{
+			return ZEFlagsBase<Type>(this->Value & Other.Value);			
+		}
+
+		inline ZEFlagsBase<Type>& operator&=(const Type& Other)
+		{
+			this->Value &= Other;
 			return *this;
 		}
 
-		inline ZEFlags()
+		inline ZEFlagsBase<Type>& operator&=(const ZEFlagsBase<Type>& Other)
+		{
+			this->Value &= Other.Value;
+			return *this;
+		}
+
+		inline ZEFlagsBase<Type> operator|(const Type& Other) const
+		{
+			return ZEFlagsBase<Type>(this->Value | Other);
+		}
+
+		inline ZEFlagsBase<Type> operator|(const ZEFlagsBase<Type>& Other) const
+		{
+			return ZEFlagsBase<Type>(this->Value | Other.Value);
+		}
+
+		inline ZEFlagsBase<Type>& operator|=(const Type& Other)
+		{
+			this->Value |= Other;
+			return *this;
+		}
+
+		inline ZEFlagsBase<Type>& operator|=(const ZEFlagsBase<Type>& Other)
+		{
+			this->Value |= Other.Value;
+			return *this;
+		}
+
+		inline ZEFlagsBase<Type> operator^(const Type& Other) const
+		{
+			return ZEFlagsBase<Type>(this->Value ^ Other);
+		}
+
+		inline ZEFlagsBase<Type> operator^(const ZEFlagsBase<Type>& Other) const
+		{
+			return ZEFlagsBase<Type>(this->Value ^ Other.Value);
+		}
+
+		inline ZEFlagsBase<Type>& operator^=(const Type& Other)
+		{
+			this->Value ^= Other;
+			return *this;
+		}
+
+		inline ZEFlagsBase<Type>& operator^=(const ZEFlagsBase<Type>& Other)
+		{
+			this->Value ^= Other.Value;
+			return *this;
+		}
+
+		inline ZEFlagsBase<Type>& operator~() const
+		{
+			return ZEFlagsBase<Type>(~this->Value);
+		}
+
+		inline ZEFlagsBase<Type>& operator=(const Type& Other)
+		{
+			this->Value = Other;
+			return *this;
+		}
+		
+		inline ZEFlagsBase<Type>& operator=(const ZEFlagsBase<Type>& Other)
+		{
+			this->Value = Other.Value;
+			return *this;
+		}
+
+		inline ZEFlagsBase()
 		{
 			Value = 0;
 		}
 
-		inline ZEFlags(const Type& Value)
+		inline ZEFlagsBase(const Type& Value)
 		{
 			this->Value = Value;
 		}
 
-		inline ZEFlags(const ZEFlags& Value)
+		inline ZEFlagsBase(const ZEFlagsBase<Type>& Value)
 		{
 			this->Value = Value;
 		}
 };
+
+typedef ZEFlagsBase<ZEUInt> ZEFlags;
 
 #endif

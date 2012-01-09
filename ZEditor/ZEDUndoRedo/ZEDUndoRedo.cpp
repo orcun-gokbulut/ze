@@ -54,13 +54,13 @@ ZEDUndoRedoOperation::ZEDUndoRedoOperation()
 
 ///////////////////////////////////////////////////////////MANAGER////////////////////////////////////////////////////
 
-int ZEDUndoRedoManager::CurrentIndex = -1;
-unsigned int ZEDUndoRedoManager::MaxOperationCount = 100;
-ZEArray<ZEDUndoRedoOperation*> ZEDUndoRedoManager::UndoRedoStack;
-bool ZEDUndoRedoManager::PreviousActionIsUndo = false;
-bool ZEDUndoRedoManager::PreviousActionIsRedo = false;
+int ZEDUndoRedoManagerOld::CurrentIndex = -1;
+unsigned int ZEDUndoRedoManagerOld::MaxOperationCount = 100;
+ZEArray<ZEDUndoRedoOperation*> ZEDUndoRedoManagerOld::UndoRedoStack;
+bool ZEDUndoRedoManagerOld::PreviousActionIsUndo = false;
+bool ZEDUndoRedoManagerOld::PreviousActionIsRedo = false;
 
-void ZEDUndoRedoManager::RegisterOperation(ZEDUndoRedoOperation* Operation)
+void ZEDUndoRedoManagerOld::RegisterOperation(ZEDUndoRedoOperation* Operation)
 {
 	/*if(CurrentIndex != UndoRedoStack.GetCount() - 1)
 	{
@@ -87,7 +87,7 @@ void ZEDUndoRedoManager::RegisterOperation(ZEDUndoRedoOperation* Operation)
 	}
 }
 
-bool ZEDUndoRedoManager::PerformUndo()
+bool ZEDUndoRedoManagerOld::PerformUndo()
 {
 	if(PreviousActionIsUndo)
 		CurrentIndex--;
@@ -117,7 +117,7 @@ bool ZEDUndoRedoManager::PerformUndo()
 	}
 }
 
-bool ZEDUndoRedoManager::PerformRedo()
+bool ZEDUndoRedoManagerOld::PerformRedo()
 {
 	if(PreviousActionIsRedo)
 		CurrentIndex++;
@@ -141,17 +141,17 @@ bool ZEDUndoRedoManager::PerformRedo()
 	}
 }
 
-void ZEDUndoRedoManager::SetMaxOperationCount(unsigned int Count)
+void ZEDUndoRedoManagerOld::SetMaxOperationCount(unsigned int Count)
 {
 	this->MaxOperationCount = Count;
 }
 
-unsigned int ZEDUndoRedoManager::GetMaxOperationCount() const
+unsigned int ZEDUndoRedoManagerOld::GetMaxOperationCount() const
 {
 	return MaxOperationCount;
 }
 
-ZEDUndoRedoManager::ZEDUndoRedoManager()
+ZEDUndoRedoManagerOld::ZEDUndoRedoManagerOld()
 {
 
 }

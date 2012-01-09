@@ -37,42 +37,30 @@
 #ifndef	__ZE_TEXTURE_2D_RESOURCE_H__
 #define __ZE_TEXTURE_2D_RESOURCE_H__
 
-#include "ZETextureLoader.h"
-#include "ZETextureResource.h"
 #include "ZEGraphicsModule.h"
-#include "ZETypes.h"
+#include "ZETextureResource.h"
 
 class ZETexture2D;
-class ZEResourceFile;
-struct ZETextureLoaderInfo;
-
 
 class ZETexture2DResource : public ZETextureResource
 {
-	friend class ZETextureTools;
-
 	private:
 		ZETexture2D*						Texture;
-
-		static ZETexture2DResource*			LoadFromFile(ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadFromFileCache(ZEResourceFile* ResourceFile, const char* TextureFileName, const ZETextureOptions *Options);
-
-		static void							GetFinalTextureOptions(ZETextureOptions& FinalOptions, ZEResourceFile* ResourceFile, const ZETextureOptions* UserOptions);
 
 	protected:
 											ZETexture2DResource();
 		virtual 							~ZETexture2DResource();
 
 	public:
+		const ZETexture2D*					GetTexture() const;
 		virtual const char*					GetResourceType() const;
 		virtual ZETextureType				GetTextureType() const;
 
-		const ZETexture2D*					GetTexture() const;
-
-		static void							CacheResource(const char* FileName);
-		static ZETexture2DResource*			LoadSharedResource(const char* FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadResource(const char* FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadResource(ZEResourceFile* ResourceFile, bool EmbededResource = true, const ZETextureOptions* UserOptions = NULL);
+		static ZETexture2DResource*			LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		
+		static ZETexture2DResource*			LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static ZETexture2DResource*			LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
 
 };
 

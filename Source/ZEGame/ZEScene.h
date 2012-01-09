@@ -108,8 +108,8 @@ class ZEScene
 		void									SetActiveListener(ZEListener* Listener);
 		ZEListener*								GetActiveListener();
 
-		bool									Save(const char* FileName);
-		bool									Load(const char* FileName);
+		bool									Save(const ZEString& FileName);
+		bool									Load(const ZEString& FileName);
 
 		bool									Initialize();
 		void									Deinitialize();

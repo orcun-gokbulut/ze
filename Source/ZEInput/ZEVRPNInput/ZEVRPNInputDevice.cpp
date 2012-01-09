@@ -133,7 +133,7 @@ bool ZEVRPNInputDevice::Initialize()
 	if (IsInitialized())
 		return false;
 
-	TrackerRemote = new vrpn_Tracker_Remote("Tracker0@localhost");
+	TrackerRemote = new vrpn_Tracker_Remote("HeadTracker@localhost");
 	TrackerRemote->register_change_handler(this, Tracker_ChangeHandler);
 
 	ButtonRemote = new vrpn_Button_Remote("Mouse0@localhost");

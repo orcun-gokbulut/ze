@@ -47,6 +47,7 @@ class ZEDirectionalLight;
 class ZECanvasBrush;
 class ZEModel;
 class ZEPortalMap;
+class ZESkyBrush;
 
 class ZEGraphicsDebugModule : public ZEApplicationModule
 {
@@ -57,9 +58,12 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 		ZEPointLight*			PointLight3;
 		ZEPointLight*			PointLight4;
 		ZEPointLight*			PointLight5;
+		ZEPointLight*			PointLight6;
 		ZEProjectiveLight*		ProjectiveLight0;
 		ZEOmniProjectiveLight*	OmniProjectiveLight0;
 		ZEDirectionalLight*		DirectionalLight0;
+
+		ZESkyBrush*				SkyBrush;
 
 		ZEPortalMap*			Map;
 		ZEModel*				Model;

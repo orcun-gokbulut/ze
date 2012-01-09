@@ -57,6 +57,7 @@ add_subdirectory(ZEDCommonEntities)
 add_subdirectory(ZEDCore)
 add_subdirectory(ZEDSceneEditor)
 add_subdirectory(ZEDMaterialEditor)
+add_subdirectory(ZEDNodeEditor)
 add_subdirectory(ZEDScriptEditor)
 add_subdirectory(ZEDUndoRedo)
 add_subdirectory(ZEDSoundExtensionsPlugIn)
@@ -68,6 +69,6 @@ ze_add_executable(ZEditor
 	SOURCES ${Sources}
 	LIBS ZEEngineAPI
 		ZEDCommonControls ZEDCommonEntities ZEDCore ZEDImageExtensionsPlugIn ZEDMaterialEditor ZEDPropertyWindowManager
-		ZEDSceneEditor ZEDScriptEditor ZEDSoundExtensionsPlugIn ZEDUndoRedo ZEDBrowser
+		ZEDSceneEditor ZEDScriptEditor ZEDSoundExtensionsPlugIn ZEDUndoRedo ZEDBrowser ZEDNodeEditor
 		QtCore4 QtGui4
 	WIN32)

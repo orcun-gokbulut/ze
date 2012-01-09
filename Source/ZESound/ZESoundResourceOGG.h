@@ -65,7 +65,7 @@ class ZESoundResourceOGG : public ZESoundResource
 
 		virtual void					Decode(void* DestinationBuffer, size_t SampleIndex, size_t SampleCount);
 
-		static ZESoundResource*			LoadResource(const char* FileName);
+		static ZESoundResource*			LoadResource(const ZEString& FileName);
 };
 
 #endif

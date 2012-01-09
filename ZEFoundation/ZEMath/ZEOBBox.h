@@ -51,7 +51,7 @@ class ZEOBBox
 		ZEVector3				Right, Up, Front;
 		ZEVector3				HalfSize;
 
-		ZEVector3				GetVertex(unsigned char Index) const;
+		ZEVector3				GetVertex(unsigned int Index) const;
 
 		static void				CreateFromOrientation(ZEOBBox& BoundingBox, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Size);
 		static void				ConvertToSphere(ZEBSphere& Sphere, const ZEOBBox& Input);

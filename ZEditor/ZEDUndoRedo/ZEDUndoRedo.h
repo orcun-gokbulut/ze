@@ -58,7 +58,7 @@ class ZEDUndoRedoOperation
 													ZEDUndoRedoOperation();
 };
 
-class ZEDUndoRedoManager
+class ZEDUndoRedoManagerOld
 {
 	private:
 
@@ -78,7 +78,7 @@ class ZEDUndoRedoManager
 		void										SetMaxOperationCount(unsigned int Count);
 		unsigned int								GetMaxOperationCount() const;
 
-													ZEDUndoRedoManager();
+													ZEDUndoRedoManagerOld();
 };
 
 #endif

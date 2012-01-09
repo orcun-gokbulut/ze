@@ -41,7 +41,7 @@
 class ZETestItem;
 enum ZETestResult;
 
-class ZETestSuite
+class ZETestSuiteItem
 {
 	private:
 		char				Name[255];
@@ -65,24 +65,23 @@ class ZETestSuite
 		int					GetFailedTestCount();
 		int					GetPassedTestCount();
 
-							ZETestSuite(const char* SuiteName);
+							ZETestSuiteItem(const char* SuiteName);
 };
 
-class ZETestSuiteRegister
+class ZETestSuiteItemRegister
 {
 	public:
-		ZETestSuiteRegister(ZETestSuite* Suite);
+		ZETestSuiteItemRegister(ZETestSuiteItem* Suite);
 };
 
-#define ZETestSuiteAdd(Name)\
+#define ZETestSuite(Name)\
 	namespace ZETestSuite_##Name\
 	{\
-		ZETestSuite Suite(#Name);\
-		ZETestSuiteRegister Registerer(&Suite);\
+		ZETestSuiteItem Suite(#Name);\
+		ZETestSuiteItemRegister Registerer(&Suite);\
 	}\
 	namespace ZETestSuite_##Name
 
 #endif
 
 #define ZETestSuiteEnd
-	

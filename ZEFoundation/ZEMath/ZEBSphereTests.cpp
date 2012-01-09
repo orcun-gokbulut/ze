@@ -45,340 +45,448 @@
 #include "ZEMath/ZEOBBox.h"
 #include <math.h>
 
-ZETestSuiteAdd(ZEBSphere)
+bool ZETestInternalCheckClose(const ZEVector3& Actual, const ZEVector3& Expected, const ZEVector3& Threshold = ZEVector3(ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD));
+
+
+ZETestSuite(ZEBSphere)
 {
-	ZETestItemAdd(BS_Constructor)
+	ZETest("void ZEBSphere::GetSurfaceNormal(ZEVector3& Normal, const ZEBSphere& BoundingSphere, const ZEVector3& Point)")
 	{
-		ZEVector3 Position(1.0f, 2.0f, 3.0f);
-		float R = 3.0f; 
-		ZEBSphere BS(Position, R);
+		ZEBSphere BSphere(ZEVector3::Zero, 0.5f);
+		ZEVector3 PointX(0.5f, 0.0f, 0.0f);
+		ZEVector3 ResultX;
 
-		CHECK_EQUAL(BS.Position, ZEVector3(1.0f, 2.0f, 3.0f));
-		CHECK_EQUAL(BS.Radius, 3.0f);
+		ZEBSphere::GetSurfaceNormal(ResultX, BSphere, PointX);
+
+		ZEVector3 PointY(0.0f, 0.5f, 0.0f);
+		ZEVector3 ResultY;
+
+		ZEBSphere::GetSurfaceNormal(ResultY, BSphere, PointY);
+
+		ZEVector3 PointZ(0.0f, 0.0f, 0.5f);
+		ZEVector3 ResultZ;
+
+		ZEBSphere::GetSurfaceNormal(ResultZ, BSphere, PointZ);
+
+		ZETestCheckClose(ResultX, ZEVector3::UnitX);
+		ZETestCheckClose(ResultY, ZEVector3::UnitY);
+		ZETestCheckClose(ResultZ, ZEVector3::UnitZ);
+
+		ZETestCase("Normal for a random point on the ZEBSphere ")
+		{
+			ZEVector3 RandomResult;
+			ZEVector3 RandomPoint(0.27284408f, 0.35951829f, -0.21518064f);
+			ZELine ValidationLine(ZEVector3::Zero, RandomPoint);
+
+			ZEBSphere::GetSurfaceNormal(RandomResult, BSphere, RandomPoint);
+
+			ZETestCheckClose(RandomResult, ValidationLine.v);
+		}
 	}
 
-
-	ZETestItemAdd(BS_PlaneHalfSpaceTest)
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox)")
 	{
-		ZEVector3 Position(1.0f, 2.0f, 3.0f);
-		float R = 3.0f; 
-		ZEBSphere BS(Position, R);
-		
-		ZEVector3 n1(1.0f, 2.0f, 3.0f);
-		ZEVector3 p1(100.0f, 100.0f, 100.0f);
-		ZEPlane P1(n1, p1);
+		ZEAABBox AABBox(ZEVector3(2.8628070f, 2.3242471f, 1.1984191f), ZEVector3(5.2628069f, 4.7242470f, 3.5984192f));
 
-		ZEHalfSpace result1 = ZEBSphere::IntersectionTest(BS, P1);
+		ZETestCase("ZEBSphere is intersecting with ZEAABBox")
+		{
+			ZEBSphere BSphere(ZEVector3(4.1487913f, 3.5950582f, 3.5657606f), 0.50000000f);
 
-		CHECK_EQUAL(result1,-1);
+			ZETestCheck(ZEBSphere::IntersectionTest(BSphere, AABBox));
+		}
 
+		ZETestCase("ZEBSphere is not intersecting with ZEAABBox")
+		{
+			ZEBSphere BSphere(ZEVector3(5.7484822f, 4.8597264f, 3.6342573f), 0.50000000f);
 
-		ZEVector3 n2(1.0f, 2.0f, 3.0f);
-		ZEVector3 p2(0.0f, -6.0f, 0.0f);
-		ZEPlane P2(n2, p2);
+			ZETestCheck(!(ZEBSphere::IntersectionTest(BSphere, AABBox)));
+		}
 
+		ZETestCase("ZEBSphere is inside ZEAABBox")
+		{
+			ZEBSphere BSphere(ZEVector3(4.0418930f, 3.4679542f, 2.4831066f), 0.50000000f);
 
-		ZEHalfSpace result2 = ZEBSphere::IntersectionTest(BS, P2);
-
-		CHECK_EQUAL(result2, 1);
-
-		
-		ZEVector3 n3(1.0f, 0.0f, 0.0f);
-		ZEVector3 p3(0.0f, 0.0f, 0.0f);
-		ZEPlane P3(n3, p3);
-
-
-		ZEHalfSpace result3 = ZEBSphere::IntersectionTest(BS, P3);
-
-		CHECK_EQUAL(result3, ZE_HS_INTERSECTS);
-		
-
-		
-		
-		ZEVector3 n4(0.0f, 0.0f, 1.0f);
-		ZEVector3 p4(-200.0f, -1000.0f, -100.0f);
-		ZEPlane P4(n4, p4);
-
-
-		ZEHalfSpace result4 = ZEBSphere::IntersectionTest(BS, P4);
-
-		CHECK_EQUAL(result4, 1);
+			ZETestCheck(ZEBSphere::IntersectionTest(BSphere, AABBox));
+		}
 	}
 
-	ZETestItemAdd(BS_GetSurfaceNormal)
-	{	
-		ZEVector3 Position(1.0f, 2.0f, 3.0f);
-		float R = 3.0f; 
-		ZEBSphere BS(Position, R);
-
-		ZEVector3 Point(1.0f, 2.0f, 10.0f);
-		ZEVector3 Normal;
-
-		ZEBSphere::GetSurfaceNormal(Normal, BS, Point);
-
-		CHECK_EQUAL(Normal, ZEVector3(0.0f, 0.0f, 1.0f));
-
-		
-		ZEVector3 Position2(0.0f, 0.0f, 0.0f);
-		float R2 = 6.0f; 
-		ZEBSphere BS2(Position2, R2);
-		ZEVector3 Point2(1.0f, 1.0f, 1.0f);
-
-		ZEBSphere::GetSurfaceNormal(Normal, BS2, Point2);
-
-		CHECK_EQUAL(Normal, ZEVector3(1.0f/sqrt(3.0f), 1.0f/sqrt(3.0f), 1.0f/sqrt(3.0f)));
-
-		
-		ZEVector3 Position3(1.0f, 2.0f, 3.0f);
-		float R3 = 5.0f; 
-		ZEBSphere BS3(Position3, R3);
-
-		ZEVector3 Point3(1.0f, 1.0f, 1.0f);
-		ZEVector3 Normal1;
-		ZEVector3 Sub;
-		ZEVector3::Sub(Sub,Point3, Position3);
-
-		ZEVector3::Normalize(Normal1, Sub);
-
-		ZEBSphere::GetSurfaceNormal(Normal, BS3, Point3);
-
-		CHECK_EQUAL(Normal, Normal1);
-
-	}
-	ZETestItemAdd(BS_IntersectionTest1)
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line)")
 	{
-		ZEVector3 Position(1.0f, 2.0f, 3.0f);
-		float R = 3.0f; 
-		ZEBSphere BS(Position, R);
-		
-		ZEVector3 P1(1.0f, 2.0f, 3.0f);
-		
-		bool result1 = ZEBSphere::IntersectionTest(BS, P1);
-		CHECK_EQUAL(result1, true);
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f), 0.50000000f);
 
-		ZEVector3 P2(10.0f, 20.0f, 30.0f);
-		
-		bool result2 = ZEBSphere::IntersectionTest(BS, P2);
-		CHECK_EQUAL(result2, false);
+		ZELine Line;
+		Line.v = ZEVector3(0.55743307f, -0.15931815f, -0.81479216f);
+		Line.p = ZEVector3(7.7504172f, 10.595081f, 13.302707f);
 
-		ZEVector3 P3(1.0f, 2.0f, 6.0f);
-		
-		bool result3 = ZEBSphere::IntersectionTest(BS, P3);
-		CHECK_EQUAL(result3, true);
+		ZETestCheck(ZEBSphere::IntersectionTest(BSphere, Line));
 	}
 
-	ZETestItemAdd(BS_IntersectionTest2)
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT)")
 	{
-		ZEVector3 Position(1.0f, 2.0f, 3.0f);
-		float R = 3.0f; 
-		ZEBSphere BS(Position, R);
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f), 0.50000000f);
 
-		ZEVector3 P0(1.0f, 2.0f, 3.0f);
-		ZEVector3 P1(2.0f, 5.0f, 6.0f);
-		ZELine L(P0, P1);
+		ZELine Line;
+		Line.v = ZEVector3(0.55743307f, -0.15931815f, -0.81479216f);
+		Line.p = ZEVector3(7.7504172f, 10.595081f, 13.302707f);
 
-		bool result = ZEBSphere::IntersectionTest(BS, L);
-		CHECK_EQUAL(result, true);
+		float Tmin = 0.0f;
 
-		ZEVector3 P2(0.0f, 0.0f,  6.8f);
-		ZEVector3 P3(0.0f, 0.0f, 12.6f);
-		ZELine L2(P2, P3);
-
-		bool result2 = ZEBSphere::IntersectionTest(BS, L2);
-		CHECK_EQUAL(result2, false);
-
-		ZEVector3 P4(1.0f, 2.0f, 6.0f);
-		ZEVector3 P5(2.0f, 4.0f, 6.0f);
-		ZELine L3(P4, P5);
-
-		bool result3 = ZEBSphere::IntersectionTest(BS, L3);
-		CHECK_EQUAL(result3, true);
-	}
-
-	ZETestItemAdd(BS_IntersectionTest3)
-	{
-		ZEVector3 Position(1.0f, 2.0f, 3.0f);
-		float R = 3.0f; 
-		ZEBSphere BS(Position, R);
-
-		ZEVector3 P0(1.0f, 2.0f, 3.0f);
-		ZEVector3 P1(2.0f, 5.0f, 6.0f);
-		ZERay R1;
-		ZERay::Create(R1, P0, P1);
-
-		bool result = ZEBSphere::IntersectionTest(BS, R1);
-		CHECK_EQUAL(result, true);
-
-		ZEVector3 P2(0.0f, 0.0f,  6.8f);
-		ZEVector3 P3(0.0f, 0.0f, 12.6f);
-		ZERay R2;
-		ZERay::Create(R2, P2, P3);
-
-		bool result2 = ZEBSphere::IntersectionTest(BS, R2);
-		CHECK_EQUAL(result2, false);
-
-		ZEVector3 P4(1.0f, 2.0f, 6.0f);
-		ZEVector3 P5(2.0f, 4.0f, 6.0f);
-		ZERay R3;
-		ZERay::Create(R3, P4, P5);
-
-		bool result3 = ZEBSphere::IntersectionTest(BS, R3);
-		CHECK_EQUAL(result3, true);
-
-		ZEVector3 P6(1.0f, 2.0f, 3.0f);
-		ZEVector3 P7(1.5f, 2.5f, 2.5f);
-		ZERay R4;
-		ZERay::Create(R4, P6, P7);
-
-		bool result4 = ZEBSphere::IntersectionTest(BS, R4);
-		CHECK_EQUAL(result4, true);
-
-	}
-//
-	ZETestItemAdd(BS_IntersectionTest4)
-	{
-		float MinT;
-		float MaxT;
-
-		ZEVector3 Position(1.0f, 2.0f, 3.0f);
-		float R = 3.0f; 
-		ZEBSphere BS(Position, R);
-
-		ZEVector3 P0(1.0f, 2.0f, 3.0f);
-		ZEVector3 P1(2.0f, 5.0f, 6.0f);
-		ZERay R1;
-		ZERay::Create(R1, P0, P1);
-
-		bool result = ZEBSphere::IntersectionTest(BS, R1, MinT, MaxT);
-		CHECK_EQUAL(result, true);
-
-		ZEVector3 P2(0.0f, 0.0f,  6.8f);
-		ZEVector3 P3(0.0f, 0.0f, 12.6f);
-		ZERay R2;
-		ZERay::Create(R2, P2, P3);
-
-		bool result2 = ZEBSphere::IntersectionTest(BS, R2, MinT, MaxT);
-		CHECK_EQUAL(result2, false);
-
-		ZEVector3 P4(1.0f, 2.0f, 6.0f);
-		ZEVector3 P5(2.0f, 4.0f, 6.0f);
-		ZERay R3;
-		ZERay::Create(R3, P4, P5);
-
-		bool result3 = ZEBSphere::IntersectionTest(BS, R3, MinT, MaxT);
-		CHECK_EQUAL(result3, true);
-
-		ZEVector3 P6(1.0f, 2.0f, 3.0f);
-		ZEVector3 P7(1.5f, 2.5f, 2.5f);
-		ZERay R4;
-		ZERay::Create(R4, P6, P7);
-
-		bool result4 = ZEBSphere::IntersectionTest(BS, R4, MinT, MaxT);
-		CHECK_EQUAL(result4, true);	}
-//
-	ZETestItemAdd(BS_IntersectionTest5)
-	{
-		ZEVector3 Position(1.0f, 2.0f, 3.0f);
-		float R = 3.0f; 
-		ZEBSphere BS(Position, R);
-
-		ZEVector3 P0(1.0f, 2.0f, 3.0f);
-		ZEVector3 P1(2.0f, 5.0f, 6.0f);
-		ZELineSegment LS1(P0, P1);
-		
-
-		bool result = ZEBSphere::IntersectionTest(BS, LS1);
-		CHECK_EQUAL(result, true);
-
-		ZEVector3 P2(0.0f, 0.0f,  6.8f);
-		ZEVector3 P3(0.0f, 0.0f, 12.6f);
-		ZELineSegment LS2(P2, P3);
-
-		bool result2 = ZEBSphere::IntersectionTest(BS, LS2);
-		CHECK_EQUAL(result2, false);
-
-		ZEVector3 P4(1.0f, 2.0f, 6.0f);
-		ZEVector3 P5(2.0f, 4.0f, 6.0f);
-		ZELineSegment LS3(P4, P5);
-
-		bool result3 = ZEBSphere::IntersectionTest(BS, LS3);
-		CHECK_EQUAL(result3, true);
-
-		ZEVector3 P6(1.0f, 2.0f, 3.0f);
-		ZEVector3 P7(1.5f, 2.5f, 2.5f);
-		ZELineSegment LS4(P6, P7);
-
-		bool result4 = ZEBSphere::IntersectionTest(BS, LS4);
-		CHECK_EQUAL(result4, true);
+		ZETestCheck(ZEBSphere::IntersectionTest(BSphere, Line, Tmin));
+		ZETestCheckClose(Tmin, 3.5423064f);
 
 	}
 
-	ZETestItemAdd(BS_CollisionTest1)
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT, float& MaxT)")
 	{
-		ZEVector3 Position(1.0f, 2.0f, 3.0f);
-		float R = 3.0f; 
-		ZEBSphere BS(Position, R);
 
-		ZEVector3 Max( 1.0f,  2.0f,  3.0f);
-		ZEVector3 Min(-1.0f, -2.0f, -3.0f);
-		ZEAABBox AABB(Min, Max);
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f), 0.50000000f);
 
-		bool result = ZEBSphere::IntersectionTest(BS, AABB);
-		CHECK_EQUAL(result, true);
-		
-		ZEVector3 Max2( 1.0f, 100.0f,  3.0f);
-		ZEVector3 Min2(-1.0f,  98.0f, -3.0f);
-		ZEAABBox AABB2(Min2, Max2);
+		ZELine Line;
+		Line.v = ZEVector3(0.55743307f, -0.15931815f, -0.81479216f);
+		Line.p = ZEVector3(7.7504172f, 10.595081f, 13.302707f);
 
-		bool result2 = ZEBSphere::IntersectionTest(BS, AABB2);
-		CHECK_EQUAL(result2, false);
-		
-		ZEVector3 Max3( 1.0f, 7.0f,  3.0f);
-		ZEVector3 Min3(-1.0f, 5.0f, -3.0f);
-		ZEAABBox AABB3(Min3, Max3);
+		float Tmin = 0.0f;
+		float Tmax = 0.0f;
 
-		bool result3 = ZEBSphere::IntersectionTest(BS, AABB3);
-		CHECK_EQUAL(result3, true);
+		ZETestCheck(ZEBSphere::IntersectionTest(BSphere, Line, Tmin, Tmax));
+		ZETestCheckClose(Tmin, 3.5423064f);
+		ZETestCheckClose(Tmax, 4.5373311f);
 
 	}
 
-	ZETestItemAdd(BS_CollisionTest2)
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment)")
 	{
-		ZEVector3 Position1(1.0f, 2.0f, 3.0f);
-		float R1 = 3.0f; 
-		ZEBSphere BS1(Position1, R1);
-		
-		ZEVector3 Position2(1.0f, 2.0f, 3.0f);
-		float R2 = 1.0f; 
-		ZEBSphere BS2(Position2, R2);
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f), 0.50000000f);
 
-		bool result = ZEBSphere::IntersectionTest(BS1, BS2);
-		CHECK_EQUAL(result, true);
+		ZELineSegment LineSegment;
+		LineSegment.v = ZEVector3(0.75925839f, 0.34364790f, 0.55265969f);
+		LineSegment.p = ZEVector3(9.7715054f, 9.8616552f, 9.8219385f);
+		LineSegment.Length = 3.8951080f;
 
-		ZEVector3 Position3(1.0f, 5.0f, 3.0f);
-		float R3 = 5.0f; 
-		ZEBSphere BS3(Position3, R3);
-
-		bool result2 = ZEBSphere::IntersectionTest(BS1, BS3);
-		CHECK_EQUAL(result2, true);
-		
-		ZEVector3 Position4(1.0f, 2.0f, 7.0f);
-		float R4 = 1.0f; 
-		ZEBSphere BS4(Position4, R4);
-
-		bool result3 = ZEBSphere::IntersectionTest(BS1, BS4);
-		CHECK_EQUAL(result3, true);
-
-		ZEVector3 Position5(0.0f, 0.0f, 15.0f);
-		float R5 = 1.0f; 
-		ZEBSphere BS5(Position5, R5);
-
-		bool result4 = ZEBSphere::IntersectionTest(BS1, BS5);
-		CHECK_EQUAL(result4, false);
+		ZETestCheck(ZEBSphere::IntersectionTest(BSphere, LineSegment)); 
 	}
 
-	ZETestItemAdd(BS_CollisionTest3)
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT)")
 	{
-		//Nofuntion
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f), 0.50000000f);
+
+		ZELineSegment LineSegment;
+		LineSegment.v = ZEVector3(0.75925839f, 0.34364790f, 0.55265969f);
+		LineSegment.p = ZEVector3(9.7715054f, 9.8616552f, 9.8219385f);
+		LineSegment.Length = 3.8951080f;
+
+		float Tmin = 0.0f;
+
+		ZETestCheck(ZEBSphere::IntersectionTest(BSphere, LineSegment, Tmin)); 
+		ZETestCheckClose(Tmin, 0.81841898f);
+	}
+
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT, float& MaxT)")
+	{
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f), 0.50000000f);
+
+		ZELineSegment LineSegment;
+		LineSegment.v = ZEVector3(0.75925839f, 0.34364790f, 0.55265969f);
+		LineSegment.p = ZEVector3(9.7715054f, 9.8616552f, 9.8219385f);
+		LineSegment.Length = 3.8951080f;
+
+		float Tmin = 0.0f;
+		float Tmax = 0.0f;
+
+		ZETestCheck(ZEBSphere::IntersectionTest(BSphere, LineSegment, Tmin, Tmax)); 
+		ZETestCheckClose(Tmin, 0.81841898f);
+		ZETestCheckClose(Tmax, 0.81841898f);
+	}
+
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEOBBox& BoundingBox)")
+	{
+		ZEOBBox OBBox;
+		OBBox.Center = ZEVector3(6.3469343f, 1.6893826f, 4.0636616f);
+		OBBox.Right = ZEVector3(0.84767789f, 0.091925949f, 0.52248615f);
+		OBBox.Up = ZEVector3(0.19911075f, 0.85774630f, -0.47394738f);
+		OBBox.Front = ZEVector3(-0.49172863f, 0.50578731f, 0.70878917f);
+		OBBox.HalfSize = ZEVector3(0.50000000f, 0.50000000f, 0.50000000f);
+
+		ZETestCase("ZEBSphere is intersecting with ZEOBBox")
+		{
+			ZEBSphere BSphere(ZEVector3(6.3338995f, 2.1556947f, 3.7471128f), 0.50000000f);
+
+			ZETestCheck(ZEBSphere::IntersectionTest(BSphere, OBBox));
+		}
+
+		ZETestCase("ZEBSphere is not intersecting with ZEOBBox")
+		{
+			ZEBSphere BSphere(ZEVector3(5.8656621f, 2.1556947f, 4.8377638f), 0.50000000f);
+
+			ZETestCheck(!(ZEBSphere::IntersectionTest(BSphere, OBBox)));
+		}
+
+		ZETestCase("ZEBSphere is on the same center point with ZEOBBox")
+		{
+			ZEBSphere BSphere(ZEVector3(6.3469343f, 1.6893826f, 4.0636616f), 0.50000000f);
+
+			ZETestCheck(ZEBSphere::IntersectionTest(BSphere, OBBox));
+		}
+
+	}
+
+	ZETest("ZEHalfSpace ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEPlane& Plane)")
+	{
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f), 0.50000000f);
+
+		ZETestCase("ZEBSphere is intersecting with ZEPlane")
+		{
+			ZEPlane Plane(ZEVector3(-0.69621903f, 0.71745402f, -0.023213712f), ZEVector3::Zero);
+			ZETestCheckEqual(ZEBSphere::IntersectionTest(BSphere, Plane), ZE_HS_INTERSECTS);
+		}
+
+		ZETestCase("ZEBSphere is on positive side of the ZEPlane")
+		{
+			ZEPlane Plane(ZEVector3(0.43667358f, 0.87336510f, 0.21575357f), ZEVector3::Zero);
+			ZETestCheckEqual(ZEBSphere::IntersectionTest(BSphere, Plane), ZE_HS_POSITIVE_SIDE);
+		}
+
+		ZETestCase("ZEBSphere is on negative side of the ZEPlane")
+		{
+			ZEPlane Plane(ZEVector3(-0.67470241f, 0.72473758f, -0.13975741f), ZEVector3::Zero);
+			ZETestCheckEqual(ZEBSphere::IntersectionTest(BSphere, Plane), ZE_HS_NEGATIVE_SIDE);
+		}
+	}
+
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray)")
+	{
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f), 0.50000000f);
+
+		ZERay Ray;
+		Ray.v = ZEVector3(-0.58191913f, -0.57352078f, -0.57657975f);
+		Ray.p = ZEVector3(10.000567f, 9.6644440f, 9.9470882f);
+
+		ZETestCheck(ZEBSphere::IntersectionTest(BSphere, Ray));
+	}
+
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray, float& MinT)")
+	{
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f), 0.50000000f);
+
+		ZERay Ray;
+		Ray.v = ZEVector3(-0.58191913f, -0.57352078f, -0.57657975f);
+		Ray.p = ZEVector3(10.000567f, 9.6644440f, 9.9470882f);
+
+		float Tmin = 0.0f;
+
+		ZETestCheck(ZEBSphere::IntersectionTest(BSphere, Ray, Tmin));
+		ZETestCheckClose(Tmin, 0.20651792f);
+	}
+
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray, float& MinT, float& MaxT)")
+	{
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f), 0.50000000f);
+
+		ZERay Ray;
+		Ray.v = ZEVector3(-0.58191913f, -0.57352078f, -0.57657975f);
+		Ray.p = ZEVector3(10.000567f, 9.6644440f, 9.9470882f);
+
+		float Tmin = 0.0f;
+		float Tmax = 0.0f;
+
+		ZETestCheck(ZEBSphere::IntersectionTest(BSphere, Ray, Tmin, Tmax));
+		ZETestCheckClose(Tmin, 0.20651792f);
+		ZETestCheckClose(Tmax, 0.20651792f);
+	}
+
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZEVector3& Point)")
+	{
+		ZEVector3 Point(5.5782952f, 1.7799615f, 3.5723135f);
+
+		ZETestCase("ZEBSphere contains the point")
+		{
+			ZEBSphere BSphere(ZEVector3(5.6335278f, 1.7817698f, 3.5722213f), 0.50000000f);
+			ZETestCheck(ZEBSphere::IntersectionTest(BSphere, Point));
+		}
+
+		ZETestCase("ZEBSphere does not contain the point")
+		{
+			ZEBSphere BSphere(ZEVector3(5.1590552f, 1.4696054f, 3.5722213f), 0.50000000f);
+			ZETestCheck(!(ZEBSphere::IntersectionTest(BSphere, Point)));
+		}
+	}
+
+	ZETest("bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere1, const ZEBSphere& BoundingSphere2)")
+	{
+		ZEBSphere StationaryBSphere(ZEVector3(2.5424056f, 1.6334116f, 3.3176670f), 1.5000000f);
+
+		ZETestCase("ZEBSpheres are intersecting")
+		{
+			ZEBSphere BSphere(ZEVector3(2.5110879f, 3.6074083f, 3.3110132f), 0.50000000f);
+			ZETestCheck(ZEBSphere::IntersectionTest(StationaryBSphere, BSphere));
+		}
+
+		ZETestCase("ZEBSphere is inside the other ZEBSphere")
+		{
+			ZEBSphere BSphere(ZEVector3(2.5110879f, 1.5797714f, 3.3110132f), 0.50000000f);
+			ZETestCheck(ZEBSphere::IntersectionTest(StationaryBSphere, BSphere));
+		}
+
+		ZETestCase("ZEBSpheres are not intersecting")
+		{
+			ZEBSphere BSphere(ZEVector3(3.8370419f, 2.0862474f, 5.6824718f), 0.50000000f);
+			ZETestCheck(!(ZEBSphere::IntersectionTest(StationaryBSphere, BSphere)));
+		}
+	
+	}
+
+	static bool ZETestCheckBSphereLineIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
+	{
+		bool Result = true;
+		float Tmin = 0.0f;
+		float Tmax = 0.0f;
+
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f) + OctantFactor, 0.50000000f);
+
+		//Line1 intersects ZEBSphere
+
+		ZELine Line1;
+		Line1.v = ZEVector3(0.55743307f, -0.15931815f, -0.81479216f);
+		Line1.p = ZEVector3(7.7504172f, 10.595081f, 13.302707f) + OctantFactor;
+
+		if(!(ZEBSphere::IntersectionTest(BSphere, Line1, Tmin, Tmax) && ZETestInternalCheckClose(Tmin, 3.5423064f) && ZETestInternalCheckClose(Tmax, 4.5373311f)))
+			Result = false;
+
+		//Line2 is the Polar axis of the ZEBSphere.
+
+		ZELine Line2;
+		Line2.v = ZEVector3(0.0f, -1.0f, 0.0f);
+		Line2.p = ZEVector3(10.0f, 10.0f, 10.0f) + OctantFactor;
+
+		if(!(ZEBSphere::IntersectionTest(BSphere, Line2, Tmin, Tmax) && ZETestInternalCheckClose(Tmin, -0.50000000f) && ZETestInternalCheckClose(Tmax, 0.50000000f)))
+			Result = false;
+
+		//Line3 is not intersecting ZEBSphere
+
+		ZELine Line3;
+		Line3.v = ZEVector3(0.76012230f, 0.089084864f, -0.64364439f);
+		Line3.p = ZEVector3(7.9298010f, 10.284784f, 11.760486f) + OctantFactor;
+
+		if(ZEBSphere::IntersectionTest(BSphere, Line3))
+			Result = false;
+
+		return Result;
+	}
+
+	ZETest("ZEBSphere vs ZELine Intersection Test")
+	{
+		ZETestCheck(ZETestCheckBSphereLineIntersection()); //FRU Octant
+		ZETestCheck(ZETestCheckBSphereLineIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
+		ZETestCheck(ZETestCheckBSphereLineIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
+		ZETestCheck(ZETestCheckBSphereLineIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
+		ZETestCheck(ZETestCheckBSphereLineIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
+		ZETestCheck(ZETestCheckBSphereLineIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
+		ZETestCheck(ZETestCheckBSphereLineIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
+		ZETestCheck(ZETestCheckBSphereLineIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
+	}
+
+	static bool ZETestCheckBSphereLineSegmentIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
+	{
+		bool Result = true;
+		float Tmin = 0.0f;
+		float Tmax = 0.0f;
+
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f) + OctantFactor, 0.50000000f);
+
+		//LineSegment1 is generated inside ZEBSphere and intersects it.
+
+		ZELineSegment LineSegment1;
+		LineSegment1.v = ZEVector3(0.75925839f, 0.34364790f, 0.55265969f);
+		LineSegment1.p = ZEVector3(9.7715054f, 9.8616552f, 9.8219385f) + OctantFactor;
+		LineSegment1.Length = 3.8951080f;
+
+		if(!(ZEBSphere::IntersectionTest(BSphere, LineSegment1, Tmin, Tmax) && ZETestInternalCheckClose(Tmin, 0.81841898f) && ZETestInternalCheckClose(Tmax, 0.81841898f)))
+			Result = false;
+
+		ZELineSegment LineSegment2;
+		LineSegment2.v = ZEVector3(0.00000000f, -1.0000000f, 0.00000000f);
+		LineSegment2.p = ZEVector3(10.001863f, 10.759313f, 9.9986048f) + OctantFactor;
+		LineSegment2.Length = 4.5312967f;
+
+		if(!(ZEBSphere::IntersectionTest(BSphere, LineSegment2, Tmin, Tmax) && ZETestInternalCheckClose(Tmin, 0.25931805f) && ZETestInternalCheckClose(Tmax, 1.2593071f)))
+			Result = false;
+
+		//LineSegment3 is generated inside ZEBSphere but not intersecting it.
+
+		ZELineSegment LineSegment3;
+		LineSegment3.v = ZEVector3(0.86825013f, 0.10560116f, 0.48475799f);
+		LineSegment3.p = ZEVector3(9.6363983f, 9.7894020f, 9.7872982f) + OctantFactor;
+		LineSegment3.Length = 0.61226231f;
+
+		if(ZEBSphere::IntersectionTest(BSphere, LineSegment3))
+			Result = false;
+
+		ZELineSegment LineSegment4;
+		LineSegment4.v = ZEVector3(0.76129007f, -0.089085706f, -0.64226270f);
+		LineSegment4.p = ZEVector3(8.0034475f, 10.744366f, 11.681805f) + OctantFactor;
+		LineSegment4.Length = 5.1187778f;
+
+		if(ZEBSphere::IntersectionTest(BSphere, LineSegment4))
+			Result = false;
+
+		return Result;
+	}
+
+	ZETest("ZEBSphere vs ZELine Intersection Test")
+	{
+		ZETestCheck(ZETestCheckBSphereLineSegmentIntersection()); //FRU Octant
+		ZETestCheck(ZETestCheckBSphereLineSegmentIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
+		ZETestCheck(ZETestCheckBSphereLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
+		ZETestCheck(ZETestCheckBSphereLineSegmentIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
+		ZETestCheck(ZETestCheckBSphereLineSegmentIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
+		ZETestCheck(ZETestCheckBSphereLineSegmentIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
+		ZETestCheck(ZETestCheckBSphereLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
+		ZETestCheck(ZETestCheckBSphereLineSegmentIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
+	}
+
+	static bool ZETestCheckBSphereRayIntersection(ZEVector3 OctantFactor = ZEVector3(0.0f, 0.0f, 0.0f))
+	{
+		bool Result = true;
+		float Tmin = 0.0f;
+		float Tmax = 0.0f;
+
+		ZEBSphere BSphere(ZEVector3(10.000000f, 10.000000f, 10.000000f) + OctantFactor, 0.50000000f);
+
+		//Ray1 is generated inside ZEBSphere and intersects it.
+
+		ZERay Ray1;
+		Ray1.v = ZEVector3(-0.58191913f, -0.57352078f, -0.57657975f);
+		Ray1.p = ZEVector3(10.000567f, 9.6644440f, 9.9470882f) + OctantFactor;
+
+		if(!(ZEBSphere::IntersectionTest(BSphere, Ray1, Tmin, Tmax) && ZETestInternalCheckClose(Tmin, 0.20651792f) && ZETestInternalCheckClose(Tmax, 0.20651792f)))
+			Result = false;
+
+		ZERay Ray2;
+		Ray2.v = ZEVector3(0.93651170f, -0.34759009f, 0.046120405f);
+		Ray2.p = ZEVector3(4.3607345f, 11.931516f, 9.8327894f) + OctantFactor;
+
+		if(!(ZEBSphere::IntersectionTest(BSphere, Ray2, Tmin, Tmax) && ZETestInternalCheckClose(Tmin, 5.4961514f) && ZETestInternalCheckClose(Tmax, 6.4245000f)))
+			Result = false;
+
+		ZERay Ray3;
+		Ray3.v = ZEVector3(0.82473522f, 0.019201333f, -0.56519306f);
+		Ray3.p = ZEVector3(8.5050440f, 9.4574652f, 11.027550f) + OctantFactor;
+
+		if(ZEBSphere::IntersectionTest(BSphere, Ray3))
+			Result = false;
+
+		return Result;
+	}
+
+	ZETest("ZEBSphere vs ZERay Intersection Test")
+	{
+		ZETestCheck(ZETestCheckBSphereRayIntersection()); //FRU Octant
+		ZETestCheck(ZETestCheckBSphereRayIntersection(ZEVector3(0.0f, 0.0f, -20.0f))); //BRU Octant
+		ZETestCheck(ZETestCheckBSphereRayIntersection(ZEVector3(-20.0f, 0.0f, 0.0f))); //FLU Octant
+		ZETestCheck(ZETestCheckBSphereRayIntersection(ZEVector3(-20.0f, 0.0f, -20.0f))); //BLU Octant
+		ZETestCheck(ZETestCheckBSphereRayIntersection(ZEVector3(0.0f, -20.0f, 0.0f))); //FRD Octant
+		ZETestCheck(ZETestCheckBSphereRayIntersection(ZEVector3(0.0f, -20.0f, -20.0f))); //BRD Octant
+		ZETestCheck(ZETestCheckBSphereRayIntersection(ZEVector3(-20.0f, -20.0f, 0.0f))); //FLD Octant
+		ZETestCheck(ZETestCheckBSphereRayIntersection(ZEVector3(-20.0f, -20.0f, -20.0f))); //BLD Octant
 	}
 }

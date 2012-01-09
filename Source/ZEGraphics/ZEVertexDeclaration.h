@@ -37,8 +37,9 @@
 #ifndef	__ZE_VERTEX_DECLARATION_H__
 #define __ZE_VERTEX_DECLARATION_H__
 
-#include "ZEDS/ZEArray.h"
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
 
 #define ZE_VE_POSITION				0x00000008
 #define ZE_VE_NORMAL				0x00000010
@@ -79,7 +80,8 @@ struct ZEVertexElement
 		unsigned int								Index;
 };
 
-class ZEResourceFile;
+class ZEFile;
+
 class ZEVertexDeclaration
 {
 	protected:
@@ -97,8 +99,8 @@ class ZEVertexDeclaration
 
 		virtual void								SetupVertexDeclaration() = 0;
 
-		static ZEVertexDeclaration*					LoadFromFile(const char* FileName);
-		static ZEVertexDeclaration*					LoadFromFile(ZEResourceFile* ResourceFile);
+		static ZEVertexDeclaration*					LoadFromFile(const ZEString& FileName);
+		static ZEVertexDeclaration*					LoadFromFile(ZEFile* ResourceFile);
 		static ZEVertexDeclaration*					CreateInstance();
 };
 

@@ -41,6 +41,8 @@
 #include <wchar.h>
 #include <stdlib.h>
 #include <string>
+#include <stdarg.h>
+
 #include "ZEError.h"
 
 bool ZEString::IsEmpty() const
@@ -93,82 +95,31 @@ void ZEString::SetValue(const char* String)
 	ZEDebugCheckMemory();
 }
 
-void ZEString::SetNumericValue(char Value, unsigned int Base)
-{
-	char Buffer[10];
-	_itoa(Value, Buffer, Base);
-	SetValue(Buffer);
-}
-
-void ZEString::SetNumericValue(unsigned char Value, unsigned int Base)
-{
-	char Buffer[10];
-	_ultoa(Value, Buffer, Base);
-	SetValue(Buffer);
-}
-
-void ZEString::SetNumericValue(short Value, unsigned int Base)
+void ZEString::SetValue(ZEInt Value, ZEUInt Base)
 {
 	char Buffer[35];
-	_ultoa(Value, Buffer, Base);
+	ltoa(Value, Buffer, Base);
 	SetValue(Buffer);
 }
 
-void ZEString::SetNumericValue(unsigned short Value, unsigned int Base)
+void ZEString::SetValue(ZEUInt Value, ZEUInt Base)
 {
 	char Buffer[35];
-	_ultoa(Value, Buffer, Base);
+	ultoa(Value, Buffer, Base);
 	SetValue(Buffer);
 }
 
-void ZEString::SetNumericValue(int Value, unsigned int Base)
-{
-	char Buffer[35];
-	_itoa(Value, Buffer, Base);
-	SetValue(Buffer);
-}
-
-void ZEString::SetNumericValue(unsigned int Value, unsigned int Base)
-{
-	char Buffer[35];
-	_ultoa(Value, Buffer, Base);
-	SetValue(Buffer);
-}
-
-void ZEString::SetNumericValue(long Value, unsigned int Base)
-{
-	char Buffer[35];
-	_ltoa(Value, Buffer, Base);
-	SetValue(Buffer);
-}
-
-void ZEString::SetNumericValue(unsigned long Value, unsigned int Base)
-{
-	char Buffer[35];
-	_ultoa(Value, Buffer, Base);
-	SetValue(Buffer);
-
-}
-
-void ZEString::SetNumericValue(float Value, unsigned int NumberOfDigits)
+void ZEString::SetValue(float Value, ZEUInt Digits)
 {
 	char Buffer[_CVTBUFSIZE];
-	gcvt(Value, NumberOfDigits, Buffer);
+	gcvt(Value, Digits, Buffer);
 	SetValue(Buffer);
 }
 
-void ZEString::SetNumericValue(double Value, unsigned int NumberOfDigits)
+void ZEString::SetValue(bool Value, const char* TrueText, const char* FalseText)
 {
-	char Buffer[_CVTBUFSIZE];
-	gcvt(Value, NumberOfDigits, Buffer);
-	SetValue(Buffer);
+	SetValue(Value ? TrueText : FalseText);
 }
-
-void ZEString::SetBooleanValue(bool Value)
-{
-	SetValue(Value ? "true" : "false");
-}
-
 
 const char* ZEString::GetValue() const
 {
@@ -510,7 +461,7 @@ ZEString ZEString::Trim() const
 	return Temp;
 }
 
-ZEString ZEString::ToLower() const
+ZEString ZEString::Lower() const
 {
 	if (Buffer == NULL)
 		return ZEString();
@@ -528,7 +479,7 @@ ZEString ZEString::ToLower() const
 	return Temp;
 }
 
-ZEString ZEString::ToUpper() const
+ZEString ZEString::Upper() const
 {
 	if (Buffer == NULL)
 		return ZEString();
@@ -547,24 +498,109 @@ ZEString ZEString::ToUpper() const
 
 }
 
-unsigned int ZEString::ToUnsignedInteger()
+ZEINT32 ZEString::ToInt() const
 {
 	return atoi(Buffer);
 }
 
-int ZEString::ToInteger()
+ZEUINT32 ZEString::ToUInt() const
 {
-	return atoi(Buffer);
+	return strtoul(Buffer, NULL, 10);
 }
 
-float ZEString::ToFloat()
+float ZEString::ToFloat() const
 {
-	return (float)atof(Buffer);
+ 	return (float)atof(Buffer);
 }
 
-double ZEString::ToDouble()
+const char* ZEString::ToCString() const
 {
-	return atof(Buffer);
+	return Buffer;
+}
+
+std::string ZEString::ToStdString() const
+{
+	return std::string(Buffer);
+}
+
+ZEString ZEString::FromChar(char Value)
+{
+	ZEString Temp;
+	Temp.Allocator.Allocate(&Temp.Buffer, 2 * sizeof(char));
+	Temp.Buffer[0] = Value;
+	Temp.Buffer[1] = '\0';
+
+	return Temp;
+}
+
+ZEString ZEString::FromInt(ZEInt Value, ZEUInt Base)
+{
+	char Buffer[33];
+	ltoa(Value, Buffer, Base);
+	
+	size_t Size = strlen(Buffer) + 1;
+	ZEString Temp;
+	Temp.Allocator.Allocate(&Temp.Buffer, Size * sizeof(char));
+	memcpy(Temp.Buffer, Buffer, Size);
+
+	return Temp;
+}
+
+ZEString ZEString::FromUInt(ZEUInt Value, ZEUInt Base)
+{
+	char Buffer[33];
+	ultoa(Value, Buffer, Base);
+	
+	size_t Size = strlen(Buffer) + 1;
+	ZEString Temp;
+	Temp.Allocator.Allocate(&Temp.Buffer, Size * sizeof(char));
+	memcpy(Temp.Buffer, Buffer, Size);
+
+	return Temp;
+}
+
+ZEString ZEString::FromFloat(float Value, ZEUInt Digits)
+{
+	char Buffer[_CVTBUFSIZE];
+	gcvt(Value, Digits, Buffer);
+	
+	ZEString Temp;
+	size_t Size = (strlen(Buffer) + 1) * sizeof(char);
+	Temp.Allocator.Allocate(&Temp.Buffer, Size);
+	memcpy(Temp.Buffer, Buffer, Size);
+	
+	return Temp;
+}
+
+ZEString ZEString::FromBool(bool Value, const char* TrueText, const char* FalseText)
+{
+	return Value ? TrueText : FalseText;
+}
+
+ZEString ZEString::FromCString(const char* Value)
+{
+	return Value;
+}
+
+ZEString ZEString::FromStdString(const std::string& Value)
+{
+	return Value.c_str();
+}
+
+ZEString ZEString::Format(const char* Format, ...)
+{
+	va_list List;
+	va_start(List, Format);
+	
+	int Length = _vscprintf(Format, List);
+	
+	ZEString Temp;
+	Temp.Allocator.Allocate(&Temp.Buffer, (Length + 1) * sizeof(char));
+	vsprintf(Temp.Buffer, Format, List);
+	
+	va_end(List);
+	
+	return Temp;
 }
 
 ZEString& ZEString::operator=(const ZEString& String)
@@ -674,4 +710,21 @@ ZEString::~ZEString()
 	Clear();
 
 	ZEDebugCheckMemory();
+}
+
+ZEString operator+(const char* String1, const ZEString& String2)
+{
+	ZEString Temp(String1);
+	Temp.Append(String2);
+	return Temp;
+}
+
+bool operator==(const char* String1, const ZEString& String2)
+{
+	return String2.Equals(String1);
+}
+
+bool operator!=(const char* String1, const ZEString& String2)
+{
+	return !String2.Equals(String1);
 }

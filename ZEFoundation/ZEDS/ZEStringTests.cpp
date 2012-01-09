@@ -34,408 +34,888 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDS/ZEString.h"
-
+#include <String>
 #include "ZETest.h"
 
-ZETestSuiteAdd(ZEString)
+ZETestSuite(ZEString)
 {
-	ZETestItemAdd(ZEString)
+	ZETest("void ZEString::Append(const ZEString & String)")
 	{
-		ZEString A, B;
+		ZEString StringA = "Lorem";
+		ZEString StringB = " Ipsum";
+		unsigned int ExpectedSize = 12;
+		unsigned int ExpectedLength = 11;
 
-		A.Buffer = "Orcun";
-		B.Buffer = "Orcun";
-		CHECK(A.Equals(B));
-		CHECK(A == B);
-		
-		B.Buffer = "nucrO";
-		CHECK(!A.Equals(B));
-		CHECK(A != B);
+		StringA.Append(StringB);
 
-		CHECK(A == "Orcun");
-		CHECK(B != "Orcun");
-		A.Buffer = NULL;
-		B.Buffer = NULL;
+		ZETestCheckEqual(StringA, "Lorem Ipsum");
+		ZETestCheckEqual(StringA.GetSize(), ExpectedSize);
+		ZETestCheckEqual(StringA.GetLength(), ExpectedLength);
+	}
+	ZETest("void ZEString::Append(const char * String)")
+	{
+		ZETestCase("char *string")
+		{
+			ZEString StringA = "Lorem";
+			const char* StringB = " Ipsum";
+			unsigned int ExpectedSize = 12;
+			unsigned int ExpectedLength = 11;
 
-		CHECK(A == B);
-		CHECK(A == "");
+			StringA.Append(StringB);
+
+			ZETestCheckEqual(StringA, "Lorem Ipsum");
+			ZETestCheckEqual(StringA.GetSize(), ExpectedSize);
+			ZETestCheckEqual(StringA.GetLength(), ExpectedLength);
+		}
 	}
 
-	ZETestItemAdd(Assignments)
+	ZETest("void ZEString::Clear()")
+	{
+		ZEString String = "Lorem Ipsum";
+
+		String.Clear();
+
+		ZETestCheckEqual(String.GetLength(), 0);
+		ZETestCheckEqual(String.GetSize(), 0);
+	}
+
+	ZETest("void ZEString::Compact()")
+	{
+		ZETestCheck(false);
+	}
+
+	ZETest("void ZEString::CopyFrom(const ZEString & String)")
+	{
+		ZETestCase("Copying a string to a previously non-empty ZEString")
+		{
+			ZEString StringA = "Lorem";
+			ZEString StringB = "Ipsum";
+			unsigned int ExpectedSize = 5;
+			unsigned int ExpectedLength = 6;
+
+			StringA.CopyFrom(StringB);
+
+			ZETestCheckEqual(StringA, "Ipsum");
+			ZETestCheckEqual(StringA.GetLength(), 5);
+			ZETestCheckEqual(StringA.GetSize(), 6);
+		}
+
+		ZETestCase("Copying a string to a previously empty ZEString")
+		{
+			ZEString StringA = "Lorem Ipsum";
+			ZEString StringB;
+			unsigned int ExpectedSize = 12;
+			unsigned int ExpectedLength = 11;
+
+			StringB.CopyFrom(StringA);
+
+			ZETestCheckEqual(StringB, "Lorem Ipsum");
+			ZETestCheckEqual(StringB.GetLength(), ExpectedLength);
+			ZETestCheckEqual(StringB.GetSize(), ExpectedSize);
+		}
+	}
+
+	ZETest("void ZEString::CopyTo(ZEString & String) const")
+		{
+			ZETestCase("Copying a string to a previously empty ZEString")
+			{
+				ZEString StringA = "Lorem Ipsum";
+				ZEString StringB;
+				unsigned int ExpectedSize = 12;
+				unsigned int ExpectedLength = 11;
+
+				StringA.CopyTo(StringB);
+
+				ZETestCheckEqual(StringB, "Lorem Ipsum");
+				ZETestCheckEqual(StringB.GetLength(), ExpectedLength);
+				ZETestCheckEqual(StringB.GetSize(), ExpectedSize);
+			}
+
+			ZETestCase("Copying a string to a previously non-empty ZEString")
+			{
+				ZEString StringA = "Lorem";
+				ZEString StringB = "Ipsum Dolor";
+				unsigned int ExpectedSize = 6;
+				unsigned int ExpectedLength = 5;
+
+				StringA.CopyTo(StringB);
+
+				ZETestCheckEqual(StringB, "Lorem");
+				ZETestCheckEqual(StringB.GetLength(), ExpectedLength);
+				ZETestCheckEqual(StringB.GetSize(), ExpectedSize);
+			}
+		}
+
+	ZETest("bool ZEString::Equals(const ZEString & String) const")
+	{
+		const ZEString StringA = "Lorem Ipsum";
+		const ZEString StringB = "Lorem Ipsum";
+
+		ZETestCheck(StringA.Equals(StringB));
+
+		ZETestCase("Two ZEStrings are not equal")
+		{
+			const ZEString StringA = "Lorem Ipsum";
+			const ZEString StringB = "Dolor Sit";
+			ZETestCheck(!(StringA.Equals(StringB)));
+		}
+	}
+
+	ZETest("bool ZEString::Equals(const char * String) const")
+	{
+		const ZEString StringA = "Lorem Ipsum";
+		const char* StringB = "Lorem Ipsum";
+
+		ZETestCheck(StringA.Equals(StringB));
+		ZETestCheck(StringA.Equals("Lorem Ipsum"));
+
+		ZETestCase("Two ZEStrings are not equal")
+		{
+			const ZEString StringA = "Lorem Ipsum";
+			const char* StringB = "Dolor Sit";
+			ZETestCheck(!(StringA.Equals(StringB)));
+		}
+	}
+
+	ZETest("ZEString ZEString::Format(const char* Format, ...)")
+	{
+		ZETestCase("char")
+		{
+			ZEString StringA = ZEString::Format("%corem %cpsum", 'L', 'I');
+			ZETestCheckEqual(StringA, "Lorem Ipsum");
+		}
+
+		ZETestCase("int")
+		{
+			ZEString StringB = ZEString::Format("c%dcTestc%dc", 1, 1);
+			ZETestCheckEqual(StringB, "c1cTestc1c");
+		}
+	}
+
+	ZETest("ZEString ZEString::FromBool(bool Value, const char* TrueText, const char* FalseText)")
+	{
+		ZETestCase("True")
+		{
+			ZEString StringA;
+			ZETestCheckEqual(StringA.FromBool(1,"True","False"), "True");
+		}
+
+		ZETestCase("False")
+		{
+			ZEString StringA;
+			ZETestCheckEqual(StringA.FromBool(0,"True","False"), "False");
+		}
+	}
+
+	ZETest("ZEString ZEString::FromChar(char Value)")
+	{
+		char C = 'a';
+
+		ZEString StringA = ZEString::FromChar(C);
+
+		ZETestCheckEqual(StringA, "a");
+	}
+
+	ZETest("ZEString ZEString::FromCString(const char* Value)")
+	{
+		const char* String = "Lorem Ipsum";
+
+		ZEString StringB = ZEString::FromCString(String);
+
+		ZETestCheckEqual(StringB, "Lorem Ipsum");
+	}
+
+	ZETest("ZEString ZEString::FromFloat(float Value, ZEUInt Digits)")
+	{
+		float Value = 845756.88781;
+		ZEUInt Digits = 7;
+
+		ZEString String = ZEString::FromFloat(Value, Digits);
+
+		ZETestCheckEqual(String, "845756.9");
+	}
+
+	ZETest("ZEString ZEString::FromInt(ZEInt Value, ZEUInt Base)")
+	{
+		ZEInt Value = 10;
+		ZEUInt Base = 5;
+
+		ZEString String = ZEString::FromInt(Value, Base);
+
+		ZETestCheckEqual(String, "20");
+	}
+
+	ZETest("ZEString ZEString::FromStdString(const std::string& Value)")
+	{
+		std::string Example = "Lorem Ipsum";
+
+		ZEString String = ZEString::FromStdString(Example);
+
+		ZETestCheckEqual(String, "Lorem Ipsum");
+
+	}
+
+	ZETest("ZEString ZEString::FromUInt(ZEUInt Value, ZEUInt Base)")
+	{
+		ZEUInt Base = 2;
+		ZEUInt Value = 120;
+
+		ZEString String = ZEString::FromUInt(Value, Base);
+
+		ZETestCheckEqual(String, "1111000");
+
+	}
+
+	ZETest("char ZEString::GetCharacter(size_t Position) const")
+	{
+		ZEString String = "Lorem Ipsum";
+
+		char Result = String.GetCharacter(4);
+
+		ZETestCheckEqual(Result, 'm');
+	}
+
+	ZETest("size_t ZEString::GetLength() const")
+	{
+		ZEString String = "Lorem Ipsum";
+		unsigned int ExpectedLength = 11;
+
+		ZETestCheckEqual(String.GetLength(), ExpectedLength);
+	}
+
+	ZETest("size_t ZEString::GetSize() const")
+	{
+		ZEString String = "Lorem Ipsum Dolor Sit Amet";
+		unsigned int ExpectedSize = 27;
+
+		ZETestCheckEqual(String.GetSize(), ExpectedSize);
+	}
+
+	ZETest("const char* ZEString::GetValue() const")
+	{
+		ZEString String = "Lorem";
+		const char * C;
+
+		C = String.GetValue();
+		ZETestCheckEqual(C[0], 'L');
+		ZETestCheckEqual(C[1], 'o');
+		ZETestCheckEqual(C[2], 'r');
+		ZETestCheckEqual(C[3], 'e');
+		ZETestCheckEqual(C[4], 'm');
+	}
+
+	ZETest("void ZEString::Insert(const ZEString & String);")
+	{
+		ZEString StringA = "Ipsum";
+		ZEString StringB = "Lorem ";
+
+		StringA.Insert(StringB);
+		ZETestCheckEqual(StringA, "Lorem Ipsum");
+
+	}
+
+	ZETest("void ZEString::Insert(const char * String);")
+	{
+		ZEString StringA = "Ipsum";
+		const char* StringB = "Lorem ";
+
+		StringA.Insert(StringB);
+		ZETestCheckEqual(StringA, "Lorem Ipsum");
+	}
+
+	ZETest("void ZEString::Insert(size_t Position, const ZEString & String)")
+	{
+		ZETestCase("Inserting a ZEString inside another ZEString")
+		{
+			ZEString StringA = "Lorem Sit Amet";
+			ZEString StringB = " Ipsum Dolor";
+			unsigned int ExpectedLength = 26;
+
+			StringA.Insert(5, StringB);
+
+			ZETestCheckEqual(StringA, "Lorem Ipsum Dolor Sit Amet");
+			ZETestCheckEqual(StringA.GetLength(), ExpectedLength);
+		}
+
+		ZETestCase("Inserting an empty ZEString inside another ZEString")
+		{
+			ZEString StringC = "Lorem";
+			ZEString StringD = "";
+			unsigned int ExpectedLength = 5;
+
+			StringC.Insert(3, StringD);
+
+			ZETestCheckEqual(StringC, "Lorem");
+			ZETestCheckEqual(StringC.GetLength(), ExpectedLength);
+		}
+
+		ZETestCase("Inserting a ZESTring towards the end of the current ZEString")
+		{
+			ZEString StringE = "Lorem ";
+			unsigned int ExpectedLength = 11;
+
+			StringE.Insert(6, "Ipsum");
+
+			ZETestCheckEqual(StringE, "Lorem Ipsum");
+			ZETestCheckEqual(StringE.GetLength(), ExpectedLength);
+		}
+	}
+
+	ZETest("void ZEString::Insert(size_t Position, const char * String)")
+	{
+		ZEString StringA = "Lorem ";
+		const char* StringB = "Ipsum";
+		unsigned int ExpectedLength = 11;
+		size_t Position = 6;
+
+		StringA.Insert(Position, StringB);
+
+		ZETestCheckEqual(StringA, "Lorem Ipsum");
+		ZETestCheckEqual(StringA.GetLength(), ExpectedLength);
+	}
+
+	ZETest("bool ZEString::IsEmpty() const")
+	{
+		ZETestCase("ZEString is empty")
+		{
+			ZEString StringA;
+			ZEString StringB = "Lorem";
+			StringB.Clear();
+
+			ZETestCheck(StringA.IsEmpty());
+			ZETestCheck(StringB.IsEmpty());
+		}
+
+		ZETestCase("ZEString is not empty")
+		{
+			ZEString StringC = "Lorem Ipsum";
+
+			ZETestCheck(!(StringC.IsEmpty()));
+		}
+	}
+
+	ZETest("ZEString ZEString::Left(size_t Count) const")
 	{
 		ZEString String;
-		String.SetValue("Testing Testing");
-		CHECK_EQUAL(String, "Testing Testing");
-		CHECK_EQUAL(String, "Testing Testing");
 
-		String.SetValue("ASCII TEST ascii test");
-		CHECK_EQUAL(String, "ASCII TEST ascii test");
+		ZETestCase("ZEString is empty")
+		{
+			ZETestCheckEqual(String.Left(0), "");
+		}
+		ZETestCase("ZEString has a value")
+		{
+			String = "1234Test5678";
 
-		String.SetValue("UTF8 Türkçe karakterler Test");
-		CHECK_EQUAL(String, "UTF8 Türkçe karakterler Test");
+			ZETestCheckEqual(String.Left(0), "");
+			ZETestCheckEqual(String.Left(1), "1");
+			ZETestCheckEqual(String.Left(4), "1234");
+			ZETestCheckEqual(String.Left(12), "1234Test5678");
+		}
+	}
 
-		String = "Testing Testing";
-		CHECK_EQUAL(String, "Testing Testing");
+	ZETest("ZEString ZEString::Lower() const")
+	{
+		ZEString StringA;
+		ZEString StringB;
+		ZEString StringC;
 
-		String = "String Test 123";
-		CHECK_EQUAL(String, "String Test 123");
+		StringA = "lorem";
+		StringB = "IPSUM";
+		StringC = "DoLoR";
 
-		ZEString A("Constructor");
-		CHECK_EQUAL(A, "Constructor");
+		ZETestCheckEqual(StringA.Lower(), "lorem");
+		ZETestCheckEqual(StringB.Lower(), "ipsum");
+		ZETestCheckEqual(StringC.Lower(), "dolor");
 
-		ZEString B("Wide Constructor");
-		CHECK_EQUAL(B, "Wide Constructor");
+		StringA = "";
 
-		ZEString C("Copy Constructor");
-		ZEString D(C);
+		ZETestCheckEqual(StringA.Lower(), "");
+	}
 
-		CHECK_EQUAL(D, "Copy Constructor");
+	ZETest("ZEString ZEString::Middle(size_t Position, size_t Count) const")
+	{
+		ZEString String;
 
-		String = A;
-		CHECK_EQUAL(String, A.GetValue());
+		ZETestCase("ZEString is empty")
+		{
+			ZETestCheckEqual(String.Middle(0, 0), "");
+		}
 
-		String = "Operator Assignment";
-		CHECK_EQUAL(String, "Operator Assignment");
+		ZETestCase("ZEString has a value")
+		{
+			String = "1234Test5678";
+
+			ZETestCheckEqual(String.Middle(0, 0), "");
+			ZETestCheckEqual(String.Middle(2, 8), "34Test56");
+			ZETestCheckEqual(String.Middle(8, 4), "5678");
+			ZETestCheckEqual(String.Middle(0, 12), "1234Test5678");
+		}
+	}
+
+	ZETest("bool ZEString::operator!=(const ZEString & String) const")
+	{
+		ZETestCase("ZEStrings are not equal")
+		{
+			const ZEString StringA = "Lorem";
+			const ZEString StringB = "Ipsum";
+
+			ZETestCheck(StringA != StringB);
+		}
+
+		ZETestCase("ZEStrings are equal")
+		{
+			const ZEString StringC = "Lorem";
+			const ZEString StringD = "Lorem";
+
+			ZETestCheck(!(StringC != StringD));
+		}
+	}
+
+	ZETest("bool ZEString::operator!=(const char * String) const")
+	{
+
+		ZETestCase("Strings are not equal")
+		{
+			const ZEString StringA = "Lorem";
+			const char* StringB = "Ipsum";
+
+			ZETestCheck(StringA != StringB);
+		}
+
+		ZETestCase("Strings are equal")
+		{
+			const ZEString StringC = "Lorem";
+			const char* StringD = "Lorem";
+
+			ZETestCheck(!(StringC != StringD));
+		}
+	}
+
+	ZETest("char & ZEString::operator[](int Index)")
+	{
+		ZEString StringA = "Lorem";
+
+		char C = StringA[0];
+
+		ZETestCheckEqual(C, 'L');
+	}
+
+
+	ZETest("const char & ZEString::operator[](int Index) const")
+	{
+		const ZEString String = "Lorem";
+
+		const char C = String[3];
+
+		ZETestCheck(C, 'r');
+	}
+
+	ZETest("ZEString ZEString::operator+(const ZEString & String)")
+	{
+		ZEString StringA = "Lorem ";
+		ZEString StringB = "Ipsum";
+
+		ZEString Result = StringA + StringB;
+
+		ZETestCheckEqual(Result, "Lorem Ipsum");
+
+	}
+
+	ZETest("ZEString ZEString::operator+(const char * String)")
+	{
+		ZEString StringA = "Lorem";
+		const char* StringB = " Ipsum";
+
+		ZEString Result = StringA + StringB;
+
+		ZETestCheckEqual(Result, "Lorem Ipsum");
+	}
+
+	ZETest("ZEString & ZEString::operator+=(const ZEString & String)")
+	{
+		ZEString StringA = "Lorem ";
+		ZEString StringB = "Ipsum";
+
+		StringA += StringB;
+		ZETestCheckEqual(StringA, "Lorem Ipsum");
+	}
+
+	ZETest("ZEString & ZEString::operator+=(const char * String)")
+	{
+		ZEString StringA = "Lorem ";
+		const char* StringB = "Ipsum";
+
+		StringA += StringB;
+		ZETestCheckEqual(StringA, "Lorem Ipsum");
+	}
+
+	ZETest("ZEString & ZEString::operator=(const ZEString & String)")
+	{
+		ZEString StringA = "Lorem";
+		ZEString StringB = "Ipsum";
+
+		StringA = StringB;
+
+		ZETestCheckEqual(StringA, "Ipsum");
+	}
+
+	ZETest("ZEString & ZEString::operator=(const char * String)")
+	{
+		ZEString StringA = "Lorem";
+		const char* StringB = "Ipsum";
+
+		StringA = StringB;
+
+		ZETestCheckEqual(StringA, "Ipsum");
+	}
+
+	ZETest(" bool ZEString::operator==(const ZEString & String) const")
+	{
+		ZETestCase("ZEStrings are not equal")
+		{
+			const ZEString StringA = "Lorem";
+			const ZEString StringB = "Ipsum";
+
+			ZETestCheck(!(StringA == StringB));
+		}
+		ZETestCase("ZEStrings are equal")
+		{
+			const ZEString StringC = "Lorem Ipsum";
+			const ZEString StringD = "Lorem Ipsum";
+
+			ZETestCheck(StringC == StringD);
+		}
+	}
+
+	ZETest("bool ZEString::operator==(const char * String) const")
+	{
+		ZETestCase("Strings are not equal")
+		{
+			const ZEString StringA = "Lorem";
+			const char* StringB = "Ipsum";
+
+			ZETestCheck(!(StringA == StringB));
+		}
+
+		ZETestCase("Strings are equal")
+		{
+			const ZEString StringA = "Lorem Ipsum";
+			const char* StringB = "Lorem Ipsum";
+
+			ZETestCheck(StringA == StringB);
+		}
+    }
+
+	ZETest("ZEString::operator const char*() const")
+	{
+		ZEString StringA = "Lorem Ipsum";
+		const char* StringB = (const char*)StringA;
+
+		ZETestCheck(strcmp(StringB, StringA.GetValue()) == 0);
 		
-		String = "Char Operator Assignment";
-		CHECK_EQUAL(String, "Char Operator Assignment");
+	}
 
-		ZEString X;
-		ZEString Y;
-		X = Y;
-		CHECK_EQUAL(X, "");
+	ZETest("ZEString::operator std::string() const")
+	{
+		ZEString StringA = "Lorem Ipsum";
+		std::string ExpectedResult = "Lorem Ipsum";
+
+		std::string StringB = (std::string)StringA;
+
+		//ZETestCheck(strcmp(StringB, StringA.GetValue()) == 0);
+		ZETestCheckEqual(StringB, ExpectedResult);
+	}
+
+	ZETest("void ZEString::Remove(size_t Position, unsigned int Count = 1)")
+	{
+		ZEString String = "1234567890";
+		size_t Position = 3;
+		unsigned int Count = 5;
+
+		String.Remove(Position, Count);
+		ZETestCheckEqual(String, "12390");
+		ZETestCheckEqual(String.GetLength(), 5);
+	}
+
+	ZETest("ZEString ZEString::Right(size_t Count) const")
+	{
+		ZEString String;
+
+		ZETestCase("ZEString is empty")
+		{
+			ZETestCheckEqual(String.Right(0), "");
+		}
 		
-		ZEString W(X);
-		CHECK_EQUAL(W, "");
+		ZETestCase("ZEString has a value")
+		{
+			String = "1234Test5678";
+
+			ZETestCheckEqual(String.Right(0), "");
+			ZETestCheckEqual(String.Right(1), "8");
+			ZETestCheckEqual(String.Right(4), "5678");
+			ZETestCheckEqual(String.Right(12), "1234Test5678");
+		}
 	}
 
-	ZETestItemAdd(ClearIsEmpty)
+	ZETest("void ZEString::SetCharacter(size_t Position, char Value)")
 	{
-		ZEString A;
-		CHECK(A.IsEmpty());
+		ZEString String = "0123456789";
+		char Value = 'X';
+		size_t Position = 5;
 
-		A = "Denerenrmenre";
-		A.Clear();
-		CHECK_EQUAL(A.GetLength(), 0);
-		CHECK_EQUAL(A.GetSize(), 0);
-		CHECK(A.IsEmpty());		
+		String.SetCharacter(Position, Value);
+		ZETestCheckEqual(String, "01234X6789");
 	}
 
-	ZETestItemAdd(Buffer)
+	ZETest("void ZEString::SetValue(bool Value, const char* TrueText, const char* FalseText)")
 	{
-		char TestString[2000];
-		for(size_t I = 0; I < 2000; I++)
-			TestString[I] = 'x';
-		TestString[1999] = '\0';
+		ZETestCase("ZEString value is set to True")
+		{
+			ZEString StringA;
 
-		ZEString A;
-		CHECK(A.Buffer == NULL);
+			StringA.SetValue(1, "True", "False");
+
+			ZETestCheckEqual(StringA, "True");
+		}
+		ZETestCase("ZEString value is set to False")
+		{
+			ZEString StringB;
+
+			StringB.SetValue(0, "True", "False");
+
+			ZETestCheckEqual(StringB, "False");
+		}
 		
-		TestString[500] = '\0';
-		A.SetValue(TestString);
-		CHECK_EQUAL(A.GetLength(), 500);
-		CHECK(A.GetSize() >=  500);
-
-		TestString[500] = 'x';
-		TestString[1000] = '\0';
-		A = TestString;
-		CHECK_EQUAL(A.GetLength(), 1000);
-		CHECK(A.GetSize() >= 1000);
-		
-		TestString[1000] = 'x';
-		TestString[1500] = '\0';
-		A = TestString;
-		CHECK_EQUAL(A.GetLength(), 1500);
-		CHECK(A.GetSize() >= 1500);
-
-		TestString[250] = '\0';
-		A = TestString;
-		CHECK_EQUAL(A.GetLength(), 250);
-		CHECK(A.GetSize() >= 250);
-
-		A.Clear();
-		CHECK_EQUAL(A.GetSize(), 0);
-		CHECK_EQUAL(A.GetLength(), 0);
-		CHECK(A.Buffer == NULL);
-
-		A = "String SetSize Testing";
-		CHECK_EQUAL(A, "String SetSize Testing");
-		A.Compact();
-		CHECK_EQUAL(A, "String SetSize Testing");
 	}
 
-	ZETestItemAdd(Insert)
+	ZETest("void ZEString::SetValue(const char* String)")
 	{
-		ZEString A = "Insertable Text";
-		A.Insert("Pre");
-		CHECK_EQUAL(A, "PreInsertable Text");
+		ZEString StringA;
+		const char* StringB = "Lorem";
 
-		ZEString B = "Insertable Text";
-		B.Insert(ZEString("Pre"));
-		CHECK_EQUAL(B, "PreInsertable Text");
+		StringA.SetValue(StringB);
 
-		ZEString C = "Empty String";
-		C.Insert("");
-		CHECK_EQUAL(C, "Empty String");
-		
-		ZEString D;
-		D.Insert("New String");
-		CHECK_EQUAL(D, "New String");
+		ZETestCheckEqual(StringA, "Lorem");
 	}
 
-	ZETestItemAdd(InsertStart)
+	ZETest("void ZEString::SetValue(float Value, ZEUInt Digits)")
 	{
-		ZEString A = "Insertable Text";
-		A.Insert(0, "Pre");
-		CHECK_EQUAL(A, "PreInsertable Text");
-
-		ZEString B = "Empty String";
-		B.Insert(0, "");
-		CHECK_EQUAL(B, "Empty String");
-		
-		ZEString C;
-		C.Insert(0, "New String");
-		CHECK_EQUAL(C, "New String");
-
-		ZEString D;
-		ZEString E;
-		D.Insert(E);
+		float Value = 400.5525252f;
+		ZEString String;
+		ZEUInt Digits = 6;
+		String.SetValue(Value, Digits);
+		ZETestCheckEqual(String, "400.553");
 	}
 
-	ZETestItemAdd(InsertMiddle)
+	ZETest("void ZEString::SetValue(ZEInt Value, ZEUInt Base)")
 	{
-		ZEString A = "$%%$";
-		A.Insert(2, "Testing");
-		CHECK_EQUAL(A, "$%Testing%$");
+		ZEString String;
+		ZEInt Value = 10;
+		ZEUInt Base = 2;
 
-		ZEString B = "$%%$";
-		B.Insert(2, "");
-		CHECK_EQUAL(B, "$%%$");
+		String.SetValue(Value, Base);
+		ZETestCheckEqual(String, "1010");
 	}
 
-	ZETestItemAdd(InsertEnd)
+	ZETest("void ZEString::SetValue(ZEUInt Value, ZEUInt Base)")
 	{
-		ZEString A = "EndPoint";
-		A.Insert(8, "Location");
-		CHECK_EQUAL(A, "EndPointLocation");
+		ZEString String;
+		ZEUInt Value = 6;
+		ZEUInt Base = 2;
 
-		ZEString B = "EndPoint";
-		B.Insert(8, "Location");
-		CHECK_EQUAL(B, "EndPointLocation");
+		String.SetValue(Value, Base);
+
+		ZETestCheckEqual(String, ZEString("110"));
 	}
 
-	ZETestItemAdd(Append)
+	ZETest("ZEString::ZEString(const char * String)")
 	{
-		//void Append(const ZEString& String);
-		ZEString A = "StringA";
-		A.Append("StringB");
-		CHECK_EQUAL(A, "StringAStringB");
+		const char* StringA = "Lorem Ipsum";
 
-		A = "Orcun";
-		A.Append("Rulz");
-		CHECK_EQUAL(A, "OrcunRulz");
-		A.Append(ZEString(" "));
-		CHECK_EQUAL(A, "OrcunRulz ");
-		
-		A = "StringA";
-		CHECK_EQUAL(A + "StringB", "StringAStringB");
-		CHECK_EQUAL(A + "StringB", "StringAStringB");
-		CHECK_EQUAL(A + ZEString("StringB"), "StringAStringB");
+		ZEString StringB(StringA);
 
-		A = "StringA";
-		A += ZEString("StringB");
-		CHECK_EQUAL(A, "StringAStringB");
-
-		A = "";
-		A.Append("");
-		CHECK_EQUAL(A, "");
-
-		A = "StringA";
-		A += "";
-		CHECK_EQUAL(A, "StringA");
-		
-		A = "XYZ";
-		A += ZEString("");
-		CHECK_EQUAL(A, "XYZ");
+		ZETestCheckEqual(StringB, "Lorem Ipsum");
 	}
 
-	ZETestItemAdd(Remove)
+	ZETest("ZEString::ZEString(const ZEString & String)")
 	{
-		ZEString A = "";
-		A.Remove(0, 0);
-		
-		A = "1234567890";
-		A.Remove(0, 0);
-		CHECK_EQUAL(A, "1234567890");
+		ZEString StringA = "Lorem Ipsum";
 
-		A = "1234567890";
-		A.Remove(0, 1);
-		CHECK_EQUAL(A, "234567890");
+		ZEString StringB(StringA);
 
-		A = "1234567890";
-		A.Remove(0, 5);
-		CHECK_EQUAL(A, "67890");
-
-		A = "1234567890";
-		A.Remove(1, 1);
-		CHECK_EQUAL(A, "134567890");
-
-		A = "1234567890";
-		A.Remove(1, 5);
-		CHECK_EQUAL(A, "17890");
-
-		A = "1234567890";
-		A.Remove(9, 1);
-		CHECK_EQUAL(A, "123456789");
-
-		A = "1234567890";
-		A.Remove(8, 2);
-		CHECK_EQUAL(A, "12345678");
-
-		A = "1234567890";
-		A.Remove(3, 4);
-		CHECK_EQUAL(A, "123890");
-	}	
-
-	ZETestItemAdd(Contains)
-	{
+		ZETestCheckEqual(StringB, "Lorem Ipsum");
 
 	}
 
-	ZETestItemAdd(Replace)
+	ZETest("ZEString ZEString::SubString(size_t StartPosition, size_t EndPosition) const")
 	{
+		ZEString String;
+
+		ZETestCase("ZEString is empty")
+		{
+			ZETestCheckEqual(String.SubString(0, 0), "");
+		}
+
+		ZETestCase("ZEString has a value")
+		{
+			String = "1234Test5678";
+			ZETestCheckEqual(String.SubString(0, 0), "1");
+			ZETestCheckEqual(String.SubString(0, 1), "12");
+			ZETestCheckEqual(String.SubString(0, 3), "1234");
+
+			ZETestCheckEqual(String.SubString(4, 4), "T");
+			ZETestCheckEqual(String.SubString(4, 5), "Te");
+			ZETestCheckEqual(String.SubString(4, 7), "Test");
+
+			ZETestCheckEqual(String.SubString(8, 8), "5");
+			ZETestCheckEqual(String.SubString(8, 9), "56");
+			ZETestCheckEqual(String.SubString(8, 11), "5678");
+		}
+	}
+
+	ZETest("const char* ZEString::ToCString() const")
+	{
+		ZEString StringA = "Lorem Ipsum";
+		const char* StringB;
+
+		StringB = StringA.ToCString();
+
+		ZETestCheck(strcmp(StringB, StringA.GetValue()) == 0);
+	}
+
+	ZETest("std::string ZEString::ToStdString() const")
+	{
+		ZEString StringA = "Lorem Ipsum";
+		std::string StringB;
+		std::string ExpectedResult = "Lorem Ipsum";
+
+		StringB = StringA.ToStdString();
+
+		//ZETestCheck(strncmp(a.c_str(), A, A.GetSize()) == 0);
+		ZETestCheckEqual(StringB, ExpectedResult);
+	}
+
+	ZETest("ZEUINT32 ZEString::ToUInt() const")
+	{
+		ZEString String = "123";
+		ZEUINT32 ExpectedValue = 123;
+
+		ZEUINT32 Value = String.ToUInt();
+
+		ZETestCheckEqual(Value, ExpectedValue);
+	}
+
+	ZETest("ZEString ZEString::Trim() const")
+	{
+		ZEString String;
+		ZETestCheckEqual(String.Trim(), "");
+
+		String = "    ";
+		ZETestCheckEqual(String.Trim(), "");
+
+		String = "Lorem Ipsum";
+		ZETestCheckEqual(String.Trim(), "Lorem Ipsum");
+
+		String = "   Lorem Ipsum   ";
+		ZETestCheckEqual(String.Trim(), "Lorem Ipsum");
+
+		String = "\t\tLorem Ipsum\t\t";
+		ZETestCheckEqual(String.Trim(), "Lorem Ipsum");
+
+		String = " \t \tLorem Ipsum \t \t";
+		ZETestCheckEqual(String.Trim(), "Lorem Ipsum");
+	}
+
+	ZETest("ZEString ZEString::TrimLeft() const")
+	{
+		ZEString String;
+		ZETestCheckEqual(String.TrimLeft(), "");
+
+		String = "    ";
+		ZETestCheckEqual(String.TrimLeft(), "");
+
+		String = "Lorem Ipsum";
+		ZETestCheckEqual(String.TrimLeft(), "Lorem Ipsum");
+
+		String = "   Lorem Ipsum   ";
+		ZETestCheckEqual(String.TrimLeft(), "Lorem Ipsum   ");
+
+		String = "\t\tLorem Ipsum\t\t";
+		ZETestCheckEqual(String.TrimLeft(), "Lorem Ipsum\t\t");
+
+		String = " \t \tLorem Ipsum \t \t";
+		ZETestCheckEqual(String.TrimLeft(), "Lorem Ipsum \t \t");
+	}
+
+	ZETest("ZEString ZEString::TrimRight() const")
+	{
+		ZEString String;
+		ZETestCheckEqual(String.TrimRight(), "");
+
+		String = "    ";
+		ZETestCheckEqual(String.TrimRight(), "");
+
+		String = "Lorem Ipsum";
+		ZETestCheckEqual(String.TrimRight(), "Lorem Ipsum");
+
+		String = "   Lorem Ipsum   ";
+		ZETestCheckEqual(String.TrimRight(), "   Lorem Ipsum");
+
+		String = "\t\tLorem Ipsum\t\t";
+		ZETestCheckEqual(String.TrimRight(), "\t\tLorem Ipsum");
+
+		String = " \t \tLorem Ipsum \t \t";
+		ZETestCheckEqual(String.TrimRight(), " \t \tLorem Ipsum");
+	}
+
+	ZETest(" ZEString ZEString::Upper() const")
+	{
+		ZEString StringA;
+		ZEString StringB;
+		ZEString StringC;
+		ZEString StringD;
+
+		StringA = "Lorem";
+		StringB = "IPSUM";
+		StringC = "DoLoR";
+		StringD = "";
+
+		ZETestCheckEqual(StringA.Upper(), "LOREM");
+		ZETestCheckEqual(StringB.Upper(), "IPSUM");
+		ZETestCheckEqual(StringC.Upper(), "DOLOR");
+		ZETestCheckEqual(StringD.Upper(), "");
+	}
+
+	ZETest("float ZEString::ToFloat()")
+	{
+		ZEString String = "-255.046";
+
+		float Value = String.ToFloat();
+
+		ZETestCheckClose(Value, -255.04601f);
 
 	}
 
-	ZETestItemAdd(Delete)
+	ZETest("int ZEString::ToInt()")
 	{
+		ZEString StringA = "255";
+		ZEString StringB = "-255.043";
 
+		int ValueA = StringA.ToInt();
+		int ValueB = StringB.ToInt();
+
+		ZETestCheckEqual(ValueA, 255);
+		ZETestCheckEqual(ValueB, -255);
 	}
 
-	ZETestItemAdd(Left)
+	ZETest("ZEString operator+(const char* String1, const ZEString& String2)")
 	{
-		ZEString A;
-		CHECK_EQUAL(A.Left(0), "");
+		ZEString StringA = "Ipsum";
+		const char* StringB = "Lorem ";
+		ZEString Result;
 
-		A = "1234Test5678";
-		CHECK_EQUAL(A.Left(0), "");
-		CHECK_EQUAL(A.Left(1), "1");
-		CHECK_EQUAL(A.Left(4), "1234");
-		CHECK_EQUAL(A.Left(12), "1234Test5678");
-	}
-	
-	ZETestItemAdd(Right)
-	{
-		ZEString A;
-		CHECK_EQUAL(A.Right(0), "");
+		Result = StringB + StringA;
 
-		A = "1234Test5678";
-		CHECK_EQUAL(A.Right(0), "");
-		CHECK_EQUAL(A.Right(1), "8");
-		CHECK_EQUAL(A.Right(4), "5678");
-		CHECK_EQUAL(A.Right(12), "1234Test5678");
-	}
-
-	ZETestItemAdd(Middle)
-	{
-		ZEString A;
-		CHECK_EQUAL(A.Middle(0,0), "");
-		
-		A = "1234Test5678";
-		CHECK_EQUAL(A.Middle(0, 0), "");
-		CHECK_EQUAL(A.Middle(5, 0), "");
-		CHECK_EQUAL(A.Middle(11, 0), "");
-
-		// Front
-		CHECK_EQUAL(A.Middle(0, 0), "");
-		CHECK_EQUAL(A.Middle(0, 1), "1");
-		CHECK_EQUAL(A.Middle(0, 4), "1234");
-		CHECK_EQUAL(A.Middle(0, 12), "1234Test5678");
-
-		// Back
-		CHECK_EQUAL(A.Middle(12, 0), "");
-		CHECK_EQUAL(A.Middle(11, 1), "8");
-		CHECK_EQUAL(A.Middle(8, 4), "5678");
-
-		// Middle
-		CHECK_EQUAL(A.Middle(4, 0), "");
-		CHECK_EQUAL(A.Middle(4, 1), "T");
-		CHECK_EQUAL(A.Middle(4, 4), "Test");
-	}
-
-	ZETestItemAdd(SubString)
-	{
-		ZEString A;
-		CHECK_EQUAL(A.SubString(0, 0), "");
-
-		A = "1234Test5678";
-		CHECK_EQUAL(A.SubString(0, 0), "1");
-		CHECK_EQUAL(A.SubString(0, 1), "12");
-		CHECK_EQUAL(A.SubString(0, 3), "1234");
-
-		CHECK_EQUAL(A.SubString(4, 4), "T");
-		CHECK_EQUAL(A.SubString(4, 5), "Te");
-		CHECK_EQUAL(A.SubString(4, 7), "Test");
-
-		CHECK_EQUAL(A.SubString(8, 8), "5");
-		CHECK_EQUAL(A.SubString(8, 9), "56");
-		CHECK_EQUAL(A.SubString(8, 11), "5678");
-	}
-
-	ZETestItemAdd(UpperLower)
-	{
-		ZEString A = "LOWERCASE";
-		CHECK_EQUAL(A.ToLower(), "lowercase");
-		
-		A = ">>*loWeR <<%12CaSe\t";
-		CHECK_EQUAL(A.ToLower(), ">>*lower <<%12case\t");
-
-		A = "uppercase";
-		CHECK_EQUAL(A.ToUpper(), "UPPERCASE");
-
-		A = ">>*UpPeR <<%12CaSe\t";
-		CHECK_EQUAL(A.ToUpper(), ">>*UPPER <<%12CASE\t");
-	}
-
-	ZETestItemAdd(Trim)
-	{
-		ZEString A;
-		CHECK_EQUAL(A.TrimLeft(), "");
-		CHECK_EQUAL(A.TrimRight(), "");
-		CHECK_EQUAL(A.Trim(), "");
-
-		A = "    ";
-		CHECK_EQUAL(A.TrimLeft(), "");
-		CHECK_EQUAL(A.TrimRight(), "");
-		CHECK_EQUAL(A.Trim(), "");
-
-		A = "Trim Trim";
-		CHECK_EQUAL(A.TrimLeft(), "Trim Trim");
-		CHECK_EQUAL(A.TrimRight(), "Trim Trim");
-		CHECK_EQUAL(A.Trim(), "Trim Trim");
-
-		A = " Trim Trim ";
-		CHECK_EQUAL(A.TrimLeft(), "Trim Trim ");
-		CHECK_EQUAL(A.TrimRight(), " Trim Trim");
-		CHECK_EQUAL(A.Trim(), "Trim Trim");
-
-		A = "    Trim Trim    ";
-		CHECK_EQUAL(A.TrimLeft(), "Trim Trim    ");
-		CHECK_EQUAL(A.TrimRight(), "    Trim Trim");
-		CHECK_EQUAL(A.Trim(), "Trim Trim");
-
-		A = "\t\tTrim Trim\t\t";
-		CHECK_EQUAL(A.TrimLeft(), "Trim Trim\t\t");
-		CHECK_EQUAL(A.TrimRight(), "\t\tTrim Trim");
-		CHECK_EQUAL(A.Trim(), "Trim Trim");
-
-		A = " \t \tTrim Trim \t \t";
-		CHECK_EQUAL(A.TrimLeft(), "Trim Trim \t \t");
-		CHECK_EQUAL(A.TrimRight(), " \t \tTrim Trim");
-		CHECK_EQUAL(A.Trim(), "Trim Trim");
-	}
-
-	ZETestItemAdd(CopyOnWrite)
-	{
+		ZETestCheckEqual(Result, "Lorem Ipsum");
 	}
 }

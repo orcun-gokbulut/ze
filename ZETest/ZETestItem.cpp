@@ -104,9 +104,19 @@ const char* ZETestItem::GetName()
 	return Name;
 }
 
-ZETestSuite* ZETestItem::GetOwner()
+ZETestSuiteItem* ZETestItem::GetOwner()
 {
 	return Owner;
+}
+
+void ZETestItem::SetCurrentCase(const char* CaseName)
+{
+	strncpy(this->CaseName, CaseName, 255);
+}
+
+const char* ZETestItem::GetCurrentCase()
+{
+	return this->CaseName;
 }
 
 ZETestResult ZETestItem::GetResult()
@@ -164,9 +174,10 @@ bool ZETestItem::RunTest()
 	}
 }
 
-ZETestItem::ZETestItem(const char* Name, ZETestSuite* Owner)
+ZETestItem::ZETestItem(const char* Name, ZETestSuiteItem* Owner)
 {
 	strncpy(this->Name, Name, 255);
+	CaseName[0] = '\0';
 	this->Owner = Owner;
 	ElapsedTime = 0;
 	Owner->RegisterTest(this);

@@ -194,6 +194,7 @@ set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll wil
 ## Directories
 #########################################################################################
 include_directories(
+	${CMAKE_SOURCE_DIR}
 	${CMAKE_SOURCE_DIR}/Source
 	${CMAKE_SOURCE_DIR}/ZEFoundation
 	${CMAKE_SOURCE_DIR}/ZEToolSDK
@@ -208,7 +209,9 @@ include_directories(
 	
 link_directories(
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}
-	#${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Release
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Release
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Release/vrpn
+
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/vrpn
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/Bullet
@@ -217,6 +220,7 @@ link_directories(
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/PhysX3
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/3dsMax/2010)
 
+set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/Rundir)
 
 ## Projects
 #########################################################################################
@@ -230,7 +234,7 @@ ze_add_conditional_build(ZEToolSDK			TRUE TITLE "Build ZEToolAPI.")
 ze_add_conditional_build(Applications		TRUE TITLE "Build Applications.")
 ze_add_conditional_build(Demos				FALSE TITLE "Build Demos.")
 ze_add_conditional_build(Samples			FALSE TITLE "Build Samples.")
-
+add_subdirectory(ZEAIPrototype)
 if (ZEBUILD_UNIT_TESTS_ENABLE)
 	add_subdirectory (ZETest)
 endif()

@@ -38,7 +38,7 @@
 #define __ZE_TEXTURE_RESOURCE_H__
 
 #include "ZECore/ZEResource.h"
-#include "ZEFile/ZEResourceFile.h"
+#include "ZEFile/ZEFile.h"
 #include "ZETexture.h"
 #include "ZETextureOptions.h"
 
