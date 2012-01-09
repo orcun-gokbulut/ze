@@ -61,7 +61,7 @@ ZETestSuite(ZEPartialFile)
 		ZETestCheckEqual(EndPosition, 1125);
 		ZEQWORD Size = PartialFile.GetFileSize();
 		ZETestCheckEqual(Size, 100);
-		unsigned int ReferenceCount = File.GetReferanceCount();
+		unsigned int ReferenceCount = File.GetReferenceCount();
 		ZETestCheckEqual(ReferenceCount, 1);
 
 		PartialFile.Close();
@@ -82,7 +82,7 @@ ZETestSuite(ZEPartialFile)
 			bool Result3 = PartialFile3.Open(&File, 300, 100);
 			ZETestCheck(Result3 == true);
 
-			ReferenceCount = File.GetReferanceCount();
+			ReferenceCount = File.GetReferenceCount();
 			ZETestCheckEqual(ReferenceCount, 3);
 
 			PartialFile1.Close();
@@ -110,7 +110,7 @@ ZETestSuite(ZEPartialFile)
 			EndPosition = PartialFile1.GetEndPosition();
 			ZETestCheckEqual(EndPosition, 250);
 
-			ReferenceCount = File.GetReferanceCount();
+			ReferenceCount = File.GetReferenceCount();
 			ZETestCheckEqual(ReferenceCount, 2);
 
 			PartialFile.Close();
@@ -199,9 +199,9 @@ ZETestSuite(ZEPartialFile)
 			ZETestCheckEqual(Size, 50);
 			ZEQWORD Size1 = PartialFile1.GetFileSize();
 			ZETestCheckEqual(Size1, 30);
-			unsigned int ReferenceCount = PartialFile.GetReferanceCount();
+			unsigned int ReferenceCount = PartialFile.GetReferenceCount();
 			ZETestCheckEqual(ReferenceCount, 1);
-			ReferenceCount = File.GetReferanceCount();
+			ReferenceCount = File.GetReferenceCount();
 			ZETestCheckEqual(ReferenceCount, 2);
 
 			PartialCursor = PartialFile.Tell();
@@ -542,11 +542,11 @@ ZETestSuite(ZEPartialFile)
 
 		File.Open("ZEPartialFileCloseTests.txt", ZE_FM_READ_WRITE, true);
 		bool Result = PartialFile.Open(&File, 0, 100);
-		unsigned int ReferenceCount = File.GetReferanceCount();
+		unsigned int ReferenceCount = File.GetReferenceCount();
 		ZETestCheckEqual(ReferenceCount, 1);
 
 		PartialFile.Close();
-		ReferenceCount = File.GetReferanceCount();
+		ReferenceCount = File.GetReferenceCount();
 		ZETestCheckEqual(ReferenceCount, 0);
 		ZEQWORD StartPosition = PartialFile.GetStartPosition();
 		ZETestCheckEqual(StartPosition, 0);
@@ -564,7 +564,7 @@ ZETestSuite(ZEPartialFile)
 			EndPosition = PartialFile.GetEndPosition();
 			ZETestCheckEqual(EndPosition, 100);
 
-			ReferenceCount = File.GetReferanceCount();
+			ReferenceCount = File.GetReferenceCount();
 			ZETestCheckEqual(ReferenceCount, 1);
 
 			File.Close();
@@ -581,7 +581,7 @@ ZETestSuite(ZEPartialFile)
 			Result = PartialFile.Open(&File, 0, 50);
 			Result = PartialFile1.Open(&File, 50, 100);
 
-			ReferenceCount = File.GetReferanceCount();
+			ReferenceCount = File.GetReferenceCount();
 			ZETestCheckEqual(ReferenceCount, 2);
 
 			PartialFile.Close();
@@ -600,9 +600,9 @@ ZETestSuite(ZEPartialFile)
 			Result = PartialFile.Open(&File, 0, 100);
 			Result = PartialFile1.Open((ZEFile*)&PartialFile, 30, 50);
 
-			ReferenceCount = PartialFile.GetReferanceCount();
+			ReferenceCount = PartialFile.GetReferenceCount();
 			ZETestCheckEqual(ReferenceCount, 1);
-			ReferenceCount = File.GetReferanceCount();
+			ReferenceCount = File.GetReferenceCount();
 			ZETestCheckEqual(ReferenceCount, 2);
 
 			PartialFile1.Close();
