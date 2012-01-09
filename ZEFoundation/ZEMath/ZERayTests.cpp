@@ -92,7 +92,7 @@ ZETestSuite(ZERay)
 		}
 
 	}
-	ZETest("void ZERay::GetPointOn(ZEVector3& Point, float TRay) const")
+	ZETest("void ZERay::GetPointOn(ZEVector3& Point, const ZERay& Ray, float TRay)")
 	{
 		ZEVector3 v(0.0f, 3.0f, 0.0f);
 		ZEVector3 p(1.0f, 4.0f, -1.0f);
@@ -102,14 +102,14 @@ ZETestSuite(ZERay)
 		ZEVector3 Point;
 		float TRay = 3.0f;
 
-		Ray.GetPointOn(Point, TRay);
+		ZERay::GetPointOn(Point, Ray, TRay);
 		ZETestCheckEqual(Point, ZEVector3(1.0f, 7.0f, -1.0f));
 
 		ZETestCase("for TRay < 0")
 		{
 			float TRay = -1.0f;
 
-			Ray.GetPointOn(Point, TRay);
+			ZERay::GetPointOn(Point, Ray, TRay);
 			ZETestCheckEqual(Point, ZEVector3(1.0f, 4.0f, -1.0f));
 		}
 	}

@@ -37,10 +37,10 @@
 #include "ZEDS/ZEArray.h"
 #include "ZETest.h"
 
-int Compare (const void *F, const void *E)
+int Compare(const int *F, const int *E)
 {
-	int A = *((int*)(F));
-	int B = *((int*)(E));
+	int A = *F;
+	int B = *E;
 
 	int ReturnValue = 0;
 
@@ -197,7 +197,7 @@ ZETestSuite(ZEArray)
 	}
 	ZETest("inline int BinarySearch(const Type& Element, int (*CompareFunction)(Type*, Type*))")
 	{
-		/*ZEArray<int> Array;
+		ZEArray<int> Array;
 
 		Array.Add(0);
 		Array.Add(5);
@@ -208,7 +208,7 @@ ZETestSuite(ZEArray)
 
 		const int Element = 20;
 
-		int Result = Array.BinarySearch(Element, &Compare);*/
+		int Result = Array.BinarySearch(Element, &Compare);
 	}
 	ZETest("inline void Clear()")
 	{
@@ -2153,7 +2153,7 @@ ZETestSuite(ZEArray)
 			ZETestCheckEqual(SmartArray.GetSize(), 6);
 		}
 	}
-	ZETest("inline void Sort(int (*CompareFunction)(const void*, const void*))")
+	ZETest("inline void Sort(int (*CompareFunction)(const Type*, const Type*))")
 	{
 		ZEArray<int> Array;
 

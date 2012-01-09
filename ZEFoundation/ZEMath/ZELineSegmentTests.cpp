@@ -93,7 +93,7 @@ ZETestSuite(ZELineSegment)
 		ZETestCheckClose(LineSegment.v, ZEVector3(0.101015254f, 0.4040610178f, 0.90913729f));
 		ZETestCheckEqual(LineSegment.p, ZEVector3(1.0f, 0.0f, 0.0f));
 	}
-	ZETest("void ZELineSegment::GetPointOn(ZEVector3& Point, float TLineSegment) const")
+	ZETest("void ZELineSegment::GetPointOn(ZEVector3& Point, const ZELineSegment& LineSegment, float TLineSegment)")
 	{
 		ZEVector3 Start(0.0f, 3.0f, 0.0f);
 		ZEVector3 End(1.0f, 4.0f, -1.0f);
@@ -102,22 +102,22 @@ ZETestSuite(ZELineSegment)
 
 		ZETestCase("for TLineSegment < 0")
 		{
-			LineSegment.GetPointOn(Point, -0.5f);
+			ZELineSegment::GetPointOn(Point, LineSegment, -0.5f);
 			ZETestCheckEqual(Point, ZEVector3(0.0f, 3.0f, 0.0f));
 		}
 		ZETestCase("for TLineSegment > Length")
 		{
-			LineSegment.GetPointOn(Point, 3.0f);
+			ZELineSegment::GetPointOn(Point, LineSegment, 3.0f);
 			ZETestCheckEqual(Point, ZEVector3(0.57735026f, 3.57735026f, -0.57735026f));
 		}
 		ZETestCase("for TLineSegment = 0")
 		{
-			LineSegment.GetPointOn(Point, 0.0f);
+			ZELineSegment::GetPointOn(Point, LineSegment, 0.0f);
 			ZETestCheckEqual(Point, ZEVector3(0.0f, 3.0f, 0.0f));
 		}
 		ZETestCase("for 0 < TLineSegment < Length")
 		{
-			LineSegment.GetPointOn(Point, 0.5f);
+			ZELineSegment::GetPointOn(Point, LineSegment, 0.5f);
 			ZETestCheckEqual(Point, ZEVector3(0.28867513f, 3.28867513f, -0.28867513f));
 		}
 	}
@@ -148,24 +148,48 @@ ZETestSuite(ZELineSegment)
 			ZETestCheckClose(Point, ZEVector3(0.28867513f, 3.28867513f, -0.28867513f));
 		}
 	}
-	ZETest("void ZELineSegment::GetSegmentEndPoint(ZEVector3& EndPoint) const")
+
+	ZETest("ZEVector3 ZELineSegment::GetEndPoint() const")
 	{
 		ZEVector3 Start(-3.0f, -1.0f, 1.0f);
 		ZEVector3 End(0.0f, 3.0f, -5.0f);
 		ZELineSegment LineSegment(Start, End);
 		ZEVector3 EndPoint;
 
-		LineSegment.GetSegmentEndPoint(EndPoint);
+		EndPoint = LineSegment.GetEndPoint();
 		ZETestCheckEqual(EndPoint, ZEVector3(0.0f, 3.0f, -5.0f));
 	}
-	ZETest("void ZELineSegment::GetSegmentStartPoint(ZEVector3& StartPoint) const")
+
+	ZETest("void ZELineSegment::GetEndPoint(ZEVector3& EndPoint, const ZELineSegment& LineSegment)")
+	{
+		ZEVector3 Start(-3.0f, -1.0f, 1.0f);
+		ZEVector3 End(0.0f, 3.0f, -5.0f);
+		ZELineSegment LineSegment(Start, End);
+		ZEVector3 EndPoint;
+
+		ZELineSegment::GetEndPoint(EndPoint, LineSegment);
+		ZETestCheckEqual(EndPoint, ZEVector3(0.0f, 3.0f, -5.0f));
+	}
+
+	ZETest("const ZEVector3& ZELineSegment::GetStartPoint() const")
 	{
 		ZEVector3 Start(-3.0f, -1.0f, 1.0f);
 		ZEVector3 End(0.0f, 3.0f, -5.0f);
 		ZELineSegment LineSegment(Start, End);
 		ZEVector3 StartPoint;
 
-		LineSegment.GetSegmentStartPoint(StartPoint);
+		StartPoint = LineSegment.GetStartPoint();
+		ZETestCheckEqual(StartPoint, ZEVector3(-3.0f, -1.0f, 1.0f));
+	}
+
+	ZETest("void ZELineSegment::GetStartPoint(ZEVector3& StartPoint, const ZELineSegment& LineSegment)")
+	{
+		ZEVector3 Start(-3.0f, -1.0f, 1.0f);
+		ZEVector3 End(0.0f, 3.0f, -5.0f);
+		ZELineSegment LineSegment(Start, End);
+		ZEVector3 StartPoint;
+
+		ZELineSegment::GetStartPoint(StartPoint, LineSegment);
 		ZETestCheckEqual(StartPoint, ZEVector3(-3.0f, -1.0f, 1.0f));
 	}
 	ZETest("float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZEVector3& Point)")

@@ -625,12 +625,12 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileTypeTests.txt");
 	}
-	ZETest("unsigned int ZEFile::GetReferanceCount() const")
+	ZETest("unsigned int ZEFile::GetReferenceCount() const")
 	{
 		ZEFile File;
 		File.Open("ZEFileReferenceCountTests.txt", ZE_FM_READ_WRITE, true);
 
-		unsigned int ReferenceCount = File.GetReferanceCount();
+		unsigned int ReferenceCount = File.GetReferenceCount();
 		ZETestCheckEqual(ReferenceCount, 0);
 
 		File.Close();

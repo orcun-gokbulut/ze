@@ -95,7 +95,7 @@ ZETestSuite(ZETriangle)
 			ZEVector3 P5;
 
 			ZEMatrix4x4 Rotation;
-			ZEQuaternion::ConvertToRotationMatrix(Rotation, ZEQuaternion(ZE_PI_2, ZEVector3::UnitZ));
+			ZEMatrix4x4::CreateRotation(Rotation, ZEQuaternion(ZE_PI_2, ZEVector3::UnitZ));
 
 			ZEMatrix4x4::Transform(P3, Rotation, P0);
 			ZEMatrix4x4::Transform(P4, Rotation, P1);

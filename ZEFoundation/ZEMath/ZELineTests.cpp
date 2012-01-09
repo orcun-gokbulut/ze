@@ -92,7 +92,7 @@ ZETestSuite(ZELine)
 		Point = Line.GetPointOn(TLine);
 		ZETestCheckClose(Point, ZEVector3(1.73205078f, 4.73205078f, -1.73205078f));
 	}
-	ZETest("void ZELine::GetPointOn(ZEVector3& Point, float TLine) const")
+	ZETest("void ZELine::GetPointOn(ZEVector3& Point, const ZELine& Line, float TLine)")
 	{
 		ZEVector3 P0(0.0f, 3.0f, 0.0f);
 		ZEVector3 P1(1.0f, 4.0f, -1.0f);
@@ -102,7 +102,7 @@ ZETestSuite(ZELine)
 		float TLine = 3.0f;
 		ZEVector3 Point;
 
-		Line.GetPointOn(Point, TLine);
+		ZELine::GetPointOn(Point, Line, TLine);
 		ZETestCheckClose(Point, ZEVector3(1.73205078f, 4.73205078f, -1.73205078f));
 	}
 	ZETest("float ZELine::MinimumDistance(const ZELine& LineA, const ZELine& LineB, float& TLineA, float& TLineB)")

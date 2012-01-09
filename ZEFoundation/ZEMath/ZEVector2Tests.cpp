@@ -164,13 +164,13 @@ ZETestSuite(ZEVector2)
 		ZEVector2::Divide(Out, VectorA, s);
 		ZETestCheckClose(Out, ZEVector2(0.33333333f, 0.66666666f));
 	}
-	ZETest("float ZEVector2::DotProduction(const ZEVector2 &A, const ZEVector2 &B)")
+	ZETest("float ZEVector2::DotProduct(const ZEVector2 &A, const ZEVector2 &B)")
 	{
 		ZEVector2 VectorA(1.0f, 2.0f);
 		ZEVector2 VectorB(2.0f, 3.0f);
 		float Result;
 
-		Result = ZEVector2::DotProduction(VectorA, VectorB);
+		Result = ZEVector2::DotProduct(VectorA, VectorB);
 		ZETestCheckEqual(Result, 8.0f);
 	}
 	ZETest("float ZEVector2::Distance(const ZEVector2 &A, const ZEVector2 &B)")

@@ -72,6 +72,15 @@ void ZETriangle::GetBarycentricCoordinates(const ZETriangle& Triangle, const ZEV
 	BaryCoords = ZEVector3(Area1 / Area, Area2 / Area, Area3 / Area);
 }
 
+ZEVector3 ZETriangle::GetCentroid(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2)
+{
+	ZEVector3 Temp;
+	Temp.x = (V0.x + V1.x + V2.x)/3.0f;
+	Temp.y = (V0.y + V1.y + V2.y)/3.0f;
+	Temp.z = (V0.z + V1.z + V2.z)/3.0f;
+	return Temp;
+}
+
 void ZETriangle::GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane)
 {
 	Plane.p = Triangle.V1;
