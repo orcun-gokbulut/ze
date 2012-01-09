@@ -38,7 +38,7 @@
 #define __ZED_GIZMO_UNDO_REDO_H__
 
 #include "ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta\ZEObject.h"
 #include "ZEDS\ZEVariant.h"
 
 enum ZEDGizmoMode;
@@ -47,7 +47,7 @@ class ZEDGizmoUndoRedoOperation : public ZEDUndoRedoOperation
 {
 	private:
 
-		ZEArray<ZEClass*>		SelectedClasses;
+		ZEArray<ZEObject*>		SelectedClasses;
 		ZEArray<ZEVariant>		OldValues;
 		ZEArray<ZEVariant>		NewValues;
 		ZEDGizmoMode			GizmoMode;
@@ -57,14 +57,14 @@ class ZEDGizmoUndoRedoOperation : public ZEDUndoRedoOperation
 		void					SetOldValues(ZEArray<ZEVariant>	OldValues);
 		void					SetNewValues(ZEArray<ZEVariant>	NewValues);
 
-		void					SetClasses(ZEArray<ZEClass*> SelectedClasses);
+		void					SetClasses(ZEArray<ZEObject*> SelectedClasses);
 		void					SetGizmoMode(ZEDGizmoMode GizmoMode);
 		ZEDGizmoMode			GetGizmoMode();
 
 		virtual bool			Undo();
 		virtual bool			Redo();
 
-								ZEDGizmoUndoRedoOperation(ZEArray<ZEClass*>	SelectedClasses, ZEDGizmoMode GizmoMode);
+								ZEDGizmoUndoRedoOperation(ZEArray<ZEObject*>	SelectedClasses, ZEDGizmoMode GizmoMode);
 };
 
 #endif

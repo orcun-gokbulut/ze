@@ -53,8 +53,7 @@ bool ZEOptionSection::AddOption(ZEOption* Option)
 {
 	if (GetOption(Option->GetName()) != NULL)
 	{
-		zeError("Options Section", 
-			"Can not add option to option section. An option with same name is already exist in the option section. "
+		zeError("Can not add option to option section. An option with same name is already exist in the option section. "
 			"(Option Section Name : \"%s\", Option Name : \"%s\")", 
 			(const char*)this->GetName(),
 			(const char*)Option->GetName());
@@ -119,8 +118,7 @@ void ZEOptionSection::CommitChanges()
 {
 	if (!Changed)
 	{
-		zeWarning("Option Section",  
-			"Wrong change commit made on option section. Options in option section was not changed. (Option Section Name : \"%s\")", 
+		zeWarning("Wrong change commit made on option section. Options in option section was not changed. (Option Section Name : \"%s\")", 
 			(const char*)this->GetName());
 	}
 	else

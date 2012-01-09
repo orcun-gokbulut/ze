@@ -63,7 +63,7 @@ ZEDPropertyWindowManagerGroup::~ZEDPropertyWindowManagerGroup()
 	delete Item;
 }
 
-ZEDPropertyWindowManager::ZEDPropertyWindowManager(QWidget *parent, ZEClass* Class, QString WorkingDirectory) : QTreeWidget(parent)
+ZEDPropertyWindowManager::ZEDPropertyWindowManager(QWidget *parent, ZEObject* Class, QString WorkingDirectory) : QTreeWidget(parent)
 {
 	this->WorkingDirectory = WorkingDirectory;
 	this->Class = Class;
@@ -110,7 +110,7 @@ void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 	const ZEPropertyDescription*		Properties;
 	size_t								PropertyCount;
 
-	ZEClassDescription* ClassDescription = this->Class->GetClassDescription();
+	ZEObjectDescription* ClassDescription = this->Class->GetDescription();
 
 	while (ClassDescription != NULL)
 	{
@@ -599,9 +599,9 @@ void ZEDPropertyWindowManager::EmitPropertyChange()
 	emit PropertyChangedSignal();
 }
 
-void ZEDPropertyWindowManager::DisplayCurveEditor(ZEClass* Class, ZEPropertyDescription Property)
+void ZEDPropertyWindowManager::DisplayCurveEditor(ZEObject* Class, ZEPropertyDescription Property)
 {
-	#pragma message (".:IMPLEMENT:. ZEDPropertyWindowManager::DisplayCurveEditor(ZEClass* Class, ZEPropertyDescription Property)")
+	#pragma message (".:IMPLEMENT:. ZEDPropertyWindowManager::DisplayCurveEditor(ZEObject* Class, ZEPropertyDescription Property)")
 }
 
 void ZEDPropertyWindowManager::UpdateCurveEditor()

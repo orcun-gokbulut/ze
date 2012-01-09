@@ -37,7 +37,7 @@
 #ifndef __ZE_MATERIAL_H__ 
 #define __ZE_MATERIAL_H__
 
-#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEObject.h"
 
 typedef ZEDWORD ZEMaterialFlags;
 #define ZE_MTF_NONE						0
@@ -83,11 +83,11 @@ enum ZEMaterialOpacityComponent
 class ZEFrameRenderer;
 class ZERenderCommand;
 
-ZE_META_CLASS_DESCRIPTION(ZEMaterial)
+ZE_META_OBJECT_DESCRIPTION(ZEMaterial)
 
-class ZEMaterial : public ZEClass
+class ZEMaterial : public ZEObject
 {
-	ZE_META_CLASS(ZEMaterial) 
+	ZE_META_OBJECT(ZEMaterial) 
 	protected:
 		bool							ShadowCaster;
 		bool							ShadowReciver;

@@ -46,7 +46,7 @@ void ZEDGizmoUndoRedoOperation::SetNewValues(ZEArray<ZEVariant> NewValues)
 	this->NewValues = NewValues;
 }
 
-void ZEDGizmoUndoRedoOperation::SetClasses(ZEArray<ZEClass*> SelectedClasses)
+void ZEDGizmoUndoRedoOperation::SetClasses(ZEArray<ZEObject*> SelectedClasses)
 {	
 	this->SelectedClasses = SelectedClasses;
 }
@@ -133,7 +133,7 @@ bool ZEDGizmoUndoRedoOperation::Redo()
 	return true;
 }
 
-ZEDGizmoUndoRedoOperation::ZEDGizmoUndoRedoOperation(ZEArray<ZEClass*> SelectedClasses, ZEDGizmoMode GizmoMode)
+ZEDGizmoUndoRedoOperation::ZEDGizmoUndoRedoOperation(ZEArray<ZEObject*> SelectedClasses, ZEDGizmoMode GizmoMode)
 {
 	this->SelectedClasses = SelectedClasses;
 	this->GizmoMode = GizmoMode;

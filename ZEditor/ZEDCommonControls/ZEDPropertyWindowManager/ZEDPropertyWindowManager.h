@@ -79,7 +79,7 @@ class ZEDPropertyWindowManager : public QTreeWidget
 
 	private:
 
-		ZEClass*								Class;
+		ZEObject*								Class;
 		QString									WorkingDirectory;
 		QList<ZEDPropertyWidget*>				PropertyWidgetsList;
 		QList<ZEDPropertyWindowManagerGroup*>	Groups;
@@ -97,10 +97,10 @@ class ZEDPropertyWindowManager : public QTreeWidget
 		void									UpdatePropertyWidgetValues();
 		QTreeWidgetItem*						FindGroup(QString GroupName);
 
-		void									DisplayCurveEditor(ZEClass* Class, ZEPropertyDescription Property);
+		void									DisplayCurveEditor(ZEObject* Class, ZEPropertyDescription Property);
 		void									UpdateCurveEditor();
 
-												ZEDPropertyWindowManager(QWidget *parent, ZEClass* Class, QString WorkingDirectory);
+												ZEDPropertyWindowManager(QWidget *parent, ZEObject* Class, QString WorkingDirectory);
 												~ZEDPropertyWindowManager();
 		void									EmitPropertyChange();
 

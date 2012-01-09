@@ -128,5 +128,3 @@ ZELight::ZELight()
 	CastsShadows = false;
 	Enabled = true;
 }
-
-#include "ZELight.h.zpp"

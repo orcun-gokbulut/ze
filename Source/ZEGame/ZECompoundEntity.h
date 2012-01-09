@@ -47,9 +47,9 @@
 #include "ZEMath/ZEOBBox.h"
 #include "ZEMath/ZEBSphere.h"
 #include "ZEDefinitions.h"
-#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEComponent.h"
 
-class ZEComponent;
 struct ZEDrawParameters;
 
 ZE_META_ENTITY_DESCRIPTION(ZECompoundEntity);

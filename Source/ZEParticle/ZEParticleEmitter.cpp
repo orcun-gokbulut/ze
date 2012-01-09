@@ -530,5 +530,3 @@ ZEParticleEmitter* ZEParticleEmitter::CreateInstance()
 {
 	return new ZEParticleEmitter();
 }
-
-#include "ZEParticleEmitter.h.zpp"

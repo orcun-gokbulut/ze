@@ -283,8 +283,6 @@ ZEPlayer* ZEPlayer::CreateInstance()
 	return new ZEPlayer();
 }
 
-#include "ZEPlayer.h.zpp"
-
 ZEEntityRunAt ZEPlayerDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;

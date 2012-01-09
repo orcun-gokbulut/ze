@@ -110,9 +110,9 @@ bool ZEDEntitySelectionItem::GetVisiblity()
 	return Entity->GetVisible();
 }
 
-ZEClass* ZEDEntitySelectionItem::GetClass() const
+ZEObject* ZEDEntitySelectionItem::GetClass() const
 {
-	ZEClass* Class = ((ZEClass*)(Entity));
+	ZEObject* Class = ((ZEObject*)(Entity));
 	return Class;
 }
 

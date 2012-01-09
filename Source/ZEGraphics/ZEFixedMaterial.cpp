@@ -1234,10 +1234,3 @@ ZEFixedMaterial* ZEFixedMaterial::CreateInstance()
 {
 	return zeGraphics->CreateFixedMaterial();
 }
-
-#include "ZEFixedMaterial.h.zpp"
-
-
-
-
-

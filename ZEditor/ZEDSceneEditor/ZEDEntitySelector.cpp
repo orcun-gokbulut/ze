@@ -183,7 +183,7 @@ void ZEDEntitySelector::GenerateList()
 
 			Id = CurrentEntity->GetEntityId();
 			Name = CurrentEntity->GetName();
-			Type = CurrentEntity->GetClassDescription()->GetName();
+			Type = CurrentEntity->GetDescription()->GetName();
 			CurrentItem = new ZEDEntitySelectorItem();
 			((ZEDEntitySelectorItem*)CurrentItem)->Entity = CurrentEntity;
 

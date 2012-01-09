@@ -58,8 +58,7 @@ bool ZECommandSection::AddCommand(ZECommand* Command)
 {
 	if (GetCommand(Command->GetName()) != NULL)
 	{
-		zeError("Command Section",
-			"Can not add command to command section. An command with same name is already exist in the command section. (Command Section Name : \"%s\", Command Name : \"%s\")", 
+		zeError("Can not add command to command section. An command with same name is already exist in the command section. (Command Section Name : \"%s\", Command Name : \"%s\")", 
 			this->GetName(),
 			Command->GetName());
 		return false;

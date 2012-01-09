@@ -38,7 +38,7 @@
 #include "ZEDPropertyUndoRedo.h"
 #include "ZEDCommonControls/CSS.h"
 
-ZEDBoolComboBox::ZEDBoolComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+ZEDBoolComboBox::ZEDBoolComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
 {
 	this->Class = Class;
 	this->ClassAttribute = ClassAttribute;

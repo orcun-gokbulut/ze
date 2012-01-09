@@ -212,5 +212,3 @@ ZETerrainMaterial* ZETerrainMaterial::CreateInstance()
 {
 	return zeGraphics->CreateTerrainMaterial();
 }
-
-#include "ZETerrainMaterial.h.zpp"

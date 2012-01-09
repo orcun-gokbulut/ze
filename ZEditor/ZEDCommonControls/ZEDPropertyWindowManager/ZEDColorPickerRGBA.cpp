@@ -39,7 +39,7 @@
 #include "ZEDPropertyUndoRedo.h"
 #include "ZEDCommonControls/CSS.h"
 
-ZEDColorPickerRGBA::ZEDColorPickerRGBA(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+ZEDColorPickerRGBA::ZEDColorPickerRGBA(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
 {
 
 	this->ParentTree = ParentTree;

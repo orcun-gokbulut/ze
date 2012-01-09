@@ -173,7 +173,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* Event)
 					if (UndoRedoStarted == false)
 					{					
 						UndoRedoStarted = true;
-						ZEArray<ZEClass*> SelectedItemClasses;
+						ZEArray<ZEObject*> SelectedItemClasses;
 						ZEArray<ZEVariant> SelectedItemOldValues;
 
 						for(size_t I = 0; I < SelectedItems->GetCount(); I++)
@@ -201,7 +201,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* Event)
 					if (UndoRedoStarted == false)
 					{					
 						UndoRedoStarted = true;
-						ZEArray<ZEClass*> SelectedItemClasses;
+						ZEArray<ZEObject*> SelectedItemClasses;
 						ZEArray<ZEVariant> SelectedItemOldValues;
 
 						for(size_t I = 0; I < SelectedItems->GetCount(); I++)

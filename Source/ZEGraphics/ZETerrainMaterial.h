@@ -42,9 +42,9 @@
 #include "ZEDefinitions.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
-#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEObject.h"
 
-ZE_META_CLASS_DESCRIPTION(ZETerrainMaterial)
+ZE_META_OBJECT_DESCRIPTION(ZETerrainMaterial)
 
 class ZETextureCube;
 class ZETextureCubeResource;
@@ -52,7 +52,7 @@ class ZETexture2D;
 class ZETexture2DResource;
 class ZETerrainMaterial : public ZEMaterial
 {
-	ZE_META_CLASS(ZETerrainMaterial)
+	ZE_META_OBJECT(ZETerrainMaterial)
 	protected:
 		bool							TwoSided;
 		bool							Wireframe;

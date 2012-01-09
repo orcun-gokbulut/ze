@@ -401,7 +401,7 @@ void MapEditor::LoadSceneActionTriggered()
 
 	for (size_t I = 0; I < Scene->GetEntities().GetCount(); I++)
 	{
-		if(QString(Scene->GetEntities()[I]->GetClassDescription()->GetName()) == QString("ZEPlayer"))
+		if(QString(Scene->GetEntities()[I]->GetDescription()->GetName()) == QString("ZEPlayer"))
 			ViewPort->SetPlayerHandle((ZEPlayer*)(Scene->GetEntities()[I]));
 	}
 }
@@ -671,7 +671,7 @@ void MapEditor::DeleteActionTriggered()
 void MapEditor::CopyActionTriggered()
 {
 	ZEEntity* EntityToCopy;
-	ZEClassDescription* ClassDescription;
+	ZEObjectDescription* ClassDescription;
 	const ZEPropertyDescription* PropertyDescriptions;
 	int	PropertyCount = 0;
 	ZEEntity* NewEntity = NULL;
@@ -684,7 +684,7 @@ void MapEditor::CopyActionTriggered()
 	for (size_t I = 0; I < SelectedItems.GetCount(); I++)
 	{
 		EntityToCopy = ((ZEEntity*)(SelectedItems[I]->GetClass()));
-		ClassDescription = EntityToCopy->GetClassDescription();
+		ClassDescription = EntityToCopy->GetDescription();
 		NewEntity = (ZEEntity*)(ZEEntityProvider::GetInstance()->CreateInstance(ClassDescription->GetName()));
 		Scene->AddEntity(NewEntity);
 
@@ -850,11 +850,11 @@ ZEDSelectionItem* MapEditor::CreateSelectionItem(ZEEntity* Entity)
 
 	for (size_t I = 0; I < SelectionItemPlugIns.GetCount(); I++)
 	{
-		if (QString(Entity->GetClassDescription()->GetName()) == SelectionItemPlugIns[I]->GetSupportedClassName())
-			return SelectionItemPlugIns[I]->CreateSelectionItem(((ZEClass*)(Entity)), GizmoMode, Scene);
+		if (QString(Entity->GetDescription()->GetName()) == SelectionItemPlugIns[I]->GetSupportedClassName())
+			return SelectionItemPlugIns[I]->CreateSelectionItem(((ZEObject*)(Entity)), GizmoMode, Scene);
 	}
 
-	return SelectionItemPlugIns[3]->CreateSelectionItem(((ZEClass*)Entity), GizmoMode, Scene); //Fix harcoded index
+	return SelectionItemPlugIns[3]->CreateSelectionItem(((ZEObject*)Entity), GizmoMode, Scene); //Fix harcoded index
 
 	//return NULL;
 }

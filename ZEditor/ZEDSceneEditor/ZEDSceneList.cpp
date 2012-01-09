@@ -112,13 +112,13 @@ void ZEDSceneListTreeWidget::GenerateTree()
 
 		for (int J = 0; J < Groups.count(); J++)
 		{
-			if (Groups[J]->GroupName == QString(CurrentEntity->GetClassDescription()->GetName()))
+			if (Groups[J]->GroupName == QString(CurrentEntity->GetDescription()->GetName()))
 				GroupExists = true;
 		}
 
 		if (GroupExists == false)
 		{
-			ZEDSceneListGroup* NewGroup = new ZEDSceneListGroup(QString(CurrentEntity->GetClassDescription()->GetName()));
+			ZEDSceneListGroup* NewGroup = new ZEDSceneListGroup(QString(CurrentEntity->GetDescription()->GetName()));
 			//QObject::connect(this, SIGNAL(itemChanged(QTreeWidgetItem*, int)), NewGroup, SLOT(ToogleVisibilities()));
 			Groups.append(NewGroup);
 		}
@@ -138,7 +138,7 @@ void ZEDSceneListTreeWidget::GenerateTree()
 		
 		for (int J = 0; J < Groups.count(); J++)
 		{
-			if (Groups[J]->GroupName == QString(CurrentEntity->GetClassDescription()->GetName()))
+			if (Groups[J]->GroupName == QString(CurrentEntity->GetDescription()->GetName()))
 				Groups[J]->TreeWidgetItem->addChild(new ZEDSceneListItem(CurrentEntity));
 		}
 	}
@@ -184,7 +184,7 @@ void ZEDSceneList::Update()
 
 void ZEDSceneList::AddItem(ZEEntity* Entity)
 {
-	QString	CorespondingGroupName = QString(Entity->GetClassDescription()->GetName());
+	QString	CorespondingGroupName = QString(Entity->GetDescription()->GetName());
 	bool GroupExsistFlag = false;
 
 	for (int I = 0; I < SceneTree->Groups.count(); I++)

@@ -42,7 +42,7 @@
 #include "ZEDCore/ZEDPlugIn.h"
 
 class	ZEDSelectionItem;
-class	ZEClass;
+class	ZEObject;
 class	ZEScene;
 enum	ZEDGizmoMode;
 
@@ -51,7 +51,7 @@ class ZEDSelectionItemPlugin : public ZEDPlugIn
 	public:
 
 		virtual const char*			GetSupportedClassName() = 0;
-		virtual ZEDSelectionItem*	CreateSelectionItem(ZEClass* Class, ZEDGizmoMode Mode, ZEScene* Scene) = 0;
+		virtual ZEDSelectionItem*	CreateSelectionItem(ZEObject* Class, ZEDGizmoMode Mode, ZEScene* Scene) = 0;
 };
 
 #endif

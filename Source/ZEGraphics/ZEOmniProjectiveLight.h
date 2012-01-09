@@ -43,7 +43,7 @@
 class ZETextureCube;
 class ZETexture2D;
 
-ZE_META_CLASS_DESCRIPTION(ZEOmniProjectiveLight);
+ZE_META_OBJECT_DESCRIPTION(ZEOmniProjectiveLight);
 
 class ZEOmniProjectiveLight : public ZELight
 {

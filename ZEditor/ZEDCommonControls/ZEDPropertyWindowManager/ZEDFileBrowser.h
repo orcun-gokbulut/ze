@@ -48,7 +48,7 @@
 #include <QFileDialog>
 #include <QString>
 #include "ZEDS\ZEVariant.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta\ZEObject.h"
 
 class ZEDFileBrowser : public QObject, public QTreeWidgetItem, public ZEDPropertyWidget
 {
@@ -56,7 +56,7 @@ class ZEDFileBrowser : public QObject, public QTreeWidgetItem, public ZEDPropert
 
 	public:
 
-		ZEClass*				Class;
+		ZEObject*				Class;
 		ZEPropertyDescription	ClassAttribute;
 		QTreeWidget*			ParentTree;
 		QWidget*				LayoutWidget;
@@ -71,7 +71,7 @@ class ZEDFileBrowser : public QObject, public QTreeWidgetItem, public ZEDPropert
 
 		virtual void			UpdateValues();
 		
-								ZEDFileBrowser(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute, QString WorkingDirectory);
+								ZEDFileBrowser(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute, QString WorkingDirectory);
 								~ZEDFileBrowser();
 
 	public slots:

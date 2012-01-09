@@ -172,8 +172,6 @@ ZEPresentationSlide* ZEPresentationSlide::CreateInstance()
 	return new ZEPresentationSlide();
 }
 
-#include "ZEPresentationSlide.h.zpp"
-
 ZEEntityRunAt ZEPresentationSlideDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;

@@ -38,7 +38,7 @@
 #include "ZEDPropertyUndoRedo.h"
 #include "ZEDCommonControls/CSS.h"
 
-ZEDFileBrowser::ZEDFileBrowser(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute, QString WorkingDirectory) : QTreeWidgetItem(parent)
+ZEDFileBrowser::ZEDFileBrowser(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute, QString WorkingDirectory) : QTreeWidgetItem(parent)
 {
 	this->ParentTree = ParentTree;
 	this->WorkingDirectory = WorkingDirectory;

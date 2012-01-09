@@ -40,6 +40,7 @@
 #include "ZEEntity.h"
 #include "ZEGraphics/ZEDirectionalLight.h"
 #include "ZEGraphics/ZECanvas.h"
+#include "ZEGraphics/ZERenderCommand.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZESkyBrush);
 

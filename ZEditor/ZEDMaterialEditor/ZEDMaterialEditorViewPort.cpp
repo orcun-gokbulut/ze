@@ -162,7 +162,7 @@ void ZEDMaterialEditorViewPort::SetModelFile(const char* FileName)
 {
 	ZEModelResource* TempResource = ZEModelResource::LoadSharedResource(FileName);
 
-	for (size_t I = 0; I < Model->GetModelResource()->Materials[0]->GetClassDescription()->GetPropertyCount(); I++)
+	for (size_t I = 0; I < Model->GetModelResource()->Materials[0]->GetDescription()->GetPropertyCount(); I++)
 	{
 		ZEVariant TempVariant;
 		Model->GetModelResource()->Materials[0]->GetProperty(I, TempVariant);

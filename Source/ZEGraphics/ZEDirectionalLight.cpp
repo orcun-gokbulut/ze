@@ -68,5 +68,3 @@ ZEDirectionalLight* ZEDirectionalLight::CreateInstance()
 {
 	return new ZEDirectionalLight();
 }
-
-#include "ZEDirectionalLight.h.zpp"

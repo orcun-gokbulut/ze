@@ -258,8 +258,7 @@ bool ZEOptionManager::RegisterSection(ZEOptionSection* Ref)
 {
 	if (GetSection(Ref->GetName()) != NULL)
 	{
-		zeError("Options Manager",
-			"Can not register option section. An option section with same name is already registered. (Option Section Name : \"%s\")", 
+		zeError("Can not register option section. An option section with same name is already registered. (Option Section Name : \"%s\")", 
 			(const char*)Ref->GetName());
 		return false;
 	}
@@ -271,8 +270,7 @@ bool ZEOptionManager::UnregisterSection(ZEOptionSection* Ref)
 {
 	if (GetSection(Ref->GetName()) == NULL)
 	{
-		zeError("Options Manager",
-			"Can not unregister option section. There is no such a registered option section. (Option Section Name : \"%s\")", 
+		zeError("Can not unregister option section. There is no such a registered option section. (Option Section Name : \"%s\")", 
 			(const char*)Ref->GetName());
 		return false;
 	}

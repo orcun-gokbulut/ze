@@ -56,11 +56,11 @@ enum ZECameraProjectionType
 
 class ZEViewPort;
 
-ZE_META_CLASS_DESCRIPTION(ZECamera);
+ZE_META_OBJECT_DESCRIPTION(ZECamera);
 
 class ZECamera : public ZEComponent
 {
-	ZE_META_CLASS(ZECamera)
+	ZE_META_OBJECT(ZECamera)
 	private:
 		bool							UpdateViewFrustum;
 		bool							UpdateView;

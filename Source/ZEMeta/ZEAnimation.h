@@ -77,11 +77,11 @@ class ZEAnimation
 
 
 
-class ZEClass;
+class ZEObject;
 class ZEAnimationController
 {
 	private:
-		ZEClass*						Owner;
+		ZEObject*						Owner;
 		ZEAnimation*					Animation;
 		float							StartFrame;
 		float							EndFrame;
@@ -91,8 +91,8 @@ class ZEAnimationController
 		float							Speed;
 
 	public:
-		void							SetOwner(ZEClass* Owner);
-		ZEClass*						GetOwner();
+		void							SetOwner(ZEObject* Owner);
+		ZEObject*						GetOwner();
 
 		void							SetLooping(bool Loop);
 		bool							GetLooping();

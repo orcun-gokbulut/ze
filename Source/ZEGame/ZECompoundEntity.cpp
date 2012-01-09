@@ -146,17 +146,10 @@ ZECompoundEntity::ZECompoundEntity()
 ZECompoundEntity::~ZECompoundEntity()
 {
 	Deinitialize();
-	zeWarningAssert(Components.GetCount() != 0, "Entity : %s. There are uninitialized component available.", GetClassDescription()->GetName());
+	zeWarningAssert(Components.GetCount() != 0, "Entity : %s. There are uninitialized component available.", GetDescription()->GetName());
 }
 
 ZEEntityRunAt ZECompoundEntityDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
-
-#include "ZECompoundEntity.h.zpp"
-
-
-
-
-

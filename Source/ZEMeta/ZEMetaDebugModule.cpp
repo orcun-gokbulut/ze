@@ -265,16 +265,16 @@ ZEMetaDebugModule::~ZEMetaDebugModule()
 //	CanvasMaterial->GetAnimationController()->PlayAnimation();
 //	Scene->AddEntity(CanvasBrush);
 //
-//	ZEClassProvider Provider;
-//	Provider.SetBaseClassType(ZEEntity::ClassDescription());
-//	Provider.RegisterClass(ZEPlayer::ClassDescription());
-//	Provider.RegisterClass(ZECanvasBrush::ClassDescription());
-//	Provider.RegisterClass(ZECamera::ClassDescription());
-//	//Provider.RegisterClass(ZEMaterial::ClassDescription());
+//	ZEObjectProvider Provider;
+//	Provider.SetBaseClassType(ZEEntity::Description());
+//	Provider.RegisterClass(ZEPlayer::Description());
+//	Provider.RegisterClass(ZECanvasBrush::Description());
+//	Provider.RegisterClass(ZECamera::Description());
+//	//Provider.RegisterClass(ZEMaterial::Description());
 //
-//	Provider.UnregisterClass(ZEPlayer::ClassDescription());
+//	Provider.UnregisterClass(ZEPlayer::Description());
 //
-//	ZEClass* Class = Provider.CreateInstance("ZECamera");
+//	ZEObject* Class = Provider.CreateInstance("ZECamera");
 //}
 //
 

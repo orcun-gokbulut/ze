@@ -42,10 +42,10 @@
 #include <QObject>
 #include "ZEDPropertyWidget.h"
 #include "ZEDS\ZEVariant.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta\ZEObject.h"
 #include "ZEDFloatIntLineEdit.h"
 
-class ZEClass;
+class ZEObject;
 struct ZEPropertyDescription;
 
 class ZEDSpinBox4 : public QObject, public QTreeWidgetItem, public ZEDPropertyWidget
@@ -54,7 +54,7 @@ class ZEDSpinBox4 : public QObject, public QTreeWidgetItem, public ZEDPropertyWi
 
 	public:
 
-		ZEClass*				Class;
+		ZEObject*				Class;
 		ZEPropertyDescription	ClassAttribute;
 		QTreeWidget*			ParentTree;
 
@@ -76,7 +76,7 @@ class ZEDSpinBox4 : public QObject, public QTreeWidgetItem, public ZEDPropertyWi
 
 		virtual void			UpdateValues();
 
-								ZEDSpinBox4(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute);
+								ZEDSpinBox4(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
 								~ZEDSpinBox4();
 
 		public slots:

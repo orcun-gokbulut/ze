@@ -70,7 +70,7 @@ public:
 	virtual void				SetVisiblity(bool Visibility);
 	virtual bool				GetVisiblity();
 
-	virtual ZEClass*			GetClass() const;
+	virtual ZEObject*			GetClass() const;
 	virtual ZEDGizmo*			GetGizmo() const;
 
 								ZEDEntitySelectionItem(ZEEntity* Entity, ZEDGizmoMode Mode, ZEScene* Scene);

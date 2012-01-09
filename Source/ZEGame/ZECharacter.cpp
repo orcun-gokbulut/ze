@@ -811,8 +811,6 @@ ZECharacter* ZECharacter::CreateInstance()
 	return new ZECharacter();
 }
 
-#include "ZECharacter.h.zpp"
-
 ZEEntityRunAt ZECharacterDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;

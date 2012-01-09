@@ -44,14 +44,14 @@
 #include <QString>
 #include "ZEDPropertyWidget.h"
 #include "ZEDFloatIntLineEdit.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta\ZEObject.h"
 
 class ZEDLineEdit : public QObject, public QTreeWidgetItem, public ZEDPropertyWidget
 {
 	Q_OBJECT
 	
 	public:
-		ZEClass*				Class;
+		ZEObject*				Class;
 		ZEPropertyDescription	ClassAttribute;
 		QTreeWidget*			ParentTree;
 
@@ -59,7 +59,7 @@ class ZEDLineEdit : public QObject, public QTreeWidgetItem, public ZEDPropertyWi
 
 		virtual void			UpdateValues();
 
-								ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute);
+								ZEDLineEdit(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
 								~ZEDLineEdit();
 
 	public slots:

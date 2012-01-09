@@ -96,8 +96,6 @@ ZEListener* ZEListener::CreateInstance()
 	return zeSound->CreateListener();
 }
 
-#include "ZEListener.h.zpp"
-
 ZEEntityRunAt ZEListenerDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;

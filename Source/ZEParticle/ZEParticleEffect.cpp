@@ -96,5 +96,3 @@ ZEParticleEffect* ZEParticleEffect::CreateInstance()
 {
 	return new ZEParticleEffect();
 }
-
-#include "ZEParticleEffect.h.zpp"

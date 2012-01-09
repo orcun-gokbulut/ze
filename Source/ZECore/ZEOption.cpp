@@ -143,7 +143,7 @@ void ZEOption::ChangeCommitted()
 {
 	if (!Changed)
 	{
-		zeWarning("Option",	"Wrong change commit made on option. Options was not changed. (Option Name : \"%s\")", (const char*)this->GetName());
+		zeWarning("Wrong change commit made on option. Options was not changed. (Option Name : \"%s\")", (const char*)this->GetName());
 	}
 	else
 		Changed = false;

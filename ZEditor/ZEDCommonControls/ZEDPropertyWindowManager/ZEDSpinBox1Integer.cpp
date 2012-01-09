@@ -37,7 +37,7 @@
 #include "ZEDUndoRedo\ZEDUndoRedo.h"
 #include "ZEDPropertyUndoRedo.h"
 
-ZEDSpinBox1Integer::ZEDSpinBox1Integer(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+ZEDSpinBox1Integer::ZEDSpinBox1Integer(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
 {
 	this->ParentTree = ParentTree;
 	this->Class = Class;
