@@ -40,7 +40,7 @@
 #include "ZED3D9Shader.h"
 #include "ZED3D9CommonTools.h"
 #include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEMaterialComponents.h"
 
 void ZED3D9FixedMaterial::CreateShaders()
@@ -175,7 +175,7 @@ void ZED3D9FixedMaterial::SetTextureStage(unsigned int Id, ZETextureAddressMode 
 
 }
 
-bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9FixedMaterial*)this)->UpdateMaterial();
@@ -184,21 +184,21 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if ((RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if ((RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
-	else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
 		ViewProjMatrix = Camera->GetViewTransform();
-	else if (RenderOrder->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	else
 		ViewProjMatrix = ZEMatrix4x4::Identity;
 
 	ZEMatrix4x4 WorldViewProjMatrix;
 	ZEMatrix4x4 WorldViewMatrix;
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
 	{
-		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderOrder->WorldMatrix);
-		ZEMatrix4x4::Multiply(WorldViewMatrix, Camera->GetViewTransform(), RenderOrder->WorldMatrix);
+		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
+		ZEMatrix4x4::Multiply(WorldViewMatrix, Camera->GetViewTransform(), RenderCommand->WorldMatrix);
 	}
 	else
 	{
@@ -222,11 +222,11 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 
 
 	// Setup ZCulling
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
+	if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-		if (RenderOrder->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
+		if (RenderCommand->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
 			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 		else
 			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
@@ -248,9 +248,9 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 
 	// Setup Bone Transforms
 	BOOL SkinEnabled = false;
-	if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
+	if (RenderCommand->Flags & ZE_ROF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
 	{
-		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderCommand->BoneTransforms.GetCArray(), RenderCommand->BoneTransforms.GetCount() * 4);
 		SkinEnabled = true;
 	}
 
@@ -304,7 +304,7 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOr
 	return true;
 }
 
-bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9FixedMaterial*)this)->UpdateMaterial();
@@ -313,21 +313,21 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if ((RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if ((RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
-	else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
 		ViewProjMatrix = Camera->GetViewTransform();
-	else if (RenderOrder->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	else
 		ViewProjMatrix = ZEMatrix4x4::Identity;
 
 	ZEMatrix4x4 WorldViewProjMatrix;
 	ZEMatrix4x4 WorldViewMatrix;
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+	if (RenderCommand->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
 	{
-		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderOrder->WorldMatrix);
-		ZEMatrix4x4::Multiply(WorldViewMatrix, Camera->GetViewTransform(), RenderOrder->WorldMatrix);
+		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
+		ZEMatrix4x4::Multiply(WorldViewMatrix, Camera->GetViewTransform(), RenderCommand->WorldMatrix);
 	}
 	else
 	{
@@ -345,7 +345,7 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&WorldViewMatrix, 4);
 
 	// Setup ZCulling
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
+	if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);
@@ -380,9 +380,9 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOr
 
 	// Setup Bone Transforms
 	BOOL SkinEnabled = false;
-	if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
+	if (RenderCommand->Flags & ZE_ROF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
 	{
-		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+		GetDevice()->SetVertexShaderConstantF(32, (float*)RenderCommand->BoneTransforms.GetCArray(), RenderCommand->BoneTransforms.GetCount() * 4);
 		SkinEnabled = true;
 	}
 	

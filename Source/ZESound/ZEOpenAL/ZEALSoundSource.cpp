@@ -126,7 +126,7 @@ bool ZEALSoundSource::CreateBuffer()
 	if ((Error = alGetError()) != AL_NO_ERROR)
 	{
 		DestroyBufferSource();
-		zeError("OpenAL Sound Source", "Can not create OpenAL buffer. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
+		zeError("Can not create OpenAL buffer. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
 		return false;
 	}
 
@@ -136,7 +136,7 @@ bool ZEALSoundSource::CreateBuffer()
 	if ((Error = alGetError()) != AL_NO_ERROR)
 	{
 		DestroyBufferSource();
-		zeError("OpenAL Sound Source", "Can not create OpenAL buffer. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
+		zeError("Can not create OpenAL buffer. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
 		return false;
 	}
 
@@ -150,7 +150,7 @@ bool ZEALSoundSource::CreateBuffer()
 		if ((Error = alGetError()) != AL_NO_ERROR)
 		{
 			DestroyBufferSource();
-			zeError("OpenAL Sound Source", "Can not load data to OpenAL buffer. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
+			zeError("Can not load data to OpenAL buffer. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
 			return false;
 		}
 		delete[] ALStupidBuffer;
@@ -160,7 +160,7 @@ bool ZEALSoundSource::CreateBuffer()
 		if ((Error = alGetError()) != AL_NO_ERROR)
 		{
 			DestroyBufferSource();
-			zeError("OpenAL Sound Source", "Can not assign OpenAL buffer to OpenAL source. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
+			zeError("Can not assign OpenAL buffer to OpenAL source. (Error No : %d, Error Text : \"%s\")", Error, ConvertErrorToString(Error));
 			return false;
 		}
 
@@ -265,7 +265,7 @@ void ZEALSoundSource::StreamDecodeAndFill(ALuint Buffer, size_t Position, size_t
 
 	alBufferData(Buffer, GetBufferFormat(SoundResource), InnerStreamBuffer, BufferSampleCount * SoundResource->GetBlockAlign(), SoundResource->GetSamplesPerSecond());
 
-	zeLog("ss", "Stream Position %d, Buffer Id : %d, Error: %d", StreamPosition, Buffer, alGetError());
+	zeLog("Stream Position %d, Buffer Id : %d, Error: %d", StreamPosition, Buffer, alGetError());
 
 }
 

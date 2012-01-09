@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore/ZEError.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 
 #include "ZEInput/ZEInputMapBinding.h"
@@ -74,20 +74,20 @@ bool ZEFreespaceInputDevice::Initialize()
 	if (IsInitialized())
 		return false;
 
-	zeLog("Freespace Input Device", "Initializing device.");
+	zeLog("Initializing device.");
 
 	int Result;
 	Result = freespace_openDevice(Device);
 	if (Result != FREESPACE_SUCCESS) 
 	{
-		zeError("Freespace Input Module", "Can not open device. Error Code : %d.", Result);
+		zeError("Can not open device. Error Code : %d.", Result);
 		return false;
 	}
 
 	Result = freespace_flush(Device);
 	if (Result != FREESPACE_SUCCESS) 
 	{
-		zeError("Freespace Input Module", "Can not flush device. Error Code : %d.", Result);
+		zeError("Can not flush device. Error Code : %d.", Result);
 		return false;
 	}
 
@@ -104,11 +104,11 @@ bool ZEFreespaceInputDevice::Initialize()
 	Result = freespace_sendMessage(Device, &Message);
 	if (Result != FREESPACE_SUCCESS) 
 	{
-		zeError("Freespace Input Module", "Can not send message. Error Code : %d.", Result);
+		zeError("Can not send message. Error Code : %d.", Result);
 		return false;
 	}
 
-	zeLog("Freespace Input Module", "Module initialized.");
+	zeLog("Module initialized.");
 	
 	memset(Axises, 0, sizeof(Axises));
 	memset(Buttons, 0, sizeof(Buttons));
@@ -124,7 +124,7 @@ void ZEFreespaceInputDevice::Deinitialize()
 	if (!IsInitialized())
 		return;
 
-	zeLog("Freespace Input Module", "Deinitializing module.");
+	zeLog("Deinitializing module.");
 
 	freespace_message Message;
 	memset(&Message, 0, sizeof(Message));
@@ -134,13 +134,13 @@ void ZEFreespaceInputDevice::Deinitialize()
 	int Result = freespace_sendMessage(Device, &Message);
 	if (Result != FREESPACE_SUCCESS) 
 	{
-		zeError("Freespace Input Module", "Can not send message. Error Code : %d.", Result);
+		zeError("Can not send message. Error Code : %d.", Result);
 	}
 
 	freespace_closeDevice(Device);
 	freespace_exit();
 
-	zeLog("Freespace Input Module", "Module deinitialized.");
+	zeLog("Module deinitialized.");
 }
 
 void ZEFreespaceInputDevice::ProcessInputs()
@@ -157,7 +157,7 @@ void ZEFreespaceInputDevice::ProcessInputs()
 
 		if (Result != FREESPACE_SUCCESS) 
 		{
-			zeError("Freespace Input Module", "Can not read message. Error Code : %d.", Result);
+			zeError("Can not read message. Error Code : %d.", Result);
 			return;
 		}
 

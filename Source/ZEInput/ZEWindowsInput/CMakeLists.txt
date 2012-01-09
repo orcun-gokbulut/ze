@@ -41,8 +41,6 @@ ze_add_source(ZEWindowsInputMouseDevice.cpp			Sources)
 ze_add_source(ZEWindowsInputMouseDevice.h			Sources)
 ze_add_source(ZEWindowsInputModule.cpp				Sources)
 ze_add_source(ZEWindowsInputModule.h				Sources)
-ze_add_source(ZEWindowsInputModuleDescription.cpp	Sources)
-ze_add_source(ZEWindowsInputModuleDescription.h		Sources)
 
 ze_add_library(ZEWindowsInput 
 	SOURCES ${Sources})

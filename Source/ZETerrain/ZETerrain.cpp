@@ -141,7 +141,7 @@ bool ZETerrain::Initialize()
 
 	if (!VertexDeclaration->Create(Elements, 1))
 	{
-		zeError("ZETerrain", "Can not create vertex elements.");
+		zeError("Can not create vertex elements.");
 		return false;
 	}
 
@@ -316,7 +316,7 @@ bool ZETerrain::LoadTerrain()
 	Result = File.Open(TerrainFileName, ZE_FM_READ_ONLY, true);
 	if (!Result)
 	{
-		zeError("ZETerrain", "Can not open terrain file.");
+		zeError("Can not open terrain file.");
 		File.Close();
 		return false;
 	}
@@ -435,17 +435,17 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVe
 		return false;
 
 
-	ZERenderOrder RenderOrder;
-	RenderOrder.SetZero();
-	RenderOrder.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
-	RenderOrder.VertexDeclaration = VertexDeclaration;
-	RenderOrder.Material = Material;
-	RenderOrder.Order = 0;
-	RenderOrder.Pipeline = ZE_RORP_3D;
-	RenderOrder.VertexBuffer = VertexBuffer;
-	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderOrder.Priority = 3;
-	ZEMatrix4x4::CreateOrientation(RenderOrder.WorldMatrix, 
+	ZERenderCommand RenderCommand;
+	RenderCommand.SetZero();
+	RenderCommand.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
+	RenderCommand.VertexDeclaration = VertexDeclaration;
+	RenderCommand.Material = Material;
+	RenderCommand.Order = 0;
+	RenderCommand.Pipeline = ZE_RORP_3D;
+	RenderCommand.VertexBuffer = VertexBuffer;
+	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	RenderCommand.Priority = 3;
+	ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, 
 		Position + Offset,
 		(Rotate ? ZEQuaternion(ZE_PI, ZEVector3::UnitY) : ZEQuaternion::Identity),
 		ZEVector3(Scale, Scale, Scale));
@@ -453,32 +453,32 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVe
 	switch(PrimitiveType)
 	{
 		case 0:
-			RenderOrder.VertexBufferOffset = Indices.CenterQuadIndex;
-			RenderOrder.PrimitiveCount = Indices.CenterQuadSize / 3;
+			RenderCommand.VertexBufferOffset = Indices.CenterQuadIndex;
+			RenderCommand.PrimitiveCount = Indices.CenterQuadSize / 3;
 			break;
 
 		case 1:
-			RenderOrder.VertexBufferOffset = Indices.LeftTopCornerIndex;
-			RenderOrder.PrimitiveCount = Indices.LeftTopCornerSize / 3;
+			RenderCommand.VertexBufferOffset = Indices.LeftTopCornerIndex;
+			RenderCommand.PrimitiveCount = Indices.LeftTopCornerSize / 3;
 			break;
 
 		case 2:
-			RenderOrder.VertexBufferOffset = Indices.LeftBottomCornerIndex;
-			RenderOrder.PrimitiveCount = Indices.LeftBottomCornerSize / 3;
+			RenderCommand.VertexBufferOffset = Indices.LeftBottomCornerIndex;
+			RenderCommand.PrimitiveCount = Indices.LeftBottomCornerSize / 3;
 			break;
 
 		case 3:
-			RenderOrder.VertexBufferOffset = Indices.LeftEdgeIndex;
-			RenderOrder.PrimitiveCount = Indices.LeftEdgeSize / 3;
+			RenderCommand.VertexBufferOffset = Indices.LeftEdgeIndex;
+			RenderCommand.PrimitiveCount = Indices.LeftEdgeSize / 3;
 			break;
 
 		case 4:
-			RenderOrder.VertexBufferOffset = Indices.TopEdgeIndex;
-			RenderOrder.PrimitiveCount = Indices.TopEdgeSize / 3;
+			RenderCommand.VertexBufferOffset = Indices.TopEdgeIndex;
+			RenderCommand.PrimitiveCount = Indices.TopEdgeSize / 3;
 			break;
 	}
 
-	Renderer->AddToRenderList(&RenderOrder);
+	Renderer->AddToRenderList(&RenderCommand);
 
 	return true;
 }

@@ -54,7 +54,7 @@ class ZESkyBrush : public ZEEntity
 		ZETextureCubeResource*				SkyTexture;
 		ZESkyBoxMaterial*					SkyMaterial;
 		ZECanvas							SkyBox;
-		ZERenderOrder						SkyRenderOrder;
+		ZERenderCommand						SkyRenderCommand;
 
 		ZEVector3							SkyColor;
 		float								SkyBrightness;

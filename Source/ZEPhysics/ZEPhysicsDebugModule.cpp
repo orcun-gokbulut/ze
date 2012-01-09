@@ -68,7 +68,7 @@ void ZEPhysicsDebugModule::TransformChanged(const ZEPhysicalTransformChangeEvent
 	float Pitch, Yaw, Roll;
 	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, TransformChange.NewRotation);
 
-	/*zeLog("Physical Object", "Transform Changed. Object: %x, New Position: [%f, %f, %f], New Orientation: [%f, %f, %f]", 
+	/*zeLog("Transform Changed. Object: %x, New Position: [%f, %f, %f], New Orientation: [%f, %f, %f]", 
 	TransformChange.PhysicalObject,
 	TransformChange.NewPosition.x, TransformChange.NewPosition.y, TransformChange.NewPosition.z,
 	Pitch, Yaw, Roll);*/
@@ -76,7 +76,7 @@ void ZEPhysicsDebugModule::TransformChanged(const ZEPhysicalTransformChangeEvent
 
 void ZEPhysicsDebugModule::ColisionDetected(const ZEPhysicalCollisionEventArgument& Collision)
 {
-	zeLog("Physical Object", "Collision Occured: Object1 : %x, Object2 : %x", Collision.Collider1, Collision.Collider2);
+	zeLog("Collision Occured: Object1 : %x, Object2 : %x", Collision.Collider1, Collision.Collider2);
 }
 
 

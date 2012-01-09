@@ -35,11 +35,8 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-add_source(ZEVirtualInputModule.cpp				Sources)
-add_source(ZEVirtualInputModule.h				Sources ZESDK)
-add_source(ZEVirtualInputModuleDescription.cpp	Sources)
-add_source(ZEVirtualInputModuleDescription.h	Sources ZESDK)
+ze_add_source(ZEVirtualInputModule.cpp				Sources)
+ze_add_source(ZEVirtualInputModule.h				Sources ZESDK)
 
-add_library(ZEVirtualInput ${Sources})
-
-set_property(TARGET ZEVirtualInput PROPERTY FOLDER "Zinek Engine")
+ze_add_library(ZEVirtualInput 
+	SOURCES ${Sources})

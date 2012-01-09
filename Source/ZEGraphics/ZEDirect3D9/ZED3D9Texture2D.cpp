@@ -115,7 +115,7 @@ bool ZED3D9Texture2D::Create(unsigned int Width, unsigned int Height, ZETextureP
 	Hr = GetDevice()->CreateTexture(Width, Height, MipMap, Usage, Format, Pool, &Texture, NULL); 
 	if (Hr != D3D_OK)
 	{
-		zeError("D3D9 Texture 2D", "Can not create 2D texture.");
+		zeError("Can not create 2D texture.");
 		return false;
 	}
 

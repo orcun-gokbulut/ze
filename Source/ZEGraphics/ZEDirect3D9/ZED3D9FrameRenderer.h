@@ -86,7 +86,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9SSAAProcessor					SSAAProcessor;
 		
 		ZED3D9EDProcessor					EDProcessor;
-		ZESmartArray<ZERenderOrder>			RenderList;
+		ZESmartArray<ZERenderCommand>			RenderList;
 
 		ZECamera*							Camera;
 
@@ -107,8 +107,8 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		} LightningComponents;
 
 
-		static bool							CheckRenderOrder(ZERenderOrder* RenderOrder);
-		static void							PumpStreams(ZERenderOrder* RenderOrder);
+		static bool							CheckRenderCommand(ZERenderCommand* RenderCommand);
+		static void							PumpStreams(ZERenderCommand* RenderCommand);
 
 		void								InitializeLightning();
 		void								DeinitializeLightning();
@@ -161,7 +161,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		virtual void						AddToLightList(ZELight* Light);
 		virtual void						ClearLightList();
 
-		virtual void						AddToRenderList(ZERenderOrder* RenderOrder);
+		virtual void						AddToRenderList(ZERenderCommand* RenderCommand);
 		virtual void						ClearRenderList();
 
 		virtual void						Render(float ElaspedTime);

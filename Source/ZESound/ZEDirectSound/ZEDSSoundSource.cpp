@@ -73,7 +73,7 @@ bool ZEDSSoundSource::CreateBuffer(bool Is3D)
 
 	if (FAILED(hr = GetDevice()->CreateSoundBuffer(&DSBufferDesc, &DSBuffer, NULL)))
 	{
-		zeError("DirectSound Sound Source", "Can not create Direct Sound buffer.");
+		zeError("Can not create Direct Sound buffer.");
 		return false;
 	}
 
@@ -165,7 +165,7 @@ void ZEDSSoundSource::Stream()
 	if ((LastUpdatedBufferChunk != 1) && (BufferPosition >= BufferSampleCount_2))
 	{
 		StreamDecodeAndFill(0, StreamPosition, BufferSampleCount_2);
-		//zeLog("SS", "Streaming 1!, Current Position : %d, StreamPosition : %d, Buffer Position : %d", CurrentPosition, StreamPosition, BufferPosition);
+		//zeLog("Streaming 1!, Current Position : %d, StreamPosition : %d, Buffer Position : %d", CurrentPosition, StreamPosition, BufferPosition);
 		LastUpdatedBufferChunk = 1;
 
 		
@@ -179,7 +179,7 @@ void ZEDSSoundSource::Stream()
 	if ((LastUpdatedBufferChunk != 2) && (BufferPosition < BufferSampleCount_2))
 	{
 		StreamDecodeAndFill(BufferSampleCount_2, StreamPosition, BufferSampleCount_2);
-		//zeLog("SS", "Streaming 2!, Current Position : %d, StreamPosition : %d, Buffer Position : %d", CurrentPosition, StreamPosition, BufferPosition);
+		//zeLog("Streaming 2!, Current Position : %d, StreamPosition : %d, Buffer Position : %d", CurrentPosition, StreamPosition, BufferPosition);
 		LastUpdatedBufferChunk = 2;
 
 		StreamPosition += BufferSampleCount_2;

@@ -33,10 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore\ZEError.h"
+#include "ZEError.h"
 #include "ZECore\ZEConsole.h"
 #include "ZEDummyInputModule.h"
-#include "ZEDummyInputModuleDescription.h"
+
+ZE_MODULE_DESCRIPTION(ZEDummyInputModule, ZEInputModule, NULL)
 
 bool ZEDummyInputModule::GetEnabled()
 {
@@ -46,17 +47,6 @@ bool ZEDummyInputModule::GetEnabled()
 void ZEDummyInputModule::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
-}
-
-ZEModuleDescription* ZEDummyInputModule::GetModuleDescription()
-{
-	return ZEDummyInputModule::ModuleDescription();
-}
-
-ZEModuleDescription* ZEDummyInputModule::ModuleDescription()
-{
-	static ZEDummyInputModuleDescription Desc;
-	return &Desc;
 }
 
 bool ZEDummyInputModule::Initialize()
@@ -84,12 +74,12 @@ void ZEDummyInputModule::ProcessInputMap(ZEInputMap* InputMap)
 
 void ZEDummyInputModule::Acquire()
 {
-	zeNotice("Dummy Input", "Dummy Input acquired.");
+	zeNotice("Dummy Input acquired.");
 }
 
 void ZEDummyInputModule::UnAcquire()
 {
-	zeNotice("Dummy Input", "Dummy Input unacquired.");
+	zeNotice("Dummy Input unacquired.");
 }
 
 void ZEDummyInputModule::GetInputEventName(char* Name, size_t MaxSize)

@@ -46,7 +46,7 @@ class ZEVertexDeclaration;
 class ZEUIRenderer
 {
 	private:
-		ZESmartArray<ZERenderOrder>		RenderOrders;
+		ZESmartArray<ZERenderCommand>	RenderCommands;
 		ZEMaterial*						DefaultMaterial;
 		ZEVertexDeclaration*			VertexDeclaration;
 		ZEMatrix4x4						ScreenTransform;

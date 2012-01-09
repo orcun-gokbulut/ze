@@ -91,13 +91,13 @@ bool ZEScene::Initialize()
 
 	if (Renderer == NULL)
 	{
-		zeCriticalError("Scene", "Can not create renderer.");
+		zeCriticalError("Can not create renderer.");
 		return false;
 	}
 
 	if (!Renderer->Initialize())
 	{
-		zeCriticalError("Scene", "Can not initialize renderer.");
+		zeCriticalError("Can not initialize renderer.");
 		return false;
 	}
 
@@ -106,13 +106,13 @@ bool ZEScene::Initialize()
 
 	if (Renderer == NULL)
 	{
-		zeCriticalError("Scene", "Can not create shadow renderer.");
+		zeCriticalError("Can not create shadow renderer.");
 		return false;
 	}
 	
 	if (!ShadowRenderer->Initialize())
 	{
-		zeCriticalError("Scene", "Can not initialize shadow renderer.");
+		zeCriticalError("Can not initialize shadow renderer.");
 		return false;
 	}
 
@@ -121,13 +121,13 @@ bool ZEScene::Initialize()
 
 	if (PhysicalWorld == NULL)
 	{
-		zeCriticalError("Scene", "Can not create physical world.");
+		zeCriticalError("Can not create physical world.");
 		return false;
 	}
 
 	if (!PhysicalWorld->Initialize())
 	{
-		zeCriticalError("Scene", "Can not create physical world.");
+		zeCriticalError("Can not create physical world.");
 		return false;
 	}
 
@@ -307,7 +307,7 @@ void ZEScene::Render(float ElapsedTime)
 
 bool ZEScene::Save(const ZEString& FileName)
 {
-	zeLog("Scene", "Saving scene file \"%s\".", FileName.GetValue());
+	zeLog("Saving scene file \"%s\".", FileName.GetValue());
 
 	ZEString NewPath = ConstructResourcePath(FileName);
 
@@ -333,8 +333,8 @@ bool ZEScene::Save(const ZEString& FileName)
 
 			if (!Entities[I]->Serialize((ZESerializer*)&Serializer))
 			{
-				zeError("Scene", "Serialization of entity \"%s\" has failed.", Entities[I]->GetName());
-				zeError("Scene", "Serialization failed.");
+				zeError("Serialization of entity \"%s\" has failed.", Entities[I]->GetName());
+				zeError("Serialization failed.");
 				Serializer.Close();
 				return false;
 			}
@@ -342,20 +342,20 @@ bool ZEScene::Save(const ZEString& FileName)
 
 		Serializer.Close();
 		
-		zeLog("Scene", "Scene file \"%s\" saved.", NewPath.GetValue());
+		zeLog("Scene file \"%s\" saved.", NewPath.GetValue());
 		Serializer.Close();
 		return true;
 	}
 	else
 	{
-		zeError("Scene", "Serialization failed.");
+		zeError("Serialization failed.");
 		return false;
 	}
 }
 
 bool ZEScene::Load(const ZEString& FileName)
 {
-	zeLog("Scene", "Loading scene file \"%s\".", FileName.GetValue());
+	zeLog("Loading scene file \"%s\".", FileName.GetValue());
 
 	ZEString NewPath = ConstructResourcePath(FileName);
 
@@ -380,15 +380,15 @@ bool ZEScene::Load(const ZEString& FileName)
 			NewEntity = (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(EntityTypeName);
 			if (NewEntity == NULL)
 			{
-				zeError("Scene", "Unserialization can not create entity type \"%s\".", EntityTypeName);
-				zeError("Scene", "Unserialization failed.");
+				zeError("Unserialization can not create entity type \"%s\".", EntityTypeName);
+				zeError("Unserialization failed.");
 				return false;
 			}
 
 			if (!NewEntity->Unserialize((ZEUnserializer*)&Unserializer))
 			{
-				zeError("Scene", "Unserialization of entity \"%s\" has failed.", Entities[I]->GetName());
-				zeError("Scene", "Unserialization failed.");
+				zeError("Unserialization of entity \"%s\" has failed.", Entities[I]->GetName());
+				zeError("Unserialization failed.");
 				Unserializer.Close();
 				return false;
 			}
@@ -396,13 +396,13 @@ bool ZEScene::Load(const ZEString& FileName)
 			AddEntity(NewEntity);
 		}
 
-		zeLog("Scene", "Scene file \"%s\" has been loaded.", NewPath.GetValue());
+		zeLog("Scene file \"%s\" has been loaded.", NewPath.GetValue());
 		Unserializer.Close();
 		return true;
 	}
 	else
 	{
-		zeError("Scene", "Can not open scene file. Unserialization failed. FileName : \"%s\"", NewPath.GetValue());
+		zeError("Can not open scene file. Unserialization failed. FileName : \"%s\"", NewPath.GetValue());
 		return false;
 	}
 }

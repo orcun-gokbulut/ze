@@ -44,13 +44,12 @@ class ZEInputDevice;
 
 class ZEVRPNInputDeviceExtension : public ZEInputDeviceExtension
 {
+	ZE_EXTENSION(ZEVRPNInputDeviceExtension)
+
 	private:
 		ZEArray<ZEVRPNInputDevice>	Devices;
 
 	public:
-		ZEExtensionDescription*			ExtensionDescription();
-		virtual ZEExtensionDescription* GetExtensionDescription();
-
 		ZEArray<ZEInputDevice*>			GetDevices();
 
 		virtual bool					Initialize();

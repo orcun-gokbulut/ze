@@ -43,7 +43,7 @@
 
 class ZETexture2D;
 class ZETextureCube;
-class ZERenderOrder;
+class ZERenderCommand;
 class ZEViewPort;
 class ZED3D9ViewPort;
 enum ZETextureCubeFace;
@@ -54,9 +54,9 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 	private:
 		ZED3D9ViewPort*							ViewPort;
 
-		ZESmartArray<ZERenderOrder>				NonTransparent;
-		ZESmartArray<ZERenderOrder>				Transparent;
-		ZESmartArray<ZERenderOrder>				Imposter;
+		ZESmartArray<ZERenderCommand>				NonTransparent;
+		ZESmartArray<ZERenderCommand>				Transparent;
+		ZESmartArray<ZERenderCommand>				Imposter;
 
 		ZEArray<ZEPostProcessor*>				PostProcessors;
 
@@ -79,7 +79,7 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 												ZED3D9ShadowRenderer();
 		virtual									~ZED3D9ShadowRenderer();
 
-		void									DrawRenderOrder(ZERenderOrder* RenderOrder);
+		void									DrawRenderCommand(ZERenderCommand* RenderCommand);
 
 	public:	
 		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors();
@@ -102,7 +102,7 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 		virtual void							SetViewPort(ZEViewPort* ViewPort);
 		virtual ZEViewPort*						GetViewPort();
 
-		virtual void							AddToRenderList(ZERenderOrder* RenderOrder);
+		virtual void							AddToRenderList(ZERenderCommand* RenderCommand);
 		virtual void							ClearRenderList();
 
 		virtual void							Render(float ElaspedTime);

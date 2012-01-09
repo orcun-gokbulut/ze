@@ -40,7 +40,7 @@ function(ze_set_project_folder)
 	set(ZEBUILD_PROJECT_FOLDER ${PARAMETER_PROJECT_FOLDER})
 	set(ZEBUILD_PROJECT_FOLDER ${ZEBUILD_PROJECT_FOLDER} PARENT_SCOPE)
 		
-	if (ZEBUILD_DEBUG_MODE)
+	if (ZEBUILD_VERBOSE)
 		message("ze_set_project_folder") 
 		message("\tZEBUILD_PROJECT_FOLDER = ${ZEBUILD_PROJECT_FOLDER}")
 	endif()
@@ -85,7 +85,7 @@ function(ze_add_source)
 	set(${PARAMETER_SOURCE_LIST} ${${PARAMETER_SOURCE_LIST}} PARENT_SCOPE)
 	
 	# Debugging
-	if (ZEBUILD_DEBUG_MODE)
+	if (ZEBUILD_VERBOSE)
 		message("ze_add_source") 
 		message("\t${PARAMETER_SOURCE_LIST} = ${${PARAMETER_SOURCE_LIST}}")
 		message("\tPARAMETER_ZEPP = ${PARAMETER_ZEPP}")
@@ -155,7 +155,7 @@ function(ze_add_executable)
 	endif()
 		
 	# Debug
-	if (ZEBUILD_DEBUG_MODE)
+	if (ZEBUILD_VERBOSE)
 		message("ze_add_executable") 
 		message("\tPARAMETER_TARGET = ${PARAMETER_TARGET}")	
 		message("\tPARAMETER_SOURCES = ${PARAMETER_SOURCES}")	
@@ -206,7 +206,7 @@ function (ze_add_library)
 	endif()
 		
 	# Debug
-	if (ZEBUILD_DEBUG_MODE)
+	if (ZEBUILD_VERBOSE)
 		message("ze_add_library") 
 		message("\tPARAMETER_TARGET = ${PARAMETER_TARGET}")	
 		message("\tPARAMETER_SOURCES = ${PARAMETER_SOURCES}")	
@@ -242,7 +242,7 @@ function (ze_add_unit_tests)
 		add_test(${PARAMETER_TARGET} ${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)/${PARAMETER_TARGET})
 			
 		# Debug
-		if (ZEBUILD_DEBUG_MODE)
+		if (ZEBUILD_VERBOSE)
 			message("ze_add_unit_tests") 
 			message("\tPARAMETER_TARGET = ${PARAMETER_TARGET}")	
 			message("\tPARAMETER_SOURCES = ${PARAMETER_SOURCES}")	
@@ -261,7 +261,7 @@ function (ze_add_bulk_unit_tests)
 	endforeach()
 
 	# Debug	
-	if (ZEBUILD_DEBUG_MODE)
+	if (ZEBUILD_VERBOSE)
 		message("ze_add_bulk_unit_tests") 
 		message("\tPARAMETER_EXTRA_SOURCES = ${PARAMETER_EXTRA_SOURCES}")	
 		message("\tPARAMETER_SOURCES = ${PARAMETER_SOURCES}")	
@@ -292,7 +292,7 @@ function(ze_add_conditional_build)
 	endif()
 
 	# Debug	
-	if (ZEBUILD_DEBUG_MODE)	
+	if (ZEBUILD_VERBOSE)	
 		message("ze_add_conditional_build") 
 		message("\tPARAMETER_TITLE = ${PARAMETER_TITLE}")
 		message("\tPARAMETER_TRUE = ${PARAMETER_TRUE}")

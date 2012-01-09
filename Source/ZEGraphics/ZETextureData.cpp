@@ -64,7 +64,7 @@ void ZETextureData::CreateTexture(ZETexturePixelFormat PixelFormat, unsigned int
 
 	Texture.Surfaces = (TextureData::SurfaceData*)malloc(AllocationSize);
 	if(Texture.Surfaces == NULL)
-		zeError("Texture File", "Cannot allocate memory for the surfaces!");
+		zeError("Cannot allocate memory for the surfaces!");
 
 	memset(Texture.Surfaces, 0, AllocationSize);
 	
@@ -75,7 +75,7 @@ void ZETextureData::CreateTexture(ZETexturePixelFormat PixelFormat, unsigned int
 	{
 		Texture.Surfaces[I].Mipmaps = (TextureData::SurfaceData::MipmapData*)malloc(AllocationSize);
 		if(Texture.Surfaces->Mipmaps == NULL)
-			zeError("Texture File", "Cannot allocate memory for the mipmaps of the surface level %d!", I);
+			zeError("Cannot allocate memory for the mipmaps of the surface level %d!", I);
 
 		memset(Texture.Surfaces[I].Mipmaps, 0, AllocationSize);
 	}
@@ -135,7 +135,7 @@ void ZETextureData::AllocateMipmap(unsigned int Depth, unsigned int MipLevel, un
 	TargetMipmap->Data = (void*)malloc(AllocationSize);
 	
 	if(TargetMipmap->Data == NULL)
-		zeError("Texture File", "Cannot allocate memory for the mipmap level %d of surface %d!", MipLevel, Depth);
+		zeError("Cannot allocate memory for the mipmap level %d of surface %d!", MipLevel, Depth);
 
 	TargetMipmap->RowSize = RowSize;
 	TargetMipmap->RowCount = RowCount;

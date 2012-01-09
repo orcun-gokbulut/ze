@@ -163,7 +163,7 @@ void ShowWindowError()
 
 void ZEWindow::WindowGainedFocus()
 {
-	zeLog("Window", "Main window gained focus.");
+	zeLog("Main window gained focus.");
 	ZEInputModule* Input = zeInput;
 	if (Input != NULL)
 		Input->Acquire();
@@ -171,7 +171,7 @@ void ZEWindow::WindowGainedFocus()
 
 void ZEWindow::WindowLostFocus()
 {
-	zeLog("Window", "Window lost focus.");
+	zeLog("Window lost focus.");
 	if (zeInput != NULL)
 		zeInput->UnAcquire();
 }
@@ -198,7 +198,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 			Style = WS_EX_TOPMOST | WS_POPUP;
 			break;
 		case ZE_WT_COMPONENT:
-			zeError("Window", "Wrong Window Type you can not create window with component type. Component windows are provided from the out size of Zinek Engine. Use SetComponentWindow function.");
+			zeError("Wrong Window Type you can not create window with component type. Component windows are provided from the out size of Zinek Engine. Use SetComponentWindow function.");
 			return false;
 	}
 
@@ -219,7 +219,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 	if(RegisterClassEx(&wc) == 0)
 	{
 		ShowWindowError();
-		zeError("Window", "Could not register windows class.");
+		zeError("Could not register windows class.");
 		ShowWindowError();
 		return false;
 	}
@@ -244,7 +244,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 	if (!WindowHandle)
 	{
 		ShowWindowError();
-		zeError("Win32Window Module", "Can not create window.");
+		zeError("Can not create window.");
 		return false;
 	}
 	ShowWindow();
@@ -259,7 +259,7 @@ bool ZEWindow::DestroyMainWindow()
 {
 	if (DestroyWindow((HWND)WindowHandle) == 0)
 	{
-		zeError("Window", "Can not destroy window.");
+		zeError("Can not destroy window.");
 		ShowWindowError();
 		return false;
 	}

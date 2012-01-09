@@ -37,6 +37,8 @@
 #ifndef	__ZE_PLUGIN_H__
 #define __ZE_PLUGIN_H__
 
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 #include "ZEVersion.h"
 
 class ZEExtensionDescription;
@@ -45,16 +47,14 @@ class ZEModuleDescription;
 class ZEPlugin
 {
 	public:
-		virtual const char*					GetName() = 0;
+		virtual ZEString					GetName() = 0;
+		virtual ZEString					GetCopyright() = 0;
+
 		virtual	ZEVersion					GetVersion() = 0;
 		virtual ZEVersion					GetRequiredZinekVersion() = 0;
-		virtual const char*					GetCopyright() = 0;
 
-		virtual size_t						GetModuleDescriptionCount() = 0;
-		virtual ZEModuleDescription**		GetModuleDescriptions() = 0;
-
-		virtual size_t						GetExtensionDescriptionCount() = 0;
-		virtual ZEExtensionDescription**	GetExtensionDescriptions() = 0;
+		virtual const 
+		ZEArray<ZEExtensionDescription*>&	GetExtensionDescriptions() = 0;
 };
 
 #endif

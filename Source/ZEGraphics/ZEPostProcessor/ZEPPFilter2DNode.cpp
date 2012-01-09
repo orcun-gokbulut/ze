@@ -68,7 +68,7 @@ void ZEPPFilter2DNode::SetKernelElements(const ZEArray<ZEKernel2DElement>& Value
 {
 	if (Values.GetCount() > 16)
 	{
-		zeError("Post Processor - Filter 2D", "Too much kernel elements. Kernel size can not exceed 16.");
+		zeError("Too much kernel elements. Kernel size can not exceed 16.");
 		return;
 	}
 

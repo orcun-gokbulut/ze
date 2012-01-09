@@ -98,7 +98,7 @@ const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(const ZEString
 	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(ZEFile::GetParentDirectory(this->GetFileName()) + "\\" + FileName);
 	if (NewTextureResource == NULL)
 	{
-		zeError("Map Resource", "Can not load texture file. (FileName : \"%s\")", FileName);
+		zeError("Can not load texture file. (FileName : \"%s\")", FileName);
 		return NULL;
 	}
 	TextureResources.Add(NewTextureResource);
@@ -117,7 +117,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEFile* ResourceFile)
 		// Check Chunk Identifier
 		if (MaterialChunk.ChunkIdentifier != ZE_MAP_MATERIAL_CHUNK)
 		{
-			zeError("Map Resource", "Material chunk's id does not match.");
+			zeError("Material chunk's id does not match.");
 			return false;
 		}	
 		
@@ -184,7 +184,7 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEFile* ResourceFile, ZEPorta
 	// Check physical mesh chunk identifier
 	if (FilePhysicalMesh.ChunkIdentifier != ZE_MAP_PHYSICAL_MESH_CHUNK)
 	{
-		zeError("Map Resource", "Physical mesh chunk's id does not match.");
+		zeError("Physical mesh chunk's id does not match.");
 		return false;
 	}
 
@@ -194,7 +194,7 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEFile* ResourceFile, ZEPorta
 	ResourceFile->Read(&ChunkIdentifier, sizeof(ZEDWORD), 1);
 	if (ChunkIdentifier != ZE_MAP_PHYSICAL_MESH_VERTICES_CHUNK)
 	{
-		zeError("Map Resource", "Physical mesh vertices chunk's id does not match.");
+		zeError("Physical mesh vertices chunk's id does not match.");
 		return false;
 	}
 
@@ -207,7 +207,7 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEFile* ResourceFile, ZEPorta
 	ResourceFile->Read(&ChunkIdentifier, sizeof(ZEDWORD), 1);
 	if (ChunkIdentifier != ZE_MAP_PHYSICAL_MESH_POLYGONS_CHUNK)
 	{
-		zeError("Map Resource", "Physical mesh polygons chunk's id does not match.");
+		zeError("Physical mesh polygons chunk's id does not match.");
 		return false;
 	}
 
@@ -237,7 +237,7 @@ bool ZEPortalMapResource::ReadPortalsFromFile(ZEFile* ResourceFile)
 
 		if (FilePortal.ChunkIdentifier != ZE_MAP_PORTAL_CHUNK)
 		{
-			zeError("Map Resource", "Portal chunk's id does not match.");
+			zeError("Portal chunk's id does not match.");
 			return false;
 		}
 
@@ -252,7 +252,7 @@ bool ZEPortalMapResource::ReadPortalsFromFile(ZEFile* ResourceFile)
 		// Read Octree
 		if (FilePortal.HasOctree)
 		{
-			zeError("Portal Map", "Octree is not supported.");
+			zeError("Octree is not supported.");
 			return false;
 			/*if (!ReadOctreeFromFile(ResourceFile, &Portal->Octree, Materials))
 				return false;*/
@@ -264,7 +264,7 @@ bool ZEPortalMapResource::ReadPortalsFromFile(ZEFile* ResourceFile)
 			ResourceFile->Read(&ChunkIdentifier, sizeof(ZEDWORD), 1);
 			if (ChunkIdentifier != ZE_MAP_POLYGONS_CHUNK)
 			{
-				zeError("Map Resource", "Polygons chunk's id does not match.");
+				zeError("Polygons chunk's id does not match.");
 				return false;
 			}
 
@@ -301,7 +301,7 @@ bool ZEPortalMapResource::ReadDoorsFromFile(ZEFile* ResourceFile)
 
 		if (FileDoor.ChunkIdentifier != ZE_MAP_PORTAL_DOOR_CHUNK)
 		{
-			zeError("Map Resource", "Portal chunk's id does not match.");
+			zeError("Portal chunk's id does not match.");
 			return false;
 		}
 
@@ -325,20 +325,20 @@ bool ZEPortalMapResource::ReadDoorsFromFile(ZEFile* ResourceFile)
 
 bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 {
-	zeLog("Portal Map Resource", "Loading map file \"%s\".", ResourceFile->GetFilePath().GetValue());
+	zeLog("Loading map file \"%s\".", ResourceFile->GetFilePath().GetValue());
 
 	ZEMapFileHeader TempHeader;
 	ResourceFile->Read(&TempHeader, sizeof(ZEMapFileHeader), 1);
 
 	if(TempHeader.Header!= ZE_MAP_HEADER)
 	{
-		zeError("Map Resource", "Unknown ZEMap file format. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("Unknown ZEMap file format. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		return false;
 	}
 	
 	if(TempHeader.Version != ZE_MAP_VERSION)
 	{	
-		zeError("Map Resource", "ZEMap file version mismatched. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("ZEMap file version mismatched. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		return false;
 	}
 
@@ -348,23 +348,23 @@ bool ZEPortalMapResource::ReadMapFromFile(ZEFile* ResourceFile)
 
 	if (!ReadMaterialsFromFile(ResourceFile))
 	{
-		zeError("Map Resource", "File is corrupted. Can not read materials from file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("File is corrupted. Can not read materials from file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		return false;
 	}
 
 	if (!ReadPortalsFromFile(ResourceFile))
 	{
-		zeError("Map Resource", "File is corrupted. Can not read portals from file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("File is corrupted. Can not read portals from file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		return false;
 	}
 
 	if (!ReadDoorsFromFile(ResourceFile))
 	{
-		zeError("Map Resource", "File is corrupted. Can not read doors from file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("File is corrupted. Can not read doors from file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		return false;
 	}
 
-	zeLog("Portal Map Resource", "Map file \"%s\" has been loaded.", ResourceFile->GetFilePath().GetValue());
+	zeLog("Map file \"%s\" has been loaded.", ResourceFile->GetFilePath().GetValue());
 
 	return true;
 }
@@ -459,7 +459,7 @@ ZEPortalMapResource* ZEPortalMapResource::LoadResource(const ZEString& FileName)
 
 		if (!MapResource->ReadMapFromFile(ResourceFile))
 		{
-			zeError("Map Resource", "Can not load map resource. (FileName : \"%s\")", NewPath.GetValue());
+			zeError("Can not load map resource. (FileName : \"%s\")", NewPath.GetValue());
 			ResourceFile->Close();
 			delete ResourceFile;
 			delete MapResource;
@@ -473,7 +473,7 @@ ZEPortalMapResource* ZEPortalMapResource::LoadResource(const ZEString& FileName)
 	}
 	else
 	{
-		zeError("Map Resource", "Map file does not exists. FileName : \"%s\"", NewPath.GetValue());
+		zeError("Map file does not exists. FileName : \"%s\"", NewPath.GetValue());
 		return NULL;
 	}
 }

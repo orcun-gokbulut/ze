@@ -55,14 +55,14 @@ bool ZETextureLoader::IsZETextureFile(const ZEString& FilePath)
 	ZEFile File;
 	if(!File.Open(FilePath, ZE_FM_READ_ONLY, true))
 	{
-		zeError("Texture Loader", "Cannot open file: \"%s\".", FilePath.GetValue());
+		zeError("Cannot open file: \"%s\".", FilePath.GetValue());
 		return false;
 	}
 
 	ZETextureFileHeader Header;
 	if(File.Read(&Header, sizeof(ZETextureFileHeader), 1) != 1)
 	{
-		zeError("Texture Loader", "Cannot read header of file: \"%s\".", FilePath.GetValue());
+		zeError("Cannot read header of file: \"%s\".", FilePath.GetValue());
 		return false;
 	}
 	File.Close();
@@ -99,7 +99,7 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 	FIBITMAP	*Bitmap;
 	FIBITMAP	*Bitmap32;
 
-	zeLog("Texture Loader", "Loading texture from image file : \"%s\".", File->GetFilePath().GetValue());
+	zeLog("Loading texture from image file : \"%s\".", File->GetFilePath().GetValue());
 
 	//Set callbacks
 	FreeImageIO Callbacks;
@@ -113,14 +113,14 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 	FREE_IMAGE_FORMAT FileFormat = FreeImage_GetFileTypeFromHandle(&Callbacks, (fi_handle)File);
 	if (FileFormat == FIF_UNKNOWN)
 	{
-		zeError("Texture Loader", "Unsupported format. File name: \"%s\"", File->GetFilePath().GetValue());
+		zeError("Unsupported format. File name: \"%s\"", File->GetFilePath().GetValue());
 		return false;
 	}
 
 	Bitmap = FreeImage_LoadFromHandle(FileFormat, &Callbacks, (fi_handle)File);
 	if(Bitmap == NULL)
 	{
-		zeError("Texture Loader", "Unknown error while loading the image. File name : \"%s\"", File->GetFilePath().GetValue());
+		zeError("Unknown error while loading the image. File name : \"%s\"", File->GetFilePath().GetValue());
 		return false;
 	}
 
@@ -146,7 +146,7 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 	
 	FreeImage_ConvertToRawBits((BYTE*)TextureData->GetMipmapData(0, 0), Bitmap32, RowSize, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
 	
-	zeLog("Texture Loader", "Image file loaded successfully: \"%s\".", File->GetFilePath().GetValue());
+	zeLog("Image file loaded successfully: \"%s\".", File->GetFilePath().GetValue());
 
 	FreeImage_Unload(Bitmap32);
 	Bitmap32 = Bitmap = NULL;
@@ -160,11 +160,11 @@ bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, 
 {
 	if(TextureData->GetPixelFormat() != ZE_TPF_A8R8G8B8)
 	{
-		zeError("Texture Loader", "Pixel Format is not supported for saving.");
+		zeError("Pixel Format is not supported for saving.");
 		return false;
 	}
 
-	zeLog("Texture Loader", "Saving texture as image file : \"%s\".", File->GetFilePath().GetValue());
+	zeLog("Saving texture as image file : \"%s\".", File->GetFilePath().GetValue());
 
 	//Set callbacks
 	FreeImageIO Callbacks;
@@ -187,19 +187,19 @@ bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, 
 	Bitmap = FreeImage_ConvertFromRawBits((BYTE*)TextureData->GetMipmapData(Surface, Mipmap), Width, Height, Pitch, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
 	if(Bitmap == NULL)
 	{
-		zeError("Texture Loader", "Error during conversion, cannot save image to \"%s\".", File->GetFilePath().GetValue());
+		zeError("Error during conversion, cannot save image to \"%s\".", File->GetFilePath().GetValue());
 		FreeImage_Unload(Bitmap);
 		return false;
 	}
 
 	if(!FreeImage_SaveToHandle(FIF_TARGA, Bitmap, &Callbacks, (fi_handle)File))
 	{
-		zeError("Texture Loader", "Unknown error, Cannot save image to \"%s\".", File->GetFilePath().GetValue());
+		zeError("Unknown error, Cannot save image to \"%s\".", File->GetFilePath().GetValue());
 		FreeImage_Unload(Bitmap);
 		return false;
 	}
 
-	zeLog("Texture Loader", "Image file saved successfully : \"%s\".", File->GetFilePath().GetValue());
+	zeLog("Image file saved successfully : \"%s\".", File->GetFilePath().GetValue());
 
 	FreeImage_Unload(Bitmap);
 	Bitmap = NULL;
@@ -209,7 +209,7 @@ bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, 
 
 bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 {
-	zeLog("Texture Loader", "Loading texture from ZETexture file : \"%s\".", File->GetFilePath().GetValue());
+	zeLog("Loading texture from ZETexture file : \"%s\".", File->GetFilePath().GetValue());
 
 	// Get file header
 	ZETextureFileHeader	FileHeader;
@@ -239,7 +239,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 		ZETextureFileSurfaceChunk	SurfaceChunk;
 		if(File->Read(&SurfaceChunk, sizeof(ZETextureFileSurfaceChunk), 1) != 1)
 		{
-			zeError("Texture Data", "Cannot read surface header from disk! File name: \"&s\".", File->GetFilePath().GetValue());
+			zeError("Cannot read surface header from disk! File name: \"&s\".", File->GetFilePath().GetValue());
 			TextureData->DestroyTexture();
 			return false;
 		}
@@ -293,7 +293,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 		}
 	}
 
-	zeLog("Texture Loader", "Texture loaded successfully: \"%s\".", File->GetFilePath().GetValue());
+	zeLog("Texture loaded successfully: \"%s\".", File->GetFilePath().GetValue());
 	return true;
 }
 
@@ -362,7 +362,7 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 	}
 
 	File->Flush();
-	zeLog("Texture Loader", "Saved successfully : \"%s\".", ZEFile::GetFileName(File->GetFilePath()).GetValue());
+	zeLog("Saved successfully : \"%s\".", ZEFile::GetFileName(File->GetFilePath()).GetValue());
 	return true;
 }
 
@@ -387,7 +387,7 @@ bool ZETextureLoader::LoadFromFile(ZEFile* File, ZETextureData* TextureData)
 
 bool ZETextureLoader::GetImageInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 {
-	zeLog("Texture Loader", "Getting image info: \"%s\".", File->GetFilePath().GetValue());
+	zeLog("Getting image info: \"%s\".", File->GetFilePath().GetValue());
 
 	ZEQWORD Cursor = File->Tell();
 	File->Seek(0, ZE_SF_BEGINING);
@@ -402,7 +402,7 @@ bool ZETextureLoader::GetImageInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 	FREE_IMAGE_FORMAT ImageFormat = FreeImage_GetFileTypeFromHandle(&Callbacks, (fi_handle)File);
 	if (ImageFormat == FIF_UNKNOWN)
 	{
-		zeError("Texture Loader", "Unsupported image format. File Path : \"%s\"", File->GetFilePath().GetValue());
+		zeError("Unsupported image format. File Path : \"%s\"", File->GetFilePath().GetValue());
 		return false;
 	}
 
@@ -410,7 +410,7 @@ bool ZETextureLoader::GetImageInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 	FIBITMAP *Bitmap = FreeImage_LoadFromHandle(ImageFormat, &Callbacks, (fi_handle)File, FIF_LOAD_NOPIXELS);
 	if(Bitmap == NULL)
 	{
-		zeError("Texture Loader", "Cannot get image info. File Path : \"%s\"", File->GetFilePath().GetValue());
+		zeError("Cannot get image info. File Path : \"%s\"", File->GetFilePath().GetValue());
 		return false;
 	}
 
@@ -424,7 +424,7 @@ bool ZETextureLoader::GetImageInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 	FreeImage_Unload(Bitmap);
 	Bitmap = NULL;
 
-	zeLog("Texture Loader", "Image info gathered successfully: \"%s\".", File->GetFilePath().GetValue());
+	zeLog("Image info gathered successfully: \"%s\".", File->GetFilePath().GetValue());
 
 	File->Seek(Cursor, ZE_SF_BEGINING);
 	return true;
@@ -436,7 +436,7 @@ bool ZETextureLoader::GetTextureInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 	ZEQWORD Cursor = File->Tell();
 	File->Seek(0, ZE_SF_BEGINING);
 
-	zeLog("Texture Loader", "Getting texture info: \"%s\".", File->GetFilePath().GetValue());
+	zeLog("Getting texture info: \"%s\".", File->GetFilePath().GetValue());
 
 	ZETextureFileHeader FileHeader;
 	if(File->Read(&FileHeader, sizeof(ZETextureFileHeader), 1) != 1)
@@ -452,7 +452,7 @@ bool ZETextureLoader::GetTextureInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 	TextureInfo->MipmapCount	= FileHeader.MipMapCount;
 	TextureInfo->PixelFormat	= (ZETexturePixelFormat)FileHeader.PixelFormat;
 	
-	zeLog("Texture Loader", "Texture info gathered successfully: \"%s\".", File->GetFilePath().GetValue());
+	zeLog("Texture info gathered successfully: \"%s\".", File->GetFilePath().GetValue());
 
 	File->Seek(Cursor, ZE_SF_BEGINING);
 	return true;

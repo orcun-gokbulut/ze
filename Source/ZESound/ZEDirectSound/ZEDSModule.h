@@ -50,7 +50,8 @@ enum ZESoundSourceType;
 #undef PlaySound
 class ZEDSModule : public ZESoundModule
 {
-	friend class ZEDSModuleDescription;
+	ZE_MODULE(ZEDSModule)
+
 	friend class ZEDSListener;
 	friend class ZEDSSoundSource;
 	friend class ZEDSSoundSource3D;
@@ -84,9 +85,6 @@ class ZEDSModule : public ZESoundModule
 		virtual								~ZEDSModule();
 
 	public:
-		virtual ZEModuleDescription*		GetModuleDescription();		
-		static ZEModuleDescription*		    ModuleDescription();		
-
 		LPDIRECTSOUND8						GetDevice();
 		LPDIRECTSOUND3DLISTENER8			GetListener();
 		LPDIRECTSOUNDBUFFER					GetPrimaryBuffer();

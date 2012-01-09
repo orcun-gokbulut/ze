@@ -208,7 +208,7 @@ bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, size_t VertexCount,
 	ZEPhysXMemoryWriteStream WriteStream;
 	if (!GetCookingInterface()->NxCookTriangleMesh(TriangleMeshDesc, WriteStream))
 	{
-		zeError("PhysX Physical Static Mesh", "Can not cook triangle mesh.");
+		zeError("Can not cook triangle mesh.");
 		return false;
 	}
 
@@ -217,7 +217,7 @@ bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, size_t VertexCount,
 	TriangleMeshShapeDesc.meshData = GetPhysicsSDK()->createTriangleMesh(ReadStream);
 	if (TriangleMeshShapeDesc.meshData == NULL)
 	{
-		zeError("PhysX Physical Static Mesh", "Can not create triangle mesh.");
+		zeError("Can not create triangle mesh.");
 		return false;
 	}
 
@@ -254,7 +254,7 @@ bool ZEPhysXPhysicalMesh::Initialize()
 	Actor = Scene->createActor(ActorDesc);
 	if (Actor == NULL)
 	{
-		zeError("PhysX Physical Static Object", "Can not create actor.");
+		zeError("Can not create actor.");
 		return false;
 	}
 

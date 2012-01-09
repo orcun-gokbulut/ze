@@ -118,7 +118,7 @@ bool ZEMaterialResource::LoadTextures(ZEMaterialResource* MaterialResource, ZEFi
 		ResourceFile->Read(&TextureChunk, sizeof(ZEMaterialFileTextureChunk), 1);
 		if (TextureChunk.ChunkId != ZE_MTLF_TEXTURE_CHUNK_ID)
 		{
-			zeError("Material Resource", "Texture chunk id does not match. (FileName : \"%s\"", ResourceFile->GetFilePath().GetValue());
+			zeError("Texture chunk id does not match. (FileName : \"%s\"", ResourceFile->GetFilePath().GetValue());
 			return false;
 		}
 
@@ -132,13 +132,13 @@ bool ZEMaterialResource::LoadTextures(ZEMaterialResource* MaterialResource, ZEFi
 					CurrentTextureResource = ZETextureCubeResource::LoadResource(ResourceFile, UserOptions);
 					ResourceFile->Seek(OldPos + TextureChunk.InternalSize, ZE_SF_BEGINING);
 					if (CurrentTextureResource == NULL)
-						zeWarning("Material Resource", "Can not load material internal texture. (Material FileName : \"%s\", Texture Index : %d)", ResourceFile->GetFilePath().GetValue(), I);
+						zeWarning("Can not load material internal texture. (Material FileName : \"%s\", Texture Index : %d)", ResourceFile->GetFilePath().GetValue(), I);
 				}
 				else
 				{
 					CurrentTextureResource = ZETextureCubeResource::LoadSharedResource(TextureChunk.FileName, UserOptions);
 					if (CurrentTextureResource == NULL)
-						zeWarning("Material Resource", "Can not load material texture. (Material FileName : \"%s\", Texture Index : %d, Texture FileName : \"%s\"", ResourceFile->GetFilePath().GetValue(), I, TextureChunk.FileName);
+						zeWarning("Can not load material texture. (Material FileName : \"%s\", Texture Index : %d, Texture FileName : \"%s\"", ResourceFile->GetFilePath().GetValue(), I, TextureChunk.FileName);
 				}
 				break;
 
@@ -149,28 +149,28 @@ bool ZEMaterialResource::LoadTextures(ZEMaterialResource* MaterialResource, ZEFi
 					CurrentTextureResource = ZETexture2DResource::LoadResource(ResourceFile, UserOptions);
 					ResourceFile->Seek(OldPos + TextureChunk.InternalSize, ZE_SF_BEGINING);
 					if (CurrentTextureResource == NULL)
-						zeWarning("Material Resource", "Can not load material internal texture. (Material FileName : \"%s\", Texture Index : %d)", ResourceFile->GetFilePath().GetValue(), I);
+						zeWarning("Can not load material internal texture. (Material FileName : \"%s\", Texture Index : %d)", ResourceFile->GetFilePath().GetValue(), I);
 				}
 				else
 				{
 					CurrentTextureResource = ZETexture2DResource::LoadSharedResource(TextureChunk.FileName, UserOptions);
 					if (CurrentTextureResource == NULL)
-						zeWarning("Material Resource", "Can not load material texture. (Material FileName : \"%s\", Texture Index : %d, Texture FileName : \"%s\"", ResourceFile->GetFilePath().GetValue(), I, TextureChunk.FileName);
+						zeWarning("Can not load material texture. (Material FileName : \"%s\", Texture Index : %d, Texture FileName : \"%s\"", ResourceFile->GetFilePath().GetValue(), I, TextureChunk.FileName);
 				}
 				break;
 
 			case ZE_TT_3D:
 				if (TextureChunk.InternalSize != 0)
 				{
-					zeWarning("Material Resource", "3D Textures is not supported in materials. (Material FileName : \"%s\", Texture Index : %d)", ResourceFile->GetFilePath().GetValue(), I);
+					zeWarning("3D Textures is not supported in materials. (Material FileName : \"%s\", Texture Index : %d)", ResourceFile->GetFilePath().GetValue(), I);
 					ResourceFile->Seek(TextureChunk.InternalSize, ZE_SF_CURRENT);
 				}
 				else
-					zeWarning("Material Resource", "3D Textures is not supported in materials. (Material FileName : \"%s\", Texture Index : %d, Texture FileName : \"%s\")", ResourceFile->GetFilePath().GetValue(), I);
+					zeWarning("3D Textures is not supported in materials. (Material FileName : \"%s\", Texture Index : %d, Texture FileName : \"%s\")", ResourceFile->GetFilePath().GetValue(), I);
 				break;
 
 			default:
-				zeError("Material Resource", "Wrong texture type. Corrupted ZEMaterial file. (Material FileName : \"%s\", Texture Index : %d)", ResourceFile->GetFilePath().GetValue(), I);
+				zeError("Wrong texture type. Corrupted ZEMaterial file. (Material FileName : \"%s\", Texture Index : %d)", ResourceFile->GetFilePath().GetValue(), I);
 				return false;
 				break;
 		}
@@ -189,7 +189,7 @@ bool ZEMaterialResource::LoadAnimations(ZEMaterialResource* MaterialResource, ZE
 	for (size_t I = 0; I < MaterialResource->Animations.GetCount(); I++)
 		if (!ZEAnimation::ReadFromFile(ResourceFile, &MaterialResource->Animations[I]))
 		{	
-			zeError("Material Resource", "Can not read material animation. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+			zeError("Can not read material animation. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 			return false;
 		}
 
@@ -207,13 +207,13 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(ZEFile* ResourceFile, const
 	ResourceFile->Read(&HeaderChunk, sizeof(ZEMaterialFileHeaderChunk), 1);
 	if (HeaderChunk.HEADER != ZE_MTLF_HEADER)
 	{
-		zeError("Material Resource", "Unknown ZEMaterial file format. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("Unknown ZEMaterial file format. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		return NULL;
 	}
 
 	if (HeaderChunk.Version != ZE_MTLF_VERSION)
 	{
-		zeError("Material Resource", "ZEMaterial file version mismatched. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("ZEMaterial file version mismatched. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		return NULL;
 	}
 	
@@ -223,7 +223,7 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(ZEFile* ResourceFile, const
 	MaterialResource->TextureResources.SetCount(HeaderChunk.TextureCount);
 	if (!LoadTextures(MaterialResource, ResourceFile, UserOptions))
 	{
-		zeError("Material File", "Corrupted material file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("Corrupted material file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		delete MaterialResource;
 		return NULL;
 	}
@@ -236,7 +236,7 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(ZEFile* ResourceFile, const
 	MaterialResource->Animations.SetCount(HeaderChunk.AnimationCount);
 	if (!LoadAnimations(MaterialResource, ResourceFile))
 	{
-		zeError("Material File", "Corrupted material file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("Corrupted material file. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		delete MaterialResource;
 		return NULL;
 	}
@@ -267,7 +267,7 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(const ZEString& FileName, c
 	}
 	else
 	{
-		zeError("Material Resource", "Material file not found. FilePath : \"%s\"", NewPath.GetValue());
+		zeError("Material file not found. FilePath : \"%s\"", NewPath.GetValue());
 		return NULL;
 	}
 }

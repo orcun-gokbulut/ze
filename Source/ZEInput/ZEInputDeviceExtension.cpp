@@ -34,10 +34,5 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInputDeviceExtension.h"
-#include "ZEInputDeviceExtensionDescription.h"
 
-ZEExtensionDescription* ZEInputDeviceExtension::ExtensionDescription()
-{
-	static ZEInputDeviceExtensionDescription Desc;
-	return &Desc;
-}
+ZE_EXTENSION_DESCRIPTION_ABSTRACT(ZEInputDeviceExtension, ZEExtension, NULL)

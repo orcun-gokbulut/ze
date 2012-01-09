@@ -51,7 +51,8 @@ enum ZESoundSourceType;
 #undef PlaySound
 class ZEALModule : public ZESoundModule
 {
-	friend class ZEALModuleDescription;
+	ZE_MODULE(ZEALModule)
+
 	friend class ZEALSoundListener;
 	friend class ZEALSoundSource;
 	friend class ZEALSoundSource3D;
@@ -82,8 +83,6 @@ class ZEALModule : public ZESoundModule
 		virtual								~ZEALModule();
 
 	public:
-		ZEModuleDescription*				GetModuleDescription();	
-
 		virtual const ZEArray<ZESoundDevice>&	GetDeviceList();
 
 		ALCdevice*							GetDevice();

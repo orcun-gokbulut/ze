@@ -39,7 +39,7 @@
 
 #include "ZED3D9ComponentBase.h"
 #include "ZEGraphics/ZEUIMaterial.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 
 class ZECamera;
 class ZED3D9UIMaterial : public ZEUIMaterial, public ZED3D9ComponentBase
@@ -56,7 +56,7 @@ class ZED3D9UIMaterial : public ZEUIMaterial, public ZED3D9ComponentBase
 		virtual							~ZED3D9UIMaterial();
 
 	public:
-		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
 		
 		virtual void					UpdateMaterial();
 

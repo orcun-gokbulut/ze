@@ -140,7 +140,7 @@ bool ZEClass::AddCustomProperty(ZERunTimeProperty Property)
 	{
 		if (GetProperty(Property.Name, ZEVariant()))
 		{
-			zeLog("Meta", "Property Already exists, Property name : %s", Property.Name);
+			zeLog("Property Already exists, Property name : %s", Property.Name);
 			return false;
 		}		
 	}
@@ -282,7 +282,7 @@ bool ZEClass::Serialize(ZESerializer* Serializer)
 			if (Properties[I].Access == (ZE_PA_READ | ZE_PA_WRITE))
 				if (!GetProperty(PropertyOffset + I, Value))
 				{
-					zeError("Class Serialize", "Class does not have specified property. (Class Type Name : \"%s\", Property Name : \"%s\")", GetClassDescription()->GetName(), Properties[I].Name);
+					zeError("Class does not have specified property. (Class Type Name : \"%s\", Property Name : \"%s\")", GetClassDescription()->GetName(), Properties[I].Name);
 					return false;
 				}
 
@@ -302,13 +302,13 @@ bool ZEClass::Unserialize(ZEUnserializer* Unserializer)
 	
 	if (ClassChunk.Header != ZE_CLSF_CLASS_CHUNKID)
 	{
-		zeError("Class Unserialize", "Corrupted file. Class chunk id does not have matches. (Class Type Name : \"%s\")", GetClassDescription()->GetName());
+		zeError("Corrupted file. Class chunk id does not have matches. (Class Type Name : \"%s\")", GetClassDescription()->GetName());
 		return false;
 	}
 
 	if (strncmp(ClassChunk.ClassType, GetClassDescription()->GetName(), ZE_MAX_NAME_SIZE) != 0)
 	{
-		zeError("Class Unserialize", "Class type does not matches. (Expected Class Type Name : \"%s\" Given Class Type Name : \"%s\")", GetClassDescription()->GetName(), ClassChunk.ClassType);
+		zeError("Class type does not matches. (Expected Class Type Name : \"%s\" Given Class Type Name : \"%s\")", GetClassDescription()->GetName(), ClassChunk.ClassType);
 		return false;
 	}
 
@@ -322,7 +322,7 @@ bool ZEClass::Unserialize(ZEUnserializer* Unserializer)
 
 		if (!SetProperty(PropertyName, Value))
 		{
-			zeError("Class Unserialize", "Class does not have specified property. (Class Type Name : \"%s\", Property Name : \"%s\")", GetClassDescription()->GetName(), PropertyName);
+			zeError("Class does not have specified property. (Class Type Name : \"%s\", Property Name : \"%s\")", GetClassDescription()->GetName(), PropertyName);
 			return false;
 		}
 	}

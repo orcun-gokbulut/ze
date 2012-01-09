@@ -38,7 +38,7 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEGraphics/ZETexture2DResource.h"
@@ -79,14 +79,14 @@ void ZEPresentationSlide::Draw(ZEDrawParameters* DrawParameters)
 {
 	if (VertexBuffer != NULL)
 	{
-		RenderOrder.Lights.SetCount(DrawParameters->Lights.GetCount());
+		RenderCommand.Lights.SetCount(DrawParameters->Lights.GetCount());
 		for (size_t I = 0; I < DrawParameters->Lights.GetCount(); I++)
-			RenderOrder.Lights[I] = DrawParameters->Lights[I];
+			RenderCommand.Lights[I] = DrawParameters->Lights[I];
 
-		RenderOrder.VertexBuffer = VertexBuffer;
-		RenderOrder.Material = Material;
-		RenderOrder.WorldMatrix = GetWorldTransform();
-		DrawParameters->Renderer->AddToRenderList(&RenderOrder);
+		RenderCommand.VertexBuffer = VertexBuffer;
+		RenderCommand.Material = Material;
+		RenderCommand.WorldMatrix = GetWorldTransform();
+		DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 	}
 }
 
@@ -155,11 +155,11 @@ ZEPresentationSlide::ZEPresentationSlide()
 	Texture = NULL;
 	Material = NULL;
 	
-	RenderOrder.SetZero();
-	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderOrder.PrimitiveCount = 2;
+	RenderCommand.SetZero();
+	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
+	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	RenderCommand.PrimitiveCount = 2;
 }
 
 ZEPresentationSlide::~ZEPresentationSlide()

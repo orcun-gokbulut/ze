@@ -35,8 +35,9 @@
 
 #include "ZEInputModule.h"
 #include "ZEInputDevice.h"
-#include "ZEInputModuleDescription.h"
 #include "ZECore/ZECore.h"
+
+ZE_MODULE_DESCRIPTION_ABSTRACT(ZEInputModule, ZEModule, NULL)
 
 ZEInputModule::ZEInputModule()
 {
@@ -49,17 +50,6 @@ void ZEInputModule::BaseInitialize()
 
 void ZEInputModule::BaseDeinitialize()
 {
-}
-
-ZEModuleDescription* ZEInputModule::GetModuleDescription()
-{
-	return ZEInputModule::ModuleDescription();
-}
-
-ZEModuleDescription* ZEInputModule::ModuleDescription()
-{
-	static ZEInputModuleDescription Desc;
-	return &Desc;
 }
 
 bool ZEInputModule::IsAcquired()

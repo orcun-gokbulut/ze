@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELight.h"
-#include "ZERenderOrder.h"
+#include "ZERenderCommand.h"
 #include "ZEGame/ZEEntity.h"
 
 ZEDWORD ZELight::GetDrawFlags() const

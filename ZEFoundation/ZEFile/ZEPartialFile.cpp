@@ -95,7 +95,7 @@ bool ZEPartialFile::Open(const ZEString FilePath, ZEFileMode Mode, bool Binary)
 
 	//if(!EndCursor || !StartCursor || EndCursor == StartCursor)
 	//{
-	//	zeError("Partial File", "Cannot resolve path: \"%s\".", FilePath.GetValue());
+	//	zeError("Cannot resolve path: \"%s\".", FilePath.GetValue());
 	//	return false;
 	//}
 
@@ -190,13 +190,13 @@ bool ZEPartialFile::Open(const ZEString FilePath, ZEFileMode Mode, bool Binary)
 	//		}
 	//		else
 	//		{
-	//			zeError("ZEFile", "Could not open file \"%s\".", PurePath.GetValue());
+	//			zeError("Could not open file \"%s\".", PurePath.GetValue());
 	//			return false;
 	//		}
 	//	}
 	//	else
 	//	{
-	//		zeError("ZEFile", "Could not open file \"%s\".", PurePath.GetValue());
+	//		zeError("Could not open file \"%s\".", PurePath.GetValue());
 	//		return false;
 	//	}
 	//}

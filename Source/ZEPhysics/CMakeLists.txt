@@ -57,8 +57,6 @@ ze_add_source(ZEPhysicalWorld.cpp				Sources)
 ze_add_source(ZEPhysicalWorld.h					Sources Headers)
 ze_add_source(ZEPhysicsModule.cpp				Sources)
 ze_add_source(ZEPhysicsModule.h					Sources Headers)
-ze_add_source(ZEPhysicsModuleDescription.cpp	Sources)
-ze_add_source(ZEPhysicsModuleDescription.h		Sources Headers)
 ze_add_source(ZEPhysicsDebugModule.cpp			Sources)
 ze_add_source(ZEPhysicsDebugModule.h	        Sources)
 

@@ -39,8 +39,6 @@ ze_add_source(ZEVRPNInputDevice.cpp							Sources)
 ze_add_source(ZEVRPNInputDevice.h							Sources)
 ze_add_source(ZEVRPNInputDeviceExtension.cpp				Sources)
 ze_add_source(ZEVRPNInputDeviceExtension.h					Sources)
-ze_add_source(ZEVRPNInputDeviceExtensionDescription.cpp		Sources)
-ze_add_source(ZEVRPNInputDeviceExtensionDescription.h		Sources)
 
 ze_add_library(ZEVRPNInput 
 	SOURCES ${Sources}

@@ -59,7 +59,7 @@ void ZESystemMessageManager::RegisterMessageHandler(ZESystemMessageHandler* Hand
 {
 	if (Handlers.Exists(Handler))
 	{
-		zeError("System Message Manager", "Handler is already added.");
+		zeError("Handler is already added.");
 		return;
 	}
 

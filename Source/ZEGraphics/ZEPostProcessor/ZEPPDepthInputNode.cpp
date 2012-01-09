@@ -71,19 +71,19 @@ bool ZEPPDepthInputNode::Process()
 {
 	if (Renderer == NULL)
 	{
-		zeError("Post Processor - Depth Input Node", "There is no renderer available.");
+		zeError("There is no renderer available.");
 		return false;
 	}
 
 	if (Renderer->GetRenderDepthTexture() == false)
 	{
-		zeError("Post Processor - Depth Input Node", "Current renderer does not enabled to provide color texture.");
+		zeError("Current renderer does not enabled to provide color texture.");
 		return false;
 	}
 
 	if (Renderer->GetDepthTexture() == NULL)
 	{
-		zeError("Post Processor - Depth Input Node", "Current renderer does provide color texture.");
+		zeError("Current renderer does provide color texture.");
 		return false;
 	}
 

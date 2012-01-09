@@ -40,17 +40,17 @@
 
 void ZEModelMeshLOD::ResetMaterial()
 {
-	RenderOrder.Material = Owner->GetModelResource()->Materials[LODResource->MaterialId];
+	RenderCommand.Material = Owner->GetModelResource()->Materials[LODResource->MaterialId];
 }
 
 void ZEModelMeshLOD::SetMaterial(const ZEMaterial* Material)
 {
-	RenderOrder.Material = Material;
+	RenderCommand.Material = Material;
 }
 
 const ZEMaterial* ZEModelMeshLOD::GetMaterial()
 {
-	return RenderOrder.Material;
+	return RenderCommand.Material;
 }
 
 bool ZEModelMeshLOD::IsSkinned()
@@ -65,18 +65,18 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DistanceSquare
 
 	if (Skinned)
 	{
-		RenderOrder.BoneTransforms.SetCount(LODResource->AffectingBoneIds.GetCount());
+		RenderCommand.BoneTransforms.SetCount(LODResource->AffectingBoneIds.GetCount());
 		for (size_t I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
-			ZEMatrix4x4::Multiply(RenderOrder.BoneTransforms[I], Owner->GetBones()[LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
+			ZEMatrix4x4::Multiply(RenderCommand.BoneTransforms[I], Owner->GetBones()[LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
 
-		RenderOrder.WorldMatrix = Owner->GetWorldTransform();
+		RenderCommand.WorldMatrix = Owner->GetWorldTransform();
 	}
 	else
-		RenderOrder.WorldMatrix = OwnerMesh->GetWorldTransform();
+		RenderCommand.WorldMatrix = OwnerMesh->GetWorldTransform();
 
-	RenderOrder.Order = DistanceSquare;
+	RenderCommand.Order = DistanceSquare;
 
-	DrawParameters->Renderer->AddToRenderList(&RenderOrder);
+	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }
 
 void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)
@@ -87,21 +87,21 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 
 	Skinned = LODResource->Vertices.GetCount() == 0 ? true : false;
 
-	RenderOrder.SetZero();
-	RenderOrder.Priority = 3;
-	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | (Skinned ? ZE_ROF_SKINNED : 0);
-	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderOrder.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
-	RenderOrder.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;
-	RenderOrder.VertexDeclaration = Skinned ? ZESkinnedModelVertex::GetVertexDeclaration() : ZEModelVertex::GetVertexDeclaration();
-	RenderOrder.Material = Owner->GetModelResource()->Materials[LODResource->MaterialId];
+	RenderCommand.SetZero();
+	RenderCommand.Priority = 3;
+	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | (Skinned ? ZE_ROF_SKINNED : 0);
+	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	RenderCommand.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
+	RenderCommand.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;
+	RenderCommand.VertexDeclaration = Skinned ? ZESkinnedModelVertex::GetVertexDeclaration() : ZEModelVertex::GetVertexDeclaration();
+	RenderCommand.Material = Owner->GetModelResource()->Materials[LODResource->MaterialId];
 }
 
 void ZEModelMeshLOD::Deinitialize()
 {
 	Owner = NULL;
 	OwnerMesh = NULL;
-	RenderOrder.SetZero();
+	RenderCommand.SetZero();
 	VertexBuffer = NULL;
 	LODResource = NULL;
 	Material = NULL;
@@ -113,7 +113,7 @@ ZEModelMeshLOD::ZEModelMeshLOD()
 	Skinned = false;
 	Owner = NULL;
 	OwnerMesh = NULL;
-	RenderOrder.SetZero();
+	RenderCommand.SetZero();
 	VertexBuffer = NULL;
 	LODResource = NULL;
 	Material = NULL;

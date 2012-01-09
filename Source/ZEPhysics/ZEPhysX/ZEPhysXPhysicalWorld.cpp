@@ -136,26 +136,26 @@ void ZEPhysXPhysicalWorld::InitializeDebugDraw()
 
 	DebugDraw.Material = ZESimpleMaterial::CreateInstance();
 
-	DebugDraw.PointsRenderOrder.SetZero();
-	DebugDraw.PointsRenderOrder.Material = DebugDraw.Material;
-	DebugDraw.PointsRenderOrder.PrimitiveType = ZE_ROPT_POINT;
-	DebugDraw.PointsRenderOrder.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
-	DebugDraw.PointsRenderOrder.VertexBuffer = &DebugDraw.PointsVertexBuffer;
-	DebugDraw.PointsRenderOrder.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
+	DebugDraw.PointsRenderCommand.SetZero();
+	DebugDraw.PointsRenderCommand.Material = DebugDraw.Material;
+	DebugDraw.PointsRenderCommand.PrimitiveType = ZE_ROPT_POINT;
+	DebugDraw.PointsRenderCommand.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
+	DebugDraw.PointsRenderCommand.VertexBuffer = &DebugDraw.PointsVertexBuffer;
+	DebugDraw.PointsRenderCommand.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
 
-	DebugDraw.LinesRenderOrder.SetZero();
-	DebugDraw.LinesRenderOrder.Material = DebugDraw.Material;
-	DebugDraw.LinesRenderOrder.PrimitiveType = ZE_ROPT_LINE;
-	DebugDraw.LinesRenderOrder.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
-	DebugDraw.LinesRenderOrder.VertexBuffer = &DebugDraw.LinesVertexBuffer;
-	DebugDraw.LinesRenderOrder.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
+	DebugDraw.LinesRenderCommand.SetZero();
+	DebugDraw.LinesRenderCommand.Material = DebugDraw.Material;
+	DebugDraw.LinesRenderCommand.PrimitiveType = ZE_ROPT_LINE;
+	DebugDraw.LinesRenderCommand.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
+	DebugDraw.LinesRenderCommand.VertexBuffer = &DebugDraw.LinesVertexBuffer;
+	DebugDraw.LinesRenderCommand.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
 
-	DebugDraw.TrianglesRenderOrder.SetZero();
-	DebugDraw.TrianglesRenderOrder.Material = DebugDraw.Material;
-	DebugDraw.TrianglesRenderOrder.PrimitiveType = ZE_ROPT_LINE;
-	DebugDraw.TrianglesRenderOrder.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
-	DebugDraw.TrianglesRenderOrder.VertexBuffer = &DebugDraw.TrianglesVertexBuffer;
-	DebugDraw.TrianglesRenderOrder.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
+	DebugDraw.TrianglesRenderCommand.SetZero();
+	DebugDraw.TrianglesRenderCommand.Material = DebugDraw.Material;
+	DebugDraw.TrianglesRenderCommand.PrimitiveType = ZE_ROPT_LINE;
+	DebugDraw.TrianglesRenderCommand.Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
+	DebugDraw.TrianglesRenderCommand.VertexBuffer = &DebugDraw.TrianglesVertexBuffer;
+	DebugDraw.TrianglesRenderCommand.VertexDeclaration = ZEColoredVertex::GetVertexDeclaration();
 }
 
 
@@ -225,7 +225,7 @@ bool ZEPhysXPhysicalWorld::Initialize()
 	Scene = GetPhysicsSDK()->createScene(SceneDesc);
 	if (Scene == NULL) 
 	{
-		zeError("PhysX Physical World", "Can not create scene.");
+		zeError("Can not create scene.");
 		return false;
 	}
 
@@ -269,35 +269,35 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 
 	const NxDebugRenderable* DebugRenderable = Scene->getDebugRenderable();
 
-	DebugDraw.PointsRenderOrder.PrimitiveCount = DebugRenderable->getNbPoints();
-	DebugDraw.PointsVertexBuffer.SetCount(DebugDraw.PointsRenderOrder.PrimitiveCount);
+	DebugDraw.PointsRenderCommand.PrimitiveCount = DebugRenderable->getNbPoints();
+	DebugDraw.PointsVertexBuffer.SetCount(DebugDraw.PointsRenderCommand.PrimitiveCount);
 	const NxDebugPoint* DebugPoints = DebugRenderable->getPoints();
-	for (size_t I = 0; I < DebugDraw.PointsRenderOrder.PrimitiveCount; I++)
+	for (size_t I = 0; I < DebugDraw.PointsRenderCommand.PrimitiveCount; I++)
 	{
 		DebugDraw.PointsVertexBuffer[I].Position = NX_TO_ZE(DebugPoints[I].p);
 		DebugDraw.PointsVertexBuffer[I].Color = NX_TO_ZE(DebugPoints[I].color);
 	}
-	if (DebugDraw.PointsRenderOrder.PrimitiveCount != 0)
-		Renderer->AddToRenderList(&DebugDraw.PointsRenderOrder);
+	if (DebugDraw.PointsRenderCommand.PrimitiveCount != 0)
+		Renderer->AddToRenderList(&DebugDraw.PointsRenderCommand);
 
 
-	DebugDraw.LinesRenderOrder.PrimitiveCount = DebugRenderable->getNbLines();
-	DebugDraw.LinesVertexBuffer.SetCount(DebugDraw.LinesRenderOrder.PrimitiveCount * 2);
+	DebugDraw.LinesRenderCommand.PrimitiveCount = DebugRenderable->getNbLines();
+	DebugDraw.LinesVertexBuffer.SetCount(DebugDraw.LinesRenderCommand.PrimitiveCount * 2);
 	const NxDebugLine* DebugLines = DebugRenderable->getLines();
-	for (size_t I = 0; I < DebugDraw.LinesRenderOrder.PrimitiveCount; I++)
+	for (size_t I = 0; I < DebugDraw.LinesRenderCommand.PrimitiveCount; I++)
 	{
 		DebugDraw.LinesVertexBuffer[2 * I].Position = NX_TO_ZE(DebugLines[I].p0);
 		DebugDraw.LinesVertexBuffer[2 * I].Color = NX_TO_ZE(DebugLines[I].color);
 		DebugDraw.LinesVertexBuffer[2 * I + 1].Position = NX_TO_ZE(DebugLines[I].p1);
 		DebugDraw.LinesVertexBuffer[2 * I + 1].Color = NX_TO_ZE(DebugLines[I].color);
 	}
-	if (DebugDraw.LinesRenderOrder.PrimitiveCount != 0)
-		Renderer->AddToRenderList(&DebugDraw.LinesRenderOrder);
+	if (DebugDraw.LinesRenderCommand.PrimitiveCount != 0)
+		Renderer->AddToRenderList(&DebugDraw.LinesRenderCommand);
 
-	DebugDraw.TrianglesRenderOrder.PrimitiveCount = DebugRenderable->getNbTriangles();
-	DebugDraw.TrianglesVertexBuffer.SetCount(DebugDraw.TrianglesRenderOrder.PrimitiveCount * 3);
+	DebugDraw.TrianglesRenderCommand.PrimitiveCount = DebugRenderable->getNbTriangles();
+	DebugDraw.TrianglesVertexBuffer.SetCount(DebugDraw.TrianglesRenderCommand.PrimitiveCount * 3);
 	const NxDebugTriangle* DebugTriangles = DebugRenderable->getTriangles();
-	for (size_t I = 0; I < DebugDraw.TrianglesRenderOrder.PrimitiveCount; I++)
+	for (size_t I = 0; I < DebugDraw.TrianglesRenderCommand.PrimitiveCount; I++)
 	{
 		DebugDraw.TrianglesVertexBuffer[3 * I].Position = NX_TO_ZE(DebugTriangles[I].p0);
 		DebugDraw.TrianglesVertexBuffer[3 * I].Color = NX_TO_ZE(DebugTriangles[I].color);
@@ -306,8 +306,8 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 		DebugDraw.TrianglesVertexBuffer[3 * I + 2].Position = NX_TO_ZE(DebugTriangles[I].p2);
 		DebugDraw.TrianglesVertexBuffer[3 * I + 2].Color = NX_TO_ZE(DebugTriangles[I].color);
 	}
-	if (DebugDraw.TrianglesRenderOrder.PrimitiveCount != 0)
-		Renderer->AddToRenderList(&DebugDraw.TrianglesRenderOrder);
+	if (DebugDraw.TrianglesRenderCommand.PrimitiveCount != 0)
+		Renderer->AddToRenderList(&DebugDraw.TrianglesRenderCommand);
 }
 
 

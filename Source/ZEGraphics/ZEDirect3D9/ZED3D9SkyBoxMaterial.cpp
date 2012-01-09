@@ -40,7 +40,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9SkyBoxMaterial.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 
 
 #include <D3D9.h>
@@ -71,7 +71,7 @@ void ZED3D9SkyBoxMaterial::ReleaseShaders()
 	ZED3D_RELEASE(PixelShader);
 }
 
-bool ZED3D9SkyBoxMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const 
+bool ZED3D9SkyBoxMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const 
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9SkyBoxMaterial*)this)->UpdateMaterial();
@@ -80,12 +80,12 @@ bool ZED3D9SkyBoxMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderO
 
 	// Setup Transformations
 	ZEMatrix4x4 WorldViewProjMatrix;
-	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Camera->GetViewProjectionTransform(), RenderOrder->WorldMatrix);
+	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Camera->GetViewProjectionTransform(), RenderCommand->WorldMatrix);
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
 
 	/*ZEMatrix4x4 WorldViewMatrix;
-	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Camera->GetViewProjectionTransform(), RenderOrder->WorldMatrix);
-	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);*/
+	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Camera->GetViewProjectionTransform(), RenderCommand->WorldMatrix);
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderCommand->WorldMatrix, 4);*/
 
 	// ZBuffer
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);

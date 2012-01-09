@@ -67,7 +67,7 @@ bool ZEWMIKSH::Callback(MSG* Message)
 			UINT InputSize = sizeof(RAWINPUT);
 			if (GetRawInputData((HRAWINPUT)Message->lParam, RID_INPUT, &Input, &InputSize, sizeof(RAWINPUTHEADER)) == (UINT)-1)
 			{
-				zeError("WindowsInput", "Can not read raw input data.");
+				zeError("Can not read raw input data.");
 				return false;
 			}
 			
@@ -192,7 +192,7 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 			if ((InputBinding->Event.ButtonState == ZE_IBS_PRESSED && ButtonStateOld[ButtonIndex] == false && ButtonState[ButtonIndex] == true) ||
 				(InputBinding->Event.ButtonState == ZE_IBS_PRESSING && ButtonState[ButtonIndex] == true))
 			{
-				zeLog("xxx", "bla");
+				zeLog("bla");
 				InputAction->Id = InputBinding->ActionId;
 				InputAction->ButtonState = ZE_IBS_PRESSED;
 				InputAction->From = InputBinding;
@@ -200,7 +200,7 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 			}
 			else if (InputBinding->Event.ButtonState == ZE_IBS_RELEASED && ButtonStateOld[ButtonIndex] == true && ButtonState[ButtonIndex] == false)
 			{
-				zeLog("xxx", "blb");
+				zeLog("blb");
 				InputAction->Id = InputBinding->ActionId;
 				InputAction->ButtonState = ZE_IBS_RELEASED;
 				InputAction->From = InputBinding;

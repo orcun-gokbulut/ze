@@ -42,15 +42,16 @@ class ZEBase
 	private:
 		bool				Initialized;
 
+	protected:
+							ZEBase();
+		virtual				~ZEBase();
+
 	public:
 		bool				IsInitialized() const;
 		virtual bool		Initialize();
 		virtual void		Deinitialize();
 
 		virtual void		Destroy();
-
-							ZEBase();
-		virtual				~ZEBase();
 };
 
 #endif

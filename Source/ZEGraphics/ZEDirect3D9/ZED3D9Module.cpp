@@ -32,14 +32,12 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#ifdef ZE_DEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLE
 #define D3D_DEBUG_INFO
 #endif
 
 #include "ZEError.h"
 #include "ZED3D9Module.h"
-#include "ZED3D9CommonTools.h"
-#include "ZED3D9ModuleDescription.h"
 #include "ZECore/ZEWindow.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEOptionManager.h"
@@ -54,9 +52,9 @@
 #include "ZED3D9UIMaterial.h"
 #include "ZED3D9SimpleMaterial.h"
 #include "ZED3D9SkyBoxMaterial.h"
-#include "ZED3D9Common.h"
 #include "ZED3D9ShaderManager.h"
 #include "ZED3D9TerrainMaterial.h"
+#include "ZED3D9CommonTools.h"
 
 #include <d3dx9.h>
 
@@ -67,16 +65,7 @@ D3DPRESENT_PARAMETERS D3DPP;
 
 #pragma warning(disable:4267)
 
-ZEModuleDescription* ZED3D9Module::ModuleDescription()
-{
-	static ZED3D9ModuleDescription Desc;
-	return &Desc;
-}
-
-ZEModuleDescription* ZED3D9Module::GetModuleDescription()
-{
-	return ZED3D9Module::ModuleDescription();
-}
+ZE_MODULE_DESCRIPTION(ZED3D9Module, ZEGraphicsModule, NULL)
 
 LPDIRECT3D9 ZED3D9Module::GetDirect3D()
 {
@@ -120,7 +109,7 @@ void ZED3D9Module::SetEnabled(bool Enabled)
 
 bool ZED3D9Module::Initialize()
 {
-	zeLog("Direct3D9", "Initializing Direct3D 9 module.");
+	zeLog("Initializing Direct3D 9 module.");
 
 	// Read options
 	ScreenWidth = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInteger();
@@ -158,7 +147,7 @@ bool ZED3D9Module::Initialize()
 	D3D = Direct3DCreate9(D3D_SDK_VERSION);
 	if (!D3D)
 	{
-		zeCriticalError("Direct3D9", "Can not create Direct3D.");
+		zeCriticalError("Can not create Direct3D.");
 		Destroy();
 		return false;
 	}
@@ -166,7 +155,7 @@ bool ZED3D9Module::Initialize()
 	// Check device type;
 	if (FAILED(D3D->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DFMT_X8R8G8B8, Fullscreen)))
 	{
-		zeCriticalError("Direct3D9", "Device does not support Device Type.");
+		zeCriticalError("Device does not support Device Type.");
 		Destroy();
 		return false;
 	}
@@ -194,14 +183,14 @@ bool ZED3D9Module::Initialize()
 	Result = D3D->CreateDevice(AdapterToUse, DeviceType, (HWND)zeWindow->GetHandle(), D3DCREATE_HARDWARE_VERTEXPROCESSING, &D3DPP, &Device);
 	if(FAILED(Result))
 	{
-		zeCriticalError("Direct3D9", "Can not create Direct3D Device.");
+		zeCriticalError("Can not create Direct3D Device.");
 		Destroy();
 		return false;
 	}
 
 	D3D9Device = Device;
 
-	zeLog("Direct3D9", "Device Created.");
+	zeLog("Device Created.");
 
 	// Check hardware capabilities
 	D3D->GetDeviceCaps(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, &DeviceCaps);
@@ -209,16 +198,16 @@ bool ZED3D9Module::Initialize()
 	// Check vertex shader versions.
 	PipelineType = ZE_D3D9_PT_PROGRAMABLE;
 
-	zeLog("Direct3D9", "Vertex Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.VertexShaderVersion));
+	zeLog("Vertex Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.VertexShaderVersion));
 	switch(D3DSHADER_VERSION_MAJOR(DeviceCaps.VertexShaderVersion))
 	{
 		case 1:
-			zeWarning("Direct3D9", "Vertex shader model 1.x is not supported.");
+			zeWarning("Vertex shader model 1.x is not supported.");
 			break;
 		case 2:
 			if (D3DXGetVertexShaderProfile(Device) == "vs_2_a")
 			{
-				zeLog("Direct3D9", "Vertex shader profile 2.0a found.");
+				zeLog("Vertex shader profile 2.0a found.");
 				VertexShaderVersion = ZE_D3D9_VSV_2_0_A;
 			}
 			else
@@ -228,27 +217,27 @@ bool ZED3D9Module::Initialize()
 			VertexShaderVersion = ZE_D3D9_VSV_3_0_0;
 			break;
 		default:
-			zeWarning("Direct3D9", "No pixel shader support present.");
+			zeWarning("No pixel shader support present.");
 			VertexShaderVersion = ZE_D3D9_VSV_NONE;
 			break;
 	};
 
 	// Check pixel shader version
-	zeLog("Direct3D9", "Pixel Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.PixelShaderVersion));
+	zeLog("Pixel Shader Version : %d.%d.", D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion), D3DSHADER_VERSION_MINOR(DeviceCaps.PixelShaderVersion));
 	switch(D3DSHADER_VERSION_MAJOR(DeviceCaps.PixelShaderVersion))
 	{
 		case 1:
-			zeWarning("Direct3D9", "Pixel shader model 1.x is not supported.");
+			zeWarning("Pixel shader model 1.x is not supported.");
 			break;
 		case 2:
 			if (D3DXGetPixelShaderProfile(Device) == "ps_2_a")
 			{
-				zeLog("Direct3D9", "Pixel shader profile 2.0a found.");
+				zeLog("Pixel shader profile 2.0a found.");
 				PixelShaderVersion = ZE_D3D9_PSV_2_0_A;
 			}
 			else if (D3DXGetPixelShaderProfile(Device) == "ps_2_b")
 			{
-				zeLog("Direct3D9", "Pixel shader profile 2.0a found.");
+				zeLog("Pixel shader profile 2.0a found.");
 				PixelShaderVersion = ZE_D3D9_PSV_2_0_A;
 			}
 			else
@@ -258,7 +247,7 @@ bool ZED3D9Module::Initialize()
 			PixelShaderVersion = ZE_D3D9_PSV_3_0_0;
 			break;
 		default:
-			zeWarning("Direct3D9", "No pixel shader support present.");
+			zeWarning("No pixel shader support present.");
 			PixelShaderVersion = ZE_D3D9_PSV_NONE;
 			break;
 	};
@@ -270,15 +259,15 @@ bool ZED3D9Module::Initialize()
 	// If falled back to fixed pipeline give warning to the user
 	if (PipelineType == ZE_D3D9_PT_FIXED_FUNCTION)
 	{
-		zeWarning("Direct3D9", "Programable shaders are not supported. Falling back to fixed pipeline.");
-		zeWarning("Direct3D9", "Fixed pipeline does not have necessery capabilities to render most of the visual so visual quality will be disimprove dramatically.");
+		zeWarning("Programable shaders are not supported. Falling back to fixed pipeline.");
+		zeWarning("Fixed pipeline does not have necessery capabilities to render most of the visual so visual quality will be disimprove dramatically.");
 	}
 
 	// Get screen's back buffer
 	Result = Device->GetBackBuffer(0, 0,D3DBACKBUFFER_TYPE_MONO, &FrameBufferViewPort.FrameBuffer);
 	if(FAILED(Result)) 
 	{
-		zeCriticalError("Direct3D9", "Can not create Direct3D Backbuffer.");
+		zeCriticalError("Can not create Direct3D Backbuffer.");
 		Destroy();
 		return false;
 	}
@@ -287,7 +276,7 @@ bool ZED3D9Module::Initialize()
 	Result = Device->GetDepthStencilSurface(&FrameBufferViewPort.ZBuffer);
 	if(FAILED(Result))
 	{
-		zeCriticalError("Direct3D9", "Can not create Direct3D Backbuffer.");
+		zeCriticalError("Can not create Direct3D Backbuffer.");
 		Destroy();
 		return false;
 	}
@@ -297,7 +286,7 @@ bool ZED3D9Module::Initialize()
 	// Initialize component base
 	if (!ZED3D9ComponentBase::BaseInitialize(this))
 	{
-		zeCriticalError("Direct3D9", "Can not initialize D3D9 component base.");
+		zeCriticalError("Can not initialize D3D9 component base.");
 		return false;
 	}
 
@@ -308,7 +297,7 @@ bool ZED3D9Module::Initialize()
 
 void ZED3D9Module::Deinitialize()
 {
-	zeLog("Direct3D9", "Destroying Direct3D.\r\n");
+	zeLog("Destroying Direct3D.\r\n");
 
 	D3D9Device = NULL;
 	D3D9Module = NULL;
@@ -403,14 +392,14 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 		DeviceState = Device->TestCooperativeLevel();
 
 		if (DeviceState == D3DERR_DRIVERINTERNALERROR)
-			zeCriticalError("Direct3D9", "Can not restore Direct3D Device. Internal driver error.");
+			zeCriticalError("Can not restore Direct3D Device. Internal driver error.");
 
 		if (DeviceState == D3DERR_DEVICENOTRESET || ForceReset)
 		{
 			HRESULT hr =Device->Reset(&D3DPP);
 			if (hr == D3D_OK)
 			{
-				zeLog("Direct3D9", "Direct3D Device Restored.");
+				zeLog("Direct3D Device Restored.");
 				break;
 			}
 			else if (hr == D3DERR_DEVICELOST)
@@ -419,7 +408,7 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 				continue;
 			}
 			else
-				zeCriticalError("Direct3D9", "Can not restore Direct3D Device.");
+				zeCriticalError("Can not restore Direct3D Device.");
 		}
 	}
 	while (DeviceState == D3DERR_DEVICELOST);
@@ -630,13 +619,13 @@ ZESkyBoxMaterial* ZED3D9Module::CreateSkyBoxMaterial()
 
 ZEFixedMaterial* ZED3D9Module::CreateCustomMaterial()
 {
-	zeError("Direct3D9 Module", "Custom Materials are not implamented.");
+	zeError("Custom Materials are not implamented.");
 	return NULL;
 }
 
 ZEFixedMaterial* ZED3D9Module::CreateCGFXMaterial()
 {
-	zeError("Direct3D9 Module", "CGFX Materials are not implamented.");
+	zeError("CGFX Materials are not implamented.");
 	return NULL;
 }
 

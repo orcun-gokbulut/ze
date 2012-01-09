@@ -63,8 +63,8 @@ class ZED3D9TerrainMaterial : public ZETerrainMaterial, private ZED3D9ComponentB
 		virtual							~ZED3D9TerrainMaterial();
 
 	public:
-		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
-		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const;
+		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
+		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
 		virtual bool					SetupShadowPass() const;	
 
 		virtual void					UpdateMaterial();

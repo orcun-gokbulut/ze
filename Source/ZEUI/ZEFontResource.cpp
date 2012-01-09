@@ -159,14 +159,14 @@ ZEFontResource* ZEFontResource::LoadResource(const ZEString& FilePath, const ZET
 	}
 	else
 	{
-		zeError("TextureResource", "Texture file not found. FilePath : \"%s\"", FilePath.GetValue());
+		zeError("Texture file not found. FilePath : \"%s\"", FilePath.GetValue());
 		return NULL;
 	}
 }
 
 ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions)
 {
-	zeLog("Font Resource", "Loading font file \"%s\".", ResourceFile->GetFilePath().GetValue());
+	zeLog("Loading font file \"%s\".", ResourceFile->GetFilePath().GetValue());
 
 	if(UserOptions == NULL)
 		UserOptions = zeGraphics->GetTextureOptions();
@@ -183,7 +183,7 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 	ResourceFile->Read(&FileHeader, sizeof(ZEFontFileHeader), 1);
 	if (FileHeader.Header != ZE_FONT_FILE_HEADER)
 	{
-		zeError("Font Resource", "Unknown ZEFont file format. (FilePath : \"%s\")", ResourceFile->GetFilePath().GetValue());
+		zeError("Unknown ZEFont file format. (FilePath : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		return NULL;
 	}
 
@@ -204,7 +204,7 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 		ZETexture2DResource* CurrentTexture = ZETexture2DResource::LoadResource((ZEFile*)&TextureResourceFile, &ModifiedOptions);
 		if (CurrentTexture == NULL)
 		{
-			zeError("Font Resource", "Can not read texture from the file. (FilePath : \"%s\", Texture Index : %d)", ResourceFile->GetFilePath().GetValue(), I);
+			zeError("Can not read texture from the file. (FilePath : \"%s\", Texture Index : %d)", ResourceFile->GetFilePath().GetValue(), I);
 			TextureResourceFile.Close();
 			delete NewResource;
 			return NULL;
@@ -227,7 +227,7 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 		NewResource->Characters[I].Material = NewResource->Materials[FileHeader.Characters[I].TextureId];
 	}
 
-	zeLog("Font Resource", "Font file \"%s\" has been loaded.", ResourceFile->GetFilePath().GetValue());
+	zeLog("Font file \"%s\" has been loaded.", ResourceFile->GetFilePath().GetValue());
 
 	return NewResource;
 }

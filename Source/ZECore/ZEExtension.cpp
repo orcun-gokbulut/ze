@@ -34,40 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEExtension.h"
-#include "ZEExtensionDescription.h"
 
-
-ZEExtensionDescription* ZEExtension::ExtensionDescription()
+ZEExtensionDescription* ZEExtension::Description()
 {
 	return 0;
-}
-
-ZEExtension::ZEExtension()
-{
-	Initialized =false;
-}
-
-ZEExtension::~ZEExtension()
-{
-	Deinitialize();
-}
-
-bool ZEExtension::IsInitialized() const
-{
-	return Initialized;
-}
-bool ZEExtension::Initialize()
-{
-	Initialized = true;
-	return true;
-}
-
-void ZEExtension::Deinitialize()
-{
-	Initialized = false;
-}
-
-void ZEExtension::Destroy()
-{
-	delete this;
 }

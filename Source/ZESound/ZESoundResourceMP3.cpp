@@ -136,7 +136,7 @@ void ZESoundResourceMP3::Decode(void* Buffer, size_t SampleIndex, size_t Count)
 		Result = mpg123_read(mpg123, (unsigned char*)Buffer, Count * BlockAlign - Position, &BytesRead);
 		if (Result != MPG123_OK && Result != MPG123_DONE && Result != MPG123_NEED_MORE)
 		{
-			zeError("Sound Resource MP3", "Error decoding mp3. (FileName : \"%s\", Error Code : %d)", GetFileName(), Result);
+			zeError("Error decoding mp3. (FileName : \"%s\", Error Code : %d)", GetFileName(), Result);
 			return;
 		}
 		Position += BytesRead;
@@ -160,7 +160,7 @@ ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 	ZEFile* File = ZEFile::Open(NewPath);
 	if(File == NULL || !File->IsOpen())
 	{
-		zeError("Sound Resource MP3", "Can not open ogg file. (FileName : \"%s\")", NewPath);
+		zeError("Can not open ogg file. (FileName : \"%s\")", NewPath);
 		return NULL;
 	}
 
@@ -180,7 +180,7 @@ ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 	NewResource->mpg123 = mpg123_new(NULL, NULL);
 	if (NewResource->mpg123 == NULL)
 	{
-		zeError("Sound Resource MP3", "Can not create MP3 handle. (FileName : \"%s\")", NewPath);
+		zeError("Can not create MP3 handle. (FileName : \"%s\")", NewPath);
 		return NULL;
 	}
 	
@@ -205,7 +205,7 @@ ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 			NewResource->BitsPerSample = 32;
 			break;
 		default:
-			zeError("Sound Source MP3", "Unsupported encoding. Only 8bit, 16bit and 32bit unsigned integer encoding supported. (Filename : \"%s\")", NewResource->GetFileName());
+			zeError("Unsupported encoding. Only 8bit, 16bit and 32bit unsigned integer encoding supported. (Filename : \"%s\")", NewResource->GetFileName());
 			delete NewResource;
 			return NULL;
 	}*/

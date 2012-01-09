@@ -122,7 +122,7 @@ ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const ZEString& Fil
 		}
 		else
 		{
-			zeError("Texture Resource", "Texture file not found. File Path : \"%s\"", NewPath.GetValue());
+			zeError("Texture file not found. File Path : \"%s\"", NewPath.GetValue());
 			return NULL;
 		}
 	}
@@ -171,7 +171,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName,
 	}
 	else
 	{
-		zeError("Texture Resource", "Texture file not found. File Path : \"%s\"", NewPath.GetValue());
+		zeError("Texture file not found. File Path : \"%s\"", NewPath.GetValue());
 		return NULL;
 	}
 }
@@ -244,7 +244,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 
 	if(TextureData.IsEmpty())
 	{
-		zeError("Texture2D Resource", "Cannot load because of an unknown error: \"%s\".", ResourceFile->GetFilePath().GetValue());
+		zeError("Cannot load because of an unknown error: \"%s\".", ResourceFile->GetFilePath().GetValue());
 		TextureData.DestroyTexture();
 		return NULL;
 	}
@@ -252,7 +252,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	// Process the data
 	if(Process)
 	{
-		zeLog("Texture2D Resource", "Processing texture \"%s\".", ResourceFile->GetFilePath().GetValue());
+		zeLog("Processing texture \"%s\".", ResourceFile->GetFilePath().GetValue());
 		if (!ZETextureQualityManager::Process(&TextureData, &FinalOptions))
 		{
 			zeAssert(true, "Cannot process texture: \"%s\".", ResourceFile->GetFilePath().GetValue());
@@ -293,7 +293,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	// Create the Texture
 	if(!Texture->Create(TextureData.GetWidth(), TextureData.GetHeight(), TextureData.GetPixelFormat(), false, TextureData.GetMipmapCount()))
 	{
-		zeError("Texture2D Resource", "Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFilePath().GetValue());
+		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFilePath().GetValue());
 		TextureData.DestroyTexture();
 		delete TextureResource;
 		return NULL;

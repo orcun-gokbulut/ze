@@ -130,7 +130,7 @@ ZEPhysicalJointState ZEPhysXPhysicalJoint::GetJointState() const
 	switch (Joint->getState())
 	{
 	default:
-		zeError("ZEPhysX", "ZEPhysicalJointState is not valid");
+		zeError("ZEPhysicalJointState is not valid");
 
 		case NX_JS_UNBOUND:
 			return ZE_PJS_UNBOUND;
@@ -1187,7 +1187,7 @@ bool ZEPhysXPhysicalJoint::Initialize()
 	Joint = (NxD6Joint*)Scene->createJoint(JointDesc);
 	if(Joint == NULL)
 	{
-		zeError("PhysX Physical Joint", "Can not create joint.");
+		zeError("Can not create joint.");
 		return false;
 	}
 

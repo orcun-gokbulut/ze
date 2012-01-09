@@ -38,7 +38,7 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 
 ZEDWORD ZECanvasBrush::GetDrawFlags() const
@@ -48,8 +48,8 @@ ZEDWORD ZECanvasBrush::GetDrawFlags() const
 
 void ZECanvasBrush::UpdateCanvas()
 {
-	if (RenderOrder.VertexBuffer != NULL)
-		delete RenderOrder.VertexBuffer;
+	if (RenderCommand.VertexBuffer != NULL)
+		delete RenderCommand.VertexBuffer;
 	
 	if (!Canvas.IsEmpty())
 	{
@@ -61,7 +61,7 @@ void ZECanvasBrush::UpdateCanvas()
 			OldVertexCount = Canvas.Vertices.GetCount();
 			VertexBuffer->Release();
 			if (!VertexBuffer->Create(Canvas.GetBufferSize()))
-				zeCriticalError("Canvas Brush", "Can not create Static Vertex Buffer.");
+				zeCriticalError("Can not create Static Vertex Buffer.");
 		}
 		
 		void* Buffer = VertexBuffer->Lock();
@@ -71,41 +71,41 @@ void ZECanvasBrush::UpdateCanvas()
 		ZEAABBox BoundingBox;
 		Canvas.CalculateBoundingBox(BoundingBox);
 		SetLocalBoundingBox(BoundingBox);
-		RenderOrder.VertexBuffer = Canvas.CreateStaticVertexBuffer();
+		RenderCommand.VertexBuffer = Canvas.CreateStaticVertexBuffer();
 	}
 }
 
 void ZECanvasBrush::Draw(ZEDrawParameters* DrawParameters)
 {
-	if (RenderOrder.VertexBuffer != NULL)
+	if (RenderCommand.VertexBuffer != NULL)
 	{
-		RenderOrder.Lights.SetCount(DrawParameters->Lights.GetCount());
+		RenderCommand.Lights.SetCount(DrawParameters->Lights.GetCount());
 		for (size_t I = 0; I < DrawParameters->Lights.GetCount(); I++)
-			RenderOrder.Lights[I] = DrawParameters->Lights[I];
+			RenderCommand.Lights[I] = DrawParameters->Lights[I];
 
 		switch(PrimitiveType)
 		{
 			case ZE_ROPT_POINT:
-				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount();
+				RenderCommand.PrimitiveCount = Canvas.Vertices.GetCount();
 				break;			
 			case ZE_ROPT_LINE:
-				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
+				RenderCommand.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
 				break;			
 			case ZE_ROPT_TRIANGLE:
-				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
+				RenderCommand.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
 				break;			
 			case ZE_ROPT_TRIANGLE_STRIPT:
-				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() - 2;
+				RenderCommand.PrimitiveCount = Canvas.Vertices.GetCount() - 2;
 				break;			
 			default:
-				RenderOrder.PrimitiveCount = 0;
+				RenderCommand.PrimitiveCount = 0;
 				break;
 		}
 
-		RenderOrder.Material = Material;
-		RenderOrder.PrimitiveType = PrimitiveType;
-		RenderOrder.WorldMatrix = GetWorldTransform();
-		DrawParameters->Renderer->AddToRenderList(&RenderOrder);
+		RenderCommand.Material = Material;
+		RenderCommand.PrimitiveType = PrimitiveType;
+		RenderCommand.WorldMatrix = GetWorldTransform();
+		DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 	}
 }
 
@@ -127,20 +127,20 @@ ZECanvasBrush::ZECanvasBrush()
 {
 	VertexBuffer = NULL;
 	OldVertexCount = 0;
-	RenderOrder.SetZero();
+	RenderCommand.SetZero();
 	Material = NULL;
 	PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	RenderOrder.Material = Material;
+	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
+	RenderCommand.Material = Material;
 }
 
 ZECanvasBrush::~ZECanvasBrush()
 {
 	if (Material != NULL)
 		Material->Release();
-	if (RenderOrder.VertexBuffer != NULL)
-		((ZEStaticVertexBuffer*)RenderOrder.VertexBuffer)->Release();
+	if (RenderCommand.VertexBuffer != NULL)
+		((ZEStaticVertexBuffer*)RenderCommand.VertexBuffer)->Release();
 }
 
 ZECanvasBrush* ZECanvasBrush::CreateInstance()

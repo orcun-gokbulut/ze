@@ -40,7 +40,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9SimpleMaterial.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 
 #include <D3D9.h>
 
@@ -70,7 +70,7 @@ void ZED3D9SimpleMaterial::ReleaseShaders()
 	ZED3D_RELEASE(PixelShader);
 }
 
-bool ZED3D9SimpleMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const 
+bool ZED3D9SimpleMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const 
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9SimpleMaterial*)this)->UpdateMaterial();
@@ -79,30 +79,30 @@ bool ZED3D9SimpleMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderO
 
 	// Setup Transformations
 	ZEMatrix4x4 ViewProjMatrix;
-	if ((RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	if ((RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 		ViewProjMatrix = Camera->GetViewProjectionTransform();
-	else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
 		ViewProjMatrix = Camera->GetViewTransform();
-	else if (RenderOrder->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+	else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
 		ViewProjMatrix = Camera->GetProjectionTransform();
 	else
 		ViewProjMatrix = ZEMatrix4x4::Identity;
 
 	ZEMatrix4x4 WorldViewProjMatrix;
 	ZEMatrix4x4 WorldViewMatrix;
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
-		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderOrder->WorldMatrix);
+	if (RenderCommand->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+		ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
 	else
 		WorldViewProjMatrix = ViewProjMatrix;
 
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
 
 
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
+	if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-		if (RenderOrder->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
+		if (RenderCommand->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
 			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 		else
 			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
@@ -111,11 +111,11 @@ bool ZED3D9SimpleMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderO
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 	
 	// Setup ZCulling
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
+	if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-		if (RenderOrder->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
+		if (RenderCommand->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
 			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 		else
 			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);

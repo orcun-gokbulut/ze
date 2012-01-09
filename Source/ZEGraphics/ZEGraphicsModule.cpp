@@ -33,29 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #include "ZEGraphicsModule.h"
-#include "ZEGraphicsModuleDescription.h"
 #include "ZECore/ZEOptionManager.h"
 #include "ZECore/ZEOption.h"
 #include "ZECore/ZECore.h"
 #include "ZERealTimeTextureCompressor.h"
+#include "ZETexture2DResource.h"
 
 #include <freeimage.h>
-#include "ZETexture2DResource.h"
 
 ZEOptionSection ZEGraphicsModule::GraphicsOptions;
 
-ZEModuleDescription* ZEGraphicsModule::ModuleDescription()
-{
-	static ZEGraphicsModuleDescription Desc;
-	return &Desc;
-}
-
-ZEModuleDescription* ZEGraphicsModule::GetModuleDescription()
-{
-	return ZEGraphicsModule::ModuleDescription();
-}
+ZE_MODULE_DESCRIPTION_ABSTRACT(ZEGraphicsModule, ZEModule, &ZEGraphicsModule::GraphicsOptions)
 
 ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 {

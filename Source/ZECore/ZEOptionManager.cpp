@@ -341,7 +341,7 @@ void ZEOptionManager::Save(const ZEString& FileName)
 		fclose(File);
 	}
 	else
-		zeError("Options", "Can not open option file. Could not write options to file.\r\n");
+		zeError("Can not open option file. Could not write options to file.\r\n");
 }  
 
 void ZEOptionManager::MatchOption(char* Line, char* MatchName, char* MatchValue)
@@ -497,7 +497,7 @@ void ZEOptionManager::Load(const ZEString& FileName)
 		ResetChanges();	
 	}
 	else
-		zeError("Options", "Can not open option file. Could not load options from file.\r\n");
+		zeError("Can not open option file. Could not load options from file.\r\n");
 }
 
 void ZEOptionManager::CommitChanges()

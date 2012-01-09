@@ -54,7 +54,7 @@ struct ZEViewPoint
 
 class ZEPostProcessor;
 class ZECamera;
-class ZERenderOrder;
+class ZERenderCommand;
 class ZETexture2D;
 class ZEViewPort;
 class ZELight;
@@ -89,7 +89,7 @@ class ZERenderer
 		virtual void						AddToLightList(ZELight* Light);
 		virtual void						ClearLightList();
 
-		virtual void						AddToRenderList(ZERenderOrder* RenderOrder) = 0;
+		virtual void						AddToRenderList(ZERenderCommand* RenderCommand) = 0;
 		virtual void						ClearRenderList() = 0;
 
 		void								ClearLists();

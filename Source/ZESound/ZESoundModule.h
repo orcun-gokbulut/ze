@@ -78,15 +78,14 @@ struct ZESoundDevice
 
 class ZESoundModule : public ZEModule
 {
+	ZE_MODULE(ZESoundModule)
+
 	protected:
 		static ZEOptionSection			SoundOptions;
 
 	public:
 		static void						BaseInitialize();
 		static void						BaseDeinitialize();
-
-		virtual ZEModuleDescription*	GetModuleDescription();
-		static ZEModuleDescription*		ModuleDescription();
 
 		virtual const ZEArray<ZESoundDevice>&	GetDeviceList() = 0;
 

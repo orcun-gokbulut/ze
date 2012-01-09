@@ -44,14 +44,12 @@ class ZEInputDeviceExtension;
 
 class ZEWindowsInputModule : public ZEInputModule
 {
+	ZE_MODULE(ZEWindowsInputModule)
+
 	private:
-		ZEArray<ZEInputDeviceExtension*>	DeviceExtensions;
 		ZEArray<ZEInputDevice*>				Devices;
 
 	public:
-		static ZEModuleDescription*			ModuleDescription();
-		virtual ZEModuleDescription*		GetModuleDescription();
-
 		virtual const
 		ZEArray<ZEInputDevice*>&			GetInputDevices();
 

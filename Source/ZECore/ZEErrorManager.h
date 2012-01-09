@@ -47,26 +47,24 @@ class ZEErrorManager
 {
 	friend class					ZECore;
 	private:
-		bool						FileLogging;
+		bool						LogFileEnabled;
 		ZEString					LogFileName;
+		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
 
 		static char*				ErrorLevelToString(ZEErrorType ErrorLevel);
-		void						LogToFile(const char* Module, ZEErrorType ErrorType, const char* Error);
-		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
+		void						LogToFile(const char* Module, ZEErrorType ErrorType, const char* ErrorText);
+
+		static void					ErrorCallback(const char* Module, ZEErrorType ErrorType, const char* ErrorText);
+		static void					AssertCallback(ZEAssertType AssertType, const char* AssertText, const char* Function, const char* File, int Line);
 
 									ZEErrorManager();
 									~ZEErrorManager();
 	public:
-		void						EnableFileLogging();
-		void						DisableFileLogging();
+		void						SetLogFileEnabled(bool Enabled);
+		bool						GetLogFileEnabled();
 
 		void						SetLogFileName(const ZEString& NewLogFile);
 		const ZEString&				GetLogFileName();
-
-		void						RaiseError(const char* Module, ZEErrorType ErrorType, const char* ErrorFormat, ...);
-		void						RaiseErrorInternal(const char* Module, ZEErrorType ErrorType, const char* ErrorFormat, void* Args);
-		void						RaiseAssert(ZEAssertType AssertType, const char* Function, const char* File, int Line, const char* Message, ...);
-		void						RaiseAssertInternal(ZEAssertType AssertType, const char* Function, const char* File, int Line, const char* Message, void* Args);
 
 		static ZEErrorManager*		GetInstance();
 };

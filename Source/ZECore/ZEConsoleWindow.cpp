@@ -141,7 +141,7 @@ bool ZEConsoleWindow::Initialize()
 	Handle = CreateDialog((HINSTANCE)zeCore->GetApplicationInstance(), MAKEINTRESOURCE(IDD_CONSOLE), NULL, &ConsoleCallback);
 	if (Handle == NULL)
 	{
-		zeError("Console Window", "Can not create console window.");
+		zeError("Can not create console window.");
 		return false;
 	}
 
@@ -194,6 +194,7 @@ void ZEConsoleWindow::HideConsole()
 
 void ZEConsoleWindow::TermiantionState()
 {
+	ShowConsole();
 	MSG msg;
 	SetWindowText(GetDlgItem((HWND)Handle, IDEXECUTE), "Exit");
 	EnableWindow(GetDlgItem((HWND)Handle, IDEXECUTE), TRUE);

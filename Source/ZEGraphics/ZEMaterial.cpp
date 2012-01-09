@@ -81,17 +81,17 @@ bool ZEMaterial::GetLightningEnabled() const
 	return LightningEnabled;
 }
 
-bool ZEMaterial::SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZEMaterial::SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
 	return false;
 }
 
-bool ZEMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZEMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
 	return false;
 }
 
-bool ZEMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZEMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
 	return false;
 }

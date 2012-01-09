@@ -37,6 +37,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <string.h>
 
 static void DefaultErrorCallback(const char* Module, ZEErrorType Type, const char* ErrorText)
 {
@@ -50,6 +51,21 @@ static void DefaultAssertCallback(ZEAssertType Type, const char* AssertText, con
 
 static ZEErrorCallback ErrorCallback = &DefaultErrorCallback;
 static ZEAssertCallback AssertCallback = &DefaultAssertCallback;
+
+void ZEError::GetModuleName(const char* Function, char* Output)
+{
+	int Len = strlen(Output);
+	for(int I = 0; I < Len; I++)
+		if (Function[I] == ':' || Function[I] == '<')
+		{
+			Output[I] ='\0';
+			return;
+		}
+		else
+			Output[I] = Function[I];
+
+	Output[Len] = '\0';
+}
 
 const char* ZEError::GetErrorTypeString(ZEErrorType Type)
 {
@@ -90,12 +106,12 @@ const char* ZEError::GetAssertTypeString(ZEAssertType Type)
 	}
 }
 
-void zeSetErrorCallback(ZEErrorCallback Callback)
+void ZEError::SetErrorCallback(ZEErrorCallback Callback)
 {
 	ErrorCallback = Callback;
 }
 
-void zeSetAssertCallback(ZEAssertCallback Callback)
+void ZEError::SetAssertCallback(ZEAssertCallback Callback)
 {
 	AssertCallback = Callback;
 }
