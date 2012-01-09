@@ -38,6 +38,9 @@
 #define __ZE_TEST_CHECK_H__
 
 #include <stdio.h>
+#include <math.h>
+
+#define ZE_TEST_CLOSE_THRESHOLD 0.00001f
 
 #define ZETestCheck(Condition)\
 	do\
@@ -83,19 +86,26 @@
 	while(false)
 
 
-#define ZETestCheckClose(Actual, Expected, Tolerance)\
+static bool ZETestInternalCheckClose(const float& Actual, const float& Expected, const float& Threshold = ZE_TEST_CLOSE_THRESHOLD)
+{
+	return (fabs(Actual - Expected) <= Threshold);
+}
+
+#define ZETestCheckClose(Actual, Expected)\
 	do\
 	{\
 		try\
 		{\
-			if (((Actual) >= ((Expected) - (Tolerance))) && ((Actual) <= ((Expected) + (Tolerance))))\
+			if (!ZETestInternalCheckClose(Actual, Expected))\
 			{\
-				this->ReportProblem(ZE_TPT_ERROR, ("Actual value \"" #Actual "\" is not close  to expected value \"" #Expected "\". Tolerance \"" #Tolerance "\"."), __FILE__, __LINE__);\
+				this->ReportProblem(ZE_TPT_ERROR, ("Actual value \"" #Actual "\" is not close  to expected value \"" #Expected "\"."), __FILE__, __LINE__);\
 			} \
 		} \
 		catch (...)\
 		{\
-			this->ReportProblem(ZE_TPT_ERROR, ("Exception occured at close check. Actual value \"" #Actual "\", Expected value : \"" #Expected "\", Tolerance : \"" #Tolerance "\"."), __FILE__, __LINE__);\
+			this->ReportProblem(ZE_TPT_ERROR, ("Exception occured at close check. Actual value \"" #Actual "\", Expected value : \"" #Expected "\"."), __FILE__, __LINE__);\
 		} } \
 	while(false)
 #endif
+
+//((Actual) >= ((Expected) - (Tolerance))) && ((Actual) <= ((Expected) + (Tolerance)))
