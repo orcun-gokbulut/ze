@@ -151,5 +151,3 @@ ZEPointLight* ZEPointLight::CreateInstance()
 {
 	return new ZEPointLight();
 }
-
-#include "ZEPointLight.h.zpp"

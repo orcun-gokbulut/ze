@@ -159,8 +159,6 @@ ZEComponent::ZEComponent()
 	Owner = NULL;
 }
 
-#include "ZEComponent.h.zpp"
-
 ZEEntityRunAt ZEComponentDescription::GetRunAt() const
 {
 	return ZE_ERA_NONE;

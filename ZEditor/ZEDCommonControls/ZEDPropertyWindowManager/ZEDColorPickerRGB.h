@@ -45,7 +45,7 @@
 #include <QColor>
 #include "ZEDPropertyWidget.h"
 #include "ZEDS\ZEVariant.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta\ZEObject.h"
 #include "ZEDFloatIntLineEdit.h"
 #include "ZEDColorLabel.h"
 
@@ -55,7 +55,7 @@ class ZEDColorPickerRGB :  public QObject, public QTreeWidgetItem, public ZEDPro
 
 	public:
 
-		ZEClass*				Class;
+		ZEObject*				Class;
 		ZEPropertyDescription	ClassAttribute;
 		QTreeWidget*			ParentTree;
 
@@ -81,7 +81,7 @@ class ZEDColorPickerRGB :  public QObject, public QTreeWidgetItem, public ZEDPro
 
 		virtual void			UpdateValues();
 
-								ZEDColorPickerRGB(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute);
+								ZEDColorPickerRGB(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
 								~ZEDColorPickerRGB();
 
 		public slots:

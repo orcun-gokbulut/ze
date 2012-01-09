@@ -42,9 +42,9 @@
 #include "ZEDefinitions.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
-#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEObject.h"
 
-ZE_META_CLASS_DESCRIPTION(ZEFixedMaterial)
+ZE_META_OBJECT_DESCRIPTION(ZEFixedMaterial)
 
 class ZETextureCube;
 class ZETextureCubeResource;
@@ -52,7 +52,7 @@ class ZETexture2D;
 class ZETexture2DResource;
 class ZEFixedMaterial : public ZEMaterial
 {
-	ZE_META_CLASS(ZEFixedMaterial)
+	ZE_META_OBJECT(ZEFixedMaterial)
 	protected:
 		unsigned int					OldMaterialComponents;
 		unsigned int					MaterialComponents;

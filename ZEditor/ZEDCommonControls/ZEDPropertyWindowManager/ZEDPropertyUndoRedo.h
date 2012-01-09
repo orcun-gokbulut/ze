@@ -39,14 +39,14 @@
 #define __ZED_PROPERTY_UNDO_REDO_H__
 
 #include "ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta\ZEObject.h"
 #include "ZEDS\ZEVariant.h"
 
 class ZEDPropertyUndoRedoOperation : public ZEDUndoRedoOperation
 {
 	private:
 
-		ZEClass*				Class;
+		ZEObject*				Class;
 		ZEPropertyDescription	PropertyDescription;
 		ZEVariant				OldValue;
 		ZEVariant				NewValue;
@@ -56,16 +56,16 @@ class ZEDPropertyUndoRedoOperation : public ZEDUndoRedoOperation
 		void					SetOldValue(ZEVariant OldValue);
 		void					SetNewValue(ZEVariant NewValue);
 
-		void					SetClass(ZEClass* Class);
+		void					SetClass(ZEObject* Class);
 		void					SetPropertyDescription(ZEPropertyDescription PropertyDescription);
 
 		virtual bool			Undo();
 		virtual bool			Redo();
 
 								ZEDPropertyUndoRedoOperation();
-								ZEDPropertyUndoRedoOperation(ZEClass* Class, ZEPropertyDescription PropertyDescription);
-								ZEDPropertyUndoRedoOperation(ZEClass* Class, ZEPropertyDescription PropertyDescription, ZEVariant OldValue);
-								ZEDPropertyUndoRedoOperation(ZEClass* Class, ZEPropertyDescription PropertyDescription, ZEVariant OldValue, ZEVariant NewValue);
+								ZEDPropertyUndoRedoOperation(ZEObject* Class, ZEPropertyDescription PropertyDescription);
+								ZEDPropertyUndoRedoOperation(ZEObject* Class, ZEPropertyDescription PropertyDescription, ZEVariant OldValue);
+								ZEDPropertyUndoRedoOperation(ZEObject* Class, ZEPropertyDescription PropertyDescription, ZEVariant OldValue, ZEVariant NewValue);
 };
 
 #endif

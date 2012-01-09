@@ -37,7 +37,7 @@
 #ifndef __ZE_TRIGGER_H__
 #define __ZE_TRIGGER_H__
 
-#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZEEntity.h"
 #include "ZEDS/ZEFastDelegate.h"
 

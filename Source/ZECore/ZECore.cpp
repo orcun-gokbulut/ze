@@ -567,7 +567,7 @@ void ZECore::ShutDown()
 
 	zeLog("Saving options.");
 	if (CoreState == ZE_CS_CRITICAL_ERROR)
-		zeLog("[Core] Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
+		zeLog("Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
 	OptionManager->Save("options.ini");
 
 	zeLog("Releasing game content data.");

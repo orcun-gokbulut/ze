@@ -558,5 +558,3 @@ ZEEntityRunAt ZETerrainDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
-
-#include "ZETerrain.h.zpp"

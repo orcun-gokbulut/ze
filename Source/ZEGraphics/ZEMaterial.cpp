@@ -116,5 +116,3 @@ void ZEMaterial::Destroy()
 {
 	delete this;
 }
-
-#include "ZEMaterial.h.zpp"

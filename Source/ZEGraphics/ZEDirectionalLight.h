@@ -42,7 +42,7 @@
 
 class ZETexture2D; 
 
-ZE_META_CLASS_DESCRIPTION(ZEDirectionalLight);
+ZE_META_OBJECT_DESCRIPTION(ZEDirectionalLight);
 
 class ZEDirectionalLight : public ZELight
 {

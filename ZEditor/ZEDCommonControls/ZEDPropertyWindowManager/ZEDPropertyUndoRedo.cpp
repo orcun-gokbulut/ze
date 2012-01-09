@@ -45,7 +45,7 @@ void ZEDPropertyUndoRedoOperation::SetNewValue(ZEVariant NewValue)
 	this->NewValue = NewValue;
 }
 
-void ZEDPropertyUndoRedoOperation::SetClass(ZEClass* Class)
+void ZEDPropertyUndoRedoOperation::SetClass(ZEObject* Class)
 {
 	this->Class = Class;
 }
@@ -84,20 +84,20 @@ ZEDPropertyUndoRedoOperation::ZEDPropertyUndoRedoOperation()
 	this->Class = NULL;
 }
 
-ZEDPropertyUndoRedoOperation::ZEDPropertyUndoRedoOperation(ZEClass* Class, ZEPropertyDescription PropertyDescription)
+ZEDPropertyUndoRedoOperation::ZEDPropertyUndoRedoOperation(ZEObject* Class, ZEPropertyDescription PropertyDescription)
 {
 	this->Class = Class;
 	this->PropertyDescription = PropertyDescription;
 }
 
-ZEDPropertyUndoRedoOperation::ZEDPropertyUndoRedoOperation(ZEClass* Class, ZEPropertyDescription PropertyDescription, ZEVariant OldValue)
+ZEDPropertyUndoRedoOperation::ZEDPropertyUndoRedoOperation(ZEObject* Class, ZEPropertyDescription PropertyDescription, ZEVariant OldValue)
 {
 	this->Class = Class;
 	this->PropertyDescription = PropertyDescription;
 	this->OldValue = OldValue;
 }
 
-ZEDPropertyUndoRedoOperation::ZEDPropertyUndoRedoOperation(ZEClass* Class, ZEPropertyDescription PropertyDescription, ZEVariant OldValue, ZEVariant NewValue)
+ZEDPropertyUndoRedoOperation::ZEDPropertyUndoRedoOperation(ZEObject* Class, ZEPropertyDescription PropertyDescription, ZEVariant OldValue, ZEVariant NewValue)
 {
 	this->Class = Class;
 	this->PropertyDescription = PropertyDescription;

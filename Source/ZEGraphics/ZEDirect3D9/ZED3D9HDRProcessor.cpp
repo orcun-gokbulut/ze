@@ -608,5 +608,3 @@ ZED3D9HDRProcessor::~ZED3D9HDRProcessor()
 {
 	Deinitialize();
 }
-
-#include "ZED3D9HDRProcessor.h.zpp"

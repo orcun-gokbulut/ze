@@ -347,7 +347,7 @@ ZETestSuite(ZEVariant)
 	}
 	ZETest("ZEVariant::operator void*()")
 	{
-		// ZEVariant has been changed pointer type became ZEClass type.
+		// ZEVariant has been changed pointer type became ZEObject type.
 		ZETestCheck(false);
 	}
 	ZETest("ZEVariant::operator ZEMatrix3x3()")
@@ -567,7 +567,7 @@ ZETestSuite(ZEVariant)
 	}
 	ZETest("void ZEVariant::SetPointer(void* Pointer)")
 	{
-		// ZEVariant has been changed pointer type became ZEClass type.
+		// ZEVariant has been changed pointer type became ZEObject type.
 		ZETestCheck(false);
 	}
 	ZETest("void ZEVariant::SetQuaternion(const ZEQuaternion& Quaternion)")

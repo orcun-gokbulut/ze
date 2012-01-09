@@ -47,7 +47,7 @@
 #include "ZEMath/ZEOBBox.h"
 #include "ZEMath/ZEBSphere.h"
 #include "ZEDefinitions.h"
-#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEObject.h"
 
 class ZEComponent;
 class ZECompoundEntity;
@@ -64,14 +64,14 @@ enum ZEEntityRunAt
 #define ZE_META_ENTITY_CLASS_EXTENSION\
 		virtual ZEEntityRunAt GetRunAt() const;
 
-#define ZE_META_ENTITY_DESCRIPTION(ClassName) ZE_META_EXTENDED_CLASS_DESCRIPTION(ClassName, ZEEntityDescription, ZE_META_ENTITY_CLASS_EXTENSION)
-#define ZE_META_ENTITY(Class) ZE_META_EXTENDED_CLASS(ZEEntityDescription, ,Class)
+#define ZE_META_ENTITY_DESCRIPTION(ObjectName) ZE_META_EXTENDED_OBJECT_DESCRIPTION(ObjectName, ZEEntityDescription, ZE_META_ENTITY_CLASS_EXTENSION)
+#define ZE_META_ENTITY(Object) ZE_META_EXTENDED_CLASS(ZEEntityDescription, ,Object)
 
-class ZEEntityDescription : public ZEClassDescription
+class ZEEntityDescription : public ZEObjectDescription
 {
 	public:
 		virtual const char*						GetName() const;
-		virtual ZEClassDescription*				GetParent() const;
+		virtual ZEObjectDescription*			GetParent() const;
 		virtual const char*						GetType() const;
 		virtual const char*						GetDescription() const;
 		virtual const char*						GetIcon() const;
@@ -84,8 +84,8 @@ class ZEEntityDescription : public ZEClassDescription
 		virtual const ZEMethodDescription*		GetMethods() const;
 		virtual size_t							GetMethodCount() const;
 		virtual size_t							GetMethodOffset() const;
-		virtual ZEClassProvider*				GetProvider() const;
-		virtual ZEClass*						CreateInstance() const;
+		virtual ZEObjectProvider*				GetProvider() const;
+		virtual ZEObject*						CreateInstance() const;
 		virtual ZEEntityRunAt					GetRunAt() const;
 };
 
@@ -121,7 +121,7 @@ typedef ZEDWORD ZEEntityDirtyFlags;
 #define ZE_EDF_WORLD_BOUNDING_BOX				8
 
 
-class ZEEntity : public ZEClass
+class ZEEntity : public ZEObject
 {
 	ZE_META_ENTITY(ZEEntity)
 	friend class ZECompoundEntity;

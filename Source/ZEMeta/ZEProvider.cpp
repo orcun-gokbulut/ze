@@ -34,25 +34,25 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEProvider.h"
-#include "ZEClass.h"
+#include "ZEObject.h"
 #include <string.h>
 #include "ZEError.h"
-void ZEProvider::SetBaseClass(ZEClassDescription* ClassType)
+void ZEProvider::SetBaseClass(ZEObjectDescription* ClassType)
 {
 	BaseClass = ClassType;
 }
 
-ZEClassDescription* ZEProvider::GetBaseClass()
+ZEObjectDescription* ZEProvider::GetBaseClass()
 {
 	return BaseClass;
 }
 
-const ZEArray<ZEClassDescription*>& ZEProvider::GetClasses()
+const ZEArray<ZEObjectDescription*>& ZEProvider::GetClasses()
 {
 	return Classes;
 }
 
-bool ZEProvider::RegisterClass(ZEClassDescription* Description)
+bool ZEProvider::RegisterClass(ZEObjectDescription* Description)
 {
 	zeAssert(Description == NULL, "Description can not be NULL.");
 
@@ -63,7 +63,7 @@ bool ZEProvider::RegisterClass(ZEClassDescription* Description)
 	}
 
 
-	if (BaseClass != NULL && !ZEClassDescription::CheckParent(BaseClass, Description))
+	if (BaseClass != NULL && !ZEObjectDescription::CheckParent(BaseClass, Description))
 	{
 		zeError("Can not add class type to provider. Class type is not derived from base class.");
 		return false;
@@ -73,7 +73,7 @@ bool ZEProvider::RegisterClass(ZEClassDescription* Description)
 	return true;
 }
 
-void ZEProvider::UnregisterClass(ZEClassDescription* Description)
+void ZEProvider::UnregisterClass(ZEObjectDescription* Description)
 {
 	zeAssert(Description == NULL, "Description can not be NULL.");
 	zeAssert(!Classes.Exists(Description), "Can not remove class type from provider. Class type is not exists. "
@@ -82,17 +82,17 @@ void ZEProvider::UnregisterClass(ZEClassDescription* Description)
 	Classes.DeleteValue(Description);
 }
 
-ZEClass* ZEProvider::CreateInstance(size_t Index) const
+ZEObject* ZEProvider::CreateInstance(size_t Index) const
 {
 	return Classes[Index]->CreateInstance();
 }
 
-ZEClass* ZEProvider::CreateInstance(const char* Name) const
+ZEObject* ZEProvider::CreateInstance(const char* Name) const
 {
 	for(size_t I = 0; I < Classes.GetCount(); I++)
 		if (strcmp(Classes[I]->GetName(), Name) == 0)
 		{
-			ZEClass* Instance = Classes[I]->CreateInstance();
+			ZEObject* Instance = Classes[I]->CreateInstance();
 			if (Instance == NULL)
 			{
 				zeError("Can not create instance of a class. NULL instance returned. Class Name : \"%s\".", Name);

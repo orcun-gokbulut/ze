@@ -43,7 +43,7 @@
 class ZETexture2D;
 class ZETexture2DResource;
 
-ZE_META_CLASS_DESCRIPTION(ZEProjectiveLight);
+ZE_META_OBJECT_DESCRIPTION(ZEProjectiveLight);
 
 class ZEProjectiveLight : public ZELight
 {

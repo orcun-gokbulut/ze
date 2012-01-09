@@ -84,7 +84,7 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 
 	for (size_t I = 0; I < Entities.GetCount(); I++)
 	{
-		if (ZEClassDescription::CheckParent(ZELight::ClassDescription(), Entities[I]->GetClassDescription()))
+		if (ZEObjectDescription::CheckParent(ZELight::Description(), Entities[I]->GetDescription()))
 		{
 			if (CullLight((ZELight*)Entities[I], DrawParameters))
 			{
@@ -100,7 +100,7 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 
 			for (size_t N = 0; N < Components.GetCount(); N++)
 			{
-				if (ZEClassDescription::CheckParent(ZELight::ClassDescription(), Components[N]->GetClassDescription()))
+				if (ZEObjectDescription::CheckParent(ZELight::Description(), Components[N]->GetDescription()))
 					if (CullLight((ZELight*)Components[N], DrawParameters))
 					{
 						DrawParameters->Renderer->AddToLightList((ZELight*)Components[N]);

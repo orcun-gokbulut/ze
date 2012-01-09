@@ -37,7 +37,7 @@
 #ifndef __ZED_SELECTION_ITEM_H__
 #define __ZED_SELECTION_ITEM_H__
 
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta\ZEObject.h"
 #include <QWidget>
 #include "ZEDCommonEntities/ZEDGizmo.h"
 
@@ -80,7 +80,7 @@ class ZEDSelectionItem
 
 		virtual	void				SetBoundingBoxVisibility(bool Visible) = 0;
 
-		virtual ZEClass*			GetClass() const = 0;
+		virtual ZEObject*			GetClass() const = 0;
 		virtual ZEDGizmo*			GetGizmo() const = 0;
 
 		virtual						~ZEDSelectionItem();

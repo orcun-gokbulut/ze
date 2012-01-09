@@ -38,7 +38,7 @@
 #define __ZE_SOUND_SOURCE_H__
 
 #include "ZEGame/ZEComponent.h"
-#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZESoundResource.h"
 
 #define ZE_SS_PAN_LEFT				-100

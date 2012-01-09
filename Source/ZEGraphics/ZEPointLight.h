@@ -42,7 +42,7 @@
 
 class ZETexture2D;
 
-ZE_META_CLASS_DESCRIPTION(ZEPointLight);
+ZE_META_OBJECT_DESCRIPTION(ZEPointLight);
 
 class ZEPointLight  : public ZELight
 {

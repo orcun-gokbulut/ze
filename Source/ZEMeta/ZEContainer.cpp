@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEContainer.h"
-#include "ZEClass.h"
+#include "ZEObject.h"
 
 void ZEContainer::SetContainerMode(ZEContainerMode Mode)
 {
@@ -46,12 +46,12 @@ ZEContainerMode ZEContainer::GetContainerMode()
 	return Mode;
 }
 
-void ZEContainer::SetBaseClass(ZEClassDescription* Type)
+void ZEContainer::SetBaseClass(ZEObjectDescription* Type)
 {
 	this->Type = Type;
 }
 
-ZEClassDescription* ZEContainer::GetBaseClass()
+ZEObjectDescription* ZEContainer::GetBaseClass()
 {
 	return Type;
 }
@@ -66,12 +66,12 @@ bool ZEContainer::GetAllowDerivedClasses()
 	return AllowDerivedTypes;
 }
 
-const ZEArray<ZEClass*>& ZEContainer::GetInstances()
+const ZEArray<ZEObject*>& ZEContainer::GetInstances()
 {
 	return Instances;
 }
 
-bool ZEContainer::AddInstance(ZEClass* Instance)
+bool ZEContainer::AddInstance(ZEObject* Instance)
 {
 	if (Type == NULL)
 	{
@@ -81,7 +81,7 @@ bool ZEContainer::AddInstance(ZEClass* Instance)
 
 	if (AllowDerivedTypes)
 	{
-		ZEClassDescription* CurrentType = Instance->GetClassDescription();
+		ZEObjectDescription* CurrentType = Instance->GetDescription();
 		while (CurrentType != NULL)
 		{
 			if (Type == CurrentType)
@@ -94,7 +94,7 @@ bool ZEContainer::AddInstance(ZEClass* Instance)
 	}
 	else
 	{
-		if (Type == Instance->GetClassDescription())
+		if (Type == Instance->GetDescription())
 		{
 			Instances.Add(Instance);
 			return true;
@@ -104,7 +104,7 @@ bool ZEContainer::AddInstance(ZEClass* Instance)
 	}
 }
 
-bool ZEContainer::RemoveInstance(ZEClass* Instance)
+bool ZEContainer::RemoveInstance(ZEObject* Instance)
 {
 	Instances.DeleteValue(Instance);
 	return true;
@@ -117,7 +117,7 @@ ZEContainer::ZEContainer()
 	AllowDerivedTypes = true;
 }
 
-ZEContainer::ZEContainer(ZEContainerMode Mode, ZEClassDescription* Type, bool AllowDerived)
+ZEContainer::ZEContainer(ZEContainerMode Mode, ZEObjectDescription* Type, bool AllowDerived)
 {
 	this->Mode = Mode;
 	this->Type = Type;

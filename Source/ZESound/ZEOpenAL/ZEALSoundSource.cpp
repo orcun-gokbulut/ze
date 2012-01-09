@@ -367,7 +367,7 @@ void ZEALSoundSource::SetPan(int NewPan)
 	else
 		Pan = NewPan;
 
-	zeLog("OpenAL","Panning is not supported with OpenAL");
+	zeLog("Panning is not supported with OpenAL");
 
 	// No panning support in OpenAL!
 }

@@ -168,8 +168,6 @@ ZETrigger* ZETrigger::CreateInstance()
 	return new ZETrigger();
 }
 
-#include "ZETrigger.h.zpp"
-
 ZEEntityRunAt ZETriggerDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;

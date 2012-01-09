@@ -365,7 +365,7 @@ void ZEVariant::SetMatrix4x4(const ZEMatrix4x4& Matrix)
 	*this->Value.Matrix4x4 = Matrix;
 }
 
-void ZEVariant::SetClass(ZEClass* Class)
+void ZEVariant::SetClass(ZEObject* Class)
 {
 	SetType(ZE_VRT_CLASS);
 	Value.Pointer = Class;
@@ -435,7 +435,7 @@ ZEMatrix4x4& ZEVariant::GetMatrix4x4() const
 	return *Value.Matrix4x4;
 }
 
-ZEClass* ZEVariant::GetClass() const
+ZEObject* ZEVariant::GetClass() const
 {
 	zeAssert(this->Type != ZE_VRT_CLASS, "ZEVariant::GetPointer operation failed. Variant type mismatched.");
 	return Value.Pointer;
@@ -568,7 +568,7 @@ ZEVariant::operator ZEMatrix4x4()
 
 }
 
-ZEVariant::operator ZEClass*()
+ZEVariant::operator ZEObject*()
 {
 	zeAssert(this->Type != ZE_VRT_CLASS, "Pointer conversion operation failed. Variant type mismatched.");
 	return Value.Pointer;
@@ -635,7 +635,7 @@ ZEVariant::ZEVariant(const ZEMatrix4x4& Matrix)
 	SetMatrix4x4(Matrix);
 }
 
-ZEVariant::ZEVariant(ZEClass* Class)
+ZEVariant::ZEVariant(ZEObject* Class)
 {
 	SetClass(Class);
 }

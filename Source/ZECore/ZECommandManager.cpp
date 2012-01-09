@@ -180,8 +180,7 @@ bool ZECommandManager::RegisterSection(ZECommandSection* Section)
 {
 	if (GetCommandSection(Section->GetName()) != NULL)
 	{
-		zeError("Command Manager",
-			"Can not register command section. A command section with same name is already registered. (Command Section Name : \"%s\")", 
+		zeError("Can not register command section. A command section with same name is already registered. (Command Section Name : \"%s\")", 
 			Section->GetName());
 		return false;
 	}
@@ -193,8 +192,7 @@ bool ZECommandManager::UnregisterSection(ZECommandSection* Section)
 {
 	if (GetCommandSection(Section->GetName()) == NULL)
 	{
-		zeError("Command Manager",
-			"Can not unregister command section. There is no such a registered command section. (Command Section Name : \"%s\")", 
+		zeError("Can not unregister command section. There is no such a registered command section. (Command Section Name : \"%s\")", 
 			Section->GetName());
 		return false;
 	}

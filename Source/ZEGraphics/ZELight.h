@@ -49,7 +49,7 @@ enum ZELightType
 	ZE_LT_OMNIPROJECTIVE = 4
 };
 
-ZE_META_CLASS_DESCRIPTION(ZELight);
+ZE_META_OBJECT_DESCRIPTION(ZELight);
 
 class ZEShadowRenderer;
 class ZEScene;

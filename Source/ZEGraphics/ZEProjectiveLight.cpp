@@ -219,5 +219,3 @@ ZEProjectiveLight* ZEProjectiveLight::CreateInstance()
 {
 	return new ZEProjectiveLight();
 }
-
-#include "ZEProjectiveLight.h.zpp"

@@ -45,7 +45,7 @@
 #include <QFocusEvent>
 #include "ZEDPropertyWidget.h"
 #include "ZEDS\ZEVariant.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta\ZEObject.h"
 
 class ZEDPropertyComboBox : public QComboBox
 {
@@ -70,7 +70,7 @@ class ZEDEnumComboBox : public QObject, public QTreeWidgetItem, public ZEDProper
 
 	public:
 
-		ZEClass*				Class;
+		ZEObject*				Class;
 		ZEPropertyDescription	ClassAttribute;
 		QTreeWidget*			ParentTree;
 
@@ -78,7 +78,7 @@ class ZEDEnumComboBox : public QObject, public QTreeWidgetItem, public ZEDProper
 
 		virtual void			UpdateValues();
 
-								ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute);
+								ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
 								~ZEDEnumComboBox();
 
 	public slots:

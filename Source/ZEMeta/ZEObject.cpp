@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEClass.cpp
+ Zinek Engine - ZEObject.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEClass.h"
+#include "ZEObject.h"
 #include <string.h>
 #include "ZEError.h"
 #include "ZEAnimation.h"
@@ -43,16 +43,16 @@
 
 #define ZE_CLSF_CLASS_CHUNKID ((ZEDWORD)'CLAS')
 
-struct ZEClassFileChunk
+struct ZEObjectFileChunk
 {
 	ZEDWORD		Header;
 	char		ClassType[ZE_MAX_NAME_SIZE];
 	ZEDWORD		PropertyCount;
 };
 
-bool ZEClassDescription::CheckParent(ZEClassDescription* Parent, ZEClassDescription* Children)
+bool ZEObjectDescription::CheckParent(ZEObjectDescription* Parent, ZEObjectDescription* Children)
 {
-	ZEClassDescription* Current = Children;
+	ZEObjectDescription* Current = Children;
 	
 	while (Current != NULL)
 	{
@@ -64,17 +64,17 @@ bool ZEClassDescription::CheckParent(ZEClassDescription* Parent, ZEClassDescript
 	return false;
 }
 
-void ZEClass::SetOwner(ZEClass* Class)
+void ZEObject::SetOwner(ZEObject* Class)
 {
 	Owner = Class;
 }
 
-ZEClass* ZEClass::GetOwner()
+ZEObject* ZEObject::GetOwner()
 {
 	return Owner;
 }
 
-bool ZEClass::SetProperty(const char* PropertyName, const ZEVariant& Value)
+bool ZEObject::SetProperty(const char* PropertyName, const ZEVariant& Value)
 {
 	int PropertyId = GetPropertyId(PropertyName);
 
@@ -104,7 +104,7 @@ bool ZEClass::SetProperty(const char* PropertyName, const ZEVariant& Value)
 	return false;
 }
 
-bool ZEClass::GetProperty(const char* PropertyName, ZEVariant& Value) const
+bool ZEObject::GetProperty(const char* PropertyName, ZEVariant& Value) const
 {
 	int PropertyId = GetPropertyId(PropertyName);
 
@@ -134,7 +134,7 @@ bool ZEClass::GetProperty(const char* PropertyName, ZEVariant& Value) const
     return false;
 }
 
-bool ZEClass::AddCustomProperty(ZERunTimeProperty Property)
+bool ZEObject::AddCustomProperty(ZERunTimeProperty Property)
 {
 	for (size_t I = 0; I < CustomProperties.GetCount(); I++)
 	{
@@ -156,7 +156,7 @@ bool ZEClass::AddCustomProperty(ZERunTimeProperty Property)
 	return true;
 }
 
-bool ZEClass::RemoveCustomProperty(const char* PropertyName)
+bool ZEObject::RemoveCustomProperty(const char* PropertyName)
 {
 	unsigned int Hash = 0;
 	size_t	NameLength = strlen(PropertyName);
@@ -178,12 +178,12 @@ bool ZEClass::RemoveCustomProperty(const char* PropertyName)
 	return false;
 }
 
-const ZEArray<ZERunTimeProperty>* ZEClass::GetCustomProperties() const
+const ZEArray<ZERunTimeProperty>* ZEObject::GetCustomProperties() const
 {
 	return &CustomProperties;
 }
 
-bool ZEClass::AddToContainer(const char* ContainerName, ZEClass* Item)
+bool ZEObject::AddToContainer(const char* ContainerName, ZEObject* Item)
 {
 	int ContainerId = GetContainerId(ContainerName);
 
@@ -193,7 +193,7 @@ bool ZEClass::AddToContainer(const char* ContainerName, ZEClass* Item)
 	return false;
 }
 
-bool ZEClass::RemoveFromContainer(const char* ContainerName, ZEClass* Item)
+bool ZEObject::RemoveFromContainer(const char* ContainerName, ZEObject* Item)
 {
 	int ContainerId = GetContainerId(ContainerName);
 
@@ -203,7 +203,7 @@ bool ZEClass::RemoveFromContainer(const char* ContainerName, ZEClass* Item)
 	return false;
 }
 
-const ZEClass** ZEClass::GetContainerItems(const char* ContainerName) const
+const ZEObject** ZEObject::GetContainerItems(const char* ContainerName) const
 {
 	int ContainerId = GetContainerId(ContainerName);
 
@@ -213,7 +213,7 @@ const ZEClass** ZEClass::GetContainerItems(const char* ContainerName) const
 	return NULL;
 }
 
-size_t ZEClass::GetContainerItemCount(const char* ContainerName) const 
+size_t ZEObject::GetContainerItemCount(const char* ContainerName) const 
 {
 	int ContainerId = GetContainerId(ContainerName);
 
@@ -223,7 +223,7 @@ size_t ZEClass::GetContainerItemCount(const char* ContainerName) const
 	return 0;
 }
 
-bool ZEClass::CallMethod(const char* MethodName, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue)
+bool ZEObject::CallMethod(const char* MethodName, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue)
 {
 	int MethodId = GetMethodId(MethodName);
 
@@ -233,12 +233,12 @@ bool ZEClass::CallMethod(const char* MethodName, const ZEVariant* Parameters, si
 	return false;
 }
 
-bool ZEClass::CallMethod(int MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
+bool ZEObject::CallMethod(int MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
 {
 	return CallMethod(MethodId, Parameters.GetConstCArray(), Parameters.GetCount(), ReturnValue);
 }
 
-bool ZEClass::CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
+bool ZEObject::CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
 {
 	int MethodId = GetMethodId(MethodName);
 
@@ -249,16 +249,16 @@ bool ZEClass::CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Param
 }
 
 
-bool ZEClass::Serialize(ZESerializer* Serializer)
+bool ZEObject::Serialize(ZESerializer* Serializer)
 {
 	ZEVariant Value;
-	ZEClassDescription* CurrDesc = GetClassDescription();
+	ZEObjectDescription* CurrDesc = GetDescription();
  
-	ZEClassFileChunk ClassChunk;
+	ZEObjectFileChunk ClassChunk;
 	ClassChunk.Header = ZE_CLSF_CLASS_CHUNKID;
 	strncpy(ClassChunk.ClassType, CurrDesc->GetName(), ZE_MAX_NAME_SIZE);
 	ClassChunk.PropertyCount = CurrDesc->GetPropertyCount() + CurrDesc->GetPropertyOffset();
-	Serializer->Write(&ClassChunk, sizeof(ZEClassFileChunk), 1);
+	Serializer->Write(&ClassChunk, sizeof(ZEObjectFileChunk), 1);
 
 	while (CurrDesc != NULL)
 	{
@@ -282,7 +282,7 @@ bool ZEClass::Serialize(ZESerializer* Serializer)
 			if (Properties[I].Access == (ZE_PA_READ | ZE_PA_WRITE))
 				if (!GetProperty(PropertyOffset + I, Value))
 				{
-					zeError("Class does not have specified property. (Class Type Name : \"%s\", Property Name : \"%s\")", GetClassDescription()->GetName(), Properties[I].Name);
+					zeError("Class does not have specified property. (Class Type Name : \"%s\", Property Name : \"%s\")", GetDescription()->GetName(), Properties[I].Name);
 					return false;
 				}
 
@@ -295,20 +295,20 @@ bool ZEClass::Serialize(ZESerializer* Serializer)
 	return true;
 }
 
-bool ZEClass::Unserialize(ZEUnserializer* Unserializer)
+bool ZEObject::Unserialize(ZEUnserializer* Unserializer)
 {
-	ZEClassFileChunk ClassChunk;
-	Unserializer->Read(&ClassChunk, sizeof(ZEClassFileChunk), 1);
+	ZEObjectFileChunk ClassChunk;
+	Unserializer->Read(&ClassChunk, sizeof(ZEObjectFileChunk), 1);
 	
 	if (ClassChunk.Header != ZE_CLSF_CLASS_CHUNKID)
 	{
-		zeError("Corrupted file. Class chunk id does not have matches. (Class Type Name : \"%s\")", GetClassDescription()->GetName());
+		zeError("Corrupted file. Class chunk id does not have matches. (Class Type Name : \"%s\")", GetDescription()->GetName());
 		return false;
 	}
 
-	if (strncmp(ClassChunk.ClassType, GetClassDescription()->GetName(), ZE_MAX_NAME_SIZE) != 0)
+	if (strncmp(ClassChunk.ClassType, GetDescription()->GetName(), ZE_MAX_NAME_SIZE) != 0)
 	{
-		zeError("Class type does not matches. (Expected Class Type Name : \"%s\" Given Class Type Name : \"%s\")", GetClassDescription()->GetName(), ClassChunk.ClassType);
+		zeError("Class type does not matches. (Expected Class Type Name : \"%s\" Given Class Type Name : \"%s\")", GetDescription()->GetName(), ClassChunk.ClassType);
 		return false;
 	}
 
@@ -322,7 +322,7 @@ bool ZEClass::Unserialize(ZEUnserializer* Unserializer)
 
 		if (!SetProperty(PropertyName, Value))
 		{
-			zeError("Class does not have specified property. (Class Type Name : \"%s\", Property Name : \"%s\")", GetClassDescription()->GetName(), PropertyName);
+			zeError("Class does not have specified property. (Class Type Name : \"%s\", Property Name : \"%s\")", GetDescription()->GetName(), PropertyName);
 			return false;
 		}
 	}
@@ -330,25 +330,25 @@ bool ZEClass::Unserialize(ZEUnserializer* Unserializer)
 	return true;
 }
 
-void ZEClass::SetAnimationController(ZEAnimationController* AnimationController)
+void ZEObject::SetAnimationController(ZEAnimationController* AnimationController)
 {
 	this->AnimationController = AnimationController;
 	AnimationController->SetOwner(this);
 }
 
-ZEAnimationController* ZEClass::GetAnimationController()
+ZEAnimationController* ZEObject::GetAnimationController()
 {
 	return AnimationController;
 }
 												
-ZEClass::ZEClass()
+ZEObject::ZEObject()
 {
 	AnimationController = NULL;
 	CustomProperties.SetCount(0);
 	Owner = NULL;
 }
 
-ZEClass::~ZEClass()
+ZEObject::~ZEObject()
 {
 }
 

@@ -33,13 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_META_CLASS_PROVIDER_H__
-#define __ZE_META_CLASS_PROVIDER_H__
+#ifndef __ZE_META_OBJECT_PROVIDER_H__
+#define __ZE_META_OBJECT_PROVIDER_H__
 
 #include <ZEDS/ZEArray.h>
 
-class ZEClassDescription;
-class ZEClass;
+class ZEObjectDescription;
+class ZEObject;
 
 #define ZE_META_REGISTER_CLASS(Provider, Class)\
 static class Provider##Class##Registration\
@@ -47,31 +47,31 @@ static class Provider##Class##Registration\
 	public: \
 	Provider##Class##Registration()\
 		{\
-		Provider::GetInstance()->RegisterClass(Class::ClassDescription());\
+		Provider::GetInstance()->RegisterClass(Class::Description());\
 		}\
 } Provider##Class##Registration_;
 
 class ZEProvider
 {
 	private:
-		ZEClassDescription*				BaseClass;
-		ZEArray<ZEClassDescription*>	Classes;
+		ZEObjectDescription*				BaseClass;
+		ZEArray<ZEObjectDescription*>	Classes;
 
 	protected:
-		void							SetBaseClass(ZEClassDescription* ClassType);
-		ZEClassDescription*				GetBaseClass();
+		void							SetBaseClass(ZEObjectDescription* ClassType);
+		ZEObjectDescription*				GetBaseClass();
 
 										ZEProvider();
 										~ZEProvider();
 
 	public:
 		const 
-		ZEArray<ZEClassDescription*>&	GetClasses();
-		bool							RegisterClass(ZEClassDescription* Description);
-		void							UnregisterClass(ZEClassDescription* Description);
+		ZEArray<ZEObjectDescription*>&	GetClasses();
+		bool							RegisterClass(ZEObjectDescription* Description);
+		void							UnregisterClass(ZEObjectDescription* Description);
 
-		ZEClass*						CreateInstance(size_t Index) const;
-		ZEClass*						CreateInstance(const char* Name) const;
+		ZEObject*						CreateInstance(size_t Index) const;
+		ZEObject*						CreateInstance(const char* Name) const;
 };
 
 #endif

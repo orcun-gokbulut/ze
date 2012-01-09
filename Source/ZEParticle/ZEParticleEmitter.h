@@ -43,9 +43,9 @@
 #include "ZEParticleSystem.h"
 #include "ZEParticle.h"
 #include "ZEParticleController.h"
-#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEObject.h"
 
-ZE_META_CLASS_DESCRIPTION(ZEParticleEmitter);
+ZE_META_OBJECT_DESCRIPTION(ZEParticleEmitter);
 
 enum ZEParticleEmitterType
 {
@@ -62,9 +62,9 @@ enum ZEParticleEmitterCollisionType
 	ZE_PECT_DYNAMIC_COLLISION			// Particles can collide to both static and dynamic objects - uses SIMD
 };
 
-class ZEParticleEmitter : public ZEClass
+class ZEParticleEmitter : public ZEObject
 {
-	ZE_META_CLASS(ZEMaterial)
+	ZE_META_OBJECT(ZEMaterial)
 	friend class ZEParticleSystem;
 
 	private:

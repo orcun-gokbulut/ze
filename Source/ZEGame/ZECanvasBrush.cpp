@@ -148,8 +148,6 @@ ZECanvasBrush* ZECanvasBrush::CreateInstance()
 	return new ZECanvasBrush();
 }
 
-#include "ZECanvasBrush.h.zpp"
-
 ZEEntityRunAt ZECanvasBrushDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;

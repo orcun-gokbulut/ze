@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEAnimation.h"
-#include "ZEClass.h"
+#include "ZEObject.h"
 #include "ZETypes.h"
 #include "ZEError.h"
 #include "ZESerialization/ZESerializer.h"
@@ -155,12 +155,12 @@ bool ZEAnimation::ReadFromFile(ZEUnserializer* Unserializer, ZEAnimation* Animat
 	return Animation;
 }
 
-void ZEAnimationController::SetOwner(ZEClass* Owner)
+void ZEAnimationController::SetOwner(ZEObject* Owner)
 {
 	this->Owner = Owner;	
 }
 
-ZEClass* ZEAnimationController::GetOwner()
+ZEObject* ZEAnimationController::GetOwner()
 {
 	return Owner;
 }

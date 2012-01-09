@@ -368,8 +368,6 @@ ZESoundSource* ZESoundSource::CreateInstance()
 	return zeSound->CreateSoundSource();
 }
 
-#include "ZESoundSource.h.zpp"
-
 ZEEntityRunAt ZESoundSourceDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;

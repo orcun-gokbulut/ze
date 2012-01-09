@@ -38,7 +38,7 @@
 #define __ZE_SOUND_SOURCE_3D_H__
 
 #include "ZEGame/ZEComponent.h"
-#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZESoundSource.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZESoundSource3D);

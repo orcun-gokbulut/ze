@@ -216,5 +216,3 @@ ZEEntityRunAt ZEPortalMapDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;
 }
-
-#include "ZEPortalMap.h.zpp"

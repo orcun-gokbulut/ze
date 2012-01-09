@@ -508,13 +508,10 @@ void ZEModel::Deinitialize()
 
 }
 
-
 ZEModel* ZEModel::CreateInstance()
 {
 	return new ZEModel();
 }
-
-#include "ZEModel.h.zpp"
 
 ZEEntityRunAt ZEModelDescription::GetRunAt() const
 {

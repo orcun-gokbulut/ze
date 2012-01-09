@@ -224,5 +224,3 @@ ZECamera* ZECamera::CreateInstance()
 {
 	return new ZECamera();
 }
-
-#include "ZECamera.h.zpp"

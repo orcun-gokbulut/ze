@@ -214,12 +214,12 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(const char* ClassName)
 {
 	ZEArray<ZEEntity*> ProperEntities;
 	ZEEntity* CurrentEntity = NULL;
-	ZEClassDescription* CurrentDesc = NULL;
+	ZEObjectDescription* CurrentDesc = NULL;
 	ProperEntities.Clear();
 
 	for (int I = 0; I < Entities.GetCount(); I++)
 	{
-		CurrentDesc = CurrentEntity->GetClassDescription();
+		CurrentDesc = CurrentEntity->GetDescription();
 
 		while(CurrentDesc != NULL)
 		{
@@ -231,7 +231,7 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(const char* ClassName)
 	return ProperEntities;
 }*/
 
-ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClassDescription* Desc)
+ZEArray<ZEEntity*> ZEScene::GetEntities(ZEObjectDescription* Desc)
 {
 	ZEArray<ZEEntity*> ProperEntities;
 	ZEEntity* CurrentEntity = NULL;
@@ -241,7 +241,7 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClassDescription* Desc)
 	{
 		CurrentEntity = Entities[I];
 
-		if (ZEClassDescription::CheckParent(Desc, CurrentEntity->GetClassDescription()))
+		if (ZEObjectDescription::CheckParent(Desc, CurrentEntity->GetDescription()))
 			ProperEntities.Add(CurrentEntity);
 	}
 
@@ -328,7 +328,7 @@ bool ZEScene::Save(const ZEString& FileName)
 		{
 			char NameBuffer[ZE_MAX_NAME_SIZE];
 			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
-			strcpy(NameBuffer, Entities[I]->GetClassDescription()->GetName());
+			strcpy(NameBuffer, Entities[I]->GetDescription()->GetName());
 			Serializer.Write((void*)NameBuffer, sizeof(char), ZE_MAX_NAME_SIZE);
 
 			if (!Entities[I]->Serialize((ZESerializer*)&Serializer))

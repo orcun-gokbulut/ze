@@ -59,7 +59,7 @@ const ZEArray<ZEInputDevice*>& ZEWindowsInputModule::GetInputDevices()
 
 bool ZEWindowsInputModule::Initialize()
 {	
-	zeLog("Initializing Windows Input.\r\n");
+	zeLog("Initializing Windows Input.");
 
 	RAWINPUTDEVICE Rid[2];    
 	// Mouse

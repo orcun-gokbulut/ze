@@ -70,7 +70,7 @@ class ZEMatrix4x4;
 class ZEVector2;
 class ZEVector3;
 class ZEVector4;
-class ZEClass;
+class ZEObject;
 
 class ZEVariant : public ZESerializable
 {
@@ -81,7 +81,7 @@ class ZEVariant : public ZESerializable
 			int				Integer;
 			bool			Boolean;
 			char*			String;
-			ZEClass*		Pointer;
+			ZEObject*		Pointer;
 			
 			struct
 			{
@@ -113,7 +113,7 @@ class ZEVariant : public ZESerializable
 		void				SetQuaternion(const ZEQuaternion& Quaternion);
 		void				SetMatrix3x3(const ZEMatrix3x3& Matrix);
 		void				SetMatrix4x4(const ZEMatrix4x4& Matrix);
-		void				SetClass(ZEClass* Pointer);
+		void				SetClass(ZEObject* Pointer);
 		void				SetNull();
 		void				SetVariant(const ZEVariant& NewValue);
 
@@ -127,7 +127,7 @@ class ZEVariant : public ZESerializable
 		ZEQuaternion&		GetQuaternion() const;
 		ZEMatrix3x3&		GetMatrix3x3() const;
 		ZEMatrix4x4&		GetMatrix4x4() const;
-		ZEClass*			GetClass() const;
+		ZEObject*			GetClass() const;
 		
 		bool				IsNull() const;
 		size_t				SizeOf() const;
@@ -146,7 +146,7 @@ class ZEVariant : public ZESerializable
 		void				operator= (const ZEQuaternion& Quaternion);
 		void				operator= (const ZEMatrix3x3& Matrix);
 		void				operator= (const ZEMatrix4x4& Matrix);
-		void				operator= (ZEClass* Pointer);
+		void				operator= (ZEObject* Pointer);
 
 							operator const char*();
 							operator int();
@@ -158,7 +158,7 @@ class ZEVariant : public ZESerializable
 							operator ZEQuaternion();
 							operator ZEMatrix3x3();
 							operator ZEMatrix4x4();
-							operator ZEClass*();
+							operator ZEObject*();
 
 							ZEVariant();
 							ZEVariant(const ZEVariant &InitialValue);
@@ -172,7 +172,7 @@ class ZEVariant : public ZESerializable
 							ZEVariant(const ZEQuaternion& Quaternion);
 							ZEVariant(const ZEMatrix3x3& Matrix);
 							ZEVariant(const ZEMatrix4x4& Matrix);
-							ZEVariant(ZEClass* Pointer);
+							ZEVariant(ZEObject* Pointer);
 							~ZEVariant();
 };
 

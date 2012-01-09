@@ -41,9 +41,9 @@
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEGraphics/ZERenderCommand.h"
-#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEObject.h"
 
-ZE_META_CLASS_DESCRIPTION(ZEParticleSystem);
+ZE_META_OBJECT_DESCRIPTION(ZEParticleSystem);
 
 class ZEParticleEffect;
 class ZEParticleEmitter;
@@ -63,9 +63,9 @@ class ZEMaterial;
 class ZEStaticVertexBuffer;
 struct ZEDrawParameters;
 
-class ZEParticleSystem : public ZEClass
+class ZEParticleSystem : public ZEObject
 {
-	ZE_META_CLASS(ZEMaterial)
+	ZE_META_OBJECT(ZEMaterial)
 
 	private:
 		ZEString							Name;						// Used in editor

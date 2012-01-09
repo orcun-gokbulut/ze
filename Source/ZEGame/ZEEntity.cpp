@@ -238,8 +238,6 @@ ZEEntity* ZEEntity::CreateInstance(const char* Name)
 	return (ZEEntity*)ZEEntityProvider::GetInstance()->CreateInstance(Name);
 }
 
-#include "ZEEntity.h.zpp"
-
 ZEEntityRunAt ZEEntityDescription::GetRunAt() const
 {
 	return ZE_ERA_NONE;

@@ -43,7 +43,7 @@
 
 struct ZEDrawParameters;
 
-ZE_META_CLASS_DESCRIPTION(ZEParticleEffect);
+ZE_META_OBJECT_DESCRIPTION(ZEParticleEffect);
 
 class ZEParticleEffect : public ZEComponent
 {

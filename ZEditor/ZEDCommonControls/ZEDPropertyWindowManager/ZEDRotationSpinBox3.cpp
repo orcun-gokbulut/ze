@@ -39,7 +39,7 @@
 #include "ZEDPropertyUndoRedo.h"
 #include <ZEMath/ZEMathDefinitions.h>
 
-ZEDRotationSpinBox3::ZEDRotationSpinBox3(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEClass* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+ZEDRotationSpinBox3::ZEDRotationSpinBox3(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
 {
 	this->ParentTree = ParentTree;
 	this->Class = Class;

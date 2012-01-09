@@ -166,8 +166,6 @@ ZESkyBrush* ZESkyBrush::CreateInstance()
 	return new ZESkyBrush();
 }
 
-#include "ZESkyBrush.h.zpp"
-
 ZEEntityRunAt ZESkyBrushDescription::GetRunAt() const
 {
 	return ZE_ERA_BOTH;

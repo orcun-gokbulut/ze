@@ -404,7 +404,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 		
 		if(MeshChunk.ChunkId != ZE_MDLF_MESH_CHUNKID)
 		{
-			zeError("Model Resource",  "Corrupted ZEModel file. Mesh's chunk id does not matches.");
+			zeError("Corrupted ZEModel file. Mesh's chunk id does not matches.");
 			return false;
 		}
 
@@ -428,7 +428,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 			ResourceFile->Read(&MeshLODChunk, sizeof(ZEModelFileMeshLODChunk), 1);
 			if (MeshLODChunk.ChunkId != ZE_MDLF_MESH_LOD_CHUNKID)
 			{
-				zeError("Model Resource",  "Corrupted ZEModel file. Mesh LOD's chunk id does not matches.");
+				zeError("Corrupted ZEModel file. Mesh LOD's chunk id does not matches.");
 				return false;			
 			}
 
@@ -595,7 +595,7 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 
 		if(BoneChunk.ChunkId != ZE_MDLF_BONE_CHUNKID)
 		{
-			zeError("Model Resource",  "Corrupted ZEModel file. Bone chunk id does not matches.");
+			zeError("Corrupted ZEModel file. Bone chunk id does not matches.");
 			return false;
 		}
 

@@ -39,7 +39,7 @@
 
 #include "ZED3D9ComponentBase.h"
 #include <d3d9.h>
-#include "ZEMeta/ZEClass.h"
+#include "ZEMeta/ZEObject.h"
 
 class ZETexture2D;
 class ZED3D9Texture2D;
@@ -47,11 +47,11 @@ class ZED3D9PixelShader;
 class ZED3D9VertexShader;
 class ZED3D9ViewPort;
 
-ZE_META_CLASS_DESCRIPTION(ZED3D9HDRProcessor);
+ZE_META_OBJECT_DESCRIPTION(ZED3D9HDRProcessor);
 
-class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEClass
+class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 {
-	ZE_META_CLASS(ZED3D9HDRProcessor);
+	ZE_META_OBJECT(ZED3D9HDRProcessor);
 
 	private:
 		ZED3D9Texture2D*				Input;
