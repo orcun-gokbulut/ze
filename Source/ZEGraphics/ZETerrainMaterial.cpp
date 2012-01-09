@@ -62,6 +62,8 @@ ZETerrainMaterial::ZETerrainMaterial()
 	Wireframe = false;
 	HeightScale = 1.0f;
 	HeightOffset = 0.0f;
+	TextureOffset = ZEVector2::Zero;
+	TextureScale = ZEVector2::One;
 
 	HeightTexture = NULL;
 	ColorTexture = NULL;
@@ -120,6 +122,26 @@ void ZETerrainMaterial::SetHeightScale(float Scale)
 float ZETerrainMaterial::GetHeightScale()
 {
 	return HeightScale;
+}
+
+void ZETerrainMaterial::SetTextureScale(const ZEVector2& Scale)
+{
+	TextureScale = Scale;
+}
+
+const ZEVector2& ZETerrainMaterial::GetTextureScale() const
+{
+	return TextureScale;
+}
+
+void ZETerrainMaterial::SetTextureOffset(const ZEVector2& Offset)
+{
+	TextureOffset = Offset;
+}
+
+const ZEVector2& ZETerrainMaterial::GetTextureOffset() const
+{
+	return TextureOffset;
 }
 
 void ZETerrainMaterial::SetColorTexture(ZETexture2D* Texture)

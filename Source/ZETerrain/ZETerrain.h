@@ -48,6 +48,29 @@ class ZETerrainMaterial;
 class ZERenderer;
 class ZEVertexDeclaration;
 
+struct ZETerrainData
+{
+	size_t Width;
+	size_t Height;
+	float* HeightData;
+	ZEUINT32* ColorData;
+
+	ZETerrainData()
+	{
+		Width = 0;
+		Height = 0;
+		HeightData = NULL;
+		ColorData = NULL;
+	}
+};
+
+struct ZETerrainLOD
+{
+	ZETexture2D* HeightTexture;
+	ZETexture2D* NormalTexture;
+	ZETexture2D* ColorTexture;
+};
+
 ZE_META_ENTITY_DESCRIPTION(ZETerrain)
 class ZETerrain : public ZEEntity
 {
@@ -59,6 +82,9 @@ class ZETerrain : public ZEEntity
 		ZEVertexDeclaration*					VertexDeclaration;
 		ZETerrainPrimitiveIndices				Indices;
 		
+		ZEArray<ZETerrainData>					TerrainData;
+		ZEArray<ZETerrainLOD>					TerrainLODs;
+
 		float									UnitLength;
 		ZEUInt									ChunkSize;
 		ZEUInt									MaxLevel;
@@ -72,7 +98,9 @@ class ZETerrain : public ZEEntity
 		ZETexture2D*							NormalTexture;
 
 		bool									LoadTerrain();
-		bool									DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVector3& WorldPosition, const ZEVector3& LocalPosition, float Scale, bool Rotate = false);
+		void									UnloadTerrain();
+
+		bool									DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVector3& Offset, const ZEVector3& Position, float Scale, bool Rotate = false);
 
 												ZETerrain();
 												~ZETerrain();
@@ -95,6 +123,8 @@ class ZETerrain : public ZEEntity
 
 		void									SetHeightScale(float Scale);
 		float									GetHeightScale();
+		
+		void									Stream();
 
 		virtual bool							Initialize();
 		virtual void							Deinitialize();

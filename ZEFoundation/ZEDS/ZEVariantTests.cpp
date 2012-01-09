@@ -100,13 +100,7 @@ ZETestSuite(ZEVariant)
 	}
 	ZETest("void* ZEVariant::GetPointer() const")
 	{
-		ZEVariant Variant;
-		int Value = 5;
-		int *p = &Value;
-		Variant.SetPointer(p);
-
-		int *Result = (int*)(Variant.GetPointer());
-		ZETestCheckEqual(*Result, 5);
+		ZETestCheck(false);
 	}
 	ZETest("ZEQuaternion& ZEVariant::GetQuaternion() const")
 	{
@@ -353,13 +347,8 @@ ZETestSuite(ZEVariant)
 	}
 	ZETest("ZEVariant::operator void*()")
 	{
-		ZEVariant Variant;
-		int Value = 5;
-		int *p = &Value;
-		Variant.SetPointer(p);
-
-		void *Result = (void *)Variant;
-		ZETestCheck(Result == Variant.GetPointer());
+		// ZEVariant has been changed pointer type became ZEClass type.
+		ZETestCheck(false);
 	}
 	ZETest("ZEVariant::operator ZEMatrix3x3()")
 	{
@@ -578,13 +567,8 @@ ZETestSuite(ZEVariant)
 	}
 	ZETest("void ZEVariant::SetPointer(void* Pointer)")
 	{
-		ZEVariant Variant;
-		int Value = 5;
-		void *p = &Value;
-
-		Variant.SetPointer(p);
-		ZETestCheck(Variant.GetType() == ZE_VRT_POINTER);
-		ZETestCheck(Variant.GetPointer() == p);
+		// ZEVariant has been changed pointer type became ZEClass type.
+		ZETestCheck(false);
 	}
 	ZETest("void ZEVariant::SetQuaternion(const ZEQuaternion& Quaternion)")
 	{
@@ -837,7 +821,7 @@ ZETestSuite(ZEVariant)
 		}
 		ZETestCase("ZE_VRT_POINTER")
 		{
-			Variant.SetType(ZE_VRT_POINTER);
+			Variant.SetType(ZE_VRT_CLASS);
 
 			Size = Variant.SizeOf();
 			ZETestCheckEqual(Size, 4);
@@ -1068,6 +1052,6 @@ ZETestSuite(ZEVariant)
 		void* Pointer;
 
 		ZEVariant Variant(&Pointer);
-		ZETestCheck(Variant.GetType() == ZE_VRT_POINTER);
+		ZETestCheck(Variant.GetType() == ZE_VRT_CLASS);
 	}
 }

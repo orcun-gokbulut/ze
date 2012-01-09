@@ -42,7 +42,7 @@
 float4x4 ViewProjMatrix : register(vs, c0);
 float4x4 WorldMatrix : register(vs, c4);
 float4x4 ViewMatrix : register(vs, c8);
-float4 VertexShaderParameters : register(c13);
+float4 VertexShaderParameters[2] : register(c13);
 
 // Pixel Shader Constants
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -53,9 +53,10 @@ float4 MaterialParametersPS[2] : register(ps, c10);
 #define	MaterialAmbientColor    MaterialParametersPS[0].xyz
 #define	MaterialDiffuseColor    MaterialParametersPS[1].xyz
 #define ScreenToTextureParams	PipelineParamatersPS[0]
-#define TextureSize				VertexShaderParameters.xy
-#define HeightAdjustments		VertexShaderParameters.zw
-
+#define TextureSize				VertexShaderParameters[0].xy
+#define HeightAdjustments		VertexShaderParameters[0].zw
+#define TextureOffset			VertexShaderParameters[1].xy
+#define TextureScale			VertexShaderParameters[1].zw
 
 // Textures
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -76,25 +77,32 @@ struct ZETerrainMaterial_GBuffer_VSOutput
 	float4 Position_ : POSITION0;
 	float3 ViewPosition : TEXCOORD0;
 	float2 Texcoord : TEXCOORD1;
-	float3 Matrix0 : TEXCOORD2;
-	float3 Matrix1 : TEXCOORD3;
-	float3 Matrix2 : TEXCOORD4;
+	float3x3 Matrix : TEXCOORD2;
+	float Cull : TEXCOORD5;
 };
+
+float2 ToTexcoord(float3 WorldPosition)
+{
+	float2 Texcoord = (TextureScale * (float2(WorldPosition.x, -WorldPosition.z) + 2.0f)) / TextureSize + 0.5f;
+	return TextureOffset + Texcoord;
+}
 
 ZETerrainMaterial_GBuffer_VSOutput ZETerrainMaterial_GBuffer_VertexShader(ZETerrainMaterial_VSInput Input)
 {
 	ZETerrainMaterial_GBuffer_VSOutput Output;
 
 	float4 WorldPosition = mul(WorldMatrix, Input.Position);
-	Output.Texcoord = (float2(WorldPosition.x, -WorldPosition.z) + TextureSize / 2) / TextureSize + 1.0f / TextureSize * 2.0f;
+	Output.Texcoord = ToTexcoord(WorldPosition);
+	
 	float Height = tex2Dlod(HeightTexture, float4(Output.Texcoord, 0.0f, 1.0f)).r;
-	WorldPosition.y  = HeightAdjustments.x + HeightAdjustments.y * Height;
+	WorldPosition.y += HeightAdjustments.x + HeightAdjustments.y * Height;
 
 	Output.Position_ = mul(ViewProjMatrix, WorldPosition);
 	Output.ViewPosition = mul(ViewMatrix, WorldPosition);
-	Output.Matrix0 = (float3)ViewMatrix[0];
-	Output.Matrix1 = (float3)ViewMatrix[1];
-	Output.Matrix2 = (float3)ViewMatrix[2];
+	Output.Matrix = ViewMatrix;
+
+	Output.Cull = Height;
+	
 	return Output;
 }
 
@@ -103,16 +111,21 @@ struct ZETerrainMaterial_GBuffer_PSInput
 {
 	float3 ViewPosition : TEXCOORD0;
 	float2 Texcoord : TEXCOORD1;
-	float3 Matrix0 : TEXCOORD2;
-	float3 Matrix1 : TEXCOORD3;
-	float3 Matrix2 : TEXCOORD4;
+	float3x3 Matrix : TEXCOORD2;
+	float Cull : TEXCOORD5;
 };
 
 ZEGBuffer ZETerrainMaterial_GBuffer_PixelShader(ZETerrainMaterial_GBuffer_PSInput Input)
 {
 	ZEGBuffer GBuffer = (ZEGBuffer)0;
 	
-	float3x3 Matrix = float3x3(Input.Matrix0, Input.Matrix1, Input.Matrix2);
+	if (Input.Cull == 0)
+	{
+		discard;
+		return GBuffer;
+	}
+	
+	//float3x3 Matrix = float3x3(Input.Matrix0, Input.Matrix1, Input.Matrix2);
 	
 	float3 PolygonDispX = ddx(Input.ViewPosition);
 	float3 PolygonDispY = ddy(Input.ViewPosition);
@@ -140,7 +153,7 @@ ZEGBuffer ZETerrainMaterial_GBuffer_PixelShader(ZETerrainMaterial_GBuffer_PSInpu
 	
 	//float coef = 0.02;
 	//float3 Normal = normalize(float3((s1 - s3), 1.0f, (s2 - s4)));
-	ZEGBuffer_SetViewNormal(GBuffer, mul(Matrix, -n));
+	ZEGBuffer_SetViewNormal(GBuffer, mul(Input.Matrix, -n));
 	// Smootering group fix
 	/*if (dot(PolygonNormal, VertexNormal) < 0.3)*/
 	//	ZEGBuffer_SetViewNormal(GBuffer, PolygonNormal);
@@ -164,6 +177,7 @@ struct ZETerrainMaterial_ForwardPass_VSOutput
 {
 	float4 Position_ : POSITION0;
 	float2 Texcoord : TEXCOORD0;
+	float Cull : TEXCOORD1;
 };
 
 ZETerrainMaterial_ForwardPass_VSOutput ZETerrainMaterial_ForwardPass_VertexShader(ZETerrainMaterial_VSInput Input)
@@ -172,11 +186,13 @@ ZETerrainMaterial_ForwardPass_VSOutput ZETerrainMaterial_ForwardPass_VertexShade
 
 	float4 WorldPosition = mul(WorldMatrix, Input.Position);
 	
-	Output.Texcoord = (float2(WorldPosition.x, -WorldPosition.z) + TextureSize / 2) / TextureSize + 1.0f / TextureSize * 2.0f;
+	Output.Texcoord = ToTexcoord(WorldPosition);
+	
 	float Height = tex2Dlod(HeightTexture, float4(Output.Texcoord, 0.0f, 1.0f)).r;
-	WorldPosition.y  = HeightAdjustments.x + HeightAdjustments.y * Height;
+	WorldPosition.y += HeightAdjustments.x + HeightAdjustments.y * Height;
 
 	Output.Position_ = mul(ViewProjMatrix, WorldPosition);
+	Output.Cull = Height;
 	
 	return Output;
 }
@@ -190,12 +206,20 @@ struct ZETerrainMaterial_ForwardPass_PSInput
 {
 	float3 ScreenPosition : VPOS;
 	float2 Texcoord : TEXCOORD0;
+	float Cull : TEXCOORD1;
 };
 
 ZETerrainMaterial_ForwardPass_PSOutput ZETerrainMaterial_ForwardPass_PixelShader(ZETerrainMaterial_ForwardPass_PSInput Input)
 {
 	ZETerrainMaterial_ForwardPass_PSOutput Output;
 	Output.Color = float4(0.0f, 0.0f, 0.0f, 1.0f);
+	
+	if (Input.Cull == 0)
+	{
+		discard;
+		return Output;
+	}
+
 	
 	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
 

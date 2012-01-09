@@ -136,8 +136,8 @@ void ZEVariant::SetVariant(const ZEVariant& NewValue)
 		case ZE_VRT_MATRIX4X4:
 			SetMatrix4x4(NewValue.GetMatrix4x4());
 			break;
-		case ZE_VRT_POINTER:
-			SetPointer(NewValue.GetPointer());
+		case ZE_VRT_CLASS:
+			SetClass(NewValue.GetClass());
 			break;
 		default:
 			zeAssert(true, "ZEVariant::SetVariant operation failed. Error in variant type.");
@@ -172,7 +172,7 @@ size_t ZEVariant::SizeOf() const
 			return sizeof(ZEMatrix3x3);
 		case ZE_VRT_MATRIX4X4:
 			return sizeof(ZEMatrix4x4);
-		case ZE_VRT_POINTER:
+		case ZE_VRT_CLASS:
 			return sizeof(void*);
 		default:
 			zeAssert(true, "ZEVariant::SizeOf is wrong type.");
@@ -182,58 +182,50 @@ size_t ZEVariant::SizeOf() const
 
 bool ZEVariant::Serialize(ZESerializer* Serializer)
 {
+
 	ZEDWORD _Type = Type;
 	ZEDWORD StringSize;
+	Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
+
 	switch(Type)
 	{
 		case ZE_VRT_UNDEFINED:
 		case ZE_VRT_NULL:
-			Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
 			break;
 		case ZE_VRT_STRING:
-			Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
 			StringSize = strlen(Value.String) + 1;
 			Serializer->Write(&StringSize, sizeof(ZEDWORD), 1);
 			Serializer->Write(Value.String, sizeof(char), StringSize);
 			break;
 		case ZE_VRT_INTEGER:
-			Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
 			Serializer->Write(&Value.Integer, sizeof(int), 1);
 			break;
 		case ZE_VRT_BOOLEAN:
-			Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
 			Serializer->Write(&Value.Boolean, sizeof(bool), 1);
 			break;
 		case ZE_VRT_FLOAT:
-			Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
 			Serializer->Write(&Value.Float, sizeof(float), 1);
 			break;
 		case ZE_VRT_VECTOR2:
-			Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
 			Serializer->Write(&Value.Vectors, sizeof(ZEVector2), 1);
 			break;
 		case ZE_VRT_VECTOR3:
-			Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
 			Serializer->Write(&Value.Vectors, sizeof(ZEVector3), 1);
 			break;
 		case ZE_VRT_VECTOR4:
-			Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
 			Serializer->Write(&Value.Vectors, sizeof(ZEVector4), 1);
 			break;
 		case ZE_VRT_QUATERNION:
-			Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
 			Serializer->Write(&Value.Vectors, sizeof(ZEQuaternion), 1);
 			break;
 		case ZE_VRT_MATRIX3X3:
-			Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
 			Serializer->Write(Value.Matrix3x3, sizeof(ZEMatrix3x3), 1);
 			break;
 		case ZE_VRT_MATRIX4X4:
-			Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
 			Serializer->Write(Value.Matrix4x4, sizeof(ZEMatrix4x4), 1);
 			break;
-		case ZE_VRT_POINTER:
-			zeAssert(true, "Can not serialize pointer type.");
+		case ZE_VRT_CLASS:
+			zeAssert(true, "Can not unserialize pointer type.");
 			return false;
 		default:
 			zeAssert(true, "Wrong variant type.");
@@ -298,7 +290,7 @@ bool ZEVariant::Unserialize(ZEUnserializer* Unserializer)
 			SetType(ZE_VRT_MATRIX4X4);
 			Unserializer->Read(Value.Matrix4x4, sizeof(ZEMatrix4x4), 1);
 			break;
-		case ZE_VRT_POINTER:
+		case ZE_VRT_CLASS:
 			SetType(ZE_VRT_UNDEFINED);
 			zeAssert(true, "Can not unserialize pointer type.");
 			return false;
@@ -373,10 +365,10 @@ void ZEVariant::SetMatrix4x4(const ZEMatrix4x4& Matrix)
 	*this->Value.Matrix4x4 = Matrix;
 }
 
-void ZEVariant::SetPointer(void* Pointer)
+void ZEVariant::SetClass(ZEClass* Class)
 {
-	SetType(ZE_VRT_POINTER);
-	Value.Pointer = Pointer;
+	SetType(ZE_VRT_CLASS);
+	Value.Pointer = Class;
 }
 
 void ZEVariant::SetNull()
@@ -443,9 +435,9 @@ ZEMatrix4x4& ZEVariant::GetMatrix4x4() const
 	return *Value.Matrix4x4;
 }
 
-void* ZEVariant::GetPointer() const
+ZEClass* ZEVariant::GetClass() const
 {
-	zeAssert(this->Type != ZE_VRT_POINTER, "ZEVariant::GetPointer operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_CLASS, "ZEVariant::GetPointer operation failed. Variant type mismatched.");
 	return Value.Pointer;
 }
 
@@ -576,9 +568,9 @@ ZEVariant::operator ZEMatrix4x4()
 
 }
 
-ZEVariant::operator void*()
+ZEVariant::operator ZEClass*()
 {
-	zeAssert(this->Type != ZE_VRT_POINTER, "Pointer conversion operation failed. Variant type mismatched.");
+	zeAssert(this->Type != ZE_VRT_CLASS, "Pointer conversion operation failed. Variant type mismatched.");
 	return Value.Pointer;
 }
 
@@ -643,9 +635,9 @@ ZEVariant::ZEVariant(const ZEMatrix4x4& Matrix)
 	SetMatrix4x4(Matrix);
 }
 
-ZEVariant::ZEVariant(void* Pointer)
+ZEVariant::ZEVariant(ZEClass* Class)
 {
-	SetPointer(Pointer);
+	SetClass(Class);
 }
 
 ZEVariant::~ZEVariant()
