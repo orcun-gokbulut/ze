@@ -38,23 +38,7 @@
 #define __ZE_COMPRESSED_FILE_H__
 
 #include "ZETypes.h"
-#include "../Source/ZEDefinitions.h"
-
-enum ZESeekFrom
-{
-	ZE_SF_BEGINING	= 0,
-	ZE_SF_END		= 1,
-	ZE_SF_CURRENT	= 2,
-};
-
-enum ZEFileMode
-{
-	ZE_FM_READ_ONLY			= 0,
-	ZE_FM_WRITE_ONLY		= 1,
-	ZE_FM_APPEND_ONLY		= 2,
-	ZE_FM_READ_WRITE		= 3,
-	ZE_FM_READ_APPEND		= 4,
-};
+#include "ZEFile/ZEFile.h"
 
 
 class ZECompressedFile

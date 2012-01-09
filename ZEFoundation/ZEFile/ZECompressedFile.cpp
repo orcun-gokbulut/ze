@@ -33,16 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETDefinitions.h"
 #include "ZECompressedFile.h"
-#include <zlib.h>
 
+#include <zlib.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <sys/stat.h>
-
 #include <string.h>
 #include <fstream>
 #include <io.h>
+
 
 
 #define CHUNK_SIZE 1048576

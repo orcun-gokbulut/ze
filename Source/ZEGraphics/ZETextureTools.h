@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TEXTURETOOLS_H__
-#define __ZE_TEXTURETOOLS_H__
+#ifndef __ZE_TEXTURE_TOOLS_H__
+#define __ZE_TEXTURE_TOOLS_H__
 
 #include "ZETextureOptions.h"
 #include "ZEGraphicsModule.h"
@@ -44,28 +44,27 @@
 #include "ZEGraphics/ZETextureLoader.h"
 
 class ZETexture2D;
-class ZEResourceFile;
 
 class ZETextureTools
 {
 	private:
 									ZETextureTools();
-									~ZETextureTools();
+	virtual							~ZETextureTools();
 
 	public:
+		static bool					IsResizeable(unsigned int Width, unsigned int Height);
+		static bool					IsCompressible(unsigned int Width, unsigned int Height);
+		static unsigned int			GetMaxMipmapCount(unsigned int Width, unsigned int Height);
 
-									// IS texture resizeable by 2
-		static bool					IsResizeable(ZETextureLoaderInfo &TextureInfo);
-									// IS texture compressible by DXT3/BC2
-		static bool					IsCompressible(ZETextureLoaderInfo &TextureInfo);
-									// Get maximum possible mipmap count
-		static unsigned int			GetMaxMipmapCount(ZETextureLoaderInfo &TextureInfo);
-
-		static void					CopyTextureRegion(void *DestData, unsigned int DestPitch,
+		static void					CopyTextureRegion(void* DestData, unsigned int DestPitch,
 													  unsigned int DestX, unsigned int DestY,
-													  void *SourceData, unsigned int SourcePitch, unsigned int SourceBitsPP,
+													  void* SourceData, unsigned int SourcePitch, unsigned int SourceBitsPP,
 													  unsigned int SourceX, unsigned int SourceY, 
 													  unsigned int CopyWidth, unsigned int CopyHeight);
+
+		static void					CopyTexture(void* DestData, unsigned int DestPitch,
+												void* SourceData, unsigned int SourcePitch,
+												unsigned int RowSize, unsigned int RowCount);
 
 		static void					CompressTexture(void* DestinationData, unsigned int DestinationPitch, 
 													void* SourceData, unsigned int SourcePitch, 
@@ -73,8 +72,8 @@ class ZETextureTools
 													const ZETextureOptions* CompressionOptions = NULL);
 
 		static void					DownSample2x(void* DestinationData, unsigned int DestinationPitch, 
-												 void* SourceData, unsigned int SourcePitch, /*unsigned int SourceBitsPP,*/
-												 unsigned int SourceWidth, unsigned int SourceHeight);
+												 void* SourceData, unsigned int SourcePitch,
+												 unsigned int SourceWidth, unsigned int SourceHeight, bool UseGpu = true);
 		
 		
 

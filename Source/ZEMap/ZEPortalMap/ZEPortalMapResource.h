@@ -91,6 +91,8 @@ struct ZEPortalMapResourceDoor
 	bool										IsOpen;
 };
 
+class ZEFile;
+
 class ZEPortalMapResource : public ZEMapResource
 {
 	private:
@@ -100,11 +102,11 @@ class ZEPortalMapResource : public ZEMapResource
 		ZEArray<ZEPortalMapResourcePortal>			Portals;
 
 		const ZETexture2D*							ManageMapMaterialTextures(const ZEString& FileName);
-		bool  										ReadMaterialsFromFile(ZEResourceFile* ResourceFile);
-		bool  										ReadPhysicalMeshFromFile(ZEResourceFile* ResourceFile, ZEPortalMapResourcePortal* Portal);
-		bool  										ReadPortalsFromFile(ZEResourceFile* ResourceFile);
-		bool  										ReadDoorsFromFile(ZEResourceFile* ResourceFile);
-		bool  										ReadMapFromFile(ZEResourceFile* ResourceFile);
+		bool  										ReadMaterialsFromFile(ZEFile* ResourceFile);
+		bool  										ReadPhysicalMeshFromFile(ZEFile* ResourceFile, ZEPortalMapResourcePortal* Portal);
+		bool  										ReadPortalsFromFile(ZEFile* ResourceFile);
+		bool  										ReadDoorsFromFile(ZEFile* ResourceFile);
+		bool  										ReadMapFromFile(ZEFile* ResourceFile);
 
 		virtual										~ZEPortalMapResource();
 
@@ -116,9 +118,9 @@ class ZEPortalMapResource : public ZEMapResource
 		const ZEArray<ZEPortalMapResourcePortal>&	GetPortals();
 		const ZEArray<ZEPortalMapResourceDoor>&		GetDoors();
 
-		static ZEPortalMapResource*					LoadResource(const char* FileName);
-		static ZEPortalMapResource*					LoadSharedResource(const char* FileName);
-		static void									CacheResource(const char* FileName);
+		static ZEPortalMapResource*					LoadResource(const ZEString& FileName);
+		static ZEPortalMapResource*					LoadSharedResource(const ZEString& FileName);
+		static void									CacheResource(const ZEString& FileName);
 };
 #endif
 

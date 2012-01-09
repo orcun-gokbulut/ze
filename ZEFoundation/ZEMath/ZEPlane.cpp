@@ -48,7 +48,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &
 	float D = ZEVector3::DotProduct(Plane.n, Line.v);
 	float N = -ZEVector3::DotProduct(Plane.n, w);
 
-	if (fabs(D) < ZE_ZERO_TRESHOLD) 
+	if (fabs(D) < ZE_ZERO_THRESHOLD) 
 	{
 		return false;
     }
@@ -66,7 +66,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELineSegment& LineSe
 	float D = ZEVector3::DotProduct(Plane.n, LineSegment.v);
 	float N = -ZEVector3::DotProduct(Plane.n, w);
 
-	if (fabs(D) < ZE_ZERO_TRESHOLD) 
+	if (fabs(D) < ZE_ZERO_THRESHOLD) 
 		return false;
 
     t = N / D;
@@ -85,7 +85,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t)
 	float D = ZEVector3::DotProduct(Plane.n, Ray.v);
 	float N = -ZEVector3::DotProduct(Plane.n, w);
 
-	if (fabs(D) < ZE_ZERO_TRESHOLD) 
+	if (fabs(D) < ZE_ZERO_THRESHOLD) 
 		return false;
 
     t = N / D;
@@ -121,9 +121,9 @@ ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane& Plane, const ZEVector3& Point)
 	
 	float D = Temp.x + Temp.y + Temp.z;
 
-	if (fabs(D) < ZE_ZERO_TRESHOLD)
+	if (fabs(D) < ZE_ZERO_THRESHOLD)
 		return ZE_HS_ON_PLANE;
-	else if (D > ZE_ZERO_TRESHOLD)
+	else if (D > ZE_ZERO_THRESHOLD)
 		return ZE_HS_POSITIVE_SIDE;
 	else
 		return ZE_HS_NEGATIVE_SIDE;

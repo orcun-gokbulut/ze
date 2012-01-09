@@ -48,8 +48,8 @@ enum ZERenderPipeline
 	ZE_RORP_2D = 1
 };
 
-// ZERenderOrderFlags
-typedef ZEDWORD ZERenderOrderFlags;
+// ZERenderCommandFlags
+typedef ZEDWORD ZERenderCommandFlags;
 #define	ZE_ROF_NONE									0
 #define	ZE_ROF_TRANSPARENT							1
 #define	ZE_ROF_IMPOSTER								2
@@ -69,7 +69,7 @@ enum ZEROPrimitiveType
 	ZE_ROPT_POINT,
 	ZE_ROPT_LINE,
 	ZE_ROPT_TRIANGLE,
-	ZE_ROPT_TRIANGLESTRIPT
+	ZE_ROPT_TRIANGLE_STRIPT
 };
 
 class ZELight;
@@ -83,7 +83,7 @@ class ZERenderCommand
 		ZERenderPipeline				Pipeline;
 		int								Priority;
 		float							Order;
-		ZERenderOrderFlags				Flags;
+		ZERenderCommandFlags				Flags;
 		ZEROPrimitiveType				PrimitiveType;
 		ZEVertexDeclaration*			VertexDeclaration;
 		size_t							VertexBufferOffset;

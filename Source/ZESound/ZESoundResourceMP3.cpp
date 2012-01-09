@@ -38,6 +38,30 @@
 #include <mpg123.h>
 #include <stdio.h>
 
+static ZEString ConstructResourcePath(const ZEString& Path)
+{
+	ZEString NewString = Path;
+	unsigned int ConstLength = strlen("resources\\") - 1;
+
+	if (Path[0] == '\\' || Path[0] == '/')
+		NewString = NewString.SubString(1, Path.GetLength() - 1);
+
+	// If it is guaranteed that there is no "resources\\" string in beginning
+	if (NewString.GetLength() - 1 < ConstLength)
+	{
+		NewString.Insert(0, "resources\\");
+		return NewString;
+	}
+	// Else check if there is "resources\\" in the beginning
+	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
+	{
+		NewString.Insert(0, "resources\\");
+		return NewString;
+	}
+
+	return NewString;
+}
+
 static ssize_t Memory_Read(int fd, void *buffer, size_t nbyte)
 {
 	ZESoundResourceMP3* Resource = (ZESoundResourceMP3*)fd;
@@ -129,31 +153,34 @@ void ZESoundResourceMP3::BaseDeinitialize()
 	mpg123_exit();
 }
 
-ZESoundResource* ZESoundResourceMP3::LoadResource(const char* FileName)
+ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 {
-	ZEResourceFile File;
-	if(!File.Open(FileName))
+	ZEString NewPath = ConstructResourcePath(FileName);
+
+	ZEFile* File = ZEFile::Open(NewPath);
+	if(File == NULL || !File->IsOpen())
 	{
-		zeError("Can not open ogg file. (FileName : \"%s\")", FileName);
+		zeError("Can not open ogg file. (FileName : \"%s\")", NewPath);
 		return NULL;
 	}
 
 	ZESoundResourceMP3* NewResource = new ZESoundResourceMP3();
 
-	File.Seek(0, ZE_SF_END);
-	NewResource->DataSize = File.Tell();
+	File->Seek(0, ZE_SF_END);
+	NewResource->DataSize = File->Tell();
 	NewResource->Data = new unsigned char[NewResource->DataSize];
-	File.Seek(0, ZE_SF_BEGINING);
-	File.Read(NewResource->Data, 1, NewResource->DataSize);
-	File.Close();
+	File->Seek(0, ZE_SF_BEGINING);
+	File->Read(NewResource->Data, 1, NewResource->DataSize);
+	File->Close();
+	delete File;
 
-	NewResource->SetFileName(FileName);	
+	NewResource->SetFileName(NewPath);	
 	NewResource->MemoryCursor = 0;
 
 	NewResource->mpg123 = mpg123_new(NULL, NULL);
 	if (NewResource->mpg123 == NULL)
 	{
-		zeError("Can not create MP3 handle. (FileName : \"%s\")", FileName);
+		zeError("Can not create MP3 handle. (FileName : \"%s\")", NewPath);
 		return NULL;
 	}
 	

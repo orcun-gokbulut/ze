@@ -91,5 +91,5 @@ void ZEDSpinBox1Float::Changed()
 	Class->GetProperty(ClassAttribute.Name, Value);
 	TempOperation->SetNewValue(Value);
 
-	ZEDUndoRedoManager::RegisterOperation(TempOperation);
+	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);
 }

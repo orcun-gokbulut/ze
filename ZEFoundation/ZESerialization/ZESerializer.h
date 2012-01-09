@@ -37,10 +37,12 @@
 #ifndef __ZE_SERIALIZER_H__
 #define __ZE_SERIALIZER_H__
 
+#include "ZETypes.h"
+
 class ZESerializer
 {
 	public:
-		virtual size_t				Write(const void* Buffer, size_t Size, size_t Count) = 0;
+		virtual ZEQWORD			Write(const void* Buffer, ZEQWORD Size, ZEQWORD Count) = 0;
 };
 
 #endif

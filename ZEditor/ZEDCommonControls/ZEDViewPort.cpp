@@ -291,7 +291,7 @@ void ZEDViewPort::mouseReleaseEvent(QMouseEvent* Event)
 
 			GizmoUndoRedo->SetNewValues(SelectedItemNewValues);
 
-			ZEDUndoRedoManager::RegisterOperation(GizmoUndoRedo);
+			ZEDUndoRedoManagerOld::RegisterOperation(GizmoUndoRedo);
 			UndoRedoStarted = false;
 		}
 	}

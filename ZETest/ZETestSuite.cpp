@@ -40,18 +40,18 @@
 #include <string.h>
 #include <stdio.h>
 
-const char* ZETestSuite::GetName()
+const char* ZETestSuiteItem::GetName()
 {
 	return Name;
 }
 
-void ZETestSuite::RegisterTest(ZETestItem* Test)
+void ZETestSuiteItem::RegisterTest(ZETestItem* Test)
 {
 	Tests[TotalTestCount] = Test;
 	TotalTestCount++;
 }
 
-bool ZETestSuite::RunTests()
+bool ZETestSuiteItem::RunTests()
 {
 	Reset();
 
@@ -78,15 +78,15 @@ bool ZETestSuite::RunTests()
 
 	Result = CurrentResult ? ZE_TR_PASSED : ZE_TR_FAILED;
 
-	if (!CurrentResult)
-		printf("Test suite \"%s\" has passed. Total Time : %d ms \n", GetName(), ElapsedTime);
+	if (CurrentResult)
+		printf("Test suite \"%s\" has passed. Total Time : %f ms \n", GetName(), ElapsedTime);
 	else
-		printf("Test suite \"%s\" has FAILED !!! Elapsed time : %d, Passed test count : %d, Failed test count : %d.\n", GetName(), ElapsedTime, PassedTestCount, TotalTestCount - PassedTestCount);
+		printf("Test suite \"%s\" has FAILED !!! Elapsed time : %f, Passed test count : %d, Failed test count : %d.\n", GetName(), ElapsedTime, PassedTestCount, TotalTestCount - PassedTestCount);
 
 	return CurrentResult;
 }
 
-void ZETestSuite::Reset()
+void ZETestSuiteItem::Reset()
 {
 	Result = ZE_TR_NOT_RUN;
 	ElapsedTime = 0;
@@ -95,22 +95,22 @@ void ZETestSuite::Reset()
 		Tests[I]->Reset();
 }
 
-ZETestResult ZETestSuite::GetResult()
+ZETestResult ZETestSuiteItem::GetResult()
 {
 	return Result;
 }
 
-float ZETestSuite::GetElapsedTime()
+float ZETestSuiteItem::GetElapsedTime()
 {
 	return ElapsedTime;
 }
 
-int ZETestSuite::GetTotalTestCount()
+int ZETestSuiteItem::GetTotalTestCount()
 {
 	return TotalTestCount;
 }
 
-int ZETestSuite::GetFailedTestCount()
+int ZETestSuiteItem::GetFailedTestCount()
 {
 	if (Result == ZE_TR_NOT_RUN)
 		return 0;
@@ -118,12 +118,12 @@ int ZETestSuite::GetFailedTestCount()
 	return TotalTestCount - PassedTestCount;
 }
 
-int ZETestSuite::GetPassedTestCount()
+int ZETestSuiteItem::GetPassedTestCount()
 {
 	return PassedTestCount;
 }
 
-ZETestSuite::ZETestSuite(const char* Name)
+ZETestSuiteItem::ZETestSuiteItem(const char* Name)
 {
 	Result = ZE_TR_NOT_RUN;
 	ElapsedTime = 0;
@@ -131,7 +131,7 @@ ZETestSuite::ZETestSuite(const char* Name)
 	strncpy(this->Name, Name, 255);
 }
 
-ZETestSuiteRegister::ZETestSuiteRegister(ZETestSuite* Suite)
+ZETestSuiteItemRegister::ZETestSuiteItemRegister(ZETestSuiteItem* Suite)
 {
 	ZETestManager::GetInstance()->RegisterTestSuite(Suite);
 }

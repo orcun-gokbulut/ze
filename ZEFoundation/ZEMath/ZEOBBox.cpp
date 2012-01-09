@@ -46,28 +46,12 @@
 #include <float.h>
 #include <math.h>
 
-ZEVector3 ZEOBBox::GetVertex(unsigned char Index) const
+ZEVector3 ZEOBBox::GetVertex(unsigned int Index) const
 {
-	zeAssert(Index > 7, "There is only 8 vertex in OBB box.");
-	switch(Index)
-	{
-		case 0:
-			return Center - Up * HalfSize.x - Right * HalfSize.y - Front * HalfSize.z;
-		case 1:
-			return Center + Up * HalfSize.x - Right * HalfSize.y - Front * HalfSize.z;
-		case 2:
-			return Center - Up * HalfSize.x + Right * HalfSize.y - Front * HalfSize.z;
-		case 3:
-			return Center + Up * HalfSize.x + Right * HalfSize.y - Front * HalfSize.z;
-		case 4:
-			return Center - Up * HalfSize.x - Right * HalfSize.y + Front * HalfSize.z;
-		case 5:
-			return Center + Up * HalfSize.x - Right * HalfSize.y + Front * HalfSize.z;
-		case 6:
-			return Center - Up * HalfSize.x + Right * HalfSize.y + Front * HalfSize.z;
-		case 7:
-			return Center + Up * HalfSize.x + Right * HalfSize.y + Front * HalfSize.z;
-	}
+	ZEVector3 Max = Center + Up * HalfSize.x + Right * HalfSize.y + Front * HalfSize.z;
+	ZEVector3 Min = Center - Up * HalfSize.x - Right * HalfSize.y - Front * HalfSize.z;
+
+	return  ZEVector3(Index & 0x01 ? Max.x : Min.x, Index & 0x02 ? Max.y : Min.y, Index & 0x04 ? Max.z : Min.z);
 }
 
 void ZEOBBox::CreateFromOrientation(ZEOBBox& BoundingBox, const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Size)
@@ -150,7 +134,7 @@ static inline int SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal
 	float e = ZEVector3::DotProduct(PlaneNormal, Center - Line->p);
 	float f = ZEVector3::DotProduct(PlaneNormal, Line->v);
 
-	if (fabs(f) > ZE_ZERO_TRESHOLD)
+	if (fabs(f) > ZE_ZERO_THRESHOLD)
 	{
 		float t1 = (e + HalfSize) / f;
 		float t2 = (e - HalfSize) / f;

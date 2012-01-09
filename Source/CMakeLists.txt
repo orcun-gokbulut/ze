@@ -44,9 +44,7 @@ set (CMAKE_CXX_SOURCE_FILE_EXTENSIONS ${CMAKE_CXX_SOURCE_FILE_EXTENSIONS} zpp)
 append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
 	ZE_ZINEK_ENGINE)
 
-include_directories(${PROJECT_SOURCE_DIR}
-	${CMAKE_SOURCE_DIR}/ZEFoundation)
-
+add_subdirectory(ZEAI)
 add_subdirectory(ZECore)
 add_subdirectory(ZEDebug)
 add_subdirectory(ZEGame)
@@ -61,6 +59,7 @@ add_subdirectory(ZEPhysics)
 add_subdirectory(ZEScript)
 add_subdirectory(ZESound)
 add_subdirectory(ZEUI)
+add_subdirectory(ZETerrain)
 
 ze_add_source(ZEAPI.h 						Sources Headers)
 ze_add_source(ZECompileOptions.h 			Sources Headers)
@@ -74,7 +73,7 @@ ze_add_library(ZEEngineAPI
 	HEADERS ${Headers}
 	LIBS ZEFoundationAPI
 		ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEUI ZEGame ZEMap ZEPortalMap ZEModel ZEParticle
-		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput
+		ZEDirect3D9 ZEWindowsInput ZEDirectSound ZEOpenAL ZEPhysX ZEVRPNInput ZEAI ZETerrain
 	INSTALL
 	INSTALL_DESTINATION "ZEEngineAPI"
 	INSTALL_COMPONENT ZESDK)

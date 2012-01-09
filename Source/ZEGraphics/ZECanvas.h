@@ -37,13 +37,16 @@
 #ifndef __ZE_CANVAS_H__
 #define __ZE_CANVAS_H__
 
-#include "ZEVertexTypes.h"
-#include "ZEVertexBuffer.h"
+
 #include "ZEDS/ZEArray.h"
+#include "ZEVertexTypes.h"
+#include "ZEDS/ZEString.h"
+#include "ZEVertexBuffer.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEQuaternion.h"
+
 
 class ZECanvasVertex
 {
@@ -112,6 +115,7 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		void							AddWireframeCylinder(float Radius, float Height, unsigned int HSegments, unsigned int VSegments, bool Caps);
 		void							AddWireframePyramid(float Width, float Height, float Length);
 		void							AddWireframeCone(float Radius, unsigned int Segments, float Height);
+		void							AddWireframeConvexPolygon(const ZEVector3* Vertices, size_t VertexCount);
 
 		// 3D Primitives
 		void							AddBox(float Width, float Height, float Length);
@@ -122,6 +126,7 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		void							AddPyramid(float Width, float Height, float Length);
 		void							AddPlane(float Width, float Length);
 		void							AddCone(float Radius, unsigned int Segments, float Height);
+		void							AddConvexPolygon(const ZEVector3* Vertices, size_t VertexCount);
 
 		// Custom Vertices
 		void							AddVertex(const ZECanvasVertex& Vertex);
@@ -134,8 +139,8 @@ class ZECanvas : public ZEDynamicVertexBuffer
 
 		ZEStaticVertexBuffer*			CreateStaticVertexBuffer();
 
-		bool							LoadFromFile(const char* FileName);
-		void							SaveToFile(const char* Filename);
+		bool							LoadFromFile(const ZEString& FileName);
+		void							SaveToFile(const ZEString& FileName);
 
 		virtual unsigned int			GetBufferSize();
 		virtual void*					GetVertexBuffer();

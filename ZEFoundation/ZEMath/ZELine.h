@@ -65,7 +65,7 @@ class ZELine
 		static float		MinimumDistance(const ZELine& Line, const ZERay& Ray);
 		static float		MinimumDistance(const ZELine& Line, const ZERay& Ray, float& TLine, float& TRay);
 
-		void				GetPointOn(ZEVector3& Point, float TLine) const;
+		static void			GetPointOn(ZEVector3& Point, const ZELine& Line, float TLine);
 		ZEVector3			GetPointOn(float TLine) const;
 
 							//ZELine(const ZEVector3& v, const ZEVector3& p);

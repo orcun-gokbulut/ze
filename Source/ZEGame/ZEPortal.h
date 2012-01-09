@@ -43,7 +43,6 @@ class ZEViewCone;
 class ZEComponent;
 class ZELight;
 class ZEPortal;
-class ZEOctree;
 class ZEMapPortal;
 
 class ZEPortal

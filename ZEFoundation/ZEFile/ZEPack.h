@@ -40,6 +40,7 @@
 #include <stdio.h>
 #include "../ZETypes.h"
 #include "../Source/ZEDefinitions.h"
+#include "ZEDS/ZEString.h"
 
 class ZECompressedFile;
 class ZEPartialCompressedFile;
@@ -63,7 +64,7 @@ class ZEPack
 										~ZEPack();
 
 										// Opens the pack file
-		bool							OpenPack(const char* PackFileName);
+		bool							Open(const char* PackFileName);
 
 										// Closes the pack file
 		void							ClosePack();
@@ -89,8 +90,7 @@ class ZEPack
 										// Deletes a chunk completely
 		bool							DeleteChunk(const char* IdentifierName);
 
-
-										
+		static bool						IsPack(ZEString& Path);
 										
 };
 

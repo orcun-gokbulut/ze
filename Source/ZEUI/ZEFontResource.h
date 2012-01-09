@@ -40,6 +40,7 @@
 #include "ZECore/ZEResource.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZERectangle.h"
+#include "ZEGraphics/ZETextureOptions.h"
 
 #define ZE_FONT_CHARACTER_COUNT				256
 
@@ -68,13 +69,14 @@ class ZEFontResource : public ZEResource
 
 	public:
 		virtual const char*					GetResourceType() const;
-
 		const ZEFontCharacter&				GetCharacter(char Character);
 
-		static ZEFontResource*				LoadResource(ZEResourceFile* ResourceFile);
-		static ZEFontResource*				LoadResource(const char* FileName);
-		static ZEFontResource*				LoadSharedResource(const char* FileName);
-		static void							CacheResource(const char* FileName);
+		static ZEFontResource*				LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		
+		static ZEFontResource*				LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static ZEFontResource*				LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
+		
 
 };
 #endif

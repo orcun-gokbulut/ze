@@ -45,7 +45,7 @@ enum ZETextureQuality
 	ZE_TQ_NORMAL	= 3,
 	ZE_TQ_HIGH		= 4,
 	ZE_TQ_VERY_HIGH	= 5,
-	ZE_TQ_AUTO		= 6
+	ZE_TQ_AUTO		= 6,
 };
 
 enum ZETextureCompressionType
@@ -55,7 +55,7 @@ enum ZETextureCompressionType
 	ZE_TCT_DXT3		= 2,	//BC2
 	ZE_TCT_DXT5		= 3,	//BC3
 	ZE_TCT_3DC		= 4,
-	ZE_TCT_AUTO		= 5
+	ZE_TCT_AUTO		= 5,
 };
 
 enum ZETextureCompressionQuality
@@ -63,7 +63,7 @@ enum ZETextureCompressionQuality
 	ZE_TCQ_LOW		= 1,
 	ZE_TCQ_NORMAL	= 2,
 	ZE_TCQ_HIGH		= 3,
-	ZE_TCQ_AUTO		= 4
+	ZE_TCQ_AUTO		= 4,
 };
 
 enum ZETextureDownSampling
@@ -72,21 +72,21 @@ enum ZETextureDownSampling
 	ZE_TDS_2X		= 1,
 	ZE_TDS_4X		= 2,
 	ZE_TDS_8X		= 3,
-	ZE_TDS_AUTO		= 4
+	ZE_TDS_AUTO		= 4,
 };
 
 enum ZETextureFileCaching
 {
 	ZE_TFC_DISABLED = 0,
 	ZE_TFC_ENABLED	= 1,
-	ZE_TFC_AUTO		= 3
+	ZE_TFC_AUTO		= 2,
 };
 
 enum ZETextureMipMapping
 {
 	ZE_TMM_DISABLED = 0,
 	ZE_TMM_ENABLED	= 1,
-	ZE_TMM_AUTO		= 2
+	ZE_TMM_AUTO		= 2,
 };
 
 struct ZETextureOptions

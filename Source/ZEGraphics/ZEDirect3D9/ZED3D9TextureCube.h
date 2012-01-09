@@ -61,7 +61,7 @@ class ZED3D9TextureCube : public ZETextureCube, public ZED3D9ComponentBase
 		virtual ZEViewPort*				GetViewPort(ZETextureCubeFace Face);
 
 		virtual bool					Create(int EdgeLenght, ZETexturePixelFormat PixelFormat, bool RenderTarget = false);
-		virtual bool					Lock(ZETextureCubeFace Face, void** Buffer, int* Pitch);
+		virtual bool					Lock(ZETextureCubeFace Face, void** Buffer, unsigned int* Pitch);
 		virtual void					Unlock(ZETextureCubeFace Face);
 		virtual void					Release();
 

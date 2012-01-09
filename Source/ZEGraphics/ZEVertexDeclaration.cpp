@@ -33,11 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEVertexDeclaration.h"
-#include "ZEDefinitions.h"
+
+
 #include "ZEError.h"
-#include "ZEFile/ZEResourceFile.h"
+#include "ZEFile/ZEFile.h"
+#include "ZEDefinitions.h"
+#include "ZEVertexDeclaration.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
+
 
 #define ZE_FILE_FORMAT_MAKEVERSION(Major, Minor)		((ZEDWORD)((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor)))
 #define ZE_FILE_FORMAT_GETMINORVERSION(x)				((ZEDWORD)((x) & 0x0000FFFF))
@@ -59,6 +62,31 @@ struct ZEVertexDeclarationFileElementChunk
 	ZEDWORD		Type;
 	ZEDWORD		Index;
 };
+
+static ZEString ConstructResourcePath(const ZEString& Path)
+{
+	ZEString NewString = Path;
+	unsigned int ConstLength = strlen("resources\\") - 1;
+
+	if (Path[0] == '\\' || Path[0] == '/')
+		NewString = NewString.SubString(1, Path.GetLength() - 1);
+
+	// If it is guaranteed that there is no "resources\\" string in beginning
+	if (NewString.GetLength() - 1 < ConstLength)
+	{
+		NewString.Insert(0, "resources\\");
+		return NewString;
+	}
+	// Else check if there is "resources\\" in the beginning
+	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
+	{
+		NewString.Insert(0, "resources\\");
+		return NewString;
+	}
+
+	return NewString;
+}
+
 ZEVertexDeclaration::ZEVertexDeclaration()
 {
 	
@@ -79,36 +107,39 @@ void ZEVertexDeclaration::Destroy()
 	delete this;
 }
 
-ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(const char* FileName)
+ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(const ZEString& FileName)
 {
-	ZEResourceFile File;
-	if (!File.Open(FileName))
+	ZEString NewPath = ConstructResourcePath(FileName);
+
+	ZEFile* File = ZEFile::Open(NewPath);
+	if (File == NULL || !File->IsOpen())
 	{
-		zeError("Can not open zeVertexDecl file. (FileName : \"%s\")", FileName);
+		zeError("Can not open zeVertexDecl file. (FileName : \"%s\")", NewPath);
 		return NULL;
 	}
 	
-	ZEVertexDeclaration* VertexDeclaration = ZEVertexDeclaration::LoadFromFile(&File);
+	ZEVertexDeclaration* VertexDeclaration = ZEVertexDeclaration::LoadFromFile(File);
 	
-	File.Close();
+	File->Close();
+	delete File;
 	
 	return VertexDeclaration;
 }
 
 
-ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(ZEResourceFile* ResourceFile)
+ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(ZEFile* ResourceFile)
 {
 	ZEVertexDeclarationFileHeaderChunk HeaderChunk;
 	ResourceFile->Read(&HeaderChunk, sizeof(ZEVertexDeclarationFileHeaderChunk), 1);
 	if (HeaderChunk.ChunkIndentifier != ZE_VERTEX_DECLARATION_FILE_HEADER_CHUNK_ID)
 	{
-		zeError("Unknown zeVertex file format. (FileName : \"%s\")", ResourceFile->GetFileName());
+		zeError("Unknown zeVertex file format. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		return NULL;
 	}
 
 	if(HeaderChunk.Version != ZE_VERTEX_DECLARATION_FILE_VERSION)
 	{	
-		zeError("ZEMap file version mismatched. (FileName : \"%s\")", ResourceFile->GetFileName());
+		zeError("ZEMap file version mismatched. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 		return false;
 	}
 	

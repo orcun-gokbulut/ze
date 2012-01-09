@@ -76,6 +76,12 @@ bool ZEUIDebugModule::Initialize()
 	if (Grid == NULL)
 		Grid = ZEGrid::CreateInstance();
 
+	ZEUITextControl* Control  = new ZEUITextControl();
+	Control->SetFont(ZEFontResource::LoadResource("OldEnglish.ZEFONT"));
+	Control->SetText("Gokay Test");
+	zeGame->UIManager->AddControl(Control);
+	Control->SetPosition(ZEVector2::Zero);
+
 	ZEUICursorControl* Cursor = new ZEUICursorControl();
 	ZEUIButtonControl* Button = new ZEUIButtonControl();
 	ZEUICheckBoxControl* CheckBox = new ZEUICheckBoxControl();
@@ -104,18 +110,18 @@ bool ZEUIDebugModule::Initialize()
 	RadioButton3->AddInteractingRadioButton(RadioButton1);
 
 	
-	//zeGame->UIManager->AddControl(Button);
+	zeGame->UIManager->AddControl(Button);
 	zeGame->UIManager->AddControl(CheckBox);
 	zeGame->UIManager->AddControl(RadioButton1);
 	zeGame->UIManager->AddControl(RadioButton2);
 	zeGame->UIManager->AddControl(RadioButton3);
-	//zeGame->UIManager->AddControl(HorizontalSlider);
-	//zeGame->UIManager->AddControl(VerticalSlider);
-	//zeGame->UIManager->AddControl(Frame);
+	zeGame->UIManager->AddControl(HorizontalSlider);
+	zeGame->UIManager->AddControl(VerticalSlider);
+	zeGame->UIManager->AddControl(Frame);
 	zeGame->UIManager->AddControl(Window);
-	//zeGame->UIManager->AddControl(Window2);
+	zeGame->UIManager->AddControl(Window2);
 	zeGame->UIManager->AddControl(LineEdit);
-	//zeGame->UIManager->AddControl(LineEdit2);
+	zeGame->UIManager->AddControl(LineEdit2);
 	zeGame->UIManager->AddControl(MultiLine);
 	zeGame->UIManager->AddControl(BorderedFrame);
 

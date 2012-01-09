@@ -37,10 +37,16 @@
 #ifndef	__ZE_FILE_H__
 #define __ZE_FILE_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZESerialization/ZESerializer.h"
 #include "ZESerialization/ZEUnserializer.h"
-//#include "ZEDefinitions.h"
+
+enum ZEFileType
+{
+	ZE_FT_FILE		= 0,
+	ZE_FT_PARTIAL	= 1,
+};
 
 enum ZESeekFrom
 {
@@ -58,82 +64,84 @@ enum ZEFileMode
 	ZE_FM_READ_APPEND		= 4,
 };
 
+
+////For formatted read however it does not work on CRT DLL
+//#ifdef _DLL
+//#error "In order to compile this code, /MT(d) instead of /MD(d) must be used.
+//#endif
+//
+//#ifdef _UNICODE
+//#define _tinput_l _winput_l
+//#else
+//#define _tinput_l _input_l
+//#endif 
+//
+//extern "C"
+//int __cdecl _tinput_l(FILE*, const TCHAR*, _locale_t, va_list);
+
+class ZECacheDataIdentifier;
+
 class ZEFile : public ZESerializer, public ZEUnserializer
 {
 	protected:
+		void*					File;
+		ZEString				FilePath;
+		ZEQWORD					FileCursor;
 
-		void*				File;
-		ZEString			FileName;
-		size_t				FileCursor;
+		ZEFileType				FileType;
+
+		unsigned int			ReferenceCount;
 
 	public:
+		virtual bool			Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary);
+		virtual bool			Seek(ZEINT64 Offset, ZESeekFrom Origin);
+		virtual ZEQWORD			Tell();
+		virtual void			Close();
+		virtual bool			Eof();
+		virtual void			Flush();
+		virtual bool			IsOpen();
 
-							ZEFile();
-		virtual				~ZEFile();
+		virtual ZEQWORD			Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);
+		virtual ZEQWORD			ReadFormated(const char* Format, ...);
 
-		const ZEString&		GetFileName() const;
-		void*				GetFileHandle() const;
+		virtual ZEQWORD			Write(const void* Buffer, ZEQWORD Size, ZEQWORD Count);
+		virtual ZEQWORD			WriteFormated(const char* Format, ...);
 
-		virtual bool		Open(const ZEString FileName, ZEFileMode Mode = ZE_FM_READ_WRITE, bool Binary = true);
-		virtual bool		Seek(int Offset, ZESeekFrom Origin);
-		virtual size_t		Tell();
+		static ZEQWORD			GetFileSize(const ZEString& FilePath);
+		virtual ZEQWORD			GetFileSize();
 
-		virtual size_t		Read(void* Buffer, size_t Size, size_t Count);
-		virtual size_t		ReadFormated(const char* Format, ...);
+		static bool				ReadFile(const ZEString& FilePath, void* Buffer, ZEQWORD BufferSize);
+		static bool				ReadTextFile(const ZEString& FilePath, char* Buffer, ZEQWORD BufferSize);
 
-		virtual size_t		Write(const void* Buffer, size_t Size, size_t Count);
-		virtual size_t		WriteFormated(const char* Format, ...);
+		ZEFileType				GetFileType() const;
+		void*					GetFileHandle() const;	
+		const ZEString			GetFilePath() const;
 
-		static size_t		GetFileSize(const char* FileName);
-		virtual size_t		GetFileSize();
+		virtual ZEQWORD			GetStartPosition();
+		virtual ZEQWORD			GetEndPosition();
+
+		unsigned int			GetReferenceCount() const;
+		virtual unsigned int	IncreaseReferenceCount();
+		virtual unsigned int	DecreaseReferenceCount();
+
+		static ZEString			GetFileName(const ZEString& FilePath);
+		static ZEString			GetAbsolutePath(const ZEString& FilePath);
+		static ZEString			GetFileExtension(const ZEString& FilePath);
+		static ZEString			GetParentDirectory(const ZEString& FilePath);
 		
-		virtual void		Close();
-		virtual bool		Eof();
+		static bool				IsDirectoryExists(const ZEString& FilePath);
+		static bool				IsFileExists(const ZEString& FilePath);
 
-		virtual void		Flush();
-		virtual bool		IsOpen();
-		
-		static bool			ReadFile(const ZEString FileName, void* Buffer, size_t BufferSize);
-		static bool			ReadTextFile(const ZEString FileName, char* Buffer, size_t BufferSize);
+		static ZEFile*			Open(const ZEString& FilePath);
 
-		static ZEString		GetAbsolutePath(const ZEString Path);
+		ZEFile&					operator = (ZEFile& OtherFile);
 
-		static bool			IsDirectoryExists(const ZEString Path);
-		static ZEString		GetParentDirectory(const ZEString Path);
+								ZEFile();
+		virtual					~ZEFile();
 
-		static bool			IsFileExists(const ZEString Path);
-		static ZEString		GetFileName(const ZEString Path);
-		static ZEString		GetFileExtension(const ZEString Path);
 };
 
 
-class ZEPartialFile : public ZEFile
-{
-	protected:
 
-		size_t				StartPosition;
-		size_t				EndPosition;
-		bool				IsEof;
-
-	public:					
-		virtual bool		Open(ZEFile* ParentFile, size_t Offset, size_t Size);
-		virtual bool		Open(const ZEString FileName, ZEFileMode Mode, bool Binary);
-		virtual void		Close();
-
-		virtual size_t		Read(void* Buffer, size_t Size, size_t Count);
-		virtual size_t		ReadFormated(const char* Format, ...);
-
-		virtual size_t		Write(void* Buffer, size_t Size, size_t Count);
-		virtual size_t		WriteFormated(const char* Format, ...);
-
-		virtual bool		Seek(int Offset, ZESeekFrom Origin);
-		virtual size_t		Tell();
-
-		virtual size_t		GetFileSize();
-		virtual bool		Eof();
-
-							ZEPartialFile();
-		virtual				~ZEPartialFile();						
-};
 
 #endif

@@ -33,41 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
 #pragma once
 #ifndef __ZE_TEXTURE_LOADER_H__
 #define __ZE_TEXTURE_LOADER_H__
 
 
+#include "ZEDS/ZEString.h"
 #include "ZEGraphics/ZETexture.h"
 #include "ZEGraphics/ZETexture2DResource.h"
 #include "ZEGraphics/ZETexture3DResource.h"
 #include "ZEGraphics/ZETextureCubeResource.h"
 
 
-struct ZETextureLoaderInfo
+class ZETextureData;
+
+
+struct ZETextureInfo
 {
-	unsigned int			TextureWidth;
-	unsigned int			TextureHeight;
-	unsigned int			TexturePitch;
-	unsigned int			BitsPerPixel;
-	ZETextureType			TextureType;
+	unsigned int			SurfaceCount;
+	unsigned int			MipmapCount;
+	unsigned int			Width;
+	unsigned int			Height;
 	ZETexturePixelFormat	PixelFormat;
-
-	ZETextureLoaderInfo		operator= (const ZETextureLoaderInfo &Info);
-	bool					operator!=(const ZETextureLoaderInfo &Info);
 };
-
 
 class ZETextureLoader
 {
+	protected:
+		// Empty
+
 	private:
 							ZETextureLoader();
-							~ZETextureLoader();
+		virtual				~ZETextureLoader();
 
 	public:
-		static bool			GetTextureInfo(ZETextureLoaderInfo& TextureInfo, ZEResourceFile* ResourceFile);
-		static bool			LoadTexture(void* DestBuffer, ZEResourceFile* ResourceFile, ZETextureLoaderInfo& TextureInfo);
+		static bool			IsZETextureFile(const ZEString& FilePath);
+		static bool			IsZETextureFile(ZEFile* File);
+
+		static bool			LoadFromImageFile(ZEFile* File, ZETextureData* TextureData);
+		static bool			SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, unsigned int Surface = 0, unsigned int Mipmap = 0);
+								
+		static bool			Read(ZEFile* File, ZETextureData* TextureData);
+		static bool			Write(ZEFile* File, ZETextureData* TextureData);
+
+		static bool			LoadFromFile(ZEFile* File, ZETextureData* TextureData);
+
+		static bool			GetImageInfo(ZETextureInfo* TextureInfo, ZEFile* File);
+		static bool			GetTextureInfo(ZETextureInfo* TextureInfo, ZEFile* File);
+
 		
+
 };
 
 #endif

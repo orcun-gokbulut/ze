@@ -33,14 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZED3D9Shader.h"
+#include "ZEFile/ZEFile.h"
+#include "ZED3D9Texture2D.h"
+#include "ZED3D9CommonTools.h"
+#include "ZEGraphics/ZECamera.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9SimpleMaterial.h"
-#include "ZED3D9Texture2D.h"
-#include "ZED3D9Shader.h"
-#include "ZED3D9CommonTools.h"
 #include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEFile/ZEResourceFile.h"
+
 #include <D3D9.h>
 
 ZED3D9SimpleMaterial::ZED3D9SimpleMaterial()

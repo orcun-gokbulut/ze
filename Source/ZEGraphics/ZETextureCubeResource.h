@@ -55,10 +55,10 @@ class ZETextureCubeResource : public ZETextureResource
 
 		const ZETextureCube*				GetTexture() const;
 
-		static void							CacheResource(const char* FileName);
-		static ZETextureCubeResource*		LoadSharedResource(const char* FileName);
-		static ZETextureCubeResource*		LoadResource(const char* FileName);
-		static ZETextureCubeResource*		LoadResource(ZEResourceFile* ResourceFile);
+		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static ZETextureCubeResource*		LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static ZETextureCubeResource*		LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+		static ZETextureCubeResource*		LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
 };
 
 #endif

@@ -84,7 +84,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLi
 	//zeCore->SetDebugComponent(&MetaDebugComponent);
 
 	ZEUIDebugModule UIDebugModule;
-	//zeCore->SetDebugComponent(&UIDebugModule);
+	//zeCore->SetApplicationModule(&UIDebugModule);
 
 
 	zeCore->GetOptions()->Load("options.ini");

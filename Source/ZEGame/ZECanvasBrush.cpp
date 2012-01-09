@@ -94,7 +94,7 @@ void ZECanvasBrush::Draw(ZEDrawParameters* DrawParameters)
 			case ZE_ROPT_TRIANGLE:
 				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
 				break;			
-			case ZE_ROPT_TRIANGLESTRIPT:
+			case ZE_ROPT_TRIANGLE_STRIPT:
 				RenderOrder.PrimitiveCount = Canvas.Vertices.GetCount() - 2;
 				break;			
 			default:

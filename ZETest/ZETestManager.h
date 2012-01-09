@@ -37,21 +37,25 @@
 #ifndef __ZE_TEST_MANAGER_H__
 #define __ZE_TEST_MANAGER_H__
 
-class ZETestSuite;
+class ZETestSuiteItem;
 class ZETestItem;
 enum ZETestProblemType;
 
 class ZETestManager
 {
 	private:
-		ZETestSuite*			TestSuites[65536];
+		ZETestSuiteItem*		TestSuites[65536];
 		size_t					TestSuiteCount;
+		char					PackageName[256];
 
 	public:
-		void					RegisterTestSuite(ZETestSuite* Suite);
+		void					RegisterTestSuite(ZETestSuiteItem* Suite);
+
+		void					SetPackageName(const char* Name);
+		const char*				GetPackageName();
 
 		bool					RunTests();
-		void					ReportProblem(ZETestSuite* Suite, ZETestItem* Test, ZETestProblemType Type, const char* Problem, const char* File, int Line);
+		void					ReportProblem(ZETestSuiteItem* Suite, ZETestItem* Test, ZETestProblemType Type, const char* Problem, const char* File, int Line);
 
 		static ZETestManager*	GetInstance();
 };

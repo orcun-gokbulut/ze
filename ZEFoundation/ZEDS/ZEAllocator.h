@@ -189,11 +189,13 @@ class ZESmartAllocator : public ZEAllocatorBase<Type>
 	public:
 		inline bool Allocate(Type** Pointer, size_t NewSize)
 		{
+			int A = Exponent;
+
 			if (NewSize != 0)
 			{
 				if ((NewSize > Size) || (NewSize < LowerLimit))
 				{
-					Size = (int)powf((float)Exponent, (logf((float)NewSize) / logf((float)Exponent)) + 1.0f);
+					Size = (int)(powf((float)Exponent, (logf((float)NewSize) / logf((float)Exponent)) + 1.0f) + 0.5f);
 					LowerLimit = (int)(Size / Exponent);
 					*Pointer = new Type[Size];
 					return true;
