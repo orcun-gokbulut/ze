@@ -74,13 +74,13 @@ ZEPhysicalMesh* ZEPortalMapPortal::GetPhysicalMesh()
 
 void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 {
-	for(size_t I = 0; I < RenderOrders.GetCount(); I++)
+	for(size_t I = 0; I < RenderCommands.GetCount(); I++)
 	{
-		RenderOrders[I].WorldMatrix = Owner->GetWorldTransform();
-		RenderOrders[I].Lights.Clear();
-		RenderOrders[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
+		RenderCommands[I].WorldMatrix = Owner->GetWorldTransform();
+		RenderCommands[I].Lights.Clear();
+		RenderCommands[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
 
-		DrawParameters->Renderer->AddToRenderList(&RenderOrders[I]);
+		DrawParameters->Renderer->AddToRenderList(&RenderCommands[I]);
 	}
 }
 
@@ -89,7 +89,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 	// Initialize Render Components
 	if (VertexBuffer == NULL)
 	{
-		RenderOrders.Clear();
+		RenderCommands.Clear();
 		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
 		if (!VertexBuffer->Create(Resource->Polygons.GetCount() * 3 * sizeof(ZEMapVertex)))
 			return false;
@@ -105,20 +105,20 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 			if (!Processed[N])
 			{
 				ZEMaterial* Material = Resource->Polygons[N].Material;
-				ZERenderOrder* RenderOrder = RenderOrders.Add();
+				ZERenderCommand* RenderCommand = RenderCommands.Add();
 
-				RenderOrder->SetZero();
-				RenderOrder->Priority = 2;
-				RenderOrder->Order = 1;
-				RenderOrder->Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-				RenderOrder->Material = Material;
-				RenderOrder->PrimitiveType = ZE_ROPT_TRIANGLE;
-				RenderOrder->VertexBufferOffset = VertexIndex;
-				RenderOrder->VertexBuffer = VertexBuffer;
-				RenderOrder->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();
-				ZEMatrix4x4::CreateIdentity(RenderOrder->WorldMatrix);
+				RenderCommand->SetZero();
+				RenderCommand->Priority = 2;
+				RenderCommand->Order = 1;
+				RenderCommand->Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
+				RenderCommand->Material = Material;
+				RenderCommand->PrimitiveType = ZE_ROPT_TRIANGLE;
+				RenderCommand->VertexBufferOffset = VertexIndex;
+				RenderCommand->VertexBuffer = VertexBuffer;
+				RenderCommand->VertexDeclaration = ZEMapVertex::GetVertexDeclaration();
+				ZEMatrix4x4::CreateIdentity(RenderCommand->WorldMatrix);
 
-				RenderOrder->PrimitiveCount = 0;
+				RenderCommand->PrimitiveCount = 0;
 				for (size_t I = N; I < Resource->Polygons.GetCount(); I++)
 				{
 					if (Resource->Polygons[I].Material != Material)
@@ -126,7 +126,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 
 					memcpy(Buffer + VertexIndex, Resource->Polygons[I].Vertices, sizeof(ZEMapVertex) * 3);
 					VertexIndex += 3;
-					RenderOrder->PrimitiveCount++;
+					RenderCommand->PrimitiveCount++;
 					Processed[I] = true;
 				}
 
@@ -176,7 +176,7 @@ void ZEPortalMapPortal::Deinitialize()
 {
 	Owner = NULL;
 	Resource = NULL;
-	RenderOrders.Clear();
+	RenderCommands.Clear();
 	if (VertexBuffer != NULL)
 	{
 		VertexBuffer->Destroy();

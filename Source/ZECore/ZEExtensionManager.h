@@ -54,7 +54,7 @@ class ZEExtensionManager
 												~ZEExtensionManager();
 
 	public:
-		ZEExtensionDescription*					GetExtensionDescription(const char* Name);
+		ZEExtensionDescription*					GetExtensionDescription(const ZEString& Name);
 		const ZEArray<ZEExtensionDescription*>&	GetExtensionDescriptions();
 		ZEArray<ZEExtensionDescription*>		GetExtensionDescriptions(ZEExtensionDescription* ParentExtension);
 

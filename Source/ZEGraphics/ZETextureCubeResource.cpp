@@ -143,7 +143,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(const ZEString& FileN
 	}
 	else
 	{
-		zeError("Cube Texture Resource", "Texture file not found. FileName : \"%s\"", NewPath.GetValue());
+		zeError("Texture file not found. FileName : \"%s\"", NewPath.GetValue());
 		return NULL;
 	}
 }
@@ -176,7 +176,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	if(CheckCache && FileCache.Open(CachePath) && FileCache.IdentifierExists(&Identifier))
 	{
 		// If found in cache load from cache directly
-		zeLog("Cube Texture Resource", "Loading from file cache: \"%s\".", ResourceFile->GetFilePath().GetValue());
+		zeLog("Loading from file cache: \"%s\".", ResourceFile->GetFilePath().GetValue());
 
 		ZEPartialFile PartialResourceFile;
 		FileCache.OpenData(&PartialResourceFile, &Identifier);
@@ -193,7 +193,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 
 	if(TextureData.IsEmpty())
 	{
-		zeError("Cube Texture Resource", "Cannot load: \"%s\".", ResourceFile->GetFilePath().GetValue());
+		zeError("Cannot load: \"%s\".", ResourceFile->GetFilePath().GetValue());
 		TextureData.DestroyTexture();
 		return NULL;
 	}
@@ -214,7 +214,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		// Check if texture dimensions are right
 		if (Width != Height)
 		{
-			zeError("Cube Texture Resource", "File does not have correct dimensions. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
+			zeError("File does not have correct dimensions. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());
 			TextureData.DestroyTexture();
 			return NULL;
 		}
@@ -259,7 +259,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	// Process the data
 	if(Process)
 	{
-		zeLog("Cube Texture Resource", "Processing texture \"%s\".", ResourceFile->GetFilePath().GetValue());
+		zeLog("Processing texture \"%s\".", ResourceFile->GetFilePath().GetValue());
 		ZETextureQualityManager::Process(&TextureData, &FinalOptions);
 	}
 
@@ -291,7 +291,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	// Create the Texture
 	if (!Texture->Create(TextureData.GetWidth(), TextureData.GetPixelFormat(), false))
 	{
-		zeError("Cube Texture Resource", "Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFilePath().GetValue());
+		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetFilePath().GetValue());
 		TextureData.DestroyTexture();
 		delete TextureResource;
 		return NULL;

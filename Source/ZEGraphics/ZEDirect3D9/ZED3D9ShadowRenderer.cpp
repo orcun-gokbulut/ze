@@ -43,7 +43,7 @@
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9ShadowRenderer.h"
 #include "ZEGraphics/ZEPointLight.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEMath/ZEMathDefinitions.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEGraphics/ZEDirectionalLight.h"
@@ -57,32 +57,32 @@ ZED3D9PixelShader* DirectionalLightPS = NULL;
 ZED3D9VertexShader* ProjectiveLightVS = NULL;
 ZED3D9PixelShader* ProjectiveLightPS = NULL;
 
-void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
+void ZED3D9ShadowRenderer::DrawRenderCommand(ZERenderCommand* RenderCommand)
 {
-	//const ZEMaterial* Material = RenderOrder->Material;
+	//const ZEMaterial* Material = RenderCommand->Material;
 
-	//if (RenderOrder->Flags & ZE_ROF_SKINNED)
-	//	GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+	//if (RenderCommand->Flags & ZE_ROF_SKINNED)
+	//	GetDevice()->SetVertexShaderConstantF(32, (float*)RenderCommand->BoneTransforms.GetCArray(), RenderCommand->BoneTransforms.GetCount() * 4);
 
-	//if (RenderOrder->IndexBuffer != NULL)
-	//	if (RenderOrder->IndexBuffer IsStaticIndexBuffer())
-	//		GetDevice()->SetIndices(StaticIndexBuffers[RenderOrder->GetStaticIndexBufferId()]);	*/
+	//if (RenderCommand->IndexBuffer != NULL)
+	//	if (RenderCommand->IndexBuffer IsStaticIndexBuffer())
+	//		GetDevice()->SetIndices(StaticIndexBuffers[RenderCommand->GetStaticIndexBufferId()]);	*/
 
-	//if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+	//if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 	//{
 	//	ZEMatrix4x4 WorldViewProjMatrix;
-	//	ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewPoint.ViewProjMatrix, RenderOrder->WorldMatrix);
+	//	ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewPoint.ViewProjMatrix, RenderCommand->WorldMatrix);
 	//	GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
 	//}
 	//else
-	//	GetDevice()->SetVertexShaderConstantF(0, (float*)&RenderOrder->WorldMatrix, 4);
+	//	GetDevice()->SetVertexShaderConstantF(0, (float*)&RenderCommand->WorldMatrix, 4);
 
 
-	//GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);
-	//GetDevice()->SetVertexShaderConstantF(8, (float*)&RenderOrder->WorldMatrix, 4);
+	//GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderCommand->WorldMatrix, 4);
+	//GetDevice()->SetVertexShaderConstantF(8, (float*)&RenderCommand->WorldMatrix, 4);
 	//GetDevice()->SetVertexShaderConstantF(16, (float*)&ZEVector4(ViewPoint.ViewPosition, 1.0f), 1);
 
-	//if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
+	//if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	//{
 	//	GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 	//	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
@@ -101,8 +101,8 @@ void ZED3D9ShadowRenderer::DrawRenderOrder(ZERenderOrder* RenderOrder)
 	//else
 	//	GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
 
-	//GetDevice()->SetVertexDeclaration(VertexDeclarations[RenderOrder->VertexType]);
-	//PumpStreams(RenderOrder);
+	//GetDevice()->SetVertexDeclaration(VertexDeclarations[RenderCommand->VertexType]);
+	//PumpStreams(RenderCommand);
 }
 
 void ZED3D9ShadowRenderer::SetViewPort(ZEViewPort* ViewPort)
@@ -180,7 +180,7 @@ bool ZED3D9ShadowRenderer::Initialize()
 		HRESULT hr = GetDevice()->CreateRenderTarget(512, 512, D3DFMT_R32F, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapFrameBuffer, NULL);
 		if (hr != S_OK)
 		{
-			zeError("D3D9 Shadow Renderer", "Can not create shadow map frame buffer.");
+			zeError("Can not create shadow map frame buffer.");
 			return false;
 		}
 	}
@@ -190,7 +190,7 @@ bool ZED3D9ShadowRenderer::Initialize()
 		HRESULT hr = GetDevice()->CreateDepthStencilSurface(512, 512, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, FALSE, &ShadowMapZBuffer, NULL);
 		if (hr != S_OK)
 		{
-			zeError("D3D9 Shadow Renderer", "Can not create shadow map z buffer.");
+			zeError("Can not create shadow map z buffer.");
 			return false;
 		}
 	}
@@ -227,21 +227,21 @@ void ZED3D9ShadowRenderer::ClearRenderList()
 	NonTransparent.Clear(true);
 }
 
-void ZED3D9ShadowRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
+void ZED3D9ShadowRenderer::AddToRenderList(ZERenderCommand* RenderCommand)
 {
-	#ifdef ZE_DEBUG_ENABLED
+	#ifdef ZE_DEBUG_ENABLE
 		// Check render order is valid
-		if (!ZED3D9FrameRenderer::CheckRenderOrder(RenderOrder))
+		if (!ZED3D9FrameRenderer::CheckRenderCommand(RenderCommand))
 			return;
 	#endif
 
 	// Add render orders to render order lists according to their properties
-	if (RenderOrder->Flags & ZE_ROF_IMPOSTER)
-		Imposter.Add(*RenderOrder);
-	if (RenderOrder->Flags & ZE_ROF_TRANSPARENT)
-		Transparent.Add(*RenderOrder);
+	if (RenderCommand->Flags & ZE_ROF_IMPOSTER)
+		Imposter.Add(*RenderCommand);
+	if (RenderCommand->Flags & ZE_ROF_TRANSPARENT)
+		Transparent.Add(*RenderCommand);
 	else
-		NonTransparent.Add(*RenderOrder);
+		NonTransparent.Add(*RenderCommand);
 }
 
 void ZED3D9ShadowRenderer::RenderProjectiveLight()
@@ -263,32 +263,32 @@ void ZED3D9ShadowRenderer::RenderProjectiveLight()
 	GetDevice()->BeginScene();
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
-		ZERenderOrder* RenderOrder = &NonTransparent[I];
+		ZERenderCommand* RenderCommand = &NonTransparent[I];
 
 		ZEMatrix4x4 ViewProjMatrix;
-		if ((RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+		if ((RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 			ViewProjMatrix = ViewProjectionTransform;
-		else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+		else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
 			ViewProjMatrix = ViewTransform;
-		else if (RenderOrder->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+		else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
 			ViewProjMatrix = ProjectionTransform;
 		else
 			ViewProjMatrix = ZEMatrix4x4::Identity;
 
 		ZEMatrix4x4 WorldViewProjMatrix;
-		if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
-			ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderOrder->WorldMatrix);
+		if (RenderCommand->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+			ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
 		else
 			WorldViewProjMatrix = ViewProjectionTransform;
 
 		GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
 
 		// Setup ZCulling
-		if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
+		if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
 		{
 			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 			GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-			if (RenderOrder->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
+			if (RenderCommand->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
 				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 			else
 				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
@@ -297,10 +297,10 @@ void ZED3D9ShadowRenderer::RenderProjectiveLight()
 			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 
 		// Setup Bone Transforms
-		if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
-			GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+		if (RenderCommand->Flags & ZE_ROF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
+			GetDevice()->SetVertexShaderConstantF(32, (float*)RenderCommand->BoneTransforms.GetCArray(), RenderCommand->BoneTransforms.GetCount() * 4);
 
-		ZED3D9FrameRenderer::PumpStreams(RenderOrder);
+		ZED3D9FrameRenderer::PumpStreams(RenderCommand);
 	}
 	GetDevice()->EndScene();
 }
@@ -340,32 +340,32 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 	GetDevice()->BeginScene();
 	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
 	{
-		ZERenderOrder* RenderOrder = &NonTransparent[I];
+		ZERenderCommand* RenderCommand = &NonTransparent[I];
 
 		ZEMatrix4x4 ViewProjMatrix;
-		if ((RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
+		if ((RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
 			ViewProjMatrix = ViewProjectionTransform;
-		else if (RenderOrder->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
+		else if (RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_TRANSFORM)
 			ViewProjMatrix = ViewTransform;
-		else if (RenderOrder->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
+		else if (RenderCommand->Flags & ZE_ROF_ENABLE_PROJECTION_TRANSFORM)
 			ViewProjMatrix = ProjectionTransform;
 		else
 			ViewProjMatrix = ZEMatrix4x4::Identity;
 
 		ZEMatrix4x4 WorldViewProjMatrix;
-		if (RenderOrder->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
-			ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderOrder->WorldMatrix);
+		if (RenderCommand->Flags & ZE_ROF_ENABLE_WORLD_TRANSFORM)
+			ZEMatrix4x4::Multiply(WorldViewProjMatrix, ViewProjMatrix, RenderCommand->WorldMatrix);
 		else
 			WorldViewProjMatrix = ViewProjectionTransform;
 
 		GetDevice()->SetVertexShaderConstantF(0, (float*)&WorldViewProjMatrix, 4);
 
 		// Setup ZCulling
-		if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
+		if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
 		{
 			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 			GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-			if (RenderOrder->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
+			if (RenderCommand->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
 				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 			else
 				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
@@ -374,10 +374,10 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
 
 		// Setup Bone Transforms
-		if (RenderOrder->Flags & ZE_ROF_SKINNED && RenderOrder->BoneTransforms.GetCount() < 58)
-			GetDevice()->SetVertexShaderConstantF(32, (float*)RenderOrder->BoneTransforms.GetCArray(), RenderOrder->BoneTransforms.GetCount() * 4);
+		if (RenderCommand->Flags & ZE_ROF_SKINNED && RenderCommand->BoneTransforms.GetCount() < 58)
+			GetDevice()->SetVertexShaderConstantF(32, (float*)RenderCommand->BoneTransforms.GetCArray(), RenderCommand->BoneTransforms.GetCount() * 4);
 
-		ZED3D9FrameRenderer::PumpStreams(RenderOrder);
+		ZED3D9FrameRenderer::PumpStreams(RenderCommand);
 	}
 	GetDevice()->EndScene();
 }

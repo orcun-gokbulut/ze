@@ -129,7 +129,7 @@ bool ZEPostProcessor::Process()
 	for (size_t I = 0; I < Nodes.GetCount(); I++)
 		if (!ProcessNode(Nodes[I]))
 		{
-			zeError("Post Processor", "Post process failed.");
+			zeError("Post process failed.");
 			return false;
 		}
 

@@ -38,7 +38,7 @@
 #define __ZE_GIZMO_H__
 
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECanvas.h"
 
 class ZESimpleMaterial;
@@ -77,7 +77,7 @@ class ZEGizmo : public ZEEntity
 
 		static ZESimpleMaterial*		GizmoMaterial;
 
-		ZERenderOrder					RenderOrder;
+		ZERenderCommand					RenderCommand;
 
 		ZEGizmoMode						Mode;
 		ZEGizmoAxis						HoveredAxis;

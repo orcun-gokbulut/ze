@@ -62,7 +62,7 @@ bool ZETextureQualityManager::Process(ZETextureData* TextureData, ZETextureOptio
 	// If texture data is empty
 	if(TextureData->IsEmpty())
 	{
-		zeLog("Texture Quality Manager", "Texture data is empty.");
+		zeLog("Texture data is empty.");
 		return false;
 	}
 

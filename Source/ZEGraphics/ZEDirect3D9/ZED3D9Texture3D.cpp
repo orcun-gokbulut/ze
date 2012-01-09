@@ -72,7 +72,7 @@ bool ZED3D9Texture3D::Create(int Width, int Height, int Depth, ZETexturePixelFor
 	Hr = GetDevice()->CreateVolumeTexture(Width, Height, Depth, 0, D3DUSAGE_AUTOGENMIPMAP, ZED3D9CommonTools::ConvertPixelFormat(PixelFormat), D3DPOOL_MANAGED, &VolumeTexture, NULL);  
 	if (Hr != D3D_OK)
 	{
-		zeError("D3D9 GetModule()", "Can not create volume texture resource.");
+		zeError("Can not create volume texture resource.");
 		return false;
 	}
 

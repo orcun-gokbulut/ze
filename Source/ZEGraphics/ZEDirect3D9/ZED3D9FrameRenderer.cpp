@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifdef ZE_DEBUG_ENABLED
+#ifdef ZE_DEBUG_ENABLE
 #define D3D_DEBUG_INFO
 #endif
 
@@ -51,7 +51,7 @@
 #include "ZED3D9Profiler.h"
 
 #include "ZEGraphics/ZEMaterial.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEPointLight.h"
 #include "ZEGraphics/ZEDirectionalLight.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
@@ -61,15 +61,15 @@
 
 #pragma warning(disable:4267)
 
-void ZED3D9FrameRenderer::PumpStreams(ZERenderOrder* RenderOrder)
+void ZED3D9FrameRenderer::PumpStreams(ZERenderCommand* RenderCommand)
 {
-	ZEVertexBuffer* VertexBuffer = RenderOrder->VertexBuffer;
+	ZEVertexBuffer* VertexBuffer = RenderCommand->VertexBuffer;
 
-	((ZED3D9VertexDeclaration*)RenderOrder->VertexDeclaration)->SetupVertexDeclaration();
+	((ZED3D9VertexDeclaration*)RenderCommand->VertexDeclaration)->SetupVertexDeclaration();
 
 	// Figure out primitive type
 	D3DPRIMITIVETYPE PrimitiveType;
-	switch(RenderOrder->PrimitiveType)
+	switch(RenderCommand->PrimitiveType)
 	{
 		default:
 		case ZE_ROPT_POINT:
@@ -85,7 +85,7 @@ void ZED3D9FrameRenderer::PumpStreams(ZERenderOrder* RenderOrder)
 
 	// Make draw call
 	// Check wheater render order is indexed or not
-	if (RenderOrder->IndexBuffer != NULL)
+	if (RenderCommand->IndexBuffer != NULL)
 	{
 		/* NOT SUPPORTED !!! */
 		/*
@@ -93,7 +93,7 @@ void ZED3D9FrameRenderer::PumpStreams(ZERenderOrder* RenderOrder)
 		if (VertexBuffer->IsStatic())
 		GetDevice()->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, VertexBuffer->GetVertexCount(), 0, VertexBuffer->GetPolygonCount());
 		else
-		GetDevice()->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, VertexBuffer->GetVertexCount(), RenderOrder->PrimitiveCount, RenderOrder->IndexBuffer, D3DFMT_INDEX32, VertexBuffer->GetVertexBuffer(), RenderOrder->VertexDeclaration->GetVertexSize());
+		GetDevice()->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, VertexBuffer->GetVertexCount(), RenderCommand->PrimitiveCount, RenderCommand->IndexBuffer, D3DFMT_INDEX32, VertexBuffer->GetVertexBuffer(), RenderCommand->VertexDeclaration->GetVertexSize());
 		*/
 	} 
 	else
@@ -101,58 +101,58 @@ void ZED3D9FrameRenderer::PumpStreams(ZERenderOrder* RenderOrder)
 		// Check wheater render order has static vertex buffer or not
 		if (VertexBuffer->IsStatic())
 		{
-			GetDevice()->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)RenderOrder->VertexBuffer)->StaticBuffer, 0, RenderOrder->VertexDeclaration->GetVertexSize());
-			GetDevice()->DrawPrimitive(PrimitiveType, RenderOrder->VertexBufferOffset, RenderOrder->PrimitiveCount);
+			GetDevice()->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)RenderCommand->VertexBuffer)->StaticBuffer, 0, RenderCommand->VertexDeclaration->GetVertexSize());
+			GetDevice()->DrawPrimitive(PrimitiveType, RenderCommand->VertexBufferOffset, RenderCommand->PrimitiveCount);
 		}
 		else
-			GetDevice()->DrawPrimitiveUP(PrimitiveType, RenderOrder->PrimitiveCount, 
-			(char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderOrder->VertexBufferOffset * RenderOrder->VertexDeclaration->GetVertexSize(),  
-			RenderOrder->VertexDeclaration->GetVertexSize());
+			GetDevice()->DrawPrimitiveUP(PrimitiveType, RenderCommand->PrimitiveCount, 
+			(char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderCommand->VertexBufferOffset * RenderCommand->VertexDeclaration->GetVertexSize(),  
+			RenderCommand->VertexDeclaration->GetVertexSize());
 	}
 }
 
-bool ZED3D9FrameRenderer::CheckRenderOrder(ZERenderOrder* RenderOrder)
+bool ZED3D9FrameRenderer::CheckRenderCommand(ZERenderCommand* RenderCommand)
 {
-	#ifdef ZE_DEBUG_ENABLED
+	#ifdef ZE_DEBUG_ENABLE
 		// Check render order material is available
-		if (RenderOrder->Material == NULL)
+		if (RenderCommand->Material == NULL)
 		{
-			zeError("Direct3D9 Renderer", "RenderOrder's material does not have valid material.");
+			zeError("RenderCommand's material does not have valid material.");
 			return false;
 		}
 
 		// Check vertex declaration is available
-		if (RenderOrder->VertexDeclaration == NULL)
+		if (RenderCommand->VertexDeclaration == NULL)
 		{
-			zeError("Direct3D9 Renderer", "RenderOrder's vertex declaration is invalid.");
+			zeError("RenderCommand's vertex declaration is invalid.");
 			return false;
 		}
 
 		// Check render order has valid primitive type
-		if (RenderOrder->PrimitiveType != ZE_ROPT_POINT &&
-			RenderOrder->PrimitiveType != ZE_ROPT_LINE &&
-			RenderOrder->PrimitiveType != ZE_ROPT_TRIANGLE &&
-			RenderOrder->PrimitiveType != ZE_ROPT_TRIANGLE_STRIPT)
+		if (RenderCommand->PrimitiveType != ZE_ROPT_POINT &&
+			RenderCommand->PrimitiveType != ZE_ROPT_LINE &&
+			RenderCommand->PrimitiveType != ZE_ROPT_TRIANGLE &&
+			RenderCommand->PrimitiveType != ZE_ROPT_TRIANGLE_STRIPT)
 		{
-			zeError("Direct3D9 Renderer", "RenderOrder's primitive type is not valid.");
+			zeError("RenderCommand's primitive type is not valid.");
 			return false;
 		}
 
 		// Check render order has vertex buffer
-		if (RenderOrder->VertexBuffer == NULL)
+		if (RenderCommand->VertexBuffer == NULL)
 		{
-			zeError("Direct3D9 Renderer", "RenderOrder's vertex buffer is not valid.");
+			zeError("RenderCommand's vertex buffer is not valid.");
 			return false;
 		}
 
 		// Check render order has one or more primitive
-		/*if (RenderOrder->PrimitiveCount == 0)
+		/*if (RenderCommand->PrimitiveCount == 0)
 		{
-			zeError("Direct3D9 Renderer", "RenderOrder's primitive count is zero.");
+			zeError("RenderCommand's primitive count is zero.");
 			return false;
 		}*/
 	#else
-		if (RenderOrder->PrimitiveCount == 0)
+		if (RenderCommand->PrimitiveCount == 0)
 			return false;
 	#endif
 
@@ -488,15 +488,15 @@ void ZED3D9FrameRenderer::DoPreZPass()
 
 	for (size_t I = 0; I < RenderList.GetCount(); I++)
 	{
-		ZERenderOrder* RenderOrder = &RenderList[I];
+		ZERenderCommand* RenderCommand = &RenderList[I];
 		
-		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_PRE_Z_PASS) == 0)
+		if ((RenderCommand->Material->GetMaterialFlags() & ZE_MTF_PRE_Z_PASS) == 0)
 			continue;
 
-		if (!RenderOrder->Material->SetupPreZPass(this, RenderOrder))
-			zeCriticalError("Renderer", "Can not set material's Pre-Z pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
+		if (!RenderCommand->Material->SetupPreZPass(this, RenderCommand))
+			zeCriticalError("Can not set material's Pre-Z pass. (Material Type : \"%s\")", RenderCommand->Material->GetClassDescription()->GetName());
 
-		PumpStreams(RenderOrder);
+		PumpStreams(RenderCommand);
 	}
 
 	zeProfilerEnd();
@@ -525,19 +525,19 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 
 	for (size_t I = 0; I < RenderList.GetCount(); I++)
 	{
-		ZERenderOrder* RenderOrder = &RenderList[I];
+		ZERenderCommand* RenderCommand = &RenderList[I];
 
-		if (RenderOrder->Pipeline != ZE_RORP_3D)
+		if (RenderCommand->Pipeline != ZE_RORP_3D)
 			continue;
 
-		if ((RenderOrder->Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS) == 0)
+		if ((RenderCommand->Material->GetMaterialFlags() & ZE_MTF_G_BUFFER_PASS) == 0)
 			continue;
 
 		zeProfilerStart("Object Pass");
-		if (!RenderOrder->Material->SetupGBufferPass(this, RenderOrder))
-			zeCriticalError("Renderer", "Can not set material's GBuffer pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
+		if (!RenderCommand->Material->SetupGBufferPass(this, RenderCommand))
+			zeCriticalError("Can not set material's GBuffer pass. (Material Type : \"%s\")", RenderCommand->Material->GetClassDescription()->GetName());
 
-		PumpStreams(RenderOrder);
+		PumpStreams(RenderCommand);
 
 		zeProfilerEnd();
 	}
@@ -638,15 +638,15 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	
 	for (size_t I = 0; I < RenderList.GetCount(); I++)
 	{		
-		ZERenderOrder* RenderOrder = &RenderList[I];
-		if (RenderOrder->Pipeline != ZE_RORP_3D)
+		ZERenderCommand* RenderCommand = &RenderList[I];
+		if (RenderCommand->Pipeline != ZE_RORP_3D)
 			continue;
 
 		zeProfilerStart("Object Pass");
 		
-		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
-			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
-		PumpStreams(RenderOrder);
+		if (!RenderCommand->Material->SetupForwardPass(this, RenderCommand))
+			zeCriticalError("Can not set material's Forward pass. (Material Type : \"%s\")", RenderCommand->Material->GetClassDescription()->GetName());
+		PumpStreams(RenderCommand);
 		
 		zeProfilerEnd();
 	}
@@ -675,15 +675,15 @@ void ZED3D9FrameRenderer::Do2DPass()
 
 	for (size_t I = 0; I < RenderList.GetCount(); I++)
 	{		
-		ZERenderOrder* RenderOrder = &RenderList[I];
-		if (RenderOrder->Pipeline != ZE_RORP_2D)
+		ZERenderCommand* RenderCommand = &RenderList[I];
+		if (RenderCommand->Pipeline != ZE_RORP_2D)
 			continue;
 
 		zeProfilerStart("Object Pass");
 
-		if (!RenderOrder->Material->SetupForwardPass(this, RenderOrder))
-			zeCriticalError("Renderer", "Can not set material's Forward pass. (Material Type : \"%s\")", RenderOrder->Material->GetClassDescription()->GetName());
-		PumpStreams(RenderOrder);
+		if (!RenderCommand->Material->SetupForwardPass(this, RenderCommand))
+			zeCriticalError("Can not set material's Forward pass. (Material Type : \"%s\")", RenderCommand->Material->GetClassDescription()->GetName());
+		PumpStreams(RenderCommand);
 
 		zeProfilerEnd();
 	}
@@ -900,15 +900,15 @@ void ZED3D9FrameRenderer::ClearLightList()
 	Lights.Clear();
 }
 
-void ZED3D9FrameRenderer::AddToRenderList(ZERenderOrder* RenderOrder)
+void ZED3D9FrameRenderer::AddToRenderList(ZERenderCommand* RenderCommand)
 {
-	#ifdef ZE_DEBUG_ENABLED
+	#ifdef ZE_DEBUG_ENABLE
 		// Check render order is valid
-		if (!CheckRenderOrder(RenderOrder))
+		if (!CheckRenderCommand(RenderCommand))
 			return;
 	#endif
 
-		RenderList.Add(*RenderOrder);
+		RenderList.Add(*RenderCommand);
 }
 
 void ZED3D9FrameRenderer::ClearRenderList()
@@ -916,7 +916,7 @@ void ZED3D9FrameRenderer::ClearRenderList()
 	RenderList.Clear(true);
 }
 
-static int RenderOrderCompare(const ZERenderOrder* A, const ZERenderOrder* B)
+static int RenderCommandCompare(const ZERenderCommand* A, const ZERenderCommand* B)
 {
 	if (A->Priority == B->Priority)
 	{
@@ -938,7 +938,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 	if (!GetModule()->GetEnabled() || GetModule()->IsDeviceLost())
 		return;
 
-	RenderList.Sort(RenderOrderCompare);
+	RenderList.Sort(RenderCommandCompare);
 
 	zeProfilerStart("Rendering");
 

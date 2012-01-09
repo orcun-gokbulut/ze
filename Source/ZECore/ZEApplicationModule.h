@@ -41,14 +41,9 @@
 
 class ZEApplicationModule : public ZEModule
 {
-	public:
-		virtual ZEModuleDescription*	GetModuleDescription();
-		static ZEModuleDescription*		ModuleDescription();
+	ZE_MODULE(ZEApplicationModule)
 
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
-		virtual void					Destroy();
-		
+	public:	
 		virtual void					PreProcess();
 		virtual void					Process(float ElapsedTime);
 		virtual void					PostProcess();

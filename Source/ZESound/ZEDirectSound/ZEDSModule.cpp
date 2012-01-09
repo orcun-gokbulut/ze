@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDSModule.h"
-#include "ZEDSModuleDescription.h"
 #include "ZEMath/ZEVector.h"
 #include "ZECore/ZECore.h"
 #include "ZEError.h"
@@ -44,6 +43,8 @@
 #include "ZEDSSoundSource.h"
 #include "ZEDSSoundSource3D.h"
 #include <dsound.h>
+
+ZE_MODULE_DESCRIPTION(ZEDSModule, ZESoundModule, NULL)
 
 #define MAX_SOUNDBUFFER_COUNT	256
 #define MapVector3(A, B)		(A).x = (B).x; (A).y = (B).y; (A).z = (B).z
@@ -61,7 +62,7 @@ static BOOL CALLBACK DSEnumProc(LPGUID GUID, LPCTSTR DeviceName, LPCTSTR DriverN
 	strncpy(Device->DriverName, DriverName, ZE_MAX_DEVICE_NAME_SIZE);
 	Module->DeviceGUIDList.Add(*GUID);
 
-	zeLog("DirectSound Module", "Found Sound Device; "
+	zeLog("Found Sound Device; "
 		"Index : %d, "
 		"Device Name: \"%s\", "
 		"Device Driver: \"%s\", "
@@ -111,17 +112,6 @@ ZEDSModule::~ZEDSModule()
 {
 }
 
-ZEModuleDescription* ZEDSModule::ModuleDescription()
-{
-	static ZEDSModuleDescription Desc;
-	return &Desc;
-}
-
-ZEModuleDescription* ZEDSModule::GetModuleDescription()
-{
-	return ZEDSModule::ModuleDescription();
-}
-
 LPDIRECTSOUND8 ZEDSModule::GetDevice()
 {
 	return DS;
@@ -146,8 +136,8 @@ bool ZEDSModule::Initialize()
 {	
 	HRESULT hr;
 	
-	zeLog("DirectSound Module", "Initializing DirectSound module.");
-	zeLog("DirectSound Module", "Enumurating sound devices.");
+	zeLog("Initializing DirectSound module.");
+	zeLog("Enumurating sound devices.");
 	
 	DeviceList.Clear();
 	DeviceList.Add();
@@ -155,7 +145,7 @@ bool ZEDSModule::Initialize()
 	hr = DirectSoundEnumerate((LPDSENUMCALLBACK)DSEnumProc, (VOID*)this);
 	if (FAILED(hr))
     {
-		zeError("DirectSound Module", "Can not enumurate sound devices.");
+		zeError("Can not enumurate sound devices.");
 		return false;
     }
 
@@ -164,17 +154,17 @@ bool ZEDSModule::Initialize()
 	GUID* DeviceGUID = NULL;
 	if (DeviceId > DeviceList.GetCount())
 	{
-		zeWarning("DirectSound Module", "Wrong device id. Using default sound device.");
+		zeWarning("Wrong device id. Using default sound device.");
 	}
 	else
 	{
 		if (DeviceId == 0)
 		{
-			zeLog("DirectSound Module", "Using default sound device.");
+			zeLog("Using default sound device.");
 		}
 		else
 		{
-			zeLog("DirectSound Module", "Using \"%s\" (Driver : \"%s\") sound device.", DeviceList[DeviceId].DeviceName, DeviceList[DeviceId].DeviceName);
+			zeLog("Using \"%s\" (Driver : \"%s\") sound device.", DeviceList[DeviceId].DeviceName, DeviceList[DeviceId].DeviceName);
 			DeviceGUID = &DeviceGUIDList[DeviceId];
 		}
 	}
@@ -183,7 +173,7 @@ bool ZEDSModule::Initialize()
 	if (FAILED(hr))
 	{	
 		Destroy();
-		zeError("DirectSound Module", "Can not create DirectSound.");
+		zeError("Can not create DirectSound.");
 		return false;
 	}
 
@@ -192,7 +182,7 @@ bool ZEDSModule::Initialize()
 	if (FAILED(hr))
 	{	
 		Destroy();
-		zeError("DirectSound Module", "Can not set DirectSound device cooperative level.");
+		zeError("Can not set DirectSound device cooperative level.");
 		return false;
 	}
 	
@@ -205,7 +195,7 @@ bool ZEDSModule::Initialize()
 	if (FAILED(hr))
 	{
 		Destroy();
-		zeError("DirectSound Module", "Can create direct sound primary buffer.");
+		zeError("Can create direct sound primary buffer.");
 		return false;
 	}
 
@@ -213,7 +203,7 @@ bool ZEDSModule::Initialize()
 	if (FAILED(hr))
 	{
 		Destroy();
-		zeError("DirectSound Module", "Can not create a Direct Sound listener.");
+		zeError("Can not create a Direct Sound listener.");
 		return false;
 	}
 
@@ -232,7 +222,7 @@ bool ZEDSModule::Initialize()
 	SetTypeVolume(ZE_SST_VIDEO, SoundOptions.GetOption("VideoVolume")->GetValue().GetInteger());
 	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetInteger());
 
-	zeLog("DirectSound", "DirectSound Initialized.");
+	zeLog("DirectSound Initialized.");
 
 	return ZESoundModule::Initialize();
 }

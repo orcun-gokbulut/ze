@@ -70,7 +70,7 @@ void ZECharacter::Movement(float ElapsedTime)
 				if (MovementRatio < 0.0f)
 					MovementRatio = 0.0f;
 
-				//zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
+				//zeLog("Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
 			}
 			else if (MovementRatio < 0.0f)
 			{
@@ -78,7 +78,7 @@ void ZECharacter::Movement(float ElapsedTime)
 				if (MovementRatio > 0.0f)
 					MovementRatio = 0.0f;
 
-				//zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);		
+				//zeLog("Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);		
 			}
 			break;
 
@@ -93,7 +93,7 @@ void ZECharacter::Movement(float ElapsedTime)
 			if (MovementRatio > 1.0f)
 				MovementRatio = 1.0f;
 		}
-		//zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
+		//zeLog("Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
 		break;
 
 	case ZE_CMS_WALKING_BACKWARD:
@@ -107,7 +107,7 @@ void ZECharacter::Movement(float ElapsedTime)
 			if (MovementRatio < -1.0f)
 				MovementRatio = -1.0f;
 		}
-		//zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
+		//zeLog("Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
 		break;
 
 	case ZE_CMS_RUNNING_FORWARD:
@@ -122,7 +122,7 @@ void ZECharacter::Movement(float ElapsedTime)
 				MovementRatio = 2.0f;
 		}
 
-		//zeLog("Character", "Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
+		//zeLog("Movement Status : %d, Movement Ratio : %f", MovementStatus, MovementRatio);
 		break;
 	}
 
@@ -263,7 +263,7 @@ void ZECharacter::Turning(float ElapsedTime)
 				if (TurnRatio < 0.0f)
 					TurnRatio = 0.0f;
 
-				//zeLog("Character", "Turn Status : %d, Movement Ratio : %f", TurnStatus, TurnRatio);
+				//zeLog("Turn Status : %d, Movement Ratio : %f", TurnStatus, TurnRatio);
 			}
 			else if (TurnRatio < 0.0f)
 			{
@@ -271,7 +271,7 @@ void ZECharacter::Turning(float ElapsedTime)
 				if (TurnRatio > 0.0f)
 					TurnRatio = 0.0f;
 
-				//zeLog("Character", "Turn Status : %d, Movement Ratio : %f", TurnStatus, TurnRatio);		
+				//zeLog("Turn Status : %d, Movement Ratio : %f", TurnStatus, TurnRatio);		
 			}
 			break;
 
@@ -280,7 +280,7 @@ void ZECharacter::Turning(float ElapsedTime)
 			if (TurnRatio < -1.0f)
 				TurnRatio = -1.0f;
 
-			//zeLog("Character", "Turn Status : %d, Turn Ratio : %f", TurnStatus, TurnRatio);
+			//zeLog("Turn Status : %d, Turn Ratio : %f", TurnStatus, TurnRatio);
 			break;
 
 		case ZE_CTS_TURN_RIGHT:
@@ -288,7 +288,7 @@ void ZECharacter::Turning(float ElapsedTime)
 			if (TurnRatio > 1.0f)
 				TurnRatio = 1.0f;
 
-			//zeLog("Character", "Turn Status : %d, Turn Ratio : %f", TurnStatus, TurnRatio);
+			//zeLog("Turn Status : %d, Turn Ratio : %f", TurnStatus, TurnRatio);
 			break;
 	}
 
@@ -374,7 +374,7 @@ void ZECharacter::Strafe(float ElapsedTime)
 				if (StrafeRatio < 0.0f)
 					StrafeRatio = 0.0f;
 
-				//zeLog("Character", "Strafe Status : %d, Movement Ratio : %f", StrafeStatus, StrafeRatio);
+				//zeLog("Strafe Status : %d, Movement Ratio : %f", StrafeStatus, StrafeRatio);
 			}
 			else if (StrafeRatio < 0.0f)
 			{
@@ -382,7 +382,7 @@ void ZECharacter::Strafe(float ElapsedTime)
 				if (StrafeRatio > 0.0f)
 					StrafeRatio = 0.0f;
 
-				//zeLog("Character", "Strafe Status : %d, Movement Ratio : %f", StrafeStatus, StrafeRatio);		
+				//zeLog("Strafe Status : %d, Movement Ratio : %f", StrafeStatus, StrafeRatio);		
 			}
 			break;
 
@@ -391,7 +391,7 @@ void ZECharacter::Strafe(float ElapsedTime)
 			if (StrafeRatio < -1.0f)
 				StrafeRatio = -1.0f;
 
-			//zeLog("Character", "Strafe Status : %d, Strafe Ratio : %f", StrafeStatus, StrafeRatio);
+			//zeLog("Strafe Status : %d, Strafe Ratio : %f", StrafeStatus, StrafeRatio);
 			break;
 
 		case ZE_CSS_STRAFE_RIGHT:
@@ -399,7 +399,7 @@ void ZECharacter::Strafe(float ElapsedTime)
 			if (StrafeRatio > 1.0f)
 				StrafeRatio = 1.0f;
 
-			//zeLog("Character", "Strafe Status : %d, Strafe Ratio : %f", StrafeStatus, StrafeRatio);
+			//zeLog("Strafe Status : %d, Strafe Ratio : %f", StrafeStatus, StrafeRatio);
 			break;
 	}
 

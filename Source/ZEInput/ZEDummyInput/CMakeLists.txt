@@ -35,11 +35,8 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZEDummyInputModule.cpp				Sources)
-add_source (ZEDummyInputModule.h				Sources)
-add_source (ZEDummyInputModuleDescription.cpp	Sources)
-add_source (ZEDummyInputModuleDescription.h		Sources)
+ze_add_source(ZEDummyInputModule.cpp				Sources)
+ze_add_source(ZEDummyInputModule.h					Sources)
 
-add_library (ZEDummyInput ${Sources})
-
-set_property(TARGET ZEDummyInput PROPERTY FOLDER "Zinek Engine")
+ze_add_library(ZEDummyInput 
+	SOURCES ${Sources})

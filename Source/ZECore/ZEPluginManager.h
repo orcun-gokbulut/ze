@@ -43,22 +43,21 @@
 class ZEPlugin;
 class ZEPluginManager
 {
+	friend class ZECore;
 	private:
-		ZEArray<ZEPlugin*>					PluginList;
-		void 								RegisterModules(ZEPlugin* Plugin);
-		void 								RegisterExtensions(ZEPlugin* Plugin);
+		ZEArray<ZEPlugin*>					Plugins;
+
+											ZEPluginManager();
+											~ZEPluginManager();
 
 	public:
-		ZEPlugin*							GetPlugin(const char* Name);
+		ZEPlugin*							GetPlugin(const ZEString& Name);
 		const ZEArray<ZEPlugin*>&			GetPlugins();
 
 		bool								RegisterPlugin(ZEPlugin* Plugin);
 		void								UnregisterPlugin(ZEPlugin* Plugin);
 
-		void								LoadExternalPlugins();
-
-											ZEPluginManager();
-											~ZEPluginManager();
+		static ZEPluginManager*				GetInstance();
 };
 #endif
 

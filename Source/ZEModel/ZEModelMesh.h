@@ -41,7 +41,7 @@
 #include "ZEModelMeshLod.h"
 
 #include "ZEGame/ZEComponent.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 
 class ZEModel;
 struct ZEModelResourceMesh;

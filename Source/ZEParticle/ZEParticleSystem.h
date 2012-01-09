@@ -40,7 +40,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEMeta/ZEClass.h"
 
 ZE_META_CLASS_DESCRIPTION(ZEParticleSystem);
@@ -73,7 +73,7 @@ class ZEParticleSystem : public ZEClass
 		bool								IsParticlePoolGenerated;
 		ZEArray<ZEParticleEmitter*>			EmitterArray;				// These elements emits the particles from the particle pool
 		ZEStaticVertexBuffer*				VertexBuffer;				// Holds the vertices
-		ZERenderOrder						RenderOrder;					// Used for rendering
+		ZERenderCommand						RenderCommand;					// Used for rendering
 		ZEParticleBillboardType				BillboardType;				// Can be choosen from 3 types
 		ZEMaterial*							ParticleMaterial;			// Material of the entire system
 		bool								IsVertexBufferUpdated;		// A boolean for checking Vertex Buffer

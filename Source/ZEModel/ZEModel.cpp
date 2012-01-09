@@ -109,19 +109,19 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 	{
 		DebugDrawComponents.Material = ZESimpleMaterial::CreateInstance();
 
-		DebugDrawComponents.BonePositionsRenderOrder.SetZero();
-		DebugDrawComponents.BonePositionsRenderOrder.Material = DebugDrawComponents.Material;
-		DebugDrawComponents.BonePositionsRenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_IMPOSTER;
-		DebugDrawComponents.BonePositionsRenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-		DebugDrawComponents.BonePositionsRenderOrder.VertexBuffer = &DebugDrawComponents.BonePositionsCanvas;
-		DebugDrawComponents.BonePositionsRenderOrder.PrimitiveType = ZE_ROPT_POINT;
+		DebugDrawComponents.BonePositionsRenderCommand.SetZero();
+		DebugDrawComponents.BonePositionsRenderCommand.Material = DebugDrawComponents.Material;
+		DebugDrawComponents.BonePositionsRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_IMPOSTER;
+		DebugDrawComponents.BonePositionsRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+		DebugDrawComponents.BonePositionsRenderCommand.VertexBuffer = &DebugDrawComponents.BonePositionsCanvas;
+		DebugDrawComponents.BonePositionsRenderCommand.PrimitiveType = ZE_ROPT_POINT;
 
-		DebugDrawComponents.BonesRenderOrder.SetZero();
-		DebugDrawComponents.BonesRenderOrder.Material = DebugDrawComponents.Material;
-		DebugDrawComponents.BonesRenderOrder.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_IMPOSTER;
-		DebugDrawComponents.BonesRenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-		DebugDrawComponents.BonesRenderOrder.VertexBuffer = &DebugDrawComponents.BonesCanvas;
-		DebugDrawComponents.BonesRenderOrder.PrimitiveType = ZE_ROPT_LINE;
+		DebugDrawComponents.BonesRenderCommand.SetZero();
+		DebugDrawComponents.BonesRenderCommand.Material = DebugDrawComponents.Material;
+		DebugDrawComponents.BonesRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_IMPOSTER;
+		DebugDrawComponents.BonesRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+		DebugDrawComponents.BonesRenderCommand.VertexBuffer = &DebugDrawComponents.BonesCanvas;
+		DebugDrawComponents.BonesRenderCommand.PrimitiveType = ZE_ROPT_LINE;
 	}
 
 	DebugDrawComponents.BonesCanvas.Clean();
@@ -139,14 +139,14 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 			if (Bones[I].GetParentBone() != NULL)
 				DebugDrawComponents.BonesCanvas.AddLine(Bones[I].GetWorldPosition(), Bones[I].GetParentBone()->GetWorldPosition());
 		}
-		DebugDrawComponents.BonesRenderOrder.WorldMatrix = GetWorldTransform();
-		DebugDrawComponents.BonesRenderOrder.PrimitiveCount = DebugDrawComponents.BonesCanvas.Vertices.GetCount() / 2;
+		DebugDrawComponents.BonesRenderCommand.WorldMatrix = GetWorldTransform();
+		DebugDrawComponents.BonesRenderCommand.PrimitiveCount = DebugDrawComponents.BonesCanvas.Vertices.GetCount() / 2;
 
-		DebugDrawComponents.BonePositionsRenderOrder.WorldMatrix = GetWorldTransform();
-		DebugDrawComponents.BonePositionsRenderOrder.PrimitiveCount = DebugDrawComponents.BonePositionsCanvas.Vertices.GetCount();
+		DebugDrawComponents.BonePositionsRenderCommand.WorldMatrix = GetWorldTransform();
+		DebugDrawComponents.BonePositionsRenderCommand.PrimitiveCount = DebugDrawComponents.BonePositionsCanvas.Vertices.GetCount();
 
-		Renderer->AddToRenderList(&DebugDrawComponents.BonesRenderOrder);
-		Renderer->AddToRenderList(&DebugDrawComponents.BonePositionsRenderOrder);
+		Renderer->AddToRenderList(&DebugDrawComponents.BonesRenderCommand);
+		Renderer->AddToRenderList(&DebugDrawComponents.BonePositionsRenderCommand);
 	}
 
 }
@@ -231,7 +231,7 @@ void ZEModel::SetModelFile(const char* ModelFile)
 
 	if (ModelResource == NULL)
 	{
-		zeError("Model", "Can not load model file. File Name : \"%s\"", ModelFile);
+		zeError("Can not load model file. File Name : \"%s\"", ModelFile);
 		return;
 	}
 

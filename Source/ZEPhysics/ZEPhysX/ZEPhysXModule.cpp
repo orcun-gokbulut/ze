@@ -34,28 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPhysXModule.h"
-#include "ZEPhysXModuleDescription.h"
 #include "ZEPhysXPhysicalWorld.h"
 #include "ZEPhysXPhysicalRigidBody.h"
 #include "ZEPhysXPhysicalMesh.h"
 #include "ZEPhysXPhysicalJoint.h"
-//#include "ZEPhysXPhysicalMaterial.h"
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 
 #include <NxPhysics.h>
 #include <NxCooking.h>
 
-ZEModuleDescription* ZEPhysXModule::GetModuleDescription()
-{
-	return ZEPhysXModule::ModuleDescription();
-}
-
-ZEModuleDescription* ZEPhysXModule::ModuleDescription()
-{
-	static ZEPhysXModuleDescription Desc;
-	return &Desc;
-}
+ZE_MODULE_DESCRIPTION(ZEPhysXModule, ZEPhysicsModule, NULL)
 
 ZEPhysXModule::ZEPhysXModule()
 {
@@ -83,25 +72,25 @@ bool ZEPhysXModule::Initialize()
 	if (IsInitialized())
 		return false;
 
-	zeLog("PhysX Module", "Initializing PhysX module.");
+	zeLog("Initializing PhysX module.");
 
 	PhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION, NULL, &OutputStream);
 	if(!PhysicsSDK)
 	{
-		zeError("PhysX Module", "Can not create PhysX SDK.");
+		zeError("Can not create PhysX SDK.");
 		return false;
 	}
 
 	CookingInterface = NxGetCookingLib(NX_PHYSICS_SDK_VERSION);
 	if (CookingInterface == NULL)
 	{
-		zeError("PhysX Module", "Can not create cooking interface.");
+		zeError("Can not create cooking interface.");
 		return false;
 	}
 
 	if (!CookingInterface->NxInitCooking())
 	{
-		zeError("PhysX Module", "Can not initilize PhysX cooking library.");
+		zeError("Can not initilize PhysX cooking library.");
 		return false;
 	}
 
@@ -109,7 +98,7 @@ bool ZEPhysXModule::Initialize()
 	
 	ZEPhysXComponentBase::InitializeBase(this);
 
-	zeLog("PhysX Module", "PhysX intialized.");
+	zeLog("PhysX intialized.");
 
 	return ZEPhysicsModule::Initialize();
 }

@@ -37,7 +37,7 @@
 #ifndef __ZE_SCENE_DEBUG_DRAW_H__
 #define __ZE_SCENE_DEBUH_DRAW_H__
 
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECanvas.h"
 
 class ZEAABBox;
@@ -51,7 +51,7 @@ class ZESceneDebugDraw
 	private:
 		ZEMaterial*					Material;
 		ZECanvas					VertexBuffer;
-		ZERenderOrder				RenderOrder;
+		ZERenderCommand				RenderCommand;
 
 		bool						Initialized;
 

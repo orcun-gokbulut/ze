@@ -128,9 +128,9 @@ void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
 {
 	if (SkyTexture != NULL)
 	{
-		SkyRenderOrder.Material = SkyMaterial;
-		SkyRenderOrder.WorldMatrix = GetWorldTransform();
-		DrawParameters->Renderer->AddToRenderList(&SkyRenderOrder);
+		SkyRenderCommand.Material = SkyMaterial;
+		SkyRenderCommand.WorldMatrix = GetWorldTransform();
+		DrawParameters->Renderer->AddToRenderList(&SkyRenderCommand);
 	}
 }
 
@@ -146,14 +146,14 @@ ZESkyBrush::ZESkyBrush()
 	SkyBrightness = 1.0f;
 	SkyBox.AddBox(2.0f, 2.0, 2.0f);
 	
-	SkyRenderOrder.SetZero();
-	SkyRenderOrder.Priority = 4;
-	SkyRenderOrder.Order = 0.0f;
-	SkyRenderOrder.VertexBuffer = &SkyBox;
-	SkyRenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
-	SkyRenderOrder.PrimitiveCount = SkyBox.Vertices.GetCount() / 3;
-	SkyRenderOrder.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	SkyRenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	SkyRenderCommand.SetZero();
+	SkyRenderCommand.Priority = 4;
+	SkyRenderCommand.Order = 0.0f;
+	SkyRenderCommand.VertexBuffer = &SkyBox;
+	SkyRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	SkyRenderCommand.PrimitiveCount = SkyBox.Vertices.GetCount() / 3;
+	SkyRenderCommand.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
+	SkyRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 }
 
 ZESkyBrush::~ZESkyBrush()

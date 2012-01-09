@@ -36,18 +36,8 @@
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEVRPNInputDeviceExtension.h"
-#include "ZEVRPNInputDeviceExtensionDescription.h"
 
-ZEExtensionDescription* ZEVRPNInputDeviceExtension::GetExtensionDescription()
-{
-	return ZEVRPNInputDeviceExtension::ExtensionDescription();
-}
-
-ZEExtensionDescription* ZEVRPNInputDeviceExtension::ExtensionDescription()
-{
-	static ZEVRPNInputDeviceExtensionDescription Desc;
-	return &Desc;
-}
+ZE_EXTENSION_DESCRIPTION(ZEVRPNInputDeviceExtension, ZEInputDeviceExtension, NULL)
 
 ZEArray<ZEInputDevice*> ZEVRPNInputDeviceExtension::GetDevices()
 {

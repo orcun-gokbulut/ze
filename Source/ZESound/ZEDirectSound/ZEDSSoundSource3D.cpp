@@ -73,13 +73,13 @@ bool ZEDSSoundSource3D::CreateBuffer()
 
 	if (FAILED(hr = GetDevice()->CreateSoundBuffer(&DSBufferDesc, &DSBuffer, NULL)))
 	{
-		zeError("DirectSound Sound Source 3D", "Can not create direct sound buffer.");
+		zeError("Can not create direct sound buffer.");
 		return false;
 	}
 
 	if (FAILED(hr = DSBuffer->QueryInterface(IID_IDirectSound3DBuffer8, (void**)&DS3DBuffer)))
 	{
-		zeError("DirectSound Sound Source 3D", "Can not create 3d direct sound buffer.");
+		zeError("Can not create 3d direct sound buffer.");
 		return false;
 	}
 
@@ -471,7 +471,7 @@ void ZEDSSoundSource3D::SetSoundResource(ZESoundResource* Resource)
 	{
 		if (Resource->GetChannelCount() != 1)
 		{
-			zeError("DirectSound Sound Source 3D", "Other than one channel (mono) sound resources can not be assigned to 3d sound source.");
+			zeError("Other than one channel (mono) sound resources can not be assigned to 3d sound source.");
 			return;
 		}
 

@@ -33,97 +33,60 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZECore/ZECore.h"
 #include "ZEModuleManager.h"
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEOptionManager.h"
 #include "ZEModule.h"
-#include "ZEModuleDescription.h"
 #include "ZEDefinitions.h"
 #include "ZECompileOptions.h"
 
 ZEOptionSection ZEModuleManager::ModuleManagerOptions;
 
-bool ZEModuleManager::CheckModule(ZEModuleDescription* ModuleDesc)
-{
-	ZEModuleDescription* Desc = GetModuleDescription(ModuleDesc->GetName());
-	if (Desc != NULL)
-	{
-		zeError("Module Manager", "Can not load module. Module is allready loaded. (Module Name : \"%s\", Module Version = %d.%d)", 
-			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
-		return false;
-	}
-
-	if (!ModuleDesc->CheckCompatible())
-	{
-		zeError("Moudle Manager", "Module compatible check failed. Module is not compatible with this system.  (Module Name : \"%s\", Module Version : %d.%d)",
-			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
-		return false;
-	}
-
-/*#ifndef ZE_DEBUG_ENABLED
-	if ((ModuleDesc->GetAttributes() & ZE_MA_DEBUG))
-	{
-		zeError("Module Manager", 
-			"Can not load module. Module is a debug module. Core must be in debug mode to load debug modules. (Module Name : \"%s\", Module Version : %d.%d)",
-			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
-		return false;
-	}
-#endif*/
-
-	if (ModuleDesc->GetRequiredZinekEngineVersion() != ZE_VERSION_MAJORNUMBER)
-	{
-		zeError("Module Manager", "Can not load module. Required Zinek Engine version does no match. This module requires Zinek Engine version %d.0. (Module Name : \"%s\", Module Version : %d.%d)",
-			ModuleDesc->GetRequiredZinekEngineVersion(), ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
-		return false;
-	}
-	return true;
-}
-
-const ZEArray<ZEModuleDescription*>& ZEModuleManager::GetModuleDescriptions()
+const ZEArray<ZEExtensionDescription*>& ZEModuleManager::GetModuleDescriptions()
 {
 	return ModuleList;
 }
 
-ZEModuleDescription* ZEModuleManager::GetModuleDescription(size_t Index)
+ZEExtensionDescription* ZEModuleManager::GetModuleDescription(size_t Index)
 {
 	return ModuleList[Index];
 }
 
-ZEModuleDescription* ZEModuleManager::GetModuleDescription(const char* Name)
+ZEExtensionDescription* ZEModuleManager::GetModuleDescription(const ZEString& Name)
 {
 	for (size_t I = 0; I < ModuleList.GetCount(); I++)
-		if (_stricmp(ModuleList[I]->GetName(), Name) == 0)
+		if (ModuleList[I]->GetName() == Name)
 			return ModuleList[I];
 
 	return NULL;
 }
 
-ZEModuleDescription* ZEModuleManager::GetModuleDescription(ZEModuleDescription* BaseModuleDescription)
+ZEExtensionDescription* ZEModuleManager::GetModuleDescription(ZEExtensionDescription* BaseModuleDescription)
 {
-	if (BaseModuleDescription->GetBaseModuleDescription() != NULL)
+	if (BaseModuleDescription->GetParent() != ZEModule::Description())
 		return NULL;
 
-	return GetModuleDescription(ModuleManagerOptions.GetOption(BaseModuleDescription->GetName())->GetValue());
+	return GetModuleDescription(ZEString(ModuleManagerOptions.GetOption(BaseModuleDescription->GetName())->GetValue()));
 }
 
 ZEModule* ZEModuleManager::CreateModuleInstance(size_t Index)
 {
-	ZEModuleDescription* ModuleDesc = GetModuleDescription(Index);
+	ZEExtensionDescription* ModuleDesc = GetModuleDescription(Index);
 
 	if (ModuleDesc == NULL)
 	{
-		zeError("Module Manager", "Can not find module. (Module Index : %d)",
-			Index);
+		zeError("Can not find module. Module Index : %d", Index);
 
 		return NULL;
 	}
 
-	ZEModule* Module = ModuleDesc->CreateModuleInstance();
+	ZEModule* Module = (ZEModule*)ModuleDesc->CreateInstance();
 	if (Module == NULL)
 	{
-		zeError("Module Manager", "Can not create module. (Module Name : \"%s\", Module Version : %d.%d)",
-			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
+		zeError("Can not create module. Module Name : \"%s\"",
+			(const char*)ModuleDesc->GetName());
 
 		return NULL;
 	}
@@ -131,22 +94,20 @@ ZEModule* ZEModuleManager::CreateModuleInstance(size_t Index)
 	return Module;
 }
 
-ZEModule* ZEModuleManager::CreateModuleInstance(const char* Name)
+ZEModule* ZEModuleManager::CreateModuleInstance(const ZEString& Name)
 {
-	ZEModuleDescription* ModuleDesc = GetModuleDescription(Name);
+	ZEExtensionDescription* ModuleDesc = GetModuleDescription(Name);
 	if (ModuleDesc == NULL)
 	{
-		zeError("Module Manager", "Can not find module. (Module Name : \"%s\")",
-			Name);
+		zeError("Can not find module. Module Name : \"%s\"", (const char*)Name);
 
 		return NULL;
 	}
 
-	ZEModule* Module = ModuleDesc->CreateModuleInstance();
+	ZEModule* Module = (ZEModule*)ModuleDesc->CreateInstance();
 	if (Module == NULL)
 	{
-		zeError("Module Manager", "Can not create module. (Module Name : \"%s\", Module Version : %d.%d)",
-			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
+		zeError("Can not create module. Module Name : \"%s\"", (const char*)ModuleDesc->GetName());
 
 		return NULL;
 	}
@@ -155,21 +116,21 @@ ZEModule* ZEModuleManager::CreateModuleInstance(const char* Name)
 }
 
 
-ZEModule* ZEModuleManager::CreateModuleInstance(ZEModuleDescription* BaseModuleDescription)
+ZEModule* ZEModuleManager::CreateModuleInstance(ZEExtensionDescription* BaseModuleDescription)
 {
-	ZEModuleDescription* ModuleDesc = GetModuleDescription(BaseModuleDescription);
+	ZEExtensionDescription* ModuleDesc = GetModuleDescription(BaseModuleDescription);
 	if (ModuleDesc == NULL)
 	{
-		zeError("Module Manager", "Can not find module. Please check your options.ini.");
+		zeCriticalError("Can not find \"%s\" module. Please check your options.ini.", (const char*)BaseModuleDescription->GetName());
 
 		return NULL;
 	}
 
-	ZEModule* Module = ModuleDesc->CreateModuleInstance();
+	ZEModule* Module = (ZEModule*)ModuleDesc->CreateInstance();
 	if (Module == NULL)
 	{
-		zeError("Module Manager", "Can not create module. (Module Name : \"%s\", Module Version : %d.%d)",
-			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
+		zeCriticalError("Can not create module. Module Name : \"%s\"",
+			(const char*)ModuleDesc->GetName());
 
 		return NULL;
 	}
@@ -177,34 +138,26 @@ ZEModule* ZEModuleManager::CreateModuleInstance(ZEModuleDescription* BaseModuleD
 	return Module;
 }
 
-bool ZEModuleManager::RegisterModule(ZEModuleDescription* ModuleDesc)
+bool ZEModuleManager::RegisterModule(ZEExtensionDescription* ModuleDesc)
 {
-	zeLog("Module Manager", "Loading Internal Module \"%s\". Version : %d.%d, Type : UNKNOWN, Attributes : %c%c%c%c%c%c, Option Section : %s",
-		ModuleDesc->GetName(),
-		ModuleDesc->GetMajorVersion(),
-		ModuleDesc->GetMinorVersion(),
-		((ModuleDesc->GetAttributes() & ZE_MA_INTERNAL)		!= 0 ? 'I' : ' '),
-		((ModuleDesc->GetAttributes() & ZE_MA_EXTERNAL)		!= 0 ? 'E' : ' '),
-		((ModuleDesc->GetAttributes() & ZE_MA_SAFE)			!= 0 ? 'S' : ' '),
-		((ModuleDesc->GetAttributes() & ZE_MA_DEBUG)		!= 0 ? 'D' : ' '),
-		((ModuleDesc->GetAttributes() & ZE_MA_COMPATIBLE)	!= 0 ? 'C' : ' '),
-		((ModuleDesc->GetAttributes() & ZE_MA_VALIDATED)	!= 0 ? 'V' : ' '),
-		(ModuleDesc->GetOptions() == NULL ? "(NONE)" : ModuleDesc->GetOptions()->GetName())
-		);
+	zeLog("Loading Internal Module \"%s\".", (const char*)ModuleDesc->GetName());
 
-	if (!CheckModule(ModuleDesc))
+	ZEExtensionDescription* Desc = GetModuleDescription(ModuleDesc->GetName());
+	if (Desc != NULL)
 	{
-		zeError("Module Manager", "Can not load module. Module check failed. (Module Name : \"%s\", Module Version : %d.%d)",
-			ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
+		zeError("Can not load module. Module is already loaded. Module Name : \"%s\"", 
+			(const char*)ModuleDesc->GetName());
 		return false;
 	}
+	
 	if (ModuleDesc->GetOptions() != NULL)
 	{
 		bool Result;
 		Result = ZEOptionManager::GetInstance()->RegisterSection(ModuleDesc->GetOptions());
 		if (!Result)
 		{
-			zeError("Module Manager", "Can not register module's option section.  (Module Name : \"%s\", Module Version : %d.%d)", ModuleDesc->GetName(), ModuleDesc->GetMajorVersion(), ModuleDesc->GetMinorVersion());
+			zeError("Can not register module's option section. Module Name : \"%s\"", 
+				(const char*)ModuleDesc->GetName());
 		}
 	}
 
@@ -212,48 +165,47 @@ bool ZEModuleManager::RegisterModule(ZEModuleDescription* ModuleDesc)
 	return true;
 }
 
-void ZEModuleManager::UnregisterModule(ZEModuleDescription* ModuleDesc)
+void ZEModuleManager::UnregisterModule(ZEExtensionDescription* ModuleDesc)
 {
 	ModuleList.DeleteValue(ModuleDesc);
 }
 
-#include "ZEGraphics/ZEDirect3D9/ZED3D9ModuleDescription.h"
-#include "ZESound/ZEDirectSound/ZEDSModuleDescription.h"
-#include "ZEInput/ZEDirectInput/ZEDirectInputModuleDescription.h"
-#include "ZEInput/ZEDummyInput/ZEDummyInputModuleDescription.h"
-#include "ZEInput/ZEWindowsInput/ZEWindowsInputModuleDescription.h"
-#include "ZEInput/ZEVirtualInput/ZEVirtualInputModuleDescription.h"
-#include "ZESound/ZEOpenAL/ZEALModuleDescription.h"
-#include "ZEPhysics/ZEPhysX/ZEPhysXModuleDescription.h"
+#include "ZEGraphics/ZEDirect3D9/ZED3D9Module.h"
+#include "ZESound/ZEDirectSound/ZEDSModule.h"
+#include "ZEInput/ZEDirectInput/ZEDirectInputModule.h"
+#include "ZEInput/ZEDummyInput/ZEDummyInputModule.h"
+#include "ZEInput/ZEWindowsInput/ZEWindowsInputModule.h"
+#include "ZEInput/ZEVirtualInput/ZEVirtualInputModule.h"
+#include "ZESound/ZEOpenAL/ZEALModule.h"
+#include "ZEPhysics/ZEPhysX/ZEPhysXModule.h"
 
 ZEModuleManager::ZEModuleManager()
 {
-	RegisterModule(new ZED3D9ModuleDescription());
-	RegisterModule(new ZEDSModuleDescription());
-	/*RegisterModule(new ZEDummyInputModuleDescription());
-	RegisterModule(new ZEVirtualInputModuleDescription());
-	RegisterModule(new ZEDirectInputModuleDescription());*/
-	RegisterModule(new ZEALModuleDescription());
-	RegisterModule(new ZEPhysXModuleDescription());
-	RegisterModule(new ZEWindowsInputModuleDescription());
+	RegisterModule(ZED3D9Module::Description());
+	RegisterModule(ZEDSModule::Description());
+	/*RegisterModule(ZEDummyInputModule::Description());
+	RegisterModule(ZEVirtualInputModule::Description());
+	RegisterModule(ZEDirectInputModule::Description());*/
+	RegisterModule(ZEALModule::Description());
+	RegisterModule(ZEPhysXModule::Description());
+	RegisterModule(ZEWindowsInputModule::Description());
 
 	ModuleManagerOptions.SetName("ModuleManager");
-	ModuleManagerOptions.AddOption(new ZEOption("GraphicsModule", "Direct3D9", ZE_OA_NORMAL));
-	ModuleManagerOptions.AddOption(new ZEOption("InputModule", "DirectInput", ZE_OA_NORMAL));
-	ModuleManagerOptions.AddOption(new ZEOption("SoundModule", "DirectSound", ZE_OA_NORMAL));
-	ModuleManagerOptions.AddOption(new ZEOption("NetworkModule", "WinNetwork", ZE_OA_NORMAL));
-	ModuleManagerOptions.AddOption(new ZEOption("PhysicsModule", "PhysX", ZE_OA_NORMAL));
-	ModuleManagerOptions.AddOption(new ZEOption("GameModule", "TestGame", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("ZEGraphicsModule", "ZED3D9Module", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("ZEInputModule", "ZEWindowsInputModule", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("ZESoundModule", "ZEDSModule", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("ZENetworkModule", "ZEWinNetwork", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("ZEPhysicsModule", "ZEPhysXModule", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("ZEGameModule", "ZETestGame", ZE_OA_NORMAL));
 	ZEOptionManager::GetInstance()->RegisterSection(&ModuleManagerOptions);
 }
 
 ZEModuleManager::~ZEModuleManager()
 {
-	for (size_t I = 0; I < ModuleList.GetCount(); I++)
-		delete ModuleList[I];
+
 }
 
-
-
-
-
+ZEModuleManager* ZEModuleManager::GetInstance()
+{
+	return ZECore::GetInstance()->GetModuleManager();
+}

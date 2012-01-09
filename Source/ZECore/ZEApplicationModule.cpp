@@ -34,31 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEApplicationModule.h"
-#include "ZEApplicationModuleDescription.h"
 
-ZEModuleDescription* ZEApplicationModule::GetModuleDescription()
-{
-	return ZEApplicationModule::ModuleDescription();
-}
-
-ZEModuleDescription* ZEApplicationModule::ModuleDescription()
-{
-	static ZEApplicationModuleDescription Desc;
-	return &Desc;
-}
-
-bool ZEApplicationModule::Initialize()
-{
-	return true;
-}
-
-void ZEApplicationModule::Deinitialize()
-{
-}
-
-void ZEApplicationModule::Destroy()
-{
-}
+ZE_MODULE_DESCRIPTION_ABSTRACT(ZEApplicationModule, ZEModule, NULL)
 
 void ZEApplicationModule::PreProcess()
 {

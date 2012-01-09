@@ -34,15 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DUMMY_INPUT_MODULE_H__
-#define __ZE_DUMMY_INPUT_MODULE_H__
+#ifndef	__ZE_VIRTUAL_INPUT_MODULE_H__
+#define __ZE_VIRTUAL_INPUT_MODULE_H__
 
 #define ZE_VIRTUAL_INPUT_MAX_INPUT_COUNT	50
 #include "ZEInput\ZEInputModule.h"
 
 class ZEVirtualInputModule: public ZEInputModule 
-{	
-	friend class ZEVirtualInputModuleDescription;
+{
+	ZE_MODULE(ZEVirtualInputModule)
 
 	private:
 		bool							Enabled;

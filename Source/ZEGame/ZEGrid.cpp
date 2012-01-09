@@ -110,52 +110,52 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 	
 	if (MinorGridEnabled)
 	{
-		RenderOrder.Order = 0.0f;
+		RenderCommand.Order = 0.0f;
 		ZEVector3 MinorGridPosition(
 			CameraPosition.x - fmod(CameraPosition.x, MajorGridUnitSize.x),
 			0.0f,
 			CameraPosition.z - fmod(CameraPosition.z, MajorGridUnitSize.y));
 
-		ZEMatrix4x4::CreateOrientation(RenderOrder.WorldMatrix, MinorGridPosition, GetRotation(), ZEVector3::One);
-		RenderOrder.VertexBuffer = &MinorGrid;
-		RenderOrder.PrimitiveCount = MinorGrid.Vertices.GetCount() / 2;
-		Parameters->Renderer->AddToRenderList(&RenderOrder);
+		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, MinorGridPosition, GetRotation(), ZEVector3::One);
+		RenderCommand.VertexBuffer = &MinorGrid;
+		RenderCommand.PrimitiveCount = MinorGrid.Vertices.GetCount() / 2;
+		Parameters->Renderer->AddToRenderList(&RenderCommand);
 	}
 
 	if (MajorGridEnabled)
 	{
-		RenderOrder.Order = 1.0f;
+		RenderCommand.Order = 1.0f;
 		ZEVector3 MajorGridPosition(
 			CameraPosition.x - fmod(CameraPosition.x, MajorGridUnitSize.x),
 			0.0f,
 			CameraPosition.z - fmod(CameraPosition.z, MajorGridUnitSize.y));
 
-		ZEMatrix4x4::CreateOrientation(RenderOrder.WorldMatrix, MajorGridPosition, GetRotation(), ZEVector3::One);
-		RenderOrder.VertexBuffer = &MajorGrid;
-		RenderOrder.PrimitiveCount = MajorGrid.Vertices.GetCount() / 2;
-		Parameters->Renderer->AddToRenderList(&RenderOrder);
+		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, MajorGridPosition, GetRotation(), ZEVector3::One);
+		RenderCommand.VertexBuffer = &MajorGrid;
+		RenderCommand.PrimitiveCount = MajorGrid.Vertices.GetCount() / 2;
+		Parameters->Renderer->AddToRenderList(&RenderCommand);
 	}
 
 	if (AxisEnabled)
 	{
-		RenderOrder.Order = 2.0f;
+		RenderCommand.Order = 2.0f;
 		ZEVector3 AxisXGridPosition(CameraPosition.x - fmod(CameraPosition.x, MajorGridUnitSize.x), 0.0f, 0.0f);
 		ZEVector3 AxisYGridPosition(0.0f, 0.0f, CameraPosition.z - fmod(CameraPosition.z, MajorGridUnitSize.y));
 
-		RenderOrder.PrimitiveCount = 1;
+		RenderCommand.PrimitiveCount = 1;
 
 		if (AxisYGridPosition.z > -GridSize.y * 0.5f && AxisYGridPosition.z < GridSize.y * 0.5f)
 		{
-			ZEMatrix4x4::CreateOrientation(RenderOrder.WorldMatrix, AxisXGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
-			RenderOrder.VertexBuffer = &AxisX;
-			Parameters->Renderer->AddToRenderList(&RenderOrder);
+			ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, AxisXGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
+			RenderCommand.VertexBuffer = &AxisX;
+			Parameters->Renderer->AddToRenderList(&RenderCommand);
 		}
 
 		if (AxisXGridPosition.x > -GridSize.x * 0.5f && AxisXGridPosition.x < GridSize.x * 0.5f)
 		{
-			ZEMatrix4x4::CreateOrientation(RenderOrder.WorldMatrix, AxisYGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
-			RenderOrder.VertexBuffer = &AxisZ;
-			Parameters->Renderer->AddToRenderList(&RenderOrder);
+			ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, AxisYGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
+			RenderCommand.VertexBuffer = &AxisZ;
+			Parameters->Renderer->AddToRenderList(&RenderCommand);
 		}
 	}
 }
@@ -167,11 +167,11 @@ bool ZEGrid::Initialize()
 	if (Material == NULL)
 		Material = ZESimpleMaterial::CreateInstance();
 
-	RenderOrder.SetZero();
-	RenderOrder.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderOrder.PrimitiveType = ZE_ROPT_LINE;
-	RenderOrder.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_NO_Z_WRITE;
-	RenderOrder.Material = Material;
+	RenderCommand.SetZero();
+	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	RenderCommand.PrimitiveType = ZE_ROPT_LINE;
+	RenderCommand.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_NO_Z_WRITE;
+	RenderCommand.Material = Material;
 
 	return true;
 }

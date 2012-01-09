@@ -37,24 +37,84 @@
 #ifndef	__ZE_EXTENSION_H__
 #define __ZE_EXTENSION_H__
 
+#include "ZEBase.h"
+#include "ZEDS\ZEString.h"
+
 class ZEExtensionDescription;
 
-class ZEExtension
+#include "ZETypes.h"
+#include "ZEVersion.h"
+
+class ZEModuleDescription;
+class ZEOptionSection;
+class ZEExtension;
+
+#define ZE_EXTENSION(Extension)\
+	public:\
+		friend class Extension##Description;\
+		static ZEExtensionDescription* Description();\
+		virtual ZEExtensionDescription* GetDescription();\
+	private:
+
+
+#define ZE_EXTENSION_DESCRIPTION(Extension, ParentExtension, Options)\
+class Extension##Description : public ZEExtensionDescription\
+{\
+	public:\
+		virtual ZEExtensionDescription*		GetParent(){ return ParentExtension::Description();}\
+		virtual ZEString					GetName() { return #Extension; }\
+		virtual ZEOptionSection*			GetOptions() { return Options; }\
+		virtual	bool						CheckCompatible() { return true; }\
+		virtual	ZEExtension*				CreateInstance() { return new Extension(); }\
+};\
+ZEExtensionDescription* Extension::Description()\
+{\
+	static Extension##Description Desc;\
+	return &Desc; \
+}\
+ZEExtensionDescription* Extension::GetDescription()\
+{\
+	return Extension::Description();\
+}
+
+#define ZE_EXTENSION_DESCRIPTION_ABSTRACT(Extension, ParentExtension, Options)\
+class Extension##Description : public ZEExtensionDescription\
+{\
+public:\
+	virtual ZEExtensionDescription*		GetParent(){ return ParentExtension::Description();}\
+	virtual ZEString					GetName() { return #Extension; }\
+	virtual ZEOptionSection*			GetOptions() { return Options; }\
+	virtual	bool						CheckCompatible() { return true; }\
+	virtual	ZEExtension*				CreateInstance() { return NULL; }\
+};\
+	ZEExtensionDescription* Extension::Description()\
+{\
+	static Extension##Description Desc;\
+	return &Desc; \
+}\
+	ZEExtensionDescription* Extension::GetDescription()\
+{\
+	return Extension::Description();\
+}
+
+
+class ZEExtensionDescription
 {
-	protected:
-		bool							Initialized;
-
-										ZEExtension();
-		virtual							~ZEExtension();
-
 	public:
-		static ZEExtensionDescription*	ExtensionDescription();
-		virtual ZEExtensionDescription*	GetExtensionDescription() = 0;
+		virtual ZEExtensionDescription*		GetParent() = 0;
+		virtual ZEString					GetName() = 0;
 
-		bool							IsInitialized() const;
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+		virtual ZEOptionSection*			GetOptions() = 0;
+		virtual	bool						CheckCompatible() = 0;
 
-		virtual void					Destroy();
+		virtual	ZEExtension*				CreateInstance() = 0;
 };
+
+class ZEExtension : public ZEBase
+{
+	public:
+		static ZEExtensionDescription*		Description();
+		virtual ZEExtensionDescription*		GetDescription() = 0;
+};
+
 #endif

@@ -187,11 +187,11 @@ bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShade
 	{
 		if (CompilerOutput == NULL)
 		{
-			zeError("D3D9 Vertex Shader Compiler", "Can not vertex compile shader. Shader file name : \"%s\"", FileName);
+			zeError("Can not vertex compile shader. Shader file name : \"%s\"", FileName);
 		}
 		else
 		{
-			zeError("D3D9 Vertex Shader Compiler", "Can not compile vertex shader.\r\nShader file name : \"%s\".\r\nCompile output :\r\n%s\r\n", FileName, CompilerOutput->GetBufferPointer());
+			zeError("Can not compile vertex shader.\r\nShader file name : \"%s\".\r\nCompile output :\r\n%s\r\n", FileName, CompilerOutput->GetBufferPointer());
 		}
 
 		*VertexShader = NULL;
@@ -200,7 +200,7 @@ bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShade
 
 	if (GetDevice()->CreateVertexShader((DWORD*)ShaderBuffer->GetBufferPointer(), VertexShader) != NULL)
 	{
-		zeError("D3D9 Vertex Shader Compiler", "Can not create vertex shader.\r\n");
+		zeError("Can not create vertex shader.\r\n");
 		*VertexShader = NULL;
 		return false;
 	}
@@ -240,11 +240,11 @@ bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, 
 	{
 		if (CompilerOutput == NULL)
 		{
-			zeError("D3D9 Vertex Shader Compiler", "Can not vertex compile shader. Shader file : \"%s\"", FileName);
+			zeError("Can not vertex compile shader. Shader file : \"%s\"", FileName);
 		}
 		else
 		{
-			zeError("D3D9 Pixel Shader Compiler", "Can not compile pixel shader.\r\nShader file : \"%s\".\r\n Compile output :\r\n%s\r\n", FileName, CompilerOutput->GetBufferPointer());
+			zeError("Can not compile pixel shader.\r\nShader file : \"%s\".\r\n Compile output :\r\n%s\r\n", FileName, CompilerOutput->GetBufferPointer());
 		}
 
 		*PixelShader = NULL;
@@ -253,7 +253,7 @@ bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, 
 
 	if (GetDevice()->CreatePixelShader((DWORD*)ShaderBuffer->GetBufferPointer(), PixelShader) != NULL)
 	{
-		zeError("D3D9 Pixel Shader Compiler", "Can not create pixel shader.");
+		zeError("Can not create pixel shader.");
 		*PixelShader = NULL;
 		return false;
 	}
@@ -290,14 +290,14 @@ bool ZED3D9CommonTools::CompileVertexShaderFromMemory(LPDIRECT3DVERTEXSHADER9* V
 
 	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, &D3DIncludeInterface, "vs_main", ShaderProfile, D3DXSHADER_PACKMATRIX_COLUMNMAJOR | ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
-		zeError("D3D9 Vertex Shader Compiler", "Can not compile vertex shader.\r\nShader name : \"%s\".\r\nCompile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
+		zeError("Can not compile vertex shader.\r\nShader name : \"%s\".\r\nCompile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
 		*VertexShader = NULL;
 		return false;
 	}
 
 	if (GetDevice()->CreateVertexShader((DWORD*)ShaderBuffer->GetBufferPointer(), VertexShader) != NULL)
 	{
-		zeError("D3D9 Vertex Shader Compiler", "Can not create vertex shader.\r\n");
+		zeError("Can not create vertex shader.\r\n");
 		*VertexShader = NULL;
 		return false;
 	}
@@ -336,14 +336,14 @@ bool ZED3D9CommonTools::CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* Pix
 
 	if (D3DXCompileShader(Source, (UINT)strlen(Source), Macros, &D3DIncludeInterface, "ps_main", ShaderProfile, D3DXSHADER_PACKMATRIX_COLUMNMAJOR | ZE_SHADER_COMPILER_PARAMETERS, &ShaderBuffer, &CompilerOutput, NULL) != D3D_OK)
 	{
-		zeError("D3D9 Pixel Shader Compiler", "Can not compile pixel shader.\r\nShader Name : \"%s\".\r\n Compile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
+		zeError("Can not compile pixel shader.\r\nShader Name : \"%s\".\r\n Compile output :\r\n%s\r\n", ShaderName, CompilerOutput->GetBufferPointer());
 		*PixelShader = NULL;
 		return false;
 	}
 
 	if (GetDevice()->CreatePixelShader((DWORD*)ShaderBuffer->GetBufferPointer(), PixelShader) != NULL)
 	{
-		zeError("D3D9 Pixel Shader Compiler", "Can not create pixel shader.");
+		zeError("Can not create pixel shader.");
 		*PixelShader = NULL;
 		return false;
 	}
@@ -374,7 +374,7 @@ bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width
 	HRESULT Hr = GetDevice()->CreateTexture(Width, Height, 1, D3DUSAGE_RENDERTARGET, D3DFormat, D3DPOOL_DEFAULT, Target, NULL);
 	if (Hr != D3D_OK)
 	{
-		zeError("D3D9", "Can not create render target.");
+		zeError("Can not create render target.");
 		*Target = NULL;
 		return false;
 	}
@@ -398,7 +398,7 @@ bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width
 	HRESULT Hr = GetDevice()->CreateRenderTarget(Width, Height, D3DFormat, D3DMULTISAMPLE_NONE, 0, FALSE, Target, NULL);
 	if (Hr != D3D_OK)
 	{
-		zeError("D3D9", "Can not create render target.");
+		zeError("Can not create render target.");
 		*Target = NULL;
 		return false;
 	}
@@ -422,7 +422,7 @@ bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int 
 	HRESULT Hr = GetDevice()->CreateDepthStencilSurface(Width, Height, D3DFMT_D24S8, D3DMULTISAMPLE_NONE, 0, FALSE, Target, NULL);
 	if (Hr != D3D_OK)
 	{
-		zeError("D3D9", "Can not create depth render target.");
+		zeError("Can not create depth render target.");
 		*Target = NULL;
 		return false;
 	}
@@ -445,7 +445,7 @@ bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DTEXTURE9* Target, int 
 	HRESULT Hr = GetDevice()->CreateTexture(Width, Height, 0, D3DUSAGE_DEPTHSTENCIL ,D3DFMT_D24S8, D3DPOOL_DEFAULT, Target, NULL);
 	if (Hr != D3D_OK)
 	{
-		zeError("D3D9", "Can not create depth render target.");
+		zeError("Can not create depth render target.");
 		*Target = NULL;
 		return false;
 	}

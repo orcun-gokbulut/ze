@@ -50,7 +50,7 @@ class ZEFixedMaterial;
 class ZETerrainMaterial;
 class ZEStaticVertexBuffer;
 class ZEVertexDeclaration;
-class ZERenderOrder;
+class ZERenderCommand;
 class ZEFrameRenderer;
 class ZEShadowRenderer;
 class ZEViewPort;
@@ -64,6 +64,7 @@ struct ZETextureOptions;
 
 class ZEGraphicsModule : public ZEModule
 {	
+	ZE_MODULE(ZEGraphicsModule)
 	protected:
 		size_t								CurrentFrameId;
 		int									ScreenWidth, ScreenHeight;
@@ -82,9 +83,6 @@ class ZEGraphicsModule : public ZEModule
 
 
 	public:
-		virtual ZEModuleDescription*		GetModuleDescription();
-		static ZEModuleDescription*			ModuleDescription();
-
 		static ZEOptionSection				GraphicsOptions;
 		static void							BaseInitialize();
 		static void							BaseDeinitialize();

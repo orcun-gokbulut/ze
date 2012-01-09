@@ -72,14 +72,14 @@ bool ZESerialPort::Open(const ZEString& PortName, ZEUINT32 BaudRate)
 	Handle = CreateFile((const char*)PortName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
 	if (Handle == INVALID_HANDLE_VALUE)
 	{
-		//zeError("ZESerialPort", "Can not create serial port.");
+		//zeError("Can not create serial port.");
 		Close();
 		return false;
 	}
 
 	if(SetupComm(Handle, 1024, 1024) == 0)
 	{
-		//zeError("ZESerialPort", "Can not configure serial port.");
+		//zeError("Can not configure serial port.");
 		Close();
 		return false;
 	}
@@ -87,7 +87,7 @@ bool ZESerialPort::Open(const ZEString& PortName, ZEUINT32 BaudRate)
 	DCB dcbConfig;
 	if (GetCommState(Handle, &dcbConfig) == 0)
 	{
-		//zeError("ZESerialPort", "Can not configure serial port.");
+		//zeError("Can not configure serial port.");
 		Close();
 		return false;
 	}
@@ -101,7 +101,7 @@ bool ZESerialPort::Open(const ZEString& PortName, ZEUINT32 BaudRate)
 
 	if(!SetCommState(Handle, &dcbConfig))
 	{
-		//zeError("ZESerialPort", "Can not configure serial port.");
+		//zeError("Can not configure serial port.");
 		Close();
 		return false;
 	}
@@ -109,7 +109,7 @@ bool ZESerialPort::Open(const ZEString& PortName, ZEUINT32 BaudRate)
 	COMMTIMEOUTS CommTimeout;
 	if (!GetCommTimeouts(Handle, &CommTimeout))
 	{
-		//zeError("ZESerialPort", "Can not configure serial port.");
+		//zeError("Can not configure serial port.");
 		Close();
 		return false;
 	}
@@ -122,7 +122,7 @@ bool ZESerialPort::Open(const ZEString& PortName, ZEUINT32 BaudRate)
 
 	if (!SetCommTimeouts(Handle, &CommTimeout))
 	{
-		//zeError("ZESerialPort", "Can not configure serial port.");
+		//zeError("Can not configure serial port.");
 		Close();
 		return false;
 	}

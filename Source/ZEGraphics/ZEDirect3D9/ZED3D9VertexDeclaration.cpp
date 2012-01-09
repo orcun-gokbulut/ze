@@ -56,7 +56,7 @@ bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Ele
 {
 	if (ElementCount > 12)
 	{
-		zeError("D3D9 Vertex Declaration", "Vertex element count in vertex declaration is too high. (Max Vertex Element Count : 12, Vertex Element Count : %d)", ElementCount);
+		zeError("Vertex element count in vertex declaration is too high. (Max Vertex Element Count : 12, Vertex Element Count : %d)", ElementCount);
 		return false;
 	}
 
@@ -97,7 +97,7 @@ bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Ele
 				D3DElements[I].Usage = D3DDECLUSAGE_BLENDWEIGHT;
 				break;
 			default:
-				zeError("D3D9 Vertex Declaration", "Wrong Vertex Element Semantic. (Index : %d)", I);
+				zeError("Wrong Vertex Element Semantic. (Index : %d)", I);
 				return false;
 				break;
 		}
@@ -137,7 +137,7 @@ bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Ele
 				VertexSize += 8;
 				break;
 			default:
-				zeError("D3D9 Vertex Declaration", "Wrong Vertex Element Type. (Index : %d)", I);
+				zeError("Wrong Vertex Element Type. (Index : %d)", I);
 				return false;
 		}
 	}
@@ -151,7 +151,7 @@ bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Ele
 
 	if (GetDevice()->CreateVertexDeclaration(D3DElements, &VertexDeclaration) != D3D_OK)
 	{
-		zeError("D3D9 Vertex Declaration", "Can not create vertex declaration.");
+		zeError("Can not create vertex declaration.");
 		Release();
 		return false;
 	}

@@ -41,34 +41,31 @@
 #include "ZEOptionSection.h"
 
 class ZEModule;
-class ZEModuleDescription;
+class ZEExtensionDescription;
 class ZEModuleManager
 {
+	friend class ZECore;
 	private:
-		ZEArray<ZEModuleDescription*>			ModuleList;
-		bool									CheckModule(ZEModuleDescription* ModuleDesc);
+		ZEArray<ZEExtensionDescription*>		ModuleList;
+
+		ZEModuleManager();
+												~ZEModuleManager();
 
 	public:
 		static ZEOptionSection					ModuleManagerOptions;
 
-		const ZEArray<ZEModuleDescription*>&	GetModuleDescriptions();
-		ZEModuleDescription*					GetModuleDescription(size_t Index);
-		ZEModuleDescription*					GetModuleDescription(const char* Name);
-		ZEModuleDescription*					GetModuleDescription(ZEModuleDescription* BaseModuleDescription);
+		const ZEArray<ZEExtensionDescription*>&	GetModuleDescriptions();
+		ZEExtensionDescription*					GetModuleDescription(size_t Index);
+		ZEExtensionDescription*					GetModuleDescription(const ZEString& Name);
+		ZEExtensionDescription*					GetModuleDescription(ZEExtensionDescription* BaseModuleDescription);
 
 		ZEModule*								CreateModuleInstance(size_t Index);
-		ZEModule*								CreateModuleInstance(const char* Name);
-		ZEModule*								CreateModuleInstance(ZEModuleDescription* BaseModuleDescription);
+		ZEModule*								CreateModuleInstance(const ZEString& Name);
+		ZEModule*								CreateModuleInstance(ZEExtensionDescription* BaseModuleDescription);
 
-		bool									RegisterModule(ZEModuleDescription* ModuleDesc);
-		void									UnregisterModule(ZEModuleDescription* ModuleDesc);
+		bool									RegisterModule(ZEExtensionDescription* ModuleDesc);
+		void									UnregisterModule(ZEExtensionDescription* ModuleDesc);
 									
-												ZEModuleManager();
-												~ZEModuleManager();
+		static ZEModuleManager*					GetInstance();
 };
 #endif
-
-
-
-
-

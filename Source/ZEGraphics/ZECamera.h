@@ -39,7 +39,7 @@
 
 #include "ZEGame/ZEComponent.h"
 #include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEGraphics/ZEViewVolume.h"
 #include "ZEMath/ZEPlane.h"

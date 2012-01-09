@@ -792,7 +792,7 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 	ZEFile* File = ZEFile::Open(NewPath);
 	if (File == NULL || !File->IsOpen())
 	{
-		zeError("Canvas", "Can not load canvas file. (FileName : \"%s\")", NewPath);
+		zeError("Can not load canvas file. (FileName : \"%s\")", NewPath);
 		return false;
 	}
 	
@@ -812,13 +812,13 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 
 	/*	if (Index == VertexCount)
 		{
-			zeError("Canvas", "Corrupted canvas file. Vertex count does not match. (FileName : \"%s\")", FileName);
+			zeError("Corrupted canvas file. Vertex count does not match. (FileName : \"%s\")", FileName);
 			return false;
 		}*/
 	}
 
 	if (Index != VertexCount + 1 )
-		zeWarning("Canvas", "Corrupted canvas file. Vertex count is less than verties in the file. (FileName : \"%s\")", NewPath);
+		zeWarning("Corrupted canvas file. Vertex count is less than verties in the file. (FileName : \"%s\")", NewPath);
 
 	return true;
 }

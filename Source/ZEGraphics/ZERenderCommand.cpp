@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEApplicationModuleDescription.h
+ Zinek Engine - ZERenderCommand.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_APPLICATION_MODULE_DESCRIPTION_H__
-#define __ZE_APPLICATION_MODULE_DESCRIPTION_H__
+#include "ZERenderCommand.h"
+#include <memory.h>
 
-#include "ZECore/ZEModuleDescription.h"
-
-class ZEApplicationModuleDescription : public ZEModuleDescription
+void ZERenderCommand::SetZero()
 {
-	public:
-		virtual ZEModuleDescription*	GetBaseModuleDescription();
-		virtual ZEModuleAttribute		GetAttributes();
-		virtual int						GetRequiredZinekEngineVersion();
-		virtual int						GetMajorVersion();
-		virtual int						GetMinorVersion();
-		virtual const char*				GetCopyright();
-		virtual const char*				GetName();
-
-		virtual ZEOptionSection*		GetOptions();
-		virtual	ZEModule*				CreateModuleInstance();
-		virtual	bool					CheckCompatible();
-};
-
-#endif
+	memset(this, 0, sizeof(ZERenderCommand));
+	this->Priority = 3;
+}

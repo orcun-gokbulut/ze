@@ -40,7 +40,7 @@
 #include "ZED3D9Shader.h"
 #include "ZED3D9CommonTools.h"
 #include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEMaterialComponents.h"
 
 void ZED3D9TerrainMaterial::CreateShaders()
@@ -83,7 +83,7 @@ ZED3D9TerrainMaterial::ZED3D9TerrainMaterial()
 	ShadowPassPixelShader = NULL;
 }
 
-bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9TerrainMaterial*)this)->UpdateMaterial();
@@ -91,13 +91,13 @@ bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERender
 	// Setup Transformations
 	ZECamera* Camera = Renderer->GetCamera();
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&Camera->GetViewProjectionTransform(), 4);
-	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderCommand->WorldMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&Camera->GetViewTransform(), 4);
 	GetDevice()->SetVertexShaderConstantF(13, (float*)&ZEVector4(HeightTexture->GetWidth(), HeightTexture->GetHeight(), HeightOffset, HeightScale), 1);
 	GetDevice()->SetVertexShaderConstantF(14, (float*)&ZEVector4(TextureOffset.x, TextureOffset.y, 1.0f / TextureScale.x, 1.0f / TextureScale.y), 1);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
+	if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
@@ -131,7 +131,7 @@ bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERender
 	return true;
 }
 
-bool ZED3D9TerrainMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const
+bool ZED3D9TerrainMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9TerrainMaterial*)this)->UpdateMaterial();
@@ -139,14 +139,14 @@ bool ZED3D9TerrainMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	// Setup Transformations
 	ZECamera* Camera = Renderer->GetCamera();
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&Camera->GetViewProjectionTransform(), 4);
-	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderOrder->WorldMatrix, 4);
+	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderCommand->WorldMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&Camera->GetViewTransform(), 4);
 	GetDevice()->SetVertexShaderConstantF(13, (float*)&ZEVector4(HeightTexture->GetWidth(), HeightTexture->GetHeight(), HeightOffset, HeightScale), 1);
 	GetDevice()->SetVertexShaderConstantF(14, (float*)&ZEVector4(TextureOffset.x, TextureOffset.y, 1.0f / TextureScale.x, 1.0f / TextureScale.y), 1);
 
 
 	// Setup ZCulling
-	if (RenderOrder->Flags & ZE_ROF_ENABLE_Z_CULLING)
+	if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);

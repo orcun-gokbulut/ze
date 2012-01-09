@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEALModule.h"
-#include "ZEALModuleDescription.h"
 #include "ZEMath/ZEVector.h"
 #include "ZECore/ZECore.h"
 #include "ZEError.h"
@@ -46,6 +45,13 @@
 
 #define MAX_SOUNDBUFFER_COUNT	256
 #define MapVector3(A, B)		(A).x = (B).x; (A).y = (B).y; (A).z = (B).z
+
+ZE_MODULE_DESCRIPTION(ZEALModule, ZESoundModule, NULL)
+
+const ZEArray<ZESoundDevice>& ZEALModule::GetDeviceList()
+{
+	return DeviceList;
+}
 
 void ZEALModule::UpdateVolumes(ZESoundSourceType SourceType)
 {
@@ -77,17 +83,6 @@ ZEALModule::~ZEALModule()
 {
 }
 
-ZEModuleDescription* ZEALModule::GetModuleDescription()
-{
-	static ZEALModuleDescription Desc;
-	return &Desc;
-}
-
-const ZEArray<ZESoundDevice>& ZEALModule::GetDeviceList()
-{
-	return DeviceList;
-}
-
 ALCdevice* ZEALModule::GetDevice()
 {
 	return Device;
@@ -100,13 +95,13 @@ ALCcontext* ZEALModule::GetContext()
 
 bool ZEALModule::Initialize()
 {	
-	zeLog("OpenAL Module", "Initializing OpenAL module.");
+	zeLog("Initializing OpenAL module.");
 	
-	zeLog("OpenAL Module", "Enumurating Sound Devices.");
+	zeLog("Enumurating Sound Devices.");
 	const ALCchar* DeviceNames = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
 	if (DeviceNames == NULL)
 	{
-		zeError("OpenAL Module", "Can not enumurate devices.");
+		zeError("Can not enumurate devices.");
 		return false;
 	}
 
@@ -120,7 +115,7 @@ bool ZEALModule::Initialize()
 			strncpy(Device->DeviceName, (char*)&DeviceNames[Start], ZE_MAX_DEVICE_NAME_SIZE);
 			Device->DriverName[0] = '\0';
 
-			zeLog("OpenAL Module", "Found sound device; "
+			zeLog("Found sound device; "
 				"Index : %d, "
 				"Device Name: \"%s\", "
 				"Device Driver: \"%s\".",
@@ -139,24 +134,24 @@ bool ZEALModule::Initialize()
 	ALchar* DeviceName = NULL;
 	if (DeviceId > DeviceList.GetCount())
 	{
-		zeWarning("OpenAL Module", "Wrong device id. Using sound default device.");
+		zeWarning("Wrong device id. Using sound default device.");
 	}
 	else
 		if (DeviceId == 0)
 		{
-			zeLog("OpenAL Module", "Using default sound device");
+			zeLog("Using default sound device");
 		}
 		else
 		{
 			DeviceName = (ALchar*)(const char*)DeviceList[DeviceId].DeviceName;
-			zeLog("OpenAL Module", "Using \"%s\" sound device.", DeviceName);
+			zeLog("Using \"%s\" sound device.", DeviceName);
 		}
 
-	zeLog("OpenAL Module", "Opening device.");
+	zeLog("Opening device.");
 	Device = alcOpenDevice(NULL); // select the "preferred device"
 	if (Device == NULL) 
 	{
-		zeError("OpenAL Module", "Can not open OpenAL device.");
+		zeError("Can not open OpenAL device.");
 		return false;
 	}
 
@@ -178,14 +173,14 @@ bool ZEALModule::Initialize()
 	SetTypeVolume(ZE_SST_VIDEO, SoundOptions.GetOption("VideoVolume")->GetValue().GetInteger());
 	SetTypeVolume(ZE_SST_PLAYER_COMM, SoundOptions.GetOption("PlayerCommVolume")->GetValue().GetInteger());
 
-	zeLog("OpenAL Module", "OpenAL module initialized.");
+	zeLog("OpenAL module initialized.");
 
 	return ZESoundModule::Initialize();
 }
 
 void ZEALModule::Deinitialize()
 {	
-	zeLog("OpenAL Module", "Destroying OpenAL.");
+	zeLog("Destroying OpenAL.");
 
 	alcMakeContextCurrent(NULL);
 	alcDestroyContext(Context);
@@ -302,7 +297,3 @@ ZEListener* ZEALModule::CreateListener()
 {
 	return new ZEALListener();
 }
-
-
-
-

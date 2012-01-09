@@ -147,13 +147,13 @@ bool ZEFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 			}
 			else
 			{
-				zeError("ZEFile", "Could not open file \"%s\".", FilePath.GetValue());
+				zeError("Could not open file \"%s\".", FilePath.GetValue());
 				return false;
 			}
 		}
 		else
 		{
-			zeError("ZEFile", "Could not open file \"%s\".", FilePath.GetValue());
+			zeError("Could not open file \"%s\".", FilePath.GetValue());
 			return false;
 		}
 	}
@@ -333,7 +333,7 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEQWORD BufferSize
 	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
 	{
-		zeError("ZEFile", "Could not open file in binary read mode \"%s\".", FilePath.GetValue());
+		zeError("Could not open file in binary read mode \"%s\".", FilePath.GetValue());
 		return false;
 	}
 
@@ -358,7 +358,7 @@ bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEQWORD Buffer
 	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
 	{
-		zeError("ZEFile", "Could not open file in binary read mode \"%s\".", FilePath.GetValue());
+		zeError("Could not open file in binary read mode \"%s\".", FilePath.GetValue());
 		return false;
 	}
 
@@ -609,14 +609,14 @@ ZEFile* ZEFile::Open(const ZEString& FilePath)
 				ZEPack Pack;
 				if(!Pack.Open(Token))
 				{
-					zeError("File", "Cannot resolve the path \"%s\".", FilePath.GetValue());
+					zeError("Cannot resolve the path \"%s\".", FilePath.GetValue());
 					return NULL;
 				}
 
 				ZEPartialCompressedFile* PartialCompressedFile = new ZEPartialCompressedFile();
 				if (!Pack.OpenChunk(*PartialCompressedFile, FilePath.Right(Token.GetLength())))
 				{
-					zeError("File", "Cannot resolve the path \"%s\".", FilePath.GetValue());
+					zeError("Cannot resolve the path \"%s\".", FilePath.GetValue());
 					return NULL;
 				}
 
@@ -627,7 +627,7 @@ ZEFile* ZEFile::Open(const ZEString& FilePath)
 				ZEFile* File = new ZEFile();
 				if (!File->Open(Token, ZE_FM_READ_WRITE, true))
 				{
-					zeError("File", "Cannot resolve the path \"%s\".", FilePath.GetValue());
+					zeError("Cannot resolve the path \"%s\".", FilePath.GetValue());
 					return NULL;
 				}
 				

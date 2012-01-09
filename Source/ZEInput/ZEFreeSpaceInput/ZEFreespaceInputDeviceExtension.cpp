@@ -33,24 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore/ZEError.h"
-#include "ZECore/ZEConsole.h"
+#include "ZEError.h"
 #include "ZEFreespaceInputDeviceExtension.h"
-#include "ZEFreespaceInputDeviceExtensionDescription.h"
 
 #include <freespace/freespace.h>
 
-
-ZEExtensionDescription* ZEFreespaceInputDeviceExtension::GetExtensionDescription()
-{
-	return ZEFreespaceInputDeviceExtension::ExtensionDescription();
-}
-
-ZEExtensionDescription* ZEFreespaceInputDeviceExtension::ExtensionDescription()
-{
-	static ZEFreespaceInputDeviceExtensionDescription Desc;
-	return &Desc;
-}
+ZE_EXTENSION_DESCRIPTION(ZEFreespaceInputDeviceExtension, ZEInputDeviceExtension, NULL)
 
 ZEArray<ZEInputDevice*> ZEFreespaceInputDeviceExtension::GetDevices()
 {
@@ -65,13 +53,13 @@ ZEArray<ZEInputDevice*> ZEFreespaceInputDeviceExtension::GetDevices()
 
 bool ZEFreespaceInputDeviceExtension::Initialize()
 {
-	zeLog("Freespace Input Module", "Initializing module.");
+	zeLog("Initializing module.");
 
 	int Result;
 	Result = freespace_init();
 	if (Result != FREESPACE_SUCCESS) 
 	{
-		zeError("Freespace Input Module", "Can not initialize Freespace. Error Code : %d.", Result);
+		zeError("Can not initialize Freespace. Error Code : %d.", Result);
 		return false;
 	}
 
@@ -80,7 +68,7 @@ bool ZEFreespaceInputDeviceExtension::Initialize()
 	Result = freespace_getDeviceList(DeviceIds, 256, &NumberOfDevices);
 	if (NumberOfDevices == 0) 
 	{
-		zeWarning("Freespace Input Device Extension", "Can not aquire number of freespace devices. Error Code : %d.", Result);
+		zeWarning("Can not aquire number of freespace devices. Error Code : %d.", Result);
 		return false;
 	}
 
@@ -91,14 +79,14 @@ bool ZEFreespaceInputDeviceExtension::Initialize()
 		freespace_getDeviceInfo(I, &Devices[I].DeviceInfo);
 	}
 	
-	zeLog("Freespace Input Device Extension", "Found %d number of devices.", NumberOfDevices);
+	zeLog("Found %d number of devices.", NumberOfDevices);
 	
 	return true;
 }
 
 void ZEFreespaceInputDeviceExtension::Deinitialize()
 {
-	zeLog("Freespace Input Module", "Deinitializing module.");
+	zeLog("Deinitializing module.");
 
 	for (size_t I = 0; I < Devices.GetCount(); I++)
 		Devices[I].Deinitialize();
@@ -107,5 +95,5 @@ void ZEFreespaceInputDeviceExtension::Deinitialize()
 
 	freespace_exit();
 
-	zeLog("Freespace Input Device Extension", "Module deinitialized.");
+	zeLog("Module deinitialized.");
 }

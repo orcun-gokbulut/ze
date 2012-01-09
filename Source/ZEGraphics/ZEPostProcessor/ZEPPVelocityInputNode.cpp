@@ -72,19 +72,19 @@ bool ZEPPVelocityInputNode::Process()
 
 	if (Renderer == NULL)
 	{
-		zeError("Post Processor - Velocity Input Node", "There is no renderer available.");
+		zeError("There is no renderer available.");
 		return false;
 	}
 
 	if (Renderer->GetRenderVelocityTexture() == false)
 	{
-		zeError("Post Processor - Velocity Input Node", "Current renderer does not enabled to provide color texture.");
+		zeError("Current renderer does not enabled to provide color texture.");
 		return false;
 	}
 
 	if (Renderer->GetVelocityTexture() == NULL)
 	{
-		zeError("Post Processor - Velocity Input Node", "Current renderer does provide color texture.");
+		zeError("Current renderer does provide color texture.");
 		return false;
 	}
 

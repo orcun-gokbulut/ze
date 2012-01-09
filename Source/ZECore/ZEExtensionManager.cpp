@@ -34,20 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEExtensionManager.h"
+#include "ZEExtension.h"
 #include "ZEError.h"
 #include "ZEOptionManager.h"
-#include "ZEExtensionDescription.h"
-#include "ZEModuleDescription.h"
 #include "ZECore/ZECore.h"
 
 #include <string.h>
 
 ZEOptionSection ZEExtensionManager::ExtensionManagerOptions;
 
-ZEExtensionDescription* ZEExtensionManager::GetExtensionDescription(const char* Name)
+ZEExtensionDescription* ZEExtensionManager::GetExtensionDescription(const ZEString& Name)
 {
 	for (size_t I = 0; I < ExtensionList.GetCount(); I++)
-		if (_stricmp(ExtensionList[I]->GetName(), Name) == 0)
+		if (ExtensionList[I]->GetName() == Name)
 			return ExtensionList[I];
 
 	return NULL;
@@ -86,16 +85,13 @@ ZEArray<ZEExtensionDescription*> ZEExtensionManager::GetExtensionDescriptions(ZE
 
 bool ZEExtensionManager::RegisterExtension(ZEExtensionDescription* ExtensionDescription)
 {
-	char ExtensionVersion[255];
 	if (ExtensionDescription->GetOptions() != NULL)
 	{
-		bool Result;
-		Result = ZEOptionManager::GetInstance()->RegisterSection(ExtensionDescription->GetOptions());
+		bool Result = ZEOptionManager::GetInstance()->RegisterSection(ExtensionDescription->GetOptions());
 		if (!Result)
 		{
-			ExtensionDescription->GetVersion().GetShortString(ExtensionVersion);
-			zeError("Module Manager", "Can not register extensions's option section. Extension Name : \"%s\", Extension Version : %s)", 
-				ExtensionDescription->GetName(), ExtensionVersion);
+			zeError("Can not register extensions's option section. Extension Name : \"%s\"", 
+				(const char*)ExtensionDescription->GetName());
 		}
 	}
 
@@ -113,11 +109,10 @@ class ZEExtensionManager* ZEExtensionManager::GetInstance()
 	return ZECore::GetInstance()->GetExtensionManager();
 }
 
-#include "ZEInput/ZEVRPNInput/ZEVRPNInputDeviceExtensionDescription.h"
-#include "ZEInput/ZEFreeSpaceInput/ZEFreespaceInputDeviceExtensionDescription.h"
+#include "ZEInput/ZEVRPNInput/ZEVRPNInputDeviceExtension.h"
 ZEExtensionManager::ZEExtensionManager()
 {
-	RegisterExtension(new ZEVRPNInputDeviceExtensionDescription());
+	RegisterExtension(ZEVRPNInputDeviceExtension::Description());
 	//RegisterExtension(new ZEFreespaceInputDeviceExtensionDescription());
 }
 

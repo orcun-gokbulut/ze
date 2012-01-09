@@ -35,12 +35,9 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-add_source (ZEDirectInputModule.cpp				Sources)
-add_source (ZEDirectInputModule.h				Sources)
-add_source (ZEDirectInputModuleDescription.cpp	Sources)
-add_source (ZEDirectInputModuleDescription.h	Sources)
+ze_add_source(ZEDirectInputModule.cpp				Sources)
+ze_add_source(ZEDirectInputModule.h					Sources)
 
-add_library (ZEDirectInput ${Sources})
-target_link_libraries (ZEDirectInput dinput8.lib dxguid.lib)
-
-set_property(TARGET ZEDirectInput PROPERTY FOLDER "Zinek Engine")
+ze_add_library(ZEDirectInput 
+	SOURCES ${Sources}
+	LIBS ZEDirectInput dinput8.lib dxguid.lib)

@@ -36,7 +36,7 @@
 #include "ZED3D9UIMaterial.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9CommonTools.h"
-#include "ZEGraphics/ZERenderOrder.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include <D3D9.h>
 
 LPDIRECT3DVERTEXSHADER9 ZED3D9UIMaterial::VertexShader = NULL;
@@ -53,7 +53,7 @@ ZED3D9UIMaterial::~ZED3D9UIMaterial()
 
 }
 
-bool ZED3D9UIMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder* RenderOrder) const 
+bool ZED3D9UIMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const 
 {
 	((ZED3D9UIMaterial*)this)->UpdateMaterial();
 
@@ -74,7 +74,7 @@ bool ZED3D9UIMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderOrder
 	GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 	GetDevice()->SetVertexShader(VertexShader);
-	GetDevice()->SetVertexShaderConstantF(0, (float*)&RenderOrder->WorldMatrix, 4);
+	GetDevice()->SetVertexShaderConstantF(0, (float*)&RenderCommand->WorldMatrix, 4);
 
 	if (Texture != NULL)
 	{
