@@ -62,7 +62,7 @@ enum ZEVariantType
 	ZE_VRT_VECTOR4,
 	ZE_VRT_MATRIX3X3,
 	ZE_VRT_MATRIX4X4,
-	ZE_VRT_POINTER
+	ZE_VRT_CLASS
 };
 
 class ZEMatrix4x4;
@@ -70,6 +70,7 @@ class ZEMatrix4x4;
 class ZEVector2;
 class ZEVector3;
 class ZEVector4;
+class ZEClass;
 
 class ZEVariant : public ZESerializable
 {
@@ -80,7 +81,7 @@ class ZEVariant : public ZESerializable
 			int				Integer;
 			bool			Boolean;
 			char*			String;
-			void*			Pointer;
+			ZEClass*		Pointer;
 			
 			struct
 			{
@@ -112,7 +113,7 @@ class ZEVariant : public ZESerializable
 		void				SetQuaternion(const ZEQuaternion& Quaternion);
 		void				SetMatrix3x3(const ZEMatrix3x3& Matrix);
 		void				SetMatrix4x4(const ZEMatrix4x4& Matrix);
-		void				SetPointer(void* Pointer);
+		void				SetClass(ZEClass* Pointer);
 		void				SetNull();
 		void				SetVariant(const ZEVariant& NewValue);
 
@@ -126,7 +127,7 @@ class ZEVariant : public ZESerializable
 		ZEQuaternion&		GetQuaternion() const;
 		ZEMatrix3x3&		GetMatrix3x3() const;
 		ZEMatrix4x4&		GetMatrix4x4() const;
-		void*				GetPointer() const;
+		ZEClass*			GetClass() const;
 		
 		bool				IsNull() const;
 		size_t				SizeOf() const;
@@ -145,7 +146,7 @@ class ZEVariant : public ZESerializable
 		void				operator= (const ZEQuaternion& Quaternion);
 		void				operator= (const ZEMatrix3x3& Matrix);
 		void				operator= (const ZEMatrix4x4& Matrix);
-		void				operator= (void* Pointer);
+		void				operator= (ZEClass* Pointer);
 
 							operator const char*();
 							operator int();
@@ -157,7 +158,7 @@ class ZEVariant : public ZESerializable
 							operator ZEQuaternion();
 							operator ZEMatrix3x3();
 							operator ZEMatrix4x4();
-							operator void*();
+							operator ZEClass*();
 
 							ZEVariant();
 							ZEVariant(const ZEVariant &InitialValue);
@@ -171,7 +172,7 @@ class ZEVariant : public ZESerializable
 							ZEVariant(const ZEQuaternion& Quaternion);
 							ZEVariant(const ZEMatrix3x3& Matrix);
 							ZEVariant(const ZEMatrix4x4& Matrix);
-							ZEVariant(void* Pointer);
+							ZEVariant(ZEClass* Pointer);
 							~ZEVariant();
 };
 

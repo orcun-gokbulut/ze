@@ -66,6 +66,9 @@ class ZETerrainMaterial : public ZEMaterial
 		float							HeightOffset;
 		float							HeightScale;
 
+		ZEVector2						TextureScale;
+		ZEVector2						TextureOffset;
+
 		union
 		{
 			struct
@@ -96,6 +99,12 @@ class ZETerrainMaterial : public ZEMaterial
 
 		void							SetWireframe(bool Enable);
 		bool							GetWireframe() const;
+
+		void							SetTextureScale(const ZEVector2& Scale);
+		const ZEVector2&				GetTextureScale() const;
+
+		void							SetTextureOffset(const ZEVector2& Offset);
+		const ZEVector2&				GetTextureOffset() const;
 
 		void							SetHeightTexture(ZETexture2D* Texture);
 		ZETexture2D*					GetHeightTexture();

@@ -42,6 +42,7 @@
 #include "ZEGraphics/ZEBitmap.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEMath/ZEMath.h"
 
 ZEDrawFlags ZETerrain::GetDrawFlags() const
 {
@@ -178,17 +179,261 @@ void ZETerrain::Deinitialize()
 	ZEEntity::Deinitialize();
 }
 
-bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVector3& WorldPosition, const ZEVector3& LocalPosition, float Scale, bool Rotate)
-{	
-	/*float TextureWidth = HeightTexture->GetWidth() * 0.5f - 0.1f;
-	if (WorldPosition.x + (LocalPosition.x - ChunkSize * 0.5f) * Scale >= TextureWidth || 
-		WorldPosition.x + (LocalPosition.x + ChunkSize * 0.5f) * Scale <= -TextureWidth)
+inline void* Address(void* Buffer, size_t x, size_t y, size_t Pitch)
+{
+	return (void*)((char*)Buffer + Pitch * y + x * sizeof(float));
+}
+
+inline void* SampleAddress(void* Buffer, size_t x, size_t y, size_t Width, size_t Height)
+{
+	if (x < 0)
+		x = 0;
+	else if (x >= Width)
+		x = Width - 1;
+
+	if (y < 0)
+		y = 0;
+	else if (y >= Height)
+		y = Height - 1;
+
+	return Address(Buffer, Width, x, y);
+}
+
+static void DownsampleHeight(float* Source, float* Destination, size_t Width, size_t Height)
+{
+	for(size_t y = 0; y < Height / 2; y++)
+		for(size_t x = 0; x < Width / 2; x++)
+		{
+			size_t Sx = x * 2;
+			size_t Sy = y * 2;
+			float Sum = 
+				*(float*)SampleAddress(Source, Sx - 1,	Sy - 1, Width, Height) +
+				*(float*)SampleAddress(Source, Sx,		Sy - 1, Width, Height) +
+				*(float*)SampleAddress(Source, Sx + 1,	Sy - 1, Width, Height) +
+				*(float*)SampleAddress(Source, Sx - 1,	Sy,		Width, Height) +  
+				*(float*)SampleAddress(Source, Sx,		Sy,		Width, Height) +  
+				*(float*)SampleAddress(Source, Sx + 1,	Sy,		Width, Height) +  
+				*(float*)SampleAddress(Source, Sx - 1,	Sy + 1, Width, Height) +
+				*(float*)SampleAddress(Source, Sx,		Sy + 1, Width, Height) +
+				*(float*)SampleAddress(Source, Sx + 1,	Sy + 1, Width, Height);
+
+			Sum /= 9;
+			*(float*)Address(Destination, x, y, Width) = Sum;
+		}
+}
+
+static void DownsampleColor(ZEUINT32* Source, ZEUINT32* Destination, size_t Width, size_t Height)
+{
+	for(size_t y = 0; y < Height; y++)
+		for(size_t x = 0; x < Width; x++)
+		{
+			size_t Sx = x * 2;
+			size_t Sy = y * 2;
+			ZEUINT32 SumA = 0;
+			ZEUINT32 SumR = 0;
+			ZEUINT32 SumG = 0;
+			ZEUINT32 SumB = 0;
+
+			ZEUINT32 Sample;
+			Sample = *(ZEUINT32*)SampleAddress(Source, Sx - 1,	Sy - 1, Width, Height);
+			SumA += (Sample & 0xFF000000) >> 24;
+			SumR += (Sample & 0x00FF0000) >> 16;
+			SumG += (Sample & 0x0000FF00) >> 8;
+			SumB += (Sample & 0x000000FF);
+			
+			Sample = *(ZEUINT32*)SampleAddress(Source, Sx,		Sy - 1, Width, Height);
+			SumA += (Sample & 0xFF000000) >> 24;
+			SumR += (Sample & 0x00FF0000) >> 16;
+			SumG += (Sample & 0x0000FF00) >> 8;
+			SumB += (Sample & 0x000000FF);
+
+			Sample = *(ZEUINT32*)SampleAddress(Source, Sx + 1,	Sy - 1, Width, Height);
+			SumA += (Sample & 0xFF000000) >> 24;
+			SumR += (Sample & 0x00FF0000) >> 16;
+			SumG += (Sample & 0x0000FF00) >> 8;
+			SumB += (Sample & 0x000000FF);
+			
+			Sample = *(ZEUINT32*)SampleAddress(Source, Sx - 1,	Sy,		Width, Height);  
+			SumA += (Sample & 0xFF000000) >> 24;
+			SumR += (Sample & 0x00FF0000) >> 16;
+			SumG += (Sample & 0x0000FF00) >> 8;
+			SumB += (Sample & 0x000000FF);
+			
+			Sample = *(ZEUINT32*)SampleAddress(Source, Sx,		Sy,		Width, Height);  
+			SumA += (Sample & 0xFF000000) >> 24;
+			SumR += (Sample & 0x00FF0000) >> 16;
+			SumG += (Sample & 0x0000FF00) >> 8;
+			SumB += (Sample & 0x000000FF);
+			
+			Sample = *(ZEUINT32*)SampleAddress(Source, Sx + 1,	Sy,		Width, Height);  
+			SumA += (Sample & 0xFF000000) >> 24;
+			SumR += (Sample & 0x00FF0000) >> 16;
+			SumG += (Sample & 0x0000FF00) >> 8;
+			SumB += (Sample & 0x000000FF);
+			Sample = *(ZEUINT32*)SampleAddress(Source, Sx - 1,	Sy + 1, Width, Height);
+			SumA += (Sample & 0xFF000000) >> 24;
+			SumR += (Sample & 0x00FF0000) >> 16;
+			SumG += (Sample & 0x0000FF00) >> 8;
+			SumB += (Sample & 0x000000FF);
+			
+			Sample = *(ZEUINT32*)SampleAddress(Source, Sx,		Sy + 1, Width, Height);
+			SumA += (Sample & 0xFF000000) >> 24;
+			SumR += (Sample & 0x00FF0000) >> 16;
+			SumG += (Sample & 0x0000FF00) >> 8;
+			SumB += (Sample & 0x000000FF);
+			
+			Sample = *(ZEUINT32*)SampleAddress(Source, Sx + 1,	Sy + 1, Width, Height);
+			SumA += (Sample & 0xFF000000) >> 24;
+			SumR += (Sample & 0x00FF0000) >> 16;
+			SumG += (Sample & 0x0000FF00) >> 8;
+			SumB += (Sample & 0x000000FF);
+
+			SumA /= 9;
+			SumR /= 9;
+			SumG /= 9;
+			SumB /= 9;
+
+			Sample = (SumA << 24) & 0xFF000000 + (SumR << 16) & 0x0000FF00 + (SumG << 8) & 0x00FF0000 + SumB & 0x000000FF;
+
+			*(ZEUINT32*)Address(Destination, x, y, Width) = Sample;
+		}
+}
+
+bool ZETerrain::LoadTerrain()
+{
+	if (TerrainFileName.IsEmpty())
 		return false;
 
-	float TextureHeight = HeightTexture->GetHeight() * 0.5f - 0.5f / HeightTexture->GetHeight() - 0.1f;
-	if (WorldPosition.y + (LocalPosition.y - ChunkSize * 0.5f) * Scale >= TextureHeight || 
-		WorldPosition.y + (LocalPosition.y + ChunkSize * 0.5f) * Scale <= -TextureHeight)
-		return false;*/
+	struct ZETerrainFileHeader
+	{
+		ZEDWORD Width;
+		ZEDWORD Heigth;
+	} Header;
+
+	ZEFile File;
+
+	bool Result;
+	Result = File.Open(TerrainFileName, ZE_FM_READ_ONLY, true);
+	if (!Result)
+	{
+		zeError("ZETerrain", "Can not open terrain file.");
+		File.Close();
+		return false;
+	}
+
+	File.Read(&Header, sizeof(ZETerrainFileHeader), 1);
+
+	TerrainData.Add();
+	TerrainData[0].Height = Header.Heigth;
+	TerrainData[0].Width = Header.Width;
+	TerrainData[0].HeightData = new float[Header.Heigth * Header.Width];
+	TerrainData[0].ColorData = new ZEUINT32[Header.Heigth * Header.Width];
+
+	File.Read(TerrainData[0].HeightData, Header.Width * Header.Heigth * sizeof(float), 1);
+	File.Read(TerrainData[0].ColorData, Header.Width * Header.Heigth * sizeof(ZEUINT32), 1);
+
+	File.Close();
+
+	ZETerrainLOD* CurrentLOD = TerrainLODs.Add();
+	CurrentLOD->HeightTexture = ZETexture2D::CreateInstance();
+	CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_LUM_HDR, false, 1);
+	CurrentLOD->ColorTexture = ZETexture2D::CreateInstance();
+	CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_LUM_HDR, false, 1);
+	CurrentLOD->NormalTexture = ZETexture2D::CreateInstance();
+	CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_LUM_HDR, false, 1);
+
+
+	for (size_t I = 1; I < 8; I++)
+	{
+		ZETerrainData* CurrentLevel = TerrainData.Add();
+		ZETerrainData* PrevLevel = &TerrainData[I - 1];
+
+		CurrentLevel->Width = PrevLevel->Width / 2;
+		CurrentLevel->Height = PrevLevel->Width / 2;
+		CurrentLevel->HeightData = new float[CurrentLevel->Width * CurrentLevel->Height * sizeof(float)];
+		CurrentLevel->ColorData = new ZEUINT32[CurrentLevel->Width * CurrentLevel->Height * sizeof(ZEUINT32)];
+
+		DownsampleHeight(PrevLevel->HeightData, CurrentLevel->HeightData, CurrentLevel->Width, CurrentLevel->Height);
+		DownsampleColor(PrevLevel->ColorData, CurrentLevel->ColorData, CurrentLevel->Width, CurrentLevel->Height);
+
+
+		ZETerrainLOD* CurrentLOD = TerrainLODs.Add();
+		CurrentLOD->HeightTexture = ZETexture2D::CreateInstance();
+		CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_A8R8G8B8, false, 1);
+		CurrentLOD->ColorTexture = ZETexture2D::CreateInstance();
+		CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_A8R8G8B8, false, 1);
+		CurrentLOD->NormalTexture = ZETexture2D::CreateInstance();
+		CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_A8R8G8B8, false, 1);
+	}
+
+	return true;
+}
+
+void ZETerrain::UnloadTerrain()
+{
+	for (size_t I = 0; I < 8; I++)
+	{
+		delete[] TerrainData[I].HeightData;
+		delete[] TerrainData[I].ColorData;
+	}
+	TerrainData.Clear();
+}
+
+void ZETerrain::Stream()
+{
+	ZEVector3 OldLocalPosition;
+	ZEVector3 LocalPosition;
+
+	if(ZEMath::Abs(LocalPosition.x - OldLocalPosition.x) < 1.0f || ZEMath::Abs(LocalPosition.z - OldLocalPosition.z) < 1.0f)
+		return;
+
+	for (size_t I = 0; I < TerrainLODs.GetCount(); I++)
+	{
+		
+	}
+	
+
+	// Calculate Position -> UV 
+	// Copy from that UV
+	// Check TWO
+
+	// Full Update
+	
+	// Semi Update
+		// Vertical Update
+			// Non-Divided
+			// Divided
+
+		// Horizontal Update
+			// Non-Divided
+			// Divided
+
+}
+
+void ZETerrain::SetTerrainFile(const ZEString& FileName)
+{
+	TerrainFileName = FileName;
+	if (GetInitialized())
+		LoadTerrain();
+}
+
+const ZEString& ZETerrain::GetTerrainFile()
+{
+	return TerrainFileName;
+}
+
+bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVector3& Offset, const ZEVector3& Position, float Scale, bool Rotate)
+{	
+	float TextureWidth = HeightTexture->GetWidth() * 0.5f * UnitLength;
+	if (Position.x - ChunkSize * 0.5f * Scale > TextureWidth ||
+		Position.x + ChunkSize * 0.5f * Scale < -TextureWidth)
+		return false;
+
+	float TextureHeight = HeightTexture->GetHeight() * 0.5f * UnitLength;
+	if (Position.z - ChunkSize * 0.5f * Scale > TextureHeight ||
+		Position.z + ChunkSize * 0.5f * Scale < -TextureHeight)
+		return false;
+
 
 	ZERenderOrder RenderOrder;
 	RenderOrder.SetZero();
@@ -200,16 +445,10 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVe
 	RenderOrder.VertexBuffer = VertexBuffer;
 	RenderOrder.PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderOrder.Priority = 3;
-
-	ZEMatrix4x4 OrientationMatrix, ScaleMatrix, TranslationMatrix, TempMatrix;
-	ZEMatrix4x4::CreateOrientation(OrientationMatrix, 
-		LocalPosition + ZEVector3(ChunkSize * 0.5f, 0.0f, ChunkSize * -0.5f),
-		(Rotate ? ZEQuaternion(ZE_PI, ZEVector3::UnitY) : ZEQuaternion::Identity));
-	ZEMatrix4x4::CreateScale(ScaleMatrix, ZEVector3(Scale, Scale, Scale));
-	ZEMatrix4x4::Multiply(TempMatrix, ScaleMatrix, OrientationMatrix);
-	ZEMatrix4x4::CreateTranslation(TranslationMatrix, WorldPosition);
-	ZEMatrix4x4::Multiply(RenderOrder.WorldMatrix, TranslationMatrix, TempMatrix);
-
+	ZEMatrix4x4::CreateOrientation(RenderOrder.WorldMatrix, 
+		Position + Offset,
+		(Rotate ? ZEQuaternion(ZE_PI, ZEVector3::UnitY) : ZEQuaternion::Identity),
+		ZEVector3(Scale, Scale, Scale));
 
 	switch(PrimitiveType)
 	{
@@ -244,135 +483,6 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVe
 	return true;
 }
 
-bool ZETerrain::LoadTerrain()
-{
-	if (HeightTexture != NULL)
-	{
-		HeightTexture->Destroy();
-		HeightTexture = NULL;
-	}
-
-	if (ColorTexture != NULL)
-	{
-		ColorTexture->Destroy();
-		ColorTexture = NULL;
-	}
-
-	if (NormalTexture != NULL)
-	{
-		ColorTexture->Destroy();
-		ColorTexture = NULL;
-	}
-
-
-	if (TerrainFileName.IsEmpty())
-		return true;
-
-	struct ZETerrainFileHeader
-	{
-		ZEDWORD Width;
-		ZEDWORD Heigth;
-	} Header;
-
-	ZEFile File;
-	
-	bool Result;
-	Result = File.Open(TerrainFileName, ZE_FM_READ_ONLY, true);
-	if (!Result)
-	{
-		zeError("ZETerrain", "Can not open terrain file.");
-		File.Close();
-		return false;
-	}
-
-	File.Read(&Header, sizeof(ZETerrainFileHeader), 1);
-
-	// HeithtTexture
-	HeightTexture = ZETexture2D::CreateInstance();
-	Result = HeightTexture->Create(Header.Width, Header.Heigth, ZE_TPF_LUM_HDR, false, 1);
-	if (!Result)
-	{
-		zeError("ZETerrain", "Can not create height texture.");
-		File.Close();
-		return false;
-	}
-
-	void* Buffer;
-	unsigned int Pitch;
-	HeightTexture->Lock(&Buffer, &Pitch, 0);
-	if (Buffer == NULL)
-	{
-		zeError("ZETerrain", "Can not lock height texture.");
-		File.Close();
-		return false;
-	}
-
-	for (int y = 0; y < Header.Heigth; y++)
-		File.Read((float*)((char*)Buffer + y * Pitch), sizeof(float) * Header.Width, 1);
-
-	HeightTexture->Unlock(0);
-
-	// ColorTexture
-	ColorTexture = ZETexture2D::CreateInstance();
-	Result = ColorTexture->Create(Header.Width, Header.Heigth, ZE_TPF_A8R8G8B8, false, 1);
-	if (!Result)
-	{
-		zeError("ZETerrain", "Can not create color texture.");
-		File.Close();
-		return false;
-	}
-
-	ColorTexture->Lock(&Buffer, &Pitch, 0);
-	if (Buffer == NULL)
-	{
-		zeError("ZETerrain", "Can not lock height texture.");
-		File.Close();
-		return false;
-	}
-
-	for (int y = 0; y < Header.Heigth; y++)
-		File.Read((ZEUINT32*)((char*)Buffer + y * Pitch), sizeof(ZEUINT32) * Header.Width, 1);
-
-	ColorTexture->Unlock(0);
-
-	/*// ColorTexture
-	NormalTexture = ZETexture2D::CreateInstance();
-	Result = NormalTexture->Create(Header.Width, Header.Heigth, ZE_TPF_A8R8G8B8, false, 1);
-	if (!Result)
-	{
-		zeError("ZETerrain", "Can not create color texture.");
-		File.Close();
-		return false;
-	}
-
-	NormalTexture->Lock(&Buffer, &Pitch, 0);
-	if (Buffer == NULL)
-	{
-		zeError("ZETerrain", "Can not lock height texture.");
-		File.Close();
-		return false;
-	}
-
-	for (int y = 0; y < Header.Heigth; y++)
-		File.Read((ZEUINT32*)((char*)Buffer + y * Pitch), sizeof(ZEUINT32) * Header.Width, 1);
-
-	NormalTexture->Unlock(0);*/
-
-	File.Close();
-	return true;
-}
-
-void ZETerrain::SetTerrainFile(const ZEString& FileName)
-{
-	TerrainFileName = FileName;
-	if (GetInitialized())
-		LoadTerrain();
-}
-
-const ZEString& ZETerrain::GetTerrainFile()
-{
-	return TerrainFileName;
-}
 
 void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 {
@@ -384,6 +494,7 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	Material->SetHeightTexture(HeightTexture);
 	Material->SetHeightOffset(HeightOffset);
 	Material->SetHeightScale(HeightScale);
+	Material->SetTextureScale(ZEVector2(UnitLength, UnitLength));
 	Material->SetColorTexture(ColorTexture);
 	Material->SetNormalTexture(NormalTexture);
 
@@ -391,45 +502,46 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 
 	// Calculate quadrant
 	ZEVector3 CameraPosition = Camera->GetWorldPosition();
-	ZEVector3 QuadPosition = CameraPosition;
+	ZEVector3 QuadPosition = ZEVector3::Zero;//CameraPosition;
 	QuadPosition.x = UnitLength * ChunkSize * (int)(CameraPosition.x / ((float)ChunkSize * UnitLength) + 0.5f);
 	QuadPosition.y = 0.0f;
 	QuadPosition.z = UnitLength * ChunkSize * (int)(CameraPosition.z / ((float)ChunkSize * UnitLength) + 0.5f);
 
+
 	int MinLevel = 0;
-	for (size_t I = 0; I < MaxLevel; I++)
+	for (size_t I = 0; I < 40; I++)
 	{
 		bool Drawed = false;
 		if (I == 0)
 		{
 			float Scale = (float)(1 << MinLevel) * UnitLength;
 
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3(-QuadSize, 0.0f, QuadSize), Scale);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3(0.0f , 0.0f, QuadSize), Scale);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3(-QuadSize, 0.0f, 0.0f), Scale);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3::Zero, UnitLength);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3(-0.5f, 0.0f,  0.5f) * ChunkSize * Scale, Scale);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3( 0.5f, 0.0f,  0.5f) * ChunkSize * Scale, Scale);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3(-0.5f, 0.0f, -0.5f) * ChunkSize * Scale, Scale);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 0, QuadPosition, ZEVector3( 0.5f, 0.0f, -0.5f) * ChunkSize * Scale, Scale);
 		}
 		else
 		{
 			float Scale = (float)(1 << (I + MinLevel - 1)) * UnitLength;
 			
 			// Top	
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 1, QuadPosition, ZEVector3(-2.0f * QuadSize,	0.0f,	2.0f * QuadSize), Scale);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 4, QuadPosition, ZEVector3(-1.0f * QuadSize,	0.0f,	2.0f * QuadSize), Scale);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 4, QuadPosition, ZEVector3(0.0f,				0.0f,	2.0f * QuadSize), Scale);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 2, QuadPosition, ZEVector3(QuadSize,			0.0f,	2.0f * QuadSize), Scale, true);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 1, QuadPosition, ZEVector3(-1.5f,	0.0f,	1.5f) * ChunkSize * Scale, Scale);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 4, QuadPosition, ZEVector3(-0.5f,	0.0f,	1.5f) * ChunkSize * Scale, Scale);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 4, QuadPosition, ZEVector3( 0.5f,	0.0f,	1.5f) * ChunkSize * Scale, Scale);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 2, QuadPosition, ZEVector3( 1.5f,	0.0f,	1.5f) * ChunkSize * Scale, Scale, true);
 
-			// Left				// Right
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 3, QuadPosition, ZEVector3(-2.0f * QuadSize,	0.0f,	QuadSize), Scale);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 3, QuadPosition, ZEVector3(-2.0f * QuadSize,	0.0f,	0.0f), Scale);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 3, QuadPosition, ZEVector3(QuadSize,			0.0f,	QuadSize), Scale, true);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 3, QuadPosition, ZEVector3(QuadSize,			0.0f,	0.0f), Scale, true);
+			// Left	
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 3, QuadPosition, ZEVector3(-1.5f,	0.0f,	-0.5f) * ChunkSize * Scale, Scale);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 3, QuadPosition, ZEVector3(-1.5f,	0.0f,	 0.5f) * ChunkSize * Scale, Scale);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 3, QuadPosition, ZEVector3( 1.5f,	0.0f,	-0.5f) * ChunkSize * Scale, Scale, true);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 3, QuadPosition, ZEVector3( 1.5f,	0.0f,	 0.5f) * ChunkSize * Scale, Scale, true);
 
 			// Bottom
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 2, QuadPosition, ZEVector3(-2.0f * QuadSize,	0.0f,	-QuadSize), Scale);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 4, QuadPosition, ZEVector3(-1.0f * QuadSize,	0.0f,	-QuadSize), Scale, true);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 4, QuadPosition, ZEVector3(0.0f,				0.0f,	-QuadSize), Scale, true);
-			Drawed |= DrawPrimtive(DrawParameters->Renderer, 1, QuadPosition, ZEVector3(QuadSize,			0.0f,	-QuadSize), Scale, true);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 2, QuadPosition, ZEVector3(-1.5f,	0.0f,	-1.5f) * ChunkSize * Scale, Scale);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 4, QuadPosition, ZEVector3(-0.5f,	0.0f,	-1.5f) * ChunkSize * Scale, Scale, true);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 4, QuadPosition, ZEVector3( 0.5f,	0.0f,	-1.5f) * ChunkSize * Scale, Scale, true);
+			Drawed |= DrawPrimtive(DrawParameters->Renderer, 1, QuadPosition, ZEVector3( 1.5f,	0.0f,	-1.5f) * ChunkSize * Scale, Scale, true);
 		
 			if (!Drawed)
 				break;
