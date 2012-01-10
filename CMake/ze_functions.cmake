@@ -233,13 +233,13 @@ function (ze_add_unit_tests)
 			target_link_libraries(${PARAMETER_TARGET} ${PARAMETER_TEST_TARGET} ${TEST_TARGET_LINKS})
 			add_custom_command(TARGET ${PARAMETER_TARGET}
 				POST_BUILD
-				COMMAND ${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)/${PARAMETER_TARGET})
+				COMMAND ${PARAMETER_TARGET})
 		endif()
 
 		target_link_libraries(${PARAMETER_TARGET} ZETest)
 	
 		source_group("" FILES ${PARAMETER_SOURCES})		
-		add_test(${PARAMETER_TARGET} ${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)/${PARAMETER_TARGET})
+		add_test(${PARAMETER_TARGET} ${PARAMETER_TARGET})
 			
 		# Debug
 		if (ZEBUILD_VERBOSE)
