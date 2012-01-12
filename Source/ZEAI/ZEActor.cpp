@@ -249,6 +249,8 @@ void ZEActor::Tick(float ElapsedTime)
 	SetRotation2D(Rotation);
 	SetLinearVelocity(LinearVelocity);
 	SetAngularVelocity(AngularVelocity);
+
+	ZECompoundEntity::Tick(ElapsedTime);
 }
 
 ZEActor::ZEActor()
