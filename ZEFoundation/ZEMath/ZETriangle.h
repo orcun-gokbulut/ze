@@ -52,7 +52,7 @@ class ZETriangle
 
 		static void					GetNormal(const ZETriangle& Triangle, ZEVector3& Normal);
 		static void					GetBarycentricCoordinates(const ZETriangle& Triangle, const ZEVector3& Point, ZEVector3& BaryCoords);
-		static ZEVector3			GetCentroid(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2);
+		static void					GetCentroid(const ZETriangle& Triangle, ZEVector3& Centroid);
 		static void					GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane);
 
 		static float				GetArea(const ZETriangle& Triangle);
@@ -63,6 +63,8 @@ class ZETriangle
 		static bool					IntersectionTest(const ZETriangle& Triangle, const ZELineSegment& LineSegment, float &t);
 		static bool					IntersectionTest(const ZETriangle& Triangle, const ZERay& Ray, float &t);
 		static bool					IntersectionTest(const ZETriangle& Triangle, const ZEPlane & Plane2, ZELine & Line);
+
+		ZEVector3					GetCentroid() const;
 
 									ZETriangle();
 									ZETriangle(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2);

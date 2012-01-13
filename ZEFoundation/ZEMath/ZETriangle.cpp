@@ -72,13 +72,11 @@ void ZETriangle::GetBarycentricCoordinates(const ZETriangle& Triangle, const ZEV
 	BaryCoords = ZEVector3(Area1 / Area, Area2 / Area, Area3 / Area);
 }
 
-ZEVector3 ZETriangle::GetCentroid(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2)
+void ZETriangle::GetCentroid(const ZETriangle& Triangle, ZEVector3& Centroid)
 {
-	ZEVector3 Temp;
-	Temp.x = (V0.x + V1.x + V2.x)/3.0f;
-	Temp.y = (V0.y + V1.y + V2.y)/3.0f;
-	Temp.z = (V0.z + V1.z + V2.z)/3.0f;
-	return Temp;
+	Centroid.x = (Triangle.V0.x + Triangle.V1.x + Triangle.V2.x) / 3.0f;
+	Centroid.y = (Triangle.V0.y + Triangle.V1.y + Triangle.V2.y) / 3.0f;
+	Centroid.z = (Triangle.V0.z + Triangle.V1.z + Triangle.V2.z) / 3.0f;
 }
 
 void ZETriangle::GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane)
@@ -174,6 +172,15 @@ bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZERay& Ray, 
 bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZEPlane & Plane2, ZELine & Line)
 {
 	return false;
+}
+
+ZEVector3 ZETriangle::GetCentroid() const
+{
+	ZEVector3 Temp;
+	Temp.x = (V0.x + V1.x + V2.x) / 3.0f;
+	Temp.y = (V0.y + V1.y + V2.y) / 3.0f;
+	Temp.z = (V0.z + V1.z + V2.z) / 3.0f;
+	return Temp;
 }
 
 ZETriangle::ZETriangle()

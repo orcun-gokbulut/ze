@@ -113,6 +113,17 @@ ZETestSuite(ZERay)
 			ZETestCheckEqual(Point, ZEVector3(1.0f, 4.0f, -1.0f));
 		}
 	}
+	ZETest("const ZEVector3& ZERay::GetStartPoint() const")
+	{
+		ZEVector3 v(0.0f, 3.0f, 0.0f);
+		ZEVector3 p(1.0f, 4.0f, -1.0f);
+		ZEVector3 StartPoint;
+
+		ZERay Ray(v.Normalize(), p);
+
+		StartPoint = Ray.GetStartPoint();
+		ZETestCheckClose(StartPoint, ZEVector3(1.0f, 4.0f, -1.0f));
+	}
 	ZETest("float ZERay::MinimumDistance(const ZERay& Ray, const ZELine& Line)")
 	{
 		ZEVector3 v(0.0f, 3.0f, 0.0f);

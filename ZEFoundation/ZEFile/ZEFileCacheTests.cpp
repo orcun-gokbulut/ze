@@ -128,6 +128,7 @@ ZETestSuite(ZEFileCache)
 		ZEFileCache FileCache;
 		FileCache.Open("ZEFileCacheOpenTests.txt");
 		ZETestCheck(FileCache.IsOpen());
+		remove("ZEFileCacheOpenTests.txt");
 	}
 	ZETest(" bool ZEFileCache::Open(ZEFile * File)")
 	{
@@ -136,6 +137,7 @@ ZETestSuite(ZEFileCache)
 		ZEFileCache FileCache;
 		FileCache.Open(&File);
 		ZETestCheck(FileCache.IsOpen());
+		remove("ZEFileCacheOpenTests2.txt");
 	}
 	ZETest("bool ZEFileCache::IsOpen()")
 	{
@@ -145,6 +147,7 @@ ZETestSuite(ZEFileCache)
 		{
 			FileCache.Open("ZEFileCacheIsOpenTests.txt");
 			ZETestCheck(FileCache.IsOpen());
+			remove("ZEFileCacheIsOpenTests.txt");
 		}
 
 		ZETestCase("False")
@@ -152,6 +155,7 @@ ZETestSuite(ZEFileCache)
 			FileCache.Open("ZEFileCacheIsOpenTests2.txt");
 			FileCache.Close();
 			ZETestCheck(!FileCache.IsOpen());
+			remove("ZEFileCacheIsOpenTests2.txt");
 		}
 	}
 	ZETest("ZEString ZEFileCache::GetCacheFilePath()")
@@ -161,6 +165,7 @@ ZETestSuite(ZEFileCache)
 
 		const ZEString FilePath = FileCache.GetCacheFilePath();
 		ZETestCheckString(FilePath, "ZEFileCacheGetCacheFilePathTests.txt");
+		remove("ZEFileCacheGetCacheFilePathTests.txt");
 	}
 	ZETest("ZEFile ZEFileCache::GetFile()")
 	{
@@ -168,6 +173,7 @@ ZETestSuite(ZEFileCache)
 		FileCache.Open("ZEFileCacheGetFileTests.txt");
 
 		ZEFile File = FileCache.GetFile();
+		remove("ZEFileCacheGetFileTests.txt");
 	}
 	ZETest("void ZEFileCache::Close()")
 	{
@@ -176,6 +182,7 @@ ZETestSuite(ZEFileCache)
 		ZETestCheck(FileCache.IsOpen());
 		FileCache.Close();
 		ZETestCheck(!FileCache.IsOpen());
+		
 	}
 	ZETest("static bool ZEFileCache::IsFileCache(ZEString FileName)")
 	{
@@ -183,6 +190,7 @@ ZETestSuite(ZEFileCache)
 		{
 			bool Result = ZEFileCache::IsFileCache("ZEFileCacheCloseTests.txt");
 			ZETestCheck(Result);
+			remove("ZEFileCacheCloseTests.txt");
 		}
 		ZETestCase("False")
 		{
