@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETest.h"
+/*#include "ZETest.h"
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZERectangle3D.h"
 #include "ZEMath/ZEVector.h"
@@ -93,4 +93,4 @@ ZETestSuite(Rectangle3D)
 		ZETestCheckEqual(C, P3);
 		ZETestCheckEqual(D, P4);
 	}
-}
+}*/

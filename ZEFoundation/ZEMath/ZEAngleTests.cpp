@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETest.h"
+/*#include "ZETest.h"
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEAngle.h"
 #include <math.h>
@@ -71,8 +71,8 @@ ZETestSuite(ZEAngle)
 		float TestItem2 = ZEAngle::Cos(ZE_PI);
 		ZETestCheck(fequal(TestItem2,  -1.0f));
 		float TestItem3 = ZEAngle::Sin(ZE_PI_4);
-		ZETestCheck(fequal(TestItem3, 0.70710678118));//
-		/*float TestItem4 = ZEAngle::Sin(ZE_PI_2);
+		ZETestCheck(fequal(TestItem3, 0.70710678118f));//
+		float TestItem4 = ZEAngle::Sin(ZE_PI_2);
 		ZETestCheck(fequal(TestItem4, 1.0f));//
 		float TestItem5 = ZEAngle::Tan(ZE_PI_4);
 		ZETestCheck(fequal(TestItem5, 1.0f));//
@@ -95,7 +95,7 @@ ZETestSuite(ZEAngle)
 	ZETest("ToVector")
 	{
 		ZEVector2 TestItem1 = ZEAngle::ToVector(ZE_PI_4);
-		ZETestCheck(TestItem1, );*/
+		ZETestCheck(TestItem1, );
 	}
 	
-}
+}*/

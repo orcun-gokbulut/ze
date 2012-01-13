@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETest.h"
+/*#include "ZETest.h"
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZERectangle.h"
 #include "ZEMath/ZEVector.h"
@@ -60,7 +60,7 @@ ZETestSuite(Rectangle)
 
 	ZETest("RECT_BoundingTest")
 	{
-		/*ZEVector2 LU(1.0f, 4.0f);
+		ZEVector2 LU(1.0f, 4.0f);
 		ZEVector2 RD(3.0f, 2.0f);
 		ZERectangle R(LU, RD);
 
@@ -74,7 +74,7 @@ ZETestSuite(Rectangle)
 
 		ZEVector2 P3(2.0f, 2.0f);
 		bool result3 = R.BoundingTest(P3);
-		CHECK_EQUAL(result3, true);*/
+		CHECK_EQUAL(result3, true);
 	}
 
 	ZETest("RECT_GetCorner")
@@ -118,7 +118,4 @@ ZETestSuite(Rectangle)
 		ZETestCheckEqual(h, 2.0f);
 
 	}
-
-
-
-}
+}*/

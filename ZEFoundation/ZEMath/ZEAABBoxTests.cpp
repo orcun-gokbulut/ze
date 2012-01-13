@@ -98,12 +98,12 @@ ZETestSuite(ZEAABBox)
 		ZEAABBox AABBox(ZEVector3(9.5000000f, 9.5000000f, 9.5000000f), ZEVector3(10.500000f, 10.500000f, 10.500000f));
   
 		ZETestCheckClose(AABBox.GetVertex(0), ZEVector3(9.5000000f, 9.5000000f, 9.5000000f));
-		ZETestCheckClose(AABBox.GetVertex(1), ZEVector3(9.5000000f, 10.500000f, 9.5000000f));
-		ZETestCheckClose(AABBox.GetVertex(2), ZEVector3(10.500000f, 9.5000000f, 9.5000000f));
+		ZETestCheckClose(AABBox.GetVertex(1), ZEVector3(10.500000f, 9.5000000f, 9.5000000f));
+		ZETestCheckClose(AABBox.GetVertex(2), ZEVector3(9.5000000f, 10.500000f, 9.5000000f));
 		ZETestCheckClose(AABBox.GetVertex(3), ZEVector3(10.500000f, 10.500000f, 9.5000000f));
 		ZETestCheckClose(AABBox.GetVertex(4), ZEVector3(9.5000000f, 9.5000000f, 10.500000f));
-		ZETestCheckClose(AABBox.GetVertex(5), ZEVector3(9.5000000f, 10.500000f, 10.500000f));
-		ZETestCheckClose(AABBox.GetVertex(6), ZEVector3(10.500000f, 9.5000000f, 10.500000f));
+		ZETestCheckClose(AABBox.GetVertex(5), ZEVector3(10.500000f, 9.5000000f, 10.500000f));
+		ZETestCheckClose(AABBox.GetVertex(6), ZEVector3(9.5000000f, 10.500000f, 10.500000f));
 		ZETestCheckClose(AABBox.GetVertex(7), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 	}
 

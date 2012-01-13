@@ -69,11 +69,117 @@ ZETestSuite(ZETriangle)
 		ZETestCheckClose(TriangleManual.V2, TriangleFromCreate.V2);
 	}
 
-	ZETest("void ZETriangle::GetBarrycentiricCoordinates(const ZETriangle& Triangle, const ZEVector3& Point, ZEVector3& BarryCoords)")
+	ZETest("float ZETriangle::GetArea(const ZETriangle& Triangle)")
 	{
-		//Due to errors known this test is skipped. (Refer to Redmine : Bug #222)
+		ZETestCase("Calculating the area of an equilateral ZETriangle")
+		{
+			ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 1.15470052f), ZEVector3(1.0f, 0.0f, -0.57735026f), ZEVector3(-1.0f, 0.0f, -0.57735026f));
+			float ExpectedResult = ((2.0f * 2.0f) * sqrt(3.0f)) / 4.0f;
+			float Result = 0.0f;
 
-		ZETestCheck(false);
+			Result = ZETriangle::GetArea(Triangle);
+
+			ZETestCheckClose(Result, ExpectedResult);
+		}
+
+		ZETestCase("Calculating the area of an isoceles ZETriangle")
+		{
+			ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 2.0f), ZEVector3(1.0f, 0.0f, 0.0f), ZEVector3(-1.0f, 0.0f, 0.0f));
+			float ExpectedResult = (2.0f * 2.0f) / 2.0f;
+			float Result = 0.0f;
+
+			Result = ZETriangle::GetArea(Triangle);
+
+			ZETestCheckClose(Result, ExpectedResult);
+		}
+
+		ZETestCase("ZETriangle is a random triangle")
+		{
+			ZETriangle Triangle(ZEVector3(4.0f, 6.0f, 0.0f), ZEVector3(2.0f, 1.0f, 0.0f), ZEVector3(6.0f, 3.0f, 0.0f));
+			float ExpectedResult = 0.0f;
+
+			float LengthA = ZEVector3::Distance(Triangle.V0, Triangle.V1);
+			float LengthB = ZEVector3::Distance(Triangle.V1, Triangle.V2);
+			float LengthC = ZEVector3::Distance(Triangle.V2, Triangle.V0);
+
+			float Semiperimeter = (LengthA + LengthB + LengthC) / 2.0f;
+
+			ExpectedResult = sqrtf(float(Semiperimeter * ((Semiperimeter - LengthA) * (Semiperimeter - LengthB) * (Semiperimeter - LengthC))));
+
+			float Result = 0.0f;
+
+			Result = ZETriangle::GetArea(Triangle);
+
+			ZETestCheckClose(Result, ExpectedResult);
+		}
+	}
+
+	ZETest("void ZETriangle::GetBarycentricCoordinates(const ZETriangle& Triangle, const ZEVector3& Point, ZEVector3& BarryCoords)")
+	{
+		ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 1.15470052f), ZEVector3(1.0f, 0.0f, -0.57735026f), ZEVector3(-1.0f, 0.0f, -0.57735026f));
+		ZEVector3 BaryCoords;
+
+		ZEVector3 Centroid;
+		ZETriangle::GetCentroid(Triangle, Centroid);
+		
+
+		ZETriangle::GetBarycentricCoordinates(Triangle, Centroid, BaryCoords);
+
+		ZETestCheckClose(BaryCoords, ZEVector3(0.33333334f, 0.33333334f, 0.33333334f));
+	}
+
+	ZETest("ZEVector3 ZETriangle::GetCentroid() const")
+	{
+		ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 1.15470052f), ZEVector3(1.0f, 0.0f, -0.57735026f), ZEVector3(-1.0f, 0.0f, -0.57735026f));
+
+		ZEVector3 Centroid = Triangle.GetCentroid();
+
+		ZETestCheckClose(Centroid, ZEVector3::Zero);
+	}
+
+	ZETest("void ZETriangle::GetCentroid(const ZETriangle& Triangle, ZEVector3& Centroid)")
+	{
+		ZETestCase("ZETriangle is equilateral and it's centroid is positioned on origin.")
+		{
+			ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 1.15470052f), ZEVector3(1.0f, 0.0f, -0.57735026f), ZEVector3(-1.0f, 0.0f, -0.57735026f));
+			ZEVector3 Centroid;
+
+			ZETriangle::GetCentroid(Triangle, Centroid);
+			
+			ZETestCheckClose(Centroid, ZEVector3::Zero);
+		}
+
+		ZETestCase("ZETriangle is an Isosceles triangle")
+		{
+			ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 2.0f), ZEVector3(1.0f, 0.0f, 0.0f), ZEVector3(-1.0f, 0.0f, 0.0f));
+			ZEVector3 BaryCoords;
+			ZEVector3 Centroid;
+
+			ZETriangle::GetCentroid(Triangle, Centroid);
+
+			ZETriangle::GetBarycentricCoordinates(Triangle, Centroid, BaryCoords);
+
+			float DoubleCheck = BaryCoords.x + BaryCoords.y + BaryCoords.z;
+			
+			ZETestCheckClose(BaryCoords, ZEVector3(0.33333334f, 0.33333334f, 0.33333334f));
+			ZETestCheckEqual(DoubleCheck, 1.0f);
+		}
+		ZETestCase("ZETriangle is a random triangle")
+		{
+			ZETriangle Triangle(ZEVector3(24.0f, -8.0f, -17.0f), ZEVector3(8.0f, 6.0f, 11.0f), ZEVector3(-10.0f, -4.0f, -6.0f));
+			ZEVector3 BaryCoords;
+			ZEVector3 Centroid;
+
+			ZETriangle::GetCentroid(Triangle, Centroid);
+
+			ZETriangle::GetBarycentricCoordinates(Triangle, Centroid, BaryCoords);
+
+			float DoubleCheck = BaryCoords.x + BaryCoords.y + BaryCoords.z;
+
+			ZETestCheckClose(BaryCoords, ZEVector3(0.33333334f, 0.33333334f, 0.33333334f));
+			ZETestCheckEqual(DoubleCheck, 1.0f);
+		}
+
 	}
 
 	ZETest("void ZETriangle::GetNormal(const ZETriangle& Triangle, ZEVector3& Normal)")
@@ -107,7 +213,7 @@ ZETestSuite(ZETriangle)
 
 			ZETriangle::GetNormal(Triangle, Normal);
 
-			ZETestCheckClose(Normal, ZEVector3::UnitX);
+			ZETestCheckClose(Normal, ZEVector3(-1.0f, 0.0f, 0.0f));
 		}
 	}
 
@@ -199,6 +305,7 @@ ZETestSuite(ZETriangle)
 	ZETest("bool ZETriangle::IntersectionTest(const ZETriangle& Triangle, const ZEPlane & Plane2, ZELine & Line)")
 	{
 		//Due to errors known this test is skipped. (Refer to Redmine : Bug #320)
+
 		ZETestCheck(false);
 	}
 

@@ -33,6 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
 #include "ZETest.h"
 #include <d3dx9.h>
 #include <math.h>
@@ -173,10 +174,55 @@ ZETestSuite(ZEMatrix4x4)
 		ZETestCheckClose(Matrix, ZEMatrix4x4(1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f));
 		
 	}
-	ZETest("static void ZEMatrix4x4::CreateRotationXYZ(ZEMatrix4x4 & Matrix, float Pitch, float Yawn, float Roll)")
+	ZETest("static void ZEMatrix4x4::CreateRotation(ZEMatrix4x4& Matrix, float Pitch, float Yawn, float Roll, ZERotationOrder RotationOrder)")
 	{
-		//Due to errors known this test is skipped. (Refer to RedMine : Bug#194)
-		ZETestCheck(false);
+		ZEMatrix4x4 Matrix;
+		float Pitch = ZE_PI;
+		float Yawn = ZE_PI_2;
+		float Roll = ZE_PI_4;
+
+		ZETestCase("for RotationOrder ZE_RO_XYZ")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_XYZ;
+			
+			ZEMatrix4x4::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix4x4(0.0f, 0.0f, 1.0f, 0.0f, -0.70710678f, -0.70710678f, 0.0f, 0.0f, 0.70710678f, -0.70710678f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f));
+		}
+		ZETestCase("for RotationOrder ZE_RO_XZY")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_XZY;
+
+			ZEMatrix4x4::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix4x4(0.0f, -0.70710678f, 0.70710678f, 0.0f, 0.0f, -0.70710678f, -0.70710678f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f));
+		}
+		ZETestCase("for RotationOrder ZE_RO_YXZ")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_YXZ;
+
+			ZEMatrix4x4::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix4x4(0.0f, 0.0f, -1.0f, 0.0f, -0.70710678f, -0.70710678f, 0.0f, 0.0f, -0.70710678f, 0.70710678f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f));
+		}
+		ZETestCase("for RotationOrder ZE_RO_YZX")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_YZX;
+
+			ZEMatrix4x4::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix4x4(0.0f, 0.0f, -1.0f, 0.0f, 0.70710678f, -0.70710678f, 0.0f, 0.0f, -0.70710678f, -0.70710678f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f));
+		}
+		ZETestCase("for RotationOrder ZE_RO_ZXY")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_ZXY;
+
+			ZEMatrix4x4::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix4x4(0.0f, 0.70710678f, 0.70710678f, 0.0f, 0.0f, -0.70710678f, 0.70710678f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f));
+		}
+		ZETestCase("for RotationOrder ZE_RO_ZYX")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_ZYX;
+
+			ZEMatrix4x4::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix4x4(0.0f, 0.70710678f, -0.70710678f, 0.0f, 0.0f, -0.70710678f, -0.70710678f, 0.0f, -1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f));
+		}
 	}
 	ZETest("static void ZEMatrix4x4::CreateRotationY(ZEMatrix4x4 & Matrix, float Yawn)")
 	{
@@ -288,7 +334,7 @@ ZETestSuite(ZEMatrix4x4)
 		ZEMatrix4x4 Out;
 
 		ZEMatrix4x4::Multiply(Out, A, B);
-		ZETestCheckEqual(Out, ZEMatrix4x4(718.0f, 1135.0f, 445.0f, 700.0f, 379.0f, 604.0f, 191.0f, 300.0f, 89.0f, 137.0f, 50.0f, 77.0f, 247.0f, 395.0f, 114.0f, 179.0f));	
+		ZETestCheckClose(Out, ZEMatrix4x4(718.0f, 1135.0f, 445.0f, 700.0f, 379.0f, 604.0f, 191.0f, 300.0f, 89.0f, 137.0f, 50.0f, 77.0f, 247.0f, 395.0f, 114.0f, 179.0f));	
 	}
 	ZETest("static inline void ZEMatrix4x4::Scale(ZEMatrix4x4 & Out, const ZEMatrix4x4 & A, float s)")
 	{
@@ -460,14 +506,14 @@ ZETestSuite(ZEMatrix4x4)
 	ZETest("void ZEMatrix4x4::operator*=(const ZEMatrix4x4 & RightOperand)")
 	{
 		ZEMatrix4x4 Matrix(35.0f, 23.0f, 16.0f, 12.0f,
-					  10.0f,  9.0f,  9.0f,  9.0f, 
-					  10.0f,  1.0f,  2.0f,  3.0f, 
-					  4.0f,  5.0f,  6.0f,  7.0f);
+					  10.0f, 9.0f, 9.0f, 9.0f, 
+					  10.0f, 1.0f, 2.0f, 3.0f, 
+					  4.0f, 5.0f, 6.0f, 7.0f);
 
-		ZEMatrix4x4 RightOperand(1.0f,  1.0f,  2.0f,  3.0f,  
-				      5.0f,  8.0f, 13.0f, 21.0f,
-					  34.0f, 55.0f,  1.0f,  1.0f, 
-					  2.0f,  3.0f,  5.0f,  8.0f);
+		ZEMatrix4x4 RightOperand(1.0f, 1.0f, 2.0f, 3.0f,  
+				      5.0f, 8.0f, 13.0f, 21.0f,
+					  34.0f, 55.0f, 1.0f, 1.0f, 
+					  2.0f, 3.0f, 5.0f, 8.0f);
 
 		Matrix *= RightOperand;
 		ZETestCheckClose(Matrix, ZEMatrix4x4(718.0f, 1135.0f, 445.0f, 700.0f, 379.0f, 604.0f, 191.0f, 300.0f, 89.0f, 137.0f, 50.0f, 77.0f, 247.0f, 395.0f, 114.0f, 179.0f));

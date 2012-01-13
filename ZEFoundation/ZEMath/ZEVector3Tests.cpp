@@ -740,7 +740,7 @@ ZETestSuite(ZEVector3)
 
 		A *= ScalarValue;
 
-		ZETestCheckClose(A, ZEVector3(14.7f, 21.0f, 28.0f), ZEVector3(ZE_ZERO_TRESHOLD, ZE_ZERO_TRESHOLD, ZE_ZERO_TRESHOLD));
+		ZETestCheckClose(A, ZEVector3(14.7f, 21.0f, 28.0f));
 	}
 
 	ZETest("ZEVector3 ZEVector3::operator/(const ZEVector3 & RightOperand) const")

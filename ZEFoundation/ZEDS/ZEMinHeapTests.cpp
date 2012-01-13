@@ -181,15 +181,15 @@ ZETestSuite(ZEMinHeap)
 			ZETestCheckEqual(TestHeap.GetMin(), 4);
 			ZETestCheckHeapTree(TestHeap);
 
-			TestHeap.Remove(4);
+			TestHeap.Remove(0);
 			ZETestCheckEqual(TestHeap.GetMin(), 5);
 			ZETestCheckHeapTree(TestHeap);
 
-			TestHeap.Remove(5);
+			TestHeap.Remove(0);
 			ZETestCheckEqual(TestHeap.GetMin(), 6);
 			ZETestCheckHeapTree(TestHeap);
 
-			TestHeap.Remove(6);
+			TestHeap.Remove(0);
 			ZETestCheckEqual(TestHeap.GetCount(), 0);
 		}
 

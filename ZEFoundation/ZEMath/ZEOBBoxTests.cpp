@@ -96,12 +96,12 @@ ZETestSuite(ZEOBBox)
 			ZEVector3(0.50000000f, 0.50000000f, 0.50000000f));
 
 		ZETestCheckClose(OBBox.GetVertex(0), ZEVector3(9.5000000f, 9.5000000f, 9.5000000f));
-		ZETestCheckClose(OBBox.GetVertex(1), ZEVector3(9.5000000f, 10.500000f, 9.5000000f));
-		ZETestCheckClose(OBBox.GetVertex(2), ZEVector3(10.500000f, 9.5000000f, 9.5000000f));
+		ZETestCheckClose(OBBox.GetVertex(1), ZEVector3(10.500000f, 9.5000000f, 9.5000000f));
+		ZETestCheckClose(OBBox.GetVertex(2), ZEVector3(9.5000000f, 10.500000f, 9.5000000f));
 		ZETestCheckClose(OBBox.GetVertex(3), ZEVector3(10.500000f, 10.500000f, 9.5000000f));
 		ZETestCheckClose(OBBox.GetVertex(4), ZEVector3(9.5000000f, 9.5000000f, 10.500000f));
-		ZETestCheckClose(OBBox.GetVertex(5), ZEVector3(9.5000000f, 10.500000f, 10.500000f));
-		ZETestCheckClose(OBBox.GetVertex(6), ZEVector3(10.500000f, 9.5000000f, 10.500000f));
+		ZETestCheckClose(OBBox.GetVertex(5), ZEVector3(10.500000f, 9.5000000f, 10.500000f));
+		ZETestCheckClose(OBBox.GetVertex(6), ZEVector3(9.5000000f, 10.500000f, 10.500000f));
 		ZETestCheckClose(OBBox.GetVertex(7), ZEVector3(10.500000f, 10.500000f, 10.500000f));
 
 	}
@@ -610,7 +610,7 @@ ZETestSuite(ZEOBBox)
 			Result = false;
 
 		ZERay Ray4;
-		Ray4.v = ZEVector3(0.28762913f, 0.39328644, -0.87326705f);
+		Ray4.v = ZEVector3(0.28762913f, 0.39328644f, -0.87326705f);
 		Ray4.p = ZEVector3(8.5197401f, 8.0577402f, 14.397716f) + OctantFactor;
 
 		if(!(ZEOBBox::IntersectionTest(OBBox, Ray4, Tmin, Tmax) && ZETestInternalCheckClose(Tmin, 4.5310888f) && ZETestInternalCheckClose(Tmax, 5.5315971f)))

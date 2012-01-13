@@ -227,7 +227,7 @@ ZETestSuite(ZEString)
 
 	ZETest("ZEString ZEString::FromFloat(float Value, ZEUInt Digits)")
 	{
-		float Value = 845756.88781;
+		float Value = 845756.88781f;
 		ZEUInt Digits = 7;
 
 		ZEString String = ZEString::FromFloat(Value, Digits);
@@ -505,9 +505,9 @@ ZETestSuite(ZEString)
 	{
 		const ZEString String = "Lorem";
 
-		const char C = String[3];
+		const char C = String[2];
 
-		ZETestCheck(C, 'r');
+		ZETestCheckEqual(C, 'r');
 	}
 
 	ZETest("ZEString ZEString::operator+(const ZEString & String)")
@@ -917,5 +917,43 @@ ZETestSuite(ZEString)
 		Result = StringB + StringA;
 
 		ZETestCheckEqual(Result, "Lorem Ipsum");
+	}
+
+	ZETest("bool operator==(const char* String1, const ZEString& String2)")
+	{
+		ZETestCase("Strings are not equal")
+		{
+			const ZEString StringA = "Lorem";
+			const char* StringB = "Ipsum";
+
+			ZETestCheck(!(StringB == StringA));
+		}
+
+		ZETestCase("Strings are equal")
+		{
+			const ZEString StringA = "Lorem Ipsum";
+			const char* StringB = "Lorem Ipsum";
+
+			ZETestCheck(StringB == StringA);
+		}
+	}
+
+	ZETest("bool operator!=(const char* String1, const ZEString& String2)")
+	{
+		ZETestCase("Strings are not equal")
+		{
+			const ZEString StringA = "Lorem";
+			const char* StringB = "Ipsum";
+
+			ZETestCheck(StringB != StringA);
+		}
+
+		ZETestCase("Strings are equal")
+		{
+			const ZEString StringC = "Lorem";
+			const char* StringD = "Lorem";
+
+			ZETestCheck(!(StringD != StringC));
+		}
 	}
 }

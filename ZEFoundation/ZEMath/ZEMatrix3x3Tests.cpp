@@ -118,10 +118,55 @@ ZETestSuite(ZEMatrix3x3)
 		ZEMatrix3x3::CreateRotationX(Matrix, Pitch);
 		ZETestCheckClose(Matrix, ZEMatrix3x3(1.0f, 0.0f, 0.0f, 0.0f, 0.70710677f, -0.70710677f, 0.0f, 0.70710677f, 0.70710677f));
 	}
-	ZETest("void ZEMatrix3x3::CreateRotationXYZ(ZEMatrix3x3& Matrix, float Pitch, float Yawn, float Roll);")
+	ZETest("void ZEMatrix3x3::CreateRotation(ZEMatrix3x3& Matrix, float Pitch, float Yawn, float Roll, ZERotationOrder RotationOrder)")
 	{
-		//Due to errors known this test is skipped. (Refer to RedMine : Bug#195)
-		ZETestCheck(false);
+		ZEMatrix3x3 Matrix;
+		float Pitch = ZE_PI;
+		float Yawn = ZE_PI_2;
+		float Roll = ZE_PI_4;
+		
+		ZETestCase("for RotationOrder ZE_RO_XYZ")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_XYZ;
+
+			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, 0.0f, 1.0f, -0.70710678f, -0.70710678f, 0.0f, 0.70710678f, -0.70710678f, 0.0f));
+		}
+		ZETestCase("for RotationOrder ZE_RO_XZY")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_XZY;
+
+			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, -0.70710678f, 0.70710678f, 0.0f, -0.70710678f, -0.70710678f, 1.0f, 0.0f, 0.0f));
+		}
+		ZETestCase("for RotationOrder ZE_RO_YXZ")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_YXZ;
+
+			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, 0.0f, -1.0f, -0.70710678f, -0.70710678f, 0.0f, -0.70710678f, 0.70710678f, 0.0f));
+		}
+		ZETestCase("for RotationOrder ZE_RO_YZX")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_YZX;
+
+			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, 0.0f, -1.0f, 0.70710678f, -0.70710678f, 0.0f, -0.70710678f, -0.70710678f, 0.0f));
+		}
+		ZETestCase("for RotationOrder ZE_RO_ZXY")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_ZXY;
+
+			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, 0.70710678f, 0.70710678f, 0.0f, -0.70710678f, 0.70710678f, 1.0f, 0.0f, 0.0f));
+		}
+		ZETestCase("for RotationOrder ZE_RO_ZYX")
+		{
+			ZERotationOrder RotationOrder = ZE_RO_ZYX;
+
+			ZEMatrix3x3::CreateRotation(Matrix, Pitch, Yawn, Roll, RotationOrder);
+			ZETestCheckClose(Matrix, ZEMatrix3x3(0.0f, 0.70710678f, -0.70710678f, 0.0f, -0.70710678f, -0.70710678f, -1.0f, 0.0f, 0.0f));
+		}
 	}
 	ZETest("void ZEMatrix3x3::CreateRotationY(ZEMatrix3x3& Matrix, float Yawn)")
 	{

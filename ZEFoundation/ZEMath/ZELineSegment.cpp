@@ -288,7 +288,7 @@ void ZELineSegment::GetPointOn(ZEVector3& Point, const ZELineSegment& LineSegmen
 {
 	if (TLineSegment < 0.0f)
 		Point = LineSegment.p;
-	else if (TLineSegment > 1.0f)
+	else if (TLineSegment > LineSegment.Length)
 	{
 		ZEVector3::Add(Point, LineSegment.p, LineSegment.v);
 		ZEVector3::Scale(Point, Point, LineSegment.Length);

@@ -441,7 +441,7 @@ ZETestSuite(ZEVariant)
 
 		ZETestCase("for Matrix3x3")
 		{
-			size_t LastItem;
+			ZEUInt64 LastItem;
 
 			ZEMatrix3x3 Matrix;
 			Matrix.M11 = 1;
@@ -456,7 +456,7 @@ ZETestSuite(ZEVariant)
 		}
 		ZETestCase("for Matrix4x4")
 		{
-			size_t LastItem;
+			ZEUInt64 LastItem;
 
 			ZEMatrix4x4 Matrix;
 			Matrix.M11 = 1;
@@ -472,7 +472,7 @@ ZETestSuite(ZEVariant)
 		}
 		ZETestCase("for Vector2")
 		{
-			size_t LastItem;
+			ZEUInt64 LastItem;
 
 			ZEVector2 Vector(1.0f, 2.0f);
 			Variant = Vector;
@@ -484,7 +484,7 @@ ZETestSuite(ZEVariant)
 		}
 		ZETestCase("for Vector3")
 		{
-			size_t LastItem;
+			ZEUInt64 LastItem;
 
 			ZEVector3 Vector(1.0f, 2.0f, 3.0f);
 			Variant = Vector;
@@ -496,7 +496,7 @@ ZETestSuite(ZEVariant)
 		}
 		ZETestCase("for Vector4")
 		{
-			size_t LastItem;
+			ZEUInt64 LastItem;
 
 			ZEVector4 Vector(1.0f, 2.0f, 3.0f, 4.0f);
 			Variant = Vector;
@@ -565,8 +565,10 @@ ZETestSuite(ZEVariant)
 		Variant.SetNull();
 		ZETestCheck(Variant.GetType() == ZE_VRT_NULL);
 	}
-	ZETest("void ZEVariant::SetPointer(void* Pointer)")
+	ZETest("void ZEVariant::SetClass(ZEObject* Class)")
 	{
+		ZEVariant Variant;
+		
 		// ZEVariant has been changed pointer type became ZEObject type.
 		ZETestCheck(false);
 	}
@@ -858,7 +860,7 @@ ZETestSuite(ZEVariant)
 		}
 		ZETestCase("for Matrix3x3")
 		{
-			size_t LastItem;
+			ZEUInt64 LastItem;
 
 			ZEVariant Variant1;
 			ZEMatrix3x3 Matrix;
@@ -877,7 +879,7 @@ ZETestSuite(ZEVariant)
 		}	
 		ZETestCase("for Matrix4x4")
 		{
-			size_t LastItem;
+			ZEUInt64 LastItem;
 
 			ZEVariant Variant1;
 			ZEMatrix4x4 Matrix;
@@ -898,7 +900,7 @@ ZETestSuite(ZEVariant)
 		}		
 		ZETestCase("for Vector2")
 		{
-			size_t LastItem;
+			ZEUInt64 LastItem;
 
 			ZEVariant Variant1;
 			ZEVector2 Vector(1.0f, 2.0f);
@@ -915,7 +917,7 @@ ZETestSuite(ZEVariant)
 		}
 		ZETestCase("for Vector3")
 		{
-			size_t LastItem;
+			ZEUInt64 LastItem;
 
 			ZEVariant Variant1;
 			ZEVector3 Vector(1.0f, 2.0f, 3.0f);
@@ -932,7 +934,7 @@ ZETestSuite(ZEVariant)
 		}
 		ZETestCase("for Vector4")
 		{
-			size_t LastItem;
+			ZEUInt64 LastItem;
 
 			ZEVariant Variant1;
 			ZEVector4 Vector(1.0f, 2.0f, 3.0f, 4.0f);

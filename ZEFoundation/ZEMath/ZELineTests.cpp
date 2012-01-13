@@ -171,9 +171,9 @@ ZETestSuite(ZELine)
 
 		float TLine, TLineSegment;
 		float Distance = ZELine::MinimumDistance(Line, LineSegment, TLine, TLineSegment);
-		ZETestCheckClose(Distance, 5.30308068f);
-		ZETestCheckClose(TLine, -3.79199158f);
-		ZETestCheckClose(TLineSegment, 1.0000000f);
+		ZETestCheckClose(Distance, 5.7154760f);
+		ZETestCheckClose(TLine, 4.61880226f);
+		ZETestCheckClose(TLineSegment, 0.0f);
 	}
 	ZETest("float ZELine::MinimumDistance(const ZELine& Line, const ZELineSegment& LineSegment)")
 	{
@@ -186,7 +186,7 @@ ZETestSuite(ZELine)
 		ZELineSegment LineSegment(P3, P4);
 
 		float Distance = ZELine::MinimumDistance(Line, LineSegment);
-		ZETestCheckClose(Distance, 5.30308068f);
+		ZETestCheckClose(Distance, 5.7154760f);
 	}
 	ZETest("float ZELine::MinimumDistance(const ZELine& Line, const ZERay& Ray, float& TLine, float& TRay)")
 	{
