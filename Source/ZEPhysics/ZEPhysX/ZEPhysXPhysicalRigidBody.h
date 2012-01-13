@@ -126,8 +126,8 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 		virtual void					SetAngularMomentum(const ZEVector3& NewAngularMomentum);
 		virtual ZEVector3				GetAngularMomentum();
 
-		virtual void					SetCollisionEventFlags(ZEDWORD CollisionEventFlags);
-		virtual ZEDWORD					GetCollisionEventFlags();
+		virtual void					SetCollisionEventFlags(ZEUInt32 CollisionEventFlags);
+		virtual ZEUInt32					GetCollisionEventFlags();
 
 		virtual void					ApplyForce(const ZEVector3& Force, ZEPhysicalForceMode ForceMode, bool IsWakeUp);
 		virtual void					ApplyTorque(const ZEVector3& Torque, ZEPhysicalForceMode ForceMode, bool IsWakeUp);

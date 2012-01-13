@@ -152,7 +152,7 @@ ZETestSuite(ZEFile)
 			remove("ZEFileIsOpenTests.txt");
 		}
 	}
-	ZETest("ZEQWORD ZEFile::Write(const void* Buffer, ZEQWORD Size, ZEQWORD Count)")
+	ZETest("ZEUInt64 ZEFile::Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count)")
 	{
 
 		unsigned char* Buffer = new unsigned char[1024];
@@ -168,7 +168,7 @@ ZETestSuite(ZEFile)
 			File.Open("ZEFileWriteTests.txt", ZE_FM_READ_WRITE, true);
 			File.Close();
 
-			ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
+			ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
 			ZETestCheckEqual(WriteCount, 0);
 			remove("ZEFileWriteTests.txt");
 		}
@@ -177,7 +177,7 @@ ZETestSuite(ZEFile)
 		{
 			File.Open("ZEFileWriteTests.txt", ZE_FM_READ_WRITE, true);
 		
-			ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
+			ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
 			File.Flush();
 			ZETestCheckEqual(WriteCount, 1024);
 			File.Close();
@@ -188,15 +188,15 @@ ZETestSuite(ZEFile)
 		{
 			File.Open("ZEFileWriteTests.txt", ZE_FM_WRITE_ONLY, true);
 
-			ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
+			ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
 			File.Flush();
 
 			ZETestCheckEqual(WriteCount, 1024);
-			ZEQWORD Size = File.GetFileSize();
+			ZEUInt64 Size = File.GetFileSize();
 			ZETestCheckEqual(Size, 1024);
 
-			bool Result = File.Seek(-24 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
-			ZEQWORD CursorPosition = File.Tell();
+			bool Result = File.Seek(-24 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
+			ZEUInt64 CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 1000);
 			WriteCount = File.Write(Buffer, sizeof(unsigned char), 28);
 			Size = File.GetFileSize();
@@ -214,7 +214,7 @@ ZETestSuite(ZEFile)
 			
 			File.Open("ZEFileWriteTests.txt", ZE_FM_READ_ONLY, true);
 
-			ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
+			ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
 			File.Flush();
 			ZETestCheckEqual(WriteCount, 0);
 			bool isopen = File.IsOpen();
@@ -230,10 +230,10 @@ ZETestSuite(ZEFile)
 		{
 			File.Open("ZEFileWriteTests.txt", ZE_FM_APPEND_ONLY, true);
 
-			ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
+			ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
 			File.Flush();
 			ZETestCheckEqual(WriteCount, 1024);
-			ZEQWORD Size = File.GetFileSize();
+			ZEUInt64 Size = File.GetFileSize();
 			ZETestCheckEqual(Size, 1024);
 
 			WriteCount = File.Write(Buffer, sizeof(unsigned char), 100);
@@ -241,9 +241,9 @@ ZETestSuite(ZEFile)
 			Size = File.GetFileSize();
 			ZETestCheckEqual(Size, 1124);
 
-			ZEQWORD CursorPosition = File.Tell();
+			ZEUInt64 CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 1124);
-			bool Result = File.Seek(-100 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
+			bool Result = File.Seek(-100 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 1024);
 			WriteCount = File.Write(Buffer, sizeof(unsigned char), 50);
@@ -258,15 +258,15 @@ ZETestSuite(ZEFile)
 		{
 			File.Open("ZEFileWriteTests.txt", ZE_FM_READ_APPEND, true);
 
-			ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
+			ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
 			File.Flush();
 			ZETestCheckEqual(WriteCount, 1024);
-			ZEQWORD Size = File.GetFileSize();
+			ZEUInt64 Size = File.GetFileSize();
 			ZETestCheckEqual(Size, 1024);
 
-			ZEQWORD CursorPosition = File.Tell();
+			ZEUInt64 CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 1024);
-			bool Result = File.Seek(-100 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
+			bool Result = File.Seek(-100 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 924);
 			WriteCount = File.Write(Buffer, sizeof(unsigned char), 50);
@@ -287,10 +287,10 @@ ZETestSuite(ZEFile)
 
 		ZEFile File;
 		File.Open("ZEFileFlushTests.txt", ZE_FM_APPEND_ONLY, true);
-		ZEQWORD Size = File.GetFileSize();
+		ZEUInt64 Size = File.GetFileSize();
 		ZETestCheckEqual(Size, 0);
 
-		ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 100);
+		ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 100);
 		
 		File.Flush();
 		ZETestCheckEqual(WriteCount, 100);
@@ -299,12 +299,12 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileFlushTests.txt");
 	}
-	ZETest("ZEQWORD ZEFile::GetFileSize()")
+	ZETest("ZEUInt64 ZEFile::GetFileSize()")
 	{
 		ZEFile File;
 		File.Open("ZEFileSizeTests.txt", ZE_FM_READ_WRITE, true);
 		
-		ZEQWORD Size = File.GetFileSize();
+		ZEUInt64 Size = File.GetFileSize();
 		ZETestCheckEqual(Size, 0);
 		File.Close();
 		remove("ZEFileSizeTests.txt");
@@ -327,7 +327,7 @@ ZETestSuite(ZEFile)
 			remove("ZEFileSizeTests.txt");
 		}
 	}
-	ZETest("ZEQWORD ZEFile::GetStartPosition()")
+	ZETest("ZEUInt64 ZEFile::GetStartPosition()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
 		for ( int I = 0; I < 1024; I++)
@@ -338,7 +338,7 @@ ZETestSuite(ZEFile)
 		ZEFile File;
 		File.Open("ZEFileStartPositionTests.txt", ZE_FM_WRITE_ONLY, true);
 
-		ZEQWORD StartPosition = File.GetStartPosition();
+		ZEUInt64 StartPosition = File.GetStartPosition();
 		ZETestCheckEqual(StartPosition, 0);
 
 		File.Write(Buffer, sizeof(unsigned char), 100);
@@ -350,7 +350,7 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileStartPositionTests.txt");
 	}
-	ZETest("ZEQWORD ZEFile::GetEndPosition()")
+	ZETest("ZEUInt64 ZEFile::GetEndPosition()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
 		for ( int I = 0; I < 1024; I++)
@@ -361,7 +361,7 @@ ZETestSuite(ZEFile)
 		ZEFile File;
 		File.Open("ZEFileEndPositionTests.txt", ZE_FM_WRITE_ONLY, true);
 
-		ZEQWORD EndPosition = File.GetEndPosition();
+		ZEUInt64 EndPosition = File.GetEndPosition();
 		ZETestCheckEqual(EndPosition, 0);
 
 		File.Write(Buffer, sizeof(unsigned char), 100);
@@ -387,34 +387,34 @@ ZETestSuite(ZEFile)
 		ZETestCase("for seek form ZE_SF_CURRENT")
 		{
 			File.Open("ZEFileSeekTests.txt", ZE_FM_WRITE_ONLY, true);
-			ZEQWORD CursorPosition = File.Tell();
+			ZEUInt64 CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 0);
 
-			ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 5);
+			ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 5);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 5);
 
-			bool Result = File.Seek(-1 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
+			bool Result = File.Seek(-1 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 			ZETestCheck(Result == true);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 4);
 
-			Result = File.Seek(-4 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
+			Result = File.Seek(-4 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 			ZETestCheck(Result == true);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 0);
 
-			Result = File.Seek(5 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
+			Result = File.Seek(5 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 			ZETestCheck(Result == true);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 5);
 
-			Result = File.Seek(10 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
+			Result = File.Seek(10 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 			ZETestCheck(Result == true);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 15);
 
-			Result = File.Seek(-20 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
+			Result = File.Seek(-20 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 			ZETestCheck(Result == false);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 15);
@@ -426,29 +426,29 @@ ZETestSuite(ZEFile)
 		ZETestCase("for seek form ZE_SF_BEGINING")
 		{
 			File.Open("ZEFileSeekTests.txt", ZE_FM_WRITE_ONLY, true);
-			ZEQWORD CursorPosition = File.Tell();
+			ZEUInt64 CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 0);
 
-			ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 5);
+			ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 5);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 5);
 
-			bool Result = File.Seek(0 * (ZEINT64)sizeof(unsigned char), ZE_SF_BEGINING);
+			bool Result = File.Seek(0 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
 			ZETestCheck(Result == true);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 0);
 
-			Result = File.Seek(5 * (ZEINT64)sizeof(unsigned char), ZE_SF_BEGINING);
+			Result = File.Seek(5 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
 			ZETestCheck(Result == true);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 5);
 
-			Result = File.Seek(-3 * (ZEINT64)sizeof(unsigned char), ZE_SF_BEGINING);
+			Result = File.Seek(-3 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
 			ZETestCheck(Result == false);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 5);
 			
-			Result = File.Seek(10 * (ZEINT64)sizeof(unsigned char), ZE_SF_BEGINING);
+			Result = File.Seek(10 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
 			ZETestCheck(Result == true);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 10);
@@ -460,30 +460,30 @@ ZETestSuite(ZEFile)
 		ZETestCase("for seek form ZE_SF_END")
 		{
 			File.Open("ZEFileSeekTests.txt", ZE_FM_WRITE_ONLY, true);
-			ZEQWORD CursorPosition = File.Tell();
+			ZEUInt64 CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 0);
 
-			ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 5);
+			ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 5);
 			File.Flush();
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 5);
 
-			bool Result = File.Seek(-1 * (ZEINT64)sizeof(unsigned char), ZE_SF_END);
+			bool Result = File.Seek(-1 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
 			ZETestCheck(Result == true);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 4);
 
-			Result = File.Seek(-5 * (ZEINT64)sizeof(unsigned char), ZE_SF_END);
+			Result = File.Seek(-5 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
 			ZETestCheck(Result == true);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 0);
 
-			Result = File.Seek(-10 * (ZEINT64)sizeof(unsigned char), ZE_SF_END);
+			Result = File.Seek(-10 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
 			ZETestCheck(Result == false);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 0);
 			
-			Result = File.Seek(1 * (ZEINT64)sizeof(unsigned char), ZE_SF_END);
+			Result = File.Seek(1 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
 			ZETestCheck(Result == true);
 			CursorPosition = File.Tell();
 			ZETestCheckEqual(CursorPosition, 6);
@@ -494,14 +494,14 @@ ZETestSuite(ZEFile)
 		}
 	}
 
-	ZETest("ZEQWORD ZEFile::Tell()")
+	ZETest("ZEUInt64 ZEFile::Tell()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
 
 		ZEFile File;
 		File.Open("ZEFileTellTests.txt", ZE_FM_WRITE_ONLY, true);
 		
-		ZEQWORD CursorPosition = File.Tell();
+		ZEUInt64 CursorPosition = File.Tell();
 		ZETestCheckEqual(CursorPosition, 0);
 
 		for ( int I = 0; I < 1024; I++)
@@ -509,21 +509,21 @@ ZETestSuite(ZEFile)
 			Buffer[I] = I % 256;
 		}
 
-		ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 10); 
+		ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 10); 
 		File.Flush();
-		bool Result = File.Seek(-3 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
+		bool Result = File.Seek(-3 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 		CursorPosition = File.Tell();
 		ZETestCheckEqual(CursorPosition, 7);
 		
-		Result = File.Seek(-5 * (ZEINT64)sizeof(unsigned char), ZE_SF_END);
+		Result = File.Seek(-5 * (ZEInt64)sizeof(unsigned char), ZE_SF_END);
 		CursorPosition = File.Tell();
 		ZETestCheckEqual(CursorPosition, 5);
 		
-		Result = File.Seek(3 * (ZEINT64)sizeof(unsigned char), ZE_SF_BEGINING);
+		Result = File.Seek(3 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
 		CursorPosition = File.Tell();
 		ZETestCheckEqual(CursorPosition, 3);
 
-		Result = File.Seek(-4 * (ZEINT64)sizeof(unsigned char), ZE_SF_BEGINING);
+		Result = File.Seek(-4 * (ZEInt64)sizeof(unsigned char), ZE_SF_BEGINING);
 		ZETestCheck(Result == false);
 		CursorPosition = File.Tell();
 		ZETestCheckEqual(CursorPosition, 3);
@@ -543,7 +543,7 @@ ZETestSuite(ZEFile)
 		ZETestCheck(isopen == false);
 		remove("ZEFileCloseTests.txt");
 	}
-	ZETest("ZEQWORD ZEFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)")
+	ZETest("ZEUInt64 ZEFile::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
 		unsigned char* BufferRead = new unsigned char[1024];
@@ -554,12 +554,12 @@ ZETestSuite(ZEFile)
 				
 		ZEFile File;
 		File.Open("ZEFileReadTests.txt", ZE_FM_READ_WRITE, true);
-		ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 10);
+		ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 10);
 		File.Flush();
 
-		bool Result = File.Seek(-10 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
+		bool Result = File.Seek(-10 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-		ZEQWORD ReadCount = File.Read(BufferRead, sizeof(unsigned char), 10);
+		ZEUInt64 ReadCount = File.Read(BufferRead, sizeof(unsigned char), 10);
 		ZETestCheckEqual(ReadCount, 10);
 
 		int Res = memcmp(Buffer, BufferRead, sizeof(unsigned char));
@@ -574,7 +574,7 @@ ZETestSuite(ZEFile)
 			WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
 			File.Flush();
 
-			Result = File.Seek(-1024 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
+			Result = File.Seek(-1024 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
 			ReadCount = File.Read(BufferRead, sizeof(unsigned char), 1024);
 			ZETestCheckEqual(ReadCount, 1024);
@@ -598,15 +598,15 @@ ZETestSuite(ZEFile)
 		ZEFile File;
 		File.Open("ZEFileEofTests.txt", ZE_FM_READ_WRITE, true);
 
-		ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
+		ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
 		File.Flush();
 
 		bool IsEof = File.Eof();
 		ZETestCheck(IsEof == false);
 
-		bool Result = File.Seek(-1024 * (ZEINT64)sizeof(unsigned char), ZE_SF_CURRENT);
+		bool Result = File.Seek(-1024 * (ZEInt64)sizeof(unsigned char), ZE_SF_CURRENT);
 
-		ZEQWORD ReadCount = File.Read(BufferRead, sizeof(unsigned char), 1025);
+		ZEUInt64 ReadCount = File.Read(BufferRead, sizeof(unsigned char), 1025);
 		IsEof = File.Eof();
 		ZETestCheck(IsEof == true);
 
@@ -636,12 +636,12 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileReferenceCountTests.txt");
 	}
-	ZETest("ZEQWORD ZEFile::WriteFormated(const char* Format, ...)")
+	ZETest("ZEUInt64 ZEFile::WriteFormated(const char* Format, ...)")
 	{
 		ZEFile File;
 		bool Result = File.Open("ZEFileWriteFormatedTests.txt", ZE_FM_APPEND_ONLY, true);
 
-		ZEQWORD WriteCount = File.WriteFormated("This Line Contains Int: %d, Double: %lf, Float: %f, String: %s", 11, 11.11, 11.11f, "eleven");
+		ZEUInt64 WriteCount = File.WriteFormated("This Line Contains Int: %d, Double: %lf, Float: %f, String: %s", 11, 11.11, 11.11f, "eleven");
 		File.Flush();
 		ZETestCheckEqual(WriteCount, 79);
 		
@@ -683,10 +683,10 @@ ZETestSuite(ZEFile)
 
 		OtherFile.Open("ZEFileOperatorTests.txt", ZE_FM_WRITE_ONLY, true);
 
-		ZEQWORD WriteCount = OtherFile.Write(&Buffer, sizeof(unsigned char), 2);
+		ZEUInt64 WriteCount = OtherFile.Write(&Buffer, sizeof(unsigned char), 2);
 		OtherFile.Flush();
 
-		ZEQWORD CursorPosition = File.Tell();
+		ZEUInt64 CursorPosition = File.Tell();
 		ZETestCheckEqual(CursorPosition, 0);
 
 		File = OtherFile; 
@@ -743,15 +743,15 @@ ZETestSuite(ZEFile)
 		bool IsFile = ZEFile::IsFileExists(FilePath);
 		ZETestCheck(IsFile == true);
 	}
-	ZETest("ZEQWORD ZEFile::GetFileSize(const ZEString& FilePath)")
+	ZETest("ZEUInt64 ZEFile::GetFileSize(const ZEString& FilePath)")
 	{
 		const ZEString FilePath = "resources\\Items0\\FileTest0\\TestTest0\\ZEFileTests0.txt";
 
-		ZEQWORD Size = ZEFile::GetFileSize(FilePath);
+		ZEUInt64 Size = ZEFile::GetFileSize(FilePath);
 		//ZETestCheckEqual(Size, 0);
 	}
 
-	ZETest("bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEQWORD BufferSize)")
+	ZETest("bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEUInt64 BufferSize)")
 	{
 		/*unsigned char* Buffer = new unsigned char[1024];
 		unsigned char* BufferRead = new unsigned char[1024];
@@ -764,7 +764,7 @@ ZETestSuite(ZEFile)
 		
 		bool Res = File.Open("resources\\ZEFileReadFileTests.txt", ZE_FM_READ_WRITE, true);
 		zeAssert(!Res, "Dosyayý acamadým");
-		ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
+		ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
 		ZETestCheckEqual(WriteCount, 1024);
 		File.Close();
 		
@@ -777,7 +777,7 @@ ZETestSuite(ZEFile)
 		remove("resources\\ZEFileReadFileTests.txt");*/
 		
 	}
-	ZETest("bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEQWORD BufferSize)")
+	ZETest("bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 BufferSize)")
 	{
 		/*unsigned char* Buffer = new unsigned char[1025];
 		for ( int I = 0; I < 1025; I++)
@@ -786,7 +786,7 @@ ZETestSuite(ZEFile)
 		}
 		ZEFile File;
 		bool Res = File.Open("resources\\ZEFileReadTextTests.txt", ZE_FM_READ_WRITE, true);
-		ZEQWORD WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
+		ZEUInt64 WriteCount = File.Write(Buffer, sizeof(unsigned char), 1024);
 		File.Flush();
 		File.Close();
 		bool Result = ZEFile::ReadTextFile("ZEFileReadTextTests.txt", (char*)Buffer, 1025);

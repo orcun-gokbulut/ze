@@ -43,10 +43,10 @@ class ZERealTimeClock
 {
 	friend class ZECore;
 	private:
-		ZEUINT64					StartTick;
-		ZEUINT64					FrameTick;
-		ZEUINT64					OldFrameTick;
-		ZEUINT64					Frequency;
+		ZEUInt64					StartTick;
+		ZEUInt64					FrameTick;
+		ZEUInt64					OldFrameTick;
+		ZEUInt64					Frequency;
 
 		void						ResetFrameTime();
 		void						ResetTime();
@@ -55,9 +55,9 @@ class ZERealTimeClock
 									~ZERealTimeClock();
 
 	public:
-		ZEUINT64					GetCurrentTime();
-		ZEUINT64					GetFrameTime();
-		ZEUINT64					GetFrameDeltaTime();
+		ZEUInt64					GetCurrentTime();
+		ZEUInt64					GetFrameTime();
+		ZEUInt64					GetFrameDeltaTime();
 
 		void						UpdateFrameTime();
 

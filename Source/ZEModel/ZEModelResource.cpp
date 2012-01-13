@@ -308,8 +308,8 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEFile* 
 			}
 			case ZE_MFPST_CONVEX:
 			{
-				ZEDWORD ChunkId;
-				ResourceFile->Read(&ChunkId, sizeof(ZEDWORD), 1);
+				ZEUInt32 ChunkId;
+				ResourceFile->Read(&ChunkId, sizeof(ZEUInt32), 1);
 				if (ChunkId != ZE_MDLF_PHYSICAL_SHAPE_VERTEX_CHUNKID)
 				{
 					zeError("Corrupted ZEModel file. Physical vertex chunk id does not matches.");
@@ -323,8 +323,8 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEFile* 
 			/*case _ZE_PST_TRIMESH:
 			{
 				//vertices
-				ZEDWORD ChunkId;
-				ResourceFile->Read(&ChunkId, sizeof(ZEDWORD), 1);
+				ZEUInt32 ChunkId;
+				ResourceFile->Read(&ChunkId, sizeof(ZEUInt32), 1);
 				if (ChunkId != ZE_MDLF_PHYSICAL_BODY_SHAPE_VERTEX_CHUNKID)
 				{
 					zeError("Corrupted ZEModel file. Physical vertex chunk id does not matches.");
@@ -335,7 +335,7 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEFile* 
 				ResourceFile->Read(Shape->TriMesh.Vertices.GetCArray(), sizeof(ZEVector3), Shape->TriMesh.Vertices.GetCount());
 				
 				//indices
-				ResourceFile->Read(&ChunkId, sizeof(ZEDWORD), 1);
+				ResourceFile->Read(&ChunkId, sizeof(ZEUInt32), 1);
 				if (ChunkId != ZE_MDLF_PHYSICAL_BODY_SHAPE_INDEX_CHUNKID)
 				{
 					zeError("Corrupted ZEModel file. Physical index chunk id does not matches.");
@@ -437,7 +437,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 			if(MeshChunk.IsSkinned)
 			{
 				LOD->AffectingBoneIds.SetCount(MeshLODChunk.AffectingBoneCount);
-				ResourceFile->Read(LOD->AffectingBoneIds.GetCArray(), sizeof(ZEDWORD), LOD->AffectingBoneIds.GetCount());
+				ResourceFile->Read(LOD->AffectingBoneIds.GetCArray(), sizeof(ZEUInt32), LOD->AffectingBoneIds.GetCount());
 
 				LOD->SkinnedVertices.SetCount(MeshLODChunk.VertexCount);				
 				ResourceFile->Read(LOD->SkinnedVertices.GetCArray(), sizeof(ZESkinnedModelVertex),  LOD->SkinnedVertices.GetCount());

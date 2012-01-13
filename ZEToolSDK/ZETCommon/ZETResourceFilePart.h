@@ -42,13 +42,13 @@
 class ZEResourceInternalFile
 {
 	private:
-		ZEDWORD						Size;
+		ZEUInt32						Size;
 		unsigned char*				Data;
 
 	public:
-		ZEDWORD						GetFileSize() const;
+		ZEUInt32						GetFileSize() const;
 		unsigned char*				GetFileBuffer() const;
-		void						AllocateBuffer(ZEDWORD Size);
+		void						AllocateBuffer(ZEUInt32 Size);
 		
 		bool						WriteToResourceFile(FILE* File) const;
 		bool						ReadFromResourceFile(FILE* File);

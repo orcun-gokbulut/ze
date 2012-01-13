@@ -62,7 +62,7 @@ class ZEMapFileOctree
 		ZEMapFileOctree*			SubTrees[8];
 
 		ZEAABBox				BoundingBox;
-		ZESmartArray<ZEDWORD>		PolygonIds;
+		ZESmartArray<ZEUInt32>		PolygonIds;
 
 		static ZEMapFileOctree*		GenerateOctree(ZEArray<ZEMapFilePolygon>& Polygons, unsigned int MaxDepth);
 

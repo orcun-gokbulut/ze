@@ -51,16 +51,16 @@ class ZETextureCacheDataIdentifier : public ZECacheDataIdentifier
 
 		char					ItemName[ZE_MAX_FILE_NAME_SIZE];
 		ZETextureOptions		TextureOptions;
-		ZEQWORD					Offset;
+		ZEUInt64					Offset;
 
 								ZETextureCacheDataIdentifier();
-								ZETextureCacheDataIdentifier(const char* ItemName, const ZETextureOptions &TextureOptions, ZEQWORD Offset = 0);
+								ZETextureCacheDataIdentifier(const char* ItemName, const ZETextureOptions &TextureOptions, ZEUInt64 Offset = 0);
 		virtual					~ZETextureCacheDataIdentifier();
 
 
-		virtual	ZEQWORD			GetDataSize()const;
-		virtual ZEQWORD			GetHash() const;
-		virtual ZEQWORD			Write(ZEFile* File) const;
+		virtual	ZEUInt64			GetDataSize()const;
+		virtual ZEUInt64			GetHash() const;
+		virtual ZEUInt64			Write(ZEFile* File) const;
 		virtual bool			Equal(ZEFile* File) const;
 };
 

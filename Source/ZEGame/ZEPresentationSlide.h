@@ -64,7 +64,7 @@ class ZEPresentationSlide : public ZECompoundEntity
 		virtual								~ZEPresentationSlide();
 
 	public:
-		virtual ZEDWORD						GetDrawFlags() const;
+		virtual ZEUInt32						GetDrawFlags() const;
 
 		virtual bool						Initialize();
 		virtual void						Deinitialize();

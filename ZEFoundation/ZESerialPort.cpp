@@ -44,17 +44,17 @@ static clock_t ClockMs()
 	return GetTickCount();
 }
 
-static clock_t GetNextTimeOut(ZEUINT32 TimeOut)
+static clock_t GetNextTimeOut(ZEUInt32 TimeOut)
 {
 	return ClockMs() + TimeOut;
 }
 
-void ZESerialPort::SetTimeOut(ZEUINT32 Milliseconds)
+void ZESerialPort::SetTimeOut(ZEUInt32 Milliseconds)
 {
 	TimeOut = Milliseconds;
 }
 
-ZEUINT32 ZESerialPort::GetTimeOut()
+ZEUInt32 ZESerialPort::GetTimeOut()
 {
 	return TimeOut;
 }
@@ -64,7 +64,7 @@ bool ZESerialPort::IsOpen()
 	return Handle != NULL;
 }
 
-bool ZESerialPort::Open(const ZEString& PortName, ZEUINT32 BaudRate)
+bool ZESerialPort::Open(const ZEString& PortName, ZEUInt32 BaudRate)
 {
 	if (Handle != NULL)
 		Close();

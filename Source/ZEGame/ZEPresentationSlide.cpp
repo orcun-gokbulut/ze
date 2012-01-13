@@ -46,7 +46,7 @@
 
 #include "ZEMath/ZEMathDefinitions.h"
 
-ZEDWORD ZEPresentationSlide::GetDrawFlags() const
+ZEUInt32 ZEPresentationSlide::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;
 }

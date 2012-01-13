@@ -35,32 +35,32 @@
 
 #include "ZEInputDevice.h"
 
-ZEDWORD ZEInputDevice::GetButtonCount()
+ZEUInt32 ZEInputDevice::GetButtonCount()
 {
 	return 0;
 }
 
-ZEDWORD ZEInputDevice::GetAxisCount()
+ZEUInt32 ZEInputDevice::GetAxisCount()
 {
 	return 0;
 }
 
-ZEDWORD ZEInputDevice::GetVector2Count()
+ZEUInt32 ZEInputDevice::GetVector2Count()
 {
 	return 0;
 }
 
-ZEDWORD ZEInputDevice::GetVector3Count()
+ZEUInt32 ZEInputDevice::GetVector3Count()
 {
 	return 0;
 }
 
-ZEDWORD ZEInputDevice::GetVector4Count()
+ZEUInt32 ZEInputDevice::GetVector4Count()
 {
 	return 0;
 }
 
-ZEDWORD ZEInputDevice::GetQuaternionCount()
+ZEUInt32 ZEInputDevice::GetQuaternionCount()
 {
 	return 0;
 }

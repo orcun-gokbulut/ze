@@ -119,54 +119,54 @@ void ZEProfilerCounter::Stop()
 	
 }
 
-ZEINT64 ZEProfilerCounter::GetFrameCount()
+ZEInt64 ZEProfilerCounter::GetFrameCount()
 {
 	return FrameCount;
 }
 
-ZEINT64 ZEProfilerCounter::GetTotalCount()
+ZEInt64 ZEProfilerCounter::GetTotalCount()
 {
 	return TotalCount;
 }
 
-ZEINT64 ZEProfilerCounter::GetFrameMaximumTime()
+ZEInt64 ZEProfilerCounter::GetFrameMaximumTime()
 {
 	return FrameMaximumTime;
 }
 
-ZEINT64 ZEProfilerCounter::GetTotalMaximumTime()
+ZEInt64 ZEProfilerCounter::GetTotalMaximumTime()
 {
 	return TotalMaximumTime;
 }
 
-ZEINT64 ZEProfilerCounter::GetFrameMinimumTime()
+ZEInt64 ZEProfilerCounter::GetFrameMinimumTime()
 {
 	return FrameMinimumTime;
 }
 
-ZEINT64 ZEProfilerCounter::GetTotalMinimumTime()
+ZEInt64 ZEProfilerCounter::GetTotalMinimumTime()
 {
 	return TotalMinimumTime;
 }
 
-ZEINT64 ZEProfilerCounter::GetTotalTime()
+ZEInt64 ZEProfilerCounter::GetTotalTime()
 {
 	return TotalTime;
 }
 
-ZEINT64 ZEProfilerCounter::GetFrameTotalTime()
+ZEInt64 ZEProfilerCounter::GetFrameTotalTime()
 {
 	return FrameTotalTime;
 }
 
-ZEINT64 ZEProfilerCounter::GetTotalAverageTime()
+ZEInt64 ZEProfilerCounter::GetTotalAverageTime()
 {
 	if(TotalCount == 0)
 		return 0;
 	return (int)(TotalTime / TotalCount);
 }
 
-ZEINT64 ZEProfilerCounter::GetFrameAverageTime()
+ZEInt64 ZEProfilerCounter::GetFrameAverageTime()
 {
 	if(FrameCount == 0)
 		return 0;

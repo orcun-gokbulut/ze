@@ -59,7 +59,7 @@ const char* ZED3D9Shader::GetFunctionName()
 	return FunctionName;
 }
 
-ZEDWORD ZED3D9Shader::GetComponents()
+ZEUInt32 ZED3D9Shader::GetComponents()
 {
 	return Components;
 }
@@ -69,7 +69,7 @@ void ZED3D9Shader::Release()
 	ZED3D9ShaderManager::GetInstance()->ReleaseShader(this);
 }
 
-ZED3D9Shader* ZED3D9Shader::CreateShader(const char* FileName, const char* FunctionName, ZEDWORD Components, ZED3D9ShaderType Type, const char* Profile)
+ZED3D9Shader* ZED3D9Shader::CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile)
 {
 	return ZED3D9ShaderManager::GetInstance()->GetShader(FileName, FunctionName, Components, Type, Profile);
 }
@@ -97,7 +97,7 @@ LPDIRECT3DPIXELSHADER9 ZED3D9PixelShader::GetPixelShader()
 	return PixelShader;
 }
 
-ZED3D9PixelShader* ZED3D9PixelShader::CreateShader(const char* FileName, const char* FunctionName, ZEDWORD Components, const char* Profile)
+ZED3D9PixelShader* ZED3D9PixelShader::CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile)
 {
 	return ZED3D9ShaderManager::GetInstance()->GetPixelShader(FileName, FunctionName, Components, Profile);
 }
@@ -125,7 +125,7 @@ LPDIRECT3DVERTEXSHADER9 ZED3D9VertexShader::GetVertexShader()
 	return VertexShader;
 }
 
-ZED3D9VertexShader* ZED3D9VertexShader::CreateShader(const char* FileName, const char* FunctionName, ZEDWORD Components, const char* Profile)
+ZED3D9VertexShader* ZED3D9VertexShader::CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile)
 {
 	return ZED3D9ShaderManager::GetInstance()->GetVertexShader(FileName, FunctionName, Components, Profile);
 }

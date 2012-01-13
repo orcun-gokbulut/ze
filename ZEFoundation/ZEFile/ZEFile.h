@@ -86,7 +86,7 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 	protected:
 		void*					File;
 		ZEString				FilePath;
-		ZEQWORD					FileCursor;
+		ZEUInt64					FileCursor;
 
 		ZEFileType				FileType;
 
@@ -94,31 +94,31 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 
 	public:
 		virtual bool			Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary);
-		virtual bool			Seek(ZEINT64 Offset, ZESeekFrom Origin);
-		virtual ZEQWORD			Tell();
+		virtual bool			Seek(ZEInt64 Offset, ZESeekFrom Origin);
+		virtual ZEUInt64			Tell();
 		virtual void			Close();
 		virtual bool			Eof();
 		virtual void			Flush();
 		virtual bool			IsOpen();
 
-		virtual ZEQWORD			Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);
-		virtual ZEQWORD			ReadFormated(const char* Format, ...);
+		virtual ZEUInt64			Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
+		virtual ZEUInt64			ReadFormated(const char* Format, ...);
 
-		virtual ZEQWORD			Write(const void* Buffer, ZEQWORD Size, ZEQWORD Count);
-		virtual ZEQWORD			WriteFormated(const char* Format, ...);
+		virtual ZEUInt64			Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
+		virtual ZEUInt64			WriteFormated(const char* Format, ...);
 
-		static ZEQWORD			GetFileSize(const ZEString& FilePath);
-		virtual ZEQWORD			GetFileSize();
+		static ZEUInt64			GetFileSize(const ZEString& FilePath);
+		virtual ZEUInt64			GetFileSize();
 
-		static bool				ReadFile(const ZEString& FilePath, void* Buffer, ZEQWORD BufferSize);
-		static bool				ReadTextFile(const ZEString& FilePath, char* Buffer, ZEQWORD BufferSize);
+		static bool				ReadFile(const ZEString& FilePath, void* Buffer, ZEUInt64 BufferSize);
+		static bool				ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 BufferSize);
 
 		ZEFileType				GetFileType() const;
 		void*					GetFileHandle() const;	
 		const ZEString			GetFilePath() const;
 
-		virtual ZEQWORD			GetStartPosition();
-		virtual ZEQWORD			GetEndPosition();
+		virtual ZEUInt64			GetStartPosition();
+		virtual ZEUInt64			GetEndPosition();
 
 		unsigned int			GetReferenceCount() const;
 		virtual unsigned int	IncreaseReferenceCount();

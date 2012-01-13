@@ -40,24 +40,24 @@
 
 struct ZEChunkHeader
 {
-	ZEQWORD				Header;
-	ZEQWORD				ChunkHash;
-	ZEQWORD				ChunkPosition;
-	ZEQWORD				ChunkPositionDecompressed;
-	ZEQWORD				ChunkSize;
-	ZEQWORD				ChunkCompressedSize;
+	ZEUInt64				Header;
+	ZEUInt64				ChunkHash;
+	ZEUInt64				ChunkPosition;
+	ZEUInt64				ChunkPositionDecompressed;
+	ZEUInt64				ChunkSize;
+	ZEUInt64				ChunkCompressedSize;
 	char				IdentifierName[256];
 };
 
 // Helper function for copying Records
-void CopyData(ZECompressedFile* File, ZEQWORD From, ZEQWORD Size, ZEQWORD To)
+void CopyData(ZECompressedFile* File, ZEUInt64 From, ZEUInt64 Size, ZEUInt64 To)
 {
-	const ZEQWORD BufferSize = 65536;
+	const ZEUInt64 BufferSize = 65536;
 	char Buffer[BufferSize];
 
-	ZEQWORD Count = Size / BufferSize;
-	ZEQWORD LeftOver = Size % BufferSize;
-	for (ZEQWORD I = 0; I < Count; I++)
+	ZEUInt64 Count = Size / BufferSize;
+	ZEUInt64 LeftOver = Size % BufferSize;
+	for (ZEUInt64 I = 0; I < Count; I++)
 	{
 		_fseeki64((FILE*)File->GetFileHandle(), From + I * BufferSize, ZE_SF_BEGINING);
 		fread(Buffer, BufferSize, 1,(FILE*)File->GetFileHandle());
@@ -154,25 +154,25 @@ bool ZEPack::ChunkExists(const char* IdentifierName)
 	strncpy(ChunkName,IdentifierName,256);
 
 	//Store file cursor position
-	ZEQWORD FileCursorBeforeChunkExists = _ftelli64((FILE*)File->GetFileHandle());
+	ZEUInt64 FileCursorBeforeChunkExists = _ftelli64((FILE*)File->GetFileHandle());
 
 	bool control;
 
 	// Go to end of file
 	_fseeki64((FILE*)File->GetFileHandle(),0, SEEK_END);
 
-	ZEQWORD EndOfFile = 0;
+	ZEUInt64 EndOfFile = 0;
 
 	//Store end of file
 	EndOfFile = _ftelli64((FILE*)File->GetFileHandle());
 
 	// Get records start position
-	_fseeki64((FILE*)File->GetFileHandle(),-(ZEINT64)sizeof(ZEQWORD), SEEK_END);
-	ZEQWORD RecordsStartPosition = 0;
-	fread(&RecordsStartPosition, (ZEINT64)(ZEINT64)sizeof(ZEQWORD), 1,(FILE*)File->GetFileHandle());
+	_fseeki64((FILE*)File->GetFileHandle(),-(ZEInt64)sizeof(ZEUInt64), SEEK_END);
+	ZEUInt64 RecordsStartPosition = 0;
+	fread(&RecordsStartPosition, (ZEInt64)(ZEInt64)sizeof(ZEUInt64), 1,(FILE*)File->GetFileHandle());
 
 	//Take first header as active header
-	ZEQWORD NextHeaderPosition = RecordsStartPosition;
+	ZEUInt64 NextHeaderPosition = RecordsStartPosition;
 
 	// Search for the identifier between CurrentPosition && EndOfFile
 	while(NextHeaderPosition < EndOfFile)
@@ -217,20 +217,20 @@ bool ZEPack::ChunkExists(const char* IdentifierName)
 }
 
 //Returns hash code
-ZEQWORD ZEPack::GetHash(const char* Identifier)
+ZEUInt64 ZEPack::GetHash(const char* Identifier)
 {
 	char ChunkName[256];
 	strncpy(ChunkName,Identifier,256);
-	ZEQWORD Hash = 0;
-	ZEQWORD I = 0;	
-	ZEQWORD Char = 0;
+	ZEUInt64 Hash = 0;
+	ZEUInt64 I = 0;	
+	ZEUInt64 Char = 0;
 	while(I < ZE_MAX_FILE_NAME_SIZE)
 	{
 		Char = ChunkName[I];
 		Hash = Char + (Hash << 6) + (Hash << 16) - Hash;
 		I++;
 	}
-	return (ZEQWORD)Hash;
+	return (ZEUInt64)Hash;
 }
 
 //Deletes a chunk
@@ -249,30 +249,30 @@ bool ZEPack::DeleteChunk(const char* IdentifierName)
 
 	ZEChunkHeader TemporaryHeader;
 
-	ZEQWORD ChunkWillBeDeletedStartPoint;
-	ZEQWORD ChunkWillBeDeletedSize;
-	ZEQWORD ChunkWillBeDeletedEndPoint;
-	ZEQWORD HeaderWillBeDeletedStartPoint;
-	ZEQWORD HeaderWillBeDeletedSize;
-	ZEQWORD HeaderWillBeDeletedEndPoint;
-	ZEQWORD NewEndOfFile;
-	ZEQWORD ChunkWillBeDeletedSizeD;
+	ZEUInt64 ChunkWillBeDeletedStartPoint;
+	ZEUInt64 ChunkWillBeDeletedSize;
+	ZEUInt64 ChunkWillBeDeletedEndPoint;
+	ZEUInt64 HeaderWillBeDeletedStartPoint;
+	ZEUInt64 HeaderWillBeDeletedSize;
+	ZEUInt64 HeaderWillBeDeletedEndPoint;
+	ZEUInt64 NewEndOfFile;
+	ZEUInt64 ChunkWillBeDeletedSizeD;
 
 	//Go to end of file
 	_fseeki64((FILE*)File->GetFileHandle(),0,SEEK_END);
 
 	//Get end of file position
-	ZEQWORD EndOfFile = _ftelli64((FILE*)File->GetFileHandle());
+	ZEUInt64 EndOfFile = _ftelli64((FILE*)File->GetFileHandle());
 
 	//Go to chunk headers' end positions storage position
-	_fseeki64((FILE*)File->GetFileHandle(),-(ZEINT64)sizeof(ZEQWORD),SEEK_END);
+	_fseeki64((FILE*)File->GetFileHandle(),-(ZEInt64)sizeof(ZEUInt64),SEEK_END);
 
 	//Get chunk headers' start position
-	ZEQWORD RecordsStartPosition =0;
-	fread(&RecordsStartPosition,(ZEINT64)sizeof(ZEQWORD),1,(FILE*)File->GetFileHandle());
+	ZEUInt64 RecordsStartPosition =0;
+	fread(&RecordsStartPosition,(ZEInt64)sizeof(ZEUInt64),1,(FILE*)File->GetFileHandle());
 
 	//Set current headers position to headers' start position
-	ZEQWORD NextHeaderPosition = RecordsStartPosition;
+	ZEUInt64 NextHeaderPosition = RecordsStartPosition;
 
 	//Control end of file is reached or data to delete is found
 	while(NextHeaderPosition < EndOfFile && !WeGotDataToDelete)
@@ -351,13 +351,13 @@ bool ZEPack::DeleteChunk(const char* IdentifierName)
 		NewEndOfFile = EndOfFile - HeaderWillBeDeletedSize - ChunkWillBeDeletedSize;
 
 		//Go to new end of file
-		_fseeki64((FILE*)File->GetFileHandle(),NewEndOfFile -(ZEINT64)sizeof(ZEQWORD),SEEK_SET);
+		_fseeki64((FILE*)File->GetFileHandle(),NewEndOfFile -(ZEInt64)sizeof(ZEUInt64),SEEK_SET);
 
 		//Recalculate headers start position
 		RecordsStartPosition -= ChunkWillBeDeletedSize;
 
 		//Write headers start position to new end of file
-		fwrite(&RecordsStartPosition,(ZEINT64)sizeof(ZEQWORD),1,(FILE*)File->GetFileHandle());
+		fwrite(&RecordsStartPosition,(ZEInt64)sizeof(ZEUInt64),1,(FILE*)File->GetFileHandle());
 		File->Close();
 
 		//Create a handle of file 
@@ -426,28 +426,28 @@ bool ZEPack::DeleteChunk(const char* IdentifierName)
 }
 
 //Adds a chunk 
-bool ZEPack::AddChunk(const char* IdentifierName,unsigned char* Source,ZEQWORD SourceSize)
+bool ZEPack::AddChunk(const char* IdentifierName,unsigned char* Source,ZEUInt64 SourceSize)
 {
 	//if file is not open return false
 	if( !File || !File->IsOpen())
 		return false;
 
 	//Go to headers' start position
-	_fseeki64((FILE*)File->GetFileHandle(),-(ZEINT64)sizeof(ZEQWORD),SEEK_END);
+	_fseeki64((FILE*)File->GetFileHandle(),-(ZEInt64)sizeof(ZEUInt64),SEEK_END);
 
 	//Get chunk headers' end position
-	ZEQWORD OldRecordsEndPosition = _ftelli64((FILE*)File->GetFileHandle());
+	ZEUInt64 OldRecordsEndPosition = _ftelli64((FILE*)File->GetFileHandle());
 	
 	//Get chunk headers' start position
-	ZEQWORD OldRecordsStartPosition = 0;
+	ZEUInt64 OldRecordsStartPosition = 0;
 
-	fread(&OldRecordsStartPosition,(ZEINT64)sizeof(ZEQWORD),1,(FILE*)File->GetFileHandle());
+	fread(&OldRecordsStartPosition,(ZEInt64)sizeof(ZEUInt64),1,(FILE*)File->GetFileHandle());
 
 	//Calculate chunk headers' total size
-	ZEQWORD OldRecordSize = OldRecordsEndPosition - OldRecordsStartPosition;
+	ZEUInt64 OldRecordSize = OldRecordsEndPosition - OldRecordsStartPosition;
 
 	//Calculate new start position for chunk headers
-	ZEQWORD NewRecorsStartPosition = OldRecordsStartPosition + SourceSize;
+	ZEUInt64 NewRecorsStartPosition = OldRecordsStartPosition + SourceSize;
 
 	//Create buffer for keeping buffers at process
 	unsigned char* bufferForHeaders = new unsigned char[(unsigned int)OldRecordSize];
@@ -459,19 +459,19 @@ bool ZEPack::AddChunk(const char* IdentifierName,unsigned char* Source,ZEQWORD S
 	fread(bufferForHeaders, (unsigned int)OldRecordSize, 1, (FILE*)File->GetFileHandle());
 
 	//Set new chunks start position to chunk headers' old start position
-	ZEQWORD NewChunkPosition = OldRecordsStartPosition;
+	ZEUInt64 NewChunkPosition = OldRecordsStartPosition;
 
 	//Go to new chunks start position
 	_fseeki64((FILE*)File->GetFileHandle(), NewChunkPosition, SEEK_SET);
 
 	//Calculate total size of compressed data
-	ZEQWORD ChunkCompressedSize = File->Write(Source, SourceSize, 1);
+	ZEUInt64 ChunkCompressedSize = File->Write(Source, SourceSize, 1);
 
 	//Calculate where headers position will start ( just after added chunk ) 
-	ZEQWORD RecordsStartPosition = _ftelli64((FILE*)File->GetFileHandle());
+	ZEUInt64 RecordsStartPosition = _ftelli64((FILE*)File->GetFileHandle());
 
 	//Calculate headers total size
-	ZEQWORD RecordsEndPosition = RecordsStartPosition + OldRecordSize;
+	ZEUInt64 RecordsEndPosition = RecordsStartPosition + OldRecordSize;
 
 	//Go to headers start position
 	_fseeki64((FILE*)File->GetFileHandle(), RecordsStartPosition, SEEK_SET);
@@ -479,9 +479,9 @@ bool ZEPack::AddChunk(const char* IdentifierName,unsigned char* Source,ZEQWORD S
 	//Write headers from buffer 
 	fwrite(bufferForHeaders, OldRecordSize, 1, (FILE*)File->GetFileHandle());
 
-	_fseeki64((FILE*)File->GetFileHandle(), -(ZEINT64)sizeof(ZEChunkHeader),SEEK_CUR);
+	_fseeki64((FILE*)File->GetFileHandle(), -(ZEInt64)sizeof(ZEChunkHeader),SEEK_CUR);
 
-	ZEQWORD NewChunkPositionDecompressed = 0;
+	ZEUInt64 NewChunkPositionDecompressed = 0;
 	ZEChunkHeader TemporaryChunkHeader;
 	fread(&TemporaryChunkHeader, sizeof(ZEChunkHeader), 1, (FILE*)File->GetFileHandle());
 	if( TemporaryChunkHeader.Header == 'ZECH')
@@ -513,11 +513,11 @@ bool ZEPack::AddChunk(const char* IdentifierName,unsigned char* Source,ZEQWORD S
 	_fseeki64((FILE*)File->GetFileHandle(),RecordsEndPosition + sizeof(ZEChunkHeader),SEEK_SET);
 
 	//Write start position of headers
-	fwrite(&RecordsStartPosition,(ZEINT64)sizeof(ZEQWORD),1,(FILE*)File->GetFileHandle());
+	fwrite(&RecordsStartPosition,(ZEInt64)sizeof(ZEUInt64),1,(FILE*)File->GetFileHandle());
 	File->Close();
 
 	//Calculate new end of file
-	ZEQWORD NewEndOfFile = RecordsEndPosition + sizeof(ZEChunkHeader) + (ZEINT64)sizeof(ZEQWORD);
+	ZEUInt64 NewEndOfFile = RecordsEndPosition + sizeof(ZEChunkHeader) + (ZEInt64)sizeof(ZEUInt64);
 
 	//Create handle
 	HANDLE FileHandle;
@@ -548,20 +548,20 @@ bool ZEPack::GetChunk(const char *IdentifierName, unsigned char *Data)
 	strncpy(ChunkName,IdentifierName,256);
 
 	//Get hash
-	ZEQWORD Hash = GetHash(IdentifierName);
+	ZEUInt64 Hash = GetHash(IdentifierName);
 
 	//Go to headers' end position
-	_fseeki64((FILE*)File->GetFileHandle(),-(ZEINT64)sizeof(ZEQWORD),SEEK_END);
+	_fseeki64((FILE*)File->GetFileHandle(),-(ZEInt64)sizeof(ZEUInt64),SEEK_END);
 
 	//Store headers' end position
-	ZEQWORD RecordsEndPosition = _ftelli64((FILE*)File->GetFileHandle());
+	ZEUInt64 RecordsEndPosition = _ftelli64((FILE*)File->GetFileHandle());
 
 	//Store headers' start position
-	ZEQWORD RecordsStartPosition=0;
-	fread(&RecordsStartPosition,(ZEINT64)sizeof(ZEQWORD),1,(FILE*)File->GetFileHandle());
+	ZEUInt64 RecordsStartPosition=0;
+	fread(&RecordsStartPosition,(ZEInt64)sizeof(ZEUInt64),1,(FILE*)File->GetFileHandle());
 
 	//Set current header position to headers' start position
-	ZEQWORD CurrentHeaderPosition = RecordsStartPosition;
+	ZEUInt64 CurrentHeaderPosition = RecordsStartPosition;
 
 	while(true)
 	{
@@ -614,20 +614,20 @@ bool ZEPack::OpenChunk(ZEPartialCompressedFile& PartialFile, const char* Identif
 	strncpy(ChunkName,IdentifierName,256);
 
 	//Get hash
-	ZEQWORD Hash = GetHash(IdentifierName);
+	ZEUInt64 Hash = GetHash(IdentifierName);
 
 	//Go to headers' end position
-	_fseeki64((FILE*)File->GetFileHandle(),-(ZEINT64)sizeof(ZEQWORD),SEEK_END);
+	_fseeki64((FILE*)File->GetFileHandle(),-(ZEInt64)sizeof(ZEUInt64),SEEK_END);
 
 	//Store headers' end position
-	ZEQWORD RecordsEndPosition = _ftelli64((FILE*)File->GetFileHandle());
+	ZEUInt64 RecordsEndPosition = _ftelli64((FILE*)File->GetFileHandle());
 
 	//Store headers' start position
-	ZEQWORD RecordsStartPosition=0;
-	fread(&RecordsStartPosition,(ZEINT64)sizeof(ZEQWORD),1,(FILE*)File->GetFileHandle());
+	ZEUInt64 RecordsStartPosition=0;
+	fread(&RecordsStartPosition,(ZEInt64)sizeof(ZEUInt64),1,(FILE*)File->GetFileHandle());
 
 	//Set current header position to headers' start position
-	ZEQWORD CurrentHeaderPosition = RecordsStartPosition;
+	ZEUInt64 CurrentHeaderPosition = RecordsStartPosition;
 
 	while(true)
 	{
@@ -654,8 +654,8 @@ bool ZEPack::OpenChunk(ZEPartialCompressedFile& PartialFile, const char* Identif
 		//Check hash
 		if(Hash == Header.ChunkHash && Control)
 		{
-			ZEQWORD Offset = 0;
-			ZEQWORD Size = Header.ChunkSize;
+			ZEUInt64 Offset = 0;
+			ZEUInt64 Size = Header.ChunkSize;
 			File->Seek(Offset,ZE_SF_BEGINING);
 			_fseeki64((FILE*)File->GetFileHandle(),Header.ChunkPosition,SEEK_SET);
 			if(Offset + Size > Header.ChunkSize)

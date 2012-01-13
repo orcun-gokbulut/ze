@@ -36,25 +36,21 @@
 #ifndef __ZE_TYPES_H__
 #define __ZE_TYPES_H__
 
-typedef signed char			ZEINT8;
-typedef signed short int	ZEINT16;
-typedef signed int			ZEINT32;
-typedef signed long long	ZEINT64;
+typedef signed char			ZEInt8;
+typedef signed short int	ZEInt16;
+typedef signed int			ZEInt32;
+typedef signed long long	ZEInt64;
 typedef signed int			ZEInt;
 
-typedef unsigned char		ZEUINT8;
-typedef unsigned short int	ZEUINT16;
-typedef unsigned int		ZEUINT32;
-typedef unsigned long long	ZEUINT64;
+typedef unsigned char		ZEUInt8;
+typedef unsigned short int	ZEUInt16;
+typedef unsigned int		ZEUInt32;
+typedef unsigned long long	ZEUInt64;
 typedef unsigned int		ZEUInt;
 
-typedef float				ZEFloat32;
-typedef double				ZEFloat64;
-typedef unsigned char		ZEChar;
-
-#define ZEBYTE				ZEUINT8
-#define ZEWORD				ZEUINT16
-#define ZEDWORD				ZEUINT32
-#define ZEQWORD				ZEUINT64
+#define ZEUInt8				ZEUInt8
+#define ZEUInt16			ZEUInt16
+#define ZEUInt32			ZEUInt32
+#define ZEUInt64			ZEUInt64
 
 #endif

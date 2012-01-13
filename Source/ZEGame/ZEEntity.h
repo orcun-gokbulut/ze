@@ -97,7 +97,7 @@ enum ZEEntityType
 };
 
 // ZEDrawFlags
-typedef ZEDWORD ZEDrawFlags;
+typedef ZEUInt32 ZEDrawFlags;
 #define ZE_DF_NONE								0
 #define ZE_DF_DRAW								1
 #define ZE_DF_DRAW_COMPONENTS					2
@@ -108,12 +108,12 @@ typedef ZEDWORD ZEDrawFlags;
 #define ZE_DF_AUTO								64
 
 // ZERayCastFlags
-typedef ZEDWORD ZERayCastFlags;
+typedef ZEUInt32 ZERayCastFlags;
 #define ZE_RCF_INTERNAL							0
 #define ZE_RCF_BOUNDING_BOX						1
 
 // Entity Dirty Flags
-typedef ZEDWORD ZEEntityDirtyFlags;
+typedef ZEUInt32 ZEEntityDirtyFlags;
 #define ZE_EDF_ALL								0xFFFFFFFF
 #define ZE_EDF_LOCAL_TRANSFORM					1
 #define ZE_EDF_WORLD_TRANSFORM					2
@@ -149,8 +149,8 @@ class ZEEntity : public ZEObject
 		virtual									~ZEEntity();
 
 	public:
-		virtual ZEDWORD							GetDrawFlags() const;
-		virtual ZEDWORD							GetRayCastFlags() const;
+		virtual ZEUInt32							GetDrawFlags() const;
+		virtual ZEUInt32							GetRayCastFlags() const;
 
 		virtual ZEEntityType					GetEntityType();
 

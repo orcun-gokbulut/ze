@@ -64,10 +64,10 @@ class ZEVRPNInputDevice : public ZEInputDevice
 		
 		virtual const ZEString&			GetDeviceName();
 
-		virtual ZEDWORD					GetAxisCount();
-		virtual ZEDWORD					GetButtonCount();
-		virtual ZEDWORD					GetVector3Count();
-		virtual ZEDWORD					GetQuaternionCount();
+		virtual ZEUInt32					GetAxisCount();
+		virtual ZEUInt32					GetButtonCount();
+		virtual ZEUInt32					GetVector3Count();
+		virtual ZEUInt32					GetQuaternionCount();
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();

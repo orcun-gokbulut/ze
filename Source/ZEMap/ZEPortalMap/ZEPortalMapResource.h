@@ -60,7 +60,7 @@ struct ZEPortalMapPolygon
 
 struct ZEPortalMapPhysicalMeshPolygon
 {
-	ZEDWORD			Indices[3];
+	ZEUInt32			Indices[3];
 };
 
 struct ZEPortalMapResourcePhysicalMesh

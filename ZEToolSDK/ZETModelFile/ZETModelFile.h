@@ -96,7 +96,7 @@ enum ZEPhysicalJointType
 struct ZEModelFileMaterial
 {
 	char										Shader[ZE_MDLF_MAX_FILENAME_SIZE];
-	ZEDWORD										ShaderComponents;
+	ZEUInt32										ShaderComponents;
 	
 	bool										TwoSided;
 	bool										LightningEnabled;
@@ -133,7 +133,7 @@ struct ZEModelFileSkinnedVertex
 	ZEVector3									Tangent;
 	ZEVector3									Binormal;
 	ZEVector2									Texcoord;
-	ZEBYTE										BoneIndices[4];
+	ZEUInt8										BoneIndices[4];
 	float										BoneWeights[4];
 };
 
@@ -148,16 +148,16 @@ struct ZEModelFileVertex
 
 struct ZEModelFileMeshLOD
 {
-	ZEINT32										LODLevel;
-	ZEINT32										MaterialId;
+	ZEInt32										LODLevel;
+	ZEInt32										MaterialId;
 	ZEArray<ZEModelFileVertex>					Vertices;
 	ZEArray<ZEModelFileSkinnedVertex>			SkinnedVertices;
-	ZEArray<ZEDWORD>							AffectingBoneIds;
+	ZEArray<ZEUInt32>							AffectingBoneIds;
 };
 
 struct ZEModelFilePhysicalPolygon
 {
-	ZEDWORD										Indices[3];
+	ZEUInt32										Indices[3];
 };
 
 struct ZEModelFilePhysicalShape
@@ -231,14 +231,14 @@ struct ZEModelFileMesh
 
 struct ZEModelFilePhysicalJoint
 {
-	ZEDWORD										ChunkId;
+	ZEUInt32										ChunkId;
 
-	ZEDWORD										JointType;
+	ZEUInt32										JointType;
 
 	bool										Enabled;
 
-	ZEDWORD										Body1Id;
-	ZEDWORD										Body2Id;
+	ZEUInt32										Body1Id;
+	ZEUInt32										Body2Id;
 
 	bool										CollideBodies;
 
@@ -257,16 +257,16 @@ struct ZEModelFilePhysicalJoint
 	float										BreakForce;
 	float										BreakTorque;
 
-	ZEDWORD										XMotion;
-	ZEDWORD										YMotion;
-	ZEDWORD										ZMotion;
+	ZEUInt32										XMotion;
+	ZEUInt32										YMotion;
+	ZEUInt32										ZMotion;
 
 	float 										LinearLimitValue;
 	float 										LinearLimitRestitution;
 	float 										LinearLimitSpring;
 	float 										LinearLimitDamping;
 
-	ZEDWORD										TwistMotion;
+	ZEUInt32										TwistMotion;
 	float 										TwistLowLimitValue;
 	float 										TwistLowLimitRestitution;
 	float 										TwistLowLimitSpring;
@@ -276,13 +276,13 @@ struct ZEModelFilePhysicalJoint
 	float 										TwistHighLimitSpring;
 	float 										TwistHighLimitDamping;
 
-	ZEDWORD										Swing1Motion;
+	ZEUInt32										Swing1Motion;
 	float 										Swing1LimitValue;
 	float 										Swing1LimitRestitution;
 	float 										Swing1LimitSpring;
 	float 										Swing1LimitDamping;
 
-	ZEDWORD										Swing2Motion;
+	ZEUInt32										Swing2Motion;
 	float 										Swing2LimitValue;
 	float 										Swing2LimitRestitution;
 	float 										Swing2LimitSpring;
@@ -293,32 +293,32 @@ struct ZEModelFilePhysicalJoint
 	ZEVector3 									MotorTargetVelocity;
 	ZEVector3 									MotorTargetAngularVelocity;
 
-	ZEDWORD 									LinearXMotor;
+	ZEUInt32 									LinearXMotor;
 	float 										LinearXMotorForce;
 	float 										LinearXMotorSpring;
 	float 										LinearXMotorDamper;
 
-	ZEDWORD 									LinearYMotor;
+	ZEUInt32 									LinearYMotor;
 	float 										LinearYMotorForce;
 	float 										LinearYMotorSpring;
 	float 										LinearYMotorDamper;
 
-	ZEDWORD 									LinearZMotor;
+	ZEUInt32 									LinearZMotor;
 	float 										LinearZMotorForce;
 	float 										LinearZMotorSpring;
 	float 										LinearZMotorDamper;
 
-	ZEDWORD										AngularSwingMotor;
+	ZEUInt32										AngularSwingMotor;
 	float										AngularSwingMotorForce;
 	float										AngularSwingMotorSpring;
 	float										AngularSwingMotorDamper;
 
-	ZEDWORD										AngularTwistMotor;
+	ZEUInt32										AngularTwistMotor;
 	float										AngularTwistMotorForce;
 	float										AngularTwistMotorSpring;
 	float										AngularTwistMotorDamper;
 
-	ZEDWORD										AngularSlerpMotor;
+	ZEUInt32										AngularSlerpMotor;
 	float										AngularSlerpMotorForce;
 	float										AngularSlerpMotorSpring;
 	float										AngularSlerpMotorDamper;
@@ -329,7 +329,7 @@ struct ZEModelFilePhysicalJoint
 struct ZEModelFileBone
 {
 	char										Name[ZE_MDLF_MAX_NAME_SIZE];
-	ZEINT32										ParentBone;
+	ZEInt32										ParentBone;
 	ZEVector3									RelativePosition;
 	ZEQuaternion								RelativeRotation;
 	ZEVector3									RelativeScale;
@@ -340,7 +340,7 @@ struct ZEModelFileBone
 
 struct ZEModelFileAnimationKey
 {
-	ZEDWORD										ItemId;
+	ZEUInt32										ItemId;
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;
 	ZEVector3									Scale;

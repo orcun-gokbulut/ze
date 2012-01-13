@@ -71,7 +71,7 @@ class ZESceneCuller
 		ZECullStatistics				Statistics;
 
 		ZESceneDebugDraw				DebugDraw;
-		ZEDWORD							DebugDrawElements;
+		ZEUInt32							DebugDrawElements;
 
 		void							DebugDrawEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
 		void							DebugDrawLight(ZELight* Light, ZEDrawParameters* DrawParameters);
@@ -85,8 +85,8 @@ class ZESceneCuller
 	public:
 		virtual const ZECullStatistics&	GetStatistics();
 
-		void							SetDebugDrawElements(ZEDWORD Elements);
-		ZEDWORD							SetDebugDrawElements();
+		void							SetDebugDrawElements(ZEUInt32 Elements);
+		ZEUInt32							SetDebugDrawElements();
 
 		virtual void					CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters);
 

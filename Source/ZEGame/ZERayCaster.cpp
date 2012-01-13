@@ -69,7 +69,7 @@ ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Posi
 	{
 		ZEEntity* CurrentEntity = Entities[I];
 
-		ZEDWORD RayCastFlags = CurrentEntity->GetRayCastFlags();
+		ZEUInt32 RayCastFlags = CurrentEntity->GetRayCastFlags();
 		if (RayCastFlags == ZE_RCF_BOUNDING_BOX)
 		{
 			if (!ZEAABBox::IntersectionTest(CurrentEntity->GetWorldBoundingBox(), Ray, MinT, MaxT))

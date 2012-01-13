@@ -39,7 +39,7 @@
 
 #include "ZEMeta/ZEObject.h"
 
-typedef ZEDWORD ZEMaterialFlags;
+typedef ZEUInt32 ZEMaterialFlags;
 #define ZE_MTF_NONE						0
 #define ZE_MTF_PRE_Z_PASS				1
 #define ZE_MTF_G_BUFFER_PASS			2

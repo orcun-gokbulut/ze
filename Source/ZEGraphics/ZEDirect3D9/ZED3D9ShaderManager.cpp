@@ -38,9 +38,9 @@
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9Module.h"
 
-ZEDWORD ZED3D9ShaderManager::CalculateHash(const char* FileName, const char* FunctionName, ZEDWORD Components)
+ZEUInt32 ZED3D9ShaderManager::CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components)
 {
-	ZEDWORD Hash = 0;
+	ZEUInt32 Hash = 0;
 	size_t Index = 0;
 
 	while(FileName[Index] != '\0')
@@ -74,12 +74,12 @@ void ZED3D9ShaderManager::ReleaseShader(ZED3D9Shader* Shader)
 	}
 }
 
-bool ZED3D9ShaderManager::ReadFromFileCache(const char* Filename, const char* FunctionName, ZEDWORD Components)
+bool ZED3D9ShaderManager::ReadFromFileCache(const char* Filename, const char* FunctionName, ZEUInt32 Components)
 {
 	return false;
 }
 
-void ZED3D9ShaderManager::WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEDWORD Components)
+void ZED3D9ShaderManager::WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEUInt32 Components)
 {
 
 }
@@ -94,10 +94,10 @@ ZED3D9ShaderManager::~ZED3D9ShaderManager()
 
 }
 
-ZED3D9Shader* ZED3D9ShaderManager::GetShader(const char* FileName, const char* FunctionName, ZEDWORD Components, ZED3D9ShaderType Type, const char* Profile)
+ZED3D9Shader* ZED3D9ShaderManager::GetShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile)
 {
 	// Check Memory Cache
-	ZEDWORD Hash = CalculateHash(FileName, FunctionName, Components);
+	ZEUInt32 Hash = CalculateHash(FileName, FunctionName, Components);
 	for (size_t I = 0; I < Shaders.GetCount(); I++)
 		if (Shaders[I] != NULL)
 			if (Shaders[I]->Hash == Hash)
@@ -154,12 +154,12 @@ ZED3D9Shader* ZED3D9ShaderManager::GetShader(const char* FileName, const char* F
 	return Shader;
 }
 
-ZED3D9PixelShader* ZED3D9ShaderManager::GetPixelShader(const char* FileName, const char* FunctionName, ZEDWORD Components, const char* Profile)
+ZED3D9PixelShader* ZED3D9ShaderManager::GetPixelShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile)
 {
 	return (ZED3D9PixelShader*)GetShader(FileName, FunctionName, Components, ZE_D3D9_ST_PIXEL, Profile);
 }
 
-ZED3D9VertexShader* ZED3D9ShaderManager::GetVertexShader(const char* FileName, const char* FunctionName, ZEDWORD Components, const char* Profile)
+ZED3D9VertexShader* ZED3D9ShaderManager::GetVertexShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile)
 {
 	return (ZED3D9VertexShader*)GetShader(FileName, FunctionName, Components, ZE_D3D9_ST_VERTEX, Profile);
 }

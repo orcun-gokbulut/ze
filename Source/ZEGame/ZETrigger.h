@@ -95,7 +95,7 @@ class ZETrigger : public ZEEntity
 									ZETrigger();
 
 	public:
-		virtual	ZEDWORD				GetDrawFlags();
+		virtual	ZEUInt32				GetDrawFlags();
 
 		virtual void				SetScale(const ZEVector3& Scale);
 

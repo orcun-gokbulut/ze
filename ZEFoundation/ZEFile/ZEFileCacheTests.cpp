@@ -61,7 +61,7 @@ class ZECacheTextDataIdentifier : public ZECacheDataIdentifier
 
 		}
 
-		virtual ZEQWORD	GetHash() const
+		virtual ZEUInt64	GetHash() const
 		{
 			unsigned int Hash = 0;
 			unsigned int I = 0;	
@@ -74,22 +74,22 @@ class ZECacheTextDataIdentifier : public ZECacheDataIdentifier
 				I++;
 			}
 
-			return (ZEQWORD)Hash;
+			return (ZEUInt64)Hash;
 		}
-		virtual ZEQWORD	Write(ZEFile* File) const
+		virtual ZEUInt64	Write(ZEFile* File) const
 		{
-			ZEQWORD BytesWritten = 0;
-			ZEQWORD WriteCount = 0;
+			ZEUInt64 BytesWritten = 0;
+			ZEUInt64 WriteCount = 0;
 			size_t ZeCharSize = sizeof(char);
 
-			WriteCount = File->Write(ItemName, (ZEQWORD)ZeCharSize, ZE_MAX_FILE_NAME_SIZE);
+			WriteCount = File->Write(ItemName, (ZEUInt64)ZeCharSize, ZE_MAX_FILE_NAME_SIZE);
 			if (WriteCount != ZE_MAX_FILE_NAME_SIZE)
 			{
 				return 0;
 			}
 			else
 			{
-				BytesWritten += WriteCount * (ZEQWORD)ZeCharSize;
+				BytesWritten += WriteCount * (ZEUInt64)ZeCharSize;
 				WriteCount = 0;
 			}
 
@@ -196,7 +196,7 @@ ZETestSuite(ZEFileCache)
 			//ZETestCheck(!ZEFileCache::IsFileCache("ZEfile.txt"));
 		}
 	}
-	ZETest("bool ZEFileCache::AddData(const ZECacheDataIdentifier * Identifier, const void * Data, ZEQWORD Size)")
+	ZETest("bool ZEFileCache::AddData(const ZECacheDataIdentifier * Identifier, const void * Data, ZEUInt64 Size)")
 	{
 		ZECacheTextDataIdentifier Identifier1("ZETestData1");
 		ZECacheTextDataIdentifier Identifier2("ZETestData2");
@@ -248,7 +248,7 @@ ZETestSuite(ZEFileCache)
 			}
 
 			ZEFile File;
-			//ZEQWORD Word;
+			//ZEUInt64 Word;
 			FileCache.Open("ZEFileCacheClearTests.txt");
 			ZECacheTextDataIdentifier Identifier1("ZETestData1");
 			FileCache.AddData(&Identifier1, Buffer, sizeof(unsigned char) * 4999);
@@ -264,7 +264,7 @@ ZETestSuite(ZEFileCache)
 			ZETestCheck(!FileCache.Clear());
 		}
 	}
-	ZETest("bool ZEFileCache::GetData(const ZECacheDataIdentifier * Identifier, void * Buffer, ZEQWORD Offset, ZEQWORD Size)")
+	ZETest("bool ZEFileCache::GetData(const ZECacheDataIdentifier * Identifier, void * Buffer, ZEUInt64 Offset, ZEUInt64 Size)")
 	{
 
 		ZECacheTextDataIdentifier Identifier1("ZETestData1");
@@ -314,7 +314,7 @@ ZETestSuite(ZEFileCache)
 		ZETestCheck(!memcmp(Buffer2, Buffer, sizeof(unsigned char) * 4999));
 		remove("ZETestData.gokay");	
 	}
-	ZETest("bool ZEFileCache::Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifier* Identifier, ZEQWORD ChunkSize)")
+	ZETest("bool ZEFileCache::Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifier* Identifier, ZEUInt64 ChunkSize)")
 	{
 		ZETestCase("writing by using partial file")
 		{

@@ -42,25 +42,25 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 
 
-#define ZE_FILE_FORMAT_MAKEVERSION(Major, Minor)		((ZEDWORD)((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor)))
-#define ZE_FILE_FORMAT_GETMINORVERSION(x)				((ZEDWORD)((x) & 0x0000FFFF))
-#define ZE_FILE_FORMAT_GETMAJORVERSION(x)				((ZEDWORD)(((x) & 0xFFFF0000) >> 16))
+#define ZE_FILE_FORMAT_MAKEVERSION(Major, Minor)		((ZEUInt32)((((ZEUInt32)(Major)) << 16) + (ZEUInt32)(Minor)))
+#define ZE_FILE_FORMAT_GETMINORVERSION(x)				((ZEUInt32)((x) & 0x0000FFFF))
+#define ZE_FILE_FORMAT_GETMAJORVERSION(x)				((ZEUInt32)(((x) & 0xFFFF0000) >> 16))
 
 #define ZE_VERTEX_DECLARATION_FILE_VERSION				ZE_FILE_FORMAT_MAKEVERSION(0,1)
-#define ZE_VERTEX_DECLARATION_FILE_HEADER_CHUNK_ID		(ZEDWORD)'ZEVD'
+#define ZE_VERTEX_DECLARATION_FILE_HEADER_CHUNK_ID		(ZEUInt32)'ZEVD'
 
 struct ZEVertexDeclarationFileHeaderChunk
 {
-	ZEDWORD		ChunkIndentifier;
-	ZEDWORD		Version;
-	ZEDWORD		VertexElementCount;
+	ZEUInt32		ChunkIndentifier;
+	ZEUInt32		Version;
+	ZEUInt32		VertexElementCount;
 };
 
 struct ZEVertexDeclarationFileElementChunk
 {
-	ZEDWORD		Semantic;
-	ZEDWORD		Type;
-	ZEDWORD		Index;
+	ZEUInt32		Semantic;
+	ZEUInt32		Type;
+	ZEUInt32		Index;
 };
 
 static ZEString ConstructResourcePath(const ZEString& Path)

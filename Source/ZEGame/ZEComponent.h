@@ -75,7 +75,7 @@ class ZEComponent : public ZEEntity
 		ZEEntityType					GetEntityType();
 
 		virtual ZECompoundEntity*		GetOwner() const;
-		virtual	ZEDWORD					GetDrawFlags() const;
+		virtual	ZEUInt32					GetDrawFlags() const;
 
 		const ZEMatrix4x4&				GetWorldTransform() const;
 		const ZEMatrix4x4&				GetLocalTransform() const;

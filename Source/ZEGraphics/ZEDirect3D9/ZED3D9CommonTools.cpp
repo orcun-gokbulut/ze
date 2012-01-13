@@ -160,7 +160,7 @@ D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 	}
 }
 
-bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* FileName, const char* MainFunction, const char* ShaderProfile, ZEDWORD Components)
+bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* FileName, const char* MainFunction, const char* ShaderProfile, ZEUInt32 Components)
 {
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
@@ -215,7 +215,7 @@ bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShade
 }
 
 
-bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, const char* FileName, const char* MainFunction, const char* ShaderProfile, ZEDWORD Components)
+bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, const char* FileName, const char* MainFunction, const char* ShaderProfile, ZEUInt32 Components)
 {
 	LPD3DXBUFFER ShaderBuffer = NULL;
 	LPD3DXBUFFER CompilerOutput = NULL;
@@ -266,7 +266,7 @@ bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, 
 	return true;
 }
 
-bool ZED3D9CommonTools::CompileVertexShaderFromMemory(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEDWORD Components)
+bool ZED3D9CommonTools::CompileVertexShaderFromMemory(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEUInt32 Components)
 {
 	LPD3DXBUFFER ShaderBuffer;
 	LPD3DXBUFFER CompilerOutput;
@@ -312,7 +312,7 @@ bool ZED3D9CommonTools::CompileVertexShaderFromMemory(LPDIRECT3DVERTEXSHADER9* V
 }
 
 
-bool ZED3D9CommonTools::CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* PixelShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEDWORD Components)
+bool ZED3D9CommonTools::CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* PixelShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEUInt32 Components)
 {
 	LPD3DXBUFFER ShaderBuffer;
 	LPD3DXBUFFER CompilerOutput;

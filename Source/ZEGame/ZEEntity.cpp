@@ -46,12 +46,12 @@ void ZEEntity::SetLocalBoundingBox(const ZEAABBox& BoundingBox)
 	LocalBoundingBox = BoundingBox;
 }
 		
-ZEDWORD ZEEntity::GetDrawFlags() const
+ZEUInt32 ZEEntity::GetDrawFlags() const
 {
 	return ZE_DF_NONE;
 }
 
-ZEDWORD ZEEntity::GetRayCastFlags() const
+ZEUInt32 ZEEntity::GetRayCastFlags() const
 {
 	return ZE_RCF_BOUNDING_BOX;
 }

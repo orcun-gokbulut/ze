@@ -42,7 +42,7 @@ ZETextureCacheDataIdentifier::ZETextureCacheDataIdentifier( )
 	/* Empty */
 }
 
-ZETextureCacheDataIdentifier::ZETextureCacheDataIdentifier( const char* ItemName, const ZETextureOptions &TextureOptions, ZEQWORD Offset )
+ZETextureCacheDataIdentifier::ZETextureCacheDataIdentifier( const char* ItemName, const ZETextureOptions &TextureOptions, ZEUInt64 Offset )
 {
 	sprintf_s(this->ItemName, sizeof(char) * ZE_MAX_FILE_NAME_SIZE, "%s", ItemName);
 
@@ -55,12 +55,12 @@ ZETextureCacheDataIdentifier::~ZETextureCacheDataIdentifier()
 	// Empty
 }
 
-ZEQWORD ZETextureCacheDataIdentifier::GetDataSize()const
+ZEUInt64 ZETextureCacheDataIdentifier::GetDataSize()const
 {
 	return 288;
 }
 
-ZEQWORD ZETextureCacheDataIdentifier::GetHash() const
+ZEUInt64 ZETextureCacheDataIdentifier::GetHash() const
 {
 	unsigned int Hash = 0;
 	unsigned int I = 0;	
@@ -73,49 +73,49 @@ ZEQWORD ZETextureCacheDataIdentifier::GetHash() const
 		I++;
 	}
 
-	return (ZEQWORD)Hash;
+	return (ZEUInt64)Hash;
 }
 
 // Returns total bytes written
-ZEQWORD ZETextureCacheDataIdentifier::Write(ZEFile* File) const
+ZEUInt64 ZETextureCacheDataIdentifier::Write(ZEFile* File) const
 {
-	size_t ZeQWordSize = sizeof(ZEQWORD);
+	size_t ZEUInt64Size = sizeof(ZEUInt64);
 	size_t ZeTexOptSize = sizeof(ZETextureOptions);
 	size_t ZeCharSize = sizeof(char);
 
-	ZEQWORD BytesWritten = 0;
-	ZEQWORD WriteCount = 0;
+	ZEUInt64 BytesWritten = 0;
+	ZEUInt64 WriteCount = 0;
 
-	WriteCount = File->Write(ItemName, (ZEQWORD)ZeCharSize, ZE_MAX_FILE_NAME_SIZE);
+	WriteCount = File->Write(ItemName, (ZEUInt64)ZeCharSize, ZE_MAX_FILE_NAME_SIZE);
 	if (WriteCount != ZE_MAX_FILE_NAME_SIZE)
 	{
 		return 0;
 	}
 	else
 	{
-		BytesWritten += WriteCount * (ZEQWORD)ZeCharSize;
+		BytesWritten += WriteCount * (ZEUInt64)ZeCharSize;
 		WriteCount = 0;
 	}
 	
-	WriteCount = File->Write(&TextureOptions, (ZEQWORD)ZeTexOptSize, 1);
+	WriteCount = File->Write(&TextureOptions, (ZEUInt64)ZeTexOptSize, 1);
 	if (WriteCount != 1)
 	{
 		return 0;
 	}
 	else
 	{
-		BytesWritten += WriteCount * (ZEQWORD)ZeTexOptSize;
+		BytesWritten += WriteCount * (ZEUInt64)ZeTexOptSize;
 		WriteCount = 0;
 	}
 	
-	WriteCount = File->Write(&Offset, (ZEQWORD)ZeQWordSize, 1);
+	WriteCount = File->Write(&Offset, (ZEUInt64)ZEUInt64Size, 1);
 	if (WriteCount != 1)
 	{
 		return 0;
 	}
 	else
 	{
-		BytesWritten += WriteCount * (ZEQWORD)ZeQWordSize;
+		BytesWritten += WriteCount * (ZEUInt64)ZEUInt64Size;
 		WriteCount = 0;
 	}
 
@@ -153,8 +153,8 @@ bool ZETextureCacheDataIdentifier::Equal(ZEFile* File) const
 	if (memcmp(&TextureOptionsRead, &TextureOptions, ZETexOptSize) != 0)
 		return false;
 
-	ZEQWORD OffsetRead;
-	if (File->Read(&OffsetRead, sizeof(ZEQWORD), 1) != 1)
+	ZEUInt64 OffsetRead;
+	if (File->Read(&OffsetRead, sizeof(ZEUInt64), 1) != 1)
 	{
 		zeAssert(true, "Cannot read offset from cache: \"%s\".", File->GetFilePath().GetValue());
 		return false;

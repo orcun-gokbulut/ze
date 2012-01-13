@@ -79,7 +79,7 @@ bool ZETextureLoader::IsZETextureFile(ZEFile* File)
 	if(!File->IsOpen())
 		return false;
 
-	ZEQWORD Cursor = File->Tell();
+	ZEUInt64 Cursor = File->Tell();
 	File->Seek(0, ZE_SF_BEGINING);
 		
 	ZETextureFileHeader	FileHeader;
@@ -389,7 +389,7 @@ bool ZETextureLoader::GetImageInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 {
 	zeLog("Getting image info: \"%s\".", File->GetFilePath().GetValue());
 
-	ZEQWORD Cursor = File->Tell();
+	ZEUInt64 Cursor = File->Tell();
 	File->Seek(0, ZE_SF_BEGINING);
 
 	FreeImageIO Callbacks;
@@ -433,7 +433,7 @@ bool ZETextureLoader::GetImageInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 bool ZETextureLoader::GetTextureInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 {
 	// Go to the beginning of file
-	ZEQWORD Cursor = File->Tell();
+	ZEUInt64 Cursor = File->Tell();
 	File->Seek(0, ZE_SF_BEGINING);
 
 	zeLog("Getting texture info: \"%s\".", File->GetFilePath().GetValue());

@@ -65,7 +65,7 @@ class ZEWindowsInputKeyboardDevice : public ZEInputDevice
 	public:
 		virtual const ZEString&				GetDeviceName();
 
-		virtual ZEDWORD						GetButtonCount();
+		virtual ZEUInt32						GetButtonCount();
 
 		virtual void						UnAcquire();
 

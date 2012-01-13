@@ -107,7 +107,7 @@ class ZEDGizmo : public ZEEntity
 		ZEVector3						ScaleProjection_(ZEDGizmoAxis Axis, const ZERay& Ray);
 
 	public:
-		virtual ZEDWORD					GetDrawFlags() const;
+		virtual ZEUInt32					GetDrawFlags() const;
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);

@@ -1165,12 +1165,12 @@ ZEVector3 ZEPhysXPhysicalJoint::GetScale()
 	return ZEVector3::Zero;
 }
 
-void ZEPhysXPhysicalJoint::SetCollisionEventFlags(ZEDWORD CollisionEventFlags)
+void ZEPhysXPhysicalJoint::SetCollisionEventFlags(ZEUInt32 CollisionEventFlags)
 {
 
 }
 
-ZEDWORD ZEPhysXPhysicalJoint::GetCollisionEventFlags()
+ZEUInt32 ZEPhysXPhysicalJoint::GetCollisionEventFlags()
 {
 	return NULL;
 }

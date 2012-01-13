@@ -42,33 +42,33 @@
 class ZEPartialFile : public ZEFile
 {
 	protected:
-		ZEQWORD					StartPosition;
-		ZEQWORD					EndPosition;
+		ZEUInt64					StartPosition;
+		ZEUInt64					EndPosition;
 		bool					IsEof;
 
 		ZEFile*					ParentFile;
 
 	public:
 		virtual bool			Open(const ZEString FilePath, ZEFileMode Mode, bool Binary);
-		virtual bool			Open(ZEFile* ParentFile, ZEQWORD Offset, ZEQWORD Size);
+		virtual bool			Open(ZEFile* ParentFile, ZEUInt64 Offset, ZEUInt64 Size);
 		virtual void			Close();
 
-		virtual ZEQWORD			Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);
-		virtual ZEQWORD			ReadFormated(const char* Format, ...);
+		virtual ZEUInt64			Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
+		virtual ZEUInt64			ReadFormated(const char* Format, ...);
 
-		virtual ZEQWORD			Write(void* Buffer, ZEQWORD Size, ZEQWORD Count);
-		virtual ZEQWORD			WriteFormated(const char* Format, ...);
+		virtual ZEUInt64			Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
+		virtual ZEUInt64			WriteFormated(const char* Format, ...);
 
 
 		/* If the seek operation tends to go beyond end position or below start position
 		the file cursor remains as it is and the return will be false */
-		virtual bool			Seek(ZEINT64 Offset, ZESeekFrom Origin);
-		virtual ZEQWORD			Tell();
+		virtual bool			Seek(ZEInt64 Offset, ZESeekFrom Origin);
+		virtual ZEUInt64			Tell();
 
-		virtual ZEQWORD			GetStartPosition();
-		virtual ZEQWORD			GetEndPosition();
+		virtual ZEUInt64			GetStartPosition();
+		virtual ZEUInt64			GetEndPosition();
 
-		virtual ZEQWORD			GetFileSize() const;
+		virtual ZEUInt64			GetFileSize() const;
 		virtual bool			Eof();
 
 		virtual unsigned int	IncreaseReferenceCount();

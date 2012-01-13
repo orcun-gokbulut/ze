@@ -69,7 +69,7 @@
 struct ZEMapFileMaterial
 {
 	char									Shader[ZE_MPFL_MAX_FILENAME_SIZE];
-	ZEDWORD									ShaderComponents;
+	ZEUInt32									ShaderComponents;
 
 	bool									TwoSided;
 	bool									LightningEnabled;
@@ -110,13 +110,13 @@ struct ZEMapFileVertex
 
 struct ZEMapFilePolygon
 {	
-	ZEDWORD									Material;
+	ZEUInt32									Material;
 	ZEMapFileVertex							Vertices[3];
 };
 
 struct ZEMapFilePhysicalMeshPolygon
 {
-	ZEDWORD									Indices[3];
+	ZEUInt32									Indices[3];
 };
 
 struct ZEMapFilePhysicalMesh
@@ -129,7 +129,7 @@ struct ZEMapFileDoor
 {
 	char									Name[ZE_MPFL_MAX_NAME_SIZE];
 	ZERectangle3D							Rectangle;
-	ZEDWORD									PortalIds[2];
+	ZEUInt32									PortalIds[2];
 	bool									IsOpen;
 };
 

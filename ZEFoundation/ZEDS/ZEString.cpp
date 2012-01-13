@@ -498,12 +498,12 @@ ZEString ZEString::Upper() const
 
 }
 
-ZEINT32 ZEString::ToInt() const
+ZEInt32 ZEString::ToInt() const
 {
 	return atoi(Buffer);
 }
 
-ZEUINT32 ZEString::ToUInt() const
+ZEUInt32 ZEString::ToUInt() const
 {
 	return strtoul(Buffer, NULL, 10);
 }

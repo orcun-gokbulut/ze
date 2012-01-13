@@ -224,7 +224,7 @@ bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, size_t VertexCount,
 	return true;
 }
 
-void ZEPhysXPhysicalMesh::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags)
+void ZEPhysXPhysicalMesh::SetCollisionCallbackFlags(ZEUInt32 CollisionCallbackFlags)
 {
 	
 	ActorDesc.contactReportFlags = (ActorDesc.contactReportFlags & ~(NX_NOTIFY_ON_TOUCH | NX_NOTIFY_ON_START_TOUCH | NX_NOTIFY_ON_END_TOUCH)) |
@@ -237,7 +237,7 @@ void ZEPhysXPhysicalMesh::SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFla
 	
 }
 
-ZEDWORD ZEPhysXPhysicalMesh::GetCollisionCallbackFlags()
+ZEUInt32 ZEPhysXPhysicalMesh::GetCollisionCallbackFlags()
 {
 	return (ActorDesc.contactReportFlags & NX_NOTIFY_ON_START_TOUCH ? ZE_PCCF_ON_START_TOUCH : NULL) |
 		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_END_TOUCH ? ZE_PCCF_ON_END_TOUCH : NULL) |

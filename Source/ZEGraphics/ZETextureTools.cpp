@@ -171,19 +171,19 @@ void ZETextureTools::DownSample2x(void* DestinationData, unsigned int Destinatio
 	{
 		struct ZEColorARGB
 		{
-			ZEBYTE Alpha;
-			ZEBYTE Red;
-			ZEBYTE Blue;
-			ZEBYTE Green;
+			ZEUInt8 Alpha;
+			ZEUInt8 Red;
+			ZEUInt8 Blue;
+			ZEUInt8 Green;
 		};
 
 		for (size_t y = 0; y < DestinationHeight; y++)
 		{
 			for (size_t x = 0; x < DestinationWidth; x++)
 			{
-				ZEColorARGB* Source = (ZEColorARGB*)((ZEBYTE*)SourceData + SourcePitch * y * 2 + x * 8);
+				ZEColorARGB* Source = (ZEColorARGB*)((ZEUInt8*)SourceData + SourcePitch * y * 2 + x * 8);
 
-				ZEWORD Red, Green, Blue, Alpha;
+				ZEUInt16 Red, Green, Blue, Alpha;
 				Alpha = Source->Alpha;
 				Red   = Source->Red;
 				Green = Source->Green;
@@ -195,7 +195,7 @@ void ZETextureTools::DownSample2x(void* DestinationData, unsigned int Destinatio
 				Green += Source->Green;
 				Blue  += Source->Blue;
 
-				Source = (ZEColorARGB*)((ZEBYTE*)Source + SourcePitch - 1 * 4);
+				Source = (ZEColorARGB*)((ZEUInt8*)Source + SourcePitch - 1 * 4);
 				Alpha += Source->Alpha;
 				Red   += Source->Red;
 				Green += Source->Green;
@@ -207,7 +207,7 @@ void ZETextureTools::DownSample2x(void* DestinationData, unsigned int Destinatio
 				Green += Source->Green;
 				Blue  += Source->Blue;
 
-				ZEColorARGB* Destination = (ZEColorARGB*)((ZEBYTE*)DestinationData + DestinationPitch * y + x * 4);
+				ZEColorARGB* Destination = (ZEColorARGB*)((ZEUInt8*)DestinationData + DestinationPitch * y + x * 4);
 				Destination->Alpha = Alpha / 4;
 				Destination->Red   = Red   / 4;
 				Destination->Green = Green / 4;

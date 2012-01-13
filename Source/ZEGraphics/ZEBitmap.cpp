@@ -103,7 +103,7 @@ bool ZEBitmap::Create(unsigned int Width, unsigned int Height, unsigned int Pixe
 	this->Width = Width;
 	this->Height = Height;
 	this->PixelSize = PixelSize;
-	this->Pixels = new ZEBYTE[Width * Height * PixelSize];
+	this->Pixels = new ZEUInt8[Width * Height * PixelSize];
 
 	return true;
 }
@@ -145,7 +145,7 @@ ZEPixelColor* ZEBitmap::GetPixels()
 
 ZEPixelColor& ZEBitmap::GetPixel(unsigned int x, unsigned int y)
 {
-	return *(ZEPixelColor*)((ZEBYTE*)Pixels + y * Pitch + x * 4);
+	return *(ZEPixelColor*)((ZEUInt8*)Pixels + y * Pitch + x * 4);
 }
 
 ZEVector4 ZEBitmap::GetPixelFloat(unsigned int x, unsigned int y)
@@ -163,7 +163,7 @@ ZEVector4 ZEBitmap::GetPixelFloat(unsigned int x, unsigned int y)
 
 ZEPixelColor* ZEBitmap::GetRow(unsigned int Index)
 {
-	return (ZEPixelColor*)((ZEBYTE*)Pixels + Index * Pitch);
+	return (ZEPixelColor*)((ZEUInt8*)Pixels + Index * Pitch);
 }
 
 ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserOptions)
@@ -338,8 +338,8 @@ void ZEBitmap::CopyFrom(void* SourceBuffer, unsigned int SourcePitch,
 		Width = this->Width;
 
 	for (size_t I = 0; I < Height; I++)
-		memcpy((ZEBYTE*)Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
-			(ZEBYTE*)SourceBuffer + (SourceOffsetY + I) * SourcePitch + SourceOffsetX * PixelSize, 
+		memcpy((ZEUInt8*)Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
+			(ZEUInt8*)SourceBuffer + (SourceOffsetY + I) * SourcePitch + SourceOffsetX * PixelSize, 
 			Width * PixelSize);
 }
 
@@ -355,8 +355,8 @@ void ZEBitmap::CopyTo(void* DestinationBuffer, unsigned int DestinationPitch,
 		Width = this->Width;
 
 	for (size_t I = 0; I < Height; I++)
-		memcpy((ZEBYTE*)DestinationBuffer + (DestinationOffsetY + I) * DestinationPitch + DestinationOffsetX * PixelSize, 
-			(ZEBYTE*)Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
+		memcpy((ZEUInt8*)DestinationBuffer + (DestinationOffsetY + I) * DestinationPitch + DestinationOffsetX * PixelSize, 
+			(ZEUInt8*)Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
 			Width * PixelSize);
 }
 

@@ -97,7 +97,7 @@ static bool WritePhysicalBodyToFile(ZEModelFilePhysicalBody* Body, FILE* File)
 
 	BodyChunk.ChunkId			= ZE_MDLF_PHYSICAL_BODY_CHUNKID;
 	BodyChunk.Enabled			= Body->Enabled;
-	BodyChunk.Type				= (ZEDWORD)Body->Type;
+	BodyChunk.Type				= (ZEUInt32)Body->Type;
 	BodyChunk.Mass				= Body->Mass;
 	BodyChunk.AngularDamping	= Body->AngularDamping;
 	BodyChunk.LinearDamping		= Body->LinearDamping;
@@ -114,7 +114,7 @@ static bool WritePhysicalBodyToFile(ZEModelFilePhysicalBody* Body, FILE* File)
 		memset(&ShapeChunk, 0, sizeof(ZEModelFilePhysicalShapeChunk));
 
 		ShapeChunk.ChunkId 					= ZE_MDLF_PHYSICAL_SHAPE_CHUNKID;
-		ShapeChunk.Type 					= (ZEDWORD)Shape->Type;
+		ShapeChunk.Type 					= (ZEUInt32)Shape->Type;
 		ShapeChunk.Position 				= Shape->Position;
 		ShapeChunk.Rotation 				= Shape->Rotation;
 		ShapeChunk.StaticFriction 			= Shape->StaticFriction;
@@ -163,8 +163,8 @@ static bool WritePhysicalBodyToFile(ZEModelFilePhysicalBody* Body, FILE* File)
 
 		if (ShapeChunk.Type == ZE_PBST_CONVEX)
 		{
-			ZEDWORD ChunkId = ZE_MDLF_PHYSICAL_SHAPE_VERTEX_CHUNKID;
-			fwrite(&ChunkId, sizeof(ZEDWORD), 1, File); 
+			ZEUInt32 ChunkId = ZE_MDLF_PHYSICAL_SHAPE_VERTEX_CHUNKID;
+			fwrite(&ChunkId, sizeof(ZEUInt32), 1, File); 
 			fwrite(Shape->Convex.Vertices.GetCArray(), sizeof(ZEVector3), ShapeChunk.Convex.VertexCount, File);
 		}
 	}
@@ -181,7 +181,7 @@ bool WritePhysicalJointToFile(ZEModelFilePhysicalJoint* Joint, FILE* File)
 
 	JointChunk.Enabled						= Joint->Enabled;
 
-	JointChunk.JointType 					= (ZEDWORD)Joint->JointType;
+	JointChunk.JointType 					= (ZEUInt32)Joint->JointType;
 
 	JointChunk.Body1Id						= Joint->Body1Id;
 	JointChunk.Body2Id						= Joint->Body2Id;
@@ -359,7 +359,7 @@ static void WriteMeshesToFile(FILE *File, ZEModelFile* Model)
 
 			if(MeshChunk.IsSkinned)
 			{
-				fwrite(MeshLOD->AffectingBoneIds.GetConstCArray(), sizeof(ZEDWORD), MeshLOD->AffectingBoneIds.GetCount(), File);
+				fwrite(MeshLOD->AffectingBoneIds.GetConstCArray(), sizeof(ZEUInt32), MeshLOD->AffectingBoneIds.GetCount(), File);
 
 				for (int N = 0; N < MeshLODChunk.VertexCount; N++)
 				{
@@ -624,8 +624,8 @@ static bool ReadPhysicalBodyFromFile(ZEModelFilePhysicalBody* Body, FILE* File)
 			}
 			case ZE_PBST_CONVEX:
 			{
-				ZEDWORD ChunkId;
-				fread(&ChunkId, sizeof(ZEDWORD),1, File);
+				ZEUInt32 ChunkId;
+				fread(&ChunkId, sizeof(ZEUInt32),1, File);
 				if (ChunkId != ZE_MDLF_PHYSICAL_SHAPE_VERTEX_CHUNKID)
 				{
 					zesdkError("Model Resource", "Corrupted ZEModel file. Physical body shape vertex chunk id does not matches.");
@@ -797,7 +797,7 @@ static bool ReadMeshesFromFile(FILE* File, ZEModelFile* Model)
 			if(MeshChunk.IsSkinned)
 			{
 				LOD->AffectingBoneIds.SetCount(MeshLODChunk.AffectingBoneCount);
-				fread(LOD->AffectingBoneIds.GetCArray(), sizeof(ZEDWORD), LOD->AffectingBoneIds.GetCount(), File);
+				fread(LOD->AffectingBoneIds.GetCArray(), sizeof(ZEUInt32), LOD->AffectingBoneIds.GetCount(), File);
 
 				LOD->SkinnedVertices.SetCount(MeshLODChunk.VertexCount);				
 				fread(LOD->SkinnedVertices.GetCArray(), sizeof(ZEModelFileSkinnedVertex),  LOD->SkinnedVertices.GetCount(), File);

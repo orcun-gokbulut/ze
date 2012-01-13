@@ -47,7 +47,7 @@
 class ZEFontCharacter
 {
 	public:
-		ZEDWORD						TextureId;
+		ZEUInt32						TextureId;
 		ZERectangle					Coordinates;
 };
 

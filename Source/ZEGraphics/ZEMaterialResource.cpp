@@ -122,7 +122,7 @@ bool ZEMaterialResource::LoadTextures(ZEMaterialResource* MaterialResource, ZEFi
 			return false;
 		}
 
-		ZEQWORD OldPos;
+		ZEUInt64 OldPos;
 		switch(TextureChunk.TextureType)
 		{
 			case ZE_TT_CUBE:

@@ -44,41 +44,41 @@
 #include "zepartialfile.h"
 
 
-#define ZE_FILE_MAKEVERSION(Major, Minor)			((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor))
+#define ZE_FILE_MAKEVERSION(Major, Minor)			((((ZEUInt32)(Major)) << 16) + (ZEUInt32)(Minor))
 #define ZE_CACHE_VERSION							ZE_FILE_MAKEVERSION(0,1)
 
-#define ZE_CACHE_HEADER								((ZEDWORD)((ZEDWORD)'CCH ' + (ZEDWORD)'HDR '))
-#define	ZE_CACHE_IDENT_CHUNKID						((ZEDWORD)(ZE_CACHE_HEADER + (ZEDWORD)'IDEN'))
-#define	ZE_CACHE_DATA_CHUNKID						((ZEDWORD)(ZE_CACHE_HEADER + (ZEDWORD)'DATA'))
+#define ZE_CACHE_HEADER								((ZEUInt32)((ZEUInt32)'CCH ' + (ZEUInt32)'HDR '))
+#define	ZE_CACHE_IDENT_CHUNKID						((ZEUInt32)(ZE_CACHE_HEADER + (ZEUInt32)'IDEN'))
+#define	ZE_CACHE_DATA_CHUNKID						((ZEUInt32)(ZE_CACHE_HEADER + (ZEUInt32)'DATA'))
 
-#define ZE_CACHE_COMPLETENESS						((ZEQWORD)((((ZEQWORD)('FCCH')) << 32) + (ZEQWORD)('CMPT')))
+#define ZE_CACHE_COMPLETENESS						((ZEUInt64)((((ZEUInt64)('FCCH')) << 32) + (ZEUInt64)('CMPT')))
 
 
 struct ZECacheFileHeader
 {
-	ZEDWORD		ChunkId;
-	ZEDWORD		Version;
+	ZEUInt32		ChunkId;
+	ZEUInt32		Version;
 };
 
 struct ZECacheDataChunk
 {
-	ZEDWORD		ChunkId;
+	ZEUInt32		ChunkId;
 };
 
 struct ZECacheIdentifierChunk
 {
-	ZEDWORD		ChunkId;
-	ZEQWORD		ChunkHash;
-	ZEQWORD		ChunkSize;
-	ZEQWORD		ChunkPosition;
-	ZEQWORD		IdentifierSize;
+	ZEUInt32		ChunkId;
+	ZEUInt64		ChunkHash;
+	ZEUInt64		ChunkSize;
+	ZEUInt64		ChunkPosition;
+	ZEUInt64		IdentifierSize;
 };
 
 class ZECacheDataIdentifier
 {
 	public:
-		virtual ZEQWORD			GetHash() const = 0;
-		virtual ZEQWORD			Write(ZEFile* File) const = 0;
+		virtual ZEUInt64			GetHash() const = 0;
+		virtual ZEUInt64			Write(ZEFile* File) const = 0;
 		virtual bool			Equal(ZEFile* File) const = 0;
 };
 
@@ -90,7 +90,7 @@ class ZEFileCache
 
 		bool					CheckCompleteness();
 		bool					PrepareCacheForFirstUse();
-		bool					CopyData(ZEFile* File, ZEQWORD From, ZEQWORD Size, ZEQWORD To);
+		bool					CopyData(ZEFile* File, ZEUInt64 From, ZEUInt64 Size, ZEUInt64 To);
 
 	public:
 		bool					Open(const ZEString FileName);
@@ -102,10 +102,10 @@ class ZEFileCache
 		ZEFile					GetFile();
 		const ZEString			GetCacheFilePath();
 
-		bool					AddData(const ZECacheDataIdentifier* Identifier, const void* Data, ZEQWORD Size);
-		bool					GetData(const ZECacheDataIdentifier* Identifier, void* Buffer, ZEQWORD Offset, ZEQWORD Size);
+		bool					AddData(const ZECacheDataIdentifier* Identifier, const void* Data, ZEUInt64 Size);
+		bool					GetData(const ZECacheDataIdentifier* Identifier, void* Buffer, ZEUInt64 Offset, ZEUInt64 Size);
 		
-		bool					Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifier* Identifier, ZEQWORD ChunkSize);
+		bool					Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifier* Identifier, ZEUInt64 ChunkSize);
 		bool					OpenData(ZEPartialFile* PartialFile, const ZECacheDataIdentifier* Identifier);
 
 		static bool				IsFileCache(ZEString FileName);
