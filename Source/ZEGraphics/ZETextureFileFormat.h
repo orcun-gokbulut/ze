@@ -37,42 +37,42 @@
 
 #include "ZETypes.h"
 
-#define ZE_FILE_MAKEVERSION(Major, Minor)			((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor))
+#define ZE_FILE_MAKEVERSION(Major, Minor)			((((ZEUInt32)(Major)) << 16) + (ZEUInt32)(Minor))
 #define ZE_TXTF_VERSION								((ZE_FILE_MAKEVERSION(0,1)))
 
-#define ZE_TXTF_HEADER								((ZEDWORD)((ZEDWORD)'TXTF' + (ZEDWORD)'TXT'))
+#define ZE_TXTF_HEADER								((ZEUInt32)((ZEUInt32)'TXTF' + (ZEUInt32)'TXT'))
 
-#define	ZE_TXTF_SURF_CHUNKID						((ZEDWORD)(ZE_TXTF_HEADER + (ZEDWORD)'SURF'))
-#define	ZE_TXTF_MIP_CHUNKID							((ZEDWORD)(ZE_TXTF_HEADER + (ZEDWORD)'MIP'))
+#define	ZE_TXTF_SURF_CHUNKID						((ZEUInt32)(ZE_TXTF_HEADER + (ZEUInt32)'SURF'))
+#define	ZE_TXTF_MIP_CHUNKID							((ZEUInt32)(ZE_TXTF_HEADER + (ZEUInt32)'MIP'))
 
 
 struct ZETextureFileHeader
 {
-	ZEDWORD			ChunkId;
-	ZEDWORD			Version;
+	ZEUInt32			ChunkId;
+	ZEUInt32			Version;
 
-	ZEDWORD			PixelFormat;
+	ZEUInt32			PixelFormat;
 
-	ZEDWORD			Depth;
-	ZEDWORD			MipMapCount;
+	ZEUInt32			Depth;
+	ZEUInt32			MipMapCount;
 
-	ZEDWORD			Width;
-	ZEDWORD			Height;	
+	ZEUInt32			Width;
+	ZEUInt32			Height;	
 	
 };
 
 struct ZETextureFileSurfaceChunk
 {
-	ZEDWORD			ChunkId;
+	ZEUInt32			ChunkId;
 
 };
 
 struct ZETExtureFileMipmapChunk
 {
-	ZEDWORD			ChunkId;
+	ZEUInt32			ChunkId;
 
-	ZEDWORD			RowSize;
-	ZEDWORD			RowCount;
+	ZEUInt32			RowSize;
+	ZEUInt32			RowCount;
 
 };
 

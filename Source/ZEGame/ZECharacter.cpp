@@ -475,7 +475,7 @@ void ZECharacter::Strafe(float ElapsedTime)
 #define ZE_CRRE_STRAFE_RIGHT 6 
 #define ZE_CRRE_STRAFE_LEFT 7
 
-void ZECharacter::RecordEvent(ZEDWORD Event)
+void ZECharacter::RecordEvent(ZEUInt32 Event)
 {
 	if (RecordingStatus != ZE_CRS_RECORDING)
 		return;
@@ -639,8 +639,8 @@ void ZECharacter::SaveRecording(const char* FileName)
 {
 	FILE* File = fopen(FileName, "wb");
 
-	ZEDWORD KeyCount = Records.GetCount();
-	fwrite(&KeyCount, sizeof(ZEDWORD), 1, File);
+	ZEUInt32 KeyCount = Records.GetCount();
+	fwrite(&KeyCount, sizeof(ZEUInt32), 1, File);
 
 	fwrite(Records.GetCArray(), sizeof(ZECharacterRecordingKey), KeyCount, File);
 
@@ -651,8 +651,8 @@ void ZECharacter::LoadRecording(const char* FileName)
 {
 	FILE* File = fopen(FileName, "rb");
 
-	ZEDWORD KeyCount;
-	fread(&KeyCount, sizeof(ZEDWORD), 1, File);
+	ZEUInt32 KeyCount;
+	fread(&KeyCount, sizeof(ZEUInt32), 1, File);
 
 	Records.SetCount(KeyCount);
 	fread(Records.GetCArray(), sizeof(ZECharacterRecordingKey), KeyCount, File);

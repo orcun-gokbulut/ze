@@ -350,7 +350,7 @@ ZEInputEvent::ZEInputEvent(const ZEString& InputString)
 	Create(InputString);
 }
 
-ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEDWORD Index, ZEInputButtonState ButtonState)
+ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEUInt32 Index, ZEInputButtonState ButtonState)
 {
 	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
@@ -366,7 +366,7 @@ ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEDWORD Index, ZEInputBut
 	this->ButtonState = ButtonState;
 }
 
-ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEDWORD Index, ZEInputAxisSign AxisSign)
+ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEUInt32 Index, ZEInputAxisSign AxisSign)
 {
 	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
@@ -382,7 +382,7 @@ ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEDWORD Index, ZEInputAxi
 	this->AxisSign = AxisSign;
 }
 
-ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEInputType InputType, ZEDWORD Index, ZEInputVectorState State)
+ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEInputType InputType, ZEUInt32 Index, ZEInputVectorState State)
 {
 	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
@@ -398,7 +398,7 @@ ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEInputType InputType, ZE
 	this->VectorState = State;
 }
 
-ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEDWORD Index, ZEInputQuaternionState State)
+ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEUInt32 Index, ZEInputQuaternionState State)
 {
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
 	for (size_t I = 0; I < Devices.GetCount(); I++)

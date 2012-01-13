@@ -134,12 +134,12 @@ const ZEString& ZEWindowsInputMouseDevice::GetDeviceName()
 	return DeviceName;
 }
 
-ZEDWORD ZEWindowsInputMouseDevice::GetButtonCount()
+ZEUInt32 ZEWindowsInputMouseDevice::GetButtonCount()
 {
 	return 5;
 }
 
-ZEDWORD ZEWindowsInputMouseDevice::GetAxisCount()
+ZEUInt32 ZEWindowsInputMouseDevice::GetAxisCount()
 {
 	return 3;
 }

@@ -45,7 +45,7 @@ class ZEFileUnserializer
 		void*						File;
 
 	public:
-		virtual ZEQWORD				Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);	
+		virtual ZEUInt64				Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);	
 		bool						OpenFile(const char* FileName);
 		void						CloseFile();
 

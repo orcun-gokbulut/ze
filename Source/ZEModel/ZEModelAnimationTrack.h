@@ -58,8 +58,8 @@ class ZEModelAnimationTrack
 		ZEModelAnimationBlendMode		BlendMode;
 		float							Speed;
 		float							CurrentFrame;
-		ZEDWORD							StartFrame;
-		ZEDWORD							EndFrame;
+		ZEUInt32							StartFrame;
+		ZEUInt32							EndFrame;
 		bool							Looping;
 		int								LOD;
 

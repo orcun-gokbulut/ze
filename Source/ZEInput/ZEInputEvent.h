@@ -97,7 +97,7 @@ class ZEInputEvent
 	public:
 		ZEInputDevice*				Device;		
 		ZEInputType					Type;
-		ZEDWORD						Index;
+		ZEUInt32						Index;
 
 		union 
 		{
@@ -113,20 +113,20 @@ class ZEInputEvent
 									ZEInputEvent();
 									ZEInputEvent(const ZEString& InputString);
 									ZEInputEvent(const ZEString& DeviceName,
-										ZEDWORD Index, 
+										ZEUInt32 Index, 
 										ZEInputButtonState ButtonState);
 
 									ZEInputEvent(const ZEString& DeviceName, 
-										ZEDWORD Index,
+										ZEUInt32 Index,
 										ZEInputAxisSign AxisSign);
 
 									ZEInputEvent(const ZEString& DeviceName,
 										ZEInputType Type,
-										ZEDWORD Index,
+										ZEUInt32 Index,
 										ZEInputVectorState State);
 
 									ZEInputEvent(const ZEString& DeviceName,
-										ZEDWORD Index,
+										ZEUInt32 Index,
 										ZEInputQuaternionState State);
 };
 

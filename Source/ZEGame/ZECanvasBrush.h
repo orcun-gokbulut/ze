@@ -60,7 +60,7 @@ class ZECanvasBrush : public ZECompoundEntity
 		virtual								~ZECanvasBrush();
 
 	public:
-		virtual ZEDWORD						GetDrawFlags() const;
+		virtual ZEUInt32						GetDrawFlags() const;
 
 		ZEROPrimitiveType					PrimitiveType;
 		ZEMaterial*							Material;

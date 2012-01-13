@@ -84,8 +84,8 @@ class ZEPhysicalObject
 		virtual void							SetScale(const ZEVector3& NewScale) = 0;
 		virtual ZEVector3						GetScale() = 0;
 
-		//virtual void							SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags) = 0;
-		//virtual ZEDWORD						GetCollisionCallbackFlags() = 0;
+		//virtual void							SetCollisionCallbackFlags(ZEUInt32 CollisionCallbackFlags) = 0;
+		//virtual ZEUInt32						GetCollisionCallbackFlags() = 0;
 
 		virtual void							SetCollisionEvent(const ZEPhysicalCollisionEvent& Event);
 		virtual const

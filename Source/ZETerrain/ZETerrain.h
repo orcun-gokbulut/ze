@@ -53,7 +53,7 @@ struct ZETerrainData
 	size_t Width;
 	size_t Height;
 	float* HeightData;
-	ZEUINT32* ColorData;
+	ZEUInt32* ColorData;
 
 	ZETerrainData()
 	{
@@ -67,7 +67,6 @@ struct ZETerrainData
 struct ZETerrainLOD
 {
 	ZETexture2D* HeightTexture;
-	ZETexture2D* NormalTexture;
 	ZETexture2D* ColorTexture;
 };
 

@@ -53,7 +53,7 @@ class ZEPack
 		char							PackFileName[256];
 
 										// Calculates hash
-		ZEQWORD							GetHash(const char* IdentiifierName);
+		ZEUInt64							GetHash(const char* IdentiifierName);
 
 	public:
 
@@ -79,7 +79,7 @@ class ZEPack
 		bool							ChunkExists(const char* IdentifierName);
 
 										// Create new chunk from Buffer
-		bool							AddChunk(const char* IdentifierName, unsigned char* source/*SourceBuffer*/, ZEQWORD Size);		
+		bool							AddChunk(const char* IdentifierName, unsigned char* source/*SourceBuffer*/, ZEUInt64 Size);		
 
 										// Returns the data in a buffer
 		bool							GetChunk(const char* IdentifierName, unsigned char* data/*DestinationBuffer*/);

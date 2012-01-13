@@ -396,7 +396,7 @@ ZEVector3 ZEPhysXPhysicalRigidBody::GetAngularMomentum()
 		return NX_TO_ZE(BodyDesc.angularVelocity * BodyDesc.mass);
 }
 
-void ZEPhysXPhysicalRigidBody::SetCollisionEventFlags(ZEDWORD CollisionEventFlags)
+void ZEPhysXPhysicalRigidBody::SetCollisionEventFlags(ZEUInt32 CollisionEventFlags)
 {
 	ActorDesc.contactReportFlags = (ActorDesc.contactReportFlags & ~(NX_NOTIFY_ON_TOUCH | NX_NOTIFY_ON_START_TOUCH | NX_NOTIFY_ON_END_TOUCH)) |
 		((CollisionEventFlags & ZE_PCCF_ON_TOUCH) ? NX_NOTIFY_ON_TOUCH : NULL) |
@@ -407,7 +407,7 @@ void ZEPhysXPhysicalRigidBody::SetCollisionEventFlags(ZEDWORD CollisionEventFlag
 		Actor->setContactReportFlags(ActorDesc.contactReportFlags);
 }
 
-ZEDWORD ZEPhysXPhysicalRigidBody::GetCollisionEventFlags()
+ZEUInt32 ZEPhysXPhysicalRigidBody::GetCollisionEventFlags()
 {
 	return (ActorDesc.contactReportFlags & NX_NOTIFY_ON_START_TOUCH ? ZE_PCCF_ON_START_TOUCH : NULL) |
 		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_END_TOUCH ? ZE_PCCF_ON_END_TOUCH : NULL) |

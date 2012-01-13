@@ -45,7 +45,7 @@ void ZEComponent::OnTransformChanged()
 {
 }
 
-ZEDWORD ZEComponent::GetDrawFlags() const
+ZEUInt32 ZEComponent::GetDrawFlags() const
 {
 	return ZE_DF_NONE;
 }

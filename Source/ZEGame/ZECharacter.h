@@ -73,7 +73,7 @@ enum ZECharacterStrafeStatus
 struct ZECharacterRecordingKey
 {
 	float Time;
-	ZEDWORD Event;
+	ZEUInt32 Event;
 	ZEVector3 Position;
 	ZEQuaternion Rotation;
 	float TurnAngle;
@@ -149,7 +149,7 @@ class ZECharacter : public ZECompoundEntity
 		void						Movement(float ElapsedTime);
 		void						Strafe(float ElapsedTime);
 		void						Turning(float ElapsedTime);
-		void						RecordEvent(ZEDWORD Event);
+		void						RecordEvent(ZEUInt32 Event);
 	public:
 		void						AdvanceRecording(float ElapsedTime);
 

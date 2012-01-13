@@ -51,10 +51,10 @@ class ZED3D9Shader
 {
 	friend class ZED3D9ShaderManager;
 	private:
-		ZEDWORD							Hash;
+		ZEUInt32							Hash;
 		char							FileName[100];
 		char							FunctionName[100];
-		ZEDWORD							Components;
+		ZEUInt32							Components;
 
 		int								CacheIndex;
 		int								ReferanceCount;
@@ -68,11 +68,11 @@ class ZED3D9Shader
 
 		const char*						GetFileName();
 		const char*						GetFunctionName();
-		ZEDWORD							GetComponents();
+		ZEUInt32							GetComponents();
 
 		void							Release();
 
-		static ZED3D9Shader*			CreateShader(const char* FileName, const char* FunctionName, ZEDWORD Components, ZED3D9ShaderType Type, const char* Profile);
+		static ZED3D9Shader*			CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, ZED3D9ShaderType Type, const char* Profile);
 };
 
 
@@ -89,7 +89,7 @@ class ZED3D9PixelShader : public ZED3D9Shader
 		virtual ZED3D9ShaderType		GetShaderType();
 		LPDIRECT3DPIXELSHADER9			GetPixelShader();
 
-		static ZED3D9PixelShader*		CreateShader(const char* FileName, const char* FunctionName, ZEDWORD Components, const char* Profile);
+		static ZED3D9PixelShader*		CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
 };
 
 
@@ -106,7 +106,7 @@ class ZED3D9VertexShader : public ZED3D9Shader
 		virtual ZED3D9ShaderType		GetShaderType();
 		LPDIRECT3DVERTEXSHADER9			GetVertexShader();
 
-		static ZED3D9VertexShader*		CreateShader(const char* FileName, const char* FunctionName, ZEDWORD Components, const char* Profile);
+		static ZED3D9VertexShader*		CreateShader(const char* FileName, const char* FunctionName, ZEUInt32 Components, const char* Profile);
 };
 
 #endif

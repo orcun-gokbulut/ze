@@ -56,8 +56,8 @@ bool ZEPartialFile::Open(const ZEString FilePath, ZEFileMode Mode, bool Binary)
 	//ZEString String;
 	//ZEString PurePath;
 
-	//ZEQWORD EndCursor = 0;
-	//ZEQWORD StartCursor = 0;
+	//ZEUInt64 EndCursor = 0;
+	//ZEUInt64 StartCursor = 0;
 	//
 	//unsigned int EndIndex = 0;
 	//unsigned int StartIndex = 0;
@@ -214,7 +214,7 @@ bool ZEPartialFile::Open(const ZEString FilePath, ZEFileMode Mode, bool Binary)
 	return false;
 }
 
-bool ZEPartialFile::Open(ZEFile* ParentFile, ZEQWORD Offset, ZEQWORD Size)
+bool ZEPartialFile::Open(ZEFile* ParentFile, ZEUInt64 Offset, ZEUInt64 Size)
 {
 	zeAssert(IsOpen(), "File is already open. File Name: \"%s\".", FilePath.GetValue());
 	zeAssert(!ParentFile->IsOpen(), "Parent file is not open. File Name: \"%s\".", FilePath.GetValue());
@@ -253,7 +253,7 @@ void ZEPartialFile::Close()
 	FilePath.Clear();
 }
 
-ZEQWORD ZEPartialFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)
+ZEUInt64 ZEPartialFile::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 {
 	if(!IsOpen())
 		return 0;
@@ -265,7 +265,7 @@ ZEQWORD ZEPartialFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)
 		return 0;
 
 	// Calculate the maximum possible read count
-	ZEQWORD ReadEndPos = _ftelli64((FILE*)File) + Size * Count;
+	ZEUInt64 ReadEndPos = _ftelli64((FILE*)File) + Size * Count;
 	if (ReadEndPos > EndPosition)
 	{
 		Count -= (ReadEndPos - EndPosition) / Size + (((ReadEndPos - EndPosition) % Size) == 0 ? 0 : 1);
@@ -273,13 +273,13 @@ ZEQWORD ZEPartialFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)
 	}
 
 	// Read
-	ZEQWORD ReadCount = fread(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	ZEUInt64 ReadCount = fread(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
 	FileCursor += ReadCount * Size;
 
 	return ReadCount;
 }
 
-ZEQWORD ZEPartialFile::ReadFormated(const char* Format, ...)
+ZEUInt64 ZEPartialFile::ReadFormated(const char* Format, ...)
 {
 	if(!IsOpen())
 		return 0;
@@ -301,7 +301,7 @@ ZEQWORD ZEPartialFile::ReadFormated(const char* Format, ...)
 	return 0;
 }
 
-ZEQWORD ZEPartialFile::Write(void* Buffer, ZEQWORD Size, ZEQWORD Count)
+ZEUInt64 ZEPartialFile::Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 {
 	if(!IsOpen())
 		return 0;
@@ -314,20 +314,20 @@ ZEQWORD ZEPartialFile::Write(void* Buffer, ZEQWORD Size, ZEQWORD Count)
 		return 0;
 
 	// Calculate the maximum possible write count
-	ZEQWORD WriteEndPos = _ftelli64((FILE*)File) + Size * Count;
+	ZEUInt64 WriteEndPos = _ftelli64((FILE*)File) + Size * Count;
 	if (WriteEndPos > EndPosition)
 	{
 		Count -= (WriteEndPos - EndPosition) / Size + (((WriteEndPos - EndPosition) % Size) == 0 ? 0 : 1);
 		IsEof = true;
 	}
 
-	ZEQWORD WriteCount = fwrite(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	ZEUInt64 WriteCount = fwrite(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
 	FileCursor += WriteCount * Size;
 
 	return WriteCount;
 }
 
-ZEQWORD ZEPartialFile::WriteFormated(const char* Format, ...)
+ZEUInt64 ZEPartialFile::WriteFormated(const char* Format, ...)
 {
 	if(!IsOpen())
 		return 0;
@@ -339,14 +339,14 @@ ZEQWORD ZEPartialFile::WriteFormated(const char* Format, ...)
 	va_list ArgList;
 
 	va_start(ArgList, Format);
-	ZEQWORD WriteSize = vfprintf((FILE*)File, Format, ArgList);
+	ZEUInt64 WriteSize = vfprintf((FILE*)File, Format, ArgList);
 	FileCursor += WriteSize;
 	va_end(ArgList);
 
 	return WriteSize;
 }
 
-bool ZEPartialFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
+bool ZEPartialFile::Seek(ZEInt64 Offset, ZESeekFrom Origin)
 {
 	if(!IsOpen())
 		return 0;
@@ -368,7 +368,7 @@ bool ZEPartialFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
 			{
 				_fseeki64((FILE*)File, FileCursor, SEEK_SET);
 
-				ZEQWORD CurrentPosition = 0;
+				ZEUInt64 CurrentPosition = 0;
 				CurrentPosition = _ftelli64((FILE*)File);
 
 				if(CurrentPosition + Offset < StartPosition || EndPosition < CurrentPosition + Offset)
@@ -404,22 +404,22 @@ bool ZEPartialFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
 	return true;
 }
 
-ZEQWORD ZEPartialFile::Tell()
+ZEUInt64 ZEPartialFile::Tell()
 {
 	return FileCursor - StartPosition;
 }
 
-ZEQWORD ZEPartialFile::GetStartPosition()
+ZEUInt64 ZEPartialFile::GetStartPosition()
 {
 	return StartPosition;
 }
 
-ZEQWORD ZEPartialFile::GetEndPosition()
+ZEUInt64 ZEPartialFile::GetEndPosition()
 {
 	return EndPosition;
 }
 
-ZEQWORD ZEPartialFile::GetFileSize() const
+ZEUInt64 ZEPartialFile::GetFileSize() const
 {
 	return EndPosition - StartPosition;	
 }

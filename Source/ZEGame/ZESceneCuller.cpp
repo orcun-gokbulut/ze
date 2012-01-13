@@ -117,7 +117,7 @@ bool ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameter
 
 	Statistics.TotalEntityCount++;
 
-	ZEDWORD EntityDrawFlags = Entity->GetDrawFlags();
+	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
 	if ((EntityDrawFlags & ZE_DF_DRAW) != ZE_DF_DRAW)
 		return false;
 
@@ -167,12 +167,12 @@ const ZECullStatistics& ZESceneCuller::GetStatistics()
 	return Statistics;
 }
 
-void ZESceneCuller::SetDebugDrawElements(ZEDWORD Elements)
+void ZESceneCuller::SetDebugDrawElements(ZEUInt32 Elements)
 {
 	this->DebugDrawElements = Elements;
 }
 
-ZEDWORD ZESceneCuller::SetDebugDrawElements()
+ZEUInt32 ZESceneCuller::SetDebugDrawElements()
 {
 	return this->DebugDrawElements;
 }

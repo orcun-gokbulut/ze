@@ -42,32 +42,32 @@
 
 #include <string.h>
 
-#define	ZE_ANIF_ANIMATION_CHUNKID					((ZEDWORD)'ANIM')
-#define	ZE_ANIF_PROPERTY_ANIMATION_CHUNKID			((ZEDWORD)(ZE_ANIF_ANIMATION_CHUNKID + (ZEDWORD)'PRPT'))
-#define	ZE_ANIF_PROPERTY_ANIMATION_KEY_CHUNKID		((ZEDWORD)(ZE_ANIF_ANIMATION_CHUNKID + (ZEDWORD)'KEY '))
+#define	ZE_ANIF_ANIMATION_CHUNKID					((ZEUInt32)'ANIM')
+#define	ZE_ANIF_PROPERTY_ANIMATION_CHUNKID			((ZEUInt32)(ZE_ANIF_ANIMATION_CHUNKID + (ZEUInt32)'PRPT'))
+#define	ZE_ANIF_PROPERTY_ANIMATION_KEY_CHUNKID		((ZEUInt32)(ZE_ANIF_ANIMATION_CHUNKID + (ZEUInt32)'KEY '))
 
 struct ZEPropertyAnimationKeyChunk
 {
-	ZEDWORD							ChunkId;
+	ZEUInt32							ChunkId;
 	float							Time;
 };
 
 struct ZEPropertyAnimationChunk
 {
-	ZEDWORD							ChunkId;
+	ZEUInt32							ChunkId;
 	int								PropertyId;
 	bool							Interpolate;
-	ZEDWORD							ValueType;
-	ZEDWORD							KeyCount;
+	ZEUInt32							ValueType;
+	ZEUInt32							KeyCount;
 };
 
 struct ZEAnimationChunk
 {
-	ZEDWORD							ChunkId;
+	ZEUInt32							ChunkId;
 	char							Name[ZE_MAX_NAME_SIZE];
-	ZEDWORD							FrameCount;
+	ZEUInt32							FrameCount;
 	float							FramePerSecond;
-	ZEDWORD							PropertyAnimationCount;
+	ZEUInt32							PropertyAnimationCount;
 };
 
 bool ZEAnimation::WriteToFile(ZESerializer* Serializer, ZEAnimation* Animation)

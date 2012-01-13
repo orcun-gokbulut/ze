@@ -188,10 +188,10 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEFile* ResourceFile, ZEPorta
 		return false;
 	}
 
-	ZEDWORD ChunkIdentifier = 0;
+	ZEUInt32 ChunkIdentifier = 0;
 
 	// Check physical mesh vertices chunk identifier
-	ResourceFile->Read(&ChunkIdentifier, sizeof(ZEDWORD), 1);
+	ResourceFile->Read(&ChunkIdentifier, sizeof(ZEUInt32), 1);
 	if (ChunkIdentifier != ZE_MAP_PHYSICAL_MESH_VERTICES_CHUNK)
 	{
 		zeError("Physical mesh vertices chunk's id does not match.");
@@ -204,7 +204,7 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEFile* ResourceFile, ZEPorta
 
 
 	// Check physical mesh polygons chunk identifier
-	ResourceFile->Read(&ChunkIdentifier, sizeof(ZEDWORD), 1);
+	ResourceFile->Read(&ChunkIdentifier, sizeof(ZEUInt32), 1);
 	if (ChunkIdentifier != ZE_MAP_PHYSICAL_MESH_POLYGONS_CHUNK)
 	{
 		zeError("Physical mesh polygons chunk's id does not match.");
@@ -260,8 +260,8 @@ bool ZEPortalMapResource::ReadPortalsFromFile(ZEFile* ResourceFile)
 		else
 		{
 			// Read chunk identifier and check it
-			ZEDWORD ChunkIdentifier = 0;
-			ResourceFile->Read(&ChunkIdentifier, sizeof(ZEDWORD), 1);
+			ZEUInt32 ChunkIdentifier = 0;
+			ResourceFile->Read(&ChunkIdentifier, sizeof(ZEUInt32), 1);
 			if (ChunkIdentifier != ZE_MAP_POLYGONS_CHUNK)
 			{
 				zeError("Polygons chunk's id does not match.");

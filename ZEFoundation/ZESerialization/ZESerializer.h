@@ -42,7 +42,7 @@
 class ZESerializer
 {
 	public:
-		virtual ZEQWORD			Write(const void* Buffer, ZEQWORD Size, ZEQWORD Count) = 0;
+		virtual ZEUInt64			Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count) = 0;
 };
 
 #endif

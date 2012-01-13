@@ -183,9 +183,9 @@ size_t ZEVariant::SizeOf() const
 bool ZEVariant::Serialize(ZESerializer* Serializer)
 {
 
-	ZEDWORD _Type = Type;
-	ZEDWORD StringSize;
-	Serializer->Write(&_Type, sizeof(ZEDWORD), 1);
+	ZEUInt32 _Type = Type;
+	ZEUInt32 StringSize;
+	Serializer->Write(&_Type, sizeof(ZEUInt32), 1);
 
 	switch(Type)
 	{
@@ -194,7 +194,7 @@ bool ZEVariant::Serialize(ZESerializer* Serializer)
 			break;
 		case ZE_VRT_STRING:
 			StringSize = strlen(Value.String) + 1;
-			Serializer->Write(&StringSize, sizeof(ZEDWORD), 1);
+			Serializer->Write(&StringSize, sizeof(ZEUInt32), 1);
 			Serializer->Write(Value.String, sizeof(char), StringSize);
 			break;
 		case ZE_VRT_INTEGER:
@@ -236,9 +236,9 @@ bool ZEVariant::Serialize(ZESerializer* Serializer)
 
 bool ZEVariant::Unserialize(ZEUnserializer* Unserializer)
 {
-	ZEDWORD Type;
-	ZEDWORD StringSize;
-	Unserializer->Read(&Type, sizeof(ZEDWORD), 1);
+	ZEUInt32 Type;
+	ZEUInt32 StringSize;
+	Unserializer->Read(&Type, sizeof(ZEUInt32), 1);
 
 	switch(Type)
 	{
@@ -250,7 +250,7 @@ bool ZEVariant::Unserialize(ZEUnserializer* Unserializer)
 			break;
 		case ZE_VRT_STRING:
 			SetType(ZE_VRT_STRING);
-			Unserializer->Read(&StringSize, sizeof(ZEDWORD), 1);
+			Unserializer->Read(&StringSize, sizeof(ZEUInt32), 1);
 			Value.String = new char[StringSize];
 			Unserializer->Read(Value.String, sizeof(char), StringSize);
 			break;

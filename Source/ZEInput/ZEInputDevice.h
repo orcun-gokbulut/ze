@@ -55,12 +55,12 @@ class ZEInputDevice
 	public:
 		virtual const ZEString&			GetDeviceName() = 0;
 
-		virtual ZEDWORD					GetButtonCount();
-		virtual ZEDWORD					GetAxisCount();
-		virtual ZEDWORD					GetVector2Count();
-		virtual ZEDWORD					GetVector3Count();
-		virtual ZEDWORD					GetVector4Count();
-		virtual ZEDWORD					GetQuaternionCount();
+		virtual ZEUInt32					GetButtonCount();
+		virtual ZEUInt32					GetAxisCount();
+		virtual ZEUInt32					GetVector2Count();
+		virtual ZEUInt32					GetVector3Count();
+		virtual ZEUInt32					GetVector4Count();
+		virtual ZEUInt32					GetQuaternionCount();
 
 		virtual void					SetEnabled(bool Enabled);
 		virtual bool					GetEnabled();

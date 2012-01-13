@@ -87,13 +87,13 @@ void CalculateBoundingBox(ZEAABBox& BoundingBox, ZEArray<ZEMapFilePolygon>& Poly
 
 void WriteMaterialsToFile(FILE* File, ZEArray<ZEMapFileMaterial>& Materials)
 {
-	ZEDWORD ChunkIndentifier = ZE_MPFL_MATERIAL_CHUNK;
+	ZEUInt32 ChunkIndentifier = ZE_MPFL_MATERIAL_CHUNK;
 	
 	// Write materials
 	for (size_t I = 0; I < Materials.GetCount(); I++)
 	{
 		// Write Material Chunk Identifier
-		fwrite(&ChunkIndentifier, sizeof(ZEDWORD), 1, File);
+		fwrite(&ChunkIndentifier, sizeof(ZEUInt32), 1, File);
 
 		// Write Material
 		fwrite(&Materials[I], sizeof(ZEMapFileMaterial), 1, File);
@@ -103,8 +103,8 @@ void WriteMaterialsToFile(FILE* File, ZEArray<ZEMapFileMaterial>& Materials)
 void WritePolygonsToFile(FILE* File, ZEArray<ZEMapFilePolygon>& Polygons)
 {
 	// Write chunk identifier
-	ZEDWORD ChunkIdentifier = ZE_MPFL_POLYGONS_CHUNK;
-	fwrite(&ChunkIdentifier, sizeof(ZEDWORD), 1, File);
+	ZEUInt32 ChunkIdentifier = ZE_MPFL_POLYGONS_CHUNK;
+	fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
 
 	// Normalize vertex elements (Normals, Binormals, Tangents)
 	for(int I = 0; I < Polygons.GetCount(); I++)
@@ -154,9 +154,9 @@ void WriteOctreeToFile(FILE* File, ZEMapFileOctree* Octree)
 	fwrite(&FileOctree, sizeof(ZEMapFileOctreeChunk), 1, File);
 	if (FileOctree.IsLeaf)
 	{
-		ZEDWORD ChunkIdentifier = ZE_MPFL_OCTREE_POLYGONIDS_CHUNK;
-		fwrite(&ChunkIdentifier, sizeof(ZEDWORD), 1, File);
-		fwrite(Octree->PolygonIds.GetCArray(), sizeof(ZEDWORD), Octree->PolygonIds.GetCount(), File);
+		ZEUInt32 ChunkIdentifier = ZE_MPFL_OCTREE_POLYGONIDS_CHUNK;
+		fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
+		fwrite(Octree->PolygonIds.GetCArray(), sizeof(ZEUInt32), Octree->PolygonIds.GetCount(), File);
 	}
 	else
 		for (int I = 0; I < 8; I++)
@@ -174,13 +174,13 @@ void WritePhysicalMeshToFile(FILE* File, ZEMapFilePhysicalMesh& PhysicalMesh)
 	fwrite(&FilePhysicalMesh, sizeof(ZEMapFilePhysicalMeshChunk), 1, File);
 
 	// Write physical mesh vertices
-	ZEDWORD ChunkIdentifier = ZE_MPFL_PHYSICAL_MESH_VERTICES_CHUNK;
-	fwrite(&ChunkIdentifier, sizeof(ZEDWORD), 1, File);
+	ZEUInt32 ChunkIdentifier = ZE_MPFL_PHYSICAL_MESH_VERTICES_CHUNK;
+	fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
 	fwrite(PhysicalMesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalMesh.Vertices.GetCount(), File);
 
 	// Write physical mesh polygons
 	ChunkIdentifier = ZE_MPFL_PHYSICAL_MESH_POLYGONS_CHUNK;
-	fwrite(&ChunkIdentifier, sizeof(ZEDWORD), 1, File);
+	fwrite(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
 	fwrite(PhysicalMesh.Polygons.GetCArray(), sizeof(ZEMapFilePhysicalMeshPolygon), PhysicalMesh.Polygons.GetCount(), File);
 }
 
@@ -280,13 +280,13 @@ bool ZEMapFile::WriteToFile(const char* FileName, int Chunks)
 
 bool ReadMaterialsFromFile(FILE* File, ZEArray<ZEMapFileMaterial>& Materials)
 {
-	ZEDWORD ChunkIndentifier = 0;
+	ZEUInt32 ChunkIndentifier = 0;
 	
 	// Read materials
 	for (size_t I = 0; I < Materials.GetCount(); I++)
 	{
 		// Read Material Chunk Identifier and check it
-		fread(&ChunkIndentifier, sizeof(ZEDWORD), 1, File);
+		fread(&ChunkIndentifier, sizeof(ZEUInt32), 1, File);
 		if (ChunkIndentifier != ZE_MPFL_MATERIAL_CHUNK)
 		{
 			zesdkError("Map File", "Material chunk's id does not match.");
@@ -302,8 +302,8 @@ bool ReadMaterialsFromFile(FILE* File, ZEArray<ZEMapFileMaterial>& Materials)
 bool ReadPolygonsFromFile(FILE* File, ZEArray<ZEMapFilePolygon>& Polygons)
 {
 	// Read chunk identifier and check it
-	ZEDWORD ChunkIdentifier = 0;
-	fread(&ChunkIdentifier, sizeof(ZEDWORD), 1, File);
+	ZEUInt32 ChunkIdentifier = 0;
+	fread(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
 	if (ChunkIdentifier != ZE_MPFL_POLYGONS_CHUNK)
 	{
 		zesdkError("Map File", "Polygons chunk's id does not match.");
@@ -351,8 +351,8 @@ bool ReadOctreeNodeFromFile(FILE* File, ZEMapFileOctree* Octree)
 	else
 	{
 		// if node is leaf node then read polygon ids.
-		ZEDWORD ChunkIndentifier;
-		fread(&ChunkIndentifier, sizeof(ZEDWORD), 1, File);
+		ZEUInt32 ChunkIndentifier;
+		fread(&ChunkIndentifier, sizeof(ZEUInt32), 1, File);
 
 		// Check chunk indentifier
 		if (ChunkIndentifier != ZE_MPFL_OCTREE_POLYGONIDS_CHUNK)
@@ -398,10 +398,10 @@ bool ReadPhysicalMeshFromFile(FILE* File, ZEMapFilePhysicalMesh& PhysicalMesh)
 	PhysicalMesh.Polygons.SetCount(FilePhysicalMesh.PolygonCount);
 	PhysicalMesh.Vertices.SetCount(FilePhysicalMesh.VertexCount);
 
-	ZEDWORD ChunkIdentifier = 0;
+	ZEUInt32 ChunkIdentifier = 0;
 
 	// Check physical mesh vertices chunk identifier
-	fread(&ChunkIdentifier, sizeof(ZEDWORD), 1, File);
+	fread(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
 	if (ChunkIdentifier != ZE_MPFL_PHYSICAL_MESH_VERTICES_CHUNK)
 	{
 		zesdkError("Map File", "Physical mesh vertices chunk's id does not match.");
@@ -412,7 +412,7 @@ bool ReadPhysicalMeshFromFile(FILE* File, ZEMapFilePhysicalMesh& PhysicalMesh)
 	fread(PhysicalMesh.Vertices.GetCArray(), sizeof(ZEVector3), PhysicalMesh.Vertices.GetCount(), File);
 
 	// Check physical mesh polygons chunk identifier
-	fread(&ChunkIdentifier, sizeof(ZEDWORD), 1, File);
+	fread(&ChunkIdentifier, sizeof(ZEUInt32), 1, File);
 	if (ChunkIdentifier != ZE_MPFL_PHYSICAL_MESH_POLYGONS_CHUNK)
 	{
 		zesdkError("Map File", "Physical mesh polygons chunk's id does not match.");

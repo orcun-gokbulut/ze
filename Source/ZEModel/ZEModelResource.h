@@ -147,8 +147,8 @@ struct ZEModelResourcePhysicalJoint
 
 	bool										Enabled;
 
-	ZEDWORD										Body1Id;
-	ZEDWORD										Body2Id;
+	ZEUInt32										Body1Id;
+	ZEUInt32										Body2Id;
 
 	bool										CollideBodies;
 
@@ -236,7 +236,7 @@ struct ZEModelResourcePhysicalJoint
 
 struct ZEModelResourceAnimationKey
 {
-	ZEDWORD										ItemId;
+	ZEUInt32										ItemId;
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;
 	ZEVector3									Scale;
@@ -261,11 +261,11 @@ class ZEModelResourceMeshLOD
 		ZEStaticVertexBuffer*					SharedVertexBuffer;
 
 	public:
-		ZEINT32									LODLevel;
-		ZEINT32									MaterialId;
+		ZEInt32									LODLevel;
+		ZEInt32									MaterialId;
 		ZEArray<ZEModelVertex>					Vertices;
 		ZEArray<ZESkinnedModelVertex>			SkinnedVertices;
-		ZEArray<ZEDWORD>						AffectingBoneIds;
+		ZEArray<ZEUInt32>						AffectingBoneIds;
 
 		ZEStaticVertexBuffer*					GetSharedVertexBuffer() const;
 		ZEStaticVertexBuffer*					CreatePrivateVertexBuffer() const;
@@ -290,7 +290,7 @@ struct ZEModelResourceBone
 {
 	char										Name[ZE_MDLF_MAX_NAME_SIZE];
 	ZEAABBox									BoundingBox;
-	ZEINT32										ParentBone;
+	ZEInt32										ParentBone;
 	ZEVector3									RelativePosition;
 	ZEQuaternion								RelativeRotation;
 	ZEVector3									RelativeScale;

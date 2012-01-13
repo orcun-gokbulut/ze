@@ -47,7 +47,7 @@ class ZECompressedFile
 	protected:
 		void*				File;
 		char				FileName[256];
-		ZEQWORD				FileCursor;
+		ZEUInt64				FileCursor;
 		
 	public:
 		const char*			GetFileName() const;
@@ -55,15 +55,15 @@ class ZECompressedFile
 
 		virtual bool		Open(const char* FileName, ZEFileMode Mode = ZE_FM_READ_WRITE, bool Binary = true); 
 
-		virtual bool		Seek(ZEINT64 Offset, ZESeekFrom Origin);		
+		virtual bool		Seek(ZEInt64 Offset, ZESeekFrom Origin);		
 
-		virtual ZEQWORD		Tell();										
+		virtual ZEUInt64		Tell();										
 
-		virtual ZEQWORD		Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);				
-		virtual ZEQWORD		Write(const void* Buffer, ZEQWORD Size, ZEQWORD Count);	
+		virtual ZEUInt64		Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);				
+		virtual ZEUInt64		Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count);	
 		
-		static ZEQWORD		GetFileSize(const char* FileName);
-		virtual ZEQWORD		GetFileSize();
+		static ZEUInt64		GetFileSize(const char* FileName);
+		virtual ZEUInt64		GetFileSize();
 		
 		virtual void		Close();
 		virtual bool		Eof();
@@ -79,23 +79,23 @@ class ZECompressedFile
 class ZEPartialCompressedFile : public ZECompressedFile
 {
 	protected:
-		ZEQWORD				StartPosition;
-		ZEQWORD				EndPosition;
+		ZEUInt64				StartPosition;
+		ZEUInt64				EndPosition;
 		bool				IsEof;
 		ZECompressedFile*	BaseFile;
 
 	public:
-		virtual bool		Open(ZECompressedFile* ParentFile, ZEQWORD Offset, ZEQWORD Size);
+		virtual bool		Open(ZECompressedFile* ParentFile, ZEUInt64 Offset, ZEUInt64 Size);
 		virtual bool		Open(const char* FileName, ZEFileMode Mode, bool Binary);
 		virtual void		Close();
 
-		virtual ZEQWORD		Read(void* Buffer, ZEQWORD Size, ZEQWORD Count);
-		virtual ZEQWORD		Write(void* Buffer, ZEQWORD Size, ZEQWORD Count);
+		virtual ZEUInt64		Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
+		virtual ZEUInt64		Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
 
-		virtual bool		Seek(ZEINT64 Offset, ZESeekFrom Origin);
-		virtual ZEQWORD		Tell();
+		virtual bool		Seek(ZEInt64 Offset, ZESeekFrom Origin);
+		virtual ZEUInt64		Tell();
 
-		virtual ZEQWORD		GetFileSize();
+		virtual ZEUInt64		GetFileSize();
 		virtual bool		Eof();				
 
 							ZEPartialCompressedFile();

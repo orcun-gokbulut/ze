@@ -46,32 +46,32 @@
 #define ZE_MAP_MAX_NAME_SIZE ZE_MAX_NAME_SIZE
 #define ZE_MAP_MAX_FILENAME_SIZE ZE_MAX_FILE_NAME_SIZE
 
-#define ZE_FILE_FORMAT_MAKEVERSION(Major, Minor) ((ZEDWORD)((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor)))
-#define ZE_FILE_FORMAT_GETMINORVERSION(x) ((ZEDWORD)((x) & 0x0000FFFF))
-#define ZE_FILE_FORMAT_GETMAJORVERSION(x) ((ZEDWORD)(((x) & 0xFFFF0000) >> 16))
+#define ZE_FILE_FORMAT_MAKEVERSION(Major, Minor) ((ZEUInt32)((((ZEUInt32)(Major)) << 16) + (ZEUInt32)(Minor)))
+#define ZE_FILE_FORMAT_GETMINORVERSION(x) ((ZEUInt32)((x) & 0x0000FFFF))
+#define ZE_FILE_FORMAT_GETMAJORVERSION(x) ((ZEUInt32)(((x) & 0xFFFF0000) >> 16))
 
 #define ZE_MAP_VERSION ZE_FILE_FORMAT_MAKEVERSION(0, 5)
 
-#define ZE_MAP_HEADER ((ZEDWORD)((ZEDWORD)'ZEMF' + (ZEDWORD)'MAP '))
-#define ZE_MAP_MATERIAL_CHUNK ((ZEDWORD)(ZE_MAP_HEADER + (ZEDWORD)'MTRL'))
-#define ZE_MAP_PORTAL_CHUNK ((ZEDWORD)(ZE_MAP_HEADER + (ZEDWORD)'PRTL'))
-#define ZE_MAP_PORTAL_DOOR_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'DOOR'))
-#define ZE_MAP_BRUSHE_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'BRSH'))
-#define ZE_MAP_POLYGONS_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'PLYG'))
-#define ZE_MAP_OCTREE_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'OCTR' + (ZEDWORD)'NODE'))
-#define ZE_MAP_OCTREE_POLYGONIDS_CHUNK ((ZEDWORD)(ZE_MAP_OCTREE_CHUNK + (ZEDWORD)'PLID'))
-#define ZE_MAP_ENTITY_CHUNK ((ZEDWORD)(ZE_MAP_HEADER + (ZEDWORD)'ENTY'))
-#define ZE_MAP_ENTITY_ATTRIBUTE_CHUNK ((ZEDWORD)(ZE_MAP_ENTITY_CHUNK + (ZEDWORD)'ATTR'))
-#define ZE_MAP_PHYSICAL_MESH_CHUNK ((ZEDWORD)(ZE_MAP_PORTAL_CHUNK + (ZEDWORD)'MESH'))
-#define ZE_MAP_PHYSICAL_MESH_VERTICES_CHUNK ((ZEDWORD)(ZE_MAP_PHYSICAL_MESH_CHUNK + (ZEDWORD)'VERT'))
-#define ZE_MAP_PHYSICAL_MESH_POLYGONS_CHUNK ((ZEDWORD)(ZE_MAP_PHYSICAL_MESH_CHUNK + (ZEDWORD)'INDX'))
+#define ZE_MAP_HEADER ((ZEUInt32)((ZEUInt32)'ZEMF' + (ZEUInt32)'MAP '))
+#define ZE_MAP_MATERIAL_CHUNK ((ZEUInt32)(ZE_MAP_HEADER + (ZEUInt32)'MTRL'))
+#define ZE_MAP_PORTAL_CHUNK ((ZEUInt32)(ZE_MAP_HEADER + (ZEUInt32)'PRTL'))
+#define ZE_MAP_PORTAL_DOOR_CHUNK ((ZEUInt32)(ZE_MAP_PORTAL_CHUNK + (ZEUInt32)'DOOR'))
+#define ZE_MAP_BRUSHE_CHUNK ((ZEUInt32)(ZE_MAP_PORTAL_CHUNK + (ZEUInt32)'BRSH'))
+#define ZE_MAP_POLYGONS_CHUNK ((ZEUInt32)(ZE_MAP_PORTAL_CHUNK + (ZEUInt32)'PLYG'))
+#define ZE_MAP_OCTREE_CHUNK ((ZEUInt32)(ZE_MAP_PORTAL_CHUNK + (ZEUInt32)'OCTR' + (ZEUInt32)'NODE'))
+#define ZE_MAP_OCTREE_POLYGONIDS_CHUNK ((ZEUInt32)(ZE_MAP_OCTREE_CHUNK + (ZEUInt32)'PLID'))
+#define ZE_MAP_ENTITY_CHUNK ((ZEUInt32)(ZE_MAP_HEADER + (ZEUInt32)'ENTY'))
+#define ZE_MAP_ENTITY_ATTRIBUTE_CHUNK ((ZEUInt32)(ZE_MAP_ENTITY_CHUNK + (ZEUInt32)'ATTR'))
+#define ZE_MAP_PHYSICAL_MESH_CHUNK ((ZEUInt32)(ZE_MAP_PORTAL_CHUNK + (ZEUInt32)'MESH'))
+#define ZE_MAP_PHYSICAL_MESH_VERTICES_CHUNK ((ZEUInt32)(ZE_MAP_PHYSICAL_MESH_CHUNK + (ZEUInt32)'VERT'))
+#define ZE_MAP_PHYSICAL_MESH_POLYGONS_CHUNK ((ZEUInt32)(ZE_MAP_PHYSICAL_MESH_CHUNK + (ZEUInt32)'INDX'))
 
 struct ZEMapFileMaterialChunk
 {
-	ZEDWORD							ChunkIdentifier;
+	ZEUInt32							ChunkIdentifier;
 
 	char							Shader[ZE_MAP_MAX_FILENAME_SIZE];
-	ZEDWORD							ShaderComponents;
+	ZEUInt32							ShaderComponents;
 
 	bool							TwoSided;
 	bool							LightningEnabled;
@@ -112,59 +112,59 @@ struct ZEMapFileVertexChunk
 
 struct ZEMapFilePolygonChunk
 {	
-	ZEDWORD							Material;
+	ZEUInt32							Material;
 	ZEMapFileVertexChunk			Vertices[3];
 };
 
 struct ZEMapFilePhysicalMeshPolygonChunk
 {
-	ZEDWORD							Indices[3];
+	ZEUInt32							Indices[3];
 };
 
 struct ZEMapFileOctreeChunk
 {
-	ZEDWORD							ChunkIdentifier;
+	ZEUInt32							ChunkIdentifier;
 	ZEAABBox					BoundingBox;
-	ZEDWORD							Depth;
+	ZEUInt32							Depth;
 	bool							SubSpaces[8];
 	bool							IsLeaf;
-	ZEDWORD							PolygonCount;
+	ZEUInt32							PolygonCount;
 };
 
 struct ZEMapFileDoorChunk
 {
-	ZEDWORD							ChunkIdentifier;
+	ZEUInt32							ChunkIdentifier;
 	char							Name[ZE_MAP_MAX_NAME_SIZE];
 	ZERectangle3D					Rectangle;
-	ZEDWORD							PortalIds[2];
+	ZEUInt32							PortalIds[2];
 	bool							IsOpen;
 };
 
 struct ZEMapFilePortalChunk
 {
-	ZEDWORD							ChunkIdentifier;
+	ZEUInt32							ChunkIdentifier;
 	char							Name[ZE_MAP_MAX_NAME_SIZE];
 	ZEAABBox					BoundingBox;
-	ZEDWORD							PolygonCount;
+	ZEUInt32							PolygonCount;
 	bool							HasOctree;
 	bool							HasPhysicalMesh;
 };
 
 struct ZEMapFilePhysicalMeshChunk
 {
-	ZEDWORD							ChunkIdentifier;
-	ZEDWORD							VertexCount;
-	ZEDWORD							PolygonCount;
+	ZEUInt32							ChunkIdentifier;
+	ZEUInt32							VertexCount;
+	ZEUInt32							PolygonCount;
 };
 
 struct ZEMapFileHeader
 {
-	ZEDWORD							Header;
-	ZEDWORD							Version;
+	ZEUInt32							Header;
+	ZEUInt32							Version;
 
-	ZEDWORD							MaterialCount;
-	ZEDWORD							PortalCount;
-	ZEDWORD							DoorCount;
+	ZEUInt32							MaterialCount;
+	ZEUInt32							PortalCount;
+	ZEUInt32							DoorCount;
 
 };
 

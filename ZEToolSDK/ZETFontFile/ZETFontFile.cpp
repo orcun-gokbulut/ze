@@ -37,12 +37,12 @@
 #include <stdio.h>
 #include <memory.h>
 
-#define ZEFONTFILE_HEADER									((ZEDWORD)((ZEDWORD)'ZEFF' + (ZEDWORD)'FONT'))
+#define ZEFONTFILE_HEADER									((ZEUInt32)((ZEUInt32)'ZEFF' + (ZEUInt32)'FONT'))
 
 struct ZEFontFileHeader
 {
-	ZEDWORD				Header;
-	ZEDWORD				TextureCount;
+	ZEUInt32				Header;
+	ZEUInt32				TextureCount;
 	ZEFontCharacter		Characters[256];
 };
 

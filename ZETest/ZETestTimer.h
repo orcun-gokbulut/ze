@@ -42,9 +42,9 @@
 class ZETestTimer
 {
 	private:
-		ZEUINT64		StartTime;
-		ZEUINT64		EndTime;
-		ZEUINT64		Frequency;
+		ZEUInt64		StartTime;
+		ZEUInt64		EndTime;
+		ZEUInt64		Frequency;
 
 	public:
 		float			GetElapsedTime();

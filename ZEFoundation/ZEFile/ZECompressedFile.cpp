@@ -57,8 +57,8 @@
 
 struct Index
 {
-	ZEQWORD				NextHolderPosition;
-	ZEQWORD				UnCompressedDataSize;
+	ZEUInt64				NextHolderPosition;
+	ZEUInt64				UnCompressedDataSize;
 };
 
 
@@ -89,16 +89,16 @@ bool ZECompressedFile::Eof()
 	return (bool)feof((FILE*)File);
 }
 
-bool ZECompressedFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
+bool ZECompressedFile::Seek(ZEInt64 Offset, ZESeekFrom Origin)
 {
 	//If file is not opened return false
 	if(!File)
 		return false;
 
 	//Store current cursor position
-	ZEQWORD CursorPositionBeforeSeek = _ftelli64((FILE*)File);
+	ZEUInt64 CursorPositionBeforeSeek = _ftelli64((FILE*)File);
 	_fseeki64((FILE*)File,0,SEEK_SET);
-	ZEQWORD CursorPosition = 0;
+	ZEUInt64 CursorPosition = 0;
 	
 	switch(Origin)
 	{
@@ -116,8 +116,8 @@ bool ZECompressedFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
 	if(CursorPosition < 0 )
 		return false;
 
-	ZEQWORD TotalReadData = 0;
-	ZEQWORD ReadDataSize;
+	ZEUInt64 TotalReadData = 0;
+	ZEUInt64 ReadDataSize;
 	Index CurrentIndex;
 
 	while(true)
@@ -159,7 +159,7 @@ bool ZECompressedFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
 	return false;
 }
 
-ZEQWORD ZECompressedFile::Tell()
+ZEUInt64 ZECompressedFile::Tell()
 {
 	if(!File)
 		return 0;
@@ -294,16 +294,16 @@ bool ZECompressedFile::Open(const char* FileName, ZEFileMode Mode, bool Binary)
 	return false;
 }    
 
-ZEQWORD ZECompressedFile::Read(void* Buffer, ZEQWORD Size,ZEQWORD Count)
+ZEUInt64 ZECompressedFile::Read(void* Buffer, ZEUInt64 Size,ZEUInt64 Count)
 {
-	ZEINT64 BufferPointer;
-	ZEQWORD DataReadSize;
-	ZEQWORD TotalPassedData = 0;
-	ZEQWORD DataStartPosition = 0;
-	ZEQWORD FirstIndexPosition;
-	ZEQWORD LastIndexPosition;
-	ZEQWORD FirstBlockTampon = 0;
-	ZEQWORD FileCursorBeforeRead = 0;
+	ZEInt64 BufferPointer;
+	ZEUInt64 DataReadSize;
+	ZEUInt64 TotalPassedData = 0;
+	ZEUInt64 DataStartPosition = 0;
+	ZEUInt64 FirstIndexPosition;
+	ZEUInt64 LastIndexPosition;
+	ZEUInt64 FirstBlockTampon = 0;
+	ZEUInt64 FileCursorBeforeRead = 0;
 	bool FirstBlockInTheProcess = true;
 	bool LastBlock = false;
 	Index CurrentIndex;
@@ -341,7 +341,7 @@ ZEQWORD ZECompressedFile::Read(void* Buffer, ZEQWORD Size,ZEQWORD Count)
 				FirstIndexFound = true;
 
 				//Go to start position of current index
-				_fseeki64((FILE*)File, - (ZEINT64)sizeof(Index),SEEK_CUR);
+				_fseeki64((FILE*)File, - (ZEInt64)sizeof(Index),SEEK_CUR);
 
 				//Store first indexes start position
 				FirstIndexPosition = _ftelli64((FILE*)File);
@@ -374,7 +374,7 @@ ZEQWORD ZECompressedFile::Read(void* Buffer, ZEQWORD Size,ZEQWORD Count)
 				LastIndexFound = true;
 
 				//Go to current indexes start position
-				_fseeki64((FILE*)File, - (ZEINT64)sizeof(Index),SEEK_CUR);
+				_fseeki64((FILE*)File, - (ZEInt64)sizeof(Index),SEEK_CUR);
 
 				//Store this position
 				LastIndexPosition = _ftelli64((FILE*)File);
@@ -396,11 +396,11 @@ ZEQWORD ZECompressedFile::Read(void* Buffer, ZEQWORD Size,ZEQWORD Count)
 	int InflateReturnValue = 0;
 	int Flush;
 	Index ActiveIndex;
-	ZEQWORD DeCompressedDataSize = 0;
-	ZEQWORD TotalDeCompressedDataSize = 0;
-	ZEQWORD DataWillBeReadSize = CHUNK_SIZE;
-	ZEQWORD DataWillBeReadTotalSize;
-	ZEQWORD TotalReadData = 0;
+	ZEUInt64 DeCompressedDataSize = 0;
+	ZEUInt64 TotalDeCompressedDataSize = 0;
+	ZEUInt64 DataWillBeReadSize = CHUNK_SIZE;
+	ZEUInt64 DataWillBeReadTotalSize;
+	ZEUInt64 TotalReadData = 0;
 
 	//Create in and out buffers for inflate function
 	unsigned char* InputBuffer = new unsigned char[CHUNK_SIZE];
@@ -460,7 +460,7 @@ ZEQWORD ZECompressedFile::Read(void* Buffer, ZEQWORD Size,ZEQWORD Count)
 		}
 		
 		//Calculate how much data must be read from file
-		ZEQWORD naynay = _ftelli64((FILE*)File);
+		ZEUInt64 naynay = _ftelli64((FILE*)File);
 		DataWillBeReadSize = ActiveIndex.NextHolderPosition - _ftelli64((FILE*)File) + FileCursorBeforeRead;
 
 
@@ -517,7 +517,7 @@ ZEQWORD ZECompressedFile::Read(void* Buffer, ZEQWORD Size,ZEQWORD Count)
 			{
 
 				//Calculate how much data must be taken from buffer
-				ZEQWORD sizeToCopy;
+				ZEUInt64 sizeToCopy;
 				if(DeCompressedDataSize-FirstBlockTampon > Size)
 					sizeToCopy = Size;
 				else
@@ -533,7 +533,7 @@ ZEQWORD ZECompressedFile::Read(void* Buffer, ZEQWORD Size,ZEQWORD Count)
 				OutputBuffer -= FirstBlockTampon;
 
 				//Calculate datas new pointer
-				BufferPointer = (ZEINT64)Buffer;
+				BufferPointer = (ZEInt64)Buffer;
 				BufferPointer += sizeToCopy;
 				Buffer = (void*)BufferPointer;
 
@@ -551,7 +551,7 @@ ZEQWORD ZECompressedFile::Read(void* Buffer, ZEQWORD Size,ZEQWORD Count)
 				memcpy(Buffer,OutputBuffer,DeCompressedDataSize);
 
 				//Recalculate datas pointer
-				BufferPointer = (ZEINT64)Buffer;
+				BufferPointer = (ZEInt64)Buffer;
 				BufferPointer += DeCompressedDataSize;
 				Buffer = (void*)BufferPointer;
 
@@ -581,7 +581,7 @@ ZEQWORD ZECompressedFile::Read(void* Buffer, ZEQWORD Size,ZEQWORD Count)
 	_fseeki64((FILE*)File,FileCursorBeforeRead,SEEK_SET);
 
 	//Recalculate data pointer 
-	BufferPointer = (ZEINT64)Buffer;
+	BufferPointer = (ZEInt64)Buffer;
 	BufferPointer -= TotalDeCompressedDataSize;
 	Buffer = (void*)BufferPointer;
 
@@ -594,22 +594,22 @@ ZEQWORD ZECompressedFile::Read(void* Buffer, ZEQWORD Size,ZEQWORD Count)
 
 }
 
-ZEQWORD ZECompressedFile::Write( const void* Buffer, ZEQWORD Size, ZEQWORD Count)
+ZEUInt64 ZECompressedFile::Write( const void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 {
 	if(!File)
 		return 0;
 	int Flush;
 	int DeflateReturnValue;
-	ZEINT64 BufferPointer;
-	ZEQWORD CompressedDataSize = 0;
-	ZEQWORD TotalCompressedDataSize = 0;
-	ZEQWORD BufferSizeToCopy = CHUNK_SIZE;
-	ZEQWORD BufferStartPointToCopy = 0;
+	ZEInt64 BufferPointer;
+	ZEUInt64 CompressedDataSize = 0;
+	ZEUInt64 TotalCompressedDataSize = 0;
+	ZEUInt64 BufferSizeToCopy = CHUNK_SIZE;
+	ZEUInt64 BufferStartPointToCopy = 0;
 	Index ActiveIndex;
-	ZEQWORD ActiveIndexPosition;
-	ZEQWORD PreviousIndexPosition = 0;
-	ZEQWORD FileCursorBeforeWrite;
-	ZEQWORD ReturnValue;
+	ZEUInt64 ActiveIndexPosition;
+	ZEUInt64 PreviousIndexPosition = 0;
+	ZEUInt64 FileCursorBeforeWrite;
+	ZEUInt64 ReturnValue;
 	z_stream Stream;
 
 	//Create in and out buffers for compress 
@@ -656,7 +656,7 @@ ZEQWORD ZECompressedFile::Write( const void* Buffer, ZEQWORD Size, ZEQWORD Count
 		memcpy(InputBuffer, Buffer,BufferSizeToCopy);
 
 		//Update Buffer pointer 
-		BufferPointer = (ZEINT64)Buffer;
+		BufferPointer = (ZEInt64)Buffer;
 		BufferPointer += BufferSizeToCopy;
 		Buffer = (void*)BufferPointer;
 
@@ -712,7 +712,7 @@ ZEQWORD ZECompressedFile::Write( const void* Buffer, ZEQWORD Size, ZEQWORD Count
 
 		//Set variables of last index
 		ActiveIndex.UnCompressedDataSize = BufferSizeToCopy;
-		ActiveIndex.NextHolderPosition = (ZEQWORD)(ActiveIndexPosition - FileCursorBeforeWrite);
+		ActiveIndex.NextHolderPosition = (ZEUInt64)(ActiveIndexPosition - FileCursorBeforeWrite);
 
 		//Go to last index position
 		_fseeki64((FILE*)File,PreviousIndexPosition,SEEK_SET);
@@ -735,14 +735,14 @@ ZEQWORD ZECompressedFile::Write( const void* Buffer, ZEQWORD Size, ZEQWORD Count
 	FileCursor += Size;
 
 	//Calculate compressed size
-	ReturnValue = (ZEINT64) (_ftelli64((FILE*)File) - ReturnValue);
+	ReturnValue = (ZEInt64) (_ftelli64((FILE*)File) - ReturnValue);
 
 	//retrun compressed size
 	return ReturnValue;
 
 }
 
-ZEQWORD ZECompressedFile::GetFileSize(const char* FileName)
+ZEUInt64 ZECompressedFile::GetFileSize(const char* FileName)
 {
 	struct stat FileStatus;
 
@@ -751,14 +751,14 @@ ZEQWORD ZECompressedFile::GetFileSize(const char* FileName)
 
 	return FileStatus.st_size;
 }
-ZEQWORD ZECompressedFile::GetFileSize()
+ZEUInt64 ZECompressedFile::GetFileSize()
 {
 	if (!File)
 		return 0;
-	ZEQWORD FieCursorBeforeGetFileSize = _ftelli64((FILE*)File);
+	ZEUInt64 FieCursorBeforeGetFileSize = _ftelli64((FILE*)File);
 
 	_fseeki64((FILE*)File, 0, SEEK_END);
-	ZEQWORD EndCursor = _ftelli64((FILE*)File);
+	ZEUInt64 EndCursor = _ftelli64((FILE*)File);
 	_fseeki64((FILE*)File, FieCursorBeforeGetFileSize, SEEK_SET);
 
 	return EndCursor;
@@ -785,7 +785,7 @@ bool ZEPartialCompressedFile::Open(const char* FileName, ZEFileMode Mode, bool B
 	return false;
 }
 
-bool ZEPartialCompressedFile::Open(ZECompressedFile* ParentFile, ZEQWORD Offset, ZEQWORD Size)
+bool ZEPartialCompressedFile::Open(ZECompressedFile* ParentFile, ZEUInt64 Offset, ZEUInt64 Size)
 {
 	//zeAssert(Size == 0, "Cannot open a PartialFile with 0 size");
 
@@ -809,12 +809,12 @@ void ZEPartialCompressedFile::Close()
 	IsEof			= false;
 }
 
-ZEQWORD ZEPartialCompressedFile::GetFileSize()
+ZEUInt64 ZEPartialCompressedFile::GetFileSize()
 {
 	return EndPosition - StartPosition;	
 }
 
-ZEQWORD ZEPartialCompressedFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)
+ZEUInt64 ZEPartialCompressedFile::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 {
 	//If file is not opened return false
 	if(!File)
@@ -825,7 +825,7 @@ ZEQWORD ZEPartialCompressedFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)
 		return 0;
 
 	// Calculate read end position
-	ZEQWORD ReadEndPosition = FileCursor + Size * Count;
+	ZEUInt64 ReadEndPosition = FileCursor + Size * Count;
 
 	//If trying to read outside of bounds
 	if (ReadEndPosition > EndPosition)
@@ -842,7 +842,7 @@ ZEQWORD ZEPartialCompressedFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)
 	BaseFile->FileCursor = FileCursor;
 
 	//Read
-	ZEQWORD ReadCount = BaseFile->Read(Buffer,Size,Count);
+	ZEUInt64 ReadCount = BaseFile->Read(Buffer,Size,Count);
 
 	//Calculate file cursor
 	FileCursor += Count * Size;
@@ -852,20 +852,20 @@ ZEQWORD ZEPartialCompressedFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)
 
 }
 
-ZEQWORD ZEPartialCompressedFile::Write(void* Buffer, ZEQWORD Size, ZEQWORD Count)
+ZEUInt64 ZEPartialCompressedFile::Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 {
 	//WRITE IS NOT ALLOWED !!!
 	return 0;
 }
 
-bool ZEPartialCompressedFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
+bool ZEPartialCompressedFile::Seek(ZEInt64 Offset, ZESeekFrom Origin)
 {
 	//If file is not opened return 0
 	if(!File)
 		return 0;
 
 	//Store cursor position
-	ZEQWORD FileCursorPosition = _ftelli64((FILE*)File);
+	ZEUInt64 FileCursorPosition = _ftelli64((FILE*)File);
 
 	switch(Origin)
 	{
@@ -929,7 +929,7 @@ bool ZEPartialCompressedFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
 	return true;
 }
 
-ZEQWORD ZEPartialCompressedFile::Tell()
+ZEUInt64 ZEPartialCompressedFile::Tell()
 {
 	return FileCursor - StartPosition;
 }

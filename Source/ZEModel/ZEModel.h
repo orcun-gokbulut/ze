@@ -115,7 +115,7 @@ class ZEModel : public ZEComponent
 	public:
 		ZEArray<ZEModelIKChain>				IKChains;
 
-		virtual	ZEDWORD						GetDrawFlags() const;
+		virtual	ZEUInt32						GetDrawFlags() const;
 
 		virtual const ZEAABBox&		GetLocalBoundingBox() const;
 

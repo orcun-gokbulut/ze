@@ -41,13 +41,13 @@
 #include "ZESerialization/ZESerializer.h"
 #include "ZESerialization/ZEUnserializer.h"
 
-#define ZE_CLSF_CLASS_CHUNKID ((ZEDWORD)'CLAS')
+#define ZE_CLSF_CLASS_CHUNKID ((ZEUInt32)'CLAS')
 
 struct ZEObjectFileChunk
 {
-	ZEDWORD		Header;
+	ZEUInt32		Header;
 	char		ClassType[ZE_MAX_NAME_SIZE];
-	ZEDWORD		PropertyCount;
+	ZEUInt32		PropertyCount;
 };
 
 bool ZEObjectDescription::CheckParent(ZEObjectDescription* Parent, ZEObjectDescription* Children)

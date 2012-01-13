@@ -798,9 +798,9 @@ ZETestSuite(ZEString)
 	ZETest("ZEUINT32 ZEString::ToUInt() const")
 	{
 		ZEString String = "123";
-		ZEUINT32 ExpectedValue = 123;
+		ZEUInt32 ExpectedValue = 123;
 
-		ZEUINT32 Value = String.ToUInt();
+		ZEUInt32 Value = String.ToUInt();
 
 		ZETestCheckEqual(Value, ExpectedValue);
 	}

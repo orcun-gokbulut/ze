@@ -49,7 +49,9 @@ class ZEMath
 	public:
 		static float		Sqrt(float Value);
 		static float		Abs(float Value);
+		static int			Abs(int Value);
 		static float		Sign(float Value);
+		static int			Sign(int Value);
 
 		static float		Min(float A, float B);
 		static float		Max(float A, float B);

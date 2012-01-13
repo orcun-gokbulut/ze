@@ -936,7 +936,7 @@ ZEGizmoAxis ZEGizmo::PickScaleAxis(const ZERay& Ray, float& TRay)
 	return PickedAxis;
 }
 
-ZEDWORD ZEGizmo::GetDrawFlags() const
+ZEUInt32 ZEGizmo::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;
 }

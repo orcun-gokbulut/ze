@@ -193,10 +193,10 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 
 	for (size_t I = 0; I < FileHeader.TextureCount; I++)
 	{
-		ZEDWORD FileCursor, TextureFileSize;
+		ZEUInt32 FileCursor, TextureFileSize;
 		
-		ResourceFile->Read(&TextureFileSize, sizeof(ZEDWORD), 1);
-		FileCursor = (ZEDWORD)ResourceFile->Tell();
+		ResourceFile->Read(&TextureFileSize, sizeof(ZEUInt32), 1);
+		FileCursor = (ZEUInt32)ResourceFile->Tell();
 
 		ZEPartialFile TextureResourceFile;
 		TextureResourceFile.Open(ResourceFile, FileCursor, TextureFileSize);

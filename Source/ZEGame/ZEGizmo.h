@@ -109,7 +109,7 @@ class ZEGizmo : public ZEEntity
 										ZEGizmo();
 
 	public:
-		virtual ZEDWORD					GetDrawFlags() const;
+		virtual ZEUInt32					GetDrawFlags() const;
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);

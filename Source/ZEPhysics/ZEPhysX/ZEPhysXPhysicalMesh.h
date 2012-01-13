@@ -58,7 +58,7 @@ class ZEPhysXPhysicalMesh : public ZEPhysicalMesh, private ZEPhysXComponentBase
 		NxActorDesc							ActorDesc;
 		NxTriangleMeshShapeDesc				TriangleMeshShapeDesc;	
 
-		ZEDWORD								CollisionFlags;
+		ZEUInt32								CollisionFlags;
 		ZEPhysicalCollisionEventArgument	CollisionCallback;
 
 		ZEVector3							Scale;
@@ -94,8 +94,8 @@ class ZEPhysXPhysicalMesh : public ZEPhysicalMesh, private ZEPhysXComponentBase
 													const ZEPhysicalTriangle* Triangles, size_t PolygonCount, 
 													const ZEPhysicalMaterial* Materials, size_t MaterialCount);
 
-		virtual void						SetCollisionCallbackFlags(ZEDWORD CollisionCallbackFlags);
-		virtual ZEDWORD						GetCollisionCallbackFlags();
+		virtual void						SetCollisionCallbackFlags(ZEUInt32 CollisionCallbackFlags);
+		virtual ZEUInt32						GetCollisionCallbackFlags();
 
 		virtual bool						Initialize();
 		virtual void						Deinitialize();	

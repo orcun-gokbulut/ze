@@ -55,19 +55,19 @@ ZERealTimeClock::~ZERealTimeClock()
 
 }
 
-ZEUINT64 ZERealTimeClock::GetCurrentTime()
+ZEUInt64 ZERealTimeClock::GetCurrentTime()
 {
 	LARGE_INTEGER CurrentTick;
 	QueryPerformanceCounter(&CurrentTick);
 	return ((FrameTick - StartTick) * 1000000) / Frequency;
 }
 
-ZEUINT64 ZERealTimeClock::GetFrameTime()
+ZEUInt64 ZERealTimeClock::GetFrameTime()
 {
 	return ((FrameTick - StartTick) * 1000000) / Frequency;
 }
 
-ZEUINT64 ZERealTimeClock::GetFrameDeltaTime()
+ZEUInt64 ZERealTimeClock::GetFrameDeltaTime()
 {
 	return ((FrameTick - OldFrameTick) * 1000000) / Frequency;
 }

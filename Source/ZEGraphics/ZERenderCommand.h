@@ -49,7 +49,7 @@ enum ZERenderPipeline
 };
 
 // ZERenderCommandFlags
-typedef ZEDWORD ZERenderCommandFlags;
+typedef ZEUInt32 ZERenderCommandFlags;
 #define	ZE_ROF_NONE									0
 #define	ZE_ROF_TRANSPARENT							1
 #define	ZE_ROF_IMPOSTER								2

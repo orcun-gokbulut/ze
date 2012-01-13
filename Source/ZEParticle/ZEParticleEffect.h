@@ -55,7 +55,7 @@ class ZEParticleEffect : public ZEComponent
 											ZEParticleEffect();
 		virtual								~ZEParticleEffect();
 	public:
-		virtual	ZEDWORD						GetDrawFlags() const;
+		virtual	ZEUInt32						GetDrawFlags() const;
 
 		bool								Initialize();
 		void								Deinitialize();

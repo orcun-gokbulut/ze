@@ -39,7 +39,7 @@
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZETrigger);
 
-ZEDWORD ZETrigger::GetDrawFlags()
+ZEUInt32 ZETrigger::GetDrawFlags()
 {
 	return ZE_DF_NONE;
 }

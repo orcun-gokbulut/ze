@@ -51,18 +51,18 @@ class ZEProfilerCounter
 		ZEProfilerCounter*			ParentCounter;
 		bool						CounterActive;
 
-		ZEINT64						StartTime;
-		ZEINT64						EndTime;
-		ZEINT64						PassedTime;
+		ZEInt64						StartTime;
+		ZEInt64						EndTime;
+		ZEInt64						PassedTime;
 
-		ZEINT64 					TotalCount;
-		ZEINT64						FrameCount;
-		ZEINT64						TotalMinimumTime;
-		ZEINT64						FrameMinimumTime;
-		ZEINT64						TotalMaximumTime;
-		ZEINT64						FrameMaximumTime;
-		ZEINT64						TotalTime;
-		ZEINT64						FrameTotalTime;
+		ZEInt64 					TotalCount;
+		ZEInt64						FrameCount;
+		ZEInt64						TotalMinimumTime;
+		ZEInt64						FrameMinimumTime;
+		ZEInt64						TotalMaximumTime;
+		ZEInt64						FrameMaximumTime;
+		ZEInt64						TotalTime;
+		ZEInt64						FrameTotalTime;
 
 
 	public:
@@ -77,17 +77,17 @@ class ZEProfilerCounter
 		void						Start();
 		void						Stop();
 
-		ZEINT64						GetFrameCount();
-		ZEINT64						GetFrameMinimumTime();
-		ZEINT64						GetFrameMaximumTime();
-		ZEINT64						GetFrameTotalTime();
-		ZEINT64						GetFrameAverageTime();
+		ZEInt64						GetFrameCount();
+		ZEInt64						GetFrameMinimumTime();
+		ZEInt64						GetFrameMaximumTime();
+		ZEInt64						GetFrameTotalTime();
+		ZEInt64						GetFrameAverageTime();
 
-		ZEINT64						GetTotalCount();
-		ZEINT64						GetTotalMinimumTime();
-		ZEINT64						GetTotalTime();
-		ZEINT64						GetTotalAverageTime();
-		ZEINT64						GetTotalMaximumTime();
+		ZEInt64						GetTotalCount();
+		ZEInt64						GetTotalMinimumTime();
+		ZEInt64						GetTotalTime();
+		ZEInt64						GetTotalAverageTime();
+		ZEInt64						GetTotalMaximumTime();
 
 		void						ResetFrame();
 		void						ResetTotal();	

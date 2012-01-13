@@ -42,7 +42,7 @@ void ZEParticleEffect::LoadFromFile(const char* ZEPEFFile)
 {
 }
 		
-ZEDWORD ZEParticleEffect::GetDrawFlags() const
+ZEUInt32 ZEParticleEffect::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;
 }

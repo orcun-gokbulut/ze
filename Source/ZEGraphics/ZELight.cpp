@@ -37,7 +37,7 @@
 #include "ZERenderCommand.h"
 #include "ZEGame/ZEEntity.h"
 
-ZEDWORD ZELight::GetDrawFlags() const
+ZEUInt32 ZELight::GetDrawFlags() const
 {
 	return ZE_DF_LIGHT_SOURCE;
 }

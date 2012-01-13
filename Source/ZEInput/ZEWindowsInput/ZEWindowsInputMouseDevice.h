@@ -67,8 +67,8 @@ class ZEWindowsInputMouseDevice : public ZEInputDevice
 	public:
 		virtual const ZEString&			GetDeviceName();
 
-		virtual ZEDWORD					GetButtonCount();
-		virtual ZEDWORD					GetAxisCount();
+		virtual ZEUInt32				GetButtonCount();
+		virtual ZEUInt32				GetAxisCount();
 		
 		virtual void					UnAcquire();
 

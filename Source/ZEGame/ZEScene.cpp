@@ -314,8 +314,8 @@ bool ZEScene::Save(const ZEString& FileName)
 	ZEFile Serializer;
 	if (Serializer.Open(NewPath, ZE_FM_WRITE_ONLY, true))
 	{
-		ZEDWORD EntityCount = Entities.GetCount();
-		Serializer.Write(&EntityCount, sizeof(ZEDWORD), 1);
+		ZEUInt32 EntityCount = Entities.GetCount();
+		Serializer.Write(&EntityCount, sizeof(ZEUInt32), 1);
 		
 		Serializer.Write(&LastEntityId, sizeof(int), 1);
 
@@ -364,8 +364,8 @@ bool ZEScene::Load(const ZEString& FileName)
 
 	if (Unserializer.Open(NewPath, ZE_FM_READ_ONLY, true))
 	{
-		ZEDWORD EntityCount;
-		Unserializer.Read(&EntityCount, sizeof(ZEDWORD), 1);
+		ZEUInt32 EntityCount;
+		Unserializer.Read(&EntityCount, sizeof(ZEUInt32), 1);
 		Unserializer.Read(&LastEntityId, sizeof(int), 1);
 
 		char MapFile[ZE_MAX_FILE_NAME_SIZE];

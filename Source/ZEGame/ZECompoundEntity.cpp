@@ -69,7 +69,7 @@ void ZECompoundEntity::UnregisterComponent(ZEComponent* Component)
 	Component->Destroy();
 } 
 		
-ZEDWORD ZECompoundEntity::GetRayCastFlags() const
+ZEUInt32 ZECompoundEntity::GetRayCastFlags() const
 {
 	return 0;
 }

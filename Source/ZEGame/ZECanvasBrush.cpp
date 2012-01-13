@@ -41,7 +41,7 @@
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 
-ZEDWORD ZECanvasBrush::GetDrawFlags() const
+ZEUInt32 ZECanvasBrush::GetDrawFlags() const
 {
 	return ZE_DF_DRAW | ZE_DF_CULL;
 }

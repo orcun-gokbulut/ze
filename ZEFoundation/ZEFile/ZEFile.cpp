@@ -169,7 +169,7 @@ bool ZEFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 	return false;
 }
 
-bool ZEFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
+bool ZEFile::Seek(ZEInt64 Offset, ZESeekFrom Origin)
 {
 	if (!IsOpen())
 		return false;
@@ -198,7 +198,7 @@ bool ZEFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)
 		return false;
 }
 
-ZEQWORD ZEFile::Tell()
+ZEUInt64 ZEFile::Tell()
 {
 	if (!IsOpen())
 		return 0;
@@ -243,19 +243,19 @@ bool ZEFile::IsOpen()
 	return false;
 }
 
-ZEQWORD ZEFile::Read(void* Buffer, ZEQWORD Size, ZEQWORD Count)
+ZEUInt64 ZEFile::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 {
 	if(!IsOpen())
 		return 0;
 
 	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-	ZEQWORD ReadCount = fread(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	ZEUInt64 ReadCount = fread(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
 	FileCursor += ReadCount * Size;
 
 	return ReadCount;
 }
 
-ZEQWORD ZEFile::ReadFormated(const char* Format, ...)
+ZEUInt64 ZEFile::ReadFormated(const char* Format, ...)
 {
 	if(!IsOpen())
 		return 0;
@@ -267,26 +267,26 @@ ZEQWORD ZEFile::ReadFormated(const char* Format, ...)
 	va_list ArgList;
 
 	va_start(ArgList, Format);
-	ZEQWORD ReadCount = 0;
+	ZEUInt64 ReadCount = 0;
 	// 	ReadCount = _tinput_l((FILE*)File, Format, 0, ArgList);
 	va_end(ArgList);
 	FileCursor += ReadCount;
 	return ReadCount;
 }
 
-ZEQWORD ZEFile::Write( const void* Buffer, ZEQWORD Size, ZEQWORD Count)
+ZEUInt64 ZEFile::Write( const void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 {
 	if(!IsOpen())
 		return 0;
 
 	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-	ZEQWORD WriteCount = fwrite(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	ZEUInt64 WriteCount = fwrite(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
 	FileCursor += WriteCount * Size;
 
 	return WriteCount;
 }
 
-ZEQWORD ZEFile::WriteFormated(const char* Format, ...)
+ZEUInt64 ZEFile::WriteFormated(const char* Format, ...)
 {
 	if(!IsOpen())
 		return 0;
@@ -295,7 +295,7 @@ ZEQWORD ZEFile::WriteFormated(const char* Format, ...)
 
 	va_list ArgList;
 	va_start(ArgList, Format);
-	ZEQWORD WriteSize = vfprintf((FILE*)File, Format, ArgList);
+	ZEUInt64 WriteSize = vfprintf((FILE*)File, Format, ArgList);
 	va_end(ArgList);
 
 	FileCursor += WriteSize;
@@ -303,7 +303,7 @@ ZEQWORD ZEFile::WriteFormated(const char* Format, ...)
 	return WriteSize;
 }
 
-ZEQWORD ZEFile::GetFileSize(const ZEString& FilePath)
+ZEUInt64 ZEFile::GetFileSize(const ZEString& FilePath)
 {
 	struct stat FileStatus;
 
@@ -313,19 +313,19 @@ ZEQWORD ZEFile::GetFileSize(const ZEString& FilePath)
 	return FileStatus.st_size;
 }
 
-ZEQWORD ZEFile::GetFileSize()
+ZEUInt64 ZEFile::GetFileSize()
 {
 	if(!IsOpen())
 		return 0;
 
 	_fseeki64((FILE*)File, 0, SEEK_END);
-	ZEQWORD EndCursor = _ftelli64((FILE*)File);
+	ZEUInt64 EndCursor = _ftelli64((FILE*)File);
 	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
 
 	return EndCursor;
 }
 
-bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEQWORD BufferSize)
+bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEUInt64 BufferSize)
 {
 	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
 	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", FilePath.GetValue());
@@ -338,7 +338,7 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEQWORD BufferSize
 	}
 
 	_fseeki64((FILE*)File, 0, SEEK_END);
-	ZEQWORD FileSize = _ftelli64(File);
+	ZEUInt64 FileSize = _ftelli64(File);
 	_fseeki64((FILE*)File, 0, SEEK_SET);
 
 	zeAssert(BufferSize < FileSize, "File size exceed buffer size.");
@@ -349,7 +349,7 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEQWORD BufferSize
 	return true;
 }
 
-bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEQWORD BufferSize)
+bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 BufferSize)
 {
 	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
 
@@ -363,7 +363,7 @@ bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEQWORD Buffer
 	}
 
 	_fseeki64((FILE*)File, 0, SEEK_END);
-	ZEQWORD FileSize = _ftelli64(File);
+	ZEUInt64 FileSize = _ftelli64(File);
 	_fseeki64((FILE*)File, 0, SEEK_SET);
 
 	zeAssert(BufferSize < FileSize + 1, "File size exceed buffer size.");
@@ -385,12 +385,12 @@ void* ZEFile::GetFileHandle() const
 	return File;
 }
 
-ZEQWORD ZEFile::GetStartPosition()
+ZEUInt64 ZEFile::GetStartPosition()
 {
 	return 0;
 }
 
-ZEQWORD ZEFile::GetEndPosition()
+ZEUInt64 ZEFile::GetEndPosition()
 {
 	return this->GetFileSize();
 }

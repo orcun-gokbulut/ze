@@ -37,7 +37,7 @@
 #include "ZETResourceFilePart.h"
 #include <memory.h>
 
-ZEDWORD ZEResourceInternalFile::GetFileSize() const
+ZEUInt32 ZEResourceInternalFile::GetFileSize() const
 {
 	return Size;
 }
@@ -47,7 +47,7 @@ unsigned char* ZEResourceInternalFile::GetFileBuffer() const
 	return Data;
 }
 
-void ZEResourceInternalFile::AllocateBuffer(ZEDWORD Size)
+void ZEResourceInternalFile::AllocateBuffer(ZEUInt32 Size)
 {
 	if (Data != NULL)
 		delete[] Data;
@@ -57,7 +57,7 @@ void ZEResourceInternalFile::AllocateBuffer(ZEDWORD Size)
 }
 bool ZEResourceInternalFile::WriteToResourceFile(FILE* File) const
 {
-	fwrite(&Size, sizeof(ZEDWORD), 1, File);
+	fwrite(&Size, sizeof(ZEUInt32), 1, File);
 	fwrite(Data, Size, 1, File);
 	return true;
 }
@@ -77,7 +77,7 @@ bool ZEResourceInternalFile::WriteToExternalFile(const char* Filename) const
 
 bool ZEResourceInternalFile::ReadFromResourceFile(FILE* File)
 {
-	fread(&Size, sizeof(ZEDWORD), 1, File);
+	fread(&Size, sizeof(ZEUInt32), 1, File);
 	AllocateBuffer(Size);
 	fread(Data, Size, 1, File);
 	return true;

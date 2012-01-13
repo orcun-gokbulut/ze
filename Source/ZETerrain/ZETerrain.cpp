@@ -222,67 +222,67 @@ static void DownsampleHeight(float* Source, float* Destination, size_t Width, si
 		}
 }
 
-static void DownsampleColor(ZEUINT32* Source, ZEUINT32* Destination, size_t Width, size_t Height)
+static void DownsampleColor(ZEUInt32* Source, ZEUInt32* Destination, size_t Width, size_t Height)
 {
 	for(size_t y = 0; y < Height; y++)
 		for(size_t x = 0; x < Width; x++)
 		{
 			size_t Sx = x * 2;
 			size_t Sy = y * 2;
-			ZEUINT32 SumA = 0;
-			ZEUINT32 SumR = 0;
-			ZEUINT32 SumG = 0;
-			ZEUINT32 SumB = 0;
+			ZEUInt32 SumA = 0;
+			ZEUInt32 SumR = 0;
+			ZEUInt32 SumG = 0;
+			ZEUInt32 SumB = 0;
 
-			ZEUINT32 Sample;
-			Sample = *(ZEUINT32*)SampleAddress(Source, Sx - 1,	Sy - 1, Width, Height);
+			ZEUInt32 Sample;
+			Sample = *(ZEUInt32*)SampleAddress(Source, Sx - 1,	Sy - 1, Width, Height);
 			SumA += (Sample & 0xFF000000) >> 24;
 			SumR += (Sample & 0x00FF0000) >> 16;
 			SumG += (Sample & 0x0000FF00) >> 8;
 			SumB += (Sample & 0x000000FF);
 			
-			Sample = *(ZEUINT32*)SampleAddress(Source, Sx,		Sy - 1, Width, Height);
+			Sample = *(ZEUInt32*)SampleAddress(Source, Sx,		Sy - 1, Width, Height);
 			SumA += (Sample & 0xFF000000) >> 24;
 			SumR += (Sample & 0x00FF0000) >> 16;
 			SumG += (Sample & 0x0000FF00) >> 8;
 			SumB += (Sample & 0x000000FF);
 
-			Sample = *(ZEUINT32*)SampleAddress(Source, Sx + 1,	Sy - 1, Width, Height);
+			Sample = *(ZEUInt32*)SampleAddress(Source, Sx + 1,	Sy - 1, Width, Height);
 			SumA += (Sample & 0xFF000000) >> 24;
 			SumR += (Sample & 0x00FF0000) >> 16;
 			SumG += (Sample & 0x0000FF00) >> 8;
 			SumB += (Sample & 0x000000FF);
 			
-			Sample = *(ZEUINT32*)SampleAddress(Source, Sx - 1,	Sy,		Width, Height);  
+			Sample = *(ZEUInt32*)SampleAddress(Source, Sx - 1,	Sy,		Width, Height);  
 			SumA += (Sample & 0xFF000000) >> 24;
 			SumR += (Sample & 0x00FF0000) >> 16;
 			SumG += (Sample & 0x0000FF00) >> 8;
 			SumB += (Sample & 0x000000FF);
 			
-			Sample = *(ZEUINT32*)SampleAddress(Source, Sx,		Sy,		Width, Height);  
+			Sample = *(ZEUInt32*)SampleAddress(Source, Sx,		Sy,		Width, Height);  
 			SumA += (Sample & 0xFF000000) >> 24;
 			SumR += (Sample & 0x00FF0000) >> 16;
 			SumG += (Sample & 0x0000FF00) >> 8;
 			SumB += (Sample & 0x000000FF);
 			
-			Sample = *(ZEUINT32*)SampleAddress(Source, Sx + 1,	Sy,		Width, Height);  
+			Sample = *(ZEUInt32*)SampleAddress(Source, Sx + 1,	Sy,		Width, Height);  
 			SumA += (Sample & 0xFF000000) >> 24;
 			SumR += (Sample & 0x00FF0000) >> 16;
 			SumG += (Sample & 0x0000FF00) >> 8;
 			SumB += (Sample & 0x000000FF);
-			Sample = *(ZEUINT32*)SampleAddress(Source, Sx - 1,	Sy + 1, Width, Height);
-			SumA += (Sample & 0xFF000000) >> 24;
-			SumR += (Sample & 0x00FF0000) >> 16;
-			SumG += (Sample & 0x0000FF00) >> 8;
-			SumB += (Sample & 0x000000FF);
-			
-			Sample = *(ZEUINT32*)SampleAddress(Source, Sx,		Sy + 1, Width, Height);
+			Sample = *(ZEUInt32*)SampleAddress(Source, Sx - 1,	Sy + 1, Width, Height);
 			SumA += (Sample & 0xFF000000) >> 24;
 			SumR += (Sample & 0x00FF0000) >> 16;
 			SumG += (Sample & 0x0000FF00) >> 8;
 			SumB += (Sample & 0x000000FF);
 			
-			Sample = *(ZEUINT32*)SampleAddress(Source, Sx + 1,	Sy + 1, Width, Height);
+			Sample = *(ZEUInt32*)SampleAddress(Source, Sx,		Sy + 1, Width, Height);
+			SumA += (Sample & 0xFF000000) >> 24;
+			SumR += (Sample & 0x00FF0000) >> 16;
+			SumG += (Sample & 0x0000FF00) >> 8;
+			SumB += (Sample & 0x000000FF);
+			
+			Sample = *(ZEUInt32*)SampleAddress(Source, Sx + 1,	Sy + 1, Width, Height);
 			SumA += (Sample & 0xFF000000) >> 24;
 			SumR += (Sample & 0x00FF0000) >> 16;
 			SumG += (Sample & 0x0000FF00) >> 8;
@@ -295,7 +295,7 @@ static void DownsampleColor(ZEUINT32* Source, ZEUINT32* Destination, size_t Widt
 
 			Sample = (SumA << 24) & 0xFF000000 + (SumR << 16) & 0x0000FF00 + (SumG << 8) & 0x00FF0000 + SumB & 0x000000FF;
 
-			*(ZEUINT32*)Address(Destination, x, y, Width) = Sample;
+			*(ZEUInt32*)Address(Destination, x, y, Width) = Sample;
 		}
 }
 
@@ -306,8 +306,8 @@ bool ZETerrain::LoadTerrain()
 
 	struct ZETerrainFileHeader
 	{
-		ZEDWORD Width;
-		ZEDWORD Heigth;
+		ZEUInt32 Width;
+		ZEUInt32 Heigth;
 	} Header;
 
 	ZEFile File;
@@ -327,10 +327,10 @@ bool ZETerrain::LoadTerrain()
 	TerrainData[0].Height = Header.Heigth;
 	TerrainData[0].Width = Header.Width;
 	TerrainData[0].HeightData = new float[Header.Heigth * Header.Width];
-	TerrainData[0].ColorData = new ZEUINT32[Header.Heigth * Header.Width];
+	TerrainData[0].ColorData = new ZEUInt32[Header.Heigth * Header.Width];
 
 	File.Read(TerrainData[0].HeightData, Header.Width * Header.Heigth * sizeof(float), 1);
-	File.Read(TerrainData[0].ColorData, Header.Width * Header.Heigth * sizeof(ZEUINT32), 1);
+	File.Read(TerrainData[0].ColorData, Header.Width * Header.Heigth * sizeof(ZEUInt32), 1);
 
 	File.Close();
 
@@ -338,9 +338,9 @@ bool ZETerrain::LoadTerrain()
 	CurrentLOD->HeightTexture = ZETexture2D::CreateInstance();
 	CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_LUM_HDR, false, 1);
 	CurrentLOD->ColorTexture = ZETexture2D::CreateInstance();
-	CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_LUM_HDR, false, 1);
-	CurrentLOD->NormalTexture = ZETexture2D::CreateInstance();
-	CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_LUM_HDR, false, 1);
+	CurrentLOD->ColorTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_LUM_HDR, false, 1);
+	//CurrentLOD->NormalTexture = ZETexture2D::CreateInstance();
+	//CurrentLOD->NormalTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_LUM_HDR, false, 1);
 
 
 	for (size_t I = 1; I < 8; I++)
@@ -351,7 +351,7 @@ bool ZETerrain::LoadTerrain()
 		CurrentLevel->Width = PrevLevel->Width / 2;
 		CurrentLevel->Height = PrevLevel->Width / 2;
 		CurrentLevel->HeightData = new float[CurrentLevel->Width * CurrentLevel->Height * sizeof(float)];
-		CurrentLevel->ColorData = new ZEUINT32[CurrentLevel->Width * CurrentLevel->Height * sizeof(ZEUINT32)];
+		CurrentLevel->ColorData = new ZEUInt32[CurrentLevel->Width * CurrentLevel->Height * sizeof(ZEUInt32)];
 
 		DownsampleHeight(PrevLevel->HeightData, CurrentLevel->HeightData, CurrentLevel->Width, CurrentLevel->Height);
 		DownsampleColor(PrevLevel->ColorData, CurrentLevel->ColorData, CurrentLevel->Width, CurrentLevel->Height);
@@ -361,9 +361,9 @@ bool ZETerrain::LoadTerrain()
 		CurrentLOD->HeightTexture = ZETexture2D::CreateInstance();
 		CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_A8R8G8B8, false, 1);
 		CurrentLOD->ColorTexture = ZETexture2D::CreateInstance();
-		CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_A8R8G8B8, false, 1);
-		CurrentLOD->NormalTexture = ZETexture2D::CreateInstance();
-		CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_A8R8G8B8, false, 1);
+		CurrentLOD->ColorTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_A8R8G8B8, false, 1);
+		//CurrentLOD->NormalTexture = ZETexture2D::CreateInstance();
+		//CurrentLOD->NormalTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_A8R8G8B8, false, 1);
 	}
 
 	return true;
@@ -378,35 +378,26 @@ void ZETerrain::UnloadTerrain()
 	}
 	TerrainData.Clear();
 }
-
 void ZETerrain::Stream()
 {
 	ZEVector3 OldLocalPosition;
 	ZEVector3 LocalPosition;
 
-	if(ZEMath::Abs(LocalPosition.x - OldLocalPosition.x) < 1.0f || ZEMath::Abs(LocalPosition.z - OldLocalPosition.z) < 1.0f)
+	int DispX = LocalPosition.x - OldLocalPosition.x;
+	int DispY = LocalPosition.z - OldLocalPosition.z;
+
+	if(ZEMath::Abs(DispX) == 0 && ZEMath::Abs(DispY) == 0)
 		return;
+
+	// Convert to Pixel Coords
 
 	for (size_t I = 0; I < TerrainLODs.GetCount(); I++)
 	{
 		
 	}
-	
 
-	// Calculate Position -> UV 
-	// Copy from that UV
-	// Check TWO
 
-	// Full Update
-	
-	// Semi Update
-		// Vertical Update
-			// Non-Divided
-			// Divided
-
-		// Horizontal Update
-			// Non-Divided
-			// Divided
+	// UVs are the same 
 
 }
 

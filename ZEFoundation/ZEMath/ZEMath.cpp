@@ -42,12 +42,30 @@ float ZEMath::Sqrt(float Value)
 	return sqrt(Value);
 }
 
+int ZEMath::Abs(int Value)
+{
+	if (Value < 0)
+		return -Value;
+	else
+		return Value;
+}
+
 float ZEMath::Abs(float Value)
 {
 	if (Value < 0.0f)
 		return -Value;
 	else
 		return Value;
+}
+
+int ZEMath::Sign(int Value)
+{
+	if (Value == 0)
+		return 0;
+	else if (Value < 0)
+		return -1;
+	else
+		return 1;
 }
 
 float ZEMath::Sign(float Value)
@@ -57,7 +75,7 @@ float ZEMath::Sign(float Value)
 	else if (Value < 0.0f)
 		return -1.0f;
 	else
-		return 0.0f;
+		return 1.0f;
 }
 
 float ZEMath::Min(float A, float B)

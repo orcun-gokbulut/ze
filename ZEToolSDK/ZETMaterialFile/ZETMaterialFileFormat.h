@@ -44,60 +44,60 @@
 #define ZE_MTLF_MAX_NAME_SIZE					128
 #define ZE_MTLF_MAX_FILENAME_SIZE				256
 
-#define ZE_FILE_MAKEVERSION(Major, Minor)		((((ZEDWORD)(Major)) << 16) + (ZEDWORD)(Minor))
+#define ZE_FILE_MAKEVERSION(Major, Minor)		((((ZEUInt32)(Major)) << 16) + (ZEUInt32)(Minor))
 
 #define ZE_MTLF_VERSION							ZE_FILE_MAKEVERSION(0, 1)
-#define ZE_MTLF_HEADER							((ZEDWORD)((ZEDWORD)'ZEMF' + (ZEDWORD)'MTRL'))
+#define ZE_MTLF_HEADER							((ZEUInt32)((ZEUInt32)'ZEMF' + (ZEUInt32)'MTRL'))
 
-#define	ZE_MTLF_MATERIAL_CHUNKID				((ZEDWORD)(ZE_MTLF_HEADER + (ZEDWORD)'FIXD'))
-#define	ZE_MTLF_TEXTURE_CHUNK_ID				((ZEDWORD)(ZE_MTLF_HEADER + (ZEDWORD)'TEXT'))
-#define	ZE_MTLF_ANIMATION_CHUNKID				((ZEDWORD)(ZE_MTLF_HEADER + (ZEDWORD)'ANIM'))
-#define	ZE_MTLF_ANIMATION_FRAME_CHUNKID			((ZEDWORD)(ZE_MTLF_HEADER + (ZEDWORD)'ANKF'))
+#define	ZE_MTLF_MATERIAL_CHUNKID				((ZEUInt32)(ZE_MTLF_HEADER + (ZEUInt32)'FIXD'))
+#define	ZE_MTLF_TEXTURE_CHUNK_ID				((ZEUInt32)(ZE_MTLF_HEADER + (ZEUInt32)'TEXT'))
+#define	ZE_MTLF_ANIMATION_CHUNKID				((ZEUInt32)(ZE_MTLF_HEADER + (ZEUInt32)'ANIM'))
+#define	ZE_MTLF_ANIMATION_FRAME_CHUNKID			((ZEUInt32)(ZE_MTLF_HEADER + (ZEUInt32)'ANKF'))
 
 struct ZEMaterialFileHeaderChunk
 {
-	ZEDWORD							HEADER;
-	ZEDWORD							Version;
-	ZEDWORD							MaterialType;
-	ZEDWORD							TextureCount;
-	ZEDWORD							AnimationCount;
+	ZEUInt32							HEADER;
+	ZEUInt32							Version;
+	ZEUInt32							MaterialType;
+	ZEUInt32							TextureCount;
+	ZEUInt32							AnimationCount;
 };
 
 struct ZEMaterialFileTextureChunk
 {
-	ZEDWORD							ChunkId;
+	ZEUInt32							ChunkId;
 	char							FileName[ZE_MTLF_MAX_NAME_SIZE];
-	ZEDWORD							TextureType;
-	ZEDWORD							InternalSize;
+	ZEUInt32							TextureType;
+	ZEUInt32							InternalSize;
 };
 
 struct ZEMaterialFileAnimationChunk
 {
-	ZEDWORD							ChunkId;
+	ZEUInt32							ChunkId;
 	char							Name[ZE_MTLF_MAX_NAME_SIZE];
-	ZEDWORD							FrameCount;
+	ZEUInt32							FrameCount;
 };
 
 struct ZEMaterialFileAnimationFrameChunk
 {
-	ZEDWORD							ChunkId;
-	ZEDWORD							KeyCount;
+	ZEUInt32							ChunkId;
+	ZEUInt32							KeyCount;
 };
 
 struct ZEMaterialFileAnimationKeyChunk
 {
-	ZEDWORD							PropertyIndex;
+	ZEUInt32							PropertyIndex;
 	ZEVariant						Value;
 };
 
 struct ZEMaterialFileFixedMaterialChunk
 {
-	ZEDWORD							ChunkId;
+	ZEUInt32							ChunkId;
 
 	bool							TwoSided;
 	bool							LightningEnabled;
 	bool							Wireframe;
-	ZEDWORD							TransparancyMode;
+	ZEUInt32							TransparancyMode;
 	bool							RecivesShadow;
 	unsigned int					TransparancyCullLimit;
 
@@ -108,75 +108,75 @@ struct ZEMaterialFileFixedMaterialChunk
 	bool							DiffuseEnabled;
 	ZEVector3						DiffuseColor;
 	float							DiffuseFactor;
-	ZEINT32							DiffuseMap;
-	ZEINT32							DiffuseMapAddressModeU;
-	ZEINT32							DiffuseMapAddressModeV;
+	ZEInt32							DiffuseMap;
+	ZEInt32							DiffuseMapAddressModeU;
+	ZEInt32							DiffuseMapAddressModeV;
 
 
-	ZEINT32							NormalMap;
-	ZEINT32							NormalMapAddressModeU;
-	ZEINT32							NormalMapAddressModeV;
+	ZEInt32							NormalMap;
+	ZEInt32							NormalMapAddressModeU;
+	ZEInt32							NormalMapAddressModeV;
 
-	ZEINT32							ParallaxMap;
-	ZEINT32							ParallaxMapAddressModeU;
-	ZEINT32							ParallaxMapAddressModeV;
+	ZEInt32							ParallaxMap;
+	ZEInt32							ParallaxMapAddressModeU;
+	ZEInt32							ParallaxMapAddressModeV;
 
 	bool							SpecularEnabled;
 	ZEVector3						SpecularColor;
 	float							SpecularFactor;
 	float							SpecularShininess;	
-	ZEINT32							SpecularMap;
-	ZEINT32							SpecularMapAddressModeU;
-	ZEINT32							SpecularMapAddressModeV;
+	ZEInt32							SpecularMap;
+	ZEInt32							SpecularMapAddressModeU;
+	ZEInt32							SpecularMapAddressModeV;
 
 	bool							EmmisiveEnabled;
 	ZEVector3						EmmisiveColor;
 	float							EmmisiveFactor;
-	ZEINT32							EmmisiveMap;
-	ZEINT32							EmmisiveMapAddressModeU;
-	ZEINT32							EmmisiveMapAddressModeV;
+	ZEInt32							EmmisiveMap;
+	ZEInt32							EmmisiveMapAddressModeU;
+	ZEInt32							EmmisiveMapAddressModeV;
 
 	bool							OpacityEnabled;
 	float							Opacity;
-	ZEINT32							OpacityMap;
-	ZEINT32							OpacityMapAddressModeU;
-	ZEINT32							OpacityMapAddressModeV;
+	ZEInt32							OpacityMap;
+	ZEInt32							OpacityMapAddressModeU;
+	ZEInt32							OpacityMapAddressModeV;
 
 	bool							DetailMapEnabled;
 	ZEVector2						DetailMapTiling;
-	ZEINT32							DetailDiffuseMap;
-	ZEINT32							DetailDiffuseMapAddressModeU;
-	ZEINT32							DetailDiffuseMapAddressModeV;
-	ZEINT32							DetailNormalMap;
-	ZEINT32							DetailNormalMapAddressModeU;
-	ZEINT32							DetailNormalMapAddressModeV;
+	ZEInt32							DetailDiffuseMap;
+	ZEInt32							DetailDiffuseMapAddressModeU;
+	ZEInt32							DetailDiffuseMapAddressModeV;
+	ZEInt32							DetailNormalMap;
+	ZEInt32							DetailNormalMapAddressModeU;
+	ZEInt32							DetailNormalMapAddressModeV;
 
 	bool							ReflectionEnabled;
 	float							ReflectionFactor;
-	ZEINT32							ReflectionMap;
-	ZEINT32							ReflectionMapAddressModeU;
-	ZEINT32							ReflectionMapAddressModeV;
-	ZEINT32							ReflectionMapAddressModeW;
+	ZEInt32							ReflectionMap;
+	ZEInt32							ReflectionMapAddressModeU;
+	ZEInt32							ReflectionMapAddressModeV;
+	ZEInt32							ReflectionMapAddressModeW;
 
 	bool							RefractionEnabled;
 	float							RefractionFactor;
 	float							RefractionIndex;
-	ZEINT32							RefractionMap;
-	ZEINT32							RefractionMapAddressModeU;
-	ZEINT32							RefractionMapAddressModeV;
-	ZEINT32							RefractionMapAddressModeW;
+	ZEInt32							RefractionMap;
+	ZEInt32							RefractionMapAddressModeU;
+	ZEInt32							RefractionMapAddressModeV;
+	ZEInt32							RefractionMapAddressModeW;
 
 	bool							LightMapEnabled;
 	float							LightMapFactor;
-	ZEINT32							LightMap;
-	ZEINT32							LightMapAddressModeU;
-	ZEINT32							LightMapAddressModeV;
+	ZEInt32							LightMap;
+	ZEInt32							LightMapAddressModeU;
+	ZEInt32							LightMapAddressModeV;
 
 	bool							DistortionEnabled;
 	float							DistortionFactor;
-	ZEINT32							DistortionMap;
-	ZEINT32							DistortionMapAddressModeU;
-	ZEINT32							DistortionMapAddressModeV;	
+	ZEInt32							DistortionMap;
+	ZEInt32							DistortionMapAddressModeU;
+	ZEInt32							DistortionMapAddressModeV;	
 };
 
 #endif

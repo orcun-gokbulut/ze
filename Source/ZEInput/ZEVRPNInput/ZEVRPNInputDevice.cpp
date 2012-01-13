@@ -108,22 +108,22 @@ const ZEString& ZEVRPNInputDevice::GetDeviceName()
 	return DeviceName;
 }
 
-ZEDWORD ZEVRPNInputDevice::GetAxisCount()
+ZEUInt32 ZEVRPNInputDevice::GetAxisCount()
 {
 	return 3;
 }
 
-ZEDWORD ZEVRPNInputDevice::GetButtonCount()
+ZEUInt32 ZEVRPNInputDevice::GetButtonCount()
 {
 	return 5;
 }
 
-ZEDWORD ZEVRPNInputDevice::GetVector3Count()
+ZEUInt32 ZEVRPNInputDevice::GetVector3Count()
 {
 	return 1;
 }
 
-ZEDWORD ZEVRPNInputDevice::GetQuaternionCount()
+ZEUInt32 ZEVRPNInputDevice::GetQuaternionCount()
 {
 	return 1;
 }
