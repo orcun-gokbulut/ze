@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZENavigationMesh.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,42 +30,20 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_NAVIGATION_MESH_H__
-#define __ZE_NAVIGATION_MESH_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEGraph.h"
-#include "ZEMath/ZEPolygon.h"
-#include "ZESpatial/ZEOctree.h"
+ze_add_source(ZEQuadTree.cpp			Sources)
+ze_add_source(ZEQuadTree.h				Sources Headers)
+ze_add_source(ZEOctree.cpp				Sources)
+ze_add_source(ZEOctree.h				Sources Headers)
 
-class ZENavigationMeshPolygon
-{
-	public:
-		bool Deleted;
-		size_t NormalIndex;
-		ZEArray<size_t> VertexIndices;
-};
-
-typedef ZEOctree<ZENavigationMeshPolygon> ZENavigationMeshOctree;
-
-class ZENavigationMesh
-{
-	public:
-		ZENavigationMeshOctree		Octree;
-		ZEArray<ZEVector3>			Vertices;
-		ZEArray<ZEVector3>			Normals;
-		ZEChunkArray<ZENavigationMeshPolygon, 10000> Polygons;
-
-
-		ZEPolygon					ToPolygon(size_t Index);
-		void						Clear();
-		void						Generate(const ZEArray<ZEPolygon>& Input);
-
-	
-};
-
-#endif
+ze_add_library(ZESpatial 
+	SOURCES ${Sources} 
+	HEADERS ${Headers}
+	LIBS ZEFoundationAPI ZEDS ZEMath
+	INSTALL
+	INSTALL_DESTINATION ZEFoundationAPI/ZESpatial
+	INSTALL_COMPONENT ZESDK)

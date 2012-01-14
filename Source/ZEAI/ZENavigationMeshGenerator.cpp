@@ -36,7 +36,7 @@
 #include "ZENavigationMeshGenerator.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
-#include "ZEOctree.h"
+#include "ZESpatial/ZEOctree.h"
 
 struct ZECheckAdjacentResult
 {
