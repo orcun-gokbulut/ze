@@ -195,7 +195,7 @@ set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll wil
 #########################################################################################
 include_directories(
 	${CMAKE_SOURCE_DIR}
-	${CMAKE_SOURCE_DIR}/Source
+	${CMAKE_SOURCE_DIR}/ZEEngine
 	${CMAKE_SOURCE_DIR}/ZEFoundation
 	${CMAKE_SOURCE_DIR}/ZEToolSDK
 	${CMAKE_SOURCE_DIR}/ZETest
@@ -226,7 +226,7 @@ set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/Rundir)
 #########################################################################################
 add_subdirectory(CMake)
 
-ze_add_conditional_build(Source				TRUE TITLE "Build ZEEngineAPI.")
+ze_add_conditional_build(ZEEngine			TRUE TITLE "Build ZEEngineAPI.")
 ze_add_conditional_build(ZEditor			TRUE TITLE "Build ZEditor.")
 ze_add_conditional_build(ZE3dsMax			TRUE TITLE "Build ZE3dsMax Exporters.")
 ze_add_conditional_build(ZEFoundation		TRUE TITLE "Build ZEFoundationAPI.")
