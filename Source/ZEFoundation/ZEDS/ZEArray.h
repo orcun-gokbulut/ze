@@ -80,7 +80,10 @@ class ZEArray
 		inline size_t Circular(int Index) const
 		{
 			if (Index < 0)
-				return Count - ((-Index) % Count);
+			{
+				size_t CircularIndex = ((-Index) % Count);
+				return (CircularIndex == 0 ? 0 : Count - CircularIndex);
+			}
 			else
 				return Index % Count;
 		}
@@ -499,12 +502,12 @@ class ZEArray
 			return *this;
 		}
 
-		bool operator==(const ZEArray<Type>& Other)
+		bool operator==(const ZEArray<Type, Allocator_>& Other)
 		{
 			if (Count != Other.Count)
 				return false;
 
-			for (size_t I = 0; I < Count I++)
+			for (size_t I = 0; I < Count; I++)
 				if (Items[I] != Other.Items[I])
 					return false;
 
@@ -512,12 +515,12 @@ class ZEArray
 		}
 
 
-		bool operator!=(const ZEArray<Type>& Other)
+		bool operator!=(const ZEArray<Type, Allocator_>& Other)
 		{
 			if (Count != Other.Count)
 				return true;
 
-			for (size_t I = 0; I < Count I++)
+			for (size_t I = 0; I < Count; I++)
 				if (Items[I] != Other.Items[I])
 					return true;
 
