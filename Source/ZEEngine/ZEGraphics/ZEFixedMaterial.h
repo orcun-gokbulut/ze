@@ -139,7 +139,7 @@ class ZEFixedMaterial : public ZEMaterial
 				const ZETexture2D*		LightMap;
 				const ZETexture2D*		DistortionMap;
 			};
-			ZETexture2D*					Textures[12];
+			ZETexture2D*				Textures[12];
 		};
 
 		ZETexture2DResource*			BaseMapResource;
@@ -389,8 +389,6 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETextureAddressMode			GetDistortionMapAddressModeU() const;
 		void							SetDistortionMapAddressModeV(ZETextureAddressMode Mode);
 		ZETextureAddressMode			GetDistortionMapAddressModeV() const;
-
-		virtual void					SetZero();
 
 		void							Tick(float ElapsedTime);
 

@@ -60,7 +60,6 @@ void ZEUIRenderer::Initialize()
 	if (DefaultMaterial == NULL)
 	{
 		DefaultMaterial = ZEFixedMaterial::CreateInstance();
-		((ZEFixedMaterial*)DefaultMaterial)->SetZero();
 		((ZEFixedMaterial*)DefaultMaterial)->SetLightningEnabled(false);
 		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientEnabled(true);
 		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));

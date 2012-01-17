@@ -47,11 +47,6 @@
 #include "ZETexture2D.h"
 #include "ZETextureCube.h"
 
-
-void ZETerrainMaterial::SetZero()
-{
-}
-
 ZETerrainMaterial::ZETerrainMaterial()
 {
 	HeightTexture = NULL;

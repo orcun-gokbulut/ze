@@ -133,8 +133,6 @@ class ZETerrainMaterial : public ZEMaterial
 		void							SetDiffuseFactor(float Factor);
 		float							GetDiffuseFactor() const;
 
-		virtual void					SetZero();
-
 		void							Tick(float ElapsedTime);
 
 		static ZETerrainMaterial*		CreateInstance();

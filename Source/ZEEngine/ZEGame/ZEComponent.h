@@ -71,17 +71,19 @@ class ZEComponent : public ZEEntity
 		void							SetLocalBoundingBox(const ZEAABBox& BoundingBox);
 		virtual	void					OnTransformChanged();
 
+										ZEComponent();
+
 	public:
 		ZEEntityType					GetEntityType();
 
 		virtual ZECompoundEntity*		GetOwner() const;
-		virtual	ZEUInt32					GetDrawFlags() const;
+		virtual	ZEUInt32				GetDrawFlags() const;
 
 		const ZEMatrix4x4&				GetWorldTransform() const;
 		const ZEMatrix4x4&				GetLocalTransform() const;
 
-		virtual const ZEAABBox&	GetLocalBoundingBox() const;
-		virtual const ZEAABBox&	GetWorldBoundingBox();
+		virtual const ZEAABBox&			GetLocalBoundingBox() const;
+		virtual const ZEAABBox&			GetWorldBoundingBox();
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);
@@ -97,8 +99,6 @@ class ZEComponent : public ZEEntity
 		const ZEVector3&				GetWorldVelocity();
 
 		virtual bool					CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float& TEnterance, float &TExit);
-
-										ZEComponent();
 };
 /*
 ZE_POST_PROCESSOR_START(Meta)

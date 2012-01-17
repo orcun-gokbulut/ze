@@ -54,20 +54,13 @@ struct ZETerrainData
 	size_t Height;
 	float* HeightData;
 	ZEUInt32* ColorData;
-
-	ZETerrainData()
-	{
-		Width = 0;
-		Height = 0;
-		HeightData = NULL;
-		ColorData = NULL;
-	}
 };
 
 struct ZETerrainLOD
 {
-	ZETexture2D* HeightTexture;
-	ZETexture2D* ColorTexture;
+	ZETerrainMaterial*	Material;
+	ZETexture2D*		HeightTexture;
+	ZETexture2D*		ColorTexture;
 };
 
 ZE_META_ENTITY_DESCRIPTION(ZETerrain)
@@ -76,7 +69,6 @@ class ZETerrain : public ZEEntity
 	ZE_META_ENTITY(ZETerrain)
 	friend class ZEPortalMapDoor;
 	private:
-		ZETerrainMaterial*						Material;
 		ZEStaticVertexBuffer*					VertexBuffer;
 		ZEVertexDeclaration*					VertexDeclaration;
 		ZETerrainPrimitiveIndices				Indices;
@@ -92,14 +84,14 @@ class ZETerrain : public ZEEntity
 		float									HeightScale;
 		
 		ZEString								TerrainFileName;
-		ZETexture2D*							HeightTexture;
-		ZETexture2D*							ColorTexture;
-		ZETexture2D*							NormalTexture;
+
+		ZEVector3								LastCameraPosition; 
 
 		bool									LoadTerrain();
 		void									UnloadTerrain();
 
-		bool									DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVector3& Offset, const ZEVector3& Position, float Scale, bool Rotate = false);
+		void									Stream(ZEDrawParameters* DrawParameters);
+		bool									DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVector3& Offset, const ZEVector3& Position, float Scale, bool Rotate, size_t LOD);
 
 												ZETerrain();
 												~ZETerrain();

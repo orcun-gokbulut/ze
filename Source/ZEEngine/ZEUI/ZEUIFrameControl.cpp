@@ -97,7 +97,6 @@ void ZEUIFrameControl::SetMaterial(ZEMaterial* Material)
 ZEUIFrameControl::ZEUIFrameControl()
 {
 	FrameMaterial = ZEUIMaterial::CreateInstance();
-	FrameMaterial->SetZero();
 	Frame.Material = FrameMaterial;
 	Frame.Color = GetBackgroundColor();
 	Frame.Texcoords.LeftUp = ZEVector2::Zero;

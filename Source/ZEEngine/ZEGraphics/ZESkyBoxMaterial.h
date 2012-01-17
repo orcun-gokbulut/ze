@@ -55,8 +55,6 @@ class ZESkyBoxMaterial : public ZEMaterial
 	public:
 		ZEMaterialFlags					GetMaterialFlags() const;
 
-		void							SetZero();
-
 		void							SetColor(const ZEVector3& Color);
 		const ZEVector3&				GetColor() const;
 

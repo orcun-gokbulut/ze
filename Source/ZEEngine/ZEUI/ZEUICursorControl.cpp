@@ -200,7 +200,6 @@ ZEUICursorControl::ZEUICursorControl()
 
 	CursorMaterial = ZEUIMaterial::CreateInstance();
 	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("Cursor.png")->GetTexture());
-	CursorMaterial->SetZero();
 	Cursor.Material = CursorMaterial;
 	Cursor.Color = GetBackgroundColor();
 

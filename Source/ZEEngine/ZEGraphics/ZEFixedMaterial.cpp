@@ -47,9 +47,20 @@
 #include "ZETexture2D.h"
 #include "ZETextureCube.h"
 
-
-void ZEFixedMaterial::SetZero()
+ZEFixedMaterial::ZEFixedMaterial()
 {
+	BaseMapResource = NULL;
+	NormalMapResource = NULL;
+	ParallaxMapResource = NULL;
+	SpecularMapResource = NULL;
+	EmmisiveMapResource = NULL;
+	OpacityMapResource = NULL;
+	DetailBaseMapResource = NULL;
+	DetailNormalMapResource = NULL;
+	EnvironmentMapResource = NULL;
+	LightMapResource = NULL;
+	DistortionMapResource = NULL;
+
 	memset(Textures, 0, sizeof(Textures));
 	memset(PixelShaderConstants, 0, sizeof(PixelShaderConstants));
 	memset(VertexShaderConstants, 0, sizeof(VertexShaderConstants));
@@ -96,21 +107,6 @@ void ZEFixedMaterial::SetZero()
 	SpecularColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	EmmisiveColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	SubSurfaceScatteringFactor = 0.0f;
-}
-
-ZEFixedMaterial::ZEFixedMaterial()
-{
-	BaseMapResource = NULL;
-	NormalMapResource = NULL;
-	ParallaxMapResource = NULL;
-	SpecularMapResource = NULL;
-	EmmisiveMapResource = NULL;
-	OpacityMapResource = NULL;
-	DetailBaseMapResource = NULL;
-	DetailNormalMapResource = NULL;
-	EnvironmentMapResource = NULL;
-	LightMapResource = NULL;
-	DistortionMapResource = NULL;
 }
 
 ZEFixedMaterial::~ZEFixedMaterial()

@@ -38,7 +38,9 @@
 
 ZESkyBoxMaterial::ZESkyBoxMaterial()
 {
-	SetZero();
+	Color = ZEVector3::One;
+	Brightness = 1.0f;
+	Texture = NULL;
 }
 
 ZESkyBoxMaterial::~ZESkyBoxMaterial()
@@ -49,13 +51,6 @@ ZESkyBoxMaterial::~ZESkyBoxMaterial()
 ZEMaterialFlags ZESkyBoxMaterial::GetMaterialFlags() const
 {
 	return ZE_MTF_NONE;
-}
-
-void ZESkyBoxMaterial::SetZero()
-{
-	Color = ZEVector3::One;
-	Brightness = 1.0f;
-	Texture = NULL;
 }
 
 void ZESkyBoxMaterial::SetColor(const ZEVector3& Color)

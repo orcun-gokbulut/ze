@@ -187,7 +187,6 @@ static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
 		Model->Materials[I] = CurrentMaterial;
 
-		CurrentMaterial->SetZero();
 		CurrentMaterial->SetDiffuseEnabled(true);
 		CurrentMaterial->SetAmbientEnabled(false);
 		CurrentMaterial->SetSpecularEnabled(true);
