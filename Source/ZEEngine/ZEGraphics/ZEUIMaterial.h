@@ -55,8 +55,6 @@ class ZEUIMaterial : public ZEMaterial
 	public:
 		ZEMaterialFlags			GetMaterialFlags() const;
 
-		void					SetZero();
-
 		void					SetWireFrame(bool Enabled);
 		bool					GetWireFrame() const;
 

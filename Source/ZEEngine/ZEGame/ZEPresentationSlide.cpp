@@ -106,7 +106,6 @@ bool ZEPresentationSlide::Initialize()
 		Material->Destroy();
 
 	Material = ZEFixedMaterial::CreateInstance();
-	Material->SetZero();
 	Material->SetTwoSided(true);
 	Material->SetAmbientEnabled(true);
 	Material->SetAmbientColor(ZEVector3(1.0f, 1.0f, 1.0f));

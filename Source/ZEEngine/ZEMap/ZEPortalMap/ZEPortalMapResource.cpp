@@ -125,7 +125,6 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEFile* ResourceFile)
 		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
 		
 		Materials[I] = CurrentMaterial;
-		CurrentMaterial->SetZero();
 		CurrentMaterial->SetTwoSided(false);
 		CurrentMaterial->SetDiffuseEnabled(true);
 		CurrentMaterial->SetAmbientEnabled(false);

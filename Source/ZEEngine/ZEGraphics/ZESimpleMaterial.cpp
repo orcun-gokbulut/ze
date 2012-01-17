@@ -38,7 +38,15 @@
 
 ZESimpleMaterial::ZESimpleMaterial()
 {
-	SetZero();
+	Wireframe = false;
+	TwoSided = false;
+	VertexColorEnabled = true;
+	TransparancyMode = ZE_MTM_NONE;
+	TransparancyCullLimit = 0x80;
+	MaterialColor = ZEVector4::One;
+	Texture = NULL;
+	TextureAddressModeU = ZE_TAM_MIRROR;
+	TextureAddressModeV = ZE_TAM_MIRROR;
 }
 
 ZESimpleMaterial::~ZESimpleMaterial()
@@ -49,19 +57,6 @@ ZESimpleMaterial::~ZESimpleMaterial()
 ZEMaterialFlags ZESimpleMaterial::GetMaterialFlags() const
 {
 	return ZE_MTF_NONE;
-}
-
-void ZESimpleMaterial::SetZero()
-{
-	Wireframe = false;
-	TwoSided = false;
-	VertexColorEnabled = true;
-	TransparancyMode = ZE_MTM_NONE;
-	TransparancyCullLimit = 0x80;
-	MaterialColor = ZEVector4::One;
-	Texture = NULL;
-	TextureAddressModeU = ZE_TAM_MIRROR;
-	TextureAddressModeV = ZE_TAM_MIRROR;
 }
 
 void ZESimpleMaterial::SetTwoSided(bool Enable)

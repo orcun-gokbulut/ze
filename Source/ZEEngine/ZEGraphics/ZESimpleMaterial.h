@@ -63,8 +63,6 @@ class ZESimpleMaterial : public ZEMaterial
 	public:
 		ZEMaterialFlags					GetMaterialFlags() const;
 
-		void							SetZero();
-
 		void							SetTwoSided(bool Enable);
 		bool							GetTwoSided() const;
 

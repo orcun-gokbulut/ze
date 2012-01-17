@@ -308,7 +308,6 @@ ZEParticleSystem::ZEParticleSystem()
 	IsVertexBufferUpdated = false;
 	BillboardType = ZE_PBT_VIEWPLANE_ORIENTED;
 	ParticleMaterial = ZEFixedMaterial::CreateInstance();
-	ParticleMaterial->SetZero();
 }
 
 ZEParticleSystem::~ZEParticleSystem()

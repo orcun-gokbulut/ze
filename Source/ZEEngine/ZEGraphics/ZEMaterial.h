@@ -99,9 +99,6 @@ class ZEMaterial : public ZEObject
 	public:
 		virtual ZEMaterialFlags			GetMaterialFlags() const = 0;
 
-		// SetUp
-		virtual void					SetZero() = 0;	
-
 		// Options
 		void							SetShadowCaster(bool Value);
 		bool							GetShadowCaster() const;
