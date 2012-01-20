@@ -141,7 +141,7 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 	unsigned int RowSize	= Width * PixelSize;
 	unsigned int RowCount	= Height;
 
-	TextureData->CreateTexture(ZE_TPF_A8R8G8B8, 1, 1, Width, Height);
+	TextureData->CreateTexture(ZE_TPF_I8_4, 1, 1, Width, Height);
 	TextureData->AllocateMipmap(0, 0, RowSize, RowCount);
 	
 	FreeImage_ConvertToRawBits((BYTE*)TextureData->GetMipmapData(0, 0), Bitmap32, RowSize, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
@@ -158,7 +158,7 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 // Only saves mipmap level 0 of surface 0
 bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, unsigned int Surface, unsigned int Mipmap)
 {
-	if(TextureData->GetPixelFormat() != ZE_TPF_A8R8G8B8)
+	if(TextureData->GetPixelFormat() != ZE_TPF_I8_4)
 	{
 		zeError("Pixel Format is not supported for saving.");
 		return false;
@@ -417,7 +417,7 @@ bool ZETextureLoader::GetImageInfo(ZETextureInfo* TextureInfo, ZEFile* File)
 	// Fill texture info
 	TextureInfo->MipmapCount	= 1;
 	TextureInfo->SurfaceCount	= 1;
-	TextureInfo->PixelFormat	= ZE_TPF_A8R8G8B8;
+	TextureInfo->PixelFormat	= ZE_TPF_I8_4;
 	TextureInfo->Width			= FreeImage_GetWidth(Bitmap);
 	TextureInfo->Height			= FreeImage_GetHeight(Bitmap);
 	

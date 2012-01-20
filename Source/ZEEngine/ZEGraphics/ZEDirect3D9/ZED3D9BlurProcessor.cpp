@@ -126,14 +126,14 @@ void ZED3D9BlurProcessor::CreateTextures()
 		if (TargetWidth != TempTexture1->GetWidth() || TargetHeight != TempTexture1->GetHeight())
 		{
 			TempTexture1->Release();
-			TempTexture1->Create(TargetWidth, TargetHeight, ZE_TPF_A8R8G8B8, true, 1);
+			TempTexture1->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
 			this->CreateKernels();
 		}
 	}
 	else // If not created before
 	{
 		TempTexture1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		TempTexture1->Create(TargetWidth, TargetHeight, ZE_TPF_A8R8G8B8, true, 1);
+		TempTexture1->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
 		this->CreateKernels();
 	}
 
@@ -144,14 +144,14 @@ void ZED3D9BlurProcessor::CreateTextures()
 		if (TargetWidth != TempTexture2->GetWidth() || TargetHeight != TempTexture2->GetHeight())
 		{
 			TempTexture2->Release();
-			TempTexture2->Create(TargetWidth, TargetHeight, ZE_TPF_A8R8G8B8, true, 1);
+			TempTexture2->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
 			this->CreateKernels();
 		}
 	}
 	else // If not created before
 	{
 		TempTexture2 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		TempTexture2->Create(TargetWidth, TargetHeight, ZE_TPF_A8R8G8B8, true, 1);
+		TempTexture2->Create(TargetWidth, TargetHeight, ZE_TPF_I8_4, true, 1);
 		this->CreateKernels();
 	}
 		

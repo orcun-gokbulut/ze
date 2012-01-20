@@ -139,22 +139,36 @@ D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 {
 	switch(Format)
 	{
-		case ZE_TPF_A8R8G8B8:
+		case ZE_TPF_I8:
+			return D3DFMT_L8;
+		case ZE_TPF_I8_4:
 			return D3DFMT_A8R8G8B8;
-		case ZE_TPF_DEPTH:
+		case ZE_TPF_I16:
+			return D3DFMT_L16;
+		case ZE_TPF_I16_2:
+			return D3DFMT_G16R16;
+
+		case ZE_TPF_F16:
+			return D3DFMT_R16F;
+		case ZE_TPF_F16_2:
+			return D3DFMT_G16R16F;
+		case ZE_TPF_F16_4:
+			return D3DFMT_A16B16G16R16F;
+
+		case ZE_TPF_F32:
 			return D3DFMT_R32F;
-		case ZE_TPF_LUM_HDR:
-			return D3DFMT_R32F;
-		case ZE_TPF_RGBA_HDR:
+		case ZE_TPF_F32_2:
+			return D3DFMT_G32R32F;
+		case ZE_TPF_F32_4:
 			return D3DFMT_A32B32G32R32F;
-		case ZE_TPF_SHADOW_MAP:
-			return D3DFMT_D24X8;
+
 		case ZE_TPF_DXT1:
 			return D3DFMT_DXT1;
 		case ZE_TPF_DXT3:
 			return D3DFMT_DXT3;
 		case ZE_TPF_DXT5:
 			return D3DFMT_DXT5;
+
 		default:
 			return (D3DFORMAT)0;
 	}
