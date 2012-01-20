@@ -77,11 +77,11 @@ class ZEArray
 		Type*		Items;
 
 	public:
-		inline size_t Circular(int Index) const
+		inline size_t Circular(ptrdiff_t Index) const
 		{
 			if (Index < 0)
 			{
-				size_t CircularIndex = ((-Index) % Count);
+				ptrdiff_t CircularIndex = ((-Index) % Count);
 				return (CircularIndex == 0 ? 0 : Count - CircularIndex);
 			}
 			else
@@ -185,7 +185,7 @@ class ZEArray
 				Items[I] = Value;
 		}
 
-		inline int FindIndex(Type Item, int StartIndex = 0) const
+		inline ptrdiff_t FindIndex(Type Item, int StartIndex = 0) const
 		{
 			for(size_t I = StartIndex; I < Count; I++)
 				if (Items[I] == Item)
@@ -435,24 +435,24 @@ class ZEArray
 			}
 		}
 
-		inline int BinarySearch(const Type& Element, int (*CompareFunction)(const Type*, const Type*))
+		inline ptrdiff_t BinarySearch(const Type& Element, int (*CompareFunction)(const Type*, const Type*))
 		{
 			void* Result = bsearch(&Element, &Items, Count, sizeof(Type), (FunctionPointerCaster*)(CompareFunction));
 			if (Result == NULL)
-				return NULL;
+				return -1;
 			else
 				return ((Type*)Result - Items);
 		}
 
 		inline const Type& GetItem(size_t Index) const
 		{
-			zeAssert(Index < 0 || Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
 		}
 
 		inline Type& GetItem(size_t Index)
 		{
-			zeAssert(Index < 0 || Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
+			zeAssert(Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
 		}
 

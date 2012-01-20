@@ -96,7 +96,7 @@ ZEViewPort* ZED3D9TextureCube::GetViewPort(ZETextureCubeFace Face)
 		return &ViewPorts[Face];
 }
 
-bool ZED3D9TextureCube::Create(int EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget)
+bool ZED3D9TextureCube::Create(unsigned int EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget)
 {
 	if (CubeTexture != NULL)
 		if (this->EdgeLength == EdgeLength)
@@ -134,7 +134,7 @@ bool ZED3D9TextureCube::Create(int EdgeLength, ZETexturePixelFormat PixelFormat,
 	return true;
 }
 
-bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, unsigned int* Pitch)
+bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, size_t* Pitch)
 {
 	D3DLOCKED_RECT Rect;
 	HRESULT hr = CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, 0, &Rect, NULL, 0);

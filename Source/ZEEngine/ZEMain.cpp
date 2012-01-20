@@ -65,7 +65,6 @@ extern HINSTANCE ApplicationInstance;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
-	_set_SSE2_enable(1);
 	ApplicationInstance = hInstance;
 	
 	ZEModelAnimationDebugModule DebugModule;

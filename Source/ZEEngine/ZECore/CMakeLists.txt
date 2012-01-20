@@ -88,7 +88,6 @@ ze_add_source(ZESystemMessageHandler.h				Sources Headers)
 ze_add_source(ZEWindow.cpp							Sources)
 ze_add_source(ZEWindow.h							Sources Headers)
 ze_add_source(ZEWindowResources.h					Sources)
-ze_add_source(ZEWindowResources.rc					Sources)
 ze_add_source(ZEVersion.cpp							Sources)
 ze_add_source(ZEVersion.h							Sources Headers)
 

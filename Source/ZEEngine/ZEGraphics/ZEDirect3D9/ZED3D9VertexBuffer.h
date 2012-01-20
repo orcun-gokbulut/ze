@@ -50,7 +50,7 @@ class ZED3D9StaticVertexBuffer : public ZEStaticVertexBuffer, public ZED3D9Compo
 
 		virtual size_t				GetBufferSize();
 
-		virtual bool				Create(unsigned int BufferSize);
+		virtual bool				Create(size_t BufferSize);
 		virtual void*				Lock();
 		virtual void				Unlock();
 		virtual void				Release();

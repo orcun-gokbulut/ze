@@ -71,7 +71,7 @@ class ZEDSModule : public ZESoundModule
 		unsigned int						TypeVolumes[ZE_SS_MAX_TYPE];
 
 		bool								StreamingDisabled;
-		unsigned int						MaxBufferSize;
+		size_t								MaxBufferSize;
 
 		ZEDSListener*						ActiveListener;
 		ZESmartArray<ZEDSListener*>			Listeners;
@@ -105,8 +105,8 @@ class ZEDSModule : public ZESoundModule
 		virtual void						SetStreamingDisabled(bool Disabled);
 		virtual bool						GetStreamingDisabled();
 
-		virtual void						SetMaxBufferSize(unsigned int BufferSize); 
-		virtual unsigned int				GetMaxBufferSize();
+		virtual void						SetMaxBufferSize(size_t BufferSize); 
+		virtual size_t						GetMaxBufferSize();
 
 		virtual void						ProcessSound(float ElapsedTime);
 

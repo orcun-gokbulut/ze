@@ -47,7 +47,7 @@ class ZESoundResourceOGG : public ZESoundResource
 	friend long OggMemory_Tell(void *datasource);
 
 	private:
-		unsigned char*					Data;
+		void*							Data;
 		size_t							DataSize;
 		
 		size_t							MemoryCursor;
@@ -58,8 +58,8 @@ class ZESoundResourceOGG : public ZESoundResource
 
 	public:
 
-		virtual unsigned int			GetDataSize() const;		
-		virtual const unsigned char*	GetData() const;
+		virtual size_t					GetDataSize() const;		
+		virtual const void*				GetData() const;
 		
 
 

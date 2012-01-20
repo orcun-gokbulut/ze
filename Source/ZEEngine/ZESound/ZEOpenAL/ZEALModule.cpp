@@ -242,12 +242,12 @@ unsigned int ZEALModule::GetTypeVolume(ZESoundSourceType Type)
 }
 
 
-void ZEALModule::SetMaxBufferSize(unsigned int BufferSize)
+void ZEALModule::SetMaxBufferSize(size_t BufferSize)
 {
 	MaxBufferSize = BufferSize;
 }
 
-unsigned int ZEALModule::GetMaxBufferSize()
+size_t ZEALModule::GetMaxBufferSize()
 {
 	return MaxBufferSize;
 }

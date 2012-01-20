@@ -73,7 +73,7 @@ class ZEString
 		void						Insert(const char* String);
 		void						Insert(size_t Position, const ZEString& String);
 		void						Insert(size_t Position, const char* String);
-		void						Remove(size_t Position, unsigned int Count = 1);
+		void						Remove(size_t Position, size_t Count = 1);
 
 		size_t						Contains(const char* String) const;	
 		size_t						Contains(const ZEString& String) const;
@@ -123,8 +123,8 @@ class ZEString
 		ZEString&					operator+=(const ZEString& String);
 		ZEString&					operator+=(const char* String);
 
-		char&						operator[](int Index);
-		const char&					operator[](int Index) const;
+		char&						operator[](ptrdiff_t Index);
+		const char&					operator[](ptrdiff_t Index) const;
 
 		bool						operator!=(const ZEString& String) const;
 		bool						operator!=(const char* String) const;

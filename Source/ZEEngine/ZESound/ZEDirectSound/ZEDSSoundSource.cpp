@@ -67,7 +67,7 @@ bool ZEDSSoundSource::CreateBuffer(bool Is3D)
 	memset(&DSBufferDesc, 0, sizeof(DSBUFFERDESC)); 
 	DSBufferDesc.dwSize = sizeof(DSBUFFERDESC); 
 	DSBufferDesc.dwFlags = (Is3D ? DSBCAPS_CTRL3D | DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLFX : DSBCAPS_CTRLFREQUENCY | DSBCAPS_CTRLVOLUME | DSBCAPS_CTRLPAN | DSBCAPS_CTRLFX);
-	DSBufferDesc.dwBufferBytes = (Streaming ? BufferSampleCount * SoundResource->GetBlockAlign() : SoundResource->GetPCMDataSize()); 
+	DSBufferDesc.dwBufferBytes = (Streaming ? BufferSampleCount * SoundResource->GetBlockAlign() : SoundResource->GetUncompressedDataSize()); 
 	DSBufferDesc.lpwfxFormat = &Format;
 	DSBufferDesc.guid3DAlgorithm = GUID_NULL;
 

@@ -144,11 +144,11 @@ bool ZEALSoundSource3D::CreateBuffer()
 
 	if (!Streaming)
 	{
-		unsigned char* ALStupidBuffer = new unsigned char[SoundResource->GetPCMDataSize()];
+		unsigned char* ALStupidBuffer = new unsigned char[SoundResource->GetUncompressedDataSize()];
 		SoundResource->Decode(ALStupidBuffer, 0, SoundResource->GetSampleCount());
 		
 		alGetError();
-		alBufferData(ALBuffer1, GetBufferFormat(SoundResource), ALStupidBuffer, SoundResource->GetPCMDataSize(), SoundResource->GetSamplesPerSecond());
+		alBufferData(ALBuffer1, GetBufferFormat(SoundResource), ALStupidBuffer, SoundResource->GetUncompressedDataSize(), SoundResource->GetSamplesPerSecond());
 		if ((Error = alGetError()) != AL_NO_ERROR)
 		{
 			DestroyBufferSource();
@@ -254,7 +254,7 @@ void ZEALSoundSource3D::ResetStream()
 }
 
 
-void ZEALSoundSource3D::StreamDecodeAndFill(ALuint Buffer, size_t Position, size_t SampleCount)
+void ZEALSoundSource3D::StreamDecodeAndFill(size_t Buffer, size_t Position, size_t SampleCount)
 {
 	if (Position + SampleCount < EffectiveEndPosition)
 		SoundResource->Decode(InnerStreamBuffer, Position, SampleCount);

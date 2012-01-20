@@ -71,14 +71,14 @@ static size_t OggMemory_Read(void *ptr, size_t size, size_t nmemb, void *datasou
 	if (Resource->DataSize < Resource->MemoryCursor + size * nmemb)
 	{
 		size_t ItemCount = (Resource->DataSize - Resource->MemoryCursor) / size;
-		memcpy(ptr, Resource->Data + Resource->MemoryCursor, size * ItemCount);
+		memcpy(ptr, (ZEUInt8*)Resource->Data + Resource->MemoryCursor, size * ItemCount);
 		Resource->MemoryCursor += ItemCount * size;
 
 		return ItemCount;
 	}
 	else
 	{
-		memcpy(ptr, Resource->Data + Resource->MemoryCursor, size * nmemb);
+		memcpy(ptr, (ZEUInt8*)Resource->Data + Resource->MemoryCursor, size * nmemb);
 		Resource->MemoryCursor += nmemb * size;
 
 		return nmemb;
@@ -127,7 +127,7 @@ size_t ZESoundResourceOGG::GetDataSize() const
 	return DataSize;
 }
 
-const unsigned char* ZESoundResourceOGG::GetData() const
+const void* ZESoundResourceOGG::GetData() const
 {
 	return Data;
 }

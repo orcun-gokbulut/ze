@@ -135,7 +135,7 @@ bool ZED3D9Texture2D::Create(unsigned int Width, unsigned int Height, ZETextureP
 	return true;
 }
 
-void ZED3D9Texture2D::Lock(void** Buffer, unsigned int* Pitch, unsigned int MipLevel)
+void ZED3D9Texture2D::Lock(void** Buffer, size_t* Pitch, unsigned int MipLevel)
 {
 	D3DLOCKED_RECT Rect;
 	Texture->LockRect(MipLevel, &Rect, NULL, NULL);

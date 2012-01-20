@@ -42,15 +42,15 @@
 class ZESoundResourceWAV : public ZESoundResource
 {
 	private:
-		unsigned char*					Data;
+		void*							Data;
 		size_t							DataSize;
 
 										ZESoundResourceWAV();
 		virtual							~ZESoundResourceWAV();
 
 	public:
-		virtual unsigned int			GetDataSize() const;		
-		virtual const unsigned char*	GetData() const;
+		virtual size_t					GetDataSize() const;		
+		virtual const void*				GetData() const;
 
 		virtual void					Decode(void* Buffer, size_t SampleIndex, size_t Count);
 

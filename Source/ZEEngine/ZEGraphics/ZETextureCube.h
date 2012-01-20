@@ -63,14 +63,14 @@ class ZETextureCube : public ZETexture
 
 	public:
 		virtual ZETextureType			GetTextureType() const;
-		int								GetEdgeLenght() const;
+		unsigned int					GetEdgeLenght() const;
 		ZETexturePixelFormat			GetPixelFormat() const;
 		bool							IsRenderTarget() const;
 
 		virtual ZEViewPort*				GetViewPort(ZETextureCubeFace Face) = 0;
 
-		virtual	bool					Create(int EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual bool					Lock(ZETextureCubeFace Face, void** Buffer, unsigned int* Pitch) = 0;
+		virtual	bool					Create(unsigned int EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
+		virtual bool					Lock(ZETextureCubeFace Face, void** Buffer, size_t* Pitch) = 0;
 		virtual void					Unlock(ZETextureCubeFace Face) = 0;
 
 		static ZETextureCube*			CreateInstance();

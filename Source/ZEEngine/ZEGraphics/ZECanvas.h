@@ -142,7 +142,7 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		bool							LoadFromFile(const ZEString& FileName);
 		void							SaveToFile(const ZEString& FileName);
 
-		virtual unsigned int			GetBufferSize();
+		virtual size_t					GetBufferSize();
 		virtual void*					GetVertexBuffer();
 		
 										ZECanvas();

@@ -208,9 +208,9 @@ include_directories(
 	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM}/3dsMax/2010)
 	
 link_directories(
-	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}
-	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Release
-	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Release/vrpn
+	#${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}
+	#${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Release
+	#${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Release/vrpn
 
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/vrpn

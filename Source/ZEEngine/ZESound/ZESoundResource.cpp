@@ -41,13 +41,13 @@
 #include "ZESoundResourceOGG.h"
 #include "ZESoundResourceWAV.h"
 
-ZESoundFileFormat ZESoundResource::GetFileFormat(const char* FileName)
+ZESoundFileFormat ZESoundResource::GetFileFormat(const ZEString& FileName)
 {
-	if(!_strnicmp(&FileName[strlen(FileName) - 3],"mp3",3))
+	if (FileName.Right(3).Lower() == "mp3")
 		return ZE_SFF_MP3;
-	else if(!_strnicmp(&FileName[strlen(FileName) - 3],"wav",3))
+	else if(FileName.Right(3).Lower() == "wav")
 		return  ZE_SFF_WAVE;
-	else if(!_strnicmp(&FileName[strlen(FileName) - 3],"ogg",3))
+	else if(FileName.Right(3).Lower() == "ogg")
 		return  ZE_SFF_OGG;
 	else
 		return  ZE_SFF_NONE;
@@ -68,32 +68,32 @@ unsigned int ZESoundResource::GetSamplesPerSecond() const
 	return SamplesPerSecond;
 }
 
-short int ZESoundResource::GetChannelCount() const
+unsigned int ZESoundResource::GetChannelCount() const
 {
 	return ChannelCount;
 }
 
-short int ZESoundResource::GetBitsPerSample() const
+unsigned int ZESoundResource::GetBitsPerSample() const
 {
 	return BitsPerSample;
 }
 
-short int ZESoundResource::GetBlockAlign() const
+size_t ZESoundResource::GetBlockAlign() const
 {
 	return BlockAlign;
 }
 
-unsigned int ZESoundResource::GetSampleCount() const
+size_t ZESoundResource::GetSampleCount() const
 {
 	return SampleCount;
 }
 
-size_t ZESoundResource::GetPCMDataSize() const
+size_t ZESoundResource::GetUncompressedDataSize() const
 {
 	return SampleCount * BlockAlign;
 }
 
-ZESoundResource* ZESoundResource::LoadResource(const char* FileName)
+ZESoundResource* ZESoundResource::LoadResource(const ZEString& FileName)
 {
 	zeLog("Loading sound file \"%s\"", FileName);
 
@@ -130,7 +130,7 @@ ZESoundResource* ZESoundResource::LoadResource(const char* FileName)
 	return Temp;
 }
 
-ZESoundResource* ZESoundResource::LoadSharedResource(const char *FileName)
+ZESoundResource* ZESoundResource::LoadSharedResource(const ZEString& FileName)
 {
 	ZESoundResource* NewResource =(ZESoundResource*)zeResources->GetResource(FileName);
 	if (NewResource == NULL)
@@ -150,7 +150,7 @@ ZESoundResource* ZESoundResource::LoadSharedResource(const char *FileName)
 		return NewResource;
 }
 
-void ZESoundResource::CacheResource(const char *FileName)
+void ZESoundResource::CacheResource(const ZEString& FileName)
 {
 	ZESoundResource* NewResource = (ZESoundResource*)zeResources->GetResource(FileName);
 	if (NewResource == NULL)

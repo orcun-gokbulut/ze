@@ -103,15 +103,15 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 {
 	switch(Type)
 	{
-	case ZE_PET_POINT:
-		Particle.Position = Position;		// All particles come from a single point
-		break;
-	case ZE_PET_BOX:	// Particles come from inside of a box
-		Particle.Position.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2, BoxSize.x / 2);
-		Particle.Position.y = Position.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2, BoxSize.y / 2);
-		Particle.Position.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2, BoxSize.z / 2);
-		break;
-	case ZE_PET_TORUS:		// Particles come from inside of a torus
+		case ZE_PET_POINT:
+			Particle.Position = Position;		// All particles come from a single point
+			break;
+		case ZE_PET_BOX:	// Particles come from inside of a box
+			Particle.Position.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2, BoxSize.x / 2);
+			Particle.Position.y = Position.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2, BoxSize.y / 2);
+			Particle.Position.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2, BoxSize.z / 2);
+			break;
+		case ZE_PET_TORUS:		// Particles come from inside of a torus
 		{
 			float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 			float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
@@ -121,7 +121,7 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 			Particle.Position.z = Position.z + TubeRadius * sinf(Phi);		
 			break;
 		}
-	case ZE_PET_SPHERE:		//Particles come from inside of a sphere.
+		case ZE_PET_SPHERE:		//Particles come from inside of a sphere.
 		{
 			float Radius = RAND_BETWEEN_TWO_FLOAT(0.0f, SphereRadius);
 			float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
