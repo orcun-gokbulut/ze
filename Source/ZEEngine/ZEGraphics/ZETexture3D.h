@@ -59,8 +59,8 @@ class ZETexture3D : public ZETexture
 		ZETexturePixelFormat			GetPixelFormat() const;
 		bool							IsRenderTarget() const;
 
-		virtual bool					Create(int Width, int Height, int Depth, ZETexturePixelFormat PixelFormat) = 0;
-		virtual void					Lock(void** Buffer, int* RowPitch, int* SlicePitch) = 0;
+		virtual bool					Create(unsigned int Width, unsigned int Height, unsigned int Depth, ZETexturePixelFormat PixelFormat) = 0;
+		virtual void					Lock(void** Buffer, size_t* RowPitch, size_t* SlicePitch) = 0;
 		virtual void					Unlock() = 0;
 
 		static ZETexture3D*				CreateInstance();

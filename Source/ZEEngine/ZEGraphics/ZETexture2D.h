@@ -69,7 +69,7 @@ class ZETexture2D : public ZETexture
 		virtual ZEViewPort*				GetViewPort() = 0;
 
 		virtual bool					Create(unsigned int Width, unsigned int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, unsigned int MipLevel = 0) = 0;
-		virtual void					Lock(void** Buffer, unsigned int* Pitch, unsigned int MipLevel = 0) = 0;
+		virtual void					Lock(void** Buffer, size_t* Pitch, unsigned int MipLevel = 0) = 0;
 		virtual void					Unlock(unsigned int MipLevel) = 0;
 
 		static ZETexture2D*				CreateInstance();

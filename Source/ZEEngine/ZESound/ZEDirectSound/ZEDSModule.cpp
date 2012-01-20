@@ -305,12 +305,12 @@ unsigned int ZEDSModule::GetTypeVolume(ZESoundSourceType Type)
 }
 
 
-void ZEDSModule::SetMaxBufferSize(unsigned int BufferSize)
+void ZEDSModule::SetMaxBufferSize(size_t BufferSize)
 {
 	MaxBufferSize = BufferSize;
 }
 
-unsigned int ZEDSModule::GetMaxBufferSize()
+size_t ZEDSModule::GetMaxBufferSize()
 {
 	return MaxBufferSize;
 }

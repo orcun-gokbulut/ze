@@ -118,7 +118,7 @@ size_t ZESoundResourceMP3::GetDataSize() const
 	return DataSize;
 }
 
-const unsigned char* ZESoundResourceMP3::GetData() const
+const void* ZESoundResourceMP3::GetData() const
 {
 	return Data;
 }

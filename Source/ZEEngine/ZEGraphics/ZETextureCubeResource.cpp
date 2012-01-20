@@ -303,7 +303,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 
 	// Copy texture data into ZETexture2D
 	void* TargetBuffer = NULL;
-	unsigned int TargetPitch = 0;
+	size_t TargetPitch = 0;
 
 	for(unsigned int I = 0; I < SurfaceCount; I++)
 	{

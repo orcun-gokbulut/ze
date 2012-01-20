@@ -641,7 +641,7 @@ ZEString& ZEString::operator+=(const char* String)
 	return *this;
 }
 
-const char& ZEString::operator[](int Index) const
+const char& ZEString::operator[](ptrdiff_t Index) const
 {
 	zeAssert(Buffer == NULL, "Empty string can not be indexed.");
 	zeAssert(Index < 0, "Index parameter is negative.");
@@ -649,7 +649,7 @@ const char& ZEString::operator[](int Index) const
 	return Buffer[Index];
 }
 
-char& ZEString::operator[](int Index)
+char& ZEString::operator[](ptrdiff_t Index)
 {
 	zeAssert(Buffer == NULL, "Empty string can not be indexed.");
 	zeAssert(Index < 0, "Index parameter is negative.");

@@ -161,126 +161,6 @@ void ZETerrain::Deinitialize()
 	ZEEntity::Deinitialize();
 }
 
-inline void* Address(void* Buffer, size_t x, size_t y, size_t Pitch)
-{
-	return (void*)((char*)Buffer + Pitch * y + x * sizeof(float));
-}
-
-inline void* SampleAddress(void* Buffer, size_t x, size_t y, size_t Width, size_t Height)
-{
-	if (x < 0)
-		x = 0;
-	else if (x >= Width)
-		x = Width - 1;
-
-	if (y < 0)
-		y = 0;
-	else if (y >= Height)
-		y = Height - 1;
-
-	return Address(Buffer, Width, x, y);
-}
-
-static void DownsampleHeight(float* Source, float* Destination, size_t Width, size_t Height)
-{
-	for(size_t y = 0; y < Height / 2; y++)
-		for(size_t x = 0; x < Width / 2; x++)
-		{
-			size_t Sx = x * 2;
-			size_t Sy = y * 2;
-			float Sum = 
-				*(float*)SampleAddress(Source, Sx - 1,	Sy - 1, Width, Height) +
-				*(float*)SampleAddress(Source, Sx,		Sy - 1, Width, Height) +
-				*(float*)SampleAddress(Source, Sx + 1,	Sy - 1, Width, Height) +
-				*(float*)SampleAddress(Source, Sx - 1,	Sy,		Width, Height) +  
-				*(float*)SampleAddress(Source, Sx,		Sy,		Width, Height) +  
-				*(float*)SampleAddress(Source, Sx + 1,	Sy,		Width, Height) +  
-				*(float*)SampleAddress(Source, Sx - 1,	Sy + 1, Width, Height) +
-				*(float*)SampleAddress(Source, Sx,		Sy + 1, Width, Height) +
-				*(float*)SampleAddress(Source, Sx + 1,	Sy + 1, Width, Height);
-
-			Sum /= 9;
-			*(float*)Address(Destination, x, y, Width) = Sum;
-		}
-}
-
-static void DownsampleColor(ZEUInt32* Source, ZEUInt32* Destination, size_t Width, size_t Height)
-{
-	for(size_t y = 0; y < Height; y++)
-		for(size_t x = 0; x < Width; x++)
-		{
-			size_t Sx = x * 2;
-			size_t Sy = y * 2;
-			ZEUInt32 SumA = 0;
-			ZEUInt32 SumR = 0;
-			ZEUInt32 SumG = 0;
-			ZEUInt32 SumB = 0;
-
-			ZEUInt32 Sample;
-			Sample = *(ZEUInt32*)SampleAddress(Source, Sx - 1,	Sy - 1, Width, Height);
-			SumA += (Sample & 0xFF000000) >> 24;
-			SumR += (Sample & 0x00FF0000) >> 16;
-			SumG += (Sample & 0x0000FF00) >> 8;
-			SumB += (Sample & 0x000000FF);
-			
-			Sample = *(ZEUInt32*)SampleAddress(Source, Sx,		Sy - 1, Width, Height);
-			SumA += (Sample & 0xFF000000) >> 24;
-			SumR += (Sample & 0x00FF0000) >> 16;
-			SumG += (Sample & 0x0000FF00) >> 8;
-			SumB += (Sample & 0x000000FF);
-
-			Sample = *(ZEUInt32*)SampleAddress(Source, Sx + 1,	Sy - 1, Width, Height);
-			SumA += (Sample & 0xFF000000) >> 24;
-			SumR += (Sample & 0x00FF0000) >> 16;
-			SumG += (Sample & 0x0000FF00) >> 8;
-			SumB += (Sample & 0x000000FF);
-			
-			Sample = *(ZEUInt32*)SampleAddress(Source, Sx - 1,	Sy,		Width, Height);  
-			SumA += (Sample & 0xFF000000) >> 24;
-			SumR += (Sample & 0x00FF0000) >> 16;
-			SumG += (Sample & 0x0000FF00) >> 8;
-			SumB += (Sample & 0x000000FF);
-			
-			Sample = *(ZEUInt32*)SampleAddress(Source, Sx,		Sy,		Width, Height);  
-			SumA += (Sample & 0xFF000000) >> 24;
-			SumR += (Sample & 0x00FF0000) >> 16;
-			SumG += (Sample & 0x0000FF00) >> 8;
-			SumB += (Sample & 0x000000FF);
-			
-			Sample = *(ZEUInt32*)SampleAddress(Source, Sx + 1,	Sy,		Width, Height);  
-			SumA += (Sample & 0xFF000000) >> 24;
-			SumR += (Sample & 0x00FF0000) >> 16;
-			SumG += (Sample & 0x0000FF00) >> 8;
-			SumB += (Sample & 0x000000FF);
-			Sample = *(ZEUInt32*)SampleAddress(Source, Sx - 1,	Sy + 1, Width, Height);
-			SumA += (Sample & 0xFF000000) >> 24;
-			SumR += (Sample & 0x00FF0000) >> 16;
-			SumG += (Sample & 0x0000FF00) >> 8;
-			SumB += (Sample & 0x000000FF);
-			
-			Sample = *(ZEUInt32*)SampleAddress(Source, Sx,		Sy + 1, Width, Height);
-			SumA += (Sample & 0xFF000000) >> 24;
-			SumR += (Sample & 0x00FF0000) >> 16;
-			SumG += (Sample & 0x0000FF00) >> 8;
-			SumB += (Sample & 0x000000FF);
-			
-			Sample = *(ZEUInt32*)SampleAddress(Source, Sx + 1,	Sy + 1, Width, Height);
-			SumA += (Sample & 0xFF000000) >> 24;
-			SumR += (Sample & 0x00FF0000) >> 16;
-			SumG += (Sample & 0x0000FF00) >> 8;
-			SumB += (Sample & 0x000000FF);
-
-			SumA /= 9;
-			SumR /= 9;
-			SumG /= 9;
-			SumB /= 9;
-
-			Sample = (SumA << 24) & 0xFF000000 + (SumR << 16) & 0x0000FF00 + (SumG << 8) & 0x00FF0000 + SumB & 0x000000FF;
-
-			*(ZEUInt32*)Address(Destination, x, y, Width) = Sample;
-		}
-}
-
 bool ZETerrain::LoadTerrain()
 {
 	if (TerrainFileName.IsEmpty())
@@ -318,9 +198,13 @@ bool ZETerrain::LoadTerrain()
 
 	ZETerrainLOD* CurrentLOD = TerrainLODs.Add();
 	CurrentLOD->HeightTexture = ZETexture2D::CreateInstance();
-	CurrentLOD->HeightTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_LUM_HDR, false, 1);
+	CurrentLOD->HeightTexture->Create(ChunkSize * 4, ChunkSize * 4, ZE_TPF_F32, false, 1);
 	CurrentLOD->ColorTexture = ZETexture2D::CreateInstance();
-	CurrentLOD->ColorTexture->Create(ChunkSize * 3, ChunkSize * 3, ZE_TPF_LUM_HDR, false, 1);
+	CurrentLOD->ColorTexture->Create(ChunkSize * 4, ChunkSize * 4, ZE_TPF_I8_4, false, 1);
+	
+	CurrentLOD->Material = ZETerrainMaterial::CreateInstance();
+	CurrentLOD->Material->SetHeightTexture(CurrentLOD->HeightTexture);
+	CurrentLOD->Material->SetColorTexture(CurrentLOD->ColorTexture);
 
 	for (size_t I = 1; I < 8; I++)
 	{
@@ -328,19 +212,19 @@ bool ZETerrain::LoadTerrain()
 		ZETerrainData* PrevLevel = &TerrainData[I - 1];
 
 		CurrentLevel->Width = PrevLevel->Width / 2;
-		CurrentLevel->Height = PrevLevel->Width / 2;
+		CurrentLevel->Height = PrevLevel->Height / 2;
 		CurrentLevel->HeightData = new float[CurrentLevel->Width * CurrentLevel->Height];
 		CurrentLevel->ColorData = new ZEUInt32[CurrentLevel->Width * CurrentLevel->Height];
 
-		DownsampleHeight(PrevLevel->HeightData, CurrentLevel->HeightData, CurrentLevel->Width, CurrentLevel->Height);
-		DownsampleColor(PrevLevel->ColorData, CurrentLevel->ColorData, CurrentLevel->Width, CurrentLevel->Height);
+		/*DownsampleHeight(PrevLevel->HeightData, CurrentLevel->HeightData, CurrentLevel->Width, CurrentLevel->Height);
+		DownsampleColor(PrevLevel->ColorData, CurrentLevel->ColorData, CurrentLevel->Width, CurrentLevel->Height);*/
 
 
 		ZETerrainLOD* CurrentLOD = TerrainLODs.Add();
 		CurrentLOD->HeightTexture = ZETexture2D::CreateInstance();
-		CurrentLOD->HeightTexture->Create(ChunkSize * 4, ChunkSize * 4, ZE_TPF_A8R8G8B8, false, 1);
+		CurrentLOD->HeightTexture->Create(ChunkSize * 4, ChunkSize * 4, ZE_TPF_F32, false, 1);
 		CurrentLOD->ColorTexture = ZETexture2D::CreateInstance();
-		CurrentLOD->ColorTexture->Create(ChunkSize * 4, ChunkSize * 4, ZE_TPF_A8R8G8B8, false, 1);
+		CurrentLOD->ColorTexture->Create(ChunkSize * 4, ChunkSize * 4, ZE_TPF_I8_4, false, 1);
 
 		CurrentLOD->Material = ZETerrainMaterial::CreateInstance();
 		CurrentLOD->Material->SetHeightTexture(CurrentLOD->HeightTexture);

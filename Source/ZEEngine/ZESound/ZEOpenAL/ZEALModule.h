@@ -103,8 +103,8 @@ class ZEALModule : public ZESoundModule
 		virtual void						SetStreamingDisabled(bool Disabled);
 		virtual bool						GetStreamingDisabled();
 
-		virtual void						SetMaxBufferSize(unsigned int BufferSize); 
-		virtual unsigned int				GetMaxBufferSize();
+		virtual void						SetMaxBufferSize(size_t BufferSize); 
+		virtual size_t						GetMaxBufferSize();
 
 		virtual void						ProcessSound(float ElapsedTime);
 

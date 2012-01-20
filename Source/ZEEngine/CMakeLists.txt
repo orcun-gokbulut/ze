@@ -66,7 +66,6 @@ ze_add_source(ZECompileOptions.h 			Sources Headers)
 ze_add_source(ZEDefinitions.h 				Sources Headers)
 ze_add_source(ZESDK.h 						Sources Headers)
 ze_add_source(ZESDK.cpp 					Sources)
-ze_add_source(ZECore/ZEWindowResources.rc	Sources)
 
 ze_add_library(ZEEngineAPI 
 	SOURCES ${Sources}

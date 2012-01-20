@@ -833,7 +833,7 @@ ZEStaticVertexBuffer* ZECanvas::CreateStaticVertexBuffer()
 	return Buffer;
 }
 
-unsigned int ZECanvas::GetBufferSize()
+size_t ZECanvas::GetBufferSize()
 {
 	return Vertices.GetCount() * sizeof(ZECanvasVertex);
 }

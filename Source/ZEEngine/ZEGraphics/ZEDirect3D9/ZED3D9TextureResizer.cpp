@@ -186,7 +186,7 @@ bool ZED3D9TextureResizer::Process()
 
 	void* Dest = NULL;
 	const unsigned int Bpp = 4;
-	unsigned int DestPitch = 0; 
+	size_t DestPitch = 0; 
 	
 	static struct Vert  
 	{

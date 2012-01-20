@@ -37,12 +37,12 @@
 #include "ZED3D9Module.h"
 #include "ZEError.h"
 
-unsigned int ZED3D9StaticVertexBuffer::GetBufferSize()
+size_t ZED3D9StaticVertexBuffer::GetBufferSize()
 {
 	return BufferSize;
 }
 
-bool ZED3D9StaticVertexBuffer::Create(unsigned int BufferSize)
+bool ZED3D9StaticVertexBuffer::Create(size_t BufferSize)
 {
 	Release();
 	this->BufferSize = BufferSize;

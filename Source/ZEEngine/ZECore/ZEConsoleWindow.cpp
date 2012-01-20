@@ -92,7 +92,11 @@ INT_PTR CALLBACK ConsoleCallback(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
 			SendMessage(GetDlgItem(hwndDlg, IDC_OUTPUT), EM_SETLIMITTEXT, 0, 0);
 			SendMessage(GetDlgItem(hwndDlg,IDC_INPUT), EM_SETLIMITTEXT, 99, 0);			
 			SendMessage(GetDlgItem(hwndDlg, IDC_OUTPUT), WM_SETFONT, (WPARAM)GetStockObject(ANSI_FIXED_FONT), MAKELPARAM(TRUE, 0));
-			OrgInputBoxCallback = (WNDPROC)SetWindowLong(GetDlgItem(hwndDlg, IDC_INPUT), GWL_WNDPROC, (LONG) InputBoxCallback);
+			#ifdef ZE_ZINEK_VERSION_PLATFORM_WIN64
+				OrgInputBoxCallback = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwndDlg, IDC_INPUT), GWLP_WNDPROC, (LONG)InputBoxCallback);
+			#else
+				OrgInputBoxCallback = (WNDPROC)SetWindowLong(GetDlgItem(hwndDlg, IDC_INPUT), GWL_WNDPROC, (LONG)InputBoxCallback);
+			#endif
 			SetFocus(GetDlgItem(hwndDlg,IDC_INPUT));
 			break;
 		case WM_COMMAND:
@@ -127,7 +131,11 @@ INT_PTR CALLBACK ConsoleCallback(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
 			return 0;
 				
 		case WM_DESTROY:
-			SetWindowLong(GetDlgItem(hwndDlg, IDC_INPUT), GWL_WNDPROC, (LONG) OrgInputBoxCallback);
+			#ifdef ZE_ZINEK_VERSION_PLATFORM_WIN64
+				SetWindowLongPtr(GetDlgItem(hwndDlg, IDC_INPUT), GWLP_WNDPROC, (LONG)OrgInputBoxCallback);
+			#else
+				SetWindowLong(GetDlgItem(hwndDlg, IDC_INPUT), GWL_WNDPROC, (LONG)OrgInputBoxCallback);
+			#endif
 			PostQuitMessage(0);
 			break;	
 		default:

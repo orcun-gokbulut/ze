@@ -304,11 +304,11 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 
 	// Copy texture data into ZETexture2D
 	void* TargetBuffer = NULL;
-	unsigned int TargetPitch = 0;
+	size_t TargetPitch = 0;
 	
-	for(unsigned int I = 0; I < SurfaceCount; I++)
+	for(size_t I = 0; I < SurfaceCount; I++)
 	{
-		for(unsigned int J = 0; J < MipCount; J++)
+		for(size_t J = 0; J < MipCount; J++)
 		{
 			Texture->Lock(&TargetBuffer, &TargetPitch, J);
 			TextureData.CopyMipmapDataTo(I, J, (unsigned char*)TargetBuffer, TargetPitch);

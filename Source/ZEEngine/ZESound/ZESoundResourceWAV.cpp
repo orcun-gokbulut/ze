@@ -72,12 +72,12 @@ ZESoundResourceWAV::~ZESoundResourceWAV()
 		delete Data;
 }
 
-unsigned int ZESoundResourceWAV::GetDataSize() const
+size_t ZESoundResourceWAV::GetDataSize() const
 {
 	return DataSize;
 }
 
-const unsigned char* ZESoundResourceWAV::GetData() const
+const void* ZESoundResourceWAV::GetData() const
 {
 	return Data;
 }
@@ -85,7 +85,7 @@ const unsigned char* ZESoundResourceWAV::GetData() const
 void ZESoundResourceWAV::Decode(void* Buffer, size_t SampleIndex, size_t Count)
 {
 	zeAssert(SampleIndex + Count > SampleCount, "Sample decoding range (SampleIndex + Count) exceed sample count.");
-	memcpy(Buffer, Data + SampleIndex * BlockAlign, Count * BlockAlign);
+	memcpy(Buffer, (ZEUInt8*)Data + SampleIndex * BlockAlign, Count * BlockAlign);
 }
 
 ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)

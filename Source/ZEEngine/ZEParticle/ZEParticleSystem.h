@@ -68,15 +68,15 @@ class ZEParticleSystem : public ZEObject
 	ZE_META_OBJECT(ZEMaterial)
 
 	private:
-		ZEString							Name;						// Used in editor
-		ZEParticleEffect*					Owner;						// Owner effect of the system
+		ZEString							Name;
+		ZEParticleEffect*					Owner;
 		bool								IsParticlePoolGenerated;
-		ZEArray<ZEParticleEmitter*>			EmitterArray;				// These elements emits the particles from the particle pool
-		ZEStaticVertexBuffer*				VertexBuffer;				// Holds the vertices
-		ZERenderCommand						RenderCommand;					// Used for rendering
-		ZEParticleBillboardType				BillboardType;				// Can be choosen from 3 types
-		ZEMaterial*							ParticleMaterial;			// Material of the entire system
-		bool								IsVertexBufferUpdated;		// A boolean for checking Vertex Buffer
+		ZEArray<ZEParticleEmitter*>			EmitterArray;
+		ZEStaticVertexBuffer*				VertexBuffer;
+		ZERenderCommand						RenderCommand;
+		ZEParticleBillboardType				BillboardType;
+		ZEMaterial*							ParticleMaterial;
+		bool								IsVertexBufferUpdated;	
 		
 		void								UpdateVertexBuffer(ZEDrawParameters* DrawParameters);
 

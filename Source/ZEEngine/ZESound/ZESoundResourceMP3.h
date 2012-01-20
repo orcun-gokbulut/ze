@@ -56,8 +56,8 @@ class ZESoundResourceMP3 : public ZESoundResource
 		virtual							~ZESoundResourceMP3();
 
 	public:
-		virtual unsigned int			GetDataSize() const;		
-		virtual const unsigned char*	GetData() const;
+		virtual size_t					GetDataSize() const;		
+		virtual const void*				GetData() const;
 
 		virtual void					Decode(void* DestinationBuffer, size_t SampleIndex, size_t SampleCount);
 
