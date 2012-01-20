@@ -89,9 +89,15 @@ size_t ZEGraphicsModule::GetCurrentFrameId()
 	return CurrentFrameId;
 }
 
+void FreeImageOutput(FREE_IMAGE_FORMAT Bitmap, const char* Message)
+{
+	zeLog("%s", Message);
+}
+
 void ZEGraphicsModule::BaseInitialize()
 {
 	FreeImage_Initialise();
+	FreeImage_SetOutputMessage(FreeImageOutput);
 	GraphicsOptions.SetName("Graphics");
 	GraphicsOptions.AddOption(new ZEOption("ScreenWidth", 640, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ScreenHeight", 480, ZE_OA_NORMAL));

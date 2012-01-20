@@ -107,13 +107,13 @@ void ZEOmniProjectiveLight::RenderShadowMap(ZEScene* Scene, ZEShadowRenderer* Sh
 	if (FrontShadowMap == NULL)
 	{
 		FrontShadowMap = ZETexture2D::CreateInstance();
-		FrontShadowMap->Create(512, 512, ZE_TPF_SHADOW_MAP, false);
+		FrontShadowMap->Create(512, 512, ZE_TPF_F32, false);
 	}
 
 	if (BackShadowMap == NULL)
 	{
 		BackShadowMap = ZETexture2D::CreateInstance();
-		BackShadowMap->Create(512, 512, ZE_TPF_SHADOW_MAP, false);
+		BackShadowMap->Create(512, 512, ZE_TPF_F32, false);
 	}
 }
 

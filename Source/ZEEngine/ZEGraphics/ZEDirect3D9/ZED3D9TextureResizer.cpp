@@ -266,7 +266,7 @@ bool ZED3D9TextureResizer::Process()
 
 		// Create the input texture and copy the image data into it
 		Input = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Input->Create(SrcInfo.Width, SrcInfo.Height, ZE_TPF_A8R8G8B8, false, 1);
+		Input->Create(SrcInfo.Width, SrcInfo.Height, ZE_TPF_I8_4, false, 1);
 
 		// Fill the input texture
 		Input->Lock(&Dest, &DestPitch, 0);
@@ -279,7 +279,7 @@ bool ZED3D9TextureResizer::Process()
 		
 		// Create output texture
 		Output = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Output->Create(DestInfo.Width, SrcInfo.Height, ZE_TPF_A8R8G8B8, true, 1);
+		Output->Create(DestInfo.Width, SrcInfo.Height, ZE_TPF_I8_4, true, 1);
 
 		// Create depth stencil buffer with the same size of the render target
 		GetDevice()->CreateDepthStencilSurface(DestInfo.Width, SrcInfo.Height, D3DFMT_D24X8, D3DMULTISAMPLE_NONE, 0, TRUE, &DepthStencil, NULL);
@@ -341,7 +341,7 @@ bool ZED3D9TextureResizer::Process()
 		{
 			// Create the input texture and copy the image data into it
 			Input = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-			Input->Create(SrcInfo.Width, SrcInfo.Height, ZE_TPF_A8R8G8B8, false, 1);
+			Input->Create(SrcInfo.Width, SrcInfo.Height, ZE_TPF_I8_4, false, 1);
 
 			// Fill the input texture
 			Input->Lock(&Dest, &DestPitch, 0);
@@ -355,7 +355,7 @@ bool ZED3D9TextureResizer::Process()
 
 		// Create output texture
 		Output = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-		Output->Create(DestInfo.Width, DestInfo.Height, ZE_TPF_A8R8G8B8, true, 1);
+		Output->Create(DestInfo.Width, DestInfo.Height, ZE_TPF_I8_4, true, 1);
 
 		// Set pixel shader
 		Result = GetDevice()->SetVertexShader(VertexShader->GetVertexShader());

@@ -80,7 +80,7 @@ bool ZETextureQualityManager::Process(ZETextureData* TextureData, ZETextureOptio
 	switch(FinalOptions->CompressionType)
 	{
 		case ZE_TCT_NONE:
-			PixelFormat			= ZE_TPF_A8R8G8B8;
+			PixelFormat			= ZE_TPF_I8_4;
 			InputBlockWidth		= 1; // Pixels
 			InputBlockHeight	= 1; // Pixels
 			OutputBlockSize		= 4; // Bytes

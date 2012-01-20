@@ -95,7 +95,7 @@ bool ZED3D9Texture2D::Create(unsigned int Width, unsigned int Height, ZETextureP
 	D3DPOOL Pool;
 	D3DFORMAT Format;
 
-	if (PixelFormat == ZE_TPF_SHADOW_MAP)
+	if (PixelFormat == ZE_TPF_F32)
 	{
 		Usage = D3DUSAGE_DEPTHSTENCIL;
 		MipMap = 1;

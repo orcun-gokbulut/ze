@@ -695,27 +695,27 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 {
 	if (GBuffer1 == NULL)
 		GBuffer1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	GBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_DEPTH, true);
+	GBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_F32, true);
 	
 	if (GBuffer2 == NULL)
 		GBuffer2 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	GBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_A8R8G8B8, true);
+	GBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_I8_4, true);
 
 	if (GBuffer3 == NULL)
 		GBuffer3 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	GBuffer3->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_A8R8G8B8, true);
+	GBuffer3->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_I8_4, true);
 
 	if (LBuffer1 == NULL)
 		LBuffer1 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	LBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
+	LBuffer1->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_F32_4, true);
 
 	if (LBuffer2 == NULL)
 		LBuffer2 = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	LBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
+	LBuffer2->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_F32_4, true);
 
 	if (SSAOBuffer == NULL)
 		SSAOBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	SSAOBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_A8R8G8B8, true);
+	SSAOBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_I8_4, true);
 
 	/*
 	if(EDInputBuffer == NULL)
@@ -725,20 +725,20 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 
 	if(SSAAInputBuffer == NULL)
 		SSAAInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	SSAAInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_A8R8G8B8, true);
+	SSAAInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_I8_4, true);
 
 	if(CTInputBuffer == NULL)
 		CTInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	CTInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_A8R8G8B8, true);
+	CTInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_I8_4, true);
 
 	if(BlurInputBuffer == NULL)
 		BlurInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	BlurInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_A8R8G8B8, true);
+	BlurInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_I8_4, true);
 
 
 	if (ABuffer == NULL)
 		ABuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
-	ABuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_RGBA_HDR, true);
+	ABuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_F32_4, true);
 }
 
 void ZED3D9FrameRenderer::DeinitializeRenderTargets()
