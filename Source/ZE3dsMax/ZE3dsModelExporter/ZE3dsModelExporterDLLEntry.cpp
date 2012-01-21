@@ -36,8 +36,11 @@
 #include "ZE3dsModelExporterDLLEntry.h"
 #include "ZE3dsModelExporterDescription.h"
 
+#include "ZETypes.h"
+
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
+
 
 HINSTANCE hInstance;
 ZEInt controlsInit = FALSE;

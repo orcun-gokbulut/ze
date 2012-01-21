@@ -37,22 +37,26 @@
 #ifndef __ZE3DS_MAP_EXPORTER_DESCRIPTION_H__
 #define __ZE3DS_MAP_EXPORTER_DESCRIPTION_H__
 
+#include "ZETypes.h"
+
+
 #include <Max.h>
 #include <iparamb2.h>
+
 
 class ZE3dsMapExporterDescription : public ClassDesc2 
 {
 	public:
 		virtual ZEInt				IsPublic();
-		virtual void*			Create(BOOL Loading = FALSE);
-		virtual const TCHAR*	ClassName();
-		virtual SClass_ID		SuperClassID();
-		virtual Class_ID		ClassID();
-		virtual const TCHAR*	Category();
-		virtual const TCHAR*	InternalName();
-		virtual HINSTANCE		HInstance();
+		virtual void*				Create(BOOL Loading = FALSE);
+		virtual const TCHAR*		ClassName();
+		virtual SClass_ID			SuperClassID();
+		virtual Class_ID			ClassID();
+		virtual const TCHAR*		Category();
+		virtual const TCHAR*		InternalName();
+		virtual HINSTANCE			HInstance();
 
-		static ClassDesc2*		GetInstance();
+		static ClassDesc2*			GetInstance();
 };
 
 #endif

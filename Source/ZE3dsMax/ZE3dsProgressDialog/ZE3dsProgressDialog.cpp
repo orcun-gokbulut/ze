@@ -34,13 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZE3dsProgressDialog.h"
+#include "ZE3dsProgressDialogResources.h"
+
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
-
-#include "ZE3dsProgressDialogResources.h"
 #include <stdio.h>
-
 #include <tchar.h>
 
 bool CloseDialog = false;

@@ -37,16 +37,19 @@
 #ifndef __ZE3DS_MAP_EXPORTER_H__
 #define __ZE3DS_MAP_EXPORTER_H__
 
-#include "ZE3dsMapExporterResources.h"
-#include "ZE3dsMapExporterOptions.h"
-#include "ZE3dsProgressDialog/ZE3dsProgressDialog.h"
+#include "ZETypes.h"
 #include "ZETMapFile/ZETMapFile.h"
+#include "ZE3dsMapExporterOptions.h"
+#include "ZE3dsMapExporterResources.h"
+#include "ZE3dsProgressDialog/ZE3dsProgressDialog.h"
+
 
 #include <Max.h>
 #include <istdplug.h>
 #include <iparamb2.h>
 #include <iparamm2.h>
 #include <IGame/IGame.h>
+
 
 extern HINSTANCE hInstance;
 

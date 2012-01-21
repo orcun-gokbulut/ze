@@ -33,7 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
+#include "ZETypes.h"
 #include "ZE3dsMapExporter.h"
+
 
 inline ZEVector2 MAX_TO_ZE(const Point2& Point)
 {

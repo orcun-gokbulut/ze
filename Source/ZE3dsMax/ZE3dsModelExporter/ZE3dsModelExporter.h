@@ -37,10 +37,11 @@
 #ifndef __ZE3DS_MODEL_EXPORTER_H__
 #define __ZE3DS_MODEL_EXPORTER_H__
 
-#include "ZE3dsModelExporterOptions.h"
-#include "ZE3dsProgressDialog/ZE3dsProgressDialog.h"
-#include "ZE3dsModelExporterResources.h"
+#include "ZETypes.h"
 #include "ZETModelFile/ZETModelFile.h"
+#include "ZE3dsModelExporterOptions.h"
+#include "ZE3dsModelExporterResources.h"
+#include "ZE3dsProgressDialog/ZE3dsProgressDialog.h"
 
 #include <Max.h>
 #include <istdplug.h>
@@ -55,20 +56,20 @@ class ZEModelExporter : public SceneExport
 {
 	public:
 		
-		virtual ZEInt					ExtCount();
-		virtual const TCHAR *		Ext(ZEInt n);
-		virtual const TCHAR *		LongDesc();
-		virtual const TCHAR *		ShortDesc();
-		virtual const TCHAR *		AuthorName();
-		virtual const TCHAR *		CopyrightMessage();
-		virtual const TCHAR *		OtherMessage1();
-		virtual const TCHAR *		OtherMessage2();
-		virtual ZEUInt		Version();
+		virtual ZEInt				ExtCount();
+		virtual const TCHAR*		Ext(ZEInt n);
+		virtual const TCHAR*		LongDesc();
+		virtual const TCHAR*		ShortDesc();
+		virtual const TCHAR*		AuthorName();
+		virtual const TCHAR*		CopyrightMessage();
+		virtual const TCHAR*		OtherMessage1();
+		virtual const TCHAR*		OtherMessage2();
+		virtual ZEUInt				Version();
 		virtual void				ShowAbout(HWND hWnd);
 		virtual	BOOL				SupportsOptions(ZEInt ext, DWORD options);
 
-		virtual ZEInt					GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
-		virtual ZEInt					DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
+		virtual ZEInt				GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
+		virtual ZEInt				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
 		
 		Tab<IGameNode*>				ProcessedBones;
 		Tab<IGameMaterial*>			ProcessedMaterials;
@@ -76,8 +77,8 @@ class ZEModelExporter : public SceneExport
 		Tab<IGameNode*>				ProcessedMasterMeshes;
 		Tab<IGameMaterial*>			Materials;
 
-		ZEInt							FrameCount;
-		ZEInt							TicksPerFrame;
+		ZEInt						FrameCount;
+		ZEInt						TicksPerFrame;
 
 		ZEModelFile					ModelFile;
 		IGameScene*					Scene;
@@ -86,12 +87,12 @@ class ZEModelExporter : public SceneExport
 
 		bool						DumpPropertyContainer(IExportEntity* Node);
 		bool						GetRelativePath(const char* RealPath, char* RelativePath);
-		ZEInt							GetBoneId(IGameNode* Node);
-		ZEInt							GetMeshId(IGameNode* Node);
+		ZEInt						GetBoneId(IGameNode* Node);
+		ZEInt						GetMeshId(IGameNode* Node);
 
 		bool						ProcessBone(IGameNode* Node);
 		bool						ProcessBones();
-		ZEInt							ProcessMeshMaterial(IGameMaterial* Material);
+		ZEInt						ProcessMeshMaterial(IGameMaterial* Material);
 		bool						ProcessMaterials();
 		bool						ProcessMeshLODVertices(IGameNode* Node,  ZEModelFileMeshLOD* ZEMeshLod);
 		void						ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEModelFilePhysicalShape* Shape);
