@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECompoundEntity.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZERay.h"
 #include "ZEError.h"
 #include "ZEComponent.h"
-#include <string.h>
+#include "ZEMath/ZERay.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZECompoundEntity.h"
+
 
 void ZECompoundEntity::UpdateComponentTransforms()
 {

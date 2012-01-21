@@ -37,9 +37,11 @@
 #ifndef	__ZE_COMMAND_MANAGER_H__
 #define __ZE_COMMAND_MANAGER_H__
 
-#include "ZEDS/ZEArray.h"
+#include "ZETypes.h"
 #include "ZECommand.h"
+#include "ZEDS/ZEArray.h"
 #include "ZECommandSection.h"
+
 
 class ZECommandManager 
 {

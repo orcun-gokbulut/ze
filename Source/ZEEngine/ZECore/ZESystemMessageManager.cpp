@@ -32,13 +32,15 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "ZESystemMessageManager.h"
-#include "ZESystemMessageHandler.h"
+#include "ZETypes.h"
 #include "ZECore.h"
 #include "ZEError.h"
+#include "ZESystemMessageManager.h"
+#include "ZESystemMessageHandler.h"
 
 #define WINDOWS_MEAN_AND_LEAN
 #include <Windows.h>
+
 
 ZESystemMessageManager::ZESystemMessageManager()
 {

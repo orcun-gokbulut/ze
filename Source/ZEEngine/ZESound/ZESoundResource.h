@@ -38,6 +38,7 @@
 #define __ZE_SOUNDRESOURCE_H__
 
 #include "ZECore/ZEResource.h"
+#include "ZETypes.h"
 
 enum ZESoundFileFormat
 {
@@ -53,9 +54,9 @@ class ZESoundResource : public ZEResource
 		ZESoundFileFormat				FileFormat;
 
 		ZESize							SampleCount;
-		ZEUInt					SamplesPerSecond;
-		ZEUInt					ChannelCount;
-		ZEUInt					BitsPerSample;
+		ZEUInt							SamplesPerSecond;
+		ZEUInt							ChannelCount;
+		ZEUInt							BitsPerSample;
 		ZESize							BlockAlign;
 		
 		static ZESoundFileFormat		GetFileFormat(const ZEString& FileName);
@@ -67,9 +68,9 @@ class ZESoundResource : public ZEResource
 		const char*						GetResourceType() const;
 		ZESoundFileFormat				GetSoundFileFormat() const;
 
-		ZEUInt					GetSamplesPerSecond() const;
-		ZEUInt					GetChannelCount() const;
-		ZEUInt					GetBitsPerSample() const;
+		ZEUInt							GetSamplesPerSecond() const;
+		ZEUInt							GetChannelCount() const;
+		ZEUInt							GetBitsPerSample() const;
 		ZESize							GetBlockAlign() const;
 		ZESize							GetSampleCount() const;
 		ZESize							GetUncompressedDataSize() const;

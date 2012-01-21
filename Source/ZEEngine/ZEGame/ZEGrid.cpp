@@ -35,12 +35,11 @@
 
 #include "ZEGrid.h"
 #include "ZEScene.h"
-#include "ZEGame/ZEDrawParameters.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
 #include "ZEGraphics/ZECamera.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
+#include "ZEGraphics/ZESimpleMaterial.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEGrid);
 

@@ -33,9 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETypes.h"
 #include "ZEDS/ZEGraph.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEMinHeap.h"
+
 
 template <typename Type>
 class ZEAStarNode

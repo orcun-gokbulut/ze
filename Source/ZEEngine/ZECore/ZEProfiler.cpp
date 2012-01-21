@@ -33,10 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETypes.h"
 #include "ZEProfiler.h"
 #include "ZEProfilerCounter.h"
 
 #include <memory.h>
+
 
 ZEProfiler::ZEProfiler(void)
 {

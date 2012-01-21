@@ -33,9 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERayCaster.h"
-#include "ZEEntity.h"
+#include "ZETypes.h"
 #include "ZEScene.h"
+#include "ZEEntity.h"
+#include "ZERayCaster.h"
+
+
 /*
 ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float Range)
 {
@@ -112,4 +115,5 @@ ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Posi
 ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, float& T, ZEVector3& Position, ZEVector3& Normal, float Range = 100000000.0f)
 {
 	return NULL;
-}*/
+}
+*/

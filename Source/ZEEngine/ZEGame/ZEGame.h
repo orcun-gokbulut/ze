@@ -37,9 +37,10 @@
 #ifndef	__ZE_GAME_H__
 #define __ZE_GAME_H__
 
-#include "ZEDS/ZEArray.h"
-#include "ZEEntity.h"
 #include "ZEScene.h"
+#include "ZEEntity.h"
+#include "ZEDS/ZEArray.h"
+
 
 #define zeGame ZEGame::GetInstance()
 
@@ -57,37 +58,37 @@ class ZEGame;
 class ZEGameDescription
 {
 	public:
-		virtual const char*						GetGameName() = 0;
-		virtual ZEGameType						GetGameType() = 0;
-		virtual ZEInt								GetGameVersion() = 0;
-		virtual const char*						GetCopyright() = 0;
-		virtual ZEGame*							CreateGameInstance() = 0;
+		virtual const char*				GetGameName() = 0;
+		virtual ZEGameType				GetGameType() = 0;
+		virtual ZEInt					GetGameVersion() = 0;
+		virtual const char*				GetCopyright() = 0;
+		virtual ZEGame*					CreateGameInstance() = 0;
 };
 
 class ZEGame
 {
 	protected:
-		ZEScene*								Scene;
+		ZEScene*						Scene;
 
 	public:
-		ZEUIManager*							UIManager;
+		ZEUIManager*					UIManager;
 
-		virtual ZEGameDescription*				GetGameDescription();
+		virtual ZEGameDescription*		GetGameDescription();
 
-		virtual ZEScene*						GetScene();
+		virtual ZEScene*				GetScene();
 		
-		virtual void							Reset();
-		virtual bool							Initialize();
-		virtual bool							Deinitialize();
-		virtual void							Destroy();
+		virtual void					Reset();
+		virtual bool					Initialize();
+		virtual bool					Deinitialize();
+		virtual void					Destroy();
 
-		virtual void							Tick(float ElapsedTime);
-		virtual void							Render(float ElapsedTime);
+		virtual void					Tick(float ElapsedTime);
+		virtual void					Render(float ElapsedTime);
 										
-												ZEGame();
-		virtual									~ZEGame();
+										ZEGame();
+		virtual							~ZEGame();
 
-		static ZEGame*							GetInstance();
+		static ZEGame*					GetInstance();
 };
 #endif
 

@@ -37,10 +37,12 @@
 #ifndef __ZE_CANVASBRUSH_H__
 #define __ZE_CANVASBRUSH_H__
 
+#include "ZETypes.h"
 #include "ZECompoundEntity.h"
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
+
 
 ZE_META_ENTITY_DESCRIPTION(ZECanvasBrush);
 
@@ -51,29 +53,29 @@ class ZECanvasBrush : public ZECompoundEntity
 	ZE_META_ENTITY(ZECanvasBrush)
 	
 	private:
-		ZERenderCommand						RenderCommand;
-		ZEStaticVertexBuffer*				VertexBuffer;
-		ZESize								OldVertexCount;
+		ZERenderCommand					RenderCommand;
+		ZEStaticVertexBuffer*			VertexBuffer;
+		ZESize							OldVertexCount;
 	
 	protected:
-											ZECanvasBrush();
-		virtual								~ZECanvasBrush();
+										ZECanvasBrush();
+		virtual							~ZECanvasBrush();
 
 	public:
-		virtual ZEUInt32						GetDrawFlags() const;
+		virtual ZEUInt32				GetDrawFlags() const;
 
-		ZEROPrimitiveType					PrimitiveType;
-		ZEMaterial*							Material;
-		ZECanvas							Canvas;
+		ZEROPrimitiveType				PrimitiveType;
+		ZEMaterial*						Material;
+		ZECanvas						Canvas;
 
-		void								UpdateCanvas();
+		void							UpdateCanvas();
 
-		virtual void						Deinitialize();
+		virtual void					Deinitialize();
 
-		virtual void						Draw(ZEDrawParameters* DrawParameters);
-		virtual void						Tick(float ElapsedTime);
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
+		virtual void					Tick(float ElapsedTime);
 
-		static ZECanvasBrush*				CreateInstance();
+		static ZECanvasBrush*			CreateInstance();
 };
 
 /*

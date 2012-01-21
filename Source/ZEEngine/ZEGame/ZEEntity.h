@@ -37,17 +37,24 @@
 #ifndef	__ZE_ENTITY_H__
 #define __ZE_ENTITY_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEVariant.h"
 #include "ZEDS/ZEString.h"
+#include "ZEDefinitions.h"
+#include "ZEDS/ZEVariant.h"
+#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEAABBox.h"
-#include "ZEMath/ZEOBBox.h"
-#include "ZEMath/ZEBSphere.h"
-#include "ZEDefinitions.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEMath/ZEBSphere.h"
+#include "ZEMath/ZEQuaternion.h"
+
+
+
+
+
+
 
 class ZEComponent;
 class ZECompoundEntity;

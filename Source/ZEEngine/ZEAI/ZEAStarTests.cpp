@@ -33,10 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEAStar.h"
 #include "ZETest.h"
+#include "ZETypes.h"
+#include "ZEAStar.h"
 #include "ZEMath/ZEVector.h"
+
 #include <string.h>
+
 
 float Cost(const ZEGraph<ZEVector2>& Graph, ZESize CurrentNodeIndex, ZESize NextNodeIndex)
 {

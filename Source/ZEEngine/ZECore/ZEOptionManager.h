@@ -37,13 +37,14 @@
 #ifndef	__ZE_OPTION_MANAGER_H__
 #define __ZE_OPTION_MANAGER_H__
 
+#include "ZETypes.h"
 #include "ZEOption.h"
-#include "ZEOptionSection.h"
+#include "ZECommand.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEOptionSection.h"
+#include "ZECommandSection.h"
 #include "ZEDS/ZETypedVariant.h"
 #include "ZEDS/ZEFastDelegate.h"
-#include "ZECommand.h"
-#include "ZECommandSection.h"
 
 class ZEOptionManager
 {

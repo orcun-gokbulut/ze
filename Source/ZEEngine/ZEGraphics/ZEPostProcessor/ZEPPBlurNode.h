@@ -37,6 +37,7 @@
 #ifndef __ZE_POST_EFFECTS_H__
 #define __ZE_POST_EFFECTS_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPostProcessorNode.h"

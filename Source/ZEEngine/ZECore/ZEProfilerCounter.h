@@ -38,8 +38,9 @@
 #define __ZE_PROFILER_COUNTER_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+
 
 class ZEProfiler;
 

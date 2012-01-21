@@ -33,14 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEWindow.h"
+
 #include "ZECore.h"
 #include "ZEError.h"
+#include "ZEWindow.h"
 #include "ZEConsole.h"
 #include "ZEInput/ZEInputModule.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZESystemMessageManager.h"
 #include "ZESystemMessageHandler.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
 #define WINDOWS_LEAN_AND_MEAN
 #define NOMINMAX

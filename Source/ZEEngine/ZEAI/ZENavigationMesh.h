@@ -37,17 +37,19 @@
 #ifndef __ZE_NAVIGATION_MESH_H__
 #define __ZE_NAVIGATION_MESH_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEGraph.h"
 #include "ZEMath/ZEPolygon.h"
 #include "ZESpatial/ZEOctree.h"
 
+
 class ZENavigationMeshPolygon
 {
 	public:
-		bool Deleted;
-		ZESize NormalIndex;
-		ZEArray<ZESize> VertexIndices;
+		bool				Deleted;
+		ZESize				NormalIndex;
+		ZEArray<ZESize>		VertexIndices;
 };
 
 typedef ZEOctree<ZENavigationMeshPolygon> ZENavigationMeshOctree;

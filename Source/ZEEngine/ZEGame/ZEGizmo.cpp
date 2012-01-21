@@ -33,20 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
+#include "ZETypes.h"
 #include "ZEGizmo.h"
+#include "ZEMath/ZERay.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEMath/ZEPlane.h"
+#include "ZECore/ZEConsole.h"
+#include "ZEMath/ZETriangle.h"
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
-#include "ZECore/ZEConsole.h"
 #include "ZEMath/ZELineSegment.h"
-#include "ZEMath/ZERay.h"
-#include "ZEMath/ZEPlane.h"
-#include "ZEMath/ZETriangle.h"
-#include "ZEGame/ZEScene.h"
+#include "ZEGraphics/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
-
 #include "ZEMath/ZEMath.h"
+#include "ZEGraphics/ZESimpleMaterial.h"
 
 ZESimpleMaterial* ZEGizmo::GizmoMaterial = NULL;
 

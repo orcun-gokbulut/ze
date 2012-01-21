@@ -52,10 +52,10 @@ enum ZEVersionCheckLevel
 class ZEVersion
 {
 	public:
-		ZEUInt			Major;
-		ZEUInt			Minor;
-		ZEUInt			Internal;
-		ZEUInt			Build;		
+		ZEUInt					Major;
+		ZEUInt					Minor;
+		ZEUInt					Internal;
+		ZEUInt					Build;		
 		ZEVersionPlatform		Platform;
 
 		void					GetShortString(char* Buffer);

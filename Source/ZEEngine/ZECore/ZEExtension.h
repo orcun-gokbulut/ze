@@ -38,13 +38,11 @@
 #define __ZE_EXTENSION_H__
 
 #include "ZEBase.h"
+#include "ZETypes.h"
+#include "ZEVersion.h"
 #include "ZEDS\ZEString.h"
 
 class ZEExtensionDescription;
-
-#include "ZETypes.h"
-#include "ZEVersion.h"
-
 class ZEModuleDescription;
 class ZEOptionSection;
 class ZEExtension;

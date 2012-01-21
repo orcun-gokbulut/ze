@@ -35,7 +35,7 @@
 
 #pragma once
 #ifndef __ZE_PRESENTATION_SLIDE_H_
-#define __ZE_CANVASBRUSH_H__
+#define __ZE_PRESENTATION_SLIDE_H_
 
 #include "ZECompoundEntity.h"
 #include "ZEGraphics/ZECanvas.h"
@@ -53,29 +53,29 @@ class ZEPresentationSlide : public ZECompoundEntity
 	ZE_META_ENTITY(ZEPresentationSlide)
 
 	private:
-		bool								Initialized;
-		ZERenderCommand						RenderCommand;
-		ZEStaticVertexBuffer*				VertexBuffer;
-		ZEFixedMaterial*					Material;
-		ZETexture2DResource*				Texture;
-		char								PresentationSlide[255];
+		bool							Initialized;
+		ZERenderCommand					RenderCommand;
+		ZEStaticVertexBuffer*			VertexBuffer;
+		ZEFixedMaterial*				Material;
+		ZETexture2DResource*			Texture;
+		char							PresentationSlide[255];
 
 		ZEPresentationSlide();
-		virtual								~ZEPresentationSlide();
+		virtual							~ZEPresentationSlide();
 
 	public:
-		virtual ZEUInt32						GetDrawFlags() const;
+		virtual ZEUInt32				GetDrawFlags() const;
 
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
+		virtual bool					Initialize();
+		virtual void					Deinitialize();
 
-		virtual void						SetPresentationSlide(const char* FileName);
-		virtual const char*					GetPresentationSlide() const;
+		virtual void					SetPresentationSlide(const char* FileName);
+		virtual const char*				GetPresentationSlide() const;
 
-		virtual void						Draw(ZEDrawParameters* DrawParameters);
-		virtual void						Tick(float ElapsedTime);
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
+		virtual void					Tick(float ElapsedTime);
 
-		static ZEPresentationSlide*			CreateInstance();
+		static ZEPresentationSlide*		CreateInstance();
 };
 
 /*

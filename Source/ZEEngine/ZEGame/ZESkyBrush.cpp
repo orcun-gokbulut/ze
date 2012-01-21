@@ -33,15 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGame/ZEScene.h"
 #include "ZESkyBrush.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZECamera.h"
+#include "ZEGame/ZEEntityProvider.h"
+#include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZESkyBoxMaterial.h"
 #include "ZEGraphics/ZEDirectionalLight.h"
 #include "ZEGraphics/ZETextureCubeResource.h"
+
+
 #include <string.h>
-#include "ZEGame/ZEEntityProvider.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZESkyBrush);
 

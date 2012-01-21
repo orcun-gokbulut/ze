@@ -37,8 +37,11 @@
 #ifndef	__ZE_SOUND_RESOURCE_MP3_H__
 #define __ZE_SOUND_RESOURCE_MP3_H__
 
+#include "ZETypes.h"
 #include "ZESoundResource.h"
+
 #include <mpg123.h>
+
 
 class ZESoundResourceMP3 : public ZESoundResource
 {

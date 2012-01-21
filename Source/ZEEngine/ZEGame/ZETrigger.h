@@ -37,8 +37,8 @@
 #ifndef __ZE_TRIGGER_H__
 #define __ZE_TRIGGER_H__
 
-#include "ZEMeta/ZEObject.h"
 #include "ZEEntity.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZEDS/ZEFastDelegate.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZETrigger);
@@ -95,7 +95,7 @@ class ZETrigger : public ZEEntity
 									ZETrigger();
 
 	public:
-		virtual	ZEUInt32				GetDrawFlags();
+		virtual	ZEUInt32			GetDrawFlags();
 
 		virtual void				SetScale(const ZEVector3& Scale);
 

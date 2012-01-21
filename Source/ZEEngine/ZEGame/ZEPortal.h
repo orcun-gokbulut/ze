@@ -44,6 +44,8 @@ class ZEComponent;
 class ZELight;
 class ZEPortal;
 class ZEMapPortal;
+class ZEEntity;
+
 
 class ZEPortal
 {
@@ -52,18 +54,18 @@ class ZEPortal
 		ZESmartArray<ZEEntity*>			Entities;
 	
 	public:
-		void						DetectVisible(ZESmartAllocator<ZECamera*>& ViewFrustumStack,
-										ZESmartAllocator<ZEViewCone*>& ViewConeStack,
-										ZESmartArray<ZEComponent*>& VisibleComponents, 
-										ZESmartArray<ZEPortal*>& VisiblePortals,
-										ZESmartArray<ZEInt>& VisibleMapPolygonIds);
+		void							DetectVisible(ZESmartAllocator<ZECamera*>& ViewFrustumStack,
+														ZESmartAllocator<ZEViewCone*>& ViewConeStack,
+														ZESmartArray<ZEComponent*>& VisibleComponents, 
+														ZESmartArray<ZEPortal*>& VisiblePortals,
+														ZESmartArray<ZEInt>& VisibleMapPolygonIds);
 
-		void						DetectEffectiveLights(ZEComponent* Component, ZESmartArray<ZELight*> EffectiveLights);
+		void							DetectEffectiveLights(ZEComponent* Component, ZESmartArray<ZELight*> EffectiveLights);
 
-		void						DetectVisible(ZECamera* ViewFrustum,
-										ZESmartArray<ZEComponent*>& VisibleComponents, 
-										ZESmartArray<ZEPortal*>& VisiblePortals,
-										ZESmartArray<ZEInt>& VisibleMapPolygonIds);
+		void							DetectVisible(ZECamera* ViewFrustum,
+														ZESmartArray<ZEComponent*>& VisibleComponents, 
+														ZESmartArray<ZEPortal*>& VisiblePortals,
+														ZESmartArray<ZEInt>& VisibleMapPolygonIds);
 							
 
 };

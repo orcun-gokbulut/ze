@@ -36,7 +36,7 @@
 #pragma once
 #ifndef __ZE_PP_COLOR_INPUT_NODE_H__
 #define __ZE_PP_COLOR_INPUT_NODE_H__
-
+#include "ZETypes.h"
 #include "ZEPostProcessorNode.h"
 
 class ZETexture2D;

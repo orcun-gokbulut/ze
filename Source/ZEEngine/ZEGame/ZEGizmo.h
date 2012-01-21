@@ -33,13 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
+
 #pragma once
 #ifndef __ZE_GIZMO_H__
 #define __ZE_GIZMO_H__
 
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECanvas.h"
+#include "ZEGraphics/ZERenderCommand.h"
+
 
 class ZESimpleMaterial;
 class ZERenderer;
@@ -109,7 +112,7 @@ class ZEGizmo : public ZEEntity
 										ZEGizmo();
 
 	public:
-		virtual ZEUInt32					GetDrawFlags() const;
+		virtual ZEUInt32				GetDrawFlags() const;
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);

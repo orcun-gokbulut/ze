@@ -37,18 +37,20 @@
 #ifndef __ZE_NAVIGATION_MESH_GENERATOR_H__
 #define __ZE_NAVIGATION_MESH_GENERATOR_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEGraph.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEPolygon.h"
 #include "ZENavigationMesh.h"
 
+
 class ZENavigationMeshGeneratorOptions 
 {
 	public:
-		ZEVector3 UpDirection;
-		float MaxWalkableSlope;
-		ZEInt MaxConvexSimplicationPass;
-		ZEInt Max3To1SimplificationPass;
+		ZEVector3	UpDirection;
+		float		MaxWalkableSlope;
+		ZEInt		MaxConvexSimplicationPass;
+		ZEInt		Max3To1SimplificationPass;
 
 };
 

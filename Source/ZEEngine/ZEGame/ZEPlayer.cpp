@@ -33,36 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEGame.h"
+#include "ZETypes.h"
 #include "ZEPlayer.h"
-
+#include "ZEMath/ZERay.h"
 #include "ZECore/ZEConsole.h"
+#include "ZEEntityProvider.h"
+#include "ZESound/ZEListener.h"
+#include "ZEGraphics/ZECamera.h"
 #include "ZEInput/ZEInputModule.h"
+#include "ZEMath/ZEMathDefinitions.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGame.h"
-#include "ZEMath/ZERay.h"
-#include "ZEMath/ZEMath.h"
-#include "ZESound/ZEListener.h"
-#include "ZEEntityProvider.h"
-#include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
+
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
 
-#define ACTIONID_FORWARD		0
-#define ACTIONID_BACKWARD		1
-#define ACTIONID_STRAFELEFT		2
-#define ACTIONID_STRAFERIGHT	3
-#define ACTIONID_TURNLEFT		4
-#define ACTIONID_TURNRIGHT		5
-#define ACTIONID_TURNUP			6
-#define ACTIONID_TURNDOWN		7
-#define ACTIONID_ZOOMIN			8
-#define ACTIONID_ZOOMOUT		9
-#define ACTIONID_CONSOLE		10
-#define ACTIONID_RAYCAST		11
-#define ACTIONID_HEAD_ORIENTATION 12
-#define ACTIONID_FORWARD_BUTTON		20
+#define ACTIONID_FORWARD				0
+#define ACTIONID_BACKWARD				1
+#define ACTIONID_STRAFELEFT				2
+#define ACTIONID_STRAFERIGHT			3
+#define ACTIONID_TURNLEFT				4
+#define ACTIONID_TURNRIGHT				5
+#define ACTIONID_TURNUP					6
+#define ACTIONID_TURNDOWN				7
+#define ACTIONID_ZOOMIN					8
+#define ACTIONID_ZOOMOUT				9
+#define ACTIONID_CONSOLE				10
+#define ACTIONID_RAYCAST				11
+#define ACTIONID_HEAD_ORIENTATION		12
+#define ACTIONID_FORWARD_BUTTON			20
 #define ACTIONID_BACKWARD_BUTTON		21
 
 ZEDrawFlags ZEPlayer::GetDrawFlags()

@@ -37,9 +37,11 @@
 #ifndef	__ZE_COMMAND_SECTION_H__
 #define __ZE_COMMAND_SECTION_H__
 
-#include "ZEDS/ZEString.h"
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEVariant.h"
+
 
 class ZECommand;
 class ZECommandSection

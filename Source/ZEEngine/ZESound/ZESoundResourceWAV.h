@@ -37,7 +37,9 @@
 #ifndef	__ZE_SOUND_RESOURCE_WAV_H__
 #define __ZE_SOUND_RESOURCE_WAV_H__
 
+#include "ZETypes.h"
 #include "ZESoundResource.h"
+
 
 class ZESoundResourceWAV : public ZESoundResource
 {
