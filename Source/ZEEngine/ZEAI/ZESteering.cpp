@@ -38,11 +38,7 @@
 
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
-
-static float frand(float Range)
-{
-	return ((float)rand()/(float)RAND_MAX) * Range - ((float)rand()/(float)RAND_MAX) * Range;
-}
+#include "ZERandom.h"
 
 void ZESteeringOutput::SetZero()
 {
@@ -107,6 +103,11 @@ ZESteering::ZESteering()
 
 	Weight = 1.0f;
 	Priority = 3;
+}
+
+ZESteering::~ZESteering()
+{
+
 }
 
 ZESteeringOutput ZESeekSteering::Seek(const ZEVector3& Target)
@@ -310,7 +311,7 @@ ZESteeringOutput ZEWanderSteering::Process(float ElapsedTime)
 {
 	ZESteeringOutput Output;
 
-	WanderRotation += frand(ZE_PI) * WanderRate * ElapsedTime;
+	WanderRotation += ZERandom::GetFloat() * ZE_PI * WanderRate * ElapsedTime;
 	ZEVector2 WanderDirection = ZEAngle::ToVector(WanderRotation);
 	
 	Output = Face(GetOwner()->GetLinearVelocity());

@@ -49,7 +49,7 @@
 #pragma warning(disable:4996 4267)
 
 
-bool ZEPartialFile::Open(const ZEString FilePath, ZEFileMode Mode, bool Binary)
+bool ZEPartialFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 {
 	//zeAssert(IsOpen(), "Close the previous file first");
 

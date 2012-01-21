@@ -35,6 +35,7 @@
 
 #include "ZEViewPort.h"
 
+ZEViewPort::~ZEViewPort()
+{
 
-
-
+}

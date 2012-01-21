@@ -79,21 +79,21 @@ class ZEOption
 		const ZEString&					GetName();
 		void							SetName(const ZEString& Name);
 
-		virtual void					SetValueType(ZEVariantType NewType);
+		void							SetValueType(ZEVariantType NewType);
 		ZEVariantType					GetValueType();
 
-		virtual void					SetDefaultValue(ZETypedVariant NewDefaultValue);
+		void							SetDefaultValue(ZETypedVariant NewDefaultValue);
 		ZETypedVariant					GetDefaultValue();
 		
 		void							SetToDefault();
 
-		virtual void					SetValue(ZETypedVariant NewValue);
+		void							SetValue(ZETypedVariant NewValue);
 		ZETypedVariant					GetValue();
 
 		ZEOptionAttribute 				GetAttribute();
 		void							SetAttribute(ZEOptionAttribute NewAttribute);
 
-		virtual ZEOptionType			GetType(); 
+		ZEOptionType					GetType(); 
 		
 		const ZEOptionsChangingEvent&	GetOnChanging();		
 		void							SetOnChanging(ZEOptionsChangingEvent EventHandler);
@@ -106,7 +106,7 @@ class ZEOption
 
 										ZEOption();
 										ZEOption(const char *InitialName, ZETypedVariant InitialDefaultValue, 
-											ZEOptionAttribute InitialAttribute);
+										ZEOptionAttribute InitialAttribute);
 };
 
 #endif

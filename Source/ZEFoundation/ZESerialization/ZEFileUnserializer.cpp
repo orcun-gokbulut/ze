@@ -36,7 +36,6 @@
 #include "ZEFileUnserializer.h"
 #include <stdio.h>
 
-
 ZEUInt64 ZEFileUnserializer::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 {
 	return fread(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);

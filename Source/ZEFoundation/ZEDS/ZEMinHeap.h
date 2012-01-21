@@ -51,15 +51,15 @@ class ZEMinHeap : public ZEHeapBase<Type, Allocator_>
 		}
 
 
-		void MinHeapify(int Index)
+		void MinHeapify(size_t Index)
 		{
 			size_t Smallest = Index;
 
-			size_t LeftIndex = GetFirstChildIndex(Index);
+			ptrdiff_t LeftIndex = GetFirstChildIndex(Index);
 			if (LeftIndex < Heap.GetCount() && Heap[LeftIndex] < Heap[Index])
 				Smallest = LeftIndex;
 
-			size_t RightIndex = GetSecondChildIndex(Index);
+			ptrdiff_t RightIndex = GetSecondChildIndex(Index);
 			if (RightIndex < Heap.GetCount() && Heap[RightIndex] < Heap[Smallest])
 				Smallest = RightIndex;
 
@@ -103,7 +103,7 @@ class ZEMinHeap : public ZEHeapBase<Type, Allocator_>
 			}
 		}
 
-		void Remove(int Index)
+		void Remove(size_t Index)
 		{
 			Heap[Index] = Heap.GetLastItem();
 			Heap.DeleteAt(Heap.GetCount() - 1);

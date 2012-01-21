@@ -113,9 +113,6 @@ bool ZECompressedFile::Seek(ZEInt64 Offset, ZESeekFrom Origin)
 
 	}
 
-	if(CursorPosition < 0 )
-		return false;
-
 	ZEUInt64 TotalReadData = 0;
 	ZEUInt64 ReadDataSize;
 	Index CurrentIndex;

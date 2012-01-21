@@ -54,8 +54,8 @@ static ZEAssertCallback AssertCallback = &DefaultAssertCallback;
 
 void ZEError::GetModuleName(const char* Function, char* Output)
 {
-	int Len = strlen(Output);
-	for(int I = 0; I < Len; I++)
+	size_t Len = strlen(Output);
+	for(size_t I = 0; I < Len; I++)
 		if (Function[I] == ':' || Function[I] == '<')
 		{
 			Output[I] ='\0';

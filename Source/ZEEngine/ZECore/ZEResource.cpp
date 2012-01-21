@@ -47,7 +47,7 @@ const ZEString& ZEResource::GetFileName() const
 	return this->FileName;
 }
 
-void ZEResource::SetFileName(const ZEString FileName)
+void ZEResource::SetFileName(const ZEString& FileName)
 {
 	this->FileName = FileName;
 }

@@ -68,7 +68,7 @@ bool ZEFileCache::CheckCompleteness()
 	if (Complete == ZE_CACHE_COMPLETENESS)
 		return true;
 	
-	zeLog("Cannot verify completeness of cache file: \"%s\".", File.GetFilePath().GetValue());
+	zeLog("Cannot verify completeness of cache file: \"%s\".", File.GetFilePath().ToCString());
 	return false;
 }
 
@@ -231,7 +231,7 @@ bool ZEFileCache::Open(ZEString FileName)
 	// If file is not open return
 	if(IsOpen())
 	{
-		zeLog("Cache is already open with the file \"%s\".", File.GetFilePath().GetValue());
+		zeLog("Cache is already open with the file \"%s\".", File.GetFilePath().ToCString());
 		return false;
 	}
 
@@ -420,7 +420,7 @@ bool ZEFileCache::IdentifierExists(const ZECacheDataIdentifier* Identifier)
 		if (Header.ChunkId != ZE_CACHE_IDENT_CHUNKID)
 		{
 			zeLog("Identifier Chunk Id does not match! Possible Corruption");
-			zeLog("Cleaning cache: \"%s\".", File.GetFilePath().GetValue());
+			zeLog("Cleaning cache: \"%s\".", File.GetFilePath().ToCString());
 			zeAssert(true, "Identifier Chunk Id does not match! Possible Corruption");
 			Clear();
 			return false;
@@ -786,7 +786,7 @@ bool ZEFileCache::GetData(const ZECacheDataIdentifier* Identifier, void* Buffer,
 		// Check if the header readable
 		if (IdentifierChunk.ChunkId != ZE_CACHE_IDENT_CHUNKID)
 		{
-			zeLog("Identifier Chunk Id does not match! Possible Corruption. File Name: \"%s\".", (File.GetFilePath()).GetValue());
+			zeLog("Identifier Chunk Id does not match! Possible Corruption. File Name: \"%s\".", (File.GetFilePath()).ToCString());
 			return false;
 		}
 
@@ -810,7 +810,7 @@ bool ZEFileCache::GetData(const ZECacheDataIdentifier* Identifier, void* Buffer,
 
 			if(DataChunk.ChunkId != ZE_CACHE_DATA_CHUNKID)
 			{
-				zeLog("Data Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFilePath().GetValue());
+				zeLog("Data Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFilePath().ToCString());
 				return false;
 			}
 
@@ -891,7 +891,7 @@ bool ZEFileCache::OpenData(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 		// If header is not corrupted
 		if (IdentifierChunk.ChunkId != ZE_CACHE_IDENT_CHUNKID)
 		{
-			zeLog("Identifier Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFilePath().GetValue());
+			zeLog("Identifier Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFilePath().ToCString());
 			return false;
 		}
 
@@ -914,7 +914,7 @@ bool ZEFileCache::OpenData(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 
 			if(DataChunk.ChunkId != ZE_CACHE_DATA_CHUNKID)
 			{
-				zeLog("Data Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFilePath().GetValue());
+				zeLog("Data Chunk Id does not match! Possible Corruption. File Name: \"%s\".", File.GetFilePath().ToCString());
 				return false;
 			}
 

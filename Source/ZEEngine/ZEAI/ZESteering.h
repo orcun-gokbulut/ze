@@ -88,6 +88,7 @@ class ZESteering
 		ZESteeringOutput			Process(float ElapsedTime) = 0;
 		
 									ZESteering();
+		virtual						~ZESteering();
 };
 
 class ZESeekSteering : public ZESteering

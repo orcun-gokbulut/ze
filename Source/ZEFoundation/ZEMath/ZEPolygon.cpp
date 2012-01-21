@@ -64,7 +64,7 @@ float ZEPolygon::GetArea() const
 	zeAssert(!IsValid(), "Polygon is not valid.");
 
 	ZEVector3 Sum;
-	for(int I = 0; I < Vertices.GetCount() - 1; I++)
+	for(size_t I = 0; I < Vertices.GetCount() - 1; I++)
 	{
 		ZEVector3 Temp;
 		ZEVector3::CrossProduct(Temp, Vertices[I], Vertices[I + 1]);
@@ -92,7 +92,7 @@ bool ZEPolygon::IntersectionTest(const ZEPolygon& Polygon, const ZEVector3& Poin
 
 	ZEVector3 Normal = Polygon.GetNormal();
 
-	for (int I = 0; I < Polygon.Vertices.GetCount(); I++)
+	for (size_t I = 0; I < Polygon.Vertices.GetCount(); I++)
 	{
 		ZEVector3 EdgeNormal;
 		ZEVector3::CrossProduct(EdgeNormal, Normal, (Polygon.Vertices[Polygon.Vertices.Circular(I + 1)] - Polygon.Vertices[I]));

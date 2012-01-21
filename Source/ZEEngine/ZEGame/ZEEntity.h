@@ -65,7 +65,7 @@ enum ZEEntityRunAt
 		virtual ZEEntityRunAt GetRunAt() const;
 
 #define ZE_META_ENTITY_DESCRIPTION(ObjectName) ZE_META_EXTENDED_OBJECT_DESCRIPTION(ObjectName, ZEEntityDescription, ZE_META_ENTITY_CLASS_EXTENSION)
-#define ZE_META_ENTITY(Object) ZE_META_EXTENDED_CLASS(ZEEntityDescription, ,Object)
+#define ZE_META_ENTITY(Object) ZE_META_EXTENDED_OBJECT(ZEEntityDescription, ,Object)
 
 class ZEEntityDescription : public ZEObjectDescription
 {

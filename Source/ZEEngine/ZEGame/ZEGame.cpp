@@ -146,7 +146,7 @@ void ZEGame::Tick(float ElapsedTime)
 	ZEQuaternion::ConvertToEulerAngles(Pitch, Yaw, Roll, Rotation);
 	
 	char Buffer[400];
-	sprintf(Buffer, "Position : [%.2f, %.2f, %.2f], Rotation : [%.2f, %.2f, %.2f], Average FPS: %d, Current FPS: %.0f", 
+	sprintf(Buffer, "Position : [%.2f, %.2f, %.2f], Rotation : [%.2f, %.2f, %.2f], Average FPS: %u, Current FPS: %.0f", 
 		Position.x, Position.y, Position.z,
 		ZERAD2DEG(Pitch), ZERAD2DEG(Yaw), ZERAD2DEG(Roll), 
 		AverageFPS, 1.0f / ElapsedTime);

@@ -180,7 +180,7 @@ class ZEChunkAllocator : public ZEAllocatorBase<Type>
 		}
 };
 
-template <typename Type, int Exponent = 2>
+template <typename Type, size_t Exponent = 2>
 class ZESmartAllocator : public ZEAllocatorBase<Type>
 {
 	private:
@@ -195,8 +195,8 @@ class ZESmartAllocator : public ZEAllocatorBase<Type>
 			{
 				if ((NewSize > Size) || (NewSize < LowerLimit))
 				{
-					Size = (int)(powf((float)Exponent, (logf((float)NewSize) / logf((float)Exponent)) + 1.0f) + 0.5f);
-					LowerLimit = (int)(Size / Exponent);
+					Size = (size_t)(powf((float)Exponent, (logf((float)NewSize) / logf((float)Exponent)) + 1.0f) + 0.5f);
+					LowerLimit = Size / Exponent;
 					*Pointer = new Type[Size];
 					return true;
 				}

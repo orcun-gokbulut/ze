@@ -59,8 +59,8 @@ bool ZECommandSection::AddCommand(ZECommand* Command)
 	if (GetCommand(Command->GetName()) != NULL)
 	{
 		zeError("Can not add command to command section. An command with same name is already exist in the command section. (Command Section Name : \"%s\", Command Name : \"%s\")", 
-			this->GetName(),
-			Command->GetName());
+			this->GetName().ToCString(),
+			Command->GetName().ToCString());
 		return false;
 	}
 	Commands.Add(Command);

@@ -185,7 +185,7 @@ class ZEArray
 				Items[I] = Value;
 		}
 
-		inline ptrdiff_t FindIndex(Type Item, int StartIndex = 0) const
+		inline ptrdiff_t FindIndex(Type Item, size_t StartIndex = 0) const
 		{
 			for(size_t I = StartIndex; I < Count; I++)
 				if (Items[I] == Item)
@@ -308,7 +308,7 @@ class ZEArray
 			Type* TempPointer = this->Items;
 			bool Changed;
 			
-			if (Count - 1 > 0)
+			if (Count > 1)
 				Changed = Allocator.Allocate(&Items, Count - 1);
 			else
 			{

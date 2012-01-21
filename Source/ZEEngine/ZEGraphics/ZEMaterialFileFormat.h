@@ -88,7 +88,7 @@ struct ZEMaterialFileAnimationKeyChunk
 
 struct ZEMaterialFileFixedMaterialChunk
 {
-	ZEUInt32							ChunkId;
+	ZEUInt32						ChunkId;
 
 	bool							TwoSided;
 	bool							LightningEnabled;

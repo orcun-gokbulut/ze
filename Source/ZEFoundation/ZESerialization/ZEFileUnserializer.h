@@ -34,23 +34,24 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SERIALIZE_H__
-#define __ZE_SERIALIZE_H__
+#ifndef __ZE_FILE_UNSERIALIZER_H__
+#define __ZE_FILE_UNSERIALIZER_H__
 
 #include "ZETypes.h"
+#include "ZEUnserializer.h"
 
-class ZEFileUnserializer
+class ZEFileUnserializer : public ZEUnserializer
 {
 	private:
 		void*						File;
 
 	public:
-		virtual ZEUInt64				Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);	
+		virtual ZEUInt64			Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);	
 		bool						OpenFile(const char* FileName);
 		void						CloseFile();
 
 									ZEFileUnserializer();
-									~ZEFileUnserializer();
+		virtual						~ZEFileUnserializer();
 };
 
 #endif

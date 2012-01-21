@@ -266,8 +266,6 @@ ZEActor::ZEActor()
 	LinearAcceleration = ZEVector3::Zero;
 	AngularAcceleration = 0.0f;
 
-	MinAngularAcceleration = 0.0f;
-	MinLinearAcceleration = 0.0f;
 	MaxAngularAcceleration = 1.0f;
 	MaxLinearAcceleration = 1.0f;
 	Radius = 1.0f;

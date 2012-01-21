@@ -205,7 +205,7 @@ bool ZED3D9Module::Initialize()
 			zeWarning("Vertex shader model 1.x is not supported.");
 			break;
 		case 2:
-			if (D3DXGetVertexShaderProfile(Device) == "vs_2_a")
+			if (strcmp(D3DXGetVertexShaderProfile(Device), "vs_2_a") == 0)
 			{
 				zeLog("Vertex shader profile 2.0a found.");
 				VertexShaderVersion = ZE_D3D9_VSV_2_0_A;
@@ -230,12 +230,12 @@ bool ZED3D9Module::Initialize()
 			zeWarning("Pixel shader model 1.x is not supported.");
 			break;
 		case 2:
-			if (D3DXGetPixelShaderProfile(Device) == "ps_2_a")
+			if (strcmp(D3DXGetPixelShaderProfile(Device), "ps_2_a") == 0)
 			{
 				zeLog("Pixel shader profile 2.0a found.");
 				PixelShaderVersion = ZE_D3D9_PSV_2_0_A;
 			}
-			else if (D3DXGetPixelShaderProfile(Device) == "ps_2_b")
+			else if (strcmp(D3DXGetPixelShaderProfile(Device), "ps_2_b") == 0)
 			{
 				zeLog("Pixel shader profile 2.0a found.");
 				PixelShaderVersion = ZE_D3D9_PSV_2_0_A;

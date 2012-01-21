@@ -52,7 +52,7 @@ static ZEAABBox GetBoundingBox(const ZEArray<ZEPolygon>& Input)
 	const ZEPolygon& Polygon = Input[0];
 	ZEAABBox::Generate(TotalBox, Polygon.Vertices.GetConstCArray(), Polygon.Vertices.GetCount());
 
-	for(int I = 0; I < Input.GetCount(); I++)
+	for(size_t I = 0; I < Input.GetCount(); I++)
 	{
 		ZEAABBox Box;
 		const ZEPolygon& Polygon = Input[I];
@@ -68,7 +68,7 @@ static size_t GetNormalIndex(ZENavigationMesh& Mesh, const ZEPolygon& Polygon)
 {
 	ZEVector3 PolygonNormal = Polygon.GetNormal();
 
-	for (int N = 0; N < Mesh.Normals.GetCount(); N++)
+	for (size_t N = 0; N < Mesh.Normals.GetCount(); N++)
 		if (Mesh.Normals[N] == PolygonNormal)
 			return N;
 
@@ -76,7 +76,7 @@ static size_t GetNormalIndex(ZENavigationMesh& Mesh, const ZEPolygon& Polygon)
 	return Mesh.Normals.GetCount() - 1;
 }
 
-static int GetVertexIndexParents(ZENavigationMesh& Mesh, const ZEVector3& Point, ZENavigationMeshOctree* CurrentNode)
+static ptrdiff_t GetVertexIndexParents(ZENavigationMesh& Mesh, const ZEVector3& Point, ZENavigationMeshOctree* CurrentNode)
 {
 	while(CurrentNode != NULL)
 	{
@@ -94,7 +94,7 @@ static int GetVertexIndexParents(ZENavigationMesh& Mesh, const ZEVector3& Point,
 	return -1;
 }
 
-static int GetVertexIndexChilds(ZENavigationMesh& Mesh, const ZEVector3& Point, ZENavigationMeshOctree* Octree)
+static ptrdiff_t GetVertexIndexChilds(ZENavigationMesh& Mesh, const ZEVector3& Point, ZENavigationMeshOctree* Octree)
 {
 	for (size_t I = 0; I < Octree->GetItemCount(); I++)
 	{
@@ -107,7 +107,7 @@ static int GetVertexIndexChilds(ZENavigationMesh& Mesh, const ZEVector3& Point, 
 	for (size_t I = 0; I < 8; I++)
 		if (Octree->GetNode(I) != NULL)
 		{
-			int Result = GetVertexIndexChilds(Mesh, Point, Octree->GetNode(I));
+			ptrdiff_t Result = GetVertexIndexChilds(Mesh, Point, Octree->GetNode(I));
 			if (Result != -1)
 				return Result;
 		}
@@ -116,14 +116,14 @@ static int GetVertexIndexChilds(ZENavigationMesh& Mesh, const ZEVector3& Point, 
 }
 
 
-static size_t GetVertexIndex(ZENavigationMesh& Mesh, const ZEVector3& Point, ZENavigationMeshOctree* Octree, size_t& VertexIndex)
+static ptrdiff_t GetVertexIndex(ZENavigationMesh& Mesh, const ZEVector3& Point, ZENavigationMeshOctree* Octree, size_t& VertexIndex)
 {
 	if (Octree != NULL)
 	{
 		ZENavigationMeshOctree* CurrentNode = Octree->GetNode(Point);
 		if (CurrentNode != NULL)
 		{
-			int Result = GetVertexIndexChilds(Mesh, Point, CurrentNode);
+			ptrdiff_t Result = GetVertexIndexChilds(Mesh, Point, CurrentNode);
 			if (Result != -1)
 				return Result;
 
@@ -152,12 +152,12 @@ void ZENavigationMesh::Generate(const ZEArray<ZEPolygon>& Input)
 
 	size_t VertexCount = 0;
 	size_t VertexIndex = 0;
-	for(int I = 0; I < Input.GetCount(); I++)
+	for(size_t I = 0; I < Input.GetCount(); I++)
 		VertexCount += Input[I].Vertices.GetCount();
 
 	Vertices.SetCount(VertexCount);
 
-	for(int I = 0; I < Input.GetCount(); I++)
+	for(size_t I = 0; I < Input.GetCount(); I++)
 	{
 		const ZEPolygon& Polygon = Input[I];
 		ZENavigationMeshPolygon MeshPolygon;

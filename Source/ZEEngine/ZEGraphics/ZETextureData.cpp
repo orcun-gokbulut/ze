@@ -75,7 +75,7 @@ void ZETextureData::CreateTexture(ZETexturePixelFormat PixelFormat, unsigned int
 	{
 		Texture.Surfaces[I].Mipmaps = (TextureData::SurfaceData::MipmapData*)malloc(AllocationSize);
 		if(Texture.Surfaces->Mipmaps == NULL)
-			zeError("Cannot allocate memory for the mipmaps of the surface level %d!", I);
+			zeError("Cannot allocate memory for the mipmaps of the surface level %u!", I);
 
 		memset(Texture.Surfaces[I].Mipmaps, 0, AllocationSize);
 	}

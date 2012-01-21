@@ -282,7 +282,7 @@ bool ZETextureQualityManager::GetFinalTextureOptions(ZETextureOptions* FinalOpti
 	// If there is MipMapping
 	if (FinalOptions->MipMapping != ZE_TMM_DISABLED)
 	{
-		unsigned int PossibleMaxMipmapNumber = 1;
+		unsigned int PossibleMaxMipmapNumber;
 		unsigned int MipMapCount = ZETextureTools::GetMaxMipmapCount(TextureInfo.Width, TextureInfo.Height);
 
 		// Subtract the mipmap count if there is a downsample before the process

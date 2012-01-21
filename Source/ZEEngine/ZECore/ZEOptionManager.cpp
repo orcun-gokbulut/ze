@@ -133,7 +133,8 @@ bool ZEOptionManager::ListSectionsCommand(ZECommand* Command, const ZECommandPar
 	for (size_t I = Index; I < Sections.GetCount() && I <= Count; I++)
 	{
 		CurrSection = Sections.GetItem(I);
-		zeOutput(" %-30s   %11s   %d\r\n", CurrSection->GetName(), (CurrSection->HasChanges() ? "    Yes    " : "   No      "),
+		zeOutput(" %-30s   %11s   %Iu\r\n", CurrSection->GetName().ToCString(), 
+			(CurrSection->HasChanges() ? "    Yes    " : "   No      "),
 			CurrSection->GetNumberOfOptions());
 	}
 	return true;
@@ -180,7 +181,7 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 		for (size_t I = 0; I < Sec->GetNumberOfOptions() && I <= Count; I++)
 		{
 			Opt = Sec->GetOption(I);	
-			zeOutput(" %-30s  ", Sec->GetOption(I)->GetName());
+			zeOutput(" %-30s  ", Sec->GetOption(I)->GetName().ToCString());
 			switch(Opt->GetValueType())
 			{
 				case ZE_VRT_UNDEFINED:
@@ -259,7 +260,7 @@ bool ZEOptionManager::RegisterSection(ZEOptionSection* Ref)
 	if (GetSection(Ref->GetName()) != NULL)
 	{
 		zeError("Can not register option section. An option section with same name is already registered. (Option Section Name : \"%s\")", 
-			(const char*)Ref->GetName());
+			Ref->GetName().ToCString());
 		return false;
 	}
 	Sections.Add(Ref);
@@ -271,7 +272,7 @@ bool ZEOptionManager::UnregisterSection(ZEOptionSection* Ref)
 	if (GetSection(Ref->GetName()) == NULL)
 	{
 		zeError("Can not unregister option section. There is no such a registered option section. (Option Section Name : \"%s\")", 
-			(const char*)Ref->GetName());
+			Ref->GetName().ToCString());
 		return false;
 	}
 	Sections.DeleteValue(Ref);
@@ -288,7 +289,7 @@ ZEOptionSection* ZEOptionManager::GetSection(const ZEString& Name)
 
 ZEOptionSection* ZEOptionManager::GetSection(size_t Index)
 {
-	if (Index >= 0 && Index < Sections.GetCount())
+	if (Index < Sections.GetCount())
 			return Sections[Index];
 	else
 		return NULL;
@@ -310,7 +311,7 @@ void ZEOptionManager::Save(const ZEString& FileName)
 		for (I = 0; I < Sections.GetCount(); I++)
 		{
 			CurrentSet = Sections.GetItem(I);
-			fprintf(File, "[%s]\n", CurrentSet->GetName());
+			fprintf(File, "[%s]\n", CurrentSet->GetName().ToCString());
 			for(N = 0; N < CurrentSet->GetNumberOfOptions(); N++)
 			{
 				Current = CurrentSet->GetOption(N);
@@ -318,19 +319,19 @@ void ZEOptionManager::Save(const ZEString& FileName)
 					switch(Current->GetValueType())
 					{
 						case ZE_VRT_NULL:
-							fprintf(File, "%s\n");
+							fprintf(File, "\n");
 							break;
 						case ZE_VRT_STRING:
-							fprintf(File, "%s = %s\n", Current->GetName(), Current->GetValue().GetString());
+							fprintf(File, "%s = %s\n", Current->GetName().ToCString(), Current->GetValue().GetString());
 							break;
 						case ZE_VRT_INTEGER:
-							fprintf(File, "%s = %d\n", Current->GetName(), Current->GetValue().GetInteger());
+							fprintf(File, "%s = %d\n", Current->GetName().ToCString(), Current->GetValue().GetInteger());
 							break;			
 						case ZE_VRT_FLOAT:
-							fprintf(File, "%s = %f\n", Current->GetName(), Current->GetValue().GetFloat());
+							fprintf(File, "%s = %f\n", Current->GetName().ToCString(), Current->GetValue().GetFloat());
 							break;
 						case ZE_VRT_BOOLEAN:
-							fprintf(File, "%s = %s\n", Current->GetName(), Current->GetValue().GetBoolean() == true ? "true" : "false");
+							fprintf(File, "%s = %s\n", Current->GetName().ToCString(), Current->GetValue().GetBoolean() == true ? "true" : "false");
 							break;
 					}
 			}

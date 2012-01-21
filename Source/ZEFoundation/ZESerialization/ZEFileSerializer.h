@@ -46,7 +46,7 @@ class ZEFileSerializer : public ZESerializer
 		void*						File;
 
 	public:
-		virtual ZEUInt64				Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
+		virtual ZEUInt64			Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
 		bool						OpenFile(const char* FileName);
 		void						CloseFile();
 									
