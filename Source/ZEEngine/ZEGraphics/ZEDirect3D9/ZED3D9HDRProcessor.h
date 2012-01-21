@@ -37,9 +37,11 @@
 #ifndef __ZE_D3D9_HDR_PROCESSOR_H__
 #define __ZE_D3D9_HDR_PROCESSOR_H__
 
+#include "ZETypes.h"
 #include "ZED3D9ComponentBase.h"
-#include <d3d9.h>
 #include "ZEMeta/ZEObject.h"
+
+#include <d3d9.h>
 
 class ZETexture2D;
 class ZED3D9Texture2D;
@@ -103,23 +105,23 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 		
 		struct 
 		{
-			float Key;
-			float BrightPassTreshold;
-			float BloomFactor;
-			float BloomStandardDeviation;
+			float						Key;
+			float						BrightPassTreshold;
+			float						BloomFactor;
+			float						BloomStandardDeviation;
 			
-			float MaxLuminanceChange;
-			float MaxLuminanceChangePerSecond;
-			float Reserved1;
-			float Reserved2;
+			float						MaxLuminanceChange;
+			float						MaxLuminanceChangePerSecond;
+			float						Reserved1;
+			float						Reserved2;
 		} Parameters;
 
 		struct
 		{
-			ZEInt BloomSampleCount;
-			ZEInt	BloomPassCount;
-			ZEInt Reserved0;
-			ZEInt Reserved1;
+			ZEInt						BloomSampleCount;
+			ZEInt						BloomPassCount;
+			ZEInt						Reserved0;
+			ZEInt						Reserved1;
 		} IntParameters;
 
 	public:
@@ -142,10 +144,10 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 		float							GetBloomStandardDeviation() const;
 
 		void							SetBloomSampleCount(ZEUInt Count);
-		ZEUInt					GetBloomSampleCount() const;
+		ZEUInt							GetBloomSampleCount() const;
 
 		void							SetBloomPassCount(ZEUInt Count);
-		ZEUInt					GetBloomPassCount() const;
+		ZEUInt							GetBloomPassCount() const;
 
 		void							SetInput(ZED3D9Texture2D* Input);
 		ZED3D9Texture2D*				GetInput();

@@ -42,6 +42,7 @@
 #include "ZEGraphics/ZEBitmap.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
 
 ZEDrawFlags ZETerrain::GetDrawFlags() const

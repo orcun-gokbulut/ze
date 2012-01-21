@@ -36,16 +36,16 @@
 #include "ZEMapResource.h"
 #include "ZEPortalMap/ZEPortalMapResource.h"
 
-ZEMapResource* ZEMapResource::LoadResource(const char* FileName)
+ZEMapResource* ZEMapResource::LoadResource(const ZEString& FileName)
 {
 	return ZEPortalMapResource::LoadResource(FileName);
 }
-const ZEMapResource* ZEMapResource::LoadSharedResource(const char* FileName)
+const ZEMapResource* ZEMapResource::LoadSharedResource(const ZEString& FileName)
 {
 	return ZEPortalMapResource::LoadSharedResource(FileName);
 }
 
-void ZEMapResource::CacheResource(const char* FileName)
+void ZEMapResource::CacheResource(const ZEString& FileName)
 {
 	ZEPortalMapResource::CacheResource(FileName);
 }

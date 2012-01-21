@@ -36,6 +36,7 @@
 #ifndef __ZE_MODEL_ANIMATION_TRACK_H__
 #define __ZE_MODEL_ANIMATION_TRACK_H__
 
+#include "ZETypes.h"
 #include "ZEModelAnimation.h"
 
 class ZEModel;
@@ -58,10 +59,10 @@ class ZEModelAnimationTrack
 		ZEModelAnimationBlendMode		BlendMode;
 		float							Speed;
 		float							CurrentFrame;
-		ZEUInt32							StartFrame;
-		ZEUInt32							EndFrame;
+		ZEUInt32						StartFrame;
+		ZEUInt32						EndFrame;
 		bool							Looping;
-		ZEInt								LOD;
+		ZEInt							LOD;
 
 	public:
 		void							SetOwner(ZEModel* Model);
@@ -77,7 +78,7 @@ class ZEModelAnimationTrack
 		ZEModelAnimationState			GetState();
 
 		void							SetLOD(ZEInt LOD);
-		ZEInt								GetLOD();
+		ZEInt							GetLOD();
 
 		void							SetSpeed(float Factor);
 		float							GetSpeed();
@@ -92,13 +93,13 @@ class ZEModelAnimationTrack
 		bool							GetLooping();
 
 		void							SetCurrentFrame(ZEUInt Frame);	
-		ZEUInt 					GetCurrentFrame();
+		ZEUInt 							GetCurrentFrame();
 
 		void							SetStartFrame(ZEUInt Frame);
-		ZEUInt					GetStartFrame();
+		ZEUInt							GetStartFrame();
 
 		void							SetEndFrame(ZEUInt Frame);
-		ZEUInt					GetEndFrame();
+		ZEUInt							GetEndFrame();
 
 		void							Play(ZEUInt StartFrame, ZEUInt EndFrame);
 		void							Play();

@@ -47,7 +47,7 @@ class ZEDPlugIn
 		virtual const char*					GetName() = 0;
 		virtual const char*					GetVersion() = 0;
 		virtual const char*					GetAuthor() = 0;
-		virtual ZEUInt				GetExtensionCount() = 0;
+		virtual ZEUInt						GetExtensionCount() = 0;
 		virtual ZEDExtensionDescription**	GetExtensionDescriptions() = 0;
 };
 

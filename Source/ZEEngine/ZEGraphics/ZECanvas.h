@@ -37,7 +37,7 @@
 #ifndef __ZE_CANVAS_H__
 #define __ZE_CANVAS_H__
 
-
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEVertexTypes.h"
 #include "ZEDS/ZEString.h"
@@ -46,7 +46,6 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEQuaternion.h"
-
 
 class ZECanvasVertex
 {

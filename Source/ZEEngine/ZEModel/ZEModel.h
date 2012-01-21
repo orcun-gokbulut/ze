@@ -37,6 +37,7 @@
 #ifndef	__ZE_MODEL_H__
 #define __ZE_MODEL_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEGame/ZEComponent.h"
 #include "ZEGraphics/ZERenderCommand.h"
@@ -87,7 +88,7 @@ class ZEModel : public ZEComponent
 
 		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
-		ZEAABBox						BoundingBox;
+		ZEAABBox							BoundingBox;
 
 		void								CalculateBoundingBox();		
 		void								UpdateTransforms();
@@ -115,9 +116,9 @@ class ZEModel : public ZEComponent
 	public:
 		ZEArray<ZEModelIKChain>				IKChains;
 
-		virtual	ZEUInt32						GetDrawFlags() const;
+		virtual	ZEUInt32					GetDrawFlags() const;
 
-		virtual const ZEAABBox&		GetLocalBoundingBox() const;
+		virtual const ZEAABBox&				GetLocalBoundingBox() const;
 
 		void								SetModelFile(const char* ModelFile);
 		const char*							GetModelFile() const;
@@ -144,7 +145,7 @@ class ZEModel : public ZEComponent
 		bool								GetAutoLOD();
 
 		void								SetActiveLOD(ZEUInt LOD);
-		ZEInt									GetActiveLOD();
+		ZEInt								GetActiveLOD();
 
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();

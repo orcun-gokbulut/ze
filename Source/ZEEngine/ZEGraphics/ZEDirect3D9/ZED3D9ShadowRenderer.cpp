@@ -44,7 +44,7 @@
 #include "ZED3D9ShadowRenderer.h"
 #include "ZEGraphics/ZEPointLight.h"
 #include "ZEGraphics/ZERenderCommand.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEGraphics/ZEDirectionalLight.h"
 #include "ZEGraphics/ZEOmniProjectiveLight.h"

@@ -38,7 +38,7 @@
 #include "ZECore/ZECore.h"
 #include "ZEUI/ZEUIManager.h"
 #include "ZEGraphics/ZECamera.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
 
 #include <string.h>
 
@@ -149,7 +149,7 @@ void ZEGame::Tick(float ElapsedTime)
 	char Buffer[400];
 	sprintf(Buffer, "Position : [%.2f, %.2f, %.2f], Rotation : [%.2f, %.2f, %.2f], Average FPS: %u, Current FPS: %.0f", 
 		Position.x, Position.y, Position.z,
-		ZERAD2DEG(Pitch), ZERAD2DEG(Yaw), ZERAD2DEG(Roll), 
+		ZEAngle::ToDegree(Pitch), ZEAngle::ToDegree(Yaw), ZEAngle::ToDegree(Roll), 
 		AverageFPS, 1.0f / ElapsedTime);
 	
 	Scene->Tick(ElapsedTime);

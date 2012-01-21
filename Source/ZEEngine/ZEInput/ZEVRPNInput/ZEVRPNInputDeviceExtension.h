@@ -47,7 +47,7 @@ class ZEVRPNInputDeviceExtension : public ZEInputDeviceExtension
 	ZE_EXTENSION(ZEVRPNInputDeviceExtension)
 
 	private:
-		ZEArray<ZEVRPNInputDevice>	Devices;
+		ZEArray<ZEVRPNInputDevice>		Devices;
 
 	public:
 		ZEArray<ZEInputDevice*>			GetDevices();

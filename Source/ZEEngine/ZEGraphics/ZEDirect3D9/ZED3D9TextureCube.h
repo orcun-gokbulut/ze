@@ -37,6 +37,7 @@
 #ifndef __ZE_D3D9_TEXTURE_CUBE_H__
 #define __ZE_D3D9_TEXTURE_CUBE_H__
 
+#include "ZETypes.h"
 #include "ZEGraphics/ZETextureCube.h"
 #include "ZED3D9ViewPort.h"
 #include "ZED3D9ComponentBase.h"

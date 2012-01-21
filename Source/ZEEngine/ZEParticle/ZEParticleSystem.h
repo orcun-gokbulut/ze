@@ -37,6 +37,7 @@
 #ifndef __ZE_PARTICLE_SYSTEM_H__
 #define __ZE_PARTICLE_SYSTEM_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
@@ -80,7 +81,7 @@ class ZEParticleSystem : public ZEObject
 		
 		void								UpdateVertexBuffer(ZEDrawParameters* DrawParameters);
 
-		ZEUInt						GetTotalParticleCount();
+		ZEUInt								GetTotalParticleCount();
 
 	public:
 		void								SetName(const ZEString& Name);

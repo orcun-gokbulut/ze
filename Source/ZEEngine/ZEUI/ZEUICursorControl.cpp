@@ -36,7 +36,7 @@
 #include "ZEUICursorControl.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEInput/ZEInputModule.h"
-#include "zeui/ZEUIRenderer.h"
+#include "ZEUI/ZEUIRenderer.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
 #include "ZEGraphics/ZETexture2DResource.h"

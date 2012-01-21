@@ -37,6 +37,7 @@
 #ifndef	__ZE_D3D9_MODULE_H__
 #define __ZE_D3D9_MODULE_H__
 
+#include "ZETypes.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZED3D9ViewPort.h"
 #include "ZEDS/ZEArray.h"
@@ -159,7 +160,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual void									SetAnisotropicFilter(ZEInt Level);
 
 		virtual void									SetMaterialComponentMask(ZEUInt Mask);
-		virtual ZEUInt							GetMaterialComponentMask();
+		virtual ZEUInt									GetMaterialComponentMask();
 		
 		virtual ZEViewPort*								GetFrameBufferViewPort();
 

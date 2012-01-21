@@ -39,6 +39,7 @@
 
 #include "ZEGraphics/ZEShadowRenderer.h"
 #include "ZED3D9ComponentBase.h"
+
 #include <d3d9.h>
 
 class ZETexture2D;
@@ -54,9 +55,9 @@ class ZED3D9ShadowRenderer : public ZEShadowRenderer, public ZED3D9ComponentBase
 	private:
 		ZED3D9ViewPort*							ViewPort;
 
-		ZESmartArray<ZERenderCommand>				NonTransparent;
-		ZESmartArray<ZERenderCommand>				Transparent;
-		ZESmartArray<ZERenderCommand>				Imposter;
+		ZESmartArray<ZERenderCommand>			NonTransparent;
+		ZESmartArray<ZERenderCommand>			Transparent;
+		ZESmartArray<ZERenderCommand>			Imposter;
 
 		ZEArray<ZEPostProcessor*>				PostProcessors;
 

@@ -37,6 +37,7 @@
 #ifndef	__ZE_LIGHT_H__
 #define __ZE_LIGHT_H__
 
+#include "ZETypes.h"
 #include "ZEGame/ZEComponent.h"
 #include "ZEViewVolume.h"
 
@@ -72,7 +73,7 @@ class ZELight : public ZEComponent
 	public:
 		virtual ZELightType				GetLightType() = 0;
 
-		virtual ZEUInt32					GetDrawFlags() const;
+		virtual ZEUInt32				GetDrawFlags() const;
 
 		virtual	void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);

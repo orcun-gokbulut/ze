@@ -39,9 +39,6 @@
 
 #include "ZEMaterial.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEDefinitions.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEVariant.h"
 #include "ZEMeta/ZEObject.h"
 
 ZE_META_OBJECT_DESCRIPTION(ZETerrainMaterial)

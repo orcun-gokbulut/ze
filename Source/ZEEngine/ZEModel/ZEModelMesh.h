@@ -37,9 +37,9 @@
 #ifndef	__ZE_MODEL_MESH_H__
 #define __ZE_MODEL_MESH_H__
 
+#include "ZETypes.h"
 #include "ZEModelAnimation.h"
 #include "ZEModelMeshLod.h"
-
 #include "ZEGame/ZEComponent.h"
 #include "ZEGraphics/ZERenderCommand.h"
 
@@ -53,9 +53,9 @@ class ZEModelMesh
 		ZEModel*							Owner;
 
 		const ZEModelResourceMesh*			MeshResource;
-		ZEAABBox						LocalBoundingBox;
-		ZEAABBox						ModelBoundingBox;
-		ZEAABBox						WorldBoundingBox;
+		ZEAABBox							LocalBoundingBox;
+		ZEAABBox							ModelBoundingBox;
+		ZEAABBox							WorldBoundingBox;
 
 		ZEVector3							Position;
 		ZEVector3							Scale;
@@ -82,9 +82,9 @@ class ZEModelMesh
 		const char*							GetName();
 		ZEPhysicalRigidBody*				GetPhysicalBody() { return PhysicalBody; }
 
-		const ZEAABBox&				GetLocalBoundingBox();
-		const ZEAABBox&				GetModelBoundingBox();
-		const ZEAABBox&				GetWorldBoundingBox();
+		const ZEAABBox&						GetLocalBoundingBox();
+		const ZEAABBox&						GetModelBoundingBox();
+		const ZEAABBox&						GetWorldBoundingBox();
 
 		const ZEMatrix4x4&					GetLocalTransform();
 		const ZEMatrix4x4&					GetModelTransform();

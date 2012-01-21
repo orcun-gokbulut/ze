@@ -38,6 +38,7 @@
 #ifndef	__ZE_D3D9_VERTEX_DECLARATION_H__
 #define __ZE_D3D9_VERTEX_DECLARATION_H__
 
+#include "ZETypes.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
 #include "ZEDS/ZEArray.h"

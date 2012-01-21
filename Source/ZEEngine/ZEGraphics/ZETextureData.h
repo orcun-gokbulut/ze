@@ -38,6 +38,7 @@
 #ifndef __ZE_TEXTURE_DATA_H__
 #define __ZE_TEXTURE_DATA_H__
 
+#include "ZETypes.h"
 #include "ZETexture.h"
 #include "ZEGraphics/ZETextureOptions.h"
 
@@ -55,23 +56,22 @@ class ZETextureData
 		{
 			ZETexturePixelFormat	PixelFormat;
 			
-			ZEUInt			Width;
-			ZEUInt			Height;
-
-			ZEUInt 			Depth;
-			ZEUInt 			MipmapCount;
+			ZEUInt					Width;
+			ZEUInt					Height;
+			ZEUInt 					Depth;
+			ZEUInt 					MipmapCount;
 			
 			struct SurfaceData
 			{
 				struct MipmapData
 				{
 					void*			Data;
-					ZEUInt 	RowCount;
-					ZEUInt 	RowSize;
+					ZEUInt 			RowCount;
+					ZEUInt			RowSize;
 
-				}*Mipmaps;
+				}* Mipmaps;
 
-			}*Surfaces;
+			}* Surfaces;
 
 		}Texture;
 		
@@ -92,37 +92,31 @@ class ZETextureData
 
 		void						AllocateMipmap(ZEUInt Depth, ZEUInt MipLevel, ZEUInt RowSize, ZEUInt RowCount);
 		void						FreeMipmap(ZEUInt Depth, ZEUInt MipLevel);
-
+			
 		void						CopyMipmapDataFrom(ZEUInt Depth, ZEUInt MipLevel, void* SourceData, ZEUInt SourcePitch);
 		void						CopyMipmapDataTo(ZEUInt Depth, ZEUInt MipLevel, void* Dest, ZEUInt DestPitch);
 
 		bool						IsEmpty();
 
 		void						SetDepth(ZEUInt Value);
-		ZEUInt				GetDepth();
+		ZEUInt						GetDepth();
 		void						SetWidth(ZEUInt Value);
-		ZEUInt				GetWidth();
+		ZEUInt						GetWidth();
 		void						SetHeight(ZEUInt Value);
-		ZEUInt				GetHeight();
+		ZEUInt						GetHeight();
 		void						SetMipmapCount(ZEUInt Value);
-		ZEUInt				GetMipmapCount();
+		ZEUInt						GetMipmapCount();
 		void						SetPixelFormat(ZETexturePixelFormat PixelFormat);
 		ZETexturePixelFormat		GetPixelFormat();
 		
-		ZEUInt				GetMipmapRowCount(ZEUInt Depth, ZEUInt MipLevel);
-		ZEUInt				GetMipmapRowSize(ZEUInt Depth, ZEUInt MipLevel);
+		ZEUInt						GetMipmapRowCount(ZEUInt Depth, ZEUInt MipLevel);
+		ZEUInt						GetMipmapRowSize(ZEUInt Depth, ZEUInt MipLevel);
 
 		void*						GetMipmapData(ZEUInt Depth, ZEUInt MipLevel);
-		ZEUInt				GetMipmapDataSize(ZEUInt Depth, ZEUInt MipLevel);
-		ZEUInt				GetSurfaceSize(ZEUInt Depth);
-		ZEUInt				GetTextureSize();
-		ZEUInt				GetSizeOnDisk();
-
-		
-
-		
-
+		ZEUInt						GetMipmapDataSize(ZEUInt Depth, ZEUInt MipLevel);
+		ZEUInt						GetSurfaceSize(ZEUInt Depth);
+		ZEUInt						GetTextureSize();
+		ZEUInt						GetSizeOnDisk();
 };
 
-
-#endif /* __ZE_TEXTURE_DATA_H__ */
+#endif

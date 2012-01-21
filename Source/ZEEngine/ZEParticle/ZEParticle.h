@@ -42,20 +42,20 @@
 class ZEParticle
 {
 	public:
-		ZEVector3							Acceleration;				// Changes the velocity
-		ZEVector3							AngularAcceleration;		// Changes the angular velocity
-		ZEVector3							Velocity;					// Changes the position
-		ZEVector3							AngularVelocity;			// Changes the up vector
-		ZEVector3							Position;					// Relative to system's position
-		ZEVector3							UpVector;					// Used for rotating particles along their axes
-		ZEVector4							Color;						// Vertex color
-		float								Life;						// When life of a particle drops below zero, it dies
-		float								Size;						// Size of an edge of the quad
-		float								BounceFactor;				// Used in repeller
-		bool								IsAlive;					// If a particle is dead, it won't drawn to the screen
+		ZEVector3		Acceleration;
+		ZEVector3		AngularAcceleration;
+		ZEVector3		Velocity;
+		ZEVector3		AngularVelocity;
+		ZEVector3		Position;
+		ZEVector3		UpVector;
+		ZEVector4		Color;
+		float			Life;
+		float			Size;
+		float			BounceFactor;
+		bool			IsAlive;
 
-											ZEParticle();
-											~ZEParticle();
+						ZEParticle();
+						~ZEParticle();
 };
 
 #endif

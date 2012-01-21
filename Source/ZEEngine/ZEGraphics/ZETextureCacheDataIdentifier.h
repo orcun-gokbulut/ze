@@ -38,6 +38,7 @@
 #ifndef __ZE_TEXTURE_CACHE_DATA_IDENTIFIER_H__
 #define __ZE_TEXTURE_CACHE_DATA_IDENTIFIER_H__
 
+#include "ZETypes.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEDefinitions.h"
 #include "ZEFile/ZEFileCache.h"
@@ -48,20 +49,19 @@
 class ZETextureCacheDataIdentifier : public ZECacheDataIdentifier
 {
 	public:
-
 		char					ItemName[ZE_MAX_FILE_NAME_SIZE];
 		ZETextureOptions		TextureOptions;
-		ZEUInt64					Offset;
+		ZEUInt64				Offset;
 
 								ZETextureCacheDataIdentifier();
 								ZETextureCacheDataIdentifier(const char* ItemName, const ZETextureOptions &TextureOptions, ZEUInt64 Offset = 0);
 		virtual					~ZETextureCacheDataIdentifier();
 
 
-		virtual	ZEUInt64			GetDataSize()const;
-		virtual ZEUInt64			GetHash() const;
-		virtual ZEUInt64			Write(ZEFile* File) const;
+		virtual	ZEUInt64		GetDataSize()const;
+		virtual ZEUInt64		GetHash() const;
+		virtual ZEUInt64		Write(ZEFile* File) const;
 		virtual bool			Equal(ZEFile* File) const;
 };
 
-#endif // __ZE_TEXTURE_CACHE_DATA_IDENTIFIER_H__
+#endif

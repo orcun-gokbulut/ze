@@ -37,6 +37,7 @@
 #ifndef	__ZE_VRPN_INPUT_DEVICE_H__
 #define __ZE_VRPN_INPUT_DEVICE_H__
 
+#include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEInput/ZEInputDevice.h"
@@ -64,10 +65,10 @@ class ZEVRPNInputDevice : public ZEInputDevice
 		
 		virtual const ZEString&			GetDeviceName();
 
-		virtual ZEUInt32					GetAxisCount();
-		virtual ZEUInt32					GetButtonCount();
-		virtual ZEUInt32					GetVector3Count();
-		virtual ZEUInt32					GetQuaternionCount();
+		virtual ZEUInt32				GetAxisCount();
+		virtual ZEUInt32				GetButtonCount();
+		virtual ZEUInt32				GetVector3Count();
+		virtual ZEUInt32				GetQuaternionCount();
 
 		virtual bool					Initialize();
 		virtual void					Deinitialize();

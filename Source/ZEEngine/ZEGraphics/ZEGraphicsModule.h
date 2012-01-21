@@ -37,6 +37,7 @@
 #ifndef	__ZE_GRAPHICS_MODULE_H__
 #define __ZE_GRAPHICS_MODULE_H__
 
+#include "ZETypes.h"
 #include "ZECore/ZEModule.h"
 #include "ZECore/ZEOptionSection.h"
 

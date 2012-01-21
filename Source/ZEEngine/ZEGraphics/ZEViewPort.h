@@ -37,12 +37,14 @@
 #ifndef __ZE_VIEW_PORT_H__
 #define __ZE_VIEW_PORT_H__
 
+#include "ZETypes.h"
+
 class ZEViewPort
 {
 	public:
 		virtual float			GetAspectRatio() = 0;
-		virtual ZEUInt	GetWidth() = 0;
-		virtual ZEUInt	GetHeight() = 0;
+		virtual ZEUInt			GetWidth() = 0;
+		virtual ZEUInt			GetHeight() = 0;
 
 		virtual					~ZEViewPort();
 };

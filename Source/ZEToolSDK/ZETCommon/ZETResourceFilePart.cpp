@@ -37,17 +37,17 @@
 #include "ZETResourceFilePart.h"
 #include <memory.h>
 
-ZEUInt32 ZEResourceInternalFile::GetFileSize() const
+ZESize ZEResourceInternalFile::GetFileSize() const
 {
 	return Size;
 }
 
-unsigned char* ZEResourceInternalFile::GetFileBuffer() const
+void* ZEResourceInternalFile::GetFileBuffer() const
 {
 	return Data;
 }
 
-void ZEResourceInternalFile::AllocateBuffer(ZEUInt32 Size)
+void ZEResourceInternalFile::AllocateBuffer(ZESize Size)
 {
 	if (Data != NULL)
 		delete[] Data;

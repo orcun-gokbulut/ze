@@ -57,7 +57,7 @@
 #include "ZEMap/ZEPortalMap/ZEPortalMap.h"
 #include "ZEMap/ZEMapResource.h"
 #include "ZEMap/ZEPortalMap/ZEPortalMapPortal.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
 
 #include "ZEMap/ZEPortalMap/ZEPortalMapResource.h"
 

@@ -37,6 +37,7 @@
 #ifndef __ZE_RENDERER_H__
 #define __ZE_RENDERER_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"

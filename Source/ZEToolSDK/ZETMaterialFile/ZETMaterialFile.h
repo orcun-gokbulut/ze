@@ -37,6 +37,7 @@
 #ifndef __ZET_MATERIAL_FILE_H__
 #define __ZET_MATERIAL_FILE_H__
 
+#include "ZETypes.h"
 #include "ZETDefinitions.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
@@ -100,7 +101,7 @@ struct ZEMaterialTexture
 
 struct ZEMaterialAnimationKey
 {
-	ZEUInt						PropertyIndex;
+	ZEUInt								PropertyIndex;
 	ZEVariant							Value;
 };
 
@@ -133,7 +134,7 @@ class ZEFixedMaterialFile : public ZEMaterialFile
 		bool							Wireframe;
 		ZEMaterialTransparancyMode		TransparancyMode;
 		bool							RecivesShadow;
-		ZEUInt					TransparancyCullLimit;
+		ZEUInt							TransparancyCullLimit;
 
 		bool							AmbientEnabled;
 		ZEVector3						AmbientColor;
@@ -229,7 +230,7 @@ class ZEFixedMaterialFile : public ZEMaterialFile
 		void							SetTransparancyMode(ZEMaterialTransparancyMode Mode);
 		ZEMaterialTransparancyMode		GetTransparancyMode();
 		void							SetTransparancyCullLimit(ZEUInt Limit);
-		ZEUInt					GetTransparancyCullLimit();
+		ZEUInt							GetTransparancyCullLimit();
 		void							SetRecivesShadow(bool Enable);
 		bool							GetRecivesShadow();
 

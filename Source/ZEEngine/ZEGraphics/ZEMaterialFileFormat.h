@@ -37,6 +37,8 @@
 #ifndef __ZE_MATERIAL_FILE_FORMAT_H__
 #define __ZE_MATERIAL_FILE_FORMAT_H__
 
+#include "ZETypes.h"
+
 #define ZE_MTLF_MAX_NAME_SIZE					128
 #define ZE_MTLF_MAX_FILENAME_SIZE				256
 

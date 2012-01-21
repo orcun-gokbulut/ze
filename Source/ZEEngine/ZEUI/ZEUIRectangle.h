@@ -37,6 +37,7 @@
 #ifndef __ZE_UI_RECTANGLE_H__
 #define __ZE_UI_RECTANGLE_H__
 
+#include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERectangle.h"
 
@@ -45,14 +46,14 @@ class ZEMaterial;
 class ZEUIRectangle
 {
 	public:
-		ZERectangle			Positions;
-		ZERectangle			Texcoords;
-		const ZEMaterial*	Material;
-		ZEVector4			Color;
+		ZERectangle				Positions;
+		ZERectangle				Texcoords;
+		const ZEMaterial*		Material;
+		ZEVector4				Color;
 		ZEInt					ZOrder;
 
-		static bool			Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, const ZERectangle& ClipRectangle);
-		void				ConvertToVertices(ZEUIVertex* Buffer) const;
+		static bool				Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, const ZERectangle& ClipRectangle);
+		void					ConvertToVertices(ZEUIVertex* Buffer) const;
 };
 #endif
 

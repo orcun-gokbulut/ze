@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETFontBaker.h"
+#include "ZETypes.h"
 
 #define WINDOWS_MEAN_AND_LEAN
 #include <windows.h>
@@ -116,12 +117,12 @@ void DumpTexture(ZEResourceInternalFile* TextureFile, HBITMAP Bitmap, HDC DC)
 
     hdr.bfOffBits = (DWORD) sizeof(BITMAPFILEHEADER) + pbih->biSize + pbih->biClrUsed * sizeof (RGBQUAD); 
 
-	unsigned char* Data = TextureFile->GetFileBuffer();
+	void* Data = TextureFile->GetFileBuffer();
 	memcpy(Data, &hdr, sizeof(BITMAPFILEHEADER));
-	Data += sizeof(BITMAPFILEHEADER);
+	Data = (ZEUInt8*)Data + sizeof(BITMAPFILEHEADER);
 
  	memcpy(Data, pbih, sizeof(BITMAPINFOHEADER) + pbih->biClrUsed * sizeof (RGBQUAD));
-	Data += sizeof(BITMAPINFOHEADER) + pbih->biClrUsed * sizeof (RGBQUAD);
+	Data = (ZEUInt8*)Data + sizeof(BITMAPINFOHEADER) + pbih->biClrUsed * sizeof (RGBQUAD);
 
 	dwTotal = cb = pbih->biSizeImage; 
  
@@ -143,7 +144,7 @@ void DumpTexture(ZEResourceInternalFile* TextureFile, HBITMAP Bitmap, HDC DC)
 	}
  	
 	memcpy(Data, hp, cb);
-	Data += cb;
+	Data = (ZEUInt8*)Data + cb;
 
     GlobalFree((HGLOBAL)lpBits);
 }

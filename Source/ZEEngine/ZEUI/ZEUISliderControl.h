@@ -37,6 +37,7 @@
 #ifndef __ZE_UI_SLIDER_CONTROL__
 #define __ZE_UI_SLIDER_CONTROL__
 
+#include "ZETypes.h"
 #include "ZEUIControl.h"
 #include "ZEUIButtonControl.h"
 #include "ZEGraphics/ZEFixedMaterial.h"

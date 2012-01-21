@@ -38,6 +38,7 @@
 #ifndef __ZE_D3D9_TEXTURE_DOWNSAMPLER_H__
 #define __ZE_D3D9_TEXTURE_DOWNSAMPLER_H__
 
+#include "ZETypes.h"
 #include "ZED3D9ComponentBase.h"
 
 class ZED3D9PixelShader;
@@ -92,10 +93,10 @@ class ZED3D9TextureResizer : public ZED3D9ComponentBase
 		TextureInfo						DestInfo;
 		TextureInfo						SrcInfo;
 
-		ZEUInt					NextPowerOfTwo(ZEUInt Value);
-		ZEUInt					PreviousPowerOfTwo(ZEUInt Value);
+		ZEUInt							NextPowerOfTwo(ZEUInt Value);
+		ZEUInt							PreviousPowerOfTwo(ZEUInt Value);
 		bool							IsPowerOfTwo(ZEUInt Value);
-		ZEUInt					GetPowerOfTwo(ZEUInt Value);
+		ZEUInt							GetPowerOfTwo(ZEUInt Value);
 		bool							Resize(ZEUInt DestWidth, ZEUInt DestHeight);
 
 	public:

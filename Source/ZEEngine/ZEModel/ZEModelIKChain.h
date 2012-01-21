@@ -37,6 +37,7 @@
 #ifndef	__ZE_MODEL_IK_CHAIN_H__
 #define __ZE_MODEL_IK_CHAIN_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
@@ -57,7 +58,7 @@ class ZEModelIKChain
 		ZEQuaternion						EffectorRotation;
 
 		float								ErrorThreshold;
-		ZEUInt						MaxIterationCount;
+		ZEUInt								MaxIterationCount;
 
 		float								RotationLimit;
 
@@ -79,7 +80,7 @@ class ZEModelIKChain
 		void								SetEffectorRotation(const ZEQuaternion& Rotation);
 
 		void								SetMaxIterationCount(ZEUInt Value);
-		ZEUInt						GetMaxIterationCount();
+		ZEUInt								GetMaxIterationCount();
 
 		void								SetErrorThreshold(float Value);
 		float								GetErrorThreshold();

@@ -37,14 +37,12 @@
 #ifndef __ZE_D3D9_FILTERS_H__
 #define __ZE_D3D9_FILTERS_H__
 
+#include "ZETypes.h"
 
-// Common Helper Functions
-float Sincf(float x);	// Sinc Function
-float Bessel0(float x);  // Bessel Function
-
+float Sincf(float x);	
+float Bessel0(float x); 
 class ZEVector4;
 
-// ZEFilter Base Class
 class ZEFilter
 {
 	private:
@@ -59,7 +57,7 @@ class ZEFilter
 		virtual float	Process(float x) const = 0;
 };
 
-// Box(Mean) ZEFilter
+
 class BoxFilter : public ZEFilter
 {
 	public:
@@ -70,7 +68,7 @@ class BoxFilter : public ZEFilter
 		virtual float	Process(float x) const;
 };
 
-// Triangle(Bilinear) ZEFilter
+
 class TriangleFilter : public ZEFilter
 {
 	public:
@@ -81,7 +79,7 @@ class TriangleFilter : public ZEFilter
 		virtual float	Process(float x) const;
 };
 
-// Cubic(Hermite) ZEFilter
+
 class CubicFilter : public ZEFilter
 {
 	public:
@@ -92,7 +90,7 @@ class CubicFilter : public ZEFilter
 		virtual float	Process(float x) const;
 };
 
-// Gaussian ZEFilter
+
 class GaussianFilter : public ZEFilter
 {
 	private:
@@ -107,7 +105,7 @@ class GaussianFilter : public ZEFilter
 		virtual float	Process(float x) const;
 };
 
-// Quadratic ZEFilter
+
 class QuadraticFilter : public ZEFilter
 {
 	public:
@@ -118,7 +116,7 @@ class QuadraticFilter : public ZEFilter
 		virtual float	Process(float x) const;
 };
 
-// Kaiser ZEFilter
+
 class KaiserFilter : public ZEFilter
 {
 	private:
@@ -132,30 +130,28 @@ class KaiserFilter : public ZEFilter
 		virtual float	Process(float x) const;
 };
 
-// Mitchell ZEFilter
+
 class MitchellFilter : public ZEFilter
 {
 	private:
-		float 				P0, P2, P3;
-		float 				Q0, Q1, Q2, Q3;
+		float 			P0, P2, P3;
+		float 			Q0, Q1, Q2, Q3;
 
 	public:
-							MitchellFilter(float B, float C);
-		virtual				~MitchellFilter();
+						MitchellFilter(float B, float C);
+		virtual			~MitchellFilter();
 
-		virtual float		Process(float x) const;
+		virtual float	Process(float x) const;
 };
+
 
 class ZEKernel
 {
 	protected:
-		ZEInt				KernelWindowSize;
+		ZEInt			KernelWindowSize;
 		float			KernelWidth;
 		ZEVector4*		KernelWeights;
 		float			Center;
-
-	private:
-		// Empty
 
 	public:
 						ZEKernel() {};
@@ -163,11 +159,9 @@ class ZEKernel
 		virtual			~ZEKernel();
 
 		ZEVector4*		GetKernel() const;
-		ZEInt				GetKernelWindowSize() const;
+		ZEInt			GetKernelWindowSize() const;
 		float			GetKernelWidth() const;
 		float			GetKernelCenter() const;
-	
-		// Also add precalculated filters
 };
 
-#endif /* __ZE_D3D9_FILTERS_H__ */
+#endif

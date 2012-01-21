@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZEModelIKChainNode.h"
 
 ZEModelIKChainNode::ZEModelIKChainNode()

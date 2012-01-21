@@ -119,7 +119,7 @@ bool ZEAnimation::ReadFromFile(ZEUnserializer* Unserializer, ZEAnimation* Animat
 
 	Animation->FramePerSecond = AnimationChunk.FramePerSecond;
 	Animation->FrameCount = AnimationChunk.FrameCount;
-	strncpy(Animation->Name, AnimationChunk.Name, ZE_MAX_NAME_SIZE);
+	Animation->Name = AnimationChunk.Name;
 	
 	Animation->PropertyAnimations.SetCount(AnimationChunk.PropertyAnimationCount);
 	for (ZESize I = 0; I < Animation->PropertyAnimations.GetCount(); I++)

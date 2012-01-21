@@ -37,33 +37,34 @@
 #ifndef __ZE_TEXTURE_3D_H__
 #define __ZE_TEXTURE_3D_H__
 
+#include "ZETypes.h"
 #include "ZETexture.h"
 
 class ZETexture3D : public ZETexture
 {
 	protected:
-		ZEUInt					Width;
-		ZEUInt					Height;
-		ZEUInt					Depth;
-		ZETexturePixelFormat			PixelFormat;
+		ZEUInt						Width;
+		ZEUInt						Height;
+		ZEUInt						Depth;
+		ZETexturePixelFormat		PixelFormat;
 
-										ZETexture3D();
-		virtual							~ZETexture3D();
+									ZETexture3D();
+		virtual						~ZETexture3D();
 
 	public:
-		virtual ZETextureType			GetTextureType() const;
+		virtual ZETextureType		GetTextureType() const;
 
-		ZEUInt					GetWidth() const;
-		ZEUInt					GetHeight() const;
-		ZEUInt					GetDepth() const;
-		ZETexturePixelFormat			GetPixelFormat() const;
-		bool							IsRenderTarget() const;
+		ZEUInt						GetWidth() const;
+		ZEUInt						GetHeight() const;
+		ZEUInt						GetDepth() const;
+		ZETexturePixelFormat		GetPixelFormat() const;
+		bool						IsRenderTarget() const;
 
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat) = 0;
-		virtual void					Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch) = 0;
-		virtual void					Unlock() = 0;
+		virtual bool				Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat) = 0;
+		virtual void				Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch) = 0;
+		virtual void				Unlock() = 0;
 
-		static ZETexture3D*				CreateInstance();
+		static ZETexture3D*			CreateInstance();
 };
 
 #endif

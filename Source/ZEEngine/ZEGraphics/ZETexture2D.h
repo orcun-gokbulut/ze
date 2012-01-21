@@ -37,6 +37,7 @@
 #ifndef __ZE_TEXTURE_2D_H__
 #define __ZE_TEXTURE_2D_H__
 
+#include "ZETypes.h"
 #include "ZETexture.h"
 
 class ZEViewPort;

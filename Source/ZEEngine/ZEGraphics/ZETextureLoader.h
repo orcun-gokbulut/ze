@@ -38,23 +38,21 @@
 #ifndef __ZE_TEXTURE_LOADER_H__
 #define __ZE_TEXTURE_LOADER_H__
 
-
+#include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEGraphics/ZETexture.h"
 #include "ZEGraphics/ZETexture2DResource.h"
 #include "ZEGraphics/ZETexture3DResource.h"
 #include "ZEGraphics/ZETextureCubeResource.h"
 
-
 class ZETextureData;
-
 
 struct ZETextureInfo
 {
-	ZEUInt			SurfaceCount;
-	ZEUInt			MipmapCount;
-	ZEUInt			Width;
-	ZEUInt			Height;
+	ZEUInt					SurfaceCount;
+	ZEUInt					MipmapCount;
+	ZEUInt					Width;
+	ZEUInt					Height;
 	ZETexturePixelFormat	PixelFormat;
 };
 
