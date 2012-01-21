@@ -33,11 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZE3dsModelExporter.h"
+#include "ZETypes.h"
 #include "ZETOutput.h"
+#include "ZE3dsModelExporter.h"
 
 #include <IGame/IGameFx.h>
 #include <io.h>
+
 
 inline ZEVector2 MAX_TO_ZE(const Point2& Point)
 {

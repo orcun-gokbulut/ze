@@ -37,8 +37,11 @@
 #ifndef __PROGRESS_DIALOG_H__
 #define __PROGRESS_DIALOG_H__
 
+#include "ZETypes.h"
+
 #include <tchar.h>
 #include <stdio.h>
+
 
 #define zepdOutput(...) ZE3dsProgressDialog::GetInstance()->Output(__VA_ARGS__)
 #define zepdLog(...) ZE3dsProgressDialog::GetInstance()->Output(ZE3DS_PDOL_LOG, __VA_ARGS__)

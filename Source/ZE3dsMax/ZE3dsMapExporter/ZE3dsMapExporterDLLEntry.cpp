@@ -33,8 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETypes.h"
 #include "ZE3dsMapExporterDLLEntry.h"
 #include "ZE3dsMapExporterDescription.h"
+
 
 HINSTANCE hInstance;
 ZEInt controlsInit = FALSE;

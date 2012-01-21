@@ -37,8 +37,11 @@
 #ifndef __ZE3DS_MAP_EXPORTER_OPTIONS_H__
 #define __ZE3DS_MAP_EXPORTER_OPTIONS_H__
 
+#include "ZETypes.h"
+
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
+
 
 enum ZEStartVolume
 {
