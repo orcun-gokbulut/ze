@@ -60,7 +60,7 @@ enum ZEAssertType
 	ZE_AT_WARNING_ASSERT
 };
 
-#define zeBreak(Condition) if (Condition) { __asm{ ZEInt 3 }}
+#define zeBreak(Condition) if (Condition) { __asm{ int 3 }}
 
 #include "ZEAPI.h"
 
