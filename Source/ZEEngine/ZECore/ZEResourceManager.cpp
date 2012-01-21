@@ -33,10 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEResourceManager.h"
-#include <string.h>
 #include "ZECore.h"
 #include "ZEError.h"
+#include "ZETypes.h"
+#include "ZEResourceManager.h"
+
+#include <string.h>
+
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)

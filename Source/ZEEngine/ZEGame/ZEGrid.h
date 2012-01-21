@@ -37,8 +37,8 @@
 #ifndef __ZE_GRID_H__
 #define __ZE_GRID_H__
 
-#include "ZEGame/ZEEntity.h"
 #include "ZECanvasBrush.h"
+#include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZERenderCommand.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEGrid);

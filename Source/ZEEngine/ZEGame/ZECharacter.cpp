@@ -33,16 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETypes.h"
 #include "ZECharacter.h"
-
+#include "ZEGame/ZEGame.h"
+#include "ZEModel/ZEModel.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEInput/ZEInputModule.h"
+#include "ZEMath/ZEMathDefinitions.h"
 #include "ZEInput/ZEInputDefinitions.h"
-#include "ZEModel/ZEModel.h"
-#include "ZEGame/ZEGame.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEGraphics/ZETexture2DResource.h"
-#include "ZEMath/ZEMath.h"
+
+
 
 #define ACTIONID_FORWARD		0
 #define ACTIONID_BACKWARD		1

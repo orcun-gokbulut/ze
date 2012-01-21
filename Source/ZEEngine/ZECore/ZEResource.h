@@ -37,6 +37,7 @@
 #ifndef	__ZE_RESOURCE_H__
 #define __ZE_RESOURCE_H__
 
+#include "ZETypes.h"
 #include "ZEFile/ZEFile.h"
 
 class ZEResourceManager;

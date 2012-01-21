@@ -49,10 +49,10 @@ class ZESoundSource3D : public ZESoundSource
 	protected:
 		float						MinDistance;
 		float						MaxDistance;
-		ZEUInt				ConeInsideAngle;
-		ZEUInt				ConeOutsideAngle;
+		ZEUInt						ConeInsideAngle;
+		ZEUInt						ConeOutsideAngle;
 		ZEVector3					ConeDirection;
-		ZEUInt				ConeOutsideVolume;
+		ZEUInt						ConeOutsideVolume;
 
 									ZESoundSource3D();
 		virtual						~ZESoundSource3D();
@@ -65,13 +65,13 @@ class ZESoundSource3D : public ZESoundSource
 		float						GetMaxDistance() const;
 		
 		virtual void				SetConeInsideAngle(ZEUInt NewInsideAngle) = 0;
-		ZEUInt				GetConeInsideAngle() const;
+		ZEUInt						GetConeInsideAngle() const;
 
 		virtual void				SetConeOutsideAngle(ZEUInt NewOutsideAngle) = 0;
-		ZEUInt				GetConeOutsideAngle() const;
+		ZEUInt						GetConeOutsideAngle() const;
 					
 		virtual void				SetConeOutsideVolume(ZEUInt NewOutsideVolume) = 0;
-		ZEUInt				GetConeOutsideVolume() const;
+		ZEUInt						GetConeOutsideVolume() const;
 
 		static ZESoundSource3D*		CreateInstance();
 };

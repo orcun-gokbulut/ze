@@ -39,6 +39,7 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERay.h"
+
 class ZEEntity;
 class ZEScene;
 class ZERay;
@@ -46,12 +47,14 @@ class ZERay;
 class ZERayCaster
 {
 	public:
-		/*static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float Range = 100000000.0f);
+		/*
+		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float Range = 100000000.0f);
 		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float& T, float Range = 100000000.0f);
 		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, float Range = 100000000.0f);
 		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Position, ZEVector3& Normal, float Range = 100000000.0f);
 		static ZEEntity*		CastRay(ZEScene* Scene, const ZERay& Ray, float& T, ZEVector3& Position, ZEVector3& Normal, float Range = 100000000.0f);
-*/};
+		*/
+};
 
 #endif
 

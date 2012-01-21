@@ -39,16 +39,18 @@
 
 #include "ZEEntity.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEAABBox.h"
-#include "ZEMath/ZEOBBox.h"
 #include "ZEMath/ZEBSphere.h"
+#include "ZEMath/ZEQuaternion.h"
 
+
+class ZELight;
 class ZERenderer;
 class ZECompoundEntity;
-class ZELight;
+
 
 ZE_META_ENTITY_DESCRIPTION(ZEComponent);
 

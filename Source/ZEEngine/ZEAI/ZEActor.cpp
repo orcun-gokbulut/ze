@@ -33,13 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETypes.h"
 #include "ZEActor.h"
 #include "ZESteering.h"
-
-#include "ZEMath/ZEMath.h"
-#include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMath.h"
+
 
 void ZEActor::SetRotation2D(float Rotation)
 {

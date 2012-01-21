@@ -33,15 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPluginManager.h"
+#include "ZECore.h"
+#include "ZETypes.h"
+#include "ZEError.h"
 #include "ZEPlugin.h"
 #include "ZEConsole.h"
-#include "ZECore.h"
 #include "ZEModuleManager.h"
+#include "ZEPluginManager.h"
 #include "ZEExtensionManager.h"
-#include "ZEError.h"
 
 #include <string.h>
+
 
 ZEPlugin* ZEPluginManager::GetPlugin(const ZEString& Name)
 {

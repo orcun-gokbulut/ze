@@ -37,6 +37,7 @@
 #ifndef __ZE_POST_PROCESSOR_H__
 #define __ZE_POST_PROCESSOR_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 
 class ZEPostProcessorNode;

@@ -33,14 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZECore.h"
+#include "ZEError.h"
+#include "ZETypes.h"
 #include "ZEConsoleWindow.h"
+#include "ZEWindowResources.h"
+
 #define NOMINMAX
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
-#include "ZECore.h"
-#include "ZEError.h"
-#include "ZEWindowResources.h"
 #include <stdarg.h>
+
 
 #pragma warning(push)
 #pragma warning(disable:4996 4311 4312)

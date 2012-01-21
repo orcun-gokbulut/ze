@@ -37,14 +37,17 @@
 #ifndef	__ZE_SOUND_RESOURCE_OGG_H__
 #define __ZE_SOUND_RESOURCE_OGG_H__
 
+#include "ZETypes.h"
 #include "ZESoundResource.h"
+
 #include <vorbis/vorbisfile.h>
+
 
 class ZESoundResourceOGG : public ZESoundResource
 {
-	friend ZESize OggMemory_Read(void *ptr, ZESize size, ZESize nmemb, void *datasource);
-	friend ZEInt OggMemory_Seek(void *datasource, ogg_int64_t offset, ZEInt whence);
-	friend long OggMemory_Tell(void *datasource);
+	friend ZESize	OggMemory_Read(void *ptr, ZESize size, ZESize nmemb, void *datasource);
+	friend ZEInt	OggMemory_Seek(void *datasource, ogg_int64_t offset, ZEInt whence);
+	friend long		OggMemory_Tell(void *datasource);
 
 	private:
 		void*							Data;

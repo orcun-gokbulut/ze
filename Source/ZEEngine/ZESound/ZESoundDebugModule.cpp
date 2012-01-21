@@ -33,17 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESoundDebugModule.h"
 
-#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGame/ZEGame.h"
-#include "ZEGame/ZEPlayer.h"
-#include "ZEGraphics/ZECamera.h"
 #include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEPlayer.h"
+#include "ZESoundDebugModule.h"
+#include "ZEGraphics/ZECamera.h"
+#include "../ZEGraphics/ZECamera.h"
 #include "ZESound/ZESoundSource3D.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "../ZEGraphics/ZECamera.h"
-	
+#include "ZEGraphics/ZEGraphicsModule.h"
+
+
 
 bool ZESoundDebugModule::Initialize()
 {

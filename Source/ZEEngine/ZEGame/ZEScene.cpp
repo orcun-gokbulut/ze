@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGame.h"
+#include "ZETypes.h"
 #include "ZEScene.h"
 #include "ZEError.h"
 #include "ZEEntity.h"
@@ -57,6 +58,7 @@
 #include "ZEMap/ZEPortalMap/ZEPortalMapResource.h"
 
 #include <memory.h>
+
 
 static ZEString ConstructResourcePath(const ZEString& Path)
 {

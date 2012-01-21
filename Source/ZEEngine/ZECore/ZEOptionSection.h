@@ -37,22 +37,22 @@
 #ifndef	__ZE_OPTION_SECTION_H__
 #define __ZE_OPTION_SECTION_H__
 
+#include "ZETypes.h"
 #include "ZEOption.h"
-
-#include "ZEDS/ZEString.h"
+#include "ZECommand.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+#include "ZECommandSection.h"
 #include "ZEDS/ZETypedVariant.h"
 #include "ZEDS/ZEFastDelegate.h"
-#include "ZECommand.h"
-#include "ZECommandSection.h"
 
 class ZEOptionSection
 {
 	friend class ZEOption;
 	private:
+		bool							Changed;
 		ZEString						Name;
 		ZEArray<ZEOption*>				Options;
-		bool							Changed;
 
 		ZEOptionsChangedEvent			OnChanged;
 		ZEOptionsChangingEvent			OnChanging;

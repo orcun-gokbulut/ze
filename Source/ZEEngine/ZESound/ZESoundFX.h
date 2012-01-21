@@ -41,7 +41,7 @@ enum ZESoundFXType
 	ZE_SFXT_ECHO,
 	ZE_SFXT_FLANGER,
 	ZE_SFXT_GARGLE,
-	ZE_SFXT_PARAMETRIC_EQ
+	ZE_SFXT_PARAMETRIC_EQ,
 	ZE_SFXT_NOISY_SUPRESSOR
 };
 
@@ -66,9 +66,9 @@ class ZEChorusFX : public ZESoundFX
 		float		Depth;
 		float		Feedback;
 		float		Frequency;
-		ZEInt			Waveform;
+		ZEInt		Waveform;
 		float		Delay;
-		ZEInt			Phase;
+		ZEInt		Phase;
 
 	public:
 		void		SetWetDryMix();
@@ -78,14 +78,14 @@ class ZEChorusFX : public ZESoundFX
 class ZEEnvironmentalReverbFX : public ZESoundFX 
 {
 	private:
-		ZEInt			Room;
-		ZEInt			RoomHF;
+		ZEInt		Room;
+		ZEInt		RoomHF;
 		float		RoomRolloffFactor;
 		float		DecayTime;
 		float		DecayHFRatio;
-		ZEInt			Reflections;
+		ZEInt		Reflections;
 		float		ReflectionsDelay;
-		ZEInt			Reverb;
+		ZEInt		Reverb;
 		float		ReverbDelay;
 		float		Diffusion;
 		float		Density;

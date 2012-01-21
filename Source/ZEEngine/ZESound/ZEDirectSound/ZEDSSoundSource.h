@@ -37,9 +37,12 @@
 #ifndef	__ZE_DS_SOUND_SOURCE_H__
 #define __ZE_DS_SOUND_SOURCE_H__
 
+#include "ZETypes.h"
 #include "ZEDSComponentBase.h"
 #include "../ZESoundSource.h"
+
 #include <dsound.h>
+
 
 class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 {
@@ -49,7 +52,7 @@ class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 		ZESize						BufferSampleCount;
 		ZESize						OldBufferPosition;
 		ZESize						StreamPosition;
-		ZEInt							LastUpdatedBufferChunk;
+		ZEInt						LastUpdatedBufferChunk;
 
 		bool						CreateBuffer(bool Is3D);
 		void						ResetParameters();
@@ -64,7 +67,7 @@ class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 	public:
 		virtual void				SetSoundSourceState(ZESoundSourceState State);
 		virtual void				SetCurrentPosition(ZEUInt SampleIndex);
-		virtual ZEUInt		GetCurrentPosition();
+		virtual ZEUInt				GetCurrentPosition();
 
 		virtual void				SetPan(ZEInt NewPan);
 		virtual void				SetPlaybackSpeed(float Speed);

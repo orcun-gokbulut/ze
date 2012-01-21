@@ -37,11 +37,12 @@
 #ifndef __ZE_ACTOR_H__
 #define __ZE_ACTOR_H__
 
-#include "ZEGame\ZECompoundEntity.h"
+
 #include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEFlags.h"
-#include "ZEMath\ZEVector.h"
 #include "ZEDS\ZEString.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEGame\ZECompoundEntity.h"
 
 class ZESteering;
 

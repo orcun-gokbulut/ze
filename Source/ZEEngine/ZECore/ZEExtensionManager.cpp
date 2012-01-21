@@ -33,13 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEExtensionManager.h"
-#include "ZEExtension.h"
+#include "ZETypes.h"
 #include "ZEError.h"
-#include "ZEOptionManager.h"
+#include "ZEExtension.h"
 #include "ZECore/ZECore.h"
+#include "ZEOptionManager.h"
+#include "ZEExtensionManager.h"
 
 #include <string.h>
+
 
 ZEOptionSection ZEExtensionManager::ExtensionManagerOptions;
 

@@ -37,10 +37,13 @@
 #ifndef	__ZE_DS_MODULE_H__
 #define __ZE_DS_MODULE_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZESound/ZESoundSource.h"
+
 #include <dsound.h>
+
 
 class ZEDSSoundSource;
 class ZEDSSoundSource3D;
@@ -58,66 +61,66 @@ class ZEDSModule : public ZESoundModule
 	friend BOOL CALLBACK DSEnumProc(LPGUID GUID, LPCTSTR DeviceName, LPCTSTR DriverName, LPVOID ModulePointer);
 
 	private:
-		ZEArray<ZESoundDevice>				DeviceList;
-		ZEArray<GUID>						DeviceGUIDList;
+		ZEArray<ZESoundDevice>					DeviceList;
+		ZEArray<GUID>							DeviceGUIDList;
 
-		float								UpdateTime;
+		float									UpdateTime;
 
-		LPDIRECTSOUND8						DS;
-		LPDIRECTSOUNDBUFFER					DSPrimary;
-		LPDIRECTSOUND3DLISTENER8			DSListener;
+		LPDIRECTSOUND8							DS;
+		LPDIRECTSOUNDBUFFER						DSPrimary;
+		LPDIRECTSOUND3DLISTENER8				DSListener;
 
-		ZEUInt						MasterVolume;
-		ZEUInt						TypeVolumes[ZE_SS_MAX_TYPE];
+		ZEUInt									MasterVolume;
+		ZEUInt									TypeVolumes[ZE_SS_MAX_TYPE];
 
-		bool								StreamingDisabled;
-		ZESize								MaxBufferSize;
+		bool									StreamingDisabled;
+		ZESize									MaxBufferSize;
 
-		ZEDSListener*						ActiveListener;
-		ZESmartArray<ZEDSListener*>			Listeners;
-		ZESmartArray<ZEDSSoundSource*>		SoundSources;
-		ZESmartArray<ZEDSSoundSource3D*>	SoundSources3D;
+		ZEDSListener*							ActiveListener;
+		ZESmartArray<ZEDSListener*>				Listeners;
+		ZESmartArray<ZEDSSoundSource*>			SoundSources;
+		ZESmartArray<ZEDSSoundSource3D*>		SoundSources3D;
 
-		void								UpdateVolumes(ZESoundSourceType SourceType);
-		void								UpdateStreams();
+		void									UpdateVolumes(ZESoundSourceType SourceType);
+		void									UpdateStreams();
 
-											ZEDSModule();
-		virtual								~ZEDSModule();
+												ZEDSModule();
+		virtual									~ZEDSModule();
 
 	public:
-		LPDIRECTSOUND8						GetDevice();
-		LPDIRECTSOUND3DLISTENER8			GetListener();
-		LPDIRECTSOUNDBUFFER					GetPrimaryBuffer();
+		LPDIRECTSOUND8							GetDevice();
+		LPDIRECTSOUND3DLISTENER8				GetListener();
+		LPDIRECTSOUNDBUFFER						GetPrimaryBuffer();
 		virtual const ZEArray<ZESoundDevice>&	GetDeviceList();
 
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
+		virtual bool							Initialize();
+		virtual void							Deinitialize();
 		
-		virtual void						SetSpeakerLayout(ZESpeakerLayout Layout);
-		virtual ZESpeakerLayout				GetSpeakerLayout();
+		virtual void							SetSpeakerLayout(ZESpeakerLayout Layout);
+		virtual ZESpeakerLayout					GetSpeakerLayout();
 
-		virtual void						SetMasterVolume(ZEUInt Volume);
-		virtual ZEUInt				GetMasterVolume();
+		virtual void							SetMasterVolume(ZEUInt Volume);
+		virtual ZEUInt							GetMasterVolume();
 
-		virtual void						SetTypeVolume(ZESoundSourceType Type, ZEUInt Volume);
-		virtual ZEUInt				GetTypeVolume(ZESoundSourceType Type);
+		virtual void							SetTypeVolume(ZESoundSourceType Type, ZEUInt Volume);
+		virtual ZEUInt							GetTypeVolume(ZESoundSourceType Type);
 
-		virtual void						SetStreamingDisabled(bool Disabled);
-		virtual bool						GetStreamingDisabled();
+		virtual void							SetStreamingDisabled(bool Disabled);
+		virtual bool							GetStreamingDisabled();
 
-		virtual void						SetMaxBufferSize(ZESize BufferSize); 
-		virtual ZESize						GetMaxBufferSize();
+		virtual void							SetMaxBufferSize(ZESize BufferSize); 
+		virtual ZESize							GetMaxBufferSize();
 
-		virtual void						ProcessSound(float ElapsedTime);
+		virtual void							ProcessSound(float ElapsedTime);
 
-		virtual void						PlaySound(ZESoundResource* SoundResource);
+		virtual void							PlaySound(ZESoundResource* SoundResource);
 
-		virtual	void						SetActiveListener(ZEListener* NewListener);
-		virtual ZEListener*					GetActiveListener();
+		virtual	void							SetActiveListener(ZEListener* NewListener);
+		virtual ZEListener*						GetActiveListener();
 
-		virtual ZESoundSource*				CreateSoundSource();
-		virtual ZESoundSource3D*			CreateSoundSource3D();
-		virtual ZEListener*					CreateListener();
+		virtual ZESoundSource*					CreateSoundSource();
+		virtual ZESoundSource3D*				CreateSoundSource3D();
+		virtual ZEListener*						CreateListener();
 };		
 #endif
 

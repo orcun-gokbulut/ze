@@ -37,6 +37,9 @@
 #ifndef __ZE_POST_PROCESSOR_NODE_H__
 #define __ZE_POST_PROCESSOR_NODE_H__
 
+
+#include "ZETypes.h"
+
 class ZETexture2D;
 class ZEPostProcessor;
 

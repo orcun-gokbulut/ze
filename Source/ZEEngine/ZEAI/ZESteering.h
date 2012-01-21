@@ -37,9 +37,12 @@
 #ifndef __ZE_STEERING_H__
 #define __ZE_STEERING_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEFlags.h"
-#include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+
+
 
 typedef ZEFlags ZESteeringElements;
 #define ZE_SE_STATIC		1

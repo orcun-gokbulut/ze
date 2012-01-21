@@ -37,9 +37,11 @@
 #ifndef	__ZE_SOUND_SOURCE_H__
 #define __ZE_SOUND_SOURCE_H__
 
+#include "ZETypes.h"
 #include "ZEGame/ZEComponent.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZESoundResource.h"
+
 
 #define ZE_SS_PAN_LEFT				-100
 #define ZE_SS_PAN_MIDDLE			0
@@ -78,25 +80,25 @@ class ZESoundSource : public ZEComponent
 {
 	ZE_META_ENTITY(ZESoundSource)
 	private:
-		ZEUInt				StartPosition;
-		ZEUInt				EndPosition;
+		ZEUInt						StartPosition;
+		ZEUInt						EndPosition;
 
 	protected:
 		ZESoundResource*			SoundResource;
 		ZESoundSourceState			SoundSourceState;
 		ZESoundSourceType			SoundSourceType;
 
-		ZEInt							Pan;
+		ZEInt						Pan;
 		float						PlaybackSpeed;
-		ZEUInt				Volume;
+		ZEUInt						Volume;
 		bool						Looping;
 		bool						Streaming;
 
-		ZEUInt				CurrentPosition;
-		ZEUInt				LocalOldPosition;
+		ZEUInt						CurrentPosition;
+		ZEUInt						LocalOldPosition;
 
-		ZEUInt				EffectiveStartPosition;
-		ZEUInt				EffectiveEndPosition;
+		ZEUInt						EffectiveStartPosition;
+		ZEUInt						EffectiveEndPosition;
 		bool						LimitsEnabled;
 
 		void						ResetParameters();
@@ -117,8 +119,8 @@ class ZESoundSource : public ZEComponent
 		void						SetCurrentPositionTime(float Seconds);
 		void						SetCurrentPositionPersentage(float Percent);
 
-		ZEUInt				GetCurrentPosition() const;
-		ZEUInt				GetCurrentPositionTime() const;
+		ZEUInt						GetCurrentPosition() const;
+		ZEUInt						GetCurrentPositionTime() const;
 		float						GetCurrentPositionPersentage() const;
 
 		void						SetLimitsEnabled(bool Enabled);
@@ -128,7 +130,7 @@ class ZESoundSource : public ZEComponent
 		void						SetStartPositionTime(float Seconds);
 		void						SetStartPositionPersentage(float Percent);
 
-		ZEUInt				GetStartPosition() const;
+		ZEUInt						GetStartPosition() const;
 		float						GetStartPositionTime() const;
 		float						GetStartPositionPersentage() const;
 
@@ -136,7 +138,7 @@ class ZESoundSource : public ZEComponent
 		void						SetEndPositionTime(float Seconds);
 		void						SetEndPositionPercentage(float Percentage);
 
-		ZEUInt				GetEndPosition() const;
+		ZEUInt						GetEndPosition() const;
 		float						GetEndPositionTime() const;
 		float						GetEndPositionPersentage() const;
 
@@ -148,13 +150,13 @@ class ZESoundSource : public ZEComponent
 		float						GetLoopingLenghtPercent();
 
 		virtual void				SetPan(ZEInt NewPan) = 0;
-		ZEInt							GetPan() const;
+		ZEInt						GetPan() const;
 							
 		virtual void				SetPlaybackSpeed(float Speed);
 		float						GetPlaybackSpeed() const;
 												
 		virtual void				SetVolume(ZEUInt NewVolume) = 0;
-		ZEUInt				GetVolume() const;
+		ZEUInt						GetVolume() const;
 						
 		virtual void				Play() = 0;
 		virtual void				Resume() = 0;

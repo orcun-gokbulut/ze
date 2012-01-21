@@ -33,17 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZECore.h"
+#include "ZETypes.h"
+#include "ZEOption.h"
 #include "ZEConsole.h"
 #include "ZECommandManager.h"
 #include "ZEOptionManager.h"
-#include "ZEOption.h"
-#include "ZECore.h"
+
 #include <ctype.h>
 #include <stdarg.h>
 #include <stdio.h>
 
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
+
 
 #define ZE_CONSOLE_PARSER_MAX_IDENTIFIER_SIZE	50
 #define ZE_CONSOLE_PARSER_MAX_STRING_SIZE		256

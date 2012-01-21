@@ -66,7 +66,7 @@ class ZESkyBrush : public ZEEntity
 		virtual								~ZESkyBrush();
 
 	public:
-		virtual ZEUInt32						GetDrawFlags() const;
+		virtual ZEUInt32					GetDrawFlags() const;
 
 		virtual void						SetSkyTexture(const char* FileName);
 		const char*							GetSkyTexture() const;

@@ -37,8 +37,10 @@
 #ifndef __ZE_SCENE_CULLER_H__
 #define __ZE_SCENE_CULLER_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZESceneDebugDraw.h"
+
 
 class ZEScene;
 class ZEEntity;
@@ -47,16 +49,16 @@ struct ZEDrawParameters;
 
 struct ZECullStatistics
 {
-	ZESize								TotalEntityCount;
-	ZESize								DrawableEntityCount;
-	ZESize								VisibleEntityCount;
-	ZESize								CulledEntityCount;
-	ZESize								DrawedEntityCount;
+	ZESize			TotalEntityCount;
+	ZESize			DrawableEntityCount;
+	ZESize			VisibleEntityCount;
+	ZESize			CulledEntityCount;
+	ZESize			DrawedEntityCount;
 
-	ZESize								TotalLightCount;
-	ZESize								VisibleLightCount;
-	ZESize								CulledLightCount;
-	ZESize								DrawedLightCount;
+	ZESize			TotalLightCount;
+	ZESize			VisibleLightCount;
+	ZESize			CulledLightCount;
+	ZESize			DrawedLightCount;
 };
 
 #define ZE_VDE_NONE									0

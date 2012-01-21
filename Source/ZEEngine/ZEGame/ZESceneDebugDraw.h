@@ -49,27 +49,27 @@ class ZERenderer;
 class ZESceneDebugDraw
 {
 	private:
-		ZEMaterial*					Material;
-		ZECanvas					VertexBuffer;
-		ZERenderCommand				RenderCommand;
+		ZEMaterial*				Material;
+		ZECanvas				VertexBuffer;
+		ZERenderCommand			RenderCommand;
 
-		bool						Initialized;
+		bool					Initialized;
 
 	public:
-		bool						Initialize();
-		void						Deinitialize();
-		void						Destroy();
+		bool					Initialize();
+		void					Deinitialize();
+		void					Destroy();
 
-		void						DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, const ZEVector4& Color);
-		void						DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, ZERenderer* Renderer, const ZEVector4& Color);
-		void						DrawBoundingSphere(const ZEBSphere& BoundingSphere, ZERenderer* Renderer, const ZEVector4& Color);
+		void					DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, const ZEVector4& Color);
+		void					DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, ZERenderer* Renderer, const ZEVector4& Color);
+		void					DrawBoundingSphere(const ZEBSphere& BoundingSphere, ZERenderer* Renderer, const ZEVector4& Color);
 
-		void						Clean();
+		void					Clean();
 
-		void						Draw(ZERenderer* Renderer);
+		void					Draw(ZERenderer* Renderer);
 
-									ZESceneDebugDraw();
-									~ZESceneDebugDraw();
+								ZESceneDebugDraw();
+								~ZESceneDebugDraw();
 
 };
 #endif

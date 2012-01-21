@@ -38,7 +38,9 @@
 #define __ZE_CORE_H__
 
 #include "ZEAPI.h"
+#include "ZETypes.h"
 #include "ZEOption.h"
+
 
 #define zeCore ZECore::GetInstance()
 
