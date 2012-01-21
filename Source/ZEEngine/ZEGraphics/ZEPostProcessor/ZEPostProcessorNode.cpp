@@ -58,7 +58,7 @@ ZEPostProcessor*  ZEPostProcessorNode::GetOwner()
 	return Owner;
 }
 
-size_t ZEPostProcessorNode::GetDependencyCount()
+ZESize ZEPostProcessorNode::GetDependencyCount()
 {
 	return 0;
 }

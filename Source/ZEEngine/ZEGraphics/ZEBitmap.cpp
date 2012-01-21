@@ -72,7 +72,7 @@ ZEPixelColor::ZEPixelColor()
 	a = 0xFF;
 }
 
-ZEPixelColor::ZEPixelColor(unsigned int Color)
+ZEPixelColor::ZEPixelColor(ZEUInt Color)
 {
 	this->a = (Color & 0xFF000000) >> 24;
 	this->r = (Color & 0x00FF0000) >> 16;
@@ -88,7 +88,7 @@ ZEPixelColor::ZEPixelColor(unsigned char a, unsigned char r, unsigned char g, un
 	this->b = b;
 }
 
-bool ZEBitmap::Create(unsigned int Width, unsigned int Height, unsigned int PixelSize)
+bool ZEBitmap::Create(ZEUInt Width, ZEUInt Height, ZEUInt PixelSize)
 {
 	if (Pixels != NULL && this->Width == Width && this->Height == Height && this->PixelSize == PixelSize)
 		return true;
@@ -108,32 +108,32 @@ bool ZEBitmap::Create(unsigned int Width, unsigned int Height, unsigned int Pixe
 	return true;
 }
 
-unsigned int ZEBitmap::GetWidth()
+ZEUInt ZEBitmap::GetWidth()
 {
 	return Width;
 }
 
-unsigned int ZEBitmap::GetHeight()
+ZEUInt ZEBitmap::GetHeight()
 {
 	return Height;
 }
 
-unsigned int ZEBitmap::GetPitch()
+ZEUInt ZEBitmap::GetPitch()
 {
 	return Pitch;
 }
 
-unsigned int ZEBitmap::GetPixelSize()
+ZEUInt ZEBitmap::GetPixelSize()
 {
 	return PixelSize;
 }
 
-unsigned int ZEBitmap::GetBPP()
+ZEUInt ZEBitmap::GetBPP()
 {
 	return PixelSize * 8;
 }
 
-unsigned int ZEBitmap::GetSize()
+ZEUInt ZEBitmap::GetSize()
 {
 	return Height * Width * PixelSize; 
 }
@@ -143,12 +143,12 @@ ZEPixelColor* ZEBitmap::GetPixels()
 	return (ZEPixelColor*)Pixels;
 }
 
-ZEPixelColor& ZEBitmap::GetPixel(unsigned int x, unsigned int y)
+ZEPixelColor& ZEBitmap::GetPixel(ZEUInt x, ZEUInt y)
 {
 	return *(ZEPixelColor*)((ZEUInt8*)Pixels + y * Pitch + x * 4);
 }
 
-ZEVector4 ZEBitmap::GetPixelFloat(unsigned int x, unsigned int y)
+ZEVector4 ZEBitmap::GetPixelFloat(ZEUInt x, ZEUInt y)
 {
 	ZEPixelColor& Color = GetPixel(x, y);
 	ZEVector4 FloatColor;
@@ -161,12 +161,12 @@ ZEVector4 ZEBitmap::GetPixelFloat(unsigned int x, unsigned int y)
 	return FloatColor;
 }
 
-ZEPixelColor* ZEBitmap::GetRow(unsigned int Index)
+ZEPixelColor* ZEBitmap::GetRow(ZEUInt Index)
 {
 	return (ZEPixelColor*)((ZEUInt8*)Pixels + Index * Pitch);
 }
 
-ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserOptions)
+ZEPixelColor& ZEBitmap::SamplePixel(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* UserOptions)
 {
 	static ZEBitmapSamplingOptions DefaultOptions = {ZE_BFM_BILINEAR, ZE_BAM_WRAP, ZE_BAM_WRAP, ZEPixelColor(0, 0, 0 ,0)};
 
@@ -186,7 +186,7 @@ ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserO
 
 		case ZE_BAM_CLAMP:
 		{
-			if (x >= (int)Width)
+			if (x >= (ZEInt)Width)
 				x = Width -1;
 			else if (x < 0)
 				x = 0;
@@ -198,14 +198,14 @@ ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserO
 			bool Odd = ((x / Width) % 2) == 1;
 			if (Odd)
 			{
-				if (x >= (int)Width)
+				if (x >= (ZEInt)Width)
 					x = Width - 1;
 				else if (x < 0)
 					x = 0;
 			}
 			else
 			{
-				if (x >= (int)Width)
+				if (x >= (ZEInt)Width)
 					x = Width - x - 1;
 				else if (x < 0)
 					x = Width - 1;
@@ -215,7 +215,7 @@ ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserO
 
 		case ZE_BAM_BORDER:
 		{
-			if (x >= (int)Width)
+			if (x >= (ZEInt)Width)
 				return Options->BorderColor;
 			else if (x < 0)
 				return Options->BorderColor;
@@ -232,7 +232,7 @@ ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserO
 
 		case ZE_BAM_CLAMP:
 		{
-			if (y >= (int)Height)
+			if (y >= (ZEInt)Height)
 				y = Height - 1;
 			else if (y < 0)
 				y = 0;
@@ -244,14 +244,14 @@ ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserO
 			bool Odd = ((y / Height) % 2) == 1;
 			if (Odd)
 			{
-				if (y >= (int)Height)
+				if (y >= (ZEInt)Height)
 					y = Height - 1;
 				else if (y < 0)
 					y = 0;
 			}
 			else
 			{
-				if (y >= (int)Height)
+				if (y >= (ZEInt)Height)
 					y = Height - y - 1;
 				else if (y < 0)	
 					y = Height - 1;
@@ -261,7 +261,7 @@ ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserO
 
 		case ZE_BAM_BORDER:
 		{
-			if (y >= (int)Height)
+			if (y >= (ZEInt)Height)
 				return Options->BorderColor;
 			else if (y < 0)
 				return Options->BorderColor;
@@ -272,7 +272,7 @@ ZEPixelColor& ZEBitmap::SamplePixel(int x, int y, ZEBitmapSamplingOptions* UserO
 	return GetPixel(x, y);
 }
 
-ZEVector4 ZEBitmap::SamplePixelFloat(int x, int y, ZEBitmapSamplingOptions* UserOptions)
+ZEVector4 ZEBitmap::SamplePixelFloat(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* UserOptions)
 {
 	ZEPixelColor Color = SamplePixel(x, y, UserOptions);
 	ZEVector4 FloatColor;
@@ -297,13 +297,13 @@ ZEVector4 ZEBitmap::SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitma
 
 	if (Options->Filter == ZE_BFM_POINT)
 	{
-		return SamplePixelFloat((int)floorf(TextureCoordinate.x), (int)floorf(TextureCoordinate.y), Options);
+		return SamplePixelFloat((ZEInt)floorf(TextureCoordinate.x), (ZEInt)floorf(TextureCoordinate.y), Options);
 	}
 
 	if (Options->Filter == ZE_BFM_BILINEAR)
 	{
-		int x = (int)floorf(TextureCoordinate.x);
-		int y = (int)floorf(TextureCoordinate.y);
+		ZEInt x = (ZEInt)floorf(TextureCoordinate.x);
+		ZEInt y = (ZEInt)floorf(TextureCoordinate.y);
 
 		float RatioU = TextureCoordinate.x - (float)x;
 		float RatioV = TextureCoordinate.y - (float)y;
@@ -325,10 +325,10 @@ ZEVector4 ZEBitmap::SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitma
 	return ZEVector4::Zero;
 }
 
-void ZEBitmap::CopyFrom(void* SourceBuffer, unsigned int SourcePitch, 
-						unsigned int Width, unsigned int Height, 
-						unsigned int SourceOffsetX, unsigned int SourceOffsetY,
-						unsigned int DestinationOffsetX, unsigned int DestinationOffsetY)
+void ZEBitmap::CopyFrom(void* SourceBuffer, ZEUInt SourcePitch, 
+						ZEUInt Width, ZEUInt Height, 
+						ZEUInt SourceOffsetX, ZEUInt SourceOffsetY,
+						ZEUInt DestinationOffsetX, ZEUInt DestinationOffsetY)
 
 {
 	if (Height == 0)
@@ -337,16 +337,16 @@ void ZEBitmap::CopyFrom(void* SourceBuffer, unsigned int SourcePitch,
 	if (Width == 0)
 		Width = this->Width;
 
-	for (size_t I = 0; I < Height; I++)
+	for (ZESize I = 0; I < Height; I++)
 		memcpy((ZEUInt8*)Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
 			(ZEUInt8*)SourceBuffer + (SourceOffsetY + I) * SourcePitch + SourceOffsetX * PixelSize, 
 			Width * PixelSize);
 }
 
-void ZEBitmap::CopyTo(void* DestinationBuffer, unsigned int DestinationPitch, 
-					  unsigned int Width, unsigned int Height, 
-					  unsigned int DestinationOffsetX, unsigned int DestinationOffsetY,
-					  unsigned int SourceOffsetX, unsigned int SourceOffsetY)
+void ZEBitmap::CopyTo(void* DestinationBuffer, ZEUInt DestinationPitch, 
+					  ZEUInt Width, ZEUInt Height, 
+					  ZEUInt DestinationOffsetX, ZEUInt DestinationOffsetY,
+					  ZEUInt SourceOffsetX, ZEUInt SourceOffsetY)
 {
 	if (Height == 0)
 		Height = this->Height;
@@ -354,13 +354,13 @@ void ZEBitmap::CopyTo(void* DestinationBuffer, unsigned int DestinationPitch,
 	if (Width == 0)
 		Width = this->Width;
 
-	for (size_t I = 0; I < Height; I++)
+	for (ZESize I = 0; I < Height; I++)
 		memcpy((ZEUInt8*)DestinationBuffer + (DestinationOffsetY + I) * DestinationPitch + DestinationOffsetX * PixelSize, 
 			(ZEUInt8*)Pixels + (SourceOffsetY + I) * Pitch + SourceOffsetX * PixelSize, 
 			Width * PixelSize);
 }
 
-void ZEBitmap::Fill(unsigned int Color)
+void ZEBitmap::Fill(ZEUInt Color)
 {
 	memset(Pixels, Color, Height * Pitch);
 }

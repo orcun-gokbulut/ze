@@ -46,15 +46,15 @@ class ZEInputMap
 {
 	public:
 		ZEInputAction				InputActions[50];
-		size_t						InputActionCount;
+		ZESize						InputActionCount;
 
 	public:
 		ZEArray<ZEInputBinding>		InputBindings;
 
-		size_t						GetInputActionCount();
+		ZESize						GetInputActionCount();
 		const ZEInputAction*		GetInputActions();
 
-		const ZEInputAction*		CheckInputAction(int Id);
+		const ZEInputAction*		CheckInputAction(ZEInt Id);
 
 		void						Update();
 

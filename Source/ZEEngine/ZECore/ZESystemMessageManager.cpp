@@ -81,7 +81,7 @@ void ZESystemMessageManager::ProcessMessages()
 
 		bool Handled = false;
 
-		for(size_t I = 0; I < Handlers.GetCount(); I++)
+		for(ZESize I = 0; I < Handlers.GetCount(); I++)
 			if (Msg.message >= Handlers[I]->MinMessage && Msg.message <= Handlers[I]->MaxMessage &&
 				(Handlers[I]->TargetWindow == NULL || Handlers[I]->TargetWindow == Msg.hwnd))
 			{

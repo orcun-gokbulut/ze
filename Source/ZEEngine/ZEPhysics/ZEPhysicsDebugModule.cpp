@@ -120,9 +120,9 @@ bool ZEPhysicsDebugModule::Initialize()
 	TestBody->SetPosition(ZEVector3(0,60,0));
 	Scene->AddEntity(TestBody);
 
-	/*int StartPos = -40.0f;
+	/*ZEInt StartPos = -40.0f;
 
-	for (int I = 0; I < 10; I++)
+	for (ZEInt I = 0; I < 10; I++)
 	{
 		TestBody = ZEModel::CreateInstance();
 		TestBody->SetModelFile("Orkun.zemodel");

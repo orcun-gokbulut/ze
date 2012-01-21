@@ -52,7 +52,7 @@ class ZEDSoundExtensionsPlugIn : public ZEDPlugIn
 		virtual const char*					GetName();
 		virtual const char*					GetVersion();
 		virtual const char*					GetAuthor();
-		virtual unsigned int				GetExtensionCount();
+		virtual ZEUInt				GetExtensionCount();
 		virtual ZEDExtensionDescription**	GetExtensionDescriptions();
 
 											ZEDSoundExtensionsPlugIn();

@@ -55,7 +55,7 @@ struct ZEPortalMapPolygon
 {
 	ZEMapVertex		Vertices[3];
 	ZEMaterial*		Material;
-	unsigned int	LastIteration;
+	ZEUInt	LastIteration;
 };
 
 struct ZEPortalMapPhysicalMeshPolygon
@@ -74,7 +74,7 @@ struct ZEPortalMapResourcePortal
 	char										Name[ZE_MAX_NAME_SIZE];
 	ZEAABBox								BoundingBox;
 	ZEArray<ZEPortalMapResourceDoor*>			Doors;
-	ZEArray<size_t>								DoorIds;
+	ZEArray<ZESize>								DoorIds;
 	ZEArray<ZEPortalMapPolygon>					Polygons;
 	ZEPortalMapResourcePhysicalMesh				PhysicalMesh;
 	bool										HasOctree;
@@ -87,7 +87,7 @@ struct ZEPortalMapResourceDoor
 	char										Name[ZE_MAX_NAME_SIZE];
 	ZERectangle3D								Rectangle;
 	ZEPortalMapResourcePortal*					Portals[2];
-	size_t										PortalIds[2];
+	ZESize										PortalIds[2];
 	bool										IsOpen;
 };
 

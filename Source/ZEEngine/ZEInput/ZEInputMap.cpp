@@ -36,7 +36,7 @@
 #include "ZEInputMap.h"
 #include "ZEInputModule.h"
 
-size_t ZEInputMap::GetInputActionCount()
+ZESize ZEInputMap::GetInputActionCount()
 {
 	return InputActionCount;
 }
@@ -46,9 +46,9 @@ const ZEInputAction* ZEInputMap::GetInputActions()
 	return InputActions;
 }
 
-const ZEInputAction* ZEInputMap::CheckInputAction(int Id)
+const ZEInputAction* ZEInputMap::CheckInputAction(ZEInt Id)
 {
-	for (size_t I = 0; I < InputActionCount; I++)
+	for (ZESize I = 0; I < InputActionCount; I++)
 		if (InputActions[I].Id == Id)
 			return &InputActions[I];
 	

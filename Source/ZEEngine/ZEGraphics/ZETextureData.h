@@ -55,19 +55,19 @@ class ZETextureData
 		{
 			ZETexturePixelFormat	PixelFormat;
 			
-			unsigned int			Width;
-			unsigned int			Height;
+			ZEUInt			Width;
+			ZEUInt			Height;
 
-			unsigned int 			Depth;
-			unsigned int 			MipmapCount;
+			ZEUInt 			Depth;
+			ZEUInt 			MipmapCount;
 			
 			struct SurfaceData
 			{
 				struct MipmapData
 				{
 					void*			Data;
-					unsigned int 	RowCount;
-					unsigned int 	RowSize;
+					ZEUInt 	RowCount;
+					ZEUInt 	RowSize;
 
 				}*Mipmaps;
 
@@ -75,48 +75,48 @@ class ZETextureData
 
 		}Texture;
 		
-		bool						CheckBoundaries(unsigned int Depth);
-		bool						CheckBoundaries(unsigned int Depth, unsigned int MipLevel);
+		bool						CheckBoundaries(ZEUInt Depth);
+		bool						CheckBoundaries(ZEUInt Depth, ZEUInt MipLevel);
 
 	public:
 									ZETextureData();
 		virtual						~ZETextureData();
 		
-		void						CreateTexture(ZETexturePixelFormat PixelFormat, unsigned int Depth, unsigned int MipmapCount, unsigned int Width, unsigned int Height);
+		void						CreateTexture(ZETexturePixelFormat PixelFormat, ZEUInt Depth, ZEUInt MipmapCount, ZEUInt Width, ZEUInt Height);
 		void						DestroyTexture();
 
-		void						AddSurface(unsigned int Count = 1);
-		void						RemoveSurface(unsigned int Count);
-		void						AddMipmap(unsigned int Count = 1);
-		void						RemoveMipmap(unsigned int Count);
+		void						AddSurface(ZEUInt Count = 1);
+		void						RemoveSurface(ZEUInt Count);
+		void						AddMipmap(ZEUInt Count = 1);
+		void						RemoveMipmap(ZEUInt Count);
 
-		void						AllocateMipmap(unsigned int Depth, unsigned int MipLevel, unsigned int RowSize, unsigned int RowCount);
-		void						FreeMipmap(unsigned int Depth, unsigned int MipLevel);
+		void						AllocateMipmap(ZEUInt Depth, ZEUInt MipLevel, ZEUInt RowSize, ZEUInt RowCount);
+		void						FreeMipmap(ZEUInt Depth, ZEUInt MipLevel);
 
-		void						CopyMipmapDataFrom(unsigned int Depth, unsigned int MipLevel, void* SourceData, unsigned int SourcePitch);
-		void						CopyMipmapDataTo(unsigned int Depth, unsigned int MipLevel, void* Dest, unsigned int DestPitch);
+		void						CopyMipmapDataFrom(ZEUInt Depth, ZEUInt MipLevel, void* SourceData, ZEUInt SourcePitch);
+		void						CopyMipmapDataTo(ZEUInt Depth, ZEUInt MipLevel, void* Dest, ZEUInt DestPitch);
 
 		bool						IsEmpty();
 
-		void						SetDepth(unsigned int Value);
-		unsigned int				GetDepth();
-		void						SetWidth(unsigned int Value);
-		unsigned int				GetWidth();
-		void						SetHeight(unsigned int Value);
-		unsigned int				GetHeight();
-		void						SetMipmapCount(unsigned int Value);
-		unsigned int				GetMipmapCount();
+		void						SetDepth(ZEUInt Value);
+		ZEUInt				GetDepth();
+		void						SetWidth(ZEUInt Value);
+		ZEUInt				GetWidth();
+		void						SetHeight(ZEUInt Value);
+		ZEUInt				GetHeight();
+		void						SetMipmapCount(ZEUInt Value);
+		ZEUInt				GetMipmapCount();
 		void						SetPixelFormat(ZETexturePixelFormat PixelFormat);
 		ZETexturePixelFormat		GetPixelFormat();
 		
-		unsigned int				GetMipmapRowCount(unsigned int Depth, unsigned int MipLevel);
-		unsigned int				GetMipmapRowSize(unsigned int Depth, unsigned int MipLevel);
+		ZEUInt				GetMipmapRowCount(ZEUInt Depth, ZEUInt MipLevel);
+		ZEUInt				GetMipmapRowSize(ZEUInt Depth, ZEUInt MipLevel);
 
-		void*						GetMipmapData(unsigned int Depth, unsigned int MipLevel);
-		unsigned int				GetMipmapDataSize(unsigned int Depth, unsigned int MipLevel);
-		unsigned int				GetSurfaceSize(unsigned int Depth);
-		unsigned int				GetTextureSize();
-		unsigned int				GetSizeOnDisk();
+		void*						GetMipmapData(ZEUInt Depth, ZEUInt MipLevel);
+		ZEUInt				GetMipmapDataSize(ZEUInt Depth, ZEUInt MipLevel);
+		ZEUInt				GetSurfaceSize(ZEUInt Depth);
+		ZEUInt				GetTextureSize();
+		ZEUInt				GetSizeOnDisk();
 
 		
 

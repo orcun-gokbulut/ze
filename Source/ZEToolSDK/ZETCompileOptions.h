@@ -37,7 +37,7 @@
 #ifndef __ZET_COMPILE_OPTIONS_H__
 #define __ZET_COMPILE_OPTIONS_H__
 
-#define ZEMAKEVERSION(Major, Minor, Build) ((unsigned int)(Major) << 24 | (unsigned int)(Minor)<<16 | (Build))
+#define ZEMAKEVERSION(Major, Minor, Build) ((ZEUInt)(Major) << 24 | (ZEUInt)(Minor)<<16 | (Build))
 #define ZESDKVERSION ZEMAKEVERSION(0, 1, 005)
 
 #endif

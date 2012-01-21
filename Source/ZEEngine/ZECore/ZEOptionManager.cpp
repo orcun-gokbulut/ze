@@ -101,7 +101,7 @@ bool ZEOptionManager::SaveCommand(ZECommand* Command, const ZECommandParameterLi
 
 bool ZEOptionManager::ListSectionsCommand(ZECommand* Command, const ZECommandParameterList* Params)
 {
-	size_t Index, Count;
+	ZESize Index, Count;
 
 	if (Params->GetCount() == 0)
 	{
@@ -130,7 +130,7 @@ bool ZEOptionManager::ListSectionsCommand(ZECommand* Command, const ZECommandPar
 		"----------------------------------------------------------------\r\n");
 
 	ZEOptionSection* CurrSection;
-	for (size_t I = Index; I < Sections.GetCount() && I <= Count; I++)
+	for (ZESize I = Index; I < Sections.GetCount() && I <= Count; I++)
 	{
 		CurrSection = Sections.GetItem(I);
 		zeOutput(" %-30s   %11s   %Iu\r\n", CurrSection->GetName().ToCString(), 
@@ -142,7 +142,7 @@ bool ZEOptionManager::ListSectionsCommand(ZECommand* Command, const ZECommandPar
 
 bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandParameterList* Params)
 {
-	size_t Index, Count;
+	ZESize Index, Count;
 	ZEOptionSection* Sec;
 
 	if (Params->GetCount() == 1 &&
@@ -178,7 +178,7 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 			"---------------------------------------------------------------------------\r\n");
 		
 		ZEOption* Opt;
-		for (size_t I = 0; I < Sec->GetNumberOfOptions() && I <= Count; I++)
+		for (ZESize I = 0; I < Sec->GetNumberOfOptions() && I <= Count; I++)
 		{
 			Opt = Sec->GetOption(I);	
 			zeOutput(" %-30s  ", Sec->GetOption(I)->GetName().ToCString());
@@ -281,13 +281,13 @@ bool ZEOptionManager::UnregisterSection(ZEOptionSection* Ref)
 
 ZEOptionSection* ZEOptionManager::GetSection(const ZEString& Name)
 {
-	for(size_t I = 0; I < Sections.GetCount(); I++)
+	for(ZESize I = 0; I < Sections.GetCount(); I++)
 		if (Sections[I]->GetName() == Name)
 			return Sections[I];
 	return NULL;
 }
 
-ZEOptionSection* ZEOptionManager::GetSection(size_t Index)
+ZEOptionSection* ZEOptionManager::GetSection(ZESize Index)
 {
 	if (Index < Sections.GetCount())
 			return Sections[Index];
@@ -295,7 +295,7 @@ ZEOptionSection* ZEOptionManager::GetSection(size_t Index)
 		return NULL;
 }
 
-size_t ZEOptionManager::GetNumberOfSections()
+ZESize ZEOptionManager::GetNumberOfSections()
 {
 	return Sections.GetCount();
 }
@@ -305,7 +305,7 @@ void ZEOptionManager::Save(const ZEString& FileName)
 	FILE* File = fopen(FileName, "w");
 	ZEOptionSection*	CurrentSet;
 	ZEOption*		Current;
-	size_t I, N;
+	ZESize I, N;
 	if (File)
 	{
 		for (I = 0; I < Sections.GetCount(); I++)
@@ -502,7 +502,7 @@ void ZEOptionManager::Load(const ZEString& FileName)
 void ZEOptionManager::CommitChanges()
 {
 	ZEOptionSection* CurrSection;
-	for (size_t I = 0; I < Sections.GetCount(); I++)
+	for (ZESize I = 0; I < Sections.GetCount(); I++)
 	{
 		CurrSection = Sections[I];
 		if (CurrSection->HasChanges())
@@ -513,7 +513,7 @@ void ZEOptionManager::CommitChanges()
 void ZEOptionManager::ResetChanges()
 {
 	ZEOptionSection* CurrSection;
-	for (size_t I = 0; I < Sections.GetCount(); I++)
+	for (ZESize I = 0; I < Sections.GetCount(); I++)
 	{
 		CurrSection = Sections[I];
 		if (CurrSection->HasChanges())

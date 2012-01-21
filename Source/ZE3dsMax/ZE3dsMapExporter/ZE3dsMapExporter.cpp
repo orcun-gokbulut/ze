@@ -48,12 +48,12 @@ ZE3dsMapExporter::~ZE3dsMapExporter()
 
 }
 
-int ZE3dsMapExporter::ExtCount()
+ZEInt ZE3dsMapExporter::ExtCount()
 {
 	return 1;
 }
 
-const TCHAR *ZE3dsMapExporter::Ext(int n)
+const TCHAR *ZE3dsMapExporter::Ext(ZEInt n)
 {		
 	return "zeMap";
 }
@@ -88,7 +88,7 @@ const TCHAR *ZE3dsMapExporter::OtherMessage2()
 	return "";
 }
 
-unsigned int ZE3dsMapExporter::Version()
+ZEUInt ZE3dsMapExporter::Version()
 {				
 	return 100;
 }
@@ -98,14 +98,14 @@ void ZE3dsMapExporter::ShowAbout(HWND hWnd)
 
 }
 
-BOOL ZE3dsMapExporter::SupportsOptions(int ext, DWORD options)
+BOOL ZE3dsMapExporter::SupportsOptions(ZEInt ext, DWORD options)
 {
 	return TRUE;
 }
 
-int ZE3dsMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
+ZEInt ZE3dsMapExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
 {
-	int i;
+	ZEInt i;
 	if (i_currentNode == NULL)
 	{
 		i_currentNode = GetCOREInterface()->GetRootNode();
@@ -127,7 +127,7 @@ void ZEToolSDKOutputCallback(const char* Output)
 	PD->Output((char*)Output);
 }
 
-int	ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
+ZEInt	ZE3dsMapExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
 	INodeTab lNodes;
 	GetSceneNodes(lNodes);

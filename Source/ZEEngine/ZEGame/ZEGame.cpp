@@ -116,8 +116,8 @@ void ZEGame::Render(float ElapsedTime)
 void ZEGame::Tick(float ElapsedTime)
 {
 	static float TotalElapsedTime = 0;
-	static unsigned int AverageFPS = 0;
-	static unsigned int FrameCount = 0;
+	static ZEUInt AverageFPS = 0;
+	static ZEUInt FrameCount = 0;
 
 	FrameCount++;
 	TotalElapsedTime += ElapsedTime;

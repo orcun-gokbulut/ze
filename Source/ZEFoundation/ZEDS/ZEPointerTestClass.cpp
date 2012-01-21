@@ -35,9 +35,9 @@
 
 #include "ZEPointerTestClass.h"
 
-int ZETestClass::Status;
-int ZETestClass::InstanceCount;
-int ZETestClass::DestroyedInstanceCount;
+ZEInt ZETestClass::Status;
+ZEInt ZETestClass::InstanceCount;
+ZEInt ZETestClass::DestroyedInstanceCount;
 
 void ZETestClass::Reset()
 {

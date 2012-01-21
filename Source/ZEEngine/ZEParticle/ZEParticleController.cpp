@@ -94,7 +94,7 @@ void ZEParticleController::AddKeyFrame(float Time, float Value)
 
 void ZEParticleController::RemoveKeyFrame(float Time)
 {
-	for(unsigned int I = 0; I < Nodes.GetCount(); I++)
+	for(ZEUInt I = 0; I < Nodes.GetCount(); I++)
 	{
 		if(Nodes[I].GetTime() == Time)
 			Nodes.DeleteAt(I);
@@ -103,7 +103,7 @@ void ZEParticleController::RemoveKeyFrame(float Time)
 
 void ZEParticleController::SetKeyFrame(float Time, float Value)
 {
-	for(unsigned int I = 0; I < Nodes.GetCount(); I++)
+	for(ZEUInt I = 0; I < Nodes.GetCount(); I++)
 	{
 		if(Nodes[I].GetTime() == Time)
 			Nodes[I].SetValue(Value);
@@ -112,7 +112,7 @@ void ZEParticleController::SetKeyFrame(float Time, float Value)
 
 float ZEParticleController::GetKeyframe(float Time)
 {
-	for(unsigned int I = 0; I < Nodes.GetCount(); I++)
+	for(ZEUInt I = 0; I < Nodes.GetCount(); I++)
 	{
 		if(Nodes[I].GetTime() == Time)
 			return Nodes[I].GetValue();

@@ -160,7 +160,7 @@ void ZEDSSoundSource3D::ResetStream()
 	DSBuffer->SetCurrentPosition(0);
  }
 
-void ZEDSSoundSource3D::StreamDecodeAndFill(size_t BufferPosition, size_t Position, size_t SampleCount)
+void ZEDSSoundSource3D::StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount)
 {
 	void* Buffer;
 	DWORD LockedBufferSize;
@@ -173,7 +173,7 @@ void ZEDSSoundSource3D::StreamDecodeAndFill(size_t BufferPosition, size_t Positi
 			SampleCount = EffectiveEndPosition - Position;
 			SoundResource->Decode(Buffer, Position, SampleCount);
 
-			size_t RemainingSampleCount = BufferSampleCount / 2 - SampleCount;
+			ZESize RemainingSampleCount = BufferSampleCount / 2 - SampleCount;
 			void* RemainingSampleBuffer = ((unsigned char*)Buffer) + SampleCount * SoundResource->GetBlockAlign();
 
 			if (Looping)
@@ -187,7 +187,7 @@ void ZEDSSoundSource3D::StreamDecodeAndFill(size_t BufferPosition, size_t Positi
 
 void ZEDSSoundSource3D::Stream()
 {
-	size_t BufferSampleCount_2 = BufferSampleCount / 2;
+	ZESize BufferSampleCount_2 = BufferSampleCount / 2;
 
 	DWORD BufferPosition;	
 	DSBuffer->GetCurrentPosition(&BufferPosition, NULL);
@@ -256,7 +256,7 @@ void ZEDSSoundSource3D::SetSoundSourceState(ZESoundSourceState State)
 		}
 }
 
-void ZEDSSoundSource3D::SetCurrentPosition(unsigned int SampleIndex)
+void ZEDSSoundSource3D::SetCurrentPosition(ZEUInt SampleIndex)
 {
 	if (SoundResource != NULL)
 	{
@@ -270,7 +270,7 @@ void ZEDSSoundSource3D::SetCurrentPosition(unsigned int SampleIndex)
 	}
 }
 
-unsigned int ZEDSSoundSource3D::GetCurrentPosition()
+ZEUInt ZEDSSoundSource3D::GetCurrentPosition()
 {
 	if (Streaming)
 		return CurrentPosition;
@@ -286,7 +286,7 @@ unsigned int ZEDSSoundSource3D::GetCurrentPosition()
 			return 0;
 }
 
-void ZEDSSoundSource3D::SetStartPosition(unsigned int SampleIndex)
+void ZEDSSoundSource3D::SetStartPosition(ZEUInt SampleIndex)
 {
 	if (SoundResource != NULL)
 		if (SampleIndex > SoundResource->GetSampleCount())
@@ -298,7 +298,7 @@ void ZEDSSoundSource3D::SetStartPosition(unsigned int SampleIndex)
 	EffectiveStartPosition = SampleIndex;
 }
 
-void ZEDSSoundSource3D::SetEndPosition(unsigned int SampleIndex)
+void ZEDSSoundSource3D::SetEndPosition(ZEUInt SampleIndex)
 {
 	if (SoundResource != NULL)
 		if (SampleIndex > SoundResource->GetSampleCount())
@@ -310,7 +310,7 @@ void ZEDSSoundSource3D::SetEndPosition(unsigned int SampleIndex)
 	EffectiveEndPosition = SampleIndex;
 }
 
-void ZEDSSoundSource3D::SetPan(int NewPan)
+void ZEDSSoundSource3D::SetPan(ZEInt NewPan)
 {
 	if (NewPan> ZE_SS_PAN_RIGHT)
 		Pan = ZE_SS_PAN_RIGHT;
@@ -331,7 +331,7 @@ void ZEDSSoundSource3D::SetPlaybackSpeed(float Speed)
 		DSBuffer->SetFrequency((DWORD)(Speed * SoundResource->GetSamplesPerSecond()));
 }
 
-void ZEDSSoundSource3D::SetVolume(unsigned int NewVolume)
+void ZEDSSoundSource3D::SetVolume(ZEUInt NewVolume)
 {
 	if (Volume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;
@@ -544,7 +544,7 @@ void ZEDSSoundSource3D::SetMaxDistance(float NewMaxDistance)
 		DS3DBuffer->SetMaxDistance(MinDistance, DS3D_DEFERRED);
 }
 
-void ZEDSSoundSource3D::SetConeInsideAngle(unsigned int NewInsideAngle)
+void ZEDSSoundSource3D::SetConeInsideAngle(ZEUInt NewInsideAngle)
 {
 	if (NewInsideAngle > 360)
 		ConeInsideAngle = 360;
@@ -555,7 +555,7 @@ void ZEDSSoundSource3D::SetConeInsideAngle(unsigned int NewInsideAngle)
 		DS3DBuffer->SetConeAngles(ConeInsideAngle, ConeOutsideAngle, DS3D_DEFERRED);
 }
 
-void ZEDSSoundSource3D::SetConeOutsideAngle(unsigned int NewOutsideAngle)			
+void ZEDSSoundSource3D::SetConeOutsideAngle(ZEUInt NewOutsideAngle)			
 {
 	if (NewOutsideAngle > 360)
 		ConeOutsideAngle = 360;
@@ -566,7 +566,7 @@ void ZEDSSoundSource3D::SetConeOutsideAngle(unsigned int NewOutsideAngle)
 		DS3DBuffer->SetConeAngles(ConeInsideAngle, ConeOutsideAngle, DS3D_DEFERRED);
 }
 
-void ZEDSSoundSource3D::SetConeOutsideVolume(unsigned int NewOutsideVolume)
+void ZEDSSoundSource3D::SetConeOutsideVolume(ZEUInt NewOutsideVolume)
 {
 	if (NewOutsideVolume > ZE_SS_VOLUME_MAX)
 		ConeOutsideVolume = ZE_SS_VOLUME_MAX;

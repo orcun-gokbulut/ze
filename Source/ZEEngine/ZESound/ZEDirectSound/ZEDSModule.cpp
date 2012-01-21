@@ -81,11 +81,11 @@ static BOOL CALLBACK DSEnumProc(LPGUID GUID, LPCTSTR DeviceName, LPCTSTR DriverN
 
 void ZEDSModule::UpdateVolumes(ZESoundSourceType SourceType)
 {
-	for (size_t I = 0; I < SoundSources.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources.GetCount(); I++)
 		if (SoundSources[I]->GetSoundSourceType() == SourceType)
 			SoundSources[I]->SetVolume(SoundSources[I]->GetVolume());
 
-	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources3D.GetCount(); I++)
 		if (SoundSources3D[I]->GetSoundSourceType() == SourceType)
 			SoundSources3D[I]->SetVolume(SoundSources[I]->GetVolume());
 
@@ -93,10 +93,10 @@ void ZEDSModule::UpdateVolumes(ZESoundSourceType SourceType)
 
 void ZEDSModule::UpdateStreams()
 {
-	for (size_t I = 0; I < SoundSources.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources.GetCount(); I++)
 		SoundSources[I]->CreateBuffer(false);
 
-	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources3D.GetCount(); I++)
 		SoundSources[I]->CreateBuffer(true);
 }
 
@@ -149,7 +149,7 @@ bool ZEDSModule::Initialize()
 		return false;
     }
 
-	unsigned int DeviceId = SoundOptions.GetOption("DeviceId")->GetValue().GetInteger();
+	ZEUInt DeviceId = SoundOptions.GetOption("DeviceId")->GetValue().GetInteger();
 
 	GUID* DeviceGUID = NULL;
 	if (DeviceId > DeviceList.GetCount())
@@ -209,7 +209,7 @@ bool ZEDSModule::Initialize()
 
 	ZEDSComponentBase::BaseInitialize(this);
 
-	for(size_t I = 0; I < ZE_SS_MAX_TYPE; I++)
+	for(ZESize I = 0; I < ZE_SS_MAX_TYPE; I++)
 		TypeVolumes[I] = 100;
 
 	SetStreamingDisabled(SoundOptions.GetOption("StreamingDisabled")->GetValue().GetBoolean());
@@ -272,7 +272,7 @@ bool ZEDSModule::GetStreamingDisabled()
 	return StreamingDisabled;
 }
 
-void ZEDSModule::SetMasterVolume(unsigned int Volume)
+void ZEDSModule::SetMasterVolume(ZEUInt Volume)
 {
 	if (Volume > ZE_SS_VOLUME_MAX)
 		MasterVolume = ZE_SS_VOLUME_MAX;
@@ -283,12 +283,12 @@ void ZEDSModule::SetMasterVolume(unsigned int Volume)
 	DSPrimary->SetVolume((LONG)(log10f((float)MasterVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f));
 }
 
-unsigned int ZEDSModule::GetMasterVolume()
+ZEUInt ZEDSModule::GetMasterVolume()
 {
 	return MasterVolume;
 }
 
-void ZEDSModule::SetTypeVolume(ZESoundSourceType Type, unsigned int Volume)
+void ZEDSModule::SetTypeVolume(ZESoundSourceType Type, ZEUInt Volume)
 {
 	if (Volume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;
@@ -298,29 +298,29 @@ void ZEDSModule::SetTypeVolume(ZESoundSourceType Type, unsigned int Volume)
 	UpdateVolumes(Type);
 }
 
-unsigned int ZEDSModule::GetTypeVolume(ZESoundSourceType Type)
+ZEUInt ZEDSModule::GetTypeVolume(ZESoundSourceType Type)
 {
 	zeAssert(Type >= 256, "Sound source types are limited to 256");
 	return TypeVolumes[Type];
 }
 
 
-void ZEDSModule::SetMaxBufferSize(size_t BufferSize)
+void ZEDSModule::SetMaxBufferSize(ZESize BufferSize)
 {
 	MaxBufferSize = BufferSize;
 }
 
-size_t ZEDSModule::GetMaxBufferSize()
+ZESize ZEDSModule::GetMaxBufferSize()
 {
 	return MaxBufferSize;
 }
 
 void ZEDSModule::ProcessSound(float ElapsedTime)
 {
-	for (size_t I = 0; I < SoundSources.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources.GetCount(); I++)
 		SoundSources[I]->Update(ElapsedTime);
 
-	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources3D.GetCount(); I++)
 		SoundSources3D[I]->Update(ElapsedTime);
 	
 	if (UpdateTime  < 0.0f)

@@ -64,21 +64,21 @@ void ZEGrid::GenerateGrid()
 
 	MinorGrid.SetColor(ZEVector4(MinorGridColor, 1.0f));
 
-	int MinorGridLineCountX = (int)(GridSize.x / MinorGridUnitSize.x);
+	ZEInt MinorGridLineCountX = (ZEInt)(GridSize.x / MinorGridUnitSize.x);
 	if (MinorGridLineCountX % 2 == 1)
 		MinorGridLineCountX--;
 	MinorGridLineCountX /= 2;
 
-	int MinorGridLineCountY = (int)(GridSize.y / MinorGridUnitSize.y);
+	ZEInt MinorGridLineCountY = (ZEInt)(GridSize.y / MinorGridUnitSize.y);
 	if (MinorGridLineCountY % 2 == 1)
 		MinorGridLineCountY--;
 	MinorGridLineCountY /= 2;
 
 
-	for (int X = -MinorGridLineCountX; X <= MinorGridLineCountX; X++)
+	for (ZEInt X = -MinorGridLineCountX; X <= MinorGridLineCountX; X++)
 		MinorGrid.AddLine(ZEVector3(X * MinorGridUnitSize.x, 0.0f, -GridSize.y * 0.5f), ZEVector3(X * MinorGridUnitSize.x, 0.0f, GridSize.y * 0.5f));
 
-	for (int Y = -MinorGridLineCountY; Y <= MinorGridLineCountY; Y++)
+	for (ZEInt Y = -MinorGridLineCountY; Y <= MinorGridLineCountY; Y++)
 		MinorGrid.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MinorGridUnitSize.y), ZEVector3(GridSize.x * 0.5f, 0.0f, Y * MinorGridUnitSize.y));
 
 
@@ -86,21 +86,21 @@ void ZEGrid::GenerateGrid()
 
 	MajorGrid.SetColor(ZEVector4(MajorGridColor, 1.0f));
 
-	int MajorGridLineCountX = (int)(GridSize.x / MajorGridUnitSize.x);
+	ZEInt MajorGridLineCountX = (ZEInt)(GridSize.x / MajorGridUnitSize.x);
 	if (MajorGridLineCountX % 2 == 1)
 		MajorGridLineCountX--;
 	MajorGridLineCountX /= 2;
 
-	int MajorGridLineCountY = (int)(GridSize.y / MajorGridUnitSize.y);
+	ZEInt MajorGridLineCountY = (ZEInt)(GridSize.y / MajorGridUnitSize.y);
 	if (MajorGridLineCountY % 2 == 1)
 		MajorGridLineCountY--;
 	MajorGridLineCountY /= 2;
 
 
-	for (int X = -MajorGridLineCountX; X <= MajorGridLineCountX; X++)
+	for (ZEInt X = -MajorGridLineCountX; X <= MajorGridLineCountX; X++)
 		MajorGrid.AddLine(ZEVector3(X * MajorGridUnitSize.x, 0.0f, -GridSize.y * 0.5f), ZEVector3(X * MajorGridUnitSize.x, 0.0f, GridSize.y * 0.5f));
 
-	for (int Y = -MajorGridLineCountY; Y <= MajorGridLineCountY; Y++)
+	for (ZEInt Y = -MajorGridLineCountY; Y <= MajorGridLineCountY; Y++)
 		MajorGrid.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y), ZEVector3(GridSize.x * 0.5f, 0.0f, Y * MajorGridUnitSize.y));
 }
 

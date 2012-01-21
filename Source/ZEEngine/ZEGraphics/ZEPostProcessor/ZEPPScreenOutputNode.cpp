@@ -46,7 +46,7 @@ ZEPostProcessorNodeType ZEPPScreenOutputNode::GetNodeType()
 	return ZE_PPNT_OUTPUT_NODE;
 }
 
-size_t ZEPPScreenOutputNode::GetDependencyCount()
+ZESize ZEPPScreenOutputNode::GetDependencyCount()
 {
 	return 1;
 }

@@ -55,7 +55,7 @@ class ZEPostProcessor
 		
 	public:
 		virtual ZEPostProcessorNode*				CreateNode(const char* TypeName);
-		virtual ZEPostProcessorNode*				CreateNode(size_t TypeId);
+		virtual ZEPostProcessorNode*				CreateNode(ZESize TypeId);
 		
 		virtual ZEArray<ZEPostProcessorNode*>&		GetNodes();		
 		virtual void								AddNode(ZEPostProcessorNode* Node);

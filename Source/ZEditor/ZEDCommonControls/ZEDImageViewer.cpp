@@ -86,8 +86,8 @@ void ZEDImageViewerViewPort::mouseMoveEvent(QMouseEvent* Event)
 	ImageWidth = ((QGraphicsPixmapItem*)(items().at(0)))->boundingRect().width() - 1;
 	ImageHeight = ((QGraphicsPixmapItem*)(items().at(0)))->boundingRect().height() - 1;
 
-	int XCoordinate = floor(UVCoordinates.x());
-	int YCoordinate = floor(UVCoordinates.y());
+	ZEInt XCoordinate = floor(UVCoordinates.x());
+	ZEInt YCoordinate = floor(UVCoordinates.y());
 
 	QPixmap ImagePixmap = ((QGraphicsPixmapItem*)(items().at(0)))->pixmap();
 	QImage Image;
@@ -244,7 +244,7 @@ void ZEDImageViewer::SetImage(QString FileName)
 	setWindowTitle(FileName);
 }
 
-void ZEDImageViewer::SetInfoNotifications(float U, float V, int X, int Y, QColor PixelColor, int Width, int Height)
+void ZEDImageViewer::SetInfoNotifications(float U, float V, ZEInt X, ZEInt Y, QColor PixelColor, ZEInt Width, ZEInt Height)
 { 
 	if(U < 0.0f || U > 1.0f || V < 0.0f || V > 1.0f)
 	{

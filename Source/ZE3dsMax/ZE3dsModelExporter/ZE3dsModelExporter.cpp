@@ -48,12 +48,12 @@ ZEModelExporter::~ZEModelExporter()
 
 }
 
-int ZEModelExporter::ExtCount()
+ZEInt ZEModelExporter::ExtCount()
 {
 	return 1;
 }
 
-const TCHAR *ZEModelExporter::Ext(int n)
+const TCHAR *ZEModelExporter::Ext(ZEInt n)
 {		
 	return _T("zeModel");
 }
@@ -88,7 +88,7 @@ const TCHAR *ZEModelExporter::OtherMessage2()
 	return _T("");
 }
 
-unsigned int ZEModelExporter::Version()
+ZEUInt ZEModelExporter::Version()
 {				
 	return 300;
 }
@@ -98,15 +98,15 @@ void ZEModelExporter::ShowAbout(HWND hWnd)
 
 }
 
-BOOL ZEModelExporter::SupportsOptions(int ext, DWORD options)
+BOOL ZEModelExporter::SupportsOptions(ZEInt ext, DWORD options)
 {
 	return TRUE;
 }
 
 
-int ZEModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
+ZEInt ZEModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode /*=NULL*/)
 {
-	int i;
+	ZEInt i;
 	if (i_currentNode == NULL)
 	{
 		i_currentNode = GetCOREInterface()->GetRootNode();
@@ -129,7 +129,7 @@ void Output(const char* Output)
 	PD->Output((char*)Output);
 }
 
-int	ZEModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
+ZEInt	ZEModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
 	PD = &ProgressDialog;
 	ProgressDialog.Create(hInstance);

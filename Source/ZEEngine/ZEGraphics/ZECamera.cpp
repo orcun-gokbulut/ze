@@ -188,7 +188,7 @@ const ZEViewVolume& ZECamera::GetViewVolume()
 	return ViewFrustum;
 }
 
-void ZECamera::GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY)
+void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 {
 	ZEVector3 V;
 	const ZEMatrix4x4& ProjMatrix = GetProjectionTransform();

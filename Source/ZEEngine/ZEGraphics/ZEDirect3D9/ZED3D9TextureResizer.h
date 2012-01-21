@@ -74,9 +74,9 @@ class ZED3D9TextureResizer : public ZED3D9ComponentBase
 	struct TextureInfo
 	{
 		void*			Buffer;
-		unsigned int	Pitch;
-		unsigned int	Width;
-		unsigned int	Height;
+		ZEUInt	Pitch;
+		ZEUInt	Width;
+		ZEUInt	Height;
 	};
 
 	private:
@@ -92,11 +92,11 @@ class ZED3D9TextureResizer : public ZED3D9ComponentBase
 		TextureInfo						DestInfo;
 		TextureInfo						SrcInfo;
 
-		unsigned int					NextPowerOfTwo(unsigned int Value);
-		unsigned int					PreviousPowerOfTwo(unsigned int Value);
-		bool							IsPowerOfTwo(unsigned int Value);
-		unsigned int					GetPowerOfTwo(unsigned int Value);
-		bool							Resize(unsigned int DestWidth, unsigned int DestHeight);
+		ZEUInt					NextPowerOfTwo(ZEUInt Value);
+		ZEUInt					PreviousPowerOfTwo(ZEUInt Value);
+		bool							IsPowerOfTwo(ZEUInt Value);
+		ZEUInt					GetPowerOfTwo(ZEUInt Value);
+		bool							Resize(ZEUInt DestWidth, ZEUInt DestHeight);
 
 	public:
 
@@ -109,8 +109,8 @@ class ZED3D9TextureResizer : public ZED3D9ComponentBase
 		void							OnDeviceLost();
 		void							OnDeviceRestored();
 
-		void							Initialize(void* DestData, unsigned int DestPitch, unsigned int DestWidth, unsigned int DestHegiht,
-													void* SrcData, unsigned int SrcPitch, unsigned int SrcWidth, unsigned int SrcHeight);
+		void							Initialize(void* DestData, ZEUInt DestPitch, ZEUInt DestWidth, ZEUInt DestHegiht,
+													void* SrcData, ZEUInt SrcPitch, ZEUInt SrcWidth, ZEUInt SrcHeight);
 		void							Deinitialize();
 
 		bool							Process();

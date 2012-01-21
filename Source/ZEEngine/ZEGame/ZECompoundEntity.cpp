@@ -42,7 +42,7 @@
 
 void ZECompoundEntity::UpdateComponentTransforms()
 {
-	for (size_t I = 0; I < Components.GetCount(); I++)
+	for (ZESize I = 0; I < Components.GetCount(); I++)
 		Components[I]->OnTransformChanged();
 }
 
@@ -113,7 +113,7 @@ bool ZECompoundEntity::Initialize()
 	if (GetInitialized())
 		return false;
 
-	for (size_t I = 0; I < Components.GetCount(); I++)
+	for (ZESize I = 0; I < Components.GetCount(); I++)
 		Components[I]->Initialize();
 
 	return ZEEntity::Initialize();
@@ -124,7 +124,7 @@ void ZECompoundEntity::Deinitialize()
 	if (GetInitialized())
 		return;
 
-	for (size_t I = 0; I < Components.GetCount(); I++)
+	for (ZESize I = 0; I < Components.GetCount(); I++)
 		Components[I]->Deinitialize();
 
 	ZEEntity::Deinitialize();
@@ -133,7 +133,7 @@ void ZECompoundEntity::Deinitialize()
 void ZECompoundEntity::Tick(float Time)
 {
 	ZEEntity::Tick(Time);
-	for (size_t I = 0; I < Components.GetCount(); I++)
+	for (ZESize I = 0; I < Components.GetCount(); I++)
 		if (Components[I]->GetEnabled())
 			Components[I]->Tick(Time);
 }

@@ -61,7 +61,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -132,7 +132,7 @@ bool ZEScene::Initialize()
 	}
 
 
-	for (size_t I = 0; I < Entities.GetCount(); I++)
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Initialize();
 
 	Initialized = true;
@@ -141,7 +141,7 @@ bool ZEScene::Initialize()
 
 void ZEScene::Deinitialize()
 {
-	for (size_t I = 0; I < Entities.GetCount(); I++)
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Deinitialize();
 
 	if (PhysicalWorld != NULL)
@@ -199,7 +199,7 @@ void ZEScene::RemoveEntity(ZEEntity* Entity)
 
 void ZEScene::ClearEntities()
 {
-	for (size_t I = 0; I < Entities.GetCount(); I++)
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Destroy();
 
 	Entities.Clear();
@@ -217,7 +217,7 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(const char* ClassName)
 	ZEObjectDescription* CurrentDesc = NULL;
 	ProperEntities.Clear();
 
-	for (int I = 0; I < Entities.GetCount(); I++)
+	for (ZEInt I = 0; I < Entities.GetCount(); I++)
 	{
 		CurrentDesc = CurrentEntity->GetDescription();
 
@@ -237,7 +237,7 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(ZEObjectDescription* Desc)
 	ZEEntity* CurrentEntity = NULL;
 	ProperEntities.Clear();
 
-	for (size_t I = 0; I < Entities.GetCount(); I++)
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
 		CurrentEntity = Entities[I];
 
@@ -281,7 +281,7 @@ ZEListener* ZEScene::GetActiveListener()
 
 void ZEScene::Tick(float ElapsedTime)
 {
-	for (size_t I = 0; I < Entities.GetCount(); I++)
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		if (Entities[I]->GetEnabled())
 			Entities[I]->Tick(ElapsedTime);
 }
@@ -317,14 +317,14 @@ bool ZEScene::Save(const ZEString& FileName)
 		ZEUInt32 EntityCount = Entities.GetCount();
 		Serializer.Write(&EntityCount, sizeof(ZEUInt32), 1);
 		
-		Serializer.Write(&LastEntityId, sizeof(int), 1);
+		Serializer.Write(&LastEntityId, sizeof(ZEInt), 1);
 
 		// Will be removed
 		char NameBuffer[ZE_MAX_NAME_SIZE];
 		memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
 		Serializer.Write(&NameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
 
-		for (size_t I = 0; I < Entities.GetCount(); I++)
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
 		{
 			char NameBuffer[ZE_MAX_NAME_SIZE];
 			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
@@ -366,14 +366,14 @@ bool ZEScene::Load(const ZEString& FileName)
 	{
 		ZEUInt32 EntityCount;
 		Unserializer.Read(&EntityCount, sizeof(ZEUInt32), 1);
-		Unserializer.Read(&LastEntityId, sizeof(int), 1);
+		Unserializer.Read(&LastEntityId, sizeof(ZEInt), 1);
 
 		char MapFile[ZE_MAX_FILE_NAME_SIZE];
 		Unserializer.Read(MapFile, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
 
 		ClearEntities();
 
-		for (size_t I = 0; I < EntityCount; I++)
+		for (ZESize I = 0; I < EntityCount; I++)
 		{
 			ZEEntity* NewEntity;
 			Unserializer.Read(EntityTypeName, sizeof(char), ZE_MAX_NAME_SIZE);

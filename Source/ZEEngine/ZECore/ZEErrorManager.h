@@ -55,7 +55,7 @@ class ZEErrorManager
 		void						LogToFile(const char* Module, ZEErrorType ErrorType, const char* ErrorText);
 
 		static void					ErrorCallback(const char* Module, ZEErrorType ErrorType, const char* ErrorText);
-		static void					AssertCallback(ZEAssertType AssertType, const char* AssertText, const char* Function, const char* File, int Line);
+		static void					AssertCallback(ZEAssertType AssertType, const char* AssertText, const char* Function, const char* File, ZEInt Line);
 
 									ZEErrorManager();
 									~ZEErrorManager();

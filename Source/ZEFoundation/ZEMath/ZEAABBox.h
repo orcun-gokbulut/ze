@@ -50,7 +50,7 @@ class ZEAABBox
 		ZEVector3					Min, Max;
 
 		ZEVector3					GetCenter() const;
-		ZEVector3					GetVertex(unsigned int Index) const;
+		ZEVector3					GetVertex(ZEUInt Index) const;
 		float						GetLenght() const;
 
 		static void					GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox);
@@ -75,7 +75,7 @@ class ZEAABBox
 		static bool					IntersectionTest(const ZEAABBox& BoundingBox1, const ZEAABBox& BoundingBox2);
 		static bool					IntersectionTest(const ZEAABBox& BoundingBox, const ZEBSphere& BoundingSphere);
 
-		static void					Generate(ZEAABBox& Output, const ZEVector3* Vertices, size_t Count);
+		static void					Generate(ZEAABBox& Output, const ZEVector3* Vertices, ZESize Count);
 		static void					Combine(ZEAABBox& Output, const ZEAABBox& A, const ZEAABBox& B);
 
 									ZEAABBox();

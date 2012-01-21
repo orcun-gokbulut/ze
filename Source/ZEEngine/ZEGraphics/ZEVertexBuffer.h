@@ -43,7 +43,7 @@ class ZEVertexBuffer
 {
 	public:
 		virtual bool						IsStatic() = 0;
-		virtual size_t						GetBufferSize() = 0;
+		virtual ZESize						GetBufferSize() = 0;
 
 											ZEVertexBuffer();
 		virtual								~ZEVertexBuffer();
@@ -58,7 +58,7 @@ class ZEStaticVertexBuffer : public ZEVertexBuffer
 	public:
 		virtual bool						IsStatic();
 
-		virtual bool						Create(size_t BufferSize) = 0;
+		virtual bool						Create(ZESize BufferSize) = 0;
 		virtual void*						Lock() = 0;
 		virtual void						Unlock() = 0;
 		virtual void						Release() = 0;
@@ -73,7 +73,7 @@ class ZEDynamicVertexBuffer : public ZEVertexBuffer
 	public:
 		virtual bool						IsStatic();
 
-		virtual size_t						GetBufferSize() = 0;
+		virtual ZESize						GetBufferSize() = 0;
 		virtual void*						GetVertexBuffer() = 0;
 };
 
@@ -81,7 +81,7 @@ template<typename _VertexType, typename _Allocator = ZESmartAllocator<_VertexTyp
 class ZEArrayVertexBuffer : public ZEDynamicVertexBuffer, public ZEArray<_VertexType, _Allocator>
 {
 	public:
-		virtual size_t GetBufferSize()
+		virtual ZESize GetBufferSize()
 		{
 			return GetCount() * sizeof(_VertexType);
 		}

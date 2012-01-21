@@ -51,7 +51,7 @@ struct ZEMethodDescription
 	bool						Visibility;
 
 	const ZEMethodParameter*	Parameters;
-	unsigned int				ParameterCount;
+	ZEUInt				ParameterCount;
 	ZEVariantType				ReturnType;
 };
 

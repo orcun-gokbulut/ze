@@ -117,7 +117,7 @@ void ZEMetaDebugModule::Process(float ElapsedTime)
 	TotalTime += ElapsedTime;
 	ZEVariant ReturnValue;
 
-	if (IfEnteredFlag == false && (int)TotalTime == 5)
+	if (IfEnteredFlag == false && (ZEInt)TotalTime == 5)
 	{
 		Player->CallMethod("SetName", &ZEVariant("TestPlayer"), 1, ReturnValue);
 		//Player->CallMethod("SetPosition", &ZEVariant(ZEVector3(0.0f, -5.0f, 0.0f)), 1, ZEVariant());
@@ -197,7 +197,7 @@ ZEMetaDebugModule::~ZEMetaDebugModule()
 //
 //	CanvasBrush->AddToContainer("Components", ZECamera::CreateInstance());
 //	const ZEComponent** Components = (const ZEComponent**)CanvasBrush->GetContainerItems("Components");
-//	size_t Count = CanvasBrush->GetContainerItemCount("Components");
+//	ZESize Count = CanvasBrush->GetContainerItemCount("Components");
 //	CanvasBrush->SetProperty("Position", ZEVector3(0.0f, 0.0f, 0.0f));
 //	CanvasBrush->Material = CanvasMaterial;
 //	CanvasMaterial->SetZero();

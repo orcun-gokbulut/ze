@@ -50,7 +50,7 @@ class ZEStateMachine
 		ZEState*					CurrentState;
 
 	public:
-		bool						AddTransaction(ZEState* From, ZEState* To, int Priority);
+		bool						AddTransaction(ZEState* From, ZEState* To, ZEInt Priority);
 		bool						AddState(ZEState* State);
 		bool						SetCurrentState(const ZEString& Name);
 		bool						Process();

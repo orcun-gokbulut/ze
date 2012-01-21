@@ -57,7 +57,7 @@ class ZEDImageViewerViewPort : public QGraphicsView
 		QPoint						OldPos;
 		QGraphicsScene				ViewportScene;
 		ZEDImageViewer*				ParentViewer;
-		int							ZoomCount;
+		ZEInt							ZoomCount;
 
 		void						ResetZoom();
 
@@ -94,7 +94,7 @@ class ZEDImageViewer : public QMainWindow
 
 	protected:
 
-		void						SetInfoNotifications(float U, float V, int X, int Y, QColor PixelColor, int Width, int Height);		
+		void						SetInfoNotifications(float U, float V, ZEInt X, ZEInt Y, QColor PixelColor, ZEInt Width, ZEInt Height);		
 
 	public:
 

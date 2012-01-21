@@ -76,14 +76,14 @@ class ZEEntityDescription : public ZEObjectDescription
 		virtual const char*						GetDescription() const;
 		virtual const char*						GetIcon() const;
 		virtual const ZEPropertyDescription*	GetProperties() const;
-		virtual size_t							GetPropertyCount() const;
-		virtual size_t							GetPropertyOffset() const;
+		virtual ZESize							GetPropertyCount() const;
+		virtual ZESize							GetPropertyOffset() const;
 		virtual const ZEContainerDescription*	GetContainers() const;
-		virtual size_t							GetContainerCount() const;
-		virtual size_t							GetContainerOffset() const;
+		virtual ZESize							GetContainerCount() const;
+		virtual ZESize							GetContainerOffset() const;
 		virtual const ZEMethodDescription*		GetMethods() const;
-		virtual size_t							GetMethodCount() const;
-		virtual size_t							GetMethodOffset() const;
+		virtual ZESize							GetMethodCount() const;
+		virtual ZESize							GetMethodOffset() const;
 		virtual ZEObjectProvider*				GetProvider() const;
 		virtual ZEObject*						CreateInstance() const;
 		virtual ZEEntityRunAt					GetRunAt() const;
@@ -127,7 +127,7 @@ class ZEEntity : public ZEObject
 	friend class ZECompoundEntity;
 	private: 
 		ZEString								Name;
-		int										EntityId;
+		ZEInt										EntityId;
 		ZEVector3								Position;
 		ZEQuaternion							Rotation;
 		ZEVector3								Scale;
@@ -160,8 +160,8 @@ class ZEEntity : public ZEObject
 
 		bool									GetInitialized();
 
-		void									SetEntityId(int EntityId);
-		int										GetEntityId() const;
+		void									SetEntityId(ZEInt EntityId);
+		ZEInt										GetEntityId() const;
 
 		void									SetName(const char* NewName);
 		const char*								GetName() const;

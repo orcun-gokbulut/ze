@@ -99,7 +99,7 @@ struct ZEMaterialFileFixedMaterialChunk
 	bool							Wireframe;
 	ZEUInt32							TransparancyMode;
 	bool							RecivesShadow;
-	unsigned int					TransparancyCullLimit;
+	ZEUInt					TransparancyCullLimit;
 
 	bool							AmbientEnabled;
 	ZEVector3						AmbientColor;

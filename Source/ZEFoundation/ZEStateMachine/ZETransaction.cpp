@@ -70,12 +70,12 @@ bool ZETransaction::Initialize(ZEState* From, ZEState* To)
 	return true;
 }
 
-void ZETransaction::SetPriority(int Priority)
+void ZETransaction::SetPriority(ZEInt Priority)
 {
 	Priority = Priority;
 }
 
-int ZETransaction::GetPriority() const
+ZEInt ZETransaction::GetPriority() const
 {
 	return Priority;
 }

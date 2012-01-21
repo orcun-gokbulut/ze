@@ -74,7 +74,7 @@ static void ZEErrorManagerErrorCallback(const char* Module, ZEErrorType Type, co
 	}
 }
 
-static void ZEErrorManagerAssertCallback(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, int Line)
+static void ZEErrorManagerAssertCallback(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, ZEInt Line)
 {
 	if (CurrentTestItem != NULL)
 	{
@@ -92,7 +92,7 @@ static void ZEErrorManagerAssertCallback(ZEAssertType Type, const char* AssertTe
 	}
 }
 
-void ZETestItem::ReportProblem(ZETestProblemType Type, const char* Problem, const char* File, int Line)
+void ZETestItem::ReportProblem(ZETestProblemType Type, const char* Problem, const char* File, ZEInt Line)
 {
 	if (Type == ZE_TPT_ERROR)
 		Result = ZE_TR_FAILED;

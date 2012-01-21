@@ -42,15 +42,15 @@
 
 class ZESoundResourceOGG : public ZESoundResource
 {
-	friend size_t OggMemory_Read(void *ptr, size_t size, size_t nmemb, void *datasource);
-	friend int OggMemory_Seek(void *datasource, ogg_int64_t offset, int whence);
+	friend ZESize OggMemory_Read(void *ptr, ZESize size, ZESize nmemb, void *datasource);
+	friend ZEInt OggMemory_Seek(void *datasource, ogg_int64_t offset, ZEInt whence);
 	friend long OggMemory_Tell(void *datasource);
 
 	private:
 		void*							Data;
-		size_t							DataSize;
+		ZESize							DataSize;
 		
-		size_t							MemoryCursor;
+		ZESize							MemoryCursor;
 		OggVorbis_File					OggFile;
 		
 										ZESoundResourceOGG();
@@ -58,12 +58,12 @@ class ZESoundResourceOGG : public ZESoundResource
 
 	public:
 
-		virtual size_t					GetDataSize() const;		
+		virtual ZESize					GetDataSize() const;		
 		virtual const void*				GetData() const;
 		
 
 
-		virtual void					Decode(void* DestinationBuffer, size_t SampleIndex, size_t SampleCount);
+		virtual void					Decode(void* DestinationBuffer, ZESize SampleIndex, ZESize SampleCount);
 
 		static ZESoundResource*			LoadResource(const ZEString& FileName);
 };

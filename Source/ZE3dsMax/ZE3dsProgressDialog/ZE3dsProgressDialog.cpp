@@ -135,18 +135,18 @@ void ZE3dsProgressDialog::StopFileLogging()
 #define PBM_SETPOS              (WM_USER+2)
 #define PBM_SETRANGE32          (WM_USER+6)
 
-void ZE3dsProgressDialog::SetProgress(int Value)
+void ZE3dsProgressDialog::SetProgress(ZEInt Value)
 {
 	SendMessage(GetDlgItem((HWND)handle, IDC_TOTALPROGRESS), PBM_SETPOS, (WPARAM) Value, 0); 
 	Update();
 }
 
-void ZE3dsProgressDialog::SetProgressRange(int Min, int Max)
+void ZE3dsProgressDialog::SetProgressRange(ZEInt Min, ZEInt Max)
 {
 	SendMessage(GetDlgItem((HWND)handle, IDC_TOTALPROGRESS), PBM_SETRANGE32, (WPARAM)Min, (LPARAM)Max);
 }
 
-void ZE3dsProgressDialog::SetPartialProgress(int Value)
+void ZE3dsProgressDialog::SetPartialProgress(ZEInt Value)
 {
 	if ((UpdateTreshold != 0) && (Value % UpdateTreshold == 0))
 	{
@@ -155,7 +155,7 @@ void ZE3dsProgressDialog::SetPartialProgress(int Value)
 	}
 }
 
-void ZE3dsProgressDialog::SetPartialProgressRange(int Min, int Max)
+void ZE3dsProgressDialog::SetPartialProgressRange(ZEInt Min, ZEInt Max)
 {
 	UpdateTreshold = (Min - Max) / 100;
 	if (UpdateTreshold == 0)
@@ -192,7 +192,7 @@ void ZE3dsProgressDialog::Output(TCHAR* Format, ...)
 	if (LogFile != NULL)
 		fputs(Buffer, LogFile);
 
-	int Length = GetWindowTextLength(GetDlgItem((HWND)handle, IDC_LOG)); 
+	ZEInt Length = GetWindowTextLength(GetDlgItem((HWND)handle, IDC_LOG)); 
 	SendMessage(GetDlgItem((HWND)handle, IDC_LOG), EM_SETSEL, (WPARAM)Length, (LPARAM)Length);
 	SendMessage(GetDlgItem((HWND)handle, IDC_LOG) ,EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)Buffer);
 	Update();
@@ -213,7 +213,7 @@ void ZE3dsProgressDialog::Output(ZE3dsProgressDialogOutputLevel OutputLevel, TCH
 	if (LogFile != NULL)
 		fputs(Buffer2, LogFile);
 
-	int Length = GetWindowTextLength(GetDlgItem((HWND)handle, IDC_LOG)); 
+	ZEInt Length = GetWindowTextLength(GetDlgItem((HWND)handle, IDC_LOG)); 
 	SendMessage(GetDlgItem((HWND)handle, IDC_LOG), EM_SETSEL, (WPARAM)Length, (LPARAM)Length);
 	SendMessage(GetDlgItem((HWND)handle, IDC_LOG) ,EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)Buffer2);
 	Update();

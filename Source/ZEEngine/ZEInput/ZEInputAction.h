@@ -46,13 +46,13 @@ class ZEInputBinding;
 class ZEInputAction
 {
 	public:
-		int							Id;
+		ZEInt							Id;
 		ZEInputBinding*				From;
 
 		union
 		{
 			ZEInputButtonState		ButtonState;
-			int						AxisValue;
+			ZEInt						AxisValue;
 		};
 
 		ZEVector3					Vector;

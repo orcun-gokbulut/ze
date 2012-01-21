@@ -38,7 +38,7 @@
 
 #define ZE3dsModelExporter_CLASS_ID	Class_ID(0x9129e3a6, 0xa6fe6398)
 
-int ZE3dsModelExporterDescription::IsPublic()
+ZEInt ZE3dsModelExporterDescription::IsPublic()
 { 
 	return TRUE; 
 }

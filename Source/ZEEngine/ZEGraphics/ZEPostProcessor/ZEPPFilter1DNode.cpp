@@ -56,7 +56,7 @@ ZEPPFilter1DNode::~ZEPPFilter1DNode()
 		Internal->Destroy();
 }
 
-size_t ZEPPFilter1DNode::GetDependencyCount()
+ZESize ZEPPFilter1DNode::GetDependencyCount()
 {
 	return 1;
 }

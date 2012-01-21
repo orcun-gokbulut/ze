@@ -61,7 +61,7 @@ ZETestSuite(ZEPartialFile)
 		ZETestCheckEqual(EndPosition, 1125);
 		ZEUInt64 Size = PartialFile.GetFileSize();
 		ZETestCheckEqual(Size, 100);
-		unsigned int ReferenceCount = File.GetReferenceCount();
+		ZEUInt ReferenceCount = File.GetReferenceCount();
 		ZETestCheckEqual(ReferenceCount, 1);
 
 		PartialFile.Close();
@@ -143,7 +143,7 @@ ZETestSuite(ZEPartialFile)
 	ZETest("ZEUInt64 ZEPartialFile::Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
-		for ( int I = 0; I < 1024; I++)
+		for ( ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -199,7 +199,7 @@ ZETestSuite(ZEPartialFile)
 			ZETestCheckEqual(Size, 50);
 			ZEUInt64 Size1 = PartialFile1.GetFileSize();
 			ZETestCheckEqual(Size1, 30);
-			unsigned int ReferenceCount = PartialFile.GetReferenceCount();
+			ZEUInt ReferenceCount = PartialFile.GetReferenceCount();
 			ZETestCheckEqual(ReferenceCount, 1);
 			ReferenceCount = File.GetReferenceCount();
 			ZETestCheckEqual(ReferenceCount, 2);
@@ -375,7 +375,7 @@ ZETestSuite(ZEPartialFile)
 		bool Result = PartialFile.Open(&File, 0, 1024);
 
 		unsigned char* Buffer = new unsigned char[1024];
-		for (int I = 0; I < 1024; I++)
+		for (ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -402,7 +402,7 @@ ZETestSuite(ZEPartialFile)
 	ZETest("bool ZEPartialFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
-		for (int I = 0; I < 1024; I++)
+		for (ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -542,7 +542,7 @@ ZETestSuite(ZEPartialFile)
 
 		File.Open("ZEPartialFileCloseTests.txt", ZE_FM_READ_WRITE, true);
 		bool Result = PartialFile.Open(&File, 0, 100);
-		unsigned int ReferenceCount = File.GetReferenceCount();
+		ZEUInt ReferenceCount = File.GetReferenceCount();
 		ZETestCheckEqual(ReferenceCount, 1);
 
 		PartialFile.Close();
@@ -617,7 +617,7 @@ ZETestSuite(ZEPartialFile)
 	{
 		unsigned char* Buffer = new unsigned char[1024];
 		unsigned char* BufferRead = new unsigned char[1024];
-		for ( int I = 0; I < 1024; I++)
+		for ( ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -634,7 +634,7 @@ ZETestSuite(ZEPartialFile)
 		ZEUInt64 ReadCount = PartialFile.Read(BufferRead, sizeof(unsigned char), 10);
 		ZETestCheckEqual(ReadCount, 10);
 
-		int Res = memcmp(Buffer, BufferRead, sizeof(unsigned char));
+		ZEInt Res = memcmp(Buffer, BufferRead, sizeof(unsigned char));
 		ZETestCheckEqual(Res, 0);
 
 		PartialFile.Close();
@@ -686,22 +686,22 @@ ZETestSuite(ZEPartialFile)
 		{
 			File.Open("ZEPartialFileReadTests.txt", ZE_FM_READ_WRITE, true);
 			PartialFile.Open(&File, 0, 100);
-			WriteCount = PartialFile.Write(Buffer, sizeof(unsigned int), 26);
+			WriteCount = PartialFile.Write(Buffer, sizeof(ZEUInt), 26);
 			ZETestCheckEqual(WriteCount, 25);
 
-			Result = PartialFile.Seek(-30 * (ZEInt64)sizeof(unsigned int), ZE_SF_CURRENT);
+			Result = PartialFile.Seek(-30 * (ZEInt64)sizeof(ZEUInt), ZE_SF_CURRENT);
 			ZETestCheck(Result == false);
 			ZEUInt64 PartialCursor = PartialFile.Tell();
 			ZETestCheckEqual(PartialCursor, 100);
-			Result = PartialFile.Seek(-25 * (ZEInt64)sizeof(unsigned int), ZE_SF_CURRENT);
+			Result = PartialFile.Seek(-25 * (ZEInt64)sizeof(ZEUInt), ZE_SF_CURRENT);
 			ZETestCheck(Result == true);
 			PartialCursor = PartialFile.Tell();
 			ZETestCheckEqual(PartialCursor, 0);
 
-			ReadCount = PartialFile.Read(BufferRead, sizeof(unsigned int), 30);
+			ReadCount = PartialFile.Read(BufferRead, sizeof(ZEUInt), 30);
 			ZETestCheckEqual(ReadCount, 25);
 
-			Res = memcmp(Buffer, BufferRead, sizeof(unsigned int));
+			Res = memcmp(Buffer, BufferRead, sizeof(ZEUInt));
 			ZETestCheckEqual(Res, 0);
 
 			PartialFile.Close();
@@ -711,7 +711,7 @@ ZETestSuite(ZEPartialFile)
 	ZETest("bool ZEPartialFile::Eof()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
-		for (int I = 0; I < 1024; I++)
+		for (ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -737,7 +737,7 @@ ZETestSuite(ZEPartialFile)
 	ZETest("ZEUInt64 ZEPartialFile::GetFileSize() const")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
-		for (int I = 0; I < 1024; I++)
+		for (ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}

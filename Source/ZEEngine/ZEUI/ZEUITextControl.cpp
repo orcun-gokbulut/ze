@@ -100,10 +100,10 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 		return;
 
 	const char* Narrow = (const char*)Text;
-	size_t Size = Text.GetLength();
+	ZESize Size = Text.GetLength();
 
 	const ZERectangle& ControlRectangle = GetVisibleRectangle();
-	int ZOrder = GetZOrder();
+	ZEInt ZOrder = GetZOrder();
 
 	ZEUIRectangle Temporary;
 	Temporary.Material = NULL;
@@ -114,7 +114,7 @@ void ZEUITextControl::Draw(ZEUIRenderer* Renderer)
 	Temporary.Positions.LeftUp = ControlRectangle.LeftUp;
 
 	Output.ZOrder = ZOrder;
-	for (size_t I = 0; I < Size; I++)
+	for (ZESize I = 0; I < Size; I++)
 	{
 		const ZEFontCharacter& CurrCharacter = FontResource->GetCharacter(Narrow[I]);
 

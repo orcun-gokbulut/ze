@@ -62,12 +62,12 @@ void ZEModel::CalculateBoundingBox()
 	BoundingBox.Min = ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX);
 	BoundingBox.Max = ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 	{
 		ZEAABBox CurrentBoundingBox;
 		ZEAABBox::Transform(CurrentBoundingBox, Meshes[I].GetLocalBoundingBox(), Meshes[I].GetLocalTransform());
 
-		for (int N = 0; N < 8; N++)
+		for (ZEInt N = 0; N < 8; N++)
 		{
 			ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
 			if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
@@ -80,7 +80,7 @@ void ZEModel::CalculateBoundingBox()
 		}
 	}
 
-	for (size_t I = 0; I < Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
 	{
 		ZEVector3 BonePosition = Bones[I].GetModelPosition();
 
@@ -96,10 +96,10 @@ void ZEModel::CalculateBoundingBox()
 
 void ZEModel::UpdateTransforms()
 {
-	for (size_t I = 0; I < Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
 		Bones[I].OnTransformChanged();
 
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].OnTransformChanged();
 }
 
@@ -132,7 +132,7 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 	if (DrawSkeleton)
 	{
 		ZEVector3 BonePosition1, BonePosition2;
-		for (size_t I = 0; I < Bones.GetCount(); I++)
+		for (ZESize I = 0; I < Bones.GetCount(); I++)
 		{
 			DebugDrawComponents.BonePositionsCanvas.AddPoint(Bones[I].GetWorldPosition());
 		
@@ -158,11 +158,11 @@ ZEUInt32 ZEModel::GetDrawFlags() const
 
 void ZEModel::LoadModelResource()
 {
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Deinitialize();
 	Meshes.SetCount(0);
 
-	for (size_t I = 0; I < Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
 		Bones[I].Deinitialize();
 	Bones.SetCount(0);
 
@@ -172,20 +172,20 @@ void ZEModel::LoadModelResource()
 		return;
 
 	Meshes.SetCount(ModelResource->Meshes.GetCount());
-	for (size_t I = 0; I < ModelResource->Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < ModelResource->Meshes.GetCount(); I++)
 	{
 		Meshes[I].Initialize(this, &ModelResource->Meshes[I]);
 	}
 
 	Bones.SetCount(ModelResource->Bones.GetCount());
 
-	for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
+	for (ZESize I = 0; I < ModelResource->Bones.GetCount(); I++)
 	{
 		if (ModelResource->Bones[I].ParentBone != -1)
 			Bones[ModelResource->Bones[I].ParentBone].AddChild(&Bones[I]);
 	}
 
-	for (size_t I = 0; I < ModelResource->Bones.GetCount(); I++)
+	for (ZESize I = 0; I < ModelResource->Bones.GetCount(); I++)
 	{
 		Bones[I].Initialize(this, &ModelResource->Bones[I]);
 		if (Bones[I].GetParentBone() == NULL)
@@ -196,7 +196,7 @@ void ZEModel::LoadModelResource()
 	{
 		ZEVector3 AveragePosition = ZEVector3::Zero;
 
-		for(size_t I = 0; I < Skeleton.GetCount(); I++)
+		for(ZESize I = 0; I < Skeleton.GetCount(); I++)
 		{
 			AveragePosition += Skeleton[I]->PhysicalBody->GetPosition();
 		}
@@ -218,7 +218,7 @@ void ZEModel::LoadModelResource()
 		ParentlessBoneBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
 		ParentlessBoneBody->Initialize();
 
-		for(size_t I = 0; I < Skeleton.GetCount(); I++)
+		for(ZESize I = 0; I < Skeleton.GetCount(); I++)
 		{
 			LinkParentlessBones(Skeleton[I]);
 		}
@@ -288,14 +288,14 @@ const ZEArray<ZEModelAnimation>* ZEModel::GetAnimations()
 		return &ModelResource->Animations;
 }
 
-void ZEModel::SetActiveLOD(unsigned int LOD)
+void ZEModel::SetActiveLOD(ZEUInt LOD)
 {
 	ActiveLOD = LOD;
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].SetActiveLOD(LOD);
 }
 
-int ZEModel::GetActiveLOD()
+ZEInt ZEModel::GetActiveLOD()
 {
 	return ActiveLOD;
 }
@@ -303,9 +303,9 @@ int ZEModel::GetActiveLOD()
 void ZEModel::SetPhysicsEnabled(bool Enabled)
 {
 	PhysicsEnabled = Enabled;
-	for (size_t I = 0; I < Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
 		Bones[I].SetPhysicsEnabled(Enabled);
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].SetPhysicsEnabled(Enabled);
 }
 
@@ -316,7 +316,7 @@ bool ZEModel::GetPhysicsEnabled()
 
 ZEModelBone* ZEModel::GetBoneByName(const char* Name)
 {
-	for (size_t I = 0; I < Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
 		if (strcmp(Bones[I].GetName(), Name) == 0)
 			return &Bones[I];
 
@@ -325,7 +325,7 @@ ZEModelBone* ZEModel::GetBoneByName(const char* Name)
 
 ZEModelMesh* ZEModel::GetMeshByName(const char* Name)
 {
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		if (strcmp(Meshes[I].GetName(), Name) == 0)
 			return &Meshes[I];
 
@@ -335,9 +335,9 @@ ZEModelMesh* ZEModel::GetMeshByName(const char* Name)
 void ZEModel::SetAnimationType(ZEModelAnimationType AnimationType)
 {
 	this->AnimationType = AnimationType;
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].SetAnimationType(AnimationType);
-	for (size_t I = 0; I < Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
 		Bones[I].SetAnimationType(AnimationType);
 }
 
@@ -354,7 +354,7 @@ ZEArray<ZEModelAnimationTrack>& ZEModel::GetAnimationTracks()
 void ZEModel::SetAutoLOD(bool Enabled)
 {
 	AutoLOD = Enabled;
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].SetAutoLOD(Enabled);
 }
 
@@ -422,7 +422,7 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 	if(!GetVisible())
 		return;
 
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		Meshes[I].Draw(DrawParameters);
 	
 	//DebugDraw(DrawParameters->Renderer);
@@ -430,17 +430,17 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 
 void ZEModel::Tick(float ElapsedTime)
 {
-	for(size_t I = 0; I < AnimationTracks.GetCount(); I++)
+	for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
 		AnimationTracks[I].AdvanceAnimation(ElapsedTime);
 
-	for(size_t I = 0; I < IKChains.GetCount(); I++)
+	for(ZESize I = 0; I < IKChains.GetCount(); I++)
 		IKChains[I].Process();
 	
 }
 
 void ZEModel::TransformChangeEvent(const ZEPhysicalTransformChangeEventArgument& TransformChange)
 {
-	for (size_t I = 0; I < Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Bones.GetCount(); I++)
 	{
 		if(Bones[I].GetParentBone() != NULL)
 		{
@@ -464,7 +464,7 @@ void ZEModel::TransformChangeEvent(const ZEPhysicalTransformChangeEventArgument&
 		}
 	}
 
-	for (size_t I = 0; I < Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 	{
 		if (Meshes[I].GetPhysicalBody() != NULL)
 		{

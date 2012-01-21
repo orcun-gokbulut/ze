@@ -127,7 +127,7 @@ ZEContainer::ZEContainer(ZEContainerMode Mode, ZEObjectDescription* Type, bool A
 ZEContainer::~ZEContainer()
 {
 	if (Mode == ZE_CM_OWNER)
-		for (size_t I = 0; I < Instances.GetCount(); I++)
+		for (ZESize I = 0; I < Instances.GetCount(); I++)
 			delete Instances[I];
 	
 	Instances.Clear();

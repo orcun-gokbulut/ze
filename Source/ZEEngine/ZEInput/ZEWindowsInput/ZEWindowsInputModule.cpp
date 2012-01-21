@@ -96,9 +96,9 @@ bool ZEWindowsInputModule::Initialize()
 		return false;
 	}
 
-	int MouseIndex = 0;
-	int KeyboardIndex = 0;
-	for (size_t I = 0; I < DeviceList.GetCount(); I++)
+	ZEInt MouseIndex = 0;
+	ZEInt KeyboardIndex = 0;
+	for (ZESize I = 0; I < DeviceList.GetCount(); I++)
 	{
 		if (DeviceList[I].dwType == RIM_TYPEMOUSE)
 		{
@@ -131,16 +131,16 @@ bool ZEWindowsInputModule::Initialize()
 
 	ZEArray<ZEExtensionDescription*> ExtensionDescriptions = ZEExtensionManager::GetInstance()->GetExtensionDescriptions(ZEInputDeviceExtension::Description());
 
-	for (size_t I = 0; I < ExtensionDescriptions.GetCount(); I++)
+	for (ZESize I = 0; I < ExtensionDescriptions.GetCount(); I++)
 	{
 		ZEInputDeviceExtension* Extension = (ZEInputDeviceExtension*)ExtensionDescriptions[I]->CreateInstance();
 
 		ZEArray<ZEInputDevice*> ExtensionDevices = Extension->GetDevices();
-		for (size_t N = 0; N < ExtensionDevices.GetCount(); N++)
+		for (ZESize N = 0; N < ExtensionDevices.GetCount(); N++)
 			Devices.Add(ExtensionDevices[N]);
 	}
 
-	for (size_t I = 0; I < Devices.GetCount(); I++)
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		if (!Devices[I]->Initialize())
 		{
 			zeError("Can not initialize input device. Name : \"\"", Devices[I]->GetDeviceName());
@@ -151,7 +151,7 @@ bool ZEWindowsInputModule::Initialize()
 
 void ZEWindowsInputModule::Deinitialize()
 {
-	for (size_t I = 0; I < Devices.GetCount(); I++)
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		Devices[I]->Destroy();
 	Devices.Clear();
 
@@ -160,7 +160,7 @@ void ZEWindowsInputModule::Deinitialize()
 
 void ZEWindowsInputModule::ProcessInputs()
 {   
-	for (size_t I = 0; I < Devices.GetCount(); I++)
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		Devices[I]->ProcessInputs();
 }
 
@@ -168,8 +168,8 @@ void ZEWindowsInputModule::ProcessInputMap(ZEInputMap* InputMap)
 {
 	InputMap->InputActionCount = 0;
 
-	for (size_t I = 0; I < InputMap->InputBindings.GetCount(); I++)
-		for (size_t N = 0; N < Devices.GetCount(); N++)
+	for (ZESize I = 0; I < InputMap->InputBindings.GetCount(); I++)
+		for (ZESize N = 0; N < Devices.GetCount(); N++)
 			if (Devices[N]->ProcessInputBinding(&InputMap->InputBindings[I], &InputMap->InputActions[InputMap->InputActionCount]))
 				InputMap->InputActionCount++;
 }

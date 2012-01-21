@@ -41,7 +41,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -62,21 +62,21 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 	return NewString;
 }
 
-static ssize_t Memory_Read(int fd, void *buffer, size_t nbyte)
+static ssize_t Memory_Read(ZEInt fd, void *buffer, ZESize nbyte)
 {
 	ZESoundResourceMP3* Resource = (ZESoundResourceMP3*)fd;
 
 	if (Resource->MemoryCursor == Resource->DataSize)
 		return 0;
 
-	size_t BytesRead = Resource->MemoryCursor + nbyte < Resource->DataSize ? nbyte : Resource->DataSize - Resource->MemoryCursor;
+	ZESize BytesRead = Resource->MemoryCursor + nbyte < Resource->DataSize ? nbyte : Resource->DataSize - Resource->MemoryCursor;
 	memcpy(buffer, Resource->Data + Resource->MemoryCursor, BytesRead);
 	Resource->MemoryCursor += BytesRead;
 
 	return BytesRead;
 }
 
-static off_t Memory_Seek(int fd, off_t offset, int whence)
+static off_t Memory_Seek(ZEInt fd, off_t offset, ZEInt whence)
 {
 	ZESoundResourceMP3* Resource = (ZESoundResourceMP3*)fd;
 
@@ -113,7 +113,7 @@ ZESoundResourceMP3::~ZESoundResourceMP3()
 		mpg123_delete(mpg123);
 }
 
-size_t ZESoundResourceMP3::GetDataSize() const
+ZESize ZESoundResourceMP3::GetDataSize() const
 {
 	return DataSize;
 }
@@ -123,13 +123,13 @@ const void* ZESoundResourceMP3::GetData() const
 	return Data;
 }
 
-void ZESoundResourceMP3::Decode(void* Buffer, size_t SampleIndex, size_t Count)
+void ZESoundResourceMP3::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
 {
 	mpg123_seek(mpg123, SampleIndex, SEEK_SET);
 	
-	size_t BytesRead = 1;
-	size_t Position = 0;
-	int Result;
+	ZESize BytesRead = 1;
+	ZESize Position = 0;
+	ZEInt Result;
 
 	while(Position < (Count * BlockAlign))
 	{
@@ -187,10 +187,10 @@ ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
 	mpg123_param(NewResource->mpg123, MPG123_RESYNC_LIMIT, -1, 0); /* New in library version 0.0.1 . */
 
 	mpg123_replace_reader(NewResource->mpg123, Memory_Read, Memory_Seek);
-	mpg123_open_fd(NewResource->mpg123, (int)NewResource);
+	mpg123_open_fd(NewResource->mpg123, (ZEInt)NewResource);
 
 	long Rate;
-	int Channels, Encoding;
+	ZEInt Channels, Encoding;
 	mpg123_getformat(NewResource->mpg123, &Rate, &Channels, &Encoding);
 
 	/*switch(Encoding)

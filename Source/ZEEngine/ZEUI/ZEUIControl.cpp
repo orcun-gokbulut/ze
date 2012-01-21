@@ -146,12 +146,12 @@ bool ZEUIControl::GetPressed() const
 	return IsPressed;
 }
 
-void ZEUIControl::SetZOrder(int Z)
+void ZEUIControl::SetZOrder(ZEInt Z)
 {
 	ZOrder = Z;
 }
 
-int ZEUIControl::GetZOrder() const
+ZEInt ZEUIControl::GetZOrder() const
 {
 	return ZOrder;
 }
@@ -193,7 +193,7 @@ void ZEUIControl::SetPosition(const ZEVector2& Position)
 
 	ZEVector2 PositionDifference = Position - GetPosition();
 
-	for (size_t I = 0; I < GetChildControls().GetCount(); I++)
+	for (ZESize I = 0; I < GetChildControls().GetCount(); I++)
 		GetChildControls()[I]->SetPosition(GetChildControls()[I]->GetPosition() + PositionDifference);
 
 	Rectangle.SetPosition(Position);
@@ -466,7 +466,7 @@ void ZEUIControl::Draw(ZEUIRenderer* Renderer)
 	if (!IsVisible)
 		return;
 
-	for (size_t I = 0; I < ChildControls.GetCount(); I++)
+	for (ZESize I = 0; I < ChildControls.GetCount(); I++)
 		ChildControls[I]->Draw(Renderer);
 }
 
@@ -475,7 +475,7 @@ void ZEUIControl::Tick(float ElapsedTime)
 	if (!IsEnabled)
 		return;
 
-	for (size_t I = 0; I < ChildControls.GetCount(); I++)
+	for (ZESize I = 0; I < ChildControls.GetCount(); I++)
 			ChildControls[I]->Tick(ElapsedTime);
 }
 

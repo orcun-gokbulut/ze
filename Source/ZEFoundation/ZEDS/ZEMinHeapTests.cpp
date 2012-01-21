@@ -36,7 +36,7 @@
 #include "ZETest.h"
 #include "ZEMinHeap.h"
 
-bool ZETestCheckHeapTree(ZEMinHeap<int> Heap, size_t Index = 0)
+bool ZETestCheckHeapTree(ZEMinHeap<ZEInt> Heap, ZESize Index = 0)
 {
 	if (Heap.GetFirstChildIndex(Index) < Heap.GetCount())
 	{
@@ -70,7 +70,7 @@ ZETestSuite(ZEMinHeap)
 	{
 		ZETestCase("InsertOrdered")
 		{
-			ZEMinHeap<int> TestHeap;
+			ZEMinHeap<ZEInt> TestHeap;
 
 			TestHeap.InsertValue(0);
 			ZETestCheckEqual(TestHeap.GetMin(), 0);
@@ -99,7 +99,7 @@ ZETestSuite(ZEMinHeap)
 
 		ZETestCase("InsertInverseOrdered")
 		{
-			ZEMinHeap<int> TestHeap;
+			ZEMinHeap<ZEInt> TestHeap;
 
 			TestHeap.InsertValue(5);
 			ZETestCheckEqual(TestHeap.GetMin(), 5);
@@ -128,7 +128,7 @@ ZETestSuite(ZEMinHeap)
 
 		ZETestCase("InsertNotOrdered")
 		{
-			ZEMinHeap<int> TestHeap;
+			ZEMinHeap<ZEInt> TestHeap;
 
 			TestHeap.InsertValue(5);
 			ZETestCheckEqual(TestHeap.GetMin(), 5);
@@ -161,7 +161,7 @@ ZETestSuite(ZEMinHeap)
 
 		ZETestCase("RemoveFirstElement")
 		{
-			ZEMinHeap<int> TestHeap;
+			ZEMinHeap<ZEInt> TestHeap;
 			TestHeap.InsertValue(1);
 			TestHeap.InsertValue(2);
 			TestHeap.InsertValue(3);
@@ -197,7 +197,7 @@ ZETestSuite(ZEMinHeap)
 
 	ZETest("GetCount")
 	{
-		ZEMinHeap<int> TestHeap;
+		ZEMinHeap<ZEInt> TestHeap;
 
 		ZETestCheckEqual(TestHeap.GetCount(), 0);
 
@@ -211,6 +211,6 @@ ZETestSuite(ZEMinHeap)
 
 	ZETest("AssignmentAndCopyConstructor")
 	{
-		ZEMinHeap<int> TestHeap;
+		ZEMinHeap<ZEInt> TestHeap;
 	}
 }

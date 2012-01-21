@@ -42,8 +42,8 @@
 
 struct ZEPhysicalTriangle
 {
-	unsigned int Indices[3];
-	unsigned int MaterialIndex;
+	ZEUInt Indices[3];
+	ZEUInt MaterialIndex;
 };
 
 class ZEPhysicalMesh : public ZEPhysicalObject
@@ -51,9 +51,9 @@ class ZEPhysicalMesh : public ZEPhysicalObject
 	public:
 		virtual ZEPhysicalObjectType	GetPhysicalObjectType();
 
-		virtual bool					SetData(const ZEVector3* Vertices, size_t VertexCount, 
-												const ZEPhysicalTriangle* Triangles, size_t PolygonCount, 
-												const ZEPhysicalMaterial* Materials, size_t MaterialCount) = 0;
+		virtual bool					SetData(const ZEVector3* Vertices, ZESize VertexCount, 
+												const ZEPhysicalTriangle* Triangles, ZESize PolygonCount, 
+												const ZEPhysicalMaterial* Materials, ZESize MaterialCount) = 0;
 
 		static ZEPhysicalMesh*	CreateInstance();
 };

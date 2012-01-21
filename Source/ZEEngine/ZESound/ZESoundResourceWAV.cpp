@@ -40,7 +40,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -72,7 +72,7 @@ ZESoundResourceWAV::~ZESoundResourceWAV()
 		delete Data;
 }
 
-size_t ZESoundResourceWAV::GetDataSize() const
+ZESize ZESoundResourceWAV::GetDataSize() const
 {
 	return DataSize;
 }
@@ -82,7 +82,7 @@ const void* ZESoundResourceWAV::GetData() const
 	return Data;
 }
 
-void ZESoundResourceWAV::Decode(void* Buffer, size_t SampleIndex, size_t Count)
+void ZESoundResourceWAV::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
 {
 	zeAssert(SampleIndex + Count > SampleCount, "Sample decoding range (SampleIndex + Count) exceed sample count.");
 	memcpy(Buffer, (ZEUInt8*)Data + SampleIndex * BlockAlign, Count * BlockAlign);
@@ -101,27 +101,27 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 
 	struct
 	{	
-		unsigned int	Header;
-		unsigned int	Size;
-		unsigned int	Format;
+		ZEUInt	Header;
+		ZEUInt	Size;
+		ZEUInt	Format;
 	} Riff;
 
 	struct
 	{ 
-		unsigned int	Header;      
-		unsigned int	Size;    
+		ZEUInt	Header;      
+		ZEUInt	Size;    
 		unsigned short	AudioFormat;
 		unsigned short	NumChannels;     
-		unsigned int	SampleRate;       
-		unsigned int	ByteRate;         
+		ZEUInt	SampleRate;       
+		ZEUInt	ByteRate;         
 		unsigned short	BlockAlign;       
 		unsigned short	BitsPerSample;
 	}Fmt;
 
 	struct
 	{
-		unsigned int	Header;    
-		unsigned int	Size;     
+		ZEUInt	Header;    
+		ZEUInt	Size;     
 	}Data;
 
 	File->Read(&Riff, sizeof(Riff), 1);

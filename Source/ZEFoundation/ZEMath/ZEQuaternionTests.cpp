@@ -130,7 +130,7 @@ ZETestSuite(ZEQuaternion)
 			ZEMatrix4x4::CreateOrientation(Rotation2, ZEVector3::Zero, Quaternion2, ZEVector3::One);
 			ZEOBBox::Transform(Result2, Rotation2, OBBox);
 
-			int asd = 0;
+			ZEInt asd = 0;
 			asd += 1;
 		}*/
 
@@ -422,7 +422,7 @@ ZETestSuite(ZEQuaternion)
 		ZETestCheckClose(Quaternion1.z, 0.49999997f);
 	}
 
-	ZETest("float& ZEQuaternion::operator[](size_t Index)")
+	ZETest("float& ZEQuaternion::operator[](ZESize Index)")
 	{
 		ZEQuaternion Quaternion(ZE_PI_2, ZEVector3::UnitX);
 		ZEQuaternion Result;
@@ -435,7 +435,7 @@ ZETestSuite(ZEQuaternion)
 		ZETestCheckClose(Result, ZEQuaternion(ZE_PI_2, ZEVector3::UnitZ));
 	}
 
-	ZETest("float& ZEQuaternion::operator[](size_t Index) const")
+	ZETest("float& ZEQuaternion::operator[](ZESize Index) const")
 	{
 		const ZEQuaternion Quaternion(ZE_PI_2, ZEVector3::UnitX);
 		ZEQuaternion Result;

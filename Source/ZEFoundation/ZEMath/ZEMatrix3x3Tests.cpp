@@ -401,7 +401,7 @@ ZETestSuite(ZEMatrix3x3)
 		A *= S;
 		ZETestCheckClose(A, ZEMatrix3x3(2.0f, 2.0f, 4.0f, 6.0f, 10.0f, 16.0f, 26.0f, 42.0f, 68.0f));
 	}
-	ZETest("float& ZEMatrix3x3::operator[](size_t Index)")
+	ZETest("float& ZEMatrix3x3::operator[](ZESize Index)")
 	{
 		ZEMatrix3x3 Matrix(1.0f, 1.0f, 2.0f,
 			3.0f, 5.0f, 8.0f,
@@ -414,7 +414,7 @@ ZETestSuite(ZEMatrix3x3)
 		ZETestCheckEqual(M21, 3.0f);
 		ZETestCheckEqual(M31, 13.0f);
 	}
-	ZETest("float ZEMatrix3x3::operator[](size_t Index) const")
+	ZETest("float ZEMatrix3x3::operator[](ZESize Index) const")
 	{
 		ZEMatrix3x3 Matrix(1.0f, 1.0f, 2.0f,
 			3.0f, 5.0f, 8.0f,

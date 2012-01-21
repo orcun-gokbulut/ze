@@ -43,7 +43,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);

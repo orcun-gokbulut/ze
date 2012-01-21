@@ -44,9 +44,9 @@
 #include "ZEDBrowser/ZEDBrowser.h"
 #include "ZEDNodeEditor/ZEDNodeEditor.h"
 
-int __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {
-	int argc = 0;
+	ZEInt argc = 0;
 	char** argv = NULL;
 
 	QApplication a(argc, argv);

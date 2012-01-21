@@ -244,7 +244,7 @@ void ZEALSoundSource::ResetStream()
 }
 
 
-void ZEALSoundSource::StreamDecodeAndFill(size_t Buffer, size_t Position, size_t SampleCount)
+void ZEALSoundSource::StreamDecodeAndFill(ZESize Buffer, ZESize Position, ZESize SampleCount)
 {
 	if (Position + SampleCount < EffectiveEndPosition)
 		SoundResource->Decode(InnerStreamBuffer, Position, SampleCount);
@@ -253,7 +253,7 @@ void ZEALSoundSource::StreamDecodeAndFill(size_t Buffer, size_t Position, size_t
 		SampleCount = EffectiveEndPosition - Position;
 		SoundResource->Decode(InnerStreamBuffer, Position, SampleCount);
 
-		size_t RemainingSampleCount = BufferSampleCount - SampleCount;
+		ZESize RemainingSampleCount = BufferSampleCount - SampleCount;
 		void* RemainingSampleBuffer = ((unsigned char*)InnerStreamBuffer) + SampleCount * SoundResource->GetBlockAlign();
 
 		if (Looping)
@@ -274,7 +274,7 @@ void ZEALSoundSource::Stream()
 	ALint BufferCount;
 	ALuint Buffer;
 	alGetSourcei(ALSource, AL_BUFFERS_PROCESSED, &BufferCount);
-	for (int I = 0; I < BufferCount; I++)
+	for (ZEInt I = 0; I < BufferCount; I++)
 	{
 		alSourceUnqueueBuffers(ALSource, 1, &Buffer);
 		alDeleteBuffers(1, &Buffer);
@@ -326,7 +326,7 @@ void ZEALSoundSource::SetSoundSourceState(ZESoundSourceState State)
 		}
 }
 
-void ZEALSoundSource::SetCurrentPosition(unsigned int SampleIndex)
+void ZEALSoundSource::SetCurrentPosition(ZEUInt SampleIndex)
 {
 	if (SoundResource != NULL)
 	{
@@ -343,7 +343,7 @@ void ZEALSoundSource::SetCurrentPosition(unsigned int SampleIndex)
 	}
 }
 
-unsigned int ZEALSoundSource::GetCurrentPosition()
+ZEUInt ZEALSoundSource::GetCurrentPosition()
 {
 	if (Streaming)
 		return CurrentPosition;
@@ -358,7 +358,7 @@ unsigned int ZEALSoundSource::GetCurrentPosition()
 			return 0;
 }
 
-void ZEALSoundSource::SetPan(int NewPan)
+void ZEALSoundSource::SetPan(ZEInt NewPan)
 {
 	if (NewPan> ZE_SS_PAN_RIGHT)
 		Pan = ZE_SS_PAN_RIGHT;
@@ -380,7 +380,7 @@ void ZEALSoundSource::SetPlaybackSpeed(float Speed)
 		alSourcef(ALSource, AL_PITCH, Speed);
 }
 
-void ZEALSoundSource::SetVolume(unsigned int NewVolume)
+void ZEALSoundSource::SetVolume(ZEUInt NewVolume)
 {
 	if (NewVolume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;

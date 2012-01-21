@@ -47,17 +47,17 @@ void CascadeStack()
 {
 	char Buffer[1024];
 
-	for (int I = 0; I < 1024; I++)
+	for (ZEInt I = 0; I < 1024; I++)
 		Buffer[I] = rand() % 0xFFFFFFFF;
 }
 
-bool CallCheck(int Arg0)
+bool CallCheck(ZEInt Arg0)
 {
 	bool Result = (Arg0 == 0x1234ABCD);
 	return Result;
 }
 
-const char* GlobalFunction(int Arg0)
+const char* GlobalFunction(ZEInt Arg0)
 {
 	return (CallCheck(Arg0) ? __FUNCTION__ : "");
 }
@@ -65,47 +65,47 @@ const char* GlobalFunction(int Arg0)
 class ZETestBase1
 {
 	public:
-				const char*		Function					(int Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
-				const char*		ConstFunction				(int Arg0) const	{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
-		virtual	const char*		BaseVirtualFunction			(int Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
-		virtual	const char*		VirtualFunction				(int Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
-		virtual	const char*		VirtualConstFunction		(int Arg0) const	{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
-		static	const char*		StaticFunction				(int Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+				const char*		Function					(ZEInt Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+				const char*		ConstFunction				(ZEInt Arg0) const	{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+		virtual	const char*		BaseVirtualFunction			(ZEInt Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+		virtual	const char*		VirtualFunction				(ZEInt Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+		virtual	const char*		VirtualConstFunction		(ZEInt Arg0) const	{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+		static	const char*		StaticFunction				(ZEInt Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
 };
 
 class ZETestBase2 : public ZETestBase1
 {
 	public:
-		virtual	const char*		AbstractVirtualFunction		(int Arg0) = 0;
-		virtual	const char*		AbstractVirtualConstFunction(int Arg0) const = 0;
+		virtual	const char*		AbstractVirtualFunction		(ZEInt Arg0) = 0;
+		virtual	const char*		AbstractVirtualConstFunction(ZEInt Arg0) const = 0;
 };
 
 class ZETestBase3 : public ZETestBase2
 {
 	public:
-		const char*				Function					(int Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
-		const char*				ConstFunction				(int Arg0) const	{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
-		virtual	const char*		VirtualFunction				(int Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
-		virtual	const char*		VirtualConstFunction		(int Arg0) const	{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
-		virtual	const char*		AbstractVirtualFunction		(int Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
-		virtual	const char*		AbstractVirtualConstFunction(int Arg0) const	{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+		const char*				Function					(ZEInt Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+		const char*				ConstFunction				(ZEInt Arg0) const	{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+		virtual	const char*		VirtualFunction				(ZEInt Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+		virtual	const char*		VirtualConstFunction		(ZEInt Arg0) const	{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+		virtual	const char*		AbstractVirtualFunction		(ZEInt Arg0)			{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
+		virtual	const char*		AbstractVirtualConstFunction(ZEInt Arg0) const	{return (CallCheck(Arg0) ? __FUNCTION__ : "");}
 };
 
 void VoidSimpleFunction0() { }
-void VoidSimpleFunction1(int) { }
+void VoidSimpleFunction1(ZEInt) { }
 
 const char* SimpleFunction0() { return __FUNCTION__;}
-const char* SimpleFunction1(int) { return __FUNCTION__;}
-const char* SimpleFunction2(int, int) { return __FUNCTION__;}
-const char* SimpleFunction3(int, int, int) { return __FUNCTION__;}
-const char* SimpleFunction4(int, int, int, int) { return __FUNCTION__;}
-const char* SimpleFunction5(int, int, int, int, int) { return __FUNCTION__;}
-const char* SimpleFunction6(int, int, int, int, int, int) { return __FUNCTION__;}
-const char* SimpleFunction7(int, int, int, int, int, int, int) { return __FUNCTION__;}
-const char* SimpleFunction8(int, int, int, int, int, int, int, int) { return __FUNCTION__;}
-const char* SimpleFunction10(int, int, int, int, int, int, int, int, int) { return __FUNCTION__;}
+const char* SimpleFunction1(ZEInt) { return __FUNCTION__;}
+const char* SimpleFunction2(ZEInt, ZEInt) { return __FUNCTION__;}
+const char* SimpleFunction3(ZEInt, ZEInt, ZEInt) { return __FUNCTION__;}
+const char* SimpleFunction4(ZEInt, ZEInt, ZEInt, ZEInt) { return __FUNCTION__;}
+const char* SimpleFunction5(ZEInt, ZEInt, ZEInt, ZEInt, ZEInt) { return __FUNCTION__;}
+const char* SimpleFunction6(ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt) { return __FUNCTION__;}
+const char* SimpleFunction7(ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt) { return __FUNCTION__;}
+const char* SimpleFunction8(ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt) { return __FUNCTION__;}
+const char* SimpleFunction10(ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt, ZEInt) { return __FUNCTION__;}
 
-#define SYNTAX const char* (int)
+#define SYNTAX const char* (ZEInt)
 
 ZETestSuite(ZEDelegate)
 {
@@ -196,20 +196,20 @@ ZETestSuite(ZEDelegate)
 		ZEDelegate<void ()> VoidDelegate0 = ZEDelegate<void ()>::Create<&VoidSimpleFunction0>();
 		VoidDelegate0();
 
-		ZEDelegate<void (int)> VoidDelegate1 = ZEDelegate<void (int)>::Create<&VoidSimpleFunction1>();
+		ZEDelegate<void (ZEInt)> VoidDelegate1 = ZEDelegate<void (ZEInt)>::Create<&VoidSimpleFunction1>();
 		VoidDelegate1(1);
 		
 		ZEDelegate<const char* ()> Delegate0 = ZEDelegate<const char* ()>::Create<&SimpleFunction0>();		
 		ZETestCheckString(Delegate0(), "SimpleFunction0");
-		ZEDelegate<const char* (int)> Delegate1 = ZEDelegate<const char* (int)>::Create<&SimpleFunction1>();
+		ZEDelegate<const char* (ZEInt)> Delegate1 = ZEDelegate<const char* (ZEInt)>::Create<&SimpleFunction1>();
 		ZETestCheckString(Delegate1(0), "SimpleFunction1");
-		ZEDelegate<const char* (int, int)> Delegate2 = ZEDelegate<const char* (int, int)>::Create<&SimpleFunction2>();
+		ZEDelegate<const char* (ZEInt, ZEInt)> Delegate2 = ZEDelegate<const char* (ZEInt, ZEInt)>::Create<&SimpleFunction2>();
 		ZETestCheckString(Delegate2(0, 1), "SimpleFunction2");
-		ZEDelegate<const char* (int, int, int)> Delegate3 = ZEDelegate<const char* (int, int, int)>::Create<&SimpleFunction3>();
+		ZEDelegate<const char* (ZEInt, ZEInt, ZEInt)> Delegate3 = ZEDelegate<const char* (ZEInt, ZEInt, ZEInt)>::Create<&SimpleFunction3>();
 		ZETestCheckString(Delegate3(0, 1, 2), "SimpleFunction3");
-		ZEDelegate<const char* (int, int, int, int)> Delegate4 = ZEDelegate<const char* (int, int, int, int)>::Create<&SimpleFunction4>();
+		ZEDelegate<const char* (ZEInt, ZEInt, ZEInt, ZEInt)> Delegate4 = ZEDelegate<const char* (ZEInt, ZEInt, ZEInt, ZEInt)>::Create<&SimpleFunction4>();
 		ZETestCheckString(Delegate4(0, 1, 2, 3), "SimpleFunction4");
-		ZEDelegate<const char* (int, int, int, int, int)> Delegate5 = ZEDelegate<const char* (int, int, int, int, int)>::Create<&SimpleFunction5>();
+		ZEDelegate<const char* (ZEInt, ZEInt, ZEInt, ZEInt, ZEInt)> Delegate5 = ZEDelegate<const char* (ZEInt, ZEInt, ZEInt, ZEInt, ZEInt)>::Create<&SimpleFunction5>();
 		ZETestCheckString(Delegate5(0, 1, 2, 3, 4), "SimpleFunction5");
 	}
 }

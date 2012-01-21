@@ -46,7 +46,7 @@ class ZED3D9PostProcessor : public ZEPostProcessor
 	friend class ZED3D9Module;
 	public:
 		virtual ZEPostProcessorNode*				CreateNode(const char* TypeName);
-		virtual ZEPostProcessorNode*				CreateNode(size_t TypeId);
+		virtual ZEPostProcessorNode*				CreateNode(ZESize TypeId);
 };
 
 #endif

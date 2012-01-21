@@ -46,8 +46,8 @@ class ZENavigationMeshPolygon
 {
 	public:
 		bool Deleted;
-		size_t NormalIndex;
-		ZEArray<size_t> VertexIndices;
+		ZESize NormalIndex;
+		ZEArray<ZESize> VertexIndices;
 };
 
 typedef ZEOctree<ZENavigationMeshPolygon> ZENavigationMeshOctree;
@@ -61,7 +61,7 @@ class ZENavigationMesh
 		ZEChunkArray<ZENavigationMeshPolygon, 10000> Polygons;
 
 
-		ZEPolygon					ToPolygon(size_t Index);
+		ZEPolygon					ToPolygon(ZESize Index);
 		void						Clear();
 		void						Generate(const ZEArray<ZEPolygon>& Input);
 

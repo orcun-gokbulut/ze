@@ -108,7 +108,7 @@ void ZEPhysXModule::Deinitialize()
 	if (!IsInitialized())
 		return;
 
-	for (size_t I = 0; I < PhysicalWorlds.GetCount(); I++)
+	for (ZESize I = 0; I < PhysicalWorlds.GetCount(); I++)
 		PhysicalWorlds[I]->Destroy();
 
 	PhysicalWorlds.Clear();
@@ -133,7 +133,7 @@ void ZEPhysXModule::Process(float ElapsedTime)
 	if (!GetEnabled())
 		return;
 
-	for (size_t I = 0; I < PhysicalWorlds.GetCount(); I++)
+	for (ZESize I = 0; I < PhysicalWorlds.GetCount(); I++)
 		if (PhysicalWorlds[I]->GetEnabled())
 			PhysicalWorlds[I]->Process(ElapsedTime);
 }
@@ -143,7 +143,7 @@ void ZEPhysXModule::UpdateWorlds()
 	if (!GetEnabled())
 		return;
 
-	for (size_t I = 0; I < PhysicalWorlds.GetCount(); I++)
+	for (ZESize I = 0; I < PhysicalWorlds.GetCount(); I++)
 		if (PhysicalWorlds[I]->GetEnabled())
 			PhysicalWorlds[I]->Update();
 }

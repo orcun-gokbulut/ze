@@ -51,7 +51,7 @@ class ZEResource
 		bool					Cached;
 		bool					Shared;
 		bool					Internal;
-		mutable size_t			ReferenceCount;
+		mutable ZESize			ReferenceCount;
 
 								ZEResource();
 		virtual					~ZEResource();
@@ -67,7 +67,7 @@ class ZEResource
 
 		void					AddReferance() const;
 
-		size_t					GetReferanceCount() const;
+		ZESize					GetReferanceCount() const;
 
 		void					Release();
 };

@@ -184,7 +184,7 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 	{
 		if (InputBinding->Event.Type == ZE_IT_BUTTON)
 		{
-			int ButtonIndex = InputBinding->Event.Index;
+			ZEInt ButtonIndex = InputBinding->Event.Index;
 
 			if (ButtonIndex >= 5)
 				return false;
@@ -207,7 +207,7 @@ bool ZEWindowsInputMouseDevice::ProcessInputBinding(ZEInputBinding* InputBinding
 		}
 		else if (InputBinding->Event.Type == ZE_IT_AXIS)
 		{
-			int AxisIndex = InputBinding->Event.Index;
+			ZEInt AxisIndex = InputBinding->Event.Index;
 
 			if (AxisIndex > 2)
 				return false;

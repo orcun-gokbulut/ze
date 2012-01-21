@@ -136,7 +136,7 @@ void ZEDFloatIntLineEditPreviewer::SetImage(QString FileName)
 bool ZEDFloatIntLineEdit::ParseInteger()
 {
 	bool* Ok = new bool;
-	int ConvertedValue = 0;
+	ZEInt ConvertedValue = 0;
 
 	ConvertedValue = text().toInt(Ok);
 
@@ -218,7 +218,7 @@ void ZEDFloatIntLineEdit::mouseMoveEvent(QMouseEvent* Event)
 
 	if(Mode == IntegerMode)
 	{
-		int Amount = Event->globalPos().y() - OldMousePositionY;
+		ZEInt Amount = Event->globalPos().y() - OldMousePositionY;
 		LastValidIntVlaue = LastValidIntVlaue + -(Amount * IntegerStepSize);
 		setText(QString().setNum(LastValidIntVlaue));
 		IsTextChanged = true;
@@ -226,7 +226,7 @@ void ZEDFloatIntLineEdit::mouseMoveEvent(QMouseEvent* Event)
 
 	if(Mode == FloatMode)
 	{
-		int Amount = Event->globalPos().y() - OldMousePositionY;
+		ZEInt Amount = Event->globalPos().y() - OldMousePositionY;
 		LastValidFloatValue = LastValidFloatValue + -(Amount * FloatStepSize);
 		setText(QString().setNum(LastValidFloatValue));
 		IsTextChanged = true;
@@ -309,12 +309,12 @@ void ZEDFloatIntLineEdit::leaveEvent(QEvent* Event)
 	QLineEdit::leaveEvent(Event);
 }
 
-void ZEDFloatIntLineEdit::SetIntegerStepSize(int StepSize)
+void ZEDFloatIntLineEdit::SetIntegerStepSize(ZEInt StepSize)
 {
 	this->IntegerStepSize = StepSize;
 }
 
-int ZEDFloatIntLineEdit::GetIntegerStepSize()
+ZEInt ZEDFloatIntLineEdit::GetIntegerStepSize()
 {
 	return IntegerStepSize;
 }
@@ -329,12 +329,12 @@ float ZEDFloatIntLineEdit::GetFloatStepSize()
 	return FloatStepSize;
 }
 
-void ZEDFloatIntLineEdit::SetInteger(int Value)
+void ZEDFloatIntLineEdit::SetInteger(ZEInt Value)
 {
 	setText(QString().setNum(Value));
 }
 
-int ZEDFloatIntLineEdit::GetInteger(bool* Ok)
+ZEInt ZEDFloatIntLineEdit::GetInteger(bool* Ok)
 {
 	if(ParseInteger() == true)
 	{

@@ -105,7 +105,7 @@ ZEReportBehaviour ZETrigger::GetReportBehaviour() const
 void ZETrigger::Tick(float ElapsedTime)
 {
 	if (Callback != NULL && ActivateTriggerOn != ZE_ATO_NONE)
-		for (size_t I = 0; I < zeScene->GetEntities().GetCount(); I++)
+		for (ZESize I = 0; I < zeScene->GetEntities().GetCount(); I++)
 		{
 			ZEEntity* CurrentEntity = zeScene->GetEntities()[I];
 
@@ -141,7 +141,7 @@ void ZETrigger::Tick(float ElapsedTime)
 			if(!ZEAABBox::IntersectionTest(GetWorldBoundingBox(), CurrentEntity->GetPosition()))
 				if (InsideEntityIds.GetCount() != 0 && ActivateTriggerOn == ZE_ATO_LEAVE)
 				{
-					for(size_t N = 0; N < InsideEntityIds.GetCount(); N++)
+					for(ZESize N = 0; N < InsideEntityIds.GetCount(); N++)
 					{
 						Callback(this,CurrentEntity);
 					}

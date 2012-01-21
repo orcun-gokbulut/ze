@@ -54,7 +54,7 @@ const char* ZEDSoundExtensionsPlugIn::GetAuthor()
 	return "Zinek Code House & Game Studio";
 }
 
-unsigned int ZEDSoundExtensionsPlugIn::GetExtensionCount()
+ZEUInt ZEDSoundExtensionsPlugIn::GetExtensionCount()
 {
 	return 1;
 }

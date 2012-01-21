@@ -62,11 +62,11 @@ class ZEOptionSection
 		const ZEString&					GetName();
 
 		bool							AddOption(ZEOption* Option);
-		void							DeleteOption(size_t Index);
-		size_t							GetNumberOfOptions();
+		void							DeleteOption(ZESize Index);
+		ZESize							GetNumberOfOptions();
 
 		ZEOption*						GetOption(const ZEString& OptionName);
-		ZEOption*						GetOption(size_t Index);
+		ZEOption*						GetOption(ZESize Index);
 
 		const ZEOptionsChangingEvent&	GetOnChanging();		
 		void							SetOnChanging(ZEOptionsChangingEvent EventHandler);

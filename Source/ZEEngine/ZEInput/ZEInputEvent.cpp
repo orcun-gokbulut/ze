@@ -57,9 +57,9 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 	};
 
 	ZEParserState ParserState = ZE_PS_DEVICE_IDENTIFIER;
-	int Len = InputString.GetLength();
-	int IdentifierStart = 0;
-	for (int I = 0; I < Len; I++)
+	ZEInt Len = InputString.GetLength();
+	ZEInt IdentifierStart = 0;
+	for (ZEInt I = 0; I < Len; I++)
 	{
 		switch(InputString[I])
 		{
@@ -224,7 +224,7 @@ static bool ParseInputBinding(ZEString InputString, ZEInputEvent& Event)
 	}
 
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (size_t I = 0; I < Devices.GetCount(); I++)
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
 		{
 			Event.Device = Devices[I];
@@ -354,7 +354,7 @@ ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEUInt32 Index, ZEInputBu
 {
 	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (size_t I = 0; I < Devices.GetCount(); I++)
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
 		{
 			this->Device = Devices[I];
@@ -370,7 +370,7 @@ ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEUInt32 Index, ZEInputAx
 {
 	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (size_t I = 0; I < Devices.GetCount(); I++)
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
 		{
 			this->Device = Devices[I];
@@ -386,7 +386,7 @@ ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEInputType InputType, ZE
 {
 	this->Device = NULL;
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (size_t I = 0; I < Devices.GetCount(); I++)
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
 		{
 			this->Device = Devices[I];
@@ -401,7 +401,7 @@ ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEInputType InputType, ZE
 ZEInputEvent::ZEInputEvent(const ZEString& DeviceName, ZEUInt32 Index, ZEInputQuaternionState State)
 {
 	const ZEArray<ZEInputDevice*>& Devices = ZEInputModule::GetInstance()->GetInputDevices();
-	for (size_t I = 0; I < Devices.GetCount(); I++)
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		if (Devices[I]->GetDeviceName() == DeviceName)
 		{
 			this->Device = Devices[I];

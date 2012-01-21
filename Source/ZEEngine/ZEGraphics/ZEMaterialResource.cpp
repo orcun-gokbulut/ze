@@ -47,7 +47,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -101,7 +101,7 @@ const ZEArray<ZEAnimation>& ZEMaterialResource::GetAnimations() const
 
 const ZEAnimation* ZEMaterialResource::GetAnimationByName(const char* Name) const
 {
-	for (size_t I = 0; I < Animations.GetCount(); I++)
+	for (ZESize I = 0; I < Animations.GetCount(); I++)
 		if (strnicmp(Animations[I].Name, Name, ZE_MTLF_MAX_NAME_SIZE) == 0)
 			return &Animations[I];
 
@@ -110,7 +110,7 @@ const ZEAnimation* ZEMaterialResource::GetAnimationByName(const char* Name) cons
 
 bool ZEMaterialResource::LoadTextures(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile, const ZETextureOptions* UserOptions)
 {
-	for (size_t I = 0; I < MaterialResource->TextureResources.GetCount(); I++)
+	for (ZESize I = 0; I < MaterialResource->TextureResources.GetCount(); I++)
 	{
 		ZEMaterialFileTextureChunk TextureChunk;
 		ZETextureResource* CurrentTextureResource = MaterialResource->TextureResources[I];
@@ -186,7 +186,7 @@ bool ZEMaterialResource::LoadFixedMaterial(ZEMaterialResource* MaterialResource,
 
 bool ZEMaterialResource::LoadAnimations(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile)
 {
-	for (size_t I = 0; I < MaterialResource->Animations.GetCount(); I++)
+	for (ZESize I = 0; I < MaterialResource->Animations.GetCount(); I++)
 		if (!ZEAnimation::ReadFromFile(ResourceFile, &MaterialResource->Animations[I]))
 		{	
 			zeError("Can not read material animation. (FileName : \"%s\")", ResourceFile->GetFilePath().GetValue());

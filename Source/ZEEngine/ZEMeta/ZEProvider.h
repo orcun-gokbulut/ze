@@ -70,7 +70,7 @@ class ZEProvider
 		bool							RegisterClass(ZEObjectDescription* Description);
 		void							UnregisterClass(ZEObjectDescription* Description);
 
-		ZEObject*						CreateInstance(size_t Index) const;
+		ZEObject*						CreateInstance(ZESize Index) const;
 		ZEObject*						CreateInstance(const char* Name) const;
 };
 

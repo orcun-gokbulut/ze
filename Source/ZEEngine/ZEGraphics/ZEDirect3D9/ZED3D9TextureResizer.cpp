@@ -55,12 +55,12 @@
 #include "ZECore/ZEConsole.h"
 
 
-bool ZED3D9TextureResizer::IsPowerOfTwo(unsigned int Value)
+bool ZED3D9TextureResizer::IsPowerOfTwo(ZEUInt Value)
 {
 	return ((Value & (Value - 1)) != 0)  ? false : true;
 }
 
-unsigned int ZED3D9TextureResizer::NextPowerOfTwo(unsigned int Value)
+ZEUInt ZED3D9TextureResizer::NextPowerOfTwo(ZEUInt Value)
 {
 	if(Value <= 1)
 		return 1;
@@ -74,7 +74,7 @@ unsigned int ZED3D9TextureResizer::NextPowerOfTwo(unsigned int Value)
 	return ((Value << 1) + 1) - Value;
 }
 
-unsigned int ZED3D9TextureResizer::PreviousPowerOfTwo(unsigned int Value)
+ZEUInt ZED3D9TextureResizer::PreviousPowerOfTwo(ZEUInt Value)
 {
 	if(Value <= 1)
 		return 1;
@@ -88,10 +88,10 @@ unsigned int ZED3D9TextureResizer::PreviousPowerOfTwo(unsigned int Value)
 	return Value - (Value >> 1);
 }
 
-unsigned int ZED3D9TextureResizer::GetPowerOfTwo(unsigned int Value)
+ZEUInt ZED3D9TextureResizer::GetPowerOfTwo(ZEUInt Value)
 {
-	unsigned int Next;
-	unsigned int Previous;
+	ZEUInt Next;
+	ZEUInt Previous;
 
 	switch(AutoFitMode)
 	{
@@ -140,8 +140,8 @@ ZED3D9FittingPowerof2Mode ZED3D9TextureResizer::GetAutoFitMode()
 	return AutoFitMode;
 }
 
-void ZED3D9TextureResizer::Initialize(void* DestData, unsigned int DestPitch, unsigned int DestWidth, unsigned int DestHegiht,
-									  void* SrcData, unsigned int SrcPitch, unsigned int SrcWidth, unsigned int SrcHeight)
+void ZED3D9TextureResizer::Initialize(void* DestData, ZEUInt DestPitch, ZEUInt DestWidth, ZEUInt DestHegiht,
+									  void* SrcData, ZEUInt SrcPitch, ZEUInt SrcWidth, ZEUInt SrcHeight)
 {
 	// Set the parameters
 	this->SrcInfo.Buffer = SrcData;
@@ -185,8 +185,8 @@ bool ZED3D9TextureResizer::Process()
 	IDirect3DSurface9* DepthStencil = NULL;	
 
 	void* Dest = NULL;
-	const unsigned int Bpp = 4;
-	size_t DestPitch = 0; 
+	const ZEUInt Bpp = 4;
+	ZESize DestPitch = 0; 
 	
 	static struct Vert  
 	{
@@ -270,7 +270,7 @@ bool ZED3D9TextureResizer::Process()
 
 		// Fill the input texture
 		Input->Lock(&Dest, &DestPitch, 0);
-		for(size_t I = 0; I < SrcInfo.Height; I++)
+		for(ZESize I = 0; I < SrcInfo.Height; I++)
 			memcpy((unsigned char*)Dest + I * DestPitch, (unsigned char*)SrcInfo.Buffer + I * SrcInfo.Pitch, SrcInfo.Width * Bpp);
 		Input->Unlock(0);
 
@@ -302,7 +302,7 @@ bool ZED3D9TextureResizer::Process()
 		GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 		GetDevice()->SetRenderState(D3DRS_CULLMODE,			D3DCULL_NONE);
 
-		const int WindowSize = HorizontalPassKernel.GetKernelWindowSize();
+		const ZEInt WindowSize = HorizontalPassKernel.GetKernelWindowSize();
 		const ZEVector4* Kernel = HorizontalPassKernel.GetKernel();
 
 		// pass the parameters to graphics device
@@ -345,7 +345,7 @@ bool ZED3D9TextureResizer::Process()
 
 			// Fill the input texture
 			Input->Lock(&Dest, &DestPitch, 0);
-			for(size_t I = 0; I < SrcInfo.Height; I++)
+			for(ZESize I = 0; I < SrcInfo.Height; I++)
 				memcpy((unsigned char*)Dest + I * DestPitch, (unsigned char*)SrcInfo.Buffer + I * SrcInfo.Pitch, SrcInfo.Width * Bpp);
 			Input->Unlock(0);
 			
@@ -378,7 +378,7 @@ bool ZED3D9TextureResizer::Process()
 		Result = GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE,	FALSE);
 		Result = GetDevice()->SetRenderState(D3DRS_CULLMODE,			D3DCULL_NONE);
 
-		const int WindowSize = VerticalPassKernel.GetKernelWindowSize();
+		const ZEInt WindowSize = VerticalPassKernel.GetKernelWindowSize();
 		const ZEVector4* Kernel = VerticalPassKernel.GetKernel();
 
 		// pass the parameters to graphics device
@@ -407,7 +407,7 @@ bool ZED3D9TextureResizer::Process()
 		D3DLOCKED_RECT Rect;
 		Result = ReadBack->LockRect(&Rect, NULL, NULL);
 
-		for(size_t I = 0; I < DestInfo.Height; I++)
+		for(ZESize I = 0; I < DestInfo.Height; I++)
 			memcpy((unsigned char*)DestInfo.Buffer + I * DestInfo.Pitch, (unsigned char*)Rect.pBits + I * Rect.Pitch, DestInfo.Width * Bpp);
 
 		Result = ReadBack->UnlockRect();

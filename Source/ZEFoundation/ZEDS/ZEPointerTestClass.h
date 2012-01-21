@@ -47,9 +47,9 @@ enum ZETestClassStatus
 class ZETestClass
 {
 	public:
-		static int	Status;
-		static int	InstanceCount;
-		static int	DestroyedInstanceCount;
+		static ZEInt	Status;
+		static ZEInt	InstanceCount;
+		static ZEInt	DestroyedInstanceCount;
 
 		static void Reset();
 

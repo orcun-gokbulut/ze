@@ -88,7 +88,7 @@ void ZEDNodeEditor::AddNode()
 
 	ZEDNodeIOPort* AddPort;
 
-	for (int I = 0; I < 30; I++)
+	for (ZEInt I = 0; I < 30; I++)
 	{
 		str.setNum(qrand());
 		if(I % 2 == 0)
@@ -122,11 +122,11 @@ void ZEDNodeEditor::NodeSelectionControl(QList<ZEDNodeEditorNode*>*	SelectedNode
 }
 void ZEDNodeEditor::NodeDeletingControl(QList<ZEDNodeEditorNode*>*	DeletingSelectedNodes, bool& DeletingNodesValidation)
 {/*
-	int counter = 0;
+	ZEInt counter = 0;
 
-	for (int I = 0; I < View->GetConnections()->count(); I++)
+	for (ZEInt I = 0; I < View->GetConnections()->count(); I++)
 	{
-		for (int J = 0; J < DeletingSelectedNodes->count(); J++)
+		for (ZEInt J = 0; J < DeletingSelectedNodes->count(); J++)
 		{
 			if (View->GetConnections()->value(I)->GetFromNode() == DeletingSelectedNodes->value(J) || View->GetConnections()->value(I)->GetToNode() == DeletingSelectedNodes->value(J))
 				counter ++;
@@ -174,7 +174,7 @@ ZEDNodeEditor::~ZEDNodeEditor()
 void ZEDNodeEditor::Test()
 {
 	ZEDNodeEditorMinimap* MiniMapView = new ZEDNodeEditorMinimap(View, View->GetScene(), View);
-	for (int I = 0; I < 2; I++)
+	for (ZEInt I = 0; I < 2; I++)
 	{
 		ZEDNodeEditorNode* NewNode = new ZEDNodeEditorNode(NULL, View, ZED_IOPA_IO_TYPE_ORDER);
 		
@@ -183,7 +183,7 @@ void ZEDNodeEditor::Test()
 
 		ZEDNodeIOPort* AddPort;
 		
-		for (int I = 0; I < 30; I++)
+		for (ZEInt I = 0; I < 30; I++)
 		{
 			str.setNum(qrand());
 			if(I % 2 == 0)
@@ -205,7 +205,7 @@ void ZEDNodeEditor::Test()
 		View->AddNode(NewNode, QPointF(200,20));
 
 		NewNode = new ZEDNodeEditorNode(NULL, View, ZED_IOPA_ALPABETICAL_ORDER);
-		for (int I = 0; I < 30; I++)
+		for (ZEInt I = 0; I < 30; I++)
 		{
 			str.setNum(qrand());
 			if(I % 2 == 0)
@@ -223,7 +223,7 @@ void ZEDNodeEditor::Test()
 		View->AddNode(NewNode, QPointF(50,20));
 
 		ZEDNodeEditorNode* NewNode1 = new ZEDNodeEditorNode(NULL, View, ZED_IOPA_ALPABETICAL_ORDER);
-		for (int I = 0; I < 30; I++)
+		for (ZEInt I = 0; I < 30; I++)
 		{
 			str.setNum(qrand());
 			if(I % 2 == 0)

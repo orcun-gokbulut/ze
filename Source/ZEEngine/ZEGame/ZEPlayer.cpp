@@ -111,7 +111,7 @@ void ZEPlayer::Tick(float Time)
 
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 
-	for (size_t I = 0; I < InputMap.InputActionCount; I++)
+	for (ZESize I = 0; I < InputMap.InputActionCount; I++)
 	{
 		Current = &InputMap.InputActions[I];
 		switch(Current->Id)

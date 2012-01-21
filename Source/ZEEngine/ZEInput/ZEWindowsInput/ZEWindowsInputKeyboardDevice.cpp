@@ -351,7 +351,7 @@ bool ZEWindowsInputKeyboardDevice::ProcessInputBinding(ZEInputBinding* InputBind
 	{
 		if (InputBinding->Event.Type == ZE_IT_BUTTON)
 		{
-			int ButtonIndex = InputBinding->Event.Index;
+			ZEInt ButtonIndex = InputBinding->Event.Index;
 
 			if (ButtonIndex > 255)
 				return false;

@@ -71,7 +71,7 @@ ZEPostProcessorNode* ZEPostProcessor::CreateNode(const char* Name)
 		return NULL;
 }
 
-ZEPostProcessorNode* ZEPostProcessor::CreateNode(size_t Index)
+ZEPostProcessorNode* ZEPostProcessor::CreateNode(ZESize Index)
 {
 	return NULL;
 }
@@ -100,7 +100,7 @@ bool ZEPostProcessor::Initialize()
 
 void ZEPostProcessor::Deinitialize()
 {
-/*	for (size_t I = 0; I < Nodes.GetCount(); I++)
+/*	for (ZESize I = 0; I < Nodes.GetCount(); I++)
 		Nodes[I]->Deinitialize();*/
 }
 
@@ -109,7 +109,7 @@ bool ZEPostProcessor::ProcessNode(ZEPostProcessorNode* Node)
 	ZEPostProcessorNode** Dependencies = Node->GetDependencies();
 
 	// Process dependent nodes
-	for (size_t I = 0; I < Node->GetDependencyCount(); I++)
+	for (ZESize I = 0; I < Node->GetDependencyCount(); I++)
 		if (Dependencies[I]->GetState() == ZE_PPNS_NOT_PROCESSED)
 			if (!ProcessNode(Dependencies[I]))
 				return false;
@@ -126,7 +126,7 @@ bool ZEPostProcessor::ProcessNode(ZEPostProcessorNode* Node)
 
 bool ZEPostProcessor::Process()
 {	
-	for (size_t I = 0; I < Nodes.GetCount(); I++)
+	for (ZESize I = 0; I < Nodes.GetCount(); I++)
 		if (!ProcessNode(Nodes[I]))
 		{
 			zeError("Post process failed.");

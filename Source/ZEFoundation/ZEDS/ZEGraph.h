@@ -41,7 +41,7 @@
 
 struct ZEGraphLink
 {
-	size_t Nodes[2];
+	ZESize Nodes[2];
 };
 
 template<typename Type, typename NodeAllocator = ZEAllocatorBase<Type>, typename LinkAllocator = ZEAllocatorBase<ZEGraphLink>>
@@ -52,9 +52,9 @@ class ZEGraph
 		ZEArray<ZEGraphLink, LinkAllocator> Links;
 
 	public:
-		bool CheckAdjacency(size_t NodeIndex1, size_t NodeIndex2) const
+		bool CheckAdjacency(ZESize NodeIndex1, ZESize NodeIndex2) const
 		{
-			for (size_t I = 0; I < Links.GetCount(); I++)
+			for (ZESize I = 0; I < Links.GetCount(); I++)
 				if ((Links[I].Nodes[0] == NodeIndex1 && Links[I].Nodes[1] == NodeIndex2) || 
 					(Links[I].Nodes[0] == NodeIndex2 && Links[I].Nodes[1] == NodeIndex1))
 					return true;
@@ -62,9 +62,9 @@ class ZEGraph
 			return false;
 		}
 
-		ptrdiff_t GetAdjacentNode(size_t NodeIndex, size_t& LastLinkIndex) const
+		ZESSize GetAdjacentNode(ZESize NodeIndex, ZESize& LastLinkIndex) const
 		{
-			for (size_t I = LastLinkIndex; I < Links.GetCount(); I++)
+			for (ZESize I = LastLinkIndex; I < Links.GetCount(); I++)
 			{
 				if (Links[I].Nodes[0] == NodeIndex)
 				{
@@ -81,11 +81,11 @@ class ZEGraph
 			return -1;
 		}
 
-		ZEArray<size_t> GetAdjacentNodes(size_t NodeIndex) const
+		ZEArray<ZESize> GetAdjacentNodes(ZESize NodeIndex) const
 		{
-			ZEArray<size_t> Indexes;
+			ZEArray<ZESize> Indexes;
 
-			for (size_t I = 0; I < Links.GetCount(); I++)
+			for (ZESize I = 0; I < Links.GetCount(); I++)
 				if (Links[I].Nodes[0] == NodeIndex || Links[I].Nodes[1] == NodeIndex)
 					Indexes.Add(I);
 
@@ -103,17 +103,17 @@ class ZEGraph
 			return Nodes;
 		}
 
-		Type& GetNode(size_t Index)
+		Type& GetNode(ZESize Index)
 		{
 			return Nodes[Index];
 		}
 
-		const Type& GetNode(size_t Index) const
+		const Type& GetNode(ZESize Index) const
 		{
 			return Nodes[Index];
 		}
 
-		size_t GetNodeCount() const
+		ZESize GetNodeCount() const
 		{
 			return Nodes.GetCount();
 		}
@@ -123,14 +123,14 @@ class ZEGraph
 			Nodes.Add(Node);
 		}
 
-		void MassAddNode(size_t Count)
+		void MassAddNode(ZESize Count)
 		{
 			Nodes.MassAdd(Count);
 		}
 
-		void RemoveNode(size_t NodeIndex)
+		void RemoveNode(ZESize NodeIndex)
 		{
-			for (size_t I = 0; I < Links.GetCount(); I++)
+			for (ZESize I = 0; I < Links.GetCount(); I++)
 				if (Links[I].Nodes[0] == NodeIndex || Links[I].Nodes[1] == NodeIndex)
 				{
 					Links.DeleteAt(I);
@@ -149,22 +149,22 @@ class ZEGraph
 			return Links;
 		}
 
-		Type& GetLink(size_t Index)
+		Type& GetLink(ZESize Index)
 		{
 			return Links[Index];
 		}
 
-		const Type& GetLink(size_t Index) const
+		const Type& GetLink(ZESize Index) const
 		{
 			return Links[Index];
 		}
 
-		size_t GetLinkCount() const
+		ZESize GetLinkCount() const
 		{
 			return Links.GetCount();
 		}
 
-		void AddLink(size_t NodeIndex1, size_t NodeIndex2)
+		void AddLink(ZESize NodeIndex1, ZESize NodeIndex2)
 		{
 			ZEGraphLink Link;
 			Link.Nodes[0] = NodeIndex1;
@@ -172,14 +172,14 @@ class ZEGraph
 			Links.Add(Link);
 		}
 
-		void RemoveLink(size_t LinkIndex)
+		void RemoveLink(ZESize LinkIndex)
 		{
 			Links.DeleteAt(LinkIndex);
 		}
 
-		void RemoveLink(size_t NodeIndex1, size_t NodeIndex2)
+		void RemoveLink(ZESize NodeIndex1, ZESize NodeIndex2)
 		{
-			for (size_t I = 0; I < Links.GetCount(); I++)
+			for (ZESize I = 0; I < Links.GetCount(); I++)
 				if ((Links[I].Nodes[0] == NodeIndex1 && Links[I].Nodes[1] == NodeIndex2) || 
 					(Links[I].Nodes[0] == NodeIndex2 && Links[I].Nodes[1] == NodeIndex1))
 				{

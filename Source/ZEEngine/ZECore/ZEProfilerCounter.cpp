@@ -163,14 +163,14 @@ ZEInt64 ZEProfilerCounter::GetTotalAverageTime()
 {
 	if(TotalCount == 0)
 		return 0;
-	return (int)(TotalTime / TotalCount);
+	return (ZEInt)(TotalTime / TotalCount);
 }
 
 ZEInt64 ZEProfilerCounter::GetFrameAverageTime()
 {
 	if(FrameCount == 0)
 		return 0;
-	return (int)(FrameTotalTime / FrameCount);
+	return (ZEInt)(FrameTotalTime / FrameCount);
 }
 
 void ZEProfilerCounter::ResetFrame()

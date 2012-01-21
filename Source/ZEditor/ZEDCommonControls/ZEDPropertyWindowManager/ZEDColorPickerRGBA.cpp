@@ -240,9 +240,9 @@ void ZEDColorPickerRGBA::ChangedByCollection()
 	QString Z;
 	QString W;
 
-	int ParsedParameterCount = 0;
+	ZEInt ParsedParameterCount = 0;
 
-	for(int I = 0; I < Text.length(); I++)
+	for(ZEInt I = 0; I < Text.length(); I++)
 	{
 		if(QString(Text[I]) == QString(";"))
 			ParsedParameterCount++;

@@ -47,7 +47,7 @@ float ZED3D9ViewPort::GetAspectRatio()
 	return 0.0f;
 }
 
-unsigned int ZED3D9ViewPort::GetWidth()
+ZEUInt ZED3D9ViewPort::GetWidth()
 {
 	if (FrameBuffer != NULL)
 	{
@@ -59,7 +59,7 @@ unsigned int ZED3D9ViewPort::GetWidth()
 	return 0;
 }
 
-unsigned int ZED3D9ViewPort::GetHeight()
+ZEUInt ZED3D9ViewPort::GetHeight()
 {
 	if (FrameBuffer != NULL)
 	{

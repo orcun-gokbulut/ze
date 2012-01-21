@@ -244,8 +244,8 @@ inline void ZEMatrix3x3::Sub(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMat
 
 inline void ZEMatrix3x3::Multiply(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B)
 {
-	for (int RowIndex = 0; RowIndex < 3; RowIndex++) // Row
-		for (int ColumnIndex = 0; ColumnIndex < 3; ColumnIndex++) // Column
+	for (ZEInt RowIndex = 0; RowIndex < 3; RowIndex++) // Row
+		for (ZEInt ColumnIndex = 0; ColumnIndex < 3; ColumnIndex++) // Column
 			Out.M[ColumnIndex][RowIndex] = 
 			A.M[0][RowIndex] * B.M[ColumnIndex][0] + 
 			A.M[1][RowIndex] * B.M[ColumnIndex][1] + 
@@ -499,7 +499,7 @@ ZEMatrix3x3& ZEMatrix3x3::operator *= (float S)
 
 bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const 
 {
-	for (size_t I = 0; I < 9; I++)
+	for (ZESize I = 0; I < 9; I++)
 		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return false;
 
@@ -508,19 +508,19 @@ bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const
 
 bool ZEMatrix3x3::operator != (const ZEMatrix3x3 &M) const 
 {
-	for (size_t I = 0; I < 9; I++)
+	for (ZESize I = 0; I < 9; I++)
 		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return true;
 
 	return false;
 }
 
-float ZEMatrix3x3::operator[](size_t Index) const
+float ZEMatrix3x3::operator[](ZESize Index) const
 {
 	return MA[Index];
 }
 
-float& ZEMatrix3x3::operator[](size_t Index)
+float& ZEMatrix3x3::operator[](ZESize Index)
 {
 	return MA[Index];
 }
@@ -989,8 +989,8 @@ inline void ZEMatrix4x4::Sub(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMat
 
 inline void ZEMatrix4x4::Multiply(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B)
 {
-	for (int RowIndex = 0; RowIndex < 4; RowIndex++) // Row
-		for (int ColumnIndex = 0; ColumnIndex < 4; ColumnIndex++) // Column
+	for (ZEInt RowIndex = 0; RowIndex < 4; RowIndex++) // Row
+		for (ZEInt ColumnIndex = 0; ColumnIndex < 4; ColumnIndex++) // Column
 			Out.M[ColumnIndex][RowIndex] = 
 				A.M[0][RowIndex] * B.M[ColumnIndex][0] + 
 				A.M[1][RowIndex] * B.M[ColumnIndex][1] + 
@@ -1337,7 +1337,7 @@ ZEMatrix4x4& ZEMatrix4x4::operator *= (float S)
 
 bool ZEMatrix4x4::operator == (const ZEMatrix4x4 &M) const 
 {
-	for (size_t I = 0; I < 16; I++)
+	for (ZESize I = 0; I < 16; I++)
 		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return false;
 
@@ -1346,19 +1346,19 @@ bool ZEMatrix4x4::operator == (const ZEMatrix4x4 &M) const
 
 bool ZEMatrix4x4::operator != (const ZEMatrix4x4 &M) const 
 {
-	for (size_t I = 0; I < 16; I++)
+	for (ZESize I = 0; I < 16; I++)
 		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return true;
 
 	return false;
 }
 
-float ZEMatrix4x4::operator[](size_t Index) const
+float ZEMatrix4x4::operator[](ZESize Index) const
 {
 	return MA[Index];
 }
 
-float& ZEMatrix4x4::operator[](size_t Index)
+float& ZEMatrix4x4::operator[](ZESize Index)
 {
 	return MA[Index];
 }

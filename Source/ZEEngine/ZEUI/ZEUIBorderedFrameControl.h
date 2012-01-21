@@ -56,8 +56,8 @@
 struct ZEUIControlStyle
 {
 	bool			BorderVisibility;
-	int				BorderWidth;
-	int				ElementVisibilities;
+	ZEInt				BorderWidth;
+	ZEInt				ElementVisibilities;
 	bool			TileTextures;
 
 	ZEVector4		BoderEdgeColor;
@@ -163,8 +163,8 @@ class ZEUIBorderedFrameControl : public ZEUIControl
 
 		virtual void		AddChildControl(ZEUIControl* Control);
 
-		void				SetElementVisibilities(int Elements, bool Visibility);
-		int					GetVisibleElements();
+		void				SetElementVisibilities(ZEInt Elements, bool Visibility);
+		ZEInt					GetVisibleElements();
 
 		void				SetBorderThickness(float Thickness);
 

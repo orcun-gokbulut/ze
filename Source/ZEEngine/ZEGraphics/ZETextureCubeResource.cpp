@@ -49,7 +49,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -70,9 +70,9 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 	return NewString;
 }
 
-static void CopyCubeFaceTo(void* Destination, unsigned int DestPitch, void* SourceBuffer, unsigned int SourcePitch, unsigned int EdgeLenght, unsigned int OffsetX, unsigned int OffsetY)
+static void CopyCubeFaceTo(void* Destination, ZEUInt DestPitch, void* SourceBuffer, ZEUInt SourcePitch, ZEUInt EdgeLenght, ZEUInt OffsetX, ZEUInt OffsetY)
 {
-	for (unsigned int I = 0; I < EdgeLenght; I++)
+	for (ZEUInt I = 0; I < EdgeLenght; I++)
 		memcpy((unsigned char*)Destination + (I * DestPitch), (unsigned char*)SourceBuffer + SourcePitch * (OffsetY + I) + OffsetX * 4, EdgeLenght * 4);
 
 }
@@ -204,12 +204,12 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		// Convert it to 6 surface TextureData
 
 		ZETexturePixelFormat PixelFormat = TextureData.GetPixelFormat();
-		unsigned int MipmapCount = TextureData.GetMipmapCount();
-		unsigned int RowSize = TextureData.GetMipmapRowSize(0, 0) / 3;
-		unsigned int RowCount = TextureData.GetMipmapRowCount(0, 0) / 2;
-		unsigned int Width = TextureData.GetWidth() / 3;
-		unsigned int Height = TextureData.GetHeight() / 2;
-		unsigned int Depth = 6; 
+		ZEUInt MipmapCount = TextureData.GetMipmapCount();
+		ZEUInt RowSize = TextureData.GetMipmapRowSize(0, 0) / 3;
+		ZEUInt RowCount = TextureData.GetMipmapRowCount(0, 0) / 2;
+		ZEUInt Width = TextureData.GetWidth() / 3;
+		ZEUInt Height = TextureData.GetHeight() / 2;
+		ZEUInt Depth = 6; 
 
 		// Check if texture dimensions are right
 		if (Width != Height)
@@ -221,13 +221,13 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 
 		// Copy Texture data
 		void* Buffer = malloc(TextureData.GetMipmapDataSize(0, 0));
-		unsigned int BufferPitch = TextureData.GetMipmapRowSize(0, 0);
+		ZEUInt BufferPitch = TextureData.GetMipmapRowSize(0, 0);
 		TextureData.CopyMipmapDataTo(0, 0, Buffer, BufferPitch);
 
 		TextureData.DestroyTexture();
 		TextureData.CreateTexture(PixelFormat, Depth, MipmapCount, Width, Height);
 
-		unsigned int Offset = Width;
+		ZEUInt Offset = Width;
 
 		// Surf0 Mip0 = +X
 		TextureData.AllocateMipmap(0, 0, RowSize, RowCount);
@@ -298,16 +298,16 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	}
 
 	// Copy Data to texture
-	unsigned int MipCount = TextureData.GetMipmapCount();
-	unsigned int SurfaceCount = TextureData.GetDepth();
+	ZEUInt MipCount = TextureData.GetMipmapCount();
+	ZEUInt SurfaceCount = TextureData.GetDepth();
 
 	// Copy texture data into ZETexture2D
 	void* TargetBuffer = NULL;
-	size_t TargetPitch = 0;
+	ZESize TargetPitch = 0;
 
-	for(unsigned int I = 0; I < SurfaceCount; I++)
+	for(ZEUInt I = 0; I < SurfaceCount; I++)
 	{
-		for(unsigned int J = 0; J < MipCount; J++)
+		for(ZEUInt J = 0; J < MipCount; J++)
 		{
 			Texture->Lock((ZETextureCubeFace)I, &TargetBuffer, &TargetPitch);
 			TextureData.CopyMipmapDataTo(I, J, (unsigned char*)TargetBuffer, TargetPitch);

@@ -206,7 +206,7 @@ bool ZETerrain::LoadTerrain()
 	CurrentLOD->Material->SetHeightTexture(CurrentLOD->HeightTexture);
 	CurrentLOD->Material->SetColorTexture(CurrentLOD->ColorTexture);
 
-	for (size_t I = 1; I < 8; I++)
+	for (ZESize I = 1; I < 8; I++)
 	{
 		ZETerrainData* CurrentLevel = TerrainData.Add();
 		ZETerrainData* PrevLevel = &TerrainData[I - 1];
@@ -236,7 +236,7 @@ bool ZETerrain::LoadTerrain()
 
 void ZETerrain::UnloadTerrain()
 {
-	for (size_t I = 0; I < 8; I++)
+	for (ZESize I = 0; I < 8; I++)
 	{
 		TerrainLODs[I].ColorTexture->Destroy();
 		TerrainLODs[I].HeightTexture->Destroy();
@@ -266,7 +266,7 @@ const ZEString& ZETerrain::GetTerrainFile()
 	return TerrainFileName;
 }
 
-bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVector3& Offset, const ZEVector3& Position, float Scale, bool Rotate, size_t LOD)
+bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, const ZEVector3& Offset, const ZEVector3& Position, float Scale, bool Rotate, ZESize LOD)
 {	
 /*	float TextureWidth = HeightTexture->GetWidth() * 0.5f * UnitLength;
 	if (Position.x - ChunkSize * 0.5f * Scale > TextureWidth ||
@@ -341,19 +341,19 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 		LastCameraPosition = CameraPosition;
 		CameraPosition /= UnitLength;
 
-		for (size_t I = 0; I < TerrainLODs.GetCount(); I++)
+		for (ZESize I = 0; I < TerrainLODs.GetCount(); I++)
 		{
 			ZETerrainData* CurrentLevel = TerrainData.Add();
 			ZETerrainLOD* CurrentLOD = TerrainLODs.Add();
 
-			size_t StartX = CameraPosition.x / (1 << I);
-			size_t StartY = CameraPosition.z / (1 << I);
-			size_t Width = 4 * ChunkSize * (1 << I);
+			ZESize StartX = CameraPosition.x / (1 << I);
+			ZESize StartY = CameraPosition.z / (1 << I);
+			ZESize Width = 4 * ChunkSize * (1 << I);
 
 			ZEUInt32* Buffer;
-			size_t Pitch;
+			ZESize Pitch;
 			CurrentLOD->ColorTexture->Lock((void**)&Buffer, &Pitch);
-			for (size_t y = 0; y < CurrentLevel->Height; y++)
+			for (ZESize y = 0; y < CurrentLevel->Height; y++)
 				memcpy(Buffer, CurrentLevel->ColorData + StartX, Width * sizeof(ZEUInt32));
 			CurrentLOD->ColorTexture->Unlock(0);
 
@@ -366,12 +366,12 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 
 	// Calculate quadrant
 	ZEVector3 QuadPosition = ZEVector3::Zero;//CameraPosition;
-	QuadPosition.x = UnitLength * ChunkSize * (int)(CameraPosition.x / ((float)ChunkSize * UnitLength) + 0.5f);
+	QuadPosition.x = UnitLength * ChunkSize * (ZEInt)(CameraPosition.x / ((float)ChunkSize * UnitLength) + 0.5f);
 	QuadPosition.y = 0.0f;
-	QuadPosition.z = UnitLength * ChunkSize * (int)(CameraPosition.z / ((float)ChunkSize * UnitLength) + 0.5f);
+	QuadPosition.z = UnitLength * ChunkSize * (ZEInt)(CameraPosition.z / ((float)ChunkSize * UnitLength) + 0.5f);
 
 
-	for (size_t I = 0; I < 40; I++)
+	for (ZESize I = 0; I < 40; I++)
 	{
 		bool Drawed = false;
 		float Scale = (float)(1 << I) * UnitLength;

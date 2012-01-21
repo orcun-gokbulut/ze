@@ -55,7 +55,7 @@ struct ZEPropertyAnimationKeyChunk
 struct ZEPropertyAnimationChunk
 {
 	ZEUInt32							ChunkId;
-	int								PropertyId;
+	ZEInt								PropertyId;
 	bool							Interpolate;
 	ZEUInt32							ValueType;
 	ZEUInt32							KeyCount;
@@ -82,7 +82,7 @@ bool ZEAnimation::WriteToFile(ZESerializer* Serializer, ZEAnimation* Animation)
 	Serializer->Write(&AnimationChunk, sizeof(ZEAnimationChunk), 1);	
 
 	AnimationChunk.PropertyAnimationCount = Animation->PropertyAnimations.GetCount();
-	for (size_t I = 0; I < AnimationChunk.PropertyAnimationCount; I++)
+	for (ZESize I = 0; I < AnimationChunk.PropertyAnimationCount; I++)
 	{
 		ZEPropertyAnimation* PropertyAnimation = &Animation->PropertyAnimations[I];
 
@@ -94,7 +94,7 @@ bool ZEAnimation::WriteToFile(ZESerializer* Serializer, ZEAnimation* Animation)
 		PropertyAnimationChunk.KeyCount = PropertyAnimation->Keys.GetCount();
 		Serializer->Write(&PropertyAnimationChunk, sizeof(ZEPropertyAnimationChunk), 1);
 		
-		for (size_t I = 0; I < PropertyAnimationChunk.KeyCount;I++)
+		for (ZESize I = 0; I < PropertyAnimationChunk.KeyCount;I++)
 		{
 			ZEPropertyAnimationKeyChunk PropertyAnimationKeyChunk;
 			PropertyAnimationKeyChunk.ChunkId = ZE_ANIF_PROPERTY_ANIMATION_KEY_CHUNKID;
@@ -122,7 +122,7 @@ bool ZEAnimation::ReadFromFile(ZEUnserializer* Unserializer, ZEAnimation* Animat
 	strncpy(Animation->Name, AnimationChunk.Name, ZE_MAX_NAME_SIZE);
 	
 	Animation->PropertyAnimations.SetCount(AnimationChunk.PropertyAnimationCount);
-	for (size_t I = 0; I < Animation->PropertyAnimations.GetCount(); I++)
+	for (ZESize I = 0; I < Animation->PropertyAnimations.GetCount(); I++)
 	{
 		ZEPropertyAnimationChunk PropertyAnimationChunk;
 		Unserializer->Read(&PropertyAnimationChunk, sizeof(ZEPropertyAnimationChunk), 1);
@@ -138,7 +138,7 @@ bool ZEAnimation::ReadFromFile(ZEUnserializer* Unserializer, ZEAnimation* Animat
 		PropertyAnimation->PropertyId = PropertyAnimationChunk.PropertyId;
 		PropertyAnimation->ValueType = (ZEVariantType)PropertyAnimationChunk.ValueType;
 		PropertyAnimation->Keys.SetCount(PropertyAnimationChunk.KeyCount);
-		for (size_t I = 0; I < PropertyAnimation->Keys.GetCount();I++)
+		for (ZESize I = 0; I < PropertyAnimation->Keys.GetCount();I++)
 		{
 			ZEPropertyAnimationKeyChunk PropertyAnimationKeyChunk;
 			Unserializer->Read(&PropertyAnimationKeyChunk, sizeof(ZEPropertyAnimationKeyChunk), 1);
@@ -290,7 +290,7 @@ void ZEAnimationController::AdvanceAnimation(float TimeElapsed)
 			}
 			
 		// Animate PRoperties
-		for (size_t I = 0; I < Animation->PropertyAnimations.GetCount(); I++)
+		for (ZESize I = 0; I < Animation->PropertyAnimations.GetCount(); I++)
 		{
 			ZEPropertyAnimation* PropertyAnimation = &Animation->PropertyAnimations[I];
 
@@ -302,9 +302,9 @@ void ZEAnimationController::AdvanceAnimation(float TimeElapsed)
 												  PropertyAnimation->ValueType == ZE_VRT_VECTOR4))
 			{
 				// Get prev and next key keys
-				int PrevKeyIndex = -1;
-				int NextKeyIndex = -1;
-				for (size_t N = 0; N < PropertyAnimation->Keys.GetCount(); N++)
+				ZEInt PrevKeyIndex = -1;
+				ZEInt NextKeyIndex = -1;
+				for (ZESize N = 0; N < PropertyAnimation->Keys.GetCount(); N++)
 				{
 					if (CurrentFrame > PropertyAnimation->Keys[N].Time)
 						PrevKeyIndex = N;
@@ -370,13 +370,13 @@ void ZEAnimationController::AdvanceAnimation(float TimeElapsed)
 					else if (PropertyAnimation->ValueType == ZE_VRT_FLOAT)
 					{
 						float V1 = PrevKeyValue->GetFloat() , V2 = NextKeyValue->GetFloat();
-						int Value = V1 + (V2 - V1) * Interpolation;
+						ZEInt Value = V1 + (V2 - V1) * Interpolation;
 						Owner->SetProperty(PropertyAnimation->PropertyId, Value);
 					}
 					else if (PropertyAnimation->ValueType == ZE_VRT_INTEGER)
 					{
-						int V1 = PrevKeyValue->GetInteger() , V2 = NextKeyValue->GetInteger();
-						int Value = V1 + (V2 - V1) * Interpolation;
+						ZEInt V1 = PrevKeyValue->GetInteger() , V2 = NextKeyValue->GetInteger();
+						ZEInt Value = V1 + (V2 - V1) * Interpolation;
 						Owner->SetProperty(PropertyAnimation->PropertyId, Value);
 					}
 				}
@@ -384,7 +384,7 @@ void ZEAnimationController::AdvanceAnimation(float TimeElapsed)
 			else
 			{
 				bool Found = false;
-				for (int N = PropertyAnimation->Keys.GetCount() - 1; N >= 0; N--)
+				for (ZEInt N = PropertyAnimation->Keys.GetCount() - 1; N >= 0; N--)
 					if (CurrentFrame >= PropertyAnimation->Keys[N].Time)
 					{
 						Owner->SetProperty(PropertyAnimation->PropertyId, PropertyAnimation->Keys[N].Value);

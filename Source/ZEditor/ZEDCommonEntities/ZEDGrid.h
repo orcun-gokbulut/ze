@@ -46,25 +46,25 @@ class ZEDGrid
 	private:
 
 		ZECanvasBrush*				Grid;
-		int							GridSpacing;
-		int							MajorLineSpacing;
-		int							GridSize;
+		ZEInt							GridSpacing;
+		ZEInt							MajorLineSpacing;
+		ZEInt							GridSize;
 		ZEScene*					Scene;
 
 		void						GenerateGrid();
 
 	public:
 
-		int							GetGridSpacing() const;
-		void						SetGridSpacing(int Spacing);
-		int							GetMajorLineSpacing() const;
-		void						SetMajorLineSpacing(int MajorLineSpacing);
-		int							GetGridSize() const;
-		void						SetGridSize(int GridSize);
+		ZEInt							GetGridSpacing() const;
+		void						SetGridSpacing(ZEInt Spacing);
+		ZEInt							GetMajorLineSpacing() const;
+		void						SetMajorLineSpacing(ZEInt MajorLineSpacing);
+		ZEInt							GetGridSize() const;
+		void						SetGridSize(ZEInt GridSize);
 		bool						GetVisible();
 		void						SetVisible(bool Visibility);
 
-									ZEDGrid(ZEScene* Scene, int Spacing = 1, int MajorLineSpacing = 5, int GridSize = 50);
+									ZEDGrid(ZEScene* Scene, ZEInt Spacing = 1, ZEInt MajorLineSpacing = 5, ZEInt GridSize = 50);
 
 };
 

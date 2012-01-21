@@ -49,12 +49,12 @@ void ZECommand::SetName(const ZEString& Name)
 	this->Name = Name;
 }
 
-void ZECommand::SetAccessLevel(int Access)
+void ZECommand::SetAccessLevel(ZEInt Access)
 {
 	this->AccessLevel = Access;
 }
 
-int ZECommand::GetAccessLevel()
+ZEInt ZECommand::GetAccessLevel()
 {
 	return this->AccessLevel;
 }
@@ -75,7 +75,7 @@ void ZECommand::SetCallback(ZECommandCallback NewCallback)
 	this->Callback = NewCallback;
 }
 
-ZECommand::ZECommand(const ZEString& Name, ZECommandCallback Callback, int AccessLevel)
+ZECommand::ZECommand(const ZEString& Name, ZECommandCallback Callback, ZEInt AccessLevel)
 {
 	this->AccessLevel = AccessLevel;
 	this->Name = Name;

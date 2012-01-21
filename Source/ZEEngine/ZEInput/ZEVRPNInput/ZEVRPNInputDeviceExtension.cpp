@@ -54,7 +54,7 @@ bool ZEVRPNInputDeviceExtension::Initialize()
 
 void ZEVRPNInputDeviceExtension::Deinitialize()
 {
-	for (size_t I = 0; I < Devices.GetCount(); I++)
+	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		Devices[I].Deinitialize();
 	Devices.Clear();
 

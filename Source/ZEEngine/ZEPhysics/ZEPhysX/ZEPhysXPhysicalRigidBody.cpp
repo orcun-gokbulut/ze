@@ -185,7 +185,7 @@ void ZEPhysXPhysicalRigidBody::AddPhysicalShape(ZEPhysicalShape* Shape)
 
 void ZEPhysXPhysicalRigidBody::RemovePhysicalShape(ZEPhysicalShape* Shape)
 {
-	size_t OldCount = Shapes.GetCount();
+	ZESize OldCount = Shapes.GetCount();
 	Shapes.DeleteValue(Shape);
 	if (Actor != NULL)
 		if (OldCount != Shapes.GetCount())
@@ -489,7 +489,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 	ZEArray<NxShapeDesc*> ShapeDescList;
 
 	ActorDesc.shapes.clear();
-	for (size_t I = 0; I < Shapes.GetCount(); I++)
+	for (ZESize I = 0; I < Shapes.GetCount(); I++)
 	{
 		ZEPhysicalShape* CurrentShape = Shapes[I];
 
@@ -599,7 +599,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 	{
 		zeError("Can not create actor.");
 
-		for (size_t I = 0; I < ShapeDescList.GetCount(); I++)
+		for (ZESize I = 0; I < ShapeDescList.GetCount(); I++)
 			delete ShapeDescList[I];
 		ShapeDescList.Clear();
 
@@ -607,7 +607,7 @@ bool ZEPhysXPhysicalRigidBody::Initialize()
 	}
 
 
-	for (size_t I = 0; I < ShapeDescList.GetCount(); I++)
+	for (ZESize I = 0; I < ShapeDescList.GetCount(); I++)
 		delete ShapeDescList[I];
 	ShapeDescList.Clear();
 

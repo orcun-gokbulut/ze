@@ -42,7 +42,7 @@ class ZEModelFile;
 bool WritePhysicalJointToFile(ZEModelFilePhysicalJoint* Joint, FILE* File);
 bool ReadPhysicalJointFromFile(ZEModelFilePhysicalJoint* Joint, FILE* File);
 
-int main()
+ZEInt main()
 {
 	ZEModelFile ModelFile;
 	ZEModelFileBone* Bone = ModelFile.Bones.Add();

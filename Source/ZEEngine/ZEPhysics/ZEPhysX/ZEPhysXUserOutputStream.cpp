@@ -37,7 +37,7 @@
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 
-void ZEPhysXUserOutputStream::reportError(NxErrorCode Code, const char* Message, const char* File, int Line)
+void ZEPhysXUserOutputStream::reportError(NxErrorCode Code, const char* Message, const char* File, ZEInt Line)
 {
 	switch(Code)
 	{
@@ -69,7 +69,7 @@ void ZEPhysXUserOutputStream::reportError(NxErrorCode Code, const char* Message,
 	}
 }
 
-NxAssertResponse ZEPhysXUserOutputStream::reportAssertViolation(const char* Message, const char* File, int Line)
+NxAssertResponse ZEPhysXUserOutputStream::reportAssertViolation(const char* Message, const char* File, ZEInt Line)
 {
 	zeCriticalError("Message: \"%s\", File: \"%s\", Line: %d.", Message, File, Line);
 	return NX_AR_CONTINUE;

@@ -129,8 +129,8 @@ class ZEMatrix3x3
 		bool							operator == (const ZEMatrix3x3 &M) const;
 		bool							operator != (const ZEMatrix3x3 &M) const;
 		
-		float&							operator[](size_t Index); 		
-		float							operator[](size_t Index) const;
+		float&							operator[](ZESize Index); 		
+		float							operator[](ZESize Index) const;
 
 										ZEMatrix3x3(float M11, float M12, float M13,
 													float M21, float M22, float M23,
@@ -222,8 +222,8 @@ class ZEMatrix4x4
 		bool							operator == (const ZEMatrix4x4 &M) const;
 		bool							operator != (const ZEMatrix4x4 &M) const;
 		
-		float&							operator[](size_t Index); 
-		float							operator[](size_t Index) const;
+		float&							operator[](ZESize Index); 
+		float							operator[](ZESize Index) const;
 
 										ZEMatrix4x4(float M11, float M12, float M13, float M14,
 													float M21, float M22, float M23, float M24,

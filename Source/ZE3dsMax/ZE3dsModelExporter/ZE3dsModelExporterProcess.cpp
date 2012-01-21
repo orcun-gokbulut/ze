@@ -114,7 +114,7 @@ bool GetProperty(IExportEntity* Object, const char* Property, IGameNode*& Value)
 	if (Prop != NULL)
 	{	
 		IParamBlock2* ParamBlock = Prop->GetMaxParamBlock2();
-		int ParamId = ParamBlock->IndextoID(Prop->GetParamBlockIndex());
+		ZEInt ParamId = ParamBlock->IndextoID(Prop->GetParamBlockIndex());
 
 		INode* Node =  ParamBlock->GetINode(ParamId);
 		if (Node == NULL)
@@ -144,7 +144,7 @@ bool GetProperty<bool>(IExportEntity* Object, PropType Type, const char* Propert
 	{
 		if (Prop->GetType() == Type)
 		{
-			int Temp;
+			ZEInt Temp;
 			if (Prop->GetPropertyValue(Temp))
 			{
 				Value = Temp;
@@ -183,9 +183,9 @@ bool GetProperty<const char*>(IExportEntity * Object, PropType Type, const char*
 }
 
 template <>
-bool GetProperty<unsigned int>(IExportEntity* Object, PropType Type, const char* Property, unsigned int& Value)
+bool GetProperty<ZEUInt>(IExportEntity* Object, PropType Type, const char* Property, ZEUInt& Value)
 { 
-	int Temp;
+	ZEInt Temp;
 	if (Object == NULL)
 		return false;
 
@@ -219,17 +219,17 @@ bool ZEModelExporter::GetRelativePath(const char* RealPath, char* RelativePath)
 	}
 }
 
-int ZEModelExporter::GetMeshId(IGameNode* Node)
+ZEInt ZEModelExporter::GetMeshId(IGameNode* Node)
 {
-	for (int I = 0; I < ProcessedMasterMeshes.Count(); I++)
+	for (ZEInt I = 0; I < ProcessedMasterMeshes.Count(); I++)
 		if (ProcessedMasterMeshes[I]->GetNodeID() == Node->GetNodeID())
 			return I;
 	return -1;
 }
 
-int ZEModelExporter::GetBoneId(IGameNode* Node)
+ZEInt ZEModelExporter::GetBoneId(IGameNode* Node)
 {
-	for (int I = 0; I < ProcessedBones.Count(); I++)
+	for (ZEInt I = 0; I < ProcessedBones.Count(); I++)
 		if (ProcessedBones[I]->GetNodeID() == Node->GetNodeID())
 			return I;
 
@@ -247,10 +247,10 @@ void CalculateLocalBoundingBox(ZEAABBox& BoundingBox, IGameMesh* Mesh)
 	else
 		BoundingBox.Min = BoundingBox.Max = *(ZEVector3*)&Mesh->GetVertex(Mesh->GetFace(0)->vert[0], true);
 
-	for (int I = 0; I < Mesh->GetNumberOfFaces(); I++)
+	for (ZEInt I = 0; I < Mesh->GetNumberOfFaces(); I++)
 	{
 		FaceEx* Face = Mesh->GetFace(I);
-		for (size_t N = 0; N < 3; N++)
+		for (ZESize N = 0; N < 3; N++)
 		{
 			Point3 Point;
 			Mesh->GetVertex(Face->vert[N], Point, true);
@@ -265,12 +265,12 @@ void CalculateLocalBoundingBox(ZEAABBox& BoundingBox, IGameMesh* Mesh)
 
 }
 
-int ZEModelExporter::ProcessMeshMaterial(IGameMaterial* Material)
+ZEInt ZEModelExporter::ProcessMeshMaterial(IGameMaterial* Material)
 {
 	if (Material == NULL)
 		return -1;
 
-	for (int I = 0; I < Materials.Count(); I++)
+	for (ZEInt I = 0; I < Materials.Count(); I++)
 		if (Materials[I] == Material)
 			return I;
 	Materials.Append(1, &Material);
@@ -282,7 +282,7 @@ bool ZEModelExporter::ProcessMaterials()
 	zepdLog("Processing materials...");
 
 	ModelFile.Materials.SetCount(Materials.Count());
-	for (int I = 0; I < Materials.Count(); I++)
+	for (ZEInt I = 0; I < Materials.Count(); I++)
 	{
 		IGameMaterial* NodeMaterial = Materials[I];
 
@@ -309,7 +309,7 @@ bool ZEModelExporter::ProcessMaterials()
 
 		CurrentMaterial->ShaderComponents = 0;
 
-		for (int N = 0; N < NodeMaterial->GetNumberOfTextureMaps(); N++)
+		for (ZEInt N = 0; N < NodeMaterial->GetNumberOfTextureMaps(); N++)
 		{
 			char RelativePath[ZE_MDLF_MAX_FILENAME_SIZE];
 
@@ -439,7 +439,7 @@ void ZEModelExporter::ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode*
 	Shape->Type = ZE_PBST_CONVEX;
 
 	Shape->Convex.Vertices.SetCount(Mesh->GetNumberOfVerts());
-	for (int I = 0; I < Mesh->GetNumberOfVerts(); I++)
+	for (ZEInt I = 0; I < Mesh->GetNumberOfVerts(); I++)
 	{
 		Point3 Vertex = Mesh->GetVertex(I, false) * WorldTransform;
 		Shape->Convex.Vertices[I] = MAX_TO_ZE(Vertex);
@@ -461,7 +461,7 @@ bool ZEModelExporter::ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode
 	PhysicalShape->Position = MAX_TO_ZE(Transform.Translation());
 	PhysicalShape->Rotation = MAX_TO_ZE(Transform.Rotation());
 
-	int GeometryType;
+	ZEInt GeometryType;
 	GetProperty(Object, IGAME_FLOAT_PROP, "PhysicalShape_MaterialRestitution", PhysicalShape->Restitution);
 	GetProperty(Object, IGAME_FLOAT_PROP, "PhysicalShape_MaterialDynamicFriction", PhysicalShape->DynamicFriction);
 	GetProperty(Object, IGAME_FLOAT_PROP, "PhysicalShape_MaterialStaticFriction", PhysicalShape->StaticFriction);
@@ -520,10 +520,10 @@ bool ZEModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEModelFilePhysicalBo
 	if (Object == NULL)
 		return false;
 
-	//GetProperty(Object, IGAME_INT_PROP, "PhysicalBody_Enabled", (int&)PhysicalBodyEnabled);
+	//GetProperty(Object, IGAME_INT_PROP, "PhysicalBody_Enabled", (ZEInt&)PhysicalBodyEnabled);
 
 	GetProperty(Object, IGAME_INT_PROP, "PhysicalBody_Enabled", PhysicalBody->Enabled);
-	int Temp;
+	ZEInt Temp;
 	GetProperty(Object, IGAME_INT_PROP, "PhysicalBody_Type", Temp);
 	PhysicalBody->Type = (ZEPhysicalBodyType)(Temp - 1); // Array index start problem with Max Script and C++)			
 	GetProperty(Object, IGAME_FLOAT_PROP, "PhysicalBody_Mass", PhysicalBody->Mass);
@@ -546,9 +546,9 @@ bool ZEModelExporter::ProcessPhysicalBody(IGameNode* Node, ZEModelFilePhysicalBo
 		return false;
 	}
 	IParamBlock2* ParamBlock = ShapesProp->GetMaxParamBlock2();
-	int ParamId = ParamBlock->IndextoID(ShapesProp->GetParamBlockIndex());
+	ZEInt ParamId = ParamBlock->IndextoID(ShapesProp->GetParamBlockIndex());
 	PhysicalBody->Shapes.SetCount(ParamBlock->Count(ParamId));
-	for (int I = 0; I < ParamBlock->Count(ParamId); I++)
+	for (ZEInt I = 0; I < ParamBlock->Count(ParamId); I++)
 	{
 		const char* Type;
 		IGameNode* PhysicalShapeNode = Scene->GetIGameNode(ParamBlock->GetINode(ParamId, 0, I));
@@ -586,7 +586,7 @@ bool ZEModelExporter::ProcessPhysicalJoint(IGameNode* Node, ZEModelFilePhysicalJ
 	else
 		Joint->Body2Id = -1;
 
-	GetProperty(Object, IGAME_INT_PROP, "Joint_UseGlobalAnchorAxis", (int&)Joint->UseGlobalAnchorAxis);
+	GetProperty(Object, IGAME_INT_PROP, "Joint_UseGlobalAnchorAxis", (ZEInt&)Joint->UseGlobalAnchorAxis);
 	if (!Joint->UseGlobalAnchorAxis)
 	{
 		IGameNode* BodyAnchor1;
@@ -793,13 +793,13 @@ bool ZEModelExporter::ProcessBones()
 	zepdLog("Processing bones...");
 	Tab<IGameNode*> Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_BONE);
 	const char* Type;
-	for (int I = 0; I < Nodes.Count(); I++)
+	for (ZEInt I = 0; I < Nodes.Count(); I++)
 	{
 		Type = NULL;
 		if (GetProperty(Nodes[I]->GetIGameObject(), IGAME_STRING_PROP, "ZEType", Type) && strcmp(Type, "Bone") == 0)
 		{
 			bool Found = false;
-			for (int N = 0; N < ProcessedBones.Count(); N++)
+			for (ZEInt N = 0; N < ProcessedBones.Count(); N++)
 			{
 				if (Nodes[I]->GetNodeID() == ProcessedBones[N]->GetNodeID())
 				{
@@ -812,7 +812,7 @@ bool ZEModelExporter::ProcessBones()
 		}
 	}
 
-	for (int I = 0; I < ProcessedBones.Count(); I++)
+	for (ZEInt I = 0; I < ProcessedBones.Count(); I++)
 		if (!ProcessBone(ProcessedBones[I]))
 			return false;
 
@@ -852,20 +852,20 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 	bool GotError = false;
 	bool BoneCountWarning = false; 
 	ZEMeshLod->AffectingBoneIds.SetCount(0);
-	for (int I = 0; I < Mesh->GetNumberOfFaces(); I++)
+	for (ZEInt I = 0; I < Mesh->GetNumberOfFaces(); I++)
 	{
 		FaceEx* Face;
 		Face = Mesh->GetFace(I);
 		if (!Mesh->IsObjectSkinned())
 		{
-			for (int N = 0; N < 3; N++)
+			for (ZEInt N = 0; N < 3; N++)
 			{	
 				ZEModelFileVertex* Vertex = &ZEMeshLod->Vertices[3*I + N];
 
 				Vertex->Position = WorldTransform * MAX_TO_ZE(Mesh->GetVertex(Face->vert[N], true)); 
 				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, MAX_TO_ZE(Mesh->GetNormal(Face->norm[N], true)));
 
-				int BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal(I, N);
+				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal(I, N);
 				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, MAX_TO_ZE(Mesh->GetTangent(BinormalTangentIndex).Normalize()));
 				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, MAX_TO_ZE(Mesh->GetBinormal(BinormalTangentIndex)));
 
@@ -875,20 +875,20 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 		}
 		else
 		{
-			for (int N = 0; N < 3; N++)
+			for (ZEInt N = 0; N < 3; N++)
 			{
 				ZEModelFileSkinnedVertex* Vertex = &ZEMeshLod->SkinnedVertices[3*I + N];
 
 				Vertex->Position = WorldTransform * MAX_TO_ZE(Mesh->GetVertex(Face->vert[N], true)); 
 				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, MAX_TO_ZE(Mesh->GetNormal(Face->norm[N], true)));
 
-				int BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal(I, N);
+				ZEInt BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal(I, N);
 				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, MAX_TO_ZE(Mesh->GetTangent(BinormalTangentIndex).Normalize()));
 				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, MAX_TO_ZE(Mesh->GetBinormal(BinormalTangentIndex)));
 
 				Vertex->Texcoord = MAX_TO_ZE(Mesh->GetTexVertex(Face->texCoord[N]));
 
-				int BoneCount = Skin->GetNumberOfBones(Face->vert[N]);
+				ZEInt BoneCount = Skin->GetNumberOfBones(Face->vert[N]);
 				if (BoneCount > 4 && !BoneCountWarning)
 				{
 					zepdWarning("Vertex can be affected maximum 4 bones. Exporter is goint to try reducing affecting bones by removing bones with small weights.\r\n"
@@ -898,10 +898,10 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 				ZeroMemory(Vertex->BoneIndices, sizeof(unsigned char) * 4);
 				ZeroMemory(Vertex->BoneWeights, sizeof(float) * 4);
 
-				int BoneIndex = 0;
-				for (int M = 0; M < BoneCount; M++)
+				ZEInt BoneIndex = 0;
+				for (ZEInt M = 0; M < BoneCount; M++)
 				{
-					int BoneId = GetBoneId(Skin->GetIGameBone(Face->vert[N], M));
+					ZEInt BoneId = GetBoneId(Skin->GetIGameBone(Face->vert[N], M));
 
 					if (BoneId == -1)
 					{
@@ -910,8 +910,8 @@ bool ZEModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEModelFileMeshLOD
 						continue;
 					}
 
-					int AffectingBoneId = -1;
-					for (size_t J = 0; J < ZEMeshLod->AffectingBoneIds.GetCount(); J++)
+					ZEInt AffectingBoneId = -1;
+					for (ZESize J = 0; J < ZEMeshLod->AffectingBoneIds.GetCount(); J++)
 					{
 						if (ZEMeshLod->AffectingBoneIds[J] == BoneId)
 						{
@@ -958,7 +958,7 @@ bool ZEModelExporter::ProcessMesh(IGameNode* Node)
 
 	// Process Attributes
 	const char* ZEType;
-	int MeshLOD;
+	ZEInt MeshLOD;
 
 	if (!GetProperty(Mesh, IGAME_STRING_PROP, "ZEType", ZEType) || strcmp(ZEType, "Mesh") != 0)
 	{
@@ -971,7 +971,7 @@ bool ZEModelExporter::ProcessMesh(IGameNode* Node)
 	// Process ZEModelFileMesh
 	zepdLog("Processin ZEModelFileMesh.");
 	ZEModelFileMesh* CurrentMesh = NULL;
-	for (size_t I = 0; I < ModelFile.Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < ModelFile.Meshes.GetCount(); I++)
 		if (strncmp(ModelFile.Meshes[I].Name, Node->GetName(), ZE_MDLF_MAX_NAME_SIZE) == 0)
 		{
 			CurrentMesh = &ModelFile.Meshes[I];
@@ -987,7 +987,7 @@ bool ZEModelExporter::ProcessMesh(IGameNode* Node)
 		}
 
 		zepdLog("Processing ZEModelFileLOD.");
-		for (size_t I = 0; I < CurrentMesh->LODs.GetCount(); I++)
+		for (ZESize I = 0; I < CurrentMesh->LODs.GetCount(); I++)
 			if (CurrentMesh->LODs[I].LODLevel == MeshLOD)
 			{
 				zepdError("Mesh has two LOD with the same LOD Level. (Mesh Name : \"%s\", LodLevel : %d)", CurrentMesh->Name, CurrentMesh->LODs[I].LODLevel);
@@ -1023,7 +1023,7 @@ bool ZEModelExporter::ProcessMeshes()
 	zepdLog("Processing Meshes...");
 	Scene_ = Scene;
 	Tab<IGameNode*> Nodes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
-	for (int I = 0; I < Nodes.Count(); I++)
+	for (ZEInt I = 0; I < Nodes.Count(); I++)
 	{
 		if (GetBoneId(Nodes[I]) == -1)
 			if (!ProcessMesh(Nodes[I]))
@@ -1038,10 +1038,10 @@ bool ZEModelExporter::ProcessAnimation()
 	Tab<IGameNode*> AnimationEnabledBones;
 	Tab<IGameNode*> AnimationEnabledMeshes;
 	GMatrix Matrix;
-	for (int I = 0; I < ProcessedMasterMeshes.Count(); I++)
+	for (ZEInt I = 0; I < ProcessedMasterMeshes.Count(); I++)
 	{
 		Matrix = ProcessedMasterMeshes[I]->GetWorldTM(I * TicksPerFrame);
-		for (int N = 0; N < FrameCount; N++)
+		for (ZEInt N = 0; N < FrameCount; N++)
 			if (!(ProcessedMeshes[I]->GetWorldTM(N * TicksPerFrame) == Matrix))
 			{
 				AnimationEnabledMeshes.Append(1, &ProcessedMeshes[I]);
@@ -1049,10 +1049,10 @@ bool ZEModelExporter::ProcessAnimation()
 			}
 	}
 
-	for (int I = 0; I < ProcessedBones.Count(); I++)
+	for (ZEInt I = 0; I < ProcessedBones.Count(); I++)
 	{
 		Matrix = ProcessedBones[I]->GetWorldTM(I * TicksPerFrame);
-		for (int N = 0; N < FrameCount; N++)
+		for (ZEInt N = 0; N < FrameCount; N++)
 			if (!(ProcessedBones[I]->GetWorldTM(N * TicksPerFrame) == Matrix))
 			{
 				AnimationEnabledBones.Append(1, &ProcessedBones[I]);
@@ -1067,7 +1067,7 @@ bool ZEModelExporter::ProcessAnimation()
 
 	zepdLog("Total Frame Count : %d", FrameCount);
 	zepdOutput("Processing Animation Frame: ");
-	for (int I = 0; I < FrameCount; I++)
+	for (ZEInt I = 0; I < FrameCount; I++)
 	{
 		zepdOutput("%d ", I);
 		if (I % 20 == 0)
@@ -1076,7 +1076,7 @@ bool ZEModelExporter::ProcessAnimation()
 		ZEModelFileAnimationFrame* CurrentFrame = &CurrentAnimation->Frames[I];
 		ZEModelFileAnimationKey* Key;
 		CurrentFrame->BoneKeys.SetCount(AnimationEnabledBones.Count());
-		for (int N = 0; N < AnimationEnabledBones.Count(); N++)
+		for (ZEInt N = 0; N < AnimationEnabledBones.Count(); N++)
 		{
 			Key = &CurrentFrame->BoneKeys[N];
 			Key->ItemId = GetBoneId(AnimationEnabledBones[N]);
@@ -1099,7 +1099,7 @@ bool ZEModelExporter::ProcessAnimation()
 		}
 
 		CurrentFrame->MeshKeys.SetCount(AnimationEnabledMeshes.Count());
-		for (int N = 0; N < AnimationEnabledMeshes.Count(); N++)
+		for (ZEInt N = 0; N < AnimationEnabledMeshes.Count(); N++)
 		{
 			Key = &CurrentFrame->MeshKeys[N];
 			Key->ItemId = GetMeshId(AnimationEnabledMeshes[N]);
@@ -1127,18 +1127,18 @@ bool ZEModelExporter::DumpPropertyContainer(IExportEntity* Node)
 		return false;
 	}
 	zepdOutput("Dumping properties of entity. Class Name : \"%s\".\r\n", Node->GetClassName());
-	for (int I = 0; I < Properties->GetNumberOfProperties(); I++)
+	for (ZEInt I = 0; I < Properties->GetNumberOfProperties(); I++)
 	{
 		IGameProperty* Property = Properties->GetProperty(I);
 		zepdOutput("Property %d. Name : \"%s\", Index : %d, Animated : %s, ", I, Property->GetName(), Property->GetParamBlockIndex(), (Property->IsPropAnimated() ? "Yes" : "No"));
 
 		float FloatValue;
-		int IntValue;
+		ZEInt IntValue;
 		Point3 Point3Value;
 		Point4 Point4Value;
 		const char* StringValue;
 		IParamBlock2* ParamBlock;
-		int ParamId;
+		ZEInt ParamId;
 		ParamType2 ParamType;
 		switch(Property->GetType())
 		{
@@ -1153,7 +1153,7 @@ bool ZEModelExporter::DumpPropertyContainer(IExportEntity* Node)
 				break;
 			case TYPE_INODE_TAB:
 				zepdOutput("Type : INodeTab, Values : [");
-				for (int N = 0 ; N < ParamBlock->Count(ParamId); N++)
+				for (ZEInt N = 0 ; N < ParamBlock->Count(ParamId); N++)
 					zepdOutput("\"%s\", ", ParamBlock->GetINode(ParamId, 0, N)->GetName());
 				zepdOutput("].\r\n");
 				break;

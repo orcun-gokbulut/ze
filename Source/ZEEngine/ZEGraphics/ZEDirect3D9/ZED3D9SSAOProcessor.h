@@ -60,7 +60,7 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 		ZED3D9Texture2D*				InputNormal;
 		ZED3D9Texture2D*				Output;
 
-		int								IterationCount;
+		ZEInt								IterationCount;
 		bool							HalfResolution;
 
 		struct
@@ -86,8 +86,8 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 		void							SetOutput(ZETexture2D* Texture);
 		ZETexture2D*					GetOutput();
 
-		void							SetIterationCount(int Iteration);
-		int								GetIterationCount();
+		void							SetIterationCount(ZEInt Iteration);
+		ZEInt								GetIterationCount();
 
 		void							SetHalfResolution(bool HalfResolution);
 		bool							GetHalfResolution();

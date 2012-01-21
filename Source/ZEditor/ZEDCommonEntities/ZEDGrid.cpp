@@ -43,9 +43,9 @@ void ZEDGrid::GenerateGrid()
 	Grid->Canvas.Clean();
 	this->Grid->PrimitiveType = ZE_ROPT_LINE;
 
-	int DrawStartPoint = -GridSize/2;
+	ZEInt DrawStartPoint = -GridSize/2;
 
-	for (int I = 0; I <= GridSize/GridSpacing; I++)
+	for (ZEInt I = 0; I <= GridSize/GridSpacing; I++)
 	{
 		Grid->Canvas.SetColor(ZEVector4(0.3f, 0.3f, 0.3f, 1.0f));
 
@@ -62,34 +62,34 @@ void ZEDGrid::GenerateGrid()
 	Grid->UpdateCanvas();
 }
 
-int ZEDGrid::GetGridSpacing() const
+ZEInt ZEDGrid::GetGridSpacing() const
 {
 	return GridSpacing;
 }
 
-void ZEDGrid::SetGridSpacing(int Spacing)
+void ZEDGrid::SetGridSpacing(ZEInt Spacing)
 {
 	this->GridSpacing = Spacing;
 	GenerateGrid();
 }
 
-int ZEDGrid::GetMajorLineSpacing() const
+ZEInt ZEDGrid::GetMajorLineSpacing() const
 {
 	return MajorLineSpacing;
 }
 
-void ZEDGrid::SetMajorLineSpacing(int MajorLineSpacing)
+void ZEDGrid::SetMajorLineSpacing(ZEInt MajorLineSpacing)
 {
 	this->MajorLineSpacing = MajorLineSpacing;
 	GenerateGrid();
 }
 
-int ZEDGrid::GetGridSize() const
+ZEInt ZEDGrid::GetGridSize() const
 {
 	return GridSize;
 }
 
-void ZEDGrid::SetGridSize(int GridSize)
+void ZEDGrid::SetGridSize(ZEInt GridSize)
 {
 	this->GridSize = GridSize;
 	GenerateGrid();
@@ -105,7 +105,7 @@ void ZEDGrid::SetVisible(bool Visibility)
 	Grid->SetVisible(Visibility);
 }
 
-ZEDGrid::ZEDGrid(ZEScene* Scene, int Spacing, int MajorLineSpacing, int GridSize)
+ZEDGrid::ZEDGrid(ZEScene* Scene, ZEInt Spacing, ZEInt MajorLineSpacing, ZEInt GridSize)
 {
 	this->GridSpacing = Spacing;
 	this->MajorLineSpacing = MajorLineSpacing;

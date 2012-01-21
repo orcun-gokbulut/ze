@@ -47,7 +47,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -74,10 +74,10 @@ ZEFontResource::ZEFontResource()
 
 ZEFontResource::~ZEFontResource()
 {
-	for (unsigned int I = 0; I < Materials.GetCount(); I++)
+	for (ZEUInt I = 0; I < Materials.GetCount(); I++)
 		Materials[I]->Destroy();
 
-	for (unsigned int I = 0; I < TextureResources.GetCount(); I++)
+	for (ZEUInt I = 0; I < TextureResources.GetCount(); I++)
 		TextureResources[I]->Release();
 }
 
@@ -191,7 +191,7 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 	NewResource->TextureResources.SetCount(FileHeader.TextureCount);
 	NewResource->Materials.SetCount(FileHeader.TextureCount);
 
-	for (size_t I = 0; I < FileHeader.TextureCount; I++)
+	for (ZESize I = 0; I < FileHeader.TextureCount; I++)
 	{
 		ZEUInt32 FileCursor, TextureFileSize;
 		
@@ -220,7 +220,7 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 		ResourceFile->Seek(FileCursor + TextureFileSize, ZE_SF_BEGINING);
 	}
 
-	for (size_t I = 0; I < ZE_FONT_FILE_CHARACTER_COUNT; I++)
+	for (ZESize I = 0; I < ZE_FONT_FILE_CHARACTER_COUNT; I++)
 	{
 		NewResource->Characters[I].CoordinateRectangle = FileHeader.Characters[I].Coordinates;
 		NewResource->Characters[I].Texture = NewResource->TextureResources[FileHeader.Characters[I].TextureId]->GetTexture();

@@ -46,7 +46,7 @@ protected:
 	ZEState*							FromState;
 	ZEState*							ToState;
 
-	int									Priority;
+	ZEInt									Priority;
 
 
 public:
@@ -59,8 +59,8 @@ public:
 	ZEState*							GetFromState();
 	ZEState*							GetToState();
 
-	void								SetPriority(int Priority);
-	int									GetPriority() const;
+	void								SetPriority(ZEInt Priority);
+	ZEInt									GetPriority() const;
 
 };
 

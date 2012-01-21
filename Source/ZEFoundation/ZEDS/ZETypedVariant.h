@@ -52,7 +52,7 @@ class ZETypedVariant : public ZEVariant
 {
 	public:
 		void		SetString		(char *NewValue);
-		void		SetInteger		(int NewValue);
+		void		SetInteger		(ZEInt NewValue);
 		void		SetFloat		(float NewValue);
 		void		SetBoolean		(bool NewValue);
 		void		SetVariant		(const ZEVariant& NewValue);
@@ -61,7 +61,7 @@ class ZETypedVariant : public ZEVariant
 		void		operator=		(ZEVariant& NewValue);
 		void		operator=		(ZETypedVariant& NewValue);
 		void		operator=		(char* NewValue);
-		void		operator=		(int NewValue);
+		void		operator=		(ZEInt NewValue);
 		void		operator=		(float NewValue);
 		void		operator=		(bool NewValue);
 
@@ -70,7 +70,7 @@ class ZETypedVariant : public ZEVariant
 					ZETypedVariant	(ZETypedVariant& InitialType);
 					ZETypedVariant	(ZEVariant& InitialValue);
 					ZETypedVariant	(char* InitialValue);	
-					ZETypedVariant	(int InitialValue);
+					ZETypedVariant	(ZEInt InitialValue);
 					ZETypedVariant	(float InitialValue);
 					ZETypedVariant	(bool InitialValue);
 

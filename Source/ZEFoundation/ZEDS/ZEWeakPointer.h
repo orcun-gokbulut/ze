@@ -85,7 +85,7 @@ class ZEWeakPointer
 			}
 		}
 
-		size_t GetReferenceCount()
+		ZESize GetReferenceCount()
 		{
 			if (ReferenceCount != NULL)
 				return ReferenceCount->Strong;
@@ -93,7 +93,7 @@ class ZEWeakPointer
 				return 0;
 		}
 
-		size_t GetWeakReferenceCount()
+		ZESize GetWeakReferenceCount()
 		{
 			if (ReferenceCount != NULL)
 				return ReferenceCount->Weak;
@@ -189,7 +189,7 @@ class ZEWeakPointer
 		static void Swap(const ZEWeakPointer<Type>& A, const ZEWeakPointer<Type>& B)
 		{
 			Type* TempP = A.Pointer;
-			size_t TempRC = A.ReferenceCount;
+			ZESize TempRC = A.ReferenceCount;
 
 			A.Pointer = B.Pointer;
 			A.ReferenceCount = B.ReferenceCount;

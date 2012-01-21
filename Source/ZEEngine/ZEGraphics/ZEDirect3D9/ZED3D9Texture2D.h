@@ -62,9 +62,9 @@ class ZED3D9Texture2D : public ZETexture2D, public ZED3D9ComponentBase
 
 		virtual ZEViewPort*				GetViewPort();
 
-		virtual bool					Create(unsigned int Width, unsigned int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, unsigned int MipLevel = 0);
-		virtual void					Lock(void** Buffer, size_t* Pitch, unsigned int MipLevel = 0);
-		virtual void					Unlock(unsigned int MipLevel);
+		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZEUInt MipLevel = 0);
+		virtual void					Lock(void** Buffer, ZESize* Pitch, ZEUInt MipLevel = 0);
+		virtual void					Unlock(ZEUInt MipLevel);
 		virtual void					Release();
 
 		virtual void					Destroy();

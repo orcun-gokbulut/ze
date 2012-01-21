@@ -56,7 +56,7 @@ class ZECommandManager
 									~ZECommandManager();
 
 	public:
-		size_t						GetNumberOfSections();
+		ZESize						GetNumberOfSections();
 
 		ZECommandSection*			GetCommandSection(const ZEString& Name);
 		ZECommand*					GetCommand(const ZEString& Section, const ZEString& Name);

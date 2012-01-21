@@ -66,9 +66,9 @@ class ZEChorusFX : public ZESoundFX
 		float		Depth;
 		float		Feedback;
 		float		Frequency;
-		int			Waveform;
+		ZEInt			Waveform;
 		float		Delay;
-		int			Phase;
+		ZEInt			Phase;
 
 	public:
 		void		SetWetDryMix();
@@ -78,14 +78,14 @@ class ZEChorusFX : public ZESoundFX
 class ZEEnvironmentalReverbFX : public ZESoundFX 
 {
 	private:
-		int			Room;
-		int			RoomHF;
+		ZEInt			Room;
+		ZEInt			RoomHF;
 		float		RoomRolloffFactor;
 		float		DecayTime;
 		float		DecayHFRatio;
-		int			Reflections;
+		ZEInt			Reflections;
 		float		ReflectionsDelay;
-		int			Reverb;
+		ZEInt			Reverb;
 		float		ReverbDelay;
 		float		Diffusion;
 		float		Density;
@@ -94,11 +94,11 @@ class ZEEnvironmentalReverbFX : public ZESoundFX
 
 class DSFXDistortion : public ZESoundFX
 {
-    unsigned int	Gain;
-    unsigned int	Edge;
-    unsigned int	PostEQCenterFrequency;
-    unsigned int	PostEQBandwidth;
-    unsigned int	PreLowpassCutoff;
+    ZEUInt	Gain;
+    ZEUInt	Edge;
+    ZEUInt	PostEQCenterFrequency;
+    ZEUInt	PostEQBandwidth;
+    ZEUInt	PreLowpassCutoff;
 } ;
 
 class DSFXEcho : public ZESoundFX
@@ -107,7 +107,7 @@ class DSFXEcho : public ZESoundFX
     float Feedback;
     float LeftDelay;
     float RightDelay;
-    int PanDelay;
+    ZEInt PanDelay;
 } ;
 
 class DSFXFlanger : public ZESoundFX
@@ -116,15 +116,15 @@ class DSFXFlanger : public ZESoundFX
     float Depth;
     float Feedback;
     float Frequency;
-    int Weveform;
+    ZEInt Weveform;
     float Delay;
-    int Phase;
+    ZEInt Phase;
 };
 
 class DSFXGargle : public ZESoundFX
 {
-    unsigned int dwRateHz;
-    unsigned int dwWaveShape;
+    ZEUInt dwRateHz;
+    ZEUInt dwWaveShape;
 };
 
 class DSFXReverb : public ZESoundFX 

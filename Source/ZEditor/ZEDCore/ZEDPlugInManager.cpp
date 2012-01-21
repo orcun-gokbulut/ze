@@ -54,7 +54,7 @@ bool ZEDPlugInManager::RegisterPlugIn(ZEDPlugIn* NewPlugIn)
 {
 	bool Exists = false;
 
-	for (int I = 0; I < PlugIns.count(); I++)
+	for (ZEInt I = 0; I < PlugIns.count(); I++)
 	{
 		if (strcmp(NewPlugIn->GetName(), PlugIns[I]->GetName()) == 0)
 			Exists = true;
@@ -64,7 +64,7 @@ bool ZEDPlugInManager::RegisterPlugIn(ZEDPlugIn* NewPlugIn)
 	{
 		PlugIns.append(NewPlugIn);
 
-		for (size_t I = 0; I < NewPlugIn->GetExtensionCount(); I++)
+		for (ZESize I = 0; I < NewPlugIn->GetExtensionCount(); I++)
 		{
 			ZEDExtensionDescription* Desc = NewPlugIn->GetExtensionDescriptions()[I];
 			Extensions.append(Desc->CreateInstance());

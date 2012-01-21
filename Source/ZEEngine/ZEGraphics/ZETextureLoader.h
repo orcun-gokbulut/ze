@@ -51,10 +51,10 @@ class ZETextureData;
 
 struct ZETextureInfo
 {
-	unsigned int			SurfaceCount;
-	unsigned int			MipmapCount;
-	unsigned int			Width;
-	unsigned int			Height;
+	ZEUInt			SurfaceCount;
+	ZEUInt			MipmapCount;
+	ZEUInt			Width;
+	ZEUInt			Height;
 	ZETexturePixelFormat	PixelFormat;
 };
 
@@ -72,7 +72,7 @@ class ZETextureLoader
 		static bool			IsZETextureFile(ZEFile* File);
 
 		static bool			LoadFromImageFile(ZEFile* File, ZETextureData* TextureData);
-		static bool			SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, unsigned int Surface = 0, unsigned int Mipmap = 0);
+		static bool			SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, ZEUInt Surface = 0, ZEUInt Mipmap = 0);
 								
 		static bool			Read(ZEFile* File, ZETextureData* TextureData);
 		static bool			Write(ZEFile* File, ZETextureData* TextureData);

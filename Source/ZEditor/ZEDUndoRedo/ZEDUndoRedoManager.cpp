@@ -78,11 +78,11 @@ void ZEDUndoRedoManager::RegisterUndoRedoOperation(ZEDUndoRedoOperation* Operati
 	}
 }
 
-void ZEDUndoRedoManager::SetMaximumStackSize(unsigned int Size)
+void ZEDUndoRedoManager::SetMaximumStackSize(ZEUInt Size)
 {
 	if(Size < MaximumStackSize)
 	{
-		for(int I = 0; I < MaximumStackSize - Size; I++)
+		for(ZEInt I = 0; I < MaximumStackSize - Size; I++)
 		{
 			if(!UndoStack.isEmpty())
 			{

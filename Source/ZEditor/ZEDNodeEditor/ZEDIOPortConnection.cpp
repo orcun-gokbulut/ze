@@ -724,7 +724,7 @@ QGraphicsPolygonItem* ZEDIOPortConnection::GetDirectionArrow(QPointF MousePosPoi
 		QPolygonF TempPolygon;
 		float ConnectionPointFromNodeX = FromNode->sceneBoundingRect().topLeft().x() + FromNode->sceneBoundingRect().width() / 2;
 		float ConnectionPointFromNodeY = FromNode->sceneBoundingRect().topLeft().y();
-		int Angle;
+		ZEInt Angle;
 		float M = (MousePosPoint.y() - ConnectionPointFromNodeY) / (MousePosPoint.x() - ConnectionPointFromNodeX);
 
 		if (MousePosPoint.x() < ConnectionPointFromNodeX)
@@ -760,7 +760,7 @@ QGraphicsPolygonItem* ZEDIOPortConnection::GetDirectionArrow(QPointF MousePosPoi
 		float ConnectionPointFromYLeft = From->sceneBoundingRect().topLeft().y() + From->sceneBoundingRect().height() / 2;
 		float ConnectionPointFromXRight = From->sceneBoundingRect().bottomRight().x() + From->sceneBoundingRect().height() / 4;
 		float ConnectionPointFromYRight = From->sceneBoundingRect().bottomRight().y() - From->sceneBoundingRect().height() / 2;
-		int Angle;
+		ZEInt Angle;
 		float M = (MousePosPoint.y() - ConnectionPointFromYLeft) / (MousePosPoint.x() - ConnectionPointFromXLeft);
 
 		if (MousePosPoint.x() >=  (ConnectionPointFromXLeft)  && MousePosPoint.x() < ConnectionPointFromXLeft + From->sceneBoundingRect().width() / 2)

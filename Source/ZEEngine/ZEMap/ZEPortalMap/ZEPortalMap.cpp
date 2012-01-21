@@ -64,12 +64,12 @@ void ZEPortalMap::LoadPortalResource(ZEPortalMapResource* NewResource)
 
 	if (NewResource == NULL)
 	{
-		for (size_t I = 0; I < Portals.GetCount(); I++)
+		for (ZESize I = 0; I < Portals.GetCount(); I++)
 			Portals[I].Deinitialize();
 
 		Portals.SetCount(0);
 
-		for (size_t I = 0; I < Doors.GetCount(); I++)
+		for (ZESize I = 0; I < Doors.GetCount(); I++)
 			Doors[I].Deinitialize();
 
 		Doors.SetCount(0);
@@ -78,11 +78,11 @@ void ZEPortalMap::LoadPortalResource(ZEPortalMapResource* NewResource)
 	this->Resource = NewResource;
 
 	Portals.SetCount(Resource->GetPortals().GetCount());
-	for (size_t I = 0; I < Portals.GetCount(); I++)
+	for (ZESize I = 0; I < Portals.GetCount(); I++)
 		Portals[I].Initialize(this, (ZEPortalMapResourcePortal*)&Resource->GetPortals()[I]);
 
 	Doors.SetCount(Resource->GetDoors().GetCount());
-	for (size_t I = 0; I < Doors.GetCount(); I++)
+	for (ZESize I = 0; I < Doors.GetCount(); I++)
 		Doors[I].Initialize(this, &Resource->GetDoors()[I]);
 }
 
@@ -170,7 +170,7 @@ void ZEPortalMap::Draw(ZEDrawParameters* DrawParameters)
 	if (!GetVisible())
 		return;
 
-	for (size_t I = 0; I < Portals.GetCount(); I++)
+	for (ZESize I = 0; I < Portals.GetCount(); I++)
 		Portals[I].Draw(DrawParameters);
 }
 
@@ -181,11 +181,11 @@ bool ZEPortalMap::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norm
 
 	float T;
 	bool Found = false;
-	for (size_t I = 0; I < Resource->GetPortals().GetCount(); I++)
+	for (ZESize I = 0; I < Resource->GetPortals().GetCount(); I++)
 	{
 		const ZEPortalMapResourcePortal* CurrentPortal = &Resource->GetPortals()[I];
 		//if (ZEAABBox::IntersectionTest(CurrentPortal->BoundingBox,Ray))
-		for (size_t N = 0; N < CurrentPortal->Polygons.GetCount(); N++)
+		for (ZESize N = 0; N < CurrentPortal->Polygons.GetCount(); N++)
 		{
 			const ZEPortalMapPolygon& MapPolygon = CurrentPortal->Polygons[N];
 			ZETriangle Triangle(MapPolygon.Vertices[0].Position, MapPolygon.Vertices[1].Position, MapPolygon.Vertices[2].Position);

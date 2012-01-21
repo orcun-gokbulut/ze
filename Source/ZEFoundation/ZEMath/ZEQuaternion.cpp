@@ -441,12 +441,12 @@ bool ZEQuaternion::operator!=(const ZEQuaternion& RightOperand) const
 			(fabs(this->w - RightOperand.w) > ZE_ZERO_THRESHOLD));
 }
 
-float ZEQuaternion::operator[](size_t Index) const
+float ZEQuaternion::operator[](ZESize Index) const
 {
 	return M[Index];
 }
 
-float& ZEQuaternion::operator[](size_t Index)
+float& ZEQuaternion::operator[](ZESize Index)
 {
 	return M[Index];
 }

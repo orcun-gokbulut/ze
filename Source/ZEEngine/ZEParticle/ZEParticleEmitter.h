@@ -70,13 +70,13 @@ class ZEParticleEmitter : public ZEObject
 	private:
 		ZEArray<ZEParticle>				ParticlePool;				// An array of 'MaxParticleCount' elements
 		ZEArray<ZEParticleController*>	ControllerArray;			// These elements controls the particles after they are emitted from an emitter
-		unsigned int					EmittedParticleCount;
+		ZEUInt					EmittedParticleCount;
 		float							LastCreation;
 
 		char							Name[ZE_MAX_NAME_SIZE];			// Name of the emitter - used in editor
 		ZEParticleSystem*				Owner;					// System that this emitter belongs
 		ZEVector3						Acceleration;					// This is acceleration of emitter NOT acceleration of particles
-		unsigned int					ParticlesPerSecond;				// Number of particles that the emitter gets from the particle pool in a second.
+		ZEUInt					ParticlesPerSecond;				// Number of particles that the emitter gets from the particle pool in a second.
 		ZEVector3						Position;						// This is position of emitter NOT position of particles - Relative to the system
 		ZEParticleEmitterType			Type;							// Type from 4 available types
 		ZEVector3						UpVector;						// This is up vector of emitter NOT up vector of particles - Relative to the system
@@ -105,7 +105,7 @@ class ZEParticleEmitter : public ZEObject
 		float							MaxLife;					//particles
 		float							MinBounceFactor;			//Bounce factor of the-
 		float							MaxBounceFactor;			//particles	
-		unsigned int					MaxParticleCount;			// Maximum number of particles of this emitter
+		ZEUInt					MaxParticleCount;			// Maximum number of particles of this emitter
 		bool							IsContinuous;					// Repeats the animation if true
 
 		// These are the controllers for manipulating emitter values
@@ -137,8 +137,8 @@ class ZEParticleEmitter : public ZEObject
 		void							SetPosition(const ZEVector3& EmitterPosition);
 		const ZEVector3&				GetPosition() const;
 
-		void							SetParticlesPerSecond(unsigned int Value);
-		unsigned int					GetParticlesPerSecond() const;
+		void							SetParticlesPerSecond(ZEUInt Value);
+		ZEUInt					GetParticlesPerSecond() const;
 
 		void							SetBoxSize(const ZEVector3& BoxSize);
 		const ZEVector3&				GetBoxSize() const;
@@ -161,8 +161,8 @@ class ZEParticleEmitter : public ZEObject
 		void							SetVelocity(const ZEVector3& EmitterVelocity);
 		const ZEVector3&				GetVelocity() const;
 
-		void							SetMaxParticleCount(unsigned int Value);
-		unsigned int					GetMaxParticleCount() const;
+		void							SetMaxParticleCount(ZEUInt Value);
+		ZEUInt					GetMaxParticleCount() const;
 
 		void							SetContinuity(bool Value);
 		bool							GetContinuity() const;

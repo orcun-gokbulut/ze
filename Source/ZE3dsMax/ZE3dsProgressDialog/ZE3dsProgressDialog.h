@@ -58,8 +58,8 @@ class ZE3dsProgressDialog
 {
 	private:
 		void*						handle;
-		int							UpdateTreshold;
-		int							OutputLevel;
+		ZEInt							UpdateTreshold;
+		ZEInt							OutputLevel;
 		FILE*						LogFile;
 		static	ZE3dsProgressDialog*	Instance;
 
@@ -83,11 +83,11 @@ class ZE3dsProgressDialog
 		void						Output(TCHAR* Format, ...);
 		void						Output(ZE3dsProgressDialogOutputLevel OutputLevel, TCHAR* Format, ...);
 
-		void						SetProgress(int Value);
-		void						SetProgressRange(int Min, int Max);
+		void						SetProgress(ZEInt Value);
+		void						SetProgressRange(ZEInt Min, ZEInt Max);
 
-		void						SetPartialProgress(int Value);
-		void						SetPartialProgressRange(int Min, int Max);
+		void						SetPartialProgress(ZEInt Value);
+		void						SetPartialProgressRange(ZEInt Min, ZEInt Max);
 
 									ZE3dsProgressDialog();
 									~ZE3dsProgressDialog();

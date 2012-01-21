@@ -63,7 +63,7 @@ class ZEPPFilter2DNode : public ZEPostProcessorNode
 		virtual									~ZEPPFilter2DNode();
 
 	public:	
-		virtual size_t							GetDependencyCount();
+		virtual ZESize							GetDependencyCount();
 		virtual ZEPostProcessorNode**			GetDependencies();
 
 		void									SetKernelElements(const ZEArray<ZEKernel2DElement>& Values);

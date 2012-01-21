@@ -51,10 +51,10 @@ class ZEALSoundSource : public ZESoundSource, public ZEALComponentBase
 		ALuint						ALBuffer2;
 		char*						InnerStreamBuffer;
 
-		size_t						BufferPosition;
-		size_t						BufferSampleCount;
-		size_t						OldBufferPosition;
-		size_t						StreamPosition;
+		ZESize						BufferPosition;
+		ZESize						BufferSampleCount;
+		ZESize						OldBufferPosition;
+		ZESize						StreamPosition;
 
 		bool						CreateBuffer();
 		void						ResetParameters();
@@ -62,19 +62,19 @@ class ZEALSoundSource : public ZESoundSource, public ZEALComponentBase
 
 		void						Stream();
 		void						ResetStream();
-		void						StreamDecodeAndFill(size_t BufferPosition, size_t Position, size_t SampleCount);
+		void						StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
 
 									ZEALSoundSource();
 		virtual						~ZEALSoundSource();
 
 	public:
 		virtual void				SetSoundSourceState(ZESoundSourceState State);
-		virtual void				SetCurrentPosition(unsigned int SampleIndex);
-		virtual unsigned int		GetCurrentPosition();
+		virtual void				SetCurrentPosition(ZEUInt SampleIndex);
+		virtual ZEUInt		GetCurrentPosition();
 
-		virtual void				SetPan(int NewPan);
+		virtual void				SetPan(ZEInt NewPan);
 		virtual void				SetPlaybackSpeed(float Speed);
-		virtual void				SetVolume(unsigned int NewVolume);
+		virtual void				SetVolume(ZEUInt NewVolume);
 		virtual void				SetLooping(bool Enabled);				
 							
 		virtual void				Play();

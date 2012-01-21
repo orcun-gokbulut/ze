@@ -57,12 +57,12 @@ class ZEString
 
 		const char*					GetValue() const;
 
-		char						GetCharacter(size_t Position) const;
-		void						SetCharacter(size_t Position, char Value);
+		char						GetCharacter(ZESize Position) const;
+		void						SetCharacter(ZESize Position, char Value);
 
 		bool						IsEmpty() const;
-		size_t						GetLength() const;
-		size_t						GetSize() const;
+		ZESize						GetLength() const;
+		ZESize						GetSize() const;
 
 		void						Compact();
 		void						Clear();
@@ -71,12 +71,12 @@ class ZEString
 		void						Append(const char* String);
 		void						Insert(const ZEString& String);
 		void						Insert(const char* String);
-		void						Insert(size_t Position, const ZEString& String);
-		void						Insert(size_t Position, const char* String);
-		void						Remove(size_t Position, size_t Count = 1);
+		void						Insert(ZESize Position, const ZEString& String);
+		void						Insert(ZESize Position, const char* String);
+		void						Remove(ZESize Position, ZESize Count = 1);
 
-		size_t						Contains(const char* String) const;	
-		size_t						Contains(const ZEString& String) const;
+		ZESize						Contains(const char* String) const;	
+		ZESize						Contains(const ZEString& String) const;
 		void						Replace(const char* StringToReplace, const char* Replace);
 		void						Replace(const ZEString& Find, const ZEString& Replace);
 		void						Delete(const char* StringToRemove);
@@ -88,10 +88,10 @@ class ZEString
 		void						CopyTo(ZEString& String) const;
 		void						CopyFrom(const ZEString& String);
 
-		ZEString					Left(size_t Count) const;
-		ZEString					Right(size_t Count) const;
-		ZEString					Middle(size_t Position, size_t Count) const;
-		ZEString					SubString(size_t StartPosition, size_t EndPosition) const;
+		ZEString					Left(ZESize Count) const;
+		ZEString					Right(ZESize Count) const;
+		ZEString					Middle(ZESize Position, ZESize Count) const;
+		ZEString					SubString(ZESize StartPosition, ZESize EndPosition) const;
 
 		ZEString					TrimLeft() const;
 		ZEString					TrimRight() const;
@@ -123,8 +123,8 @@ class ZEString
 		ZEString&					operator+=(const ZEString& String);
 		ZEString&					operator+=(const char* String);
 
-		char&						operator[](ptrdiff_t Index);
-		const char&					operator[](ptrdiff_t Index) const;
+		char&						operator[](ZESSize Index);
+		const char&					operator[](ZESSize Index) const;
 
 		bool						operator!=(const ZEString& String) const;
 		bool						operator!=(const char* String) const;

@@ -56,7 +56,7 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 	private:
 		ZED3D9Texture2D*				Input;
 		ZED3D9ViewPort*					Output;
-		size_t							ScreenWidth, ScreenHeight;
+		ZESize							ScreenWidth, ScreenHeight;
 
 		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
 
@@ -116,10 +116,10 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 
 		struct
 		{
-			int BloomSampleCount;
-			int	BloomPassCount;
-			int Reserved0;
-			int Reserved1;
+			ZEInt BloomSampleCount;
+			ZEInt	BloomPassCount;
+			ZEInt Reserved0;
+			ZEInt Reserved1;
 		} IntParameters;
 
 	public:
@@ -141,11 +141,11 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 		void							SetBloomStandardDeviation(float Deviation);
 		float							GetBloomStandardDeviation() const;
 
-		void							SetBloomSampleCount(unsigned int Count);
-		unsigned int					GetBloomSampleCount() const;
+		void							SetBloomSampleCount(ZEUInt Count);
+		ZEUInt					GetBloomSampleCount() const;
 
-		void							SetBloomPassCount(unsigned int Count);
-		unsigned int					GetBloomPassCount() const;
+		void							SetBloomPassCount(ZEUInt Count);
+		ZEUInt					GetBloomPassCount() const;
 
 		void							SetInput(ZED3D9Texture2D* Input);
 		ZED3D9Texture2D*				GetInput();

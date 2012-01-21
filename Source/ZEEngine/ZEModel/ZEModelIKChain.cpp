@@ -76,12 +76,12 @@ void ZEModelIKChain::SetEffectorRotation(const ZEQuaternion& Rotation)
 	EffectorRotation = Rotation;
 }
 
-void ZEModelIKChain::SetMaxIterationCount(unsigned int Value)
+void ZEModelIKChain::SetMaxIterationCount(ZEUInt Value)
 {
 	MaxIterationCount = Value;
 }
 
-unsigned int ZEModelIKChain::GetMaxIterationCount()
+ZEUInt ZEModelIKChain::GetMaxIterationCount()
 {
 	return MaxIterationCount;
 }
@@ -101,7 +101,7 @@ void ZEModelIKChain::Process()
 	if (!Enabled)
 		return;
 
-	for (unsigned int I = 0; I < MaxIterationCount; I++)
+	for (ZEUInt I = 0; I < MaxIterationCount; I++)
 	{	
 		if (ZEVector3::LengthSquare(Nodes[Nodes.GetCount() - 1].Bone->GetLocalPosition() - EffectorPosition) < ErrorThreshold * ErrorThreshold)
 			return;
@@ -115,7 +115,7 @@ void ZEModelIKChain::Iterate()
 	// Get Direction from bone root to the effector
 	ZEModelBone* Knob = Nodes[Nodes.GetCount() - 1].Bone;
 
-	for (int I = Nodes.GetCount() - 2; I >= 0 ; I--)
+	for (ZEInt I = Nodes.GetCount() - 2; I >= 0 ; I--)
 	{
 		ZEModelIKChainNode& CurrentNode = Nodes[I];
 

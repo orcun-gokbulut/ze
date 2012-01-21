@@ -59,7 +59,7 @@ class ZEGameDescription
 	public:
 		virtual const char*						GetGameName() = 0;
 		virtual ZEGameType						GetGameType() = 0;
-		virtual int								GetGameVersion() = 0;
+		virtual ZEInt								GetGameVersion() = 0;
 		virtual const char*						GetCopyright() = 0;
 		virtual ZEGame*							CreateGameInstance() = 0;
 };

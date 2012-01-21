@@ -68,7 +68,7 @@ class ZEScene
 	private:
 		bool									Initialized;
 
-		unsigned int							LastEntityId;
+		ZEUInt							LastEntityId;
 
 		ZESceneCuller							Culler;
 

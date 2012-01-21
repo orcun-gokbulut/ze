@@ -56,14 +56,14 @@ class ZEPortal
 										ZESmartAllocator<ZEViewCone*>& ViewConeStack,
 										ZESmartArray<ZEComponent*>& VisibleComponents, 
 										ZESmartArray<ZEPortal*>& VisiblePortals,
-										ZESmartArray<int>& VisibleMapPolygonIds);
+										ZESmartArray<ZEInt>& VisibleMapPolygonIds);
 
 		void						DetectEffectiveLights(ZEComponent* Component, ZESmartArray<ZELight*> EffectiveLights);
 
 		void						DetectVisible(ZECamera* ViewFrustum,
 										ZESmartArray<ZEComponent*>& VisibleComponents, 
 										ZESmartArray<ZEPortal*>& VisiblePortals,
-										ZESmartArray<int>& VisibleMapPolygonIds);
+										ZESmartArray<ZEInt>& VisibleMapPolygonIds);
 							
 
 };

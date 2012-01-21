@@ -317,7 +317,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalBody->SetMassCenterPosition(BoneResource->PhysicalBody.MassCenter);
 		PhysicalBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this->Owner, &ZEModel::TransformChangeEvent));
 
-		for (size_t I = 0; I < BoneResource->PhysicalBody.Shapes.GetCount(); I++)
+		for (ZESize I = 0; I < BoneResource->PhysicalBody.Shapes.GetCount(); I++)
 		{
 			const ZEModelResourcePhysicalShape* Shape = &BoneResource->PhysicalBody.Shapes[I];
 			switch(Shape->Type)
@@ -502,7 +502,7 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 		PhysicalJoint->Initialize();
 	}
 
-	for (size_t I = 0; I < ShapeList.GetCount(); I++)
+	for (ZESize I = 0; I < ShapeList.GetCount(); I++)
 		delete ShapeList[I];
 	ShapeList.Clear();
 }

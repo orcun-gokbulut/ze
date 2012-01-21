@@ -45,7 +45,7 @@
 	#define zeProfilerEnd()
 #endif*/
 
-void zeD3D9ProfileStart(const char* EventName, const char* FileName, int Line);
+void zeD3D9ProfileStart(const char* EventName, const char* FileName, ZEInt Line);
 void zeD3D9ProfileEnd();
 
 #endif

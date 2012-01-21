@@ -783,7 +783,7 @@ ZETestSuite(ZEVector3)
 		ZETestCheckEqual(A, ZEVector3(2.0f, 0.2f, 4.0f));
 	}
 
-	ZETest("float ZEVector3::operator[](size_t Index) const")
+	ZETest("float ZEVector3::operator[](ZESize Index) const")
 	{
 		const ZEVector3 A(24.0f, 12.0f, 32.0f);
 		ZEVector3 Result;
@@ -795,7 +795,7 @@ ZETestSuite(ZEVector3)
 		ZETestCheckEqual(Result, ZEVector3(12.0f, 32.0f, 24.0f));
 	}
 
-	ZETest("float & ZEVector3::operator[](size_t Index)")
+	ZETest("float & ZEVector3::operator[](ZESize Index)")
 	{
 		ZEVector3 A(24.0f, 12.0f, 32.0f);
 		ZEVector3 Result;

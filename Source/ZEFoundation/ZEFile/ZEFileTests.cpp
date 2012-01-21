@@ -156,7 +156,7 @@ ZETestSuite(ZEFile)
 	{
 
 		unsigned char* Buffer = new unsigned char[1024];
-		for ( int I = 0; I < 1024; I++)
+		for ( ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -280,7 +280,7 @@ ZETestSuite(ZEFile)
 	ZETest("void ZEFile::Flush()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
-		for ( int I = 0; I < 1024; I++)
+		for ( ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -312,7 +312,7 @@ ZETestSuite(ZEFile)
 		ZETestCase("for size != 0")
 		{
 			unsigned char* Buffer = new unsigned char[1024];
-			for ( int I = 0; I < 1024; I++)
+			for ( ZEInt I = 0; I < 1024; I++)
 			{
 				Buffer[I] = I % 256;
 			}
@@ -330,7 +330,7 @@ ZETestSuite(ZEFile)
 	ZETest("ZEUInt64 ZEFile::GetStartPosition()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
-		for ( int I = 0; I < 1024; I++)
+		for ( ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -353,7 +353,7 @@ ZETestSuite(ZEFile)
 	ZETest("ZEUInt64 ZEFile::GetEndPosition()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
-		for ( int I = 0; I < 1024; I++)
+		for ( ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -377,7 +377,7 @@ ZETestSuite(ZEFile)
 	ZETest("bool ZEFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
-		for ( int I = 0; I < 1024; I++)
+		for ( ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -504,7 +504,7 @@ ZETestSuite(ZEFile)
 		ZEUInt64 CursorPosition = File.Tell();
 		ZETestCheckEqual(CursorPosition, 0);
 
-		for ( int I = 0; I < 1024; I++)
+		for ( ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -547,7 +547,7 @@ ZETestSuite(ZEFile)
 	{
 		unsigned char* Buffer = new unsigned char[1024];
 		unsigned char* BufferRead = new unsigned char[1024];
-		for ( int I = 0; I < 1024; I++)
+		for ( ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -562,7 +562,7 @@ ZETestSuite(ZEFile)
 		ZEUInt64 ReadCount = File.Read(BufferRead, sizeof(unsigned char), 10);
 		ZETestCheckEqual(ReadCount, 10);
 
-		int Res = memcmp(Buffer, BufferRead, sizeof(unsigned char));
+		ZEInt Res = memcmp(Buffer, BufferRead, sizeof(unsigned char));
 		ZETestCheckEqual(Res, 0);
 		
 		File.Close();
@@ -590,7 +590,7 @@ ZETestSuite(ZEFile)
 	{
 		unsigned char* Buffer = new unsigned char[1024];
 		unsigned char* BufferRead = new unsigned char[1024];
-		for (int I = 0; I < 1024; I++)
+		for (ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -625,12 +625,12 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileTypeTests.txt");
 	}
-	ZETest("unsigned int ZEFile::GetReferenceCount() const")
+	ZETest("ZEUInt ZEFile::GetReferenceCount() const")
 	{
 		ZEFile File;
 		File.Open("ZEFileReferenceCountTests.txt", ZE_FM_READ_WRITE, true);
 
-		unsigned int ReferenceCount = File.GetReferenceCount();
+		ZEUInt ReferenceCount = File.GetReferenceCount();
 		ZETestCheckEqual(ReferenceCount, 0);
 
 		File.Close();
@@ -676,7 +676,7 @@ ZETestSuite(ZEFile)
 		ZEFile OtherFile;
 
 		unsigned char* Buffer = new unsigned char[1024];
-		for ( int I = 0; I < 100; I++)
+		for ( ZEInt I = 0; I < 100; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -755,7 +755,7 @@ ZETestSuite(ZEFile)
 	{
 		/*unsigned char* Buffer = new unsigned char[1024];
 		unsigned char* BufferRead = new unsigned char[1024];
-		for (int I = 0; I < 1024; I++)
+		for (ZEInt I = 0; I < 1024; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -770,7 +770,7 @@ ZETestSuite(ZEFile)
 		
 		bool Result = ZEFile::ReadFile("ZEFileReadFileTests.txt", (void*)BufferRead, 1024);
 		
-		int CompResult = memcmp(Buffer, BufferRead, sizeof(unsigned char) * 1024);
+		ZEInt CompResult = memcmp(Buffer, BufferRead, sizeof(unsigned char) * 1024);
 		ZETestCheckEqual(CompResult, 0);
 
 
@@ -780,7 +780,7 @@ ZETestSuite(ZEFile)
 	ZETest("bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 BufferSize)")
 	{
 		/*unsigned char* Buffer = new unsigned char[1025];
-		for ( int I = 0; I < 1025; I++)
+		for ( ZEInt I = 0; I < 1025; I++)
 		{
 			Buffer[I] = I % 256;
 		}

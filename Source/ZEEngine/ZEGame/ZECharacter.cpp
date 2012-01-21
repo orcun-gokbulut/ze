@@ -500,7 +500,7 @@ void ZECharacter::AdvanceRecording(float ElapsedTime)
 		if (RecordingFrame >= Records.GetCount())
 			RecordingStatus = ZE_CRS_STOPPED;
 
-		for (size_t I = RecordingFrame; I < Records.GetCount(); I++)
+		for (ZESize I = RecordingFrame; I < Records.GetCount(); I++)
 		{
 			if (Records[I].Time > RecordingTime)
 				break;

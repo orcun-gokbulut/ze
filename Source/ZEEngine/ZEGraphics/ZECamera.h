@@ -107,7 +107,7 @@ class ZECamera : public ZEComponent
 		const ZEView&					GetView();
 		const ZEViewVolume&				GetViewVolume();
 
-		void							GetScreenRay(ZERay& Ray, int ScreenX, int ScreenY);
+		void							GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
 
 		static ZECamera*				CreateInstance();
 };

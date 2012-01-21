@@ -67,7 +67,7 @@ bool ZEFont::ReadFromFile(const char* Filename)
 	memcpy(Characters, FileHeader.Characters, sizeof(ZEFontCharacter) * ZEFONTFILE_CHARACTERCOUNT);
 
 	Textures.SetCount(FileHeader.TextureCount);
-	for (size_t I = 0; I < FileHeader.TextureCount; I++)
+	for (ZESize I = 0; I < FileHeader.TextureCount; I++)
 	{
 		Textures[I].ReadFromResourceFile(File);
 	}
@@ -93,7 +93,7 @@ bool ZEFont::WriteToFile(const char* Filename)
 	fwrite(&FileHeader, sizeof(ZEFontFileHeader), 1, File);
 
 
-	for (size_t I = 0; I < FileHeader.TextureCount; I++)
+	for (ZESize I = 0; I < FileHeader.TextureCount; I++)
 		Textures[I].WriteToResourceFile(File);
 
 	return true;

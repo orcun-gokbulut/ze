@@ -82,14 +82,14 @@ void ZEProvider::UnregisterClass(ZEObjectDescription* Description)
 	Classes.DeleteValue(Description);
 }
 
-ZEObject* ZEProvider::CreateInstance(size_t Index) const
+ZEObject* ZEProvider::CreateInstance(ZESize Index) const
 {
 	return Classes[Index]->CreateInstance();
 }
 
 ZEObject* ZEProvider::CreateInstance(const char* Name) const
 {
-	for(size_t I = 0; I < Classes.GetCount(); I++)
+	for(ZESize I = 0; I < Classes.GetCount(); I++)
 		if (strcmp(Classes[I]->GetName(), Name) == 0)
 		{
 			ZEObject* Instance = Classes[I]->CreateInstance();

@@ -531,7 +531,7 @@ ZETestSuite(ZEMatrix4x4)
 		Matrix *= S;
 		ZETestCheckClose(Matrix, ZEMatrix4x4(2.0f, 2.0f, 4.0f, 6.0f, 10.0f, 16.0f, 26.0f, 42.0f, 68.0f, 110.0f, 2.0f, 2.0f, 4.0f, 6.0f, 10.0f, 16.0f));
 	}
-	ZETest(" float & ZEMatrix4x4::operator[](size_t Index)")
+	ZETest(" float & ZEMatrix4x4::operator[](ZESize Index)")
 	{
 		ZEMatrix4x4 Matrix(35.0f, 23.0f, 16.0f, 12.0f,
 			10.0f, 9.0f, 9.0f, 9.0f,
@@ -547,7 +547,7 @@ ZETestSuite(ZEMatrix4x4)
 		ZETestCheckEqual(M31, 10.0f);
 		ZETestCheckEqual(M41, 4.0f);
 	}
-	ZETest("float ZEMatrix4x4::operator[](size_t Index) const")
+	ZETest("float ZEMatrix4x4::operator[](ZESize Index) const")
 	{
 		ZEMatrix4x4 Matrix(35.0f, 23.0f, 16.0f, 12.0f,
 			10.0f, 9.0f, 9.0f, 9.0f,

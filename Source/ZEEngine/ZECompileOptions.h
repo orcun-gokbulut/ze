@@ -41,7 +41,7 @@
 #define ZE_ZINEK_ENGINE
 #endif
 
-#define ZE_MAKE_VERSION(Major, Minor, Build) ((unsigned int)(Major) << 24 | (unsigned int)(Minor)<<16 | (Build))
+#define ZE_MAKE_VERSION(Major, Minor, Build) ((ZEUInt)(Major) << 24 | (ZEUInt)(Minor)<<16 | (Build))
 #define ZE_VERSION_MAJORNUMBER 0
 #define ZE_VERSION_MINORNUMBER 5
 #define ZE_VERSION_NUMBER ZE_MAKE_VERSION(ZE_VERSION_MAJORNUMBER, ZE_VERSION_MINORNUMBER, 0)

@@ -79,7 +79,7 @@ ZEViewPort* ZED3D9Texture2D::GetViewPort()
 	return &ViewPort;
 }
 
-bool ZED3D9Texture2D::Create(unsigned int Width, unsigned int Height, ZETexturePixelFormat PixelFormat, bool RenderTarget, unsigned int MipLevel)
+bool ZED3D9Texture2D::Create(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat PixelFormat, bool RenderTarget, ZEUInt MipLevel)
 {
 	if (Texture != NULL)
 		if (this->Width == Width && this->Height == Height && this->PixelFormat == PixelFormat && this->RenderTarget == RenderTarget)
@@ -124,7 +124,7 @@ bool ZED3D9Texture2D::Create(unsigned int Width, unsigned int Height, ZETextureP
 	return true;
 }
 
-void ZED3D9Texture2D::Lock(void** Buffer, size_t* Pitch, unsigned int MipLevel)
+void ZED3D9Texture2D::Lock(void** Buffer, ZESize* Pitch, ZEUInt MipLevel)
 {
 	D3DLOCKED_RECT Rect;
 	Texture->LockRect(MipLevel, &Rect, NULL, NULL);
@@ -132,7 +132,7 @@ void ZED3D9Texture2D::Lock(void** Buffer, size_t* Pitch, unsigned int MipLevel)
 	*Pitch = Rect.Pitch;
 }
 
-void ZED3D9Texture2D::Unlock(unsigned int MipLevel)
+void ZED3D9Texture2D::Unlock(ZEUInt MipLevel)
 {
 	Texture->UnlockRect(MipLevel);
 }

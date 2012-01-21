@@ -84,7 +84,7 @@ ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 	}
 }
 
-size_t ZEGraphicsModule::GetCurrentFrameId()
+ZESize ZEGraphicsModule::GetCurrentFrameId()
 {
 	return CurrentFrameId;
 }
@@ -124,24 +124,24 @@ void ZEGraphicsModule::BaseDeinitialize()
 	ZEOptionManager::GetInstance()->UnregisterSection(&GraphicsOptions);
 }
 
-void ZEGraphicsModule::SetScreenSize(int Width, int Height)
+void ZEGraphicsModule::SetScreenSize(ZEInt Width, ZEInt Height)
 {
 	ScreenWidth = Width;
 	ScreenHeight = Height;
 }
 
-void ZEGraphicsModule::GetScreenSize(int& Width, int& Height)
+void ZEGraphicsModule::GetScreenSize(ZEInt& Width, ZEInt& Height)
 {
 	Width = ScreenWidth;
 	Height = ScreenHeight;
 }
 
-int ZEGraphicsModule::GetScreenWidth()
+ZEInt ZEGraphicsModule::GetScreenWidth()
 {
 	return ScreenWidth;
 }
 
-int ZEGraphicsModule::GetScreenHeight()
+ZEInt ZEGraphicsModule::GetScreenHeight()
 {
 	return ScreenHeight;
 }
@@ -181,12 +181,12 @@ bool ZEGraphicsModule::GetVerticalSync()
 	return VerticalSync;
 }
 
-void ZEGraphicsModule::SetShaderQuality(int Quality)
+void ZEGraphicsModule::SetShaderQuality(ZEInt Quality)
 {
 	ShaderQuality = Quality;
 }
 
-int ZEGraphicsModule::GetShaderQuality()
+ZEInt ZEGraphicsModule::GetShaderQuality()
 {
 	return ShaderQuality;
 }
@@ -201,62 +201,62 @@ ZETextureQuality ZEGraphicsModule::GetTextureQuality()
 	return TextureQuality;
 }
 
-void ZEGraphicsModule::SetModelQuality(int Quality)
+void ZEGraphicsModule::SetModelQuality(ZEInt Quality)
 {
 	ShaderQuality = Quality;
 }
 
-int ZEGraphicsModule::GetModelQuality()
+ZEInt ZEGraphicsModule::GetModelQuality()
 {
 	return ModelQuality;
 }
 
-void ZEGraphicsModule::SetShadowQuality(int Quality)
+void ZEGraphicsModule::SetShadowQuality(ZEInt Quality)
 {
 	ShadowQuality = Quality;
 }
 
-int ZEGraphicsModule::GetShadowQuality()
+ZEInt ZEGraphicsModule::GetShadowQuality()
 {
 	return ShadowQuality;
 }
 
-void ZEGraphicsModule::SetPostEffectQuality(int Quality)
+void ZEGraphicsModule::SetPostEffectQuality(ZEInt Quality)
 {
 	PostEffectQuality = Quality;
 }
 
-int ZEGraphicsModule::GetPostEffectQuality()
+ZEInt ZEGraphicsModule::GetPostEffectQuality()
 {
 	return PostEffectQuality;
 }
 
-void ZEGraphicsModule::SetHDRQuality(int Quality)
+void ZEGraphicsModule::SetHDRQuality(ZEInt Quality)
 {
 	HDRQuality = Quality;
 }
 
-int ZEGraphicsModule::GetHDRQuality()
+ZEInt ZEGraphicsModule::GetHDRQuality()
 {
 	return HDRQuality;
 }
 
-void ZEGraphicsModule::SetAntiAliasing(int Level)
+void ZEGraphicsModule::SetAntiAliasing(ZEInt Level)
 {
 	AntiAliasing = Level;
 }
 
-int ZEGraphicsModule::GetAntiAliasing()
+ZEInt ZEGraphicsModule::GetAntiAliasing()
 {
 	return AntiAliasing;
 }
 
-void ZEGraphicsModule::SetAnisotropicFilter(int Level)
+void ZEGraphicsModule::SetAnisotropicFilter(ZEInt Level)
 {
 	AnisotropicFilter = Level;
 }
 
-int ZEGraphicsModule::GetAnisotropicFilter()
+ZEInt ZEGraphicsModule::GetAnisotropicFilter()
 {
 	return AnisotropicFilter;
 }

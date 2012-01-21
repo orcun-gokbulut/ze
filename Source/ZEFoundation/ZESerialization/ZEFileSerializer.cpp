@@ -38,7 +38,7 @@
 
 ZEUInt64 ZEFileSerializer::Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 {
-	return fwrite(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	return fwrite(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
 }
 
 bool ZEFileSerializer::OpenFile(const char* FileName)

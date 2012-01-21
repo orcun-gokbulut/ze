@@ -293,7 +293,7 @@ bool ZEWindow::SetComponentWindowHandle(void* Handle)
 	return true;
 }
 
-void ZEWindow::WindowResized(int Width, int Height)
+void ZEWindow::WindowResized(ZEInt Width, ZEInt Height)
 {
 
 /*	if (WindowHandle != NULL && WindowType != ZE_WT_COMPONENT)
@@ -313,7 +313,7 @@ void ZEWindow::WindowResized(int Width, int Height)
 	WindowHeight = Height;
 }
 
-void ZEWindow::SetWindowPosition(int Left, int Top)
+void ZEWindow::SetWindowPosition(ZEInt Left, ZEInt Top)
 {
 	if (WindowType == ZE_WT_COMPONENT || WindowType == ZE_WT_FULLSCREEN)
 		return;
@@ -327,7 +327,7 @@ void ZEWindow::SetWindowPosition(int Left, int Top)
 	}
 }
 
-void ZEWindow::GetWindowPosition(int& Left, int& Top)
+void ZEWindow::GetWindowPosition(ZEInt& Left, ZEInt& Top)
 {
 	RECT Rect;
 	GetWindowRect((HWND)WindowHandle, &Rect);
@@ -335,7 +335,7 @@ void ZEWindow::GetWindowPosition(int& Left, int& Top)
 	Top = Rect.top;
 }
 
-void ZEWindow::SetWindowSize(int Width, int Height)
+void ZEWindow::SetWindowSize(ZEInt Width, ZEInt Height)
 {
 	if (WindowType != ZE_WT_COMPONENT)
 	{
@@ -353,7 +353,7 @@ void ZEWindow::SetWindowSize(int Width, int Height)
 	WindowResized(Width, Height);
 }
 
-void ZEWindow::GetWindowSize(int& Width, int& Height)
+void ZEWindow::GetWindowSize(ZEInt& Width, ZEInt& Height)
 {
 	RECT Rect;
 	GetClientRect((HWND)WindowHandle, &Rect);

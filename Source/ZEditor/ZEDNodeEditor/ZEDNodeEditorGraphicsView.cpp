@@ -74,16 +74,16 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 		bool LookAtConnections = true;
 		IsMousePositionContainsGizmo = false;
 		IsMouseMoving = false;
-		int PressedConnectionCount = 0;
+		ZEInt PressedConnectionCount = 0;
 		QPointF MouseScenePos(0.0f, 0.0f);
 		MouseScenePos = mapToScene(Event->pos());
 		InitialMousePos = MouseScenePos;
 
-		int TopMostNodeZValue = SelectTopMostNodeZValue(MouseScenePos);
+		ZEInt TopMostNodeZValue = SelectTopMostNodeZValue(MouseScenePos);
 
-		for (int I = 0; I < Nodes.count(); I++)
+		for (ZEInt I = 0; I < Nodes.count(); I++)
 		{	
-			for (int J = 0; J < Nodes[I]->GetScaleGizmo()->GetGizmoPointList()->count(); J++) // Controlling if any gizmo containing the mousePos
+			for (ZEInt J = 0; J < Nodes[I]->GetScaleGizmo()->GetGizmoPointList()->count(); J++) // Controlling if any gizmo containing the mousePos
 			{
 				if (Nodes[I]->GetScaleGizmo()->GetGizmoPointList()->value(J)->boundingRect().contains(Nodes[I]->GetScaleGizmo()->GetGizmoPointList()->value(J)->deviceTransform(viewportTransform()).inverted().map(Event->pos())) && Nodes[I]->GetScaleGizmo()->GetGizmoPointList()->value(J)->isVisible())
 				{
@@ -96,7 +96,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 		qDebug() << "*****************************";
 
 		bool ItemFound = false;
-		for (int I = 0; I < Nodes.count(); I++)
+		for (ZEInt I = 0; I < Nodes.count(); I++)
 		{	
 			if (Nodes[I]->GetScaleGizmo()->isVisible() && IsMousePositionContainsGizmo == true && ItemFound == false) // if any gizmo selected set pressed item as a Node
 			{
@@ -115,7 +115,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 					{
 						PressedItem = (ZEDNodeEditorItem*)(Nodes[I]);
 					}
-					for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+					for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 					{
 						if ((Nodes[I]->GetIOPorts()->value(J)->sceneBoundingRect().contains(MouseScenePos) == false && Nodes[I]->GetConnectionPoint()->sceneBoundingRect().contains(MouseScenePos) == false) || transform().m11() < 0.30f ) // If none of IO ports selected select Node
 						{
@@ -170,7 +170,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 						}
 					}
 
-					for (int I = 0; I < SelectedNodes.count(); I++)
+					for (ZEInt I = 0; I < SelectedNodes.count(); I++)
 					{
 						SelectedNodes[I]->SetNodeOldPosition(SelectedNodes[I]->scenePos());
 						SelectedNodes[I]->SetNodeOldRectangle(SelectedNodes[I]->boundingRect());
@@ -188,7 +188,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 		
 		if (LookAtConnections) // If none of Node | Gizmo | IOPort selected, look if any connection is pressed
 		{
-			for (int I = 0 ; I < Connections.count(); I++) //Look how many connections under the mouse when LMB pressed
+			for (ZEInt I = 0 ; I < Connections.count(); I++) //Look how many connections under the mouse when LMB pressed
 			{
 				QPolygonF TempConnectionBodyBoundingRect	= Connections[I]->ConnectionBodyBoundingRect->mapToScene(Connections[I]->ConnectionBodyBoundingRect->polygon()); // Controlling three virtual bounding polygons that if any of them clicked 
 				QPolygonF TempConnectionToBoundingRect		= Connections[I]->ConnectionToBoundingRect->mapToScene(Connections[I]->ConnectionToBoundingRect->polygon());
@@ -202,7 +202,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 			}
 			if (PressedConnectionCount == 1) // if Connection under the mouse is one
 			{
-				for (int I = 0 ; I < Connections.count(); I++)
+				for (ZEInt I = 0 ; I < Connections.count(); I++)
 				{
 					QPolygonF TempConnectionBodyBoundingRect	= Connections[I]->ConnectionBodyBoundingRect->mapToScene(Connections[I]->ConnectionBodyBoundingRect->polygon());
 					QPolygonF TempConnectionToBoundingRect		= Connections[I]->ConnectionToBoundingRect->mapToScene(Connections[I]->ConnectionToBoundingRect->polygon());
@@ -214,7 +214,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 							Connections[I]->setZValue(-1);
 						else // else make the selected ones z value 0 the others -1
 						{
-							for (int J = 0; J < Connections.count(); J++)
+							for (ZEInt J = 0; J < Connections.count(); J++)
 							{
 								if (J != I)
 								{
@@ -248,7 +248,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 			}
 			else if (PressedConnectionCount > 1) // if more than 1 connection is under the mouse
 			{				
-				for (int I = LastSelectedConnectionIndex ; I < Connections.count(); I++) // selecting the connections one by one
+				for (ZEInt I = LastSelectedConnectionIndex ; I < Connections.count(); I++) // selecting the connections one by one
 				{
 					QPolygonF TempConnectionBodyBoundingRect	= Connections[I]->ConnectionBodyBoundingRect->mapToScene(Connections[I]->ConnectionBodyBoundingRect->polygon());
 					QPolygonF TempConnectionToBoundingRect		= Connections[I]->ConnectionToBoundingRect->mapToScene(Connections[I]->ConnectionToBoundingRect->polygon());
@@ -279,7 +279,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 								SelectedConnections.clear();
 								SelectedConnections.append(Connections[I]);
 
-								for (int J = 0; J < Connections.count(); J++)
+								for (ZEInt J = 0; J < Connections.count(); J++)
 								{
 									if (J != I)
 									{
@@ -293,7 +293,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 						}
 					}
 				}	
-				for (int I = Connections.count() - 1 ; I > 0; I--) // to deselect connections one by one
+				for (ZEInt I = Connections.count() - 1 ; I > 0; I--) // to deselect connections one by one
 				{
 					QPolygonF TempConnectionBodyBoundingRect	= Connections[I]->ConnectionBodyBoundingRect->mapToScene(Connections[I]->ConnectionBodyBoundingRect->polygon());
 					QPolygonF TempConnectionToBoundingRect		= Connections[I]->ConnectionToBoundingRect->mapToScene(Connections[I]->ConnectionToBoundingRect->polygon());
@@ -338,7 +338,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 		{			
 			if (IsMultipleSelectionEnabled == true && IsDeselectionEnabled == false)  // if Mult. selection enabled
 			{
-				for (int I = 0; I < SelectedItems.count(); I++)
+				for (ZEInt I = 0; I < SelectedItems.count(); I++)
 				{
 					if (SelectedItems[I]->GetItemType() != ZED_NEIT_IOPORT) // if selected items include IOPort set the flag false
 						SelectedItemsIncludeIOPort = false;
@@ -346,7 +346,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 					else // else vice versa
 					{
 						SelectedItemsIncludeIOPort = true;
-						for (int I = 0; I < SelectedItems.count(); I++)
+						for (ZEInt I = 0; I < SelectedItems.count(); I++)
 							SelectedItems[I]->SetSelected(false);
 					}
 
@@ -356,7 +356,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 					else // else vice versa
 					{
 						SelectedItemsIncludeNodeConnectionPoint = true;
-						for (int I = 0; I < SelectedItems.count(); I++)
+						for (ZEInt I = 0; I < SelectedItems.count(); I++)
 							SelectedItems[I]->SetSelected(false);
 					}
 
@@ -380,7 +380,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 			{
 				if (!SelectedItems.contains(PressedItem) || SelectedItems.count() == 0) // if there is no selected item or pressed item is not in the selected item list
 				{
-					for (int I = 0; I < SelectedItems.count(); I++) // clear and deselect all the elements on the view
+					for (ZEInt I = 0; I < SelectedItems.count(); I++) // clear and deselect all the elements on the view
 						SelectedItems[I]->SetSelected(false);
 
 					MutualDeselection(UndoRedoOperation);
@@ -450,13 +450,13 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 		{
 			if(IsMultipleSelectionEnabled == false && IsDeselectionEnabled == false)
 			{
-				for (int I = 0; I < Connections.count(); I++)
+				for (ZEInt I = 0; I < Connections.count(); I++)
 				{				
 					Connections[I]->SetSelected(false);
 					Connections[I]->setZValue(-1);
 				}
 
-				for (int I = 0; I < SelectedItems.count(); I++)
+				for (ZEInt I = 0; I < SelectedItems.count(); I++)
 					SelectedItems[I]->SetSelected(false);
 
 				MutualDeselection(UndoRedoOperation);
@@ -490,13 +490,13 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 		QPointF MouseScenePos(0.0f, 0.0f);
 		MouseScenePos = mapToScene(Event->pos());
 
-		int TopMostNodeZValue = SelectTopMostNodeZValue(MouseScenePos);
+		ZEInt TopMostNodeZValue = SelectTopMostNodeZValue(MouseScenePos);
 
 		ZEDUndoRedoOperation* UndoRedoOperation = ZEDUndoRedoOperation::CreateInstance();
 
 		if (SelectedItems.count() > 1)
 		{
-			for (int I = 0; I < Nodes.count(); I++)
+			for (ZEInt I = 0; I < Nodes.count(); I++)
 			{	
 				if (Nodes[I]->sceneBoundingRect().contains(MouseScenePos) ) //If mouse pos in a node
 				{
@@ -509,7 +509,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 			}
 			if (!AnyItemPressedFlag) //If mouse pos NOT in a node
 			{
-				for (int I = 0; I < SelectedItems.count(); I++)
+				for (ZEInt I = 0; I < SelectedItems.count(); I++)
 				{
 					SelectedItems[I]->SetSelected(false);
 				}
@@ -520,7 +520,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 		}
 		else
 		{
-			for (int I = 0; I < Nodes.count(); I++)
+			for (ZEInt I = 0; I < Nodes.count(); I++)
 			{	
 				if (Nodes[I]->sceneBoundingRect().contains(MouseScenePos) ) //If mouse pos in a node
 				{
@@ -537,7 +537,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 							SelectedConnections.clear();
 
 						}
-						for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+						for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 						{
 							if (Nodes[I]->GetIOPorts()->value(J)->sceneBoundingRect().contains(MouseScenePos) == false || transform().m11() < 0.30f ) // If none of IO ports selected select Node
 							{
@@ -575,7 +575,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 				if (IsMultipleSelectionEnabled == true && IsDeselectionEnabled == false)  // if Mult. selection enabled
 				{
 					TempConnection = new ZEDIOPortConnection(NULL);	
-					for (int I = 0; I < SelectedItems.count(); I++)
+					for (ZEInt I = 0; I < SelectedItems.count(); I++)
 					{
 						if (SelectedItems[I]->GetItemType() != ZED_NEIT_IOPORT) // if selected items include IOPort set the flag false
 							SelectedItemsIncludeIOPort = false;
@@ -583,7 +583,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 						else // else vice versa
 						{
 							SelectedItemsIncludeIOPort = true;
-							for (int I = 0; I < SelectedItems.count(); I++)
+							for (ZEInt I = 0; I < SelectedItems.count(); I++)
 								SelectedItems[I]->SetSelected(false);
 						}
 						if (SelectedItemsIncludeNodeConnectionPoint || SelectedItemsIncludeIOPort)
@@ -605,7 +605,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 				{
 					if (!SelectedItems.contains(PressedItem) || SelectedItems.count() == 0) // if there is no selected item or pressed item is not in the selected item list
 					{
-						for (int I = 0; I < SelectedItems.count(); I++) // clear and deselect all the elements on the view
+						for (ZEInt I = 0; I < SelectedItems.count(); I++) // clear and deselect all the elements on the view
 							SelectedItems[I]->SetSelected(false);
 
 						MutualDeselection(UndoRedoOperation);
@@ -626,7 +626,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 							else // set connection if an io port pressed
 							{
 								SelectedConnections.clear();
-								for (int I = 0; I < Connections.count(); I++) // set selected connections for selected IOPort
+								for (ZEInt I = 0; I < Connections.count(); I++) // set selected connections for selected IOPort
 								{
 									if (Connections[I]->GetFrom() == SelectedIOPort || Connections[I]->GetTo() == SelectedIOPort)
 									{
@@ -672,13 +672,13 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 			{
 				if(IsMultipleSelectionEnabled == false && IsDeselectionEnabled == false)
 				{
-					for (int I = 0; I < Connections.count(); I++)
+					for (ZEInt I = 0; I < Connections.count(); I++)
 					{				
 						Connections[I]->SetSelected(false);
 						Connections[I]->setZValue(-1);
 					}
 
-					for (int I = 0; I < SelectedItems.count(); I++)
+					for (ZEInt I = 0; I < SelectedItems.count(); I++)
 						SelectedItems[I]->SetSelected(false);
 
 					MutualDeselection(UndoRedoOperation);
@@ -690,7 +690,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 				RubberBandSelectionRectItem = new QGraphicsRectItem(NULL,MainScene);
 				MainScene->addItem(RubberBandSelectionRectItem);
 			}		
-			for (int I = 0; I < Nodes.count(); I++)
+			for (ZEInt I = 0; I < Nodes.count(); I++)
 			{	
 				if (Nodes[I]->sceneBoundingRect().contains(MouseScenePos) ) //If mouse pos in a node
 				{
@@ -702,7 +702,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 							AnyItemPressedFlag = true;
 							break;
 						}
-						for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+						for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 						{
 							if (Nodes[I]->GetIOPorts()->value(J)->sceneBoundingRect().contains(MouseScenePos) == true && transform().m11() > 0.30f) // If any IO port Selected select IOPort
 							{
@@ -716,7 +716,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 			}
 			if (!AnyItemPressedFlag)
 			{
-				for (int I = 0; I < Nodes.count(); I++)
+				for (ZEInt I = 0; I < Nodes.count(); I++)
 				{	
 					if (Nodes[I]->sceneBoundingRect().contains(MouseScenePos) ) //If mouse pos in a node
 					{
@@ -728,7 +728,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 								AnyItemPressedFlag = true;
 								break;
 							}
-							for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+							for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 							{
 								if (Nodes[I]->GetIOPorts()->value(J)->sceneBoundingRect().contains(MouseScenePos) == false || transform().m11() < 0.30f) // If none of IO ports selected select Node
 								{
@@ -743,7 +743,7 @@ void ZEDNodeEditorGraphicsView::mousePressEvent(QMouseEvent *Event)
 			}	
 			if (!AnyItemPressedFlag) //If mouse pos NOT in a node
 			{
-				for (int I = 0; I < SelectedItems.count(); I++)
+				for (ZEInt I = 0; I < SelectedItems.count(); I++)
 				{
 					SelectedItems[I]->SetSelected(false);
 				}
@@ -774,13 +774,13 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 	{
 		IsMouseMoving = false;
 
-		for (int I = 0; I < Nodes.count(); I++)
+		for (ZEInt I = 0; I < Nodes.count(); I++)
 		{
 			if(Nodes[I]->GetSelected() == true)
 			{
 				Nodes[I]->ScaleByGizmo();
 
-				for (int J = 0; J < Connections.count(); J++)
+				for (ZEInt J = 0; J < Connections.count(); J++)
 				{
 					if (Connections[J]->GetFromNode() == Nodes[I] || Connections[J]->GetToNode() == Nodes[I])
 					{
@@ -797,7 +797,7 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 			{
 				ZEDUndoRedoOperation* UndoRedoOperation = ZEDUndoRedoOperation::CreateInstance();
 				
-				for (int I = 0; I < SelectedNodes.count(); I++)
+				for (ZEInt I = 0; I < SelectedNodes.count(); I++)
 				{
 					ZEDNodeEditorMoveNodeOperation* NodeMove = ZEDNodeEditorMoveNodeOperation::CreateInstance();
 					NodeMove->SetView(this);
@@ -821,7 +821,7 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 
 					ZEDUndoRedoOperation* UndoRedoOperation = ZEDUndoRedoOperation::CreateInstance();
 
-					for (int I = 0; I < SelectedNodes.count(); I++)
+					for (ZEInt I = 0; I < SelectedNodes.count(); I++)
 					{
 						ZEDNodeEditorResizeNodeOperation* NodeResize = ZEDNodeEditorResizeNodeOperation::CreateInstance();
 						NodeResize->SetView(this);
@@ -846,10 +846,10 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 			MainScene->removeItem(TempConnection);
 			QPointF MousePosNow = mapToScene(Event->pos());
 			bool SelectedFlag = false;
-			QList<int> SelectTopMost;
-			int TopMost = 0;
+			QList<ZEInt> SelectTopMost;
+			ZEInt TopMost = 0;
 
-			for (int I = 0; I < Nodes.count(); I++) //create qlist to find topmost item
+			for (ZEInt I = 0; I < Nodes.count(); I++) //create qlist to find topmost item
 			{
 				if (Nodes[I]->sceneBoundingRect().contains(MousePosNow))
 					SelectTopMost.append(Nodes[I]->zValue());
@@ -862,9 +862,9 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 			}
 
 			ZEDUndoRedoOperation* UndoRedoOperation = ZEDUndoRedoOperation::CreateInstance();
-			for (int I = 0; I < Nodes.count(); I++)
+			for (ZEInt I = 0; I < Nodes.count(); I++)
 			{
-				for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+				for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 				{
 					if (Nodes[I]->GetIOPorts()->value(J)->sceneBoundingRect().contains(MousePosNow) && SelectedFlag == false)
 					{
@@ -878,7 +878,7 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 								AddConnection(TempConnection->GetFrom(), TempConnection->GetTo(), TempConnection->GetDirected());
 							}
 
-							for (int I = 0; I < SelectedItems.count(); I++)
+							for (ZEInt I = 0; I < SelectedItems.count(); I++)
 								SelectedItems[I]->SetSelected(false);
 							
 							MutualDeselection(UndoRedoOperation);							
@@ -906,10 +906,10 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 			QPointF MousePosNow = mapToScene(Event->pos());
 			bool IOPortSelectedFlag = false;
 			bool NodeConnectionPointSelectedFlag = false;
-			QList<int> SelectTopMost;
-			int TopMost = 0;
+			QList<ZEInt> SelectTopMost;
+			ZEInt TopMost = 0;
 
-			for (int I = 0; I < Nodes.count(); I++) //create qlist to find topmost item
+			for (ZEInt I = 0; I < Nodes.count(); I++) //create qlist to find topmost item
 			{
 				if (Nodes[I]->sceneBoundingRect().contains(MousePosNow))
 					SelectTopMost.append(Nodes[I]->zValue());
@@ -923,7 +923,7 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 
 			ZEDUndoRedoOperation* UndoRedoOperation = ZEDUndoRedoOperation::CreateInstance();
 			
-			for (int I = 0; I < Nodes.count(); I++)
+			for (ZEInt I = 0; I < Nodes.count(); I++)
 			{
 				if (Nodes[I]->GetConnectionPoint()->sceneBoundingRect().contains(MousePosNow) && NodeConnectionPointSelectedFlag == false)
 				{
@@ -935,7 +935,7 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 						if (TempConnection->GetFrom() == NULL)
 							AddNodeConnection(TempConnection->GetFromNode(), TempConnection->GetToNode(), TempConnection->GetTo(), TempConnection->GetDirected());
 
-						for (int I = 0; I < SelectedItems.count(); I++)
+						for (ZEInt I = 0; I < SelectedItems.count(); I++)
 							SelectedItems[I]->SetSelected(false);
 
 						MutualDeselection(UndoRedoOperation);
@@ -946,7 +946,7 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 				}
 				else
 				{
-					for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+					for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 					{
 						if (Nodes[I]->GetIOPorts()->value(J)->sceneBoundingRect().contains(MousePosNow) && IOPortSelectedFlag == false)
 						{
@@ -958,7 +958,7 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 								if (TempConnection->GetFrom() == NULL)
 									AddNodeConnection(TempConnection->GetFromNode(), TempConnection->GetToNode(), TempConnection->GetTo(), TempConnection->GetDirected());
 
-								for (int I = 0; I < SelectedItems.count(); I++)
+								for (ZEInt I = 0; I < SelectedItems.count(); I++)
 									SelectedItems[I]->SetSelected(false);
 
 								MutualDeselection(UndoRedoOperation);
@@ -971,7 +971,7 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 				}
 				if (IOPortSelectedFlag == false && NodeConnectionPointSelectedFlag == false)
 				{
-					for (int I = 0; I < SelectedItems.count(); I++)
+					for (ZEInt I = 0; I < SelectedItems.count(); I++)
 						SelectedItems[I]->SetSelected(false);
 
 					MutualDeselection(UndoRedoOperation);
@@ -1018,14 +1018,14 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 			{
 				LastMousePos = mapToScene(Event->pos());
 
-				for (int I = 0; I < Nodes.count(); I++)
+				for (ZEInt I = 0; I < Nodes.count(); I++)
 				{
 					if(Nodes[I]->GetSelected() == true)
 					{
 						Nodes[I]->translate((LastMousePos.x() - InitialMousePos.x()), (LastMousePos.y() - InitialMousePos.y()));
 						Nodes[I]->GetScaleGizmo()->translate((LastMousePos.x() - InitialMousePos.x()), (LastMousePos.y() - InitialMousePos.y()));
 
-						for (int J = 0; J < Connections.count(); J++)
+						for (ZEInt J = 0; J < Connections.count(); J++)
 						{
 							if (Connections[J]->GetFromNode() == Nodes[I] || Connections[J]->GetToNode() == Nodes[I])
 							{
@@ -1040,7 +1040,7 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 			else if (IsDeselectionEnabled == false &&  IsMousePositionContainsGizmo == true )
 			{
 				LastMousePos = mapToScene(Event->pos());
-				for (int I = 0; I < Nodes.count(); I++)
+				for (ZEInt I = 0; I < Nodes.count(); I++)
 				{
 					if(Nodes[I]->GetSelected() == true)
 					{
@@ -1089,10 +1089,10 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 				}
 
 				bool SelectedFlag = false;
-				QList<int> SelectTopMost;
-				int TopMost = 0;
+				QList<ZEInt> SelectTopMost;
+				ZEInt TopMost = 0;
 
-				for (int I = 0; I < Nodes.count(); I++) //create qlist to find topmost item
+				for (ZEInt I = 0; I < Nodes.count(); I++) //create qlist to find topmost item
 				{
 					if (Nodes[I]->sceneBoundingRect().contains(LastMousePos))
 						SelectTopMost.append(Nodes[I]->zValue());
@@ -1104,11 +1104,11 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 					TopMost = SelectTopMost.takeLast();
 				}
 				
-				for (int I = 0; I < Nodes.count(); I++)
+				for (ZEInt I = 0; I < Nodes.count(); I++)
 				{
 					if (Nodes[I]->sceneBoundingRect().contains(LastMousePos))
 					{
-						for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+						for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 						{
 							if (Nodes[I]->GetIOPorts()->value(J)->sceneBoundingRect().contains(LastMousePos) && Nodes[I]->zValue() == TopMost && SelectedFlag == false)
 							{
@@ -1126,7 +1126,7 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 					}
 					else 
 					{
-						for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+						for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 							if (TempConnection->GetFrom() != Nodes[I]->GetIOPorts()->value(J))
 								Nodes[I]->GetIOPorts()->value(J)->SetSelected(false);
 					}
@@ -1158,10 +1158,10 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 				bool SelectedIOPortFlag = false;
 				bool SelectedNodeConnectionPointFlag = false;
 
-				QList<int> SelectTopMost;
-				int TopMost = 0;
+				QList<ZEInt> SelectTopMost;
+				ZEInt TopMost = 0;
 
-				for (int I = 0; I < Nodes.count(); I++) //create qlist to find topmost item
+				for (ZEInt I = 0; I < Nodes.count(); I++) //create qlist to find topmost item
 				{
 					if (Nodes[I]->sceneBoundingRect().contains(LastMousePos))
 						SelectTopMost.append(Nodes[I]->zValue());
@@ -1173,7 +1173,7 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 					TopMost = SelectTopMost.takeLast();
 				}
 
-				for (int I = 0; I < Nodes.count(); I++)
+				for (ZEInt I = 0; I < Nodes.count(); I++)
 				{
 					if (Nodes[I]->sceneBoundingRect().contains(LastMousePos))
 					{
@@ -1189,7 +1189,7 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 						}
 						else if (!Nodes[I]->GetConnectionPoint()->sceneBoundingRect().contains(LastMousePos) )
 						{
-							for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+							for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 							{
 								if (Nodes[I]->GetIOPorts()->value(J)->sceneBoundingRect().contains(LastMousePos)  && Nodes[I]->zValue() == TopMost && SelectedIOPortFlag == false)
 								{
@@ -1216,7 +1216,7 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 					}
 					else 
 					{
-						for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+						for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 							Nodes[I]->GetIOPorts()->value(J)->SetSelected(false);
 
 						if (Nodes[I]->GetConnectionPoint() != TempConnection->GetFromNode()->GetConnectionPoint())
@@ -1231,9 +1231,9 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 			}
 			else if (SelectedItemsIncludeNodeConnectionPoint == true && (IsDeselectionEnabled == true || IsMultipleSelectionEnabled == true) )
 			{
-				for (int I = 0; I < Nodes.count(); I++)
+				for (ZEInt I = 0; I < Nodes.count(); I++)
 				{
-					for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+					for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 					{
 						Nodes[I]->GetIOPorts()->value(J)->SetSelected(false);
 					}
@@ -1246,9 +1246,9 @@ void ZEDNodeEditorGraphicsView::mouseMoveEvent(QMouseEvent *Event)
 			}
 			else if (SelectedItemsIncludeIOPort == true && (IsDeselectionEnabled == true || IsMultipleSelectionEnabled == true) )
 			{
-				for (int I = 0; I < Nodes.count(); I++)
+				for (ZEInt I = 0; I < Nodes.count(); I++)
 				{
-					for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+					for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 					{
 						Nodes[I]->GetIOPorts()->value(J)->SetSelected(false);
 					}
@@ -1301,9 +1301,9 @@ void ZEDNodeEditorGraphicsView::wheelEvent(QWheelEvent *Event)
 
 	if (TempRect->transform().m11() <= 0.25)
 	{
-		for (int I = 0; I < Nodes.count(); I++)// set names visibility after a scaling treshold
+		for (ZEInt I = 0; I < Nodes.count(); I++)// set names visibility after a scaling treshold
 		{	
-			for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+			for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 			{
 				Nodes[I]->GetIOPorts()->value(J)->GetIOPortName()->setVisible(false);
 			}
@@ -1311,9 +1311,9 @@ void ZEDNodeEditorGraphicsView::wheelEvent(QWheelEvent *Event)
 	}
 	else if (TempRect->transform().m11() > 0.25)
 	{
-		for (int I = 0; I < Nodes.count(); I++)// set names visibility after a scaling treshold
+		for (ZEInt I = 0; I < Nodes.count(); I++)// set names visibility after a scaling treshold
 		{	
-			for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+			for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 			{
 				Nodes[I]->GetIOPorts()->value(J)->GetIOPortName()->setVisible(true);
 			}
@@ -1325,9 +1325,9 @@ void ZEDNodeEditorGraphicsView::wheelEvent(QWheelEvent *Event)
 		scale(pow((double)2, Event->delta() / 120.0), pow((double)2, Event->delta() / 120.0));	
 		GridSpacing = GridSpacing / pow((double)2, Event->delta() / 120);
 
-		for (int I = 0; I < Nodes.count(); I++)// resize all the gizmo points
+		for (ZEInt I = 0; I < Nodes.count(); I++)// resize all the gizmo points
 		{	
-			for (int J = 0; J < Nodes[I]->GetScaleGizmo()->GetGizmoPointList()->count(); J++)
+			for (ZEInt J = 0; J < Nodes[I]->GetScaleGizmo()->GetGizmoPointList()->count(); J++)
 			{
 				//Nodes[I]->GetScaleGizmo()->GetGizmoPointList()->value(J)->scale(pow((double)2, Event->delta() / -120.0), pow((double)2, Event->delta() / -120.0));
 				Nodes[I]->GetScaleGizmo()->Update();
@@ -1392,17 +1392,17 @@ void ZEDNodeEditorGraphicsView::drawBackground (QPainter* Painter, const QRectF 
 {
 	QGraphicsView::drawBackground(Painter,rect);
 
-	int topLeftGridX = rect.topLeft().toPoint().x()- GridSpacing - (rect.topLeft().toPoint().x() % GridSpacing);
-	int topLeftGridY = rect.topLeft().toPoint().y()- GridSpacing - (rect.topLeft().toPoint().y() % GridSpacing);	
-	int bottomRightGridX = rect.bottomRight().toPoint().x() + GridSpacing - (rect.bottomRight().toPoint().x() % GridSpacing);
-	int bottomRightGridY = rect.bottomRight().toPoint().y() + GridSpacing - (rect.bottomRight().toPoint().y() % GridSpacing);	
+	ZEInt topLeftGridX = rect.topLeft().toPoint().x()- GridSpacing - (rect.topLeft().toPoint().x() % GridSpacing);
+	ZEInt topLeftGridY = rect.topLeft().toPoint().y()- GridSpacing - (rect.topLeft().toPoint().y() % GridSpacing);	
+	ZEInt bottomRightGridX = rect.bottomRight().toPoint().x() + GridSpacing - (rect.bottomRight().toPoint().x() % GridSpacing);
+	ZEInt bottomRightGridY = rect.bottomRight().toPoint().y() + GridSpacing - (rect.bottomRight().toPoint().y() % GridSpacing);	
 	Painter->setPen(Qt::darkGray);
 
-	for (int I = topLeftGridX; I < bottomRightGridX; I = I + GridSpacing)
+	for (ZEInt I = topLeftGridX; I < bottomRightGridX; I = I + GridSpacing)
 	{
 		Painter->drawLine(I , rect.topLeft().y() , I , rect.bottomRight().y());
 	}
-	for (int I = topLeftGridY; I < bottomRightGridY; I = I + GridSpacing)
+	for (ZEInt I = topLeftGridY; I < bottomRightGridY; I = I + GridSpacing)
 	{
 		Painter->drawLine(rect.topLeft().x() , I , rect.bottomRight().x(), I);
 	}	
@@ -1417,7 +1417,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 
 		if (IsMultipleSelectionEnabled == true && IsDeselectionEnabled == false)
 		{					
-			for (int I = 0; I < Nodes.count(); I++)
+			for (ZEInt I = 0; I < Nodes.count(); I++)
 			{
 				if (Nodes[I]->sceneBoundingRect().intersects(RubberBandSelectionRectItem->rect()))
 				{
@@ -1430,7 +1430,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 				}
 			}
 
-			for (int I = 0; I < Connections.count(); I++)
+			for (ZEInt I = 0; I < Connections.count(); I++)
 			{
 				if(Connections[I]->collidesWithItem(RubberBandSelectionRectItem, Qt::IntersectsItemShape) || Connections[I]->ArrowPolygon->collidesWithItem(RubberBandSelectionRectItem, Qt::IntersectsItemShape))
 				{
@@ -1446,7 +1446,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 
 		else if (IsMultipleSelectionEnabled == false && IsDeselectionEnabled == true)
 		{
-			for (int I = 0; I < Nodes.count(); I++)
+			for (ZEInt I = 0; I < Nodes.count(); I++)
 			{
 				if (Nodes[I]->sceneBoundingRect().intersects(RubberBandSelectionRectItem->rect()))
 				{
@@ -1457,7 +1457,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 					emit OnNodeSelection(&SelectedNodes);
 				}
 			}
-			for (int I = 0; I < Connections.count(); I++)
+			for (ZEInt I = 0; I < Connections.count(); I++)
 			{
 				if(Connections[I]->collidesWithItem(RubberBandSelectionRectItem, Qt::IntersectsItemShape) || Connections[I]->ArrowPolygon->collidesWithItem(RubberBandSelectionRectItem, Qt::IntersectsItemShape))
 				{
@@ -1473,7 +1473,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 		else if (IsMultipleSelectionEnabled == false && IsDeselectionEnabled == false)
 		{
 			MutualDeselection(UndoRedoOperation);
-			for (int I = 0; I < Nodes.count(); I++)
+			for (ZEInt I = 0; I < Nodes.count(); I++)
 			{
 				if (Nodes[I]->sceneBoundingRect().intersects(RubberBandSelectionRectItem->rect()))
 				{
@@ -1484,7 +1484,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 					emit OnNodeSelection(&SelectedNodes);
 				}
 			}	
-			for (int I = 0; I < Connections.count(); I++)
+			for (ZEInt I = 0; I < Connections.count(); I++)
 			{
 				if(Connections[I]->collidesWithItem(RubberBandSelectionRectItem, Qt::IntersectsItemShape) || Connections[I]->ArrowPolygon->collidesWithItem(RubberBandSelectionRectItem, Qt::IntersectsItemShape))
 				{
@@ -1508,7 +1508,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 		ZEDUndoRedoOperation* UndoRedoOperation = ZEDUndoRedoOperation::CreateInstance();
 		if (IsMultipleSelectionEnabled == true && IsDeselectionEnabled == false)
 		{
-			for (int I = 0; I < Nodes.count(); I++)
+			for (ZEInt I = 0; I < Nodes.count(); I++)
 			{
 				if (RubberBandSelectionRectItem->rect().contains(Nodes[I]->sceneBoundingRect()))
 				{
@@ -1519,7 +1519,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 					emit OnNodeSelection(&SelectedNodes);
 				}
 			}	
-			for (int I = 0; I < Connections.count(); I++)
+			for (ZEInt I = 0; I < Connections.count(); I++)
 			{
 				if(Connections[I]->collidesWithItem(RubberBandSelectionRectItem, Qt::ContainsItemShape) || Connections[I]->ArrowPolygon->collidesWithItem(RubberBandSelectionRectItem, Qt::ContainsItemShape))
 				{
@@ -1535,7 +1535,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 
 		else if (IsMultipleSelectionEnabled == false && IsDeselectionEnabled == true)
 		{
-			for (int I = 0; I < Nodes.count(); I++)
+			for (ZEInt I = 0; I < Nodes.count(); I++)
 			{
 				if (RubberBandSelectionRectItem->rect().contains(Nodes[I]->sceneBoundingRect()))
 				{
@@ -1546,7 +1546,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 					emit OnNodeSelection(&SelectedNodes);
 				}
 			}
-			for (int I = 0; I < Connections.count(); I++)
+			for (ZEInt I = 0; I < Connections.count(); I++)
 			{
 				if(Connections[I]->collidesWithItem(RubberBandSelectionRectItem, Qt::ContainsItemShape) || Connections[I]->ArrowPolygon->collidesWithItem(RubberBandSelectionRectItem, Qt::ContainsItemShape))
 				{
@@ -1562,7 +1562,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 		else if (IsMultipleSelectionEnabled == false && IsDeselectionEnabled == false)
 		{
 			MutualDeselection(UndoRedoOperation);
-			for (int I = 0; I < Nodes.count(); I++)
+			for (ZEInt I = 0; I < Nodes.count(); I++)
 			{
 				if (RubberBandSelectionRectItem->rect().contains(Nodes[I]->sceneBoundingRect()))
 				{
@@ -1573,7 +1573,7 @@ void ZEDNodeEditorGraphicsView::RubberBandSelection()
 					emit OnNodeSelection(&SelectedNodes);
 				}
 			}	
-			for (int I = 0; I < Connections.count(); I++)
+			for (ZEInt I = 0; I < Connections.count(); I++)
 			{
 				if(Connections[I]->collidesWithItem(RubberBandSelectionRectItem, Qt::ContainsItemShape) || Connections[I]->ArrowPolygon->collidesWithItem(RubberBandSelectionRectItem, Qt::ContainsItemShape))
 				{
@@ -1631,7 +1631,7 @@ void ZEDNodeEditorGraphicsView::MutualDeselection(ZEDUndoRedoOperation* Deselect
 {
 	if (!SelectedItems.isEmpty()) // for mutual deselection undo/redo
 	{
-		for (int I = 0; I < SelectedItems.count(); I++)
+		for (ZEInt I = 0; I < SelectedItems.count(); I++)
 		{
 			if (SelectedItems[I]->GetItemType() != ZED_NEIT_IOPORT && SelectedItems[I]->GetItemType() != ZED_NEIT_NODE_CONNECTION_POINT)
 			{
@@ -1666,15 +1666,15 @@ void ZEDNodeEditorGraphicsView::SetNewConnection(ZEDNodeEditorNode* FromNode, ZE
 
 }
 
-int ZEDNodeEditorGraphicsView::SelectTopMostNodeZValue(QPointF MousePosition)
+ZEInt ZEDNodeEditorGraphicsView::SelectTopMostNodeZValue(QPointF MousePosition)
 {
-	QList<int> SelectTopMostZvalue;
-	int TopMostNodeZValue = 0;
+	QList<ZEInt> SelectTopMostZvalue;
+	ZEInt TopMostNodeZValue = 0;
 	SelectTopMostZvalue.clear();
 	
 	if (!Nodes.isEmpty())
 	{
-		for (int I = 0; I < Nodes.count(); I++) //create qlist to find topmost item
+		for (ZEInt I = 0; I < Nodes.count(); I++) //create qlist to find topmost item
 		{	
 			if (Nodes[I]->sceneBoundingRect().contains(MousePosition)) // append all nodes to List that includes MousePos to find topmost
 				SelectTopMostZvalue.append(Nodes[I]->zValue());
@@ -1693,7 +1693,7 @@ void ZEDNodeEditorGraphicsView::SendBackward()
 {
 	bool SendBackwardAvailable = true;
 
-	for (int I = 0; I < SelectedNodes.count(); I++)
+	for (ZEInt I = 0; I < SelectedNodes.count(); I++)
 	{
 		if (SelectedNodes[I]->zValue() < 2)
 		{
@@ -1705,9 +1705,9 @@ void ZEDNodeEditorGraphicsView::SendBackward()
 	{
 		ZEDUndoRedoOperation* UndoRedoOperation = ZEDUndoRedoOperation::CreateInstance();
 
-		for (int I = 0; I < SelectedNodes.count(); I++)
+		for (ZEInt I = 0; I < SelectedNodes.count(); I++)
 		{
-			for (int J = 0; J < Nodes.count(); J++)
+			for (ZEInt J = 0; J < Nodes.count(); J++)
 			{
 				if (Nodes[J]->zValue() == SelectedNodes[I]->zValue() - 1)
 					Nodes[J]->setZValue(SelectedNodes[I]->zValue());
@@ -1728,7 +1728,7 @@ void ZEDNodeEditorGraphicsView::BringForward()
 {
 	bool BringForwardAvailable = true;
 
-	for (int I = 0; I < SelectedNodes.count(); I++)
+	for (ZEInt I = 0; I < SelectedNodes.count(); I++)
 	{
 		if (SelectedNodes[I]->zValue() > Nodes.count() - 1)
 		{
@@ -1740,9 +1740,9 @@ void ZEDNodeEditorGraphicsView::BringForward()
 	{
 		ZEDUndoRedoOperation* UndoRedoOperation = ZEDUndoRedoOperation::CreateInstance();
 
-		for (int I = 0; I < SelectedNodes.count(); I++)
+		for (ZEInt I = 0; I < SelectedNodes.count(); I++)
 		{
-			for (int J = 0; J < Nodes.count(); J++)
+			for (ZEInt J = 0; J < Nodes.count(); J++)
 			{
 				if (Nodes[J]->zValue() == SelectedNodes[I]->zValue() + 1)
 					Nodes[J]->setZValue(SelectedNodes[I]->zValue());
@@ -1765,11 +1765,11 @@ void ZEDNodeEditorGraphicsView::DeleteSelectedItems()
 
 	if (!IsMouseMoving && !SelectedItems.isEmpty())
 	{
-		for (int I = 0; I < SelectedItems.count(); I++) // rearrange selected items which are nodes, zvalues descenting order
+		for (ZEInt I = 0; I < SelectedItems.count(); I++) // rearrange selected items which are nodes, zvalues descenting order
 		{
 			if (SelectedItems[I]->GetItemType() == ZED_NEIT_NODE)
 			{		
-				for (int J = I; J < SelectedItems.count(); J++)
+				for (ZEInt J = I; J < SelectedItems.count(); J++)
 				{
 					if (SelectedItems[J]->GetItemType() == ZED_NEIT_NODE)
 					{			
@@ -1784,13 +1784,13 @@ void ZEDNodeEditorGraphicsView::DeleteSelectedItems()
 
 		ZEDUndoRedoOperation* UndoRedoOperation = ZEDUndoRedoOperation::CreateInstance();
 
-		for (int I = 0; I < SelectedItems.count(); I++)
+		for (ZEInt I = 0; I < SelectedItems.count(); I++)
 		{
 			if (SelectedItems[I]->GetItemType() == ZED_NEIT_IOPORT)
 			{			
 				QList<ZEDIOPortConnection*> TempConnections = Connections;
 
-				for (int J = 0; J < TempConnections.count(); J++)
+				for (ZEInt J = 0; J < TempConnections.count(); J++)
 				{
 					if (TempConnections[J]->GetFrom() == (ZEDNodeIOPort*)(SelectedItems[I]) || TempConnections[J]->GetTo() == (ZEDNodeIOPort*)(SelectedItems[I]))
 					{
@@ -1823,11 +1823,11 @@ void ZEDNodeEditorGraphicsView::DeleteSelectedItems()
 				{
 					QList<ZEDIOPortConnection*> TempConnections = Connections;
 
-					for (int J = 0; J < TempConnections.count(); J++)
+					for (ZEInt J = 0; J < TempConnections.count(); J++)
 					{
 						if (TempConnections[J]->GetFromNode() == (ZEDNodeEditorNode*)(SelectedItems[I]) || TempConnections[J]->GetToNode() == (ZEDNodeEditorNode*)(SelectedItems[I]))
 						{
-							for (int K = SelectedItems.count() - 1; K > I; K--)
+							for (ZEInt K = SelectedItems.count() - 1; K > I; K--)
 							{
 								if (SelectedItems[K] == ((ZEDNodeEditorItem*)(TempConnections[J])))
 								{
@@ -1885,7 +1885,7 @@ void ZEDNodeEditorGraphicsView::DeleteSelectedItems()
 		else
 			UndoRedoOperation->Destroy();
 
-		for (int I = 0; I < SelectedItems.count(); I++)
+		for (ZEInt I = 0; I < SelectedItems.count(); I++)
 		{
 			SelectedItems[I]->SetSelected(false);
 		}
@@ -1902,11 +1902,11 @@ void ZEDNodeEditorGraphicsView::DeleteNode(ZEDNodeEditorNode* Node)
 	MainScene->removeItem(Node);
 	NodeZValue--;
 		
-	int RemovedNodeZValue = Node->zValue();
+	ZEInt RemovedNodeZValue = Node->zValue();
 
 	Nodes.removeOne(Node);
 
-	for (int I = 0; I < Nodes.count(); I++)
+	for (ZEInt I = 0; I < Nodes.count(); I++)
 	{				
 		if (Nodes[I]->zValue() > RemovedNodeZValue)
 		{
@@ -1933,13 +1933,13 @@ void ZEDNodeEditorGraphicsView::SelectAllItems()
 
 	ZEDUndoRedoOperation* UndoRedoOperation = ZEDUndoRedoOperation::CreateInstance();
 	
-	for (int I = 0; I < Nodes.count(); I++)
+	for (ZEInt I = 0; I < Nodes.count(); I++)
 	{
 		SelectedNodes.append(Nodes[I]);
 		SelectItem((ZEDNodeEditorItem*)(Nodes[I]), UndoRedoOperation);
 		Nodes[I]->SetSelected(true);		
 	}
-	for (int I = 0; I < Connections.count(); I++)
+	for (ZEInt I = 0; I < Connections.count(); I++)
 	{
 		SelectedConnections.append(Connections[I]);
 		SelectItem((ZEDNodeEditorItem*)(Connections[I]), UndoRedoOperation);
@@ -1961,7 +1961,7 @@ QList<QAction*>* ZEDNodeEditorGraphicsView::GetCustomViewContextMenuItems()
 }
 void ZEDNodeEditorGraphicsView::AddCustomViewContextMenuItems(QList<QAction*> ContextMenuItems)
 {
-	for (int I = 0; I < ContextMenuItems.count(); I++)
+	for (ZEInt I = 0; I < ContextMenuItems.count(); I++)
 	{
 		ContextMenuItems[I] = new QAction(ContextMenuItems[I]->text(), ViewContextMenu);
 		ViewContextMenu->addAction(ContextMenuItems[I]);
@@ -1974,7 +1974,7 @@ void ZEDNodeEditorGraphicsView::DisplayViewContextMenu(QPointF MousePos)
 }
 void ZEDNodeEditorGraphicsView::AddMultipleSelectionCustomContextMenuItems(QList<QAction*> ContextMenuItems)
 {
-	for (int I = 0; I < ContextMenuItems.count(); I++)
+	for (ZEInt I = 0; I < ContextMenuItems.count(); I++)
 	{
 		ContextMenuItems[I] = new QAction(ContextMenuItems[I]->text(), MultipleSelectionContextMenu);
 		MultipleSelectionContextMenu->addAction(ContextMenuItems[I]);
@@ -2047,7 +2047,7 @@ void ZEDNodeEditorGraphicsView::AddNode(ZEDNodeEditorNode* NewNode, QPointF Posi
 
 	QTransform Matrix;
 	Matrix.setMatrix(ScaleCoefficient,0,0,0,ScaleCoefficient,0,0,0,1);
-	for (int J = 0; J < Gizmo->GetGizmoPointList()->count(); J++)
+	for (ZEInt J = 0; J < Gizmo->GetGizmoPointList()->count(); J++)
 	{
 		Gizmo->GetGizmoPointList()->value(J)->setTransform(Matrix);		
 	}	
@@ -2060,9 +2060,9 @@ void ZEDNodeEditorGraphicsView::AddNode(ZEDNodeEditorNode* NewNode, QPointF Posi
 
 	if (ScaleCoefficient > 2.01f)
 	{
-		for (int I = 0; I < Nodes.count(); I++)// set names visibility after a scaling treshold
+		for (ZEInt I = 0; I < Nodes.count(); I++)// set names visibility after a scaling treshold
 		{	
-			for (int J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
+			for (ZEInt J = 0; J < Nodes[I]->GetIOPorts()->count(); J++)
 			{
 				Nodes[I]->GetIOPorts()->value(J)->GetIOPortName()->setVisible(false);
 			}
@@ -2107,7 +2107,7 @@ void ZEDNodeEditorGraphicsView::AddNodeConnection(ZEDNodeEditorNode* FromNode, Z
 
 		bool IsValid = true;
 
-		for (int I = 0; I < Connections.count(); I++)
+		for (ZEInt I = 0; I < Connections.count(); I++)
 		{
 			if(Connections[I] == Connection)
 				continue;
@@ -2177,7 +2177,7 @@ void ZEDNodeEditorGraphicsView::AddConnection(ZEDNodeIOPort* From, ZEDNodeIOPort
 
 		bool IsValid = true;
 
-		for (int I = 0; I < Connections.count(); I++)
+		for (ZEInt I = 0; I < Connections.count(); I++)
 		{
 			if(Connections[I] == Connection)
 				continue;

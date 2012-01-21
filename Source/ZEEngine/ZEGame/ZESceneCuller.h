@@ -47,16 +47,16 @@ struct ZEDrawParameters;
 
 struct ZECullStatistics
 {
-	size_t								TotalEntityCount;
-	size_t								DrawableEntityCount;
-	size_t								VisibleEntityCount;
-	size_t								CulledEntityCount;
-	size_t								DrawedEntityCount;
+	ZESize								TotalEntityCount;
+	ZESize								DrawableEntityCount;
+	ZESize								VisibleEntityCount;
+	ZESize								CulledEntityCount;
+	ZESize								DrawedEntityCount;
 
-	size_t								TotalLightCount;
-	size_t								VisibleLightCount;
-	size_t								CulledLightCount;
-	size_t								DrawedLightCount;
+	ZESize								TotalLightCount;
+	ZESize								VisibleLightCount;
+	ZESize								CulledLightCount;
+	ZESize								DrawedLightCount;
 };
 
 #define ZE_VDE_NONE									0

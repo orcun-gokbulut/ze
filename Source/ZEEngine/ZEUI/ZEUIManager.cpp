@@ -179,7 +179,7 @@ void ZEUIManager::ProcessEvents()
 		/************************************************************************/
 		if (OldMousePosition != CursorPosition)
 		{
-			for (size_t I = 0; I < Controls.GetCount(); I++)
+			for (ZESize I = 0; I < Controls.GetCount(); I++)
 			{
 				if (Controls[I] == Cursor)
 				{
@@ -197,7 +197,7 @@ void ZEUIManager::ProcessEvents()
 
 				ZEUIControl* Reciever = NULL;
 
-				for (size_t I = 0; I < Controls.GetCount(); I++)
+				for (ZESize I = 0; I < Controls.GetCount(); I++)
 				{
 					if (Controls[I]->GetVisiblity() == false)
 						continue;
@@ -296,7 +296,7 @@ void ZEUIManager::ProcessEvents()
 	{
 		zeInput->ProcessInputMap(&InputMap);
 
-		for (size_t I = 0; I < InputMap.InputActionCount; I++)
+		for (ZESize I = 0; I < InputMap.InputActionCount; I++)
 		{
 			switch (InputMap.InputActions[I].Id)
 			{
@@ -438,7 +438,7 @@ void ZEUIManager::ProcessEvents()
 
 ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 {
-	for (size_t I = 0; I < ParentControl->GetChildControls().GetCount(); I++)
+	for (ZESize I = 0; I < ParentControl->GetChildControls().GetCount(); I++)
 	{
 		ZEUIControl* CurrentControl = ParentControl->GetChildControls()[I];
 		if (ZERectangle::IntersectionTest(CurrentControl->GetVisibleRectangle(), Cursor->GetPosition()))
@@ -459,7 +459,7 @@ ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 void ZEUIManager::Render(ZERenderer* Renderer)
 {
 	UIRenderer->Clean();
-	for (size_t I = 0; I < Controls.GetCount(); I++)
+	for (ZESize I = 0; I < Controls.GetCount(); I++)
 		if (Controls[I]->GetVisiblity())
 			Controls[I]->Draw(UIRenderer);
 
@@ -468,7 +468,7 @@ void ZEUIManager::Render(ZERenderer* Renderer)
 
 void ZEUIManager::Tick(float ElapsedTime)
 {
-	for (size_t I = 0; I < Controls.GetCount(); I++)
+	for (ZESize I = 0; I < Controls.GetCount(); I++)
 		if (Controls[I]->GetEnabled())
 			Controls[I]->Tick(ElapsedTime);
 

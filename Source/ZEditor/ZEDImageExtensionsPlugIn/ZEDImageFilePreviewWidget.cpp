@@ -132,8 +132,8 @@ QPixmap ZEDImageFilePreviewWidget::CreatePixmap(QString FileName)
 		return QPixmap();
 	}
 
-	int Height = FreeImage_GetHeight(BitMap);
-	int	Width = FreeImage_GetWidth(BitMap);
+	ZEInt Height = FreeImage_GetHeight(BitMap);
+	ZEInt	Width = FreeImage_GetWidth(BitMap);
 
 	QString Resolution = QString().setNum(Height) + QString(" x ") + QString().setNum(Width);
 

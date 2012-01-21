@@ -49,7 +49,7 @@ void ZECommandSection::SetName(const ZEString& Name)
 	this->Name = Name;
 }
 
-size_t ZECommandSection::GetNumberOfCommands()
+ZESize ZECommandSection::GetNumberOfCommands()
 {
 	return Commands.GetCount();
 }
@@ -69,18 +69,18 @@ bool ZECommandSection::AddCommand(ZECommand* Command)
 
 ZECommand* ZECommandSection::GetCommand(const ZEString& Name)
 {
-	for(size_t I=0; I < Commands.GetCount(); I++)
+	for(ZESize I=0; I < Commands.GetCount(); I++)
 		if (Commands[I]->GetName() == Name)
 			return Commands[I];
 	return NULL;
 }
 
-ZECommand* ZECommandSection::GetCommand(size_t Index)
+ZECommand* ZECommandSection::GetCommand(ZESize Index)
 {
 	return Commands.GetItem(Index);
 }
 
-void ZECommandSection::DeleteCommand(size_t Index)
+void ZECommandSection::DeleteCommand(ZESize Index)
 {
 	Commands.DeleteAt(Index);
 }
@@ -109,7 +109,7 @@ ZECommandSection::ZECommandSection(const ZEString& Name)
 
 ZECommandSection::~ZECommandSection()
 {
-	for(size_t I = 0; I < Commands.GetCount(); I++)
+	for(ZESize I = 0; I < Commands.GetCount(); I++)
 		delete Commands[I];
 	Commands.Clear();
 }

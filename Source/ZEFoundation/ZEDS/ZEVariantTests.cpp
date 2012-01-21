@@ -67,13 +67,13 @@ ZETestSuite(ZEVariant)
 		float Result = Variant.GetFloat();
 		ZETestCheckClose(Result, 0.8f);
 	}
-	ZETest("int ZEVariant::GetInteger() const")
+	ZETest("ZEInt ZEVariant::GetInteger() const")
 	{
 		ZEVariant Variant;
-		int Value = 6;
+		ZEInt Value = 6;
 		Variant.SetInteger(Value);
 
-		int Result = Variant.GetInteger();
+		ZEInt Result = Variant.GetInteger();
 		ZETestCheckEqual(Result, 6);
 	}
 	ZETest("ZEMatrix3x3& ZEVariant::GetMatrix3x3() const")
@@ -124,7 +124,7 @@ ZETestSuite(ZEVariant)
 	ZETest("ZEVariantType ZEVariant::GetType() const")
 	{
 		ZEVariant Variant;
-		int i = 6;
+		ZEInt i = 6;
 		Variant.SetInteger(i);
 
 		ZEVariantType Result = Variant.GetType();
@@ -133,7 +133,7 @@ ZETestSuite(ZEVariant)
 	ZETest("ZEVariant::ZEVariantValue ZEVariant::GetValue()	const")
 	{
 		ZEVariant Variant;
-		int i = 6;
+		ZEInt i = 6;
 		Variant.SetInteger(i);
 
 		ZEVariant::ZEVariantValue Result = Variant.GetValue();
@@ -169,7 +169,7 @@ ZETestSuite(ZEVariant)
 	ZETest("ZEVariant::ZEVariantValue& ZEVariant::ImplicitAcesss()")
 	{
 		ZEVariant Variant;
-		int i = 6;
+		ZEInt i = 6;
 		Variant.SetInteger(i);
 
 		ZEVariant::ZEVariantValue Result = Variant.ImplicitAcesss();
@@ -288,10 +288,10 @@ ZETestSuite(ZEVariant)
 		ZETestCheck(Variant.GetType() == ZE_VRT_FLOAT);
 		ZETestCheck(Variant.GetFloat() == NewValue);
 	}
-	ZETest("void ZEVariant::operator=(int NewValue)")
+	ZETest("void ZEVariant::operator=(ZEInt NewValue)")
 	{
 		ZEVariant Variant;
-		int NewValue = 7;
+		ZEInt NewValue = 7;
 
 		Variant = NewValue;
 		ZETestCheck(Variant.GetType() == ZE_VRT_INTEGER);
@@ -329,19 +329,19 @@ ZETestSuite(ZEVariant)
 			ZETestCheckClose(Result, 5.0f);
 		}
 	}
-	ZETest("ZEVariant::operator int()")
+	ZETest("ZEVariant::operator ZEInt()")
 	{
 		ZEVariant Variant;
 		Variant.SetInteger(5);
 
-		int Result = (int)Variant;
+		ZEInt Result = (ZEInt)Variant;
 		ZETestCheck(Result == Variant.GetInteger());
 
 		ZETestCase("for float")
 		{
 			Variant.SetFloat(5.5f);
 
-			Result = (int)Variant;
+			Result = (ZEInt)Variant;
 			ZETestCheckEqual(Result, 5);
 		}
 	}
@@ -432,7 +432,7 @@ ZETestSuite(ZEVariant)
 			float Float = 9.0f;
 
 			Variant = Float;
-			size_t LastItem = File.Tell();
+			ZESize LastItem = File.Tell();
 
 			bool Result = Variant.Serialize((ZESerializer*)&File);
 			File.Seek(LastItem, ZE_SF_BEGINING);
@@ -526,10 +526,10 @@ ZETestSuite(ZEVariant)
 		ZETestCheck(Variant.GetType() == ZE_VRT_FLOAT);
 		ZETestCheck(Variant.GetFloat() == Value);
 	}
-	ZETest("void ZEVariant::SetInteger(int Value)")
+	ZETest("void ZEVariant::SetInteger(ZEInt Value)")
 	{
 		ZEVariant Variant;
-		int Value = 6;
+		ZEInt Value = 6;
 
 		Variant.SetInteger(Value);
 		ZETestCheck(Variant.GetType() == ZE_VRT_INTEGER);
@@ -732,10 +732,10 @@ ZETestSuite(ZEVariant)
 		ZETestCheck(Variant.GetType() == ZE_VRT_VECTOR4);
 		ZETestCheck(Variant.GetVector4() == Vector);
 	}
-	ZETest("size_t ZEVariant::SizeOf() const")
+	ZETest("ZESize ZEVariant::SizeOf() const")
 	{
 		ZEVariant Variant;
-		int Size;
+		ZEInt Size;
 
 		ZETestCase("ZE_VRT_UNDEFINED")
 		{
@@ -848,7 +848,7 @@ ZETestSuite(ZEVariant)
 			float Float = 9.0f;
 
 			Variant1 = Float;
-			size_t LastItem = File.Tell();
+			ZESize LastItem = File.Tell();
 
 			Variant1.Serialize((ZESerializer*)&File);
 			File.Seek(LastItem, ZE_SF_BEGINING);
@@ -1041,9 +1041,9 @@ ZETestSuite(ZEVariant)
 		ZETestCheck(Variant.GetType() == ZE_VRT_FLOAT);
 		ZETestCheck(Variant.GetFloat() == InitialValue);
 	}
-	ZETest("ZEVariant::ZEVariant(int InitialValue)")
+	ZETest("ZEVariant::ZEVariant(ZEInt InitialValue)")
 	{
-		int InitialValue = 255;
+		ZEInt InitialValue = 255;
 
 		ZEVariant Variant(InitialValue);
 		ZETestCheck(Variant.GetType() == ZE_VRT_INTEGER);

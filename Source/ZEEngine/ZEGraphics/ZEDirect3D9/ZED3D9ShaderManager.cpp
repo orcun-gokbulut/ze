@@ -41,7 +41,7 @@
 ZEUInt32 ZED3D9ShaderManager::CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components)
 {
 	ZEUInt32 Hash = 0;
-	size_t Index = 0;
+	ZESize Index = 0;
 
 	while(FileName[Index] != '\0')
 	{
@@ -66,7 +66,7 @@ void ZED3D9ShaderManager::ReleaseShader(ZED3D9Shader* Shader)
 	Shader->ReferanceCount--;
 	if (Shader->ReferanceCount < 1)
 	{
-		for (size_t I = 0; I < Shaders.GetCount(); I++)
+		for (ZESize I = 0; I < Shaders.GetCount(); I++)
 			if (Shaders[I] == Shader)
 				Shaders[I] = NULL;
 
@@ -98,7 +98,7 @@ ZED3D9Shader* ZED3D9ShaderManager::GetShader(const char* FileName, const char* F
 {
 	// Check Memory Cache
 	ZEUInt32 Hash = CalculateHash(FileName, FunctionName, Components);
-	for (size_t I = 0; I < Shaders.GetCount(); I++)
+	for (ZESize I = 0; I < Shaders.GetCount(); I++)
 		if (Shaders[I] != NULL)
 			if (Shaders[I]->Hash == Hash)
 				if (Shaders[I]->GetComponents() == Components &&
@@ -141,7 +141,7 @@ ZED3D9Shader* ZED3D9ShaderManager::GetShader(const char* FileName, const char* F
 	
 	// Add to shader list
 	bool Found = false;
-	for (size_t I = 0; I < Shaders.GetCount(); I++)
+	for (ZESize I = 0; I < Shaders.GetCount(); I++)
 		if (Shaders[I] == NULL)
 		{
 			Found = true;

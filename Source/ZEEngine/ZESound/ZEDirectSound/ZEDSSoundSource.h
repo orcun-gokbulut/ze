@@ -46,29 +46,29 @@ class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 	friend class ZEDSModule;
 	private:
 		LPDIRECTSOUNDBUFFER			DSBuffer;
-		size_t						BufferSampleCount;
-		size_t						OldBufferPosition;
-		size_t						StreamPosition;
-		int							LastUpdatedBufferChunk;
+		ZESize						BufferSampleCount;
+		ZESize						OldBufferPosition;
+		ZESize						StreamPosition;
+		ZEInt							LastUpdatedBufferChunk;
 
 		bool						CreateBuffer(bool Is3D);
 		void						ResetParameters();
 
 		void						Stream();
 		void						ResetStream();
-		void						StreamDecodeAndFill(size_t BufferPosition, size_t Position, size_t SampleCount);
+		void						StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount);
 
 									ZEDSSoundSource();
 		virtual						~ZEDSSoundSource();
 
 	public:
 		virtual void				SetSoundSourceState(ZESoundSourceState State);
-		virtual void				SetCurrentPosition(unsigned int SampleIndex);
-		virtual unsigned int		GetCurrentPosition();
+		virtual void				SetCurrentPosition(ZEUInt SampleIndex);
+		virtual ZEUInt		GetCurrentPosition();
 
-		virtual void				SetPan(int NewPan);
+		virtual void				SetPan(ZEInt NewPan);
 		virtual void				SetPlaybackSpeed(float Speed);
-		virtual void				SetVolume(unsigned int NewVolume);
+		virtual void				SetVolume(ZEUInt NewVolume);
 		virtual void				SetLooping(bool Enabled);				
 							
 		virtual void				Play();

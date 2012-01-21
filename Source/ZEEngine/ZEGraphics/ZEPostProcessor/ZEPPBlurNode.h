@@ -48,8 +48,8 @@ class ZEPPBlurNode : public ZEPostProcessorNode
 		ZEPostProcessorNode*				Input;
 	
 		float								StandartDeviation;	
-		unsigned int						PassCount;
-		unsigned int						DownSample;
+		ZEUInt						PassCount;
+		ZEUInt						DownSample;
 
 		bool								HorizontalPass;
 		bool								VerticalPass;
@@ -65,18 +65,18 @@ class ZEPPBlurNode : public ZEPostProcessorNode
 	public:	
 		virtual ZEPostProcessorNodeType		GetNodeType();
 
-		virtual size_t						GetDependencyCount();
+		virtual ZESize						GetDependencyCount();
 		virtual ZEPostProcessorNode**		GetDependencies();
 
 
 		virtual void						SetInput(ZEPostProcessorNode* Node);
 		virtual ZEPostProcessorNode*		GetInput();
 
-		void								SetDownSample(unsigned int Factor);
-		unsigned int						GetDownSample();
+		void								SetDownSample(ZEUInt Factor);
+		ZEUInt						GetDownSample();
 
-		void								SetPassCount(unsigned int PassCount);
-		unsigned int						GetPassCount();
+		void								SetPassCount(ZEUInt PassCount);
+		ZEUInt						GetPassCount();
 
 		void								SetStandartDeviation(float Ro);
 		float								GetStandartDeviation();

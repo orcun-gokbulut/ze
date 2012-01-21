@@ -64,12 +64,12 @@ ZEModelAnimationState ZEModelAnimationTrack::GetState()
 }
 
 
-void ZEModelAnimationTrack::SetLOD(int LOD)
+void ZEModelAnimationTrack::SetLOD(ZEInt LOD)
 {
 	this->LOD = LOD;
 }
 
-int ZEModelAnimationTrack::GetLOD()
+ZEInt ZEModelAnimationTrack::GetLOD()
 {
 	return LOD;
 }
@@ -91,7 +91,7 @@ void ZEModelAnimationTrack::SetAnimationByName(const char* AnimationName)
 	if (Owner->ModelResource == NULL)
 		return;
 
-	for (size_t I = 0; I < Owner->ModelResource->Animations.GetCount(); I++)
+	for (ZESize I = 0; I < Owner->ModelResource->Animations.GetCount(); I++)
 		if (strnicmp(AnimationName, Owner->ModelResource->Animations[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
 		{
 			Animation = &Owner->ModelResource->Animations[I];
@@ -109,34 +109,34 @@ const char* ZEModelAnimationTrack::GetAnimationName()
 		return "";
 }
 
-void ZEModelAnimationTrack::SetCurrentFrame(unsigned int Frame)
+void ZEModelAnimationTrack::SetCurrentFrame(ZEUInt Frame)
 {
 	CurrentFrame = Frame;
 }
 
-unsigned int ZEModelAnimationTrack::GetCurrentFrame()
+ZEUInt ZEModelAnimationTrack::GetCurrentFrame()
 {
 	return CurrentFrame;
 }
 
-void ZEModelAnimationTrack::SetStartFrame(unsigned int Frame)
+void ZEModelAnimationTrack::SetStartFrame(ZEUInt Frame)
 {
 	// Recalculate Effective Start Frame
 	StartFrame = Frame;
 }
 
-unsigned int ZEModelAnimationTrack::GetStartFrame()
+ZEUInt ZEModelAnimationTrack::GetStartFrame()
 {
 	return StartFrame;
 }
 
-void ZEModelAnimationTrack::SetEndFrame(unsigned int Frame)
+void ZEModelAnimationTrack::SetEndFrame(ZEUInt Frame)
 {
 	// Recalculate Effective End Frame
 	EndFrame = Frame;
 }
 
-unsigned int ZEModelAnimationTrack::GetEndFrame()
+ZEUInt ZEModelAnimationTrack::GetEndFrame()
 {
 	return EndFrame;
 }
@@ -192,7 +192,7 @@ void ZEModelAnimationTrack::Play()
 	State = ZE_MAS_PLAYING;
 }
 
-void ZEModelAnimationTrack::Play(unsigned int StartFrame, unsigned int EndFrame)
+void ZEModelAnimationTrack::Play(ZEUInt StartFrame, ZEUInt EndFrame)
 {
 	if (Animation == NULL)
 	{
@@ -286,16 +286,16 @@ void ZEModelAnimationTrack::AdvanceAnimation(float ElapsedTime)
 		float Interpolation = CurrentFrame - floorf(CurrentFrame);
 
 		// Find next frame id
-		int NextFrameId = (int)ceilf(CurrentFrame);
+		ZEInt NextFrameId = (ZEInt)ceilf(CurrentFrame);
 		if (NextFrameId >= Animation->Frames.GetCount())
 			NextFrameId = StartFrame + fmodf(CurrentFrame, EndFrame - StartFrame);
 
 		// Get frames
-		const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[(int)floorf(CurrentFrame)];
+		const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[(ZEInt)floorf(CurrentFrame)];
 		const ZEModelResourceAnimationFrame* NextFrame = &Animation->Frames[NextFrameId];
 
 		// Update Bones 
-		for (size_t I = 0; I < Frame->BoneKeys.GetCount(); I++)
+		for (ZESize I = 0; I < Frame->BoneKeys.GetCount(); I++)
 		{
 			const ZEModelResourceAnimationKey* Key = &Frame->BoneKeys[I];
 			const ZEModelResourceAnimationKey* NextKey = &NextFrame->BoneKeys[I];
@@ -341,7 +341,7 @@ void ZEModelAnimationTrack::AdvanceAnimation(float ElapsedTime)
 		
 		// Update model meshes.
 		// Mechanism is same as above (Update Bones)
-		for (size_t I = 0; I < Frame->MeshKeys.GetCount(); I++)
+		for (ZESize I = 0; I < Frame->MeshKeys.GetCount(); I++)
 		{
 			const ZEModelResourceAnimationKey* Key = &Frame->MeshKeys[I];
 			const ZEModelResourceAnimationKey* NextKey = &NextFrame->MeshKeys[I];

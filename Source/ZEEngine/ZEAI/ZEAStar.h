@@ -41,8 +41,8 @@ template <typename Type>
 class ZEAStarNode
 {
 	public:
-		size_t ActualNodeIndex;
-		ptrdiff_t PrevNodeIndex;
+		ZESize ActualNodeIndex;
+		ZESSize PrevNodeIndex;
 
 		float SummedCost;
 		float EstimatedCost;
@@ -67,15 +67,15 @@ class ZEAIAStar
 {
 	private:
 		template <typename Type>
-		static bool CheckLists(size_t Index, 
+		static bool CheckLists(ZESize Index, 
 			ZEMinHeap<ZEAStarNode<Type>, ZEChunkAllocator<ZEAStarNode<Type>, 100>>& OpenList, 
 			const ZEArray<ZEAStarNode<Type>, ZESmartAllocator<ZEAStarNode<Type>, 2>>& ClosedList)
 		{
-			for (size_t I = 0; I < ClosedList.GetCount(); I++)
+			for (ZESize I = 0; I < ClosedList.GetCount(); I++)
 				if (ClosedList[I].ActualNodeIndex == Index)
 					return true;
 
-			for (size_t I = 0; I < OpenList.GetCount(); I++)
+			for (ZESize I = 0; I < OpenList.GetCount(); I++)
 				if (OpenList.GetArray()[I].ActualNodeIndex == Index)
 					return true;
 
@@ -90,7 +90,7 @@ class ZEAIAStar
 
 	public:
 		template <typename Type>
-		static ZEArray<const Type*> Process(const ZEGraph<Type>& Graph, size_t StartIndex, size_t DestinationIndex, float (*Cost)(const ZEGraph<Type>&, size_t, size_t), float (*Heuristic)(const ZEGraph<Type>&, size_t, size_t))
+		static ZEArray<const Type*> Process(const ZEGraph<Type>& Graph, ZESize StartIndex, ZESize DestinationIndex, float (*Cost)(const ZEGraph<Type>&, ZESize, ZESize), float (*Heuristic)(const ZEGraph<Type>&, ZESize, ZESize))
 		{
 			ZEMinHeap<ZEAStarNode<Type>, ZEChunkAllocator<ZEAStarNode<Type>, 100> > OpenList;
 			ZEArray<ZEAStarNode<Type>, ZESmartAllocator<ZEAStarNode<Type>, 2> > ClosedList;
@@ -112,8 +112,8 @@ class ZEAIAStar
 				OpenList.RemoveMin();
 				ClosedList.Add(CurrentNode);
 
-				size_t LinkIndex = 0;
-				ptrdiff_t AdjacentNodeIndex = Graph.GetAdjacentNode(CurrentNode.ActualNodeIndex, LinkIndex);
+				ZESize LinkIndex = 0;
+				ZESSize AdjacentNodeIndex = Graph.GetAdjacentNode(CurrentNode.ActualNodeIndex, LinkIndex);
 				while(AdjacentNodeIndex != -1)
 				{
 					if (AdjacentNodeIndex == DestinationIndex)

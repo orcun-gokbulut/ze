@@ -55,22 +55,22 @@ static float GausianFunction(float x, float y, float StandartDeviation)
 	return (1.0f / (2.0f * ZE_PI * StandartDeviation * StandartDeviation)) * powf(ZE_E, -((x * x + y * y) / (2.0f * StandartDeviation * StandartDeviation))); 
 }
 
-void FillGaussianKernel1D(float* Kernel, size_t KernelSize, float StandartDeviation)
+void FillGaussianKernel1D(float* Kernel, ZESize KernelSize, float StandartDeviation)
 {
-	int HalfKernelSize = (KernelSize - 1) / 2;
-	for (int x = 0; x < KernelSize; x++)
+	ZEInt HalfKernelSize = (KernelSize - 1) / 2;
+	for (ZEInt x = 0; x < KernelSize; x++)
 	{
 		Kernel[4 * x] = x - HalfKernelSize;
 		Kernel[4 * x + 1] = GausianFunction(x - HalfKernelSize, StandartDeviation);
 	}
 }
 
-static void FillGaussianKernel2D(float* Kernel, size_t KernelSize, float StandartDeviation)
+static void FillGaussianKernel2D(float* Kernel, ZESize KernelSize, float StandartDeviation)
 {
-	int HalfKernelSize = (KernelSize - 1) / 2;
-	for (int y = 0; y < KernelSize; y++)
+	ZEInt HalfKernelSize = (KernelSize - 1) / 2;
+	for (ZEInt y = 0; y < KernelSize; y++)
 	{
-		for (int x = 0; x < KernelSize; x++)
+		for (ZEInt x = 0; x < KernelSize; x++)
 		{
 			float* CurrentSample = &Kernel[4 * KernelSize * y + x];
 			CurrentSample[0] = x - HalfKernelSize;
@@ -418,7 +418,7 @@ void ZED3D9HDRProcessor::Process(float ElapsedTime)
 
 	Parameters.MaxLuminanceChange = ElapsedTime;
 	GetDevice()->SetPixelShaderConstantF(1, (float*)&Parameters, 2);
-	GetDevice()->SetPixelShaderConstantI(0, (int*)&IntParameters, 1);
+	GetDevice()->SetPixelShaderConstantI(0, (ZEInt*)&IntParameters, 1);
 
 	bool BloomPasses[4];
 	BloomPasses[0] = IntParameters.BloomPassCount > 0;
@@ -506,7 +506,7 @@ float ZED3D9HDRProcessor::GetBloomStandardDeviation() const
 	return Parameters.BloomStandardDeviation;
 }
 
-void ZED3D9HDRProcessor::SetBloomSampleCount(unsigned int Count)
+void ZED3D9HDRProcessor::SetBloomSampleCount(ZEUInt Count)
 {
 	if (Count > 16)
 		Count = 16;
@@ -514,12 +514,12 @@ void ZED3D9HDRProcessor::SetBloomSampleCount(unsigned int Count)
 	IntParameters.BloomSampleCount = Count;
 }
 
-unsigned int ZED3D9HDRProcessor::GetBloomSampleCount() const
+ZEUInt ZED3D9HDRProcessor::GetBloomSampleCount() const
 {
 	return IntParameters.BloomSampleCount;
 }
 
-void ZED3D9HDRProcessor::SetBloomPassCount(unsigned int Count)
+void ZED3D9HDRProcessor::SetBloomPassCount(ZEUInt Count)
 {
 	if (Count > 4)
 		Count = 4;
@@ -527,7 +527,7 @@ void ZED3D9HDRProcessor::SetBloomPassCount(unsigned int Count)
 	IntParameters.BloomPassCount = Count;
 }
 
-unsigned int ZED3D9HDRProcessor::GetBloomPassCount() const
+ZEUInt ZED3D9HDRProcessor::GetBloomPassCount() const
 {
 	return IntParameters.BloomPassCount;
 }
@@ -554,7 +554,7 @@ ZED3D9ViewPort* ZED3D9HDRProcessor::GetOutput()
 
 void ZED3D9HDRProcessor::Initialize()
 {
-	size_t ScreenWidth, ScreenHeight;
+	ZESize ScreenWidth, ScreenHeight;
 	D3DVERTEXELEMENT9 Declaration[] = 
 	{
 		{0,  0, D3DDECLTYPE_FLOAT3, D3DDECLMETHOD_DEFAULT, D3DDECLUSAGE_POSITION, 0},

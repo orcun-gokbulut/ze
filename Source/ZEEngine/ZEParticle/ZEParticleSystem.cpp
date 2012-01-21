@@ -51,7 +51,7 @@ void ZEParticleSystem::UpdateVertexBuffer(ZEDrawParameters* DrawParameters) //Bi
 	}
 	else if (BillboardType == ZE_PBT_VIEWPLANE_ORIENTED)
 	{
-		unsigned int ParticleCount = GetTotalParticleCount();
+		ZEUInt ParticleCount = GetTotalParticleCount();
 		if (VertexBuffer == NULL)
 			VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
 
@@ -70,12 +70,12 @@ void ZEParticleSystem::UpdateVertexBuffer(ZEDrawParameters* DrawParameters) //Bi
 		ZESimpleVertex* Buffer = (ZESimpleVertex*)VertexBuffer->Lock();
 		if (Buffer != NULL)
 		{
-			size_t VertexIndex = 0;
-			for (size_t I = 0; I < EmitterArray.GetCount(); I++)
+			ZESize VertexIndex = 0;
+			for (ZESize I = 0; I < EmitterArray.GetCount(); I++)
 			{
 				ZEParticleEmitter* CurrentEmmiter = EmitterArray[I];
 
-				for (size_t N = 0; N < CurrentEmmiter->ParticlePool.GetCount(); N++)
+				for (ZESize N = 0; N < CurrentEmmiter->ParticlePool.GetCount(); N++)
 				{
 					ZEParticle* Particle = &CurrentEmmiter->ParticlePool[N];
 
@@ -124,7 +124,7 @@ void ZEParticleSystem::UpdateVertexBuffer(ZEDrawParameters* DrawParameters) //Bi
 	}
 	else if (BillboardType == ZE_PBT_VIEWPOINT_ORIENTED)
 	{
-		unsigned int ParticleCount = GetTotalParticleCount();
+		ZEUInt ParticleCount = GetTotalParticleCount();
 		if (VertexBuffer == NULL)
 			VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
 
@@ -138,12 +138,12 @@ void ZEParticleSystem::UpdateVertexBuffer(ZEDrawParameters* DrawParameters) //Bi
 		ZESimpleVertex* Buffer = (ZESimpleVertex*)VertexBuffer->Lock();
 		if (Buffer != NULL)
 		{
-			size_t VertexIndex = 0;
-			for (size_t I = 0; I < EmitterArray.GetCount(); I++)
+			ZESize VertexIndex = 0;
+			for (ZESize I = 0; I < EmitterArray.GetCount(); I++)
 			{
 				ZEParticleEmitter* CurrentEmmiter = EmitterArray[I];
 
-				for (size_t N = 0; N < CurrentEmmiter->ParticlePool.GetCount(); N++)
+				for (ZESize N = 0; N < CurrentEmmiter->ParticlePool.GetCount(); N++)
 				{
 					ZEParticle* Particle = &CurrentEmmiter->ParticlePool[N];
 
@@ -220,17 +220,17 @@ void ZEParticleSystem::Draw(ZEDrawParameters* DrawParameters)
 
 void ZEParticleSystem::Tick(float TimeElapsed)
 {
-	for(unsigned int I = 0; I < EmitterArray.GetCount(); I++)
+	for(ZEUInt I = 0; I < EmitterArray.GetCount(); I++)
 	{
 		EmitterArray[I]->Tick(TimeElapsed);
 	}
 }
 
-unsigned int ZEParticleSystem::GetTotalParticleCount()
+ZEUInt ZEParticleSystem::GetTotalParticleCount()
 {
-	unsigned int TotalParticleCount = 0;
+	ZEUInt TotalParticleCount = 0;
 
-	for(unsigned int I = 0; I < EmitterArray.GetCount(); I++)
+	for(ZEUInt I = 0; I < EmitterArray.GetCount(); I++)
 	{
 		TotalParticleCount += EmitterArray[I]->GetMaxParticleCount();
 	}

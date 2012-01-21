@@ -64,14 +64,14 @@ enum ZEBitmapFilteringMode
 
 struct ZEPixelColor
 {
-	unsigned char b, g, r, a;
+	unsigned char				b, g, r, a;
 
-	static ZEPixelColor	Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T);
-	static ZEVector4 LerpFloat(const ZEPixelColor& A, const ZEPixelColor& B, float T);
+	static ZEPixelColor			Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T);
+	static ZEVector4			LerpFloat(const ZEPixelColor& A, const ZEPixelColor& B, float T);
 
-	ZEPixelColor();
-	ZEPixelColor(unsigned int Color);
-	ZEPixelColor(unsigned char a, unsigned char r, unsigned char g, unsigned char b);
+								ZEPixelColor();
+								ZEPixelColor(ZEUInt Color);
+								ZEPixelColor(unsigned char a, unsigned char r, unsigned char g, unsigned char b);
 };
 
 struct ZEBitmapSamplingOptions
@@ -85,43 +85,43 @@ struct ZEBitmapSamplingOptions
 class ZEBitmap
 {
 	private:
-		unsigned int			Width;
-		unsigned int			Height;
-		unsigned int			Pitch;
-		unsigned int			PixelSize;
+		ZEUInt					Width;
+		ZEUInt					Height;
+		ZEUInt					Pitch;
+		ZEUInt					PixelSize;
 		void*					Pixels;
 
 	public:
-		bool					Create(unsigned int Width, unsigned int Height, unsigned int PixelSize);
+		bool					Create(ZEUInt Width, ZEUInt Height, ZEUInt PixelSize);
 
-		unsigned int			GetWidth();
-		unsigned int			GetHeight();
-		unsigned int			GetPitch();
-		unsigned int			GetPixelSize();
-		unsigned int			GetBPP();
-		unsigned int			GetSize();
+		ZEUInt					GetWidth();
+		ZEUInt					GetHeight();
+		ZEUInt					GetPitch();
+		ZEUInt					GetPixelSize();
+		ZEUInt					GetBPP();
+		ZEUInt					GetSize();
 
 		ZEPixelColor*			GetPixels();
-		ZEPixelColor&			GetPixel(unsigned int x, unsigned int y);
-		ZEVector4				GetPixelFloat(unsigned int x, unsigned int y);
+		ZEPixelColor&			GetPixel(ZEUInt x, ZEUInt y);
+		ZEVector4				GetPixelFloat(ZEUInt x, ZEUInt y);
 
-		ZEPixelColor&			SamplePixel(int x, int y, ZEBitmapSamplingOptions* Options = 0);
-		ZEVector4				SamplePixelFloat(int x, int y, ZEBitmapSamplingOptions* Options = 0);		
+		ZEPixelColor&			SamplePixel(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* Options = 0);
+		ZEVector4				SamplePixelFloat(ZEInt x, ZEInt y, ZEBitmapSamplingOptions* Options = 0);		
 		ZEVector4				SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitmapSamplingOptions* Options = 0);
 	
-		ZEPixelColor*			GetRow(unsigned int Index);
+		ZEPixelColor*			GetRow(ZEUInt Index);
 
-		void					CopyFrom(void* SourceBuffer, unsigned int SourcePitch, 
-									unsigned int Width, unsigned int Height, 
-									unsigned int SourceOffsetX = 0, unsigned int SourceOffsetY = 0,
-									unsigned int DestinationOffsetX = 0, unsigned int DestinationOffsetY = 0);
+		void					CopyFrom(void* SourceBuffer, ZEUInt SourcePitch, 
+									ZEUInt Width, ZEUInt Height, 
+									ZEUInt SourceOffsetX = 0, ZEUInt SourceOffsetY = 0,
+									ZEUInt DestinationOffsetX = 0, ZEUInt DestinationOffsetY = 0);
 
-		void					CopyTo(void* DestinationBuffer, unsigned int DestinationPitch, 
-									unsigned int Width, unsigned int Height, 
-									unsigned int DestinationOffsetX = 0, unsigned int DestinationOffsetY = 0,
-									unsigned int SourceOffsetX = 0, unsigned int SourceOffsetY = 0);
+		void					CopyTo(void* DestinationBuffer, ZEUInt DestinationPitch, 
+									ZEUInt Width, ZEUInt Height, 
+									ZEUInt DestinationOffsetX = 0, ZEUInt DestinationOffsetY = 0,
+									ZEUInt SourceOffsetX = 0, ZEUInt SourceOffsetY = 0);
 
-		void					Fill(unsigned int Color);
+		void					Fill(ZEUInt Color);
 		void					Clear();
 
 		bool					Load(const char* Filename);

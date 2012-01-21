@@ -99,7 +99,7 @@ ZEVersion::ZEVersion()
 	this->Platform = ZE_VP_WIN32;
 }
 
-ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal)
+ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal)
 {
 	this->Major = Major;
 	this->Minor = Minor;
@@ -108,7 +108,7 @@ ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Intern
 	this->Platform = ZE_VP_WIN32;
 }
 
-ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build)
+ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build)
 {
 	this->Major = Major;
 	this->Minor = Minor;
@@ -117,7 +117,7 @@ ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Intern
 	this->Platform = ZE_VP_WIN32;
 }
 
-ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build, ZEVersionPlatform Platform)
+ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build, ZEVersionPlatform Platform)
 {
 	this->Major = Major;
 	this->Minor = Minor;

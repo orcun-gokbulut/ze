@@ -80,7 +80,7 @@ class ZEParticleSystem : public ZEObject
 		
 		void								UpdateVertexBuffer(ZEDrawParameters* DrawParameters);
 
-		unsigned int						GetTotalParticleCount();
+		ZEUInt						GetTotalParticleCount();
 
 	public:
 		void								SetName(const ZEString& Name);

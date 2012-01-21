@@ -55,20 +55,20 @@ class ZEModelExporter : public SceneExport
 {
 	public:
 		
-		virtual int					ExtCount();
-		virtual const TCHAR *		Ext(int n);
+		virtual ZEInt					ExtCount();
+		virtual const TCHAR *		Ext(ZEInt n);
 		virtual const TCHAR *		LongDesc();
 		virtual const TCHAR *		ShortDesc();
 		virtual const TCHAR *		AuthorName();
 		virtual const TCHAR *		CopyrightMessage();
 		virtual const TCHAR *		OtherMessage1();
 		virtual const TCHAR *		OtherMessage2();
-		virtual unsigned int		Version();
+		virtual ZEUInt		Version();
 		virtual void				ShowAbout(HWND hWnd);
-		virtual	BOOL				SupportsOptions(int ext, DWORD options);
+		virtual	BOOL				SupportsOptions(ZEInt ext, DWORD options);
 
-		virtual int					GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
-		virtual int					DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
+		virtual ZEInt					GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
+		virtual ZEInt					DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
 		
 		Tab<IGameNode*>				ProcessedBones;
 		Tab<IGameMaterial*>			ProcessedMaterials;
@@ -76,8 +76,8 @@ class ZEModelExporter : public SceneExport
 		Tab<IGameNode*>				ProcessedMasterMeshes;
 		Tab<IGameMaterial*>			Materials;
 
-		int							FrameCount;
-		int							TicksPerFrame;
+		ZEInt							FrameCount;
+		ZEInt							TicksPerFrame;
 
 		ZEModelFile					ModelFile;
 		IGameScene*					Scene;
@@ -86,12 +86,12 @@ class ZEModelExporter : public SceneExport
 
 		bool						DumpPropertyContainer(IExportEntity* Node);
 		bool						GetRelativePath(const char* RealPath, char* RelativePath);
-		int							GetBoneId(IGameNode* Node);
-		int							GetMeshId(IGameNode* Node);
+		ZEInt							GetBoneId(IGameNode* Node);
+		ZEInt							GetMeshId(IGameNode* Node);
 
 		bool						ProcessBone(IGameNode* Node);
 		bool						ProcessBones();
-		int							ProcessMeshMaterial(IGameMaterial* Material);
+		ZEInt							ProcessMeshMaterial(IGameMaterial* Material);
 		bool						ProcessMaterials();
 		bool						ProcessMeshLODVertices(IGameNode* Node,  ZEModelFileMeshLOD* ZEMeshLod);
 		void						ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEModelFilePhysicalShape* Shape);
