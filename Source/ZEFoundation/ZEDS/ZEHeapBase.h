@@ -37,6 +37,7 @@
 #ifndef __ZE_HEAP_BASE_H__
 #define __ZE_HEAP_BASE_H__
 
+#include "ZETypes.h"
 #include "ZEArray.h"
 
 template<typename Type, typename Allocator_>

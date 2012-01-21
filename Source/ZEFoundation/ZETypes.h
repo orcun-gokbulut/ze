@@ -36,6 +36,8 @@
 #ifndef __ZE_TYPES_H__
 #define __ZE_TYPES_H__
 
+#include <stddef.h>
+
 typedef signed char			ZEInt8;
 typedef signed short int	ZEInt16;
 typedef signed int			ZEInt32;

@@ -67,8 +67,17 @@ bool ZETestManager::RunTests()
 	bool Result = true;
 	for (ZESize I = 0; I < TestSuiteCount; I++)
 	{
-		if (!TestSuites[I]->RunTests())
+		try
+		{
+			if (!TestSuites[I]->RunTests())
+				Result = false;
+		}
+		catch(...)
+		{
+			printf("%s : error T0004: Exception occured. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
 			Result = false;
+			break;
+		}
 	}
 	
 	if (!Result)

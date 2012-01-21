@@ -38,11 +38,12 @@
 #include "ZETest.h"
 #include <d3dx9.h>
 #include <math.h>
+#include "ZEMath/ZEAngle.h"
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEMath.h"
 
 bool ZETestInternalCheckClose(const ZEMatrix3x3& Actual, const ZEMatrix3x3& Expected, const ZEMatrix3x3& Threshold = ZEMatrix3x3(ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD))
 {	

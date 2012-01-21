@@ -43,6 +43,7 @@
 #include "ZEMath/ZELineSegment.h"
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEAngle.h"
 #include <math.h>
 #include "ZEQuaternion.h"
 

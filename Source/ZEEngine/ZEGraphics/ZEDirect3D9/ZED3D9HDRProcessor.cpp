@@ -43,7 +43,7 @@
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
 
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEMath.h"
 
 static float GausianFunction(float x, float StandartDeviation)
 {

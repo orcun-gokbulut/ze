@@ -41,7 +41,7 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGame.h"
 #include "ZEMath/ZERay.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEMath.h"
 #include "ZESound/ZEListener.h"
 #include "ZEEntityProvider.h"
 #include "ZEGraphics/ZECamera.h"

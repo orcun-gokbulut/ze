@@ -37,6 +37,7 @@
 #ifndef __ZE_MATH_AA_BOUNDING_BOX_H__
 #define __ZE_MATH_AA_BOUNDING_BOX_H__
 
+#include "ZETypes.h"
 #include "ZEVector.h"
 #include "ZEMatrix.h"
 #include "ZEPlane.h"

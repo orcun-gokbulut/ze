@@ -43,7 +43,7 @@
 #include "ZEGraphicsDebugModule.h"
 #include "ZEGraphics/ZEPointLight.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEMath.h"
 #include "ZEGraphics/ZESimpleMaterial.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEProjectiveLight.h"

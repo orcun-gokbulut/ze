@@ -41,9 +41,9 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZELineSegment.h"
 #include "ZEMath/ZERay.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZEMathIOStreamMapping.h"
-
 
 bool ZETestInternalCheckClose(const ZEVector3& Actual, const ZEVector3& Expected, const ZEVector3& Threshold = ZEVector3(ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD));
 

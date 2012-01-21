@@ -38,7 +38,7 @@
 
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
 
 void ZEActor::SetRotation2D(float Rotation)

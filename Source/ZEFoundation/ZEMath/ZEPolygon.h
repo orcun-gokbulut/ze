@@ -37,9 +37,11 @@
 #ifndef __ZE_POLYGON_H__
 #define __ZE_POLYGON_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZELineSegment.h"
+
 class ZEPolygon
 {
 	public:

@@ -37,10 +37,11 @@
 #ifndef __ZE_PACK_H__
 #define __ZE_PACK_H__
 
-#include <stdio.h>
 #include "ZETypes.h"
 #include "ZEDefinitions.h"
 #include "ZEDS/ZEString.h"
+
+#include <stdio.h>
 
 class ZECompressedFile;
 class ZEPartialCompressedFile;

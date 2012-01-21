@@ -41,7 +41,7 @@
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZELine.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEMath.h"
 #include "ZEMath/ZELineSegment.h"
 #include "ZEMath/ZERay.h"
 

@@ -34,35 +34,33 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-
 #ifndef __ZE_TRANSACTION_H__
 #define __ZE_TRANSACTION_H__
 
-class ZEState;
+#include <ZETypes.h>
 
+class ZEState;
 class ZETransaction
 {
-protected:
-	ZEState*							FromState;
-	ZEState*							ToState;
+	protected:
+		ZEState*				FromState;
+		ZEState*				ToState;
 
-	ZEInt									Priority;
+		ZEInt					Priority;
 
 
-public:
-										ZETransaction(void);
-										~ZETransaction(void);
+	public:
+								ZETransaction(void);
+								~ZETransaction(void);
 
-	bool								Initialize(ZEState* From, ZEState* To);
-	virtual bool						Evaluates();
+		bool					Initialize(ZEState* From, ZEState* To);
+		virtual bool			Evaluates();
 
-	ZEState*							GetFromState();
-	ZEState*							GetToState();
+		ZEState*				GetFromState();
+		ZEState*				GetToState();
 
-	void								SetPriority(ZEInt Priority);
-	ZEInt									GetPriority() const;
-
+		void					SetPriority(ZEInt Priority);
+		ZEInt					GetPriority() const;
 };
-
 
 #endif

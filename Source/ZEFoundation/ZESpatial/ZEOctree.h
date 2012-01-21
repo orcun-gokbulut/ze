@@ -37,6 +37,7 @@
 #ifndef __ZE_OCTREE_H__
 #define __ZE_OCTREE_H__
 
+#include "ZETypes.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEArray.h"

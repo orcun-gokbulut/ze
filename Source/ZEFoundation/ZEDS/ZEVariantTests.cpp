@@ -37,11 +37,12 @@
 #include "ZEVariant.h"
 #include "ZETest.h"
 #include "ZEString.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEMath\ZEVector.h"
 #include "ZETypedVariant.h"
-#include "ZEFile\ZEFile.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEAngle.h"
+#include "ZEFile/ZEFile.h"
 
 ZETestSuite(ZEVariant)
 {

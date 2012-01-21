@@ -37,7 +37,7 @@
 #include <math.h>
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEMath.h"
 
 bool ZETestInternalCheckClose(const ZEVector4& Actual, const ZEVector4& Expected, const ZEVector4& Threshold = ZEVector4(ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD))
 {

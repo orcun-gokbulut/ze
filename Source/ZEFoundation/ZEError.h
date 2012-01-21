@@ -37,6 +37,7 @@
 #ifndef	__ZE_ERROR_H__
 #define __ZE_ERROR_H__
 
+#include "ZETypes.h"
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_ZINEK_VERSION_PLATFORM_WINDOWS)
 	#include <crtdbg.h>

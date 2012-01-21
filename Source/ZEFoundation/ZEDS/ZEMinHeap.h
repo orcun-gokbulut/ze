@@ -37,6 +37,7 @@
 #ifndef __ZE_MIN_HEAP_H__
 #define __ZE_MIN_HEAP_H__
 
+#include "ZETypes.h"
 #include "ZEHeapBase.h"
 
 template<typename Type, typename Allocator_ = ZEAllocatorBase<Type> >
