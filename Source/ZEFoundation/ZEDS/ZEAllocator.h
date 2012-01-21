@@ -41,6 +41,8 @@
 #define NULL 0
 #endif
 
+#include "ZETypes.h"
+
 #include <math.h>
 
 template <typename Type>

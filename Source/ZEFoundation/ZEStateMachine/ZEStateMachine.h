@@ -37,8 +37,9 @@
 #ifndef __ZE_STATE_MACHINE_H__
 #define	__ZE_STATE_MACHINE_H__
 
-#include "ZETransaction.h"
+#include "ZETypes.h"
 #include "ZEState.h"
+#include "ZETransaction.h"
 #include "ZEDS/ZEArray.h"
 
 class ZEStateMachine

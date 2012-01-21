@@ -36,7 +36,7 @@
 #include "ZEMatrix.h"
 #include "ZEVector.h"
 #include "ZEQuaternion.h"
-#include "ZEMathDefinitions.h"
+#include "ZEMath.h"
 #include <memory.h>
 #include <math.h>
 

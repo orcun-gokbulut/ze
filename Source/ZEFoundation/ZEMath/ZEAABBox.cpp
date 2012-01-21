@@ -39,7 +39,7 @@
 #include "ZERay.h"
 #include "ZELineSegment.h"
 #include "ZELine.h"
-#include "ZEMathDefinitions.h"
+#include "ZEMath.h"
 
 #include <float.h>
 #include <math.h>

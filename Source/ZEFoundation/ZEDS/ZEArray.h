@@ -61,10 +61,11 @@ ZEArray<*>{
 #ifndef	__ZEDS_ARRAY_H__
 #define __ZEDS_ARRAY_H__
 
-#include <stdlib.h>
 #include "ZETypes.h"
 #include "ZEAllocator.h"
 #include "ZEError.h"
+
+#include <stdlib.h>
 
 typedef ZEInt FunctionPointerCaster(const void*, const void*);
 

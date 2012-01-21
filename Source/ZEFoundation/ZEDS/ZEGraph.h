@@ -37,6 +37,7 @@
 #ifndef __ZE_GRAPH_H__
 #define __ZE_GRAPH_H__
 
+#include "ZETypes.h"
 #include "ZEArray.h"
 
 struct ZEGraphLink

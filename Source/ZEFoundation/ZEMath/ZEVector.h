@@ -37,15 +37,10 @@
 #ifndef	__ZE_MATH_VECTOR_H__
 #define __ZE_MATH_VECTOR_H__
 
-#ifdef OPTIONS_THREAD_SAFE
-	#define _VECTOR_STATIC_
-#else
-	#define _VECTOR_STATIC_ static
-#endif
+#include <ZETypes.h>
 
 class ZEMatrix3x3;
 class ZEMatrix4x4;
-
 
 // ZEVector2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////

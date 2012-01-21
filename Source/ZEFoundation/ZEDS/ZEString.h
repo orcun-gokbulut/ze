@@ -37,10 +37,10 @@
 #ifndef __ZE_STRING_H__
 #define __ZE_STRING_H__
 
-#include "ZEAllocator.h"
-#include <string>
-
 #include "ZETypes.h"
+#include "ZEAllocator.h"
+
+#include <string>
 
 class ZEString
 {

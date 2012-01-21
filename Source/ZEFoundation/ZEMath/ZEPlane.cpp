@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPlane.h"
-#include "ZEMathDefinitions.h"
+#include "ZEMath.h"
 #include "ZELine.h"
 #include "ZELineSegment.h"
 #include "ZERay.h"

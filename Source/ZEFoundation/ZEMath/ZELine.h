@@ -39,9 +39,6 @@
 
 #include "ZEVector.h"
 
-#define MapLine(A, B)	(A).v = (B).v; (A).p = (B).p 
-#define MapLineToXYZ(L, _v, _p) (L).v = (_v); (L).p = (_p)
-
 class ZEPlane;
 class ZELineSegment;
 class ZERay;

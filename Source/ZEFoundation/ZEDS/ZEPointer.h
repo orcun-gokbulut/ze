@@ -38,6 +38,7 @@
 #define __ZE_POINTER_H__
 
 #include "ZEError.h"
+
 template<typename Type>
 class ZEPointer
 {

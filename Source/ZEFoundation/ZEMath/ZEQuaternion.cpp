@@ -34,7 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEQuaternion.h"
-#include "ZEMathDefinitions.h"
+#include "ZEMath.h"
+#include "ZEAngle.h"
 #include "ZEError.h"
 
 #include <math.h>

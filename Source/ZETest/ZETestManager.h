@@ -37,6 +37,8 @@
 #ifndef __ZE_TEST_MANAGER_H__
 #define __ZE_TEST_MANAGER_H__
 
+#include "ZETypes.h"
+
 class ZETestSuiteItem;
 class ZETestItem;
 enum ZETestProblemType;

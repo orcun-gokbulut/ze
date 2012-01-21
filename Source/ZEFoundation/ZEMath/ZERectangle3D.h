@@ -46,7 +46,7 @@ class ZERectangle3D
 		ZEVector3				P1, P2, P3, P4;
 
 		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&			GetPoint(ZEUInt Index) const;
+		const ZEVector3&		GetPoint(ZEUInt Index) const;
 
 								ZERectangle3D();
 								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);

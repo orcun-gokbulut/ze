@@ -37,6 +37,7 @@
 #ifndef __ZE_MAX_HEAP_H__
 #define __ZE_MAX_HEAP_H__
 
+#include "ZETypes.h"
 #include "ZEHeapBase.h"
 
 template<typename Type, typename Allocator_ = ZEChunkAllocator<Type, 100>>

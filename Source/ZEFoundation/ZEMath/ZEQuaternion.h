@@ -37,7 +37,7 @@
 #ifndef	__ZE_MATH_QUATERNION_H__
 #define __ZE_MATH_QUATERNION_H__
 
-#include "ZEMathDefinitions.h"
+#include <ZETypes.h>
 #include "ZEVector.h"
 #include "ZEMatrix.h"
 

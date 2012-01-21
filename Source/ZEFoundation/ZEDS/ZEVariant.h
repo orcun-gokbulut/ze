@@ -40,6 +40,7 @@
 #pragma warning(push)
 #pragma warning(disable:4482)
 
+#include "ZETypes.h"
 #include "ZESerialization/ZESerializable.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"

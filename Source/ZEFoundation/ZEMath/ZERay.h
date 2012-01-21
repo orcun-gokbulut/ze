@@ -39,6 +39,7 @@
 
 #include "ZEVector.h"
 #include "ZELine.h"
+
 class ZEPlane;
 class ZELineSegment;
 class ZERay : public ZELine

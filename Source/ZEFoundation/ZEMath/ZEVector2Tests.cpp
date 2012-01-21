@@ -33,14 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
-
 #include "ZETest.h"
-#include <math.h>
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
 
+#include <math.h>
 
 bool ZETestInternalCheckClose(const ZEVector2& Actual, const ZEVector2& Expected, const ZEVector2& Threshold = ZEVector2(ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD))
 {	

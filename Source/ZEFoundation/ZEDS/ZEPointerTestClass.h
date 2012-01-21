@@ -37,6 +37,8 @@
 #ifndef __ZE_POINTER_TEST_CLASS_H__
 #define __ZE_POINTER_TEST_CLASS_H__
 
+#include "ZETypes.h"
+
 enum ZETestClassStatus
 {
 	ZE_TCS_NOT_CONSTRUCTED,

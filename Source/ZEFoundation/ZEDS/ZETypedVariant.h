@@ -48,6 +48,8 @@
 #pragma warning(disable:4482)
 
 #include "ZEVariant.h"
+#include "ZETypes.h"
+
 class ZETypedVariant : public ZEVariant
 {
 	public:

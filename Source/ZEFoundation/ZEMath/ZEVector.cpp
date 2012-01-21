@@ -35,7 +35,7 @@
 
 #include "ZEVector.h"
 #include "ZEMatrix.h"
-#include "ZEMathDefinitions.h"
+#include "ZEMath.h"
 #include <math.h>
 
 // ZEVector2

@@ -39,15 +39,15 @@
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZERay.h"
-
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZELineSegment.h"
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEOBBox.h"
-#include "ZEMath/ZEMathDefinitions.h"
-#include "ZEQuaternion.h"
-#include <math.h>
+#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
+#include "ZEMath/ZEQuaternion.h"
 
+#include <math.h>
 
 bool ZETestInternalCheckClose(const ZEVector3& Actual, const ZEVector3& Expected, const ZEVector3& Threshold = ZEVector3(ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD));
 

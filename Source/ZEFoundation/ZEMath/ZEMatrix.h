@@ -37,11 +37,7 @@
 #ifndef	__ZE_MATH_MATRIX_H__
 #define __ZE_MATH_MATRIX_H__
 
-#ifdef OPTIONS_THREAD_SAFE
-	#define _MATRIX_STATIC_
-#else
-	#define _MATRIX_STATIC_ static
-#endif
+#include "ZETypes.h"
 
 class ZEVector2;
 class ZEVector3;

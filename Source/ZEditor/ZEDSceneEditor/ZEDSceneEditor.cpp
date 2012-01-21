@@ -53,7 +53,7 @@
 #include "ZECore\ZEModuleManager.h"
 #include "ZECore\ZEWindow.h"
 #include "ZEGraphics/ZECamera.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEMath.h"
 
 #include "ZEDCommonEntities/ZEDScreenAxis.h"
 

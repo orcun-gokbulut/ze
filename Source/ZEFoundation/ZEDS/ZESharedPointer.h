@@ -37,7 +37,9 @@
 #ifndef __ZE_SHARED_POINTER_H__
 #define __ZE_SHARED_POINTER_H__
 
+#include "ZETypes.h"
 #include "ZEError.h"
+
 struct ZEReferenceCount
 {
 	ZESize Strong;
