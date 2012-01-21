@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEVersion.cpp
+ Zinek Engine - ZERandom.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,95 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEVersion.h"
+#ifndef __ZE_RANDOM_H__
+#define __ZE_RANDOM_H__
 
-#include <stdio.h>
+#include "ZETypes.h"
 
-void ZEVersion::GetShortString(char* Buffer) 
+class ZERandom
 {
-	sprintf(Buffer, "%02u.%02u.%02u", Major, Minor, Internal);
-}
+	public:
+		static float GetFloat();
+		static float GetFloatPositive();
+		static ZEInt GetInt();
+		static ZEUInt GetUInt();
+};
 
-void ZEVersion::GetLongString(char* Buffer)	
-{
-	char* PlatformString;
-	switch(Platform)
-	{
-		case ZE_VP_WIN32:
-			PlatformString = "WIN32";
-			break;
-
-		default:
-			PlatformString = "UNKNOWN";
-			break;
-
-	}
-	sprintf(Buffer, "%02u.%02u.%02u (%s) - Build %06u", Major, Minor, Internal, PlatformString, Build);
-}
-
-ZEVersion ZEVersion::GetZinekVersion()
-{
-	ZEVersion Temp;
-	
-	Temp.Major = ZE_ZINEK_VERSION_MAJOR;
-	Temp.Minor = ZE_ZINEK_VERSION_MINOR;
-	Temp.Internal = ZE_ZINEK_VERSION_INTERNAL;
-	Temp.Build = ZE_ZINEK_VERSION_BUILD;
-	Temp.Platform = ZE_VP_WIN32;
-
-	return Temp;
-}
-
-bool ZEVersion::Check(const ZEVersion& A, const ZEVersion& B, ZEVersionCheckLevel Level)
-{
-	switch(Level)
-	{
-		case ZE_VCL_MAJOR:
-			return A.Major == B.Major;
-
-		case ZE_VCL_MINOR:
-			return A.Major == B.Major && A.Minor >= B.Minor;
-
-		case ZE_VCL_INTERNAL:
-			return A.Major == B.Major && A.Minor >= B.Minor && A.Internal >= B.Internal;
-		
-		default:
-			return false;
-	}
-}
-
-ZEVersion::ZEVersion()
-{
-	this->Major = 0;
-	this->Minor = 0;
-	this->Internal = 0;
-	this->Build = 0;
-	this->Platform = ZE_VP_WIN32;
-}
-
-ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal)
-{
-	this->Major = Major;
-	this->Minor = Minor;
-	this->Internal = Internal;
-	this->Build = 0;
-	this->Platform = ZE_VP_WIN32;
-}
-
-ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build)
-{
-	this->Major = Major;
-	this->Minor = Minor;
-	this->Internal = Internal;
-	this->Build = 0;
-	this->Platform = ZE_VP_WIN32;
-}
-
-ZEVersion::ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build, ZEVersionPlatform Platform)
-{
-	this->Major = Major;
-	this->Minor = Minor;
-	this->Internal = Internal;
-	this->Build = Build;
-	this->Platform = ZE_VP_WIN32;
-}
+#endif

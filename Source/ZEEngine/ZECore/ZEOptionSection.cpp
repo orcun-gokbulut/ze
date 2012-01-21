@@ -84,7 +84,7 @@ ZEOption* ZEOptionSection::GetOption(const ZEString& OptionName)
 
 ZEOption* ZEOptionSection::GetOption(size_t Index)
 {
-	if (Index >= 0 && Index < Options.GetCount())
+	if (Index < Options.GetCount())
 			return Options[Index];
 	else
 		return NULL;

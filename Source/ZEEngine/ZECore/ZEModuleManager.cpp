@@ -77,7 +77,7 @@ ZEModule* ZEModuleManager::CreateModuleInstance(size_t Index)
 
 	if (ModuleDesc == NULL)
 	{
-		zeError("Can not find module. Module Index : %d", Index);
+		zeError("Can not find module. Module Index : %Iu", Index);
 
 		return NULL;
 	}

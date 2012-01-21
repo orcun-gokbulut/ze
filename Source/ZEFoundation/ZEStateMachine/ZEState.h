@@ -43,20 +43,20 @@ class ZETransaction;
 
 class ZEState
 {
-protected:
-	ZEString							Name;
+	protected:
+		ZEString							Name;
 
-public:
-										ZEState(void);
-										~ZEState(void);
+	public:
+											ZEState(void);
+											~ZEState(void);
 
-	virtual void						OnEnter(ZETransaction* Transaction);
-	virtual void						OnLeave(ZETransaction* Transaction);
-	virtual bool						OnLeaving(ZETransaction* Transaction);
-	virtual bool						OnEntering(ZETransaction* Transaction);
+		virtual void						OnEnter(ZETransaction* Transaction);
+		virtual void						OnLeave(ZETransaction* Transaction);
+		virtual bool						OnLeaving(ZETransaction* Transaction);
+		virtual bool						OnEntering(ZETransaction* Transaction);
 
-	ZEString&							GetName();
-	void								SetName(const ZEString& Name);
+		ZEString&							GetName();
+		void								SetName(const ZEString& Name);
 };
 
 #endif

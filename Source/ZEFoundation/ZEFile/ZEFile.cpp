@@ -147,13 +147,13 @@ bool ZEFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 			}
 			else
 			{
-				zeError("Could not open file \"%s\".", FilePath.GetValue());
+				zeError("Could not open file \"%s\".", FilePath.ToCString());
 				return false;
 			}
 		}
 		else
 		{
-			zeError("Could not open file \"%s\".", FilePath.GetValue());
+			zeError("Could not open file \"%s\".", FilePath.ToCString());
 			return false;
 		}
 	}
@@ -353,12 +353,12 @@ bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 Buffe
 {
 	char RelativeFileName[ZE_MAX_NAME_SIZE + 11];
 
-	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", FilePath.GetValue());
+	sprintf_s(RelativeFileName, ZE_MAX_NAME_SIZE + 11, "resources\\%s", FilePath.ToCString());
 
 	FILE* File = fopen(RelativeFileName, "rb");
 	if(File == NULL)
 	{
-		zeError("Could not open file in binary read mode \"%s\".", FilePath.GetValue());
+		zeError("Could not open file in binary read mode \"%s\".", FilePath.ToCString());
 		return false;
 	}
 
@@ -422,7 +422,7 @@ ZEString ZEFile::GetFileName(const ZEString& FilePath)
 	if (Length == 0)
 		return "";
 
-	for (int I = Length - 1; I >= 0; I--)
+	for (ptrdiff_t I = Length - 1; I >= 0; I--)
 	{
 		if (FilePath[I] == '\\' || FilePath[I] == '/')
 			return FilePath.Right(Length - 1 - I);
@@ -438,12 +438,15 @@ ZEString ZEFile::GetAbsolutePath(const ZEString& FilePath)
 
 ZEString ZEFile::GetFileExtension(const ZEString& FilePath)
 {
-	unsigned int Lenght = FilePath.GetLength();
+	size_t Length = FilePath.GetLength();
 
-	for(unsigned int I = Lenght - 1; I >= 0; I--)
+	if (Length == 0)
+		return "";
+
+	for (ptrdiff_t I = Length - 1; I >= 0; I--)
 	{
 		if(FilePath[I] == '.')
-			return FilePath.Right(Lenght - I);
+			return FilePath.Right(Length - I);
 	}
 
 	return "";
@@ -456,7 +459,7 @@ ZEString ZEFile::GetParentDirectory(const ZEString& FilePath)
 	if (Length == 0)
 		return "";
 
-	for (int I = Length - 1; I >= 0; I--)
+	for (ptrdiff_t I = Length - 1; I >= 0; I--)
 	{
 		if (FilePath[I] == '\\' || FilePath[I] == '/')
 			return FilePath.Left(I);
@@ -537,9 +540,9 @@ ZEFile& ZEFile::operator = (ZEFile& OtherFile)
 // Opens and returns the first file
 ZEFile* ZEFile::Open(const ZEString& FilePath)
 {
-	int			TokenStart = 0;
-	int			TokenEnd = 0;
-	int			Lenght = 0;
+	size_t		TokenStart = 0;
+	size_t		TokenEnd = 0;
+	size_t		Lenght = 0;
 	ZEString	Token;
 	ZEString	NewPath;
 
@@ -584,7 +587,7 @@ ZEFile* ZEFile::Open(const ZEString& FilePath)
 	while(TokenEnd <= Lenght)
 	{
 		// For the rest of the string starting from token end
-		for(int I = TokenEnd; I < Lenght; I++)
+		for(size_t I = TokenEnd; I < Lenght; I++)
 		{
 			if(NewPath[I] == '\\' || NewPath[I] == '/')
 			{
@@ -609,14 +612,14 @@ ZEFile* ZEFile::Open(const ZEString& FilePath)
 				ZEPack Pack;
 				if(!Pack.Open(Token))
 				{
-					zeError("Cannot resolve the path \"%s\".", FilePath.GetValue());
+					zeError("Cannot resolve the path \"%s\".", FilePath.ToCString());
 					return NULL;
 				}
 
 				ZEPartialCompressedFile* PartialCompressedFile = new ZEPartialCompressedFile();
 				if (!Pack.OpenChunk(*PartialCompressedFile, FilePath.Right(Token.GetLength())))
 				{
-					zeError("Cannot resolve the path \"%s\".", FilePath.GetValue());
+					zeError("Cannot resolve the path \"%s\".", FilePath.ToCString());
 					return NULL;
 				}
 
@@ -627,7 +630,7 @@ ZEFile* ZEFile::Open(const ZEString& FilePath)
 				ZEFile* File = new ZEFile();
 				if (!File->Open(Token, ZE_FM_READ_WRITE, true))
 				{
-					zeError("Cannot resolve the path \"%s\".", FilePath.GetValue());
+					zeError("Cannot resolve the path \"%s\".", FilePath.ToCString());
 					return NULL;
 				}
 				

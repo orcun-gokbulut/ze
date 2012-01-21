@@ -57,6 +57,8 @@ class ZEConsoleInterface
 
 		virtual void			Output(const char* Output) = 0;
 		void					Input(const char* Input);
+
+		virtual					~ZEConsoleInterface();
 };
 
 class ZEConsole
@@ -69,13 +71,7 @@ class ZEConsole
 		bool					InputEnabled;
 		bool					Visible;
 
-		void					ParseEmptySpace(const char* Input, int &Cursor);
-		bool					ParseIdentifier(const char* Input, int &Cursor, char* Output);
-		bool					ParseConstant(const char* Input, int &Cursor, ZEVariant *Output);
-		int						ParseOperator(const char* Input, int &Cursor);
-		bool					ParseScope(const char* Input, int &Cursor);
-		bool					ParseParameters(const char* Input, int &Cursor, ZEArray<ZEVariant>* Output);
-
+		
 								ZEConsole();
 								~ZEConsole();
 

@@ -117,7 +117,7 @@ bool ZECommandManager::Callback_ListCommands(ZECommand* Command, const ZECommand
 		for (size_t I = 0; I < Sec->GetNumberOfCommands() && I <= Count; I++)
 		{
 			Cmd = Sec->GetCommand(I);	
-			zeOutput(" %-30s", Cmd->GetName());
+			zeOutput(" %-30s", Cmd->GetName().ToCString());
 			switch(Cmd->GetAccessLevel())
 			{
 				case ZE_UL_DEVELOPPER:
@@ -181,7 +181,7 @@ bool ZECommandManager::RegisterSection(ZECommandSection* Section)
 	if (GetCommandSection(Section->GetName()) != NULL)
 	{
 		zeError("Can not register command section. A command section with same name is already registered. (Command Section Name : \"%s\")", 
-			Section->GetName());
+			Section->GetName().ToCString());
 		return false;
 	}
 	Sections.Add(Section);
@@ -193,7 +193,7 @@ bool ZECommandManager::UnregisterSection(ZECommandSection* Section)
 	if (GetCommandSection(Section->GetName()) == NULL)
 	{
 		zeError("Can not unregister command section. There is no such a registered command section. (Command Section Name : \"%s\")", 
-			Section->GetName());
+			Section->GetName().ToCString());
 		return false;
 	}
 	Sections.DeleteValue(Section);

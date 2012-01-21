@@ -43,6 +43,8 @@ class ZEViewPort
 		virtual float			GetAspectRatio() = 0;
 		virtual unsigned int	GetWidth() = 0;
 		virtual unsigned int	GetHeight() = 0;
+
+		virtual					~ZEViewPort();
 };
 
 #endif

@@ -43,6 +43,8 @@ class ZESerializer
 {
 	public:
 		virtual ZEUInt64			Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count) = 0;
+
+		virtual						~ZESerializer();
 };
 
 #endif

@@ -45,25 +45,21 @@
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// PARSER PARSER PARSER PARSER PARSER PARSER PARSER PARSER PARSER PARSER PARSER PARSER PARSER PARSER PARSER PARSER //
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
- 
-#define PARSER_MAX_IDENTIFIER_SIZE	50
-#define PARSER_MAX_STRING_SIZE		256
+#define ZE_CONSOLE_PARSER_MAX_IDENTIFIER_SIZE	50
+#define ZE_CONSOLE_PARSER_MAX_STRING_SIZE		256
 
-enum EParserState
+enum ZEConsoleParserState
 {
-	PARSERSTATE_ERROR,
-	PARSERSTATE_SECTION,
-	PARSERSTATE_SCOPE,
-	PARSERSTATE_NAME,
-	PARSERSTATE_OPERATOR,
-	PARSERSTATE_PARAMETER,
-	PARSERSTATE_ASSINGMENT,
-	PARSERSTATE_DISPLAY,
-	PARSERSTATE_NEXTCOMMAND,
-	PARSERSTATE_FINISHED
+	ZE_CPS_ERROR,
+	ZE_CPS_SECTION,
+	ZE_CPS_SCOPE,
+	ZE_CPS_NAME,
+	ZE_CPS_OPERATOR,
+	ZE_CPS_PARAMETER,
+	ZE_CPS_ASSINGMENT,
+	ZE_CPS_DISPLAY,
+	ZE_CPS_NEXT_COMMAND,
+	ZE_CPS_FINISHED
 };
 
 ZEConsole* ZEConsole::Instance = NULL;
@@ -73,40 +69,70 @@ void ZEConsoleInterface::Input(const char* Input)
 	ZEConsole::GetInstance()->Input(Input);
 }
 
-
-inline void ZEConsole::ParseEmptySpace(const char* Input, int &Cursor)
+ZEConsoleInterface::~ZEConsoleInterface()
 {
-	while(Input[Cursor] == L' ' || Input[Cursor] == L'\t')
+
+}
+
+static void ParseEmptySpace(const char* Input, size_t &Cursor)
+{
+	while(Input[Cursor] == ' ' || Input[Cursor] == '\t')
 		Cursor++;
 }
 
-inline bool ZEConsole::ParseConstant(const char* Input, int &Cursor, ZEVariant *Output)
+static bool ParseIdentifier(const char* Input, size_t &Cursor, char* Output)
 {
-	char Temp[PARSER_MAX_STRING_SIZE];
+	size_t Index = 0;
+
+	ParseEmptySpace(Input, Cursor);
+
+	if (!isalpha(Input[Cursor]))
+		return false;
+	else
+		Output[Index++] = Input[Cursor++];
+
+
+	while(isalnum(Input[Cursor]))
+		if (Index > ZE_CONSOLE_PARSER_MAX_IDENTIFIER_SIZE - 1)
+		{
+			zeOutput("[Parser] Error : Indentifier is too big on position %Iu. Maximumum allowed indentifier size is %d.\r\n", Cursor, ZE_CONSOLE_PARSER_MAX_IDENTIFIER_SIZE);
+			return false;
+		}
+		else
+			Output[Index++] = Input[Cursor++];
+
+	Output[Index] = '\0';
+
+	return true;
+}
+
+static bool ParseConstant(const char* Input, size_t &Cursor, ZEVariant *Output)
+{
+	char Temp[ZE_CONSOLE_PARSER_MAX_STRING_SIZE];
 	int I = 0;
 
 	ParseEmptySpace(Input, Cursor);
 
 	if(Input[Cursor] == '\"')
 	{
-		while(I < PARSER_MAX_STRING_SIZE - 2)
+		while(I < ZE_CONSOLE_PARSER_MAX_STRING_SIZE - 2)
 		{
 			 Cursor++;
-			 if (Input[Cursor] == L'\0')
+			 if (Input[Cursor] == '\0')
 			 {
-				 this->Output("[Parser] Error : String constant terminated unexpectedly on position %d.\r\n", Cursor);
+				 zeOutput("[Parser] Error : String constant terminated unexpectedly on position %Iu.\r\n", Cursor);
 				 return false;
 			 }
-			 else if (Input[Cursor] == L'\"' && Input[Cursor - 1] != L'\\')
+			 else if (Input[Cursor] == '\"' && Input[Cursor - 1] != '\\')
 			 {
-				Temp[I] = L'\0';
+				Temp[I] = '\0';
 				Cursor++;
 				Output->SetString(Temp);
 				return true;	
 			 }
 			 Temp[I++] = Input[Cursor];
 		}
-		this->Output("[Parser] Error : String constant is too big on position %d . Allowed maximum size is %d.\r\n", Cursor, PARSER_MAX_STRING_SIZE);
+		zeOutput("[Parser] Error : String constant is too big on position %Iu . Allowed maximum size is %d.\r\n", Cursor, ZE_CONSOLE_PARSER_MAX_STRING_SIZE);
 		return false;
 	}
  	else if (isdigit(Input[Cursor]))
@@ -114,18 +140,18 @@ inline bool ZEConsole::ParseConstant(const char* Input, int &Cursor, ZEVariant *
 		bool IsFloat = false;
 		Temp[I++] = Input[Cursor++];
 
-		while(I < PARSER_MAX_STRING_SIZE - 1)
+		while(I < ZE_CONSOLE_PARSER_MAX_STRING_SIZE - 1)
 		{
 			if (isdigit(Input[Cursor]))
 				Temp[I++] = Input[Cursor++];
-			else if (IsFloat == false && Input[Cursor] == L'.')
+			else if (IsFloat == false && Input[Cursor] == '.')
 			{
 				Temp[I++] = Input[Cursor++];
 				IsFloat = true;
 			}
 			else
 			{
-				Temp[I] = L'\0';
+				Temp[I] = '\0';
 				if (IsFloat)
 					Output->SetFloat((float)atof(Temp));
 				else
@@ -133,7 +159,7 @@ inline bool ZEConsole::ParseConstant(const char* Input, int &Cursor, ZEVariant *
 				return true;
 			}
 		}
-		this->Output("[Parser] Error : Numeric constant is too big on position %d . Allowed maximum size is %d.\r\n", Cursor, PARSER_MAX_STRING_SIZE);
+		zeOutput("[Parser] Error : Numeric constant is too big on position %Iu . Allowed maximum size is %d.\r\n", Cursor, ZE_CONSOLE_PARSER_MAX_STRING_SIZE);
 		return false;
 	}
 	else if (isalpha(Input[Cursor]))
@@ -157,7 +183,7 @@ inline bool ZEConsole::ParseConstant(const char* Input, int &Cursor, ZEVariant *
 			}
 			else
 			{
-				this->Output("[Parser] Error : Unexpected indentifier on position %d.\r\n", Cursor);
+				zeOutput("[Parser] Error : Unexpected identifier on position %Iu.\r\n", Cursor);
 				return false;
 			}
 		}
@@ -168,7 +194,7 @@ inline bool ZEConsole::ParseConstant(const char* Input, int &Cursor, ZEVariant *
 		return false;
 }
 
-inline bool ZEConsole::ParseParameters(const char* Input, int &Cursor, ZECommandParameterList *Output)
+static bool ParseParameters(const char* Input, size_t &Cursor, ZECommandParameterList *Output)
 {
 	ZEVariant Param;
 	bool FirstParam = true;
@@ -180,19 +206,19 @@ inline bool ZEConsole::ParseParameters(const char* Input, int &Cursor, ZECommand
 		ParseEmptySpace(Input, Cursor);
 		switch(Input[Cursor])
 		{
-			case L')':
+			case ')':
 				return true;
 				break;
 
-			case L',':
+			case ',':
 				Cursor++;
 				if (ParseConstant(Input, Cursor, &Param))
 					Output->Add(Param);
 				else
 					return false;
 				break;
-			case L'\0':
-				this->Output("[Parser] Error : Sytax error parameter terminated unexpectedly on position %d.\r\n", Cursor);
+			case '\0':
+				zeOutput("[Parser] Error : Syntax error parameter terminated unexpectedly on position %Iu.\r\n", Cursor);
 				return false;
 			default:
 				if (FirstParam)
@@ -202,145 +228,118 @@ inline bool ZEConsole::ParseParameters(const char* Input, int &Cursor, ZECommand
 						FirstParam = false;
 						break;
 					}
-				this->Output("[Parser] Error : Sytax error parameter list on position %d.\r\n", Cursor);
+				zeOutput("[Parser] Error : Syntax error parameter list on position %Iu.\r\n", Cursor);
 				return false;
 				break;
 		}
 	}
 }
 
-inline int ZEConsole::ParseOperator(const char* Input, int &Cursor)
+static ZEConsoleParserState ParseOperator(const char* Input, size_t &Cursor)
 {
 	ParseEmptySpace(Input, Cursor);
 
 	switch(Input[Cursor])
 	{
-		case L'=':
+		case '=':
 			Cursor++;
-			return PARSERSTATE_ASSINGMENT;
-		case L'(':
+			return ZE_CPS_ASSINGMENT;
+		case '(':
 			Cursor++;
-			return PARSERSTATE_PARAMETER;
-		case L';':
-		case L'\0':
-			return PARSERSTATE_DISPLAY;
+			return ZE_CPS_PARAMETER;
+		case ';':
+		case '\0':
+			return ZE_CPS_DISPLAY;
 		default:
-			Output("[Parser] Error : Syntax error on position %d.\r\n", Cursor);
-			return PARSERSTATE_ERROR;
+			zeOutput("[Parser] Error : Syntax error on position %Iu.\r\n", Cursor);
+			return ZE_CPS_ERROR;
 	}
 }
 
-inline bool ZEConsole::ParseScope(const char* Input, int &Cursor)
+static bool ParseScope(const char* Input, size_t &Cursor)
 {
 	ParseEmptySpace(Input, Cursor);
 	
-	if (Input[Cursor++] == L'.')
+	if (Input[Cursor++] == '.')
 		return true;
 	else 
 	{	
-		Output("[Parser] Error : Sytax error on position %d.\r\n", Cursor);
+		zeOutput("[Parser] Error : Sytax error on position %Iu.\r\n", Cursor);
 		return false;
 	}
 }
 
-inline bool ZEConsole::ParseIdentifier(const char* Input, int &Cursor, char* Output)
-{
-	int Index = 0;
-
-	ParseEmptySpace(Input, Cursor);
-
-	if (!isalpha(Input[Cursor]))
-		return false;
-	else
-		Output[Index++] = Input[Cursor++];
-
-
-	while(isalnum(Input[Cursor]))
-		if (Index > PARSER_MAX_IDENTIFIER_SIZE - 1)
-		{
-			this->Output("[Parser] Error : Indentifier is too big on position %d. Maximumum allowed indentifier size is %d.\r\n", Cursor, PARSER_MAX_IDENTIFIER_SIZE);
-			return false;
-		}
-		else
-			Output[Index++] = Input[Cursor++];
-
-	Output[Index] = L'\0';
-
-	return true;
-}
-
-
 bool ZEConsole::ParseInput(const char* Input)
 {
-	char Section[PARSER_MAX_IDENTIFIER_SIZE], Name[PARSER_MAX_IDENTIFIER_SIZE];
+	char Section[ZE_CONSOLE_PARSER_MAX_IDENTIFIER_SIZE], Name[ZE_CONSOLE_PARSER_MAX_IDENTIFIER_SIZE];
 	ZECommandParameterList ParamList;
 	ZEVariant Constant;
 	ZEOption* Opt;
 	Output("> %s\r\n", Input);
-	int State = PARSERSTATE_SECTION;
-	int Cursor = 0;
+	ZEConsoleParserState State = ZE_CPS_SECTION;
+	size_t Cursor = 0;
 
-	while(State != PARSERSTATE_FINISHED)
+	while(State != ZE_CPS_FINISHED)
 	{
 		switch (State)
 		{
-			case PARSERSTATE_ERROR:
+			case ZE_CPS_ERROR:
 				Output("\r\n");
 				return false;
 				break;
 
-			case PARSERSTATE_SECTION:
+			case ZE_CPS_SECTION:
 				if (ParseIdentifier(Input, Cursor, Section))
-					State = PARSERSTATE_SCOPE;
+					State = ZE_CPS_SCOPE;
 				else
 				{
-					Output("[Parser] Error : Identifier error on position %d.\r\n", Cursor);
-					State =	PARSERSTATE_ERROR;
+					Output("[Parser] Error : Identifier error on position %Iu.\r\n", Cursor);
+					State =	ZE_CPS_ERROR;
 				}
 				break;
 
-			case PARSERSTATE_SCOPE:
+			case ZE_CPS_SCOPE:
 				if (ParseScope(Input, Cursor))
-					State = PARSERSTATE_NAME;
+					State = ZE_CPS_NAME;
 				else
 				{
-					Output("[Parser] Error : Scope operator is expected on position %d.\r\n", Cursor);
-					State = PARSERSTATE_ERROR;
+					Output("[Parser] Error : Scope operator is expected on position %Iu.\r\n", Cursor);
+					State = ZE_CPS_ERROR;
 				}
 				break;
 
-			case PARSERSTATE_NAME:
+			case ZE_CPS_NAME:
 				if (ParseIdentifier(Input, Cursor, Name))
-					State = PARSERSTATE_OPERATOR;
+					State = ZE_CPS_OPERATOR;
 				else
 				{
-					Output("[Parser] Error : Identifier error on position %d.\r\n", Cursor);
-					State = PARSERSTATE_ERROR;
+					Output("[Parser] Error : Identifier error on position %Iu.\r\n", Cursor);
+					State = ZE_CPS_ERROR;
 				}
 				break;
 			
-			case PARSERSTATE_OPERATOR:
+			case ZE_CPS_OPERATOR:
 				State = ParseOperator(Input, Cursor);
-				if (State == PARSERSTATE_ERROR)
-					Output("[Parser] Error : An operator is expected on position %d.\r\n", Cursor);
+				if (State == ZE_CPS_ERROR)
+					Output("[Parser] Error : An operator is expected on position %Iu.\r\n", Cursor);
 				break;
 
-			case PARSERSTATE_PARAMETER:
+			case ZE_CPS_PARAMETER:
 				if (ParseParameters(Input, Cursor, &ParamList))
 				{				
 					if (ZECommandManager::GetInstance()->ExecuteCommand(Section, Name, &ParamList))
-						State = PARSERSTATE_NEXTCOMMAND;
+						State = ZE_CPS_NEXT_COMMAND;
 					else
 					{
 						Output("[Parser] Wrong command name.\r\n");
-						State = PARSERSTATE_ERROR;
+						State = ZE_CPS_ERROR;
 					}
 				}
 				else
-					State = PARSERSTATE_ERROR;
+					State = ZE_CPS_ERROR;
 				break;
 
-			case PARSERSTATE_ASSINGMENT:
+			case ZE_CPS_ASSINGMENT:
 				if (ParseConstant(Input, Cursor, &Constant))
 				{	
 					Opt = ZEOptionManager::GetInstance()->GetOption(Section, Name);
@@ -348,24 +347,24 @@ bool ZEConsole::ParseInput(const char* Input)
 						if (Opt->GetValueType() == Constant.GetType())
 						{
 							Opt->SetValue(Constant);
-							State = PARSERSTATE_NEXTCOMMAND;
+							State = ZE_CPS_NEXT_COMMAND;
 						}
 						else
 						{
 							Output("[Parser] Error : Option value type does not match with the assignment type.\r\n");
-							State = PARSERSTATE_ERROR;
+							State = ZE_CPS_ERROR;
 						}
 					else
 					{
 						Output("[Parser] Error : There is no such an option or command named \"%s\".\r\n", Name);
-						State = PARSERSTATE_ERROR;
+						State = ZE_CPS_ERROR;
 					}
 				}
 				else
-					State = PARSERSTATE_ERROR;
+					State = ZE_CPS_ERROR;
 				break;
 
-			case PARSERSTATE_DISPLAY:
+			case ZE_CPS_DISPLAY:
 				Opt = ZEOptionManager::GetInstance()->GetOption(Section, Name);
 				if (Opt != NULL)
 				{
@@ -393,7 +392,7 @@ bool ZEConsole::ParseInput(const char* Input)
 							Output("Internal error not supported variant type.");
 							break;
 					}
-					State = PARSERSTATE_NEXTCOMMAND;
+					State = ZE_CPS_NEXT_COMMAND;
 					return true;
 				}
 				else
@@ -403,9 +402,9 @@ bool ZEConsole::ParseInput(const char* Input)
 				}
 				break;
 
-			case PARSERSTATE_NEXTCOMMAND:
+			case ZE_CPS_NEXT_COMMAND:
 					Output("\r\n");
-			case PARSERSTATE_FINISHED:
+			case ZE_CPS_FINISHED:
 				return true;
 				break;
 		}
@@ -554,9 +553,3 @@ ZEConsole::~ZEConsole()
 	#endif
 	Instance = NULL;
 }
-
-
-
-
-
-

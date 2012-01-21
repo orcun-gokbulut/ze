@@ -45,6 +45,8 @@ class ZESerializable
 	public:
 		virtual bool				Serialize(ZESerializer* Serializer) = 0;
 		virtual	bool				Unserialize(ZEUnserializer* Unserializer) = 0;
+
+		virtual						~ZESerializable();
 };
 
 #endif

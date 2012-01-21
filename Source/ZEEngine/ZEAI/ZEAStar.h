@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEAIAStar.h
+ Zinek Engine - ZEAStar.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -42,7 +42,7 @@ class ZEAStarNode
 {
 	public:
 		size_t ActualNodeIndex;
-		int PrevNodeIndex;
+		ptrdiff_t PrevNodeIndex;
 
 		float SummedCost;
 		float EstimatedCost;
@@ -92,8 +92,8 @@ class ZEAIAStar
 		template <typename Type>
 		static ZEArray<const Type*> Process(const ZEGraph<Type>& Graph, size_t StartIndex, size_t DestinationIndex, float (*Cost)(const ZEGraph<Type>&, size_t, size_t), float (*Heuristic)(const ZEGraph<Type>&, size_t, size_t))
 		{
-			ZEMinHeap<ZEAStarNode<Type>, ZEChunkAllocator<ZEAStarNode<Type>, 100>> OpenList;
-			ZEArray<ZEAStarNode<Type>, ZESmartAllocator<ZEAStarNode<Type>, 2>> ClosedList;
+			ZEMinHeap<ZEAStarNode<Type>, ZEChunkAllocator<ZEAStarNode<Type>, 100> > OpenList;
+			ZEArray<ZEAStarNode<Type>, ZESmartAllocator<ZEAStarNode<Type>, 2> > ClosedList;
 
 			OpenList.Clear();
 			ClosedList.Clear();
@@ -113,7 +113,7 @@ class ZEAIAStar
 				ClosedList.Add(CurrentNode);
 
 				size_t LinkIndex = 0;
-				int AdjacentNodeIndex = Graph.GetAdjacentNode(CurrentNode.ActualNodeIndex, LinkIndex);
+				ptrdiff_t AdjacentNodeIndex = Graph.GetAdjacentNode(CurrentNode.ActualNodeIndex, LinkIndex);
 				while(AdjacentNodeIndex != -1)
 				{
 					if (AdjacentNodeIndex == DestinationIndex)

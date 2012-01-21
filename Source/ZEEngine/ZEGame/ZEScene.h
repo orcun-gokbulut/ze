@@ -63,13 +63,6 @@ class ZEObjectDescription;
 
 #define zeScene ZEScene::GetInstance()
 
-class ZESceneBridge
-{
-	public:
-		virtual void*							GetScene() = 0;
-		virtual void*							OnEntityChanged(ZEEntity* Entity) = 0;
-};
-
 class ZEScene
 {
 	private:

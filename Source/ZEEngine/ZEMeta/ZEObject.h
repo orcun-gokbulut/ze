@@ -93,12 +93,12 @@
 	public:\
 		virtual ZEObjectDescription* GetDescription() const;\
 		static ZEObjectDescription* Description();\
-		virtual int GetPropertyId(const char* PropertyName) const;\
+		virtual ptrdiff_t GetPropertyId(const char* PropertyName) const;\
 		using ZEObject::SetProperty;\
 		virtual bool SetProperty(int PropertyId, const ZEVariant& Value);\
 		using ZEObject::GetProperty;\
 		virtual bool GetProperty(int PropertyId, ZEVariant& Value) const;\
-		virtual int GetContainerId(const char* ContainerName) const;\
+		virtual ptrdiff_t GetContainerId(const char* ContainerName) const;\
 		using ZEObject::AddToContainer;\
 		virtual bool AddToContainer(int ContainerId, ZEObject* Item);\
 		using ZEObject::RemoveFromContainer;\
@@ -107,12 +107,12 @@
 		virtual const ZEObject** GetContainerItems(int ContainerId) const;\
 		using ZEObject::GetContainerItemCount;\
 		virtual size_t GetContainerItemCount(int ContainerId) const;\
-		virtual int GetMethodId(const char* MethodName) const;\
+		virtual ptrdiff_t GetMethodId(const char* MethodName) const;\
 		using ZEObject::CallMethod;\
 		virtual bool CallMethod(int MethodId, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue);\
 	private:
 
-#define ZE_META_EXTENDED_CLASS(ExtensionClass, Extension, Class)\
+#define ZE_META_EXTENDED_OBJECT(ExtensionClass, Extension, Class)\
 		ZE_META_OBJECT(Class)\
 	public:\
 		Extension\
@@ -169,37 +169,28 @@ class ZEObject
 		virtual ZEObject*						GetOwner();
 
 		// Property Functions
-		virtual int								GetPropertyId(const char* PropertyName) const = 0;
-
+		virtual ptrdiff_t						GetPropertyId(const char* PropertyName) const = 0;
 		virtual bool							SetProperty(int PropertyId, const ZEVariant& Value) = 0;
 		bool									SetProperty(const char* PropertyName, const ZEVariant& Value);
-
 		virtual bool							GetProperty(int PropertyId, ZEVariant& Value) const = 0;
 		bool									GetProperty(const char* PropertyName, ZEVariant& Value) const;
-
 		bool									AddCustomProperty(ZERunTimeProperty Property);
 		bool									RemoveCustomProperty(const char* PropertyName);
-
 		const ZEArray<ZERunTimeProperty>*		GetCustomProperties() const;
 
 		// Containers
-		virtual int								GetContainerId(const char* ContainerName) const = 0;
-
+		virtual ptrdiff_t						GetContainerId(const char* ContainerName) const = 0;
 		virtual bool							AddToContainer(int ContainerId, ZEObject* Item) = 0;
 		bool									AddToContainer(const char* ContainerName, ZEObject* Item);
-		
 		virtual bool							RemoveFromContainer(int ContainerId, ZEObject* Item) = 0;
 		bool									RemoveFromContainer(const char* ContainerName, ZEObject* Item);
-		
 		virtual const ZEObject**				GetContainerItems(int ContainerId) const = 0;
-		const ZEObject**						GetContainerItems(const char* ContainerName) const;
-		
+		const ZEObject**						GetContainerItems(const char* ContainerName) const;		
 		virtual size_t							GetContainerItemCount(int ContainerId) const = 0;
 		size_t									GetContainerItemCount(const char* ContainerName) const;
 
 		// Methods
-		virtual int								GetMethodId(const char* MethodName) const = 0;
-
+		virtual ptrdiff_t						GetMethodId(const char* MethodName) const = 0;
 		virtual bool							CallMethod(int MethodId, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue) = 0;
 		bool									CallMethod(const char* MethodName, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue);
 		bool									CallMethod(int MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue);

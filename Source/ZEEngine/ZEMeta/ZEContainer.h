@@ -57,7 +57,7 @@ struct ZEContainerDescription
 	ZEContainerAccess		Access;
 	bool					Visibility;
 
-	ZEObjectDescription*		BaseClass;
+	ZEObjectDescription*	BaseClass;
 	bool					AllowDerived;
 };
 

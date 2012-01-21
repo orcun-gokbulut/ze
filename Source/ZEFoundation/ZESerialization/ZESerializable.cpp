@@ -34,3 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESerializable.h"
+
+ZESerializable::~ZESerializable()
+{
+
+}

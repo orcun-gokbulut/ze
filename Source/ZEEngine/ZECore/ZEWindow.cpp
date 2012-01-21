@@ -156,7 +156,7 @@ void ShowWindowError()
         (LPTSTR) &lpMsgBuf,
         0, NULL );
 
-	sprintf_s(szBuf, 256, "Win32API Error no : %d, Error text : \"%s\"", dw, lpMsgBuf); 
+	sprintf_s(szBuf, 256, "Win32API Error no : %u, Error text : \"%s\"", dw, lpMsgBuf); 
 	zeError("Win32", szBuf); 
     LocalFree(lpMsgBuf);
 }

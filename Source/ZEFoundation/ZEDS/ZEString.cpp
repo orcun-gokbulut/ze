@@ -592,7 +592,7 @@ ZEString ZEString::Format(const char* Format, ...)
 	va_list List;
 	va_start(List, Format);
 	
-	int Length = _vscprintf(Format, List);
+	size_t Length = _vscprintf(Format, List);
 	
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (Length + 1) * sizeof(char));

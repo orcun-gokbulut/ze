@@ -47,7 +47,7 @@ class ZEResource
 		ZEString				FileName;
 
 	protected:
-		void					SetFileName(const ZEString Value);
+		void					SetFileName(const ZEString& Value);
 		bool					Cached;
 		bool					Shared;
 		bool					Internal;

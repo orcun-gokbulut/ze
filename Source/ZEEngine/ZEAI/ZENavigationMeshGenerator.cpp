@@ -55,12 +55,12 @@ size_t ZENavigationMeshGenerator::AddVertex(const ZEVector3& Point)
 	return Mesh.Vertices.GetCount() - 1;
 }
 
-ZEVector3& ZENavigationMeshGenerator::GetVertex(const ZENavigationMeshPolygon& Polygon, int Index)
+ZEVector3& ZENavigationMeshGenerator::GetVertex(const ZENavigationMeshPolygon& Polygon, ptrdiff_t Index)
 {
 	return Mesh.Vertices[Polygon.VertexIndices[Polygon.VertexIndices.Circular(Index)]];
 }
 
-size_t ZENavigationMeshGenerator::GetVertexIndex(const ZENavigationMeshPolygon& Polygon, int Index)
+size_t ZENavigationMeshGenerator::GetVertexIndex(const ZENavigationMeshPolygon& Polygon, ptrdiff_t Index)
 {
 	return Polygon.VertexIndices[Polygon.VertexIndices.Circular(Index)];
 }
@@ -141,8 +141,8 @@ bool ZENavigationMeshGenerator::CheckAdjacent(const ZENavigationMeshPolygon& A, 
 	if (ZEVector3::DotProduct(GetNormal(A), GetNormal(B)) < 0.9999)
 		return false;
 
-	for (int I = 0; I < A.VertexIndices.GetCount(); I++)
-		for (int N = 0; N < B.VertexIndices.GetCount(); N++)
+	for (ptrdiff_t I = 0; I < A.VertexIndices.GetCount(); I++)
+		for (ptrdiff_t N = 0; N < B.VertexIndices.GetCount(); N++)
 			if (GetVertexIndex(A, I) == GetVertexIndex(B, N))
 			{
 
@@ -204,7 +204,7 @@ bool ZENavigationMeshGenerator::CheckAdjacent(const ZENavigationMeshPolygon& A, 
 
 bool ZENavigationMeshGenerator::SlicePolygon(ZENavigationMeshPolygon& Output1, ZENavigationMeshPolygon& Output2, ZENavigationMeshPolygon& Input, const ZELine& Cut)
 {
-	int State = 0;
+	size_t State = 0;
 	for (size_t I = 0; I < Input.VertexIndices.GetCount(); I++)
 	{
 		if (State % 2 == 0)
@@ -388,9 +388,9 @@ bool ZENavigationMeshGenerator::MergePolygons2to1(ZENavigationMeshPolygon& Outpu
 	if (ZEVector3::DotProduct(Mesh.Normals[A.NormalIndex], Mesh.Normals[B.NormalIndex]) < 0.99f)
 		return false;
 
-	for (int I = 0; I < A.VertexIndices.GetCount(); I++)
+	for (ptrdiff_t I = 0; I < A.VertexIndices.GetCount(); I++)
 	{
-		for (int N = 0; N < B.VertexIndices.GetCount(); N++)
+		for (ptrdiff_t N = 0; N < B.VertexIndices.GetCount(); N++)
 		{
 			if (GetVertex(A, I) == GetVertex(B, N) && 
 				GetVertex(A, I + 1) == GetVertex(B, N - 1))
@@ -403,19 +403,19 @@ bool ZENavigationMeshGenerator::MergePolygons2to1(ZENavigationMeshPolygon& Outpu
 
 					size_t Index = 0;
 
-					for (int K = 0; K < B.VertexIndices.GetCount(); K++)
+					for (ptrdiff_t K = 0; K < B.VertexIndices.GetCount(); K++)
 					{
 						Output.VertexIndices[Index] = GetVertexIndex(B, N + K);
 						Index++;
 					}
 
-					for (int K = 0; K < A.VertexIndices.GetCount() - 2; K++)
+					for (ptrdiff_t K = 0; K < A.VertexIndices.GetCount() - 2; K++)
 					{
 						Output.VertexIndices[Index] = GetVertexIndex(A, I + 2 + K);
 						Index++;
 					}
 
-					for (int K = 0; K < Output.VertexIndices.GetCount(); K++)
+					for (ptrdiff_t K = 0; K < Output.VertexIndices.GetCount(); K++)
 						if (GetVertex(Output, K - 1) == GetVertex(Output, K) || CheckStraight(GetVertex(Output, K - 1), GetVertex(Output, K), GetVertex(Output, K + 1)))
 						{
 							Output.VertexIndices.DeleteAt(K);
@@ -473,10 +473,10 @@ ZENavigationMesh&  ZENavigationMeshGenerator::GetOutput()
 
 bool ZENavigationMeshGenerator::OptimizePolygons2to1()
 {
-	int PolygonCulled = 0;
-	for (int I = 0; I < Mesh.Polygons.GetCount(); I++)
+	size_t PolygonCulled = 0;
+	for (size_t I = 0; I < Mesh.Polygons.GetCount(); I++)
 	{
-		for (int N = 0; N < Mesh.Polygons.GetCount(); N++)
+		for (size_t N = 0; N < Mesh.Polygons.GetCount(); N++)
 		{
 			if (I == N)
 				continue;
@@ -495,8 +495,8 @@ bool ZENavigationMeshGenerator::OptimizePolygons2to1()
 
 bool ZENavigationMeshGenerator::OptimizePolygons3to2()
 {
-	int PolygonCulled = 0;
-	for (int I = 0; I < Mesh.Polygons.GetCount(); I++)
+	size_t PolygonCulled = 0;
+	for (size_t I = 0; I < Mesh.Polygons.GetCount(); I++)
 		if (MergePolygons3to2(I))
 		{
 			PolygonCulled++;

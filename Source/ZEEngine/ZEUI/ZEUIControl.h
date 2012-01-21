@@ -220,7 +220,7 @@ class ZEUIControl
 		virtual void					SetMaterial(ZEMaterial* Material) = 0;
 
 										ZEUIControl();
-										~ZEUIControl();
+		virtual							~ZEUIControl();
 };
 
 

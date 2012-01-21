@@ -42,7 +42,9 @@
 class ZEUnserializer
 {
 	public:
-		virtual ZEUInt64			Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count) = 0;	
+		virtual ZEUInt64			Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count) = 0;
+
+		virtual						~ZEUnserializer();
 };
 
 #endif

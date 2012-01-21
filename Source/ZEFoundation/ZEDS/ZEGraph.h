@@ -62,7 +62,7 @@ class ZEGraph
 			return false;
 		}
 
-		int GetAdjacentNode(size_t NodeIndex, size_t& LastLinkIndex) const
+		ptrdiff_t GetAdjacentNode(size_t NodeIndex, size_t& LastLinkIndex) const
 		{
 			for (size_t I = LastLinkIndex; I < Links.GetCount(); I++)
 			{

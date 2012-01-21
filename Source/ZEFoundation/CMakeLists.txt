@@ -58,6 +58,8 @@ ze_add_source(ZEError.h 			Sources Headers)
 ze_add_source(ZEError.cpp 			Sources)
 ze_add_source(ZESerialPort.h 		Sources Headers)
 ze_add_source(ZESerialPort.cpp 		Sources)
+ze_add_source(ZERandom.h 			Sources Headers)
+ze_add_source(ZERandom.cpp 			Sources)
 
 ze_add_library(ZEFoundation 
 	SOURCES ${Sources} 

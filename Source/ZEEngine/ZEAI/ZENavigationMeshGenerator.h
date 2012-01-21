@@ -60,8 +60,8 @@ class ZENavigationMeshGenerator
 		ZENavigationMesh Mesh;
 
 		// Helpers
-		ZEVector3&			GetVertex(const ZENavigationMeshPolygon& Polygon, int Index);
-		size_t				GetVertexIndex(const ZENavigationMeshPolygon& Polygon, int Index);
+		ZEVector3&			GetVertex(const ZENavigationMeshPolygon& Polygon, ptrdiff_t Index);
+		size_t				GetVertexIndex(const ZENavigationMeshPolygon& Polygon, ptrdiff_t Index);
 		ZEVector3&			GetNormal(const ZENavigationMeshPolygon& Polygon);
 		void				GetBoundingBox(ZEAABBox& Output, ZENavigationMeshPolygon& Polygon);
 

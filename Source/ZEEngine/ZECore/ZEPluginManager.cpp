@@ -63,21 +63,21 @@ bool ZEPluginManager::RegisterPlugin(ZEPlugin* Plugin)
 		return false;
 
 	zeLog("Registering plugin. Plugin Name : \"%s\".", 
-		(const char*)Plugin->GetName());
+		Plugin->GetName().ToCString());
 
 	if (Plugins.Exists(Plugin))
 	{
 		zeError("Pluging already registered. Plugin Name : \"%s\".", 
-			(const char*)Plugin->GetName());
+			Plugin->GetName().ToCString());
 		return false;
 	}
 
 	const ZEArray<ZEExtensionDescription*>& Extensions = Plugin->GetExtensionDescriptions();
 
-	zeLog("Registering plugin's extensions. Plugin Name : \"%s\", Total Extensions : %d.", 
-		(const char*)Plugin->GetName(), Extensions.GetCount());
+	zeLog("Registering plugin's extensions. Plugin Name : \"%s\", Total Extensions : %Iu.", 
+		Plugin->GetName().ToCString(), Extensions.GetCount());
 	
-	for (int I = 0; I < Extensions.GetCount(); I++ )
+	for (size_t I = 0; I < Extensions.GetCount(); I++ )
 		ZEExtensionManager::GetInstance()->RegisterExtension(Extensions[I]);
 
 	zeLog("Plugin registered. Plugin Name : \"%s\".", (const char*)Plugin->GetName());
@@ -89,7 +89,7 @@ void ZEPluginManager::UnregisterPlugin(ZEPlugin* Plugin)
 {
 	Plugins.DeleteValue(Plugin);
 	const ZEArray<ZEExtensionDescription*>& Extensions = Plugin->GetExtensionDescriptions();
-	for (int I = 0; I < Extensions.GetCount(); I++ )
+	for (size_t I = 0; I < Extensions.GetCount(); I++ )
 		ZEExtensionManager::GetInstance()->UnregisterExtension(Extensions[I]);
 }
 
