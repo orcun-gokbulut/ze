@@ -38,7 +38,7 @@
 #include "ZELine.h"
 #include "ZELineSegment.h"
 #include "ZERay.h"
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &t)
 {	
@@ -48,7 +48,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &
 	float D = ZEVector3::DotProduct(Plane.n, Line.v);
 	float N = -ZEVector3::DotProduct(Plane.n, w);
 
-	if (fabs(D) < ZE_ZERO_THRESHOLD) 
+	if (ZEMath::Abs(D) < ZE_ZERO_THRESHOLD) 
 	{
 		return false;
     }
@@ -66,7 +66,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELineSegment& LineSe
 	float D = ZEVector3::DotProduct(Plane.n, LineSegment.v);
 	float N = -ZEVector3::DotProduct(Plane.n, w);
 
-	if (fabs(D) < ZE_ZERO_THRESHOLD) 
+	if (ZEMath::Abs(D) < ZE_ZERO_THRESHOLD) 
 		return false;
 
     t = N / D;
@@ -85,7 +85,7 @@ bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t)
 	float D = ZEVector3::DotProduct(Plane.n, Ray.v);
 	float N = -ZEVector3::DotProduct(Plane.n, w);
 
-	if (fabs(D) < ZE_ZERO_THRESHOLD) 
+	if (ZEMath::Abs(D) < ZE_ZERO_THRESHOLD) 
 		return false;
 
     t = N / D;
@@ -121,7 +121,7 @@ ZEHalfSpace ZEPlane::TestHalfSpace(const ZEPlane& Plane, const ZEVector3& Point)
 	
 	float D = Temp.x + Temp.y + Temp.z;
 
-	if (fabs(D) < ZE_ZERO_THRESHOLD)
+	if (ZEMath::Abs(D) < ZE_ZERO_THRESHOLD)
 		return ZE_HS_ON_PLANE;
 	else if (D > ZE_ZERO_THRESHOLD)
 		return ZE_HS_POSITIVE_SIDE;
@@ -136,7 +136,7 @@ float ZEPlane::DistanceSigned(const ZEPlane& Plane, const ZEVector3& Point)
 
 float ZEPlane::Distance(const ZEPlane& Plane, const ZEVector3& Point)
 {
-	return  fabs(ZEVector3::DotProduct(Point - Plane.p, Plane.n));
+	return  ZEMath::Abs(ZEVector3::DotProduct(Point - Plane.p, Plane.n));
 }
 
 inline void ZEPlane::Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p)

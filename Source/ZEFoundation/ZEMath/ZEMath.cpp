@@ -39,7 +39,7 @@
 
 float ZEMath::Sqrt(float Value)
 {
-	return sqrt(Value);
+	return sqrtf(Value);
 }
 
 ZEInt ZEMath::Abs(ZEInt Value)
@@ -66,6 +66,11 @@ ZEInt ZEMath::Sign(ZEInt Value)
 		return -1;
 	else
 		return 1;
+}
+
+float ZEMath::Mod(float Value, float Modulus)
+{
+	return fmodf(Value, Modulus);
 }
 
 float ZEMath::Sign(float Value)
@@ -98,7 +103,7 @@ ZEInt ZEMath::Min(ZEInt A, ZEInt B)
 	return (A < B ? A : B);
 }
 
-float ZEMath::Loge(float Value)
+float ZEMath::Log(float Value)
 {
 	return logf(Value);
 }
@@ -118,9 +123,30 @@ float ZEMath::Exp(float Exponent)
 	return expf(Exponent);
 }
 
+float ZEMath::Floor(float Value)
+{
+	return floorf(Value);
+}
+
+float ZEMath::Ceil(float Value)
+{
+	return ceilf(Value);
+}
+
+float ZEMath::Round(float Value)
+{
+	return (float)(int)(Value + 0.5f);
+}
+
+
 float ZEMath::Lerp(float A, float B, float Factor)
 {
 	return A + (B - A) * Factor;
+}
+
+float ZEMath::CopySign(float Value, float Sign)
+{
+	return _copysignf(Value, Sign);
 }
 
 float ZEMath::Clamp(float A, float MinValue, float MaxValue)

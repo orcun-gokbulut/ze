@@ -284,7 +284,7 @@ ZESteeringOutput ZEFaceSteering::Face(const ZEVector3& TargetDirection)
 		return Output;
 	}
 
-	return Align(atan2(TargetDirection.x, TargetDirection.z));
+	return Align(ZEAngle::ArcTan2(TargetDirection.x, TargetDirection.z));
 }
 
 ZESteeringOutput ZEFaceSteering::Process(float ElapsedTime)

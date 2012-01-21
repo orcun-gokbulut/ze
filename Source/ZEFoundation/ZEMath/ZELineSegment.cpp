@@ -39,7 +39,7 @@
 #include "ZEVector.h"
 #include "ZEPlane.h"
 
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 inline void ZELineSegment::Create(ZELineSegment& LineSegment, const ZEVector3& Start, const ZEVector3& End)
 {
@@ -128,8 +128,8 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZEL
         }
     }
 
-    TLineSegment  = (fabs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
-    TLine = (fabs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
+    TLineSegment  = (ZEMath::Abs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
+    TLine = (ZEMath::Abs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
 
 	ZEVector3 P1, P2;
 	ZEVector3::Scale(P1, LineSegment.v, TLineSegment);
@@ -210,8 +210,8 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegmentA, const ZE
         }
     }
 
-    TLineSegmentA = (fabs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
-    TLineSegmentB = (fabs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
+    TLineSegmentA = (ZEMath::Abs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
+    TLineSegmentB = (ZEMath::Abs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
 
 	ZEVector3 P1, P2;
 	ZEVector3::Scale(P1, LineSegmentA.v, TLineSegmentA);
@@ -278,8 +278,8 @@ float ZELineSegment::MinimumDistance(const ZELineSegment& LineSegment, const ZER
         }
     }
 
-    TLineSegment = (fabs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
-    TRay = (fabs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
+    TLineSegment = (ZEMath::Abs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
+    TRay = (ZEMath::Abs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
 
 	return ZEVector3::Length(ZEVector3(LineSegment.GetPointOn(TLineSegment), Ray.GetPointOn(TRay)));
 }

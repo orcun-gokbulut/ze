@@ -116,9 +116,9 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 			float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 			float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 			float TubeRadius = RAND_BETWEEN_TWO_FLOAT(0.0f, TorusSize.y);
-			Particle.Position.x = Position.x + (TorusSize.x + TubeRadius * cosf(Phi)) * cosf(Theta);
-			Particle.Position.y = Position.y + (TorusSize.x + TubeRadius * cosf(Phi)) * sinf(Theta);
-			Particle.Position.z = Position.z + TubeRadius * sinf(Phi);		
+			Particle.Position.x = Position.x + (TorusSize.x + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Cos(Theta);
+			Particle.Position.y = Position.y + (TorusSize.x + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Sin(Theta);
+			Particle.Position.z = Position.z + TubeRadius * ZEAngle::Sin(Phi);		
 			break;
 		}
 		case ZE_PET_SPHERE:		//Particles come from inside of a sphere.
@@ -126,9 +126,9 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 			float Radius = RAND_BETWEEN_TWO_FLOAT(0.0f, SphereRadius);
 			float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
 			float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, ZE_PI);
-			Particle.Position.x = Position.x + Radius * cosf(Theta) * sinf(Phi);
-			Particle.Position.y = Position.y + Radius * sinf(Theta) * sinf(Phi);
-			Particle.Position.z = Position.z + Radius * cosf(Phi);		
+			Particle.Position.x = Position.x + Radius * ZEAngle::Cos(Theta) * ZEAngle::Sin(Phi);
+			Particle.Position.y = Position.y + Radius * ZEAngle::Sin(Theta) * ZEAngle::Sin(Phi);
+			Particle.Position.z = Position.z + Radius * ZEAngle::Cos(Phi);		
 			break;
 		}
 	}

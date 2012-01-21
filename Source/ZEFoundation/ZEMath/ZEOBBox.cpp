@@ -44,7 +44,7 @@
 #include "ZEError.h"
 
 #include <float.h>
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 ZEVector3 ZEOBBox::GetVertex(ZEUInt Index) const
 {
@@ -80,9 +80,9 @@ void ZEOBBox::ConvertToSphere(ZEBSphere& Sphere, const ZEOBBox& Input)
 ZEHalfSpace ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZEPlane& Plane)
 {
 	float Extent = 
-		BoundingBox.HalfSize.x * fabs(ZEVector3::DotProduct(Plane.n, BoundingBox.Right)) +
-		BoundingBox.HalfSize.y * fabs(ZEVector3::DotProduct(Plane.n, BoundingBox.Up)) +
-		BoundingBox.HalfSize.z * fabs(ZEVector3::DotProduct(Plane.n, BoundingBox.Front));
+		BoundingBox.HalfSize.x * ZEMath::Abs(ZEVector3::DotProduct(Plane.n, BoundingBox.Right)) +
+		BoundingBox.HalfSize.y * ZEMath::Abs(ZEVector3::DotProduct(Plane.n, BoundingBox.Up)) +
+		BoundingBox.HalfSize.z * ZEMath::Abs(ZEVector3::DotProduct(Plane.n, BoundingBox.Front));
 	float Distance = ZEVector3::DotProduct(BoundingBox.Center - Plane.p, Plane.n);
 
 	if (Distance - Extent > 0)
@@ -134,7 +134,7 @@ static inline ZEInt SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNorm
 	float e = ZEVector3::DotProduct(PlaneNormal, Center - Line->p);
 	float f = ZEVector3::DotProduct(PlaneNormal, Line->v);
 
-	if (fabs(f) > ZE_ZERO_THRESHOLD)
+	if (ZEMath::Abs(f) > ZE_ZERO_THRESHOLD)
 	{
 		float t1 = (e + HalfSize) / f;
 		float t2 = (e - HalfSize) / f;
@@ -325,38 +325,38 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox1, const ZEAABBox& Boun
 
 static inline bool SperatingAxisTest(const ZEVector3& Axis, const ZEOBBox& A, const ZEOBBox& B)
 {
-	float dA = A.HalfSize.x *  fabs(ZEVector3::DotProduct(A.Right, Axis)) +
-		A.HalfSize.y *  fabs(ZEVector3::DotProduct(A.Up, Axis)) +
-		A.HalfSize.z *  fabs(ZEVector3::DotProduct(A.Front, Axis));
+	float dA = A.HalfSize.x *  ZEMath::Abs(ZEVector3::DotProduct(A.Right, Axis)) +
+		A.HalfSize.y *  ZEMath::Abs(ZEVector3::DotProduct(A.Up, Axis)) +
+		A.HalfSize.z *  ZEMath::Abs(ZEVector3::DotProduct(A.Front, Axis));
 
-	float dB = B.HalfSize.x *  fabs(ZEVector3::DotProduct(B.Right, Axis)) +
-		B.HalfSize.y *  fabs(ZEVector3::DotProduct(B.Up, Axis)) +
-		B.HalfSize.z *  fabs(ZEVector3::DotProduct(B.Front, Axis));
+	float dB = B.HalfSize.x *  ZEMath::Abs(ZEVector3::DotProduct(B.Right, Axis)) +
+		B.HalfSize.y *  ZEMath::Abs(ZEVector3::DotProduct(B.Up, Axis)) +
+		B.HalfSize.z *  ZEMath::Abs(ZEVector3::DotProduct(B.Front, Axis));
 
-	return fabs(ZEVector3::DotProduct(ZEVector3(A.Center, B.Center), Axis)) > (dA + dB); 
+	return ZEMath::Abs(ZEVector3::DotProduct(ZEVector3(A.Center, B.Center), Axis)) > (dA + dB); 
 }
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& A, const ZEOBBox& B)
 {
 	ZEVector3 BRelCenter;
-	BRelCenter.x = fabs(ZEVector3::DotProduct(A.Right, B.Center));
-	BRelCenter.y = fabs(ZEVector3::DotProduct(A.Up, B.Center));
-	BRelCenter.z = fabs(ZEVector3::DotProduct(A.Front, B.Center));
+	BRelCenter.x = ZEMath::Abs(ZEVector3::DotProduct(A.Right, B.Center));
+	BRelCenter.y = ZEMath::Abs(ZEVector3::DotProduct(A.Up, B.Center));
+	BRelCenter.z = ZEMath::Abs(ZEVector3::DotProduct(A.Front, B.Center));
 
 	ZEVector3 BRelRight;
-	BRelRight.x = fabs(ZEVector3::DotProduct(A.Right, B.Right));
-	BRelRight.y = fabs(ZEVector3::DotProduct(A.Up, B.Right));
-	BRelRight.z = fabs(ZEVector3::DotProduct(A.Front, B.Right));
+	BRelRight.x = ZEMath::Abs(ZEVector3::DotProduct(A.Right, B.Right));
+	BRelRight.y = ZEMath::Abs(ZEVector3::DotProduct(A.Up, B.Right));
+	BRelRight.z = ZEMath::Abs(ZEVector3::DotProduct(A.Front, B.Right));
 
 	ZEVector3 BRelUp;
-	BRelUp.x = fabs(ZEVector3::DotProduct(A.Right, B.Up));
-	BRelUp.y = fabs(ZEVector3::DotProduct(A.Up, B.Up));
-	BRelUp.z = fabs(ZEVector3::DotProduct(A.Front, B.Up));
+	BRelUp.x = ZEMath::Abs(ZEVector3::DotProduct(A.Right, B.Up));
+	BRelUp.y = ZEMath::Abs(ZEVector3::DotProduct(A.Up, B.Up));
+	BRelUp.z = ZEMath::Abs(ZEVector3::DotProduct(A.Front, B.Up));
 
 	ZEVector3 BRelFront;
-	BRelFront.x = fabs(ZEVector3::DotProduct(A.Right, B.Front));
-	BRelFront.y = fabs(ZEVector3::DotProduct(A.Up, B.Front));
-	BRelFront.z = fabs(ZEVector3::DotProduct(A.Front, B.Front));
+	BRelFront.x = ZEMath::Abs(ZEVector3::DotProduct(A.Right, B.Front));
+	BRelFront.y = ZEMath::Abs(ZEVector3::DotProduct(A.Up, B.Front));
+	BRelFront.z = ZEMath::Abs(ZEVector3::DotProduct(A.Front, B.Front));
 
 	ZEVector3 t(A.Center, BRelCenter);
 
@@ -366,21 +366,21 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& A, const ZEOBBox& B)
 		B.HalfSize.y * BRelUp.x +
 		B.HalfSize.z * BRelFront.x;
 
-	if (fabs(t.x) <= A.HalfSize.x + dB)
+	if (ZEMath::Abs(t.x) <= A.HalfSize.x + dB)
 		return false;
 
 	dB = B.HalfSize.x * BRelRight.y +
 		B.HalfSize.y * BRelUp.y +
 		B.HalfSize.z * BRelFront.y;
 
-	if (fabs(t.y) <= A.HalfSize.y + dB)
+	if (ZEMath::Abs(t.y) <= A.HalfSize.y + dB)
 		return false;
 
 	dB = B.HalfSize.x * BRelRight.z +
 		B.HalfSize.y * BRelUp.z +
 		B.HalfSize.z * BRelFront.z;
 
-	if (fabs(t.z) <= A.HalfSize.z + dB)
+	if (ZEMath::Abs(t.z) <= A.HalfSize.z + dB)
 		return false;
 
 	// B vs A
@@ -388,21 +388,21 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& A, const ZEOBBox& B)
 		B.HalfSize.y * BRelRight.y +
 		B.HalfSize.z * BRelRight.z;
 
-	if (fabs(ZEVector3::DotProduct(t, BRelRight)) <= B.HalfSize.x + dA)
+	if (ZEMath::Abs(ZEVector3::DotProduct(t, BRelRight)) <= B.HalfSize.x + dA)
 		return false;
 
 	dA = A.HalfSize.x *  BRelUp.x +
 		B.HalfSize.y *  BRelUp.y +
 		B.HalfSize.z *  BRelUp.z;
 
-	if (fabs(ZEVector3::DotProduct(t, BRelUp)) <= B.HalfSize.y + dA)
+	if (ZEMath::Abs(ZEVector3::DotProduct(t, BRelUp)) <= B.HalfSize.y + dA)
 		return false;
 
 	dA = A.HalfSize.x *  BRelFront.x +
 		B.HalfSize.y * BRelFront.y +
 		B.HalfSize.z * BRelFront.z;
 
-	if (fabs(ZEVector3::DotProduct(t, BRelFront)) <= B.HalfSize.z + dA)
+	if (ZEMath::Abs(ZEVector3::DotProduct(t, BRelFront)) <= B.HalfSize.z + dA)
 		return false;
 
 	if (!SperatingAxisTest(A.Right, A, B))

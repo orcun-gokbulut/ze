@@ -39,7 +39,7 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
 
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 bool ZETestInternalCheckClose(const ZEVector2& Actual, const ZEVector2& Expected, const ZEVector2& Threshold = ZEVector2(ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD))
 {	

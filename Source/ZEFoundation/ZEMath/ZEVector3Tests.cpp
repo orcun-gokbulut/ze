@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETest.h"
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMath.h"
@@ -291,7 +291,7 @@ ZETestSuite(ZEVector3)
 
 		float Length = ZEVector3::Length(Vector);
 
-		ZETestCheckEqual(Length, sqrt(14.0f));
+		ZETestCheckEqual(Length, ZEMath::Sqrt(14.0f));
 	}
 
 	ZETest("inline float ZEVector3::Length() const")
@@ -300,7 +300,7 @@ ZETestSuite(ZEVector3)
 
 		float Length = Vector.Length();
 
-		ZETestCheckEqual(Length, sqrt(14.0f));
+		ZETestCheckEqual(Length, ZEMath::Sqrt(14.0f));
 	}
 
 	ZETest("float ZEVector3::DistanceSquare(const ZEVector3& A, const ZEVector3& B)")
@@ -320,7 +320,7 @@ ZETestSuite(ZEVector3)
 
 		float Distance = ZEVector3::Distance(A, B);
 
-		ZETestCheckEqual(Distance, sqrt(27.0f));
+		ZETestCheckEqual(Distance, ZEMath::Sqrt(27.0f));
 	}
 
 	ZETest("void ZEVector3::Normalize(ZEVector3& Out, const ZEVector3& Vector)")
@@ -330,7 +330,7 @@ ZETestSuite(ZEVector3)
 
 		ZEVector3::Normalize(Result, Vector);
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f/sqrt(14.0f), 2.0f/sqrt(14.0f), 3.0f/sqrt(14.0f)));	
+		ZETestCheckEqual(Result, ZEVector3(1.0f/ZEMath::Sqrt(14.0f), 2.0f/ZEMath::Sqrt(14.0f), 3.0f/ZEMath::Sqrt(14.0f)));	
 	}
 
 	ZETest("ZEVector3 ZEVector3::Normalize() const")
@@ -340,7 +340,7 @@ ZETestSuite(ZEVector3)
 
 		Result = Vector.Normalize();
 
-		ZETestCheckEqual(Result, ZEVector3(1.0f/sqrt(14.0f), 2.0f/sqrt(14.0f), 3.0f/sqrt(14.0f)));	
+		ZETestCheckEqual(Result, ZEVector3(1.0f/ZEMath::Sqrt(14.0f), 2.0f/ZEMath::Sqrt(14.0f), 3.0f/ZEMath::Sqrt(14.0f)));	
 	}
 
 	ZETest("void ZEVector3::NormalizeSelf()")
@@ -349,7 +349,7 @@ ZETestSuite(ZEVector3)
 
 		Vector.NormalizeSelf();
 
-		ZETestCheckEqual(Vector, ZEVector3(1.0f/sqrt(14.0f), 2.0f/sqrt(14.0f), 3.0f/sqrt(14.0f)));	
+		ZETestCheckEqual(Vector, ZEVector3(1.0f/ZEMath::Sqrt(14.0f), 2.0f/ZEMath::Sqrt(14.0f), 3.0f/ZEMath::Sqrt(14.0f)));	
 	}
 
 	ZETest("void ZEVector3::Lerp(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B, float Factor)")

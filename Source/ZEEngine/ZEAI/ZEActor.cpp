@@ -192,7 +192,7 @@ void ZEActor::Tick(float ElapsedTime)
 		if (LinearAcceleration.LengthSquare() < MinLinearAcceleration * MinLinearAcceleration)
 			LinearAcceleration = ZEVector3::Zero;
 
-		if (fabs(AngularAcceleration) < MinAngularAcceleration)
+		if (ZEMath::Abs(AngularAcceleration) < MinAngularAcceleration)
 			AngularAcceleration = 0.0f;
 
 		if (!PriorityLinearSteeringDone && PriorityLinearAcceleration.LengthSquare() > GetMaxLinearAcceleration() * GetMaxLinearAcceleration() * 0.1f)

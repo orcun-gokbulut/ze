@@ -42,7 +42,7 @@
 #include "ZEMath.h"
 
 #include <float.h>
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 ZEVector3 ZEAABBox::GetCenter() const
 {
@@ -88,7 +88,7 @@ ZEHalfSpace ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZEPlan
 	ZEVector3 Center = (BoundingBox.Max + BoundingBox.Min) * 0.5f;
 	ZEVector3 HalfDiameter = (BoundingBox.Max - BoundingBox.Min) * 0.5f;
 
-	float Extent = HalfDiameter.x * fabs(Plane.n.x) + HalfDiameter.y * fabs(Plane.n.y) + HalfDiameter.z * fabs(Plane.n.z);
+	float Extent = HalfDiameter.x * ZEMath::Abs(Plane.n.x) + HalfDiameter.y * ZEMath::Abs(Plane.n.y) + HalfDiameter.z * ZEMath::Abs(Plane.n.z);
 
 	float Distance = ZEVector3::DotProduct(Center - Plane.p, Plane.n);
 
@@ -138,7 +138,7 @@ static inline ZEInt SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNorm
 	float e = ZEVector3::DotProduct(PlaneNormal, Center - Line->p);
 	float f = ZEVector3::DotProduct(PlaneNormal, Line->v);
 
-	if (fabs(f) > ZE_ZERO_THRESHOLD)
+	if (ZEMath::Abs(f) > ZE_ZERO_THRESHOLD)
 	{
 		float t1 = (e + HalfSize) / f;
 		float t2 = (e - HalfSize) / f;

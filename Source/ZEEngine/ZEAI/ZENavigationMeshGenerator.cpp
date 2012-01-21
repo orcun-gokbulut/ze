@@ -235,7 +235,7 @@ bool ZENavigationMeshGenerator::SlicePolygon(ZENavigationMeshPolygon& Output1, Z
 
 void ZENavigationMeshGenerator::RemoveUnwalkable(ZEArray<ZEPolygon>& Output, const ZEArray<ZEPolygon>& Input, const ZEVector3& Up, float MaxDegree)
 {
-	float CosMaxDegree = cosf(MaxDegree);
+	float CosMaxDegree = ZEAngle::Cos(MaxDegree);
 	ZESize Count = 0;
 	for (ZESize I = 0; I < Input.GetCount(); I++)
 		if (ZEVector3::DotProduct(Input[I].GetNormal(), Up) > CosMaxDegree)

@@ -38,7 +38,7 @@
 #define __ZE_TEST_CHECK_H__
 
 #include <stdio.h>
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 #define ZE_TEST_CLOSE_THRESHOLD 0.00001f
 
@@ -88,7 +88,7 @@
 
 static bool ZETestInternalCheckClose(const float& Actual, const float& Expected, const float& Threshold = ZE_TEST_CLOSE_THRESHOLD)
 {
-	return (fabs(Actual - Expected) <= Threshold);
+	return (ZEMath::Abs(Actual - Expected) <= Threshold);
 }
 
 #define ZETestCheckClose(Actual, Expected)\

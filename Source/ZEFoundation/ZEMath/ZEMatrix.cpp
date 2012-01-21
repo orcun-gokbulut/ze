@@ -38,7 +38,7 @@
 #include "ZEQuaternion.h"
 #include "ZEMath.h"
 #include <memory.h>
-#include <math.h>
+#include "ZEMath/ZEAngle.h"
 
 #define SWAP(x, y) temp = (x); (x) = (y); (y) = temp
 
@@ -136,8 +136,8 @@ void ZEMatrix3x3::CreateRotation(ZEMatrix3x3& Matrix, float Pitch, float Yawn, f
 
 void ZEMatrix3x3::CreateRotationX(ZEMatrix3x3& Matrix, float Pitch)
 {
-	float Cos = cosf(Pitch);
-	float Sin = sinf(Pitch);
+	float Cos = ZEAngle::Cos(Pitch);
+	float Sin = ZEAngle::Sin(Pitch);
 
 	Matrix.M11 = 1.0f;
 	Matrix.M12 = 0.0f;
@@ -154,8 +154,8 @@ void ZEMatrix3x3::CreateRotationX(ZEMatrix3x3& Matrix, float Pitch)
 
 void ZEMatrix3x3::CreateRotationY(ZEMatrix3x3& Matrix, float Yawn)
 {
-	float Cos = cosf(Yawn);
-	float Sin = sinf(Yawn);
+	float Cos = ZEAngle::Cos(Yawn);
+	float Sin = ZEAngle::Sin(Yawn);
 
 	Matrix.M11 = Cos;
 	Matrix.M12 = 0.0f;
@@ -172,8 +172,8 @@ void ZEMatrix3x3::CreateRotationY(ZEMatrix3x3& Matrix, float Yawn)
 
 void ZEMatrix3x3::CreateRotationZ(ZEMatrix3x3& Matrix, float Roll)
 {
-	float Cos = cosf(Roll);
-	float Sin = sinf(Roll);
+	float Cos = ZEAngle::Cos(Roll);
+	float Sin = ZEAngle::Sin(Roll);
 
 	Matrix.M11 = Cos;
 	Matrix.M12 = -Sin;
@@ -500,7 +500,7 @@ ZEMatrix3x3& ZEMatrix3x3::operator *= (float S)
 bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const 
 {
 	for (ZESize I = 0; I < 9; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
+		if (ZEMath::Abs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return false;
 
 	return true;
@@ -509,7 +509,7 @@ bool ZEMatrix3x3::operator == (const ZEMatrix3x3 &M) const
 bool ZEMatrix3x3::operator != (const ZEMatrix3x3 &M) const 
 {
 	for (ZESize I = 0; I < 9; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
+		if (ZEMath::Abs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return true;
 
 	return false;
@@ -656,8 +656,8 @@ void ZEMatrix4x4::CreateRotation(ZEMatrix4x4& Matrix, float Pitch, float Yawn, f
 
 void ZEMatrix4x4::CreateRotationX(ZEMatrix4x4& Matrix, float Pitch)
 {
-	float Cos = cosf(Pitch);
-	float Sin = sinf(Pitch);
+	float Cos = ZEAngle::Cos(Pitch);
+	float Sin = ZEAngle::Sin(Pitch);
 
 	Matrix.M11 = 1.0f;
 	Matrix.M12 = 0.0f;
@@ -682,8 +682,8 @@ void ZEMatrix4x4::CreateRotationX(ZEMatrix4x4& Matrix, float Pitch)
 
 void ZEMatrix4x4::CreateRotationY(ZEMatrix4x4& Matrix, float Yawn)
 {
-	float Cos = cosf(Yawn);
-	float Sin = sinf(Yawn);
+	float Cos = ZEAngle::Cos(Yawn);
+	float Sin = ZEAngle::Sin(Yawn);
 
 	Matrix.M11 = Cos;
 	Matrix.M12 = 0.0f;
@@ -708,8 +708,8 @@ void ZEMatrix4x4::CreateRotationY(ZEMatrix4x4& Matrix, float Yawn)
 
 void ZEMatrix4x4::CreateRotationZ(ZEMatrix4x4& Matrix, float Roll)
 {
-	float Cos = cosf(Roll);
-	float Sin = sinf(Roll);
+	float Cos = ZEAngle::Cos(Roll);
+	float Sin = ZEAngle::Sin(Roll);
 
 	Matrix.M11 = Cos;
 	Matrix.M12 = -Sin;
@@ -921,7 +921,7 @@ void ZEMatrix4x4::CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width,
 
 void ZEMatrix4x4::CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ)
 {
-	float Ys = 1.0f / tanf(FOV * 0.5f);
+	float Ys = 1.0f / ZEAngle::Tan(FOV * 0.5f);
 	float Xs = Ys / AspectRatio;
 
 	Create(Matrix, 
@@ -1338,7 +1338,7 @@ ZEMatrix4x4& ZEMatrix4x4::operator *= (float S)
 bool ZEMatrix4x4::operator == (const ZEMatrix4x4 &M) const 
 {
 	for (ZESize I = 0; I < 16; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
+		if (ZEMath::Abs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return false;
 
 	return true;
@@ -1347,7 +1347,7 @@ bool ZEMatrix4x4::operator == (const ZEMatrix4x4 &M) const
 bool ZEMatrix4x4::operator != (const ZEMatrix4x4 &M) const 
 {
 	for (ZESize I = 0; I < 16; I++)
-		if (fabs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
+		if (ZEMath::Abs(MA[I] - M.MA[I]) > ZE_ZERO_THRESHOLD)
 			return true;
 
 	return false;

@@ -43,7 +43,7 @@
 
 #include "ZETypes.h"
 
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 template <typename Type>
 class ZEAllocatorBase
@@ -197,7 +197,7 @@ class ZESmartAllocator : public ZEAllocatorBase<Type>
 			{
 				if ((NewSize > Size) || (NewSize < LowerLimit))
 				{
-					Size = (ZESize)(powf((float)Exponent, (logf((float)NewSize) / logf((float)Exponent)) + 1.0f) + 0.5f);
+					Size = (ZESize)(ZEMath::Power((float)Exponent, (ZEMath::Log((float)NewSize) / ZEMath::Log((float)Exponent)) + 1.0f) + 0.5f);
 					LowerLimit = Size / Exponent;
 					*Pointer = new Type[Size];
 					return true;

@@ -341,7 +341,7 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	ZEMatrix4x4 WorldTransform;
 	ZEMatrix4x4 WorldViewTransform;
 	ZEMatrix4x4 WorldViewProjTransform;
-	float TanFovRange = tanf(Light->GetFOV() * 0.5f) * Light->GetRange();
+	float TanFovRange = ZEAngle::Tan(Light->GetFOV() * 0.5f) * Light->GetRange();
 	ZEMatrix4x4::CreateOrientation(WorldTransform, Light->GetWorldPosition(), Light->GetWorldRotation(), ZEVector3(TanFovRange * Light->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, Light->GetRange()));
 	ZEMatrix4x4::Multiply(WorldViewTransform, Camera->GetViewTransform(), WorldTransform);
 	ZEMatrix4x4::Multiply(WorldViewProjTransform, Camera->GetViewProjectionTransform(), WorldTransform);
@@ -583,7 +583,7 @@ void ZED3D9FrameRenderer::DoLightningPass()
 
 	// ViewVector & PixelSize
 	ZEVector4 ViewVector;
-	ViewVector.y = tanf(Camera->GetFOV() * 0.5f);
+	ViewVector.y = ZEAngle::Tan(Camera->GetFOV() * 0.5f);
 	ViewVector.x = ViewVector.y * ViewPort->GetAspectRatio();
 	ViewVector.z = 1.0f;
 	ViewVector.w = 0.0f;

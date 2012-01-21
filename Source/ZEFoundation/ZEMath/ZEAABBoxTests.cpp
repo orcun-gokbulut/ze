@@ -44,7 +44,7 @@
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEOBBox.h"
 #include "ZEMath/ZEAngle.h"
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 #include "ZEQuaternion.h"
 
 bool ZETestInternalCheckClose(const ZEVector3& Actual, const ZEVector3& Expected, const ZEVector3& Threshold = ZEVector3(ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD, ZE_TEST_CLOSE_THRESHOLD));

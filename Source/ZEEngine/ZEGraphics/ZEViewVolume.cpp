@@ -38,6 +38,7 @@
 #include "ZEError.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZELight.h"
+#include "ZEMath/ZEAngle.h"
 
 /*bool ZEViewFrustum::ConeCullTest(const ZEBSphere& BoundingSphere) const
 {
@@ -177,9 +178,9 @@ ZEArray<ZELineSegment> ZEViewFrustum::GetFrustumLineSegments()
 
 void ZEViewFrustum::Create(const ZEVector3& Position, const ZEQuaternion& Rotation, float FOV, float AspectRatio, float NearZ, float FarZ)
 {
-	float SinFov = sinf(FOV/2);
+	float SinFov = ZEAngle::Sin(FOV/2);
 	float SinFovAT = SinFov * AspectRatio;
-	float CosFov = cosf(FOV/2);
+	float CosFov = ZEAngle::Cos(FOV/2);
 
 	Look = Rotation * ZEVector3::UnitZ;
 	Up = Rotation * ZEVector3::UnitY;
@@ -214,13 +215,13 @@ void ZEViewFrustum::Create(const ZEVector3& Position, const ZEQuaternion& Rotati
 	this->Position = Position;
 	ZEQuaternion::VectorProduct(CenterVector, Rotation, ZEVector3(0.0f, 0.0f, 1.0f));
 
-	float tanfov = tanf(FOV / 2.0f);
+	float tanfov = ZEAngle::Tan(FOV / 2.0f);
 	float tHeight = tanfov * NearZ * 2.0f;
 	float tWidth = AspectRatio * tHeight;
 
-	float radius = sqrt(tWidth * tWidth + tHeight * tHeight) / 2.0f;
+	float radius = ZEMath::Sqrt(tWidth * tWidth + tHeight * tHeight) / 2.0f;
 	TanRatio = radius / NearZ;
-	SinRatio = radius / sqrt(radius * radius + NearZ * NearZ);
+	SinRatio = radius / ZEMath::Sqrt(radius * radius + NearZ * NearZ);
 }
 
 // ZEViewSphere

@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 #include "ZETest.h"
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZEVector.h"
@@ -74,7 +74,7 @@ ZETestSuite(ZETriangle)
 		ZETestCase("Calculating the area of an equilateral ZETriangle")
 		{
 			ZETriangle Triangle(ZEVector3(0.0f, 0.0f, 1.15470052f), ZEVector3(1.0f, 0.0f, -0.57735026f), ZEVector3(-1.0f, 0.0f, -0.57735026f));
-			float ExpectedResult = ((2.0f * 2.0f) * sqrt(3.0f)) / 4.0f;
+			float ExpectedResult = ((2.0f * 2.0f) * ZEMath::Sqrt(3.0f)) / 4.0f;
 			float Result = 0.0f;
 
 			Result = ZETriangle::GetArea(Triangle);
@@ -104,7 +104,7 @@ ZETestSuite(ZETriangle)
 
 			float Semiperimeter = (LengthA + LengthB + LengthC) / 2.0f;
 
-			ExpectedResult = sqrtf(float(Semiperimeter * ((Semiperimeter - LengthA) * (Semiperimeter - LengthB) * (Semiperimeter - LengthC))));
+			ExpectedResult = ZEMath::Sqrt(float(Semiperimeter * ((Semiperimeter - LengthA) * (Semiperimeter - LengthB) * (Semiperimeter - LengthC))));
 
 			float Result = 0.0f;
 

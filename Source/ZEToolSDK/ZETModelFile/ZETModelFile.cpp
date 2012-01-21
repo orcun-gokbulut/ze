@@ -1024,7 +1024,7 @@ bool ZEModelFile::Validate()
 						Validated = false;						
 					}
 
-					if (fabsf(Vertex.BoneWeights[0] + Vertex.BoneWeights[1] + Vertex.BoneWeights[2] + Vertex.BoneWeights[3] - 1.0f ) > 0.001)
+					if (ZEMath::Abs(Vertex.BoneWeights[0] + Vertex.BoneWeights[1] + Vertex.BoneWeights[2] + Vertex.BoneWeights[3] - 1.0f ) > 0.001)
 						zesdkWarning("Model File Validation", "Mesh %d LOD %d Vertex %d sum of bone weights is not one.", I, N, M);					
 			}
 		}
