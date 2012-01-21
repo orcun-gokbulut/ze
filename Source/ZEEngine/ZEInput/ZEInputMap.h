@@ -37,8 +37,8 @@
 #ifndef	__ZE_INPUT_MAP_H__
 #define __ZE_INPUT_MAP_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-
 #include "ZEInputAction.h"
 #include "ZEInputMapBinding.h"
 

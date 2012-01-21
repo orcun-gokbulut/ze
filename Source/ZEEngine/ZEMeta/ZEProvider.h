@@ -54,12 +54,12 @@ static class Provider##Class##Registration\
 class ZEProvider
 {
 	private:
-		ZEObjectDescription*				BaseClass;
+		ZEObjectDescription*			BaseClass;
 		ZEArray<ZEObjectDescription*>	Classes;
 
 	protected:
 		void							SetBaseClass(ZEObjectDescription* ClassType);
-		ZEObjectDescription*				GetBaseClass();
+		ZEObjectDescription*			GetBaseClass();
 
 										ZEProvider();
 										~ZEProvider();

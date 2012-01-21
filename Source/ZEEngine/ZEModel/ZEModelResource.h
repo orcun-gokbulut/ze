@@ -37,6 +37,7 @@
 #ifndef	__ZE_MODEL_RESOURCE_H__
 #define __ZE_MODEL_RESOURCE_H__
 
+#include "ZETypes.h"
 #include "ZECore/ZEResource.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
@@ -82,7 +83,7 @@ enum ZEModelResourcePhysicalBodyType
 
 struct ZEModelResourcePhysicalPolygon
 {
-	ZEInt											VertexIndexes[3];
+	ZEInt										VertexIndexes[3];
 };
 
 struct ZEModelResourcePhysicalShape
@@ -147,8 +148,8 @@ struct ZEModelResourcePhysicalJoint
 
 	bool										Enabled;
 
-	ZEUInt32										Body1Id;
-	ZEUInt32										Body2Id;
+	ZEUInt32									Body1Id;
+	ZEUInt32									Body2Id;
 
 	bool										CollideBodies;
 
@@ -236,7 +237,7 @@ struct ZEModelResourcePhysicalJoint
 
 struct ZEModelResourceAnimationKey
 {
-	ZEUInt32										ItemId;
+	ZEUInt32									ItemId;
 	ZEVector3									Position;
 	ZEQuaternion								Rotation;
 	ZEVector3									Scale;

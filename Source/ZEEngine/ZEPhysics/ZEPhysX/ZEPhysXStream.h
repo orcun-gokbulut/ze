@@ -41,6 +41,8 @@
 #include <NxStream.h>
 #include <Nxf.h>
 
+#include "ZETypes.h"
+
 class ZEPhysXFileStream : public NxStream
 {
 	private:

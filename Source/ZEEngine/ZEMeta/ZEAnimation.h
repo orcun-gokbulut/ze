@@ -37,7 +37,8 @@
 #ifndef __ZE_ANIMATION_H__
 #define __ZE_ANIMATION_H__
 
-#include "ZEDefinitions.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
 
@@ -57,7 +58,7 @@ struct ZEPropertyAnimationKey
 
 struct ZEPropertyAnimation
 {
-	ZEInt									PropertyId;
+	ZEInt								PropertyId;
 	ZEVariantType						ValueType;
 	bool								Interpolate;
 	ZEArray<ZEPropertyAnimationKey>		Keys;
@@ -66,16 +67,14 @@ struct ZEPropertyAnimation
 class ZEAnimation
 {
 	public:
-		char							Name[ZE_MAX_NAME_SIZE];
-		ZEInt								FrameCount;
+		ZEString						Name;
+		ZEInt							FrameCount;
 		float							FramePerSecond;
 		ZEArray<ZEPropertyAnimation>	PropertyAnimations;
 
 		static bool						ReadFromFile(ZEUnserializer* Unserializer, ZEAnimation* Animation);
 		static bool						WriteToFile(ZESerializer* Serializer, ZEAnimation* Animation);
 };
-
-
 
 class ZEObject;
 class ZEAnimationController

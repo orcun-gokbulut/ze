@@ -37,6 +37,7 @@
 #ifndef	__ZE_INPUT_DEVICE_H__
 #define __ZE_INPUT_DEVICE_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEInputEvent.h"
 #include "ZEInputAction.h"
@@ -55,12 +56,12 @@ class ZEInputDevice
 	public:
 		virtual const ZEString&			GetDeviceName() = 0;
 
-		virtual ZEUInt32					GetButtonCount();
-		virtual ZEUInt32					GetAxisCount();
-		virtual ZEUInt32					GetVector2Count();
-		virtual ZEUInt32					GetVector3Count();
-		virtual ZEUInt32					GetVector4Count();
-		virtual ZEUInt32					GetQuaternionCount();
+		virtual ZEUInt32				GetButtonCount();
+		virtual ZEUInt32				GetAxisCount();
+		virtual ZEUInt32				GetVector2Count();
+		virtual ZEUInt32				GetVector3Count();
+		virtual ZEUInt32				GetVector4Count();
+		virtual ZEUInt32				GetQuaternionCount();
 
 		virtual void					SetEnabled(bool Enabled);
 		virtual bool					GetEnabled();

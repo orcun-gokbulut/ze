@@ -44,8 +44,6 @@
 
 class ZEFileCacheManager
 {
-	private:
-		//ZEArray<
 	public:
 		virtual void*						AddToCache();
 		virtual void*						GetFromCache();

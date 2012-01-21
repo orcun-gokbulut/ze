@@ -38,7 +38,7 @@
 #include "ZEPresentationSlide.h"
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEGraphics/ZERenderCommand.h"

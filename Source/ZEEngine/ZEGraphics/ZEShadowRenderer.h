@@ -38,6 +38,7 @@
 #define __ZE_SHADOW_RENDERER_H__
 
 #include "ZERenderer.h"
+#include "ZETypes.h"
 
 class ZETexture2D;
 class ZETextureCube;

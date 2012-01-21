@@ -37,6 +37,7 @@
 #ifndef	__ZE_D3D9_SHADER_MANAGER_H__
 #define __ZE_D3D9_SHADER_MANAGER_H__
 
+#include "ZETypes.h"
 #include "ZED3D9Shader.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEFile/ZEFileCache.h"
@@ -47,9 +48,9 @@ class ZED3D9ShaderManager
 	friend ZED3D9Module;
 	private:
 		ZESmartArray<ZED3D9Shader*>		Shaders;
-		//ZEFileCache						ShaderFileCache;
+		//ZEFileCache					ShaderFileCache;
 
-		ZEUInt32							CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components);
+		ZEUInt32						CalculateHash(const char* FileName, const char* FunctionName, ZEUInt32 Components);
 		void							ReleaseShader(ZED3D9Shader* Shader);
 		bool							ReadFromFileCache(const char* Filename, const char* FunctionName, ZEUInt32 Components);
 		void							WriteToFileCache(const char* Filenamne, const char* FunctionName, ZEUInt32 Components);

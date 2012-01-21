@@ -42,14 +42,14 @@
 
 struct ZEFontFileCharacter
 {
-	ZEUInt32						TextureId;
+	ZEUInt32					TextureId;
 	ZERectangle					Coordinates;
 };
 
 struct ZEFontFileHeader
 {
-	ZEUInt32						Header;
-	ZEUInt32						TextureCount;
+	ZEUInt32					Header;
+	ZEUInt32					TextureCount;
 	ZEFontFileCharacter			Characters[ZE_FONT_FILE_CHARACTER_COUNT];
 };
 

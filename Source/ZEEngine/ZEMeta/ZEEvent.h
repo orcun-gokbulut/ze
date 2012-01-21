@@ -37,6 +37,8 @@
 #ifndef __ZE_META_EVENT_H__
 #define __ZE_META_EVENT_H__
 
+#include "ZETypes.h"
+
 struct ZEMethodParameter
 {
 	const char*					Name;
@@ -51,7 +53,7 @@ struct ZEMethodDescription
 	bool						Visibility;
 
 	const ZEMethodParameter*	Parameters;
-	ZEUInt				ParameterCount;
+	ZEUInt						ParameterCount;
 	ZEVariantType				ReturnType;
 };
 

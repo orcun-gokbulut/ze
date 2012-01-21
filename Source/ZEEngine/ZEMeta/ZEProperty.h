@@ -37,6 +37,7 @@
 #ifndef __ZE_PROPERTY_H__
 #define __ZE_PROPERTY_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEDefinitions.h"
 
@@ -59,7 +60,7 @@ typedef ZEUInt ZEPropertyAccess;
 struct ZEPropertyEnumuratorItem
 {
 	const char*						Name;
-	ZEInt								Value;
+	ZEInt							Value;
 };
 
 struct ZEPropertyEnumurator
@@ -91,7 +92,7 @@ struct ZERunTimeProperty
 	const char*						Name;
 	ZEVariantType					Type;
 	ZEVariant						Value;
-	ZEUInt					Hash;
+	ZEUInt							Hash;
 	ZEPropertySemantic				Semantic;
 };
 

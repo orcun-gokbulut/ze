@@ -37,6 +37,8 @@
 #ifndef	__ZE_VERSION_H__
 #define __ZE_VERSION_H__
 
+#include "ZETypes.h"
+
 enum ZEVersionPlatform
 {
 	ZE_VP_WIN32

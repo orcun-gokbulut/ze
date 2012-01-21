@@ -37,6 +37,7 @@
 #ifndef __ZE_POLYGON_H__
 #define __ZE_POLYGON_H__
 
+#include "ZETypes.h"
 #include "ZEVertexTypes.h"
 
 struct ZEIndexedPolygon

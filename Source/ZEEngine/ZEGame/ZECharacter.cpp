@@ -39,7 +39,7 @@
 #include "ZEModel/ZEModel.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEInput/ZEInputModule.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEGraphics/ZETexture2DResource.h"

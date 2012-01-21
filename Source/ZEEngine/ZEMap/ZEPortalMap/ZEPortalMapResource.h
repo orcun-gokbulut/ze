@@ -37,6 +37,7 @@
 #ifndef __ZE_PORTAL_MAP_RESOURCE_H__
 #define __ZE_PORTAL_MAP_RESOURCE_H__
 
+#include "ZETypes.h"
 #include "../ZEMapResource.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
@@ -53,9 +54,9 @@ struct ZEPortalMapResourceDoor;
 
 struct ZEPortalMapPolygon
 {
-	ZEMapVertex		Vertices[3];
-	ZEMaterial*		Material;
-	ZEUInt	LastIteration;
+	ZEMapVertex			Vertices[3];
+	ZEMaterial*			Material;
+	ZEUInt				LastIteration;
 };
 
 struct ZEPortalMapPhysicalMeshPolygon

@@ -37,6 +37,8 @@
 #ifndef ZE_D3D9_PROFILER_H__
 #define ZE_D3D9_PROFILER_H__
 
+#include "ZETypes.h"
+
 //#ifdef ZE_DEBUG_D3D9_PROFILE 
 	#define zeProfilerStart(EventName) zeD3D9ProfileStart(EventName, __FILE__, __LINE__)
 	#define zeProfilerEnd() zeD3D9ProfileEnd()

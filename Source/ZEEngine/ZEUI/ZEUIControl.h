@@ -37,6 +37,7 @@
 #ifndef __ZE_UI_COMPONENT__
 #define __ZE_UI_COMPONENT__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
@@ -92,23 +93,23 @@ class ZEUIControl
 		bool							IsFocused;
 		bool							IsPressed;       
 		
-		ZEInt								ZOrder;
+		ZEInt							ZOrder;
 
 		ZEVector2						MaximumSize;
 		ZEVector2						MinimumSize;
 
-		ZEUIEventMouseClicked			MouseClickedEvent;			//Done
+		ZEUIEventMouseClicked			MouseClickedEvent;		
 		ZEUIEventMouseDoubleClicked		MouseDoubleClickedEvent;
-		ZEUIEventMouseButtonPressed		MouseButtonPressedEvent;	//Done
-		ZEUIEventMouseButtonReleased	MouseButtonReleasedEvent;	//Done
-		ZEUIEventMouseHovered			MouseHoveredEvent;			//Done
-		ZEUIEventMouseEntered			MouseEnteredEvent;			//Done
-		ZEUIEventMouseLeft				MouseLeftEvent;				//Done
-		ZEUIEventMouseMoved				MouseMovedEvent;			//Done
-		ZEUIEventKeyPressed				KeyPressedEvent;			//Done
-		ZEUIEventKeyReleased			KeyReleasedEvent;			//Done
-		ZEUIEventFocusGained			FocusGainedEvent;			//Done
-		ZEUIEventFocusLost				FocusLostEvent;				//Done
+		ZEUIEventMouseButtonPressed		MouseButtonPressedEvent;
+		ZEUIEventMouseButtonReleased	MouseButtonReleasedEvent;
+		ZEUIEventMouseHovered			MouseHoveredEvent;
+		ZEUIEventMouseEntered			MouseEnteredEvent;
+		ZEUIEventMouseLeft				MouseLeftEvent;
+		ZEUIEventMouseMoved				MouseMovedEvent;
+		ZEUIEventKeyPressed				KeyPressedEvent;
+		ZEUIEventKeyReleased			KeyReleasedEvent;
+		ZEUIEventFocusGained			FocusGainedEvent;
+		ZEUIEventFocusLost				FocusLostEvent;
 
 	protected:
 
@@ -172,7 +173,7 @@ class ZEUIControl
 		bool							GetPressed() const;
 
 		void							SetZOrder(ZEInt Z);
-		ZEInt								GetZOrder() const;
+		ZEInt							GetZOrder() const;
 
 		void							SetMinimumSize(ZEVector2 MinimumSize);
 		ZEVector2						GetMinimumSize() const;

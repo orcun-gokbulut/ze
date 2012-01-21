@@ -37,8 +37,8 @@
 #ifndef __ZE_UI_WINDOW_CONTROL__
 #define __ZE_UI_WINDOW_CONTROL__
 
-#include "zeui/ZEUIControl.h"
-#include "zeui/ZEUIRectangle.h"
+#include "ZEUI/ZEUIControl.h"
+#include "ZEUI/ZEUIRectangle.h"
 #include "ZEUIFrameControl.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 #include "ZEUITextControl.h"

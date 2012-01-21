@@ -35,6 +35,8 @@
 
 #ifndef __ZET_OUTPUT_H__
 #define __ZET_OUTPUT_H__
+
+#include "ZETypes.h"
 #include "ZETCompileOptions.h"
 
 enum ZESDKOutputLevel

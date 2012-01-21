@@ -37,6 +37,8 @@
 #ifndef __ZE_TERRAIN_VERTEX_BUFFER_H__
 #define __ZE_TERRAIN_VERTEX_BUFFER_H__
 
+#include "ZETypes.h"
+
 class ZEStaticVertexBuffer;
 
 struct ZETerrainPrimitiveIndices

@@ -64,8 +64,8 @@ class ZEModelBone
 
 		ZEMatrix4x4							VertexTransform;
 
-		ZEAABBox						ModelBoundingBox;
-		ZEAABBox						WorldBoundingBox;
+		ZEAABBox							ModelBoundingBox;
+		ZEAABBox							WorldBoundingBox;
 
 		ZEPhysicalRigidBody*				PhysicalBody;
 		ZEPhysicalJoint*					PhysicalJoint;
@@ -83,9 +83,9 @@ class ZEModelBone
 
 		bool								IsRootBone();
 
-		const ZEAABBox&				GetLocalBoundingBox();
-		const ZEAABBox&				GetModelBoundingBox();
-		const ZEAABBox&				GetWorldBoundingBox();
+		const ZEAABBox&						GetLocalBoundingBox();
+		const ZEAABBox&						GetModelBoundingBox();
+		const ZEAABBox&						GetWorldBoundingBox();
 
 		const ZEMatrix4x4&					GetLocalTransform();
 		const ZEMatrix4x4&					GetWorldTransform();		

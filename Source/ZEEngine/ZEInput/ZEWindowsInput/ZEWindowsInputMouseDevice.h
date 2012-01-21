@@ -37,6 +37,7 @@
 #ifndef	__ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
 #define __ZE_WINDOWS_MOUSE_INPUT_DEVICE_H__
 
+#include "ZETypes.h"
 #include "ZEInput/ZEInputDevice.h"
 
 #define WINDOWS_LEAN_AND_MEAN
@@ -54,8 +55,8 @@ class ZEWindowsInputMouseDevice : public ZEInputDevice
 		HANDLE							DeviceHandle;
 		RID_DEVICE_INFO					DeviceInfo;
 
-		ZEInt								AxisState[3];
-		ZEInt								AxisStateOld[3];
+		ZEInt							AxisState[3];
+		ZEInt							AxisStateOld[3];
 		bool							ButtonState[5];
 		bool							ButtonStateOld[5];
 

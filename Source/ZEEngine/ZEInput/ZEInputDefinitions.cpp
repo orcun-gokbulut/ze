@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETypes.h"
 #include "ZEInputDefinitions.h"
 #include <string.h>
 
 #define ZE_MAX_KEYIDNAME			0x100
-
 
 const char* KeyNames[ZE_MAX_KEYIDNAME][2] =
 {

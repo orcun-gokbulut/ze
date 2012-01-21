@@ -54,7 +54,7 @@
 #include "ZESound/ZESoundSource.h"
 #include "ZESound/ZESoundResource.h"
 #include "ZEModel/ZEModel.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
 
 #define ZE_ACTIONID_CAMERA_TURN_LEFT		100
 #define ZE_ACTIONID_CAMERA_TURN_RIGHT		101

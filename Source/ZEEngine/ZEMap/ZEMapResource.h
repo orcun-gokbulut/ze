@@ -43,9 +43,9 @@
 class ZEMapResource : public ZEResource
 {
 	public:
-		static ZEMapResource*			LoadResource(const char* FileName);
-		static const ZEMapResource*		LoadSharedResource(const char* FileName);
-		static void						CacheResource(const char* FileName);
+		static ZEMapResource*			LoadResource(const ZEString& FileName);
+		static const ZEMapResource*		LoadSharedResource(const ZEString& FileName);
+		static void						CacheResource(const ZEString& FileName);
 };
 
 #endif

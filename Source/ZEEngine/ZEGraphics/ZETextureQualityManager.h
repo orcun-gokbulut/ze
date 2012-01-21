@@ -46,15 +46,10 @@ class ZETextureQualityManager
 						ZETextureQualityManager();
 		virtual			~ZETextureQualityManager();
 
-	private:
-		// Empty
-
 	public:
 		static bool		Process(ZETextureData* TextureData, ZETextureOptions* FinalOptions);
 		static bool		GetFinalTextureOptions(ZETextureOptions* FinalOptions, ZEFile* ResourceFile, const ZETextureOptions* UserOptions);
 
 };
 
-
-
-#endif // __ZE_TEXTURE_QUALITY_MANAGER_H__
+#endif 

@@ -37,6 +37,7 @@
 #ifndef	__ZE_WINDOWS_KEYBOARD_INPUT_DEVICE_H__
 #define __ZE_WINDOWS_KEYBOARD_INPUT_DEVICE_H__
 
+#include "ZETypes.h"
 #include "ZEInput/ZEInputDevice.h"
 
 #define WINDOWS_LEAN_AND_MEAN
@@ -64,8 +65,7 @@ class ZEWindowsInputKeyboardDevice : public ZEInputDevice
 
 	public:
 		virtual const ZEString&				GetDeviceName();
-
-		virtual ZEUInt32						GetButtonCount();
+				virtual ZEUInt32						GetButtonCount();
 
 		virtual void						UnAcquire();
 

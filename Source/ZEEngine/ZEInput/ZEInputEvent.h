@@ -37,10 +37,10 @@
 #ifndef	__ZE_INPUT_EVENT_H__
 #define __ZE_INPUT_EVENT_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZETypes.h"
 
 enum ZEInputButtonState
 {

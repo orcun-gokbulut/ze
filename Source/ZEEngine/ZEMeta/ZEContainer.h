@@ -71,7 +71,7 @@ class ZEContainer
 {
 	private:
 		ZEContainerMode				Mode;
-		ZEObjectDescription*			Type;
+		ZEObjectDescription*		Type;
 		bool						AllowDerivedTypes;
 
 		ZEArray<ZEObject*>			Instances;
@@ -81,7 +81,7 @@ class ZEContainer
 		ZEContainerMode				GetContainerMode();
 
 		void						SetBaseClass(ZEObjectDescription* Type);
-		ZEObjectDescription*			GetBaseClass();
+		ZEObjectDescription*		GetBaseClass();
 
 		void						SetAllowDerivedClasses(bool Allow);
 		bool						GetAllowDerivedClasses();

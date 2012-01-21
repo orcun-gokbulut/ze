@@ -57,7 +57,7 @@
 #include "ZEGraphics/ZEProjectiveLight.h"
 #include "ZEGraphics/ZEOmniProjectiveLight.h"
 #include "ZEGraphics/ZECamera.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
 
 #pragma warning(disable:4267)
 

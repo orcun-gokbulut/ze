@@ -68,10 +68,10 @@
 
 struct ZEMapFileMaterialChunk
 {
-	ZEUInt32							ChunkIdentifier;
+	ZEUInt32						ChunkIdentifier;
 
 	char							Shader[ZE_MAP_MAX_FILENAME_SIZE];
-	ZEUInt32							ShaderComponents;
+	ZEUInt32						ShaderComponents;
 
 	bool							TwoSided;
 	bool							LightningEnabled;

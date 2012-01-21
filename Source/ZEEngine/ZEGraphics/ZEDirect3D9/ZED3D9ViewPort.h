@@ -37,6 +37,7 @@
 #ifndef __ZE_D3D9_RENDER_VIEW_PORT_H__
 #define __ZE_D3D9_RENDER_VIEW_PORT_H__
 
+#include "ZETypes.h"
 #include "ZEGraphics/ZEViewPort.h"
 
 #include <d3d9.h>
@@ -48,9 +49,8 @@ class ZED3D9ViewPort : public ZEViewPort
 		LPDIRECT3DSURFACE9		ZBuffer;
 
 		virtual float			GetAspectRatio();
-		virtual ZEUInt	GetWidth();
-		virtual ZEUInt	GetHeight();
-
+		virtual ZEUInt			GetWidth();
+		virtual ZEUInt			GetHeight();
 
 								ZED3D9ViewPort();
 		virtual					~ZED3D9ViewPort();

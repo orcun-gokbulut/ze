@@ -37,6 +37,7 @@
 #ifndef	__ZE_ACTION_H__
 #define __ZE_ACTION_H__
 
+#include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 
@@ -46,13 +47,13 @@ class ZEInputBinding;
 class ZEInputAction
 {
 	public:
-		ZEInt							Id;
+		ZEInt						Id;
 		ZEInputBinding*				From;
 
 		union
 		{
 			ZEInputButtonState		ButtonState;
-			ZEInt						AxisValue;
+			ZEInt					AxisValue;
 		};
 
 		ZEVector3					Vector;

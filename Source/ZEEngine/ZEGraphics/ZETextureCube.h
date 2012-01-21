@@ -37,6 +37,7 @@
 #ifndef __ZE_TEXTURE_CUBE_H__
 #define __ZE_TEXTURE_CUBE_H__
 
+#include "ZETypes.h"
 #include "ZETexture.h"
 
 class ZEViewPort;
@@ -54,26 +55,26 @@ enum ZETextureCubeFace
 class ZETextureCube : public ZETexture
 {
 	protected:
-		ZEUInt					EdgeLength;
-		ZETexturePixelFormat			PixelFormat;
-		bool							RenderTarget;
+		ZEUInt						EdgeLength;
+		ZETexturePixelFormat		PixelFormat;
+		bool						RenderTarget;
 
-										ZETextureCube();
-		virtual							~ZETextureCube();
+									ZETextureCube();
+		virtual						~ZETextureCube();
 
 	public:
-		virtual ZETextureType			GetTextureType() const;
-		ZEUInt					GetEdgeLenght() const;
-		ZETexturePixelFormat			GetPixelFormat() const;
-		bool							IsRenderTarget() const;
+		virtual ZETextureType		GetTextureType() const;
+		ZEUInt						GetEdgeLenght() const;
+		ZETexturePixelFormat		GetPixelFormat() const;
+		bool						IsRenderTarget() const;
 
-		virtual ZEViewPort*				GetViewPort(ZETextureCubeFace Face) = 0;
+		virtual ZEViewPort*			GetViewPort(ZETextureCubeFace Face) = 0;
 
-		virtual	bool					Create(ZEUInt EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual bool					Lock(ZETextureCubeFace Face, void** Buffer, ZESize* Pitch) = 0;
-		virtual void					Unlock(ZETextureCubeFace Face) = 0;
+		virtual	bool				Create(ZEUInt EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
+		virtual bool				Lock(ZETextureCubeFace Face, void** Buffer, ZESize* Pitch) = 0;
+		virtual void				Unlock(ZETextureCubeFace Face) = 0;
 
-		static ZETextureCube*			CreateInstance();
+		static ZETextureCube*		CreateInstance();
 };
 #endif
 

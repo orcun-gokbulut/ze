@@ -55,35 +55,34 @@ class ZEUICheckBoxControl : public ZEUIControl
 	friend class ZEUIManager;
 
 	private:
+		ZEUICheckBoxState		State;
 
-		ZEUICheckBoxState	State;
+		bool					IsTriState;
 
-		bool				IsTriState;
-
-		ZEUIButtonControl	Box;
-		ZEUITextControl		Label;
+		ZEUIButtonControl		Box;
+		ZEUITextControl			Label;
 
 	protected:
 
-		virtual void 		MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		virtual void 			MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
 
 	public:
 
-		void				SetTriState(bool Tristate);
-		bool				GetTristate() const;
+		void					SetTriState(bool Tristate);
+		bool					GetTristate() const;
 
-		void				SetState(ZEUICheckBoxState State);
-		ZEUICheckBoxState	GetState() const;	
+		void					SetState(ZEUICheckBoxState State);
+		ZEUICheckBoxState		GetState() const;	
 
-		void				SetText(ZEString Text);
-		ZEString			GetText();
+		void					SetText(ZEString Text);
+		ZEString				GetText();
 
-		virtual ZEMaterial*	GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
+		virtual ZEMaterial*		GetMaterial() const;
+		virtual void			SetMaterial(ZEMaterial* Material);
 
 
-							ZEUICheckBoxControl();
-							~ZEUICheckBoxControl();
+								ZEUICheckBoxControl();
+								~ZEUICheckBoxControl();
 
 };
 

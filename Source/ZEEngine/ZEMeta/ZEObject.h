@@ -37,6 +37,7 @@
 #ifndef __ZE_OBJECT_H__
 #define __ZE_OBJECT_H__
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEProperty.h"

@@ -37,6 +37,7 @@
 #ifndef __ZE_SIMPLE_MATERIAL_H__ 
 #define __ZE_SIMPLE_MATERIAL_H__
 
+#include "ZETypes.h"
 #include "ZEMaterial.h"
 
 class ZETexture2D;
@@ -50,7 +51,7 @@ class ZESimpleMaterial : public ZEMaterial
 		bool							VertexColorEnabled;
 
 		ZEMaterialTransparancyMode		TransparancyMode;
-		ZEUInt					TransparancyCullLimit;
+		ZEUInt							TransparancyCullLimit;
 		ZEVector4						MaterialColor;
 
 		const ZETexture2D*				Texture;
@@ -79,7 +80,7 @@ class ZESimpleMaterial : public ZEMaterial
 		ZEMaterialTransparancyMode		GetTransparancyMode() const;
 
 		void							SetTransparancyCullLimit(ZEUInt Limit);
-		ZEUInt					GetTransparancyCullLimit() const;
+		ZEUInt							GetTransparancyCullLimit() const;
 
 		void							SetTexture(const ZETexture2D* Texture);
 		const ZETexture2D*				GetTexture() const;

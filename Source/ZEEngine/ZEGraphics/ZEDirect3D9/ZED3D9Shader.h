@@ -37,6 +37,7 @@
 #ifndef	__ZE_D3D9_SHADER_H__
 #define __ZE_D3D9_SHADER_H__
 
+#include "ZETypes.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZEDS/ZEArray.h"
 #include <d3d9.h>
@@ -51,13 +52,13 @@ class ZED3D9Shader
 {
 	friend class ZED3D9ShaderManager;
 	private:
-		ZEUInt32							Hash;
+		ZEUInt32						Hash;
 		char							FileName[100];
 		char							FunctionName[100];
-		ZEUInt32							Components;
+		ZEUInt32						Components;
 
-		ZEInt								CacheIndex;
-		ZEInt								ReferanceCount;
+		ZEInt							CacheIndex;
+		ZEInt							ReferanceCount;
 	
 	protected:
 										ZED3D9Shader();
@@ -68,7 +69,7 @@ class ZED3D9Shader
 
 		const char*						GetFileName();
 		const char*						GetFunctionName();
-		ZEUInt32							GetComponents();
+		ZEUInt32						GetComponents();
 
 		void							Release();
 

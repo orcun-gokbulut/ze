@@ -34,13 +34,14 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECamera.h"
-#include <math.h>
 #include "ZEGraphicsModule.h"
 #include "ZEError.h"
 #include "ZEMath/ZERay.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
+
+#include <math.h>
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZECamera)
 

@@ -37,6 +37,7 @@
 #ifndef __ZE_TEXTURE_TOOLS_H__
 #define __ZE_TEXTURE_TOOLS_H__
 
+#include "ZETypes.h"
 #include "ZETextureOptions.h"
 #include "ZEGraphicsModule.h"
 #include "ZETextureResource.h"
@@ -49,12 +50,12 @@ class ZETextureTools
 {
 	private:
 									ZETextureTools();
-	virtual							~ZETextureTools();
+		virtual						~ZETextureTools();
 
 	public:
 		static bool					IsResizeable(ZEUInt Width, ZEUInt Height);
 		static bool					IsCompressible(ZEUInt Width, ZEUInt Height);
-		static ZEUInt			GetMaxMipmapCount(ZEUInt Width, ZEUInt Height);
+		static ZEUInt				GetMaxMipmapCount(ZEUInt Width, ZEUInt Height);
 
 		static void					CopyTextureRegion(void* DestData, ZEUInt DestPitch,
 													  ZEUInt DestX, ZEUInt DestY,
@@ -74,9 +75,6 @@ class ZETextureTools
 		static void					DownSample2x(void* DestinationData, ZEUInt DestinationPitch, 
 												 void* SourceData, ZEUInt SourcePitch,
 												 ZEUInt SourceWidth, ZEUInt SourceHeight, bool UseGpu = true);
-		
-		
+};
 
-};/* class ZETextureTools */
-
-#endif /* __ZETEXTURETOOLS_H__ */
+#endif

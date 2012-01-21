@@ -37,17 +37,18 @@
 #ifndef	__ZE_INPUT_MAP_BINDING_H__
 #define __ZE_INPUT_MAP_BINDING_H__
 
+#include "ZETypes.h"
 #include "ZEInputEvent.h"
 
 class ZEInputBinding
 {
 	public: 
-		ZEInt							ActionId;
-		ZEInputEvent				Event;
+		ZEInt				ActionId;
+		ZEInputEvent		Event;
 
-									ZEInputBinding(ZEInt ActionId, ZEInputEvent& Event);
-									ZEInputBinding(ZEInt ActionId, const ZEString& InputDescription);
-									ZEInputBinding();
+							ZEInputBinding(ZEInt ActionId, ZEInputEvent& Event);
+							ZEInputBinding(ZEInt ActionId, const ZEString& InputDescription);
+							ZEInputBinding();
 };
 
 #endif

@@ -39,11 +39,9 @@
 #include "ZED3D9Module.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9Shader.h"
-
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
-
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
 
 static float GausianFunction(float x, float StandartDeviation)
 {

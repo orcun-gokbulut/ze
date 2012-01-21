@@ -37,6 +37,7 @@
 #ifndef __ZE_D3D9_SSAO_PROCESSOR_H__
 #define __ZE_D3D9_SSAO_PROCESSOR_H__
 
+#include "ZETypes.h"
 #include "ZED3D9ComponentBase.h"
 
 class ZED3D9PixelShader;
@@ -60,7 +61,7 @@ class ZED3D9SSAOProcessor : public ZED3D9ComponentBase
 		ZED3D9Texture2D*				InputNormal;
 		ZED3D9Texture2D*				Output;
 
-		ZEInt								IterationCount;
+		ZEInt							IterationCount;
 		bool							HalfResolution;
 
 		struct

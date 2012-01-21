@@ -42,7 +42,7 @@
 #include "ZESound/ZEListener.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZEInput/ZEInputModule.h"
-#include "ZEMath/ZEMathDefinitions.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
