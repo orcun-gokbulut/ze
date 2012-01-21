@@ -48,7 +48,7 @@ void ZEParticleEmitter::Tick(float TimeElapsed)
 
 	if(LastCreation > ParticleCreationTime)	// If more than 'ParticleCreation' seconds has passed since last creation...
 	{
-		for(unsigned int I = 0; I < ParticlePool.GetCount(); I++)
+		for(ZEUInt I = 0; I < ParticlePool.GetCount(); I++)
 		{
 			if(ParticlePool[I].IsAlive == false)	// ...look for a dead particle...
 			{
@@ -61,7 +61,7 @@ void ZEParticleEmitter::Tick(float TimeElapsed)
 		LastCreation = 0.0f;
 	}
 
-	for(unsigned int I = 0; I < ParticlePool.GetCount(); I++)
+	for(ZEUInt I = 0; I < ParticlePool.GetCount(); I++)
 	{
 		if(ParticlePool[I].IsAlive == true)
 		{
@@ -79,7 +79,7 @@ void ZEParticleEmitter::Tick(float TimeElapsed)
 	if(IsContinuous == false)	// If the emitter is not continuous...
 	{
 		if(EmittedParticleCount > MaxParticleCount)	//...and it reaches its limit...
-			for(unsigned int I = 0; I < ParticlePool.GetCount(); I++)
+			for(ZEUInt I = 0; I < ParticlePool.GetCount(); I++)
 			{
 				if(ParticlePool[I].IsAlive == true)	//...wait for the pool's death...
 					return;
@@ -93,7 +93,7 @@ void ZEParticleEmitter::InitializeParticlePool()
 {
 	ParticlePool.SetCount(MaxParticleCount);
 
-	for(unsigned int I = 0; I < MaxParticleCount; I++)
+	for(ZEUInt I = 0; I < MaxParticleCount; I++)
 	{
 		GenerateParticle(ParticlePool[I]);
 	}
@@ -196,12 +196,12 @@ ZEParticleSystem* ZEParticleEmitter::GetOwner() const
 	return Owner;
 }
 
-void ZEParticleEmitter::SetParticlesPerSecond(unsigned int Value)
+void ZEParticleEmitter::SetParticlesPerSecond(ZEUInt Value)
 {
 	ParticlesPerSecond = Value;
 }
 
-unsigned int ZEParticleEmitter::GetParticlesPerSecond() const
+ZEUInt ZEParticleEmitter::GetParticlesPerSecond() const
 {
 	return ParticlesPerSecond;
 }
@@ -426,18 +426,18 @@ float ZEParticleEmitter::GetMaxLife() const
 	return MaxLife;
 }
 
-void ZEParticleEmitter::SetMaxParticleCount(unsigned int Value)
+void ZEParticleEmitter::SetMaxParticleCount(ZEUInt Value)
 {
 	MaxParticleCount = Value;
 
-	size_t OldSize = ParticlePool.GetCount();
+	ZESize OldSize = ParticlePool.GetCount();
 	ParticlePool.Resize(Value);
-	for (size_t I = OldSize; I < MaxParticleCount; I++)
+	for (ZESize I = OldSize; I < MaxParticleCount; I++)
 		GenerateParticle(ParticlePool[I]);
 
 }
 
-unsigned int ZEParticleEmitter::GetMaxParticleCount() const
+ZEUInt ZEParticleEmitter::GetMaxParticleCount() const
 {
 	return MaxParticleCount;
 }

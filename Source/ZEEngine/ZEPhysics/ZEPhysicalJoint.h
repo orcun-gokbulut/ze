@@ -176,7 +176,7 @@ class ZEPhysicalJoint : public ZEPhysicalObject
 		virtual const 
 		ZEArray<ZEPhysicalLimitPlane>&			GetLimitPlanes() const = 0;
 		virtual void							AddLimitPlane(const ZEPhysicalLimitPlane& Plane) = 0;
-		virtual void							RemoveLimitPlane(size_t Index) = 0;
+		virtual void							RemoveLimitPlane(ZESize Index) = 0;
 
 		//Constraints
 

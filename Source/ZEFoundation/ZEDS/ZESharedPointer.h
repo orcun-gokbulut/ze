@@ -40,8 +40,8 @@
 #include "ZEError.h"
 struct ZEReferenceCount
 {
-	size_t Strong;
-	size_t Weak;
+	ZESize Strong;
+	ZESize Weak;
 };
 
 template<typename Type>
@@ -86,7 +86,7 @@ class ZESharedPointer
 			}
 		}
 
-		size_t GetReferenceCount()
+		ZESize GetReferenceCount()
 		{
 			if (ReferanceCount != NULL)
 				return ReferanceCount->Strong;
@@ -95,7 +95,7 @@ class ZESharedPointer
 		}
 
 
-		size_t GetWeakReferenceCount()
+		ZESize GetWeakReferenceCount()
 		{
 			if (ReferanceCount != NULL)
 				return ReferanceCount->Weak;
@@ -178,7 +178,7 @@ class ZESharedPointer
 		static void Swap(const ZESharedPointer<Type>& A, const ZESharedPointer<Type>& B)
 		{
 			Type* TempP = A.Pointer;
-			size_t TempRC = A.ReferanceCount;
+			ZESize TempRC = A.ReferanceCount;
 
 			A.Pointer = B.Pointer;
 			A.ReferanceCount = B.ReferanceCount;

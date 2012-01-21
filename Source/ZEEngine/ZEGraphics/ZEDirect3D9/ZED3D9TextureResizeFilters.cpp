@@ -65,7 +65,7 @@ float Bessel0(float x)
 {
 	const float EPSILON_RATIO = (float)0.000001;
 	float Xh, Sum, Pow, Ds;
-	int K;
+	ZEInt K;
 
 	Xh = 0.5f * x;
 	Sum = 1.0f;
@@ -100,14 +100,14 @@ float ZEFilter::GetFilterWidth() const
 	return FilterWidth;
 }
 
-float ZEFilter::SampleBox(float x, float Scale, int Samples) const
+float ZEFilter::SampleBox(float x, float Scale, ZEInt Samples) const
 {
 	float Sum = 0;
 	float InverseSamples = 1.0f / (float)Samples;
 	float Increment = 1.0f / (Samples + 1);
 	
 
-	for(int s = 0; s < Samples; s++)
+	for(ZEInt s = 0; s < Samples; s++)
 	{
 		// this equation is wrong
 		//float p = (x + (float(s) + 0.5f) * InverseSamples) * Scale;
@@ -308,7 +308,7 @@ float MitchellFilter::Process(float x) const
 }
 
 // 1D Polyphase kernel
-ZEKernel::ZEKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int DestLength, int Samples, float PixelSize)
+ZEKernel::ZEKernel(const ZEFilter* Filt, ZEUInt SrcLength, ZEUInt DestLength, ZEInt Samples, float PixelSize)
 {
 	float Scale = (float)DestLength / (float)SrcLength;
 	float InverseScale = 1.0f / Scale;
@@ -321,7 +321,7 @@ ZEKernel::ZEKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int De
 	}
 
 	KernelWidth = Filt->GetFilterWidth() * InverseScale;
-	KernelWindowSize = (int)ceilf(KernelWidth * 2);
+	KernelWindowSize = (ZEInt)ceilf(KernelWidth * 2);
 	// allocation is fixed since we pass it to graphics device
 	KernelWeights = new ZEVector4[KernelWindowSize];
 	memset(KernelWeights, 0, sizeof(ZEVector4) * KernelWindowSize);
@@ -330,7 +330,7 @@ ZEKernel::ZEKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int De
 
 	float PixelCoord = -1.0f * (floorf(Center) - 0.5f);
 	float Total = 0.0f;
-	for(int I = 0; I < KernelWindowSize; I++)
+	for(ZEInt I = 0; I < KernelWindowSize; I++)
 	{
 		const float Sample = Filt->SampleBox(I - Center, Scale, Samples);
 		KernelWeights[I] = ZEVector4(Sample, PixelCoord * PixelSize, 0.0f, 0.0f);
@@ -340,7 +340,7 @@ ZEKernel::ZEKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int De
 
 	float InverseTotal = 1.0f / Total;
 	// Normalize the weight of the WindowSize
-	for(int I = 0; I < KernelWindowSize; I++)
+	for(ZEInt I = 0; I < KernelWindowSize; I++)
 	{
 		KernelWeights[I].x *= InverseTotal;
 	}
@@ -361,7 +361,7 @@ ZEVector4* ZEKernel::GetKernel() const
 	return KernelWeights;
 }
 
-int ZEKernel::GetKernelWindowSize() const
+ZEInt ZEKernel::GetKernelWindowSize() const
 {
 	return KernelWindowSize;
 }

@@ -126,7 +126,7 @@ void ZEDSSoundSource::ResetStream()
 	DSBuffer->SetCurrentPosition(0);
 }
 
-void ZEDSSoundSource::StreamDecodeAndFill(size_t BufferPosition, size_t Position, size_t SampleCount)
+void ZEDSSoundSource::StreamDecodeAndFill(ZESize BufferPosition, ZESize Position, ZESize SampleCount)
 {
 	void* Buffer;
 	DWORD LockedBufferSize;
@@ -139,7 +139,7 @@ void ZEDSSoundSource::StreamDecodeAndFill(size_t BufferPosition, size_t Position
 			SampleCount = EffectiveEndPosition - Position;
 			SoundResource->Decode(Buffer, Position, SampleCount);
 
-			size_t RemainingSampleCount = BufferSampleCount / 2 - SampleCount;
+			ZESize RemainingSampleCount = BufferSampleCount / 2 - SampleCount;
 			void* RemainingSampleBuffer = ((unsigned char*)Buffer) + SampleCount * SoundResource->GetBlockAlign();
 
 			if (Looping)
@@ -153,7 +153,7 @@ void ZEDSSoundSource::StreamDecodeAndFill(size_t BufferPosition, size_t Position
 
 void ZEDSSoundSource::Stream()
 {
-	size_t BufferSampleCount_2 = BufferSampleCount / 2;
+	ZESize BufferSampleCount_2 = BufferSampleCount / 2;
 
 	DWORD BufferPosition;	
 	DSBuffer->GetCurrentPosition(&BufferPosition, NULL);
@@ -221,7 +221,7 @@ void ZEDSSoundSource::SetSoundSourceState(ZESoundSourceState State)
 		}
 }
 
-void ZEDSSoundSource::SetCurrentPosition(unsigned int SampleIndex)
+void ZEDSSoundSource::SetCurrentPosition(ZEUInt SampleIndex)
 {
 	if (SoundResource != NULL)
 	{
@@ -239,7 +239,7 @@ void ZEDSSoundSource::SetCurrentPosition(unsigned int SampleIndex)
 	}
 }
 
-unsigned int ZEDSSoundSource::GetCurrentPosition()
+ZEUInt ZEDSSoundSource::GetCurrentPosition()
 {
 	if (Streaming)
 		return CurrentPosition;
@@ -255,7 +255,7 @@ unsigned int ZEDSSoundSource::GetCurrentPosition()
 			return 0;
 }
 
-void ZEDSSoundSource::SetPan(int NewPan)
+void ZEDSSoundSource::SetPan(ZEInt NewPan)
 {
 	if (NewPan> ZE_SS_PAN_RIGHT)
 		Pan = ZE_SS_PAN_RIGHT;
@@ -278,7 +278,7 @@ void ZEDSSoundSource::SetPlaybackSpeed(float Speed)
 		DSBuffer->SetFrequency((DWORD)(Speed * SoundResource->GetSamplesPerSecond()));
 }
 
-void ZEDSSoundSource::SetVolume(unsigned int NewVolume)
+void ZEDSSoundSource::SetVolume(ZEUInt NewVolume)
 {
 	if (NewVolume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;

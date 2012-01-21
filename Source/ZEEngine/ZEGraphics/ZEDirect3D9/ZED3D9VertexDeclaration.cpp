@@ -42,7 +42,7 @@ const ZEArray<ZEVertexElement>& ZED3D9VertexDeclaration::GetVertexElements()
 	return VertexElements;
 }
 
-size_t ZED3D9VertexDeclaration::GetVertexSize()
+ZESize ZED3D9VertexDeclaration::GetVertexSize()
 {
 	return VertexSize;
 }
@@ -52,7 +52,7 @@ void ZED3D9VertexDeclaration::SetupVertexDeclaration()
 	GetDevice()->SetVertexDeclaration(VertexDeclaration);
 }
 
-bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Elements, size_t ElementCount)
+bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Elements, ZESize ElementCount)
 {
 	if (ElementCount > 12)
 	{
@@ -64,7 +64,7 @@ bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Ele
 
 
 	static D3DVERTEXELEMENT9 D3DElements[13];	
-	for (size_t I = 0; I < ElementCount; I++)
+	for (ZESize I = 0; I < ElementCount; I++)
 	{
 		D3DElements[I].Stream = 0;
 		D3DElements[I].Offset = VertexSize;
@@ -159,7 +159,7 @@ bool ZED3D9VertexDeclaration::CreateVertexDeclaration(const ZEVertexElement* Ele
 	return true;
 }
 
-bool ZED3D9VertexDeclaration::Create(const ZEVertexElement* Elements, size_t ElementCount)
+bool ZED3D9VertexDeclaration::Create(const ZEVertexElement* Elements, ZESize ElementCount)
 {
 	Release();
 

@@ -44,7 +44,7 @@ static void DefaultErrorCallback(const char* Module, ZEErrorType Type, const cha
 	printf("[%s] %s : %s \r\n", Module, ZEError::GetErrorTypeString(Type), ErrorText);
 }
 
-static void DefaultAssertCallback(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, int Line)
+static void DefaultAssertCallback(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, ZEInt Line)
 {
 	printf("[%s] : %s (Function : \"%s\", File : \"%s\", Line : %d)\r\n", ZEError::GetAssertTypeString(Type), AssertText, Function, File, Line);
 }
@@ -54,8 +54,8 @@ static ZEAssertCallback AssertCallback = &DefaultAssertCallback;
 
 void ZEError::GetModuleName(const char* Function, char* Output)
 {
-	size_t Len = strlen(Output);
-	for(size_t I = 0; I < Len; I++)
+	ZESize Len = strlen(Output);
+	for(ZESize I = 0; I < Len; I++)
 		if (Function[I] == ':' || Function[I] == '<')
 		{
 			Output[I] ='\0';
@@ -132,7 +132,7 @@ void ZEError::RaiseError(const char* Module, ZEErrorType Type, const char* Error
 	}
 }
 
-void ZEError::RaiseAssert(ZEAssertType Type, const char* Function, const char* File, int Line, const char* AssertText, ...)
+void ZEError::RaiseAssert(ZEAssertType Type, const char* Function, const char* File, ZEInt Line, const char* AssertText, ...)
 {
 	if (AssertCallback != NULL)
 	{

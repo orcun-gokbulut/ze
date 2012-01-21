@@ -139,7 +139,7 @@ void ZEErrorManager::ErrorCallback(const char* From, ZEErrorType Level, const ch
 	}
 }
 
-void ZEErrorManager::AssertCallback(ZEAssertType AssertType, const char* AssertText, const char* Function, const char* File, int Line)
+void ZEErrorManager::AssertCallback(ZEAssertType AssertType, const char* AssertText, const char* Function, const char* File, ZEInt Line)
 {
 	if (zeCore->GetConsole() != NULL)
 		zeOutput("%s : %s (Function : %s, File : %s, Line : %d)\r\n", (AssertType == ZE_AT_ASSERT ? "Assert" : "Warning"),  AssertText,  Function, File, Line);

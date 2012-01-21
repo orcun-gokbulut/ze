@@ -43,7 +43,7 @@
 
 bool ZECommandManager::Callback_ListSections(ZECommand* Command, const ZECommandParameterList* Params)
 {
-	size_t Index, Count;
+	ZESize Index, Count;
 
 	if (Params->GetCount() == 0)
 	{
@@ -71,14 +71,14 @@ bool ZECommandManager::Callback_ListSections(ZECommand* Command, const ZECommand
 	zeOutput(" Name                       Number Of Commands \r\n"
 					 "-----------------------------------------------\r\n");
 
-	for (size_t I = Index; I < Sections.GetCount() && I <= Count; I++)
+	for (ZESize I = Index; I < Sections.GetCount() && I <= Count; I++)
 		zeOutput(" %-30s      %d\r\n", Sections.GetItem(I)->GetName(), Sections.GetItem(I)->GetNumberOfCommands());
 	return true;
 }
 
 bool ZECommandManager::Callback_ListCommands(ZECommand* Command, const ZECommandParameterList* Params)
 {
-	size_t Index, Count;
+	ZESize Index, Count;
 	ZECommandSection* Sec;
 
 	if (Params->GetCount() == 1 &&
@@ -114,7 +114,7 @@ bool ZECommandManager::Callback_ListCommands(ZECommand* Command, const ZECommand
 						 "------------------------------------------\r\n");
 		
 		ZECommand* Cmd;
-		for (size_t I = 0; I < Sec->GetNumberOfCommands() && I <= Count; I++)
+		for (ZESize I = 0; I < Sec->GetNumberOfCommands() && I <= Count; I++)
 		{
 			Cmd = Sec->GetCommand(I);	
 			zeOutput(" %-30s", Cmd->GetName().ToCString());
@@ -140,14 +140,14 @@ bool ZECommandManager::Callback_ListCommands(ZECommand* Command, const ZECommand
 	}
 }
 
-size_t ZECommandManager::GetNumberOfSections()
+ZESize ZECommandManager::GetNumberOfSections()
 {
 	return Sections.GetCount();
 }
 
 ZECommandSection* ZECommandManager::GetCommandSection(const ZEString& Name)
 {
-	for (size_t I = 0 ; I < Sections.GetCount(); I++)
+	for (ZESize I = 0 ; I < Sections.GetCount(); I++)
 		if (Sections[I]->GetName() == Name)
 			return Sections[I];
 	return NULL;

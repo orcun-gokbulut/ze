@@ -46,62 +46,62 @@ class ZEHeapBase
 		ZEArray<Type, Allocator_> Heap;
 
 	public:
-		size_t GetParentIndex(size_t Index) const
+		ZESize GetParentIndex(ZESize Index) const
 		{
 			return (Index - 1) / 2;
 		}
 
-		Type& GetParent(size_t Index)
+		Type& GetParent(ZESize Index)
 		{
 			return Heap(GetParentIndex());
 		}
 
-		const Type& GetParent(size_t Index) const
+		const Type& GetParent(ZESize Index) const
 		{
 			return Heap(GetParentIndex());
 		}
 		
-		size_t GetFirstChildIndex(size_t Index) const
+		ZESize GetFirstChildIndex(ZESize Index) const
 		{
 			return 2 * Index + 1;
 		}
 		
-		Type& GetFirstChild(size_t Index)
+		Type& GetFirstChild(ZESize Index)
 		{
 			return Heap[GetFirstChildIndex(Index)];
 		}
 
-		const Type& GetFirstChild(size_t Index) const
+		const Type& GetFirstChild(ZESize Index) const
 		{
 			return Heap[GetFirstChildIndex(Index)];
 		}
 
-		size_t GetSecondChildIndex(size_t Index) const
+		ZESize GetSecondChildIndex(ZESize Index) const
 		{
 			return 2 * Index + 2;
 		}
 
-		Type& GetSecondChild(size_t Index) 
+		Type& GetSecondChild(ZESize Index) 
 		{
 			return Heap[GetSecondChildIndex(Index)];
 		}
 
-		const Type& GetSecondChild(size_t Index) const
+		const Type& GetSecondChild(ZESize Index) const
 		{
 			return Heap[GetSecondChildIndex(Index)];
 		}
 
-		const Type& GetItem(size_t Index) const
+		const Type& GetItem(ZESize Index) const
 		{
 			return Heap[Index];
 		}
 
-		Type& GetItem(size_t Index)
+		Type& GetItem(ZESize Index)
 		{
 			return Heap[Index];
 		}
 
-		size_t GetCount()
+		ZESize GetCount()
 		{
 			return Heap.GetCount();
 		}

@@ -396,12 +396,12 @@ bool ZEVector2::operator !=(const ZEVector2 &RightOperand) const
 		(fabs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD));
 }
 
-float ZEVector2::operator[](size_t Index) const
+float ZEVector2::operator[](ZESize Index) const
 {
 	return M[Index];
 }
 
-float& ZEVector2::operator[](size_t Index)
+float& ZEVector2::operator[](ZESize Index)
 {
 	return M[Index];
 }
@@ -983,12 +983,12 @@ bool ZEVector3::operator != (const ZEVector3 &RightOperand) const
 			(fabs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD));
 }
 
-float ZEVector3::operator[](size_t Index) const
+float ZEVector3::operator[](ZESize Index) const
 {
 	return M[Index];
 }
 
-float& ZEVector3::operator[](size_t Index)
+float& ZEVector3::operator[](ZESize Index)
 {
 	return M[Index];
 }
@@ -1336,7 +1336,7 @@ void ZEVector4::SaturateSelf()
 float ZEVector4::Min() const
 {
 	float Min = x;
-	for (int I = 1; I < 4; I++)
+	for (ZEInt I = 1; I < 4; I++)
 		if (M[I] < Min)
 			Min = M[I];
 
@@ -1346,7 +1346,7 @@ float ZEVector4::Min() const
 float ZEVector4::Max() const
 {
 	float Max = x;
-	for (int I = 1; I < 4; I++)
+	for (ZEInt I = 1; I < 4; I++)
 		if (M[I] > Max)
 			Max = M[I];
 
@@ -1452,12 +1452,12 @@ bool ZEVector4::operator != (const ZEVector4 &RightOperand) const
 			(fabs(this->w - RightOperand.w) > ZE_ZERO_THRESHOLD));
 }
 
-float ZEVector4::operator[](size_t Index) const
+float ZEVector4::operator[](ZESize Index) const
 {
 	return M[Index];
 }
 
-float& ZEVector4::operator[](size_t Index)
+float& ZEVector4::operator[](ZESize Index)
 {
 	return M[Index];
 }

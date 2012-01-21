@@ -44,18 +44,18 @@ ZEMapFileOctree::ZEMapFileOctree()
 	IsLeaf = false;
 	Depth = 0;
 	BoundingBox.Max = BoundingBox.Min = ZEVector3(0.0f, 0.0f, 0.0f);
-	for (int I = 0; I < 8; I++)
+	for (ZEInt I = 0; I < 8; I++)
 		SubTrees[I] = NULL;
 }
 
 ZEMapFileOctree::~ZEMapFileOctree()
 {
-	for (int I = 0; I < 8; I++)
+	for (ZEInt I = 0; I < 8; I++)
 		if (SubTrees[I] != NULL)
 			delete SubTrees[I];
 }
 
-void AddPolygonToSubSpace(ZEMapFileOctree* Node, ZEOctreeSubspace SubSpace, int PolygonId)
+void AddPolygonToSubSpace(ZEMapFileOctree* Node, ZEOctreeSubspace SubSpace, ZEInt PolygonId)
 {
 	if (Node->SubTrees[SubSpace] == NULL)
 	{
@@ -103,7 +103,7 @@ void AddPolygonToSubSpace(ZEMapFileOctree* Node, ZEOctreeSubspace SubSpace, int 
 	Node->SubTrees[SubSpace]->PolygonIds.Add(PolygonId);
 }
 
-void GenerateOctreeNode(ZEMapFileOctree* Node, int MaxDepth, ZEArray<ZEMapFilePolygon>* Polygons)
+void GenerateOctreeNode(ZEMapFileOctree* Node, ZEInt MaxDepth, ZEArray<ZEMapFilePolygon>* Polygons)
 {
 	if (Node->Depth == MaxDepth)
 	{
@@ -117,11 +117,11 @@ void GenerateOctreeNode(ZEMapFileOctree* Node, int MaxDepth, ZEArray<ZEMapFilePo
 	bool AtLeft, AtRight, AtDown, AtUp, AtFront, AtBack;
 	ZEMapFilePolygon* Polygon;
 
-	for (size_t I = 0; I < Node->PolygonIds.GetCount(); I++)
+	for (ZESize I = 0; I < Node->PolygonIds.GetCount(); I++)
 	{
 		AtLeft = AtRight = AtDown = AtUp = AtFront = AtBack = false;
 		Polygon = &(*Polygons)[Node->PolygonIds[I]];
-		for (int N = 0; N < 3; N++)
+		for (ZEInt N = 0; N < 3; N++)
 		{
 
 			if (Polygon->Vertices[N].Position.x < PlaneX)
@@ -168,7 +168,7 @@ void GenerateOctreeNode(ZEMapFileOctree* Node, int MaxDepth, ZEArray<ZEMapFilePo
 	Node->PolygonIds.Clear();
 
 	Node->IsLeaf = false;
-	for (int I = 0; I < 8; I++)
+	for (ZEInt I = 0; I < 8; I++)
 	{
 		if (Node->SubTrees[I] != NULL)
 			GenerateOctreeNode(Node->SubTrees[I], MaxDepth, Polygons);
@@ -181,9 +181,9 @@ ZEAABBox CalculateBoundingBox(ZEArray<ZEMapFilePolygon>& Polygons)
 	MapBoundingBox.Min = Polygons[0].Vertices[0].Position;
 	MapBoundingBox.Max = Polygons[0].Vertices[0].Position;
 
-	for(size_t I = 0; I < Polygons.GetCount(); I++)
+	for(ZESize I = 0; I < Polygons.GetCount(); I++)
 	{
-		for (int N = 0; N < 3; N++)
+		for (ZEInt N = 0; N < 3; N++)
 		{			
 			if (Polygons[I].Vertices[N].Position.x > MapBoundingBox.Max.x)
 				MapBoundingBox.Max.x = Polygons[I].Vertices[N].Position.x;
@@ -204,13 +204,13 @@ ZEAABBox CalculateBoundingBox(ZEArray<ZEMapFilePolygon>& Polygons)
 	return MapBoundingBox;
 }
 
-ZEMapFileOctree* ZEMapFileOctree::GenerateOctree(ZEArray<ZEMapFilePolygon>& Polygons, unsigned int MaxDepth)
+ZEMapFileOctree* ZEMapFileOctree::GenerateOctree(ZEArray<ZEMapFilePolygon>& Polygons, ZEUInt MaxDepth)
 {
 	ZEMapFileOctree* Octree = new ZEMapFileOctree();
 	Octree->Depth = 0;
 	Octree->BoundingBox = CalculateBoundingBox(Polygons);
 	Octree->PolygonIds.SetCount(Polygons.GetCount());
-	for(size_t I = 0; I < Polygons.GetCount(); I++)
+	for(ZESize I = 0; I < Polygons.GetCount(); I++)
 		Octree->PolygonIds[I] = I;
 	
 	GenerateOctreeNode(Octree, MaxDepth, &Polygons);

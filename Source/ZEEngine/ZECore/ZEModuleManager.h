@@ -55,11 +55,11 @@ class ZEModuleManager
 		static ZEOptionSection					ModuleManagerOptions;
 
 		const ZEArray<ZEExtensionDescription*>&	GetModuleDescriptions();
-		ZEExtensionDescription*					GetModuleDescription(size_t Index);
+		ZEExtensionDescription*					GetModuleDescription(ZESize Index);
 		ZEExtensionDescription*					GetModuleDescription(const ZEString& Name);
 		ZEExtensionDescription*					GetModuleDescription(ZEExtensionDescription* BaseModuleDescription);
 
-		ZEModule*								CreateModuleInstance(size_t Index);
+		ZEModule*								CreateModuleInstance(ZESize Index);
 		ZEModule*								CreateModuleInstance(const ZEString& Name);
 		ZEModule*								CreateModuleInstance(ZEExtensionDescription* BaseModuleDescription);
 

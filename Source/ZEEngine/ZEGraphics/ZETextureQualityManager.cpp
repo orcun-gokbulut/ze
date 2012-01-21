@@ -71,9 +71,9 @@ bool ZETextureQualityManager::Process(ZETextureData* TextureData, ZETextureOptio
 		FinalOptions->MipMapping == ZE_TMM_DISABLED)
 		return true;
 
-	unsigned int OutputBlockSize = 0;
-	unsigned int InputBlockWidth = 0;
-	unsigned int InputBlockHeight = 0;
+	ZEUInt OutputBlockSize = 0;
+	ZEUInt InputBlockWidth = 0;
+	ZEUInt InputBlockHeight = 0;
 
 	// Decide pixel format and block properties
 	ZETexturePixelFormat PixelFormat;
@@ -108,30 +108,30 @@ bool ZETextureQualityManager::Process(ZETextureData* TextureData, ZETextureOptio
 			break;
 	}
 
-	unsigned int MipmapCount	= FinalOptions->MaximumMipmapLevel;
-	unsigned int SurfaceCount	= TextureData->GetDepth();
-	unsigned int Width			= TextureData->GetWidth();
-	unsigned int Height			= TextureData->GetHeight();
+	ZEUInt MipmapCount	= FinalOptions->MaximumMipmapLevel;
+	ZEUInt SurfaceCount	= TextureData->GetDepth();
+	ZEUInt Width			= TextureData->GetWidth();
+	ZEUInt Height			= TextureData->GetHeight();
 	
 	bool Compress = FinalOptions->CompressionType == ZE_TCT_NONE ? false : true;
 	bool Mipmap = FinalOptions->MipMapping == ZE_TMM_DISABLED ? false : true;
 
 	// Create the temp buffer
 	void* Buffer = (void*)malloc(TextureData->GetMipmapDataSize(0, 0));
-	unsigned int BufferPitch = TextureData->GetMipmapRowSize(0, 0);
+	ZEUInt BufferPitch = TextureData->GetMipmapRowSize(0, 0);
 
 	// Add new mipmaps if it is needed
 	if(Mipmap && FinalOptions->MaximumMipmapLevel > TextureData->GetMipmapCount())
 		TextureData->AddMipmap(FinalOptions->MaximumMipmapLevel - 1);
 	
 	// For every surface
-	for(unsigned int I = 0; I < SurfaceCount; I++)
+	for(ZEUInt I = 0; I < SurfaceCount; I++)
 	{
 		// Get mipmap 0 of surface I to buffer
 		TextureData->CopyMipmapDataTo(I, 0, Buffer, BufferPitch);
 
 		// Downsample if it is needed
-		for(unsigned int K = 0; K < (unsigned int)FinalOptions->DownSample; K++)
+		for(ZEUInt K = 0; K < (ZEUInt)FinalOptions->DownSample; K++)
 		{
 			// Down Sample if requested
 			ZETextureTools::DownSample2x(Buffer, BufferPitch, Buffer, BufferPitch, Width, Height);
@@ -144,14 +144,14 @@ bool ZETextureQualityManager::Process(ZETextureData* TextureData, ZETextureOptio
 		TextureData->SetPixelFormat(PixelFormat);
 
 		void* DestData			= 0;
-		unsigned int DestPitch	= 0;
-		unsigned int RowSize	= 0;
-		unsigned int RowCount	= 0;		
+		ZEUInt DestPitch	= 0;
+		ZEUInt RowSize	= 0;
+		ZEUInt RowCount	= 0;		
 
 		if (Compress && Mipmap)
 		{
 			// For every mipmap
-			for(unsigned int J = 0; J < MipmapCount; J++)
+			for(ZEUInt J = 0; J < MipmapCount; J++)
 			{
 				// Do not change the row size and row count for the last 2 mipmaps
 				// Since they wont be compressible, they will have the same data with compressed 4x4 mipmap 
@@ -179,7 +179,7 @@ bool ZETextureQualityManager::Process(ZETextureData* TextureData, ZETextureOptio
 		else if (Compress && !Mipmap)
 		{
 			// For every mipmap
-			for(unsigned int J = 0; J < MipmapCount; J++)
+			for(ZEUInt J = 0; J < MipmapCount; J++)
 			{
 				// Allocate for the new Mipmap
 				RowSize = (Width / InputBlockWidth) * OutputBlockSize;
@@ -196,7 +196,7 @@ bool ZETextureQualityManager::Process(ZETextureData* TextureData, ZETextureOptio
 		else if (!Compress && Mipmap)
 		{
 			// For every mipmap
-			for(unsigned int J = 0; J < MipmapCount; J++)
+			for(ZEUInt J = 0; J < MipmapCount; J++)
 			{
 				// Allocate for the new Mipmap
 				RowSize = (Width / InputBlockWidth) * OutputBlockSize;
@@ -215,7 +215,7 @@ bool ZETextureQualityManager::Process(ZETextureData* TextureData, ZETextureOptio
 		else if (!Compress && !Mipmap)
 		{
 			// For every mipmap
-			for(unsigned int J = 0; J < MipmapCount; J++)
+			for(ZEUInt J = 0; J < MipmapCount; J++)
 			{
 				// Allocate for the new Mipmap
 				RowSize = (Width / InputBlockWidth) * OutputBlockSize;
@@ -282,11 +282,11 @@ bool ZETextureQualityManager::GetFinalTextureOptions(ZETextureOptions* FinalOpti
 	// If there is MipMapping
 	if (FinalOptions->MipMapping != ZE_TMM_DISABLED)
 	{
-		unsigned int PossibleMaxMipmapNumber;
-		unsigned int MipMapCount = ZETextureTools::GetMaxMipmapCount(TextureInfo.Width, TextureInfo.Height);
+		ZEUInt PossibleMaxMipmapNumber;
+		ZEUInt MipMapCount = ZETextureTools::GetMaxMipmapCount(TextureInfo.Width, TextureInfo.Height);
 
 		// Subtract the mipmap count if there is a downsample before the process
-		PossibleMaxMipmapNumber = MipMapCount - (unsigned int)(FinalOptions->DownSample);
+		PossibleMaxMipmapNumber = MipMapCount - (ZEUInt)(FinalOptions->DownSample);
 		// Set final mipmap count
 		FinalOptions->MaximumMipmapLevel = (UserOptions->MaximumMipmapLevel > PossibleMaxMipmapNumber) ? PossibleMaxMipmapNumber : UserOptions->MaximumMipmapLevel;
 	}

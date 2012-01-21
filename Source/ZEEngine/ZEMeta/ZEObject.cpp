@@ -76,22 +76,22 @@ ZEObject* ZEObject::GetOwner()
 
 bool ZEObject::SetProperty(const char* PropertyName, const ZEVariant& Value)
 {
-	int PropertyId = GetPropertyId(PropertyName);
+	ZEInt PropertyId = GetPropertyId(PropertyName);
 
     if (PropertyId != -1)
         return SetProperty(PropertyId, Value);
 
 	else
 	{
-		unsigned int Hash = 0;
-		size_t	NameLength = strlen(PropertyName);
+		ZEUInt Hash = 0;
+		ZESize	NameLength = strlen(PropertyName);
 
-		for (size_t I = 0; I < NameLength ; I++)
+		for (ZESize I = 0; I < NameLength ; I++)
 		{
 			Hash += PropertyName[I];
 		}
 
-		for (size_t I = 0; I < CustomProperties.GetCount(); I++)
+		for (ZESize I = 0; I < CustomProperties.GetCount(); I++)
 		{
 			if (CustomProperties[I].Hash == Hash && Value.GetType() == CustomProperties[I].Type)
 			{
@@ -106,22 +106,22 @@ bool ZEObject::SetProperty(const char* PropertyName, const ZEVariant& Value)
 
 bool ZEObject::GetProperty(const char* PropertyName, ZEVariant& Value) const
 {
-	int PropertyId = GetPropertyId(PropertyName);
+	ZEInt PropertyId = GetPropertyId(PropertyName);
 
     if (PropertyId != -1)
         return GetProperty(PropertyId, Value);
 	
 	else
 	{
-		unsigned int Hash = 0;
-		size_t	NameLength = strlen(PropertyName);
+		ZEUInt Hash = 0;
+		ZESize	NameLength = strlen(PropertyName);
 
-		for (size_t I = 0; I < NameLength ; I++)
+		for (ZESize I = 0; I < NameLength ; I++)
 		{
 			Hash += PropertyName[I];
 		}
 
-		for (size_t I = 0; I < CustomProperties.GetCount(); I++)
+		for (ZESize I = 0; I < CustomProperties.GetCount(); I++)
 		{
 			if (CustomProperties[I].Hash == Hash)
 			{
@@ -136,7 +136,7 @@ bool ZEObject::GetProperty(const char* PropertyName, ZEVariant& Value) const
 
 bool ZEObject::AddCustomProperty(ZERunTimeProperty Property)
 {
-	for (size_t I = 0; I < CustomProperties.GetCount(); I++)
+	for (ZESize I = 0; I < CustomProperties.GetCount(); I++)
 	{
 		if (GetProperty(Property.Name, ZEVariant()))
 		{
@@ -146,9 +146,9 @@ bool ZEObject::AddCustomProperty(ZERunTimeProperty Property)
 	}
 
 	Property.Hash = 0;
-	size_t NameLength = strlen(Property.Name);
+	ZESize NameLength = strlen(Property.Name);
 
-	for(size_t I = 0; I < NameLength; I++)
+	for(ZESize I = 0; I < NameLength; I++)
 		Property.Hash += Property.Name[I];
 
 	CustomProperties.Add(Property);
@@ -158,15 +158,15 @@ bool ZEObject::AddCustomProperty(ZERunTimeProperty Property)
 
 bool ZEObject::RemoveCustomProperty(const char* PropertyName)
 {
-	unsigned int Hash = 0;
-	size_t	NameLength = strlen(PropertyName);
+	ZEUInt Hash = 0;
+	ZESize	NameLength = strlen(PropertyName);
 
-	for (size_t I = 0; I < NameLength ; I++)
+	for (ZESize I = 0; I < NameLength ; I++)
 	{
 		Hash += PropertyName[I];
 	}
 
-	for (size_t I = 0; I < CustomProperties.GetCount(); I++)
+	for (ZESize I = 0; I < CustomProperties.GetCount(); I++)
 	{
 		if (CustomProperties[I].Hash == Hash)
 		{
@@ -185,7 +185,7 @@ const ZEArray<ZERunTimeProperty>* ZEObject::GetCustomProperties() const
 
 bool ZEObject::AddToContainer(const char* ContainerName, ZEObject* Item)
 {
-	int ContainerId = GetContainerId(ContainerName);
+	ZEInt ContainerId = GetContainerId(ContainerName);
 
 	if (ContainerId != -1)
 		return AddToContainer(ContainerId, Item);
@@ -195,7 +195,7 @@ bool ZEObject::AddToContainer(const char* ContainerName, ZEObject* Item)
 
 bool ZEObject::RemoveFromContainer(const char* ContainerName, ZEObject* Item)
 {
-	int ContainerId = GetContainerId(ContainerName);
+	ZEInt ContainerId = GetContainerId(ContainerName);
 
 	if (ContainerId != -1)
 		return RemoveFromContainer(ContainerId, Item);
@@ -205,7 +205,7 @@ bool ZEObject::RemoveFromContainer(const char* ContainerName, ZEObject* Item)
 
 const ZEObject** ZEObject::GetContainerItems(const char* ContainerName) const
 {
-	int ContainerId = GetContainerId(ContainerName);
+	ZEInt ContainerId = GetContainerId(ContainerName);
 
 	if (ContainerId != -1)
 		return GetContainerItems(ContainerId);
@@ -213,9 +213,9 @@ const ZEObject** ZEObject::GetContainerItems(const char* ContainerName) const
 	return NULL;
 }
 
-size_t ZEObject::GetContainerItemCount(const char* ContainerName) const 
+ZESize ZEObject::GetContainerItemCount(const char* ContainerName) const 
 {
-	int ContainerId = GetContainerId(ContainerName);
+	ZEInt ContainerId = GetContainerId(ContainerName);
 
 	if (ContainerId != -1)
 		return GetContainerItemCount(ContainerId);
@@ -223,9 +223,9 @@ size_t ZEObject::GetContainerItemCount(const char* ContainerName) const
 	return 0;
 }
 
-bool ZEObject::CallMethod(const char* MethodName, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue)
+bool ZEObject::CallMethod(const char* MethodName, const ZEVariant* Parameters, ZESize ParameterCount, ZEVariant& ReturnValue)
 {
-	int MethodId = GetMethodId(MethodName);
+	ZEInt MethodId = GetMethodId(MethodName);
 
 	if (MethodId != -1)
 		return CallMethod(MethodId, Parameters, ParameterCount, ReturnValue);
@@ -233,14 +233,14 @@ bool ZEObject::CallMethod(const char* MethodName, const ZEVariant* Parameters, s
 	return false;
 }
 
-bool ZEObject::CallMethod(int MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
+bool ZEObject::CallMethod(ZEInt MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
 {
 	return CallMethod(MethodId, Parameters.GetConstCArray(), Parameters.GetCount(), ReturnValue);
 }
 
 bool ZEObject::CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue)
 {
-	int MethodId = GetMethodId(MethodName);
+	ZEInt MethodId = GetMethodId(MethodName);
 
 	if (MethodId != -1)
 		return CallMethod(MethodId, Parameters.GetConstCArray(), Parameters.GetCount(), ReturnValue);
@@ -262,17 +262,17 @@ bool ZEObject::Serialize(ZESerializer* Serializer)
 
 	while (CurrDesc != NULL)
 	{
-		size_t PropertyCount = CurrDesc->GetPropertyCount();
+		ZESize PropertyCount = CurrDesc->GetPropertyCount();
 		if (PropertyCount == 0)
 		{
 			CurrDesc = CurrDesc->GetParent();
 			continue;
 		}	
 
-		size_t PropertyOffset = CurrDesc->GetPropertyOffset();
+		ZESize PropertyOffset = CurrDesc->GetPropertyOffset();
 		const ZEPropertyDescription* Properties = CurrDesc->GetProperties();
 
-		for (size_t I = 0; I < PropertyCount; I++)
+		for (ZESize I = 0; I < PropertyCount; I++)
 		{
 			char NameBuffer[ZE_MAX_NAME_SIZE];
 			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
@@ -312,7 +312,7 @@ bool ZEObject::Unserialize(ZEUnserializer* Unserializer)
 		return false;
 	}
 
-	for (size_t I = 0; I < ClassChunk.PropertyCount; I++)
+	for (ZESize I = 0; I < ClassChunk.PropertyCount; I++)
 	{
 		char PropertyName[ZE_MAX_NAME_SIZE];
 		Unserializer->Read(PropertyName, sizeof(char), ZE_MAX_NAME_SIZE);

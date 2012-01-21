@@ -82,7 +82,7 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 	ZESmartArray<ZELight*> VisibleLights;
 	ZESmartArray<ZEEntity*> Entities = Scene->GetEntities();
 
-	for (size_t I = 0; I < Entities.GetCount(); I++)
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
 		if (ZEObjectDescription::CheckParent(ZELight::Description(), Entities[I]->GetDescription()))
 		{
@@ -98,7 +98,7 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 		{
 			const ZEArray<ZEComponent*>& Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
 
-			for (size_t N = 0; N < Components.GetCount(); N++)
+			for (ZESize N = 0; N < Components.GetCount(); N++)
 			{
 				if (ZEObjectDescription::CheckParent(ZELight::Description(), Components[N]->GetDescription()))
 					if (CullLight((ZELight*)Components[N], DrawParameters))
@@ -140,7 +140,7 @@ void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameter
 {
 	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
 
-	for (size_t I = 0; I < Entities.GetCount(); I++)
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
 		if (CullEntity(Entities[I], DrawParameters))
 		{
@@ -152,7 +152,7 @@ void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameter
 		{
 			const ZEArray<ZEComponent*>& Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
 
-			for (size_t N = 0; N < Components.GetCount(); N++)
+			for (ZESize N = 0; N < Components.GetCount(); N++)
 				if (CullEntity(Components[N], DrawParameters))
 				{
 					Components[N]->Draw(DrawParameters);

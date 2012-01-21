@@ -64,8 +64,8 @@ class ZEDUndoRedoManagerOld
 
 		static bool									PreviousActionIsUndo;
 		static bool									PreviousActionIsRedo;
-		static int									CurrentIndex;
-		static unsigned int							MaxOperationCount;
+		static ZEInt									CurrentIndex;
+		static ZEUInt							MaxOperationCount;
 		static ZEArray<ZEDUndoRedoOperation*>		UndoRedoStack;
 
 	public:
@@ -75,8 +75,8 @@ class ZEDUndoRedoManagerOld
 		bool										PerformUndo();
 		bool										PerformRedo();
 
-		void										SetMaxOperationCount(unsigned int Count);
-		unsigned int								GetMaxOperationCount() const;
+		void										SetMaxOperationCount(ZEUInt Count);
+		ZEUInt								GetMaxOperationCount() const;
 
 													ZEDUndoRedoManagerOld();
 };

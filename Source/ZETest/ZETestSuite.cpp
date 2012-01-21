@@ -58,7 +58,7 @@ bool ZETestSuiteItem::RunTests()
 	printf("Running Test Suite \"%s\".\n", GetName());
 
 	bool CurrentResult = true;
-	for (size_t I = 0; I < TotalTestCount; I++)
+	for (ZESize I = 0; I < TotalTestCount; I++)
 	{
 		printf("  Test #%d/%d - %s.\n", I + 1, TotalTestCount, Tests[I]->GetName());
 
@@ -91,7 +91,7 @@ void ZETestSuiteItem::Reset()
 	Result = ZE_TR_NOT_RUN;
 	ElapsedTime = 0;
 	PassedTestCount = 0;
-	for (size_t I = 0; I < TotalTestCount; I++)
+	for (ZESize I = 0; I < TotalTestCount; I++)
 		Tests[I]->Reset();
 }
 
@@ -105,12 +105,12 @@ float ZETestSuiteItem::GetElapsedTime()
 	return ElapsedTime;
 }
 
-int ZETestSuiteItem::GetTotalTestCount()
+ZEInt ZETestSuiteItem::GetTotalTestCount()
 {
 	return TotalTestCount;
 }
 
-int ZETestSuiteItem::GetFailedTestCount()
+ZEInt ZETestSuiteItem::GetFailedTestCount()
 {
 	if (Result == ZE_TR_NOT_RUN)
 		return 0;
@@ -118,7 +118,7 @@ int ZETestSuiteItem::GetFailedTestCount()
 	return TotalTestCount - PassedTestCount;
 }
 
-int ZETestSuiteItem::GetPassedTestCount()
+ZEInt ZETestSuiteItem::GetPassedTestCount()
 {
 	return PassedTestCount;
 }

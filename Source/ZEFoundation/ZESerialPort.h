@@ -60,11 +60,11 @@ class ZESerialPort
 		void				SetTimeOut(ZEUInt32 Milliseconds);
 		ZEUInt32			GetTimeOut();
 
-		bool				Read(void* Buffer, size_t BufferSize, size_t &BytesRead);
-		bool				Write(const void* Data, size_t DataSize, size_t &BytesWritten);
+		bool				Read(void* Buffer, ZESize BufferSize, ZESize &BytesRead);
+		bool				Write(const void* Data, ZESize DataSize, ZESize &BytesWritten);
 
-		bool				ReadPackage(void* Packet, size_t PackageSize);
-		bool				WritePackage(const void* Packet, size_t PackageSize);
+		bool				ReadPackage(void* Packet, ZESize PackageSize);
+		bool				WritePackage(const void* Packet, ZESize PackageSize);
 
 		void				Clear();
 

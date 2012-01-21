@@ -275,7 +275,7 @@ void ZEDGizmo::UpdateRotateGizmo()
 	bool FullDraw =  (fabs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
 
 	ZEVector3 LineStart, LineEnd;
-	for (size_t X = 0; X < 64; X++)
+	for (ZESize X = 0; X < 64; X++)
 	{
 		ZEMatrix4x4::Transform(LineStart, Transformation, ZEVector3(0.0f, AxisLenght * sinf(X * HAngle), AxisLenght * cosf(X * HAngle)));
 		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(0.0f, AxisLenght * sinf((X + 1) * HAngle), AxisLenght * cosf((X + 1) * HAngle)));
@@ -311,7 +311,7 @@ void ZEDGizmo::UpdateRotateGizmo()
 	ZEQuaternion::VectorProduct(AxisUp, Rotation, ZEVector3::UnitY);
 	FullDraw =  (fabs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
 
-	for (size_t X = 0; X < 64; X++)
+	for (ZESize X = 0; X < 64; X++)
 	{
 		ZEMatrix4x4::Transform(LineStart, Transformation, ZEVector3(AxisLenght * sinf(X * HAngle), 0.0f, AxisLenght * cosf(X * HAngle)));
 		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(AxisLenght * sinf((X + 1) * HAngle), 0.0f, AxisLenght * cosf((X + 1) * HAngle)));
@@ -348,7 +348,7 @@ void ZEDGizmo::UpdateRotateGizmo()
 	ZEQuaternion::VectorProduct(AxisUp, Rotation, ZEVector3::UnitZ);
 	FullDraw =  (fabs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
 
-	for (size_t X = 0; X < 64; X++)
+	for (ZESize X = 0; X < 64; X++)
 	{
 		ZEMatrix4x4::Transform(LineStart, Transformation, ZEVector3(AxisLenght * sinf(X * HAngle), AxisLenght * cosf(X * HAngle), 0.0f));
 		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(AxisLenght * sinf((X + 1) * HAngle), AxisLenght * cosf((X + 1) * HAngle), 0.0f));

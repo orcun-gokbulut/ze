@@ -195,12 +195,12 @@ ZEMaterialTransparancyMode ZEFixedMaterialFile::GetTransparancyMode()
 	return TransparancyMode;
 }
 
-void ZEFixedMaterialFile::SetTransparancyCullLimit(unsigned int Limit)
+void ZEFixedMaterialFile::SetTransparancyCullLimit(ZEUInt Limit)
 {
 	Limit = TransparancyCullLimit;
 }
 
-unsigned int ZEFixedMaterialFile::GetTransparancyCullLimit()
+ZEUInt ZEFixedMaterialFile::GetTransparancyCullLimit()
 {
 	return TransparancyCullLimit;
 }

@@ -57,7 +57,7 @@ class ZEModelIKChain
 		ZEQuaternion						EffectorRotation;
 
 		float								ErrorThreshold;
-		unsigned int						MaxIterationCount;
+		ZEUInt						MaxIterationCount;
 
 		float								RotationLimit;
 
@@ -78,8 +78,8 @@ class ZEModelIKChain
 		const ZEQuaternion&					GetEffectorRotation();
 		void								SetEffectorRotation(const ZEQuaternion& Rotation);
 
-		void								SetMaxIterationCount(unsigned int Value);
-		unsigned int						GetMaxIterationCount();
+		void								SetMaxIterationCount(ZEUInt Value);
+		ZEUInt						GetMaxIterationCount();
 
 		void								SetErrorThreshold(float Value);
 		float								GetErrorThreshold();

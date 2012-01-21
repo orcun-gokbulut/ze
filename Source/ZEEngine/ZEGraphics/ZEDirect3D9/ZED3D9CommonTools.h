@@ -67,10 +67,10 @@ class ZED3D9CommonTools : public ZED3D9ComponentBase
 		static bool				CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* PixelShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEUInt32 Components = 0);
 		static bool				CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* FileName, const char* MainFunction, const char* ShaderProfile, ZEUInt32 Components = 0);
 		static bool				CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, const char* FileNamee, const char* MainFunction, const char* ShaderProfile, ZEUInt32 Components = 0);
-		/*static bool				CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height);
-		static bool				CreateDepthRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height);
-		static bool				CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height, ZETexturePixelFormat Format);
-		static bool				CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height, ZETexturePixelFormat Format);*/
+		/*static bool				CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, ZEInt Width, ZEInt Height);
+		static bool				CreateDepthRenderTarget(LPDIRECT3DTEXTURE9* Target, ZEInt Width, ZEInt Height);
+		static bool				CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, ZEInt Width, ZEInt Height, ZETexturePixelFormat Format);
+		static bool				CreateRenderTarget(LPDIRECT3DSURFACE9* Target, ZEInt Width, ZEInt Height, ZETexturePixelFormat Format);*/
 };
 #endif
 

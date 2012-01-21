@@ -71,8 +71,8 @@ class ZEPartialFile : public ZEFile
 		virtual ZEUInt64		GetFileSize() const;
 		virtual bool			Eof();
 
-		virtual unsigned int	IncreaseReferenceCount();
-		virtual unsigned int	DecreaseReferenceCount();
+		virtual ZEUInt	IncreaseReferenceCount();
+		virtual ZEUInt	DecreaseReferenceCount();
 
 								ZEPartialFile();
 		virtual					~ZEPartialFile();

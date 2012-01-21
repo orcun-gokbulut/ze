@@ -57,7 +57,7 @@ struct ZEPropertyAnimationKey
 
 struct ZEPropertyAnimation
 {
-	int									PropertyId;
+	ZEInt									PropertyId;
 	ZEVariantType						ValueType;
 	bool								Interpolate;
 	ZEArray<ZEPropertyAnimationKey>		Keys;
@@ -67,7 +67,7 @@ class ZEAnimation
 {
 	public:
 		char							Name[ZE_MAX_NAME_SIZE];
-		int								FrameCount;
+		ZEInt								FrameCount;
 		float							FramePerSecond;
 		ZEArray<ZEPropertyAnimation>	PropertyAnimations;
 

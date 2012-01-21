@@ -54,8 +54,8 @@ class ZEFixedMaterial : public ZEMaterial
 {
 	ZE_META_OBJECT(ZEFixedMaterial)
 	protected:
-		unsigned int					OldMaterialComponents;
-		unsigned int					MaterialComponents;
+		ZEUInt					OldMaterialComponents;
+		ZEUInt					MaterialComponents;
 
 		ZEMaterialOpacityComponent		OpacityComponent;
 

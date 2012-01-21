@@ -69,7 +69,7 @@ class ZEModelMesh
 		ZEPhysicalRigidBody*				PhysicalBody;
 
 		bool								AutoLOD;
-		size_t								ActiveLOD;
+		ZESize								ActiveLOD;
 
 		ZEModelAnimationType				AnimationType;
 		bool								Visible;		
@@ -102,8 +102,8 @@ class ZEModelMesh
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();
 
-		void								SetActiveLOD(size_t LOD);
-		size_t								GetActiveLOD();
+		void								SetActiveLOD(ZESize LOD);
+		ZESize								GetActiveLOD();
 
 		void								SetAutoLOD(bool Enabled);
 		bool								GetAutoLOD();

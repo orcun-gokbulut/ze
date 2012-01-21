@@ -50,15 +50,15 @@ class  ZEMaxHeap : public ZEHeapBase<Type, Allocator_>
 			Two = Temp;
 		}
 
-		void MaxHeapify(int Index)
+		void MaxHeapify(ZEInt Index)
 		{
-			size_t Largest = Index;
+			ZESize Largest = Index;
 
-			size_t LeftIndex = GetFirstChildIndex(Index);
+			ZESize LeftIndex = GetFirstChildIndex(Index);
 			if (LeftIndex < Heap.GetCount() && Heap[LeftIndex] > Heap[Index])
 				Largest = LeftIndex;
 
-			size_t RightIndex = GetSecondChildIndex(Index);
+			ZESize RightIndex = GetSecondChildIndex(Index);
 			if (RightIndex < Heap.GetCount() && Heap[RightIndex] > Heap[Largest])
 				Largest = RightIndex;
 
@@ -70,11 +70,11 @@ class  ZEMaxHeap : public ZEHeapBase<Type, Allocator_>
 		}
 
 	public:
-		void Create(Type* Array, size_t Size)
+		void Create(Type* Array, ZESize Size)
 		{
-			Heap.CopyFrom(Array, size_t Size);
+			Heap.CopyFrom(Array, ZESize Size);
 
-			for (size_t I = Heap.GetSize() / 2; I >= 0; I--)
+			for (ZESize I = Heap.GetSize() / 2; I >= 0; I--)
 				MaxHeapify(I);
 		}
 
@@ -102,10 +102,10 @@ class  ZEMaxHeap : public ZEHeapBase<Type, Allocator_>
 		{
 			Heap.Add(Value);
 
-			size_t Index = Heap.GetCount() - 1;
+			ZESize Index = Heap.GetCount() - 1;
 			while(Index != 0)
 			{
-				size_t ParentIndex = GetParentIndex(Index);
+				ZESize ParentIndex = GetParentIndex(Index);
 
 				if (Heap[Index] < Heap[ParentIndex])
 					break;
@@ -115,7 +115,7 @@ class  ZEMaxHeap : public ZEHeapBase<Type, Allocator_>
 			}
 		}
 
-		void Remove(int Index)
+		void Remove(ZEInt Index)
 		{
 			Heap[Index] = Heap.GetLastItem();
 			Heap.DeleteAt(Heap.GetCount() - 1);

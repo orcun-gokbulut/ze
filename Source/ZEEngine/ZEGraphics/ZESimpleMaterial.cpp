@@ -111,12 +111,12 @@ ZEMaterialTransparancyMode ZESimpleMaterial::GetTransparancyMode() const
 	return TransparancyMode;
 }
 
-void ZESimpleMaterial::SetTransparancyCullLimit(unsigned int Limit)
+void ZESimpleMaterial::SetTransparancyCullLimit(ZEUInt Limit)
 {
 	Limit = TransparancyCullLimit;
 }
 
-unsigned int ZESimpleMaterial::GetTransparancyCullLimit() const
+ZEUInt ZESimpleMaterial::GetTransparancyCullLimit() const
 {
 	return TransparancyCullLimit;
 }

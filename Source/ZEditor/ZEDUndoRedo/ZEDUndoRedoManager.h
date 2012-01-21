@@ -50,7 +50,7 @@ class ZEDUndoRedoManager : public QObject
 		QList<ZEDUndoRedoOperation*>	UndoStack;
 		QList<ZEDUndoRedoOperation*>	RedoStack;
 
-		unsigned int					MaximumStackSize;
+		ZEUInt					MaximumStackSize;
 
 	public:
 
@@ -58,7 +58,7 @@ class ZEDUndoRedoManager : public QObject
 		void							Redo();
 
 		void							RegisterUndoRedoOperation(ZEDUndoRedoOperation* Operation);
-		void							SetMaximumStackSize(unsigned int Size);
+		void							SetMaximumStackSize(ZEUInt Size);
 
 										ZEDUndoRedoManager();
 

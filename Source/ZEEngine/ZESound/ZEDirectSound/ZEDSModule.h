@@ -67,11 +67,11 @@ class ZEDSModule : public ZESoundModule
 		LPDIRECTSOUNDBUFFER					DSPrimary;
 		LPDIRECTSOUND3DLISTENER8			DSListener;
 
-		unsigned int						MasterVolume;
-		unsigned int						TypeVolumes[ZE_SS_MAX_TYPE];
+		ZEUInt						MasterVolume;
+		ZEUInt						TypeVolumes[ZE_SS_MAX_TYPE];
 
 		bool								StreamingDisabled;
-		size_t								MaxBufferSize;
+		ZESize								MaxBufferSize;
 
 		ZEDSListener*						ActiveListener;
 		ZESmartArray<ZEDSListener*>			Listeners;
@@ -96,17 +96,17 @@ class ZEDSModule : public ZESoundModule
 		virtual void						SetSpeakerLayout(ZESpeakerLayout Layout);
 		virtual ZESpeakerLayout				GetSpeakerLayout();
 
-		virtual void						SetMasterVolume(unsigned int Volume);
-		virtual unsigned int				GetMasterVolume();
+		virtual void						SetMasterVolume(ZEUInt Volume);
+		virtual ZEUInt				GetMasterVolume();
 
-		virtual void						SetTypeVolume(ZESoundSourceType Type, unsigned int Volume);
-		virtual unsigned int				GetTypeVolume(ZESoundSourceType Type);
+		virtual void						SetTypeVolume(ZESoundSourceType Type, ZEUInt Volume);
+		virtual ZEUInt				GetTypeVolume(ZESoundSourceType Type);
 
 		virtual void						SetStreamingDisabled(bool Disabled);
 		virtual bool						GetStreamingDisabled();
 
-		virtual void						SetMaxBufferSize(size_t BufferSize); 
-		virtual size_t						GetMaxBufferSize();
+		virtual void						SetMaxBufferSize(ZESize BufferSize); 
+		virtual ZESize						GetMaxBufferSize();
 
 		virtual void						ProcessSound(float ElapsedTime);
 

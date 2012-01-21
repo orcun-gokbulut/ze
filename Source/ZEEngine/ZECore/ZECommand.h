@@ -50,20 +50,20 @@ class ZECommand
 {
 	private:
 		ZEString					Name;
-		int							AccessLevel;
+		ZEInt							AccessLevel;
 		ZECommandCallback			Callback;
 
 	public:
 		const ZEString&				GetName();
 		void						SetName(const ZEString& Name);
 
-		int							GetAccessLevel();
-		void						SetAccessLevel(int AccessLevel);
+		ZEInt							GetAccessLevel();
+		void						SetAccessLevel(ZEInt AccessLevel);
 		
 		void						SetCallback(ZECommandCallback Callback);
 		bool						Execute(ZECommandParameterList* ParamList);
 
-									ZECommand(const ZEString& Name, ZECommandCallback Callback, int AccessLevel = 0);
+									ZECommand(const ZEString& Name, ZECommandCallback Callback, ZEInt AccessLevel = 0);
 };
 
 #endif

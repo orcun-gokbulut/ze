@@ -52,13 +52,13 @@ class ZECommandSection
 		const ZEString&				GetName();
 		void						SetName(const ZEString& Name);
 
-		size_t						GetNumberOfCommands();
+		ZESize						GetNumberOfCommands();
 		
 		bool						AddCommand(ZECommand* Command);
-		void						DeleteCommand(size_t Index);
+		void						DeleteCommand(ZESize Index);
 
 		ZECommand*					GetCommand(const ZEString& Name);
-		ZECommand*					GetCommand(size_t Index);
+		ZECommand*					GetCommand(ZESize Index);
 
 		bool						ExecuteCommand(const ZEString& Name, ZEArray<ZEVariant>* Paramlist);
 

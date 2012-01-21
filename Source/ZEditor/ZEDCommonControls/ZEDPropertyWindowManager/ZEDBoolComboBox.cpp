@@ -74,7 +74,7 @@ ZEDBoolComboBox::ZEDBoolComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *paren
 	
 	XValue->setFixedHeight(20);
 
-	connect(this->XValue, SIGNAL(stateChanged(int)), this, SLOT(Changed()));
+	connect(this->XValue, SIGNAL(stateChanged(ZEInt)), this, SLOT(Changed()));
 }
 
 ZEDBoolComboBox::~ZEDBoolComboBox()

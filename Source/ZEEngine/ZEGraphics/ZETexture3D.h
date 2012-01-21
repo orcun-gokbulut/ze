@@ -42,9 +42,9 @@
 class ZETexture3D : public ZETexture
 {
 	protected:
-		unsigned int					Width;
-		unsigned int					Height;
-		unsigned int					Depth;
+		ZEUInt					Width;
+		ZEUInt					Height;
+		ZEUInt					Depth;
 		ZETexturePixelFormat			PixelFormat;
 
 										ZETexture3D();
@@ -53,14 +53,14 @@ class ZETexture3D : public ZETexture
 	public:
 		virtual ZETextureType			GetTextureType() const;
 
-		unsigned int					GetWidth() const;
-		unsigned int					GetHeight() const;
-		unsigned int					GetDepth() const;
+		ZEUInt					GetWidth() const;
+		ZEUInt					GetHeight() const;
+		ZEUInt					GetDepth() const;
 		ZETexturePixelFormat			GetPixelFormat() const;
 		bool							IsRenderTarget() const;
 
-		virtual bool					Create(unsigned int Width, unsigned int Height, unsigned int Depth, ZETexturePixelFormat PixelFormat) = 0;
-		virtual void					Lock(void** Buffer, size_t* RowPitch, size_t* SlicePitch) = 0;
+		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat) = 0;
+		virtual void					Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch) = 0;
 		virtual void					Unlock() = 0;
 
 		static ZETexture3D*				CreateInstance();

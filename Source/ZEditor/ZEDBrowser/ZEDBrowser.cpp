@@ -51,7 +51,7 @@ ZEDBrowser::ZEDBrowser(QWidget *Parent, Qt::WFlags Flags) : QMainWindow(Parent, 
 	BrowserItemsLayout->setContentsMargins(1, 1, 1, 1);
 	BrowserItemsLayout->setSizeConstraint(QLayout::SetMinAndMaxSize);
 	showMaximized();
-	QList<int> WidgetSizes;
+	QList<ZEInt> WidgetSizes;
 	WidgetSizes.append(300);
 	WidgetSizes.append(1600);
 	AssertBrowserUI->splitter->setSizes(WidgetSizes);
@@ -81,18 +81,18 @@ void ZEDBrowser::DirectorySelected(QTreeWidgetItem* Current, QTreeWidgetItem* Pr
 
 void ZEDBrowser::GenerateBrowserItems(ZEDDirectoryTreeWidgetItem* Current)
 {
-	int ExpansionRow = 0;
-	int ExpansionColumn = 0;
+	ZEInt ExpansionRow = 0;
+	ZEInt ExpansionColumn = 0;
 
-	int RowItemCapacity = floor((float)AssertBrowserUI->BrowserScrollArea->width() / 256.0f);
-	int SpacePixexls = 6 * RowItemCapacity;
+	ZEInt RowItemCapacity = floor((float)AssertBrowserUI->BrowserScrollArea->width() / 256.0f);
+	ZEInt SpacePixexls = 6 * RowItemCapacity;
 
 	if(SpacePixexls + 256 * RowItemCapacity > AssertBrowserUI->BrowserScrollArea->width())
 		RowItemCapacity--;
 
 	QStringList Files = Current->GetDirectory().entryList(QStringList(), QDir::Files | QDir::NoDotAndDotDot, QDir::Name);
 
-	for (int I = 0; I < Files.count(); I++)
+	for (ZEInt I = 0; I < Files.count(); I++)
 	{
 		ZEDBrowserItem* NewItem = new ZEDBrowserItem(this, AssertBrowserUI->BrowserScrollArea->widget() ,WorkingDir + Current->GetDirectory().path().remove(0,1) + "/" + Files[I]);
 		BrowserItems.append(NewItem);
@@ -117,7 +117,7 @@ QList<QAction*> ZEDBrowser::GetBrowserContextMenuActions()
 
 void ZEDBrowser::ClearBrowserItems()
 {
-	for (int I = 0; I < BrowserItems.count(); I++)
+	for (ZEInt I = 0; I < BrowserItems.count(); I++)
 	{
 		BrowserItems.at(I)->close();
 		delete BrowserItems.at(I);
@@ -143,7 +143,7 @@ void ZEDBrowser::ItemDeselected(ZEDBrowserItem* SelectedItem)
 
 void ZEDBrowser::ClearSelectedItems()
 {
-	for (int I = 0; I < SelectedBrowserItems.count(); I++)
+	for (ZEInt I = 0; I < SelectedBrowserItems.count(); I++)
 	{
 		SelectedBrowserItems.at(I)->SetSelected(false);
 	}

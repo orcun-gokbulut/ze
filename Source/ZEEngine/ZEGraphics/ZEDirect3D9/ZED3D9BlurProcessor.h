@@ -54,7 +54,7 @@ class ZED3D9BlurKernel : public ZEKernel
 {
 	public:
 		ZED3D9BlurKernel(){};
-		ZED3D9BlurKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int DestLength, int Samples, float PixelSize);
+		ZED3D9BlurKernel(const ZEFilter* Filt, ZEUInt SrcLength, ZEUInt DestLength, ZEInt Samples, float PixelSize);
 		~ZED3D9BlurKernel(){};
 };
 

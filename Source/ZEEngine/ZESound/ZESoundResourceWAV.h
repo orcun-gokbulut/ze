@@ -43,16 +43,16 @@ class ZESoundResourceWAV : public ZESoundResource
 {
 	private:
 		void*							Data;
-		size_t							DataSize;
+		ZESize							DataSize;
 
 										ZESoundResourceWAV();
 		virtual							~ZESoundResourceWAV();
 
 	public:
-		virtual size_t					GetDataSize() const;		
+		virtual ZESize					GetDataSize() const;		
 		virtual const void*				GetData() const;
 
-		virtual void					Decode(void* Buffer, size_t SampleIndex, size_t Count);
+		virtual void					Decode(void* Buffer, ZESize SampleIndex, ZESize Count);
 
 		static ZESoundResource*			LoadResource(const ZEString& FileName);
 };

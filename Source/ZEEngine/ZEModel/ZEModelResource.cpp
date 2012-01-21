@@ -49,7 +49,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -141,7 +141,7 @@ static const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArr
 	if (strncmp(FileName, "", ZE_MDLF_MAX_FILENAME_SIZE) == 0)
 		return NULL;
 
-	for (size_t I = 0; I < TextureResources.GetCount(); I++)
+	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
 	{
 		//if (strnicmp(TextureResources[I]->GetFileName(), FileName, ZE_MDLF_MAX_FILENAME_SIZE) == 0)
 		if (TextureResources[I]->GetFileName() == ZEString(FileName))
@@ -173,7 +173,7 @@ static const ZETexture2D* ManageModelMaterialTextures(char* FileName, ZESmartArr
 
 static bool ReadMaterialsFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 {
-	for (size_t I = 0; I < Model->Materials.GetCount(); I++)
+	for (ZESize I = 0; I < Model->Materials.GetCount(); I++)
 	{
 		ZEModelFileMaterialChunk MaterialChunk;
 
@@ -259,7 +259,7 @@ static bool ReadPhysicalBodyFromFile(ZEModelResourcePhysicalBody* Body, ZEFile* 
 	Body->MassCenter		= BodyChunk.MassCenter;
 
 	Body->Shapes.SetCount(BodyChunk.ShapeCount);
-	for (size_t I = 0; I < Body->Shapes.GetCount(); I++)
+	for (ZESize I = 0; I < Body->Shapes.GetCount(); I++)
 	{
 		ZEModelResourcePhysicalShape* Shape = &Body->Shapes[I];
 
@@ -358,12 +358,12 @@ static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 	Mesh->BoundingBox.Min = ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX);
 	Mesh->BoundingBox.Max = ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX);
 
-	for (size_t I = 0; I < Mesh->LODs.GetCount(); I++)
+	for (ZESize I = 0; I < Mesh->LODs.GetCount(); I++)
 	{
 		ZEModelResourceMeshLOD* CurrentLOD = &Mesh->LODs[I];
 		if (Mesh->IsSkinned)
 		{
-			for (size_t N = 0; N < CurrentLOD->SkinnedVertices.GetCount(); N++)
+			for (ZESize N = 0; N < CurrentLOD->SkinnedVertices.GetCount(); N++)
 			{
 				ZEVector3& Position = CurrentLOD->SkinnedVertices[N].Position;
 
@@ -377,7 +377,7 @@ static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 		}
 		else
 		{
-			for (size_t N = 0; N < CurrentLOD->Vertices.GetCount(); N++)
+			for (ZESize N = 0; N < CurrentLOD->Vertices.GetCount(); N++)
 			{
 				ZEVector3& Position = CurrentLOD->Vertices[N].Position;
 
@@ -394,7 +394,7 @@ static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 
 static bool ReadMeshesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 {
-	for (size_t I = 0; I < Model->Meshes.GetCount(); I++)
+	for (ZESize I = 0; I < Model->Meshes.GetCount(); I++)
 	{
 		ZEModelResourceMesh* Mesh = &Model->Meshes[I];
 
@@ -420,7 +420,7 @@ static bool ReadMeshesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 		Mesh->PhysicalBody.Orientation = ZEQuaternion::Identity;
 
 		Mesh->LODs.SetCount(MeshChunk.LODCount);
-		for (size_t I = 0; I < Mesh->LODs.GetCount(); I++)
+		for (ZESize I = 0; I < Mesh->LODs.GetCount(); I++)
 		{
 			ZEModelResourceMeshLOD* LOD = &Mesh->LODs[I];
 			ZEModelFileMeshLODChunk MeshLODChunk;
@@ -562,7 +562,7 @@ static bool ReadPhysicalJointFromFile(ZEModelResourcePhysicalJoint* Joint, ZEFil
 	return true;
 }
 
-static void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, int BoneId)
+static void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, ZEInt BoneId)
 {
 	ZEMatrix4x4::CreateOrientation(Bone->RelativeTransform, Bone->RelativePosition, Bone->RelativeRotation, Bone->RelativeScale);
 
@@ -578,14 +578,14 @@ static void ProcessBones(ZEModelResource* Model, ZEModelResourceBone* Bone, int 
 		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
 	}
 
-	for (size_t I = 0; I < Model->Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Model->Bones.GetCount(); I++)
 		if (Model->Bones[I].ParentBone == BoneId)
 			ProcessBones(Model, &Model->Bones[I], I);
 }
 
 static bool ReadBonesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 {
-	for (size_t I = 0; I < Model->Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Model->Bones.GetCount(); I++)
 	{
 		ZEModelResourceBone* Bone = &Model->Bones[I];
 
@@ -622,7 +622,7 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 		}
 	}
 
-	for (size_t I = 0; I < Model->Bones.GetCount(); I++)
+	for (ZESize I = 0; I < Model->Bones.GetCount(); I++)
 		if (Model->Bones[I].ParentBone == -1)
 			ProcessBones(Model, &Model->Bones[I], I);
 	return true;
@@ -630,7 +630,7 @@ static bool ReadBonesFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 
 static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 {
-	for (size_t I = 0; I < Model->Animations.GetCount(); I++)
+	for (ZESize I = 0; I < Model->Animations.GetCount(); I++)
 	{
 		ZEModelResourceAnimation* Animation = &Model->Animations[I];
 
@@ -646,7 +646,7 @@ static bool ReadAnimationsFromFile(ZEModelResource* Model, ZEFile* ResourceFile)
 		Animation->Frames.SetCount(AnimationChunk.FrameCount);
 		strncpy(Animation->Name, AnimationChunk.Name, ZE_MDLF_MAX_NAME_SIZE);
 
-		for (size_t I = 0; I < Animation->Frames.GetCount(); I++)
+		for (ZESize I = 0; I < Animation->Frames.GetCount(); I++)
 		{
 			ZEModelResourceAnimationFrame* CurrentAnimationFrame = &Animation->Frames[I];
 
@@ -798,6 +798,6 @@ ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 
 ZEModelResource::~ZEModelResource()
 {
-	for (size_t I = 0; I < TextureResources.GetCount(); I++)
+	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
 		TextureResources[I]->Release();
 }

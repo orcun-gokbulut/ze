@@ -55,7 +55,7 @@ class ZEFilter
 		virtual			~ZEFilter();
 
 		float			GetFilterWidth() const;
-		float			SampleBox(float x, float Scale, int Samples) const;
+		float			SampleBox(float x, float Scale, ZEInt Samples) const;
 		virtual float	Process(float x) const = 0;
 };
 
@@ -149,7 +149,7 @@ class MitchellFilter : public ZEFilter
 class ZEKernel
 {
 	protected:
-		int				KernelWindowSize;
+		ZEInt				KernelWindowSize;
 		float			KernelWidth;
 		ZEVector4*		KernelWeights;
 		float			Center;
@@ -159,11 +159,11 @@ class ZEKernel
 
 	public:
 						ZEKernel() {};
-						ZEKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int DestLength, int Samples, float PixelSize);
+						ZEKernel(const ZEFilter* Filt, ZEUInt SrcLength, ZEUInt DestLength, ZEInt Samples, float PixelSize);
 		virtual			~ZEKernel();
 
 		ZEVector4*		GetKernel() const;
-		int				GetKernelWindowSize() const;
+		ZEInt				GetKernelWindowSize() const;
 		float			GetKernelWidth() const;
 		float			GetKernelCenter() const;
 	

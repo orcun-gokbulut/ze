@@ -56,7 +56,7 @@ ZEDSoundFilePreviewWidget::ZEDSoundFilePreviewWidget(QWidget* Parent, QString Fi
 
 	QObject::connect(&PlayButton, SIGNAL(pressed()), this, SLOT(PlaySound()));
 	QObject::connect(&StopButton, SIGNAL(pressed()), this, SLOT(StopSound()));
-	QObject::connect(&LoopCheckBox, SIGNAL(stateChanged(int)), this, SLOT(EnableLoop(int)));
+	QObject::connect(&LoopCheckBox, SIGNAL(stateChanged(ZEInt)), this, SLOT(EnableLoop(ZEInt)));
 
 	Player = new QSound(FileName, this);
 }
@@ -83,7 +83,7 @@ void ZEDSoundFilePreviewWidget::StopSound()
 	Player->stop();
 }
 
-void ZEDSoundFilePreviewWidget::EnableLoop(int State)
+void ZEDSoundFilePreviewWidget::EnableLoop(ZEInt State)
 {	
 	Player->stop();
 

@@ -54,7 +54,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -299,16 +299,16 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 		return NULL;
 	}
 
-	unsigned int MipCount = TextureData.GetMipmapCount();
-	unsigned int SurfaceCount = TextureData.GetDepth();
+	ZEUInt MipCount = TextureData.GetMipmapCount();
+	ZEUInt SurfaceCount = TextureData.GetDepth();
 
 	// Copy texture data into ZETexture2D
 	void* TargetBuffer = NULL;
-	size_t TargetPitch = 0;
+	ZESize TargetPitch = 0;
 	
-	for(size_t I = 0; I < SurfaceCount; I++)
+	for(ZESize I = 0; I < SurfaceCount; I++)
 	{
-		for(size_t J = 0; J < MipCount; J++)
+		for(ZESize J = 0; J < MipCount; J++)
 		{
 			Texture->Lock(&TargetBuffer, &TargetPitch, J);
 			TextureData.CopyMipmapDataTo(I, J, (unsigned char*)TargetBuffer, TargetPitch);

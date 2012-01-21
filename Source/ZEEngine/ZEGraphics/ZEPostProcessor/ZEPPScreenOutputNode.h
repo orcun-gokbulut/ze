@@ -51,7 +51,7 @@ class ZEPPScreenOutputNode : public ZEPostProcessorNode
 	public:	
 		virtual ZEPostProcessorNodeType		GetNodeType();
 
-		virtual size_t						GetDependencyCount();
+		virtual ZESize						GetDependencyCount();
 		virtual ZEPostProcessorNode**		GetDependencies();
 
 		virtual void						SetInput(ZEPostProcessorNode* Node);

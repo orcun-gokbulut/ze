@@ -62,9 +62,9 @@ ZEUInt64 ZETextureCacheDataIdentifier::GetDataSize()const
 
 ZEUInt64 ZETextureCacheDataIdentifier::GetHash() const
 {
-	unsigned int Hash = 0;
-	unsigned int I = 0;	
-	int Char = 0;
+	ZEUInt Hash = 0;
+	ZEUInt I = 0;	
+	ZEInt Char = 0;
 
 	while (I < ZE_MAX_FILE_NAME_SIZE)
 	{
@@ -79,9 +79,9 @@ ZEUInt64 ZETextureCacheDataIdentifier::GetHash() const
 // Returns total bytes written
 ZEUInt64 ZETextureCacheDataIdentifier::Write(ZEFile* File) const
 {
-	size_t ZEUInt64Size = sizeof(ZEUInt64);
-	size_t ZeTexOptSize = sizeof(ZETextureOptions);
-	size_t ZeCharSize = sizeof(char);
+	ZESize ZEUInt64Size = sizeof(ZEUInt64);
+	ZESize ZeTexOptSize = sizeof(ZETextureOptions);
+	ZESize ZeCharSize = sizeof(char);
 
 	ZEUInt64 BytesWritten = 0;
 	ZEUInt64 WriteCount = 0;
@@ -124,7 +124,7 @@ ZEUInt64 ZETextureCacheDataIdentifier::Write(ZEFile* File) const
 
 bool ZETextureCacheDataIdentifier::Equal(ZEFile* File) const
 {
-	size_t ZETexOptSize = sizeof(ZETextureOptions);
+	ZESize ZETexOptSize = sizeof(ZETextureOptions);
 
 	char ItemNameBuffer[ZE_MAX_FILE_NAME_SIZE];
 	if (File->Read(ItemNameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE) != ZE_MAX_FILE_NAME_SIZE)
@@ -134,8 +134,8 @@ bool ZETextureCacheDataIdentifier::Equal(ZEFile* File) const
 	}
 
 	// Burda sorun olabilir
-	unsigned int I = 0;
-	unsigned int StringLenght = strlen(ItemNameBuffer);
+	ZEUInt I = 0;
+	ZEUInt StringLenght = strlen(ItemNameBuffer);
 	while (I < StringLenght)
 	{
 		if(ItemNameBuffer[I] != ItemName[I])

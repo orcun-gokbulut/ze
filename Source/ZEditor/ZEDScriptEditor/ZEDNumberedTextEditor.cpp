@@ -78,17 +78,17 @@ NumberBar::~NumberBar()
 {
 }
 
-void NumberBar::setCurrentLine( int lineno )
+void NumberBar::setCurrentLine( ZEInt lineno )
 {
 	currentLine = lineno;
 }
 
-void NumberBar::setStopLine( int lineno )
+void NumberBar::setStopLine( ZEInt lineno )
 {
 	stopLine = lineno;
 }
 
-void NumberBar::setBugLine( int lineno )
+void NumberBar::setBugLine( ZEInt lineno )
 {
 	bugLine = lineno;
 }
@@ -98,18 +98,18 @@ void NumberBar::setTextEdit( QTextEdit *edit )
 	this->edit = edit;
 	connect( edit->document()->documentLayout(), SIGNAL( update(const QRectF &) ),
 		this, SLOT( update() ) );
-	connect( edit->verticalScrollBar(), SIGNAL(valueChanged(int) ),
+	connect( edit->verticalScrollBar(), SIGNAL(valueChanged(ZEInt) ),
 		this, SLOT( update() ) );
 }
 
 void NumberBar::paintEvent( QPaintEvent * )
 {
 	QAbstractTextDocumentLayout *layout = edit->document()->documentLayout();
-	int contentsY = edit->verticalScrollBar()->value();
+	ZEInt contentsY = edit->verticalScrollBar()->value();
 	qreal pageBottom = contentsY + edit->viewport()->height();
 	const QFontMetrics fm = fontMetrics();
-	const int ascent = fontMetrics().ascent() + 1; // height = ascent + descent + 1
-	int lineCount = 1;
+	const ZEInt ascent = fontMetrics().ascent() + 1; // height = ascent + descent + 1
+	ZEInt lineCount = 1;
 
 	QPainter p(this);
 
@@ -183,7 +183,7 @@ NumberedTextView::NumberedTextView( QWidget *parent )
 	view->setFrameStyle( QFrame::NoFrame );
 	view->installEventFilter( this );
 
-	connect( view->document(), SIGNAL(contentsChange(int,int,int)), this, SLOT(textChanged(int,int,int)) );
+	connect( view->document(), SIGNAL(contentsChange(ZEInt,ZEInt,ZEInt)), this, SLOT(textChanged(ZEInt,ZEInt,ZEInt)) );
 
 	// Setup the line number pane
 	numbers = new NumberBar( this );
@@ -204,24 +204,24 @@ NumberedTextView::~NumberedTextView()
 {
 }
 
-void NumberedTextView::setCurrentLine( int lineno )
+void NumberedTextView::setCurrentLine( ZEInt lineno )
 {
 	currentLine = lineno;
 	numbers->setCurrentLine( lineno );
 	textChanged( 0, 0, 1 );
 }
 
-void NumberedTextView::setStopLine( int lineno )
+void NumberedTextView::setStopLine( ZEInt lineno )
 {
 	numbers->setStopLine( lineno );
 }
 
-void NumberedTextView::setBugLine( int lineno )
+void NumberedTextView::setBugLine( ZEInt lineno )
 {
 	numbers->setBugLine( lineno );
 }
 
-void NumberedTextView::textChanged( int pos, int removed, int added )
+void NumberedTextView::textChanged( ZEInt pos, ZEInt removed, ZEInt added )
 {
 	Q_UNUSED( pos );
 
@@ -234,7 +234,7 @@ void NumberedTextView::textChanged( int pos, int removed, int added )
 	fmt.setBackground( bg );
 	highlight.setBlockFormat( fmt );
 
-	int lineCount = 1;
+	ZEInt lineCount = 1;
 	for ( QTextBlock block = view->document()->begin();
 		block.isValid(); block = block.next(), ++lineCount ) {
 

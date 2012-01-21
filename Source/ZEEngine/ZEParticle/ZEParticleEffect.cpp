@@ -58,13 +58,13 @@ void ZEParticleEffect::Deinitialize()
 
 void ZEParticleEffect::Draw(ZEDrawParameters* DrawParameters)
 {
-	for(unsigned int I = 0; I < SystemArray.GetCount(); I++)
+	for(ZEUInt I = 0; I < SystemArray.GetCount(); I++)
 		SystemArray[I]->Draw(DrawParameters);
 }
 
 void ZEParticleEffect::Tick(float TimeElapsed)
 {
-	for(unsigned int I = 0; I < SystemArray.GetCount(); I++)
+	for(ZEUInt I = 0; I < SystemArray.GetCount(); I++)
 		SystemArray[I]->Tick(TimeElapsed);
 }
 

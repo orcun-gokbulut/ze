@@ -43,8 +43,8 @@ ZETestSuite(ZEString)
 	{
 		ZEString StringA = "Lorem";
 		ZEString StringB = " Ipsum";
-		unsigned int ExpectedSize = 12;
-		unsigned int ExpectedLength = 11;
+		ZEUInt ExpectedSize = 12;
+		ZEUInt ExpectedLength = 11;
 
 		StringA.Append(StringB);
 
@@ -58,8 +58,8 @@ ZETestSuite(ZEString)
 		{
 			ZEString StringA = "Lorem";
 			const char* StringB = " Ipsum";
-			unsigned int ExpectedSize = 12;
-			unsigned int ExpectedLength = 11;
+			ZEUInt ExpectedSize = 12;
+			ZEUInt ExpectedLength = 11;
 
 			StringA.Append(StringB);
 
@@ -90,8 +90,8 @@ ZETestSuite(ZEString)
 		{
 			ZEString StringA = "Lorem";
 			ZEString StringB = "Ipsum";
-			unsigned int ExpectedSize = 5;
-			unsigned int ExpectedLength = 6;
+			ZEUInt ExpectedSize = 5;
+			ZEUInt ExpectedLength = 6;
 
 			StringA.CopyFrom(StringB);
 
@@ -104,8 +104,8 @@ ZETestSuite(ZEString)
 		{
 			ZEString StringA = "Lorem Ipsum";
 			ZEString StringB;
-			unsigned int ExpectedSize = 12;
-			unsigned int ExpectedLength = 11;
+			ZEUInt ExpectedSize = 12;
+			ZEUInt ExpectedLength = 11;
 
 			StringB.CopyFrom(StringA);
 
@@ -121,8 +121,8 @@ ZETestSuite(ZEString)
 			{
 				ZEString StringA = "Lorem Ipsum";
 				ZEString StringB;
-				unsigned int ExpectedSize = 12;
-				unsigned int ExpectedLength = 11;
+				ZEUInt ExpectedSize = 12;
+				ZEUInt ExpectedLength = 11;
 
 				StringA.CopyTo(StringB);
 
@@ -135,8 +135,8 @@ ZETestSuite(ZEString)
 			{
 				ZEString StringA = "Lorem";
 				ZEString StringB = "Ipsum Dolor";
-				unsigned int ExpectedSize = 6;
-				unsigned int ExpectedLength = 5;
+				ZEUInt ExpectedSize = 6;
+				ZEUInt ExpectedLength = 5;
 
 				StringA.CopyTo(StringB);
 
@@ -185,7 +185,7 @@ ZETestSuite(ZEString)
 			ZETestCheckEqual(StringA, "Lorem Ipsum");
 		}
 
-		ZETestCase("int")
+		ZETestCase("ZEInt")
 		{
 			ZEString StringB = ZEString::Format("c%dcTestc%dc", 1, 1);
 			ZETestCheckEqual(StringB, "c1cTestc1c");
@@ -266,7 +266,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest("char ZEString::GetCharacter(size_t Position) const")
+	ZETest("char ZEString::GetCharacter(ZESize Position) const")
 	{
 		ZEString String = "Lorem Ipsum";
 
@@ -275,18 +275,18 @@ ZETestSuite(ZEString)
 		ZETestCheckEqual(Result, 'm');
 	}
 
-	ZETest("size_t ZEString::GetLength() const")
+	ZETest("ZESize ZEString::GetLength() const")
 	{
 		ZEString String = "Lorem Ipsum";
-		unsigned int ExpectedLength = 11;
+		ZEUInt ExpectedLength = 11;
 
 		ZETestCheckEqual(String.GetLength(), ExpectedLength);
 	}
 
-	ZETest("size_t ZEString::GetSize() const")
+	ZETest("ZESize ZEString::GetSize() const")
 	{
 		ZEString String = "Lorem Ipsum Dolor Sit Amet";
-		unsigned int ExpectedSize = 27;
+		ZEUInt ExpectedSize = 27;
 
 		ZETestCheckEqual(String.GetSize(), ExpectedSize);
 	}
@@ -323,13 +323,13 @@ ZETestSuite(ZEString)
 		ZETestCheckEqual(StringA, "Lorem Ipsum");
 	}
 
-	ZETest("void ZEString::Insert(size_t Position, const ZEString & String)")
+	ZETest("void ZEString::Insert(ZESize Position, const ZEString & String)")
 	{
 		ZETestCase("Inserting a ZEString inside another ZEString")
 		{
 			ZEString StringA = "Lorem Sit Amet";
 			ZEString StringB = " Ipsum Dolor";
-			unsigned int ExpectedLength = 26;
+			ZEUInt ExpectedLength = 26;
 
 			StringA.Insert(5, StringB);
 
@@ -341,7 +341,7 @@ ZETestSuite(ZEString)
 		{
 			ZEString StringC = "Lorem";
 			ZEString StringD = "";
-			unsigned int ExpectedLength = 5;
+			ZEUInt ExpectedLength = 5;
 
 			StringC.Insert(3, StringD);
 
@@ -352,7 +352,7 @@ ZETestSuite(ZEString)
 		ZETestCase("Inserting a ZESTring towards the end of the current ZEString")
 		{
 			ZEString StringE = "Lorem ";
-			unsigned int ExpectedLength = 11;
+			ZEUInt ExpectedLength = 11;
 
 			StringE.Insert(6, "Ipsum");
 
@@ -361,12 +361,12 @@ ZETestSuite(ZEString)
 		}
 	}
 
-	ZETest("void ZEString::Insert(size_t Position, const char * String)")
+	ZETest("void ZEString::Insert(ZESize Position, const char * String)")
 	{
 		ZEString StringA = "Lorem ";
 		const char* StringB = "Ipsum";
-		unsigned int ExpectedLength = 11;
-		size_t Position = 6;
+		ZEUInt ExpectedLength = 11;
+		ZESize Position = 6;
 
 		StringA.Insert(Position, StringB);
 
@@ -394,7 +394,7 @@ ZETestSuite(ZEString)
 		}
 	}
 
-	ZETest("ZEString ZEString::Left(size_t Count) const")
+	ZETest("ZEString ZEString::Left(ZESize Count) const")
 	{
 		ZEString String;
 
@@ -432,7 +432,7 @@ ZETestSuite(ZEString)
 		ZETestCheckEqual(StringA.Lower(), "");
 	}
 
-	ZETest("ZEString ZEString::Middle(size_t Position, size_t Count) const")
+	ZETest("ZEString ZEString::Middle(ZESize Position, ZESize Count) const")
 	{
 		ZEString String;
 
@@ -491,7 +491,7 @@ ZETestSuite(ZEString)
 		}
 	}
 
-	ZETest("char & ZEString::operator[](int Index)")
+	ZETest("char & ZEString::operator[](ZEInt Index)")
 	{
 		ZEString StringA = "Lorem";
 
@@ -501,7 +501,7 @@ ZETestSuite(ZEString)
 	}
 
 
-	ZETest("const char & ZEString::operator[](int Index) const")
+	ZETest("const char & ZEString::operator[](ZEInt Index) const")
 	{
 		const ZEString String = "Lorem";
 
@@ -626,18 +626,18 @@ ZETestSuite(ZEString)
 		ZETestCheckEqual(StringB, ExpectedResult);
 	}
 
-	ZETest("void ZEString::Remove(size_t Position, unsigned int Count = 1)")
+	ZETest("void ZEString::Remove(ZESize Position, ZEUInt Count = 1)")
 	{
 		ZEString String = "1234567890";
-		size_t Position = 3;
-		unsigned int Count = 5;
+		ZESize Position = 3;
+		ZEUInt Count = 5;
 
 		String.Remove(Position, Count);
 		ZETestCheckEqual(String, "12390");
 		ZETestCheckEqual(String.GetLength(), 5);
 	}
 
-	ZETest("ZEString ZEString::Right(size_t Count) const")
+	ZETest("ZEString ZEString::Right(ZESize Count) const")
 	{
 		ZEString String;
 
@@ -657,11 +657,11 @@ ZETestSuite(ZEString)
 		}
 	}
 
-	ZETest("void ZEString::SetCharacter(size_t Position, char Value)")
+	ZETest("void ZEString::SetCharacter(ZESize Position, char Value)")
 	{
 		ZEString String = "0123456789";
 		char Value = 'X';
-		size_t Position = 5;
+		ZESize Position = 5;
 
 		String.SetCharacter(Position, Value);
 		ZETestCheckEqual(String, "01234X6789");
@@ -747,7 +747,7 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest("ZEString ZEString::SubString(size_t StartPosition, size_t EndPosition) const")
+	ZETest("ZEString ZEString::SubString(ZESize StartPosition, ZESize EndPosition) const")
 	{
 		ZEString String;
 
@@ -896,13 +896,13 @@ ZETestSuite(ZEString)
 
 	}
 
-	ZETest("int ZEString::ToInt()")
+	ZETest("ZEInt ZEString::ToInt()")
 	{
 		ZEString StringA = "255";
 		ZEString StringB = "-255.043";
 
-		int ValueA = StringA.ToInt();
-		int ValueB = StringB.ToInt();
+		ZEInt ValueA = StringA.ToInt();
+		ZEInt ValueB = StringB.ToInt();
 
 		ZETestCheckEqual(ValueA, 255);
 		ZETestCheckEqual(ValueB, -255);

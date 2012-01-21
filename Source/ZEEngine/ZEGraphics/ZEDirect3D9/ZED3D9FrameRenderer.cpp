@@ -486,7 +486,7 @@ void ZED3D9FrameRenderer::DoPreZPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 
-	for (size_t I = 0; I < RenderList.GetCount(); I++)
+	for (ZESize I = 0; I < RenderList.GetCount(); I++)
 	{
 		ZERenderCommand* RenderCommand = &RenderList[I];
 		
@@ -523,7 +523,7 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
-	for (size_t I = 0; I < RenderList.GetCount(); I++)
+	for (ZESize I = 0; I < RenderList.GetCount(); I++)
 	{
 		ZERenderCommand* RenderCommand = &RenderList[I];
 
@@ -596,7 +596,7 @@ void ZED3D9FrameRenderer::DoLightningPass()
 	ZECanvasVertex::GetVertexDeclaration()->SetupVertexDeclaration();
 
 	// Draw lights
-	for (size_t I = 0; I < Lights.GetCount(); I++)
+	for (ZESize I = 0; I < Lights.GetCount(); I++)
 		switch(Lights[I]->GetLightType())
 		{
 			case ZE_LT_POINT:
@@ -636,7 +636,7 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	
-	for (size_t I = 0; I < RenderList.GetCount(); I++)
+	for (ZESize I = 0; I < RenderList.GetCount(); I++)
 	{		
 		ZERenderCommand* RenderCommand = &RenderList[I];
 		if (RenderCommand->Pipeline != ZE_RORP_3D)
@@ -673,7 +673,7 @@ void ZED3D9FrameRenderer::Do2DPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 
-	for (size_t I = 0; I < RenderList.GetCount(); I++)
+	for (ZESize I = 0; I < RenderList.GetCount(); I++)
 	{		
 		ZERenderCommand* RenderCommand = &RenderList[I];
 		if (RenderCommand->Pipeline != ZE_RORP_2D)
@@ -927,7 +927,7 @@ void ZED3D9FrameRenderer::ClearRenderList()
 	RenderList.Clear(true);
 }
 
-static int RenderCommandCompare(const ZERenderCommand* A, const ZERenderCommand* B)
+static ZEInt RenderCommandCompare(const ZERenderCommand* A, const ZERenderCommand* B)
 {
 	if (A->Priority == B->Priority)
 	{

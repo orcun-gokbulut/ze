@@ -41,7 +41,7 @@
 #include <memory.h>
 
 
-bool ZETextureData::CheckBoundaries(unsigned int Depth)
+bool ZETextureData::CheckBoundaries(ZEUInt Depth)
 {
 	if(Depth < Texture.Depth)
 		return true;
@@ -49,7 +49,7 @@ bool ZETextureData::CheckBoundaries(unsigned int Depth)
 	return false;
 }
 
-bool ZETextureData::CheckBoundaries(unsigned int Depth, unsigned int MipLevel)
+bool ZETextureData::CheckBoundaries(ZEUInt Depth, ZEUInt MipLevel)
 {
 	if(Depth < Texture.Depth && MipLevel < Texture.MipmapCount)
 		return true;
@@ -57,10 +57,10 @@ bool ZETextureData::CheckBoundaries(unsigned int Depth, unsigned int MipLevel)
 	return false;
 }
 
-void ZETextureData::CreateTexture(ZETexturePixelFormat PixelFormat, unsigned int Depth, unsigned int MipmapCount, unsigned int Width, unsigned int Height)
+void ZETextureData::CreateTexture(ZETexturePixelFormat PixelFormat, ZEUInt Depth, ZEUInt MipmapCount, ZEUInt Width, ZEUInt Height)
 {
 	// Allocate surfaces of the texture
-	unsigned int AllocationSize = sizeof(TextureData::SurfaceData) * Depth;
+	ZEUInt AllocationSize = sizeof(TextureData::SurfaceData) * Depth;
 
 	Texture.Surfaces = (TextureData::SurfaceData*)malloc(AllocationSize);
 	if(Texture.Surfaces == NULL)
@@ -71,7 +71,7 @@ void ZETextureData::CreateTexture(ZETexturePixelFormat PixelFormat, unsigned int
 	// Allocate the mipmaps of each surface
 	AllocationSize = sizeof(TextureData::SurfaceData::MipmapData) * MipmapCount;
 
-	for(size_t I = 0; I < Depth; I++)
+	for(ZESize I = 0; I < Depth; I++)
 	{
 		Texture.Surfaces[I].Mipmaps = (TextureData::SurfaceData::MipmapData*)malloc(AllocationSize);
 		if(Texture.Surfaces->Mipmaps == NULL)
@@ -90,10 +90,10 @@ void ZETextureData::CreateTexture(ZETexturePixelFormat PixelFormat, unsigned int
 void ZETextureData::DestroyTexture()
 {
 	// Deallocate
-	for(size_t I = 0; I < Texture.Depth; I++)
+	for(ZESize I = 0; I < Texture.Depth; I++)
 	{
 		// Deallocate mipmap data
-		for(size_t J = 0; J < Texture.MipmapCount; J++)
+		for(ZESize J = 0; J < Texture.MipmapCount; J++)
 		{
 			if(Texture.Surfaces[I].Mipmaps[J].Data != NULL)
 			{
@@ -117,12 +117,12 @@ void ZETextureData::DestroyTexture()
 		Texture.Surfaces = NULL;
 	}
 
-	unsigned int TextureDataSize = sizeof(TextureData);
+	ZEUInt TextureDataSize = sizeof(TextureData);
 	memset(&Texture, 0, TextureDataSize);
 }
 
 // Creates the mipmap data
-void ZETextureData::AllocateMipmap(unsigned int Depth, unsigned int MipLevel, unsigned int RowSize, unsigned int RowCount)
+void ZETextureData::AllocateMipmap(ZEUInt Depth, ZEUInt MipLevel, ZEUInt RowSize, ZEUInt RowCount)
 {
 	zeAssert(!CheckBoundaries(Depth, MipLevel), "Wrong Index");
 
@@ -131,7 +131,7 @@ void ZETextureData::AllocateMipmap(unsigned int Depth, unsigned int MipLevel, un
 	if(TargetMipmap->Data != NULL)
 		FreeMipmap(Depth, MipLevel);
 	
-	unsigned int AllocationSize = RowSize * RowCount;
+	ZEUInt AllocationSize = RowSize * RowCount;
 	TargetMipmap->Data = (void*)malloc(AllocationSize);
 	
 	if(TargetMipmap->Data == NULL)
@@ -143,7 +143,7 @@ void ZETextureData::AllocateMipmap(unsigned int Depth, unsigned int MipLevel, un
 }
 
 // Destroys mipmap data
-void ZETextureData::FreeMipmap(unsigned int Depth, unsigned int MipLevel)
+void ZETextureData::FreeMipmap(ZEUInt Depth, ZEUInt MipLevel)
 {
 	zeAssert(!CheckBoundaries(Depth, MipLevel), "Wrong Index");
 
@@ -161,11 +161,11 @@ void ZETextureData::FreeMipmap(unsigned int Depth, unsigned int MipLevel)
 }
 
 // Adds a surface to the end of the array
-void ZETextureData::AddSurface(unsigned int Count)
+void ZETextureData::AddSurface(ZEUInt Count)
 {
 	// Allocate surfaces of the texture
-	unsigned int OldAllocationSize	= sizeof(TextureData::SurfaceData) * Texture.Depth;
-	unsigned int AllocationSize		= sizeof(TextureData::SurfaceData) * (Texture.Depth + Count);
+	ZEUInt OldAllocationSize	= sizeof(TextureData::SurfaceData) * Texture.Depth;
+	ZEUInt AllocationSize		= sizeof(TextureData::SurfaceData) * (Texture.Depth + Count);
 	TextureData::SurfaceData* NewSurfaces = (TextureData::SurfaceData*)malloc(AllocationSize);
 	memset(NewSurfaces, 0, AllocationSize);
 	
@@ -181,11 +181,11 @@ void ZETextureData::AddSurface(unsigned int Count)
 	NewSurfaces = NULL;
 
 	// Allocate mipmaps array for the new surface
-	unsigned int MipmapsAllocationSize = sizeof(TextureData::SurfaceData::MipmapData) * Texture.MipmapCount;
+	ZEUInt MipmapsAllocationSize = sizeof(TextureData::SurfaceData::MipmapData) * Texture.MipmapCount;
 
 	if (MipmapsAllocationSize != 0)
 	{
-		for(unsigned int I = 0; I < Count; I++)
+		for(ZEUInt I = 0; I < Count; I++)
 		{
 			TextureData::SurfaceData::MipmapData* NewMipmaps = (TextureData::SurfaceData::MipmapData*)malloc(MipmapsAllocationSize);
 			memset(NewMipmaps, 0, MipmapsAllocationSize);
@@ -199,21 +199,21 @@ void ZETextureData::AddSurface(unsigned int Count)
 
 }
 
-void ZETextureData::RemoveSurface(unsigned int Count)
+void ZETextureData::RemoveSurface(ZEUInt Count)
 {
 	zeAssert(true, "NOT IMPLEMENTED!!!");
 }
 
 // Adds a mipmap to the end of the mipmap array of surface Depth
 // Adds mipmap to all surfaces.
-void ZETextureData::AddMipmap(unsigned int Count)
+void ZETextureData::AddMipmap(ZEUInt Count)
 {
-	unsigned int OldAllocationSize	= sizeof(TextureData::SurfaceData::MipmapData) * Texture.MipmapCount;
-	unsigned int AllocationSize		= sizeof(TextureData::SurfaceData::MipmapData) * (Texture.MipmapCount + Count);
+	ZEUInt OldAllocationSize	= sizeof(TextureData::SurfaceData::MipmapData) * Texture.MipmapCount;
+	ZEUInt AllocationSize		= sizeof(TextureData::SurfaceData::MipmapData) * (Texture.MipmapCount + Count);
 	TextureData::SurfaceData::MipmapData* NewMipmaps = NULL;
 
 	// For every surface
-	for(unsigned int I = 0; I < Texture.Depth; I++)
+	for(ZEUInt I = 0; I < Texture.Depth; I++)
 	{
 		// Allocate new storage
 		NewMipmaps = (TextureData::SurfaceData::MipmapData*)malloc(AllocationSize);
@@ -235,16 +235,16 @@ void ZETextureData::AddMipmap(unsigned int Count)
 	Texture.MipmapCount += Count;
 }
 
-void ZETextureData::RemoveMipmap(unsigned int Count)
+void ZETextureData::RemoveMipmap(ZEUInt Count)
 {
 	zeAssert(true, "NOT IMPLEMENTED!!!");
 }
 
 bool ZETextureData::IsEmpty()
 {
-	for(unsigned int I = 0; I < Texture.Depth; I++)
+	for(ZEUInt I = 0; I < Texture.Depth; I++)
 	{
-		for(unsigned int J = 0; J < Texture.MipmapCount; J++)
+		for(ZEUInt J = 0; J < Texture.MipmapCount; J++)
 		{
 			if(Texture.Surfaces[I].Mipmaps[J].Data != NULL)
 				return false;
@@ -254,42 +254,42 @@ bool ZETextureData::IsEmpty()
 	return true;
 }
 
-void ZETextureData::SetDepth(unsigned int Value)
+void ZETextureData::SetDepth(ZEUInt Value)
 {
 	Texture.Depth = Value;
 }
 
-unsigned int ZETextureData::GetDepth()
+ZEUInt ZETextureData::GetDepth()
 {
 	return Texture.Depth;
 }
 
-void ZETextureData::SetMipmapCount(unsigned int Value)
+void ZETextureData::SetMipmapCount(ZEUInt Value)
 {
 	Texture.MipmapCount = Value;
 }
 
-unsigned int ZETextureData::GetMipmapCount()
+ZEUInt ZETextureData::GetMipmapCount()
 {
 	return Texture.MipmapCount;
 }
 
-void ZETextureData::SetWidth(unsigned int Value)
+void ZETextureData::SetWidth(ZEUInt Value)
 {
 	Texture.Width = Value;
 }
 
-unsigned int ZETextureData::GetWidth()
+ZEUInt ZETextureData::GetWidth()
 {
 	return Texture.Width;
 }
 
-void ZETextureData::SetHeight(unsigned int Value)
+void ZETextureData::SetHeight(ZEUInt Value)
 {
 	Texture.Height = Value;
 }
 
-unsigned int ZETextureData::GetHeight()
+ZEUInt ZETextureData::GetHeight()
 {
 	return Texture.Height;
 }
@@ -304,7 +304,7 @@ ZETexturePixelFormat ZETextureData::GetPixelFormat()
 	return Texture.PixelFormat;
 }
 
-unsigned int ZETextureData::GetMipmapRowCount(unsigned int Depth, unsigned int MipLevel)
+ZEUInt ZETextureData::GetMipmapRowCount(ZEUInt Depth, ZEUInt MipLevel)
 {
 	zeAssert(!CheckBoundaries(Depth, MipLevel), "Wrong Index");
 
@@ -312,7 +312,7 @@ unsigned int ZETextureData::GetMipmapRowCount(unsigned int Depth, unsigned int M
 
 }
 
-unsigned int ZETextureData::GetMipmapRowSize(unsigned int Depth, unsigned int MipLevel)
+ZEUInt ZETextureData::GetMipmapRowSize(ZEUInt Depth, ZEUInt MipLevel)
 {
 	zeAssert(!CheckBoundaries(Depth, MipLevel), "Wrong Index");
 
@@ -320,7 +320,7 @@ unsigned int ZETextureData::GetMipmapRowSize(unsigned int Depth, unsigned int Mi
 
 }
 
-void* ZETextureData::GetMipmapData(unsigned int Depth, unsigned int MipLevel)
+void* ZETextureData::GetMipmapData(ZEUInt Depth, ZEUInt MipLevel)
 {
 	zeAssert(!CheckBoundaries(Depth, MipLevel), "Wrong Index");
 	
@@ -328,7 +328,7 @@ void* ZETextureData::GetMipmapData(unsigned int Depth, unsigned int MipLevel)
 
 }
 
-unsigned int ZETextureData::GetMipmapDataSize(unsigned int Depth, unsigned int MipLevel)
+ZEUInt ZETextureData::GetMipmapDataSize(ZEUInt Depth, ZEUInt MipLevel)
 {
 	zeAssert(!CheckBoundaries(Depth, MipLevel), "Wrong Index");
 
@@ -336,12 +336,12 @@ unsigned int ZETextureData::GetMipmapDataSize(unsigned int Depth, unsigned int M
 
 }
 
-unsigned int ZETextureData::GetSurfaceSize(unsigned int Depth)
+ZEUInt ZETextureData::GetSurfaceSize(ZEUInt Depth)
 {
 	zeAssert(!CheckBoundaries(Depth), "Wrong Index");
-	unsigned int SurfaceSize = 0;
+	ZEUInt SurfaceSize = 0;
 
-	for(unsigned int J = 0; J < Texture.MipmapCount; J++)
+	for(ZEUInt J = 0; J < Texture.MipmapCount; J++)
 	{
 		SurfaceSize += Texture.Surfaces[Depth].Mipmaps[J].RowCount * Texture.Surfaces[Depth].Mipmaps[J].RowSize;
 	}
@@ -349,12 +349,12 @@ unsigned int ZETextureData::GetSurfaceSize(unsigned int Depth)
 	return SurfaceSize;
 }
 
-unsigned int ZETextureData::GetTextureSize()
+ZEUInt ZETextureData::GetTextureSize()
 {
-	unsigned int TotalTextureSize = 0;
+	ZEUInt TotalTextureSize = 0;
 	
-	for(unsigned int I = 0; I < Texture.Depth; I++)
-		for(unsigned int J = 0; J < Texture.MipmapCount; J++)
+	for(ZEUInt I = 0; I < Texture.Depth; I++)
+		for(ZEUInt J = 0; J < Texture.MipmapCount; J++)
 			TotalTextureSize += Texture.Surfaces[I].Mipmaps[J].RowCount * Texture.Surfaces[I].Mipmaps[J].RowSize;
 	
 	return TotalTextureSize;
@@ -362,20 +362,20 @@ unsigned int ZETextureData::GetTextureSize()
 }
 
 // Returns the total size needed to open a ZEpartialFile in cache or in pack
-unsigned int ZETextureData::GetSizeOnDisk()
+ZEUInt ZETextureData::GetSizeOnDisk()
 {
-	unsigned int ZETextureFileHeaderSize = sizeof(ZETextureFileHeader);
-	unsigned int ZETextureFileSurfaceChunkSize = sizeof(ZETextureFileSurfaceChunk);
-	unsigned int ZETExtureFileMipmapChunkSize = sizeof(ZETExtureFileMipmapChunk);
+	ZEUInt ZETextureFileHeaderSize = sizeof(ZETextureFileHeader);
+	ZEUInt ZETextureFileSurfaceChunkSize = sizeof(ZETextureFileSurfaceChunk);
+	ZEUInt ZETExtureFileMipmapChunkSize = sizeof(ZETExtureFileMipmapChunk);
 
-	unsigned int TotalSurfaceChunkSize = 0;
-	unsigned int TotalMipmapChunkSize = 0;
-	unsigned int TotalMipmapDataSize = 0;
+	ZEUInt TotalSurfaceChunkSize = 0;
+	ZEUInt TotalMipmapChunkSize = 0;
+	ZEUInt TotalMipmapDataSize = 0;
 
-	for(unsigned int I = 0; I < Texture.Depth; I++)
+	for(ZEUInt I = 0; I < Texture.Depth; I++)
 	{
 		TotalSurfaceChunkSize += ZETextureFileSurfaceChunkSize;
-		for(unsigned int J = 0; J < Texture.MipmapCount; J++)
+		for(ZEUInt J = 0; J < Texture.MipmapCount; J++)
 		{
 			TotalMipmapChunkSize += ZETExtureFileMipmapChunkSize;
 			TotalMipmapDataSize += Texture.Surfaces[I].Mipmaps[J].RowCount * Texture.Surfaces[I].Mipmaps[J].RowSize;
@@ -386,37 +386,37 @@ unsigned int ZETextureData::GetSizeOnDisk()
 
 }
 
-void ZETextureData::CopyMipmapDataFrom(unsigned int Depth, unsigned int MipLevel, void* SourceData, unsigned int SourcePitch)
+void ZETextureData::CopyMipmapDataFrom(ZEUInt Depth, ZEUInt MipLevel, void* SourceData, ZEUInt SourcePitch)
 {
 	zeAssert(!CheckBoundaries(Depth, MipLevel), "Wrong Index");
 
 	void* Destination = Texture.Surfaces[Depth].Mipmaps[MipLevel].Data;
-	unsigned int DestinationPitch = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowSize;
-	unsigned int RowCount = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowCount;
-	unsigned int RowSize = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowSize;
+	ZEUInt DestinationPitch = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowSize;
+	ZEUInt RowCount = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowCount;
+	ZEUInt RowSize = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowSize;
 	
-	for(size_t I = 0; I < RowCount; I++)
+	for(ZESize I = 0; I < RowCount; I++)
 		memcpy((unsigned char*)Destination + I * DestinationPitch, (unsigned char*)SourceData + I * SourcePitch, RowSize);
 
 }
 
-void ZETextureData::CopyMipmapDataTo(unsigned int Depth, unsigned int MipLevel, void* Dest, unsigned int DestPitch)
+void ZETextureData::CopyMipmapDataTo(ZEUInt Depth, ZEUInt MipLevel, void* Dest, ZEUInt DestPitch)
 {
 	zeAssert(!CheckBoundaries(Depth, MipLevel), "Wrong Index");
 
 	void* Source = Texture.Surfaces[Depth].Mipmaps[MipLevel].Data;
-	unsigned int SourcePitch = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowSize;
-	unsigned int RowCount = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowCount;
-	unsigned int RowSize = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowSize;
+	ZEUInt SourcePitch = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowSize;
+	ZEUInt RowCount = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowCount;
+	ZEUInt RowSize = Texture.Surfaces[Depth].Mipmaps[MipLevel].RowSize;
 	
-	for(size_t I = 0; I < RowCount; I++)
+	for(ZESize I = 0; I < RowCount; I++)
 		memcpy((unsigned char*)Dest + I * DestPitch, (unsigned char*)Source + I * SourcePitch, RowSize);
 
 }
 
 ZETextureData::ZETextureData()
 {
-	unsigned int TexturedataSize = sizeof(TextureData);
+	ZEUInt TexturedataSize = sizeof(TextureData);
 	memset(&Texture, 0, TexturedataSize);
 
 }

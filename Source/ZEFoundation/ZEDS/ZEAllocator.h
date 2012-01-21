@@ -47,10 +47,10 @@ template <typename Type>
 class ZEAllocatorBase
 {
 	protected:
-		size_t				Size;
+		ZESize				Size;
 
 	public:	
-		inline static void ObjectCopy(Type* Destination, const Type* Source, size_t Count)
+		inline static void ObjectCopy(Type* Destination, const Type* Source, ZESize Count)
 		{
 			if (Count == 0)
 				return;
@@ -62,7 +62,7 @@ class ZEAllocatorBase
 			} while (Count--);
 		}
 
-		inline size_t GetSize() const
+		inline ZESize GetSize() const
 		{
 			return Size;
 		}
@@ -77,7 +77,7 @@ class ZEAllocatorBase
 			}
 		}
 	
-		inline bool Allocate(Type** Pointer, size_t NewSize)
+		inline bool Allocate(Type** Pointer, ZESize NewSize)
 		{
 			if (NewSize != 0)
 			{
@@ -103,13 +103,13 @@ class ZEAllocatorBase
 
 		}
 
-		inline void Reallocate(Type** Pointer, size_t NewSize)
+		inline void Reallocate(Type** Pointer, ZESize NewSize)
 		{
 			if (NewSize != 0)
 			{
 				if (Size != NewSize)
 				{
-					size_t OldSize = Size;
+					ZESize OldSize = Size;
 					Type* NewPointer = new Type[NewSize];
 					if (*Pointer != NULL)
 					{
@@ -130,13 +130,13 @@ class ZEAllocatorBase
 		}
 };
 
-template <typename Type, int ChunkSize>
+template <typename Type, ZEInt ChunkSize>
 class ZEChunkAllocator : public ZEAllocatorBase<Type>
 {
 	public:
-		inline bool Allocate(Type** Pointer, size_t NewSize)
+		inline bool Allocate(Type** Pointer, ZESize NewSize)
 		{
-			size_t OldSize;
+			ZESize OldSize;
 			if (NewSize != 0)
 			{
 				if ((Size < NewSize) || (Size - NewSize > ChunkSize))
@@ -165,10 +165,10 @@ class ZEChunkAllocator : public ZEAllocatorBase<Type>
 			}
 		}
 
-		inline void Reallocate(Type** Pointer, size_t NewSize)
+		inline void Reallocate(Type** Pointer, ZESize NewSize)
 		{
 			Type* OldPointer = *Pointer;
-			size_t OldSize = Size;
+			ZESize OldSize = Size;
 			if (Allocate(Pointer, NewSize))
 			{	
 				if (OldPointer != NULL)		
@@ -180,22 +180,22 @@ class ZEChunkAllocator : public ZEAllocatorBase<Type>
 		}
 };
 
-template <typename Type, size_t Exponent = 2>
+template <typename Type, ZESize Exponent = 2>
 class ZESmartAllocator : public ZEAllocatorBase<Type>
 {
 	private:
-		size_t LowerLimit;
+		ZESize LowerLimit;
 
 	public:
-		inline bool Allocate(Type** Pointer, size_t NewSize)
+		inline bool Allocate(Type** Pointer, ZESize NewSize)
 		{
-			int A = Exponent;
+			ZEInt A = Exponent;
 
 			if (NewSize != 0)
 			{
 				if ((NewSize > Size) || (NewSize < LowerLimit))
 				{
-					Size = (size_t)(powf((float)Exponent, (logf((float)NewSize) / logf((float)Exponent)) + 1.0f) + 0.5f);
+					Size = (ZESize)(powf((float)Exponent, (logf((float)NewSize) / logf((float)Exponent)) + 1.0f) + 0.5f);
 					LowerLimit = Size / Exponent;
 					*Pointer = new Type[Size];
 					return true;
@@ -215,9 +215,9 @@ class ZESmartAllocator : public ZEAllocatorBase<Type>
 			}
 		}
 
-		inline void Reallocate(Type** Pointer, size_t NewSize)
+		inline void Reallocate(Type** Pointer, ZESize NewSize)
 		{
-			size_t OldSize = Size;
+			ZESize OldSize = Size;
 			Type* OldPointer = *Pointer;
 			if (Allocate(Pointer, NewSize))
 			{	

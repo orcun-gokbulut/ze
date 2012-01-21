@@ -250,7 +250,7 @@ void ZED3D9ShadowRenderer::RenderProjectiveLight()
 	GetDevice()->SetRenderTarget(0, ShadowMapFrameBuffer);
 	GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)Light->GetShadowMap()->GetViewPort())->FrameBuffer);
 	float MaxFloat = 1.0f;
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, *(int*)&MaxFloat, 1.0f, 0x00);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, *(ZEInt*)&MaxFloat, 1.0f, 0x00);
 
 	GetDevice()->SetVertexShader(ProjectiveLightVS->GetVertexShader());
 	GetDevice()->SetPixelShader(ProjectiveLightPS->GetPixelShader());
@@ -261,7 +261,7 @@ void ZED3D9ShadowRenderer::RenderProjectiveLight()
 
 	ZEMatrix4x4::Multiply(ViewProjectionTransform, ProjectionTransform, ViewTransform);
 	GetDevice()->BeginScene();
-	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
+	for (ZESize I = 0; I < NonTransparent.GetCount(); I++)
 	{
 		ZERenderCommand* RenderCommand = &NonTransparent[I];
 
@@ -321,7 +321,7 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 		GetDevice()->SetDepthStencilSurface(((ZED3D9ViewPort*)Light->GetBackShadowMap()->GetViewPort())->FrameBuffer);
 
 	float MaxFloat = FLT_MAX;
-	GetDevice()->Clear(0, NULL, D3DCLEAR_ZBUFFER, *(int*)&MaxFloat, 1.0f, 0x00);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_ZBUFFER, *(ZEInt*)&MaxFloat, 1.0f, 0x00);
 
 	GetDevice()->SetVertexShader(OmniLightVS->GetVertexShader());
 	GetDevice()->SetPixelShader(OmniLightPS->GetPixelShader());
@@ -338,7 +338,7 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFF);
 	GetDevice()->BeginScene();
-	for (size_t I = 0; I < NonTransparent.GetCount(); I++)
+	for (ZESize I = 0; I < NonTransparent.GetCount(); I++)
 	{
 		ZERenderCommand* RenderCommand = &NonTransparent[I];
 

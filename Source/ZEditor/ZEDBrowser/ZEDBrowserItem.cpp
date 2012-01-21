@@ -130,7 +130,7 @@ ZEDBrowserItem::ZEDBrowserItem(ZEDBrowser* ParentBrowser, QWidget* Parent, QStri
 	FileType = FileInfo.suffix().toUpper();
 	Header->setText(FileInfo.fileName());
 
-	int FileSizeKB = FileInfo.size() / 1024;
+	ZEInt FileSizeKB = FileInfo.size() / 1024;
 
 	if(FileSizeKB < 1)
 		Footer->setText(QString::number(FileInfo.size()) + " B");
@@ -184,15 +184,15 @@ ZEDFileExtension* ZEDBrowserItem::GetRelatedExtension()
 {
 	ZEDExtension* CurrentExtension;
 
-	for (int I = 0; I < zedPlugInManager->GetExtensions().count(); I++)
+	for (ZEInt I = 0; I < zedPlugInManager->GetExtensions().count(); I++)
 	{
 		CurrentExtension = zedPlugInManager->GetExtensions().at(I);
 
 		if(CurrentExtension->GetDescription()->GetType() == ZED_FILE_EXTENSION)
 		{
-			int SupportedFileFormatCount = ((ZEDFileExtension*)(CurrentExtension))->GetSupportedFileFormats().count();
+			ZEInt SupportedFileFormatCount = ((ZEDFileExtension*)(CurrentExtension))->GetSupportedFileFormats().count();
 
-			for (int J = 0; J < SupportedFileFormatCount; J++)
+			for (ZEInt J = 0; J < SupportedFileFormatCount; J++)
 			{
 				if(QString::compare(((ZEDFileExtension*)(CurrentExtension))->GetSupportedFileFormats().at(J), FileType.toUpper(), CaseInsensitive) == 0)
 					return ((ZEDFileExtension*)(CurrentExtension));

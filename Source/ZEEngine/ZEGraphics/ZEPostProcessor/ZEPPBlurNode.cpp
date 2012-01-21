@@ -41,7 +41,7 @@ void ZEPPBlurNode::UpdateKernel()
 {
 	if (KernelDirtyFlag)
 	{
-		for (size_t I = 0; I <= 7; I++)
+		for (ZESize I = 0; I <= 7; I++)
 			Kernel[I] = (1.0f / (sqrtf(2.0f * ZE_PI * StandartDeviation))) * powf(ZE_E, -((((float)I - 3) * ((float)I - 3)) / (2 * StandartDeviation * StandartDeviation)));
 
 		KernelDirtyFlag = false;
@@ -70,7 +70,7 @@ ZEPostProcessorNodeType ZEPPBlurNode::GetNodeType()
 	return ZE_PPNT_PROCESSOR_NODE;
 }
 
-size_t ZEPPBlurNode::GetDependencyCount()
+ZESize ZEPPBlurNode::GetDependencyCount()
 {
 	return 1;
 }
@@ -90,22 +90,22 @@ ZEPostProcessorNode* ZEPPBlurNode::GetInput()
 	return Input;
 }
 
-void ZEPPBlurNode::SetDownSample(unsigned int Factor)
+void ZEPPBlurNode::SetDownSample(ZEUInt Factor)
 {
 	DownSample = Factor;
 }
 
-unsigned int ZEPPBlurNode::GetDownSample()
+ZEUInt ZEPPBlurNode::GetDownSample()
 {
 	return DownSample;
 }
 
-void ZEPPBlurNode::SetPassCount(unsigned int PassCount)
+void ZEPPBlurNode::SetPassCount(ZEUInt PassCount)
 {
 	this->PassCount = PassCount;
 }
 
-unsigned int ZEPPBlurNode::GetPassCount()
+ZEUInt ZEPPBlurNode::GetPassCount()
 {
 	return PassCount;
 }

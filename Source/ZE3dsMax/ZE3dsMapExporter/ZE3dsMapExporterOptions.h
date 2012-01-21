@@ -60,7 +60,7 @@ class ZE3dsMapExporterOptions
 		
 		bool				Logging_OutputToFile;
 		TCHAR				Logging_OutputFile[MAX_PATH];
-		int					Logging_Level;
+		ZEInt					Logging_Level;
 
 		void				Save(char* Filename);
 		void				Load(char* Filename);

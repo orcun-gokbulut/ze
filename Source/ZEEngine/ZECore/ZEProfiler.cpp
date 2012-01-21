@@ -50,7 +50,7 @@ ZEProfilerCounter* ZEProfiler::GetCounter(const ZEString& Name)
 {
 	if(Stack.GetSize() > 0)
 	{
-		for (size_t I = 0; I < Counters.GetCount(); I++)
+		for (ZESize I = 0; I < Counters.GetCount(); I++)
 			if (Stack.GetLastItem() == Counters[I]->GetParent() && Counters[I]->GetName() == Name)
 				return Counters[I];
 	}
@@ -66,7 +66,7 @@ ZEProfilerCounter* ZEProfiler::GetCounter(const ZEString& Name)
 
 ZEProfilerCounter* ZEProfiler::GetCounterForData(const ZEString& Name)
 {
-	for (size_t I = 0; I < Counters.GetCount(); I++)
+	for (ZESize I = 0; I < Counters.GetCount(); I++)
 		if (Counters[I]->GetName() == Name)
 			return Counters[I];
 

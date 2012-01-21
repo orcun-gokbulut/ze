@@ -66,7 +66,7 @@ struct ZEVertexDeclarationFileElementChunk
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -147,7 +147,7 @@ ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(ZEFile* ResourceFile)
 	VertexElements.SetCount(HeaderChunk.VertexElementCount);
 	
 	ZEVertexDeclarationFileElementChunk ElementChunk;
-	for (size_t I = 0; I < HeaderChunk.VertexElementCount; I++)
+	for (ZESize I = 0; I < HeaderChunk.VertexElementCount; I++)
 	{
 		ResourceFile->Read(&ElementChunk, sizeof(ZEVertexDeclarationFileElementChunk), 1);
 		VertexElements[I].Semantic = (ZEVertexElementSemantic)ElementChunk.Semantic;

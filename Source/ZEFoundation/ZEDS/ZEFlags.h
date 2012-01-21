@@ -45,17 +45,17 @@ class ZEFlagsBase
 	public:
 		Type Value;
 
-		inline void RaiseBit(size_t Index)
+		inline void RaiseBit(ZESize Index)
 		{
 			Value |= (0x1 << Index);
 		}
 
-		inline void UnraiseBit(size_t Index)
+		inline void UnraiseBit(ZESize Index)
 		{
 			Value &= ~(0x1 << Index);
 		}
 
-		inline void SetBit(size_t Index, bool Raise)
+		inline void SetBit(ZESize Index, bool Raise)
 		{
 			if (Raise)
 				RaiseBit(Index);
@@ -63,14 +63,14 @@ class ZEFlagsBase
 				UnraiseBit(Index);
 		}
 
-		inline bool GetBit(size_t Index) const
+		inline bool GetBit(ZESize Index) const
 		{
-			zeAssert(Index > 31, "ZEFlags::GetBit(size_t Index) index can't be greater than 31.");
+			zeAssert(Index > 31, "ZEFlags::GetBit(ZESize Index) index can't be greater than 31.");
 
 			return (Value & (0x1 << Index)) != 0;
 		}
 
-		inline void SetFlags(int Flags, bool Raise)
+		inline void SetFlags(ZEInt Flags, bool Raise)
 		{
 			if (Raise)
 				RaiseFlags(Flags);
@@ -78,7 +78,7 @@ class ZEFlagsBase
 				UnraiseFlags(Flags);
 		}
 
-		inline void RaiseFlags(int Flags)
+		inline void RaiseFlags(ZEInt Flags)
 		{
 			Value |= Flags;
 		}
@@ -89,12 +89,12 @@ class ZEFlagsBase
 
 		}
 
-		inline bool GetFlags(int Flags) const
+		inline bool GetFlags(ZEInt Flags) const
 		{
 			return (Value & Flags) == Flags;
 		}
 
-		inline bool operator[](size_t Index) const
+		inline bool operator[](ZESize Index) const
 		{
 			return GetBit(Index);
 		}

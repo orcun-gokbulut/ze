@@ -104,33 +104,33 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		// 2D Primitives
 		void							AddPoint(const ZEVector3& Point);
 		void							AddLine(const ZEVector3& Point0, const ZEVector3& Point1);
-		void							AddCircle(float Radius, unsigned int Segments);
+		void							AddCircle(float Radius, ZEUInt Segments);
 
 		// 3D Wireframe primitives
-		void							AddWireframePlane(float Width, float Length, unsigned int VSegment, unsigned int HSegment);
+		void							AddWireframePlane(float Width, float Length, ZEUInt VSegment, ZEUInt HSegment);
 		void							AddWireframeBox(float Width, float Height, float Length);
-		void							AddWireframeSphere(float Radius, unsigned int HSegments, unsigned int VSegments);
+		void							AddWireframeSphere(float Radius, ZEUInt HSegments, ZEUInt VSegments);
 		void							AddWireframeTriangle(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2);
 		void							AddWireframeQuad(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3);
-		void							AddWireframeCylinder(float Radius, float Height, unsigned int HSegments, unsigned int VSegments, bool Caps);
+		void							AddWireframeCylinder(float Radius, float Height, ZEUInt HSegments, ZEUInt VSegments, bool Caps);
 		void							AddWireframePyramid(float Width, float Height, float Length);
-		void							AddWireframeCone(float Radius, unsigned int Segments, float Height);
-		void							AddWireframeConvexPolygon(const ZEVector3* Vertices, size_t VertexCount);
+		void							AddWireframeCone(float Radius, ZEUInt Segments, float Height);
+		void							AddWireframeConvexPolygon(const ZEVector3* Vertices, ZESize VertexCount);
 
 		// 3D Primitives
 		void							AddBox(float Width, float Height, float Length);
-		void							AddSphere(float Radius, unsigned int HSegment, unsigned int VSegment);
+		void							AddSphere(float Radius, ZEUInt HSegment, ZEUInt VSegment);
 		void							AddTriangle(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2);
 		void							AddQuad(const ZEVector3& P0, const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3);
-		void							AddDisc(float Radius, unsigned int Segments);
+		void							AddDisc(float Radius, ZEUInt Segments);
 		void							AddPyramid(float Width, float Height, float Length);
 		void							AddPlane(float Width, float Length);
-		void							AddCone(float Radius, unsigned int Segments, float Height);
-		void							AddConvexPolygon(const ZEVector3* Vertices, size_t VertexCount);
+		void							AddCone(float Radius, ZEUInt Segments, float Height);
+		void							AddConvexPolygon(const ZEVector3* Vertices, ZESize VertexCount);
 
 		// Custom Vertices
 		void							AddVertex(const ZECanvasVertex& Vertex);
-		void							AddVertices(const ZECanvasVertex* Vertices, size_t Count);
+		void							AddVertices(const ZECanvasVertex* Vertices, ZESize Count);
 		
 		void							CalculateBoundingBox(ZEAABBox& BoundingBox);
 
@@ -142,7 +142,7 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		bool							LoadFromFile(const ZEString& FileName);
 		void							SaveToFile(const ZEString& FileName);
 
-		virtual size_t					GetBufferSize();
+		virtual ZESize					GetBufferSize();
 		virtual void*					GetVertexBuffer();
 		
 										ZECanvas();

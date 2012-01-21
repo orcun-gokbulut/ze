@@ -41,26 +41,26 @@ class ZEStaticVertexBuffer;
 
 struct ZETerrainPrimitiveIndices
 {
-	size_t CenterQuadIndex;
-	size_t CenterQuadSize;
+	ZESize CenterQuadIndex;
+	ZESize CenterQuadSize;
 	
-	size_t LeftTopCornerIndex;
-	size_t LeftTopCornerSize;
+	ZESize LeftTopCornerIndex;
+	ZESize LeftTopCornerSize;
 
-	size_t LeftBottomCornerIndex;
-	size_t LeftBottomCornerSize;
+	ZESize LeftBottomCornerIndex;
+	ZESize LeftBottomCornerSize;
 
-	size_t LeftEdgeIndex;
-	size_t LeftEdgeSize;
+	ZESize LeftEdgeIndex;
+	ZESize LeftEdgeSize;
 
-	size_t TopEdgeIndex;
-	size_t TopEdgeSize;
+	ZESize TopEdgeIndex;
+	ZESize TopEdgeSize;
 };
 
 class ZETerrainPrimitivesGenerator
 {
 	public:
-		static bool Generate(ZEStaticVertexBuffer** Buffer, ZETerrainPrimitiveIndices* Indices, int EdgeLenght);
+		static bool Generate(ZEStaticVertexBuffer** Buffer, ZETerrainPrimitiveIndices* Indices, ZEInt EdgeLenght);
 };
 
 #endif

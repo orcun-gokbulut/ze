@@ -144,14 +144,14 @@ void ZESerialPort::Close()
 	PortName = "";
 }
 
-bool ZESerialPort::ReadPackage(void* Packet, size_t PackageSize)
+bool ZESerialPort::ReadPackage(void* Packet, ZESize PackageSize)
 {
-	size_t TotalBytesRead = 0;
+	ZESize TotalBytesRead = 0;
 	clock_t NextTimeOut = ClockMs() + TimeOut;
 
 	while (PackageSize != TotalBytesRead)
 	{
-		size_t BytesRead = 0;
+		ZESize BytesRead = 0;
 
 		if (!ZESerialPort::Read(((char*)Packet + TotalBytesRead), PackageSize - TotalBytesRead, BytesRead))
 			return false;
@@ -172,14 +172,14 @@ bool ZESerialPort::ReadPackage(void* Packet, size_t PackageSize)
 	return true;
 }
 
-bool ZESerialPort::WritePackage(const void* Packet, size_t PackageSize)
+bool ZESerialPort::WritePackage(const void* Packet, ZESize PackageSize)
 {
-	size_t TotalBytesWritten = 0;
+	ZESize TotalBytesWritten = 0;
 	clock_t NextTimeOut = ClockMs() + TimeOut;
 
 	while (PackageSize != TotalBytesWritten)
 	{
-		size_t BytesWritten = 0;
+		ZESize BytesWritten = 0;
 
 		if (!ZESerialPort::Write(((const char*)Packet + TotalBytesWritten), PackageSize - TotalBytesWritten, BytesWritten))
 			return false;
@@ -201,7 +201,7 @@ bool ZESerialPort::WritePackage(const void* Packet, size_t PackageSize)
 
 void ZESerialPort::Clear()
 {
-	size_t BytesRead = 0;
+	ZESize BytesRead = 0;
 	do 
 	{
         char Temp[100];
@@ -212,7 +212,7 @@ void ZESerialPort::Clear()
 }
 
 
-bool ZESerialPort::Read(void* Data, size_t DataSize, size_t &BytesRead)
+bool ZESerialPort::Read(void* Data, ZESize DataSize, ZESize &BytesRead)
 {
 	unsigned long Temp;
 	if (!ReadFile(Handle, Data, DataSize, &Temp, NULL))
@@ -223,7 +223,7 @@ bool ZESerialPort::Read(void* Data, size_t DataSize, size_t &BytesRead)
 	return true;
 }
 
-bool ZESerialPort::Write(const void* Data, size_t DataSize, size_t &BytesWritten)
+bool ZESerialPort::Write(const void* Data, ZESize DataSize, ZESize &BytesWritten)
 {
 	DWORD Temp;
 	if (!WriteFile(Handle, Data, DataSize, &Temp, NULL))

@@ -46,7 +46,7 @@
 
 static unsigned DLL_CALLCONV	FreeImageFile_Write_2D(void *buffer, unsigned size, unsigned count, fi_handle handle);
 static unsigned DLL_CALLCONV	FreeImageFile_Read_2D(void *buffer, unsigned size, unsigned count, fi_handle handle);
-static int		DLL_CALLCONV	FreeImageFile_Seek_2D(fi_handle handle, long offset, int origin);
+static ZEInt		DLL_CALLCONV	FreeImageFile_Seek_2D(fi_handle handle, long offset, ZEInt origin);
 static long		DLL_CALLCONV	FreeImageFile_Tell_2D(fi_handle handle);
 
 // Checks the file is in ZE texture file format
@@ -134,12 +134,12 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 		Bitmap32 = Bitmap;
 	}
 
-	unsigned int BPP		= FreeImage_GetBPP(Bitmap32);
-	unsigned int Width		= FreeImage_GetWidth(Bitmap32);
-	unsigned int Height		= FreeImage_GetHeight(Bitmap32);
-	unsigned int PixelSize	= BPP / 8;
-	unsigned int RowSize	= Width * PixelSize;
-	unsigned int RowCount	= Height;
+	ZEUInt BPP		= FreeImage_GetBPP(Bitmap32);
+	ZEUInt Width		= FreeImage_GetWidth(Bitmap32);
+	ZEUInt Height		= FreeImage_GetHeight(Bitmap32);
+	ZEUInt PixelSize	= BPP / 8;
+	ZEUInt RowSize	= Width * PixelSize;
+	ZEUInt RowCount	= Height;
 
 	TextureData->CreateTexture(ZE_TPF_I8_4, 1, 1, Width, Height);
 	TextureData->AllocateMipmap(0, 0, RowSize, RowCount);
@@ -156,7 +156,7 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 
 // Saves a ZETexture data to specified file in ".tga" format
 // Only saves mipmap level 0 of surface 0
-bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, unsigned int Surface, unsigned int Mipmap)
+bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, ZEUInt Surface, ZEUInt Mipmap)
 {
 	if(TextureData->GetPixelFormat() != ZE_TPF_I8_4)
 	{
@@ -175,13 +175,13 @@ bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, 
 
 	File->Seek(0, ZE_SF_BEGINING);
 
-	unsigned int PixelSize	= 4;
-	unsigned int BPP		= PixelSize * 8;
-	unsigned int RowSize	= TextureData->GetMipmapRowSize(Surface, Mipmap);
-	unsigned int RowCount	= TextureData->GetMipmapRowCount(Surface, Mipmap);
-	unsigned int Width		= RowSize / PixelSize;
-	unsigned int Height		= RowCount;
-	unsigned int Pitch		= RowSize;
+	ZEUInt PixelSize	= 4;
+	ZEUInt BPP		= PixelSize * 8;
+	ZEUInt RowSize	= TextureData->GetMipmapRowSize(Surface, Mipmap);
+	ZEUInt RowCount	= TextureData->GetMipmapRowCount(Surface, Mipmap);
+	ZEUInt Width		= RowSize / PixelSize;
+	ZEUInt Height		= RowCount;
+	ZEUInt Pitch		= RowSize;
 
 	FIBITMAP* Bitmap;
 	Bitmap = FreeImage_ConvertFromRawBits((BYTE*)TextureData->GetMipmapData(Surface, Mipmap), Width, Height, Pitch, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
@@ -233,7 +233,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 							FileHeader.MipMapCount, FileHeader.Width, FileHeader.Height);
 
 	// For every surface
-	for(size_t I = 0; I < FileHeader.Depth; I++)
+	for(ZESize I = 0; I < FileHeader.Depth; I++)
 	{
 		// Get surface header
 		ZETextureFileSurfaceChunk	SurfaceChunk;
@@ -256,7 +256,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 		// There is no surface data for v1.0
 
 		// For every mipmap
-		for(size_t J = 0; J < FileHeader.MipMapCount; J++)
+		for(ZESize J = 0; J < FileHeader.MipMapCount; J++)
 		{
 			ZETExtureFileMipmapChunk MipmapChunk;
 			if(File->Read(&MipmapChunk, sizeof(ZETExtureFileMipmapChunk), 1) != 1)
@@ -275,7 +275,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 			}
 
 			// Read mipmap data
-			unsigned int MipSize = MipmapChunk.RowCount * MipmapChunk.RowSize;
+			ZEUInt MipSize = MipmapChunk.RowCount * MipmapChunk.RowSize;
 			TextureData->AllocateMipmap(I, J, MipmapChunk.RowSize, MipmapChunk.RowCount);
 			if(File->Read(TextureData->GetMipmapData(I, J), MipSize, 1) != 1)
 			{
@@ -317,7 +317,7 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 	}
 
 	// For every surface
-	for(size_t I = 0; I < FileHeader.Depth; I++)
+	for(ZESize I = 0; I < FileHeader.Depth; I++)
 	{
 		// Create and write surface header
 		ZETextureFileSurfaceChunk	SurfaceChunk;
@@ -330,7 +330,7 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 		}
 
 		// For every mipmap
-		for(size_t J = 0; J < FileHeader.MipMapCount; J++)
+		for(ZESize J = 0; J < FileHeader.MipMapCount; J++)
 		{
 			// Create and write mipmap header
 			ZETExtureFileMipmapChunk	MipmapChunk;
@@ -345,7 +345,7 @@ bool ZETextureLoader::Write(ZEFile* File, ZETextureData* TextureData)
 			}
 
 			// Write mipmap data
-			unsigned int MipSize = MipmapChunk.RowCount * MipmapChunk.RowSize;
+			ZEUInt MipSize = MipmapChunk.RowCount * MipmapChunk.RowSize;
 			if(File->Write(TextureData->GetMipmapData(I, J), MipSize, 1) != 1)
 			{
 				zeAssert(true, "Cannot write mipmap data! File name: \"&s\".", File->GetFilePath().GetValue());
@@ -470,15 +470,15 @@ ZETextureLoader::~ZETextureLoader()
 
 static unsigned DLL_CALLCONV FreeImageFile_Write_2D(void *buffer, unsigned size, unsigned count, fi_handle handle)
 {
-	return (unsigned int)((ZEFile*)handle)->Write(buffer, size, count);
+	return (ZEUInt)((ZEFile*)handle)->Write(buffer, size, count);
 }
 
 static unsigned DLL_CALLCONV FreeImageFile_Read_2D(void *buffer, unsigned size, unsigned count, fi_handle handle) 
 {
-	return (unsigned int)((ZEFile*)handle)->Read(buffer, size, count);
+	return (ZEUInt)((ZEFile*)handle)->Read(buffer, size, count);
 }
 
-static int DLL_CALLCONV FreeImageFile_Seek_2D(fi_handle handle, long offset, int origin)
+static ZEInt DLL_CALLCONV FreeImageFile_Seek_2D(fi_handle handle, long offset, ZEInt origin)
 {
 	ZESeekFrom OriginNorm;
 	switch(origin)

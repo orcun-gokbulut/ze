@@ -38,7 +38,7 @@
 
 #define ZE3dsMapExporter_CLASS_ID	Class_ID(0x3a8ad1e4, 0x973e26ff)
 
-int ZE3dsMapExporterDescription::IsPublic()
+ZEInt ZE3dsMapExporterDescription::IsPublic()
 { 
 	return TRUE; 
 }

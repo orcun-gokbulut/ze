@@ -55,11 +55,11 @@ const ZEArray<ZESoundDevice>& ZEALModule::GetDeviceList()
 
 void ZEALModule::UpdateVolumes(ZESoundSourceType SourceType)
 {
-	for (size_t I = 0; I < SoundSources.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources.GetCount(); I++)
 		if (SoundSources[I]->GetSoundSourceType() == SourceType)
 			SoundSources[I]->SetVolume(SoundSources[I]->GetVolume());
 
-	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources3D.GetCount(); I++)
 		if (SoundSources3D[I]->GetSoundSourceType() == SourceType)
 			SoundSources3D[I]->SetVolume(SoundSources[I]->GetVolume());
 
@@ -67,10 +67,10 @@ void ZEALModule::UpdateVolumes(ZESoundSourceType SourceType)
 
 void ZEALModule::UpdateStreams()
 {
-	for (size_t I = 0; I < SoundSources.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources.GetCount(); I++)
 		SoundSources[I]->CreateBuffer();
 
-	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources3D.GetCount(); I++)
 		SoundSources[I]->CreateBuffer();
 }
 
@@ -105,7 +105,7 @@ bool ZEALModule::Initialize()
 		return false;
 	}
 
-	size_t I = 0, Start = 0;
+	ZESize I = 0, Start = 0;
 	while (true)
 	{
 		if (DeviceNames[I] == '\0')
@@ -129,7 +129,7 @@ bool ZEALModule::Initialize()
 		I++;
 	}
 
-	unsigned int DeviceId = SoundOptions.GetOption("DeviceId")->GetValue().GetInteger();
+	ZEUInt DeviceId = SoundOptions.GetOption("DeviceId")->GetValue().GetInteger();
 
 	ALchar* DeviceName = NULL;
 	if (DeviceId > DeviceList.GetCount())
@@ -160,7 +160,7 @@ bool ZEALModule::Initialize()
 
 	ZEALComponentBase::BaseInitialize(this);
 
-	for(size_t I = 0; I < ZE_SS_MAX_TYPE; I++)
+	for(ZESize I = 0; I < ZE_SS_MAX_TYPE; I++)
 		TypeVolumes[I] = 100;
 
 	SetStreamingDisabled(SoundOptions.GetOption("StreamingDisabled")->GetValue().GetBoolean());
@@ -210,7 +210,7 @@ bool ZEALModule::GetStreamingDisabled()
 	return StreamingDisabled;
 }
 
-void ZEALModule::SetMasterVolume(unsigned int Volume)
+void ZEALModule::SetMasterVolume(ZEUInt Volume)
 {
 	if (Volume > ZE_SS_VOLUME_MAX)
 		MasterVolume = ZE_SS_VOLUME_MAX;
@@ -220,12 +220,12 @@ void ZEALModule::SetMasterVolume(unsigned int Volume)
 	alListenerf(AL_GAIN, MasterVolume / 100.0f);
 }
 
-unsigned int ZEALModule::GetMasterVolume()
+ZEUInt ZEALModule::GetMasterVolume()
 {
 	return MasterVolume;
 }
 
-void ZEALModule::SetTypeVolume(ZESoundSourceType Type, unsigned int Volume)
+void ZEALModule::SetTypeVolume(ZESoundSourceType Type, ZEUInt Volume)
 {
 	if (Volume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;
@@ -235,29 +235,29 @@ void ZEALModule::SetTypeVolume(ZESoundSourceType Type, unsigned int Volume)
 	UpdateVolumes(Type);
 }
 
-unsigned int ZEALModule::GetTypeVolume(ZESoundSourceType Type)
+ZEUInt ZEALModule::GetTypeVolume(ZESoundSourceType Type)
 {
 	zeAssert(Type >= 256, "Sound source types are limited to 256");
 	return TypeVolumes[Type];
 }
 
 
-void ZEALModule::SetMaxBufferSize(size_t BufferSize)
+void ZEALModule::SetMaxBufferSize(ZESize BufferSize)
 {
 	MaxBufferSize = BufferSize;
 }
 
-size_t ZEALModule::GetMaxBufferSize()
+ZESize ZEALModule::GetMaxBufferSize()
 {
 	return MaxBufferSize;
 }
 
 void ZEALModule::ProcessSound(float ElapsedTime)
 {
-	for (size_t I = 0; I < SoundSources.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources.GetCount(); I++)
 		SoundSources[I]->Update(ElapsedTime);
 
-	for (size_t I = 0; I < SoundSources3D.GetCount(); I++)
+	for (ZESize I = 0; I < SoundSources3D.GetCount(); I++)
 		SoundSources3D[I]->Update(ElapsedTime);
 }
 

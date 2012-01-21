@@ -68,7 +68,7 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 {
 	zeInput->ProcessInputMap(&InputMap);
 
-	for (size_t I = 0; I < InputMap.InputActionCount; I++)
+	for (ZESize I = 0; I < InputMap.InputActionCount; I++)
 	{
 		switch (InputMap.InputActions[I].Id)
 		{
@@ -128,7 +128,7 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 		}
 	}
 
-	int WindowWidth, WindowHeight;
+	ZEInt WindowWidth, WindowHeight;
 	zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
 
 	if (GetPosition().x > WindowWidth)
@@ -188,7 +188,7 @@ ZEUICursorControl::ZEUICursorControl()
 	SetHeight(24);
 	SetWidth(24);	
 
-	int Width, Height;
+	ZEInt Width, Height;
 	zeCore->GetWindow()->GetWindowSize(Width, Height);
 	SetPosition(ZEVector2((Width / 2.0f) , (Height / 2.0f)));
 

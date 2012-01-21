@@ -135,7 +135,7 @@ void DumpTexture(ZEResourceInternalFile* TextureFile, HBITMAP Bitmap, HDC DC)
 
 	hp = lpBits; 
 	
-	for (size_t I = 0; I < cb / 4; I++)
+	for (ZESize I = 0; I < cb / 4; I++)
 	{
 		color = ((ARGB*)hp) + I;
 		color->r = color->g = color->b = color->a = (color->r + color->g + color->b) / 3;
@@ -149,12 +149,12 @@ void DumpTexture(ZEResourceInternalFile* TextureFile, HBITMAP Bitmap, HDC DC)
 }
 
 bool ZEFontBaker:: BakeFont(ZEFont* Output, 
-							const char* FontName, int FontSize,
+							const char* FontName, ZEInt FontSize,
 							bool FontItalic, bool FontBold,	bool FontUnderLine, bool FontStrikeOut,
-							int TextureWidth, int TextureHeight, 
-							int StartCharacter, int EndCharacter,
-							int CharacterSpacingX, int CharacterSpacingY,
-							int LeftMargin, int TopMargin, int RightMargin, int BottomMargin, 
+							ZEInt TextureWidth, ZEInt TextureHeight, 
+							ZEInt StartCharacter, ZEInt EndCharacter,
+							ZEInt CharacterSpacingX, ZEInt CharacterSpacingY,
+							ZEInt LeftMargin, ZEInt TopMargin, ZEInt RightMargin, ZEInt BottomMargin, 
 							bool GenerateCoordsOnly )
 {
 	HDC dc;
@@ -174,10 +174,10 @@ bool ZEFontBaker:: BakeFont(ZEFont* Output,
 	SetBkMode(dc, TRANSPARENT);
 	SetTextColor(dc, RGB(255, 255, 255));
 
-	int OffsetX = LeftMargin + CharacterSpacingX;
-	int OffsetY = TopMargin + CharacterSpacingY;
+	ZEInt OffsetX = LeftMargin + CharacterSpacingX;
+	ZEInt OffsetY = TopMargin + CharacterSpacingY;
 
-	int* CharacterWidths = new int[EndCharacter - StartCharacter];
+	ZEInt* CharacterWidths = new ZEInt[EndCharacter - StartCharacter];
 	GetCharWidth(dc, StartCharacter, EndCharacter, CharacterWidths);
 
 	TEXTMETRIC	Metric;
@@ -185,15 +185,15 @@ bool ZEFontBaker:: BakeFont(ZEFont* Output,
 
 	Output->Textures.Clear();
 
-	int BitmapId = 0;
+	ZEInt BitmapId = 0;
 	RECT CharacterRectangle;
-	for (int I = 0; I <= 255; I++)
+	for (ZEInt I = 0; I <= 255; I++)
 	{
 		if (I < StartCharacter || I > EndCharacter)
 			ZeroMemory(&Output->Characters[I], sizeof(ZEFontCharacter));
 	}
 
-	for (int I = StartCharacter; I <= EndCharacter; I++)
+	for (ZEInt I = StartCharacter; I <= EndCharacter; I++)
 	{
 		char Character = I;
 		if (OffsetX + CharacterWidths[I - StartCharacter] + RightMargin >= TextureWidth)

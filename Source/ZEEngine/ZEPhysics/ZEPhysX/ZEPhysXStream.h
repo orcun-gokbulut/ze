@@ -82,7 +82,7 @@ class ZEPhysXMemoryWriteStream : public NxStream
 		virtual					~ZEPhysXMemoryWriteStream();
 
 		const NxU8*				GetData() const;
-		const size_t			GetDataSize() const;
+		const ZESize			GetDataSize() const;
 
 		void					Clear();
 

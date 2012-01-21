@@ -80,7 +80,7 @@ void ZEDNodeEditorAddConnectionOperation::Undo()
 {
 	if (AddConnectionUndoRedo != NULL)
 	{
-		int Index = ParentView->Connections.indexOf(AddConnectionUndoRedo);
+		ZEInt Index = ParentView->Connections.indexOf(AddConnectionUndoRedo);
 		ParentView->MainScene->removeItem(ParentView->Connections[Index]);				
 		ParentView->Connections.removeAt(Index);
 		
@@ -136,7 +136,7 @@ void ZEDNodeEditorDeleteNodeOperation::SetView(ZEDNodeEditorGraphicsView* View)
 
 void ZEDNodeEditorDeleteNodeOperation::Undo()
 {
-	for (int J = 0; J < ParentView->Nodes.count() ; J++)
+	for (ZEInt J = 0; J < ParentView->Nodes.count() ; J++)
 	{
 		if (ParentView->Nodes[J]->zValue() >= NodeZValue )
 		{
@@ -155,12 +155,12 @@ void ZEDNodeEditorDeleteNodeOperation::Redo()
 	ParentView->MainScene->removeItem(DeletedNode);	
 	ParentView->MainScene->removeItem(DeletedNode->GetScaleGizmo());	
 
-	int Index = ParentView->Nodes.indexOf(DeletedNode);
+	ZEInt Index = ParentView->Nodes.indexOf(DeletedNode);
 	ParentView->Nodes.removeAt(Index);
 
-	int RemovedNodeZValue = DeletedNode->zValue();
+	ZEInt RemovedNodeZValue = DeletedNode->zValue();
 
-	for (int I = 0; I < ParentView->Nodes.count(); I++)
+	for (ZEInt I = 0; I < ParentView->Nodes.count(); I++)
 	{				
 		if (ParentView->Nodes[I]->zValue() > RemovedNodeZValue)
 		{
@@ -204,13 +204,13 @@ void ZEDNodeEditorMoveNodeOperation::SetView(ZEDNodeEditorGraphicsView* View)
 
 void ZEDNodeEditorMoveNodeOperation::Undo()
 {
-	int Index = ParentView->Nodes.indexOf(MoveNode);
+	ZEInt Index = ParentView->Nodes.indexOf(MoveNode);
 	NodeNewPosition = ParentView->Nodes[Index]->scenePos();
 
 	ParentView->Nodes[Index]->translate(NodeOldPosition.x() - NodeNewPosition.x(), NodeOldPosition.y() - NodeNewPosition.y());
 	ParentView->Nodes[Index]->GetScaleGizmo()->translate(NodeOldPosition.x() - NodeNewPosition.x(), NodeOldPosition.y() - NodeNewPosition.y());
 
-	for (int J = 0; J < ParentView->Connections.count(); J++)
+	for (ZEInt J = 0; J < ParentView->Connections.count(); J++)
 	{
 		if (ParentView->Connections[J]->GetFromNode() == MoveNode || ParentView->Connections[J]->GetToNode() == MoveNode)
 		{
@@ -229,7 +229,7 @@ void ZEDNodeEditorMoveNodeOperation::Redo()
 	MoveNode->translate(NodeNewPosition.x() - NodeOldPosition.x(), NodeNewPosition.y() - NodeOldPosition.y());
 	MoveNode->GetScaleGizmo()->translate(NodeNewPosition.x() - NodeOldPosition.x(), NodeNewPosition.y() - NodeOldPosition.y());
 
-	for (int J = 0; J < ParentView->Connections.count(); J++)
+	for (ZEInt J = 0; J < ParentView->Connections.count(); J++)
 	{
 		if (ParentView->Connections[J]->GetFromNode() == MoveNode || ParentView->Connections[J]->GetToNode() == MoveNode)
 		{
@@ -284,7 +284,7 @@ void ZEDNodeEditorDeleteConnectionOperation::Undo()
 
 void ZEDNodeEditorDeleteConnectionOperation::Redo()
 {
-	int Index = ParentView->Connections.indexOf(DeletedConnection);
+	ZEInt Index = ParentView->Connections.indexOf(DeletedConnection);
 	ParentView->MainScene->removeItem(ParentView->Connections[Index]);				
 	ParentView->Connections.removeAt(Index);
 
@@ -324,7 +324,7 @@ void ZEDNodeEditorResizeNodeOperation::SetView(ZEDNodeEditorGraphicsView* View)
 
 void ZEDNodeEditorResizeNodeOperation::Undo()
 {
-	int Index = ParentView->Nodes.indexOf(ResizeNode);
+	ZEInt Index = ParentView->Nodes.indexOf(ResizeNode);
 	NodeNewRectangle = QRectF(ParentView->Nodes[Index]->boundingRect());
 	
 	ResizeNode->setPolygon(QRectF(NodeOldRectangle));
@@ -332,7 +332,7 @@ void ZEDNodeEditorResizeNodeOperation::Undo()
 	ResizeNode->ScaleByGizmo();
 	ResizeNode->GetScaleGizmo()->Update();
 
-	for (int J = 0; J < ParentView->GetConnections()->count(); J++)
+	for (ZEInt J = 0; J < ParentView->GetConnections()->count(); J++)
 	{
 		if (ParentView->Connections[J]->GetFromNode() == ResizeNode || ParentView->Connections[J]->GetToNode() == ResizeNode)
 		{
@@ -346,7 +346,7 @@ void ZEDNodeEditorResizeNodeOperation::Undo()
 
 void ZEDNodeEditorResizeNodeOperation::Redo()
 {
-	int Index = ParentView->Nodes.indexOf(ResizeNode);
+	ZEInt Index = ParentView->Nodes.indexOf(ResizeNode);
 	NodeOldRectangle = QRectF(ParentView->Nodes[Index]->boundingRect());
 
 	ResizeNode->setPolygon(QRectF(NodeNewRectangle));
@@ -354,7 +354,7 @@ void ZEDNodeEditorResizeNodeOperation::Redo()
 	ResizeNode->ScaleByGizmo();
 	ResizeNode->GetScaleGizmo()->Update();
 
-	for (int J = 0; J < ParentView->GetConnections()->count(); J++)
+	for (ZEInt J = 0; J < ParentView->GetConnections()->count(); J++)
 	{
 		if (ParentView->Connections[J]->GetFromNode() == ResizeNode || ParentView->Connections[J]->GetToNode() == ResizeNode)
 		{
@@ -403,7 +403,7 @@ void ZEDNodeEditorItemSelectionOperation::Undo()
 	{
 		SelectedItem->SetSelected(false);
 		
-		int Index = ParentView->SelectedItems.indexOf(SelectedItem);
+		ZEInt Index = ParentView->SelectedItems.indexOf(SelectedItem);
 		ParentView->SelectedItems.removeAt(Index);
 	}
 
@@ -467,7 +467,7 @@ void ZEDNodeEditorItemDeselectionOperation::Redo()
 	{
 		DeselectedItem->SetSelected(false);
 
-		int Index = ParentView->SelectedItems.indexOf(DeselectedItem);
+		ZEInt Index = ParentView->SelectedItems.indexOf(DeselectedItem);
 		ParentView->SelectedItems.removeAt(Index);
 	}
 
@@ -509,7 +509,7 @@ void ZEDNodeEditorSendBackwardOperation::SetView(ZEDNodeEditorGraphicsView* View
 
 void ZEDNodeEditorSendBackwardOperation::Undo()
 {
-	for (int I = 0; I < ParentView->Nodes.count(); I++)
+	for (ZEInt I = 0; I < ParentView->Nodes.count(); I++)
 	{
 		if (ParentView->Nodes[I]->zValue() == SendBackwardNodeZValue)
 		{
@@ -519,7 +519,7 @@ void ZEDNodeEditorSendBackwardOperation::Undo()
 	
 	SendBackwardNode->setZValue(SendBackwardNodeZValue);
 
-	for (int I = 0; I < ParentView->Nodes.count(); I++)
+	for (ZEInt I = 0; I < ParentView->Nodes.count(); I++)
 	{
 		qDebug() << ParentView->Nodes[I]->zValue();
 	}
@@ -527,7 +527,7 @@ void ZEDNodeEditorSendBackwardOperation::Undo()
 
 void ZEDNodeEditorSendBackwardOperation::Redo()
 {
-	for (int I = 0; I < ParentView->Nodes.count(); I++)
+	for (ZEInt I = 0; I < ParentView->Nodes.count(); I++)
 	{
 		if (ParentView->Nodes[I]->zValue() == SendBackwardNodeZValue - 1)
 		{
@@ -573,7 +573,7 @@ void ZEDNodeEditorBringForwardOperation::SetView(ZEDNodeEditorGraphicsView* View
 
 void ZEDNodeEditorBringForwardOperation::Undo()
 {
-	for (int I = 0; I < ParentView->Nodes.count(); I++)
+	for (ZEInt I = 0; I < ParentView->Nodes.count(); I++)
 	{
 		if (ParentView->Nodes[I]->zValue() == BringForwardNodeZValue)
 		{
@@ -586,7 +586,7 @@ void ZEDNodeEditorBringForwardOperation::Undo()
 
 void ZEDNodeEditorBringForwardOperation::Redo()
 {
-	for (int I = 0; I < ParentView->Nodes.count(); I++)
+	for (ZEInt I = 0; I < ParentView->Nodes.count(); I++)
 	{
 		if (ParentView->Nodes[I]->zValue() == BringForwardNodeZValue + 1)
 		{

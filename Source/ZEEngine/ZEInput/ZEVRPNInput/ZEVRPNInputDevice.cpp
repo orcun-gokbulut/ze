@@ -73,8 +73,8 @@ static void VRPN_CALLBACK Axis_ChangeHandler(void* UserData, const vrpn_ANALOGCB
 {
 	ZEVRPNInputDevice* Device = (ZEVRPNInputDevice*)UserData;
 
-	int AxisCount = Data.num_channel > 3 ? 3 : Data.num_channel;
-	for (int I = 0; I < AxisCount; I++)
+	ZEInt AxisCount = Data.num_channel > 3 ? 3 : Data.num_channel;
+	for (ZEInt I = 0; I < AxisCount; I++)
 		Device->Axises[I] = (float)(Data.channel[I]);
 }
 
@@ -190,7 +190,7 @@ bool ZEVRPNInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInpu
 						{
 							Action->Id = InputBinding->ActionId;
 							Action->From =  InputBinding;
-							Action->AxisValue = (int)(Axises[InputEvent->Index]);
+							Action->AxisValue = (ZEInt)(Axises[InputEvent->Index]);
 							return true;
 						}
 					}
@@ -200,7 +200,7 @@ bool ZEVRPNInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInpu
 						{
 							Action->Id = InputBinding->ActionId;
 							Action->From =  InputBinding;
-							Action->AxisValue = (int)(-Axises[InputEvent->Index]);
+							Action->AxisValue = (ZEInt)(-Axises[InputEvent->Index]);
 							return true;
 						}
 					}
@@ -208,7 +208,7 @@ bool ZEVRPNInputDevice::ProcessInputBinding(ZEInputBinding* InputBinding, ZEInpu
 				break;
 
 			case ZE_IT_BUTTON:
-				for (int I = 0; I < 5; I++)
+				for (ZEInt I = 0; I < 5; I++)
 					if ((InputEvent->ButtonState == ZE_IBS_PRESSING && (Buttons[InputEvent->Index] == true)) ||
 						(InputEvent->ButtonState == ZE_IBS_PRESSED && (Buttons[InputEvent->Index] == true) && !(OldButtons[InputEvent->Index] == true)) || 
 						(InputEvent->ButtonState == ZE_IBS_RELEASED && !(Buttons[InputEvent->Index] == true) && (OldButtons[InputEvent->Index] == true)))

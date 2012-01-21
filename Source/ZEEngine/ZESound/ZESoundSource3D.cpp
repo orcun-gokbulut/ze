@@ -62,17 +62,17 @@ float ZESoundSource3D::GetMaxDistance() const
 	return MaxDistance;
 }
 
-unsigned int ZESoundSource3D::GetConeInsideAngle() const
+ZEUInt ZESoundSource3D::GetConeInsideAngle() const
 {
 	return ConeInsideAngle;
 }
 
-unsigned int ZESoundSource3D::GetConeOutsideAngle() const
+ZEUInt ZESoundSource3D::GetConeOutsideAngle() const
 {
 	return ConeOutsideAngle;
 }
 	
-unsigned int ZESoundSource3D::GetConeOutsideVolume() const
+ZEUInt ZESoundSource3D::GetConeOutsideVolume() const
 {
 	return ConeOutsideVolume;
 }

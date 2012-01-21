@@ -390,8 +390,8 @@ ZEUInt64 ZECompressedFile::Read(void* Buffer, ZEUInt64 Size,ZEUInt64 Count)
 
 	}
 
-	int InflateReturnValue = 0;
-	int Flush;
+	ZEInt InflateReturnValue = 0;
+	ZEInt Flush;
 	Index ActiveIndex;
 	ZEUInt64 DeCompressedDataSize = 0;
 	ZEUInt64 TotalDeCompressedDataSize = 0;
@@ -595,8 +595,8 @@ ZEUInt64 ZECompressedFile::Write( const void* Buffer, ZEUInt64 Size, ZEUInt64 Co
 {
 	if(!File)
 		return 0;
-	int Flush;
-	int DeflateReturnValue;
+	ZEInt Flush;
+	ZEInt DeflateReturnValue;
 	ZEInt64 BufferPointer;
 	ZEUInt64 CompressedDataSize = 0;
 	ZEUInt64 TotalCompressedDataSize = 0;

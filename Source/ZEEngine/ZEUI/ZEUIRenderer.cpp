@@ -72,7 +72,7 @@ void ZEUIRenderer::Initialize()
 
 void ZEUIRenderer::Deinitialize()
 {
-	for (size_t I = 0; I < RenderCommands.GetCount(); I++)
+	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
 		if (RenderCommands[I].VertexBuffer != NULL)
 			delete RenderCommands[I].VertexBuffer;
 
@@ -97,7 +97,7 @@ void ZEUIRenderer::Destroy()
 
 void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 {
-	for (size_t I = 0; I < RenderCommands.GetCount(); I++)
+	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
 		if (RenderCommands[I].Material == Rectangle.Material || (Rectangle.Material == NULL && RenderCommands[I].Material == DefaultMaterial))
 		{
 			RenderCommands[I].PrimitiveCount += 2;
@@ -124,7 +124,7 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 void ZEUIRenderer::Render(ZERenderer* Renderer)
 {
 	
-	for (size_t I = 0; I < RenderCommands.GetCount(); I++)
+	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
 	{
 		if (RenderCommands[I].Material == NULL)
 			RenderCommands[I].Material = DefaultMaterial;
@@ -134,7 +134,7 @@ void ZEUIRenderer::Render(ZERenderer* Renderer)
 
 void ZEUIRenderer::Clean()
 {
-	for (size_t I = 0; I < RenderCommands.GetCount(); I++)
+	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
 		if (RenderCommands[I].VertexBuffer != NULL)
 		{
 			((ZEArrayVertexBuffer<ZEUIVertex>*)RenderCommands[I].VertexBuffer)->Clear();

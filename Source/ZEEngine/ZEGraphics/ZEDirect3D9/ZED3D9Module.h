@@ -147,19 +147,19 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual void									ClearFrameBuffer();
 		virtual void									UpdateScreen();
 	
-		virtual void									SetScreenSize(int Width, int Height);
+		virtual void									SetScreenSize(ZEInt Width, ZEInt Height);
 		virtual void									SetVerticalSync(bool Enabled);
-		virtual void									SetShaderQuality(int Quality);
-		virtual void									SetTextureQuality(int Quality);
-		virtual void									SetModelQuality(int Quality);
-		virtual void									SetShadowQuality(int Quality);
-		virtual void									SetPostEffectQuality(int Quality);
-		virtual void									SetHDRQuality(int Quality);
-		virtual void									SetAntiAliasing(int Level);
-		virtual void									SetAnisotropicFilter(int Level);
+		virtual void									SetShaderQuality(ZEInt Quality);
+		virtual void									SetTextureQuality(ZEInt Quality);
+		virtual void									SetModelQuality(ZEInt Quality);
+		virtual void									SetShadowQuality(ZEInt Quality);
+		virtual void									SetPostEffectQuality(ZEInt Quality);
+		virtual void									SetHDRQuality(ZEInt Quality);
+		virtual void									SetAntiAliasing(ZEInt Level);
+		virtual void									SetAnisotropicFilter(ZEInt Level);
 
-		virtual void									SetMaterialComponentMask(unsigned int Mask);
-		virtual unsigned int							GetMaterialComponentMask();
+		virtual void									SetMaterialComponentMask(ZEUInt Mask);
+		virtual ZEUInt							GetMaterialComponentMask();
 		
 		virtual ZEViewPort*								GetFrameBufferViewPort();
 

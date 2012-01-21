@@ -48,8 +48,8 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	private:
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
-		void							SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
+		void							SetTextureStage(ZEUInt Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
+		void							SetTextureStage(ZEUInt Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
 
 		ZED3D9VertexShader*				GBufferPassVertexShader;
 		ZED3D9PixelShader*				GBufferPassPixelShader;
@@ -66,7 +66,7 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 		virtual							~ZED3D9FixedMaterial();
 
 	public:
-		const char*						ConvertToString(unsigned int MaterialComponent);
+		const char*						ConvertToString(ZEUInt MaterialComponent);
 
 		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
 		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;

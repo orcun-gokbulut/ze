@@ -158,7 +158,7 @@ void ZEUIBorderedFrameControl::AddChildControl(ZEUIControl* Control)
 	MainArea.AddChildControl(Control);
 }
 
-void ZEUIBorderedFrameControl::SetElementVisibilities(int Elements, bool Visibility)
+void ZEUIBorderedFrameControl::SetElementVisibilities(ZEInt Elements, bool Visibility)
 {
 	if ((Elements & ZEUI_BFC_EL_ALL) == ZEUI_BFC_EL_ALL)
 	{
@@ -202,9 +202,9 @@ void ZEUIBorderedFrameControl::SetElementVisibilities(int Elements, bool Visibil
 		RightEdgeArea.SetVisiblity(Visibility);
 }
 
-int ZEUIBorderedFrameControl::GetVisibleElements()
+ZEInt ZEUIBorderedFrameControl::GetVisibleElements()
 {
-	int VisibleElements = 0;
+	ZEInt VisibleElements = 0;
 
 	if (MainArea.GetVisiblity())
 		VisibleElements = VisibleElements | ZEUI_BFC_EL_MAINAREA;

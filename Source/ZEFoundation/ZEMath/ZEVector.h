@@ -127,8 +127,8 @@ class ZEVector2
 		bool						operator ==(const ZEVector2 &RightOperand) const;
 		bool						operator !=(const ZEVector2 &RightOperand) const;
 		
-		float						operator[](size_t Index) const;
-		float&						operator[](size_t Index);
+		float						operator[](ZESize Index) const;
+		float&						operator[](ZESize Index);
 
 									ZEVector2(float x, float y);
 									ZEVector2(const ZEVector2 &Start, const ZEVector2 &End);
@@ -240,8 +240,8 @@ class ZEVector3
 		bool						operator == (const ZEVector3 &RightOperand) const;
 		bool						operator != (const ZEVector3 &RightOperand) const;
 
-		float						operator[](size_t Index) const;
-		float&						operator[](size_t Index);
+		float						operator[](ZESize Index) const;
+		float&						operator[](ZESize Index);
 
 									ZEVector3(float x, float y, float z);
 									ZEVector3(ZEVector2& Base, float z);
@@ -333,8 +333,8 @@ class ZEVector4
 		bool						operator == (const ZEVector4 &RightOperand) const;
 		bool						operator != (const ZEVector4 &RightOperand) const;
 
-		float						operator[](size_t Index) const;
-		float&						operator[](size_t Index);
+		float						operator[](ZESize Index) const;
+		float&						operator[](ZESize Index);
 
 									ZEVector4(float x, float y, float z, float w);
 									ZEVector4(const ZEVector2& Base, float z, float w);

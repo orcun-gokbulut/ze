@@ -79,12 +79,12 @@ const ZEMatrix4x4& ZEEntity::GetWorldTransform()
 	return WorldTransform;
 }
 
-void ZEEntity::SetEntityId(int EntityId)
+void ZEEntity::SetEntityId(ZEInt EntityId)
 {
 	this->EntityId = EntityId;
 }
 
-int ZEEntity::GetEntityId() const
+ZEInt ZEEntity::GetEntityId() const
 {
 	return EntityId;
 }

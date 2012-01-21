@@ -93,7 +93,7 @@ QPointF ZEDNodeEditorNode::GetNodeOldPosition()
 }
 void ZEDNodeEditorNode::AddCustomNodeContextMenuItems(QList<QAction*> ContextMenuItems)
 {
-	for (int I = 0; I < ContextMenuItems.count(); I++)
+	for (ZEInt I = 0; I < ContextMenuItems.count(); I++)
 	{
 		ContextMenuItems[I] = new QAction(ContextMenuItems[I]->text(), NodeContextMenu);
 		NodeContextMenu->addAction(ContextMenuItems[I]);
@@ -166,7 +166,7 @@ void ZEDNodeEditorNode::ScaleByGizmo()
 
 	float NewY = polygon().boundingRect().bottomRight().y() - SPACE_BETWEEN_NODE_ITEMS / 2 ;
 	
-	for (int I = IOPorts.count() - 1; I >= 0; I--)
+	for (ZEInt I = IOPorts.count() - 1; I >= 0; I--)
 	{
 		NewY = NewY - SPACE_BETWEEN_NODE_ITEMS;
 		
@@ -179,7 +179,7 @@ void ZEDNodeEditorNode::ScaleRect(QPointF Amount, ZEDNodeEditorNodeScaleGizmoPoi
 	if (ParentView->GetIsDeselectionEnabled() == false)
 	{
 		QRectF TempPolygon;
-		int MinHeight;
+		ZEInt MinHeight;
 		if (GizmoNodePosition == ZED_NENSGPP_BOTTOM_RIGHT)
 		{
 			TempPolygon.setRect(ScaleRectItem->boundingRect().topLeft().x(), ScaleRectItem->boundingRect().topLeft().y(), ScaleRectItem->boundingRect().width() - Amount.x(), ScaleRectItem->boundingRect().height() - Amount.y());
@@ -361,7 +361,7 @@ void ZEDNodeEditorNode::ScaleRect(QPointF Amount, ZEDNodeEditorNodeScaleGizmoPoi
 }
 void ZEDNodeEditorNode::Update()
 {
-	int a = LastPortPosition.y() + (SPACE_BETWEEN_NODE_ITEMS * IOPorts.count());
+	ZEInt a = LastPortPosition.y() + (SPACE_BETWEEN_NODE_ITEMS * IOPorts.count());
 	setPolygon(QRectF(0, 0, PIXMAP_DIMENSION + 10, a + SPACE_BETWEEN_NODE_ITEMS / 2));
 	ScaleRectItem->setPolygon(QRectF(polygon().boundingRect().topLeft().x(), polygon().boundingRect().topLeft().y(), polygon().boundingRect().width(), polygon().boundingRect().height()));
 
@@ -459,7 +459,7 @@ void ZEDNodeEditorNode::UpdateIOPortsOnPixmapVisibilityChange()
 {
 	if (PreviewPixmapVisibility == true)
 	{
-		for (int I = 0; I < IOPorts.count(); I++ )
+		for (ZEInt I = 0; I < IOPorts.count(); I++ )
 		{
 			IOPorts[I]->setPos(IOPorts[I]->pos().x(), (IOPorts[I]->pos().y() + (PIXMAP_DIMENSION + 10)));
 		}
@@ -467,7 +467,7 @@ void ZEDNodeEditorNode::UpdateIOPortsOnPixmapVisibilityChange()
 	}
 	else if(PreviewPixmapVisibility == false)
 	{
-		for (int I = 0; I < IOPorts.count(); I++ )
+		for (ZEInt I = 0; I < IOPorts.count(); I++ )
 		{
 			IOPorts[I]->setPos(IOPorts[I]->pos().x(), (IOPorts[I]->pos().y() - (PIXMAP_DIMENSION )));
 		}
@@ -491,7 +491,7 @@ void ZEDNodeEditorNode::ReArrangeIOPorts(QList<ZEDNodeIOPort*> IO)
 		QList<ZEDNodeIOPort*> IOOutputs;
 		QList<ZEDNodeIOPort*> IOInputOutputs;
 
-		for(int I=0; I < IOPorts.count(); I++)
+		for(ZEInt I=0; I < IOPorts.count(); I++)
 		{
 			if(IOPorts[I]->GetType() == ZED_NIOPT_INPUT)
 			{
@@ -506,25 +506,25 @@ void ZEDNodeEditorNode::ReArrangeIOPorts(QList<ZEDNodeIOPort*> IO)
 				IOInputOutputs.append(IOPorts[I]);
 			}
 		}	
-		for(int K = 0; K < IOInputs.count(); K++)
+		for(ZEInt K = 0; K < IOInputs.count(); K++)
 		{
-			for ( int I = 0; I < IOInputs.count() - 1 - K; I++ )
+			for ( ZEInt I = 0; I < IOInputs.count() - 1 - K; I++ )
 				if ( QString::compare(IOInputs[I]->GetName(), IOInputs[I+1]->GetName(), Qt::CaseInsensitive) > 0)
 				{
 					IOInputs.swap(I, I+1);
 				}
 		}
-		for(int K = 0; K < IOOutputs.count(); K++)
+		for(ZEInt K = 0; K < IOOutputs.count(); K++)
 		{
-			for ( int I = 0; I < IOOutputs.count() - 1 - K; I++ )
+			for ( ZEInt I = 0; I < IOOutputs.count() - 1 - K; I++ )
 				if ( QString::compare(IOOutputs[I]->GetName(), IOOutputs[I+1]->GetName(), Qt::CaseInsensitive) > 0)
 				{
 					IOOutputs.swap(I, I+1);
 				}
 		}
-		for(int K = 0; K < IOInputOutputs.count(); K++)
+		for(ZEInt K = 0; K < IOInputOutputs.count(); K++)
 		{
-			for ( int I = 0; I < IOInputOutputs.count() - 1 - K; I++ )
+			for ( ZEInt I = 0; I < IOInputOutputs.count() - 1 - K; I++ )
 				if ( QString::compare(IOInputOutputs[I]->GetName(), IOInputOutputs[I+1]->GetName(), Qt::CaseInsensitive) > 0)
 				{
 					IOInputOutputs.swap(I, I+1);
@@ -539,9 +539,9 @@ void ZEDNodeEditorNode::ReArrangeIOPorts(QList<ZEDNodeIOPort*> IO)
 
 	else if (IOPortOrder == ZED_IOPA_ALPABETICAL_ORDER)
 	{
-		for(int K = 0; K < IOPorts.count(); K++)
+		for(ZEInt K = 0; K < IOPorts.count(); K++)
 		{
-			for ( int I = 0; I < IOPorts.count() - 1 - K; I++ )
+			for ( ZEInt I = 0; I < IOPorts.count() - 1 - K; I++ )
 				if ( QString::compare(IOPorts[I]->GetName(), IOPorts[I+1]->GetName(), Qt::CaseInsensitive) > 0)
 				{
 					IOPorts.swap(I, I+1);
@@ -550,7 +550,7 @@ void ZEDNodeEditorNode::ReArrangeIOPorts(QList<ZEDNodeIOPort*> IO)
 	}
 
 
-	for (int I = 0; I < IOPorts.count(); I++)
+	for (ZEInt I = 0; I < IOPorts.count(); I++)
 		IOPorts[I]->setPos(LastPortPosition.x() , (LastPortPosition.y() + (SPACE_BETWEEN_NODE_ITEMS * I)));	
 
 	Update();

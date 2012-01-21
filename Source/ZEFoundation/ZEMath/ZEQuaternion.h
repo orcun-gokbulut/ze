@@ -96,8 +96,8 @@ class ZEQuaternion
 		bool							operator==(const ZEQuaternion& RightOperand) const;
 		bool							operator!=(const ZEQuaternion& RightOperand) const;
 
-		float							operator[](size_t Index) const;
-		float&							operator[](size_t Index);
+		float							operator[](ZESize Index) const;
+		float&							operator[](ZESize Index);
 
 										ZEQuaternion(float w, float x, float y, float z);
 										ZEQuaternion(float Angle, const ZEVector3& Axis);

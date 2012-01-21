@@ -59,7 +59,7 @@ void ZEResource::AddReferance() const
 }
 
 
-size_t ZEResource::GetReferanceCount() const
+ZESize ZEResource::GetReferanceCount() const
 {
 	if (Shared)
 		return this->ReferenceCount;

@@ -254,7 +254,7 @@ void ZEALSoundSource3D::ResetStream()
 }
 
 
-void ZEALSoundSource3D::StreamDecodeAndFill(size_t Buffer, size_t Position, size_t SampleCount)
+void ZEALSoundSource3D::StreamDecodeAndFill(ZESize Buffer, ZESize Position, ZESize SampleCount)
 {
 	if (Position + SampleCount < EffectiveEndPosition)
 		SoundResource->Decode(InnerStreamBuffer, Position, SampleCount);
@@ -263,7 +263,7 @@ void ZEALSoundSource3D::StreamDecodeAndFill(size_t Buffer, size_t Position, size
 		SampleCount = EffectiveEndPosition - Position;
 		SoundResource->Decode(InnerStreamBuffer, Position, SampleCount);
 
-		size_t RemainingSampleCount = BufferSampleCount - SampleCount;
+		ZESize RemainingSampleCount = BufferSampleCount - SampleCount;
 		void* RemainingSampleBuffer = ((unsigned char*)InnerStreamBuffer) + SampleCount * SoundResource->GetBlockAlign();
 
 		if (Looping)
@@ -284,7 +284,7 @@ void ZEALSoundSource3D::Stream()
 	ALint BufferCount;
 	ALuint Buffer;
 	alGetSourcei(ALSource, AL_BUFFERS_PROCESSED, &BufferCount);
-	for (int I = 0; I < BufferCount; I++)
+	for (ZEInt I = 0; I < BufferCount; I++)
 	{
 		alSourceUnqueueBuffers(ALSource, 1, &Buffer);
 		alDeleteBuffers(1, &Buffer);
@@ -336,7 +336,7 @@ void ZEALSoundSource3D::SetSoundSourceState(ZESoundSourceState State)
 		}
 }
 
-void ZEALSoundSource3D::SetCurrentPosition(unsigned int SampleIndex)
+void ZEALSoundSource3D::SetCurrentPosition(ZEUInt SampleIndex)
 {
 	if (SoundResource != NULL)
 	{
@@ -350,7 +350,7 @@ void ZEALSoundSource3D::SetCurrentPosition(unsigned int SampleIndex)
 	}
 }
 
-unsigned int ZEALSoundSource3D::GetCurrentPosition()
+ZEUInt ZEALSoundSource3D::GetCurrentPosition()
 {
 	if (Streaming)
 		return CurrentPosition;
@@ -365,7 +365,7 @@ unsigned int ZEALSoundSource3D::GetCurrentPosition()
 			return 0;
 }
 
-void ZEALSoundSource3D::SetPan(int NewPan)
+void ZEALSoundSource3D::SetPan(ZEInt NewPan)
 {
 	if (NewPan> ZE_SS_PAN_RIGHT)
 		Pan = ZE_SS_PAN_RIGHT;
@@ -385,7 +385,7 @@ void ZEALSoundSource3D::SetPlaybackSpeed(float Speed)
 		alSourcef(ALSource, AL_PITCH, Speed);
 }
 
-void ZEALSoundSource3D::SetVolume(unsigned int NewVolume)
+void ZEALSoundSource3D::SetVolume(ZEUInt NewVolume)
 {
 	if (Volume > ZE_SS_VOLUME_MAX)
 		Volume = ZE_SS_VOLUME_MAX;
@@ -595,7 +595,7 @@ void ZEALSoundSource3D::SetMaxDistance(float  NewMaxDistance)
 		alSourcei(ALSource, AL_MAX_DISTANCE, MaxDistance);
 }
 
-void ZEALSoundSource3D::SetConeInsideAngle(unsigned int NewInsideAngle)
+void ZEALSoundSource3D::SetConeInsideAngle(ZEUInt NewInsideAngle)
 {
 	if (NewInsideAngle > 360)
 		ConeInsideAngle = 360;
@@ -606,7 +606,7 @@ void ZEALSoundSource3D::SetConeInsideAngle(unsigned int NewInsideAngle)
 		alSourcei(ALSource, AL_CONE_INNER_ANGLE, ConeInsideAngle);
 }
 
-void ZEALSoundSource3D::SetConeOutsideAngle(unsigned int NewOutsideAngle)			
+void ZEALSoundSource3D::SetConeOutsideAngle(ZEUInt NewOutsideAngle)			
 {
 	if (NewOutsideAngle > 360)
 		ConeOutsideAngle = 360;
@@ -618,7 +618,7 @@ void ZEALSoundSource3D::SetConeOutsideAngle(unsigned int NewOutsideAngle)
 		alSourcei(ALSource, AL_CONE_OUTER_ANGLE, ConeOutsideAngle);
 }
 
-void ZEALSoundSource3D::SetConeOutsideVolume(unsigned int NewOutsideVolume)
+void ZEALSoundSource3D::SetConeOutsideVolume(ZEUInt NewOutsideVolume)
 {
 	if (NewOutsideVolume > ZE_SS_VOLUME_MAX)
 		ConeOutsideVolume = ZE_SS_VOLUME_MAX;

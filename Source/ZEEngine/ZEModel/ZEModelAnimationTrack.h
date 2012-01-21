@@ -61,7 +61,7 @@ class ZEModelAnimationTrack
 		ZEUInt32							StartFrame;
 		ZEUInt32							EndFrame;
 		bool							Looping;
-		int								LOD;
+		ZEInt								LOD;
 
 	public:
 		void							SetOwner(ZEModel* Model);
@@ -76,8 +76,8 @@ class ZEModelAnimationTrack
 		void							SetState(ZEModelAnimationState State);
 		ZEModelAnimationState			GetState();
 
-		void							SetLOD(int LOD);
-		int								GetLOD();
+		void							SetLOD(ZEInt LOD);
+		ZEInt								GetLOD();
 
 		void							SetSpeed(float Factor);
 		float							GetSpeed();
@@ -91,16 +91,16 @@ class ZEModelAnimationTrack
 		void							SetLooping(bool Looping);
 		bool							GetLooping();
 
-		void							SetCurrentFrame(unsigned int Frame);	
-		unsigned int 					GetCurrentFrame();
+		void							SetCurrentFrame(ZEUInt Frame);	
+		ZEUInt 					GetCurrentFrame();
 
-		void							SetStartFrame(unsigned int Frame);
-		unsigned int					GetStartFrame();
+		void							SetStartFrame(ZEUInt Frame);
+		ZEUInt					GetStartFrame();
 
-		void							SetEndFrame(unsigned int Frame);
-		unsigned int					GetEndFrame();
+		void							SetEndFrame(ZEUInt Frame);
+		ZEUInt					GetEndFrame();
 
-		void							Play(unsigned int StartFrame, unsigned int EndFrame);
+		void							Play(ZEUInt StartFrame, ZEUInt EndFrame);
 		void							Play();
 		void							Resume();
 		void							Pause();

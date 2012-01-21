@@ -94,17 +94,17 @@ class ZEOctree
 			this->BoundingBox = BoundingBox;
 		}
 
-		size_t GetItemCount()
+		ZESize GetItemCount()
 		{
 			return Items.GetCount();
 		}
 
-		const Type& GetItem(size_t Index) const
+		const Type& GetItem(ZESize Index) const
 		{
 			return Items[Index];
 		}
 
-		Type& GetItem(size_t Index)
+		Type& GetItem(ZESize Index)
 		{
 			return Items[Index];
 		}
@@ -114,7 +114,7 @@ class ZEOctree
 			return Items;
 		}
 
-		void CreateNode(int Octant)
+		void CreateNode(ZEInt Octant)
 		{
 			ZEVector3 Center = BoundingBox.GetCenter();
 
@@ -167,7 +167,7 @@ class ZEOctree
 				Items.Add(Item);
 			else
 			{
-				int ItemOctant = GetOctantIndex(Point);
+				ZEInt ItemOctant = GetOctantIndex(Point);
 				if (ItemOctant == -1)
 					Items.Add(Item);
 				else
@@ -184,7 +184,7 @@ class ZEOctree
 				Items.Add(Item);
 			else
 			{
-				int ItemOctant = GetOctantIndex(Volume);
+				ZEInt ItemOctant = GetOctantIndex(Volume);
 				if (ItemOctant == -1)
 					Items.Add(Item);
 				else
@@ -195,7 +195,7 @@ class ZEOctree
 			}
 		}
 		
-		void RemoveItem(size_t Index)
+		void RemoveItem(ZESize Index)
 		{
 			Items.DeleteAt(Index);
 		}
@@ -203,7 +203,7 @@ class ZEOctree
 		void Clear()
 		{
 			Items.Clear();
-			for (int I = 0; I < 8; I++)
+			for (ZEInt I = 0; I < 8; I++)
 				if (Nodes[I] != NULL)
 				{
 					delete Nodes[I];
@@ -211,23 +211,23 @@ class ZEOctree
 				}
 		}
 
-		int GetOctantIndex(const ZEVector3& Point)
+		ZEInt GetOctantIndex(const ZEVector3& Point)
 		{
 			ZEVector3& Center = BoundingBox.GetCenter();
 			return (Point.z > Center.z ? 4 : 0) + (Point.y > Center.y ? 2 : 0) + (Point.x > Center.x ? 1 : 0);
 		}
 
-		int GetOctantIndex(const ZEAABBox& BoundingBox)
+		ZEInt GetOctantIndex(const ZEAABBox& BoundingBox)
 		{
-			int MinOctantIndex = GetOctantIndex(BoundingBox.Min);
-			int MaxOctantIndex = GetOctantIndex(BoundingBox.Max);
+			ZEInt MinOctantIndex = GetOctantIndex(BoundingBox.Min);
+			ZEInt MaxOctantIndex = GetOctantIndex(BoundingBox.Max);
 			if (MinOctantIndex == MaxOctantIndex)
 				return MinOctantIndex;
 			else
 				return -1;
 		}
 
-		ZEOctree* GetNode(size_t OctantIndex)
+		ZEOctree* GetNode(ZESize OctantIndex)
 		{
 			return Nodes[OctantIndex];
 		}
@@ -237,7 +237,7 @@ class ZEOctree
 			if (!ZEAABBox::IntersectionTest(BoundingBox, Point))
 				return NULL;
 
-			int OctantIndex = GetOctantIndex(Point);
+			ZEInt OctantIndex = GetOctantIndex(Point);
 			if (Nodes[OctantIndex] != NULL)
 				return Nodes[OctantIndex]->GetNode(Point);
 			else
@@ -249,7 +249,7 @@ class ZEOctree
 			if (!ZEAABBox::IntersectionTest(BoundingBox, SearchVolume))
 				return NULL;
 
-			int OctantIndex = GetOctantIndex(SearchVolume);
+			ZEInt OctantIndex = GetOctantIndex(SearchVolume);
 			if (OctantIndex == -1)
 				return this;
 			else
@@ -264,7 +264,7 @@ class ZEOctree
 		bool Shrink()
 		{
 			bool Found = false;
-			for (int I = 0; I < 8; I++)
+			for (ZEInt I = 0; I < 8; I++)
 				if (Nodes[I] != NULL)
 				{
 					if (Nodes[I]->Shrink())
@@ -288,7 +288,7 @@ class ZEOctree
 		ZEOctree()
 		{
 			Parent = NULL;
-			for (int I = 0; I < 8; I++)
+			for (ZEInt I = 0; I < 8; I++)
 				Nodes[I] = NULL;
 
 			Depth = 0;
@@ -298,7 +298,7 @@ class ZEOctree
 
 		~ZEOctree()
 		{
-			for (int I = 0; I < 8; I++)
+			for (ZEInt I = 0; I < 8; I++)
 				if (Nodes[I] != NULL)
 					delete Nodes[I];
 		}

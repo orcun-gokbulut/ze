@@ -37,7 +37,7 @@
 #include "ZE3dsMapExporterDescription.h"
 
 HINSTANCE hInstance;
-int controlsInit = FALSE;
+ZEInt controlsInit = FALSE;
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL,ULONG fdwReason, LPVOID /*lpvReserved*/)
 {
@@ -55,12 +55,12 @@ __declspec( dllexport ) const TCHAR* LibDescription()
 	return "ZEMap Exporter";
 }
 
-__declspec( dllexport ) int LibNumberClasses()
+__declspec( dllexport ) ZEInt LibNumberClasses()
 {
 	return 1;
 }
 
-__declspec( dllexport ) ClassDesc* LibClassDesc(int i)
+__declspec( dllexport ) ClassDesc* LibClassDesc(ZEInt i)
 {
 	switch(i) 
 	{
@@ -76,12 +76,12 @@ __declspec( dllexport ) ULONG LibVersion()
 	return VERSION_3DSMAX;
 }
 
-__declspec( dllexport ) int LibInitialize(void)
+__declspec( dllexport ) ZEInt LibInitialize(void)
 {
 	return TRUE;
 }
 
-__declspec( dllexport ) int LibShutdown(void)
+__declspec( dllexport ) ZEInt LibShutdown(void)
 {
 	return TRUE;	
 }

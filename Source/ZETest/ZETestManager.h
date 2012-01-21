@@ -45,7 +45,7 @@ class ZETestManager
 {
 	private:
 		ZETestSuiteItem*		TestSuites[65536];
-		size_t					TestSuiteCount;
+		ZESize					TestSuiteCount;
 		char					PackageName[256];
 
 	public:
@@ -55,7 +55,7 @@ class ZETestManager
 		const char*				GetPackageName();
 
 		bool					RunTests();
-		void					ReportProblem(ZETestSuiteItem* Suite, ZETestItem* Test, ZETestProblemType Type, const char* Problem, const char* File, int Line);
+		void					ReportProblem(ZETestSuiteItem* Suite, ZETestItem* Test, ZETestProblemType Type, const char* Problem, const char* File, ZEInt Line);
 
 		static ZETestManager*	GetInstance();
 };

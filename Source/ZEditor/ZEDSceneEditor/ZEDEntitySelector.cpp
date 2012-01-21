@@ -112,7 +112,7 @@ ZEDEntitySelector::ZEDEntitySelector()
 
 	this->ListTreeWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-	QObject::connect(this->FilterComboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(UpdateListByFilter()));
+	QObject::connect(this->FilterComboBox, SIGNAL(currentIndexChanged(ZEInt)), this, SLOT(UpdateListByFilter()));
 	QObject::connect(this->SearchLineEdit, SIGNAL(textChanged(QString)), this, SLOT(UpdateListBySearch()));
 }
 
@@ -122,12 +122,12 @@ void ZEDEntitySelector::UpdateListByFilter()
 	QString SearchFilter;
 	SearchFilter = this->FilterComboBox->currentText();
 
-	for(int I = 0; I < this->ListTreeWidget->topLevelItemCount(); I++)
+	for(ZEInt I = 0; I < this->ListTreeWidget->topLevelItemCount(); I++)
 	{
 		this->ListTreeWidget->topLevelItem(I)->setHidden(true);
 	}
 	
-	for(int I = 0; I < this->ListTreeWidget->topLevelItemCount(); I++)
+	for(ZEInt I = 0; I < this->ListTreeWidget->topLevelItemCount(); I++)
 	{
 		if(this->ListTreeWidget->topLevelItem(I)->text(2).contains(SearchFilter) == true)
 
@@ -145,14 +145,14 @@ void ZEDEntitySelector::UpdateListBySearch()
 	QString SearchText;
 	SearchText = this->SearchLineEdit->text().toLower();
 
-	for(int I = 0; I < this->ListTreeWidget->topLevelItemCount(); I++)
+	for(ZEInt I = 0; I < this->ListTreeWidget->topLevelItemCount(); I++)
 	{
 		this->ListTreeWidget->topLevelItem(I)->setHidden(true);
 	}
 
 
 	
-	for(int I = 0; I < this->ListTreeWidget->topLevelItemCount(); I++)
+	for(ZEInt I = 0; I < this->ListTreeWidget->topLevelItemCount(); I++)
 	{
 		if(this->ListTreeWidget->topLevelItem(I)->text(1).toLower().contains(SearchText) == true)
 			
@@ -168,13 +168,13 @@ void ZEDEntitySelector::GenerateList()
 
 	ZEScene*			Scene = zeCore->GetGame()->GetScene();
 	ZEEntity*			CurrentEntity;
-	int					Id;
+	ZEInt					Id;
 	const char*			Name;
 	const char*			Type;
 	QTreeWidgetItem*	CurrentItem;
 	QString				TempString;
 
-	for(size_t I = 0; I < Scene->GetEntities().GetCount(); I++)
+	for(ZESize I = 0; I < Scene->GetEntities().GetCount(); I++)
 	{
 			CurrentEntity = Scene->GetEntities()[I];
 
@@ -195,7 +195,7 @@ void ZEDEntitySelector::GenerateList()
 
 	this->FilterComboBox->addItem(QString("All"));
 
-	for(size_t I = 0; I < ZEEntityProvider::GetInstance()->GetClasses().GetCount(); I++)
+	for(ZESize I = 0; I < ZEEntityProvider::GetInstance()->GetClasses().GetCount(); I++)
 	{
 		this->FilterComboBox->addItem(QString(ZEEntityProvider::GetInstance()->GetClasses().GetItem(I)->GetName()));
 	}
@@ -214,7 +214,7 @@ void ZEDEntitySelector::FillSelectedEntities()
 	if(this->ListTreeWidget->selectedItems().count() != 0)
 	{
 		this->SelectedEntities->SetCount(0);
-		for(int I = 0; I < this->ListTreeWidget->selectedItems().count(); I++)
+		for(ZEInt I = 0; I < this->ListTreeWidget->selectedItems().count(); I++)
 		{
 			this->SelectedEntities->Add((((ZEDEntitySelectorItem*)(this->ListTreeWidget->selectedItems()[I]))->Entity));
 		}

@@ -42,7 +42,7 @@
 ZED3D9TextureCube::ZED3D9TextureCube()
 {
 	CubeTexture = NULL;
-	for (size_t I = 0; I < 6; I++)
+	for (ZESize I = 0; I < 6; I++)
 	{
 		ViewPorts[I].FrameBuffer = NULL;
 		ViewPorts[I].ZBuffer = NULL;
@@ -63,7 +63,7 @@ void ZED3D9TextureCube::DeviceLost()
 {
 	if (RenderTarget)
 	{
-		for (size_t I = 0; I < 8; I++)
+		for (ZESize I = 0; I < 8; I++)
 			ZED3D_RELEASE(ViewPorts[I].FrameBuffer);
 
 		ZED3D_RELEASE(CubeTexture);
@@ -77,7 +77,7 @@ bool ZED3D9TextureCube::DeviceRestored()
 		if (!Create(EdgeLength, PixelFormat, true))
 			return false;
 
-		for (size_t I = 0; I < 6; I++)
+		for (ZESize I = 0; I < 6; I++)
 		{
 			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].FrameBuffer);
 			ViewPorts[I].ZBuffer = NULL;
@@ -96,7 +96,7 @@ ZEViewPort* ZED3D9TextureCube::GetViewPort(ZETextureCubeFace Face)
 		return &ViewPorts[Face];
 }
 
-bool ZED3D9TextureCube::Create(unsigned int EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget)
+bool ZED3D9TextureCube::Create(ZEUInt EdgeLength, ZETexturePixelFormat PixelFormat, bool RenderTarget)
 {
 	if (CubeTexture != NULL)
 		if (this->EdgeLength == EdgeLength)
@@ -125,7 +125,7 @@ bool ZED3D9TextureCube::Create(unsigned int EdgeLength, ZETexturePixelFormat Pix
 	this->RenderTarget = RenderTarget;
 
 	if (RenderTarget)
-		for (size_t I = 0; I < 6; I++)
+		for (ZESize I = 0; I < 6; I++)
 		{
 			CubeTexture->GetCubeMapSurface((D3DCUBEMAP_FACES)I, 0, &ViewPorts[I].FrameBuffer);
 			ViewPorts[I].ZBuffer = NULL;
@@ -134,7 +134,7 @@ bool ZED3D9TextureCube::Create(unsigned int EdgeLength, ZETexturePixelFormat Pix
 	return true;
 }
 
-bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, size_t* Pitch)
+bool ZED3D9TextureCube::Lock(ZETextureCubeFace Face, void** Buffer, ZESize* Pitch)
 {
 	D3DLOCKED_RECT Rect;
 	HRESULT hr = CubeTexture->LockRect((D3DCUBEMAP_FACES)Face, 0, &Rect, NULL, 0);
@@ -161,7 +161,7 @@ void ZED3D9TextureCube::Release()
 	}
 
 	if (RenderTarget)
-		for (size_t I = 0; I < 6; I++)
+		for (ZESize I = 0; I < 6; I++)
 		{
 			ZED3D_RELEASE(ViewPorts[I].FrameBuffer);
 			ViewPorts[I].ZBuffer = NULL;

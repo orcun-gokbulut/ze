@@ -53,7 +53,7 @@ class ZECanvasBrush : public ZECompoundEntity
 	private:
 		ZERenderCommand						RenderCommand;
 		ZEStaticVertexBuffer*				VertexBuffer;
-		size_t								OldVertexCount;
+		ZESize								OldVertexCount;
 	
 	protected:
 											ZECanvasBrush();

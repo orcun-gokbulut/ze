@@ -54,8 +54,8 @@ ZEDUndoRedoOperation::ZEDUndoRedoOperation()
 
 ///////////////////////////////////////////////////////////MANAGER////////////////////////////////////////////////////
 
-int ZEDUndoRedoManagerOld::CurrentIndex = -1;
-unsigned int ZEDUndoRedoManagerOld::MaxOperationCount = 100;
+ZEInt ZEDUndoRedoManagerOld::CurrentIndex = -1;
+ZEUInt ZEDUndoRedoManagerOld::MaxOperationCount = 100;
 ZEArray<ZEDUndoRedoOperation*> ZEDUndoRedoManagerOld::UndoRedoStack;
 bool ZEDUndoRedoManagerOld::PreviousActionIsUndo = false;
 bool ZEDUndoRedoManagerOld::PreviousActionIsRedo = false;
@@ -64,14 +64,14 @@ void ZEDUndoRedoManagerOld::RegisterOperation(ZEDUndoRedoOperation* Operation)
 {
 	/*if(CurrentIndex != UndoRedoStack.GetCount() - 1)
 	{
-		for(int I = CurrentIndex; I <= UndoRedoStack.GetCount(); I++)
+		for(ZEInt I = CurrentIndex; I <= UndoRedoStack.GetCount(); I++)
 		{
 			UndoRedoStack.DeleteAt(I);
 		}
 		CurrentIndex = UndoRedoStack.GetCount();
 	}*/
 
-	unsigned int TotalCount = UndoRedoStack.GetCount() + 1;
+	ZEUInt TotalCount = UndoRedoStack.GetCount() + 1;
 
 	if(TotalCount < MaxOperationCount)
 	{
@@ -92,7 +92,7 @@ bool ZEDUndoRedoManagerOld::PerformUndo()
 	if(PreviousActionIsUndo)
 		CurrentIndex--;
 
-	if(CurrentIndex >= (int)UndoRedoStack.GetCount())
+	if(CurrentIndex >= (ZEInt)UndoRedoStack.GetCount())
 		CurrentIndex = UndoRedoStack.GetCount() - 1;
 
 	if(CurrentIndex < 0)
@@ -122,7 +122,7 @@ bool ZEDUndoRedoManagerOld::PerformRedo()
 	if(PreviousActionIsRedo)
 		CurrentIndex++;
 
-	if(CurrentIndex < 0 || CurrentIndex >= (int)UndoRedoStack.GetCount())
+	if(CurrentIndex < 0 || CurrentIndex >= (ZEInt)UndoRedoStack.GetCount())
 	{
 		return false;
 	}
@@ -141,12 +141,12 @@ bool ZEDUndoRedoManagerOld::PerformRedo()
 	}
 }
 
-void ZEDUndoRedoManagerOld::SetMaxOperationCount(unsigned int Count)
+void ZEDUndoRedoManagerOld::SetMaxOperationCount(ZEUInt Count)
 {
 	this->MaxOperationCount = Count;
 }
 
-unsigned int ZEDUndoRedoManagerOld::GetMaxOperationCount() const
+ZEUInt ZEDUndoRedoManagerOld::GetMaxOperationCount() const
 {
 	return MaxOperationCount;
 }

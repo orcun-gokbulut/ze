@@ -92,7 +92,7 @@ class ZEUIControl
 		bool							IsFocused;
 		bool							IsPressed;       
 		
-		int								ZOrder;
+		ZEInt								ZOrder;
 
 		ZEVector2						MaximumSize;
 		ZEVector2						MinimumSize;
@@ -171,8 +171,8 @@ class ZEUIControl
 		bool							GetFocused() const;
 		bool							GetPressed() const;
 
-		void							SetZOrder(int Z);
-		int								GetZOrder() const;
+		void							SetZOrder(ZEInt Z);
+		ZEInt								GetZOrder() const;
 
 		void							SetMinimumSize(ZEVector2 MinimumSize);
 		ZEVector2						GetMinimumSize() const;

@@ -125,18 +125,18 @@ void ZESoundDebugModule::Process(float ElapsedTime)
 	float EndPositionTime				= SoundBrush2D->GetEndPositionTime();
 
 
-	unsigned int StartPosition			= SoundBrush2D->GetStartPosition();
-	unsigned int EndPosition			= SoundBrush2D->GetEndPosition();
+	ZEUInt StartPosition			= SoundBrush2D->GetStartPosition();
+	ZEUInt EndPosition			= SoundBrush2D->GetEndPosition();
 
-	unsigned int Volume					= SoundBrush2D->GetVolume();
+	ZEUInt Volume					= SoundBrush2D->GetVolume();
 
 	float CurrentPositionPersentage		= SoundBrush2D->GetCurrentPositionPersentage();
 
 	float CurrentPositionTime			= SoundBrush2D->GetCurrentPositionTime();
 
-	short int BitsPerSample				= SoundBrush2D->GetSoundResource()->GetBitsPerSample();
+	short ZEInt BitsPerSample				= SoundBrush2D->GetSoundResource()->GetBitsPerSample();
 
-	if (EnterFlag == false && (int)TotalTime == 5)
+	if (EnterFlag == false && (ZEInt)TotalTime == 5)
 	{
 		//SoundBrush2D->GetSoundSource()->Pause();
 		//SoundBrush2D->GetSoundSource()->Stop();
@@ -146,19 +146,19 @@ void ZESoundDebugModule::Process(float ElapsedTime)
 		EnterFlag = true;
 	}
 
-	//if (EnterFlag == true && (int)TotalTime == 10)
+	//if (EnterFlag == true && (ZEInt)TotalTime == 10)
 	//{
 	//	SoundBrush2D->GetSoundSource()->Resume();
 	//	EnterFlag = false;
 	//}
 
-	//if (EnterFlag == false && (int)TotalTime == 15)
+	//if (EnterFlag == false && (ZEInt)TotalTime == 15)
 	//{
 	//	SoundBrush2D->GetSoundSource()->Stop();
 	//	EnterFlag = true;
 	//}
 
-	//if (EnterFlag == true && (int)TotalTime == 20)
+	//if (EnterFlag == true && (ZEInt)TotalTime == 20)
 	//{
 	//	SoundBrush2D->GetSoundSource()->Play();
 	//	EnterFlag = false;

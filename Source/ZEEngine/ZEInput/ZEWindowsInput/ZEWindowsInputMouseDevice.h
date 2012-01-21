@@ -54,8 +54,8 @@ class ZEWindowsInputMouseDevice : public ZEInputDevice
 		HANDLE							DeviceHandle;
 		RID_DEVICE_INFO					DeviceInfo;
 
-		int								AxisState[3];
-		int								AxisStateOld[3];
+		ZEInt								AxisState[3];
+		ZEInt								AxisStateOld[3];
 		bool							ButtonState[5];
 		bool							ButtonStateOld[5];
 

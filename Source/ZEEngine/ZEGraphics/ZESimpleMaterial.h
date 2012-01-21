@@ -50,7 +50,7 @@ class ZESimpleMaterial : public ZEMaterial
 		bool							VertexColorEnabled;
 
 		ZEMaterialTransparancyMode		TransparancyMode;
-		unsigned int					TransparancyCullLimit;
+		ZEUInt					TransparancyCullLimit;
 		ZEVector4						MaterialColor;
 
 		const ZETexture2D*				Texture;
@@ -78,8 +78,8 @@ class ZESimpleMaterial : public ZEMaterial
 		void							SetTransparancyMode(ZEMaterialTransparancyMode Mode);
 		ZEMaterialTransparancyMode		GetTransparancyMode() const;
 
-		void							SetTransparancyCullLimit(unsigned int Limit);
-		unsigned int					GetTransparancyCullLimit() const;
+		void							SetTransparancyCullLimit(ZEUInt Limit);
+		ZEUInt					GetTransparancyCullLimit() const;
 
 		void							SetTexture(const ZETexture2D* Texture);
 		const ZETexture2D*				GetTexture() const;

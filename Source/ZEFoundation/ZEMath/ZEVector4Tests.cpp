@@ -588,7 +588,7 @@ ZETestSuite(ZEVector4)
 		ZETestCheckClose(Vector, ZEVector4(5.0f, 0.5f, 1.5f, 2.0f));
 	}
 
-	ZETest("ZEVector4::operator[](size_t Index)")
+	ZETest("ZEVector4::operator[](ZESize Index)")
 	{
 		ZEVector4 Vector(2.0f, 4.0f, 6.0f, 3.0f);
 		ZEVector4 Result;
@@ -601,7 +601,7 @@ ZETestSuite(ZEVector4)
 		ZETestCheckEqual(Result, ZEVector4(3.0f, 2.0f, 4.0f, 6.0f));
 	}
 	
-	ZETest("ZEVector4::operator[](size_t Index) const")
+	ZETest("ZEVector4::operator[](ZESize Index) const")
 	{
 		const ZEVector4 Vector(2.0f, 4.0f, 6.0f, 3.0f);
 		ZEVector4 Result;

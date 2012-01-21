@@ -71,7 +71,7 @@ void ZEDSceneListGroup::ToogleVisibilities()
 {
 	Qt::CheckState IsChecked = TreeWidgetItem->checkState(2);
 
-	for (int I = 0; I < TreeWidgetItem->childCount(); I++)
+	for (ZEInt I = 0; I < TreeWidgetItem->childCount(); I++)
 	{
 		TreeWidgetItem->child(I)->setCheckState(2, IsChecked);
 	}
@@ -83,10 +83,10 @@ void ZEDSceneListGroup::ToogleVisibilities()
 
 void ZEDSceneListTreeWidget::GenerateTree()
 {	
-	for (int I = 0; I < this->Groups.count(); I++)
+	for (ZEInt I = 0; I < this->Groups.count(); I++)
 	{
 		ZEDSceneListGroup* CurrentItem =  Groups[I];
-		QObject::disconnect(this, SIGNAL(itemChanged(QTreeWidgetItem*, int)), CurrentItem, SLOT(ToogleVisibilities()));
+		QObject::disconnect(this, SIGNAL(itemChanged(QTreeWidgetItem*, ZEInt)), CurrentItem, SLOT(ToogleVisibilities()));
 		delete CurrentItem;
 	}
 	Groups.clear();
@@ -102,7 +102,7 @@ void ZEDSceneListTreeWidget::GenerateTree()
 
 	bool GroupExists = false;
 
-	for (size_t I = 0; I < Scene->GetEntities().GetCount(); I++)
+	for (ZESize I = 0; I < Scene->GetEntities().GetCount(); I++)
 	{
 		CurrentEntity = Scene->GetEntities().GetItem(I);
 		GroupExists = false;
@@ -110,7 +110,7 @@ void ZEDSceneListTreeWidget::GenerateTree()
 		if (QString(CurrentEntity->GetName()) == QString(".:SELECTION__ITEM:."))
 			continue;
 
-		for (int J = 0; J < Groups.count(); J++)
+		for (ZEInt J = 0; J < Groups.count(); J++)
 		{
 			if (Groups[J]->GroupName == QString(CurrentEntity->GetDescription()->GetName()))
 				GroupExists = true;
@@ -119,24 +119,24 @@ void ZEDSceneListTreeWidget::GenerateTree()
 		if (GroupExists == false)
 		{
 			ZEDSceneListGroup* NewGroup = new ZEDSceneListGroup(QString(CurrentEntity->GetDescription()->GetName()));
-			//QObject::connect(this, SIGNAL(itemChanged(QTreeWidgetItem*, int)), NewGroup, SLOT(ToogleVisibilities()));
+			//QObject::connect(this, SIGNAL(itemChanged(QTreeWidgetItem*, ZEInt)), NewGroup, SLOT(ToogleVisibilities()));
 			Groups.append(NewGroup);
 		}
 	}
 
-	for (int I = 0; I < Groups.count(); I++)
+	for (ZEInt I = 0; I < Groups.count(); I++)
 	{
 		addTopLevelItem(Groups[I]->TreeWidgetItem);
 	}
 
-	for(size_t I = 0 ; I < Scene->GetEntities().GetCount(); I++)
+	for(ZESize I = 0 ; I < Scene->GetEntities().GetCount(); I++)
 	{
 		CurrentEntity = Scene->GetEntities().GetItem(I);
 
 		if (QString(CurrentEntity->GetName()) == QString(".:SELECTION__ITEM:."))
 			continue;
 		
-		for (int J = 0; J < Groups.count(); J++)
+		for (ZEInt J = 0; J < Groups.count(); J++)
 		{
 			if (Groups[J]->GroupName == QString(CurrentEntity->GetDescription()->GetName()))
 				Groups[J]->TreeWidgetItem->addChild(new ZEDSceneListItem(CurrentEntity));
@@ -187,7 +187,7 @@ void ZEDSceneList::AddItem(ZEEntity* Entity)
 	QString	CorespondingGroupName = QString(Entity->GetDescription()->GetName());
 	bool GroupExsistFlag = false;
 
-	for (int I = 0; I < SceneTree->Groups.count(); I++)
+	for (ZEInt I = 0; I < SceneTree->Groups.count(); I++)
 	{
 		if (SceneTree->Groups[I]->TreeWidgetItem->text(0) == CorespondingGroupName)
 		{
@@ -209,11 +209,11 @@ void ZEDSceneList::AddItem(ZEEntity* Entity)
 
 void ZEDSceneList::RemoveItem(ZEEntity* Entity)
 {
-	for (int I = 0; I < SceneTree->Groups.count(); I++)
+	for (ZEInt I = 0; I < SceneTree->Groups.count(); I++)
 	{
-		int GroupChildCount = SceneTree->Groups[I]->TreeWidgetItem->childCount();
+		ZEInt GroupChildCount = SceneTree->Groups[I]->TreeWidgetItem->childCount();
 
-		for(int J = 0; J < GroupChildCount; J++)
+		for(ZEInt J = 0; J < GroupChildCount; J++)
 		{
 			ZEDSceneListItem* CurrentItem = ((ZEDSceneListItem*)(SceneTree->Groups[I]->TreeWidgetItem->child(J)));
 
@@ -236,6 +236,6 @@ void ZEDSceneList::RemoveItem(ZEEntity* Entity)
 
 void ZEDSceneList::ClearAllSelections()
 {
-	for(int I = 0; I < SceneTree->selectedItems().count(); I++)
+	for(ZEInt I = 0; I < SceneTree->selectedItems().count(); I++)
 		SceneTree->selectedItems().at(I)->setSelected(false);
 }

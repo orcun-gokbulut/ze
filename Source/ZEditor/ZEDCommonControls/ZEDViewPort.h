@@ -61,10 +61,10 @@ class ZEDViewPort : public QFrame
 
 	private:
 
-		int							StepSize;
+		ZEInt							StepSize;
 
-		int							OldMousePositionX;
-		int							OldMousePositionY;
+		ZEInt							OldMousePositionX;
+		ZEInt							OldMousePositionY;
 
 		bool						SendInputs;
 		bool						AltPressed;
@@ -75,7 +75,7 @@ class ZEDViewPort : public QFrame
 		ZEPlayer*					Player;
 		ZEDGizmoAxis				SelectedAxis;
 		QTimer						MovementTimer;
-		int							PressedKey;
+		ZEInt							PressedKey;
 		float						Yawn, Pitch, Roll;
 		ZEVector3					MoveDifferance;
 		bool						UndoRedoStarted;
@@ -113,7 +113,7 @@ class ZEDViewPort : public QFrame
 
 									ZEDViewPort(MapEditor* ParentEditor, ZEArray<ZEDSelectionItem*>* SelectedItems/*, ZEArray<ZEDPlugin*>*	PlugIns*/, QString WorkingDirectory, QWidget *parent = 0);
 	
-		void						UpdateStepSize(int StepSize);
+		void						UpdateStepSize(ZEInt StepSize);
 
 		void						MoveSelections(ZEVector3 MoveAmount);
 		void						ScaleSelections(ZEVector3 ScaleAmount);

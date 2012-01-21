@@ -85,7 +85,7 @@ class ZEDNodeEditorDeleteNodeOperation : public ZEDUndoRedoOperation
 
 		ZEDNodeEditorGraphicsView*					ParentView;
 		QPointF										NodePos;
-		int											NodeZValue;
+		ZEInt											NodeZValue;
 		ZEDNodeEditorNode*		 					DeletedNode;
 
 	protected:
@@ -239,7 +239,7 @@ private:
 
 	ZEDNodeEditorGraphicsView*					ParentView;
 	ZEDNodeEditorNode*							SendBackwardNode;
-	int											SendBackwardNodeZValue;
+	ZEInt											SendBackwardNodeZValue;
 
 protected:
 
@@ -264,7 +264,7 @@ private:
 
 	ZEDNodeEditorGraphicsView*					ParentView;
 	ZEDNodeEditorNode*							BringForwardNode;
-	int											BringForwardNodeZValue;
+	ZEInt											BringForwardNodeZValue;
 
 protected:
 

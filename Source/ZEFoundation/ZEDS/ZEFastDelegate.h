@@ -72,7 +72,7 @@
 //				  * Standardised all the compiler-specific workarounds.
 //                * MFP conversion now works for CodePlay (but not yet supported in the full code).
 //                * Now compiles without warnings on _any_ supported compiler, including BCC 5.5.1
-//				  * New syntax: FastDelegate< int (char *, double) >. 
+//				  * New syntax: FastDelegate< ZEInt (char *, double) >. 
 // 14-Feb-05 1.4.1* Now treats =0 as equivalent to .clear(), ==0 as equivalent to .empty(). (Thanks elfric).
 //				  * Now tested on Intel ICL for AMD64, VS2005 Beta for AMD64 and Itanium.
 // 30-Mar-05 1.5  * Safebool idiom: "if (dg)" is now equivalent to "if (!dg.empty())"
@@ -212,7 +212,7 @@ namespace fastdelegate {
 			// Cause a compile-time error if in, out and u are not the same size.
 			// If the compile fails here, it means the compiler has peculiar
 			// unions which would prevent the cast from working.
-			typedef int ERROR_CantUseHorrible_cast[sizeof(InputClass)==sizeof(u) 
+			typedef ZEInt ERROR_CantUseHorrible_cast[sizeof(InputClass)==sizeof(u) 
 				&& sizeof(InputClass)==sizeof(OutputClass) ? 1 : -1];
 			u.in = input;
 			return u.out;
@@ -244,7 +244,7 @@ namespace fastdelegate {
 		//   identical to the code for calling a non-void function in which the
 		//   return value is never used, provided the return value is returned
 		//   in the EAX register, rather than on the stack. 
-		//   This is true for most fundamental types such as int, enum, void *.
+		//   This is true for most fundamental types such as ZEInt, enum, void *.
 		//   Const void * is the safest option since it doesn't participate 
 		//   in any automatic conversions. But on a 16-bit compiler it might
 		//   cause extra code to be generated, so we disable it for all compilers
@@ -309,7 +309,7 @@ namespace fastdelegate {
 #endif
 
 		// The size of a single inheritance member function pointer.
-		const int SINGLE_MEMFUNCPTR_SIZE = sizeof(void (GenericClass::*)());
+		const ZEInt SINGLE_MEMFUNCPTR_SIZE = sizeof(void (GenericClass::*)());
 
 		//						SimplifyMemFunc< >::Convert()
 		//
@@ -323,7 +323,7 @@ namespace fastdelegate {
 		//	template specialisation, I use full specialisation of a wrapper struct.
 
 		// general case -- don't know how to convert it. Force a compile failure
-		template <int N>
+		template <ZEInt N>
 		struct SimplifyMemFunc {
 			template <class X, class XFuncType, class GenericMemFuncType>
 			inline static GenericClass *Convert(X *pthis, XFuncType function_to_bind, 
@@ -345,7 +345,7 @@ namespace fastdelegate {
 #if defined __DMC__  
 					// Digital Mars doesn't allow you to cast between abitrary PMF's, 
 					// even though the standard says you can. The 32-bit compiler lets you
-					// static_cast through an int, but the DOS compiler doesn't.
+					// static_cast through an ZEInt, but the DOS compiler doesn't.
 					bound_func = horrible_cast<GenericMemFuncType>(function_to_bind);
 #else 
 					bound_func = reinterpret_cast<GenericMemFuncType>(function_to_bind);
@@ -373,7 +373,7 @@ namespace fastdelegate {
 		// __multiple_inheritance classes go here
 		// Nasty hack for Microsoft and Intel (IA32 and Itanium)
 		template<>
-		struct SimplifyMemFunc< SINGLE_MEMFUNCPTR_SIZE + sizeof(int) >  {
+		struct SimplifyMemFunc< SINGLE_MEMFUNCPTR_SIZE + sizeof(ZEInt) >  {
 			template <class X, class XFuncType, class GenericMemFuncType>
 			inline static GenericClass *Convert(X *pthis, XFuncType function_to_bind, 
 				GenericMemFuncType &bound_func) { 
@@ -383,11 +383,11 @@ namespace fastdelegate {
 						XFuncType func;
 						struct {	 
 							GenericMemFuncType funcaddress; // points to the actual member function
-							int delta;	     // #BYTES to be added to the 'this' pointer
+							ZEInt delta;	     // #BYTES to be added to the 'this' pointer
 						}s;
 					} u;
 					// Check that the horrible_cast will work
-					typedef int ERROR_CantUsehorrible_cast[sizeof(function_to_bind)==sizeof(u.s)? 1 : -1];
+					typedef ZEInt ERROR_CantUsehorrible_cast[sizeof(function_to_bind)==sizeof(u.s)? 1 : -1];
 					u.func = function_to_bind;
 					bound_func = u.s.funcaddress;
 					return reinterpret_cast<GenericClass *>(reinterpret_cast<char *>(pthis) + u.s.delta); 
@@ -406,8 +406,8 @@ namespace fastdelegate {
 		// is internally defined as:
 		struct MicrosoftVirtualMFP {
 			void (GenericClass::*codeptr)(); // points to the actual member function
-			int delta;		// #bytes to be added to the 'this' pointer
-			int vtable_index; // or 0 if no virtual inheritance
+			ZEInt delta;		// #bytes to be added to the 'this' pointer
+			ZEInt vtable_index; // or 0 if no virtual inheritance
 		};
 		// The CRUCIAL feature of Microsoft/Intel MFPs which we exploit is that the
 		// m_codeptr member is *always* called, regardless of the values of the other
@@ -426,7 +426,7 @@ namespace fastdelegate {
 
 		// __virtual_inheritance classes go here
 		template <>
-		struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 2*sizeof(int) >
+		struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 2*sizeof(ZEInt) >
 		{
 
 			template <class X, class XFuncType, class GenericMemFuncType>
@@ -444,7 +444,7 @@ namespace fastdelegate {
 						MicrosoftVirtualMFP s;
 					} u2;
 					// Check that the horrible_cast<>s will work
-					typedef int ERROR_CantUsehorrible_cast[sizeof(function_to_bind)==sizeof(u.s)
+					typedef ZEInt ERROR_CantUsehorrible_cast[sizeof(function_to_bind)==sizeof(u.s)
 						&& sizeof(function_to_bind)==sizeof(u.ProbeFunc)
 						&& sizeof(u2.virtfunc)==sizeof(u2.s) ? 1 : -1];
 					// Unfortunately, taking the address of a MF prevents it from being inlined, so 
@@ -461,7 +461,7 @@ namespace fastdelegate {
 		// unknown_inheritance classes go here
 		// There is a compiler bug in MSVC6 which generates incorrect code in this case!!
 		template <>
-		struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3*sizeof(int) >
+		struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3*sizeof(ZEInt) >
 		{
 			template <class X, class XFuncType, class GenericMemFuncType>
 			inline static GenericClass *Convert(X *pthis, XFuncType function_to_bind, 
@@ -503,7 +503,7 @@ namespace fastdelegate {
 		// This is probably the ugliest bit of code I've ever written. Look at the casts!
 		// There is a compiler bug in MSVC6 which prevents it from using this code.
 		template <>
-		struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3*sizeof(int) >
+		struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3*sizeof(ZEInt) >
 		{
 			template <class X, class XFuncType, class GenericMemFuncType>
 			inline static GenericClass *Convert(X *pthis, XFuncType function_to_bind, 
@@ -516,27 +516,27 @@ namespace fastdelegate {
 						// is internally defined as:
 						struct {
 							GenericMemFuncType m_funcaddress; // points to the actual member function
-							int delta;		// #bytes to be added to the 'this' pointer
-							int vtordisp;		// #bytes to add to 'this' to find the vtable
-							int vtable_index; // or 0 if no virtual inheritance
+							ZEInt delta;		// #bytes to be added to the 'this' pointer
+							ZEInt vtordisp;		// #bytes to add to 'this' to find the vtable
+							ZEInt vtable_index; // or 0 if no virtual inheritance
 						} s;
 					} u;
 					// Check that the horrible_cast will work
-					typedef int ERROR_CantUsehorrible_cast[sizeof(XFuncType)==sizeof(u.s)? 1 : -1];
+					typedef ZEInt ERROR_CantUsehorrible_cast[sizeof(XFuncType)==sizeof(u.s)? 1 : -1];
 					u.func = function_to_bind;
 					bound_func = u.s.funcaddress;
-					int virtual_delta = 0;
+					ZEInt virtual_delta = 0;
 					if (u.s.vtable_index) { // Virtual inheritance is used
 						// First, get to the vtable. 
 						// It is 'vtordisp' bytes from the start of the class.
-						const int * vtable = *reinterpret_cast<const int *const*>(
+						const ZEInt * vtable = *reinterpret_cast<const ZEInt *const*>(
 							reinterpret_cast<const char *>(pthis) + u.s.vtordisp );
 
 						// 'vtable_index' tells us where in the table we should be looking.
-						virtual_delta = u.s.vtordisp + *reinterpret_cast<const int *>( 
+						virtual_delta = u.s.vtordisp + *reinterpret_cast<const ZEInt *>( 
 							reinterpret_cast<const char *>(vtable) + u.s.vtable_index);
 					}
-					// The int at 'virtual_delta' gives us the amount to add to 'this'.
+					// The ZEInt at 'virtual_delta' gives us the amount to add to 'this'.
 					// Finally we can add the three components together. Phew!
 					return reinterpret_cast<GenericClass *>(
 						reinterpret_cast<char *>(pthis) + u.s.delta + virtual_delta);
@@ -816,7 +816,7 @@ namespace fastdelegate {
 					// Ensure that there's a compilation failure if function pointers 
 					// and data pointers have different sizes.
 					// If you get this error, you need to #undef FASTDELEGATE_USESTATICFUNCTIONHACK.
-					typedef int ERROR_CantUseEvilMethod[sizeof(GenericClass *)==sizeof(function_to_bind) ? 1 : -1];
+					typedef ZEInt ERROR_CantUseEvilMethod[sizeof(GenericClass *)==sizeof(function_to_bind) ? 1 : -1];
 					m_pthis = horrible_cast<GenericClass *>(function_to_bind);
 					// MSVC, SunC++ and DMC accept the following (non-standard) code:
 					//		m_pthis = static_cast<GenericClass *>(static_cast<void *>(function_to_bind));
@@ -831,7 +831,7 @@ namespace fastdelegate {
 				// Ensure that there's a compilation failure if function pointers 
 				// and data pointers have different sizes.
 				// If you get this error, you need to #undef FASTDELEGATE_USESTATICFUNCTIONHACK.
-				typedef int ERROR_CantUseEvilMethod[sizeof(UnvoidStaticFuncPtr)==sizeof(this) ? 1 : -1];
+				typedef ZEInt ERROR_CantUseEvilMethod[sizeof(UnvoidStaticFuncPtr)==sizeof(this) ? 1 : -1];
 				return horrible_cast<UnvoidStaticFuncPtr>(this);
 			}
 #endif // !defined(FASTDELEGATE_USESTATICFUNCTIONHACK)
@@ -859,7 +859,7 @@ namespace fastdelegate {
 	// Once we have the member function conversion templates, it's easy to make the
 	// wrapper classes. So that they will work with as many compilers as possible, 
 	// the classes are of the form
-	//   FastDelegate3<int, char *, double>
+	//   FastDelegate3<ZEInt, char *, double>
 	// They can cope with any combination of parameters. The max number of parameters
 	// allowed is 8, but it is trivial to increase this limit.
 	// Note that we need to treat const member functions seperately.
@@ -945,7 +945,7 @@ namespace fastdelegate {
 		// Implicit conversion to "bool" using the safe_bool idiom
 	private:
 		typedef struct SafeBoolStruct {
-			int a_data_pointer_to_this_is_0_on_buggy_compilers;
+			ZEInt a_data_pointer_to_this_is_0_on_buggy_compilers;
 			StaticFunctionPtr m_nonzero;
 		} UselessTypedef;
 		typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1030,7 +1030,7 @@ namespace fastdelegate {
 		// Implicit conversion to "bool" using the safe_bool idiom
 	private:
 		typedef struct SafeBoolStruct {
-			int a_data_pointer_to_this_is_0_on_buggy_compilers;
+			ZEInt a_data_pointer_to_this_is_0_on_buggy_compilers;
 			StaticFunctionPtr m_nonzero;
 		} UselessTypedef;
 		typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1115,7 +1115,7 @@ namespace fastdelegate {
 		// Implicit conversion to "bool" using the safe_bool idiom
 	private:
 		typedef struct SafeBoolStruct {
-			int a_data_pointer_to_this_is_0_on_buggy_compilers;
+			ZEInt a_data_pointer_to_this_is_0_on_buggy_compilers;
 			StaticFunctionPtr m_nonzero;
 		} UselessTypedef;
 		typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1200,7 +1200,7 @@ namespace fastdelegate {
 		// Implicit conversion to "bool" using the safe_bool idiom
 	private:
 		typedef struct SafeBoolStruct {
-			int a_data_pointer_to_this_is_0_on_buggy_compilers;
+			ZEInt a_data_pointer_to_this_is_0_on_buggy_compilers;
 			StaticFunctionPtr m_nonzero;
 		} UselessTypedef;
 		typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1285,7 +1285,7 @@ namespace fastdelegate {
 		// Implicit conversion to "bool" using the safe_bool idiom
 	private:
 		typedef struct SafeBoolStruct {
-			int a_data_pointer_to_this_is_0_on_buggy_compilers;
+			ZEInt a_data_pointer_to_this_is_0_on_buggy_compilers;
 			StaticFunctionPtr m_nonzero;
 		} UselessTypedef;
 		typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1370,7 +1370,7 @@ namespace fastdelegate {
 		// Implicit conversion to "bool" using the safe_bool idiom
 	private:
 		typedef struct SafeBoolStruct {
-			int a_data_pointer_to_this_is_0_on_buggy_compilers;
+			ZEInt a_data_pointer_to_this_is_0_on_buggy_compilers;
 			StaticFunctionPtr m_nonzero;
 		} UselessTypedef;
 		typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1455,7 +1455,7 @@ namespace fastdelegate {
 		// Implicit conversion to "bool" using the safe_bool idiom
 	private:
 		typedef struct SafeBoolStruct {
-			int a_data_pointer_to_this_is_0_on_buggy_compilers;
+			ZEInt a_data_pointer_to_this_is_0_on_buggy_compilers;
 			StaticFunctionPtr m_nonzero;
 		} UselessTypedef;
 		typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1540,7 +1540,7 @@ namespace fastdelegate {
 		// Implicit conversion to "bool" using the safe_bool idiom
 	private:
 		typedef struct SafeBoolStruct {
-			int a_data_pointer_to_this_is_0_on_buggy_compilers;
+			ZEInt a_data_pointer_to_this_is_0_on_buggy_compilers;
 			StaticFunctionPtr m_nonzero;
 		} UselessTypedef;
 		typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1625,7 +1625,7 @@ namespace fastdelegate {
 		// Implicit conversion to "bool" using the safe_bool idiom
 	private:
 		typedef struct SafeBoolStruct {
-			int a_data_pointer_to_this_is_0_on_buggy_compilers;
+			ZEInt a_data_pointer_to_this_is_0_on_buggy_compilers;
 			StaticFunctionPtr m_nonzero;
 		} UselessTypedef;
 		typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
@@ -1658,9 +1658,9 @@ namespace fastdelegate {
 	// 
 	//				FastDelegate<> class (Original author: Jody Hagins)
 	//	Allows boost::function style syntax like:
-	//			FastDelegate< double (int, long) >
+	//			FastDelegate< double (ZEInt, long) >
 	// instead of:
-	//			FastDelegate2< int, long, double >
+	//			FastDelegate2< ZEInt, long, double >
 	//
 	////////////////////////////////////////////////////////////////////////////////
 

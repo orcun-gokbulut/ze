@@ -155,7 +155,7 @@ bool ZEConsoleWindow::Initialize()
 
 	ShowWindow((HWND)Handle, SW_HIDE);
 
-	for (size_t I = 0; I < ZEConsole::GetInstance()->OutputHistory.GetCount(); I++)
+	for (ZESize I = 0; I < ZEConsole::GetInstance()->OutputHistory.GetCount(); I++)
 		Output(ZEConsole::GetInstance()->OutputHistory[I]);
 
 	return true;
@@ -225,7 +225,7 @@ void ZEConsoleWindow::TermiantionState()
 
 void ZEConsoleWindow::Output(const char* OutputText)
 {
-	int Length = GetWindowTextLength(GetDlgItem((HWND)Handle, IDC_OUTPUT)); 
+	ZEInt Length = GetWindowTextLength(GetDlgItem((HWND)Handle, IDC_OUTPUT)); 
 	SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_SETSEL, (WPARAM)Length, (LPARAM)Length);
 	SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT) ,EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)OutputText);
 

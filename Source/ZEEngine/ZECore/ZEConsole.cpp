@@ -74,15 +74,15 @@ ZEConsoleInterface::~ZEConsoleInterface()
 
 }
 
-static void ParseEmptySpace(const char* Input, size_t &Cursor)
+static void ParseEmptySpace(const char* Input, ZESize &Cursor)
 {
 	while(Input[Cursor] == ' ' || Input[Cursor] == '\t')
 		Cursor++;
 }
 
-static bool ParseIdentifier(const char* Input, size_t &Cursor, char* Output)
+static bool ParseIdentifier(const char* Input, ZESize &Cursor, char* Output)
 {
-	size_t Index = 0;
+	ZESize Index = 0;
 
 	ParseEmptySpace(Input, Cursor);
 
@@ -106,10 +106,10 @@ static bool ParseIdentifier(const char* Input, size_t &Cursor, char* Output)
 	return true;
 }
 
-static bool ParseConstant(const char* Input, size_t &Cursor, ZEVariant *Output)
+static bool ParseConstant(const char* Input, ZESize &Cursor, ZEVariant *Output)
 {
 	char Temp[ZE_CONSOLE_PARSER_MAX_STRING_SIZE];
-	int I = 0;
+	ZEInt I = 0;
 
 	ParseEmptySpace(Input, Cursor);
 
@@ -194,7 +194,7 @@ static bool ParseConstant(const char* Input, size_t &Cursor, ZEVariant *Output)
 		return false;
 }
 
-static bool ParseParameters(const char* Input, size_t &Cursor, ZECommandParameterList *Output)
+static bool ParseParameters(const char* Input, ZESize &Cursor, ZECommandParameterList *Output)
 {
 	ZEVariant Param;
 	bool FirstParam = true;
@@ -235,7 +235,7 @@ static bool ParseParameters(const char* Input, size_t &Cursor, ZECommandParamete
 	}
 }
 
-static ZEConsoleParserState ParseOperator(const char* Input, size_t &Cursor)
+static ZEConsoleParserState ParseOperator(const char* Input, ZESize &Cursor)
 {
 	ParseEmptySpace(Input, Cursor);
 
@@ -256,7 +256,7 @@ static ZEConsoleParserState ParseOperator(const char* Input, size_t &Cursor)
 	}
 }
 
-static bool ParseScope(const char* Input, size_t &Cursor)
+static bool ParseScope(const char* Input, ZESize &Cursor)
 {
 	ParseEmptySpace(Input, Cursor);
 	
@@ -277,7 +277,7 @@ bool ZEConsole::ParseInput(const char* Input)
 	ZEOption* Opt;
 	Output("> %s\r\n", Input);
 	ZEConsoleParserState State = ZE_CPS_SECTION;
-	size_t Cursor = 0;
+	ZESize Cursor = 0;
 
 	while(State != ZE_CPS_FINISHED)
 	{
@@ -540,11 +540,11 @@ ZEConsole::ZEConsole()
 
 ZEConsole::~ZEConsole()
 {
-	for (size_t I = 0; I < OutputHistory.GetCount(); I++)
+	for (ZESize I = 0; I < OutputHistory.GetCount(); I++)
 		delete[] OutputHistory[I];
 	OutputHistory.Clear();
 
-	for (size_t I = 0; I < InputHistory.GetCount(); I++)
+	for (ZESize I = 0; I < InputHistory.GetCount(); I++)
 		delete[] InputHistory[I];
 	InputHistory.Clear();
 	#ifdef ZE_DEBUG_CHECK_HEAP

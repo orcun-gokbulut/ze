@@ -38,26 +38,26 @@
 #include "ZEMath/ZEVector.h"
 #include <string.h>
 
-float Cost(const ZEGraph<ZEVector2>& Graph, size_t CurrentNodeIndex, size_t NextNodeIndex)
+float Cost(const ZEGraph<ZEVector2>& Graph, ZESize CurrentNodeIndex, ZESize NextNodeIndex)
 {
 	return 1.0f;
 }
 
-float Heuristic(const ZEGraph<ZEVector2>& Graph, size_t CurrentNodeIndex, size_t DestinationNodeIndex)
+float Heuristic(const ZEGraph<ZEVector2>& Graph, ZESize CurrentNodeIndex, ZESize DestinationNodeIndex)
 {
 	return ZEVector2::Distance(Graph.GetNodes()[CurrentNodeIndex], Graph.GetNodes()[DestinationNodeIndex]);
 }
 
-void Visualize(const char* Tiles, size_t Width, size_t Height, ZEArray<const ZEVector2*>& Path, bool DiagonalMovement = false)
+void Visualize(const char* Tiles, ZESize Width, ZESize Height, ZEArray<const ZEVector2*>& Path, bool DiagonalMovement = false)
 {
 	char Buffer[32 * 1024];
 	strcpy(Buffer, Tiles);
-	for (size_t I = 0; I < Path.GetCount(); I++)
-		Buffer[(int)Path[I]->y * Width + (int)Path[I]->x] = 'O';
+	for (ZESize I = 0; I < Path.GetCount(); I++)
+		Buffer[(ZEInt)Path[I]->y * Width + (ZEInt)Path[I]->x] = 'O';
 
-	for (size_t y = 0; y < Height; y++)
+	for (ZESize y = 0; y < Height; y++)
 	{
-		for (size_t x = 0; x < Width; x++)
+		for (ZESize x = 0; x < Width; x++)
 			printf("%c", Buffer[y * Width + x]);
 
 		printf("\n");
@@ -68,7 +68,7 @@ void PrintSolution(ZEArray<const ZEVector2*>& Path)
 {
 	printf("ZEVector2 Solution[%d] = ", Path.GetCount());
 	printf("\n{");
-	for (size_t I = 0; I < Path.GetCount(); I++)
+	for (ZESize I = 0; I < Path.GetCount(); I++)
 	{
 		if (I % 5 == 0)
 			printf("\n\t");
@@ -79,11 +79,11 @@ void PrintSolution(ZEArray<const ZEVector2*>& Path)
 	printf("\n};\n\nZETestCheck(CheckSolution(Output, Solution, %d));\n\n", Path.GetCount());
 }
 
-ZEGraph<ZEVector2> GenerateGraph(const char* Tiles, size_t Width, size_t Height, size_t& Start, size_t& Destination, bool DiagonalMovement = false)
+ZEGraph<ZEVector2> GenerateGraph(const char* Tiles, ZESize Width, ZESize Height, ZESize& Start, ZESize& Destination, bool DiagonalMovement = false)
 {
 	ZEGraph<ZEVector2> Graph;
-	for (size_t y = 0; y < Height; y++)
-		for (size_t x = 0; x < Width; x++)
+	for (ZESize y = 0; y < Height; y++)
+		for (ZESize x = 0; x < Width; x++)
 		{
 			if (Tiles[y * Width + x] != 'X')
 				Graph.AddNode(ZEVector2(x, y));
@@ -95,9 +95,9 @@ ZEGraph<ZEVector2> GenerateGraph(const char* Tiles, size_t Width, size_t Height,
 				Start = Graph.GetNodeCount() - 1;
 		}
 
-		for (size_t I = 0; I < Graph.GetNodeCount(); I++)
+		for (ZESize I = 0; I < Graph.GetNodeCount(); I++)
 		{
-			int AdjIndex = Graph.GetNodes().FindIndex(ZEVector2(Graph.GetNodes()[I] + ZEVector2(0, 1)));
+			ZEInt AdjIndex = Graph.GetNodes().FindIndex(ZEVector2(Graph.GetNodes()[I] + ZEVector2(0, 1)));
 			if (AdjIndex != -1)
 				Graph.AddLink(I, AdjIndex);
 
@@ -121,12 +121,12 @@ ZEGraph<ZEVector2> GenerateGraph(const char* Tiles, size_t Width, size_t Height,
 	return Graph;
 }
 
-bool CheckSolution(ZEArray<const ZEVector2*> Output, ZEVector2* Solution, size_t SolutionSize)
+bool CheckSolution(ZEArray<const ZEVector2*> Output, ZEVector2* Solution, ZESize SolutionSize)
 {
 	if (Output.GetSize() != SolutionSize)
 		return false;
 
-	for (int I = 0; I < SolutionSize; I++)
+	for (ZEInt I = 0; I < SolutionSize; I++)
 		if (*Output[I] != Solution[I])
 			return false;
 
@@ -154,7 +154,7 @@ ZETestSuite(ZEAIAStar)
 				"X                 X"
 				"XXXXXXXXXXXXXXXXXXX";
 
-			size_t Start, Destination;
+			ZESize Start, Destination;
 			ZEGraph<ZEVector2> MazeGraph = GenerateGraph(Maze, 19, 13, Start, Destination);
 			ZEArray<const ZEVector2*> Output = ZEAIAStar::Process(MazeGraph, Start, Destination, Cost, Heuristic);
 
@@ -181,7 +181,7 @@ ZETestSuite(ZEAIAStar)
 				"X                 X"
 				"XXXXXXXXXXXXXXXXXXX";
 
-			size_t Start, Destination;
+			ZESize Start, Destination;
 			ZEGraph<ZEVector2> MazeGraph = GenerateGraph(Maze, 19, 13, Start, Destination);
 			ZEArray<const ZEVector2*> Output = ZEAIAStar::Process(MazeGraph, Start, Destination, Cost, Heuristic);
 
@@ -213,7 +213,7 @@ ZETestSuite(ZEAIAStar)
 				"X                 X"
 				"XXXXXXXXXXXXXXXXXXX";
 
-			size_t Start, Destination;
+			ZESize Start, Destination;
 			ZEGraph<ZEVector2> MazeGraph = GenerateGraph(Maze, 19, 13, Start, Destination);
 			ZEArray<const ZEVector2*> Output = ZEAIAStar::Process(MazeGraph, Start, Destination, Cost, Heuristic);
 
@@ -250,7 +250,7 @@ ZETestSuite(ZEAIAStar)
 				"X                 X"
 				"XXXXXXXXXXXXXXXXXXX";
 
-			size_t Start, Destination;
+			ZESize Start, Destination;
 			ZEGraph<ZEVector2> MazeGraph = GenerateGraph(Maze, 19, 13, Start, Destination);
 			ZEArray<const ZEVector2*> Output = ZEAIAStar::Process(MazeGraph, Start, Destination, Cost, Heuristic);
 
@@ -284,7 +284,7 @@ ZETestSuite(ZEAIAStar)
 				"X                 X"
 				"XXXXXXXXXXXXXXXXXXX";
 
-			size_t Start, Destination;
+			ZESize Start, Destination;
 			ZEGraph<ZEVector2> MazeGraph = GenerateGraph(Maze, 19, 13, Start, Destination);
 			ZEArray<const ZEVector2*> Output = ZEAIAStar::Process(MazeGraph, Start, Destination, Cost, Heuristic);
 
@@ -320,7 +320,7 @@ ZETestSuite(ZEAIAStar)
 				"X        X        X"
 				"XXXXXXXXXXXXXXXXXXX";
 
-			size_t Start, Destination;
+			ZESize Start, Destination;
 			ZEGraph<ZEVector2> MazeGraph = GenerateGraph(Maze, 19, 13, Start, Destination);
 			ZEArray<const ZEVector2*> Output = ZEAIAStar::Process(MazeGraph, Start, Destination, Cost, Heuristic);
 
@@ -363,7 +363,7 @@ ZETestSuite(ZEAIAStar)
 				"X     X   X       X"
 				"XXXXXXXXXXXXXXXXXXX";
 
-			size_t Start, Destination;
+			ZESize Start, Destination;
 			ZEGraph<ZEVector2> MazeGraph = GenerateGraph(Maze, 19, 13, Start, Destination);
 			ZEArray<const ZEVector2*> Output = ZEAIAStar::Process(MazeGraph, Start, Destination, Cost, Heuristic);
 

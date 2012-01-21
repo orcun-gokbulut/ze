@@ -131,7 +131,7 @@ struct ZEModelFileAnimationFrameChunk
 
 struct ZEModelFilePhysicalPolygonChunk
 {	
-	int									VertexIndexes[3];
+	ZEInt									VertexIndexes[3];
 };
 
 struct ZEModelFilePhysicalShapeChunk

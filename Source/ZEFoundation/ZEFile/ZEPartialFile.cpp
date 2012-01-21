@@ -59,16 +59,16 @@ bool ZEPartialFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 	//ZEUInt64 EndCursor = 0;
 	//ZEUInt64 StartCursor = 0;
 	//
-	//unsigned int EndIndex = 0;
-	//unsigned int StartIndex = 0;
+	//ZEUInt EndIndex = 0;
+	//ZEUInt StartIndex = 0;
 	//
-	//unsigned int PathSize = FilePath.GetSize() - 1;
-	//for(size_t I = 0; I < PathSize; I++)
+	//ZEUInt PathSize = FilePath.GetSize() - 1;
+	//for(ZESize I = 0; I < PathSize; I++)
 	//{
 	//	if(FilePath[I] == ':')
 	//	{
 	//		StartIndex = I + 1;
-	//		for(size_t J = I; J < PathSize; J++)
+	//		for(ZESize J = I; J < PathSize; J++)
 	//		{
 	//			if(FilePath[J] == '-')
 	//			{
@@ -77,7 +77,7 @@ bool ZEPartialFile::Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary)
 	//				StartCursor = _strtoui64(String.GetValue(), NULL, 10);
 
 	//				StartIndex = J + 1;
-	//				for(size_t K = J; K < PathSize; K++)
+	//				for(ZESize K = J; K < PathSize; K++)
 	//				{
 	//					if(FilePath[K] == '\0')
 	//					{
@@ -273,7 +273,7 @@ ZEUInt64 ZEPartialFile::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 	}
 
 	// Read
-	ZEUInt64 ReadCount = fread(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	ZEUInt64 ReadCount = fread(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
 	FileCursor += ReadCount * Size;
 
 	return ReadCount;
@@ -295,7 +295,7 @@ ZEUInt64 ZEPartialFile::ReadFormated(const char* Format, ...)
 	// 	va_list ArgList;
 	// 
 	// 	va_start(ArgList, Format);
-	// 	size_t CharCount = _tinput_l(File, Format, 0, ArgList);
+	// 	ZESize CharCount = _tinput_l(File, Format, 0, ArgList);
 	// 	va_end(ArgList);
 
 	return 0;
@@ -321,7 +321,7 @@ ZEUInt64 ZEPartialFile::Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 		IsEof = true;
 	}
 
-	ZEUInt64 WriteCount = fwrite(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	ZEUInt64 WriteCount = fwrite(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
 	FileCursor += WriteCount * Size;
 
 	return WriteCount;
@@ -429,13 +429,13 @@ bool ZEPartialFile::Eof()
 	return IsEof;
 }
 
-unsigned int ZEPartialFile::IncreaseReferenceCount()
+ZEUInt ZEPartialFile::IncreaseReferenceCount()
 {
 	ParentFile->IncreaseReferenceCount();
 	return ++ReferenceCount;
 }
 
-unsigned int ZEPartialFile::DecreaseReferenceCount()
+ZEUInt ZEPartialFile::DecreaseReferenceCount()
 {
 	ParentFile->DecreaseReferenceCount();
 	return --ReferenceCount;

@@ -59,7 +59,7 @@ enum ZEAssertType
 	ZE_AT_WARNING_ASSERT
 };
 
-#define zeBreak(Condition) if (Condition) { __asm{ int 3 }}
+#define zeBreak(Condition) if (Condition) { __asm{ ZEInt 3 }}
 
 #include "ZEAPI.h"
 
@@ -126,7 +126,7 @@ enum ZEAssertType
 
 
 typedef void (*ZEErrorCallback)(const char* Module, ZEErrorType Type, const char* ErrorText);
-typedef void (*ZEAssertCallback)(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, int Line);
+typedef void (*ZEAssertCallback)(ZEAssertType Type, const char* AssertText, const char* Function, const char* File, ZEInt Line);
 
 class ZEError
 {
@@ -140,7 +140,7 @@ class ZEError
 		static void			SetAssertCallback(ZEAssertCallback Callback);
 
 		static void			RaiseError(const char* Module, ZEErrorType Type, const char* ErrorText, ...);
-		static void			RaiseAssert(ZEAssertType Type, const char* Function, const char* File, int Line, const char* AssertText, ...);
+		static void			RaiseAssert(ZEAssertType Type, const char* Function, const char* File, ZEInt Line, const char* AssertText, ...);
 };
 
 

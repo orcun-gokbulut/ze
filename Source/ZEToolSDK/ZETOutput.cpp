@@ -111,7 +111,7 @@ void ZESDKOutput::Output(const char* Module, ZESDKOutputLevel Level, const char*
 		Out(Buffer2);
 	}
 }
-void ZESDKOutput::DebugOutput(const char* File, const char* Function, int Line, bool Warning, const char* Format, ...)
+void ZESDKOutput::DebugOutput(const char* File, const char* Function, ZEInt Line, bool Warning, const char* Format, ...)
 {
 	if (Out != NULL && ZET_OL_DEBUG <= OutputLevel)
 	{

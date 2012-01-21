@@ -285,7 +285,7 @@ ZEApplicationModule* ZECore::GetApplicationModule()
 	return Application;
 }
 
-size_t ZECore::GetFrameId()
+ZESize ZECore::GetFrameId()
 {
 	return FrameId;
 }

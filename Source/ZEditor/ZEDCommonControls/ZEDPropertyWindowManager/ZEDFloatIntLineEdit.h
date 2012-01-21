@@ -77,20 +77,20 @@ class ZEDFloatIntLineEdit : public QLineEdit
 
 		bool											Entered;
 
-		int												IntegerStepSize;
+		ZEInt												IntegerStepSize;
 		float											FloatStepSize;
 
-		int												ParsedInt;
+		ZEInt												ParsedInt;
 		float											ParsedFloat;
 
-		int												LastValidIntVlaue;
+		ZEInt												LastValidIntVlaue;
 		float											LastValidFloatValue;
 
 		bool											ParseInteger();
 		bool											ParseFloat();
 
 		bool											MidButtonPressed;
-		int												OldMousePositionY;
+		ZEInt												OldMousePositionY;
 	
 	protected:
 	
@@ -109,14 +109,14 @@ class ZEDFloatIntLineEdit : public QLineEdit
 
 		bool											IsTextChanged;
 
-		void											SetIntegerStepSize(int StepSize);
-		int												GetIntegerStepSize();
+		void											SetIntegerStepSize(ZEInt StepSize);
+		ZEInt												GetIntegerStepSize();
 
 		void											SetFloatStepSize(float StepSize);
 		float											GetFloatStepSize();
 
-		void											SetInteger(int Value);
-		int												GetInteger(bool* Ok = NULL);
+		void											SetInteger(ZEInt Value);
+		ZEInt												GetInteger(bool* Ok = NULL);
 
 		void											SetFloat(float Value);
 		float											GetFloat(bool* Ok = NULL);

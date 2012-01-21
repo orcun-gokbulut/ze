@@ -53,8 +53,8 @@ class ZESystemMessageHandler;
 class ZEWindow
 {
 	protected:
-		int						WindowPositionLeft, WindowPositionTop;
-		int						WindowWidth, WindowHeight;
+		ZEInt						WindowPositionLeft, WindowPositionTop;
+		ZEInt						WindowWidth, WindowHeight;
 		ZEWindowType			WindowType;
 		void*					WindowHandle;
 		ZESystemMessageHandler* SystemMessageHandler;
@@ -66,18 +66,18 @@ class ZEWindow
 		void					WindowGainedFocus();
 		void					WindowLostFocus();
 		void					WindowDestroyed();
-		void					WindowResized(int Width, int Height);
+		void					WindowResized(ZEInt Width, ZEInt Height);
 
 		void					SetWindowType(ZEWindowType WindowType);
 		ZEWindowType			GetWindowType();
 
 		bool					SetComponentWindowHandle(void* Handle);
 
-		void					SetWindowPosition(int Left, int Top);
-		void					GetWindowPosition(int& Left, int& Top);
+		void					SetWindowPosition(ZEInt Left, ZEInt Top);
+		void					GetWindowPosition(ZEInt& Left, ZEInt& Top);
 
-		void					SetWindowSize(int Width, int Height);
-		void					GetWindowSize(int& Width, int& Height);
+		void					SetWindowSize(ZEInt Width, ZEInt Height);
+		void					GetWindowSize(ZEInt& Width, ZEInt& Height);
 
 		void					ShowWindow();
 		void					HideWindow();

@@ -64,25 +64,25 @@ bool ZEOptionSection::AddOption(ZEOption* Option)
 	return true;
 }
 
-void ZEOptionSection::DeleteOption(size_t Index)
+void ZEOptionSection::DeleteOption(ZESize Index)
 {
 	Options.DeleteAt(Index);
 }
 
-size_t ZEOptionSection::GetNumberOfOptions()
+ZESize ZEOptionSection::GetNumberOfOptions()
 {
 	return Options.GetCount();
 }
 
 ZEOption* ZEOptionSection::GetOption(const ZEString& OptionName)
 {
-	for(size_t I=0; I < Options.GetCount(); I++)
+	for(ZESize I=0; I < Options.GetCount(); I++)
 		if (Options[I]->GetName() == OptionName)
 			return Options[I];
 	return NULL;
 }
 
-ZEOption* ZEOptionSection::GetOption(size_t Index)
+ZEOption* ZEOptionSection::GetOption(ZESize Index)
 {
 	if (Index < Options.GetCount())
 			return Options[Index];
@@ -129,7 +129,7 @@ void ZEOptionSection::CommitChanges()
 void ZEOptionSection::ResetChanges()
 {
 	ZEOption* CurrOption;
-	for (size_t I = 0; I < Options.GetCount(); I++)
+	for (ZESize I = 0; I < Options.GetCount(); I++)
 	{
 		CurrOption = Options[I];
 		if (CurrOption->IsChanged())
@@ -151,6 +151,6 @@ ZEOptionSection::ZEOptionSection(const ZEString& Name)
 
 ZEOptionSection::~ZEOptionSection()
 {
-	for (size_t I = 0; I < Options.GetCount(); I++)
+	for (ZESize I = 0; I < Options.GetCount(); I++)
 		delete Options[I];
 }

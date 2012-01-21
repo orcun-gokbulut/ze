@@ -66,7 +66,7 @@ void ZETypedVariant::SetString(char *NewValue)
 	}
 }
 
-void ZETypedVariant::SetInteger(int NewValue)
+void ZETypedVariant::SetInteger(ZEInt NewValue)
 {
 	zeAssert(Type != ZE_VRT_INTEGER && Type != ZE_VRT_UNDEFINED, "ZETypedVariant::SetInteger operation failed. Types does not match.");
 	if (Type == ZE_VRT_INTEGER)
@@ -159,7 +159,7 @@ void ZETypedVariant::operator=(char* NewValue)
 	SetString(NewValue);
 }
 
-void ZETypedVariant::operator=(int NewValue)
+void ZETypedVariant::operator=(ZEInt NewValue)
 {
 	SetInteger(NewValue);
 }
@@ -208,7 +208,7 @@ ZETypedVariant::ZETypedVariant(char* InitialValue)
 	SetString(InitialValue);
 }
 	
-ZETypedVariant::ZETypedVariant(int InitialValue)
+ZETypedVariant::ZETypedVariant(ZEInt InitialValue)
 {
 	SetType(ZE_VRT_INTEGER);
 	SetInteger(InitialValue);

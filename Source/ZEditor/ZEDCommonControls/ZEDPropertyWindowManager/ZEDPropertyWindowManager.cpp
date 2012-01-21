@@ -90,7 +90,7 @@ ZEDPropertyWindowManager::ZEDPropertyWindowManager(QWidget *parent, ZEObject* Cl
 
 QTreeWidgetItem* ZEDPropertyWindowManager::FindGroup(QString GroupName)
 {
-	for(int I = 0; I < Groups.count(); I++)
+	for(ZEInt I = 0; I < Groups.count(); I++)
 		if(GroupName == Groups[I]->GroupName)
 			return Groups[I]->Item;
 
@@ -108,7 +108,7 @@ void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 	QFont							TopLevelFont;
 
 	const ZEPropertyDescription*		Properties;
-	size_t								PropertyCount;
+	ZESize								PropertyCount;
 
 	ZEObjectDescription* ClassDescription = this->Class->GetDescription();
 
@@ -121,7 +121,7 @@ void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 	
 		Properties = ClassDescription->GetProperties();
 
-		for(size_t I = 0; I < PropertyCount; I++)
+		for(ZESize I = 0; I < PropertyCount; I++)
 		{
 			ZEPropertyDescription Property = Properties[I];
 
@@ -148,13 +148,13 @@ void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 
 			bool GroupExists = false;
 
-			for(size_t I = 0; I < PropertyCount; I++)
+			for(ZESize I = 0; I < PropertyCount; I++)
 			{
 				GroupExists = false;
 
 				if(Properties[I].GroupName != NULL)
 				{
-					for(int J = 0; J < Groups.count(); J++)
+					for(ZEInt J = 0; J < Groups.count(); J++)
 					{
 						if(Groups[J]->GroupName == QString(Properties[I].GroupName))
 							GroupExists = true;
@@ -420,7 +420,7 @@ void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 		ClassDescription = ClassDescription->GetParent();
 	}
 
-	for (int I = 0; I < model()->rowCount(); I++)
+	for (ZEInt I = 0; I < model()->rowCount(); I++)
 	{
 		header()->resizeSection(I,20);
 	}
@@ -454,7 +454,7 @@ void ZEDPropertyWindowManager::UpdateCustomPropertyWidgets()
 
 	ZERunTimeProperty RuntimeProperty;
 
-	for (size_t I = 0; I < Class->GetCustomProperties()->GetCount(); I++)
+	for (ZESize I = 0; I < Class->GetCustomProperties()->GetCount(); I++)
 	{
 		RuntimeProperty = Class->GetCustomProperties()->GetItem(I);
 		ZEPropertyDescription Property;
@@ -588,7 +588,7 @@ void ZEDPropertyWindowManager::UpdateCustomPropertyWidgets()
 
 void ZEDPropertyWindowManager::UpdatePropertyWidgetValues()
 {
-	for(int I = 0; I < PropertyWidgetsList.count(); I++)
+	for(ZEInt I = 0; I < PropertyWidgetsList.count(); I++)
 	{
 		PropertyWidgetsList[I]->UpdateValues();
 	}
@@ -613,7 +613,7 @@ void ZEDPropertyWindowManager::drawRow(QPainter* Painter, const QStyleOptionView
 {
 	QTreeWidget::drawRow(Painter, Option, Index);
 	
-	for(int I = 0; I < columnCount(); I++)
+	for(ZEInt I = 0; I < columnCount(); I++)
 	{
 		QModelIndex CurrentIndex = Index.sibling(Index.row(), I);
 		if(CurrentIndex.isValid())
@@ -640,9 +640,9 @@ void ZEDPropertyWindowManager::drawRow(QPainter* Painter, const QStyleOptionView
 
 ZEDPropertyWindowManager::~ZEDPropertyWindowManager()
 {
-	//for(int I = 0; I < PropertyWidgetsList.count(); I++)
+	//for(ZEInt I = 0; I < PropertyWidgetsList.count(); I++)
 	//	delete PropertyWidgetsList[I];
 
-	for(int I = 0; I < Groups.count(); I++)
+	for(ZEInt I = 0; I < Groups.count(); I++)
 		delete Groups[I];
 }

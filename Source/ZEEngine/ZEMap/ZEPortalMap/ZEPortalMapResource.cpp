@@ -65,7 +65,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -91,7 +91,7 @@ const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(const ZEString
 	if (FileName == "")
 		return NULL;
 
-	for (size_t I = 0; I < TextureResources.GetCount(); I++)
+	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
 		if (TextureResources[I]->GetFileName() == FileName)
 			return TextureResources[I]->GetTexture();
 
@@ -109,7 +109,7 @@ bool ZEPortalMapResource::ReadMaterialsFromFile(ZEFile* ResourceFile)
 {
 	ZEMapFileMaterialChunk MaterialChunk;
 	// Read materials
-	for (size_t I = 0; I < Materials.GetCount(); I++)
+	for (ZESize I = 0; I < Materials.GetCount(); I++)
 	{
 		// Read Material
 		ResourceFile->Read(&MaterialChunk, sizeof(ZEMapFileMaterialChunk), 1);
@@ -212,7 +212,7 @@ bool ZEPortalMapResource::ReadPhysicalMeshFromFile(ZEFile* ResourceFile, ZEPorta
 
 	// Read physical mesh polygons
 	Portal->PhysicalMesh.Polygons.SetCount(FilePhysicalMesh.PolygonCount);
-	for (size_t I = 0; I < FilePhysicalMesh.PolygonCount; I++)
+	for (ZESize I = 0; I < FilePhysicalMesh.PolygonCount; I++)
 	{
 		ZEMapFilePhysicalMeshPolygonChunk Chunk;
 		ResourceFile->Read(&Chunk, sizeof(ZEMapFilePhysicalMeshPolygonChunk), 1);
@@ -228,7 +228,7 @@ bool ZEPortalMapResource::ReadPortalsFromFile(ZEFile* ResourceFile)
 {
 	ZEMapFilePortalChunk FilePortal;
 
-	for (size_t I = 0; I < Portals.GetCount(); I++)
+	for (ZESize I = 0; I < Portals.GetCount(); I++)
 	{
 		ZEPortalMapResourcePortal* Portal = &Portals[I];
 
@@ -271,7 +271,7 @@ bool ZEPortalMapResource::ReadPortalsFromFile(ZEFile* ResourceFile)
 			ZEArray<ZEMapFilePolygonChunk> MapPolygons;
 			MapPolygons.SetCount(FilePortal.PolygonCount);
 			ResourceFile->Read(MapPolygons.GetCArray(), sizeof(ZEMapFilePolygonChunk), MapPolygons.GetCount());
-			for (size_t I = 0; I < Portal->Polygons.GetCount(); I++)
+			for (ZESize I = 0; I < Portal->Polygons.GetCount(); I++)
 			{
 				Portal->Polygons[I].Material = Materials[MapPolygons[I].Material];
 				Portal->Polygons[I].LastIteration = 0;
@@ -291,7 +291,7 @@ bool ZEPortalMapResource::ReadPortalsFromFile(ZEFile* ResourceFile)
 
 bool ZEPortalMapResource::ReadDoorsFromFile(ZEFile* ResourceFile)
 { 
-	for (size_t I = 0; I < Doors.GetCount(); I++)
+	for (ZESize I = 0; I < Doors.GetCount(); I++)
 	{
 		ZEPortalMapResourceDoor* Door = &Doors[I];
 		
@@ -479,7 +479,7 @@ ZEPortalMapResource* ZEPortalMapResource::LoadResource(const ZEString& FileName)
 
 ZEPortalMapResource::~ZEPortalMapResource()
 {
-	for (size_t I = 0; I < TextureResources.GetCount(); I++)
+	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
 		TextureResources[I]->Release();
 	TextureResources.Clear();
 }

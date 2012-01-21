@@ -184,8 +184,8 @@ bool ZED3D9CommonTools::CompileVertexShader(LPDIRECT3DVERTEXSHADER9* VertexShade
 	D3DXMACRO Macros[33];
 	char ComponentTexts[32][26];
 
-	int ComponentCount = 0;
-	for (int I = 0; I < 32; I++)
+	ZEInt ComponentCount = 0;
+	for (ZEInt I = 0; I < 32; I++)
 		if (Components & (1 << I))
 		{
 			sprintf(ComponentTexts[ComponentCount], "ZE_SHADER_COMPONENT_%d", I);
@@ -239,8 +239,8 @@ bool ZED3D9CommonTools::CompilePixelShader(LPDIRECT3DPIXELSHADER9* PixelShader, 
 	D3DXMACRO Macros[33];
 	char ComponentTexts[32][26];
 
-	int ComponentCount = 0;
-	for (int I = 0; I < 32; I++)
+	ZEInt ComponentCount = 0;
+	for (ZEInt I = 0; I < 32; I++)
 		if (Components & (1 << I))
 		{
 			sprintf(ComponentTexts[ComponentCount], "ZE_SHADER_COMPONENT_%d", I);
@@ -290,8 +290,8 @@ bool ZED3D9CommonTools::CompileVertexShaderFromMemory(LPDIRECT3DVERTEXSHADER9* V
 	D3DXMACRO Macros[33];
 	char ComponentTexts[32][26];
 
-	int ComponentCount = 0;
-	for (int I = 0; I < 32; I++)
+	ZEInt ComponentCount = 0;
+	for (ZEInt I = 0; I < 32; I++)
 		if (Components & (1 << I))
 		{
 			sprintf(ComponentTexts[ComponentCount], "ZE_SHADER_COMPONENT_%d", I);
@@ -336,8 +336,8 @@ bool ZED3D9CommonTools::CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* Pix
 	D3DXMACRO Macros[33];
 	char ComponentTexts[32][26];
 
-	int ComponentCount = 0;
-	for (int I = 0; I < 32; I++)
+	ZEInt ComponentCount = 0;
+	for (ZEInt I = 0; I < 32; I++)
 		if (Components & (1 << I))
 		{
 			sprintf(ComponentTexts[ComponentCount], "ZE_SHADER_COMPONENT_%d", I);
@@ -371,7 +371,7 @@ bool ZED3D9CommonTools::CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* Pix
 }
 
 /*
-bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height, ZETexturePixelFormat Format)
+bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, ZEInt Width, ZEInt Height, ZETexturePixelFormat Format)
 {
 	D3DSURFACE_DESC SurDesc;
 	D3DFORMAT D3DFormat = ConvertPixelFormat(Format);
@@ -396,7 +396,7 @@ bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width
 	return true;
 }
 
-bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height, ZETexturePixelFormat Format)
+bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DSURFACE9* Target, ZEInt Width, ZEInt Height, ZETexturePixelFormat Format)
 {
 	D3DSURFACE_DESC SurDesc;
 	D3DFORMAT D3DFormat = ConvertPixelFormat(Format);
@@ -421,7 +421,7 @@ bool ZED3D9CommonTools::CreateRenderTarget(LPDIRECT3DSURFACE9* Target, int Width
 }
 
 
-bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int Width, int Height)
+bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, ZEInt Width, ZEInt Height)
 {
 	D3DSURFACE_DESC SurDesc;
 	if (*Target != NULL)
@@ -444,7 +444,7 @@ bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DSURFACE9* Target, int 
 	return true;
 }
 
-bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DTEXTURE9* Target, int Width, int Height)
+bool ZED3D9CommonTools::CreateDepthRenderTarget(LPDIRECT3DTEXTURE9* Target, ZEInt Width, ZEInt Height)
 {
 	D3DSURFACE_DESC SurDesc;
 	if (*Target != NULL)

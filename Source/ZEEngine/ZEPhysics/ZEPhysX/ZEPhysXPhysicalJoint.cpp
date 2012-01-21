@@ -411,14 +411,14 @@ void ZEPhysXPhysicalJoint::AddLimitPlane(const ZEPhysicalLimitPlane& Plane)
 		Joint->addLimitPlane(ZE_TO_NX(Plane.n), ZE_TO_NX(Plane.p), Plane.Restitution);
 }
 
-void ZEPhysXPhysicalJoint::RemoveLimitPlane(size_t Index)
+void ZEPhysXPhysicalJoint::RemoveLimitPlane(ZESize Index)
 {
 	LimitPlanes.DeleteAt(Index);
 
 	if (Joint != NULL)
 	{
 		Joint->purgeLimitPlanes();
-		for (size_t I = 0; I < LimitPlanes.GetCount(); I++)
+		for (ZESize I = 0; I < LimitPlanes.GetCount(); I++)
 			Joint->addLimitPlane(ZE_TO_NX(LimitPlanes[I].n), ZE_TO_NX(LimitPlanes[I].p), LimitPlanes[I].Restitution);
 	}
 }

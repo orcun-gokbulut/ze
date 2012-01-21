@@ -47,7 +47,7 @@ class ZEModelExporterOptions
 		
 		bool					LogToFile;
 		TCHAR					LogFile[MAX_PATH];
-		int						OutputLevel;
+		ZEInt						OutputLevel;
 		bool					ExportAnimation;
 		TCHAR					AnimationName[MAX_PATH];
 

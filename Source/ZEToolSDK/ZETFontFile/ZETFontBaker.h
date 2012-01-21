@@ -43,12 +43,12 @@ class ZEFontBaker
 {
 	public:
 		static bool		BakeFont(ZEFont* Output, 
-								const char* FontName, int FontSize,
+								const char* FontName, ZEInt FontSize,
 								bool FontItalic, bool FontBold,	bool FontUnderLine, bool FontStrikeOut,
-								int TextureWidth, int TextureHeight, 
-								int StartCharacter = 32, int EndCharacter = 126,
-								int CharacterSpacingX= 1, int CharacterSpacingY = 1,
-								int LeftMargin = 0, int TopMargin = 0, int RightMargin = 0, int BottomMargin = 0, 
+								ZEInt TextureWidth, ZEInt TextureHeight, 
+								ZEInt StartCharacter = 32, ZEInt EndCharacter = 126,
+								ZEInt CharacterSpacingX= 1, ZEInt CharacterSpacingY = 1,
+								ZEInt LeftMargin = 0, ZEInt TopMargin = 0, ZEInt RightMargin = 0, ZEInt BottomMargin = 0, 
 								bool GenerateCoordsOnly = false);
 };
 

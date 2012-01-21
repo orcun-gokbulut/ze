@@ -63,7 +63,7 @@ bool ZED3D9Texture3D::DeviceRestored()
 	return true;
 }
 
-bool ZED3D9Texture3D::Create(unsigned int Width, unsigned int Height, unsigned int Depth, ZETexturePixelFormat PixelFormat)
+bool ZED3D9Texture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat)
 {
 	if (VolumeTexture != NULL)
 		VolumeTexture->Release();
@@ -84,7 +84,7 @@ bool ZED3D9Texture3D::Create(unsigned int Width, unsigned int Height, unsigned i
 	return true;
 }
 
-void ZED3D9Texture3D::Lock(void** Buffer, size_t* RowPitch, size_t* SlicePitch)
+void ZED3D9Texture3D::Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch)
 {
 	D3DLOCKED_BOX Box;
 	VolumeTexture->LockBox(0, &Box, NULL, D3DLOCK_DISCARD);

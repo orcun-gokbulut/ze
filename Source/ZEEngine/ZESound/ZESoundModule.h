@@ -70,7 +70,7 @@ enum ZESoundSourceType;
 #define ZE_MAX_DEVICE_NAME_SIZE 128
 struct ZESoundDevice
 {
-	size_t			DeviceId;
+	ZESize			DeviceId;
 	char			DeviceName[ZE_MAX_DEVICE_NAME_SIZE];
 	char			DriverName[ZE_MAX_DEVICE_NAME_SIZE];
 };
@@ -92,8 +92,8 @@ class ZESoundModule : public ZEModule
 		virtual void					SetSpeakerLayout(ZESpeakerLayout Layout) = 0;
 		virtual ZESpeakerLayout			GetSpeakerLayout() = 0;
 
-		virtual void					SetMasterVolume(unsigned int Volume) = 0;
-		virtual unsigned int 			GetMasterVolume() = 0;
+		virtual void					SetMasterVolume(ZEUInt Volume) = 0;
+		virtual ZEUInt 			GetMasterVolume() = 0;
 
 		virtual void					ProcessSound(float ElapsedTime) = 0;
 
@@ -102,11 +102,11 @@ class ZESoundModule : public ZEModule
 		virtual void					SetStreamingDisabled(bool Disabled) = 0;
 		virtual bool					GetStreamingDisabled() = 0;
 
-		virtual void					SetMaxBufferSize(size_t BufferSize) = 0; 
-		virtual size_t					GetMaxBufferSize() = 0;
+		virtual void					SetMaxBufferSize(ZESize BufferSize) = 0; 
+		virtual ZESize					GetMaxBufferSize() = 0;
 
-		virtual void					SetTypeVolume(ZESoundSourceType Type, unsigned int Volume) = 0;
-		virtual unsigned int			GetTypeVolume(ZESoundSourceType Type) = 0;
+		virtual void					SetTypeVolume(ZESoundSourceType Type, ZEUInt Volume) = 0;
+		virtual ZEUInt			GetTypeVolume(ZESoundSourceType Type) = 0;
 
 		virtual	void					SetActiveListener(ZEListener* NewListener) = 0;
 		virtual ZEListener*				GetActiveListener() = 0;

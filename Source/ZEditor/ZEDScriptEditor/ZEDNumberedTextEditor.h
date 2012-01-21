@@ -74,9 +74,9 @@ public:
 	NumberBar( QWidget *parent );
 	~NumberBar();
 
-	void setCurrentLine( int lineno );
-	void setStopLine( int lineno );
-	void setBugLine( int lineno );
+	void setCurrentLine( ZEInt lineno );
+	void setStopLine( ZEInt lineno );
+	void setBugLine( ZEInt lineno );
 
 	void setTextEdit( QTextEdit *edit );
 	void paintEvent( QPaintEvent *ev );
@@ -89,9 +89,9 @@ private:
 	QPixmap stopMarker;
 	QPixmap currentMarker;
 	QPixmap bugMarker;
-	int stopLine;
-	int currentLine;
-	int bugLine;
+	ZEInt stopLine;
+	ZEInt currentLine;
+	ZEInt bugLine;
 	QRect stopRect;
 	QRect currentRect;
 	QRect bugRect;
@@ -115,19 +115,19 @@ public:
 	* Sets the line that should have the current line indicator.
 	* A value of -1 indicates no line should show the indicator.
 	*/
-	void setCurrentLine( int lineno );
+	void setCurrentLine( ZEInt lineno );
 
 	/**
 	* Sets the line that should have the stop line indicator.
 	* A value of -1 indicates no line should show the indicator.
 	*/
-	void setStopLine( int lineno );
+	void setStopLine( ZEInt lineno );
 
 	/**
 	* Sets the line that should have the bug line indicator.
 	* A value of -1 indicates no line should show the indicator.
 	*/
-	void setBugLine( int lineno );
+	void setBugLine( ZEInt lineno );
 
 	/** @internal Used to get tooltip events from the view for the hover signal. */
 	bool eventFilter( QObject *obj, QEvent *event );
@@ -148,13 +148,13 @@ signals:
 
 	protected slots:
 		/** @internal Used to update the highlight on the current line. */
-		void textChanged( int pos, int added, int removed );
+		void textChanged( ZEInt pos, ZEInt added, ZEInt removed );
 
 private:
 	QTextEdit *view;
 	NumberBar *numbers;
 	QHBoxLayout *box;
-	int currentLine;
+	ZEInt currentLine;
 	QTextCursor highlight;
 };
 

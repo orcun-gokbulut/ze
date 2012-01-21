@@ -181,9 +181,9 @@ void ZEPhysXPhysicalMesh::ReCreate()
 	Initialize();
 }
 
-bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, size_t VertexCount, 
-										const ZEPhysicalTriangle* Triangles, size_t TriangleCount, 
-										const ZEPhysicalMaterial* Materials, size_t MaterialCount)
+bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, ZESize VertexCount, 
+										const ZEPhysicalTriangle* Triangles, ZESize TriangleCount, 
+										const ZEPhysicalMaterial* Materials, ZESize MaterialCount)
 {
 	if (TriangleMeshShapeDesc.meshData != NULL)
 	{
@@ -193,7 +193,7 @@ bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, size_t VertexCount,
 
 	ZEArray<ZEVector3> TransformedVertices;
 	TransformedVertices.SetCount(VertexCount);
-	for (size_t I = 0; I < VertexCount; I++)
+	for (ZESize I = 0; I < VertexCount; I++)
 		ZEVector3::Multiply(TransformedVertices[I], Vertices[I], Scale);
 
 	NxTriangleMeshDesc TriangleMeshDesc;

@@ -42,7 +42,7 @@
 static ZEString ConstructResourcePath(const ZEString& Path)
 {
 	ZEString NewString = Path;
-	unsigned int ConstLength = strlen("resources\\") - 1;
+	ZEUInt ConstLength = strlen("resources\\") - 1;
 
 	if (Path[0] == '\\' || Path[0] == '/')
 		NewString = NewString.SubString(1, Path.GetLength() - 1);
@@ -64,13 +64,13 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 }
 
 // MEMORY SEEK
-static size_t OggMemory_Read(void *ptr, size_t size, size_t nmemb, void *datasource)
+static ZESize OggMemory_Read(void *ptr, ZESize size, ZESize nmemb, void *datasource)
 {
 	ZESoundResourceOGG* Resource = (ZESoundResourceOGG*)datasource;
 
 	if (Resource->DataSize < Resource->MemoryCursor + size * nmemb)
 	{
-		size_t ItemCount = (Resource->DataSize - Resource->MemoryCursor) / size;
+		ZESize ItemCount = (Resource->DataSize - Resource->MemoryCursor) / size;
 		memcpy(ptr, (ZEUInt8*)Resource->Data + Resource->MemoryCursor, size * ItemCount);
 		Resource->MemoryCursor += ItemCount * size;
 
@@ -85,7 +85,7 @@ static size_t OggMemory_Read(void *ptr, size_t size, size_t nmemb, void *datasou
 	}
 }
 
-static int OggMemory_Seek(void *datasource, ogg_int64_t offset, int whence)
+static ZEInt OggMemory_Seek(void *datasource, ogg_int64_t offset, ZEInt whence)
 {
 	ZESoundResourceOGG* Resource = (ZESoundResourceOGG*)datasource;
 	switch(whence)
@@ -122,7 +122,7 @@ ZESoundResourceOGG::~ZESoundResourceOGG()
 		delete Data;
 }
 
-size_t ZESoundResourceOGG::GetDataSize() const
+ZESize ZESoundResourceOGG::GetDataSize() const
 {
 	return DataSize;
 }
@@ -132,13 +132,13 @@ const void* ZESoundResourceOGG::GetData() const
 	return Data;
 }
 
-void ZESoundResourceOGG::Decode(void* Buffer, size_t SampleIndex, size_t Count)
+void ZESoundResourceOGG::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
 {
 	ov_pcm_seek_lap(&OggFile, SampleIndex);	
 
 	long  BytesRead = 1;
-	int   Position = 0;		
-	int	  Section = 0;
+	ZEInt   Position = 0;		
+	ZEInt	  Section = 0;
 
 	while(Position < (Count * BlockAlign))
 	{	

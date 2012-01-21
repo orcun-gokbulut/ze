@@ -53,7 +53,7 @@ enum ZESDKOutputLevel
 	#include <stdlib.h> 
 #endif
 
-#define zesdkBreak(Condition) if (Condition) { __asm { int 3 }}
+#define zesdkBreak(Condition) if (Condition) { __asm { ZEInt 3 }}
 #define zesdkPrint(...) ZESDKOutput::Output(__VA_ARGS__)
 #define zesdkLog(Module, ...) ZESDKOutput::Output(Module, ZET_OL_LOG, __VA_ARGS__)
 #define zesdkNotice(Module, ...) ZESDKOutput::Output(Module, ZET_OL_NOTICE, __VA_ARGS__)
@@ -108,7 +108,7 @@ class ZESDKOutput
 		static void SetOutputCallback(void (*OutputCallback)(const char*));
 		static void SetOutputLevel(ZESDKOutputLevel Level);
 
-		static void DebugOutput(const char* File, const char* Function, int Line, bool Warning, const char* Format, ...);
+		static void DebugOutput(const char* File, const char* Function, ZEInt Line, bool Warning, const char* Format, ...);
 		static void Output(const char* Text);
 		static void Output(const char* Module, const char* Text);
 		static void Output(const char* Module, const char* Format, ...);

@@ -90,9 +90,9 @@ class ZEPhysXPhysicalMesh : public ZEPhysicalMesh, private ZEPhysXComponentBase
 		virtual void						SetSkinWidth(float Width);
 		virtual float						GetSkinWidth() const;
 
-		virtual bool						SetData(const ZEVector3* Vertices, size_t VertexCount, 
-													const ZEPhysicalTriangle* Triangles, size_t PolygonCount, 
-													const ZEPhysicalMaterial* Materials, size_t MaterialCount);
+		virtual bool						SetData(const ZEVector3* Vertices, ZESize VertexCount, 
+													const ZEPhysicalTriangle* Triangles, ZESize PolygonCount, 
+													const ZEPhysicalMaterial* Materials, ZESize MaterialCount);
 
 		virtual void						SetCollisionCallbackFlags(ZEUInt32 CollisionCallbackFlags);
 		virtual ZEUInt32						GetCollisionCallbackFlags();

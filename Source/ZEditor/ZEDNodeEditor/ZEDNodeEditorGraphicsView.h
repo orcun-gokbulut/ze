@@ -114,12 +114,12 @@ class ZEDNodeEditorGraphicsView : public QGraphicsView
 		bool												IsMouseMoving;
 		bool												IsRubberBandSelectionOnGoing;
 
-		int													PanStartX;
-		int													PanStartY;
-		int													NodeZValue;
-		int													LastSelectedConnectionIndex;
-		int													ConnectionLoopControlInteger;
-		int													GridSpacing;
+		ZEInt													PanStartX;
+		ZEInt													PanStartY;
+		ZEInt													NodeZValue;
+		ZEInt													LastSelectedConnectionIndex;
+		ZEInt													ConnectionLoopControlInteger;
+		ZEInt													GridSpacing;
 		
 		ZEDNodeEditorGraphicsViewRubberBandSelectionMode	RubberBandSelectionMode;		
 
@@ -128,7 +128,7 @@ class ZEDNodeEditorGraphicsView : public QGraphicsView
 		void												DeselectItem(ZEDNodeEditorItem* Item, ZEDUndoRedoOperation* DeselectionUndoRedoOperation);
 		void												MutualDeselection(ZEDUndoRedoOperation* DeselectionUndoRedoOperation);
 		void												SetNewConnection(ZEDNodeEditorNode* FromNode, ZEDNodeIOPort* FromPort);
-		int													SelectTopMostNodeZValue(QPointF MousePosition);
+		ZEInt													SelectTopMostNodeZValue(QPointF MousePosition);
 		void												DeleteConnection(ZEDIOPortConnection* Connection);
 		void												DeleteNode(ZEDNodeEditorNode* Node);	
 

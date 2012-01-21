@@ -68,7 +68,7 @@ class ZEDSoundFilePreviewWidget : public ZEDPreviewWidget
 
 		void			PlaySound();
 		void			StopSound();
-		void			EnableLoop(int State);
+		void			EnableLoop(ZEInt State);
 
 	public:
 

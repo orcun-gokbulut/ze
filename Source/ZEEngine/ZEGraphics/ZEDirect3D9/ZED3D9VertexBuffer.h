@@ -44,13 +44,13 @@
 class ZED3D9StaticVertexBuffer : public ZEStaticVertexBuffer, public ZED3D9ComponentBase
 {
 	private:
-		size_t						BufferSize;
+		ZESize						BufferSize;
 	public:
 		LPDIRECT3DVERTEXBUFFER9		StaticBuffer;
 
-		virtual size_t				GetBufferSize();
+		virtual ZESize				GetBufferSize();
 
-		virtual bool				Create(size_t BufferSize);
+		virtual bool				Create(ZESize BufferSize);
 		virtual void*				Lock();
 		virtual void				Unlock();
 		virtual void				Release();

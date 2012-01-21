@@ -144,7 +144,7 @@ void ZEVariant::SetVariant(const ZEVariant& NewValue)
 	}
 }
 
-size_t ZEVariant::SizeOf() const
+ZESize ZEVariant::SizeOf() const
 {
 	switch(Type)
 	{
@@ -155,7 +155,7 @@ size_t ZEVariant::SizeOf() const
 		case ZE_VRT_STRING:
 			return strlen(Value.String) + 1;
 		case ZE_VRT_INTEGER:
-			return sizeof(int);
+			return sizeof(ZEInt);
 		case ZE_VRT_BOOLEAN:
 			return sizeof(bool);
 		case ZE_VRT_FLOAT:
@@ -198,7 +198,7 @@ bool ZEVariant::Serialize(ZESerializer* Serializer)
 			Serializer->Write(Value.String, sizeof(char), StringSize);
 			break;
 		case ZE_VRT_INTEGER:
-			Serializer->Write(&Value.Integer, sizeof(int), 1);
+			Serializer->Write(&Value.Integer, sizeof(ZEInt), 1);
 			break;
 		case ZE_VRT_BOOLEAN:
 			Serializer->Write(&Value.Boolean, sizeof(bool), 1);
@@ -256,7 +256,7 @@ bool ZEVariant::Unserialize(ZEUnserializer* Unserializer)
 			break;
 		case ZE_VRT_INTEGER:
 			SetType(ZE_VRT_INTEGER);
-			Unserializer->Read(&Value.Integer, sizeof(int), 1);
+			Unserializer->Read(&Value.Integer, sizeof(ZEInt), 1);
 			break;
 		case ZE_VRT_BOOLEAN:
 			SetType(ZE_VRT_BOOLEAN);
@@ -310,7 +310,7 @@ void ZEVariant::SetString(const char *NewValue)
 	strcpy(Value.String, NewValue);
 }
 
-void ZEVariant::SetInteger(int Value)
+void ZEVariant::SetInteger(ZEInt Value)
 {
 	Type = ZE_VRT_INTEGER;
 	this->Value.Integer = Value;
@@ -382,7 +382,7 @@ char* ZEVariant::GetString() const
 	return Value.String;
 }
 
-int ZEVariant::GetInteger() const
+ZEInt ZEVariant::GetInteger() const
 {
 	zeAssert(this->Type != ZE_VRT_INTEGER, "ZEVariant::GetInteger operation failed. Variant type mismatched.");
 	return Value.Integer;
@@ -450,7 +450,7 @@ void ZEVariant::operator=(const char* NewValue)
 {
 	SetString(NewValue);
 }
-void ZEVariant::operator=(int NewValue)
+void ZEVariant::operator=(ZEInt NewValue)
 {
 	SetInteger(NewValue);
 }
@@ -506,11 +506,11 @@ ZEVariant::operator const char*()
 	return Value.String;
 }
 
-ZEVariant::operator int()
+ZEVariant::operator ZEInt()
 {
 	zeAssert(this->Type != ZE_VRT_INTEGER && this->Type != ZE_VRT_FLOAT, "Integer conversion operation failed. Variant type mismatched.");
 	if (this->Type == ZE_VRT_FLOAT)
-		return (int)Value.Float;
+		return (ZEInt)Value.Float;
 	else
 		return Value.Integer;
 }
@@ -590,7 +590,7 @@ ZEVariant::ZEVariant(const char* InitialValue)
 	SetString(InitialValue);
 }
 	
-ZEVariant::ZEVariant(int InitialValue)
+ZEVariant::ZEVariant(ZEInt InitialValue)
 {
 	SetInteger(InitialValue);
 }

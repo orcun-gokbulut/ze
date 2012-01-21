@@ -63,9 +63,9 @@ class ZECacheTextDataIdentifier : public ZECacheDataIdentifier
 
 		virtual ZEUInt64	GetHash() const
 		{
-			unsigned int Hash = 0;
-			unsigned int I = 0;	
-			int Char = 0;
+			ZEUInt Hash = 0;
+			ZEUInt I = 0;	
+			ZEInt Char = 0;
 
 			while (I < ZE_MAX_FILE_NAME_SIZE)
 			{
@@ -80,7 +80,7 @@ class ZECacheTextDataIdentifier : public ZECacheDataIdentifier
 		{
 			ZEUInt64 BytesWritten = 0;
 			ZEUInt64 WriteCount = 0;
-			size_t ZeCharSize = sizeof(char);
+			ZESize ZeCharSize = sizeof(char);
 
 			WriteCount = File->Write(ItemName, (ZEUInt64)ZeCharSize, ZE_MAX_FILE_NAME_SIZE);
 			if (WriteCount != ZE_MAX_FILE_NAME_SIZE)
@@ -104,8 +104,8 @@ class ZECacheTextDataIdentifier : public ZECacheDataIdentifier
 				return false;
 			}
 
-			unsigned int I = 0;
-			unsigned int StringLenght = strlen(ItemNameBuffer);
+			ZEUInt I = 0;
+			ZEUInt StringLenght = strlen(ItemNameBuffer);
 			while (I < StringLenght)
 			{
 				if(ItemNameBuffer[I] != ItemName[I])
@@ -218,7 +218,7 @@ ZETestSuite(ZEFileCache)
 		ZECacheTextDataIdentifier Identifier10("ZETestData10");
 
 		unsigned char* Buffer = new unsigned char[4999];
-		for (int I = 0; I < 4999; I++)
+		for (ZEInt I = 0; I < 4999; I++)
 		{
 			Buffer[I] = I % 256;
 		}
@@ -250,7 +250,7 @@ ZETestSuite(ZEFileCache)
 		ZETestCase("True (after open)")
 		{
 			unsigned char* Buffer = new unsigned char[4999];
-			for (int I = 0; I < 4999; I++)
+			for (ZEInt I = 0; I < 4999; I++)
 			{
 				Buffer[I] = I % 256;
 			}
@@ -289,7 +289,7 @@ ZETestSuite(ZEFileCache)
 		unsigned char* Buffer1 = new unsigned char[4999];
 		unsigned char* Buffer2 = new unsigned char[4999];
 		unsigned char* Buffer = new unsigned char[4999];
-		for (int I = 0; I < 4999; I++)
+		for (ZEInt I = 0; I < 4999; I++)
 		{
 			Buffer1[I] = I % 256;
 			Buffer2[4998 - I] = I % 256;
@@ -335,7 +335,7 @@ ZETestSuite(ZEFileCache)
 			ZECacheTextDataIdentifier Identifier5("ZETestData5");
 			ZEFileCache FileCache;
 			unsigned char* Buffer = new unsigned char[4999];
-			for (int I = 0; I < 4999; I++)
+			for (ZEInt I = 0; I < 4999; I++)
 			{
 				Buffer[I] = I % 256;
 			}
@@ -361,7 +361,7 @@ ZETestSuite(ZEFileCache)
 			ZECacheTextDataIdentifier Identifier1("ZETestData1");
 			ZECacheTextDataIdentifier Identifier3("ZETestData3");
 			unsigned char* Buffer = new unsigned char[4999];
-			for (int I = 0; I < 4999; I++)
+			for (ZEInt I = 0; I < 4999; I++)
 			{
 				Buffer[I] = I % 256;
 			}
@@ -390,7 +390,7 @@ ZETestSuite(ZEFileCache)
 		ZEFileCache FileCache;
 		unsigned char* Buffer = new unsigned char[4999];
 		unsigned char* BufferRead = new unsigned char[4999];
-		for (int I = 0; I < 4999; I++)
+		for (ZEInt I = 0; I < 4999; I++)
 		{
 			Buffer[I] = I % 256;
 		}

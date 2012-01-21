@@ -80,7 +80,7 @@ struct ZEMaterialTexture
 	public:
 		char							FileName[ZE_MAX_FILE_NAME_SIZE];
 		bool							Internal;
-		size_t							Size;
+		ZESize							Size;
 		char*							Data;
 
 
@@ -90,8 +90,8 @@ struct ZEMaterialTexture
 		void							SetFileName();
 		void							GetFileName();
 		
-		void							SetSize(size_t Size);
-		size_t							GetSize();
+		void							SetSize(ZESize Size);
+		ZESize							GetSize();
 
 		char*							GetData();
 
@@ -100,7 +100,7 @@ struct ZEMaterialTexture
 
 struct ZEMaterialAnimationKey
 {
-	unsigned int						PropertyIndex;
+	ZEUInt						PropertyIndex;
 	ZEVariant							Value;
 };
 
@@ -133,7 +133,7 @@ class ZEFixedMaterialFile : public ZEMaterialFile
 		bool							Wireframe;
 		ZEMaterialTransparancyMode		TransparancyMode;
 		bool							RecivesShadow;
-		unsigned int					TransparancyCullLimit;
+		ZEUInt					TransparancyCullLimit;
 
 		bool							AmbientEnabled;
 		ZEVector3						AmbientColor;
@@ -228,8 +228,8 @@ class ZEFixedMaterialFile : public ZEMaterialFile
 		bool							GetWireframe();
 		void							SetTransparancyMode(ZEMaterialTransparancyMode Mode);
 		ZEMaterialTransparancyMode		GetTransparancyMode();
-		void							SetTransparancyCullLimit(unsigned int Limit);
-		unsigned int					GetTransparancyCullLimit();
+		void							SetTransparancyCullLimit(ZEUInt Limit);
+		ZEUInt					GetTransparancyCullLimit();
 		void							SetRecivesShadow(bool Enable);
 		bool							GetRecivesShadow();
 

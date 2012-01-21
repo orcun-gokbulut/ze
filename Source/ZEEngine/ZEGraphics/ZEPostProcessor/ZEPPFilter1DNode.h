@@ -66,7 +66,7 @@ class ZEPPFilter1DNode : public ZEPostProcessorNode
 		virtual									~ZEPPFilter1DNode();
 
 	public:	
-		virtual size_t							GetDependencyCount();
+		virtual ZESize							GetDependencyCount();
 		virtual ZEPostProcessorNode**			GetDependencies();
 
 		virtual void							SetInput(ZEPostProcessorNode* Node);

@@ -78,25 +78,25 @@ class ZESoundSource : public ZEComponent
 {
 	ZE_META_ENTITY(ZESoundSource)
 	private:
-		unsigned int				StartPosition;
-		unsigned int				EndPosition;
+		ZEUInt				StartPosition;
+		ZEUInt				EndPosition;
 
 	protected:
 		ZESoundResource*			SoundResource;
 		ZESoundSourceState			SoundSourceState;
 		ZESoundSourceType			SoundSourceType;
 
-		int							Pan;
+		ZEInt							Pan;
 		float						PlaybackSpeed;
-		unsigned int				Volume;
+		ZEUInt				Volume;
 		bool						Looping;
 		bool						Streaming;
 
-		unsigned int				CurrentPosition;
-		unsigned int				LocalOldPosition;
+		ZEUInt				CurrentPosition;
+		ZEUInt				LocalOldPosition;
 
-		unsigned int				EffectiveStartPosition;
-		unsigned int				EffectiveEndPosition;
+		ZEUInt				EffectiveStartPosition;
+		ZEUInt				EffectiveEndPosition;
 		bool						LimitsEnabled;
 
 		void						ResetParameters();
@@ -113,48 +113,48 @@ class ZESoundSource : public ZEComponent
 		ZESoundSourceType			GetSoundSourceType();
 		void						SetSoundSourceType(ZESoundSourceType Type);
 
-		virtual void				SetCurrentPosition(unsigned int SampleIndex);
+		virtual void				SetCurrentPosition(ZEUInt SampleIndex);
 		void						SetCurrentPositionTime(float Seconds);
 		void						SetCurrentPositionPersentage(float Percent);
 
-		unsigned int				GetCurrentPosition() const;
-		unsigned int				GetCurrentPositionTime() const;
+		ZEUInt				GetCurrentPosition() const;
+		ZEUInt				GetCurrentPositionTime() const;
 		float						GetCurrentPositionPersentage() const;
 
 		void						SetLimitsEnabled(bool Enabled);
 		bool						GetLimitsEnabled() const;
 
-		virtual void				SetStartPosition(unsigned int SampleIndex);
+		virtual void				SetStartPosition(ZEUInt SampleIndex);
 		void						SetStartPositionTime(float Seconds);
 		void						SetStartPositionPersentage(float Percent);
 
-		unsigned int				GetStartPosition() const;
+		ZEUInt				GetStartPosition() const;
 		float						GetStartPositionTime() const;
 		float						GetStartPositionPersentage() const;
 
-		virtual void				SetEndPosition(unsigned int SampleIndex);
+		virtual void				SetEndPosition(ZEUInt SampleIndex);
 		void						SetEndPositionTime(float Seconds);
 		void						SetEndPositionPercentage(float Percentage);
 
-		unsigned int				GetEndPosition() const;
+		ZEUInt				GetEndPosition() const;
 		float						GetEndPositionTime() const;
 		float						GetEndPositionPersentage() const;
 
 		virtual void				SetLooping(bool Enabled) = 0;
 		bool						GetLooping() const;
 
-		size_t						GetLoopingLength();
+		ZESize						GetLoopingLength();
 		float						GetLoopingLenghtTime();
 		float						GetLoopingLenghtPercent();
 
-		virtual void				SetPan(int NewPan) = 0;
-		int							GetPan() const;
+		virtual void				SetPan(ZEInt NewPan) = 0;
+		ZEInt							GetPan() const;
 							
 		virtual void				SetPlaybackSpeed(float Speed);
 		float						GetPlaybackSpeed() const;
 												
-		virtual void				SetVolume(unsigned int NewVolume) = 0;
-		unsigned int				GetVolume() const;
+		virtual void				SetVolume(ZEUInt NewVolume) = 0;
+		ZEUInt				GetVolume() const;
 						
 		virtual void				Play() = 0;
 		virtual void				Resume() = 0;

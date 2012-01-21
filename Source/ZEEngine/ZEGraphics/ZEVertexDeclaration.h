@@ -77,7 +77,7 @@ struct ZEVertexElement
 	/*public:	*/
 		ZEVertexElementSemantic						Semantic;
 		ZEVertexElementType							Type;
-		unsigned int								Index;
+		ZEUInt								Index;
 };
 
 class ZEFile;
@@ -90,10 +90,10 @@ class ZEVertexDeclaration
 
 	public:
 		virtual const ZEArray<ZEVertexElement>&		GetVertexElements() = 0;
-		virtual size_t								GetVertexSize() = 0;
+		virtual ZESize								GetVertexSize() = 0;
 
 		virtual bool								Create(const ZEArray<ZEVertexElement>& VertexElements);
-		virtual bool								Create(const ZEVertexElement* Elements, size_t ElementCount) = 0;
+		virtual bool								Create(const ZEVertexElement* Elements, ZESize ElementCount) = 0;
 		virtual void								Release() = 0;
 		virtual void								Destroy();
 

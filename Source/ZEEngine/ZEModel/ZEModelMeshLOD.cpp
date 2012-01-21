@@ -66,7 +66,7 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DistanceSquare
 	if (Skinned)
 	{
 		RenderCommand.BoneTransforms.SetCount(LODResource->AffectingBoneIds.GetCount());
-		for (size_t I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
+		for (ZESize I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
 			ZEMatrix4x4::Multiply(RenderCommand.BoneTransforms[I], Owner->GetBones()[LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
 
 		RenderCommand.WorldMatrix = Owner->GetWorldTransform();

@@ -41,7 +41,7 @@
 
 struct ZEIndexedPolygon
 {
-	int			VertexIndexes[3];
+	ZEInt			VertexIndexes[3];
 };
 
 #endif

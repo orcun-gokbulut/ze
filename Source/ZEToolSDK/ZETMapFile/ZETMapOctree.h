@@ -58,13 +58,13 @@ class ZEMapFileOctree
 {
 	public:	
 		bool						IsLeaf;
-		int							Depth;
+		ZEInt							Depth;
 		ZEMapFileOctree*			SubTrees[8];
 
 		ZEAABBox				BoundingBox;
 		ZESmartArray<ZEUInt32>		PolygonIds;
 
-		static ZEMapFileOctree*		GenerateOctree(ZEArray<ZEMapFilePolygon>& Polygons, unsigned int MaxDepth);
+		static ZEMapFileOctree*		GenerateOctree(ZEArray<ZEMapFilePolygon>& Polygons, ZEUInt MaxDepth);
 
 									ZEMapFileOctree();
 									~ZEMapFileOctree();

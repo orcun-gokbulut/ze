@@ -56,12 +56,12 @@ void ZESteering::SetOwner(ZEActor*	Owner)
 	this->Owner = Owner;
 }
 
-unsigned int ZESteering::GetPriority()
+ZEUInt ZESteering::GetPriority()
 {
 	return Priority;
 }
 
-void ZESteering::SetPriority(unsigned int Priority)
+void ZESteering::SetPriority(ZEUInt Priority)
 {
 	this->Priority = Priority;
 }
@@ -386,7 +386,7 @@ ZESteeringOutput ZESeperateSteering::Process(float ElapsedTime)
 		}
 	}
 
-	for (size_t I = 0; I < AvoidedActors.GetCount(); I++)
+	for (ZESize I = 0; I < AvoidedActors.GetCount(); I++)
 	{
 		ZEVector3 Direction = GetOwner()->GetPosition() - AvoidedActors[I]->GetPosition();
 		float Distance = Direction.Length();
@@ -451,7 +451,7 @@ ZESteeringOutput ZECollisionAvoidanceSteering::Process(float ElapsedTime)
 	ZEVector3 FirstRelativePosition;
 	ZEVector3 FirstRelativeVelocity;
 
-	for (size_t I = 0; I < AvoidedActors.GetCount(); I++)
+	for (ZESize I = 0; I < AvoidedActors.GetCount(); I++)
 	{
 		ZEActor* CurrentTarget = AvoidedActors[I];
 

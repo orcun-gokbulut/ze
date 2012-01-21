@@ -95,7 +95,7 @@ ZEDEnumComboBox::ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *paren
 	XValue->setAutoFillBackground(false);
 	XValue->setFrame(false);
 
-	for(size_t I = 0; I < this->ClassAttribute.Enumurators->ItemCount; I++)
+	for(ZESize I = 0; I < this->ClassAttribute.Enumurators->ItemCount; I++)
 		this->XValue->addItem(QString(ClassAttribute.Enumurators->Items[I].Name));
 
 	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
@@ -103,14 +103,14 @@ ZEDEnumComboBox::ZEDEnumComboBox(QTreeWidget* ParentTree, QTreeWidgetItem *paren
 
 	this->XValue->setMaxCount(this->ClassAttribute.Enumurators->ItemCount);
 
-	for (size_t I = 0; I < ClassAttribute.Enumurators->ItemCount; I++)
+	for (ZESize I = 0; I < ClassAttribute.Enumurators->ItemCount; I++)
 	{
 		ValueIndexTable.append(ClassAttribute.Enumurators->Items[I].Value);
 	}
 
 	ParentTree->setItemWidget(this, 1, XValue);	
 	XValue->setCurrentIndex(Value.GetInteger());////////////////////Buggggggggggg
-	connect(this->XValue, SIGNAL(currentIndexChanged(int)), this, SLOT(Changed()));
+	connect(this->XValue, SIGNAL(currentIndexChanged(ZEInt)), this, SLOT(Changed()));
 }
 
 void ZEDEnumComboBox::UpdateValues()
@@ -131,7 +131,7 @@ void ZEDEnumComboBox::Changed()
 	Class->GetProperty(ClassAttribute.Name, Value);
 	TempOperation->SetOldValue(Value);
 
-	int Index = XValue->currentIndex();
+	ZEInt Index = XValue->currentIndex();
 	Value.SetInteger(ValueIndexTable[Index]);
 	this->Class->SetProperty(ClassAttribute.Name, Value);
 

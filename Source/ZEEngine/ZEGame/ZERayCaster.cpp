@@ -65,7 +65,7 @@ ZEEntity* ZERayCaster::CastRay(ZEScene* Scene, const ZERay& Ray, ZEVector3& Posi
 
 	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
 
-	for (size_t I = 0; I < Entities.GetCount(); I++)
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
 		ZEEntity* CurrentEntity = Entities[I];
 

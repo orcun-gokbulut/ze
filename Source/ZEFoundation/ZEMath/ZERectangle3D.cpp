@@ -41,7 +41,7 @@ void ZERectangle3D::GetPlane(ZEPlane & Plane) const
 	ZEPlane::Create(Plane,P1,P2,P3);
 }
 
-const ZEVector3& ZERectangle3D::GetPoint(unsigned int Index) const
+const ZEVector3& ZERectangle3D::GetPoint(ZEUInt Index) const
 {
 	switch(Index)
 	{

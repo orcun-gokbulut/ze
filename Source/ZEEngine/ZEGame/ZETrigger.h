@@ -84,7 +84,7 @@ class ZETrigger : public ZEEntity
 		bool						IsTriggerActive;
 		bool						IsTriggerFired;
 
-		ZESmartArray<int>			InsideEntityIds;
+		ZESmartArray<ZEInt>			InsideEntityIds;
 
 		ZETriggerShape				TriggerShape;
 		ZEFilterObjectsBy			FilterObjectsBy;

@@ -52,11 +52,11 @@ class ZESoundResource : public ZEResource
 	protected:
 		ZESoundFileFormat				FileFormat;
 
-		size_t							SampleCount;
-		unsigned int					SamplesPerSecond;
-		unsigned int					ChannelCount;
-		unsigned int					BitsPerSample;
-		size_t							BlockAlign;
+		ZESize							SampleCount;
+		ZEUInt					SamplesPerSecond;
+		ZEUInt					ChannelCount;
+		ZEUInt					BitsPerSample;
+		ZESize							BlockAlign;
 		
 		static ZESoundFileFormat		GetFileFormat(const ZEString& FileName);
 
@@ -67,17 +67,17 @@ class ZESoundResource : public ZEResource
 		const char*						GetResourceType() const;
 		ZESoundFileFormat				GetSoundFileFormat() const;
 
-		unsigned int					GetSamplesPerSecond() const;
-		unsigned int					GetChannelCount() const;
-		unsigned int					GetBitsPerSample() const;
-		size_t							GetBlockAlign() const;
-		size_t							GetSampleCount() const;
-		size_t							GetUncompressedDataSize() const;
+		ZEUInt					GetSamplesPerSecond() const;
+		ZEUInt					GetChannelCount() const;
+		ZEUInt					GetBitsPerSample() const;
+		ZESize							GetBlockAlign() const;
+		ZESize							GetSampleCount() const;
+		ZESize							GetUncompressedDataSize() const;
 
-		virtual size_t					GetDataSize() const = 0;		
+		virtual ZESize					GetDataSize() const = 0;		
 		virtual const void*				GetData() const = 0;
 
-		virtual void					Decode(void* Buffer, size_t SampleIndex, size_t SampleCount) = 0;
+		virtual void					Decode(void* Buffer, ZESize SampleIndex, ZESize SampleCount) = 0;
 
 		static void						CacheResource(const ZEString& FileName);
 		static ZESoundResource*			LoadSharedResource(const ZEString& FileName); 

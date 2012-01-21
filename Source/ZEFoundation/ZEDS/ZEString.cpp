@@ -50,7 +50,7 @@ bool ZEString::IsEmpty() const
 	return (Buffer == NULL || (Buffer[0] == '\0')); 
 }
 
-size_t ZEString::GetSize() const
+ZESize ZEString::GetSize() const
 {
 	return Allocator.GetSize();
 }
@@ -77,14 +77,14 @@ void ZEString::SetValue(const char* String)
 		return;
 	}
 
-	size_t StringSize = strlen(String);
+	ZESize StringSize = strlen(String);
 	if (StringSize == 0)
 	{
 		Clear();
 		return;
 	}
 
-	size_t Size = ((StringSize) + 1) * sizeof(char);
+	ZESize Size = ((StringSize) + 1) * sizeof(char);
 	
 	char* OldBuffer = Buffer;
 	if (Allocator.Allocate(&Buffer, Size))
@@ -129,19 +129,19 @@ const char* ZEString::GetValue() const
 		return Buffer;
 }
 
-char ZEString::GetCharacter(size_t Position) const
+char ZEString::GetCharacter(ZESize Position) const
 {
 	zeAssert(Position > strlen(Buffer), "Position parameter value exceed length of the string.");
 	return Buffer[Position];
 }
 
-void ZEString::SetCharacter(size_t Position, char Value)
+void ZEString::SetCharacter(ZESize Position, char Value)
 {
 	zeAssert(Position > strlen(Buffer), "Position parameter value exceed length of the string.");
 	Buffer[Position] = Value;
 }
 
-size_t ZEString::GetLength() const
+ZESize ZEString::GetLength() const
 {
 	if (Buffer != NULL)
 		return strlen(Buffer);
@@ -157,8 +157,8 @@ void ZEString::Append(const char* String)
 		SetValue(String);
 	else
 	{
-		size_t Length = strlen(Buffer);
-		size_t StringLength = strlen(String);
+		ZESize Length = strlen(Buffer);
+		ZESize StringLength = strlen(String);
 		Allocator.Reallocate(&Buffer, (Length + StringLength + 1) * sizeof(char));
 		memcpy(Buffer + Length, String, (StringLength + 1) * sizeof(char));
 	}
@@ -179,11 +179,11 @@ void ZEString::Insert(const char* String)
 		SetValue(String);
 	else
 	{
-		size_t StringLength = strlen(String);
+		ZESize StringLength = strlen(String);
 		if (StringLength == 0)
 			return;
 
-		size_t Length = strlen(Buffer);
+		ZESize Length = strlen(Buffer);
 
 		char* OldBuffer = Buffer;
 		bool Changed = Allocator.Allocate(&Buffer, (Length + StringLength + 1) * sizeof(char));
@@ -203,17 +203,17 @@ void ZEString::Insert(const ZEString& String)
 	Insert(String.GetValue());
 }
 
-void ZEString::Insert(size_t Position, const ZEString& String)
+void ZEString::Insert(ZESize Position, const ZEString& String)
 {
 	Insert(Position, String.GetValue());
 }
 
-void ZEString::Insert(size_t Position, const char* String)
+void ZEString::Insert(ZESize Position, const char* String)
 {
 	zeAssert(String == NULL, "Inserting string is not valid.");
 	zeAssert(Buffer == NULL && Position != 0, "A string can only be inserted in to empty string at position 0.");
 
-	size_t StringLength = strlen(String);
+	ZESize StringLength = strlen(String);
 	if (StringLength == 0)
 		return;
 
@@ -223,7 +223,7 @@ void ZEString::Insert(size_t Position, const char* String)
 		return;
 	}
 
-	size_t Length = strlen(Buffer);
+	ZESize Length = strlen(Buffer);
 	zeAssert(Position > Length, "Position parameter is more than string length.");
 	Length += StringLength;
 
@@ -248,13 +248,13 @@ void ZEString::Insert(size_t Position, const char* String)
 	ZEDebugCheckMemory();
 }
 
-void ZEString::Remove(size_t Position, size_t Count)
+void ZEString::Remove(ZESize Position, ZESize Count)
 {
 
 	if (Buffer == NULL && Position == 0 && Count == 0)
 		return;
 
-	size_t Length = strlen(Buffer);
+	ZESize Length = strlen(Buffer);
 	zeAssert(Position > Length, "Position parameter is more than string length.");
 	zeAssert(Position + Count > Length, "Remove operation range (Position + Count) exceeds length of the string.");
 
@@ -302,7 +302,7 @@ void ZEString::CopyFrom(const ZEString& String)
 		SetValue(String.GetValue());
 }
 
-ZEString ZEString::Left(size_t Count) const
+ZEString ZEString::Left(ZESize Count) const
 {
 	if (Count == 0)
 		return ZEString();
@@ -320,14 +320,14 @@ ZEString ZEString::Left(size_t Count) const
 	return Temp;
 }
 
-ZEString ZEString::Right(size_t Count) const
+ZEString ZEString::Right(ZESize Count) const
 {
 	if (Count == 0)
 		return ZEString();
 
 	zeAssert(Buffer == NULL, "Buffer is empty.");
 
-	size_t Length = strlen(Buffer);
+	ZESize Length = strlen(Buffer);
 	zeAssert(Count > strlen(Buffer), "Position is bigger than string length.");
 
 	ZEString Temp;
@@ -339,7 +339,7 @@ ZEString ZEString::Right(size_t Count) const
 	return Temp;
 }
 
-ZEString ZEString::Middle(size_t Position, size_t Count) const
+ZEString ZEString::Middle(ZESize Position, ZESize Count) const
 {
 	if (Count == 0)
 		return ZEString();
@@ -357,7 +357,7 @@ ZEString ZEString::Middle(size_t Position, size_t Count) const
 	return Temp;
 }
 
-ZEString ZEString::SubString(size_t StartPosition, size_t EndPosition) const
+ZEString ZEString::SubString(ZESize StartPosition, ZESize EndPosition) const
 {
 	if (Buffer == NULL && StartPosition == 0 && EndPosition == 0)
 		return ZEString();
@@ -381,13 +381,13 @@ ZEString ZEString::TrimLeft() const
 	if (Buffer == NULL)
 		return ZEString();
 
-	size_t Length = strlen(Buffer);
+	ZESize Length = strlen(Buffer);
 
 	char* Cursor = Buffer;
 	while(*Cursor != L'\0' && (*Cursor == L' ' || *Cursor == L'\t'))
 		Cursor++;
 
-	size_t Count = Cursor - Buffer;
+	ZESize Count = Cursor - Buffer;
 	if (Count == Length)
 		return ZEString();
 	
@@ -405,13 +405,13 @@ ZEString ZEString::TrimRight() const
 	if (Buffer == NULL)
 		return ZEString();
 
-	size_t Length = strlen(Buffer);
+	ZESize Length = strlen(Buffer);
 	char* Cursor = Buffer + (Length - 1);
 
 	while(*Cursor != L'\0' && (*Cursor == L' ' || *Cursor == L'\t'))
 		Cursor--; 
 	
-	size_t Count = Length - ((Cursor + 1) - Buffer);
+	ZESize Count = Length - ((Cursor + 1) - Buffer);
 	if (Count == Length)
 		return ZEString();
 
@@ -431,13 +431,13 @@ ZEString ZEString::Trim() const
 	if (Buffer == NULL)
 		return ZEString();
 
-	size_t Length = strlen(Buffer);
+	ZESize Length = strlen(Buffer);
 
 	char* Cursor = Buffer;
 	while(*Cursor != L'\0' && (*Cursor == L' ' || *Cursor == L'\t'))
 		Cursor++;
 
-	size_t LeftCount = Cursor - Buffer;
+	ZESize LeftCount = Cursor - Buffer;
 	
 	if (LeftCount == Length)
 		return ZEString();
@@ -446,7 +446,7 @@ ZEString ZEString::Trim() const
 	while(*Cursor != L'\0' && (*Cursor == L' ' || *Cursor == L'\t'))
 		Cursor--; 
 	
-	size_t RightCount = Length - ((Cursor + 1) - Buffer);
+	ZESize RightCount = Length - ((Cursor + 1) - Buffer);
 
 	if (RightCount + LeftCount == Length)
 		return ZEString();
@@ -466,12 +466,12 @@ ZEString ZEString::Lower() const
 	if (Buffer == NULL)
 		return ZEString();
 
-	size_t Length = strlen(Buffer);
+	ZESize Length = strlen(Buffer);
 	
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (Length + 1) * sizeof(char));
 
-	for (size_t I = 0; I < Length; I++)
+	for (ZESize I = 0; I < Length; I++)
 		Temp.Buffer[I] = tolower(Buffer[I]);
 
 	Temp.Buffer[Length] = '\0';
@@ -484,12 +484,12 @@ ZEString ZEString::Upper() const
 	if (Buffer == NULL)
 		return ZEString();
 
-	size_t Length = strlen(Buffer);
+	ZESize Length = strlen(Buffer);
 	
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (Length + 1) * sizeof(char));
 
-	for (size_t I = 0; I < Length; I++)
+	for (ZESize I = 0; I < Length; I++)
 		Temp.Buffer[I] = toupper(Buffer[I]);
 	
 	Temp.Buffer[Length] = '\0';
@@ -538,7 +538,7 @@ ZEString ZEString::FromInt(ZEInt Value, ZEUInt Base)
 	char Buffer[33];
 	ltoa(Value, Buffer, Base);
 	
-	size_t Size = strlen(Buffer) + 1;
+	ZESize Size = strlen(Buffer) + 1;
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, Size * sizeof(char));
 	memcpy(Temp.Buffer, Buffer, Size);
@@ -551,7 +551,7 @@ ZEString ZEString::FromUInt(ZEUInt Value, ZEUInt Base)
 	char Buffer[33];
 	ultoa(Value, Buffer, Base);
 	
-	size_t Size = strlen(Buffer) + 1;
+	ZESize Size = strlen(Buffer) + 1;
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, Size * sizeof(char));
 	memcpy(Temp.Buffer, Buffer, Size);
@@ -565,7 +565,7 @@ ZEString ZEString::FromFloat(float Value, ZEUInt Digits)
 	gcvt(Value, Digits, Buffer);
 	
 	ZEString Temp;
-	size_t Size = (strlen(Buffer) + 1) * sizeof(char);
+	ZESize Size = (strlen(Buffer) + 1) * sizeof(char);
 	Temp.Allocator.Allocate(&Temp.Buffer, Size);
 	memcpy(Temp.Buffer, Buffer, Size);
 	
@@ -592,7 +592,7 @@ ZEString ZEString::Format(const char* Format, ...)
 	va_list List;
 	va_start(List, Format);
 	
-	size_t Length = _vscprintf(Format, List);
+	ZESize Length = _vscprintf(Format, List);
 	
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (Length + 1) * sizeof(char));
@@ -641,7 +641,7 @@ ZEString& ZEString::operator+=(const char* String)
 	return *this;
 }
 
-const char& ZEString::operator[](ptrdiff_t Index) const
+const char& ZEString::operator[](ZESSize Index) const
 {
 	zeAssert(Buffer == NULL, "Empty string can not be indexed.");
 	zeAssert(Index < 0, "Index parameter is negative.");
@@ -649,7 +649,7 @@ const char& ZEString::operator[](ptrdiff_t Index) const
 	return Buffer[Index];
 }
 
-char& ZEString::operator[](ptrdiff_t Index)
+char& ZEString::operator[](ZESSize Index)
 {
 	zeAssert(Buffer == NULL, "Empty string can not be indexed.");
 	zeAssert(Index < 0, "Index parameter is negative.");

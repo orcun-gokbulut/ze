@@ -65,7 +65,7 @@ const char* ZETestManager::GetPackageName()
 bool ZETestManager::RunTests()
 {
 	bool Result = true;
-	for (size_t I = 0; I < TestSuiteCount; I++)
+	for (ZESize I = 0; I < TestSuiteCount; I++)
 	{
 		if (!TestSuites[I]->RunTests())
 			Result = false;
@@ -77,7 +77,7 @@ bool ZETestManager::RunTests()
 	return Result;
 }
 
-void ZETestManager::ReportProblem(ZETestSuiteItem* Suite, ZETestItem* Test, ZETestProblemType Type, const char* ProblemText, const char* File, int Line)
+void ZETestManager::ReportProblem(ZETestSuiteItem* Suite, ZETestItem* Test, ZETestProblemType Type, const char* ProblemText, const char* File, ZEInt Line)
 {
 	const char* TypeString;
 

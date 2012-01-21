@@ -81,13 +81,13 @@ class ZERenderCommand
 {
 	public:
 		ZERenderPipeline				Pipeline;
-		int								Priority;
+		ZEInt								Priority;
 		float							Order;
 		ZERenderCommandFlags			Flags;
 		ZEROPrimitiveType				PrimitiveType;
 		ZEVertexDeclaration*			VertexDeclaration;
-		size_t							VertexBufferOffset;
-		size_t							PrimitiveCount;
+		ZESize							VertexBufferOffset;
+		ZESize							PrimitiveCount;
 
 		const ZEMaterial*				Material;
 

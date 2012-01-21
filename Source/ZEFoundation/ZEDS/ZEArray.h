@@ -66,22 +66,22 @@ ZEArray<*>{
 #include "ZEAllocator.h"
 #include "ZEError.h"
 
-typedef int FunctionPointerCaster(const void*, const void*);
+typedef ZEInt FunctionPointerCaster(const void*, const void*);
 
 template<typename Type, typename Allocator_= ZEAllocatorBase<Type> >
 class ZEArray
 {
 	private:
-		size_t		Count;
+		ZESize		Count;
 		Allocator_	Allocator;
 		Type*		Items;
 
 	public:
-		inline size_t Circular(ptrdiff_t Index) const
+		inline ZESize Circular(ZESSize Index) const
 		{
 			if (Index < 0)
 			{
-				ptrdiff_t CircularIndex = ((-Index) % Count);
+				ZESSize CircularIndex = ((-Index) % Count);
 				return (CircularIndex == 0 ? 0 : Count - CircularIndex);
 			}
 			else
@@ -114,20 +114,20 @@ class ZEArray
 			return Temp;
 		}
 
-		inline void SetItem(size_t Index, Type Value)
+		inline void SetItem(ZESize Index, Type Value)
 		{
 			zeAssert(Index < 0 || Index >= Count, "ZEArray::SetItem operaion failed. Index is out of range. (0 <= Index < Count)");
 			this->Items[Index] = Value;
 		}
 
-		inline Type* MassAdd(size_t ItemCount)
+		inline Type* MassAdd(ZESize ItemCount)
 		{
 			Resize(Count + ItemCount);
 
 			return &Items[Count - ItemCount];
 		}
 
-		inline Type* MassAdd(const Type* NewItems, size_t ItemCount)
+		inline Type* MassAdd(const Type* NewItems, ZESize ItemCount)
 		{
 			Resize(Count + ItemCount);
 			ZEAllocatorBase<Type>::ObjectCopy(this->Items + Count - ItemCount, NewItems, ItemCount);
@@ -137,7 +137,7 @@ class ZEArray
 			return &Items[Count - ItemCount];
 		}
 		
-		inline Type* MassInsert(size_t Index, size_t ItemCount)
+		inline Type* MassInsert(ZESize Index, ZESize ItemCount)
 		{
 			Type* NewBuffer;
 			if (Allocator.Allocate(&NewBuffer, Count + ItemCount))
@@ -157,7 +157,7 @@ class ZEArray
 			return &Items[Index];
 		}
 
-		inline Type* MassInsert(size_t Index, Type* NewItems, size_t ItemCount)
+		inline Type* MassInsert(ZESize Index, Type* NewItems, ZESize ItemCount)
 		{
 			Type* NewBuffer;
 			if (Allocator.Allocate(&NewBuffer, Count + ItemCount))
@@ -181,13 +181,13 @@ class ZEArray
 
 		inline void Fill(Type Value)
 		{
-			for (size_t I = 0; I < Count; I++)
+			for (ZESize I = 0; I < Count; I++)
 				Items[I] = Value;
 		}
 
-		inline ptrdiff_t FindIndex(Type Item, size_t StartIndex = 0) const
+		inline ZESSize FindIndex(Type Item, ZESize StartIndex = 0) const
 		{
-			for(size_t I = StartIndex; I < Count; I++)
+			for(ZESize I = StartIndex; I < Count; I++)
 				if (Items[I] == Item)
 					return I;
 
@@ -201,13 +201,13 @@ class ZEArray
 			ZEDebugCheckMemory();
 		}
 
-		void CopyTo(Type* OtherArray, size_t Count) const
+		void CopyTo(Type* OtherArray, ZESize Count) const
 		{
 			ZEAllocatorBase<Type>::ObjectCopy(OtherArray, this->Items, Count > this->Count ? this->Count : Count);
 			ZEDebugCheckMemory();
 		}
 
-		void CopyFrom(const Type* OtherArray, size_t Count)
+		void CopyFrom(const Type* OtherArray, ZESize Count)
 		{
 			this->SetCount(Count);
 			ZEAllocatorBase<Type>::ObjectCopy(this->Items, OtherArray, Count);	
@@ -259,28 +259,28 @@ class ZEArray
 		
 		inline bool Exists(Type& Value)
 		{
-			for (size_t I = 0; I < Count; I++)
+			for (ZESize I = 0; I < Count; I++)
 				if (Items[I] == Value)
 					return true;
 
 			return false;
 		}
 
-		inline Type* Insert(size_t Index)
+		inline Type* Insert(ZESize Index)
 		{
 			zeAssert(Index < 0 || Index > Count, "ZEArray::Insert operation failed. Index is out of range. (0 <= Index <= Count)");
-			size_t N = 0;
+			ZESize N = 0;
 			Type* TempPointer = this->Items;
 			bool Changed = Allocator.Allocate(&Items, Count + 1);
 
-			for(size_t I = Index; I < Count; I++)
+			for(ZESize I = Index; I < Count; I++)
 				Items[I + 1] = TempPointer[I];
 
 			Count++;
 
 			if (Changed)
 			{
-				for(size_t I = 0; I < Index; I++)
+				for(ZESize I = 0; I < Index; I++)
 					Items[I] = TempPointer[I];
 				delete[] TempPointer;
 			}
@@ -290,7 +290,7 @@ class ZEArray
 			return &Items[Index];
 		}
 
-		inline Type* Insert(size_t Index, Type NewItem)
+		inline Type* Insert(ZESize Index, Type NewItem)
 		{
 			
 			Insert(Index);
@@ -301,10 +301,10 @@ class ZEArray
 			return &Items[Index];
 		}
 
-		inline void DeleteAt(size_t Index)
+		inline void DeleteAt(ZESize Index)
 		{
 			zeAssert(Index < 0 || Index >= Count, "ZEArray::DeleteAt operation failed. Index is out of range. (0 <= Index < Count)");
-			size_t NewCount = Count, N = 0;
+			ZESize NewCount = Count, N = 0;
 			Type* TempPointer = this->Items;
 			bool Changed;
 			
@@ -317,12 +317,12 @@ class ZEArray
 				return;
 			}
 
-			for(size_t I = Index; I < Count - 1; I++)
+			for(ZESize I = Index; I < Count - 1; I++)
 				Items[I] = TempPointer[I + 1];
 
 			if (Changed && Index != 0)
 			{
-				for(size_t I = 0; I < Index; I++)
+				for(ZESize I = 0; I < Index; I++)
 					Items[I] = TempPointer[I];
 				delete[] TempPointer;
 			}
@@ -334,7 +334,7 @@ class ZEArray
 
 		inline void DeleteValue(Type Value)
 		{
-			size_t N = 0, OldCount = Count;
+			ZESize N = 0, OldCount = Count;
 
 			for(Type* I = Items; I < Items + OldCount; I++)
 				if (*I != Value)
@@ -349,7 +349,7 @@ class ZEArray
 			ZEDebugCheckMemory();
 		}
 		
-		inline void SetCount(size_t Count)
+		inline void SetCount(ZESize Count)
 		{
 			zeAssert(Count < 0, "ZEArray::SetCount operation failed. Wrong Count value. (Count >= 0)");
 
@@ -366,7 +366,7 @@ class ZEArray
 			ZEDebugCheckMemory();
 		}
 
-		inline void Resize(size_t Count)
+		inline void Resize(ZESize Count)
 		{
 			zeAssert(Count < 0, "ZEArray::Resize operation failed. Wrong Count value. (Count >= 0)");
 			
@@ -396,12 +396,12 @@ class ZEArray
 			return Items;
 		}
 
-		inline size_t GetCount() const
+		inline ZESize GetCount() const
 		{
 			return Count;
 		}
 
-		inline size_t GetSize() const
+		inline ZESize GetSize() const
 		{
 			return Allocator.GetSize();
 		}
@@ -420,14 +420,14 @@ class ZEArray
 			Count = 0;
 		}
 
-		inline void Sort(int (*CompareFunction)(const Type*, const Type*))
+		inline void Sort(ZEInt (*CompareFunction)(const Type*, const Type*))
 		{
 			qsort(Items, Count, sizeof(Type), (FunctionPointerCaster*)(CompareFunction));
 		}
 
 		void Traverse()
 		{
-			for (size_t I = 0; I < Count / 2; I++)
+			for (ZESize I = 0; I < Count / 2; I++)
 			{
 				Type Temp = Items[I];
 				Items[I] = Items[Count - I - 1];
@@ -435,7 +435,7 @@ class ZEArray
 			}
 		}
 
-		inline ptrdiff_t BinarySearch(const Type& Element, int (*CompareFunction)(const Type*, const Type*))
+		inline ZESSize BinarySearch(const Type& Element, ZEInt (*CompareFunction)(const Type*, const Type*))
 		{
 			void* Result = bsearch(&Element, &Items, Count, sizeof(Type), (FunctionPointerCaster*)(CompareFunction));
 			if (Result == NULL)
@@ -444,13 +444,13 @@ class ZEArray
 				return ((Type*)Result - Items);
 		}
 
-		inline const Type& GetItem(size_t Index) const
+		inline const Type& GetItem(ZESize Index) const
 		{
 			zeAssert(Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
 		}
 
-		inline Type& GetItem(size_t Index)
+		inline Type& GetItem(ZESize Index)
 		{
 			zeAssert(Index >= Count, "ZEArray::GetItem operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
@@ -476,13 +476,13 @@ class ZEArray
 			return Items[Count - 1];
 		}
 
-		inline Type& operator[](size_t Index)
+		inline Type& operator[](ZESize Index)
 		{
 			zeAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
 		}
 		
-		inline const Type& operator[](size_t Index) const
+		inline const Type& operator[](ZESize Index) const
 		{
 			zeAssert(Index < 0 || Index >= Count, "ZEArray::operator[] operation failed. Index is out of range. (0 <= Index < Count)");
 			return Items[Index];
@@ -507,7 +507,7 @@ class ZEArray
 			if (Count != Other.Count)
 				return false;
 
-			for (size_t I = 0; I < Count; I++)
+			for (ZESize I = 0; I < Count; I++)
 				if (Items[I] != Other.Items[I])
 					return false;
 
@@ -520,7 +520,7 @@ class ZEArray
 			if (Count != Other.Count)
 				return true;
 
-			for (size_t I = 0; I < Count; I++)
+			for (ZESize I = 0; I < Count; I++)
 				if (Items[I] != Other.Items[I])
 					return true;
 
@@ -551,11 +551,11 @@ class ZEArray
 		}
 };
 
-template <typename Type, int Exponent = 2>
+template <typename Type, ZEInt Exponent = 2>
 class ZESmartArray : public ZEArray<Type, ZESmartAllocator<Type, Exponent> >
 {};
 
-template <typename Type, int ChunkSize>
+template <typename Type, ZEInt ChunkSize>
 class ZEChunkArray : public ZEArray<Type, ZEChunkAllocator<Type, ChunkSize> >
 {};
 

@@ -174,7 +174,7 @@ bool ZEFile::Seek(ZEInt64 Offset, ZESeekFrom Origin)
 	if (!IsOpen())
 		return false;
 
-	int OriginNorm;
+	ZEInt OriginNorm;
 	switch(Origin)
 	{
 		case ZE_SF_BEGINING:
@@ -249,7 +249,7 @@ ZEUInt64 ZEFile::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 		return 0;
 
 	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-	ZEUInt64 ReadCount = fread(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	ZEUInt64 ReadCount = fread(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
 	FileCursor += ReadCount * Size;
 
 	return ReadCount;
@@ -280,7 +280,7 @@ ZEUInt64 ZEFile::Write( const void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 		return 0;
 
 	_fseeki64((FILE*)File, FileCursor, SEEK_SET);
-	ZEUInt64 WriteCount = fwrite(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	ZEUInt64 WriteCount = fwrite(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
 	FileCursor += WriteCount * Size;
 
 	return WriteCount;
@@ -343,7 +343,7 @@ bool ZEFile::ReadFile(const ZEString& FilePath, void* Buffer, ZEUInt64 BufferSiz
 
 	zeAssert(BufferSize < FileSize, "File size exceed buffer size.");
 
-	fread(Buffer, sizeof(char), (BufferSize > FileSize ? (size_t)FileSize : (size_t)BufferSize), File);
+	fread(Buffer, sizeof(char), (BufferSize > FileSize ? (ZESize)FileSize : (ZESize)BufferSize), File);
 
 	fclose(File);
 	return true;
@@ -368,7 +368,7 @@ bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 Buffe
 
 	zeAssert(BufferSize < FileSize + 1, "File size exceed buffer size.");
 
-	fread(Buffer, sizeof(char), (size_t)FileSize, File);
+	fread(Buffer, sizeof(char), (ZESize)FileSize, File);
 	Buffer[FileSize] = '\0';
 
 	fclose(File);
@@ -400,29 +400,29 @@ const ZEString ZEFile::GetFilePath() const
 	return FilePath;
 }
 
-unsigned int ZEFile::GetReferenceCount() const
+ZEUInt ZEFile::GetReferenceCount() const
 {
 	return ReferenceCount;
 }
 
-unsigned int ZEFile::IncreaseReferenceCount()
+ZEUInt ZEFile::IncreaseReferenceCount()
 {
 	return ++ReferenceCount;
 }
 
-unsigned int ZEFile::DecreaseReferenceCount()
+ZEUInt ZEFile::DecreaseReferenceCount()
 {
 	return --ReferenceCount;
 }
 
 ZEString ZEFile::GetFileName(const ZEString& FilePath)
 {
-	size_t Length = FilePath.GetLength();
+	ZESize Length = FilePath.GetLength();
 
 	if (Length == 0)
 		return "";
 
-	for (ptrdiff_t I = Length - 1; I >= 0; I--)
+	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
 		if (FilePath[I] == '\\' || FilePath[I] == '/')
 			return FilePath.Right(Length - 1 - I);
@@ -438,12 +438,12 @@ ZEString ZEFile::GetAbsolutePath(const ZEString& FilePath)
 
 ZEString ZEFile::GetFileExtension(const ZEString& FilePath)
 {
-	size_t Length = FilePath.GetLength();
+	ZESize Length = FilePath.GetLength();
 
 	if (Length == 0)
 		return "";
 
-	for (ptrdiff_t I = Length - 1; I >= 0; I--)
+	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
 		if(FilePath[I] == '.')
 			return FilePath.Right(Length - I);
@@ -454,12 +454,12 @@ ZEString ZEFile::GetFileExtension(const ZEString& FilePath)
 
 ZEString ZEFile::GetParentDirectory(const ZEString& FilePath)
 {
-	size_t Length = FilePath.GetLength();
+	ZESize Length = FilePath.GetLength();
 
 	if (Length == 0)
 		return "";
 
-	for (ptrdiff_t I = Length - 1; I >= 0; I--)
+	for (ZESSize I = Length - 1; I >= 0; I--)
 	{
 		if (FilePath[I] == '\\' || FilePath[I] == '/')
 			return FilePath.Left(I);
@@ -540,9 +540,9 @@ ZEFile& ZEFile::operator = (ZEFile& OtherFile)
 // Opens and returns the first file
 ZEFile* ZEFile::Open(const ZEString& FilePath)
 {
-	size_t		TokenStart = 0;
-	size_t		TokenEnd = 0;
-	size_t		Lenght = 0;
+	ZESize		TokenStart = 0;
+	ZESize		TokenEnd = 0;
+	ZESize		Lenght = 0;
 	ZEString	Token;
 	ZEString	NewPath;
 
@@ -587,7 +587,7 @@ ZEFile* ZEFile::Open(const ZEString& FilePath)
 	while(TokenEnd <= Lenght)
 	{
 		// For the rest of the string starting from token end
-		for(size_t I = TokenEnd; I < Lenght; I++)
+		for(ZESize I = TokenEnd; I < Lenght; I++)
 		{
 			if(NewPath[I] == '\\' || NewPath[I] == '/')
 			{

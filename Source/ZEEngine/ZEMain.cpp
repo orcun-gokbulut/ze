@@ -63,7 +63,7 @@ extern HINSTANCE ApplicationInstance;
 
 #include "ZEGraphics/ZEBitmap.h"
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
+ZEInt WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, ZEInt nCmdShow)
 {
 	ApplicationInstance = hInstance;
 	

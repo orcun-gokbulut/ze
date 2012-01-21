@@ -63,32 +63,32 @@ ZESoundFileFormat ZESoundResource::GetSoundFileFormat() const
 	return FileFormat;
 }
 
-unsigned int ZESoundResource::GetSamplesPerSecond() const
+ZEUInt ZESoundResource::GetSamplesPerSecond() const
 {
 	return SamplesPerSecond;
 }
 
-unsigned int ZESoundResource::GetChannelCount() const
+ZEUInt ZESoundResource::GetChannelCount() const
 {
 	return ChannelCount;
 }
 
-unsigned int ZESoundResource::GetBitsPerSample() const
+ZEUInt ZESoundResource::GetBitsPerSample() const
 {
 	return BitsPerSample;
 }
 
-size_t ZESoundResource::GetBlockAlign() const
+ZESize ZESoundResource::GetBlockAlign() const
 {
 	return BlockAlign;
 }
 
-size_t ZESoundResource::GetSampleCount() const
+ZESize ZESoundResource::GetSampleCount() const
 {
 	return SampleCount;
 }
 
-size_t ZESoundResource::GetUncompressedDataSize() const
+ZESize ZESoundResource::GetUncompressedDataSize() const
 {
 	return SampleCount * BlockAlign;
 }

@@ -41,8 +41,8 @@
 
 class ZEPhysXUserOutputStream : public NxUserOutputStream
 {
-	virtual void				reportError(NxErrorCode Code, const char* Message, const char* File, int Line);
-	virtual NxAssertResponse	reportAssertViolation(const char* Message, const char* File, int Line);
+	virtual void				reportError(NxErrorCode Code, const char* Message, const char* File, ZEInt Line);
+	virtual NxAssertResponse	reportAssertViolation(const char* Message, const char* File, ZEInt Line);
 	virtual void				print(const char *message);
 };
 

@@ -58,27 +58,27 @@ ZETextureTools::~ZETextureTools()
 }
 
 // Is texture resizeable by 2
-bool ZETextureTools::IsResizeable(unsigned int Width, unsigned int Height)
+bool ZETextureTools::IsResizeable(ZEUInt Width, ZEUInt Height)
 {
 	return (((Width & (Width - 1)) != 0) || ((Height & (Height - 1)) != 0)) ? false : true;
 }
 
 // Is texture compressible by DXT3/BC2
-bool ZETextureTools::IsCompressible(unsigned int Width, unsigned int Height)
+bool ZETextureTools::IsCompressible(ZEUInt Width, ZEUInt Height)
 {
 	return ((Width % 4 != 0) || (Height % 4 != 0)) ? false : true;
 }
 
-unsigned int ZETextureTools::GetMaxMipmapCount(unsigned int Width, unsigned int Height)
+ZEUInt ZETextureTools::GetMaxMipmapCount(ZEUInt Width, ZEUInt Height)
 {
-	unsigned int WidthCount = (unsigned int)(logf((float)Width) / logf(2.0f));
-	unsigned int HeightCount = (unsigned int)(logf((float)Height) / logf(2.0f));
+	ZEUInt WidthCount = (ZEUInt)(logf((float)Width) / logf(2.0f));
+	ZEUInt HeightCount = (ZEUInt)(logf((float)Height) / logf(2.0f));
 
 	/* also counts the original (level 0) texture as a mipmap */
 	return WidthCount >= HeightCount ? HeightCount + 1 : WidthCount + 1;
 }
 
-void ZETextureTools::CompressTexture(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int	SourcePitch, unsigned int SourceWidth, unsigned int SourceHeight, const ZETextureOptions* CompressionOptions)
+void ZETextureTools::CompressTexture(void* DestinationData, ZEUInt DestinationPitch, void* SourceData, ZEUInt	SourcePitch, ZEUInt SourceWidth, ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions)
 {
 	ATI_TC_FORMAT	Format;
 	ATI_TC_Speed	Speed;
@@ -149,14 +149,14 @@ void ZETextureTools::CompressTexture(void* DestinationData, unsigned int Destina
 	ATI_TC_ConvertTexture(&srcTexture, &destTexture, &options, NULL, NULL, NULL);
 }
 
-void ZETextureTools::DownSample2x(void* DestinationData, unsigned int DestinationPitch, void* SourceData, unsigned int SourcePitch, unsigned int SourceWidth, unsigned int SourceHeight, bool UseGpu)
+void ZETextureTools::DownSample2x(void* DestinationData, ZEUInt DestinationPitch, void* SourceData, ZEUInt SourcePitch, ZEUInt SourceWidth, ZEUInt SourceHeight, bool UseGpu)
 {
 	// Check width height
 	if(SourceWidth <= 1 || SourceHeight <= 1)
 		return;
 
-	unsigned int DestinationHeight = SourceHeight / 2;
-	unsigned int DestinationWidth = SourceWidth / 2;
+	ZEUInt DestinationHeight = SourceHeight / 2;
+	ZEUInt DestinationWidth = SourceWidth / 2;
 
 	if (UseGpu)
 	{
@@ -177,9 +177,9 @@ void ZETextureTools::DownSample2x(void* DestinationData, unsigned int Destinatio
 			ZEUInt8 Green;
 		};
 
-		for (size_t y = 0; y < DestinationHeight; y++)
+		for (ZESize y = 0; y < DestinationHeight; y++)
 		{
-			for (size_t x = 0; x < DestinationWidth; x++)
+			for (ZESize x = 0; x < DestinationWidth; x++)
 			{
 				ZEColorARGB* Source = (ZEColorARGB*)((ZEUInt8*)SourceData + SourcePitch * y * 2 + x * 8);
 
@@ -219,14 +219,14 @@ void ZETextureTools::DownSample2x(void* DestinationData, unsigned int Destinatio
 
 // Can be used to copy a image buffer to another
 // Can be used for getting a portion of a image ex: a face of cube map
-void ZETextureTools::CopyTextureRegion(void* DestData, unsigned int DestPitch, unsigned int DestX, unsigned int DestY, void *SourceData, unsigned int SourcePitch, unsigned int SourceBitsPP, unsigned int SourceX, unsigned int SourceY, unsigned int CopyWidth, unsigned int CopyHeight)
+void ZETextureTools::CopyTextureRegion(void* DestData, ZEUInt DestPitch, ZEUInt DestX, ZEUInt DestY, void *SourceData, ZEUInt SourcePitch, ZEUInt SourceBitsPP, ZEUInt SourceX, ZEUInt SourceY, ZEUInt CopyWidth, ZEUInt CopyHeight)
 {
-	unsigned int SourceBytesPP = SourceBitsPP / 8;
+	ZEUInt SourceBytesPP = SourceBitsPP / 8;
 
 	BYTE* DestRegion	= (BYTE*)DestData + DestPitch * DestY + DestX * SourceBytesPP;
 	BYTE* SourceRegion	= (BYTE*)SourceData + SourcePitch * SourceY + SourceX * SourceBytesPP;
 
-	for(unsigned int I = 0; I < CopyHeight; I++)
+	for(ZEUInt I = 0; I < CopyHeight; I++)
 	{
 		memcpy(DestRegion, SourceRegion, CopyWidth * SourceBytesPP);
 		
@@ -235,9 +235,9 @@ void ZETextureTools::CopyTextureRegion(void* DestData, unsigned int DestPitch, u
 	}
 }
 
-void ZETextureTools::CopyTexture(void* DestData, unsigned int DestPitch, void* SourceData, unsigned int SourcePitch, unsigned int RowSize, unsigned int RowCount)
+void ZETextureTools::CopyTexture(void* DestData, ZEUInt DestPitch, void* SourceData, ZEUInt SourcePitch, ZEUInt RowSize, ZEUInt RowCount)
 {
-	for (unsigned int I = 0; I < RowCount; I++)
+	for (ZEUInt I = 0; I < RowCount; I++)
 	{
 		memcpy((unsigned char*)DestData + I * DestPitch, (unsigned char*)SourceData + SourcePitch, RowSize);
 	}

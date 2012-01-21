@@ -47,8 +47,8 @@ class ZENavigationMeshGeneratorOptions
 	public:
 		ZEVector3 UpDirection;
 		float MaxWalkableSlope;
-		int MaxConvexSimplicationPass;
-		int Max3To1SimplificationPass;
+		ZEInt MaxConvexSimplicationPass;
+		ZEInt Max3To1SimplificationPass;
 
 };
 
@@ -60,14 +60,14 @@ class ZENavigationMeshGenerator
 		ZENavigationMesh Mesh;
 
 		// Helpers
-		ZEVector3&			GetVertex(const ZENavigationMeshPolygon& Polygon, ptrdiff_t Index);
-		size_t				GetVertexIndex(const ZENavigationMeshPolygon& Polygon, ptrdiff_t Index);
+		ZEVector3&			GetVertex(const ZENavigationMeshPolygon& Polygon, ZESSize Index);
+		ZESize				GetVertexIndex(const ZENavigationMeshPolygon& Polygon, ZESSize Index);
 		ZEVector3&			GetNormal(const ZENavigationMeshPolygon& Polygon);
 		void				GetBoundingBox(ZEAABBox& Output, ZENavigationMeshPolygon& Polygon);
 
-		size_t				AddVertex(const ZEVector3& Point);
-		void				RemovePolygonsByOrder(size_t PolygonAIndex, size_t PolygonBIndex);
-		void				RemovePolygonsByOrder(size_t PolygonAIndex, size_t PolygonBIndex, size_t PolygonCIndex);
+		ZESize				AddVertex(const ZEVector3& Point);
+		void				RemovePolygonsByOrder(ZESize PolygonAIndex, ZESize PolygonBIndex);
+		void				RemovePolygonsByOrder(ZESize PolygonAIndex, ZESize PolygonBIndex, ZESize PolygonCIndex);
 
 		void				TraverseOctree(ZENavigationMeshOctree* Octree);
 
@@ -84,13 +84,13 @@ class ZENavigationMeshGenerator
 		// Mergers
 		static void			RemoveUnwalkable(ZEArray<ZEPolygon>& Output, const ZEArray<ZEPolygon>& Input, const ZEVector3& Up, float MaxDegree);
 		bool				MergePolygons2to1(ZENavigationMeshPolygon& Output, const ZENavigationMeshPolygon& A, const ZENavigationMeshPolygon& B);
-		bool				MergePolygons2to1(size_t PolygonIndex1, size_t PolygonIndex2);
+		bool				MergePolygons2to1(ZESize PolygonIndex1, ZESize PolygonIndex2);
 
-		bool				MergePolygons3to2(size_t PolygonAIndex);
-		bool				MergePolygons3to2(size_t PolygonAIndex, size_t PolygonBIndex);
-		bool				MergePolygons3to2(size_t PolygonAIndex, size_t PolygonBIndex, size_t PolygonCIndex, ZECheckAdjacentResult& Result);
+		bool				MergePolygons3to2(ZESize PolygonAIndex);
+		bool				MergePolygons3to2(ZESize PolygonAIndex, ZESize PolygonBIndex);
+		bool				MergePolygons3to2(ZESize PolygonAIndex, ZESize PolygonBIndex, ZESize PolygonCIndex, ZECheckAdjacentResult& Result);
 
-		bool				MergePolygonsNto1(size_t VertexIndex);
+		bool				MergePolygonsNto1(ZESize VertexIndex);
 
 		void				FloodFill(const ZEVector3& StartPoint);
 		

@@ -74,7 +74,7 @@ ZEPhysicalMesh* ZEPortalMapPortal::GetPhysicalMesh()
 
 void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
 {
-	for(size_t I = 0; I < RenderCommands.GetCount(); I++)
+	for(ZESize I = 0; I < RenderCommands.GetCount(); I++)
 	{
 		RenderCommands[I].WorldMatrix = Owner->GetWorldTransform();
 		RenderCommands[I].Lights.Clear();
@@ -98,9 +98,9 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 		Processed.SetCount(Resource->Polygons.GetCount());
 		Processed.Fill(false);
 
-		size_t VertexIndex = 0;
+		ZESize VertexIndex = 0;
 		ZEMapVertex* Buffer = (ZEMapVertex*)VertexBuffer->Lock();	
-		for (size_t N = 0; N < Resource->Polygons.GetCount(); N++)
+		for (ZESize N = 0; N < Resource->Polygons.GetCount(); N++)
 		{
 			if (!Processed[N])
 			{
@@ -119,7 +119,7 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 				ZEMatrix4x4::CreateIdentity(RenderCommand->WorldMatrix);
 
 				RenderCommand->PrimitiveCount = 0;
-				for (size_t I = N; I < Resource->Polygons.GetCount(); I++)
+				for (ZESize I = N; I < Resource->Polygons.GetCount(); I++)
 				{
 					if (Resource->Polygons[I].Material != Material)
 						continue;
@@ -141,13 +141,13 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 	PhysicalVertices.SetCount(Resource->Polygons.GetCount() * 3);
 	PhysicalTriangles.SetCount(Resource->Polygons.GetCount());
 
-	for (size_t I = 0; I < PhysicalTriangles.GetCount(); I++)
+	for (ZESize I = 0; I < PhysicalTriangles.GetCount(); I++)
 	{
 		PhysicalVertices[3 * I] = Resource->Polygons[I].Vertices[0].Position;
 		PhysicalVertices[3 * I + 1] = Resource->Polygons[I].Vertices[1].Position;
 		PhysicalVertices[3 * I + 2] = Resource->Polygons[I].Vertices[2].Position;
 	}
-	for (size_t I = 0; I < PhysicalTriangles.GetCount(); I++)
+	for (ZESize I = 0; I < PhysicalTriangles.GetCount(); I++)
 	{
 		PhysicalTriangles[I].MaterialIndex = 0;
 		PhysicalTriangles[I].Indices[0] =  3 * I;

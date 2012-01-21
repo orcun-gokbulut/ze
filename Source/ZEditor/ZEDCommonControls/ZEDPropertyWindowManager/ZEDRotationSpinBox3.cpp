@@ -173,17 +173,17 @@ void ZEDRotationSpinBox3::Changed()
 	ZEQuaternion Temp;
 
 	if(XValue->GetFloat() > 360 || XValue->GetFloat() < 0)
-		XValue->SetFloat((int)XValue->GetFloat() % 360);
+		XValue->SetFloat((ZEInt)XValue->GetFloat() % 360);
 
 	if(YValue->GetFloat() > 360 || YValue->GetFloat() < 0)
-		YValue->SetFloat((int)YValue->GetFloat() % 360);
+		YValue->SetFloat((ZEInt)YValue->GetFloat() % 360);
 
 	if(ZValue->GetFloat() > 360 || ZValue->GetFloat() < 0)
-		ZValue->SetFloat((int)ZValue->GetFloat() % 360);
+		ZValue->SetFloat((ZEInt)ZValue->GetFloat() % 360);
 
 	if(AllValue->text().length() != 0)
 		if(AllValue->GetFloat() > 360 || AllValue->GetFloat() < 0)
-			AllValue->SetFloat((int)AllValue->GetFloat() % 360);
+			AllValue->SetFloat((ZEInt)AllValue->GetFloat() % 360);
 
 	ValueCollectionLine->setText("[" + XValue->text() + " ;  " + YValue->text() + " ;  " + ZValue->text() + "]");
 
@@ -224,9 +224,9 @@ void ZEDRotationSpinBox3::ChangedByCollection()
 	QString Y;
 	QString Z;
 
-	int ParsedParameterCount = 0;
+	ZEInt ParsedParameterCount = 0;
 
-	for(int I = 0; I < Text.length(); I++)
+	for(ZEInt I = 0; I < Text.length(); I++)
 	{
 		if(QString(Text[I]) == QString(";"))
 			ParsedParameterCount++;

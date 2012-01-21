@@ -96,7 +96,7 @@ bool ZED3D9PPBlurNode::Initialize()
 				"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
 				"{"
 					"float4 Color = 0.0f;"
-					"for (int I = 0; I < 7; I++)"
+					"for (ZEInt I = 0; I < 7; I++)"
 						"Color += Kernel[I].x * tex2D(Input, float2(TexCoord.x, TexCoord.y + Kernel[I].y));"
 					"return Color;"
 				"}", "Horizantal Blur Pass", "ps_2_0", NULL)
@@ -111,7 +111,7 @@ bool ZED3D9PPBlurNode::Initialize()
 				"float4 ps_main(float2 TexCoord : TEXCOORD0) : COLOR0"
 				"{"
 					"float4 Color = 0.0f;"
-					"for (int I = 0; I < 7; I++)"
+					"for (ZEInt I = 0; I < 7; I++)"
 						"Color += Kernel[I].x * tex2D(Input, float2(TexCoord.x + Kernel[I].y, TexCoord.y));"
 					"return Color;"
 				"}", "Vertical Blur Pass", "ps_2_0", NULL)
@@ -260,7 +260,7 @@ bool ZED3D9PPBlurNode::Process()
 		GetDevice()->SetPixelShader(HorizontalPassPixelShader);
 		
 		// Pixel shader constants
-		for (int I = 0; I <= 7; I++)
+		for (ZEInt I = 0; I <= 7; I++)
 		{
 			KernelValues[I].x = (float)(I - 3) * PixelWidth_2;
 			KernelValues[I].y = Kernel[I];
@@ -269,7 +269,7 @@ bool ZED3D9PPBlurNode::Process()
 
 		GetDevice()->BeginScene();
 		// Do the passes
-		for (unsigned int I = 0; I < PassCount; I++)
+		for (ZEUInt I = 0; I < PassCount; I++)
 		{
 			// Set source as texture input
 			GetDevice()->SetTexture(0, Source);
@@ -287,7 +287,7 @@ bool ZED3D9PPBlurNode::Process()
 		// Set horizontal pixel shader
 		GetDevice()->SetPixelShader(HorizontalPassPixelShader);
 		// Pixel shader constants
-		for (int I = 0; I <= 7; I++)
+		for (ZEInt I = 0; I <= 7; I++)
 		{
 			KernelValues[I].x =  (I - 3) * PixelHeight_2;
 			KernelValues[I].y = Kernel[I];
@@ -295,7 +295,7 @@ bool ZED3D9PPBlurNode::Process()
 		GetDevice()->SetPixelShaderConstantF(0, (float*)KernelValues, 7);
 
 		// Do the passes
-		for (unsigned int I = 0; I < PassCount; I++)
+		for (ZEUInt I = 0; I < PassCount; I++)
 		{
 			// Set source as texture input
 			GetDevice()->SetTexture(0, Source);
@@ -329,7 +329,7 @@ bool ZED3D9PPBlurNode::Process()
 			// Set horizantal pixel shader
 			GetDevice()->SetPixelShader(VerticalPassPixelShader);
 			// Set kernel values;
-			for (int I = 0; I <= 7; I++)
+			for (ZEInt I = 0; I <= 7; I++)
 			{
 				KernelValues[I].x =  (I - 3) * PixelWidth_2;
 				KernelValues[I].y = Kernel[I];
@@ -341,14 +341,14 @@ bool ZED3D9PPBlurNode::Process()
 			// Set vertical pixel shader
 			GetDevice()->SetPixelShader(VerticalPassPixelShader);
 			// Set kernel values;
-			for (int I = 0; I <= 7; I++)
+			for (ZEInt I = 0; I <= 7; I++)
 				KernelValues[I].x =  (I - 3) * PixelHeight_2;
 			GetDevice()->SetPixelShaderConstantF(0, (float*)KernelValues, 7);
 		}
 
 		// Do passes
 		GetDevice()->BeginScene();
-		for (unsigned int I = 0; I < PassCount; I++)
+		for (ZEUInt I = 0; I < PassCount; I++)
 		{
 			// Set input as texture
 			GetDevice()->SetTexture(0, Source);

@@ -35,7 +35,7 @@
 
 #include "ZED3D9Profiler.h"
 #include <d3d9.h>
-void zeD3D9ProfileStart(const char* EventName, const char* FileName, int Line)
+void zeD3D9ProfileStart(const char* EventName, const char* FileName, ZEInt Line)
 {
 	/*char Temp[250];
 	mbstowcs(Temp, EventName, 250);

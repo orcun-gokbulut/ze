@@ -63,7 +63,7 @@ void ZEDUndoRedoOperation::AddChildOperation(ZEDUndoRedoOperation* Operation)
 
 void ZEDUndoRedoOperation::Undo()
 {
-	for (int I = ChildOperations.count() - 1; I >= 0; I--)
+	for (ZEInt I = ChildOperations.count() - 1; I >= 0; I--)
 	{
 		ChildOperations[I]->Undo();
 	}
@@ -71,7 +71,7 @@ void ZEDUndoRedoOperation::Undo()
 
 void ZEDUndoRedoOperation::Redo()
 {
-	for (int I = 0; I < ChildOperations.count(); I++)
+	for (ZEInt I = 0; I < ChildOperations.count(); I++)
 	{
 		ChildOperations[I]->Redo();
 	}
@@ -84,7 +84,7 @@ ZEDUndoRedoOperation::ZEDUndoRedoOperation()
 
 ZEDUndoRedoOperation::~ZEDUndoRedoOperation()
 {
-	for (int I = ChildOperations.count() - 1; I >= 0; I--)
+	for (ZEInt I = ChildOperations.count() - 1; I >= 0; I--)
 	{
 		ChildOperations[I]->Destroy();
 		ChildOperations[I] = NULL;

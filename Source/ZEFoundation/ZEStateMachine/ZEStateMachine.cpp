@@ -52,7 +52,7 @@ bool ZEStateMachine::AddState(ZEState* State)
 	return true;
 }
 
-bool ZEStateMachine::AddTransaction(ZEState* From, ZEState* To, int Priority)
+bool ZEStateMachine::AddTransaction(ZEState* From, ZEState* To, ZEInt Priority)
 {
 	ZETransaction TemporaryTransaction;
 	TemporaryTransaction.Initialize(From, To);
@@ -63,7 +63,7 @@ bool ZEStateMachine::AddTransaction(ZEState* From, ZEState* To, int Priority)
 
 bool ZEStateMachine::SetCurrentState(const ZEString& Name)
 {
-	for(size_t I = 0; I < StateArray.GetSize(); I++)
+	for(ZESize I = 0; I < StateArray.GetSize(); I++)
 	{
 		if(StateArray.GetItem(I).GetName().Equals(Name))
 		{
@@ -76,11 +76,11 @@ bool ZEStateMachine::SetCurrentState(const ZEString& Name)
 
 bool ZEStateMachine::Process()
 {
-	int TheBiggestPriority = 0;
-	int TheChosenOne = -1;
+	ZEInt TheBiggestPriority = 0;
+	ZEInt TheChosenOne = -1;
 
 	//Find transaction with higher priority
-	for(size_t I = 0; I < TransactionArray.GetSize(); I++)
+	for(ZESize I = 0; I < TransactionArray.GetSize(); I++)
 	{
 		if(TransactionArray.GetItem(I).GetFromState() == CurrentState)
 		{
@@ -119,7 +119,7 @@ ZEState* ZEStateMachine::GetCurrentState()
 
 ZEState* ZEStateMachine::GetState(ZEString Name)
 {
-	for(size_t I = 0; I < StateArray.GetSize(); I++)
+	for(ZESize I = 0; I < StateArray.GetSize(); I++)
 	{
 		if(StateArray.GetItem(I).GetName().Equals(Name))
 		{

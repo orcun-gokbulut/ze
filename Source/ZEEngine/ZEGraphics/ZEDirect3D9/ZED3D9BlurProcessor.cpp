@@ -49,7 +49,7 @@
 #include <stdlib.h>
 #include <math.h>
 
-ZED3D9BlurKernel::ZED3D9BlurKernel(const ZEFilter* Filt, unsigned int SrcLength, unsigned int DestLength, int Samples, float PixelSize)
+ZED3D9BlurKernel::ZED3D9BlurKernel(const ZEFilter* Filt, ZEUInt SrcLength, ZEUInt DestLength, ZEInt Samples, float PixelSize)
 {
 	float Scale = (float)DestLength / (float)SrcLength;
 	float InverseScale = 1.0f / Scale;
@@ -62,7 +62,7 @@ ZED3D9BlurKernel::ZED3D9BlurKernel(const ZEFilter* Filt, unsigned int SrcLength,
 	}
 
 	KernelWidth = Filt->GetFilterWidth() * InverseScale;
-	KernelWindowSize = (int)ceilf(KernelWidth * 2);
+	KernelWindowSize = (ZEInt)ceilf(KernelWidth * 2);
 	// allocation is fixed since we pass it to graphics device
 	KernelWeights = new ZEVector4[KernelWindowSize];
 	memset(KernelWeights, 0, sizeof(ZEVector4) * KernelWindowSize);
@@ -71,7 +71,7 @@ ZED3D9BlurKernel::ZED3D9BlurKernel(const ZEFilter* Filt, unsigned int SrcLength,
 
 	float PixelCoord = -1.0f * (Center - 0.5f);
 	float Total = 0.0f;
-	for(int I = 0; I < KernelWindowSize; I++)
+	for(ZEInt I = 0; I < KernelWindowSize; I++)
 	{
 		const float Sample = Filt->SampleBox(I - Center, Scale, Samples);
 		KernelWeights[I] = ZEVector4(Sample, PixelCoord * PixelSize, 0.0f, 0.0f);
@@ -81,7 +81,7 @@ ZED3D9BlurKernel::ZED3D9BlurKernel(const ZEFilter* Filt, unsigned int SrcLength,
 
 	float InverseTotal = 1.0f / Total;
 	// Normalize the weight of the WindowSize
-	for(int I = 0; I < KernelWindowSize; I++)
+	for(ZEInt I = 0; I < KernelWindowSize; I++)
 	{
 		KernelWeights[I].x *= InverseTotal;
 	}
@@ -89,10 +89,10 @@ ZED3D9BlurKernel::ZED3D9BlurKernel(const ZEFilter* Filt, unsigned int SrcLength,
 
 void ZED3D9BlurProcessor::CreateKernels()
 {
-	unsigned int TargetWidth;
-	unsigned int TargetHeight;
-	unsigned int SourceWidth;
-	unsigned int SourceHeight;
+	ZEUInt TargetWidth;
+	ZEUInt TargetHeight;
+	ZEUInt SourceWidth;
+	ZEUInt SourceHeight;
 
 	if (HorizontalKernel != NULL)
 		delete HorizontalKernel;
@@ -116,8 +116,8 @@ void ZED3D9BlurProcessor::CreateTextures()
 	// the Input/Output(viewport) texture size changes.
 	// Such as the resize of application window.
 	
-	unsigned int TargetWidth = Renderer->GetViewPort()->GetWidth() / 8;
-	unsigned int TargetHeight = Renderer->GetViewPort()->GetHeight() / 8;
+	ZEUInt TargetWidth = Renderer->GetViewPort()->GetWidth() / 8;
+	ZEUInt TargetHeight = Renderer->GetViewPort()->GetHeight() / 8;
 	
 	// If created before
 	if (TempTexture1 != NULL)
@@ -279,7 +279,7 @@ void ZED3D9BlurProcessor::Process()
 	zeProfilerStart("Blur Pass");
 
 	ZEVector4* KernelData;
-	unsigned int Vector4Count;
+	ZEUInt Vector4Count;
 	
 	static struct Vertex
 	{

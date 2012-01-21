@@ -52,7 +52,7 @@ ZEVector3 ZEAABBox::GetCenter() const
 	return Center;
 }
 
-ZEVector3 ZEAABBox::GetVertex(unsigned int Index) const
+ZEVector3 ZEAABBox::GetVertex(ZEUInt Index) const
 {
 	return  ZEVector3(Index & 0x01 ? Max.x : Min.x, Index & 0x02 ? Max.y : Min.y, Index & 0x04 ? Max.z : Min.z);
 }
@@ -70,7 +70,7 @@ void ZEAABBox::Transform(ZEAABBox& Output, const ZEAABBox& Input, const ZEMatrix
 	ZEVector3 Point;
 	ZEMatrix4x4::Transform(Point, TransformMatrix, Input.GetVertex(0));
 	Output.Min = Output.Max = Point;
-	for (int I = 1; I < 8; I++)
+	for (ZEInt I = 1; I < 8; I++)
 	{
 		ZEMatrix4x4::Transform(Point, TransformMatrix, Input.GetVertex(I));
 		if (Point.x < Output.Min.x) Output.Min.x = Point.x;
@@ -133,7 +133,7 @@ static inline void CheckSwap(float& a, float& b)
 	b = Temp;
 }
 
-static inline int SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal, float HalfSize, const ZELine* Line, float& TMin, float& TMax)
+static inline ZEInt SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal, float HalfSize, const ZELine* Line, float& TMin, float& TMax)
 {
 	float e = ZEVector3::DotProduct(PlaneNormal, Center - Line->p);
 	float f = ZEVector3::DotProduct(PlaneNormal, Line->v);
@@ -221,7 +221,7 @@ bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZERay& Ray, f
 	float TempTMax = FLT_MAX;
 
 	ZEVector3 Center = BoundingBox.GetCenter();
-	int Result = SlabTest(Center, ZEVector3::UnitX, (BoundingBox.Max.x - BoundingBox.Min.x) * 0.5f, &Ray, TempTMin, TempTMax);
+	ZEInt Result = SlabTest(Center, ZEVector3::UnitX, (BoundingBox.Max.x - BoundingBox.Min.x) * 0.5f, &Ray, TempTMin, TempTMax);
 	if (Result == 0)
 		return false;
 
@@ -273,7 +273,7 @@ bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox, const ZELineSegment
 	float TempTMax = FLT_MAX;
 
 	ZEVector3 Center = BoundingBox.GetCenter();
-	int Result = SlabTest(Center, ZEVector3::UnitX, (BoundingBox.Max.x - BoundingBox.Min.x) * 0.5f, &LineSegment, TempTMin, TempTMax);
+	ZEInt Result = SlabTest(Center, ZEVector3::UnitX, (BoundingBox.Max.x - BoundingBox.Min.x) * 0.5f, &LineSegment, TempTMin, TempTMax);
 	if (Result == 0)
 		return false;
 
@@ -349,14 +349,14 @@ bool ZEAABBox::IntersectionTest(const ZEAABBox& BoundingBox1, const ZEOBBox& Bou
 	return false;
 }
 
-void ZEAABBox::Generate(ZEAABBox& Output, const ZEVector3* Vertices, size_t Count)
+void ZEAABBox::Generate(ZEAABBox& Output, const ZEVector3* Vertices, ZESize Count)
 {
 	if (Count == 0)
 		return;
 
 	Output.Min = Output.Max = Vertices[0];
 	
-	for (size_t I = 1; I < Count; I++)
+	for (ZESize I = 1; I < Count; I++)
 	{
 		if (Output.Min.x > Vertices[I].x)
 			Output.Min.x = Vertices[I].x;

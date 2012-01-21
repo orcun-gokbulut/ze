@@ -42,7 +42,7 @@ float ZEMath::Sqrt(float Value)
 	return sqrt(Value);
 }
 
-int ZEMath::Abs(int Value)
+ZEInt ZEMath::Abs(ZEInt Value)
 {
 	if (Value < 0)
 		return -Value;
@@ -58,7 +58,7 @@ float ZEMath::Abs(float Value)
 		return Value;
 }
 
-int ZEMath::Sign(int Value)
+ZEInt ZEMath::Sign(ZEInt Value)
 {
 	if (Value == 0)
 		return 0;
@@ -88,12 +88,12 @@ float ZEMath::Max(float A, float B)
 	return (A > B ? A : B);
 }
 
-int ZEMath::Max(int A, int B)
+ZEInt ZEMath::Max(ZEInt A, ZEInt B)
 {
 	return (A > B ? A : B);
 }
 
-int ZEMath::Min(int A, int B)
+ZEInt ZEMath::Min(ZEInt A, ZEInt B)
 {
 	return (A < B ? A : B);
 }

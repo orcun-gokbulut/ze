@@ -42,24 +42,24 @@
 
 class ZESoundResourceMP3 : public ZESoundResource
 {
-	friend long Memory_Read(int fd, void *buffer, size_t nbytes);
-	friend long Memory_Seek(int fd, long offset, int whence);
+	friend long Memory_Read(ZEInt fd, void *buffer, ZESize nbytes);
+	friend long Memory_Seek(ZEInt fd, long offset, ZEInt whence);
 
 	private:
 		unsigned char*					Data;
-		size_t							DataSize;
+		ZESize							DataSize;
 
 		mpg123_handle*					mpg123;
-		size_t							MemoryCursor;
+		ZESize							MemoryCursor;
 
 										ZESoundResourceMP3();
 		virtual							~ZESoundResourceMP3();
 
 	public:
-		virtual size_t					GetDataSize() const;		
+		virtual ZESize					GetDataSize() const;		
 		virtual const void*				GetData() const;
 
-		virtual void					Decode(void* DestinationBuffer, size_t SampleIndex, size_t SampleCount);
+		virtual void					Decode(void* DestinationBuffer, ZESize SampleIndex, ZESize SampleCount);
 
 		static void						BaseInitialize();
 		static void						BaseDeinitialize();

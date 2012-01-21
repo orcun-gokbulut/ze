@@ -39,7 +39,7 @@
 
 #include <stdlib.h>
 
-int main(int Argc, char** Argv)
+ZEInt main(ZEInt Argc, char** Argv)
 {
 	#ifdef __COVERAGESCANNER__ 
 		__coveragescanner_install(Argv[0]);

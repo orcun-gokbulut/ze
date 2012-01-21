@@ -49,14 +49,14 @@ class ZEMath
 	public:
 		static float		Sqrt(float Value);
 		static float		Abs(float Value);
-		static int			Abs(int Value);
+		static ZEInt			Abs(ZEInt Value);
 		static float		Sign(float Value);
-		static int			Sign(int Value);
+		static ZEInt			Sign(ZEInt Value);
 
 		static float		Min(float A, float B);
 		static float		Max(float A, float B);
-		static int			Min(int A, int B);
-		static int			Max(int A, int B);
+		static ZEInt			Min(ZEInt A, ZEInt B);
+		static ZEInt			Max(ZEInt A, ZEInt B);
 
 		static float		Loge(float Value);
 		static float		Log10(float Value);

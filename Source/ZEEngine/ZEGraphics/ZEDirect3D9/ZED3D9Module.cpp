@@ -322,28 +322,28 @@ bool ZED3D9Module::IsDeviceLost()
 void ZED3D9Module::DeviceLost()
 {
 	DeviceLostState = true;
-	for (size_t I = 0; I < Texture2Ds.GetCount(); I++)
+	for (ZESize I = 0; I < Texture2Ds.GetCount(); I++)
 		Texture2Ds[I]->DeviceLost();
 
-	for (size_t I = 0; I < Texture3Ds.GetCount(); I++)
+	for (ZESize I = 0; I < Texture3Ds.GetCount(); I++)
 		Texture3Ds[I]->DeviceLost();
 
-	for (size_t I = 0; I < TextureCubes.GetCount(); I++)
+	for (ZESize I = 0; I < TextureCubes.GetCount(); I++)
 		TextureCubes[I]->DeviceLost();
 
-/*	for (size_t I = 0; I < Shaders.GetCount(); I++)
+/*	for (ZESize I = 0; I < Shaders.GetCount(); I++)
 		Shaders[I]->DeviceLost();
 
-	for (size_t I = 0; I < PostProcessors.GetCount(); I++)
+	for (ZESize I = 0; I < PostProcessors.GetCount(); I++)
 		PostProcessors[I]->DeviceLost();
 	
-	for (size_t I = 0; I < VertexBuffers.GetCount(); I++)
+	for (ZESize I = 0; I < VertexBuffers.GetCount(); I++)
 		VertexBuffers[I]->DeviceRestored();*/
 
-	for (size_t I = 0; I < Renderers.GetCount(); I++)
+	for (ZESize I = 0; I < Renderers.GetCount(); I++)
 		Renderers[I]->DeviceLost();
 	
-	for (size_t I = 0; I < ShadowRenderers.GetCount(); I++)
+	for (ZESize I = 0; I < ShadowRenderers.GetCount(); I++)
 		ShadowRenderers[I]->DeviceLost();
 
 
@@ -358,28 +358,28 @@ void ZED3D9Module::DeviceRestored()
 	Device->GetBackBuffer(0, 0,D3DBACKBUFFER_TYPE_MONO, &FrameBufferViewPort.FrameBuffer);
 	Device->GetDepthStencilSurface(&FrameBufferViewPort.ZBuffer);
 
-	for (size_t I = 0; I < Texture2Ds.GetCount(); I++)
+	for (ZESize I = 0; I < Texture2Ds.GetCount(); I++)
 		Texture2Ds[I]->DeviceRestored();
 
-	for (size_t I = 0; I < Texture3Ds.GetCount(); I++)
+	for (ZESize I = 0; I < Texture3Ds.GetCount(); I++)
 		Texture3Ds[I]->DeviceRestored();
 
-	for (size_t I = 0; I < TextureCubes.GetCount(); I++)
+	for (ZESize I = 0; I < TextureCubes.GetCount(); I++)
 		TextureCubes[I]->DeviceRestored();
 
-	/*for (size_t I = 0; I < VertexBuffers.GetCount(); I++)
+	/*for (ZESize I = 0; I < VertexBuffers.GetCount(); I++)
 		VertexBuffers[I]->DeviceRestored();*/
 
-	/*for (size_t I = 0; I < Shaders.GetCount(); I++)
+	/*for (ZESize I = 0; I < Shaders.GetCount(); I++)
 		Shaders[I]->DeviceRestored();
 
-	for (size_t I = 0; I < PostProcessors.GetCount(); I++)
+	for (ZESize I = 0; I < PostProcessors.GetCount(); I++)
 		PostProcessors[I]->DeviceRestored();*/
 
-	for (size_t I = 0; I < Renderers.GetCount(); I++)
+	for (ZESize I = 0; I < Renderers.GetCount(); I++)
 		Renderers[I]->DeviceRestored();
 
-	for (size_t I = 0; I < ShadowRenderers.GetCount(); I++)
+	for (ZESize I = 0; I < ShadowRenderers.GetCount(); I++)
 		ShadowRenderers[I]->DeviceRestored();
 }
 
@@ -415,7 +415,7 @@ void ZED3D9Module::RestoreDevice(bool ForceReset)
 	DeviceRestored();
 }
 
-void ZED3D9Module::SetScreenSize(int Width, int Height)
+void ZED3D9Module::SetScreenSize(ZEInt Width, ZEInt Height)
 {
 	ScreenWidth = Width;
 	ScreenHeight = Height;
@@ -437,31 +437,31 @@ void ZED3D9Module::SetVerticalSync(bool Enabled)
 	}
 }
 
-void ZED3D9Module::SetShaderQuality(int Quality)
+void ZED3D9Module::SetShaderQuality(ZEInt Quality)
 {
 }
 
-void ZED3D9Module::SetTextureQuality(int Quality)
+void ZED3D9Module::SetTextureQuality(ZEInt Quality)
 {
 }
 
-void ZED3D9Module::SetModelQuality(int Quality)
+void ZED3D9Module::SetModelQuality(ZEInt Quality)
 {
 }
 
-void ZED3D9Module::SetShadowQuality(int Quality)
+void ZED3D9Module::SetShadowQuality(ZEInt Quality)
 {
 }
 
-void ZED3D9Module::SetPostEffectQuality(int Quality)
+void ZED3D9Module::SetPostEffectQuality(ZEInt Quality)
 {
 }
 
-void ZED3D9Module::SetHDRQuality(int Quality)
+void ZED3D9Module::SetHDRQuality(ZEInt Quality)
 {
 }
 
-void ZED3D9Module::SetAntiAliasing(int Level)
+void ZED3D9Module::SetAntiAliasing(ZEInt Level)
 {
 	AntiAliasing = Level;
 	if (Device != NULL)
@@ -471,7 +471,7 @@ void ZED3D9Module::SetAntiAliasing(int Level)
 	}
 }
 
-void ZED3D9Module::SetAnisotropicFilter(int Level)
+void ZED3D9Module::SetAnisotropicFilter(ZEInt Level)
 {
 	AnisotropicFilter = Level;
 	for (DWORD I = 0; I < DeviceCaps.MaxSimultaneousTextures; I++)
@@ -484,12 +484,12 @@ void ZED3D9Module::SetAnisotropicFilter(int Level)
 	}
 }
 
-void ZED3D9Module::SetMaterialComponentMask(unsigned int Mask)
+void ZED3D9Module::SetMaterialComponentMask(ZEUInt Mask)
 {
 	#pragma message("Task : Implament ZED3D9Module::SetMaterialComponentMask()")
 }
 
-unsigned int ZED3D9Module::GetMaterialComponentMask()
+ZEUInt ZED3D9Module::GetMaterialComponentMask()
 {
 	#pragma message("Task : Implament ZED3D9Module::GetMaterialComponentMask()")
 	return 0xFFFFFFFF;

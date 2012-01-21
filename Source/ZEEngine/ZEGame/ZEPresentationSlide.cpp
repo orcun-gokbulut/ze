@@ -80,7 +80,7 @@ void ZEPresentationSlide::Draw(ZEDrawParameters* DrawParameters)
 	if (VertexBuffer != NULL)
 	{
 		RenderCommand.Lights.SetCount(DrawParameters->Lights.GetCount());
-		for (size_t I = 0; I < DrawParameters->Lights.GetCount(); I++)
+		for (ZESize I = 0; I < DrawParameters->Lights.GetCount(); I++)
 			RenderCommand.Lights[I] = DrawParameters->Lights[I];
 
 		RenderCommand.VertexBuffer = VertexBuffer;

@@ -63,7 +63,7 @@ class ZESteering
 		ZEActor*					Owner;
 		ZEActor*					Target;
 
-		int							Priority;
+		ZEInt							Priority;
 		bool						Enabled;
 
 		float						Weight;
@@ -72,8 +72,8 @@ class ZESteering
 		ZEActor*					GetOwner();
 		virtual void				SetOwner(ZEActor*	Owner);
 
-		unsigned int				GetPriority();
-		void						SetPriority(unsigned int Priority);
+		ZEUInt				GetPriority();
+		void						SetPriority(ZEUInt Priority);
 
 		float						GetWeight();
 		virtual void				SetWeight(float Weight);
@@ -184,7 +184,7 @@ class ZEPathFollowingSteering : public ZESteering
 
 		ZEArray<ZEVector3>			PathNodes;
 		float						PathNodeRadius;
-		size_t						CurrentPathNode;
+		ZESize						CurrentPathNode;
 
 		virtual void				SetOwner(ZEActor*	Owner);
 		virtual ZESteeringOutput	Process(float ElapsedTime);

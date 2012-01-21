@@ -197,7 +197,7 @@ void ZEModelAnimationDebugModule::Process(float ElapsedTime)
 	zeInput->ProcessInputMap(&InputMap);
 
 	ZEVector3 CameraMovement;
-	for (size_t I = 0; I < InputMap.InputActionCount; I++)
+	for (ZESize I = 0; I < InputMap.InputActionCount; I++)
 	{
 		ZEInputAction* CurrentAction = &InputMap.InputActions[I];
 			switch (CurrentAction->Id)

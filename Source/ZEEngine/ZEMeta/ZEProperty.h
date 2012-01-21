@@ -51,7 +51,7 @@ enum ZEPropertySemantic
 	ZE_PS_COLOR,
 };
 
-typedef unsigned int ZEPropertyAccess;
+typedef ZEUInt ZEPropertyAccess;
 #define	ZE_PA_NO_ACCESS		0
 #define	ZE_PA_READ			1
 #define	ZE_PA_WRITE			2
@@ -59,14 +59,14 @@ typedef unsigned int ZEPropertyAccess;
 struct ZEPropertyEnumuratorItem
 {
 	const char*						Name;
-	int								Value;
+	ZEInt								Value;
 };
 
 struct ZEPropertyEnumurator
 {
 	const char*						Name;
 	ZEPropertyEnumuratorItem*		Items;
-	size_t							ItemCount;
+	ZESize							ItemCount;
 };
 
 
@@ -91,7 +91,7 @@ struct ZERunTimeProperty
 	const char*						Name;
 	ZEVariantType					Type;
 	ZEVariant						Value;
-	unsigned int					Hash;
+	ZEUInt					Hash;
 	ZEPropertySemantic				Semantic;
 };
 

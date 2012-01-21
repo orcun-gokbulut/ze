@@ -66,7 +66,7 @@ class ZEDEnumComboBox : public QObject, public QTreeWidgetItem, public ZEDProper
 	
 	private:
 
-		QList<int>				ValueIndexTable;
+		QList<ZEInt>				ValueIndexTable;
 
 	public:
 

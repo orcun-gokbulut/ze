@@ -46,7 +46,7 @@
 #include <float.h>
 #include <math.h>
 
-ZEVector3 ZEOBBox::GetVertex(unsigned int Index) const
+ZEVector3 ZEOBBox::GetVertex(ZEUInt Index) const
 {
 	ZEVector3 Max = Center + Up * HalfSize.x + Right * HalfSize.y + Front * HalfSize.z;
 	ZEVector3 Min = Center - Up * HalfSize.x - Right * HalfSize.y - Front * HalfSize.z;
@@ -129,7 +129,7 @@ static inline void CheckSwap(float& a, float& b)
 	b = Temp;
 }
 
-static inline int SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal, float HalfSize, const ZELine* Line, float& TMin, float& TMax)
+static inline ZEInt SlabTest(const ZEVector3& Center, const ZEVector3& PlaneNormal, float HalfSize, const ZELine* Line, float& TMin, float& TMax)
 {
 	float e = ZEVector3::DotProduct(PlaneNormal, Center - Line->p);
 	float f = ZEVector3::DotProduct(PlaneNormal, Line->v);
@@ -207,7 +207,7 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZERay& Ray, flo
 	float TempTMin = -FLT_MAX;
 	float TempTMax = FLT_MAX;
 
-	int Result = SlabTest(BoundingBox.Center, BoundingBox.Right, BoundingBox.HalfSize.x, &Ray, TempTMin, TempTMax);
+	ZEInt Result = SlabTest(BoundingBox.Center, BoundingBox.Right, BoundingBox.HalfSize.x, &Ray, TempTMin, TempTMax);
 	if (Result == 0)
 		return false;
 
@@ -258,7 +258,7 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox, const ZELineSegment& 
 	float TempTMin = -FLT_MAX;
 	float TempTMax = FLT_MAX;
 
-	int Result = SlabTest(BoundingBox.Center, BoundingBox.Right, BoundingBox.HalfSize.x, &LineSegment, TempTMin, TempTMax);
+	ZEInt Result = SlabTest(BoundingBox.Center, BoundingBox.Right, BoundingBox.HalfSize.x, &LineSegment, TempTMin, TempTMax);
 
 	if(Result == 0)
 		return false;

@@ -50,7 +50,7 @@ ZEPostProcessorNode* ZED3D9PostProcessor::CreateNode(const char* TypeName)
 
 }
 
-ZEPostProcessorNode* ZED3D9PostProcessor::CreateNode(size_t TypeId)
+ZEPostProcessorNode* ZED3D9PostProcessor::CreateNode(ZESize TypeId)
 {
 	return NULL;
 }

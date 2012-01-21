@@ -173,12 +173,12 @@ void ZEActor::Tick(float ElapsedTime)
 	bool PriorityLinearSteeringDone = false;
 	bool PriorityAngularSteeringDone = false;
 
-	for (size_t Priority = 1; Priority <= 5; Priority++)
+	for (ZESize Priority = 1; Priority <= 5; Priority++)
 	{
 		ZEVector3 PriorityLinearAcceleration = ZEVector3::Zero;
 		float PriorityAngularAcceleration = 0.0f;
 
-		for (size_t I = 0; I < Steerings.GetCount(); I++)
+		for (ZESize I = 0; I < Steerings.GetCount(); I++)
 		{
 			if (Steerings[I]->GetPriority() == Priority && Steerings[I]->GetEnabled() && Steerings[I]->GetWeight() != 0.0f)
 			{
@@ -255,7 +255,7 @@ void ZEActor::Tick(float ElapsedTime)
 
 ZEActor::ZEActor()
 {
-	static int Index = 0;
+	static ZEInt Index = 0;
 	Rotation2D = 0.0f;
 	MinLinearAcceleration = 0.01;
 	MinAngularAcceleration = 0.01;

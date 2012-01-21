@@ -50,8 +50,8 @@ class ZEVertexDeclaration;
 
 struct ZETerrainData
 {
-	size_t Width;
-	size_t Height;
+	ZESize Width;
+	ZESize Height;
 	float* HeightData;
 	ZEUInt32* ColorData;
 };
@@ -91,7 +91,7 @@ class ZETerrain : public ZEEntity
 		void									UnloadTerrain();
 
 		void									Stream(ZEDrawParameters* DrawParameters);
-		bool									DrawPrimtive(ZERenderer* Renderer, int PrimitiveType, const ZEVector3& Offset, const ZEVector3& Position, float Scale, bool Rotate, size_t LOD);
+		bool									DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, const ZEVector3& Offset, const ZEVector3& Position, float Scale, bool Rotate, ZESize LOD);
 
 												ZETerrain();
 												~ZETerrain();

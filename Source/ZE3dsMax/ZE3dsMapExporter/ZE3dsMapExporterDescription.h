@@ -43,7 +43,7 @@
 class ZE3dsMapExporterDescription : public ClassDesc2 
 {
 	public:
-		virtual int				IsPublic();
+		virtual ZEInt				IsPublic();
 		virtual void*			Create(BOOL Loading = FALSE);
 		virtual const TCHAR*	ClassName();
 		virtual SClass_ID		SuperClassID();

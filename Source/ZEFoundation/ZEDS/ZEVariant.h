@@ -78,7 +78,7 @@ class ZEVariant : public ZESerializable
 		union ZEVariantValue
 		{
 			float			Float;
-			int				Integer;
+			ZEInt				Integer;
 			bool			Boolean;
 			char*			String;
 			ZEObject*		Pointer;
@@ -104,7 +104,7 @@ class ZEVariant : public ZESerializable
 		ZEVariantValue&		ImplicitAcesss();
 
 		void				SetString(const char *NewValue);
-		void				SetInteger(int Value);
+		void				SetInteger(ZEInt Value);
 		void				SetFloat(float Value);
 		void				SetBoolean(bool Value);
 		void				SetVector2(const ZEVector2& Vector);
@@ -118,7 +118,7 @@ class ZEVariant : public ZESerializable
 		void				SetVariant(const ZEVariant& NewValue);
 
 		char*				GetString() const;
-		int					GetInteger() const;
+		ZEInt					GetInteger() const;
 		float				GetFloat() const;
 		bool				GetBoolean() const;
 		ZEVector2&			GetVector2() const;
@@ -130,14 +130,14 @@ class ZEVariant : public ZESerializable
 		ZEObject*			GetClass() const;
 		
 		bool				IsNull() const;
-		size_t				SizeOf() const;
+		ZESize				SizeOf() const;
 
 		bool				Serialize(ZESerializer* Serializer);
 		bool				Unserialize(ZEUnserializer* Unserializer);
 
 		void				operator= (const ZEVariant &NewValue);
 		void				operator= (const char* NewValue);
-		void				operator= (int NewValue);
+		void				operator= (ZEInt NewValue);
 		void				operator= (float NewValue);
 		void				operator= (bool NewValue);
 		void				operator= (const ZEVector2& Vector);
@@ -149,7 +149,7 @@ class ZEVariant : public ZESerializable
 		void				operator= (ZEObject* Pointer);
 
 							operator const char*();
-							operator int();
+							operator ZEInt();
 							operator float();
 							operator bool();
 							operator ZEVector2();
@@ -163,7 +163,7 @@ class ZEVariant : public ZESerializable
 							ZEVariant();
 							ZEVariant(const ZEVariant &InitialValue);
 							ZEVariant(const char* InitialValue);	
-							ZEVariant(int InitialValue);
+							ZEVariant(ZEInt InitialValue);
 							ZEVariant(float InitialValue);
 							ZEVariant(bool InitialValue);
 							ZEVariant(const ZEVector2& Vector);

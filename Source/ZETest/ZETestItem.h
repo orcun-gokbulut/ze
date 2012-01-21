@@ -71,7 +71,7 @@ class ZETestItem
 		void					SetCurrentCase(const char* CaseName);
 		const char*				GetCurrentCase();
 
-		void					ReportProblem(ZETestProblemType Type, const char* Problem, const char* File, int Line);
+		void					ReportProblem(ZETestProblemType Type, const char* Problem, const char* File, ZEInt Line);
 
 		virtual void			TestImpl() = 0;
 

@@ -39,7 +39,7 @@
 
 #include "ZEDS/ZEArray.h"
 
-typedef unsigned int ZEContainerAccess;
+typedef ZEUInt ZEContainerAccess;
 #define ZE_CA_NO_ACCESS		0
 #define ZE_CA_ADD			1
 #define ZE_CA_REMOVE		2

@@ -41,13 +41,13 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEDrawParameters.h"
 
-void ZEModelMesh::SetActiveLOD(size_t LOD)
+void ZEModelMesh::SetActiveLOD(ZESize LOD)
 {
 	AutoLOD = false;
 	this->ActiveLOD = LOD;
 }
 
-size_t ZEModelMesh::GetActiveLOD()
+ZESize ZEModelMesh::GetActiveLOD()
 {
 	return ActiveLOD;
 }
@@ -199,7 +199,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			PhysicalBody->SetMassCenterPosition(MeshResource->PhysicalBody.MassCenter);
 			PhysicalBody->SetTransformChangeEvent(ZEPhysicalTransformChangeEvent(this->Owner, &ZEModel::TransformChangeEvent));
 
-			for (size_t I = 0; I < MeshResource->PhysicalBody.Shapes.GetCount(); I++)
+			for (ZESize I = 0; I < MeshResource->PhysicalBody.Shapes.GetCount(); I++)
 			{
 				const ZEModelResourcePhysicalShape* Shape = &MeshResource->PhysicalBody.Shapes[I];
 				switch(Shape->Type)
@@ -257,10 +257,10 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	}
 
 	LODs.SetCount(MeshResource->LODs.GetCount());
-	for (size_t I = 0; I < MeshResource->LODs.GetCount(); I++)
+	for (ZESize I = 0; I < MeshResource->LODs.GetCount(); I++)
 		LODs[I].Initialize(Owner, this, &MeshResource->LODs[I]);
 
-	for (size_t I = 0; I < ShapeList.GetCount(); I++)
+	for (ZESize I = 0; I < ShapeList.GetCount(); I++)
 		delete ShapeList[I];
 	ShapeList.Clear();
 
@@ -291,8 +291,8 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 	ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), ZEVector3::Zero);
 	float DistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->Camera->GetWorldPosition(), WorldPosition);
 
-	int Lod = 0;
-	/*int LastLod = LODs.GetCount() - 1;
+	ZEInt Lod = 0;
+	/*ZEInt LastLod = LODs.GetCount() - 1;
 
 	if (DistanceSquare > 40 * 40) 
 		Lod = -1;

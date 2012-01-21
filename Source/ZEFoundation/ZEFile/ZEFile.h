@@ -77,7 +77,7 @@ enum ZEFileMode
 //#endif 
 //
 //extern "C"
-//int __cdecl _tinput_l(FILE*, const TCHAR*, _locale_t, va_list);
+//ZEInt __cdecl _tinput_l(FILE*, const TCHAR*, _locale_t, va_list);
 
 class ZECacheDataIdentifier;
 
@@ -90,7 +90,7 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 
 		ZEFileType				FileType;
 
-		unsigned int			ReferenceCount;
+		ZEUInt			ReferenceCount;
 
 	public:
 		virtual bool			Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary);
@@ -120,9 +120,9 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 		virtual ZEUInt64		GetStartPosition();
 		virtual ZEUInt64		GetEndPosition();
 
-		unsigned int			GetReferenceCount() const;
-		virtual unsigned int	IncreaseReferenceCount();
-		virtual unsigned int	DecreaseReferenceCount();
+		ZEUInt			GetReferenceCount() const;
+		virtual ZEUInt	IncreaseReferenceCount();
+		virtual ZEUInt	DecreaseReferenceCount();
 
 		static ZEString			GetFileName(const ZEString& FilePath);
 		static ZEString			GetAbsolutePath(const ZEString& FilePath);

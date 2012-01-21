@@ -64,7 +64,7 @@ void ZEPhysXFileStream::CloseFile()
 NxU8 ZEPhysXFileStream::readByte() const
 {
 	NxU8 b;
-	size_t r = fread(&b, sizeof(NxU8), 1, ((FILE*)File));
+	ZESize r = fread(&b, sizeof(NxU8), 1, ((FILE*)File));
 	zeAssert(r == 0, "Reading error.");
 	return b;
 }
@@ -72,7 +72,7 @@ NxU8 ZEPhysXFileStream::readByte() const
 NxU16 ZEPhysXFileStream::readWord() const
 {
 	NxU16 w;
-	size_t r = fread(&w, sizeof(NxU16), 1, ((FILE*)File));
+	ZESize r = fread(&w, sizeof(NxU16), 1, ((FILE*)File));
 	zeAssert(r == 0, "Reading error.");
 	return w;
 }
@@ -80,7 +80,7 @@ NxU16 ZEPhysXFileStream::readWord() const
 NxU32 ZEPhysXFileStream::readDword() const
 {
 	NxU32 d;
-	size_t r = fread(&d, sizeof(NxU32), 1, ((FILE*)File));
+	ZESize r = fread(&d, sizeof(NxU32), 1, ((FILE*)File));
 	zeAssert(r == 0, "Reading error.");
 	return d;
 }
@@ -88,7 +88,7 @@ NxU32 ZEPhysXFileStream::readDword() const
 float ZEPhysXFileStream::readFloat() const
 {
 	NxReal f;
-	size_t r = fread(&f, sizeof(NxReal), 1, ((FILE*)File));
+	ZESize r = fread(&f, sizeof(NxReal), 1, ((FILE*)File));
 	zeAssert(r == 0, "Reading error.");
 	return f;
 }
@@ -96,55 +96,55 @@ float ZEPhysXFileStream::readFloat() const
 double ZEPhysXFileStream::readDouble() const
 {
 	NxF64 f;
-	size_t r = fread(&f, sizeof(NxF64), 1, ((FILE*)File));
+	ZESize r = fread(&f, sizeof(NxF64), 1, ((FILE*)File));
 	zeAssert(r == 0, "Reading error.");
 	return f;
 }
 
 void ZEPhysXFileStream::readBuffer(void* Buffer, NxU32 Size)	const
 {
-	size_t r= fread(Buffer, Size, 1, ((FILE*)File));
+	ZESize r= fread(Buffer, Size, 1, ((FILE*)File));
 	zeAssert(r == 0, "Reading error.");
 }
 
 NxStream& ZEPhysXFileStream::storeByte(NxU8 b)
 {
-	size_t w = fwrite(&b, sizeof(NxU8), 1, ((FILE*)File));
+	ZESize w = fwrite(&b, sizeof(NxU8), 1, ((FILE*)File));
 	zeAssert(w == 0, "Writing error.");
 	return *this;
 }
 
 NxStream& ZEPhysXFileStream::storeWord(NxU16 w)
 {
-	size_t ww = fwrite(&w, sizeof(NxU16), 1, ((FILE*)File));
+	ZESize ww = fwrite(&w, sizeof(NxU16), 1, ((FILE*)File));
 	zeAssert(ww == 0, "Writing error.");
 	return *this;
 }
 
 NxStream& ZEPhysXFileStream::storeDword(NxU32 d)
 {
-	size_t w = fwrite(&d, sizeof(NxU32), 1, ((FILE*)File));
+	ZESize w = fwrite(&d, sizeof(NxU32), 1, ((FILE*)File));
 	zeAssert(w == 0, "Writing error.");
 	return *this;
 }
 
 NxStream& ZEPhysXFileStream::storeFloat(NxReal f)
 {
-	size_t w = fwrite(&f, sizeof(NxReal), 1, ((FILE*)File));
+	ZESize w = fwrite(&f, sizeof(NxReal), 1, ((FILE*)File));
 	zeAssert(w == 0, "Writing error.");
 	return *this;
 }
 
 NxStream& ZEPhysXFileStream::storeDouble(NxF64 f)
 {
-	size_t w = fwrite(&f, sizeof(NxF64), 1, ((FILE*)File));
+	ZESize w = fwrite(&f, sizeof(NxF64), 1, ((FILE*)File));
 	zeAssert(w == 0, "Writing error.");
 	return *this;
 }
 
 NxStream& ZEPhysXFileStream::storeBuffer(const void* Buffer, NxU32 Size)
 {
-	size_t w = fwrite(Buffer, Size, 1, ((FILE*)File));
+	ZESize w = fwrite(Buffer, Size, 1, ((FILE*)File));
 	zeAssert(w == 0, "Writing error.");
 	return *this;
 }
@@ -170,7 +170,7 @@ const NxU8* ZEPhysXMemoryWriteStream::GetData() const
 	return Data;
 }
 
-const size_t ZEPhysXMemoryWriteStream::GetDataSize() const
+const ZESize ZEPhysXMemoryWriteStream::GetDataSize() const
 {
 	return CurrentSize;
 }

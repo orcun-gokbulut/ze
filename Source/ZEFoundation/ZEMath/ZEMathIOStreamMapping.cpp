@@ -70,7 +70,7 @@ ostream& operator<<(ostream& Out, const ZEQuaternion& Input)
 ostream& operator<<(ostream& Out, const ZEMatrix3x3& Input)
 {
 	 Out << "[";
-	for (size_t I = 0; I < 9; I++)
+	for (ZESize I = 0; I < 9; I++)
 		if (I != 8)
 			Out << Input.M[I] << ", ";
 		else
@@ -82,7 +82,7 @@ ostream& operator<<(ostream& Out, const ZEMatrix3x3& Input)
 ostream& operator<<(ostream& Out, const ZEMatrix4x4& Input)
 {
 	Out << "[";
-	for (size_t I = 0; I < 16; I++)
+	for (ZESize I = 0; I < 16; I++)
 		if (I != 15)
 			Out << Input.M[I] << ", ";
 		else

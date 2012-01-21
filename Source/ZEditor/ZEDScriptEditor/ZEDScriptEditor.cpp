@@ -64,7 +64,7 @@ ZEDLuaScriptHighLighter::ZEDLuaScriptHighLighter(QTextEdit* Parent) : QSyntaxHig
 			 << "\\bfor\\b" << "\\bnil\\b" << "\\bthen\\b" << "\\belse\\b" << "\\bfunction\\b" << "\\bnot\\b" << "\\btrue\\b" << "\\belseif\\b" << "\\bif\\b" 
 			 << "\\bor\\b" << "\\buntil\\b" << "\\bwhile\\b";
 
-	for (int I = 0; I < KeyWords.count(); I++)
+	for (ZEInt I = 0; I < KeyWords.count(); I++)
 	{
 		ZEDSyntaxHighLightRule Rule;
 		Rule.Expresion = QRegExp(KeyWords[I]);
@@ -85,14 +85,14 @@ ZEDLuaScriptHighLighter::ZEDLuaScriptHighLighter(QTextEdit* Parent) : QSyntaxHig
 
 void ZEDLuaScriptHighLighter::highlightBlock(const QString &Text)
 {
-	for (int I = 0; I < Rules.count(); I++)
+	for (ZEInt I = 0; I < Rules.count(); I++)
 	{
 		QRegExp Expression = Rules[I].Expresion;
-		int Index = Expression.indexIn(Text);
+		ZEInt Index = Expression.indexIn(Text);
 
 		while (Index >= 0)
 		{
-			int Length = Expression.matchedLength();
+			ZEInt Length = Expression.matchedLength();
 			setFormat(Index, Length, Rules[I].FontFormat);
 			Index = Expression.indexIn(Text, Index + Length);
 		}
@@ -214,7 +214,7 @@ void ZEDScriptEditor::OpenEditorButtonTriggered()
 	ScriptEdior->GetTextEditor()->setText(this->TextEditor->toPlainText());
 	ScriptEditorDialog->setBaseSize(QSize(800,600));
 	
-	int Result = ScriptEditorDialog->exec();
+	ZEInt Result = ScriptEditorDialog->exec();
 
 	if (Result == QDialog::Accepted)
 	{
@@ -228,7 +228,7 @@ void ZEDScriptEditor::OpenEditorButtonTriggered()
 		MessageBox.setInformativeText("Do you want to save your changes?");
 		MessageBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard);
 		MessageBox.setDefaultButton(QMessageBox::Save);
-		int MessageResult = MessageBox.exec();
+		ZEInt MessageResult = MessageBox.exec();
 
 		if (MessageResult == QMessageBox::Save)
 		{

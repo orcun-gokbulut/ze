@@ -52,10 +52,10 @@ enum ZEVersionCheckLevel
 class ZEVersion
 {
 	public:
-		unsigned int			Major;
-		unsigned int			Minor;
-		unsigned int			Internal;
-		unsigned int			Build;		
+		ZEUInt			Major;
+		ZEUInt			Minor;
+		ZEUInt			Internal;
+		ZEUInt			Build;		
 		ZEVersionPlatform		Platform;
 
 		void					GetShortString(char* Buffer);
@@ -65,9 +65,9 @@ class ZEVersion
 		static bool				Check(const ZEVersion& A, const ZEVersion& B, ZEVersionCheckLevel Level);
 
 								ZEVersion();
-								ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal);
-								ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build);
-								ZEVersion(unsigned int Major, unsigned int Minor, unsigned int Internal, unsigned int Build, ZEVersionPlatform Platform);
+								ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal);
+								ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build);
+								ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build, ZEVersionPlatform Platform);
 };
 
 #endif

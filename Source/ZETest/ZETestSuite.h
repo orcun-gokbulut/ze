@@ -46,10 +46,10 @@ class ZETestSuiteItem
 	private:
 		char				Name[255];
 		ZETestItem*			Tests[65536];
-		size_t				TotalTestCount;
+		ZESize				TotalTestCount;
 		ZETestResult		Result;
 		float				ElapsedTime;
-		int					PassedTestCount;
+		ZEInt					PassedTestCount;
 
 	public:
 		const char*			GetName();
@@ -61,9 +61,9 @@ class ZETestSuiteItem
 		ZETestResult		GetResult();
 		float				GetElapsedTime();
 
-		int					GetTotalTestCount();
-		int					GetFailedTestCount();
-		int					GetPassedTestCount();
+		ZEInt					GetTotalTestCount();
+		ZEInt					GetFailedTestCount();
+		ZEInt					GetPassedTestCount();
 
 							ZETestSuiteItem(const char* SuiteName);
 };

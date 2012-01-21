@@ -48,9 +48,7 @@ typedef unsigned int		ZEUInt32;
 typedef unsigned long long	ZEUInt64;
 typedef unsigned int		ZEUInt;
 
-#define ZEUInt8				ZEUInt8
-#define ZEUInt16			ZEUInt16
-#define ZEUInt32			ZEUInt32
-#define ZEUInt64			ZEUInt64
+typedef size_t				ZESize;
+typedef ptrdiff_t			ZESSize;
 
 #endif

@@ -83,7 +83,7 @@ class ZEViewPort;
 
 struct ZEDrawParameters
 {
-	size_t					FrameId;
+	ZESize					FrameId;
 	float					ElapsedTime;
 	float					Time;
 	ZERenderer*				Renderer;

@@ -68,9 +68,9 @@ void CopyData(ZECompressedFile* File, ZEUInt64 From, ZEUInt64 Size, ZEUInt64 To)
 	if (LeftOver != 0)
 	{
 		_fseeki64((FILE*)File->GetFileHandle(),From + Count * BufferSize, ZE_SF_BEGINING);
-		fread(Buffer, (size_t)LeftOver, 1,(FILE*)File->GetFileHandle());
+		fread(Buffer, (ZESize)LeftOver, 1,(FILE*)File->GetFileHandle());
 		_fseeki64((FILE*)File->GetFileHandle(),To + Count * BufferSize, ZE_SF_BEGINING);
-		fwrite(Buffer, (size_t)LeftOver, 1,(FILE*)File->GetFileHandle());
+		fwrite(Buffer, (ZESize)LeftOver, 1,(FILE*)File->GetFileHandle());
 
 	}
 }
@@ -192,7 +192,7 @@ bool ZEPack::ChunkExists(const char* IdentifierName)
 
 		//Compare header chunk name and wanted chunk name
 		control=true;
-		for ( int i=0;i<256;i++)
+		for ( ZEInt i=0;i<256;i++)
 		{
 			if(Header.IdentifierName[i] != ChunkName[i])
 			{
@@ -292,7 +292,7 @@ bool ZEPack::DeleteChunk(const char* IdentifierName)
 
 		//Control headers identifier name
 		Control = true;
- 		for(int i=0;i<256;i++)
+ 		for(ZEInt i=0;i<256;i++)
 		{
 			if(Header.IdentifierName[i] != ChunkName[i])
 				Control = false;
@@ -450,13 +450,13 @@ bool ZEPack::AddChunk(const char* IdentifierName,unsigned char* Source,ZEUInt64 
 	ZEUInt64 NewRecorsStartPosition = OldRecordsStartPosition + SourceSize;
 
 	//Create buffer for keeping buffers at process
-	unsigned char* bufferForHeaders = new unsigned char[(unsigned int)OldRecordSize];
+	unsigned char* bufferForHeaders = new unsigned char[(ZEUInt)OldRecordSize];
 
 	//Go to chunk headers' start position
 	_fseeki64((FILE*)File->GetFileHandle(),OldRecordsStartPosition,SEEK_SET);
 
 	//Copy chunk headers to buffer
-	fread(bufferForHeaders, (unsigned int)OldRecordSize, 1, (FILE*)File->GetFileHandle());
+	fread(bufferForHeaders, (ZEUInt)OldRecordSize, 1, (FILE*)File->GetFileHandle());
 
 	//Set new chunks start position to chunk headers' old start position
 	ZEUInt64 NewChunkPosition = OldRecordsStartPosition;
@@ -579,7 +579,7 @@ bool ZEPack::GetChunk(const char *IdentifierName, unsigned char *Data)
 
 		//Check identifier name
 		Control = true;
-		for(int i = 0; i < 256; i++)
+		for(ZEInt i = 0; i < 256; i++)
 		{
 			if(Header.IdentifierName[i] != ChunkName[i])
 				Control = false;
@@ -645,7 +645,7 @@ bool ZEPack::OpenChunk(ZEPartialCompressedFile& PartialFile, const char* Identif
 
 		//Check identifier name
 		Control = true;
-		for(int i = 0; i < 256; i++)
+		for(ZEInt i = 0; i < 256; i++)
 		{
 			if(Header.IdentifierName[i] != ChunkName[i])
 				Control = false;

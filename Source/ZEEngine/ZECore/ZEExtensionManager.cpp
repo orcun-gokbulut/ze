@@ -45,7 +45,7 @@ ZEOptionSection ZEExtensionManager::ExtensionManagerOptions;
 
 ZEExtensionDescription* ZEExtensionManager::GetExtensionDescription(const ZEString& Name)
 {
-	for (size_t I = 0; I < ExtensionList.GetCount(); I++)
+	for (ZESize I = 0; I < ExtensionList.GetCount(); I++)
 		if (ExtensionList[I]->GetName() == Name)
 			return ExtensionList[I];
 
@@ -63,7 +63,7 @@ ZEArray<ZEExtensionDescription*> ZEExtensionManager::GetExtensionDescriptions(ZE
 		return ExtensionList;
 
 	ZEArray<ZEExtensionDescription*> List;
-	for (size_t I = 0; I < ExtensionList.GetCount(); I++)
+	for (ZESize I = 0; I < ExtensionList.GetCount(); I++)
 	{
 		ZEExtensionDescription* Current = ExtensionList[I]->GetParent();
 		

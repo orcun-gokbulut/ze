@@ -38,7 +38,7 @@
 
 ZEUInt64 ZEFileUnserializer::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
 {
-	return fread(Buffer, (size_t)Size, (size_t)Count, (FILE*)File);
+	return fread(Buffer, (ZESize)Size, (ZESize)Count, (FILE*)File);
 }
 
 bool ZEFileUnserializer::OpenFile(const char* FileName)

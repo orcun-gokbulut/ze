@@ -73,7 +73,7 @@ class ZEPostProcessorNode
 		void								SetOwner(ZEPostProcessor* Owner);
 		ZEPostProcessor*					GetOwner();
 
-		virtual size_t						GetDependencyCount();
+		virtual ZESize						GetDependencyCount();
 		virtual ZEPostProcessorNode**		GetDependencies();
 
 		void								SetState(ZEPostProcessorNodeState State);

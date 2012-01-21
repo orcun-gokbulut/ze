@@ -140,7 +140,7 @@ public:
 	char									Name[ZE_MPFL_MAX_NAME_SIZE];
 	ZEAABBox							BoundingBox;
 	bool									GenerateOctree;
-	unsigned int							MaxOctreeDepth;
+	ZEUInt							MaxOctreeDepth;
 
 	ZEMapFileOctree*						Octree;
 	ZEArray<ZEMapFilePolygon>				Polygons;
@@ -160,8 +160,8 @@ class ZEMapFile
 		ZEArray<ZEMapFilePortal>			Portals;
 		ZEArray<ZEMapFileDoor>				Doors;
 
-		bool								WriteToFile(const char* File, int Chunks = ZEMAP_FILEPART_ALL);
-		bool								ReadFromFile(const char* File, int Chunks = ZEMAP_FILEPART_ALL);
+		bool								WriteToFile(const char* File, ZEInt Chunks = ZEMAP_FILEPART_ALL);
+		bool								ReadFromFile(const char* File, ZEInt Chunks = ZEMAP_FILEPART_ALL);
 
 		void								Clear();
 

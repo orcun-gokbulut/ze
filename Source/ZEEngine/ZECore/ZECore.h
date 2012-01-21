@@ -88,7 +88,7 @@ class ZECore
 	private:
 		ZECoreState						CoreState;
 		ZEUserLevel						UserLevel;
-		size_t							FrameId;
+		ZESize							FrameId;
 		float							RunningTime;
 		bool							DebugMode;
 
@@ -166,7 +166,7 @@ class ZECore
 		ZEApplicationModule*			GetApplicationModule();
 
 		float							GetRuningTime();
-		size_t							GetFrameId();
+		ZESize							GetFrameId();
 		
 		void							SetDebugMode(bool Enabled);
 		bool							GetDebugMode();

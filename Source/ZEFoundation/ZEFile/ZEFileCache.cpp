@@ -41,7 +41,7 @@
 
 bool ZEFileCache::CheckCompleteness()
 {
-	size_t ZEQuadWordSize = sizeof(ZEUInt64);
+	ZESize ZEQuadWordSize = sizeof(ZEUInt64);
 
 	ZEUInt64 Cursor = File.Tell();
 	// Go to end of the file and read cache completeness flag
@@ -147,7 +147,7 @@ bool ZEFileCache::CopyData(ZEFile* File, ZEUInt64 From, ZEUInt64 Size, ZEUInt64 
 	}
 
 	// Copy backward to avoid corruption due to overlap
-	for (size_t I = Count; I > 0; --I)
+	for (ZESize I = Count; I > 0; --I)
 	{
 		if (!File->Seek((ZEInt64)From + (I - 1) * (ZEInt64)BufferSize, ZE_SF_BEGINING))
 		{
@@ -363,11 +363,11 @@ bool ZEFileCache::IdentifierExists(const ZECacheDataIdentifier* Identifier)
 		return false;
 	}
 
-	size_t ZEQuadWordSize = sizeof(ZEUInt64);
-	size_t ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
+	ZESize ZEQuadWordSize = sizeof(ZEUInt64);
+	ZESize ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
 	// This is the size of Completeness flag + Record start position data size
 	// They are both always stored at the end of the cache file
-	size_t ZECacheExtraDataSize = 2 * ZEQuadWordSize;
+	ZESize ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Get end of file
 	if (!File.Seek((ZEInt64)0, ZE_SF_END))
@@ -456,12 +456,12 @@ bool ZEFileCache::AddData(const ZECacheDataIdentifier* Identifier, const void* D
 	ZEUInt64 TempCount = 0;
 	bool Result = false;
 
-	size_t ZEQuadWordSize = sizeof(ZEUInt64);
-	size_t ZEDataChunkSize = sizeof(ZECacheDataChunk);
-	size_t ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
+	ZESize ZEQuadWordSize = sizeof(ZEUInt64);
+	ZESize ZEDataChunkSize = sizeof(ZECacheDataChunk);
+	ZESize ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
 	// This is the size of Completeness flag + Record start position data size
 	// They are both always stored at the end of the cache file
-	size_t ZECacheExtraDataSize = 2 * ZEQuadWordSize;
+	ZESize ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Go to the end of records
 	if (!File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END))
@@ -597,12 +597,12 @@ bool ZEFileCache::Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 		return false;
 	}
 
-	size_t ZEQuadWordSize = sizeof(ZEUInt64);
-	size_t ZEDataChunkSize = sizeof(ZECacheDataChunk);
-	size_t ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
+	ZESize ZEQuadWordSize = sizeof(ZEUInt64);
+	ZESize ZEDataChunkSize = sizeof(ZECacheDataChunk);
+	ZESize ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
 	// This is the size of Completeness flag + Record start position data size
 	// They are both always stored at the end of the cache file
-	size_t ZECacheExtraDataSize = 2 * ZEQuadWordSize;
+	ZESize ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Go to the end of records
 	if (!File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END))
@@ -737,12 +737,12 @@ bool ZEFileCache::GetData(const ZECacheDataIdentifier* Identifier, void* Buffer,
 		return false;
 	}
 
-	size_t ZEQuadWordSize = sizeof(ZEUInt64);
-	size_t ZEDataChunkSize = sizeof(ZECacheDataChunk);
-	size_t ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
+	ZESize ZEQuadWordSize = sizeof(ZEUInt64);
+	ZESize ZEDataChunkSize = sizeof(ZECacheDataChunk);
+	ZESize ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
 	// This is the size of Completeness flag + Record start position data size
 	// They are both always stored at the end of the cache file
-	size_t ZECacheExtraDataSize = 2 * ZEQuadWordSize;
+	ZESize ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Get hash from identifier
 	ZEUInt64 Hash = Identifier->GetHash();
@@ -845,12 +845,12 @@ bool ZEFileCache::OpenData(ZEPartialFile* PartialFile, const ZECacheDataIdentifi
 		return false;
 	}
 
-	size_t ZEQuadWordSize = sizeof(ZEUInt64);
-	size_t ZEDataChunkSize = sizeof(ZECacheDataChunk);
-	size_t ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
+	ZESize ZEQuadWordSize = sizeof(ZEUInt64);
+	ZESize ZEDataChunkSize = sizeof(ZECacheDataChunk);
+	ZESize ZEIdentifierChunkSize = sizeof(ZECacheIdentifierChunk);
 	// This is the size of Completeness flag + Record start position data size
 	// They are both always stored at the end of the cache file
-	size_t ZECacheExtraDataSize = 2 * ZEQuadWordSize;
+	ZESize ZECacheExtraDataSize = 2 * ZEQuadWordSize;
 
 	// Get records start and end position
 	if (!File.Seek(-1 * (ZEInt64)ZECacheExtraDataSize, ZE_SF_END))

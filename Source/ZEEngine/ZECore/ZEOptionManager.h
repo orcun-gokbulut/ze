@@ -69,10 +69,10 @@ class ZEOptionManager
 		bool						RegisterSection(ZEOptionSection* Ref);
 		bool						UnregisterSection(ZEOptionSection* Ref);
 		
-		size_t						GetNumberOfSections();
+		ZESize						GetNumberOfSections();
 		
 		ZEOptionSection*			GetSection(const ZEString& Name);
-		ZEOptionSection*			GetSection(size_t Index);
+		ZEOptionSection*			GetSection(ZESize Index);
 
 		ZEOption*					GetOption(const ZEString& SectionName, const ZEString& Name);
 

@@ -80,7 +80,7 @@ class ZEModel : public ZEComponent
 
 		bool								Visibility;
 		bool								AutoLOD;
-		size_t								ActiveLOD;
+		ZESize								ActiveLOD;
 		bool								PhysicsEnabled;
 
 		ZEModelAnimationType				AnimationType;
@@ -143,15 +143,15 @@ class ZEModel : public ZEComponent
 		void								SetAutoLOD(bool Enabled);
 		bool								GetAutoLOD();
 
-		void								SetActiveLOD(unsigned int LOD);
-		int									GetActiveLOD();
+		void								SetActiveLOD(ZEUInt LOD);
+		ZEInt									GetActiveLOD();
 
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();
 
-		void								SetStaticPose(const ZEModelAnimation* Animation, unsigned int Frame);
-		void								SetStaticPoseByIndex(size_t AnimationIndex, unsigned int Frame);
-		void								SetStaticPoseByName(const char* AnimationName, unsigned int Frame);
+		void								SetStaticPose(const ZEModelAnimation* Animation, ZEUInt Frame);
+		void								SetStaticPoseByIndex(ZESize AnimationIndex, ZEUInt Frame);
+		void								SetStaticPoseByName(const char* AnimationName, ZEUInt Frame);
 
 		virtual void						SetPosition(const ZEVector3& NewPosition);
 		virtual void						SetRotation(const ZEQuaternion& NewRotation);

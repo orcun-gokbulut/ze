@@ -53,14 +53,14 @@
 			virtual const char*						GetDescription() const;\
 			virtual const char*						GetIcon() const;\
 			virtual const ZEPropertyDescription*	GetProperties() const;\
-			virtual size_t							GetPropertyCount() const;\
-			virtual size_t							GetPropertyOffset() const;\
+			virtual ZESize							GetPropertyCount() const;\
+			virtual ZESize							GetPropertyOffset() const;\
 			virtual const ZEContainerDescription*	GetContainers() const;\
-			virtual size_t							GetContainerCount() const;\
-			virtual size_t							GetContainerOffset() const;\
+			virtual ZESize							GetContainerCount() const;\
+			virtual ZESize							GetContainerOffset() const;\
 			virtual const ZEMethodDescription*		GetMethods() const;\
-			virtual size_t							GetMethodCount() const;\
-			virtual size_t							GetMethodOffset() const;\
+			virtual ZESize							GetMethodCount() const;\
+			virtual ZESize							GetMethodOffset() const;\
 			virtual ZEObjectProvider*				GetProvider() const;\
 			virtual ZEObject*						CreateInstance() const;\
 	};	
@@ -75,14 +75,14 @@
 			virtual const char*						GetDescription() const;\
 			virtual const char*						GetIcon() const;\
 			virtual const ZEPropertyDescription*	GetProperties() const;\
-			virtual size_t							GetPropertyCount() const;\
-			virtual size_t							GetPropertyOffset() const;\
+			virtual ZESize							GetPropertyCount() const;\
+			virtual ZESize							GetPropertyOffset() const;\
 			virtual const ZEContainerDescription*	GetContainers() const;\
-			virtual size_t							GetContainerCount() const;\
-			virtual size_t							GetContainerOffset() const;\
+			virtual ZESize							GetContainerCount() const;\
+			virtual ZESize							GetContainerOffset() const;\
 			virtual const ZEMethodDescription*		GetMethods() const;\
-			virtual size_t							GetMethodCount() const;\
-			virtual size_t							GetMethodOffset() const;\
+			virtual ZESize							GetMethodCount() const;\
+			virtual ZESize							GetMethodOffset() const;\
 			virtual ZEObjectProvider*				GetProvider() const;\
 			virtual ZEObject*						CreateInstance() const;\
 			Extension\
@@ -93,23 +93,23 @@
 	public:\
 		virtual ZEObjectDescription* GetDescription() const;\
 		static ZEObjectDescription* Description();\
-		virtual ptrdiff_t GetPropertyId(const char* PropertyName) const;\
+		virtual ZESSize GetPropertyId(const char* PropertyName) const;\
 		using ZEObject::SetProperty;\
-		virtual bool SetProperty(int PropertyId, const ZEVariant& Value);\
+		virtual bool SetProperty(ZEInt PropertyId, const ZEVariant& Value);\
 		using ZEObject::GetProperty;\
-		virtual bool GetProperty(int PropertyId, ZEVariant& Value) const;\
-		virtual ptrdiff_t GetContainerId(const char* ContainerName) const;\
+		virtual bool GetProperty(ZEInt PropertyId, ZEVariant& Value) const;\
+		virtual ZESSize GetContainerId(const char* ContainerName) const;\
 		using ZEObject::AddToContainer;\
-		virtual bool AddToContainer(int ContainerId, ZEObject* Item);\
+		virtual bool AddToContainer(ZEInt ContainerId, ZEObject* Item);\
 		using ZEObject::RemoveFromContainer;\
-		virtual bool RemoveFromContainer(int ContainerId, ZEObject* Item);\
+		virtual bool RemoveFromContainer(ZEInt ContainerId, ZEObject* Item);\
 		using ZEObject::GetContainerItems;\
-		virtual const ZEObject** GetContainerItems(int ContainerId) const;\
+		virtual const ZEObject** GetContainerItems(ZEInt ContainerId) const;\
 		using ZEObject::GetContainerItemCount;\
-		virtual size_t GetContainerItemCount(int ContainerId) const;\
-		virtual ptrdiff_t GetMethodId(const char* MethodName) const;\
+		virtual ZESize GetContainerItemCount(ZEInt ContainerId) const;\
+		virtual ZESSize GetMethodId(const char* MethodName) const;\
 		using ZEObject::CallMethod;\
-		virtual bool CallMethod(int MethodId, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue);\
+		virtual bool CallMethod(ZEInt MethodId, const ZEVariant* Parameters, ZESize ParameterCount, ZEVariant& ReturnValue);\
 	private:
 
 #define ZE_META_EXTENDED_OBJECT(ExtensionClass, Extension, Class)\
@@ -136,16 +136,16 @@ class ZEObjectDescription
 		virtual const char*						GetIcon() const = 0;
 
 		virtual const ZEPropertyDescription*	GetProperties() const = 0;
-		virtual size_t							GetPropertyCount() const = 0;
-		virtual size_t							GetPropertyOffset() const = 0;
+		virtual ZESize							GetPropertyCount() const = 0;
+		virtual ZESize							GetPropertyOffset() const = 0;
 
 		virtual const ZEContainerDescription*	GetContainers() const = 0;
-		virtual size_t							GetContainerCount() const = 0;
-		virtual size_t							GetContainerOffset() const = 0;
+		virtual ZESize							GetContainerCount() const = 0;
+		virtual ZESize							GetContainerOffset() const = 0;
 
 		virtual const ZEMethodDescription*		GetMethods() const = 0;
-		virtual size_t							GetMethodCount() const = 0;
-		virtual size_t							GetMethodOffset() const = 0;
+		virtual ZESize							GetMethodCount() const = 0;
+		virtual ZESize							GetMethodOffset() const = 0;
 		
 		virtual ZEObjectProvider*				GetProvider() const = 0;
 		
@@ -169,31 +169,31 @@ class ZEObject
 		virtual ZEObject*						GetOwner();
 
 		// Property Functions
-		virtual ptrdiff_t						GetPropertyId(const char* PropertyName) const = 0;
-		virtual bool							SetProperty(int PropertyId, const ZEVariant& Value) = 0;
+		virtual ZESSize						GetPropertyId(const char* PropertyName) const = 0;
+		virtual bool							SetProperty(ZEInt PropertyId, const ZEVariant& Value) = 0;
 		bool									SetProperty(const char* PropertyName, const ZEVariant& Value);
-		virtual bool							GetProperty(int PropertyId, ZEVariant& Value) const = 0;
+		virtual bool							GetProperty(ZEInt PropertyId, ZEVariant& Value) const = 0;
 		bool									GetProperty(const char* PropertyName, ZEVariant& Value) const;
 		bool									AddCustomProperty(ZERunTimeProperty Property);
 		bool									RemoveCustomProperty(const char* PropertyName);
 		const ZEArray<ZERunTimeProperty>*		GetCustomProperties() const;
 
 		// Containers
-		virtual ptrdiff_t						GetContainerId(const char* ContainerName) const = 0;
-		virtual bool							AddToContainer(int ContainerId, ZEObject* Item) = 0;
+		virtual ZESSize						GetContainerId(const char* ContainerName) const = 0;
+		virtual bool							AddToContainer(ZEInt ContainerId, ZEObject* Item) = 0;
 		bool									AddToContainer(const char* ContainerName, ZEObject* Item);
-		virtual bool							RemoveFromContainer(int ContainerId, ZEObject* Item) = 0;
+		virtual bool							RemoveFromContainer(ZEInt ContainerId, ZEObject* Item) = 0;
 		bool									RemoveFromContainer(const char* ContainerName, ZEObject* Item);
-		virtual const ZEObject**				GetContainerItems(int ContainerId) const = 0;
+		virtual const ZEObject**				GetContainerItems(ZEInt ContainerId) const = 0;
 		const ZEObject**						GetContainerItems(const char* ContainerName) const;		
-		virtual size_t							GetContainerItemCount(int ContainerId) const = 0;
-		size_t									GetContainerItemCount(const char* ContainerName) const;
+		virtual ZESize							GetContainerItemCount(ZEInt ContainerId) const = 0;
+		ZESize									GetContainerItemCount(const char* ContainerName) const;
 
 		// Methods
-		virtual ptrdiff_t						GetMethodId(const char* MethodName) const = 0;
-		virtual bool							CallMethod(int MethodId, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue) = 0;
-		bool									CallMethod(const char* MethodName, const ZEVariant* Parameters, size_t ParameterCount, ZEVariant& ReturnValue);
-		bool									CallMethod(int MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue);
+		virtual ZESSize						GetMethodId(const char* MethodName) const = 0;
+		virtual bool							CallMethod(ZEInt MethodId, const ZEVariant* Parameters, ZESize ParameterCount, ZEVariant& ReturnValue) = 0;
+		bool									CallMethod(const char* MethodName, const ZEVariant* Parameters, ZESize ParameterCount, ZEVariant& ReturnValue);
+		bool									CallMethod(ZEInt MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue);
 		bool									CallMethod(const char* MethodName, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue);
 
 		// Scripting

@@ -83,7 +83,7 @@ ZED3D9FixedMaterial::ZED3D9FixedMaterial()
 }
 
 
-void ZED3D9FixedMaterial::SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const
+void ZED3D9FixedMaterial::SetTextureStage(ZEUInt Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const
 {
 	GetDevice()->SetSamplerState(Id, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
 	GetDevice()->SetSamplerState(Id, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
@@ -123,7 +123,7 @@ void ZED3D9FixedMaterial::SetTextureStage(unsigned int Id, ZETextureAddressMode 
 
 }
 
-void ZED3D9FixedMaterial::SetTextureStage(unsigned int Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const
+void ZED3D9FixedMaterial::SetTextureStage(ZEUInt Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const
 {
 	switch(AddressU)
 	{
@@ -213,7 +213,7 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCo
 	/*if (GetAlphaCullEnabled())
 	{
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-		GetDevice()->SetRenderState(D3DRS_ALPHAREF, (int)(256.0f * AlphaCullLimit));
+		GetDevice()->SetRenderState(D3DRS_ALPHAREF, (ZEInt)(256.0f * AlphaCullLimit));
 		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 		//GetDevice()->SetRenderState(D3DRS_ADAPTIVETESS_Y, (D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C'));
 	}
@@ -362,7 +362,7 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	/*if (GetAlphaCullEnabled())
 	{
 		GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
-		GetDevice()->SetRenderState(D3DRS_ALPHAREF, (int)(256.0f * AlphaCullLimit));
+		GetDevice()->SetRenderState(D3DRS_ALPHAREF, (ZEInt)(256.0f * AlphaCullLimit));
 		GetDevice()->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
 		GetDevice()->SetRenderState(D3DRS_ADAPTIVETESS_Y, (D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C'));
 	}

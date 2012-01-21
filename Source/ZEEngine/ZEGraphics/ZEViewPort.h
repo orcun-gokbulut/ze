@@ -41,8 +41,8 @@ class ZEViewPort
 {
 	public:
 		virtual float			GetAspectRatio() = 0;
-		virtual unsigned int	GetWidth() = 0;
-		virtual unsigned int	GetHeight() = 0;
+		virtual ZEUInt	GetWidth() = 0;
+		virtual ZEUInt	GetHeight() = 0;
 
 		virtual					~ZEViewPort();
 };

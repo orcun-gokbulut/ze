@@ -44,7 +44,7 @@
 ZEResource* ZEResourceManager::_GetResource(const char* FileName)
 {
 	ZEResource* CurResource;
-	for (size_t I = 0; I < this->SharedResources.GetCount(); I++)
+	for (ZESize I = 0; I < this->SharedResources.GetCount(); I++)
 	{
 		CurResource = this->SharedResources.GetItem(I);
 		if (_stricmp (CurResource->FileName, FileName) == 0)
@@ -57,7 +57,7 @@ ZEResource* ZEResourceManager::_GetResource(const char* FileName)
 const ZEResource* ZEResourceManager::GetResource(const char* FileName)
 {
 	ZEResource* CurResource;
-	for (size_t I = 0; I < this->SharedResources.GetCount(); I++)
+	for (ZESize I = 0; I < this->SharedResources.GetCount(); I++)
 	{
 		CurResource = this->SharedResources.GetItem(I);
 		if (_stricmp (CurResource->FileName, FileName) == 0)
@@ -84,7 +84,7 @@ void ZEResourceManager::ReleaseAllResources()
 {
 	zeWarningAssert(SharedResources.GetCount(), "[Resource Manager] Possible memory leak ! One or more shared resources are not released.");
 
-	for (size_t I = 0; I < SharedResources.GetCount(); I++)
+	for (ZESize I = 0; I < SharedResources.GetCount(); I++)
 		delete SharedResources.GetItem(I);
 	
 	SharedResources.Clear();

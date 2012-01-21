@@ -49,14 +49,14 @@ const ZEArray<ZEExtensionDescription*>& ZEModuleManager::GetModuleDescriptions()
 	return ModuleList;
 }
 
-ZEExtensionDescription* ZEModuleManager::GetModuleDescription(size_t Index)
+ZEExtensionDescription* ZEModuleManager::GetModuleDescription(ZESize Index)
 {
 	return ModuleList[Index];
 }
 
 ZEExtensionDescription* ZEModuleManager::GetModuleDescription(const ZEString& Name)
 {
-	for (size_t I = 0; I < ModuleList.GetCount(); I++)
+	for (ZESize I = 0; I < ModuleList.GetCount(); I++)
 		if (ModuleList[I]->GetName() == Name)
 			return ModuleList[I];
 
@@ -71,7 +71,7 @@ ZEExtensionDescription* ZEModuleManager::GetModuleDescription(ZEExtensionDescrip
 	return GetModuleDescription(ZEString(ModuleManagerOptions.GetOption(BaseModuleDescription->GetName())->GetValue()));
 }
 
-ZEModule* ZEModuleManager::CreateModuleInstance(size_t Index)
+ZEModule* ZEModuleManager::CreateModuleInstance(ZESize Index)
 {
 	ZEExtensionDescription* ModuleDesc = GetModuleDescription(Index);
 
