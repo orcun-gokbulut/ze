@@ -38,7 +38,7 @@
 #include "ZEMath/ZERectangle3D.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEPlane.h"
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 
 ZETestSuite(Rectangle3D)

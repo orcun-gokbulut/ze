@@ -36,11 +36,11 @@
 /*#include "ZETest.h"
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEAngle.h"
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 static bool fequal(float a, float b)
 {
-	return fabs(a-b) < 0.00001;
+	return ZEMath::Abs(a-b) < 0.00001;
 }
 
 ZETestSuite(ZEAngle)

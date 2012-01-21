@@ -39,8 +39,8 @@
 #include "ZERay.h"
 #include "ZELineSegment.h"
 #include "ZELine.h"
-
-#include <math.h>
+#include "ZEMath.h"
+#include "ZEAngle.h"
 
 static inline void SWAP(float a, float b)
 {
@@ -90,7 +90,7 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& 
 	
 	if (d > 0)
 	{
-		float sqrtd = sqrtf(d);
+		float sqrtd = ZEMath::Sqrt(d);
 
 		float MaxT = -b + sqrtd;
 		MinT = -b - sqrtd;
@@ -114,7 +114,7 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& 
 
 	if (d > 0)
 	{
-		float sqrtd = sqrtf(d);
+		float sqrtd = ZEMath::Sqrt(d);
 
 		MinT = -b - sqrtd;
 		MaxT = -b + sqrtd;
@@ -159,7 +159,7 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& R
 	if (mm > rr)
 		return false;
 
-	float q = sqrt(rr - mm);
+	float q = ZEMath::Sqrt(rr - mm);
 	if (ll > rr)
 		MinT = s - q;
 	else
@@ -182,7 +182,7 @@ bool ZEBSphere::IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& R
 	if (mm > rr)
 		return false;
 
-	float q = sqrt(rr - mm);
+	float q = ZEMath::Sqrt(rr - mm);
 	if (ll > rr)
 	{
 		MinT = s - q;

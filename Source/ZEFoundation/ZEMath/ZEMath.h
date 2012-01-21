@@ -61,16 +61,23 @@ class ZEMath
 		static ZEInt		Abs(ZEInt Value);
 		static float		Sign(float Value);
 		static ZEInt		Sign(ZEInt Value);
+		static float		Mod(float Value, float Modulus);
 
 		static float		Min(float A, float B);
 		static float		Max(float A, float B);
 		static ZEInt		Min(ZEInt A, ZEInt B);
 		static ZEInt		Max(ZEInt A, ZEInt B);
 
-		static float		Loge(float Value);
+		static float		Log(float Value);
 		static float		Log10(float Value);
 		static float		Power(float Base, float Exponent);
 		static float		Exp(float Value);
+
+		static float		Floor(float Value);
+		static float		Ceil(float Value);
+		static float		Round(float Value);
+
+		static float		CopySign(float Value, float Sign);
 
 		static float		Lerp(float A, float B, float Factor);
 

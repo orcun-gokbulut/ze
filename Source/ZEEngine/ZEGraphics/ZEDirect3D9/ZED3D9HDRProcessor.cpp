@@ -45,12 +45,12 @@
 
 static float GausianFunction(float x, float StandartDeviation)
 {
-	return (1.0f / (sqrtf(2.0f * ZE_PI) * StandartDeviation)) * powf(ZE_E, -((x * x) / (2.0f * StandartDeviation * StandartDeviation)));
+	return (1.0f / (ZEMath::Sqrt(2.0f * ZE_PI) * StandartDeviation)) * ZEMath::Power(ZE_E, -((x * x) / (2.0f * StandartDeviation * StandartDeviation)));
 }
 
 static float GausianFunction(float x, float y, float StandartDeviation)
 {
-	return (1.0f / (2.0f * ZE_PI * StandartDeviation * StandartDeviation)) * powf(ZE_E, -((x * x + y * y) / (2.0f * StandartDeviation * StandartDeviation))); 
+	return (1.0f / (2.0f * ZE_PI * StandartDeviation * StandartDeviation)) * ZEMath::Power(ZE_E, -((x * x + y * y) / (2.0f * StandartDeviation * StandartDeviation))); 
 }
 
 void FillGaussianKernel1D(float* Kernel, ZESize KernelSize, float StandartDeviation)

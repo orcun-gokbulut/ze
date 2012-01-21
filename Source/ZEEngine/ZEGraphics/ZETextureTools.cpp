@@ -71,8 +71,8 @@ bool ZETextureTools::IsCompressible(ZEUInt Width, ZEUInt Height)
 
 ZEUInt ZETextureTools::GetMaxMipmapCount(ZEUInt Width, ZEUInt Height)
 {
-	ZEUInt WidthCount = (ZEUInt)(logf((float)Width) / logf(2.0f));
-	ZEUInt HeightCount = (ZEUInt)(logf((float)Height) / logf(2.0f));
+	ZEUInt WidthCount = (ZEUInt)(ZEMath::Log((float)Width) / ZEMath::Log(2.0f));
+	ZEUInt HeightCount = (ZEUInt)(ZEMath::Log((float)Height) / ZEMath::Log(2.0f));
 
 	/* also counts the original (level 0) texture as a mipmap */
 	return WidthCount >= HeightCount ? HeightCount + 1 : WidthCount + 1;

@@ -34,12 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEAngle.h"
-
 #include <math.h>
+#include "ZEMath/ZEMath.h"
 
 float ZEAngle::Range(float Angle)
 {
-	float ModAngle = fmod(Angle, ZE_PIx2);
+	float ModAngle = ZEMath::Mod(Angle, ZE_PIx2);
 	if(ModAngle > ZE_PI)
 		return ModAngle - ZE_PIx2;
 	else if(ModAngle < -ZE_PI)
@@ -50,47 +50,47 @@ float ZEAngle::Range(float Angle)
 
 float ZEAngle::Distance(float Angle1, float Angle2)
 {
-	return Range(fabs(Angle1 - Angle2));
+	return Range(ZEMath::Abs(Angle1 - Angle2));
 }
 
 float ZEAngle::Cos(float Value)
 {
-	return cos(Value);
+	return cosf(Value);
 }
 
 float ZEAngle::Sin(float Value)
 {
-	return sin(Value);
+	return sinf(Value);
 }
 
 float ZEAngle::Tan(float Value)
 {
-	return tan(Value);
+	return tanf(Value);
 }
 
 float ZEAngle::Cot(float Value)
 {
-	return 1.0f / tan(Value);
+	return 1.0f / tanf(Value);
 }
 
 float ZEAngle::ArcSin(float Value)
 {
-	return asin(Value);
+	return asinf(Value);
 }
 
 float ZEAngle::ArcCos(float Value)
 {
-	return acos(Value);
+	return acosf(Value);
 }
 
 float ZEAngle::ArcTan(float Value)
 {
-	return atan(Value);
+	return atanf(Value);
 }
 
 float ZEAngle::ArcTan2(float x, float y)
 {
-	return atan2(x, y);
+	return atan2f(x, y);
 }
 
 float ZEAngle::ToRadian(float Angle)
@@ -106,8 +106,8 @@ float ZEAngle::ToDegree(float Angle)
 ZEVector2 ZEAngle::ToVector(float Angle)
 {
 	ZEVector2 Output;
-	Output.x = sin(Angle);
-	Output.y = cos(Angle);
+	Output.x = sinf(Angle);
+	Output.y = cosf(Angle);
 
 	return Output;
 }

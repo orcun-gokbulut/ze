@@ -61,7 +61,6 @@
 #define WINDOWS_LEAN_AND_MEAN
 #include <windows.h>
 #include <time.h>
-#include <math.h>
 
 ZEOptionSection ZECore::CoreOptions; 
 

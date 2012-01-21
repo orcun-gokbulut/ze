@@ -41,7 +41,7 @@
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEMath/ZEAngle.h"
 
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZECamera)
 

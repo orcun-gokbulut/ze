@@ -39,7 +39,7 @@
 #include "ZELineSegment.h"
 #include "ZELine.h"
 #include "ZERay.h"
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 void ZETriangle::Create(ZETriangle& Triangle, const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2)
 {

@@ -46,8 +46,9 @@
 
 #include <d3d9.h>
 #include <stdlib.h>
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 #include <freeimage.h>
+#include "ZEMath/ZEAngle.h"
 
 void ZED3D9SSAOProcessor::SetRenderer(ZEFrameRenderer* Renderer)
 {
@@ -225,7 +226,7 @@ void ZED3D9SSAOProcessor::Process()
 	GetDevice()->SetVertexShaderConstantF(1, (const float*)&ZEVector4(1.0f / InputDepth->GetWidth(), 1.0f / InputDepth->GetHeight(), 0.0f, 0.0f), 1);
 	
 	ZEVector4 ViewVector;
-	ViewVector.y = tanf(Renderer->GetCamera()->GetFOV() * 0.5f);// * Renderer->GetCamera()->GetFarZ();
+	ViewVector.y = ZEAngle::Tan(Renderer->GetCamera()->GetFOV() * 0.5f);// * Renderer->GetCamera()->GetFarZ();
 	ViewVector.x = ViewVector.y * Renderer->GetViewPort()->GetAspectRatio();
 	ViewVector.z = 1.0f;//Renderer->GetCamera()->GetFarZ();
 	ViewVector.w = 0.0f;

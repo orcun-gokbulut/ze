@@ -36,7 +36,8 @@
 #include "ZEVector.h"
 #include "ZEMatrix.h"
 #include "ZEMath.h"
-#include <math.h>
+#include "ZEMath.h"
+#include "ZEAngle.h"
 
 // ZEVector2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -59,14 +60,14 @@ inline void ZEVector2::Create(const ZEVector2 &Start, const ZEVector2 &End)
 
 void ZEVector2::CreateFromPolar(float Radius, float Theta)
 {
-	x = Radius * cosf(Theta);
-	y = Radius * sinf(Theta);
+	x = Radius * ZEAngle::Cos(Theta);
+	y = Radius * ZEAngle::Sin(Theta);
 }
 
 void ZEVector2::ConvertToPolar(float& Radius, float& Theta)
 {
-	Radius = sqrtf(x * x + y * y);
-	Theta = atan2f(y, x);
+	Radius = ZEMath::Sqrt(x * x + y * y);
+	Theta = ZEAngle::ArcTan2(y, x);
 }
 
 inline void ZEVector2::Add(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
@@ -120,12 +121,12 @@ bool ZEVector2::IsValid() const
 
 bool ZEVector2::IsNormalized() const
 {
-	return fabs(Length() - 1.0f) < 0.001;
+	return ZEMath::Abs(Length() - 1.0f) < 0.001;
 }
 
 float ZEVector2::Length(const ZEVector2 &A)
 {
-	return sqrt(A.x * A.x + A.y * A.y);
+	return ZEMath::Sqrt(A.x * A.x + A.y * A.y);
 }
 
 float ZEVector2::LengthSquare(const ZEVector2 &A)
@@ -135,7 +136,7 @@ float ZEVector2::LengthSquare(const ZEVector2 &A)
 
 float ZEVector2::Distance(const ZEVector2 &A, const ZEVector2 &B)
 {
-	return sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
+	return ZEMath::Sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y));
 }
 
 float ZEVector2::DistanceSquare(const ZEVector2 &A, const ZEVector2 &B)
@@ -239,7 +240,7 @@ void ZEVector2::NormalizeSelf()
 
 inline float ZEVector2::Length() const
 {
-	return sqrt(x * x + y * y);
+	return ZEMath::Sqrt(x * x + y * y);
 }
 
 float ZEVector2::LengthSquare() const
@@ -386,14 +387,14 @@ ZEVector2& ZEVector2::operator /=(float s)
 
 bool ZEVector2::operator ==(const ZEVector2 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
-		(fabs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD));
+	return ((ZEMath::Abs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
+		(ZEMath::Abs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD));
 }
 
 bool ZEVector2::operator !=(const ZEVector2 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
-		(fabs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD));
+	return ((ZEMath::Abs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
+		(ZEMath::Abs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD));
 }
 
 float ZEVector2::operator[](ZESize Index) const
@@ -450,30 +451,30 @@ inline void ZEVector3::Create(ZEVector3& Out, const ZEVector3 &Start, const ZEVe
 
 void ZEVector3::CreateFromSpherical(ZEVector3& Out, float Radius, float Theta, float Phi)
 {
-	float SinTheta = sinf(Theta);
-	Out.x = Radius * SinTheta * cosf(Phi);
-	Out.y = Radius * cosf(Theta);
-	Out.z = Radius * SinTheta * sinf(Phi);
+	float SinTheta = ZEAngle::Sin(Theta);
+	Out.x = Radius * SinTheta * ZEAngle::Cos(Phi);
+	Out.y = Radius * ZEAngle::Cos(Theta);
+	Out.z = Radius * SinTheta * ZEAngle::Sin(Phi);
 }
 
 void ZEVector3::CreateFromCylindirical(ZEVector3& Out, float Radius, float Theta, float Height)
 {
-	Out.x = Radius * cosf(Theta);
+	Out.x = Radius * ZEAngle::Cos(Theta);
 	Out.y = Height;
-	Out.z = Radius * sinf(Theta);
+	Out.z = Radius * ZEAngle::Sin(Theta);
 }
 
 void ZEVector3::ConvertToSpherical(const ZEVector3& In, float& Radius, float& Theta, float& Phi)
 {
-	Radius = sqrtf(In.x * In.x + In.y * In.y + In.z * In.z);
-	Theta =  atan(In.y / sqrtf(In.x * In.x + In.z * In.z));
-	Phi = atanf(In.z / In.x);
+	Radius = ZEMath::Sqrt(In.x * In.x + In.y * In.y + In.z * In.z);
+	Theta =  ZEAngle::ArcTan(In.y / ZEMath::Sqrt(In.x * In.x + In.z * In.z));
+	Phi = ZEAngle::ArcTan(In.z / In.x);
 }
 
 void ZEVector3::ConvertToCylindirical(const ZEVector3& In, float& Radius, float& Theta, float& Height)
 {
-	Radius = sqrtf(In.x * In.x + In.z * In.z);
-	Theta = atanf(In.z / In.x);
+	Radius = ZEMath::Sqrt(In.x * In.x + In.z * In.z);
+	Theta = ZEAngle::ArcTan(In.z / In.x);
 	Height = In.y;
 }
 
@@ -542,12 +543,12 @@ bool ZEVector3::IsValid() const
 
 bool ZEVector3::IsNormalized() const
 {
-	return fabs(Length() - 1.0f) < 0.001;
+	return ZEMath::Abs(Length() - 1.0f) < 0.001;
 }
 
 float ZEVector3::Length(const ZEVector3& Vector)
 {
-	return sqrt(Vector.x * Vector.x + Vector.y * Vector.y + Vector.z * Vector.z);
+	return ZEMath::Sqrt(Vector.x * Vector.x + Vector.y * Vector.y + Vector.z * Vector.z);
 }
 
 float ZEVector3::LengthSquare(const ZEVector3& Vector)
@@ -557,7 +558,7 @@ float ZEVector3::LengthSquare(const ZEVector3& Vector)
 
 float ZEVector3::Distance(const ZEVector3& A, const ZEVector3& B)
 {
-	return sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) + (A.z - B.z) * (A.z - B.z));
+	return ZEMath::Sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) + (A.z - B.z) * (A.z - B.z));
 }
 
 float ZEVector3::DistanceSquare(const ZEVector3& A, const ZEVector3& B)
@@ -742,7 +743,7 @@ void ZEVector3::Saturate(ZEVector3& Out, const ZEVector3& Vector)
 
 inline float ZEVector3::Length() const
 {
-	return sqrt(x * x + y * y + z * z);
+	return ZEMath::Sqrt(x * x + y * y + z * z);
 }
 
 float ZEVector3::LengthSquare() const
@@ -970,17 +971,17 @@ ZEVector3& ZEVector3::operator /= (float s)
 
 bool ZEVector3::operator == (const ZEVector3 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
-			(fabs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD) &&
-			(fabs(this->z - RightOperand.z) < ZE_ZERO_THRESHOLD));
+	return ((ZEMath::Abs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
+			(ZEMath::Abs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD) &&
+			(ZEMath::Abs(this->z - RightOperand.z) < ZE_ZERO_THRESHOLD));
 
 }
 
 bool ZEVector3::operator != (const ZEVector3 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
-			(fabs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD) ||
-			(fabs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD));
+	return ((ZEMath::Abs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
+			(ZEMath::Abs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD) ||
+			(ZEMath::Abs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD));
 }
 
 float ZEVector3::operator[](ZESize Index) const
@@ -1106,7 +1107,7 @@ float ZEVector4::DotProduct(const ZEVector4& A, const ZEVector4& B)
 
 float ZEVector4::Length(const ZEVector4& Vector)
 {
-	return sqrt(Vector.x * Vector.x + Vector.y * Vector.y + Vector.z * Vector.z + Vector.w * Vector.w);
+	return ZEMath::Sqrt(Vector.x * Vector.x + Vector.y * Vector.y + Vector.z * Vector.z + Vector.w * Vector.w);
 }
 
 float ZEVector4::LengthSquare(const ZEVector4& Vector)
@@ -1116,7 +1117,7 @@ float ZEVector4::LengthSquare(const ZEVector4& Vector)
 
 float ZEVector4::Distance(const ZEVector4& A, const ZEVector4& B)
 {
-	return sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) + (A.z - B.z) * (A.z - B.z) + (A.w - B.w) * (A.w - B.w));
+	return ZEMath::Sqrt((A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) + (A.z - B.z) * (A.z - B.z) + (A.w - B.w) * (A.w - B.w));
 }
 
 float ZEVector4::DistanceSquare(const ZEVector4& A, const ZEVector4& B)
@@ -1134,7 +1135,7 @@ bool ZEVector4::IsValid() const
 
 bool ZEVector4::IsNormalized() const
 {
-	return fabs(Length() - 1.0f) < 0.001;
+	return ZEMath::Abs(Length() - 1.0f) < 0.001;
 }
 
 void ZEVector4::Normalize(ZEVector4& Out, const ZEVector4& Vector)
@@ -1265,7 +1266,7 @@ void ZEVector4::Saturate(ZEVector4& Out, const ZEVector4& Vector)
 
 inline float ZEVector4::Length() const
 {
-	return sqrt(x * x + y * y + z * z + w * w);
+	return ZEMath::Sqrt(x * x + y * y + z * z + w * w);
 }
 
 float ZEVector4::LengthSquare() const
@@ -1438,18 +1439,18 @@ ZEVector4 ZEVector4::operator-() const
 
 bool ZEVector4::operator == (const ZEVector4 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
-			(fabs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD) &&
-			(fabs(this->z - RightOperand.z) < ZE_ZERO_THRESHOLD) &&
-			(fabs(this->w - RightOperand.w) < ZE_ZERO_THRESHOLD));
+	return ((ZEMath::Abs(this->x - RightOperand.x) < ZE_ZERO_THRESHOLD) && 
+			(ZEMath::Abs(this->y - RightOperand.y) < ZE_ZERO_THRESHOLD) &&
+			(ZEMath::Abs(this->z - RightOperand.z) < ZE_ZERO_THRESHOLD) &&
+			(ZEMath::Abs(this->w - RightOperand.w) < ZE_ZERO_THRESHOLD));
 }
 
 bool ZEVector4::operator != (const ZEVector4 &RightOperand) const
 {
-	return ((fabs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
-			(fabs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD) ||
-			(fabs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD) ||
-			(fabs(this->w - RightOperand.w) > ZE_ZERO_THRESHOLD));
+	return ((ZEMath::Abs(this->x - RightOperand.x) > ZE_ZERO_THRESHOLD) || 
+			(ZEMath::Abs(this->y - RightOperand.y) > ZE_ZERO_THRESHOLD) ||
+			(ZEMath::Abs(this->z - RightOperand.z) > ZE_ZERO_THRESHOLD) ||
+			(ZEMath::Abs(this->w - RightOperand.w) > ZE_ZERO_THRESHOLD));
 }
 
 float ZEVector4::operator[](ZESize Index) const

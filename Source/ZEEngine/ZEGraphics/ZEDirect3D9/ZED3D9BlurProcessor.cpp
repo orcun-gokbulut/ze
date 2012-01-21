@@ -47,7 +47,7 @@
 
 #include <d3d9.h>
 #include <stdlib.h>
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 ZED3D9BlurKernel::ZED3D9BlurKernel(const ZEFilter* Filt, ZEUInt SrcLength, ZEUInt DestLength, ZEInt Samples, float PixelSize)
 {

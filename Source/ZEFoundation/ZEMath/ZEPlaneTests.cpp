@@ -35,7 +35,7 @@
 
 #include "ZETest.h"
 #include <d3dx9.h>
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEPlane.h"

@@ -35,6 +35,7 @@
 
 #include "ZEPPBlurNode.h"
 #include "ZEError.h"
+#include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
 
 void ZEPPBlurNode::UpdateKernel()
@@ -42,7 +43,7 @@ void ZEPPBlurNode::UpdateKernel()
 	if (KernelDirtyFlag)
 	{
 		for (ZESize I = 0; I <= 7; I++)
-			Kernel[I] = (1.0f / (sqrtf(2.0f * ZE_PI * StandartDeviation))) * powf(ZE_E, -((((float)I - 3) * ((float)I - 3)) / (2 * StandartDeviation * StandartDeviation)));
+			Kernel[I] = (1.0f / (ZEMath::Sqrt(2.0f * ZE_PI * StandartDeviation))) * ZEMath::Power(ZE_E, -((((float)I - 3) * ((float)I - 3)) / (2 * StandartDeviation * StandartDeviation)));
 
 		KernelDirtyFlag = false;
 	}

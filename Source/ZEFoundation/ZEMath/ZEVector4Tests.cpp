@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETest.h"
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMath.h"
@@ -185,7 +185,7 @@ ZETestSuite(ZEVector4)
 
 		ZEVector4::Normalize(NormalizedVector, Vector);
 
-		ZETestCheckClose(NormalizedVector, ZEVector4(1.0f/sqrt(30.0f), 2.0f/sqrt(30.0f), 3.0f/sqrt(30.0f), 4.0f/sqrt(30.0f)));	
+		ZETestCheckClose(NormalizedVector, ZEVector4(1.0f/ZEMath::Sqrt(30.0f), 2.0f/ZEMath::Sqrt(30.0f), 3.0f/ZEMath::Sqrt(30.0f), 4.0f/ZEMath::Sqrt(30.0f)));	
 	}
 
 	ZETest("ZEVector4 ZEVector4::Normalize() const")
@@ -237,7 +237,7 @@ ZETestSuite(ZEVector4)
 
 		float Result = ZEVector4::Length(Vector);
 
-		ZETestCheckClose(Result, sqrt(70.0f));
+		ZETestCheckClose(Result, ZEMath::Sqrt(70.0f));
 	}
 
 	ZETest("ZEVector4::Length() const")
@@ -246,7 +246,7 @@ ZETestSuite(ZEVector4)
 
 		float Result = ZEVector4::Length(Vector);
 
-		ZETestCheckClose(Result, sqrt(30.0f));
+		ZETestCheckClose(Result, ZEMath::Sqrt(30.0f));
 	}
 
 	ZETest("ZEVector4::LengthSquare(const ZEVector4 & Vector)")
@@ -272,7 +272,7 @@ ZETestSuite(ZEVector4)
 
 		float Result = ZEVector4::Distance(A, B);
 
-		ZETestCheckClose(Result, sqrt(31.0f));
+		ZETestCheckClose(Result, ZEMath::Sqrt(31.0f));
 	}
 
 	ZETest("ZEVector4::DistanceSquare(const ZEVector4 & A, const ZEVector4 & B)")

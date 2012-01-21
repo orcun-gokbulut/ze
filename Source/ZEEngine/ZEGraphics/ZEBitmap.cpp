@@ -37,7 +37,7 @@
 #include "ZEError.h"
 #include "ZETypes.h"
 #include <memory.h>
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 #include <FreeImage.h>
 
@@ -297,13 +297,13 @@ ZEVector4 ZEBitmap::SamplePixelFloat(const ZEVector2& TextureCoordinate, ZEBitma
 
 	if (Options->Filter == ZE_BFM_POINT)
 	{
-		return SamplePixelFloat((ZEInt)floorf(TextureCoordinate.x), (ZEInt)floorf(TextureCoordinate.y), Options);
+		return SamplePixelFloat((ZEInt)ZEMath::Floor(TextureCoordinate.x), (ZEInt)ZEMath::Floor(TextureCoordinate.y), Options);
 	}
 
 	if (Options->Filter == ZE_BFM_BILINEAR)
 	{
-		ZEInt x = (ZEInt)floorf(TextureCoordinate.x);
-		ZEInt y = (ZEInt)floorf(TextureCoordinate.y);
+		ZEInt x = (ZEInt)ZEMath::Floor(TextureCoordinate.x);
+		ZEInt y = (ZEInt)ZEMath::Floor(TextureCoordinate.y);
 
 		float RatioU = TextureCoordinate.x - (float)x;
 		float RatioV = TextureCoordinate.y - (float)y;

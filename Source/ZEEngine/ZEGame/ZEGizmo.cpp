@@ -273,13 +273,13 @@ void ZEGizmo::UpdateRotateGizmo()
 	// X Axis
 	ZEVector3 AxisUp;
 	ZEQuaternion::VectorProduct(AxisUp, Rotation, ZEVector3::UnitX);
-	bool FullDraw =  (fabs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
+	bool FullDraw =  (ZEMath::Abs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
 
 	ZEVector3 LineStart, LineEnd;
 	for (ZESize X = 0; X < 64; X++)
 	{
-		ZEMatrix4x4::Transform(LineStart, Transformation, ZEVector3(0.0f, AxisLenght * sinf(X * HAngle), AxisLenght * cosf(X * HAngle)));
-		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(0.0f, AxisLenght * sinf((X + 1) * HAngle), AxisLenght * cosf((X + 1) * HAngle)));
+		ZEMatrix4x4::Transform(LineStart, Transformation, ZEVector3(0.0f, AxisLenght * ZEAngle::Sin(X * HAngle), AxisLenght * ZEAngle::Cos(X * HAngle)));
+		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(0.0f, AxisLenght * ZEAngle::Sin((X + 1) * HAngle), AxisLenght * ZEAngle::Cos((X + 1) * HAngle)));
 	
 		bool Backface = (!FullDraw && 
 						ZEVector3::DotProduct((LineStart - Position).Normalize(), CameraDirection) < -0.01f &&
@@ -310,12 +310,12 @@ void ZEGizmo::UpdateRotateGizmo()
 
 	// Y Axis
 	ZEQuaternion::VectorProduct(AxisUp, Rotation, ZEVector3::UnitY);
-	FullDraw =  (fabs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
+	FullDraw =  (ZEMath::Abs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
 
 	for (ZESize X = 0; X < 64; X++)
 	{
-		ZEMatrix4x4::Transform(LineStart, Transformation, ZEVector3(AxisLenght * sinf(X * HAngle), 0.0f, AxisLenght * cosf(X * HAngle)));
-		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(AxisLenght * sinf((X + 1) * HAngle), 0.0f, AxisLenght * cosf((X + 1) * HAngle)));
+		ZEMatrix4x4::Transform(LineStart, Transformation, ZEVector3(AxisLenght * ZEAngle::Sin(X * HAngle), 0.0f, AxisLenght * ZEAngle::Cos(X * HAngle)));
+		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(AxisLenght * ZEAngle::Sin((X + 1) * HAngle), 0.0f, AxisLenght * ZEAngle::Cos((X + 1) * HAngle)));
 
 		bool Backface = (!FullDraw && 
 						ZEVector3::DotProduct((LineStart - Position).Normalize(), CameraDirection) < -0.01f &&
@@ -347,12 +347,12 @@ void ZEGizmo::UpdateRotateGizmo()
 
 	// Z Axis
 	ZEQuaternion::VectorProduct(AxisUp, Rotation, ZEVector3::UnitZ);
-	FullDraw =  (fabs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
+	FullDraw =  (ZEMath::Abs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
 
 	for (ZESize X = 0; X < 64; X++)
 	{
-		ZEMatrix4x4::Transform(LineStart, Transformation, ZEVector3(AxisLenght * sinf(X * HAngle), AxisLenght * cosf(X * HAngle), 0.0f));
-		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(AxisLenght * sinf((X + 1) * HAngle), AxisLenght * cosf((X + 1) * HAngle), 0.0f));
+		ZEMatrix4x4::Transform(LineStart, Transformation, ZEVector3(AxisLenght * ZEAngle::Sin(X * HAngle), AxisLenght * ZEAngle::Cos(X * HAngle), 0.0f));
+		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(AxisLenght * ZEAngle::Sin((X + 1) * HAngle), AxisLenght * ZEAngle::Cos((X + 1) * HAngle), 0.0f));
 		
 		bool Backface = (!FullDraw && 
 						ZEVector3::DotProduct((LineStart - Position).Normalize(), CameraDirection) < -0.01f &&
@@ -815,7 +815,7 @@ ZEGizmoAxis ZEGizmo::PickRotateAxis(const ZERay& Ray, float& TRay)
 
 			float Distance = ZEVector3::Distance(IntersectionPoint, Position);
 
-			if (fabs(Distance - AxisLenght) < AxisTreshold &&
+			if (ZEMath::Abs(Distance - AxisLenght) < AxisTreshold &&
 				ZEVector3::DotProduct(IntersectionPoint.Normalize(), CameraDirection) < 0.0f)
 			{
 				TRay = NewTRay;
@@ -829,7 +829,7 @@ ZEGizmoAxis ZEGizmo::PickRotateAxis(const ZERay& Ray, float& TRay)
 			ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
 			float Distance = ZEVector3::Distance(IntersectionPoint, Position);
 
-			if (fabs(Distance - AxisLenght) < AxisTreshold &&
+			if (ZEMath::Abs(Distance - AxisLenght) < AxisTreshold &&
 				ZEVector3::DotProduct(IntersectionPoint.Normalize(), CameraDirection) < 0.0f)
 			{
 				TRay = NewTRay;
@@ -843,7 +843,7 @@ ZEGizmoAxis ZEGizmo::PickRotateAxis(const ZERay& Ray, float& TRay)
 			ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
 			float Distance = ZEVector3::Distance(IntersectionPoint, Position);
 
-			if (fabs(Distance - AxisLenght) < AxisTreshold &&
+			if (ZEMath::Abs(Distance - AxisLenght) < AxisTreshold &&
 				ZEVector3::DotProduct(IntersectionPoint.Normalize(), CameraDirection) < 0.0f)
 			{
 				TRay = NewTRay;

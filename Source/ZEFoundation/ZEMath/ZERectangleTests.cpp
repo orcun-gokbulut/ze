@@ -37,7 +37,7 @@
 #include "ZEMathIOStreamMapping.h"
 #include "ZEMath/ZERectangle.h"
 #include "ZEMath/ZEVector.h"
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 ZETestSuite(Rectangle)
 {

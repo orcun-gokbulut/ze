@@ -39,7 +39,7 @@
 #include "ZEVector.h"
 #include "ZEPlane.h"
 
-#include <math.h>
+#include "ZEMath/ZEMath.h"
 
 void ZERay::Create(ZERay & Ray, const ZEVector3 & Start,const ZEVector3 & End)
 {
@@ -113,8 +113,8 @@ float ZERay::MinimumDistance(const ZERay& Ray, const ZELine& Line, float& TRay, 
         }
     }
 
-    TRay = (fabs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
-    TLine = (fabs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
+    TRay = (ZEMath::Abs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
+    TLine = (ZEMath::Abs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
 
 	return ZEVector3::Length(ZEVector3(Ray.GetPointOn(TRay), Line.GetPointOn(TLine)));
 }
@@ -180,8 +180,8 @@ float ZERay::MinimumDistance(const ZERay& RayA, const ZERay& RayB, float& TRayA,
         }
     }
 
-    TRayA = (fabs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
-    TRayB = (fabs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
+    TRayA = (ZEMath::Abs(sN) < ZE_ZERO_THRESHOLD ? 0.0f : sN / sD);
+    TRayB = (ZEMath::Abs(tN) < ZE_ZERO_THRESHOLD ? 0.0f : tN / tD);
 
 	ZEVector3 P1, P2;
 	ZEVector3::Scale(P1, RayA.v, TRayA);

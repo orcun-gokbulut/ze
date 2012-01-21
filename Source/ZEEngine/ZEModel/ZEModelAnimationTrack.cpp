@@ -283,7 +283,7 @@ void ZEModelAnimationTrack::AdvanceAnimation(float ElapsedTime)
 			return;
 
 		// Calculate interpolation value between two frames (current and next frame)
-		float Interpolation = CurrentFrame - floorf(CurrentFrame);
+		float Interpolation = CurrentFrame - ZEMath::Floor(CurrentFrame);
 
 		// Find next frame id
 		ZEInt NextFrameId = (ZEInt)ceilf(CurrentFrame);
@@ -291,7 +291,7 @@ void ZEModelAnimationTrack::AdvanceAnimation(float ElapsedTime)
 			NextFrameId = StartFrame + fmodf(CurrentFrame, EndFrame - StartFrame);
 
 		// Get frames
-		const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[(ZEInt)floorf(CurrentFrame)];
+		const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[(ZEInt)ZEMath::Floor(CurrentFrame)];
 		const ZEModelResourceAnimationFrame* NextFrame = &Animation->Frames[NextFrameId];
 
 		// Update Bones 

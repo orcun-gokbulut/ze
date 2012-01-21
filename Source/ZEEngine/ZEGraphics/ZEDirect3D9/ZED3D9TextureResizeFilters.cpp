@@ -36,11 +36,12 @@
 #include "ZED3D9TextureResizeFilters.h"
 #include "ZECore\ZEConsole.h"
 #include "ZEMath\ZEVector.h"
-
+#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
 
 // Includes
 #include <cassert>
-#include <math.h>
+
 #include <memory.h>
 
 // Definitions
@@ -51,13 +52,13 @@
 // Sinc Function
 float Sincf(float x)
 {
-	if (fabs(x) < EPSILON) 
+	if (ZEMath::Abs(x) < EPSILON) 
 	{
 		float Square = x * x;
 		return 1.0f + Square * (-1.0f / 6.0f + Square * 1.0f / 120.0f);
 	}
 	else 
-		return sin(x) / x;
+		return ZEAngle::Sin(x) / x;
 }
 
 // Bessel Function
@@ -139,7 +140,7 @@ BoxFilter::~BoxFilter()
 
 float BoxFilter::Process(float x) const
 {
-	x = fabs(x);
+	x = ZEMath::Abs(x);
 	if(x <= GetFilterWidth())
 		return 1.0f;
 	return 0.0f;
@@ -164,7 +165,7 @@ TriangleFilter::~TriangleFilter()
 
 float TriangleFilter::Process(float x) const
 {
-	x = fabs(x);
+	x = ZEMath::Abs(x);
 	if(x < GetFilterWidth())
 		return 1.0f;
 	return 0.0f;
@@ -190,7 +191,7 @@ CubicFilter::~CubicFilter()
 
 float CubicFilter::Process(float x) const
 {
-	x = fabs(x);
+	x = ZEMath::Abs(x);
 	if(x < 1.0f)
 		return (2.0f * x - 3.0f) * x * x + 1;
 	
@@ -221,8 +222,8 @@ GaussianFilter::~GaussianFilter()
 
 float GaussianFilter::Process(float x) const
 {
-	x = fabs(x);
-	return exp(-Alpha * x * x) * sqrtf(Alpha / PI);
+	x = ZEMath::Abs(x);
+	return ZEMath::Exp(-Alpha * x * x) * ZEMath::Sqrt(Alpha / PI);
 }
 
 
@@ -243,7 +244,7 @@ QuadraticFilter::~QuadraticFilter()
 
 float QuadraticFilter::Process(float x) const
 {
-	x = fabs(x);
+	x = ZEMath::Abs(x);
 	if(x < 0.5f)
 		return (float)(0.75 - x * x);
 	if(x < 1.5f)
@@ -274,7 +275,7 @@ float KaiserFilter::Process(float x) const
 	float T2 = 1 - T * T;
 
 	if(T2 >= 0.0f)
-		return SincValue * Bessel0(Alpha * sqrtf(T2)) / Bessel0(Alpha);
+		return SincValue * Bessel0(Alpha * ZEMath::Sqrt(T2)) / Bessel0(Alpha);
 	else
 		return 0.0f;
 }
@@ -299,7 +300,7 @@ MitchellFilter::~MitchellFilter()
 
 float MitchellFilter::Process(float x) const
 {
-	x = fabs(x);
+	x = ZEMath::Abs(x);
 	if( x < 1.0f )
 		return P0 + x * x * (P2 + x * P3);
 	if( x < 2.0f )
@@ -321,14 +322,14 @@ ZEKernel::ZEKernel(const ZEFilter* Filt, ZEUInt SrcLength, ZEUInt DestLength, ZE
 	}
 
 	KernelWidth = Filt->GetFilterWidth() * InverseScale;
-	KernelWindowSize = (ZEInt)ceilf(KernelWidth * 2);
+	KernelWindowSize = (ZEInt)ZEMath::Ceil(KernelWidth * 2);
 	// allocation is fixed since we pass it to graphics device
 	KernelWeights = new ZEVector4[KernelWindowSize];
 	memset(KernelWeights, 0, sizeof(ZEVector4) * KernelWindowSize);
 
 	Center = float(KernelWindowSize) / 2.0f;
 
-	float PixelCoord = -1.0f * (floorf(Center) - 0.5f);
+	float PixelCoord = -1.0f * (ZEMath::Floor(Center) - 0.5f);
 	float Total = 0.0f;
 	for(ZEInt I = 0; I < KernelWindowSize; I++)
 	{
