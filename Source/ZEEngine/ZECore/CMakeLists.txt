@@ -91,6 +91,7 @@ ze_add_source(ZEWindowResources.h					Sources)
 ze_add_source(ZEVersion.cpp							Sources)
 ze_add_source(ZEVersion.h							Sources Headers)
 
+
 ze_add_library(ZECore 
 	SOURCES ${Sources}
 	HEADERS ${Headers}

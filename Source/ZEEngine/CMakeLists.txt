@@ -67,6 +67,7 @@ ze_add_source(ZEDefinitions.h 				Sources Headers)
 ze_add_source(ZESDK.h 						Sources Headers)
 ze_add_source(ZESDK.cpp 					Sources)
 
+
 ze_add_library(ZEEngineAPI 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
@@ -78,7 +79,7 @@ ze_add_library(ZEEngineAPI
 	INSTALL_COMPONENT ZESDK)
 	
 ze_add_executable(ZE 
-	SOURCES ${Sources} ZEMain.cpp 
+	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
 	LIBS ZEEngineAPI
 	WIN32
 	INSTALL
