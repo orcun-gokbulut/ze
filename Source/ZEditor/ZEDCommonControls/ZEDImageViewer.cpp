@@ -38,6 +38,7 @@
 #include <FreeImage.h>
 #include <QMouseEvent>
 #include "ZEMath/ZEAngle.h"
+#include "ZEMath/ZEMath.h"
 
 void ZEDImageViewerViewPort::mousePressEvent(QMouseEvent* Event)
 {
@@ -86,8 +87,8 @@ void ZEDImageViewerViewPort::mouseMoveEvent(QMouseEvent* Event)
 	ImageWidth = ((QGraphicsPixmapItem*)(items().at(0)))->boundingRect().width() - 1;
 	ImageHeight = ((QGraphicsPixmapItem*)(items().at(0)))->boundingRect().height() - 1;
 
-	ZEInt XCoordinate = floor(UVCoordinates.x());
-	ZEInt YCoordinate = floor(UVCoordinates.y());
+	ZEInt XCoordinate = ZEMath::Floor(UVCoordinates.x());
+	ZEInt YCoordinate = ZEMath::Floor(UVCoordinates.y());
 
 	QPixmap ImagePixmap = ((QGraphicsPixmapItem*)(items().at(0)))->pixmap();
 	QImage Image;

@@ -42,30 +42,12 @@ float ZEMath::Sqrt(float Value)
 	return sqrtf(Value);
 }
 
-ZEInt ZEMath::Abs(ZEInt Value)
-{
-	if (Value < 0)
-		return -Value;
-	else
-		return Value;
-}
-
 float ZEMath::Abs(float Value)
 {
 	if (Value < 0.0f)
 		return -Value;
 	else
 		return Value;
-}
-
-ZEInt ZEMath::Sign(ZEInt Value)
-{
-	if (Value == 0)
-		return 0;
-	else if (Value < 0)
-		return -1;
-	else
-		return 1;
 }
 
 float ZEMath::Mod(float Value, float Modulus)
@@ -91,16 +73,6 @@ float ZEMath::Min(float A, float B)
 float ZEMath::Max(float A, float B)
 {
 	return (A > B ? A : B);
-}
-
-ZEInt ZEMath::Max(ZEInt A, ZEInt B)
-{
-	return (A > B ? A : B);
-}
-
-ZEInt ZEMath::Min(ZEInt A, ZEInt B)
-{
-	return (A < B ? A : B);
 }
 
 float ZEMath::Log(float Value)

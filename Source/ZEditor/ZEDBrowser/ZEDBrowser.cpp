@@ -84,7 +84,7 @@ void ZEDBrowser::GenerateBrowserItems(ZEDDirectoryTreeWidgetItem* Current)
 	ZEInt ExpansionRow = 0;
 	ZEInt ExpansionColumn = 0;
 
-	ZEInt RowItemCapacity = floor((float)AssertBrowserUI->BrowserScrollArea->width() / 256.0f);
+	ZEInt RowItemCapacity = ZEMath::Floor((float)AssertBrowserUI->BrowserScrollArea->width() / 256.0f);
 	ZEInt SpacePixexls = 6 * RowItemCapacity;
 
 	if(SpacePixexls + 256 * RowItemCapacity > AssertBrowserUI->BrowserScrollArea->width())

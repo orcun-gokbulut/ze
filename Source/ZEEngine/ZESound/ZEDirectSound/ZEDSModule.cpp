@@ -280,7 +280,7 @@ void ZEDSModule::SetMasterVolume(ZEUInt Volume)
 		MasterVolume = Volume;
 	
 	//DSPrimary->SetVolume(((MasterVolume - ZE_SS_VOLUME_MIN) * (DSBVOLUME_MAX - DSBVOLUME_MIN)) / (ZE_SS_VOLUME_MAX - ZE_SS_VOLUME_MIN) + DSBVOLUME_MIN);
-	DSPrimary->SetVolume((LONG)(log10f((float)MasterVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f));
+	DSPrimary->SetVolume((LONG)(ZEMath::Log10((float)MasterVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f));
 }
 
 ZEUInt ZEDSModule::GetMasterVolume()

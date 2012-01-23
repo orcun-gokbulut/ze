@@ -135,8 +135,8 @@ ZEArray<ZELineSegment> ZEViewFrustum::GetFrustumLineSegments()
 	ZEVector3 NearPlaneCenter = Position + (Look * NearZ);
 	ZEVector3 FarPlaneCenter = Position + (Look * FarZ);
 
-	float NearPlaneHeight = NearZ * tan(Fov_2);
-	float FarPlaneHeight = FarZ * tan(Fov_2);
+	float NearPlaneHeight = NearZ * ZEAngle::Tan(Fov_2);
+	float FarPlaneHeight = FarZ * ZEAngle::Tan(Fov_2);
 
 	float NearPlaneWidth = NearPlaneHeight * AspectRatio;
 	float FarPlaneWidth = FarPlaneHeight * AspectRatio;
