@@ -33,16 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QPen>
-#include <QDebug>
-#include <QGraphicsPolygonItem>
-#include <QCursor>
 #include "ZEMath/ZEAngle.h"
-
 #include "ZEDIOPortConnection.h"
 #include "ZEDNodeIOPort.h"
 #include "ZEDNodeEditorNode.h"
 #include "ZEDDefinitions.h"
+#include "ZEMath/ZEMath.h"
+
+#include <QPen>
+#include <QDebug>
+#include <QGraphicsPolygonItem>
+#include <QCursor>
 
 #define ARROW_DIMENSION 12.0f
 #define PI 3.14159265358979323846f
@@ -78,18 +79,18 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 		}
 
 		///////////////////////////////Drawing the bounding polygon///////////////////////////////
-		if ((ConnectionPointToX - ARROW_DIMENSION) - (ConnectionPointFromX + ARROW_DIMENSION) >= 0 && fabs(ConnectionPointFromX - From->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD  && fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+		if ((ConnectionPointToX - ARROW_DIMENSION) - (ConnectionPointFromX + ARROW_DIMENSION) >= 0 && ZEMath::Abs(ConnectionPointFromX - (float)(From->sceneBoundingRect().bottomRight().x())) < ZE_ZERO_THRESHOLD  && ZEMath::Abs(ConnectionPointToX - (float)(To->sceneBoundingRect().topLeft().x())) < ZE_ZERO_THRESHOLD)
 		{
-			float Angle = atan((ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX - 2 * ARROW_DIMENSION)) * 180 / PI;
+			float Angle = ZEAngle::ArcTan((ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX - 2 * ARROW_DIMENSION)) * 180 / PI;
 			float M = (ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX - 2 * ARROW_DIMENSION);
 			float DistanceX = (ConnectionPointToX - ARROW_DIMENSION) - (ConnectionPointFromX + ARROW_DIMENSION);
 			float DistanceY = (ConnectionPointToY - ARROW_DIMENSION) - (ConnectionPointFromY - ARROW_DIMENSION) ;
 
-			if(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
+			if(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
 			{
 				TempPolygon.append(QPointF(0, 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
 				TempPolygon.append(QPointF(0 , ARROW_DIMENSION / 2));
 				ConnectionBodyBoundingRect->setPolygon(TempPolygon);
 				ConnectionBodyBoundingRect->rotate(Angle - OldAngle);
@@ -107,18 +108,18 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 			}
 
 		}
-		else if((ConnectionPointFromX - ARROW_DIMENSION) >= (ConnectionPointToX + ARROW_DIMENSION) && fabs(ConnectionPointFromX - From->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD && fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+		else if((ConnectionPointFromX - ARROW_DIMENSION) >= (ConnectionPointToX + ARROW_DIMENSION) && ZEMath::Abs(ConnectionPointFromX - (float)(From->sceneBoundingRect().topLeft().x())) < ZE_ZERO_THRESHOLD && ZEMath::Abs(ConnectionPointToX - (float)(To->sceneBoundingRect().bottomRight().x())) < ZE_ZERO_THRESHOLD)
 		{
-			float Angle = atan((ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX + 2 * ARROW_DIMENSION)) * 180 / PI;
+			float Angle = ZEAngle::ArcTan((ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX + 2 * ARROW_DIMENSION)) * 180 / PI;
 			float M = (ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX + 2 * ARROW_DIMENSION);
 			float DistanceX =  (ConnectionPointFromX - ARROW_DIMENSION) - (ConnectionPointToX + ARROW_DIMENSION);
 			float DistanceY = (ConnectionPointToY - ARROW_DIMENSION) - (ConnectionPointFromY - ARROW_DIMENSION) ;
 
-			if(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
+			if(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
 			{
 				TempPolygon.append(QPointF(0, 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
 				TempPolygon.append(QPointF(0 , ARROW_DIMENSION / 2));
 				ConnectionBodyBoundingRect->setPolygon(TempPolygon);
 				ConnectionBodyBoundingRect->rotate(Angle - OldAngle);
@@ -135,18 +136,18 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 				OldAngle = Angle;	
 			}
 		}
-		else if (fabs(ConnectionPointFromX - From->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD && fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+		else if (ZEMath::Abs(ConnectionPointFromX - From->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD && ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 		{
-			float Angle = - atan((ConnectionPointToY - ConnectionPointFromY) / ( ConnectionPointFromX - ConnectionPointToX + 2 * ARROW_DIMENSION)) * 180 / PI;
+			float Angle = - ZEAngle::ArcTan((ConnectionPointToY - ConnectionPointFromY) / ( ConnectionPointFromX - ConnectionPointToX + 2 * ARROW_DIMENSION)) * 180 / PI;
 			float M = (ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX + 2 * ARROW_DIMENSION);
 			float DistanceX = (ConnectionPointFromX - ARROW_DIMENSION) - (ConnectionPointToX + ARROW_DIMENSION);
 			float DistanceY = (ConnectionPointToY - ARROW_DIMENSION) - (ConnectionPointFromY - ARROW_DIMENSION) ;
 
-			if(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
+			if(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
 			{
 				TempPolygon.append(QPointF(0, 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
 				TempPolygon.append(QPointF(0 , ARROW_DIMENSION / 2));
 				ConnectionBodyBoundingRect->setPolygon(TempPolygon);
 				ConnectionBodyBoundingRect->rotate((Angle - OldAngle));
@@ -161,18 +162,18 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 			}
 		}
 
-		else if (fabs(ConnectionPointFromX - From->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD && fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+		else if (ZEMath::Abs(ConnectionPointFromX - From->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD && ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 		{
-			float Angle =  -atan((ConnectionPointToY - ConnectionPointFromY) / ( ConnectionPointFromX - ConnectionPointToX - 2 * ARROW_DIMENSION)) * 180 / PI;
+			float Angle =  -ZEAngle::ArcTan((ConnectionPointToY - ConnectionPointFromY) / ( ConnectionPointFromX - ConnectionPointToX - 2 * ARROW_DIMENSION)) * 180 / PI;
 			float M = (ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX - 2 * ARROW_DIMENSION);
 			float DistanceX = (ConnectionPointFromX - ARROW_DIMENSION) - (ConnectionPointToX + ARROW_DIMENSION);
 			float DistanceY = (ConnectionPointToY - ARROW_DIMENSION) - (ConnectionPointFromY - ARROW_DIMENSION) ;
 
-			if(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
+			if(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
 			{
 				TempPolygon.append(QPointF(0, 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
 				TempPolygon.append(QPointF(0 , ARROW_DIMENSION / 2));
 				ConnectionBodyBoundingRect->setPolygon(TempPolygon);
 				ConnectionBodyBoundingRect->rotate((Angle - OldAngle));
@@ -185,18 +186,18 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 				OldAngle = Angle;
 			}
 		}
-		else if (ConnectionPointFromX > ConnectionPointToX && fabs(ConnectionPointFromX - From->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD && fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+		else if (ConnectionPointFromX > ConnectionPointToX && ZEMath::Abs(ConnectionPointFromX - From->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD && ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 		{
-			float Angle = atan((ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX )) * 180 / PI;
+			float Angle = ZEAngle::ArcTan((ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX )) * 180 / PI;
 			float M = (ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX );
 			float DistanceX =  (ConnectionPointFromX - ARROW_DIMENSION) - (ConnectionPointToX + ARROW_DIMENSION);
 			float DistanceY = (ConnectionPointToY - ARROW_DIMENSION) - (ConnectionPointFromY - ARROW_DIMENSION) ;
 
-			if(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
+			if(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
 			{
 				TempPolygon.append(QPointF(0, 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
 				TempPolygon.append(QPointF(0 , ARROW_DIMENSION / 2));
 				ConnectionBodyBoundingRect->setPolygon(TempPolygon);
 				ConnectionBodyBoundingRect->rotate(Angle - OldAngle);
@@ -210,18 +211,18 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 				OldAngle = Angle;
 			}
 		}
-		else if (ConnectionPointFromX < ConnectionPointToX && fabs(ConnectionPointFromX - From->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD && fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+		else if (ConnectionPointFromX < ConnectionPointToX && ZEMath::Abs(ConnectionPointFromX - From->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD && ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 		{
-			float Angle = atan((ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX )) * 180 / PI;
+			float Angle = ZEAngle::ArcTan((ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX )) * 180 / PI;
 			float M = (ConnectionPointToY - ConnectionPointFromY) / (ConnectionPointToX - ConnectionPointFromX );
 			float DistanceX =  (ConnectionPointFromX - ARROW_DIMENSION) - (ConnectionPointToX + ARROW_DIMENSION);
 			float DistanceY = (ConnectionPointToY - ARROW_DIMENSION) - (ConnectionPointFromY - ARROW_DIMENSION) ;
 
-			if(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
+			if(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) > 0)
 			{
 				TempPolygon.append(QPointF(0, 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
-				TempPolygon.append(QPointF(sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY) , 0));
+				TempPolygon.append(QPointF(ZEMath::Sqrt(DistanceX * DistanceX + DistanceY * DistanceY), ARROW_DIMENSION / 2));
 				TempPolygon.append(QPointF(0 , ARROW_DIMENSION / 2));
 				ConnectionBodyBoundingRect->setPolygon(TempPolygon);
 				ConnectionBodyBoundingRect->rotate(Angle - OldAngle);
@@ -239,7 +240,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 
 		if (IsDirected == true)
 		{
-			if (fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+			if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(0, 0));
 				TempPolygon.append(QPointF(0, ARROW_DIMENSION));
@@ -248,7 +249,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 				ConnectionToBoundingRect->setPolygon(TempPolygon);	
 				ConnectionToBoundingRect->setPos(ConnectionPointToX, (To->sceneBoundingRect().height() - ARROW_DIMENSION) / 2 + To->sceneBoundingRect().topLeft().y());
 			}
-			else if (fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+			else if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(0, 0));
 				TempPolygon.append(QPointF(0, ARROW_DIMENSION));
@@ -260,7 +261,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 		}
 		else if (IsDirected == false)
 		{
-			if (fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+			if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(0, 0));
 				TempPolygon.append(QPointF(0, ARROW_DIMENSION / 2));
@@ -269,7 +270,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 				ConnectionToBoundingRect->setPolygon(TempPolygon);	
 				ConnectionToBoundingRect->setPos(ConnectionPointToX, (To->sceneBoundingRect().height() - ARROW_DIMENSION / 2) / 2 + To->sceneBoundingRect().topLeft().y());
 			}
-			else if (fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+			else if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(0, 0));
 				TempPolygon.append(QPointF(0, ARROW_DIMENSION / 2));
@@ -281,7 +282,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 		}
 
 		TempPolygon.clear();
-		if (fabs(ConnectionPointFromX - From->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+		if (ZEMath::Abs(ConnectionPointFromX - From->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 		{
 			TempPolygon.append(QPointF(0, 0));
 			TempPolygon.append(QPointF(0, ARROW_DIMENSION / 2));
@@ -290,7 +291,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 			ConnectionFromBoundingRect->setPolygon(TempPolygon);	
 			ConnectionFromBoundingRect->setPos(ConnectionPointFromX, (From->sceneBoundingRect().height() - ARROW_DIMENSION / 2) / 2 + From->sceneBoundingRect().topLeft().y());
 		}
-		else if (fabs(ConnectionPointFromX - From->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+		else if (ZEMath::Abs(ConnectionPointFromX - From->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 		{
 			TempPolygon.append(QPointF(0, 0));
 			TempPolygon.append(QPointF(0, ARROW_DIMENSION / 2));
@@ -393,7 +394,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 
 		if (ConnectionPointFromY - ARROW_DIMENSION * 2 <= ConnectionPointToY)
 		{
-			if (fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+			if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointFromX - ARROW_DIMENSION / 4, ConnectionPointFromY));
 				TempPolygon.append(QPointF(ConnectionPointFromX - ARROW_DIMENSION / 4, ConnectionPointFromY - ARROW_DIMENSION * 2 + ARROW_DIMENSION / 4));
@@ -407,7 +408,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 				TempPolygon.append(QPointF(ConnectionPointFromX + ARROW_DIMENSION / 4, ConnectionPointFromY));
 				TempPolygon.append(QPointF(ConnectionPointFromX - ARROW_DIMENSION / 4, ConnectionPointFromY));
 			}
-			else if (fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+			else if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointFromX + ARROW_DIMENSION / 4, ConnectionPointFromY));
 				TempPolygon.append(QPointF(ConnectionPointFromX + ARROW_DIMENSION / 4, ConnectionPointFromY - ARROW_DIMENSION * 2 + ARROW_DIMENSION / 4));
@@ -424,7 +425,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 		}
 		else if (ConnectionPointFromY - ARROW_DIMENSION * 2 > ConnectionPointToY)
 		{
-			if (fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+			if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointFromX - ARROW_DIMENSION / 4, ConnectionPointFromY));
 				TempPolygon.append(QPointF(ConnectionPointFromX - ARROW_DIMENSION / 4, ConnectionPointToY + ARROW_DIMENSION / 4));
@@ -433,7 +434,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 				TempPolygon.append(QPointF(ConnectionPointFromX + ARROW_DIMENSION / 4, ConnectionPointToY - ARROW_DIMENSION / 4));
 				TempPolygon.append(QPointF(ConnectionPointFromX + ARROW_DIMENSION / 4, ConnectionPointFromY));
 			}
-			else if (fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+			else if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointFromX - ARROW_DIMENSION / 4, ConnectionPointFromY));
 				TempPolygon.append(QPointF(ConnectionPointFromX - ARROW_DIMENSION / 4, ConnectionPointToY - ARROW_DIMENSION / 4));
@@ -451,7 +452,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 
 		if (IsDirected == true)
 		{
-			if (fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+			if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointToX, ConnectionPointToY - ARROW_DIMENSION / 2));
 				TempPolygon.append(QPointF(ConnectionPointToX, ConnectionPointToY + ARROW_DIMENSION / 2));
@@ -459,7 +460,7 @@ void ZEDIOPortConnection::UpdateBoundingRect()
 				TempPolygon.append(QPointF(ConnectionPointToX - ARROW_DIMENSION , ConnectionPointToY - ARROW_DIMENSION / 2));
 				ConnectionToBoundingRect->setPolygon(TempPolygon);	
 			}
-			else if (fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+			else if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointToX, ConnectionPointToY - ARROW_DIMENSION / 2));
 				TempPolygon.append(QPointF(ConnectionPointToX, ConnectionPointToY + ARROW_DIMENSION / 2));
@@ -496,9 +497,9 @@ void ZEDIOPortConnection::Update()
 
 		///////////////////////////////////////////Drawing the line ////////////////////////////////////////////////
 
-		if (fabs(ConnectionPointFromX - From->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+		if (ZEMath::Abs(ConnectionPointFromX - From->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 		{
-			if (fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+			if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointFromX , ConnectionPointFromY));
 				TempPolygon.append(QPointF(ConnectionPointFromX + ARROW_DIMENSION , ConnectionPointFromY));
@@ -509,7 +510,7 @@ void ZEDIOPortConnection::Update()
 				TempPolygon.append(QPointF(ConnectionPointFromX , ConnectionPointFromY));
 				setPolygon(TempPolygon);
 			}
-			else if (fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+			else if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointFromX , ConnectionPointFromY));
 				TempPolygon.append(QPointF(ConnectionPointFromX + ARROW_DIMENSION , ConnectionPointFromY));
@@ -523,9 +524,9 @@ void ZEDIOPortConnection::Update()
 
 
 		}
-		else if (fabs(ConnectionPointFromX - From->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+		else if (ZEMath::Abs(ConnectionPointFromX - From->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 		{
-			if (fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+			if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointFromX , ConnectionPointFromY));
 				TempPolygon.append(QPointF(ConnectionPointFromX - ARROW_DIMENSION , ConnectionPointFromY));
@@ -536,7 +537,7 @@ void ZEDIOPortConnection::Update()
 				TempPolygon.append(QPointF(ConnectionPointFromX , ConnectionPointFromY));
 				setPolygon(TempPolygon);
 			}
-			else if (fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+			else if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointFromX , ConnectionPointFromY));
 				TempPolygon.append(QPointF(ConnectionPointFromX - ARROW_DIMENSION , ConnectionPointFromY));
@@ -559,14 +560,14 @@ void ZEDIOPortConnection::Update()
 
 		if (IsDirected == true)
 		{
-			if (fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+			if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(0, 0));
 				TempPolygon.append(QPointF((0 - ARROW_DIMENSION), - (0 - ARROW_DIMENSION / 2)));
 				TempPolygon.append(QPointF( (0 - ARROW_DIMENSION),- (0 + ARROW_DIMENSION / 2)));
 				TempPolygon.append(QPointF(0, 0));
 			}
-			else if (fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+			else if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(0, 0));
 				TempPolygon.append(QPointF((0 + ARROW_DIMENSION), - (0 + ARROW_DIMENSION / 2)));
@@ -650,7 +651,7 @@ void ZEDIOPortConnection::Update()
 
 		if (ConnectionPointFromY - ARROW_DIMENSION * 2 <= ConnectionPointToY)
 		{
-			if (fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+			if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointFromX, ConnectionPointFromY));
 				TempPolygon.append(QPointF(ConnectionPointFromX, ConnectionPointFromY - ARROW_DIMENSION * 2));
@@ -663,7 +664,7 @@ void ZEDIOPortConnection::Update()
 				TempPolygon.append(QPointF(ConnectionPointFromX , ConnectionPointFromY - ARROW_DIMENSION * 2));
 				TempPolygon.append(QPointF(ConnectionPointFromX, ConnectionPointFromY));
 			}
-			else if (fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+			else if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(ConnectionPointFromX, ConnectionPointFromY));
 				TempPolygon.append(QPointF(ConnectionPointFromX, ConnectionPointFromY - ARROW_DIMENSION * 2));
@@ -695,14 +696,14 @@ void ZEDIOPortConnection::Update()
 
 		if (IsDirected == true)
 		{
-			if (fabs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
+			if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().topLeft().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(0, 0));
 				TempPolygon.append(QPointF((0 - ARROW_DIMENSION), - (0 - ARROW_DIMENSION / 2)));
 				TempPolygon.append(QPointF( (0 - ARROW_DIMENSION),- (0 + ARROW_DIMENSION / 2)));
 				TempPolygon.append(QPointF(0, 0));
 			}
-			else if (fabs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
+			else if (ZEMath::Abs(ConnectionPointToX - To->sceneBoundingRect().bottomRight().x()) < ZE_ZERO_THRESHOLD)
 			{
 				TempPolygon.append(QPointF(0, 0));
 				TempPolygon.append(QPointF((0 + ARROW_DIMENSION), - (0 + ARROW_DIMENSION / 2)));
@@ -733,7 +734,7 @@ QGraphicsPolygonItem* ZEDIOPortConnection::GetDirectionArrow(QPointF MousePosPoi
 			TempPolygon.append(QPointF((0 + ARROW_DIMENSION), - (0 + ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF((0 + ARROW_DIMENSION),- (0 - ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF(0, 0));
-			Angle = atan((MousePosPoint.y() - ConnectionPointFromNodeY) / (MousePosPoint.x() - ConnectionPointFromNodeX)) * 180 / PI;
+			Angle = ZEAngle::ArcTan((MousePosPoint.y() - ConnectionPointFromNodeY) / (MousePosPoint.x() - ConnectionPointFromNodeX)) * 180 / PI;
 		}
 		else if (MousePosPoint.x() >= ConnectionPointFromNodeX)
 		{
@@ -741,7 +742,7 @@ QGraphicsPolygonItem* ZEDIOPortConnection::GetDirectionArrow(QPointF MousePosPoi
 			TempPolygon.append(QPointF((0 - ARROW_DIMENSION), - (0 - ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF((0 - ARROW_DIMENSION),- (0 + ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF(0, 0));
-			Angle = atan((MousePosPoint.y() - ConnectionPointFromNodeY) / (MousePosPoint.x() - ConnectionPointFromNodeX)) * 180 / PI;
+			Angle = ZEAngle::ArcTan((MousePosPoint.y() - ConnectionPointFromNodeY) / (MousePosPoint.x() - ConnectionPointFromNodeX)) * 180 / PI;
 		}
 
 
@@ -769,7 +770,7 @@ QGraphicsPolygonItem* ZEDIOPortConnection::GetDirectionArrow(QPointF MousePosPoi
 			TempPolygon.append(QPointF((0 - ARROW_DIMENSION), - (0 - ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF((0 - ARROW_DIMENSION),- (0 + ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF(0, 0));
-			Angle = atan((MousePosPoint.y() - ConnectionPointFromYLeft) / (MousePosPoint.x() - ConnectionPointFromXLeft)) * 180 / PI;
+			Angle = ZEAngle::ArcTan((MousePosPoint.y() - ConnectionPointFromYLeft) / (MousePosPoint.x() - ConnectionPointFromXLeft)) * 180 / PI;
 		}
 		else if (MousePosPoint.x() <  (ConnectionPointFromXLeft))
 		{
@@ -777,7 +778,7 @@ QGraphicsPolygonItem* ZEDIOPortConnection::GetDirectionArrow(QPointF MousePosPoi
 			TempPolygon.append(QPointF((0 + ARROW_DIMENSION), - (0 + ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF((0 + ARROW_DIMENSION),- (0 - ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF(0, 0));
-			Angle = atan((MousePosPoint.y() - ConnectionPointFromYLeft) / (MousePosPoint.x() - ConnectionPointFromXLeft)) * 180 / PI;
+			Angle = ZEAngle::ArcTan((MousePosPoint.y() - ConnectionPointFromYLeft) / (MousePosPoint.x() - ConnectionPointFromXLeft)) * 180 / PI;
 		}
 		else if (MousePosPoint.x() >=  (ConnectionPointFromXRight))
 		{
@@ -785,7 +786,7 @@ QGraphicsPolygonItem* ZEDIOPortConnection::GetDirectionArrow(QPointF MousePosPoi
 			TempPolygon.append(QPointF((0 - ARROW_DIMENSION), - (0 - ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF((0 - ARROW_DIMENSION),- (0 + ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF(0, 0));
-			Angle = atan((MousePosPoint.y() - ConnectionPointFromYRight) / (MousePosPoint.x() - ConnectionPointFromXRight)) * 180 / PI;
+			Angle = ZEAngle::ArcTan((MousePosPoint.y() - ConnectionPointFromYRight) / (MousePosPoint.x() - ConnectionPointFromXRight)) * 180 / PI;
 		}
 		else if (MousePosPoint.x() <  (ConnectionPointFromXRight))
 		{
@@ -793,7 +794,7 @@ QGraphicsPolygonItem* ZEDIOPortConnection::GetDirectionArrow(QPointF MousePosPoi
 			TempPolygon.append(QPointF((0 + ARROW_DIMENSION), - (0 + ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF((0 + ARROW_DIMENSION),- (0 - ARROW_DIMENSION / 2)));
 			TempPolygon.append(QPointF(0, 0));
-			Angle = atan((MousePosPoint.y() - ConnectionPointFromYRight) / (MousePosPoint.x() - ConnectionPointFromXRight)) * 180 / PI;
+			Angle = ZEAngle::ArcTan((MousePosPoint.y() - ConnectionPointFromYRight) / (MousePosPoint.x() - ConnectionPointFromXRight)) * 180 / PI;
 		}
 
 		ArrowPolygon->setBrush(Qt::black);

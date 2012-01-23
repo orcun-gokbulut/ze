@@ -728,7 +728,7 @@ bool ZEModelExporter::ProcessBone(IGameNode* Node)
 		return false;
 	}
 
-	if (fabs(BoneScale.x - 1.0f) > 0.001 || fabs(BoneScale.y - 1.0f) > 0.001 || fabs(BoneScale.z - 1.0f) > 0.001)
+	if (ZEMath::Abs(BoneScale.x - 1.0f) > 0.001 || ZEMath::Abs(BoneScale.y - 1.0f) > 0.001 || ZEMath::Abs(BoneScale.z - 1.0f) > 0.001)
 		zepdWarning("The bone has been scaled. It can cause problems.");
 
 	/*// Process Attributes

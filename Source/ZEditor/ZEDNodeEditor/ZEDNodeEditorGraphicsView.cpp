@@ -33,6 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDNodeEditorGraphicsView.h"
+#include "ZEDIOPortConnection.h"
+#include "ZEDNodeConnectionPoint.h"
+#include "ZEDNodeEditorNode.h"
+#include "ZEDNodeIOPort.h"
+#include "ZEDNodeEditorNodeScaleGizmo.h"
+#include "ZEDNodeEditorNodeScaleGizmoPoint.h"
+#include "ZEDNodeEditorUndoRedo.h"
+#include "ZEDDefinitions.h"
+#include "ZEMath/ZEAngle.h"
+#include "ZEMath/ZEMath.h"
+#include "ZEDNodeEditorMiniMap.h"
+#include "../ZEDUndoRedo/ZEDUndoRedoOperation.h"
+#include "../ZEDUndoRedo/ZEDUndoRedoManager.h"
+
 #include <QGraphicsView>
 #include <QMouseEvent>
 #include <QKeyEvent>
@@ -46,21 +61,6 @@
 #include <QPainter>
 #include <QMenu>
 #include <QAction>
-#include "ZEMath/ZEAngle.h"
-
-#include "ZEDNodeEditorGraphicsView.h"
-#include "ZEDIOPortConnection.h"
-#include "ZEDNodeConnectionPoint.h"
-#include "ZEDNodeEditorNode.h"
-#include "ZEDNodeIOPort.h"
-#include "ZEDNodeEditorNodeScaleGizmo.h"
-#include "ZEDNodeEditorNodeScaleGizmoPoint.h"
-#include "ZEDNodeEditorUndoRedo.h"
-#include "../ZEDUndoRedo/ZEDUndoRedoOperation.h"
-#include "../ZEDUndoRedo/ZEDUndoRedoManager.h"
-#include "ZEDDefinitions.h"
-
-#include "ZEDNodeEditorMiniMap.h"
 
 #define MAX_Z_VALUE 4000000
 
@@ -793,7 +793,7 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 
 		if (SelectedNodes.count() != 0 && !IsRubberBandSelectionOnGoing)
 		{
-			if ((fabs(SelectedNodes[0]->GetNodeOldPosition().x() - SelectedNodes[0]->scenePos().x()) > ZE_ZERO_THRESHOLD) || fabs(SelectedNodes[0]->GetNodeOldPosition().y() - SelectedNodes[0]->scenePos().y()) > ZE_ZERO_THRESHOLD)
+			if ((ZEMath::Abs(SelectedNodes[0]->GetNodeOldPosition().x() - SelectedNodes[0]->scenePos().x()) > ZE_ZERO_THRESHOLD) || ZEMath::Abs(SelectedNodes[0]->GetNodeOldPosition().y() - SelectedNodes[0]->scenePos().y()) > ZE_ZERO_THRESHOLD)
 			{
 				ZEDUndoRedoOperation* UndoRedoOperation = ZEDUndoRedoOperation::CreateInstance();
 				
@@ -815,7 +815,7 @@ void ZEDNodeEditorGraphicsView::mouseReleaseEvent(QMouseEvent *Event)
 		{
 			if (SelectedNodes.count() != 0)
 			{
-				if ((fabs(SelectedNodes[0]->GetNodeOldRectangle().width() - SelectedNodes[0]->sceneBoundingRect().width()) > ZE_ZERO_THRESHOLD) || fabs(SelectedNodes[0]->GetNodeOldRectangle().height() - SelectedNodes[0]->sceneBoundingRect().height()) > ZE_ZERO_THRESHOLD)
+				if ((ZEMath::Abs(SelectedNodes[0]->GetNodeOldRectangle().width() - SelectedNodes[0]->sceneBoundingRect().width()) > ZE_ZERO_THRESHOLD) || ZEMath::Abs(SelectedNodes[0]->GetNodeOldRectangle().height() - SelectedNodes[0]->sceneBoundingRect().height()) > ZE_ZERO_THRESHOLD)
 				{
 					SelectedNode->ScaleByGizmo();
 
@@ -1284,16 +1284,16 @@ void ZEDNodeEditorGraphicsView::wheelEvent(QWheelEvent *Event)
 {
 	bool DoScaling;
 	TempRect->setRect(sceneRect());
-	TempRect->scale(pow((double)2, Event->delta() / 120.0), pow((double)2, Event->delta() / 120.0));
+	TempRect->scale(ZEMath::Power((double)2, Event->delta() / 120.0), ZEMath::Power((double)2, Event->delta() / 120.0));
 
 	if (TempRect->transform().m11() > 4)
 	{
-		TempRect->scale(pow((double)2, Event->delta() / -120.0), pow((double)2, Event->delta() / -120.0));
+		TempRect->scale(ZEMath::Power((double)2, Event->delta() / -120.0), ZEMath::Power((double)2, Event->delta() / -120.0));
 		DoScaling = false;
 	}
 	else if (TempRect->transform().m11() < 0.10)
 	{
-		TempRect->scale(pow((double)2, Event->delta() / -120.0), pow((double)2, Event->delta() / -120.0));
+		TempRect->scale(ZEMath::Power((double)2, Event->delta() / -120.0), ZEMath::Power((double)2, Event->delta() / -120.0));
 		DoScaling = false;
 	}
 	else
@@ -1322,8 +1322,8 @@ void ZEDNodeEditorGraphicsView::wheelEvent(QWheelEvent *Event)
 
 	if (DoScaling)
 	{
-		scale(pow((double)2, Event->delta() / 120.0), pow((double)2, Event->delta() / 120.0));	
-		GridSpacing = GridSpacing / pow((double)2, Event->delta() / 120);
+		scale(ZEMath::Power((double)2, Event->delta() / 120.0), ZEMath::Power((double)2, Event->delta() / 120.0));	
+		GridSpacing = GridSpacing / ZEMath::Power((double)2, Event->delta() / 120);
 
 		for (ZEInt I = 0; I < Nodes.count(); I++)// resize all the gizmo points
 		{	

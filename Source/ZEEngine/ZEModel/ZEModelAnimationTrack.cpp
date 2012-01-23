@@ -268,7 +268,7 @@ void ZEModelAnimationTrack::AdvanceAnimation(float ElapsedTime)
 			{
 				// Recalculate current frame
 				CurrentFrame -= EndFrame;
-				CurrentFrame = StartFrame + fmod(CurrentFrame, (EndFrame - StartFrame));
+				CurrentFrame = StartFrame + ZEMath::Mod(CurrentFrame, (EndFrame - StartFrame));
 			}
 			else
 			{
@@ -286,9 +286,9 @@ void ZEModelAnimationTrack::AdvanceAnimation(float ElapsedTime)
 		float Interpolation = CurrentFrame - ZEMath::Floor(CurrentFrame);
 
 		// Find next frame id
-		ZEInt NextFrameId = (ZEInt)ceilf(CurrentFrame);
+		ZEInt NextFrameId = (ZEInt)ZEMath::Ceil(CurrentFrame);
 		if (NextFrameId >= Animation->Frames.GetCount())
-			NextFrameId = StartFrame + fmodf(CurrentFrame, EndFrame - StartFrame);
+			NextFrameId = StartFrame + ZEMath::Mod(CurrentFrame, EndFrame - StartFrame);
 
 		// Get frames
 		const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[(ZEInt)ZEMath::Floor(CurrentFrame)];

@@ -36,6 +36,7 @@
 #include "ZEDSSoundSource3D.h"
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
+#include "ZEMath/ZEMath.h"
 
 bool ZEDSSoundSource3D::CreateBuffer()
 {
@@ -115,7 +116,7 @@ void ZEDSSoundSource3D::ResetParameters()
 {
 	// Reset properties to apply sound buffer
 	float EffectiveVolume = (float)Volume * ((float)zeSound->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
-	DSBuffer->SetVolume((LONG)(log10f(EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f));
+	DSBuffer->SetVolume((LONG)(ZEMath::Log10(EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f));
 	DSBuffer->SetPan((((Pan + 100)*(DSBPAN_RIGHT - DSBPAN_LEFT))/200) + DSBPAN_LEFT);
 	DSBuffer->SetFrequency((LONG)(PlaybackSpeed * (float)SoundResource->GetSamplesPerSecond()));
 
@@ -140,7 +141,7 @@ void ZEDSSoundSource3D::ResetParameters()
 	Params.dwOutsideConeAngle = ConeOutsideAngle;
 	Params.flMinDistance = MinDistance;
 	Params.flMaxDistance = MaxDistance;
-	Params.lConeOutsideVolume = (LONG)(log10f(EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f);
+	Params.lConeOutsideVolume = (LONG)(ZEMath::Log10(EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f);
 
 	Params.dwMode = DS3DMODE_NORMAL ;
 	
@@ -341,7 +342,7 @@ void ZEDSSoundSource3D::SetVolume(ZEUInt NewVolume)
 	float EffectiveVolume = (float)Volume * ((float)zeSound->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
 	
 	if (DSBuffer != NULL)
-		DSBuffer->SetVolume((long)(log10f((float)EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f));
+		DSBuffer->SetVolume((long)(ZEMath::Log10((float)EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f));
 }
 
 void ZEDSSoundSource3D::SetLooping(bool Enabled)
@@ -576,7 +577,7 @@ void ZEDSSoundSource3D::SetConeOutsideVolume(ZEUInt NewOutsideVolume)
 	float EffectiveVolume = (float)ConeOutsideVolume * ((float)zeSound->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX);
 	
 	if (DSBuffer != NULL)
-		DS3DBuffer->SetConeOutsideVolume((DWORD)(log10f(EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f), DS3D_DEFERRED);
+		DS3DBuffer->SetConeOutsideVolume((DWORD)(ZEMath::Log10(EffectiveVolume / 100.0f * 99.0f + 1.0f) * 5000.0f - 10000.0f), DS3D_DEFERRED);
 }
 
 

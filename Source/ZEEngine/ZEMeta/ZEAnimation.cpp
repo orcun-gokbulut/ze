@@ -282,7 +282,7 @@ void ZEAnimationController::AdvanceAnimation(float TimeElapsed)
 		CurrentFrame += TimeElapsed * (Speed / Animation->FramePerSecond);
 		if (CurrentFrame > EndFrame)
 			if (Looping)
-				CurrentFrame = StartFrame + fmodf(CurrentFrame, EndFrame - StartFrame);
+				CurrentFrame = StartFrame + ZEMath::Mod(CurrentFrame, EndFrame - StartFrame);
 			else
 			{
 				// Initial values;

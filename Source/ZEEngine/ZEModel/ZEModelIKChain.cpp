@@ -36,6 +36,7 @@
 #include "ZEModelIKChain.h"
 #include "ZEModelBone.h"
 #include "ZEModel.h"
+#include "ZEMath\ZEAngle.h"
 
 const ZEString& ZEModelIKChain::GetName()
 {
@@ -141,7 +142,7 @@ void ZEModelIKChain::Iterate()
 			else if (Dot < -1.0)
 				Dot = -1.0f;
 		
-			float Angle = acosf(Dot);
+			float Angle = ZEAngle::ArcCos(Dot);
 			if (Angle != Angle)
 				return;
 

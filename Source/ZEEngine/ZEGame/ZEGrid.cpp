@@ -40,6 +40,7 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZEMath/ZEMath.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEGrid);
 
@@ -111,9 +112,9 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 	{
 		RenderCommand.Order = 0.0f;
 		ZEVector3 MinorGridPosition(
-			CameraPosition.x - fmod(CameraPosition.x, MajorGridUnitSize.x),
+			CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x),
 			0.0f,
-			CameraPosition.z - fmod(CameraPosition.z, MajorGridUnitSize.y));
+			CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
 
 		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, MinorGridPosition, GetRotation(), ZEVector3::One);
 		RenderCommand.VertexBuffer = &MinorGrid;
@@ -125,9 +126,9 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 	{
 		RenderCommand.Order = 1.0f;
 		ZEVector3 MajorGridPosition(
-			CameraPosition.x - fmod(CameraPosition.x, MajorGridUnitSize.x),
+			CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x),
 			0.0f,
-			CameraPosition.z - fmod(CameraPosition.z, MajorGridUnitSize.y));
+			CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
 
 		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, MajorGridPosition, GetRotation(), ZEVector3::One);
 		RenderCommand.VertexBuffer = &MajorGrid;
@@ -138,8 +139,8 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 	if (AxisEnabled)
 	{
 		RenderCommand.Order = 2.0f;
-		ZEVector3 AxisXGridPosition(CameraPosition.x - fmod(CameraPosition.x, MajorGridUnitSize.x), 0.0f, 0.0f);
-		ZEVector3 AxisYGridPosition(0.0f, 0.0f, CameraPosition.z - fmod(CameraPosition.z, MajorGridUnitSize.y));
+		ZEVector3 AxisXGridPosition(CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x), 0.0f, 0.0f);
+		ZEVector3 AxisYGridPosition(0.0f, 0.0f, CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
 
 		RenderCommand.PrimitiveCount = 1;
 
