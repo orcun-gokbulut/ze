@@ -33,6 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETypes.h"
 #include "ZEDDirectoryTreeWidget.h"
 
 ZEDDirectoryTreeWidgetItem::ZEDDirectoryTreeWidgetItem(QTreeWidgetItem* Parent, QStringList ColumnValues, QDir Directory) : QTreeWidgetItem(Parent, ColumnValues)

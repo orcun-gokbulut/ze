@@ -37,6 +37,7 @@
 #ifndef __ZED_GIZMO_H__
 #define __ZED_GIZMO_H__
 
+#include "ZETypes.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEGraphics\ZERenderCommand.h"
 #include "ZEGraphics\ZECanvas.h"
@@ -107,7 +108,7 @@ class ZEDGizmo : public ZEEntity
 		ZEVector3						ScaleProjection_(ZEDGizmoAxis Axis, const ZERay& Ray);
 
 	public:
-		virtual ZEUInt32					GetDrawFlags() const;
+		virtual ZEUInt32				GetDrawFlags() const;
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);

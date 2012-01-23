@@ -146,7 +146,7 @@ float ZEMath::Lerp(float A, float B, float Factor)
 
 float ZEMath::CopySign(float Value, float Sign)
 {
-	return _copysignf(Value, Sign);
+	return _copysign(Value, Sign);
 }
 
 float ZEMath::Clamp(float A, float MinValue, float MaxValue)

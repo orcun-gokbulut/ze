@@ -46,6 +46,7 @@
 #include "ZEDNodeEditorNode.h"
 #include "ZEDNodeIOPort.h"
 #include "ZEDNodeEditorMiniMap.h"
+#include "ZETypes.h"
 
 
 ZEDNodeEditor::ZEDNodeEditor(QWidget *parent, Qt::WFlags flags)

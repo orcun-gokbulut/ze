@@ -43,6 +43,7 @@
 #include <QMenu>
 #include <QAction>
 #include "..\src\gui\graphicsview\qgraphicsitem.h"
+#include "ZETypes.h"
 
 class ZEDNodeEditorNode;
 class ZEDIOPortConnection;
@@ -114,12 +115,12 @@ class ZEDNodeEditorGraphicsView : public QGraphicsView
 		bool												IsMouseMoving;
 		bool												IsRubberBandSelectionOnGoing;
 
-		ZEInt													PanStartX;
-		ZEInt													PanStartY;
-		ZEInt													NodeZValue;
-		ZEInt													LastSelectedConnectionIndex;
-		ZEInt													ConnectionLoopControlInteger;
-		ZEInt													GridSpacing;
+		ZEInt												PanStartX;
+		ZEInt												PanStartY;
+		ZEInt												NodeZValue;
+		ZEInt												LastSelectedConnectionIndex;
+		ZEInt												ConnectionLoopControlInteger;
+		ZEInt												GridSpacing;
 		
 		ZEDNodeEditorGraphicsViewRubberBandSelectionMode	RubberBandSelectionMode;		
 

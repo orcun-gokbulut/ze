@@ -59,6 +59,7 @@ Boston, MA 02110-1301, USA.
 #include <QFrame>
 #include <QPixmap>
 #include <QTextCursor>
+#include "ZETypes.h"
 
 class QTextEdit;
 class QHBoxLayout;

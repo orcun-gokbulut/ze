@@ -38,6 +38,7 @@
 #ifndef __ZED_PLUG_IN_H__
 #define __ZED_PLUG_IN_H__
 
+#include "ZETypes.h"
 #include "ZEDExtension.h"
 
 class ZEDPlugIn

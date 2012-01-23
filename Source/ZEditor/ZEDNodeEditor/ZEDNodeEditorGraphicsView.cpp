@@ -46,7 +46,7 @@
 #include <QPainter>
 #include <QMenu>
 #include <QAction>
-#include <math.h>
+#include "ZEMath/ZEAngle.h"
 
 #include "ZEDNodeEditorGraphicsView.h"
 #include "ZEDIOPortConnection.h"

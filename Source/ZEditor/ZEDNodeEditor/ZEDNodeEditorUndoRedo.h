@@ -41,6 +41,7 @@
 #include <QGraphicsScene>
 
 #include "../ZEDUndoRedo/ZEDUndoRedoOperation.h"
+#include "ZETypes.h"
 
 class ZEDIOPortConnectionPoint;
 class ZEDNodeConnectionPoint;
@@ -85,7 +86,7 @@ class ZEDNodeEditorDeleteNodeOperation : public ZEDUndoRedoOperation
 
 		ZEDNodeEditorGraphicsView*					ParentView;
 		QPointF										NodePos;
-		ZEInt											NodeZValue;
+		ZEInt										NodeZValue;
 		ZEDNodeEditorNode*		 					DeletedNode;
 
 	protected:
@@ -138,25 +139,25 @@ class ZEDNodeEditorDeleteConnectionOperation :  public ZEDUndoRedoOperation
 {
 	private:
 
-		ZEDNodeEditorGraphicsView*						ParentView;
-		ZEDIOPortConnection*							DeletedConnection;
-		QList<ZEDIOPortConnection*> 					DeletedConnectionsRedoList;
+		ZEDNodeEditorGraphicsView*					ParentView;
+		ZEDIOPortConnection*						DeletedConnection;
+		QList<ZEDIOPortConnection*> 				DeletedConnectionsRedoList;
 
 	protected:
 
-														ZEDNodeEditorDeleteConnectionOperation();
-		virtual											~ZEDNodeEditorDeleteConnectionOperation();
+													ZEDNodeEditorDeleteConnectionOperation();
+		virtual										~ZEDNodeEditorDeleteConnectionOperation();
 
 	public:
 
 		static ZEDNodeEditorDeleteConnectionOperation*	CreateInstance();
 		virtual void									Destroy();
 
-		void											SetDeletedConnection(ZEDIOPortConnection* Connection);
-		void											SetView(ZEDNodeEditorGraphicsView* View);
+		void										SetDeletedConnection(ZEDIOPortConnection* Connection);
+		void										SetView(ZEDNodeEditorGraphicsView* View);
 
-		virtual void 									Undo();
-		virtual void 									Redo();
+		virtual void 								Undo();
+		virtual void 								Redo();
 
 };
 class ZEDNodeEditorResizeNodeOperation : public ZEDUndoRedoOperation
@@ -189,8 +190,8 @@ class ZEDNodeEditorItemSelectionOperation : public ZEDUndoRedoOperation
 {
 private:
 
-	ZEDNodeEditorGraphicsView*					ParentView;
-	ZEDNodeEditorItem*							SelectedItem;
+	ZEDNodeEditorGraphicsView*						ParentView;
+	ZEDNodeEditorItem*								SelectedItem;
 
 protected:
 

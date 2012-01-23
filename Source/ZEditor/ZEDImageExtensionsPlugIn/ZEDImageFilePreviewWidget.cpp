@@ -42,7 +42,7 @@
 #include <QMouseEvent>
 #include <QWheelEvent>
 #include <QImage>
-#include <math.h>
+#include "ZEMath/ZEAngle.h"
 
 
 

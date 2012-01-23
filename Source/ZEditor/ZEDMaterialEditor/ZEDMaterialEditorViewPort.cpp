@@ -41,6 +41,7 @@
 #include <QResizeEvent>
 
 #include "ZEDMaterialEditor.h"
+#include "ZEMath/ZEAngle.h"
 
 using namespace Qt;
 

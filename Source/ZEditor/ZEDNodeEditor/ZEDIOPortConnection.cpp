@@ -37,7 +37,7 @@
 #include <QDebug>
 #include <QGraphicsPolygonItem>
 #include <QCursor>
-#include <math.h>
+#include "ZEMath/ZEAngle.h"
 
 #include "ZEDIOPortConnection.h"
 #include "ZEDNodeIOPort.h"

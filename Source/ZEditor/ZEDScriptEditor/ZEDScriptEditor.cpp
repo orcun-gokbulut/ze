@@ -41,6 +41,7 @@
 #include <QPainter>
 #include <QRect>
 #include <QPaintEngine>
+#include "ZETypes.h"
 
 /************************************************************************/
 /*                            LUA HighLighter                           */

@@ -37,7 +37,7 @@
 #include "ZEMath\ZEQuaternion.h"
 #include "ZEDUndoRedo\ZEDUndoRedo.h"
 #include "ZEDPropertyUndoRedo.h"
-#include <ZEMath/ZEMathDefinitions.h>
+#include "ZEMath/ZEAngle.h"
 
 ZEDRotationSpinBox3::ZEDRotationSpinBox3(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
 {
@@ -57,12 +57,12 @@ ZEDRotationSpinBox3::ZEDRotationSpinBox3(QTreeWidget* ParentTree, QTreeWidgetIte
 		return;
 	}
 
-	float x,y,z;
+	float x, y, z;
 	ZEQuaternion::ConvertToEulerAngles(x,y,z,Temp);
 
-	x = x*(180/ZE_PI);
-	y = y*(180/ZE_PI);
-	z = z*(180/ZE_PI);
+	x = x * (180.0f / ZE_PI);
+	y = y * (180.0f / ZE_PI);
+	z = z * (180.0f / ZE_PI);
 
 	this->XValue = new ZEDFloatIntLineEdit();
 	this->XValue->SetFloat(x);

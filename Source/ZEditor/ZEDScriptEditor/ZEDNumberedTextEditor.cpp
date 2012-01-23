@@ -61,6 +61,8 @@ Boston, MA 02110-1301, USA.
 #include <QAbstractTextDocumentLayout>
 #include <QToolTip>
 #include <QDebug>
+#include "ZETypes.h"
+#include "ZETypes.h"
 
 #include "ZEDNumberedTextEditor.h"
 
