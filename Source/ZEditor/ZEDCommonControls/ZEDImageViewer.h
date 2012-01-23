@@ -38,6 +38,7 @@
 #ifndef __H_ZED_IMAGE_VIEWER_H__
 #define __H_ZED_IMAGE_VIEWER_H__
 
+#include "ZETypes.h"
 #include <QGraphicsView>
 #include <QMainWindow>
 #include <QPoint>
@@ -57,7 +58,7 @@ class ZEDImageViewerViewPort : public QGraphicsView
 		QPoint						OldPos;
 		QGraphicsScene				ViewportScene;
 		ZEDImageViewer*				ParentViewer;
-		ZEInt							ZoomCount;
+		ZEInt						ZoomCount;
 
 		void						ResetZoom();
 

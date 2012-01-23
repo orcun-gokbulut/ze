@@ -37,7 +37,7 @@
 
 #include <FreeImage.h>
 #include <QMouseEvent>
-#include <math.h>
+#include "ZEMath/ZEAngle.h"
 
 void ZEDImageViewerViewPort::mousePressEvent(QMouseEvent* Event)
 {

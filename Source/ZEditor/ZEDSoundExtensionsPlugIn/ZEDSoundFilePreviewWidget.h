@@ -47,6 +47,7 @@
 #include <QList>
 #include <QAction>
 #include "ZEDCore/ZEDPreviewWidget.h"
+#include "ZETypes.h"
 
 using namespace Qt;
 

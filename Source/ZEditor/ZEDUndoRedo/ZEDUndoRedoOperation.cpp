@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDUndoRedoOperation.h"
+#include "ZETypes.h"
 
 ZEDUndoRedoOperation* ZEDUndoRedoOperation::CreateInstance()
 {

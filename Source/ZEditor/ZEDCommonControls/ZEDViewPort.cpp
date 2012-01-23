@@ -45,7 +45,7 @@
 #include "ZEMath\ZERay.h"
 #include "ZECore\ZEWindow.h"
 #include <float.h>
-#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
 
 using namespace Qt;
 

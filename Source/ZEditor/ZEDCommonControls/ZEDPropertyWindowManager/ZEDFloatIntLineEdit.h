@@ -44,6 +44,8 @@
 #include <QFrame>
 #include <QVBoxLayout>
 
+#include "ZETypes.h"
+
 enum FloatIntLineEditMode
 {
 	IntegerMode,

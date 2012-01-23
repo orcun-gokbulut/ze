@@ -64,6 +64,7 @@
 #include <ZEModel\ZEModel.h>
 #include <ZEGame\ZESkyBrush.h>
 #include "ZEDCommonControls\CSS.h"
+#include "ZEMath/ZEAngle.h"
 
 
 

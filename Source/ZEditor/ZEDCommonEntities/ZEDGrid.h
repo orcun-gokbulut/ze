@@ -37,7 +37,8 @@
 #ifndef __ZED_GRID_H__
 #define __ZED_GRID_H__
 
-#include <ZEGame/ZECanvasBrush.h>
+#include "ZETypes.h"
+#include "ZEGame/ZECanvasBrush.h"
 
 class ZEScene;
 
@@ -55,11 +56,11 @@ class ZEDGrid
 
 	public:
 
-		ZEInt							GetGridSpacing() const;
+		ZEInt						GetGridSpacing() const;
 		void						SetGridSpacing(ZEInt Spacing);
-		ZEInt							GetMajorLineSpacing() const;
+		ZEInt						GetMajorLineSpacing() const;
 		void						SetMajorLineSpacing(ZEInt MajorLineSpacing);
-		ZEInt							GetGridSize() const;
+		ZEInt						GetGridSize() const;
 		void						SetGridSize(ZEInt GridSize);
 		bool						GetVisible();
 		void						SetVisible(bool Visibility);

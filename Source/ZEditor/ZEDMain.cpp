@@ -39,6 +39,8 @@
 #include <windows.h>
 
 #include <QtGui/QApplication>
+
+#include "ZETypes.h"
 #include "ZEDSceneEditor/ZEDSceneEditor.h"
 #include "ZEDMaterialEditor/ZEDMaterialEditor.h"
 #include "ZEDBrowser/ZEDBrowser.h"

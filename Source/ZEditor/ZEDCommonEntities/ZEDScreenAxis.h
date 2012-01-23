@@ -52,7 +52,6 @@ class ZEDScreenAxisHelper : public ZEDGizmo
 		virtual void		Tick(float Time);
 
 	public:
-
 							ZEDScreenAxisHelper(ZEPlayer* BoundedPlayer);
 };
 

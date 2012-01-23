@@ -45,6 +45,7 @@
 #include <QFocusEvent>
 #include <QTimer>
 
+#include "ZETypes.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEGame\ZEScene.h"
 #include "ZEGame\ZEPlayer.h"
@@ -61,10 +62,10 @@ class ZEDViewPort : public QFrame
 
 	private:
 
-		ZEInt							StepSize;
+		ZEInt						StepSize;
 
-		ZEInt							OldMousePositionX;
-		ZEInt							OldMousePositionY;
+		ZEInt						OldMousePositionX;
+		ZEInt						OldMousePositionY;
 
 		bool						SendInputs;
 		bool						AltPressed;
@@ -75,7 +76,7 @@ class ZEDViewPort : public QFrame
 		ZEPlayer*					Player;
 		ZEDGizmoAxis				SelectedAxis;
 		QTimer						MovementTimer;
-		ZEInt							PressedKey;
+		ZEInt						PressedKey;
 		float						Yawn, Pitch, Roll;
 		ZEVector3					MoveDifferance;
 		bool						UndoRedoStarted;

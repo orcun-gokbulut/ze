@@ -38,6 +38,7 @@
 #define _H_ZED_UNDO_REDO_MANAGER_H_
 
 #include <QObject>
+#include "ZETypes.h"
 
 class ZEDUndoRedoOperation;
 
