@@ -40,6 +40,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZESceneDebugDraw.h"
 #include "ZESceneCuller.h"
+#include "ZETypes.h"
 
 class ZEViewVolume;
 class ZEBoundingBox;
@@ -68,7 +69,7 @@ class ZEScene
 	private:
 		bool									Initialized;
 
-		ZEUInt							LastEntityId;
+		ZEUInt									LastEntityId;
 
 		ZESceneCuller							Culler;
 
@@ -87,7 +88,7 @@ class ZEScene
 		void									RemoveEntity(ZEEntity* Entity);
 
 		const ZESmartArray<ZEEntity*>&			GetEntities();
-		//ZEArray<ZEEntity*>						GetEntities(const char* ClassName);
+		//ZEArray<ZEEntity*>					GetEntities(const char* ClassName);
 		ZEArray<ZEEntity*>						GetEntities(ZEObjectDescription* Desc);
 
 		void									ClearEntities();
