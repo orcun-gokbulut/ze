@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QDebug>
-#include <QtAlgorithms>
+#include <QtCore/QDebug>
+#include <QtCore/QtAlgorithms>
 
 #include "ZEDNodeEditorUndoRedo.h"
 #include "../ZEDUndoRedo/ZEDUndoRedoOperation.h"

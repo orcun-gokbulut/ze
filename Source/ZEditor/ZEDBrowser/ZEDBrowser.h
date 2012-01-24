@@ -38,10 +38,10 @@
 #ifndef __ZED_BROWSER_H__
 #define __ZED_BROWSER_H__
 
-#include <QDir>
-#include <QGridLayout>
-#include <QList>
-#include <QMainWindow>
+#include <QtCore/QDir>
+#include <QtGui/QGridLayout>
+#include <QtCore/QList>
+#include <QtGui/QMainWindow>
 
 #include "ZEDDirectoryTreeWidget.h"
 

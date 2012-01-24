@@ -37,9 +37,9 @@
 #ifndef __ZED_SCENE_LIST_H__
 #define __ZED_SCENE_LIST_H__
 
-#include <QDockWidget>
-#include <QTreeWidget>
-#include <QVBoxLayout>
+#include <QtGui/QDockWidget>
+#include <QtGui/QTreeWidget>
+#include <QtGui/QVBoxLayout>
 #include "ZEGame\ZEScene.h"
 #include "ZEGame/ZEEntity.h"
 

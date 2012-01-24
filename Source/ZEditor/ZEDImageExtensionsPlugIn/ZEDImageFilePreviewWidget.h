@@ -38,10 +38,10 @@
 #ifndef __ZED_IMAGE_FILE_PREVIEW_WIDGET_H__
 #define __ZED_IMAGE_FILE_PREVIEW_WIDGET_H__
 
-#include <QVBoxLayout>
-#include <QHBoxLayout>
-#include <QPushButton>
-#include <QList>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QPushButton>
+#include <QtCore/QList>
 
 #include "ZEDCore/ZEDPreviewWidget.h"
 #include "ZEDCommonControls/ZEDImageViewer.h"

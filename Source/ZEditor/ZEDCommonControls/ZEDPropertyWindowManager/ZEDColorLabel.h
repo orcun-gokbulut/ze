@@ -38,11 +38,11 @@
 #ifndef __ZED_COLOR_LABEL_H__
 #define __ZED_COLOR_LABEL_H__
 
-#include <QColor>
-#include <QLabel>
-#include <QWidget>
-#include <QTreeWidgetItem>
-#include <QMouseEvent>
+#include <QtGui/QColor>
+#include <QtGui/QLabel>
+#include <QtGui/QWidget>
+#include <QtGui/QTreeWidgetItem>
+#include <QtGui/QMouseEvent>
 
 class ZEDColorPickerRGB;
 class ZEDColorPickerRGBA;

@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QScrollBar>
+#include <QtGui/QScrollBar>
 #include "ZEDConsoleInterface.h"
 #include <ZESDK.h>
 

@@ -37,7 +37,7 @@
 #define ZEDMATERIALEDITOR_H
 
 #include <QtGui/QMainWindow>
-#include <QTimer>
+#include <QtCore/QTimer>
 #include "ZEDMaterialEditorViewPort.h"
 
 class ZEDPropertyWindowManager;

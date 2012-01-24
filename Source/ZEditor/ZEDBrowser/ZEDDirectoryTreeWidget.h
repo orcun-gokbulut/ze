@@ -36,8 +36,8 @@
 #ifndef __ZED_DIRECTORY_TREE_WIDGET_H__
 #define __ZED_DIRECTORY_TREE_WIDGET_H__
 
-#include <QTreeWidget>
-#include <QDir>
+#include <QtGui/QTreeWidget>
+#include <QtCore/QDir>
 
 using namespace Qt;
 class ZEDDirectoryTreeWidget;

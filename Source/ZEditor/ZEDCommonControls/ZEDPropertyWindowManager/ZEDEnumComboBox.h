@@ -38,11 +38,11 @@
 #ifndef __ZED_ENUMCOMBOBOX_H__
 #define __ZED_ENUMCOMBOBOX_H__
 
-#include <QComboBox>
-#include <QObject>
-#include <QTreeWidgetItem>
-#include <QMouseEvent>
-#include <QFocusEvent>
+#include <QtGui/QComboBox>
+#include <QtCore/QObject>
+#include <QtGui/QTreeWidgetItem>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QFocusEvent>
 #include "ZEDPropertyWidget.h"
 #include "ZEDS\ZEVariant.h"
 #include "ZEMeta\ZEObject.h"

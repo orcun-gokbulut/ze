@@ -38,11 +38,11 @@
 #ifndef __ZED_COLOR_PICKER_RGBA_H__
 #define __ZED_COLOR_PICKER_RGBA_H__
 
-#include <QWidget>
-#include <QHBoxLayout>
-#include <QColor>
-#include <QColorDialog>
-#include <QTreeWidget>
+#include <QtGui/QWidget>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QColor>
+#include <QtGui/QColorDialog>
+#include <QtGui/QTreeWidget>
 #include "ZEDPropertyWidget.h"
 #include "ZEMeta\ZEObject.h"
 #include "ZEDS\ZEVariant.h"

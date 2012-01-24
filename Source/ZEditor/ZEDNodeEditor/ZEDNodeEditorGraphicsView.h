@@ -37,12 +37,12 @@
 #ifndef _H_ZED_NODE_EDITOR_GRAPHICS_VIEW_H_
 #define _H_ZED_NODE_EDITOR_GRAPHICS_VIEW_H_
 
-#include <QGraphicsView>
-#include <QPixmap>
-#include <QPainter>
-#include <QMenu>
-#include <QAction>
-#include "..\src\gui\graphicsview\qgraphicsitem.h"
+#include <QtGui/QGraphicsView>
+#include <QtGui/QPixmap>
+#include <QtGui/QPainter>
+#include <QtGui/QMenu>
+#include <QtGui/QAction>
+#include <QtGui/qgraphicsitem.h>
 #include "ZETypes.h"
 
 class ZEDNodeEditorNode;

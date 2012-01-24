@@ -40,8 +40,8 @@
 
 #include "ZEDExtension.h"
 #include "ZEDPreviewWidget.h"
-#include <QWidget>
-#include <QList>
+#include <QtGui/QWidget>
+#include <QtCore/QList>
 #include <ZEGame/ZEEntity.h>
 
 /*

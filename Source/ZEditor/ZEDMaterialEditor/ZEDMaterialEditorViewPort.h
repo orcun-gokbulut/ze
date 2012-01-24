@@ -37,12 +37,12 @@
 #ifndef __ZED_MATERIAL_EDITOR_VIEWPORT_H__
 #define __ZED_MATERIAL_EDITOR_VIEWPORT_H__
 
-#include <QFrame>
+#include <QtGui/QFrame>
 #include <ZEGame/ZEPlayer.h>
 #include <ZEGame/ZEGrid.h>
 #include <ZEModel/ZEModel.h>
 #include <ZEGraphics/ZEDirectionalLight.h>
-#include <QPoint>
+#include <QtCore/QPoint>
 
 class ZEDMaterialEditor;
 

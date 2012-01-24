@@ -38,9 +38,9 @@
 #ifndef __ZED_SPIN_BOX_1_FLOAT_H__
 #define __ZED_SPIN_BOX_1_FLOAT_H__
 
-#include <QObject>
-#include <QDoubleSpinBox>
-#include <QTreeWidgetItem>
+#include <QtCore/QObject>
+#include <QtGui/QDoubleSpinBox>
+#include <QtGui/QTreeWidgetItem>
 #include "ZEDPropertyWidget.h"
 #include "ZEDS\ZEVariant.h"
 #include "ZEMeta\ZEObject.h"

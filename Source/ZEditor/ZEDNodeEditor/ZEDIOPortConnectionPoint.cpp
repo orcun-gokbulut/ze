@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QPen>
-#include <QBrush>
+#include <QtGui/QPen>
+#include <QtGui/QBrush>
 #include "ZEDIOPortConnectionPoint.h"
 #include "ZEDNodeIOPort.h"
 

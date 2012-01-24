@@ -36,7 +36,7 @@
 #include "ZEDImageViewer.h"
 
 #include <FreeImage.h>
-#include <QMouseEvent>
+#include <QtGui/QMouseEvent>
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
 

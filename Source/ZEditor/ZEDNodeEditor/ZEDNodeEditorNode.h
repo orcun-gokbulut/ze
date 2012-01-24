@@ -37,8 +37,8 @@
 #ifndef _H_ZED_NODE_EDITOR_NODE_H_
 #define _H_ZED_NODE_EDITOR_NODE_H_
 
-#include <QGraphicsPolygonItem>
-#include <QAction>
+#include <QtGui/QGraphicsPolygonItem>
+#include <QtGui/QAction>
 #include "ZEDNodeEditorItem.h"
 
 class ZEDNodeEditorGraphicsView;

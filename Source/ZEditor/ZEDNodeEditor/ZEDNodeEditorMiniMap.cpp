@@ -33,20 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QGraphicsItem>
-#include <QWidget>
-#include <QPolygonF>
-#include <QPen>
-#include <QMouseEvent>
-#include <QPainter>
-#include <QPixmap>
-#include <QPointF>
-#include <QCursor>
-#include <QScrollBar>
-#include <QDebug>
-#include <QTransform>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsItem>
+#include <QtGui/QWidget>
+#include <QtGui/QPolygonF>
+#include <QtGui/QPen>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QPainter>
+#include <QtGui/QPixmap>
+#include <QtCore/QPointF>
+#include <QtGui/QCursor>
+#include <QtGui/QScrollBar>
+#include <QtCore/QDebug>
+#include <QtGui/QTransform>
 
 #include "ZEDNodeEditorMiniMap.h"
 

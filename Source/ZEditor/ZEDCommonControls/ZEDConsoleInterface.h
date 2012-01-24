@@ -37,8 +37,8 @@
 #ifndef __ZED_CONSOLE_INTERFACE_H__
 #define __ZED_CONSOLE_INTERFACE_H__
 
-#include <QLineEdit.h>
-#include <QTextEdit.h>
+#include <QtGui/QLineEdit.h>
+#include <QtGui/QTextEdit.h>
 #include <ZECore/ZEConsole.h>
 
 class ZEDConsole: public ZEConsoleInterface

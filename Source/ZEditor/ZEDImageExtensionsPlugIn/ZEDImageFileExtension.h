@@ -39,7 +39,7 @@
 #define __ZED_IMAGE_FILE_EXTENSION_H__
 
 #include "ZEDCore/ZEDFileExtension.h"
-#include <QAction>
+#include <QtGui/QAction>
 
 class ZEDImageFileExtensionDescription : public ZEDExtensionDescription
 {

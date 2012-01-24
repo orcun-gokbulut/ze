@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDSceneList.h"
-#include <QStringList>
-#include <QTreeWidgetItem>
+#include <QtCore/QStringList>
+#include <QtGui/QTreeWidgetItem>
 /************************************************************************/
 /*								 TreeItems					            */
 /************************************************************************/

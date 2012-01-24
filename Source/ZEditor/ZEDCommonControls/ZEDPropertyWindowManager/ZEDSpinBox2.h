@@ -38,8 +38,8 @@
 #ifndef __ZED_SPIN_BOX_2_H__
 #define __ZED_SPIN_BOX_2_H__
 
-#include <QTreeWidgetItem>
-#include <QObject>
+#include <QtGui/QTreeWidgetItem>
+#include <QtCore/QObject>
 #include "ZEDPropertyWidget.h"
 #include "ZEDS\ZEVariant.h"
 #include "ZEMeta\ZEObject.h"

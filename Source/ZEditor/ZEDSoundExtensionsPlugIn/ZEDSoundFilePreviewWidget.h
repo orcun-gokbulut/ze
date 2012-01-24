@@ -38,14 +38,14 @@
 #ifndef __ZED_SOUND_FILE_PREVIEW_WIDGET_H__
 #define __ZED_SOUND_FILE_PREVIEW_WIDGET_H__
 
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QObject>
-#include <QCheckBox>
-#include <QSound>
-#include <QList>
-#include <QAction>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QPushButton>
+#include <QtCore/QObject>
+#include <QtGui/QCheckBox>
+#include <QtGui/QSound>
+#include <QtCore/QList>
+#include <QtGui/QAction>
 #include "ZEDCore/ZEDPreviewWidget.h"
 #include "ZETypes.h"
 

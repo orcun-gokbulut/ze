@@ -37,13 +37,13 @@
 #ifndef _H_ZED_NODE_EDITOR_MINIMAP_H_
 #define _H_ZED_NODE_EDITOR_MINIMAP_H_
 
-#include <QGraphicsView>
-#include <QGraphicsScene>
-#include <QGraphicsItem>
-#include <QStyleOptionGraphicsItem>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QGraphicsScene>
+#include <QtGui/QGraphicsItem>
+#include <QtGui/QStyleOptionGraphicsItem>
 
-#include <QList>
-#include <QWidget>
+#include <QtCore/QList>
+#include <QtGui/QWidget>
 
 class ZEDNodeEditorMinimap : public QGraphicsView
 {

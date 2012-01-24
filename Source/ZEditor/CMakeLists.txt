@@ -35,21 +35,10 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-project (ZEditior)
+project (ZEditor)
 ze_set_project_folder("ZEditor")
 
-find_package(Qt4 REQUIRED)
-add_definitions(${QT_DEFINITIONS})
-include(${QT_USE_FILE})
-
-include_directories(
-	${PROJECT_SOURCE_DIR}
-	${QT_INCLUDE_DIR}
-	${QT_INCLUDE_DIR}/QtGui
-	${QT_INCLUDE_DIR}/QtCore)
-	
-link_directories(
-	${QT_LIBRARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(ZEDBrowser)
 add_subdirectory(ZEDCommonControls)

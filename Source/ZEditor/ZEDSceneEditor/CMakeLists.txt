@@ -35,8 +35,6 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-include(${QT_USE_FILE})
-
 ze_add_source(ZEDEntitySelectionItem.cpp		Sources)
 ze_add_source(ZEDEntitySelectionItem.h			Sources)
 ze_add_source(ZEDEntitySelector.cpp				Sources)

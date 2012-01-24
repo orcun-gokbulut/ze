@@ -48,19 +48,19 @@
 #include "../ZEDUndoRedo/ZEDUndoRedoOperation.h"
 #include "../ZEDUndoRedo/ZEDUndoRedoManager.h"
 
-#include <QGraphicsView>
-#include <QMouseEvent>
-#include <QKeyEvent>
-#include <QDebug>
-#include <QtAlgorithms>
-#include <QTransform>
-#include <QScrollBar>
-#include <QPen>
-#include <QCursor>
-#include <QPixmap>
-#include <QPainter>
-#include <QMenu>
-#include <QAction>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QKeyEvent>
+#include <QtCore/QDebug>
+#include <QtCore/qalgorithms.h>
+#include <QtGui/QTransform>
+#include <QtGui/QScrollBar>
+#include <QtGui/QPen>
+#include <QtGui/QCursor>
+#include <QtGui/QPixmap>
+#include <QtGui/QPainter>
+#include <QtGui/QMenu>
+#include <QtGui/QAction>
 
 #define MAX_Z_VALUE 4000000
 

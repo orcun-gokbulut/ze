@@ -37,9 +37,9 @@
 #include "ZEDCore/ZEDPreviewWidget.h"
 #include "ZEDCore/ZEDFileExtension.h"
 #include "ZEDCore/ZEDPlugInManager.h"
-#include <QMouseEvent>
-#include <QFileInfo>
-#include <QMenu>
+#include <QtGui/QMouseEvent>
+#include <QtCore/QFileInfo>
+#include <QtGui/QMenu>
 #include "ZEDBrowser.h"
 
 void ZEDBrowserItem::Clicked(QMouseEvent* Event)

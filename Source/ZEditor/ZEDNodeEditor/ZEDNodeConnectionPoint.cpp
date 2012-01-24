@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QBrush>
+#include <QtGui/QBrush>
 
 #include "ZEDNodeConnectionPoint.h"
 

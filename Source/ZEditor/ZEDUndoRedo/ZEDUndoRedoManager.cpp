@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QList>
-#include <QtAlgorithms>
-#include <QDebug>
+#include <QtCore/QList>
+#include <QtCore/QtAlgorithms>
+#include <QtCore/QDebug>
 
 #include "ZEDUndoRedoManager.h"
 #include "ZEDUndoRedoOperation.h"

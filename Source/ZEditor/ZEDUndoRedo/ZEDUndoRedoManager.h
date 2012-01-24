@@ -37,7 +37,7 @@
 #ifndef _H_ZED_UNDO_REDO_MANAGER_H_
 #define _H_ZED_UNDO_REDO_MANAGER_H_
 
-#include <QObject>
+#include <QtCore/QObject>
 #include "ZETypes.h"
 
 class ZEDUndoRedoOperation;

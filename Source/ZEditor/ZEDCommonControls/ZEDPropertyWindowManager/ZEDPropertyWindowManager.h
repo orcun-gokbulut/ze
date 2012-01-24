@@ -38,14 +38,14 @@
 #ifndef __ZED_PROPERTY_WINDOW_MANAGER_H__
 #define __ZED_PROPERTY_WINDOW_MANAGER_H__
 
-#include <QTreeWidget>
-#include <QWidget>
-#include <QDockWidget>
-#include <QObject>
-#include <QHeaderView>
-#include <QVBoxLayout>
-#include <QStringList>
-#include <QLabel>
+#include <QtGui/QTreeWidget>
+#include <QtGui/QWidget>
+#include <QtGui/QDockWidget>
+#include <QtCore/QObject>
+#include <QtGui/QHeaderView>
+#include <QtGui/QVBoxLayout>
+#include <QtCore/QStringList>
+#include <QtGui/QLabel>
 #include <ZEDS/ZEArray.h>
 
 #include "ZEDLineEdit.h"

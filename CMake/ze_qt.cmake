@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEDLoadingScreen.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - ze_qt.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,51 +30,17 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include <QtGui/QFont>
-#include <QtGui/QColor>
-#include <QtGui/QBrush>
-#include "ZEDLoadingScreen.h"
+set(QT_MOC_EXECUTABLE ${CMAKE_SOURCE_DIR}/Tool/${ZE_BUILD_PLATFORM}/Qt/moc)
+set(QT_RCC_EXECUTABLE ${CMAKE_SOURCE_DIR}/Tool/${ZE_BUILD_PLATFORM}/Qt/rcc)
+set(QT_UIC_EXECUTABLE ${CMAKE_SOURCE_DIR}/Tool/${ZE_BUILD_PLATFORM}/Qt/uic)
 
-
-void ZEDLoadingScreen::SetNotificationText(const char* Text)
-{
-	this->NotificationLabel->clear();
-	this->NotificationLabel->setText(QString(" ") + QString(Text));
-	this->repaint();
-}
-						
- ZEDLoadingScreen::ZEDLoadingScreen()
-{
-	this->setFixedSize(500,320);
+include_directories(
+	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM})
 	
-	QFont Font; 
-
-	this->PictureLabel = new QLabel(this);
-	this->NotificationLabel = new QLabel(QString(" Loading lots of thing..."),this);
-
-	this->Layout = new QHBoxLayout(this);
-	this->Layout->setDirection(QBoxLayout::BottomToTop);
-
-	this->PMap.load(":/SplashScreen/ZEditor Splash Screen Flat.png");
-
-	this->PictureLabel->setPixmap(this->PMap);
-
-	this->NotificationLabel->setMaximumHeight(18);
-	this->NotificationLabel->setMinimumHeight(18);
-
-	this->setLayout(this->Layout);
-
-	this->Layout->addWidget(this->NotificationLabel);
-	this->Layout->addWidget(this->PictureLabel);
-
-	this->Layout->setMargin(0);
-
-	this->setWindowFlags(Qt::SplashScreen);
-
-
-	this->hide();
-
-}
+link_directories(
+	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Qt)
+	
+include(Qt4Macros)

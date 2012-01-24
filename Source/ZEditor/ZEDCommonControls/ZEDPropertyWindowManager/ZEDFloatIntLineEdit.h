@@ -38,11 +38,11 @@
 #ifndef __ZED_FLOAT_INT_EDIT_H__
 #define __ZED_FLOAT_INT_EDIT_H__
 
-#include <QWidget>
-#include <QLineEdit>
-#include <QLabel>
-#include <QFrame>
-#include <QVBoxLayout>
+#include <QtGui/QWidget>
+#include <QtGui/QLineEdit>
+#include <QtGui/QLabel>
+#include <QtGui/QFrame>
+#include <QtGui/QVBoxLayout>
 
 #include "ZETypes.h"
 

@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "CSS.h"
-#include <QFile>
-#include <QTextStream>
+#include <QtCore/QFile>
+#include <QtCore/QTextStream>
 #include "ZECore/ZEConsole.h"
 
 QString	GetCSSFromFile(const char* FileName)

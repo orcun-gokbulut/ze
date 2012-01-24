@@ -220,6 +220,8 @@ link_directories(
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/PhysX3
 	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/3dsMax/2010)
 
+include(ze_qt)
+
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_SOURCE_DIR}/Rundir)
 
 ## Projects

@@ -38,11 +38,11 @@
 #ifndef __H_ZED_LOADING_SCREEN_H__
 #define __H_ZED_LOADING_SCREEN_H__
 
-#include <QFrame>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QPixmap>
-#include <QString>
+#include <QtGui/QFrame>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QLabel>
+#include <QtGui/QPixmap>
+#include <QtCore/QString>
 
 class ZEDLoadingScreen : public QFrame
 {

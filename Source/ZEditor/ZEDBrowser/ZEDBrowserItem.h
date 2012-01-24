@@ -38,9 +38,9 @@
 #ifndef __ZED_BROWSER_ITEM_H__
 #define __ZED_BROWSER_ITEM_H__
 
-#include <QLabel>
-#include <QVBoxLayout>
-#include <QMenu>
+#include <QtGui/QLabel>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QMenu>
 
 using namespace Qt;
 

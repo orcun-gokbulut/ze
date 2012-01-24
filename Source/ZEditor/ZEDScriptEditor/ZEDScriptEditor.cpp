@@ -34,13 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDScriptEditor.h"
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QMessageBox>
-#include <QPaintEvent>
-#include <QPainter>
-#include <QRect>
-#include <QPaintEngine>
+#include <QtGui/QDialog>
+#include <QtGui/QDialogButtonBox>
+#include <QtGui/QMessageBox>
+#include <QtGui/QPaintEvent>
+#include <QtGui/QPainter>
+#include <QtCore/QRect>
+#include <QtGui/QPaintEngine>
 #include "ZETypes.h"
 
 /************************************************************************/

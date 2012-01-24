@@ -37,8 +37,8 @@
 #ifndef _H_ZED_NODE_EDITOR_UNDO_REDO_H_
 #define _H_ZED_NODE_EDITOR_UNDO_REDO_H_
 
-#include <QUndoCommand>
-#include <QGraphicsScene>
+#include <QtGui/QUndoCommand>
+#include <QtGui/QGraphicsScene>
 
 #include "../ZEDUndoRedo/ZEDUndoRedoOperation.h"
 #include "ZETypes.h"

@@ -37,13 +37,13 @@
 #ifndef __ZED_VIEWPORT_H__
 #define __ZED_VIEWPORT_H__
 
-#include <QFrame>
-#include <QMouseEvent>
-#include <QKeyEvent>
-#include <QPixmap>
-#include <QDropEvent>
-#include <QFocusEvent>
-#include <QTimer>
+#include <QtGui/QFrame>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QKeyEvent>
+#include <QtGui/QPixmap>
+#include <QtGui/QDropEvent>
+#include <QtGui/QFocusEvent>
+#include <QtCore/QTimer>
 
 #include "ZETypes.h"
 #include "ZEGame\ZEEntity.h"

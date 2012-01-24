@@ -38,7 +38,7 @@
 #ifndef __ZED_PLUG_IN_MANAGER_H__
 #define __ZED_PLUG_IN_MANAGER_H__
 
-#include <QList>
+#include <QtCore/QList>
 #include "ZEDPlugIn.h"
 #include "ZEDExtension.h"
 

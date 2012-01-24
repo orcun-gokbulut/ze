@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDSoundFilePreviewWidget.h"
-#include <QPixmap>
+#include <QtGui/QPixmap>
 
 ZEDSoundFilePreviewWidget::ZEDSoundFilePreviewWidget(QWidget* Parent, QString FileName, WindowFlags F) : ZEDPreviewWidget(Parent, FileName, F)
 {
