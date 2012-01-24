@@ -37,8 +37,8 @@
 #ifndef _H_ZED_UNDO_REDO_OPERATION_H_
 #define _H_ZED_UNDO_REDO_OPERATION_H_
 
-#include <QString>
-#include <QList>
+#include <QtCore/QString>
+#include <QtCore/QList>
 
 class ZEDUndoRedoOperation
 {

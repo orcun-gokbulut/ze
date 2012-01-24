@@ -33,8 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QDir>
-#include <QChar>
+#include <QtCore/QDir>
+#include <QtCore/QChar>
+
 #include "ZEDSceneEditor/ZEDSceneEditor.h"
 #include "ZEDViewPort.h"
 #include "ZESDK.h"

@@ -38,9 +38,9 @@
 #ifndef __ZED_PREVIEW_WIDGET_H__
 #define __ZED_PREVIEW_WIDGET_H__
 
-#include <QLabel>
-#include <QList>
-#include <QAction>
+#include <QtGui/QLabel>
+#include <QtCore/QList>
+#include <QtGui/QAction>
 
 using namespace Qt;
 

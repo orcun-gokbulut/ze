@@ -33,10 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QPen>
-#include <QFont>
-#include <QMenu>
-#include <QAction>
+#include <QtGui/QPen>
+#include <QtGui/QFont>
+#include <QtGui/QMenu>
+#include <QtGui/QAction>
 #include "ZEDNodeEditorGraphicsView.h"
 #include "ZEDNodeIOPort.h"
 #include "ZEDNodeEditorNode.h"

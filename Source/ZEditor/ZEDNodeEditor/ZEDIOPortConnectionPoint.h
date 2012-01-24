@@ -37,7 +37,7 @@
 #ifndef _H_ZED_IO_PORT_CONNECTION_POINT_H_
 #define _H_ZED_IO_PORT_CONNECTION_POINT_H_
 
-#include <QGraphicsPolygonItem>
+#include <QtGui/QGraphicsPolygonItem>
 
 class ZEDNodeIOPort;
 

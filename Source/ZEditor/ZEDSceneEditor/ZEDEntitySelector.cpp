@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QString>
-#include <QStringList>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
 #include "ZEDEntitySelector.h"
 #include "ZEGame\ZEGame.h"
 #include "ZEGame\ZEScene.h"

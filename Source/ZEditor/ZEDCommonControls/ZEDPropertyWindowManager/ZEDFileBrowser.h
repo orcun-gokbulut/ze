@@ -38,15 +38,17 @@
 #ifndef __ZED_FILE_BROWSER_H__
 #define __ZED_FILE_BROWSER_H__
 
-#include <QObject>
-#include <QWidget>
-#include <QTreeWidgetItem>
-#include <QHBoxLayout>
-#include <QPushButton>
+#include <QtCore/QObject>
+#include <QtGui/QWidget>
+#include <QtGui/QTreeWidgetItem>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QPushButton>
+#include <QtGui/QFileDialog>
+#include <QtCore/QString>
+
 #include "ZEDPropertyWidget.h"
 #include "ZEDFloatIntLineEdit.h"
-#include <QFileDialog>
-#include <QString>
+
 #include "ZEDS\ZEVariant.h"
 #include "ZEMeta\ZEObject.h"
 

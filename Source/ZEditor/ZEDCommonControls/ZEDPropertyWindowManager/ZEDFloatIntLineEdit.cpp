@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QString>
-#include <QFocusEvent>
-#include <QWheelEvent>
-#include <QMessageBox>
-#include <QApplication>
-#include <QDesktopWidget>
+#include <QtCore/QString>
+#include <QtGui/QFocusEvent>
+#include <QtGui/QWheelEvent>
+#include <QtGui/QMessageBox>
+#include <QtGui/QApplication>
+#include <QtGui/QDesktopWidget>
 #include "ZEDFloatIntLineEdit.h"
 #include "ZEDCommonControls/CSS.h"
 

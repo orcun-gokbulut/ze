@@ -38,10 +38,10 @@
 #ifndef __ZED_LINE_EDIT_H__
 #define __ZED_LINE_EDIT_H__
 
-#include <QObject>
-#include <QTreeWidgetItem>
-#include <QLineEdit>
-#include <QString>
+#include <QtCore/QObject>
+#include <QtGui/QTreeWidgetItem>
+#include <QtGui/QLineEdit>
+#include <QtCore/QString>
 #include "ZEDPropertyWidget.h"
 #include "ZEDFloatIntLineEdit.h"
 #include "ZEMeta\ZEObject.h"

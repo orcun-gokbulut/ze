@@ -35,8 +35,6 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-include(${QT_USE_FILE})
-
 ze_add_source(ZEDUndoRedoManager.h			Sources QtMocs)
 ze_add_source(ZEDUndoRedoManager.cpp		Sources)
 ze_add_source(ZEDUndoRedoOperation.h		Sources)

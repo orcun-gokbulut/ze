@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QBrush>
-#include <QPen>
-#include <QCursor>
-#include <QRectF>
-#include <QGraphicsSceneMouseEvent>
-#include <QGraphicsRectItem>
+#include <QtGui/QBrush>
+#include <QtGui/QPen>
+#include <QtGui/QCursor>
+#include <QtCore/QRectF>
+#include <QtGui/QGraphicsSceneMouseEvent>
+#include <QtGui/QGraphicsRectItem>
 
 #include "ZEDNodeEditorNodeScaleGizmo.h"
 #include "ZEDNodeEditorNodeScaleGizmoPoint.h"

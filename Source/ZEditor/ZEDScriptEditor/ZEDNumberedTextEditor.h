@@ -56,9 +56,9 @@ Boston, MA 02110-1301, USA.
 #ifndef NUMBERED_TEXT_VIEW_H
 #define NUMBERED_TEXT_VIEW_H
 
-#include <QFrame>
-#include <QPixmap>
-#include <QTextCursor>
+#include <QtGui/QFrame>
+#include <QtGui/QPixmap>
+#include <QtGui/QTextCursor>
 #include "ZETypes.h"
 
 class QTextEdit;

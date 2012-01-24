@@ -37,17 +37,17 @@
 #ifndef __ZED_SCRIPT_EDITOR_H__
 #define __ZED_SCRIPT_EDITOR_H__
 
-#include <QWidget>
-#include <QSyntaxHighlighter>
-#include <QTextDocument>
-#include <QTextEdit>
-#include <QVBoxLayout>
-#include <QTextCharFormat>
-#include <QStringList>
-#include <QRegExp>
-#include <QList>
-#include <QAction>
-#include <QToolBar>
+#include <QtGui/QWidget>
+#include <QtGui/QSyntaxHighlighter>
+#include <QtGui/QTextDocument>
+#include <QtGui/QTextEdit>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QTextCharFormat>
+#include <QtCore/QStringList>
+#include <QtCore/QRegExp>
+#include <QtCore/QList>
+#include <QtGui/QAction>
+#include <QtGui/QToolBar>
 #include "ZEDNumberedTextEditor.h"
 
 struct ZEDSyntaxHighLightRule

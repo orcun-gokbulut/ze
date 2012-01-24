@@ -38,7 +38,7 @@
 #ifndef __ZED_SELECTION_ITEM_PLUG_IN_H__
 #define __ZED_SELECTION_ITEM_PLUG_IN_H__
 
-#include <QString>
+#include <QtCore/QString>
 #include "ZEDCore/ZEDPlugIn.h"
 
 class	ZEDSelectionItem;

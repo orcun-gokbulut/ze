@@ -36,12 +36,12 @@
 #include "ZEDImageFilePreviewWidget.h"
 
 #include <FreeImage.h>
-#include <QPen>
-#include <QFileInfo>
-#include <QPainter>
-#include <QMouseEvent>
-#include <QWheelEvent>
-#include <QImage>
+#include <QtGui/QPen>
+#include <QtCore/QFileInfo>
+#include <QtGui/QPainter>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QWheelEvent>
+#include <QtGui/QImage>
 #include "ZEMath/ZEAngle.h"
 
 

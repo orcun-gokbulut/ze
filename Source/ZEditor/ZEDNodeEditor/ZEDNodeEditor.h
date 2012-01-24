@@ -36,8 +36,8 @@
 #ifndef ZEDNODEEDITOR_H
 #define ZEDNODEEDITOR_H
 
-#include <QWidget>
-#include <QGridLayout>
+#include <QtGui/QWidget>
+#include <QtGui/QGridLayout>
 
 
 class ZEDNodeEditorGraphicsView;

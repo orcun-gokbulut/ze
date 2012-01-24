@@ -38,7 +38,7 @@
 #define __ZED_SELECTION_ITEM_H__
 
 #include "ZEMeta\ZEObject.h"
-#include <QWidget>
+#include <QtGui/QWidget>
 #include "ZEDCommonEntities/ZEDGizmo.h"
 
 enum ZEDGizmoMode;

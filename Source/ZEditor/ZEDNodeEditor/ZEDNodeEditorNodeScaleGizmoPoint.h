@@ -37,10 +37,10 @@
 #ifndef _H_ZED_NODE_EDITOR_NODE_SCALEGIZMOPOINT_H_
 #define _H_ZED_NODE_EDITOR_NODE_SCALEGIZMOPOINT_H_
 
-#include <QGraphicsPolygonItem>
-#include <QGraphicsEllipseItem>
-#include <QGraphicsRectItem>
-#include <QGraphicsSceneMouseEvent>
+#include <QtGui/QGraphicsPolygonItem>
+#include <QtGui/QGraphicsEllipseItem>
+#include <QtGui/QGraphicsRectItem>
+#include <QtGui/QGraphicsSceneMouseEvent>
 
 class ZEDNodeEditorNodeScaleGizmo;
 class ZEDNodeEditorNode;

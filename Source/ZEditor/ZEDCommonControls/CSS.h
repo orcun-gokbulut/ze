@@ -38,7 +38,7 @@
 #ifndef __CSS_H__
 #define __CSS_H__
 
-#include <QString>
+#include <QtCore/QString>
 
 QString	GetCSSFromFile(const char* FileName);
 

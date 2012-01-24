@@ -43,4 +43,5 @@ add_custom_target(CMakeScripts
 		parse_arguments.cmake
 		pclint.cmake
 		test_cocoon.cmake
-		ze_functions.cmake)
+		ze_functions.cmake
+		ze_qt.cmake)

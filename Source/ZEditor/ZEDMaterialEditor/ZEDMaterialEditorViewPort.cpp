@@ -38,7 +38,7 @@
 #include <ZECore/ZEWindow.h>
 #include <ZEGame/ZEGame.h>
 #include <ZEGame/ZEScene.h>
-#include <QResizeEvent>
+#include <QtGui/QResizeEvent>
 
 #include "ZEDMaterialEditor.h"
 #include "ZEMath/ZEAngle.h"

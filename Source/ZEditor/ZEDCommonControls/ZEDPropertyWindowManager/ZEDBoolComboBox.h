@@ -38,9 +38,9 @@
 #ifndef __ZED_BOOLCOMBOBOX_H__
 #define __ZED_BOOLCOMBOBOX_H__
 
-#include <QObject>
-#include <QTreeWidgetItem>
-#include <QCheckBox>
+#include <QtCore/QObject>
+#include <QtGui/QTreeWidgetItem>
+#include <QtGui/QCheckBox>
 #include "ZEDPropertyWidget.h"
 #include "ZEDS\ZEVariant.h"
 #include "ZEMeta\ZEObject.h"

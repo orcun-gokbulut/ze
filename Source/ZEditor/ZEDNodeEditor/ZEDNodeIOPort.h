@@ -37,7 +37,7 @@
 #ifndef _H_ZED_NODE_IO_PORT_H_
 #define _H_ZED_NODE_IO_PORT_H_
 
-#include <QGraphicsPolygonItem>
+#include <QtGui/QGraphicsPolygonItem>
 #include "ZEDNodeEditorItem.h"
 
 class ZEDNodeEditorGraphicsView;

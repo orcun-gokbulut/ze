@@ -37,21 +37,21 @@
 #ifndef __ZED_ENTITY_SELECTOR_H__
 #define __ZED_ENTITY_SELECTOR_H__
 
-#include <QDialog.h>
-#include <QWidget.h>
-#include <QVector.h>
-#include <QTreeWidgetItem>
-#include <QTreeWidget>
-#include <QMenuBar>
-#include <QMenu>
-#include <QPushButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QSpacerItem>
-#include <QToolBar>
-#include <QComboBox>
-#include <QLineEdit>
-#include <QLabel>
+#include <QtGui/QDialog>
+#include <QtGui/QWidget>
+#include <QtCore/QVector>
+#include <QtGui/QTreeWidgetItem>
+#include <QtGui/QTreeWidget>
+#include <QtGui/QMenuBar>
+#include <QtGui/QMenu>
+#include <QtGui/QPushButton>
+#include <QtGui/QHBoxLayout>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QSpacerItem>
+#include <QtGui/QToolBar>
+#include <QtGui/QComboBox>
+#include <QtGui/QLineEdit>
+#include <QtGui/QLabel>
 
 #include "ZEGame\ZEEntity.h"
 #include <ZEDS/ZEArray.h>

@@ -33,9 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QCursor>
-#include <QBrush>
-#include <QDebug>
+#include <QtGui/QCursor>
+#include <QtGui/QBrush>
+#include <QtCore/QDebug>
 
 #include "ZEDNodeEditorNodeScaleGizmoPoint.h"
 #include "ZEDNodeEditorNodeScaleGizmo.h"

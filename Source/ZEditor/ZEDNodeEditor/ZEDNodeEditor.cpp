@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QPixmap>
-#include <QDebug>
-#include <QMenu>
-#include <QAction>
-#include <..\src\corelib\tools\qdatetime.h>
+#include <QtGui/QPixmap>
+#include <QtCore/QDebug>
+#include <QtGui/QMenu>
+#include <QtGui/QAction>
+#include <QtCore/QDateTime>
 
 #include "ui_zednodeeditor.h"
 #include "ZEDNodeEditor.h"

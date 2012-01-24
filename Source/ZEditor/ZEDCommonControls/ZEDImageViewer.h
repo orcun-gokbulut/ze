@@ -39,13 +39,13 @@
 #define __H_ZED_IMAGE_VIEWER_H__
 
 #include "ZETypes.h"
-#include <QGraphicsView>
-#include <QMainWindow>
-#include <QPoint>
-#include <QGraphicsScene>
-#include <QVBoxLayout>
-#include <QGraphicsPixmapItem>
-#include <QLabel>
+#include <QtGui/QGraphicsView>
+#include <QtGui/QMainWindow>
+#include <QtCore/QPoint>
+#include <QtGui/QGraphicsScene>
+#include <QtGui/QVBoxLayout>
+#include <QtGui/QGraphicsPixmapItem>
+#include <QtGui/QLabel>
 
 using namespace Qt;
 

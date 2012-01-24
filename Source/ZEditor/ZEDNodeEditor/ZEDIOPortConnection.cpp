@@ -40,10 +40,10 @@
 #include "ZEDDefinitions.h"
 #include "ZEMath/ZEMath.h"
 
-#include <QPen>
-#include <QDebug>
-#include <QGraphicsPolygonItem>
-#include <QCursor>
+#include <QtGui/QPen>
+#include <QtCore/QDebug>
+#include <QtGui/QGraphicsPolygonItem>
+#include <QtGui/QCursor>
 
 #define ARROW_DIMENSION 12.0f
 #define PI 3.14159265358979323846f

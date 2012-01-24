@@ -33,17 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QPen>
-#include <QBrush>
-#include <QString>
-#include <QDebug>
-#include <QCursor>
-#include <QGraphicsSceneMouseEvent>
-#include <QFont>
-#include <QMenu>
-#include <QAction>
-#include <QKeyEvent>
-#include <QStringList>
+#include <QtGui/QPen>
+#include <QtGui/QBrush>
+#include <QtCore/QString>
+#include <QtCore/QDebug>
+#include <QtGui/QCursor>
+#include <QtGui/QGraphicsSceneMouseEvent>
+#include <QtGui/QFont>
+#include <QtGui/QMenu>
+#include <QtGui/QAction>
+#include <QtGui/QKeyEvent>
+#include <QtCore/QStringList>
 
 #include "ZEDNodeEditorNode.h"
 #include "ZEDNodeIOPort.h"

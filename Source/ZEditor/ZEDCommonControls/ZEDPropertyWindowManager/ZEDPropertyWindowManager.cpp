@@ -33,15 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <QList>
-#include <QFont>
-#include <QPalette>
+#include <QtCore/QList>
+#include <QtGui/QFont>
+#include <QtGui/QPalette>
 #include "ZEDPropertyWindowManager.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEDPropertyWidget.h"
-#include <QModelIndex>
-#include <QPainter>
-#include <QStyleOptionViewItem>
+#include <QtCore/QModelIndex>
+#include <QtGui/QPainter>
+#include <QtGui/QStyleOptionViewItem>
 #include "ZEDCommonControls/CSS.h"
 
 ZEDPropertyWindowManagerGroup::ZEDPropertyWindowManagerGroup(QString GroupName, QTreeWidgetItem* Parent)

@@ -37,7 +37,7 @@
 #ifndef _H_ZED_NODE_CONNECTION_POINT_H
 #define _H_ZED_NODE_CONNECTION_POINT_H
 
-#include <QGraphicsPolygonItem>
+#include <QtGui/QGraphicsPolygonItem>
 #include "ZEDNodeEditorItem.h"
 #include "ZEDNodeEditorNode.h"
 

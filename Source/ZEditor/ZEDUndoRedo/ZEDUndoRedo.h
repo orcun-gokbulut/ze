@@ -38,8 +38,8 @@
 #ifndef __ZED_UNDO_REDO_H__
 #define __ZED_UNDO_REDO_H__
 
-#include "ZEDS\ZEArray.h"
-#include <QString>
+#include "ZEDS/ZEArray.h"
+#include <QtCore/QString>
 
 class ZEDUndoRedoOperation
 {
