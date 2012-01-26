@@ -226,10 +226,7 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCo
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-		if (RenderCommand->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
-			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-		else
-			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+		GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE ? FALSE : TRUE);
 	}
 	else
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
@@ -348,7 +345,8 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);
+		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+		GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE ? FALSE : TRUE);
 	}
 	else
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);

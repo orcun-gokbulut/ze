@@ -101,6 +101,7 @@ bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERender
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
+		GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE ? FALSE : TRUE);
 	}
 	else
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
@@ -150,6 +151,7 @@ bool ZED3D9TerrainMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	{
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 		GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_EQUAL);
+		GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE ? FALSE : TRUE);
 	}
 	else
 		GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);

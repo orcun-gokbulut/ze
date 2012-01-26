@@ -97,13 +97,13 @@ ZEFixedMaterial::ZEFixedMaterial()
 	DistortionMapAddressModeU = ZE_TAM_WRAP;
 	DistortionMapAddressModeV = ZE_TAM_WRAP;
 
-	AmbientFactor = 0.0f;
+	AmbientFactor = 1.0f;
 	DiffuseFactor = 1.0f;
 	SpecularFactor = 1.0f;
 	EmmisiveFactor = 1.0f;
 	DistortionFactor = 1.0f;
 	AmbientColor = ZEVector3(0.0f, 0.0f, 0.0f);
-	DiffuseColor = ZEVector3(0.0f, 0.0f, 0.0f);
+	DiffuseColor = ZEVector3(1.0f, 1.0f, 1.0f);
 	SpecularColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	EmmisiveColor = ZEVector3(0.0f, 0.0f, 0.0f);
 	SubSurfaceScatteringFactor = 0.0f;

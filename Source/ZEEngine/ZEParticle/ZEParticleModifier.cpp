@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleController.h
+ Zinek Engine - ZEParticleModifier.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,55 +33,36 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PARTICLE_CONTROLLER_H__
-#define __ZE_PARTICLE_CONTROLLER_H__
+#include "ZEParticleModifier.h"
 
-#include "ZEParticle.h"
-#include "ZEParticleSystem.h"
-
-class ZEParticleControllerNode
+void ZEParticleModifier::SetName(const ZEString& Name)
 {
-	private:
-		float 								Time;
-		float 								Value;
+	this->Name = Name;
+}
 
-	public:
-											ZEParticleControllerNode();
-											ZEParticleControllerNode(float Time, float Value);
-
-		void								SetTime(float Time);
-		float								GetTime();
-
-		void								SetValue(float Value);
-		float								GetValue();
-};
-
-class ZEParticleController
+const ZEString& ZEParticleModifier::GetName()
 {
-	private:
-		ZEString							Name;				// Name of the controller - used in editor
-		ZEParticleEmitter*					Owner;				// Owner emitter of the controller
-		ZEArray<ZEParticleControllerNode>	Nodes;
+	return Name;
+}
 
-	public:
-		void								SetName(const ZEString& ControllerName);
-		const ZEString&						GetName();
+void ZEParticleModifier::SetOwner(ZEParticleEmitter* Owner)
+{
+	this->Owner = Owner;
+}
 
-		void								SetOwner(ZEParticleEmitter* ControllerOwner);
-		ZEParticleEmitter*					GetOwner();
+ZEParticleEmitter* ZEParticleModifier::GetOwner()
+{
+	return Owner;
+}
 
-		void								AddKeyFrame(float Time, float Value);
-		void								RemoveKeyFrame(float Time);
+ZEParticleModifier::ZEParticleModifier()
+{
+	Owner = NULL;
+}
 
-		void								SetKeyFrame(float Time, float Value);
-		float								GetKeyframe(float Time);
-
-											ZEParticleController();
-											~ZEParticleController();
-};
-
-#endif
+ZEParticleModifier::~ZEParticleModifier()
+{
+}
 
 
 

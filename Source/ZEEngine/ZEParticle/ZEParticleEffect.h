@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEGame/ZEComponent.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEParticleSystem.h"
+#include "ZEParticleEmitter.h"
 
 struct ZEDrawParameters;
 
@@ -50,13 +50,14 @@ class ZEParticleEffect : public ZEComponent
 {
 	ZE_META_ENTITY(ZEParticleEffect)
 	private:
-		ZEArray<ZEParticleSystem*>			SystemArray;				// An effect might be composed of many systems
+		ZEArray<ZEParticleEmitter*>			Emitters;
 
-	protected:
+
 											ZEParticleEffect();
 		virtual								~ZEParticleEffect();
 	public:
 		virtual	ZEUInt32					GetDrawFlags() const;
+		virtual const ZEAABBox&				GetWorldBoundingBox();
 
 		bool								Initialize();
 		void								Deinitialize();
@@ -64,11 +65,9 @@ class ZEParticleEffect : public ZEComponent
 		void								Draw(ZEDrawParameters* DrawParameters);
 		void								Tick(float TimeElapsed);
 
-		void								AddParticleSystem(ZEParticleSystem* ParticleSystem);
-		void								RemoveParticleSystem(ZEParticleSystem* ParticleSystem);
-		const ZEArray<ZEParticleSystem*>&	GetParticleSystems();
-
-		void								LoadFromFile(const char* FileName);
+		const ZEArray<ZEParticleEmitter*>&	GetEmitters();
+		void								AddEmitter(ZEParticleEmitter* Emitter);
+		void								RemoveEmitter(ZEParticleEmitter* Emitter);
 		
 		static ZEParticleEffect*			CreateInstance();
 

@@ -52,8 +52,6 @@ enum ZERenderPipeline
 // ZERenderCommandFlags
 typedef ZEUInt32 ZERenderCommandFlags;
 #define	ZE_ROF_NONE									0
-#define	ZE_ROF_TRANSPARENT							1
-#define	ZE_ROF_IMPOSTER								2
 #define	ZE_ROF_ENABLE_Z_CULLING						4
 #define	ZE_ROF_ENABLE_NO_Z_WRITE					8
 #define	ZE_ROF_ENABLE_WORLD_TRANSFORM				16
@@ -82,7 +80,7 @@ class ZERenderCommand
 {
 	public:
 		ZERenderPipeline				Pipeline;
-		ZEInt								Priority;
+		ZEInt							Priority;
 		float							Order;
 		ZERenderCommandFlags			Flags;
 		ZEROPrimitiveType				PrimitiveType;

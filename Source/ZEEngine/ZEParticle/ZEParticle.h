@@ -53,9 +53,6 @@ class ZEParticle
 		float			Size;
 		float			BounceFactor;
 		bool			IsAlive;
-
-						ZEParticle();
-						~ZEParticle();
 };
 
 #endif
