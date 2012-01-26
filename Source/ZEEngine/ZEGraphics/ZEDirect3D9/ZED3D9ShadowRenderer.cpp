@@ -213,7 +213,6 @@ void ZED3D9ShadowRenderer::Deinitialize()
 
 void ZED3D9ShadowRenderer::Destroy()
 {
-	// Remove renderer from modules renderer list
 	GetModule()->ShadowRenderers.DeleteValue((ZED3D9ShadowRenderer*)this);
 	ZERenderer::Destroy();
 }
@@ -221,27 +220,17 @@ void ZED3D9ShadowRenderer::Destroy()
 
 void ZED3D9ShadowRenderer::ClearRenderList()
 {
-	//Clear render lists
-	Imposter.Clear(true);
-	Transparent.Clear(true);
-	NonTransparent.Clear(true);
+	CommandList.Clear(true);
 }
 
 void ZED3D9ShadowRenderer::AddToRenderList(ZERenderCommand* RenderCommand)
 {
 	#ifdef ZE_DEBUG_ENABLE
-		// Check render order is valid
 		if (!ZED3D9FrameRenderer::CheckRenderCommand(RenderCommand))
 			return;
 	#endif
 
-	// Add render orders to render order lists according to their properties
-	if (RenderCommand->Flags & ZE_ROF_IMPOSTER)
-		Imposter.Add(*RenderCommand);
-	if (RenderCommand->Flags & ZE_ROF_TRANSPARENT)
-		Transparent.Add(*RenderCommand);
-	else
-		NonTransparent.Add(*RenderCommand);
+	CommandList.Add(*RenderCommand);
 }
 
 void ZED3D9ShadowRenderer::RenderProjectiveLight()
@@ -261,9 +250,9 @@ void ZED3D9ShadowRenderer::RenderProjectiveLight()
 
 	ZEMatrix4x4::Multiply(ViewProjectionTransform, ProjectionTransform, ViewTransform);
 	GetDevice()->BeginScene();
-	for (ZESize I = 0; I < NonTransparent.GetCount(); I++)
+	for (ZESize I = 0; I < CommandList.GetCount(); I++)
 	{
-		ZERenderCommand* RenderCommand = &NonTransparent[I];
+		ZERenderCommand* RenderCommand = &CommandList[I];
 
 		ZEMatrix4x4 ViewProjMatrix;
 		if ((RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
@@ -288,10 +277,7 @@ void ZED3D9ShadowRenderer::RenderProjectiveLight()
 		{
 			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 			GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-			if (RenderCommand->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
-				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-			else
-				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE ? FALSE : TRUE);
 		}
 		else
 			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
@@ -338,9 +324,9 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 
 	GetDevice()->SetRenderState(D3DRS_COLORWRITEENABLE, 0xFF);
 	GetDevice()->BeginScene();
-	for (ZESize I = 0; I < NonTransparent.GetCount(); I++)
+	for (ZESize I = 0; I < CommandList.GetCount(); I++)
 	{
-		ZERenderCommand* RenderCommand = &NonTransparent[I];
+		ZERenderCommand* RenderCommand = &CommandList[I];
 
 		ZEMatrix4x4 ViewProjMatrix;
 		if ((RenderCommand->Flags & ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM) == ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM)
@@ -365,10 +351,7 @@ void ZED3D9ShadowRenderer::RenderPointLight()
 		{
 			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
 			GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
-			if (RenderCommand->Flags & (ZE_ROF_TRANSPARENT | ZE_ROF_IMPOSTER))
-				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-			else
-				GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+			GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, RenderCommand->Flags & ZE_ROF_ENABLE_NO_Z_WRITE ? FALSE : TRUE);
 		}
 		else
 			GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);

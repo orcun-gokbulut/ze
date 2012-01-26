@@ -61,6 +61,8 @@ class ZEVector2
 		static const ZEVector2		One;
 		static const ZEVector2		UnitX;
 		static const ZEVector2		UnitY;
+		static const ZEVector2		MaxValue;
+		static const ZEVector2		MinValue;
 
 		void						Create(float x, float y);
 		void						Create(const ZEVector2 &Start, const ZEVector2 &End);
@@ -153,6 +155,8 @@ class ZEVector3
 		static const ZEVector3		UnitX;
 		static const ZEVector3		UnitY;
 		static const ZEVector3		UnitZ;
+		static const ZEVector3		MaxValue;
+		static const ZEVector3		MinValue;
 
 		static void					Create(ZEVector3& Out, float x, float y, float z);
 		static void					Create(ZEVector3& Out, const ZEVector3 &Start, const ZEVector3 &End);
@@ -271,6 +275,8 @@ class ZEVector4
 		static const ZEVector4		HomogenousUnitX;
 		static const ZEVector4		HomogenousUnitY;
 		static const ZEVector4		HomogenousUnitZ;
+		static const ZEVector4		MaxValue;
+		static const ZEVector4		MinValue;
 
 		void						Create(float x, float y, float z, float w);
 		void						Create(const ZEVector4 &Start, const ZEVector4 &End);

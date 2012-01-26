@@ -37,14 +37,25 @@
 #include "ZEGame/ZEEntityProvider.h"
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEParticleEffect);
-
-void ZEParticleEffect::LoadFromFile(const char* ZEPEFFile)
-{
-}
 		
 ZEUInt32 ZEParticleEffect::GetDrawFlags() const
 {
-	return ZE_DF_DRAW;
+	return ZE_DF_DRAW | ZE_DF_CULL;
+}
+
+const ZEAABBox& ZEParticleEffect::GetWorldBoundingBox()
+{
+	ZEAABBox Box;
+	Box.Max = ZEVector3::MinValue;
+	Box.Min = ZEVector3::MaxValue;
+
+	for (ZESize I = 0; I < Emitters.GetCount(); I++)
+	{
+		ZEVector3::Min(Box.Min, Box.Min, Emitters[I]->GetBoundingBox().Min);
+		ZEVector3::Max(Box.Max, Box.Max, Emitters[I]->GetBoundingBox().Max);
+	}
+
+	return Box;
 }
 
 bool ZEParticleEffect::Initialize()
@@ -58,30 +69,30 @@ void ZEParticleEffect::Deinitialize()
 
 void ZEParticleEffect::Draw(ZEDrawParameters* DrawParameters)
 {
-	for(ZEUInt I = 0; I < SystemArray.GetCount(); I++)
-		SystemArray[I]->Draw(DrawParameters);
+	for(ZESize I = 0; I < Emitters.GetCount(); I++)
+		Emitters[I]->Draw(DrawParameters);
 }
 
 void ZEParticleEffect::Tick(float TimeElapsed)
 {
-	for(ZEUInt I = 0; I < SystemArray.GetCount(); I++)
-		SystemArray[I]->Tick(TimeElapsed);
+	for(ZESize I = 0; I < Emitters.GetCount(); I++)
+		Emitters[I]->Tick(TimeElapsed);
 }
 
-void ZEParticleEffect::AddParticleSystem(ZEParticleSystem* ParticleSystem)
+void ZEParticleEffect::AddEmitter(ZEParticleEmitter* Emitter)
 {
-	ParticleSystem->SetOwner(this);
-	SystemArray.Add(ParticleSystem);
+	Emitter->SetOwner(this);
+	Emitters.Add(Emitter);
 }
 
-void ZEParticleEffect::RemoveParticleSystem(ZEParticleSystem* ParticleSystem)
+void ZEParticleEffect::RemoveEmitter(ZEParticleEmitter* Emitter)
 {
-	SystemArray.DeleteValue(ParticleSystem);
+	Emitters.DeleteValue(Emitter);
 }
 
-const ZEArray<ZEParticleSystem*>& ZEParticleEffect::GetParticleSystems()
+const ZEArray<ZEParticleEmitter*>& ZEParticleEffect::GetEmitters()
 {
-	return SystemArray;
+	return Emitters;
 }
 
 ZEParticleEffect::ZEParticleEffect()

@@ -170,7 +170,7 @@ bool ZEGrid::Initialize()
 	RenderCommand.SetZero();
 	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 	RenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	RenderCommand.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_NO_Z_WRITE;
+	RenderCommand.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 	RenderCommand.Material = Material;
 
 	return true;

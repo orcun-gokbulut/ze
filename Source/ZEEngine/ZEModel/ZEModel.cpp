@@ -111,14 +111,14 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 
 		DebugDrawComponents.BonePositionsRenderCommand.SetZero();
 		DebugDrawComponents.BonePositionsRenderCommand.Material = DebugDrawComponents.Material;
-		DebugDrawComponents.BonePositionsRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_IMPOSTER;
+		DebugDrawComponents.BonePositionsRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM;
 		DebugDrawComponents.BonePositionsRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 		DebugDrawComponents.BonePositionsRenderCommand.VertexBuffer = &DebugDrawComponents.BonePositionsCanvas;
 		DebugDrawComponents.BonePositionsRenderCommand.PrimitiveType = ZE_ROPT_POINT;
 
 		DebugDrawComponents.BonesRenderCommand.SetZero();
 		DebugDrawComponents.BonesRenderCommand.Material = DebugDrawComponents.Material;
-		DebugDrawComponents.BonesRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_IMPOSTER;
+		DebugDrawComponents.BonesRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM;
 		DebugDrawComponents.BonesRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 		DebugDrawComponents.BonesRenderCommand.VertexBuffer = &DebugDrawComponents.BonesCanvas;
 		DebugDrawComponents.BonesRenderCommand.PrimitiveType = ZE_ROPT_LINE;

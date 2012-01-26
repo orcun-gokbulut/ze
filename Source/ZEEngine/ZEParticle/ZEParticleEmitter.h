@@ -38,104 +38,112 @@
 #define __ZE_PARTICLE_EMITTER_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEParticleSystem.h"
-#include "ZEParticle.h"
-#include "ZEParticleController.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEGraphics/ZERenderCommand.h"
+#include "ZEParticle.h"
+#include "ZEMath/ZEAABBox.h"
+
 
 ZE_META_OBJECT_DESCRIPTION(ZEParticleEmitter);
 
 enum ZEParticleEmitterType
 {
-	ZE_PET_POINT,						// Particles are emitted from a single point
-	ZE_PET_BOX,							// Particles are emitted from inside of a 3D shaped box
-	ZE_PET_TORUS,						// Particles are emitted from inside of a torus
-	ZE_PET_SPHERE						// Particles are emitted from inside of a sphere
+	ZE_PET_POINT,
+	ZE_PET_BOX,
+	ZE_PET_TORUS,
+	ZE_PET_SPHERE
 };
 
-enum ZEParticleEmitterCollisionType
+
+enum ZEParticleBillboardType
 {
-	ZE_PECT_NO_COLLISION,				// No collision effect - can be used in weather effects - uses GPU
-	ZE_PECT_STATIC_COLLISION,			// Particles can collide to static objects - uses SIMD
-	ZE_PECT_DYNAMIC_COLLISION			// Particles can collide to both static and dynamic objects - uses SIMD
+	ZE_PBT_NONE					= 0,
+	ZE_PBT_SCREEN_ALIGNED		= 1,
+	ZE_PBT_VIEW_PLANE_ALIGNED	= 2,
+	ZE_PBT_VIEW_POINT_ORIENTED	= 3
 };
+
+class ZEStaticVertexBuffer;
+class ZEParticleEffect;
+class ZEParticleModifier;
+class ZEDrawParameters;
 
 class ZEParticleEmitter : public ZEObject
 {
-	ZE_META_OBJECT(ZEMaterial)
-	friend class ZEParticleSystem;
-
+	ZE_META_OBJECT(ZEParticleEmitter)
 	private:
-		ZEArray<ZEParticle>				ParticlePool;				// An array of 'MaxParticleCount' elements
-		ZEArray<ZEParticleController*>	ControllerArray;			// These elements controls the particles after they are emitted from an emitter
-		ZEUInt							EmittedParticleCount;
-		float							LastCreation;
+		ZEString						Name;
+		ZEParticleEffect*				Owner;
 
-		char							Name[ZE_MAX_NAME_SIZE];			// Name of the emitter - used in editor
-		ZEParticleSystem*				Owner;					// System that this emitter belongs
-		ZEVector3						Acceleration;					// This is acceleration of emitter NOT acceleration of particles
-		ZEUInt							ParticlesPerSecond;				// Number of particles that the emitter gets from the particle pool in a second.
-		ZEVector3						Position;						// This is position of emitter NOT position of particles - Relative to the system
-		ZEParticleEmitterType			Type;							// Type from 4 available types
-		ZEVector3						UpVector;						// This is up vector of emitter NOT up vector of particles - Relative to the system
-		ZEVector3						Velocity;						// This is velocity of emitter NOT velocity of particles
+		ZEAABBox						BoundingBox;
+
+		ZEVector3						Acceleration;
+		ZEUInt							ParticlesPerSecond;
+		ZEVector3						Position;
+		ZEParticleEmitterType			Type;
+		ZEVector3						UpVector;
+		ZEVector3						Velocity;
 
 		ZEVector3						BoxSize;
 		float							SphereRadius;
 		ZEVector2						TorusSize;
 
-		// Following variables are used to create the Particle Pool
-		ZEVector3						MinUpVector;				//Orientation of-
-		ZEVector3						MaxUpVector;				//particles
-		ZEVector3						MinAcceleration;			//Acceleration of-
-		ZEVector3						MaxAcceleration;			//particles
-		ZEVector3						MinVelocity;				//Velocity of-
-		ZEVector3						MaxVelocity;				//particles
-		ZEVector3						MinAngularAcceleration;		//Angular acceleration of-
-		ZEVector3						MaxAngularAcceleration;		//particles
-		ZEVector3						MinAngularVelocity;			//Angular velocity of-
-		ZEVector3						MaxAngularVelocity;			//particles
-		ZEVector4						MinColor;					//Color value of-
-		ZEVector4						MaxColor;					//particles in RGBA
-		float							MinSize;					//Size of an edge of-
-		float							MaxSize;					//particles
-		float							MinLife;					//Life of the-
-		float							MaxLife;					//particles
-		float							MinBounceFactor;			//Bounce factor of the-
-		float							MaxBounceFactor;			//particles	
-		ZEUInt							MaxParticleCount;			// Maximum number of particles of this emitter
-		bool							IsContinuous;					// Repeats the animation if true
+		ZEVector3						MinUpVector;	
+		ZEVector3						MaxUpVector;
+		ZEVector3						MinAcceleration;
+		ZEVector3						MaxAcceleration;
+		ZEVector3						MinVelocity;
+		ZEVector3						MaxVelocity;
+		ZEVector3						MinAngularAcceleration;
+		ZEVector3						MaxAngularAcceleration;
+		ZEVector3						MinAngularVelocity;
+		ZEVector3						MaxAngularVelocity;
+		ZEVector4						MinColor;
+		ZEVector4						MaxColor;
+		float							MinSize;
+		float							MaxSize;
+		float							MinLife;
+		float							MaxLife;
+		float							MinBounceFactor;
+		float							MaxBounceFactor;
+		ZEUInt							MaxParticleCount;
+		bool							IsContinuous;
+		
+		ZEArray<ZEParticle>				ParticlePool;
+		ZEArray<ZEParticleModifier*>	Modifiers;
+		ZEUInt							EmittedParticleCount;
+		float							LastCreation;
 
-		// These are the controllers for manipulating emitter values
-		ZEParticleController			ParticlesPerSecondController;
-		ZEParticleController			AccelerationController;
-		ZEParticleController			VelocityController;
-		ZEParticleController			AngularAccelerationController;
-		ZEParticleController			AngularVelocityController;
-		ZEParticleController			ColorController;
-		ZEParticleController			SizeController;
-		ZEParticleController			LifeController;
+		ZEParticleBillboardType			BillboardType;
+		ZEMaterial*						Material;
+		ZEStaticVertexBuffer*			VertexBuffer;
+		ZERenderCommand					RenderCommand;
 
-
-		//	Required functions for emitter
 		void 							InitializeParticlePool();
 		void							GenerateParticle(ZEParticle &Particle);
+		void							UpdateVertexBuffer(ZEDrawParameters* DrawParameters);
+
+										ZEParticleEmitter();
+										~ZEParticleEmitter();
 
 	public:
-		void							Tick(float TimeElapsed);
-		
-		void							AddParticleController(ZEParticleController* &ParticleController);
+		void							SetName(const ZEString& Name);
+		const ZEString&					GetName() const;	
 
-		void							SetName(const char* EmitterName);
-		const char*						GetName() const;	
+		void							SetOwner(ZEParticleEffect* Owner);
+		ZEParticleEffect*				GetOwner() const;
 
-		void							SetOwner(ZEParticleSystem* EmitterOwner);
-		ZEParticleSystem*				GetOwner() const;
-
-		void							SetPosition(const ZEVector3& EmitterPosition);
+		void							SetPosition(const ZEVector3& Position);
 		const ZEVector3&				GetPosition() const;
+
+		const ZEAABBox&					GetBoundingBox();
+
+		const ZEArray<ZEParticleModifier*>&	GetModifiers();
+		void							AddModifier(ZEParticleModifier* Modifier);
+		void							RemoveModifier(ZEParticleModifier* Modifier);
 
 		void							SetParticlesPerSecond(ZEUInt Value);
 		ZEUInt							GetParticlesPerSecond() const;
@@ -212,8 +220,14 @@ class ZEParticleEmitter : public ZEObject
 		void 							SetMaxBounceFactor(float BounceFactor);
 		float 							GetMaxBounceFactor() const;
 
-										ZEParticleEmitter();
-										~ZEParticleEmitter();
+		void							SetBillboardType(ZEParticleBillboardType Type);
+		ZEParticleBillboardType			GetBillboardType() const;
+
+		void							SetMaterial(ZEMaterial *Material);
+		ZEMaterial*						GetMaterial() const;
+
+		void							Tick(float TimeElapsed);
+		void							Draw(ZEDrawParameters* DrawParameters);
 
 		static ZEParticleEmitter*		CreateInstance();
 };
@@ -260,7 +274,15 @@ ZE_POST_PROCESSOR_START(Meta)
 			<property name="MaxColor" groupname="Particle Generation" type="ZEVector4" semantic="ZE_PS_COLOR" autogetset="true" description="Maximum color of particles."/>			
 			<property name="MinBounceFactor" groupname="Physics" type="float" autogetset="true" description="Minimum  bounce factor of particles."/>
 			<property name="MaxBounceFactor" groupname="Physics" type="float" autogetset="true" description="Maximum bounce factor of particles."/>
-		</class>
+			<property name="BillboardType" type="integer" autogetset="true" description="Billboarding type of the particles used in this system.">
+				<enumurator name="ZEParticleBillboardType">
+					<item name="None" value="ZE_PBT_NONE"/>
+					<item name="Screen Aligned" value="ZE_PBT_SCREEN_ALIGNED"/>
+					<item name="ViewPlane Aligned" value="ZE_PBT_VIEW_PLANE_ALIGNED"/>
+					<item name="ViewPoint Oriented" value="ZE_PBT_VIEW_POINT_ORIENTED"/>
+				</enumurator>
+			</property>
+			</class>
 	</meta>
 </zinek>
 ZE_POST_PROCESSOR_END()
@@ -268,7 +290,3 @@ ZE_POST_PROCESSOR_END()
 
 
 #endif
-
-
-
-
