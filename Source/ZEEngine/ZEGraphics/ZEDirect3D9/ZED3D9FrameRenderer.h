@@ -67,7 +67,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 	friend class ZED3D9ShadowRenderer;
 
 	private:
-		ZEUInt32								LightStencilMaskValue;
+		ZEUInt32							LightStencilMaskValue;
 
 		ZED3D9ViewPort*						ViewPort;
 
