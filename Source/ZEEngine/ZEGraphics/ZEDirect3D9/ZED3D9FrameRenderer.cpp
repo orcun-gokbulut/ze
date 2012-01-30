@@ -486,9 +486,9 @@ void ZED3D9FrameRenderer::DoPreZPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 
-	for (ZESize I = 0; I < RenderList.GetCount(); I++)
+	for (ZESize I = 0; I < CommandList.GetCount(); I++)
 	{
-		ZERenderCommand* RenderCommand = &RenderList[I];
+		ZERenderCommand* RenderCommand = &CommandList[I];
 		
 		if ((RenderCommand->Material->GetMaterialFlags() & ZE_MTF_PRE_Z_PASS) == 0)
 			continue;
@@ -523,9 +523,9 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
-	for (ZESize I = 0; I < RenderList.GetCount(); I++)
+	for (ZESize I = 0; I < CommandList.GetCount(); I++)
 	{
-		ZERenderCommand* RenderCommand = &RenderList[I];
+		ZERenderCommand* RenderCommand = &CommandList[I];
 
 		if (RenderCommand->Pipeline != ZE_RORP_3D)
 			continue;
@@ -636,9 +636,9 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	
-	for (ZESize I = 0; I < RenderList.GetCount(); I++)
+	for (ZESize I = 0; I < CommandList.GetCount(); I++)
 	{		
-		ZERenderCommand* RenderCommand = &RenderList[I];
+		ZERenderCommand* RenderCommand = &CommandList[I];
 		if (RenderCommand->Pipeline != ZE_RORP_3D)
 			continue;
 
@@ -673,9 +673,9 @@ void ZED3D9FrameRenderer::Do2DPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 
-	for (ZESize I = 0; I < RenderList.GetCount(); I++)
+	for (ZESize I = 0; I < CommandList.GetCount(); I++)
 	{		
-		ZERenderCommand* RenderCommand = &RenderList[I];
+		ZERenderCommand* RenderCommand = &CommandList[I];
 		if (RenderCommand->Pipeline != ZE_RORP_2D)
 			continue;
 
@@ -919,12 +919,12 @@ void ZED3D9FrameRenderer::AddToRenderList(ZERenderCommand* RenderCommand)
 			return;
 	#endif
 
-		RenderList.Add(*RenderCommand);
+		CommandList.Add(*RenderCommand);
 }
 
 void ZED3D9FrameRenderer::ClearRenderList()
 {
-	RenderList.Clear(true);
+	CommandList.Clear(true);
 }
 
 static ZEInt RenderCommandCompare(const ZERenderCommand* A, const ZERenderCommand* B)
@@ -949,7 +949,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 	if (!GetModule()->GetEnabled() || GetModule()->IsDeviceLost())
 		return;
 
-	RenderList.Sort(RenderCommandCompare);
+	CommandList.Sort(RenderCommandCompare);
 
 	zeProfilerStart("Rendering");
 
