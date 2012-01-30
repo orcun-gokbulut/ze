@@ -39,6 +39,7 @@
  
 #include "ZECompoundEntity.h"
 #include "ZEInput/ZEInputMap.h"
+#include "ZEUI/ZEUITextControl.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZEPlayer);
 
@@ -50,6 +51,7 @@ class ZEModelIKChain;
 class ZEPlayer : public ZECompoundEntity
 {
 	ZE_META_ENTITY(ZEPlayer)
+	
 	private:
 		ZEInputMap				InputMap;
 		ZECamera*				Camera;
@@ -57,6 +59,7 @@ class ZEPlayer : public ZECompoundEntity
 		ZEProjectiveLight*		Light;
 
 		float					Ry, Rx, Rz, FOV;
+		float					MovementSpeed;
 
 								ZEPlayer();
 		virtual					~ZEPlayer();
@@ -66,6 +69,9 @@ class ZEPlayer : public ZECompoundEntity
 
 		ZECamera*				GetCamera();
 		ZEListener*				GetListener();
+
+		void					SetMovementSpeed(float Meters);
+		float					GetMovementSpeed();
 
 		void					SetFOV(float FOV);
 		float					GetFOV();

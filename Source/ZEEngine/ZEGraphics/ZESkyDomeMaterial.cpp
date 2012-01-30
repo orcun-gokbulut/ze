@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZESkyDomeMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,49 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZESkyDomeMaterial.h"
+#include "ZEGraphicsModule.h"
+#include "ZEGame\ZEScene.h"
+#include "ZECamera.h"
+#include <float.h>
+
+
+ZESkyDomeMaterial::ZESkyDomeMaterial()
+{
+	MieConstant				= 0.0010f;
+	MieScaleDepth			= 0.1000f;
+	
+	RayleighConstant		= 0.0025f;
+	RayleighScaleDepth		= 0.2500f;
+	
+	SunIntensity			= 20.0f;
+	G						= -0.99f;
+
+	OuterRadius				= 61500.0f;
+	InnerRadius				= 60000.0f;
+
+	AmbientFactor			= 1.0000f;
+	AmbientColor			= ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
+
+	SunPosition				= ZEVector3(0.0f, 0.0f, -1.0f);
+
+	WaveLenght				= ZEVector3(0.650f, 0.570f, 0.475f);
+
+	CameraPosition			= ZEVector3(0.0f, 0.0f, 0.0f);
+	CameraPositionOffset	= ZEVector3(0.0f, 60001.0f, 0.0f);
+}
+
+ZESkyDomeMaterial::~ZESkyDomeMaterial()
+{
+	
+}
+
+ZEMaterialFlags ZESkyDomeMaterial::GetMaterialFlags() const
+{
+	return ZE_MTF_NONE;
+}
+
+ZESkyDomeMaterial* ZESkyDomeMaterial::CreateInstance()
+{
+	return zeGraphics->CreateSkyDomeMaterial();
+}

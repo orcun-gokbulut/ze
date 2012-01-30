@@ -79,18 +79,24 @@ enum ZEFileMode
 //extern "C"
 //ZEInt __cdecl _tinput_l(FILE*, const TCHAR*, _locale_t, va_list);
 
+class ZEPartialFile;
 class ZECacheDataIdentifier;
 
 class ZEFile : public ZESerializer, public ZEUnserializer
 {
+	friend class ZEPartialFile;
+
 	protected:
-		void*					File;
-		ZEString				FilePath;
+		void*					File;				// C file pointer
+		ZEString				FilePath;			
 		ZEUInt64				FileCursor;
 
 		ZEFileType				FileType;
+		bool					AutoClose;			// Closes the file when reference count goes zero
+		ZEUInt					ReferenceCount;		// Count of how many files are open on this file
 
-		ZEUInt			ReferenceCount;
+		virtual ZEUInt			IncreaseReferenceCount();
+		virtual ZEUInt			DecreaseReferenceCount();
 
 	public:
 		virtual bool			Open(const ZEString& FilePath, ZEFileMode Mode, bool Binary);
@@ -101,6 +107,9 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 		virtual void			Flush();
 		virtual bool			IsOpen();
 
+		void					SetAutoClose(bool AutoClose);
+		bool					GetAutoClose();
+		
 		virtual ZEUInt64		Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
 		virtual ZEUInt64		ReadFormated(const char* Format, ...);
 
@@ -114,15 +123,13 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 		static bool				ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 BufferSize);
 
 		ZEFileType				GetFileType() const;
-		void*					GetFileHandle() const;	
+		void*					GetFileHandle() const;
 		const ZEString			GetFilePath() const;
 
 		virtual ZEUInt64		GetStartPosition();
 		virtual ZEUInt64		GetEndPosition();
 
-		ZEUInt			GetReferenceCount() const;
-		virtual ZEUInt	IncreaseReferenceCount();
-		virtual ZEUInt	DecreaseReferenceCount();
+		ZEUInt					GetReferenceCount() const;
 
 		static ZEString			GetFileName(const ZEString& FilePath);
 		static ZEString			GetAbsolutePath(const ZEString& FilePath);
@@ -132,7 +139,7 @@ class ZEFile : public ZESerializer, public ZEUnserializer
 		static bool				IsDirectoryExists(const ZEString& FilePath);
 		static bool				IsFileExists(const ZEString& FilePath);
 
-		static ZEFile*			Open(const ZEString& FilePath);
+		static ZEFile*			Open(const ZEString& FilePath, bool AutoClose = true);
 
 		ZEFile&					operator = (ZEFile& OtherFile);
 

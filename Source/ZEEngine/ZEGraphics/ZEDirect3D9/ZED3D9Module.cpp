@@ -57,6 +57,7 @@
 #include "ZED3D9CommonTools.h"
 
 #include <d3dx9.h>
+#include "ZED3D9SkyDomeMaterial.h"
 
 
 LPDIRECT3DDEVICE9 D3D9Device;
@@ -615,6 +616,11 @@ ZETerrainMaterial* ZED3D9Module::CreateTerrainMaterial()
 ZESkyBoxMaterial* ZED3D9Module::CreateSkyBoxMaterial()
 {
 	return new ZED3D9SkyBoxMaterial();
+}
+
+ZESkyDomeMaterial* ZED3D9Module::CreateSkyDomeMaterial()
+{
+	return new ZED3D9SkyDomeMaterial();
 }
 
 ZEFixedMaterial* ZED3D9Module::CreateCustomMaterial()

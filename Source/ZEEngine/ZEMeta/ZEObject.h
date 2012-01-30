@@ -170,7 +170,7 @@ class ZEObject
 		virtual ZEObject*						GetOwner();
 
 		// Property Functions
-		virtual ZESSize						GetPropertyId(const char* PropertyName) const = 0;
+		virtual ZESSize							GetPropertyId(const char* PropertyName) const = 0;
 		virtual bool							SetProperty(ZEInt PropertyId, const ZEVariant& Value) = 0;
 		bool									SetProperty(const char* PropertyName, const ZEVariant& Value);
 		virtual bool							GetProperty(ZEInt PropertyId, ZEVariant& Value) const = 0;
@@ -180,7 +180,7 @@ class ZEObject
 		const ZEArray<ZERunTimeProperty>*		GetCustomProperties() const;
 
 		// Containers
-		virtual ZESSize						GetContainerId(const char* ContainerName) const = 0;
+		virtual ZESSize							GetContainerId(const char* ContainerName) const = 0;
 		virtual bool							AddToContainer(ZEInt ContainerId, ZEObject* Item) = 0;
 		bool									AddToContainer(const char* ContainerName, ZEObject* Item);
 		virtual bool							RemoveFromContainer(ZEInt ContainerId, ZEObject* Item) = 0;
@@ -191,7 +191,7 @@ class ZEObject
 		ZESize									GetContainerItemCount(const char* ContainerName) const;
 
 		// Methods
-		virtual ZESSize						GetMethodId(const char* MethodName) const = 0;
+		virtual ZESSize							GetMethodId(const char* MethodName) const = 0;
 		virtual bool							CallMethod(ZEInt MethodId, const ZEVariant* Parameters, ZESize ParameterCount, ZEVariant& ReturnValue) = 0;
 		bool									CallMethod(const char* MethodName, const ZEVariant* Parameters, ZESize ParameterCount, ZEVariant& ReturnValue);
 		bool									CallMethod(ZEInt MethodId, const ZEArray<ZEVariant>& Parameters, ZEVariant& ReturnValue);

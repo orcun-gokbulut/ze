@@ -59,6 +59,7 @@ class ZEPostProcessor;
 class ZEUIMaterial;
 class ZESimpleMaterial;
 class ZESkyBoxMaterial;
+class ZESkyDomeMaterial;
 enum ZETextureQuality;
 struct ZETextureOptions;
 
@@ -68,19 +69,19 @@ class ZEGraphicsModule : public ZEModule
 	ZE_MODULE(ZEGraphicsModule)
 	protected:
 		ZESize								CurrentFrameId;
-		ZEInt									ScreenWidth, ScreenHeight;
+		ZEInt								ScreenWidth, ScreenHeight;
 		bool								Fullscreen;
 		float								NearZ, FarZ;
 		bool								VerticalSync;
-		ZEInt									ShaderQuality;
+		ZEInt								ShaderQuality;
 		ZETextureQuality					TextureQuality;
-		ZEInt									ModelQuality;
-		ZEInt									ShadowQuality;
-		ZEInt									PostEffectQuality;
-		ZEInt									HDRQuality;
-		ZEInt									AntiAliasing;
+		ZEInt								ModelQuality;
+		ZEInt								ShadowQuality;
+		ZEInt								PostEffectQuality;
+		ZEInt								HDRQuality;
+		ZEInt								AntiAliasing;
 		bool								ToneMappingEnabled;
-		ZEInt									AnisotropicFilter;
+		ZEInt								AnisotropicFilter;
 
 
 	public:
@@ -91,8 +92,8 @@ class ZEGraphicsModule : public ZEModule
 		// Options
 		virtual void						SetScreenSize(ZEInt Width, ZEInt Height);
 		void								GetScreenSize(ZEInt& Width, ZEInt& Height);
-		ZEInt									GetScreenWidth();
-		ZEInt									GetScreenHeight();
+		ZEInt								GetScreenWidth();
+		ZEInt								GetScreenHeight();
 
 		float								GetAspectRatio();
 		void								SetNearZ(float NearZ);
@@ -102,28 +103,28 @@ class ZEGraphicsModule : public ZEModule
 		virtual void						SetVerticalSync(bool Enabled);
 		bool								GetVerticalSync();
 		virtual void						SetShaderQuality(ZEInt Quality);
-		ZEInt									GetShaderQuality();
+		ZEInt								GetShaderQuality();
 		virtual void						SetTextureQuality(ZETextureQuality Quality);
 		ZETextureQuality					GetTextureQuality();
 		virtual void						SetModelQuality(ZEInt Quality);
-		ZEInt									GetModelQuality();
+		ZEInt								GetModelQuality();
 		virtual void						SetShadowQuality(ZEInt Quality);
-		ZEInt									GetShadowQuality();
+		ZEInt								GetShadowQuality();
 		virtual void						SetPostEffectQuality(ZEInt Quality);
-		ZEInt									GetPostEffectQuality();
+		ZEInt								GetPostEffectQuality();
 		virtual void						SetHDRQuality(ZEInt Quality);
-		ZEInt									GetHDRQuality();
+		ZEInt								GetHDRQuality();
 		virtual void						SetAntiAliasing(ZEInt Level);
-		ZEInt									GetAntiAliasing();
+		ZEInt								GetAntiAliasing();
 		virtual void						SetAnisotropicFilter(ZEInt Level);
-		ZEInt									GetAnisotropicFilter();
+		ZEInt								GetAnisotropicFilter();
 
 		virtual ZETextureOptions*			GetTextureOptions();
 
 		ZESize								GetCurrentFrameId();
 
 		virtual void						SetMaterialComponentMask(ZEUInt Mask) = 0;
-		virtual ZEUInt				GetMaterialComponentMask() = 0;
+		virtual ZEUInt						GetMaterialComponentMask() = 0;
 
 		virtual void						UpdateScreen() = 0;
 		virtual void						ClearFrameBuffer() = 0;
@@ -147,11 +148,14 @@ class ZEGraphicsModule : public ZEModule
 		virtual ZETerrainMaterial*			CreateTerrainMaterial() = 0;
 		virtual ZESimpleMaterial*			CreateSimpleMaterial() = 0;
 		virtual ZESkyBoxMaterial*			CreateSkyBoxMaterial() = 0;
+		virtual ZESkyDomeMaterial*			CreateSkyDomeMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCustomMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateCGFXMaterial() = 0;
 
 		static ZEGraphicsModule*			GetInstance();
 };
+
+
 #endif
 
 

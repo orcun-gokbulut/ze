@@ -38,13 +38,11 @@
 #define __ZE_SKYBRUSH_H__
 
 #include "ZEEntity.h"
-#include "ZEGraphics/ZEDirectionalLight.h"
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEGraphics/ZERenderCommand.h"
 
 ZE_META_ENTITY_DESCRIPTION(ZESkyBrush);
 
-class ZEScene;
 class ZETextureCubeResource;
 class ZESkyBoxMaterial;
 
@@ -52,15 +50,13 @@ class ZESkyBrush : public ZEEntity
 {
 	ZE_META_ENTITY(ZESkyBrush)
 	private:
+		ZECanvas							SkyBox;
 		ZETextureCubeResource*				SkyTexture;
 		ZESkyBoxMaterial*					SkyMaterial;
-		ZECanvas							SkyBox;
 		ZERenderCommand						SkyRenderCommand;
 
 		ZEVector3							SkyColor;
 		float								SkyBrightness;
-
-		ZEScene*							Scene;
 
 											ZESkyBrush();
 		virtual								~ZESkyBrush();
@@ -85,7 +81,7 @@ class ZESkyBrush : public ZEEntity
 
 		static ZESkyBrush*					CreateInstance();
 
-};	
+};
 /*
 ZE_POST_PROCESSOR_START(Meta)
 <zinek>
@@ -97,7 +93,7 @@ ZE_POST_PROCESSOR_START(Meta)
 				default="ZEVector3::One"
 				description="Color of the sky"
 				semantic="ZE_PS_COLOR"/>
-			<property name="SkyBrightness"		
+			<property name="SkyBrightness"
 				type="float"
 				autogetset="true"
 				default="1.0f"

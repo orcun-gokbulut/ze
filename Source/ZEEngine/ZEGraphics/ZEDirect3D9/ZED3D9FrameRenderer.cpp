@@ -486,9 +486,9 @@ void ZED3D9FrameRenderer::DoPreZPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 
-	for (ZESize I = 0; I < CommandList.GetCount(); I++)
+	for (ZESize I = 0; I < RenderList.GetCount(); I++)
 	{
-		ZERenderCommand* RenderCommand = &CommandList[I];
+		ZERenderCommand* RenderCommand = &RenderList[I];
 		
 		if ((RenderCommand->Material->GetMaterialFlags() & ZE_MTF_PRE_Z_PASS) == 0)
 			continue;
@@ -523,9 +523,9 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
-	for (ZESize I = 0; I < CommandList.GetCount(); I++)
+	for (ZESize I = 0; I < RenderList.GetCount(); I++)
 	{
-		ZERenderCommand* RenderCommand = &CommandList[I];
+		ZERenderCommand* RenderCommand = &RenderList[I];
 
 		if (RenderCommand->Pipeline != ZE_RORP_3D)
 			continue;
@@ -621,7 +621,7 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	zeProfilerStart("Forward Pass");
 
 	// GBuffers
-	ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
+	ZED3D9CommonTools::SetRenderTarget(0, ViewPort); // ZED3D9CommonTools::SetRenderTarget(0, ABuffer);
 
 	ZED3D9CommonTools::SetTexture(0, GBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, GBuffer2, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
@@ -636,9 +636,9 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	
-	for (ZESize I = 0; I < CommandList.GetCount(); I++)
+	for (ZESize I = 0; I < RenderList.GetCount(); I++)
 	{		
-		ZERenderCommand* RenderCommand = &CommandList[I];
+		ZERenderCommand* RenderCommand = &RenderList[I];
 		if (RenderCommand->Pipeline != ZE_RORP_3D)
 			continue;
 
@@ -673,9 +673,9 @@ void ZED3D9FrameRenderer::Do2DPass()
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 
-	for (ZESize I = 0; I < CommandList.GetCount(); I++)
+	for (ZESize I = 0; I < RenderList.GetCount(); I++)
 	{		
-		ZERenderCommand* RenderCommand = &CommandList[I];
+		ZERenderCommand* RenderCommand = &RenderList[I];
 		if (RenderCommand->Pipeline != ZE_RORP_2D)
 			continue;
 
@@ -919,12 +919,12 @@ void ZED3D9FrameRenderer::AddToRenderList(ZERenderCommand* RenderCommand)
 			return;
 	#endif
 
-		CommandList.Add(*RenderCommand);
+		RenderList.Add(*RenderCommand);
 }
 
 void ZED3D9FrameRenderer::ClearRenderList()
 {
-	CommandList.Clear(true);
+	RenderList.Clear(true);
 }
 
 static ZEInt RenderCommandCompare(const ZERenderCommand* A, const ZERenderCommand* B)
@@ -949,7 +949,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 	if (!GetModule()->GetEnabled() || GetModule()->IsDeviceLost())
 		return;
 
-	CommandList.Sort(RenderCommandCompare);
+	RenderList.Sort(RenderCommandCompare);
 
 	zeProfilerStart("Rendering");
 
@@ -966,20 +966,22 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DoLightningPass();
 		DoForwardPass();
 
-		/*HDRProcessor.SetInput(ABuffer);
-		HDRProcessor.SetOutput((ZED3D9ViewPort*)ViewPort);
+		/*
+		HDRProcessor.SetInput(ABuffer);
+		HDRProcessor.SetOutput(ViewPort); // HDRProcessor.SetOutput((ZED3D9ViewPort*)SSAAInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
+		*/
 
-		
+		/*
 		// Edge detection pass
 		EDProcessor.SetInputDepth(GBuffer1);
 		EDProcessor.SetInputNormal(GBuffer2);
 		EDProcessor.SetInputColor(EDInputBuffer);
 		EDProcessor.SetOutput(ViewPort);
 		EDProcessor.Process();
-		*/
 		
-		/*//Anti Aliasing pass
+		
+		//Anti Aliasing pass
 		SSAAProcessor.SetInputDepth(GBuffer1);
 		SSAAProcessor.SetInputNormal(GBuffer2);
 		SSAAProcessor.SetInputColor(SSAAInputBuffer);
@@ -997,12 +999,12 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		BlurProcessor.Process();
 		
 		// DOF Pass
-		
+	
 		DOFProcessor.SetInputColor(DOFInputBuffer);
 		DOFProcessor.SetInputDepth(GBuffer1);
 		DOFProcessor.SetOutput(ViewPort);
-		DOFProcessor.Process();*/
-		
+		DOFProcessor.Process();
+		*/
 		Do2DPass();
 
 	GetDevice()->EndScene();

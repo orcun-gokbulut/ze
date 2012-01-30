@@ -157,7 +157,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName,
 	ZETexture2DResource* TextureResource;
 	ZEString NewPath = ConstructResourcePath(FileName);
 	
-	ZEFile* File = ZEFile::Open(NewPath);
+	ZEFile* File = ZEFile::Open(NewPath, false);
 	if(File != NULL && File->IsOpen())
 	{
 		if(UserOptions == NULL)

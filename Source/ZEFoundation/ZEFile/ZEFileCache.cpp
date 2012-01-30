@@ -212,6 +212,7 @@ bool ZEFileCache::IsFileCache(ZEString FileName)
 		return true;
 	}
 
+	Check.Close();
 	return false;
 }
 

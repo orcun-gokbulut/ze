@@ -821,6 +821,9 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 	if (Index != VertexCount + 1 )
 		zeWarning("Corrupted canvas file. Vertex count is less than verties in the file. (FileName : \"%s\")", NewPath.ToCString());
 
+	File->Close();
+	delete File;
+
 	return true;
 }
 

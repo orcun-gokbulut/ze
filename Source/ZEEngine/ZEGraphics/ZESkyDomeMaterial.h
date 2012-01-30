@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZESkyDomeMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,54 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef __ZE_SKY_DOME_MATERIAL_H__
+#define __ZE_SKY_DOME_MATERIAL_H__
+
+#include "ZEMaterial.h"
+#include "ZEMath\ZEVector.h"
+
+class ZECamera;
+
+class ZESkyDomeMaterial : public ZEMaterial
+{
+	friend class ZED3D9Module;
+	friend class ZESkyDome;
+
+	protected:
+		float						G;						// Scattering Symmetry input for phase function 
+
+		float						AmbientFactor;			// Ambient Factor to use with ambient color
+		ZEVector4					AmbientColor;			// Ambient color to enlighten dark areas
+
+		float						MieConstant;			// Mie scattering constant
+		float						RayleighConstant;		// Rayleigh scattering constant
+
+		float						MieScaleDepth;
+		float						RayleighScaleDepth;
+		
+		float						OuterRadius;			// Radius of Sky Dome
+		float						InnerRadius;			// Radius of Earth
+
+		float						SunIntensity;			// Brightness of sun
+		
+		ZEVector3					SunPosition;			// Position of sun
+		ZEVector3					WaveLenght;				// Wave length of sunlight
+
+		ZEVector3					CameraPosition;			// Camera to render from
+		ZEVector3					CameraPositionOffset;	// Offset to render with static camera position
+
+
+									ZESkyDomeMaterial();
+		virtual						~ZESkyDomeMaterial();
+
+	private:
+
+	public:
+		ZEMaterialFlags				GetMaterialFlags() const;
+		static ZESkyDomeMaterial*	CreateInstance();
+
+};
+
+
+#endif // __ZE_SKY_DOME_MATERIAL_H__
