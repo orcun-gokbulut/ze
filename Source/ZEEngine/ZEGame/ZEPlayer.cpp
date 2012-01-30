@@ -66,6 +66,10 @@ ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
 #define ACTIONID_FORWARD_BUTTON			20
 #define ACTIONID_BACKWARD_BUTTON		21
 
+#define ACTIONID_UP						22
+#define ACTIONID_DOWN					23
+
+
 ZEDrawFlags ZEPlayer::GetDrawFlags()
 {
 	return ZE_DF_NONE | ZE_DF_LIGHT_SOURCE;
@@ -79,6 +83,16 @@ ZECamera* ZEPlayer::GetCamera()
 ZEListener* ZEPlayer::GetListener()
 {
 	return Listener;
+}
+
+void ZEPlayer::SetMovementSpeed(float Meters)
+{
+	MovementSpeed = Meters;
+}
+
+float ZEPlayer::GetMovementSpeed()
+{
+	return MovementSpeed;
 }
 
 void ZEPlayer::SetFOV(float FOV)
@@ -107,9 +121,6 @@ void ZEPlayer::Tick(float Time)
 	ZEInputAction* Current;
 	zeInput->ProcessInputMap(&InputMap);
 
-	//float MetersPerSecond = 0.00150f;
-	float MetersPerSecond = 5.0f;
-
 	ZEVector3 RayDirection, HitPosition, HitNormal;
 
 	for (ZESize I = 0; I < InputMap.InputActionCount; I++)
@@ -118,26 +129,26 @@ void ZEPlayer::Tick(float Time)
 		switch(Current->Id)
 		{
 			case ACTIONID_FORWARD:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, 3));
-				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
+				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, 1));
+				ZEVector3::Scale(PositionChange, PositionChange, MovementSpeed * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
 			case ACTIONID_BACKWARD:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, -3));
-				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
+				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, -1));
+				ZEVector3::Scale(PositionChange, PositionChange, MovementSpeed * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
 			case ACTIONID_STRAFELEFT:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(-3, 0, 0));
-				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
+				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(-1, 0, 0));
+				ZEVector3::Scale(PositionChange, PositionChange, MovementSpeed * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
 			case ACTIONID_STRAFERIGHT:
-				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(3, 0, 0));
-				ZEVector3::Scale(PositionChange, PositionChange, MetersPerSecond * Time);
+				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(1, 0, 0));
+				ZEVector3::Scale(PositionChange, PositionChange, MovementSpeed * Time);
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
@@ -179,6 +190,20 @@ void ZEPlayer::Tick(float Time)
 
 			case ACTIONID_HEAD_ORIENTATION:
 				//Camera->SetRotation(Current->Quaternion);
+				break;
+
+			case ACTIONID_UP:
+				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0.0f, 1.0f, 0.0f));
+				ZEVector3::Scale(PositionChange, PositionChange, MovementSpeed * Time);
+				ZEVector3::Add(Position, Position, PositionChange);
+				SetPosition(Position);
+				break;
+
+			case ACTIONID_DOWN:
+				ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0.0f, -1.0f, 0.0f));
+				ZEVector3::Scale(PositionChange, PositionChange, MovementSpeed * Time);
+				ZEVector3::Add(Position, Position, PositionChange);
+				SetPosition(Position);
 				break;
 		}
 		
@@ -234,6 +259,11 @@ ZEPlayer::ZEPlayer()
 
 	FOV = ZE_PI_4;
 	Rx = Ry = Rz = 0;
+	MovementSpeed = 10.0f;
+
+
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_UP,				ZEInputEvent("Keyboard", ZE_IKB_LSHIFT, ZE_IBS_PRESSING)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_DOWN,			ZEInputEvent("Keyboard", ZE_IKB_LCONTROL, ZE_IBS_PRESSING)));
 
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_FORWARD,			 ZEInputEvent("Keyboard", ZE_IKB_W, ZE_IBS_PRESSING)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_BACKWARD,		 ZEInputEvent("Keyboard", ZE_IKB_S, ZE_IBS_PRESSING)));

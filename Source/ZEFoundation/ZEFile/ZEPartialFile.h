@@ -59,9 +59,6 @@ class ZEPartialFile : public ZEFile
 		virtual ZEUInt64		Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count);
 		virtual ZEUInt64		WriteFormated(const char* Format, ...);
 
-
-		/* If the seek operation tends to go beyond end position or below start position
-		the file cursor remains as it is and the return will be false */
 		virtual bool			Seek(ZEInt64 Offset, ZESeekFrom Origin);
 		virtual ZEUInt64		Tell();
 
@@ -71,8 +68,8 @@ class ZEPartialFile : public ZEFile
 		virtual ZEUInt64		GetFileSize() const;
 		virtual bool			Eof();
 
-		virtual ZEUInt	IncreaseReferenceCount();
-		virtual ZEUInt	DecreaseReferenceCount();
+		virtual ZEUInt			IncreaseReferenceCount();
+		virtual ZEUInt			DecreaseReferenceCount();
 
 								ZEPartialFile();
 		virtual					~ZEPartialFile();

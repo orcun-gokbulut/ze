@@ -241,8 +241,7 @@ void ZEPartialFile::Close()
 {
 	// Parent File will close itself if and only if its reference count is zero
 	ParentFile->DecreaseReferenceCount();
-	ParentFile->Close();
-		
+	
 	// Close the partial file
 	ReferenceCount	= 0;
 	StartPosition	= 0;
@@ -346,6 +345,8 @@ ZEUInt64 ZEPartialFile::WriteFormated(const char* Format, ...)
 	return WriteSize;
 }
 
+/* If the seek operation tends to go beyond end position or below start position
+the file cursor remains as it is and the return will be false */
 bool ZEPartialFile::Seek(ZEInt64 Offset, ZESeekFrom Origin)
 {
 	if(!IsOpen())

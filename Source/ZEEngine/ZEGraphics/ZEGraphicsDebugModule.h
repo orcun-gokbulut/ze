@@ -48,11 +48,18 @@ class ZECanvasBrush;
 class ZEModel;
 class ZEPortalMap;
 class ZESkyBrush;
+class ZESkyDome;
+class ZEUITextControl;
+
 
 class ZEGraphicsDebugModule : public ZEApplicationModule
 {
 	private:
+
+		ZEPortalMap*			Map;
+		ZEModel*				Model;
 		ZEPlayer*				Player;
+		ZESkyBrush*				SkyBrush;
 		ZEPointLight*			PointLight1;
 		ZEPointLight*			PointLight2;
 		ZEPointLight*			PointLight3;
@@ -60,13 +67,16 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 		ZEPointLight*			PointLight5;
 		ZEPointLight*			PointLight6;
 		ZEProjectiveLight*		ProjectiveLight0;
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
 		ZEDirectionalLight*		DirectionalLight0;
-
-		ZESkyBrush*				SkyBrush;
-
-		ZEPortalMap*			Map;
-		ZEModel*				Model;
+		ZEOmniProjectiveLight*	OmniProjectiveLight0;
+		
+		// Sky Dome related variables
+		ZESkyDome*				SkyDome;
+		float					SunRotationSpeed;
+		ZEUITextControl*		Coordinates;
+		ZEUITextControl*		CameraHeight;
+		ZEUITextControl*		InOutRadius;
+		ZEUITextControl*		MovementSpeed;
 
 	public:
 		virtual bool			Initialize();

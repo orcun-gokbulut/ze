@@ -65,6 +65,7 @@ class ZED3D9ShadowRenderer;
 class ZED3D9PostProcessor;
 class ZED3D9FixedMaterialShader;
 class ZED3D9ShaderManager;
+//class ZED3D9SkyDomeMaterial;
 
 enum ZED3D9PixelShaderVersion
 {
@@ -183,6 +184,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual ZESimpleMaterial*						CreateSimpleMaterial();
 		virtual ZETerrainMaterial*						CreateTerrainMaterial();
 		virtual ZESkyBoxMaterial*						CreateSkyBoxMaterial();
+		virtual ZESkyDomeMaterial*						CreateSkyDomeMaterial();
 		virtual ZEFixedMaterial*						CreateCustomMaterial();
 		virtual ZEFixedMaterial*						CreateCGFXMaterial();
 

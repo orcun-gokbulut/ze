@@ -73,6 +73,8 @@ ze_add_source(ZESceneCuller.cpp			Sources)
 ze_add_source(ZESceneCuller.h			Sources Headers)
 ze_add_source(ZESkyBrush.cpp			Sources)
 ze_add_source(ZESkyBrush.h				Sources Header ZEPP)
+ze_add_source(ZESkyDome.cpp				Sources)
+ze_add_source(ZESkyDome.h				Sources Header)
 ze_add_source(ZETrigger.cpp				Sources)
 ze_add_source(ZETrigger.h				Sources Header ZEPP)
 

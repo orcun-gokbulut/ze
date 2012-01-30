@@ -208,15 +208,16 @@ ZEUInt64 ZEFile::Tell()
 
 void ZEFile::Close()
 {
-	if(IsOpen() && ReferenceCount == 0)
-	{
-		fclose((FILE*)File);
-		FilePath.Clear();
+	if(!IsOpen() || ReferenceCount != 0)
+		return;
 
-		File			= NULL;
-		FileCursor		= 0;
-		ReferenceCount	= 0;
-	}
+	fclose((FILE*)File);
+	FilePath.Clear();
+
+	File			= NULL;
+	AutoClose		= false;
+	FileCursor		= 0;
+	ReferenceCount	= 0;
 }
 
 bool ZEFile::Eof()
@@ -241,6 +242,16 @@ bool ZEFile::IsOpen()
 		return true;
 
 	return false;
+}
+
+void ZEFile::SetAutoClose(bool AutoClose)
+{
+	this->AutoClose = AutoClose;
+}
+
+bool ZEFile::GetAutoClose()
+{
+	return AutoClose;
 }
 
 ZEUInt64 ZEFile::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)
@@ -412,7 +423,13 @@ ZEUInt ZEFile::IncreaseReferenceCount()
 
 ZEUInt ZEFile::DecreaseReferenceCount()
 {
-	return --ReferenceCount;
+	// Prevent ReferenceCount to go to negative values
+	ReferenceCount = (ReferenceCount == 0) ? 0 : --ReferenceCount;
+
+	if (ReferenceCount == 0 && AutoClose)
+		this->Close();
+
+	return ReferenceCount;
 }
 
 ZEString ZEFile::GetFileName(const ZEString& FilePath)
@@ -479,23 +496,6 @@ bool ZEFile::IsDirectoryExists(const ZEString& FilePath)
 	}
 
 	return false;
-
-	// OLD CODE
-	/*WIN32_FIND_DATA Info;
-	HANDLE Handle = FindFirstFile(FilePath.GetValue(), &Info);
-
-	BOOL Result = Handle != INVALID_HANDLE_VALUE;
-	while(Result)
-	{
-		if ((Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0)
-			return true;
-
-		Result = FindNextFile(Handle, &Info);
-	}
-
-	FindClose(Handle);
-
-	return false;*/
 }
 
 bool ZEFile::IsFileExists(const ZEString& FilePath)
@@ -509,23 +509,6 @@ bool ZEFile::IsFileExists(const ZEString& FilePath)
 	}
 
 	return false;
-
-	// OLD CODE
-	/*WIN32_FIND_DATA Info;
-	HANDLE Handle = FindFirstFile(FilePath.GetValue(), &Info);
-
-	BOOL Result = Handle != INVALID_HANDLE_VALUE;
-	while(Result)
-	{
-		if ((Info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0)
-			return true;
-
-		Result = FindNextFile(Handle, &Info);
-	}
-
-	FindClose(Handle);
-
-	return false;*/
 }
 
 ZEFile& ZEFile::operator = (ZEFile& OtherFile)
@@ -537,8 +520,8 @@ ZEFile& ZEFile::operator = (ZEFile& OtherFile)
 	return *this;
 }
 
-// Opens and returns the first file
-ZEFile* ZEFile::Open(const ZEString& FilePath)
+// Opens and returns the first file that is found
+ZEFile* ZEFile::Open(const ZEString& FilePath, bool AutoClose)
 {
 	ZESize		TokenStart = 0;
 	ZESize		TokenEnd = 0;
@@ -596,7 +579,7 @@ ZEFile* ZEFile::Open(const ZEString& FilePath)
 			}
 		}
 
-		// If no new token is found, between '\\' characters, since the last iteration
+		// If no new token is found, between '\\' characters since the last iteration
 		// It means that the last token of the string still remains
 		if(TokenEnd == Token.GetLength())
 			  TokenEnd = Lenght;
@@ -633,7 +616,8 @@ ZEFile* ZEFile::Open(const ZEString& FilePath)
 					zeError("Cannot resolve the path \"%s\".", FilePath.ToCString());
 					return NULL;
 				}
-				
+
+				File->SetAutoClose(AutoClose);
 				return File;
 			}
 		}
@@ -651,6 +635,7 @@ ZEFile::ZEFile()
 	File			= NULL;
 	FileType		= ZE_FT_FILE;
 	
+	AutoClose		= false;
 	FilePath		= "";
 	FileCursor		= 0;
 	ReferenceCount	= 0;

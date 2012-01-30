@@ -144,7 +144,7 @@ ZEFontResource* ZEFontResource::LoadResource(const ZEString& FilePath, const ZET
 	ZEString NewPath = ConstructResourcePath(FilePath);
 
 	ZEFontResource* FontResource;
-	ZEFile* File = ZEFile::Open(NewPath);
+	ZEFile* File = ZEFile::Open(NewPath, false);
 
 	if (File != NULL && File->IsOpen())
 	{
@@ -188,6 +188,7 @@ ZEFontResource* ZEFontResource::LoadResource(ZEFile* ResourceFile, const ZETextu
 	}
 
 	ZEFontResource* NewResource = new ZEFontResource();
+	NewResource->SetFileName(ResourceFile->GetFilePath());
 	NewResource->TextureResources.SetCount(FileHeader.TextureCount);
 	NewResource->Materials.SetCount(FileHeader.TextureCount);
 
