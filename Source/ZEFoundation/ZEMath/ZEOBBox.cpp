@@ -323,104 +323,84 @@ bool ZEOBBox::IntersectionTest(const ZEOBBox& BoundingBox1, const ZEAABBox& Boun
 	return false;
 }
 
-static inline bool SperatingAxisTest(const ZEVector3& Axis, const ZEOBBox& A, const ZEOBBox& B)
+static inline bool SeparatingAxisTest(const ZEVector3& Axis, const ZEOBBox& A, const ZEOBBox& B)
 {
-	float dA = A.HalfSize.x *  ZEMath::Abs(ZEVector3::DotProduct(A.Right, Axis)) +
+	float dA = A.HalfSize.x * ZEMath::Abs(ZEVector3::DotProduct(A.Right, Axis)) +
 		A.HalfSize.y *  ZEMath::Abs(ZEVector3::DotProduct(A.Up, Axis)) +
 		A.HalfSize.z *  ZEMath::Abs(ZEVector3::DotProduct(A.Front, Axis));
 
-	float dB = B.HalfSize.x *  ZEMath::Abs(ZEVector3::DotProduct(B.Right, Axis)) +
+	float dB = B.HalfSize.x * ZEMath::Abs(ZEVector3::DotProduct(B.Right, Axis)) +
 		B.HalfSize.y *  ZEMath::Abs(ZEVector3::DotProduct(B.Up, Axis)) +
 		B.HalfSize.z *  ZEMath::Abs(ZEVector3::DotProduct(B.Front, Axis));
 
-	return ZEMath::Abs(ZEVector3::DotProduct(ZEVector3(A.Center, B.Center), Axis)) > (dA + dB); 
+	return (ZEMath::Abs(ZEVector3::DotProduct(ZEVector3(A.Center, B.Center), Axis)) > (dA + dB)); 
 }
 
 bool ZEOBBox::IntersectionTest(const ZEOBBox& A, const ZEOBBox& B)
 {
-	ZEVector3 BRelCenter;
-	BRelCenter.x = ZEMath::Abs(ZEVector3::DotProduct(A.Right, B.Center));
-	BRelCenter.y = ZEMath::Abs(ZEVector3::DotProduct(A.Up, B.Center));
-	BRelCenter.z = ZEMath::Abs(ZEVector3::DotProduct(A.Front, B.Center));
-
-	ZEVector3 BRelRight;
-	BRelRight.x = ZEMath::Abs(ZEVector3::DotProduct(A.Right, B.Right));
-	BRelRight.y = ZEMath::Abs(ZEVector3::DotProduct(A.Up, B.Right));
-	BRelRight.z = ZEMath::Abs(ZEVector3::DotProduct(A.Front, B.Right));
-
-	ZEVector3 BRelUp;
-	BRelUp.x = ZEMath::Abs(ZEVector3::DotProduct(A.Right, B.Up));
-	BRelUp.y = ZEMath::Abs(ZEVector3::DotProduct(A.Up, B.Up));
-	BRelUp.z = ZEMath::Abs(ZEVector3::DotProduct(A.Front, B.Up));
-
-	ZEVector3 BRelFront;
-	BRelFront.x = ZEMath::Abs(ZEVector3::DotProduct(A.Right, B.Front));
-	BRelFront.y = ZEMath::Abs(ZEVector3::DotProduct(A.Up, B.Front));
-	BRelFront.z = ZEMath::Abs(ZEVector3::DotProduct(A.Front, B.Front));
-
-	ZEVector3 t(A.Center, BRelCenter);
-
-	// A vs B
-	float dA, dB;
-	dB = B.HalfSize.x * BRelRight.x +
-		B.HalfSize.y * BRelUp.x +
-		B.HalfSize.z * BRelFront.x;
-
-	if (ZEMath::Abs(t.x) <= A.HalfSize.x + dB)
+	if (SeparatingAxisTest(A.Right, A, B))
 		return false;
 
-	dB = B.HalfSize.x * BRelRight.y +
-		B.HalfSize.y * BRelUp.y +
-		B.HalfSize.z * BRelFront.y;
-
-	if (ZEMath::Abs(t.y) <= A.HalfSize.y + dB)
+	if (SeparatingAxisTest(A.Up, A, B))
 		return false;
 
-	dB = B.HalfSize.x * BRelRight.z +
-		B.HalfSize.y * BRelUp.z +
-		B.HalfSize.z * BRelFront.z;
-
-	if (ZEMath::Abs(t.z) <= A.HalfSize.z + dB)
+	if (SeparatingAxisTest(A.Front, A, B))
 		return false;
 
-	// B vs A
-	dA = A.HalfSize.x * BRelRight.x +
-		B.HalfSize.y * BRelRight.y +
-		B.HalfSize.z * BRelRight.z;
-
-	if (ZEMath::Abs(ZEVector3::DotProduct(t, BRelRight)) <= B.HalfSize.x + dA)
+	if (SeparatingAxisTest(B.Right, A, B))
 		return false;
 
-	dA = A.HalfSize.x *  BRelUp.x +
-		B.HalfSize.y *  BRelUp.y +
-		B.HalfSize.z *  BRelUp.z;
-
-	if (ZEMath::Abs(ZEVector3::DotProduct(t, BRelUp)) <= B.HalfSize.y + dA)
+	if (SeparatingAxisTest(B.Up, A, B))
 		return false;
 
-	dA = A.HalfSize.x *  BRelFront.x +
-		B.HalfSize.y * BRelFront.y +
-		B.HalfSize.z * BRelFront.z;
-
-	if (ZEMath::Abs(ZEVector3::DotProduct(t, BRelFront)) <= B.HalfSize.z + dA)
+	if (SeparatingAxisTest(B.Front, A, B))
 		return false;
 
-	if (!SperatingAxisTest(A.Right, A, B))
+	ZEVector3 CrossProductOutput;
+
+	ZEVector3::CrossProduct(CrossProductOutput, B.Right, A.Right);
+
+	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	if (!SperatingAxisTest(A.Up, A, B))
+	ZEVector3::CrossProduct(CrossProductOutput, B.Right, A.Up);
+
+	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	if (!SperatingAxisTest(A.Front, A, B))
+	ZEVector3::CrossProduct(CrossProductOutput, B.Right, A.Front);
+
+	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	if (!SperatingAxisTest(B.Right, A, B))
+	ZEVector3::CrossProduct(CrossProductOutput, B.Up, A.Right);
+
+	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	if (!SperatingAxisTest(B.Up, A, B))
+	ZEVector3::CrossProduct(CrossProductOutput, B.Up, A.Up);
+
+	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
-	if (!SperatingAxisTest(B.Front, A, B))
+	ZEVector3::CrossProduct(CrossProductOutput, B.Up, A.Front);
+
+	if (SeparatingAxisTest(CrossProductOutput, A, B))
+		return false;
+
+	ZEVector3::CrossProduct(CrossProductOutput, B.Front, A.Right);
+
+	if (SeparatingAxisTest(CrossProductOutput, A, B))
+		return false;
+
+	ZEVector3::CrossProduct(CrossProductOutput, B.Front, A.Up);
+
+	if (SeparatingAxisTest(CrossProductOutput, A, B))
+		return false;
+
+	ZEVector3::CrossProduct(CrossProductOutput, B.Front, A.Front);
+
+	if (SeparatingAxisTest(CrossProductOutput, A, B))
 		return false;
 
 	return true;
