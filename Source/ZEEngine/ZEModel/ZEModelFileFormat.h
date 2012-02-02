@@ -43,12 +43,13 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDefinitions.h"
 #include "ZETypes.h"
+#include "ZEFile/ZEFileStructure.h"
 
 #define ZE_MDLF_MAX_NAME_SIZE						128
 #define ZE_MDLF_MAX_FILENAME_SIZE					256
 
 #define ZE_FILE_MAKEVERSION(Major, Minor)			((((ZEUInt32)(Major)) << 16) + (ZEUInt32)(Minor))
-#define ZE_MDLF_VERSION								ZE_FILE_MAKEVERSION(0,40)
+#define ZE_MDLF_VERSION								ZE_FILE_MAKEVERSION(0, 40)
 #define ZE_MDLF_HEADER								((ZEUInt32)((ZEUInt32)'ZEMF' + (ZEUInt32)'MDL '))
 
 #define	ZE_MDLF_MATERIAL_CHUNKID					((ZEUInt32)(ZE_MDLF_HEADER + (ZEUInt32)'MTRL'))
@@ -70,253 +71,263 @@ typedef ZEUInt32 ZEModelFilePhysicalShapeType;
 #define ZE_MFPST_CYLINDER							3
 #define ZE_MFPST_CONVEX								4
 
+ZEPackStruct(
 struct ZEModelFileMaterialChunk
 {
-	ZEUInt32								ChunkId;
-	char								Shader[ZE_MDLF_MAX_FILENAME_SIZE];
-	ZEUInt32								ShaderComponents;
+	ZEUInt32				ChunkId;
+	char					Shader[ZE_MDLF_MAX_FILENAME_SIZE];
+	ZEUInt32				ShaderComponents;
 
-	bool								TwoSided;
-	bool								LightningEnabled;
-	bool								Wireframe;
-	bool								Transparant;
+	bool					TwoSided;
+	bool					LightningEnabled;
+	bool					Wireframe;
+	bool					Transparant;
 
-	ZEVector3							AmbientColor;
-	ZEVector3							DiffuseColor;
-	ZEVector3							SpecularColor;
-	ZEVector3							EmmisiveColor;
-	float								EmmisiveFactor;
-	float								SpecularFactor;
-	float								Opasity;
-	float								ReflectionFactor;
-	float								RefractionFactor;
-	ZEVector2							DetailMapTiling;
+	ZEVector3				AmbientColor;
+	ZEVector3				DiffuseColor;
+	ZEVector3				SpecularColor;
+	ZEVector3				EmmisiveColor;
+	float					EmmisiveFactor;
+	float					SpecularFactor;
+	float					Opasity;
+	float					ReflectionFactor;
+	float					RefractionFactor;
+	ZEVector2				DetailMapTiling;
 
-	char								DiffuseMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char								NormalMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char								SpecularMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char								EmmisiveMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char								OpasityMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char								DetailMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char								DetailNormalMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char								ReflectionMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char								RefractionMap[ZE_MDLF_MAX_FILENAME_SIZE];
-	char								LightMap[ZE_MDLF_MAX_FILENAME_SIZE];
-};
+	char					DiffuseMap[ZE_MDLF_MAX_FILENAME_SIZE];
+	char					NormalMap[ZE_MDLF_MAX_FILENAME_SIZE];
+	char					SpecularMap[ZE_MDLF_MAX_FILENAME_SIZE];
+	char					EmmisiveMap[ZE_MDLF_MAX_FILENAME_SIZE];
+	char					OpasityMap[ZE_MDLF_MAX_FILENAME_SIZE];
+	char					DetailMap[ZE_MDLF_MAX_FILENAME_SIZE];
+	char					DetailNormalMap[ZE_MDLF_MAX_FILENAME_SIZE];
+	char					ReflectionMap[ZE_MDLF_MAX_FILENAME_SIZE];
+	char					RefractionMap[ZE_MDLF_MAX_FILENAME_SIZE];
+	char					LightMap[ZE_MDLF_MAX_FILENAME_SIZE];
+});
 
+ZEPackStruct(
 struct ZEModelFileHeaderChunk
 {
-	ZEUInt32								HEADER;
-	ZEUInt32								Version;
+	ZEUInt32				HEADER;
+	ZEUInt32				Version;
 
-	ZEUInt32								MaterialCount;
-	ZEUInt32								MeshCount;
-	ZEUInt32								BoneCount;
-	ZEUInt32								AnimationCount;
-};
+	ZEUInt32				MaterialCount;
+	ZEUInt32				MeshCount;
+	ZEUInt32				BoneCount;
+	ZEUInt32				AnimationCount;
+});
 
+ZEPackStruct(
 struct ZEModelFileAnimationChunk
 {
-	ZEUInt32								ChunkId;
-	char								Name[ZE_MDLF_MAX_NAME_SIZE];
-	ZEUInt32								FrameCount;
-};
+	ZEUInt32				ChunkId;
+	char					Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEUInt32				FrameCount;
+});
 
+ZEPackStruct(
 struct ZEModelFileAnimationFrameChunk
 {
-	ZEUInt32								ChunkId;
-	ZEUInt32								BoneKeyCount;
-	ZEUInt32								MeshKeyCount;
-};
+	ZEUInt32				ChunkId;
+	ZEUInt32				BoneKeyCount;
+	ZEUInt32				MeshKeyCount;
+});
 
-struct ZEModelFilePhysicalPolygonChunk
+ZEPackStruct(struct  ZEModelFilePhysicalPolygonChunk
 {	
-	ZEInt									VertexIndexes[3];
-};
+	ZEInt					VertexIndexes[3];
+});
 
+ZEPackStruct(
 struct ZEModelFilePhysicalShapeChunk
 {
-	ZEUInt32								ChunkId;
+	ZEUInt32				ChunkId;
 	ZEModelFilePhysicalShapeType		Type;
-	ZEVector3							Position;
-	ZEQuaternion						Rotation;
-	float								Restitution;
-	float								StaticFriction;
-	float								DynamicFriction;
+	ZEVector3				Position;
+	ZEQuaternion			Rotation;
+	float					Restitution;
+	float					StaticFriction;
+	float					DynamicFriction;
 	
 	union
 	{
 		struct
 		{
-			float						Width;
-			float						Height;
-			float						Length;
+			float			Width;
+			float			Height;
+			float			Length;
 		} Box;
 
 		struct
 		{
-			float						Radius;
+			float			Radius;
 		} Sphere;
 
 		struct
 		{
-			float						Radius;
-			float						Height;
+			float			Radius;
+			float			Height;
 		} Capsule;
 
 		struct  
 		{
-			float						Radius;
-			float						Height;
+			float			Radius;
+			float			Height;
 		} Cylinder;
 
 		struct
 		{
-			ZEUInt32						VertexCount;
+			ZEUInt32		VertexCount;
 		} Convex;
 	};
-};
+});
 
+ZEPackStruct(
 struct ZEModelFilePhysicalBodyChunk
 {
-	ZEUInt32								ChunkId;
-	ZEUInt32				                Type;
-	bool								Enabled;
-	float								Mass;
-	float								LinearDamping;
-	float								AngularDamping;
-	ZEVector3							MassCenter;
-	ZEUInt32								ShapeCount;
-};
+	ZEUInt32				ChunkId;
+	ZEUInt32				Type;
+	bool					Enabled;
+	float					Mass;
+	float					LinearDamping;
+	float					AngularDamping;
+	ZEVector3				MassCenter;
+	ZEUInt32				ShapeCount;
+});
 
+ZEPackStruct(
 struct ZEModelFilePhysicalJointChunk
 {
-	ZEUInt32								ChunkId;
+	ZEUInt32				ChunkId;
 	
-	ZEUInt32								JointType;
+	ZEUInt32				JointType;
 
-	bool								Enabled;
+	bool					Enabled;
 
-	ZEUInt32								Body1Id;
-	ZEUInt32								Body2Id;
+	ZEUInt32				Body1Id;
+	ZEUInt32				Body2Id;
 
-	bool								CollideBodies;
+	bool					CollideBodies;
 
-	bool								UseGlobalAnchorAxis;
+	bool					UseGlobalAnchorAxis;
 
-	ZEVector3							GlobalAnchor;
-	ZEQuaternion						GlobalAxis;
+	ZEVector3				GlobalAnchor;
+	ZEQuaternion			GlobalAxis;
 
-	ZEVector3							LocalAnchor1;
-	ZEVector3							LocalAnchor2;
+	ZEVector3				LocalAnchor1;
+	ZEVector3				LocalAnchor2;
 
-	ZEQuaternion						LocalAxis1;
-	ZEQuaternion						LocalAxis2;
+	ZEQuaternion			LocalAxis1;
+	ZEQuaternion			LocalAxis2;
 
-	bool								Breakable;
-	float								BreakForce;
-	float								BreakTorque;
+	bool					Breakable;
+	float					BreakForce;
+	float					BreakTorque;
 
-	ZEUInt32								XMotion;
-	ZEUInt32								YMotion;
-	ZEUInt32								ZMotion;
+	ZEUInt32				XMotion;
+	ZEUInt32				YMotion;
+	ZEUInt32				ZMotion;
 
-	float 								LinearLimitValue;
-	float 								LinearLimitRestitution;
-	float 								LinearLimitSpring;
-	float 								LinearLimitDamping;
+	float 					LinearLimitValue;
+	float 					LinearLimitRestitution;
+	float 					LinearLimitSpring;
+	float 					LinearLimitDamping;
 
-	ZEUInt32								TwistMotion;
-	float 								TwistLowLimitValue;
-	float 								TwistLowLimitRestitution;
-	float 								TwistLowLimitSpring;
-	float 								TwistLowLimitDamping;
-	float 								TwistHighLimitValue;
-	float 								TwistHighLimitRestitution;
-	float 								TwistHighLimitSpring;
-	float 								TwistHighLimitDamping;
+	ZEUInt32				TwistMotion;
+	float 					TwistLowLimitValue;
+	float 					TwistLowLimitRestitution;
+	float 					TwistLowLimitSpring;
+	float 					TwistLowLimitDamping;
+	float 					TwistHighLimitValue;
+	float 					TwistHighLimitRestitution;
+	float 					TwistHighLimitSpring;
+	float 					TwistHighLimitDamping;
 
-	ZEUInt32								Swing1Motion;
-	float 								Swing1LimitValue;
-	float 								Swing1LimitRestitution;
-	float 								Swing1LimitSpring;
-	float 								Swing1LimitDamping;
+	ZEUInt32				Swing1Motion;
+	float 					Swing1LimitValue;
+	float 					Swing1LimitRestitution;
+	float 					Swing1LimitSpring;
+	float 					Swing1LimitDamping;
 
-	ZEUInt32								Swing2Motion;
-	float 								Swing2LimitValue;
-	float 								Swing2LimitRestitution;
-	float 								Swing2LimitSpring;
-	float 								Swing2LimitDamping;
+	ZEUInt32				Swing2Motion;
+	float 					Swing2LimitValue;
+	float 					Swing2LimitRestitution;
+	float 					Swing2LimitSpring;
+	float 					Swing2LimitDamping;
 
-	ZEVector3 							MotorTargetPosition;
-	ZEQuaternion 						MotorTargetOrientation;
-	ZEVector3 							MotorTargetVelocity;
-	ZEVector3 							MotorTargetAngularVelocity;
+	ZEVector3 				MotorTargetPosition;
+	ZEQuaternion 			MotorTargetOrientation;
+	ZEVector3 				MotorTargetVelocity;
+	ZEVector3 				MotorTargetAngularVelocity;
 
-	ZEUInt32 							LinearXMotor;
-	float 								LinearXMotorForce;
-	float 								LinearXMotorSpring;
-	float 								LinearXMotorDamper;
+	ZEUInt32 				LinearXMotor;
+	float 					LinearXMotorForce;
+	float 					LinearXMotorSpring;
+	float 					LinearXMotorDamper;
 
-	ZEUInt32 							LinearYMotor;
-	float 								LinearYMotorForce;
-	float 								LinearYMotorSpring;
-	float 								LinearYMotorDamper;
+	ZEUInt32 				LinearYMotor;
+	float 					LinearYMotorForce;
+	float 					LinearYMotorSpring;
+	float 					LinearYMotorDamper;
 
-	ZEUInt32 							LinearZMotor;
-	float 								LinearZMotorForce;
-	float 								LinearZMotorSpring;
-	float 								LinearZMotorDamper;
+	ZEUInt32 				LinearZMotor;
+	float 					LinearZMotorForce;
+	float 					LinearZMotorSpring;
+	float 					LinearZMotorDamper;
 
-	ZEUInt32								AngularSwingMotor;
-	float								AngularSwingMotorForce;
-	float								AngularSwingMotorSpring;
-	float								AngularSwingMotorDamper;
+	ZEUInt32				AngularSwingMotor;
+	float					AngularSwingMotorForce;
+	float					AngularSwingMotorSpring;
+	float					AngularSwingMotorDamper;
 
-	ZEUInt32								AngularTwistMotor;
-	float								AngularTwistMotorForce;
-	float								AngularTwistMotorSpring;
-	float								AngularTwistMotorDamper;
+	ZEUInt32				AngularTwistMotor;
+	float					AngularTwistMotorForce;
+	float					AngularTwistMotorSpring;
+	float					AngularTwistMotorDamper;
 
-	ZEUInt32								AngularSlerpMotor;
-	float								AngularSlerpMotorForce;
-	float								AngularSlerpMotorSpring;
-	float								AngularSlerpMotorDamper;
-};
+	ZEUInt32				AngularSlerpMotor;
+	float					AngularSlerpMotorForce;
+	float					AngularSlerpMotorSpring;
+	float					AngularSlerpMotorDamper;
+});
 
+ZEPackStruct(
 struct ZEModelFileMeshLODChunk
 {
-	ZEUInt32								ChunkId;
-	ZEInt32								LODLevel;
-	ZEInt32								MaterialId;
-	ZEUInt32								VertexCount;
-	ZEUInt32								AffectingBoneCount;
-};
+	ZEUInt32				ChunkId;
+	ZEInt32					LODLevel;
+	ZEInt32					MaterialId;
+	ZEUInt32				VertexCount;
+	ZEUInt32				AffectingBoneCount;
+});
 
+ZEPackStruct(
 struct ZEModelFileMeshChunk
 {
-	ZEUInt32								ChunkId;
-	char								Name[ZE_MDLF_MAX_NAME_SIZE];
-	ZEAABBox							BoundingBox;
-	ZEVector3							Position;
-	ZEQuaternion						Rotation;
-	ZEVector3							Scale;
-	bool								IsSkinned;
-	ZEUInt32								LODCount;
-	bool								HasPhysicalBody;
-};
+	ZEUInt32				ChunkId;
+	char					Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEAABBox				BoundingBox;
+	ZEVector3				Position;
+	ZEQuaternion			Rotation;
+	ZEVector3				Scale;
+	bool					IsSkinned;
+	ZEUInt32				LODCount;
+	bool					HasPhysicalBody;
+});
 
+ZEPackStruct(
 struct ZEModelFileBoneChunk
 {
-	ZEUInt32								ChunkId;
-	char								Name[ZE_MDLF_MAX_NAME_SIZE];
-	ZEInt32								ParentBone;
-	ZEVector3							RelativePosition;
-	ZEQuaternion						RelativeRotation;
-	ZEVector3							RelativeScale;
-	ZEAABBox							BoundingBox;
-	bool								HasPhysicalBody;
-	bool								HasPhysicalJoint;
-};
+	ZEUInt32				ChunkId;
+	char					Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEInt32					ParentBone;
+	ZEVector3				RelativePosition;
+	ZEQuaternion			RelativeRotation;
+	ZEVector3				RelativeScale;
+	ZEAABBox				BoundingBox;
+	bool					HasPhysicalBody;
+	bool					HasPhysicalJoint;
+});
 
 #endif

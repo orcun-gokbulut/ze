@@ -33,14 +33,14 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-set(QT_MOC_EXECUTABLE ${CMAKE_SOURCE_DIR}/Tool/${ZE_BUILD_PLATFORM}/Qt/moc)
-set(QT_RCC_EXECUTABLE ${CMAKE_SOURCE_DIR}/Tool/${ZE_BUILD_PLATFORM}/Qt/rcc)
-set(QT_UIC_EXECUTABLE ${CMAKE_SOURCE_DIR}/Tool/${ZE_BUILD_PLATFORM}/Qt/uic)
+set(QT_MOC_EXECUTABLE ${CMAKE_SOURCE_DIR}/Tool/${ZEBUILD_PLATFORM}/Qt/moc)
+set(QT_RCC_EXECUTABLE ${CMAKE_SOURCE_DIR}/Tool/${ZEBUILD_PLATFORM}/Qt/rcc)
+set(QT_UIC_EXECUTABLE ${CMAKE_SOURCE_DIR}/Tool/${ZEBUILD_PLATFORM}/Qt/uic)
 
 include_directories(
-	${CMAKE_SOURCE_DIR}/Include/${ZE_BUILD_PLATFORM})
+	${CMAKE_SOURCE_DIR}/Include/${ZEBUILD_PLATFORM})
 	
 link_directories(
-	${CMAKE_SOURCE_DIR}/Lib/${ZE_BUILD_PLATFORM}/Qt)
+	${CMAKE_SOURCE_DIR}/Lib/${ZEBUILD_PLATFORM}/Qt)
 	
 include(Qt4Macros)

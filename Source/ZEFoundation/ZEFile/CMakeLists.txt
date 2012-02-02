@@ -39,19 +39,21 @@ include_directories(
 	${PROJECT_SOURCE_DIR}
 	${CMAKE_SOURCE_DIR}/Source)
 	
-ze_add_source(ZECompressedFile.cpp	Sources)
-ze_add_source(ZECompressedFile.h	Sources Headers)
-ze_add_source(ZEFile.cpp			Sources)
-ze_add_source(ZEFile.h				Sources Headers)
-ze_add_source(ZEFileTests.cpp			  Tests)
-ze_add_source(ZEPartialFile.cpp		Sources)
-ze_add_source(ZEPartialFile.h		Sources Headers)
+ze_add_source(ZECompressedFile.cpp		Sources)
+ze_add_source(ZECompressedFile.h		Sources Headers)
+ze_add_source(ZEFile.cpp				Sources)
+ze_add_source(ZEFile.h					Sources Headers)
+ze_add_source(ZEFileTests.cpp			Tests)
+ze_add_source(ZEPartialFile.cpp			Sources)
+ze_add_source(ZEPartialFile.h			Sources Headers)
 ze_add_source(ZEPartialFileTests.cpp	Tests)
-ze_add_source(ZEFileCache.cpp		Sources)
-ze_add_source(ZEFileCache.h			Sources Headers)
-ze_add_source(ZEFileCacheTests.cpp	Tests)
-ze_add_source(ZEPack.cpp			Sources)
-ze_add_source(ZEPack.h				Sources Headers)
+ze_add_source(ZEFileCache.cpp			Sources)
+ze_add_source(ZEFileCache.h				Sources Headers)
+ze_add_source(ZEFileCacheTests.cpp		Tests)
+ze_add_source(ZEFileStructure.h			Sources Headers)
+ze_add_source(ZEFileStructure.cpp		Sources)
+ze_add_source(ZEPack.cpp				Sources)
+ze_add_source(ZEPack.h					Sources Headers)
 
 ze_add_library(ZEFile 
 	SOURCES ${Sources} 

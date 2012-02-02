@@ -114,7 +114,7 @@ ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(const ZEString& FileName)
 	ZEFile* File = ZEFile::Open(NewPath);
 	if (File == NULL || !File->IsOpen())
 	{
-		zeError("Can not open zeVertexDecl file. (FileName : \"%s\")", NewPath);
+		zeError("Can not open zeVertexDecl file. (FileName : \"%s\")", NewPath.ToCString());
 		return NULL;
 	}
 	

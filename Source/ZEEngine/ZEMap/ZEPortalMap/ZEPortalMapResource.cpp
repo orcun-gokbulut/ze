@@ -98,7 +98,7 @@ const ZETexture2D* ZEPortalMapResource::ManageMapMaterialTextures(const ZEString
 	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(ZEFile::GetParentDirectory(this->GetFileName()) + "\\" + FileName);
 	if (NewTextureResource == NULL)
 	{
-		zeError("Can not load texture file. (FileName : \"%s\")", FileName);
+		zeError("Can not load texture file. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 	TextureResources.Add(NewTextureResource);

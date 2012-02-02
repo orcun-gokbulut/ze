@@ -37,7 +37,7 @@
 #ifndef	__ZE_API_H__
 #define __ZE_API_H__
 
-#ifdef ZE_BUILD_PLUGIN
+#ifdef ZEBUILD_PLUGIN
 	#define ZEAPI __declspec(dllimport)
 #else
 	#define ZEAPI __declspec(dllexport)

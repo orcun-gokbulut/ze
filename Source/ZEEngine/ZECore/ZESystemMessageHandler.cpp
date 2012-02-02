@@ -41,3 +41,7 @@ ZESystemMessageHandler::ZESystemMessageHandler()
 	MaxMessage = 0xFFFFFFFF;
 	MinMessage = 0;
 }
+
+ZESystemMessageHandler::~ZESystemMessageHandler()
+{
+}

@@ -38,11 +38,7 @@
 #define __ZE_VERSION_H__
 
 #include "ZETypes.h"
-
-enum ZEVersionPlatform
-{
-	ZE_VP_WIN32
-};
+#include "ZEDS/ZEString.h"
 
 enum ZEVersionCheckLevel
 {
@@ -58,18 +54,17 @@ class ZEVersion
 		ZEUInt					Minor;
 		ZEUInt					Internal;
 		ZEUInt					Build;		
-		ZEVersionPlatform		Platform;
+		const char*				Platform;
 
-		void					GetShortString(char* Buffer);
-		void 					GetLongString(char* Buffer);
-
-		static ZEVersion		GetZinekVersion();
-		static bool				Check(const ZEVersion& A, const ZEVersion& B, ZEVersionCheckLevel Level);
+		ZEString				GetShortString();
+		ZEString				GetLongString();
 
 								ZEVersion();
 								ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal);
 								ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build);
-								ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build, ZEVersionPlatform Platform);
+
+		static ZEVersion		GetZinekVersion();
+		static bool				Check(const ZEVersion& A, const ZEVersion& B, ZEVersionCheckLevel Level);
 };
 
 #endif
