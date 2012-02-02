@@ -776,7 +776,7 @@ ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 		NewResource->ReferenceCount = 0;
 		if (!ReadModelFromFile(NewResource, ResourceFile))
 		{
-			zeError("Can not load model file. (FileName : \"%s\")", FileName);
+			zeError("Can not load model file. (FileName : \"%s\")", FileName.ToCString());
 			ResourceFile->Close();
 			delete ResourceFile;
 			delete NewResource;
@@ -791,7 +791,7 @@ ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 	}
 	else
 	{
-		zeError("Model file does not exists. (FileName : \"%s\")", FileName);
+		zeError("Model file does not exists. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 }

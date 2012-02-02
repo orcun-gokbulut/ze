@@ -39,6 +39,7 @@
 
 #include "ZEDefinitions.h"
 #include "ZETypes.h"
+#include "ZEFile/ZEFileStructure.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZERectangle3D.h"
@@ -66,107 +67,116 @@
 #define ZE_MAP_PHYSICAL_MESH_VERTICES_CHUNK ((ZEUInt32)(ZE_MAP_PHYSICAL_MESH_CHUNK + (ZEUInt32)'VERT'))
 #define ZE_MAP_PHYSICAL_MESH_POLYGONS_CHUNK ((ZEUInt32)(ZE_MAP_PHYSICAL_MESH_CHUNK + (ZEUInt32)'INDX'))
 
-struct ZEMapFileMaterialChunk
+ZEPackStruct(
+struct  ZEMapFileMaterialChunk
 {
-	ZEUInt32						ChunkIdentifier;
+	ZEUInt32				ChunkIdentifier;
 
-	char							Shader[ZE_MAP_MAX_FILENAME_SIZE];
-	ZEUInt32						ShaderComponents;
+	char					Shader[ZE_MAP_MAX_FILENAME_SIZE];
+	ZEUInt32				ShaderComponents;
 
-	bool							TwoSided;
-	bool							LightningEnabled;
-	bool							Wireframe;
-	bool							Transparant;
+	bool					TwoSided;
+	bool					LightningEnabled;
+	bool					Wireframe;
+	bool					Transparant;
 
-	ZEVector3						AmbientColor;
-	ZEVector3						DiffuseColor;
-	ZEVector3						SpecularColor;
-	ZEVector3						EmmisiveColor;
-	float							EmmisiveFactor;
-	float							SpecularFactor;
-	float							Transparancy;
-	float							ReflectionFactor;
-	float							RefractionFactor;
-	ZEVector2						DetailMapTiling;
+	ZEVector3				AmbientColor;
+	ZEVector3				DiffuseColor;
+	ZEVector3				SpecularColor;
+	ZEVector3				EmmisiveColor;
+	float					EmmisiveFactor;
+	float					SpecularFactor;
+	float					Transparancy;
+	float					ReflectionFactor;
+	float					RefractionFactor;
+	ZEVector2				DetailMapTiling;
 
-	char							DiffuseMap[ZE_MAP_MAX_FILENAME_SIZE];
-	char							NormalMap[ZE_MAP_MAX_FILENAME_SIZE];
-	char							SpecularMap[ZE_MAP_MAX_FILENAME_SIZE];
-	char							EmmisiveMap[ZE_MAP_MAX_FILENAME_SIZE];
-	char							OpacityMap[ZE_MAP_MAX_FILENAME_SIZE];
-	char							DetailMap[ZE_MAP_MAX_FILENAME_SIZE];
-	char							DetailNormalMap[ZE_MAP_MAX_FILENAME_SIZE];
-	char							ReflectionMap[ZE_MAP_MAX_FILENAME_SIZE];
-	char							RefractionMap[ZE_MAP_MAX_FILENAME_SIZE];
-	char							LightMap[ZE_MAP_MAX_FILENAME_SIZE];
-};
+	char					DiffuseMap[ZE_MAP_MAX_FILENAME_SIZE];
+	char					NormalMap[ZE_MAP_MAX_FILENAME_SIZE];
+	char					SpecularMap[ZE_MAP_MAX_FILENAME_SIZE];
+	char					EmmisiveMap[ZE_MAP_MAX_FILENAME_SIZE];
+	char					OpacityMap[ZE_MAP_MAX_FILENAME_SIZE];
+	char					DetailMap[ZE_MAP_MAX_FILENAME_SIZE];
+	char					DetailNormalMap[ZE_MAP_MAX_FILENAME_SIZE];
+	char					ReflectionMap[ZE_MAP_MAX_FILENAME_SIZE];
+	char					RefractionMap[ZE_MAP_MAX_FILENAME_SIZE];
+	char					LightMap[ZE_MAP_MAX_FILENAME_SIZE];
+});
 
+ZEPackStruct(
 struct ZEMapFileVertexChunk
 {
-	ZEVector3						Position;
-	ZEVector3						Normal;
-	ZEVector3						Tangent;
-	ZEVector3						Binormal;
-	ZEVector2						Texcoord;
-};
+	ZEVector3				Position;
+	ZEVector3				Normal;
+	ZEVector3				Tangent;
+	ZEVector3				Binormal;
+	ZEVector2				Texcoord;
+});
 
-struct ZEMapFilePolygonChunk
+ZEPackStruct(
+struct  ZEMapFilePolygonChunk
 {	
-	ZEUInt32							Material;
-	ZEMapFileVertexChunk			Vertices[3];
-};
+	ZEUInt32				Material;
+	ZEMapFileVertexChunk	Vertices[3];
+});
 
-struct ZEMapFilePhysicalMeshPolygonChunk
+ZEPackStruct(
+struct  ZEMapFilePhysicalMeshPolygonChunk
 {
-	ZEUInt32							Indices[3];
-};
+	ZEUInt32				Indices[3];
+});
 
-struct ZEMapFileOctreeChunk
+ZEPackStruct(
+struct  ZEMapFileOctreeChunk
 {
-	ZEUInt32							ChunkIdentifier;
-	ZEAABBox					BoundingBox;
-	ZEUInt32							Depth;
-	bool							SubSpaces[8];
-	bool							IsLeaf;
-	ZEUInt32							PolygonCount;
-};
+	ZEUInt32				ChunkIdentifier;
+	ZEAABBox				BoundingBox;
+	ZEUInt32				Depth;
+	bool					SubSpaces[8];
+	bool					IsLeaf;
+	ZEUInt32				PolygonCount;
+});
 
-struct ZEMapFileDoorChunk
+ZEPackStruct(
+struct  ZEMapFileDoorChunk
 {
-	ZEUInt32							ChunkIdentifier;
-	char							Name[ZE_MAP_MAX_NAME_SIZE];
-	ZERectangle3D					Rectangle;
-	ZEUInt32							PortalIds[2];
-	bool							IsOpen;
-};
+	ZEUInt32				ChunkIdentifier;
+	char					Name[ZE_MAP_MAX_NAME_SIZE];
+	ZERectangle3D			Rectangle;
+	ZEUInt32				PortalIds[2];
+	bool					IsOpen;
+});
 
-struct ZEMapFilePortalChunk
+ZEPackStruct(
+struct  ZEMapFilePortalChunk
 {
-	ZEUInt32							ChunkIdentifier;
-	char							Name[ZE_MAP_MAX_NAME_SIZE];
-	ZEAABBox					BoundingBox;
-	ZEUInt32							PolygonCount;
-	bool							HasOctree;
-	bool							HasPhysicalMesh;
-};
+	ZEUInt32				ChunkIdentifier;
+	char					Name[ZE_MAP_MAX_NAME_SIZE];
+	ZEAABBox				BoundingBox;
+	ZEUInt32				PolygonCount;
+	bool					HasOctree;
+	bool					HasPhysicalMesh;
+});
 
-struct ZEMapFilePhysicalMeshChunk
+ZEPackStruct(
+struct  ZEMapFilePhysicalMeshChunk
 {
-	ZEUInt32							ChunkIdentifier;
-	ZEUInt32							VertexCount;
-	ZEUInt32							PolygonCount;
-};
+	ZEUInt32				ChunkIdentifier;
+	ZEUInt32				VertexCount;
+	ZEUInt32				PolygonCount;
+});
 
-struct ZEMapFileHeader
+ZEPackStruct(
+struct  ZEMapFileHeader
 {
-	ZEUInt32							Header;
-	ZEUInt32							Version;
+	ZEUInt32				Header;
+	ZEUInt32				Version;
 
-	ZEUInt32							MaterialCount;
-	ZEUInt32							PortalCount;
-	ZEUInt32							DoorCount;
+	ZEUInt32				MaterialCount;
+	ZEUInt32				PortalCount;
+	ZEUInt32				DoorCount;
 
-};
+});
 
 #endif
 

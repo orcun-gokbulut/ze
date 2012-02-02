@@ -333,7 +333,7 @@ ZEString ZEInputEvent::GetInputString()
 			return "";
 	}
 
-	sprintf(Temp, "%s:%s[%d%].%s", Device->GetDeviceName(), TypeString, Index, ModifierString);
+	sprintf(Temp, "%s:%s[%d%].%s", Device->GetDeviceName().ToCString(), TypeString, Index, ModifierString);
 
 	return Temp;
 

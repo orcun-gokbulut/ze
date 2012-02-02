@@ -143,7 +143,7 @@ bool ZEWindowsInputModule::Initialize()
 	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		if (!Devices[I]->Initialize())
 		{
-			zeError("Can not initialize input device. Name : \"\"", Devices[I]->GetDeviceName());
+			zeError("Can not initialize input device. Name : \"\"", Devices[I]->GetDeviceName().ToCString());
 		}
 
 	return ZEInputModule::Initialize();

@@ -35,39 +35,29 @@
 
 #include "ZEVersion.h"
 
-#include <stdio.h>
-
-void ZEVersion::GetShortString(char* Buffer) 
+ZEString ZEVersion::GetShortString() 
 {
-	sprintf(Buffer, "%02u.%02u.%02u", Major, Minor, Internal);
+	ZEString Temp;
+	Temp.Format("%02u.%02u.%02u", Major, Minor, Internal);
+	return Temp;
 }
 
-void ZEVersion::GetLongString(char* Buffer)	
+ZEString ZEVersion::GetLongString()	
 {
-	char* PlatformString;
-	switch(Platform)
-	{
-		case ZE_VP_WIN32:
-			PlatformString = "WIN32";
-			break;
-
-		default:
-			PlatformString = "UNKNOWN";
-			break;
-
-	}
-	sprintf(Buffer, "%02u.%02u.%02u (%s) - Build %06u", Major, Minor, Internal, PlatformString, Build);
+	ZEString Temp;
+	Temp.Format("%02u.%02u.%02u (%s) - Build %06u", Major, Minor, Internal, ""/*ZE_PLATFORM*/, Build);
+	return Temp;
 }
 
 ZEVersion ZEVersion::GetZinekVersion()
 {
 	ZEVersion Temp;
 	
-	Temp.Major = ZE_ZINEK_VERSION_MAJOR;
-	Temp.Minor = ZE_ZINEK_VERSION_MINOR;
-	Temp.Internal = ZE_ZINEK_VERSION_INTERNAL;
-	Temp.Build = ZE_ZINEK_VERSION_BUILD;
-	Temp.Platform = ZE_VP_WIN32;
+	Temp.Major = ZE_VERSION_MAJOR;
+	Temp.Minor = ZE_VERSION_MINOR;
+	Temp.Internal = ZE_VERSION_INTERNAL;
+	Temp.Build = ZE_VERSION_BUILD;
+	//Temp.Platform = ZE_PLATFORM;
 
 	return Temp;
 }
@@ -96,7 +86,7 @@ ZEVersion::ZEVersion()
 	this->Minor = 0;
 	this->Internal = 0;
 	this->Build = 0;
-	this->Platform = ZE_VP_WIN32;
+//	this->Platform = ZE_PLATFORM;
 }
 
 ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal)
@@ -105,7 +95,7 @@ ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal)
 	this->Minor = Minor;
 	this->Internal = Internal;
 	this->Build = 0;
-	this->Platform = ZE_VP_WIN32;
+//	this->Platform = ZE_PLATFORM;
 }
 
 ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build)
@@ -113,15 +103,6 @@ ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build)
 	this->Major = Major;
 	this->Minor = Minor;
 	this->Internal = Internal;
-	this->Build = 0;
-	this->Platform = ZE_VP_WIN32;
-}
-
-ZEVersion::ZEVersion(ZEUInt Major, ZEUInt Minor, ZEUInt Internal, ZEUInt Build, ZEVersionPlatform Platform)
-{
-	this->Major = Major;
-	this->Minor = Minor;
-	this->Internal = Internal;
 	this->Build = Build;
-	this->Platform = ZE_VP_WIN32;
+//	this->Platform = ZE_PLATFORM;
 }

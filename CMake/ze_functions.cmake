@@ -115,7 +115,7 @@ function(ze_add_executable)
 	
 	target_link_libraries(${PARAMETER_TARGET} ${PARAMETER_LIBS})
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
-	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZE_BUILD_LIBS ${PARAMETER_LIBS})
+	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_LIBS ${PARAMETER_LIBS})
 
 	# Static Analysis
 	if (ZEBUILD_STATIC_CHECKS_ENABLE)
@@ -141,8 +141,8 @@ function(ze_add_executable)
 	# Copy dependecies
 	if (PARAMETER_PLUGIN)
 	else()
-		FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Dll/${ZE_BUILD_PLATFORM}/*.dll" A)
-		FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Dll/${ZE_BUILD_PLATFORM}/$(ConfigurationName)/*.dll" B)
+		FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Dll/${ZEBUILD_PLATFORM}/*.dll" A)
+		FILE(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/Dll/${ZEBUILD_PLATFORM}/$(ConfigurationName)/*.dll" B)
 		FILE(TO_NATIVE_PATH "${CMAKE_CURRENT_BINARY_DIR}/$(ConfigurationName)" C)
 		add_custom_command(
 			TARGET ${PARAMETER_TARGET}
@@ -178,7 +178,7 @@ function (ze_add_library)
 
 	target_link_libraries(${PARAMETER_TARGET} ${PARAMETER_LIBS})
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
-	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZE_BUILD_LIBS ${PARAMETER_LIBS})
+	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_LIBS ${PARAMETER_LIBS})
 	
 	# Static Analysis
 	if (ZEBUILD_STATIC_CHECKS_ENABLE)
@@ -229,7 +229,7 @@ function (ze_add_unit_tests)
 		set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER "${ZEBUILD_PROJECT_FOLDER}/Tests")
 		
 		if (PARAMETER_TEST_TARGET)
-			get_property(TEST_TARGET_LINKS TARGET ${PARAMETER_TEST_TARGET} PROPERTY ZE_BUILD_LIBS)
+			get_property(TEST_TARGET_LINKS TARGET ${PARAMETER_TEST_TARGET} PROPERTY ZEBUILD_LIBS)
 			target_link_libraries(${PARAMETER_TARGET} ${PARAMETER_TEST_TARGET} ${TEST_TARGET_LINKS})
 			add_custom_command(TARGET ${PARAMETER_TARGET}
 				POST_BUILD
@@ -239,7 +239,7 @@ function (ze_add_unit_tests)
 		target_link_libraries(${PARAMETER_TARGET} ZETest)
 	
 		source_group("" FILES ${PARAMETER_SOURCES})		
-		add_test(${PARAMETER_TARGET} ${PARAMETER_TARGET})
+		add_test(${PARAMETER_TARGET}Test ${PARAMETER_TARGET})
 			
 		# Debug
 		if (ZEBUILD_VERBOSE)

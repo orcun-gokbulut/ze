@@ -50,6 +50,7 @@ class ZESystemMessageHandler
 		virtual bool			Callback(MSG* Message) = 0;
 
 								ZESystemMessageHandler();
+		virtual					~ZESystemMessageHandler();
 };
 
 #endif

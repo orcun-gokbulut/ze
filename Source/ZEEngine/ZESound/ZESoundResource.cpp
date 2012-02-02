@@ -95,7 +95,7 @@ ZESize ZESoundResource::GetUncompressedDataSize() const
 
 ZESoundResource* ZESoundResource::LoadResource(const ZEString& FileName)
 {
-	zeLog("Loading sound file \"%s\"", FileName);
+	zeLog("Loading sound file \"%s\"", FileName.ToCString());
 
 	ZESoundResource* Temp = NULL;
 	switch(GetFileFormat(FileName))
@@ -114,18 +114,18 @@ ZESoundResource* ZESoundResource::LoadResource(const ZEString& FileName)
 
 		default:	
 		case ZE_SFF_NONE:			
-			zeError("Unknown sound file format. (FileName : \"%s\")" , FileName);
+			zeError("Unknown sound file format. (FileName : \"%s\")" , FileName.ToCString());
 			return NULL;
 			break;
 	}
 
 	if (Temp == NULL)
 	{
-		zeError("Could not load sound file. (FileName : \"%s\")" , FileName);
+		zeError("Could not load sound file. (FileName : \"%s\")" , FileName.ToCString());
 		return NULL;
 	}
 
-	zeLog("Sound file \"%s\" has been loaded.", FileName);
+	zeLog("Sound file \"%s\" has been loaded.", FileName.ToCString());
 
 	return Temp;
 }
