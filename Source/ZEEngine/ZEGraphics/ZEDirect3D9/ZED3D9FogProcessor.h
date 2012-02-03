@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9DOFProcessor.h
+ Zinek Engine - ZED3D9FogProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,71 +35,83 @@
 
 
 #pragma once
-#ifndef __ZE_D3D9_DOF_PROCESSOR_H__
-#define __ZE_D3D9_DOF_PROCESSOR_H__
+#ifndef __ZE_D3D9_FOG_PROCESSOR_H__
+#define __ZE_D3D9_FOG_PROCESSOR_H__
 
 #include "ZED3D9ComponentBase.h"
 #include "ZED3D9BlurProcessor.h"
+#include "ZEMath\ZEVector.h"
 
-class ZED3D9PixelShader;
-class ZED3D9VertexShader;
-class ZED3D9Texture2D;
 class ZETexture2D;
 class ZED3D9ViewPort;
 class ZEFrameRenderer;
+class ZED3D9Texture2D;
+class ZED3D9PixelShader;
+class ZED3D9VertexShader;
 class ZED3D9FrameRenderer;
 class ZETexture2DResource;
 
-
-class ZED3D9DOFProcessor : public ZED3D9ComponentBase
+enum ZED3D9FogModel
 {
+	ZE_D3D9_FM_LINEAR				= 0,
+	ZE_D3D9_FM_EXPONENTIAL			= 1,
+	ZE_D3D9_FM_EXPONENTIAL_SQUARE	= 2
+};
+
+
+class ZED3D9FogProcessor : public ZED3D9ComponentBase
+{
+	protected:
+		float							FogHeight;
+		float							FogDistanceFar;
+		float							FogDistanceNear;
+		float							FogVisibility;
+		
+		ZEVector3						FogColor;
+		ZEVector3						OutScatterFactor;
+		ZEVector3						InScatterFactor;
+
+		ZED3D9FogModel					FogModel;
+
+		ZED3D9FrameRenderer*			Renderer;
+
+		ZED3D9Texture2D*				InputColorBuffer;
+		ZED3D9Texture2D*				InputDepthBuffer;
+		ZED3D9ViewPort*					OutputBuffer;
+
+		ZED3D9VertexShader*				VertexShaderFog;
+		ZED3D9PixelShader*				PixelShaderExpFog;
+		ZED3D9PixelShader*				PixelShaderLinearFog;
+		ZED3D9PixelShader*				PixelShaderExpSquareFog;
+
+		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;
+	
 	private:
-		float							FarClamp;			// Max blur between FarDistance and FocusDistance [Range: 0-1]
-		float							NearClamp;			// Max blur between FocusDistance and NearDistance [Range: 0-1]
-		float							FarDistance;		// Far distance [FocusDistance < FarDistance < ZFar where FarDistance is in meters]
-		float							NearDistance;		// Near distance [ZNear < NearDistance < FocusDistance where NearDistance is in meters]
-		float							FocusDistance;		// Focus Distance [NearDistance < FocusDistance < FarDistance where FocusDistance is in meters]
-
-		ZED3D9BlurKernel*				HorizontalKernel;	// Horizontal blur kernel
-		ZED3D9BlurKernel*				VerticalKernel;		// Vertical blur kernel
-
-		ZED3D9FrameRenderer*			Renderer;			// Renderer
-
-		ZED3D9Texture2D*				ColorBufferDS2xBlur;// 1/4 sized color buffer
-		ZED3D9Texture2D*				ColorBufferDS2xTmp; // 1/4 sized temp buffer
-
-		ZED3D9Texture2D*				InputColorBuffer;	// Input color texture
-		ZED3D9Texture2D*				InputDepthBuffer;	// Input depth texture
-		ZED3D9ViewPort*					OutputBuffer;		// DOF applied output texture
-
-		ZED3D9VertexShader*				VertexShaderCommon;	// Common vertex shader for all passes
-
-		ZED3D9PixelShader*				PixelShaderDOF;		// DOF pixel shader
-		ZED3D9PixelShader*				PixelShaderDS2x;	// Down Sampling pixel shader
-		ZED3D9PixelShader*				PixelShaderBlurH;	// Horizontal blur pixel shader
-		ZED3D9PixelShader*				PixelShaderBlurV;	// Vertical blur pixel shader
-
-
-		LPDIRECT3DVERTEXDECLARATION9	VertexDeclaration;	// Vertex deceleration for quadiliteral
-
-		void							CreateBlurKernels();
-		void							CreateRenderTargets();
-
+		
 	public:
-		float							GetFocusDistance();
-		void							SetFocusDistance(float Value);
+		void							SetFogModel(ZED3D9FogModel Model);
+		ZED3D9FogModel					GetFogModel();
 
-		float							GetFarDistance();
-		void							SetFarDistance(float Value);
+		void							SetFogColor(ZEVector3 Color);
+		ZEVector3						GetFogColor();
 
-		float							GetNearDistance();
-		void							SetNearDistance(float Value);
+		void							SetOutScatterFactor(ZEVector3 Color);
+		ZEVector3						GetOutScatterFactor();
 
-		float							GetFarClamp();
-		void							SetFarClamp(float Value);
+		void							SetInScatterFactor(ZEVector3 Color);
+		ZEVector3						GetInScatterFactor();
+		
+		void							SetFogHeight(float Value);
+		float							GetFogHeight();
 
-		float							GetNearClamp();
-		void							SetNearClamp(float Value);
+		void							SetFogDistanceFar(float Value);
+		float							GetFogDistanceFar();
+		
+		void							SetFogDistanceNear(float Value);
+		float							GetFogDistanceNear();
+		
+		void							SetFogVisibility(float Value);
+		float							GetFogVisibility();
 
 		void							SetRenderer(ZEFrameRenderer* Renderer);
 		ZEFrameRenderer*				GetRenderer();
@@ -113,16 +125,16 @@ class ZED3D9DOFProcessor : public ZED3D9ComponentBase
 		void							SetOutput(ZED3D9ViewPort* Texture);
 		ZED3D9ViewPort*					GetOutput();
 
+		void							Initialize();
+		void							Deinitialize();
+
 		void							OnDeviceLost();
 		void							OnDeviceRestored();
 
 		void							Process();
 
-		void							Initialize();
-		void							Deinitialize();
-
-										ZED3D9DOFProcessor();
-		virtual							~ZED3D9DOFProcessor();
+										ZED3D9FogProcessor();
+		virtual							~ZED3D9FogProcessor();
 };
 
-#endif	/* __ZE_D3D9_DOF_PROCESSOR_H__ */
+#endif	/* __ZE_D3D9_FOG_PROCESSOR_H__ */

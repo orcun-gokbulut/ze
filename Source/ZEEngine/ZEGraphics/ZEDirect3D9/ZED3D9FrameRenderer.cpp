@@ -621,7 +621,7 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	zeProfilerStart("Forward Pass");
 
 	// GBuffers
-	ZED3D9CommonTools::SetRenderTarget(0, ViewPort); // ZED3D9CommonTools::SetRenderTarget(0, ABuffer);
+	ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
 
 	ZED3D9CommonTools::SetTexture(0, GBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, GBuffer2, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
@@ -739,6 +739,10 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 		BlurInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	BlurInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_I8_4, true);
 
+	if(FogInputBuffer == NULL)
+		FogInputBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
+	FogInputBuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_I8_4, true);
+
 	if (ABuffer == NULL)
 		ABuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
 	ABuffer->Create(ViewPort->GetWidth(), ViewPort->GetHeight(), ZE_TPF_F16_4, true);
@@ -746,6 +750,7 @@ void ZED3D9FrameRenderer::InitializeRenderTargets()
 
 void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 {
+	ZED3D_DESTROY(ABuffer);
 	ZED3D_DESTROY(GBuffer1);
 	ZED3D_DESTROY(GBuffer2);
 	ZED3D_DESTROY(GBuffer3);
@@ -755,39 +760,41 @@ void ZED3D9FrameRenderer::DeinitializeRenderTargets()
 	/*
 	ZED3D_DESTROY(EDInputBuffer);
 	*/
+	ZED3D_DESTROY(FogInputBuffer);
 	ZED3D_DESTROY(DOFInputBuffer);
 	ZED3D_DESTROY(SSAAInputBuffer);
 	ZED3D_DESTROY(CTInputBuffer);
 	ZED3D_DESTROY(BlurInputBuffer);
-	ZED3D_DESTROY(ABuffer);
+	
 }
 
 ZED3D9FrameRenderer::ZED3D9FrameRenderer()
 {
-	GBuffer1 = NULL;
-	GBuffer2 = NULL;
-	GBuffer3 = NULL;
-	LBuffer1 = NULL;
-	LBuffer2 = NULL;
+	GBuffer1 		= NULL;
+	GBuffer2 		= NULL;
+	GBuffer3 		= NULL;
+	LBuffer1 		= NULL;
+	LBuffer2 		= NULL;
 	ABuffer			= NULL;
 	SSAOBuffer		= NULL;
 	/*
 	EDInputBuffer	= NULL;
 	*/
+	FogInputBuffer	= NULL;
 	DOFInputBuffer	= NULL;
 	CTInputBuffer	= NULL;
 	BlurInputBuffer	= NULL;
 	SSAAInputBuffer = NULL;
 
-	LightningComponents.LightMeshVB		= NULL;
-	LightningComponents.PointLightVS	= NULL;
-	LightningComponents.PointLightPS	= NULL;
-	LightningComponents.DirectionalLightVS	= NULL;
-	LightningComponents.DirectionalLightPS	= NULL;
-	LightningComponents.ProjectiveLightVS	= NULL;
-	LightningComponents.ProjectiveLightPS	= NULL;
-	LightningComponents.OmniProjectiveLightVS = NULL;
-	LightningComponents.OmniProjectiveLightPS = NULL;
+	LightningComponents.LightMeshVB				= NULL;
+	LightningComponents.PointLightVS			= NULL;
+	LightningComponents.PointLightPS			= NULL;
+	LightningComponents.DirectionalLightVS		= NULL;
+	LightningComponents.DirectionalLightPS		= NULL;
+	LightningComponents.ProjectiveLightVS		= NULL;
+	LightningComponents.ProjectiveLightPS		= NULL;
+	LightningComponents.OmniProjectiveLightVS 	= NULL;
+	LightningComponents.OmniProjectiveLightPS 	= NULL;
 
 	SetViewPort(zeGraphics->GetFrameBufferViewPort());
 }
@@ -829,7 +836,10 @@ bool ZED3D9FrameRenderer::Initialize()
 	EDProcessor.SetRenderer(this);
 	EDProcessor.Initialize();
 	*/
-	
+
+	FogProcessor.SetRenderer(this);
+	FogProcessor.Initialize();
+
 	DOFProcessor.SetRenderer(this);
 	DOFProcessor.Initialize();
 
@@ -846,6 +856,7 @@ void ZED3D9FrameRenderer::Deinitialize()
 	/*
 	EDProcessor.Deinitialize();
 	*/
+	FogProcessor.Deinitialize();
 	DOFProcessor.Deinitialize();
 	CTProcessor.Deinitialize();
 	BlurProcessor.Deinitialize();
@@ -965,7 +976,22 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DoGBufferPass();
 		DoLightningPass();
 		DoForwardPass();
+		
+		/*
+		//Anti Aliasing pass
+		SSAAProcessor.SetInputDepth(GBuffer1);
+		SSAAProcessor.SetInputNormal(GBuffer2);
+		SSAAProcessor.SetInputColor(SSAAInputBuffer);
+		SSAAProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
+		SSAAProcessor.Process();
+		
 
+		FogProcessor.SetInputColor(FogInputBuffer);
+		FogProcessor.SetInputDepth(GBuffer1);
+		FogProcessor.SetOutput((ZED3D9ViewPort*)ABuffer->GetViewPort());
+		FogProcessor.Process();
+		*/
+		
 		/*
 		HDRProcessor.SetInput(ABuffer);
 		HDRProcessor.SetOutput(ViewPort); // HDRProcessor.SetOutput((ZED3D9ViewPort*)SSAAInputBuffer->GetViewPort());
@@ -980,13 +1006,11 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		EDProcessor.SetOutput(ViewPort);
 		EDProcessor.Process();
 		
-		
-		//Anti Aliasing pass
-		SSAAProcessor.SetInputDepth(GBuffer1);
-		SSAAProcessor.SetInputNormal(GBuffer2);
-		SSAAProcessor.SetInputColor(SSAAInputBuffer);
-		SSAAProcessor.SetOutput((ZED3D9ViewPort*)CTInputBuffer->GetViewPort());
-		SSAAProcessor.Process();
+		// DOF Pass
+		DOFProcessor.SetInputColor(DOFInputBuffer);
+		DOFProcessor.SetInputDepth(GBuffer1);
+		DOFProcessor.SetOutput(ViewPort);
+		DOFProcessor.Process();
 
 		// Color Transform Pass
 		CTProcessor.SetInput(CTInputBuffer);
@@ -998,12 +1022,6 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		BlurProcessor.SetOutput((ZED3D9ViewPort*)DOFInputBuffer->GetViewPort());
 		BlurProcessor.Process();
 		
-		// DOF Pass
-	
-		DOFProcessor.SetInputColor(DOFInputBuffer);
-		DOFProcessor.SetInputDepth(GBuffer1);
-		DOFProcessor.SetOutput(ViewPort);
-		DOFProcessor.Process();
 		*/
 		Do2DPass();
 
