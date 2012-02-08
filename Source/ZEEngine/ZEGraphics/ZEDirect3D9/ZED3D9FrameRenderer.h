@@ -48,7 +48,7 @@
 #include "ZED3D9SSAAProcessor.h"
 #include "ZEGraphics/ZEFrameRenderer.h"
 #include "ZED3D9ColorTransformProcessor.h"
-
+#include "ZED3D9MLAAProcessor.h"
 
 
 class ZELight;
@@ -82,6 +82,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		ZED3D9Texture2D*					SSAOBuffer;
 		ZED3D9Texture2D*					CTInputBuffer;
 		//ZED3D9Texture2D*					EDInputBuffer;
+		ZED3D9Texture2D*					HDRInputBuffer;
 		ZED3D9Texture2D*					FogInputBuffer;
 		ZED3D9Texture2D*					DOFInputBuffer;
 		ZED3D9Texture2D*					SSAAInputBuffer;
@@ -89,6 +90,7 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 		
 		ZED3D9SSAOProcessor					SSAOProcessor;
 		ZED3D9SSAAProcessor					SSAAProcessor;
+		ZED3D9MLAAProcessor					MLAAProcessor;
 		
 		ZED3D9EDProcessor					EDProcessor;
 		ZESmartArray<ZERenderCommand>		CommandList;
