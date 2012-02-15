@@ -48,19 +48,18 @@ class ZETerrainMaterial;
 class ZERenderer;
 class ZEVertexDeclaration;
 
-struct ZETerrainData
+struct ZETerrainLevelData
 {
-	ZESize Width;
-	ZESize Height;
-	float* HeightData;
-	ZEUInt32* ColorData;
+	ZESize		ElevationWidth;
+	ZESize		ElevationHeight;
+	float*		ElevationData;
+	ZEUInt32*	ColorData;
 };
 
-struct ZETerrainLOD
+struct ZETerrainLevel
 {
 	ZETerrainMaterial*	Material;
 	ZETexture2D*		HeightTexture;
-	ZETexture2D*		ColorTexture;
 };
 
 ZE_META_ENTITY_DESCRIPTION(ZETerrain)
@@ -73,8 +72,8 @@ class ZETerrain : public ZEEntity
 		ZEVertexDeclaration*					VertexDeclaration;
 		ZETerrainPrimitiveIndices				Indices;
 		
-		ZEArray<ZETerrainData>					TerrainData;
-		ZEArray<ZETerrainLOD>					TerrainLODs;
+		ZEArray<ZETerrainLevelData>				LevelData;
+		ZEArray<ZETerrainLevel>					Levels;
 
 		float									UnitLength;
 		ZEUInt									ChunkSize;
@@ -85,13 +84,21 @@ class ZETerrain : public ZEEntity
 		
 		ZEString								TerrainFileName;
 
-		ZEVector3								LastCameraPosition; 
+		ZESSize									ChunkPositionX;
+		ZESSize									ChunkPositionY;
 
-		bool									LoadTerrain();
-		void									UnloadTerrain();
 
-		void									Stream(ZEDrawParameters* DrawParameters);
-		bool									DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, const ZEVector3& Offset, const ZEVector3& Position, float Scale, bool Rotate, ZESize LOD);
+		bool									CreateVertexBuffer();
+		void									DestroyVertexBuffer();
+
+		bool									CreateLevels();
+		void									DestroyLevels();
+
+		bool									LoadLevelData();
+		void									UnloadLevelData();
+
+		void									Stream(ZEDrawParameters* DrawParameters, const ZEVector3& Position);
+		bool									DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, const ZEVector3& Position, ZESize Level);
 
 												ZETerrain();
 												~ZETerrain();
@@ -114,8 +121,6 @@ class ZETerrain : public ZEEntity
 
 		void									SetHeightScale(float Scale);
 		float									GetHeightScale();
-		
-		void									Stream();
 
 		virtual bool							Initialize();
 		virtual void							Deinitialize();

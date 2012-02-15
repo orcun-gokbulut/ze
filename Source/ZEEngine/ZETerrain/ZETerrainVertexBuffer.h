@@ -43,20 +43,11 @@ class ZEStaticVertexBuffer;
 
 struct ZETerrainPrimitiveIndices
 {
-	ZESize CenterQuadIndex;
-	ZESize CenterQuadSize;
+	ZESize CenterIndex;
+	ZESize CenterSize;
 	
-	ZESize LeftTopCornerIndex;
-	ZESize LeftTopCornerSize;
-
-	ZESize LeftBottomCornerIndex;
-	ZESize LeftBottomCornerSize;
-
-	ZESize LeftEdgeIndex;
-	ZESize LeftEdgeSize;
-
-	ZESize TopEdgeIndex;
-	ZESize TopEdgeSize;
+	ZESize RingIndex;
+	ZESize RingSize;
 };
 
 class ZETerrainPrimitivesGenerator
