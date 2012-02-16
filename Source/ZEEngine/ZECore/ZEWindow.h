@@ -48,16 +48,15 @@ enum ZEWindowType
 	ZE_WT_FULLSCREEN		= 4,
 };
 
-class ZESystemMessageHandler;
-
 class ZEWindow
 {
 	protected:
-		ZEInt						WindowPositionLeft, WindowPositionTop;
-		ZEInt						WindowWidth, WindowHeight;
+		ZEInt					WindowPositionLeft, WindowPositionTop;
+		ZEInt					WindowWidth, WindowHeight;
 		ZEWindowType			WindowType;
 		void*					WindowHandle;
-		ZESystemMessageHandler* SystemMessageHandler;
+		bool					MouseCursorVisibility;
+		bool					MouseCursorLockEnabled;
 
 		bool					CreateMainWindow(const char* WindowTitle);
 		bool					DestroyMainWindow();
@@ -78,6 +77,12 @@ class ZEWindow
 
 		void					SetWindowSize(ZEInt Width, ZEInt Height);
 		void					GetWindowSize(ZEInt& Width, ZEInt& Height);
+
+		void					SetMouseCursorVisibility(bool Visibility);
+		bool					GetMouseCursorVisibility();
+
+		void					SetMouseCursorLockEnabled(bool Enabled);
+		bool					GetMouseCursorLockEnabled();
 
 		void					ShowWindow();
 		void					HideWindow();
