@@ -56,50 +56,45 @@ char*  Parameters;
 ZEWindow* Window = NULL;
 bool WindowInitialization;
 
-class ZEWindowSystemMessageHandler : public ZESystemMessageHandler
+static void ManageCursorVisibility(HWND hWnd, LPARAM lParam)
 {
-	public:
-		virtual bool Callback(MSG* Message);
-};
-
-bool ZEWindowSystemMessageHandler::Callback(MSG* Message)
-{
-	switch (Message->message)
+	WORD Handle = LOWORD(lParam);
+	static bool CursorHidden = false;
+	if (Handle == HTCLIENT && !CursorHidden && !Window->GetMouseCursorVisibility() && GetFocus() == hWnd)
 	{
-		case WM_CREATE:
-			return true;
-
-		case WM_SIZE:
-			if (!WindowInitialization)
-				Window->WindowResized(LOWORD(Message->lParam), HIWORD(Message->lParam));
-			return true;
-
-		case WM_PAINT:
-			ValidateRect(Message->hwnd, NULL);
-			return true;
-
-		case WM_ACTIVATE:
-			if (Message->wParam == WA_INACTIVE)
-				Window->WindowLostFocus();
-			else
-				Window->WindowGainedFocus();
-			return true;
-
-		case WM_CLOSE:
-			if (MessageBox(Message->hwnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
-			{
-				exit(0);
-				Window->WindowDestroyed();
-			}
-			return true;
-
-		case WM_DESTROY:
-			Window->WindowDestroyed();
-			return true;
-
-		default:
-			return false;
+		CursorHidden = true;
+		ShowCursor(false);
 	}
+	else if (Handle != HTCLIENT && CursorHidden) 
+	{
+		CursorHidden = false;
+		ShowCursor(true);
+	}
+}
+
+static void LockMousePosition(HWND hWnd)
+{
+	if (!Window->GetMouseCursorLockEnabled())
+		return;
+
+	RECT Rect;
+	GetClientRect(hWnd, &Rect);
+
+	RECT ScreenRect;
+	POINT Point;
+	Point.x = Rect.left; Point.y = Rect.top;
+	ClientToScreen(hWnd, &Point);
+	ScreenRect.left = Point.x; ScreenRect.top = Point.y;
+	Point.x = Rect.right; Point.y = Rect.bottom;
+	ClientToScreen(hWnd, &Point);
+	ScreenRect.right = Point.x; ScreenRect.bottom = Point.y;
+
+	ClipCursor(&ScreenRect);
+}
+
+static void UnlockMousePosition(HWND hWnd)
+{
+	ClipCursor(NULL);
 }
 
 LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -107,23 +102,52 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	switch (msg)
 	{
 		case WM_CREATE:
-			return true;
+			break;
 
 		case WM_SIZE:
 			if (!WindowInitialization)
 				Window->WindowResized(LOWORD(lParam), HIWORD(lParam));
-			return true;
+			break;
 
 		case WM_PAINT:
 			ValidateRect(hWnd, NULL);
-			return true;
+			break;
+
+		case WM_SETCURSOR:
+			ManageCursorVisibility(hWnd, lParam);
+			break;
+
+		case WM_ACTIVATEAPP:
+			if (wParam == TRUE)
+			{
+				Window->WindowLostFocus();
+				LockMousePosition(hWnd);
+			}
+			else
+			{
+				Window->WindowGainedFocus();
+				UnlockMousePosition(hWnd);
+			}
+			break;
+		
+		case WM_LBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+			LockMousePosition(hWnd);
+			break;
 
 		case WM_ACTIVATE:
-			if (wParam == WA_INACTIVE)
+			if (wParam == WA_ACTIVE)
+			{
 				Window->WindowLostFocus();
-			else
+				LockMousePosition(hWnd);
+			}
+			else if (wParam == WA_INACTIVE)
+			{
 				Window->WindowGainedFocus();
-			return true;
+				UnlockMousePosition(hWnd);
+			}
+			break;
 
 		case WM_CLOSE:
 			if (MessageBox(hWnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
@@ -131,15 +155,17 @@ LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 				exit(0);
 				Window->WindowDestroyed();
 			}
-			return true;
+			break;
 
 		case WM_DESTROY:
 			Window->WindowDestroyed();
-			return true;
+			break;
 
 		default:
 			return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
+
+	return true;
 }
 
 void ShowWindowError()
@@ -225,23 +251,19 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
 		return false;
 	}
 
-	//ZESystemMessageManager::GetInstance()->RegisterMessageHandler(SystemMessageHandler);
-
 	WindowHandle = CreateWindowEx(WS_EX_APPWINDOW, 
-               "ZINEK ENGINE WINDOW", 
-               WindowTitle, 
-			   Style, 
-               CW_USEDEFAULT,
-			   0, 
-			   WindowWidth,
-               WindowHeight, 
-               NULL, 
-               NULL, 
-			   (HINSTANCE)zeCore->GetApplicationInstance(), 
-               NULL);
+        "ZINEK ENGINE WINDOW", 
+        WindowTitle, 
+		Style, 
+        CW_USEDEFAULT,
+		0, 
+		WindowWidth,
+        WindowHeight, 
+        NULL, 
+        NULL, 
+		(HINSTANCE)zeCore->GetApplicationInstance(), 
+        NULL);
 	
-	SystemMessageHandler->TargetWindow = (HWND)WindowHandle;
-
 	if (!WindowHandle)
 	{
 		ShowWindowError();
@@ -264,8 +286,6 @@ bool ZEWindow::DestroyMainWindow()
 		ShowWindowError();
 		return false;
 	}
-
-	ZESystemMessageManager::GetInstance()->RegisterMessageHandler(SystemMessageHandler);
 	 
 	return true;
 }
@@ -367,6 +387,26 @@ void* ZEWindow::GetHandle()
 	return WindowHandle;
 }
 
+void ZEWindow::SetMouseCursorVisibility(bool Visibility)
+{
+	MouseCursorVisibility = Visibility;
+}
+
+bool ZEWindow::GetMouseCursorVisibility()
+{
+	return MouseCursorVisibility;
+}
+
+void ZEWindow::SetMouseCursorLockEnabled(bool Enabled)
+{
+	MouseCursorLockEnabled = Enabled;
+}
+
+bool ZEWindow::GetMouseCursorLockEnabled()
+{
+	return MouseCursorLockEnabled;
+}
+
 void ZEWindow::ShowWindow()
 {
 	::ShowWindow((HWND)WindowHandle, SW_SHOWNORMAL);
@@ -403,7 +443,8 @@ ZEWindow* ZEWindow::GetInstance()
 
 ZEWindow::ZEWindow()
 {
-	SystemMessageHandler = new ZEWindowSystemMessageHandler();
+	MouseCursorVisibility = false;
+	MouseCursorLockEnabled = true;
 	WindowType = ZE_WT_DEFAULT;
 	WindowPositionLeft = CW_USEDEFAULT;
 	WindowPositionTop = 0;
@@ -415,6 +456,5 @@ ZEWindow::ZEWindow()
 
 ZEWindow::~ZEWindow()
 {
-	delete SystemMessageHandler;
 	Window = NULL;
 }
