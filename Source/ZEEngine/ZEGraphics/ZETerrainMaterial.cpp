@@ -59,6 +59,8 @@ ZETerrainMaterial::ZETerrainMaterial()
 	HeightOffset = 0.0f;
 	TextureOffset = ZEVector2::Zero;
 	TextureScale = ZEVector2::One;
+	ChunkSize = 32;
+	BlendTreshold = 0.75f;
 
 	HeightTexture = NULL;
 	ColorTexture = NULL;
@@ -137,6 +139,26 @@ void ZETerrainMaterial::SetTextureOffset(const ZEVector2& Offset)
 const ZEVector2& ZETerrainMaterial::GetTextureOffset() const
 {
 	return TextureOffset;
+}
+
+void ZETerrainMaterial::SetChunkSize(ZESize Size)
+{
+	ChunkSize = Size;
+}
+
+ZESize ZETerrainMaterial::GetChunkSize()
+{
+	return ChunkSize;
+}
+
+void ZETerrainMaterial::SetBlendTreshold(float Treshold)
+{
+	BlendTreshold = Treshold;
+}
+
+float ZETerrainMaterial::GetBlendTreshold()
+{
+	return BlendTreshold;
 }
 
 void ZETerrainMaterial::SetColorTexture(ZETexture2D* Texture)

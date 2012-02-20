@@ -469,7 +469,6 @@ void ZEConsole::DisableInput()
 	InputEnabled = false;
 }
 
-#include <crtdbg.h>
 void ZEConsole::Log(const char* Module, const char* Format, ...)
 {
 	char Buffer[32768];
@@ -490,9 +489,6 @@ void ZEConsole::Log(const char* Module, const char* Format, ...)
 		if (!_CrtCheckMemory())
 			OutputDebugString("Jackpot");
 	#endif
-	#ifdef ZE_DEBUG_ENABLE
-		OutputDebugString(Buffer2);
-	#endif
 }
 
 void ZEConsole::Output(const char* Format, ...)
@@ -511,9 +507,6 @@ void ZEConsole::Output(const char* Format, ...)
 	#ifdef ZE_DEBUG_CHECK_HEAP
 		if (!_CrtCheckMemory())
 			OutputDebugString("Jackpot");
-	#endif
-	#ifdef ZE_DEBUG_ENABLE
-		OutputDebugString(Buffer);
 	#endif
 }
 

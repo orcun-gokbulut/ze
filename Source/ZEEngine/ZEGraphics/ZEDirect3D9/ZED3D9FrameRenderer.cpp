@@ -621,7 +621,7 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	zeProfilerStart("Forward Pass");
 
 	// GBuffers
-	ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9ViewPort*)ABuffer->GetViewPort());
+	ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9ViewPort*)ViewPort);
 	
 	ZED3D9CommonTools::SetTexture(0, GBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, GBuffer2, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
@@ -988,7 +988,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DoForwardPass();
 		
 		//Anti Aliasing Process
-		MLAAProcessor.SetInputDepth(GBuffer1);
+		/*MLAAProcessor.SetInputDepth(GBuffer1);
 		MLAAProcessor.SetInputNormal(GBuffer2);
 		MLAAProcessor.SetInputColor((ZED3D9Texture2D*)ABuffer);
 		MLAAProcessor.SetOutput((ZED3D9ViewPort*)HDRInputBuffer->GetViewPort());
@@ -1003,7 +1003,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DOFProcessor.SetInputColor(DOFInputBuffer);
 		DOFProcessor.SetInputDepth(GBuffer1);
 		DOFProcessor.SetOutput(ViewPort);
-		DOFProcessor.Process();
+		DOFProcessor.Process();*/
 
 		/*
 		//Anti Aliasing Process (the old and the ugly one)

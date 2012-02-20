@@ -84,8 +84,8 @@ class ZETerrain : public ZEEntity
 		
 		ZEString								TerrainFileName;
 
-		ZESSize									ChunkPositionX;
-		ZESSize									ChunkPositionY;
+		ZESSize									OldPositionX;
+		ZESSize									OldPositionY;
 
 
 		bool									CreateVertexBuffer();
@@ -97,13 +97,14 @@ class ZETerrain : public ZEEntity
 		bool									LoadLevelData();
 		void									UnloadLevelData();
 
-		void									Stream(ZEDrawParameters* DrawParameters, const ZEVector3& Position);
-		bool									DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, const ZEVector3& Position, ZESize Level);
+		void									Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt PositionY);
+		bool									DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt PositionX, ZEInt PositionY, ZEInt Mode, ZESize Level);
 
 												ZETerrain();
 												~ZETerrain();
 
 	public:	
+		bool									Locked;
 		virtual ZEDrawFlags						GetDrawFlags() const;
 		virtual ZERayCastFlags					GetRayCastFlags() const;
 

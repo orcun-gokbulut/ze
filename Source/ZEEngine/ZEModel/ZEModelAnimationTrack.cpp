@@ -109,12 +109,13 @@ const char* ZEModelAnimationTrack::GetAnimationName()
 		return "";
 }
 
-void ZEModelAnimationTrack::SetCurrentFrame(ZEUInt Frame)
+void ZEModelAnimationTrack::SetCurrentFrame(float Frame)
 {
 	CurrentFrame = Frame;
+	UpdateMeshesAndBones();
 }
 
-ZEUInt ZEModelAnimationTrack::GetCurrentFrame()
+float ZEModelAnimationTrack::GetCurrentFrame()
 {
 	return CurrentFrame;
 }
@@ -247,19 +248,129 @@ void ZEModelAnimationTrack::Pause()
 void ZEModelAnimationTrack::Stop()
 {
 	State = ZE_MAS_STOPPED;
-	AdvanceAnimation(0.0f);
+	Tick(0.0f);
 }
 
-void ZEModelAnimationTrack::AdvanceAnimation(float ElapsedTime)
+void ZEModelAnimationTrack::UpdateMeshesAndBones()
+{
+	// Check wheater this track is the root track
+	bool RootAnimation = (&Owner->AnimationTracks[0] == this);
+
+	// Calculate interpolation value between two frames (current and next frame)
+	float Interpolation = CurrentFrame - ZEMath::Floor(CurrentFrame);
+
+	// Find next frame id
+	ZEInt NextFrameId = (ZEInt)ZEMath::Ceil(CurrentFrame);
+	if (NextFrameId >= Animation->Frames.GetCount())
+		NextFrameId = StartFrame + ZEMath::Mod(CurrentFrame, EndFrame - StartFrame);
+
+	// Get frames
+	const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[(ZEInt)ZEMath::Floor(CurrentFrame)];
+	const ZEModelResourceAnimationFrame* NextFrame = &Animation->Frames[NextFrameId];
+
+	// Update Bones 
+	for (ZESize I = 0; I < Frame->BoneKeys.GetCount(); I++)
+	{
+		const ZEModelResourceAnimationKey* Key = &Frame->BoneKeys[I];
+		const ZEModelResourceAnimationKey* NextKey = &NextFrame->BoneKeys[I];
+
+		// Linear interpolate position of the two frames (Current and next frame)
+		ZEVector3 Position;
+		ZEVector3::Lerp(Position, Key->Position, NextKey->Position, Interpolation);
+
+		// Spherical linear interpolate rotation of the two frames (Current and next frame
+		ZEQuaternion Rotation;
+		ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
+
+		// Check that whether animation will be written directly or blended with previous track
+		if (RootAnimation || BlendMode == ZE_MABM_OVERWRITE)
+		{
+			// Write the calculated value with out blending
+			Owner->Bones[Key->ItemId].SetRelativePosition(Position);
+			Owner->Bones[Key->ItemId].SetRelativeRotation(Rotation);
+		}
+		else
+		{
+			ZEVector3 PositionBlend;
+			ZEQuaternion RotationBlend;
+
+			// Select blending mode
+			switch(BlendMode)
+			{
+				case ZE_MABM_INTERPOLATE:
+					ZEVector3::Lerp(PositionBlend, Owner->Bones[Key->ItemId].GetRelativePosition(), Position, BlendFactor);
+					ZEQuaternion::Slerp(RotationBlend, Owner->Bones[Key->ItemId].GetRelativeRotation(), Rotation, BlendFactor);
+					break;
+				case ZE_MABM_ADDAPTIVE:		
+					PositionBlend = Owner->Bones[Key->ItemId].GetRelativePosition() + (Position - Owner->ModelResource->Bones[Key->ItemId].RelativePosition) * BlendFactor;
+					RotationBlend = Owner->Bones[Key->ItemId].GetRelativeRotation() * (Owner->ModelResource->Bones[Key->ItemId].RelativeRotation.Conjugate() * Rotation);
+					break;
+			}
+
+			// Update bone
+			Owner->Bones[Key->ItemId].SetRelativePosition(PositionBlend);
+			Owner->Bones[Key->ItemId].SetRelativeRotation(RotationBlend);
+		}
+	}
+
+	// Update model meshes.
+	// Mechanism is same as above (Update Bones)
+	for (ZESize I = 0; I < Frame->MeshKeys.GetCount(); I++)
+	{
+		const ZEModelResourceAnimationKey* Key = &Frame->MeshKeys[I];
+		const ZEModelResourceAnimationKey* NextKey = &NextFrame->MeshKeys[I];
+
+		ZEVector3 Position;
+		ZEVector3::Lerp(Position, Key->Position, NextKey->Position, Interpolation);
+		Owner->Meshes[Key->ItemId].SetLocalPosition(Position);
+
+		ZEQuaternion Rotation;
+		ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
+
+		ZEVector3 Scale;
+		ZEVector3::Lerp(Scale, Key->Scale, NextKey->Scale, Interpolation);
+
+		if (RootAnimation || BlendMode == ZE_MABM_OVERWRITE)
+		{
+			Owner->Meshes[Key->ItemId].SetLocalPosition(Position);
+			Owner->Meshes[Key->ItemId].SetLocalRotation(Rotation);
+			Owner->Meshes[Key->ItemId].SetLocalScale(Scale);
+		}
+		else
+		{
+			ZEVector3 PositionBlend;
+			ZEQuaternion RotationBlend;
+			ZEVector3 ScaleBlend;
+
+			switch(BlendMode)
+			{
+			case ZE_MABM_INTERPOLATE:
+				ZEVector3::Lerp(PositionBlend, Owner->Meshes[Key->ItemId].GetLocalPosition(), Position, BlendFactor);
+				ZEQuaternion::Slerp(RotationBlend, Owner->Meshes[Key->ItemId].GetLocalRotation(), Rotation, BlendFactor);
+				ZEVector3::Lerp(ScaleBlend, Owner->Meshes[Key->ItemId].GetLocalScale(), Scale, BlendFactor);
+				break;
+
+			case ZE_MABM_ADDAPTIVE:
+				PositionBlend = Owner->Meshes[Key->ItemId].GetLocalPosition() + Position * BlendFactor;
+				RotationBlend = Owner->Meshes[Key->ItemId].GetLocalRotation() * Rotation;
+				ScaleBlend = Owner->Meshes[Key->ItemId].GetLocalScale() + Scale * BlendFactor;
+				break;
+			}
+
+			Owner->Meshes[Key->ItemId].SetLocalPosition(PositionBlend);
+			Owner->Meshes[Key->ItemId].SetLocalRotation(RotationBlend);
+			Owner->Meshes[Key->ItemId].SetLocalScale(ScaleBlend);
+		}
+	}
+}
+
+void ZEModelAnimationTrack::Tick(float ElapsedTime)
 {
 	if (State == ZE_MAS_PLAYING)
 	{
 		// Check LOD status if Model's current LOD is lower than current track do not calculate it
 		if (LOD != -1 && Owner->ActiveLOD > LOD)
 			return;
-
-		// Check wheater this track is the root track
-		bool RootAnimation = (&Owner->AnimationTracks[0] == this);
 
 		// Check animation limits
 		if (CurrentFrame >= EndFrame)
@@ -282,112 +393,8 @@ void ZEModelAnimationTrack::AdvanceAnimation(float ElapsedTime)
 		if (BlendFactor == 0.0f)
 			return;
 
-		// Calculate interpolation value between two frames (current and next frame)
-		float Interpolation = CurrentFrame - ZEMath::Floor(CurrentFrame);
+		UpdateMeshesAndBones();
 
-		// Find next frame id
-		ZEInt NextFrameId = (ZEInt)ZEMath::Ceil(CurrentFrame);
-		if (NextFrameId >= Animation->Frames.GetCount())
-			NextFrameId = StartFrame + ZEMath::Mod(CurrentFrame, EndFrame - StartFrame);
-
-		// Get frames
-		const ZEModelResourceAnimationFrame* Frame = &Animation->Frames[(ZEInt)ZEMath::Floor(CurrentFrame)];
-		const ZEModelResourceAnimationFrame* NextFrame = &Animation->Frames[NextFrameId];
-
-		// Update Bones 
-		for (ZESize I = 0; I < Frame->BoneKeys.GetCount(); I++)
-		{
-			const ZEModelResourceAnimationKey* Key = &Frame->BoneKeys[I];
-			const ZEModelResourceAnimationKey* NextKey = &NextFrame->BoneKeys[I];
-			
-			// Linear interpolate position of the two frames (Current and next frame)
-			ZEVector3 Position;
-			ZEVector3::Lerp(Position, Key->Position, NextKey->Position, Interpolation);
-
-			// Spherical linear interpolate rotation of the two frames (Current and next frame
-			ZEQuaternion Rotation;
-			ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
-
-			// Check that whether animation will be written directly or blended with previous track
-			if (RootAnimation || BlendMode == ZE_MABM_OVERWRITE)
-			{
-				// Write the calculated value with out blending
-				Owner->Bones[Key->ItemId].SetRelativePosition(Position);
-				Owner->Bones[Key->ItemId].SetRelativeRotation(Rotation);
-			}
-			else
-			{
-				ZEVector3 PositionBlend;
-				ZEQuaternion RotationBlend;
-
-				// Select blending mode
-				switch(BlendMode)
-				{
-					case ZE_MABM_INTERPOLATE:
-						ZEVector3::Lerp(PositionBlend, Owner->Bones[Key->ItemId].GetRelativePosition(), Position, BlendFactor);
-						ZEQuaternion::Slerp(RotationBlend, Owner->Bones[Key->ItemId].GetRelativeRotation(), Rotation, BlendFactor);
-						break;
-					case ZE_MABM_ADDAPTIVE:		
-						PositionBlend = Owner->Bones[Key->ItemId].GetRelativePosition() + (Position - Owner->ModelResource->Bones[Key->ItemId].RelativePosition) * BlendFactor;
-						RotationBlend = Owner->Bones[Key->ItemId].GetRelativeRotation() * (Owner->ModelResource->Bones[Key->ItemId].RelativeRotation.Conjugate() * Rotation);
-						break;
-				}
-
-				// Update bone
-				Owner->Bones[Key->ItemId].SetRelativePosition(PositionBlend);
-				Owner->Bones[Key->ItemId].SetRelativeRotation(RotationBlend);
-			}
-		}
-		
-		// Update model meshes.
-		// Mechanism is same as above (Update Bones)
-		for (ZESize I = 0; I < Frame->MeshKeys.GetCount(); I++)
-		{
-			const ZEModelResourceAnimationKey* Key = &Frame->MeshKeys[I];
-			const ZEModelResourceAnimationKey* NextKey = &NextFrame->MeshKeys[I];
-			
-			ZEVector3 Position;
-			ZEVector3::Lerp(Position, Key->Position, NextKey->Position, Interpolation);
-			Owner->Meshes[Key->ItemId].SetLocalPosition(Position);
-
-			ZEQuaternion Rotation;
-			ZEQuaternion::Slerp(Rotation, Key->Rotation, NextKey->Rotation, Interpolation);
-
-			ZEVector3 Scale;
-			ZEVector3::Lerp(Scale, Key->Scale, NextKey->Scale, Interpolation);
-			
-			if (RootAnimation || BlendMode == ZE_MABM_OVERWRITE)
-			{
-				Owner->Meshes[Key->ItemId].SetLocalPosition(Position);
-				Owner->Meshes[Key->ItemId].SetLocalRotation(Rotation);
-				Owner->Meshes[Key->ItemId].SetLocalScale(Scale);
-			}
-			else
-			{
-				ZEVector3 PositionBlend;
-				ZEQuaternion RotationBlend;
-				ZEVector3 ScaleBlend;
-
-				switch(BlendMode)
-				{
-					case ZE_MABM_INTERPOLATE:
-						ZEVector3::Lerp(PositionBlend, Owner->Meshes[Key->ItemId].GetLocalPosition(), Position, BlendFactor);
-						ZEQuaternion::Slerp(RotationBlend, Owner->Meshes[Key->ItemId].GetLocalRotation(), Rotation, BlendFactor);
-						ZEVector3::Lerp(ScaleBlend, Owner->Meshes[Key->ItemId].GetLocalScale(), Scale, BlendFactor);
-						break;
-				
-					case ZE_MABM_ADDAPTIVE:
-						PositionBlend = Owner->Meshes[Key->ItemId].GetLocalPosition() + Position * BlendFactor;
-						RotationBlend = Owner->Meshes[Key->ItemId].GetLocalRotation() * Rotation;
-						ScaleBlend = Owner->Meshes[Key->ItemId].GetLocalScale() + Scale * BlendFactor;
-						break;
-				}
-
-				Owner->Meshes[Key->ItemId].SetLocalPosition(PositionBlend);
-				Owner->Meshes[Key->ItemId].SetLocalRotation(RotationBlend);
-				Owner->Meshes[Key->ItemId].SetLocalScale(ScaleBlend);
-			}
-		}
 		CurrentFrame += Speed * ElapsedTime;
 	}
 }

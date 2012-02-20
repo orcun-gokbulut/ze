@@ -156,3 +156,36 @@ float ZEMath::Saturate(float Value)
 	else
 		return Value;
 }
+
+bool ZEMath::IsPowerOfTwo(ZEUInt Value)
+{
+	return ((Value & (Value - 1)) != 0)  ? false : true;
+}
+
+ZEUInt ZEMath::NextPowerOfTwo(ZEUInt Value)
+{
+	if(Value <= 1)
+		return 1;
+
+	Value = (Value >> 1)  | Value;
+	Value = (Value >> 2)  | Value;
+	Value = (Value >> 4)  | Value;
+	Value = (Value >> 8)  | Value;
+	Value = (Value >> 16) | Value;
+
+	return ((Value << 1) + 1) - Value;
+}
+
+ZEUInt ZEMath::PreviousPowerOfTwo(ZEUInt Value)
+{
+	if(Value <= 1)
+		return 1;
+
+	Value = (Value >> 1)  | Value;
+	Value = (Value >> 2)  | Value;
+	Value = (Value >> 4)  | Value;
+	Value = (Value >> 8)  | Value;
+	Value = (Value >> 16) | Value;
+
+	return Value - (Value >> 1);
+}

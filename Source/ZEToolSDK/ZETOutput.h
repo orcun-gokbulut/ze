@@ -61,7 +61,7 @@ enum ZESDKOutputLevel
 #define zesdkNotice(Module, ...) ZESDKOutput::Output(Module, ZET_OL_NOTICE, __VA_ARGS__)
 
 #if defined(ZET_DEBUG_ENABLED) && defined(ZET_DEBUG_BREAK_ON_WARNING)
-	#ifdef ZE_PLATFORM_WINDOWS
+	#ifdef ZE_PLATFORM_CLASS_WINDOWS
 		#define zesdkWarning(Module, ...) {ZESDKOutput::Output(Module, ZET_OL_WARNINGS, __VA_ARGS__); if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zesdkBreak(true);}
 	#else
 		#define zesdkWarning(Module, ...) {ZESDKOutput::Output(Module, ZET_OL_WARNINGS, __VA_ARGS__); abort();}
@@ -71,7 +71,7 @@ enum ZESDKOutputLevel
 #endif
 
 #if defined(ZET_DEBUG_ENABLED) && defined(ZET_DEBUG_BREAK_ON_ERROR)
-	#ifdef ZE_PLATFORM_WINDOWS
+	#ifdef ZE_PLATFORM_CLASS_WINDOWS
 		#define zesdkError(Module, ...) {ZESDKOutput::Output(Module, ZET_OL_ERROR, __VA_ARGS__); if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zesdkBreak(true);}
 	#else
 		#define zesdkError(Module, ...) {ZESDKOutput::Output(Module, ZET_OL_ERROR, __VA_ARGS__); abort();}

@@ -94,7 +94,9 @@ bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderCommand->WorldMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&Camera->GetViewTransform(), 4);
 	GetDevice()->SetVertexShaderConstantF(13, (float*)&ZEVector4(HeightTexture->GetWidth(), HeightTexture->GetHeight(), HeightOffset, HeightScale), 1);
-	GetDevice()->SetVertexShaderConstantF(14, (float*)&ZEVector4(TextureOffset.x, TextureOffset.y, 1.0f / TextureScale.x, 1.0f / TextureScale.y), 1);
+	GetDevice()->SetVertexShaderConstantF(14, (float*)&ZEVector4(TextureOffset.x, TextureOffset.y, TextureScale.x, TextureScale.y), 1);
+	GetDevice()->SetVertexShaderConstantF(15, (float*)&ZEVector4((1.0f + BlendTreshold) * ChunkSize, (1.0f - BlendTreshold) * ChunkSize, 0.0f, 0.0f), 1);
+
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
 	if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
@@ -111,10 +113,11 @@ bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERender
 	else
 		GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
 
-	if (Wireframe)
+	// Setup Wireframe
+	//if (Wireframe)
 		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-	else
-		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	/*else
+		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);*/
 
 
 	// Setup Material Properties
@@ -143,8 +146,8 @@ bool ZED3D9TerrainMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderCommand->WorldMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&Camera->GetViewTransform(), 4);
 	GetDevice()->SetVertexShaderConstantF(13, (float*)&ZEVector4(HeightTexture->GetWidth(), HeightTexture->GetHeight(), HeightOffset, HeightScale), 1);
-	GetDevice()->SetVertexShaderConstantF(14, (float*)&ZEVector4(TextureOffset.x, TextureOffset.y, 1.0f / TextureScale.x, 1.0f / TextureScale.y), 1);
-
+	GetDevice()->SetVertexShaderConstantF(14, (float*)&ZEVector4(TextureOffset.x, TextureOffset.y, TextureScale.x, TextureScale.y), 1);
+	GetDevice()->SetVertexShaderConstantF(15, (float*)&ZEVector4((1.0f + BlendTreshold) * ChunkSize, (1.0f - BlendTreshold) * ChunkSize, 0.0f, 0.0f), 1);
 
 	// Setup ZCulling
 	if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
@@ -161,14 +164,13 @@ bool ZED3D9TerrainMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 		GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 	else
 		GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-
-	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
 
 	// Setup Wireframe
-	if (Wireframe)
+	//if (Wireframe)
 		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_WIREFRAME);
-	else
-		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);
+	/*else
+		GetDevice()->SetRenderState(D3DRS_FILLMODE, D3DFILL_SOLID);*/
 
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 

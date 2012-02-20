@@ -64,7 +64,3 @@ void ZERenderer::Destroy()
 {
 	delete this;
 }
-
-
-
-

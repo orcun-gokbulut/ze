@@ -273,8 +273,8 @@ ZEPlayer::ZEPlayer()
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNDOWN,		 ZEInputEvent("Mouse", ZE_IMA_VERTICAL_AXIS, ZE_IAS_NEGATIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNRIGHT,		 ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_POSITIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_TURNLEFT,		 ZEInputEvent("Mouse", ZE_IMA_HORIZANTAL_AXIS, ZE_IAS_NEGATIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_ZOOMIN,			 ZEInputEvent("Mouse", ZE_IMA_SCROLL_AXIS, ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_ZOOMOUT,			 ZEInputEvent("Mouse", ZE_IMA_SCROLL_AXIS, ZE_IAS_NEGATIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_ZOOMIN,			 ZEInputEvent("Mouse", ZE_IMA_WHEEL_AXIS, ZE_IAS_POSITIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_ZOOMOUT,			 ZEInputEvent("Mouse", ZE_IMA_WHEEL_AXIS, ZE_IAS_NEGATIVE)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RAYCAST,			 ZEInputEvent("Keyboard", ZE_IKB_R, ZE_IBS_RELEASED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_CONSOLE,			 ZEInputEvent("Keyboard", ZE_IKB_GRAVE, ZE_IBS_PRESSED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_HEAD_ORIENTATION, ZEInputEvent("VPRN", 0, ZE_IQS_ALWAYS)));

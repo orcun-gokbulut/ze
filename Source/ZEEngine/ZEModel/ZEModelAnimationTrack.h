@@ -64,6 +64,8 @@ class ZEModelAnimationTrack
 		bool							Looping;
 		ZEInt							LOD;
 
+		void							UpdateMeshesAndBones();
+
 	public:
 		void							SetOwner(ZEModel* Model);
 		ZEModel*						GetOwner();
@@ -92,8 +94,8 @@ class ZEModelAnimationTrack
 		void							SetLooping(bool Looping);
 		bool							GetLooping();
 
-		void							SetCurrentFrame(ZEUInt Frame);	
-		ZEUInt 							GetCurrentFrame();
+		void							SetCurrentFrame(float Frame);	
+		float 							GetCurrentFrame();
 
 		void							SetStartFrame(ZEUInt Frame);
 		ZEUInt							GetStartFrame();
@@ -107,7 +109,7 @@ class ZEModelAnimationTrack
 		void							Pause();
 		void							Stop();
 
-		void							AdvanceAnimation(float ElapsedTime);
+		void							Tick(float ElapsedTime);
 
 										ZEModelAnimationTrack();
 };
