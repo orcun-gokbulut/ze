@@ -42,13 +42,13 @@
 float4x4 ViewProjMatrix : register(vs, c0);
 float4x4 WorldMatrix : register(vs, c4);
 float4x4 ViewMatrix : register(vs, c8);
-float4 VertexShaderParameters[2] : register(c13);
+float4 VertexShaderParameters[3] : register(c13);
 
 // Pixel Shader Constants
 /////////////////////////////////////////////////////////////////////////////////////////
 // Fixed Material Properties
 float4 PipelineParamatersPS[10] : register(ps, c0);
-float4 MaterialParametersPS[2] : register(ps, c10);
+float4 MaterialParametersPS[3] : register(ps, c10);
 
 #define	MaterialAmbientColor    MaterialParametersPS[0].xyz
 #define	MaterialDiffuseColor    MaterialParametersPS[1].xyz
@@ -57,12 +57,35 @@ float4 MaterialParametersPS[2] : register(ps, c10);
 #define HeightAdjustments		VertexShaderParameters[0].zw
 #define TextureOffset			VertexShaderParameters[1].xy
 #define TextureScale			VertexShaderParameters[1].zw
+#define BlendTreshold			VertexShaderParameters[2]
 
 // Textures
 /////////////////////////////////////////////////////////////////////////////////////////
 sampler2D HeightTexture : register(vs, s0);
 sampler2D ColorTexture  : register(s4);
 sampler2D NormalTexture : register(s5);
+
+float2 GetTexcoord(float3 LocalPosition)
+{
+	return TextureScale * float2(LocalPosition.x, -LocalPosition.z) + TextureOffset;
+}
+
+float GetBlendFactor(float3 LocalPosition)
+{
+	float2 Blend = max(abs(LocalPosition.xz) - BlendTreshold.x, 0.0f) / BlendTreshold.y;
+	return max(Blend.x, Blend.y);
+}
+
+float GetHeight(float3 LocalPosition)
+{
+	float2 Height = tex2Dlod(HeightTexture, float4(GetTexcoord(LocalPosition), 0.0f, 1.0f)).rg;
+	return HeightAdjustments.x + HeightAdjustments.y * lerp(Height.x, Height.y, GetBlendFactor(LocalPosition));
+}
+
+float3 GetLocalPosition(float3 VertexPosition)
+{
+	return VertexPosition;
+}
 
 struct ZETerrainMaterial_VSInput 
 {
@@ -81,27 +104,20 @@ struct ZETerrainMaterial_GBuffer_VSOutput
 	float Cull : TEXCOORD5;
 };
 
-float2 ToTexcoord(float3 WorldPosition)
-{
-	float2 Texcoord = (TextureScale * (float2(WorldPosition.x, -WorldPosition.z) + 2.0f)) / TextureSize + 0.5f;
-	return TextureOffset + Texcoord;
-}
-
 ZETerrainMaterial_GBuffer_VSOutput ZETerrainMaterial_GBuffer_VertexShader(ZETerrainMaterial_VSInput Input)
 {
 	ZETerrainMaterial_GBuffer_VSOutput Output;
-
-	float4 WorldPosition = mul(WorldMatrix, Input.Position);
-	Output.Texcoord = ToTexcoord(WorldPosition);
+	float3 LocalPostion = GetLocalPosition(Input.Position);
 	
-	float Height = tex2Dlod(HeightTexture, float4(Output.Texcoord, 0.0f, 1.0f)).r;
-	WorldPosition.y += HeightAdjustments.x + HeightAdjustments.y * Height;
+	Output.Texcoord = GetTexcoord(LocalPostion);
+	LocalPostion.y += GetHeight(LocalPostion);
 
+	float4 WorldPosition = mul(WorldMatrix, float4(LocalPostion, 1.0f));
 	Output.Position_ = mul(ViewProjMatrix, WorldPosition);
 	Output.ViewPosition = mul(ViewMatrix, WorldPosition);
 	Output.Matrix = ViewMatrix;
 
-	Output.Cull = Height;
+	Output.Cull = GetHeight(LocalPostion);
 	
 	return Output;
 }
@@ -178,21 +194,23 @@ struct ZETerrainMaterial_ForwardPass_VSOutput
 	float4 Position_ : POSITION0;
 	float2 Texcoord : TEXCOORD0;
 	float Cull : TEXCOORD1;
+	float Bulluk : TEXCOORD2;
 };
 
 ZETerrainMaterial_ForwardPass_VSOutput ZETerrainMaterial_ForwardPass_VertexShader(ZETerrainMaterial_VSInput Input)
 {
 	ZETerrainMaterial_ForwardPass_VSOutput Output;
-
-	float4 WorldPosition = mul(WorldMatrix, Input.Position);
 	
-	Output.Texcoord = ToTexcoord(WorldPosition);
-	
-	float Height = tex2Dlod(HeightTexture, float4(Output.Texcoord, 0.0f, 1.0f)).r;
-	WorldPosition.y += HeightAdjustments.x + HeightAdjustments.y * Height;
+	float3 LocalPostion = GetLocalPosition(Input.Position);
+		
+	Output.Texcoord = GetTexcoord(LocalPostion);
 
+	Output.Bulluk = GetBlendFactor(LocalPostion);
+	LocalPostion.y += GetHeight(LocalPostion);
+
+	float4 WorldPosition = mul(WorldMatrix, float4(LocalPostion, 1.0f));
 	Output.Position_ = mul(ViewProjMatrix, WorldPosition);
-	Output.Cull = Height;
+	Output.Cull = GetHeight(LocalPostion);
 	
 	return Output;
 }
@@ -207,6 +225,7 @@ struct ZETerrainMaterial_ForwardPass_PSInput
 	float3 ScreenPosition : VPOS;
 	float2 Texcoord : TEXCOORD0;
 	float Cull : TEXCOORD1;
+	float Bulluk : TEXCOORD2;
 };
 
 ZETerrainMaterial_ForwardPass_PSOutput ZETerrainMaterial_ForwardPass_PixelShader(ZETerrainMaterial_ForwardPass_PSInput Input)
@@ -233,6 +252,6 @@ ZETerrainMaterial_ForwardPass_PSOutput ZETerrainMaterial_ForwardPass_PixelShader
 	DiffuseColor = BaseColor;
 	DiffuseColor *= ZELBuffer_GetDiffuse(ScreenPosition);
 	Output.Color.rgb += DiffuseColor;
-
+	Output.Color.rgb = 1.0f;// Input.Bulluk;
 	return Output;
 }

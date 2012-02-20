@@ -63,6 +63,9 @@ class ZETerrainMaterial : public ZEMaterial
 		float							HeightOffset;
 		float							HeightScale;
 
+		ZESize							ChunkSize;
+		float							BlendTreshold;
+
 		ZEVector2						TextureScale;
 		ZEVector2						TextureOffset;
 
@@ -111,6 +114,12 @@ class ZETerrainMaterial : public ZEMaterial
 
 		void							SetHeightScale(float Scale);
 		float							GetHeightScale();
+
+		void							SetChunkSize(ZESize Size);
+		ZESize							GetChunkSize();
+
+		void							SetBlendTreshold(float Treshold);
+		float							GetBlendTreshold();
 
 		void							SetColorTexture(ZETexture2D* Texture);
 		ZETexture2D*					GetColorTexture();

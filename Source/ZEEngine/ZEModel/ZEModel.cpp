@@ -314,7 +314,7 @@ bool ZEModel::GetPhysicsEnabled()
 	return PhysicsEnabled;
 }
 
-ZEModelBone* ZEModel::GetBoneByName(const char* Name)
+ZEModelBone* ZEModel::GetBone(const char* Name)
 {
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
 		if (strcmp(Bones[I].GetName(), Name) == 0)
@@ -323,7 +323,7 @@ ZEModelBone* ZEModel::GetBoneByName(const char* Name)
 	return NULL;
 }
 
-ZEModelMesh* ZEModel::GetMeshByName(const char* Name)
+ZEModelMesh* ZEModel::GetMesh(const char* Name)
 {
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 		if (strcmp(Meshes[I].GetName(), Name) == 0)
@@ -431,7 +431,7 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 void ZEModel::Tick(float ElapsedTime)
 {
 	for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
-		AnimationTracks[I].AdvanceAnimation(ElapsedTime);
+		AnimationTracks[I].Tick(ElapsedTime);
 
 	for(ZESize I = 0; I < IKChains.GetCount(); I++)
 		IKChains[I].Process();

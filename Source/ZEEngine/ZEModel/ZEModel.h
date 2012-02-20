@@ -133,8 +133,8 @@ class ZEModel : public ZEComponent
 		const ZEArray<ZEModelMesh>&			GetMeshes();
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
 
-		ZEModelBone*						GetBoneByName(const char* Name);
-		ZEModelMesh*						GetMeshByName(const char* Name);
+		ZEModelBone*						GetBone(const char* Name);
+		ZEModelMesh*						GetMesh(const char* Name);
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType				GetAnimationType();

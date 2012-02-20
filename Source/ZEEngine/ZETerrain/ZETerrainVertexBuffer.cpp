@@ -45,9 +45,11 @@ struct ZETerrainVertex
 	ZEVector3 Position;
 };
 
-static ZEInt CreateQuad(ZETerrainVertex* Vertices, float x, float y)
+static ZEInt EdgeLength;
+
+static ZESize CreateQuad(ZETerrainVertex* Vertices, float x, float y)
 {
-	if (((int)x + (int)y) % 2 == 0)	
+	/*if (((int)x + (int)y) % 2 == 0)	
 	{
 		Vertices[0].Position = ZEVector3(x, 0.0f, y);
 		Vertices[1].Position = ZEVector3(x + 1, 0.0f, y);
@@ -56,9 +58,9 @@ static ZEInt CreateQuad(ZETerrainVertex* Vertices, float x, float y)
 		Vertices[3].Position = Vertices[0].Position;
 		Vertices[4].Position = Vertices[2].Position;
 		Vertices[5].Position = ZEVector3(x, 0.0f, y - 1);	
-	}
+}
 	else
-	{
+	{*/
 		Vertices[0].Position = ZEVector3(x, 0.0f, y);
 		Vertices[1].Position = ZEVector3(x + 1, 0.0f, y);
 		Vertices[2].Position = ZEVector3(x, 0.0f, y - 1);
@@ -66,448 +68,108 @@ static ZEInt CreateQuad(ZETerrainVertex* Vertices, float x, float y)
 		Vertices[3].Position = Vertices[2].Position;
 		Vertices[4].Position = Vertices[1].Position;
 		Vertices[5].Position = ZEVector3(x + 1, 0.0f, y - 1);
-	}
+	/*}*/
 
 	return 6;
 }
 
-static ZEInt CreateQuad(ZETerrainVertex* Vertices, ZEInt EdgeLength)
+static ZESize CreateVertical(ZETerrainVertex* Vertices, ZEInt PosY, ZEInt Direction)
 {
 	ZESize Index = 0;
-	for (ZEInt y = EdgeLength / 2; y > -EdgeLength / 2; y--)
-		for (ZEInt x = -EdgeLength / 2; x < EdgeLength / 2; x++)
-			Index += CreateQuad(Vertices + Index, x, y);
-
-	return Index;
-}
-
-static ZEInt CreateLeftEdge(ZETerrainVertex* Vertices, float x, float y)
-{
-	Vertices[0].Position = ZEVector3(x,	0.0f, y);
-	Vertices[1].Position = ZEVector3(x + 1, 0.0f, y);
-	Vertices[2].Position = ZEVector3(x + 1,	0.0f, y - 1);
-
-	Vertices[3].Position = Vertices[0].Position;
-	Vertices[4].Position = Vertices[2].Position;
-	Vertices[5].Position = ZEVector3(x, 0.0f, y - 2);
-
-	Vertices[6].Position = Vertices[5].Position;
-	Vertices[7].Position = Vertices[2].Position;
-	Vertices[8].Position = ZEVector3(x + 1, 0.0f, y - 2);
-
-	return 9;
-}
-
-static ZEInt CreateBottomEdge(ZETerrainVertex* Vertices, float x, float y)
-{
-	Vertices[0].Position = ZEVector3(x,	0.0f, y);
-	Vertices[1].Position = ZEVector3(x + 1, 0.0f, y);
-	Vertices[2].Position = ZEVector3(x,	0.0f, y - 1);
-
-	Vertices[3].Position = Vertices[2].Position;
-	Vertices[4].Position = Vertices[1].Position;
-	Vertices[5].Position = ZEVector3(x + 2, 0.0f, y - 1);
-
-	Vertices[6].Position = Vertices[5].Position;
-	Vertices[7].Position = Vertices[1].Position;
-	Vertices[8].Position = ZEVector3(x + 2, 0.0f, y);
-
-	return 9;
-}
-
-static ZEInt CreateLeftEdge(ZETerrainVertex* Vertices, ZEInt EdgeLength)
-{	
-	ZESize Index = 0;
-
-	for (ZEInt y = EdgeLength / 2; y > -EdgeLength / 2; y--)
-		for (ZEInt x = -EdgeLength / 2 + 1; x < EdgeLength / 2; x++)
-			Index += CreateQuad(Vertices + Index, x, y);
-
-
-	ZEInt x =  -EdgeLength / 2;
-	for (ZEInt y = EdgeLength / 2; y > -EdgeLength / 2; y -= 2)
-		Index += CreateLeftEdge(Vertices + Index, x, y);
-
-	return Index;
-}
-
-static ZEInt CreateTopEdge(ZETerrainVertex* Vertices, float x, float y)
-{
-	Vertices[0].Position = ZEVector3(x,	0.0f, y);
-	Vertices[1].Position = ZEVector3(x + 1, 0.0f, y - 1);
-	Vertices[2].Position = ZEVector3(x,	0.0f, y - 1);
-
-	Vertices[3].Position = Vertices[1].Position;
-	Vertices[4].Position = Vertices[0].Position;
-	Vertices[5].Position = ZEVector3(x + 2, 0.0f, y);
-
-	Vertices[6].Position = Vertices[3].Position;
-	Vertices[7].Position = Vertices[5].Position;
-	Vertices[8].Position = ZEVector3(x + 2, 0.0f, y - 1);
-
-	return 9;
-}
-
-static ZEInt CreateTopEdge(ZETerrainVertex* Vertices, ZEInt EdgeLength)
-{	
-	ZESize Index = 0;
-
-	ZEInt y =  EdgeLength / 2;
-	for (ZEInt x = -EdgeLength / 2; x < EdgeLength / 2; x += 2)
-		Index += CreateTopEdge(Vertices + Index, x, y);
-
-	for (ZEInt y = EdgeLength / 2 - 1; y > -EdgeLength / 2; y--)
-		for (ZEInt x = -EdgeLength / 2; x < EdgeLength / 2; x++)
-			Index += CreateQuad(Vertices + Index, x, y);
-
-	return Index;
-}
-
-static ZEInt CreateLeftBottomCorner(ZETerrainVertex* Vertices, float x, float y)
-{
-	Vertices[0].Position = ZEVector3(x, 0.0f, y);
-	Vertices[1].Position = ZEVector3(x + 1, 0.0f, y);
-	Vertices[2].Position = ZEVector3(x + 1, 0.0f, y - 1);
-
-	Vertices[3].Position = Vertices[0].Position;
-	Vertices[4].Position = Vertices[2].Position;
-	Vertices[5].Position = ZEVector3(x, 0.0f, y - 2);
-
-	Vertices[6].Position = Vertices[5].Position;
-	Vertices[7].Position = Vertices[2].Position;
-	Vertices[8].Position = ZEVector3(x + 2, 0.0f, y - 2);
-
-	Vertices[9].Position = Vertices[8].Position;
-	Vertices[10].Position = Vertices[2].Position;
-	Vertices[11].Position = ZEVector3(x + 2, 0.0f, y - 1);
-
-	CreateQuad(Vertices + 12, x + 1, y);
-
-	return 12 + 6;
-}
-
-static ZEInt CreateLeftBottomCorner(ZETerrainVertex* Vertices, ZEInt EdgeLength)
-{	
-	ZESize Index = 0;
-
-	for (ZEInt y = EdgeLength / 2; y > -EdgeLength / 2; y -= 2)
-		for (ZEInt x = -EdgeLength / 2; x < EdgeLength / 2; x += 2)
-			if (x == -EdgeLength / 2)
-			{
-				if (y == -EdgeLength / 2 + 2)
-					Index += CreateLeftBottomCorner(Vertices + Index, x, y);
-				else
-				{
-					Index += CreateLeftEdge(Vertices + Index, x, y);
-					Index += CreateQuad(Vertices + Index, x + 1, y);
-					Index += CreateQuad(Vertices + Index, x + 1, y - 1);
-				}
-			}
-			else
-			{
-				if (y == -EdgeLength / 2 + 2)
-				{
-					Index += CreateBottomEdge(Vertices + Index, x, y - 1);
-					Index += CreateQuad(Vertices + Index, x, y);
-					Index += CreateQuad(Vertices + Index, x + 1, y);
-				}
-				else
-				{
-					Index += CreateQuad(Vertices + Index, x, y - 1);
-					Index += CreateQuad(Vertices + Index, x, y);
-					Index += CreateQuad(Vertices + Index, x + 1, y - 1);
-					Index += CreateQuad(Vertices + Index, x + 1, y);
-				}
-			}
-
-	return Index;
-}
-
-
-static ZEInt CreateLeftTopCorner(ZETerrainVertex* Vertices, float x, float y)
-{
-	Vertices[0].Position = ZEVector3(x, 0.0f, y);
-	Vertices[1].Position = ZEVector3(x + 2, 0.0f, y);
-	Vertices[2].Position = ZEVector3(x + 1, 0.0f, y - 1);
-
-	Vertices[3].Position = Vertices[2].Position;
-	Vertices[4].Position = Vertices[1].Position;
-	Vertices[5].Position = ZEVector3(x + 2, 0.0f, y - 1);
-
-	Vertices[6].Position = Vertices[0].Position;
-	Vertices[7].Position = Vertices[2].Position;
-	Vertices[8].Position = ZEVector3(x, 0.0f, y - 2);
-
-	Vertices[9].Position = Vertices[8].Position;
-	Vertices[10].Position = Vertices[7].Position;
-	Vertices[11].Position = ZEVector3(x + 1, 0.0f, y - 2);
-
-	CreateQuad(Vertices + 12, x + 1, y - 1);
-
-	return 12 + 6;
-}
-
-static ZEInt CreateLeftTopCorner(ZETerrainVertex* Vertices, ZEInt EdgeLength)
-{	
-	ZESize Index = 0;
-
-	for (ZEInt y = EdgeLength / 2; y > -EdgeLength / 2; y -= 2)
-		for (ZEInt x = -EdgeLength / 2; x < EdgeLength / 2; x += 2)
-			if (x == -EdgeLength / 2)
-			{
-				if (y == EdgeLength / 2)
-					Index += CreateLeftTopCorner(Vertices + Index, x, y);
-				else
-				{
-					Index += CreateLeftEdge(Vertices + Index, x, y);
-					Index += CreateQuad(Vertices + Index, x + 1, y);
-					Index += CreateQuad(Vertices + Index, x + 1, y - 1);
-				}
-			}
-			else
-			{
-				if (y == EdgeLength / 2)
-				{
-					Index += CreateTopEdge(Vertices + Index, x, y);
-					Index += CreateQuad(Vertices + Index, x, y - 1);
-					Index += CreateQuad(Vertices + Index, x + 1, y - 1);
-				}
-				else
-				{
-					Index += CreateQuad(Vertices + Index, x, y - 1);
-					Index += CreateQuad(Vertices + Index, x, y);
-					Index += CreateQuad(Vertices + Index, x + 1, y - 1);
-					Index += CreateQuad(Vertices + Index, x + 1, y);
-				}
-			}
-
-	return Index;
-}
-
-void ApplyTransform(ZETerrainVertex* Vertices, ZESize Start, ZESize End, const ZEMatrix4x4& Transform)
-{
-	for (ZEInt I = Start; I < End; I++)
+	ZESize PosX = -EdgeLength;
+	for (ZEInt x = 0; x < EdgeLength + 2; x++)
 	{
-		ZEVector3 Temp;
-		ZEMatrix4x4::Transform(Temp, Transform, Vertices[I].Position);
-		Vertices[I].Position = Temp;
+		for (ZEInt y = 0; y < EdgeLength; y++)
+		{
+			Index += CreateQuad(Vertices + Index, PosX, PosY);
+			PosY ++;
+		}
+		PosX += Direction;
 	}
+	
+	return Index;
 }
 
-ZEInt CreateCenter(ZETerrainVertex* Vertices, ZEInt EdgeLength, float Scale)
-{	
-	ZESize TotalIndex = 0;
-	ZEInt Index;
-	ZEMatrix4x4 Transform;
-
-	Index = CreateQuad(Vertices + TotalIndex, EdgeLength);
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-EdgeLength + EdgeLength / 2, 0.0f, EdgeLength - EdgeLength / 2));
-	ApplyTransform(Vertices, TotalIndex, TotalIndex + Index, Transform);
-	TotalIndex += Index;
-
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-EdgeLength + EdgeLength / 2, 0.0f, 0 - EdgeLength / 2));
-	Index = CreateQuad(Vertices + TotalIndex, EdgeLength);
-	ApplyTransform(Vertices, TotalIndex, TotalIndex + Index, Transform);
-	TotalIndex += Index;
-
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(0 + EdgeLength / 2, 0.0f, EdgeLength - EdgeLength / 2));
-	Index = CreateQuad(Vertices + TotalIndex, EdgeLength);
-	ApplyTransform(Vertices, TotalIndex, TotalIndex + Index, Transform);
-	TotalIndex += Index;
-
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(0 + EdgeLength / 2, 0.0f, 0 - EdgeLength / 2));
-	Index = CreateQuad(Vertices + TotalIndex, EdgeLength);
-	ApplyTransform(Vertices, TotalIndex, TotalIndex + Index, Transform);
-	TotalIndex += Index;
-
-	ZEMatrix4x4 ScaleMatrix;
-	ZEMatrix4x4::CreateScale(ScaleMatrix, Scale, Scale, Scale);
-	ApplyTransform(Vertices, TotalIndex, TotalIndex + Index, Transform);
-
-	return TotalIndex;
-}
-
-ZEInt CreateHorizonalBand(ZETerrainVertex* Vertices, ZEInt EdgeLength, bool Direction)
-{
-	return 0;
-}
-
-ZEInt CreateVerticalBand(ZETerrainVertex* Vertices, ZEInt EdgeLength, bool HDirection, bool VDirection)
-{
-	return 0;
-}
-
-/*
-ZEInt CreateRing(ZETerrainVertex* Vertices, ZEInt EdgeLength, float Scale)
+static ZESize CreateTop(ZETerrainVertex* Vertices)
 {
 	ZESize Index = 0;
-	ZEInt Size;
-	ZEMatrix4x4 Transform;
-
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-2 * EdgeLength + EdgeLength / 2, 0.0f, 2 * EdgeLength - EdgeLength / 2));
-	Size = CreateLeftTopCorner(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-EdgeLength + EdgeLength / 2, 0.0f, 2 * EdgeLength - EdgeLength / 2));
-	Size = CreateTopEdge(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(0.0f + EdgeLength / 2, 0.0f, 2 * EdgeLength - EdgeLength / 2));
-	Size = CreateTopEdge(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-2 * EdgeLength + EdgeLength / 2, 0.0f, -EdgeLength - EdgeLength / 2));
-	Size = CreateLeftBottomCorner(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	// Left
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-2 * EdgeLength + EdgeLength / 2, 0.0f, EdgeLength - EdgeLength / 2));
-	Size = CreateLeftEdge(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-2 * EdgeLength + EdgeLength / 2, 0.0f, 0 - EdgeLength / 2));
-	Size = CreateLeftEdge(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	// Right
-	ZEMatrix4x4::CreateOrientation(Transform, ZEVector3(EdgeLength + EdgeLength / 2, 0.0f, EdgeLength - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateLeftEdge(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4::CreateOrientation(Transform, ZEVector3(EdgeLength + EdgeLength / 2, 0.0f, 0 - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateLeftEdge(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	// Bottom
-	ZEMatrix4x4::CreateOrientation(Transform,ZEVector3(EdgeLength + EdgeLength / 2, 0.0f, 2 * EdgeLength - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateLeftBottomCorner(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4::CreateOrientation(Transform, ZEVector3(-EdgeLength + EdgeLength / 2, 0.0f, -EdgeLength - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateTopEdge(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4::CreateOrientation(Transform, ZEVector3(0.0f + EdgeLength / 2, 0.0f, -EdgeLength - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateTopEdge(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4::CreateOrientation(Transform, ZEVector3(EdgeLength + EdgeLength / 2, 0.0f, -EdgeLength - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateLeftTopCorner(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4 ScaleMatrix;
-	ZEMatrix4x4::CreateScale(ScaleMatrix, Scale, Scale, Scale);
-	ApplyTransform(Vertices, 0, Index, ScaleMatrix);
+	for (int y = EdgeLength + 1; y <= 2 * EdgeLength + 2; y++)
+		for (int x = -EdgeLength; x < EdgeLength; x++)
+			Index += CreateQuad(Vertices + Index, x, y);
 
 	return Index;
-}*/
+}
 
-ZEInt CreateRing(ZETerrainVertex* Vertices, ZEInt EdgeLength, float Scale)
+static ZESize CreateBottom(ZETerrainVertex* Vertices)
 {
 	ZESize Index = 0;
-	ZEInt Size;
-	ZEMatrix4x4 Transform;
+	for (int y = -EdgeLength; y >= -2 * EdgeLength - 1; y--)
+		for (int x = -EdgeLength; x < EdgeLength; x++)
+			Index += CreateQuad(Vertices + Index, x, y);
 
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-2 * EdgeLength + EdgeLength / 2, 0.0f, 2 * EdgeLength - EdgeLength / 2));
-	Size = CreateQuad(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
+	return Index;
+}
 
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-EdgeLength + EdgeLength / 2, 0.0f, 2 * EdgeLength - EdgeLength / 2));
-	Size = CreateQuad(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
+static ZESize CreateRight(ZETerrainVertex* Vertices)
+{
+	ZESize Index = 0;
+	for (int x = EdgeLength; x <= 2 * EdgeLength + 1; x++)
+		for (int y = -EdgeLength + 1; y <= EdgeLength; y++)
+			Index += CreateQuad(Vertices + Index, x, y);
 
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(0.0f + EdgeLength / 2, 0.0f, 2 * EdgeLength - EdgeLength / 2));
-	Size = CreateQuad(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
+	return Index;
+}
 
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-2 * EdgeLength + EdgeLength / 2, 0.0f, -EdgeLength - EdgeLength / 2));
-	Size = CreateQuad(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
+static ZESize CreateLeft(ZETerrainVertex* Vertices)
+{
+	ZESize Index = 0;
+	for (int x = -EdgeLength - 1; x >= -2 * EdgeLength - 2; x--)
+		for (int y = -EdgeLength + 1; y <= EdgeLength; y++)
+			Index += CreateQuad(Vertices + Index, x, y);
 
-	// Left
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-2 * EdgeLength + EdgeLength / 2, 0.0f, EdgeLength - EdgeLength / 2));
-	Size = CreateQuad(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
+	return Index;
+}
 
-	ZEMatrix4x4::CreateTranslation(Transform, ZEVector3(-2 * EdgeLength + EdgeLength / 2, 0.0f, 0 - EdgeLength / 2));
-	Size = CreateQuad(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
+static ZESize CreateCorner(ZETerrainVertex* Vertices, ZEInt PosX,ZEInt PosY, ZEInt DirectionX, ZEInt DirectionY)
+{
+	ZESize Index = 0;
+	ZEInt TempPosY = PosY;
+	for (ZEInt y = 0; y < EdgeLength; y++)
+	{
+		ZEInt TempPosX = PosX;
+		for (ZEInt x = 0; x < EdgeLength; x++)
+		{
+			Index += CreateQuad(Vertices + Index, TempPosX, TempPosY);
+			TempPosX += DirectionX;
+		}
+		TempPosY += DirectionY;
+	}
 
-	// Right
-	ZEMatrix4x4::CreateOrientation(Transform, ZEVector3(EdgeLength + EdgeLength / 2, 0.0f, EdgeLength - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateLeftEdge(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
+	TempPosY = PosY;
+	for (ZEInt y = 0; y < EdgeLength + 2; y++)
+	{
+		ZEInt TempPosX = PosX;
+		for (ZEInt x = 0; x < EdgeLength + 2; x++)
+		{
+			if (x >= EdgeLength || y >= EdgeLength)
+				Index += CreateQuad(Vertices + Index, TempPosX, TempPosY);
 
-	ZEMatrix4x4::CreateOrientation(Transform, ZEVector3(EdgeLength + EdgeLength / 2, 0.0f, 0 - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateQuad(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	// Bottom
-	ZEMatrix4x4::CreateOrientation(Transform,ZEVector3(EdgeLength + EdgeLength / 2, 0.0f, 2 * EdgeLength - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateLeftBottomCorner(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4::CreateOrientation(Transform, ZEVector3(-EdgeLength + EdgeLength / 2, 0.0f, -EdgeLength - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateQuad(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4::CreateOrientation(Transform, ZEVector3(0.0f + EdgeLength / 2, 0.0f, -EdgeLength - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateQuad(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4::CreateOrientation(Transform, ZEVector3(EdgeLength + EdgeLength / 2, 0.0f, -EdgeLength - EdgeLength / 2), ZEQuaternion(ZE_PI, ZEVector3::UnitY));
-	Size = CreateQuad(Vertices + Index, EdgeLength);
-	ApplyTransform(Vertices, Index, Index + Size, Transform);
-	Index += Size;
-
-	ZEMatrix4x4 ScaleMatrix;
-	ZEMatrix4x4::CreateScale(ScaleMatrix, Scale, Scale, Scale);
-	ApplyTransform(Vertices, 0, Index, ScaleMatrix);
+			TempPosX += DirectionX;
+		}
+		TempPosY += DirectionY;
+	}
 
 	return Index;
 }
 
 bool ZETerrainPrimitivesGenerator::Generate(ZEStaticVertexBuffer** VertexBuffer, ZETerrainPrimitiveIndices* Indices, ZEInt EdgeLength)
 {
-	ZEInt QuadSize = 6 * EdgeLength * EdgeLength;
-	ZESize CornerSize = 3 * (2 * (EdgeLength - 1) * (EdgeLength - 1) + 3 * EdgeLength - 2);
-	ZESize EdgeSize = 3 * (2 * EdgeLength * EdgeLength - EdgeLength / 2);
-	ZESize CenterSize = 4 * QuadSize + 4 * CornerSize + 8 * EdgeSize;
-
-	/*ZESize VertexBufferSize = 
-		4 * CornerSize + 
-		8 * EdgeSize +
-		4 * CenterSize;*/
-
+	::EdgeLength = EdgeLength;
+	
 	ZESize VertexBufferSize = 
-		4 * CenterSize + 
-		8 * CenterSize +
-		4 * CenterSize;
-
-	VertexBufferSize *= sizeof(ZETerrainVertex);
+		4 * 4 * EdgeLength * (EdgeLength + 2) +
+		8 * 2 * (EdgeLength + 2) * (EdgeLength + 2);
+	VertexBufferSize *= 3 * sizeof(ZETerrainVertex);
 
 	if (*VertexBuffer == 0)
 		*VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
@@ -520,14 +182,83 @@ bool ZETerrainPrimitivesGenerator::Generate(ZEStaticVertexBuffer** VertexBuffer,
 		return false;
 
 	// Primitives
-	ZESize Index = 0;
+	ZEInt HalfLength = EdgeLength / 2;
+	ZEInt Negative = -2 * EdgeLength;
+	ZEInt Positivie = -2 * EdgeLength;
 
-	Indices->CenterIndex = 0;
-	Indices->CenterSize = CreateCenter(Vertices, EdgeLength, 1.0f);
-	Index += Indices->CenterSize;
+	ZESize VertexIndex = 0;
+	Indices->Size[ZE_TP_LEFT] =	4 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_LEFT] = 4 * EdgeLength * (EdgeLength + 2);
+	Indices->Index[ZE_TP_LEFT] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_LEFT] = Indices->Index[ZE_TP_LEFT] + 4 * EdgeLength;
+	VertexIndex += CreateLeft(Vertices + VertexIndex);
 
-	Indices->RingIndex = Index;
-	Indices->RingSize = 	CreateRing(Vertices + Indices->CenterSize, EdgeLength, 1.0f);
+	Indices->Size[ZE_TP_RIGHT] = 4 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_RIGHT] = 4 * EdgeLength * (EdgeLength + 2);
+	Indices->Index[ZE_TP_RIGHT] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_RIGHT] = Indices->Index[ZE_TP_RIGHT] + 4 * EdgeLength;
+	VertexIndex += CreateRight(Vertices + VertexIndex);
 
+	Indices->Size[ZE_TP_TOP] = 4 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_TOP] = 4 * EdgeLength * (EdgeLength + 2);
+	Indices->Index[ZE_TP_TOP] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_TOP] = Indices->Index[ZE_TP_TOP] + 4 * EdgeLength;
+	VertexIndex += CreateTop(Vertices + VertexIndex);
+
+	Indices->Size[ZE_TP_BOTTOM] = 4 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_BOTTOM] = 4 * EdgeLength * (EdgeLength + 2);
+	Indices->Index[ZE_TP_BOTTOM] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_BOTTOM] = Indices->Index[ZE_TP_BOTTOM] + 4 * EdgeLength;
+	VertexIndex += CreateBottom(Vertices + VertexIndex);
+
+	Indices->Size[ZE_TP_TOP_LEFT] = 2 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_TOP_LEFT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
+	Indices->Index[ZE_TP_TOP_LEFT] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_TOP_LEFT] = Indices->Index[ZE_TP_TOP_LEFT] + 2;
+	VertexIndex += CreateCorner(Vertices + VertexIndex, -EdgeLength - 1, EdgeLength + 1, -1, 1);	
+
+	Indices->Size[ZE_TP_TOP_RIGHT] = 2 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_TOP_RIGHT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
+	Indices->Index[ZE_TP_TOP_RIGHT] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_TOP_RIGHT] = Indices->Index[ZE_TP_TOP_RIGHT] + 2;
+	VertexIndex += CreateCorner(Vertices + VertexIndex, EdgeLength, EdgeLength + 1, 1, 1);	
+
+	Indices->Size[ZE_TP_BOTTOM_LEFT] = 2 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_BOTTOM_LEFT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
+	Indices->Index[ZE_TP_BOTTOM_LEFT] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_BOTTOM_LEFT] = Indices->Index[ZE_TP_BOTTOM_LEFT] + 2;
+	VertexIndex += CreateCorner(Vertices + VertexIndex, -EdgeLength - 1, -EdgeLength, -1, -1);	
+
+	Indices->Size[ZE_TP_BOTTOM_RIGHT] = 2 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_BOTTOM_RIGHT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
+	Indices->Index[ZE_TP_BOTTOM_RIGHT] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_BOTTOM_RIGHT] = Indices->Index[ZE_TP_BOTTOM_RIGHT] + 2;
+	VertexIndex += CreateCorner(Vertices + VertexIndex, EdgeLength, -EdgeLength, 1, -1);	
+
+	Indices->Size[ZE_TP_CENTER_TOP_LEFT] = 2 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_CENTER_TOP_LEFT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
+	Indices->Index[ZE_TP_CENTER_TOP_LEFT] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_CENTER_TOP_LEFT] = Indices->Index[ZE_TP_CENTER_TOP_LEFT] + 2;
+	VertexIndex += CreateCorner(Vertices + VertexIndex, 0 - 1, 0 + 1, -1, 1);	
+
+	Indices->Size[ZE_TP_CENTER_TOP_RIGHT] = 2 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_CENTER_TOP_RIGHT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
+	Indices->Index[ZE_TP_CENTER_TOP_RIGHT] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_CENTER_TOP_RIGHT] = Indices->Index[ZE_TP_CENTER_TOP_RIGHT] + 2;
+	VertexIndex += CreateCorner(Vertices + VertexIndex, 0, 0 + 1, 1, 1);	
+
+	Indices->Size[ZE_TP_CENTER_BOTTOM_LEFT] = 2 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_CENTER_BOTTOM_LEFT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
+	Indices->Index[ZE_TP_CENTER_BOTTOM_LEFT] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_CENTER_BOTTOM_LEFT] = Indices->Index[ZE_TP_CENTER_BOTTOM_LEFT] + 2;
+	VertexIndex += CreateCorner(Vertices + VertexIndex, -1, 0, -1, -1);	
+
+	Indices->Size[ZE_TP_CENTER_BOTTOM_RIGHT] = 2 * EdgeLength * EdgeLength;
+	Indices->SizeExtended[ZE_TP_CENTER_BOTTOM_RIGHT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
+	Indices->Index[ZE_TP_CENTER_BOTTOM_RIGHT] = VertexIndex / 3;
+	Indices->IndexShrinked[ZE_TP_CENTER_BOTTOM_RIGHT] = Indices->Index[ZE_TP_CENTER_BOTTOM_RIGHT] + 2;
+	VertexIndex += CreateCorner(Vertices + VertexIndex, 0, 0, 1, -1);
+
+	zeAssert(VertexIndex * sizeof(ZETerrainVertex) != VertexBufferSize, "Vertex counts does not match.");
 	(*VertexBuffer)->Unlock();
 }

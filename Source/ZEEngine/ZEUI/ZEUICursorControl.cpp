@@ -182,8 +182,8 @@ ZEUICursorControl::ZEUICursorControl()
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_RIGHT_RELEASE,		ZEInputEvent("Mouse", ZE_IMB_BUTTON1,			ZE_IBS_RELEASED)));
 	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_MIDDLE_RELEASE,		ZEInputEvent("Mouse", ZE_IMB_BUTTON2,			ZE_IBS_RELEASED)));
 
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_UP,			ZEInputEvent("Mouse", ZE_IMA_SCROLL_AXIS,		ZE_IAS_POSITIVE)));
-	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_DOWN,			ZEInputEvent("Mouse", ZE_IMA_SCROLL_AXIS,		ZE_IAS_NEGATIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_UP,			ZEInputEvent("Mouse", ZE_IMA_WHEEL_AXIS,		ZE_IAS_POSITIVE)));
+	InputMap.InputBindings.Add(ZEInputBinding(ACTIONID_SCROLL_DOWN,			ZEInputEvent("Mouse", ZE_IMA_WHEEL_AXIS,		ZE_IAS_NEGATIVE)));
 
 	SetHeight(24);
 	SetWidth(24);	

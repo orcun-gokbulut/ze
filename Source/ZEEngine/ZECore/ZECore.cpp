@@ -650,7 +650,8 @@ void ZECore::Run()
 	SetCoreState(ZE_CS_RUNNING);
 	
 	if (Application != NULL)
-		Application->Initialize();
+		if (!Application->Initialize())
+			zeCriticalError("Can not initialize application.");
 
 	RealTimeClock->ResetFrameTime();
 	while(CoreState != ZE_CS_TERMINATE && CoreState != ZE_CS_SHUTDOWN)

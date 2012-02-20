@@ -82,6 +82,11 @@ class ZEMath
 		static float		ClampLower(float Value, float MinValue);
 		static float		ClampUpper(float Value, float MaxValue);
 		static float		Saturate(float Value);
+
+
+		bool				IsPowerOfTwo(ZEUInt Value);
+		ZEUInt				NextPowerOfTwo(ZEUInt Value);
+		ZEUInt				PreviousPowerOfTwo(ZEUInt Value);
 };
 
 #endif

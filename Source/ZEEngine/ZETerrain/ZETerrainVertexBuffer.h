@@ -41,13 +41,29 @@
 
 class ZEStaticVertexBuffer;
 
+enum ZETerrainPrimitive
+{
+	ZE_TP_BOTTOM_LEFT			= 0,
+	ZE_TP_BOTTOM				= 1,
+	ZE_TP_BOTTOM_RIGHT			= 2,
+	ZE_TP_LEFT					= 3,
+	ZE_TP_RIGHT					= 4,
+	ZE_TP_TOP_LEFT				= 5,
+	ZE_TP_TOP					= 6,
+	ZE_TP_TOP_RIGHT				= 7,
+	ZE_TP_CENTER_TOP_LEFT		= 8,	
+	ZE_TP_CENTER_TOP_RIGHT		= 9,	
+	ZE_TP_CENTER_BOTTOM_LEFT	= 10,	
+	ZE_TP_CENTER_BOTTOM_RIGHT	= 11
+};
+
 struct ZETerrainPrimitiveIndices
 {
-	ZESize CenterIndex;
-	ZESize CenterSize;
-	
-	ZESize RingIndex;
-	ZESize RingSize;
+	ZESize Index[12];
+	ZESize IndexShrinked[12];
+
+	ZESize Size[12];
+	ZESize SizeExtended[12];
 };
 
 class ZETerrainPrimitivesGenerator

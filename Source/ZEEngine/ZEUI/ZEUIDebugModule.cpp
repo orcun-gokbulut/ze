@@ -58,8 +58,6 @@
 
 bool ZEUIDebugModule::Initialize()
 {
-	ShowCursor(false);
-
 	Scene = zeGame->GetScene();
 
 	if (Player == NULL)

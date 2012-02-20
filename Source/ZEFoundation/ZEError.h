@@ -39,7 +39,8 @@
 
 #include "ZETypes.h"
 
-#if defined(ZE_DEBUG_ENABLE) && defined(ZE_PLATFORM_WINDOWS)
+#if defined(ZE_DEBUG_ENABLE) && defined(ZE_PLATFORM_CLASS_WINDOWS)
+	#include <intrin.h>
 	#include <crtdbg.h>
 #else
 	#include <stdlib.h> 
@@ -60,22 +61,25 @@ enum ZEAssertType
 	ZE_AT_WARNING_ASSERT
 };
 
-#define zeBreak(Condition) if (Condition) {/* __asm{ int 3 } */}
-
+#if defined(ZE_DEBUG_ENABLE) && defined(ZE_PLATFORM_CLASS_WINDOWS)
+	#define zeBreak(Condition) do {if (Condition) {__debugbreak();}} while(false)
+#else
+	#define zeBreak(Condition) do {if (Condition) {}} while(false)
+#endif
 #include "ZEAPI.h"
 
 #define ZE_MAX_MODULE_NAME_LENGTH 1024
 
 #ifdef ZE_DEBUG_MEMORY_CHECKS_ENABLE
 	#include <crtdbg.h>
-	#define ZEDebugCheckMemory() zeAssert(!_CrtCheckMemory(), "Heap problem")
+#define ZEDebugCheckMemory() do {zeAssert(!_CrtCheckMemory(), "Heap problem");} while(false)
 #else
-	#define ZEDebugCheckMemory()
+	#define ZEDebugCheckMemory() do {} while(false)
 #endif
 
 
 #ifdef ZE_DEBUG_ENABLE
-	#ifdef ZE_PLATFORM_WINDOWS
+	#ifdef ZE_PLATFORM_CLASS_WINDOWS
 		#define zeAssert(Condition, ...) do {if (Condition) {ZEError::RaiseAssert(ZE_AT_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__); if (_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true);}} while(false)
 		#define zeWarningAssert(Condition, ...) do {if (Condition) {ZEError::RaiseAssert(ZE_AT_WARNING_ASSERT, __FUNCTION__, __FILE__, __LINE__, __VA_ARGS__);}} while(false)
 	#else
@@ -93,7 +97,7 @@ enum ZEAssertType
 #endif
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_DEBUG_BREAK_ON_ERROR)
-	#ifdef ZE_PLATFORM_WINDOWS
+	#ifdef ZE_PLATFORM_CLASS_WINDOWS
 		#define zeCriticalError(...) do {if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__FUNCTION__, __MODULE__); ZEError::RaiseError(__MODULE__, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);} while(false)
 	#else
 		#define zeCriticalError(...) do {abort(); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__FUNCTION__, __MODULE__); ZEError::RaiseError(__MODULE__, ZE_ET_CRITICAL_ERROR, __VA_ARGS__);} while(false)
@@ -103,7 +107,7 @@ enum ZEAssertType
 #endif
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_DEBUG_BREAK_ON_ERROR)
-	#ifdef ZE_PLATFORM_WINDOWS 
+	#ifdef ZE_PLATFORM_CLASS_WINDOWS 
 		#define zeError(...) do {if (_CrtDbgReport(_CRT_ERROR, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) == 1) zeBreak(true); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__FUNCTION__, __MODULE__); ZEError::RaiseError(__MODULE__, ZE_ET_ERROR, __VA_ARGS__);} while(false)
 	#else
 		#define zeError(...) do {abort(); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__FUNCTION__, __MODULE__); ZEError::RaiseError(__MODULE__, ZE_ET_ERROR, __VA_ARGS__);} while(false)
@@ -113,7 +117,7 @@ enum ZEAssertType
 #endif
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_DEBUG_BREAK_ON_WARNING)
-	#ifdef ZE_PLATFORM_WINDOWS
+	#ifdef ZE_PLATFORM_CLASS_WINDOWS
 		#define zeWarning(...) do {if(_CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__) ==  1) zeBreak(true); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__FUNCTION__, __MODULE__); ZEError::RaiseError(__MODULE__, ZE_ET_WARNING, __VA_ARGS__);} while(false)
 	#else
 		#define zeWarning(...) do {abort(); char __MODULE__[ZE_MAX_MODULE_NAME_LENGTH]; ZEError::GetModuleName(__FUNCTION__, __MODULE__); ZEError::RaiseError(__MODULE__, ZE_ET_WARNING, __VA_ARGS__);} while(false)

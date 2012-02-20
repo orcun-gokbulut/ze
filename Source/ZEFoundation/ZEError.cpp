@@ -39,6 +39,11 @@
 #include <stdarg.h>
 #include <string.h>
 
+#if defined(ZE_PLATFORM_CLASS_WINDOWS) && defined(ZE_DEBUG_ENABLE)
+#define WINDOWS_MEAN_AND_LEAN
+#include <windows.h>
+#endif
+
 static void DefaultErrorCallback(const char* Module, ZEErrorType Type, const char* ErrorText)
 {
 	printf("[%s] %s : %s \r\n", Module, ZEError::GetErrorTypeString(Type), ErrorText);
@@ -54,17 +59,17 @@ static ZEAssertCallback AssertCallback = &DefaultAssertCallback;
 
 void ZEError::GetModuleName(const char* Function, char* Output)
 {
-	ZESize Len = strlen(Output);
-	for(ZESize I = 0; I < Len; I++)
+	ZESize Len = strlen(Function);
+	for(ZESize I = 0; I <= Len; I++)
 		if (Function[I] == ':' || Function[I] == '<')
 		{
-			Output[I] ='\0';
+			Output[I] = '\0';
 			return;
 		}
 		else
 			Output[I] = Function[I];
 
-	Output[Len] = '\0';
+	Output[Len + 1] = '\0';
 }
 
 const char* ZEError::GetErrorTypeString(ZEErrorType Type)
@@ -127,6 +132,12 @@ void ZEError::RaiseError(const char* Module, ZEErrorType Type, const char* Error
 		vsprintf(Buffer, ErrorText, Args);
 		
 		va_end(Args);
+		
+		#if defined(ZE_PLATFORM_CLASS_WINDOWS) && defined(ZE_DEBUG_ENABLE)
+			char DebugBuffer[4096];
+			sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZEError::GetErrorTypeString(Type), Buffer);
+			OutputDebugString(DebugBuffer);
+		#endif
 
 		ErrorCallback(Module, Type, Buffer);
 	}
@@ -143,6 +154,12 @@ void ZEError::RaiseAssert(ZEAssertType Type, const char* Function, const char* F
 		vsprintf(Buffer, AssertText, Args);
 		
 		va_end(Args);
+
+		#if defined(ZE_PLATFORM_CLASS_WINDOWS) && defined(ZE_DEBUG_ENABLE)
+			char DebugBuffer[4096];
+			sprintf(DebugBuffer, "[%s] : %s (Function : \"%s\", File : \"%s\", Line : %d)\r\n", ZEError::GetAssertTypeString(Type), Buffer, Function, File, Line);
+			OutputDebugString(DebugBuffer);
+		#endif
 		
 		AssertCallback(Type, Buffer, Function, File, Line);
 	}
