@@ -60,7 +60,7 @@ enum ZETerrainPrimitive
 struct ZETerrainPrimitiveIndices
 {
 	ZESize Index[12];
-	ZESize IndexShrinked[12];
+	ZESize SizeShrinked[12];
 
 	ZESize Size[12];
 	ZESize SizeExtended[12];

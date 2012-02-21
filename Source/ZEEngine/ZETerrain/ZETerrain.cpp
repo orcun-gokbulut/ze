@@ -319,13 +319,8 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 		ZESSize DataX = (CurrPositionX >> CurrLevelIndex) - (ZESSize)ChunkSize * 2 + (ZESSize)CurrentLevelData->ElevationWidth / 2;
 		ZESSize DataY = (CurrPositionY >> CurrLevelIndex) - (ZESSize)ChunkSize * 2 + (ZESSize)CurrentLevelData->ElevationHeight / 2;
 
-		ZEInt NextPositionX = Align(PositionX, 1 << (CurrLevelIndex + 1));
-		ZEInt NextPositionY = -Align(PositionY, 1 << (CurrLevelIndex + 1));
-		ZESSize NextDataX = (NextPositionX >> (CurrLevelIndex + 1)) - (ZESSize)ChunkSize + (ZESSize)NextLevelData->ElevationWidth / 2;
-		ZESSize NextDataY = (NextPositionY >> (CurrLevelIndex + 1)) - (ZESSize)ChunkSize + (ZESSize)NextLevelData->ElevationHeight / 2;
-
-		NextDataX = DataX / 2;
-		NextDataY = DataY / 2;
+		ZESSize NextDataX = DataX / 2;
+		ZESSize NextDataY = DataY / 2;
 
 		CurrLevel->Material->SetHeightOffset(HeightOffset);
 		CurrLevel->Material->SetHeightScale(HeightScale);
@@ -406,8 +401,13 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt Po
 	ZEMatrix4x4::CreateOrientation(ScaleMatrix, ZEVector3(PositionX, 0.0f, PositionY), ZEQuaternion::Identity, ZEVector3((float)(1 << Level), 1.0f, (float)(1 << Level)));
 	ZEMatrix4x4::Multiply(RenderCommand.WorldMatrix, GetWorldTransform(), ScaleMatrix);
 
-	RenderCommand.VertexBufferOffset = (Mode & ZE_TPM_SHRINKED ? Indices.IndexShrinked[PrimitiveType] : Indices.Index[PrimitiveType]) * 3;
-	RenderCommand.PrimitiveCount = (Mode & ZE_TPM_EXTENDED ? Indices.SizeExtended[PrimitiveType] : Indices.Size[PrimitiveType]) - (Mode & ZE_TPM_SHRINKED ? Indices.IndexShrinked[PrimitiveType] - Indices.Index[PrimitiveType] : 0);
+	RenderCommand.VertexBufferOffset = Indices.Index[PrimitiveType] * 3;
+	if (Mode == ZE_TPM_NORMAL)
+		RenderCommand.PrimitiveCount = Indices.Size[PrimitiveType];
+	else if (Mode == ZE_TPM_SHRINKED)
+		RenderCommand.PrimitiveCount = Indices.SizeShrinked[PrimitiveType];
+	else if (Mode == ZE_TPM_EXTENDED)
+		RenderCommand.PrimitiveCount = Indices.SizeExtended[PrimitiveType];
 
 	Renderer->AddToRenderList(&RenderCommand);
 
@@ -444,38 +444,50 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	int ActiveLevel = 0;
 	for (ZESize CurrIndex = 0; CurrIndex < Levels.GetCount(); CurrIndex++)
 	{
-		ZEInt PrevLevelPositionX = Align(PositionX, 1 << (CurrIndex - 1));
-		ZEInt PrevLevelPositionY = Align(PositionY, 1 << (CurrIndex - 1));
 		ZEInt CurrLevelPositionX = Align(PositionX, 1 << CurrIndex);
 		ZEInt CurrLevelPositionY = Align(PositionY, 1 << CurrIndex);
 		ZEInt NextLevelPositionX = Align(PositionX, 1 << (CurrIndex + 1));
 		ZEInt NextLevelPositionY = Align(PositionY, 1 << (CurrIndex + 1));
 
+		ZEInt PrevLevelPositionX; 
+		ZEInt PrevLevelPositionY;
+		if (CurrIndex == 0)
+		{
+			PrevLevelPositionX = CurrLevelPositionX;
+			PrevLevelPositionY = CurrLevelPositionY;
+		}
+		else
+		{
+			PrevLevelPositionX = Align(PositionX, 1 << (CurrIndex - 1));
+			PrevLevelPositionY = Align(PositionY, 1 << (CurrIndex - 1));
+		}
+		
 		ZEInt LeftMode = ZE_TPM_NORMAL;
 		ZEInt RightMode = ZE_TPM_NORMAL;
 		ZEInt TopMode = ZE_TPM_NORMAL;
 		ZEInt BottomMode = ZE_TPM_NORMAL;
 		
-		/*
-		if (CurrentLevelPositionX - NextLevelPositionX > 0)
-			RightMode |= ZE_TPM_EXTENDED;
-		else if (CurrentLevelPositionX - NextLevelPositionX > 0)
-			LeftMode |= ZE_TPM_EXTENDED;
+		if (CurrLevelPositionX - NextLevelPositionX < 0)
+		{
+			RightMode = ZE_TPM_EXTENDED;
+			LeftMode = ZE_TPM_SHRINKED;
+		}
+		else if (CurrLevelPositionX - NextLevelPositionX > 0)
+		{
+			RightMode = ZE_TPM_SHRINKED;
+			LeftMode = ZE_TPM_EXTENDED;
+		}
 
-		if (PrevLevelPositionX - CurrentLevelPositionX > 0)
-			RightMode |= ZE_TPM_SHRINKED;
-		else if (PrevLevelPositionX - CurrentLevelPositionX > 0)
-			LeftMode |= ZE_TPM_SHRINKED;
-
-		if (CurrentLevelPositionY - NextLevelPositionY > 0)
-			TopMode |= ZE_TPM_EXTENDED;
-		else if (CurrentLevelPositionY - NextLevelPositionY > 0)
-			BottomMode |= ZE_TPM_EXTENDED;
-
-		if (PrevLevelPositionY - CurrentLevelPositionY > 0)
-			TopMode |= ZE_TPM_SHRINKED;
-		else if (PrevLevelPositionY - CurrentLevelPositionY > 0)
-			BottomMode |= ZE_TPM_SHRINKED;*/
+		if (CurrLevelPositionY - NextLevelPositionY < 0)
+		{
+			TopMode = ZE_TPM_EXTENDED;
+			BottomMode = ZE_TPM_SHRINKED;
+		}
+		else if (CurrLevelPositionY - NextLevelPositionY > 0)
+		{
+			TopMode = ZE_TPM_SHRINKED;
+			BottomMode = ZE_TPM_EXTENDED;
+		}
 
 		if (CurrIndex == ActiveLevel)
 		{
@@ -485,16 +497,16 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CENTER_BOTTOM_RIGHT,	CurrLevelPositionX, CurrLevelPositionY, ZE_TPM_NORMAL, CurrIndex);
 		}
 		
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_TOP_LEFT,		CurrLevelPositionX, CurrLevelPositionY, TopMode | LeftMode,		CurrIndex);
+		//DrawPrimtive(DrawParameters->Renderer, ZE_TP_TOP_LEFT,		CurrLevelPositionX, CurrLevelPositionY, TopMode | LeftMode,		CurrIndex);
 		DrawPrimtive(DrawParameters->Renderer, ZE_TP_TOP,			CurrLevelPositionX, CurrLevelPositionY, TopMode,				CurrIndex);
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_TOP_RIGHT,		CurrLevelPositionX, CurrLevelPositionY, TopMode | RightMode,	CurrIndex);
+		//DrawPrimtive(DrawParameters->Renderer, ZE_TP_TOP_RIGHT,		CurrLevelPositionX, CurrLevelPositionY, TopMode | RightMode,	CurrIndex);*/
 
 		DrawPrimtive(DrawParameters->Renderer, ZE_TP_LEFT,			CurrLevelPositionX, CurrLevelPositionY, LeftMode,				CurrIndex);
 		DrawPrimtive(DrawParameters->Renderer, ZE_TP_RIGHT,			CurrLevelPositionX, CurrLevelPositionY, RightMode,				CurrIndex);
 
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_BOTTOM_LEFT,	CurrLevelPositionX, CurrLevelPositionY, BottomMode | LeftMode,	CurrIndex);
+		//DrawPrimtive(DrawParameters->Renderer, ZE_TP_BOTTOM_LEFT,	CurrLevelPositionX, CurrLevelPositionY, BottomMode | LeftMode,	CurrIndex);
 		DrawPrimtive(DrawParameters->Renderer, ZE_TP_BOTTOM,			CurrLevelPositionX, CurrLevelPositionY, BottomMode,				CurrIndex);
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_BOTTOM_RIGHT,	CurrLevelPositionX, CurrLevelPositionY, BottomMode | RightMode,	CurrIndex);
+		//DrawPrimtive(DrawParameters->Renderer, ZE_TP_BOTTOM_RIGHT,	CurrLevelPositionX, CurrLevelPositionY, BottomMode | RightMode,	CurrIndex);*/
 	}
 }
 

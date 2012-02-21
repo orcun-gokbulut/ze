@@ -188,75 +188,75 @@ bool ZETerrainPrimitivesGenerator::Generate(ZEStaticVertexBuffer** VertexBuffer,
 
 	ZESize VertexIndex = 0;
 	Indices->Size[ZE_TP_LEFT] =	4 * EdgeLength * EdgeLength;
+	Indices->SizeShrinked[ZE_TP_LEFT] = 4 * EdgeLength * (EdgeLength - 1);
 	Indices->SizeExtended[ZE_TP_LEFT] = 4 * EdgeLength * (EdgeLength + 2);
 	Indices->Index[ZE_TP_LEFT] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_LEFT] = Indices->Index[ZE_TP_LEFT] + 4 * EdgeLength;
 	VertexIndex += CreateLeft(Vertices + VertexIndex);
 
 	Indices->Size[ZE_TP_RIGHT] = 4 * EdgeLength * EdgeLength;
+	Indices->SizeShrinked[ZE_TP_RIGHT] = 4 * EdgeLength * (EdgeLength - 1);
 	Indices->SizeExtended[ZE_TP_RIGHT] = 4 * EdgeLength * (EdgeLength + 2);
 	Indices->Index[ZE_TP_RIGHT] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_RIGHT] = Indices->Index[ZE_TP_RIGHT] + 4 * EdgeLength;
 	VertexIndex += CreateRight(Vertices + VertexIndex);
 
 	Indices->Size[ZE_TP_TOP] = 4 * EdgeLength * EdgeLength;
+	Indices->SizeShrinked[ZE_TP_TOP] = 4 * EdgeLength * (EdgeLength - 1);
 	Indices->SizeExtended[ZE_TP_TOP] = 4 * EdgeLength * (EdgeLength + 2);
 	Indices->Index[ZE_TP_TOP] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_TOP] = Indices->Index[ZE_TP_TOP] + 4 * EdgeLength;
 	VertexIndex += CreateTop(Vertices + VertexIndex);
 
 	Indices->Size[ZE_TP_BOTTOM] = 4 * EdgeLength * EdgeLength;
+	Indices->SizeShrinked[ZE_TP_BOTTOM] = 4 * EdgeLength * (EdgeLength - 1);
 	Indices->SizeExtended[ZE_TP_BOTTOM] = 4 * EdgeLength * (EdgeLength + 2);
 	Indices->Index[ZE_TP_BOTTOM] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_BOTTOM] = Indices->Index[ZE_TP_BOTTOM] + 4 * EdgeLength;
 	VertexIndex += CreateBottom(Vertices + VertexIndex);
 
 	Indices->Size[ZE_TP_TOP_LEFT] = 2 * EdgeLength * EdgeLength;
 	Indices->SizeExtended[ZE_TP_TOP_LEFT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
 	Indices->Index[ZE_TP_TOP_LEFT] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_TOP_LEFT] = Indices->Index[ZE_TP_TOP_LEFT] + 2;
+	Indices->SizeShrinked[ZE_TP_TOP_LEFT] = Indices->Index[ZE_TP_TOP_LEFT] + 2;
 	VertexIndex += CreateCorner(Vertices + VertexIndex, -EdgeLength - 1, EdgeLength + 1, -1, 1);	
 
 	Indices->Size[ZE_TP_TOP_RIGHT] = 2 * EdgeLength * EdgeLength;
 	Indices->SizeExtended[ZE_TP_TOP_RIGHT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
 	Indices->Index[ZE_TP_TOP_RIGHT] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_TOP_RIGHT] = Indices->Index[ZE_TP_TOP_RIGHT] + 2;
+	Indices->SizeShrinked[ZE_TP_TOP_RIGHT] = Indices->Index[ZE_TP_TOP_RIGHT] + 2;
 	VertexIndex += CreateCorner(Vertices + VertexIndex, EdgeLength, EdgeLength + 1, 1, 1);	
 
 	Indices->Size[ZE_TP_BOTTOM_LEFT] = 2 * EdgeLength * EdgeLength;
 	Indices->SizeExtended[ZE_TP_BOTTOM_LEFT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
 	Indices->Index[ZE_TP_BOTTOM_LEFT] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_BOTTOM_LEFT] = Indices->Index[ZE_TP_BOTTOM_LEFT] + 2;
+	Indices->SizeShrinked[ZE_TP_BOTTOM_LEFT] = Indices->Index[ZE_TP_BOTTOM_LEFT] + 2;
 	VertexIndex += CreateCorner(Vertices + VertexIndex, -EdgeLength - 1, -EdgeLength, -1, -1);	
 
 	Indices->Size[ZE_TP_BOTTOM_RIGHT] = 2 * EdgeLength * EdgeLength;
 	Indices->SizeExtended[ZE_TP_BOTTOM_RIGHT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
 	Indices->Index[ZE_TP_BOTTOM_RIGHT] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_BOTTOM_RIGHT] = Indices->Index[ZE_TP_BOTTOM_RIGHT] + 2;
+	Indices->SizeShrinked[ZE_TP_BOTTOM_RIGHT] = Indices->Index[ZE_TP_BOTTOM_RIGHT] + 2;
 	VertexIndex += CreateCorner(Vertices + VertexIndex, EdgeLength, -EdgeLength, 1, -1);	
 
 	Indices->Size[ZE_TP_CENTER_TOP_LEFT] = 2 * EdgeLength * EdgeLength;
 	Indices->SizeExtended[ZE_TP_CENTER_TOP_LEFT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
 	Indices->Index[ZE_TP_CENTER_TOP_LEFT] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_CENTER_TOP_LEFT] = Indices->Index[ZE_TP_CENTER_TOP_LEFT] + 2;
+	Indices->SizeShrinked[ZE_TP_CENTER_TOP_LEFT] = Indices->Index[ZE_TP_CENTER_TOP_LEFT] + 2;
 	VertexIndex += CreateCorner(Vertices + VertexIndex, 0 - 1, 0 + 1, -1, 1);	
 
 	Indices->Size[ZE_TP_CENTER_TOP_RIGHT] = 2 * EdgeLength * EdgeLength;
 	Indices->SizeExtended[ZE_TP_CENTER_TOP_RIGHT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
 	Indices->Index[ZE_TP_CENTER_TOP_RIGHT] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_CENTER_TOP_RIGHT] = Indices->Index[ZE_TP_CENTER_TOP_RIGHT] + 2;
+	Indices->SizeShrinked[ZE_TP_CENTER_TOP_RIGHT] = Indices->Index[ZE_TP_CENTER_TOP_RIGHT] + 2;
 	VertexIndex += CreateCorner(Vertices + VertexIndex, 0, 0 + 1, 1, 1);	
 
 	Indices->Size[ZE_TP_CENTER_BOTTOM_LEFT] = 2 * EdgeLength * EdgeLength;
 	Indices->SizeExtended[ZE_TP_CENTER_BOTTOM_LEFT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
 	Indices->Index[ZE_TP_CENTER_BOTTOM_LEFT] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_CENTER_BOTTOM_LEFT] = Indices->Index[ZE_TP_CENTER_BOTTOM_LEFT] + 2;
+	Indices->SizeShrinked[ZE_TP_CENTER_BOTTOM_LEFT] = Indices->Index[ZE_TP_CENTER_BOTTOM_LEFT] + 2;
 	VertexIndex += CreateCorner(Vertices + VertexIndex, -1, 0, -1, -1);	
 
 	Indices->Size[ZE_TP_CENTER_BOTTOM_RIGHT] = 2 * EdgeLength * EdgeLength;
 	Indices->SizeExtended[ZE_TP_CENTER_BOTTOM_RIGHT] = 2 * (EdgeLength + 2) * (EdgeLength + 2);
 	Indices->Index[ZE_TP_CENTER_BOTTOM_RIGHT] = VertexIndex / 3;
-	Indices->IndexShrinked[ZE_TP_CENTER_BOTTOM_RIGHT] = Indices->Index[ZE_TP_CENTER_BOTTOM_RIGHT] + 2;
+	Indices->SizeShrinked[ZE_TP_CENTER_BOTTOM_RIGHT] = Indices->Index[ZE_TP_CENTER_BOTTOM_RIGHT] + 2;
 	VertexIndex += CreateCorner(Vertices + VertexIndex, 0, 0, 1, -1);
 
 	zeAssert(VertexIndex * sizeof(ZETerrainVertex) != VertexBufferSize, "Vertex counts does not match.");
