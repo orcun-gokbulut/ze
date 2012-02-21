@@ -232,6 +232,12 @@ bool ZEGraphicsDebugModule::Initialize()
 	DirectionalLight0->SetName("TestDirectionalLight0");
 	Scene->AddEntity(DirectionalLight0);
 	
+// 	StarMap = ZESkyBrush::CreateInstance();
+// 	StarMap->SetSkyTexture("StarMap.png");
+// 	StarMap->SetSkyColor(ZEVector3::One);
+// 	StarMap->SetSkyBrightness(1.0f);
+// 	Scene->AddEntity(StarMap);
+
 	SkyDome = ZESkyDome::CreateInstance();
 	SkyDome->SetName("TestSkyDome");
 	SkyDome->SetEnabled(true);
@@ -240,7 +246,6 @@ bool ZEGraphicsDebugModule::Initialize()
 	SkyDome->SetOuterRadius(61500.0f); // Try to maintain the Inner/Outer radius ratio
 	SkyDome->SetInnerRadius(60000.0f); 
 	SkyDome->SetCameraPositionOffset(ZEVector3(0.0f, 60000.0f, 0.0f)); // For camera on the ground case, it is advised to use offset as (0.0f, InnerRadius, 0.0f)
-	
 	SkyDome->SetSunPosition(ZEVector3(0.0f, 1.0f, 0.0f));
 	Scene->AddEntity(SkyDome);
 
@@ -249,7 +254,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	Cloud->SetEnabled(true);
 	Cloud->SetVisible(true);
 	Cloud->SetSunLightDirection(ZEVector3(0.0f, -1.0f, 0.0f));
-	Cloud->SetCloudCover(0.5f);
+	Cloud->SetCloudCover(0.6f);
 	Cloud->SetCloudPlaneHeight(2000.0f);
 	Scene->AddEntity(Cloud);
 
@@ -308,7 +313,7 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 	static float RotY = 0.0f;
 	static float RotZ = 0.0f;
 
-	// RotX += SunRotationSpeed * ElapsedTime * 1.5f;
+	RotX += SunRotationSpeed * ElapsedTime * 1.5f;
 	// RotY += SunRotationSpeed * ElapsedTime * 1.5f;
 	// RotZ += SunRotationSpeed * ElapsedTime * 2;
 
@@ -318,12 +323,12 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 
 	ZEMatrix4x4 Rot;
 	ZEMatrix4x4::CreateRotation(Rot, RotX, RotY, RotZ);
-	static ZEVector3 SunPos = SkyDome->GetSunPosition();
-	ZEVector3 SunPosTrans;
-	ZEMatrix4x4::Transform(SunPosTrans, Rot, SunPos);
-	SunPosTrans.NormalizeSelf();
+	static ZEVector4 SunPos(SkyDome->GetSunPosition(), 0.0f);
+	ZEVector4 RotatedSun;
+	ZEMatrix4x4::Transform(RotatedSun, Rot, SunPos);
+	RotatedSun.NormalizeSelf();
 	
-	// SkyDome->SetSunPosition(SunPosTrans);
+	SkyDome->SetSunPosition(ZEVector3(RotatedSun.x, RotatedSun.y, RotatedSun.z));
 	// Cloud->SetSunLightDirection(SunPosTrans);
 	
 
@@ -336,9 +341,10 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 
 ZEGraphicsDebugModule::ZEGraphicsDebugModule()
 {
-	SunRotationSpeed = 0.1f;
+	SunRotationSpeed		= 0.1f;
 
-	PortalMap						= NULL;
+	StarMap					= NULL;
+	PortalMap				= NULL;
 	Model					= NULL;
 	Cloud					= NULL;
 	Player					= NULL;
