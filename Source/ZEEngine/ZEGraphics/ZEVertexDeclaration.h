@@ -74,8 +74,8 @@ enum ZEVertexElementType
 
 struct ZEVertexElement
 {
-	ZEVertexElementSemantic						Semantic;
-	ZEVertexElementType							Type;
+	ZEVertexElementSemantic				Semantic;
+	ZEVertexElementType					Type;
 	ZEUInt								Index;
 };
 

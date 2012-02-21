@@ -206,7 +206,7 @@ bool ZESkyDome::Initialize()
 		}
 	}
 
-	SkyDomeRenderCommand.Priority = 4;
+	SkyDomeRenderCommand.Priority = 0;
 	SkyDomeRenderCommand.Order = 0.0f;
 	SkyDomeRenderCommand.Pipeline = ZE_RORP_3D;
 	SkyDomeRenderCommand.VertexBuffer = &SkyDomeGeometry;

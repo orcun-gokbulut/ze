@@ -55,9 +55,11 @@
 #include "ZED3D9ShaderManager.h"
 #include "ZED3D9TerrainMaterial.h"
 #include "ZED3D9CommonTools.h"
+#include "ZED3D9IndexBuffer.h"
 
 #include <d3dx9.h>
 #include "ZED3D9SkyDomeMaterial.h"
+#include "ZED3D9CloudMaterial.h"
 
 
 LPDIRECT3DDEVICE9 D3D9Device;
@@ -152,7 +154,7 @@ bool ZED3D9Module::Initialize()
 		Destroy();
 		return false;
 	}
-
+	
 	// Check device type;
 	if (FAILED(D3D->CheckDeviceType(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, D3DFMT_X8R8G8B8, D3DFMT_X8R8G8B8, Fullscreen)))
 	{
@@ -565,6 +567,13 @@ void ZED3D9Module::ClearFrameBuffer()
 	Device->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0x00555555, 1, 0);
 }
 
+ZEStaticIndexBuffer* ZED3D9Module::CreateStaticIndexBuffer()
+{
+	ZED3D9StaticIndexBuffer* IndexBuffer = new ZED3D9StaticIndexBuffer();
+	IndexBuffers.Add(IndexBuffer);
+	return (ZEStaticIndexBuffer*)IndexBuffer;
+}
+
 ZEStaticVertexBuffer* ZED3D9Module::CreateStaticVertexBuffer()
 {
 	ZED3D9StaticVertexBuffer* VertexBuffer = new ZED3D9StaticVertexBuffer();
@@ -601,6 +610,11 @@ ZEFixedMaterial* ZED3D9Module::CreateFixedMaterial()
 ZEUIMaterial* ZED3D9Module::CreateUIMaterial()
 {
 	return new ZED3D9UIMaterial();
+}
+
+ZECloudMaterial* ZED3D9Module::CreateCloudMaterial()
+{
+	return new ZED3D9CloudMaterial();
 }
 
 ZESimpleMaterial* ZED3D9Module::CreateSimpleMaterial()

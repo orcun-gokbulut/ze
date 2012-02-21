@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDebugModule.h
+ Zinek Engine - ZECloudMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,63 +34,59 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
-#define __ZE_GRAPHICS_DEBUG_MODULE_H__
+#ifndef __ZE_CLOUD_MATERIAL_H__
+#define __ZE_CLOUD_MATERIAL_H__
 
-#include "ZECore/ZEApplicationModule.h"
+#include "ZEMaterial.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEAABBox.h"
 
-class ZEPlayer;
-class ZEPointLight;
-class ZEOmniProjectiveLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZECanvasBrush;
-class ZEModel;
-class ZEPortalMap;
-class ZESkyBrush;
-class ZESkyDome;
-class ZEUITextControl;
-class ZECloud;
 
-class ZEGraphicsDebugModule : public ZEApplicationModule
+class ZECamera;
+
+class ZECloudMaterial : public ZEMaterial
 {
-	private:
-		ZECloud*				Cloud;
-		ZEPortalMap*			PortalMap;
-		ZEModel*				Model;
-		ZEPlayer*				Player;
-		ZESkyBrush*				SkyBrush;
-		ZEPointLight*			PointLight1;
-		ZEPointLight*			PointLight2;
-		ZEPointLight*			PointLight3;
-		ZEPointLight*			PointLight4;
-		ZEPointLight*			PointLight5;
-		ZEPointLight*			PointLight6;
-		ZEProjectiveLight*		ProjectiveLight0;
-		ZEDirectionalLight*		DirectionalLight0;
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
+	friend class ZED3D9Module;
+	friend class ZECloud;
+
+	protected:
+		ZECamera*					Camera;
+
+		float						CloudCover;
+		float						CloudPlaneHeight;
+		float						CloudPlaneHeightFallOff;
 		
-		// Sky Dome related variables
-		ZESkyDome*				SkyDome;
-		float					SunRotationSpeed;
-		ZEUITextControl*		Coordinates;
-		ZEUITextControl*		CameraHeight;
-		ZEUITextControl*		InOutRadius;
-		ZEUITextControl*		MovementSpeed;
+		ZEVector2					UVOffset;
+		ZEVector2					WindVelocity;
+		ZEVector3					SunLightDirection;
+
+		ZEAABBox					CloudBoundingBox;
+		ZEAABBox					GroundBoundingBox;
+
+		ZEVector3					SunLightColor;
+		ZEVector3					AmbientColor;
+		ZEVector3					Rayleigh;
+		ZEVector3					Mie;
+		float						G;
+		float						LightScale;
+		float						AmbientScale;
+		float						EarthRadius;
+		float						AtmosphereHeight;
+
+									ZECloudMaterial();
+		virtual						~ZECloudMaterial();
+
+	private:
+
 
 	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Process(float ElapsedTime);
+		virtual void				UpdateParameters(float Time);
+		
 
+		ZEMaterialFlags				GetMaterialFlags() const;
+		static ZECloudMaterial*		CreateInstance();
 
-								ZEGraphicsDebugModule();
-		virtual					~ZEGraphicsDebugModule();
 };
 
-#endif
 
-
-
-
-
+#endif // __ZE_CLOUD_MATERIAL_H__

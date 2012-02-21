@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDebugModule.h
+ Zinek Engine - ZED3D9IndexBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,64 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
 #pragma once
-#ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
-#define __ZE_GRAPHICS_DEBUG_MODULE_H__
+#ifndef __ZE_D3D9_INDEX_BUFFER_H__
+#define __ZE_D3D9_INDEX_BUFFER_H__
 
-#include "ZECore/ZEApplicationModule.h"
+#include "ZETypes.h"
+#include "ZED3D9ComponentBase.h"
+#include "ZEGraphics/ZEIndexBuffer.h"
 
-class ZEPlayer;
-class ZEPointLight;
-class ZEOmniProjectiveLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZECanvasBrush;
-class ZEModel;
-class ZEPortalMap;
-class ZESkyBrush;
-class ZESkyDome;
-class ZEUITextControl;
-class ZECloud;
+#include <d3d9.h>
 
-class ZEGraphicsDebugModule : public ZEApplicationModule
+
+class ZED3D9StaticIndexBuffer : public ZEStaticIndexBuffer, public ZED3D9ComponentBase
 {
 	private:
-		ZECloud*				Cloud;
-		ZEPortalMap*			PortalMap;
-		ZEModel*				Model;
-		ZEPlayer*				Player;
-		ZESkyBrush*				SkyBrush;
-		ZEPointLight*			PointLight1;
-		ZEPointLight*			PointLight2;
-		ZEPointLight*			PointLight3;
-		ZEPointLight*			PointLight4;
-		ZEPointLight*			PointLight5;
-		ZEPointLight*			PointLight6;
-		ZEProjectiveLight*		ProjectiveLight0;
-		ZEDirectionalLight*		DirectionalLight0;
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
-		
-		// Sky Dome related variables
-		ZESkyDome*				SkyDome;
-		float					SunRotationSpeed;
-		ZEUITextControl*		Coordinates;
-		ZEUITextControl*		CameraHeight;
-		ZEUITextControl*		InOutRadius;
-		ZEUITextControl*		MovementSpeed;
-
+		ZESize						BufferSize;
+	
 	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Process(float ElapsedTime);
+		LPDIRECT3DINDEXBUFFER9		StaticBuffer;
 
+		virtual ZESize				GetBufferSize();
 
-								ZEGraphicsDebugModule();
-		virtual					~ZEGraphicsDebugModule();
+		virtual bool				Create(ZESize BufferSize, ZEIndexBufferFormat Format);
+		virtual void*				Lock();
+		virtual void				Unlock();
+		virtual void				Release();
+
+		virtual void				Destroy();
+
+									ZED3D9StaticIndexBuffer();
+		virtual						~ZED3D9StaticIndexBuffer();
+
 };
 
-#endif
 
-
-
-
-
+#endif	// __ZE_D3D9_INDEX_BUFFER_H__

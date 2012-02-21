@@ -32,6 +32,8 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
+
 #include "ZEVertexBuffer.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZECore/ZECore.h"
@@ -74,7 +76,3 @@ bool ZEDynamicVertexBuffer::IsStatic()
 {
 	return false;
 }
-
-
-
-

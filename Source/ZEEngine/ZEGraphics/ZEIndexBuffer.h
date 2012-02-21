@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDebugModule.h
+ Zinek Engine - ZEIndexBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,64 +33,72 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
 #pragma once
-#ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
-#define __ZE_GRAPHICS_DEBUG_MODULE_H__
+#ifndef	__ZE_INDEX_BUFFER_H__
+#define __ZE_INDEX_BUFFER_H__
 
-#include "ZECore/ZEApplicationModule.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
 
-class ZEPlayer;
-class ZEPointLight;
-class ZEOmniProjectiveLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZECanvasBrush;
-class ZEModel;
-class ZEPortalMap;
-class ZESkyBrush;
-class ZESkyDome;
-class ZEUITextControl;
-class ZECloud;
-
-class ZEGraphicsDebugModule : public ZEApplicationModule
+enum ZEIndexBufferFormat
 {
-	private:
-		ZECloud*				Cloud;
-		ZEPortalMap*			PortalMap;
-		ZEModel*				Model;
-		ZEPlayer*				Player;
-		ZESkyBrush*				SkyBrush;
-		ZEPointLight*			PointLight1;
-		ZEPointLight*			PointLight2;
-		ZEPointLight*			PointLight3;
-		ZEPointLight*			PointLight4;
-		ZEPointLight*			PointLight5;
-		ZEPointLight*			PointLight6;
-		ZEProjectiveLight*		ProjectiveLight0;
-		ZEDirectionalLight*		DirectionalLight0;
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
-		
-		// Sky Dome related variables
-		ZESkyDome*				SkyDome;
-		float					SunRotationSpeed;
-		ZEUITextControl*		Coordinates;
-		ZEUITextControl*		CameraHeight;
-		ZEUITextControl*		InOutRadius;
-		ZEUITextControl*		MovementSpeed;
+	ZE_IBF_INDEX16	= 0,
+	ZE_IBF_INDEX32	= 1,
 
-	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Process(float ElapsedTime);
-
-
-								ZEGraphicsDebugModule();
-		virtual					~ZEGraphicsDebugModule();
 };
 
-#endif
+class ZEIndexBuffer
+{
+	public:
+		virtual bool					IsStatic() = 0;
+		virtual ZESize					GetBufferSize() = 0;
 
+										ZEIndexBuffer();
+		virtual							~ZEIndexBuffer();
+};
 
+class ZEStaticIndexBuffer : public ZEIndexBuffer
+{
+	protected:
+										ZEStaticIndexBuffer();
+		virtual							~ZEStaticIndexBuffer();
 
+	public:
+		virtual bool					IsStatic();
 
+		virtual bool					Create(ZESize BufferSize, ZEIndexBufferFormat Format) = 0;
+		virtual void*					Lock() = 0;
+		virtual void					Unlock() = 0;
+		virtual void					Release() = 0;
 
+		virtual void					Destroy();
+
+		static ZEStaticIndexBuffer*		CreateInstance();
+};
+
+class ZEDynamicIndexBuffer : public ZEIndexBuffer
+{
+	public:
+		virtual bool					IsStatic();
+
+		virtual ZESize					GetBufferSize() = 0;
+		virtual void*					GetIndexBuffer() = 0;
+};
+
+template<typename _VertexType, typename _Allocator = ZESmartAllocator<_VertexType> >
+class ZEArrayIndexBuffer : public ZEDynamicIndexBuffer, public ZEArray<_VertexType, _Allocator>
+{
+	public:
+		virtual ZESize GetBufferSize()
+		{
+			return GetCount() * sizeof(_VertexType);
+		}
+
+		virtual void* GetVertexBuffer()
+		{
+			return GetCArray();
+		}
+};
+
+#endif // __ZE_INDEX_BUFFER_H__

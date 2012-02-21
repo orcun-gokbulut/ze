@@ -49,12 +49,15 @@ class ZETexture3D;
 class ZEMaterial;
 class ZEFixedMaterial;
 class ZETerrainMaterial;
+class ZEStaticIndexBuffer;
+class ZEDynamicIndexBuffer;
 class ZEStaticVertexBuffer;
 class ZEVertexDeclaration;
 class ZERenderCommand;
 class ZEFrameRenderer;
 class ZEShadowRenderer;
 class ZEViewPort;
+class ZECloudMaterial;
 class ZEPostProcessor;
 class ZEUIMaterial;
 class ZESimpleMaterial;
@@ -62,6 +65,9 @@ class ZESkyBoxMaterial;
 class ZESkyDomeMaterial;
 enum ZETextureQuality;
 struct ZETextureOptions;
+
+
+
 
 
 class ZEGraphicsModule : public ZEModule
@@ -136,6 +142,7 @@ class ZEGraphicsModule : public ZEModule
 		virtual ZEFrameRenderer*			CreateFrameRenderer() = 0;
 		virtual ZEShadowRenderer*			CreateShadowRenderer() = 0;
 
+		virtual ZEStaticIndexBuffer*		CreateStaticIndexBuffer() = 0;
 		virtual ZEStaticVertexBuffer*		CreateStaticVertexBuffer() = 0;
 		virtual ZEVertexDeclaration*		CreateVertexDeclaration() = 0;
 
@@ -144,6 +151,7 @@ class ZEGraphicsModule : public ZEModule
 		virtual ZETextureCube*				CreateTextureCube() = 0;
 
 		virtual ZEUIMaterial*				CreateUIMaterial() = 0;
+		virtual ZECloudMaterial*			CreateCloudMaterial() = 0;
 		virtual ZEFixedMaterial*			CreateFixedMaterial() = 0;
 		virtual ZETerrainMaterial*			CreateTerrainMaterial() = 0;
 		virtual ZESimpleMaterial*			CreateSimpleMaterial() = 0;

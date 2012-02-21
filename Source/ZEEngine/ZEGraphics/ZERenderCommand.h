@@ -75,6 +75,7 @@ class ZELight;
 class ZEMaterial;
 class ZEVertexDeclaration;
 class ZEVertexBuffer;
+class ZEIndexBuffer;
 
 class ZERenderCommand
 {
@@ -84,21 +85,22 @@ class ZERenderCommand
 		float							Order;
 		ZERenderCommandFlags			Flags;
 		ZEROPrimitiveType				PrimitiveType;
-		ZEVertexDeclaration*			VertexDeclaration;
-		ZESize							VertexBufferOffset;
+		
 		ZESize							PrimitiveCount;
+		ZESize							VertexBufferOffset;
 
 		const ZEMaterial*				Material;
 
-		void*							IndexBuffer;
+		ZEIndexBuffer*					IndexBuffer;
 		ZEVertexBuffer*					VertexBuffer;
+		ZEVertexDeclaration*			VertexDeclaration;
 
 		ZEMatrix4x4						WorldMatrix;
 
 		ZEArray<ZERenderCommand*>		Instances;
 		ZEArray<ZEMatrix4x4>			BoneTransforms;
 
-		ZEArray<ZELight*>				Lights;		
+		ZEArray<ZELight*>				Lights;
 
 		void							SetZero();
 };

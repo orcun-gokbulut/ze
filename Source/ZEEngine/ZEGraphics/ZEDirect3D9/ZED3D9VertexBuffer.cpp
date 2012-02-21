@@ -103,7 +103,7 @@ ZED3D9StaticVertexBuffer::ZED3D9StaticVertexBuffer()
 
 ZED3D9StaticVertexBuffer::~ZED3D9StaticVertexBuffer()
 {
-	Release();
+	this->Release();
 }
 
 
