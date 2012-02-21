@@ -71,9 +71,10 @@ class ZED3D9FrameRenderer : public ZEFrameRenderer, public ZED3D9ComponentBase
 	private:
 		ZEUInt32							LightStencilMaskValue;
 
+		ZED3D9Texture2D*					ABuffer;
 		ZED3D9ViewPort*						ViewPort;
 
-		ZED3D9Texture2D*					ABuffer;
+		//ZED3D9Texture2D*					ABuffer;
 		ZED3D9Texture2D* 					GBuffer1;
 		ZED3D9Texture2D*					GBuffer2;
 		ZED3D9Texture2D*					GBuffer3;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDebugModule.h
+ Zinek Engine - ZED3D9IndexBuffer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,64 +33,104 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
-#define __ZE_GRAPHICS_DEBUG_MODULE_H__
 
-#include "ZECore/ZEApplicationModule.h"
+#include "ZED3D9IndexBuffer.h"
+#include "ZED3D9Module.h"
+#include "ZEError.h"
 
-class ZEPlayer;
-class ZEPointLight;
-class ZEOmniProjectiveLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZECanvasBrush;
-class ZEModel;
-class ZEPortalMap;
-class ZESkyBrush;
-class ZESkyDome;
-class ZEUITextControl;
-class ZECloud;
 
-class ZEGraphicsDebugModule : public ZEApplicationModule
+ZESize ZED3D9StaticIndexBuffer::GetBufferSize()
 {
-	private:
-		ZECloud*				Cloud;
-		ZEPortalMap*			PortalMap;
-		ZEModel*				Model;
-		ZEPlayer*				Player;
-		ZESkyBrush*				SkyBrush;
-		ZEPointLight*			PointLight1;
-		ZEPointLight*			PointLight2;
-		ZEPointLight*			PointLight3;
-		ZEPointLight*			PointLight4;
-		ZEPointLight*			PointLight5;
-		ZEPointLight*			PointLight6;
-		ZEProjectiveLight*		ProjectiveLight0;
-		ZEDirectionalLight*		DirectionalLight0;
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
+	return BufferSize;
+}
+
+bool ZED3D9StaticIndexBuffer::Create(ZESize BufferSize, ZEIndexBufferFormat Format)
+{
+	this->Release();
+	this->BufferSize = BufferSize;
+
+	D3DFORMAT D3D9Format;
+	switch (Format)
+	{
+		case ZE_IBF_INDEX16:
+			D3D9Format = D3DFMT_INDEX16;
+			break;
+		case ZE_IBF_INDEX32:
+			D3D9Format = D3DFMT_INDEX32;
+			break;
+		default:
+			D3D9Format = D3DFMT_UNKNOWN;
+			zeAssert(true, "Unknown Index Buffer Format");
+			break;
+	}
+
+	if (GetDevice()->CreateIndexBuffer(BufferSize, D3DUSAGE_WRITEONLY, D3D9Format, D3DPOOL_MANAGED, &StaticBuffer, NULL) != D3D_OK)
+	{
+		zeCriticalError("Can not create static index buffer.");
+		return false;
+	}
+
+	return true;
+}
+
+void* ZED3D9StaticIndexBuffer::Lock()
+{
+	if (StaticBuffer != NULL)
+	{
+		char* Data;
+		HRESULT Result = StaticBuffer->Lock(0, 0, (void**)&Data, 0);
 		
-		// Sky Dome related variables
-		ZESkyDome*				SkyDome;
-		float					SunRotationSpeed;
-		ZEUITextControl*		Coordinates;
-		ZEUITextControl*		CameraHeight;
-		ZEUITextControl*		InOutRadius;
-		ZEUITextControl*		MovementSpeed;
+		if (Result != D3D_OK)
+		{
+			zeCriticalError("Can not lock static vertex buffer.");
+			return NULL;
+		}
 
-	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Process(float ElapsedTime);
+		return (void*)Data;
+	}
+
+	return NULL;
+}
+
+void ZED3D9StaticIndexBuffer::Unlock()
+{
+	if (StaticBuffer != NULL)
+	{
+		HRESULT Result;
+		Result = StaticBuffer->Unlock();
+
+		if (Result != D3D_OK)
+			zeError("Can not unlock static index buffer.");
+	}
+
+}
+
+void ZED3D9StaticIndexBuffer::Release()
+{
+	if (StaticBuffer != NULL)
+	{
+		StaticBuffer->Release();
+		StaticBuffer = NULL;
+	}
+
+	BufferSize = 0;
+}
 
 
-								ZEGraphicsDebugModule();
-		virtual					~ZEGraphicsDebugModule();
-};
+void ZED3D9StaticIndexBuffer::Destroy()
+{
+	GetModule()->IndexBuffers.DeleteValue((ZED3D9StaticIndexBuffer*)this);
 
-#endif
+	delete this;
+}
 
+ZED3D9StaticIndexBuffer::ZED3D9StaticIndexBuffer()
+{
+	BufferSize = 0;
+	StaticBuffer = NULL;
+}
 
-
-
-
+ZED3D9StaticIndexBuffer::~ZED3D9StaticIndexBuffer()
+{
+	this->Release();
+}

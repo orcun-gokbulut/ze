@@ -81,6 +81,7 @@ static ZEString ConstructResourcePath(const ZEString& Path)
 }
 
 ZEVertexDeclaration* ZECanvasVertex::VertexDeclaration = NULL;
+
 ZEVertexDeclaration* ZECanvasVertex::GetVertexDeclaration()
 {
 	if (VertexDeclaration != NULL)

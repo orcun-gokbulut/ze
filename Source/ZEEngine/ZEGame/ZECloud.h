@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESkyDome.h
+ Zinek Engine - ZECloud.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,95 +34,92 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SKY_DOME_H__
-#define __ZE_SKY_DOME_H__
+#ifndef __ZE_CLOUD_H__
+#define __ZE_CLOUD_H__
 
 #include "ZEEntity.h"
 #include "ZEGraphics\ZECanvas.h"
 #include "ZEGraphics\ZERenderCommand.h"
 #include "ZETypes.h"
+#include "ZEMath\ZEAABBox.h"
 
-class ZESkyDomeMaterial;
+class ZECloudMaterial;
 class ZEMaterial;
 class ZEScene;
+class ZECamera;
 
-class ZESkyDome : public ZEEntity
+class ZECloud : public ZEEntity
 {
 	protected:
-		float					G;					
-
-		float					AmbientFactor;		
-		ZEVector4				AmbientColor;		
-
-		float					MieConstant;		
-		float					RayleighConstant;	
-
-		float					MieScaleDepth;
-		float					RayleighScaleDepth;
-
-		float					OuterRadius;		
-		float					InnerRadius;		
-
-		float					SunIntensity;		
-
-		ZEVector3				SunPosition;		
-		ZEVector3				WaveLenght;			
-
-		ZEVector3				CameraPosition;		
-		ZEVector3				CameraPositionOffset;
+		float					CloudCover;
+		float					CloudPlaneHeight;
 		
+		ZEVector2				WindVelocity;
+		ZEVector3				SunLightDirection;
+		ZEVector3				SunLightColor;
+		ZEVector3				AmbientColor;
+		ZECamera*				Camera;
+		
+		ZEVector3				Rayleigh;
+		ZEVector3				Mie;
+		float					G;
+		float					LightScale;
+		float					AmbientScale;
+		float					EarthRadius;
+		float					AtmosphereHeight;
 
-		ZECanvas				SkyDomeGeometry;
-		ZESkyDomeMaterial*		SkyDomeMaterial;
-		ZERenderCommand			SkyDomeRenderCommand;
 
-								ZESkyDome();
-		virtual					~ZESkyDome();
+		ZECloudMaterial*		CloudMaterial;
+		ZERenderCommand			CloudRenderCommand;
+
+								ZECloud();
+		virtual					~ZECloud();
 
 	private:
-		
+
+
 	public:
-		void					SetAmbientFactor(float Value);
-		float					GetAmbientFactor() const;
+		void					SetAmbientColor(ZEVector3 Color);
+		ZEVector3				GetAmbientColor();
 
-		void					SetAmbientColor(ZEVector4& Color);
-		ZEVector4				SetAmbientColor() const;
-
-		void					SetSetMieConstant(float Value);
-		float					GetGetMieConstant() const;
-
-		void					SetRayleighConstant(float Value);
-		float					GetRayleighConstant() const;
-
-		void					SetMieScaleDepth(float Value);
-		float					GetMieScaleDepth() const;
-
-		void					SetRayleighScaleDepth(float Value);
-		float					GetRayleighScaleDepth() const;
-
-		void					SetSunIntensity(float Value);
-		float					GetSunIntensity() const;
-
-		void					SetSunPosition(ZEVector3& Value);
-		ZEVector3				GetSunPosition() const;
-
-		void					SetWaveLenght(ZEVector3& Value);
-		ZEVector3				GetWaveLenght() const;
-
-		void					SetOuterRadius(float Value);
-		float					GetOuterRadius() const;
-
-		void					SetInnerRadius(float Value);
-		float					GetInnerRadius() const;
-
-		void					SetCameraPosition(ZEVector3 Value);
-		ZEVector3				GetCameraPosition() const;
-
-		void					SetCameraPositionOffset(ZEVector3 Value);
-		ZEVector3				GetCameraPositionOffset() const;
+		void					SetSunLightColor(ZEVector3 Color);
+		ZEVector3				GetSunLightColor();
+		
+		void					SetRayleigh(ZEVector3  Vector);
+		ZEVector3				GetRayleigh();
+		
+		void					SetMie(ZEVector3 Vector);
+		ZEVector3				GetMie();
 		
 		void					SetG(float Value);
-		float					GetG() const;
+		float					GetG();
+
+		void					SetLightScale(float Value);
+		float					GetLightScale();
+		
+		void					SetAmbientScale(float Value);
+		float					GetAmbientScale();
+		
+		void					SetEarthRadius(float Value);
+		float					GetEarthRadius();
+		
+		void					SetAtmosphereHeight(float Value);
+		float					GetAtmosphereHeight();
+
+		void					SetCloudCover(float Value);
+		float					GetCloudCover();
+
+		void					SetCloudPlaneHeight(float Value);
+		float					GetCloudPlaneHeight();
+
+		void					SetWindVelocity(ZEVector2 Value);
+		ZEVector2				GetWindVelocity();
+
+		void					SetSunLightDirection(ZEVector3 Value);
+		ZEVector3				GetSunLightDirection();
+
+		void					SetCamera(ZECamera* Camera);
+		ZECamera*				GetCamera();
 
 		virtual ZEUInt32		GetDrawFlags() const;
 
@@ -132,7 +129,9 @@ class ZESkyDome : public ZEEntity
 		virtual void			Draw(ZEDrawParameters* DrawParameters);
 		virtual void			Tick(float Time);
 
-		static ZESkyDome*		CreateInstance();
-};
+		static ZECloud*			CreateInstance();
 
-#endif // __ZE_SKY_DOME_H__
+}; // class ZECloud
+
+
+#endif

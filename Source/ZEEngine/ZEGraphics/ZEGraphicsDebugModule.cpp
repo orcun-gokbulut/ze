@@ -66,6 +66,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 #include <stdio.h>
+#include "ZEGame/ZECloud.h"
 
 
 bool ZEGraphicsDebugModule::Initialize()
@@ -98,11 +99,13 @@ bool ZEGraphicsDebugModule::Initialize()
 
 	ZEScene* Scene = zeGame->GetScene();
 	
-	ZEPortalMap* Map = ZEPortalMap::CreateInstance();
-	Map->SetMapFile("deneme.ZEMAP");
-	Map->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
-	Map->SetName("deneme.ZEMAP");
-	Scene->AddEntity(Map);
+	
+
+	PortalMap = ZEPortalMap::CreateInstance();
+	PortalMap->SetMapFile("Ground.ZeMap");
+	PortalMap->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
+	PortalMap->SetName("deneme.ZEMAP");
+	Scene->AddEntity(PortalMap);
 	
 	Player = ZEPlayer::CreateInstance();
 	Player->SetName("TestPlayer1");
@@ -111,9 +114,11 @@ bool ZEGraphicsDebugModule::Initialize()
 	Player->GetCamera()->SetNearZ(zeGraphics->GetNearZ());
 	Player->GetCamera()->SetFarZ(zeGraphics->GetFarZ());
 	Player->GetCamera()->SetFOV(ZE_PI / 3.0f);
-	Player->SetMovementSpeed(10.0f);
+	Player->SetMovementSpeed(100.0f);
 	Scene->SetActiveCamera(Player->GetCamera());
 	Scene->AddEntity(Player);
+
+	
 
 	ZEFontResource* Font = ZEFontResource::LoadSharedResource("Courier New.zeFont", NULL);
 	
@@ -144,7 +149,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	MovementSpeed->SetName("MovementSpeed");
 	MovementSpeed->SetFont(Font);
 	zeGame->UIManager->AddControl(MovementSpeed);
-
+	
 	PointLight1 = ZEPointLight::CreateInstance();
 	PointLight1->SetPosition(ZEVector3(-6.0f, 3.0f, -2.0f));
 	PointLight1->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
@@ -155,7 +160,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight1->SetVisible(true);
 	PointLight1->SetEnabled(true);
 	PointLight1->SetName("TestLight1");
-	Scene->AddEntity(PointLight1);
+	//Scene->AddEntity(PointLight1);
 
 	PointLight2 = ZEPointLight::CreateInstance();
 	PointLight2->SetPosition(ZEVector3(-15.0f, 3.0f, -15.0f));
@@ -167,7 +172,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight2->SetVisible(true);
 	PointLight2->SetEnabled(true);
 	PointLight2->SetName("TestLight2");
-	Scene->AddEntity(PointLight2);
+	//Scene->AddEntity(PointLight2);
 
 	PointLight3 = ZEPointLight::CreateInstance();
 	PointLight3->SetPosition(ZEVector3(-33.0f, 3.0f, -1.0f));
@@ -179,7 +184,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight3->SetVisible(true);
 	PointLight3->SetEnabled(true);
 	PointLight3->SetName("TestLight3");
-	Scene->AddEntity(PointLight3);
+	//Scene->AddEntity(PointLight3);
 
 	PointLight4 = ZEPointLight::CreateInstance();
 	PointLight4->SetPosition(ZEVector3(-17.0f, 4.0f, 37.0f));
@@ -191,7 +196,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight4->SetVisible(true);
 	PointLight4->SetEnabled(true);
 	PointLight4->SetName("TestLight4");
-	Scene->AddEntity(PointLight4);
+	//Scene->AddEntity(PointLight4);
 
 	PointLight5 = ZEPointLight::CreateInstance();
 	PointLight5->SetPosition(ZEVector3(-32.0f, 3.0f, 24.0f));
@@ -203,7 +208,7 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight5->SetVisible(true);
 	PointLight5->SetEnabled(true);
 	PointLight5->SetName("TestLight5");
-	Scene->AddEntity(PointLight5);
+	//Scene->AddEntity(PointLight5);
 
 	PointLight6 = ZEPointLight::CreateInstance();
 	PointLight6->SetPosition(ZEVector3(-50.0f, 15.0f, -10.0f));
@@ -215,11 +220,11 @@ bool ZEGraphicsDebugModule::Initialize()
 	PointLight6->SetVisible(true);
 	PointLight6->SetEnabled(true);
 	PointLight6->SetName("TestLight6");
-	Scene->AddEntity(PointLight6);
+	//Scene->AddEntity(PointLight6);
 
 	DirectionalLight0 = ZEDirectionalLight::CreateInstance();
 	DirectionalLight0->SetEnabled(true);
-	DirectionalLight0->SetRotation(ZEQuaternion(ZE_PI, ZEVector3::UnitY));
+	DirectionalLight0->SetRotation(ZEQuaternion(ZE_PI / 2.0f, ZEVector3::UnitX));
 	DirectionalLight0->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
 	DirectionalLight0->SetIntensity(1.0f);
 	DirectionalLight0->SetCastsShadow(false);
@@ -231,14 +236,22 @@ bool ZEGraphicsDebugModule::Initialize()
 	SkyDome->SetName("TestSkyDome");
 	SkyDome->SetEnabled(true);
 	SkyDome->SetVisible(true);
-	// Try to maintain the Inner/Outer radius ratio
-	SkyDome->SetOuterRadius(61500.0f);
-	SkyDome->SetInnerRadius(60000.0f);
-	// For camera on the ground case, it is advised to use offset as (0.0f, InnerRadius, 0.0f) 
-	SkyDome->SetCameraPositionOffset(ZEVector3(0.0f, 60000.0f, 0.0f));
-	//Scene->AddEntity(SkyDome);
+	SkyDome->SetSunIntensity(30.0f);
+	SkyDome->SetOuterRadius(61500.0f); // Try to maintain the Inner/Outer radius ratio
+	SkyDome->SetInnerRadius(60000.0f); 
+	SkyDome->SetCameraPositionOffset(ZEVector3(0.0f, 60000.0f, 0.0f)); // For camera on the ground case, it is advised to use offset as (0.0f, InnerRadius, 0.0f)
 	
-	// Scene->AddEntity(ZEGrid::CreateInstance());
+	SkyDome->SetSunPosition(ZEVector3(0.0f, 1.0f, 0.0f));
+	Scene->AddEntity(SkyDome);
+
+	Cloud = ZECloud::CreateInstance();
+	Cloud->SetCamera(Scene->GetActiveCamera());
+	Cloud->SetEnabled(true);
+	Cloud->SetVisible(true);
+	Cloud->SetSunLightDirection(ZEVector3(0.0f, -1.0f, 0.0f));
+	Cloud->SetCloudCover(0.5f);
+	Cloud->SetCloudPlaneHeight(2000.0f);
+	Scene->AddEntity(Cloud);
 
 	return true;
 }
@@ -247,8 +260,9 @@ void ZEGraphicsDebugModule::Deinitialize()
 {
 	zeScene->SetActiveCamera(NULL);
 
+	PortalMap->Destroy();
 	Player->Destroy();
-
+	Cloud->Destroy();
 	PointLight1->Destroy();
 	PointLight2->Destroy();
 	PointLight3->Destroy();
@@ -262,7 +276,7 @@ void ZEGraphicsDebugModule::Deinitialize()
 	delete CameraHeight;
 	delete InOutRadius;
 
-	Map->Destroy();
+	PortalMap->Destroy();
 }
 
 void ZEGraphicsDebugModule::Process(float ElapsedTime)
@@ -294,9 +308,9 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 	static float RotY = 0.0f;
 	static float RotZ = 0.0f;
 
-	RotX += SunRotationSpeed * ElapsedTime;
-	//RotY += SunRotationSpeed * ElapsedTime;
-	//RotZ += SunRotationSpeed * ElapsedTime;
+	// RotX += SunRotationSpeed * ElapsedTime * 1.5f;
+	// RotY += SunRotationSpeed * ElapsedTime * 1.5f;
+	// RotZ += SunRotationSpeed * ElapsedTime * 2;
 
 	if (RotX > ZE_PI * 2.0f) RotX = 0.0f;
 	if (RotY > ZE_PI * 2.0f) RotY = 0.0f;
@@ -308,11 +322,14 @@ void ZEGraphicsDebugModule::Process(float ElapsedTime)
 	ZEVector3 SunPosTrans;
 	ZEMatrix4x4::Transform(SunPosTrans, Rot, SunPos);
 	SunPosTrans.NormalizeSelf();
-	SkyDome->SetSunPosition(SunPosTrans);
+	
+	// SkyDome->SetSunPosition(SunPosTrans);
+	// Cloud->SetSunLightDirection(SunPosTrans);
+	
 
 	ZEQuaternion Temp;
 	ZEQuaternion::CreateFromMatrix(Temp, Rot);
-	DirectionalLight0->SetRotation(Temp);
+	// DirectionalLight0->SetRotation(Temp);
 
 }
 
@@ -321,18 +338,19 @@ ZEGraphicsDebugModule::ZEGraphicsDebugModule()
 {
 	SunRotationSpeed = 0.1f;
 
-	Player = NULL;
-	PointLight1 = NULL;
-	PointLight2 = NULL;
-	PointLight3 = NULL;
-	PointLight4 = NULL;
-	PointLight5 = NULL;
-
-	ProjectiveLight0 = NULL;
-	OmniProjectiveLight0 = NULL;
-	DirectionalLight0 = NULL;
-	Map = NULL;
-	Model = NULL;
+	PortalMap						= NULL;
+	Model					= NULL;
+	Cloud					= NULL;
+	Player					= NULL;
+	PointLight1				= NULL;
+	PointLight2				= NULL;
+	PointLight3				= NULL;
+	PointLight4				= NULL;
+	PointLight5				= NULL;
+	ProjectiveLight0		= NULL;
+	DirectionalLight0		= NULL;
+	OmniProjectiveLight0	= NULL;
+	
 }
 
 ZEGraphicsDebugModule::~ZEGraphicsDebugModule()

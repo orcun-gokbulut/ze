@@ -53,13 +53,13 @@ ZED3D9SkyDomeMaterial::ZED3D9SkyDomeMaterial()
 
 ZED3D9SkyDomeMaterial::~ZED3D9SkyDomeMaterial()
 {
-	ReleaseShaders();
+	this->ReleaseShaders();
 }
 
 void ZED3D9SkyDomeMaterial::CreateShaders()
 {
 	if (VertexShader != NULL || PixelShader != NULL)
-		ReleaseShaders();
+		this->ReleaseShaders();
 
 	VertexShader = ZED3D9VertexShader::CreateShader("SkyDomeMaterial.hlsl", "vs_main", 0, "vs_3_0");
 	PixelShader = ZED3D9PixelShader::CreateShader("SkyDomeMaterial.hlsl", "ps_main", 0, "ps_3_0");
@@ -80,15 +80,10 @@ bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
 	GetDevice()->SetPixelShader(PixelShader->GetPixelShader());
 
-	// ZBuffer
 	GetDevice()->SetRenderState(D3DRS_ZENABLE, D3DZB_TRUE);
-	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
-
-	// Culling
+	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-
-	// Transparancy
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
@@ -164,10 +159,10 @@ bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 void ZED3D9SkyDomeMaterial::UpdateMaterial()
 {
 	if (VertexShader == NULL && PixelShader == NULL)
-		CreateShaders();
+		this->CreateShaders();
 }
 
 void ZED3D9SkyDomeMaterial::Release()
 {
-	ReleaseShaders();
+	this->ReleaseShaders();
 }

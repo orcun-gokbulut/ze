@@ -58,6 +58,7 @@
 #include "ZEGraphics/ZEOmniProjectiveLight.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZEMath/ZEAngle.h"
+#include "ZED3D9IndexBuffer.h"
 
 #pragma warning(disable:4267)
 
@@ -81,34 +82,52 @@ void ZED3D9FrameRenderer::PumpStreams(ZERenderCommand* RenderCommand)
 		case ZE_ROPT_TRIANGLE:
 			PrimitiveType = D3DPT_TRIANGLELIST;
 			break;
+		case ZE_ROPT_TRIANGLE_STRIPT:
+			PrimitiveType = D3DPT_TRIANGLESTRIP;
+			break;
+
 	}
 
 	// Make draw call
-	// Check wheater render order is indexed or not
+	// Check whether render order is indexed or not
 	if (RenderCommand->IndexBuffer != NULL)
 	{
-		/* NOT SUPPORTED !!! */
-		/*
-		// Check wheater render order has static vertex buffer or not
+		ZEUInt VertexCount = ((ZED3D9StaticVertexBuffer*)RenderCommand->VertexBuffer)->GetBufferSize() / ((ZED3D9VertexDeclaration*)RenderCommand->VertexDeclaration)->GetVertexSize();
+
+		// Check weather render order has static vertex buffer or not
 		if (VertexBuffer->IsStatic())
-		GetDevice()->DrawIndexedPrimitive(D3DPT_TRIANGLELIST, 0, 0, VertexBuffer->GetVertexCount(), 0, VertexBuffer->GetPolygonCount());
+		{
+			GetDevice()->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)RenderCommand->VertexBuffer)->StaticBuffer, 0, RenderCommand->VertexDeclaration->GetVertexSize());
+			GetDevice()->SetIndices(((ZED3D9StaticIndexBuffer*)RenderCommand->IndexBuffer)->StaticBuffer);
+			GetDevice()->DrawIndexedPrimitive(PrimitiveType, 0, 0, VertexCount, 0, RenderCommand->PrimitiveCount);
+
+		}
 		else
-		GetDevice()->DrawIndexedPrimitiveUP(D3DPT_TRIANGLELIST, 0, VertexBuffer->GetVertexCount(), RenderCommand->PrimitiveCount, RenderCommand->IndexBuffer, D3DFMT_INDEX32, VertexBuffer->GetVertexBuffer(), RenderCommand->VertexDeclaration->GetVertexSize());
-		*/
-	} 
+		{
+			GetDevice()->DrawIndexedPrimitiveUP(PrimitiveType, 0, VertexCount, RenderCommand->PrimitiveCount, ((ZED3D9StaticIndexBuffer*)RenderCommand->IndexBuffer)->StaticBuffer, D3DFMT_INDEX32, 
+												(char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderCommand->VertexBufferOffset * RenderCommand->VertexDeclaration->GetVertexSize(),
+												RenderCommand->VertexDeclaration->GetVertexSize());
+
+		}
+	}
 	else
 	{
-		// Check wheater render order has static vertex buffer or not
+		// Check whether render order has static vertex buffer or not
 		if (VertexBuffer->IsStatic())
 		{
 			GetDevice()->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)RenderCommand->VertexBuffer)->StaticBuffer, 0, RenderCommand->VertexDeclaration->GetVertexSize());
 			GetDevice()->DrawPrimitive(PrimitiveType, RenderCommand->VertexBufferOffset, RenderCommand->PrimitiveCount);
+
 		}
 		else
-			GetDevice()->DrawPrimitiveUP(PrimitiveType, RenderCommand->PrimitiveCount, 
-			(char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderCommand->VertexBufferOffset * RenderCommand->VertexDeclaration->GetVertexSize(),  
-			RenderCommand->VertexDeclaration->GetVertexSize());
+		{
+			GetDevice()->DrawPrimitiveUP(PrimitiveType, RenderCommand->PrimitiveCount,
+										 (char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderCommand->VertexBufferOffset * RenderCommand->VertexDeclaration->GetVertexSize(),  
+										 RenderCommand->VertexDeclaration->GetVertexSize());
+
+		}
 	}
+
 }
 
 bool ZED3D9FrameRenderer::CheckRenderCommand(ZERenderCommand* RenderCommand)
@@ -621,7 +640,8 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	zeProfilerStart("Forward Pass");
 
 	// GBuffers
-	ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9ViewPort*)ViewPort);
+	ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
+	// ZED3D9CommonTools::SetRenderTarget(0, (ZED3D9ViewPort*)ABuffer->GetViewPort());
 	
 	ZED3D9CommonTools::SetTexture(0, GBuffer1, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, GBuffer2, D3DTEXF_POINT, D3DTEXF_NONE, D3DTADDRESS_CLAMP);
@@ -986,7 +1006,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DoGBufferPass();
 		DoLightningPass();
 		DoForwardPass();
-		
+		/*
 		//Anti Aliasing Process
 		/*MLAAProcessor.SetInputDepth(GBuffer1);
 		MLAAProcessor.SetInputNormal(GBuffer2);
@@ -996,14 +1016,16 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		
 		// HDR Process
 		HDRProcessor.SetInput(HDRInputBuffer);
-		HDRProcessor.SetOutput((ZED3D9ViewPort*)DOFInputBuffer->GetViewPort());
+		HDRProcessor.SetOutput(ViewPort); // HDRProcessor.SetOutput((ZED3D9ViewPort*)DOFInputBuffer->GetViewPort());
 		HDRProcessor.Process(ElaspedTime);
-
+		*/
+		/*
 		// DOF Process
 		DOFProcessor.SetInputColor(DOFInputBuffer);
 		DOFProcessor.SetInputDepth(GBuffer1);
 		DOFProcessor.SetOutput(ViewPort);
-		DOFProcessor.Process();*/
+		DOFProcessor.Process();
+		*/
 
 		/*
 		//Anti Aliasing Process (the old and the ugly one)

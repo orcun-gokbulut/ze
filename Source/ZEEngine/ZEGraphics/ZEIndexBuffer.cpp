@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDebugModule.h
+ Zinek Engine - ZEIndexBuffer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,64 +33,47 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_GRAPHICS_DEBUG_MODULE_H__
-#define __ZE_GRAPHICS_DEBUG_MODULE_H__
+#include "ZEIndexBuffer.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZECore/ZECore.h"
 
-#include "ZECore/ZEApplicationModule.h"
-
-class ZEPlayer;
-class ZEPointLight;
-class ZEOmniProjectiveLight;
-class ZEProjectiveLight;
-class ZEDirectionalLight;
-class ZECanvasBrush;
-class ZEModel;
-class ZEPortalMap;
-class ZESkyBrush;
-class ZESkyDome;
-class ZEUITextControl;
-class ZECloud;
-
-class ZEGraphicsDebugModule : public ZEApplicationModule
+ZEIndexBuffer::ZEIndexBuffer()
 {
-	private:
-		ZECloud*				Cloud;
-		ZEPortalMap*			PortalMap;
-		ZEModel*				Model;
-		ZEPlayer*				Player;
-		ZESkyBrush*				SkyBrush;
-		ZEPointLight*			PointLight1;
-		ZEPointLight*			PointLight2;
-		ZEPointLight*			PointLight3;
-		ZEPointLight*			PointLight4;
-		ZEPointLight*			PointLight5;
-		ZEPointLight*			PointLight6;
-		ZEProjectiveLight*		ProjectiveLight0;
-		ZEDirectionalLight*		DirectionalLight0;
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
-		
-		// Sky Dome related variables
-		ZESkyDome*				SkyDome;
-		float					SunRotationSpeed;
-		ZEUITextControl*		Coordinates;
-		ZEUITextControl*		CameraHeight;
-		ZEUITextControl*		InOutRadius;
-		ZEUITextControl*		MovementSpeed;
 
-	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Process(float ElapsedTime);
+}
 
+ZEIndexBuffer::~ZEIndexBuffer()
+{
 
-								ZEGraphicsDebugModule();
-		virtual					~ZEGraphicsDebugModule();
-};
+}
 
-#endif
+ZEStaticIndexBuffer::ZEStaticIndexBuffer()
+{
+
+}
+
+ZEStaticIndexBuffer::~ZEStaticIndexBuffer()
+{
+
+}
+
+bool ZEStaticIndexBuffer::IsStatic()
+{
+	return true;
+}
+
+void ZEStaticIndexBuffer::Destroy()
+{
+	delete this;
+}
 
 
+ZEStaticIndexBuffer* ZEStaticIndexBuffer::CreateInstance()
+{
+	return zeGraphics->CreateStaticIndexBuffer();
+}
 
-
-
+bool ZEDynamicIndexBuffer::IsStatic()
+{
+	return false;
+}

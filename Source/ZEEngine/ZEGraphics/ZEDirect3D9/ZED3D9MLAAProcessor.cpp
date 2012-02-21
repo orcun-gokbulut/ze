@@ -251,6 +251,16 @@ void ZED3D9MLAAProcessor::Process()
 	float FarZ = zeScene->GetActiveCamera()->GetFarZ();
 	ZEVector4 PixelSize(1.0f / InputDepthBuffer->GetWidth(), 1.0f / InputDepthBuffer->GetHeight(), 0.0f, 0.0f);
 
+	// Clear Render Targets
+	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)EdgeBuffer);
+	ZED3D9CommonTools::SetRenderTarget(1, (ZETexture2D*)BlendWeightBuffer);
+	ZED3D9CommonTools::SetRenderTarget(2, (ZEViewPort*)OutputBuffer);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x000000FF, 1.0f, 0x00);
+	GetDevice()->SetRenderTarget(0, NULL);
+	GetDevice()->SetRenderTarget(1, NULL);
+	GetDevice()->SetRenderTarget(2, NULL);
+	
+
 	/************************************************************************/
 	/*						Edge Detection Pass                             */
 	/************************************************************************/
@@ -263,7 +273,7 @@ void ZED3D9MLAAProcessor::Process()
 
 	//ZED3D9CommonTools::SetRenderTarget(0, OutputBuffer);
 	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)EdgeBuffer);
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0x00);
+	
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputDepthBuffer, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, (ZETexture2D*)InputNormalBuffer, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 	
@@ -272,13 +282,11 @@ void ZED3D9MLAAProcessor::Process()
 	/************************************************************************/
 	/*                      Weight Blending Pass	                        */
 	/************************************************************************/
-	
 	GetDevice()->SetVertexShader(VertexShaderCommon->GetVertexShader());
 	GetDevice()->SetPixelShader(PixelShaderWeightBlending->GetPixelShader());
 
 	//ZED3D9CommonTools::SetRenderTarget(0, OutputBuffer);
 	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)BlendWeightBuffer);
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0x00);
 	
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelSize, 1);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&PixelSize, 1);
@@ -291,12 +299,10 @@ void ZED3D9MLAAProcessor::Process()
 	/************************************************************************/
 	/*                      Color Blending Pass	                            */
 	/************************************************************************/
-	
 	GetDevice()->SetVertexShader(VertexShaderCommon->GetVertexShader());
 	GetDevice()->SetPixelShader(PixelShaderColorBlending->GetPixelShader());
 
 	ZED3D9CommonTools::SetRenderTarget(0, (ZEViewPort*)OutputBuffer);
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0x00);
 
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelSize, 1);
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&PixelSize, 1);

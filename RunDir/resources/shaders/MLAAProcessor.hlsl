@@ -53,7 +53,7 @@ float2		MLAAParameters	: register(ps, c1);
 #define		Treshold		MLAAParameters.x
 #define		FarZ			MLAAParameters.y
 
-#define		SEARCH_STEP		2
+#define		SEARCH_STEP		4
 #define		NUM_DISTANCES	32.0f
 #define		AREA_SIZE (NUM_DISTANCES * 5.0f)
 

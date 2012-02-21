@@ -65,6 +65,8 @@ class ZED3D9ShadowRenderer;
 class ZED3D9PostProcessor;
 class ZED3D9FixedMaterialShader;
 class ZED3D9ShaderManager;
+class ZED3D9StaticIndexBuffer;
+class ZED3D9DynamicIndexBuffer;
 //class ZED3D9SkyDomeMaterial;
 
 enum ZED3D9PixelShaderVersion
@@ -89,6 +91,7 @@ enum ZED3D9PipelineType
 	ZE_D3D9_PT_FIXED_FUNCTION,
 	ZE_D3D9_PT_PROGRAMABLE
 };
+
 
 class ZED3D9Module : public ZEGraphicsModule
 {
@@ -123,6 +126,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		ZEChunkArray<ZED3D9Texture3D*, 50>				Texture3Ds;
 		ZEChunkArray<ZED3D9TextureCube*, 50>			TextureCubes;
 		ZEChunkArray<ZED3D9FixedMaterialShader*, 50>	Shaders;
+		ZEChunkArray<ZED3D9StaticIndexBuffer*, 50>		IndexBuffers;
 		ZEChunkArray<ZED3D9StaticVertexBuffer*, 50>		VertexBuffers;
 		ZEChunkArray<ZED3D9PostProcessor*, 50>			PostProcessors;
 		ZEChunkArray<ZED3D9VertexDeclaration*, 50>		VertexDeclaration;
@@ -173,6 +177,7 @@ class ZED3D9Module : public ZEGraphicsModule
 		virtual ZEPostProcessor*						CreatePostProcessor();
 
 		virtual ZEVertexDeclaration*					CreateVertexDeclaration();
+		virtual ZEStaticIndexBuffer*					CreateStaticIndexBuffer();
 		virtual ZEStaticVertexBuffer*					CreateStaticVertexBuffer();
 
 		virtual ZETexture2D*							CreateTexture2D();
@@ -181,6 +186,7 @@ class ZED3D9Module : public ZEGraphicsModule
 
 		virtual ZEFixedMaterial*						CreateFixedMaterial();
 		virtual ZEUIMaterial*							CreateUIMaterial();
+		virtual ZECloudMaterial*						CreateCloudMaterial();
 		virtual ZESimpleMaterial*						CreateSimpleMaterial();
 		virtual ZETerrainMaterial*						CreateTerrainMaterial();
 		virtual ZESkyBoxMaterial*						CreateSkyBoxMaterial();
