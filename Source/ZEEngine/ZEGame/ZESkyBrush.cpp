@@ -47,7 +47,7 @@
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZESkyBrush);
 
-ZEUInt32 ZESkyBrush::GetDrawFlags() const
+ZEDrawFlags ZESkyBrush::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;
 }

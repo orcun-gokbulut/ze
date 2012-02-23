@@ -64,10 +64,6 @@ class ZEComponent : public ZEEntity
 		ZECompoundEntity*				Owner;
 
 		ZEMatrix4x4						LocalTransform;
-		ZEMatrix4x4						WorldTransform;
-
-		ZEAABBox						LocalBoundingBox;
-		ZEAABBox						WorldBoundingBox;
 
 	protected: 
 		void							SetLocalBoundingBox(const ZEAABBox& BoundingBox);
@@ -79,7 +75,7 @@ class ZEComponent : public ZEEntity
 		ZEEntityType					GetEntityType();
 
 		virtual ZECompoundEntity*		GetOwner() const;
-		virtual	ZEUInt32				GetDrawFlags() const;
+		virtual	ZEDrawFlags				GetDrawFlags() const;
 
 		const ZEMatrix4x4&				GetWorldTransform() const;
 		const ZEMatrix4x4&				GetLocalTransform() const;

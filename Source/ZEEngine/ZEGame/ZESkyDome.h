@@ -124,7 +124,7 @@ class ZESkyDome : public ZEEntity
 		void					SetG(float Value);
 		float					GetG() const;
 
-		virtual ZEUInt32		GetDrawFlags() const;
+		virtual ZEDrawFlags		GetDrawFlags() const;
 
 		virtual bool			Initialize();
 		virtual void			Deinitialize();

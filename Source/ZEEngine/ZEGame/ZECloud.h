@@ -121,7 +121,7 @@ class ZECloud : public ZEEntity
 		void					SetCamera(ZECamera* Camera);
 		ZECamera*				GetCamera();
 
-		virtual ZEUInt32		GetDrawFlags() const;
+		virtual ZEDrawFlags		GetDrawFlags() const;
 
 		virtual bool			Initialize();
 		virtual void			Deinitialize();

@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
+#include "ZEDS/ZEFlags.h"
 #include "ZEDefinitions.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZEOBBox.h"
@@ -49,12 +50,6 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEQuaternion.h"
-
-
-
-
-
-
 
 class ZEComponent;
 class ZECompoundEntity;
@@ -104,7 +99,7 @@ enum ZEEntityType
 };
 
 // ZEDrawFlags
-typedef ZEUInt32 ZEDrawFlags;
+typedef ZEFlags ZEDrawFlags;
 #define ZE_DF_NONE								0
 #define ZE_DF_DRAW								1
 #define ZE_DF_DRAW_COMPONENTS					2
@@ -115,30 +110,32 @@ typedef ZEUInt32 ZEDrawFlags;
 #define ZE_DF_AUTO								64
 
 // ZERayCastFlags
-typedef ZEUInt32 ZERayCastFlags;
+typedef ZEFlags ZERayCastFlags;
 #define ZE_RCF_INTERNAL							0
 #define ZE_RCF_BOUNDING_BOX						1
 
 // Entity Dirty Flags
-typedef ZEUInt32 ZEEntityDirtyFlags;
-#define ZE_EDF_ALL								0xFFFFFFFF
+typedef ZEFlags ZEEntityDirtyFlags;
+#define ZE_EDF_NONE								0
 #define ZE_EDF_LOCAL_TRANSFORM					1
 #define ZE_EDF_WORLD_TRANSFORM					2
 #define ZE_EDF_WORLD_BOUNDING_SPHERE			4
 #define ZE_EDF_WORLD_BOUNDING_BOX				8
+#define ZE_EDF_ALL								0xFFFFFFFF
 
 
 class ZEEntity : public ZEObject
 {
 	ZE_META_ENTITY(ZEEntity)
 	friend class ZECompoundEntity;
+	friend class ZEComponent;
 	private: 
 		ZEString								Name;
-		ZEInt										EntityId;
+		ZEInt									EntityId;
 		ZEVector3								Position;
 		ZEQuaternion							Rotation;
 		ZEVector3								Scale;
-		ZEMatrix4x4								WorldTransform;
+	
 		ZEVector3								Velocity;
 		ZEVector3								OldPosition;
 
@@ -146,6 +143,8 @@ class ZEEntity : public ZEObject
 		bool									Enabled;
 		bool									Visible;
 
+		ZEEntityDirtyFlags						DirtyFlags;
+		ZEMatrix4x4								WorldTransform;
 		ZEAABBox								WorldBoundingBox;
 		ZEAABBox								LocalBoundingBox;
 
@@ -156,8 +155,8 @@ class ZEEntity : public ZEObject
 		virtual									~ZEEntity();
 
 	public:
-		virtual ZEUInt32							GetDrawFlags() const;
-		virtual ZEUInt32							GetRayCastFlags() const;
+		virtual ZEDrawFlags						GetDrawFlags() const;
+		virtual ZERayCastFlags					GetRayCastFlags() const;
 
 		virtual ZEEntityType					GetEntityType();
 
@@ -168,7 +167,7 @@ class ZEEntity : public ZEObject
 		bool									GetInitialized();
 
 		void									SetEntityId(ZEInt EntityId);
-		ZEInt										GetEntityId() const;
+		ZEInt									GetEntityId() const;
 
 		void									SetName(const char* NewName);
 		const char*								GetName() const;

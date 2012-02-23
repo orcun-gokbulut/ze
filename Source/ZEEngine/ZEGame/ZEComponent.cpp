@@ -38,14 +38,20 @@
 
 void ZEComponent::SetLocalBoundingBox(const ZEAABBox& BoundingBox)
 {
-	LocalBoundingBox = BoundingBox;
+	if (Owner != NULL)
+	{
+		Owner->DirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+	}
+
+	ZEEntity::SetLocalBoundingBox(BoundingBox);
 }
 
 void ZEComponent::OnTransformChanged()
 {
+	DirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM | ZE_EDF_WORLD_TRANSFORM | ZE_EDF_WORLD_BOUNDING_BOX);
 }
 
-ZEUInt32 ZEComponent::GetDrawFlags() const
+ZEDrawFlags ZEComponent::GetDrawFlags() const
 {
 	return ZE_DF_NONE;
 }
@@ -84,8 +90,11 @@ const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 {
 	if (Owner != NULL)
 	{
-		ZEMatrix4x4::Multiply(((ZEComponent*)this)->WorldTransform, Owner->GetWorldTransform(), GetLocalTransform());
-		return WorldTransform;
+		if (DirtyFlags.GetFlags(ZE_EDF_WORLD_TRANSFORM))
+		{
+			ZEMatrix4x4::Multiply(((ZEComponent*)this)->WorldTransform, Owner->GetWorldTransform(), GetLocalTransform());
+			((ZEComponent*)this)->DirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
+		}
 	}
 	else
 		return GetLocalTransform();
@@ -93,7 +102,12 @@ const ZEMatrix4x4& ZEComponent::GetWorldTransform() const
 
 const ZEMatrix4x4& ZEComponent::GetLocalTransform() const 
 {
-	ZEMatrix4x4::CreateOrientation(((ZEComponent*)this)->LocalTransform, GetPosition(), GetRotation(), GetScale());
+	if (DirtyFlags.GetFlags(ZE_EDF_LOCAL_TRANSFORM))
+	{
+		ZEMatrix4x4::CreateOrientation(((ZEComponent*)this)->LocalTransform, GetPosition(), GetRotation(), GetScale());
+		((ZEComponent*)this)->DirtyFlags.UnraiseFlags(ZE_EDF_LOCAL_TRANSFORM);
+	}
+
 	return LocalTransform;
 }
 
@@ -104,22 +118,29 @@ const ZEAABBox& ZEComponent::GetLocalBoundingBox() const
 
 const ZEAABBox& ZEComponent::GetWorldBoundingBox()
 {
-	ZEAABBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+	if (DirtyFlags.GetFlags(ZE_EDF_WORLD_BOUNDING_BOX))
+	{
+		ZEAABBox::Transform(((ZEComponent*)this)->WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+		((ZEComponent*)this)->DirtyFlags.UnraiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+	}
 	return WorldBoundingBox;
 }
 
 void ZEComponent::SetPosition(const ZEVector3& NewPosition)
 {
+	DirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 	ZEEntity::SetPosition(NewPosition);
 }
 
 void ZEComponent::SetRotation(const ZEQuaternion& NewRotation)
 {
+	DirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 	ZEEntity::SetRotation(NewRotation);
 }
 
 void ZEComponent::SetScale(const ZEVector3& NewScale)
 {
+	DirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 	ZEEntity::SetScale(NewScale);
 }
 
@@ -157,6 +178,7 @@ bool ZEComponent::CastRay(const ZERay& Ray, ZEVector3& Position, ZEVector3& Norm
 ZEComponent::ZEComponent()
 {
 	Owner = NULL;
+	DirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
 }
 
 ZEEntityRunAt ZEComponentDescription::GetRunAt() const
