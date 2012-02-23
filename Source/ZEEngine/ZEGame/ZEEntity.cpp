@@ -44,14 +44,15 @@
 void ZEEntity::SetLocalBoundingBox(const ZEAABBox& BoundingBox)
 {
 	LocalBoundingBox = BoundingBox;
+	DirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
 }
 		
-ZEUInt32 ZEEntity::GetDrawFlags() const
+ZEDrawFlags ZEEntity::GetDrawFlags() const
 {
 	return ZE_DF_NONE;
 }
 
-ZEUInt32 ZEEntity::GetRayCastFlags() const
+ZERayCastFlags ZEEntity::GetRayCastFlags() const
 {
 	return ZE_RCF_BOUNDING_BOX;
 }
@@ -69,13 +70,23 @@ const ZEAABBox& ZEEntity::GetLocalBoundingBox() const
 
 const ZEAABBox& ZEEntity::GetWorldBoundingBox()
 {
-	ZEAABBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+	if (DirtyFlags.GetFlags(ZE_EDF_WORLD_BOUNDING_BOX))
+	{
+		ZEAABBox::Transform(WorldBoundingBox, GetLocalBoundingBox(), GetWorldTransform());
+		DirtyFlags.UnraiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+	}
+
 	return WorldBoundingBox;
 }
 
 const ZEMatrix4x4& ZEEntity::GetWorldTransform()
 {
-	ZEMatrix4x4::CreateOrientation(WorldTransform, Position, Rotation, Scale);
+	if (DirtyFlags.GetFlags(ZE_EDF_WORLD_TRANSFORM))
+	{
+		ZEMatrix4x4::CreateOrientation(WorldTransform, Position, Rotation, Scale);
+		DirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
+	}
+
 	return WorldTransform;
 }
 
@@ -122,6 +133,7 @@ bool ZEEntity::GetEnabled() const
 void ZEEntity::SetPosition(const ZEVector3& NewPosition) 
 {
 	Position = NewPosition;
+	DirtyFlags.RaiseFlags(ZE_EDF_WORLD_TRANSFORM | ZE_EDF_WORLD_BOUNDING_BOX);
 }
 
 const ZEVector3& ZEEntity::GetPosition() const
@@ -132,6 +144,7 @@ const ZEVector3& ZEEntity::GetPosition() const
 void ZEEntity::SetRotation(const ZEQuaternion& NewRotation) 
 {
 	Rotation = NewRotation;
+	DirtyFlags.RaiseFlags(ZE_EDF_WORLD_TRANSFORM | ZE_EDF_WORLD_BOUNDING_BOX);
 }
 
 const ZEQuaternion& ZEEntity::GetRotation() const
@@ -142,6 +155,7 @@ const ZEQuaternion& ZEEntity::GetRotation() const
 void ZEEntity::SetScale(const ZEVector3& NewScale)
 {
 	Scale = NewScale;
+	DirtyFlags.RaiseFlags(ZE_EDF_WORLD_TRANSFORM | ZE_EDF_WORLD_BOUNDING_BOX); 
 }
 
 const ZEVector3& ZEEntity::GetScale() const
@@ -221,6 +235,7 @@ void ZEEntity::Draw(ZEDrawParameters* DrawParameters)
 
 ZEEntity::ZEEntity()
 {
+	DirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX | ZE_EDF_WORLD_TRANSFORM);
 	OldPosition = Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;

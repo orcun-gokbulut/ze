@@ -76,7 +76,7 @@ class ZECompoundEntity : public ZEEntity
 
 		const ZEArray<ZEComponent*>&			GetComponents() const;
 
-		virtual ZEUInt32						GetRayCastFlags() const;
+		virtual ZEFlags							GetRayCastFlags() const;
 
 		virtual void							SetPosition(const ZEVector3& NewPosition);
 		virtual void							SetRotation(const ZEQuaternion& NewRotation);

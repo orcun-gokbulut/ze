@@ -182,7 +182,7 @@ float ZESkyDome::GetG() const
 	return G;
 }
 
-ZEUInt32 ZESkyDome::GetDrawFlags() const
+ZEDrawFlags ZESkyDome::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;
 }

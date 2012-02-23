@@ -180,7 +180,7 @@ ZECamera* ZECloud::GetCamera()
 	return Camera;
 }
 
-ZEUInt32 ZECloud::GetDrawFlags() const
+ZEDrawFlags ZECloud::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;
 }

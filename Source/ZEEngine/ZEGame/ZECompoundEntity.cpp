@@ -43,7 +43,7 @@
 void ZECompoundEntity::UpdateComponentTransforms()
 {
 	for (ZESize I = 0; I < Components.GetCount(); I++)
-		Components[I]->OnTransformChanged();
+		Components[I]->DirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM | ZE_EDF_WORLD_TRANSFORM | ZE_EDF_WORLD_BOUNDING_BOX);
 }
 
 void ZECompoundEntity::RegisterComponent(ZEComponent* Component)
@@ -56,6 +56,8 @@ void ZECompoundEntity::RegisterComponent(ZEComponent* Component)
 		Component->Initialize();
 
 	Components.Add(Component);
+
+	DirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
 }
 
 void ZECompoundEntity::UnregisterComponent(ZEComponent* Component)
@@ -67,9 +69,11 @@ void ZECompoundEntity::UnregisterComponent(ZEComponent* Component)
 	Component->Owner = NULL;
 
 	Component->Destroy();
+
+	DirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
 } 
 		
-ZEUInt32 ZECompoundEntity::GetRayCastFlags() const
+ZERayCastFlags ZECompoundEntity::GetRayCastFlags() const
 {
 	return 0;
 }
