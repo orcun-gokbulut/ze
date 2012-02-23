@@ -77,6 +77,8 @@ ze_add_source(ZEUIWindowControl.cpp				Sources)
 ze_add_source(ZEUIWindowControl.h				Sources Headers)
 ze_add_source(ZEUTextEditControl.cpp			Sources)
 ze_add_source(ZEUTextEditControl.h				Sources Headers)
+ze_add_source(ZESceneStatisticsControl.cpp Sources)
+ze_add_source(ZESceneStatisticsControl.h Sources Headers)
 
 ze_add_library(ZEUI 
 	SOURCES ${Sources}

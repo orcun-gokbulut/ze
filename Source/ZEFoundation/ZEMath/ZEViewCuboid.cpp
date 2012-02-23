@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERectangle3D.h
+ Zinek Engine - ZEViewCuboid.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#include "ZEViewCuboid.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEGraphics/ZELight.h"
 
-#include "ZEVector.h"
-#include "ZEPlane.h"
-#include "ZETypes.h"
-#include "ZELineSegment.h"
-#include "ZEDS/ZEArray.h"
-
-class ZERectangle3D
+ZEViewVolumeType ZEViewCuboid::GetViewVolumeType() const
 {
-	public:
-		ZEVector3				P1, P2, P3, P4;
+	return ZE_VVT_CUBOID;
+}
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&		GetPoint(ZEUInt Index) const;
-		const ZELine&			GetBorderLine(ZEUInt Index) const;
-		const ZELineSegment&	GetBorder(ZEUInt Index) const;
+bool ZEViewCuboid::CullTest(const ZEBSphere& BoundingSphere) const
+{
+	return !ZEOBBox::IntersectionTest(Box, BoundingSphere);
+}
 
-		static ZEHalfSpace		IntersectionTest(const ZERectangle3D& Rectangle, const ZEPlane& Plane);
-		static ZEHalfSpace		IntersectionTest(const ZEArray<ZEVector3>& Rectangle, const ZEPlane& Plane, ZEArray<ZEVector3>& Points);
+bool ZEViewCuboid::CullTest(const ZEAABBox& BoundingBox) const
+{
+	return !ZEOBBox::IntersectionTest(Box, BoundingBox);
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
-};
+}
 
-#endif
+bool ZEViewCuboid::CullTest(const ZEOBBox& BoundingBox) const
+{
+	return !ZEOBBox::IntersectionTest(Box, BoundingBox);
+}
 
+bool ZEViewCuboid::CullTest(ZEEntity* Entity) const
+{
+	return CullTest(Entity->GetWorldBoundingBox());
+}
 
+bool ZEViewCuboid::CullTest(ZELight* Light) const
+{
+	if (Light->GetLightType() == ZE_LT_DIRECTIONAL)
+		return false;
 
+	ZEBSphere BoundingSphere;
+	BoundingSphere.Position = Light->GetWorldPosition();
+	BoundingSphere.Radius = Light->GetRange();
 
+	return CullTest(BoundingSphere);
+}
+
+bool ZEViewCuboid::CullTest(const ZERectangle3D& PortalDoor) const
+{
+	zeAssert(true, "Not implemented.");
+	return false;
+}
+
+void ZEViewCuboid::Create(const ZEVector3& Position, const ZEQuaternion& Rotation, float Width, float Height, float NearZ, float FarZ)
+{
+	ZEQuaternion::VectorProduct(Box.Right, Rotation, ZEVector3::UnitX);
+	ZEQuaternion::VectorProduct(Box.Up, Rotation, ZEVector3::UnitY);
+	ZEQuaternion::VectorProduct(Box.Front, Rotation, ZEVector3::UnitZ);
+
+	Box.HalfSize = ZEVector3(Width * 0.5f, Height * 0.5f, (FarZ - NearZ) * 0.5f);
+
+	ZEVector3 Center;
+	ZEQuaternion::VectorProduct(Center, Rotation, ZEVector3(0.0f, 0.0f, FarZ - NearZ));
+
+	ZEVector3::Multiply(Box.Center, Position, Center);
+}

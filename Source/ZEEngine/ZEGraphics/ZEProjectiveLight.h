@@ -38,7 +38,7 @@
 #define __ZE_PROJECTIVE_LIGHT_H__
 
 #include "ZELight.h"
-#include "ZEViewVolume.h"
+#include "ZEMath/ZEViewFrustum.h"
 
 class ZETexture2D;
 class ZETexture2DResource;

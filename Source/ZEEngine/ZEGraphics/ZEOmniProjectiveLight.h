@@ -38,7 +38,7 @@
 #define __ZE_OMNI_PROJECTIVE_LIGHT_H__
 
 #include "ZELight.h"
-#include "ZEViewVolume.h"
+#include "ZEMath/ZEViewSphere.h"
 
 class ZETextureCube;
 class ZETexture2D;

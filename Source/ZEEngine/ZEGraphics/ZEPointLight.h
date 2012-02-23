@@ -38,7 +38,7 @@
 #define __ZE_POINT_LIGHT_H__
 
 #include "ZELight.h"
-#include "ZEViewVolume.h"
+#include "ZEMath/ZEViewSphere.h"
 
 class ZETexture2D;
 

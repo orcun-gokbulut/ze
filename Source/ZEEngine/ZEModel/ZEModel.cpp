@@ -151,7 +151,7 @@ void ZEModel::DebugDraw(ZERenderer* Renderer)
 
 }
 
-ZEUInt32 ZEModel::GetDrawFlags() const
+ZEDrawFlags ZEModel::GetDrawFlags() const
 {
 	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }

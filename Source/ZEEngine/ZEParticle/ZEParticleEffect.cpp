@@ -38,7 +38,7 @@
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEParticleEffect);
 		
-ZEUInt32 ZEParticleEffect::GetDrawFlags() const
+ZEDrawFlags ZEParticleEffect::GetDrawFlags() const
 {
 	return ZE_DF_DRAW | ZE_DF_CULL;
 }

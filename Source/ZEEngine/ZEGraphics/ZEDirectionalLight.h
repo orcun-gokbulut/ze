@@ -38,7 +38,7 @@
 #define __ZE_DIRECTIONAL_LIGHT_H__
 
 #include "ZELight.h"
-#include "ZEViewVolume.h"
+#include "ZEMath/ZEViewCuboid.h"
 
 class ZETexture2D; 
 

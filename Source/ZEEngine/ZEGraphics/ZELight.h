@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEGame/ZEComponent.h"
-#include "ZEViewVolume.h"
+#include "ZEMath/ZEViewVolume.h"
 
 enum ZELightType
 {
@@ -73,7 +73,7 @@ class ZELight : public ZEComponent
 	public:
 		virtual ZELightType				GetLightType() = 0;
 
-		virtual ZEUInt32				GetDrawFlags() const;
+		virtual ZEDrawFlags				GetDrawFlags() const;
 
 		virtual	void					SetPosition(const ZEVector3& NewPosition);
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);

@@ -41,7 +41,7 @@
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZEViewVolume.h"
+#include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZERectangle.h"
 #include "ZEGame/ZEPortal.h"

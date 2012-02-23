@@ -71,12 +71,12 @@ class ZEGraphicsDebugModule : public ZEApplicationModule
 		ZEOmniProjectiveLight*	OmniProjectiveLight0;
 		
 		// Sky Dome related variables
-		ZESkyDome*				SkyDome;
-		float					SunRotationSpeed;
-		ZEUITextControl*		Coordinates;
-		ZEUITextControl*		CameraHeight;
-		ZEUITextControl*		InOutRadius;
-		ZEUITextControl*		MovementSpeed;
+// 		ZESkyDome*				SkyDome;
+// 		float					SunRotationSpeed;
+// 		ZEUITextControl*		Coordinates;
+// 		ZEUITextControl*		CameraHeight;
+// 		ZEUITextControl*		InOutRadius;
+// 		ZEUITextControl*		MovementSpeed;
 
 	public:
 		virtual bool			Initialize();
