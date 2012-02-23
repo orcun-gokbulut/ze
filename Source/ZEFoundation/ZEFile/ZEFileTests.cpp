@@ -75,11 +75,11 @@ ZETestSuite(ZEFile)
 			remove("ZEFileReadOnlyTests.txt");
 		}
 
-		ZETestCase("for file mode ZE_FM_READ_ONLY when file is not exist")
-		{
-			bool Result = File.Open("ZEFileReadOnlyTestsCase.txt", ZE_FM_READ_ONLY, true);
-			ZETestCheck(Result == false);
-		}
+// 		ZETestCase("for file mode ZE_FM_READ_ONLY when file is not exist")
+// 		{
+// 			bool Result = File.Open("ZEFileReadOnlyTestsCase.txt", ZE_FM_READ_ONLY, true);
+// 			ZETestCheck(Result == false);
+// 		}
 
 		ZETestCase("for file mode ZE_FM_WRITE_ONLY")
 		{
@@ -133,6 +133,7 @@ ZETestSuite(ZEFile)
 			remove("ZEFileReadWriteTests.txt");
 		}
 	}
+
 	ZETest("bool ZEFile::IsOpen()")
 	{
 		ZEFile File;
@@ -152,6 +153,7 @@ ZETestSuite(ZEFile)
 			remove("ZEFileIsOpenTests.txt");
 		}
 	}
+
 	ZETest("ZEUInt64 ZEFile::Write(const void* Buffer, ZEUInt64 Size, ZEUInt64 Count)")
 	{
 
@@ -277,6 +279,7 @@ ZETestSuite(ZEFile)
 			remove("ZEFileWriteTests.txt");
 		}
 	}
+
 	ZETest("void ZEFile::Flush()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
@@ -299,6 +302,7 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileFlushTests.txt");
 	}
+
 	ZETest("ZEUInt64 ZEFile::GetFileSize()")
 	{
 		ZEFile File;
@@ -327,6 +331,7 @@ ZETestSuite(ZEFile)
 			remove("ZEFileSizeTests.txt");
 		}
 	}
+
 	ZETest("ZEUInt64 ZEFile::GetStartPosition()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
@@ -350,6 +355,7 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileStartPositionTests.txt");
 	}
+
 	ZETest("ZEUInt64 ZEFile::GetEndPosition()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
@@ -374,6 +380,7 @@ ZETestSuite(ZEFile)
 		remove("ZEFileEndPositionTests.txt");
 		
 	}
+
 	ZETest("bool ZEFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
@@ -531,6 +538,7 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileTellTests.txt");
 	}
+
 	ZETest("void ZEFile::Close()")
 	{
 		ZEFile File;
@@ -543,6 +551,7 @@ ZETestSuite(ZEFile)
 		ZETestCheck(isopen == false);
 		remove("ZEFileCloseTests.txt");
 	}
+
 	ZETest("ZEUInt64 ZEFile::Read(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
@@ -586,6 +595,7 @@ ZETestSuite(ZEFile)
 			remove("ZEFileReadTests.txt");
 		}
 	}
+
 	ZETest("bool ZEFile::Eof()")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
@@ -612,8 +622,8 @@ ZETestSuite(ZEFile)
 
 		File.Close();
 		remove("ZEFileEofTests.txt");
-
 	}
+
 	ZETest("ZEFileType ZEFile::GetFileType() const")
 	{
 		ZEFile File;
@@ -625,6 +635,7 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileTypeTests.txt");
 	}
+
 	ZETest("ZEUInt ZEFile::GetReferenceCount() const")
 	{
 		ZEFile File;
@@ -636,6 +647,7 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileReferenceCountTests.txt");
 	}
+
 	ZETest("ZEUInt64 ZEFile::WriteFormated(const char* Format, ...)")
 	{
 		ZEFile File;
@@ -648,6 +660,7 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileWriteFormatedTests.txt");
 	}
+
 	ZETest("void* ZEFile::GetFileHandle() const")
 	{
 		ZEFile File;
@@ -659,6 +672,7 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFileHandleTests.txt");
 	}
+
 	ZETest("const ZEString ZEFile::GetFilePath() const")
 	{
 		ZEFile File;
@@ -670,6 +684,7 @@ ZETestSuite(ZEFile)
 		File.Close();
 		remove("ZEFilePathTests.txt");
 	}
+
 	ZETest("ZEFile& ZEFile::operator = (ZEFile& OtherFile)")
 	{
 		ZEFile File;
@@ -701,7 +716,6 @@ ZETestSuite(ZEFile)
 		File.Close();
 		OtherFile.Close();
 		remove("ZEFileOperatorTests.txt");
-
 	}
 
 		//////////////////////////////////////
@@ -715,6 +729,7 @@ ZETestSuite(ZEFile)
 		ZEString FileName = ZEFile::GetFileName(FilePath);
 		ZETestCheckString(FileName, "ZEFileTests0.txt");
 	}
+
 	ZETest("ZEString ZEFile::GetFileExtension(const ZEString& FilePath)")
 	{
 		const ZEString FilePath = "resources\\Items0\\FileTest0\\TestTest0\\ZEFileTests0.txt";
@@ -722,6 +737,7 @@ ZETestSuite(ZEFile)
 		ZEString FileExtension = ZEFile::GetFileExtension(FilePath);
 		ZETestCheckString(FileExtension, ".txt");
 	}
+
 	ZETest("ZEString ZEFile::GetParentDirectory(const ZEString& FilePath)")
 	{
 		const ZEString FilePath = "resources\\Items0\\FileTest0\\TestTest0\\ZEFileTests0.txt";
@@ -729,6 +745,7 @@ ZETestSuite(ZEFile)
 		ZEString ParentDirectory = ZEFile::GetParentDirectory(FilePath);
 		ZETestCheckString(ParentDirectory, "resources\\Items0\\FileTest0\\TestTest0");
 	}
+
 	ZETest("bool ZEFile::IsDirectoryExists(const ZEString& FilePath)")
 	{
 		const ZEString FilePath = "resources\\Items0\\FileTest0\\TestTest0\\ZEFileTests0.txt";
@@ -736,6 +753,7 @@ ZETestSuite(ZEFile)
 		bool IsDirectory = ZEFile::IsDirectoryExists(FilePath);
 		ZETestCheck(IsDirectory == false);
 	}
+
 	ZETest("bool ZEFile::IsFileExists(const ZEString& FilePath)")
 	{
 		const ZEString FilePath = "resources\\Items0\\FileTest0\\TestTest0\\ZEFileTests0.txt";
@@ -743,6 +761,7 @@ ZETestSuite(ZEFile)
 		bool IsFile = ZEFile::IsFileExists(FilePath);
 		ZETestCheck(IsFile == true);
 	}
+
 	ZETest("ZEUInt64 ZEFile::GetFileSize(const ZEString& FilePath)")
 	{
 		const ZEString FilePath = "resources\\Items0\\FileTest0\\TestTest0\\ZEFileTests0.txt";
@@ -777,6 +796,7 @@ ZETestSuite(ZEFile)
 		remove("resources\\ZEFileReadFileTests.txt");*/
 		
 	}
+
 	ZETest("bool ZEFile::ReadTextFile(const ZEString& FilePath, char* Buffer, ZEUInt64 BufferSize)")
 	{
 		/*unsigned char* Buffer = new unsigned char[1025];
