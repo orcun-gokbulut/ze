@@ -128,8 +128,11 @@ ZETestSuite(ZEFileCache)
 		ZEFileCache FileCache;
 		FileCache.Open("ZEFileCacheOpenTests.txt");
 		ZETestCheck(FileCache.IsOpen());
+
+		FileCache.Close();
 		remove("ZEFileCacheOpenTests.txt");
 	}
+
 	ZETest(" bool ZEFileCache::Open(ZEFile * File)")
 	{
 		ZEFile File;
@@ -137,8 +140,12 @@ ZETestSuite(ZEFileCache)
 		ZEFileCache FileCache;
 		FileCache.Open(&File);
 		ZETestCheck(FileCache.IsOpen());
+
+		FileCache.Close();
+		File.Close();
 		remove("ZEFileCacheOpenTests2.txt");
 	}
+
 	ZETest("bool ZEFileCache::IsOpen()")
 	{
 		ZEFileCache FileCache;
@@ -147,6 +154,8 @@ ZETestSuite(ZEFileCache)
 		{
 			FileCache.Open("ZEFileCacheIsOpenTests.txt");
 			ZETestCheck(FileCache.IsOpen());
+
+			FileCache.Close();
 			remove("ZEFileCacheIsOpenTests.txt");
 		}
 
@@ -155,9 +164,11 @@ ZETestSuite(ZEFileCache)
 			FileCache.Open("ZEFileCacheIsOpenTests2.txt");
 			FileCache.Close();
 			ZETestCheck(!FileCache.IsOpen());
+
 			remove("ZEFileCacheIsOpenTests2.txt");
 		}
 	}
+
 	ZETest("ZEString ZEFileCache::GetCacheFilePath()")
 	{
 		ZEFileCache FileCache;
@@ -165,16 +176,22 @@ ZETestSuite(ZEFileCache)
 
 		const ZEString FilePath = FileCache.GetCacheFilePath();
 		ZETestCheckString(FilePath, "ZEFileCacheGetCacheFilePathTests.txt");
+
+		FileCache.Close();
 		remove("ZEFileCacheGetCacheFilePathTests.txt");
 	}
+
 	ZETest("ZEFile ZEFileCache::GetFile()")
 	{
 		ZEFileCache FileCache;
 		FileCache.Open("ZEFileCacheGetFileTests.txt");
 
 		ZEFile File = FileCache.GetFile();
+
+		FileCache.Close();
 		remove("ZEFileCacheGetFileTests.txt");
 	}
+
 	ZETest("void ZEFileCache::Close()")
 	{
 		ZEFileCache FileCache;
@@ -183,7 +200,9 @@ ZETestSuite(ZEFileCache)
 		FileCache.Close();
 		ZETestCheck(!FileCache.IsOpen());
 		
+		remove("ZEFileCacheCloseTests.txt");
 	}
+
 	ZETest("static bool ZEFileCache::IsFileCache(ZEString FileName)")
 	{
 		ZETestCase("True")
@@ -192,18 +211,22 @@ ZETestSuite(ZEFileCache)
 			ZETestCheck(Result);
 			remove("ZEFileCacheCloseTests.txt");
 		}
+
 		ZETestCase("False")
 		{
-			ZEFile File;
-			File.Open("ZEFileCacheIsFileCacheTests.txt", ZE_FM_READ_WRITE, true);
-
-			bool Result = ZEFileCache::IsFileCache("ZEFileCacheIsFileCacheTests.txt");
-			ZETestCheck(!Result);
-			remove("ZEFileCacheIsFileCacheTests.txt");
+// 			ZEFile File;
+// 			File.Open("ZEFileCacheIsFileCacheTests.txt", ZE_FM_READ_WRITE, true);
+// 
+// 			bool Result = ZEFileCache::IsFileCache("ZEFileCacheIsFileCacheTests.txt");
+// 			ZETestCheck(!Result);
+// 
+// 			File.Close();
+// 			remove("ZEFileCacheIsFileCacheTests.txt");
 			
 			//ZETestCheck(!ZEFileCache::IsFileCache("ZEfile.txt"));
 		}
 	}
+
 	ZETest("bool ZEFileCache::AddData(const ZECacheDataIdentifier * Identifier, const void * Data, ZEUInt64 Size)")
 	{
 		ZECacheTextDataIdentifier Identifier1("ZETestData1");
@@ -243,6 +266,7 @@ ZETestSuite(ZEFileCache)
 
 		remove("ZETestData.cagri");
 	}
+
 	ZETest("bool ZEFileCache::Clear()")
 	{
 		ZEFileCache FileCache;
@@ -262,6 +286,8 @@ ZETestSuite(ZEFileCache)
 			FileCache.AddData(&Identifier1, Buffer, sizeof(unsigned char) * 4999);
 			
 			ZETestCheck(FileCache.Clear());
+
+			FileCache.Close();
 			//File = FileCache.GetFile();
 			//Word = File.GetFileSize();
 			//ZETestCheckEqual(Word, 0);
@@ -270,8 +296,11 @@ ZETestSuite(ZEFileCache)
 		ZETestCase("false(still close)")
 		{
 			ZETestCheck(!FileCache.Clear());
+
+			remove("ZEFileCacheClearTests.txt");
 		}
 	}
+
 	ZETest("bool ZEFileCache::GetData(const ZECacheDataIdentifier * Identifier, void * Buffer, ZEUInt64 Offset, ZEUInt64 Size)")
 	{
 
@@ -320,8 +349,11 @@ ZETestSuite(ZEFileCache)
 
 		ZETestCheck(FileCache.GetData(&Identifier7, Buffer, 0, sizeof(unsigned char) * 4999));
 		ZETestCheck(!memcmp(Buffer2, Buffer, sizeof(unsigned char) * 4999));
+
+		FileCache.Close();
 		remove("ZETestData.gokay");	
 	}
+
 	ZETest("bool ZEFileCache::Allocate(ZEPartialFile* PartialFile, const ZECacheDataIdentifier* Identifier, ZEUInt64 ChunkSize)")
 	{
 		ZETestCase("writing by using partial file")
@@ -347,12 +379,13 @@ ZETestSuite(ZEFileCache)
 			PartialFile2.Seek(4999, ZE_SF_CURRENT);
 			PartialFile2.Write(Buffer, sizeof(unsigned char), 4999);
 
-			FileCache.Close();
-			PartialFile.Close();
 			PartialFile2.Close();
+			PartialFile.Close();
+			FileCache.Close();
 
 			remove("ZETestData.elif");
 		}
+
 		ZETestCase("writing file after closing cache")
 		{
 			ZEPartialFile PartialFile;
@@ -377,6 +410,7 @@ ZETestSuite(ZEFileCache)
 			remove("ZETestData.cagri2");
 		}
 	}
+
 	ZETest("bool ZEFileCache::OpenData(ZEPartialFile* PartialFile, const ZECacheDataIdentifier* Identifier)")
 	{
 		

@@ -65,6 +65,10 @@ ZETestSuite(ZEPartialFile)
 		ZETestCheckEqual(ReferenceCount, 1);
 
 		PartialFile.Close();
+		ReferenceCount = File.GetReferenceCount();
+		ZETestCheckEqual(ReferenceCount, 0);
+		bool isopen = File.IsOpen();
+		File.Close();
 		remove("ZEPartialFileOpenTests.txt");
 		
 		ZETestCase("open more than 1 partial files")
@@ -88,8 +92,12 @@ ZETestSuite(ZEPartialFile)
 			PartialFile1.Close();
 			PartialFile2.Close();
 			PartialFile3.Close();
+			ReferenceCount = File.GetReferenceCount();
+			ZETestCheckEqual(ReferenceCount, 0);
+			bool isopen = File.IsOpen();
+			File.Close();
 			remove("ZEPartialFileOpenTests.txt");	
-		}
+ 		}
 
 		ZETestCase("try to intersect the partial files")
 		{
@@ -115,6 +123,7 @@ ZETestSuite(ZEPartialFile)
 
 			PartialFile.Close();
 			PartialFile1.Close();
+			File.Close();
 			remove("ZEPartialFileOpenTests.txt");
 		}
 
@@ -137,9 +146,11 @@ ZETestSuite(ZEPartialFile)
 			PartialFile.Close();
 			PartialFile1.Close();
 			PartialFile2.Close();
+			File.Close();
 			remove("ZEPartialFileOpenTests.txt");
 		}
 	}
+
 	ZETest("ZEUInt64 ZEPartialFile::Write(void* Buffer, ZEUInt64 Size, ZEUInt64 Count)")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
@@ -183,6 +194,7 @@ ZETestSuite(ZEPartialFile)
 		ZETestCheck(isEof == true);
 	
 		PartialFile.Close();
+		File.Close();
 		remove("ZEPartialFileWriteTests.txt");
 
 		ZETestCase("try to write exceed the partial file size")
@@ -251,6 +263,7 @@ ZETestSuite(ZEPartialFile)
 
 			PartialFile1.Close();
 			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileWriteTests.txt");
 		}
 
@@ -271,6 +284,7 @@ ZETestSuite(ZEPartialFile)
 			ZETestCheck(isEof == true);
 
 			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileWriteTests.txt");
 		}
 
@@ -289,9 +303,11 @@ ZETestSuite(ZEPartialFile)
 			ZETestCheckEqual(WriteCount, 0);
 
 			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileWriteTests.txt");
 		}
 	}
+
 	ZETest("ZEUInt64 ZEPartialFile::GetStartPosition()")
 	{
 		ZEFile File;
@@ -305,8 +321,10 @@ ZETestSuite(ZEPartialFile)
 		ZETestCheckEqual(StartPosition, 10);
 
 		PartialFile.Close();
+		File.Close();
 		remove("ZEPartialFileStartPositionTests.txt");
 	}
+
 	ZETest("ZEUInt64 ZEPartialFile::GetEndPosition()")
 	{
 		ZEFile File;
@@ -320,8 +338,10 @@ ZETestSuite(ZEPartialFile)
 		ZETestCheckEqual(EndPosition, 1010);
 
 		PartialFile.Close();
+		File.Close();
 		remove("ZEPartialFileEndPositionTests.txt");
 	}
+
 	ZETest("ZEUInt64 ZEPartialFile::WriteFormated(const char* Format, ...)")
 	{
 		ZEFile File;
@@ -338,6 +358,7 @@ ZETestSuite(ZEPartialFile)
 		ZETestCheckEqual(PartialCursor, 79);
 
 		PartialFile.Close();
+		File.Close();
 		remove("ZEPartialFileWriteFormatedTests.txt");
 
 		ZETestCase("try to write bigger size of data than partial file size")
@@ -353,6 +374,7 @@ ZETestSuite(ZEPartialFile)
 			ZETestCheckEqual(PartialCursor, 79);
 
 			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileWriteFormatedTests.txt");
 		}
 
@@ -365,6 +387,7 @@ ZETestSuite(ZEPartialFile)
 			remove("ZEPartialFileWriteFormatedTests.txt");
 		}
 	}
+
 	ZETest("ZEUInt64 ZEPartialFile::Tell()")
 	{
 		ZEFile File;
@@ -397,8 +420,10 @@ ZETestSuite(ZEPartialFile)
 		ZETestCheckEqual(PartialCursor, 1024);
 
 		PartialFile.Close();
+		File.Close();
 		remove("ZEPartialFileTellTests.txt");
 	}
+
 	ZETest("bool ZEPartialFile::Seek(ZEINT64 Offset, ZESeekFrom Origin)")
 	{
 		unsigned char* Buffer = new unsigned char[1024];
@@ -452,6 +477,7 @@ ZETestSuite(ZEPartialFile)
 			ZETestCheckEqual(PartialCursor, 60);
 
 			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileSeekTests.txt");
 		}
 
@@ -492,6 +518,7 @@ ZETestSuite(ZEPartialFile)
 			ZETestCheckEqual(PartialCursor, 50);
 
 			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileSeekTests.txt");
 		}
 
@@ -532,9 +559,11 @@ ZETestSuite(ZEPartialFile)
 			ZETestCheckEqual(PartialCursor, 0);
 
 			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileSeekTests.txt");	
 		}
 	}
+
 	ZETest("void ZEPartialFile::Close()")
 	{
 		ZEFile File;
@@ -555,6 +584,7 @@ ZETestSuite(ZEPartialFile)
 		bool isEof = PartialFile.Eof();
 		ZETestCheck(isEof == false);
 		
+		File.Close();
 		remove("ZEPartialFileCloseTests.txt");
 
 		ZETestCase("close parent file first")
@@ -571,6 +601,8 @@ ZETestSuite(ZEPartialFile)
 			EndPosition = PartialFile.GetEndPosition();
 			ZETestCheckEqual(EndPosition, 100);
 
+			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileCloseTests.txt");
 		}
 
@@ -588,8 +620,11 @@ ZETestSuite(ZEPartialFile)
 			PartialFile1.Close();
 
 			bool isOpen = File.IsOpen();
-			ZETestCheck(isOpen == false);
+			ZETestCheck(isOpen == true);
 
+			File.Close();
+			isOpen = File.IsOpen();
+			ZETestCheck(!isOpen);
 			remove("ZEPartialFileCloseTests.txt");
 		}
 
@@ -608,8 +643,10 @@ ZETestSuite(ZEPartialFile)
 			PartialFile1.Close();
 			
 			EndPosition = PartialFile.GetEndPosition();
-			ZETestCheckEqual(EndPosition, 0);
+			ZETestCheckEqual(EndPosition, 100);
 
+			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileCloseTests.txt");
 		}
 	}
@@ -638,6 +675,7 @@ ZETestSuite(ZEPartialFile)
 		ZETestCheckEqual(Res, 0);
 
 		PartialFile.Close();
+		File.Close();
 		remove("ZEPartialFileReadTests.txt");
 
 		ZETestCase("try to read whole partial file")
@@ -658,6 +696,7 @@ ZETestSuite(ZEPartialFile)
 			ZETestCheck(isEof == false);
 
 			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileReadTests.txt");
 		}
 
@@ -679,6 +718,7 @@ ZETestSuite(ZEPartialFile)
 			ZETestCheck(isEof == true);
 
 			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileReadTests.txt");
 		}
 
@@ -705,6 +745,7 @@ ZETestSuite(ZEPartialFile)
 			ZETestCheckEqual(Res, 0);
 
 			PartialFile.Close();
+			File.Close();
 			remove("ZEPartialFileReadTests.txt");
 		}
 	}
@@ -732,6 +773,7 @@ ZETestSuite(ZEPartialFile)
 		ZETestCheck(isEof == true);
 
 		PartialFile.Close();
+		File.Close();
 		remove("ZEPartialFileEofTests.txt");
 	}
 	ZETest("ZEUInt64 ZEPartialFile::GetFileSize() const")
@@ -757,6 +799,7 @@ ZETestSuite(ZEPartialFile)
 		ZETestCheckEqual(Size, 100);
 
 		PartialFile.Close();
+		File.Close();
 		remove("ZEPartialFileSizeTests.txt");
 	}
 }
