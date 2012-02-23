@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERectangle3D.h
+ Zinek Engine - ZEUISceneStatisticsControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,34 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#ifndef __ZE_SCENE_STATISTICS_CONTROL_H__
+#define __ZE_SCENE_STATISTICS_CONTROL_H__
 
-#include "ZEVector.h"
-#include "ZEPlane.h"
-#include "ZETypes.h"
-#include "ZELineSegment.h"
-#include "ZEDS/ZEArray.h"
+#include "ZEUI/ZEUIControl.h"
+#include "ZEUI/ZEUITextControl.h"
 
-class ZERectangle3D
+class ZEUISceneStatisticsControl : public ZEUIControl
 {
+	private:
+
+		ZEUITextControl*		TotalEntityCount;
+		ZEUITextControl*		DrawableEntityCount;
+		ZEUITextControl*		VisibleEntityCount;
+		ZEUITextControl*		CulledEntityCount;
+		ZEUITextControl*		DrawedEntityCount;
+		ZEUITextControl*		TotalLightCount;
+		ZEUITextControl*		VisibleLightCount;
+		ZEUITextControl*		CulledLightCount;
+		ZEUITextControl*		DrawedLightCount;
+
+		ZEUITextControl*		FPSCount;
+		ZEUITextControl*		CameraPosition;
+
 	public:
-		ZEVector3				P1, P2, P3, P4;
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&		GetPoint(ZEUInt Index) const;
-		const ZELine&			GetBorderLine(ZEUInt Index) const;
-		const ZELineSegment&	GetBorder(ZEUInt Index) const;
+		void					SetMaterial(ZEMaterial* Material);
+		ZEMaterial*				GetMaterial() const;
 
-		static ZEHalfSpace		IntersectionTest(const ZERectangle3D& Rectangle, const ZEPlane& Plane);
-		static ZEHalfSpace		IntersectionTest(const ZEArray<ZEVector3>& Rectangle, const ZEPlane& Plane, ZEArray<ZEVector3>& Points);
+		void					Draw(ZEUIRenderer* Renderer);
+		void					Tick(float ElapsedTime);
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
+								ZEUISceneStatisticsControl();
+
+
 };
 
 #endif
-
-
-
-

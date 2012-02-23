@@ -276,6 +276,11 @@ void ZEScene::SetActiveListener(ZEListener* Listener)
 	zeSound->SetActiveListener(Listener);
 }
 
+const ZECullStatistics& ZEScene::GetCullerStatistics()
+{
+	return Culler.GetStatistics();
+}
+
 ZEListener* ZEScene::GetActiveListener()
 {
 	return ActiveListener;

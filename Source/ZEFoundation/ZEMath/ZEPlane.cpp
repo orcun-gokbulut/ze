@@ -151,6 +151,7 @@ void ZEPlane::Create(ZEPlane& Plane,const ZEVector3 &P1,const ZEVector3 &P2,cons
 	ZEVector3::Sub(Sub1,P2,P1);
 	ZEVector3::Sub(Sub2,P3,P1);
 	ZEVector3::CrossProduct(Plane.n, Sub1, Sub2);
+	Plane.n.NormalizeSelf();
 	Plane.p = P3;
 }
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERectangle3D.h
+ Zinek Engine - ZEViewHemiSphere.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,66 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#include "ZEViewHemiSphere.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEGraphics/ZELight.h"
 
-#include "ZEVector.h"
-#include "ZEPlane.h"
-#include "ZETypes.h"
-#include "ZELineSegment.h"
-#include "ZEDS/ZEArray.h"
-
-class ZERectangle3D
+ZEViewVolumeType ZEViewHemiSphere::GetViewVolumeType() const
 {
-	public:
-		ZEVector3				P1, P2, P3, P4;
+	return ZE_VVT_HEMISPHERE;
+}
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&		GetPoint(ZEUInt Index) const;
-		const ZELine&			GetBorderLine(ZEUInt Index) const;
-		const ZELineSegment&	GetBorder(ZEUInt Index) const;
+bool ZEViewHemiSphere::CullTest(const ZEBSphere& BoundingSphere) const
+{
+	if(ZEBSphere::IntersectionTest(BoundingSphere, HalfPlane) != ZE_HS_NEGATIVE_SIDE)
+		return !ZEBSphere::IntersectionTest(Sphere, BoundingSphere);
 
-		static ZEHalfSpace		IntersectionTest(const ZERectangle3D& Rectangle, const ZEPlane& Plane);
-		static ZEHalfSpace		IntersectionTest(const ZEArray<ZEVector3>& Rectangle, const ZEPlane& Plane, ZEArray<ZEVector3>& Points);
+	return true;
+}
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
-};
+bool ZEViewHemiSphere::CullTest(const ZEAABBox& BoundingBox) const
+{
+	if(ZEAABBox::IntersectionTest(BoundingBox, HalfPlane) != ZE_HS_NEGATIVE_SIDE)
+		return !ZEBSphere::IntersectionTest(Sphere, BoundingBox);
 
-#endif
+	return true;
+}
 
+bool ZEViewHemiSphere::CullTest(const ZEOBBox& BoundingBox) const
+{
+	if (ZEOBBox::IntersectionTest(BoundingBox, HalfPlane) != ZE_HS_NEGATIVE_SIDE)
+		return !ZEBSphere::IntersectionTest(Sphere, BoundingBox);
 
+	return true;
+}
 
+bool ZEViewHemiSphere::CullTest(ZEEntity* Entity) const
+{
+	return CullTest(Entity->GetWorldBoundingBox());
+}
 
+bool ZEViewHemiSphere::CullTest(ZELight* Light) const
+{
+	if (Light->GetLightType() == ZE_LT_DIRECTIONAL)
+		return false;
+
+	ZEBSphere BoundingSphere;
+	BoundingSphere.Position = Light->GetWorldPosition();
+	BoundingSphere.Radius = Light->GetRange();
+
+	return CullTest(BoundingSphere);
+}
+
+bool ZEViewHemiSphere::CullTest(const ZERectangle3D& PortalDoor) const
+{
+	zeAssert(true, "NOT IMPLEMENTED");
+	return false;
+}
+
+void ZEViewHemiSphere::Create(const ZEVector3& Position, const ZEVector3& Direction, float Radius, float NearZ)
+{
+	Sphere.Position = Position;
+	Sphere.Radius = Radius;
+	HalfPlane.p = Position;
+	HalfPlane.n = Direction;
+}

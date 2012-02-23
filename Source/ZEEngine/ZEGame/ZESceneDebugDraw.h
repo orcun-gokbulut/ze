@@ -35,7 +35,7 @@
 
 #pragma once
 #ifndef __ZE_SCENE_DEBUG_DRAW_H__
-#define __ZE_SCENE_DEBUH_DRAW_H__
+#define __ZE_SCENE_DEBUG_DRAW_H__
 
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZECanvas.h"

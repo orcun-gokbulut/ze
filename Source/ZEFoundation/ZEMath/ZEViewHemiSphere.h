@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERectangle3D.h
+ Zinek Engine - ZEViewHemiSphere.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,34 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#ifndef __ZE_VIEWVIEWHEMISPHERE_H__
+#define __ZE_VIEWVIEWHEMISPHERE_H__
 
-#include "ZEVector.h"
-#include "ZEPlane.h"
-#include "ZETypes.h"
-#include "ZELineSegment.h"
-#include "ZEDS/ZEArray.h"
+#include "ZEViewVolume.h"
 
-class ZERectangle3D
+class ZEViewHemiSphere : public ZEViewVolume
 {
-	public:
-		ZEVector3				P1, P2, P3, P4;
+private:
+	ZEPlane								HalfPlane;
+	ZEBSphere							Sphere;
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&		GetPoint(ZEUInt Index) const;
-		const ZELine&			GetBorderLine(ZEUInt Index) const;
-		const ZELineSegment&	GetBorder(ZEUInt Index) const;
+public:
+	virtual ZEViewVolumeType			GetViewVolumeType() const;
 
-		static ZEHalfSpace		IntersectionTest(const ZERectangle3D& Rectangle, const ZEPlane& Plane);
-		static ZEHalfSpace		IntersectionTest(const ZEArray<ZEVector3>& Rectangle, const ZEPlane& Plane, ZEArray<ZEVector3>& Points);
+	virtual bool						CullTest(const ZEBSphere& BoundingSphere) const;
+	virtual bool						CullTest(const ZEAABBox& BoundingBox) const;
+	virtual bool						CullTest(const ZEOBBox& BoundingBox) const;
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
+	virtual bool						CullTest(ZELight* Light) const;
+	virtual bool						CullTest(ZEEntity* Entity) const;
+	virtual bool						CullTest(const ZERectangle3D& PortalDoor) const;
+
+	void								Create(const ZEVector3& Position, const ZEVector3& Direction, float Radius, float NearZ);
 };
 
 #endif
-
-
-
-

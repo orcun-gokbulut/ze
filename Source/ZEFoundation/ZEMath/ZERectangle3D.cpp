@@ -57,6 +57,100 @@ const ZEVector3& ZERectangle3D::GetPoint(ZEUInt Index) const
 			return P1;
 	}
 }
+
+const ZELine& ZERectangle3D::GetBorderLine(ZEUInt Index) const
+{
+	switch(Index)
+	{
+	case 0:
+		return ZELine(P1, P2);
+	case 1:
+		return ZELine(P2, P3);
+	case 2:
+		return ZELine(P3, P4);
+	case 3:
+		return ZELine(P4, P1);
+	default:
+		return ZELine(P1, P2);
+	}
+}
+
+const ZELineSegment& ZERectangle3D::GetBorder(ZEUInt Index) const
+{
+	switch(Index)
+	{
+	case 0:
+		return ZELineSegment(P1, P2);
+	case 1:
+		return ZELineSegment(P2, P3);
+	case 2:
+		return ZELineSegment(P3, P4);
+	case 3:
+		return ZELineSegment(P4, P1);
+	default:
+		return ZELineSegment(P1, P2);
+	}
+}
+
+ZEHalfSpace ZERectangle3D::IntersectionTest(const ZERectangle3D& Rectangle, const ZEPlane& Plane)
+{
+	ZEHalfSpace Result1 = ZEPlane::TestHalfSpace(Plane, Rectangle.P1);
+	ZEHalfSpace Result2 = ZEPlane::TestHalfSpace(Plane, Rectangle.P2);
+	ZEHalfSpace Result3 = ZEPlane::TestHalfSpace(Plane, Rectangle.P3);
+	ZEHalfSpace Result4 = ZEPlane::TestHalfSpace(Plane, Rectangle.P4);
+
+	if (Result1 == Result2 && Result1 == Result3 && Result1 == Result4)
+		return Result1;
+	else
+		return ZE_HS_INTERSECTS;
+}
+
+ZEHalfSpace ZERectangle3D::IntersectionTest(const ZEArray<ZEVector3>& Rectangle, const ZEPlane& Plane, ZEArray<ZEVector3>& Points)
+{
+	ZEArray<ZEHalfSpace> Results;
+	Results.SetCount(Rectangle.GetCount());
+	Points.Clear();
+
+	for (size_t I = 0; I < Rectangle.GetCount(); I++)
+	{
+		Results[I] = ZEPlane::TestHalfSpace(Plane, Rectangle[I]);
+
+		if(Results[I] == ZE_HS_POSITIVE_SIDE)
+		{
+			Points.Add(Rectangle[I]);
+		}
+	}
+
+	bool AllResultsSame = true;
+
+	for (size_t I = 0; I < Results.GetCount(); I++)
+	{
+		if(Results[0] != Results[I])
+			AllResultsSame = false;
+	}		
+
+
+	if (AllResultsSame)
+	{
+		return Results[0];
+	}
+	else
+	{
+		float TempT = 0.0f;
+		ZELineSegment TempLineSegment;
+
+		for (size_t I = 0; I < Rectangle.GetCount(); I++)
+		{
+			TempLineSegment = ZELineSegment(Rectangle[Rectangle.Circular(I)], Rectangle[Rectangle.Circular(I + 1)]);
+
+			if(ZEPlane::IntersectionTest(Plane, TempLineSegment, TempT))
+			{
+				Points.Add(TempLineSegment.GetPointOn(TempT));
+			}
+		}
+		return ZE_HS_INTERSECTS;
+	}	
+}
 		
 ZERectangle3D::ZERectangle3D()
 {

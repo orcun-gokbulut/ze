@@ -40,7 +40,7 @@
 #include "ZEGraphics/ZELight.h"
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEDrawParameters.h"
-#include "ZEGraphics/ZEViewVolume.h"
+#include "ZEMath/ZEViewVolume.h"
 
 void ZESceneCuller::DebugDrawEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
 {
@@ -113,27 +113,23 @@ void ZESceneCuller::CullLights(ZEScene* Scene, ZEDrawParameters* DrawParameters)
 
 bool ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
 {
-	return true;
-
 	Statistics.TotalEntityCount++;
 
 	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
 	if ((EntityDrawFlags & ZE_DF_DRAW) != ZE_DF_DRAW)
 		return false;
 
-	return true;
-
 	Statistics.DrawableEntityCount++;
 
 	if (EntityDrawFlags & ZE_DF_CULL && DrawParameters->ViewVolume->CullTest(Entity))
 	{
 		Statistics.CulledEntityCount++;
-		return false;
+		return true;
 	}
 
 	Statistics.DrawedEntityCount++;
 
-	return true;
+	return false;
 }
 
 void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameters)
@@ -142,7 +138,7 @@ void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameter
 
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
-		if (CullEntity(Entities[I], DrawParameters))
+		if (!CullEntity(Entities[I], DrawParameters))
 		{
 			Entities[I]->Draw(DrawParameters);
 			DebugDrawEntity(Entities[I], DrawParameters);
@@ -153,7 +149,7 @@ void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameter
 			const ZEArray<ZEComponent*>& Components = ((ZECompoundEntity*)Entities[I])->GetComponents();
 
 			for (ZESize N = 0; N < Components.GetCount(); N++)
-				if (CullEntity(Components[N], DrawParameters))
+				if (!CullEntity(Components[N], DrawParameters))
 				{
 					Components[N]->Draw(DrawParameters);
 					DebugDrawEntity(Components[N], DrawParameters);

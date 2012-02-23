@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERectangle3D.h
+ Zinek Engine - ZEViewVolume.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,34 +34,52 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MATH_RECTANGLE_3D_H__
-#define __ZE_MATH_RECTANGLE_3D_H__
+#ifndef __ZE_VIEWVOLUME_H__
+#define __ZE_VIEWVOLUME_H__
 
-#include "ZEVector.h"
-#include "ZEPlane.h"
-#include "ZETypes.h"
-#include "ZELineSegment.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEBSphere.h"
+#include "ZEMath/ZERectangle3D.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEMath/ZELineSegment.h"
 
-class ZERectangle3D
+enum ZEViewVolumeType
 {
-	public:
-		ZEVector3				P1, P2, P3, P4;
+	ZE_VVT_NONE	= 0,
+	ZE_VVT_FRUSTUM,
+	ZE_VVT_SPHERE,
+	ZE_VVT_HEMISPHERE,
+	ZE_VVT_CUBOID,
+	ZE_VVT_CONE,
+	ZE_VVT_PLANE
+};
 
-		void					GetPlane(ZEPlane& Plane) const;
-		const ZEVector3&		GetPoint(ZEUInt Index) const;
-		const ZELine&			GetBorderLine(ZEUInt Index) const;
-		const ZELineSegment&	GetBorder(ZEUInt Index) const;
+enum ZEDoorViewTest
+{
+	ZE_DVT_INSIDE,
+	ZE_DVT_OUTSIDE,
+	ZE_DVT_INTERSECTS,
+	ZE_DVT_DOORCOVERS
+};
 
-		static ZEHalfSpace		IntersectionTest(const ZERectangle3D& Rectangle, const ZEPlane& Plane);
-		static ZEHalfSpace		IntersectionTest(const ZEArray<ZEVector3>& Rectangle, const ZEPlane& Plane, ZEArray<ZEVector3>& Points);
+class ZEEntity;
+class ZEComponent;
+class ZELight;
+class ZEViewVolume
+{
+public:
+	virtual ZEViewVolumeType			GetViewVolumeType() const = 0;
 
-								ZERectangle3D();
-								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);
+	virtual bool						CullTest(const ZEBSphere& BoundingBox) const = 0;
+	virtual bool						CullTest(const ZEAABBox& BoundingBox) const = 0;
+	virtual bool						CullTest(const ZEOBBox& BoundingBox) const = 0;
+
+	virtual bool						CullTest(ZELight* Light) const = 0;
+	virtual bool						CullTest(ZEEntity* Entity) const = 0;
+	virtual bool						CullTest(const ZERectangle3D& PortalDoor) const = 0;
 };
 
 #endif
-
-
-
-

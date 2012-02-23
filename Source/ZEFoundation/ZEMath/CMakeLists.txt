@@ -84,6 +84,16 @@ ze_add_source(ZEVector3Tests.cpp		Tests)
 ze_add_source(ZEVector4Tests.cpp		Tests)
 ze_add_source(ZEPolygon.h				Sources Headers)
 ze_add_source(ZEPolygon.cpp				Sources)
+ze_add_source(ZEViewVolume.h			Sources Headers)
+ze_add_source(ZEViewVolume.cpp			Sources)
+ze_add_source(ZEViewFrustum.h			Sources Headers)
+ze_add_source(ZEViewFrustum.cpp			Sources)
+ze_add_source(ZEViewSphere.h			Sources Headers)
+ze_add_source(ZEViewSphere.cpp			Sources)
+ze_add_source(ZEViewHemiSphere.h			Sources Headers)
+ze_add_source(ZEViewHemiSphere.cpp			Sources)
+ze_add_source(ZEViewCuboid.h			Sources Headers)
+ze_add_source(ZEViewCuboid.cpp			Sources)
 	
 ze_add_library(ZEMath 
 	SOURCES ${Sources} 
