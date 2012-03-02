@@ -47,9 +47,11 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
 
-#define ZE_TPM_NORMAL	0x0
-#define ZE_TPM_SHRINKED 0x1
-#define ZE_TPM_EXTENDED 0x2
+#define ZE_TPM_NORMAL			0
+#define ZE_TPM_SHRINK_NEGATIVE	1
+#define ZE_TPM_SHRINK_POSITIVE	2
+#define ZE_TPM_EXTEND_NEGATIVE	3
+#define ZE_TPM_EXTEND_POSITIVE	4
 
 ZEDrawFlags ZETerrain::GetDrawFlags() const
 {
@@ -196,10 +198,11 @@ bool ZETerrain::CreateLevels()
 	{
 		ZETerrainLevel* CurrentLevel = &Levels[I];
 		CurrentLevel->HeightTexture = ZETexture2D::CreateInstance();
-		if (!CurrentLevel->HeightTexture->Create(ChunkSize * 4 + 1, ChunkSize * 4 + 1, ZE_TPF_F32_2, false, 1))
+		if (!CurrentLevel->HeightTexture->Create(ChunkSize * 4 + 6 + 1, ChunkSize * 4 + 6 + 1, ZE_TPF_F32_2, false, 1))
 			return false;
 
 		CurrentLevel->Material = ZETerrainMaterial::CreateInstance();
+		CurrentLevel->Material->Level = I;
 		CurrentLevel->Material->SetHeightTexture(CurrentLevel->HeightTexture);
 		CurrentLevel->Material->SetColorTexture(CurrentLevel->HeightTexture);
 		CurrentLevel->Material->SetBlendTreshold(0.75f);
@@ -267,11 +270,6 @@ void ZETerrain::UnloadLevelData()
 	LevelData.Clear();
 }
 
-#include <FreeImage.h>
-
-#define GetDestinationAddress(buffer, x, y, pitch) ((ZEUInt8*)(buffer) + (pitch) * (y) + (x) * 2 * sizeof(float))
-#define GetSourceAddress(buffer, x, y, pitch) ((ZEUInt8*)(buffer) + (pitch) * (y) + (x) * sizeof(float))
-
 float Sample(ZETerrainLevelData* Data, ZESize x, ZESize y)
 {
 	if (x < 0 || x >= Data->ElevationWidth)
@@ -299,7 +297,7 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 	OldPositionX = PositionX;
 	OldPositionY = PositionY;
 
-	ZESize TextureSize = (ChunkSize * 4 + 1);
+	ZESize TextureSize = (ChunkSize * 4 + 6 + 1);
 	float TexelSize = 1.0f / TextureSize;
 
 	ZESize LevelCount = Levels.GetCount();
@@ -313,11 +311,14 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 		ZETerrainLevelData* CurrentLevelData = &LevelData[CurrLevelIndex];
 		ZETerrainLevelData* NextLevelData = &LevelData[CurrLevelIndex + 1];
 		ZETerrainLevel* CurrLevel = &Levels[CurrLevelIndex];
-		
+
+		CurrLevel->MinHeight = ZE_FLOAT_MAX;
+		CurrLevel->MaxHeight = ZE_FLOAT_MIN;
+
 		ZEInt CurrPositionX	= Align(PositionX, 1 << CurrLevelIndex);
 		ZEInt CurrPositionY	= -Align(PositionY, 1 << CurrLevelIndex);
-		ZESSize DataX = (CurrPositionX >> CurrLevelIndex) - (ZESSize)ChunkSize * 2 + (ZESSize)CurrentLevelData->ElevationWidth / 2;
-		ZESSize DataY = (CurrPositionY >> CurrLevelIndex) - (ZESSize)ChunkSize * 2 + (ZESSize)CurrentLevelData->ElevationHeight / 2;
+		ZESSize DataX = (CurrPositionX >> CurrLevelIndex) - (ZESSize)(ChunkSize * 2 + 3) + (ZESSize)CurrentLevelData->ElevationWidth / 2;
+		ZESSize DataY = (CurrPositionY >> CurrLevelIndex) - (ZESSize)(ChunkSize * 2 + 3) + (ZESSize)CurrentLevelData->ElevationHeight / 2;
 
 		ZESSize NextDataX = DataX / 2;
 		ZESSize NextDataY = DataY / 2;
@@ -325,7 +326,7 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 		CurrLevel->Material->SetHeightOffset(HeightOffset);
 		CurrLevel->Material->SetHeightScale(HeightScale);
 		CurrLevel->Material->SetTextureScale(ZEVector2(TexelSize, TexelSize));
-		CurrLevel->Material->SetTextureOffset(ZEVector2(2.0f * (float)ChunkSize * TexelSize + 0.5f * TexelSize, 2.0f * (float)ChunkSize * TexelSize + 0.5f * TexelSize));
+		CurrLevel->Material->SetTextureOffset(ZEVector2(2.0f * ((float)ChunkSize + 1.5f) * TexelSize + 0.5f * TexelSize, 2.0f * ((float)ChunkSize + 1.5f) * TexelSize + 0.5f * TexelSize));
 
 		void* Buffer;
 		ZESize Pitch;		
@@ -337,39 +338,45 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 				ZESSize NextBufferY = BufferY / 2;
 
 				// Linear Filtering
-				float Value;
+				float NextLevelHeight;
 				if (((DataX + BufferX) % 2) != 0 && ((DataY + BufferY) % 2) != 0)
 				{
-					Value  = Sample(NextLevelData,	NextDataX + NextBufferX,		NextDataY + NextBufferY);
-					Value += Sample(NextLevelData,	NextDataX + NextBufferX,		NextDataY + NextBufferY + 1);
-					Value += Sample(NextLevelData,	NextDataX + NextBufferX + 1,	NextDataY + NextBufferY);
-					Value += Sample(NextLevelData,	NextDataX + NextBufferX + 1,	NextDataY + NextBufferY + 1);
-					Value /= 4;
+					NextLevelHeight  = Sample(NextLevelData,	NextDataX + NextBufferX,		NextDataY + NextBufferY);
+					NextLevelHeight += Sample(NextLevelData,	NextDataX + NextBufferX,		NextDataY + NextBufferY + 1);
+					NextLevelHeight += Sample(NextLevelData,	NextDataX + NextBufferX + 1,	NextDataY + NextBufferY);
+					NextLevelHeight += Sample(NextLevelData,	NextDataX + NextBufferX + 1,	NextDataY + NextBufferY + 1);
+					NextLevelHeight /= 4;
 					}
 				else if (((DataX + BufferX) % 2) != 0)
 				{
-					Value  = Sample(NextLevelData,	NextDataX + NextBufferX,		NextDataY + NextBufferY + DataY % 2);
-					Value += Sample(NextLevelData,	NextDataX + NextBufferX + 1,	NextDataY + NextBufferY + DataY % 2);
-					Value /= 2;
+					NextLevelHeight  = Sample(NextLevelData,	NextDataX + NextBufferX,		NextDataY + NextBufferY + DataY % 2);
+					NextLevelHeight += Sample(NextLevelData,	NextDataX + NextBufferX + 1,	NextDataY + NextBufferY + DataY % 2);
+					NextLevelHeight /= 2;
 				}
 				else if (((DataY + BufferY) % 2) != 0)
 				{
-					Value  = Sample(NextLevelData,	NextDataX + NextBufferX + DataX % 2,		NextDataY + NextBufferY);
-					Value += Sample(NextLevelData,	NextDataX + NextBufferX + DataX % 2,		NextDataY + NextBufferY + 1);
-					Value /= 2;
+					NextLevelHeight  = Sample(NextLevelData,	NextDataX + NextBufferX + DataX % 2,		NextDataY + NextBufferY);
+					NextLevelHeight += Sample(NextLevelData,	NextDataX + NextBufferX + DataX % 2,		NextDataY + NextBufferY + 1);
+					NextLevelHeight /= 2;
 				}
 				else
 				{
-					Value = Sample(NextLevelData,	NextDataX + NextBufferX + DataX % 2,	NextDataY + NextBufferY + DataY % 2);
+					NextLevelHeight = Sample(NextLevelData,	NextDataX + NextBufferX + DataX % 2,	NextDataY + NextBufferY + DataY % 2);
 				}
+				
+				float Height = Sample(CurrentLevelData, DataX + BufferX, DataY + BufferY);
 
-				Write(Buffer, Pitch, BufferX, BufferY)[0] = Sample(CurrentLevelData, DataX + BufferX, DataY + BufferY);
-				Write(Buffer, Pitch, BufferX, BufferY)[1] = Value;
+				if (Height < CurrLevel->MinHeight)
+					CurrLevel->MinHeight = Height;
+				else if (Height > CurrLevel->MaxHeight)
+					CurrLevel->MaxHeight = Height;
+
+				Write(Buffer, Pitch, BufferX, BufferY)[0] = Height;
+				Write(Buffer, Pitch, BufferX, BufferY)[1] = NextLevelHeight;
 			}
 
 		CurrLevel->HeightTexture->Unlock(0);
 	}
-
 }
 
 void ZETerrain::SetTerrainFile(const ZEString& FileName)
@@ -384,7 +391,7 @@ const ZEString& ZETerrain::GetTerrainFile()
 	return TerrainFileName;
 }
 
-bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt PositionX, ZEInt PositionY, ZEInt Mode, ZESize Level)
+bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt PositionX, ZEInt PositionY, ZEInt LocalPositionX, ZEInt LocalPositionY, ZEInt Mode, ZESize Level)
 {	
 	ZERenderCommand RenderCommand;
 	RenderCommand.SetZero();
@@ -400,14 +407,40 @@ bool ZETerrain::DrawPrimtive(ZERenderer* Renderer, ZEInt PrimitiveType, ZEInt Po
 	ZEMatrix4x4 ScaleMatrix;
 	ZEMatrix4x4::CreateOrientation(ScaleMatrix, ZEVector3(PositionX, 0.0f, PositionY), ZEQuaternion::Identity, ZEVector3((float)(1 << Level), 1.0f, (float)(1 << Level)));
 	ZEMatrix4x4::Multiply(RenderCommand.WorldMatrix, GetWorldTransform(), ScaleMatrix);
+	ZEMatrix4x4::CreateTranslation(RenderCommand.LocalMatrix, LocalPositionX, 0.0f, LocalPositionY);
 
-	RenderCommand.VertexBufferOffset = Indices.Index[PrimitiveType] * 3;
-	if (Mode == ZE_TPM_NORMAL)
-		RenderCommand.PrimitiveCount = Indices.Size[PrimitiveType];
-	else if (Mode == ZE_TPM_SHRINKED)
-		RenderCommand.PrimitiveCount = Indices.SizeShrinked[PrimitiveType];
-	else if (Mode == ZE_TPM_EXTENDED)
-		RenderCommand.PrimitiveCount = Indices.SizeExtended[PrimitiveType];
+	ZEInt BarSize;
+	if (PrimitiveType == ZE_TP_CORNER_2)
+		BarSize = 2;
+	else if (PrimitiveType == ZE_TP_CORNER_1)
+		BarSize = 1;
+	else if (PrimitiveType == ZE_TP_CORNER)
+		BarSize = ChunkSize - 1;
+	else
+		BarSize = ChunkSize;
+	
+	RenderCommand.VertexBufferOffset = Indices.Index[PrimitiveType] + BarSize * 2 * 3;
+	RenderCommand.PrimitiveCount = ChunkSize * BarSize * 2;
+
+	switch (Mode)
+	{
+		case ZE_TPM_SHRINK_NEGATIVE:
+			RenderCommand.VertexBufferOffset += BarSize * 2 * 3;
+			RenderCommand.PrimitiveCount -= BarSize * 2;
+			break;
+
+		case ZE_TPM_SHRINK_POSITIVE:
+			RenderCommand.PrimitiveCount -= BarSize * 2;
+			break;
+		
+		case ZE_TPM_EXTEND_NEGATIVE:
+			RenderCommand.VertexBufferOffset -= BarSize * 2 * 3;
+			RenderCommand.PrimitiveCount += BarSize * 2;
+			break;
+
+		case ZE_TPM_EXTEND_POSITIVE:
+			RenderCommand.PrimitiveCount += BarSize * 2;
+	}
 
 	Renderer->AddToRenderList(&RenderCommand);
 
@@ -441,8 +474,14 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 
 	Stream(DrawParameters, PositionX, PositionY);
 	
+	ZESize LevelCount = Levels.GetCount();
+	if (LevelData.GetCount() < LevelCount)
+		LevelCount = LevelData.GetCount();
+	if (MaxLevel < LevelCount)
+		LevelCount = MaxLevel;
+
 	int ActiveLevel = 0;
-	for (ZESize CurrIndex = 0; CurrIndex < Levels.GetCount(); CurrIndex++)
+	for (ZESize CurrIndex = 0; CurrIndex < LevelCount; CurrIndex++)
 	{
 		ZEInt CurrLevelPositionX = Align(PositionX, 1 << CurrIndex);
 		ZEInt CurrLevelPositionY = Align(PositionY, 1 << CurrIndex);
@@ -469,45 +508,95 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 		
 		if (CurrLevelPositionX - NextLevelPositionX < 0)
 		{
-			RightMode = ZE_TPM_EXTENDED;
-			LeftMode = ZE_TPM_SHRINKED;
+			RightMode = ZE_TPM_EXTEND_POSITIVE;
+			LeftMode = ZE_TPM_SHRINK_NEGATIVE;
 		}
 		else if (CurrLevelPositionX - NextLevelPositionX > 0)
 		{
-			RightMode = ZE_TPM_SHRINKED;
-			LeftMode = ZE_TPM_EXTENDED;
+			RightMode = ZE_TPM_SHRINK_POSITIVE;
+			LeftMode = ZE_TPM_EXTEND_NEGATIVE;
 		}
 
 		if (CurrLevelPositionY - NextLevelPositionY < 0)
 		{
-			TopMode = ZE_TPM_EXTENDED;
-			BottomMode = ZE_TPM_SHRINKED;
+			TopMode = ZE_TPM_EXTEND_POSITIVE;
+			BottomMode = ZE_TPM_SHRINK_NEGATIVE;
 		}
 		else if (CurrLevelPositionY - NextLevelPositionY > 0)
 		{
-			TopMode = ZE_TPM_SHRINKED;
-			BottomMode = ZE_TPM_EXTENDED;
+			TopMode = ZE_TPM_SHRINK_POSITIVE;
+			BottomMode = ZE_TPM_EXTEND_NEGATIVE;
 		}
 
 		if (CurrIndex == ActiveLevel)
 		{
-			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CENTER_TOP_LEFT,		CurrLevelPositionX, CurrLevelPositionY, ZE_TPM_NORMAL, CurrIndex);
-			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CENTER_TOP_RIGHT,		CurrLevelPositionX, CurrLevelPositionY, ZE_TPM_NORMAL, CurrIndex);
-			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CENTER_BOTTOM_LEFT,		CurrLevelPositionX, CurrLevelPositionY, ZE_TPM_NORMAL, CurrIndex);
-			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CENTER_BOTTOM_RIGHT,	CurrLevelPositionX, CurrLevelPositionY, ZE_TPM_NORMAL, CurrIndex);
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, -ChunkSize, -ChunkSize, ZE_TPM_NORMAL, CurrIndex);
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, -ChunkSize, 0, ZE_TPM_NORMAL, CurrIndex);
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, 0, -ChunkSize, ZE_TPM_NORMAL, CurrIndex);
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, 0, 0, ZE_TPM_NORMAL, CurrIndex);
 		}
 		
-		//DrawPrimtive(DrawParameters->Renderer, ZE_TP_TOP_LEFT,		CurrLevelPositionX, CurrLevelPositionY, TopMode | LeftMode,		CurrIndex);
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_TOP,			CurrLevelPositionX, CurrLevelPositionY, TopMode,				CurrIndex);
-		//DrawPrimtive(DrawParameters->Renderer, ZE_TP_TOP_RIGHT,		CurrLevelPositionX, CurrLevelPositionY, TopMode | RightMode,	CurrIndex);*/
+		// Left			
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL, CurrLevelPositionX, CurrLevelPositionY, -2 * ChunkSize, -ChunkSize, LeftMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL, CurrLevelPositionX, CurrLevelPositionY, -2 * ChunkSize, 0, LeftMode, CurrIndex);
 
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_LEFT,			CurrLevelPositionX, CurrLevelPositionY, LeftMode,				CurrIndex);
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_RIGHT,			CurrLevelPositionX, CurrLevelPositionY, RightMode,				CurrIndex);
+		// Right
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL, CurrLevelPositionX, CurrLevelPositionY, ChunkSize, -ChunkSize, RightMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_HORIZONTAL,	 CurrLevelPositionX, CurrLevelPositionY, ChunkSize, 0 * ChunkSize, RightMode, CurrIndex);
 
-		//DrawPrimtive(DrawParameters->Renderer, ZE_TP_BOTTOM_LEFT,	CurrLevelPositionX, CurrLevelPositionY, BottomMode | LeftMode,	CurrIndex);
-		DrawPrimtive(DrawParameters->Renderer, ZE_TP_BOTTOM,			CurrLevelPositionX, CurrLevelPositionY, BottomMode,				CurrIndex);
-		//DrawPrimtive(DrawParameters->Renderer, ZE_TP_BOTTOM_RIGHT,	CurrLevelPositionX, CurrLevelPositionY, BottomMode | RightMode,	CurrIndex);*/
+		// Top
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, -ChunkSize, ChunkSize, TopMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, 0 * ChunkSize, ChunkSize, TopMode, CurrIndex);
+
+		// Bottom
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, -ChunkSize, -2 * ChunkSize, BottomMode, CurrIndex);
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_VERTICAL, CurrLevelPositionX, CurrLevelPositionY, 0, -2 * ChunkSize, BottomMode, CurrIndex);
+
+		// Top Left
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER, CurrLevelPositionX, CurrLevelPositionY, -2 * ChunkSize + 1, ChunkSize, TopMode, CurrIndex);
+		if (LeftMode == ZE_TPM_NORMAL)
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER_1, CurrLevelPositionX, CurrLevelPositionY, -2 * ChunkSize, ChunkSize, TopMode, CurrIndex);
+		else if (LeftMode == ZE_TPM_EXTEND_NEGATIVE)
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER_2, CurrLevelPositionX, CurrLevelPositionY, -2 * ChunkSize - 1, ChunkSize, TopMode, CurrIndex);
+
+		// TopRight
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER, CurrLevelPositionX, CurrLevelPositionY, ChunkSize, ChunkSize, TopMode, CurrIndex);
+		if (RightMode == ZE_TPM_NORMAL)
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER_1, CurrLevelPositionX, CurrLevelPositionY, 2 * ChunkSize - 1, ChunkSize, TopMode, CurrIndex);
+		else if (RightMode == ZE_TPM_EXTEND_POSITIVE)
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER_2, CurrLevelPositionX, CurrLevelPositionY, 2 * ChunkSize - 1, ChunkSize, TopMode, CurrIndex);
+				
+		// Bottom Left
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER, CurrLevelPositionX, CurrLevelPositionY, -2 * ChunkSize + 1, -2 * ChunkSize, BottomMode, CurrIndex);
+		if (LeftMode == ZE_TPM_NORMAL)
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER_1, CurrLevelPositionX, CurrLevelPositionY, -2 * ChunkSize, -2 * ChunkSize, BottomMode, CurrIndex);
+		else if (LeftMode == ZE_TPM_EXTEND_NEGATIVE)
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER_2, CurrLevelPositionX, CurrLevelPositionY, -2 * ChunkSize - 1, -2 * ChunkSize, BottomMode, CurrIndex);
+
+
+		// Bottom Right
+		DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER, CurrLevelPositionX, CurrLevelPositionY, ChunkSize, -2 * ChunkSize, BottomMode, CurrIndex);
+		if (RightMode == ZE_TPM_NORMAL)
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER_1, CurrLevelPositionX, CurrLevelPositionY, 2 * ChunkSize - 1, -2 * ChunkSize, BottomMode, CurrIndex);
+		else if (RightMode == ZE_TPM_EXTEND_POSITIVE)
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER_2, CurrLevelPositionX, CurrLevelPositionY, 2 * ChunkSize - 1, -2 * ChunkSize, BottomMode, CurrIndex);
 	}
+
+	
+	ZESSize Width = LevelData[LevelCount - 1].ElevationWidth >> LevelCount;
+	ZESSize Height = LevelData[LevelCount - 1].ElevationWidth >> LevelCount;
+
+	ZEInt CurrLevelPositionX = Align(PositionX, 1 << (LevelCount - 1));
+	ZEInt CurrLevelPositionY = Align(PositionY, 1 << (LevelCount - 1));
+	
+	/*for (ZESSize y = -Height; y < Height; y++)
+		for (ZESSize x = -Width; x < Width; x++)
+		{
+			if (x >= -2 && x <= 1 && y >= -2 && y <= 1)
+				continue;
+
+			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER_2, CurrLevelPositionX, CurrLevelPositionY, x * ChunkSize, y * ChunkSize, ZE_TPM_NORMAL, (LevelCount - 1));
+		}*/
 }
 
 ZETerrain* ZETerrain::CreateInstance()

@@ -85,7 +85,6 @@ void ZED3D9FrameRenderer::PumpStreams(ZERenderCommand* RenderCommand)
 		case ZE_ROPT_TRIANGLE_STRIPT:
 			PrimitiveType = D3DPT_TRIANGLESTRIP;
 			break;
-
 	}
 
 	// Make draw call
@@ -105,9 +104,8 @@ void ZED3D9FrameRenderer::PumpStreams(ZERenderCommand* RenderCommand)
 		else
 		{
 			GetDevice()->DrawIndexedPrimitiveUP(PrimitiveType, 0, VertexCount, RenderCommand->PrimitiveCount, ((ZED3D9StaticIndexBuffer*)RenderCommand->IndexBuffer)->StaticBuffer, D3DFMT_INDEX32, 
-												(char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderCommand->VertexBufferOffset * RenderCommand->VertexDeclaration->GetVertexSize(),
-												RenderCommand->VertexDeclaration->GetVertexSize());
-
+				(char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderCommand->VertexBufferOffset * RenderCommand->VertexDeclaration->GetVertexSize(),
+				RenderCommand->VertexDeclaration->GetVertexSize());
 		}
 	}
 	else
@@ -117,17 +115,14 @@ void ZED3D9FrameRenderer::PumpStreams(ZERenderCommand* RenderCommand)
 		{
 			GetDevice()->SetStreamSource(0, ((ZED3D9StaticVertexBuffer*)RenderCommand->VertexBuffer)->StaticBuffer, 0, RenderCommand->VertexDeclaration->GetVertexSize());
 			GetDevice()->DrawPrimitive(PrimitiveType, RenderCommand->VertexBufferOffset, RenderCommand->PrimitiveCount);
-
 		}
 		else
 		{
 			GetDevice()->DrawPrimitiveUP(PrimitiveType, RenderCommand->PrimitiveCount,
-										 (char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderCommand->VertexBufferOffset * RenderCommand->VertexDeclaration->GetVertexSize(),  
-										 RenderCommand->VertexDeclaration->GetVertexSize());
-
+				(char*)((ZEDynamicVertexBuffer*)VertexBuffer)->GetVertexBuffer() + RenderCommand->VertexBufferOffset * RenderCommand->VertexDeclaration->GetVertexSize(),  
+				RenderCommand->VertexDeclaration->GetVertexSize());
 		}
 	}
-
 }
 
 bool ZED3D9FrameRenderer::CheckRenderCommand(ZERenderCommand* RenderCommand)

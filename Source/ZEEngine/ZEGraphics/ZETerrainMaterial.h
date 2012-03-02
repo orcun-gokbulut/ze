@@ -91,6 +91,7 @@ class ZETerrainMaterial : public ZEMaterial
 		virtual							~ZETerrainMaterial();
 
 	public:
+		ZESize							Level;
 		virtual ZEMaterialFlags			GetMaterialFlags() const;
 
 		// Material Options

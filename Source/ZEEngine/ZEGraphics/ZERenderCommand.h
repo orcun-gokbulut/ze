@@ -84,9 +84,11 @@ class ZERenderCommand
 		ZEInt							Priority;
 		float							Order;
 		ZERenderCommandFlags			Flags;
+
 		ZEROPrimitiveType				PrimitiveType;
-		
+		void*							PrimitiveParameters;
 		ZESize							PrimitiveCount;
+
 		ZESize							VertexBufferOffset;
 
 		const ZEMaterial*				Material;
@@ -95,6 +97,7 @@ class ZERenderCommand
 		ZEVertexBuffer*					VertexBuffer;
 		ZEVertexDeclaration*			VertexDeclaration;
 
+		ZEMatrix4x4						LocalMatrix;
 		ZEMatrix4x4						WorldMatrix;
 
 		ZEArray<ZERenderCommand*>		Instances;
