@@ -60,7 +60,7 @@ ZETerrainMaterial::ZETerrainMaterial()
 	TextureOffset = ZEVector2::Zero;
 	TextureScale = ZEVector2::One;
 	ChunkSize = 32;
-	BlendTreshold = 0.75f;
+	BlendTreshold = 0.5f;
 
 	HeightTexture = NULL;
 	ColorTexture = NULL;
