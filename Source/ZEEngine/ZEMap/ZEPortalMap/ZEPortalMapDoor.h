@@ -51,6 +51,9 @@ class ZEPortalMapDoor
 		ZERectangle3D					Rectangle;
 		ZEPortalMapPortal*				Portals[2];
 		bool							Open;
+		bool							SeenThrough;
+
+										ZEPortalMapDoor();
 
 	public:
 		ZEPortalMap*					GetOwner();
@@ -58,7 +61,10 @@ class ZEPortalMapDoor
 		const char*						GetName();
 
 		ZEPortalMapPortal**				GetPortals();
-		const ZERectangle3D&			GetRectangle();
+		const ZERectangle3D&			GetRectangle() const;
+
+		void							SetSeenThrough(bool Value);
+		bool							GetSeenThrough();
 
 		void							Initialize(ZEPortalMap* Owner, const ZEPortalMapResourceDoor* Resource);
 		void							Deinitialize();
@@ -66,7 +72,7 @@ class ZEPortalMapDoor
 		void							SetOpen(bool Open);
 		bool							GetOpen();
 
-										ZEPortalMapDoor();
+		static ZEPortalMapDoor*			CreateInstance();
 };
 
 #endif

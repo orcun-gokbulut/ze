@@ -257,7 +257,7 @@ void ZEPlayer::Deinitialize()
 ZEPlayer::ZEPlayer()
 {
 
-	FOV = ZE_PI_4;
+	FOV = ZE_PI / 3.0f;
 	Rx = Ry = Rz = 0;
 	MovementSpeed = 10.0f;
 
@@ -284,7 +284,7 @@ ZEPlayer::ZEPlayer()
 	Camera->SetLocalRotation(ZEQuaternion::Identity);
 	Camera->SetNearZ(zeGraphics->GetNearZ());
 	Camera->SetFarZ(zeGraphics->GetFarZ());
-	Camera->SetFOV(32);
+	Camera->SetFOV(FOV);
 	Camera->SetAspectRatio(zeGraphics->GetAspectRatio());
 	RegisterComponent(Camera);
 

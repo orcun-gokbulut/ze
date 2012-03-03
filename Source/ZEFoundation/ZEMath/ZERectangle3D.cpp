@@ -62,16 +62,16 @@ const ZELine& ZERectangle3D::GetBorderLine(ZEUInt Index) const
 {
 	switch(Index)
 	{
-	case 0:
-		return ZELine(P1, P2);
-	case 1:
-		return ZELine(P2, P3);
-	case 2:
-		return ZELine(P3, P4);
-	case 3:
-		return ZELine(P4, P1);
-	default:
-		return ZELine(P1, P2);
+		case 0:
+			return ZELine(P1, P2);
+		case 1:
+			return ZELine(P2, P3);
+		case 2:
+			return ZELine(P3, P4);
+		case 3:
+			return ZELine(P4, P1);
+		default:
+			return ZELine(P1, P2);
 	}
 }
 
@@ -79,16 +79,16 @@ const ZELineSegment& ZERectangle3D::GetBorder(ZEUInt Index) const
 {
 	switch(Index)
 	{
-	case 0:
-		return ZELineSegment(P1, P2);
-	case 1:
-		return ZELineSegment(P2, P3);
-	case 2:
-		return ZELineSegment(P3, P4);
-	case 3:
-		return ZELineSegment(P4, P1);
-	default:
-		return ZELineSegment(P1, P2);
+		case 0:
+			return ZELineSegment(P1, P2);
+		case 1:
+			return ZELineSegment(P2, P3);
+		case 2:
+			return ZELineSegment(P3, P4);
+		case 3:
+			return ZELineSegment(P4, P1);
+		default:
+			return ZELineSegment(P1, P2);
 	}
 }
 
@@ -105,51 +105,39 @@ ZEHalfSpace ZERectangle3D::IntersectionTest(const ZERectangle3D& Rectangle, cons
 		return ZE_HS_INTERSECTS;
 }
 
-ZEHalfSpace ZERectangle3D::IntersectionTest(const ZEArray<ZEVector3>& Rectangle, const ZEPlane& Plane, ZEArray<ZEVector3>& Points)
+void ZERectangle3D::IntersectionTest(ZEArray<ZEVector3>& IntersectedPoints, const ZEPlane& Plane, const ZEArray<ZEVector3>& Points)
 {
-	ZEArray<ZEHalfSpace> Results;
-	Results.SetCount(Rectangle.GetCount());
-	Points.Clear();
+	IntersectedPoints.Clear();
+	if (Points.GetCount() == 0)
+		return;
 
-	for (size_t I = 0; I < Rectangle.GetCount(); I++)
+	bool CurrentResult = ZEPlane::TestHalfSpace(Plane, Points[0]) != ZE_HS_NEGATIVE_SIDE;
+	for (size_t I = 0; I < Points.GetCount(); I++)
 	{
-		Results[I] = ZEPlane::TestHalfSpace(Plane, Rectangle[I]);
-
-		if(Results[I] == ZE_HS_POSITIVE_SIDE)
+		bool NextResult = ZEPlane::TestHalfSpace(Plane, Points[Points.Circular(I + 1)]) != ZE_HS_NEGATIVE_SIDE;
+		if (CurrentResult)
 		{
-			Points.Add(Rectangle[I]);
-		}
-	}
+			IntersectedPoints.Add(Points[Points.Circular(I)]);
 
-	bool AllResultsSame = true;
-
-	for (size_t I = 0; I < Results.GetCount(); I++)
-	{
-		if(Results[0] != Results[I])
-			AllResultsSame = false;
-	}		
-
-
-	if (AllResultsSame)
-	{
-		return Results[0];
-	}
-	else
-	{
-		float TempT = 0.0f;
-		ZELineSegment TempLineSegment;
-
-		for (size_t I = 0; I < Rectangle.GetCount(); I++)
-		{
-			TempLineSegment = ZELineSegment(Rectangle[Rectangle.Circular(I)], Rectangle[Rectangle.Circular(I + 1)]);
-
-			if(ZEPlane::IntersectionTest(Plane, TempLineSegment, TempT))
+			if (!NextResult)
 			{
-				Points.Add(TempLineSegment.GetPointOn(TempT));
+				ZELineSegment Edge(Points[Points.Circular(I)], Points[Points.Circular(I + 1)]);
+				float t;
+				ZEPlane::IntersectionTest(Plane, Edge, t);
+				IntersectedPoints.Add(Edge.GetPointOn(t));
 			}
 		}
-		return ZE_HS_INTERSECTS;
-	}	
+		else if (!CurrentResult && NextResult)
+		{
+			ZELineSegment Edge(Points[Points.Circular(I)], Points[Points.Circular(I + 1)]);
+			float t;
+			ZEPlane::IntersectionTest(Plane, Edge, t);
+			IntersectedPoints.Add(Edge.GetPointOn(t));
+			IntersectedPoints.Add(Points[Points.Circular(I + 1)]);
+		}
+
+		CurrentResult = NextResult;
+	}
 }
 		
 ZERectangle3D::ZERectangle3D()

@@ -46,10 +46,13 @@ struct ZEPortalMapResourcePortal;
 class ZEStaticVertexBuffer;
 class ZEPhysicalMesh;
 struct ZEDrawParameters;
+class ZEViewVolume;
 
 class ZEPortalMapPortal
 {
 	friend class ZEPortalMapDoor;
+	friend class ZEPortalMap;
+
 	private:
 		ZEPortalMap*						Owner;
 		const ZEPortalMapResourcePortal*	Resource;
@@ -58,6 +61,11 @@ class ZEPortalMapPortal
 		ZEArray<ZEPortalMapDoor*>			Doors;
 		ZEPhysicalMesh*						PhysicalMesh;
 
+		bool								CullPass;
+
+											ZEPortalMapPortal();
+											~ZEPortalMapPortal();
+
 	public:
 		ZEPortalMap*						GetOwner();
 		const char*							GetName();
@@ -65,14 +73,14 @@ class ZEPortalMapPortal
 		const ZEArray<ZEPortalMapDoor*>&	GetDoors();
 		const ZEAABBox&						GetBoundingBox();
 		ZEPhysicalMesh*						GetPhysicalMesh();
+		size_t								GetPolygonCount();
 
 		bool								Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal* Resource);
 		void								Deinitialize();
 
 		void								Draw(ZEDrawParameters* DrawParameters);
 
-											ZEPortalMapPortal();
-											~ZEPortalMapPortal();
+		static ZEPortalMapPortal*			CreateInstance();
 };
 
 #endif

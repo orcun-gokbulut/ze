@@ -54,7 +54,7 @@ class ZERectangle3D
 		const ZELineSegment&	GetBorder(ZEUInt Index) const;
 
 		static ZEHalfSpace		IntersectionTest(const ZERectangle3D& Rectangle, const ZEPlane& Plane);
-		static ZEHalfSpace		IntersectionTest(const ZEArray<ZEVector3>& Rectangle, const ZEPlane& Plane, ZEArray<ZEVector3>& Points);
+		static void				IntersectionTest(ZEArray<ZEVector3>& IntersectedPoints, const ZEPlane& Plane, const ZEArray<ZEVector3>& Points);
 
 								ZERectangle3D();
 								ZERectangle3D(const ZEVector3& P1, const ZEVector3& P2, const ZEVector3& P3, const ZEVector3& P4);

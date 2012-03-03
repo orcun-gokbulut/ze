@@ -56,9 +56,19 @@ ZEPortalMapPortal** ZEPortalMapDoor::GetPortals()
 	return Portals;
 }
 
-const ZERectangle3D& ZEPortalMapDoor::GetRectangle()
+const ZERectangle3D& ZEPortalMapDoor::GetRectangle() const
 {
 	return Rectangle;
+}
+
+void ZEPortalMapDoor::SetSeenThrough(bool Value)
+{
+	SeenThrough = Value;
+}
+
+bool ZEPortalMapDoor::GetSeenThrough()
+{
+	return SeenThrough;
 }
 
 void ZEPortalMapDoor::Initialize(ZEPortalMap* Owner, const ZEPortalMapResourceDoor* Resource)
@@ -68,10 +78,10 @@ void ZEPortalMapDoor::Initialize(ZEPortalMap* Owner, const ZEPortalMapResourceDo
 	Rectangle = Resource->Rectangle;
 	Open = Resource->IsOpen;
 	
-	Portals[0] = &Owner->Portals[Resource->PortalIds[0]];
+	Portals[0] = Owner->Portals[Resource->PortalIds[0]];
 	Portals[0]->Doors.Add(this);
 
-	Portals[1] = &Owner->Portals[Resource->PortalIds[1]];
+	Portals[1] = Owner->Portals[Resource->PortalIds[1]];
 	Portals[1]->Doors.Add(this);
 }
 
@@ -100,5 +110,9 @@ ZEPortalMapDoor::ZEPortalMapDoor()
 	Open = true;
 }
 
+ZEPortalMapDoor* ZEPortalMapDoor::CreateInstance()
+{
+	return new ZEPortalMapDoor();
+}
 
 

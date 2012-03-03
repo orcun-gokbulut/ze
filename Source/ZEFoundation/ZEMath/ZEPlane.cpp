@@ -145,7 +145,7 @@ inline void ZEPlane::Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3&
 	Plane.p = p;
 }
 
-void ZEPlane::Create(ZEPlane& Plane,const ZEVector3 &P1,const ZEVector3 &P2,const ZEVector3 &P3)
+void ZEPlane::Create(ZEPlane& Plane, const ZEVector3 &P1, const ZEVector3 &P2, const ZEVector3 &P3)
 {
 	ZEVector3 Sub1,Sub2;
 	ZEVector3::Sub(Sub1,P2,P1);

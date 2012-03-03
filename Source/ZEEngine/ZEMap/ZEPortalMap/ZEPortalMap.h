@@ -41,14 +41,33 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 
+struct ZEPortalMapCullStatistics
+{
+	size_t	TotalPortalCount;
+	size_t	CulledPortalCount;
+	size_t	DrawedPortalCount;
+
+	size_t	TotalMapPolygonCount;
+	size_t	CulledMapPolygonCount;
+	size_t	DrawedMapPolygonCount;
+
+	size_t	TotalMapMaterialCount;
+	size_t	CulledMapMaterialCount;
+	size_t	DrawedMapMaterialCount;
+
+};
+
 ZE_META_ENTITY_DESCRIPTION(ZEPortalMap)
 
 class ZEPortalMapResource;
 class ZEPortalMapPortal;
 class ZEPortalMapDoor;
 struct ZEDrawParameters;
+struct ZEPortalMapCullStatistics;
 class ZERay;
 class ZEVector3;
+class ZEViewVolume;
+class ZEViewFrustum;
 
 class ZEPortalMap : public ZEEntity
 {
@@ -57,17 +76,25 @@ class ZEPortalMap : public ZEEntity
 	private:
 		ZEString								PortalMapFile;
 		ZEPortalMapResource*					Resource;
-		ZEArray<ZEPortalMapPortal>				Portals;
-		ZEArray<ZEPortalMapDoor>				Doors; 
+		ZEArray<ZEPortalMapPortal*>				Portals;
+		ZEArray<ZEPortalMapDoor*>				Doors; 
+		ZEPortalMapCullStatistics				Statistics;
 
 		void									LoadPortalResource(ZEPortalMapResource* Resource);
+
+		static bool								GenerateViewVolume(ZEViewFrustum& NewViewVolume, const ZEPortalMapDoor* Door, const ZEViewVolume* OldViewVolume);
+		void									CullPortal(ZEPortalMapDoor* Door, ZEDrawParameters* DrawParameters, ZEViewVolume* ViewVolume);
+		void									CullPortals(ZEDrawParameters* DrawParameters);
+
 
 												ZEPortalMap();
 												~ZEPortalMap();
 
 	public:	
-		const ZEArray<ZEPortalMapPortal>&		GetPortals();
-		const ZEArray<ZEPortalMapDoor>&			GetDoors();
+		const ZEArray<ZEPortalMapPortal*>&		GetPortals();
+		const ZEArray<ZEPortalMapDoor*>&		GetDoors();
+
+		const ZEPortalMapCullStatistics&		GetCullStatistics();
 
 		virtual ZEDrawFlags						GetDrawFlags() const;
 		virtual ZERayCastFlags					GetRayCastFlags() const;
