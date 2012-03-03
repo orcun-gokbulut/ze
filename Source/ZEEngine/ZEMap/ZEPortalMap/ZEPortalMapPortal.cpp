@@ -44,6 +44,8 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
 #include "ZEMap/ZEPortalMap/ZEPortalMap.h"
+#include "ZEMath/ZEViewVolume.h"
+
 ZEPortalMap* ZEPortalMapPortal::GetOwner()
 {
 	return Owner;
@@ -70,6 +72,11 @@ const ZEAABBox& ZEPortalMapPortal::GetBoundingBox()
 ZEPhysicalMesh* ZEPortalMapPortal::GetPhysicalMesh()
 {
 	return PhysicalMesh;
+}
+
+size_t ZEPortalMapPortal::GetPolygonCount()
+{
+	return Resource->Polygons.GetCount();
 }
 
 void ZEPortalMapPortal::Draw(ZEDrawParameters* DrawParameters)
@@ -167,6 +174,8 @@ bool ZEPortalMapPortal::Initialize(ZEPortalMap* Owner, ZEPortalMapResourcePortal
 		zeScene->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
 	}
 
+	this->Resource = Resource;
+
 	this->Owner = Owner;
 
 	return true;
@@ -201,4 +210,9 @@ ZEPortalMapPortal::ZEPortalMapPortal()
 ZEPortalMapPortal::~ZEPortalMapPortal()
 {
 	Deinitialize();
+}
+
+ZEPortalMapPortal* ZEPortalMapPortal::CreateInstance()
+{
+	return new ZEPortalMapPortal();
 }

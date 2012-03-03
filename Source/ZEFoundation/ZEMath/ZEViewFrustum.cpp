@@ -121,17 +121,17 @@ const ZEPlane& ZEViewFrustum::GetClippingPlane(ZEViewFrustumPlane Plane) const
 {
 	switch(Plane)
 	{
-		case ZE_VFP_RIGHTCLIPPINGPLANE:
+		case ZE_VFP_RIGHT:
 			return RightClippingPlane;
-		case ZE_VFP_LEFTCLIPPINGPLANE:
+		case ZE_VFP_LEFT:
 			return LeftClippingPlane;
-		case ZE_VFP_TOPCLIPPINGPLANE:
+		case ZE_VFP_TOP:
 			return TopClippingPlane;
-		case ZE_VFP_BOTTOMCLIPPINGPLANE:
+		case ZE_VFP_BOTTOM:
 			return BottomClippingPlane;
-		case ZE_VFP_FARCLIPPINGPLANE:
+		case ZE_VFP_FAR:
 			return FarClippingPlane;
-		case ZE_VFP_NEARCLIPPINGPLANE:
+		case ZE_VFP_NEAR:
 			return NearClippingPlane;
 		default:
 			return LeftClippingPlane;
@@ -380,7 +380,9 @@ void ZEViewFrustum::Create(const ZEVector3& Position, const ZEQuaternion& Rotati
 	ZEQuaternion::VectorProduct(BottomClippingPlane.n, Rotation, ZEVector3(0.0f, CosFov, SinFov));
 
 	ZEQuaternion::VectorProduct(RightClippingPlane.n, Rotation, ZEVector3(-CosFov, 0.0f, SinFovAT));
+	RightClippingPlane.n.NormalizeSelf();
 	ZEQuaternion::VectorProduct(LeftClippingPlane.n, Rotation, ZEVector3(CosFov, 0.0f, SinFovAT));
+	LeftClippingPlane.n.NormalizeSelf();
 
 	ZEQuaternion::VectorProduct(NearClippingPlane.n, Rotation, ZEVector3(0.0f, 0.0f, 1.0f));
 	ZEQuaternion::VectorProduct(FarClippingPlane.n, Rotation, ZEVector3(0.0f, 0.0f, -1.0f));

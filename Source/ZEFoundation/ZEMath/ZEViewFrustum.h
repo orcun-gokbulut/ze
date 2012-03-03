@@ -69,12 +69,12 @@ enum ZEViewFrustumEdge
 
 enum ZEViewFrustumPlane
 {
-	ZE_VFP_RIGHTCLIPPINGPLANE = 0,
-	ZE_VFP_BOTTOMCLIPPINGPLANE,
-	ZE_VFP_LEFTCLIPPINGPLANE,
-	ZE_VFP_TOPCLIPPINGPLANE,
-	ZE_VFP_FARCLIPPINGPLANE,
-	ZE_VFP_NEARCLIPPINGPLANE
+	ZE_VFP_RIGHT = 0,
+	ZE_VFP_BOTTOM,
+	ZE_VFP_LEFT,
+	ZE_VFP_TOP,
+	ZE_VFP_FAR,
+	ZE_VFP_NEAR
 };
 
 class ZEViewFrustum : public ZEViewVolume
@@ -85,9 +85,7 @@ class ZEViewFrustum : public ZEViewVolume
 		float								SinRatio;
 		float								TanRatio;
 
-		ZEVector3							Look;
-		ZEVector3							Right;
-		ZEVector3							Up;
+
 
 
 		float								AspectRatio;
@@ -103,6 +101,11 @@ class ZEViewFrustum : public ZEViewVolume
 		ZEPlane								NearClippingPlane;
 
 	public:
+
+		ZEVector3							Look;
+		ZEVector3							Right;
+		ZEVector3							Up;
+
 		virtual ZEViewVolumeType			GetViewVolumeType() const;
 		virtual ZEVector3					GetPosition() const;
 
