@@ -39,6 +39,7 @@
 #include "ZEMath.h"
 #include <memory.h>
 #include "ZEMath/ZEAngle.h"
+#include "ZEError.h"
 
 #define SWAP(x, y) temp = (x); (x) = (y); (y) = temp
 
@@ -244,6 +245,9 @@ inline void ZEMatrix3x3::Sub(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMat
 
 inline void ZEMatrix3x3::Multiply(ZEMatrix3x3 &Out, const ZEMatrix3x3 &A, const ZEMatrix3x3 &B)
 {
+	zeAssert(&Out == &A, "Parameters Out and A can not be the same variable.");
+	zeAssert(&Out == &B, "Parameters Out and B can not be the same variable.");
+
 	for (ZEInt RowIndex = 0; RowIndex < 3; RowIndex++) // Row
 		for (ZEInt ColumnIndex = 0; ColumnIndex < 3; ColumnIndex++) // Column
 			Out.M[ColumnIndex][RowIndex] = 
@@ -269,6 +273,8 @@ inline void ZEMatrix3x3::Scale(ZEMatrix3x3 &Out, const ZEMatrix3x3& A, float s)
 
 void ZEMatrix3x3::Transpose(ZEMatrix3x3& Out, const ZEMatrix3x3& Matrix)
 {
+	zeAssert(&Out == &Matrix, "Parameters Out and Matrix can not be the same variable.");
+
 	Out.M11 = Matrix.M11;
 	Out.M12 = Matrix.M21;
 	Out.M13 = Matrix.M31;
@@ -284,12 +290,16 @@ void ZEMatrix3x3::Transpose(ZEMatrix3x3& Out, const ZEMatrix3x3& Matrix)
 
 void ZEMatrix3x3::Transform(ZEVector2& Out, const ZEMatrix3x3& Matrix, const ZEVector2& Vector)
 {
+	zeAssert(&Out == &Vector, "Parameters Out and Vector can not be the same variable.");
+
 	Out.x = Matrix.M11 * Vector.x + Matrix.M12 * Vector.y + Matrix.M13;
 	Out.y = Matrix.M21 * Vector.x + Matrix.M22 * Vector.y + Matrix.M23;
 }
 
 void ZEMatrix3x3::Transform(ZEVector3& Out, const ZEMatrix3x3& Matrix, const ZEVector3& Vector)
 {
+	zeAssert(&Out == &Vector, "Parameters Out and Vector can not be the same variable.");
+
 	Out.x = Matrix.M11 * Vector.x + Matrix.M12 * Vector.y + Matrix.M13 * Vector.z;
 	Out.y = Matrix.M21 * Vector.x + Matrix.M22 * Vector.y + Matrix.M23 * Vector.z;
 	Out.z = Matrix.M31 * Vector.x + Matrix.M32 * Vector.y + Matrix.M33 * Vector.z;
@@ -297,6 +307,8 @@ void ZEMatrix3x3::Transform(ZEVector3& Out, const ZEMatrix3x3& Matrix, const ZEV
 
 void ZEMatrix3x3::Transform(ZEVector4& Out, const ZEMatrix3x3& Matrix, const ZEVector4& Vector)
 {
+	zeAssert(&Out == &Vector, "Parameters Out and Vector can not be the same variable.");
+
 	Out.x = Matrix.M11 * Vector.x + Matrix.M12 * Vector.y + Matrix.M13 * Vector.z;
 	Out.y = Matrix.M21 * Vector.x + Matrix.M22 * Vector.y + Matrix.M23 * Vector.z;
 	Out.z = Matrix.M31 * Vector.x + Matrix.M32 * Vector.y + Matrix.M33 * Vector.z;
@@ -319,6 +331,8 @@ float ZEMatrix3x3::Determinant(const ZEMatrix3x3 &Matrix)
 
 bool ZEMatrix3x3::Inverse(ZEMatrix3x3 &Out, const ZEMatrix3x3 &Matrix)
 {
+	zeAssert(&Out == &Matrix, "Parameters Out and Matrix can not be the same variable.");
+
 	float Determinant = ZEMatrix3x3::Determinant(Matrix);
 
 	if (Determinant == 0)
@@ -989,6 +1003,9 @@ inline void ZEMatrix4x4::Sub(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMat
 
 inline void ZEMatrix4x4::Multiply(ZEMatrix4x4 &Out, const ZEMatrix4x4 &A, const ZEMatrix4x4 &B)
 {
+	zeAssert(&Out == &A, "Parameters Out and A can not be the same variable.");
+	zeAssert(&Out == &B, "Parameters Out and B can not be the same variable.");
+
 	for (ZEInt RowIndex = 0; RowIndex < 4; RowIndex++) // Row
 		for (ZEInt ColumnIndex = 0; ColumnIndex < 4; ColumnIndex++) // Column
 			Out.M[ColumnIndex][RowIndex] = 
@@ -1024,6 +1041,8 @@ inline void ZEMatrix4x4::Scale(ZEMatrix4x4 &Out, const ZEMatrix4x4& A, float s)
 
 void ZEMatrix4x4::Transpose(ZEMatrix4x4& Out, const ZEMatrix4x4& Matrix)
 {
+	zeAssert(&Out == &Matrix, "Parameters Out and Matrix can not be the same variable.");
+
 	Out.M11 = Matrix.M11;
 	Out.M12 = Matrix.M21;
 	Out.M13 = Matrix.M31;
@@ -1047,6 +1066,8 @@ void ZEMatrix4x4::Transpose(ZEMatrix4x4& Out, const ZEMatrix4x4& Matrix)
 
 void ZEMatrix4x4::Transform(ZEVector3& Out, const ZEMatrix4x4& Matrix, const ZEVector3& Vector)
 {
+	zeAssert(&Out == &Vector, "Parameters Out and Matrix can not be the same variable.");
+
 	Out.x = Matrix.M11 * Vector.x + Matrix.M12 * Vector.y + Matrix.M13 * Vector.z + Matrix.M14;
 	Out.y = Matrix.M21 * Vector.x + Matrix.M22 * Vector.y + Matrix.M23 * Vector.z + Matrix.M24;
 	Out.z = Matrix.M31 * Vector.x + Matrix.M32 * Vector.y + Matrix.M33 * Vector.z + Matrix.M34;
@@ -1054,6 +1075,8 @@ void ZEMatrix4x4::Transform(ZEVector3& Out, const ZEMatrix4x4& Matrix, const ZEV
 
 void ZEMatrix4x4::Transform3x3(ZEVector3 &Out, const ZEMatrix4x4& Matrix, const ZEVector3& Vector)
 {
+	zeAssert(&Out == &Vector, "Parameters Out and Matrix can not be the same variable.");
+
 	Out.x = Matrix.M11 * Vector.x + Matrix.M12 * Vector.y + Matrix.M13 * Vector.z;
 	Out.y = Matrix.M21 * Vector.x + Matrix.M22 * Vector.y + Matrix.M23 * Vector.z;
 	Out.z = Matrix.M31 * Vector.x + Matrix.M32 * Vector.y + Matrix.M33 * Vector.z;
@@ -1061,6 +1084,8 @@ void ZEMatrix4x4::Transform3x3(ZEVector3 &Out, const ZEMatrix4x4& Matrix, const 
 
 void ZEMatrix4x4::Transform(ZEVector4& Out, const ZEMatrix4x4& Matrix, const ZEVector4& Vector)
 {
+	zeAssert(&Out == &Vector, "Parameters Out and Matrix can not be the same variable.");
+
 	Out.x = Matrix.M11 * Vector.x + Matrix.M12 * Vector.y + Matrix.M13 * Vector.z + Matrix.M14;
 	Out.y = Matrix.M21 * Vector.x + Matrix.M22 * Vector.y + Matrix.M23 * Vector.z + Matrix.M24;
 	Out.z = Matrix.M31 * Vector.x + Matrix.M32 * Vector.y + Matrix.M33 * Vector.z + Matrix.M34;
@@ -1095,6 +1120,8 @@ float ZEMatrix4x4::Determinant(const ZEMatrix4x4 &Matrix)
 
 bool ZEMatrix4x4::Inverse(ZEMatrix4x4 &Out, const ZEMatrix4x4 &Matrix)
 {
+	zeAssert(&Out == &Matrix, "Parameters Out and Matrix can not be the same variable.");
+
 	float Determinant = Matrix.Determinant();
 
 	if(Determinant == 0)

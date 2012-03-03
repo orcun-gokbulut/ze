@@ -220,7 +220,7 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 	CameraPosition->SetTextColor(ZEVector4::HomogenousUnitY);
 	AddChildControl(CameraPosition);
 
-	this->SetHeight(275.0f);
+	this->SetHeight(300.0f);
 	this->SetWidth(450.0f);
 
 // 	int WindowWidth = 0;
