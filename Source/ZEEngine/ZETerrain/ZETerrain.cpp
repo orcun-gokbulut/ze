@@ -198,7 +198,7 @@ bool ZETerrain::CreateLevels()
 	{
 		ZETerrainLevel* CurrentLevel = &Levels[I];
 		CurrentLevel->HeightTexture = ZETexture2D::CreateInstance();
-		if (!CurrentLevel->HeightTexture->Create(ChunkSize * 4 + 6 + 1, ChunkSize * 4 + 6 + 1, ZE_TPF_F32_2, false, 1))
+		if (!CurrentLevel->HeightTexture->Create(ChunkSize * 4 + 8 + 1, ChunkSize * 4 + 8 + 1, ZE_TPF_F32_2, false, 1))
 			return false;
 
 		CurrentLevel->Material = ZETerrainMaterial::CreateInstance();
@@ -297,7 +297,7 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 	OldPositionX = PositionX;
 	OldPositionY = PositionY;
 
-	ZESize TextureSize = (ChunkSize * 4 + 6 + 1);
+	ZESize TextureSize = (ChunkSize * 4 + 8 + 1);
 	float TexelSize = 1.0f / TextureSize;
 
 	ZESize LevelCount = Levels.GetCount();
@@ -308,71 +308,66 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 
 	for (size_t CurrLevelIndex = 0; CurrLevelIndex < LevelCount - 1; CurrLevelIndex++)
 	{
-		ZETerrainLevelData* CurrentLevelData = &LevelData[CurrLevelIndex];
-		ZETerrainLevelData* NextLevelData = &LevelData[CurrLevelIndex + 1];
 		ZETerrainLevel* CurrLevel = &Levels[CurrLevelIndex];
-
 		CurrLevel->MinHeight = ZE_FLOAT_MAX;
 		CurrLevel->MaxHeight = ZE_FLOAT_MIN;
-
-		ZEInt CurrPositionX	= Align(PositionX, 1 << CurrLevelIndex);
-		ZEInt CurrPositionY	= -Align(PositionY, 1 << CurrLevelIndex);
-		ZESSize DataX = (CurrPositionX >> CurrLevelIndex) - (ZESSize)(ChunkSize * 2 + 3) + (ZESSize)CurrentLevelData->ElevationWidth / 2;
-		ZESSize DataY = (CurrPositionY >> CurrLevelIndex) - (ZESSize)(ChunkSize * 2 + 3) + (ZESSize)CurrentLevelData->ElevationHeight / 2;
-
-		ZESSize NextDataX = DataX / 2;
-		ZESSize NextDataY = DataY / 2;
-
 		CurrLevel->Material->SetHeightOffset(HeightOffset);
 		CurrLevel->Material->SetHeightScale(HeightScale);
 		CurrLevel->Material->SetTextureScale(ZEVector2(TexelSize, TexelSize));
 		CurrLevel->Material->SetTextureOffset(ZEVector2(2.0f * ((float)ChunkSize + 1.5f) * TexelSize + 0.5f * TexelSize, 2.0f * ((float)ChunkSize + 1.5f) * TexelSize + 0.5f * TexelSize));
 
+		ZETerrainLevelData* CurrentLevelData = &LevelData[CurrLevelIndex];
+		ZETerrainLevelData* NextLevelData = &LevelData[CurrLevelIndex + 1];
+
+		ZEInt CurrPositionX	= Align(PositionX, 1 << CurrLevelIndex);
+		ZEInt CurrPositionY	= -Align(PositionY, 1 << CurrLevelIndex);
+
+		ZESSize DataX = (CurrPositionX >> CurrLevelIndex) - (ZESSize)(ChunkSize * 2 + 4) + (ZESSize)CurrentLevelData->ElevationWidth / 2;
+		ZESSize DataY = (CurrPositionY >> CurrLevelIndex) - (ZESSize)(ChunkSize * 2 + 4) + (ZESSize)CurrentLevelData->ElevationHeight / 2;
+		
 		void* Buffer;
 		ZESize Pitch;		
 		CurrLevel->HeightTexture->Lock(&Buffer, &Pitch);
 		for (ZESSize BufferY = 0; BufferY < TextureSize; BufferY++)
 			for (ZESSize BufferX = 0; BufferX < TextureSize; BufferX++)
 			{
-				ZESSize NextBufferX = BufferX / 2;
-				ZESSize NextBufferY = BufferY / 2;
+				ZESize PosX = DataX + BufferX + 1;
+				ZESize PosY = DataY + BufferY + 1;
+				float Height = Sample(CurrentLevelData, PosX, PosY);
 
-				// Linear Filtering
 				float NextLevelHeight;
-				if (((DataX + BufferX) % 2) != 0 && ((DataY + BufferY) % 2) != 0)
+				if (PosX % 2 != 0 && PosY % 2 != 0)
 				{
-					NextLevelHeight  = Sample(NextLevelData,	NextDataX + NextBufferX,		NextDataY + NextBufferY);
-					NextLevelHeight += Sample(NextLevelData,	NextDataX + NextBufferX,		NextDataY + NextBufferY + 1);
-					NextLevelHeight += Sample(NextLevelData,	NextDataX + NextBufferX + 1,	NextDataY + NextBufferY);
-					NextLevelHeight += Sample(NextLevelData,	NextDataX + NextBufferX + 1,	NextDataY + NextBufferY + 1);
+					NextLevelHeight  = Sample(NextLevelData, (PosX - 1) / 2,	 (PosY - 1) / 2);
+					NextLevelHeight += Sample(NextLevelData, (PosX + 1) / 2, (PosY - 1) / 2);
+					NextLevelHeight += Sample(NextLevelData, (PosX - 1) / 2,	 (PosY + 1) / 2);
+					NextLevelHeight += Sample(NextLevelData, (PosX + 1) / 2, (PosY + 1) / 2);
 					NextLevelHeight /= 4;
-					}
-				else if (((DataX + BufferX) % 2) != 0)
+				}
+				else if (PosX % 2 != 0)
 				{
-					NextLevelHeight  = Sample(NextLevelData,	NextDataX + NextBufferX,		NextDataY + NextBufferY + DataY % 2);
-					NextLevelHeight += Sample(NextLevelData,	NextDataX + NextBufferX + 1,	NextDataY + NextBufferY + DataY % 2);
+					NextLevelHeight  = Sample(NextLevelData, (PosX - 1) / 2,	 PosY / 2);
+					NextLevelHeight += Sample(NextLevelData, (PosX + 1) / 2, PosY / 2);
 					NextLevelHeight /= 2;
 				}
-				else if (((DataY + BufferY) % 2) != 0)
+				else if (PosY % 2 != 0)
 				{
-					NextLevelHeight  = Sample(NextLevelData,	NextDataX + NextBufferX + DataX % 2,		NextDataY + NextBufferY);
-					NextLevelHeight += Sample(NextLevelData,	NextDataX + NextBufferX + DataX % 2,		NextDataY + NextBufferY + 1);
+					NextLevelHeight  = Sample(NextLevelData, PosX / 2, (PosY - 1) / 2);
+					NextLevelHeight += Sample(NextLevelData, PosX / 2, (PosY + 1) / 2);
 					NextLevelHeight /= 2;
 				}
 				else
 				{
-					NextLevelHeight = Sample(NextLevelData,	NextDataX + NextBufferX + DataX % 2,	NextDataY + NextBufferY + DataY % 2);
+					NextLevelHeight = Sample(NextLevelData,	PosX / 2 , PosY / 2);
 				}
 				
-				float Height = Sample(CurrentLevelData, DataX + BufferX, DataY + BufferY);
+				Write(Buffer, Pitch, BufferX, BufferY)[0] = Height;
+				Write(Buffer, Pitch, BufferX, BufferY)[1] = NextLevelHeight;
 
 				if (Height < CurrLevel->MinHeight)
 					CurrLevel->MinHeight = Height;
 				else if (Height > CurrLevel->MaxHeight)
 					CurrLevel->MaxHeight = Height;
-
-				Write(Buffer, Pitch, BufferX, BufferY)[0] = Height;
-				Write(Buffer, Pitch, BufferX, BufferY)[1] = NextLevelHeight;
 			}
 
 		CurrLevel->HeightTexture->Unlock(0);
@@ -588,15 +583,6 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 
 	ZEInt CurrLevelPositionX = Align(PositionX, 1 << (LevelCount - 1));
 	ZEInt CurrLevelPositionY = Align(PositionY, 1 << (LevelCount - 1));
-	
-	/*for (ZESSize y = -Height; y < Height; y++)
-		for (ZESSize x = -Width; x < Width; x++)
-		{
-			if (x >= -2 && x <= 1 && y >= -2 && y <= 1)
-				continue;
-
-			DrawPrimtive(DrawParameters->Renderer, ZE_TP_CORNER_2, CurrLevelPositionX, CurrLevelPositionY, x * ChunkSize, y * ChunkSize, ZE_TPM_NORMAL, (LevelCount - 1));
-		}*/
 }
 
 ZETerrain* ZETerrain::CreateInstance()

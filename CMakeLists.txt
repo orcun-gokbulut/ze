@@ -55,13 +55,6 @@ include(ze_functions)
 
 macro_ensure_out_of_source_build ("${PROJECT_NAME} requires an out of source build.")
 
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")
-set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
-
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
-set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /VERBOSE:LIB")
-
-
 ## Platform Detection
 #########################################################################################
 message(STATUS "[ZEBuild] Detecting Platform.")
@@ -200,6 +193,17 @@ set(ZEBUILD_SYMBOL_SERVER_SOURCE_INDEX BOOL	FALSE	CACHE BOOL "Index code in sybo
 #########################################################################################
 set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll will be generated and external plugins will be disabled.")
 
+## Compiler & Linker Options
+#########################################################################################
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4996")
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /ZI")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ignore:4099")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /VERBOSE:LIB")
+
+append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+
 
 ## Directories
 #########################################################################################
@@ -241,91 +245,4 @@ add_subdirectory(Source)
 
 ## Install & Packing
 #########################################################################################
-set(ZEBUILD_BUILD_INSTALLER		TRUE CACHE BOOL "Build Installer.")
-
-if (ZEBUILD_BUILD_INSTALLER)
-	install(DIRECTORY Dll/${ZEBUILD_PLATFORM}/ 
-		DESTINATION Bin 
-		CONFIGURATIONS Release
-		FILES_MATCHING 
-			PATTERN "*.dll" 
-			PATTERN "Debug" EXCLUDE
-			PATTERN "Release" EXCLUDE)
-
-	install(DIRECTORY Dll/${ZEBUILD_PLATFORM}/Release/
-		DESTINATION Bin
-		CONFIGURATIONS Release)
-			
-	include(InstallRequiredSystemLibraries)
-
-	set(CPACK_PACKAGE_NAME "Zinek Engine")
-	set(CPACK_PACKAGE_VENDOR "Zinek Code House and Game Studio")
-	set(CPACK_PACKAGE_VERSION_MAJOR ${ZINEK_VERSION_MAJOR})
-	set(CPACK_PACKAGE_VERSION_MINOR ${ZINEK_VERSION_MINOR})
-	set(CPACK_PACKAGE_VERSION_PATCH "0")
-	set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Zinek")
-	set(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_SOURCE_DIR}/Installation/Description.txt")
-	set(CPACK_PACKAGE_INSTALL_DIRECTORY ${CPACK_PACKAGE_NAME})
-	set(CPACK_PACKAGE_ICON "${CMAKE_SOURCE_DIR}\\\\Installation\\\\InstallIcon.bmp")
-
-	set(CPACK_NSIS_DISPLAY_NAME ${CPACK_PACKAGE_NAME})
-	set(CPACK_NSIS_PACKAGE_NAME ${CPACK_PACKAGE_NAME})
-	set(CPACK_NSIS_INSTALLED_ICON_NAME "ZE.exe")
-	set(CPACK_NSIS_HELP_LINK "http:\\\\\\\\www.zinekengine.com\\\\en\\\\docs\\\\install")
-	set(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\\\\\www.zinekengine.com")
-	set(CPACK_NSIS_CONTACT "contact@zinekengine.com")
-	set(CPACK_NSIS_MODIFY_PATH 0)
-
-	set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/Installation/License.txt")
-	set(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_SOURCE_DIR}/Installation/Welcome.txt")
-	set(CPACK_RESOURCE_FILE_README "${CMAKE_SOURCE_DIR}/Installation/Readme.txt")
-
-	set(CPACK_COMPONENTS_ALL_GROUPS_IN_ONE_PACKAGE 1)
-
-	set(CPACK_COMPONENT_RUNTIME_DISPLAY_NAME "Runtime")
-	set(CPACK_COMPONENT_RUNTIME_DESCRIPTION "Runtime Required to Run Zinek Engine base Projects")
-	set(CPACK_COMPONENT_RUNTIME_GROUP "Zinek Engine")
-	set(CPACK_COMPONENT_RUNTIME_REQUIRED 1)
-
-	set(CPACK_COMPONENT_DEMOS_DISPLAY_NAME "Demos")
-	set(CPACK_COMPONENT_DEMOS_DESCRIPTION "Demos that are developed by Zinek Engine")
-	set(CPACK_COMPONENT_DEMOS_GROUP "Zinek Engine")
-
-	set(CPACK_COMPONENT_ZEEDITOR_DISPLAY_NAME "ZEEditor")
-	set(CPACK_COMPONENT_ZEEDITOR_DESCRIPTION "Zinek Engine Editor")
-	set(CPACK_COMPONENT_ZEEDITOR_GROUP "Content Creation")
-		
-	set(CPACK_COMPONENT_ZE3DSMAX_EXPORTERS_DISPLAY_NAME "Autodesk 3ds Max Exporters")
-	set(CPACK_COMPONENT_ZE3DSMAX_DESCRIPTION "3ds Max plugins for exporting ZEModel and ZEMap files.")
-	set(CPACK_COMPONENT_ZE3DSMAX_GROUP "Content Creation")
-
-	set(CPACK_COMPONENT_ZEMAYA_EXPORTERS_DISPLAY_NAME "Autodesk Maya Exporters")
-	set(CPACK_COMPONENT_ZEMAYA_DESCRIPTION "Autodesk Maya Exporters plugins for exporting ZEModel and ZEMap files.")
-	set(CPACK_COMPONENT_ZEMAYA_GROUP "Content Creation")
-
-	set(CPACK_COMPONENT_ZESOFTIMAGE_EXPORTERS_DISPLAY_NAME "Autodesk Softimage XSI Exporters")
-	set(CPACK_COMPONENT_ZESOFTIMAGE_DESCRIPTION "Autodesk Softimage XSI plugins for exporting ZEModel and ZEMap files.")
-	set(CPACK_COMPONENT_ZESOFTIMAGE_GROUP "Content Creation")
-
-	set(CPACK_COMPONENT_ZEBLENDER_EXPORTERS_DISPLAY_NAME "Blender Exporters")
-	set(CPACK_COMPONENT_ZEBLENDER_DESCRIPTION "Blender plugins for exporting ZEModel and ZEMap files.")
-	set(CPACK_COMPONENT_ZEBLENDER_GROUP "Content Creation")
-	
-	set(CPACK_COMPONENT_ZECONENTSAMPLES_EXPORTERS_DISPLAY_NAME "Sample and Base Contents")
-	set(CPACK_COMPONENT_ZECONENTSAMPLES_DESCRIPTION "Sample and base conent files for creating and deriving new content.")
-	set(CPACK_COMPONENT_ZECONENTSAMPLES_GROUP "Content Creation")
-	
-	set(CPACK_COMPONENT_ZESDK_DISPLAY_NAME "ZESDK")
-	set(CPACK_COMPONENT_ZESDK_DESCRIPTION "Zinek Engine C++ Software Development Kit.")
-	set(CPACK_COMPONENT_ZESDK_GROUP "C++ Development")
-
-	set(CPACK_COMPONENT_ZESDKSAMPLES_DISPLAY_NAME "Samples")
-	set(CPACK_COMPONENT_ZESDKSAMPLES_DESCRIPTION "Sample applications that are developed by ZESDK.")
-	set(CPACK_COMPONENT_ZESDKSAMPLES_GROUP "C++ Development")
-
-	set(CPACK_COMPONENT_ZESDKDOCUMENTS_DISPLAY_NAME "Documentation")
-	set(CPACK_COMPONENT_ZESDKDOCUMENTS_DESCRIPTION "Developers Guide and referance documentations.")
-	set(CPACK_COMPONENT_ZESDKDOCUMENTS_GROUP "C++ Development")
-
-	include(CPack)
-endif()
+add_subdirectory(Installation)
