@@ -58,12 +58,18 @@ class ZEMath
 	public:
 		static float		Sqrt(float Value);
 
-		static float		Abs(float Value);
-		static float		Sign(float Value);
+		template <typename Type>
+		static Type			Abs(Type Value);
+
+		template <typename Type>
+		static Type			Sign(Type Value);
+
 		static float		Mod(float Value, float Modulus);
 
-		static float		Min(float A, float B);
-		static float		Max(float A, float B);
+		template <typename Type>
+		static Type			Min(Type A, Type B);
+		template <typename Type>
+		static Type			Max(Type A, Type B);
 
 		static float		Log(float Value);
 		static float		Log10(float Value);
@@ -78,16 +84,90 @@ class ZEMath
 
 		static float		Lerp(float A, float B, float Factor);
 
-		static float		Clamp(float A, float MinValue, float MaxValue);
-		static float		ClampLower(float Value, float MinValue);
-		static float		ClampUpper(float Value, float MaxValue);
-		static float		Saturate(float Value);
-
-
-		bool				IsPowerOfTwo(ZEUInt Value);
-		ZEUInt				NextPowerOfTwo(ZEUInt Value);
-		ZEUInt				PreviousPowerOfTwo(ZEUInt Value);
+		template <typename Type>
+		static Type			Clamp(Type A, Type MinValue, Type MaxValue);
+		
+		template <typename Type>
+		static Type			ClampLower(Type Value, Type MinValue);
+		
+		template <typename Type>
+		static Type			ClampUpper(Type Value, Type MaxValue);
+		
+		template <typename Type>
+		static Type			Saturate(Type Value);
 };
+
+template <typename Type>
+static Type ZEMath::Abs(Type Value)
+{
+	if (Value < (Type)0)
+		return -Value;
+	else
+		return Value;
+}
+
+template <typename Type>
+Type ZEMath::Sign(Type Value)
+{
+	if (Value < (Type)0)
+		return (Type)-1;
+	else if (Value > (Type)0)
+		return (Type)1;
+	else
+		return (Type)0;
+}
+
+template <typename Type>
+Type ZEMath::Min(Type A, Type B)
+{
+	return (A < B ? A : B);
+}
+
+template <typename Type>
+static Type ZEMath::Max(Type A, Type B)
+{
+	return (A > B ? A : B);
+}
+
+template <typename Type>
+Type ZEMath::Clamp(Type A, Type MinValue, Type MaxValue)
+{
+	if (Value < MinValue)
+		return MinValue;
+	else if (Value > MaxValue)
+		return MaxValue;
+	else
+		return Value;
+}
+
+template <typename Type>
+Type ZEMath::ClampLower(Type Value, Type MinValue)
+{
+	if (Value < MinValue)
+		return MaxValue;
+	else
+		return Value;
+}
+
+template <typename Type>
+Type ZEMath::ClampUpper(Type Value, Type MaxValue)
+{
+	if (Value > MaxValue)
+		return MaxValue;
+	else
+		return Value;
+}
+
+template <typename Type>
+Type ZEMath::Saturate(Type Value)
+{
+	if (Value < (Type)0)
+		return (Type)0;
+	else if (Value > (Type)1)
+		return (Type)1;
+	else
+		return Value;
+}
 
 #endif
 

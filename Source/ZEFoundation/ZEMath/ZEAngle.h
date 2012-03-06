@@ -60,16 +60,9 @@
 
 class ZEAngle
 {
-	private:
-
-		static float		SinTable[902];
-
 	public:
 		static float		Range(float Angle);
 		static float		Distance(float Angle1, float Angle2);
-
-		static float		FastSin(float Value);
-		static float		FastCos(float Value);
 
 		static float		Cos(float Value);
 		static float		Sin(float Value);

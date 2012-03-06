@@ -42,37 +42,9 @@ float ZEMath::Sqrt(float Value)
 	return sqrtf(Value);
 }
 
-float ZEMath::Abs(float Value)
-{
-	if (Value < 0.0f)
-		return -Value;
-	else
-		return Value;
-}
-
 float ZEMath::Mod(float Value, float Modulus)
 {
 	return fmodf(Value, Modulus);
-}
-
-float ZEMath::Sign(float Value)
-{
-	if (Value == 0.0f)
-		return 0.0f;
-	else if (Value < 0.0f)
-		return -1.0f;
-	else
-		return 1.0f;
-}
-
-float ZEMath::Min(float A, float B)
-{
-	return (A < B ? A : B);
-}
-
-float ZEMath::Max(float A, float B)
-{
-	return (A > B ? A : B);
 }
 
 float ZEMath::Log(float Value)
@@ -119,73 +91,4 @@ float ZEMath::Lerp(float A, float B, float Factor)
 float ZEMath::CopySign(float Value, float Sign)
 {
 	return _copysign(Value, Sign);
-}
-
-float ZEMath::Clamp(float A, float MinValue, float MaxValue)
-{
-	if (A > MaxValue)
-		return MaxValue;
-	else if (A < MinValue)
-		return MinValue;
-	else
-		return A;
-}
-
-float ZEMath::ClampLower(float Value, float MinValue)
-{
-	if (Value < MinValue)
-		return MinValue;
-	else
-		return Value;
-}
-
-float ZEMath::ClampUpper(float Value, float MaxValue)
-{
-	if (Value > MaxValue)
-		return MaxValue;
-	else
-		return Value;
-}
-
-float ZEMath::Saturate(float Value)
-{
-	if (Value > 1.0f)
-		return 1.0f;
-	else if (Value < 0.0f)
-		return 0.0f;
-	else
-		return Value;
-}
-
-bool ZEMath::IsPowerOfTwo(ZEUInt Value)
-{
-	return ((Value & (Value - 1)) != 0)  ? false : true;
-}
-
-ZEUInt ZEMath::NextPowerOfTwo(ZEUInt Value)
-{
-	if(Value <= 1)
-		return 1;
-
-	Value = (Value >> 1)  | Value;
-	Value = (Value >> 2)  | Value;
-	Value = (Value >> 4)  | Value;
-	Value = (Value >> 8)  | Value;
-	Value = (Value >> 16) | Value;
-
-	return ((Value << 1) + 1) - Value;
-}
-
-ZEUInt ZEMath::PreviousPowerOfTwo(ZEUInt Value)
-{
-	if(Value <= 1)
-		return 1;
-
-	Value = (Value >> 1)  | Value;
-	Value = (Value >> 2)  | Value;
-	Value = (Value >> 4)  | Value;
-	Value = (Value >> 8)  | Value;
-	Value = (Value >> 16) | Value;
-
-	return Value - (Value >> 1);
 }
