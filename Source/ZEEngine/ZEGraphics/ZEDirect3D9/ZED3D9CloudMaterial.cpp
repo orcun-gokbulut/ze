@@ -108,9 +108,10 @@ void ZED3D9CloudMaterial::UpdateShadowTransformations()
 		ZEMatrix4x4 OrthProj;
 		ZEMatrix4x4::CreateOrthographicProjection(OrthProj, BoundingBoxDiagonal.x, BoundingBoxDiagonal.y, 0.0f, BoundingBoxDiagonal.z);
 
+		ZEMatrix4x4 Temp;
 		// Create world to shadow map projection matrix (normal projection)
-		ZEMatrix4x4::Multiply(WorldToShadowTexProjMatrix, WorldToLightMtrx, Translation);
-		ZEMatrix4x4::Multiply(WorldToShadowTexProjMatrix, OrthProj, WorldToShadowTexProjMatrix);
+		ZEMatrix4x4::Multiply(Temp, WorldToLightMtrx, Translation);
+		ZEMatrix4x4::Multiply(WorldToShadowTexProjMatrix, OrthProj, Temp);
 
 		// Compute world to shadow texture coordinate matrix (Projection to texture coordinate matrix)
 		ZEMatrix4x4	ProjToTexCoord(	0.5f,  0.0f, 0.0f, 0.0f,
@@ -165,9 +166,9 @@ void ZED3D9CloudMaterial::CreateBuffers()
 		float ScaleX = 1.0f / (CellCountXZ.x + 1.0f);
 		float ScaleZ = 1.0f / (CellCountXZ.y + 1.0f);
 		
-		for (ZEUInt Z = 0; Z < CellCountXZ.y + 1.0f; ++Z)
+		for (ZEUInt Z = 0; Z < ((ZEUInt)CellCountXZ.y) + 1; ++Z)
 		{
-			for (ZEUInt X = 0; X < CellCountXZ.x + 1.0f; ++X)
+			for (ZEUInt X = 0; X < ((ZEUInt)CellCountXZ.x) + 1; ++X)
 			{
 				Data->X = (float)X;
 				Data->Z	= (float)Z;
@@ -445,10 +446,6 @@ void ZED3D9CloudMaterial::CreateRenderTargets()
 	ZEUInt TargetWidth = zeScene->GetRenderer()->GetViewPort()->GetWidth() / 2;
 	ZEUInt TargetHeight = zeScene->GetRenderer()->GetViewPort()->GetHeight() / 2;
 
-	// ZEUInt TargetWidth = zeScene->GetRenderer()->GetViewPort()->GetWidth();
-	// ZEUInt TargetHeight = zeScene->GetRenderer()->GetViewPort()->GetHeight();
-
-
 	if(CloudShadowBuffer == NULL)
 	{
 		CloudShadowBuffer = (ZED3D9Texture2D*)ZETexture2D::CreateInstance();
@@ -472,18 +469,11 @@ void ZED3D9CloudMaterial::CreateRenderTargets()
 
 	if(CloudTexture == NULL)
 	{
-		ZETextureOptions TextureOptions = 
-		{
-			ZE_TCT_NONE,
-			ZE_TCQ_AUTO,
-			ZE_TDS_NONE,
-			ZE_TFC_ENABLED,
-			ZE_TMM_DISABLED,
-			1
-		};
+		ZETextureOptions TextureOptions = { ZE_TCT_NONE, ZE_TCQ_AUTO, ZE_TDS_NONE,
+											ZE_TFC_ENABLED,	ZE_TMM_DISABLED, 1 };
 		
 		// Load cloud texture
-		ZETexture2DResource* Resource = ZETexture2DResource::LoadSharedResource("Cloudx512.bmp", &TextureOptions);
+		ZETexture2DResource* Resource = ZETexture2DResource::LoadSharedResource("Cloud.bmp", &TextureOptions);
 		CloudTexture = (ZED3D9Texture2D*)Resource->GetTexture();
 	}
 }
@@ -540,8 +530,9 @@ void ZED3D9CloudMaterial::ReleaseShaders()
 ZED3D9CloudMaterial::ZED3D9CloudMaterial()
 {
 	CellCountXZ		= ZEVector2(16.0f, 16.0f);
-	StartXZ			= ZEVector2(-20000.0f, -20000.0f);
-	CellSizeXZ		= ZEVector2(80000.0f / CellCountXZ.x, 80000.0f / CellCountXZ.y);
+	PlaneDimensions	= ZEVector2(40000.0f, 40000.0f);
+	StartXZ			= ZEVector2(-PlaneDimensions.x / 2.0f, -PlaneDimensions.y / 2.0f);
+	CellSizeXZ		= ZEVector2(PlaneDimensions.x / CellCountXZ.x, PlaneDimensions.y / CellCountXZ.y);
 
 	VertexShaderCloudShadow			= NULL;
 	PixelShaderCloudShadow			= NULL;
@@ -593,9 +584,12 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	IDirect3DSurface9* RenderTarget;
 	GetDevice()->GetRenderTarget(0, &RenderTarget);
 
+	// This cloud shadow pass is not functional right now
+
 	/************************************************************************/
 	/*               Pass 1: Create Cloud Shadow Texture                    */
 	/************************************************************************/
+	/*
 	GetDevice()->SetVertexShader(VertexShaderCloudShadow->GetVertexShader());
 	GetDevice()->SetPixelShader(PixelShaderCloudShadow->GetPixelShader());
 
@@ -608,17 +602,17 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	ZED3D9CommonTools::SetRenderTarget(0, (ZETexture2D*)CloudShadowBuffer);
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00FFFFFF, 1.0f, 0x00);
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)CloudTexture, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_WRAP);
-
+	*/
 	ZEVector3 CameraPosition = Camera->GetWorldPosition();
-	
+
 	struct
 	{
 		float	HeightParameters[2];
+		float	Reserved0;
 		float	Reserved1;
-		float	Reserved2;
 
 		float	CameraPos[3];
-		float	Reserved0;
+		float	Reserved2;
 
 		float	UVParameters[4];
 
@@ -640,11 +634,11 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 		float	Reserved1;
 		float	Reserved2;
 	}
-	PixelShaderParameters = 
+	PixelShaderParameters =
 	{
 		CloudCover, 0.0f, 0.0f, 0.0f
 	};
-
+	/*
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&WorldToShadowTexProjMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(4, (const float*)&VertexShaderParameters, sizeof(VertexShaderParameters) / 16);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelShaderParameters, sizeof(PixelShaderParameters) / 16);
@@ -653,7 +647,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	GetDevice()->SetIndices(CloudShadowIndexBuffer->StaticBuffer);
 	GetDevice()->SetStreamSource(0, CloudShadowVertexBuffer->StaticBuffer, 0, sizeof(Vertex0));
 	GetDevice()->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, CloudShadowVertexCount, 0, CloudShadowTriangleCount);
-	
+	*/
 	/************************************************************************/
 	/*                 Pass 2: Create Cloud Density Texture                 */
 	/************************************************************************/
@@ -711,35 +705,43 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 		// assuming light direction is horizontal when sunset or sunrise.
 		// otherwise, shadow of clouds converges at a point on the screen opposite to the light.
 		Light.y = 0.0f;
-		Light = Light.Normalize();
+		Light.NormalizeSelf();
 	}
+
 	ZEVector4 TransformedLight;
 	ZEMatrix4x4::Transform(TransformedLight, WorldViewProjMatrix, Light);
-
+	
 	// blur vector = vBlurDir.xy * uv + vBlurDir.zw 
 	ZEVector4 BlurDirection;
-	if (ZEMath::Abs(TransformedLight.w) < (ZE_ZERO_THRESHOLD * 100) || ZEMath::Abs(TransformedLight.z) < (ZE_ZERO_THRESHOLD * 100))
+	if (ZEMath::Abs(TransformedLight.w) < ((float)ZE_ZERO_THRESHOLD * 100.0f) || ZEMath::Abs(TransformedLight.z) < ((float)ZE_ZERO_THRESHOLD * 100.0f))
 	{
 		// if dot( litdir, ray ) == 0.0f : directional light is stil directional in projection space.
 		TransformedLight.w = TransformedLight.z = 0.0f;
-		TransformedLight = TransformedLight.Normalize();
+		TransformedLight.NormalizeSelf();
 		TransformedLight.y = -TransformedLight.y;
+
 		BlurDirection = ZEVector4(0.0f, 0.0f, -TransformedLight.x, -TransformedLight.y);
 	}
 	else
 	{
 		// otherwise : point blur. light direction is a position in projection space.
-		// transform screen position to texture coordinate
-		ZEVector4::Scale(TransformedLight, TransformedLight, 1.0f / TransformedLight.w);
-		TransformedLight.x =  0.5f * TransformedLight.x + 0.5f;
-		TransformedLight.y = -0.5f * TransformedLight.y + 0.5f;
-
 		if (0.0f < TransformedLight.w)
-		{
+		{	
+			// transform screen position to texture coordinate
+			ZEVector4::Scale(TransformedLight, TransformedLight, 1.0f / TransformedLight.w);
+			TransformedLight.x =  0.5f * TransformedLight.x + 0.5f;
+			TransformedLight.y = -0.5f * TransformedLight.y + 0.5f;
+
+			// Light in front case
 			BlurDirection = ZEVector4(1.0f, 1.0f, -TransformedLight.x, -TransformedLight.y);
 		}
 		else
 		{
+			// transform screen position to texture coordinate
+			ZEVector4::Scale(TransformedLight, TransformedLight, 1.0f / TransformedLight.w);
+			TransformedLight.x =  0.5f * TransformedLight.x + 0.5f;
+			TransformedLight.y = -0.5f * TransformedLight.y + 0.5f;
+
 			// invert vector if light comes from behind the camera.
 			BlurDirection = ZEVector4(-1.0f, -1.0f, TransformedLight.x, TransformedLight.y);
 		}
@@ -748,8 +750,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	ZEVector4 LocalRayleigh;
 	ZEVector4::Scale(LocalRayleigh, ZEVector4(Rayleigh.x, Rayleigh.y, Rayleigh.z, 0.0f), 3.0f / (16.0f * (float)ZE_PI));
 	LocalRayleigh.w = -2.0f * G;
-	ZEVector4::Sub(LocalRayleigh, LocalRayleigh, ZEVector4(0.001f, 0.002f, 0.03f, 0.0f));
-
+	
 
 	float LocalG = 1.0f - G;
 	ZEVector4 LocalMie;
@@ -775,8 +776,8 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	struct
 	{
 		float	PixelSize[2];
+		float	Reserved0;
 		float	Reserved1;
-		float	Reserved2;
 
 		float	BlurDirection[4];
 
@@ -791,14 +792,14 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	struct
 	{
 		float	InverseMax[2];
-		float	Reserved2;
-		float	Reserved3;
+		float	Reserved0;
+		float	Reserved1;
 
 		float	CameraPosition[3];
-		float	Reserved0;
+		float	Reserved2;
 
 		float	DistanceParamters[3];
-		float	Reserved1;
+		float	Reserved3;
 
 		float	FallofParameters[4];
 
@@ -832,9 +833,6 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
 	GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
 	GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
-	
-	// Distance to cloud
-	//ZEVector2 CloudDistance(EarthRadius, CloudPlaneHeight * (2.0f * EarthRadius + CloudPlaneHeight));
 	
 	struct
 	{
@@ -897,27 +895,20 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 		
 	};
 
-
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&InvWorldViewProjMat, 4);
 	GetDevice()->SetVertexShaderConstantF(4, (const float*)&VertexShaderParametersCloudRender, sizeof(VertexShaderParametersCloudRender) / 16);
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&PixelShaderParametersCloudRender, sizeof(PixelShaderParametersCloudRender) / 16);
 	
 	// Restore render target
 	GetDevice()->SetRenderTarget(0, RenderTarget);
-	//ZED3D9CommonTools::SetRenderTarget(0, (ZEViewPort*)((ZED3D9FrameRenderer*)Renderer)->GetViewPort());
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)CloudDensityBuffer, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(1, (ZETexture2D*)CloudDensityBlurBuffer, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
 
-	RenderCommand->Order				= 1.0f;
-	RenderCommand->Priority				= 1;
-	RenderCommand->VertexBufferOffset	= 0;
 	RenderCommand->PrimitiveType		= ZE_ROPT_TRIANGLE_STRIPT;
 	RenderCommand->PrimitiveCount		= RenderCloudTriangleCount;
 	RenderCommand->IndexBuffer			= RenderCloudIndexBuffer;
 	RenderCommand->VertexBuffer			= RenderCloudVertexBuffer;
 	RenderCommand->VertexDeclaration	= RenderCloudVertexDeclaration;
-	
-	//GetDevice()->DrawIndexedPrimitive(D3DPT_TRIANGLESTRIP, 0, 0, RenderCloudVertexCount, 0, RenderCloudTriangleCount);
 
 	return true;
 }

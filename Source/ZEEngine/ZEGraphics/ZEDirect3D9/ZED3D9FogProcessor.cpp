@@ -322,7 +322,7 @@ ZED3D9FogProcessor::ZED3D9FogProcessor()
 	FogHeight				= 15.0f;
 	FogDistanceFar			= 1000.0f;
 	FogDistanceNear			= 100.0f;
-	FogVisibility			= 0.9;
+	FogVisibility			= 0.9f;
 
 	FogModel				= ZE_D3D9_FM_LINEAR;
 

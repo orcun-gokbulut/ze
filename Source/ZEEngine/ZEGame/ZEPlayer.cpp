@@ -46,6 +46,8 @@
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZECore/ZECore.h"
+#include "ZEGraphics/ZEGraphicsDebugModule.h"
 
 
 ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
@@ -65,7 +67,6 @@ ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEPlayer);
 #define ACTIONID_HEAD_ORIENTATION		12
 #define ACTIONID_FORWARD_BUTTON			20
 #define ACTIONID_BACKWARD_BUTTON		21
-
 #define ACTIONID_UP						22
 #define ACTIONID_DOWN					23
 
@@ -205,6 +206,7 @@ void ZEPlayer::Tick(float Time)
 				ZEVector3::Add(Position, Position, PositionChange);
 				SetPosition(Position);
 				break;
+
 		}
 		
 		if (Ry < -ZE_PI)

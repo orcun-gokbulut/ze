@@ -51,7 +51,8 @@ class ZESkyDomeMaterial : public ZEMaterial
 		float						G;						// Scattering Symmetry input for phase function 
 
 		float						AmbientFactor;			// Ambient Factor to use with ambient color
-		ZEVector4					AmbientColor;			// Ambient color to enlighten dark areas
+		ZEVector3					MiddayAmbientColor;		// Ambient color to add to dark areas in the daylight
+		ZEVector3					SunsetAmbientColor;		// Ambient color to add to light areas at sunset
 
 		float						MieConstant;			// Mie scattering constant
 		float						RayleighConstant;		// Rayleigh scattering constant
@@ -62,10 +63,9 @@ class ZESkyDomeMaterial : public ZEMaterial
 		float						OuterRadius;			// Radius of Sky Dome
 		float						InnerRadius;			// Radius of Earth
 
-		float						SunIntensity;			// Brightness of sun
-		
-		ZEVector3					SunPosition;			// Position of sun
-		ZEVector3					WaveLenght;				// Wave length of sunlight
+		float						SunLightIntensity;		// Brightness of sun
+		ZEVector3					SunLightDirection;		// Direction of sun
+		ZEVector3					SunLightWaveLenght;		// Wave length of sunlight
 
 		ZEVector3					CameraPosition;			// Camera to render from
 		ZEVector3					CameraPositionOffset;	// Offset to render with static camera position

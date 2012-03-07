@@ -1086,12 +1086,11 @@ void ZEMatrix4x4::Transform(ZEVector4& Out, const ZEMatrix4x4& Matrix, const ZEV
 {
 	zeAssert(&Out == &Vector, "Parameters Out and Matrix can not be the same variable.");
 
-	Out.x = Matrix.M11 * Vector.x + Matrix.M12 * Vector.y + Matrix.M13 * Vector.z + Matrix.M14;
-	Out.y = Matrix.M21 * Vector.x + Matrix.M22 * Vector.y + Matrix.M23 * Vector.z + Matrix.M24;
-	Out.z = Matrix.M31 * Vector.x + Matrix.M32 * Vector.y + Matrix.M33 * Vector.z + Matrix.M34;
-	Out.w = Matrix.M41 * Vector.x + Matrix.M42 * Vector.y + Matrix.M43 * Vector.z + Matrix.M44;
+	Out.x = Matrix.M11 * Vector.x + Matrix.M12 * Vector.y + Matrix.M13 * Vector.z + Matrix.M14 * Vector.w;
+	Out.y = Matrix.M21 * Vector.x + Matrix.M22 * Vector.y + Matrix.M23 * Vector.z + Matrix.M24 * Vector.w;
+	Out.z = Matrix.M31 * Vector.x + Matrix.M32 * Vector.y + Matrix.M33 * Vector.z + Matrix.M34 * Vector.w;
+	Out.w = Matrix.M41 * Vector.x + Matrix.M42 * Vector.y + Matrix.M43 * Vector.z + Matrix.M44 * Vector.w;
 }
-
 float ZEMatrix4x4::Determinant(const ZEMatrix4x4 &Matrix)
 {
 	ZEMatrix3x3 A, B, C, D;

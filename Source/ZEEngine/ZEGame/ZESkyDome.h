@@ -52,7 +52,8 @@ class ZESkyDome : public ZEEntity
 		float					G;					
 
 		float					AmbientFactor;		
-		ZEVector4				AmbientColor;		
+		ZEVector3				MiddayAmbientColor;		// Ambient color for the midday
+		ZEVector3				SunsetAmbientColor;		// Ambient color for sunset or sundown
 
 		float					MieConstant;		
 		float					RayleighConstant;	
@@ -60,18 +61,18 @@ class ZESkyDome : public ZEEntity
 		float					MieScaleDepth;
 		float					RayleighScaleDepth;
 
-		float					OuterRadius;		
-		float					InnerRadius;		
+		float					OuterRadius;			// = 61500.0f. Try to maintain Inner / Outer radius ratio 
+		float					InnerRadius;			// = 60000.0f. Try to maintain Inner / Outer radius ratio
 
 		float					SunIntensity;		
 
-		ZEVector3				SunPosition;		
-		ZEVector3				WaveLenght;			
+		ZEVector3				SunLightDirection;		
+		ZEVector3				SunLightWaveLenght;			
 
-		ZEVector3				CameraPosition;		
-		ZEVector3				CameraPositionOffset;
+		ZEVector3				CameraPosition;			// This parameter is the real time camera position for when the ground is round. No need to use offset parameter.
+		ZEVector3				CameraPositionOffset;	// = 60000.0f. This parameter is for when the ground is flat and calculations are done 
+														// with a fixed camera height. No need to use real time camera position.
 		
-
 		ZECanvas				SkyDomeGeometry;
 		ZESkyDomeMaterial*		SkyDomeMaterial;
 		ZERenderCommand			SkyDomeRenderCommand;
@@ -85,8 +86,11 @@ class ZESkyDome : public ZEEntity
 		void					SetAmbientFactor(float Value);
 		float					GetAmbientFactor() const;
 
-		void					SetAmbientColor(ZEVector4& Color);
-		ZEVector4				SetAmbientColor() const;
+		void					SetMiddayAmbientColor(ZEVector3& Color);
+		ZEVector3				GetMiddayAmbientColor() const;
+
+		void					SetSunsetAmbientColor(ZEVector3& Color);
+		ZEVector3				GetSunsetAmbientColor() const;
 
 		void					SetSetMieConstant(float Value);
 		float					GetGetMieConstant() const;
@@ -103,11 +107,11 @@ class ZESkyDome : public ZEEntity
 		void					SetSunIntensity(float Value);
 		float					GetSunIntensity() const;
 
-		void					SetSunPosition(ZEVector3& Value);
-		ZEVector3				GetSunPosition() const;
+		void					SetSunLightDirection(ZEVector3& Value);
+		ZEVector3				GetSunLightDirection() const;
 
-		void					SetWaveLenght(ZEVector3& Value);
-		ZEVector3				GetWaveLenght() const;
+		void					SetSunLightWaveLenght(ZEVector3& Value);
+		ZEVector3				GetSunLightWaveLenght() const;
 
 		void					SetOuterRadius(float Value);
 		float					GetOuterRadius() const;

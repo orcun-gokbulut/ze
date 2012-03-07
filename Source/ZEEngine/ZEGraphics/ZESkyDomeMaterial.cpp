@@ -48,21 +48,21 @@ ZESkyDomeMaterial::ZESkyDomeMaterial()
 	RayleighConstant		= 0.0025f;
 	RayleighScaleDepth		= 0.2500f;
 	
-	SunIntensity			= 20.0f;
+	SunLightIntensity		= 20.0f;
 	G						= -0.99f;
 
 	OuterRadius				= 61500.0f;
 	InnerRadius				= 60000.0f;
 
 	AmbientFactor			= 1.0000f;
-	AmbientColor			= ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
+	MiddayAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
+	SunsetAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
 
-	SunPosition				= ZEVector3(0.0f, 0.0f, -1.0f);
-
-	WaveLenght				= ZEVector3(0.650f, 0.570f, 0.475f);
+	SunLightDirection		= ZEVector3(0.0f, 0.0f, -1.0f);
+	SunLightWaveLenght		= ZEVector3(0.650f, 0.570f, 0.475f);
 
 	CameraPosition			= ZEVector3(0.0f, 0.0f, 0.0f);
-	CameraPositionOffset	= ZEVector3(0.0f, 60001.0f, 0.0f);
+	CameraPositionOffset	= ZEVector3(0.0f, 60000.0f, 0.0f);
 }
 
 ZESkyDomeMaterial::~ZESkyDomeMaterial()

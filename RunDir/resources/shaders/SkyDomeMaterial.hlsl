@@ -54,8 +54,8 @@
 float4x4	WorldViewProjMatrix		: register(vs, c0);		// Projections matrix.
 float4x4	ScaleMatrix				: register(vs, c4);		// Scaling matrix
 float3		InvWaveLenghtPow4		: register(vs, c8);		// 1 / pow(WaveLenght, 4).
-float3		SunPosition				: register(vs, c9)		// Sun position.
-									: register(ps, c2);
+float3		SunDirection				: register(vs, c9)		// Sun position.
+									: register(ps, c3);
 float4		Parameters3				: register(vs, c10);	// xyz: CameraPositionOffset, w: ScaleOverScaleDepth
 float4		Parameters4				: register(vs, c11);	// xyz: Camera position. w: CameraHeight
 
@@ -63,8 +63,9 @@ float4		Parameters0				: register(vs, c12);	// x: OuterRadius, y: InnerRadius, z
 float4		Parameters1				: register(vs, c13);	// x: Mie4PI, y: Ray4PI, z: Scale, w: ScaleDepth
 
 // Pixel shader parameters
-float4		AmbienColor				: register(ps, c0);
-float4		Parameters2				: register(ps, c1);		// x: G, y: GPow2, z: AmbienFactor
+float4		MiddayAmbientColor		: register(ps, c0);
+float4		SunsetAmbientColor		: register(ps, c1);
+float4		Parameters2				: register(ps, c2);		// x: G, y: GPow2, z: AmbienFactor
 
 
 #define		CameraPositionOffset	Parameters3.xyz
@@ -82,10 +83,15 @@ float4		Parameters2				: register(ps, c1);		// x: G, y: GPow2, z: AmbienFactor
 
 #define		G						Parameters2.x
 #define		GPow2					Parameters2.y
-#define		AmbienFactor			Parameters2.z
+#define		AmbientFactor			Parameters2.z
 
 #define		CameraPosition			Parameters4.xyz
 #define		CameraHeight			Parameters4.w
+
+#define		MiddayFactor			MiddayAmbientColor.w
+#define		SunsetFactor			SunsetAmbientColor.w
+
+#define		SunHeight				-SunDirection.y
 
 #define		SAMPLE_COUNT_INT		5
 #define		SAMPLE_COUNT_FLOAT		5.0f
@@ -94,10 +100,10 @@ float4		Parameters2				: register(ps, c1);		// x: G, y: GPow2, z: AmbienFactor
 // Vertex Shader Input
 struct VS_INPUT
 {
-	float4 Position		: POSITION0;	// Position
-	float3 Normal		: NORMAL0;		// Normal
-	float2 TexCoord0	: TEXCOORD0;	// Texture Coordinates
-	float4 TexCoord1	: TEXCOORD1;	// Color
+	float4 Position			: POSITION0;	// Position
+	float3 Normal			: NORMAL0;		// Normal
+	float2 TexCoord0		: TEXCOORD0;	// Texture Coordinates
+	float4 TexCoord1		: TEXCOORD1;	// Color
 };
 
 // Vertex Shader Output
@@ -121,7 +127,7 @@ struct PS_INPUT
 // Pixel Shader Output
 struct PS_OUTPUT
 {
-	float4 PixelColor  : COLOR0;
+	float4 PixelColor		: COLOR0;
 };
 
 // Scale equation
@@ -167,7 +173,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	{
 		float SamplePointHeight = length(SamplePoint);
 		float SamplePointDepth = exp(ScaleOverScaleDepth * (InnerRadius - SamplePointHeight));
-		float SamplePointLightAngle = dot(SunPosition, SamplePoint) / SamplePointHeight;
+		float SamplePointLightAngle = dot(-SunDirection, SamplePoint) / SamplePointHeight;
 		float SamplePointCameraAngle = dot(Ray, SamplePoint) / SamplePointHeight;
 		float Scatter = (StartOffset + SamplePointDepth * (ScaleAngle(SamplePointLightAngle) - ScaleAngle(SamplePointCameraAngle)));
 		float3 Attenuate = exp(-Scatter * Constant);
@@ -202,11 +208,21 @@ PS_OUTPUT ps_main(PS_INPUT Input)
 {
 	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
 	
-	float Cosine = dot(SunPosition, Input.ScatteringDir) / length(Input.ScatteringDir);
+	float Cosine = dot(-SunDirection, Input.ScatteringDir) / length(Input.ScatteringDir);
 	float CosinePow2 = Cosine * Cosine;  
 	
 	Output.PixelColor.rgb = GetRayleighPhase(CosinePow2) * Input.VertColorRay.rgb + GetMiePhase(Cosine, CosinePow2, G, GPow2) * Input.VertColorMie.rgb;
-	Output.PixelColor.a =  Output.PixelColor.b;
+	
+	// Calculate dome ambient color and alpha
+	float Luminance = dot(Output.PixelColor.rgb, float3(0.299f, 0.587f, 0.114f));
+
+	float3 MiddayColor = lerp((float3)0.0f, MiddayAmbientColor, MiddayFactor);
+	float3 SunsetColor = lerp((float3)0.0f, SunsetAmbientColor, SunsetFactor);
+
+	Output.PixelColor.rgb +=  MiddayColor * (1.0f - AmbientFactor * Luminance);
+	Output.PixelColor.rgb +=  SunsetColor * (AmbientFactor * Luminance);
+	
+	Output.PixelColor.a = saturate((log10(Output.PixelColor.b * 2.0f + 0.025f) + 1.6f));
 	
 	return Output;
 }

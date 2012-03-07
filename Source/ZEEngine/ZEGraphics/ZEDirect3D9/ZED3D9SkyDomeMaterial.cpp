@@ -74,7 +74,7 @@ void ZED3D9SkyDomeMaterial::ReleaseShaders()
 bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
 	// Update material if its changed. (Recompile shader, etc.)
-	((ZED3D9SkyDomeMaterial*)this)->UpdateMaterial();
+	// ((ZED3D9SkyDomeMaterial*)this)->UpdateMaterial();
 
 	// Setup Shaders
 	GetDevice()->SetVertexShader(VertexShader->GetVertexShader());
@@ -84,8 +84,13 @@ bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 	GetDevice()->SetRenderState(D3DRS_ZFUNC, D3DCMP_LESSEQUAL);
 	GetDevice()->SetRenderState(D3DRS_CULLMODE, D3DCULL_CCW);
-	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
-	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+	//GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
+	//GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+
+	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+	GetDevice()->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_SRCALPHA);
+	GetDevice()->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
 
 	ZEMatrix4x4	ScaleMatrix;
 	ZEMatrix4x4	WorldViewProjMatrix;
@@ -98,13 +103,28 @@ bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	// Scale matrix
 	GetDevice()->SetVertexShaderConstantF(4, (const float*)&ScaleMatrix, 4);
 	
+
+	float MiddayFactor, SunsetFactor;
+	float SunHeight = -SunLightDirection.y;
+
+	if (SunHeight < 0.3f)
+	{
+		MiddayFactor = 0.0f;
+		SunsetFactor = ZEMath::Power((SunHeight - 0.3f), 2.0f) / 0.09f;
+	}
+	else
+	{
+		SunsetFactor = 0.0f;
+		MiddayFactor = (SunHeight - 0.3f) / 0.7f;
+	}
+
 	float Scale = 1.0f / (OuterRadius - InnerRadius);
 	struct
 	{
 		float	InvWaveLenghtPow4[3];
 		float	Reserved0;
 
-		float	SunPosition[3];
+		float	SunDirection[3];
 		float	Reserved1;
 
 		float	CameraPositionOffset[3];
@@ -123,31 +143,41 @@ bool ZED3D9SkyDomeMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 		float	Scale;
 		float	ScaleDepth;
 	
-	}VertexShaderParameters = {
-		{1.0f / ZEMath::Power(WaveLenght.x, 4.0f), 1.0f / ZEMath::Power(WaveLenght.y, 4.0f), 1.0f / ZEMath::Power(WaveLenght.z, 4.0f)}, 0.0f,
-		{SunPosition.x, SunPosition.y, SunPosition.z}, 0.0f,
+	}
+	VertexShaderParameters = 
+	{
+		{1.0f / ZEMath::Power(SunLightWaveLenght.x, 4.0f), 1.0f / ZEMath::Power(SunLightWaveLenght.y, 4.0f), 1.0f / ZEMath::Power(SunLightWaveLenght.z, 4.0f)}, 0.0f,
+		{SunLightDirection.x, SunLightDirection.y, SunLightDirection.z}, 0.0f,
 		{CameraPositionOffset.x, CameraPositionOffset.y, CameraPositionOffset.z}, Scale / RayleighScaleDepth,
 		{CameraPosition.x, CameraPosition.y, CameraPosition.z}, ZEVector3::Length(CameraPosition + CameraPositionOffset),
-		OuterRadius, InnerRadius, MieConstant * SunIntensity, RayleighConstant * SunIntensity,
+		OuterRadius, InnerRadius, MieConstant * SunLightIntensity, RayleighConstant * SunLightIntensity,
 		MieConstant * 4.0f * ZE_PI, RayleighConstant * 4.0f * ZE_PI, Scale = 1.0f / (OuterRadius - InnerRadius), RayleighScaleDepth
 	};
 
+
 	struct 
 	{
-		float	AmbientColor[4];
+		float	MiddayAmbientColor[3];
+		float	MiddayFactor;
+
+		float	SunsetAmbientColor[3];
+		float	SunsetFactor;
 
 		float	G;
 		float	GPow2;
 		float	AmbienFactor;
 		float	Reserved2;
 
-		float	SunPosition[3];
+		float	SunDirection[3];
 		float	Reserved3;
 
-	}PixelShaderParameters = {
-		{AmbientColor.x, AmbientColor.y, AmbientColor.z, AmbientColor.w},
+	}
+	PixelShaderParameters = 
+	{
+		{MiddayAmbientColor.x, MiddayAmbientColor.y, MiddayAmbientColor.z}, MiddayFactor,
+		{SunsetAmbientColor.x, SunsetAmbientColor.y, SunsetAmbientColor.z}, SunsetFactor,
 		G, G * G, AmbientFactor, 0.0f,
-		{SunPosition.x, SunPosition.y, SunPosition.z}, 0.0f
+		{SunLightDirection.x, SunLightDirection.y, SunLightDirection.z}, 0.0f
 	};
 	
 	GetDevice()->SetVertexShaderConstantF(8, (const float*)&VertexShaderParameters, sizeof(VertexShaderParameters) / 16);

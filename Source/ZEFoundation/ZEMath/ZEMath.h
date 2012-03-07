@@ -80,6 +80,11 @@ class ZEMath
 		static float		Ceil(float Value);
 		static float		Round(float Value);
 
+		static bool			IsPowerOfTwo(ZEUInt Value);
+		
+		static ZEUInt		NextPowerOfTwo(ZEUInt Value);
+		static ZEUInt		PreviousPowerOfTwo(ZEUInt Value);
+		
 		static float		CopySign(float Value, float Sign);
 
 		static float		Lerp(float A, float B, float Factor);
