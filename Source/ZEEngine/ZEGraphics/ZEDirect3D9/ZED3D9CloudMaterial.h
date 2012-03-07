@@ -74,6 +74,7 @@ class ZED3D9CloudMaterial : public ZECloudMaterial, public ZED3D9ComponentBase
 
 		// Geometry creation parameters
 		ZEVector2						StartXZ;
+		ZEVector2						PlaneDimensions;
 		ZEVector2						CellCountXZ;
 		ZEVector2						CellSizeXZ;
 

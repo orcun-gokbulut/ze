@@ -43,6 +43,9 @@
 
 #include <d3dx9.h>
 #include <stdio.h>
+#include "../ZETexture3DResource.h"
+#include "ZED3D9Texture3D.h"
+#include "../ZETexture3D.h"
 
 #ifdef ZE_DEBUG_D3D9_DEBUG_SHADERS
 	#define ZE_SHADER_COMPILER_PARAMETERS	(D3DXSHADER_DEBUG | D3DXSHADER_SKIPOPTIMIZATION)
@@ -123,7 +126,7 @@ void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCube* Texture, DWORD Fi
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
 	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
-	GetDevice()->SetTexture(Stage, ((ZED3D9Texture2D*)Texture)->Texture);
+	GetDevice()->SetTexture(Stage, ((ZED3D9TextureCube*)Texture)->CubeTexture);
 }
 
 void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCubeResource* TextureResource, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
@@ -134,6 +137,28 @@ void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETextureCubeResource* TextureRe
 
 	ZED3D9CommonTools::SetTexture(Stage, Texture, Filter, MipMappingFilter, Addressing);
 }
+
+
+void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture3D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
+{
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSU, Addressing);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSV, Addressing);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_ADDRESSW, Addressing);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_MAGFILTER, Filter);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_MINFILTER, Filter);
+	GetDevice()->SetSamplerState(Stage, D3DSAMP_MIPFILTER, MipMappingFilter);
+	GetDevice()->SetTexture(Stage, ((ZED3D9Texture3D*)Texture)->VolumeTexture);
+}
+
+void ZED3D9CommonTools::SetTexture(DWORD Stage, ZETexture3DResource* TextureResource, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing)
+{
+	ZETexture3D* Texture = (ZETexture3D*)TextureResource->GetTexture();
+	if (Texture == NULL)
+		GetDevice()->SetTexture(Stage, NULL);
+
+	ZED3D9CommonTools::SetTexture(Stage, Texture, Filter, MipMappingFilter, Addressing);
+}
+
 
 D3DFORMAT  ZED3D9CommonTools::ConvertPixelFormat(ZETexturePixelFormat Format)
 {

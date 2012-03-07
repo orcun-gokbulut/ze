@@ -59,7 +59,7 @@ class ZECloud : public ZEEntity
 		ZEVector3				SunLightColor;
 		ZEVector3				AmbientColor;
 		ZECamera*				Camera;
-		
+
 		ZEVector3				Rayleigh;
 		ZEVector3				Mie;
 		float					G;
@@ -79,6 +79,7 @@ class ZECloud : public ZEEntity
 
 
 	public:
+
 		void					SetAmbientColor(ZEVector3 Color);
 		ZEVector3				GetAmbientColor();
 

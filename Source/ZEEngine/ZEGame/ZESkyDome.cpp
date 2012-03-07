@@ -51,14 +51,24 @@ float ZESkyDome::GetAmbientFactor() const
 	return AmbientFactor;
 }
 
-void ZESkyDome::SetAmbientColor(ZEVector4& Color)
+void ZESkyDome::SetMiddayAmbientColor(ZEVector3& Color)
 {
-	AmbientColor = Color;
+	MiddayAmbientColor = Color;
 }
 
-ZEVector4 ZESkyDome::SetAmbientColor() const
+ZEVector3 ZESkyDome::GetMiddayAmbientColor() const
 {
-	return AmbientColor;
+	return MiddayAmbientColor;
+}
+
+void ZESkyDome::SetSunsetAmbientColor(ZEVector3& Color)
+{
+	SunsetAmbientColor = Color;
+}
+
+ZEVector3 ZESkyDome::GetSunsetAmbientColor() const
+{
+	return SunsetAmbientColor;
 }
 
 void ZESkyDome::SetSetMieConstant(float Value)
@@ -108,27 +118,27 @@ void ZESkyDome::SetSunIntensity(float Value)
 
 float ZESkyDome::GetSunIntensity() const
 {
-	return SkyDomeMaterial->SunIntensity;
+	return SkyDomeMaterial->SunLightIntensity;
 }
 
-void ZESkyDome::SetSunPosition(ZEVector3& Value)
+void ZESkyDome::SetSunLightDirection(ZEVector3& Value)
 {
-	ZEVector3::Normalize(SunPosition, Value);
+	ZEVector3::Normalize(SunLightDirection, Value);
 }
 
-ZEVector3 ZESkyDome::GetSunPosition() const
+ZEVector3 ZESkyDome::GetSunLightDirection() const
 {
-	return SunPosition;
+	return SunLightDirection;
 }
 
-void ZESkyDome::SetWaveLenght(ZEVector3& Value)
+void ZESkyDome::SetSunLightWaveLenght(ZEVector3& Value)
 {
-	WaveLenght = Value;
+	SunLightWaveLenght = Value;
 }
 
-ZEVector3 ZESkyDome::GetWaveLenght() const
+ZEVector3 ZESkyDome::GetSunLightWaveLenght() const
 {
-	return WaveLenght;
+	return SunLightWaveLenght;
 }
 
 void ZESkyDome::SetOuterRadius(float Value)
@@ -194,6 +204,23 @@ bool ZESkyDome::Initialize()
 	{
 		SkyDomeMaterial = ZESkyDomeMaterial::CreateInstance();
 		SkyDomeMaterial->UpdateMaterial();
+
+		// Set initial parameters
+		SkyDomeMaterial->G						= G;
+		SkyDomeMaterial->SunsetAmbientColor		= SunsetAmbientColor;
+		SkyDomeMaterial->MiddayAmbientColor		= MiddayAmbientColor;
+		SkyDomeMaterial->AmbientFactor			= AmbientFactor;
+		SkyDomeMaterial->MieConstant			= MieConstant;
+		SkyDomeMaterial->RayleighConstant		= RayleighConstant;
+		SkyDomeMaterial->MieScaleDepth			= MieScaleDepth;
+		SkyDomeMaterial->RayleighScaleDepth		= RayleighScaleDepth;
+		SkyDomeMaterial->OuterRadius			= OuterRadius;
+		SkyDomeMaterial->InnerRadius			= InnerRadius;
+		SkyDomeMaterial->SunLightIntensity		= SunIntensity;
+		SkyDomeMaterial->SunLightDirection		= SunLightDirection;
+		SkyDomeMaterial->SunLightWaveLenght		= SunLightWaveLenght;
+		SkyDomeMaterial->CameraPosition			= CameraPosition;
+		SkyDomeMaterial->CameraPositionOffset	= CameraPositionOffset;
 	}
 
 	// Load sky dome
@@ -206,8 +233,8 @@ bool ZESkyDome::Initialize()
 		}
 	}
 
-	SkyDomeRenderCommand.Priority = 0;
-	SkyDomeRenderCommand.Order = 0.0f;
+	SkyDomeRenderCommand.Priority = 1;
+	SkyDomeRenderCommand.Order = 1.1f;
 	SkyDomeRenderCommand.Pipeline = ZE_RORP_3D;
 	SkyDomeRenderCommand.VertexBuffer = &SkyDomeGeometry;
 	SkyDomeRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
@@ -235,7 +262,8 @@ void ZESkyDome::Deinitialize()
 void ZESkyDome::Draw(ZEDrawParameters* DrawParameters)
 {
 	SkyDomeMaterial->G						= G;
-	SkyDomeMaterial->AmbientColor			= AmbientColor;
+	SkyDomeMaterial->SunsetAmbientColor		= SunsetAmbientColor;
+	SkyDomeMaterial->MiddayAmbientColor		= MiddayAmbientColor;
 	SkyDomeMaterial->AmbientFactor			= AmbientFactor;
 	SkyDomeMaterial->MieConstant			= MieConstant;
 	SkyDomeMaterial->RayleighConstant		= RayleighConstant;
@@ -243,9 +271,9 @@ void ZESkyDome::Draw(ZEDrawParameters* DrawParameters)
 	SkyDomeMaterial->RayleighScaleDepth		= RayleighScaleDepth;
 	SkyDomeMaterial->OuterRadius			= OuterRadius;
 	SkyDomeMaterial->InnerRadius			= InnerRadius;
-	SkyDomeMaterial->SunIntensity			= SunIntensity;
-	SkyDomeMaterial->SunPosition			= SunPosition;
-	SkyDomeMaterial->WaveLenght				= WaveLenght;
+	SkyDomeMaterial->SunLightIntensity		= SunIntensity;
+	SkyDomeMaterial->SunLightDirection		= SunLightDirection;
+	SkyDomeMaterial->SunLightWaveLenght		= SunLightWaveLenght;
 	SkyDomeMaterial->CameraPosition			= CameraPosition;
 	SkyDomeMaterial->CameraPositionOffset	= CameraPositionOffset;
 
@@ -279,11 +307,11 @@ ZESkyDome::ZESkyDome()
 	InnerRadius				= 60000.0f;
 
 	AmbientFactor			= 1.0000f;
-	AmbientColor			= ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
+	MiddayAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
+	SunsetAmbientColor		= ZEVector3(0.0f, 0.0f, 0.0f);
 
-	SunPosition				= ZEVector3(0.0f, 0.0f, -1.0f);
-
-	WaveLenght				= ZEVector3(0.650f, 0.570f, 0.475f);
+	SunLightDirection		= ZEVector3(0.0f, 0.0f, -1.0f);
+	SunLightWaveLenght		= ZEVector3(0.650f, 0.570f, 0.475f);
 
 	CameraPosition			= ZEVector3(0.0f, 0.0f, 0.0f);
 	CameraPositionOffset	= ZEVector3(0.0f, 60001.0f, 0.0f);

@@ -147,7 +147,7 @@ bool ZEFileCache::CopyData(ZEFile* File, ZEUInt64 From, ZEUInt64 Size, ZEUInt64 
 	}
 
 	// Copy backward to avoid corruption due to overlap
-	for (ZESize I = Count; I > 0; --I)
+	for (ZESize I = (ZESize)Count; I > 0; --I)
 	{
 		if (!File->Seek((ZEInt64)From + (I - 1) * (ZEInt64)BufferSize, ZE_SF_BEGINING))
 		{

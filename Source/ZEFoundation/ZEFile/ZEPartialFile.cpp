@@ -240,12 +240,14 @@ bool ZEPartialFile::Open(ZEFile* ParentFile, ZEUInt64 Offset, ZEUInt64 Size)
 void ZEPartialFile::Close()
 {
 	// Parent File will close itself if and only if its reference count is zero
-	ParentFile->DecreaseReferenceCount();
+	if (ParentFile != NULL)
+		ParentFile->DecreaseReferenceCount();
 	
 	// Close the partial file
 	ReferenceCount	= 0;
 	StartPosition	= 0;
 	EndPosition		= 0;
+	ParentFile		= NULL;
 	File			= NULL;
 	IsEof			= false;
 

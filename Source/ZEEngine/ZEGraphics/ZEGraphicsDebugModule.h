@@ -38,6 +38,7 @@
 #define __ZE_GRAPHICS_DEBUG_MODULE_H__
 
 #include "ZECore/ZEApplicationModule.h"
+#include "ZEInput/ZEInputMap.h"
 
 class ZEPlayer;
 class ZEPointLight;
@@ -55,37 +56,52 @@ class ZECloud;
 class ZEGraphicsDebugModule : public ZEApplicationModule
 {
 	private:
-		ZECloud*				Cloud;
-		ZEPortalMap*			PortalMap;
-		ZEModel*				Model;
-		ZEPlayer*				Player;
-		ZESkyBrush*				SkyBrush;
-		ZEPointLight*			PointLight1;
-		ZEPointLight*			PointLight2;
-		ZEPointLight*			PointLight3;
-		ZEPointLight*			PointLight4;
-		ZEPointLight*			PointLight5;
-		ZEPointLight*			PointLight6;
-		ZEProjectiveLight*		ProjectiveLight0;
-		ZEDirectionalLight*		DirectionalLight0;
-		ZEOmniProjectiveLight*	OmniProjectiveLight0;
+		ZEInputMap					InputMap;
+
+		ZEVector3					SunDirection;
+		ZEVector3					SunRotation;
+		ZEVector3					SunRotationSpeed;
+
+		ZECloud*					Cloud;
+		float						CloudCover;
+		float						CloudCoverFactor;
+
+		ZEPortalMap*				PortalMap;
+		ZEModel*					Model;
+		ZEPlayer*					Player;
+		ZESkyBrush*					StarMap;
+		ZEPointLight*				PointLight1;
+		ZEPointLight*				PointLight2;
+		ZEPointLight*				PointLight3;
+		ZEPointLight*				PointLight4;
+		ZEPointLight*				PointLight5;
+		ZEPointLight*				PointLight6;
+		ZEProjectiveLight*			ProjectiveLight0;
+		ZEDirectionalLight*			DirectionalLight0;
+		ZEOmniProjectiveLight*		OmniProjectiveLight0;
+		ZESkyDome*					SkyDome;
 		
-		// Sky Dome related variables
-// 		ZESkyDome*				SkyDome;
-// 		float					SunRotationSpeed;
-// 		ZEUITextControl*		Coordinates;
-// 		ZEUITextControl*		CameraHeight;
-// 		ZEUITextControl*		InOutRadius;
-// 		ZEUITextControl*		MovementSpeed;
+		ZEUITextControl*			CoordinatesText;
+		ZEUITextControl*			SunDirectionText;
+		ZEUITextControl*			CloudCoverText;
+		ZEUITextControl*			WindSpeedText;
 
 	public:
-		virtual bool			Initialize();
-		virtual void			Deinitialize();
-		virtual void			Process(float ElapsedTime);
+		virtual bool				Initialize();
+		virtual void				Deinitialize();
+		virtual void				Process(float ElapsedTime);
 
+		virtual void				ProcessInputs(float ElapsedTime);
 
-								ZEGraphicsDebugModule();
-		virtual					~ZEGraphicsDebugModule();
+		virtual	void				DisplayStatus();
+		virtual void				UpdateCloudColor();
+		virtual void				IncreaseCloudCover(float ElapsedTime);
+		virtual void				DecreaseCloudCover(float ElapsedTime);
+		virtual void				IncreaseDayTime(float ElapsedTime);
+		virtual void				DecreaseDayTime(float ElapsedTime);
+		
+									ZEGraphicsDebugModule();
+		virtual						~ZEGraphicsDebugModule();
 };
 
 #endif

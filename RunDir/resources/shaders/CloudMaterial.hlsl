@@ -63,23 +63,23 @@ float		CloudCoverPass1			: register(ps, c0);
 //------------------------------------------------
 struct VS_INPUT_PASS1
 {
-	float4 Position : POSITION0;
+	float4 Position			: POSITION0;
 };
 
 struct VS_OUTPUT_PASS1 
 {
-	float4 Position		: POSITION0;
-	float2 TextureCoord	: TEXCOORD0;
+	float4 Position			: POSITION0;
+	float2 TextureCoord		: TEXCOORD0;
 };
 
 struct PS_INPUT_PASS1
 {
-	float2 TextureCoord	: TEXCOORD0;
+	float2 TextureCoord		: TEXCOORD0;
 };
 
 struct PS_OUTPUT_PASS1
 {
-	float4 PixelColor : COLOR0;
+	float4 PixelColor		: COLOR0;
 };
 
 //------------------------------------------------
@@ -155,23 +155,23 @@ float		CloudCoverPass2			: register(ps, c0);
 //------------------------------------------------
 struct VS_INPUT_PASS2
 {
-	float4 Position : POSITION0;
+	float4 Position			: POSITION0;
 };
 
 struct VS_OUTPUT_PASS2 
 {
-	float4 Position		: POSITION0;
-	float2 TextureCoord	: TEXCOORD0;
+	float4 Position			: POSITION0;
+	float2 TextureCoord		: TEXCOORD0;
 };
 
 struct PS_INPUT_PASS2
 {
-	float2 TextureCoord	: TEXCOORD0;
+	float2 TextureCoord		: TEXCOORD0;
 };
 
 struct PS_OUTPUT_PASS2
 {
-	float4 PixelColor : COLOR0;
+	float4 PixelColor		: COLOR0;
 };
 
 //------------------------------------------------
@@ -192,7 +192,7 @@ VS_OUTPUT_PASS2 vs_main_cloud_density(VS_INPUT_PASS2 Input)
 	WorldPosition.w = 1.0f;
 	
 	// Transform
-	Output.Position = mul(WorldViewProjMatPass2, WorldPosition);
+	Output.Position = mul(WorldViewProjMatPass2, WorldPosition.xyzw);
 	Output.TextureCoord = Input.Position.zw * UVParametersPass2.xy + UVParametersPass2.zw;
 	return Output;
 }
@@ -210,7 +210,7 @@ PS_OUTPUT_PASS2 ps_main_cloud_density(PS_INPUT_PASS2 Input)
 	float4 CloudDensity = abs(CloudCoverPass2 - float4(0.25f, 0.50f, 0.75f, 1.00f)) / 0.25f;
 	CloudDensity = saturate(1.0f - CloudDensity);
 
-	Output.PixelColor = (float4)dot(CloudSample, CloudDensity);	
+	Output.PixelColor = (float4)dot(CloudSample, CloudDensity);
 	return Output;
 }
 
@@ -266,7 +266,7 @@ struct PS_INPUT_PASS3
 
 struct PS_OUTPUT_PASS3
 {
-	float4 PixelColor : COLOR0;
+	float4 PixelColor		: COLOR0;
 };
 
 //------------------------------------------------
@@ -401,7 +401,7 @@ struct PS_INPUT_PASS4
 
 struct PS_OUTPUT_PASS4
 {
-	float4 PixelColor : COLOR0;
+	float4 PixelColor		: COLOR0;
 };
 
 //------------------------------------------------

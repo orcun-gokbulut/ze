@@ -50,6 +50,9 @@ class ZETexture2D;
 class ZETexture2DResource;
 class ZETextureCube;
 class ZETextureCubeResource;
+class ZETexture3D;
+class ZETexture3DResource;
+
 class ZEViewPort;
 
 class ZED3D9CommonTools : public ZED3D9ComponentBase
@@ -61,7 +64,10 @@ class ZED3D9CommonTools : public ZED3D9ComponentBase
 		static void				SetTexture(DWORD Stage, ZETexture2DResource* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
 		static void				SetTexture(DWORD Stage, ZETextureCube* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
 		static void				SetTexture(DWORD Stage, ZETextureCubeResource* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
-
+		static void				SetTexture(DWORD Stage, ZETexture3D* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
+		static void				SetTexture(DWORD Stage, ZETexture3DResource* Texture, DWORD Filter, DWORD MipMappingFilter, DWORD Addressing);
+		
+		
 		static D3DFORMAT		ConvertPixelFormat(ZETexturePixelFormat Format);
 		static bool				CompileVertexShaderFromMemory(LPDIRECT3DVERTEXSHADER9* VertexShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEUInt32 Components = 0);
 		static bool				CompilePixelShaderFromMemory(LPDIRECT3DPIXELSHADER9* PixelShader, const char* Source, const char* ShaderName, const char* ShaderProfile, ZEUInt32 Components = 0);

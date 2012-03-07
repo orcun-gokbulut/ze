@@ -40,6 +40,7 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZEDirect3D9/ZED3D9CloudMaterial.h"
 
+
 void ZECloud::SetAmbientColor(ZEVector3 Color)
 {
 	AmbientColor = Color;
@@ -193,7 +194,19 @@ bool ZECloud::Initialize()
 		CloudMaterial = ZECloudMaterial::CreateInstance();
 		CloudMaterial->Camera = Camera;
 		CloudMaterial->UpdateMaterial();
+	
+		// Send initial Parameters to material
+		CloudMaterial->Camera					= Camera;
+		CloudMaterial->EarthRadius				= EarthRadius;
+		CloudMaterial->AtmosphereHeight			= AtmosphereHeight;
+		CloudMaterial->CloudCover				= CloudCover;
+		CloudMaterial->WindVelocity				= WindVelocity;
+		CloudMaterial->CloudPlaneHeight			= CloudPlaneHeight;
+		CloudMaterial->SunLightColor			= SunLightColor;
+		CloudMaterial->SunLightDirection		= SunLightDirection;
 	}
+
+
 
 	CloudRenderCommand.Priority = 4;
 	CloudRenderCommand.Order = 4.0f;
@@ -223,23 +236,33 @@ void ZECloud::Deinitialize()
 void ZECloud::Draw(ZEDrawParameters* DrawParameters)
 {
 	// Set updated parameters to material
+	
+	// CloudMaterial->Rayleigh				= Rayleigh;
+	// CloudMaterial->Mie					= Mie;
+	// CloudMaterial->G						= G;
+	// CloudMaterial->LightScale			= LightScale;
+	// CloudMaterial->AmbientScale			= AmbientScale;
+	// CloudMaterial->AmbientColor			= AmbientColor;
+	
+	// Update materials parameters before drawing
 	CloudMaterial->Camera					= Camera;
-	//CloudMaterial->Rayleigh					= Rayleigh;
-	//CloudMaterial->Mie						= Mie;
-	//CloudMaterial->G						= G;
-	//CloudMaterial->LightScale				= LightScale;
-	//CloudMaterial->AmbientScale				= AmbientScale;
 	CloudMaterial->EarthRadius				= EarthRadius;
 	CloudMaterial->AtmosphereHeight			= AtmosphereHeight;
 	CloudMaterial->CloudCover				= CloudCover;
 	CloudMaterial->WindVelocity				= WindVelocity;
 	CloudMaterial->CloudPlaneHeight			= CloudPlaneHeight;
+	CloudMaterial->SunLightColor			= SunLightColor;
 	CloudMaterial->SunLightDirection		= SunLightDirection;
-	//CloudMaterial->AmbientColor				= AmbientColor;
 
+
+	CloudRenderCommand.Order				= 1.2f;
+	CloudRenderCommand.Priority				= 1;
+
+	CloudRenderCommand.VertexBufferOffset	= 0;
 	CloudRenderCommand.Material				= CloudMaterial;
 	CloudRenderCommand.WorldMatrix			= GetWorldTransform();
 	DrawParameters->Renderer->AddToRenderList(&CloudRenderCommand);
+
 }
 
 void ZECloud::Tick(float Time)
@@ -262,14 +285,14 @@ ZECloud::ZECloud()
 	EarthRadius				= 21600000.0f;
 	AtmosphereHeight		= 30000.0f;
 	CloudCover				= 0.5f;
-	CloudPlaneHeight		= 2000.0f;
-	WindVelocity			= ZEVector2(0.01f, 0.01f);
+	CloudPlaneHeight		= 600.0f;
+	WindVelocity			= ZEVector2(0.005f, 0.005f);
 	SunLightDirection		= ZEVector3(0.0f, -1.0f, 0.0f);
 	AmbientColor			= ZEVector3(0.3f, 0.35f, 0.4f);
 	SunLightColor			= ZEVector3(1.2f, 1.2f,  1.2f);
 	Rayleigh				= ZEVector3(0.3f, 0.45f, 6.5f);
 	Mie						= ZEVector3(0.3f, 0.3f,  0.3f);
-
+	
 }
 
 ZECloud::~ZECloud()

@@ -43,6 +43,7 @@
 #include "ZEMath\ZEAABBox.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEMap\ZEPortalMap\ZEPortalMapPortal.h"
+#include <math.h>
 
 
 ZECloudMaterial::ZECloudMaterial()
@@ -54,10 +55,10 @@ ZECloudMaterial::ZECloudMaterial()
 	EarthRadius				= 21600000.0f;
 	AtmosphereHeight		= 30000.0f;
 	CloudCover				= 0.5f;
-	CloudPlaneHeight		= 2000.0f;
+	CloudPlaneHeight		= 600.0f;
 	CloudPlaneHeightFallOff = 0.0f;
 	UVOffset				= ZEVector2(0.0f, 0.0f);
-	WindVelocity			= ZEVector2(0.01f, 0.01f);
+	WindVelocity			= ZEVector2(0.005f, 0.005f);
 	SunLightDirection		= ZEVector3(0.0f, -1.0f, 0.0f);
 	SunLightColor			= ZEVector3(1.2f, 1.2f, 1.2f);
 	Rayleigh				= ZEVector3(0.3f, 0.45f, 6.5f);
@@ -87,39 +88,42 @@ void ZECloudMaterial::UpdateParameters(float Time)
 	float Range = 0.5f * Camera->GetFarZ();
 	float Height = Range * 0.12f;
 	CloudPlaneHeight = Height + Camera->GetWorldPosition().y;
-	CloudPlaneHeightFallOff  = -1.0f * (0.1f / Range) * (Camera->GetWorldPosition().y / Height + 1.0f);
+	CloudPlaneHeightFallOff  = -(0.1f / Range) * (Camera->GetWorldPosition().y / Height + 1.0f);
 
 	// Update Bounding Box
 	CloudBoundingBox.Max.y = CloudPlaneHeight;
 
-	// Underground map bounding box
-	// GroundBoundingBox.Min = ZEVector3(-96.0f, -49.0f, -92.0f);
-	// GroundBoundingBox.Max = ZEVector3(200.0f,  60.0f,  80.0f);
-
-	// Demo bounding box
-	GroundBoundingBox.Min = ZEVector3(-12750.0f, -500.0f, -12750.0f);
-	GroundBoundingBox.Max = ZEVector3(12750.0f,  25000.0f,  12750.0f);
+	GroundBoundingBox.Min = ZEVector3(-12750.0f, 0.0f, -12750.0f);
+	GroundBoundingBox.Max = ZEVector3(12750.0f,  25500.0f,  12750.0f);
 	
-	GroundBoundingBox.Min = ZEVector3(0.0f, 0.0f, 0.0f);
-	GroundBoundingBox.Max = ZEVector3(25500.0f,  25500.0f,  25500.0f);
-
 	// Update scattering parameters based on cloud cover
 	float LocalCloudCover = (CloudCover - 0.7f) / (1.0f - 0.7f);
+	// Original : (CloudCover - 0.7f) / (1.0f - 0.7f);
 	LocalCloudCover = ZEMath::Max(0.0f, LocalCloudCover);
+	
 	// Mie scattering is caused by vapor.
-	float LocalMie = 0.05f * (1.0f - LocalCloudCover) + 1.5f * LocalCloudCover;
+	float LocalMie =  0.05f * (1.0f - LocalCloudCover) + 1.5f * LocalCloudCover;
+	// Original : 0.05f * (1.0f - LocalCloudCover) + 1.5f * LocalCloudCover;
 	Mie = ZEVector3(LocalMie, LocalMie, LocalMie);
+	
 	// Rayleigh scattering
 	float LocalRayleigh = 0.9f * LocalCloudCover + 1.0f * (1.0f - LocalCloudCover);
+	// Original : 0.9f * LocalCloudCover + 1.0f * (1.0f - LocalCloudCover);
+	
 	ZEVector3 FineRayleigh(0.05f, 0.15f, 1.5f);
 	ZEVector3::Scale(Rayleigh, FineRayleigh, LocalRayleigh);
+	
 	// Ambient color
-	static ZEVector3 FineAmbient(0.3, 0.35f, 0.4f);
+	static ZEVector3 FineAmbient(0.3f, 0.35f, 0.4f);
 	static ZEVector3 CloudyAmbient(0.35f, 0.35f, 0.35f);
 	ZEVector3::Lerp(AmbientColor, FineAmbient, CloudyAmbient, LocalCloudCover);
+
 	// When cloudy, ambient term of scattering is risen
 	AmbientScale = 0.5f * (1.0f - LocalCloudCover) + 1.0f * LocalCloudCover;
-	
+	// Original : 0.5f * (1.0f - LocalCloudCover) + 1.0f * LocalCloudCover;
+
+	// AmbientScale = 0.5f; //AmbientScale > 0.8f ? 0.8f : AmbientScale;
+
 }
 
 ZEMaterialFlags ZECloudMaterial::GetMaterialFlags() const
