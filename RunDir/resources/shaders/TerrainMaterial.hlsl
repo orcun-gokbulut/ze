@@ -75,8 +75,8 @@ float2 GetTexcoord(float3 LocalPosition)
 
 float GetBlendFactor(float3 LocalPosition)
 {
-	float2 Blend = max(abs(LocalPosition.xz) - BlendTreshold.x, 0.0f) / BlendTreshold.y;
-	return min(max(Blend.x, Blend.y), 1.0f);
+	float2 Blend = (abs(LocalPosition.xz) - BlendTreshold.x) / BlendTreshold.y;
+	return saturate(max(Blend.x, Blend.y));
 }
 
 float3 GetLocalPosition(float3 VertexPosition)
