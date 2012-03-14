@@ -78,8 +78,8 @@ class ZETerrain : public ZEEntity
 		ZEArray<ZETerrainLevel>					Levels;
 
 		float									UnitLength;
-		ZEUInt									ChunkSize;
-		ZEUInt									MaxLevel;
+		ZEInt									ChunkSize;
+		ZEInt									MaxLevel;
 
 		float									HeightOffset;
 		float									HeightScale;
@@ -107,6 +107,7 @@ class ZETerrain : public ZEEntity
 
 	public:	
 		bool									Locked;
+		bool									Wireframe;
 		virtual ZEDrawFlags						GetDrawFlags() const;
 		virtual ZERayCastFlags					GetRayCastFlags() const;
 
