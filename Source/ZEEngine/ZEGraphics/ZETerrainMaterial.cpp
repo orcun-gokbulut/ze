@@ -81,6 +81,16 @@ ZEMaterialFlags ZETerrainMaterial::GetMaterialFlags() const
 	return ZE_MTF_G_BUFFER_PASS | ZE_MTF_PRE_Z_PASS | ZE_MTF_SUPPORTS_SKINNING;
 }
 
+void ZETerrainMaterial::SetWireframe(bool Enable)
+{
+	Wireframe = Enable;
+}
+
+bool ZETerrainMaterial::GetWireframe() const
+{
+	return Wireframe;
+}
+
 void ZETerrainMaterial::SetTwoSided(bool Enable)
 {
 	TwoSided = Enable;
