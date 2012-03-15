@@ -42,7 +42,7 @@
 float4x4 ViewProjMatrix : register(vs, c0);
 float4x4 WorldMatrix : register(vs, c4);
 float4x4 ViewMatrix : register(c8);
-float4 VertexShaderParameters[3] : register(c13);
+float4 VertexShaderParameters[4] : register(c13);
 
 float4x4 LocalTransform : register(c20);
 
@@ -60,17 +60,25 @@ float4 MaterialParametersPS[3] : register(ps, c1);
 #define TextureOffset			VertexShaderParameters[1].xy
 #define TextureScale			VertexShaderParameters[1].zw
 #define BlendTreshold			VertexShaderParameters[2]
+#define ColorTextureOffset		VertexShaderParameters[3].xy
+#define ColorTextureScale		VertexShaderParameters[3].zw
 
 
 // Textures
 /////////////////////////////////////////////////////////////////////////////////////////
 sampler2D HeightTexture : register(s0);
 sampler2D ColorTexture  : register(s4);
-sampler2D NormalTexture : register(s5);
+sampler2D DetailNormalTexture : register(s5);
 
 float2 GetTexcoord(float3 LocalPosition)
 {
 	return TextureScale * float2(LocalPosition.x, -LocalPosition.z) + TextureOffset;
+}
+
+float2 GetGlobalTexcoord(float3 WorldPosition)
+{
+	float2 B = ColorTextureScale * float2(WorldPosition.x, -WorldPosition.z) + ColorTextureOffset;
+	return float2(B.y, 1.0 - B.x);
 }
 
 float GetBlendFactor(float3 LocalPosition)
@@ -223,9 +231,8 @@ ZETerrainMaterial_ForwardPass_VSOutput ZETerrainMaterial_ForwardPass_VertexShade
 	float3 LocalPosition = GetLocalPosition(Input.Position);
 	LocalPosition.y = GetHeight(LocalPosition, GetBlendFactor(LocalPosition));
 		
-	Output.Texcoord = GetTexcoord(LocalPosition);
-
 	float4 WorldPosition = mul(WorldMatrix, float4(LocalPosition, 1.0f));
+	Output.Texcoord = GetGlobalTexcoord(WorldPosition);
 	Output.Position_ = mul(ViewProjMatrix, WorldPosition);
 	Output.Cull = GetHeight(LocalPosition, GetBlendFactor(LocalPosition));
 	
@@ -264,7 +271,7 @@ ZETerrainMaterial_ForwardPass_PSOutput ZETerrainMaterial_ForwardPass_PixelShader
 	Output.Color.rgb += AmbientColor;
 
 	float3 DiffuseColor = MaterialDiffuseColor;
-	DiffuseColor = BaseColor;
+	DiffuseColor *= BaseColor;
 	DiffuseColor *= ZELBuffer_GetDiffuse(ScreenPosition);
 	Output.Color.rgb += DiffuseColor;
 	

@@ -134,10 +134,10 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 		Bitmap32 = Bitmap;
 	}
 
-	ZEUInt BPP		= FreeImage_GetBPP(Bitmap32);
-	ZEUInt Width		= FreeImage_GetWidth(Bitmap32);
-	ZEUInt Height		= FreeImage_GetHeight(Bitmap32);
-	ZEUInt PixelSize	= BPP / 8;
+	ZEUInt BPP = FreeImage_GetBPP(Bitmap32);
+	ZEUInt Width = FreeImage_GetWidth(Bitmap32);
+	ZEUInt Height = FreeImage_GetHeight(Bitmap32);
+	ZEUInt PixelSize = BPP / 8;
 	ZEUInt RowSize	= Width * PixelSize;
 	ZEUInt RowCount	= Height;
 

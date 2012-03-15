@@ -43,6 +43,7 @@ add_subdirectory (ZETFontFile)
 add_subdirectory (ZETMapFile)
 add_subdirectory (ZETMaterialFile)
 add_subdirectory (ZETModelFile)
+#add_subdirectory (ZETTerrainFile)
 add_subdirectory (ZETCommon)
 
 ze_add_source(ZETCompileOptions.h	Sources)
