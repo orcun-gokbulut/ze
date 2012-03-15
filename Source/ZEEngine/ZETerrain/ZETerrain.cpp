@@ -43,6 +43,7 @@
 #include "ZEGraphics/ZEVertexDeclaration.h"
 #include "ZEGraphics/ZEBitmap.h"
 #include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZETexture2DResource.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
@@ -199,16 +200,17 @@ bool ZETerrain::CreateLevels()
 	for (ZESize I = 0; I < Levels.GetCount(); I++)
 	{
 		ZETerrainLevel* CurrentLevel = &Levels[I];
-		CurrentLevel->HeightTexture = ZETexture2D::CreateInstance();
-		if (!CurrentLevel->HeightTexture->Create(ChunkSize * 4 + 8 + 1, ChunkSize * 4 + 8 + 1, ZE_TPF_F32_2, false, 1))
+		CurrentLevel->ElevationTexture = ZETexture2D::CreateInstance();
+		if (!CurrentLevel->ElevationTexture->Create(ChunkSize * 4 + 8 + 1, ChunkSize * 4 + 8 + 1, ZE_TPF_F32_2, false, 1))
 			return false;
 
 		CurrentLevel->Material = ZETerrainMaterial::CreateInstance();
 		CurrentLevel->Material->Level = I;
-		CurrentLevel->Material->SetHeightTexture(CurrentLevel->HeightTexture);
-		CurrentLevel->Material->SetColorTexture(CurrentLevel->HeightTexture);
+		CurrentLevel->Material->SetHeightTexture(CurrentLevel->ElevationTexture);
+		CurrentLevel->Material->SetColorTexture(CurrentLevel->ElevationTexture);
 		CurrentLevel->Material->SetBlendTreshold(0.75f);
 		CurrentLevel->Material->SetChunkSize(ChunkSize);
+		CurrentLevel->Material->SetColorTexture((ZETexture2D*)ColorTexture);
 	}
 
 	return true;
@@ -219,7 +221,7 @@ void ZETerrain::DestroyLevels()
 	for (ZESize I = 0; I < Levels.GetCount(); I++)
 	{
 		Levels[I].Material->Destroy();
-		Levels[I].HeightTexture->Destroy();
+		Levels[I].ElevationTexture->Destroy();
 	}
 	Levels.Clear();
 }
@@ -249,17 +251,20 @@ bool ZETerrain::LoadLevelData()
 
 	ZEUInt32 Depth;
 	File.Read(&Depth, sizeof(ZEUInt32), 1);
-	LevelData.SetCount(Depth);
+	DataLevels.SetCount(Depth);
 	for (size_t I = 0; I < Depth; I++)
 	{
 		File.Read(&Header, sizeof(ZETerrainFileHeader), 1);
-		LevelData[I].ElevationHeight = Header.Heigth;
-		LevelData[I].ElevationWidth = Header.Width;
-		LevelData[I].ElevationData = new float[Header.Heigth * Header.Width];
-		File.Read(LevelData[I].ElevationData, Header.Width * Header.Heigth * sizeof(float), 1);
+		DataLevels[I].ElevationHeight = Header.Heigth;
+		DataLevels[I].ElevationWidth = Header.Width;
+		DataLevels[I].ElevationData = new float[Header.Heigth * Header.Width];
+		File.Read(DataLevels[I].ElevationData, Header.Width * Header.Heigth * sizeof(float), 1);
 	}
 
 	File.Close();
+
+	DetailNormalTexture = ZETexture2DResource::LoadResource("normal.jpg")->GetTexture();
+	ColorTexture = ZETexture2DResource::LoadResource("Diffuse3.tif")->GetTexture();
 	 
 	return true;
 }
@@ -267,12 +272,12 @@ bool ZETerrain::LoadLevelData()
 void ZETerrain::UnloadLevelData()
 {
 	for (ZESize I = 0; I < 8; I++)
-		delete[] LevelData[I].ElevationData;
+		delete[] DataLevels[I].ElevationData;
 
-	LevelData.Clear();
+	DataLevels.Clear();
 }
 
-float Sample(ZETerrainLevelData* Data, ZESize x, ZESize y)
+float Sample(ZETerrainDataLevel* Data, ZESize x, ZESize y)
 {
 	if (x < 0 || x >= Data->ElevationWidth)
 		return 0.0f;
@@ -305,8 +310,8 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 	float TexelSize = 1.0f / TextureSize;
 
 	ZEInt LevelCount = Levels.GetCount();
-	if (LevelData.GetCount() < LevelCount)
-		LevelCount = LevelData.GetCount();
+	if (DataLevels.GetCount() < LevelCount)
+		LevelCount = DataLevels.GetCount();
 	if (MaxLevel < LevelCount)
 		LevelCount = MaxLevel;
 
@@ -322,15 +327,15 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 		CurrLevel->Material->SetTextureScale(ZEVector2(TextureScale, TextureScale));
 		CurrLevel->Material->SetTextureOffset(ZEVector2(0.5f, 0.5f));
 
-		ZETerrainLevelData* CurrentLevelData = &LevelData[CurrLevelIndex];
-		ZETerrainLevelData* NextLevelData = &LevelData[CurrLevelIndex + 1];
+		ZETerrainDataLevel* CurrentLevelData = &DataLevels[CurrLevelIndex];
+		ZETerrainDataLevel* NextLevelData = &DataLevels[CurrLevelIndex + 1];
 
 		ZESSize DataX = (PositionX / (1 << CurrLevelIndex)) - (2 * ChunkSize + 4);
 		ZESSize DataY = (-PositionY / (1 << CurrLevelIndex)) - (2 * ChunkSize + 4);
 		
 		void* Buffer;
 		ZESize Pitch;		
-		CurrLevel->HeightTexture->Lock(&Buffer, &Pitch);
+		CurrLevel->ElevationTexture->Lock(&Buffer, &Pitch);
 		for (ZESize BufferY = 0; BufferY < TextureSize; BufferY++)
 			for (ZESize BufferX = 0; BufferX < TextureSize; BufferX++)
 			{
@@ -373,7 +378,10 @@ void ZETerrain::Stream(ZEDrawParameters* DrawParameters, ZEInt PositionX, ZEInt 
 					CurrLevel->MaxHeight = Height;
 			}
 
-		CurrLevel->HeightTexture->Unlock(0);
+		CurrLevel->ElevationTexture->Unlock(0);
+
+		// Color
+
 	}
 }
 
@@ -473,8 +481,8 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	Stream(DrawParameters, PositionX, PositionY);
 	
 	ZESize LevelCount = Levels.GetCount();
-	if (LevelData.GetCount() < LevelCount)
-		LevelCount = LevelData.GetCount();
+	if (DataLevels.GetCount() < LevelCount)
+		LevelCount = DataLevels.GetCount();
 	if (MaxLevel < LevelCount)
 		LevelCount = MaxLevel;
 
@@ -584,8 +592,8 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	}
 
 	
-	ZESSize Width = LevelData[LevelCount - 1].ElevationWidth >> LevelCount;
-	ZESSize Height = LevelData[LevelCount - 1].ElevationWidth >> LevelCount;
+	ZESSize Width = DataLevels[LevelCount - 1].ElevationWidth >> LevelCount;
+	ZESSize Height = DataLevels[LevelCount - 1].ElevationWidth >> LevelCount;
 
 	ZEInt CurrLevelPositionX = Align(PositionX, 1 << (LevelCount - 1));
 	ZEInt CurrLevelPositionY = Align(PositionY, 1 << (LevelCount - 1));

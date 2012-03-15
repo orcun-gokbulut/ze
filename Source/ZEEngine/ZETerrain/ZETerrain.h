@@ -48,18 +48,21 @@ class ZETerrainMaterial;
 class ZERenderer;
 class ZEVertexDeclaration;
 
-struct ZETerrainLevelData
+struct ZETerrainDataLevel
 {
 	ZESize		ElevationWidth;
 	ZESize		ElevationHeight;
 	float*		ElevationData;
+	ZESize		ColorWidth;
+	ZESize		ColorHeight;
 	ZEUInt32*	ColorData;
 };
 
 struct ZETerrainLevel
 {
 	ZETerrainMaterial*	Material;
-	ZETexture2D*		HeightTexture;
+	ZETexture2D*		ElevationTexture;
+	ZETexture2D*		ColorTexture;
 	float				MinHeight;
 	float				MaxHeight;
 };
@@ -74,8 +77,11 @@ class ZETerrain : public ZEEntity
 		ZEVertexDeclaration*					VertexDeclaration;
 		ZETerrainPrimitiveIndices				Indices;
 		
-		ZEArray<ZETerrainLevelData>				LevelData;
+		ZEArray<ZETerrainDataLevel>				DataLevels;
 		ZEArray<ZETerrainLevel>					Levels;
+
+		const ZETexture2D*						ColorTexture;
+		const ZETexture2D*						DetailNormalTexture;
 
 		float									UnitLength;
 		ZEInt									ChunkSize;
