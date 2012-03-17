@@ -44,6 +44,11 @@ set(ZEBUILD_VERSION_MINOR 5)
 set(ZEBUILD_VERSION_INTERNAL 0)
 set(ZEBUILD_VERSION_BUILD 5)
 
+message(STATUS "[ZEBuild] Major Version    : " ${ZEBUILD_VERSION_MAJOR})
+message(STATUS "[ZEBuild] Minor Version    : " ${ZEBUILD_VERSION_MINOR})
+message(STATUS "[ZEBuild] Internal Version : " ${ZEBUILD_VERSION_INTERNAL})
+message(STATUS "[ZEBuild] Build            : " ${ZEBUILD_VERSION_BUILD})
+message(STATUS "")
 ## Configuration
 #########################################################################################
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake ${CMAKE_MODULE_PATH})
@@ -99,17 +104,25 @@ else()
 	set(ZEBUILD_PLATFORM_COMPILER "UNKNOWN")
 endif()
 
-set(ZEBUILD_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
+set(ZEBUILD_PLATFORM_ARCHITECTURE ${CMAKE_SYSTEM_PROCESSOR})
 
-message(STATUS "[ZEBuild] Major Version    : " ${ZEBUILD_VERSION_MAJOR})
-message(STATUS "[ZEBuild] Minor Version    : " ${ZEBUILD_VERSION_MINOR})
-message(STATUS "[ZEBuild] Internal Version : " ${ZEBUILD_VERSION_INTERNAL})
-message(STATUS "[ZEBuild] Build            : " ${ZEBUILD_VERSION_BUILD})
+include(TestBigEndian)
+TEST_BIG_ENDIAN(IS_BIG_ENDIAN)
+if (IS_BIG_ENDIAN)
+	set(ZEBUILD_PLATFORM_ENDIANNESS "Big")
+else()
+	set(ZEBUILD_PLATFORM_ENDIANNESS "Little")
+endif()
+
+message(STATUS "[ZEBuild] Platform detected.")
+message(STATUS "")
+
 message(STATUS "[ZEBuild] Platform Class   : " ${ZEBUILD_PLATFORM_CLASS})
 message(STATUS "[ZEBuild] Platform         : " ${ZEBUILD_PLATFORM})
-message(STATUS "[ZEBuild] Architecture     : " ${ZEBUILD_ARCHITECTURE})
-message(STATUS "[ZEBuild] C++ Compiler     : " ${ZEBUILD_COMPILER})
-message(STATUS "[ZEBuild] Platform detected.")
+message(STATUS "[ZEBuild] Architecture     : " ${ZEBUILD_PLATFORM_ARCHITECTURE})
+message(STATUS "[ZEBuild] C++ Compiler     : " ${ZEBUILD_PLATFORM_COMPILER})
+message(STATUS "[ZEBuild] Endianness       : " ${ZEBUILD_PLATFORM_ENDIANNESS})
+message(STATUS "")
 
 if (ZEBUILD_PLATFORM_COMPILER MATCHES "UNKNOWN")
 message(ERROR "Unknown compiler detected. You can only compile Zinek Engine with Microsoft Visual C++ Compiler, Intel C++ Compiler, GCC and CLANG. Other compiler are not supported.")
@@ -120,12 +133,14 @@ endif()
 string(TOUPPER ${ZEBUILD_PLATFORM} ZEBUILD_PLATFORM_UPPER_CASE)
 string(TOUPPER ${ZEBUILD_PLATFORM_CLASS} ZEBUILD_PLATFORM_CLASS_UPPER_CASE)
 string(TOUPPER ${ZEBUILD_PLATFORM_COMPILER} ZEBUILD_PLATFORM_COMPILER_UPPER_CASE)
+string(TOUPPER ${ZEBUILD_PLATFORM_ENDIANNESS} ZEBUILD_PLATFORM_ENDIANNESS_UPPER_CASE)
 
 append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS 
 	ZE_ZINEK
 	"ZE_PLATFORM_${ZEBUILD_PLATFORM_UPPER_CASE}"
 	"ZE_PLATFORM_CLASS_${ZEBUILD_PLATFORM_CLASS_UPPER_CASE}"
 	"ZE_PLATFORM_COMPILER_${ZEBUILD_PLATFORM_COMPILER_UPPER_CASE}"
+	"ZE_PLATFORM_ENDIANNESS_${ZEBUILD_PLATFORM_ENDIANNESS_UPPER_CASE}"
 
 	ZE_PLATFORM="${ZEBUILD_PLATFORM}"
 	ZE_PLATFORM_CLASS="${ZEBUILD_PLATFORM_CLASS}"
