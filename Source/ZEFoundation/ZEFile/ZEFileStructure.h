@@ -44,24 +44,4 @@
 	#define ZEPackStruct(Declaration) Declaration __attribute__((__packed__))
 #endif
 
-class ZEEndian
-{
-	public:
-		static ZEUInt16 ToLittle(ZEUInt16 Value);
-		static ZEUInt32 ToLittle(ZEUInt32 Value);
-		static ZEUInt64 ToLittle(ZEUInt64 Value);
-
-		static ZEInt16 ToLittle(ZEInt16 Value);
-		static ZEInt32 ToLittle(ZEInt32 Value);
-		static ZEInt64 ToLittle(ZEInt64 Value);
-
-		static ZEUInt16 ToBig(ZEUInt16 Value);
-		static ZEUInt32 ToBig(ZEUInt32 Value);
-		static ZEUInt64 ToBig(ZEUInt64 Value);
-
-		static ZEInt16 ToBig(ZEInt16 Value);
-		static ZEInt32 ToBig(ZEInt32 Value);
-		static ZEInt64 ToBig(ZEInt64 Value);
-};
-
 #endif
